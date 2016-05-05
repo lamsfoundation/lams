@@ -8,10 +8,10 @@ import org.apache.commons.lang.builder.HashCodeBuilder;
 /**
  * Subscription for an event notification. This class binds an user to an event and stores some information on the
  * notification attempts.
- * 
+ *
  * @hibernate.class table="lams_event_subscriptions"
  * @author Marcin Cieslak
- * 
+ *
  */
 class Subscription {
     // ------ persistent fields -------
@@ -62,7 +62,7 @@ class Subscription {
 
     /**
      * Standard consctructor used by Events.
-     * 
+     *
      * @param userId
      * @param deliveryMethod
      * @param periodicity
@@ -91,7 +91,8 @@ class Subscription {
 
     protected AbstractDeliveryMethod getDeliveryMethod() {
 	if (deliveryMethod == null) {
-	    for (AbstractDeliveryMethod delivery : EventNotificationService.getInstance().getAvailableDeliveryMethods()) {
+	    for (AbstractDeliveryMethod delivery : EventNotificationService.getInstance()
+		    .getAvailableDeliveryMethods()) {
 		if (delivery.getId() == deliveryMethodId) {
 		    deliveryMethod = delivery;
 		}
@@ -148,7 +149,7 @@ class Subscription {
 
     /**
      * States if a message should be send to the user or rather this subscription should be skipped.
-     * 
+     *
      * @return if the message should be send
      */
     protected boolean isEligibleForNotification() {
@@ -158,7 +159,7 @@ class Subscription {
 
     /**
      * Sends the message to the user. Properties storing information of the last notification attempt are updated.
-     * 
+     *
      * @param subject
      *            subject of the message; <code>null</code> if not applicable
      * @param message

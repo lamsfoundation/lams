@@ -2,21 +2,21 @@
  * Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
  * =============================================================
  * License Information: http://lamsfoundation.org/licensing/lams/2.0/
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License version 2.0
  * as published by the Free Software Foundation.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301
  * USA
- * 
+ *
  * http://www.gnu.org/licenses/gpl.txt
  * ***********************************************************************/
 
@@ -65,9 +65,9 @@ public class VoteAction extends LamsDispatchAction implements VoteAppConstants {
     private static Logger logger = Logger.getLogger(VoteAction.class.getName());
 
     /**
-     * 
+     *
      * main content/question content management and workflow logic
-     * 
+     *
      * if the passed toolContentID exists in the db, we need to get the relevant data into the Map if not, create the
      * default Map
      */
@@ -78,7 +78,7 @@ public class VoteAction extends LamsDispatchAction implements VoteAppConstants {
 	VoteAuthoringForm voteAuthoringForm = (VoteAuthoringForm) form;
 	VoteGeneralAuthoringDTO voteGeneralAuthoringDTO = new VoteGeneralAuthoringDTO();
 	repopulateRequestParameters(request, voteAuthoringForm, voteGeneralAuthoringDTO);
-	
+
 	String richTextTitle = request.getParameter(TITLE);
 	String richTextInstructions = request.getParameter(INSTRUCTIONS);
 
@@ -89,14 +89,14 @@ public class VoteAction extends LamsDispatchAction implements VoteAppConstants {
 	if (richTextInstructions != null) {
 	    voteGeneralAuthoringDTO.setActivityInstructions(richTextInstructions);
 	}
-	
+
 	voteAuthoringForm.resetUserAction();
 	return null;
     }
 
     /**
      * repopulateRequestParameters reads and saves request parameters
-     * 
+     *
      * @param request
      * @param voteAuthoringForm
      * @param voteGeneralAuthoringDTO
@@ -115,7 +115,7 @@ public class VoteAction extends LamsDispatchAction implements VoteAppConstants {
 	String lockOnFinish = request.getParameter(VoteAppConstants.LOCK_ON_FINISH);
 	voteAuthoringForm.setLockOnFinish(lockOnFinish);
 	voteGeneralAuthoringDTO.setLockOnFinish(lockOnFinish);
-	
+
 	String useSelectLeaderToolOuput = request.getParameter(VoteAppConstants.USE_SELECT_LEADER_TOOL_OUTPUT);
 	voteAuthoringForm.setUseSelectLeaderToolOuput(useSelectLeaderToolOuput);
 	voteGeneralAuthoringDTO.setUseSelectLeaderToolOuput(useSelectLeaderToolOuput);
@@ -132,9 +132,9 @@ public class VoteAction extends LamsDispatchAction implements VoteAppConstants {
 	voteAuthoringForm.setMaxNominationCount(maxNominationCount);
 	voteGeneralAuthoringDTO.setMaxNominationCount(maxNominationCount);
 
-        String minNominationCount=request.getParameter(MIN_NOMINATION_COUNT);
-        voteAuthoringForm.setMinNominationCount(minNominationCount);
-        voteGeneralAuthoringDTO.setMinNominationCount(minNominationCount);
+	String minNominationCount = request.getParameter(MIN_NOMINATION_COUNT);
+	voteAuthoringForm.setMinNominationCount(minNominationCount);
+	voteGeneralAuthoringDTO.setMinNominationCount(minNominationCount);
 
 	String reflect = request.getParameter("reflect");
 	voteAuthoringForm.setReflect(reflect);
@@ -149,7 +149,7 @@ public class VoteAction extends LamsDispatchAction implements VoteAppConstants {
 	    maxInputs = "0";
 	}
 	voteAuthoringForm.setMaxInputs(new Short(maxInputs));
-	
+
 	ToolAccessMode mode = getAccessMode(request);
 	request.setAttribute(AttributeNames.ATTR_MODE, mode.toString());
     }
@@ -162,14 +162,15 @@ public class VoteAction extends LamsDispatchAction implements VoteAppConstants {
 	VoteAuthoringForm voteAuthoringForm = (VoteAuthoringForm) form;
 
 	String httpSessionID = voteAuthoringForm.getHttpSessionID();
-	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession().getAttribute(httpSessionID);
+	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
+		.getAttribute(httpSessionID);
 
 	String questionIndex = request.getParameter("questionIndex");
 
 	List<VoteQuestionDTO> questionDTOs = (List<VoteQuestionDTO>) sessionMap.get(VoteAppConstants.LIST_QUESTION_DTO);
 
 	questionDTOs = AuthoringUtil.swapQuestions(questionDTOs, questionIndex, "down");
-	
+
 	questionDTOs = AuthoringUtil.reorderQuestionDTOs(questionDTOs);
 	sessionMap.put(VoteAppConstants.LIST_QUESTION_DTO, questionDTOs);
 
@@ -218,7 +219,8 @@ public class VoteAction extends LamsDispatchAction implements VoteAppConstants {
 	VoteAuthoringForm voteAuthoringForm = (VoteAuthoringForm) form;
 
 	String httpSessionID = voteAuthoringForm.getHttpSessionID();
-	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession().getAttribute(httpSessionID);
+	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
+		.getAttribute(httpSessionID);
 
 	String questionIndex = request.getParameter("questionIndex");
 
@@ -274,7 +276,8 @@ public class VoteAction extends LamsDispatchAction implements VoteAppConstants {
 	VoteAuthoringForm voteAuthoringForm = (VoteAuthoringForm) form;
 
 	String httpSessionID = voteAuthoringForm.getHttpSessionID();
-	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession().getAttribute(httpSessionID);
+	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
+		.getAttribute(httpSessionID);
 
 	String questionIndexToDelete = request.getParameter("questionIndex");
 	List<VoteQuestionDTO> questionDTOs = (List<VoteQuestionDTO>) sessionMap.get(VoteAppConstants.LIST_QUESTION_DTO);
@@ -287,13 +290,15 @@ public class VoteAction extends LamsDispatchAction implements VoteAppConstants {
 	    String displayOrder = questionDTO.getDisplayOrder();
 
 	    if (questionText != null && !questionText.equals("") && (!displayOrder.equals(questionIndexToDelete))) {
-		
+
 		++queIndex;
 		questionDTO.setDisplayOrder(new Integer(queIndex).toString());
 		listFinalQuestionDTO.add(questionDTO);
 	    }
 	    if ((questionText != null) && (!questionText.isEmpty()) && displayOrder.equals(questionIndexToDelete)) {
-		List<VoteQuestionDTO> deletedQuestionDTOs = (List<VoteQuestionDTO>) sessionMap.get(LIST_DELETED_QUESTION_DTOS);;
+		List<VoteQuestionDTO> deletedQuestionDTOs = (List<VoteQuestionDTO>) sessionMap
+			.get(LIST_DELETED_QUESTION_DTOS);
+		;
 		deletedQuestionDTOs.add(questionDTO);
 		sessionMap.put(LIST_DELETED_QUESTION_DTOS, deletedQuestionDTOs);
 	    }
@@ -345,7 +350,8 @@ public class VoteAction extends LamsDispatchAction implements VoteAppConstants {
 
 	String httpSessionID = voteAuthoringForm.getHttpSessionID();
 
-	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession().getAttribute(httpSessionID);
+	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
+		.getAttribute(httpSessionID);
 
 	String questionIndex = request.getParameter("questionIndex");
 
@@ -399,7 +405,8 @@ public class VoteAction extends LamsDispatchAction implements VoteAppConstants {
 
 	String httpSessionID = voteAuthoringForm.getHttpSessionID();
 
-	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession().getAttribute(httpSessionID);
+	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
+		.getAttribute(httpSessionID);
 
 	String contentFolderID = WebUtil.readStrParam(request, AttributeNames.PARAM_CONTENT_FOLDER_ID);
 	voteAuthoringForm.setContentFolderID(contentFolderID);
@@ -433,7 +440,8 @@ public class VoteAction extends LamsDispatchAction implements VoteAppConstants {
 
 	String httpSessionID = voteAuthoringForm.getHttpSessionID();
 
-	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession().getAttribute(httpSessionID);
+	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
+		.getAttribute(httpSessionID);
 	String contentFolderID = WebUtil.readStrParam(request, AttributeNames.PARAM_CONTENT_FOLDER_ID);
 	voteAuthoringForm.setContentFolderID(contentFolderID);
 
@@ -461,7 +469,7 @@ public class VoteAction extends LamsDispatchAction implements VoteAppConstants {
 		questionDTOs.add(voteQuestionDTO);
 	    }
 	}
-	
+
 	request.setAttribute(VoteAppConstants.LIST_QUESTION_DTO, questionDTOs);
 	sessionMap.put(VoteAppConstants.LIST_QUESTION_DTO, questionDTOs);
 
@@ -498,7 +506,8 @@ public class VoteAction extends LamsDispatchAction implements VoteAppConstants {
 
 	String httpSessionID = voteAuthoringForm.getHttpSessionID();
 
-	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession().getAttribute(httpSessionID);
+	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
+		.getAttribute(httpSessionID);
 
 	String contentFolderID = WebUtil.readStrParam(request, AttributeNames.PARAM_CONTENT_FOLDER_ID);
 	voteAuthoringForm.setContentFolderID(contentFolderID);
@@ -543,8 +552,8 @@ public class VoteAction extends LamsDispatchAction implements VoteAppConstants {
 		    voteQuestionDTO.setQuestion(newNomination);
 		    voteQuestionDTO.setDisplayOrder(editableNominationIndex);
 
-		    questionDTOs = AuthoringUtil.reorderUpdateListQuestionDTO(
-			    questionDTOs, voteQuestionDTO, editableNominationIndex);
+		    questionDTOs = AuthoringUtil.reorderUpdateListQuestionDTO(questionDTOs, voteQuestionDTO,
+			    editableNominationIndex);
 		} else {
 		    //duplicate question entry, not adding
 		}
@@ -569,8 +578,8 @@ public class VoteAction extends LamsDispatchAction implements VoteAppConstants {
 		voteQuestionDTO.setNomination(newNomination);
 		voteQuestionDTO.setDisplayOrder(editableNominationIndex);
 
-		questionDTOs = AuthoringUtil.reorderUpdateListQuestionDTO(
-			questionDTOs, voteQuestionDTO, editableNominationIndex);
+		questionDTOs = AuthoringUtil.reorderUpdateListQuestionDTO(questionDTOs, voteQuestionDTO,
+			editableNominationIndex);
 	    }
 	} else {
 	    //entry blank, not adding
@@ -614,7 +623,8 @@ public class VoteAction extends LamsDispatchAction implements VoteAppConstants {
 
 	String httpSessionID = voteAuthoringForm.getHttpSessionID();
 
-	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession().getAttribute(httpSessionID);
+	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
+		.getAttribute(httpSessionID);
 
 	String contentFolderID = WebUtil.readStrParam(request, AttributeNames.PARAM_CONTENT_FOLDER_ID);
 	voteAuthoringForm.setContentFolderID(contentFolderID);
@@ -624,9 +634,8 @@ public class VoteAction extends LamsDispatchAction implements VoteAppConstants {
 	List<VoteQuestionDTO> questionDTOs = (List<VoteQuestionDTO>) sessionMap.get(VoteAppConstants.LIST_QUESTION_DTO);
 
 	ActionMessages errors = new ActionMessages();
-	if (questionDTOs.isEmpty()
-		&& (voteAuthoringForm.getAssignedDataFlowObject() == null || voteAuthoringForm
-			.getAssignedDataFlowObject() == 0)) {
+	if (questionDTOs.isEmpty() && (voteAuthoringForm.getAssignedDataFlowObject() == null
+		|| voteAuthoringForm.getAssignedDataFlowObject() == 0)) {
 	    ActionMessage error = new ActionMessage("nominations.none.submitted");
 	    errors.add(ActionMessages.GLOBAL_MESSAGE, error);
 	}
@@ -695,7 +704,8 @@ public class VoteAction extends LamsDispatchAction implements VoteAppConstants {
 	}
 	voteGeneralAuthoringDTO.setDataFlowObjectNames(dataFlowObjectNames);
 
-	if (voteAuthoringForm.getAssignedDataFlowObject() != null && voteAuthoringForm.getAssignedDataFlowObject() != 0) {
+	if (voteAuthoringForm.getAssignedDataFlowObject() != null
+		&& voteAuthoringForm.getAssignedDataFlowObject() != 0) {
 	    assignedDataFlowObject = dataFlowObjects.get(voteAuthoringForm.getAssignedDataFlowObject() - 1);
 	}
 
@@ -724,18 +734,19 @@ public class VoteAction extends LamsDispatchAction implements VoteAppConstants {
 	    ToolAccessMode mode = getAccessMode(request);
 	    request.setAttribute(AttributeNames.ATTR_MODE, mode.toString());
 
-	    List<VoteQuestionDTO> deletedQuestionDTOs = (List<VoteQuestionDTO>) sessionMap.get(LIST_DELETED_QUESTION_DTOS);
+	    List<VoteQuestionDTO> deletedQuestionDTOs = (List<VoteQuestionDTO>) sessionMap
+		    .get(LIST_DELETED_QUESTION_DTOS);
 
 	    // in case request is from monitoring module - recalculate User Answers
 	    if (mode.isTeacher()) {
 		Set<VoteQueContent> oldQuestions = voteContentTest.getVoteQueContents();
 		voteService.removeQuestionsFromCache(voteContentTest);
 		VoteUtils.setDefineLater(request, false, strToolContentID, voteService);
-		    
+
 		// recalculate User Answers
 		voteService.recalculateUserAnswers(voteContentTest, oldQuestions, questionDTOs, deletedQuestionDTOs);
 	    }
-	    
+
 	    // remove deleted questions
 	    for (VoteQuestionDTO deletedQuestionDTO : deletedQuestionDTOs) {
 		VoteQueContent removeableQuestion = voteService.getVoteQueContentByUID(deletedQuestionDTO.getUid());
@@ -794,10 +805,10 @@ public class VoteAction extends LamsDispatchAction implements VoteAppConstants {
 
 	return mapping.findForward(VoteAppConstants.LOAD_QUESTIONS);
     }
-    
+
     /**
      * Get ToolAccessMode from HttpRequest parameters. Default value is AUTHOR mode.
-     * 
+     *
      * @param request
      * @return
      */

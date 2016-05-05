@@ -2,21 +2,21 @@
  * Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
  * =============================================================
  * License Information: http://lamsfoundation.org/licensing/lams/2.0/
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License version 2.0 
+ * it under the terms of the GNU General Public License version 2.0
  * as published by the Free Software Foundation.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301
  * USA
- * 
+ *
  * http://www.gnu.org/licenses/gpl.txt
  * ****************************************************************
  */
@@ -46,9 +46,9 @@ import org.lamsfoundation.lams.util.Configuration;
 import org.lamsfoundation.lams.util.ConfigurationKeys;
 
 /**
- * 
+ *
  * @author Steve.Ni
- * 
+ *
  * @version $Revision$
  */
 public class SessionManager {
@@ -71,7 +71,7 @@ public class SessionManager {
 
     /**
      * Get the singleton instance of this class.
-     * 
+     *
      * @return
      */
     private static SessionManager getInstance() {
@@ -84,7 +84,7 @@ public class SessionManager {
 
     /**
      * Get system level HttpSession by current session id.
-     * 
+     *
      * @return HttpSession instanceof org.lamsfoundation.lams.systemsession.SessionManager#SessionImpl
      */
     public static HttpSession getSession() {
@@ -94,7 +94,7 @@ public class SessionManager {
 
     /**
      * Get system session by given session id.
-     * 
+     *
      * @param sessionId
      * @return system session. Return an null if the given sessionid can not map to an existed session.
      */
@@ -106,14 +106,14 @@ public class SessionManager {
 	return SessionManager.getInstance().sessionContainer.get(sessionId);
 
     }
-    
+
     /**
      * Returns number of sessions stored in the container.
      */
-    public static int getSessionCount(){
-	return getInstance().sessionContainer.size();
+    public static int getSessionCount() {
+	return SessionManager.getInstance().sessionContainer.size();
     }
-    
+
     static void createSession(String sessionId) {
 	// initialize a new one
 	HttpSession session = SessionManager.getInstance().new SessionImpl(sessionId);
@@ -123,7 +123,7 @@ public class SessionManager {
     /**
      * Return <code>SessionVisitor</code> of <code>currentSessionId</code>. <strong>An internal method, only available
      * in package.</strong>
-     * 
+     *
      * @return
      */
     static SessionVisitor getSessionVisitor() {
@@ -132,7 +132,7 @@ public class SessionManager {
 
     /**
      * <strong>An internal method, only available in package.</strong>
-     * 
+     *
      * @param currentSessionId
      */
     static void setCurrentSessionId(String currentSessionId) {
@@ -176,7 +176,7 @@ public class SessionManager {
     /**
      * Start a session for current ServletRequest and SerlvetResponse. If session does not exist, then create a new
      * session. If it exists, just using current session.
-     * 
+     *
      * @param req
      * @param res
      */
@@ -202,8 +202,8 @@ public class SessionManager {
 	    SessionManager.createSession(currentSessionId);
 	    ssoCookie = SessionManager.createCookie((HttpServletResponse) res, SystemSessionFilter.SSO_SESSION_COOKIE,
 		    currentSessionId);
-	    SessionManager.log.debug("==>Creating new " + SystemSessionFilter.SSO_SESSION_COOKIE + " - "
-		    + ssoCookie.getValue());
+	    SessionManager.log
+		    .debug("==>Creating new " + SystemSessionFilter.SSO_SESSION_COOKIE + " - " + ssoCookie.getValue());
 	}
 
 	Cookie cookie = SessionManager.findCookie((HttpServletRequest) req, SystemSessionFilter.SYS_SESSION_COOKIE);
@@ -232,7 +232,7 @@ public class SessionManager {
 
     /**
      * Find a cookie by given cookie name from request.
-     * 
+     *
      * @param req
      * @param name
      *            The cookie name
@@ -253,7 +253,7 @@ public class SessionManager {
 
     /**
      * Remove cookie by given name from request
-     * 
+     *
      * @param res
      * @param name
      * @return the removed cookies
@@ -269,7 +269,7 @@ public class SessionManager {
 
     /**
      * Create a new cookie for request.
-     * 
+     *
      * @param res
      * @param name
      *            cookie name

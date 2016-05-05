@@ -2,21 +2,21 @@
  * Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
  * =============================================================
  * License Information: http://lamsfoundation.org/licensing/lams/2.0/
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License version 2.0 
+ * it under the terms of the GNU General Public License version 2.0
  * as published by the Free Software Foundation.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301
  * USA
- * 
+ *
  * http://www.gnu.org/licenses/gpl.txt
  * ****************************************************************
  */
@@ -25,8 +25,8 @@ package org.lamsfoundation.lams.tool;
 
 import java.io.Serializable;
 import java.util.Date;
-import java.util.Set;
 import java.util.HashSet;
+import java.util.Set;
 
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
@@ -95,7 +95,7 @@ public class Tool implements Serializable {
 
     /** persistent field */
     private Set activities;
-    
+
     /** persistent field */
     private Set<ExtServerToolAdapterMap> mappedServers;
 
@@ -107,10 +107,9 @@ public class Tool implements Serializable {
 
     /** persistent field */
     private String toolVersion;
-    
+
     /** persistent field */
     private Long learningLibraryId;
-
 
     /**
      * Name of the file (including the package) that contains the text strings for this activity. e.g.
@@ -137,9 +136,9 @@ public class Tool implements Serializable {
     public Tool(Long toolId, String learnerUrl, String learnerPreviewUrl, String learnerProgressUrl, String authorUrl,
 	    String monitorUrl, String contributeUrl, String moderationUrl, String exportPortfolioLearnerUrl,
 	    String exportPortfolioClassUrl, boolean supportsGrouping, long defaultToolContentId, String toolSignature,
-	    String toolDisplayName, String description, String className, Set activities,
-	    Integer groupingSupportTypeId, Date createDateTime, String toolIdentifier, String toolVersion,
-	    String languageFile, boolean supportsOutputs, String extLmsId) {
+	    String toolDisplayName, String description, String className, Set activities, Integer groupingSupportTypeId,
+	    Date createDateTime, String toolIdentifier, String toolVersion, String languageFile,
+	    boolean supportsOutputs, String extLmsId) {
 	this.toolId = toolId;
 	this.learnerUrl = learnerUrl;
 	this.learnerPreviewUrl = learnerPreviewUrl;
@@ -303,7 +302,7 @@ public class Tool implements Serializable {
 
     /**
      * @param valid
-     *                The valid to set.
+     *            The valid to set.
      */
     public void setValid(boolean valid) {
 	this.valid = valid;
@@ -318,7 +317,7 @@ public class Tool implements Serializable {
 
     /**
      * @param groupingSupportTypeId
-     *                The groupingSupportTypeId to set.
+     *            The groupingSupportTypeId to set.
      */
     public void setGroupingSupportTypeId(Integer groupingSupportTypeId) {
 	this.groupingSupportTypeId = groupingSupportTypeId;
@@ -333,7 +332,7 @@ public class Tool implements Serializable {
 
     /**
      * @param createDateTime
-     *                The createDateTime to set.
+     *            The createDateTime to set.
      */
     public void setCreateDateTime(Date createDateTime) {
 	this.createDateTime = createDateTime;
@@ -348,7 +347,7 @@ public class Tool implements Serializable {
 
     /**
      * @param monitorUrl
-     *                The monitorUrl to set.
+     *            The monitorUrl to set.
      */
     public void setMonitorUrl(String monitorUrl) {
 	this.monitorUrl = monitorUrl;
@@ -363,7 +362,7 @@ public class Tool implements Serializable {
 
     /**
      * @param helpUrl
-     *                The helpUrl to set.
+     *            The helpUrl to set.
      */
     public void setHelpUrl(String helpUrl) {
 	this.helpUrl = helpUrl;
@@ -378,7 +377,7 @@ public class Tool implements Serializable {
 
     /**
      * @param helpUrl
-     *                The helpUrl to set.
+     *            The helpUrl to set.
      */
     public void setAdminUrl(String adminUrl) {
 	this.adminUrl = adminUrl;
@@ -399,13 +398,13 @@ public class Tool implements Serializable {
     public void setToolVersion(String toolVersion) {
 	this.toolVersion = toolVersion;
     }
-    
+
     public Long getLearningLibraryId() {
-        return learningLibraryId;
+	return learningLibraryId;
     }
 
     public void setLearningLibraryId(Long learningLibraryId) {
-        this.learningLibraryId = learningLibraryId;
+	this.learningLibraryId = learningLibraryId;
     }
 
     public String getLanguageFile() {
@@ -425,7 +424,7 @@ public class Tool implements Serializable {
 
     /**
      * @param supportsOutputs
-     *                The supportsOutputs to set.
+     *            The supportsOutputs to set.
      */
     public void setSupportsOutputs(boolean supportsOutputs) {
 	this.supportsOutputs = supportsOutputs;
@@ -482,10 +481,10 @@ public class Tool implements Serializable {
     }
 
     public Set<ExtServerToolAdapterMap> getMappedServers() {
-        return mappedServers;
+	return mappedServers;
     }
 
     public void setMappedServers(Set<ExtServerToolAdapterMap> mappedServers) {
-        this.mappedServers = mappedServers;
+	this.mappedServers = mappedServers;
     }
 }

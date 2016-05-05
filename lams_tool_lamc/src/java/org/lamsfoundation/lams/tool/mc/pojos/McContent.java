@@ -2,21 +2,21 @@
  * Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
  * =============================================================
  * License Information: http://lamsfoundation.org/licensing/lams/2.0/
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301
  * USA
- * 
+ *
  * http://www.gnu.org/licenses/gpl.txt
  * ***********************************************************************/
 /* $$Id$$ */
@@ -36,7 +36,7 @@ import org.apache.commons.lang.builder.ToStringBuilder;
  * Persistent object/bean that defines the content for the MCQ tool. Provides accessors and mutators to get/set
  * attributes It maps to database table: tl_lamc11_content
  * </p>
- * 
+ *
  * @author Ozgur Demirtas
  */
 public class McContent implements Serializable {
@@ -83,11 +83,11 @@ public class McContent implements Serializable {
     private boolean displayAnswers;
 
     private boolean showMarks;
-    
+
     private boolean useSelectLeaderToolOuput;
-    
+
     private boolean prefixAnswersWithLetters;
-    
+
     /** nullable persistent field */
     private Date submissionDeadline;
 
@@ -108,7 +108,7 @@ public class McContent implements Serializable {
 	    boolean showReport, boolean randomize, boolean displayAnswers, boolean showMarks,
 	    boolean useSelectLeaderToolOuput, boolean prefixAnswersWithLetters, boolean retries, boolean reflect,
 	    String reflectionSubject, Set mcQueContents, Set mcSessions) {
-	
+
 	this.mcContentId = mcContentId;
 	this.content = content;
 	this.title = title;
@@ -145,10 +145,10 @@ public class McContent implements Serializable {
 
     /**
      * gets called as part of the copyToolContent
-     * 
+     *
      * Copy Construtor to create a new mc content instance. Note that we don't copy the mc session data here because the
      * mc session will be created after we copied tool content.
-     * 
+     *
      * @param mc
      *            the original mc content.
      * @param newContentId
@@ -168,7 +168,7 @@ public class McContent implements Serializable {
 
     /**
      * gets called as part of the copyToolContent
-     * 
+     *
      * @param newQaContent
      * @return Set
      */
@@ -258,8 +258,9 @@ public class McContent implements Serializable {
     }
 
     public Set getMcQueContents() {
-	if (this.mcQueContents == null)
+	if (this.mcQueContents == null) {
 	    setMcQueContents(new HashSet());
+	}
 	return this.mcQueContents;
     }
 
@@ -268,8 +269,9 @@ public class McContent implements Serializable {
     }
 
     public Set getMcSessions() {
-	if (this.mcSessions == null)
+	if (this.mcSessions == null) {
 	    setMcSessions(new HashSet());
+	}
 	return this.mcSessions;
     }
 
@@ -277,6 +279,7 @@ public class McContent implements Serializable {
 	this.mcSessions = mcSessions;
     }
 
+    @Override
     public String toString() {
 	return new ToStringBuilder(this).append("uid", getUid()).toString();
     }
@@ -382,34 +385,33 @@ public class McContent implements Serializable {
     public void setShowMarks(boolean showMarks) {
 	this.showMarks = showMarks;
     }
-    
-    
+
     /**
      * @return
      */
     public boolean isUseSelectLeaderToolOuput() {
-        return useSelectLeaderToolOuput;
+	return useSelectLeaderToolOuput;
     }
 
     /**
      * @param useSelectLeaderToolOuput
      */
     public void setUseSelectLeaderToolOuput(boolean useSelectLeaderToolOuput) {
-        this.useSelectLeaderToolOuput = useSelectLeaderToolOuput;
+	this.useSelectLeaderToolOuput = useSelectLeaderToolOuput;
     }
-    
+
     /**
      * @return
      */
     public boolean isPrefixAnswersWithLetters() {
-        return prefixAnswersWithLetters;
+	return prefixAnswersWithLetters;
     }
 
     /**
      * @param prefixAnswersWithLetters
      */
     public void setPrefixAnswersWithLetters(boolean prefixAnswersWithLetters) {
-        this.prefixAnswersWithLetters = prefixAnswersWithLetters;
+	this.prefixAnswersWithLetters = prefixAnswersWithLetters;
     }
 
     /**

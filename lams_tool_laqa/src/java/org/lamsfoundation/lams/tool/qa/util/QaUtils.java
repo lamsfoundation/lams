@@ -2,21 +2,21 @@
  * Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
  * =============================================================
  * License Information: http://lamsfoundation.org/licensing/lams/2.0/
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301
  * USA
- * 
+ *
  * http://www.gnu.org/licenses/gpl.txt
  * ****************************************************************
  */
@@ -28,16 +28,14 @@ import javax.servlet.http.HttpServletRequest;
 import org.apache.commons.lang.StringUtils;
 import org.lamsfoundation.lams.tool.ToolAccessMode;
 import org.lamsfoundation.lams.tool.qa.QaAppConstants;
-import org.lamsfoundation.lams.tool.qa.QaContent;
 import org.lamsfoundation.lams.tool.qa.dto.QaGeneralAuthoringDTO;
-import org.lamsfoundation.lams.tool.qa.service.IQaService;
 import org.lamsfoundation.lams.tool.qa.web.form.QaAuthoringForm;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 
 /**
  * Common utility functions live here.
- * 
+ *
  * @author Ozgur Demirtas
  */
 public abstract class QaUtils implements QaAppConstants {
@@ -72,14 +70,14 @@ public abstract class QaUtils implements QaAppConstants {
 	String lockWhenFinished = request.getParameter("lockWhenFinished");
 	qaAuthoringForm.setLockWhenFinished(lockWhenFinished);
 	qaGeneralAuthoringDTO.setLockWhenFinished(lockWhenFinished);
-	
-	int minimumRates = WebUtil.readIntParam(request, MINIMUM_RATES, true) == null ? 0 : WebUtil.readIntParam(
-		request, MINIMUM_RATES);
+
+	int minimumRates = WebUtil.readIntParam(request, MINIMUM_RATES, true) == null ? 0
+		: WebUtil.readIntParam(request, MINIMUM_RATES);
 	qaAuthoringForm.setMinimumRates(minimumRates);
 	qaGeneralAuthoringDTO.setMinimumRates(minimumRates);
-	
-	int maximumRates = WebUtil.readIntParam(request, MAXIMUM_RATES, true) == null ? 0 : WebUtil.readIntParam(
-		request, MAXIMUM_RATES);
+
+	int maximumRates = WebUtil.readIntParam(request, MAXIMUM_RATES, true) == null ? 0
+		: WebUtil.readIntParam(request, MAXIMUM_RATES);
 	qaAuthoringForm.setMaximumRates(maximumRates);
 	qaGeneralAuthoringDTO.setMaximumRates(maximumRates);
 
@@ -92,7 +90,7 @@ public abstract class QaUtils implements QaAppConstants {
 
 	qaAuthoringForm.setReflectionSubject(reflectionSubject);
 	qaGeneralAuthoringDTO.setReflectionSubject(reflectionSubject);
-	
+
 	ToolAccessMode mode;
 	String modeStr = request.getParameter(AttributeNames.ATTR_MODE);
 	if (StringUtils.equalsIgnoreCase(modeStr, ToolAccessMode.TEACHER.toString())) {
@@ -106,7 +104,7 @@ public abstract class QaUtils implements QaAppConstants {
     /**
      * the only attributes kept are TOOL_SESSION and TOOL_CONTENT_ID and ACTIVITY_TITLE ACTIVITY_INSTRUCTIONS
      * cleanUpSessionAbsolute(HttpServletRequest request)
-     * 
+     *
      * @param request
      */
     public static void cleanUpSessionAbsolute(HttpServletRequest request) {

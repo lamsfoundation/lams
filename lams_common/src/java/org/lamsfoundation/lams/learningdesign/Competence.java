@@ -1,9 +1,7 @@
 package org.lamsfoundation.lams.learningdesign;
 
-import org.lamsfoundation.lams.learningdesign.dto.CompetenceDTO;
-
 /**
- * 
+ *
  * @hibernate.class table="lams_competence"
  */
 public class Competence {
@@ -53,7 +51,7 @@ public class Competence {
     /**
      * @hibernate.many-to-one not-null="true"
      * @hibernate.column name="learning_design_id"
-     * 
+     *
      */
     public org.lamsfoundation.lams.learningdesign.LearningDesign getLearningDesign() {
 	return this.learningDesign;

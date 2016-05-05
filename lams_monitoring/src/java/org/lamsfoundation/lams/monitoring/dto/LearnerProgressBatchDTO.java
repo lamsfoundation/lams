@@ -44,8 +44,8 @@ public class LearnerProgressBatchDTO {
 	this.numAllLearnerProgress = numAllLearnerProgress;
 
 	// integer division truncates, so convert to floating point first.
-	double batchSizeAsDouble = (double) batchSize;
-	double numAllLearnerProgressAsDouble = (double) numAllLearnerProgress;
+	double batchSizeAsDouble = batchSize;
+	double numAllLearnerProgressAsDouble = numAllLearnerProgress;
 	double numBatchesDouble = numAllLearnerProgressAsDouble / batchSizeAsDouble;
 	numBatchesDouble = Math.ceil(numBatchesDouble);
 

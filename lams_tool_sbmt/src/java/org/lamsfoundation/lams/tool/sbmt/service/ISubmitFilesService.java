@@ -2,21 +2,21 @@
  * Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
  * =============================================================
  * License Information: http://lamsfoundation.org/licensing/lams/2.0/
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License version 2.0 
+ * it under the terms of the GNU General Public License version 2.0
  * as published by the Free Software Foundation.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301
  * USA
- * 
+ *
  * http://www.gnu.org/licenses/gpl.txt
  * ****************************************************************
  */
@@ -42,7 +42,6 @@ import org.lamsfoundation.lams.tool.sbmt.SubmitUser;
 import org.lamsfoundation.lams.tool.sbmt.dto.FileDetailsDTO;
 import org.lamsfoundation.lams.tool.sbmt.dto.StatisticDTO;
 import org.lamsfoundation.lams.tool.sbmt.exception.SubmitFilesException;
-import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 
 /**
@@ -54,17 +53,17 @@ public interface ISubmitFilesService {
      * Returns the <code>SubmitFilesContent</code> object corresponding to the given <code>contentID</code>. If
      * could not find out corresponding <code>SubmitFilesContent</code> by given <code>contentID</code>, return a
      * not-null but emtpy <code>SubmitFilesContent</code> instance.
-     * 
+     *
      * @param contentID
-     *                The <code>content_id</code> of the object to be looked up
+     *            The <code>content_id</code> of the object to be looked up
      * @return SubmitFilesContent The required populated object
      */
     public SubmitFilesContent getSubmitFilesContent(Long contentID);
 
     /**
-     * 
+     *
      * Returns the <code>SubmitFilesReport</code> object corresponding to the given <code>reportID</code>
-     * 
+     *
      * @param reportID
      * @return SubmitFilesReport The required populated object
      */
@@ -76,16 +75,16 @@ public interface ISubmitFilesService {
      * <li>It first uploads the file to the content repository</li>
      * <li>And then it updates the database</li>
      * </ol>
-     * 
+     *
      * @param fileDescription
-     *                The description of the file being uploaded.
+     *            The description of the file being uploaded.
      * @param userID
-     *                The <code>User</code> who has uploaded the file.
+     *            The <code>User</code> who has uploaded the file.
      * @param contentID
-     *                The content_id of the record to be updated in the database
+     *            The content_id of the record to be updated in the database
      * @param uploadedFile
-     *                The STRUTS org.apache.struts.upload.FormFile type
-     * 
+     *            The STRUTS org.apache.struts.upload.FormFile type
+     *
      * @throws SubmitFilesException
      */
     public void uploadFileToSession(Long sessionID, FormFile uploadFile, String fileDescription, Integer userID)
@@ -94,40 +93,43 @@ public interface ISubmitFilesService {
     /**
      * This method returns a list of files that were uploaded by the given
      * <code>User<code> for given <code>contentID</code>.
-     * 
-     * This method is used in the learning enviornment for displaying 
-     * the files being uploaded by the given user, as the user 
+     *
+     * This method is used in the learning enviornment for displaying
+     * the files being uploaded by the given user, as the user
      * uploads them one by one.
-     * 
-     * @param userID The <code>user_id</code> of the <code>User</code>
-     * @param sessionID The <code>session_id</code> to be looked up
+     *
+     * @param userID
+     *            The <code>user_id</code> of the <code>User</code>
+     * @param sessionID
+     *            The <code>session_id</code> to be looked up
      * @return List The list of required objects.
      */
     public List getFilesUploadedByUser(Integer userID, Long sessionID, Locale currentLocale);
 
     /**
      * This method returns a SortedMap of all files that were submitted users within a given <code>sessionID</code>.
-     * 
+     *
      * @param sessionID
-     *                The <code>session_id</code> to be looked up
+     *            The <code>session_id</code> to be looked up
      * @return SortedMap, the key is UserDTO, the value is a List of FileDetailsDTO objects
      */
     public SortedMap getFilesUploadedBySession(Long sessionID, Locale currentLocale);
 
     /**
      * Updates the marks for a file, and also allows a file to be uploaded
-     * 
+     *
      * @param reportID
      * @param marks
      * @param comments
      * @param marksFileInputStream
      * @param marksFileName
      */
-    public void updateMarks(Long reportID, Float marks, String comments, FormFile file) throws InvalidParameterException, RepositoryCheckedException;
-    
+    public void updateMarks(Long reportID, Float marks, String comments, FormFile file)
+	    throws InvalidParameterException, RepositoryCheckedException;
+
     /**
      * Removes the marks file from a report
-     * 
+     *
      * @param reportID
      * @param markFileUUID
      * @param markFileVersionID
@@ -138,7 +140,7 @@ public interface ISubmitFilesService {
 
     /**
      * Get SubmitFilesSession instance according to the given session id.
-     * 
+     *
      * @param sessionID
      * @return
      */
@@ -148,7 +150,7 @@ public interface ISubmitFilesService {
 
     /**
      * Release marks and comments information to learners, for a special session.
-     * 
+     *
      * @param sessionID
      * @return success return true, otherwise return false.
      */
@@ -158,7 +160,7 @@ public interface ISubmitFilesService {
 
     /**
      * When learner finish submission, it invokes this function and will remark the <code>finished</code> field.
-     * 
+     *
      * @param sessionID
      * @param userID
      */
@@ -167,23 +169,23 @@ public interface ISubmitFilesService {
     /**
      * Create the default content for the given contentID. These default data will copy from default record in Tool
      * Content database table.
-     * 
+     *
      * @return The SubmitFilesContent with default content and given contentID
      */
     public SubmitFilesContent createDefaultContent(Long contentID);
 
     /**
      * This method retrieves the default content id.
-     * 
+     *
      * @param toolSignature
-     *                The tool signature which is defined in lams_tool table.
+     *            The tool signature which is defined in lams_tool table.
      * @return the default content id
      */
     public Long getToolDefaultContentIdBySignature(String toolSignature);
 
     /**
      * This method retrieves a list of SubmitFileSession from the contentID.
-     * 
+     *
      * @param contentID
      * @return a list of SubmitFileSession
      */
@@ -192,15 +194,15 @@ public interface ISubmitFilesService {
 
     /**
      * Save or update tool content into database.
-     * 
+     *
      * @param persistContent
-     *                The <code>SubmitFilesContent</code> to be updated
+     *            The <code>SubmitFilesContent</code> to be updated
      */
     public void saveOrUpdateContent(SubmitFilesContent persistContent);
 
     /**
      * Create refection entry into notebook tool.
-     * 
+     *
      * @param sessionId
      * @param notebook_tool
      * @param tool_signature
@@ -212,7 +214,7 @@ public interface ISubmitFilesService {
 
     /**
      * Get reflection entry from notebook tool.
-     * 
+     *
      * @param sessionId
      * @param idType
      * @param signature
@@ -234,7 +236,7 @@ public interface ISubmitFilesService {
 
     /**
      * Get learner by given <code>toolSessionID</code> and <code>userID</code>.
-     * 
+     *
      * @param sessionID
      * @param userID
      * @return
@@ -245,7 +247,7 @@ public interface ISubmitFilesService {
 
     /**
      * Create new user
-     * 
+     *
      * @param userDto
      * @param sessionID
      * @return
@@ -256,14 +258,14 @@ public interface ISubmitFilesService {
 
     /**
      * Get information of all users who have submitted file.
-     * 
+     *
      * @return The user information list
      */
     public List<SubmitUser> getUsersBySession(Long sessionID);
 
     /**
      * get user by UID
-     * 
+     *
      * @param uid
      * @return
      */
@@ -271,43 +273,48 @@ public interface ISubmitFilesService {
 
     /**
      * Get a paged, optionally sorted and filtered, list of users.
-     * Will return List<[SubmitUser, Integer1, Integer2, String], [SubmitUser, Integer1, Integer2, String], ... , [SubmitUser, Integer1, Integer2, String]>
-     * where Integer1 is the number of files uploaded, Integer2 is the number of files marked 
+     * Will return List<[SubmitUser, Integer1, Integer2, String], [SubmitUser, Integer1, Integer2, String], ... ,
+     * [SubmitUser, Integer1, Integer2, String]>
+     * where Integer1 is the number of files uploaded, Integer2 is the number of files marked
      * and String is the notebook entry. No notebook entries needed? Will return null in their place.
+     * 
      * @return
      */
-    List<Object[]> getUsersForTablesorter(final Long sessionId, int page, int size, int sorting, String searchString, boolean getNotebookEntries);
+    List<Object[]> getUsersForTablesorter(final Long sessionId, int page, int size, int sorting, String searchString,
+	    boolean getNotebookEntries);
 
     /**
-     * Get the number of users that would be returned by getUsersForTablesorter() if it was not paged. Supports filtering.
+     * Get the number of users that would be returned by getUsersForTablesorter() if it was not paged. Supports
+     * filtering.
+     * 
      * @return
      */
     int getCountUsersBySession(Long sessionId, String searchString);
 
     /**
      * Get the basic statistics for all the sessions for one activity.
+     * 
      * @param contentId
      * @return
      */
     List<StatisticDTO> getStatisticsBySession(final Long contentId);
-    
-    
+
     public IEventNotificationService getEventNotificationService();
 
     /**
      * Gets a message from resource bundle. Same as <code><fmt:message></code> in JSP pages.
-     * 
+     *
      * @param key
-     *                key of the message
+     *            key of the message
      * @param args
-     *                arguments for the message
+     *            arguments for the message
      * @return message content
      */
     String getLocalisedMessage(String key, Object[] args);
-    
+
     /**
      * Returns whether activity is grouped and therefore it is expected more than one tool session.
-     * 
+     *
      * @param toolContentID
      * @return
      */

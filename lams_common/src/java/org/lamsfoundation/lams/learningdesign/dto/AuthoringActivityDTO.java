@@ -2,21 +2,21 @@
  * Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
  * =============================================================
  * License Information: http://lamsfoundation.org/licensing/lams/2.0/
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License version 2.0 
+ * it under the terms of the GNU General Public License version 2.0
  * as published by the Free Software Foundation.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301
  * USA
- * 
+ *
  * http://www.gnu.org/licenses/gpl.txt
  * ****************************************************************
  */
@@ -28,8 +28,8 @@ import java.util.Date;
 import java.util.Iterator;
 import java.util.Set;
 
-import org.lamsfoundation.lams.learningdesign.ActivityEvaluation;
 import org.lamsfoundation.lams.learningdesign.Activity;
+import org.lamsfoundation.lams.learningdesign.ActivityEvaluation;
 import org.lamsfoundation.lams.learningdesign.BranchActivityEntry;
 import org.lamsfoundation.lams.learningdesign.BranchingActivity;
 import org.lamsfoundation.lams.learningdesign.CompetenceMapping;
@@ -271,7 +271,8 @@ public class AuthoringActivityDTO extends BaseDTO {
     /*******************************************************************************************************************
      * Constructors
      ******************************************************************************************************************/
-    public AuthoringActivityDTO(Activity activity, ArrayList<BranchActivityEntryDTO> branchMappings, String languageCode) {
+    public AuthoringActivityDTO(Activity activity, ArrayList<BranchActivityEntryDTO> branchMappings,
+	    String languageCode) {
 	activityID = activity.getActivityId();
 	activityUIID = activity.getActivityUIID();
 	description = activity.getDescription();
@@ -289,8 +290,8 @@ public class AuthoringActivityDTO extends BaseDTO {
 	orderID = activity.getOrderId();
 	learningDesignID = activity.getLearningDesign() != null ? activity.getLearningDesign().getLearningDesignId()
 		: null;
-	learningLibraryID = activity.getLearningLibrary() != null ? activity.getLearningLibrary()
-		.getLearningLibraryId() : null;
+	learningLibraryID = activity.getLearningLibrary() != null ? activity.getLearningLibrary().getLearningLibraryId()
+		: null;
 	createDateTime = activity.getCreateDateTime();
 	languageFile = activity.getLanguageFile();
 	activityCategoryID = activity.getActivityCategoryID();
@@ -431,8 +432,8 @@ public class AuthoringActivityDTO extends BaseDTO {
 	    }
 	}
 
-	plannerMetadataDTO = toolActivity.getPlannerMetadata() == null ? null : new PlannerActivityMetadataDTO(
-		toolActivity.getPlannerMetadata());
+	plannerMetadataDTO = toolActivity.getPlannerMetadata() == null ? null
+		: new PlannerActivityMetadataDTO(toolActivity.getPlannerMetadata());
     }
 
     private void addGateActivityAttributes(Object activity, ArrayList<BranchActivityEntryDTO> branchMappings) {
@@ -1197,7 +1198,7 @@ public class AuthoringActivityDTO extends BaseDTO {
     }
 
     /**
-     * 
+     *
      * @param readOnly
      *            The readOnly to set.
      */

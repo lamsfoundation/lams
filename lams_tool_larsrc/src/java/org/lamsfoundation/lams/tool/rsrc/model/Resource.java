@@ -2,48 +2,43 @@
  * Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
  * =============================================================
  * License Information: http://lamsfoundation.org/licensing/lams/2.0/
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301
  * USA
- * 
+ *
  * http://www.gnu.org/licenses/gpl.txt
  * ****************************************************************
  */
 /* $Id$ */
 package org.lamsfoundation.lams.tool.rsrc.model;
 
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Set;
 
-import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.log4j.Logger;
-import org.lamsfoundation.lams.contentrepository.client.IToolContentHandler;
-import org.lamsfoundation.lams.tool.rsrc.util.ResourceToolContentHandler;
 
 /**
  * Resource
- * 
+ *
  * @author Dapeng Ni
- * 
+ *
  * @hibernate.class table="tl_larsrc11_resource"
- * 
+ *
  */
 public class Resource implements Cloneable {
 
@@ -97,7 +92,7 @@ public class Resource implements Cloneable {
 
     /**
      * Default contruction method.
-     * 
+     *
      */
     public Resource() {
 	resourceItems = new HashSet();
@@ -190,7 +185,7 @@ public class Resource implements Cloneable {
     // **********************************************************
     /**
      * Returns the object's creation date
-     * 
+     *
      * @return date
      * @hibernate.property column="create_date"
      */
@@ -200,7 +195,7 @@ public class Resource implements Cloneable {
 
     /**
      * Sets the object's creation date
-     * 
+     *
      * @param created
      */
     public void setCreated(Date created) {
@@ -209,7 +204,7 @@ public class Resource implements Cloneable {
 
     /**
      * Returns the object's date of last update
-     * 
+     *
      * @return date updated
      * @hibernate.property column="update_date"
      */
@@ -219,7 +214,7 @@ public class Resource implements Cloneable {
 
     /**
      * Sets the object's date of last update
-     * 
+     *
      * @param updated
      */
     public void setUpdated(Date updated) {
@@ -228,9 +223,9 @@ public class Resource implements Cloneable {
 
     /**
      * @return Returns the userid of the user who created the Share resources.
-     * 
+     *
      * @hibernate.many-to-one cascade="save-update" column="create_by"
-     * 
+     *
      */
     public ResourceUser getCreatedBy() {
 	return createdBy;
@@ -257,9 +252,9 @@ public class Resource implements Cloneable {
 
     /**
      * @return Returns the title.
-     * 
+     *
      * @hibernate.property column="title"
-     * 
+     *
      */
     public String getTitle() {
 	return title;
@@ -275,9 +270,9 @@ public class Resource implements Cloneable {
 
     /**
      * @return Returns the lockWhenFinish.
-     * 
+     *
      * @hibernate.property column="lock_on_finished"
-     * 
+     *
      */
     public boolean getLockWhenFinished() {
 	return lockWhenFinished;
@@ -293,7 +288,7 @@ public class Resource implements Cloneable {
 
     /**
      * @return Returns the instructions set by the teacher.
-     * 
+     *
      * @hibernate.property column="instructions" type="text"
      */
     public String getInstructions() {
@@ -305,12 +300,12 @@ public class Resource implements Cloneable {
     }
 
     /**
-     * 
-     * 
+     *
+     *
      * @hibernate.set lazy="true" inverse="false" cascade="all" order-by="create_date desc"
      * @hibernate.collection-key column="resource_uid"
      * @hibernate.collection-one-to-many class="org.lamsfoundation.lams.tool.rsrc.model.ResourceItem"
-     * 
+     *
      * @return
      */
     public Set getResourceItems() {
@@ -407,7 +402,7 @@ public class Resource implements Cloneable {
 
     /**
      * For display use
-     * 
+     *
      * @return
      */
     public String getMiniViewNumberStr() {

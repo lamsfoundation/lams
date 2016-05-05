@@ -2,21 +2,21 @@
  * Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
  * =============================================================
  * License Information: http://lamsfoundation.org/licensing/lams/2.0/
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301
  * USA
- * 
+ *
  * http://www.gnu.org/licenses/gpl.txt
  * ****************************************************************
  */
@@ -58,13 +58,13 @@ import org.lamsfoundation.lams.web.util.AttributeNames;
 
 /**
  * @author Andrey Balan
- * 
- * @struts.action path="/monitoring" parameter="dispatch" scope="request" 
- * 
+ *
+ * @struts.action path="/monitoring" parameter="dispatch" scope="request"
+ *
  * @struts.action-forward name="success" path="tiles:/monitoring/main"
  * @struts.action-forward name="kalturaDisplay" path="tiles:/monitoring/kalturaDisplay"
  * @struts:action-forward name ="groupLearning" path="/learning.do" redirect="true"
- * 
+ *
  */
 public class MonitoringAction extends LamsDispatchAction {
 
@@ -72,6 +72,7 @@ public class MonitoringAction extends LamsDispatchAction {
 
     public IKalturaService kalturaService;
 
+    @Override
     public ActionForward unspecified(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) {
 
@@ -85,14 +86,14 @@ public class MonitoringAction extends LamsDispatchAction {
 	request.setAttribute(KalturaConstants.ATTR_KALTURA, kaltura);
 	request.setAttribute("contentFolderID", contentFolderID);
 	request.setAttribute("isGroupedActivity", isGroupedActivity);
-	
+
 	Set<KalturaSessionDTO> sessionDTOs = new TreeSet<KalturaSessionDTO>(new KalturaSessionDTOComparator());
-	for (KalturaSession session : (Set<KalturaSession>)kaltura.getKalturaSessions()) {
+	for (KalturaSession session : (Set<KalturaSession>) kaltura.getKalturaSessions()) {
 	    KalturaSessionDTO sessionDTO = new KalturaSessionDTO(session);
 	    sessionDTOs.add(sessionDTO);
 	}
 	request.setAttribute("sessionDTOs", sessionDTOs);
-	
+
 	// Create reflectList if reflection is enabled.
 	if (kaltura.isReflectOnActivity()) {
 	    List<NotebookEntryDTO> reflectList = kalturaService.getReflectList(kaltura);
@@ -110,7 +111,7 @@ public class MonitoringAction extends LamsDispatchAction {
 
 	return mapping.findForward("success");
     }
-    
+
     public ActionForward showGroupLearning(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) {
 
@@ -120,7 +121,7 @@ public class MonitoringAction extends LamsDispatchAction {
 	UserDTO user = (UserDTO) SessionManager.getSession().getAttribute(AttributeNames.USER);
 
 	ActionRedirect redirect = new ActionRedirect(mapping.findForwardConfig(KalturaConstants.GROUP_LEARNING));
-	//to distinguish from opening learning page from monitor's Learners tab pass this parameter 
+	//to distinguish from opening learning page from monitor's Learners tab pass this parameter
 	redirect.addParameter(KalturaConstants.ATTR_IS_GROUP_MONITORING, true);
 	redirect.addParameter(AttributeNames.PARAM_MODE, "teacher");
 	redirect.addParameter(AttributeNames.PARAM_TOOL_SESSION_ID, toolSessionID);
@@ -140,7 +141,7 @@ public class MonitoringAction extends LamsDispatchAction {
 
 	return mapping.findForward("kalturaDisplay");
     }
-    
+
     /**
      * Update item's mark. If it's not long then store 0.
      */
@@ -148,7 +149,7 @@ public class MonitoringAction extends LamsDispatchAction {
 	    HttpServletResponse response) {
 
 	setupService();
-	
+
 	String markStr = WebUtil.readStrParam(request, "content");
 	try {
 	    Long mark = Long.parseLong(markStr);
@@ -157,11 +158,11 @@ public class MonitoringAction extends LamsDispatchAction {
 	} catch (NumberFormatException e) {
 	    log.debug(e.getMessage());
 	}
-	
+
 	return null;
 
     }
-    
+
     public ActionForward setItemVisibility(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) {
 
@@ -173,7 +174,7 @@ public class MonitoringAction extends LamsDispatchAction {
 
 	return null;
     }
-    
+
     public ActionForward setCommentVisibility(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) {
 
@@ -188,7 +189,7 @@ public class MonitoringAction extends LamsDispatchAction {
 
     /**
      * Set Submission Deadline
-     * 
+     *
      * @param mapping
      * @param form
      * @param request

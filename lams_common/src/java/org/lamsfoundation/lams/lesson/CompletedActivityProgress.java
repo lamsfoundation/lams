@@ -32,23 +32,24 @@ import org.lamsfoundation.lams.learningdesign.Activity;
 
 /**
  * A class representing a finished activity for a user
- * 
+ *
  * @author lfoxton
- * 
+ *
  */
-public class CompletedActivityProgress implements Serializable{
-
+public class CompletedActivityProgress implements Serializable {
 
     private static final long serialVersionUID = -6210497575761751861L;
-    
+
     LearnerProgress learnerProgress;
     Activity activity;
     Date startDate;
     Date finishDate;
 
-    public CompletedActivityProgress() {}
+    public CompletedActivityProgress() {
+    }
 
-    public CompletedActivityProgress(LearnerProgress learnerProgress, Activity activity, Date startDate, Date finishDate) {
+    public CompletedActivityProgress(LearnerProgress learnerProgress, Activity activity, Date startDate,
+	    Date finishDate) {
 	this.learnerProgress = learnerProgress;
 	this.activity = activity;
 	this.startDate = startDate;
@@ -86,23 +87,27 @@ public class CompletedActivityProgress implements Serializable{
     public void setFinishDate(Date finishDate) {
 	this.finishDate = finishDate;
     }
-    
+
     @Override
     public boolean equals(Object other) {
-	if ((this == other))
+	if ((this == other)) {
 	    return true;
-	if (!(other instanceof CompletedActivityProgress))
+	}
+	if (!(other instanceof CompletedActivityProgress)) {
 	    return false;
+	}
 	CompletedActivityProgress castOther = (CompletedActivityProgress) other;
-	
+
 	EqualsBuilder eq = new EqualsBuilder();
 	eq.append(this.getActivity().getActivityId(), castOther.getActivity().getActivityId());
-	eq.append(this.getLearnerProgress().getLearnerProgressId(), castOther.getLearnerProgress().getLearnerProgressId());
+	eq.append(this.getLearnerProgress().getLearnerProgressId(),
+		castOther.getLearnerProgress().getLearnerProgressId());
 	return eq.isEquals();
     }
-    
+
     @Override
     public int hashCode() {
-	return new HashCodeBuilder().append(this.getActivity().getActivityId().toString() + this.getLearnerProgress().getLearnerProgressId().toString()).toHashCode();
+	return new HashCodeBuilder().append(this.getActivity().getActivityId().toString()
+		+ this.getLearnerProgress().getLearnerProgressId().toString()).toHashCode();
     }
 }

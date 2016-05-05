@@ -2,21 +2,21 @@
  * Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
  * =============================================================
  * License Information: http://lamsfoundation.org/licensing/lams/2.0/
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License version 2.0 
+ * it under the terms of the GNU General Public License version 2.0
  * as published by the Free Software Foundation.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301
  * USA
- * 
+ *
  * http://www.gnu.org/licenses/gpl.txt
  * ************************************************************************
  */
@@ -47,7 +47,7 @@ public interface ILearningDesignService {
 
     /**
      * Get the learning design DTO, suitable to send to Flash via WDDX
-     * 
+     *
      * @param learningDesignId
      * @param languageCode
      *            Two letter language code needed to I18N the help url
@@ -58,7 +58,7 @@ public interface ILearningDesignService {
     /**
      * This method calls other validation methods which apply the validation rules to determine whether or not the
      * learning design is valid.
-     * 
+     *
      * @param learningDesign
      * @return list of validation errors
      */
@@ -66,7 +66,7 @@ public interface ILearningDesignService {
 
     /**
      * Get the DTO list of all valid learning libraries, which equals getAllLearningLibraryDetails(true) method.
-     * 
+     *
      * @return list of LearningLibraryDTO
      * @throws IOException
      */
@@ -74,7 +74,7 @@ public interface ILearningDesignService {
 
     /**
      * Get the DTO list of all learning libraries whatever it is valid or not.
-     * 
+     *
      * @param valid
      * @return
      * @throws IOException
@@ -83,17 +83,17 @@ public interface ILearningDesignService {
 	    throws IOException;
 
     public LearningLibrary getLearningLibrary(Long learningLibraryId);
-    
+
     /**
      * Gets all existing learning library groups.
      */
     public List<LearningLibraryGroup> getLearningLibraryGroups();
-    
+
     public void saveLearningLibraryGroups(Collection<LearningLibraryGroup> groups);
-    
+
     /**
      * Set valid flag to learning library.
-     * 
+     *
      * @param learningLibraryId
      * @param valid
      */
@@ -101,7 +101,7 @@ public interface ILearningDesignService {
 
     /**
      * Creates learning design SVG/PNG file. Also stores it into the file system for caching.
-     * 
+     *
      * @param learningDesignId
      *            source learning design for the outcome image
      * @param imageFormat
@@ -114,6 +114,6 @@ public interface ILearningDesignService {
     String createLearningDesignSVG(Long learningDesignId, int imageFormat) throws IOException;
 
     String createBranchingSVG(Long branchingActivityId, int imageFormat) throws IOException;
-    
+
     public List<ToolDTO> getToolDTOs(boolean includeParallel, String userName) throws IOException;
 }

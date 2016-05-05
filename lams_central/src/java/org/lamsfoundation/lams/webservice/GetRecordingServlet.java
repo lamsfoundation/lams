@@ -18,14 +18,12 @@
  *
  * http://www.gnu.org/licenses/gpl.txt
  * ****************************************************************
- */ 
- 
-/* $Id$ */ 
-package org.lamsfoundation.lams.webservice; 
+ */
+
+/* $Id$ */
+package org.lamsfoundation.lams.webservice;
 
 import java.io.File;
-import java.io.InputStream;
-import java.util.HashMap;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.Cookie;
@@ -36,7 +34,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.util.HttpUrlConnectionUtil;
 import org.lamsfoundation.lams.util.WebUtil;
- 
+
 /**
  * @author pgeorges
  *
@@ -44,45 +42,44 @@ import org.lamsfoundation.lams.util.WebUtil;
  * @web:servlet-mapping url-pattern="/GetRecording"
  */
 public class GetRecordingServlet extends HttpServlet {
-	
-	private static Logger logger = Logger.getLogger(GetRecordingServlet.class);
-	
-	public void doPost(HttpServletRequest request, HttpServletResponse response) 
-		throws ServletException {
 
-		try {
-			String urlStr = WebUtil.readStrParam(request, "urlStr");
-			String filename = WebUtil.readStrParam(request, "filename");
-			String dir = WebUtil.readStrParam(request, "dir");
-			
-			String absoluteFilePath = dir + filename;
-			
-			File newPath = new File(dir);
-			newPath.mkdirs();
-			
-			File newFile = new File(absoluteFilePath);
-			newFile.createNewFile();
-			
-			// get the stream from the external server
-		    int success = HttpUrlConnectionUtil.writeResponseToFile(urlStr, dir, filename, new Cookie[0]);
-		    
-		    // if success
-		    if(success == 1){
-			    // add the filename to the list
-		    	logger.debug("file copy complete");
-		    }else{
-		    	logger.debug("file copy failed");
-		    }
+    private static Logger logger = Logger.getLogger(GetRecordingServlet.class);
 
-		} catch (Exception e) {
-			logger.error(e.getMessage());
-		}		
+    @Override
+    public void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException {
+
+	try {
+	    String urlStr = WebUtil.readStrParam(request, "urlStr");
+	    String filename = WebUtil.readStrParam(request, "filename");
+	    String dir = WebUtil.readStrParam(request, "dir");
+
+	    String absoluteFilePath = dir + filename;
+
+	    File newPath = new File(dir);
+	    newPath.mkdirs();
+
+	    File newFile = new File(absoluteFilePath);
+	    newFile.createNewFile();
+
+	    // get the stream from the external server
+	    int success = HttpUrlConnectionUtil.writeResponseToFile(urlStr, dir, filename, new Cookie[0]);
+
+	    // if success
+	    if (success == 1) {
+		// add the filename to the list
+		logger.debug("file copy complete");
+	    } else {
+		logger.debug("file copy failed");
+	    }
+
+	} catch (Exception e) {
+	    logger.error(e.getMessage());
 	}
-	
-	public void doGet(HttpServletRequest request, HttpServletResponse response) 
-	throws ServletException {
-		doPost(request, response);
-	}
+    }
+
+    @Override
+    public void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException {
+	doPost(request, response);
+    }
 
 }
- 

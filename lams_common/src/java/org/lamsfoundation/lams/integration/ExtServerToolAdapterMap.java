@@ -27,7 +27,7 @@ import org.lamsfoundation.lams.tool.Tool;
 
 /**
  * Maps a tool adapter to multiple integrated server instances
- * 
+ *
  * @hibernate.class table="lams_ext_server_tool_map"
  */
 public class ExtServerToolAdapterMap {
@@ -38,7 +38,7 @@ public class ExtServerToolAdapterMap {
 
     public ExtServerToolAdapterMap() {
     }
-    
+
     public ExtServerToolAdapterMap(Tool tool, ExtServerOrgMap extServer) {
 	this.tool = tool;
 	this.extServer = extServer;
@@ -46,7 +46,7 @@ public class ExtServerToolAdapterMap {
 
     /**
      * @hibernate.id generator-class="native" type="java.lang.Long" column="uid"
-     * 
+     *
      */
     public Long getUid() {
 	return uid;
@@ -59,11 +59,12 @@ public class ExtServerToolAdapterMap {
     /**
      * @hibernate.many-to-one not-null="true"
      * @hibernate.column name="tool_id"
-     * 
+     *
      */
     public Tool getTool() {
 	return tool;
     }
+
     public void setTool(Tool tool) {
 	this.tool = tool;
     }
@@ -71,7 +72,7 @@ public class ExtServerToolAdapterMap {
     /**
      * @hibernate.many-to-one not-null="true"
      * @hibernate.column name="ext_server_org_map_id"
-     * 
+     *
      */
     public ExtServerOrgMap getExtServer() {
 	return extServer;

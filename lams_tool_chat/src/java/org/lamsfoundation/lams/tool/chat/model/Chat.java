@@ -2,21 +2,21 @@
  * Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
  * =============================================================
  * License Information: http://lamsfoundation.org/licensing/lams/2.0/
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301
  * USA
- * 
+ *
  * http://www.gnu.org/licenses/gpl.txt
  * ****************************************************************
  */
@@ -26,12 +26,10 @@ package org.lamsfoundation.lams.tool.chat.model;
 
 import java.util.Date;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.Set;
 import java.util.TreeSet;
 
 import org.apache.log4j.Logger;
-import org.lamsfoundation.lams.contentrepository.client.IToolContentHandler;
 import org.lamsfoundation.lams.learningdesign.TextSearchConditionComparator;
 import org.lamsfoundation.lams.tool.chat.service.ChatService;
 
@@ -42,7 +40,7 @@ import org.lamsfoundation.lams.tool.chat.service.ChatService;
 public class Chat implements java.io.Serializable, Cloneable {
 
     /**
-     * 
+     *
      */
     private static final long serialVersionUID = 579733009969321015L;
 
@@ -50,7 +48,7 @@ public class Chat implements java.io.Serializable, Cloneable {
 
     // Fields
     /**
-     * 
+     *
      */
     private Long uid;
 
@@ -79,7 +77,7 @@ public class Chat implements java.io.Serializable, Cloneable {
     private boolean defineLater;
 
     private Long toolContentId;
-    
+
     private Date submissionDeadline;
 
     private Set chatSessions;
@@ -93,8 +91,8 @@ public class Chat implements java.io.Serializable, Cloneable {
 
     /** full constructor */
     public Chat(Date createDate, Date updateDate, Long createBy, String title, String instructions,
-	    boolean lockOnFinished, boolean filteringEnabled, String filterKeywords, boolean contentInUse, boolean defineLater, Long toolContentId,
-	    Set chatSessions) {
+	    boolean lockOnFinished, boolean filteringEnabled, String filterKeywords, boolean contentInUse,
+	    boolean defineLater, Long toolContentId, Set chatSessions) {
 	this.createDate = createDate;
 	this.updateDate = updateDate;
 	this.createBy = createBy;
@@ -112,7 +110,7 @@ public class Chat implements java.io.Serializable, Cloneable {
     // Property accessors
     /**
      * @hibernate.id generator-class="native" type="java.lang.Long" column="uid"
-     * 
+     *
      */
 
     public Long getUid() {
@@ -125,7 +123,7 @@ public class Chat implements java.io.Serializable, Cloneable {
 
     /**
      * @hibernate.property column="create_date"
-     * 
+     *
      */
 
     public Date getCreateDate() {
@@ -138,7 +136,7 @@ public class Chat implements java.io.Serializable, Cloneable {
 
     /**
      * @hibernate.property column="update_date"
-     * 
+     *
      */
 
     public Date getUpdateDate() {
@@ -151,7 +149,7 @@ public class Chat implements java.io.Serializable, Cloneable {
 
     /**
      * @hibernate.property column="create_by" length="20"
-     * 
+     *
      */
 
     public Long getCreateBy() {
@@ -164,7 +162,7 @@ public class Chat implements java.io.Serializable, Cloneable {
 
     /**
      * @hibernate.property column="title" length="255"
-     * 
+     *
      */
 
     public String getTitle() {
@@ -177,7 +175,7 @@ public class Chat implements java.io.Serializable, Cloneable {
 
     /**
      * @hibernate.property column="instructions" length="65535"
-     * 
+     *
      */
 
     public String getInstructions() {
@@ -190,7 +188,7 @@ public class Chat implements java.io.Serializable, Cloneable {
 
     /**
      * @hibernate.property column="lock_on_finished" length="1"
-     * 
+     *
      */
 
     public boolean isLockOnFinished() {
@@ -225,7 +223,7 @@ public class Chat implements java.io.Serializable, Cloneable {
 
     /**
      * @hibernate.property column="content_in_use" length="1"
-     * 
+     *
      */
 
     public boolean isContentInUse() {
@@ -238,7 +236,7 @@ public class Chat implements java.io.Serializable, Cloneable {
 
     /**
      * @hibernate.property column="define_later" length="1"
-     * 
+     *
      */
 
     public boolean isDefineLater() {
@@ -251,7 +249,7 @@ public class Chat implements java.io.Serializable, Cloneable {
 
     /**
      * @hibernate.property column="tool_content_id" length="20"
-     * 
+     *
      */
 
     public Long getToolContentId() {
@@ -266,7 +264,7 @@ public class Chat implements java.io.Serializable, Cloneable {
      * @hibernate.set lazy="true" inverse="true" cascade="none"
      * @hibernate.collection-key column="chat_uid"
      * @hibernate.collection-one-to-many class="org.lamsfoundation.lams.tool.chat.model.ChatSession"
-     * 
+     *
      */
 
     public Set getChatSessions() {
@@ -299,22 +297,21 @@ public class Chat implements java.io.Serializable, Cloneable {
 	this.filterKeywords = filterKeywords;
     }
 
-	/**
-	 * @hibernate.property column="submission_deadline"
-	 * @return
-	 */
-	public Date getSubmissionDeadline() {
-		return submissionDeadline;
-	}
+    /**
+     * @hibernate.property column="submission_deadline"
+     * @return
+     */
+    public Date getSubmissionDeadline() {
+	return submissionDeadline;
+    }
 
-	public void setSubmissionDeadline(Date submissionDeadline) {
-		this.submissionDeadline = submissionDeadline;
-	}
+    public void setSubmissionDeadline(Date submissionDeadline) {
+	this.submissionDeadline = submissionDeadline;
+    }
 
-    
     /**
      * toString
-     * 
+     *
      * @return String
      */
     @Override
@@ -343,8 +340,8 @@ public class Chat implements java.io.Serializable, Cloneable {
 	}
 	Chat castOther = (Chat) other;
 
-	return this.getUid() == castOther.getUid() || this.getUid() != null && castOther.getUid() != null
-		&& this.getUid().equals(castOther.getUid());
+	return this.getUid() == castOther.getUid()
+		|| this.getUid() != null && castOther.getUid() != null && this.getUid().equals(castOther.getUid());
     }
 
     @Override
@@ -392,7 +389,7 @@ public class Chat implements java.io.Serializable, Cloneable {
      *                sort="org.lamsfoundation.lams.learningdesign.TextSearchConditionComparator"
      * @hibernate.collection-key column="content_uid"
      * @hibernate.collection-one-to-many class="org.lamsfoundation.lams.tool.chat.model.ChatCondition"
-     * 
+     *
      */
     public Set<ChatCondition> getConditions() {
 	return conditions;

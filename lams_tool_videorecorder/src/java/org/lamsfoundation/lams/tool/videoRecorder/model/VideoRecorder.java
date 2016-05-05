@@ -2,21 +2,21 @@
  * Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
  * =============================================================
  * License Information: http://lamsfoundation.org/licensing/lams/2.0/
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301
  * USA
- * 
+ *
  * http://www.gnu.org/licenses/gpl.txt
  * ****************************************************************
  */
@@ -26,12 +26,10 @@ package org.lamsfoundation.lams.tool.videoRecorder.model;
 
 import java.util.Date;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.Set;
 import java.util.TreeSet;
 
 import org.apache.log4j.Logger;
-import org.lamsfoundation.lams.contentrepository.client.IToolContentHandler;
 import org.lamsfoundation.lams.learningdesign.TextSearchConditionComparator;
 import org.lamsfoundation.lams.tool.videoRecorder.service.VideoRecorderService;
 
@@ -42,7 +40,7 @@ import org.lamsfoundation.lams.tool.videoRecorder.service.VideoRecorderService;
 public class VideoRecorder implements java.io.Serializable, Cloneable {
 
     /**
-     * 
+     *
      */
     private static final long serialVersionUID = 579733009969321015L;
 
@@ -50,7 +48,7 @@ public class VideoRecorder implements java.io.Serializable, Cloneable {
 
     // Fields
     /**
-     * 
+     *
      */
     private Long uid;
 
@@ -63,25 +61,25 @@ public class VideoRecorder implements java.io.Serializable, Cloneable {
     private String title;
 
     private String instructions;
-    
-	boolean reflectOnActivity;
-	
-	String reflectInstructions;
+
+    boolean reflectOnActivity;
+
+    String reflectInstructions;
 
     private boolean lockOnFinished;
 
     private boolean allowUseVoice;
-    
+
     private boolean allowUseCamera;
-        
+
     private boolean allowLearnerVideoVisibility;
-    
+
     private boolean allowComments;
-    
+
     private boolean allowRatings;
-    
+
     private boolean exportOffline;
-    
+
     private boolean exportAll;
 
     private boolean contentInUse;
@@ -93,13 +91,14 @@ public class VideoRecorder implements java.io.Serializable, Cloneable {
     private Set videoRecorderSessions;
 
     private VideoRecorderRecording authorRecording;
-    
-    private Set<VideoRecorderCondition> conditions = new TreeSet<VideoRecorderCondition>(new TextSearchConditionComparator());
+
+    private Set<VideoRecorderCondition> conditions = new TreeSet<VideoRecorderCondition>(
+	    new TextSearchConditionComparator());
 
     // Property accessors
     /**
      * @hibernate.id generator-class="native" type="java.lang.Long" column="uid"
-     * 
+     *
      */
 
     public Long getUid() {
@@ -112,7 +111,7 @@ public class VideoRecorder implements java.io.Serializable, Cloneable {
 
     /**
      * @hibernate.property column="create_date"
-     * 
+     *
      */
 
     public Date getCreateDate() {
@@ -125,7 +124,7 @@ public class VideoRecorder implements java.io.Serializable, Cloneable {
 
     /**
      * @hibernate.property column="update_date"
-     * 
+     *
      */
 
     public Date getUpdateDate() {
@@ -138,7 +137,7 @@ public class VideoRecorder implements java.io.Serializable, Cloneable {
 
     /**
      * @hibernate.property column="create_by" length="20"
-     * 
+     *
      */
 
     public Long getCreateBy() {
@@ -151,7 +150,7 @@ public class VideoRecorder implements java.io.Serializable, Cloneable {
 
     /**
      * @hibernate.property column="title" length="255"
-     * 
+     *
      */
 
     public String getTitle() {
@@ -164,7 +163,7 @@ public class VideoRecorder implements java.io.Serializable, Cloneable {
 
     /**
      * @hibernate.property column="instructions" length="65535"
-     * 
+     *
      */
 
     public String getInstructions() {
@@ -175,31 +174,31 @@ public class VideoRecorder implements java.io.Serializable, Cloneable {
 	this.instructions = instructions;
     }
 
-	/**
-	 * @hibernate.property column="reflect_on_activity" length="1"
-	 */
-	public boolean isReflectOnActivity() {
-		return reflectOnActivity;
-	}
+    /**
+     * @hibernate.property column="reflect_on_activity" length="1"
+     */
+    public boolean isReflectOnActivity() {
+	return reflectOnActivity;
+    }
 
-	public void setReflectOnActivity(boolean reflectOnActivity) {
-		this.reflectOnActivity = reflectOnActivity;
-	}
+    public void setReflectOnActivity(boolean reflectOnActivity) {
+	this.reflectOnActivity = reflectOnActivity;
+    }
 
-	/**
-	 * @hibernate.property column="reflect_instructions" length="65535"
-	 */
-	public String getReflectInstructions() {
-		return reflectInstructions;
-	}
+    /**
+     * @hibernate.property column="reflect_instructions" length="65535"
+     */
+    public String getReflectInstructions() {
+	return reflectInstructions;
+    }
 
-	public void setReflectInstructions(String reflectInstructions) {
-		this.reflectInstructions = reflectInstructions;
-	}
+    public void setReflectInstructions(String reflectInstructions) {
+	this.reflectInstructions = reflectInstructions;
+    }
 
     /**
      * @hibernate.property column="lock_on_finished" length="1"
-     * 
+     *
      */
 
     public boolean isLockOnFinished() {
@@ -220,8 +219,8 @@ public class VideoRecorder implements java.io.Serializable, Cloneable {
 
     public void setAllowUseVoice(boolean allowUseVoice) {
 	this.allowUseVoice = allowUseVoice;
-    }    
-    
+    }
+
     /**
      * @hibernate.property column="allow_use_camera" length="1"
      * @return
@@ -232,7 +231,7 @@ public class VideoRecorder implements java.io.Serializable, Cloneable {
 
     public void setAllowUseCamera(boolean allowUseCamera) {
 	this.allowUseCamera = allowUseCamera;
-    }    
+    }
 
     /**
      * @hibernate.property column="allow_learner_video_visibility" length="1"
@@ -244,7 +243,7 @@ public class VideoRecorder implements java.io.Serializable, Cloneable {
 
     public void setAllowLearnerVideoVisibility(boolean allowLearnerVideoVisibility) {
 	this.allowLearnerVideoVisibility = allowLearnerVideoVisibility;
-    }    
+    }
 
     /**
      * @hibernate.property column="allow_comments" length="1"
@@ -256,7 +255,7 @@ public class VideoRecorder implements java.io.Serializable, Cloneable {
 
     public void setAllowComments(boolean allowComments) {
 	this.allowComments = allowComments;
-    }  
+    }
 
     /**
      * @hibernate.property column="allow_ratings" length="1"
@@ -268,7 +267,7 @@ public class VideoRecorder implements java.io.Serializable, Cloneable {
 
     public void setAllowRatings(boolean allowRatings) {
 	this.allowRatings = allowRatings;
-    }  
+    }
 
     /**
      * @hibernate.property column="export_offline" length="1"
@@ -280,8 +279,8 @@ public class VideoRecorder implements java.io.Serializable, Cloneable {
 
     public void setExportOffline(boolean exportOffline) {
 	this.exportOffline = exportOffline;
-    }  
-    
+    }
+
     /**
      * @hibernate.property column="export_all" length="1"
      * @return
@@ -296,7 +295,7 @@ public class VideoRecorder implements java.io.Serializable, Cloneable {
 
     /**
      * @hibernate.property column="content_in_use" length="1"
-     * 
+     *
      */
 
     public boolean isContentInUse() {
@@ -309,7 +308,7 @@ public class VideoRecorder implements java.io.Serializable, Cloneable {
 
     /**
      * @hibernate.property column="define_later" length="1"
-     * 
+     *
      */
 
     public boolean isDefineLater() {
@@ -322,7 +321,7 @@ public class VideoRecorder implements java.io.Serializable, Cloneable {
 
     /**
      * @hibernate.property column="tool_content_id" length="20"
-     * 
+     *
      */
 
     public Long getToolContentId() {
@@ -337,7 +336,7 @@ public class VideoRecorder implements java.io.Serializable, Cloneable {
      * @hibernate.set lazy="true" inverse="true" cascade="none"
      * @hibernate.collection-key column="videoRecorder_uid"
      * @hibernate.collection-one-to-many class="org.lamsfoundation.lams.tool.videoRecorder.model.VideoRecorderSession"
-     * 
+     *
      */
 
     public Set getVideoRecorderSessions() {
@@ -347,13 +346,13 @@ public class VideoRecorder implements java.io.Serializable, Cloneable {
     public void setVideoRecorderSessions(Set videoRecorderSessions) {
 	this.videoRecorderSessions = videoRecorderSessions;
     }
-    
-	/**
+
+    /**
      * @return Returns the first recording made by author
      *
      * @hibernate.one-to-one
-     * 		column="author_recording_id"
-     *  	cascade="none"
+     * 		      column="author_recording_id"
+     *                       cascade="none"
      *
      */
 
@@ -364,13 +363,13 @@ public class VideoRecorder implements java.io.Serializable, Cloneable {
     public void setAuthorRecording(VideoRecorderRecording authorRecording) {
 	this.authorRecording = authorRecording;
     }
-    
+
     /**
      * @hibernate.set lazy="true" cascade="all"
      *                sort="org.lamsfoundation.lams.learningdesign.TextSearchConditionComparator"
      * @hibernate.collection-key column="content_uid"
      * @hibernate.collection-one-to-many class="org.lamsfoundation.lams.tool.videoRecorder.model.VideoRecorderCondition"
-     * 
+     *
      */
     public Set<VideoRecorderCondition> getConditions() {
 	return conditions;
@@ -382,7 +381,7 @@ public class VideoRecorder implements java.io.Serializable, Cloneable {
 
     /**
      * toString
-     * 
+     *
      * @return String
      */
     @Override
@@ -414,8 +413,8 @@ public class VideoRecorder implements java.io.Serializable, Cloneable {
 	}
 	VideoRecorder castOther = (VideoRecorder) other;
 
-	return this.getUid() == castOther.getUid() || this.getUid() != null && castOther.getUid() != null
-		&& this.getUid().equals(castOther.getUid());
+	return this.getUid() == castOther.getUid()
+		|| this.getUid() != null && castOther.getUid() != null && this.getUid().equals(castOther.getUid());
     }
 
     @Override
@@ -445,7 +444,8 @@ public class VideoRecorder implements java.io.Serializable, Cloneable {
 	    videoRecorder.videoRecorderSessions = new HashSet();
 
 	    if (conditions != null) {
-		Set<VideoRecorderCondition> set = new TreeSet<VideoRecorderCondition>(new TextSearchConditionComparator());
+		Set<VideoRecorderCondition> set = new TreeSet<VideoRecorderCondition>(
+			new TextSearchConditionComparator());
 		for (VideoRecorderCondition condition : conditions) {
 		    set.add((VideoRecorderCondition) condition.clone());
 		}

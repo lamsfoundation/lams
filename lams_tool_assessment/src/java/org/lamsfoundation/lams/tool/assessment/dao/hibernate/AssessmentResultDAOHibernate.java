@@ -1,23 +1,23 @@
-/**************************************************************** 
- * Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org) 
- * ============================================================= 
- * License Information: http://lamsfoundation.org/licensing/lams/2.0/ 
- * 
- * This program is free software; you can redistribute it and/or modify 
- * it under the terms of the GNU General Public License version 2.0 
- * as published by the Free Software Foundation. 
- * 
- * This program is distributed in the hope that it will be useful, 
- * but WITHOUT ANY WARRANTY; without even the implied warranty of 
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the 
- * GNU General Public License for more details. 
- * 
- * You should have received a copy of the GNU General Public License 
- * along with this program; if not, write to the Free Software 
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 * USA 
- * 
- * http://www.gnu.org/licenses/gpl.txt 
- * **************************************************************** 
+/****************************************************************
+ * Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
+ * =============================================================
+ * License Information: http://lamsfoundation.org/licensing/lams/2.0/
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License version 2.0
+ * as published by the Free Software Foundation.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 * USA
+ *
+ * http://www.gnu.org/licenses/gpl.txt
+ * ****************************************************************
  */
 
 /* $Id$ */
@@ -36,8 +36,7 @@ public class AssessmentResultDAOHibernate extends BaseDAOHibernate implements As
     private static final String FIND_BY_ASSESSMENT_AND_USER_AND_FINISHED = "FROM " + AssessmentResult.class.getName()
 	    + " AS r WHERE r.user.userId = ? AND r.assessment.uid=? AND (r.finishDate != null) ORDER BY r.startDate ASC";
 
-    private static final String FIND_LAST_FINISHED_BY_ASSESSMENT_AND_USER = "FROM "
-	    + AssessmentResult.class.getName()
+    private static final String FIND_LAST_FINISHED_BY_ASSESSMENT_AND_USER = "FROM " + AssessmentResult.class.getName()
 	    + " AS r WHERE r.user.userId = ? AND r.assessment.uid=? AND (r.finishDate != null) AND r.latest=1";
 
     private static final String FIND_BY_SESSION_AND_USER = "FROM " + AssessmentResult.class.getName()
@@ -46,12 +45,10 @@ public class AssessmentResultDAOHibernate extends BaseDAOHibernate implements As
     private static final String FIND_BY_SESSION_AND_USER_AND_FINISHED = "FROM " + AssessmentResult.class.getName()
 	    + " AS r WHERE r.user.userId = ? AND r.sessionId=? AND (r.finishDate != null) ORDER BY r.startDate ASC";
 
-    private static final String FIND_LAST_FINISHED_BY_SESSION_AND_USER = "FROM "
-	    + AssessmentResult.class.getName()
+    private static final String FIND_LAST_FINISHED_BY_SESSION_AND_USER = "FROM " + AssessmentResult.class.getName()
 	    + " AS r WHERE r.user.userId = ? AND r.sessionId=? AND (r.finishDate != null) AND r.latest=1";
-    
-    private static final String FIND_LAST_FINISHED_RESULTS_BY_CONTENT_ID = "FROM "
-	    + AssessmentResult.class.getName()
+
+    private static final String FIND_LAST_FINISHED_RESULTS_BY_CONTENT_ID = "FROM " + AssessmentResult.class.getName()
 	    + " AS r WHERE r.assessment.contentId=? AND (r.finishDate != null) AND r.latest=1";
 
     private static final String FIND_ASSESSMENT_RESULT_COUNT_BY_ASSESSMENT_AND_USER = "select COUNT(*) FROM "
@@ -62,13 +59,16 @@ public class AssessmentResultDAOHibernate extends BaseDAOHibernate implements As
 	    + AssessmentResult.class.getName()
 	    + " AS r WHERE r.user.userId=? AND r.assessment.uid=? AND (r.finishDate != null) AND r.latest=1";
 
-    private static final String BEST_SCORE_BY_SESSION_AND_USER = "SELECT MAX(r.grade) FROM " + AssessmentResult.class.getName()
+    private static final String BEST_SCORE_BY_SESSION_AND_USER = "SELECT MAX(r.grade) FROM "
+	    + AssessmentResult.class.getName()
 	    + " AS r WHERE r.user.userId = ? AND r.sessionId=? AND (r.finishDate != null) ORDER BY r.startDate ASC";
-    
-    private static final String FIRST_SCORE_BY_SESSION_AND_USER = "SELECT r.grade FROM " + AssessmentResult.class.getName()
+
+    private static final String FIRST_SCORE_BY_SESSION_AND_USER = "SELECT r.grade FROM "
+	    + AssessmentResult.class.getName()
 	    + " AS r WHERE r.user.userId = ? AND r.sessionId=? AND (r.finishDate != null) ORDER BY r.startDate ASC LIMIT 1";
-    
-    private static final String AVERAGE_SCORE_BY_SESSION_AND_USER = "SELECT AVG(r.grade) FROM " + AssessmentResult.class.getName()
+
+    private static final String AVERAGE_SCORE_BY_SESSION_AND_USER = "SELECT AVG(r.grade) FROM "
+	    + AssessmentResult.class.getName()
 	    + " AS r WHERE r.user.userId = ? AND r.sessionId=? AND (r.finishDate != null) ORDER BY r.startDate ASC";
 
     private static final String FIND_LAST_ASSESSMENT_RESULT_TIME_TAKEN = "select UNIX_TIMESTAMP(r.finishDate) - UNIX_TIMESTAMP(r.startDate) FROM "
@@ -108,8 +108,7 @@ public class AssessmentResultDAOHibernate extends BaseDAOHibernate implements As
 
     @Override
     public AssessmentResult getLastFinishedAssessmentResult(Long assessmentUid, Long userId) {
-	List list = getHibernateTemplate().find(
-		AssessmentResultDAOHibernate.FIND_LAST_FINISHED_BY_ASSESSMENT_AND_USER,
+	List list = getHibernateTemplate().find(AssessmentResultDAOHibernate.FIND_LAST_FINISHED_BY_ASSESSMENT_AND_USER,
 		new Object[] { userId, assessmentUid });
 	if ((list == null) || (list.size() == 0)) {
 	    return null;
@@ -117,7 +116,7 @@ public class AssessmentResultDAOHibernate extends BaseDAOHibernate implements As
 	    return (AssessmentResult) list.get(0);
 	}
     }
-    
+
     @Override
     public Float getLastTotalScoreByUser(Long assessmentUid, Long userId) {
 	List list = getHibernateTemplate().find(AssessmentResultDAOHibernate.FIND_LAST_ASSESSMENT_RESULT_GRADE,
@@ -139,7 +138,7 @@ public class AssessmentResultDAOHibernate extends BaseDAOHibernate implements As
 	    return ((Float) list.get(0));
 	}
     }
-    
+
     @Override
     public Float getFirstTotalScoreByUser(Long sessionId, Long userId) {
 	List list = getHibernateTemplate().find(AssessmentResultDAOHibernate.FIRST_SCORE_BY_SESSION_AND_USER,
@@ -150,7 +149,7 @@ public class AssessmentResultDAOHibernate extends BaseDAOHibernate implements As
 	    return ((Float) list.get(0));
 	}
     }
-    
+
     @Override
     public Float getAvergeTotalScoreByUser(Long sessionId, Long userId) {
 	List list = getHibernateTemplate().find(AssessmentResultDAOHibernate.AVERAGE_SCORE_BY_SESSION_AND_USER,
@@ -177,8 +176,7 @@ public class AssessmentResultDAOHibernate extends BaseDAOHibernate implements As
 
     @Override
     public AssessmentResult getLastFinishedAssessmentResultByUser(Long sessionId, Long userId) {
-	List list = getHibernateTemplate().find(
-		AssessmentResultDAOHibernate.FIND_LAST_FINISHED_BY_SESSION_AND_USER,
+	List list = getHibernateTemplate().find(AssessmentResultDAOHibernate.FIND_LAST_FINISHED_BY_SESSION_AND_USER,
 		new Object[] { userId, sessionId });
 	if ((list == null) || (list.size() == 0)) {
 	    return null;
@@ -186,7 +184,7 @@ public class AssessmentResultDAOHibernate extends BaseDAOHibernate implements As
 	    return (AssessmentResult) list.get(0);
 	}
     }
-    
+
     @Override
     public List<AssessmentResult> getLastFinishedAssessmentResults(Long contentId) {
 	return getHibernateTemplate().find(AssessmentResultDAOHibernate.FIND_LAST_FINISHED_RESULTS_BY_CONTENT_ID,

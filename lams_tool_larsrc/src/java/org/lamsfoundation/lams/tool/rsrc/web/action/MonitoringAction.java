@@ -2,21 +2,21 @@
  * Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
  * =============================================================
  * License Information: http://lamsfoundation.org/licensing/lams/2.0/
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License version 2.0 
+ * it under the terms of the GNU General Public License version 2.0
  * as published by the Free Software Foundation.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301
  * USA
- * 
+ *
  * http://www.gnu.org/licenses/gpl.txt
  * ****************************************************************
  */
@@ -99,15 +99,15 @@ public class MonitoringAction extends Action {
 	request.getSession().setAttribute(sessionMap.getSessionID(), sessionMap);
 	request.setAttribute(ResourceConstants.ATTR_SESSION_MAP_ID, sessionMap.getSessionID());
 	// save contentFolderID into session
-	sessionMap.put(AttributeNames.PARAM_CONTENT_FOLDER_ID, WebUtil.readStrParam(request,
-		AttributeNames.PARAM_CONTENT_FOLDER_ID));
+	sessionMap.put(AttributeNames.PARAM_CONTENT_FOLDER_ID,
+		WebUtil.readStrParam(request, AttributeNames.PARAM_CONTENT_FOLDER_ID));
 
 	Long contentId = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_CONTENT_ID);
 	IResourceService service = getResourceService();
 	List<SessionDTO> groupList = service.getSummary(contentId);
 
 	Resource resource = service.getResourceByContentId(contentId);
-	
+
 	// Create reflectList if reflection is enabled.
 	if (resource.isReflectOnActivity()) {
 	    List<ReflectDTO> relectList = service.getReflectList(contentId);
@@ -136,14 +136,14 @@ public class MonitoringAction extends Action {
 	request.setAttribute(ResourceConstants.ATTR_USER_LIST, list);
 	return mapping.findForward(ResourceConstants.SUCCESS);
     }
-    
+
     private ActionForward getSubgridData(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) throws JSONException, IOException {
 	IResourceService service = getResourceService();
 
 	Long itemUid = WebUtil.readLongParam(request, ResourceConstants.ATTR_RESOURCE_ITEM_UID);
 	Long sessionId = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_SESSION_ID);
-	
+
 	// Getting the params passed in from the jqGrid
 	int page = WebUtil.readIntParam(request, AttributeNames.PARAM_PAGE);
 	int rowLimit = WebUtil.readIntParam(request, AttributeNames.PARAM_ROWS);
@@ -158,9 +158,9 @@ public class MonitoringAction extends Action {
 		rowLimit, sortBy, sortOrder, searchString);
 	int countVisitLogs = service.getCountVisitLogsBySessionAndItem(sessionId, itemUid, searchString);
 
-	int totalPages = new Double(Math.ceil(new Integer(countVisitLogs).doubleValue()
-		/ new Integer(rowLimit).doubleValue())).intValue();
-	
+	int totalPages = new Double(
+		Math.ceil(new Integer(countVisitLogs).doubleValue() / new Integer(rowLimit).doubleValue())).intValue();
+
 	JSONArray rows = new JSONArray();
 	DateFormat timeTakenFormatter = new SimpleDateFormat("H:mm:ss");
 	DateFormat dateFormatter = new SimpleDateFormat("d-MMM-yyyy h:mm a");
@@ -174,14 +174,16 @@ public class MonitoringAction extends Action {
 	    visitLogData.put(visitLogDto.getUserId());
 	    String fullName = StringEscapeUtils.escapeHtml(visitLogDto.getUserFullName());
 	    visitLogData.put(fullName);
-	    String accessDate = (visitLogDto.getAccessDate() == null) ? "" : dateFormatter.format(DateUtil
-		    .convertToTimeZoneFromDefault(monitorTimeZone, visitLogDto.getAccessDate()));
+	    String accessDate = (visitLogDto.getAccessDate() == null) ? ""
+		    : dateFormatter.format(
+			    DateUtil.convertToTimeZoneFromDefault(monitorTimeZone, visitLogDto.getAccessDate()));
 	    visitLogData.put(accessDate);
-	    String completeDate = (visitLogDto.getCompleteDate() == null) ? "" : dateFormatter.format(DateUtil
-		    .convertToTimeZoneFromDefault(monitorTimeZone, visitLogDto.getCompleteDate()));
+	    String completeDate = (visitLogDto.getCompleteDate() == null) ? ""
+		    : dateFormatter.format(
+			    DateUtil.convertToTimeZoneFromDefault(monitorTimeZone, visitLogDto.getCompleteDate()));
 	    visitLogData.put(completeDate);
-	    String timeTaken = (visitLogDto.getTimeTaken() == null) ? "" : timeTakenFormatter.format(visitLogDto
-		    .getTimeTaken());
+	    String timeTaken = (visitLogDto.getTimeTaken() == null) ? ""
+		    : timeTakenFormatter.format(visitLogDto.getTimeTaken());
 	    visitLogData.put(timeTaken);
 
 	    JSONObject userRow = new JSONObject();
@@ -196,7 +198,7 @@ public class MonitoringAction extends Action {
 	responseJSON.put("page", page);
 	responseJSON.put("records", countVisitLogs);
 	responseJSON.put("rows", rows);
-	    
+
 	response.setContentType("application/json;charset=utf-8");
 	response.getWriter().write(responseJSON.toString());
 	return null;
@@ -243,8 +245,8 @@ public class MonitoringAction extends Action {
     // Private method
     // *************************************************************************************
     private IResourceService getResourceService() {
-	WebApplicationContext wac = WebApplicationContextUtils.getRequiredWebApplicationContext(getServlet()
-		.getServletContext());
+	WebApplicationContext wac = WebApplicationContextUtils
+		.getRequiredWebApplicationContext(getServlet().getServletContext());
 	return (IResourceService) wac.getBean(ResourceConstants.RESOURCE_SERVICE);
     }
 }

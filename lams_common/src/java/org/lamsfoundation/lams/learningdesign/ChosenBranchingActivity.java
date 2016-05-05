@@ -2,21 +2,21 @@
  * Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
  * =============================================================
  * License Information: http://lamsfoundation.org/licensing/lams/2.0/
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License version 2.0 
+ * it under the terms of the GNU General Public License version 2.0
  * as published by the Free Software Foundation.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301
  * USA
- * 
+ *
  * http://www.gnu.org/licenses/gpl.txt
  * ****************************************************************
  */
@@ -32,7 +32,7 @@ import org.lamsfoundation.lams.tool.SystemTool;
 /**
  * @author Mitchell Seaton
  * @version 2.1
- * 
+ *
  * @hibernate.class
  */
 public class ChosenBranchingActivity extends BranchingActivity implements Serializable {
@@ -71,9 +71,10 @@ public class ChosenBranchingActivity extends BranchingActivity implements Serial
 
     /**
      * Makes a copy of the BranchingActivity for authoring, preview and monitoring environment
-     * 
+     *
      * @return BranchingActivity Returns a deep-copy of the originalActivity
      */
+    @Override
     public Activity createCopy(int uiidOffset) {
 
 	ChosenBranchingActivity newBranchingActivity = new ChosenBranchingActivity();
@@ -91,6 +92,7 @@ public class ChosenBranchingActivity extends BranchingActivity implements Serial
 	return newBranchingActivity;
     }
 
+    @Override
     public String toString() {
 	return new ToStringBuilder(this).append("activityId", getActivityId()).toString();
     }

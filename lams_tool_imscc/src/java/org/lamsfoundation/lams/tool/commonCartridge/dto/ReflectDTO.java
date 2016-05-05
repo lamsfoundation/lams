@@ -3,9 +3,9 @@ package org.lamsfoundation.lams.tool.commonCartridge.dto;
 import org.lamsfoundation.lams.tool.commonCartridge.model.CommonCartridgeUser;
 
 /**
- * 
+ *
  * @author Andrey Balan
- * 
+ *
  */
 public class ReflectDTO {
     private Long userUid;

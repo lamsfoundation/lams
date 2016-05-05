@@ -2,21 +2,21 @@
  * Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
  * =============================================================
  * License Information: http://lamsfoundation.org/licensing/lams/2.0/
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License version 2.0 
+ * it under the terms of the GNU General Public License version 2.0
  * as published by the Free Software Foundation.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301
  * USA
- * 
+ *
  * http://www.gnu.org/licenses/gpl.txt
  * ****************************************************************
  */
@@ -63,6 +63,7 @@ public class ExportServlet extends AbstractExportPortfolioServlet {
 
     private IPixlrService pixlrService;
 
+    @Override
     protected String doExport(HttpServletRequest request, HttpServletResponse response, String directoryName,
 	    Cookie[] cookies) {
 
@@ -82,8 +83,7 @@ public class ExportServlet extends AbstractExportPortfolioServlet {
 	    logger.error("Cannot perform export for pixlr tool.");
 	}
 
-	String basePath = WebUtil.getBaseServerURL()
-		+ request.getContextPath();
+	String basePath = WebUtil.getBaseServerURL() + request.getContextPath();
 	writeResponseToFile(basePath + "/pages/export/exportPortfolio.jsp", directoryName, FILENAME, cookies);
 
 	return FILENAME;
@@ -107,14 +107,14 @@ public class ExportServlet extends AbstractExportPortfolioServlet {
 
 	UserDTO lamsUserDTO = (UserDTO) SessionManager.getSession().getAttribute(AttributeNames.USER);
 
-	PixlrUser pixlrUser = pixlrService
-		.getUserByUserIdAndSessionId(new Long(lamsUserDTO.getUserID()), toolSessionID);
+	PixlrUser pixlrUser = pixlrService.getUserByUserIdAndSessionId(new Long(lamsUserDTO.getUserID()),
+		toolSessionID);
 
 	//NotebookEntry pixlrEntry = pixlrService.getEntry(pixlrUser.getEntryUID());
 
 	// construct dto's
 	PixlrDTO pixlrDTO = new PixlrDTO(pixlr);
-	
+
 	PixlrSessionDTO sessionDTO = new PixlrSessionDTO();
 	sessionDTO.setSessionName(pixlrSession.getSessionName());
 	sessionDTO.setSessionID(pixlrSession.getSessionId());
@@ -124,32 +124,31 @@ public class ExportServlet extends AbstractExportPortfolioServlet {
 
 	sessionDTO.getUserDTOs().add(userDTO);
 	pixlrDTO.getSessionDTOs().add(sessionDTO);
-	
+
 	NotebookEntry notebookEntry = pixlrService.getEntry(toolSessionID, CoreNotebookConstants.NOTEBOOK_TOOL,
 		PixlrConstants.TOOL_SIGNATURE, userDTO.getUserId().intValue());
-	
-	if (notebookEntry != null)
-	{
+
+	if (notebookEntry != null) {
 	    userDTO.setNotebookEntry(notebookEntry.getEntry());
 	    userDTO.setFinishedReflection(true);
 	}
-	
+
 	String imageFileArray[] = new String[2];
 	imageFileArray[0] = pixlrDTO.getImageFileName();
-	
-	if (userDTO.getImageFileName() != null)
-	{
+
+	if (userDTO.getImageFileName() != null) {
 	    imageFileArray[1] = userDTO.getImageFileName();
 	}
-	
+
 	// bundling the images in export
 	try {
 	    CustomToolImageBundler imageBundler = new CustomToolImageBundler();
-	    imageBundler.bundle(request, cookies, directoryName, PixlrConstants.LAMS_WWW_PIXLR_FOLDER_URL, imageFileArray);
+	    imageBundler.bundle(request, cookies, directoryName, PixlrConstants.LAMS_WWW_PIXLR_FOLDER_URL,
+		    imageFileArray);
 	} catch (Exception e) {
 	    logger.error("Could not export gmap images, some images may be missing in export portfolio", e);
 	}
-	
+
 	request.getSession().setAttribute("userDTO", userDTO);
 	request.getSession().setAttribute("pixlrDTO", pixlrDTO);
     }
@@ -169,14 +168,14 @@ public class ExportServlet extends AbstractExportPortfolioServlet {
 	Pixlr pixlr = pixlrService.getPixlrByContentId(toolContentID);
 
 	PixlrDTO pixlrDTO = new PixlrDTO(pixlr);
-	
+
 	// Creating a list of image files to copy for export
 	ArrayList<String> imageFiles = new ArrayList<String>();
 	imageFiles.add(pixlr.getImageFileName());
-	
+
 	for (PixlrSessionDTO sessionDTO : pixlrDTO.getSessionDTOs()) {
 	    Long toolSessionID = sessionDTO.getSessionID();
-	   
+
 	    for (PixlrUserDTO userDTO : sessionDTO.getUserDTOs()) {
 		// get the notebook entry.
 		NotebookEntry notebookEntry = pixlrService.getEntry(toolSessionID, CoreNotebookConstants.NOTEBOOK_TOOL,
@@ -184,31 +183,31 @@ public class ExportServlet extends AbstractExportPortfolioServlet {
 		if (notebookEntry != null) {
 		    userDTO.notebookEntry = notebookEntry.getEntry();
 		    userDTO.setFinishedReflection(true);
-		    if (userDTO.getImageFileName() != null && !userDTO.getImageFileName().equals(pixlrDTO.getImageFileName()))
-		    {
+		    if (userDTO.getImageFileName() != null
+			    && !userDTO.getImageFileName().equals(pixlrDTO.getImageFileName())) {
 			imageFiles.add(userDTO.getImageFileName());
 		    }
 		}
-		
+
 	    }
 	}
-	
+
 	String[] imageFileArray = new String[imageFiles.size()];
-	int i=0;
-	for (String image : imageFiles)
-	{
+	int i = 0;
+	for (String image : imageFiles) {
 	    imageFileArray[i] = image;
 	    i++;
 	}
-	
+
 	// bundling the images in export
 	try {
 	    CustomToolImageBundler imageBundler = new CustomToolImageBundler();
-	    imageBundler.bundle(request, cookies, directoryName, PixlrConstants.LAMS_WWW_PIXLR_FOLDER_URL, imageFileArray);
+	    imageBundler.bundle(request, cookies, directoryName, PixlrConstants.LAMS_WWW_PIXLR_FOLDER_URL,
+		    imageFileArray);
 	} catch (Exception e) {
 	    logger.error("Could not export gmap images, some images may be missing in export portfolio", e);
 	}
-	
+
 	request.getSession().setAttribute("pixlrDTO", pixlrDTO);
     }
 

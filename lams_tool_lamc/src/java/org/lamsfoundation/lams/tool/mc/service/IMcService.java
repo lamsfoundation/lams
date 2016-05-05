@@ -2,21 +2,21 @@
  * Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
  * =============================================================
  * License Information: http://lamsfoundation.org/licensing/lams/2.0/
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General License as published by
  * the Free Software Foundation.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General License for more details.
- * 
+ *
  * You should have received a copy of the GNU General License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301
  * USA
- * 
+ *
  * http://www.gnu.org/licenses/gpl.txt
  * ***********************************************************************/
 /* $$Id$$ */
@@ -48,32 +48,31 @@ import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 
 /**
  * Interface that defines the contract that all MCQ service provider must follow.
- * 
+ *
  * @author Ozgur Demirtas
  */
 public interface IMcService {
-    
+
     /**
      * Set specified user as a leader. Also the previous leader (if any) is marked as non-leader.
-     * 
+     *
      * @param userId
      * @param toolSessionID
      */
     McQueUsr checkLeaderSelectToolForSessionLeader(McQueUsr user, Long toolSessionID);
-    
+
     /**
-     * Check user has the same answers logs as group leader. If not - creates missing ones. 
-     * 
+     * Check user has the same answers logs as group leader. If not - creates missing ones.
+     *
      * @param user
      * @param leader
      */
     void copyAnswersFromLeader(McQueUsr user, McQueUsr leader);
-    
 
     void createMc(McContent mcContent) throws McApplicationException;
 
     McContent getMcContent(Long toolContentId) throws McApplicationException;
-    
+
     void setDefineLater(String strToolContentID, boolean value);
 
     void updateQuestion(McQueContent mcQueContent) throws McApplicationException;
@@ -92,12 +91,12 @@ public interface IMcService {
     void removeMcQueContent(McQueContent mcQueContent) throws McApplicationException;
 
     void saveOrUpdateMcQueContent(McQueContent mcQueContent) throws McApplicationException;
-    
+
     /**
      * persists the questions
      */
     McContent createQuestions(List<McQuestionDTO> questionDTOs, McContent content);
-    
+
     void releaseQuestionsFromCache(McContent content);
 
     List refreshQuestionContent(final Long mcContentId) throws McApplicationException;
@@ -107,12 +106,12 @@ public interface IMcService {
     McQueContent getQuestionByUid(Long uid);
 
     McQueUsr getMcUserByUID(Long uid) throws McApplicationException;
-    
+
     List<McUserMarkDTO> getPagedUsersBySession(Long sessionId, int page, int size, String sortBy, String sortOrder,
 	    String searchString);
 
     int getCountPagedUsersBySession(Long sessionId, String searchString);
-    
+
     String getLocalizedMessage(String key);
 
     List<McQueContent> getQuestionsByContentUid(final Long mcContentId) throws McApplicationException;
@@ -124,15 +123,14 @@ public interface IMcService {
     void updateMcQueUsr(McQueUsr mcQueUsr) throws McApplicationException;
 
     List<McOptionDTO> getOptionDtos(Long mcQueContentId) throws McApplicationException;
-    
+
     List<McUsrAttempt> getFinalizedUserAttempts(final McQueUsr user) throws McApplicationException;
 
     List findOptionsByQuestionUid(Long mcQueContentId) throws McApplicationException;
 
     void updateMcOptionsContent(McOptsContent mcOptsContent) throws McApplicationException;
 
-    McUsrAttempt getUserAttemptByQuestion(Long queUsrUid, Long mcQueContentId)
-	    throws McApplicationException;
+    McUsrAttempt getUserAttemptByQuestion(Long queUsrUid, Long mcQueContentId) throws McApplicationException;
 
     void copyToolContent(Long fromContentId, Long toContentId) throws ToolException;
 
@@ -146,8 +144,7 @@ public interface IMcService {
 
     ToolSessionExportOutputData exportToolSession(Long toolSessionId) throws DataMissingException, ToolException;
 
-    ToolSessionExportOutputData exportToolSession(List toolSessionIds) throws DataMissingException,
-	    ToolException;
+    ToolSessionExportOutputData exportToolSession(List toolSessionIds) throws DataMissingException, ToolException;
 
     IToolVO getToolBySignature(String toolSignature) throws McApplicationException;
 
@@ -161,7 +158,7 @@ public interface IMcService {
 
     /**
      * Return the top, lowest and average mark for all learners for one particular tool session.
-     * 
+     *
      * @param request
      * @return top mark, lowest mark, average mark in that order
      */
@@ -169,22 +166,23 @@ public interface IMcService {
 
     /**
      * Returns whether activity is grouped and therefore it is expected more than one tool session.
-     * 
+     *
      * @param toolContentID
      * @return
      */
     boolean isGroupedActivity(long toolContentID);
-    
+
     /**
      * @param mcContent
-     * @param user user; pass null if there is no need to populate previous answers
+     * @param user
+     *            user; pass null if there is no need to populate previous answers
      * @return
      */
     List<McLearnerAnswersDTO> buildLearnerAnswersDTOList(McContent mcContent, McQueUsr user);
-    
+
     /**
      * Returns userMarksDtos grouped by sessions. Used *only* for export portfolio.
-     * 
+     *
      * @param mcContent
      * @param isFullAttemptDetailsRequired
      *            if true populates complete user attempt history including option select history, used only for export
@@ -192,34 +190,34 @@ public interface IMcService {
      * @return
      */
     List<McSessionMarkDTO> buildGroupsMarkData(McContent mcContent, boolean isFullAttemptDetailsRequired);
-    
+
     /**
      * prepareSessionDataSpreadsheet
-     * 
+     *
      * @param mcContent
-     * 
+     *
      * @return data to write out
      */
     byte[] prepareSessionDataSpreadsheet(McContent mcContent) throws IOException;
-    
+
     void changeUserAttemptMark(Long userAttemptUid, Integer newMark);
-    
+
     void recalculateUserAnswers(McContent content, Set<McQueContent> oldQuestions, List<McQuestionDTO> questionDTOs,
 	    List<McQuestionDTO> deletedQuestions);
-    
+
     /**
      * Recalculate mark for leader and sets it to all members of a group. Authentication check: user must be either
      * lesson stuff or group manager.
-     * 
+     *
      * @param requestUserDTO
      * @param lessonId
      */
     void recalculateMarkForLesson(UserDTO requestUserDTO, Long lessonId);
-    
+
     /**
-     * 
+     *
      * returns reflection data for all sessions
-     * 
+     *
      * @param mcContent
      * @param userID
      * @param mcService

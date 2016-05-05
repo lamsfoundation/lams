@@ -1,45 +1,43 @@
 package org.lamsfoundation.lams.learningdesign.dto;
 
 import org.lamsfoundation.lams.learningdesign.CompetenceMapping;
-import org.lamsfoundation.lams.learningdesign.ToolActivity;
 
-public class CompetenceMappingDTO 
-{
-	private Long competenceMappingId;
-	private String competenceTitle;
-	private Integer toolActivityUIID;
-	
-	public CompetenceMappingDTO() {}
-	
-	public CompetenceMappingDTO(CompetenceMapping competenceMapping)
-	{
-		this.competenceMappingId = competenceMapping.getCompetenceMappingId();
-		this.competenceTitle = competenceMapping.getCompetence().getTitle();
-		this.toolActivityUIID = competenceMapping.getToolActivity().getActivityUIID();
-		
-	}
+public class CompetenceMappingDTO {
+    private Long competenceMappingId;
+    private String competenceTitle;
+    private Integer toolActivityUIID;
 
-	public Long getCompetenceMappingId() {
-		return competenceMappingId;
-	}
+    public CompetenceMappingDTO() {
+    }
 
-	public void setCompetenceMappingId(Long competenceMappingId) {
-		this.competenceMappingId = competenceMappingId;
-	}
+    public CompetenceMappingDTO(CompetenceMapping competenceMapping) {
+	this.competenceMappingId = competenceMapping.getCompetenceMappingId();
+	this.competenceTitle = competenceMapping.getCompetence().getTitle();
+	this.toolActivityUIID = competenceMapping.getToolActivity().getActivityUIID();
 
-	public String getCompetenceTitle() {
-		return competenceTitle;
-	}
+    }
 
-	public void setCompetenceTitle(String competenceTitle) {
-		this.competenceTitle = competenceTitle;
-	}
+    public Long getCompetenceMappingId() {
+	return competenceMappingId;
+    }
 
-	public Integer getToolActivityUIID() {
-		return toolActivityUIID;
-	}
+    public void setCompetenceMappingId(Long competenceMappingId) {
+	this.competenceMappingId = competenceMappingId;
+    }
 
-	public void setToolActivityUIID(Integer toolActivityUIID) {
-		this.toolActivityUIID = toolActivityUIID;
-	}
+    public String getCompetenceTitle() {
+	return competenceTitle;
+    }
+
+    public void setCompetenceTitle(String competenceTitle) {
+	this.competenceTitle = competenceTitle;
+    }
+
+    public Integer getToolActivityUIID() {
+	return toolActivityUIID;
+    }
+
+    public void setToolActivityUIID(Integer toolActivityUIID) {
+	this.toolActivityUIID = toolActivityUIID;
+    }
 }

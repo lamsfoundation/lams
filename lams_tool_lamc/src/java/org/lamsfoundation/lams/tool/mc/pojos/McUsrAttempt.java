@@ -2,21 +2,21 @@
  * Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
  * =============================================================
  * License Information: http://lamsfoundation.org/licensing/lams/2.0/
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301
  * USA
- * 
+ *
  * http://www.gnu.org/licenses/gpl.txt
  * ***********************************************************************/
 /* $$Id$$ */
@@ -32,7 +32,7 @@ import org.apache.commons.lang.builder.ToStringBuilder;
  * Persistent object/bean that defines the user attempt for the MCQ tool. Provides accessors and mutators to get/set
  * attributes It maps to database table: tl_lamc11_usr_attempt
  * </p>
- * 
+ *
  * @author Ozgur Demirtas
  */
 public class McUsrAttempt implements Serializable {
@@ -64,10 +64,8 @@ public class McUsrAttempt implements Serializable {
     /** persistent field */
     private McOptsContent mcOptionsContent;
 
-    public McUsrAttempt(Date attemptTime, McQueContent mcQueContent,
-	    McQueUsr mcQueUsr,
-	    McOptsContent mcOptionsContent, Integer mark, boolean passed,
-	    boolean attemptCorrect) {
+    public McUsrAttempt(Date attemptTime, McQueContent mcQueContent, McQueUsr mcQueUsr, McOptsContent mcOptionsContent,
+	    Integer mark, boolean passed, boolean attemptCorrect) {
 	this.attemptTime = attemptTime;
 	this.mcQueContent = mcQueContent;
 	this.mcQueUsr = mcQueUsr;
@@ -80,7 +78,7 @@ public class McUsrAttempt implements Serializable {
     /** default constructor */
     public McUsrAttempt() {
     }
-    
+
     @Override
     public int hashCode() {
 	final int prime = 31;
@@ -91,18 +89,23 @@ public class McUsrAttempt implements Serializable {
 
     @Override
     public boolean equals(Object obj) {
-	if (this == obj)
+	if (this == obj) {
 	    return true;
-	if (obj == null)
+	}
+	if (obj == null) {
 	    return false;
-	if (getClass() != obj.getClass())
+	}
+	if (getClass() != obj.getClass()) {
 	    return false;
+	}
 	McUsrAttempt other = (McUsrAttempt) obj;
 	if (uid == null) {
-	    if (other.uid != null)
+	    if (other.uid != null) {
 		return false;
-	} else if (!uid.equals(other.uid))
+	    }
+	} else if (!uid.equals(other.uid)) {
 	    return false;
+	}
 	return true;
     }
 
@@ -146,6 +149,7 @@ public class McUsrAttempt implements Serializable {
 	this.mcOptionsContent = mcOptionsContent;
     }
 
+    @Override
     public String toString() {
 	return new ToStringBuilder(this).append("uid", getUid()).toString();
     }
@@ -236,7 +240,7 @@ public class McUsrAttempt implements Serializable {
 //	} else {
 //	    return new Integer(0);
 //	}
-	
+
 	return getMark();
     }
 

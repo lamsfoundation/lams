@@ -30,9 +30,9 @@ import org.lamsfoundation.lams.web.TextSearchActionForm;
 
 /**
  * A text search form with additional parameters for Q&A needs.
- * 
+ *
  * @author Marcin Cieslak
- * 
+ *
  */
 public class QaConditionForm extends TextSearchActionForm {
     /**
@@ -97,7 +97,7 @@ public class QaConditionForm extends TextSearchActionForm {
     /**
      * Fills a new QaCondition with data contained in this form. Note that some cruicial data is missing, so the
      * condition is NOT complete.
-     * 
+     *
      * @return created condition
      */
     public QaCondition extractCondition() {

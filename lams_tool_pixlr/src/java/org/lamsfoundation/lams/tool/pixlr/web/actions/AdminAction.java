@@ -7,23 +7,24 @@ import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.lamsfoundation.lams.tool.pixlr.model.PixlrConfigItem;
-import org.lamsfoundation.lams.tool.pixlr.service.PixlrServiceProxy;
 import org.lamsfoundation.lams.tool.pixlr.service.IPixlrService;
+import org.lamsfoundation.lams.tool.pixlr.service.PixlrServiceProxy;
 import org.lamsfoundation.lams.tool.pixlr.web.forms.AdminForm;
 import org.lamsfoundation.lams.web.action.LamsDispatchAction;
 
 /**
  * @author
  * @version
- * 
+ *
  * @struts.action path="/lapixl10admin" parameter="dispatch" scope="request"
  *                name="lapixl10AdminForm" validate="false"
- * 
+ *
  * @struts.action-forward name="config" path="/pages/admin/config.jsp"
  */
 public class AdminAction extends LamsDispatchAction {
     public IPixlrService pixlrService;
 
+    @Override
     public ActionForward unspecified(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) {
 	// set up mdlForumService
@@ -34,8 +35,9 @@ public class AdminAction extends LamsDispatchAction {
 	AdminForm adminForm = (AdminForm) form;
 
 	PixlrConfigItem pixlrKey = pixlrService.getConfigItem(PixlrConfigItem.KEY_LANGUAGE_CSV);
-	if (pixlrKey != null)
+	if (pixlrKey != null) {
 	    adminForm.setLanguagesCSV(pixlrKey.getConfigValue());
+	}
 
 	request.setAttribute("error", false);
 	return mapping.findForward("config");

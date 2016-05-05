@@ -58,36 +58,37 @@ public class ForumOutputFactory extends OutputFactory {
      * @see org.lamsfoundation.lams.tool.OutputDefinitionFactory#getToolOutputDefinitions(java.lang.Object)
      */
     @Override
-    public SortedMap<String, ToolOutputDefinition> getToolOutputDefinitions(Object toolContentObject, int definitionType)
-	    throws ToolException {
+    public SortedMap<String, ToolOutputDefinition> getToolOutputDefinitions(Object toolContentObject,
+	    int definitionType) throws ToolException {
 
 	SortedMap<String, ToolOutputDefinition> definitionMap = new TreeMap<String, ToolOutputDefinition>();
 	Class topicDatesToAnswersClass = (new HashMap<Date, Set<String>>()).getClass();
 	Class stringArrayClass = String[].class;
 
 	switch (definitionType) {
-	case ToolOutputDefinition.DATA_OUTPUT_DEFINITION_TYPE_CONDITION:
-	    if (toolContentObject != null) {
-		ToolOutputDefinition chosenTopicAnswersDefinition = buildComplexOutputDefinition(
-			ForumConstants.TOPIC_DATE_TO_ANSWERS_DEFINITION_NAME, topicDatesToAnswersClass);
-		Forum forum = (Forum) toolContentObject;
+	    case ToolOutputDefinition.DATA_OUTPUT_DEFINITION_TYPE_CONDITION:
+		if (toolContentObject != null) {
+		    ToolOutputDefinition chosenTopicAnswersDefinition = buildComplexOutputDefinition(
+			    ForumConstants.TOPIC_DATE_TO_ANSWERS_DEFINITION_NAME, topicDatesToAnswersClass);
+		    Forum forum = (Forum) toolContentObject;
 
-		// adding all existing conditions
-		chosenTopicAnswersDefinition
-			.setDefaultConditions(new ArrayList<BranchCondition>(forum.getConditions()));
+		    // adding all existing conditions
+		    chosenTopicAnswersDefinition
+			    .setDefaultConditions(new ArrayList<BranchCondition>(forum.getConditions()));
 
-		chosenTopicAnswersDefinition.setShowConditionNameOnly(true);
-		definitionMap.put(ForumConstants.TOPIC_DATE_TO_ANSWERS_DEFINITION_NAME, chosenTopicAnswersDefinition);
-	    }
-	    ToolOutputDefinition numberOfPostsDefinition = buildRangeDefinition(
-		    ForumConstants.LEARNER_NUM_POSTS_DEFINITION_NAME, new Long(0), null);
-	    definitionMap.put(ForumConstants.LEARNER_NUM_POSTS_DEFINITION_NAME, numberOfPostsDefinition);
-	    break;
-	case ToolOutputDefinition.DATA_OUTPUT_DEFINITION_TYPE_DATA_FLOW:
-	    ToolOutputDefinition allUsersAnswersDefinition = buildComplexOutputDefinition(
-		    ForumConstants.ALL_USERS_ANSWERS_DEFINITION_NAME, stringArrayClass);
-	    definitionMap.put(ForumConstants.ALL_USERS_ANSWERS_DEFINITION_NAME, allUsersAnswersDefinition);
-	    break;
+		    chosenTopicAnswersDefinition.setShowConditionNameOnly(true);
+		    definitionMap.put(ForumConstants.TOPIC_DATE_TO_ANSWERS_DEFINITION_NAME,
+			    chosenTopicAnswersDefinition);
+		}
+		ToolOutputDefinition numberOfPostsDefinition = buildRangeDefinition(
+			ForumConstants.LEARNER_NUM_POSTS_DEFINITION_NAME, new Long(0), null);
+		definitionMap.put(ForumConstants.LEARNER_NUM_POSTS_DEFINITION_NAME, numberOfPostsDefinition);
+		break;
+	    case ToolOutputDefinition.DATA_OUTPUT_DEFINITION_TYPE_DATA_FLOW:
+		ToolOutputDefinition allUsersAnswersDefinition = buildComplexOutputDefinition(
+			ForumConstants.ALL_USERS_ANSWERS_DEFINITION_NAME, stringArrayClass);
+		definitionMap.put(ForumConstants.ALL_USERS_ANSWERS_DEFINITION_NAME, allUsersAnswersDefinition);
+		break;
 	}
 
 	return definitionMap;
@@ -148,7 +149,8 @@ public class ForumOutputFactory extends OutputFactory {
 	    Map<Date, Set<String>> answers = new HashMap<Date, Set<String>>();
 
 	    ForumUser user = forumService.getUserByUserAndSession(learnerId, toolSessionId);
-	    List<MessageDTO> userMessages = user == null ? null : forumService.getMessagesByUserUid(user.getUid(), toolSessionId);
+	    List<MessageDTO> userMessages = user == null ? null
+		    : forumService.getMessagesByUserUid(user.getUid(), toolSessionId);
 
 	    if (userMessages != null) {
 		for (MessageDTO messageDTO : userMessages) {
@@ -200,8 +202,8 @@ public class ForumOutputFactory extends OutputFactory {
 
     private ToolOutput getNumPosts(IForumService forumService, Long learnerId, Long toolSessionId) {
 	int num = forumService.getTopicsNum(learnerId, toolSessionId);
-	return new ToolOutput(ForumConstants.LEARNER_NUM_POSTS_DEFINITION_NAME, getI18NText(
-		ForumConstants.LEARNER_NUM_POSTS_DEFINITION_NAME, true), new Long(num));
+	return new ToolOutput(ForumConstants.LEARNER_NUM_POSTS_DEFINITION_NAME,
+		getI18NText(ForumConstants.LEARNER_NUM_POSTS_DEFINITION_NAME, true), new Long(num));
     }
 
     @Override
@@ -215,7 +217,7 @@ public class ForumOutputFactory extends OutputFactory {
 
     /**
      * Creates a default condition so teachers know how to use complex conditions for this tool.
-     * 
+     *
      * @param forum
      *            content of the tool
      * @return default Forum condition
@@ -223,7 +225,7 @@ public class ForumOutputFactory extends OutputFactory {
     protected ForumCondition createDefaultTopicDateToAnswersCondition(Forum forum) {
 
 	Set<Message> messages = new HashSet<Message>();
-	for (Message message : (Set<Message>) forum.getMessages()) {
+	for (Message message : forum.getMessages()) {
 	    if (message.getIsAuthored() && message.getToolSession() == null) {
 		messages.add(message);
 		break;
@@ -234,11 +236,11 @@ public class ForumOutputFactory extends OutputFactory {
 	    return null;
 	}
 
-	String name = buildConditionName(ForumConstants.TOPIC_DATE_TO_ANSWERS_DEFINITION_NAME, forum.getContentId()
-		.toString());
+	String name = buildConditionName(ForumConstants.TOPIC_DATE_TO_ANSWERS_DEFINITION_NAME,
+		forum.getContentId().toString());
 	// Default condition checks if the answers for the first topic contain word "LAMS"
-	return new ForumCondition(null, null, 1, name, getI18NText(
-		ForumConstants.TOPIC_DATE_TO_ANSWERS_DEFAULT_CONDITION_DISPLAY_NAME_KEY, false), "LAMS", null, null,
-		null, messages);
+	return new ForumCondition(null, null, 1, name,
+		getI18NText(ForumConstants.TOPIC_DATE_TO_ANSWERS_DEFAULT_CONDITION_DISPLAY_NAME_KEY, false), "LAMS",
+		null, null, null, messages);
     }
 }

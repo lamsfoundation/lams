@@ -2,21 +2,21 @@
  * Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
  * =============================================================
  * License Information: http://lamsfoundation.org/licensing/lams/2.0/
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License version 2.0 
+ * it under the terms of the GNU General Public License version 2.0
  * as published by the Free Software Foundation.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301
  * USA
- * 
+ *
  * http://www.gnu.org/licenses/gpl.txt
  * ****************************************************************
  */
@@ -28,58 +28,58 @@ package org.lamsfoundation.lams.tool.chat.web.forms;
 import org.apache.struts.action.ActionForm;
 
 /**
- * 
+ *
  * @author Anthony Sukkar
- * 
+ *
  * @struts.form name="learningForm"
  */
 public class LearningForm extends ActionForm {
 
-	private static final long serialVersionUID = -4728946254882237144L;
-	
-	String dispatch;
-	Long chatUserUID;
-	Long toolSessionID;
-	String mode;
-	String entryText;
+    private static final long serialVersionUID = -4728946254882237144L;
 
-	public String getMode() {
-		return mode;
-	}
+    String dispatch;
+    Long chatUserUID;
+    Long toolSessionID;
+    String mode;
+    String entryText;
 
-	public void setMode(String mode) {
-		this.mode = mode;
-	}
+    public String getMode() {
+	return mode;
+    }
 
-	public Long getChatUserUID() {
-		return chatUserUID;
-	}
+    public void setMode(String mode) {
+	this.mode = mode;
+    }
 
-	public void setChatUserUID(Long chatUserUID) {
-		this.chatUserUID = chatUserUID;
-	}
+    public Long getChatUserUID() {
+	return chatUserUID;
+    }
 
-	public String getDispatch() {
-		return dispatch;
-	}
+    public void setChatUserUID(Long chatUserUID) {
+	this.chatUserUID = chatUserUID;
+    }
 
-	public void setDispatch(String dispatch) {
-		this.dispatch = dispatch;
-	}
+    public String getDispatch() {
+	return dispatch;
+    }
 
-	public Long getToolSessionID() {
-		return toolSessionID;
-	}
+    public void setDispatch(String dispatch) {
+	this.dispatch = dispatch;
+    }
 
-	public void setToolSessionID(Long toolSessionID) {
-		this.toolSessionID = toolSessionID;
-	}
+    public Long getToolSessionID() {
+	return toolSessionID;
+    }
 
-	public String getEntryText() {
-		return entryText;
-	}
+    public void setToolSessionID(Long toolSessionID) {
+	this.toolSessionID = toolSessionID;
+    }
 
-	public void setEntryText(String entryText) {
-		this.entryText = entryText;
-	}
+    public String getEntryText() {
+	return entryText;
+    }
+
+    public void setEntryText(String entryText) {
+	this.entryText = entryText;
+    }
 }

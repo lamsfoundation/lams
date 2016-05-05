@@ -32,11 +32,11 @@ import org.lamsfoundation.lams.gradebook.util.GradebookUtil;
 import org.lamsfoundation.lams.usermanagement.User;
 
 public class GBUserGridRowDTO extends GradebookGridRowDTO {
-    
+
     // For activity view
     private Date startDate;
     private String activityUrl;
-    
+
     // For excel export
     private Date finishDate;
     private String firstName;
@@ -46,7 +46,7 @@ public class GBUserGridRowDTO extends GradebookGridRowDTO {
 
     public GBUserGridRowDTO() {
     }
-    
+
     public GBUserGridRowDTO(User user) {
 	this.id = user.getUserId().toString();
 	this.rowName = StringEscapeUtils.escapeHtml(user.getLastName() + " " + user.getFirstName());
@@ -60,21 +60,21 @@ public class GBUserGridRowDTO extends GradebookGridRowDTO {
 	ArrayList<String> ret = new ArrayList<String>();
 
 	ret.add(id.toString());
-	
+
 	if (view == GBGridView.MON_USER) {
-	    
+
 	    ret.add(rowName);
 	    ret.add(status);
 	    ret.add((timeTaken != null) ? convertTimeToString(timeTaken) : CELL_EMPTY);
 	    ret.add(feedback);
 	    ret.add((mark != null) ? GradebookUtil.niceFormatting(mark) : CELL_EMPTY);
-	    	    
-	} else if (view == GBGridView.MON_ACTIVITY){
-	    
+
+	} else if (view == GBGridView.MON_ACTIVITY) {
+
 	    ret.add(marksAvailable != null ? marksAvailable.toString() : "");
 	    if (activityUrl != null && activityUrl.length() != 0) {
-		ret.add("<a href='javascript:launchPopup(\"" + activityUrl + "\",\"" + rowName + "\",796,570)'>" + rowName
-			+ "</a>");
+		ret.add("<a href='javascript:launchPopup(\"" + activityUrl + "\",\"" + rowName + "\",796,570)'>"
+			+ rowName + "</a>");
 	    } else {
 		ret.add(rowName);
 	    }
@@ -82,14 +82,14 @@ public class GBUserGridRowDTO extends GradebookGridRowDTO {
 	    ret.add((timeTaken != null) ? convertTimeToString(timeTaken) : CELL_EMPTY);
 	    ret.add(feedback);
 	    ret.add((mark != null) ? GradebookUtil.niceFormatting(mark) : CELL_EMPTY);
-	    
-	} else if (view == GBGridView.MON_COURSE){
+
+	} else if (view == GBGridView.MON_COURSE) {
 	    ret.add(rowName);
 	    ret.add(status);
 	    ret.add((timeTaken != null) ? convertTimeToString(timeTaken) : CELL_EMPTY);
 	    ret.add(feedback);
 	    ret.add((mark != null) ? GradebookUtil.niceFormatting(mark) : CELL_EMPTY);
-	    
+
 	} else if (view == GBGridView.LIST) {
 	    ret.add(rowName);
 	}
@@ -104,7 +104,7 @@ public class GBUserGridRowDTO extends GradebookGridRowDTO {
     public void setActivityUrl(String activityUrl) {
 	this.activityUrl = activityUrl;
     }
-    
+
     public String getFirstName() {
 	return firstName;
     }
@@ -112,7 +112,7 @@ public class GBUserGridRowDTO extends GradebookGridRowDTO {
     public void setFirstName(String firstName) {
 	this.firstName = firstName;
     }
-    
+
     public String getLastName() {
 	return lastName;
     }
@@ -120,7 +120,7 @@ public class GBUserGridRowDTO extends GradebookGridRowDTO {
     public void setLastName(String lastName) {
 	this.lastName = lastName;
     }
-    
+
     public String getLogin() {
 	return login;
     }
@@ -128,29 +128,29 @@ public class GBUserGridRowDTO extends GradebookGridRowDTO {
     public void setLogin(String login) {
 	this.login = login;
     }
-    
+
     public String getCurrentActivity() {
 	return currentActivity;
     }
-    
+
     public void setCurrentActivity(String currentActivity) {
 	this.currentActivity = currentActivity;
     }
 
     public Date getStartDate() {
-        return startDate;
+	return startDate;
     }
 
     public void setStartDate(Date startTime) {
-        this.startDate = startTime;
+	this.startDate = startTime;
     }
-    
+
     public Date getFinishDate() {
-        return finishDate;
+	return finishDate;
     }
 
     public void setFinishDate(Date finishDate) {
-        this.finishDate = finishDate;
+	this.finishDate = finishDate;
     }
 
 }

@@ -2,21 +2,21 @@
  * Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
  * =============================================================
  * License Information: http://lamsfoundation.org/licensing/lams/2.0/
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License version 2.0 
+ * it under the terms of the GNU General Public License version 2.0
  * as published by the Free Software Foundation.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301
  * USA
- * 
+ *
  * http://www.gnu.org/licenses/gpl.txt
  * ****************************************************************
  */
@@ -38,18 +38,14 @@ public class PresenceChatDAO extends BaseDAO implements IPresenceChatDAO {
     private static final String MESSAGE_BY_MESSAGE_ID = "from " + PresenceChatMessage.class.getName() + " msg"
 	    + " where msg.uid=?";
 
-    private static final String MESSAGE_BY_CONVERSATION = "from "
-	    + PresenceChatMessage.class.getName()
-	    + " msg"
+    private static final String MESSAGE_BY_CONVERSATION = "from " + PresenceChatMessage.class.getName() + " msg"
 	    + " where (msg.from=:from and msg.to=:to) or (msg.from=:to and msg.to=:from) and msg.lessonId=:lessonId order by msg.dateSent asc";
 
     private static final String MESSAGE_BY_LESSON_ID = "from " + PresenceChatMessage.class.getName() + " msg"
 	    + " where msg.lessonId=? and msg.to is null order by msg.dateSent asc";
 
     // main query for getting new messages
-    private static final String MESSAGE_NEW = "FROM "
-	    + PresenceChatMessage.class.getName()
-	    + " msg"
+    private static final String MESSAGE_NEW = "FROM " + PresenceChatMessage.class.getName() + " msg"
 	    + " WHERE msg.lessonId=:lessonId AND"
 	    // below: get messages for opened tab, only if they have not been read yet;
 	    // in HQL, CASE statement does notwork :( and this trick with 'NULL'=:to is really necessary
@@ -82,8 +78,8 @@ public class PresenceChatDAO extends BaseDAO implements IPresenceChatDAO {
     @Override
     @SuppressWarnings("unchecked")
     public List<PresenceChatMessage> getMessagesByConversation(Long lessonId, String from, String to) {
-	return (getHibernateTemplate().findByNamedParam(PresenceChatDAO.MESSAGE_BY_CONVERSATION, new String[] { "from",
-		"to", "lessonId" }, new Object[] { from, to, lessonId }));
+	return (getHibernateTemplate().findByNamedParam(PresenceChatDAO.MESSAGE_BY_CONVERSATION,
+		new String[] { "from", "to", "lessonId" }, new Object[] { from, to, lessonId }));
     }
 
     @Override
@@ -96,9 +92,12 @@ public class PresenceChatDAO extends BaseDAO implements IPresenceChatDAO {
     @SuppressWarnings("unchecked")
     public List<PresenceChatMessage> getNewMessages(Long lessonId, String from, String to, Long lastMessageUid,
 	    Date lastCheck) {
-	return (getHibernateTemplate().findByNamedParam(PresenceChatDAO.MESSAGE_NEW, new String[] { "lessonId", "from",
-		"to", "lastMessageUid", "lastCheck" }, new Object[] { lessonId, from, to == null ? "NULL" : to,
-		lastMessageUid == null ? 0 : lastMessageUid, lastCheck == null ? new Date(0) : lastCheck }));
+	return (getHibernateTemplate()
+		.findByNamedParam(PresenceChatDAO.MESSAGE_NEW,
+			new String[] { "lessonId", "from", "to", "lastMessageUid", "lastCheck" },
+			new Object[] { lessonId, from, to == null ? "NULL" : to,
+				lastMessageUid == null ? 0 : lastMessageUid,
+				lastCheck == null ? new Date(0) : lastCheck }));
     }
 
     @Override

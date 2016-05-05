@@ -18,10 +18,10 @@
  *
  * http://www.gnu.org/licenses/gpl.txt
  * ****************************************************************
- */ 
- 
-/* $Id$ */ 
-package org.lamsfoundation.lams.webservice; 
+ */
+
+/* $Id$ */
+package org.lamsfoundation.lams.webservice;
 
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
@@ -37,7 +37,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.log4j.Logger;
- 
+
 /**
  * @author jliew
  *
@@ -45,65 +45,64 @@ import org.apache.log4j.Logger;
  * @web:servlet-mapping url-pattern="/BogoPogo"
  */
 public class WhiteboardToJpgServlet extends HttpServlet {
-	
-	private static Logger log = Logger.getLogger(WhiteboardToJpgServlet.class);
-	
-	public void doPost(HttpServletRequest request, HttpServletResponse response) 
-		throws ServletException {
-		
-		PrintWriter out = null;
-		String ext = "jpg";
-		String dir = System.getProperty("java.io.tmpdir");
-		
-		try {
-			out = response.getWriter();
-			
-			String d = request.getParameter("data");
-			String w = request.getParameter("width");
-			String h = request.getParameter("height");
-			
-			log.debug("got parameters data="+d+", width="+w+", height="+h);
-			out.write("got parameters data="+d+", width="+w+", height="+h);
-			
-			String[] darray = d.split(",");
-			int[] pixels = new int[darray.length];
-			for (int i=0; i<darray.length; i++) {
-				pixels[i] = new Integer(darray[i]).intValue();
-			}
-			int width = new Integer(w).intValue();
-			int height = new Integer(h).intValue();
-			
-			BufferedImage buffer = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
-			buffer.setRGB(0, 0, width, height, pixels, 0, width);
-			
-			ByteArrayOutputStream os = new ByteArrayOutputStream();
-			try {
-				// put buffer data into byte output stream
-				ImageIO.write(buffer, ext, os);
-				byte[] imagebytes = os.toByteArray();
-				
-				// write bytes into file
-				FileOutputStream fileos = new FileOutputStream(new File(dir + "/new." + ext));
-				fileos.write(imagebytes);
-				fileos.close();
-			} catch (IOException e) {
-				log.error("file output stream threw exception, " + e);
-			} catch (Exception e) {
-				log.error(e);
-				out.write("\n"+e);
-			}
-		} catch (IOException e) {
-			log.error("print writer threw exception, " + e);
-		} catch (Exception e) {
-			log.error(e);
-			out.write("\n"+e);
-		} finally {
-			if (out != null) {
-				out.close();
-			}
-		}
-		
+
+    private static Logger log = Logger.getLogger(WhiteboardToJpgServlet.class);
+
+    @Override
+    public void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException {
+
+	PrintWriter out = null;
+	String ext = "jpg";
+	String dir = System.getProperty("java.io.tmpdir");
+
+	try {
+	    out = response.getWriter();
+
+	    String d = request.getParameter("data");
+	    String w = request.getParameter("width");
+	    String h = request.getParameter("height");
+
+	    log.debug("got parameters data=" + d + ", width=" + w + ", height=" + h);
+	    out.write("got parameters data=" + d + ", width=" + w + ", height=" + h);
+
+	    String[] darray = d.split(",");
+	    int[] pixels = new int[darray.length];
+	    for (int i = 0; i < darray.length; i++) {
+		pixels[i] = new Integer(darray[i]).intValue();
+	    }
+	    int width = new Integer(w).intValue();
+	    int height = new Integer(h).intValue();
+
+	    BufferedImage buffer = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
+	    buffer.setRGB(0, 0, width, height, pixels, 0, width);
+
+	    ByteArrayOutputStream os = new ByteArrayOutputStream();
+	    try {
+		// put buffer data into byte output stream
+		ImageIO.write(buffer, ext, os);
+		byte[] imagebytes = os.toByteArray();
+
+		// write bytes into file
+		FileOutputStream fileos = new FileOutputStream(new File(dir + "/new." + ext));
+		fileos.write(imagebytes);
+		fileos.close();
+	    } catch (IOException e) {
+		log.error("file output stream threw exception, " + e);
+	    } catch (Exception e) {
+		log.error(e);
+		out.write("\n" + e);
+	    }
+	} catch (IOException e) {
+	    log.error("print writer threw exception, " + e);
+	} catch (Exception e) {
+	    log.error(e);
+	    out.write("\n" + e);
+	} finally {
+	    if (out != null) {
+		out.close();
+	    }
 	}
 
+    }
+
 }
- 

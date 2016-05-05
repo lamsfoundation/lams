@@ -2,21 +2,21 @@
  * Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
  * =============================================================
  * License Information: http://lamsfoundation.org/licensing/lams/2.0/
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License version 2.0 
+ * it under the terms of the GNU General Public License version 2.0
  * as published by the Free Software Foundation.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301
  * USA
- * 
+ *
  * http://www.gnu.org/licenses/gpl.txt
  * ****************************************************************
  */
@@ -41,11 +41,11 @@ import org.lamsfoundation.lams.contentrepository.dao.ICredentialDAO;
 import org.lamsfoundation.lams.dao.hibernate.BaseDAO;
 
 /**
- * 
+ *
  * Implements the credentials lookup using Hibernate.
- * 
+ *
  * @author Fiona Malikoff
- * 
+ *
  */
 public class CredentialDAO extends BaseDAO implements ICredentialDAO {
 
@@ -54,6 +54,7 @@ public class CredentialDAO extends BaseDAO implements ICredentialDAO {
     /**
      * Checks whether a user can login to this workspace. The Credential must include the password.
      */
+    @Override
     public boolean checkCredential(ICredentials credential, IWorkspace workspace) throws RepositoryRuntimeException {
 	if (log.isDebugEnabled()) {
 	    log.debug("Checking credential " + credential + " for workspace " + workspace);
@@ -69,6 +70,7 @@ public class CredentialDAO extends BaseDAO implements ICredentialDAO {
     /**
      * Checks whether a user can login to the repository. The Credential must include the password.
      */
+    @Override
     public boolean checkCredential(ICredentials credential) throws RepositoryRuntimeException {
 	if (log.isDebugEnabled()) {
 	    log.debug("Checking credential " + credential);
@@ -83,7 +85,7 @@ public class CredentialDAO extends BaseDAO implements ICredentialDAO {
 
     /**
      * Checks whether a user can login to the repository. The Credential must include the password.
-     * 
+     *
      * If workspace defined then checks workspace, otherwise just checks password
      */
     public boolean checkCredentialInternal(ICredentials credential, IWorkspace workspace)
@@ -153,6 +155,7 @@ public class CredentialDAO extends BaseDAO implements ICredentialDAO {
 	return credentialMatched;
     }
 
+    @Override
     public CrCredential findByName(String name) {
 
 	log.debug("Getting credential for name " + name);

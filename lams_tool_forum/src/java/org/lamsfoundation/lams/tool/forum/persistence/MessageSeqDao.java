@@ -2,21 +2,21 @@
  * Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
  * =============================================================
  * License Information: http://lamsfoundation.org/licensing/lams/2.0/
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License version 2.0 
+ * it under the terms of the GNU General Public License version 2.0
  * as published by the Free Software Foundation.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301
  * USA
- * 
+ *
  * http://www.gnu.org/licenses/gpl.txt
  * ****************************************************************
  */
@@ -31,7 +31,6 @@ import java.util.List;
 import org.apache.log4j.Logger;
 import org.hibernate.HibernateException;
 import org.hibernate.Session;
-import org.lamsfoundation.lams.tool.Tool;
 import org.springframework.orm.hibernate3.HibernateCallback;
 import org.springframework.orm.hibernate3.HibernateTemplate;
 import org.springframework.orm.hibernate3.support.HibernateDaoSupport;
@@ -57,17 +56,18 @@ public class MessageSeqDao extends HibernateDaoSupport {
 	    + MessageSeq.class.getName() + " seq WHERE seq.rootMessage.uid = ? AND seq.message.updated > ?";
 
     private static final Logger log = Logger.getLogger(MessageSeqDao.class);
-    
+
     public MessageSeq getById(Long messageSeqId) {
 	return (MessageSeq) getHibernateTemplate().get(MessageSeq.class, messageSeqId);
     }
 
     public MessageSeq getByMessageId(Long messageId) {
 	HibernateTemplate template = this.getHibernateTemplate();
-	List list = template.find(SQL_QUERY_GET_SEQ_BY_MESSAGE, messageId);	
-	if (list != null ) {
-	    if ( list.size() > 1) {
-		log.warn("Looking up message seq by message id="+messageId+". More than one message seq found!"+list.toString());
+	List list = template.find(SQL_QUERY_GET_SEQ_BY_MESSAGE, messageId);
+	if (list != null) {
+	    if (list.size() > 1) {
+		log.warn("Looking up message seq by message id=" + messageId + ". More than one message seq found!"
+			+ list.toString());
 	    }
 	    return (MessageSeq) list.get(0);
 	} else {
@@ -86,11 +86,13 @@ public class MessageSeqDao extends HibernateDaoSupport {
     public List getNextThreadByThreadId(final Long rootTopicId, final Long previousThreadMessageId) {
 	HibernateTemplate template = this.getHibernateTemplate();
 	template.setMaxResults(1);
-	List list = template.find(SQL_QUERY_FIND_NEXT_THREAD_TOP, new Object[] { rootTopicId, previousThreadMessageId });	
+	List list = template.find(SQL_QUERY_FIND_NEXT_THREAD_TOP,
+		new Object[] { rootTopicId, previousThreadMessageId });
 	template.setMaxResults(0);
 	if (list != null && list.size() > 0) {
 	    MessageSeq threadTop = ((MessageSeq) list.get(0));
-	    List all = template.find(SQL_QUERY_FIND_NEXT_THREAD_MESSAGES, new Object[] { rootTopicId, threadTop.getMessage().getUid() });
+	    List all = template.find(SQL_QUERY_FIND_NEXT_THREAD_MESSAGES,
+		    new Object[] { rootTopicId, threadTop.getMessage().getUid() });
 	    all.add(threadTop);
 	    return all;
 	}
@@ -100,32 +102,33 @@ public class MessageSeqDao extends HibernateDaoSupport {
     // used for the recureive proc call - to be deleted later
     public List getThreadIds(final Long rootTopicId, final Long previousThreadMessageId) {
 
-        return (List) getHibernateTemplate().execute(new HibernateCallback()
-        {
-            public Object doInHibernate(Session session) throws HibernateException
-            {
-        	String call = "CALL TL_LAFRUM11_GET_THREAD_MESSAGE_UIDS("+rootTopicId+","+previousThreadMessageId+")";
-                return session.createSQLQuery(call).list();
-            }
-        });
+	return (List) getHibernateTemplate().execute(new HibernateCallback() {
+	    @Override
+	    public Object doInHibernate(Session session) throws HibernateException {
+		String call = "CALL TL_LAFRUM11_GET_THREAD_MESSAGE_UIDS(" + rootTopicId + "," + previousThreadMessageId
+			+ ")";
+		return session.createSQLQuery(call).list();
+	    }
+	});
     }
-    
+
 //    Query query = session.createSQLQuery(
 //		"CALL GetStocks(:stockCode)")
 //		.addEntity(Stock.class)
 //		.setParameter("stockCode", "7277");
-//	 
+//
 //	List result = query.list();
 //	for(int i=0; i<result.size(); i++){
 //		Stock stock = (Stock)result.get(i);
 //		System.out.println(stock.getStockCode());
 //	}
-//	
+//
 
     public MessageSeq getByTopicId(Long messageId) {
 	List list = this.getHibernateTemplate().find(SQL_QUERY_FIND_TOPIC_ID, messageId);
-	if (list == null || list.isEmpty())
+	if (list == null || list.isEmpty()) {
 	    return null;
+	}
 	return (MessageSeq) list.get(0);
     }
 
@@ -135,21 +138,23 @@ public class MessageSeqDao extends HibernateDaoSupport {
 
     public void deleteByTopicId(Long topicUid) {
 	MessageSeq seq = getByTopicId(topicUid);
-	if (seq != null)
+	if (seq != null) {
 	    this.getHibernateTemplate().delete(seq);
+	}
     }
 
     public int getNumOfPostsByTopic(Long userID, Long topicID) {
 	List list = this.getHibernateTemplate().find(SQL_QUERY_NUM_POSTS_BY_TOPIC, new Object[] { userID, topicID });
-	if (list != null && list.size() > 0)
+	if (list != null && list.size() > 0) {
 	    return ((Number) list.get(0)).intValue();
-	else
+	} else {
 	    return 0;
+	}
     }
 
     /**
      * Get number of messages newer than specified date.
-     * 
+     *
      * @param rootMessageId
      * @param userId
      * @return

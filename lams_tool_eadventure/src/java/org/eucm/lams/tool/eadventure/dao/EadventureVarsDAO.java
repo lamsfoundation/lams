@@ -18,16 +18,14 @@
  *
  * http://www.gnu.org/licenses/gpl.txt
  * ****************************************************************
- */ 
- 
-/* $Id$ */ 
-package org.eucm.lams.tool.eadventure.dao; 
+ */
+
+/* $Id$ */
+package org.eucm.lams.tool.eadventure.dao;
 
 import org.eucm.lams.tool.eadventure.model.EadventureVars;
- 
+
 public interface EadventureVarsDAO extends DAO {
 
-    
-    public EadventureVars getEadventureVars(Long itemVisitLogID,String name);
+    public EadventureVars getEadventureVars(Long itemVisitLogID, String name);
 }
- 

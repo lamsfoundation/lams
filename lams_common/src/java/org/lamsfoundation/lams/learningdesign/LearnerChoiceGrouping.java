@@ -2,21 +2,21 @@
  * Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
  * =============================================================
  * License Information: http://lamsfoundation.org/licensing/lams/2.0/
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License version 2.0 
+ * it under the terms of the GNU General Public License version 2.0
  * as published by the Free Software Foundation.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301
  * USA
- * 
+ *
  * http://www.gnu.org/licenses/gpl.txt
  * ****************************************************************
  */
@@ -27,7 +27,7 @@ import java.util.Set;
 
 /**
  * Grouping formed by learner's choice
- * 
+ *
  * @author Marcin Cieslak
  */
 public class LearnerChoiceGrouping extends Grouping {
@@ -55,7 +55,7 @@ public class LearnerChoiceGrouping extends Grouping {
 
     /**
      * This method creates a deep copy of the Grouping
-     * 
+     *
      * @return LearnerChoiceGrouping The deep copied Grouping object
      */
     @Override
@@ -71,7 +71,7 @@ public class LearnerChoiceGrouping extends Grouping {
 
     /**
      * This type of grouping doesn't have groups other than learner groups. So it always return <code>true</code>.
-     * 
+     *
      * @see org.lamsfoundation.lams.learningdesign.Grouping#isLearnerGroup(org.lamsfoundation.lams.learningdesign.Group)
      */
     @Override

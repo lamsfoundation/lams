@@ -83,6 +83,7 @@ public class LearningDesignRepositoryServlet extends HttpServlet {
     /**
      * Destruction of the servlet. <br>
      */
+    @Override
     public void destroy() {
 	super.destroy(); // Just puts "destroy" string in log
 	// Put your code here
@@ -131,6 +132,7 @@ public class LearningDesignRepositoryServlet extends HttpServlet {
 	 * Sequence Folder', null, ['',null] ] ], ['MATH111', null, ['Lesson
 	 * Sequence Folder', null, ['',null] ] ] ] ] ]
 	 */
+	@Override
 	public String toString() {
 	    // return '[' + convert() + ']';
 
@@ -166,8 +168,8 @@ public class LearningDesignRepositoryServlet extends HttpServlet {
 		sb.append(']');
 	    } else if (content.getResourceType().equals(FolderContentDTO.DESIGN)) {
 		sb.append('[');
-		sb.append('\'').append(content.getName()).append('\'').append(',').append('\'').append(
-			content.getResourceID()).append('\'');
+		sb.append('\'').append(content.getName()).append('\'').append(',').append('\'')
+			.append(content.getResourceID()).append('\'');
 		sb.append(']');
 	    }
 	    return sb.toString();
@@ -216,8 +218,8 @@ public class LearningDesignRepositoryServlet extends HttpServlet {
 	}
     }
 
-    private ContentTreeNode buildContentTree(Integer userId, Integer mode) throws IOException,
-	    UserAccessDeniedException, RepositoryCheckedException {
+    private ContentTreeNode buildContentTree(Integer userId, Integer mode)
+	    throws IOException, UserAccessDeniedException, RepositoryCheckedException {
 	log.debug("User Id - " + userId);
 	FolderContentDTO rootFolder = new FolderContentDTO(msgService.getMessage("label.workspace.root_folder"),
 		msgService.getMessage("folder"), null, null, FolderContentDTO.FOLDER,
@@ -225,10 +227,10 @@ public class LearningDesignRepositoryServlet extends HttpServlet {
 	ContentTreeNode root = new ContentTreeNode(rootFolder);
 	FolderContentDTO userFolder = service.getUserWorkspaceFolder(userId);
 	root.addChild(buildContentTreeNode(userFolder, userId, mode));
-	
-	FolderContentDTO dummyOrgFolder = new FolderContentDTO(msgService.getMessage("organisations"), msgService
-		.getMessage("folder"), null, null, FolderContentDTO.FOLDER, new Long(WorkspaceAction.ORG_FOLDER_ID
-		.longValue()), WorkspaceFolder.READ_ACCESS, null);
+
+	FolderContentDTO dummyOrgFolder = new FolderContentDTO(msgService.getMessage("organisations"),
+		msgService.getMessage("folder"), null, null, FolderContentDTO.FOLDER,
+		new Long(WorkspaceAction.ORG_FOLDER_ID.longValue()), WorkspaceFolder.READ_ACCESS, null);
 	ContentTreeNode dummyOrgNode = new ContentTreeNode(dummyOrgFolder);
 	// tried using service.getAccessibleOrganisationWorkspaceFolders(userId)
 	// api,
@@ -242,7 +244,7 @@ public class LearningDesignRepositoryServlet extends HttpServlet {
 	    dummyOrgNode.addChild(buildContentTreeNode(orgFolder, userId, mode));
 	}
 	root.addChild(dummyOrgNode);
-	
+
 	FolderContentDTO publicFolder = service.getPublicWorkspaceFolder(userId);
 	if (publicFolder != null) {
 	    root.addChild(buildContentTreeNode(publicFolder, userId, mode));
@@ -268,18 +270,19 @@ public class LearningDesignRepositoryServlet extends HttpServlet {
 
     /**
      * The doGet method of the servlet. <br>
-     * 
+     *
      * This method is called when a form has its tag value method equals to get.
-     * 
+     *
      * @param request
-     *                the request send by the client to the server
+     *            the request send by the client to the server
      * @param response
-     *                the response send by the server to the client
+     *            the response send by the server to the client
      * @throws ServletException
-     *                 if an error occurred
+     *             if an error occurred
      * @throws IOException
-     *                 if an error occurred
+     *             if an error occurred
      */
+    @Override
     public void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 
 	try {
@@ -296,25 +299,26 @@ public class LearningDesignRepositoryServlet extends HttpServlet {
 	    String method = request.getParameter(CentralConstants.PARAM_METHOD);
 	    String usePrefix = request.getParameter(CentralConstants.PARAM_USE_PREFIX);
 	    final boolean isUpdateUserDetails = false;
-	    
+
 	    String firstName = request.getParameter(LoginRequestDispatcher.PARAM_FIRST_NAME);
 	    String lastName = request.getParameter(LoginRequestDispatcher.PARAM_LAST_NAME);
 	    String email = request.getParameter(LoginRequestDispatcher.PARAM_EMAIL);
-	    
+
 	    if (serverId == null || datetime == null || hashValue == null || username == null || courseId == null
-		    || country == null || lang == null ) {
+		    || country == null || lang == null) {
 		String msg = "Parameters missing";
 		log.error(msg);
-		response.sendError(response.SC_BAD_REQUEST, "Parameters missing");
+		response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Parameters missing");
 	    }
-	    
+
 	    // LDEV-2196 preserve character encoding if necessary
 	    if (request.getCharacterEncoding() == null) {
-	    	log.debug("request.getCharacterEncoding is empty, parsing username and courseName as 8859_1 to UTF-8...");
-	    	username = new String(username.getBytes("8859_1"), "UTF-8");
-	    	if (courseName != null) {
-	    		courseName = new String(courseName.getBytes("8859_1"), "UTF-8");
-	    	}
+		log.debug(
+			"request.getCharacterEncoding is empty, parsing username and courseName as 8859_1 to UTF-8...");
+		username = new String(username.getBytes("8859_1"), "UTF-8");
+		if (courseName != null) {
+		    courseName = new String(courseName.getBytes("8859_1"), "UTF-8");
+		}
 	    }
 
 	    // get Server map
@@ -328,62 +332,66 @@ public class LearningDesignRepositoryServlet extends HttpServlet {
 	    if (method != null && method.equals("exportLD")) {
 		// do export
 		exportLD(request, response);
-		
-	    } else if (method != null && ( method.equals("getLearningDesignsJSON") || method.equals("getPagedHomeLearningDesignsJSON")) ) {
 
-    		Integer userId = getUserId(username, courseId, courseName, country, lang, usePrefix,
-			isUpdateUserDetails, firstName, lastName, email, serverMap);
-        
-       		boolean allowInvalidDesigns = WebUtil.readBooleanParam(request, "allowInvalidDesigns", false);
-       		 
-       		String folderContentsJSON = null;
-       		if ( method.equals("getLearningDesignsJSON") ) {
-       		    Integer folderID = WebUtil.readIntParam(request, "folderID", true);
-       		    String designType = request.getParameter("type");
-       		    folderContentsJSON = service.getFolderContentsJSON(folderID, userId, allowInvalidDesigns, designType);
-       		} else {
-       		    Integer page = WebUtil.readIntParam(request, "page", true);
-       		    Integer size = WebUtil.readIntParam(request, "size", true);
-       		    String sortName = request.getParameter("sortName");
-       		    String sortDate = request.getParameter("sortDate");
-       		    String search = request.getParameter("search");
-       		    folderContentsJSON = service.getPagedLearningDesignsJSON(userId, allowInvalidDesigns, search, page, size, 
-       			sortName == null ? null : ( sortName.equals("0") ? "DESC" : "ASC" ),
-       			sortDate == null ? null : ( sortDate.equals("0") ? "DESC" : "ASC" ));
-       		}
+	    } else if (method != null
+		    && (method.equals("getLearningDesignsJSON") || method.equals("getPagedHomeLearningDesignsJSON"))) {
 
-        	response.setContentType("application/json;charset=UTF-8");
-        	response.getWriter().write(folderContentsJSON);
-
-	    } else if (method != null && method.equals("deleteLearningDesignJSON") ) {
-		
 		Integer userId = getUserId(username, courseId, courseName, country, lang, usePrefix,
 			isUpdateUserDetails, firstName, lastName, email, serverMap);
-		
+
+		boolean allowInvalidDesigns = WebUtil.readBooleanParam(request, "allowInvalidDesigns", false);
+
+		String folderContentsJSON = null;
+		if (method.equals("getLearningDesignsJSON")) {
+		    Integer folderID = WebUtil.readIntParam(request, "folderID", true);
+		    String designType = request.getParameter("type");
+		    folderContentsJSON = service.getFolderContentsJSON(folderID, userId, allowInvalidDesigns,
+			    designType);
+		} else {
+		    Integer page = WebUtil.readIntParam(request, "page", true);
+		    Integer size = WebUtil.readIntParam(request, "size", true);
+		    String sortName = request.getParameter("sortName");
+		    String sortDate = request.getParameter("sortDate");
+		    String search = request.getParameter("search");
+		    folderContentsJSON = service.getPagedLearningDesignsJSON(userId, allowInvalidDesigns, search, page,
+			    size, sortName == null ? null : (sortName.equals("0") ? "DESC" : "ASC"),
+			    sortDate == null ? null : (sortDate.equals("0") ? "DESC" : "ASC"));
+		}
+
+		response.setContentType("application/json;charset=UTF-8");
+		response.getWriter().write(folderContentsJSON);
+
+	    } else if (method != null && method.equals("deleteLearningDesignJSON")) {
+
+		Integer userId = getUserId(username, courseId, courseName, country, lang, usePrefix,
+			isUpdateUserDetails, firstName, lastName, email, serverMap);
+
 		Long learningDesignId = WebUtil.readLongParam(request, PARAM_LEARING_DESIGN_ID);
-		log.debug("User "+userId+" "+username+" deleting learning design "+learningDesignId);
+		log.debug("User " + userId + " " + username + " deleting learning design " + learningDesignId);
 		String wddxResponse = service.deleteResource(learningDesignId, FolderContentDTO.DESIGN, userId);
 		Hashtable table = (Hashtable) WDDXProcessor.deserialize(wddxResponse);
 
 		Double messageTypeDouble = (Double) table.get("messageType");
 		int messageType = messageTypeDouble != null ? messageTypeDouble.intValue() : 0;
-		if ( messageType == FlashMessage.OBJECT_MESSAGE ) {
+		if (messageType == FlashMessage.OBJECT_MESSAGE) {
 		    JSONObject jsonObject = new JSONObject(table);
 		    response.setContentType("application/json;charset=utf-8");
 		    response.getWriter().print(jsonObject.toString());
 
 		} else {
-		    log.error("Unable to delete learning design "+learningDesignId+" for user "+userId+" error "+table.get("messageValue"));
-		    response.sendError(response.SC_INTERNAL_SERVER_ERROR, table.get("messageValue").toString());
+		    log.error("Unable to delete learning design " + learningDesignId + " for user " + userId + " error "
+			    + table.get("messageValue"));
+		    response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
+			    table.get("messageValue").toString());
 		}
 
-	    //TODO remove the next else-paragraph as soon as all integrations will start using new method. (After this also stop checking for (method != null && method.equals("getLearningDesignsJSONFormat")))
+		//TODO remove the next else-paragraph as soon as all integrations will start using new method. (After this also stop checking for (method != null && method.equals("getLearningDesignsJSONFormat")))
 	    } else {
 
-		if ( mode == null) {
+		if (mode == null) {
 		    String msg = "Parameter missing: mode";
 		    log.error(msg);
-		    response.sendError(response.SC_BAD_REQUEST, msg);
+		    response.sendError(HttpServletResponse.SC_BAD_REQUEST, msg);
 		}
 
 		ExtUserUseridMap userMap = null;
@@ -396,7 +404,8 @@ public class LearningDesignRepositoryServlet extends HttpServlet {
 		}
 
 		// create group for external course if necessary
-		integrationService.getExtCourseClassMap(serverMap, userMap, courseId, country, lang, courseName, LoginRequestDispatcher.METHOD_AUTHOR);
+		integrationService.getExtCourseClassMap(serverMap, userMap, courseId, country, lang, courseName,
+			LoginRequestDispatcher.METHOD_AUTHOR);
 		Integer userId = userMap.getUser().getUserId();
 
 		String contentTree = buildContentTree(userId, mode).toString();
@@ -411,22 +420,23 @@ public class LearningDesignRepositoryServlet extends HttpServlet {
 
 	} catch (NumberFormatException nfe) {
 	    log.error("mode is not an integer", nfe);
-	    response.sendError(response.SC_BAD_REQUEST, "mode is not an integer");
+	    response.sendError(HttpServletResponse.SC_BAD_REQUEST, "mode is not an integer");
 	} catch (AuthenticationException e) {
 	    log.error("can not authenticate", e);
-	    response.sendError(response.SC_BAD_REQUEST, "can not authenticate");
+	    response.sendError(HttpServletResponse.SC_BAD_REQUEST, "can not authenticate");
 	} catch (UserInfoFetchException e) {
 	    log.error("can not retrieve user information", e);
-	    response.sendError(response.SC_BAD_REQUEST, "can not retrieve user information");
+	    response.sendError(HttpServletResponse.SC_BAD_REQUEST, "can not retrieve user information");
 	} catch (UserAccessDeniedException e) {
 	    log.error("user access denied", e);
-	    response.sendError(response.SC_BAD_REQUEST, "user access denied");
+	    response.sendError(HttpServletResponse.SC_BAD_REQUEST, "user access denied");
 	} catch (RepositoryCheckedException e) {
 	    log.error("repository checked", e);
-	    response.sendError(response.SC_BAD_REQUEST, "repository checked");
+	    response.sendError(HttpServletResponse.SC_BAD_REQUEST, "repository checked");
 	} catch (Exception e) {
 	    log.error("Problem with LearningDesignRepositoryServlet request", e);
-	    response.sendError(response.SC_BAD_REQUEST, "Problem with LearningDesignRepositoryServlet request");
+	    response.sendError(HttpServletResponse.SC_BAD_REQUEST,
+		    "Problem with LearningDesignRepositoryServlet request");
 	}
 
     }
@@ -439,18 +449,20 @@ public class LearningDesignRepositoryServlet extends HttpServlet {
 	if (firstName == null && lastName == null) {
 	    userMap = integrationService.getExtUserUseridMap(serverMap, username, prefix);
 	} else {
-	    userMap = integrationService.getImplicitExtUserUseridMap(serverMap, username, firstName, lastName,
-		    lang, country, email, prefix, isUpdateUserDetails);
+	    userMap = integrationService.getImplicitExtUserUseridMap(serverMap, username, firstName, lastName, lang,
+		    country, email, prefix, isUpdateUserDetails);
 	}
-      
+
 	// create group for external course if necessary
-	integrationService.getExtCourseClassMap(serverMap, userMap, courseId, country, lang, courseName, LoginRequestDispatcher.METHOD_AUTHOR);
+	integrationService.getExtCourseClassMap(serverMap, userMap, courseId, country, lang, courseName,
+		LoginRequestDispatcher.METHOD_AUTHOR);
 	Integer userId = userMap.getUser().getUserId();
 	return userId;
     }
-        
+
+    @Override
     public void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-    	doGet(request, response);
+	doGet(request, response);
     }
 
     public void exportLD(HttpServletRequest request, HttpServletResponse response) {
@@ -460,8 +472,8 @@ public class LearningDesignRepositoryServlet extends HttpServlet {
 
 	try {
 	    File xslt = new File(getServletContext().getRealPath(IMS_XSLT_PATH) + File.separator + IMS_XSLT_NAME);
-	    String zipFilename = exportToolContentService.exportLearningDesign(learningDesignId, toolsErrorMsgs,
-		    format, xslt);
+	    String zipFilename = exportToolContentService.exportLearningDesign(learningDesignId, toolsErrorMsgs, format,
+		    xslt);
 
 	    // get only filename
 	    String zipfile = FileUtil.getFileName(zipFilename);
@@ -496,10 +508,12 @@ public class LearningDesignRepositoryServlet extends HttpServlet {
 		throw new ExportToolContentException(e);
 	    } finally {
 		try {
-		    if (in != null)
+		    if (in != null) {
 			in.close(); // very important
-		    if (out != null)
+		    }
+		    if (out != null) {
 			out.close();
+		    }
 		} catch (Exception e) {
 		    log.error("Error Closing file. File already written out - no exception being thrown.", e);
 		}
@@ -511,16 +525,17 @@ public class LearningDesignRepositoryServlet extends HttpServlet {
 
     /**
      * Initialization of the servlet. <br>
-     * 
+     *
      * @throws ServletException
-     *                 if an error occure
+     *             if an error occure
      */
+    @Override
     public void init() throws ServletException {
-	integrationService = (IntegrationService) WebApplicationContextUtils.getRequiredWebApplicationContext(
-		getServletContext()).getBean("integrationService");
+	integrationService = (IntegrationService) WebApplicationContextUtils
+		.getRequiredWebApplicationContext(getServletContext()).getBean("integrationService");
 
-	service = (IWorkspaceManagementService) WebApplicationContextUtils.getRequiredWebApplicationContext(
-		getServletContext()).getBean("workspaceManagementService");
+	service = (IWorkspaceManagementService) WebApplicationContextUtils
+		.getRequiredWebApplicationContext(getServletContext()).getBean("workspaceManagementService");
 
 	msgService = service.getMessageService();
 

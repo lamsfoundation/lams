@@ -5,7 +5,7 @@ import org.lamsfoundation.lams.web.TextSearchActionForm;
 
 /**
  * A text search form with additional parameters for Notebook needs.
- * 
+ *
  * @author Marcin Cieslak
  * @struts.form name="notebookConditionForm"
  */
@@ -42,7 +42,7 @@ public class NotebookConditionForm extends TextSearchActionForm {
     /**
      * Fills a new NotebookCondition with data contained in this form. Note that some cruicial data is missing, so the
      * condition is NOT complete.
-     * 
+     *
      * @return created condition
      */
     public NotebookCondition extractCondition() {

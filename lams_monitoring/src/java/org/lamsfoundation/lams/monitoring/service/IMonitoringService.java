@@ -2,21 +2,21 @@
  * Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
  * =============================================================
  * License Information: http://lamsfoundation.org/licensing/lams/2.0/
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License version 2.0 
+ * it under the terms of the GNU General Public License version 2.0
  * as published by the Free Software Foundation.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301
  * USA
- * 
+ *
  * http://www.gnu.org/licenses/gpl.txt
  * ****************************************************************
  */
@@ -48,7 +48,7 @@ import org.lamsfoundation.lams.util.MessageService;
 
 /**
  * Interface defines all monitoring services needed by presentation tier.
- * 
+ *
  * @author Jacky Fang 2/02/2005
  * @author Manpreet Minhas
  */
@@ -69,19 +69,19 @@ public interface IMonitoringService {
      * <p>
      * Create new lesson according to the learning design specified by the user. This involves following major steps:
      * </P>
-     * 
+     *
      * <li>1. Make a runtime copy of static learning design defined in authoring</li>
      * <li>2. Go through all the tool activities defined in the learning design, create a runtime copy of all tool's
      * content.</li>
-     * 
+     *
      * <P>
      * As a runtime design, it is not copied into any folder.
      * </P>
-     * 
+     *
      * <p>
      * The initialization process doesn't involve the setup of lesson class and organization.
      * </p>
-     * 
+     *
      * @param lessonName
      *            the name of the lesson
      * @param lessonDescription
@@ -118,7 +118,7 @@ public interface IMonitoringService {
      * Initialize a new lesson so as to start the learning process for a normal or preview learning session. It needs to
      * notify lams which learning design it belongs to. The initialize process doesn't involve the setup of lesson class
      * and organization.
-     * 
+     *
      * @param creatorUserId
      *            the user who want to create this lesson.
      * @param lessonPacket
@@ -138,7 +138,7 @@ public interface IMonitoringService {
 
     /**
      * Setup the lesson class and organization for a lesson according to the input from monitoring GUI interface.
-     * 
+     *
      * <p>
      * Pre-condition: This method must be called under the condition of the the new lesson exists (without lesson
      * class).
@@ -146,7 +146,7 @@ public interface IMonitoringService {
      * <p>
      * A lesson class record should be inserted and organization should be setup after execution of this service.
      * </p>
-     * 
+     *
      * @param lessonId
      *            the lesson without lesson class and organization
      * @param organisation
@@ -163,11 +163,11 @@ public interface IMonitoringService {
      */
     Lesson createLessonClassForLesson(long lessonId, Organisation organisation, String learnerGroupName,
 	    List<User> organizationUsers, String staffGroupName, List<User> staffs, Integer userID)
-		    throws UserAccessDeniedException;
+	    throws UserAccessDeniedException;
 
     /**
      * Start the specified the lesson. It must be created before calling this service.
-     * 
+     *
      * @param lessonId
      *            the specified the lesson id.
      * @param userId
@@ -192,7 +192,7 @@ public interface IMonitoringService {
      * <li>1. Initialize the resource needed by scheduling job by setting them into the job data map.</li>
      * <li>2. Create customized triggers for the scheduling.</li>
      * <li>3. start the scheduling job</li>
-     * 
+     *
      * @param scheduleGate
      *            the gate that needs to be scheduled.
      * @param schedulingStartTime
@@ -207,7 +207,7 @@ public interface IMonitoringService {
 
     /**
      * Start a lesson on scheduled datetime.
-     * 
+     *
      * @param lessonId
      * @param startDate
      *            the lesson start date and time.
@@ -219,7 +219,7 @@ public interface IMonitoringService {
 
     /**
      * Finish a lesson on scheduled datetime.
-     * 
+     *
      * @param lessonId
      * @param endDate
      *            number of days since lesson start when the lesson should be closed.
@@ -233,7 +233,7 @@ public interface IMonitoringService {
      * Finish a lesson.A Finished lesson can be viewed on the monitoring interface. It should be an "inactive" lesson. A
      * Finished lesson is listed on the learner interface but all the learner can do is view the progress bar and do an
      * export portfolio - they cannot access any of the tool screens.
-     * 
+     *
      * @param lessonId
      * @param userId
      *            checks that the user is a staff member for this lesson
@@ -245,7 +245,7 @@ public interface IMonitoringService {
     /**
      * Set whether or not the export portfolio button is available in learner. Sets it to FALSE if
      * learnerExportAvailable is null. Checks that the user is a staff member of this lesson before updating.
-     * 
+     *
      * @param lessonId
      * @param userId
      * @param learnerExportAvailable
@@ -257,7 +257,7 @@ public interface IMonitoringService {
     /**
      * Set whether or not the learner presence button is available in monitor. Sets it to FALSE if
      * learnerExportAvailable is null. Checks that the user is a staff member of this lesson before updating.
-     * 
+     *
      * @param lessonId
      * @param userId
      * @param learnerPresenceAvailable
@@ -269,7 +269,7 @@ public interface IMonitoringService {
     /**
      * Set whether or not the learner IM button is available in monitor. Sets it to FALSE if learnerExportAvailable is
      * null. Checks that the user is a staff member of this lesson before updating.
-     * 
+     *
      * @param lessonId
      * @param userId
      * @param learnerImPresenceAvailable
@@ -281,7 +281,7 @@ public interface IMonitoringService {
     /**
      * Set whether or not the live edit is available in monitor. Sets it to FALSE if learnerExportAvailable is null.
      * Checks that the user is a staff member of this lesson before updating.
-     * 
+     *
      * @param lessonId
      * @param userId
      * @param liveEditEnabled
@@ -295,7 +295,7 @@ public interface IMonitoringService {
 
     /**
      * Archive the specified lesson. When archived, the data is retained but the learners cannot access the details.
-     * 
+     *
      * @param lessonId
      *            the specified the lesson id.
      * @param userId
@@ -305,7 +305,7 @@ public interface IMonitoringService {
 
     /**
      * Unarchive the specified the lesson. Reverts back to its previous state.
-     * 
+     *
      * @param lessonId
      *            the specified the lesson id.
      */
@@ -314,7 +314,7 @@ public interface IMonitoringService {
     /**
      * A lesson can only be suspended if it is started. The purpose of suspending is to hide the lesson from learners
      * temporarily.
-     * 
+     *
      * @param lessonId
      *            the lesson ID which will be suspended.
      * @param userId
@@ -325,7 +325,7 @@ public interface IMonitoringService {
     /**
      * Unsuspend a lesson, which state must be Lesson.SUSPEND_STATE. Returns the lesson back to its previous state.
      * Otherwise an exception will be thrown.
-     * 
+     *
      * @param lessonId
      * @param userId
      *            checks that the user is a staff member for this lesson
@@ -337,7 +337,7 @@ public interface IMonitoringService {
      * Teachers sometimes find that there are just too many "old" designs and wish to remove them and never access them
      * again. This function disables the lesson - it does not remove the contents from the database
      * </P>
-     * 
+     *
      * @param lessonId
      *            the specified the lesson id.
      * @param userId
@@ -346,7 +346,7 @@ public interface IMonitoringService {
     void removeLesson(long lessonId, Integer userId) throws SecurityException;
 
     /**
-     * Removes the lesson and all referenced resources (learning design, tool content etc.) from the database. 
+     * Removes the lesson and all referenced resources (learning design, tool content etc.) from the database.
      */
     void removeLessonPermanently(long lessonId, Integer userId) throws SecurityException;
 
@@ -354,7 +354,7 @@ public interface IMonitoringService {
      * Set the gate to open to let all the learners through. This learning service is triggerred by the system
      * scheduler. Will return true GateActivity (or subclass) object, rather than a hibernate proxy. This is needed so
      * that the class can be returned to the web layer for proper handling.
-     * 
+     *
      * @param gate
      *            the id of the gate we need to open.
      */
@@ -362,7 +362,7 @@ public interface IMonitoringService {
 
     /**
      * Allows a single learner to pass the gate.
-     * 
+     *
      * @param gateId
      * @param userId
      * @return
@@ -371,7 +371,7 @@ public interface IMonitoringService {
 
     /**
      * Set the gate to closed.
-     * 
+     *
      * @param gate
      *            the id of the gate we need to close.
      */
@@ -379,33 +379,33 @@ public interface IMonitoringService {
 
     /**
      * Returns a list of learners participating in the given Lesson
-     * 
+     *
      * @param lessonID
      *            The lesson_id of the Lesson
      * @param userID
      *            The user id of the user requesting the lesson learners
      * @return String The requested list in wddx format
-     * 
+     *
      * @throws IOException
      */
     String getLessonLearners(Long lessonID, Integer userID) throws IOException;
 
     /**
      * Returns a list of staff participating in the given Lesson
-     * 
+     *
      * @param lessonID
      *            The lesson_id of the Lesson
      * @param userID
      *            The user id of the user requesting the lesson staff members
      * @return String The requested list in wddx format
-     * 
+     *
      * @throws IOException
      */
     String getLessonStaff(Long lessonID, Integer userID) throws IOException;
 
     /**
      * Returns users by search type criteria. It's sorted by first and last user names.
-     * 
+     *
      * @param searchType
      *            one of 11 constants from <code>MonitoringConstants</code> defining search type
      * @param lessonId
@@ -420,7 +420,7 @@ public interface IMonitoringService {
 
     /**
      * This method returns the LearningDesign details for a given Lesson
-     * 
+     *
      * @param lessonID
      *            The lesson_id of the Lesson whose LearningDesign details are required
      * @return String The requested details in wddx format
@@ -434,9 +434,9 @@ public interface IMonitoringService {
      * This method returns the url associated with the activity in the monitoring enviornment. This is the URL that
      * opens up when the user/teacher clicks on the activity in the monitoring enviornment and then selects a learner OR
      * in the LEARNER tab when a learner's activity is clicked.
-     * 
+     *
      * This is also known as the learner progress url.
-     * 
+     *
      * @param lessonID
      *            The lesson_id of the Lesson for which the information has to be fetched.
      * @param activityID
@@ -454,7 +454,7 @@ public interface IMonitoringService {
 
     /**
      * This method returns the monitor url for the given activity
-     * 
+     *
      * @param lessonID
      *            The lesson_id of the Lesson for which the information has to be fetched.
      * @param activityID
@@ -471,7 +471,7 @@ public interface IMonitoringService {
      * This method moves the learning design corresponding to the given Lesson into the specified workspaceFolder. But
      * before this action is performed it checks whether the user is authorized to do so. If not, Flash is notified of
      * the same. As of now it is assumed that only the owner of lesson/learning design can move it
-     * 
+     *
      * @param lessonID
      *            The lesson_id of the Lesson which has to be moved
      * @param targetWorkspaceFolderID
@@ -485,7 +485,7 @@ public interface IMonitoringService {
 
     /**
      * Return an activity object based on the requested id.
-     * 
+     *
      * @param activityId
      *            id of the activity.
      * @return the requested activity object.
@@ -495,7 +495,7 @@ public interface IMonitoringService {
     /**
      * Return an activity object based on the requested id. Where possible, give it the type we want so that it can be
      * cast properly.
-     * 
+     *
      * @param activityId
      *            id of the activity.
      * @return the requested activity object.
@@ -504,7 +504,7 @@ public interface IMonitoringService {
 
     /**
      * Return an activity object based on the requested id.
-     * 
+     *
      * @param activityId
      *            id of the activity.
      * @return the requested activity object.
@@ -514,7 +514,7 @@ public interface IMonitoringService {
     /**
      * Returns an acknowledgement that the gate has been released. Returns true if the gate has been released and false
      * otherwise. This information is packaged in WDDX format
-     * 
+     *
      * @param activityID
      *            The activity_id of the Activity whose gate must be checked
      * @param lessonID
@@ -531,7 +531,7 @@ public interface IMonitoringService {
      * <li>Order ID</li>
      * <li>Group name</li>
      * </ol>
-     * 
+     *
      * @param groupingActivity
      * @param groups
      *            list of group information.
@@ -543,7 +543,7 @@ public interface IMonitoringService {
     // ---------------------------------------------------------------------
     /**
      * Create the lesson class and the staff class for a preview lesson. The lesson is not attached to any organisation.
-     * 
+     *
      * @param userID
      *            User ID of the teacher running the preview. Mandatory.
      * @param lessonID
@@ -555,11 +555,11 @@ public interface IMonitoringService {
     /* Supports the Chosen Groupings and Branching */
     /**
      * Get all the active learners in the lesson who are not in a group or in a branch.
-     * 
+     *
      * If the activity is a grouping activity, then set useCreatingGrouping = true to base the list on the create
      * grouping. Otherwise leave it false and it will use the grouping applied to the activity - this is used for
      * branching activities.
-     * 
+     *
      * @param activityID
      * @param lessonID
      * @param useCreateGrouping
@@ -573,9 +573,9 @@ public interface IMonitoringService {
      * the activity is a grouping activity, then set useCreatingGrouping = true to base the list on the create grouping.
      * Otherwise leave it false and it will use the grouping applied to the activity - this is used for branching
      * activities.
-     * 
+     *
      * If it is a teacher chosen branching activity and the grouping doesn't exist, it creates one.
-     * 
+     *
      * @param activityID
      *            id of the grouping activity
      * @param name
@@ -589,13 +589,13 @@ public interface IMonitoringService {
     /**
      * Remove a group to from a grouping activity. If the group does not exists then nothing happens. If the group is
      * already used (e.g. a tool session exists) then it throws a LessonServiceException.
-     * 
+     *
      * If the activity is a grouping activity, then set useCreatingGrouping = true to base the list on the create
      * grouping. Otherwise leave it false and it will use the grouping applied to the activity - this is used for
      * branching activities.
-     * 
+     *
      * If it is a teacher chosen branching activity and the grouping doesn't exist, it creates one.
-     * 
+     *
      * @param activityID
      *            id of the grouping activity
      * @param name
@@ -611,7 +611,7 @@ public interface IMonitoringService {
 
     /**
      * Remove a user to a group. If the user is not in the group, then nothing is changed.
-     * 
+     *
      * @throws LessonServiceException
      */
     abstract void removeUsersFromGroup(Long activityID, Long groupID, String learnerIDs[])
@@ -621,7 +621,7 @@ public interface IMonitoringService {
      * Add learners to a branch. Doesn't necessarily check if the user is already in another branch. Assumes there
      * should only be one group for this branch. Use for Teacher Chosen Branching. Don't use for Group Based Branching
      * as there could be more than one group for the branch.
-     * 
+     *
      * @param sequenceActivityID
      *            Activity id of the sequenceActivity representing this branch
      * @param learnerIDs
@@ -632,7 +632,7 @@ public interface IMonitoringService {
     /**
      * Remove learners from a branch. Assumes there should only be one group for this branch. Use for Teacher Chosen
      * Branching. Don't use for Group Based Branching as there could be more than one group for the branch.
-     * 
+     *
      * @param sequenceActivityID
      *            Activity id of the sequenceActivity representing this branch
      * @param learnerIDs
@@ -649,7 +649,7 @@ public interface IMonitoringService {
     /**
      * Match group(s) to a branch. Doesn't necessarily check if the group is already assigned to another branch. Use for
      * Group Based Branching.
-     * 
+     *
      * @param sequenceActivityID
      *            Activity id of the sequenceActivity representing this branch
      * @param learnerIDs
@@ -660,7 +660,7 @@ public interface IMonitoringService {
     /**
      * Remove group / branch mapping. Cannot be done if any users in the group have started the branch. Used for group
      * based branching in define later.
-     * 
+     *
      * @param sequenceActivityID
      *            Activity id of the sequenceActivity representing this branch
      * @param learnerIDs
@@ -670,7 +670,7 @@ public interface IMonitoringService {
 
     /**
      * Get all the groups that exist for the related grouping activity that have not been allocated to a branch.
-     * 
+     *
      * @param branchingActivityID
      *            Activity id of the branchingActivity
      */
@@ -739,7 +739,7 @@ public interface IMonitoringService {
     /**
      * Used in admin to clone lessons using the given lesson Ids (from another group) into the given group. Given staff
      * and learner ids should already be members of the group.
-     * 
+     *
      * @param lessonIds
      * @param addAllStaff
      * @param addAllLearners
@@ -754,7 +754,7 @@ public interface IMonitoringService {
 
     /**
      * Same as cloneLessons method, except it clones only one lesson.
-     * 
+     *
      * @param lessonId
      * @param creatorId
      * @param addAllStaff

@@ -2,21 +2,21 @@
  * Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
  * =============================================================
  * License Information: http://lamsfoundation.org/licensing/lams/2.0/
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License version 2.0 
+ * it under the terms of the GNU General Public License version 2.0
  * as published by the Free Software Foundation.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301
  * USA
- * 
+ *
  * http://www.gnu.org/licenses/gpl.txt
  * ****************************************************************
  */
@@ -60,7 +60,6 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
 
-import org.apache.batik.transcoder.TranscoderException;
 import org.apache.commons.beanutils.BeanUtils;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.StringUtils;
@@ -155,9 +154,9 @@ import com.thoughtworks.xstream.converters.Converter;
 
 /**
  * Export tool content service bean.
- * 
+ *
  * @author Steve.Ni
- * 
+ *
  * @version $Revision$
  */
 public class ExportToolContentService implements IExportToolContentService, ApplicationContextAware {
@@ -187,9 +186,9 @@ public class ExportToolContentService implements IExportToolContentService, Appl
     public static final String TOOL_FILE_NAME = "tool.xml";
 
     public static final String TOOL_FAILED_FILE_NAME = "export_failed.xml";
-    
+
     public static final String SVG_IMAGE_FILE_NAME = "learning_design.svg";
-    
+
     public static final String PNG_IMAGE_FILE_NAME = "learning_design.png";
 
     private static final String ERROR_TOOL_NOT_FOUND = "error.import.matching.tool.not.found";
@@ -426,7 +425,7 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 
     /**
      * Proxy class for Default XStream converter.
-     * 
+     *
      */
     private class FileInvocationHandler implements InvocationHandler {
 
@@ -441,6 +440,7 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 	    fileNodes = new ArrayList<ValueInfo>();
 	}
 
+	@Override
 	public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
 	    Object result;
 	    try {
@@ -453,8 +453,8 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 				// version id is optional
 				Long version = null;
 				if (name.versionFieldName != null) {
-				    version = NumberUtils.createLong(BeanUtils.getProperty(args[0],
-					    name.versionFieldName));
+				    version = NumberUtils
+					    .createLong(BeanUtils.getProperty(args[0], name.versionFieldName));
 				}
 				log.debug("XStream get file node [" + uuid + "," + version + "].");
 				fileNodes.add(ExportToolContentService.this.new ValueInfo(uuid, version));
@@ -511,9 +511,9 @@ public class ExportToolContentService implements IExportToolContentService, Appl
     /**
      * This class is just for later system extent tool compaiblity strategy use. Currently, it just simple to get tool
      * by same signature.
-     * 
+     *
      * @author Steve.Ni
-     * 
+     *
      * @version $Revision$
      */
     public class ToolCompatibleStrategy {
@@ -532,6 +532,7 @@ public class ExportToolContentService implements IExportToolContentService, Appl
     /**
      * @see org.lamsfoundation.lams.authoring.service.IExportToolContentService.exportLearningDesign(Long)
      */
+    @Override
     public String exportLearningDesign(Long learningDesignId, List<String> toolsErrorMsgs, int format, File xslt)
 	    throws ExportToolContentException {
 	try {
@@ -613,8 +614,8 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 
 		// find out current acitivites toolContentMananger and export
 		// tool content.
-		ToolContentManager contentManager = (ToolContentManager) findToolService(toolDAO.getToolByID(activity
-			.getToolID()));
+		ToolContentManager contentManager = (ToolContentManager) findToolService(
+			toolDAO.getToolByID(activity.getToolID()));
 		log.debug("Tool export content : " + activity.getActivityTitle() + " by contentID :"
 			+ activity.getToolContentID());
 		try {
@@ -653,24 +654,25 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 	    XStream designXml = new XStream();
 	    designXml.toXML(ldDto, ldFile);
 	    ldFile.close();
-	    
+
 	    //generate SVG image
 	    if (format != ExportToolContentService.PACKAGE_FORMAT_IMS) {
-		
+
 		String destinationPath = FileUtil.getFullPath(contentDir, ExportToolContentService.SVG_IMAGE_FILE_NAME);
-		String svgPath = service.createLearningDesignSVG(learningDesignId, SVGGenerator.OUTPUT_FORMAT_SVG_LAMS_COMMUNITY);
+		String svgPath = service.createLearningDesignSVG(learningDesignId,
+			SVGGenerator.OUTPUT_FORMAT_SVG_LAMS_COMMUNITY);
 		File svgFile = new File(svgPath);
-		if (svgFile.canRead()){
+		if (svgFile.canRead()) {
 		    FileUtils.copyFile(svgFile, new File(destinationPath));
 		    // remove the file as its icons refer to LAMS Community server instead of local resources
 		    // and should not be used in Monitoring
 		    svgFile.delete();
 		}
-		
+
 		destinationPath = FileUtil.getFullPath(contentDir, ExportToolContentService.PNG_IMAGE_FILE_NAME);
 		String pngPath = service.createLearningDesignSVG(learningDesignId, SVGGenerator.OUTPUT_FORMAT_PNG);
 		File pngFile = new File(pngPath);
-		if (pngFile.canRead()){
+		if (pngFile.canRead()) {
 		    FileUtils.copyFile(pngFile, new File(destinationPath));
 		}
 	    }
@@ -725,7 +727,7 @@ public class ExportToolContentService implements IExportToolContentService, Appl
      * Generate temporary files: resources.xml and transitions.xml. <BR>
      * Transform LAMS format learning_design.xml with resources.xml and transitions.xml into ims_learning_design.xml
      * file.
-     * 
+     *
      * @param resChildren
      * @param rootDir
      * @param ldDto
@@ -749,9 +751,12 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 	File imsldbSrc = new File(FileUtil.getFullPath(path, ExportToolContentService.SCHEMA_FILE_IMS_LD_LEVEL_B));
 	File imsldcSrc = new File(FileUtil.getFullPath(path, ExportToolContentService.SCHEMA_FILE_IMS_LD_LEVEL_C));
 	File imscpTar = new File(FileUtil.getFullPath(contentDir, ExportToolContentService.SCHEMA_FILE_IMSCP));
-	File imsldaTar = new File(FileUtil.getFullPath(contentDir, ExportToolContentService.SCHEMA_FILE_IMS_LD_LEVEL_A));
-	File imsldbTar = new File(FileUtil.getFullPath(contentDir, ExportToolContentService.SCHEMA_FILE_IMS_LD_LEVEL_B));
-	File imsldcTar = new File(FileUtil.getFullPath(contentDir, ExportToolContentService.SCHEMA_FILE_IMS_LD_LEVEL_C));
+	File imsldaTar = new File(
+		FileUtil.getFullPath(contentDir, ExportToolContentService.SCHEMA_FILE_IMS_LD_LEVEL_A));
+	File imsldbTar = new File(
+		FileUtil.getFullPath(contentDir, ExportToolContentService.SCHEMA_FILE_IMS_LD_LEVEL_B));
+	File imsldcTar = new File(
+		FileUtil.getFullPath(contentDir, ExportToolContentService.SCHEMA_FILE_IMS_LD_LEVEL_C));
 	FileUtils.copyFile(imscpSrc, imscpTar);
 	FileUtils.copyFile(imsldaSrc, imsldaTar);
 	FileUtils.copyFile(imsldbSrc, imsldbTar);
@@ -806,7 +811,8 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 	    if (actDto.getActivityTypeID().equals(Activity.SEQUENCE_ACTIVITY_TYPE)) {
 		String attributeValue = ExportToolContentService.IMS_PREFIX_COMPLEX_REF
 			+ ExportToolContentService.IMS_TAG_SEQUENCE + "-" + actDto.getActivityID();
-		if (actDto.getParentActivityID() != null && branchingActivityIds.contains(actDto.getParentActivityID())) {
+		if (actDto.getParentActivityID() != null
+			&& branchingActivityIds.contains(actDto.getParentActivityID())) {
 		    Element[] propertyConditions = generatePropertyCondition(actDto.getActivityID(), attributeValue);
 		    propertiesChildren.add(propertyConditions[0]);
 		    conditionsChildren.add(propertyConditions[1]);
@@ -822,8 +828,8 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 
 		if (actDto.getActivityTypeID().equals(Activity.GROUPING_ACTIVITY_TYPE)) {
 		    att = new Attribute(ExportToolContentService.IMS_ATTR_REF,
-			    ExportToolContentService.IMS_PREFIX_ACTIVITY_REF
-				    + ExportToolContentService.IMS_TAG_GROUPING + "-" + actDto.getActivityID());
+			    ExportToolContentService.IMS_PREFIX_ACTIVITY_REF + ExportToolContentService.IMS_TAG_GROUPING
+				    + "-" + actDto.getActivityID());
 		} else if (actDto.getActivityTypeID().equals(Activity.SCHEDULE_GATE_ACTIVITY_TYPE)
 			|| actDto.getActivityTypeID().equals(Activity.PERMISSION_GATE_ACTIVITY_TYPE)
 			|| actDto.getActivityTypeID().equals(Activity.SYNCH_GATE_ACTIVITY_TYPE)
@@ -845,8 +851,8 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 			|| actDto.getActivityTypeID().equals(Activity.GROUP_BRANCHING_ACTIVITY_TYPE)
 			|| actDto.getActivityTypeID().equals(Activity.TOOL_BRANCHING_ACTIVITY_TYPE)) {
 		    att = new Attribute(ExportToolContentService.IMS_ATTR_REF,
-			    ExportToolContentService.IMS_PREFIX_COMPLEX_REF
-				    + ExportToolContentService.IMS_TAG_BRANCHING + "-" + actDto.getActivityID());
+			    ExportToolContentService.IMS_PREFIX_COMPLEX_REF + ExportToolContentService.IMS_TAG_BRANCHING
+				    + "-" + actDto.getActivityID());
 		} else {
 		    att = new Attribute(ExportToolContentService.IMS_ATTR_REF,
 			    ExportToolContentService.IMS_PREFIX_ACTIVITY_REF + actDto.getToolSignature() + "-"
@@ -864,22 +870,24 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 	File transFile = new File(FileUtil.getFullPath(xsltDir, ExportToolContentService.IMS_TRANSITION_FILE_NAME));
 	XMLOutputter transOutput = new XMLOutputter();
 	transOutput.output(transDom, new FileOutputStream(transFile));
-	log.debug("Export IMS: Transtion(<learning-activity-ref>) file generated sucess: "
-		+ transFile.getAbsolutePath());
+	log.debug(
+		"Export IMS: Transtion(<learning-activity-ref>) file generated sucess: " + transFile.getAbsolutePath());
 
 	// create the properties file and conditions file - needed for gate
 	// showing gates when open and branches when
 	// determined
 	propertiesRoot.setChildren(propertiesChildren);
 	propertiesDom.setRootElement(propertiesRoot);
-	File propertiesFile = new File(FileUtil.getFullPath(xsltDir, ExportToolContentService.IMS_PROPERTIES_FILE_NAME));
+	File propertiesFile = new File(
+		FileUtil.getFullPath(xsltDir, ExportToolContentService.IMS_PROPERTIES_FILE_NAME));
 	XMLOutputter propertiesOutput = new XMLOutputter();
 	propertiesOutput.output(propertiesDom, new FileOutputStream(propertiesFile));
 	log.debug("Export IMS: Properties file generated sucess: " + propertiesFile.getAbsolutePath());
 
 	conditionsRoot.setChildren(conditionsChildren);
 	conditionsDom.setRootElement(conditionsRoot);
-	File conditionsFile = new File(FileUtil.getFullPath(xsltDir, ExportToolContentService.IMS_CONDITIONS_FILE_NAME));
+	File conditionsFile = new File(
+		FileUtil.getFullPath(xsltDir, ExportToolContentService.IMS_CONDITIONS_FILE_NAME));
 	XMLOutputter conditionsOutput = new XMLOutputter();
 	conditionsOutput.output(conditionsDom, new FileOutputStream(conditionsFile));
 	log.debug("Export IMS: Conditions file generated sucess: " + conditionsFile.getAbsolutePath());
@@ -913,7 +921,7 @@ public class ExportToolContentService implements IExportToolContentService, Appl
      * Generate the nodes for a property and the related conditions. The first element is the property, which goes in
      * the <properties> tag, the second through fourth elements are the if-then-else that makes up the condition and
      * goes in the <conditions> tag.
-     * 
+     *
      * @param activityId
      * @return
      */
@@ -973,7 +981,7 @@ public class ExportToolContentService implements IExportToolContentService, Appl
      * sequence in this LD sorted by randomly. In one broken sequence, all activities will sorted by transition. <BR>
      * The reason to use lots "for" is Activity DTO does not contain next transition information. It has to be iterator
      * all transitions or activities.
-     * 
+     *
      * @param ldDto
      * @return
      */
@@ -1074,7 +1082,7 @@ public class ExportToolContentService implements IExportToolContentService, Appl
      * Move LAMS tool.xml from tool folder to export content root folder and modify it to {toolContentID}.xml file.
      * Cache all attachement files from this tool into ArrayList, which will be save into a temporary file
      * (resources.xml) and used by XSLT.
-     * 
+     *
      * @param rootDir
      * @param activity
      * @param resChildren
@@ -1106,8 +1114,8 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 			// for later import use by XStream.
 			String mainObject = root.getName();
 			root.setName(activity.getToolSignature());
-			Namespace ns = Namespace.getNamespace(ExportToolContentService.IMS_TOOL_NS_PREFIX
-				+ activity.getToolSignature() + "_ims.xsd");
+			Namespace ns = Namespace.getNamespace(
+				ExportToolContentService.IMS_TOOL_NS_PREFIX + activity.getToolSignature() + "_ims.xsd");
 			root.setNamespace(ns);
 
 			// add mainObject tag: it save the Tool DTO class name.
@@ -1121,9 +1129,8 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 
 			// create a new tools.xml file with toolContentID.xml as
 			// name.
-			File imsToolFile = new File(FileUtil.getFullPath(xsltDir, activity.getToolContentID()
-				.toString()
-				+ ".xml"));
+			File imsToolFile = new File(
+				FileUtil.getFullPath(xsltDir, activity.getToolContentID().toString() + ".xml"));
 			XMLOutputter toolOutput = new XMLOutputter();
 			toolOutput.output(doc, new FileOutputStream(imsToolFile));
 
@@ -1153,8 +1160,8 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 
 		// file TAG
 		Element fileEle = new Element(ExportToolContentService.IMS_TAG_FILE);
-		Attribute fileAtt = new Attribute(ExportToolContentService.IMS_ATTR_HREF, activity.getToolContentID()
-			+ "/" + filename);
+		Attribute fileAtt = new Attribute(ExportToolContentService.IMS_ATTR_HREF,
+			activity.getToolContentID() + "/" + filename);
 		fileEle.setAttribute(fileAtt);
 
 		log.debug("Export IMS: Cache resource file " + filename + " under " + activity.getActivityTitle() + "["
@@ -1182,8 +1189,9 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 
     /**
      * @throws ExportToolContentException
-     * 
+     *
      */
+    @Override
     public void exportToolContent(Long toolContentId, Object toolContentObj, IToolContentHandler toolContentHandler,
 	    String rootPath) throws ExportToolContentException {
 	try {
@@ -1218,8 +1226,8 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 		List<ValueInfo> list = handler.getFileNodes();
 		for (ValueInfo fileNode : list) {
 		    log.debug("Tool attachement file is going to save : " + fileNode.fileUuid);
-		    toolContentHandler.saveFile(fileNode.fileUuid, FileUtil.getFullPath(toolPath, fileNode.fileUuid
-			    .toString()));
+		    toolContentHandler.saveFile(fileNode.fileUuid,
+			    FileUtil.getFullPath(toolPath, fileNode.fileUuid.toString()));
 		}
 		list.clear();
 	    }
@@ -1240,13 +1248,16 @@ public class ExportToolContentService implements IExportToolContentService, Appl
     }
 
     /**
-     * @see org.lamsfoundation.lams.authoring.service.IExportToolContentService.registerFileHandleClass(String,String,String)
+     * @see org.lamsfoundation.lams.authoring.service.IExportToolContentService.registerFileHandleClass(String,String,
+     *      String)
      */
+    @Override
     public void registerFileClassForExport(String fileNodeClassName, String fileUuidFieldName,
 	    String fileVersionFieldName) {
 	fileHandleClassList.add(this.new NameInfo(fileNodeClassName, fileUuidFieldName, fileVersionFieldName));
     }
 
+    @Override
     public void registerFileClassForImport(String fileNodeClassName, String fileUuidFieldName,
 	    String fileVersionFieldName, String fileNameFieldName, String filePropertyFieldName,
 	    String mimeTypeFieldName, String initialItemFieldName) {
@@ -1254,6 +1265,7 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 		fileNameFieldName, filePropertyFieldName, mimeTypeFieldName, initialItemFieldName));
     }
 
+    @Override
     public void registerImportVersionFilterClass(Class filterClass) {
 	this.filterClass = filterClass;
     }
@@ -1261,7 +1273,7 @@ public class ExportToolContentService implements IExportToolContentService, Appl
     /**
      * Import the learning design from the given path. Set the importer as the creator. If the workspaceFolderUid is
      * null then saves the design in the user's own workspace folder.
-     * 
+     *
      * @param designFile
      * @param importer
      * @param workspaceFolderUid
@@ -1271,9 +1283,10 @@ public class ExportToolContentService implements IExportToolContentService, Appl
      *         <li>Object[1] = ldErrors when importing (List<String>)</li>
      *         <li>Object[2] = toolErrors when importing (List<String>)</li>
      *         </ul>
-     * 
+     *
      * @throws ImportToolContentException
      */
+    @Override
     public Object[] importLearningDesign(File designFile, User importer, Integer workspaceFolderUid,
 	    List<String> toolsErrorMsgs, String customCSV) throws ImportToolContentException {
 
@@ -1301,8 +1314,8 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 		// ZipFileUtil.expandZip(file.getInputStream(),filename);
 		String ldPath = ZipFileUtil.expandZip(new FileInputStream(designFile), filename);
 
-		File fullFilePath = new File(FileUtil.getFullPath(ldPath,
-			ExportToolContentService.LEARNING_DESIGN_FILE_NAME));
+		File fullFilePath = new File(
+			FileUtil.getFullPath(ldPath, ExportToolContentService.LEARNING_DESIGN_FILE_NAME));
 		if (fullFilePath.canRead()) {
 		    ldId = importLearningDesignV2(ldPath, importer, workspaceFolderUid, toolsErrorMsgs, customCSV);
 		} else {
@@ -1312,7 +1325,7 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 		badFileType(ldErrorMsgs, filename, "Unexpected extension");
 	    }
 
-	}  catch (Exception e) {
+	} catch (Exception e) {
 	    throw new ImportToolContentException("Error while importing a sequence", e);
 	}
 
@@ -1338,7 +1351,7 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 
     /**
      * Import 1.0.2 learning design
-     * 
+     *
      * @return learningDesingID
      * @throws ExportToolContentException
      * @see org.lamsfoundation.lams.authoring.service.IExportToolContentService.importLearningDesign102(String, User,
@@ -1397,10 +1410,10 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 		    removedActMap.put(activity.getActivityID(), activity);
 		    continue;
 		}
-		
+
 		// imported Learning Library ID and one stored in current DB may not match, so fix it here
 		activity.setLearningLibraryID(newTool.getLearningLibraryId());
-		
+
 		// save Tool into lams_tool table.
 		ToolContent newContent = new ToolContent(newTool);
 		toolContentDAO.saveToolContent(newContent);
@@ -1427,8 +1440,8 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 		    // importToolContentMethod
 		    if (contentManager instanceof ToolAdapterContentManager) {
 			ToolAdapterContentManager toolAdapterContentManager = (ToolAdapterContentManager) contentManager;
-			toolAdapterContentManager.importToolContent(newContent.getToolContentId(),
-				importer.getUserId(), toolPath, fromVersion, toVersion, customCSV);
+			toolAdapterContentManager.importToolContent(newContent.getToolContentId(), importer.getUserId(),
+				toolPath, fromVersion, toVersion, customCSV);
 		    } else {
 			contentManager.importToolContent(newContent.getToolContentId(), importer.getUserId(), toolPath,
 				fromVersion, toVersion);
@@ -1491,8 +1504,8 @@ public class ExportToolContentService implements IExportToolContentService, Appl
      * @param toolsErrorMsgs
      * @return version of the server that exported this file
      */
-    private String checkImportVersion(String fullFilePath, List<String> toolsErrorMsgs) throws FileNotFoundException,
-	    JDOMException {
+    private String checkImportVersion(String fullFilePath, List<String> toolsErrorMsgs)
+	    throws FileNotFoundException, JDOMException {
 
 	SAXBuilder sax = new SAXBuilder();
 	Document doc = sax.build(new FileInputStream(fullFilePath), "UTF-8");
@@ -1504,8 +1517,8 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 	try {
 	    boolean isLaterVersion = !VersionUtil.isSameOrLaterVersionAsServer(versionString, true);
 	    if (isLaterVersion) {
-		log
-			.warn("Importing a design from a later version of LAMS. There may be parts of the design that will fail to import. Design name \'"
+		log.warn(
+			"Importing a design from a later version of LAMS. There may be parts of the design that will fail to import. Design name \'"
 				+ title + "\'. Version in import file " + versionString);
 		toolsErrorMsgs.add(getMessageService().getMessage(ExportToolContentService.ERROR_INCOMPATIBLE_VERSION,
 			new Object[] { versionString, currentVersionString }));
@@ -1516,13 +1529,13 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 	    toolsErrorMsgs.add(getMessageService().getMessage(ExportToolContentService.ERROR_INCOMPATIBLE_VERSION,
 		    new Object[] { versionString, currentVersionString }));
 	}
-	
+
 	return versionString;
     }
-    
+
     /**
      * Transform main XML file to correct version format.
-     * 
+     *
      * @param fullFilePath
      * @param versionString
      * @return
@@ -1573,6 +1586,7 @@ public class ExportToolContentService implements IExportToolContentService, Appl
     /**
      * Import tool content
      */
+    @Override
     public Object importToolContent(String toolContentPath, IToolContentHandler toolContentHandler, String fromVersion,
 	    String toVersion) throws ImportToolContentException {
 	Object toolPOJO = null;
@@ -1611,8 +1625,8 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 		valueList = handler.getFileNodes();
 		for (ValueInfo fileNode : valueList) {
 
-		    Long uuid = NumberUtils.createLong(BeanUtils.getProperty(fileNode.instance,
-			    fileNode.name.uuidFieldName));
+		    Long uuid = NumberUtils
+			    .createLong(BeanUtils.getProperty(fileNode.instance, fileNode.name.uuidFieldName));
 		    // For instance, item class in share resource tool may
 		    // be url or single file. If it is URL, then the
 		    // file uuid will be null. Ignore it!
@@ -1623,8 +1637,8 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 		    Long version = null;
 		    // optional
 		    try {
-			version = NumberUtils.createLong(BeanUtils.getProperty(fileNode.instance,
-				fileNode.name.versionFieldName));
+			version = NumberUtils
+				.createLong(BeanUtils.getProperty(fileNode.instance, fileNode.name.versionFieldName));
 		    } catch (Exception e) {
 			log.debug("No method for version:" + fileNode.instance);
 		    }
@@ -1645,8 +1659,8 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 			// if this file is norpackage neither single file, throw
 			// exception.
 			if (!file.exists()) {
-			    throw new ImportToolContentException("Content attached file/package can not be found: "
-				    + fullFileName + "(.zip)");
+			    throw new ImportToolContentException(
+				    "Content attached file/package can not be found: " + fullFileName + "(.zip)");
 			}
 		    }
 
@@ -1701,6 +1715,7 @@ public class ExportToolContentService implements IExportToolContentService, Appl
     // ******************************************************************
     // ApplicationContextAware method implementation
     // ******************************************************************
+    @Override
     public void setApplicationContext(ApplicationContext context) throws BeansException {
 	applicationContext = context;
     }
@@ -1711,7 +1726,8 @@ public class ExportToolContentService implements IExportToolContentService, Appl
     /**
      * Execute XSLT to generate IMS XML file.
      */
-    private Document transform(InputStream sourceDoc, File stylesheetFile, Map<String, Object> params) throws Exception {
+    private Document transform(InputStream sourceDoc, File stylesheetFile, Map<String, Object> params)
+	    throws Exception {
 	// Set up the XSLT stylesheet
 	TransformerFactory transformerFactory = TransformerFactory.newInstance();
 
@@ -1744,7 +1760,7 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 
     /**
      * Transform tool XML file to correct version format.
-     * 
+     *
      * @param toVersion
      * @param fromVersion
      * @throws IllegalAccessException
@@ -2096,7 +2112,8 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 	    }
 	}
 
-	LearningDesign ld = getLearningDesign(dto, importer, folder, actList, transList, activityMapper, competenceList);
+	LearningDesign ld = getLearningDesign(dto, importer, folder, actList, transList, activityMapper,
+		competenceList);
 
 	// validate learning design
 	Vector listOfValidationErrorDTOs = getLearningDesignService().validateLearningDesign(ld);
@@ -2113,7 +2130,6 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 	// then read and update the title, then save again.
 	learningDesignDAO.insert(ld);
 
-	
 	// add suffix if configuration is not set or is set to true
 	String addSuffix = Configuration.get(ConfigurationKeys.SUFFIX_IMPORTED_LD);
 	if (addSuffix == null || Boolean.valueOf(addSuffix)) {
@@ -2121,7 +2137,7 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 	    learningDesignDAO.update(ld);
 	    // persist
 	}
-	
+
 	// Once we have the competences saved, we can save the competence mappings
 	Set<CompetenceMapping> allCompetenceMappings = new HashSet<CompetenceMapping>();
 	for (AuthoringActivityDTO actDto : actDtoList) {
@@ -2153,7 +2169,7 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 
     /**
      * Method to sort activity DTO according to the rule: Parents is before their children.
-     * 
+     *
      * @param activities
      * @return
      */
@@ -2200,9 +2216,9 @@ public class ExportToolContentService implements IExportToolContentService, Appl
      * <li>lams_workspace_folder - An input parameters to let user choose import workspace</li>
      * <li>User - The person who execute import action</li>
      * <li>OriginalLearningDesign - set to null</li>
-     * 
+     *
      * @param activityMapper
-     * 
+     *
      * @return
      * @throws ImportToolContentException
      */
@@ -2252,8 +2268,8 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 	if (licenseId != null) {
 	    License license = licenseDAO.getLicenseByID(licenseId);
 	    if (license == null) {
-		throw new ImportToolContentException("Import failed: License [" + dto.getLicenseText()
-			+ "] does not exist in target database");
+		throw new ImportToolContentException(
+			"Import failed: License [" + dto.getLicenseText() + "] does not exist in target database");
 	    }
 	    ld.setLicense(licenseDAO.getLicenseByID(licenseId));
 	    ld.setLicenseText(dto.getLicenseText());
@@ -2261,7 +2277,7 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 
 	ld.setLastModifiedDateTime(dto.getLastModifiedDateTime());
 	ld.setContentFolderID(dto.getContentFolderID());
-	
+
 	ld.setDesignType(dto.getDesignType());
 
 	// set learning design to transition.
@@ -2290,7 +2306,7 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 
     /**
      * Return Grouping object from given GroupingDTO.
-     * 
+     *
      * @param groupingDto
      * @return
      */
@@ -2315,10 +2331,10 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 	    grouping = new LearnerChoiceGrouping();
 	    ((LearnerChoiceGrouping) grouping).setLearnersPerGroup(groupingDto.getLearnersPerGroup());
 	    ((LearnerChoiceGrouping) grouping).setNumberOfGroups(groupingDto.getNumberOfGroups());
-	    ((LearnerChoiceGrouping) grouping).setEqualNumberOfLearnersPerGroup(groupingDto
-		    .getEqualNumberOfLearnersPerGroup());
-	    ((LearnerChoiceGrouping) grouping).setViewStudentsBeforeSelection(groupingDto
-		    .getViewStudentsBeforeSelection());
+	    ((LearnerChoiceGrouping) grouping)
+		    .setEqualNumberOfLearnersPerGroup(groupingDto.getEqualNumberOfLearnersPerGroup());
+	    ((LearnerChoiceGrouping) grouping)
+		    .setViewStudentsBeforeSelection(groupingDto.getViewStudentsBeforeSelection());
 	} else {
 	    log.error("Unable to determine the grouping type. Creating a random grouping. GroupingDTO was "
 		    + groupingDto);
@@ -2356,7 +2372,7 @@ public class ExportToolContentService implements IExportToolContentService, Appl
      * Creates the map entry between a branch sequence activity and a group. We need the group maps and the activity
      * maps so that we can update the ids to the groups and the activities. Therefore this method must be done after all
      * the groups are imported and the activities are imported.
-     * 
+     *
      * Note: there isn't an set in the learning design for the branch mappings. The group objects actually contain the
      * link to the mappings, so this method updates the group objects.
      */
@@ -2477,7 +2493,7 @@ public class ExportToolContentService implements IExportToolContentService, Appl
     }
 
     /**
-     * 
+     *
      * @param actDto
      * @param activityMapper
      * @param groupingList
@@ -2495,81 +2511,86 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 
 	Activity act = Activity.getActivityInstance(type);
 	switch (act.getActivityTypeId()) {
-	case Activity.TOOL_ACTIVITY_TYPE:
-	    // get back the toolContent in new system by activityID in
-	    // old system.
-	    ToolContent content = toolMapper.get(actDto.getActivityID());
-	    // if activity can not find matching tool, the content should be
-	    // null.
-	    if (content != null) {
-		((ToolActivity) act).setTool(content.getTool());
-		((ToolActivity) act).setToolContentId(content.getToolContentId());
-		((ToolActivity) act).setToolSessions(null);
-	    }
-	    if (actDto.getPlannerMetadataDTO() != null) {
-		PedagogicalPlannerActivityMetadata plannerMetadata = actDto.getPlannerMetadataDTO().toPlannerMetadata();
-		plannerMetadata.setActivity(((ToolActivity) act));
-		((ToolActivity) act).setPlannerMetadata(plannerMetadata);
-	    }
+	    case Activity.TOOL_ACTIVITY_TYPE:
+		// get back the toolContent in new system by activityID in
+		// old system.
+		ToolContent content = toolMapper.get(actDto.getActivityID());
+		// if activity can not find matching tool, the content should be
+		// null.
+		if (content != null) {
+		    ((ToolActivity) act).setTool(content.getTool());
+		    ((ToolActivity) act).setToolContentId(content.getToolContentId());
+		    ((ToolActivity) act).setToolSessions(null);
+		}
+		if (actDto.getPlannerMetadataDTO() != null) {
+		    PedagogicalPlannerActivityMetadata plannerMetadata = actDto.getPlannerMetadataDTO()
+			    .toPlannerMetadata();
+		    plannerMetadata.setActivity(((ToolActivity) act));
+		    ((ToolActivity) act).setPlannerMetadata(plannerMetadata);
+		}
 
-	    act.setLearningLibrary(learningLibraryDAO.getLearningLibraryById(actDto.getLearningLibraryID()));
-	    break;
-	case Activity.GROUPING_ACTIVITY_TYPE:
-	    newGrouping = groupingList.get(actDto.getCreateGroupingID());
-	    ((GroupingActivity) act).setCreateGrouping(newGrouping);
-	    ((GroupingActivity) act).setCreateGroupingUIID(newGrouping.getGroupingUIID());
-	    ((GroupingActivity) act).setSystemTool(systemToolDAO.getSystemToolByID(SystemTool.GROUPING));
-	    break;
-	case Activity.SYNCH_GATE_ACTIVITY_TYPE:
-	    ((SynchGateActivity) act).setGateActivityLevelId(actDto.getGateActivityLevelID());
-	    // always set false
-	    ((SynchGateActivity) act).setGateOpen(false);
-	    ((SynchGateActivity) act).setSystemTool(systemToolDAO.getSystemToolByID(SystemTool.SYNC_GATE));
-	    break;
-	case Activity.SCHEDULE_GATE_ACTIVITY_TYPE:
-	    ((ScheduleGateActivity) act).setGateActivityLevelId(actDto.getGateActivityLevelID());
-	    // always set false
-	    ((ScheduleGateActivity) act).setGateOpen(false);
+		act.setLearningLibrary(learningLibraryDAO.getLearningLibraryById(actDto.getLearningLibraryID()));
+		break;
+	    case Activity.GROUPING_ACTIVITY_TYPE:
+		newGrouping = groupingList.get(actDto.getCreateGroupingID());
+		((GroupingActivity) act).setCreateGrouping(newGrouping);
+		((GroupingActivity) act).setCreateGroupingUIID(newGrouping.getGroupingUIID());
+		((GroupingActivity) act).setSystemTool(systemToolDAO.getSystemToolByID(SystemTool.GROUPING));
+		break;
+	    case Activity.SYNCH_GATE_ACTIVITY_TYPE:
+		((SynchGateActivity) act).setGateActivityLevelId(actDto.getGateActivityLevelID());
+		// always set false
+		((SynchGateActivity) act).setGateOpen(false);
+		((SynchGateActivity) act).setSystemTool(systemToolDAO.getSystemToolByID(SystemTool.SYNC_GATE));
+		break;
+	    case Activity.SCHEDULE_GATE_ACTIVITY_TYPE:
+		((ScheduleGateActivity) act).setGateActivityLevelId(actDto.getGateActivityLevelID());
+		// always set false
+		((ScheduleGateActivity) act).setGateOpen(false);
 
-	    ((ScheduleGateActivity) act).setGateStartTimeOffset(actDto.getGateStartTimeOffset());
-	    ((ScheduleGateActivity) act).setGateEndTimeOffset(actDto.getGateEndTimeOffset());
-	    ((ScheduleGateActivity) act).setGateActivityCompletionBased(actDto.getGateActivityCompletionBased());
-	    ((ScheduleGateActivity) act).setSystemTool(systemToolDAO.getSystemToolByID(SystemTool.SCHEDULE_GATE));
-	    break;
-	case Activity.PERMISSION_GATE_ACTIVITY_TYPE:
-	    ((PermissionGateActivity) act).setGateActivityLevelId(actDto.getGateActivityLevelID());
-	    ((PermissionGateActivity) act).setGateOpen(false);
-	    ((PermissionGateActivity) act).setSystemTool(systemToolDAO.getSystemToolByID(SystemTool.PERMISSION_GATE));
-	    break;
-	case Activity.CONDITION_GATE_ACTIVITY_TYPE:
-	    ((ConditionGateActivity) act).setGateActivityLevelId(actDto.getGateActivityLevelID());
-	    ((ConditionGateActivity) act).setGateOpen(false);
-	    ((ConditionGateActivity) act).setSystemTool(systemToolDAO.getSystemToolByID(SystemTool.PERMISSION_GATE));
-	    break;
-	case Activity.PARALLEL_ACTIVITY_TYPE:
-	    act.setLearningLibrary(learningLibraryDAO.getLearningLibraryById(actDto.getLearningLibraryID()));
-	    break;
-	case Activity.OPTIONS_ACTIVITY_TYPE:
-	case Activity.OPTIONS_WITH_SEQUENCES_TYPE:
-	    ((OptionsActivity) act).setMaxNumberOfOptions(actDto.getMaxOptions());
-	    ((OptionsActivity) act).setMinNumberOfOptions(actDto.getMinOptions());
-	    ((OptionsActivity) act).setOptionsInstructions(actDto.getOptionsInstructions());
-	    break;
-	case Activity.SEQUENCE_ACTIVITY_TYPE:
-	    break;
-	case Activity.CHOSEN_BRANCHING_ACTIVITY_TYPE:
-	    ((BranchingActivity) act).setSystemTool(systemToolDAO
-		    .getSystemToolByID(SystemTool.TEACHER_CHOSEN_BRANCHING));
-	    processBranchingFields((BranchingActivity) act, actDto);
-	    break;
-	case Activity.GROUP_BRANCHING_ACTIVITY_TYPE:
-	    ((BranchingActivity) act).setSystemTool(systemToolDAO.getSystemToolByID(SystemTool.GROUP_BASED_BRANCHING));
-	    processBranchingFields((BranchingActivity) act, actDto);
-	    break;
-	case Activity.TOOL_BRANCHING_ACTIVITY_TYPE:
-	    ((BranchingActivity) act).setSystemTool(systemToolDAO.getSystemToolByID(SystemTool.TOOL_BASED_BRANCHING));
-	    processBranchingFields((BranchingActivity) act, actDto);
-	    break;
+		((ScheduleGateActivity) act).setGateStartTimeOffset(actDto.getGateStartTimeOffset());
+		((ScheduleGateActivity) act).setGateEndTimeOffset(actDto.getGateEndTimeOffset());
+		((ScheduleGateActivity) act).setGateActivityCompletionBased(actDto.getGateActivityCompletionBased());
+		((ScheduleGateActivity) act).setSystemTool(systemToolDAO.getSystemToolByID(SystemTool.SCHEDULE_GATE));
+		break;
+	    case Activity.PERMISSION_GATE_ACTIVITY_TYPE:
+		((PermissionGateActivity) act).setGateActivityLevelId(actDto.getGateActivityLevelID());
+		((PermissionGateActivity) act).setGateOpen(false);
+		((PermissionGateActivity) act)
+			.setSystemTool(systemToolDAO.getSystemToolByID(SystemTool.PERMISSION_GATE));
+		break;
+	    case Activity.CONDITION_GATE_ACTIVITY_TYPE:
+		((ConditionGateActivity) act).setGateActivityLevelId(actDto.getGateActivityLevelID());
+		((ConditionGateActivity) act).setGateOpen(false);
+		((ConditionGateActivity) act)
+			.setSystemTool(systemToolDAO.getSystemToolByID(SystemTool.PERMISSION_GATE));
+		break;
+	    case Activity.PARALLEL_ACTIVITY_TYPE:
+		act.setLearningLibrary(learningLibraryDAO.getLearningLibraryById(actDto.getLearningLibraryID()));
+		break;
+	    case Activity.OPTIONS_ACTIVITY_TYPE:
+	    case Activity.OPTIONS_WITH_SEQUENCES_TYPE:
+		((OptionsActivity) act).setMaxNumberOfOptions(actDto.getMaxOptions());
+		((OptionsActivity) act).setMinNumberOfOptions(actDto.getMinOptions());
+		((OptionsActivity) act).setOptionsInstructions(actDto.getOptionsInstructions());
+		break;
+	    case Activity.SEQUENCE_ACTIVITY_TYPE:
+		break;
+	    case Activity.CHOSEN_BRANCHING_ACTIVITY_TYPE:
+		((BranchingActivity) act)
+			.setSystemTool(systemToolDAO.getSystemToolByID(SystemTool.TEACHER_CHOSEN_BRANCHING));
+		processBranchingFields((BranchingActivity) act, actDto);
+		break;
+	    case Activity.GROUP_BRANCHING_ACTIVITY_TYPE:
+		((BranchingActivity) act)
+			.setSystemTool(systemToolDAO.getSystemToolByID(SystemTool.GROUP_BASED_BRANCHING));
+		processBranchingFields((BranchingActivity) act, actDto);
+		break;
+	    case Activity.TOOL_BRANCHING_ACTIVITY_TYPE:
+		((BranchingActivity) act)
+			.setSystemTool(systemToolDAO.getSystemToolByID(SystemTool.TOOL_BASED_BRANCHING));
+		processBranchingFields((BranchingActivity) act, actDto);
+		break;
 	}
 
 	if (act.isComplexActivity() && actDto.getDefaultActivityUIID() != null) {
@@ -2634,7 +2655,7 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 		&& activity.getActivityTypeID().equals(Activity.PARALLEL_ACTIVITY_TYPE)) {
 	    String description = activity.getDescription();
 	    // recognise learning libraries by their word description
-	    for (LearningLibrary library : (List<LearningLibrary>) learningLibraryDAO.getAllLearningLibraries()) {
+	    for (LearningLibrary library : learningLibraryDAO.getAllLearningLibraries()) {
 		for (String[] keyWords : COMPLEX_LEARNING_LIBRARY_KEY_WORDS) {
 		    boolean found = false;
 		    for (String keyWord : keyWords) {

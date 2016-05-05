@@ -35,12 +35,13 @@ public class PixlrConfigItem {
     Long id;
     String configKey;
     String configValue;
-    
-    public PixlrConfigItem() {}
-    
+
+    public PixlrConfigItem() {
+    }
+
     /**
      * @hibernate.id generator-class="native" type="java.lang.Long" column="uid"
-     * 
+     *
      */
     public Long getId() {
 	return id;

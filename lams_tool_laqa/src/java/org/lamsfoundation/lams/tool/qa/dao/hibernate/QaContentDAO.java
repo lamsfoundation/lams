@@ -2,21 +2,21 @@
  * Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
  * =============================================================
  * License Information: http://lamsfoundation.org/licensing/lams/2.0/
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301
  * USA
- * 
+ *
  * http://www.gnu.org/licenses/gpl.txt
  * ****************************************************************
  */
@@ -24,7 +24,6 @@
 package org.lamsfoundation.lams.tool.qa.dao.hibernate;
 
 import java.util.List;
-import java.util.Set;
 
 import org.hibernate.FlushMode;
 import org.lamsfoundation.lams.tool.qa.QaCondition;
@@ -36,11 +35,12 @@ import org.springframework.orm.hibernate3.support.HibernateDaoSupport;
 
 /**
  * @author Ozgur Demirtas
- * 
+ *
  */
 
 public class QaContentDAO extends HibernateDaoSupport implements IQaContentDAO {
 
+    @Override
     public QaContent getQaByContentId(long qaId) {
 	String query = "from QaContent as qa where qa.qaContentId = ?";
 	HibernateTemplate templ = this.getHibernateTemplate();
@@ -53,16 +53,19 @@ public class QaContentDAO extends HibernateDaoSupport implements IQaContentDAO {
 	return null;
     }
 
+    @Override
     public void updateQa(QaContent qa) {
 	this.getSession().setFlushMode(FlushMode.AUTO);
 	this.getHibernateTemplate().update(qa);
     }
 
+    @Override
     public void saveQa(QaContent qa) {
 	this.getSession().setFlushMode(FlushMode.AUTO);
 	this.getHibernateTemplate().save(qa);
     }
 
+    @Override
     public void saveOrUpdateQa(QaContent qa) {
 	this.getSession().setFlushMode(FlushMode.AUTO);
 	this.getHibernateTemplate().saveOrUpdate(qa);
@@ -73,10 +76,12 @@ public class QaContentDAO extends HibernateDaoSupport implements IQaContentDAO {
 	this.getHibernateTemplate().save(qa);
     }
 
+    @Override
     public void removeAllQaSession(QaContent qaContent) {
 	this.getHibernateTemplate().deleteAll(qaContent.getQaSessions());
     }
 
+    @Override
     public void removeQa(Long qaContentId) {
 	if (qaContentId != null) {
 	    String query = "from qa in class org.lamsfoundation.lams.tool.qa.QaContent" + " where qa.qaContentId = ?";
@@ -86,11 +91,13 @@ public class QaContentDAO extends HibernateDaoSupport implements IQaContentDAO {
 	}
     }
 
+    @Override
     public void deleteQa(QaContent qaContent) {
 	this.getSession().setFlushMode(FlushMode.AUTO);
 	this.getHibernateTemplate().delete(qaContent);
     }
 
+    @Override
     public void removeQaById(Long qaId) {
 	this.getSession().setFlushMode(FlushMode.AUTO);
 	removeQa(qaId);
@@ -100,13 +107,15 @@ public class QaContentDAO extends HibernateDaoSupport implements IQaContentDAO {
 	this.getHibernateTemplate().flush();
     }
 
+    @Override
     public void deleteCondition(QaCondition condition) {
 	if (condition != null && condition.getConditionId() != null) {
 	    this.getSession().setFlushMode(FlushMode.AUTO);
 	    this.getHibernateTemplate().delete(condition);
 	}
     }
-    
+
+    @Override
     public void removeQaContentFromCache(QaContent qaContent) {
 	if (qaContent != null) {
 	    getHibernateTemplate().evict(qaContent);
@@ -114,10 +123,11 @@ public class QaContentDAO extends HibernateDaoSupport implements IQaContentDAO {
 
     }
 
+    @Override
     public void removeQuestionsFromCache(QaContent qaContent) {
 	if (qaContent != null) {
 
-	    for (QaQueContent question : (Set<QaQueContent>) qaContent.getQaQueContents()) {
+	    for (QaQueContent question : qaContent.getQaQueContents()) {
 		getHibernateTemplate().evict(question);
 	    }
 	}

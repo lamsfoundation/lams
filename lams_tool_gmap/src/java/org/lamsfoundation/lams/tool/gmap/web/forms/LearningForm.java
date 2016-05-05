@@ -2,21 +2,21 @@
  * Copyright (C) 2008 LAMS Foundation (http://lamsfoundation.org)
  * =============================================================
  * License Information: http://lamsfoundation.org/licensing/lams/2.0/
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License version 2.0 
+ * it under the terms of the GNU General Public License version 2.0
  * as published by the Free Software Foundation.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301
  * USA
- * 
+ *
  * http://www.gnu.org/licenses/gpl.txt
  * ****************************************************************
  */
@@ -28,77 +28,77 @@ package org.lamsfoundation.lams.tool.gmap.web.forms;
 import org.apache.struts.action.ActionForm;
 
 /**
- * 
+ *
  * @author lfoxton
- * 
+ *
  * @struts.form name="learningForm"
  */
 public class LearningForm extends ActionForm {
 
-	private static final long serialVersionUID = -4728946254882237144L;
-	
-	String title;
-	String instructions;
-	
-	String dispatch;
-	Long toolSessionID;
-	String mode;
-	String entryText;
-	String markersXML;
+    private static final long serialVersionUID = -4728946254882237144L;
 
-	public String getMarkersXML() {
-		return markersXML;
-	}
+    String title;
+    String instructions;
 
-	public void setMarkersXML(String markersXML) {
-		this.markersXML = markersXML;
-	}
+    String dispatch;
+    Long toolSessionID;
+    String mode;
+    String entryText;
+    String markersXML;
 
-	public String getMode() {
-		return mode;
-	}
+    public String getMarkersXML() {
+	return markersXML;
+    }
 
-	public void setMode(String mode) {
-		this.mode = mode;
-	}
+    public void setMarkersXML(String markersXML) {
+	this.markersXML = markersXML;
+    }
 
-	public String getDispatch() {
-		return dispatch;
-	}
+    public String getMode() {
+	return mode;
+    }
 
-	public void setDispatch(String dispatch) {
-		this.dispatch = dispatch;
-	}
+    public void setMode(String mode) {
+	this.mode = mode;
+    }
 
-	public Long getToolSessionID() {
-		return toolSessionID;
-	}
+    public String getDispatch() {
+	return dispatch;
+    }
 
-	public void setToolSessionID(Long toolSessionID) {
-		this.toolSessionID = toolSessionID;
-	}
+    public void setDispatch(String dispatch) {
+	this.dispatch = dispatch;
+    }
 
-	public String getInstructions() {
-		return instructions;
-	}
+    public Long getToolSessionID() {
+	return toolSessionID;
+    }
 
-	public void setInstructions(String instructions) {
-		this.instructions = instructions;
-	}
+    public void setToolSessionID(Long toolSessionID) {
+	this.toolSessionID = toolSessionID;
+    }
 
-	public String getTitle() {
-		return title;
-	}
+    public String getInstructions() {
+	return instructions;
+    }
 
-	public void setTitle(String title) {
-		this.title = title;
-	}
+    public void setInstructions(String instructions) {
+	this.instructions = instructions;
+    }
 
-	public String getEntryText() {
-		return entryText;
-	}
+    public String getTitle() {
+	return title;
+    }
 
-	public void setEntryText(String entryText) {
-		this.entryText = entryText;
-	}
+    public void setTitle(String title) {
+	this.title = title;
+    }
+
+    public String getEntryText() {
+	return entryText;
+    }
+
+    public void setEntryText(String entryText) {
+	this.entryText = entryText;
+    }
 }

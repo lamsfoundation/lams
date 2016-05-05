@@ -2,21 +2,21 @@
  * Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
  * =============================================================
  * License Information: http://lamsfoundation.org/licensing/lams/2.0/
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License version 2.0 
+ * it under the terms of the GNU General Public License version 2.0
  * as published by the Free Software Foundation.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301
  * USA
- * 
+ *
  * http://www.gnu.org/licenses/gpl.txt
  * ****************************************************************
  */
@@ -37,7 +37,7 @@ import org.lamsfoundation.lams.contentrepository.RepositoryCheckedException;
  * Persistent noticeboard object/bean that defines the content for the noticeboard tool. Provides accessors and mutators
  * to get/set noticeboard attributes
  * </p>
- * 
+ *
  * @hibernate.class table="tl_lanb11_content"
  * @author mtruong
  */
@@ -73,13 +73,13 @@ public class NoticeboardContent implements Serializable {
 
     /** nullable persistent field */
     private Date dateUpdated;
-    
+
     /** nullable persistent field */
     private boolean allowComments;
-    
+
     /** nullable persistent field */
     private boolean commentsLikeAndDislike;
-    
+
     /** persistent field */
     private Set<NoticeboardSession> nbSessions = new HashSet<NoticeboardSession>();
 
@@ -89,7 +89,7 @@ public class NoticeboardContent implements Serializable {
 
     /** full constructor */
     public NoticeboardContent(Long nbContentId, String title, String content, boolean defineLater,
-	    boolean reflectOnActivity, String reflectInstructions, boolean contentInUse, Long creatorUserId, 
+	    boolean reflectOnActivity, String reflectInstructions, boolean contentInUse, Long creatorUserId,
 	    Date dateCreated, Date dateUpdated, boolean allowComments, boolean commentsLikeAndDislike) {
 	this.nbContentId = nbContentId;
 	this.title = title;
@@ -107,7 +107,7 @@ public class NoticeboardContent implements Serializable {
 
     /**
      * Minimal Constructor used to initialise values for the NoticeboardContent object
-     * 
+     *
      * @return
      */
 
@@ -138,7 +138,7 @@ public class NoticeboardContent implements Serializable {
     }
 
     /**
-     * 
+     *
      * @hibernate.property column="creator_user_id" length="20"
      */
     public Long getCreatorUserId() {
@@ -150,7 +150,7 @@ public class NoticeboardContent implements Serializable {
     }
 
     /**
-     * 
+     *
      * @hibernate.property column="date_created" length="19"
      */
     public Date getDateCreated() {
@@ -162,7 +162,7 @@ public class NoticeboardContent implements Serializable {
     }
 
     /**
-     * 
+     *
      * @hibernate.property column="date_updated" length="19"
      */
     public Date getDateUpdated() {
@@ -237,7 +237,7 @@ public class NoticeboardContent implements Serializable {
     public void setCommentsLikeAndDislike(boolean commentsLikeAndDislike) {
 	this.commentsLikeAndDislike = commentsLikeAndDislike;
     }
-    
+
     /**
      * @hibernate.property column="nb_content_id" length="20" not-null="true"
      */
@@ -306,7 +306,7 @@ public class NoticeboardContent implements Serializable {
 
     /**
      * Creates a new NoticeboardContent object from the supplied object. Assigns it the toContendId.
-     * 
+     *
      * @param nb
      *            NoticeboardContent object containing the content to copy from
      * @param toContentId
@@ -315,11 +315,12 @@ public class NoticeboardContent implements Serializable {
      * @throws RepositoryCheckedException
      * @throws ItemNotFoundException
      */
-    public static NoticeboardContent newInstance(NoticeboardContent nb, Long toContentId) throws ItemNotFoundException,
-	    RepositoryCheckedException {
+    public static NoticeboardContent newInstance(NoticeboardContent nb, Long toContentId)
+	    throws ItemNotFoundException, RepositoryCheckedException {
 	NoticeboardContent newContent = new NoticeboardContent(toContentId, nb.getTitle(), nb.getContent(),
 		nb.isDefineLater(), nb.getReflectOnActivity(), nb.getReflectInstructions(), nb.isContentInUse(),
-		nb.getCreatorUserId(), nb.getDateCreated(), nb.getDateUpdated(), nb.isAllowComments(), nb.isCommentsLikeAndDislike());
+		nb.getCreatorUserId(), nb.getDateCreated(), nb.getDateUpdated(), nb.isAllowComments(),
+		nb.isCommentsLikeAndDislike());
 
 	return newContent;
     }

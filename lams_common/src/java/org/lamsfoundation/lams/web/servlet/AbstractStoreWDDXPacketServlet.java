@@ -2,21 +2,21 @@
  * Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
  * =============================================================
  * License Information: http://lamsfoundation.org/licensing/lams/2.0/
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License version 2.0 
+ * it under the terms of the GNU General Public License version 2.0
  * as published by the Free Software Foundation.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301
  * USA
- * 
+ *
  * http://www.gnu.org/licenses/gpl.txt
  * ****************************************************************
  */
@@ -54,7 +54,7 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
  * If this servlet receives a GET rather than a POST, then an error packet (in wddx format) will be returned.
  * <P>
  * If the log level is set to debug, then the both the received packet and the reply packet will be logged.
- * 
+ *
  * @author Fiona Malikoff
  */
 public abstract class AbstractStoreWDDXPacketServlet extends HttpServlet {
@@ -66,7 +66,8 @@ public abstract class AbstractStoreWDDXPacketServlet extends HttpServlet {
      * @see javax.servlet.http.HttpServlet#doGet(HttpServletRequest, HttpServletResponse)
      */
     @Override
-    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+    protected void doGet(HttpServletRequest request, HttpServletResponse response)
+	    throws ServletException, IOException {
 	Writer writer = response.getWriter();
 	FlashMessage flashMessage = FlashMessage.getWDDXPacketGetReceived(getMessageKey(null, request));
 	writer.write(flashMessage.serializeMessage());
@@ -86,21 +87,21 @@ public abstract class AbstractStoreWDDXPacketServlet extends HttpServlet {
 
 	    packet = AbstractStoreWDDXPacketServlet.getBody(request);
 	    if (AbstractStoreWDDXPacketServlet.log.isDebugEnabled()) {
-		AbstractStoreWDDXPacketServlet.log.debug("Request " + request.getRequestURI()
-			+ " received packet length " + packet);
+		AbstractStoreWDDXPacketServlet.log
+			.debug("Request " + request.getRequestURI() + " received packet length " + packet);
 	    }
 
 	    if (containsNulls(packet)) {
-		FlashMessage flashMessage = new FlashMessage(getMessageKey(packet, request),
-			"WDDXPacket contains null", FlashMessage.ERROR);
+		FlashMessage flashMessage = new FlashMessage(getMessageKey(packet, request), "WDDXPacket contains null",
+			FlashMessage.ERROR);
 		writer.write(flashMessage.serializeMessage());
 	    }
 
 	    replyPacket = process(packet, request);
 
 	    if (AbstractStoreWDDXPacketServlet.log.isDebugEnabled()) {
-		AbstractStoreWDDXPacketServlet.log.debug("Request " + request.getRequestURI() + " sending back packet "
-			+ replyPacket);
+		AbstractStoreWDDXPacketServlet.log
+			.debug("Request " + request.getRequestURI() + " sending back packet " + replyPacket);
 	    }
 
 	} catch (Exception e) {
@@ -112,8 +113,8 @@ public abstract class AbstractStoreWDDXPacketServlet extends HttpServlet {
 		    e.getMessage() != null ? e.getMessage() : e.getClass().getName());
 	    writer.write(flashMessage.serializeMessage());
 
-	    AbstractStoreWDDXPacketServlet.auditService.log(AbstractStoreWDDXPacketServlet.class.getName(), "URL:"
-		    + uri + " triggered exception" + e.toString());
+	    AbstractStoreWDDXPacketServlet.auditService.log(AbstractStoreWDDXPacketServlet.class.getName(),
+		    "URL:" + uri + " triggered exception" + e.toString());
 	    return;
 	}
 
@@ -140,7 +141,7 @@ public abstract class AbstractStoreWDDXPacketServlet extends HttpServlet {
      * because for very large learning designs, the wddx packet read in gets corrupted or truncated. The reason for
      * this, is still unknown, however using getInputStream() doesn't seem to have this problem. TODO: investigate why
      * getReader() doesn't work for large learning designs. The original code has been commented out below.
-     * 
+     *
      * @param req
      * @return
      * @throws IOException
@@ -148,14 +149,15 @@ public abstract class AbstractStoreWDDXPacketServlet extends HttpServlet {
     public static String getBody(HttpServletRequest req) throws IOException {
 	int tempContentLength = req.getContentLength();
 	InputStream sis = req.getInputStream();
-	/*  	    byte[] content = new byte[1024*4];
-	  	    OutputStream bos = new ByteArrayOutputStream(tempContentLength>0 ? tempContentLength : 200);
-	  	    int len;
-	  	    while((len = sis.read(content)) != -1){
-	  	    	bos.write(content,0,len);
-	  	    }
-	  	    return bos.toString();
-	  */
+	/*
+	 * byte[] content = new byte[1024*4];
+	 * OutputStream bos = new ByteArrayOutputStream(tempContentLength>0 ? tempContentLength : 200);
+	 * int len;
+	 * while((len = sis.read(content)) != -1){
+	 * bos.write(content,0,len);
+	 * }
+	 * return bos.toString();
+	 */
 	BufferedReader buff = new BufferedReader(new InputStreamReader(sis, "UTF-8"));
 
 	StringBuffer tempStrBuf = new StringBuffer(tempContentLength > 0 ? tempContentLength : 200);
@@ -168,19 +170,21 @@ public abstract class AbstractStoreWDDXPacketServlet extends HttpServlet {
 
 	return (tempStrBuf.toString());
 
-	/*	BufferedReader  tempReader  = req.getReader();
-		int tempContentLength = req.getContentLength();
-		
-		StringBuffer tempStrBuf = new StringBuffer( tempContentLength>0 ? tempContentLength : 200 );
-		String tempStr;
-		tempStr = tempReader.readLine(); 
-		while ( tempStr != null )
-		{
-			tempStrBuf.append(tempStr);
-			tempStr = tempReader.readLine();
-		}
-
-		return(tempStrBuf.toString()); */
+	/*
+	 * BufferedReader tempReader = req.getReader();
+	 * int tempContentLength = req.getContentLength();
+	 * 
+	 * StringBuffer tempStrBuf = new StringBuffer( tempContentLength>0 ? tempContentLength : 200 );
+	 * String tempStr;
+	 * tempStr = tempReader.readLine();
+	 * while ( tempStr != null )
+	 * {
+	 * tempStrBuf.append(tempStr);
+	 * tempStr = tempReader.readLine();
+	 * }
+	 * 
+	 * return(tempStrBuf.toString());
+	 */
 
     }
 
@@ -189,7 +193,7 @@ public abstract class AbstractStoreWDDXPacketServlet extends HttpServlet {
      * <p>
      * If an error occurs, this method should throw an exception so that the base class will log the exception and
      * return an error message to Flash.
-     * 
+     *
      * @return A string which is a WDDX packet containing a FlashMessage.
      */
     abstract protected String process(String packet, HttpServletRequest request) throws Exception;
@@ -200,20 +204,20 @@ public abstract class AbstractStoreWDDXPacketServlet extends HttpServlet {
      * <p>
      * If an exception is thrown by process(), the base class generates an error packet to send back to Flash. It will
      * include this messageKey in the error message, so that the Flash client can match the error to the call.
-     * 
+     *
      * @return messageKey
      */
     abstract protected String getMessageKey(String packet, HttpServletRequest request);
 
     /**
      * Get AuditService bean.
-     * 
+     *
      * @return
      */
     private IAuditService getAuditService() {
 	if (AbstractStoreWDDXPacketServlet.auditService == null) {
-	    WebApplicationContext ctx = WebApplicationContextUtils.getRequiredWebApplicationContext(this
-		    .getServletContext());
+	    WebApplicationContext ctx = WebApplicationContextUtils
+		    .getRequiredWebApplicationContext(this.getServletContext());
 	    AbstractStoreWDDXPacketServlet.auditService = (IAuditService) ctx.getBean("auditService");
 	}
 	return AbstractStoreWDDXPacketServlet.auditService;

@@ -2,21 +2,21 @@
  * Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
  * =============================================================
  * License Information: http://lamsfoundation.org/licensing/lams/2.0/
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License version 2.0 
+ * it under the terms of the GNU General Public License version 2.0
  * as published by the Free Software Foundation.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301
  * USA
- * 
+ *
  * http://www.gnu.org/licenses/gpl.txt
  * ****************************************************************
  */
@@ -37,11 +37,11 @@ import org.lamsfoundation.lams.learningdesign.TextSearchConditionComparator;
 
 /**
  * Forum
- * 
+ *
  * @author conradb
- * 
+ *
  * @hibernate.class table="tl_lafrum11_forum"
- * 
+ *
  */
 public class Forum implements Cloneable {
 
@@ -64,13 +64,13 @@ public class Forum implements Cloneable {
     private boolean allowNewTopic;
 
     private boolean allowUpload;
-    
+
     private boolean allowRateMessages;
 
     private int maximumReply;
 
     private int minimumReply;
-    
+
     private int maximumRate;
 
     private int minimumRate;
@@ -90,9 +90,9 @@ public class Forum implements Cloneable {
     private ForumUser createdBy;
 
     private Set messages;
-    
+
     private int minCharacters;
-    
+
     private boolean limitedMinCharacters;
 
     private int maxCharacters;
@@ -102,13 +102,13 @@ public class Forum implements Cloneable {
     private boolean reflectOnActivity;
 
     private String reflectInstructions;
-    
+
     private boolean notifyLearnersOnMarkRelease;
-    
+
     private boolean notifyLearnersOnForumPosting;
 
     private boolean notifyTeachersOnForumPosting;
-    
+
     private Date submissionDeadline;
 
     // conditions
@@ -116,7 +116,7 @@ public class Forum implements Cloneable {
 
     /**
      * Default contruction method.
-     * 
+     *
      */
     public Forum() {
 	messages = new HashSet();
@@ -167,14 +167,15 @@ public class Forum implements Cloneable {
 
 	final Forum genericEntity = (Forum) o;
 
-	return new EqualsBuilder().append(uid, genericEntity.uid).append(title, genericEntity.title).append(
-		instructions, genericEntity.instructions).append(created, genericEntity.created)
+	return new EqualsBuilder().append(uid, genericEntity.uid).append(title, genericEntity.title)
+		.append(instructions, genericEntity.instructions).append(created, genericEntity.created)
 		.append(updated, genericEntity.updated).append(createdBy, genericEntity.createdBy).isEquals();
     }
 
     @Override
     public int hashCode() {
-	return new HashCodeBuilder().append(uid).append(title).append(instructions).append(created).append(updated).append(createdBy).toHashCode();
+	return new HashCodeBuilder().append(uid).append(title).append(instructions).append(created).append(updated)
+		.append(createdBy).toHashCode();
     }
 
     // **********************************************************
@@ -182,7 +183,7 @@ public class Forum implements Cloneable {
     // **********************************************************
     /**
      * Returns the object's creation date
-     * 
+     *
      * @return date
      * @hibernate.property column="create_date"
      */
@@ -192,7 +193,7 @@ public class Forum implements Cloneable {
 
     /**
      * Sets the object's creation date
-     * 
+     *
      * @param created
      */
     public void setCreated(Date created) {
@@ -201,7 +202,7 @@ public class Forum implements Cloneable {
 
     /**
      * Returns the object's date of last update
-     * 
+     *
      * @return date updated
      * @hibernate.property column="update_date"
      */
@@ -211,7 +212,7 @@ public class Forum implements Cloneable {
 
     /**
      * Sets the object's date of last update
-     * 
+     *
      * @param updated
      */
     public void setUpdated(Date updated) {
@@ -220,9 +221,9 @@ public class Forum implements Cloneable {
 
     /**
      * @return Returns the userid of the user who created the Forum.
-     * 
+     *
      * @hibernate.many-to-one cascade="none" column="create_by"
-     * 
+     *
      */
     public ForumUser getCreatedBy() {
 	return createdBy;
@@ -230,7 +231,7 @@ public class Forum implements Cloneable {
 
     /**
      * @param createdBy
-     *                The userid of the user who created this Forum.
+     *            The userid of the user who created this Forum.
      */
     public void setCreatedBy(ForumUser createdBy) {
 	this.createdBy = createdBy;
@@ -249,9 +250,9 @@ public class Forum implements Cloneable {
 
     /**
      * @return Returns the title.
-     * 
+     *
      * @hibernate.property column="title"
-     * 
+     *
      */
     public String getTitle() {
 	return title;
@@ -259,7 +260,7 @@ public class Forum implements Cloneable {
 
     /**
      * @param title
-     *                The title to set.
+     *            The title to set.
      */
     public void setTitle(String title) {
 	this.title = title;
@@ -267,9 +268,9 @@ public class Forum implements Cloneable {
 
     /**
      * @return Returns the allowAnonym.
-     * 
+     *
      * @hibernate.property column="allow_anonym"
-     * 
+     *
      */
     public boolean getAllowAnonym() {
 	return allowAnonym;
@@ -277,8 +278,8 @@ public class Forum implements Cloneable {
 
     /**
      * @param allowAnonym
-     *                The allowAnonym to set.
-     * 
+     *            The allowAnonym to set.
+     *
      */
     public void setAllowAnonym(boolean allowAnnomity) {
 	allowAnonym = allowAnnomity;
@@ -286,9 +287,9 @@ public class Forum implements Cloneable {
 
     /**
      * @return Returns the lockWhenFinish.
-     * 
+     *
      * @hibernate.property column="lock_on_finished"
-     * 
+     *
      */
     public boolean getLockWhenFinished() {
 	return lockWhenFinished;
@@ -296,7 +297,7 @@ public class Forum implements Cloneable {
 
     /**
      * @param lockWhenFinished
-     *                Set to true to lock the forum for finished users.
+     *            Set to true to lock the forum for finished users.
      */
     public void setLockWhenFinished(boolean lockWhenFinished) {
 	this.lockWhenFinished = lockWhenFinished;
@@ -304,7 +305,7 @@ public class Forum implements Cloneable {
 
     /**
      * @return Returns the instructions set by the teacher.
-     * 
+     *
      * @hibernate.property column="instructions" type="text"
      */
     public String getInstructions() {
@@ -318,11 +319,11 @@ public class Forum implements Cloneable {
     /**
      * NOTE: The reason that relation don't use save-update to persist message is MessageSeq table need save a record as
      * well.
-     * 
+     *
      * @hibernate.set lazy="true" inverse="true" cascade="none" order-by="create_date desc"
      * @hibernate.collection-key column="forum_uid"
      * @hibernate.collection-one-to-many class="org.lamsfoundation.lams.tool.forum.persistence.Message"
-     * 
+     *
      * @return
      */
     public Set<Message> getMessages() {
@@ -409,7 +410,7 @@ public class Forum implements Cloneable {
 	Forum toContent = new Forum();
 	toContent = (Forum) fromContent.clone();
 	toContent.setContentId(contentId);
-	
+
 	Set topics = toContent.getMessages();
 	if (topics != null) {
 	    Iterator iter = topics.iterator();
@@ -419,10 +420,10 @@ public class Forum implements Cloneable {
 		msg.setForum(null);
 	    }
 	}
-	
+
 	return toContent;
     }
-    
+
     /**
      * @hibernate.property column="min_characters"
      * @return
@@ -434,7 +435,7 @@ public class Forum implements Cloneable {
     public void setMinCharacters(int minCharacters) {
 	this.minCharacters = minCharacters;
     }
-    
+
     /**
      * @hibernate.property column="limited_min_characters"
      * @return
@@ -494,7 +495,7 @@ public class Forum implements Cloneable {
     public void setAllowUpload(boolean allowUpload) {
 	this.allowUpload = allowUpload;
     }
-    
+
     /**
      * @hibernate.property column="allow_rate_messages"
      * @return
@@ -506,7 +507,6 @@ public class Forum implements Cloneable {
     public void setAllowRateMessages(boolean allowRateMessages) {
 	this.allowRateMessages = allowRateMessages;
     }
-    
 
     /**
      * @hibernate.property column="maximum_reply"
@@ -555,7 +555,7 @@ public class Forum implements Cloneable {
     public void setReflectOnActivity(boolean reflectOnActivity) {
 	this.reflectOnActivity = reflectOnActivity;
     }
-    
+
     /**
      * @hibernate.property column="notify_learners_on_forum_posting"
      * @return
@@ -567,7 +567,7 @@ public class Forum implements Cloneable {
     public void setNotifyLearnersOnForumPosting(boolean notifyLearnersOnForumPosting) {
 	this.notifyLearnersOnForumPosting = notifyLearnersOnForumPosting;
     }
-    
+
     /**
      * @hibernate.property column="notify_teachers_on_forum_posting"
      * @return
@@ -597,7 +597,7 @@ public class Forum implements Cloneable {
      *                sort="org.lamsfoundation.lams.learningdesign.TextSearchConditionComparator"
      * @hibernate.collection-key column="content_uid"
      * @hibernate.collection-one-to-many class="org.lamsfoundation.lams.tool.forum.persistence.ForumCondition"
-     * 
+     *
      */
     public Set<ForumCondition> getConditions() {
 	return conditions;
@@ -606,40 +606,40 @@ public class Forum implements Cloneable {
     public void setConditions(Set<ForumCondition> conditions) {
 	this.conditions = conditions;
     }
-    
-	/**
+
+    /**
      * @hibernate.property column="submission_deadline"
-	 * @return date submissionDeadline
-	 */
-	public Date getSubmissionDeadline() {
-		return submissionDeadline;
-	}
-	
-	public void setSubmissionDeadline(Date submissionDeadline) {
-		this.submissionDeadline = submissionDeadline;
-	}
+     * @return date submissionDeadline
+     */
+    public Date getSubmissionDeadline() {
+	return submissionDeadline;
+    }
+
+    public void setSubmissionDeadline(Date submissionDeadline) {
+	this.submissionDeadline = submissionDeadline;
+    }
 
     /**
      * @hibernate.property column="maximum_rate"
      * @return
      */
-	public int getMaximumRate() {
-		return maximumRate;
-	}
+    public int getMaximumRate() {
+	return maximumRate;
+    }
 
-	public void setMaximumRate(int maximumRate) {
-		this.maximumRate = maximumRate;
-	}
+    public void setMaximumRate(int maximumRate) {
+	this.maximumRate = maximumRate;
+    }
 
     /**
      * @hibernate.property column="minimum_rate"
      * @return
-     */	
-	public int getMinimumRate() {
-		return minimumRate;
-	}
+     */
+    public int getMinimumRate() {
+	return minimumRate;
+    }
 
-	public void setMinimumRate(int minimumRate) {
-		this.minimumRate = minimumRate;
-	}
+    public void setMinimumRate(int minimumRate) {
+	this.minimumRate = minimumRate;
+    }
 }

@@ -34,9 +34,9 @@ import org.lamsfoundation.lams.tool.qa.QaWizardQuestion;
 import org.lamsfoundation.lams.tool.qa.dao.IQaWizardDAO;
 
 /**
- * 
+ *
  * @author edited by lfoxton
- * 
+ *
  */
 public class QaWizardDAO extends BaseDAO implements IQaWizardDAO {
 
@@ -44,11 +44,13 @@ public class QaWizardDAO extends BaseDAO implements IQaWizardDAO {
     private static final String QUERY_GET_CATEGORY = "from " + QaWizardCategory.class.getName() + " c where c.uid=?";
     private static final String QUERY_GET_SKILL = "from " + QaWizardCognitiveSkill.class.getName() + " c where c.uid=?";
     private static final String QUERY_GET_QUESTION = "from " + QaWizardQuestion.class.getName() + " q where q.uid=?";
-    
+
+    @Override
     public void saveOrUpdateCategories(SortedSet<QaWizardCategory> categories) {
 	getHibernateTemplate().saveOrUpdateAll(categories);
     }
 
+    @Override
     @SuppressWarnings("unchecked")
     public SortedSet<QaWizardCategory> getWizardCategories() {
 	SortedSet<QaWizardCategory> ret = new TreeSet<QaWizardCategory>();
@@ -59,26 +61,26 @@ public class QaWizardDAO extends BaseDAO implements IQaWizardDAO {
 	return ret;
     }
 
+    @Override
     public void deleteWizardCategoryByUID(Long uid) {
 	QaWizardCategory cat = getWizardCategoryByUID(uid);
-	if (cat != null)
-	{
+	if (cat != null) {
 	    getHibernateTemplate().delete(cat);
 	}
     }
 
-    public void deleteWizardSkillByUID(Long uid){
+    @Override
+    public void deleteWizardSkillByUID(Long uid) {
 	QaWizardCognitiveSkill skill = getWizardSkillByUID(uid);
-	if (skill != null)
-	{
+	if (skill != null) {
 	    getHibernateTemplate().delete(skill);
 	}
     }
-    
-    public void deleteWizardQuestionByUID(Long uid){
+
+    @Override
+    public void deleteWizardQuestionByUID(Long uid) {
 	QaWizardQuestion question = getWizardQuestionByUID(uid);
-	if (question != null)
-	{
+	if (question != null) {
 	    getHibernateTemplate().delete(question);
 	}
     }
@@ -86,45 +88,36 @@ public class QaWizardDAO extends BaseDAO implements IQaWizardDAO {
     @SuppressWarnings("unchecked")
     public QaWizardCategory getWizardCategoryByUID(Long uid) {
 	List result = getHibernateTemplate().find(QUERY_GET_CATEGORY, uid);
-	if (result.size() > 0)
-	{
-	    return (QaWizardCategory)result.get(0);
-	}
-	else
-	{
+	if (result.size() > 0) {
+	    return (QaWizardCategory) result.get(0);
+	} else {
 	    return null;
 	}
     }
 
     @SuppressWarnings("unchecked")
-    public QaWizardCognitiveSkill getWizardSkillByUID(Long uid){
+    public QaWizardCognitiveSkill getWizardSkillByUID(Long uid) {
 	List result = getHibernateTemplate().find(QUERY_GET_SKILL, uid);
-	if (result.size() > 0)
-	{
-	    return (QaWizardCognitiveSkill)result.get(0);
-	}
-	else
-	{
+	if (result.size() > 0) {
+	    return (QaWizardCognitiveSkill) result.get(0);
+	} else {
 	    return null;
 	}
     }
-    
+
     @SuppressWarnings("unchecked")
-    public QaWizardQuestion getWizardQuestionByUID(Long uid){
-	
+    public QaWizardQuestion getWizardQuestionByUID(Long uid) {
+
 	List result = getHibernateTemplate().find(QUERY_GET_QUESTION, uid);
-	if (result.size() > 0)
-	{
-	    return (QaWizardQuestion)result.get(0);
-	}
-	else
-	{
+	if (result.size() > 0) {
+	    return (QaWizardQuestion) result.get(0);
+	} else {
 	    return null;
 	}
     }
-    
-    public void deleteAllWizardCategories()
-    {
+
+    @Override
+    public void deleteAllWizardCategories() {
 	this.getHibernateTemplate().deleteAll(getWizardCategories());
     }
 

@@ -59,9 +59,9 @@ import org.w3c.dom.Element;
 /**
  * Packs questions and answers into files. They can be later used in question-based 3rd party applications. Currently it
  * supports only IMS QTI but other methods can be added as needed.
- * 
+ *
  * @author Marcin Cieslak
- * 
+ *
  */
 public class QuestionExporter {
     private static final Logger log = Logger.getLogger(QuestionExporter.class);
@@ -74,9 +74,9 @@ public class QuestionExporter {
 
     private static final String EAR_IMAGE_FOLDER = Configuration.get(ConfigurationKeys.LAMS_EAR_DIR) + File.separator
 	    + FileUtil.LAMS_WWW_DIR;
-    private static final File MANIFEST_TEMPLATE_FILE = new File(Configuration.get(ConfigurationKeys.LAMS_EAR_DIR)
-	    + File.separator + "lams-central.war" + File.separator + "questions" + File.separator
-	    + "imsmanifest_template.xml");
+    private static final File MANIFEST_TEMPLATE_FILE = new File(
+	    Configuration.get(ConfigurationKeys.LAMS_EAR_DIR) + File.separator + "lams-central.war" + File.separator
+		    + "questions" + File.separator + "imsmanifest_template.xml");
 
     private String packageTitle = null;
     private Question[] questions = null;
@@ -107,8 +107,8 @@ public class QuestionExporter {
 	    String fileName = FileUtil.getFileName(packagePath);
 	    fileName = FileUtil.encodeFilenameForDownload(request, fileName);
 	    response.setContentType(CentralConstants.RESPONSE_CONTENT_TYPE_DOWNLOAD);
-	    response.setHeader(CentralConstants.HEADER_CONTENT_DISPOSITION, CentralConstants.HEADER_CONTENT_ATTACHMENT
-		    + fileName);
+	    response.setHeader(CentralConstants.HEADER_CONTENT_DISPOSITION,
+		    CentralConstants.HEADER_CONTENT_ATTACHMENT + fileName);
 
 	    // write out the ZIP to respose error
 	    FileUtils.copyFile(packageFile, response.getOutputStream());
@@ -122,7 +122,7 @@ public class QuestionExporter {
 
     /**
      * Builds a QTI ZIP package (manifest, QTI file, resources) with the given questions.
-     * 
+     *
      * @return Path to the created ZIP file
      */
     public String exportQTIPackage() {
@@ -165,7 +165,7 @@ public class QuestionExporter {
 
     /**
      * Builds QTI XML file containing structured questions & answers content.
-     * 
+     *
      * @return XML file content
      */
     public String exportQTIFile() {
@@ -202,8 +202,8 @@ public class QuestionExporter {
 	    }
 
 	    if (itemElem == null) {
-		QuestionExporter.log.warn("Unknow type \"" + question.getType() + "\" of question \""
-			+ question.getTitle() + "\"");
+		QuestionExporter.log
+			.warn("Unknow type \"" + question.getType() + "\" of question \"" + question.getTitle() + "\"");
 	    } else {
 		sectionElem.appendChild(itemElem);
 	    }
@@ -297,20 +297,20 @@ public class QuestionExporter {
 
 	    // link feedback for correct/incorrect answer
 	    if (isCorrect) {
-		Element displayfeedbackElem = (Element) respconditionElem.appendChild(doc
-			.createElement("displayfeedback"));
+		Element displayfeedbackElem = (Element) respconditionElem
+			.appendChild(doc.createElement("displayfeedback"));
 		displayfeedbackElem.setAttribute("feedbacktype", "Response");
 		displayfeedbackElem.setAttribute("linkrefid", correctFeedbackLabel);
 	    } else {
-		Element displayfeedbackElem = (Element) respconditionElem.appendChild(doc
-			.createElement("displayfeedback"));
+		Element displayfeedbackElem = (Element) respconditionElem
+			.appendChild(doc.createElement("displayfeedback"));
 		displayfeedbackElem.setAttribute("feedbacktype", "Response");
 		displayfeedbackElem.setAttribute("linkrefid", incorrectFeedbackLabel);
 	    }
 
 	    if (overallFeedbackElem != null) {
-		Element displayfeedbackElem = (Element) respconditionElem.appendChild(doc
-			.createElement("displayfeedback"));
+		Element displayfeedbackElem = (Element) respconditionElem
+			.appendChild(doc.createElement("displayfeedback"));
 		displayfeedbackElem.setAttribute("feedbacktype", "Response");
 		displayfeedbackElem.setAttribute("linkrefid", overallFeedbackElem.getAttribute("ident"));
 	    }
@@ -406,8 +406,8 @@ public class QuestionExporter {
 		if (matchAnswerIndex == question.getMatchMap().get(answerIndex)) {
 		    Element respconditionElem = doc.createElement("respcondition");
 		    respconditionElem.setAttribute("title", "Matching " + responseLidIdentifier + " Resp Condition 1");
-		    Element conditionvarElem = (Element) respconditionElem.appendChild(doc
-			    .createElement("conditionvar"));
+		    Element conditionvarElem = (Element) respconditionElem
+			    .appendChild(doc.createElement("conditionvar"));
 		    Element varequalElem = (Element) conditionvarElem.appendChild(doc.createElement("varequal"));
 		    varequalElem.setAttribute("respident", responseLidIdentifier);
 		    varequalElem.setTextContent(matchAnswerIdent);
@@ -555,8 +555,8 @@ public class QuestionExporter {
 	    setvarElem.setTextContent(String.valueOf(answer.getScore()));
 
 	    if (overallFeedbackElem != null) {
-		Element displayfeedbackElem = (Element) respconditionElem.appendChild(doc
-			.createElement("displayfeedback"));
+		Element displayfeedbackElem = (Element) respconditionElem
+			.appendChild(doc.createElement("displayfeedback"));
 		displayfeedbackElem.setAttribute("feedbacktype", "Response");
 		displayfeedbackElem.setAttribute("linkrefid", overallFeedbackElem.getAttribute("ident"));
 	    }
@@ -693,7 +693,7 @@ public class QuestionExporter {
 
     /**
      * Fill the existing template file with current data.
-     * 
+     *
      * @return contents of XML template file
      */
     private String createManifest() throws IOException {

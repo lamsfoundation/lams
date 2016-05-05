@@ -2,21 +2,21 @@
  * Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
  * =============================================================
  * License Information: http://lamsfoundation.org/licensing/lams/2.0/
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License version 2.0 
+ * it under the terms of the GNU General Public License version 2.0
  * as published by the Free Software Foundation.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301
  * USA
- * 
+ *
  * http://www.gnu.org/licenses/gpl.txt
  * ****************************************************************
  */
@@ -35,15 +35,15 @@ import org.lamsfoundation.lams.util.MessageService;
 
 /**
  * This is interface that defines the contract for performing grouping algorithm.
- * 
+ *
  * It would be nicer to get the message service directly from within the classes, rather than have a setter. But can't
  * think of a way to directly access it when the grouper object doesn't have any link to the Spring context. (Fiona
  * Malikoff)
- * 
+ *
  * @author Jacky Fang
  * @since 2005-3-24
  * @version 1.1
- * 
+ *
  */
 public abstract class Grouper {
 
@@ -67,7 +67,7 @@ public abstract class Grouper {
     /**
      * Do the grouping for a list of learners that the teacher requested. If you don't supply a name, you may get a
      * system generated name.
-     * 
+     *
      * @param grouping
      *            the grouping that is used to perform groups creation.
      * @param name
@@ -80,7 +80,7 @@ public abstract class Grouper {
     /**
      * Do the grouping for a single learner. Should call setCommonMessageService() before calling this method. If you
      * don't supply a name, you may get a system generated name.
-     * 
+     *
      * @param grouping
      *            the grouping that is used to perform groups creation.
      * @param name
@@ -93,7 +93,7 @@ public abstract class Grouper {
     /**
      * Do the grouping for a list of learners that the teacher requested. If you don't supply an id, you may get a group
      * with a system generated name.
-     * 
+     *
      * @param grouping
      *            the grouping that is used to perform groups creation.
      * @param id
@@ -108,7 +108,7 @@ public abstract class Grouper {
 
     /**
      * Get the default group name prefix
-     * 
+     *
      * @return default group name prefix
      */
     public String getPrefix() {
@@ -121,7 +121,7 @@ public abstract class Grouper {
     /**
      * Remove the give learners from the given group. Cannot remove learners if the group is already in use (i.e. a tool
      * session exists)
-     * 
+     *
      * Trims the name of the group before checking if it is null or before matching to a group.
      *
      * @param grouping
@@ -167,7 +167,7 @@ public abstract class Grouper {
      * Create an empty group for the given grouping. Trims the name of the group before creating the group. If the group
      * name group name already exists then it appends a datetime string to make the name unique. Gives it 5 attempts to
      * make it unique then gives up.
-     * 
+     *
      * Throws a GroupingException if name is null or blank.
      *
      * @param grouping
@@ -208,8 +208,9 @@ public abstract class Grouper {
 	    }
 	}
 
-	if (newGroup != null)
+	if (newGroup != null) {
 	    grouping.getGroups().add(newGroup);
+	}
 
 	return newGroup;
 
@@ -218,13 +219,13 @@ public abstract class Grouper {
     /**
      * Remove a group for the given grouping. If the group is already used (e.g. a tool session exists) then it throws a
      * GroupingException. If the group does not exist, nothing happens.
-     * 
+     *
      * Trims the name of the group before selecting the group.
-     * 
+     *
      * When a group is removed all the users in the group become ungrouped.
-     * 
+     *
      * Also throws a GroupingException if groupName is null or blank.
-     * 
+     *
      * @param grouping
      *            (mandatory)
      * @param groupID

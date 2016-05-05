@@ -2,26 +2,26 @@
  * Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
  * =============================================================
  * License Information: http://lamsfoundation.org/licensing/lams/2.0/
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License version 2.0 
+ * it under the terms of the GNU General Public License version 2.0
  * as published by the Free Software Foundation.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301
  * USA
- * 
+ *
  * http://www.gnu.org/licenses/gpl.txt
  * ****************************************************************
  */
 
-/* $$Id$$ */	
+/* $$Id$$ */
 package org.lamsfoundation.lams.learning.web.action;
 
 import javax.servlet.http.HttpServletRequest;
@@ -40,57 +40,55 @@ import org.lamsfoundation.lams.lesson.Lesson;
 
 /**
  * @author daveg
- * 
- * XDoclet definition:
- * 
+ *
+ *         XDoclet definition:
+ *
  * @struts:action path="/ChooseActivity" name="activityForm"
  *                validate="false" scope="request"
- *  
+ * 
  */
 public class ChooseActivityAction extends ActivityAction {
 
     protected static String className = "ChooseActivity";
-    
-	/**
-	 * Gets an activity from the request (attribute) and forwards onto the required
-	 * jsp (SingleActivity or ParallelActivity).
-	 */
-	public ActionForward execute(
-			ActionMapping mapping,
-			ActionForm actionForm,
-			HttpServletRequest request,
-			HttpServletResponse response) {
-		ActivityMapping actionMappings = LearningWebUtil.getActivityMapping(this.getServlet().getServletContext());
-		
-		// check token
-		if (!this.isTokenValid(request, true)) {
-			// didn't come here from options page
-		    log.info(className+": No valid token in request");
-			return mapping.findForward(ActivityMapping.DOUBLE_SUBMIT_ERROR);
-		}
-		
-		ICoreLearnerService learnerService = getLearnerService();
 
-		// Get learner and lesson details.
-		Integer learnerId = LearningWebUtil.getUserId();
-		LearnerProgress progress = LearningWebUtil.getLearnerProgress(request,learnerService);
-		Lesson lesson = progress.getLesson();
-		
-		Activity activity = LearningWebUtil.getActivityFromRequest(request, learnerService);
+    /**
+     * Gets an activity from the request (attribute) and forwards onto the required
+     * jsp (SingleActivity or ParallelActivity).
+     */
+    @Override
+    public ActionForward execute(ActionMapping mapping, ActionForm actionForm, HttpServletRequest request,
+	    HttpServletResponse response) {
+	ActivityMapping actionMappings = LearningWebUtil.getActivityMapping(this.getServlet().getServletContext());
 
-		if (activity != null) {
-			progress = learnerService.chooseActivity(learnerId, lesson.getLessonId(), activity, false);
-		} else {
-			// Something has gone wrong - maybe due to Live Edit. Need to recalculate their current location.
-			progress = learnerService.joinLesson(learnerId, lesson.getLessonId());
-  		}
-
-		// need to do the choose first as the chooseActivity / joinLesson changes the progress details 
-		LearningWebUtil.setupProgressInRequest((ActivityForm)actionForm, request, progress);
-
-		ActionForward forward = actionMappings.getActivityForward(activity, progress, true);
-		return forward;
-
+	// check token
+	if (!this.isTokenValid(request, true)) {
+	    // didn't come here from options page
+	    log.info(className + ": No valid token in request");
+	    return mapping.findForward(ActivityMapping.DOUBLE_SUBMIT_ERROR);
 	}
+
+	ICoreLearnerService learnerService = getLearnerService();
+
+	// Get learner and lesson details.
+	Integer learnerId = LearningWebUtil.getUserId();
+	LearnerProgress progress = LearningWebUtil.getLearnerProgress(request, learnerService);
+	Lesson lesson = progress.getLesson();
+
+	Activity activity = LearningWebUtil.getActivityFromRequest(request, learnerService);
+
+	if (activity != null) {
+	    progress = learnerService.chooseActivity(learnerId, lesson.getLessonId(), activity, false);
+	} else {
+	    // Something has gone wrong - maybe due to Live Edit. Need to recalculate their current location.
+	    progress = learnerService.joinLesson(learnerId, lesson.getLessonId());
+	}
+
+	// need to do the choose first as the chooseActivity / joinLesson changes the progress details 
+	LearningWebUtil.setupProgressInRequest((ActivityForm) actionForm, request, progress);
+
+	ActionForward forward = actionMappings.getActivityForward(activity, progress, true);
+	return forward;
+
+    }
 
 }

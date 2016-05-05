@@ -2,21 +2,21 @@
  * Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
  * =============================================================
  * License Information: http://lamsfoundation.org/licensing/lams/2.0/
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301
  * USA
- * 
+ *
  * http://www.gnu.org/licenses/gpl.txt
  * ***********************************************************************/
 /* $$Id$$ */
@@ -31,7 +31,7 @@ import org.lamsfoundation.lams.tool.mc.pojos.McUsrAttempt;
  * <p>
  * DTO that holds learner flow decision properties and some other view-only properties
  * </p>
- * 
+ *
  * @author Ozgur Demirtas
  */
 public class McGeneralLearnerFlowDTO implements Comparable {
@@ -373,15 +373,18 @@ public class McGeneralLearnerFlowDTO implements Comparable {
 	this.userOverPassMark = userOverPassMark;
     }
 
+    @Override
     public int compareTo(Object o) {
 	McGeneralLearnerFlowDTO mcGeneralLearnerFlowDTO = (McGeneralLearnerFlowDTO) o;
 
-	if (mcGeneralLearnerFlowDTO == null)
+	if (mcGeneralLearnerFlowDTO == null) {
 	    return 1;
-	else
+	} else {
 	    return 0;
+	}
     }
 
+    @Override
     public String toString() {
 	return new ToStringBuilder(this).append("retries: ", retries)
 		.append("mapGeneralOptionsContent: ", mapGeneralOptionsContent).append("learnerMark : ", learnerMark)
@@ -594,7 +597,7 @@ public class McGeneralLearnerFlowDTO implements Comparable {
      * If using for a display screen then showMarks controls whether or not to show the average and top marks for the
      * session. If using for the "get answers" screens, then this controls whether or not to show the marks for each
      * question - this allows us to NOT show the marks if ALL of the questions have a mark of 1.
-     * 
+     *
      * @return Returns the showMarks.
      */
     public String getShowMarks() {
@@ -603,7 +606,7 @@ public class McGeneralLearnerFlowDTO implements Comparable {
 
     /**
      * See getShowMarks() for the meaning of "showMarks".
-     * 
+     *
      * @param showMarks
      *            The showMarks to set.
      */
@@ -613,7 +616,7 @@ public class McGeneralLearnerFlowDTO implements Comparable {
 
     /**
      * Displays answers on the screen
-     * 
+     *
      * @return Returns the displayAnswers.
      */
     public String getDisplayAnswers() {
@@ -622,7 +625,7 @@ public class McGeneralLearnerFlowDTO implements Comparable {
 
     /**
      * See getDisplayAnswers() for the meaning of "displayAnswers".
-     * 
+     *
      * @param displayAnswers
      *            The displayAnswers to set.
      */

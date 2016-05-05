@@ -2,72 +2,68 @@
  * Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
  * =============================================================
  * License Information: http://lamsfoundation.org/licensing/lams/2.0/
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License version 2.0 
+ * it under the terms of the GNU General Public License version 2.0
  * as published by the Free Software Foundation.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301
  * USA
- * 
+ *
  * http://www.gnu.org/licenses/gpl.txt
  * ****************************************************************
  */
 
-/* $$Id$$ */	
+/* $$Id$$ */
 package org.lamsfoundation.lams.tool.rsrc.web.form;
 
-import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
-import org.apache.struts.action.ActionErrors;
-import org.apache.struts.action.ActionMapping;
-import org.apache.struts.action.ActionMessage;
-import org.apache.struts.action.ActionMessages;
 import org.apache.struts.validator.ValidatorForm;
 
 /**
  *
- * 	Reflection Form.
- *	@struts.form name="reflectionForm"
+ * Reflection Form.
+ * 
+ * @struts.form name="reflectionForm"
  *
  */
 public class ReflectionForm extends ValidatorForm {
-	private static final long serialVersionUID = -9054365604649146735L;
-	private static Logger logger = Logger.getLogger(ReflectionForm.class.getName());
-	
-	private Integer userID;
-	private String sessionMapID;
-	private String entryText;
+    private static final long serialVersionUID = -9054365604649146735L;
+    private static Logger logger = Logger.getLogger(ReflectionForm.class.getName());
 
-	public String getEntryText() {
-		return entryText;
-	}
+    private Integer userID;
+    private String sessionMapID;
+    private String entryText;
 
-	public void setEntryText(String entryText) {
-		this.entryText = entryText;
-	}
+    public String getEntryText() {
+	return entryText;
+    }
 
-	public Integer getUserID() {
-		return userID;
-	}
+    public void setEntryText(String entryText) {
+	this.entryText = entryText;
+    }
 
-	public void setUserID(Integer userUid) {
-		this.userID = userUid;
-	}
+    public Integer getUserID() {
+	return userID;
+    }
 
-	public String getSessionMapID() {
-		return sessionMapID;
-	}
+    public void setUserID(Integer userUid) {
+	this.userID = userUid;
+    }
 
-	public void setSessionMapID(String sessionMapID) {
-		this.sessionMapID = sessionMapID;
-	}
+    public String getSessionMapID() {
+	return sessionMapID;
+    }
+
+    public void setSessionMapID(String sessionMapID) {
+	this.sessionMapID = sessionMapID;
+    }
 
 }

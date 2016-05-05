@@ -18,68 +18,68 @@
  *
  * http://www.gnu.org/licenses/gpl.txt
  * ****************************************************************
- */ 
- 
-/* $Id$ */ 
-package org.lamsfoundation.lams.tool.wookie.dto; 
- 
+ */
+
+/* $Id$ */
+package org.lamsfoundation.lams.tool.wookie.dto;
+
 public class WidgetData {
-    
+
     private String url;
     private String identifier;
     private String title;
     private int height;
     private int width;
     private Boolean maximize;
-    
-    public WidgetData() {}
+
+    public WidgetData() {
+    }
 
     public String getUrl() {
-        return url;
+	return url;
     }
 
     public void setUrl(String url) {
-        this.url = url;
+	this.url = url;
     }
 
     public String getIdentifier() {
-        return identifier;
+	return identifier;
     }
 
     public void setIdentifier(String identifier) {
-        this.identifier = identifier;
+	this.identifier = identifier;
     }
 
     public String getTitle() {
-        return title;
+	return title;
     }
 
     public void setTitle(String title) {
-        this.title = title;
+	this.title = title;
     }
 
     public int getHeight() {
-        return height;
+	return height;
     }
 
     public void setHeight(int height) {
-        this.height = height;
+	this.height = height;
     }
 
     public int getWidth() {
-        return width;
+	return width;
     }
 
     public void setWidth(int width) {
-        this.width = width;
+	this.width = width;
     }
 
     public Boolean getMaximize() {
-        return maximize;
+	return maximize;
     }
 
     public void setMaximize(Boolean maximize) {
-        this.maximize = maximize;
+	this.maximize = maximize;
     }
 }
- 

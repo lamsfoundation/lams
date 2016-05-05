@@ -54,8 +54,8 @@ public class SignupService implements ISignupService {
 	    rolesList.add(Role.ROLE_MONITOR.toString());
 	}
 
-	userManagementService
-		.setRolesForUserOrganisation(user, signup.getOrganisation().getOrganisationId(), rolesList);
+	userManagementService.setRolesForUserOrganisation(user, signup.getOrganisation().getOrganisationId(),
+		rolesList);
 
 	if (signup.getAddToLessons()) {
 	    // add to lessons
@@ -72,11 +72,11 @@ public class SignupService implements ISignupService {
 	    }
 	}
     }
-    
+
     @Override
     public void signinUser(String login, String context) {
 	User user = userManagementService.getUserByLogin(login);
-	
+
 	// add to org
 	SignupOrganisation signup = signupDAO.getSignupOrganisation(context);
 
@@ -91,7 +91,8 @@ public class SignupService implements ISignupService {
 	    rolesList.add(Role.ROLE_MONITOR.toString());
 	}
 
-	userManagementService.setRolesForUserOrganisation(user, signup.getOrganisation().getOrganisationId(), rolesList);
+	userManagementService.setRolesForUserOrganisation(user, signup.getOrganisation().getOrganisationId(),
+		rolesList);
 
 	if (signup.getAddToLessons()) {
 	    // add to lessons
@@ -106,12 +107,12 @@ public class SignupService implements ISignupService {
 	    }
 	}
     }
-    
+
     @Override
     public User getUserByLogin(String login) {
 	return userManagementService.getUserByLogin(login);
     }
-    
+
     @Override
     public SignupOrganisation getSignupOrganisation(String context) {
 	return signupDAO.getSignupOrganisation(context);
@@ -126,7 +127,7 @@ public class SignupService implements ISignupService {
     public boolean courseKeyIsValid(String context, String courseKey) {
 	return signupDAO.courseKeyIsValid(context, courseKey);
     }
-    
+
     @Override
     public List getSignupOrganisations() {
 	return signupDAO.getSignupOrganisations();
@@ -136,7 +137,7 @@ public class SignupService implements ISignupService {
     public List getOrganisationCandidates() {
 	return signupDAO.getOrganisationCandidates();
     }
-    
+
     @Override
     public boolean contextExists(Integer soid, String context) {
 	return signupDAO.contextExists(soid, context);
@@ -153,7 +154,7 @@ public class SignupService implements ISignupService {
     public void setLessonService(ILessonService lessonService) {
 	this.lessonService = lessonService;
     }
-    
+
     private AuthenticationMethod getAuthenticationMethod(Integer id) {
 	return (AuthenticationMethod) userManagementService.findById(AuthenticationMethod.class, id);
     }

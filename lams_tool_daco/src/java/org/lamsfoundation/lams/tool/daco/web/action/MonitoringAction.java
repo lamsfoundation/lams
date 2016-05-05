@@ -2,21 +2,21 @@
  * Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
  * =============================================================
  * License Information: http://lamsfoundation.org/licensing/lams/2.0/
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License version 2.0 
+ * it under the terms of the GNU General Public License version 2.0
  * as published by the Free Software Foundation.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301
  * USA
- * 
+ *
  * http://www.gnu.org/licenses/gpl.txt
  * ****************************************************************
  */
@@ -107,29 +107,29 @@ public class MonitoringAction extends Action {
 	    return exportToSpreadsheet(request, response);
 	}
 
-	
 	return mapping.findForward(DacoConstants.ERROR);
     }
 
     protected ActionForward listRecords(ActionMapping mapping, HttpServletRequest request) {
 	return listRecords(mapping, request, false);
     }
-    
+
     protected ActionForward changeView(ActionMapping mapping, HttpServletRequest request) {
 	return listRecords(mapping, request, true);
     }
-    
+
     private ActionForward listRecords(ActionMapping mapping, HttpServletRequest request, boolean changeView) {
-	
+
 	String sessionMapID = request.getParameter(DacoConstants.ATTR_SESSION_MAP_ID);
 	SessionMap sessionMap = (SessionMap) request.getSession().getAttribute(sessionMapID);
 	Long toolSessionId = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_SESSION_ID, true);
 	Long userId = WebUtil.readLongParam(request, DacoConstants.USER_ID, true);
 	Integer sortOrder = WebUtil.readIntParam(request, DacoConstants.ATTR_SORT, true);
-	if ( sortOrder == null )
+	if (sortOrder == null) {
 	    sortOrder = DacoConstants.SORT_BY_NO;
+	}
 
-	sessionMap.put(DacoConstants.ATTR_MONITORING_SUMMARY, 
+	sessionMap.put(DacoConstants.ATTR_MONITORING_SUMMARY,
 		getDacoService().getAnswersAsRecords(toolSessionId, userId, sortOrder));
 	request.setAttribute(DacoConstants.ATTR_SESSION_MAP_ID, sessionMapID);
 	request.setAttribute(AttributeNames.PARAM_TOOL_SESSION_ID, toolSessionId);
@@ -138,7 +138,7 @@ public class MonitoringAction extends Action {
 
 	if (changeView) {
 	    String currentView = (String) sessionMap.get(DacoConstants.ATTR_LEARNING_VIEW);
-	    if ( DacoConstants.LEARNING_VIEW_HORIZONTAL.equals(currentView)) {
+	    if (DacoConstants.LEARNING_VIEW_HORIZONTAL.equals(currentView)) {
 		sessionMap.put(DacoConstants.ATTR_LEARNING_VIEW, DacoConstants.LEARNING_VIEW_VERTICAL);
 	    } else {
 		sessionMap.put(DacoConstants.ATTR_LEARNING_VIEW, DacoConstants.LEARNING_VIEW_HORIZONTAL);
@@ -164,8 +164,9 @@ public class MonitoringAction extends Action {
 	    sessionMap = (SessionMap) request.getSession().getAttribute(sessionMapID);
 	}
 
-	Long contentId = sessionMap.get(AttributeNames.PARAM_TOOL_CONTENT_ID) == null ? WebUtil.readLongParam(request,
-		AttributeNames.PARAM_TOOL_CONTENT_ID) : (Long) sessionMap.get(AttributeNames.PARAM_TOOL_CONTENT_ID);
+	Long contentId = sessionMap.get(AttributeNames.PARAM_TOOL_CONTENT_ID) == null
+		? WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_CONTENT_ID)
+		: (Long) sessionMap.get(AttributeNames.PARAM_TOOL_CONTENT_ID);
 	Daco daco = service.getDacoByContentId(contentId);
 
 	List<MonitoringSummarySessionDTO> monitoringSummaryList = service.getMonitoringSummary(contentId,
@@ -189,8 +190,8 @@ public class MonitoringAction extends Action {
 	    sessionMap.put(DacoConstants.ATTR_IS_GROUPED_ACTIVITY, isGroupedActivity);
 	    sessionMap.put(DacoConstants.ATTR_DACO, daco);
 	    sessionMap.put(AttributeNames.PARAM_TOOL_CONTENT_ID, contentId);
-	    sessionMap.put(AttributeNames.PARAM_CONTENT_FOLDER_ID, WebUtil.readStrParam(request,
-		    AttributeNames.PARAM_CONTENT_FOLDER_ID));
+	    sessionMap.put(AttributeNames.PARAM_CONTENT_FOLDER_ID,
+		    WebUtil.readStrParam(request, AttributeNames.PARAM_CONTENT_FOLDER_ID));
 
 	    HttpSession ss = SessionManager.getSession();
 	    UserDTO user = (UserDTO) ss.getAttribute(AttributeNames.USER);
@@ -205,18 +206,19 @@ public class MonitoringAction extends Action {
 	String sessionMapID = WebUtil.readStrParam(request, DacoConstants.ATTR_SESSION_MAP_ID, true);
 	SessionMap sessionMap = (SessionMap) request.getSession().getAttribute(sessionMapID);
 
-	Long sessionId = WebUtil.readLongParam(request,  AttributeNames.PARAM_TOOL_SESSION_ID);
-	
-	Long contentId = sessionMap.get(AttributeNames.PARAM_TOOL_CONTENT_ID) == null ? WebUtil.readLongParam(request,
-		AttributeNames.PARAM_TOOL_CONTENT_ID) : (Long) sessionMap.get(AttributeNames.PARAM_TOOL_CONTENT_ID);
+	Long sessionId = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_SESSION_ID);
+
+	Long contentId = sessionMap.get(AttributeNames.PARAM_TOOL_CONTENT_ID) == null
+		? WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_CONTENT_ID)
+		: (Long) sessionMap.get(AttributeNames.PARAM_TOOL_CONTENT_ID);
 
 	// paging parameters of tablesorter
 	int size = WebUtil.readIntParam(request, "size");
 	int page = WebUtil.readIntParam(request, "page");
 	Integer isSort1 = WebUtil.readIntParam(request, "column[0]", true);
 	Integer isSort2 = WebUtil.readIntParam(request, "column[1]", true);
-	String searchString = request.getParameter("fcol[0]"); 
-	
+	String searchString = request.getParameter("fcol[0]");
+
 	int sorting = DacoConstants.SORT_BY_NO;
 	if ((isSort1 != null) && isSort1.equals(0)) {
 	    sorting = DacoConstants.SORT_BY_USER_NAME_ASC;
@@ -229,11 +231,11 @@ public class MonitoringAction extends Action {
 
 	} else if ((isSort2 != null) && isSort2.equals(1)) {
 	    sorting = DacoConstants.SORT_BY_NUM_RECORDS_DESC;
-	} 
-	
+	}
+
 	Daco daco = service.getDacoByContentId(contentId);
 
-	List<Object[]> users = service.getUsersForTablesorter(sessionId, page, size, sorting, searchString, 
+	List<Object[]> users = service.getUsersForTablesorter(sessionId, page, size, sorting, searchString,
 		daco.isReflectOnActivity());
 
 	JSONArray rows = new JSONArray();
@@ -244,20 +246,21 @@ public class MonitoringAction extends Action {
 	for (Object[] userAndReflection : users) {
 
 	    JSONObject responseRow = new JSONObject();
-	    
+
 	    DacoUser user = (DacoUser) userAndReflection[0];
 
 	    responseRow.put(DacoConstants.USER_ID, user.getUserId());
 	    responseRow.put(DacoConstants.USER_FULL_NAME, StringEscapeUtils.escapeHtml(user.getFullName()));
-	    
-	    if ( userAndReflection.length > 1 && userAndReflection[1] != null) {
-		responseRow.put(DacoConstants.RECORD_COUNT, (Integer)userAndReflection[1]);
+
+	    if (userAndReflection.length > 1 && userAndReflection[1] != null) {
+		responseRow.put(DacoConstants.RECORD_COUNT, userAndReflection[1]);
 	    } else {
 		responseRow.put(DacoConstants.RECORD_COUNT, 0);
 	    }
 
-	    if ( userAndReflection.length > 2 && userAndReflection[2] != null) {
-		responseRow.put(DacoConstants.NOTEBOOK_ENTRY, StringEscapeUtils.escapeHtml((String)userAndReflection[2]));
+	    if (userAndReflection.length > 2 && userAndReflection[2] != null) {
+		responseRow.put(DacoConstants.NOTEBOOK_ENTRY,
+			StringEscapeUtils.escapeHtml((String) userAndReflection[2]));
 	    }
 	    rows.put(responseRow);
 	}
@@ -266,6 +269,7 @@ public class MonitoringAction extends Action {
 	res.getWriter().print(new String(responsedata.toString()));
 	return null;
     }
+
     protected ActionForward viewReflection(ActionMapping mapping, HttpServletRequest request) {
 	String sessionMapID = request.getParameter(DacoConstants.ATTR_SESSION_MAP_ID);
 	SessionMap sessionMap = (SessionMap) request.getSession().getAttribute(sessionMapID);
@@ -285,14 +289,14 @@ public class MonitoringAction extends Action {
     }
 
     private IDacoService getDacoService() {
-	WebApplicationContext wac = WebApplicationContextUtils.getRequiredWebApplicationContext(getServlet()
-		.getServletContext());
+	WebApplicationContext wac = WebApplicationContextUtils
+		.getRequiredWebApplicationContext(getServlet().getServletContext());
 	return (IDacoService) wac.getBean(DacoConstants.DACO_SERVICE);
     }
 
     /**
      * Exports all learners' data to an Excel or CSV file.
-     * 
+     *
      * @param request
      * @param response
      * @return
@@ -334,7 +338,8 @@ public class MonitoringAction extends Action {
 
 	List<Object[]> rows = new LinkedList<Object[]>();
 	// We get all sessions with all users with all their records from the given Daco content
-	List<MonitoringSummarySessionDTO> monitoringSummary = service.getExportPortfolioSummary(daco.getContentId(), null);
+	List<MonitoringSummarySessionDTO> monitoringSummary = service.getExportPortfolioSummary(daco.getContentId(),
+		null);
 	// Get current user's locale to format numbers properly
 	Locale monitoringUserLocale = null;
 	HttpSession ss = SessionManager.getSession();
@@ -371,90 +376,94 @@ public class MonitoringAction extends Action {
 			columnIndex = questionUidToSpreadsheetColumnIndex.get(answer.getQuestion().getUid());
 			// we extract answers and add them to "data" array in readable form
 			switch (answer.getQuestion().getType()) {
-			case DacoConstants.QUESTION_TYPE_NUMBER:
-			    if (!StringUtils.isBlank(answerString)) {
-				Short fractionDigits = answer.getQuestion().getDigitsDecimal();
-				if (fractionDigits == null) {
-				    fractionDigits = Short.MAX_VALUE;
+			    case DacoConstants.QUESTION_TYPE_NUMBER:
+				if (!StringUtils.isBlank(answerString)) {
+				    Short fractionDigits = answer.getQuestion().getDigitsDecimal();
+				    if (fractionDigits == null) {
+					fractionDigits = Short.MAX_VALUE;
+				    }
+				    cell = NumberUtil.formatLocalisedNumber(Double.parseDouble(answerString),
+					    monitoringUserLocale, fractionDigits);
 				}
-				cell = NumberUtil.formatLocalisedNumber(Double.parseDouble(answerString),
-					monitoringUserLocale, fractionDigits);
-			    }
-			    break;
-			case DacoConstants.QUESTION_TYPE_DATE:
-			    if (!StringUtils.isBlank(answerString)) {
-				cell = DacoConstants.DEFAULT_DATE_FORMAT.parse(answerString);
-			    }
-			    break;
-			case DacoConstants.QUESTION_TYPE_CHECKBOX:
-			    if (!StringUtils.isBlank(answerString)) {
-				DacoQuestion question = answer.getQuestion();
-				DacoQuestion currentQuestion = question;
-				List<DacoAnswerOption> answerOptions = new LinkedList<DacoAnswerOption>(question
-					.getAnswerOptions());
-				StringBuilder cellStringBuilder = new StringBuilder();
-				// instead of number, we create a comma-separated string of chosen options
-				do {
+				break;
+			    case DacoConstants.QUESTION_TYPE_DATE:
+				if (!StringUtils.isBlank(answerString)) {
+				    cell = DacoConstants.DEFAULT_DATE_FORMAT.parse(answerString);
+				}
+				break;
+			    case DacoConstants.QUESTION_TYPE_CHECKBOX:
+				if (!StringUtils.isBlank(answerString)) {
+				    DacoQuestion question = answer.getQuestion();
+				    DacoQuestion currentQuestion = question;
+				    List<DacoAnswerOption> answerOptions = new LinkedList<DacoAnswerOption>(
+					    question.getAnswerOptions());
+				    StringBuilder cellStringBuilder = new StringBuilder();
+				    // instead of number, we create a comma-separated string of chosen options
+				    do {
+					try {
+					    int chosenAnswer = Integer.parseInt(answerString) - 1;
+					    String chosenAnswerOption = answerOptions.get(chosenAnswer)
+						    .getAnswerOption();
+					    cellStringBuilder.append(chosenAnswerOption).append(", ");
+					} catch (Exception e) {
+					    log.error("exportToSpreadsheet encountered '" + e
+						    + "' while parsing checkbox answer; answer was " + answerString);
+					}
+					answerIndex++;
+					// LDEV-3648 If the checkbox is the last entry, then there won't be any more answers so don't trigger an out of bounds exception!
+					if (answerIndex < record.size()) {
+					    answer = record.get(answerIndex);
+					    currentQuestion = answer.getQuestion();
+					    answerString = answer.getAnswer();
+					}
+				    } while (answerIndex < record.size() && currentQuestion.equals(question));
+				    // we went one answer too far, so we go back
+				    answerIndex--;
+				    cell = (cellStringBuilder.length() > 1 ? cellStringBuilder
+					    .delete(cellStringBuilder.length() - 2, cellStringBuilder.length())
+					    .toString() : cellStringBuilder.toString());
+				}
+				break;
+			    case DacoConstants.QUESTION_TYPE_LONGLAT:
+				// Both longitude and latitude go in the same cell
+				if (StringUtils.isBlank(answerString)) {
+				    // If longitude was not entered, then latitude also is blank, so skip the next answer
+				    answerIndex++;
+				} else {
+				    StringBuilder cellStringBuilder = new StringBuilder(longitudeHeader).append(' ')
+					    .append(answerString).append(' ').append(longitudeUnit).append("; ");
+				    answerIndex++;
+				    answer = record.get(answerIndex);
+				    cellStringBuilder.append(latitudeHeader).append(' ').append(answer.getAnswer())
+					    .append(' ').append(latitudeUnit);
+				    cell = cellStringBuilder.toString();
+				}
+				break;
+			    case DacoConstants.QUESTION_TYPE_FILE:
+			    case DacoConstants.QUESTION_TYPE_IMAGE:
+				if (!StringUtils.isBlank(answer.getFileName())) {
+				    // Just get the file name, instead of the real file
+				    cell = answer.getFileName();
+				}
+				break;
+			    case DacoConstants.QUESTION_TYPE_RADIO:
+			    case DacoConstants.QUESTION_TYPE_DROPDOWN:
+				if (!StringUtils.isBlank(answerString)) {
+				    List<DacoAnswerOption> answerOptions = new LinkedList<DacoAnswerOption>(
+					    answer.getQuestion().getAnswerOptions());
 				    try {
 					int chosenAnswer = Integer.parseInt(answerString) - 1;
-					String chosenAnswerOption = answerOptions.get(chosenAnswer).getAnswerOption();
-					cellStringBuilder.append(chosenAnswerOption).append(", ");
+					cell = answerOptions.get(chosenAnswer).getAnswerOption();
 				    } catch (Exception e) {
-					log.error("exportToSpreadsheet encountered '" + e + "' while parsing checkbox answer; answer was " + answerString);
+					log.error("exportToSpreadsheet encountered '" + e
+						+ "' while parsing dropdown or radio answer; answer was "
+						+ answerString);
 				    }
-				    answerIndex++;
-				    // LDEV-3648 If the checkbox is the last entry, then there won't be any more answers so don't trigger an out of bounds exception!
-				    if ( answerIndex < record.size() ) {
-					answer = record.get(answerIndex);
-					currentQuestion = answer.getQuestion();
-					answerString = answer.getAnswer();
-				    }
-				} while (answerIndex < record.size() && currentQuestion.equals(question));
-				// we went one answer too far, so we go back
-				answerIndex--;
-				cell = (cellStringBuilder.length() > 1 
-					? cellStringBuilder.delete(cellStringBuilder.length() - 2, cellStringBuilder.length()).toString()
-					: cellStringBuilder.toString());
-			    }
-			    break;
-			case DacoConstants.QUESTION_TYPE_LONGLAT:
-			    // Both longitude and latitude go in the same cell
-			    if (StringUtils.isBlank(answerString)) {
-				// If longitude was not entered, then latitude also is blank, so skip the next answer
-				answerIndex++;
-			    } else {
-				StringBuilder cellStringBuilder = new StringBuilder(longitudeHeader).append(' ')
-					.append(answerString).append(' ').append(longitudeUnit).append("; ");
-				answerIndex++;
-				answer = record.get(answerIndex);
-				cellStringBuilder.append(latitudeHeader).append(' ').append(answer.getAnswer()).append(
-					' ').append(latitudeUnit);
-				cell = cellStringBuilder.toString();
-			    }
-			    break;
-			case DacoConstants.QUESTION_TYPE_FILE:
-			case DacoConstants.QUESTION_TYPE_IMAGE:
-			    if (!StringUtils.isBlank(answer.getFileName())) {
-				// Just get the file name, instead of the real file
-				cell = answer.getFileName();
-			    }
-			    break;
-			case DacoConstants.QUESTION_TYPE_RADIO:
-			case DacoConstants.QUESTION_TYPE_DROPDOWN:
-			    if (!StringUtils.isBlank(answerString)) {
-					List<DacoAnswerOption> answerOptions = new LinkedList<DacoAnswerOption>(answer
-						.getQuestion().getAnswerOptions());
-					try {
-						int chosenAnswer = Integer.parseInt(answerString) - 1;
-						cell = answerOptions.get(chosenAnswer).getAnswerOption();
-					} catch (Exception e) {
-						log.error("exportToSpreadsheet encountered '" + e + "' while parsing dropdown or radio answer; answer was " + answerString);
-					}
-			    }
-			    break;
-			default:
-			    cell = answer.getAnswer();
-			    break;
+				}
+				break;
+			    default:
+				cell = answer.getAnswer();
+				break;
 			}
 			row[columnIndex] = cell;
 		    }
@@ -470,8 +479,8 @@ public class MonitoringAction extends Action {
 	String fileName = DacoConstants.EXPORT_TO_SPREADSHEET_FILE_NAME;
 	fileName = FileUtil.encodeFilenameForDownload(request, fileName);
 	response.setContentType(CentralConstants.RESPONSE_CONTENT_TYPE_DOWNLOAD);
-	response.setHeader(CentralConstants.HEADER_CONTENT_DISPOSITION, CentralConstants.HEADER_CONTENT_ATTACHMENT
-		+ fileName);
+	response.setHeader(CentralConstants.HEADER_CONTENT_DISPOSITION,
+		CentralConstants.HEADER_CONTENT_ATTACHMENT + fileName);
 	MonitoringAction.log.debug("Exporting to a spreadsheet tool content with UID: " + daco.getUid());
 	ServletOutputStream out = response.getOutputStream();
 
@@ -482,20 +491,20 @@ public class MonitoringAction extends Action {
 	// Return the file inside response, but not any JSP page
 	return null;
     }
-    
+
     @SuppressWarnings({ "rawtypes", "unchecked" })
     protected ActionForward getQuestionSummaries(ActionMapping mapping, HttpServletRequest request) {
 	String sessionMapID = WebUtil.readStrParam(request, DacoConstants.ATTR_SESSION_MAP_ID);
 	SessionMap sessionMap = (SessionMap) request.getSession().getAttribute(sessionMapID);
 
-	Long sessionId =  WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_SESSION_ID);
+	Long sessionId = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_SESSION_ID);
 	IDacoService service = getDacoService();
 
 	DacoUser user;
 	Long userId = WebUtil.readLongParam(request, DacoConstants.USER_ID, true);
 	user = userId != null ? service.getUserByUserIdAndSessionId(userId, sessionId) : null;
 
-	if ( user != null ) {
+	if (user != null) {
 	    List<QuestionSummaryDTO> summaries = service.getQuestionSummaries(user.getUid());
 	    sessionMap.put(DacoConstants.ATTR_QUESTION_SUMMARIES, summaries);
 	    Integer totalRecordCount = service.getGroupRecordCount(sessionId);
@@ -516,7 +525,7 @@ public class MonitoringAction extends Action {
 
     /**
      * Show statistics page.
-     * 
+     *
      * @param mapping
      * @param form
      * @param request
@@ -524,14 +533,15 @@ public class MonitoringAction extends Action {
      * @return
      */
     private ActionForward statistic(ActionMapping mapping, HttpServletRequest request) {
-    
+
 	String sessionMapID = WebUtil.readStrParam(request, DacoConstants.ATTR_SESSION_MAP_ID);
 	SessionMap sessionMap = (SessionMap) request.getSession().getAttribute(sessionMapID);
 
 	IDacoService service = getDacoService();
 
-	Long contentId = sessionMap.get(AttributeNames.PARAM_TOOL_CONTENT_ID) == null ? WebUtil.readLongParam(request,
-		AttributeNames.PARAM_TOOL_CONTENT_ID) : (Long) sessionMap.get(AttributeNames.PARAM_TOOL_CONTENT_ID);
+	Long contentId = sessionMap.get(AttributeNames.PARAM_TOOL_CONTENT_ID) == null
+		? WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_CONTENT_ID)
+		: (Long) sessionMap.get(AttributeNames.PARAM_TOOL_CONTENT_ID);
 	Daco daco = service.getDacoByContentId(contentId);
 	List<MonitoringSummarySessionDTO> sessList = service.getSessionStatistics(daco.getUid());
 

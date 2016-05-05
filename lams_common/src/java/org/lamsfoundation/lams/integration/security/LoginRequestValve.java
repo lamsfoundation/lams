@@ -39,7 +39,7 @@ import org.lamsfoundation.lams.integration.util.LoginRequestDispatcher;
 /**
  * When j_security_check authentication is successful the user is redirected to the original requested URL. The
  * LoginRequestValve is responsible for setting the original request URL to trick j_security_check
- * 
+ *
  * @author Anthony Xiao, Fei Yang
  */
 public class LoginRequestValve extends ValveBase {
@@ -76,7 +76,8 @@ public class LoginRequestValve extends ValveBase {
 		String[] values = response.getHeaderValues(name);
 		if (values.length > 0) {
 		    LoginRequestValve.log.info(name + " = " + values[0]);
-		    if (name.toLowerCase().equals("location") && values[0].matches(".*" + Constants.FORM_ACTION + ".*")) {
+		    if (name.toLowerCase().equals("location")
+			    && values[0].matches(".*" + Constants.FORM_ACTION + ".*")) {
 			isLoginSuccessful = true;
 		    }
 		} else {

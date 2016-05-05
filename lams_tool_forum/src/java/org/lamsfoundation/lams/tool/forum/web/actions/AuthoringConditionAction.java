@@ -1,23 +1,23 @@
-/**************************************************************** 
- * Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org) 
- * ============================================================= 
- * License Information: http://lamsfoundation.org/licensing/lams/2.0/ 
- * 
- * This program is free software; you can redistribute it and/or modify 
- * it under the terms of the GNU General Public License version 2.0 
- * as published by the Free Software Foundation. 
- * 
- * This program is distributed in the hope that it will be useful, 
- * but WITHOUT ANY WARRANTY; without even the implied warranty of 
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the 
- * GNU General Public License for more details. 
- * 
- * You should have received a copy of the GNU General Public License 
- * along with this program; if not, write to the Free Software 
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 * USA 
- * 
- * http://www.gnu.org/licenses/gpl.txt 
- * **************************************************************** 
+/****************************************************************
+ * Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
+ * =============================================================
+ * License Information: http://lamsfoundation.org/licensing/lams/2.0/
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License version 2.0
+ * as published by the Free Software Foundation.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 * USA
+ *
+ * http://www.gnu.org/licenses/gpl.txt
+ * ****************************************************************
  */
 
 /* $$Id$$ */
@@ -61,7 +61,7 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
 /**
  * Auxiliary action in author mode. It contains operations with ForumCondition. The rest of operations are located in
  * <code>AuthoringAction</code> action.
- * 
+ *
  * @author Marcin Cieslak
  * @see org.lamsfoundation.lams.tool.forum.web.actions.AuthoringAction
  */
@@ -96,7 +96,7 @@ public class AuthoringConditionAction extends Action {
 
     /**
      * Display empty page for a new condition.
-     * 
+     *
      * @param mapping
      * @param form
      * @param request
@@ -113,7 +113,7 @@ public class AuthoringConditionAction extends Action {
 
     /**
      * Display edit page for an existing condition.
-     * 
+     *
      * @param mapping
      * @param form
      * @param request
@@ -146,7 +146,7 @@ public class AuthoringConditionAction extends Action {
      * This method will get necessary information from condition form and save or update into <code>HttpSession</code>
      * condition list. Notice, this save is not persist them into database, just save <code>HttpSession</code>
      * temporarily. Only they will be persist when the entire authoring page is being persisted.
-     * 
+     *
      * @param mapping
      * @param form
      * @param request
@@ -186,7 +186,7 @@ public class AuthoringConditionAction extends Action {
     /**
      * Remove condition from HttpSession list and update page display. As authoring rule, all persist only happen when
      * user submit whole page. So this remove is just impact HttpSession values.
-     * 
+     *
      * @param mapping
      * @param form
      * @param request
@@ -224,7 +224,7 @@ public class AuthoringConditionAction extends Action {
 
     /**
      * Move up current item.
-     * 
+     *
      * @param mapping
      * @param form
      * @param request
@@ -238,7 +238,7 @@ public class AuthoringConditionAction extends Action {
 
     /**
      * Move down current item.
-     * 
+     *
      * @param mapping
      * @param form
      * @param request
@@ -287,14 +287,14 @@ public class AuthoringConditionAction extends Action {
      * Return ForumService bean.
      */
     private IForumService getForumService() {
-	WebApplicationContext wac = WebApplicationContextUtils.getRequiredWebApplicationContext(getServlet()
-		.getServletContext());
+	WebApplicationContext wac = WebApplicationContextUtils
+		.getRequiredWebApplicationContext(getServlet().getServletContext());
 	return (IForumService) wac.getBean(ForumConstants.FORUM_SERVICE);
     }
 
     /**
      * List containing Forum conditions.
-     * 
+     *
      * @param request
      * @return
      */
@@ -318,7 +318,7 @@ public class AuthoringConditionAction extends Action {
 
     /**
      * Get the deleted condition list, which could be persisted or non-persisted items.
-     * 
+     *
      * @param request
      * @return
      */
@@ -328,7 +328,7 @@ public class AuthoringConditionAction extends Action {
 
     /**
      * Get <code>java.util.List</code> from HttpSession by given name.
-     * 
+     *
      * @param request
      * @param name
      * @return
@@ -344,7 +344,7 @@ public class AuthoringConditionAction extends Action {
 
     /**
      * This method will populate condition information to its form for edit use.
-     * 
+     *
      * @param orderId
      * @param condition
      * @param form
@@ -360,7 +360,7 @@ public class AuthoringConditionAction extends Action {
 
     /**
      * This method will populate questions to choose to the form for edit use.
-     * 
+     *
      * @param sequenceId
      * @param condition
      * @param form
@@ -387,7 +387,7 @@ public class AuthoringConditionAction extends Action {
 
     /**
      * Extract form content to ForumCondition.
-     * 
+     *
      * @param request
      * @param form
      * @throws Exception
@@ -434,7 +434,7 @@ public class AuthoringConditionAction extends Action {
 
     /**
      * Validate ForumCondition
-     * 
+     *
      * @param conditionForm
      * @return
      */

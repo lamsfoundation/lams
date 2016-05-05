@@ -2,21 +2,21 @@
  * Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
  * =============================================================
  * License Information: http://lamsfoundation.org/licensing/lams/2.0/
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License version 2.0 
+ * it under the terms of the GNU General Public License version 2.0
  * as published by the Free Software Foundation.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301
  * USA
- * 
+ *
  * http://www.gnu.org/licenses/gpl.txt
  * ****************************************************************
  */
@@ -35,13 +35,13 @@ import org.lamsfoundation.lams.learningdesign.exception.LearningDesignProcessorE
 /**
  * Run through a learning design, in the order of the activities. Process the learning design to produce somethings
  * else.
- * 
+ *
  * This is an abstract class that implements stepping through the learning design. It is used by
  * getAllContributeActivities to build up the list of "todo" activities and can also be used by export portfolio and
  * export learning design. The implementing classes will need to implement the startBlah and endBlah methods.
- * 
+ *
  * @author Fiona Malikoff
- * 
+ *
  */
 public abstract class LearningDesignProcessor {
 
@@ -82,13 +82,12 @@ public abstract class LearningDesignProcessor {
 
     protected void handleActivity(Activity activity) throws LearningDesignProcessorException {
 	if (activity == null) {
-	    LearningDesignProcessor.log
-		    .warn("Parsing activity method handleActivity got a null activity. Learning design was "
-			    + getDesign());
+	    LearningDesignProcessor.log.warn(
+		    "Parsing activity method handleActivity got a null activity. Learning design was " + getDesign());
 	} else {
 	    if (LearningDesignProcessor.log.isTraceEnabled()) {
-		LearningDesignProcessor.log.trace("Processing activity " + activity.getActivityId() + " "
-			+ activity.getTitle());
+		LearningDesignProcessor.log
+			.trace("Processing activity " + activity.getActivityId() + " " + activity.getTitle());
 	    }
 	    if (activity.isComplexActivity()) {
 		handleComplexActivity(activity);

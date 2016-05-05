@@ -36,12 +36,13 @@ public class WookieConfigItem {
     Long id;
     String configKey;
     String configValue;
-    
-    public WookieConfigItem() {}
-    
+
+    public WookieConfigItem() {
+    }
+
     /**
      * @hibernate.id generator-class="native" type="java.lang.Long" column="uid"
-     * 
+     *
      */
     public Long getId() {
 	return id;

@@ -2,21 +2,21 @@
  * Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
  * =============================================================
  * License Information: http://lamsfoundation.org/licensing/lams/2.0/
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301
  * USA
- * 
+ *
  * http://www.gnu.org/licenses/gpl.txt
  * ****************************************************************
  */
@@ -26,11 +26,9 @@ package org.lamsfoundation.lams.tool.wiki.model;
 
 import java.util.Date;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
-import org.lamsfoundation.lams.contentrepository.client.IToolContentHandler;
 
 /**
  * @hibernate.class table="tl_lawiki10_wiki"
@@ -39,7 +37,7 @@ import org.lamsfoundation.lams.contentrepository.client.IToolContentHandler;
 public class Wiki implements java.io.Serializable, Cloneable {
 
     /**
-     * 
+     *
      */
     private static final long serialVersionUID = 382787654329119829L;
 
@@ -47,7 +45,7 @@ public class Wiki implements java.io.Serializable, Cloneable {
 
     // Fields
     /**
-     * 
+     *
      */
     private Long uid;
 
@@ -74,7 +72,7 @@ public class Wiki implements java.io.Serializable, Cloneable {
 
     // Allow learners to attach images to the wiki page
     private boolean allowLearnerAttachImages;
-    
+
     // Add notification for wiki updates
     private boolean notifyUpdates;
 
@@ -107,7 +105,7 @@ public class Wiki implements java.io.Serializable, Cloneable {
     // Property accessors
     /**
      * @hibernate.id generator-class="native" type="java.lang.Long" column="uid"
-     * 
+     *
      */
 
     public Long getUid() {
@@ -120,7 +118,7 @@ public class Wiki implements java.io.Serializable, Cloneable {
 
     /**
      * @hibernate.property column="create_date"
-     * 
+     *
      */
 
     public Date getCreateDate() {
@@ -133,7 +131,7 @@ public class Wiki implements java.io.Serializable, Cloneable {
 
     /**
      * @hibernate.property column="update_date"
-     * 
+     *
      */
 
     public Date getUpdateDate() {
@@ -146,7 +144,7 @@ public class Wiki implements java.io.Serializable, Cloneable {
 
     /**
      * @hibernate.property column="create_by" length="20"
-     * 
+     *
      */
 
     public Long getCreateBy() {
@@ -159,7 +157,7 @@ public class Wiki implements java.io.Serializable, Cloneable {
 
     /**
      * @hibernate.property column="title" length="255"
-     * 
+     *
      */
 
     public String getTitle() {
@@ -172,7 +170,7 @@ public class Wiki implements java.io.Serializable, Cloneable {
 
     /**
      * @hibernate.property column="instructions" length="65535"
-     * 
+     *
      */
 
     public String getInstructions() {
@@ -185,7 +183,7 @@ public class Wiki implements java.io.Serializable, Cloneable {
 
     /**
      * @hibernate.property column="lock_on_finished" length="1"
-     * 
+     *
      */
 
     public boolean isLockOnFinished() {
@@ -198,7 +196,7 @@ public class Wiki implements java.io.Serializable, Cloneable {
 
     /**
      * @hibernate.property column="allow_learner_create_pages" length="1"
-     * 
+     *
      */
     public boolean isAllowLearnerCreatePages() {
 	return allowLearnerCreatePages;
@@ -210,7 +208,7 @@ public class Wiki implements java.io.Serializable, Cloneable {
 
     /**
      * @hibernate.property column="allow_learner_insert_links" length="1"
-     * 
+     *
      */
     public boolean isAllowLearnerInsertLinks() {
 	return allowLearnerInsertLinks;
@@ -222,7 +220,7 @@ public class Wiki implements java.io.Serializable, Cloneable {
 
     /**
      * @hibernate.property column="allow_learner_attach_images" length="1"
-     * 
+     *
      */
     public boolean isAllowLearnerAttachImages() {
 	return allowLearnerAttachImages;
@@ -231,17 +229,17 @@ public class Wiki implements java.io.Serializable, Cloneable {
     public void setAllowLearnerAttachImages(boolean allowLearnerAttachImages) {
 	this.allowLearnerAttachImages = allowLearnerAttachImages;
     }
-    
+
     /**
      * @hibernate.property column="notify_updates" length="1" default="0"
-     * 
+     *
      */
     public boolean isNotifyUpdates() {
-        return notifyUpdates;
+	return notifyUpdates;
     }
 
     public void setNotifyUpdates(boolean notifyUpdates) {
-        this.notifyUpdates = notifyUpdates;
+	this.notifyUpdates = notifyUpdates;
     }
 
     /**
@@ -290,7 +288,7 @@ public class Wiki implements java.io.Serializable, Cloneable {
 
     /**
      * @hibernate.property column="content_in_use" length="1"
-     * 
+     *
      */
 
     public boolean isContentInUse() {
@@ -303,7 +301,7 @@ public class Wiki implements java.io.Serializable, Cloneable {
 
     /**
      * @hibernate.property column="define_later" length="1"
-     * 
+     *
      */
 
     public boolean isDefineLater() {
@@ -316,7 +314,7 @@ public class Wiki implements java.io.Serializable, Cloneable {
 
     /**
      * @hibernate.property column="tool_content_id" length="20"
-     * 
+     *
      */
 
     public Long getToolContentId() {
@@ -331,7 +329,7 @@ public class Wiki implements java.io.Serializable, Cloneable {
      * @hibernate.set lazy="true" inverse="true" cascade="none"
      * @hibernate.collection-key column="wiki_uid"
      * @hibernate.collection-one-to-many class="org.lamsfoundation.lams.tool.wiki.model.WikiSession"
-     * 
+     *
      */
 
     public Set<WikiSession> getWikiSessions() {
@@ -347,7 +345,7 @@ public class Wiki implements java.io.Serializable, Cloneable {
      *                asc"
      * @hibernate.collection-key column="wiki_uid"
      * @hibernate.collection-one-to-many class="org.lamsfoundation.lams.tool.wiki.model.WikiPage"
-     * 
+     *
      */
 
     public Set<WikiPage> getWikiPages() {
@@ -361,7 +359,7 @@ public class Wiki implements java.io.Serializable, Cloneable {
     /**
      * @hibernate.many-to-one not-null="true"
      * @hibernate.column name="wiki_main_page_uid"
-     * 
+     *
      */
     public WikiPage getMainPage() {
 	return mainPage;
@@ -373,9 +371,10 @@ public class Wiki implements java.io.Serializable, Cloneable {
 
     /**
      * toString
-     * 
+     *
      * @return String
      */
+    @Override
     public String toString() {
 	StringBuffer buffer = new StringBuffer();
 
@@ -388,19 +387,24 @@ public class Wiki implements java.io.Serializable, Cloneable {
 	return buffer.toString();
     }
 
+    @Override
     public boolean equals(Object other) {
-	if ((this == other))
+	if ((this == other)) {
 	    return true;
-	if ((other == null))
+	}
+	if ((other == null)) {
 	    return false;
-	if (!(other instanceof Wiki))
+	}
+	if (!(other instanceof Wiki)) {
 	    return false;
+	}
 	Wiki castOther = (Wiki) other;
 
-	return ((this.getUid() == castOther.getUid()) || (this.getUid() != null && castOther.getUid() != null && this
-		.getUid().equals(castOther.getUid())));
+	return ((this.getUid() == castOther.getUid())
+		|| (this.getUid() != null && castOther.getUid() != null && this.getUid().equals(castOther.getUid())));
     }
 
+    @Override
     public int hashCode() {
 	int result = 17;
 	result = 37 * result + (getUid() == null ? 0 : this.getUid().hashCode());
@@ -415,6 +419,7 @@ public class Wiki implements java.io.Serializable, Cloneable {
 	return toContent;
     }
 
+    @Override
     protected Object clone() {
 
 	Wiki wiki = null;
@@ -434,9 +439,8 @@ public class Wiki implements java.io.Serializable, Cloneable {
 		}
 		wiki.setWikiPages(newPages);
 	    }
-	    
-	    wiki.setMainPage((WikiPage)wiki.getMainPage().clone());
-	    
+
+	    wiki.setMainPage((WikiPage) wiki.getMainPage().clone());
 
 	    // create an empty set for the wikiSession
 	    wiki.wikiSessions = new HashSet<WikiSession>();

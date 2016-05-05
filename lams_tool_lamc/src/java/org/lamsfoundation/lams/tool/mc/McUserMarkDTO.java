@@ -2,21 +2,21 @@
  * Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
  * =============================================================
  * License Information: http://lamsfoundation.org/licensing/lams/2.0/
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301
  * USA
- * 
+ *
  * http://www.gnu.org/licenses/gpl.txt
  * ***********************************************************************/
 /* $$Id$$ */
@@ -30,7 +30,7 @@ import org.apache.commons.lang.builder.ToStringBuilder;
  * <p>
  * DTO that hols user marks
  * </p>
- * 
+ *
  * @author Ozgur Demirtas
  */
 public class McUserMarkDTO implements Comparable {
@@ -45,6 +45,7 @@ public class McUserMarkDTO implements Comparable {
     private String[] answeredOptions;
     private Long totalMark;
 
+    @Override
     public String toString() {
 	return new ToStringBuilder(this).append("Listing UserMarkDTO:").append("sessionId", sessionId)
 		.append("queUsrId", queUsrId).append("userName", userName).append("fullName", fullName)
@@ -65,7 +66,7 @@ public class McUserMarkDTO implements Comparable {
     public void setMarks(Integer[] marks) {
 	this.marks = marks;
     }
-    
+
     /**
      * @return Returns the answeredOptions - sequencial letter of the option that was chosen.
      */
@@ -125,22 +126,24 @@ public class McUserMarkDTO implements Comparable {
     public void setFullName(String fullName) {
 	this.fullName = fullName;
     }
-    
+
     public boolean setUserGroupLeader(boolean isUserLeader) {
 	return this.isUserLeader = isUserLeader;
     }
-    
+
     public boolean isUserGroupLeader() {
 	return isUserLeader;
     }
-    
+
+    @Override
     public int compareTo(Object o) {
 	McUserMarkDTO mcUserMarkDTO = (McUserMarkDTO) o;
 
-	if (mcUserMarkDTO == null)
+	if (mcUserMarkDTO == null) {
 	    return 1;
-	else
+	} else {
 	    return (int) (new Long(queUsrId).longValue() - new Long(mcUserMarkDTO.queUsrId).longValue());
+	}
     }
 
     /**

@@ -2,21 +2,21 @@
  * Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
  * =============================================================
  * License Information: http://lamsfoundation.org/licensing/lams/2.0/
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301
  * USA
- * 
+ *
  * http://www.gnu.org/licenses/gpl.txt
  * ****************************************************************
  */
@@ -32,17 +32,17 @@ import org.apache.log4j.Logger;
 
 /**
  * Tool may contain several questions. Which in turn contain answers.
- * 
+ *
  * @author Andrey Balan
- * 
+ *
  * @hibernate.class table="tl_lascrt11_scratchie_item"
- * 
+ *
  */
 public class ScratchieItem implements Cloneable {
     private static final Logger log = Logger.getLogger(ScratchieItem.class);
 
     private Long uid;
-    
+
     private String title;
 
     private String description;
@@ -52,35 +52,36 @@ public class ScratchieItem implements Cloneable {
     private boolean isCreateByAuthor;
 
     private Date createDate;
-    
+
     // scratchie Items
     private Set answers;
-    
+
     // ***********************************************
     // DTO fields:
     private boolean isUnraveled;
-    
+
     private String correctAnswer;
     private int userMark;
     private int userAttempts;
     private String firstChoiceAnswerLetter;
     private String burningQuestion;
-    
+
     /**
      * Default contruction method.
-     * 
+     *
      */
     public ScratchieItem() {
 	answers = new HashSet();
     }
 
+    @Override
     public Object clone() {
 	ScratchieItem item = null;
 	try {
 	    item = (ScratchieItem) super.clone();
-	    
-	    ((ScratchieItem) item).setUid(null);
-	    
+
+	    item.setUid(null);
+
 	    if (answers != null) {
 		Iterator iter = answers.iterator();
 		Set set = new HashSet();
@@ -118,7 +119,7 @@ public class ScratchieItem implements Cloneable {
     public void setUid(Long userID) {
 	this.uid = userID;
     }
-    
+
     /**
      * @hibernate.property column="title"
      * @return
@@ -166,24 +167,24 @@ public class ScratchieItem implements Cloneable {
     public void setCreateByAuthor(boolean isCreateByAuthor) {
 	this.isCreateByAuthor = isCreateByAuthor;
     }
-    
+
     /**
      * @hibernate.property column="order_id"
      * @return
      */
     public Integer getOrderId() {
-        return orderId;
+	return orderId;
     }
 
     public void setOrderId(Integer orderId) {
-        this.orderId = orderId;
+	this.orderId = orderId;
     }
-    
+
     /**
      * @hibernate.set lazy="true" inverse="false" cascade="all" order-by="order_id asc"
      * @hibernate.collection-key column="scratchie_item_uid"
      * @hibernate.collection-one-to-many class="org.lamsfoundation.lams.tool.scratchie.model.ScratchieAnswer"
-     * 
+     *
      * @return
      */
     public Set getAnswers() {
@@ -193,7 +194,7 @@ public class ScratchieItem implements Cloneable {
     public void setAnswers(Set answers) {
 	this.answers = answers;
     }
-    
+
     public boolean isUnraveled() {
 	return isUnraveled;
     }
@@ -201,7 +202,7 @@ public class ScratchieItem implements Cloneable {
     public void setUnraveled(boolean isUnraveled) {
 	this.isUnraveled = isUnraveled;
     }
-    
+
     public String getCorrectAnswer() {
 	return correctAnswer;
     }
@@ -209,7 +210,7 @@ public class ScratchieItem implements Cloneable {
     public void setCorrectAnswer(String correctAnswer) {
 	this.correctAnswer = correctAnswer;
     }
-    
+
     public int getUserMark() {
 	return userMark;
     }
@@ -217,7 +218,7 @@ public class ScratchieItem implements Cloneable {
     public void setUserMark(int userMark) {
 	this.userMark = userMark;
     }
-    
+
     public int getUserAttempts() {
 	return userAttempts;
     }
@@ -225,7 +226,7 @@ public class ScratchieItem implements Cloneable {
     public void setUserAttempts(int userAttempts) {
 	this.userAttempts = userAttempts;
     }
-    
+
     public String getFirstChoiceAnswerLetter() {
 	return firstChoiceAnswerLetter;
     }
@@ -233,7 +234,7 @@ public class ScratchieItem implements Cloneable {
     public void setFirstChoiceAnswerLetter(String firstChoiceAnswerLetter) {
 	this.firstChoiceAnswerLetter = firstChoiceAnswerLetter;
     }
-    
+
     public String getBurningQuestion() {
 	return burningQuestion;
     }

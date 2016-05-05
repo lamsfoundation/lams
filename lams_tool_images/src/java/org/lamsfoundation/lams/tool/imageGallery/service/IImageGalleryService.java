@@ -2,21 +2,21 @@
  * Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
  * =============================================================
  * License Information: http://lamsfoundation.org/licensing/lams/2.0/
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301
  * USA
- * 
+ *
  * http://www.gnu.org/licenses/gpl.txt
  * ****************************************************************
  */
@@ -43,15 +43,15 @@ import org.lamsfoundation.lams.tool.imageGallery.model.ImageVote;
 
 /**
  * Interface that defines the contract that all ShareImageGallery service provider must follow.
- * 
- * @author Andrey Balan        
+ *
+ * @author Andrey Balan
  */
 public interface IImageGalleryService extends ToolRatingManager {
 
     /**
      * Get a cloned copy of tool default tool content (ImageGallery) and assign the toolContentId of that copy as the
      * given <code>contentId</code>
-     * 
+     *
      * @param contentId
      * @return
      * @throws ImageGalleryException
@@ -60,7 +60,7 @@ public interface IImageGalleryService extends ToolRatingManager {
 
     /**
      * Get list of imageGallery items by given imageGalleryUid. These imageGallery items must be created by author.
-     * 
+     *
      * @param imageGalleryUid
      * @return
      */
@@ -68,7 +68,7 @@ public interface IImageGalleryService extends ToolRatingManager {
 
     /**
      * Upload imageGallery item file to repository. i.e., single file, websize zip file, or learning object zip file.
-     * 
+     *
      * @param item
      * @param file
      * @throws UploadImageGalleryFileException
@@ -83,7 +83,7 @@ public interface IImageGalleryService extends ToolRatingManager {
 
     /**
      * Get user by given userID and toolContentID.
-     * 
+     *
      * @param long1
      * @return
      */
@@ -91,7 +91,7 @@ public interface IImageGalleryService extends ToolRatingManager {
 
     /**
      * Get user by sessionID and UserID
-     * 
+     *
      * @param long1
      * @param sessionId
      * @return
@@ -100,33 +100,33 @@ public interface IImageGalleryService extends ToolRatingManager {
 
     /**
      * Save or update imageGallery into database.
-     * 
+     *
      * @param ImageGallery
      */
     void saveOrUpdateImageGallery(ImageGallery ImageGallery);
 
     /**
      * Delete resoruce item from database.
-     * 
+     *
      * @param uid
      */
     void deleteImageGalleryItem(Long uid);
 
     /**
      * Returns set of images from authoring + the tasks added by members of that particular group.
-     * 
+     *
      * @param imageGallery
      * @param sessionId
      *            sessionId which defines Group
      * @return
      */
     Set<ImageGalleryItem> getImagesForGroup(ImageGallery imageGallery, Long sessionId);
-    
+
     ItemRatingDTO getRatingCriteriaDtos(Long contentId, Long imageUid, Long userId);
 
     /**
      * Save/update current ImageGalleryItem.
-     * 
+     *
      * @param item
      *            current ImageGalleryItem
      * @return
@@ -135,7 +135,7 @@ public interface IImageGalleryService extends ToolRatingManager {
 
     /**
      * Delete image with the given uid from imageGallery.
-     * 
+     *
      * @param toolSessionId
      * @param imageUid
      */
@@ -143,7 +143,7 @@ public interface IImageGalleryService extends ToolRatingManager {
 
     /**
      * Save/update ImageVote.
-     * 
+     *
      * @param vote
      *            ImageVote
      * @return
@@ -152,7 +152,7 @@ public interface IImageGalleryService extends ToolRatingManager {
 
     /**
      * Get imageGallery which is relative with the special toolSession.
-     * 
+     *
      * @param sessionId
      * @return
      */
@@ -160,7 +160,7 @@ public interface IImageGalleryService extends ToolRatingManager {
 
     /**
      * Get imageGallery toolSession by toolSessionId
-     * 
+     *
      * @param sessionId
      * @return
      */
@@ -168,7 +168,7 @@ public interface IImageGalleryService extends ToolRatingManager {
 
     /**
      * Get <code>ImageGallery</code> by toolContentID.
-     * 
+     *
      * @param contentId
      * @return
      */
@@ -176,7 +176,7 @@ public interface IImageGalleryService extends ToolRatingManager {
 
     /**
      * Returns imageVote by the given imageUid and userId
-     * 
+     *
      * @param imageUid
      * @param userId
      * @return
@@ -185,7 +185,7 @@ public interface IImageGalleryService extends ToolRatingManager {
 
     /**
      * Return number of imageVotes made by user.
-     * 
+     *
      * @param userId
      * @return
      */
@@ -193,7 +193,7 @@ public interface IImageGalleryService extends ToolRatingManager {
 
     /**
      * Save or update imageGallery session.
-     * 
+     *
      * @param resSession
      */
     void saveOrUpdateImageGallerySession(ImageGallerySession resSession);
@@ -202,7 +202,7 @@ public interface IImageGalleryService extends ToolRatingManager {
 
     /**
      * If success return next activity's url, otherwise return null.
-     * 
+     *
      * @param toolSessionId
      * @param userId
      * @return
@@ -213,7 +213,7 @@ public interface IImageGalleryService extends ToolRatingManager {
 
     /**
      * Return monitoring summary list. The return value is list of imageGallery summaries for each groups.
-     * 
+     *
      * @param contentId
      * @return
      */
@@ -221,7 +221,7 @@ public interface IImageGalleryService extends ToolRatingManager {
 
     /**
      * Return monitoring image summary. The return value is list of UserImageContributionDTOs for each groups.
-     * 
+     *
      * @param contentId
      * @param imageUid
      * @return
@@ -232,7 +232,7 @@ public interface IImageGalleryService extends ToolRatingManager {
 
     /**
      * Set a imageGallery item visible or not.
-     * 
+     *
      * @param itemUid
      * @param visible
      *            true, item is visible. False, item is invisible.
@@ -241,20 +241,21 @@ public interface IImageGalleryService extends ToolRatingManager {
 
     /**
      * Get imageGallery item <code>Summary</code> list according to sessionId and skipHide flag.
-     * 
+     *
      * @param sessionId
      * @param skipHide
      *            true, don't get imageGallery item if its <code>isHide</code> flag is true. Otherwise, get all
      *            imageGallery item
      * @return
      */
-    List<List<List<UserImageContributionDTO>>> exportBySessionId(Long sessionId, ImageGalleryUser user, boolean skipHide);
+    List<List<List<UserImageContributionDTO>>> exportBySessionId(Long sessionId, ImageGalleryUser user,
+	    boolean skipHide);
 
     List<List<List<UserImageContributionDTO>>> exportByContentId(Long contentId);
 
     /**
      * Create refection entry into notebook tool.
-     * 
+     *
      * @param sessionId
      * @param notebook_tool
      * @param tool_signature
@@ -266,7 +267,7 @@ public interface IImageGalleryService extends ToolRatingManager {
 
     /**
      * Get reflection entry from notebook tool.
-     * 
+     *
      * @param sessionId
      * @param idType
      * @param signature
@@ -282,7 +283,7 @@ public interface IImageGalleryService extends ToolRatingManager {
 
     /**
      * Get Reflect DTO list grouped by sessionID.
-     * 
+     *
      * @param contentId
      * @return
      */
@@ -290,7 +291,7 @@ public interface IImageGalleryService extends ToolRatingManager {
 
     /**
      * Get user by UID
-     * 
+     *
      * @param uid
      * @return
      */
@@ -298,7 +299,7 @@ public interface IImageGalleryService extends ToolRatingManager {
 
     /**
      * Gets a message from imageGallery bundle. Same as <code><fmt:message></code> in JSP pages.
-     * 
+     *
      * @param key
      *            key of the message
      * @param args
@@ -309,7 +310,7 @@ public interface IImageGalleryService extends ToolRatingManager {
 
     /**
      * Get the ImageGallery config item by key
-     * 
+     *
      * @param key
      * @return
      */
@@ -317,7 +318,7 @@ public interface IImageGalleryService extends ToolRatingManager {
 
     /**
      * Save a ImageGallery configItem
-     * 
+     *
      * @param item
      */
     void saveOrUpdateImageGalleryConfigItem(ImageGalleryConfigItem item);
@@ -326,7 +327,7 @@ public interface IImageGalleryService extends ToolRatingManager {
 
     /**
      * Returns whether activity is grouped and therefore it is expected more than one tool session.
-     * 
+     *
      * @param toolContentID
      * @return
      */

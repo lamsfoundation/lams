@@ -2,21 +2,21 @@
  * Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
  * =============================================================
  * License Information: http://lamsfoundation.org/licensing/lams/2.0/
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301
  * USA
- * 
+ *
  * http://www.gnu.org/licenses/gpl.txt
  * ****************************************************************
  */
@@ -35,7 +35,7 @@ import org.lamsfoundation.lams.tool.qa.QaUsrResp;
  * <p>
  * DTO that holds learner flow decision properties and some other view-only properties
  * </p>
- * 
+ *
  * @author Ozgur Demirtas
  */
 public class GeneralLearnerFlowDTO implements Comparable {
@@ -98,15 +98,15 @@ public class GeneralLearnerFlowDTO implements Comparable {
 
     //only for export now
     protected List listMonitoredAnswersContainerDTO;
-    
+
     protected Set<QaQueContent> questions;
-    
+
     protected List<QaUsrResp> userResponses;
 
     protected String initialScreen;
 
     protected String lockWhenFinished;
-    
+
     protected boolean noReeditAllowed;
 
     protected String userUid;
@@ -243,15 +243,18 @@ public class GeneralLearnerFlowDTO implements Comparable {
 	this.questionListingMode = questionListingMode;
     }
 
+    @Override
     public int compareTo(Object o) {
 	GeneralLearnerFlowDTO gneralLearnerFlowDTO = (GeneralLearnerFlowDTO) o;
 
-	if (gneralLearnerFlowDTO == null)
+	if (gneralLearnerFlowDTO == null) {
 	    return 1;
-	else
+	} else {
 	    return 0;
+	}
     }
 
+    @Override
     public String toString() {
 	return new ToStringBuilder(this).append("remainingQuestionCount: ", remainingQuestionCount)
 		.append("totalQuestionCount : ", totalQuestionCount)
@@ -259,9 +262,8 @@ public class GeneralLearnerFlowDTO implements Comparable {
 		.append("lockWhenFinished: ", lockWhenFinished).append("activityTitle: ", activityTitle)
 		.append("countSessionComplete: ", countSessionComplete).append("toolSessionID: ", toolSessionID)
 		.append("currentQuestionIndex: ", currentQuestionIndex)
-		.append("questionListingMode: ", questionListingMode)
-		.append("reportTitleLearner: ", reportTitleLearner).append("userNameVisible: ", userNameVisible)
-		.append("requestLearningReport: ", requestLearningReport)
+		.append("questionListingMode: ", questionListingMode).append("reportTitleLearner: ", reportTitleLearner)
+		.append("userNameVisible: ", userNameVisible).append("requestLearningReport: ", requestLearningReport)
 		.append("requestLearningReportProgress: ", requestLearningReportProgress)
 		.append("requestLearningReportViewOnly: ", requestLearningReportViewOnly)
 		.append("mapAnswers: ", mapAnswers).append("mapQuestions: ", mapQuestions)
@@ -478,7 +480,7 @@ public class GeneralLearnerFlowDTO implements Comparable {
     public void setListMonitoredAnswersContainerDTO(List listMonitoredAnswersContainerDTO) {
 	this.listMonitoredAnswersContainerDTO = listMonitoredAnswersContainerDTO;
     }
-    
+
     /**
      * @return Returns the questions.
      */
@@ -493,7 +495,7 @@ public class GeneralLearnerFlowDTO implements Comparable {
     public void setUserResponses(List<QaUsrResp> userResponses) {
 	this.userResponses = userResponses;
     }
-    
+
     /**
      * @return Returns the questions.
      */
@@ -658,7 +660,7 @@ public class GeneralLearnerFlowDTO implements Comparable {
     public void setLockWhenFinished(String lockWhenFinished) {
 	this.lockWhenFinished = lockWhenFinished;
     }
-    
+
     /**
      * @return Returns the noReeditAllowed.
      */

@@ -57,7 +57,7 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
  * The LoginRequestServlet handles login request by an integrated external system. This servlet checks for the UserId,
  * Timestamp, Hash and ServerId if it's valid it fetch the password from database and pass it to j_security_check for
  * authentication
- * 
+ *
  * @author Fei Yang, Anthony Xiao
  */
 @SuppressWarnings("serial")
@@ -73,9 +73,9 @@ public class LoginRequestServlet extends HttpServlet {
 
     /**
      * The doGet method of the servlet. <br>
-     * 
+     *
      * This method is called when a form has its tag value method equals to get.
-     * 
+     *
      * @param request
      *            the request send by the client to the server
      * @param response
@@ -175,11 +175,12 @@ public class LoginRequestServlet extends HttpServlet {
 	    // but forward doesn't work, use this until a better method is found
 	    hses.setAttribute("extUser", login);
 	    hses.setAttribute(AttributeNames.USER, user.getUserDTO());
-	    
+
 	    // for NTU Blackboard's based templates, force to https to co-exist with Blackboard
 	    String redirect = request.getParameter("redirectURL");
-	    if ( redirect != null && redirect.indexOf("ldtemplate") >= 0 ) {
-		response.sendRedirect("https://"+ request.getServerName() + request.getContextPath() +"/j_security_check?j_username=" + login + "&j_password=" + pass);
+	    if (redirect != null && redirect.indexOf("ldtemplate") >= 0) {
+		response.sendRedirect("https://" + request.getServerName() + request.getContextPath()
+			+ "/j_security_check?j_username=" + login + "&j_password=" + pass);
 	    } else {
 		response.sendRedirect("j_security_check?j_username=" + login + "&j_password=" + pass);
 	    }
@@ -208,9 +209,9 @@ public class LoginRequestServlet extends HttpServlet {
 
     /**
      * The doPost method of the servlet. <br>
-     * 
+     *
      * This method is called when a form has its tag value method equals to post.
-     * 
+     *
      * @param request
      *            the request send by the client to the server
      * @param response

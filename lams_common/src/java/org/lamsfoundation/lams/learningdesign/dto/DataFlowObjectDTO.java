@@ -55,8 +55,8 @@ public class DataFlowObjectDTO {
 	name = dataFlowObject.getName();
 	displayName = dataFlowObject.getDisplayName();
 	orderId = dataFlowObject.getOrderId();
-	toolAssigmentId = dataFlowObject.getToolAssigmentId() == null ? null : dataFlowObject.getToolAssigmentId()
-		.toString();
+	toolAssigmentId = dataFlowObject.getToolAssigmentId() == null ? null
+		: dataFlowObject.getToolAssigmentId().toString();
     }
 
     public String getName() {

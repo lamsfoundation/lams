@@ -2,21 +2,21 @@
  * Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
  * =============================================================
  * License Information: http://lamsfoundation.org/licensing/lams/2.0/
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License version 2.0 
+ * it under the terms of the GNU General Public License version 2.0
  * as published by the Free Software Foundation.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301
  * USA
- * 
+ *
  * http://www.gnu.org/licenses/gpl.txt
  * ****************************************************************
  */
@@ -55,7 +55,7 @@ import org.lamsfoundation.lams.web.servlet.AbstractExportPortfolioServlet;
 
 /**
  * Enables exporting portfolio for teacher and learner modes.
- * 
+ *
  * @author Ozgur Demirtas
  */
 public class ExportServlet extends AbstractExportPortfolioServlet implements VoteAppConstants {
@@ -66,8 +66,7 @@ public class ExportServlet extends AbstractExportPortfolioServlet implements Vot
     @Override
     public String doExport(HttpServletRequest request, HttpServletResponse response, String directoryName,
 	    Cookie[] cookies) {
-	String basePath = WebUtil.getBaseServerURL()
-		+ request.getContextPath();
+	String basePath = WebUtil.getBaseServerURL() + request.getContextPath();
 
 	if (StringUtils.equals(mode, ToolAccessMode.LEARNER.toString())) {
 	    learner(request, response, directoryName, cookies);
@@ -80,7 +79,8 @@ public class ExportServlet extends AbstractExportPortfolioServlet implements Vot
 	return FILENAME;
     }
 
-    public void learner(HttpServletRequest request, HttpServletResponse response, String directoryName, Cookie[] cookies) {
+    public void learner(HttpServletRequest request, HttpServletResponse response, String directoryName,
+	    Cookie[] cookies) {
 
 	IVoteService voteService = VoteServiceProxy.getVoteService(getServletContext());
 
@@ -107,19 +107,19 @@ public class ExportServlet extends AbstractExportPortfolioServlet implements Vot
 		ExportServlet.logger.error(error);
 		throw new VoteApplicationException(error);
 	    }
-	    
+
 	    LinkedList<SessionDTO> sessionDTOs = getSessionDTOs(request, content, voteService, toolSessionID, userID);
 	    exportPortfolioDTO.setSessionDtos(sessionDTOs);
 
 	    boolean userExceptionNoToolSessions = !voteService.studentActivityOccurredGlobal(content);
 	    exportPortfolioDTO.setUserExceptionNoToolSessions(userExceptionNoToolSessions);
-	    
+
 	    boolean isGroupedActivity = voteService.isGroupedActivity(content.getVoteContentId());
 	    request.getSession().setAttribute(VoteAppConstants.ATTR_IS_GROUPED_ACTIVITY, isGroupedActivity);
 
 	    List<ReflectionDTO> reflectionsContainerDTO = voteService.getReflectionData(content, userID);
 	    request.getSession().setAttribute(VoteAppConstants.REFLECTIONS_CONTAINER_DTO, reflectionsContainerDTO);
-	    
+
 	} else {
 	    // thise field is needed for the jsp.
 	    exportPortfolioDTO.setUserExceptionNoToolSessions(false);
@@ -129,7 +129,8 @@ public class ExportServlet extends AbstractExportPortfolioServlet implements Vot
 	request.getSession().setAttribute(VoteAppConstants.EXPORT_PORTFOLIO_DTO, exportPortfolioDTO);
     }
 
-    public void teacher(HttpServletRequest request, HttpServletResponse response, String directoryName, Cookie[] cookies) {
+    public void teacher(HttpServletRequest request, HttpServletResponse response, String directoryName,
+	    Cookie[] cookies) {
 
 	IVoteService voteService = VoteServiceProxy.getVoteService(getServletContext());
 
@@ -148,39 +149,39 @@ public class ExportServlet extends AbstractExportPortfolioServlet implements Vot
 
 	ExportPortfolioDTO exportPortfolioDTO = new ExportPortfolioDTO();
 	exportPortfolioDTO.setPortfolioExportMode("teacher");
-	
+
 	LinkedList<SessionDTO> sessionDTOs = getSessionDTOs(request, content, voteService, null, null);
 	exportPortfolioDTO.setSessionDtos(sessionDTOs);
-	
+
 	boolean userExceptionNoToolSessions = !voteService.studentActivityOccurredGlobal(content);
 	exportPortfolioDTO.setUserExceptionNoToolSessions(userExceptionNoToolSessions);
 	request.getSession().setAttribute(VoteAppConstants.EXPORT_PORTFOLIO_DTO, exportPortfolioDTO);
-	
+
 	boolean isGroupedActivity = voteService.isGroupedActivity(content.getVoteContentId());
 	request.getSession().setAttribute(VoteAppConstants.ATTR_IS_GROUPED_ACTIVITY, isGroupedActivity);
 
 	List<ReflectionDTO> reflectionsContainerDTO = voteService.getReflectionData(content, null);
 	request.getSession().setAttribute(VoteAppConstants.REFLECTIONS_CONTAINER_DTO, reflectionsContainerDTO);
     }
-    
+
     public LinkedList<SessionDTO> getSessionDTOs(HttpServletRequest request, VoteContent voteContent,
 	    IVoteService voteService, Long currentSessionId, Long userId) {
 
 	Set<VoteSession> sessions = new HashSet<VoteSession>();
 	if (currentSessionId == null) {
-	    sessions = (Set<VoteSession>) voteContent.getVoteSessions();
+	    sessions = voteContent.getVoteSessions();
 	} else {
 	    VoteSession voteSession = voteService.getSessionBySessionId(currentSessionId);
 	    sessions.add(voteSession);
 	}
-	
+
 	LinkedList<SessionDTO> sessionDTOs = new LinkedList<SessionDTO>();
 	for (VoteSession session : sessions) {
 
 	    SessionDTO sessionDTO = new SessionDTO();
 	    sessionDTO.setSessionId(session.getVoteSessionId().toString());
 	    sessionDTO.setSessionName(session.getSession_name());
-	    
+
 	    List<VoteMonitoredAnswersDTO> openVotes = voteService.getOpenVotes(voteContent.getUid(),
 		    session.getVoteSessionId(), userId);
 	    sessionDTO.setOpenVotes(openVotes);
@@ -192,13 +193,13 @@ public class ExportServlet extends AbstractExportPortfolioServlet implements Vot
 		List<VoteUsrAttempt> userAttempts;
 		if (userId == null) {
 		    /* request is for monitoring summary */
-		    userAttempts = voteService.getAttemptsForQuestionContentAndSessionUid(questionUid, session.getUid());
+		    userAttempts = voteService.getAttemptsForQuestionContentAndSessionUid(questionUid,
+			    session.getUid());
 
 		} else {
 		    /* request is for learner report, use only the passed tool session in the report */
 		    VoteQueUsr user = voteService.getVoteUserBySession(userId, session.getUid());
-		    userAttempts = voteService
-			    .getAttemptsForUserAndQuestionContent(user.getUid(), questionUid);
+		    userAttempts = voteService.getAttemptsForUserAndQuestionContent(user.getUid(), questionUid);
 		}
 
 		Map<Integer, VoteUsrAttempt> questionAttempts = new HashMap<Integer, VoteUsrAttempt>();
@@ -213,11 +214,12 @@ public class ExportServlet extends AbstractExportPortfolioServlet implements Vot
 		answerDTO.setQuestionAttempts(questionAttempts);
 		answerDTOs.add(answerDTO);
 	    }
-	    sessionDTO.setAnswers(answerDTOs);;
+	    sessionDTO.setAnswers(answerDTOs);
+	    ;
 
 	    sessionDTOs.add(sessionDTO);
 	}
-	
+
 	return sessionDTOs;
     }
 }

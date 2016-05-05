@@ -18,10 +18,10 @@
  *
  * http://www.gnu.org/licenses/gpl.txt
  * ****************************************************************
- */ 
- 
-/* $Id$ */ 
-package org.lamsfoundation.lams.learningdesign; 
+ */
+
+/* $Id$ */
+package org.lamsfoundation.lams.learningdesign;
 
 import java.io.Serializable;
 import java.util.Date;
@@ -30,13 +30,13 @@ import org.lamsfoundation.lams.usermanagement.User;
 
 /**
  * A persistence bean for group/user mappings
- * 
+ *
  * @author lfoxton
- * 
+ *
  * @hibernate.class table="lams_user_group"
  */
 public class GroupUser implements Serializable {
-    
+
     private static final long serialVersionUID = 4680781848791310422L;
 
     private Group group;
@@ -49,7 +49,7 @@ public class GroupUser implements Serializable {
     /**
      * @hibernate.many-to-one not-null="true" lazy="false"
      * @hibernate.column name="group_id"
-     * 
+     *
      */
     public Group getGroup() {
 	return group;
@@ -62,7 +62,7 @@ public class GroupUser implements Serializable {
     /**
      * @hibernate.many-to-one not-null="true" lazy="false"
      * @hibernate.column name="user_id"
-     * 
+     *
      */
     public User getUser() {
 	return user;
@@ -71,18 +71,19 @@ public class GroupUser implements Serializable {
     public void setUser(User user) {
 	this.user = user;
     }
-    
+
     /**
      * @hibernate.property type="java.sql.Timestamp" column="scheduled_lesson_end_date" length="19"
-     * 
+     *
      * @return Returns the scheduledLessonEndDate.
      */
     public Date getScheduledLessonEndDate() {
 	return scheduledLessonEndDate;
     }
-    
+
     /**
-     * @param scheduledLessonEndDate The scheduledLessonEndDate to set.
+     * @param scheduledLessonEndDate
+     *            The scheduledLessonEndDate to set.
      */
     public void setScheduledLessonEndDate(Date scheduledLessonEndDate) {
 	this.scheduledLessonEndDate = scheduledLessonEndDate;

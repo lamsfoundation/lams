@@ -2,21 +2,21 @@
  * Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
  * =============================================================
  * License Information: http://lamsfoundation.org/licensing/lams/2.0/
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301
  * USA
- * 
+ *
  * http://www.gnu.org/licenses/gpl.txt
  * ****************************************************************
  */
@@ -166,7 +166,7 @@ public class AuthoringAction extends Action {
     /**
      * Remove survey item from HttpSession list and update page display. As authoring rule, all persist only happen when
      * user submit whole page. So this remove is just impact HttpSession values.
-     * 
+     *
      * @param mapping
      * @param form
      * @param request
@@ -209,7 +209,7 @@ public class AuthoringAction extends Action {
 
     /**
      * Move up current item.
-     * 
+     *
      * @param mapping
      * @param form
      * @param request
@@ -224,7 +224,7 @@ public class AuthoringAction extends Action {
 
     /**
      * Move down current item.
-     * 
+     *
      * @param mapping
      * @param form
      * @param request
@@ -269,7 +269,7 @@ public class AuthoringAction extends Action {
 
     /**
      * Display edit page for existed survey item.
-     * 
+     *
      * @param mapping
      * @param form
      * @param request
@@ -303,7 +303,7 @@ public class AuthoringAction extends Action {
 
     /**
      * Display empty page for new survey item.
-     * 
+     *
      * @param mapping
      * @param form
      * @param request
@@ -325,7 +325,7 @@ public class AuthoringAction extends Action {
 	    return mapping.findForward(SurveyConstants.FORWARD_CHOICE_QUESTION);
 	}
     }
-    
+
     /**
      * Create a new question based on existing one.
      */
@@ -355,7 +355,7 @@ public class AuthoringAction extends Action {
      * This method will get necessary information from survey item form and save or update into <code>HttpSession</code>
      * SurveyItemList. Notice, this save is not persist them into database, just save <code>HttpSession</code>
      * temporarily. Only they will be persist when the entire authoring page is being persisted.
-     * 
+     *
      * @param mapping
      * @param form
      * @param request
@@ -401,11 +401,11 @@ public class AuthoringAction extends Action {
     /**
      * Read survey data from database and put them into HttpSession. It will redirect to init.do directly after this
      * method run successfully.
-     * 
+     *
      * This method will avoid read database again and lost un-saved resouce item lost when user "refresh page",
-     * 
+     *
      * @throws ServletException
-     * 
+     *
      */
     private ActionForward start(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) throws Exception {
@@ -481,7 +481,7 @@ public class AuthoringAction extends Action {
 
     /**
      * Display same entire authoring page content from HttpSession variable.
-     * 
+     *
      * @param mapping
      * @param form
      * @param request
@@ -512,7 +512,7 @@ public class AuthoringAction extends Action {
 
     /**
      * This method will persist all inforamtion in this authoring page, include all survey item, information etc.
-     * 
+     *
      * @param mapping
      * @param form
      * @param request
@@ -569,14 +569,14 @@ public class AuthoringAction extends Action {
 	HttpSession ss = SessionManager.getSession();
 	// get back login user DTO
 	UserDTO user = (UserDTO) ss.getAttribute(AttributeNames.USER);
-	SurveyUser surveyUser = service.getUserByIDAndContent(new Long(user.getUserID().intValue()), surveyForm
-		.getSurvey().getContentId());
+	SurveyUser surveyUser = service.getUserByIDAndContent(new Long(user.getUserID().intValue()),
+		surveyForm.getSurvey().getContentId());
 	if (surveyUser == null) {
 	    surveyUser = new SurveyUser(user, surveyPO);
 	}
 
 	surveyPO.setCreatedBy(surveyUser);
-	
+
 	// ************************* Handle survey questions *******************
 	Set questionList = new LinkedHashSet();
 	SortedSet topics = getSurveyItemList(sessionMap);
@@ -604,7 +604,7 @@ public class AuthoringAction extends Action {
 	// ******************************** Handle conditions ****************
 	Set<SurveyCondition> conditions = getSurveyConditionSet(sessionMap);
 	List delConditions = getDeletedSurveyConditionList(sessionMap);
-	
+
 	// delete conditions that don't contain any questions
 	Iterator<SurveyCondition> conditionIter = conditions.iterator();
 	while (conditionIter.hasNext()) {
@@ -612,7 +612,7 @@ public class AuthoringAction extends Action {
 	    if (condition.getQuestions().isEmpty()) {
 		conditionIter.remove();
 		delConditions.add(condition);
-		
+
 		//reorder remaining conditions
 		for (SurveyCondition otherCondition : conditions) {
 		    if (otherCondition.getOrderId() > condition.getOrderId()) {
@@ -629,7 +629,7 @@ public class AuthoringAction extends Action {
 	    SurveyCondition condition = (SurveyCondition) iter.next();
 	    iter.remove();
 	    service.deleteCondition(condition);
-	}	
+	}
 
 	// finally persist surveyPO again
 	service.saveOrUpdateSurvey(surveyPO);
@@ -651,14 +651,14 @@ public class AuthoringAction extends Action {
      * Return SurveyService bean.
      */
     private ISurveyService getSurveyService() {
-	WebApplicationContext wac = WebApplicationContextUtils.getRequiredWebApplicationContext(getServlet()
-		.getServletContext());
+	WebApplicationContext wac = WebApplicationContextUtils
+		.getRequiredWebApplicationContext(getServlet().getServletContext());
 	return (ISurveyService) wac.getBean(SurveyConstants.SURVEY_SERVICE);
     }
 
     /**
      * List save current survey items.
-     * 
+     *
      * @param request
      * @return
      */
@@ -673,7 +673,7 @@ public class AuthoringAction extends Action {
 
     /**
      * Set of conditions.
-     * 
+     *
      * @param request
      * @return
      */
@@ -689,7 +689,7 @@ public class AuthoringAction extends Action {
 
     /**
      * List save deleted survey items, which could be persisted or non-persisted items.
-     * 
+     *
      * @param request
      * @return
      */
@@ -699,7 +699,7 @@ public class AuthoringAction extends Action {
 
     /**
      * Get <code>java.util.List</code> from HttpSession by given name.
-     * 
+     *
      * @param request
      * @param name
      * @return
@@ -715,7 +715,7 @@ public class AuthoringAction extends Action {
 
     /**
      * Get survey items instruction from <code>HttpRequest</code>
-     * 
+     *
      * @param request
      */
     private List<String> getInstructionsFromRequest(HttpServletRequest request) {
@@ -754,7 +754,7 @@ public class AuthoringAction extends Action {
 
     /**
      * This method will populate survey item information to its form for edit use.
-     * 
+     *
      * @param itemIdx
      * @param item
      * @param form
@@ -781,14 +781,14 @@ public class AuthoringAction extends Action {
 
     /**
      * Extract web from content to survey item.
-     * 
+     *
      * @param request
      * @param instructionList
      * @param itemForm
      * @throws SurveyApplicationException
      */
-    private void extractFormToSurveyItem(HttpServletRequest request, List<String> instructionList, QuestionForm itemForm)
-	    throws Exception {
+    private void extractFormToSurveyItem(HttpServletRequest request, List<String> instructionList,
+	    QuestionForm itemForm) throws Exception {
 	/*
 	 * BE CAREFUL: This method will copy nessary info from request form to a old or new SurveyItem instance. It gets
 	 * all info EXCEPT SurveyItem.createDate and SurveyItem.createBy, which need be set when persisting this survey
@@ -819,7 +819,7 @@ public class AuthoringAction extends Action {
 	    item.setAllowMultipleAnswer(itemForm.getQuestion().isAllowMultipleAnswer());
 
 	}
-	retriveQuestionForDisplay(item);
+	AuthoringAction.retriveQuestionForDisplay(item);
 	short type = getQuestionType(itemForm);
 	item.setType(type);
 
@@ -851,19 +851,19 @@ public class AuthoringAction extends Action {
 
     private void retriveQuestionListForDisplay(List<SurveyQuestion> list) {
 	for (SurveyQuestion item : list) {
-	    retriveQuestionForDisplay(item);
+	    AuthoringAction.retriveQuestionForDisplay(item);
 	}
     }
 
     public static void retriveQuestionForDisplay(SurveyQuestion item) {
 	String desc = item.getDescription();
 	desc = desc.replaceAll("<(.|\n)*?>", "");
-        item.setShortTitle(StringUtils.abbreviate(desc, AuthoringAction.SHORT_TITLE_LENGTH));
+	item.setShortTitle(StringUtils.abbreviate(desc, AuthoringAction.SHORT_TITLE_LENGTH));
     }
 
     /**
      * Vaidate survey item regards to their type (url/file/learning object/website zip file)
-     * 
+     *
      * @param itemForm
      * @param instructionList
      * @return
@@ -886,7 +886,7 @@ public class AuthoringAction extends Action {
 
     /**
      * Get ToolAccessMode from HttpRequest parameters. Default value is AUTHOR mode.
-     * 
+     *
      * @param request
      * @return
      */
@@ -921,7 +921,7 @@ public class AuthoringAction extends Action {
 
     /**
      * Ajax call, will add one more input line for new survey item instruction.
-     * 
+     *
      * @param mapping
      * @param form
      * @param request
@@ -946,7 +946,7 @@ public class AuthoringAction extends Action {
 
     /**
      * Ajax call, remove the given line of instruction of survey item.
-     * 
+     *
      * @param mapping
      * @param form
      * @param request
@@ -975,7 +975,7 @@ public class AuthoringAction extends Action {
 
     /**
      * Get the deleted condition list, which could be persisted or non-persisted items.
-     * 
+     *
      * @param request
      * @return
      */

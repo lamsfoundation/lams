@@ -2,21 +2,21 @@
  * Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
  * =============================================================
  * License Information: http://lamsfoundation.org/licensing/lams/2.0/
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License version 2.0 
+ * it under the terms of the GNU General Public License version 2.0
  * as published by the Free Software Foundation.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301
  * USA
- * 
+ *
  * http://www.gnu.org/licenses/gpl.txt
  * ****************************************************************
  */
@@ -33,7 +33,7 @@ import org.apache.commons.lang.builder.ToStringBuilder;
  * When importing data, which "tool signatures" does a tool support. This maps the 1.0.2 tool types to 2.0 tool
  * signatures, and may be used for 2.1 tool versions to automatically support 2.0 tool data, even if the tools
  * themselves have changed.
- * 
+ *
  * @hibernate.class table="lams_tool_import_support"
  */
 public class ToolImportSupport implements Serializable {
@@ -94,23 +94,28 @@ public class ToolImportSupport implements Serializable {
 	this.supportsToolSignature = supportsToolSignature;
     }
 
+    @Override
     public String toString() {
 	return new ToStringBuilder(this).append("id", getId())
 		.append("installedToolSignature", getInstalledToolSignature())
 		.append("supportsToolSignature", getSupportsToolSignature()).toString();
     }
 
+    @Override
     public boolean equals(Object other) {
-	if ((this == other))
+	if ((this == other)) {
 	    return true;
-	if (!(other instanceof ToolImportSupport))
+	}
+	if (!(other instanceof ToolImportSupport)) {
 	    return false;
+	}
 	ToolImportSupport castOther = (ToolImportSupport) other;
 	return new EqualsBuilder().append(this.getId(), castOther.getId())
 		.append(this.getInstalledToolSignature(), castOther.getInstalledToolSignature())
 		.append(this.getSupportsToolSignature(), castOther.getSupportsToolSignature()).isEquals();
     }
 
+    @Override
     public int hashCode() {
 	return new HashCodeBuilder().append(getId()).toHashCode();
     }

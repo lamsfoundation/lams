@@ -28,7 +28,7 @@ public class RestTags {
 
     public static String AUTH = "auth";
     public static String LEARNING_DESIGN = "ld";
-    
+
     /* Learning Design Related */
     public static String WORKSPACE_ID = "workspaceFolderID";
     public static String COPY_TYPE_ID = "copyTypeID";
@@ -61,6 +61,5 @@ public class RestTags {
     public static String ANSWER_TEXT = "answerText";
     public static String DISPLAY_ORDER = "displayOrder";
     public static String CORRECT = "correct";
-    
 
 }

@@ -18,23 +18,21 @@
  *
  * http://www.gnu.org/licenses/gpl.txt
  * ****************************************************************
- */ 
- 
-/* $Id$ */ 
-package org.eucm.lams.tool.eadventure.dao; 
+ */
+
+/* $Id$ */
+package org.eucm.lams.tool.eadventure.dao;
 
 import java.util.List;
 
 import org.eucm.lams.tool.eadventure.model.EadventureParam;
- 
+
 public interface EadventureParamDAO extends DAO {
 
-    
     public List<EadventureParam> getEadventureParamByEadContentId(Long contentId);
-    
+
     public String getEadventureParamTypeByNameAndEadContentID(String name, Long contentId);
-    
+
     void delete(EadventureParam param);
-    
+
 }
- 

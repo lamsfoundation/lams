@@ -2,26 +2,26 @@
  * Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
  * =============================================================
  * License Information: http://lamsfoundation.org/licensing/lams/2.0/
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License version 2.0 
+ * it under the terms of the GNU General Public License version 2.0
  * as published by the Free Software Foundation.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301
  * USA
- * 
+ *
  * http://www.gnu.org/licenses/gpl.txt
  * ****************************************************************
  */
 
-/* $$Id$$ */	
+/* $$Id$$ */
 package org.lamsfoundation.lams.tool.mindmap.model;
 
 /**
@@ -31,142 +31,146 @@ package org.lamsfoundation.lams.tool.mindmap.model;
  *
  */
 public class MindmapRequest implements Cloneable {
-	
-	private Long uid;
-	private Long uniqueId;
-	private Long globalId;
-	private int type;
-	private Long nodeId;
-	private Long nodeChildId;
-	private MindmapUser user;
-	private Mindmap mindmap;
-	
-	/** default constructor */
-	public MindmapRequest() {
-	}
-	
-	/** full constructor */
-	public MindmapRequest(Long uid, Long uniqueId, int type, Long nodeId, MindmapUser user, 
-		Mindmap mindmap) {
-	    this.uid = uid;
-	    this.uniqueId = uniqueId;
-	    this.type = type;
-	    this.nodeId = nodeId;
-	    this.user = user;
-	    this.mindmap = mindmap;
-	}
-	
-	//  **********************************************************
-  	//		get/set methods
-	//  **********************************************************
-	
-	/**
-	 * @hibernate.id column="uid" generator-class="native"
-	 */
-	public Long getUid() {
-	    return uid;
-	}
 
-	public void setUid(Long uid) {
-	    this.uid = uid;
-	}
-	
-	/**
-	 * @return Returns the subject of the Message.
-	 * @hibernate.property column="unique_id"
-	 */
-	public Long getUniqueId() {
-	    return uniqueId;
-	}
+    private Long uid;
+    private Long uniqueId;
+    private Long globalId;
+    private int type;
+    private Long nodeId;
+    private Long nodeChildId;
+    private MindmapUser user;
+    private Mindmap mindmap;
 
-	/**
-	 * @param subject The subject of the Message to be set.
-	 */
-	public void setUniqueId(Long uniqueId) {
-	    this.uniqueId = uniqueId;
-	}
-	
-	/**
-	 * @return Returns the subject of the Message.
-	 * @hibernate.property column="global_id"
-	 */
-	public Long getGlobalId() {
-	    return globalId;
-	}
-	
-	/**
-	 * @param globalId the globalId to set
-	 */
-	public void setGlobalId(Long globalId) {
-	    this.globalId = globalId;
-	}
-	
-	/**
-	 * @return Returns the subject of the Message.
-	 * @hibernate.property column="request_type"
-	 */
-	public int getType() {
-	    return type;
-	}
-	
-	/**
-	 * @param subject The subject of the Message to be set.
-	 */
-	public void setType(int type) {
-	    this.type = type;
-	}
-	
-	/**
-	 * @return Returns the userid of the user who created the Mindmap.
-	 * @hibernate.property column="node_id"
-	 */
-	public Long getNodeId() {
-	    return nodeId;
-	}
+    /** default constructor */
+    public MindmapRequest() {
+    }
 
-	/**
-	 * @param createdBy The userid of the user who created this Mindmap.
-	 */
-	public void setNodeId(Long nodeId) {
-	    this.nodeId = nodeId;
-	}
-	
-	/**
-	 * @return Returns the userid of the user who created the Mindmap.
-	 * @hibernate.property column="node_child_id"
-	 */
-	public Long getNodeChildId() {
-	    return nodeChildId;
-	}
-	
-	public void setNodeChildId(Long nodeChildId) {
-	    this.nodeChildId = nodeChildId;
-	}
-	
-	/**
-	 * @return Returns the userid of the user who created the Mindmap.
-	 * @hibernate.many-to-one column="user_id" cascade="all"
-	 */
-	public MindmapUser getUser() {
-	    return user;
-	}
+    /** full constructor */
+    public MindmapRequest(Long uid, Long uniqueId, int type, Long nodeId, MindmapUser user, Mindmap mindmap) {
+	this.uid = uid;
+	this.uniqueId = uniqueId;
+	this.type = type;
+	this.nodeId = nodeId;
+	this.user = user;
+	this.mindmap = mindmap;
+    }
 
-	/**
-	 * @param createdBy The userid of the user who created this Mindmap.
-	 */
-	public void setUser(MindmapUser user) {
-	    this.user = user;
-	}
-	
-	/**
-	 * @return Returns the userid of the user who created the Mindmap.
-	 * @hibernate.many-to-one column="mindmap_id" cascade="all"
-	 */
-	public Mindmap getMindmap() {
-	    return mindmap;
-	}
-	
-	public void setMindmap(Mindmap mindmap) {
-	    this.mindmap = mindmap;
-	}
+    //  **********************************************************
+    //		get/set methods
+    //  **********************************************************
+
+    /**
+     * @hibernate.id column="uid" generator-class="native"
+     */
+    public Long getUid() {
+	return uid;
+    }
+
+    public void setUid(Long uid) {
+	this.uid = uid;
+    }
+
+    /**
+     * @return Returns the subject of the Message.
+     * @hibernate.property column="unique_id"
+     */
+    public Long getUniqueId() {
+	return uniqueId;
+    }
+
+    /**
+     * @param subject
+     *            The subject of the Message to be set.
+     */
+    public void setUniqueId(Long uniqueId) {
+	this.uniqueId = uniqueId;
+    }
+
+    /**
+     * @return Returns the subject of the Message.
+     * @hibernate.property column="global_id"
+     */
+    public Long getGlobalId() {
+	return globalId;
+    }
+
+    /**
+     * @param globalId
+     *            the globalId to set
+     */
+    public void setGlobalId(Long globalId) {
+	this.globalId = globalId;
+    }
+
+    /**
+     * @return Returns the subject of the Message.
+     * @hibernate.property column="request_type"
+     */
+    public int getType() {
+	return type;
+    }
+
+    /**
+     * @param subject
+     *            The subject of the Message to be set.
+     */
+    public void setType(int type) {
+	this.type = type;
+    }
+
+    /**
+     * @return Returns the userid of the user who created the Mindmap.
+     * @hibernate.property column="node_id"
+     */
+    public Long getNodeId() {
+	return nodeId;
+    }
+
+    /**
+     * @param createdBy
+     *            The userid of the user who created this Mindmap.
+     */
+    public void setNodeId(Long nodeId) {
+	this.nodeId = nodeId;
+    }
+
+    /**
+     * @return Returns the userid of the user who created the Mindmap.
+     * @hibernate.property column="node_child_id"
+     */
+    public Long getNodeChildId() {
+	return nodeChildId;
+    }
+
+    public void setNodeChildId(Long nodeChildId) {
+	this.nodeChildId = nodeChildId;
+    }
+
+    /**
+     * @return Returns the userid of the user who created the Mindmap.
+     * @hibernate.many-to-one column="user_id" cascade="all"
+     */
+    public MindmapUser getUser() {
+	return user;
+    }
+
+    /**
+     * @param createdBy
+     *            The userid of the user who created this Mindmap.
+     */
+    public void setUser(MindmapUser user) {
+	this.user = user;
+    }
+
+    /**
+     * @return Returns the userid of the user who created the Mindmap.
+     * @hibernate.many-to-one column="mindmap_id" cascade="all"
+     */
+    public Mindmap getMindmap() {
+	return mindmap;
+    }
+
+    public void setMindmap(Mindmap mindmap) {
+	this.mindmap = mindmap;
+    }
 }

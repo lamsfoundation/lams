@@ -2,21 +2,21 @@
  * Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
  * =============================================================
  * License Information: http://lamsfoundation.org/licensing/lams/2.0/
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301
  * USA
- * 
+ *
  * http://www.gnu.org/licenses/gpl.txt
  * ****************************************************************
  */
@@ -89,7 +89,7 @@ import org.lamsfoundation.lams.util.MessageService;
 
 /**
  * Class implements <code>org.lamsfoundation.lams.tool.taskList.service.ITaskListService</code>.
- * 
+ *
  * @author Andrey Balan
  * @see org.lamsfoundation.lams.tool.taskList.service.ITaskListService
  */
@@ -220,7 +220,7 @@ public class TaskListServiceImpl
     public TaskListItem getTaskListItemByUid(Long itemUid) {
 	return taskListItemDao.getByUid(itemUid);
     }
-    
+
     @Override
     public List<TaskListSession> getSessionsByContentId(Long contentId) {
 	return taskListSessionDao.getByContentId(contentId);
@@ -300,17 +300,18 @@ public class TaskListServiceImpl
 	    }
 	}
     }
-    
+
     @Override
     public Collection<TaskListUserDTO> getPagedUsersBySession(Long sessionId, int page, int size, String sortBy,
 	    String sortOrder, String searchString) {
 	return taskListUserDao.getPagedUsersBySession(sessionId, page, size, sortBy, sortOrder, searchString);
     }
-    
+
     @Override
-    public Collection<TaskListUserDTO> getPagedUsersBySessionAndItem(Long sessionId, Long taskListItemUid, int page, int size, String sortBy,
-	    String sortOrder, String searchString) {
-	return taskListUserDao.getPagedUsersBySessionAndItem(sessionId, taskListItemUid, page, size, sortBy, sortOrder, searchString);
+    public Collection<TaskListUserDTO> getPagedUsersBySessionAndItem(Long sessionId, Long taskListItemUid, int page,
+	    int size, String sortBy, String sortOrder, String searchString) {
+	return taskListUserDao.getPagedUsersBySessionAndItem(sessionId, taskListItemUid, page, size, sortBy, sortOrder,
+		searchString);
     }
 
     @Override
@@ -338,7 +339,8 @@ public class TaskListServiceImpl
 		TaskListItem item = itemList.get(j);
 
 		// retreiving TaskListItemVisitLog for current taskList and user
-		visitNumbers[j] = taskListItemVisitDao.getCountCompletedTasksBySessionAndItem(toolSessionId, item.getUid());
+		visitNumbers[j] = taskListItemVisitDao.getCountCompletedTasksBySessionAndItem(toolSessionId,
+			item.getUid());
 	    }
 
 	    SessionDTO summary = new SessionDTO(toolSessionId, session.getSessionName(), itemList, visitNumbers);
@@ -350,11 +352,13 @@ public class TaskListServiceImpl
 
     /*
      * Return task summary for the specified TaskListItem. Used in monitoring.
-     * 
+     *
      * @param contentId
-     *            toolContenId
+     * toolContenId
+     * 
      * @param item
-     *            specified TaskListItem
+     * specified TaskListItem
+     * 
      * @return
      */
     private ItemSummary exportItem(Long contentId, TaskListItem item) {
@@ -432,7 +436,7 @@ public class TaskListServiceImpl
 
 	return itemSummary;
     }
-    
+
     @Override
     public NotebookEntry getEntry(Long sessionId, Integer userId) {
 	List<NotebookEntry> list = coreNotebookService.getEntry(sessionId, CoreNotebookConstants.NOTEBOOK_TOOL,
@@ -443,7 +447,7 @@ public class TaskListServiceImpl
 	    return list.get(0);
 	}
     }
-    
+
     @Override
     public List<ReflectDTO> getReflectList(Long contentId) {
 	List<ReflectDTO> reflectList = new LinkedList<ReflectDTO>();
@@ -617,7 +621,7 @@ public class TaskListServiceImpl
     public boolean isGroupedActivity(long toolContentID) {
 	return toolService.isGroupedActivity(toolContentID);
     }
-    
+
     @Override
     public String getMessage(String key) {
 	return messageService.getMessage(key);
@@ -992,7 +996,7 @@ public class TaskListServiceImpl
 
     /**
      * Get the tool output for the given tool output name.
-     * 
+     *
      * @see org.lamsfoundation.lams.tool.ToolSessionManager#getToolOutput(java.lang.String, java.lang.Long,
      *      java.lang.Long)
      */
@@ -1057,7 +1061,7 @@ public class TaskListServiceImpl
 
     /**
      * Returns list of tasks from authoring + the tasks added by members of that group.
-     * 
+     *
      * @param contentId
      * @param sessionId
      *            sessionId which defines Group
@@ -1102,7 +1106,7 @@ public class TaskListServiceImpl
 
     /**
      * Process an uploaded file.
-     * 
+     *
      * @throws TaskListException
      * @throws FileNotFoundException
      * @throws IOException

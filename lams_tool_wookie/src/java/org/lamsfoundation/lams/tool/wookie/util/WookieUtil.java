@@ -62,8 +62,8 @@ public class WookieUtil {
 
     private static Logger logger = Logger.getLogger(AuthoringAction.class);
 
-    public static List<WidgetDefinition> getWidgetDefinitions(String url) throws DOMException, IOException,
-	    ParserConfigurationException, SAXException, Exception {
+    public static List<WidgetDefinition> getWidgetDefinitions(String url)
+	    throws DOMException, IOException, ParserConfigurationException, SAXException, Exception {
 	List<WidgetDefinition> widgetDefinitions = new ArrayList<WidgetDefinition>();
 
 	// add the relative url for the widget list
@@ -74,7 +74,7 @@ public class WookieUtil {
 	params.put(WookieConstants.PARAM_ALL, WookieConstants.PARAM_TRUE);
 
 	// Reading the response from the wookie server
-	String xml = getResponseStringFromExternalServer(url, params);
+	String xml = WookieUtil.getResponseStringFromExternalServer(url, params);
 	if (xml == null) {
 	    logger.error("Got null xml from url: " + url);
 	    return null;
@@ -117,8 +117,8 @@ public class WookieUtil {
 	return widgetDefinitions;
     }
 
-    public static int getWidgetCount(String url) throws DOMException, IOException, ParserConfigurationException,
-	    SAXException, Exception {
+    public static int getWidgetCount(String url)
+	    throws DOMException, IOException, ParserConfigurationException, SAXException, Exception {
 
 	// add the relative url for the widget list
 	url += WookieConstants.RELATIVE_URL_WIDGET_LIST;
@@ -128,7 +128,7 @@ public class WookieUtil {
 	params.put(WookieConstants.PARAM_ALL, WookieConstants.PARAM_TRUE);
 
 	// Make the request to the wookie server
-	String xml = getResponseStringFromExternalServer(url, params);
+	String xml = WookieUtil.getResponseStringFromExternalServer(url, params);
 	if (xml == null) {
 	    logger.error("Got null xml from url: " + url);
 	    return 0;
@@ -159,14 +159,14 @@ public class WookieUtil {
 	params.put(WookieConstants.PARAM_KEY_SHARED_DATA_KEY, URLEncoder.encode(sharedDataKey, "UTF8"));
 
 	params.put(WookieConstants.PARAM_KEY_API_KEY, URLEncoder.encode(apiKey, "UTF8"));
-	params.put(WookieConstants.PARAM_KEY_REQUEST_ID, URLEncoder.encode(WookieConstants.PARAM_VALUE_GET_WIDGET,
-		"UTF8"));
+	params.put(WookieConstants.PARAM_KEY_REQUEST_ID,
+		URLEncoder.encode(WookieConstants.PARAM_VALUE_GET_WIDGET, "UTF8"));
 
-	String widgetXML = getResponseStringFromExternalServer(url, params);
+	String widgetXML = WookieUtil.getResponseStringFromExternalServer(url, params);
 	String displayName = user.getFirstName() + " " + user.getLastName();
 
 	// Add the participant
-	boolean participantAdded = addParticipant(url, apiKey, widgetIdentifier, user.getUserID().toString(),
+	boolean participantAdded = WookieUtil.addParticipant(url, apiKey, widgetIdentifier, user.getUserID().toString(),
 		sharedDataKey, user.getUserID().toString(), displayName, null);
 	if (!participantAdded) {
 	    throw new WookieException("Attempt to add participant failed, check response code in logs");
@@ -174,7 +174,7 @@ public class WookieUtil {
 
 	// If required, set the moderator property
 	if (isModerator) {
-	    boolean propertyAdded = addProperty(url, apiKey, widgetIdentifier, user.getUserID().toString(),
+	    boolean propertyAdded = WookieUtil.addProperty(url, apiKey, widgetIdentifier, user.getUserID().toString(),
 		    sharedDataKey, user.getUserID().toString(), displayName, null,
 		    WookieConstants.PARAM_VALUE_PROPERTY_NAME_MODERATOR,
 		    WookieConstants.PARAM_VALUE_PROPERTY_VALUE_TRUE);
@@ -189,7 +189,7 @@ public class WookieUtil {
     }
 
     /**
-     * 
+     *
      * @param url
      * @param apiKey
      * @param widgetIdentifier
@@ -214,19 +214,19 @@ public class WookieUtil {
 	params.put(WookieConstants.PARAM_KEY_USER_ID, URLEncoder.encode(userId, "UTF8"));
 	params.put(WookieConstants.PARAM_KEY_SHARED_DATA_KEY, URLEncoder.encode(sharedDataKey, "UTF8"));
 	params.put(WookieConstants.PARAM_KEY_PARTICIPANT_ID, URLEncoder.encode(participantId, "UTF8"));
-	params.put(WookieConstants.PARAM_KEY_PARTICIPANT_DISPLAY_NAME, URLEncoder
-		.encode(participantDisplayName, "UTF8"));
+	params.put(WookieConstants.PARAM_KEY_PARTICIPANT_DISPLAY_NAME,
+		URLEncoder.encode(participantDisplayName, "UTF8"));
 	if (participantThumbnailURL != null) {
-	    params.put(WookieConstants.PARAM_KEY_PARTICIPANT_THUMBNAIL_URL, URLEncoder.encode(participantThumbnailURL,
-		    "UTF8"));
+	    params.put(WookieConstants.PARAM_KEY_PARTICIPANT_THUMBNAIL_URL,
+		    URLEncoder.encode(participantThumbnailURL, "UTF8"));
 	} else {
 	    // LDEV-2742 add default avatar
 	    String defaultAvatar = Configuration.get(ConfigurationKeys.SERVER_URL) + "images/lamb_big.png";
 	    params.put(WookieConstants.PARAM_KEY_PARTICIPANT_THUMBNAIL_URL, URLEncoder.encode(defaultAvatar, "UTF8"));
 	}
 	params.put(WookieConstants.PARAM_KEY_API_KEY, URLEncoder.encode(apiKey, "UTF8"));
-	params.put(WookieConstants.PARAM_KEY_REQUEST_ID, URLEncoder.encode(WookieConstants.PARAM_VALUE_ADD_PARTICIPANT,
-		"UTF8"));
+	params.put(WookieConstants.PARAM_KEY_REQUEST_ID,
+		URLEncoder.encode(WookieConstants.PARAM_VALUE_ADD_PARTICIPANT, "UTF8"));
 
 	// Making the request and getting the response code
 	int responseCode = WookieUtil.getResponseCodeExternalServer(url, params);
@@ -241,7 +241,7 @@ public class WookieUtil {
 
     /**
      * Add a property to the existing initiated widget
-     * 
+     *
      * @param url
      * @param apiKey
      * @param widgetIdentifier
@@ -266,17 +266,17 @@ public class WookieUtil {
 	params.put(WookieConstants.PARAM_KEY_USER_ID, URLEncoder.encode(userId, "UTF8"));
 	params.put(WookieConstants.PARAM_KEY_SHARED_DATA_KEY, URLEncoder.encode(sharedDataKey, "UTF8"));
 	params.put(WookieConstants.PARAM_KEY_PARTICIPANT_ID, URLEncoder.encode(participantId, "UTF8"));
-	params.put(WookieConstants.PARAM_KEY_PARTICIPANT_DISPLAY_NAME, URLEncoder
-		.encode(participantDisplayName, "UTF8"));
+	params.put(WookieConstants.PARAM_KEY_PARTICIPANT_DISPLAY_NAME,
+		URLEncoder.encode(participantDisplayName, "UTF8"));
 	if (participantThumbnailURL != null) {
-	    params.put(WookieConstants.PARAM_KEY_PARTICIPANT_THUMBNAIL_URL, URLEncoder.encode(participantThumbnailURL,
-		    "UTF8"));
+	    params.put(WookieConstants.PARAM_KEY_PARTICIPANT_THUMBNAIL_URL,
+		    URLEncoder.encode(participantThumbnailURL, "UTF8"));
 	}
 	params.put(WookieConstants.PARAM_KEY_PROPERTY_NAME, URLEncoder.encode(propertyName, "UTF8"));
 	params.put(WookieConstants.PARAM_KEY_PROPERTY_VALUE, URLEncoder.encode(propertyValue, "UTF8"));
 	params.put(WookieConstants.PARAM_KEY_API_KEY, URLEncoder.encode(apiKey, "UTF8"));
-	params.put(WookieConstants.PARAM_KEY_REQUEST_ID, URLEncoder.encode(
-		WookieConstants.PARAM_VALUE_SET_PERSONAL_PROPERTY, "UTF8"));
+	params.put(WookieConstants.PARAM_KEY_REQUEST_ID,
+		URLEncoder.encode(WookieConstants.PARAM_VALUE_SET_PERSONAL_PROPERTY, "UTF8"));
 
 	// Making the request and getting the response code
 	int responseCode = WookieUtil.getResponseCodeExternalServer(url, params);
@@ -291,7 +291,7 @@ public class WookieUtil {
 
     /**
      * Make a clone of the widget identified by the shared data key
-     * 
+     *
      * @param url
      * @param apiKey
      * @param widgetIdentifier
@@ -311,8 +311,8 @@ public class WookieUtil {
 	params.put(WookieConstants.PARAM_KEY_WIDGET_ID, URLEncoder.encode(widgetIdentifier, "UTF8"));
 	params.put(WookieConstants.PARAM_KEY_SHARED_DATA_KEY, URLEncoder.encode(sharedDataKey, "UTF8"));
 	params.put(WookieConstants.PARAM_KEY_API_KEY, URLEncoder.encode(apiKey, "UTF8"));
-	params.put(WookieConstants.PARAM_KEY_REQUEST_ID, URLEncoder.encode(
-		WookieConstants.PARAM_VALUE_PROPERTY_VALUE_CLONE, "UTF8"));
+	params.put(WookieConstants.PARAM_KEY_REQUEST_ID,
+		URLEncoder.encode(WookieConstants.PARAM_VALUE_PROPERTY_VALUE_CLONE, "UTF8"));
 	params.put(WookieConstants.PARAM_KEY_SHARED_DATA_KEY, URLEncoder.encode(sharedDataKey, "UTF8"));
 	params.put(WookieConstants.PARAM_KEY_PROPERTY_CLONED_SHARED_KEY, URLEncoder.encode(newSharedDataKey, "UTF8"));
 	params.put(WookieConstants.PARAM_KEY_USER_ID, URLEncoder.encode(userID, "UTF8"));
@@ -331,7 +331,7 @@ public class WookieUtil {
     /**
      * Makes a request to the specified url with the specified parameters and
      * returns the response string
-     * 
+     *
      * @param urlStr
      * @param params
      * @return
@@ -340,7 +340,7 @@ public class WookieUtil {
      */
     public static String getResponseStringFromExternalServer(String urlStr, HashMap<String, String> params)
 	    throws Exception {
-	InputStream is = getResponseInputStreamFromExternalServer(urlStr, params);
+	InputStream is = WookieUtil.getResponseInputStreamFromExternalServer(urlStr, params);
 	BufferedReader reader = new BufferedReader(new InputStreamReader(is));
 	StringBuilder sb = new StringBuilder();
 	String line = null;
@@ -354,7 +354,7 @@ public class WookieUtil {
     /**
      * Makes a request to the specified url. Returns true if the expected status
      * response code is returned
-     * 
+     *
      * @param urlStr
      * @param params
      * @return
@@ -362,7 +362,7 @@ public class WookieUtil {
      * @throws IOException
      */
     public static int getResponseCodeExternalServer(String urlStr, HashMap<String, String> params) throws Exception {
-	URLConnection conn = getResponseUrlConnectionFromExternalServer(urlStr, params);
+	URLConnection conn = WookieUtil.getResponseUrlConnectionFromExternalServer(urlStr, params);
 	HttpURLConnection httpConn = (HttpURLConnection) conn;
 
 	return httpConn.getResponseCode();
@@ -371,7 +371,7 @@ public class WookieUtil {
     /**
      * Makes a request to the specified url with the specified parameters and
      * returns the response input stream
-     * 
+     *
      * @param urlStr
      * @param params
      * @return
@@ -380,7 +380,7 @@ public class WookieUtil {
      */
     public static InputStream getResponseInputStreamFromExternalServer(String urlStr, HashMap<String, String> params)
 	    throws Exception {
-	URLConnection conn = getResponseUrlConnectionFromExternalServer(urlStr, params);
+	URLConnection conn = WookieUtil.getResponseUrlConnectionFromExternalServer(urlStr, params);
 	InputStream is = conn.getInputStream();
 	return is;
     }
@@ -388,15 +388,15 @@ public class WookieUtil {
     /**
      * Makes a request to the specified url with the specified parameters and
      * returns the response URLConnection
-     * 
+     *
      * @param urlStr
      * @param params
      * @return
      * @throws ToolException
      * @throws IOException
      */
-    public static URLConnection getResponseUrlConnectionFromExternalServer(String urlStr, HashMap<String, String> params)
-	    throws Exception {
+    public static URLConnection getResponseUrlConnectionFromExternalServer(String urlStr,
+	    HashMap<String, String> params) throws Exception {
 	if (!urlStr.contains("?")) {
 	    urlStr += "?";
 	}
@@ -420,14 +420,15 @@ public class WookieUtil {
 
     /**
      * Gets the url response from the getWidget xml
-     * 
+     *
      * @param xml
      * @return
      * @throws ParserConfigurationException
      * @throws SAXException
      * @throws IOException
      */
-    public static String getWidgetUrlFromXML(String xml) throws ParserConfigurationException, SAXException, IOException {
+    public static String getWidgetUrlFromXML(String xml)
+	    throws ParserConfigurationException, SAXException, IOException {
 	DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
 	DocumentBuilder db = dbf.newDocumentBuilder();
 	Document document = db.parse(new InputSource(new StringReader(xml)));
@@ -443,15 +444,15 @@ public class WookieUtil {
 
     /**
      * Gets the widget data response from the getWidget xml
-     * 
+     *
      * @param xml
      * @return
      * @throws ParserConfigurationException
      * @throws SAXException
      * @throws IOException
      */
-    public static WidgetData getWidgetDataFromXML(String xml) throws ParserConfigurationException, SAXException,
-	    IOException {
+    public static WidgetData getWidgetDataFromXML(String xml)
+	    throws ParserConfigurationException, SAXException, IOException {
 	DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
 	DocumentBuilder db = dbf.newDocumentBuilder();
 	Document document = db.parse(new InputSource(new StringReader(xml)));
@@ -459,10 +460,10 @@ public class WookieUtil {
 
 	NodeList widgetPropertyList = (widgetList.item(0)).getChildNodes();
 	WidgetData widgetData = new WidgetData();
-	
+
 	for (int i = 0; i < widgetPropertyList.getLength(); i++) {
 	    Node widgetProperty = widgetPropertyList.item(i);
-	    
+
 	    String propertyTitle = widgetProperty.getNodeName();
 
 	    // Add the properties
@@ -473,17 +474,17 @@ public class WookieUtil {
 	    } else if (propertyTitle.equals(WookieConstants.XML_TITLE)) {
 		widgetData.setTitle(widgetProperty.getTextContent());
 	    } else if (propertyTitle.equals(WookieConstants.XML_HEIGHT)) {
-		String heightStr = widgetProperty.getTextContent();		
+		String heightStr = widgetProperty.getTextContent();
 		if (heightStr != null) {
 		    widgetData.setHeight(Integer.parseInt(heightStr));
-		}		
+		}
 	    } else if (propertyTitle.equals(WookieConstants.XML_WIDTH)) {
-		String widthStr = widgetProperty.getTextContent();		
+		String widthStr = widgetProperty.getTextContent();
 		if (widthStr != null) {
 		    widgetData.setWidth(Integer.parseInt(widthStr));
 		}
 	    } else if (propertyTitle.equals(WookieConstants.XML_MAXIMISE)) {
-		String maximiseStr = widgetProperty.getTextContent();		
+		String maximiseStr = widgetProperty.getTextContent();
 		if (maximiseStr != null) {
 		    widgetData.setMaximize(Boolean.parseBoolean(maximiseStr));
 		}

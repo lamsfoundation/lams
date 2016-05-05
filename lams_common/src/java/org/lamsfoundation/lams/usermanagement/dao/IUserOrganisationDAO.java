@@ -29,14 +29,14 @@ import org.lamsfoundation.lams.dao.IBaseDAO;
 
 /**
  * @author jliew
- * 
+ *
  */
 public interface IUserOrganisationDAO extends IBaseDAO {
 
     /**
      * Return list of userOrganisations that the user is a member of except the
      * given orgId, and the orgId's children.
-     * 
+     *
      * @param userId
      * @param orgId
      * @return list of userOrganisations.

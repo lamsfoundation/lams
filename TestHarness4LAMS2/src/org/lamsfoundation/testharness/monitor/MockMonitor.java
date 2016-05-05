@@ -2,21 +2,21 @@
  * Copyright (C) 2006 LAMS Foundation (http://lamsfoundation.org)
  * =============================================================
  * License Information: http://lamsfoundation.org/licensing/lams/2.0/
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License version 2.0 
+ * it under the terms of the GNU General Public License version 2.0
  * as published by the Free Software Foundation.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301
  * USA
- * 
+ *
  * http://www.gnu.org/licenses/gpl.txt
  * ****************************************************************
  */
@@ -37,11 +37,11 @@ import com.meterware.httpunit.WebResponse;
 
 /**
  * @version
- * 
+ *
  *          <p>
  *          <a href="MockMonitor.java.html"><i>View Source</i></a>
  *          </p>
- * 
+ *
  * @author <a href="mailto:fyang@melcoe.mq.edu.au">Fei Yang</a>
  */
 public class MockMonitor extends MockUser implements Runnable {
@@ -66,7 +66,7 @@ public class MockMonitor extends MockUser implements Runnable {
 
     /**
      * MockMonitor Constructor
-     * 
+     *
      * @param
      */
     public MockMonitor(MonitorTest test, String username, String password, String userId) {
@@ -141,8 +141,8 @@ public class MockMonitor extends MockUser implements Runnable {
 
     public void startLesson(String startLessonURL, String lsId, String userId) {
 	try {
-	    String url = startLessonURL.replace(MockMonitor.LESSON_ID_PATTERN, lsId).replace(
-		    MockMonitor.USER_ID_PATTERN, userId);
+	    String url = startLessonURL.replace(MockMonitor.LESSON_ID_PATTERN, lsId)
+		    .replace(MockMonitor.USER_ID_PATTERN, userId);
 	    WebResponse resp = (WebResponse) new Call(wc, test, username + " starts Lesson", url).execute();
 	    if (!MockUser.checkPageContains(resp, MockMonitor.LESSON_CREATED_FLAG)) {
 		MockMonitor.log.debug(resp.getText());

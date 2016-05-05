@@ -2,21 +2,21 @@
  * Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
  * =============================================================
  * License Information: http://lamsfoundation.org/licensing/lams/2.0/
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License version 2.0 
+ * it under the terms of the GNU General Public License version 2.0
  * as published by the Free Software Foundation.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301
  * USA
- * 
+ *
  * http://www.gnu.org/licenses/gpl.txt
  * ****************************************************************
  */
@@ -61,6 +61,7 @@ public class ExportServlet extends AbstractExportPortfolioServlet {
 
     private IWookieService wookieService;
 
+    @Override
     protected String doExport(HttpServletRequest request, HttpServletResponse response, String directoryName,
 	    Cookie[] cookies) {
 
@@ -80,8 +81,7 @@ public class ExportServlet extends AbstractExportPortfolioServlet {
 	    logger.error("Cannot perform export for wookie tool.");
 	}
 
-	String basePath = WebUtil.getBaseServerURL()
-		+ request.getContextPath();
+	String basePath = WebUtil.getBaseServerURL() + request.getContextPath();
 	writeResponseToFile(basePath + "/pages/export/exportPortfolio.jsp", directoryName, FILENAME, cookies);
 
 	return FILENAME;
@@ -105,14 +105,14 @@ public class ExportServlet extends AbstractExportPortfolioServlet {
 
 	UserDTO lamsUserDTO = (UserDTO) SessionManager.getSession().getAttribute(AttributeNames.USER);
 
-	WookieUser wookieUser = wookieService
-		.getUserByUserIdAndSessionId(new Long(lamsUserDTO.getUserID()), toolSessionID);
+	WookieUser wookieUser = wookieService.getUserByUserIdAndSessionId(new Long(lamsUserDTO.getUserID()),
+		toolSessionID);
 
 	//NotebookEntry wookieEntry = wookieService.getEntry(wookieUser.getEntryUID());
 
 	// construct dto's
 	WookieDTO wookieDTO = new WookieDTO(wookie);
-	
+
 	WookieSessionDTO sessionDTO = new WookieSessionDTO();
 	sessionDTO.setSessionName(wookieSession.getSessionName());
 	sessionDTO.setSessionID(wookieSession.getSessionId());
@@ -122,24 +122,22 @@ public class ExportServlet extends AbstractExportPortfolioServlet {
 
 	sessionDTO.getUserDTOs().add(userDTO);
 	wookieDTO.getSessionDTOs().add(sessionDTO);
-	
+
 	NotebookEntry notebookEntry = wookieService.getEntry(toolSessionID, CoreNotebookConstants.NOTEBOOK_TOOL,
 		WookieConstants.TOOL_SIGNATURE, userDTO.getUserId().intValue());
-	
-	if (notebookEntry != null)
-	{
+
+	if (notebookEntry != null) {
 	    userDTO.setNotebookEntry(notebookEntry.getEntry());
 	    userDTO.setFinishedReflection(true);
 	}
-	
+
 	String imageFileArray[] = new String[2];
 	imageFileArray[0] = wookieDTO.getImageFileName();
-	
-	if (userDTO.getImageFileName() != null)
-	{
+
+	if (userDTO.getImageFileName() != null) {
 	    imageFileArray[1] = userDTO.getImageFileName();
 	}
-	
+
 	request.getSession().setAttribute("userWidgetURL", wookieUser.getUserWidgetURL());
 	request.getSession().setAttribute("widgetHeight", wookieSession.getWidgetHeight());
 	request.getSession().setAttribute("widgetWidth", wookieSession.getWidgetWidth());
@@ -162,17 +160,17 @@ public class ExportServlet extends AbstractExportPortfolioServlet {
 	Wookie wookie = wookieService.getWookieByContentId(toolContentID);
 
 	WookieDTO wookieDTO = new WookieDTO(wookie);
-	
-	
+
 	for (WookieSessionDTO sessionDTO : wookieDTO.getSessionDTOs()) {
 	    Long toolSessionID = sessionDTO.getSessionID();
-	   
+
 	    // Initiate the wookie widget for the monitor
 	    if (!StringUtils.isEmpty(sessionDTO.getWidgetSharedDataKey())) {
-    	    	String sessionUserWidgetUrl = initiateWidget(sessionDTO.getWidgetIdentifier(), sessionDTO.getWidgetSharedDataKey());
-    	    	sessionDTO.setSessionUserWidgetUrl(sessionUserWidgetUrl);
+		String sessionUserWidgetUrl = initiateWidget(sessionDTO.getWidgetIdentifier(),
+			sessionDTO.getWidgetSharedDataKey());
+		sessionDTO.setSessionUserWidgetUrl(sessionUserWidgetUrl);
 	    }
-	    
+
 	    for (WookieUserDTO userDTO : sessionDTO.getUserDTOs()) {
 		// get the notebook entry.
 		NotebookEntry notebookEntry = wookieService.getEntry(toolSessionID, CoreNotebookConstants.NOTEBOOK_TOOL,
@@ -181,20 +179,20 @@ public class ExportServlet extends AbstractExportPortfolioServlet {
 		    userDTO.notebookEntry = notebookEntry.getEntry();
 		    userDTO.setFinishedReflection(true);
 		}
-		
+
 	    }
 	}
-	
-	// Set a flag if there is only one session 
+
+	// Set a flag if there is only one session
 	boolean multipleSessionFlag = false;
 	if (wookieDTO.getSessionDTOs() != null && wookieDTO.getSessionDTOs().size() > 1) {
 	    multipleSessionFlag = true;
 	}
 	request.setAttribute("multipleSessionFlag", multipleSessionFlag);
-	
+
 	request.getSession().setAttribute("wookieDTO", wookieDTO);
     }
-    
+
     private String initiateWidget(String wookieIdentifier, String sharedDataKey) throws WookieException {
 	try {
 
@@ -203,15 +201,16 @@ public class ExportServlet extends AbstractExportPortfolioServlet {
 
 	    wookieUrl += WookieConstants.RELATIVE_URL_WIDGET_SERVICE;
 
-	    String returnXML = WookieUtil.getWidget(wookieUrl, wookieKey, wookieIdentifier, getUser(), sharedDataKey, true);
-	    return  WookieUtil.getWidgetUrlFromXML(returnXML);
+	    String returnXML = WookieUtil.getWidget(wookieUrl, wookieKey, wookieIdentifier, getUser(), sharedDataKey,
+		    true);
+	    return WookieUtil.getWidgetUrlFromXML(returnXML);
 
 	} catch (Exception e) {
 	    logger.error("Problem intitating widget for learner" + e);
 	    throw new WookieException(e);
 	}
     }
-    
+
     private UserDTO getUser() {
 	return (UserDTO) SessionManager.getSession().getAttribute(AttributeNames.USER);
     }

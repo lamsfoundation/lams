@@ -2,21 +2,21 @@
  * Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
  * =============================================================
  * License Information: http://lamsfoundation.org/licensing/lams/2.0/
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License version 2.0 
+ * it under the terms of the GNU General Public License version 2.0
  * as published by the Free Software Foundation.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301
  * USA
- * 
+ *
  * http://www.gnu.org/licenses/gpl.txt
  * ****************************************************************
  */
@@ -30,28 +30,33 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 
 /**
- * <p>ToolAccessMode is implemented using Ordinal-based typesafe enum pattern. 
+ * <p>
+ * ToolAccessMode is implemented using Ordinal-based typesafe enum pattern.
  * It resolves the performance and potential hard coding error problems of using
- * interface to define enum type.</p>
- * 
- * <p>This set of modes is a helper for tools. Some tools may want to use the same
+ * interface to define enum type.
+ * </p>
+ *
+ * <p>
+ * This set of modes is a helper for tools. Some tools may want to use the same
  * code for the three versions of the learner screen (ordinary, learner progress and
  * preview) or for the two versions of export portfolio (leaner and teacher).
  * If a tool wants to do this, they should include mode=author, mode=teacher
  * and mode=learner in their url definitions, and use the helper methods
  * WebUtil.readToolAccessModeParam() and WebUtil.getToolAccessMode() to access
- * the modes.</p>
- * 
- * <p>As a class, it can implement any interface as we want. For now, it implements
+ * the modes.
+ * </p>
+ *
+ * <p>
+ * As a class, it can implement any interface as we want. For now, it implements
  * serializable because we might need to set it into http session. To ensure
- * serializable works properly, <code>readResolve()</code> must be overriden.</p>
- * 
- * 
+ * serializable works properly, <code>readResolve()</code> must be overriden.
+ * </p>
+ *
+ *
  * @author Jacky Fang 2005-1-7
- * 
+ *
  */
-public class ToolAccessMode implements Serializable
-{
+public class ToolAccessMode implements Serializable {
 
     private final transient String name;
 
@@ -64,9 +69,8 @@ public class ToolAccessMode implements Serializable
     /**
      * Private construtor to avoid instantiation
      */
-    private ToolAccessMode(String name)
-    {
-        this.name = name;
+    private ToolAccessMode(String name) {
+	this.name = name;
     }
 
     public static final ToolAccessMode AUTHOR = new ToolAccessMode("author");
@@ -76,39 +80,44 @@ public class ToolAccessMode implements Serializable
     //This is necessary for serialization
     private static final ToolAccessMode[] VALUES = { AUTHOR, TEACHER, LEARNER };
 
-    public String toString() {return name;};
-    
+    @Override
+    public String toString() {
+	return name;
+    };
+
     /**
      * Overidden method to ensure it is serializable.
+     * 
      * @return the object instance
      * @throws ObjectStreamException
      */
-    Object readResolve() throws ObjectStreamException
-    {
-        return VALUES[ordinal];
+    Object readResolve() throws ObjectStreamException {
+	return VALUES[ordinal];
     }
 
-	@Override
-	public boolean equals(Object obj) {
-		if(!(obj instanceof ToolAccessMode))
-			return false;
-		return StringUtils.equals(((ToolAccessMode)obj).name,this.name);
+    @Override
+    public boolean equals(Object obj) {
+	if (!(obj instanceof ToolAccessMode)) {
+	    return false;
 	}
+	return StringUtils.equals(((ToolAccessMode) obj).name, this.name);
+    }
 
-	@Override
-	public int hashCode() {
-		return new HashCodeBuilder().append(name).toHashCode();
-	}
-    
-    public boolean isTeacher(){
-    	return TEACHER.equals(this);
+    @Override
+    public int hashCode() {
+	return new HashCodeBuilder().append(name).toHashCode();
     }
-    public boolean isLearner(){
-    	return LEARNER.equals(this);
+
+    public boolean isTeacher() {
+	return TEACHER.equals(this);
     }
-    public boolean isAuthor(){
-    	return AUTHOR.equals(this);
+
+    public boolean isLearner() {
+	return LEARNER.equals(this);
     }
-    
+
+    public boolean isAuthor() {
+	return AUTHOR.equals(this);
+    }
 
 }

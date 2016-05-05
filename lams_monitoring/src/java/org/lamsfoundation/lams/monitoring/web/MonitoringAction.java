@@ -2,21 +2,21 @@
  * Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
  * =============================================================
  * License Information: http://lamsfoundation.org/licensing/lams/2.0/
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License version 2.0 
+ * it under the terms of the GNU General Public License version 2.0
  * as published by the Free Software Foundation.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301
  * USA
- * 
+ *
  * http://www.gnu.org/licenses/gpl.txt
  * ****************************************************************
  */
@@ -107,19 +107,19 @@ import com.google.gson.GsonBuilder;
  * The action servlet that provide all the monitoring functionalities. It interact with the teacher via flash and JSP
  * monitoring interface.
  * </p>
- * 
+ *
  * @author Jacky Fang
  * @since 2005-4-15
  * @version 1.1
- * 
+ *
  *          ----------------XDoclet Tags--------------------
- * 
+ *
  * @struts:action path="/monitoring" parameter="method" validate="false"
  * @struts.action-forward name = "previewdeleted" path = "/previewdeleted.jsp"
  * @struts.action-forward name = "notsupported" path = ".notsupported"
  * @struts.action-forward name = "timeChart" path = "/timeChart.jsp"
  * @struts.action-forward name = "monitorLesson" path = "/monitor.jsp"
- * 
+ *
  *                        ----------------XDoclet Tags--------------------
  */
 public class MonitoringAction extends LamsDispatchAction {
@@ -199,7 +199,7 @@ public class MonitoringAction extends LamsDispatchAction {
     /**
      * Initializes a lesson for specific learning design with the given lesson title and lesson description. If
      * initialization is successful, this method will the ID of new lesson.
-     * 
+     *
      * Currently used only in TestHarness and Flashless Authoring Preview.
      */
     public ActionForward initializeLesson(ActionMapping mapping, ActionForm form, HttpServletRequest request,
@@ -247,11 +247,11 @@ public class MonitoringAction extends LamsDispatchAction {
      * The Struts dispatch method that starts a lesson that has been created beforehand. Most likely, the request to
      * start lesson should be triggered by the Monitoring This method will delegate to the Spring service bean to
      * complete all the steps for starting a lesson.
-     * 
+     *
      * @param mapping
      *            An ActionMapping class that will be used by the Action class to tell the ActionServlet where to send
      *            the end-user.
-     * 
+     *
      * @param form
      *            The ActionForm class that will contain any data submitted by the end-user via a form.
      * @param request
@@ -451,11 +451,11 @@ public class MonitoringAction extends LamsDispatchAction {
 
     /**
      * The Struts dispatch method to archive a lesson.
-     * 
+     *
      * @param mapping
      *            An ActionMapping class that will be used by the Action class to tell the ActionServlet where to send
      *            the end-user.
-     * 
+     *
      * @param form
      *            The ActionForm class that will contain any data submitted by the end-user via a form.
      * @param request
@@ -482,11 +482,11 @@ public class MonitoringAction extends LamsDispatchAction {
     /**
      * The Struts dispatch method to "unarchive" a lesson. Returns it back to its previous state. A wddx acknowledgement
      * message will be serialized and sent back to the flash component.
-     * 
+     *
      * @param mapping
      *            An ActionMapping class that will be used by the Action class to tell the ActionServlet where to send
      *            the end-user.
-     * 
+     *
      * @param form
      *            The ActionForm class that will contain any data submitted by the end-user via a form.
      * @param request
@@ -513,7 +513,7 @@ public class MonitoringAction extends LamsDispatchAction {
      * The purpose of suspending is to hide the lesson from learners temporarily. It doesn't make any sense to suspend a
      * created or a not started (ie scheduled) lesson as they will not be shown on the learner interface anyway! If the
      * teacher tries to suspend a lesson that is not in the STARTED_STATE, then an error should be returned to Flash.
-     * 
+     *
      * @param mapping
      * @param form
      * @param request
@@ -536,7 +536,7 @@ public class MonitoringAction extends LamsDispatchAction {
     /**
      * Unsuspend a lesson which state must be Lesson.SUPSENDED_STATE. Otherwise a error message will return to flash
      * client.
-     * 
+     *
      * @param mapping
      * @param form
      * @param request
@@ -564,7 +564,7 @@ public class MonitoringAction extends LamsDispatchAction {
      * <P>
      * This action need a lession ID as input.
      * </P>
-     * 
+     *
      * @param form
      *            The ActionForm class that will contain any data submitted by the end-user via a form.
      * @param request
@@ -611,7 +611,7 @@ public class MonitoringAction extends LamsDispatchAction {
      * This action need a lession ID, Learner ID and Activity ID as input. Activity ID is optional, if it is null, all
      * activities for this learner will complete to as end as possible.
      * </P>
-     * 
+     *
      * @param form
      * @param request
      *            A standard Servlet HttpServletRequest class.
@@ -1462,7 +1462,7 @@ public class MonitoringAction extends LamsDispatchAction {
 
     /**
      * Get AuditService bean.
-     * 
+     *
      * @return
      */
     private IAuditService getAuditService() {
@@ -1476,7 +1476,7 @@ public class MonitoringAction extends LamsDispatchAction {
 
     /**
      * Get TimezoneService bean.
-     * 
+     *
      * @return
      */
     private ITimezoneService getTimezoneService() {

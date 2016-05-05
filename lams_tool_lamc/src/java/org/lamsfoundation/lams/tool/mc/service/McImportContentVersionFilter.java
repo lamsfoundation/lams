@@ -8,14 +8,14 @@ import org.lamsfoundation.lams.tool.mc.pojos.McUsrAttempt;
 
 /**
  * Import filter class for different version of MC content.
- * 
+ *
  * @author steven
  */
 public class McImportContentVersionFilter extends ToolContentVersionFilter {
 
     /**
      * Import 1.0 version content to 1.1 version tool server.
-     * 
+     *
      */
     public void up10To20061015() {
 	this.removeField(McQueContent.class, "weight");
@@ -34,7 +34,7 @@ public class McImportContentVersionFilter extends ToolContentVersionFilter {
 	// Adds displayAnswers LDEV-1156
 	this.addField(McContent.class, "displayAnswers", new Boolean(true));
     }
-    
+
     /**
      * Import 20140101 version content to 20140102 version tool server.
      */
@@ -44,7 +44,7 @@ public class McImportContentVersionFilter extends ToolContentVersionFilter {
 	this.removeField(McContent.class, "offlineInstructions");
 	this.removeField(McContent.class, "mcAttachments");
     }
-    
+
     /**
      * Import 20131212 version content to 20140512 version tool server.
      */

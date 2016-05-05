@@ -7,7 +7,7 @@ import org.lamsfoundation.lams.tool.qa.QaQueContent;
 /**
  * Comparator for <code>QaQueContent</code>. Only the display order is
  * compared.
- * 
+ *
  * @author Marcin Cieslak
  */
 public class QaQueContentComparator implements Comparator<QaQueContent> {
@@ -15,6 +15,7 @@ public class QaQueContentComparator implements Comparator<QaQueContent> {
     /**
      * {@inheritDoc}
      */
+    @Override
     public int compare(QaQueContent o1, QaQueContent o2) {
 	if (o1 != null && o2 != null) {
 	    return o1.getDisplayOrder() - o2.getDisplayOrder();

@@ -2,21 +2,21 @@
  * Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
  * =============================================================
  * License Information: http://lamsfoundation.org/licensing/lams/2.0/
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301
  * USA
- * 
+ *
  * http://www.gnu.org/licenses/gpl.txt
  * ****************************************************************
  */
@@ -111,7 +111,7 @@ import org.springframework.dao.DataAccessException;
 /**
  * The POJO implementation of Qa service. All business logics of Qa tool are implemented in this class. It translate the
  * request from presentation layer and perform approporiate database operation.
- * 
+ *
  * @author Ozgur Demirtas
  */
 public class QaServicePOJO implements IQaService, ToolContentManager, ToolSessionManager, ToolContentImport102Manager,
@@ -326,7 +326,8 @@ public class QaServicePOJO implements IQaService, ToolContentManager, ToolSessio
     }
 
     @Override
-    public void updateResponseWithNewAnswer(String newAnswer, String toolSessionID, Long questionDisplayOrder, boolean isAutosave) {
+    public void updateResponseWithNewAnswer(String newAnswer, String toolSessionID, Long questionDisplayOrder,
+	    boolean isAutosave) {
 	HttpSession ss = SessionManager.getSession();
 	UserDTO toolUser = (UserDTO) ss.getAttribute(AttributeNames.USER);
 	Long userId = new Long(toolUser.getUserID().longValue());
@@ -342,10 +343,10 @@ public class QaServicePOJO implements IQaService, ToolContentManager, ToolSessio
 	if (response == null) {
 	    response = isAutosave
 		    ? new QaUsrResp(null, newAnswer, new Date(System.currentTimeMillis()), "", question, user, true)
-		    : new QaUsrResp(newAnswer, null, new Date(System.currentTimeMillis()), "", question, user, true);	    
+		    : new QaUsrResp(newAnswer, null, new Date(System.currentTimeMillis()), "", question, user, true);
 	    createUserResponse(response);
 
-	// if answer has changed
+	    // if answer has changed
 	} else if (!newAnswer.equals(response.getAnswer())) {
 	    if (isAutosave) {
 		response.setAnswerAutosaved(newAnswer);
@@ -353,7 +354,7 @@ public class QaServicePOJO implements IQaService, ToolContentManager, ToolSessio
 		response.setAnswer(newAnswer);
 		response.setAnswerAutosaved(null);
 	    }
-	    
+
 	    response.setAttemptTime(new Date(System.currentTimeMillis()));
 	    response.setTimezone("");
 	    updateUserResponse(response);
@@ -676,13 +677,17 @@ public class QaServicePOJO implements IQaService, ToolContentManager, ToolSessio
 	return reflectionDTOs;
     }
 
-    public List<Object[]> getUserReflectionsForTablesorter(Long toolSessionId, int page, int size, int sorting, String searchString) {
-	return qaQueUsrDAO.getUserReflectionsForTablesorter(toolSessionId, page, size, sorting, searchString, getCoreNotebookService());
+    @Override
+    public List<Object[]> getUserReflectionsForTablesorter(Long toolSessionId, int page, int size, int sorting,
+	    String searchString) {
+	return qaQueUsrDAO.getUserReflectionsForTablesorter(toolSessionId, page, size, sorting, searchString,
+		getCoreNotebookService());
     }
+
+    @Override
     public int getCountUsersBySessionWithSearch(Long toolSessionId, String searchString) {
 	return qaQueUsrDAO.getCountUsersBySessionWithSearch(toolSessionId, searchString);
     }
-    
 
     @Override
     public List exportLearner(QaContent qaContent, boolean isUserNamesVisible, boolean isLearnerRequest,
@@ -933,7 +938,7 @@ public class QaServicePOJO implements IQaService, ToolContentManager, ToolSessio
 	    for (LearnerItemRatingCriteria criteria : toolContentObj.getRatingCriterias()) {
 		criteria.setToolContentId(toolContentID);
 	    }
-	    
+
 	    // set back the tool content
 	    Set<QaQueContent> questions = toolContentObj.getQaQueContents();
 	    for (QaQueContent question : questions) {

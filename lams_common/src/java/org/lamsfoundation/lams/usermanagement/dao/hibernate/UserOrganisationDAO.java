@@ -45,15 +45,17 @@ public class UserOrganisationDAO extends BaseDAO implements IUserOrganisationDAO
      * using any lazy loading. Ideally the delete would be performed in one HQL
      * statement, but the HQL wouldn't work with UserOrganisation for some
      * reason (TODO). (non-Javadoc)
-     * 
+     *
      * @seeorg.lamsfoundation.lams.usermanagement.dao.IUserOrganisationDAO#
      * userOrganisationsNotById(java.lang.Integer, java.lang.Integer)
      */
+    @Override
     public List userOrganisationsNotById(final Integer userId, final Integer orgId) {
 
 	List userOrganisations;
 	HibernateTemplate hibernateTemplate = new HibernateTemplate(this.getSessionFactory());
 	userOrganisations = (List) hibernateTemplate.execute(new HibernateCallback() {
+	    @Override
 	    public Object doInHibernate(Session session) throws HibernateException {
 		Query query = session.getNamedQuery("userOrganisationsNotById");
 		query.setInteger("userId", userId.intValue());

@@ -2,21 +2,21 @@
  * Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
  * =============================================================
  * License Information: http://lamsfoundation.org/licensing/lams/2.0/
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General License version 2.0 
+ * it under the terms of the GNU General License version 2.0
  * as published by the Free Software Foundation.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General License for more details.
- * 
+ *
  * You should have received a copy of the GNU General License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301
  * USA
- * 
+ *
  * http://www.gnu.org/licenses/gpl.txt
  * ****************************************************************
  */
@@ -33,14 +33,14 @@ import org.lamsfoundation.lams.usermanagement.User;
 
 /**
  * Inteface defines Lesson DAO Methods
- * 
+ *
  * @author chris
  */
 public interface ILessonDAO extends IBaseDAO {
 
     /**
      * Retrieves the Lesson
-     * 
+     *
      * @param lessonId
      *            identifies the lesson to get
      * @return the lesson
@@ -51,7 +51,7 @@ public interface ILessonDAO extends IBaseDAO {
 
     /**
      * Gets all lessons that are active for a learner. TODO to be removed when the dummy interface is no longer needed
-     * 
+     *
      * @param learner
      *            a User that identifies the learner.
      * @return a Set with all active lessons in it.
@@ -60,7 +60,7 @@ public interface ILessonDAO extends IBaseDAO {
 
     /**
      * Saves or Updates a Lesson.
-     * 
+     *
      * @param lesson
      *            the Lesson to save
      */
@@ -68,7 +68,7 @@ public interface ILessonDAO extends IBaseDAO {
 
     /**
      * Deletes a Lesson <b>permanently</b>.
-     * 
+     *
      * @param lesson
      *            the Lesson to remove.
      */
@@ -76,7 +76,7 @@ public interface ILessonDAO extends IBaseDAO {
 
     /**
      * Update a requested lesson.
-     * 
+     *
      * @param createdLesson
      */
     void updateLesson(Lesson lesson);
@@ -84,7 +84,7 @@ public interface ILessonDAO extends IBaseDAO {
     /**
      * Returns the list of available Lessons created by a given user. Does not return disabled lessons or preview
      * lessons.
-     * 
+     *
      * @param userID
      *            The user_id of the user
      * @return List The list of Lessons for the given user
@@ -93,7 +93,7 @@ public interface ILessonDAO extends IBaseDAO {
 
     /**
      * Returns the all the learners that have started the requested lesson.
-     * 
+     *
      * @param lessonId
      *            the id of the requested lesson.
      * @return the list of learners.
@@ -102,7 +102,7 @@ public interface ILessonDAO extends IBaseDAO {
 
     /**
      * Returns the count of all the learners that have started the requested lesson.
-     * 
+     *
      * @param lessonId
      *            the id of the requested lesson.
      * @return the count of the learners.
@@ -129,7 +129,7 @@ public interface ILessonDAO extends IBaseDAO {
 
     /**
      * Get all the preview lessons more with the creation date before the given date.
-     * 
+     *
      * @param startDate
      *            UTC date
      * @return the list of Lessons
@@ -144,21 +144,21 @@ public interface ILessonDAO extends IBaseDAO {
     /**
      * Gets all non-removed lessons for a user in an org; set userRole parameter to learner if you want lessons where
      * user is in the learner list, or to monitor if in the staff list.
-     * 
+     *
      * @param userId
      *            a user id that identifies the user.
      * @param orgId
      *            an org id that identifies the organisation.
      * @param userRole
      *            return lessons where user is learner or monitor. or returns all lessons in case of group manager
-     * 
+     *
      * @return a List containing a list of tuples containing lesson details and the lesson completed flag for the user.
      */
     List getLessonsByOrgAndUserWithCompletedFlag(Integer userId, Integer orgId, Integer userRole);
 
     /**
      * Gets all non-removed lessons for a user in a group including sub-groups
-     * 
+     *
      * @param userId
      *            a user id that identifies the user.
      * @param orgId
@@ -169,7 +169,7 @@ public interface ILessonDAO extends IBaseDAO {
 
     /**
      * Gets all non-removed lessons for a group.
-     * 
+     *
      * @param orgId
      * @return
      */
@@ -177,7 +177,7 @@ public interface ILessonDAO extends IBaseDAO {
 
     /**
      * Get lessons based on learning designs where the original learning design has the given id.
-     * 
+     *
      * @param ldId
      * @param orgId
      * @return list of lessons
@@ -186,7 +186,7 @@ public interface ILessonDAO extends IBaseDAO {
 
     /**
      * Finds out which lesson the given tool content belongs to and returns its monitoring users.
-     * 
+     *
      * @param sessionId
      *            tool session ID
      * @return list of teachers that monitor the lesson which contains the tool with given session ID

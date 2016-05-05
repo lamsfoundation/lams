@@ -2,21 +2,21 @@
  * Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
  * =============================================================
  * License Information: http://lamsfoundation.org/licensing/lams/2.0/
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License version 2.0 
+ * it under the terms of the GNU General Public License version 2.0
  * as published by the Free Software Foundation.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301
  * USA
- * 
+ *
  * http://www.gnu.org/licenses/gpl.txt
  * ****************************************************************
  */
@@ -65,9 +65,9 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
 
 /**
  * Export portfolio servlet to export all images into offline HTML package.
- * 
+ *
  * @author Andrey Balan
- * 
+ *
  * @version $Revision$
  */
 public class ExportServlet extends AbstractExportPortfolioServlet {
@@ -87,6 +87,7 @@ public class ExportServlet extends AbstractExportPortfolioServlet {
 	super.init();
     }
 
+    @Override
     public String doExport(HttpServletRequest request, HttpServletResponse response, String directoryName,
 	    Cookie[] cookies) {
 
@@ -106,18 +107,17 @@ public class ExportServlet extends AbstractExportPortfolioServlet {
 	    logger.error("Cannot perform export for imageGallery tool.");
 	}
 
-	String basePath = WebUtil.getBaseServerURL()
-		+ request.getContextPath();
-	
+	String basePath = WebUtil.getBaseServerURL() + request.getContextPath();
+
 	// Attempting to export required images
 	try {
 	    ImageGalleryBundler imageBundler = new ImageGalleryBundler();
 	    imageBundler.bundle(request, cookies, directoryName);
 	} catch (Exception e) {
-	    logger.error(
-		    "Could not export spreadsheet javascript files, some files may be missing in export portfolio", e);
+	    logger.error("Could not export spreadsheet javascript files, some files may be missing in export portfolio",
+		    e);
 	}
-	
+
 	writeResponseToFile(basePath + "/pages/export/exportportfolio.jsp?sessionMapID=" + sessionMap.getSessionID(),
 		directoryName, FILENAME, cookies);
 
@@ -149,7 +149,8 @@ public class ExportServlet extends AbstractExportPortfolioServlet {
 	    throw new ImageGalleryException(error);
 	}
 
-	List<List<List<UserImageContributionDTO>>> exportImageList = service.exportBySessionId(toolSessionID, learner, true);
+	List<List<List<UserImageContributionDTO>>> exportImageList = service.exportBySessionId(toolSessionID, learner,
+		true);
 	saveFileToLocal(exportImageList, directoryName);
 
 	// Add flag to indicate whether to render user notebook entries
@@ -206,7 +207,7 @@ public class ExportServlet extends AbstractExportPortfolioServlet {
 	}
 
 	// put it into HTTPSession
-	sessionMap.put(ImageGalleryConstants.ATTR_IMAGE_GALLERY, content);	
+	sessionMap.put(ImageGalleryConstants.ATTR_IMAGE_GALLERY, content);
 	sessionMap.put(ImageGalleryConstants.ATTR_TITLE, content.getTitle());
 	sessionMap.put(ImageGalleryConstants.ATTR_INSTRUCTIONS, content.getInstructions());
 	sessionMap.put(ImageGalleryConstants.ATTR_EXPORT_IMAGE_LIST, exportImageList);
@@ -214,7 +215,7 @@ public class ExportServlet extends AbstractExportPortfolioServlet {
 
     /**
      * Create download links for every attachment.
-     * 
+     *
      * @param taskSummaries
      * @param directoryName
      * @throws IOException
@@ -241,8 +242,8 @@ public class ExportServlet extends AbstractExportPortfolioServlet {
 			}
 			image.setAttachmentLocalUrl(userName + "/" + idx + "/" + image.getMediumFileUuid() + '.'
 				+ FileUtil.getFileExtension(image.getFileName()));
-			handler.saveFile(image.getMediumFileUuid(), FileUtil.getFullPath(directoryName, image
-				.getAttachmentLocalUrl()));
+			handler.saveFile(image.getMediumFileUuid(),
+				FileUtil.getFullPath(directoryName, image.getAttachmentLocalUrl()));
 		    } catch (Exception e) {
 			logger.error("Export forum topic attachment failed: " + e.toString());
 		    }
@@ -253,11 +254,11 @@ public class ExportServlet extends AbstractExportPortfolioServlet {
 	}
 
     }
-    
+
     private ImageGalleryToolContentHandler getToolContentHandler() {
 	if (handler == null) {
-	    WebApplicationContext wac = WebApplicationContextUtils.getRequiredWebApplicationContext(this
-		    .getServletContext());
+	    WebApplicationContext wac = WebApplicationContextUtils
+		    .getRequiredWebApplicationContext(this.getServletContext());
 	    handler = (ImageGalleryToolContentHandler) wac.getBean(ImageGalleryConstants.TOOL_CONTENT_HANDLER_NAME);
 	}
 	return handler;
@@ -266,8 +267,8 @@ public class ExportServlet extends AbstractExportPortfolioServlet {
     private ReflectDTO getReflectionEntry(ImageGalleryUser imageGalleryUser) {
 	ReflectDTO reflectDTO = new ReflectDTO(imageGalleryUser);
 	NotebookEntry notebookEntry = service.getEntry(imageGalleryUser.getSession().getSessionId(),
-		CoreNotebookConstants.NOTEBOOK_TOOL, ImageGalleryConstants.TOOL_SIGNATURE, imageGalleryUser.getUserId()
-			.intValue());
+		CoreNotebookConstants.NOTEBOOK_TOOL, ImageGalleryConstants.TOOL_SIGNATURE,
+		imageGalleryUser.getUserId().intValue());
 
 	// check notebookEntry is not null
 	if (notebookEntry != null) {

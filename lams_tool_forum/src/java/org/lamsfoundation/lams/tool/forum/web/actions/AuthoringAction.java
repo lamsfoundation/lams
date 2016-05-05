@@ -2,21 +2,21 @@
  * Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
  * =============================================================
  * License Information: http://lamsfoundation.org/licensing/lams/2.0/
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License version 2.0 
+ * it under the terms of the GNU General Public License version 2.0
  * as published by the Free Software Foundation.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301
  * USA
- * 
+ *
  * http://www.gnu.org/licenses/gpl.txt
  * ****************************************************************
  */
@@ -54,9 +54,7 @@ import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.apache.struts.action.ActionMessage;
 import org.apache.struts.action.ActionMessages;
-import org.apache.struts.upload.FormFile;
 import org.lamsfoundation.lams.authoring.web.AuthoringConstants;
-import org.lamsfoundation.lams.contentrepository.client.IToolContentHandler;
 import org.lamsfoundation.lams.learningdesign.TextSearchConditionComparator;
 import org.lamsfoundation.lams.tool.ToolAccessMode;
 import org.lamsfoundation.lams.tool.forum.dto.MessageDTO;
@@ -76,7 +74,6 @@ import org.lamsfoundation.lams.tool.forum.web.forms.ForumForm;
 import org.lamsfoundation.lams.tool.forum.web.forms.ForumPedagogicalPlannerForm;
 import org.lamsfoundation.lams.tool.forum.web.forms.MessageForm;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
-import org.lamsfoundation.lams.util.FileValidatorUtil;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
@@ -152,7 +149,7 @@ public class AuthoringAction extends Action {
 	}
 	if (param.equals("downTopic")) {
 	    return downTopic(mapping, form, request, response);
-	}	
+	}
 	if (param.equals("initPedagogicalPlannerForm")) {
 	    return initPedagogicalPlannerForm(mapping, form, request, response);
 	}
@@ -173,7 +170,7 @@ public class AuthoringAction extends Action {
     /**
      * This page will display initial submit tool content. Or just a blank page if the toolContentID does not exist
      * before.
-     * 
+     *
      * @see org.apache.struts.actions.DispatchAction#unspecified(org.apache.struts.action.ActionMapping,
      *      org.apache.struts.action.ActionForm, javax.servlet.http.HttpServletRequest,
      *      javax.servlet.http.HttpServletResponse)
@@ -242,7 +239,7 @@ public class AuthoringAction extends Action {
 
 	    // tear down PO to normal object using clone() method
 	    forumForm.setForum((Forum) forum.clone());
-	    
+
 	    sessionMap.put(ForumConstants.AUTHORING_FORUM, forum);
 	} catch (Exception e) {
 	    AuthoringAction.log.error(e);
@@ -276,18 +273,19 @@ public class AuthoringAction extends Action {
      * <li>Topics' attachment file</li>
      * <li>Author user information</li>
      * </ol>
-     * 
+     *
      * @param mapping
      * @param form
      * @param request
      * @param response
      * @return
-     * @throws NoSuchMethodException 
-     * @throws InvocationTargetException 
-     * @throws IllegalAccessException 
+     * @throws NoSuchMethodException
+     * @throws InvocationTargetException
+     * @throws IllegalAccessException
      */
     public ActionForward updateContent(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws IllegalAccessException, InvocationTargetException, NoSuchMethodException {
+	    HttpServletResponse response)
+	    throws IllegalAccessException, InvocationTargetException, NoSuchMethodException {
 
 	ToolAccessMode mode = getAccessMode(request);
 	ForumForm forumForm = (ForumForm) form;
@@ -307,78 +305,78 @@ public class AuthoringAction extends Action {
 	// get back tool content ID
 	forum.setContentId(forumForm.getToolContentID());
 
-	    forumService = getForumManager();
+	forumService = getForumManager();
 
-	    // *******************************Handle user*******************
-	    String contentFolderID = (String) sessionMap.get(AttributeNames.PARAM_CONTENT_FOLDER_ID);
-	    ForumUser forumUser = null;
-	    // check whether it is sysadmin:LDEV-906
-	    if (!StringUtils.equals(contentFolderID, "-1")) {
-		// try to get form system session
-		HttpSession ss = SessionManager.getSession();
-		// get back login user DTO
-		UserDTO user = (UserDTO) ss.getAttribute(AttributeNames.USER);
-		forumUser = forumService.getUserByID(new Long(user.getUserID().intValue()));
-		if (forumUser == null) {
-		    forumUser = new ForumUser(user, null);
-		    forumService.createUser(forumUser);
-		}
+	// *******************************Handle user*******************
+	String contentFolderID = (String) sessionMap.get(AttributeNames.PARAM_CONTENT_FOLDER_ID);
+	ForumUser forumUser = null;
+	// check whether it is sysadmin:LDEV-906
+	if (!StringUtils.equals(contentFolderID, "-1")) {
+	    // try to get form system session
+	    HttpSession ss = SessionManager.getSession();
+	    // get back login user DTO
+	    UserDTO user = (UserDTO) ss.getAttribute(AttributeNames.USER);
+	    forumUser = forumService.getUserByID(new Long(user.getUserID().intValue()));
+	    if (forumUser == null) {
+		forumUser = new ForumUser(user, null);
+		forumService.createUser(forumUser);
 	    }
-	    // **********************************Get Forum PO*********************
-	    Forum forumPO = forumService.getForumByContentId(forumForm.getToolContentID());
-	    if (forumPO == null) {
-		// new Forum, create it.
-		forumPO = forum;
-		forumPO.setContentId(forumForm.getToolContentID());
+	}
+	// **********************************Get Forum PO*********************
+	Forum forumPO = forumService.getForumByContentId(forumForm.getToolContentID());
+	if (forumPO == null) {
+	    // new Forum, create it.
+	    forumPO = forum;
+	    forumPO.setContentId(forumForm.getToolContentID());
+	} else {
+	    if (mode.isAuthor()) {
+		Long uid = forumPO.getUid();
+		PropertyUtils.copyProperties(forumPO, forum);
+		// get back UID
+		forumPO.setUid(uid);
 	    } else {
-		if (mode.isAuthor()) {
-		    Long uid = forumPO.getUid();
-		    PropertyUtils.copyProperties(forumPO, forum);
-		    // get back UID
-		    forumPO.setUid(uid);
-		} else {
-		    // if it is Teacher, then just update basic tab content (definelater)
-		    forumPO.setInstructions(forum.getInstructions());
-		    forumPO.setTitle(forum.getTitle());
-		    // change define later status
-		    forumPO.setDefineLater(false);
-		}
+		// if it is Teacher, then just update basic tab content (definelater)
+		forumPO.setInstructions(forum.getInstructions());
+		forumPO.setTitle(forum.getTitle());
+		// change define later status
+		forumPO.setDefineLater(false);
 	    }
-	    forumPO.setCreatedBy(forumUser);
+	}
+	forumPO.setCreatedBy(forumUser);
 
-	    // copy back
-	    forum = forumService.updateForum(forumPO);
-	    
-	    // delete message attachment
-	    List topicDeleteAttachmentList = getTopicDeletedAttachmentList(sessionMap);
-	    Iterator iter = topicDeleteAttachmentList.iterator();
-	    while (iter.hasNext()) {
-		Attachment delAtt = (Attachment) iter.next();
-		iter.remove();
-	    }	    
+	// copy back
+	forum = forumService.updateForum(forumPO);
 
-	    // **************************** Handle topic *********************
-	    Set<MessageDTO> topics = getTopics(sessionMap);
-	    iter = topics.iterator();
-	    while (iter.hasNext()) {
-		MessageDTO dto = (MessageDTO) iter.next();
-		if (dto.getMessage() != null) {
-		    // This flushes user UID info to message if this user is a new user.
-		    dto.getMessage().setCreatedBy(forumUser);
-		    dto.getMessage().setModifiedBy(forumUser);
-		    forumService.createRootTopic(forum.getUid(), null, dto.getMessage());
-		}
+	// delete message attachment
+	List topicDeleteAttachmentList = getTopicDeletedAttachmentList(sessionMap);
+	Iterator iter = topicDeleteAttachmentList.iterator();
+	while (iter.hasNext()) {
+	    Attachment delAtt = (Attachment) iter.next();
+	    iter.remove();
+	}
+
+	// **************************** Handle topic *********************
+	Set<MessageDTO> topics = getTopics(sessionMap);
+	iter = topics.iterator();
+	while (iter.hasNext()) {
+	    MessageDTO dto = (MessageDTO) iter.next();
+	    if (dto.getMessage() != null) {
+		// This flushes user UID info to message if this user is a new user.
+		dto.getMessage().setCreatedBy(forumUser);
+		dto.getMessage().setModifiedBy(forumUser);
+		forumService.createRootTopic(forum.getUid(), null, dto.getMessage());
 	    }
-	    // delete them from database.
-	    List delTopics = getDeletedTopicList(sessionMap);
-	    iter = delTopics.iterator();
-	    while (iter.hasNext()) {
-		MessageDTO dto = (MessageDTO) iter.next();
-		iter.remove();
-		if (dto.getMessage() != null && dto.getMessage().getUid() != null) {
-		    forumService.deleteTopic(dto.getMessage().getUid());
-		}
+	}
+	// delete them from database.
+	List delTopics = getDeletedTopicList(sessionMap);
+	iter = delTopics.iterator();
+	while (iter.hasNext()) {
+	    MessageDTO dto = (MessageDTO) iter.next();
+	    iter.remove();
+	    if (dto.getMessage() != null && dto.getMessage().getUid() != null) {
+		forumService.deleteTopic(dto.getMessage().getUid());
 	    }
+	}
 
 	// ******************************** Handle conditions ****************
 	Set<ForumCondition> conditions = getForumConditionSet(sessionMap);
@@ -407,7 +405,7 @@ public class AuthoringAction extends Action {
 	    ForumCondition condition = (ForumCondition) iter.next();
 	    iter.remove();
 	    forumService.deleteCondition(condition);
-	}	
+	}
 
 	forum = forumService.updateForum(forum);
 
@@ -425,7 +423,7 @@ public class AuthoringAction extends Action {
     /**
      * Display emtpy topic page for user input topic information. This page will contain all topics list which this
      * author posted before.
-     * 
+     *
      * @param mapping
      * @param form
      * @param request
@@ -442,7 +440,7 @@ public class AuthoringAction extends Action {
 
     /**
      * Create a topic in memory. This topic will be saved when user save entire authoring page.
-     * 
+     *
      * @param mapping
      * @param form
      * @param request
@@ -471,7 +469,7 @@ public class AuthoringAction extends Action {
 	message.setCreated(new Date());
 	message.setUpdated(new Date());
 	message.setLastReplyDate(new Date());
-	
+
 	int maxSeq = 1;
 	if (topics.size() > 0) {
 	    MessageDTO last = (MessageDTO) topics.last();
@@ -502,7 +500,7 @@ public class AuthoringAction extends Action {
 	    attSet.add(att);
 	}
 	message.setAttachments(attSet);
-	
+
 	// create clones of this topic (appropriate only for editing in monitoring)
 	Forum forum = (Forum) sessionMap.get(ForumConstants.AUTHORING_FORUM);
 	if (forum != null) {
@@ -512,7 +510,7 @@ public class AuthoringAction extends Action {
 		newMsg.setToolSession(toolSession);
 		newMsg.setAttachments(new TreeSet());
 		newMsg.setModifiedBy(null);
-		newMsg.setCreatedBy(null);		
+		newMsg.setCreatedBy(null);
 		message.getSessionClones().add(newMsg);
 	    }
 	}
@@ -525,7 +523,7 @@ public class AuthoringAction extends Action {
     /**
      * Delete a topic form current topic list. But database record will be deleted only when user save whole authoring
      * page.
-     * 
+     *
      * @param mapping
      * @param form
      * @param request
@@ -570,7 +568,7 @@ public class AuthoringAction extends Action {
     /**
      * Display a HTML FORM which contains subject, body and attachment information from a special topic. This page is
      * ready for user update this topic.
-     * 
+     *
      * @param mapping
      * @param form
      * @param request
@@ -593,7 +591,7 @@ public class AuthoringAction extends Action {
 	if (topicIdx != -1) {
 	    Set topics = getTopics(sessionMap);
 	    List<MessageDTO> rList = new ArrayList<MessageDTO>(topics);
-	    MessageDTO topic = rList.get(topicIdx);	    
+	    MessageDTO topic = rList.get(topicIdx);
 	    if (topic != null) {
 		// update message to HTML Form to echo back to web page: for subject, body display
 		msgForm.setMessage(topic.getMessage());
@@ -609,7 +607,7 @@ public class AuthoringAction extends Action {
     /**
      * Submit user updated inforamion in a topic to memory. This update will be submit to database only when user save
      * whole authoring page.
-     * 
+     *
      * @param mapping
      * @param form
      * @param request
@@ -667,7 +665,7 @@ public class AuthoringAction extends Action {
 
     /**
      * Remove message attachment.
-     * 
+     *
      * @param mapping
      * @param form
      * @param request
@@ -679,10 +677,10 @@ public class AuthoringAction extends Action {
 	request.setAttribute("itemAttachment", null);
 	return mapping.findForward("success");
     }
-    
+
     /**
      * Move up current topic.
-     * 
+     *
      * @param mapping
      * @param form
      * @param request
@@ -696,7 +694,7 @@ public class AuthoringAction extends Action {
 
     /**
      * Move down current topic.
-     * 
+     *
      * @param mapping
      * @param form
      * @param request
@@ -717,10 +715,10 @@ public class AuthoringAction extends Action {
 	if (itemIdx != -1) {
 	    Set topics = getTopics(sessionMap);
 	    List<MessageDTO> rList = new ArrayList<MessageDTO>(topics);
-	    MessageDTO newMsg = rList.get(itemIdx);	    
-	    
+	    MessageDTO newMsg = rList.get(itemIdx);
+
 	    // get current and the target item, and switch their sequence
-	    MessageDTO item = (MessageDTO) rList.get(itemIdx);
+	    MessageDTO item = rList.get(itemIdx);
 	    MessageDTO repItem;
 	    if (up) {
 		repItem = rList.get(--itemIdx);
@@ -745,8 +743,8 @@ public class AuthoringAction extends Action {
     // ******************************************************************************************************************
     private IForumService getForumManager() {
 	if (forumService == null) {
-	    WebApplicationContext wac = WebApplicationContextUtils.getRequiredWebApplicationContext(getServlet()
-		    .getServletContext());
+	    WebApplicationContext wac = WebApplicationContextUtils
+		    .getRequiredWebApplicationContext(getServlet().getServletContext());
 	    forumService = (IForumService) wac.getBean(ForumConstants.FORUM_SERVICE);
 	}
 	return forumService;
@@ -764,7 +762,7 @@ public class AuthoringAction extends Action {
 	}
 	return topics;
     }
-    
+
     /**
      * @param request
      * @return
@@ -783,7 +781,7 @@ public class AuthoringAction extends Action {
 
     /**
      * Get <code>java.util.List</code> from HttpSession by given name.
-     * 
+     *
      * @param request
      * @param name
      * @return
@@ -799,7 +797,7 @@ public class AuthoringAction extends Action {
 
     /**
      * Get ToolAccessMode from HttpRequest parameters. Default value is AUTHOR mode.
-     * 
+     *
      * @param request
      * @return
      */
@@ -816,9 +814,10 @@ public class AuthoringAction extends Action {
 
     /**
      * Forum validation method from STRUCT interface.
-     * 
+     *
      */
-    public ActionMessages validate(ForumForm form, ActionMapping mapping, javax.servlet.http.HttpServletRequest request) {
+    public ActionMessages validate(ForumForm form, ActionMapping mapping,
+	    javax.servlet.http.HttpServletRequest request) {
 	ActionMessages errors = new ActionMessages();
 
 	SessionMap sessionMap = (SessionMap) request.getSession().getAttribute(form.getSessionMapID());
@@ -880,7 +879,7 @@ public class AuthoringAction extends Action {
 
     /**
      * List containing Forum conditions.
-     * 
+     *
      * @param request
      * @return
      */
@@ -895,7 +894,7 @@ public class AuthoringAction extends Action {
 
     /**
      * Get the deleted condition list, which could be persisted or non-persisted items.
-     * 
+     *
      * @param request
      * @return
      */
@@ -932,7 +931,7 @@ public class AuthoringAction extends Action {
 	    List<Message> newTopics = new LinkedList<Message>();
 	    Set<Message> forumTopics = new TreeSet<Message>(new MessageComparator());
 	    for (Message existingMessage : forum.getMessages()) {
-		if (existingMessage.getIsAuthored() && existingMessage.getToolSession() == null){
+		if (existingMessage.getIsAuthored() && existingMessage.getToolSession() == null) {
 		    forumTopics.add(existingMessage);
 		}
 	    }
@@ -943,7 +942,7 @@ public class AuthoringAction extends Action {
 	    HttpSession ss = SessionManager.getSession();
 	    UserDTO user = (UserDTO) ss.getAttribute(AttributeNames.USER);
 	    ForumUser forumUser = getForumManager().getUserByID(new Long(user.getUserID().intValue()));
-	    
+
 	    do {
 		topic = plannerForm.getTopic(topicIndex);
 		subject = WebUtil.removeHTMLtags(topic);
@@ -991,7 +990,7 @@ public class AuthoringAction extends Action {
 		}
 		topicIndex++;
 	    } while (topic != null);
-	    
+
 	    while (forumTopicIterator.hasNext()) {
 		message = forumTopicIterator.next();
 		forumTopicIterator.remove();
@@ -1006,8 +1005,8 @@ public class AuthoringAction extends Action {
     }
 
     public ActionForward createPedagogicalPlannerTopic(ActionMapping mapping, ActionForm form,
-	    HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException,
-	    PersistenceException {
+	    HttpServletRequest request, HttpServletResponse response)
+	    throws IOException, ServletException, PersistenceException {
 	ForumPedagogicalPlannerForm plannerForm = (ForumPedagogicalPlannerForm) form;
 	plannerForm.setTopic(plannerForm.getTopicCount().intValue(), "");
 	return mapping.findForward("success");

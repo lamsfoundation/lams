@@ -18,27 +18,27 @@
  *
  * http://www.gnu.org/licenses/gpl.txt
  * ****************************************************************
- */ 
- 
-/* $Id$ */ 
-package org.lamsfoundation.lams.planner; 
+ */
+
+/* $Id$ */
+package org.lamsfoundation.lams.planner;
 
 import org.lamsfoundation.lams.usermanagement.Role;
 import org.lamsfoundation.lams.usermanagement.User;
 
 /**
  * @hibernate.class table="lams_planner_node_role"
- * 
+ *
  */
 public class PedagogicalPlannerNodeRole {
-    
+
     Long uid;
     PedagogicalPlannerSequenceNode node;
     User user;
     Role role;
-    
+
     public PedagogicalPlannerNodeRole() {
-	
+
     }
 
     public PedagogicalPlannerNodeRole(PedagogicalPlannerSequenceNode node, User user, Role role) {
@@ -47,16 +47,16 @@ public class PedagogicalPlannerNodeRole {
 	this.user = user;
 	this.role = role;
     }
-    
+
     /**
      * @hibernate.id column="uid" generator-class="native" type="java.lang.Long"
      */
     public Long getUid() {
-        return uid;
+	return uid;
     }
 
     public void setUid(Long uid) {
-        this.uid = uid;
+	this.uid = uid;
     }
 
     /**

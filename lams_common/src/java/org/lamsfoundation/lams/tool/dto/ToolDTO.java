@@ -85,11 +85,11 @@ public class ToolDTO {
     }
 
     public Long getDefaultToolContentId() {
-        return defaultToolContentId;
+	return defaultToolContentId;
     }
 
     public void setDefaultToolContentId(Long defaultToolContentId) {
-        this.defaultToolContentId = defaultToolContentId;
+	this.defaultToolContentId = defaultToolContentId;
     }
 
     public Long[] getChildToolIds() {

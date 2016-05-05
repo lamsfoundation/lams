@@ -34,46 +34,44 @@ class HMAC_SHA1 extends OAuthSignatureMethod {
 
     @Override
     protected String getSignature(String baseString) throws OAuthException {
-        try {
-            String signature = base64Encode(computeSignature(baseString));
-            return signature;
-        } catch (GeneralSecurityException e) {
-            throw new OAuthException(e);
-        } catch (UnsupportedEncodingException e) {
-            throw new OAuthException(e);
-        }
+	try {
+	    String signature = OAuthSignatureMethod.base64Encode(computeSignature(baseString));
+	    return signature;
+	} catch (GeneralSecurityException e) {
+	    throw new OAuthException(e);
+	} catch (UnsupportedEncodingException e) {
+	    throw new OAuthException(e);
+	}
     }
 
     @Override
-    protected boolean isValid(String signature, String baseString)
-    throws OAuthException {
-        try {
-            byte[] expected = computeSignature(baseString);
-            byte[] actual = decodeBase64(signature);
-            return Arrays.equals(expected, actual);
-        } catch (GeneralSecurityException e) {
-            throw new OAuthException(e);
-        } catch (UnsupportedEncodingException e) {
-            throw new OAuthException(e);
-        }
+    protected boolean isValid(String signature, String baseString) throws OAuthException {
+	try {
+	    byte[] expected = computeSignature(baseString);
+	    byte[] actual = OAuthSignatureMethod.decodeBase64(signature);
+	    return Arrays.equals(expected, actual);
+	} catch (GeneralSecurityException e) {
+	    throw new OAuthException(e);
+	} catch (UnsupportedEncodingException e) {
+	    throw new OAuthException(e);
+	}
     }
 
-    private byte[] computeSignature(String baseString)
-            throws GeneralSecurityException, UnsupportedEncodingException {
-        SecretKey key = null;
-        synchronized (this) {
-            if (this.key == null) {
-                String keyString = OAuth.percentEncode(getConsumerSecret())
-                        + '&' + OAuth.percentEncode(getTokenSecret());
-                byte[] keyBytes = keyString.getBytes(ENCODING);
-                this.key = new SecretKeySpec(keyBytes, MAC_NAME);
-            }
-            key = this.key;
-        }
-        Mac mac = Mac.getInstance(MAC_NAME);
-        mac.init(key);
-        byte[] text = baseString.getBytes(ENCODING);
-        return mac.doFinal(text);
+    private byte[] computeSignature(String baseString) throws GeneralSecurityException, UnsupportedEncodingException {
+	SecretKey key = null;
+	synchronized (this) {
+	    if (this.key == null) {
+		String keyString = OAuth.percentEncode(getConsumerSecret()) + '&'
+			+ OAuth.percentEncode(getTokenSecret());
+		byte[] keyBytes = keyString.getBytes(ENCODING);
+		this.key = new SecretKeySpec(keyBytes, MAC_NAME);
+	    }
+	    key = this.key;
+	}
+	Mac mac = Mac.getInstance(MAC_NAME);
+	mac.init(key);
+	byte[] text = baseString.getBytes(ENCODING);
+	return mac.doFinal(text);
     }
 
     /** ISO-8859-1 or US-ASCII would work, too. */
@@ -85,18 +83,18 @@ class HMAC_SHA1 extends OAuthSignatureMethod {
 
     @Override
     public void setConsumerSecret(String consumerSecret) {
-        synchronized (this) {
-            key = null;
-        }
-        super.setConsumerSecret(consumerSecret);
+	synchronized (this) {
+	    key = null;
+	}
+	super.setConsumerSecret(consumerSecret);
     }
 
     @Override
     public void setTokenSecret(String tokenSecret) {
-        synchronized (this) {
-            key = null;
-        }
-        super.setTokenSecret(tokenSecret);
+	synchronized (this) {
+	    key = null;
+	}
+	super.setTokenSecret(tokenSecret);
     }
 
 }

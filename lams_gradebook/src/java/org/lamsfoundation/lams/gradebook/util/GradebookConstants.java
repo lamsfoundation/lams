@@ -18,21 +18,21 @@
  *
  * http://www.gnu.org/licenses/gpl.txt
  * ****************************************************************
- */ 
- 
-/* $Id$ */ 
-package org.lamsfoundation.lams.gradebook.util; 
+ */
+
+/* $Id$ */
+package org.lamsfoundation.lams.gradebook.util;
 
 /**
  * Constants for gradebook module
- * 
+ *
  * @author lfoxton
  *
  */
 public class GradebookConstants {
-    
+
     public static final String MODULE_NAME = "gradebook";
-    
+
     // Parameters
     public static final String PARAM_PAGE = "page";
     public static final String PARAM_ROWS = "rows";
@@ -56,22 +56,22 @@ public class GradebookConstants {
     public static final String PARAM_VIEW = "view";
     public static final String PARAM_START_DATE = "startDate";
     public static final String PARAM_GROUP_ID = "groupId";
-    
+
     // Sort
     public static final String SORT_DESC = "desc";
     public static final String SORT_ASC = "asc";
-    
+
     // Search
     public static final String SEARCH_EQUALS = "eq";
     public static final String SEARCH_NOT_EQUALS = "ne";
     public static final String SEARCH_BEGINS_WITH = "bw";
     public static final String SEARCH_ENDS_WITH = "ew";
     public static final String SEARCH_CONTAINS = "cn";
-    
+
     // Views
     public static final String VIEW_MON_ACTIVITY = "monActivityView";
     public static final String VIEW_MON_USER = "monUserView";
-    public static final String VIEW_MON_COURSE= "monCourse";
+    public static final String VIEW_MON_COURSE = "monCourse";
     public static final String VIEW_LRN_COURSE = "lrnCourse";
     public static final String VIEW_LRN_ACTIVITY = "lrnActivity";
     public static final String VIEW_LIST = "listView";
@@ -84,7 +84,7 @@ public class GradebookConstants {
     public static final String ELEMENT_ROW = "row";
     public static final String ELEMENT_ID = "id";
     public static final String ELEMENT_CELL = "cell";
-    
+
     // Misc
     public static final String CONTENT_TYPE_TEXTXML = "text/xml";
     public static final String CONTENT_TYPE_TEXTPLAIN = "text/plain";
@@ -92,4 +92,3 @@ public class GradebookConstants {
     public static final String UTF8 = "UTF8";
 
 }
- 

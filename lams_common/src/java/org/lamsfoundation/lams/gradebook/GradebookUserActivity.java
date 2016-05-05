@@ -30,9 +30,9 @@ import org.lamsfoundation.lams.usermanagement.User;
 
 /**
  * @author lfoxton
- * 
- * This class maps to one activity mark for a learner
- * 
+ *
+ *         This class maps to one activity mark for a learner
+ *
  * @hibernate.class table="lams_gradebook_user_activity"
  */
 public class GradebookUserActivity {
@@ -49,8 +49,8 @@ public class GradebookUserActivity {
 	markedInGradebook = false;
 	updateDate = new Date();
     }
-    
-    public GradebookUserActivity(ToolActivity activity, User learner){
+
+    public GradebookUserActivity(ToolActivity activity, User learner) {
 	this.activity = activity;
 	this.learner = learner;
 	markedInGradebook = false;
@@ -80,9 +80,9 @@ public class GradebookUserActivity {
 	this.activity = activity;
     }
 
-    /** 
+    /**
      * @hibernate.many-to-one not-null="true"
-     * @hibernate.column name="user_id"      
+     * @hibernate.column name="user_id"
      */
     public User getLearner() {
 	return learner;
@@ -107,24 +107,24 @@ public class GradebookUserActivity {
      * @hibernate.property column="feedback" length="65535"
      */
     public String getFeedback() {
-        return feedback;
+	return feedback;
     }
 
     public void setFeedback(String feedback) {
-        this.feedback = feedback;
+	this.feedback = feedback;
     }
 
     /**
      * @hibernate.property column="marked_in_gradebook" length="1"
      */
     public Boolean getMarkedInGradebook() {
-        return markedInGradebook;
+	return markedInGradebook;
     }
 
     public void setMarkedInGradebook(Boolean markedInGradebook) {
-        this.markedInGradebook = markedInGradebook;
+	this.markedInGradebook = markedInGradebook;
     }
-    
+
     /**
      * @hibernate.property column="update_date"
      * @return

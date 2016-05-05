@@ -2,21 +2,21 @@
  * Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
  * =============================================================
  * License Information: http://lamsfoundation.org/licensing/lams/2.0/
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301
  * USA
- * 
+ *
  * http://www.gnu.org/licenses/gpl.txt
  * ****************************************************************
  */
@@ -30,13 +30,13 @@ import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.commons.lang.builder.ToStringBuilder;
 
 /**
- * 
+ *
  * @author Ozgur Demirtas
- * 
- * The value object that maps to our model database table: tl_laqa11_que_content The relevant hibernate mapping
- * resides in: QaQueContent.hbm.xml
- * 
- * Holds question content within a particular content
+ *
+ *         The value object that maps to our model database table: tl_laqa11_que_content The relevant hibernate mapping
+ *         resides in: QaQueContent.hbm.xml
+ *
+ *         Holds question content within a particular content
  */
 public class QaQueContent implements Serializable, Comparable, Nullable {
 
@@ -54,9 +54,9 @@ public class QaQueContent implements Serializable, Comparable, Nullable {
     private String feedback;
 
     private boolean required;
-    
+
     private int minWordsLimit;
-    
+
     /** nullable persistent field */
     private QaContent qaContent;
 
@@ -109,7 +109,7 @@ public class QaQueContent implements Serializable, Comparable, Nullable {
 
     /**
      * @param required
-     * Does this question have to be answered.
+     *            Does this question have to be answered.
      */
     public void setRequired(boolean required) {
 	this.required = required;
@@ -121,7 +121,7 @@ public class QaQueContent implements Serializable, Comparable, Nullable {
     public boolean isRequired() {
 	return required;
     }
-    
+
     /**
      * @param minWordsLimit
      *            minWordsLimit
@@ -139,12 +139,11 @@ public class QaQueContent implements Serializable, Comparable, Nullable {
 
     /**
      * @param displayOrder
-     *                The displayOrder to set.
+     *            The displayOrder to set.
      */
     public void setDisplayOrder(int displayOrder) {
 	this.displayOrder = displayOrder;
     }
-
 
     /**
      * @return Returns the qaContent.
@@ -155,7 +154,7 @@ public class QaQueContent implements Serializable, Comparable, Nullable {
 
     /**
      * @param qaContent
-     *                The qaContent to set.
+     *            The qaContent to set.
      */
     public void setQaContent(org.lamsfoundation.lams.tool.qa.QaContent qaContent) {
 	this.qaContent = qaContent;
@@ -170,16 +169,18 @@ public class QaQueContent implements Serializable, Comparable, Nullable {
 
     /**
      * @param question
-     *                The question to set.
+     *            The question to set.
      */
     public void setQuestion(String question) {
 	this.question = question;
     }
 
+    @Override
     public boolean isNull() {
 	return false;
     }
 
+    @Override
     public int compareTo(Object o) {
 	//QaQueContent queContent = (QaQueContent) o;
 
@@ -199,7 +200,7 @@ public class QaQueContent implements Serializable, Comparable, Nullable {
 
     /**
      * @param uid
-     *                The uid to set.
+     *            The uid to set.
      */
     public void setUid(Long uid) {
 	this.uid = uid;
@@ -214,7 +215,7 @@ public class QaQueContent implements Serializable, Comparable, Nullable {
 
     /**
      * @param feedback
-     *                The feedback to set.
+     *            The feedback to set.
      */
     public void setFeedback(String feedback) {
 	this.feedback = feedback;

@@ -2,21 +2,21 @@
  * Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
  * =============================================================
  * License Information: http://lamsfoundation.org/licensing/lams/2.0/
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License version 2.0 
+ * it under the terms of the GNU General Public License version 2.0
  * as published by the Free Software Foundation.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301
  * USA
- * 
+ *
  * http://www.gnu.org/licenses/gpl.txt
  * ****************************************************************
  */
@@ -37,7 +37,6 @@ import java.util.Set;
 import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
-import org.lamsfoundation.lams.gradebook.GradebookUserActivity;
 import org.lamsfoundation.lams.gradebook.service.IGradebookService;
 import org.lamsfoundation.lams.learning.progress.ProgressBuilder;
 import org.lamsfoundation.lams.learning.progress.ProgressEngine;
@@ -47,7 +46,6 @@ import org.lamsfoundation.lams.learning.web.bean.GateActivityDTO;
 import org.lamsfoundation.lams.learning.web.util.ActivityMapping;
 import org.lamsfoundation.lams.learning.web.util.LearningWebUtil;
 import org.lamsfoundation.lams.learningdesign.Activity;
-import org.lamsfoundation.lams.learningdesign.ActivityEvaluation;
 import org.lamsfoundation.lams.learningdesign.BranchActivityEntry;
 import org.lamsfoundation.lams.learningdesign.BranchCondition;
 import org.lamsfoundation.lams.learningdesign.BranchingActivity;
@@ -80,7 +78,6 @@ import org.lamsfoundation.lams.lesson.service.LessonServiceException;
 import org.lamsfoundation.lams.logevent.LogEvent;
 import org.lamsfoundation.lams.logevent.service.ILogEventService;
 import org.lamsfoundation.lams.tool.ToolOutput;
-import org.lamsfoundation.lams.tool.ToolOutputValue;
 import org.lamsfoundation.lams.tool.ToolSession;
 import org.lamsfoundation.lams.tool.exception.LamsToolServiceException;
 import org.lamsfoundation.lams.tool.exception.RequiredGroupMissingException;
@@ -93,7 +90,7 @@ import org.springframework.dao.DataIntegrityViolationException;
 
 /**
  * This class is a facade over the Learning middle tier.
- * 
+ *
  * @author chris, Jacky Fang
  */
 public class LearnerService implements ICoreLearnerService {
@@ -237,7 +234,7 @@ public class LearnerService implements ICoreLearnerService {
     // ---------------------------------------------------------------------
     /**
      * Delegate to lesson dao to load up the lessons.
-     * 
+     *
      * @see org.lamsfoundation.lams.learning.service.ICoreLearnerService#getActiveLessonsFor(org.lamsfoundation.lams.usermanagement.User)
      */
     @Override
@@ -272,18 +269,18 @@ public class LearnerService implements ICoreLearnerService {
      * <p>
      * Joins a User to a lesson as a learner. It could either be a new lesson or a lesson that has been started.
      * </p>
-     * 
+     *
      * <p>
      * In terms of new lesson, a new learner progress would be initialized. Tool session for the next activity will be
      * initialized if necessary.
      * </p>
-     * 
+     *
      * <p>
      * In terms of an started lesson, the learner progress will be returned without calculation. Tool session will be
      * initialized if necessary. Note that we won't initialize tool session for current activity because we assume tool
      * session will always initialize before it becomes a current activity. </p
-     * 
-     * 
+     *
+     *
      * @param learnerId
      *            the Learner's userID
      * @param lessionID
@@ -366,10 +363,10 @@ public class LearnerService implements ICoreLearnerService {
      * activities get the won't be grouped properly (See LDEV-1774). We could get the child tool activities for a
      * parallel activity but that could create a bug in the future - if we ever put sequences inside parallel activities
      * then we are stuck again!
-     * 
+     *
      * We look up the database to check up the existence of correspondent tool session. If the tool session doesn't
      * exist, we create a new tool session instance.
-     * 
+     *
      * @param learnerProgress
      *            the learner progress we are processing.
      * @throws LamsToolServiceException
@@ -392,7 +389,7 @@ public class LearnerService implements ICoreLearnerService {
 
     /**
      * Returns the current progress data of the User.
-     * 
+     *
      * @param learnerId
      *            the Learner's userID
      * @param lessonId
@@ -553,7 +550,7 @@ public class LearnerService implements ICoreLearnerService {
 
     /**
      * Calculates learner progress and returns the data required to be displayed to the learner.
-     * 
+     *
      * @param completedActivity
      *            the activity just completed
      * @param learner
@@ -623,7 +620,7 @@ public class LearnerService implements ICoreLearnerService {
      * Complete the activity in the progress engine and delegate to the progress engine to calculate the next activity
      * in the learning design. It is currently triggered by various progress engine related action classes, which then
      * calculate the url to go to next, based on the ActivityMapping class.
-     * 
+     *
      * @param learnerId
      *            the learner who are running this activity in the design.
      * @param activity
@@ -689,7 +686,7 @@ public class LearnerService implements ICoreLearnerService {
 
     /**
      * Exit a lesson.
-     * 
+     *
      * @see org.lamsfoundation.lams.learning.service.ICoreLearnerService#exitLesson(org.lamsfoundation.lams.lesson.LearnerProgress)
      */
     @Override
@@ -972,9 +969,9 @@ public class LearnerService implements ICoreLearnerService {
      * member in the group. If the unique_check is broken, we need to query the database to get the instance instead of
      * inserting it. It should be done in the Spring rollback strategy.
      * </p>
-     * 
+     *
      * Once lams tool session is inserted, we need to notify the tool to its own session.
-     * 
+     *
      * @param toolActivity
      * @param learner
      * @throws LamsToolServiceException
@@ -998,7 +995,7 @@ public class LearnerService implements ICoreLearnerService {
 
     /**
      * Create an array of lesson dto based a list of lessons.
-     * 
+     *
      * @param lessons
      *            the list of lessons.
      * @return the lesson dto array.
@@ -1173,7 +1170,7 @@ public class LearnerService implements ICoreLearnerService {
 
     /**
      * Checks if any of the conditions that open the gate is met.
-     * 
+     *
      * @param gate
      *            gate to check
      * @param learner
@@ -1231,7 +1228,7 @@ public class LearnerService implements ICoreLearnerService {
 
     /**
      * Select a particular branch - we are in preview mode and the author has selected a particular activity.
-     * 
+     *
      * @throws LearnerServiceException
      * @see org.lamsfoundation.lams.learning.service.ICoreLearnerService#determineBranch(org.lamsfoundation.lams.lesson.Lesson,
      *      org.lamsfoundation.lams.learningdesign.BranchingActivity, java.lang.Integer)

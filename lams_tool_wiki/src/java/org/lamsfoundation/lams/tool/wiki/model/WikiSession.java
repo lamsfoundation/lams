@@ -2,21 +2,21 @@
  * Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
  * =============================================================
  * License Information: http://lamsfoundation.org/licensing/lams/2.0/
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301
  * USA
- * 
+ *
  * http://www.gnu.org/licenses/gpl.txt
  * ****************************************************************
  */
@@ -31,9 +31,9 @@ import java.util.Set;
 import org.apache.log4j.Logger;
 
 /**
- * 
+ *
  * Represents the tool session.
- * 
+ *
  * @hibernate.class table="tl_lawiki10_session"
  */
 
@@ -41,7 +41,7 @@ public class WikiSession implements java.io.Serializable {
 
     private static Logger log = Logger.getLogger(WikiSession.class);
     /**
-     * 
+     *
      */
     private static final long serialVersionUID = 7762187772612318324L;
 
@@ -63,7 +63,7 @@ public class WikiSession implements java.io.Serializable {
     private Set<WikiUser> wikiUsers;
 
     private Set<WikiPage> wikiPages; // Need a runtime copy for each wikiPage
-    
+
     private WikiPage mainPage; //Need a runtime reference to the main page
 
     // Constructors
@@ -88,7 +88,7 @@ public class WikiSession implements java.io.Serializable {
     // Property accessors
     /**
      * @hibernate.id generator-class="native" type="java.lang.Long" column="uid"
-     * 
+     *
      */
 
     public Long getUid() {
@@ -101,7 +101,7 @@ public class WikiSession implements java.io.Serializable {
 
     /**
      * @hibernate.property column="session_end_date"
-     * 
+     *
      */
 
     public Date getSessionEndDate() {
@@ -114,7 +114,7 @@ public class WikiSession implements java.io.Serializable {
 
     /**
      * @hibernate.property column="session_start_date"
-     * 
+     *
      */
 
     public Date getSessionStartDate() {
@@ -127,7 +127,7 @@ public class WikiSession implements java.io.Serializable {
 
     /**
      * @hibernate.property column="status" length="11"
-     * 
+     *
      */
 
     public Integer getStatus() {
@@ -140,7 +140,7 @@ public class WikiSession implements java.io.Serializable {
 
     /**
      * @hibernate.property column="session_id" length="20"
-     * 
+     *
      */
 
     public Long getSessionId() {
@@ -153,7 +153,7 @@ public class WikiSession implements java.io.Serializable {
 
     /**
      * @hibernate.property column="session_name" length="250"
-     * 
+     *
      */
 
     public String getSessionName() {
@@ -167,7 +167,7 @@ public class WikiSession implements java.io.Serializable {
     /**
      * @hibernate.many-to-one not-null="true"
      * @hibernate.column name="wiki_uid"
-     * 
+     *
      */
 
     public Wiki getWiki() {
@@ -182,7 +182,7 @@ public class WikiSession implements java.io.Serializable {
      * @hibernate.set lazy="true" inverse="true" cascade="none"
      * @hibernate.collection-key column="wiki_session_uid"
      * @hibernate.collection-one-to-many class="org.lamsfoundation.lams.tool.wiki.model.WikiUser"
-     * 
+     *
      */
 
     public Set<WikiUser> getWikiUsers() {
@@ -198,7 +198,7 @@ public class WikiSession implements java.io.Serializable {
      *                asc"
      * @hibernate.collection-key column="wiki_session_uid"
      * @hibernate.collection-one-to-many class="org.lamsfoundation.lams.tool.wiki.model.WikiPage"
-     * 
+     *
      */
     public Set<WikiPage> getWikiPages() {
 	return wikiPages;
@@ -207,11 +207,11 @@ public class WikiSession implements java.io.Serializable {
     public void setWikiPages(Set<WikiPage> wikiPages) {
 	this.wikiPages = wikiPages;
     }
-    
+
     /**
      * @hibernate.many-to-one not-null="true"
      * @hibernate.column name="wiki_main_page_uid"
-     * 
+     *
      */
     public WikiPage getMainPage() {
 	return mainPage;
@@ -223,9 +223,10 @@ public class WikiSession implements java.io.Serializable {
 
     /**
      * toString
-     * 
+     *
      * @return String
      */
+    @Override
     public String toString() {
 	StringBuffer buffer = new StringBuffer();
 
@@ -240,25 +241,31 @@ public class WikiSession implements java.io.Serializable {
 	return buffer.toString();
     }
 
+    @Override
     public boolean equals(Object other) {
-	if ((this == other))
+	if ((this == other)) {
 	    return true;
-	if ((other == null))
+	}
+	if ((other == null)) {
 	    return false;
-	if (!(other instanceof WikiSession))
+	}
+	if (!(other instanceof WikiSession)) {
 	    return false;
+	}
 	WikiSession castOther = (WikiSession) other;
 
-	return ((this.getUid() == castOther.getUid()) || (this.getUid() != null && castOther.getUid() != null && this
-		.getUid().equals(castOther.getUid())));
+	return ((this.getUid() == castOther.getUid())
+		|| (this.getUid() != null && castOther.getUid() != null && this.getUid().equals(castOther.getUid())));
     }
 
+    @Override
     public int hashCode() {
 	int result = 17;
 	result = 37 * result + (getUid() == null ? 0 : this.getUid().hashCode());
 	return result;
     }
 
+    @Override
     public Object clone() {
 
 	WikiSession session = null;

@@ -2,21 +2,21 @@
  * Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
  * =============================================================
  * License Information: http://lamsfoundation.org/licensing/lams/2.0/
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301
  * USA
- * 
+ *
  * http://www.gnu.org/licenses/gpl.txt
  * ****************************************************************
  */
@@ -27,7 +27,7 @@ package org.eucm.lams.tool.eadventure.ims;
  * A ContentPackageConverter converts an IMS Content Package into the
  * data needed for our tool. The only implementation initially done was
  * SimpleContentPackageCoverter.
- * 
+ *
  * The creation method of the converter (which is unique to each converter)
  * will need to parse the package and have the data ready for the "get"
  * calls.
@@ -36,7 +36,7 @@ package org.eucm.lams.tool.eadventure.ims;
  * not singletons. This allows them to have instance data.
  */
 public interface IContentPackageConverter {
-    
+
     /**
      * @return Returns the defaultItem.
      */

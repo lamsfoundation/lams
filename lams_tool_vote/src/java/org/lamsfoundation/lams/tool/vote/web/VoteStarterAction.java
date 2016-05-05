@@ -2,21 +2,21 @@
  * Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
  * =============================================================
  * License Information: http://lamsfoundation.org/licensing/lams/2.0/
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License version 2.0
  * as published by the Free Software Foundation.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301
  * USA
- * 
+ *
  * http://www.gnu.org/licenses/gpl.txt
  * ***********************************************************************/
 package org.lamsfoundation.lams.tool.vote.web;
@@ -59,7 +59,7 @@ import org.lamsfoundation.lams.web.util.SessionMap;
 /**
  * VoteStarterAction loads the default content and initializes the presentation Map. Initializes the tool's authoring
  * mode Requests can come either from authoring environment or from the monitoring environment for Edit Activity screen.
- * 
+ *
  * @author Ozgur Demirtas
  */
 public class VoteStarterAction extends Action implements VoteAppConstants {
@@ -106,7 +106,7 @@ public class VoteStarterAction extends Action implements VoteAppConstants {
 	if (validateSignature != null) {
 	    return validateSignature;
 	}
-	    
+
 	//no problems getting the default content, will render authoring screen
 
 	/* the authoring url must be passed a tool content id */
@@ -120,7 +120,7 @@ public class VoteStarterAction extends Action implements VoteAppConstants {
 	    VoteUtils.cleanUpUserExceptions(request);
 	    return mapping.findForward(VoteAppConstants.ERROR_LIST);
 	}
-	
+
 	ToolAccessMode mode = getAccessMode(request);
 	// request is from monitoring module
 	if (mode.isTeacher()) {
@@ -129,7 +129,7 @@ public class VoteStarterAction extends Action implements VoteAppConstants {
 	request.setAttribute(AttributeNames.ATTR_MODE, mode.toString());
 
 	VoteContent voteContent = voteService.getVoteContent(new Long(strToolContentId));
-	
+
 	// if mcContent does not exist, try to use default content instead.
 	if (voteContent == null) {
 	    long defaultContentID = voteService.getToolDefaultContentIdBySignature(VoteAppConstants.MY_SIGNATURE);
@@ -177,7 +177,7 @@ public class VoteStarterAction extends Action implements VoteAppConstants {
 
 	List<VoteQuestionDTO> questionDTOs = new LinkedList<VoteQuestionDTO>();
 
-	for (VoteQueContent question : (Set<VoteQueContent>)voteContent.getVoteQueContents()) {
+	for (VoteQueContent question : (Set<VoteQueContent>) voteContent.getVoteQueContents()) {
 	    VoteQuestionDTO questionDTO = new VoteQuestionDTO();
 
 	    questionDTO.setUid(question.getUid());
@@ -195,7 +195,7 @@ public class VoteStarterAction extends Action implements VoteAppConstants {
 	}
 	voteAuthoringForm.setMaxInputs(maxInputs);
 	voteAuthoringForm.resetUserAction();
-	
+
 	List<VoteQuestionDTO> listDeletedQuestionDTOs = new ArrayList<VoteQuestionDTO>();
 	sessionMap.put(VoteAppConstants.LIST_DELETED_QUESTION_DTOS, listDeletedQuestionDTOs);
 
@@ -209,13 +209,13 @@ public class VoteStarterAction extends Action implements VoteAppConstants {
      * each tool has a signature. Voting tool's signature is stored in MY_SIGNATURE. The default tool content id and
      * other depending content ids are obtained in this method. if all the default content has been setup properly the
      * method saves DEFAULT_CONTENT_ID in the session.
-     * 
+     *
      * @param request
      * @param mapping
      * @return ActionForward
      */
-    private ActionForward validateDefaultContent(HttpServletRequest request, ActionMapping mapping, IVoteService voteService,
-	    VoteAuthoringForm voteAuthoringForm) {
+    private ActionForward validateDefaultContent(HttpServletRequest request, ActionMapping mapping,
+	    IVoteService voteService, VoteAuthoringForm voteAuthoringForm) {
 	/*
 	 * retrieve the default content id based on tool signature
 	 */
@@ -253,7 +253,7 @@ public class VoteStarterAction extends Action implements VoteAppConstants {
 
 	return null;
     }
-    
+
     private static void prepareDTOandForm(HttpServletRequest request, VoteContent voteContent,
 	    VoteAuthoringForm voteAuthoringForm, VoteGeneralAuthoringDTO voteGeneralAuthoringDTO) {
 
@@ -275,21 +275,23 @@ public class VoteStarterAction extends Action implements VoteAppConstants {
 	voteAuthoringForm.setReflect(voteContent.isReflect() ? "1" : "0");
 
 	String maxNomcount = voteContent.getMaxNominationCount();
-	if (maxNomcount.equals(""))
+	if (maxNomcount.equals("")) {
 	    maxNomcount = "0";
+	}
 	voteAuthoringForm.setMaxNominationCount(maxNomcount);
 	voteGeneralAuthoringDTO.setMaxNominationCount(maxNomcount);
 
 	String minNomcount = voteContent.getMinNominationCount();
-	if ((minNomcount == null) || minNomcount.equals(""))
+	if ((minNomcount == null) || minNomcount.equals("")) {
 	    minNomcount = "0";
+	}
 	voteAuthoringForm.setMinNominationCount(minNomcount);
 	voteGeneralAuthoringDTO.setMinNominationCount(minNomcount);
     }
 
     /**
      * saves error messages to request scope
-     * 
+     *
      * @param request
      * @param message
      */
@@ -299,10 +301,10 @@ public class VoteStarterAction extends Action implements VoteAppConstants {
 	VoteStarterAction.logger.error("add " + message + "  to ActionMessages:");
 	saveErrors(request, errors);
     }
-    
+
     /**
      * Get ToolAccessMode from HttpRequest parameters. Default value is AUTHOR mode.
-     * 
+     *
      * @param request
      * @return
      */

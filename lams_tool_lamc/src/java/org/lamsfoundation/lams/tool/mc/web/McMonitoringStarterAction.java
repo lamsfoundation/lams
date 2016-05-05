@@ -2,21 +2,21 @@
  * Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
  * =============================================================
  * License Information: http://lamsfoundation.org/licensing/lams/2.0/
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License version 2.0
  * as published by the Free Software Foundation.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301
  * USA
- * 
+ *
  * http://www.gnu.org/licenses/gpl.txt
  * ***********************************************************************/
 
@@ -53,13 +53,14 @@ import org.lamsfoundation.lams.web.util.SessionMap;
 
 /**
  * Starts up the monitoring module
- * 
+ *
  * @author Ozgur Demirtas
  */
 public class McMonitoringStarterAction extends Action implements McAppConstants {
     private static Logger logger = Logger.getLogger(McMonitoringStarterAction.class.getName());
     private static IMcService service;
 
+    @Override
     public ActionForward execute(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) throws IOException, ServletException, McApplicationException {
 	initializeMcService();
@@ -94,7 +95,7 @@ public class McMonitoringStarterAction extends Action implements McAppConstants 
 	 */
 	List<McQuestionDTO> listQuestionContentDTO = new LinkedList<McQuestionDTO>();
 	Long mapIndex = new Long(1);
-	for (McQueContent question : (Set<McQueContent>)mcContent.getMcQueContents()) {
+	for (McQueContent question : (Set<McQueContent>) mcContent.getMcQueContents()) {
 	    McQuestionDTO mcContentDTO = new McQuestionDTO();
 
 	    if (question != null) {
@@ -131,7 +132,7 @@ public class McMonitoringStarterAction extends Action implements McAppConstants 
 	mcGeneralAuthoringDTO.setActivityTitle(mcGeneralMonitoringDTO.getActivityTitle());
 	mcGeneralAuthoringDTO.setActivityInstructions(mcGeneralMonitoringDTO.getActivityInstructions());
 	request.setAttribute(MC_GENERAL_AUTHORING_DTO, mcGeneralAuthoringDTO);
-	
+
 	McMonitoringAction monitoringAction = new McMonitoringAction();
 	monitoringAction.repopulateRequestParameters(request, mcMonitoringForm, mcGeneralMonitoringDTO);
 
@@ -157,7 +158,7 @@ public class McMonitoringStarterAction extends Action implements McAppConstants 
 	if (!reflectionsContainerDTO.isEmpty()) {
 	    request.setAttribute(NOTEBOOK_ENTRIES_EXIST, new Boolean(true).toString());
 
-	    String userExceptionNoToolSessions = (String) mcGeneralMonitoringDTO.getUserExceptionNoToolSessions();
+	    String userExceptionNoToolSessions = mcGeneralMonitoringDTO.getUserExceptionNoToolSessions();
 
 	    if (userExceptionNoToolSessions.equals("true")) {
 		// there are no online student activity but there are reflections
@@ -171,7 +172,7 @@ public class McMonitoringStarterAction extends Action implements McAppConstants 
 
 	return (mapping.findForward(LOAD_MONITORING_CONTENT));
     }
-    
+
     // *************************************************************************************
     // Private method
     // *************************************************************************************

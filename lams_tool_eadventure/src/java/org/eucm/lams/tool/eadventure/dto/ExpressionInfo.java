@@ -18,83 +18,79 @@
  *
  * http://www.gnu.org/licenses/gpl.txt
  * ****************************************************************
- */ 
- 
-/* $Id$ */ 
-package org.eucm.lams.tool.eadventure.dto; 
- 
+ */
+
+/* $Id$ */
+package org.eucm.lams.tool.eadventure.dto;
+
 public class ExpressionInfo {
-	
-	private String name;
-	
-	private String type;
-	
-	private String valueInExpression;
-	
-	private String operator;
-	
-	private String nameSecondOp;
-	
-	private String nextOp;
 
-	
-	public ExpressionInfo(String name, String type, String operator, String nextOp){
-		this.name = name;
-		this.type = type;
-		this.operator = operator;
-		this.nextOp = nextOp;
-		
-	}
+    private String name;
 
-	public String getName() {
-		return name;
-	}
+    private String type;
 
-	public void setName(String name) {
-		this.name = name;
-	}
+    private String valueInExpression;
 
-	public String getType() {
-		return type;
-	}
+    private String operator;
 
-	public void setType(String type) {
-		this.type = type;
-	}
+    private String nameSecondOp;
 
-	public String getValueInExpression() {
-		return valueInExpression;
-	}
+    private String nextOp;
 
-	public void setValueInExpression(String valueInExpression) {
-		this.valueInExpression = valueInExpression;
-	}
+    public ExpressionInfo(String name, String type, String operator, String nextOp) {
+	this.name = name;
+	this.type = type;
+	this.operator = operator;
+	this.nextOp = nextOp;
 
-	public String getOperator() {
-		return operator;
-	}
+    }
 
-	public void setOperator(String operator) {
-		this.operator = operator;
-	}
+    public String getName() {
+	return name;
+    }
 
-	public String getNameSecondOp() {
-		return nameSecondOp;
-	}
+    public void setName(String name) {
+	this.name = name;
+    }
 
-	public void setNameSecondOp(String nameSecondOp) {
-		this.nameSecondOp = nameSecondOp;
-	}
+    public String getType() {
+	return type;
+    }
 
-	public String getNextOp() {
-		return nextOp;
-	}
+    public void setType(String type) {
+	this.type = type;
+    }
 
-	public void setNextOp(String nextOp) {
-		this.nextOp = nextOp;
-	}
-	
-	
+    public String getValueInExpression() {
+	return valueInExpression;
+    }
+
+    public void setValueInExpression(String valueInExpression) {
+	this.valueInExpression = valueInExpression;
+    }
+
+    public String getOperator() {
+	return operator;
+    }
+
+    public void setOperator(String operator) {
+	this.operator = operator;
+    }
+
+    public String getNameSecondOp() {
+	return nameSecondOp;
+    }
+
+    public void setNameSecondOp(String nameSecondOp) {
+	this.nameSecondOp = nameSecondOp;
+    }
+
+    public String getNextOp() {
+	return nextOp;
+    }
+
+    public void setNextOp(String nextOp) {
+	this.nextOp = nextOp;
+    }
 
 }
- 

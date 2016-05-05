@@ -17,9 +17,9 @@ import org.lamsfoundation.lams.util.Emailer;
 
 /**
  * Allows sending mail from the configured mail server.
- * 
+ *
  * @author Marcin Cieslak
- * 
+ *
  */
 public class DeliveryMethodMail extends AbstractDeliveryMethod {
 
@@ -38,8 +38,8 @@ public class DeliveryMethodMail extends AbstractDeliveryMethod {
 	    log.error("Target user ID must not be null.");
 	}
 	try {
-	    User toUser = (User) EventNotificationService.getInstance().getUserManagementService()
-		    .findById(User.class, toUserId);
+	    User toUser = (User) EventNotificationService.getInstance().getUserManagementService().findById(User.class,
+		    toUserId);
 	    if (toUser == null) {
 		log.error("Target user with ID " + toUserId + " was not found.");
 	    }
@@ -78,12 +78,12 @@ public class DeliveryMethodMail extends AbstractDeliveryMethod {
 
     /**
      * Sends an email to the address provided by the admin.
-     * 
+     *
      * @param subject
      *            subject of the message
      * @param body
      *            text of the message
-     * 
+     *
      * @param isHtmlFormat
      *            whether the message is of HTML content-type or plain text
      * @throws UnsupportedEncodingException
@@ -92,12 +92,12 @@ public class DeliveryMethodMail extends AbstractDeliveryMethod {
      * @throws MessagingException
      *             if the operation failed
      */
-    void notifyAdmin(String subject, String body, boolean isHtmlFormat) throws AddressException,
-	    UnsupportedEncodingException, MessagingException {
+    void notifyAdmin(String subject, String body, boolean isHtmlFormat)
+	    throws AddressException, UnsupportedEncodingException, MessagingException {
 	String adminEmail = Configuration.get(ConfigurationKeys.LAMS_ADMIN_EMAIL);
 	if (StringUtils.isEmpty(adminEmail)) {
-	    DeliveryMethodMail.log.warn("Could not notify admin as his email is blank. The subject: " + subject
-		    + ". The message: " + body);
+	    DeliveryMethodMail.log.warn(
+		    "Could not notify admin as his email is blank. The subject: " + subject + ". The message: " + body);
 	} else {
 	    Emailer.sendFromSupportEmail(subject, adminEmail, body, isHtmlFormat);
 	}

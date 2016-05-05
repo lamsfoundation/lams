@@ -2,21 +2,21 @@
  * Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
  * =============================================================
  * License Information: http://lamsfoundation.org/licensing/lams/2.0/
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License version 2.0 
+ * it under the terms of the GNU General Public License version 2.0
  * as published by the Free Software Foundation.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301
  * USA
- * 
+ *
  * http://www.gnu.org/licenses/gpl.txt
  * ****************************************************************
  */
@@ -60,7 +60,7 @@ import org.lamsfoundation.lams.web.util.AttributeNames;
  * The action servlet that allows the teacher to view the status of sync gate, scheduling gate and permission gate. The
  * teacher can also force the gate to open through this servlet.
  * </p>
- * 
+ *
  * <p>
  * Regarding view gate status, followings contents should be shown by calling this action servlet:
  * <li>1.View the status of an sync gate, the lams should show how many learners are waiting and the size of the total
@@ -70,20 +70,20 @@ import org.lamsfoundation.lams.web.util.AttributeNames;
  * <li>3.View the status of the schedule gate, the lams shows the gate status. If the schedule has been triggerred. The
  * teacher should be able to change the trigger.</li>
  * </p>
- * 
+ *
  * @author Jacky Fang
  * @since 2005-4-15
  * @version 1.1
- * 
+ *
  *          ----------------XDoclet Tags--------------------
- * 
+ *
  * @struts:action name="GateForm" path="/gate" parameter="method" scope="session" validate="false"
  * @struts:action-forward name="viewSynchGate" path=".viewSynchGate"
  * @struts:action-forward name="viewPermissionGate" path=".viewPermissionGate"
  * @struts:action-forward name="viewScheduleGate" path=".viewScheduleGate"
  * @struts:action-forward name="viewConditionGate" path=".viewConditionGate" ----------------XDoclet
  *                        Tags--------------------
- * 
+ *
  */
 public class GateAction extends LamsDispatchAction {
     // ---------------------------------------------------------------------
@@ -117,20 +117,20 @@ public class GateAction extends LamsDispatchAction {
      * The dispatch method that allows the teacher to view the status of the gate. It is expecting the caller passed in
      * lesson id and gate activity id as http parameter. Otherwise, the utility method will generate some exception.
      * </p>
-     * 
+     *
      * <p>
      * Based on the lesson id and gate activity id, it sets up the gate form to show the waiting learners and the total
      * waiting learners. Regarding schedule gate, it also shows the estimated gate opening time and gate closing time.
      * </p>
-     * 
+     *
      * <b>Note:</b> gate form attribute <code>waitingLearners</code> got setup after the view is dispatch to ensure
      * there won't be casting exception occur if the activity id is not a gate by chance.
-     * 
-     * 
+     *
+     *
      * @param mapping
      *            An ActionMapping class that will be used by the Action class to tell the ActionServlet where to send
      *            the end-user.
-     * 
+     *
      * @param form
      *            The ActionForm class that will contain any data submitted by the end-user via a form.
      * @param request
@@ -171,11 +171,11 @@ public class GateAction extends LamsDispatchAction {
 
     /**
      * Open the gate if is closed.
-     * 
+     *
      * @param mapping
      *            An ActionMapping class that will be used by the Action class to tell the ActionServlet where to send
      *            the end-user.
-     * 
+     *
      * @param form
      *            The ActionForm class that will contain any data submitted by the end-user via a form.
      * @param request
@@ -200,7 +200,7 @@ public class GateAction extends LamsDispatchAction {
 
     /**
      * Allows a single learner to pass the gate.
-     * 
+     *
      * @param mapping
      *            An ActionMapping class that will be used by the Action class to tell the ActionServlet where to send
      *            the end-user.
@@ -243,7 +243,7 @@ public class GateAction extends LamsDispatchAction {
     // ---------------------------------------------------------------------
     /**
      * Dispatch view the according to the gate type.
-     * 
+     *
      * @param mapping
      *            An ActionMapping class that will be used by the Action class to tell the ActionServlet where to send
      *            the end-user.
@@ -311,7 +311,7 @@ public class GateAction extends LamsDispatchAction {
 
     /**
      * Set up the form attributes specific to the schedule gate and navigate to the schedule gate view.
-     * 
+     *
      * @param mapping
      *            An ActionMapping class that will be used by the Action class to tell the ActionServlet where to send
      *            the end-user.

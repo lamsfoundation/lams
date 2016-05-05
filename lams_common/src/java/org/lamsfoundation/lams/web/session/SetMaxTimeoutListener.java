@@ -18,10 +18,10 @@
  *
  * http://www.gnu.org/licenses/gpl.txt
  * ****************************************************************
- */ 
- 
-/* $Id$ */ 
-package org.lamsfoundation.lams.web.session; 
+ */
+
+/* $Id$ */
+package org.lamsfoundation.lams.web.session;
 
 import javax.servlet.http.HttpSessionEvent;
 import javax.servlet.http.HttpSessionListener;
@@ -29,28 +29,27 @@ import javax.servlet.http.HttpSessionListener;
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.util.Configuration;
 import org.lamsfoundation.lams.util.ConfigurationKeys;
- 
+
 /**
  * @author jliew
  *
  */
 public class SetMaxTimeoutListener implements HttpSessionListener {
 
-	private static Logger log = Logger.getLogger(SetMaxTimeoutListener.class); 
-	
-	public void sessionCreated(HttpSessionEvent se)
-	{
-		try {
-			int timeout = Configuration.getAsInt(ConfigurationKeys.INACTIVE_TIME);
-			se.getSession().setMaxInactiveInterval(timeout);
-		} catch (Exception e) {
-			log.error("Couldn't set max inactive interval due to exception, ", e);
-		}
-	}
+    private static Logger log = Logger.getLogger(SetMaxTimeoutListener.class);
 
-	public void sessionDestroyed(HttpSessionEvent se)
-	{
-		//nothing to do
+    @Override
+    public void sessionCreated(HttpSessionEvent se) {
+	try {
+	    int timeout = Configuration.getAsInt(ConfigurationKeys.INACTIVE_TIME);
+	    se.getSession().setMaxInactiveInterval(timeout);
+	} catch (Exception e) {
+	    log.error("Couldn't set max inactive interval due to exception, ", e);
 	}
+    }
+
+    @Override
+    public void sessionDestroyed(HttpSessionEvent se) {
+	//nothing to do
+    }
 }
- 

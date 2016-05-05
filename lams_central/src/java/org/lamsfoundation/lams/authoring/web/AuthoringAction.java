@@ -2,21 +2,21 @@
  * Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
  * =============================================================
  * License Information: http://lamsfoundation.org/licensing/lams/2.0/
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License version 2.0 
+ * it under the terms of the GNU General Public License version 2.0
  * as published by the Free Software Foundation.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301
  * USA
- * 
+ *
  * http://www.gnu.org/licenses/gpl.txt
  * ************************************************************************
  */
@@ -90,7 +90,7 @@ import com.google.gson.GsonBuilder;
 
 /**
  * @author Manpreet Minhas
- * 
+ *
  * @struts.action path = "/authoring/author" parameter = "method" validate = "false"
  * @struts:action-forward name="openAutoring" path="/authoring/authoring.jsp"
  * @struts:action-forward name="svgGenerator" path="/authoring/svgGenerator.jsp"
@@ -161,7 +161,7 @@ public class AuthoringAction extends LamsDispatchAction {
      * Output the supplied WDDX packet. If the request parameter USE_JSP_OUTPUT is set, then it sets the session
      * attribute "parameterName" to the wddx packet string. If USE_JSP_OUTPUT is not set, then the packet is written out
      * to the request's PrintWriter.
-     * 
+     *
      * @param mapping
      *            action mapping (for the forward to the success jsp)
      * @param request
@@ -203,8 +203,8 @@ public class AuthoringAction extends LamsDispatchAction {
     }
 
     public ActionForward getToolOutputDefinitionsJSON(ActionMapping mapping, ActionForm form,
-	    HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException,
-	    JSONException {
+	    HttpServletRequest request, HttpServletResponse response)
+	    throws ServletException, IOException, JSONException {
 	String wddxPacket;
 	IAuthoringService authoringService = getAuthoringService();
 	Long toolContentID = WebUtil.readLongParam(request, "toolContentID");
@@ -347,11 +347,11 @@ public class AuthoringAction extends LamsDispatchAction {
 
     /**
      * This method returns a list of all available license in WDDX format.
-     * 
+     *
      * This will include our supported Creative Common licenses and an "OTHER" license which may be used for user
      * entered license details. The picture url supplied should be a full URL i.e. if it was a relative URL in the
      * database, it should have been converted to a complete server URL (starting http://) before sending to the client.
-     * 
+     *
      * @return String The required information in WDDX format
      * @throws IOException
      */
@@ -366,8 +366,8 @@ public class AuthoringAction extends LamsDispatchAction {
 	    flashMessage = new FlashMessage("getAvailableLicenses", licenses);
 	} catch (Exception e) {
 	    AuthoringAction.log.error("getAvailableLicenses: License details unavailable due to system error.", e);
-	    flashMessage = new FlashMessage("getAvailableLicenses", "License details unavailable due to system error :"
-		    + e.getMessage(), FlashMessage.ERROR);
+	    flashMessage = new FlashMessage("getAvailableLicenses",
+		    "License details unavailable due to system error :" + e.getMessage(), FlashMessage.ERROR);
 
 	    getAuditService().log(AuthoringAction.class.getName(), e.toString());
 	}
@@ -457,8 +457,8 @@ public class AuthoringAction extends LamsDispatchAction {
 	IAuthoringService authoringService = getAuthoringService();
 	Long toolID = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_ID);
 	Long toolContentID = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_CONTENT_ID);
-        Long learningLibraryID = WebUtil.readLongParam(request, AttributeNames.PARAM_LEARNING_LIBRARY_ID);
-        String contentFolderID = request.getParameter(AttributeNames.PARAM_CONTENT_FOLDER_ID);
+	Long learningLibraryID = WebUtil.readLongParam(request, AttributeNames.PARAM_LEARNING_LIBRARY_ID);
+	String contentFolderID = request.getParameter(AttributeNames.PARAM_CONTENT_FOLDER_ID);
 	Integer organisationID = WebUtil.readIntParam(request, AttributeNames.PARAM_ORGANISATION_ID);
 	Integer userID = getUserId();
 
@@ -469,13 +469,13 @@ public class AuthoringAction extends LamsDispatchAction {
 
 	// get title from tool content
 	IToolVO tool = getToolService().getToolByID(toolID);
-	WebApplicationContext wac = WebApplicationContextUtils.getRequiredWebApplicationContext(getServlet()
-		.getServletContext());
+	WebApplicationContext wac = WebApplicationContextUtils
+		.getRequiredWebApplicationContext(getServlet().getServletContext());
 	ToolContentManager toolManager = (ToolContentManager) wac.getBean(tool.getServiceName());
 	String title = toolManager.getToolContentTitle(toolContentID);
 	// create the LD and put it in Run Sequences folder in the given organisation
-	Long learningDesignID = authoringService.insertSingleActivityLearningDesign(title, toolID, toolContentID, learningLibraryID,
-		contentFolderID, organisationID);
+	Long learningDesignID = authoringService.insertSingleActivityLearningDesign(title, toolID, toolContentID,
+		learningLibraryID, contentFolderID, organisationID);
 	if (learningDesignID != null) {
 	    User user = (User) getUserManagementService().findById(User.class, userID);
 	    Lesson lesson = getMonitoringService().initializeLessonWithoutLDcopy(title, "", learningDesignID, user,
@@ -505,7 +505,7 @@ public class AuthoringAction extends LamsDispatchAction {
 
     /**
      * Handle flash error.
-     * 
+     *
      * @param e
      * @param methodKey
      * @param monitoringService
@@ -537,8 +537,8 @@ public class AuthoringAction extends LamsDispatchAction {
 	    Long learningDesignID = learningDesign.getLearningDesignId();
 	    if (learningDesignID != null) {
 		Gson gson = new GsonBuilder().create();
-		Vector<ValidationErrorDTO> validationDTOs = getAuthoringService().validateLearningDesign(
-			learningDesignID);
+		Vector<ValidationErrorDTO> validationDTOs = getAuthoringService()
+			.validateLearningDesign(learningDesignID);
 		String validationJSON = gson.toJson(validationDTOs);
 		responseJSON.put("validation", new JSONArray(validationJSON));
 
@@ -627,8 +627,8 @@ public class AuthoringAction extends LamsDispatchAction {
 		writer.close();
 	    }
 	} catch (IOException e) {
-	    AuthoringAction.log.error("Error while writing " + extension.toUpperCase() + " thumbnail of LD "
-		    + learningDesignID + ".", e);
+	    AuthoringAction.log.error(
+		    "Error while writing " + extension.toUpperCase() + " thumbnail of LD " + learningDesignID + ".", e);
 	} finally {
 	    if (fos != null) {
 		try {
@@ -643,13 +643,13 @@ public class AuthoringAction extends LamsDispatchAction {
 
     /**
      * Get AuditService bean.
-     * 
+     *
      * @return
      */
     private IAuditService getAuditService() {
 	if (AuthoringAction.auditService == null) {
-	    WebApplicationContext ctx = WebApplicationContextUtils.getRequiredWebApplicationContext(getServlet()
-		    .getServletContext());
+	    WebApplicationContext ctx = WebApplicationContextUtils
+		    .getRequiredWebApplicationContext(getServlet().getServletContext());
 	    AuthoringAction.auditService = (IAuditService) ctx.getBean("auditService");
 	}
 	return AuthoringAction.auditService;
@@ -657,8 +657,8 @@ public class AuthoringAction extends LamsDispatchAction {
 
     private IMonitoringService getMonitoringService() {
 	if (AuthoringAction.monitoringService == null) {
-	    WebApplicationContext ctx = WebApplicationContextUtils.getRequiredWebApplicationContext(getServlet()
-		    .getServletContext());
+	    WebApplicationContext ctx = WebApplicationContextUtils
+		    .getRequiredWebApplicationContext(getServlet().getServletContext());
 	    AuthoringAction.monitoringService = (IMonitoringService) ctx.getBean("monitoringService");
 	}
 	return AuthoringAction.monitoringService;
@@ -666,8 +666,8 @@ public class AuthoringAction extends LamsDispatchAction {
 
     private IUserManagementService getUserManagementService() {
 	if (AuthoringAction.userManagementService == null) {
-	    WebApplicationContext wac = WebApplicationContextUtils.getRequiredWebApplicationContext(getServlet()
-		    .getServletContext());
+	    WebApplicationContext wac = WebApplicationContextUtils
+		    .getRequiredWebApplicationContext(getServlet().getServletContext());
 	    AuthoringAction.userManagementService = (IUserManagementService) wac
 		    .getBean(CentralConstants.USER_MANAGEMENT_SERVICE_BEAN_NAME);
 	}
@@ -676,8 +676,8 @@ public class AuthoringAction extends LamsDispatchAction {
 
     public IAuthoringService getAuthoringService() {
 	if (AuthoringAction.authoringService == null) {
-	    WebApplicationContext wac = WebApplicationContextUtils.getRequiredWebApplicationContext(getServlet()
-		    .getServletContext());
+	    WebApplicationContext wac = WebApplicationContextUtils
+		    .getRequiredWebApplicationContext(getServlet().getServletContext());
 	    AuthoringAction.authoringService = (IAuthoringService) wac
 		    .getBean(AuthoringConstants.AUTHORING_SERVICE_BEAN_NAME);
 	}
@@ -686,8 +686,8 @@ public class AuthoringAction extends LamsDispatchAction {
 
     public ILamsToolService getToolService() {
 	if (AuthoringAction.toolService == null) {
-	    WebApplicationContext wac = WebApplicationContextUtils.getRequiredWebApplicationContext(getServlet()
-		    .getServletContext());
+	    WebApplicationContext wac = WebApplicationContextUtils
+		    .getRequiredWebApplicationContext(getServlet().getServletContext());
 	    AuthoringAction.toolService = (ILamsToolService) wac.getBean(AuthoringConstants.TOOL_SERVICE_BEAN_NAME);
 	}
 	return AuthoringAction.toolService;
@@ -695,8 +695,8 @@ public class AuthoringAction extends LamsDispatchAction {
 
     private ILearningDesignService getLearningDesignService() {
 	if (AuthoringAction.learningDesignService == null) {
-	    WebApplicationContext ctx = WebApplicationContextUtils.getRequiredWebApplicationContext(getServlet()
-		    .getServletContext());
+	    WebApplicationContext ctx = WebApplicationContextUtils
+		    .getRequiredWebApplicationContext(getServlet().getServletContext());
 	    AuthoringAction.learningDesignService = (ILearningDesignService) ctx.getBean("learningDesignService");
 	}
 	return AuthoringAction.learningDesignService;
@@ -704,8 +704,8 @@ public class AuthoringAction extends LamsDispatchAction {
 
     private ISecurityService getSecurityService() {
 	if (AuthoringAction.securityService == null) {
-	    WebApplicationContext ctx = WebApplicationContextUtils.getRequiredWebApplicationContext(getServlet()
-		    .getServletContext());
+	    WebApplicationContext ctx = WebApplicationContextUtils
+		    .getRequiredWebApplicationContext(getServlet().getServletContext());
 	    AuthoringAction.securityService = (ISecurityService) ctx.getBean("securityService");
 	}
 	return AuthoringAction.securityService;

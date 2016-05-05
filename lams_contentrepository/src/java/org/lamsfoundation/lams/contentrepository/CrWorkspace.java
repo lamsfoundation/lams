@@ -2,42 +2,42 @@
  * Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
  * =============================================================
  * License Information: http://lamsfoundation.org/licensing/lams/2.0/
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License version 2.0 
+ * it under the terms of the GNU General Public License version 2.0
  * as published by the Free Software Foundation.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301
  * USA
- * 
+ *
  * http://www.gnu.org/licenses/gpl.txt
  * ****************************************************************
  */
 
-/* $$Id$$ */	
+/* $$Id$$ */
 package org.lamsfoundation.lams.contentrepository;
 
 import java.io.Serializable;
 import java.util.Set;
+
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.commons.lang.builder.ToStringBuilder;
 
-
-/** 
- *        @hibernate.class
- *         table="lams_cr_workspace"
- * 
- * 		  @hibernate.cache usage = "transactional"
-*/
-public class CrWorkspace implements IWorkspace,Serializable {
+/**
+ * @hibernate.class
+ * 		 table="lams_cr_workspace"
+ *
+ * @hibernate.cache usage = "transactional"
+ */
+public class CrWorkspace implements IWorkspace, Serializable {
 
     /** identifier field */
     private Long workspaceId;
@@ -53,104 +53,105 @@ public class CrWorkspace implements IWorkspace,Serializable {
 
     /** full constructor */
     public CrWorkspace(String name, Set crWorkspaceCredentials, Set crNodes) {
-        this.name = name;
-        this.crWorkspaceCredentials = crWorkspaceCredentials;
-        this.crNodes = crNodes;
+	this.name = name;
+	this.crWorkspaceCredentials = crWorkspaceCredentials;
+	this.crNodes = crNodes;
     }
 
     /** default constructor */
     public CrWorkspace() {
     }
 
-    /** 
-     *            @hibernate.id
-     *             generator-class="native"
-     *             type="java.lang.Long"
-     *             column="workspace_id"
-     *             unsaved-value="0"
-     *         
+    /**
+     * @hibernate.id
+     * 	      generator-class="native"
+     *               type="java.lang.Long"
+     *               column="workspace_id"
+     *               unsaved-value="0"
+     * 
      */
+    @Override
     public Long getWorkspaceId() {
-        return this.workspaceId;
+	return this.workspaceId;
     }
 
     public void setWorkspaceId(Long workspaceId) {
-        this.workspaceId = workspaceId;
+	this.workspaceId = workspaceId;
     }
 
-    /** 
-     *            @hibernate.property
-     *             column="name"
-     *             length="255"
-     *             not-null="true"
-     *         
+    /**
+     * @hibernate.property
+     * 		    column="name"
+     *                     length="255"
+     *                     not-null="true"
+     * 
      */
+    @Override
     public String getName() {
-        return this.name;
+	return this.name;
     }
 
     public void setName(String name) {
-        this.name = name;
+	this.name = name;
     }
 
-    /** 
+    /**
      * bi-directional one-to-many association to CrWorkspaceCredential
+     *
+     * @hibernate.set lazy="true" inverse="true" cascade="none"
+     * @hibernate.collection-key
+     * 			  column="workspace_id"
+     * @hibernate.collection-one-to-many
+     * 				  class="org.lamsfoundation.lams.contentrepository.CrWorkspaceCredential"
      * 
-     *            @hibernate.set lazy="true" inverse="true" cascade="none"
-     *            @hibernate.collection-key
-     *             column="workspace_id"
-     *            @hibernate.collection-one-to-many
-     *             class="org.lamsfoundation.lams.contentrepository.CrWorkspaceCredential"
-     *         
      */
     public Set getCrWorkspaceCredentials() {
-        return this.crWorkspaceCredentials;
+	return this.crWorkspaceCredentials;
     }
 
     public void setCrWorkspaceCredentials(Set crWorkspaceCredentials) {
-        this.crWorkspaceCredentials = crWorkspaceCredentials;
+	this.crWorkspaceCredentials = crWorkspaceCredentials;
     }
 
-    /** 
+    /**
      * bi-directional one-to-many association to CrNode
+     *
+     * @hibernate.set lazy="true" inverse="true" cascade="none"
+     * @hibernate.collection-key
+     * 			  column="workspace_id"
+     * @hibernate.collection-one-to-many
+     * 				  class="org.lamsfoundation.lams.contentrepository.CrNode"
      * 
-     *            @hibernate.set lazy="true" inverse="true" cascade="none"
-     *            @hibernate.collection-key
-     *             column="workspace_id"
-     *            @hibernate.collection-one-to-many
-     *             class="org.lamsfoundation.lams.contentrepository.CrNode"
-     *         
      */
     public Set getCrNodes() {
-        return this.crNodes;
+	return this.crNodes;
     }
 
     public void setCrNodes(Set crNodes) {
-        this.crNodes = crNodes;
+	this.crNodes = crNodes;
     }
 
+    @Override
     public String toString() {
-        return new ToStringBuilder(this)
-            .append("workspaceId", getWorkspaceId())
-            .append("name", getName())
-            .toString();
+	return new ToStringBuilder(this).append("workspaceId", getWorkspaceId()).append("name", getName()).toString();
     }
 
+    @Override
     public boolean equals(Object other) {
-        if ( (this == other ) ) return true;
-        if ( !(other instanceof CrWorkspace) ) return false;
-        CrWorkspace castOther = (CrWorkspace) other;
-        return new EqualsBuilder()
-            .append(this.getWorkspaceId(), castOther.getWorkspaceId())
-            .append(this.getName(), castOther.getName())
-            .isEquals();
+	if ((this == other)) {
+	    return true;
+	}
+	if (!(other instanceof CrWorkspace)) {
+	    return false;
+	}
+	CrWorkspace castOther = (CrWorkspace) other;
+	return new EqualsBuilder().append(this.getWorkspaceId(), castOther.getWorkspaceId())
+		.append(this.getName(), castOther.getName()).isEquals();
     }
 
+    @Override
     public int hashCode() {
-        return new HashCodeBuilder()
-            .append(getWorkspaceId())
-            .append(getName())
-            .toHashCode();
+	return new HashCodeBuilder().append(getWorkspaceId()).append(getName()).toHashCode();
     }
 
 }

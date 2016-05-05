@@ -42,7 +42,7 @@ public class WebUtil {
      * <code>(?:<BR>|<br>|<BR />|<br />)</code> . Right now CKeditor creates only the first option.
      */
     private static final String SPACE_TAG_REGEX = "(?:<BR>)|(?:&nbsp;)|(?:</div><div>)";
-    
+
     private static final String URL_SHORTENING_CYPHER = "jbdnuteywk";
 
     /**
@@ -154,12 +154,13 @@ public class WebUtil {
     /**
      * Get a long version of paramValue, throwing an IllegalArgumentException if isOptional = false and the is value is
      * null
-     * 
+     *
      * @return long value of paramValue
      * @exception IllegalArgumentException
      *                - if not set or not long
      */
-    public static long checkLong(String paramName, Long paramValue, boolean isOptional) throws IllegalArgumentException {
+    public static long checkLong(String paramName, Long paramValue, boolean isOptional)
+	    throws IllegalArgumentException {
 	if (!isOptional) {
 	    WebUtil.checkObject(paramName, paramValue);
 	}
@@ -179,7 +180,7 @@ public class WebUtil {
 
     /**
      * Read an int parameter, throwing exception if null or not a integer
-     * 
+     *
      * @param req
      *            -
      * @param paramName
@@ -192,7 +193,7 @@ public class WebUtil {
 
     /**
      * Read an int parameter, throwing exception if ( not optional and null ) or not a integer
-     * 
+     *
      * @param req
      *            -
      * @param paramName
@@ -206,7 +207,7 @@ public class WebUtil {
 
     /**
      * Read an long parameter, throwing exception if null or not a long
-     * 
+     *
      * @param req
      *            -
      * @param paramName
@@ -219,7 +220,7 @@ public class WebUtil {
 
     /**
      * Read an long parameter, throwing exception if ( not optional and null ) or not a long
-     * 
+     *
      * @param req
      *            -
      * @param paramName
@@ -294,7 +295,7 @@ public class WebUtil {
     /**
      * TODO default proper exception at lams level to replace RuntimeException TODO isTesting should be removed when
      * login is done properly.
-     * 
+     *
      * @param req
      *            -
      * @return username from principal object
@@ -306,8 +307,8 @@ public class WebUtil {
 
 	Principal prin = req.getUserPrincipal();
 	if (prin == null) {
-	    throw new RuntimeException("Trying to get username but principal object missing. Request is "
-		    + req.toString());
+	    throw new RuntimeException(
+		    "Trying to get username but principal object missing. Request is " + req.toString());
 	}
 
 	String username = prin.getName();
@@ -324,12 +325,13 @@ public class WebUtil {
      * for the learner screen. They use mode=learner, mode=author and mode=teacher for learning, preview and monitoring
      * respectively. Only used if the tool programmer wants to have one call that supports all three ways of looking at
      * a learner screen.
-     * 
+     *
      * @param request
      * @param param_mode
      * @return the ToolAccessMode object
      */
-    public static ToolAccessMode readToolAccessModeParam(HttpServletRequest request, String param_mode, boolean optional) {
+    public static ToolAccessMode readToolAccessModeParam(HttpServletRequest request, String param_mode,
+	    boolean optional) {
 	String mode = WebUtil.readStrParam(request, param_mode, optional);
 	if (mode == null) {
 	    return null;
@@ -349,7 +351,7 @@ public class WebUtil {
      * that share an implementation for the learner screen. They use mode=learner, mode=author and mode=teacher for
      * learning, preview and monitoring respectively. Only used if the tool programmer wants to have one call that
      * supports all three ways of looking at a learner screen.
-     * 
+     *
      * @param request
      * @param param_mode
      * @return the ToolAccessMode object
@@ -372,13 +374,13 @@ public class WebUtil {
      * This helper method create the struts action forward name using the path. It will chop all path related
      * characters, such as "/" and ".do".
      * </p>
-     * 
+     *
      * <p>
      * For example:
      * <li><code>getStrutsForwardNameFromPath("/DisplayParallelActivity.do")<code>
-     * 	  = displayParallelActivity</li>
+     * = displayParallelActivity</li>
      * </p>
-     * 
+     *
      * @param path
      * @return
      */
@@ -392,7 +394,7 @@ public class WebUtil {
 
     /**
      * Append a parameter to a requested url.
-     * 
+     *
      * @param parameterName
      *            the name of the parameter
      * @param parameterValue
@@ -410,7 +412,7 @@ public class WebUtil {
      * This helper append the parameter deliminator for a url.
      * </p>
      * It is using a null safe String util method to checkup the url String and append proper deliminator if necessary.
-     * 
+     *
      * @param url
      *            the url needs to append deliminator.
      * @return target url with the deliminator;
@@ -429,7 +431,7 @@ public class WebUtil {
      * Converts a url (such as one from a tool) to a complete url. If the url starts with "http" then it is assumed to
      * be a complete url and is returned as is. Otherwise it assumes starts with the path of the webapp so it is
      * appended to the server url from the LAMS Configuration.
-     * 
+     *
      * @param url
      *            e.g. tool/lanb11/starter/learner.do
      * @return complete url
@@ -463,19 +465,19 @@ public class WebUtil {
 
     /**
      * Strips HTML tags and leave "pure" text. Useful for CKeditor created text.
-     * 
+     *
      * @param text
      *            string to process
      * @return string after stripping
      */
     public static String removeHTMLtags(String text) {
-	return text == null ? null : text.replaceAll(WebUtil.SPACE_TAG_REGEX, " ").replaceAll(WebUtil.HTML_TAG_REGEX,
-		"");
+	return text == null ? null
+		: text.replaceAll(WebUtil.SPACE_TAG_REGEX, " ").replaceAll(WebUtil.HTML_TAG_REGEX, "");
     }
 
     /**
      * Makes a request to the specified url with the specified parameters and returns the response inputstream
-     * 
+     *
      * @param urlStr
      * @param params
      * @return
@@ -518,10 +520,10 @@ public class WebUtil {
     /**
      * Uploads a file to the given url. Uses a multi-part http post to post the file as well as the user, course, and
      * hash server-authentication strings.
-     * 
+     *
      * Some of the java multipart posting libraries clashed with existing jboss libraries So instead, the multipart post
      * is put together manually
-     * 
+     *
      * @param f
      * @param urlString
      * @param timestamp
@@ -658,15 +660,15 @@ public class WebUtil {
 	// "https://" is 8 characters, so next "/" should be context
 	return serverURL.substring(0, serverURL.indexOf('/', 9));
     }
-    
+
     /**
      * Converse lessonId into alphabetic sequence for using it in URL shortening
-     * 
+     *
      * @param lessonId
      * @return
      */
     public static String encodeLessonId(Long lessonId) {
-	
+
 	String encodedLessonId = lessonId.toString();
 	encodedLessonId = encodedLessonId.replace('0', URL_SHORTENING_CYPHER.charAt(0));
 	encodedLessonId = encodedLessonId.replace('1', URL_SHORTENING_CYPHER.charAt(1));
@@ -678,23 +680,23 @@ public class WebUtil {
 	encodedLessonId = encodedLessonId.replace('7', URL_SHORTENING_CYPHER.charAt(7));
 	encodedLessonId = encodedLessonId.replace('8', URL_SHORTENING_CYPHER.charAt(8));
 	encodedLessonId = encodedLessonId.replace('9', URL_SHORTENING_CYPHER.charAt(9));
-	
+
 	return encodedLessonId;
     }
-    
+
     /**
      * Decodes alphabetic sequence (that is lessonId encoded for URL shortening purposes)
-     * 
+     *
      * @param encodedlessonId
      * @return
      */
-    public static String decodeLessonId(String encodedLessonId) throws IllegalArgumentException{
-	
+    public static String decodeLessonId(String encodedLessonId) throws IllegalArgumentException {
+
 	// it should contain only the characters from URL_SHORTENING_CYPHER
 	if (!encodedLessonId.matches("[" + URL_SHORTENING_CYPHER + "]*")) {
 	    throw new IllegalArgumentException("LessonId: " + encodedLessonId + " has wrong format.");
 	}
-	
+
 	String decodedLessonId = encodedLessonId;
 	decodedLessonId = decodedLessonId.replace(URL_SHORTENING_CYPHER.charAt(0), '0');
 	decodedLessonId = decodedLessonId.replace(URL_SHORTENING_CYPHER.charAt(1), '1');
@@ -706,7 +708,7 @@ public class WebUtil {
 	decodedLessonId = decodedLessonId.replace(URL_SHORTENING_CYPHER.charAt(7), '7');
 	decodedLessonId = decodedLessonId.replace(URL_SHORTENING_CYPHER.charAt(8), '8');
 	decodedLessonId = decodedLessonId.replace(URL_SHORTENING_CYPHER.charAt(9), '9');
-	
+
 	return decodedLessonId;
     }
 }

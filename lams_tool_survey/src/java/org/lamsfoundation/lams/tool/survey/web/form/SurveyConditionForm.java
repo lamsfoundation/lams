@@ -30,10 +30,10 @@ import org.lamsfoundation.lams.web.TextSearchActionForm;
 
 /**
  * A text search form with additional parameters for Survey needs.
- * 
+ *
  * @struts.form name="surveyConditionForm"
  * @author Marcin Cieslak
- * 
+ *
  */
 public class SurveyConditionForm extends TextSearchActionForm {
     /**
@@ -98,7 +98,7 @@ public class SurveyConditionForm extends TextSearchActionForm {
     /**
      * Fills a new SurveyCondition with data contained in this form. Note that some cruicial data is missing, so the
      * condition is NOT complete.
-     * 
+     *
      * @return created condition
      */
     public SurveyCondition extractCondition() {

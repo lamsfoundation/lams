@@ -2,21 +2,21 @@
  * Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
  * =============================================================
  * License Information: http://lamsfoundation.org/licensing/lams/2.0/
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License version 2.0 
+ * it under the terms of the GNU General Public License version 2.0
  * as published by the Free Software Foundation.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301
  * USA
- * 
+ *
  * http://www.gnu.org/licenses/gpl.txt
  * ****************************************************************
  */
@@ -88,7 +88,7 @@ public class LearningAction extends Action {
     @Override
     public ActionForward execute(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response)
-		    throws IOException, ServletException, JSONException, ScratchieApplicationException {
+	    throws IOException, ServletException, JSONException, ScratchieApplicationException {
 
 	String param = mapping.getParameter();
 	// -----------------------Scratchie Learner function ---------------------------
@@ -137,11 +137,11 @@ public class LearningAction extends Action {
     /**
      * Read scratchie data from database and put them into HttpSession. It will redirect to init.do directly after this
      * method run successfully.
-     * 
+     *
      * This method will avoid read database again and lost un-saved resouce item lost when user "refresh page",
-     * 
+     *
      * @throws ScratchieApplicationException
-     * 
+     *
      */
     private ActionForward start(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) throws ScratchieApplicationException {
@@ -344,7 +344,7 @@ public class LearningAction extends Action {
 
     /**
      * Refresh
-     * 
+     *
      * @throws ScratchieApplicationException
      */
     private ActionForward refreshQuestionList(ActionMapping mapping, ActionForm form, HttpServletRequest request,
@@ -418,7 +418,7 @@ public class LearningAction extends Action {
 
     /**
      * Record in DB that leader has scratched specified answer. And return whether scratchie answer is correct or not
-     * 
+     *
      * @throws ScratchieApplicationException
      */
     private ActionForward recordItemScratched(ActionMapping mapping, ActionForm form, HttpServletRequest request,
@@ -470,7 +470,7 @@ public class LearningAction extends Action {
 
     /**
      * Displays results page. When leader gets to this page, scratchingFinished column is set to true for all users.
-     * 
+     *
      * @param mapping
      * @param form
      * @param request
@@ -509,7 +509,8 @@ public class LearningAction extends Action {
 	// display other groups' BurningQuestions
 	if (isBurningQuestionsEnabled) {
 	    Scratchie scratchie = toolSession.getScratchie();
-	    List<BurningQuestionItemDTO> burningQuestionItemDtos = LearningAction.service.getBurningQuestionDtos(scratchie, toolSessionId);
+	    List<BurningQuestionItemDTO> burningQuestionItemDtos = LearningAction.service
+		    .getBurningQuestionDtos(scratchie, toolSessionId);
 	    request.setAttribute(ScratchieConstants.ATTR_BURNING_QUESTION_ITEM_DTOS, burningQuestionItemDtos);
 	}
 
@@ -539,15 +540,16 @@ public class LearningAction extends Action {
 
 	return mapping.findForward(ScratchieConstants.SUCCESS);
     }
-    
+
     /**
-     * @throws ServletException 
-     * @throws ScratchieApplicationException 
+     * @throws ServletException
+     * @throws ScratchieApplicationException
      */
     private synchronized ActionForward like(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws JSONException, IOException, ServletException, ScratchieApplicationException {
+	    HttpServletResponse response)
+	    throws JSONException, IOException, ServletException, ScratchieApplicationException {
 	initializeScratchieService();
-	
+
 	String sessionMapID = WebUtil.readStrParam(request, ScratchieConstants.ATTR_SESSION_MAP_ID);
 	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
 		.getAttribute(sessionMapID);
@@ -570,15 +572,16 @@ public class LearningAction extends Action {
 	response.getWriter().print(JSONObject);
 	return null;
     }
-    
+
     /**
-     * @throws ServletException 
-     * @throws ScratchieApplicationException 
+     * @throws ServletException
+     * @throws ScratchieApplicationException
      */
     private synchronized ActionForward removeLike(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws JSONException, IOException, ServletException, ScratchieApplicationException {
+	    HttpServletResponse response)
+	    throws JSONException, IOException, ServletException, ScratchieApplicationException {
 	initializeScratchieService();
-	
+
 	String sessionMapID = WebUtil.readStrParam(request, ScratchieConstants.ATTR_SESSION_MAP_ID);
 	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
 		.getAttribute(sessionMapID);
@@ -600,7 +603,7 @@ public class LearningAction extends Action {
 
     /**
      * Finish learning session.
-     * 
+     *
      * @param mapping
      * @param form
      * @param request
@@ -633,7 +636,7 @@ public class LearningAction extends Action {
 
     /**
      * Displays burning questions page.
-     * 
+     *
      * @param mapping
      * @param form
      * @param request
@@ -666,7 +669,7 @@ public class LearningAction extends Action {
 
     /**
      * Submit reflection form input database. Only leaders can submit reflections.
-     * 
+     *
      * @param mapping
      * @param form
      * @param request
@@ -713,18 +716,18 @@ public class LearningAction extends Action {
 	ActionRedirect redirect;
 	if (scratchie.isReflectOnActivity() && !isNotebookSubmitted) {
 	    redirect = new ActionRedirect(mapping.findForwardConfig("newReflection"));
-	// show results page
+	    // show results page
 	} else {
 	    redirect = new ActionRedirect(mapping.findForwardConfig("showResults"));
 	}
-	
+
 	redirect.addParameter(ScratchieConstants.ATTR_SESSION_MAP_ID, sessionMap.getSessionID());
 	return redirect;
     }
 
     /**
      * Display empty reflection form.
-     * 
+     *
      * @param mapping
      * @param form
      * @param request
@@ -769,7 +772,7 @@ public class LearningAction extends Action {
 
     /**
      * Submit reflection form input database. Only leaders can submit reflections.
-     * 
+     *
      * @param mapping
      * @param form
      * @param request
@@ -804,7 +807,7 @@ public class LearningAction extends Action {
 	    LearningAction.service.updateEntry(entry);
 	}
 	sessionMap.put(ScratchieConstants.ATTR_REFLECTION_ENTRY, entryText);
-	
+
 	ActionRedirect redirect = new ActionRedirect(mapping.findForwardConfig("showResults"));
 	redirect.addParameter(ScratchieConstants.ATTR_SESSION_MAP_ID, sessionMap.getSessionID());
 	return redirect;

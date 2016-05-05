@@ -2,21 +2,21 @@
  * Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
  * =============================================================
  * License Information: http://lamsfoundation.org/licensing/lams/2.0/
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301
  * USA
- * 
+ *
  * http://www.gnu.org/licenses/gpl.txt
  * ****************************************************************
  */
@@ -28,14 +28,14 @@ package org.lamsfoundation.lams.tool.qa;
  * @author Ozgur Demirtas
  */
 public interface QaAppConstants {
-    
+
     public static final int SORT_BY_NO = 0;
     public static final int SORT_BY_ANSWER_ASC = 3; // learner
     public static final int SORT_BY_ANSWER_DESC = 4; // learner
     public static final int SORT_BY_USERNAME_ASC = 1; // monitoring
     public static final int SORT_BY_USERNAME_DESC = 2; // monitoring
     public static final int SORT_BY_RATING_ASC = 5; // learner & monitoring
-    public static final int SORT_BY_RATING_DESC = 6;  // learner & monitoring
+    public static final int SORT_BY_RATING_DESC = 6; // learner & monitoring
 
     public static final String MY_SIGNATURE = "laqa11";
     public static final String TOOL_CONTENT_ID = "toolContentID";
@@ -219,8 +219,7 @@ public interface QaAppConstants {
     public static final String ATTR_GROUP_USERS = "groupUsers";
     public static final String ATTR_IS_USER_LEADER = "isUserLeader";
     public static final String ATTR_GROUP_LEADER = "groupLeader";
-    
-   
+
     public static final String TIMEZONE = "timeZone";
     public static final String TIMEZONE_ID = "timeZoneId";
     /*

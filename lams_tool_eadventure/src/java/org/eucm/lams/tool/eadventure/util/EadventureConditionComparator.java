@@ -18,25 +18,25 @@
  *
  * http://www.gnu.org/licenses/gpl.txt
  * ****************************************************************
- */ 
- 
-/* $Id$ */ 
-package org.eucm.lams.tool.eadventure.util; 
+ */
+
+/* $Id$ */
+package org.eucm.lams.tool.eadventure.util;
 
 import java.util.Comparator;
 
-import org.eucm.lams.tool.eadventure.dto.ReflectDTO;
 import org.eucm.lams.tool.eadventure.model.EadventureCondition;
- 
+
 public class EadventureConditionComparator implements Comparator<EadventureCondition> {
-    
+
+    @Override
     public int compare(EadventureCondition o1, EadventureCondition o2) {
-	if(o1 != null && o2 != null){
-		return o1.getSequenceId() - o2.getSequenceId();
-	}else if(o1 != null)
-		return 1;
-	else
-		return -1;
+	if (o1 != null && o2 != null) {
+	    return o1.getSequenceId() - o2.getSequenceId();
+	} else if (o1 != null) {
+	    return 1;
+	} else {
+	    return -1;
+	}
     }
 }
- 

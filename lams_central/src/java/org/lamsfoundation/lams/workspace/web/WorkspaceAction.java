@@ -2,21 +2,21 @@
  * Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
  * =============================================================
  * License Information: http://lamsfoundation.org/licensing/lams/2.0/
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License version 2.0 
+ * it under the terms of the GNU General Public License version 2.0
  * as published by the Free Software Foundation.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301
  * USA
- * 
+ *
  * http://www.gnu.org/licenses/gpl.txt
  * ****************************************************************
  */
@@ -93,8 +93,8 @@ public class WorkspaceAction extends LamsDispatchAction {
      * @return
      */
     public IWorkspaceManagementService getWorkspaceManagementService() {
-	WebApplicationContext webContext = WebApplicationContextUtils.getRequiredWebApplicationContext(this
-		.getServlet().getServletContext());
+	WebApplicationContext webContext = WebApplicationContextUtils
+		.getRequiredWebApplicationContext(this.getServlet().getServletContext());
 	return (IWorkspaceManagementService) webContext.getBean("workspaceManagementService");
     }
 
@@ -118,14 +118,13 @@ public class WorkspaceAction extends LamsDispatchAction {
      * functions on this folder.
      */
     private boolean checkResourceDummyValue(Long folderID, String resourceType) throws IOException {
-	return FolderContentDTO.FOLDER.equals(resourceType)
-		&& (WorkspaceAction.BOOTSTRAP_FOLDER_ID.equals(folderID) || WorkspaceAction.ORG_FOLDER_ID
-			.equals(folderID));
+	return FolderContentDTO.FOLDER.equals(resourceType) && (WorkspaceAction.BOOTSTRAP_FOLDER_ID.equals(folderID)
+		|| WorkspaceAction.ORG_FOLDER_ID.equals(folderID));
     }
 
     /**
      * For details please refer to org.lamsfoundation.lams.workspace.service.IWorkspaceManagementService
-     * 
+     *
      * @param mapping
      * @param form
      * @param request
@@ -139,8 +138,8 @@ public class WorkspaceAction extends LamsDispatchAction {
 	Integer parentFolderID = new Integer(WebUtil.readIntParam(request, "parentFolderID"));
 	boolean isDummyValue = checkResourceDummyValue(parentFolderID.longValue(), FolderContentDTO.FOLDER);
 	if (isDummyValue) {
-	    FlashMessage errorPacket = new FlashMessage("createFolderForFlash", "FolderID " + parentFolderID
-		    + " invalid for this call.", FlashMessage.ERROR);
+	    FlashMessage errorPacket = new FlashMessage("createFolderForFlash",
+		    "FolderID " + parentFolderID + " invalid for this call.", FlashMessage.ERROR);
 	    return returnWDDXPacket(errorPacket.serializeMessage(), response);
 	}
 
@@ -153,22 +152,22 @@ public class WorkspaceAction extends LamsDispatchAction {
 
     /**
      * getFolderContents returns the details of the folders, learning designs and files contained in a folder.
-     * 
+     *
      * If getFolderContents gets the BOOTSTRAP_FOLDER_ID (-1), then it return the user's private folder and the root
      * folder.
-     * 
+     *
      * If getFolderContents gets the ORG_FOLDER_ID (-2) then it will return all the workspace folders that the user can
      * access.
-     * 
+     *
      * This method handles the special values for the BOOTSTRAP_FOLDER_ID and the ORG_FOLDER_ID as these values are only
      * meaningful to the Flash client - they are not meaningful to the progress engine or the like. If we ever had to
      * return this data to another client, the data may be returned in a different way.
-     * 
+     *
      * The calls made to the service layer vary depending on what is required - this decouple's the client's special
      * needs from the overall logic of the workspaces.
-     * 
+     *
      * For more details please refer to org.lamsfoundation.lams.workspace.service.IWorkspaceManagementService
-     * 
+     *
      * @param mapping
      * @param form
      * @param request
@@ -221,8 +220,8 @@ public class WorkspaceAction extends LamsDispatchAction {
 	    }
 
 	    FolderContentDTO dummyOrgFolder = new FolderContentDTO(msgService.getMessage("organisations"),
-		    msgService.getMessage("folder"), null, null, FolderContentDTO.FOLDER, new Long(
-			    WorkspaceAction.ORG_FOLDER_ID.longValue()), WorkspaceFolder.READ_ACCESS, null);
+		    msgService.getMessage("folder"), null, null, FolderContentDTO.FOLDER,
+		    new Long(WorkspaceAction.ORG_FOLDER_ID.longValue()), WorkspaceFolder.READ_ACCESS, null);
 
 	    folders.add(dummyOrgFolder);
 
@@ -265,9 +264,9 @@ public class WorkspaceAction extends LamsDispatchAction {
 		}
 
 	    } else {
-		throw new WorkspaceFolderException(FlashMessage
-			.getNoSuchWorkspaceFolderContentExsists(methodKey, new Long(folderID.longValue()))
-			.getMessageValue().toString());
+		throw new WorkspaceFolderException(
+			FlashMessage.getNoSuchWorkspaceFolderContentExsists(methodKey, new Long(folderID.longValue()))
+				.getMessageValue().toString());
 	    }
 	}
 
@@ -294,7 +293,7 @@ public class WorkspaceAction extends LamsDispatchAction {
 
     /**
      * For details please refer to org.lamsfoundation.lams.workspace.service.IWorkspaceManagementService
-     * 
+     *
      * @param mapping
      * @param form
      * @param request
@@ -310,8 +309,8 @@ public class WorkspaceAction extends LamsDispatchAction {
 
 	boolean isDummyValue = checkResourceDummyValue(resourceID, FolderContentDTO.FOLDER);
 	if (isDummyValue) {
-	    FlashMessage errorPacket = new FlashMessage("deleteResource", "FolderID " + resourceID
-		    + " invalid for this call.", FlashMessage.ERROR);
+	    FlashMessage errorPacket = new FlashMessage("deleteResource",
+		    "FolderID " + resourceID + " invalid for this call.", FlashMessage.ERROR);
 	    return returnWDDXPacket(errorPacket.serializeMessage(), response);
 	}
 
@@ -334,7 +333,7 @@ public class WorkspaceAction extends LamsDispatchAction {
 
     /**
      * For details please refer to org.lamsfoundation.lams.workspace.service.IWorkspaceManagementService
-     * 
+     *
      * @param mapping
      * @param form
      * @param request
@@ -351,8 +350,8 @@ public class WorkspaceAction extends LamsDispatchAction {
 
 	boolean isDummyValue = checkResourceDummyValue(targetFolderID.longValue(), FolderContentDTO.FOLDER);
 	if (isDummyValue) {
-	    FlashMessage errorPacket = new FlashMessage("copyResource", "FolderID " + targetFolderID
-		    + " invalid for this call.", FlashMessage.ERROR);
+	    FlashMessage errorPacket = new FlashMessage("copyResource",
+		    "FolderID " + targetFolderID + " invalid for this call.", FlashMessage.ERROR);
 	    return returnWDDXPacket(errorPacket.serializeMessage(), response);
 	}
 
@@ -374,7 +373,7 @@ public class WorkspaceAction extends LamsDispatchAction {
 
     /**
      * For details please refer to org.lamsfoundation.lams.workspace.service.IWorkspaceManagementService
-     * 
+     *
      * @param mapping
      * @param form
      * @param request
@@ -392,8 +391,8 @@ public class WorkspaceAction extends LamsDispatchAction {
 
 	boolean isDummyValue = checkResourceDummyValue(targetFolderID.longValue(), FolderContentDTO.FOLDER);
 	if (isDummyValue) {
-	    FlashMessage errorPacket = new FlashMessage("copyResource", "FolderID " + targetFolderID
-		    + " invalid for this call.", FlashMessage.ERROR);
+	    FlashMessage errorPacket = new FlashMessage("copyResource",
+		    "FolderID " + targetFolderID + " invalid for this call.", FlashMessage.ERROR);
 	    return returnWDDXPacket(errorPacket.serializeMessage(), response);
 	}
 
@@ -406,7 +405,7 @@ public class WorkspaceAction extends LamsDispatchAction {
 
     /**
      * For details please refer to org.lamsfoundation.lams.workspace.service.IWorkspaceManagementService
-     * 
+     *
      * @param mapping
      * @param form
      * @param request
@@ -428,8 +427,8 @@ public class WorkspaceAction extends LamsDispatchAction {
 
 	boolean isDummyValue = checkResourceDummyValue(workspaceFolderID.longValue(), FolderContentDTO.FOLDER);
 	if (isDummyValue) {
-	    FlashMessage errorPacket = new FlashMessage("createWorkspaceFolderContent", "FolderID " + workspaceFolderID
-		    + " invalid for this call.", FlashMessage.ERROR);
+	    FlashMessage errorPacket = new FlashMessage("createWorkspaceFolderContent",
+		    "FolderID " + workspaceFolderID + " invalid for this call.", FlashMessage.ERROR);
 	    return returnWDDXPacket(errorPacket.serializeMessage(), response);
 	}
 
@@ -441,8 +440,8 @@ public class WorkspaceAction extends LamsDispatchAction {
 	} catch (Exception e) {
 	    log.error("createWorkspaceFolderContent: Exception occured. contentTypeID " + contentTypeID + " name "
 		    + name + " workspaceFolderID " + workspaceFolderID, e);
-	    FlashMessage flashMessage = FlashMessage.getExceptionOccured(
-		    IWorkspaceManagementService.MSG_KEY_CREATE_WKF_CONTENT, e.getMessage());
+	    FlashMessage flashMessage = FlashMessage
+		    .getExceptionOccured(IWorkspaceManagementService.MSG_KEY_CREATE_WKF_CONTENT, e.getMessage());
 	    wddxPacket = flashMessage.serializeMessage();
 	}
 	return returnWDDXPacket(wddxPacket, response);
@@ -450,7 +449,7 @@ public class WorkspaceAction extends LamsDispatchAction {
 
     /**
      * For details please refer to org.lamsfoundation.lams.workspace.service.IWorkspaceManagementService
-     * 
+     *
      * @param mapping
      * @param form
      * @param request
@@ -470,8 +469,8 @@ public class WorkspaceAction extends LamsDispatchAction {
 	} catch (Exception e) {
 	    log.error("updateWorkspaceFolderContent: Exception occured. path " + path + " folderContentID "
 		    + folderContentID, e);
-	    FlashMessage flashMessage = FlashMessage.getExceptionOccured(
-		    IWorkspaceManagementService.MSG_KEY_UPDATE_WKF_CONTENT, e.getMessage());
+	    FlashMessage flashMessage = FlashMessage
+		    .getExceptionOccured(IWorkspaceManagementService.MSG_KEY_UPDATE_WKF_CONTENT, e.getMessage());
 	    wddxPacket = flashMessage.serializeMessage();
 	}
 	return returnWDDXPacket(wddxPacket, response);
@@ -479,7 +478,7 @@ public class WorkspaceAction extends LamsDispatchAction {
 
     /**
      * For details please refer to org.lamsfoundation.lams.workspace.service.IWorkspaceManagementService
-     * 
+     *
      * @param mapping
      * @param form
      * @param request
@@ -495,8 +494,8 @@ public class WorkspaceAction extends LamsDispatchAction {
 
 	boolean isDummyValue = checkResourceDummyValue(resourceID, resourceType);
 	if (isDummyValue) {
-	    FlashMessage errorPacket = new FlashMessage("renameResource", "FolderID " + resourceID
-		    + " invalid for this call.", FlashMessage.ERROR);
+	    FlashMessage errorPacket = new FlashMessage("renameResource",
+		    "FolderID " + resourceID + " invalid for this call.", FlashMessage.ERROR);
 	    return returnWDDXPacket(errorPacket.serializeMessage(), response);
 	}
 
@@ -538,7 +537,7 @@ public class WorkspaceAction extends LamsDispatchAction {
 
     /**
      * For details please refer to org.lamsfoundation.lams.workspace.service.IWorkspaceManagementService
-     * 
+     *
      * @param mapping
      * @param form
      * @param request
@@ -554,8 +553,8 @@ public class WorkspaceAction extends LamsDispatchAction {
 
 	boolean isDummyValue = checkResourceDummyValue(folderContentID, FolderContentDTO.FOLDER);
 	if (isDummyValue) {
-	    FlashMessage errorPacket = new FlashMessage("deleteContentWithVersion", "FolderID " + folderContentID
-		    + " invalid for this call.", FlashMessage.ERROR);
+	    FlashMessage errorPacket = new FlashMessage("deleteContentWithVersion",
+		    "FolderID " + folderContentID + " invalid for this call.", FlashMessage.ERROR);
 	    return returnWDDXPacket(errorPacket.serializeMessage(), response);
 	}
 
@@ -566,8 +565,8 @@ public class WorkspaceAction extends LamsDispatchAction {
 	} catch (Exception e) {
 	    log.error("deleteContentWithVersion: Exception occured. uuID " + uuID + " versionID " + versionID
 		    + " folderContentID " + folderContentID, e);
-	    FlashMessage flashMessage = FlashMessage.getExceptionOccured(
-		    IWorkspaceManagementService.MSG_KEY_DELETE_VERSION, e.getMessage());
+	    FlashMessage flashMessage = FlashMessage
+		    .getExceptionOccured(IWorkspaceManagementService.MSG_KEY_DELETE_VERSION, e.getMessage());
 	    wddxPacket = flashMessage.serializeMessage();
 	}
 	return returnWDDXPacket(wddxPacket, response);
@@ -606,8 +605,8 @@ public class WorkspaceAction extends LamsDispatchAction {
 	    String error = new ToStringBuilder(this).append("").append("userID", userID).append("roles", roles)
 		    .append("courseId", courseId).append("classIdStrings", classIdStrings).toString();
 	    log.error("getOrganisationsByUserRole: Exception occured. Request data " + error, e);
-	    FlashMessage flashMessage = FlashMessage.getExceptionOccured(
-		    IWorkspaceManagementService.MSG_KEY_ORG_BY_ROLE, e.getMessage());
+	    FlashMessage flashMessage = FlashMessage
+		    .getExceptionOccured(IWorkspaceManagementService.MSG_KEY_ORG_BY_ROLE, e.getMessage());
 	    wddxPacket = flashMessage.serializeMessage();
 	}
 	return returnWDDXPacket(wddxPacket, response);
@@ -622,8 +621,8 @@ public class WorkspaceAction extends LamsDispatchAction {
 	FlashMessage flashMessage = null;
 	try {
 	    IWorkspaceManagementService workspaceManagementService = getWorkspaceManagementService();
-	    Vector<UserFlashDTO> users = workspaceManagementService
-		    .getUsersFromOrganisationByRole(organisationID, role);
+	    Vector<UserFlashDTO> users = workspaceManagementService.getUsersFromOrganisationByRole(organisationID,
+		    role);
 	    if (log.isDebugEnabled()) {
 		log.debug("getUsersFromOrganisationByRole: organisationID=" + organisationID + " role=" + role
 			+ " users " + users);
@@ -652,8 +651,8 @@ public class WorkspaceAction extends LamsDispatchAction {
 	    wddxPacket = workspaceManagementService.getUserOrganisation(userID, orgId);
 	} catch (Exception e) {
 	    log.error("getUserOrganisation: Exception occured. userID " + userID + " organisationId " + orgId, e);
-	    FlashMessage flashMessage = FlashMessage.getExceptionOccured(
-		    IWorkspaceManagementService.MSG_KEY_ORG_BY_ROLE, e.getMessage());
+	    FlashMessage flashMessage = FlashMessage
+		    .getExceptionOccured(IWorkspaceManagementService.MSG_KEY_ORG_BY_ROLE, e.getMessage());
 	    wddxPacket = flashMessage.serializeMessage();
 	}
 	return returnWDDXPacket(wddxPacket, response);

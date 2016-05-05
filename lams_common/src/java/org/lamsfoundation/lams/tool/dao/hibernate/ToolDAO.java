@@ -2,21 +2,21 @@
  * Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
  * =============================================================
  * License Information: http://lamsfoundation.org/licensing/lams/2.0/
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License version 2.0 
+ * it under the terms of the GNU General Public License version 2.0
  * as published by the Free Software Foundation.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301
  * USA
- * 
+ *
  * http://www.gnu.org/licenses/gpl.txt
  * ****************************************************************
  */
@@ -32,66 +32,58 @@ import org.lamsfoundation.lams.tool.dao.IToolDAO;
 import org.springframework.orm.hibernate3.HibernateCallback;
 import org.springframework.orm.hibernate3.support.HibernateDaoSupport;
 
-
 /**
- * 
+ *
  * @author Jacky Fang 8/02/2005
  * @author Ozgur Demirtas 24/06/2005
- * 
+ *
  */
-public class ToolDAO extends HibernateDaoSupport implements IToolDAO
-{
-	private static final String FIND_ALL = "from obj in class " + Tool.class.getName();
-	private static final String LOAD_TOOL_BY_SIG = "from tool in class Tool where tool.toolSignature=:toolSignature";
-	
-	
+public class ToolDAO extends HibernateDaoSupport implements IToolDAO {
+    private static final String FIND_ALL = "from obj in class " + Tool.class.getName();
+    private static final String LOAD_TOOL_BY_SIG = "from tool in class Tool where tool.toolSignature=:toolSignature";
+
     /**
      * @see org.lamsfoundation.lams.tool.dao.IToolDAO#getToolByID(java.lang.Long)
      */
-    public Tool getToolByID(Long toolID)
-    {
-        return (Tool)getHibernateTemplate().get(Tool.class,toolID);
-    }
-   
-    public List getAllTools(){    	
-    	return this.getHibernateTemplate().find(FIND_ALL);
-    }
-    
-    public Tool getToolBySignature(final String toolSignature)
-    {
-        return (Tool) getHibernateTemplate().execute(new HibernateCallback()
-         {
-             public Object doInHibernate(Session session) throws HibernateException
-             {
-                 return session.createQuery(LOAD_TOOL_BY_SIG)
-                               .setString("toolSignature",toolSignature)
-                               .uniqueResult();
-             }
-         });
+    @Override
+    public Tool getToolByID(Long toolID) {
+	return (Tool) getHibernateTemplate().get(Tool.class, toolID);
     }
 
-    public long getToolDefaultContentIdBySignature(final String toolSignature)
-    {
-    	Tool tool= (Tool) getHibernateTemplate().execute(new HibernateCallback()
-         {
-             public Object doInHibernate(Session session) throws HibernateException
-             {
-                 return session.createQuery(LOAD_TOOL_BY_SIG)
-                               .setString("toolSignature",toolSignature)
-                               .uniqueResult();
-             }
-         });
-        
-        if (tool != null)
-        	return tool.getDefaultToolContentId();
-        else
-        	return 0;
-    }
-    
-    public void saveOrUpdateTool(Tool tool)
-    {
-    	this.getHibernateTemplate().saveOrUpdate(tool);
+    @Override
+    public List getAllTools() {
+	return this.getHibernateTemplate().find(FIND_ALL);
     }
 
+    @Override
+    public Tool getToolBySignature(final String toolSignature) {
+	return (Tool) getHibernateTemplate().execute(new HibernateCallback() {
+	    @Override
+	    public Object doInHibernate(Session session) throws HibernateException {
+		return session.createQuery(LOAD_TOOL_BY_SIG).setString("toolSignature", toolSignature).uniqueResult();
+	    }
+	});
+    }
+
+    @Override
+    public long getToolDefaultContentIdBySignature(final String toolSignature) {
+	Tool tool = (Tool) getHibernateTemplate().execute(new HibernateCallback() {
+	    @Override
+	    public Object doInHibernate(Session session) throws HibernateException {
+		return session.createQuery(LOAD_TOOL_BY_SIG).setString("toolSignature", toolSignature).uniqueResult();
+	    }
+	});
+
+	if (tool != null) {
+	    return tool.getDefaultToolContentId();
+	} else {
+	    return 0;
+	}
+    }
+
+    @Override
+    public void saveOrUpdateTool(Tool tool) {
+	this.getHibernateTemplate().saveOrUpdate(tool);
+    }
 
 }

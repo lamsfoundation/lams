@@ -2,21 +2,21 @@
  * Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
  * =============================================================
  * License Information: http://lamsfoundation.org/licensing/lams/2.0/
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301
  * USA
- * 
+ *
  * http://www.gnu.org/licenses/gpl.txt
  * ****************************************************************
  */
@@ -37,7 +37,6 @@ import org.lamsfoundation.lams.learning.export.NotebookPortfolio;
 import org.lamsfoundation.lams.learningdesign.Activity;
 import org.lamsfoundation.lams.learningdesign.CompetenceMapping;
 import org.lamsfoundation.lams.learningdesign.ComplexActivity;
-import org.lamsfoundation.lams.learningdesign.FloatingActivity;
 import org.lamsfoundation.lams.learningdesign.ISystemToolActivity;
 import org.lamsfoundation.lams.learningdesign.LearningDesign;
 import org.lamsfoundation.lams.learningdesign.LearningDesignProcessor;
@@ -77,13 +76,13 @@ public class PortfolioBuilder extends LearningDesignProcessor {
 
     /**
      * Create the builder. Supply all the data that will be needed to parse the design and build the portfolio entries.
-     * 
+     *
      * If accessMode == LEARNER then progress and user must not be null. This will create a list of portfolio objects
      * for all activities that the LEARNER has completed or attempted.
-     * 
+     *
      * If accessMode == TEACHER then progress and user will be null and all activities will be included. Note: Because
      * the progress is null we can't rely on getting the lesson from the progress.
-     * 
+     *
      * @param design
      * @param activityDAO
      * @param lamsCoreToolService
@@ -108,8 +107,7 @@ public class PortfolioBuilder extends LearningDesignProcessor {
 	this.user = user;
 	this.lesson = lesson;
 	this.progress = progress;
-	
-	
+
     }
 
     /** Prepares to process children */
@@ -118,15 +116,15 @@ public class PortfolioBuilder extends LearningDesignProcessor {
 	// Create a new current activity list, putting the old current one on the stack.
 	// An exception to this is when we reach a branching activity in learner mode. The children are added to the
 	// current list.
-	boolean flattenLearnerBranching = (activity.isBranchingActivity() || activity.isSequenceActivity()
-		&& activity.getParentActivity().isBranchingActivity())
+	boolean flattenLearnerBranching = (activity.isBranchingActivity()
+		|| activity.isSequenceActivity() && activity.getParentActivity().isBranchingActivity())
 		&& accessMode == ToolAccessMode.LEARNER;
 
 	if (!flattenLearnerBranching) {
 	    activityListStack.push(currentPortfolioList);
 	    currentPortfolioList = new ArrayList<ActivityPortfolio>();
 	}
-	
+
 	return true;
     }
 
@@ -139,8 +137,8 @@ public class PortfolioBuilder extends LearningDesignProcessor {
 
 	ActivityPortfolio complexPortfolio = null;
 
-	boolean flattenLearnerBranching = (activity.isBranchingActivity() || activity.isSequenceActivity()
-		&& activity.getParentActivity().isBranchingActivity())
+	boolean flattenLearnerBranching = (activity.isBranchingActivity()
+		|| activity.isSequenceActivity() && activity.getParentActivity().isBranchingActivity())
 		&& accessMode == ToolAccessMode.LEARNER;
 
 	if (currentPortfolioList.size() > 0 || accessMode == ToolAccessMode.TEACHER) {
@@ -182,9 +180,8 @@ public class PortfolioBuilder extends LearningDesignProcessor {
     public void endSimpleActivity(SimpleActivity activity) throws LearningDesignProcessorException {
 
 	// if learner only include the attempted and completed activities
-	if (accessMode == ToolAccessMode.LEARNER
-		&& !(progress.getCompletedActivities().containsKey(activity) || progress.getAttemptedActivities()
-			.containsKey(activity))) {
+	if (accessMode == ToolAccessMode.LEARNER && !(progress.getCompletedActivities().containsKey(activity)
+		|| progress.getAttemptedActivities().containsKey(activity))) {
 	    return;
 	}
 
@@ -253,9 +250,9 @@ public class PortfolioBuilder extends LearningDesignProcessor {
      * System tools don't use the modes or the tool session id but need to add them or the validation fails in
      * AbstractExportPortfolio servlet. So why leave the validation there - because system tools are the exception
      * rather than the rule. In the future, they may need these parameters.
-     * 
+     *
      * @param activity:
-     *                an activity which also meets the ISystemToolActivity interface
+     *            an activity which also meets the ISystemToolActivity interface
      * @param exportUrlForTool
      */
     private String getExportURLForSystemTool(Activity activity) {
@@ -282,8 +279,8 @@ public class PortfolioBuilder extends LearningDesignProcessor {
 	}
 	if (exportUrlForTool != null) {
 	    if (accessMode == ToolAccessMode.LEARNER) {
-		exportUrlForTool = WebUtil.appendParameterToURL(exportUrlForTool, AttributeNames.PARAM_USER_ID, user
-			.getUserId().toString());
+		exportUrlForTool = WebUtil.appendParameterToURL(exportUrlForTool, AttributeNames.PARAM_USER_ID,
+			user.getUserId().toString());
 		exportUrlForTool = WebUtil.appendParameterToURL(exportUrlForTool, AttributeNames.PARAM_TOOL_SESSION_ID,
 			"0");
 	    } else {
@@ -292,17 +289,17 @@ public class PortfolioBuilder extends LearningDesignProcessor {
 	    }
 	    exportUrlForTool = WebUtil.appendParameterToURL(exportUrlForTool, AttributeNames.PARAM_ACTIVITY_ID,
 		    activity.getActivityId().toString());
-	    exportUrlForTool = WebUtil.appendParameterToURL(exportUrlForTool, AttributeNames.PARAM_LESSON_ID, lesson
-		    .getLessonId().toString());
+	    exportUrlForTool = WebUtil.appendParameterToURL(exportUrlForTool, AttributeNames.PARAM_LESSON_ID,
+		    lesson.getLessonId().toString());
 	}
 	return exportUrlForTool;
     }
 
     /**
      * Process all Notebook (Scratchpad) entries into portfolio objects.
-     * 
+     *
      * @param notebookAccessMode
-     *                The access mode that determines what entries are returned.
+     *            The access mode that determines what entries are returned.
      */
     public void processNotebook(ToolAccessMode notebookAccessMode) throws ExportPortfolioException {
 	List entries = null;
@@ -312,8 +309,8 @@ public class PortfolioBuilder extends LearningDesignProcessor {
 	}
 
 	if (notebookAccessMode == null) {
-	    entries = coreNotebookService.getEntry(lesson.getLessonId(), CoreNotebookConstants.SCRATCH_PAD, user
-		    .getUserId());
+	    entries = coreNotebookService.getEntry(lesson.getLessonId(), CoreNotebookConstants.SCRATCH_PAD,
+		    user.getUserId());
 	} else if (notebookAccessMode.equals(ToolAccessMode.TEACHER)) {
 	    entries = coreNotebookService.getEntry(lesson.getLessonId(), CoreNotebookConstants.SCRATCH_PAD,
 		    CoreNotebookConstants.JOURNAL_SIG, user.getUserId());
@@ -336,9 +333,9 @@ public class PortfolioBuilder extends LearningDesignProcessor {
      * Obtains the Tool from the ToolActivity and creates a portfolio object with properties activityId, activityName,
      * activityDescription, exportURL set to the value of the ToolActivity's properties activityId, toolDisplayName
      * (retrieved from Tool object), title, exportPortfolioUrl respestively.
-     * 
+     *
      * @param activity
-     *                The Tool Activity
+     *            The Tool Activity
      * @return a Portfolio object
      */
     protected ActivityPortfolio createActivityPortfolio(Activity activity) {
@@ -357,9 +354,9 @@ public class PortfolioBuilder extends LearningDesignProcessor {
 
     /**
      * Creates a portfolio object with properties title and entry from the NotebookEntry.
-     * 
+     *
      * @param entry
-     *                The Notebook Entry
+     *            The Notebook Entry
      * @return a Portfolio object
      */
     protected NotebookPortfolio createNotebookPortfolio(NotebookEntry entry) {
@@ -391,7 +388,7 @@ public class PortfolioBuilder extends LearningDesignProcessor {
 
     /**
      * Get the list of notebook entries
-     * 
+     *
      * @return
      */
     public ArrayList<NotebookPortfolio> getNotebookList() {

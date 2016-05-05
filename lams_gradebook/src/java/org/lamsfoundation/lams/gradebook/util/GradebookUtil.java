@@ -56,11 +56,11 @@ public class GradebookUtil {
 
     /**
      * Wrapper method for printing the xml for grid rows
-     * 
+     *
      * It takes the list of rows along with the grid parameter and returns the
      * xml for the altered set
-     * 
-     * 
+     *
+     *
      * @param gridRows
      * @param view
      * @param sortBy
@@ -78,14 +78,15 @@ public class GradebookUtil {
 	    String searchOper, String searchString, String sortOrder, int rowLimit, int page) {
 
 	// Alter the set based on the parameters
-	gridRows = makeGridRowAlterations(gridRows, sortBy, isSearch, searchField, searchOper, searchString, sortOrder,
-		rowLimit, page);
+	gridRows = GradebookUtil.makeGridRowAlterations(gridRows, sortBy, isSearch, searchField, searchOper,
+		searchString, sortOrder, rowLimit, page);
 	// Work out the sublist to fetch based on rowlimit and current page.
 	int totalPages = 1;
 	if (rowLimit < gridRows.size()) {
 
-	    totalPages = new Double(Math.ceil(new Integer(gridRows.size()).doubleValue()
-		    / new Integer(rowLimit).doubleValue())).intValue();
+	    totalPages = new Double(
+		    Math.ceil(new Integer(gridRows.size()).doubleValue() / new Integer(rowLimit).doubleValue()))
+			    .intValue();
 	    int firstRow = (page - 1) * rowLimit;
 	    int lastRow = firstRow + rowLimit;
 
@@ -97,12 +98,12 @@ public class GradebookUtil {
 
 	}
 
-	return toGridXML(gridRows, page, totalPages, view);
+	return GradebookUtil.toGridXML(gridRows, page, totalPages, view);
     }
 
     /**
      * Tranlates a list of grid rows into the required jqGrid xml
-     * 
+     *
      * @param gridRows
      * @param page
      * @param totalPages
@@ -113,7 +114,7 @@ public class GradebookUtil {
     public static String toGridXML(List gridRows, int page, int totalPages, GBGridView view) {
 	String xml = "";
 	try {
-	    Document document = getDocument();
+	    Document document = GradebookUtil.getDocument();
 
 	    // root element
 	    Element rootElement = document.createElement(GradebookConstants.ELEMENT_ROWS);
@@ -151,7 +152,7 @@ public class GradebookUtil {
 	    }
 
 	    document.appendChild(rootElement);
-	    xml = getStringFromDocument(document);
+	    xml = GradebookUtil.getStringFromDocument(document);
 
 	} catch (ParserConfigurationException e) {
 	    // TODO Auto-generated catch block
@@ -163,15 +164,14 @@ public class GradebookUtil {
 
 	return xml;
     }
-    
+
     public static String niceFormatting(Double mark) {
-    	
-    	String markStr = new DecimalFormat("##0.00").format(mark);
-    	return markStr;
-    	
+
+	String markStr = new DecimalFormat("##0.00").format(mark);
+	return markStr;
+
     }
-    
-    
+
     private static Document getDocument() throws ParserConfigurationException {
 	DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
 	DocumentBuilder builder = factory.newDocumentBuilder();
@@ -192,7 +192,7 @@ public class GradebookUtil {
 
     /**
      * Alters a grid row for sorting and searching
-     * 
+     *
      * @param gridRows
      * @param sortBy
      * @param isSearch
@@ -233,8 +233,7 @@ public class GradebookUtil {
 
 	// if it is a search fix up the set
 	if (isSearch && searchField != null && searchOper != null && searchString != null) {
-	    gridRows = (List<GradebookGridRowDTO>) doRowNameSearch(gridRows, searchField, searchOper, searchString
-		    .toLowerCase());
+	    gridRows = GradebookUtil.doRowNameSearch(gridRows, searchField, searchOper, searchString.toLowerCase());
 	}
 
 	// Reverse the order if requested
@@ -248,7 +247,7 @@ public class GradebookUtil {
 
     /**
      * Does the search operation on the set for row names
-     * 
+     *
      * @param gradebookRows
      * @param searchField
      * @param searchOper
@@ -256,7 +255,8 @@ public class GradebookUtil {
      * @return
      */
     @SuppressWarnings("unchecked")
-    private static List doRowNameSearch(List gradebookRows, String searchField, String searchOper, String searchString) {
+    private static List doRowNameSearch(List gradebookRows, String searchField, String searchOper,
+	    String searchString) {
 	List<GradebookGridRowDTO> ret = new ArrayList<GradebookGridRowDTO>();
 
 	if (searchField.equals(GradebookConstants.PARAM_ROW_NAME)) {
@@ -299,19 +299,20 @@ public class GradebookUtil {
 	String view = WebUtil.readStrParam(request, param_mode, optional);
 	if (view == null) {
 	    return null;
-	} else if (view.equals(GradebookConstants.VIEW_MON_USER))
+	} else if (view.equals(GradebookConstants.VIEW_MON_USER)) {
 	    return GBGridView.MON_USER;
-	else if (view.equals(GradebookConstants.VIEW_MON_ACTIVITY))
+	} else if (view.equals(GradebookConstants.VIEW_MON_ACTIVITY)) {
 	    return GBGridView.MON_ACTIVITY;
-	else if (view.equals(GradebookConstants.VIEW_MON_COURSE))
+	} else if (view.equals(GradebookConstants.VIEW_MON_COURSE)) {
 	    return GBGridView.MON_COURSE;
-	else if (view.equals(GradebookConstants.VIEW_LRN_COURSE))
+	} else if (view.equals(GradebookConstants.VIEW_LRN_COURSE)) {
 	    return GBGridView.LRN_COURSE;
-	else if (view.equals(GradebookConstants.VIEW_LRN_ACTIVITY))
+	} else if (view.equals(GradebookConstants.VIEW_LRN_ACTIVITY)) {
 	    return GBGridView.LRN_ACTIVITY;
-	else if (view.equals(GradebookConstants.VIEW_LIST))
-	    return GBGridView.LIST;	
-	else
+	} else if (view.equals(GradebookConstants.VIEW_LIST)) {
+	    return GBGridView.LIST;
+	} else {
 	    throw new IllegalArgumentException("[" + view + "] is not a legal gradebook view");
+	}
     }
 }

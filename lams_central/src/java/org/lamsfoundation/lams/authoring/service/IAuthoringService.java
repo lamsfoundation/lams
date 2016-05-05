@@ -2,21 +2,21 @@
  * Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
  * =============================================================
  * License Information: http://lamsfoundation.org/licensing/lams/2.0/
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License version 2.0 
+ * it under the terms of the GNU General Public License version 2.0
  * as published by the Free Software Foundation.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301
  * USA
- * 
+ *
  * http://www.gnu.org/licenses/gpl.txt
  * ************************************************************************
  */
@@ -67,7 +67,7 @@ public interface IAuthoringService {
 
     /**
      * Returns a populated LearningDesign object corresponding to the given learningDesignID
-     * 
+     *
      * @param learningDesignID
      *            The learning_design_id of the design which has to be fetched
      * @return LearningDesign The populated LearningDesign object corresponding to the given learningDesignID
@@ -77,7 +77,7 @@ public interface IAuthoringService {
     /**
      * Create a copy of learning design as per the requested learning design and saves it in the given workspacefolder.
      * Does not set the original
-     * 
+     *
      * @param originalLearningDesign
      *            The source learning design id.
      * @param copyType
@@ -102,7 +102,7 @@ public interface IAuthoringService {
      * Create a copy of learning design as per the requested learning design and saves it in the given workspacefolder.
      * Designed to be called when user tries to copy a learning design using the Flash interface. Does not set the
      * original learning design field, so it should not be used for creating lesson learning designs.
-     * 
+     *
      * @param originalLearningDesingID
      *            the source learning design id.
      * @param copyType
@@ -121,14 +121,14 @@ public interface IAuthoringService {
      * @return new LearningDesign
      */
     public LearningDesign copyLearningDesign(Long originalLearningDesignID, Integer copyType, Integer userID,
-	    Integer workspaceFolder, boolean setOriginalDesign) throws UserException, LearningDesignException,
-	    WorkspaceFolderException, IOException;
+	    Integer workspaceFolder, boolean setOriginalDesign)
+	    throws UserException, LearningDesignException, WorkspaceFolderException, IOException;
 
     /**
      * Insert a learning design into another learning design. This is a copy and paste type of copy - it just dumps the
      * contents (with modified activity ui ids) in the main learning design. It doesn't wrap up the contents in a
      * sequence activity. Always sets the type to COPY_TYPE_NONE.
-     * 
+     *
      * @param originalDesignID
      *            The design to be "modified". Required.
      * @param designToImportID
@@ -159,7 +159,7 @@ public interface IAuthoringService {
 
     /**
      * Returns a string representing the requested LearningDesign in WDDX format
-     * 
+     *
      * @param learningDesignID
      *            The learning_design_id of the design whose WDDX packet is requested
      * @return String The requested LearningDesign in WDDX format
@@ -170,9 +170,9 @@ public interface IAuthoringService {
     /**
      * This method saves a new Learning Design to the database. It received a WDDX packet from flash, deserializes it
      * and then finally persists it to the database.
-     * 
+     *
      * Note: it does not validate the design - that must be done separately.
-     * 
+     *
      * @param wddxPacket
      *            The WDDX packet to be stored in the database
      * @return Long learning design id
@@ -180,22 +180,22 @@ public interface IAuthoringService {
      */
     public Long storeLearningDesignDetails(String wddxPacket) throws Exception;
 
-    public LearningDesign saveLearningDesignDetails(JSONObject ldJSON) throws UserException, JSONException,
-	    WorkspaceFolderException, ObjectExtractorException, ParseException;
+    public LearningDesign saveLearningDesignDetails(JSONObject ldJSON)
+	    throws UserException, JSONException, WorkspaceFolderException, ObjectExtractorException, ParseException;
 
     /**
      * Validate the learning design, updating the valid flag appropriately.
-     * 
+     *
      * This needs to be run in a separate transaction to storeLearningDesignDetails to ensure the database is fully
      * updated before the validation occurs (due to some quirks we are finding using Hibernate)
-     * 
+     *
      * @param learningDesignId
      * @throws Exception
      */
     public Vector<ValidationErrorDTO> validateLearningDesign(Long learningDesignId);
 
     /**
-     * 
+     *
      * @param learningDesignId
      * @return
      */
@@ -209,7 +209,7 @@ public interface IAuthoringService {
     /**
      * This method returns a output definition of the Tool, filtered by the supported Tool Output classes, in WDDX
      * format.
-     * 
+     *
      * @return String The required definitions in WDDX format
      * @throws IOException
      */
@@ -218,7 +218,7 @@ public interface IAuthoringService {
 
     /**
      * Saves the LearningDesign to the database. Will update if already saved. Used when a design is run.
-     * 
+     *
      * @param learningDesign
      *            The LearningDesign to be saved
      */
@@ -226,7 +226,7 @@ public interface IAuthoringService {
 
     /**
      * This method returns a list of all available system libraries in WDDX format.
-     * 
+     *
      * @return String The required information in WDDX format
      * @throws IOException
      */
@@ -234,11 +234,11 @@ public interface IAuthoringService {
 
     /**
      * Returns a string representing the new tool content id in WDDX format.
-     * 
+     *
      * Typically, when a user clicks on an activity to edit the tool contnet, it must have a tool content id passed to
      * it. This method uses the ToolContentIDGenerator to generate the new tool content id and passes this value back to
      * flash in WDDX format.
-     * 
+     *
      * @param toolID
      *            The toolID in which to generate the new tool content id for
      * @return String The new tool content id in WDDX Format
@@ -249,10 +249,10 @@ public interface IAuthoringService {
 
     /**
      * Calls an appropriate tool to copy the content indicated by toolContentId. Returns the new tool content id.
-     * 
+     *
      * The is called when the user copies and pastes a tool activity icon in authoring. It should only be called on a
      * ToolActivity - never a Gate or Grouping or Complex activity.
-     * 
+     *
      * @param toolContentID
      *            The toolContentID indicating the content to copy
      * @param customCSV
@@ -265,12 +265,12 @@ public interface IAuthoringService {
      * Calls an appropriate tools to copy the content indicated by toolContentIds. Batch version of String
      * copyToolContent(Long toolContentID). Returns a map containing the old and new ids, and this is converted to a
      * WDDX format in the calling servlet.
-     * 
+     *
      * The is called when the user copies and pastes a complex activity icon in authoring. Authoring calls this method
      * to copy all the contained tool activities' content in one go.
-     * 
+     *
      * It should only be called on a ToolActivity - never a Gate or Grouping or Complex activity.
-     * 
+     *
      * @param userId
      *            Id of the user requesting the copy
      * @param customCSV
@@ -286,7 +286,7 @@ public interface IAuthoringService {
      * may be used for user entered license details. The picture url supplied should be a full URL i.e. if it was a
      * relative URL in the database, it should have been converted to a complete server URL (starting http://) before
      * sending to the client.
-     * 
+     *
      * @return Vector of LicenseDTO objects. It is a Vector to ensure compatibility with WDDX
      */
     public Vector getAvailableLicenses();
@@ -299,7 +299,7 @@ public interface IAuthoringService {
 
     /**
      * Generates a unique content folder for the newly created design to store
-     * 
+     *
      * @return String The unique content folder id in WDDX Format
      */
     public String generateUniqueContentFolder() throws FileUtilException, IOException;
@@ -307,7 +307,7 @@ public interface IAuthoringService {
     /**
      * Prepares a LearningDesign to be ready for Edit-On-The-Fly (Editing). Return a string representing the updated
      * learning design in WDDX format.
-     * 
+     *
      * @param design
      *            The learning design whose WDDX packet is requested
      * @param userID
@@ -316,15 +316,15 @@ public interface IAuthoringService {
      * @throws LearningDesignException
      * @throws IOException
      */
-    public String setupEditOnFlyGate(Long learningDesignID, Integer userID) throws UserException,
-	    LearningDesignException, IOException;
+    public String setupEditOnFlyGate(Long learningDesignID, Integer userID)
+	    throws UserException, LearningDesignException, IOException;
 
-    public boolean setupEditOnFlyLock(Long learningDesignID, Integer userID) throws LearningDesignException,
-	    UserException, IOException;
+    public boolean setupEditOnFlyLock(Long learningDesignID, Integer userID)
+	    throws LearningDesignException, UserException, IOException;
 
     /**
-     * 
-     * 
+     *
+     *
      * @param learningDesignID
      *            The learning_design_id of the design for which editing has finished.
      * @param userID
@@ -338,7 +338,7 @@ public interface IAuthoringService {
 
     /**
      * Returns the generic help url from configuration
-     * 
+     *
      * @return String Generic help url
      * @throws Exception
      */
@@ -352,7 +352,7 @@ public interface IAuthoringService {
      * learning design has duplicated name in same folder, then the new name will have a timestamp. The new name format
      * will be oldname_ddMMYYYY_idx. The idx will be auto incremental index number, start from 1. Warning - this may be
      * quite intensive as it gets all the learning designs in a folder.
-     * 
+     *
      * @param originalLearningDesign
      * @param workspaceFolder
      * @param copyType
@@ -364,8 +364,8 @@ public interface IAuthoringService {
 
     public String getToolAuthorUrl(Long toolID, Long toolContentID, String contentFolderID);
 
-    public Long insertSingleActivityLearningDesign(String learningDesignTitle, Long toolID, Long toolContentID, Long learningLibraryID,
-	    String contentFolderID, Integer organisationID);
+    public Long insertSingleActivityLearningDesign(String learningDesignTitle, Long toolID, Long toolContentID,
+	    Long learningLibraryID, String contentFolderID, Integer organisationID);
 
     public List<LearningDesignAccess> updateLearningDesignAccessByUser(Integer userId);
 

@@ -2,21 +2,21 @@
  * Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
  * =============================================================
  * License Information: http://lamsfoundation.org/licensing/lams/2.0/
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301
  * USA
- * 
+ *
  * http://www.gnu.org/licenses/gpl.txt
  * ****************************************************************
  */
@@ -65,12 +65,13 @@ import org.lamsfoundation.lams.web.util.AttributeNames;
 
 /**
  * Starts up the monitoring module
- * 
- * @author Ozgur Demirtas 
+ *
+ * @author Ozgur Demirtas
  */
 public class QaMonitoringStarterAction extends Action implements QaAppConstants {
     private static Logger logger = Logger.getLogger(QaMonitoringStarterAction.class.getName());
 
+    @Override
     public ActionForward execute(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) throws IOException, ServletException, QaApplicationException {
 	QaUtils.cleanUpSessionAbsolute(request);
@@ -136,7 +137,7 @@ public class QaMonitoringStarterAction extends Action implements QaAppConstants 
 
 	boolean isGroupedActivity = qaService.isGroupedActivity(qaContent.getQaContentId());
 	request.setAttribute("isGroupedActivity", isGroupedActivity);
-	
+
 	//rating stuff
 	boolean isCommentsEnabled = qaService.isCommentsEnabled(qaContent.getQaContentId());
 	request.setAttribute("isCommentsEnabled", isCommentsEnabled);
@@ -168,7 +169,7 @@ public class QaMonitoringStarterAction extends Action implements QaAppConstants 
 	qaStatsDTO.setCountAllUsers(new Integer(countAllUsers).toString());
 	qaStatsDTO.setCountSessionComplete(new Integer(countSessionComplete).toString());
 	request.setAttribute(QA_STATS_DTO, qaStatsDTO);
-	
+
 	// set SubmissionDeadline, if any
 	if (qaContent.getSubmissionDeadline() != null) {
 	    Date submissionDeadline = qaContent.getSubmissionDeadline();
@@ -184,11 +185,11 @@ public class QaMonitoringStarterAction extends Action implements QaAppConstants 
 
     /**
      * validates request paramaters based on tool contract
-     * 
+     *
      * @param request
      * @param mapping
      * @return ActionForward
-     * @throws ServletException 
+     * @throws ServletException
      */
     protected ActionForward validateParameters(HttpServletRequest request, ActionMapping mapping,
 	    QaMonitoringForm qaMonitoringForm) throws ServletException {

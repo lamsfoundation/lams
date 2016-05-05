@@ -2,21 +2,21 @@
  * Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
  * =============================================================
  * License Information: http://lamsfoundation.org/licensing/lams/2.0/
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License version 2.0 
+ * it under the terms of the GNU General Public License version 2.0
  * as published by the Free Software Foundation.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301
  * USA
- * 
+ *
  * http://www.gnu.org/licenses/gpl.txt
  * ****************************************************************
  */
@@ -174,7 +174,7 @@ public class MonitoringAction extends Action {
 
     /**
      * The initial method for monitoring. List all users according to given Content ID.
-     * 
+     *
      * @param mapping
      * @param form
      * @param request
@@ -235,8 +235,8 @@ public class MonitoringAction extends Action {
 	    HttpServletResponse res) throws IOException, ServletException, JSONException {
 	forumService = getForumService();
 	String sessionMapId = WebUtil.readStrParam(request, ForumConstants.ATTR_SESSION_MAP_ID);
-	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession().getAttribute(
-		sessionMapId);
+	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
+		.getAttribute(sessionMapId);
 
 	// teacher timezone
 	HttpSession ss = SessionManager.getSession();
@@ -253,8 +253,8 @@ public class MonitoringAction extends Action {
 	Integer isSort2 = WebUtil.readIntParam(request, "column[1]", true);
 	Integer isSort3 = WebUtil.readIntParam(request, "column[2]", true);
 	Integer isSort4 = WebUtil.readIntParam(request, "column[3]", true);
-	String searchString = request.getParameter("fcol[0]"); 
-	
+	String searchString = request.getParameter("fcol[0]");
+
 	int sorting = ForumConstants.SORT_BY_NO;
 	if ((isSort1 != null) && isSort1.equals(0)) {
 	    sorting = ForumConstants.SORT_BY_USER_NAME_ASC;
@@ -273,7 +273,7 @@ public class MonitoringAction extends Action {
 
 	} else if ((isSort3 != null) && isSort3.equals(1)) {
 	    sorting = ForumConstants.SORT_BY_LAST_POSTING_DESC;
-	    
+
 	} else if ((isSort4 != null) && isSort4.equals(0)) {
 	    sorting = ForumConstants.SORT_BY_MARKED_ASC;
 
@@ -292,7 +292,7 @@ public class MonitoringAction extends Action {
 	Map<ForumUser, List<MessageDTO>> topicsByUser = currentSessionDto.getTopicsByUser();
 
 	Forum forum = (Forum) sessionMap.get("forum");
-	List<Object[]> users = forumService.getUsersForTablesorter(sessionId, page, size, sorting, searchString, 
+	List<Object[]> users = forumService.getUsersForTablesorter(sessionId, page, size, sorting, searchString,
 		forum.isReflectOnActivity());
 
 	JSONArray rows = new JSONArray();
@@ -303,7 +303,7 @@ public class MonitoringAction extends Action {
 	for (Object[] userAndReflection : users) {
 
 	    JSONObject responseRow = new JSONObject();
-	    
+
 	    ForumUser user = (ForumUser) userAndReflection[0];
 
 	    responseRow.put(ForumConstants.ATTR_USER_UID, user.getUid());
@@ -336,8 +336,8 @@ public class MonitoringAction extends Action {
 	    responseRow.put("anyPostsMarked", isAnyPostsMarked);
 	    responseRow.put("numberOfPosts", numberOfPosts);
 
-	    if ( userAndReflection.length > 1 && userAndReflection[1] != null) {
-		responseRow.put("notebookEntry", StringEscapeUtils.escapeHtml((String)userAndReflection[1]));
+	    if (userAndReflection.length > 1 && userAndReflection[1] != null) {
+		responseRow.put("notebookEntry", StringEscapeUtils.escapeHtml((String) userAndReflection[1]));
 	    }
 	    rows.put(responseRow);
 	}
@@ -349,7 +349,7 @@ public class MonitoringAction extends Action {
 
     /**
      * Download marks for all users in a speical session.
-     * 
+     *
      * @param mapping
      * @param form
      * @param request
@@ -469,7 +469,7 @@ public class MonitoringAction extends Action {
 
     /**
      * View activity for content.
-     * 
+     *
      * @param request
      */
     private void viewActivity(HttpServletRequest request) {
@@ -488,7 +488,7 @@ public class MonitoringAction extends Action {
 
     /**
      * View instruction information for a content.
-     * 
+     *
      * @param request
      */
     private void viewInstructions(HttpServletRequest request) {
@@ -504,7 +504,7 @@ public class MonitoringAction extends Action {
 
     /**
      * Show statisitc page for a session.
-     * 
+     *
      * @param mapping
      * @param form
      * @param request
@@ -519,7 +519,7 @@ public class MonitoringAction extends Action {
 
     /**
      * Performs all necessary actions for showing statistic page.
-     * 
+     *
      * @param request
      */
     private void statistic(HttpServletRequest request) {
@@ -577,7 +577,7 @@ public class MonitoringAction extends Action {
 
     /**
      * View all messages under one topic.
-     * 
+     *
      * @param mapping
      * @param form
      * @param request
@@ -598,7 +598,7 @@ public class MonitoringAction extends Action {
 
     /**
      * View topic subject, content and attachement.
-     * 
+     *
      * @param mapping
      * @param form
      * @param request
@@ -646,7 +646,7 @@ public class MonitoringAction extends Action {
 
     /**
      * View a special user's mark
-     * 
+     *
      * @param mapping
      * @param form
      * @param request
@@ -660,8 +660,8 @@ public class MonitoringAction extends Action {
 
 	// create sessionMap
 	String sessionMapId = WebUtil.readStrParam(request, ForumConstants.ATTR_SESSION_MAP_ID);
-	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession().getAttribute(
-		sessionMapId);
+	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
+		.getAttribute(sessionMapId);
 	request.setAttribute(ForumConstants.ATTR_SESSION_MAP_ID, sessionMapId);
 
 	sessionMap.put(AttributeNames.PARAM_TOOL_SESSION_ID, sessionId);
@@ -680,7 +680,7 @@ public class MonitoringAction extends Action {
 
     /**
      * Edit a special user's mark.
-     * 
+     *
      * @param mapping
      * @param form
      * @param request
@@ -690,8 +690,8 @@ public class MonitoringAction extends Action {
     private ActionForward editMark(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) {
 	MarkForm markForm = (MarkForm) form;
-	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession().getAttribute(
-		markForm.getSessionMapID());
+	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
+		.getAttribute(markForm.getSessionMapID());
 	String updateMode = (String) sessionMap.get(ForumConstants.PARAM_UPDATE_MODE);
 	// view forum mode
 	if (StringUtils.isBlank(updateMode)) {
@@ -731,7 +731,7 @@ public class MonitoringAction extends Action {
 
     /**
      * Update mark for a special user
-     * 
+     *
      * @param mapping
      * @param form
      * @param request
@@ -780,8 +780,8 @@ public class MonitoringAction extends Action {
 	    msg.setReport(report);
 	}
 
-	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession().getAttribute(
-		markForm.getSessionMapID());
+	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
+		.getAttribute(markForm.getSessionMapID());
 	Long sessionId = (Long) sessionMap.get(AttributeNames.PARAM_TOOL_SESSION_ID);
 	String updateMode = (String) sessionMap.get(ForumConstants.PARAM_UPDATE_MODE);
 
@@ -798,7 +798,7 @@ public class MonitoringAction extends Action {
 	    return mapping.findForward("success");
 
 	} else { // mark from view forum
-		 // display root topic rather than leaf one
+		     // display root topic rather than leaf one
 	    Long rootTopicId = forumService.getRootTopicId(msg.getUid());
 
 	    ForwardConfig redirectConfig = mapping.findForwardConfig("viewTopic");
@@ -813,7 +813,7 @@ public class MonitoringAction extends Action {
 
     /**
      * Set Submission Deadline
-     * 
+     *
      * @param mapping
      * @param form
      * @param request
@@ -849,13 +849,13 @@ public class MonitoringAction extends Action {
 
     /**
      * Get Forum Service.
-     * 
+     *
      * @return
      */
     private IForumService getForumService() {
 	if (forumService == null) {
-	    WebApplicationContext wac = WebApplicationContextUtils.getRequiredWebApplicationContext(getServlet()
-		    .getServletContext());
+	    WebApplicationContext wac = WebApplicationContextUtils
+		    .getRequiredWebApplicationContext(getServlet().getServletContext());
 	    forumService = (IForumService) wac.getBean(ForumConstants.FORUM_SERVICE);
 	}
 	return forumService;
@@ -889,8 +889,8 @@ public class MonitoringAction extends Action {
      * Return ResourceService bean.
      */
     private MessageService getMessageService() {
-	WebApplicationContext wac = WebApplicationContextUtils.getRequiredWebApplicationContext(getServlet()
-		.getServletContext());
+	WebApplicationContext wac = WebApplicationContextUtils
+		.getRequiredWebApplicationContext(getServlet().getServletContext());
 	return (MessageService) wac.getBean("forumMessageService");
     }
 }

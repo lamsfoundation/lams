@@ -2,21 +2,21 @@
  * Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
  * =============================================================
  * License Information: http://lamsfoundation.org/licensing/lams/2.0/
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301
  * USA
- * 
+ *
  * http://www.gnu.org/licenses/gpl.txt
  * ****************************************************************
  */
@@ -32,7 +32,7 @@ import org.apache.commons.lang.builder.ToStringBuilder;
  * <p>
  * DTO that holds question and user attempts data for jsp purposes
  * </p>
- * 
+ *
  * @author Ozgur Demirtas
  */
 public class QaMonitoredAnswersDTO implements Comparable {
@@ -43,7 +43,7 @@ public class QaMonitoredAnswersDTO implements Comparable {
     private String questionUid;
 
     private String question;
-    
+
     private String feedback;
 
     private Map questionAttempts;
@@ -62,9 +62,9 @@ public class QaMonitoredAnswersDTO implements Comparable {
     public void setQuestion(String question) {
 	this.question = question;
     }
-    
+
     /**
-     * 
+     *
      * @return Returns the feedback.
      */
     public String getFeedback() {
@@ -73,7 +73,7 @@ public class QaMonitoredAnswersDTO implements Comparable {
 
     /**
      * @param feedback
-     *                The feedback to set.
+     *            The feedback to set.
      */
     public void setFeedback(String feedback) {
 	this.feedback = feedback;
@@ -88,7 +88,7 @@ public class QaMonitoredAnswersDTO implements Comparable {
 
     /**
      * @param questionUid
-     *                The questionUid to set.
+     *            The questionUid to set.
      */
     public void setQuestionUid(String questionUid) {
 	this.questionUid = questionUid;
@@ -103,25 +103,28 @@ public class QaMonitoredAnswersDTO implements Comparable {
 
     /**
      * @param questionAttempts
-     *                The questionAttempts to set.
+     *            The questionAttempts to set.
      */
     public void setQuestionAttempts(Map questionAttempts) {
 	this.questionAttempts = questionAttempts;
     }
 
+    @Override
     public String toString() {
-	return new ToStringBuilder(this).append("sessionName:", sessionName).append("sessionId:", sessionId).append(
-		"questionUid:", questionUid).append("question:", question)
+	return new ToStringBuilder(this).append("sessionName:", sessionName).append("sessionId:", sessionId)
+		.append("questionUid:", questionUid).append("question:", question)
 		.append("questionAttempts:", questionAttempts).toString();
     }
 
+    @Override
     public int compareTo(Object o) {
 	QaMonitoredAnswersDTO qaMonitoredAnswersDTO = (QaMonitoredAnswersDTO) o;
 
-	if (qaMonitoredAnswersDTO == null)
+	if (qaMonitoredAnswersDTO == null) {
 	    return 1;
-	else
+	} else {
 	    return (int) (new Long(questionUid).longValue() - new Long(qaMonitoredAnswersDTO.questionUid).longValue());
+	}
     }
 
     /**
@@ -133,7 +136,7 @@ public class QaMonitoredAnswersDTO implements Comparable {
 
     /**
      * @param sessionId
-     *                The sessionId to set.
+     *            The sessionId to set.
      */
     public void setSessionId(String sessionId) {
 	this.sessionId = sessionId;
@@ -148,7 +151,7 @@ public class QaMonitoredAnswersDTO implements Comparable {
 
     /**
      * @param sessionName
-     *                The sessionName to set.
+     *            The sessionName to set.
      */
     public void setSessionName(String sessionName) {
 	this.sessionName = sessionName;

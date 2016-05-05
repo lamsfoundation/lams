@@ -1,25 +1,25 @@
 package org.lamsfoundation.lams.util.svg;
 
-/**************************************************************** 
- * Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org) 
- * ============================================================= 
- * License Information: http://lamsfoundation.org/licensing/lams/2.0/ 
- * 
- * This program is free software; you can redistribute it and/or modify 
- * it under the terms of the GNU General Public License version 2.0 
- * as published by the Free Software Foundation. 
- * 
- * This program is distributed in the hope that it will be useful, 
- * but WITHOUT ANY WARRANTY; without even the implied warranty of 
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the 
- * GNU General Public License for more details. 
- * 
- * You should have received a copy of the GNU General Public License 
- * along with this program; if not, write to the Free Software 
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 * USA 
- * 
- * http://www.gnu.org/licenses/gpl.txt 
- * **************************************************************** 
+/****************************************************************
+ * Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
+ * =============================================================
+ * License Information: http://lamsfoundation.org/licensing/lams/2.0/
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License version 2.0
+ * as published by the Free Software Foundation.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 * USA
+ *
+ * http://www.gnu.org/licenses/gpl.txt
+ * ****************************************************************
  */
 
 /* $Id$ */
@@ -68,7 +68,7 @@ import org.w3c.dom.svg.SVGDocument;
 
 /**
  * Generates SVG document based on exported learning design's xml file.
- * 
+ *
  * @author Andrey Balan
  */
 public class SVGGenerator {
@@ -114,7 +114,7 @@ public class SVGGenerator {
 
     /**
      * Adjusts resulted SVG with user-specific width
-     * 
+     *
      * @param width
      *            user specific width
      */
@@ -138,12 +138,12 @@ public class SVGGenerator {
 
     /**
      * Stream out SVG document into specified outputStream.
-     * 
+     *
      * @param outputStream
      *            stream where we put resulted data. It can be null in case of RESULT_TYPE_DISPLAY
      * @param outputFormat
      *            one of SVGGenerator's constants: either RESULT_TYPE_SVG or RESULT_TYPE_PNG or RESULT_TYPE_DISPLAY
-     * 
+     *
      * @throws TranscoderException
      * @throws IOException
      * @throws IllegalAccessException
@@ -180,7 +180,7 @@ public class SVGGenerator {
 
     /**
      * Generates SVG image based on learning design provided.
-     * 
+     *
      * @param learningDesign
      * @throws JDOMException
      * @throws IOException
@@ -274,7 +274,7 @@ public class SVGGenerator {
 
     /**
      * Recursive tree traverse.
-     * 
+     *
      * @param doc
      * @param svgRoot
      * @param learningDesign
@@ -305,7 +305,7 @@ public class SVGGenerator {
 
     /**
      * Adds activity to SVG DOM.
-     * 
+     *
      * @param doc
      * @param svgRoot
      * @param learningDesign
@@ -454,8 +454,8 @@ public class SVGGenerator {
 
 	String text = activity.getActivityTitle();
 	if (StringUtils.isNotEmpty(text)) {
-	    createText("TextElement-" + activity.getActivityID(), x + 9, y + 19, "start", "12", "Arial",
-		    "fill:#828990", text, g);
+	    createText("TextElement-" + activity.getActivityID(), x + 9, y + 19, "start", "12", "Arial", "fill:#828990",
+		    text, g);
 	}
     }
 
@@ -467,8 +467,8 @@ public class SVGGenerator {
 
 	String text = activity.getActivityTitle();
 	if (StringUtils.isNotEmpty(text)) {
-	    createText("TextElement-" + activity.getActivityID(), x + 9, y + 19, "start", "12", "Arial",
-		    "fill:#828990", text, g);
+	    createText("TextElement-" + activity.getActivityID(), x + 9, y + 19, "start", "12", "Arial", "fill:#828990",
+		    text, g);
 	}
 
 	int supportActivityChildrenSize = node.getChildCount();
@@ -508,8 +508,8 @@ public class SVGGenerator {
 
 	String text = activity.getActivityTitle();
 	if (StringUtils.isNotEmpty(text)) {
-	    createText("TextElement-" + activity.getActivityID(), x + 9, y + 19, "start", "12", "Arial",
-		    "fill:#828990", text, g);
+	    createText("TextElement-" + activity.getActivityID(), x + 9, y + 19, "start", "12", "Arial", "fill:#828990",
+		    text, g);
 	}
 
 	createText("Children-" + activity.getActivityID(), x + 9, y + (19 * 2) + 1, "start", "11", "Arial",
@@ -525,15 +525,16 @@ public class SVGGenerator {
 
 	String text = activity.getActivityTitle();
 	if (StringUtils.isNotEmpty(text)) {
-	    createText("TextElement-" + activity.getActivityID(), x + 9, y + 19, "start", "12", "Arial",
-		    "fill:#828990", text, g);
+	    createText("TextElement-" + activity.getActivityID(), x + 9, y + 19, "start", "12", "Arial", "fill:#828990",
+		    text, g);
 	}
 
 	createText("Children-" + activity.getActivityID(), x + 9, y + (19 * 2) + 1, "start", "11", "Arial",
 		"fill:#828990", node.getChildCount() + " - Sequences", g);
     }
 
-    private void createBranchingActivity(AuthoringActivityDTO activity, ActivityTreeNode node, Element g, int x, int y) {
+    private void createBranchingActivity(AuthoringActivityDTO activity, ActivityTreeNode node, Element g, int x,
+	    int y) {
 	// if the parallel is grouped, show it
 	if (activity.getApplyGrouping()) {
 	    createGroupingEffect(node, x, y, g);
@@ -584,8 +585,8 @@ public class SVGGenerator {
 
 	    // Create the lines
 	    Iterator<ActivityTreeNode> activityNodeIterator = sequenceNode.getChildren().iterator();
-	    for (int activityIndex = 1; activityNodeIterator.hasNext() && (activityIndex <= 6); activityIndex++, activityNodeIterator
-		    .next()) {
+	    for (int activityIndex = 1; activityNodeIterator.hasNext()
+		    && (activityIndex <= 6); activityIndex++, activityNodeIterator.next()) {
 		double activityPointX = startingPointX + (activityIndex * SVGConstants.BRANCHING_STEP)
 			+ (SVGConstants.BRANCHING_ACTIVITY_POINT / 2);
 		double activityPointY = startingPointY + (sequenceIndex * SVGConstants.BRANCHING_STEP)
@@ -659,7 +660,7 @@ public class SVGGenerator {
 
     /**
      * Returns estimated width and height of the whole SVG document.
-     * 
+     *
      * @param nodes
      * @param x
      * @param y
@@ -835,7 +836,7 @@ public class SVGGenerator {
 
     /**
      * Creates image for a tool.
-     * 
+     *
      * @param node
      * @param x
      * @param y
@@ -884,9 +885,8 @@ public class SVGGenerator {
 	    imageFileName = "icon_grouping.png";
 	}
 
-	imagePath = (SVGGenerator.OUTPUT_FORMAT_SVG_LAMS_COMMUNITY == outputFormat ? SVGConstants.PATH_TO_LAMSCOMMUNITY_SVG_IMAGES
-		: localSvgIconsPath)
-		+ imageFileName;
+	imagePath = (SVGGenerator.OUTPUT_FORMAT_SVG_LAMS_COMMUNITY == outputFormat
+		? SVGConstants.PATH_TO_LAMSCOMMUNITY_SVG_IMAGES : localSvgIconsPath) + imageFileName;
 
 	String imageId = "image-" + activity.getActivityID();
 	createImage(g, imagePath, imageId, imageX, imageY);
@@ -1075,7 +1075,8 @@ public class SVGGenerator {
     /**
      * Draws transitions between activities.
      */
-    private void createActivityTransitionLines(Map<Long, ActivityTreeNode> nodes, Collection<TransitionDTO> transitions) {
+    private void createActivityTransitionLines(Map<Long, ActivityTreeNode> nodes,
+	    Collection<TransitionDTO> transitions) {
 	for (TransitionDTO transition : transitions) {
 	    ActivityTreeNode fromActivity = nodes.get(transition.getFromActivityID());
 	    ActivityTreeNode toActivity = nodes.get(transition.getToActivityID());
@@ -1099,19 +1100,20 @@ public class SVGGenerator {
      * Draws initial (from door) and ending (to door) transition lines in branching.
      */
     private void createBranchingTransitionLines(Collection<BranchDTO> branches, ActivityTreeNode root) {
-	String imageFolder = (SVGGenerator.OUTPUT_FORMAT_SVG_LAMS_COMMUNITY == outputFormat ? SVGConstants.PATH_TO_LAMSCOMMUNITY_SVG_IMAGES
+	String imageFolder = (SVGGenerator.OUTPUT_FORMAT_SVG_LAMS_COMMUNITY == outputFormat
+		? SVGConstants.PATH_TO_LAMSCOMMUNITY_SVG_IMAGES
 		: Configuration.get(ConfigurationKeys.SERVER_URL) + "images/icons/");
 
 	// first the lines from door
 	String imageFileName = imageFolder + "door_out.png";
 	String imageId = "image-start";
-	createImage(null, imageFileName, imageId, new Double(branchingStartPoint.getX()).intValue(), new Double(
-		branchingStartPoint.getY()).intValue());
+	createImage(null, imageFileName, imageId, new Double(branchingStartPoint.getX()).intValue(),
+		new Double(branchingStartPoint.getY()).intValue());
 
 	imageFileName = imageFolder + "door_in.png";
 	imageId = "image-end";
-	createImage(null, imageFileName, imageId, new Double(branchingEndPoint.getX()).intValue(), new Double(
-		branchingEndPoint.getY()).intValue());
+	createImage(null, imageFileName, imageId, new Double(branchingEndPoint.getX()).intValue(),
+		new Double(branchingEndPoint.getY()).intValue());
 
 	Dimension edgePointsDimensions = new Dimension(27, 27);
 	Rectangle startRectangle = new Rectangle(branchingStartPoint, edgePointsDimensions);
@@ -1142,8 +1144,8 @@ public class SVGGenerator {
 
 		Point2D fromIntersection = SVGTrigonometryUtils.getRectangleAndLineSegmentIntersection(startRectangle,
 			branchFirstActivityRectangle);
-		Point2D toIntersection = SVGTrigonometryUtils.getRectangleAndLineSegmentIntersection(
-			branchFirstActivityRectangle, startRectangle);
+		Point2D toIntersection = SVGTrigonometryUtils
+			.getRectangleAndLineSegmentIntersection(branchFirstActivityRectangle, startRectangle);
 
 		// skip lines between overlapped activities
 		if ((fromIntersection == null) || (toIntersection == null)) {
@@ -1156,14 +1158,13 @@ public class SVGGenerator {
 
 		ActivityTreeNode branchLastActivity = branch.getLast();
 		if (!branch.stopAfterActivity) {
-		    Rectangle branchLastActivityRectangle = new Rectangle(
-			    branchLastActivity.getActivityCoordinates().x,
+		    Rectangle branchLastActivityRectangle = new Rectangle(branchLastActivity.getActivityCoordinates().x,
 			    branchLastActivity.getActivityCoordinates().y,
 			    branchLastActivity.getActivityDimension().width,
 			    branchLastActivity.getActivityDimension().height);
 
-		    fromIntersection = SVGTrigonometryUtils.getRectangleAndLineSegmentIntersection(
-			    branchLastActivityRectangle, endRectangle);
+		    fromIntersection = SVGTrigonometryUtils
+			    .getRectangleAndLineSegmentIntersection(branchLastActivityRectangle, endRectangle);
 		    toIntersection = SVGTrigonometryUtils.getRectangleAndLineSegmentIntersection(endRectangle,
 			    branchLastActivityRectangle);
 

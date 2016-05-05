@@ -2,28 +2,27 @@
  * Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
  * =============================================================
  * License Information: http://lamsfoundation.org/licensing/lams/2.0/
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License version 2.0 
+ * it under the terms of the GNU General Public License version 2.0
  * as published by the Free Software Foundation.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301
  * USA
- * 
+ *
  * http://www.gnu.org/licenses/gpl.txt
  * ***********************************************************************/
 /* $$Id$$ */
 package org.lamsfoundation.lams.web.tag;
 
 import java.io.IOException;
-import java.util.Iterator;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
@@ -44,11 +43,11 @@ import org.lamsfoundation.lams.web.filter.LocaleFilter;
  * style sheet. If the user doesn't have a theme then it just exports the
  * default. This way, if the user's entry points to a stylesheet that doesn't
  * exist, the default one is always available.
- * 
+ *
  * @jsp.tag name="css" body-content="empty" display-name="User's chosen
  *          stylesheet" description="Output stylesheet based on the user
  *          preferences."
- * 
+ *
  * @author Fiona Malikoff
  */
 public class CssTag extends TagSupport {
@@ -67,12 +66,13 @@ public class CssTag extends TagSupport {
     private static final String MAIN_STYLE = "main"; // expandable
 
     /**
-     * 
+     *
      */
     public CssTag() {
 	super();
     }
 
+    @Override
     public int doStartTag() throws JspException {
 	HttpSession session = ((HttpServletRequest) this.pageContext.getRequest()).getSession();
 
@@ -88,19 +88,22 @@ public class CssTag extends TagSupport {
 
 	    JspWriter writer = pageContext.getOut();
 	    if (serverURL != null) {
-		if (pageDirection != null)
-		    if (pageDirection.toLowerCase().equals(RTL_DIR))
+		if (pageDirection != null) {
+		    if (pageDirection.toLowerCase().equals(RTL_DIR)) {
 			rtl = true;
+		    }
+		}
 
 		List<String> themeList = CSSThemeUtil.getAllUserThemes();
 
 		for (String theme : themeList) {
 		    if (theme != null) {
 			theme = appendStyle(theme, rtl);
-			if (localLinkPath != null)
+			if (localLinkPath != null) {
 			    customStylesheetLink = generateLocalLink(theme);
-			else
+			} else {
 			    customStylesheetLink = generateLink(theme, serverURL);
+			}
 		    }
 
 		    if (customStylesheetLink != null) {
@@ -109,14 +112,15 @@ public class CssTag extends TagSupport {
 		}
 
 	    } else {
-		log.warn("CSSTag unable to write out CSS entries as the server url is missing from the configuration file.");
+		log.warn(
+			"CSSTag unable to write out CSS entries as the server url is missing from the configuration file.");
 	    }
 
 	    // Special IE stylesheet for all those IE related formatting issues
 	    String ieStylesheetName = (!rtl) ? IE_STYLESHEET_NAME : IE_STYLESHEET_NAME_RTL;
 	    String ie7StylesheetName = (!rtl) ? IE7_STYLESHEET_NAME : IE7_STYLESHEET_NAME_RTL;
-	    String ieLink = localLinkPath != null ? generateLocalURL(ieStylesheetName) : generateURL(ieStylesheetName,
-		    serverURL);
+	    String ieLink = localLinkPath != null ? generateLocalURL(ieStylesheetName)
+		    : generateURL(ieStylesheetName, serverURL);
 
 	    writer.println("<!--[if IE]>");
 	    writer.println("<style type=\"text/css\">");
@@ -124,8 +128,8 @@ public class CssTag extends TagSupport {
 	    writer.println("</style>");
 	    writer.println("<![endif]-->");
 
-	    String ie7Link = localLinkPath != null ? generateLocalURL(ie7StylesheetName) : generateURL(
-		    ie7StylesheetName, serverURL);
+	    String ie7Link = localLinkPath != null ? generateLocalURL(ie7StylesheetName)
+		    : generateURL(ie7StylesheetName, serverURL);
 	    writer.println("<!--[if IE 7]>");
 	    writer.println("<style type=\"text/css\">");
 	    writer.println("@import url (" + ie7Link + ");");
@@ -185,6 +189,7 @@ public class CssTag extends TagSupport {
 	}
     }
 
+    @Override
     public int doEndTag() {
 	return EVAL_PAGE;
     }
@@ -194,7 +199,7 @@ public class CssTag extends TagSupport {
      *                the css link be a local file link? If so, what is the path
      *                back to the 'root'. For tools' export portfolio pages,
      *                this should be set to \"../\""
-     * 
+     *
      * @return Returns the property.
      */
     public String getLocalLinkPath() {
@@ -209,7 +214,7 @@ public class CssTag extends TagSupport {
      * @jsp.attribute required="false" rtexprvalue="true" description="Learner
      *                pages use learner, fancy pages such as index page use
      *                core"
-     * 
+     *
      *                Sets whether to use blah.css (style="core") or
      *                blah_learner.css (style=learner). If this parameter is
      *                left blank, you get blah_learner.css e.g.

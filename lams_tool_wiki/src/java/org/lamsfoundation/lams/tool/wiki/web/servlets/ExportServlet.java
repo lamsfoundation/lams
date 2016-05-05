@@ -2,21 +2,21 @@
  * Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
  * =============================================================
  * License Information: http://lamsfoundation.org/licensing/lams/2.0/
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License version 2.0 
+ * it under the terms of the GNU General Public License version 2.0
  * as published by the Free Software Foundation.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301
  * USA
- * 
+ *
  * http://www.gnu.org/licenses/gpl.txt
  * ****************************************************************
  */
@@ -28,8 +28,6 @@ package org.lamsfoundation.lams.tool.wiki.web.servlets;
 import java.io.IOException;
 import java.util.SortedSet;
 import java.util.TreeSet;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
@@ -37,7 +35,6 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
-import org.lamsfoundation.lams.learning.export.web.action.ImageBundler;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.notebook.service.CoreNotebookConstants;
 import org.lamsfoundation.lams.tool.ToolAccessMode;
@@ -55,8 +52,6 @@ import org.lamsfoundation.lams.tool.wiki.service.WikiServiceProxy;
 import org.lamsfoundation.lams.tool.wiki.util.WikiConstants;
 import org.lamsfoundation.lams.tool.wiki.util.WikiException;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
-import org.lamsfoundation.lams.util.Configuration;
-import org.lamsfoundation.lams.util.ConfigurationKeys;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.servlet.AbstractExportPortfolioServlet;
 import org.lamsfoundation.lams.web.session.SessionManager;
@@ -64,9 +59,9 @@ import org.lamsfoundation.lams.web.util.AttributeNames;
 
 /**
  * This servlet does export portfolio for teachers and students
- * 
+ *
  * @author lfoxton
- * 
+ *
  */
 public class ExportServlet extends AbstractExportPortfolioServlet {
 
@@ -89,8 +84,7 @@ public class ExportServlet extends AbstractExportPortfolioServlet {
 	    wikiService = WikiServiceProxy.getWikiService(getServletContext());
 	}
 
-	String basePath = WebUtil.getBaseServerURL()
-		+ request.getContextPath();
+	String basePath = WebUtil.getBaseServerURL() + request.getContextPath();
 
 	try {
 	    if (StringUtils.equals(mode, ToolAccessMode.LEARNER.toString())) {
@@ -115,7 +109,7 @@ public class ExportServlet extends AbstractExportPortfolioServlet {
     /**
      * Do export for learners, outputs the wiki pages into one page which seperates each page into divs which are
      * displayed onclick
-     * 
+     *
      * @param request
      * @param response
      * @param directoryName
@@ -166,8 +160,8 @@ public class ExportServlet extends AbstractExportPortfolioServlet {
 	request.getSession().setAttribute(WikiConstants.ATTR_CURRENT_WIKI, new WikiPageDTO(wikiSession.getMainPage()));
 
 	// construct main page dto
-	request.getSession()
-		.setAttribute(WikiConstants.ATTR_MAIN_WIKI_PAGE, new WikiPageDTO(wikiSession.getMainPage()));
+	request.getSession().setAttribute(WikiConstants.ATTR_MAIN_WIKI_PAGE,
+		new WikiPageDTO(wikiSession.getMainPage()));
 
 	// Construct the user dto
 	UserDTO lamsUserDTO = (UserDTO) SessionManager.getSession().getAttribute(AttributeNames.USER);
@@ -191,7 +185,7 @@ public class ExportServlet extends AbstractExportPortfolioServlet {
 
     /**
      * Exports for teacher, does a main file and a file for each session so that each session can have its own wiki page
-     * 
+     *
      * @param request
      * @param response
      * @param directoryName
@@ -233,8 +227,8 @@ public class ExportServlet extends AbstractExportPortfolioServlet {
 		if (wikiUserDTO.isFinishedActivity()) {
 		    // get the notebook entry.
 		    NotebookEntry notebookEntry = wikiService.getEntry(sessionDTO.getSessionID(),
-			    CoreNotebookConstants.NOTEBOOK_TOOL, WikiConstants.TOOL_SIGNATURE, wikiUserDTO.getUserId()
-				    .intValue());
+			    CoreNotebookConstants.NOTEBOOK_TOOL, WikiConstants.TOOL_SIGNATURE,
+			    wikiUserDTO.getUserId().intValue());
 		    if (notebookEntry != null) {
 			wikiUserDTO.setNotebookEntry(notebookEntry.getEntry());
 		    }

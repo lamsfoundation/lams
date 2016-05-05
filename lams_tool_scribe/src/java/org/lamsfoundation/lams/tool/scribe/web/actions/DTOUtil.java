@@ -36,30 +36,30 @@ import org.lamsfoundation.lams.tool.scribe.util.ScribeUtils;
  */
 public class DTOUtil {
 
-	/** Create the session DTO for a user's session/group. Includes the number of votes
-	 * for, percentages, etc.
-	 * @param scribeSession
-	 */
-	public ScribeSessionDTO createSessionDTO(ScribeSession scribeSession) {
-		ScribeSessionDTO sessionDTO = new ScribeSessionDTO(scribeSession);
+    /**
+     * Create the session DTO for a user's session/group. Includes the number of votes
+     * for, percentages, etc.
+     * 
+     * @param scribeSession
+     */
+    public ScribeSessionDTO createSessionDTO(ScribeSession scribeSession) {
+	ScribeSessionDTO sessionDTO = new ScribeSessionDTO(scribeSession);
 
-		int numberOfVotes = 0;
-		for (Iterator iter = scribeSession.getScribeUsers().iterator(); iter
-				.hasNext();) {
-			ScribeUser user = (ScribeUser) iter.next();
-			if (user.isReportApproved()) {
-				numberOfVotes++;
-			}
-		}
-
-		int numberOfLearners = scribeSession.getScribeUsers().size();
-
-		sessionDTO.setNumberOfVotes(numberOfVotes);
-		sessionDTO.setNumberOfLearners(numberOfLearners);
-		sessionDTO.setVotePercentage(ScribeUtils.calculateVotePercentage(
-				numberOfVotes, numberOfLearners));
-
-		return sessionDTO;
+	int numberOfVotes = 0;
+	for (Iterator iter = scribeSession.getScribeUsers().iterator(); iter.hasNext();) {
+	    ScribeUser user = (ScribeUser) iter.next();
+	    if (user.isReportApproved()) {
+		numberOfVotes++;
+	    }
 	}
-	
+
+	int numberOfLearners = scribeSession.getScribeUsers().size();
+
+	sessionDTO.setNumberOfVotes(numberOfVotes);
+	sessionDTO.setNumberOfLearners(numberOfLearners);
+	sessionDTO.setVotePercentage(ScribeUtils.calculateVotePercentage(numberOfVotes, numberOfLearners));
+
+	return sessionDTO;
+    }
+
 }

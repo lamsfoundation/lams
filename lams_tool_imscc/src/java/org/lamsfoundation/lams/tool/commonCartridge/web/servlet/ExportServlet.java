@@ -2,21 +2,21 @@
  * Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
  * =============================================================
  * License Information: http://lamsfoundation.org/licensing/lams/2.0/
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License version 2.0 
+ * it under the terms of the GNU General Public License version 2.0
  * as published by the Free Software Foundation.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301
  * USA
- * 
+ *
  * http://www.gnu.org/licenses/gpl.txt
  * ****************************************************************
  */
@@ -47,7 +47,6 @@ import org.lamsfoundation.lams.tool.commonCartridge.CommonCartridgeConstants;
 import org.lamsfoundation.lams.tool.commonCartridge.dto.ReflectDTO;
 import org.lamsfoundation.lams.tool.commonCartridge.dto.Summary;
 import org.lamsfoundation.lams.tool.commonCartridge.model.CommonCartridge;
-import org.lamsfoundation.lams.tool.commonCartridge.model.CommonCartridgeSession;
 import org.lamsfoundation.lams.tool.commonCartridge.model.CommonCartridgeUser;
 import org.lamsfoundation.lams.tool.commonCartridge.service.CommonCartridgeApplicationException;
 import org.lamsfoundation.lams.tool.commonCartridge.service.CommonCartridgeServiceProxy;
@@ -64,7 +63,7 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
 
 /**
  * Export portfolio servlet to export all shared commonCartridge into offline HTML package.
- * 
+ *
  * @author Andrey Balan
  */
 public class ExportServlet extends AbstractExportPortfolioServlet {
@@ -84,6 +83,7 @@ public class ExportServlet extends AbstractExportPortfolioServlet {
 	super.init();
     }
 
+    @Override
     public String doExport(HttpServletRequest request, HttpServletResponse response, String directoryName,
 	    Cookie[] cookies) {
 
@@ -103,8 +103,7 @@ public class ExportServlet extends AbstractExportPortfolioServlet {
 	    logger.error("Cannot perform export for commonCartridge tool.");
 	}
 
-	String basePath = WebUtil.getBaseServerURL()
-		+ request.getContextPath();
+	String basePath = WebUtil.getBaseServerURL() + request.getContextPath();
 	writeResponseToFile(basePath + "/pages/export/exportportfolio.jsp?sessionMapID=" + sessionMap.getSessionID(),
 		directoryName, FILENAME, cookies);
 
@@ -140,8 +139,9 @@ public class ExportServlet extends AbstractExportPortfolioServlet {
 	saveFileToLocal(group, directoryName);
 
 	List<List> groupList = new ArrayList<List>();
-	if (group.size() > 0)
+	if (group.size() > 0) {
 	    groupList.add(group);
+	}
 
 	// Add flag to indicate whether to render user notebook entries
 	sessionMap.put(CommonCartridgeConstants.ATTR_REFLECTION_ON, content.isReflectOnActivity());
@@ -241,8 +241,8 @@ public class ExportServlet extends AbstractExportPortfolioServlet {
 
     private CommonCartridgeToolContentHandler getToolContentHandler() {
 	if (handler == null) {
-	    WebApplicationContext wac = WebApplicationContextUtils.getRequiredWebApplicationContext(this
-		    .getServletContext());
+	    WebApplicationContext wac = WebApplicationContextUtils
+		    .getRequiredWebApplicationContext(this.getServletContext());
 	    handler = (CommonCartridgeToolContentHandler) wac
 		    .getBean(CommonCartridgeConstants.TOOL_CONTENT_HANDLER_NAME);
 	}
@@ -252,8 +252,8 @@ public class ExportServlet extends AbstractExportPortfolioServlet {
     private ReflectDTO getReflectionEntry(CommonCartridgeUser commonCartridgeUser) {
 	ReflectDTO reflectDTO = new ReflectDTO(commonCartridgeUser);
 	NotebookEntry notebookEntry = service.getEntry(commonCartridgeUser.getSession().getSessionId(),
-		CoreNotebookConstants.NOTEBOOK_TOOL, CommonCartridgeConstants.TOOL_SIGNATURE, commonCartridgeUser
-			.getUserId().intValue());
+		CoreNotebookConstants.NOTEBOOK_TOOL, CommonCartridgeConstants.TOOL_SIGNATURE,
+		commonCartridgeUser.getUserId().intValue());
 
 	// check notebookEntry is not null
 	if (notebookEntry != null) {

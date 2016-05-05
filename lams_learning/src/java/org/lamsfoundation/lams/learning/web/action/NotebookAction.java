@@ -2,21 +2,21 @@
  * Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
  * =============================================================
  * License Information: http://lamsfoundation.org/licensing/lams/2.0/
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License version 2.0 
+ * it under the terms of the GNU General Public License version 2.0
  * as published by the Free Software Foundation.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301
  * USA
- * 
+ *
  * http://www.gnu.org/licenses/gpl.txt
  * ****************************************************************
  */
@@ -54,20 +54,20 @@ import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 
 /**
- * 
+ *
  * @author M Seaton
- * 
+ *
  *         ----------------XDoclet Tags--------------------
- * 
+ *
  * @struts:action name="NotebookForm" path="/notebook" parameter="method" validate="false"
- * 
+ *
  * @struts.action-forward name = "viewAll" path = ".notebookViewAll"
  * @struts.action-forward name= "viewSingle" path = ".notebookViewSingle"
  * @struts.action-forward name= "viewJournals" path = ".notebookViewJournals"
  * @struts.action-forward name = "addNew" path = ".notebookAddNew"
  * @struts.action-forward name = "saveSuccess" path = ".notebookSaveSuccess" ----------------XDoclet
  *                        Tags--------------------
- * 
+ *
  */
 public class NotebookAction extends LamsDispatchAction {
     // ---------------------------------------------------------------------
@@ -161,7 +161,7 @@ public class NotebookAction extends LamsDispatchAction {
     }
 
     /**
-     * 
+     *
      * @param lessonID
      *            Lesson to get the journals from.
      * @return List of Journal entries
@@ -205,7 +205,7 @@ public class NotebookAction extends LamsDispatchAction {
     }
 
     /**
-     * 
+     *
      */
     public ActionForward processNewEntry(ActionMapping mapping, ActionForm actionForm, HttpServletRequest request,
 	    HttpServletResponse response) throws IOException, ServletException {
@@ -227,7 +227,7 @@ public class NotebookAction extends LamsDispatchAction {
     }
 
     /**
-     * 
+     *
      */
     public ActionForward updateEntry(ActionMapping mapping, ActionForm actionForm, HttpServletRequest request,
 	    HttpServletResponse response) throws IOException, ServletException {
@@ -265,7 +265,7 @@ public class NotebookAction extends LamsDispatchAction {
 
     /**
      * Get AuditService bean.
-     * 
+     *
      * @return
      */
     private IAuditService getAuditService() {

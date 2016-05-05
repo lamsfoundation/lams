@@ -18,137 +18,132 @@
  *
  * http://www.gnu.org/licenses/gpl.txt
  * ****************************************************************
- */ 
- 
-/* $Id$ */ 
-package org.eucm.lams.tool.eadventure.web.form; 
+ */
+
+/* $Id$ */
+package org.eucm.lams.tool.eadventure.web.form;
 
 import org.apache.struts.action.ActionForm;
-import org.apache.struts.util.LabelValueBean;
- 
+
 /**
  * Form responsible for representing <code>EadventureExpression</code> objects on a view layer.
- * 
+ *
  * @author Angel del Blanco
- * 
+ *
  * @struts.form name="eadventureExpressionForm"
  */
 public class EadventureExpressionForm extends ActionForm {
-    
-    	private String sessionMapID;
 
-	private String position;
-    	// Link the name of the variable with their UUID for the first param
-	private String[] possibleVarsOp1;
-	private String selectedVarOp1;
-	// Select the operator
-	private String[] possibleOperator;
-	private String selectedOperator;
-	// Link the name of the variable with their UUID for the second param
-	private String[] possibleVarsOp2;
-	private String selectedVarOp2;
-	//TODO comprobar el tipo!!!
-	private String introducedValue;
-	// this var identifies if the user selects to introduce a value (false) or a variable as second op (true)
-	private boolean isSecondVarSelected;
-	
-	
-	private String nextOp;
-	
-	public EadventureExpressionForm() {
-		super();
-		position = "-1";
-	}
+    private String sessionMapID;
 
-	public String getSessionMapID() {
-	    return sessionMapID;
-	}
+    private String position;
+    // Link the name of the variable with their UUID for the first param
+    private String[] possibleVarsOp1;
+    private String selectedVarOp1;
+    // Select the operator
+    private String[] possibleOperator;
+    private String selectedOperator;
+    // Link the name of the variable with their UUID for the second param
+    private String[] possibleVarsOp2;
+    private String selectedVarOp2;
+    //TODO comprobar el tipo!!!
+    private String introducedValue;
+    // this var identifies if the user selects to introduce a value (false) or a variable as second op (true)
+    private boolean isSecondVarSelected;
 
-	public void setSessionMapID(String sessionMapID) {
-	    this.sessionMapID = sessionMapID;
-	}
+    private String nextOp;
 
-	public String[] getPossibleVarsOp1() {
-	    return possibleVarsOp1;
-	}
+    public EadventureExpressionForm() {
+	super();
+	position = "-1";
+    }
 
-	public void setPossibleVarsOp1(String[] possibleVarsOp1) {
-	    this.possibleVarsOp1 = possibleVarsOp1;
-	}
+    public String getSessionMapID() {
+	return sessionMapID;
+    }
 
-	public String getSelectedVarOp1() {
-	    return selectedVarOp1;
-	}
+    public void setSessionMapID(String sessionMapID) {
+	this.sessionMapID = sessionMapID;
+    }
 
-	public void setSelectedVarOp1(String selectedVarOp1) {
-	    this.selectedVarOp1 = selectedVarOp1;
-	}
+    public String[] getPossibleVarsOp1() {
+	return possibleVarsOp1;
+    }
 
-	public String[] getPossibleVarsOp2() {
-	    return possibleVarsOp2;
-	}
+    public void setPossibleVarsOp1(String[] possibleVarsOp1) {
+	this.possibleVarsOp1 = possibleVarsOp1;
+    }
 
-	public void setPossibleVarsOp2(String[] possibleVarsOp2) {
-	    this.possibleVarsOp2 = possibleVarsOp2;
-	}
+    public String getSelectedVarOp1() {
+	return selectedVarOp1;
+    }
 
-	public String getSelectedVarOp2() {
-	    return selectedVarOp2;
-	}
+    public void setSelectedVarOp1(String selectedVarOp1) {
+	this.selectedVarOp1 = selectedVarOp1;
+    }
 
-	public void setSelectedVarOp2(String selectedVarOp2) {
-	    this.selectedVarOp2 = selectedVarOp2;
-	}
+    public String[] getPossibleVarsOp2() {
+	return possibleVarsOp2;
+    }
 
-	public String getIntroducedValue() {
-	    return introducedValue;
-	}
+    public void setPossibleVarsOp2(String[] possibleVarsOp2) {
+	this.possibleVarsOp2 = possibleVarsOp2;
+    }
 
-	public void setIntroducedValue(String introducedValue) {
-	    this.introducedValue = introducedValue;
-	}
+    public String getSelectedVarOp2() {
+	return selectedVarOp2;
+    }
 
-	public String[] getPossibleOperator() {
-	    return possibleOperator;
-	}
+    public void setSelectedVarOp2(String selectedVarOp2) {
+	this.selectedVarOp2 = selectedVarOp2;
+    }
 
-	public void setPossibleOperator(String[] possibleOperator) {
-	    this.possibleOperator = possibleOperator;
-	}
+    public String getIntroducedValue() {
+	return introducedValue;
+    }
 
-	public String getSelectedOperator() {
-	    return selectedOperator;
-	}
+    public void setIntroducedValue(String introducedValue) {
+	this.introducedValue = introducedValue;
+    }
 
-	public void setSelectedOperator(String selectedOperator) {
-	    this.selectedOperator = selectedOperator;
-	}
+    public String[] getPossibleOperator() {
+	return possibleOperator;
+    }
 
+    public void setPossibleOperator(String[] possibleOperator) {
+	this.possibleOperator = possibleOperator;
+    }
 
+    public String getSelectedOperator() {
+	return selectedOperator;
+    }
 
-	public String getPosition() {
-	    return position;
-	}
+    public void setSelectedOperator(String selectedOperator) {
+	this.selectedOperator = selectedOperator;
+    }
 
-	public void setPosition(String position) {
-	    this.position = position;
-	}
+    public String getPosition() {
+	return position;
+    }
 
-	public String getNextOp() {
-		return nextOp;
-	}
+    public void setPosition(String position) {
+	this.position = position;
+    }
 
-	public void setNextOp(String nextOp) {
-		this.nextOp = nextOp;
-	}
+    public String getNextOp() {
+	return nextOp;
+    }
 
-	public boolean isSecondVarSelected() {
-		return isSecondVarSelected;
-	}
+    public void setNextOp(String nextOp) {
+	this.nextOp = nextOp;
+    }
 
-	public void setSecondVarSelected(boolean isSecondVarSelected) {
-		this.isSecondVarSelected = isSecondVarSelected;
-	}
+    public boolean isSecondVarSelected() {
+	return isSecondVarSelected;
+    }
+
+    public void setSecondVarSelected(boolean isSecondVarSelected) {
+	this.isSecondVarSelected = isSecondVarSelected;
+    }
 
 }
- 

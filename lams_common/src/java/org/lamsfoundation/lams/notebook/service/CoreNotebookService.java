@@ -2,21 +2,21 @@
  * Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
  * =============================================================
  * License Information: http://lamsfoundation.org/licensing/lams/2.0/
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License version 2.0 
+ * it under the terms of the GNU General Public License version 2.0
  * as published by the Free Software Foundation.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301
  * USA
- * 
+ *
  * http://www.gnu.org/licenses/gpl.txt
  * ****************************************************************
  */
@@ -96,33 +96,34 @@ public class CoreNotebookService implements ICoreNotebookService {
      * retrieving the tool data, rather than making a separate lookup. Note - if there is more than on row for each
      * tool/session/learner, then the tool will end up with a cross product against the learner record and you will get
      * one row in the learner + notebook result for each notebook entry.
-     * 
+     *
      * May only be used for entries where the external_id_type = CoreNotebookConstants.NOTEBOOK_TOOL
-     * 
+     *
      * The parameters are strings, and the SQL is built up rather than using parameters as either sessionIdString or
      * userIdString may be the name of a field you are joining on. Typically the sessionId will be a number as the tool
      * would be requesting the entries for only one session but the user field will need to be a reference to a column
      * in the user table so that it can get entries for more than one user. If you wanted multiple users across multiple
      * sessions, then the sessionId would need to refer to the column in the user/session table.
-     * 
+     *
      * If you only want an entry for one user, use getEntry(id, idIdType, signature, userID);
-     * 
+     *
      * The return values are the entry for the select clause (will always have a leading but no trailing comma and an
      * alias of notebookEntry) and the sql join clause, which should go with any other join clauses.
-     * 
+     *
      * To make sure it always returns the same number of objects add the select clause like this:
      * queryText.append(notebookEntryStrings != null ? notebookEntryStrings[0] : ", NULL notebookEntry"); or
-     * queryText.append(notebookEntryStrings != null ? notebookEntryStrings[0] : ", NULL notebookEntry, NULL notebookModifiedDate"); or
-     * 
+     * queryText.append(notebookEntryStrings != null ? notebookEntryStrings[0] :
+     * ", NULL notebookEntry, NULL notebookModifiedDate"); or
+     *
      * Then if there is isn't a notebookEntry to return, it still returns a notebookEntry column, which translates to
      * null. So you can return a collection like List<Object[UserObject, String]> irrespective of whether or not the
      * notebook entries (the Strings) are needed.
-     * 
+     *
      * Finally, as it will be returning the notebook entry as a separate field in select clause, set up the sql -> java
-     * object translation using ".addScalar("notebookEntry", Hibernate.STRING)" if includeDateModified = false or 
+     * object translation using ".addScalar("notebookEntry", Hibernate.STRING)" if includeDateModified = false or
      * .addScalar("notebookEntry", Hibernate.STRING).addScalar("notebookModifiedDate", Hibernate.DATE)
-     *  if  includeDates = true.
-     * 
+     * if includeDates = true.
+     *
      * @param sessionIdString
      *            Session identifier, usually the toolSessionId
      * @param toolSignature
@@ -130,12 +131,13 @@ public class CoreNotebookService implements ICoreNotebookService {
      * @param userIdString
      *            User identifier field string e.g.
      * @param includeDates
-     * 		  if true, SQL should also return the date modified as well as the notebook entry
+     *            if true, SQL should also return the date modified as well as the notebook entry
      * @return String[] { partial select string, join clause }
-     * 
+     *
      */
     @Override
-    public String[] getNotebookEntrySQLStrings(String sessionIdString, String toolSignature, String userIdString, boolean includeDates) {
+    public String[] getNotebookEntrySQLStrings(String sessionIdString, String toolSignature, String userIdString,
+	    boolean includeDates) {
 	StringBuilder buf = new StringBuilder(" LEFT JOIN lams_notebook_entry entry ON entry.external_id=");
 	buf.append(sessionIdString);
 	buf.append(" AND entry.external_id_type=");
@@ -145,13 +147,12 @@ public class CoreNotebookService implements ICoreNotebookService {
 	buf.append("\" AND entry.user_id=");
 	buf.append(userIdString);
 	String[] retValue = new String[2];
-	retValue[0] = includeDates 
-		? ", entry.entry notebookEntry, (CASE WHEN entry.last_modified IS NULL THEN entry.create_date ELSE entry.last_modified END) notebookModifiedDate " 
+	retValue[0] = includeDates
+		? ", entry.entry notebookEntry, (CASE WHEN entry.last_modified IS NULL THEN entry.create_date ELSE entry.last_modified END) notebookModifiedDate "
 		: ", entry.entry notebookEntry ";
 	retValue[1] = buf.toString();
 	return retValue;
     }
-
 
     @Override
     public String[] getNotebookEntrySQLStrings(String sessionIdString, String toolSignature, String userIdString) {
@@ -218,7 +219,7 @@ public class CoreNotebookService implements ICoreNotebookService {
     }
 
     /**
-     * 
+     *
      * @param IUserManagementService
      *            The userManagementService to set.
      */

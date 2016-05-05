@@ -2,21 +2,21 @@
  * Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
  * =============================================================
  * License Information: http://lamsfoundation.org/licensing/lams/2.0/
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License version 2.0 
+ * it under the terms of the GNU General Public License version 2.0
  * as published by the Free Software Foundation.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301
  * USA
- * 
+ *
  * http://www.gnu.org/licenses/gpl.txt
  * ****************************************************************
  */
@@ -38,9 +38,9 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
 
 /**
  * Various internationalisation (internationalization) utilities.
- * 
+ *
  * @author Fiona Malikoff
- * 
+ *
  */
 public class LanguageUtil {
 
@@ -54,13 +54,13 @@ public class LanguageUtil {
 
     private static IUserManagementService getService() {
 	if (service == null) {
-	    WebApplicationContext ctx = WebApplicationContextUtils.getWebApplicationContext(HttpSessionManager
-		    .getInstance().getServletContext());
+	    WebApplicationContext ctx = WebApplicationContextUtils
+		    .getWebApplicationContext(HttpSessionManager.getInstance().getServletContext());
 	    service = (IUserManagementService) ctx.getBean("userManagementService");
 	}
 	return service;
     }
-    
+
     public static void setService(IUserManagementService service) {
 	LanguageUtil.service = service;
     }
@@ -68,7 +68,7 @@ public class LanguageUtil {
     /**
      * Get the default language, country, based on entries in the server
      * configuration file.
-     * 
+     *
      * @return String[language, country]
      */
     public static String[] getDefaultLangCountry() {
@@ -79,17 +79,21 @@ public class LanguageUtil {
 	String serverLang = Configuration.get(ConfigurationKeys.SERVER_LANGUAGE);
 	if (serverLang != null) {
 	    // assume either "en" or "en_AU" formats
-	    if (serverLang.length() >= 2)
+	    if (serverLang.length() >= 2) {
 		languageIsoCode = serverLang.substring(0, 2);
-	    if (serverLang.length() >= 5)
+	    }
+	    if (serverLang.length() >= 5) {
 		countryIsoCode = serverLang.substring(3, 5);
+	    }
 	}
 
 	// fallback to en_AU
-	if (languageIsoCode == null)
+	if (languageIsoCode == null) {
 	    languageIsoCode = DEFAULT_LANGUAGE;
-	if (countryIsoCode == null)
+	}
+	if (countryIsoCode == null) {
 	    languageIsoCode = DEFAULT_COUNTRY;
+	}
 
 	return new String[] { languageIsoCode, countryIsoCode };
 
@@ -98,19 +102,20 @@ public class LanguageUtil {
     /**
      * Get the default direction, based on the values in the server
      * configuration file.
-     * 
+     *
      * @return direction
      */
     public static String getDefaultDirection() {
 	String direction = Configuration.get(ConfigurationKeys.SERVER_PAGE_DIRECTION);
-	if (direction == null)
+	if (direction == null) {
 	    direction = DEFAULT_DIRECTION;
+	}
 	return direction;
     }
 
     /**
      * Get the default timezone
-     * 
+     *
      * @return timezone
      */
     public static TimeZone getDefaultTimeZone() {
@@ -130,9 +135,9 @@ public class LanguageUtil {
 	}
 
 	SupportedLocale locale = null;
-	locale = getSupportedLocaleOrNull(langIsoCode, countryIsoCode);
+	locale = LanguageUtil.getSupportedLocaleOrNull(langIsoCode, countryIsoCode);
 	if (locale == null) {
-	    locale = getSupportedLocaleOrNull(DEFAULT_LANGUAGE, DEFAULT_COUNTRY);
+	    locale = LanguageUtil.getSupportedLocaleOrNull(DEFAULT_LANGUAGE, DEFAULT_COUNTRY);
 	}
 
 	return locale;
@@ -143,16 +148,16 @@ public class LanguageUtil {
      * single input string. Otherwise returns server default locale.
      */
     public static SupportedLocale getSupportedLocale(String input) {
-	List list = getService().findByProperty(SupportedLocale.class, "languageIsoCode", input);
+	List list = LanguageUtil.getService().findByProperty(SupportedLocale.class, "languageIsoCode", input);
 	if (list != null && list.size() > 0) {
 	    return (SupportedLocale) list.get(0);
 	} else {
-	    list = getService().findByProperty(SupportedLocale.class, "countryIsoCode", input);
+	    list = LanguageUtil.getService().findByProperty(SupportedLocale.class, "countryIsoCode", input);
 	    if (list != null && list.size() > 0) {
 		return (SupportedLocale) list.get(0);
 	    }
 	}
-	return getDefaultLocale();
+	return LanguageUtil.getDefaultLocale();
     }
 
     /**
@@ -162,9 +167,9 @@ public class LanguageUtil {
     public static SupportedLocale getSupportedLocale(String langIsoCode, String countryIsoCode) {
 	SupportedLocale locale = null;
 
-	locale = getSupportedLocaleOrNull(langIsoCode, countryIsoCode);
+	locale = LanguageUtil.getSupportedLocaleOrNull(langIsoCode, countryIsoCode);
 	if (locale == null) {
-	    locale = getDefaultLocale();
+	    locale = LanguageUtil.getDefaultLocale();
 	}
 
 	return locale;
@@ -188,7 +193,7 @@ public class LanguageUtil {
 	    return null;
 	}
 
-	List list = getService().findByProperties(SupportedLocale.class, properties);
+	List list = LanguageUtil.getService().findByProperties(SupportedLocale.class, properties);
 	if (list != null && list.size() > 0) {
 	    Collections.sort(list);
 	    locale = (SupportedLocale) list.get(0);

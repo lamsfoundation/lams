@@ -27,7 +27,7 @@ public interface HttpClient {
 
     /**
      * Send an HTTP request and return the response.
-     * 
+     *
      * @param httpParameters
      *            HTTP client parameters, as a map from parameter name to value.
      *            Parameter names are defined as constants below.

@@ -71,18 +71,20 @@ public class OrganisationDAO extends BaseDAO implements IOrganisationDAO {
 	    + " and o1.organisationState.organisationStateId = " + OrganisationState.ARCHIVED
 	    + " and uo1.user.userId = :userId)" + " order by o1.name";
 
+    @Override
     public List getActiveCourseIdsByUser(final Integer userId, final boolean isSysadmin) {
 
-		return (isSysadmin ? getSession().createQuery(GET_ALL_ACTIVE_COURSE_IDS).list() : getSession()
-			.createQuery(GET_ACTIVE_COURSE_IDS_BY_USER).setInteger("userId", userId).list());
+	return (isSysadmin ? getSession().createQuery(GET_ALL_ACTIVE_COURSE_IDS).list()
+		: getSession().createQuery(GET_ACTIVE_COURSE_IDS_BY_USER).setInteger("userId", userId).list());
     }
 
+    @Override
     public List getArchivedCourseIdsByUser(final Integer userId, final boolean isSysadmin) {
 
-		return (isSysadmin ? getSession().createQuery(GET_ALL_ARCHIVED_COURSE_IDS).list() : getSession()
-			.createQuery(GET_ARCHIVED_COURSE_IDS_BY_USER).setInteger("userId", userId).list());
+	return (isSysadmin ? getSession().createQuery(GET_ALL_ARCHIVED_COURSE_IDS).list()
+		: getSession().createQuery(GET_ARCHIVED_COURSE_IDS_BY_USER).setInteger("userId", userId).list());
     }
-    
+
     @Override
     public List<Organisation> getPagedCourses(final Integer parentOrgId, final Integer typeId, final Integer stateId,
 	    int page, int size, String sortBy, String sortOrder, String searchString) {
@@ -90,27 +92,26 @@ public class OrganisationDAO extends BaseDAO implements IOrganisationDAO {
 		+ " WHERE o.organisationType.organisationTypeId =:typeId "
 		+ " AND o.organisationState.organisationStateId =:stateId "
 		+ " AND o.parentOrganisation.organisationId =:parentOrgId"
-		+ " AND (o.name LIKE CONCAT('%', :searchString, '%')) "
-		+ " ORDER BY ";
-	
+		+ " AND (o.name LIKE CONCAT('%', :searchString, '%')) " + " ORDER BY ";
+
 	String sortByParam = "o.name";
 	if (sortBy == null) {
 	    sortByParam = "o.name";
-	    
+
 	} else if (sortBy.equals("id")) {
 	    sortByParam = "o.organisationId";
-	    
+
 	} else if (sortBy.equals("name")) {
 	    sortByParam = "o.name";
-	    
+
 	} else if (sortBy.equals("code")) {
 	    sortByParam = "o.code";
-	    
+
 	} else if (sortBy.equals("description")) {
 	    sortByParam = "o.description";
 	}
-	
-	Query query = getSession().createQuery(GET_ORGS + sortByParam + " " +sortOrder);
+
+	Query query = getSession().createQuery(GET_ORGS + sortByParam + " " + sortOrder);
 	query.setInteger("typeId", typeId);
 	query.setInteger("stateId", stateId);
 	query.setInteger("parentOrgId", parentOrgId);
@@ -121,7 +122,7 @@ public class OrganisationDAO extends BaseDAO implements IOrganisationDAO {
 	query.setMaxResults(size);
 	return query.list();
     }
-    
+
     @Override
     public int getCountCoursesByParentCourseAndTypeAndState(final Integer parentOrgId, final Integer typeId,
 	    final Integer stateId, String searchString) {
@@ -138,7 +139,7 @@ public class OrganisationDAO extends BaseDAO implements IOrganisationDAO {
 	// support for custom search from a toolbar
 	searchString = searchString == null ? "" : searchString;
 	query.setString("searchString", searchString);
-	
+
 	List list = query.list();
 	if (list == null || list.size() == 0) {
 	    return 0;

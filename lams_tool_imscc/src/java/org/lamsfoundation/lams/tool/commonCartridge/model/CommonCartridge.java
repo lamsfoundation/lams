@@ -2,48 +2,43 @@
  * Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
  * =============================================================
  * License Information: http://lamsfoundation.org/licensing/lams/2.0/
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301
  * USA
- * 
+ *
  * http://www.gnu.org/licenses/gpl.txt
  * ****************************************************************
  */
 /* $Id$ */
 package org.lamsfoundation.lams.tool.commonCartridge.model;
 
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Set;
 
-import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.log4j.Logger;
-import org.lamsfoundation.lams.contentrepository.client.IToolContentHandler;
-import org.lamsfoundation.lams.tool.commonCartridge.util.CommonCartridgeToolContentHandler;
 
 /**
  * CommonCartridge
- * 
+ *
  * @author Andrey Balan
- * 
+ *
  * @hibernate.class table="tl_laimsc11_commoncartridge"
- * 
+ *
  */
 public class CommonCartridge implements Cloneable {
 
@@ -91,7 +86,7 @@ public class CommonCartridge implements Cloneable {
 
     /**
      * Default contruction method.
-     * 
+     *
      */
     public CommonCartridge() {
 	commonCartridgeItems = new HashSet();
@@ -163,7 +158,8 @@ public class CommonCartridge implements Cloneable {
 
     @Override
     public int hashCode() {
-	return new HashCodeBuilder().append(uid).append(title).append(instructions).append(created).append(updated).append(createdBy).toHashCode();
+	return new HashCodeBuilder().append(uid).append(title).append(instructions).append(created).append(updated)
+		.append(createdBy).toHashCode();
     }
 
     /**
@@ -183,7 +179,7 @@ public class CommonCartridge implements Cloneable {
     // **********************************************************
     /**
      * Returns the object's creation date
-     * 
+     *
      * @return date
      * @hibernate.property column="create_date"
      */
@@ -193,7 +189,7 @@ public class CommonCartridge implements Cloneable {
 
     /**
      * Sets the object's creation date
-     * 
+     *
      * @param created
      */
     public void setCreated(Date created) {
@@ -202,7 +198,7 @@ public class CommonCartridge implements Cloneable {
 
     /**
      * Returns the object's date of last update
-     * 
+     *
      * @return date updated
      * @hibernate.property column="update_date"
      */
@@ -212,7 +208,7 @@ public class CommonCartridge implements Cloneable {
 
     /**
      * Sets the object's date of last update
-     * 
+     *
      * @param updated
      */
     public void setUpdated(Date updated) {
@@ -221,9 +217,9 @@ public class CommonCartridge implements Cloneable {
 
     /**
      * @return Returns the userid of the user who created the Share commonCartridge.
-     * 
+     *
      * @hibernate.many-to-one cascade="save-update" column="create_by"
-     * 
+     *
      */
     public CommonCartridgeUser getCreatedBy() {
 	return createdBy;
@@ -250,9 +246,9 @@ public class CommonCartridge implements Cloneable {
 
     /**
      * @return Returns the title.
-     * 
+     *
      * @hibernate.property column="title"
-     * 
+     *
      */
     public String getTitle() {
 	return title;
@@ -268,9 +264,9 @@ public class CommonCartridge implements Cloneable {
 
     /**
      * @return Returns the lockWhenFinish.
-     * 
+     *
      * @hibernate.property column="lock_on_finished"
-     * 
+     *
      */
     public boolean getLockWhenFinished() {
 	return lockWhenFinished;
@@ -286,7 +282,7 @@ public class CommonCartridge implements Cloneable {
 
     /**
      * @return Returns the instructions set by the teacher.
-     * 
+     *
      * @hibernate.property column="instructions" type="text"
      */
     public String getInstructions() {
@@ -298,12 +294,12 @@ public class CommonCartridge implements Cloneable {
     }
 
     /**
-     * 
-     * 
+     *
+     *
      * @hibernate.set lazy="true" inverse="false" cascade="all" order-by="create_date desc"
      * @hibernate.collection-key column="commonCartridge_uid"
      * @hibernate.collection-one-to-many class="org.lamsfoundation.lams.tool.commonCartridge.model.CommonCartridgeItem"
-     * 
+     *
      * @return
      */
     public Set getCommonCartridgeItems() {
@@ -376,7 +372,7 @@ public class CommonCartridge implements Cloneable {
 
     /**
      * For display use
-     * 
+     *
      * @return
      */
     public String getMiniViewNumberStr() {

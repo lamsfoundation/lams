@@ -2,21 +2,21 @@
  * Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
  * =============================================================
  * License Information: http://lamsfoundation.org/licensing/lams/2.0/
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License version 2.0 
+ * it under the terms of the GNU General Public License version 2.0
  * as published by the Free Software Foundation.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301
  * USA
- * 
+ *
  * http://www.gnu.org/licenses/gpl.txt
  * ****************************************************************
  */
@@ -33,120 +33,119 @@ import org.lamsfoundation.lams.tool.scribe.model.Scribe;
 
 public class ScribeDTO {
 
-	private static Logger logger = Logger.getLogger(ScribeDTO.class);
+    private static Logger logger = Logger.getLogger(ScribeDTO.class);
 
-	public Long toolContentID;
+    public Long toolContentID;
 
-	public String title;
+    public String title;
 
-	public String instructions;
-	
-	public boolean defineLater;
-	
-	public boolean contentInUse;
-	
-	public boolean reflectOnActivity;
-	
-	public String reflectInstructions;
+    public String instructions;
 
-	public Set<ScribeSessionDTO> sessionDTOs = new TreeSet<ScribeSessionDTO>();
-	
-	public Set<ScribeHeadingDTO> headingDTOs = new TreeSet<ScribeHeadingDTO>();
-	
-	public boolean autoSelectScribe;
-	
-	public boolean showAggregatedReports;
+    public boolean defineLater;
 
-	
-	public ScribeDTO(Scribe scribe) {
-		toolContentID = scribe.getToolContentId();
-		title = scribe.getTitle();
-		instructions = scribe.getInstructions();
-		contentInUse = scribe.isContentInUse();
-		reflectInstructions = scribe.getReflectInstructions();
-		reflectOnActivity = scribe.isReflectOnActivity();
-		autoSelectScribe = scribe.isAutoSelectScribe();
-		showAggregatedReports = scribe.isShowAggregatedReports();
-		
-	}
+    public boolean contentInUse;
 
-	public Set<ScribeSessionDTO> getSessionDTOs() {
-		return sessionDTOs;
-	}
+    public boolean reflectOnActivity;
 
-	public void setSessionDTOs(Set<ScribeSessionDTO> sessionDTOs) {
-		this.sessionDTOs = sessionDTOs;
-	}
+    public String reflectInstructions;
 
-	public String getInstructions() {
-		return instructions;
-	}
+    public Set<ScribeSessionDTO> sessionDTOs = new TreeSet<ScribeSessionDTO>();
 
-	public void setInstructions(String instructions) {
-		this.instructions = instructions;
-	}
+    public Set<ScribeHeadingDTO> headingDTOs = new TreeSet<ScribeHeadingDTO>();
 
-	public String getTitle() {
-		return title;
-	}
+    public boolean autoSelectScribe;
 
-	public void setTitle(String title) {
-		this.title = title;
-	}
+    public boolean showAggregatedReports;
 
-	public Long getToolContentID() {
-		return toolContentID;
-	}
+    public ScribeDTO(Scribe scribe) {
+	toolContentID = scribe.getToolContentId();
+	title = scribe.getTitle();
+	instructions = scribe.getInstructions();
+	contentInUse = scribe.isContentInUse();
+	reflectInstructions = scribe.getReflectInstructions();
+	reflectOnActivity = scribe.isReflectOnActivity();
+	autoSelectScribe = scribe.isAutoSelectScribe();
+	showAggregatedReports = scribe.isShowAggregatedReports();
 
-	public void setToolContentID(Long toolContentID) {
-		this.toolContentID = toolContentID;
-	}
+    }
 
-	public String getReflectInstructions() {
-		return reflectInstructions;
-	}
+    public Set<ScribeSessionDTO> getSessionDTOs() {
+	return sessionDTOs;
+    }
 
-	public void setReflectInstructions(String reflectInstructions) {
-		this.reflectInstructions = reflectInstructions;
-	}
+    public void setSessionDTOs(Set<ScribeSessionDTO> sessionDTOs) {
+	this.sessionDTOs = sessionDTOs;
+    }
 
-	public boolean isContentInUse() {
-		return contentInUse;
-	}
+    public String getInstructions() {
+	return instructions;
+    }
 
-	public void setContentInUse(boolean contentInUse) {
-		this.contentInUse = contentInUse;
-	}
+    public void setInstructions(String instructions) {
+	this.instructions = instructions;
+    }
 
-	public boolean isDefineLater() {
-		return defineLater;
-	}
+    public String getTitle() {
+	return title;
+    }
 
-	public void setDefineLater(boolean defineLater) {
-		this.defineLater = defineLater;
-	}
+    public void setTitle(String title) {
+	this.title = title;
+    }
 
-	public boolean isReflectOnActivity() {
-		return reflectOnActivity;
-	}
+    public Long getToolContentID() {
+	return toolContentID;
+    }
 
-	public void setReflectOnActivity(boolean reflectOnActivity) {
-		this.reflectOnActivity = reflectOnActivity;
-	}
+    public void setToolContentID(Long toolContentID) {
+	this.toolContentID = toolContentID;
+    }
 
-	public boolean isAutoSelectScribe() {
-		return autoSelectScribe;
-	}
+    public String getReflectInstructions() {
+	return reflectInstructions;
+    }
 
-	public void setAutoSelectScribe(boolean autoSelectScribe) {
-		this.autoSelectScribe = autoSelectScribe;
-	}
+    public void setReflectInstructions(String reflectInstructions) {
+	this.reflectInstructions = reflectInstructions;
+    }
 
-	public boolean isShowAggregatedReports() {
-		return showAggregatedReports;
-	}
+    public boolean isContentInUse() {
+	return contentInUse;
+    }
 
-	public void setShowAggregatedReports(boolean showAggregatedReports) {
-		this.showAggregatedReports = showAggregatedReports;
-	}
+    public void setContentInUse(boolean contentInUse) {
+	this.contentInUse = contentInUse;
+    }
+
+    public boolean isDefineLater() {
+	return defineLater;
+    }
+
+    public void setDefineLater(boolean defineLater) {
+	this.defineLater = defineLater;
+    }
+
+    public boolean isReflectOnActivity() {
+	return reflectOnActivity;
+    }
+
+    public void setReflectOnActivity(boolean reflectOnActivity) {
+	this.reflectOnActivity = reflectOnActivity;
+    }
+
+    public boolean isAutoSelectScribe() {
+	return autoSelectScribe;
+    }
+
+    public void setAutoSelectScribe(boolean autoSelectScribe) {
+	this.autoSelectScribe = autoSelectScribe;
+    }
+
+    public boolean isShowAggregatedReports() {
+	return showAggregatedReports;
+    }
+
+    public void setShowAggregatedReports(boolean showAggregatedReports) {
+	this.showAggregatedReports = showAggregatedReports;
+    }
 }

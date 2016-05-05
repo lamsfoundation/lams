@@ -2,21 +2,21 @@
  * Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
  * =============================================================
  * License Information: http://lamsfoundation.org/licensing/lams/2.0/
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License version 2.0 
+ * it under the terms of the GNU General Public License version 2.0
  * as published by the Free Software Foundation.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301
  * USA
- * 
+ *
  * http://www.gnu.org/licenses/gpl.txt
  * ****************************************************************
  */
@@ -33,7 +33,7 @@ import org.lamsfoundation.lams.usermanagement.User;
 
 /**
  * @author Fiona Malikoff
- * 
+ *
  */
 public class Comment implements Cloneable {
 
@@ -53,7 +53,7 @@ public class Comment implements Cloneable {
     private int replyNumber;
     private boolean hideFlag;
     private boolean sticky;
-    
+
     private Comment rootComment;
     private Comment threadComment;
     private short commentLevel;
@@ -81,11 +81,14 @@ public class Comment implements Cloneable {
 	this.setUpdatedBy(user);
     }
 
+    @Override
     public boolean equals(Object o) {
-	if (this == o)
+	if (this == o) {
 	    return true;
-	if (!(o instanceof Comment))
+	}
+	if (!(o instanceof Comment)) {
 	    return false;
+	}
 
 	Comment genericEntity = (Comment) o;
 
@@ -97,6 +100,7 @@ public class Comment implements Cloneable {
 		.append(this.updatedBy, genericEntity.getUpdatedBy()).isEquals();
     }
 
+    @Override
     public int hashCode() {
 	return new HashCodeBuilder().append(uid).append(body).append(created).append(updated).append(createdBy)
 		.append(updatedBy).toHashCode();
@@ -185,6 +189,7 @@ public class Comment implements Cloneable {
     public void setSticky(boolean sticky) {
 	this.sticky = sticky;
     }
+
     public Comment getParent() {
 	return parent;
     }
@@ -241,6 +246,7 @@ public class Comment implements Cloneable {
 	this.vote = vote;
     }
 
+    @Override
     public String toString() {
 	return new ToStringBuilder(this).append("uid", uid).append("body", body).toString();
     }

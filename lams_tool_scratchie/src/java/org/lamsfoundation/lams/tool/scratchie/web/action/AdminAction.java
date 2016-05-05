@@ -1,23 +1,23 @@
-/**************************************************************** 
- * Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org) 
- * ============================================================= 
- * License Information: http://lamsfoundation.org/licensing/lams/2.0/ 
- * 
- * This program is free software; you can redistribute it and/or modify 
- * it under the terms of the GNU General Public License version 2.0 
- * as published by the Free Software Foundation. 
- * 
- * This program is distributed in the hope that it will be useful, 
- * but WITHOUT ANY WARRANTY; without even the implied warranty of 
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the 
- * GNU General Public License for more details. 
- * 
- * You should have received a copy of the GNU General Public License 
- * along with this program; if not, write to the Free Software 
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 * USA 
- * 
- * http://www.gnu.org/licenses/gpl.txt 
- * **************************************************************** 
+/****************************************************************
+ * Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
+ * =============================================================
+ * License Information: http://lamsfoundation.org/licensing/lams/2.0/
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License version 2.0
+ * as published by the Free Software Foundation.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 * USA
+ *
+ * http://www.gnu.org/licenses/gpl.txt
+ * ****************************************************************
  */
 
 /* $Id$ */
@@ -116,7 +116,7 @@ public class AdminAction extends Action {
 
     /**
      * Validate ScratchieConfigItems.
-     * 
+     *
      * @param adminForm
      * @return
      */
@@ -125,16 +125,16 @@ public class AdminAction extends Action {
 
 	String presetMarks = adminForm.getPresetMarks();
 	if (StringUtils.isNotBlank(presetMarks)) {
-	    
+
 	    //it's not a comma separated numbers
 	    if (!presetMarks.matches("[0-9]+(,[0-9]+)*")) {
-		errors.add(ActionMessages.GLOBAL_MESSAGE, new ActionMessage(
-			ScratchieConstants.ERROR_MSG_ENTERED_MARKS_NOT_COMMA_SEPARATED_INTEGERS));
+		errors.add(ActionMessages.GLOBAL_MESSAGE,
+			new ActionMessage(ScratchieConstants.ERROR_MSG_ENTERED_MARKS_NOT_COMMA_SEPARATED_INTEGERS));
 	    }
-	    
+
 	} else {
-	    errors.add(ActionMessages.GLOBAL_MESSAGE, new ActionMessage(
-		    ScratchieConstants.ERROR_MSG_REQUIRED_FIELDS_MISSING));
+	    errors.add(ActionMessages.GLOBAL_MESSAGE,
+		    new ActionMessage(ScratchieConstants.ERROR_MSG_REQUIRED_FIELDS_MISSING));
 	}
 
 	return errors;

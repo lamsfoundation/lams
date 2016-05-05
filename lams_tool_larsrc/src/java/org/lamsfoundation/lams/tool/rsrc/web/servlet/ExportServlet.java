@@ -2,21 +2,21 @@
  * Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
  * =============================================================
  * License Information: http://lamsfoundation.org/licensing/lams/2.0/
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License version 2.0 
+ * it under the terms of the GNU General Public License version 2.0
  * as published by the Free Software Foundation.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301
  * USA
- * 
+ *
  * http://www.gnu.org/licenses/gpl.txt
  * ****************************************************************
  */
@@ -61,197 +61,202 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
 /**
  * Export portfolio servlet to export all shared resource into offline HTML
  * package.
- * 
+ *
  * @author Steve.Ni
- * 
+ *
  * @version $Revision$
  */
 public class ExportServlet extends AbstractExportPortfolioServlet {
-	private static final long serialVersionUID = -4529093489007108143L;
+    private static final long serialVersionUID = -4529093489007108143L;
 
-	private static Logger logger = Logger.getLogger(ExportServlet.class);
+    private static Logger logger = Logger.getLogger(ExportServlet.class);
 
-	private final String FILENAME = "shared_resources_main.html";
+    private final String FILENAME = "shared_resources_main.html";
 
-	private ResourceToolContentHandler handler;
-	
-	private IResourceService service;
-	
-	@Override
-	public void init() throws ServletException {
-		service = ResourceServiceProxy.getResourceService(getServletContext());
-		super.init();
-	}
-	
-	public String doExport(HttpServletRequest request, HttpServletResponse response, String directoryName, Cookie[] cookies) {
+    private ResourceToolContentHandler handler;
+
+    private IResourceService service;
+
+    @Override
+    public void init() throws ServletException {
+	service = ResourceServiceProxy.getResourceService(getServletContext());
+	super.init();
+    }
+
+    @Override
+    public String doExport(HttpServletRequest request, HttpServletResponse response, String directoryName,
+	    Cookie[] cookies) {
 
 //		initial sessionMap
-		SessionMap sessionMap = new SessionMap();
-		request.getSession().setAttribute(sessionMap.getSessionID(), sessionMap);
-		
-		try {
-			if (StringUtils.equals(mode, ToolAccessMode.LEARNER.toString())) {
-				sessionMap.put(AttributeNames.ATTR_MODE,ToolAccessMode.LEARNER);
-				learner(request, response, directoryName, cookies,sessionMap);
-			} else if (StringUtils.equals(mode, ToolAccessMode.TEACHER.toString())) {
-				sessionMap.put(AttributeNames.ATTR_MODE,ToolAccessMode.TEACHER);
-				teacher(request, response, directoryName, cookies,sessionMap);
-			}
-		} catch (ResourceApplicationException e) {
-			logger.error("Cannot perform export for share resource tool.");
-		}
+	SessionMap sessionMap = new SessionMap();
+	request.getSession().setAttribute(sessionMap.getSessionID(), sessionMap);
 
-		String basePath =WebUtil.getBaseServerURL()
-				+ request.getContextPath();
-		writeResponseToFile(basePath + "/pages/export/exportportfolio.jsp?sessionMapID="+sessionMap.getSessionID()
-				, directoryName, FILENAME, cookies);
-
-		return FILENAME;
+	try {
+	    if (StringUtils.equals(mode, ToolAccessMode.LEARNER.toString())) {
+		sessionMap.put(AttributeNames.ATTR_MODE, ToolAccessMode.LEARNER);
+		learner(request, response, directoryName, cookies, sessionMap);
+	    } else if (StringUtils.equals(mode, ToolAccessMode.TEACHER.toString())) {
+		sessionMap.put(AttributeNames.ATTR_MODE, ToolAccessMode.TEACHER);
+		teacher(request, response, directoryName, cookies, sessionMap);
+	    }
+	} catch (ResourceApplicationException e) {
+	    logger.error("Cannot perform export for share resource tool.");
 	}
 
-	public void learner(HttpServletRequest request, HttpServletResponse response, String directoryName, Cookie[] cookies, HashMap sessionMap)
-			throws ResourceApplicationException {
+	String basePath = WebUtil.getBaseServerURL() + request.getContextPath();
+	writeResponseToFile(basePath + "/pages/export/exportportfolio.jsp?sessionMapID=" + sessionMap.getSessionID(),
+		directoryName, FILENAME, cookies);
 
-		if (userID == null || toolSessionID == null) {
-			String error = "Tool session Id or user Id is null. Unable to continue";
-			logger.error(error);
-			throw new ResourceApplicationException(error);
-		}
+	return FILENAME;
+    }
 
-		ResourceUser learner = service.getUserByIDAndSession(userID,toolSessionID);
+    public void learner(HttpServletRequest request, HttpServletResponse response, String directoryName,
+	    Cookie[] cookies, HashMap sessionMap) throws ResourceApplicationException {
 
-		if (learner == null) {
-			String error = "The user with user id " + userID + " does not exist.";
-			logger.error(error);
-			throw new ResourceApplicationException(error);
-		}
-
-		Resource content = service.getResourceBySessionId(toolSessionID);
-
-		if (content == null) {
-			String error = "The content for this activity has not been defined yet.";
-			logger.error(error);
-			throw new ResourceApplicationException(error);
-		}
-		
-		
-		List<ResourceItemDTO> group = service.exportBySessionId(toolSessionID,true);
-		saveFileToLocal(group, directoryName);
-		
-		List<List<ResourceItemDTO>> groupList = new ArrayList<List<ResourceItemDTO>>();
-		if(group.size() > 0)
-			groupList.add(group);
-		
-		// Add flag to indicate whether to render user notebook entries
-		sessionMap.put(ResourceConstants.ATTR_REFLECTION_ON, content.isReflectOnActivity());
-		
-		// Create reflectList if reflection is enabled.
-		if (content.isReflectOnActivity()) {
-		    	List<ReflectDTO> reflectList = new LinkedList<ReflectDTO>();
-			
-			// Create reflectList, need to follow same structure used in teacher
-			// see service.getReflectList();
-			reflectList.add(getReflectionEntry(learner));
-			
-			// Add reflectList to sessionMap
-			sessionMap.put(ResourceConstants.ATTR_REFLECT_LIST, reflectList);
-		}
-		
-		sessionMap.put(ResourceConstants.ATTR_TITLE, content.getTitle());
-		sessionMap.put(ResourceConstants.ATTR_INSTRUCTIONS, content.getInstructions());
-		sessionMap.put(ResourceConstants.ATTR_SUMMARY_LIST, groupList);
+	if (userID == null || toolSessionID == null) {
+	    String error = "Tool session Id or user Id is null. Unable to continue";
+	    logger.error(error);
+	    throw new ResourceApplicationException(error);
 	}
 
-	public void teacher(HttpServletRequest request, HttpServletResponse response, String directoryName, Cookie[] cookies, HashMap sessionMap)
-			throws ResourceApplicationException {
+	ResourceUser learner = service.getUserByIDAndSession(userID, toolSessionID);
 
-		// check if toolContentId exists in db or not
-		if (toolContentID == null) {
-			String error = "Tool Content Id is missing. Unable to continue";
-			logger.error(error);
-			throw new ResourceApplicationException(error);
-		}
-
-		Resource content = service.getResourceByContentId(toolContentID);
-
-		if (content == null) {
-			String error = "Data is missing from the database. Unable to Continue";
-			logger.error(error);
-			throw new ResourceApplicationException(error);
-		}
-		List<List<ResourceItemDTO>> groupList = service.exportByContentId(toolContentID);
-		if(groupList != null) {
-			for (List<ResourceItemDTO> list : groupList) {
-				saveFileToLocal(list, directoryName);
-			}
-		}
-		
-		// Add flag to indicate whether to render user notebook entries
-		sessionMap.put(ResourceConstants.ATTR_REFLECTION_ON, content.isReflectOnActivity());
-		
-		// Create reflectList if reflection is enabled.
-		if (content.isReflectOnActivity()) {
-		    	List<ReflectDTO> reflectList = service.getReflectList(content.getContentId());
-			// Add reflectList to sessionMap
-			sessionMap.put(ResourceConstants.ATTR_REFLECT_LIST, reflectList);
-		}
-		
-		// put it into HTTPSession
-		sessionMap.put(ResourceConstants.ATTR_TITLE, content.getTitle());
-		sessionMap.put(ResourceConstants.ATTR_INSTRUCTIONS, content.getInstructions());
-		sessionMap.put(ResourceConstants.ATTR_SUMMARY_LIST, groupList);
+	if (learner == null) {
+	    String error = "The user with user id " + userID + " does not exist.";
+	    logger.error(error);
+	    throw new ResourceApplicationException(error);
 	}
+
+	Resource content = service.getResourceBySessionId(toolSessionID);
+
+	if (content == null) {
+	    String error = "The content for this activity has not been defined yet.";
+	    logger.error(error);
+	    throw new ResourceApplicationException(error);
+	}
+
+	List<ResourceItemDTO> group = service.exportBySessionId(toolSessionID, true);
+	saveFileToLocal(group, directoryName);
+
+	List<List<ResourceItemDTO>> groupList = new ArrayList<List<ResourceItemDTO>>();
+	if (group.size() > 0) {
+	    groupList.add(group);
+	}
+
+	// Add flag to indicate whether to render user notebook entries
+	sessionMap.put(ResourceConstants.ATTR_REFLECTION_ON, content.isReflectOnActivity());
+
+	// Create reflectList if reflection is enabled.
+	if (content.isReflectOnActivity()) {
+	    List<ReflectDTO> reflectList = new LinkedList<ReflectDTO>();
+
+	    // Create reflectList, need to follow same structure used in teacher
+	    // see service.getReflectList();
+	    reflectList.add(getReflectionEntry(learner));
+
+	    // Add reflectList to sessionMap
+	    sessionMap.put(ResourceConstants.ATTR_REFLECT_LIST, reflectList);
+	}
+
+	sessionMap.put(ResourceConstants.ATTR_TITLE, content.getTitle());
+	sessionMap.put(ResourceConstants.ATTR_INSTRUCTIONS, content.getInstructions());
+	sessionMap.put(ResourceConstants.ATTR_SUMMARY_LIST, groupList);
+    }
+
+    public void teacher(HttpServletRequest request, HttpServletResponse response, String directoryName,
+	    Cookie[] cookies, HashMap sessionMap) throws ResourceApplicationException {
+
+	// check if toolContentId exists in db or not
+	if (toolContentID == null) {
+	    String error = "Tool Content Id is missing. Unable to continue";
+	    logger.error(error);
+	    throw new ResourceApplicationException(error);
+	}
+
+	Resource content = service.getResourceByContentId(toolContentID);
+
+	if (content == null) {
+	    String error = "Data is missing from the database. Unable to Continue";
+	    logger.error(error);
+	    throw new ResourceApplicationException(error);
+	}
+	List<List<ResourceItemDTO>> groupList = service.exportByContentId(toolContentID);
+	if (groupList != null) {
+	    for (List<ResourceItemDTO> list : groupList) {
+		saveFileToLocal(list, directoryName);
+	    }
+	}
+
+	// Add flag to indicate whether to render user notebook entries
+	sessionMap.put(ResourceConstants.ATTR_REFLECTION_ON, content.isReflectOnActivity());
+
+	// Create reflectList if reflection is enabled.
+	if (content.isReflectOnActivity()) {
+	    List<ReflectDTO> reflectList = service.getReflectList(content.getContentId());
+	    // Add reflectList to sessionMap
+	    sessionMap.put(ResourceConstants.ATTR_REFLECT_LIST, reflectList);
+	}
+
+	// put it into HTTPSession
+	sessionMap.put(ResourceConstants.ATTR_TITLE, content.getTitle());
+	sessionMap.put(ResourceConstants.ATTR_INSTRUCTIONS, content.getInstructions());
+	sessionMap.put(ResourceConstants.ATTR_SUMMARY_LIST, groupList);
+    }
 
     private void saveFileToLocal(List<ResourceItemDTO> list, String directoryName) {
-    	handler = getToolContentHandler();
-		for (ResourceItemDTO resourceItemDTO : list) {
-			//for learning object, it just display "No offline package available" information.
-			if(resourceItemDTO.getItemType() == ResourceConstants.RESOURCE_TYPE_LEARNING_OBJECT 
-				|| resourceItemDTO.getItemType() == ResourceConstants.RESOURCE_TYPE_URL
-				|| resourceItemDTO.getItemType() == 0){
-			    continue;
-			}
-				
-			try{
-				int idx= 1;
-				String userName = resourceItemDTO.getUsername();
-				String localDir;
-				while(true){
-					localDir = FileUtil.getFullPath(directoryName,userName + "/" + idx);
-					File local = new File(localDir);
-					if(!local.exists()){
-						local.mkdirs();
-						break;
-					}
-					idx++;
-				}
-				resourceItemDTO.setAttachmentLocalUrl(userName + "/" + idx + "/" + resourceItemDTO.getFileUuid() + '.' + FileUtil.getFileExtension(resourceItemDTO.getFileName()));
-				handler.saveFile(resourceItemDTO.getFileUuid(), FileUtil.getFullPath(directoryName, resourceItemDTO.getAttachmentLocalUrl()));
-			} catch (Exception e) {
-				logger.error("Export forum topic attachment failed: " + e.toString());
-			}
+	handler = getToolContentHandler();
+	for (ResourceItemDTO resourceItemDTO : list) {
+	    //for learning object, it just display "No offline package available" information.
+	    if (resourceItemDTO.getItemType() == ResourceConstants.RESOURCE_TYPE_LEARNING_OBJECT
+		    || resourceItemDTO.getItemType() == ResourceConstants.RESOURCE_TYPE_URL
+		    || resourceItemDTO.getItemType() == 0) {
+		continue;
+	    }
+
+	    try {
+		int idx = 1;
+		String userName = resourceItemDTO.getUsername();
+		String localDir;
+		while (true) {
+		    localDir = FileUtil.getFullPath(directoryName, userName + "/" + idx);
+		    File local = new File(localDir);
+		    if (!local.exists()) {
+			local.mkdirs();
+			break;
+		    }
+		    idx++;
 		}
-		
+		resourceItemDTO.setAttachmentLocalUrl(userName + "/" + idx + "/" + resourceItemDTO.getFileUuid() + '.'
+			+ FileUtil.getFileExtension(resourceItemDTO.getFileName()));
+		handler.saveFile(resourceItemDTO.getFileUuid(),
+			FileUtil.getFullPath(directoryName, resourceItemDTO.getAttachmentLocalUrl()));
+	    } catch (Exception e) {
+		logger.error("Export forum topic attachment failed: " + e.toString());
+	    }
 	}
 
-	private ResourceToolContentHandler getToolContentHandler() {
-  	    if ( handler == null ) {
-    	      WebApplicationContext wac = WebApplicationContextUtils.getRequiredWebApplicationContext(this.getServletContext());
-    	      handler = (ResourceToolContentHandler) wac.getBean(ResourceConstants.TOOL_CONTENT_HANDLER_NAME);
-    	    }
-    	    return handler;
+    }
+
+    private ResourceToolContentHandler getToolContentHandler() {
+	if (handler == null) {
+	    WebApplicationContext wac = WebApplicationContextUtils
+		    .getRequiredWebApplicationContext(this.getServletContext());
+	    handler = (ResourceToolContentHandler) wac.getBean(ResourceConstants.TOOL_CONTENT_HANDLER_NAME);
 	}
-	
-	private ReflectDTO getReflectionEntry(ResourceUser resourceUser) {
-		ReflectDTO reflectDTO = new ReflectDTO(resourceUser);
-		NotebookEntry notebookEntry = service.getEntry(resourceUser.getSession().getSessionId(), CoreNotebookConstants.NOTEBOOK_TOOL, 
-				ResourceConstants.TOOL_SIGNATURE, resourceUser.getUserId().intValue());
-		
-		// check notebookEntry is not null
-		if (notebookEntry != null) {
-			reflectDTO.setReflect(notebookEntry.getEntry());
-			logger.debug("Could not find notebookEntry for ResourceUser: " + resourceUser.getUid());
-		}        		
-		 return reflectDTO;
+	return handler;
+    }
+
+    private ReflectDTO getReflectionEntry(ResourceUser resourceUser) {
+	ReflectDTO reflectDTO = new ReflectDTO(resourceUser);
+	NotebookEntry notebookEntry = service.getEntry(resourceUser.getSession().getSessionId(),
+		CoreNotebookConstants.NOTEBOOK_TOOL, ResourceConstants.TOOL_SIGNATURE,
+		resourceUser.getUserId().intValue());
+
+	// check notebookEntry is not null
+	if (notebookEntry != null) {
+	    reflectDTO.setReflect(notebookEntry.getEntry());
+	    logger.debug("Could not find notebookEntry for ResourceUser: " + resourceUser.getUid());
 	}
+	return reflectDTO;
+    }
 }

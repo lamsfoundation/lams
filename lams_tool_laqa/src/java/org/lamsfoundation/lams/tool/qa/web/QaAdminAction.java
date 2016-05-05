@@ -51,7 +51,6 @@ import org.lamsfoundation.lams.web.action.LamsDispatchAction;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NamedNodeMap;
-import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
@@ -61,10 +60,10 @@ import com.thoughtworks.xstream.XStream;
 /**
  * Handles the admin page for question and answer which includes the settings
  * and items for the q&a question wizard
- * 
+ *
  * @author lfoxton
- * 
- * 
+ *
+ *
  */
 public class QaAdminAction extends LamsDispatchAction {
 
@@ -84,6 +83,7 @@ public class QaAdminAction extends LamsDispatchAction {
     /**
      * Sets up the admin page
      */
+    @Override
     public ActionForward unspecified(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) {
 	// set up qaService
@@ -94,8 +94,9 @@ public class QaAdminAction extends LamsDispatchAction {
 	QaAdminForm adminForm = (QaAdminForm) form;
 
 	QaConfigItem enableQaWizard = qaService.getConfigItem(QaConfigItem.KEY_ENABLE_QAWIZARD);
-	if (enableQaWizard != null)
+	if (enableQaWizard != null) {
 	    adminForm.setQaWizardEnabled(enableQaWizard.getConfigValue());
+	}
 
 	request.setAttribute("error", false);
 	request.setAttribute(ATTR_CATEGORIES, getQaWizardCategories());
@@ -105,7 +106,7 @@ public class QaAdminAction extends LamsDispatchAction {
 
     /**
      * Saves admin page, if the wizard is enabled, saves the wizard content
-     * 
+     *
      * @param mapping
      * @param form
      * @param request
@@ -132,8 +133,8 @@ public class QaAdminAction extends LamsDispatchAction {
 	    }
 
 	    // remove any wizard items that were removed
-	    removeWizardItems(adminForm.getDeleteCategoriesCSV(), adminForm.getDeleteSkillsCSV(), adminForm
-		    .getDeleteQuestionsCSV());
+	    removeWizardItems(adminForm.getDeleteCategoriesCSV(), adminForm.getDeleteSkillsCSV(),
+		    adminForm.getDeleteQuestionsCSV());
 	} else {
 	    enableQaWizard.setConfigValue(QaAdminForm.FALSE);
 	}
@@ -147,7 +148,7 @@ public class QaAdminAction extends LamsDispatchAction {
 
     /**
      * Gets the complete set of wizard categories
-     * 
+     *
      * @return
      */
     public SortedSet<QaWizardCategory> getQaWizardCategories() {
@@ -156,7 +157,7 @@ public class QaAdminAction extends LamsDispatchAction {
 
     /**
      * Removes all the removed wizard items from the db using CSV values
-     * 
+     *
      * @param categoriesCSV
      * @param skillsCSV
      * @param questionsCSV
@@ -190,7 +191,7 @@ public class QaAdminAction extends LamsDispatchAction {
 
     /**
      * Saves all the wizard items from the xml serialisation sent from the form
-     * 
+     *
      * @param xmlStr
      */
     @SuppressWarnings("unchecked")
@@ -210,7 +211,7 @@ public class QaAdminAction extends LamsDispatchAction {
 		Element categoryElement = (Element) categoryNodeList.item(i);
 
 		// Get the attributes for this category
-		NamedNodeMap categoryNamedNode = ((Node) categoryNodeList.item(i)).getAttributes();
+		NamedNodeMap categoryNamedNode = categoryNodeList.item(i).getAttributes();
 
 		QaWizardCategory category = new QaWizardCategory();
 		category.setTitle(categoryNamedNode.getNamedItem(ATTR_TITLE).getNodeValue());
@@ -227,7 +228,7 @@ public class QaAdminAction extends LamsDispatchAction {
 		    Element skillElement = (Element) skillNodeList.item(j);
 
 		    // Get the attributes for this skill
-		    NamedNodeMap skillNamedNode = ((Node) skillNodeList.item(j)).getAttributes();
+		    NamedNodeMap skillNamedNode = skillNodeList.item(j).getAttributes();
 
 		    // Create the skill and add attributes from the node
 		    QaWizardCognitiveSkill skill = new QaWizardCognitiveSkill();
@@ -247,7 +248,7 @@ public class QaAdminAction extends LamsDispatchAction {
 		    NodeList questionNodeList = skillElement.getElementsByTagName(ATTR_QUESTION);
 		    for (int k = 0; k < questionNodeList.getLength(); k++) {
 			// Get the attributes for this question
-			NamedNodeMap questionNamedNode = ((Node) questionNodeList.item(k)).getAttributes();
+			NamedNodeMap questionNamedNode = questionNodeList.item(k).getAttributes();
 
 			// Create the question, and add attributes from the node
 			QaWizardQuestion question = new QaWizardQuestion();
@@ -279,7 +280,7 @@ public class QaAdminAction extends LamsDispatchAction {
     /**
      * Exports the wizard categories list so it can be imported elsewhere The
      * export format is the same xml format used by the export ld servlet
-     * 
+     *
      * @param mapping
      * @param form
      * @param request
@@ -317,8 +318,9 @@ public class QaAdminAction extends LamsDispatchAction {
 	    throw new ExportToolContentException(e);
 	} finally {
 	    try {
-		if (out != null)
+		if (out != null) {
 		    out.close();
+		}
 	    } catch (Exception e) {
 		log.error("Error Closing file. File already written out - no exception being thrown.", e);
 	    }
@@ -330,7 +332,7 @@ public class QaAdminAction extends LamsDispatchAction {
     /**
      * Imports the wizard model from an xml file and replaces the current model
      * First, saves the configurations, then performs the import using xstream
-     * 
+     *
      * @param mapping
      * @param form
      * @param request
@@ -358,8 +360,8 @@ public class QaAdminAction extends LamsDispatchAction {
 	    }
 
 	    // remove any wizard items that were removed
-	    removeWizardItems(adminForm.getDeleteCategoriesCSV(), adminForm.getDeleteSkillsCSV(), adminForm
-		    .getDeleteQuestionsCSV());
+	    removeWizardItems(adminForm.getDeleteCategoriesCSV(), adminForm.getDeleteSkillsCSV(),
+		    adminForm.getDeleteQuestionsCSV());
 	} else {
 	    enableQaWizard.setConfigValue(QaAdminForm.FALSE);
 	}

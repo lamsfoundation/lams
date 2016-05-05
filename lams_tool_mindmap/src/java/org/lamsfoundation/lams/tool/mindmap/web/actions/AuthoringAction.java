@@ -2,21 +2,21 @@
  * Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
  * =============================================================
  * License Information: http://lamsfoundation.org/licensing/lams/2.0/
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301
  * USA
- * 
+ *
  * http://www.gnu.org/licenses/gpl.txt
  * ****************************************************************
  */
@@ -59,7 +59,7 @@ import com.thoughtworks.xstream.XStream;
 /**
  * @author Ruslan Kazakov
  * @version 1.0.1
- * 
+ *
  * @struts.action path="/authoring" name="authoringForm" parameter="dispatch" scope="request" validate="false"
  * @struts.action-forward name="success" path="tiles:/authoring/main"
  * @struts.action-forward name="message_page" path="tiles:/generic/message"
@@ -105,9 +105,9 @@ public class AuthoringAction extends LamsDispatchAction {
 	    String rootNodeName = mindmapService.getMindmapMessageService().getMessage("node.root.defaultName");
 	    String childNodeName1 = mindmapService.getMindmapMessageService().getMessage("node.child1.defaultName");
 	    String childNodeName2 = mindmapService.getMindmapMessageService().getMessage("node.child2.defaultName");
-	    
-	    MindmapNode rootMindmapNode = 
-		mindmapService.saveMindmapNode(null, null, 1l, rootNodeName, "ffffff", null, mindmap, null);
+
+	    MindmapNode rootMindmapNode = mindmapService.saveMindmapNode(null, null, 1l, rootNodeName, "ffffff", null,
+		    mindmap, null);
 	    mindmapService.saveOrUpdateMindmapNode(rootMindmapNode);
 	    mindmapService.saveMindmapNode(null, rootMindmapNode, 2l, childNodeName1, "ffffff", null, mindmap, null);
 	    mindmapService.saveMindmapNode(null, rootMindmapNode, 3l, childNodeName2, "ffffff", null, mindmap, null);
@@ -125,23 +125,24 @@ public class AuthoringAction extends LamsDispatchAction {
 	String mindmapContentPath = Configuration.get(ConfigurationKeys.SERVER_URL)
 		+ "tool/lamind10/authoring.do?dispatch=setMindmapContent%26mindmapId=" + mindmap.getUid();
 	request.setAttribute("mindmapContentPath", mindmapContentPath);
-	
-	String localizationPath = Configuration.get(ConfigurationKeys.SERVER_URL) + 
-		"tool/lamind10/authoring.do?dispatch=setLocale";
+
+	String localizationPath = Configuration.get(ConfigurationKeys.SERVER_URL)
+		+ "tool/lamind10/authoring.do?dispatch=setLocale";
 	request.setAttribute("localizationPath", localizationPath);
-	
+
 	String currentMindmapUser = mindmapService.getMindmapMessageService().getMessage("node.instructor.label");
 	request.setAttribute("currentMindmapUser", currentMindmapUser);
 
 	String mindmapType = "images/mindmap_singleuser.swf";
 	request.setAttribute("mindmapType", mindmapType);
-	
+
 	// Set up the authForm.
 	AuthoringForm authForm = (AuthoringForm) form;
 	updateAuthForm(authForm, mindmap);
 
 	// Set up sessionMap
-	SessionMap<String, Object> map = createSessionMap(mindmap, getAccessMode(request), contentFolderID, toolContentID);
+	SessionMap<String, Object> map = createSessionMap(mindmap, getAccessMode(request), contentFolderID,
+		toolContentID);
 	authForm.setSessionMapID(map.getSessionID());
 
 	// add the sessionMap to HTTPSession.
@@ -153,7 +154,7 @@ public class AuthoringAction extends LamsDispatchAction {
 
     /**
      * Returns the serialized XML of the Mindmap Nodes from Database
-     * 
+     *
      * @param mapping
      * @param form
      * @param request
@@ -164,7 +165,7 @@ public class AuthoringAction extends LamsDispatchAction {
 	    HttpServletResponse response) {
 
 	Long mindmapId = WebUtil.readLongParam(request, "mindmapId", false);
-	
+
 	List mindmapNodeList = mindmapService.getAuthorRootNodeByMindmapId(mindmapId);
 
 	if (mindmapNodeList != null && mindmapNodeList.size() > 0) {
@@ -172,15 +173,15 @@ public class AuthoringAction extends LamsDispatchAction {
 
 	    String rootMindmapUser = mindmapService.getMindmapMessageService().getMessage("node.instructor.label");
 
-	    NodeModel rootNodeModel = new NodeModel(new NodeConceptModel(rootMindmapNode.getUniqueId(), rootMindmapNode
-		    .getText(), rootMindmapNode.getColor(), rootMindmapUser, 1));
+	    NodeModel rootNodeModel = new NodeModel(new NodeConceptModel(rootMindmapNode.getUniqueId(),
+		    rootMindmapNode.getText(), rootMindmapNode.getColor(), rootMindmapUser, 1));
 	    NodeModel currentNodeModel = mindmapService.getMindmapXMLFromDatabase(rootMindmapNode.getNodeId(),
 		    mindmapId, rootNodeModel, null);
 
 	    XStream xstream = new XStream();
 	    xstream.alias("branch", NodeModel.class);
 	    String mindmapContent = xstream.toXML(currentNodeModel);
-	    
+
 	    try {
 		response.setContentType("text/xml");
 		response.setCharacterEncoding("utf-8");
@@ -192,10 +193,10 @@ public class AuthoringAction extends LamsDispatchAction {
 
 	return null;
     }
-    
+
     /**
      * Returns the serialized XML of the Mindmap Nodes from Database
-     * 
+     *
      * @param mapping
      * @param form
      * @param request
@@ -204,7 +205,7 @@ public class AuthoringAction extends LamsDispatchAction {
      */
     public ActionForward setLocale(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) {
-	
+
 	try {
 	    response.setContentType("text/xml");
 	    response.setCharacterEncoding("utf-8");
@@ -218,7 +219,7 @@ public class AuthoringAction extends LamsDispatchAction {
 
     /**
      * Saves Mindmap Nodes to Database
-     * 
+     *
      * @param mapping
      * @param form
      * @param request
@@ -237,7 +238,7 @@ public class AuthoringAction extends LamsDispatchAction {
 	// update mindmap content using form inputs.
 	ToolAccessMode mode = (ToolAccessMode) map.get(AuthoringAction.KEY_MODE);
 	updateMindmap(mindmap, authForm, mode);
-	
+
 	// set the update date
 	mindmap.setUpdateDate(new Date());
 
@@ -267,7 +268,8 @@ public class AuthoringAction extends LamsDispatchAction {
 	List<NodeModel> branches = rootNodeModel.getBranch();
 
 	// saving root Node into database
-	MindmapNode rootMindmapNode = (MindmapNode) mindmapService.getAuthorRootNodeByMindmapId(mindmap.getUid()).get(0);
+	MindmapNode rootMindmapNode = (MindmapNode) mindmapService.getAuthorRootNodeByMindmapId(mindmap.getUid())
+		.get(0);
 	rootMindmapNode = mindmapService.saveMindmapNode(rootMindmapNode, null, nodeConceptModel.getId(),
 		nodeConceptModel.getText(), nodeConceptModel.getColor(), mindmapUser, mindmap, null);
 
@@ -288,7 +290,7 @@ public class AuthoringAction extends LamsDispatchAction {
 
     /**
      * Updates Mindmap content using AuthoringForm inputs.
-     * 
+     *
      * @param mindmap
      * @param authForm
      * @param mode
@@ -307,7 +309,7 @@ public class AuthoringAction extends LamsDispatchAction {
 
     /**
      * Updates AuthoringForm using Mindmap content.
-     * 
+     *
      * @param authForm
      * @param mindmap
      */
@@ -323,7 +325,7 @@ public class AuthoringAction extends LamsDispatchAction {
 
     /**
      * Updates SessionMap using Mindmap content.
-     * 
+     *
      * @param mindmap
      * @param mode
      * @return map
@@ -342,7 +344,7 @@ public class AuthoringAction extends LamsDispatchAction {
 
     /**
      * Gets ToolAccessMode from HttpRequest parameters. Default value is AUTHOR mode.
-     * 
+     *
      * @param request
      */
     private ToolAccessMode getAccessMode(HttpServletRequest request) {
@@ -358,7 +360,7 @@ public class AuthoringAction extends LamsDispatchAction {
 
     /**
      * Retrieve the SessionMap from the HttpSession.
-     * 
+     *
      * @param request
      * @param authForm
      */

@@ -2,21 +2,21 @@
  * Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
  * =============================================================
  * License Information: http://lamsfoundation.org/licensing/lams/2.0/
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301
  * USA
- * 
+ *
  * http://www.gnu.org/licenses/gpl.txt
  * ****************************************************************
  */
@@ -31,9 +31,9 @@ import java.util.Set;
 import org.apache.log4j.Logger;
 
 /**
- * 
+ *
  * Represents the tool session.
- * 
+ *
  * @hibernate.class table="tl_lalead11_session"
  */
 
@@ -58,7 +58,7 @@ public class LeaderselectionSession implements java.io.Serializable {
     private Leaderselection leaderselection;
 
     private Set users;
-    
+
     private LeaderselectionUser groupLeader;
 
     // Constructors
@@ -82,7 +82,7 @@ public class LeaderselectionSession implements java.io.Serializable {
     // Property accessors
     /**
      * @hibernate.id generator-class="native" type="java.lang.Long" column="uid"
-     * 
+     *
      */
 
     public Long getUid() {
@@ -95,7 +95,7 @@ public class LeaderselectionSession implements java.io.Serializable {
 
     /**
      * @hibernate.property column="session_end_date"
-     * 
+     *
      */
 
     public Date getSessionEndDate() {
@@ -108,7 +108,7 @@ public class LeaderselectionSession implements java.io.Serializable {
 
     /**
      * @hibernate.property column="session_start_date"
-     * 
+     *
      */
 
     public Date getSessionStartDate() {
@@ -121,7 +121,7 @@ public class LeaderselectionSession implements java.io.Serializable {
 
     /**
      * @hibernate.property column="status" length="11"
-     * 
+     *
      */
 
     public Integer getStatus() {
@@ -134,7 +134,7 @@ public class LeaderselectionSession implements java.io.Serializable {
 
     /**
      * @hibernate.property column="session_id" length="20"
-     * 
+     *
      */
 
     public Long getSessionId() {
@@ -147,7 +147,7 @@ public class LeaderselectionSession implements java.io.Serializable {
 
     /**
      * @hibernate.property column="session_name" length="250"
-     * 
+     *
      */
 
     public String getSessionName() {
@@ -161,7 +161,7 @@ public class LeaderselectionSession implements java.io.Serializable {
     /**
      * @hibernate.many-to-one not-null="true"
      * @hibernate.column name="leaderselection_uid"
-     * 
+     *
      */
 
     public Leaderselection getLeaderselection() {
@@ -176,7 +176,7 @@ public class LeaderselectionSession implements java.io.Serializable {
      * @hibernate.set lazy="true" inverse="true" cascade="none"
      * @hibernate.collection-key column="leaderselection_session_uid"
      * @hibernate.collection-one-to-many class="org.lamsfoundation.lams.tool.leaderselection.model.LeaderselectionUser"
-     * 
+     *
      */
 
     public Set getUsers() {
@@ -186,7 +186,7 @@ public class LeaderselectionSession implements java.io.Serializable {
     public void setUsers(Set leaderselectionUsers) {
 	this.users = leaderselectionUsers;
     }
-    
+
     /**
      * @hibernate.many-to-one not-null="true"
      * @hibernate.column name="group_leader_uid"
@@ -201,9 +201,10 @@ public class LeaderselectionSession implements java.io.Serializable {
 
     /**
      * toString
-     * 
+     *
      * @return String
      */
+    @Override
     public String toString() {
 	StringBuffer buffer = new StringBuffer();
 
@@ -218,25 +219,31 @@ public class LeaderselectionSession implements java.io.Serializable {
 	return buffer.toString();
     }
 
+    @Override
     public boolean equals(Object other) {
-	if ((this == other))
+	if ((this == other)) {
 	    return true;
-	if ((other == null))
+	}
+	if ((other == null)) {
 	    return false;
-	if (!(other instanceof LeaderselectionSession))
+	}
+	if (!(other instanceof LeaderselectionSession)) {
 	    return false;
+	}
 	LeaderselectionSession castOther = (LeaderselectionSession) other;
 
-	return ((this.getUid() == castOther.getUid()) || (this.getUid() != null && castOther.getUid() != null && this
-		.getUid().equals(castOther.getUid())));
+	return ((this.getUid() == castOther.getUid())
+		|| (this.getUid() != null && castOther.getUid() != null && this.getUid().equals(castOther.getUid())));
     }
 
+    @Override
     public int hashCode() {
 	int result = 17;
 	result = 37 * result + (getUid() == null ? 0 : this.getUid().hashCode());
 	return result;
     }
 
+    @Override
     public Object clone() {
 
 	LeaderselectionSession session = null;

@@ -2,21 +2,21 @@
  * Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
  * =============================================================
  * License Information: http://lamsfoundation.org/licensing/lams/2.0/
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License version 2.0 
+ * it under the terms of the GNU General Public License version 2.0
  * as published by the Free Software Foundation.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301
  * USA
- * 
+ *
  * http://www.gnu.org/licenses/gpl.txt
  * ****************************************************************
  */
@@ -56,9 +56,9 @@ public class AuthoringForm extends ActionForm {
     boolean lockOnFinished;
 
     boolean reflectOnActivity;
-    
+
     boolean allowViewOthersImages;
-    
+
     String reflectInstructions;
 
     FormFile onlineFile;
@@ -74,20 +74,19 @@ public class AuthoringForm extends ActionForm {
     Long deleteFileUuid;
 
     SessionMap sessionMap;
-    
+
     String contentFolderID;
-    
+
     Long toolContentID;
-    
+
     String mode;
-    
+
     // Wookie widget paramerters
     String widgetAuthorUrl;
     Integer widgetHeight;
     Integer widgetWidth;
     Boolean widgetMaximise;
     String widgetIdentifier;
-    
 
     @Override
     public ActionErrors validate(ActionMapping arg0, HttpServletRequest arg1) {
@@ -192,94 +191,93 @@ public class AuthoringForm extends ActionForm {
     public void setDeleteFileUuid(Long deleteFile) {
 	this.deleteFileUuid = deleteFile;
     }
-    
+
     public boolean isReflectOnActivity() {
-        return reflectOnActivity;
+	return reflectOnActivity;
     }
 
     public void setReflectOnActivity(boolean reflectOnActivity) {
-        this.reflectOnActivity = reflectOnActivity;
+	this.reflectOnActivity = reflectOnActivity;
     }
 
     public String getContentFolderID() {
-        return contentFolderID;
+	return contentFolderID;
     }
 
     public void setContentFolderID(String contentFolderID) {
-        this.contentFolderID = contentFolderID;
+	this.contentFolderID = contentFolderID;
     }
 
     public Long getToolContentID() {
-        return toolContentID;
+	return toolContentID;
     }
 
     public void setToolContentID(Long toolContentID) {
-        this.toolContentID = toolContentID;
+	this.toolContentID = toolContentID;
     }
 
     public String getMode() {
-        return mode;
+	return mode;
     }
 
     public void setMode(String mode) {
-        this.mode = mode;
+	this.mode = mode;
     }
 
     public String getReflectInstructions() {
-        return reflectInstructions;
+	return reflectInstructions;
     }
 
     public void setReflectInstructions(String reflectInstructions) {
-        this.reflectInstructions = reflectInstructions;
+	this.reflectInstructions = reflectInstructions;
     }
 
     public boolean isAllowViewOthersImages() {
-        return allowViewOthersImages;
+	return allowViewOthersImages;
     }
 
     public void setAllowViewOthersImages(boolean allowViewOthersImages) {
-        this.allowViewOthersImages = allowViewOthersImages;
+	this.allowViewOthersImages = allowViewOthersImages;
     }
 
     public String getWidgetAuthorUrl() {
-        return widgetAuthorUrl;
+	return widgetAuthorUrl;
     }
 
     public void setWidgetAuthorUrl(String widgetAuthorUrl) {
-        this.widgetAuthorUrl = widgetAuthorUrl;
+	this.widgetAuthorUrl = widgetAuthorUrl;
     }
 
     public Integer getWidgetHeight() {
-        return widgetHeight;
+	return widgetHeight;
     }
 
     public void setWidgetHeight(Integer widgetHeight) {
-        this.widgetHeight = widgetHeight;
+	this.widgetHeight = widgetHeight;
     }
 
     public Integer getWidgetWidth() {
-        return widgetWidth;
+	return widgetWidth;
     }
 
     public void setWidgetWidth(Integer widgetWidth) {
-        this.widgetWidth = widgetWidth;
+	this.widgetWidth = widgetWidth;
     }
 
     public Boolean getWidgetMaximise() {
-        return widgetMaximise;
+	return widgetMaximise;
     }
 
     public void setWidgetMaximise(Boolean widgetMaximise) {
-        this.widgetMaximise = widgetMaximise;
+	this.widgetMaximise = widgetMaximise;
     }
 
     public String getWidgetIdentifier() {
-        return widgetIdentifier;
+	return widgetIdentifier;
     }
 
     public void setWidgetIdentifier(String widgetIdentifier) {
-        this.widgetIdentifier = widgetIdentifier;
+	this.widgetIdentifier = widgetIdentifier;
     }
 
-    
 }

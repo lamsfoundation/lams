@@ -61,8 +61,7 @@ public class SecurityDAO extends HibernateDaoSupport implements ISecurityDAO {
     /**
      * Checks if user has a global role of SYSADMIN.
      */
-    private static final String CHECK_SYSADMIN = "FROM "
-	    + UserOrganisation.class.getName()
+    private static final String CHECK_SYSADMIN = "FROM " + UserOrganisation.class.getName()
 	    + " AS userOrganisation INNER JOIN userOrganisation.userOrganisationRoles AS userOrganisationRole "
 	    + "WHERE userOrganisation.organisation.organisationType.organisationTypeId = 1 AND userOrganisation.user.userId = ? "
 	    + "AND userOrganisationRole.role.name = '" + Role.SYSADMIN + "'";
@@ -106,8 +105,8 @@ public class SecurityDAO extends HibernateDaoSupport implements ISecurityDAO {
 
     @Override
     public boolean isLessonMonitor(Long lessonId, Integer userId, boolean ownerAccepted) {
-	boolean result = !getHibernateTemplate().find(SecurityDAO.CHECK_LESSON_MONITOR,
-		new Object[] { lessonId, userId }).isEmpty();
+	boolean result = !getHibernateTemplate()
+		.find(SecurityDAO.CHECK_LESSON_MONITOR, new Object[] { lessonId, userId }).isEmpty();
 	Lesson lesson = null;
 	if (!result && ownerAccepted) {
 	    lesson = (Lesson) find(Lesson.class, lessonId);

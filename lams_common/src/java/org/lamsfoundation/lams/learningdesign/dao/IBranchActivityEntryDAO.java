@@ -30,7 +30,7 @@ import org.lamsfoundation.lams.learningdesign.BranchCondition;
 
 /**
  * @author fiona
- * 
+ *
  */
 public interface IBranchActivityEntryDAO {
 

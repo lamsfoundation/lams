@@ -1,23 +1,23 @@
-/**************************************************************** 
- * Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org) 
- * ============================================================= 
- * License Information: http://lamsfoundation.org/licensing/lams/2.0/ 
- * 
- * This program is free software; you can redistribute it and/or modify 
- * it under the terms of the GNU General Public License version 2.0 
- * as published by the Free Software Foundation. 
- * 
- * This program is distributed in the hope that it will be useful, 
- * but WITHOUT ANY WARRANTY; without even the implied warranty of 
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the 
- * GNU General Public License for more details. 
- * 
- * You should have received a copy of the GNU General Public License 
- * along with this program; if not, write to the Free Software 
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 * USA 
- * 
- * http://www.gnu.org/licenses/gpl.txt 
- * **************************************************************** 
+/****************************************************************
+ * Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
+ * =============================================================
+ * License Information: http://lamsfoundation.org/licensing/lams/2.0/
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License version 2.0
+ * as published by the Free Software Foundation.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 * USA
+ *
+ * http://www.gnu.org/licenses/gpl.txt
+ * ****************************************************************
  */
 
 /* $Id$ */
@@ -42,7 +42,7 @@ import org.lamsfoundation.lams.tool.notebook.util.NotebookConstants;
 
 /**
  * Output factory for Notebook tool. Currently it provides only one type of output - the entry that user provided.
- * 
+ *
  * @author Marcin Cieslak
  */
 public class NotebookOutputFactory extends OutputFactory {
@@ -51,25 +51,27 @@ public class NotebookOutputFactory extends OutputFactory {
      * {@inheritDoc}
      */
     @Override
-    public SortedMap<String, ToolOutputDefinition> getToolOutputDefinitions(Object toolContentObject, int definitionType)
-	    throws ToolException {
+    public SortedMap<String, ToolOutputDefinition> getToolOutputDefinitions(Object toolContentObject,
+	    int definitionType) throws ToolException {
 	SortedMap<String, ToolOutputDefinition> definitionMap = new TreeMap<String, ToolOutputDefinition>();
 	Class stringArrayClass = new String[] {}.getClass();
 	switch (definitionType) {
-	case ToolOutputDefinition.DATA_OUTPUT_DEFINITION_TYPE_CONDITION:
-	    if (toolContentObject != null) {
-		ToolOutputDefinition notebookEntryDefinition = buildStringOutputDefinition(NotebookConstants.USER_ENTRY_DEFINITION_NAME);
-		Notebook notebook = (Notebook) toolContentObject;
-		// adding all existing conditions
-		notebookEntryDefinition.setDefaultConditions(new ArrayList<BranchCondition>(notebook.getConditions()));
-		notebookEntryDefinition.setShowConditionNameOnly(true);
-		definitionMap.put(NotebookConstants.USER_ENTRY_DEFINITION_NAME, notebookEntryDefinition);
-	    }
-	case ToolOutputDefinition.DATA_OUTPUT_DEFINITION_TYPE_DATA_FLOW:
-	    ToolOutputDefinition allUsersEntriesDefinition = buildComplexOutputDefinition(
-		    NotebookConstants.ALL_USERS_ENTRIES_DEFINITION_NAME, stringArrayClass);
-	    definitionMap.put(NotebookConstants.ALL_USERS_ENTRIES_DEFINITION_NAME, allUsersEntriesDefinition);
-	    break;
+	    case ToolOutputDefinition.DATA_OUTPUT_DEFINITION_TYPE_CONDITION:
+		if (toolContentObject != null) {
+		    ToolOutputDefinition notebookEntryDefinition = buildStringOutputDefinition(
+			    NotebookConstants.USER_ENTRY_DEFINITION_NAME);
+		    Notebook notebook = (Notebook) toolContentObject;
+		    // adding all existing conditions
+		    notebookEntryDefinition
+			    .setDefaultConditions(new ArrayList<BranchCondition>(notebook.getConditions()));
+		    notebookEntryDefinition.setShowConditionNameOnly(true);
+		    definitionMap.put(NotebookConstants.USER_ENTRY_DEFINITION_NAME, notebookEntryDefinition);
+		}
+	    case ToolOutputDefinition.DATA_OUTPUT_DEFINITION_TYPE_DATA_FLOW:
+		ToolOutputDefinition allUsersEntriesDefinition = buildComplexOutputDefinition(
+			NotebookConstants.ALL_USERS_ENTRIES_DEFINITION_NAME, stringArrayClass);
+		definitionMap.put(NotebookConstants.ALL_USERS_ENTRIES_DEFINITION_NAME, allUsersEntriesDefinition);
+		break;
 	}
 
 	return definitionMap;
@@ -77,7 +79,7 @@ public class NotebookOutputFactory extends OutputFactory {
 
     /**
      * Follows {@link NotebookService#getToolOutput(List, Long, Long)}.
-     * 
+     *
      */
     public SortedMap<String, ToolOutput> getToolOutput(List<String> names, INotebookService notebookService,
 	    Long toolSessionId, Long learnerId) {
@@ -164,16 +166,17 @@ public class NotebookOutputFactory extends OutputFactory {
 
     /**
      * Creates a default condition so teachers know how to use complex conditions for this tool.
-     * 
+     *
      * @param notebook
-     *                content of the tool
+     *            content of the tool
      * @return default notebook condition
      */
     protected NotebookCondition createDefaultUserEntryCondition(Notebook notebook) {
-	String name = buildConditionName(NotebookConstants.USER_ENTRY_DEFINITION_NAME, notebook.getToolContentId()
-		.toString());
+	String name = buildConditionName(NotebookConstants.USER_ENTRY_DEFINITION_NAME,
+		notebook.getToolContentId().toString());
 	// Default condition checks if the text contains word "LAMS"
-	return new NotebookCondition(null, null, 1, name, getI18NText(
-		NotebookConstants.USER_ENTRY_DEFAULT_CONDITION_DISPLAY_NAME_KEY, false), "LAMS", null, null, null);
+	return new NotebookCondition(null, null, 1, name,
+		getI18NText(NotebookConstants.USER_ENTRY_DEFAULT_CONDITION_DISPLAY_NAME_KEY, false), "LAMS", null, null,
+		null);
     }
 }

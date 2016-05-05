@@ -2,21 +2,21 @@
  * Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
  * =============================================================
  * License Information: http://lamsfoundation.org/licensing/lams/2.0/
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301
  * USA
- * 
+ *
  * http://www.gnu.org/licenses/gpl.txt
  * ****************************************************************
  */
@@ -27,13 +27,13 @@ import org.apache.struts.action.ActionForm;
 
 /**
  * Assessment Question Form.
- * 
+ *
  * @struts.form name="assessmentQuestionForm"
  * @author Andrey Balan
  */
 public class AssessmentQuestionForm extends ActionForm {
     private static final long serialVersionUID = 4900738305713649389L;
-    
+
     private String questionIndex;
     private String sessionMapID;
     private String contentFolderID;
@@ -69,7 +69,7 @@ public class AssessmentQuestionForm extends ActionForm {
     public void setSessionMapID(String sessionMapID) {
 	this.sessionMapID = sessionMapID;
     }
-    
+
     public String getContentFolderID() {
 	return contentFolderID;
     }
@@ -85,7 +85,7 @@ public class AssessmentQuestionForm extends ActionForm {
     public void setMode(String mode) {
 	this.mode = mode;
     }
-    
+
     public String getTitle() {
 	return title;
     }
@@ -93,7 +93,7 @@ public class AssessmentQuestionForm extends ActionForm {
     public void setTitle(String title) {
 	this.title = title;
     }
-    
+
     public String getQuestion() {
 	return question;
     }
@@ -101,7 +101,7 @@ public class AssessmentQuestionForm extends ActionForm {
     public void setQuestion(String question) {
 	this.question = question;
     }
-    
+
     public String getQuestionIndex() {
 	return questionIndex;
     }
@@ -133,7 +133,7 @@ public class AssessmentQuestionForm extends ActionForm {
     public void setPenaltyFactor(String penaltyFactor) {
 	this.penaltyFactor = penaltyFactor;
     }
-    
+
     public boolean isAnswerRequired() {
 	return answerRequired;
     }
@@ -149,7 +149,7 @@ public class AssessmentQuestionForm extends ActionForm {
     public void setGeneralFeedback(String generalFeedback) {
 	this.generalFeedback = generalFeedback;
     }
-    
+
     public String getFeedback() {
 	return feedback;
     }
@@ -157,7 +157,7 @@ public class AssessmentQuestionForm extends ActionForm {
     public void setFeedback(String feedback) {
 	this.feedback = feedback;
     }
-    
+
     public boolean isMultipleAnswersAllowed() {
 	return multipleAnswersAllowed;
     }
@@ -165,7 +165,7 @@ public class AssessmentQuestionForm extends ActionForm {
     public void setMultipleAnswersAllowed(boolean multipleAnswersAllowed) {
 	this.multipleAnswersAllowed = multipleAnswersAllowed;
     }
-    
+
     public boolean isIncorrectAnswerNullifiesMark() {
 	return incorrectAnswerNullifiesMark;
     }
@@ -205,7 +205,7 @@ public class AssessmentQuestionForm extends ActionForm {
     public void setShuffle(boolean shuffle) {
 	this.shuffle = shuffle;
     }
-    
+
     public boolean isCaseSensitive() {
 	return caseSensitive;
     }
@@ -213,7 +213,7 @@ public class AssessmentQuestionForm extends ActionForm {
     public void setCaseSensitive(boolean caseSensitive) {
 	this.caseSensitive = caseSensitive;
     }
-    
+
     public boolean isCorrectAnswer() {
 	return correctAnswer;
     }
@@ -221,7 +221,7 @@ public class AssessmentQuestionForm extends ActionForm {
     public void setCorrectAnswer(boolean correctAnswer) {
 	this.correctAnswer = correctAnswer;
     }
-    
+
     public boolean isAllowRichEditor() {
 	return allowRichEditor;
     }
@@ -229,7 +229,7 @@ public class AssessmentQuestionForm extends ActionForm {
     public void setAllowRichEditor(boolean allowRichEditor) {
 	this.allowRichEditor = allowRichEditor;
     }
-    
+
     public int getMaxWordsLimit() {
 	return maxWordsLimit;
     }
@@ -237,7 +237,7 @@ public class AssessmentQuestionForm extends ActionForm {
     public void setMaxWordsLimit(int maxWordsLimit) {
 	this.maxWordsLimit = maxWordsLimit;
     }
-    
+
     public int getMinWordsLimit() {
 	return minWordsLimit;
     }

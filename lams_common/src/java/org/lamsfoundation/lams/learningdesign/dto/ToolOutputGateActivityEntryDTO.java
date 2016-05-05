@@ -27,10 +27,10 @@ package org.lamsfoundation.lams.learningdesign.dto;
  * Models the relationship between a group and a branch for Tool Output Based based branching. The branchCondition
  * indicates the condition on which the related group should be created. During authoring, we expect branchCondition to
  * be not null, and the group to be null.
- * 
+ *
  * @author Fiona Malikoff
  * @version 2.1
- * 
+ *
  */
 public class ToolOutputGateActivityEntryDTO extends ToolOutputBranchActivityEntryDTO {
     private Integer gateActivityUIID;

@@ -18,51 +18,48 @@
  *
  * http://www.gnu.org/licenses/gpl.txt
  * ****************************************************************
- */ 
- 
-/* $Id$ */ 
-package org.eucm.lams.tool.eadventure.dao.hibernate; 
+ */
+
+/* $Id$ */
+package org.eucm.lams.tool.eadventure.dao.hibernate;
 
 import java.util.List;
 
 import org.eucm.lams.tool.eadventure.dao.EadventureParamDAO;
 import org.eucm.lams.tool.eadventure.model.EadventureParam;
-import org.eucm.lams.tool.eadventure.model.EadventureVars;
- 
+
 public class EadventureParamDAOHibernate extends BaseDAOHibernate implements EadventureParamDAO {
 
-    
-    private static final String FIND_BY_PARAM_NAME= "from " + EadventureParam.class.getName()
-	+ " as r where r.eadventure_uid = ? and r.name =?";
+    private static final String FIND_BY_PARAM_NAME = "from " + EadventureParam.class.getName()
+	    + " as r where r.eadventure_uid = ? and r.name =?";
 
-    
     private static final String FIND_BY_EAD = "from " + EadventureParam.class.getName()
-	+ " as r where r.eadventure_uid = ?";
+	    + " as r where r.eadventure_uid = ?";
 
-    
-    public List<EadventureParam> getEadventureParamByEadContentId(Long contentId){
-	List list = getHibernateTemplate().find(FIND_BY_EAD,contentId);
-	if(list == null || list.size() ==0)
-		return null;
-	
+    @Override
+    public List<EadventureParam> getEadventureParamByEadContentId(Long contentId) {
+	List list = getHibernateTemplate().find(FIND_BY_EAD, contentId);
+	if (list == null || list.size() == 0) {
+	    return null;
+	}
+
 	return list;
     }
 
-    
-    public void delete(EadventureParam param){
+    @Override
+    public void delete(EadventureParam param) {
 	this.getHibernateTemplate().delete(param);
     }
 
-	public String getEadventureParamTypeByNameAndEadContentID(String name,
-			Long contentId) {
-		
-		List list = getHibernateTemplate().find(FIND_BY_PARAM_NAME,new Object[]{contentId,name});
-		if(list == null || list.size() ==0)
-			return null;
-		
-		return ((EadventureParam)list.get(0)).getType();
+    @Override
+    public String getEadventureParamTypeByNameAndEadContentID(String name, Long contentId) {
+
+	List list = getHibernateTemplate().find(FIND_BY_PARAM_NAME, new Object[] { contentId, name });
+	if (list == null || list.size() == 0) {
+	    return null;
 	}
-    
-    
+
+	return ((EadventureParam) list.get(0)).getType();
+    }
+
 }
- 

@@ -2,21 +2,21 @@
  * Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
  * =============================================================
  * License Information: http://lamsfoundation.org/licensing/lams/2.0/
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
  * USA
- * 
+ *
  * http://www.gnu.org/licenses/gpl.txt
  * ***********************************************************************/
 /* $$Id$$ */
@@ -26,7 +26,7 @@ import org.lamsfoundation.lams.tool.mc.McAppConstants;
 
 /**
  * @author Ozgur Demirtas
- * 
+ *
  *         ActionForm for the Authoring environment
  */
 public class McAuthoringForm extends McLearningForm implements McAppConstants {
@@ -209,6 +209,7 @@ public class McAuthoringForm extends McLearningForm implements McAppConstants {
     /**
      * @return Returns the questionIndex.
      */
+    @Override
     public String getQuestionIndex() {
 	return questionIndex;
     }
@@ -217,6 +218,7 @@ public class McAuthoringForm extends McLearningForm implements McAppConstants {
      * @param questionIndex
      *            The questionIndex to set.
      */
+    @Override
     public void setQuestionIndex(String questionIndex) {
 	this.questionIndex = questionIndex;
     }
@@ -325,7 +327,7 @@ public class McAuthoringForm extends McLearningForm implements McAppConstants {
     public void setToolContentId(String toolContentId) {
 	this.toolContentId = toolContentId;
     }
-    
+
     /**
      * @return Returns the syncInMonitor.
      */
@@ -716,7 +718,6 @@ public class McAuthoringForm extends McLearningForm implements McAppConstants {
 	this.sln = sln;
     }
 
-
     public String getDispatch() {
 	return dispatch;
     }
@@ -743,6 +744,7 @@ public class McAuthoringForm extends McLearningForm implements McAppConstants {
     /**
      * @return Returns the toolContentID.
      */
+    @Override
     public String getToolContentID() {
 	return toolContentID;
     }
@@ -751,6 +753,7 @@ public class McAuthoringForm extends McLearningForm implements McAppConstants {
      * @param toolContentID
      *            The toolContentID to set.
      */
+    @Override
     public void setToolContentID(String toolContentID) {
 	this.toolContentID = toolContentID;
     }
@@ -934,7 +937,7 @@ public class McAuthoringForm extends McLearningForm implements McAppConstants {
     public void setShowMarks(String showMarks) {
 	this.showMarks = showMarks;
     }
-    
+
     /**
      * @return Returns the useSelectLeaderToolOuput.
      */
@@ -949,7 +952,7 @@ public class McAuthoringForm extends McLearningForm implements McAppConstants {
     public void setUseSelectLeaderToolOuput(String useSelectLeaderToolOuput) {
 	this.useSelectLeaderToolOuput = useSelectLeaderToolOuput;
     }
-    
+
     /**
      * @return Returns the prefixAnswersWithLetters.
      */

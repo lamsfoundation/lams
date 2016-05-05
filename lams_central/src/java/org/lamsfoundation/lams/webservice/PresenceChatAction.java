@@ -55,13 +55,13 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
 
 /**
  * Gets all necessary content for Presence Chat in Learning.
- * 
+ *
  * @author Paul Georges, Marcin Cieslak
- * 
+ *
  *         ----------------XDoclet Tags--------------------
- * 
+ *
  * @struts:action path="/PresenceChat" parameter="method" validate="false"
- * 
+ *
  *                ----------------XDoclet Tags--------------------
  */
 public class PresenceChatAction extends LamsDispatchAction {
@@ -88,7 +88,7 @@ public class PresenceChatAction extends LamsDispatchAction {
 	    // roster is used also to get messages by other users, so we need to synchronise on it
 	    synchronized (roster) {
 		Date currentDate = new Date(currentTime);
-		
+
 		if (!StringUtils.isBlank(nickname)) {
 		    // blank nickname means this is just check but user is not really using chat
 		    activeUsers.put(nickname, currentDate);
@@ -100,8 +100,8 @@ public class PresenceChatAction extends LamsDispatchAction {
 		    activeUsers.clear();
 
 		    // read active users from all nodes
-		    List<PresenceChatUser> storedActiveUsers = getPresenceChatService().getUsersActiveByLessonId(
-			    lessonId);
+		    List<PresenceChatUser> storedActiveUsers = getPresenceChatService()
+			    .getUsersActiveByLessonId(lessonId);
 		    roster.clear();
 		    for (PresenceChatUser activeUser : storedActiveUsers) {
 			roster.put(activeUser.getNickname(), activeUser.getLastPresence());
@@ -130,7 +130,7 @@ public class PresenceChatAction extends LamsDispatchAction {
 	    boolean getMessages = Boolean.parseBoolean(request.getParameter("getMessages"));
 	    // this is the current user
 	    String nickname = request.getParameter("to");
- 
+
 	    JSONObject responseJSON = new JSONObject();
 	    // no need to fetch messages if presence is collapsed
 	    if (getMessages && !StringUtils.isBlank(nickname)) {
@@ -206,8 +206,9 @@ public class PresenceChatAction extends LamsDispatchAction {
 	for (PresenceChatMessage message : messages) {
 	    String messageFrom = message.getFrom();
 	    String messageTo = message.getTo();
-	    if (from == null ? messageTo == null : (from.equals(messageTo) && nickname.equals(messageFrom))
-		    || (from.equals(messageFrom) && nickname.equals(messageTo))) {
+	    if (from == null ? messageTo == null
+		    : (from.equals(messageTo) && nickname.equals(messageFrom))
+			    || (from.equals(messageFrom) && nickname.equals(messageTo))) {
 		// this goes to opened tab, so get the whole message
 		JSONObject messageJSON = new JSONObject();
 		messageJSON.put("uid", message.getUid());
@@ -229,8 +230,8 @@ public class PresenceChatAction extends LamsDispatchAction {
 
     private IPresenceChatService getPresenceChatService() {
 	if (PresenceChatAction.presenceChatService == null) {
-	    WebApplicationContext ctx = WebApplicationContextUtils.getWebApplicationContext(HttpSessionManager
-		    .getInstance().getServletContext());
+	    WebApplicationContext ctx = WebApplicationContextUtils
+		    .getWebApplicationContext(HttpSessionManager.getInstance().getServletContext());
 	    PresenceChatAction.presenceChatService = (IPresenceChatService) ctx.getBean("presenceChatService");
 	}
 	return PresenceChatAction.presenceChatService;

@@ -39,10 +39,10 @@ import org.lamsfoundation.lams.tool.survey.util.QuestionsComparator;
 
 /**
  * A text search condition with a set of questions on answers to which the search should be performed.
- * 
- * 
+ *
+ *
  * @author Marcin Cieslak
- * 
+ *
  */
 public class SurveyCondition extends TextSearchCondition {
     /**
@@ -85,17 +85,17 @@ public class SurveyCondition extends TextSearchCondition {
 		    // the condition "knows" it's an array of strings, i.e. user's answers
 		    String[] answers = (String[]) value.getValue();
 		    result = true;
-		    
-		    for (int i=0; i<answers.length; i++) {
+
+		    for (int i = 0; i < answers.length; i++) {
 			String textToMatch = answers[i];
 
 			result &= matches(textToMatch);
 			// if at least one answer does not satisfy the condition, there is no need to look further
 			if (!result) {
 			    break;
-			}			
+			}
 		    }
-		    
+
 		} else {
 		    throw new ToolOutputFormatException("Survey tool produced a non-complex tool output.");
 		}

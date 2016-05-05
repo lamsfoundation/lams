@@ -2,21 +2,21 @@
  * Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
  * =============================================================
  * License Information: http://lamsfoundation.org/licensing/lams/2.0/
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License version 2.0 
+ * it under the terms of the GNU General Public License version 2.0
  * as published by the Free Software Foundation.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301
  * USA
- * 
+ *
  * http://www.gnu.org/licenses/gpl.txt
  * ****************************************************************
  */
@@ -485,9 +485,9 @@ public class User implements Serializable, Comparable {
 		// TimeZone.getTimeZone("Australia/Sydney"),
 		timeZone, authenticationMethod.getAuthenticationMethodId(), fckLanguageMapping, lamsCommunityToken,
 		lamsCommunityUsername, (tutorialsDisabled == null ? false : true), // assume tutorials enabled if not
-										   // set
+		// set
 		tutorialPages, (firstLogin == null ? true : false) // assume no firstLogin value means they haven't
-								   // logged in
+							   // logged in
 	);
     }
 
@@ -514,7 +514,7 @@ public class User implements Serializable, Comparable {
      * This method checks whether the user has membership access to the given workspaceFolder. Membership access means I
      * am a member of the organisation relating to this folder (either as the root folder or a folder under the root
      * folder).
-     * 
+     *
      * Membership access means that the user has read and write access but cannot modify anybody else's content/stuff
      */
     public boolean hasMemberAccess(WorkspaceFolder workspaceFolder) {

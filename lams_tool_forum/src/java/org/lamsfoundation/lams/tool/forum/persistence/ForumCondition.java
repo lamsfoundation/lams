@@ -44,10 +44,10 @@ import org.lamsfoundation.lams.util.WebUtil;
 
 /**
  * A text search condition with a set of topics on answers to which the search should be performed.
- * 
- * 
+ *
+ *
  * @author Marcin Cieslak
- * 
+ *
  */
 public class ForumCondition extends TextSearchCondition {
     /**
@@ -179,7 +179,7 @@ public class ForumCondition extends TextSearchCondition {
 
 	Set<Message> topicsCopy = new TreeSet<Message>(new ConditionTopicComparator());
 	for (Message conditionTopic : getTopics()) {
-	    for (Message contentTopic : (Set<Message>) forum.getMessages()) {
+	    for (Message contentTopic : forum.getMessages()) {
 		if (contentTopic.getIsAuthored() && contentTopic.getToolSession() == null
 			&& contentTopic.getCreated().equals(conditionTopic.getCreated())) {
 		    topicsCopy.add(contentTopic);
@@ -201,7 +201,7 @@ public class ForumCondition extends TextSearchCondition {
 
     /**
      * It filters the given text in order to find any of the unwanted words.
-     * 
+     *
      * @param excludedWords
      *            words to search for
      * @param textToMatch

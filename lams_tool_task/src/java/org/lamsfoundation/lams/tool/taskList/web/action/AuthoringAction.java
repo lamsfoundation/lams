@@ -2,21 +2,21 @@
  * Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
  * =============================================================
  * License Information: http://lamsfoundation.org/licensing/lams/2.0/
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301
  * USA
- * 
+ *
  * http://www.gnu.org/licenses/gpl.txt
  * ****************************************************************
  */
@@ -76,7 +76,7 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
 /**
  * The main action in author mode. All the authoring operations are located in here. Except for operations dealing with
  * TaskListCondition that are located in <code>AuthoringTaskListConditionAction</code> action.
- * 
+ *
  * @author Steve.Ni
  * @author Andrey Balan
  * @see org.lamsfoundation.lams.tool.taskList.web.action.AuthoringTaskListConditionAction
@@ -160,9 +160,9 @@ public class AuthoringAction extends Action {
     /**
      * Read taskList data from database and put them into HttpSession. It will redirect to init.do directly after this
      * method run successfully.
-     * 
+     *
      * This method will avoid read database again and lost un-saved resouce item lost when user "refresh page",
-     * 
+     *
      * @throws ServletException
      */
     private ActionForward start(ActionMapping mapping, ActionForm form, HttpServletRequest request,
@@ -243,7 +243,7 @@ public class AuthoringAction extends Action {
 
     /**
      * Display same entire authoring page content from HttpSession variable.
-     * 
+     *
      * @param mapping
      * @param form
      * @param request
@@ -274,7 +274,7 @@ public class AuthoringAction extends Action {
 
     /**
      * This method will persist all inforamtion in this authoring page, include all taskList item, information etc.
-     * 
+     *
      * @param mapping
      * @param form
      * @param request
@@ -331,14 +331,14 @@ public class AuthoringAction extends Action {
 	HttpSession ss = SessionManager.getSession();
 	// get back login user DTO
 	UserDTO user = (UserDTO) ss.getAttribute(AttributeNames.USER);
-	TaskListUser taskListUser = service.getUserByIDAndContent(new Long(user.getUserID().intValue()), taskListForm
-		.getTaskList().getContentId());
+	TaskListUser taskListUser = service.getUserByIDAndContent(new Long(user.getUserID().intValue()),
+		taskListForm.getTaskList().getContentId());
 	if (taskListUser == null) {
 	    taskListUser = new TaskListUser(user, taskListPO);
 	}
 
 	taskListPO.setCreatedBy(taskListUser);
-	
+
 	// ************************* Handle taskList items *******************
 	Set itemList = new LinkedHashSet();
 	SortedSet<TaskListItem> items = getTaskListItemList(sessionMap);
@@ -355,12 +355,12 @@ public class AuthoringAction extends Action {
 	SortedSet<TaskListCondition> conditions = getTaskListConditionList(sessionMap);
 	SortedSet<TaskListCondition> conditionListWithoutEmptyElements = new TreeSet<TaskListCondition>(conditions);
 	List delConditions = getDeletedTaskListConditionList(sessionMap);
-	
+
 	for (TaskListCondition condition : conditions) {
 	    if (condition.getTaskListItems().size() == 0) {
 		conditionListWithoutEmptyElements.remove(condition);
 		delConditions.add(condition);
-		
+
 		//reorder remaining conditions
 		for (TaskListCondition otherCondition : conditionListWithoutEmptyElements) {
 		    if (otherCondition.getSequenceId() > condition.getSequenceId()) {
@@ -424,7 +424,7 @@ public class AuthoringAction extends Action {
 
     /**
      * Display empty page for new taskList item.
-     * 
+     *
      * @param mapping
      * @param form
      * @param request
@@ -441,7 +441,7 @@ public class AuthoringAction extends Action {
 
     /**
      * Display edit page for existed taskList item.
-     * 
+     *
      * @param mapping
      * @param form
      * @param request
@@ -474,7 +474,7 @@ public class AuthoringAction extends Action {
      * <code>HttpSession</code> TaskListItemList. Notice, this save is not persist them into database, just save
      * <code>HttpSession</code> temporarily. Only they will be persist when the entire authoring page is being
      * persisted.
-     * 
+     *
      * @param mapping
      * @param form
      * @param request
@@ -496,8 +496,8 @@ public class AuthoringAction extends Action {
 	    extractFormToTaskListItem(request, itemForm);
 	} catch (Exception e) {
 	    // any upload exception will display as normal error message rather then throw exception directly
-	    errors.add(ActionMessages.GLOBAL_MESSAGE, new ActionMessage(TaskListConstants.ERROR_MSG_UPLOAD_FAILED, e
-		    .getMessage()));
+	    errors.add(ActionMessages.GLOBAL_MESSAGE,
+		    new ActionMessage(TaskListConstants.ERROR_MSG_UPLOAD_FAILED, e.getMessage()));
 	    if (!errors.isEmpty()) {
 		this.addErrors(request, errors);
 		return mapping.findForward("task");
@@ -512,7 +512,7 @@ public class AuthoringAction extends Action {
     /**
      * Remove taskList item from HttpSession list and update page display. As authoring rule, all persist only happen
      * when user submit whole page. So this remove is just impact HttpSession values.
-     * 
+     *
      * @param mapping
      * @param form
      * @param request
@@ -554,7 +554,7 @@ public class AuthoringAction extends Action {
 
     /**
      * Move up current item.
-     * 
+     *
      * @param mapping
      * @param form
      * @param request
@@ -568,7 +568,7 @@ public class AuthoringAction extends Action {
 
     /**
      * Move down current item.
-     * 
+     *
      * @param mapping
      * @param form
      * @param request
@@ -617,14 +617,14 @@ public class AuthoringAction extends Action {
      * Return TaskListService bean.
      */
     private ITaskListService getTaskListService() {
-	WebApplicationContext wac = WebApplicationContextUtils.getRequiredWebApplicationContext(getServlet()
-		.getServletContext());
+	WebApplicationContext wac = WebApplicationContextUtils
+		.getRequiredWebApplicationContext(getServlet().getServletContext());
 	return (ITaskListService) wac.getBean(TaskListConstants.TASKLIST_SERVICE);
     }
 
     /**
      * List save current taskList items.
-     * 
+     *
      * @param request
      * @return
      */
@@ -640,7 +640,7 @@ public class AuthoringAction extends Action {
 
     /**
      * List save current taskList items.
-     * 
+     *
      * @param request
      * @return
      */
@@ -656,7 +656,7 @@ public class AuthoringAction extends Action {
 
     /**
      * List save deleted taskList items, which could be persisted or non-persisted items.
-     * 
+     *
      * @param request
      * @return
      */
@@ -666,7 +666,7 @@ public class AuthoringAction extends Action {
 
     /**
      * List save deleted taskList items, which could be persisted or non-persisted items.
-     * 
+     *
      * @param request
      * @return
      */
@@ -676,7 +676,7 @@ public class AuthoringAction extends Action {
 
     /**
      * Get <code>java.util.List</code> from HttpSession by given name.
-     * 
+     *
      * @param request
      * @param name
      * @return
@@ -692,7 +692,7 @@ public class AuthoringAction extends Action {
 
     /**
      * This method will populate taskList item information to its form for edit use.
-     * 
+     *
      * @param itemIdx
      * @param item
      * @param form
@@ -719,7 +719,7 @@ public class AuthoringAction extends Action {
 
     /**
      * Extract web from content to taskList item.
-     * 
+     *
      * @param request
      * @param itemForm
      * @throws TaskListException
@@ -771,7 +771,7 @@ public class AuthoringAction extends Action {
 
     /**
      * Vaidate taskList item regards to their type (url/file/learning object/website zip file)
-     * 
+     *
      * @param itemForm
      * @return
      */
@@ -786,7 +786,7 @@ public class AuthoringAction extends Action {
 
     /**
      * Get ToolAccessMode from HttpRequest parameters. Default value is AUTHOR mode.
-     * 
+     *
      * @param request
      * @return
      */

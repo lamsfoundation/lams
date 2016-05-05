@@ -2,21 +2,21 @@
  * Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
  * =============================================================
  * License Information: http://lamsfoundation.org/licensing/lams/2.0/
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License version 2.0 
+ * it under the terms of the GNU General Public License version 2.0
  * as published by the Free Software Foundation.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301
  * USA
- * 
+ *
  * http://www.gnu.org/licenses/gpl.txt
  * ****************************************************************
  */
@@ -80,7 +80,7 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
 /**
  * this is an action where all lams client environments launch. initial configuration of the individual environment
  * setting is done here.
- * 
+ *
  * @struts:action path="/home" validate="false" parameter="method"
  * @struts:action-forward name="sysadmin" path="/sysadmin.jsp"
  * @struts:action-forward name="lessonIntro" path="/lessonIntro.jsp"
@@ -90,7 +90,7 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
  * @struts:action-forward name="message" path=".message"
  * @struts:action-forward name="passwordChange" path=".passwordChange"
  * @struts:action-forward name="index" path="/index.jsp"
- * 
+ *
  */
 public class HomeAction extends DispatchAction {
 
@@ -134,8 +134,8 @@ public class HomeAction extends DispatchAction {
     /**
      * request for learner environment
      */
-    public ActionForward learner(ActionMapping mapping, ActionForm form, HttpServletRequest req, HttpServletResponse res)
-	    throws IOException, ServletException {
+    public ActionForward learner(ActionMapping mapping, ActionForm form, HttpServletRequest req,
+	    HttpServletResponse res) throws IOException, ServletException {
 	try {
 	    Long lessonId = WebUtil.readLongParam(req, AttributeNames.PARAM_LESSON_ID);
 	    UserDTO user = getUser();
@@ -207,8 +207,8 @@ public class HomeAction extends DispatchAction {
 		req.setAttribute(AttributeNames.PARAM_MODE, mode);
 	    }
 
-	    Boolean isPortfolioEnabled = lesson.getLearnerExportAvailable() != null ? lesson
-		    .getLearnerExportAvailable() : Boolean.TRUE;
+	    Boolean isPortfolioEnabled = lesson.getLearnerExportAvailable() != null ? lesson.getLearnerExportAvailable()
+		    : Boolean.TRUE;
 	    Organisation organisation = lesson.getOrganisation();
 	    //in case of preview lesson (organisation is null) don't check organisation's settings
 	    if (organisation != null) {
@@ -228,8 +228,8 @@ public class HomeAction extends DispatchAction {
 
 	    // forward to /lams/learning/main.jsp
 	    String serverURLContextPath = Configuration.get(ConfigurationKeys.SERVER_URL_CONTEXT_PATH);
-	    serverURLContextPath = serverURLContextPath.startsWith("/") ? serverURLContextPath : "/"
-		    + serverURLContextPath;
+	    serverURLContextPath = serverURLContextPath.startsWith("/") ? serverURLContextPath
+		    : "/" + serverURLContextPath;
 	    serverURLContextPath += serverURLContextPath.endsWith("/") ? "" : "/";
 	    getServlet().getServletContext().getContext(serverURLContextPath + "learning")
 		    .getRequestDispatcher("/main.jsp").forward(req, res);
@@ -252,7 +252,7 @@ public class HomeAction extends DispatchAction {
 		HomeAction.log.error("admin: User missing from session. ");
 		return mapping.findForward("error");
 	    }
-	    
+
 	    Long learningDesignID = null;
 	    String layout = null;
 	    String serverUrl = Configuration.get(ConfigurationKeys.SERVER_URL);
@@ -308,7 +308,7 @@ public class HomeAction extends DispatchAction {
 	    HomeAction.log.error("User missing from session. Can not open Lesson Monitor.");
 	    return mapping.findForward("error");
 	}
-	
+
 	Lesson lesson = lessonId == null ? null : getLessonService().getLesson(lessonId);
 	if (lesson == null) {
 	    HomeAction.log.error("Lesson " + lessonId + " does not exist. Can not open Lesson Monitor.");
@@ -324,8 +324,8 @@ public class HomeAction extends DispatchAction {
 
     @SuppressWarnings("unchecked")
     public ActionForward addLesson(ActionMapping mapping, ActionForm form, HttpServletRequest req,
-	    HttpServletResponse res) throws IOException, UserAccessDeniedException, JSONException,
-	    RepositoryCheckedException {
+	    HttpServletResponse res)
+	    throws IOException, UserAccessDeniedException, JSONException, RepositoryCheckedException {
 	UserDTO userDTO = getUser();
 	Integer organisationID = new Integer(WebUtil.readIntParam(req, "organisationID"));
 
@@ -391,8 +391,8 @@ public class HomeAction extends DispatchAction {
      * Gets subfolder contents in Add Lesson screen.
      */
     public ActionForward getFolderContents(ActionMapping mapping, ActionForm form, HttpServletRequest req,
-	    HttpServletResponse res) throws UserAccessDeniedException, JSONException, IOException,
-	    RepositoryCheckedException {
+	    HttpServletResponse res)
+	    throws UserAccessDeniedException, JSONException, IOException, RepositoryCheckedException {
 	Integer folderID = WebUtil.readIntParam(req, "folderID", true);
 	boolean allowInvalidDesigns = WebUtil.readBooleanParam(req, "allowInvalidDesigns", false);
 	String folderContentsJSON = getWorkspaceManagementService().getFolderContentsJSON(folderID,
@@ -419,8 +419,8 @@ public class HomeAction extends DispatchAction {
 
 	// should the image be downloaded or a part of page?
 	if (download) {
-	    String name = getLearningDesignService().getLearningDesignDTO(learningDesignId,
-		    getUser().getLocaleLanguage()).getTitle();
+	    String name = getLearningDesignService()
+		    .getLearningDesignDTO(learningDesignId, getUser().getLocaleLanguage()).getTitle();
 	    name += "." + (format == SVGGenerator.OUTPUT_FORMAT_PNG ? "png" : "svg");
 	    name = FileUtil.encodeFilenameForDownload(req, name);
 	    res.setContentType("application/x-download");
@@ -471,8 +471,8 @@ public class HomeAction extends DispatchAction {
 
     private IUserManagementService getService() {
 	if (HomeAction.service == null) {
-	    WebApplicationContext ctx = WebApplicationContextUtils.getRequiredWebApplicationContext(getServlet()
-		    .getServletContext());
+	    WebApplicationContext ctx = WebApplicationContextUtils
+		    .getRequiredWebApplicationContext(getServlet().getServletContext());
 	    HomeAction.service = (IUserManagementService) ctx.getBean("userManagementService");
 	}
 	return HomeAction.service;
@@ -480,8 +480,8 @@ public class HomeAction extends DispatchAction {
 
     private ILessonService getLessonService() {
 	if (HomeAction.lessonService == null) {
-	    WebApplicationContext ctx = WebApplicationContextUtils.getRequiredWebApplicationContext(getServlet()
-		    .getServletContext());
+	    WebApplicationContext ctx = WebApplicationContextUtils
+		    .getRequiredWebApplicationContext(getServlet().getServletContext());
 	    HomeAction.lessonService = (ILessonService) ctx.getBean("lessonService");
 	}
 	return HomeAction.lessonService;
@@ -489,8 +489,8 @@ public class HomeAction extends DispatchAction {
 
     private ILearningDesignService getLearningDesignService() {
 	if (HomeAction.learningDesignService == null) {
-	    WebApplicationContext ctx = WebApplicationContextUtils.getRequiredWebApplicationContext(getServlet()
-		    .getServletContext());
+	    WebApplicationContext ctx = WebApplicationContextUtils
+		    .getRequiredWebApplicationContext(getServlet().getServletContext());
 	    HomeAction.learningDesignService = (ILearningDesignService) ctx.getBean("learningDesignService");
 	}
 	return HomeAction.learningDesignService;
@@ -498,8 +498,8 @@ public class HomeAction extends DispatchAction {
 
     private IGroupUserDAO getGroupUserDAO() {
 	if (HomeAction.groupUserDAO == null) {
-	    WebApplicationContext ctx = WebApplicationContextUtils.getRequiredWebApplicationContext(getServlet()
-		    .getServletContext());
+	    WebApplicationContext ctx = WebApplicationContextUtils
+		    .getRequiredWebApplicationContext(getServlet().getServletContext());
 	    HomeAction.groupUserDAO = (IGroupUserDAO) ctx.getBean("groupUserDAO");
 	}
 	return HomeAction.groupUserDAO;
@@ -507,8 +507,8 @@ public class HomeAction extends DispatchAction {
 
     private IWorkspaceManagementService getWorkspaceManagementService() {
 	if (HomeAction.workspaceManagementService == null) {
-	    WebApplicationContext webContext = WebApplicationContextUtils.getRequiredWebApplicationContext(getServlet()
-		    .getServletContext());
+	    WebApplicationContext webContext = WebApplicationContextUtils
+		    .getRequiredWebApplicationContext(getServlet().getServletContext());
 	    HomeAction.workspaceManagementService = (IWorkspaceManagementService) webContext
 		    .getBean("workspaceManagementService");
 	}
@@ -518,8 +518,8 @@ public class HomeAction extends DispatchAction {
 
     private ISecurityService getSecurityService() {
 	if (HomeAction.securityService == null) {
-	    WebApplicationContext webContext = WebApplicationContextUtils.getRequiredWebApplicationContext(getServlet()
-		    .getServletContext());
+	    WebApplicationContext webContext = WebApplicationContextUtils
+		    .getRequiredWebApplicationContext(getServlet().getServletContext());
 	    HomeAction.securityService = (ISecurityService) webContext.getBean("securityService");
 	}
 

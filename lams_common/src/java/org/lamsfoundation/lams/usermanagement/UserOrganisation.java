@@ -2,21 +2,21 @@
  * Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
  * =============================================================
  * License Information: http://lamsfoundation.org/licensing/lams/2.0/
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License version 2.0 
+ * it under the terms of the GNU General Public License version 2.0
  * as published by the Free Software Foundation.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301
  * USA
- * 
+ *
  * http://www.gnu.org/licenses/gpl.txt
  * ****************************************************************
  */
@@ -26,6 +26,7 @@ package org.lamsfoundation.lams.usermanagement;
 import java.io.Serializable;
 import java.util.HashSet;
 import java.util.Set;
+
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.commons.lang.builder.ToStringBuilder;
@@ -42,21 +43,21 @@ public class UserOrganisation implements Serializable {
     private Organisation organisation;
 
     private UserOrganisationCollapsed userOrganisationCollapsed;
-    
+
     /** persistent field */
     private Set userOrganisationRoles;
 
     /** full constructor */
     public UserOrganisation(User user, Organisation organisation, Set userOrganisationRoles) {
-        this.user = user;
-        this.organisation = organisation;
-        this.userOrganisationRoles = userOrganisationRoles;
+	this.user = user;
+	this.organisation = organisation;
+	this.userOrganisationRoles = userOrganisationRoles;
     }
-    
-    /**minimal constructor */
-    public UserOrganisation(User user, Organisation organisation){
-    	this.user = user;
-        this.organisation = organisation;
+
+    /** minimal constructor */
+    public UserOrganisation(User user, Organisation organisation) {
+	this.user = user;
+	this.organisation = organisation;
     }
 
     /** default constructor */
@@ -64,68 +65,69 @@ public class UserOrganisation implements Serializable {
     }
 
     public Integer getUserOrganisationId() {
-        return this.userOrganisationId;
+	return this.userOrganisationId;
     }
 
     public void setUserOrganisationId(Integer userOrganisationId) {
-        this.userOrganisationId = userOrganisationId;
+	this.userOrganisationId = userOrganisationId;
     }
 
     public User getUser() {
-        return this.user;
+	return this.user;
     }
 
     public void setUser(User user) {
-        this.user = user;
+	this.user = user;
     }
 
     public Organisation getOrganisation() {
-        return this.organisation;
+	return this.organisation;
     }
 
     public void setOrganisation(Organisation organisation) {
-        this.organisation = organisation;
+	this.organisation = organisation;
     }
 
     public UserOrganisationCollapsed getUserOrganisationCollapsed() {
-    	return this.userOrganisationCollapsed;
+	return this.userOrganisationCollapsed;
     }
-    
+
     public void setUserOrganisationCollapsed(UserOrganisationCollapsed uoc) {
-    	this.userOrganisationCollapsed = uoc;
+	this.userOrganisationCollapsed = uoc;
     }
 
     public Set getUserOrganisationRoles() {
-        return this.userOrganisationRoles;
+	return this.userOrganisationRoles;
     }
 
     public void setUserOrganisationRoles(Set userOrganisationRoles) {
-        this.userOrganisationRoles = userOrganisationRoles;
-    }
-    public void addUserOrganisationRole(UserOrganisationRole userOrganisationRole){
-    	if(userOrganisationRoles==null)
-    		userOrganisationRoles = new HashSet();
-    	userOrganisationRoles.add(userOrganisationRole);
+	this.userOrganisationRoles = userOrganisationRoles;
     }
 
+    public void addUserOrganisationRole(UserOrganisationRole userOrganisationRole) {
+	if (userOrganisationRoles == null) {
+	    userOrganisationRoles = new HashSet();
+	}
+	userOrganisationRoles.add(userOrganisationRole);
+    }
+
+    @Override
     public String toString() {
-        return new ToStringBuilder(this)
-            .append("userOrganisationId", getUserOrganisationId())
-            .toString();
+	return new ToStringBuilder(this).append("userOrganisationId", getUserOrganisationId()).toString();
     }
 
+    @Override
     public boolean equals(Object other) {
-        if ( !(other instanceof UserOrganisation) ) return false;
-        UserOrganisation castOther = (UserOrganisation) other;
-        return new EqualsBuilder()
-            .append(this.getUserOrganisationId(), castOther.getUserOrganisationId())
-            .isEquals();
+	if (!(other instanceof UserOrganisation)) {
+	    return false;
+	}
+	UserOrganisation castOther = (UserOrganisation) other;
+	return new EqualsBuilder().append(this.getUserOrganisationId(), castOther.getUserOrganisationId()).isEquals();
     }
 
+    @Override
     public int hashCode() {
-        return new HashCodeBuilder()
-            .append(getUserOrganisationId())
-            .toHashCode();
+	return new HashCodeBuilder().append(getUserOrganisationId()).toHashCode();
     }
 
 }

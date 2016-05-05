@@ -18,115 +18,117 @@
  *
  * http://www.gnu.org/licenses/gpl.txt
  * ****************************************************************
- */ 
- 
-/* $Id$ */ 
-package org.eucm.lams.tool.eadventure.web.form; 
+ */
+
+/* $Id$ */
+package org.eucm.lams.tool.eadventure.web.form;
 
 import java.util.HashSet;
 import java.util.Set;
 
 import org.apache.struts.action.ActionForm;
-import org.apache.struts.util.LabelValueBean;
- 
+
 /**
  * Form responsible for representing <code>EadventureCondition</code> objects on a view layer.
- * 
+ *
  * @author Andrey Balan
  * @author Angel del Blanco
- * 
+ *
  * @struts.form name="eadventureConditionForm"
  */
 public class EadventureConditionForm extends ActionForm {
-	
-	//tool access mode;
-	private String mode;
-	private String sessionMapID;
 
-	private String name;
-	
-	private String position;
-	
-	private Set expressionList;
-	// Link the name of the variable with their UUID 
-	//TODO renombrar a possibleParams
-	//private LabelValueBean[] possibleVars;
-	//TODO tiene que ser solo un string, ya que no permitimos seleccion multiple
-	//private String[] selectedItems;
-	
-	public EadventureConditionForm() {
-		super();
-		expressionList = new HashSet();
-	}
-	
-	/**
-	 * Returns TaskListCondition name.
-	 * 
-	 * @return TaskListCondition name
-	 */
-	public String getName() {
-		return name;
-	}
-	/**
-	 * Sets TaskListCondition title.
-	 * 
-	 * @param title TaskListCondition title
-	 */
-	public void setName(String name) {
-		this.name = name;
-	}
-	
-	/**
-	 * Returns current SessionMapID.
-	 * 
-	 * @return current SessionMapID
-	 */
-	public String getSessionMapID() {
-		return sessionMapID;
-	}
-	/**
-	 * Sets current SessionMapID.
-	 * 
-	 * @param sessionMapID current SessionMapID
-	 */
-	public void setSessionMapID(String sessionMapID) {
-		this.sessionMapID = sessionMapID;
-	}
-	
-	/**
-	 * Returns working mode.
-	 * 
-	 * @return working mode
-	 */
-	public String getMode() {
-		return mode;
-	}
-	/**
-	 * Returns working mode.
-	 * 
-	 * @param mode working mode
-	 */
-	public void setMode(String mode) {
-		this.mode = mode;
-	}
+    //tool access mode;
+    private String mode;
+    private String sessionMapID;
 
-	public Set getExpressionList() {
-	    return expressionList;
-	}
+    private String name;
 
-	public void setExpressionList(Set expressionList) {
-	    this.expressionList = expressionList;
-	}
+    private String position;
 
-	public String getPosition() {
-	    return position;
-	}
+    private Set expressionList;
+    // Link the name of the variable with their UUID 
+    //TODO renombrar a possibleParams
+    //private LabelValueBean[] possibleVars;
+    //TODO tiene que ser solo un string, ya que no permitimos seleccion multiple
+    //private String[] selectedItems;
 
-	public void setPosition(String position) {
-	    this.position = position;
-	}
+    public EadventureConditionForm() {
+	super();
+	expressionList = new HashSet();
+    }
+
+    /**
+     * Returns TaskListCondition name.
+     * 
+     * @return TaskListCondition name
+     */
+    public String getName() {
+	return name;
+    }
+
+    /**
+     * Sets TaskListCondition title.
+     * 
+     * @param title
+     *            TaskListCondition title
+     */
+    public void setName(String name) {
+	this.name = name;
+    }
+
+    /**
+     * Returns current SessionMapID.
+     * 
+     * @return current SessionMapID
+     */
+    public String getSessionMapID() {
+	return sessionMapID;
+    }
+
+    /**
+     * Sets current SessionMapID.
+     * 
+     * @param sessionMapID
+     *            current SessionMapID
+     */
+    public void setSessionMapID(String sessionMapID) {
+	this.sessionMapID = sessionMapID;
+    }
+
+    /**
+     * Returns working mode.
+     * 
+     * @return working mode
+     */
+    public String getMode() {
+	return mode;
+    }
+
+    /**
+     * Returns working mode.
+     * 
+     * @param mode
+     *            working mode
+     */
+    public void setMode(String mode) {
+	this.mode = mode;
+    }
+
+    public Set getExpressionList() {
+	return expressionList;
+    }
+
+    public void setExpressionList(Set expressionList) {
+	this.expressionList = expressionList;
+    }
+
+    public String getPosition() {
+	return position;
+    }
+
+    public void setPosition(String position) {
+	this.position = position;
+    }
 
 }
-
-
- 

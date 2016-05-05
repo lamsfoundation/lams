@@ -2,21 +2,21 @@
  * Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
  * =============================================================
  * License Information: http://lamsfoundation.org/licensing/lams/2.0/
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License version 2.0 
+ * it under the terms of the GNU General Public License version 2.0
  * as published by the Free Software Foundation.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301
  * USA
- * 
+ *
  * http://www.gnu.org/licenses/gpl.txt
  * ****************************************************************
  */
@@ -24,10 +24,7 @@
 package org.lamsfoundation.lams.themes.dto;
 
 import java.text.ParseException;
-import java.util.ArrayList;
 import java.util.Hashtable;
-import java.util.Iterator;
-import java.util.List;
 
 import org.apache.commons.lang.builder.ToStringBuilder;
 import org.apache.log4j.Logger;
@@ -40,7 +37,7 @@ import org.lamsfoundation.lams.util.wddx.WDDXProcessorConversionException;
  * Models the Theme structure that is used to communicate with Flash. Includes
  * all the information from Theme down to each individual property. Based on the
  * native Flash structure for Style objects.
- * 
+ *
  * @author Fiona Malikoff
  */
 public class CSSThemeDTO extends BaseDTO {
@@ -68,7 +65,7 @@ public class CSSThemeDTO extends BaseDTO {
 
     /**
      * Create the DTO using the data from Flash
-     * 
+     *
      * @throws WDDXProcessorConversionException
      */
     public CSSThemeDTO(Hashtable wddxData) throws WDDXProcessorConversionException {
@@ -81,9 +78,9 @@ public class CSSThemeDTO extends BaseDTO {
 
     /**
      * Create the DTO from a database object.
-     * 
+     *
      * @throws ParseException
-     * 
+     *
      */
     public CSSThemeDTO(Theme theme) {
 	if (theme != null) {
@@ -96,7 +93,7 @@ public class CSSThemeDTO extends BaseDTO {
     /**
      * Creates the database format object from this DTO. Does not look up any
      * existing entries in the database. Does not set the users field.
-     * 
+     *
      * Don't call it getCSSTheme, or CSSTheme will be be written out in the WDDX
      * packet created from the DTO!
      */
@@ -114,17 +111,16 @@ public class CSSThemeDTO extends BaseDTO {
      * object but that would confused matters as some of the field copying code
      * would be in this object, and other bits would be in the CSSTheme object.
      * Does not change the user's field.
-     * 
+     *
      * Changes the parameter object (currentTheme) and returns the modified
      * object.
      */
     public Theme updateCSSTheme(Theme currentTheme) {
-	
+
 	currentTheme.setDescription(description);
 	currentTheme.setName(name);
 	return currentTheme;
     }
-
 
     /**
      * @return Returns the description.
@@ -147,9 +143,10 @@ public class CSSThemeDTO extends BaseDTO {
 	return name;
     }
 
-
+    @Override
     public String toString() {
-	return new ToStringBuilder(this).append("id", id).append("name", name).append("description", description).toString();
+	return new ToStringBuilder(this).append("id", id).append("name", name).append("description", description)
+		.toString();
     }
 
 }

@@ -2,21 +2,21 @@
  * Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
  * =============================================================
  * License Information: http://lamsfoundation.org/licensing/lams/2.0/
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301
  * USA
- * 
+ *
  * http://www.gnu.org/licenses/gpl.txt
  * ***********************************************************************/
 /* $$Id$$ */
@@ -77,8 +77,9 @@ public class McMonitoringAction extends LamsDispatchAction implements McAppConst
 
     /**
      * main content/question content management and workflow logic
-     * 
+     *
      */
+    @Override
     public ActionForward unspecified(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) throws IOException, ServletException {
 	return null;
@@ -93,7 +94,7 @@ public class McMonitoringAction extends LamsDispatchAction implements McAppConst
 	String strToolContentID = request.getParameter(AttributeNames.PARAM_TOOL_CONTENT_ID);
 	McContent mcContent = mcService.getMcContent(new Long(strToolContentID));
 	mcContent.setDisplayAnswers(new Boolean(true));
-	
+
 	McMonitoringForm mcMonitoringForm = (McMonitoringForm) form;
 	McGeneralMonitoringDTO mcGeneralMonitoringDTO = new McGeneralMonitoringDTO();
 
@@ -142,7 +143,7 @@ public class McMonitoringAction extends LamsDispatchAction implements McAppConst
 	if (!reflectionsContainerDTO.isEmpty()) {
 	    request.setAttribute(NOTEBOOK_ENTRIES_EXIST, new Boolean(true).toString());
 
-	    String userExceptionNoToolSessions = (String) mcGeneralMonitoringDTO.getUserExceptionNoToolSessions();
+	    String userExceptionNoToolSessions = mcGeneralMonitoringDTO.getUserExceptionNoToolSessions();
 
 	    if (userExceptionNoToolSessions.equals("true")) {
 		// there are no online student activity but there are reflections
@@ -222,8 +223,9 @@ public class McMonitoringAction extends LamsDispatchAction implements McAppConst
 	    out.flush();
 	} finally {
 	    try {
-		if (out != null)
+		if (out != null) {
 		    out.close();
+		}
 	    } catch (IOException e) {
 	    }
 	}
@@ -257,14 +259,14 @@ public class McMonitoringAction extends LamsDispatchAction implements McAppConst
 
 	return null;
     }
-    
+
     /**
      * Populate user jqgrid table on summary page.
      */
     public ActionForward userMasterDetail(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) {
 	IMcService mcService = McServiceProxy.getMcService(getServlet().getServletContext());
-	
+
 	Long userUid = WebUtil.readLongParam(request, McAppConstants.USER_UID);
 	McQueUsr user = mcService.getMcUserByUID(userUid);
 	List<McUsrAttempt> userAttempts = mcService.getFinalizedUserAttempts(user);
@@ -277,9 +279,10 @@ public class McMonitoringAction extends LamsDispatchAction implements McAppConst
 
 	request.setAttribute(McAppConstants.USER_ATTEMPTS, userAttempts);
 	request.setAttribute(McAppConstants.TOOL_SESSION_ID, user.getMcSession().getMcSessionId());
-	return (userAttempts == null || userAttempts.isEmpty()) ? null : mapping.findForward(McAppConstants.USER_MASTER_DETAIL);
+	return (userAttempts == null || userAttempts.isEmpty()) ? null
+		: mapping.findForward(McAppConstants.USER_MASTER_DETAIL);
     }
-    
+
     /**
      * Return paged users for jqGrid.
      */
@@ -291,7 +294,7 @@ public class McMonitoringAction extends LamsDispatchAction implements McAppConst
 	McSession session = mcService.getMcSessionById(sessionId);
 	//find group leader, if any
 	McQueUsr groupLeader = session.getGroupLeader();
-	
+
 	// Getting the params passed in from the jqGrid
 	int page = WebUtil.readIntParam(request, AttributeNames.PARAM_PAGE);
 	int rowLimit = WebUtil.readIntParam(request, AttributeNames.PARAM_ROWS);
@@ -302,13 +305,13 @@ public class McMonitoringAction extends LamsDispatchAction implements McAppConst
 	}
 	String searchString = WebUtil.readStrParam(request, "userName", true);
 
-	List<McUserMarkDTO> userDtos = mcService.getPagedUsersBySession(sessionId, page - 1, rowLimit, sortBy, sortOrder,
-		searchString);
+	List<McUserMarkDTO> userDtos = mcService.getPagedUsersBySession(sessionId, page - 1, rowLimit, sortBy,
+		sortOrder, searchString);
 	int countVisitLogs = mcService.getCountPagedUsersBySession(sessionId, searchString);
 
-	int totalPages = new Double(Math.ceil(new Integer(countVisitLogs).doubleValue()
-		/ new Integer(rowLimit).doubleValue())).intValue();
-	
+	int totalPages = new Double(
+		Math.ceil(new Integer(countVisitLogs).doubleValue() / new Integer(rowLimit).doubleValue())).intValue();
+
 	JSONArray rows = new JSONArray();
 	int i = 1;
 	for (McUserMarkDTO userDto : userDtos) {
@@ -320,7 +323,7 @@ public class McMonitoringAction extends LamsDispatchAction implements McAppConst
 	    if (groupLeader != null && groupLeader.getUid().equals(userUid)) {
 		fullName += " (" + mcService.getLocalizedMessage("label.monitoring.group.leader") + ")";
 	    }
-	    
+
 	    visitLogData.put(fullName);
 	    Long totalMark = (userDto.getTotalMark() == null) ? 0 : userDto.getTotalMark();
 	    visitLogData.put(totalMark);
@@ -337,19 +340,19 @@ public class McMonitoringAction extends LamsDispatchAction implements McAppConst
 	responseJSON.put("page", page);
 	responseJSON.put("records", countVisitLogs);
 	responseJSON.put("rows", rows);
-	    
+
 	response.setContentType("application/json;charset=utf-8");
 	response.getWriter().write(responseJSON.toString());
 	return null;
     }
-    
+
     public ActionForward saveUserMark(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) {
 
 	if ((request.getParameter(McAppConstants.PARAM_NOT_A_NUMBER) == null)
 		&& !StringUtils.isEmpty(request.getParameter(McAppConstants.PARAM_USER_ATTEMPT_UID))) {
 	    IMcService mcService = McServiceProxy.getMcService(getServlet().getServletContext());
-	    
+
 	    Long userAttemptUid = WebUtil.readLongParam(request, McAppConstants.PARAM_USER_ATTEMPT_UID);
 	    Integer newGrade = Integer.valueOf(request.getParameter(McAppConstants.PARAM_GRADE));
 	    mcService.changeUserAttemptMark(userAttemptUid, newGrade);
@@ -357,7 +360,7 @@ public class McMonitoringAction extends LamsDispatchAction implements McAppConst
 
 	return null;
     }
-    
+
     // *************************************************************************************
     // Private methods
     // *************************************************************************************
@@ -375,11 +378,11 @@ public class McMonitoringAction extends LamsDispatchAction implements McAppConst
 	mcMonitoringForm.setResponseId(responseId);
 	mcGeneralMonitoringDTO.setResponseId(responseId);
     }
-    
+
     /**
      * Return ResourceService bean.
      */
     private MessageService getMessageService() {
-	return (MessageService) McServiceProxy.getMessageService(getServlet().getServletContext());
+	return McServiceProxy.getMessageService(getServlet().getServletContext());
     }
 }

@@ -11,8 +11,10 @@ public class WookieConfigItemDAO extends BaseDAO implements IWookieConfigItemDAO
     private static final String LOAD_CONFIG_ITEM_BY_KEY = "from WookieConfigItem configuration"
 	    + " where configuration.configKey=:key";
 
+    @Override
     public WookieConfigItem getConfigItemByKey(final String configKey) {
 	return (WookieConfigItem) getHibernateTemplate().execute(new HibernateCallback() {
+	    @Override
 	    public Object doInHibernate(Session session) throws HibernateException {
 		return session.createQuery(LOAD_CONFIG_ITEM_BY_KEY).setString("key", configKey).uniqueResult();
 	    }
@@ -20,6 +22,7 @@ public class WookieConfigItemDAO extends BaseDAO implements IWookieConfigItemDAO
 
     }
 
+    @Override
     public void saveOrUpdate(WookieConfigItem mdlForumConfigItem) {
 	this.getHibernateTemplate().saveOrUpdate(mdlForumConfigItem);
 	this.getHibernateTemplate().flush();

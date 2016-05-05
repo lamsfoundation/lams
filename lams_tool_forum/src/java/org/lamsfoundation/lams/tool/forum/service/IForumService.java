@@ -2,21 +2,21 @@
  * Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
  * =============================================================
  * License Information: http://lamsfoundation.org/licensing/lams/2.0/
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License version 2.0 
+ * it under the terms of the GNU General Public License version 2.0
  * as published by the Free Software Foundation.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301
  * USA
- * 
+ *
  * http://www.gnu.org/licenses/gpl.txt
  * ****************************************************************
  */
@@ -30,7 +30,6 @@ import java.util.List;
 import org.apache.struts.upload.FormFile;
 import org.lamsfoundation.lams.events.IEventNotificationService;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
-import org.lamsfoundation.lams.notebook.service.ICoreNotebookService;
 import org.lamsfoundation.lams.tool.forum.dto.AverageRatingDTO;
 import org.lamsfoundation.lams.tool.forum.dto.MessageDTO;
 import org.lamsfoundation.lams.tool.forum.persistence.Attachment;
@@ -53,7 +52,7 @@ public interface IForumService {
     /**
      * Create a Forum instance according to the default content. <BR>
      * Note, this new instance won't save into database until called persist method.
-     * 
+     *
      * @param contentID
      * @return
      */
@@ -61,7 +60,7 @@ public interface IForumService {
 
     /**
      * Update forum by given <code>Forum</code>. If forum does not exist, the create a new forum.
-     * 
+     *
      * @param forum
      * @return
      * @throws PersistenceException
@@ -70,7 +69,7 @@ public interface IForumService {
 
     /**
      * Get forum by forum UID
-     * 
+     *
      * @param forumUid
      * @return
      * @throws PersistenceException
@@ -79,42 +78,42 @@ public interface IForumService {
 
     /**
      * Get forum by forum ID(not record UID)
-     * 
+     *
      * @param contentID
      * @return
      * @throws PersistenceException
      */
     Forum getForumByContentId(Long contentID) throws PersistenceException;
-    
-    List<Object[]> getUsersForTablesorter(final Long sessionId, int page, int size, int sorting, String searchString, 
-		boolean getNotebookEntries);
-    
+
+    List<Object[]> getUsersForTablesorter(final Long sessionId, int page, int size, int sorting, String searchString,
+	    boolean getNotebookEntries);
+
     int getCountUsersBySession(Long sessionId, String searchString);
 
     // ************************************************************************************
     // Topic Method
     // ************************************************************************************
-    
+
     /**
      * Get number of new postings.
-     * 
+     *
      * @param messageId
      * @param userId
-     * @return 
+     * @return
      */
     int getNewMessagesNum(Message message, Long userId);
-    
+
     /**
      * Saves timestamp
-     * 
+     *
      * @param rootTopicId
      * @param forumUser
      */
     void saveTimestamp(Long rootTopicId, ForumUser forumUser);
-    
+
     /**
      * Create a root topic.
-     * 
+     *
      * @param forumId
      * @param sessionId
      * @param message
@@ -125,7 +124,7 @@ public interface IForumService {
 
     /**
      * Update a topic by give <code>Message</code> instance.
-     * 
+     *
      * @param message
      * @return
      * @throws PersistenceException
@@ -134,7 +133,7 @@ public interface IForumService {
 
     /**
      * Hide a message by given <code>Message</code> instance
-     * 
+     *
      * @param message
      * @return
      * @throws PersistenceException
@@ -143,10 +142,10 @@ public interface IForumService {
 
     /**
      * Reply a topic.
-     * 
+     *
      * @param parentId
      * @param sessionId
-     *                ToolSessionID
+     *            ToolSessionID
      * @param message
      * @return
      * @throws PersistenceException
@@ -155,7 +154,7 @@ public interface IForumService {
 
     /**
      * Delete the topic by given topic ID. The function will delete all children topics under this topic.
-     * 
+     *
      * @param topicId
      * @throws PersistenceException
      */
@@ -164,7 +163,7 @@ public interface IForumService {
     /**
      * Upload message attachment file into repository. This method only upload the given file into system repository. It
      * does not execute any database operation.
-     * 
+     *
      * @param file
      * @return Attachment A new instance of attachment has uploaded file VersionID and UUID information.
      * @throws PersistenceException
@@ -176,39 +175,39 @@ public interface IForumService {
     // ************************************************************************************
     /**
      * Get a complete topic and its children list by given root topic ID. Note that the return type is DTO.
-     * 
+     *
      * @param rootTopicId
      * @return List of MessageDTO
      */
     List getTopicThread(Long rootTopicId);
-    
+
     /**
-     * Get topic and its children list by given root topic ID, starting from after the sequence number specified. 
+     * Get topic and its children list by given root topic ID, starting from after the sequence number specified.
      * Return the number of entries indicated by the paging number. Note that the return type is DTO.
-     * 
+     *
      * @param rootTopicId
      * @param afterSequenceId
      * @param pagingSize
      * @return List of MessageDTO
      */
-    public List getTopicThread(Long rootTopicId, Long afterSequenceId, Long pagingSize );
+    public List getTopicThread(Long rootTopicId, Long afterSequenceId, Long pagingSize);
 
     /**
      * Get one complete thread within a topic Note that the return type is DTO.
-     * 
+     *
      * @param threadId
      * @return List of MessageDTO
      */
-    public List getThread(Long threadId );
+    public List getThread(Long threadId);
 
     /**
      * Get root topics by a given sessionID value. Simultanousely, it gets back topics, which author posted in authoring
      * page for this forum, which is related with the given sessionID value.
-     * 
+     *
      * This method will used by user to display initial topic page for a forum.
-     * 
+     *
      * Note that the return type is DTO.
-     * 
+     *
      * @param sessionId
      * @return List of MessageDTO
      */
@@ -216,14 +215,14 @@ public interface IForumService {
 
     /**
      * Get topics posted by author role. Note that the return type is DTO.
-     * 
+     *
      * @return List of MessageDTO
      */
     List getAuthoredTopics(Long forumId);
 
     /**
      * This method will look up root topic ID by any level topicID.
-     * 
+     *
      * @param topicId
      * @return
      */
@@ -231,7 +230,7 @@ public interface IForumService {
 
     /**
      * Get message by given message UID
-     * 
+     *
      * @param messageUid
      * @return Message
      * @throws PersistenceException
@@ -240,16 +239,16 @@ public interface IForumService {
 
     /**
      * Get message by given message UID, wrapped up in the usual DTO list that is used for the view code in learner.
-     * 
+     *
      * @param messageUid
      * @return Message
      * @throws PersistenceException
      */
     List<MessageDTO> getMessageAsDTO(Long messageUid) throws PersistenceException;
-    
+
     /**
      * Get message list posted by given user. Note that the return type is DTO.
-     * 
+     *
      * @param userId
      * @return
      */
@@ -257,7 +256,7 @@ public interface IForumService {
 
     /**
      * Get how many post of this user post in a special session. DOES NOT include posts from author.
-     * 
+     *
      * @param userID
      * @param sessionId
      * @return
@@ -266,7 +265,7 @@ public interface IForumService {
 
     /**
      * Returns the number of posts this user has made in this topic.
-     * 
+     *
      * @param userId
      * @param topicId
      * @return
@@ -278,7 +277,7 @@ public interface IForumService {
     // ************************************************************************************
     /**
      * Get Forum tool session by Session ID (not record UID).
-     * 
+     *
      * @param sessionId
      * @return
      */
@@ -286,7 +285,7 @@ public interface IForumService {
 
     /**
      * Get session list according to content ID.
-     * 
+     *
      * @param contentID
      * @return List
      */
@@ -294,7 +293,7 @@ public interface IForumService {
 
     /**
      * Get all message according to the given session ID.
-     * 
+     *
      * @param sessionID
      * @return
      */
@@ -305,14 +304,14 @@ public interface IForumService {
     // ************************************************************************************
     /**
      * Create a new user in database.
-     * 
+     *
      * @param forumUser
      */
     void createUser(ForumUser forumUser);
 
     /**
      * Get user by user ID (not record UID).
-     * 
+     *
      * @param userId
      * @return
      */
@@ -320,7 +319,7 @@ public interface IForumService {
 
     /**
      * Get user list by given session ID.
-     * 
+     *
      * @param sessionID
      * @return
      */
@@ -328,7 +327,7 @@ public interface IForumService {
 
     /**
      * Get user by uid
-     * 
+     *
      * @param userUid
      * @return
      */
@@ -336,7 +335,7 @@ public interface IForumService {
 
     /**
      * Get user by user ID
-     * 
+     *
      * @param userId
      * @return
      */
@@ -344,8 +343,9 @@ public interface IForumService {
 
     /**
      * Update report contained inside specified message.
-     * 
-     * @param message specified message
+     *
+     * @param message
+     *            specified message
      */
     void updateContainedReport(Message message);
 
@@ -363,14 +363,14 @@ public interface IForumService {
 
     /**
      * Mark user completing a session.
-     * 
+     *
      * @param currentUser
      */
     void finishUserSession(ForumUser currentUser);
 
     /**
      * Create refection entry into notebook tool.
-     * 
+     *
      * @param sessionId
      * @param notebook_tool
      * @param tool_signature
@@ -382,7 +382,7 @@ public interface IForumService {
 
     /**
      * Get reflection entry from notebook tool.
-     * 
+     *
      * @param sessionId
      * @param idType
      * @param signature
@@ -400,11 +400,11 @@ public interface IForumService {
 
     /**
      * Gets a message from resource bundle. Same as <code><fmt:message></code> in JSP pages.
-     * 
+     *
      * @param key
-     *                key of the message
+     *            key of the message
      * @param args
-     *                arguments for the message
+     *            arguments for the message
      * @return message content
      */
     String getLocalisedMessage(String key, Object[] args);
@@ -412,42 +412,42 @@ public interface IForumService {
     /**
      * Creates an unique name for a ForumCondition. It consists of the tool output definition name and a unique positive
      * integer number.
-     * 
+     *
      * @param existingConditions
-     *                existing conditions; required to check if a condition with the same name does not exist.
+     *            existing conditions; required to check if a condition with the same name does not exist.
      * @return unique ForumCondition name
      */
     String createTextSearchConditionName(Collection<ForumCondition> existingConditions);
 
     void deleteCondition(ForumCondition condition) throws PersistenceException;
-    
+
     void sendNotificationsOnNewPosting(Long forumId, Long sessionId, Message message);
-    
+
     /**
      * Returns whether activity is grouped and therefore it is expected more than one tool session.
-     * 
+     *
      * @param toolContentID
      * @return
      */
     boolean isGroupedActivity(long toolContentID);
-    
+
     /**
      * Return content folder (unique to each learner and lesson) which is used for storing user generated content.
      * It's been used by CKEditor.
-     * 
+     *
      * @param toolSessionId
      * @param userId
      * @return
      */
     String getLearnerContentFolder(Long toolSessionId, Long userId);
-    
+
     AverageRatingDTO rateMessage(Long messageId, Long userId, Long toolSessionID, float rating);
-    
+
     AverageRatingDTO getAverageRatingDTOByMessage(Long responseId);
-    
+
     /**
      * Return total number of posts done by current user in this forum activity
-     * 
+     *
      * @param userUid
      * @param forumUid
      * @return

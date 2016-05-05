@@ -2,21 +2,21 @@
  * Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
  * =============================================================
  * License Information: http://lamsfoundation.org/licensing/lams/2.0/
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301
  * USA
- * 
+ *
  * http://www.gnu.org/licenses/gpl.txt
  * ****************************************************************
  */
@@ -172,7 +172,7 @@ public class ResourceServiceImpl implements IResourceService, ToolContentManager
     /**
      * Try to get the file. If forceLogin = false and an access denied exception occurs, call this method again to get a
      * new ticket and retry file lookup. If forceLogin = true and it then fails then throw exception.
-     * 
+     *
      * @param uuid
      * @param versionId
      * @param relativePath
@@ -210,10 +210,10 @@ public class ResourceServiceImpl implements IResourceService, ToolContentManager
     /**
      * This method verifies the credentials of the Share Resource Tool and gives it the <code>Ticket</code> to login and
      * access the Content Repository.
-     * 
+     *
      * A valid ticket is needed in order to access the content from the repository. This method would be called evertime
      * the tool needs to upload/download files from the content repository.
-     * 
+     *
      * @return ITicket The ticket for repostory access
      * @throws ResourceApplicationException
      */
@@ -679,7 +679,7 @@ public class ResourceServiceImpl implements IResourceService, ToolContentManager
 
     /**
      * Process an uploaded file.
-     * 
+     *
      * @throws ResourceApplicationException
      * @throws FileNotFoundException
      * @throws IOException
@@ -780,7 +780,7 @@ public class ResourceServiceImpl implements IResourceService, ToolContentManager
 
     /**
      * Find out default.htm/html or index.htm/html in the given directory folder
-     * 
+     *
      * @param packageDirectory
      * @return
      */
@@ -813,7 +813,7 @@ public class ResourceServiceImpl implements IResourceService, ToolContentManager
 
     /**
      * Gets a message from resource bundle. Same as <code><fmt:message></code> in JSP pages.
-     * 
+     *
      * @param key
      *            key of the message
      * @param args

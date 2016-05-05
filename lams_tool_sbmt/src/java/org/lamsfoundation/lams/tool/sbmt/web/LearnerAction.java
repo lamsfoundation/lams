@@ -2,21 +2,21 @@
  * Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
  * =============================================================
  * License Information: http://lamsfoundation.org/licensing/lams/2.0/
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License version 2.0 
+ * it under the terms of the GNU General Public License version 2.0
  * as published by the Free Software Foundation.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301
  * USA
- * 
+ *
  * http://www.gnu.org/licenses/gpl.txt
  * ****************************************************************
  */
@@ -45,7 +45,6 @@ import org.apache.struts.action.ActionMessage;
 import org.apache.struts.action.ActionMessages;
 import org.apache.struts.actions.DispatchAction;
 import org.apache.struts.upload.FormFile;
-import org.lamsfoundation.lams.events.DeliveryMethodMail;
 import org.lamsfoundation.lams.events.IEventNotificationService;
 import org.lamsfoundation.lams.learning.web.util.LearningWebUtil;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
@@ -64,7 +63,6 @@ import org.lamsfoundation.lams.tool.sbmt.form.LearnerForm;
 import org.lamsfoundation.lams.tool.sbmt.service.ISubmitFilesService;
 import org.lamsfoundation.lams.tool.sbmt.service.SubmitFilesServiceProxy;
 import org.lamsfoundation.lams.tool.sbmt.util.SbmtConstants;
-import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.util.DateUtil;
 import org.lamsfoundation.lams.util.FileUtil;
@@ -80,12 +78,12 @@ import org.lamsfoundation.lams.web.util.SessionMap;
  * @author Steve.Ni
  * @struts.action path="/learner" parameter="method" name="learnerForm" input="/learner/sbmtlearner.jsp" scope="request"
  *                validate="false"
- * 
+ *
  * @struts.action-forward name="success" path="/learner/sbmtlearner.jsp"
  * @struts.action-forward name="defineLater" path="/learner/definelater.jsp"
  * @struts.action-forward name="submissionDeadline" path="/learner/submissionDeadline.jsp"
- * 
- * 
+ *
+ *
  */
 public class LearnerAction extends DispatchAction {
 
@@ -95,7 +93,7 @@ public class LearnerAction extends DispatchAction {
 
     /**
      * The initial page of learner in Submission tool. This page will list all uploaded files and learn
-     * 
+     *
      * @param mapping
      * @param form
      * @param request
@@ -171,8 +169,8 @@ public class LearnerAction extends DispatchAction {
 	content.setDefineLater(false);
 	submitFilesService.saveOrUpdateContent(content);
 
-	LearningWebUtil.putActivityPositionInRequestByToolSessionId(sessionID, request, getServlet()
-		.getServletContext());
+	LearningWebUtil.putActivityPositionInRequestByToolSessionId(sessionID, request,
+		getServlet().getServletContext());
 
 	// check if there is submission deadline
 	Date submissionDeadline = content.getSubmissionDeadline();
@@ -209,7 +207,7 @@ public class LearnerAction extends DispatchAction {
     /**
      * Implements learner upload submission function. This function also display the page again for learner uploading
      * more submission use.
-     * 
+     *
      * @param mapping
      * @param form
      * @param request
@@ -227,8 +225,8 @@ public class LearnerAction extends DispatchAction {
 	// set the mode into http session
 	Long sessionID = (Long) sessionMap.get(AttributeNames.PARAM_TOOL_SESSION_ID);
 
-	LearningWebUtil.putActivityPositionInRequestByToolSessionId(sessionID, request, getServlet()
-		.getServletContext());
+	LearningWebUtil.putActivityPositionInRequestByToolSessionId(sessionID, request,
+		getServlet().getServletContext());
 
 	if (validateUploadForm(learnerForm, request)) {
 	    // get session from shared session.
@@ -269,18 +267,18 @@ public class LearnerAction extends DispatchAction {
 	SubmitFilesContent content = submitFilesService.getSessionById(sessionID).getContent();
 	if (content.isNotifyTeachersOnFileSubmit()) {
 
-	    String message = submitFilesService
-		    .getLocalisedMessage("event.file.submit.body", new Object[] { learner.getFullName() });
+	    String message = submitFilesService.getLocalisedMessage("event.file.submit.body",
+		    new Object[] { learner.getFullName() });
 	    submitFilesService.getEventNotificationService().notifyLessonMonitors(sessionID, message, false);
 	}
-	
+
 	return mapping.getInputForward();
     }
 
     /**
      * Learner choose finish upload button, will invoke this function. This function will mark the <code>finished</code>
      * field by special toolSessionID and userID.
-     * 
+     *
      * @param mapping
      * @param form
      * @param request
@@ -298,8 +296,8 @@ public class LearnerAction extends DispatchAction {
 	Long sessionID = (Long) sessionMap.get(AttributeNames.PARAM_TOOL_SESSION_ID);
 
 	if (mode == ToolAccessMode.LEARNER || mode.equals(ToolAccessMode.AUTHOR)) {
-	    ToolSessionManager sessionMgrService = SubmitFilesServiceProxy.getToolSessionManager(getServlet()
-		    .getServletContext());
+	    ToolSessionManager sessionMgrService = SubmitFilesServiceProxy
+		    .getToolSessionManager(getServlet().getServletContext());
 	    ISubmitFilesService submitFilesService = getService();
 
 	    // get back login user DTO
@@ -329,8 +327,8 @@ public class LearnerAction extends DispatchAction {
     // Private mehtods
     // **********************************************************************************************
     private ISubmitFilesService getService() {
-	ISubmitFilesService submitFilesService = SubmitFilesServiceProxy.getSubmitFilesService(this.getServlet()
-		.getServletContext());
+	ISubmitFilesService submitFilesService = SubmitFilesServiceProxy
+		.getSubmitFilesService(this.getServlet().getServletContext());
 	return submitFilesService;
     }
 
@@ -339,15 +337,15 @@ public class LearnerAction extends DispatchAction {
 	ActionMessages errors = new ActionMessages();
 	Locale preferredLocale = (Locale) request.getSession().getAttribute(LocaleFilter.PREFERRED_LOCALE_KEY);
 	if (learnerForm.getFile() == null || StringUtils.isBlank(learnerForm.getFile().getFileName())) {
-	    errors.add(ActionMessages.GLOBAL_MESSAGE, new ActionMessage("errors.required", this.getResources(request)
-		    .getMessage(preferredLocale, "learner.form.filepath.displayname")));
+	    errors.add(ActionMessages.GLOBAL_MESSAGE, new ActionMessage("errors.required",
+		    this.getResources(request).getMessage(preferredLocale, "learner.form.filepath.displayname")));
 	}
 	if (StringUtils.isBlank(learnerForm.getDescription())) {
-	    errors.add(ActionMessages.GLOBAL_MESSAGE, new ActionMessage("errors.required", this.getResources(request)
-		    .getMessage(preferredLocale, "label.learner.fileDescription")));
+	    errors.add(ActionMessages.GLOBAL_MESSAGE, new ActionMessage("errors.required",
+		    this.getResources(request).getMessage(preferredLocale, "label.learner.fileDescription")));
 	} else if (learnerForm.getDescription().length() > LearnerForm.DESCRIPTION_LENGTH) {
-	    errors.add(ActionMessages.GLOBAL_MESSAGE, new ActionMessage("errors.maxdescsize",
-		    LearnerForm.DESCRIPTION_LENGTH));
+	    errors.add(ActionMessages.GLOBAL_MESSAGE,
+		    new ActionMessage("errors.maxdescsize", LearnerForm.DESCRIPTION_LENGTH));
 	}
 
 	FileValidatorUtil.validateFileSize(learnerForm.getFile(), false, errors);
@@ -370,10 +368,10 @@ public class LearnerAction extends DispatchAction {
     }
 
     /**
-     * 
+     *
      * Set information into learner DTO object for page display. Fill file list uploaded by the special user into web
      * form. Remove the unauthorized mark and comments.
-     * 
+     *
      * @param request
      * @param sessionMap
      * @param sessionID

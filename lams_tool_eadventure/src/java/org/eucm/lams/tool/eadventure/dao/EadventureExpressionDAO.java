@@ -18,12 +18,11 @@
  *
  * http://www.gnu.org/licenses/gpl.txt
  * ****************************************************************
- */ 
- 
-/* $Id$ */ 
-package org.eucm.lams.tool.eadventure.dao; 
- 
-public interface EadventureExpressionDAO extends DAO{
+ */
+
+/* $Id$ */
+package org.eucm.lams.tool.eadventure.dao;
+
+public interface EadventureExpressionDAO extends DAO {
 
 }
- 

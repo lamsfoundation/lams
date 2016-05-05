@@ -2,21 +2,21 @@
  * Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
  * =============================================================
  * License Information: http://lamsfoundation.org/licensing/lams/2.0/
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301
  * USA
- * 
+ *
  * http://www.gnu.org/licenses/gpl.txt
  * ****************************************************************
  */
@@ -26,11 +26,9 @@ package org.lamsfoundation.lams.tool.wookie.model;
 
 import java.util.Date;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
-import org.lamsfoundation.lams.contentrepository.client.IToolContentHandler;
 import org.lamsfoundation.lams.tool.wookie.service.WookieService;
 
 /**
@@ -38,14 +36,14 @@ import org.lamsfoundation.lams.tool.wookie.service.WookieService;
  */
 
 public class Wookie implements java.io.Serializable, Cloneable {
-    
+
     private static final long serialVersionUID = 579733009969321015L;
 
     static Logger log = Logger.getLogger(WookieService.class.getName());
 
     // Fields
     /**
-     * 
+     *
      */
     private Long uid;
 
@@ -72,7 +70,7 @@ public class Wookie implements java.io.Serializable, Cloneable {
     private Long toolContentId;
 
     private Set<WookieSession> wookieSessions;
-    
+
     // Wookie parameters
     String widgetAuthorUrl;
     Integer widgetHeight;
@@ -83,7 +81,7 @@ public class Wookie implements java.io.Serializable, Cloneable {
     // Property accessors
     /**
      * @hibernate.id generator-class="native" type="java.lang.Long" column="uid"
-     * 
+     *
      */
 
     public Long getUid() {
@@ -96,7 +94,7 @@ public class Wookie implements java.io.Serializable, Cloneable {
 
     /**
      * @hibernate.property column="create_date"
-     * 
+     *
      */
 
     public Date getCreateDate() {
@@ -109,7 +107,7 @@ public class Wookie implements java.io.Serializable, Cloneable {
 
     /**
      * @hibernate.property column="update_date"
-     * 
+     *
      */
 
     public Date getUpdateDate() {
@@ -122,7 +120,7 @@ public class Wookie implements java.io.Serializable, Cloneable {
 
     /**
      * @hibernate.property column="create_by" length="20"
-     * 
+     *
      */
 
     public Integer getCreateBy() {
@@ -135,7 +133,7 @@ public class Wookie implements java.io.Serializable, Cloneable {
 
     /**
      * @hibernate.property column="title" length="255"
-     * 
+     *
      */
 
     public String getTitle() {
@@ -148,7 +146,7 @@ public class Wookie implements java.io.Serializable, Cloneable {
 
     /**
      * @hibernate.property column="instructions" length="65535"
-     * 
+     *
      */
 
     public String getInstructions() {
@@ -161,7 +159,7 @@ public class Wookie implements java.io.Serializable, Cloneable {
 
     /**
      * @hibernate.property column="lock_on_finished" length="1"
-     * 
+     *
      */
 
     public boolean isLockOnFinished() {
@@ -185,7 +183,7 @@ public class Wookie implements java.io.Serializable, Cloneable {
 
     /**
      * @hibernate.property column="content_in_use" length="1"
-     * 
+     *
      */
 
     public boolean isContentInUse() {
@@ -198,7 +196,7 @@ public class Wookie implements java.io.Serializable, Cloneable {
 
     /**
      * @hibernate.property column="define_later" length="1"
-     * 
+     *
      */
 
     public boolean isDefineLater() {
@@ -211,7 +209,7 @@ public class Wookie implements java.io.Serializable, Cloneable {
 
     /**
      * @hibernate.property column="tool_content_id" length="20"
-     * 
+     *
      */
 
     public Long getToolContentId() {
@@ -226,7 +224,7 @@ public class Wookie implements java.io.Serializable, Cloneable {
      * @hibernate.set lazy="true" inverse="true" cascade="none"
      * @hibernate.collection-key column="wookie_uid"
      * @hibernate.collection-one-to-many class="org.lamsfoundation.lams.tool.wookie.model.WookieSession"
-     * 
+     *
      */
 
     public Set<WookieSession> getWookieSessions() {
@@ -239,7 +237,7 @@ public class Wookie implements java.io.Serializable, Cloneable {
 
     /**
      * toString
-     * 
+     *
      * @return String
      */
     @Override
@@ -268,8 +266,8 @@ public class Wookie implements java.io.Serializable, Cloneable {
 	}
 	Wookie castOther = (Wookie) other;
 
-	return this.getUid() == castOther.getUid() || this.getUid() != null && castOther.getUid() != null
-		&& this.getUid().equals(castOther.getUid());
+	return this.getUid() == castOther.getUid()
+		|| this.getUid() != null && castOther.getUid() != null && this.getUid().equals(castOther.getUid());
     }
 
     @Override
@@ -320,58 +318,58 @@ public class Wookie implements java.io.Serializable, Cloneable {
      * @return
      */
     public String getWidgetAuthorUrl() {
-        return widgetAuthorUrl;
+	return widgetAuthorUrl;
     }
 
     public void setWidgetAuthorUrl(String widgetAuthorUrl) {
-        this.widgetAuthorUrl = widgetAuthorUrl;
+	this.widgetAuthorUrl = widgetAuthorUrl;
     }
-    
+
     /**
-     * @hibernate.property column="widget_height" 
+     * @hibernate.property column="widget_height"
      * @return
      */
     public Integer getWidgetHeight() {
-        return widgetHeight;
+	return widgetHeight;
     }
 
     public void setWidgetHeight(Integer widgetHeight) {
-        this.widgetHeight = widgetHeight;
+	this.widgetHeight = widgetHeight;
     }
 
     /**
-     * @hibernate.property column="widget_width" 
+     * @hibernate.property column="widget_width"
      * @return
      */
     public Integer getWidgetWidth() {
-        return widgetWidth;
+	return widgetWidth;
     }
 
     public void setWidgetWidth(Integer widgetWidth) {
-        this.widgetWidth = widgetWidth;
+	this.widgetWidth = widgetWidth;
     }
 
     /**
-     * @hibernate.property column="widget_maximise" 
+     * @hibernate.property column="widget_maximise"
      * @return
      */
     public Boolean getWidgetMaximise() {
-        return widgetMaximise;
+	return widgetMaximise;
     }
 
     public void setWidgetMaximise(Boolean widgetMaximise) {
-        this.widgetMaximise = widgetMaximise;
+	this.widgetMaximise = widgetMaximise;
     }
 
     /**
-     * @hibernate.property column="widget_identifier"  length="511"
+     * @hibernate.property column="widget_identifier" length="511"
      * @return
      */
     public String getWidgetIdentifier() {
-        return widgetIdentifier;
+	return widgetIdentifier;
     }
 
     public void setWidgetIdentifier(String widgetIdentifier) {
-        this.widgetIdentifier = widgetIdentifier;
+	this.widgetIdentifier = widgetIdentifier;
     }
 }

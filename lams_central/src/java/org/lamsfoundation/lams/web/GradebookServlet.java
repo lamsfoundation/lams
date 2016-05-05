@@ -47,7 +47,7 @@ import org.lamsfoundation.lams.util.ConfigurationKeys;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 
 /**
- * 
+ *
  * @author Marcin Cieslak
  */
 @SuppressWarnings("serial")
@@ -64,9 +64,9 @@ public class GradebookServlet extends HttpServlet {
 
     /**
      * The doGet method of the servlet. <br>
-     * 
+     *
      * This method is called when a form has its tag value method equals to get.
-     * 
+     *
      * @param request
      *            the request send by the client to the server
      * @param response
@@ -141,12 +141,12 @@ public class GradebookServlet extends HttpServlet {
 	    }
 	}
     }
-    
+
     /**
      * The doPost method of the servlet. <br>
-     * 
+     *
      * This method is called when a form has its tag value method equals to post.
-     * 
+     *
      * @param request
      *            the request send by the client to the server
      * @param response
@@ -172,8 +172,8 @@ public class GradebookServlet extends HttpServlet {
     protected IUserManagementService getUserManagementService() {
 	if (GradebookServlet.userManagementService == null) {
 	    GradebookServlet.userManagementService = (IUserManagementService) WebApplicationContextUtils
-		    .getRequiredWebApplicationContext(getServletContext()).getBean(
-			    CentralConstants.USER_MANAGEMENT_SERVICE_BEAN_NAME);
+		    .getRequiredWebApplicationContext(getServletContext())
+		    .getBean(CentralConstants.USER_MANAGEMENT_SERVICE_BEAN_NAME);
 
 	}
 	return GradebookServlet.userManagementService;

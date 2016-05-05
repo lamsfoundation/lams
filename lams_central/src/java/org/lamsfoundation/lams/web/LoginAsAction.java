@@ -43,17 +43,18 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
 
 /**
  * @author jliew
- * 
+ *
  * @struts.action path="/loginas" validate="false"
  * @struts.action-forward name="usersearch" path="/admin/usersearch.do"
  */
 public class LoginAsAction extends Action {
 
+    @Override
     public ActionForward execute(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) throws Exception {
 
-	WebApplicationContext ctx = WebApplicationContextUtils.getRequiredWebApplicationContext(getServlet()
-		.getServletContext());
+	WebApplicationContext ctx = WebApplicationContextUtils
+		.getRequiredWebApplicationContext(getServlet().getServletContext());
 	IUserManagementService service = (IUserManagementService) ctx.getBean("userManagementService");
 	MessageService messageService = (MessageService) ctx.getBean("centralMessageService");
 	String login = WebUtil.readStrParam(request, "login", false);
@@ -61,14 +62,14 @@ public class LoginAsAction extends Action {
 	if (service.isUserSysAdmin()) {
 	    if (login != null && login.trim().length() > 0) {
 		if (service.getUserByLogin(login) != null) {
-		    
+
 		    // audit log when loginas
 		    UserDTO sysadmin = (UserDTO) SessionManager.getSession().getAttribute(AttributeNames.USER);
 		    IAuditService auditService = (IAuditService) ctx.getBean("auditService");
-		    String[] args = new String[]{sysadmin.getLogin() + "(" + sysadmin.getUserID() + ")", login};
+		    String[] args = new String[] { sysadmin.getLogin() + "(" + sysadmin.getUserID() + ")", login };
 		    String message = messageService.getMessage("audit.admin.loginas", args);
 		    auditService.log(CentralConstants.MODULE_NAME, message);
-		    
+
 		    // logout, but not the LAMS shared session; needed by UniversalLoginModule
 		    // to check for sysadmin role
 		    request.getSession().invalidate();

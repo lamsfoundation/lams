@@ -26,7 +26,7 @@ import org.lamsfoundation.lams.util.ConfigurationKeys;
 
 /**
  * Runs extraction of chosen IMS QTI zip file and prepares form for user to manually choose interesting question.
- * 
+ *
  * @struts.action path="/questions" validate="false"
  * @struts.action-forward name="questionChoice" path="/questions/questionChoice.jsp"
  * @struts.action-forward name="questionFile" path="/questions/questionFile.jsp"
@@ -60,7 +60,7 @@ public class QuestionsAction extends Action {
 
 	// this parameter is not really used at the moment
 	request.setAttribute("returnURL", returnURL);
-	
+
 	// show only chosen types of questions
 	request.setAttribute("limitType", limitTypeParam);
 
@@ -79,8 +79,9 @@ public class QuestionsAction extends Action {
 	    Collections.addAll(limitType, limitTypeParam.split(","));
 	}
 
-	Question[] questions = packageName.endsWith(".xml") ? QuestionParser.parseQTIFile(uploadedFileStream, null,
-		limitType) : QuestionParser.parseQTIPackage(uploadedFileStream, limitType);
+	Question[] questions = packageName.endsWith(".xml")
+		? QuestionParser.parseQTIFile(uploadedFileStream, null, limitType)
+		: QuestionParser.parseQTIPackage(uploadedFileStream, limitType);
 	request.setAttribute("questions", questions);
 
 	return mapping.findForward("questionChoice");

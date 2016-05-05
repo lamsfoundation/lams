@@ -2,21 +2,21 @@
  * Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
  * =============================================================
  * License Information: http://lamsfoundation.org/licensing/lams/2.0/
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301
  * USA
- * 
+ *
  * http://www.gnu.org/licenses/gpl.txt
  * ****************************************************************
  */
@@ -31,9 +31,9 @@ import java.util.Set;
 import org.apache.log4j.Logger;
 
 /**
- * 
+ *
  * Represents the tool session.
- * 
+ *
  * @hibernate.class table="tl_lawook10_session"
  */
 
@@ -41,8 +41,8 @@ public class WookieSession implements java.io.Serializable {
 
     private static Logger log = Logger.getLogger(WookieSession.class);
     /**
-	 * 
-	 */
+     * 
+     */
     private static final long serialVersionUID = 4407078136514639026L;
 
     // Fields
@@ -61,7 +61,7 @@ public class WookieSession implements java.io.Serializable {
     private Wookie wookie;
 
     private Set<WookieUser> wookieUsers;
-    
+
     private Long createBy;
 
     // Wookie properties
@@ -78,8 +78,8 @@ public class WookieSession implements java.io.Serializable {
     }
 
     /** full constructor */
-    public WookieSession(Date sessionEndDate, Date sessionStartDate, Integer status, Long sessionId,
-	    String sessionName, Wookie wookie, Set<WookieUser> wookieUsers) {
+    public WookieSession(Date sessionEndDate, Date sessionStartDate, Integer status, Long sessionId, String sessionName,
+	    Wookie wookie, Set<WookieUser> wookieUsers) {
 	this.sessionEndDate = sessionEndDate;
 	this.sessionStartDate = sessionStartDate;
 	this.status = status;
@@ -92,7 +92,7 @@ public class WookieSession implements java.io.Serializable {
     // Property accessors
     /**
      * @hibernate.id generator-class="native" type="java.lang.Long" column="uid"
-     * 
+     *
      */
 
     public Long getUid() {
@@ -105,7 +105,7 @@ public class WookieSession implements java.io.Serializable {
 
     /**
      * @hibernate.property column="session_end_date"
-     * 
+     *
      */
 
     public Date getSessionEndDate() {
@@ -118,7 +118,7 @@ public class WookieSession implements java.io.Serializable {
 
     /**
      * @hibernate.property column="session_start_date"
-     * 
+     *
      */
 
     public Date getSessionStartDate() {
@@ -131,7 +131,7 @@ public class WookieSession implements java.io.Serializable {
 
     /**
      * @hibernate.property column="status" length="11"
-     * 
+     *
      */
 
     public Integer getStatus() {
@@ -144,7 +144,7 @@ public class WookieSession implements java.io.Serializable {
 
     /**
      * @hibernate.property column="session_id" length="20"
-     * 
+     *
      */
 
     public Long getSessionId() {
@@ -157,7 +157,7 @@ public class WookieSession implements java.io.Serializable {
 
     /**
      * @hibernate.property column="session_name" length="250"
-     * 
+     *
      */
 
     public String getSessionName() {
@@ -171,7 +171,7 @@ public class WookieSession implements java.io.Serializable {
     /**
      * @hibernate.many-to-one not-null="true"
      * @hibernate.column name="wookie_uid"
-     * 
+     *
      */
 
     public Wookie getWookie() {
@@ -185,9 +185,9 @@ public class WookieSession implements java.io.Serializable {
     /**
      * @hibernate.set lazy="true" inverse="true" cascade="none"
      * @hibernate.collection-key column="wookie_session_uid"
-     * @hibernate.collection-one-to-many 
-     *                                   class="org.lamsfoundation.lams.tool.wookie.model.WookieUser"
-     * 
+     * @hibernate.collection-one-to-many
+     * 				  class="org.lamsfoundation.lams.tool.wookie.model.WookieUser"
+     *
      */
 
     public Set<WookieUser> getWookieUsers() {
@@ -197,7 +197,7 @@ public class WookieSession implements java.io.Serializable {
     public void setWookieUsers(Set<WookieUser> wookieUsers) {
 	this.wookieUsers = wookieUsers;
     }
-    
+
     /**
      * @hibernate.property column="widget_shared_data_key" length="63"
      * @return
@@ -260,9 +260,10 @@ public class WookieSession implements java.io.Serializable {
 
     /**
      * toString
-     * 
+     *
      * @return String
      */
+    @Override
     public String toString() {
 	StringBuffer buffer = new StringBuffer();
 
@@ -277,25 +278,31 @@ public class WookieSession implements java.io.Serializable {
 	return buffer.toString();
     }
 
+    @Override
     public boolean equals(Object other) {
-	if ((this == other))
+	if ((this == other)) {
 	    return true;
-	if ((other == null))
+	}
+	if ((other == null)) {
 	    return false;
-	if (!(other instanceof WookieSession))
+	}
+	if (!(other instanceof WookieSession)) {
 	    return false;
+	}
 	WookieSession castOther = (WookieSession) other;
 
-	return ((this.getUid() == castOther.getUid()) || (this.getUid() != null && castOther.getUid() != null && this
-		.getUid().equals(castOther.getUid())));
+	return ((this.getUid() == castOther.getUid())
+		|| (this.getUid() != null && castOther.getUid() != null && this.getUid().equals(castOther.getUid())));
     }
 
+    @Override
     public int hashCode() {
 	int result = 17;
 	result = 37 * result + (getUid() == null ? 0 : this.getUid().hashCode());
 	return result;
     }
 
+    @Override
     public Object clone() {
 
 	WookieSession session = null;

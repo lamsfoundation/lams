@@ -9,20 +9,23 @@ public interface IStatisticsService {
 
     /**
      * Get the overall statistics for the server
+     * 
      * @return
      */
     public StatisticsDTO getOverallStatistics();
-    
+
     /**
      * Get the statistics for the specified group
+     * 
      * @param orgId
      * @return
      * @throws Exception
      */
     public GroupStatisticsDTO getGroupStatisticsDTO(Integer orgId) throws Exception;
-    
+
     /**
      * Get a map of orgname,orgid for the drop down menu
+     * 
      * @return
      */
     public Map<String, Integer> getGroupMap();

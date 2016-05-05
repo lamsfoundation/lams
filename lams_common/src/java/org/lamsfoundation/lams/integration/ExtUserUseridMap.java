@@ -1,6 +1,7 @@
 package org.lamsfoundation.lams.integration;
 
 import java.io.Serializable;
+
 import org.apache.commons.lang.builder.ToStringBuilder;
 import org.lamsfoundation.lams.usermanagement.User;
 
@@ -36,7 +37,7 @@ public class ExtUserUseridMap implements Serializable {
 
     /**
      * @hibernate.id generator-class="native" type="java.lang.Integer" column="sid"
-     * 
+     *
      */
     public Integer getSid() {
 	return this.sid;
@@ -48,7 +49,7 @@ public class ExtUserUseridMap implements Serializable {
 
     /**
      * @hibernate.property column="external_username" length="250" not-null="true"
-     * 
+     *
      */
     public String getExtUsername() {
 	return this.extUsername;
@@ -61,7 +62,7 @@ public class ExtUserUseridMap implements Serializable {
     /**
      * @hibernate.many-to-one not-null="true"
      * @hibernate.column name="user_id" lazy="true"
-     * 
+     *
      */
     public User getUser() {
 	return this.user;
@@ -74,7 +75,7 @@ public class ExtUserUseridMap implements Serializable {
     /**
      * @hibernate.many-to-one not-null="true"
      * @hibernate.column name="ext_server_org_map_id"
-     * 
+     *
      */
     public ExtServerOrgMap getExtServerOrgMap() {
 	return this.extServerOrgMap;
@@ -84,6 +85,7 @@ public class ExtUserUseridMap implements Serializable {
 	this.extServerOrgMap = extServerOrgMap;
     }
 
+    @Override
     public String toString() {
 	return new ToStringBuilder(this).append("sid", getSid()).append("extUsername", getExtUsername()).toString();
     }
