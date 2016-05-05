@@ -1,44 +1,41 @@
-/**************************************************************** 
- * Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org) 
- * ============================================================= 
- * License Information: http://lamsfoundation.org/licensing/lams/2.0/ 
- * 
- * This program is free software; you can redistribute it and/or modify 
- * it under the terms of the GNU General Public License version 2.0 
- * as published by the Free Software Foundation. 
- * 
- * This program is distributed in the hope that it will be useful, 
- * but WITHOUT ANY WARRANTY; without even the implied warranty of 
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the 
- * GNU General Public License for more details. 
- * 
- * You should have received a copy of the GNU General Public License 
- * along with this program; if not, write to the Free Software 
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 * USA 
- * 
- * http://www.gnu.org/licenses/gpl.txt 
- * **************************************************************** 
+/****************************************************************
+ * Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
+ * =============================================================
+ * License Information: http://lamsfoundation.org/licensing/lams/2.0/
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License version 2.0
+ * as published by the Free Software Foundation.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 * USA
+ *
+ * http://www.gnu.org/licenses/gpl.txt
+ * ****************************************************************
  */
 
 /* $Id$ */
 package org.lamsfoundation.lams.tool.imageGallery.dto;
 
-import java.util.Set;
-
-import org.lamsfoundation.lams.tool.imageGallery.model.ImageGalleryItem;
 import org.lamsfoundation.lams.tool.imageGallery.model.ImageGalleryUser;
 
 /**
  * List contains following element: <br>
- * 
+ *
  * <li>session_name</li>
  * <li>user</li>
  * <li>ImageGalleryItem.rating</li>
  * <li>isVotedForThisImage</li>
  * <li>ImageGalleryItem.comments</li>
- * 
+ *
  * @author Andrey Balan
- * 
+ *
  */
 public class UserImageContributionDTO {
 
@@ -53,7 +50,7 @@ public class UserImageContributionDTO {
 
     /**
      * Contruction method for monitoring summary function.
-     * 
+     *
      * @param sessionName
      * @param item
      * @param isInitGroup
@@ -73,7 +70,7 @@ public class UserImageContributionDTO {
 
     /**
      * Returns image number of votes.
-     * 
+     *
      * @return image sequence number
      */
     public int getNumberOfVotesForImage() {
@@ -82,7 +79,7 @@ public class UserImageContributionDTO {
 
     /**
      * Sets image number of votes.
-     * 
+     *
      * @param numberRates
      *            image number of rates
      */

@@ -2,21 +2,21 @@
  * Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
  * =============================================================
  * License Information: http://lamsfoundation.org/licensing/lams/2.0/
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301
  * USA
- * 
+ *
  * http://www.gnu.org/licenses/gpl.txt
  * ****************************************************************
  */
@@ -34,7 +34,7 @@ import org.lamsfoundation.lams.rating.model.LearnerItemRatingCriteria;
 
 /**
  * ImageGallery
- * 
+ *
  */
 public class ImageGallery implements Cloneable {
 
@@ -55,7 +55,7 @@ public class ImageGallery implements Cloneable {
     // advance
 
     private boolean allowVote;
-    
+
     private boolean allowShareImages;
 
     private boolean lockWhenFinished;
@@ -90,7 +90,7 @@ public class ImageGallery implements Cloneable {
 
     /**
      * Default contruction method.
-     * 
+     *
      */
     public ImageGallery() {
 	nextImageTitle = new Long(1);
@@ -152,7 +152,7 @@ public class ImageGallery implements Cloneable {
 	    // clone ratingCriterias as well
 	    if (ratingCriterias != null) {
 		Set<LearnerItemRatingCriteria> newCriterias = new HashSet<LearnerItemRatingCriteria>();
-		for (LearnerItemRatingCriteria criteria : (Set<LearnerItemRatingCriteria>) ratingCriterias) {
+		for (LearnerItemRatingCriteria criteria : ratingCriterias) {
 		    LearnerItemRatingCriteria newCriteria = (LearnerItemRatingCriteria) criteria.clone();
 		    // just clone old file without duplicate it in repository
 		    newCriterias.add(newCriteria);
@@ -206,7 +206,7 @@ public class ImageGallery implements Cloneable {
     // **********************************************************
     /**
      * Returns the object's creation date
-     * 
+     *
      * @return date
      */
     public Date getCreated() {
@@ -215,7 +215,7 @@ public class ImageGallery implements Cloneable {
 
     /**
      * Sets the object's creation date
-     * 
+     *
      * @param created
      */
     public void setCreated(Date created) {
@@ -224,7 +224,7 @@ public class ImageGallery implements Cloneable {
 
     /**
      * Returns the object's date of last update
-     * 
+     *
      * @return date updated
      */
     public Date getUpdated() {
@@ -233,7 +233,7 @@ public class ImageGallery implements Cloneable {
 
     /**
      * Sets the object's date of last update
-     * 
+     *
      * @param updated
      */
     public void setUpdated(Date updated) {
@@ -242,7 +242,7 @@ public class ImageGallery implements Cloneable {
 
     /**
      * @return Returns the userid of the user who created the Share imageGallery.
-     * 
+     *
      */
     public ImageGalleryUser getCreatedBy() {
 	return createdBy;
@@ -268,7 +268,7 @@ public class ImageGallery implements Cloneable {
 
     /**
      * @return Returns the title.
-     * 
+     *
      */
     public String getTitle() {
 	return title;
@@ -284,7 +284,7 @@ public class ImageGallery implements Cloneable {
 
     /**
      * @return Returns the lockWhenFinish.
-     * 
+     *
      */
     public boolean getLockWhenFinished() {
 	return lockWhenFinished;
@@ -321,7 +321,7 @@ public class ImageGallery implements Cloneable {
     }
 
     /**
-     * 
+     *
      * @return
      */
     public Set getImageGalleryItems() {
@@ -443,7 +443,7 @@ public class ImageGallery implements Cloneable {
     }
 
     /**
-     * 
+     *
      * @return
      */
     public Set<LearnerItemRatingCriteria> getRatingCriterias() {

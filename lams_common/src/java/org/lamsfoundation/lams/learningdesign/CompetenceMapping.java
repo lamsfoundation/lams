@@ -1,64 +1,62 @@
 package org.lamsfoundation.lams.learningdesign;
 
-/** 
- * 
+/**
+ *
  *
  */
-public class CompetenceMapping 
-{
-	
-	private Long competenceMappingId;
-	private Competence competence;
-	private ToolActivity toolActivity;
-	
-	public CompetenceMapping(Long competenceMappingId, Competence competence,
-			ToolActivity toolActivity) {
-		super();
-		this.competenceMappingId = competenceMappingId;
-		this.competence = competence;
-		this.toolActivity = toolActivity;
-	}
+public class CompetenceMapping {
 
-	public CompetenceMapping() {
-		super();
-		// TODO Auto-generated constructor stub
-	}
+    private Long competenceMappingId;
+    private Competence competence;
+    private ToolActivity toolActivity;
 
-	/** 
-     *
-     *
-     */
-	public Long getCompetenceMappingId() {
-		return competenceMappingId;
-	}
+    public CompetenceMapping(Long competenceMappingId, Competence competence, ToolActivity toolActivity) {
+	super();
+	this.competenceMappingId = competenceMappingId;
+	this.competence = competence;
+	this.toolActivity = toolActivity;
+    }
 
-	public void setCompetenceMappingId(Long competenceMappingId) {
-		this.competenceMappingId = competenceMappingId;
-	}
+    public CompetenceMapping() {
+	super();
+	// TODO Auto-generated constructor stub
+    }
 
-	/** 
-     * 
-     *
-     *
-     */
-	public Competence getCompetence() {
-		return competence;
-	}
+    /** 
+    *
+    *
+    */
+    public Long getCompetenceMappingId() {
+	return competenceMappingId;
+    }
 
-	public void setCompetence(Competence competence) {
-		this.competence = competence;
-	}
+    public void setCompetenceMappingId(Long competenceMappingId) {
+	this.competenceMappingId = competenceMappingId;
+    }
 
-	/** 
-     * 
-     *
-     *
-     */
+    /** 
+    * 
+    *
+    *
+    */
+    public Competence getCompetence() {
+	return competence;
+    }
+
+    public void setCompetence(Competence competence) {
+	this.competence = competence;
+    }
+
+    /** 
+    * 
+    *
+    *
+    */
     public ToolActivity getToolActivity() {
-        return this.toolActivity;
+	return this.toolActivity;
     }
 
     public void setToolActivity(ToolActivity toolActivity) {
-        this.toolActivity = toolActivity;
+	this.toolActivity = toolActivity;
     }
 }

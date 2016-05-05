@@ -1,23 +1,23 @@
-/**************************************************************** 
- * Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org) 
- * ============================================================= 
- * License Information: http://lamsfoundation.org/licensing/lams/2.0/ 
- * 
- * This program is free software; you can redistribute it and/or modify 
- * it under the terms of the GNU General Public License version 2.0 
- * as published by the Free Software Foundation. 
- * 
- * This program is distributed in the hope that it will be useful, 
- * but WITHOUT ANY WARRANTY; without even the implied warranty of 
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the 
- * GNU General Public License for more details. 
- * 
- * You should have received a copy of the GNU General Public License 
- * along with this program; if not, write to the Free Software 
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 * USA 
- * 
- * http://www.gnu.org/licenses/gpl.txt 
- * **************************************************************** 
+/****************************************************************
+ * Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
+ * =============================================================
+ * License Information: http://lamsfoundation.org/licensing/lams/2.0/
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License version 2.0
+ * as published by the Free Software Foundation.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 * USA
+ *
+ * http://www.gnu.org/licenses/gpl.txt
+ * ****************************************************************
  */
 
 /* $Id$ */
@@ -46,7 +46,7 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
 public class PopulateMarksServlet extends HttpServlet {
 
     private static Logger log = Logger.getLogger(PopulateMarksServlet.class);
-    
+
     private static IScratchieService service;
     private static ScratchieSessionDAO scratchieSessionDAO;
 
@@ -56,7 +56,7 @@ public class PopulateMarksServlet extends HttpServlet {
 
 	WebApplicationContext ctx = WebApplicationContextUtils.getRequiredWebApplicationContext(getServletContext());
 	PopulateMarksServlet.scratchieSessionDAO = (ScratchieSessionDAO) ctx.getBean("scratchieSessionDao");
-	
+
 	super.init();
     }
 
@@ -65,13 +65,15 @@ public class PopulateMarksServlet extends HttpServlet {
      * sessions belonging to that toolContent, if this parameter is missing - it goes in a loop and recalculates for
      * session uids from 1 to 20 000.
      */
-    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+    @Override
+    protected void doGet(HttpServletRequest request, HttpServletResponse response)
+	    throws ServletException, IOException {
 
 	PrintWriter out = response.getWriter();
 	int sessionCount = 0;
 	try {
 	    List<ScratchieSession> sessions = new ArrayList<ScratchieSession>();
-	    
+
 	    Long toolContentId = WebUtil.readLongParam(request, "toolContentId", true);
 	    //in case toolContentId is not specified traverse the first 20 000 session ids
 	    if (toolContentId == null) {
@@ -84,13 +86,13 @@ public class PopulateMarksServlet extends HttpServlet {
 		    }
 
 		}
-		
-	    //otherwise - only the ones that belong to specified toolContentId
+
+		//otherwise - only the ones that belong to specified toolContentId
 	    } else {
 		List<ScratchieSession> dbSessions = scratchieSessionDAO.getByContentId(toolContentId);
 		sessions.addAll(dbSessions);
 	    }
-	    
+
 	    //recalculate marks for all selected sessions
 	    for (ScratchieSession session : sessions) {
 
@@ -101,7 +103,7 @@ public class PopulateMarksServlet extends HttpServlet {
 		    out.println("recalculateMarkForSession uid:" + session.getUid());
 		}
 	    }
-	    
+
 	    sessionCount = sessions.size();
 
 	} catch (Exception e) {
@@ -110,13 +112,14 @@ public class PopulateMarksServlet extends HttpServlet {
 	    out.close();
 	    throw new ServletException("LAMS ERROR: " + e.getMessage() + e.getCause());
 	}
-	
+
 	out.println("OK. Total number of sessions processed " + sessionCount);
 
     }
 
-    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException,
-	    IOException {
+    @Override
+    protected void doPost(HttpServletRequest request, HttpServletResponse response)
+	    throws ServletException, IOException {
 	doGet(request, response);
     }
 

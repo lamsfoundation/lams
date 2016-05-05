@@ -1,23 +1,23 @@
-/**************************************************************** 
- * Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org) 
- * ============================================================= 
- * License Information: http://lamsfoundation.org/licensing/lams/2.0/ 
- * 
- * This program is free software; you can redistribute it and/or modify 
- * it under the terms of the GNU General Public License version 2.0 
- * as published by the Free Software Foundation. 
- * 
- * This program is distributed in the hope that it will be useful, 
- * but WITHOUT ANY WARRANTY; without even the implied warranty of 
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the 
- * GNU General Public License for more details. 
- * 
- * You should have received a copy of the GNU General Public License 
- * along with this program; if not, write to the Free Software 
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 * USA 
- * 
- * http://www.gnu.org/licenses/gpl.txt 
- * **************************************************************** 
+/****************************************************************
+ * Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
+ * =============================================================
+ * License Information: http://lamsfoundation.org/licensing/lams/2.0/
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License version 2.0
+ * as published by the Free Software Foundation.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 * USA
+ *
+ * http://www.gnu.org/licenses/gpl.txt
+ * ****************************************************************
  */
 
 /* $Id$ */
@@ -63,7 +63,7 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
 /**
  * Auxiliary action in author mode. It contains operations with TaskListCondition. The rest of operations are located in
  * <code>AuthoringAction</code> action.
- * 
+ *
  * @author Andrey Balan
  * @see org.lamsfoundation.lams.tool.taskList.web.action.AuthoringAction
  */
@@ -102,7 +102,7 @@ public class AuthoringTaskListConditionAction extends Action {
 
     /**
      * Display same entire authoring page content from HttpSession variable.
-     * 
+     *
      * @param mapping
      * @param form
      * @param request
@@ -133,7 +133,7 @@ public class AuthoringTaskListConditionAction extends Action {
 
     /**
      * Display empty page for new taskList item.
-     * 
+     *
      * @param mapping
      * @param form
      * @param request
@@ -151,7 +151,7 @@ public class AuthoringTaskListConditionAction extends Action {
 
     /**
      * Display edit page for existed taskList item.
-     * 
+     *
      * @param mapping
      * @param form
      * @param request
@@ -185,7 +185,7 @@ public class AuthoringTaskListConditionAction extends Action {
      * <code>HttpSession</code> TaskListItemList. Notice, this save is not persist them into database, just save
      * <code>HttpSession</code> temporarily. Only they will be persist when the entire authoring page is being
      * persisted.
-     * 
+     *
      * @param mapping
      * @param form
      * @param request
@@ -209,8 +209,8 @@ public class AuthoringTaskListConditionAction extends Action {
 	    extractFormToTaskListCondition(request, conditionForm);
 	} catch (Exception e) {
 	    // any upload exception will display as normal error message rather then throw exception directly
-	    errors.add(ActionMessages.GLOBAL_MESSAGE, new ActionMessage(TaskListConstants.ERROR_MSG_UPLOAD_FAILED, e
-		    .getMessage()));
+	    errors.add(ActionMessages.GLOBAL_MESSAGE,
+		    new ActionMessage(TaskListConstants.ERROR_MSG_UPLOAD_FAILED, e.getMessage()));
 	    if (!errors.isEmpty()) {
 		populateFormWithPossibleItems(form, request);
 		this.addErrors(request, errors);
@@ -226,7 +226,7 @@ public class AuthoringTaskListConditionAction extends Action {
     /**
      * Remove taskList item from HttpSession list and update page display. As authoring rule, all persist only happen
      * when user submit whole page. So this remove is just impact HttpSession values.
-     * 
+     *
      * @param mapping
      * @param form
      * @param request
@@ -263,7 +263,7 @@ public class AuthoringTaskListConditionAction extends Action {
 
     /**
      * Move up current item.
-     * 
+     *
      * @param mapping
      * @param form
      * @param request
@@ -277,7 +277,7 @@ public class AuthoringTaskListConditionAction extends Action {
 
     /**
      * Move down current item.
-     * 
+     *
      * @param mapping
      * @param form
      * @param request
@@ -326,14 +326,14 @@ public class AuthoringTaskListConditionAction extends Action {
      * Return TaskListService bean.
      */
     private ITaskListService getTaskListService() {
-	WebApplicationContext wac = WebApplicationContextUtils.getRequiredWebApplicationContext(getServlet()
-		.getServletContext());
+	WebApplicationContext wac = WebApplicationContextUtils
+		.getRequiredWebApplicationContext(getServlet().getServletContext());
 	return (ITaskListService) wac.getBean(TaskListConstants.TASKLIST_SERVICE);
     }
 
     /**
      * List save current taskList items.
-     * 
+     *
      * @param request
      * @return
      */
@@ -349,7 +349,7 @@ public class AuthoringTaskListConditionAction extends Action {
 
     /**
      * List save current taskList items.
-     * 
+     *
      * @param request
      * @return
      */
@@ -365,7 +365,7 @@ public class AuthoringTaskListConditionAction extends Action {
 
     /**
      * List save deleted taskList items, which could be persisted or non-persisted items.
-     * 
+     *
      * @param request
      * @return
      */
@@ -375,7 +375,7 @@ public class AuthoringTaskListConditionAction extends Action {
 
     /**
      * Get <code>java.util.List</code> from HttpSession by given name.
-     * 
+     *
      * @param request
      * @param name
      * @return
@@ -391,7 +391,7 @@ public class AuthoringTaskListConditionAction extends Action {
 
     /**
      * This method will populate taskList item information to its form for edit use.
-     * 
+     *
      * @param sequenceId
      * @param condition
      * @param form
@@ -415,7 +415,7 @@ public class AuthoringTaskListConditionAction extends Action {
 
     /**
      * This method will populate taskList item information to its form for edit use.
-     * 
+     *
      * @param sequenceId
      * @param condition
      * @param form
@@ -441,7 +441,7 @@ public class AuthoringTaskListConditionAction extends Action {
 
     /**
      * Extract form content to taskListContent.
-     * 
+     *
      * @param request
      * @param form
      * @throws TaskListException
@@ -493,7 +493,7 @@ public class AuthoringTaskListConditionAction extends Action {
 
     /**
      * Validate taskListCondition
-     * 
+     *
      * @param conditionForm
      * @return
      */
@@ -504,8 +504,8 @@ public class AuthoringTaskListConditionAction extends Action {
 	if (StringUtils.isBlank(formConditionName)) {
 	    errors.add(ActionMessages.GLOBAL_MESSAGE, new ActionMessage(TaskListConstants.ERROR_MSG_NAME_BLANK));
 	} else if (StringUtils.contains(formConditionName, '#')) {
-	    errors.add(ActionMessages.GLOBAL_MESSAGE, new ActionMessage(
-		    TaskListConstants.ERROR_MSG_NAME_CONTAINS_WRONG_SYMBOL));
+	    errors.add(ActionMessages.GLOBAL_MESSAGE,
+		    new ActionMessage(TaskListConstants.ERROR_MSG_NAME_CONTAINS_WRONG_SYMBOL));
 	} else {
 
 	    String formConditionSequenceId = conditionForm.getSequenceId();
@@ -516,8 +516,8 @@ public class AuthoringTaskListConditionAction extends Action {
 	    for (TaskListCondition condition : conditionList) {
 		if (formConditionName.equals(condition.getName())
 			&& !formConditionSequenceId.equals((new Integer(condition.getSequenceId() - 1)).toString())) {
-		    errors.add(ActionMessages.GLOBAL_MESSAGE, new ActionMessage(
-			    TaskListConstants.ERROR_MSG_NAME_DUPLICATED));
+		    errors.add(ActionMessages.GLOBAL_MESSAGE,
+			    new ActionMessage(TaskListConstants.ERROR_MSG_NAME_DUPLICATED));
 		    break;
 		}
 	    }
@@ -526,9 +526,8 @@ public class AuthoringTaskListConditionAction extends Action {
 	// should be selected at least one TaskListItem
 	String[] selectedItems = conditionForm.getSelectedItems();
 	if (selectedItems == null || selectedItems.length == 0) {
-	    errors
-		    .add(ActionMessages.GLOBAL_MESSAGE, new ActionMessage(
-			    TaskListConstants.ERROR_MSG_NO_TASK_LIST_ITEMS));
+	    errors.add(ActionMessages.GLOBAL_MESSAGE,
+		    new ActionMessage(TaskListConstants.ERROR_MSG_NO_TASK_LIST_ITEMS));
 	}
 
 	return errors;
@@ -536,7 +535,7 @@ public class AuthoringTaskListConditionAction extends Action {
 
     /**
      * Get ToolAccessMode from HttpRequest parameters. Default value is AUTHOR mode.
-     * 
+     *
      * @param request
      * @return
      */

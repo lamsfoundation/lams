@@ -9,7 +9,7 @@ import org.lamsfoundation.lams.events.Subscription;
 public interface EventDAO extends IBaseDAO {
     /**
      * Gets an instance of the event.
-     * 
+     *
      * @param scope
      * @param name
      * @param eventSessionId
@@ -19,7 +19,7 @@ public interface EventDAO extends IBaseDAO {
 
     /**
      * Gets events with messages that need to be resend. Either they failed to be send or they should be repeated.
-     * 
+     *
      * @return list of events
      */
     List<Event> getEventsToResend();

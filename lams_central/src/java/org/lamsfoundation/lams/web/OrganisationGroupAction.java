@@ -155,7 +155,7 @@ public class OrganisationGroupAction extends DispatchAction {
 
     /**
      * Shows course grouping list or redirects to groups if a grouping was already chosen.
-     * 
+     *
      * @throws Exception
      */
     @SuppressWarnings("unchecked")
@@ -219,7 +219,7 @@ public class OrganisationGroupAction extends DispatchAction {
 
     /**
      * View groups of the given grouping.
-     * 
+     *
      * @throws Exception
      */
     @SuppressWarnings("unchecked")
@@ -295,7 +295,7 @@ public class OrganisationGroupAction extends DispatchAction {
 	JSONArray orgGroupsJSON = new JSONArray();
 	Collection<User> learners = null;
 
-	// if teacher selected groups from integrated server - show them 
+	// if teacher selected groups from integrated server - show them
 	if (isExternalGroupsSelected) {
 
 	    if (lesson == null) {
@@ -381,7 +381,7 @@ public class OrganisationGroupAction extends DispatchAction {
 
     /**
      * Saves a course grouping.
-     * 
+     *
      * @throws InvalidParameterException
      * @throws IOException
      */
@@ -474,7 +474,7 @@ public class OrganisationGroupAction extends DispatchAction {
 
     /**
      * Deletes course grouping with the given ID.
-     * 
+     *
      * @throws Exception
      */
     public ActionForward removeGrouping(ActionMapping mapping, ActionForm form, HttpServletRequest request,

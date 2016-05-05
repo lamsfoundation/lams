@@ -2,21 +2,21 @@
  * Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
  * =============================================================
  * License Information: http://lamsfoundation.org/licensing/lams/2.0/
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301
  * USA
- * 
+ *
  * http://www.gnu.org/licenses/gpl.txt
  * ****************************************************************
  */
@@ -33,11 +33,11 @@ import org.lamsfoundation.lams.rating.dto.ItemRatingDTO;
 
 /**
  * Holds user responses to questions
- * 
+ *
  * QaUsrResp Value Object The value object that maps to our model database
  * table: tl_laqa11_usr_resp The relevant hibernate mapping resides in:
  * QaQueResp.hbm.xml
- * 
+ *
  * @author Ozgur Demirtas
  */
 
@@ -48,7 +48,7 @@ public class QaUsrResp implements Serializable, Comparable {
 
     /** nullable persistent field */
     private String answer;
-    
+
     /** nullable persistent field */
     private String answerAutosaved;
 
@@ -65,7 +65,7 @@ public class QaUsrResp implements Serializable, Comparable {
 
     /** nullable persistent field */
     private String timezone;
-    
+
     //DTO fields
     private ItemRatingDTO itemRatingDto;
 
@@ -99,9 +99,9 @@ public class QaUsrResp implements Serializable, Comparable {
     /**
      * Copy construtor. Delegate to full construtor to achieve the object
      * creation.
-     * 
+     *
      * @param response
-     *                the original survey user response
+     *            the original survey user response
      * @return the new qa user response cloned from original object
      */
     public static QaUsrResp newInstance(QaUsrResp response) {
@@ -109,18 +109,22 @@ public class QaUsrResp implements Serializable, Comparable {
 		response.getAttemptTime(), response.getTimezone(), response.getQaQuestion(), response.qaQueUser);
     }
 
+    @Override
     public String toString() {
-	return new ToStringBuilder(this).append("responseId: ", getResponseId()).append("answer:", getAnswer()).append(
-		"attempt time: ", getAttemptTime()).toString();
+	return new ToStringBuilder(this).append("responseId: ", getResponseId()).append("answer:", getAnswer())
+		.append("attempt time: ", getAttemptTime()).toString();
     }
 
+    @Override
     public boolean equals(Object other) {
-	if (!(other instanceof QaUsrResp))
+	if (!(other instanceof QaUsrResp)) {
 	    return false;
+	}
 	QaUsrResp castOther = (QaUsrResp) other;
 	return new EqualsBuilder().append(this.getResponseId(), castOther.getResponseId()).isEquals();
     }
 
+    @Override
     public int hashCode() {
 	return new HashCodeBuilder().append(getResponseId()).toHashCode();
     }
@@ -134,12 +138,12 @@ public class QaUsrResp implements Serializable, Comparable {
 
     /**
      * @param answer
-     *                The answer to set.
+     *            The answer to set.
      */
     public void setAnswer(String answer) {
 	this.answer = answer;
     }
-    
+
     /**
      * @return Returns the answerAutosaved.
      */
@@ -149,7 +153,7 @@ public class QaUsrResp implements Serializable, Comparable {
 
     /**
      * @param answerAutosaved
-     *                The answerAutosaved to set.
+     *            The answerAutosaved to set.
      */
     public void setAnswerAutosaved(String answerAutosaved) {
 	this.answerAutosaved = answerAutosaved;
@@ -164,7 +168,7 @@ public class QaUsrResp implements Serializable, Comparable {
 
     /**
      * @param attemptTime
-     *                The attemptTime to set.
+     *            The attemptTime to set.
      */
     public void setAttemptTime(Date attemptTime) {
 	this.attemptTime = attemptTime;
@@ -179,7 +183,7 @@ public class QaUsrResp implements Serializable, Comparable {
 
     /**
      * @param qaQuestion
-     *                The qaQuestion to set.
+     *            The qaQuestion to set.
      */
     public void setQaQuestion(QaQueContent qaQuestion) {
 	this.qaQuestion = qaQuestion;
@@ -194,7 +198,7 @@ public class QaUsrResp implements Serializable, Comparable {
 
     /**
      * @param qaQueUsr
-     *                The qaQueUsr to set.
+     *            The qaQueUsr to set.
      */
     public void setQaQueUser(QaQueUsr qaQueUser) {
 	this.qaQueUser = qaQueUser;
@@ -209,19 +213,22 @@ public class QaUsrResp implements Serializable, Comparable {
 
     /**
      * @param responseId
-     *                The responseId to set.
+     *            The responseId to set.
      */
     public void setResponseId(Long responseId) {
 	this.responseId = responseId;
     }
 
+    @Override
     public int compareTo(Object o) {
 	QaUsrResp response = (QaUsrResp) o;
 
-	if (responseId == null)
+	if (responseId == null) {
 	    return -1;
-	if (response.responseId == null)
+	}
+	if (response.responseId == null) {
 	    return 1;
+	}
 
 	return (int) (responseId.longValue() - response.responseId.longValue());
     }
@@ -235,7 +242,7 @@ public class QaUsrResp implements Serializable, Comparable {
 
     /**
      * @param timezone
-     *                The timezone to set.
+     *            The timezone to set.
      */
     public void setTimezone(String timezone) {
 	this.timezone = timezone;
@@ -250,7 +257,7 @@ public class QaUsrResp implements Serializable, Comparable {
 
     /**
      * @param visible
-     *                The visible to set.
+     *            The visible to set.
      */
     public void setVisible(boolean visible) {
 	this.visible = visible;

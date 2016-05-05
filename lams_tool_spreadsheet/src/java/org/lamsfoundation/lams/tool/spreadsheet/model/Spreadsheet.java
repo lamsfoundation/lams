@@ -2,21 +2,21 @@
  * Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
  * =============================================================
  * License Information: http://lamsfoundation.org/licensing/lams/2.0/
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301
  * USA
- * 
+ *
  * http://www.gnu.org/licenses/gpl.txt
  * ****************************************************************
  */
@@ -31,11 +31,11 @@ import org.apache.log4j.Logger;
 
 /**
  * Spreadsheet
- * 
- * @author Andrey Balan
- * 
  *
- * 
+ * @author Andrey Balan
+ *
+ *
+ *
  */
 public class Spreadsheet implements Cloneable {
 
@@ -80,6 +80,7 @@ public class Spreadsheet implements Cloneable {
 	return toContent;
     }
 
+    @Override
     public Object clone() {
 
 	Spreadsheet spreadsheet = null;
@@ -97,11 +98,14 @@ public class Spreadsheet implements Cloneable {
 	return spreadsheet;
     }
 
+    @Override
     public boolean equals(Object o) {
-	if (this == o)
+	if (this == o) {
 	    return true;
-	if (!(o instanceof Spreadsheet))
+	}
+	if (!(o instanceof Spreadsheet)) {
 	    return false;
+	}
 
 	final Spreadsheet genericEntity = (Spreadsheet) o;
 
@@ -111,6 +115,7 @@ public class Spreadsheet implements Cloneable {
 		.append(this.createdBy, genericEntity.createdBy).isEquals();
     }
 
+    @Override
     public int hashCode() {
 	return new HashCodeBuilder().append(uid).append(title).append(instructions).append(code).append(code)
 		.append(created).append(updated).append(createdBy).toHashCode();
@@ -133,7 +138,7 @@ public class Spreadsheet implements Cloneable {
     // **********************************************************
     /**
      * Returns the object's creation date
-     * 
+     *
      * @return date
      *
      */
@@ -143,7 +148,7 @@ public class Spreadsheet implements Cloneable {
 
     /**
      * Sets the object's creation date
-     * 
+     *
      * @param created
      */
     public void setCreated(Date created) {
@@ -152,7 +157,7 @@ public class Spreadsheet implements Cloneable {
 
     /**
      * Returns the object's date of last update
-     * 
+     *
      * @return date updated
      *
      */
@@ -162,7 +167,7 @@ public class Spreadsheet implements Cloneable {
 
     /**
      * Sets the object's date of last update
-     * 
+     *
      * @param updated
      */
     public void setUpdated(Date updated) {
@@ -171,7 +176,7 @@ public class Spreadsheet implements Cloneable {
 
     /**
      * @return Returns the userid of the user who created the Share spreadsheet.
-     * 
+     *
      *
      */
     public SpreadsheetUser getCreatedBy() {
@@ -199,7 +204,7 @@ public class Spreadsheet implements Cloneable {
 
     /**
      * @return Returns the title.
-     * 
+     *
      *
      */
     public String getTitle() {
@@ -216,7 +221,7 @@ public class Spreadsheet implements Cloneable {
 
     /**
      * @return Returns whether learner is allowed to save spreadsheet.
-     * 
+     *
      *
      */
     public boolean isLearnerAllowedToSave() {
@@ -233,7 +238,7 @@ public class Spreadsheet implements Cloneable {
 
     /**
      * @return Returns whether the marking is enabled.
-     * 
+     *
      *
      */
     public boolean isMarkingEnabled() {
@@ -250,7 +255,7 @@ public class Spreadsheet implements Cloneable {
 
     /**
      * @return Returns the lockWhenFinish.
-     * 
+     *
      *
      */
     public boolean getLockWhenFinished() {
@@ -267,7 +272,7 @@ public class Spreadsheet implements Cloneable {
 
     /**
      * @return Returns the instructions set by the teacher.
-     * 
+     *
      *
      */
     public String getInstructions() {
@@ -280,7 +285,7 @@ public class Spreadsheet implements Cloneable {
 
     /**
      * @return Returns spreadsheet code.
-     * 
+     *
      *
      */
     public String getCode() {
@@ -357,20 +362,20 @@ public class Spreadsheet implements Cloneable {
 
 	for (char c : input.toCharArray()) {
 	    switch (c) {
-	    case '\'':
-		filtered.append("\\'");
-		break;
+		case '\'':
+		    filtered.append("\\'");
+		    break;
 
-	    case '"':
-		filtered.append("\\\"");
-		break;
+		case '"':
+		    filtered.append("\\\"");
+		    break;
 
-	    case '\n':
-	    case '\r':
-		break;
+		case '\n':
+		case '\r':
+		    break;
 
-	    default:
-		filtered.append(c);
+		default:
+		    filtered.append(c);
 	    }
 	}
 	return filtered.toString();

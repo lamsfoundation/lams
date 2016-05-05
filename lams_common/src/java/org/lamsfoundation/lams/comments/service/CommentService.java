@@ -41,11 +41,11 @@ import org.lamsfoundation.lams.util.MessageService;
 import org.lamsfoundation.lams.util.audit.IAuditService;
 
 /**
- * 
- * Comments Widget Service 
- * 
+ *
+ * Comments Widget Service
+ *
  * @author Fiona Malikoff
- * 
+ *
  */
 public class CommentService implements ICommentService {
 
@@ -62,43 +62,44 @@ public class CommentService implements ICommentService {
     private ICommentLikeDAO commentLikeDAO;
 
     @Override
-    public List<CommentDTO> getTopicThread(Long externalId, Integer externalType, String externalSignature, Long lastCommentSeqId, 
-	    Integer pageSize, Integer sortBy, String extraSortParam, Integer userId) {
+    public List<CommentDTO> getTopicThread(Long externalId, Integer externalType, String externalSignature,
+	    Long lastCommentSeqId, Integer pageSize, Integer sortBy, String extraSortParam, Integer userId) {
 
 	long lastThreadMessageUid = lastCommentSeqId != null ? lastCommentSeqId.longValue() : 0L;
-	
+
 	// hidden root of all the threads!
 	Comment rootTopic = commentDAO.getRootTopic(externalId, externalType, externalSignature);
 
 	// first time through - no root topic.
-	if ( rootTopic == null ) {
+	if (rootTopic == null) {
 	    return new ArrayList<CommentDTO>();
 	}
 
-	SortedSet<Comment> comments =  commentDAO.getNextThreadByThreadId(rootTopic.getUid(), lastThreadMessageUid, pageSize, sortBy, extraSortParam, userId);
+	SortedSet<Comment> comments = commentDAO.getNextThreadByThreadId(rootTopic.getUid(), lastThreadMessageUid,
+		pageSize, sortBy, extraSortParam, userId);
 	return getSortedCommentDTO(comments);
     }
 
     @Override
-    public List<CommentDTO> getTopicStickyThread(Long externalId, Integer externalType, String externalSignature, 
+    public List<CommentDTO> getTopicStickyThread(Long externalId, Integer externalType, String externalSignature,
 	    Integer sortBy, String extraSortParam, Integer userId) {
 
 	// hidden root of all the threads!
 	Comment rootTopic = commentDAO.getRootTopic(externalId, externalType, externalSignature);
 
 	// first time through - no root topic.
-	if ( rootTopic == null ) {
+	if (rootTopic == null) {
 	    return new ArrayList<CommentDTO>();
 	}
 
-	SortedSet<Comment> comments =  commentDAO.getStickyThreads(rootTopic.getUid(), sortBy, extraSortParam, userId);
+	SortedSet<Comment> comments = commentDAO.getStickyThreads(rootTopic.getUid(), sortBy, extraSortParam, userId);
 	return getSortedCommentDTO(comments);
     }
 
-    private List<CommentDTO> getSortedCommentDTO(SortedSet<Comment>  comments) {
-	
+    private List<CommentDTO> getSortedCommentDTO(SortedSet<Comment> comments) {
+
 	List<CommentDTO> msgDtoList = new ArrayList<CommentDTO>();
-	for ( Comment comment : comments ) {
+	for (Comment comment : comments) {
 	    CommentDTO dto = CommentDTO.getCommentDTO(comment);
 	    dto.setLevel(comment.getCommentLevel());
 	    dto.setThreadNum(comment.getThreadComment().getUid().intValue());
@@ -107,30 +108,32 @@ public class CommentService implements ICommentService {
 	return msgDtoList;
     }
 
-    public List<CommentDTO> getThread( Long threadId, Integer sortBy, Integer userId ) {	
-	SortedSet<Comment> comments =  commentDAO.getThreadByThreadId(threadId, sortBy, userId);
+    @Override
+    public List<CommentDTO> getThread(Long threadId, Integer sortBy, Integer userId) {
+	SortedSet<Comment> comments = commentDAO.getThreadByThreadId(threadId, sortBy, userId);
 	return getSortedCommentDTO(comments);
     }
 
-    // Do we need to synchronize this method? Would be nice but it is the equivalent of tool session creation 
+    // Do we need to synchronize this method? Would be nice but it is the equivalent of tool session creation
     // and we don't synchonize them!
+    @Override
     public Comment createOrGetRoot(Long externalId, Integer externalIdType, String externalSignature, User user) {
 	Comment rootComment = commentDAO.getRootTopic(externalId, externalIdType, externalSignature);
-	return ( rootComment != null ? rootComment : 
-	    createRoot(externalId, externalIdType, externalSignature, user) );
+	return (rootComment != null ? rootComment : createRoot(externalId, externalIdType, externalSignature, user));
     }
-    
+
+    @Override
     public Comment getRoot(Long externalId, Integer externalIdType, String externalSignature) {
 	return commentDAO.getRootTopic(externalId, externalIdType, externalSignature);
     }
 
-    private Comment createRoot(Long externalId, Integer externalIdType, String externalSignature, User user ) {
+    private Comment createRoot(Long externalId, Integer externalIdType, String externalSignature, User user) {
 
 	CommentSession session = new CommentSession();
 	session.setExternalId(externalId);
 	session.setExternalIdType(externalIdType);
 	session.setExternalSignature(externalSignature);
-	
+
 	Comment comment = new Comment();
 	comment.setBody("Hidden Root Message");
 	comment.setHideFlag(true);
@@ -141,18 +144,19 @@ public class CommentService implements ICommentService {
 	comment.setRootComment(comment);
 	comment.setThreadComment(null); // this one is not part of a thread!
 
-	commentSessionDAO.save(session); 
+	commentSessionDAO.save(session);
 	commentDAO.saveOrUpdate(comment);
 	return comment;
     }
-    
+
+    @Override
     public Comment createReply(Comment parent, String replyText, User user) {
 
 	Comment replyMessage = new Comment();
 	replyMessage.setBody(replyText);
 	replyMessage.setHideFlag(false);
 	replyMessage.updateModificationData(user);
-	
+
 	replyMessage.setParent(parent);
 	replyMessage.setSession(parent.getSession());
 
@@ -161,16 +165,16 @@ public class CommentService implements ICommentService {
 	replyMessage.setRootComment(root);
 
 	// look back up through the parents to find the thread top - will be level 1
-	if ( replyMessage.getCommentLevel() == 1 ) {
+	if (replyMessage.getCommentLevel() == 1) {
 	    replyMessage.setThreadComment(replyMessage);
 	} else {
 	    Comment threadComment = parent;
-	    while ( threadComment.getCommentLevel() > 1 ) {
+	    while (threadComment.getCommentLevel() > 1) {
 		threadComment = threadComment.getParent();
 	    }
 	    replyMessage.setThreadComment(threadComment);
 	}
-	
+
 	commentDAO.saveOrUpdate(replyMessage);
 
 	// update last reply date for root message
@@ -181,70 +185,74 @@ public class CommentService implements ICommentService {
 
 	return replyMessage;
     }
-    
+
+    @Override
     public boolean addLike(Long commentUid, User user, Integer likeVote) {
 
- 	return commentLikeDAO.addLike(commentUid, user.getUserId(), likeVote);
-     }
+	return commentLikeDAO.addLike(commentUid, user.getUserId(), likeVote);
+    }
 
+    @Override
     public Comment hideComment(Long commentUid, User user, boolean status) {
 
- 	Comment comment = commentDAO.getById(commentUid);
- 	comment.setHideFlag(status);
- 	commentDAO.saveOrUpdate(comment);
- 	return comment;
-     }
+	Comment comment = commentDAO.getById(commentUid);
+	comment.setHideFlag(status);
+	commentDAO.saveOrUpdate(comment);
+	return comment;
+    }
 
-
+    @Override
     public Comment createReply(Long parentId, String replyText, User user) {
-	
+
 	Comment parent = commentDAO.getById(parentId);
-	return(createReply(parent, replyText, user));
+	return (createReply(parent, replyText, user));
 
     }
-    
+
+    @Override
     public Comment updateComment(Long commentUid, String newBody, User user, boolean makeAuditEntry) {
 	Comment comment = commentDAO.getById(commentUid);
 
-	if ( comment != null && user != null ) {
-	    if ( makeAuditEntry ) {
+	if (comment != null && user != null) {
+	    if (makeAuditEntry) {
 		Long userId = 0L;
 		String loginName = "Default";
 		if (comment.getCreatedBy() != null) {
 		    userId = comment.getCreatedBy().getUserId().longValue();
 		    loginName = comment.getCreatedBy().getLogin();
 		}
-		getAuditService().logChange(MODULE_NAME, userId, loginName,
-			    comment.getBody(), newBody);
+		getAuditService().logChange(MODULE_NAME, userId, loginName, comment.getBody(), newBody);
 	    }
-	    
+
 	    comment.setBody(newBody);
 	    comment.updateModificationData(user);
 	    commentDAO.saveOrUpdate(comment);
 
 	    return comment;
 	} else {
-	    log.error("Unable to update comment as comment not found or user missing. Comment uid "+commentUid
-		    +" new body "+newBody
-		    +" user "+(user!=null?user.getLogin():" missing"));
+	    log.error("Unable to update comment as comment not found or user missing. Comment uid " + commentUid
+		    + " new body " + newBody + " user " + (user != null ? user.getLogin() : " missing"));
 	    return null;
 	}
     }
-    
+
+    @Override
     public Comment updateSticky(Long commentUid, Boolean newSticky) {
 
 	Comment comment = commentDAO.getById(commentUid);
-	if ( comment != null ) {
+	if (comment != null) {
 	    comment.setSticky(newSticky);
 	    commentDAO.saveOrUpdate(comment);
 	    return comment;
 	} else {
-	    log.error("Unable to update comment as comment not found. Comment uid "+commentUid
-		    +" new sticky "+newSticky);
+	    log.error("Unable to update comment as comment not found. Comment uid " + commentUid + " new sticky "
+		    + newSticky);
 	    return null;
 	}
     }
-    public CommentDTO getComment(Long commentUid){
+
+    @Override
+    public CommentDTO getComment(Long commentUid) {
 	Comment comment = commentDAO.getById(commentUid);
 	return comment != null ? CommentDTO.getCommentDTO(comment) : null;
     }
@@ -257,7 +265,7 @@ public class CommentService implements ICommentService {
 	this.userService = userService;
     }
 
-
+    @Override
     public MessageService getMessageService() {
 	return messageService;
     }
@@ -267,39 +275,36 @@ public class CommentService implements ICommentService {
     }
 
     public IAuditService getAuditService() {
-        return auditService;
+	return auditService;
     }
 
     public void setAuditService(IAuditService auditService) {
-        this.auditService = auditService;
+	this.auditService = auditService;
     }
 
     public ICommentSessionDAO getCommentSessionDAO() {
-        return commentSessionDAO;
+	return commentSessionDAO;
     }
 
     public void setCommentSessionDAO(ICommentSessionDAO commentSessionDAO) {
-        this.commentSessionDAO = commentSessionDAO;
+	this.commentSessionDAO = commentSessionDAO;
     }
 
     public ICommentDAO getCommentDAO() {
-        return commentDAO;
+	return commentDAO;
     }
 
     public void setCommentDAO(ICommentDAO commentDAO) {
-        this.commentDAO = commentDAO;
+	this.commentDAO = commentDAO;
     }
 
     public ICommentLikeDAO getCommentLikeDAO() {
-        return commentLikeDAO;
+	return commentLikeDAO;
     }
 
     public void setCommentLikeDAO(ICommentLikeDAO commentLikeDAO) {
-        this.commentLikeDAO = commentLikeDAO;
+	this.commentLikeDAO = commentLikeDAO;
     }
-
-
-
 
     // -------------------------------------------------------------------------
 }

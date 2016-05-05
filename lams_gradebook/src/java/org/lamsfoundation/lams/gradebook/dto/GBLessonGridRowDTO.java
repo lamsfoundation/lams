@@ -36,41 +36,42 @@ public class GBLessonGridRowDTO extends GradebookGridRowDTO {
 
     private String subGroup;
     private String startDate;
-    
+
     // Only for monitor view
     private String gradebookMonitorURL;
-    
+
     // Only for learner view
     private String gradebookLearnerURL;
     private String finishDate;
-    
+
     public GBLessonGridRowDTO() {
     }
 
     @Override
     public ArrayList<String> toStringArray(GBGridView view) {
 	ArrayList<String> ret = new ArrayList<String>();
-	
+
 	ret.add(id.toString());
-	
+
 	rowName = StringEscapeUtils.escapeHtml(rowName);
-	
+
 	if (view == GBGridView.MON_COURSE) {
 	    if (gradebookMonitorURL != null && gradebookMonitorURL.length() != 0) {
-		ret.add("<a href='javascript:launchPopup(\"" + gradebookMonitorURL + "\",\"" + rowName + "\",1220,600)'>" + rowName
-			+ "</a>");
+		ret.add("<a href='javascript:launchPopup(\"" + gradebookMonitorURL + "\",\"" + rowName
+			+ "\",1220,600)'>" + rowName + "</a>");
 	    } else {
 		ret.add(rowName);
 	    }
 	    ret.add(subGroup);
 	    ret.add(startDate);
-	    ret.add((averageTimeTaken != null && averageTimeTaken != 0) ? convertTimeToString(averageTimeTaken) : CELL_EMPTY);
+	    ret.add((averageTimeTaken != null && averageTimeTaken != 0) ? convertTimeToString(averageTimeTaken)
+		    : CELL_EMPTY);
 	    ret.add((averageMark != null) ? GradebookUtil.niceFormatting(averageMark) : CELL_EMPTY);
-	    
+
 	} else if ((view == GBGridView.LRN_COURSE) || (view == GBGridView.MON_USER)) {
 	    if (gradebookLearnerURL != null && gradebookLearnerURL.length() != 0) {
-		ret.add("<a href='javascript:launchPopup(\"" + gradebookLearnerURL + "\",\"" + rowName + "\",796,570)'>" + rowName
-			+ "</a>");
+		ret.add("<a href='javascript:launchPopup(\"" + gradebookLearnerURL + "\",\"" + rowName + "\",796,570)'>"
+			+ rowName + "</a>");
 	    } else {
 		ret.add(rowName);
 	    }
@@ -79,12 +80,13 @@ public class GBLessonGridRowDTO extends GradebookGridRowDTO {
 	    ret.add(feedback);
 	    ret.add((startDate != null) ? startDate : CELL_EMPTY);
 	    ret.add((finishDate != null) ? finishDate : CELL_EMPTY);
-	    ret.add((averageTimeTaken != null && averageTimeTaken != 0) ? toItalic(convertTimeToString(averageTimeTaken)) : CELL_EMPTY);
+	    ret.add((averageTimeTaken != null && averageTimeTaken != 0)
+		    ? toItalic(convertTimeToString(averageTimeTaken)) : CELL_EMPTY);
 	    ret.add((timeTaken != null) ? convertTimeToString(timeTaken) : CELL_EMPTY);
 	    ret.add((averageMark != null) ? toItalic(GradebookUtil.niceFormatting(averageMark)) : CELL_EMPTY);
 	    ret.add((mark != null) ? GradebookUtil.niceFormatting(mark) : CELL_EMPTY);
-	    
-	//plain lesson list case
+
+	    //plain lesson list case
 	} else if (view == GBGridView.LIST) {
 	    ret.add(rowName);
 	}
@@ -100,43 +102,43 @@ public class GBLessonGridRowDTO extends GradebookGridRowDTO {
     }
 
     public String getGradebookMonitorURL() {
-        return gradebookMonitorURL;
+	return gradebookMonitorURL;
     }
 
     public void setGradebookMonitorURL(String gradebookMonitorURL) {
-        this.gradebookMonitorURL = gradebookMonitorURL;
+	this.gradebookMonitorURL = gradebookMonitorURL;
     }
 
     public String getGradebookLearnerURL() {
-        return gradebookLearnerURL;
+	return gradebookLearnerURL;
     }
 
     public void setGradebookLearnerURL(String gradebookLearnerURL) {
-        this.gradebookLearnerURL = gradebookLearnerURL;
+	this.gradebookLearnerURL = gradebookLearnerURL;
     }
 
     public String getSubGroup() {
-        return subGroup;
+	return subGroup;
     }
 
     public void setSubGroup(String subGroup) {
-        this.subGroup = subGroup;
+	this.subGroup = subGroup;
     }
 
     public String getStartDate() {
-        return startDate;
+	return startDate;
     }
 
     public void setStartDate(String startDate) {
-        this.startDate = startDate;
+	this.startDate = startDate;
     }
 
     public String getFinishDate() {
-        return finishDate;
+	return finishDate;
     }
 
     public void setFinishDate(String finishDate) {
-        this.finishDate = finishDate;
+	this.finishDate = finishDate;
     }
-    
+
 }

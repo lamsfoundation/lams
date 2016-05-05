@@ -1,23 +1,23 @@
-/**************************************************************** 
- * Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org) 
- * ============================================================= 
- * License Information: http://lamsfoundation.org/licensing/lams/2.0/ 
- * 
- * This program is free software; you can redistribute it and/or modify 
- * it under the terms of the GNU General Public License version 2.0 
- * as published by the Free Software Foundation. 
- * 
- * This program is distributed in the hope that it will be useful, 
- * but WITHOUT ANY WARRANTY; without even the implied warranty of 
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the 
- * GNU General Public License for more details. 
- * 
- * You should have received a copy of the GNU General Public License 
- * along with this program; if not, write to the Free Software 
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 * USA 
- * 
- * http://www.gnu.org/licenses/gpl.txt 
- * **************************************************************** 
+/****************************************************************
+ * Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
+ * =============================================================
+ * License Information: http://lamsfoundation.org/licensing/lams/2.0/
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License version 2.0
+ * as published by the Free Software Foundation.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 * USA
+ *
+ * http://www.gnu.org/licenses/gpl.txt
+ * ****************************************************************
  */
 
 /* $Id$ */
@@ -44,25 +44,25 @@ import org.apache.poi.xssf.streaming.SXSSFWorkbook;
  * Utilities for producing .xlsx files.
  */
 public class ExcelUtil {
-    
+
     private static CellStyle defaultStyle;
     private static CellStyle boldStyle;
-    
+
     private static CellStyle greenColor;
     private static CellStyle blueColor;
     private static CellStyle redColor;
     private static CellStyle yellowColor;
-    
+
     private static CellStyle borderStyleLeftThin;
     private static CellStyle borderStyleRightThick;
     private static CellStyle borderStyleLeftThinBoldFont;
     private static CellStyle borderStyleRightThickBoldFont;
-    
+
     public final static String DEFAULT_FONT_NAME = "Calibri-Regular";
 
     /**
      * Create .xlsx file out of provided data and then write out it to an OutputStream.
-     * 
+     *
      * @param out
      *            output stream to which the file written; usually taken from HTTP response
      * @param dataToExport
@@ -85,14 +85,14 @@ public class ExcelUtil {
 	//create default style with default font name
 	ExcelUtil.defaultStyle = workbook.createCellStyle();
 	ExcelUtil.defaultStyle.setFont(defaultFont);
-	
+
 	//create bold style
 	boldStyle = workbook.createCellStyle();
 	Font boldFont = workbook.createFont();
 	boldFont.setBoldweight(Font.BOLDWEIGHT_BOLD);
 	boldFont.setFontName(DEFAULT_FONT_NAME);
 	boldStyle.setFont(boldFont);
-	
+
 	//create color style
 	blueColor = workbook.createCellStyle();
 	blueColor.setFillForegroundColor(IndexedColors.LIGHT_CORNFLOWER_BLUE.getIndex());
@@ -113,7 +113,7 @@ public class ExcelUtil {
 	yellowColor.setFillForegroundColor(IndexedColors.GOLD.getIndex());
 	yellowColor.setFillPattern(CellStyle.SOLID_FOREGROUND);
 	yellowColor.setFont(defaultFont);
-	
+
 	//create border style
 	borderStyleLeftThin = workbook.createCellStyle();
 	borderStyleLeftThin.setBorderLeft(CellStyle.BORDER_THIN);
@@ -127,12 +127,12 @@ public class ExcelUtil {
 	borderStyleRightThickBoldFont = workbook.createCellStyle();
 	borderStyleRightThickBoldFont.setBorderRight(CellStyle.BORDER_THICK);
 	borderStyleRightThickBoldFont.setFont(boldFont);
-	
+
 	int i = 0;
 	for (String sheetName : dataToExport.keySet()) {
 	    if (dataToExport.get(sheetName) != null) {
 		String sheetTitle = (displaySheetTitle) ? sheetName : null;
-		createSheet(workbook, sheetName, sheetTitle, i, dateHeader, dataToExport.get(sheetName));
+		ExcelUtil.createSheet(workbook, sheetName, sheetTitle, i, dateHeader, dataToExport.get(sheetName));
 		i++;
 	    }
 	}
@@ -143,34 +143,34 @@ public class ExcelUtil {
 
     public static void createSheet(Workbook workbook, String sheetName, String sheetTitle, int sheetIndex,
 	    String dateHeader, ExcelCell[][] data) throws IOException {
-	
+
 	// Modify sheet name if required. It should contain only allowed letters and sheets are not allowed with
 	// the same names (case insensitive)
 	sheetName = WorkbookUtil.createSafeSheetName(sheetName);
 	while (workbook.getSheet(sheetName) != null) {
 	    sheetName += " ";
 	}
-	
+
 	Sheet sheet = workbook.createSheet(sheetName);
 
 	// Print title in bold, if needed
 	if (!StringUtils.isBlank(sheetTitle)) {
 	    Row row = sheet.createRow(0);
-	    createCell(new ExcelCell(sheetTitle, true), 0, row);
+	    ExcelUtil.createCell(new ExcelCell(sheetTitle, true), 0, row);
 	}
 
 	// Print current date, if needed
 	if (!StringUtils.isBlank(dateHeader)) {
 	    Row row = sheet.createRow(1);
-	    createCell(new ExcelCell(dateHeader, false), 0, row);
+	    ExcelUtil.createCell(new ExcelCell(dateHeader, false), 0, row);
 
 	    SimpleDateFormat titleDateFormat = new SimpleDateFormat(FileUtil.EXPORT_TO_SPREADSHEET_TITLE_DATE_FORMAT);
-	    createCell(new ExcelCell(titleDateFormat.format(new Date()), false), 1, row);
+	    ExcelUtil.createCell(new ExcelCell(titleDateFormat.format(new Date()), false), 1, row);
 	}
 
 	if (data != null) {
 	    int maxColumnSize = 0;
-	    
+
 	    // Print data
 	    for (int rowIndex = 0; rowIndex < data.length; rowIndex++) {
 
@@ -182,22 +182,22 @@ public class ExcelUtil {
 		int columnSize = data[rowIndex].length;
 		for (int columnIndex = 0; columnIndex < columnSize; columnIndex++) {
 		    ExcelCell excelCell = data[rowIndex][columnIndex];
-		    createCell(excelCell, columnIndex, row);
+		    ExcelUtil.createCell(excelCell, columnIndex, row);
 		}
-		
+
 		//calculate max column size
 		if (columnSize > maxColumnSize) {
 		    maxColumnSize = columnSize;
 		}
 	    }
-	    
+
 	    //autoSizeColumns
-	    for (int i=0; i < maxColumnSize; i++) {
+	    for (int i = 0; i < maxColumnSize; i++) {
 		sheet.autoSizeColumn(i);
 	    }
-	    
+
 	}
-	
+
     }
 
     public static void createCell(ExcelCell excelCell, int cellnum, Row row) {
@@ -212,56 +212,56 @@ public class ExcelUtil {
 	    } else if (excelCell.getCellValue() != null && excelCell.getCellValue() instanceof java.lang.Long) {
 		cell.setCellValue(((Long) excelCell.getCellValue()).doubleValue());
 	    } else if (excelCell.getCellValue() != null && excelCell.getCellValue() instanceof java.lang.Integer) {
-		cell.setCellValue(((Integer) excelCell.getCellValue()).doubleValue());		
+		cell.setCellValue(((Integer) excelCell.getCellValue()).doubleValue());
 	    } else if (excelCell.getCellValue() != null) {
 		cell.setCellValue(excelCell.getCellValue().toString());
 	    }
-	    
+
 	    //set default font
 	    cell.setCellStyle(defaultStyle);
 
 	    if (excelCell.isBold()) {
 		cell.setCellStyle(boldStyle);
 	    }
-	    
+
 	    if (excelCell.getColor() != null) {
-		switch (excelCell.getColor()) { 
-		case BLUE:
-		    cell.setCellStyle(blueColor);
-		    break;
-		case GREEN:
-		    cell.setCellStyle(greenColor);
-		    break;
-		case RED:
-		    cell.setCellStyle(redColor);
-		    break;
-		case YELLOW:
-		    cell.setCellStyle(yellowColor);
-		    break;		    
-		default:
-		    break;
+		switch (excelCell.getColor()) {
+		    case BLUE:
+			cell.setCellStyle(blueColor);
+			break;
+		    case GREEN:
+			cell.setCellStyle(greenColor);
+			break;
+		    case RED:
+			cell.setCellStyle(redColor);
+			break;
+		    case YELLOW:
+			cell.setCellStyle(yellowColor);
+			break;
+		    default:
+			break;
 		}
 	    }
-	    
+
 	    if (excelCell.getBorderStyle() != 0) {
 
 		switch (excelCell.getBorderStyle()) {
-		case ExcelCell.BORDER_STYLE_LEFT_THIN:
-		    if (excelCell.isBold()) {
-			cell.setCellStyle(borderStyleLeftThinBoldFont);
-		    } else {
-			cell.setCellStyle(borderStyleLeftThin);
-		    }
-		    break;
-		case ExcelCell.BORDER_STYLE_RIGHT_THICK:
-		    if (excelCell.isBold()) {
-			cell.setCellStyle(borderStyleRightThickBoldFont);
-		    } else {
-			cell.setCellStyle(borderStyleRightThick);
-		    }
-		    break;
-		default:
-		    break;
+		    case ExcelCell.BORDER_STYLE_LEFT_THIN:
+			if (excelCell.isBold()) {
+			    cell.setCellStyle(borderStyleLeftThinBoldFont);
+			} else {
+			    cell.setCellStyle(borderStyleLeftThin);
+			}
+			break;
+		    case ExcelCell.BORDER_STYLE_RIGHT_THICK:
+			if (excelCell.isBold()) {
+			    cell.setCellStyle(borderStyleRightThickBoldFont);
+			} else {
+			    cell.setCellStyle(borderStyleRightThick);
+			}
+			break;
+		    default:
+			break;
 		}
 
 	    }

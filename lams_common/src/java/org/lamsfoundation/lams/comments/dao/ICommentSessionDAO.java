@@ -4,5 +4,5 @@ import org.lamsfoundation.lams.comments.CommentSession;
 
 public interface ICommentSessionDAO {
 
-    void save( CommentSession session);
+    void save(CommentSession session);
 }

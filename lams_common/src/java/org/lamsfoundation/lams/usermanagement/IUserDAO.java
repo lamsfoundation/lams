@@ -15,7 +15,7 @@ public interface IUserDAO extends IBaseDAO {
 
     /**
      * Get all users (paged), except for disabled users.
-     * 
+     *
      * @param page
      * @param size
      * @param sortBy

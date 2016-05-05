@@ -2,21 +2,21 @@
  * Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
  * =============================================================
  * License Information: http://lamsfoundation.org/licensing/lams/2.0/
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301
  * USA
- * 
+ *
  * http://www.gnu.org/licenses/gpl.txt
  * ****************************************************************
  */
@@ -66,12 +66,13 @@ import org.lamsfoundation.lams.web.util.SessionMap;
 
 /**
  * Action class that controls the logic of tool behavior.
- * 
+ *
  * @author Ozgur Demirtas
  */
 public class McAction extends LamsDispatchAction implements McAppConstants {
     private static Logger logger = Logger.getLogger(McAction.class.getName());
 
+    @Override
     public ActionForward unspecified(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) {
 	return (mapping.findForward(McAppConstants.LOAD_AUTHORING));
@@ -89,7 +90,8 @@ public class McAction extends LamsDispatchAction implements McAppConstants {
 
 	String httpSessionID = mcAuthoringForm.getHttpSessionID();
 
-	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession().getAttribute(httpSessionID);
+	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
+		.getAttribute(httpSessionID);
 
 	String contentFolderID = WebUtil.readStrParam(request, AttributeNames.PARAM_CONTENT_FOLDER_ID);
 	mcAuthoringForm.setContentFolderID(contentFolderID);
@@ -140,11 +142,11 @@ public class McAction extends LamsDispatchAction implements McAppConstants {
 		Set<McQueContent> oldQuestions = mcContent.getMcQueContents();
 		mcService.releaseQuestionsFromCache(mcContent);
 		mcService.setDefineLater(strToolContentID, false);
-		    
+
 		// recalculate User Answers
 		mcService.recalculateUserAnswers(mcContent, oldQuestions, questionDTOs, deletedQuestionDTOs);
 	    }
-	    
+
 	    // remove deleted questions
 	    for (McQuestionDTO deletedQuestionDTO : deletedQuestionDTOs) {
 		McQueContent removeableQuestion = mcService.getQuestionByUid(deletedQuestionDTO.getUid());
@@ -163,15 +165,14 @@ public class McAction extends LamsDispatchAction implements McAppConstants {
 
 	    //store content
 	    mcContent = AuthoringUtil.saveOrUpdateMcContent(mcService, request, mcContentTest, strToolContentID);
-	    
+
 	    //store questions
 	    mcContent = mcService.createQuestions(questionDTOs, mcContent);
 
 	    if (mcContent != null) {
 
 		// sorts the questions by the display order
-		List<McQueContent> sortedQuestions = mcService.getAllQuestionsSorted(mcContent.getUid()
-			.longValue());
+		List<McQueContent> sortedQuestions = mcService.getAllQuestionsSorted(mcContent.getUid().longValue());
 		int displayOrder = 1;
 		for (McQueContent question : sortedQuestions) {
 		    McQueContent existingQuestion = mcService.getQuestionByUid(question.getUid());
@@ -189,7 +190,8 @@ public class McAction extends LamsDispatchAction implements McAppConstants {
 	    // errors is not empty
 
 	    if (mcContent != null) {
-		McUtils.setFormProperties(request, mcAuthoringForm, mcGeneralAuthoringDTO, strToolContentID, httpSessionID);
+		McUtils.setFormProperties(request, mcAuthoringForm, mcGeneralAuthoringDTO, strToolContentID,
+			httpSessionID);
 	    }
 	}
 
@@ -235,7 +237,8 @@ public class McAction extends LamsDispatchAction implements McAppConstants {
 	IMcService mcService = McServiceProxy.getMcService(getServlet().getServletContext());
 
 	String httpSessionID = mcAuthoringForm.getHttpSessionID();
-	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession().getAttribute(httpSessionID);
+	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
+		.getAttribute(httpSessionID);
 
 	String contentFolderID = WebUtil.readStrParam(request, AttributeNames.PARAM_CONTENT_FOLDER_ID);
 	mcAuthoringForm.setContentFolderID(contentFolderID);
@@ -248,11 +251,10 @@ public class McAction extends LamsDispatchAction implements McAppConstants {
 
 	String passmark = request.getParameter("passmark");
 
-	List<McOptionDTO> options = repopulateOptionDTOs(request, false);
+	List<McOptionDTO> options = McAction.repopulateOptionDTOs(request, false);
 	options = AuthoringUtil.removeBlankOptions(options);
 
-	List<McQuestionDTO> questionDTOs = (List<McQuestionDTO>) sessionMap
-		.get(McAppConstants.LIST_QUESTION_DTOS);
+	List<McQuestionDTO> questionDTOs = (List<McQuestionDTO>) sessionMap.get(McAppConstants.LIST_QUESTION_DTOS);
 
 	McGeneralAuthoringDTO mcGeneralAuthoringDTO = new McGeneralAuthoringDTO();
 	mcGeneralAuthoringDTO.setMarkValue(mark);
@@ -294,8 +296,8 @@ public class McAction extends LamsDispatchAction implements McAppConstants {
 		    questionDTO.setListCandidateAnswersDTO(options);
 		    questionDTO.setMark(mark);
 
-		    questionDTOs = AuthoringUtil.reorderUpdateQuestionDtos(questionDTOs,
-			    questionDTO, editableQuestionIndex);
+		    questionDTOs = AuthoringUtil.reorderUpdateQuestionDtos(questionDTOs, questionDTO,
+			    editableQuestionIndex);
 		    // post reorderUpdateListQuestionContentDTO questionDTOs
 		} else {
 		    // duplicate question entry, not adding
@@ -323,8 +325,8 @@ public class McAction extends LamsDispatchAction implements McAppConstants {
 		questionDTO.setListCandidateAnswersDTO(options);
 		questionDTO.setMark(mark);
 
-		questionDTOs = AuthoringUtil.reorderUpdateQuestionDtos(questionDTOs,
-			questionDTO, editableQuestionIndex);
+		questionDTOs = AuthoringUtil.reorderUpdateQuestionDtos(questionDTOs, questionDTO,
+			editableQuestionIndex);
 	    }
 	} else {
 	    // entry blank, not adding
@@ -335,8 +337,8 @@ public class McAction extends LamsDispatchAction implements McAppConstants {
 	request.setAttribute(McAppConstants.LIST_QUESTION_DTOS, questionDTOs);
 	sessionMap.put(McAppConstants.LIST_QUESTION_DTOS, questionDTOs);
 
-	commonSaveCode(request, mcGeneralAuthoringDTO, mcAuthoringForm, sessionMap, strToolContentID,
-		mcService, httpSessionID, questionDTOs);
+	commonSaveCode(request, mcGeneralAuthoringDTO, mcAuthoringForm, sessionMap, strToolContentID, mcService,
+		httpSessionID, questionDTOs);
 
 	request.setAttribute(McAppConstants.TOTAL_QUESTION_COUNT, new Integer(questionDTOs.size()));
 
@@ -355,7 +357,8 @@ public class McAction extends LamsDispatchAction implements McAppConstants {
 	IMcService mcService = McServiceProxy.getMcService(getServlet().getServletContext());
 
 	String httpSessionID = request.getParameter("httpSessionID");
-	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession().getAttribute(httpSessionID);
+	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
+		.getAttribute(httpSessionID);
 	String contentFolderID = WebUtil.readStrParam(request, AttributeNames.PARAM_CONTENT_FOLDER_ID);
 	mcAuthoringForm.setContentFolderID(contentFolderID);
 	String strToolContentID = request.getParameter(AttributeNames.PARAM_TOOL_CONTENT_ID);
@@ -363,8 +366,7 @@ public class McAction extends LamsDispatchAction implements McAppConstants {
 	McGeneralAuthoringDTO mcGeneralAuthoringDTO = new McGeneralAuthoringDTO();
 	mcGeneralAuthoringDTO.setContentFolderID(contentFolderID);
 
-	List<McQuestionDTO> questionDTOs = (List<McQuestionDTO>) sessionMap
-		.get(McAppConstants.LIST_QUESTION_DTOS);
+	List<McQuestionDTO> questionDTOs = (List<McQuestionDTO>) sessionMap.get(McAppConstants.LIST_QUESTION_DTOS);
 	// proper parsing
 	Question[] questions = QuestionParser.parseQuestionChoiceForm(request);
 
@@ -398,8 +400,8 @@ public class McAction extends LamsDispatchAction implements McAppConstants {
 			continue;
 		    }
 		    if (correctAnswer != null && correctAnswer.equals(answerText)) {
-			LamsDispatchAction.log.warn("Skipping an answer with same text as the correct answer: "
-				+ answerText);
+			LamsDispatchAction.log
+				.warn("Skipping an answer with same text as the correct answer: " + answerText);
 
 			continue;
 		    }
@@ -414,9 +416,8 @@ public class McAction extends LamsDispatchAction implements McAppConstants {
 			    correctAnswerScore = Math.min(new Double(Math.ceil(answer.getScore())).intValue(), 10);
 			} else {
 			    // there can be only one correct answer in a MCQ question
-			    LamsDispatchAction.log
-				    .warn("Choosing only first correct answer, despite another one was found: "
-					    + answerText);
+			    LamsDispatchAction.log.warn(
+				    "Choosing only first correct answer, despite another one was found: " + answerText);
 			    optionDto.setCorrect("Incorrect");
 			}
 		    } else {
@@ -449,8 +450,8 @@ public class McAction extends LamsDispatchAction implements McAppConstants {
 	request.setAttribute(McAppConstants.LIST_QUESTION_DTOS, questionDTOs);
 	sessionMap.put(McAppConstants.LIST_QUESTION_DTOS, questionDTOs);
 
-	commonSaveCode(request, mcGeneralAuthoringDTO, mcAuthoringForm, sessionMap, strToolContentID,
-		mcService, httpSessionID, questionDTOs);
+	commonSaveCode(request, mcGeneralAuthoringDTO, mcAuthoringForm, sessionMap, strToolContentID, mcService,
+		httpSessionID, questionDTOs);
 
 	request.setAttribute(McAppConstants.TOTAL_QUESTION_COUNT, new Integer(questionDTOs.size()));
 	return mapping.findForward(McAppConstants.LOAD_AUTHORING);
@@ -463,10 +464,10 @@ public class McAction extends LamsDispatchAction implements McAppConstants {
     public ActionForward exportQTI(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) throws IOException {
 	String httpSessionID = request.getParameter("httpSessionID");
-	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession().getAttribute(httpSessionID);
+	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
+		.getAttribute(httpSessionID);
 
-	List<McQuestionDTO> questionDTOs = (List<McQuestionDTO>) sessionMap
-		.get(McAppConstants.LIST_QUESTION_DTOS);
+	List<McQuestionDTO> questionDTOs = (List<McQuestionDTO>) sessionMap.get(McAppConstants.LIST_QUESTION_DTOS);
 	List<Question> questions = new LinkedList<Question>();
 
 	for (McQuestionDTO mcQuestion : questionDTOs) {
@@ -478,11 +479,11 @@ public class McAction extends LamsDispatchAction implements McAppConstants {
 	    question.setFeedback(mcQuestion.getFeedback());
 	    List<Answer> answers = new ArrayList<Answer>();
 
-	    for (McOptionDTO mcAnswer : (List<McOptionDTO>) mcQuestion.getListCandidateAnswersDTO()) {
+	    for (McOptionDTO mcAnswer : mcQuestion.getListCandidateAnswersDTO()) {
 		Answer answer = new Answer();
 		answer.setText(mcAnswer.getCandidateAnswer());
-		answer.setScore("Correct".equalsIgnoreCase(mcAnswer.getCorrect()) ? Float.parseFloat(mcQuestion
-			.getMark()) : 0);
+		answer.setScore(
+			"Correct".equalsIgnoreCase(mcAnswer.getCorrect()) ? Float.parseFloat(mcQuestion.getMark()) : 0);
 
 		answers.add(answer);
 		question.setAnswers(answers);
@@ -551,7 +552,8 @@ public class McAction extends LamsDispatchAction implements McAppConstants {
 
 	String httpSessionID = mcAuthoringForm.getHttpSessionID();
 
-	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession().getAttribute(httpSessionID);
+	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
+		.getAttribute(httpSessionID);
 
 	String contentFolderID = WebUtil.readStrParam(request, AttributeNames.PARAM_CONTENT_FOLDER_ID);
 	mcAuthoringForm.setContentFolderID(contentFolderID);
@@ -578,7 +580,7 @@ public class McAction extends LamsDispatchAction implements McAppConstants {
 	String passmark = request.getParameter("passmark");
 	mcGeneralAuthoringDTO.setPassMarkValue(passmark);
 
-	List<McOptionDTO> optionDtos = repopulateOptionDTOs(request, false);
+	List<McOptionDTO> optionDtos = McAction.repopulateOptionDTOs(request, false);
 	optionDtos = AuthoringUtil.removeBlankOptions(optionDtos);
 
 	if ((newQuestionParam != null) && (newQuestionParam.length() > 0)) {
@@ -619,8 +621,8 @@ public class McAction extends LamsDispatchAction implements McAppConstants {
 	request.setAttribute(McAppConstants.LIST_QUESTION_DTOS, questionDTOs);
 	sessionMap.put(McAppConstants.LIST_QUESTION_DTOS, questionDTOs);
 
-	commonSaveCode(request, mcGeneralAuthoringDTO, mcAuthoringForm, sessionMap, strToolContentID,
-		mcService, httpSessionID, questionDTOs);
+	commonSaveCode(request, mcGeneralAuthoringDTO, mcAuthoringForm, sessionMap, strToolContentID, mcService,
+		httpSessionID, questionDTOs);
 
 	request.setAttribute(McAppConstants.TOTAL_QUESTION_COUNT, new Integer(questionDTOs.size()));
 
@@ -629,7 +631,7 @@ public class McAction extends LamsDispatchAction implements McAppConstants {
 
     /**
      * opens up an new screen within the current page for adding a new question
-     * 
+     *
      * @param mapping
      * @param form
      * @param request
@@ -645,7 +647,8 @@ public class McAction extends LamsDispatchAction implements McAppConstants {
 	IMcService mcService = McServiceProxy.getMcService(getServlet().getServletContext());
 
 	String httpSessionID = mcAuthoringForm.getHttpSessionID();
-	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession().getAttribute(httpSessionID);
+	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
+		.getAttribute(httpSessionID);
 	String contentFolderID = WebUtil.readStrParam(request, AttributeNames.PARAM_CONTENT_FOLDER_ID);
 	mcAuthoringForm.setContentFolderID(contentFolderID);
 
@@ -672,7 +675,7 @@ public class McAction extends LamsDispatchAction implements McAppConstants {
 	mcGeneralAuthoringDTO.setCorrectMap(correctMap);
 
 	request.setAttribute(McAppConstants.MC_GENERAL_AUTHORING_DTO, mcGeneralAuthoringDTO);
-	
+
 	//prepare question for adding new question page
 	McQuestionDTO newQuestionDTO = new McQuestionDTO();
 	List<McOptionDTO> newOptions = new ArrayList<McOptionDTO>();
@@ -718,7 +721,7 @@ public class McAction extends LamsDispatchAction implements McAppConstants {
 
     /**
      * opens up an new screen within the current page for editing a question
-     * 
+     *
      * @param mapping
      * @param form
      * @param request
@@ -735,7 +738,8 @@ public class McAction extends LamsDispatchAction implements McAppConstants {
 
 	String httpSessionID = mcAuthoringForm.getHttpSessionID();
 
-	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession().getAttribute(httpSessionID);
+	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
+		.getAttribute(httpSessionID);
 
 	String questionIndex = request.getParameter("questionIndex");
 	mcAuthoringForm.setQuestionIndex(questionIndex);
@@ -854,24 +858,27 @@ public class McAction extends LamsDispatchAction implements McAppConstants {
 	String questionIndexToDelete = request.getParameter("questionIndex");
 	mcAuthoringForm.setQuestionIndex(questionIndexToDelete);
 
-	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession().getAttribute(httpSessionID);
+	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
+		.getAttribute(httpSessionID);
 	List<McQuestionDTO> questionDTOs = (List<McQuestionDTO>) sessionMap.get(McAppConstants.LIST_QUESTION_DTOS);
 
 	//exclude Question with questionIndex From List
 	List<McQuestionDTO> listFinalQuestionContentDTO = new LinkedList<McQuestionDTO>();
 	int queIndex = 0;
 	for (McQuestionDTO questionDTO : questionDTOs) {
-	    
+
 	    String questionText = questionDTO.getQuestion();
 	    String displayOrder = questionDTO.getDisplayOrder();
 	    if ((questionText != null) && (!questionText.isEmpty()) && !displayOrder.equals(questionIndexToDelete)) {
-		
+
 		++queIndex;
 		questionDTO.setDisplayOrder(new Integer(queIndex).toString());
 		listFinalQuestionContentDTO.add(questionDTO);
 	    }
 	    if ((questionText != null) && (!questionText.isEmpty()) && displayOrder.equals(questionIndexToDelete)) {
-		List<McQuestionDTO> deletedQuestionDTOs = (List<McQuestionDTO>) sessionMap.get(LIST_DELETED_QUESTION_DTOS);;
+		List<McQuestionDTO> deletedQuestionDTOs = (List<McQuestionDTO>) sessionMap
+			.get(LIST_DELETED_QUESTION_DTOS);
+		;
 		deletedQuestionDTOs.add(questionDTO);
 		sessionMap.put(LIST_DELETED_QUESTION_DTOS, deletedQuestionDTOs);
 	    }
@@ -932,7 +939,7 @@ public class McAction extends LamsDispatchAction implements McAppConstants {
 
     /**
      * moves a question down in the list
-     * 
+     *
      * @param mapping
      * @param form
      * @param request
@@ -949,7 +956,8 @@ public class McAction extends LamsDispatchAction implements McAppConstants {
 
 	String httpSessionID = mcAuthoringForm.getHttpSessionID();
 
-	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession().getAttribute(httpSessionID);
+	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
+		.getAttribute(httpSessionID);
 
 	String questionIndex = request.getParameter("questionIndex");
 	mcAuthoringForm.setQuestionIndex(questionIndex);
@@ -1020,7 +1028,8 @@ public class McAction extends LamsDispatchAction implements McAppConstants {
 
 	String httpSessionID = mcAuthoringForm.getHttpSessionID();
 
-	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession().getAttribute(httpSessionID);
+	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
+		.getAttribute(httpSessionID);
 
 	String questionIndex = request.getParameter("questionIndex");
 	mcAuthoringForm.setQuestionIndex(questionIndex);
@@ -1087,9 +1096,9 @@ public class McAction extends LamsDispatchAction implements McAppConstants {
     }
 
     /**
-     * 
+     *
      * persists error messages to request scope
-     * 
+     *
      * @param request
      * @param message
      */
@@ -1101,7 +1110,7 @@ public class McAction extends LamsDispatchAction implements McAppConstants {
 
     /**
      * moves a candidate dwn in the list
-     * 
+     *
      * @param mapping
      * @param form
      * @param request
@@ -1118,7 +1127,8 @@ public class McAction extends LamsDispatchAction implements McAppConstants {
 
 	String httpSessionID = mcAuthoringForm.getHttpSessionID();
 
-	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession().getAttribute(httpSessionID);
+	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
+		.getAttribute(httpSessionID);
 
 	String questionIndex = request.getParameter("questionIndex");
 	request.setAttribute("questionIndex", questionIndex);
@@ -1127,7 +1137,7 @@ public class McAction extends LamsDispatchAction implements McAppConstants {
 	String candidateIndex = request.getParameter("candidateIndex");
 	request.setAttribute("candidateIndex", candidateIndex);
 
-	List<McOptionDTO> optionDtos = repopulateOptionDTOs(request, false);
+	List<McOptionDTO> optionDtos = McAction.repopulateOptionDTOs(request, false);
 
 	List<McQuestionDTO> questionDTOs = (List) sessionMap.get(McAppConstants.LIST_QUESTION_DTOS);
 
@@ -1220,7 +1230,7 @@ public class McAction extends LamsDispatchAction implements McAppConstants {
 
     /**
      * moves a candidate up in the list
-     * 
+     *
      * @param mapping
      * @param form
      * @param request
@@ -1237,7 +1247,8 @@ public class McAction extends LamsDispatchAction implements McAppConstants {
 
 	String httpSessionID = mcAuthoringForm.getHttpSessionID();
 
-	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession().getAttribute(httpSessionID);
+	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
+		.getAttribute(httpSessionID);
 
 	String questionIndex = request.getParameter("questionIndex");
 	request.setAttribute("questionIndex", questionIndex);
@@ -1246,7 +1257,7 @@ public class McAction extends LamsDispatchAction implements McAppConstants {
 	String candidateIndex = request.getParameter("candidateIndex");
 	request.setAttribute("candidateIndex", candidateIndex);
 
-	List<McOptionDTO> optionDtos = repopulateOptionDTOs(request, false);
+	List<McOptionDTO> optionDtos = McAction.repopulateOptionDTOs(request, false);
 
 	List<McQuestionDTO> questionDTOs = (List) sessionMap.get(McAppConstants.LIST_QUESTION_DTOS);
 
@@ -1336,7 +1347,7 @@ public class McAction extends LamsDispatchAction implements McAppConstants {
 
     /**
      * removes a candidate from the list
-     * 
+     *
      * @param mapping
      * @param form
      * @param request
@@ -1353,7 +1364,8 @@ public class McAction extends LamsDispatchAction implements McAppConstants {
 
 	String httpSessionID = mcAuthoringForm.getHttpSessionID();
 
-	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession().getAttribute(httpSessionID);
+	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
+		.getAttribute(httpSessionID);
 
 	String questionIndex = request.getParameter("questionIndex");
 	request.setAttribute("questionIndex", questionIndex);
@@ -1377,7 +1389,7 @@ public class McAction extends LamsDispatchAction implements McAppConstants {
 	}
 
 	//update options
-	List<McOptionDTO> optionDtos = repopulateOptionDTOs(request, false);
+	List<McOptionDTO> optionDtos = McAction.repopulateOptionDTOs(request, false);
 	List<McOptionDTO> listFinalCandidatesDTO = new LinkedList<McOptionDTO>();
 	McOptionDTO mcOptionDTO = null;
 	Iterator listCaIterator = optionDtos.iterator();
@@ -1453,7 +1465,7 @@ public class McAction extends LamsDispatchAction implements McAppConstants {
 
     /**
      * enables adding a new candidate answer
-     * 
+     *
      * @param mapping
      * @param form
      * @param request
@@ -1470,7 +1482,8 @@ public class McAction extends LamsDispatchAction implements McAppConstants {
 
 	String httpSessionID = mcAuthoringForm.getHttpSessionID();
 
-	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession().getAttribute(httpSessionID);
+	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
+		.getAttribute(httpSessionID);
 
 	String questionIndex = request.getParameter("questionIndex");
 	request.setAttribute("questionIndex", questionIndex);
@@ -1481,7 +1494,7 @@ public class McAction extends LamsDispatchAction implements McAppConstants {
 
 	List<McQuestionDTO> questionDTOs = (List) sessionMap.get(McAppConstants.LIST_QUESTION_DTOS);
 
-	List<McOptionDTO> optionDtos = repopulateOptionDTOs(request, true);
+	List<McOptionDTO> optionDtos = McAction.repopulateOptionDTOs(request, true);
 
 	String newQuestion = request.getParameter("newQuestion");
 
@@ -1577,7 +1590,8 @@ public class McAction extends LamsDispatchAction implements McAppConstants {
 
 	String httpSessionID = mcAuthoringForm.getHttpSessionID();
 
-	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession().getAttribute(httpSessionID);
+	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
+		.getAttribute(httpSessionID);
 
 	String questionIndex = request.getParameter("questionIndex");
 	mcAuthoringForm.setQuestionIndex(questionIndex);
@@ -1647,13 +1661,13 @@ public class McAction extends LamsDispatchAction implements McAppConstants {
 
 	String httpSessionID = mcAuthoringForm.getHttpSessionID();
 
-	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession().getAttribute(httpSessionID);
-
+	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
+		.getAttribute(httpSessionID);
 
 	String candidateIndex = request.getParameter("candidateIndex");
 	request.setAttribute("candidateIndex", candidateIndex);
 
-	List<McOptionDTO> optionDtos = repopulateOptionDTOs(request, false);
+	List<McOptionDTO> optionDtos = McAction.repopulateOptionDTOs(request, false);
 
 	List<McQuestionDTO> questionDTOs = (List) sessionMap.get(McAppConstants.LIST_QUESTION_DTOS);
 
@@ -1733,12 +1747,13 @@ public class McAction extends LamsDispatchAction implements McAppConstants {
 
 	String httpSessionID = mcAuthoringForm.getHttpSessionID();
 
-	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession().getAttribute(httpSessionID);
+	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
+		.getAttribute(httpSessionID);
 
 	String candidateIndex = request.getParameter("candidateIndex");
 	request.setAttribute("candidateIndex", candidateIndex);
 
-	List<McOptionDTO> optionDtos = repopulateOptionDTOs(request, false);
+	List<McOptionDTO> optionDtos = McAction.repopulateOptionDTOs(request, false);
 
 	List<McQuestionDTO> questionDTOs = (List) sessionMap.get(McAppConstants.LIST_QUESTION_DTOS);
 	sessionMap.put(McAppConstants.LIST_QUESTION_DTOS, questionDTOs);
@@ -1811,7 +1826,8 @@ public class McAction extends LamsDispatchAction implements McAppConstants {
 
 	String httpSessionID = mcAuthoringForm.getHttpSessionID();
 
-	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession().getAttribute(httpSessionID);
+	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
+		.getAttribute(httpSessionID);
 
 	String candidateIndexToRemove = request.getParameter("candidateIndex");
 	request.setAttribute("candidateIndex", candidateIndexToRemove);
@@ -1821,8 +1837,8 @@ public class McAction extends LamsDispatchAction implements McAppConstants {
 
 	// removeAddedCandidate
 	McQuestionDTO newQuestionDTO = (McQuestionDTO) sessionMap.get(McAppConstants.NEW_QUESTION_DTO);
-	
-	List<McOptionDTO> optionDtos = repopulateOptionDTOs(request, false);
+
+	List<McOptionDTO> optionDtos = McAction.repopulateOptionDTOs(request, false);
 	List<McOptionDTO> listFinalCandidatesDTO = new LinkedList<McOptionDTO>();
 	int caIndex = 0;
 	for (McOptionDTO mcOptionDTO : optionDtos) {
@@ -1832,7 +1848,7 @@ public class McAction extends LamsDispatchAction implements McAppConstants {
 		listFinalCandidatesDTO.add(mcOptionDTO);
 	    }
 	}
-	
+
 	newQuestionDTO.setListCandidateAnswersDTO(listFinalCandidatesDTO);
 	request.setAttribute(McAppConstants.NEW_QUESTION_DTO, newQuestionDTO);
 	sessionMap.put(McAppConstants.NEW_QUESTION_DTO, newQuestionDTO);
@@ -1903,14 +1919,15 @@ public class McAction extends LamsDispatchAction implements McAppConstants {
 
 	String httpSessionID = mcAuthoringForm.getHttpSessionID();
 
-	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession().getAttribute(httpSessionID);
+	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
+		.getAttribute(httpSessionID);
 
 	String candidateIndex = request.getParameter("candidateIndex");
 	request.setAttribute("candidateIndex", candidateIndex);
 
 	List<McQuestionDTO> questionDTOs = (List) sessionMap.get(McAppConstants.LIST_QUESTION_DTOS);
 
-	List<McOptionDTO> optionDtos = repopulateOptionDTOs(request, true);
+	List<McOptionDTO> optionDtos = McAction.repopulateOptionDTOs(request, true);
 
 	String newQuestion = request.getParameter("newQuestion");
 
@@ -1989,10 +2006,10 @@ public class McAction extends LamsDispatchAction implements McAppConstants {
 
 	return true;
     }
-    
+
     /**
      * Get ToolAccessMode from HttpRequest parameters. Default value is AUTHOR mode.
-     * 
+     *
      * @param request
      * @return
      */

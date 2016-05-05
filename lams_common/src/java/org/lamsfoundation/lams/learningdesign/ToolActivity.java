@@ -2,21 +2,21 @@
  * Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
  * =============================================================
  * License Information: http://lamsfoundation.org/licensing/lams/2.0/
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License version 2.0 
+ * it under the terms of the GNU General Public License version 2.0
  * as published by the Free Software Foundation.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301
  * USA
- * 
+ *
  * http://www.gnu.org/licenses/gpl.txt
  * ****************************************************************
  */
@@ -28,7 +28,6 @@ import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.SortedSet;
-import java.util.TreeSet;
 
 import org.apache.commons.lang.builder.ToStringBuilder;
 import org.apache.log4j.Logger;
@@ -41,7 +40,6 @@ import org.lamsfoundation.lams.tool.GroupedToolSession;
 import org.lamsfoundation.lams.tool.NonGroupedToolSession;
 import org.lamsfoundation.lams.tool.Tool;
 import org.lamsfoundation.lams.tool.ToolSession;
-import org.lamsfoundation.lams.tool.exception.LamsToolServiceException;
 import org.lamsfoundation.lams.tool.exception.RequiredGroupMissingException;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.util.MessageService;
@@ -56,7 +54,7 @@ public class ToolActivity extends SimpleActivity implements Serializable {
 
     /** Holds value of property toolContentId. */
     private Long toolContentId;
-    
+
     /** Holds value of property tool. */
     private Tool tool;
 
@@ -68,20 +66,20 @@ public class ToolActivity extends SimpleActivity implements Serializable {
     private Set<ActivityEvaluation> activityEvaluations;
 
     private Set<GradebookUserActivity> gradebookUserActivities;
-    
+
     private PedagogicalPlannerActivityMetadata plannerMetadata;
 
     /** full constructor */
     public ToolActivity(Long activityId, Integer id, String description, String title, Integer xcoord, Integer ycoord,
-	    Integer orderId, java.util.Date createDateTime, LearningLibrary learningLibrary,
-	    Activity parentActivity, Activity libraryActivity, Integer parentUIID, LearningDesign learningDesign,
-	    Grouping grouping, Integer activityTypeId, Transition transitionTo, Transition transitionFrom,
-	    String languageFile, Boolean stopAfterActivity, Set inputActivities, Tool tool, Long toolContentId,
-	    Set branchActivityEntries, Set<CompetenceMapping> competenceMappings,
-	    Set<ActivityEvaluation> activityEvaluations, Set<GradebookUserActivity> gradebookUserActivities) {
-	super(activityId, id, description, title, xcoord, ycoord, orderId, createDateTime,
-		learningLibrary, parentActivity, libraryActivity, parentUIID, learningDesign, grouping, activityTypeId,
-		transitionTo, transitionFrom, languageFile, stopAfterActivity, inputActivities, branchActivityEntries);
+	    Integer orderId, java.util.Date createDateTime, LearningLibrary learningLibrary, Activity parentActivity,
+	    Activity libraryActivity, Integer parentUIID, LearningDesign learningDesign, Grouping grouping,
+	    Integer activityTypeId, Transition transitionTo, Transition transitionFrom, String languageFile,
+	    Boolean stopAfterActivity, Set inputActivities, Tool tool, Long toolContentId, Set branchActivityEntries,
+	    Set<CompetenceMapping> competenceMappings, Set<ActivityEvaluation> activityEvaluations,
+	    Set<GradebookUserActivity> gradebookUserActivities) {
+	super(activityId, id, description, title, xcoord, ycoord, orderId, createDateTime, learningLibrary,
+		parentActivity, libraryActivity, parentUIID, learningDesign, grouping, activityTypeId, transitionTo,
+		transitionFrom, languageFile, stopAfterActivity, inputActivities, branchActivityEntries);
 	this.tool = tool;
 	this.toolContentId = toolContentId;
 	this.competenceMappings = competenceMappings;
@@ -112,7 +110,7 @@ public class ToolActivity extends SimpleActivity implements Serializable {
     /**
      * Makes a copy of the ToolActivity for authoring, preview and monitoring
      * environment
-     * 
+     *
      * @return ToolActivity Returns a deep-copy of the originalActivity
      */
     @Override
@@ -183,7 +181,7 @@ public class ToolActivity extends SimpleActivity implements Serializable {
      * If groupingSupportType is not set then defaults to GROUPING_SUPPORT_NONE. If for some reason a grouped session if
      * also does the equivalent of GROUPING_SUPPORT_NONE. This way the system will still function, if not as expected!
      * <p>
-     * 
+     *
      * @param learner
      *            the user who should be using this tool session.
      * @return the new tool session.
@@ -202,11 +200,11 @@ public class ToolActivity extends SimpleActivity implements Serializable {
 	    Group group = null;
 	    if (getApplyGrouping().booleanValue()) {
 		group = this.getGroupFor(learner);
-		
+
 		//check if activity requires existing grouping but no group for user exists yet
 		if (group == null || group.isNull()) {
-		    String errorMessage = messageService.getMessage("error.requires.existing.grouping", new Object[] {
-			    getActivityId(), learner.getUserId() });
+		    String errorMessage = messageService.getMessage("error.requires.existing.grouping",
+			    new Object[] { getActivityId(), learner.getUserId() });
 		    throw new RequiredGroupMissingException(errorMessage);
 		}
 
@@ -216,7 +214,7 @@ public class ToolActivity extends SimpleActivity implements Serializable {
 			break;
 		    }
 		}
-		
+
 		if (session == null) {
 		    session = new GroupedToolSession(this, now, ToolSession.STARTED_STATE, group, lesson);
 		}
@@ -228,8 +226,7 @@ public class ToolActivity extends SimpleActivity implements Serializable {
 		    session = new GroupedToolSession(this, now, ToolSession.STARTED_STATE, group, lesson);
 		} else {
 		    log.error("Unable to get a lesson class group for a new tool session for activity "
-			    + getActivityId() + " and user " + learner
-			    + ". Falling back to one learner per session.");
+			    + getActivityId() + " and user " + learner + ". Falling back to one learner per session.");
 		}
 	    }
 	}
@@ -250,7 +247,7 @@ public class ToolActivity extends SimpleActivity implements Serializable {
 
     /**
      * Getter for property toolContentId.
-     * 
+     *
      * @return Value of property toolContentId.
      */
     public Long getToolContentId() {
@@ -260,9 +257,9 @@ public class ToolActivity extends SimpleActivity implements Serializable {
 
     /**
      * Setter for property toolContentId.
-     * 
+     *
      * @param toolContentId
-     *                New value of property toolContentId.
+     *            New value of property toolContentId.
      */
     public void setToolContentId(Long toolContentId) {
 
@@ -271,7 +268,7 @@ public class ToolActivity extends SimpleActivity implements Serializable {
 
     /**
      * Getter for property tool.
-     * 
+     *
      * @return Value of property tool.
      */
     public Tool getTool() {
@@ -281,9 +278,9 @@ public class ToolActivity extends SimpleActivity implements Serializable {
 
     /**
      * Setter for property tool.
-     * 
+     *
      * @param tool
-     *                New value of property tool.
+     *            New value of property tool.
      */
     public void setTool(Tool tool) {
 
@@ -299,14 +296,14 @@ public class ToolActivity extends SimpleActivity implements Serializable {
 
     /**
      * @param toolSessions
-     *                The toolSessions to set.
+     *            The toolSessions to set.
      */
     public void setToolSessions(Set toolSessions) {
 	this.toolSessions = toolSessions;
     }
 
     /**
-     * 
+     *
      * @return
      */
     public Set<CompetenceMapping> getCompetenceMappings() {
@@ -314,7 +311,7 @@ public class ToolActivity extends SimpleActivity implements Serializable {
     }
 
     /**
-     * 
+     *
      * @param competenceMappings
      */
     public void setCompetenceMappings(Set<CompetenceMapping> competenceMappings) {
@@ -324,6 +321,7 @@ public class ToolActivity extends SimpleActivity implements Serializable {
     /**
      * @see org.lamsfoundation.lams.util.Nullable#isNull()
      */
+    @Override
     public boolean isNull() {
 	return false;
     }
@@ -355,10 +353,10 @@ public class ToolActivity extends SimpleActivity implements Serializable {
     }
 
     public PedagogicalPlannerActivityMetadata getPlannerMetadata() {
-        return plannerMetadata;
+	return plannerMetadata;
     }
 
     public void setPlannerMetadata(PedagogicalPlannerActivityMetadata plannerMetadata) {
-        this.plannerMetadata = plannerMetadata;
+	this.plannerMetadata = plannerMetadata;
     }
 }

@@ -42,7 +42,7 @@ import com.tacitknowledge.util.migration.jdbc.DataSourceMigrationContext;
 
 /**
  * @author mseaton
- * 
+ *
  *         Insert new workspace and workspace folder for new Public Folder -
  *         LDEV2107.
  */
@@ -65,6 +65,7 @@ public class Patch0016FixWorkspacePublicFolder extends MigrationTaskSupport {
 	setName(NAME);
     }
 
+    @Override
     public void migrate(MigrationContext context) throws MigrationException {
 
 	// using data source defined in application container
@@ -78,43 +79,46 @@ public class Patch0016FixWorkspacePublicFolder extends MigrationTaskSupport {
 
 	    // add workspace public folder
 	    String i18nMessage = getI18nMessage(conn);
-	    PreparedStatement query = conn.prepareStatement(insertWorkspacePublicFolder, Statement.RETURN_GENERATED_KEYS);
+	    PreparedStatement query = conn.prepareStatement(insertWorkspacePublicFolder,
+		    Statement.RETURN_GENERATED_KEYS);
 	    query.setLong(1, new Long(1));
 	    query.setString(2, i18nMessage);
 	    query.setLong(3, new Long(1));
 	    query.setDate(4, new java.sql.Date(System.currentTimeMillis()));
 	    query.setDate(5, new java.sql.Date(System.currentTimeMillis()));
 	    query.setInt(6, new Integer(3));
-	    
+
 	    int numUpdatedWorkspaces = query.executeUpdate();
 	    ResultSet results = query.getGeneratedKeys();
-	    
+
 	    log.info("Inserted " + numUpdatedWorkspaces + " new workspace folder.");
 	    long wkspcFolderId = -1;
-	    if(results.next())
-	    	wkspcFolderId = results.getLong(1);
-	    
+	    if (results.next()) {
+		wkspcFolderId = results.getLong(1);
+	    }
+
 	    // insert new workspace
 	    query = conn.prepareStatement(insertNewWorkspace, Statement.RETURN_GENERATED_KEYS);
 	    query.setString(1, i18nMessage);
 	    query.setLong(2, wkspcFolderId);
-	    
+
 	    numUpdatedWorkspaces = query.executeUpdate();
-	     results = query.getGeneratedKeys();
-	    
+	    results = query.getGeneratedKeys();
+
 	    log.info("Inserted " + numUpdatedWorkspaces + " new workspace.");
 	    long wkspcId = -1;
-		if(results.next())
-			wkspcId = results.getLong(1);
-	    
+	    if (results.next()) {
+		wkspcId = results.getLong(1);
+	    }
+
 	    // insert new wkspc to wkspc folder mapping
 	    query = conn.prepareStatement(insertNewWkspcWkspcFolder);
 	    query.setLong(1, wkspcId);
 	    query.setLong(2, wkspcFolderId);
-	    
+
 	    numUpdatedWorkspaces = query.executeUpdate();
 	    log.info("Inserted " + numUpdatedWorkspaces + " wkspc_wkspc_folder links.");
-	    
+
 	    ctx.commit();
 
 	    // conn.close(); // container managed data source

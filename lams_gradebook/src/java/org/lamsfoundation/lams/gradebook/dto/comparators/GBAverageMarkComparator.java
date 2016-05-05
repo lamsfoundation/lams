@@ -30,16 +30,17 @@ import org.lamsfoundation.lams.gradebook.dto.GradebookGridRowDTO;
 @SuppressWarnings("unchecked")
 public class GBAverageMarkComparator implements Comparator {
 
+    @Override
     public int compare(Object gradebookGridRow, Object anotherGradebookGridRow) {
 
 	if (gradebookGridRow instanceof GradebookGridRowDTO && anotherGradebookGridRow instanceof GradebookGridRowDTO) {
-	   
+
 	    Double mark1 = ((GradebookGridRowDTO) gradebookGridRow).getAverageMark();
 	    Double mark2 = ((GradebookGridRowDTO) anotherGradebookGridRow).getAverageMark();
-	    
+
 	    mark1 = (mark1 == null) ? 0.0 : mark1;
 	    mark2 = (mark2 == null) ? 0.0 : mark2;
-	    return new Double(mark1 - mark2).intValue();    
+	    return new Double(mark1 - mark2).intValue();
 	} else {
 	    return 0;
 	}

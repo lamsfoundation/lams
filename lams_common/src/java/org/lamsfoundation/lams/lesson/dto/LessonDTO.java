@@ -2,21 +2,21 @@
  * Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
  * =============================================================
  * License Information: http://lamsfoundation.org/licensing/lams/2.0/
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License version 2.0 
+ * it under the terms of the GNU General Public License version 2.0
  * as published by the Free Software Foundation.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301
  * USA
- * 
+ *
  * http://www.gnu.org/licenses/gpl.txt
  * ***********************************************************************/
 /* $$Id$$ */
@@ -34,14 +34,14 @@ import org.lamsfoundation.lams.usermanagement.Organisation;
  * between UI and java. As the UI and java communication is expensive, DTO pattern works fine here to save all
  * unecessary data transfer.
  * </p>
- * 
+ *
  * <p>
  * As DTO is only used for data transfer purpose, we should make it immutable to avoid any unecessary error state.
  * </p>
- * 
+ *
  * @author Jacky Fang 2005-3-3
  * @version 1.1
- * 
+ *
  */
 public class LessonDTO {
     //---------------------------------------------------------------------
@@ -87,7 +87,7 @@ public class LessonDTO {
     //---------------------------------------------------------------------
     /**
      * Returns the lesson id.
-     * 
+     *
      * @return Returns the lessonID.
      */
     public Long getLessonID() {
@@ -96,7 +96,7 @@ public class LessonDTO {
 
     /**
      * Returns the name of the lesson..
-     * 
+     *
      * @return Returns the title.
      */
     public String getLessonName() {
@@ -105,7 +105,7 @@ public class LessonDTO {
 
     /**
      * Returns the lesson description.
-     * 
+     *
      * @return Returns the description.
      */
     public String getLessonDescription() {
@@ -114,7 +114,7 @@ public class LessonDTO {
 
     /**
      * Returns the lesson state. Plese refer to the lesson object for lesson state.
-     * 
+     *
      * @return Returns the lessonStateID.
      */
     public Integer getLessonStateID() {
@@ -159,7 +159,7 @@ public class LessonDTO {
 
     /**
      * Returns the String representation of lesson data transfer object.
-     * 
+     *
      * @see java.lang.Object#toString()
      */
     @Override

@@ -2,21 +2,21 @@
  * Copyright (C) 2006 LAMS Foundation (http://lamsfoundation.org)
  * =============================================================
  * License Information: http://lamsfoundation.org/licensing/lams/2.0/
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License version 2.0 
+ * it under the terms of the GNU General Public License version 2.0
  * as published by the Free Software Foundation.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301
  * USA
- * 
+ *
  * http://www.gnu.org/licenses/gpl.txt
  * ****************************************************************
  */
@@ -38,11 +38,11 @@ import com.meterware.httpunit.WebResponse;
 
 /**
  * @version
- * 
+ *
  *          <p>
  *          <a href="MockAuthor.java.html"><i>View Source</i></a>
  *          </p>
- * 
+ *
  * @author <a href="mailto:fyang@melcoe.mq.edu.au">Fei Yang</a>
  */
 public class MockAuthor extends MockUser {
@@ -59,7 +59,7 @@ public class MockAuthor extends MockUser {
 
     /**
      * MockAuthor Constructor
-     * 
+     *
      * @param
      */
     public MockAuthor(AuthorTest test, String username, String password, String userId) {
@@ -69,17 +69,17 @@ public class MockAuthor extends MockUser {
     public String importLearningDesign(String learningDesignUploadURL, File file) {
 	try {
 	    delay();
-	    WebResponse resp = (WebResponse) new Call(wc, test, username + " import Learning Design", learningDesignUploadURL)
-		    .execute();
+	    WebResponse resp = (WebResponse) new Call(wc, test, username + " import Learning Design",
+		    learningDesignUploadURL).execute();
 	    if (!MockUser.checkPageContains(resp, MockAuthor.IMPORT_FORM_FLAG)) {
 		MockAuthor.log.debug(resp.getText());
-		throw new TestHarnessException(username + " did not get learning design import page with the url:"
-			+ learningDesignUploadURL);
+		throw new TestHarnessException(
+			username + " did not get learning design import page with the url:" + learningDesignUploadURL);
 	    }
 	    Map<String, Object> params = new HashMap<String, Object>();
 	    params.put(MockAuthor.UPLOAD_FILE_PARAM, file);
-	    resp = (WebResponse) new Call(wc, test, username + " submits Learning Design import form", fillForm(resp, 0, params))
-		    .execute();
+	    resp = (WebResponse) new Call(wc, test, username + " submits Learning Design import form",
+		    fillForm(resp, 0, params)).execute();
 	    if (!MockUser.checkPageContains(resp, MockAuthor.IMPORT_SUCCESS_FLAG)) {
 		MockAuthor.log.debug(resp.getText());
 		throw new TestHarnessException(username + " failed to upload file:" + file.getAbsolutePath());
@@ -88,8 +88,8 @@ public class MockAuthor extends MockUser {
 	    int startIndex = text.indexOf(MockAuthor.LD_START_TAG);
 	    int endIndex = text.indexOf(MockAuthor.LD_END_TAG, startIndex);
 	    String idAsString = text.substring(startIndex + MockAuthor.LD_START_TAG.length(), endIndex);
-	    MockAuthor.log.info(username + " imported learning design " + file.getName() + " and the id is "
-		    + idAsString);
+	    MockAuthor.log
+		    .info(username + " imported learning design " + file.getName() + " and the id is " + idAsString);
 	    return idAsString;
 	} catch (IOException e) {
 	    throw new RuntimeException(e);

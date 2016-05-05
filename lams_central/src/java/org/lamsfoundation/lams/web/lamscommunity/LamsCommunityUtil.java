@@ -30,8 +30,8 @@ import java.util.HashMap;
 import javax.crypto.Cipher;
 import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
-import javax.servlet.http.HttpSession;
 
+import org.apache.commons.codec.binary.Base64;
 import org.lamsfoundation.lams.config.Registration;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
@@ -39,8 +39,6 @@ import org.lamsfoundation.lams.util.Configuration;
 import org.lamsfoundation.lams.util.HashUtil;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
-
-import org.apache.commons.codec.binary.Base64;
 
 public class LamsCommunityUtil {
 
@@ -63,7 +61,7 @@ public class LamsCommunityUtil {
 	    String serverKey) {
 	String hash = "";
 	if (serverId != null && serverKey != null) {
-	    hash = hash(timestamp + username + serverId + password + serverKey);
+	    hash = LamsCommunityUtil.hash(timestamp + username + serverId + password + serverKey);
 	}
 	return hash;
     }
@@ -76,7 +74,8 @@ public class LamsCommunityUtil {
 	    String serverKey) throws Exception {
 	String hash = "";
 	if (serverId != null && serverKey != null) {
-	    hash = encrypt(timestamp + "," + username + "," + URLEncoder.encode(password, "UTF8"), serverKey);
+	    hash = LamsCommunityUtil.encrypt(timestamp + "," + username + "," + URLEncoder.encode(password, "UTF8"),
+		    serverKey);
 	}
 	return hash;
     }
@@ -89,8 +88,9 @@ public class LamsCommunityUtil {
 	byte[] keyBytes = new byte[16];
 	byte[] b = password.getBytes("UTF-8");
 	int len = b.length;
-	if (len > keyBytes.length)
+	if (len > keyBytes.length) {
 	    len = keyBytes.length;
+	}
 	System.arraycopy(b, 0, keyBytes, 0, len);
 
 	SecretKeySpec keySpec = new SecretKeySpec(keyBytes, "AES");
@@ -102,13 +102,13 @@ public class LamsCommunityUtil {
 	byte[] results = cipher.doFinal(text.getBytes("UTF-8"));
 	byte[] encodedBytes = Base64.encodeBase64(results);
 	String encodedString = new String(encodedBytes);
-	
+
 	return encodedString;
     }
 
     /**
      * Appends the required authentication info and hash to a url
-     * 
+     *
      * @param url
      * @return
      * @throws Exception
@@ -124,13 +124,11 @@ public class LamsCommunityUtil {
 	    throw new Exception("Attempt to authenticate in lams community without registration");
 	}
 
-	
 	String timestamp = "" + new Date().getTime();
-	String hash = LamsCommunityUtil.createAuthenticationHash(timestamp, user.getLamsCommunityUsername(), user
-		.getLamsCommunityToken(), serverID, serverKey);
+	String hash = LamsCommunityUtil.createAuthenticationHash(timestamp, user.getLamsCommunityUsername(),
+		user.getLamsCommunityToken(), serverID, serverKey);
 
-	url += "&" + PARAM_LC_USERNAME + "="
-		+ URLEncoder.encode(user.getLamsCommunityUsername(), "UTF8");
+	url += "&" + PARAM_LC_USERNAME + "=" + URLEncoder.encode(user.getLamsCommunityUsername(), "UTF8");
 	url += "&" + PARAM_HASH + "=" + hash;
 	url += "&" + PARAM_SERVER_ID + "=" + serverID;
 	url += "&" + PARAM_TIMESTAMP + "=" + timestamp;
@@ -153,8 +151,8 @@ public class LamsCommunityUtil {
 
 	UserDTO userDTO = (UserDTO) SessionManager.getSession().getAttribute(AttributeNames.USER);
 	String timestamp = "" + new Date().getTime();
-	String hash = LamsCommunityUtil.createAuthenticationHash(timestamp, userDTO.getLamsCommunityUsername(), userDTO
-		.getLamsCommunityToken(), serverID, serverKey);
+	String hash = LamsCommunityUtil.createAuthenticationHash(timestamp, userDTO.getLamsCommunityUsername(),
+		userDTO.getLamsCommunityToken(), serverID, serverKey);
 
 	ret.put(PARAM_LC_USERNAME, URLEncoder.encode(userDTO.getLamsCommunityUsername(), "UTF8"));
 	ret.put(PARAM_HASH, hash);
@@ -162,8 +160,5 @@ public class LamsCommunityUtil {
 	ret.put(PARAM_TIMESTAMP, timestamp);
 	return ret;
     }
-    
-    
-
 
 }

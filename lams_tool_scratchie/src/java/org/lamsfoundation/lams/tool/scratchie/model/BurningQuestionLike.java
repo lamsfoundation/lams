@@ -2,7 +2,7 @@ package org.lamsfoundation.lams.tool.scratchie.model;
 
 /**
  * @author Andrey Balan
- * 
+ *
  *
  */
 public class BurningQuestionLike {
@@ -18,7 +18,7 @@ public class BurningQuestionLike {
     public Long getUid() {
 	return uid;
     }
-	
+
     public void setUid(Long uid) {
 	this.uid = uid;
     }

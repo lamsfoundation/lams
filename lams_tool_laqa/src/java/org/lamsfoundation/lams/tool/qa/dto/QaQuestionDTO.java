@@ -2,21 +2,21 @@
  * Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
  * =============================================================
  * License Information: http://lamsfoundation.org/licensing/lams/2.0/
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301
  * USA
- * 
+ *
  * http://www.gnu.org/licenses/gpl.txt
  * ****************************************************************
  */
@@ -27,7 +27,7 @@ import org.lamsfoundation.lams.tool.qa.QaQueContent;
 
 /**
  * DTO that holds users attempt history data for jsp purposes
- * 
+ *
  * @author Ozgur Demirtas
  */
 public class QaQuestionDTO implements Comparable {
@@ -55,6 +55,7 @@ public class QaQuestionDTO implements Comparable {
 	this.minWordsLimit = minWordsLimit;
     }
 
+    @Override
     public int compareTo(Object o) {
 	QaMonitoredUserDTO qaMonitoredUserDTO = (QaMonitoredUserDTO) o;
 
@@ -64,7 +65,7 @@ public class QaQuestionDTO implements Comparable {
 	    return 0;
 	}
     }
-    
+
     /**
      * @return Returns the uid.
      */
@@ -89,7 +90,7 @@ public class QaQuestionDTO implements Comparable {
 
     /**
      * @param displayOrder
-     *                The displayOrder to set.
+     *            The displayOrder to set.
      */
     public void setDisplayOrder(String displayOrder) {
 	this.displayOrder = displayOrder;
@@ -104,7 +105,7 @@ public class QaQuestionDTO implements Comparable {
 
     /**
      * @param feedback
-     *                The feedback to set.
+     *            The feedback to set.
      */
     public void setFeedback(String feedback) {
 	this.feedback = feedback;
@@ -119,7 +120,7 @@ public class QaQuestionDTO implements Comparable {
 
     /**
      * @param question
-     *                The question to set.
+     *            The question to set.
      */
     public void setQuestion(String question) {
 	this.question = question;
@@ -134,12 +135,12 @@ public class QaQuestionDTO implements Comparable {
 
     /**
      * @param required
-     * Is this question required
+     *            Is this question required
      */
     public void setRequired(boolean required) {
 	this.required = required;
     }
-    
+
     /**
      * @return minWordsLimit
      */
@@ -149,12 +150,11 @@ public class QaQuestionDTO implements Comparable {
 
     /**
      * @param minWordsLimit
-     * minWordsLimit
+     *            minWordsLimit
      */
     public void setMinWordsLimit(int minWordsLimit) {
 	this.minWordsLimit = minWordsLimit;
     }
-
 
     @Override
     public boolean equals(Object o) {

@@ -8,9 +8,9 @@ import org.lamsfoundation.lams.tool.notebook.dto.NotebookConditionDTO;
 
 /**
  * Basically the same as {@link TextSearchCondition}. No new functionality was required.
- * 
+ *
  * @author Marcin Cieslak
- * 
+ *
  */
 public class NotebookCondition extends TextSearchCondition {
 

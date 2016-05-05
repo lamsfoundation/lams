@@ -1,23 +1,23 @@
-/**************************************************************** 
- * Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org) 
- * ============================================================= 
- * License Information: http://lamsfoundation.org/licensing/lams/2.0/ 
- * 
- * This program is free software; you can redistribute it and/or modify 
- * it under the terms of the GNU General Public License version 2.0 
- * as published by the Free Software Foundation. 
- * 
- * This program is distributed in the hope that it will be useful, 
- * but WITHOUT ANY WARRANTY; without even the implied warranty of 
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the 
- * GNU General Public License for more details. 
- * 
- * You should have received a copy of the GNU General Public License 
- * along with this program; if not, write to the Free Software 
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 * USA 
- * 
- * http://www.gnu.org/licenses/gpl.txt 
- * **************************************************************** 
+/****************************************************************
+ * Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
+ * =============================================================
+ * License Information: http://lamsfoundation.org/licensing/lams/2.0/
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License version 2.0
+ * as published by the Free Software Foundation.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 * USA
+ *
+ * http://www.gnu.org/licenses/gpl.txt
+ * ****************************************************************
  */
 
 /* $Id$ */
@@ -42,19 +42,20 @@ import org.lamsfoundation.lams.tool.leaderselection.util.LeaderselectionConstant
 public class LeaderselectionOutputFactory extends OutputFactory {
 
     @Override
-    public SortedMap<String, ToolOutputDefinition> getToolOutputDefinitions(Object toolContentObject, int definitionType)
-	    throws ToolException {
+    public SortedMap<String, ToolOutputDefinition> getToolOutputDefinitions(Object toolContentObject,
+	    int definitionType) throws ToolException {
 	SortedMap<String, ToolOutputDefinition> definitionMap = new TreeMap<String, ToolOutputDefinition>();
 	switch (definitionType) {
-	case ToolOutputDefinition.DATA_OUTPUT_DEFINITION_TYPE_CONDITION:
-	    ToolOutputDefinition definition = buildBooleanOutputDefinition(LeaderselectionConstants.OUTPUT_NAME_IS_LEARNER_A_LEADER);
-	    definitionMap.put(LeaderselectionConstants.OUTPUT_NAME_IS_LEARNER_A_LEADER, definition);
-	    break;
-	case ToolOutputDefinition.DATA_OUTPUT_DEFINITION_TYPE_DATA_FLOW:
-	    ToolOutputDefinition leaderDefinition = buildRangeDefinition(
-		    LeaderselectionConstants.OUTPUT_NAME_LEADER_USERID, new Long(0), null);
-	    definitionMap.put(LeaderselectionConstants.OUTPUT_NAME_LEADER_USERID, leaderDefinition);
-	    break;
+	    case ToolOutputDefinition.DATA_OUTPUT_DEFINITION_TYPE_CONDITION:
+		ToolOutputDefinition definition = buildBooleanOutputDefinition(
+			LeaderselectionConstants.OUTPUT_NAME_IS_LEARNER_A_LEADER);
+		definitionMap.put(LeaderselectionConstants.OUTPUT_NAME_IS_LEARNER_A_LEADER, definition);
+		break;
+	    case ToolOutputDefinition.DATA_OUTPUT_DEFINITION_TYPE_DATA_FLOW:
+		ToolOutputDefinition leaderDefinition = buildRangeDefinition(
+			LeaderselectionConstants.OUTPUT_NAME_LEADER_USERID, new Long(0), null);
+		definitionMap.put(LeaderselectionConstants.OUTPUT_NAME_LEADER_USERID, leaderDefinition);
+		break;
 	}
 
 	return definitionMap;
@@ -69,14 +70,12 @@ public class LeaderselectionOutputFactory extends OutputFactory {
 	TreeMap<String, ToolOutput> outputs = new TreeMap<String, ToolOutput>();
 
 	if (names == null || names.contains(LeaderselectionConstants.OUTPUT_NAME_IS_LEARNER_A_LEADER)) {
-	    outputs.put(
-		    LeaderselectionConstants.OUTPUT_NAME_IS_LEARNER_A_LEADER,
+	    outputs.put(LeaderselectionConstants.OUTPUT_NAME_IS_LEARNER_A_LEADER,
 		    getToolOutput(LeaderselectionConstants.OUTPUT_NAME_IS_LEARNER_A_LEADER, leaderselectionService,
 			    toolSessionId, learnerId));
 	}
 	if (names == null || names.contains(LeaderselectionConstants.OUTPUT_NAME_LEADER_USERID)) {
-	    outputs.put(
-		    LeaderselectionConstants.OUTPUT_NAME_LEADER_USERID,
+	    outputs.put(LeaderselectionConstants.OUTPUT_NAME_LEADER_USERID,
 		    getToolOutput(LeaderselectionConstants.OUTPUT_NAME_LEADER_USERID, leaderselectionService,
 			    toolSessionId, learnerId));
 	}

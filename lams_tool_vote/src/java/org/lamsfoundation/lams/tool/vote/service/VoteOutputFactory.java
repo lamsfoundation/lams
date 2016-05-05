@@ -53,7 +53,8 @@ public class VoteOutputFactory extends OutputFactory {
      * @see org.lamsfoundation.lams.tool.OutputDefinitionFactory#getToolOutputDefinitions(java.lang.Object)
      */
     @Override
-    public SortedMap<String, ToolOutputDefinition> getToolOutputDefinitions(Object toolContentObject, int definitionType) {
+    public SortedMap<String, ToolOutputDefinition> getToolOutputDefinitions(Object toolContentObject,
+	    int definitionType) {
 
 	TreeMap<String, ToolOutputDefinition> definitionMap = new TreeMap<String, ToolOutputDefinition>();
 
@@ -62,12 +63,13 @@ public class VoteOutputFactory extends OutputFactory {
 	    VoteContent content = (VoteContent) toolContentObject;
 
 	    if (content.getMaxNominationCount() != null && !content.getMaxNominationCount().equals("1")) {
-		log
-			.error("Unable to build output definitions for Voting if the user can have more than one nomination. Vote "
+		log.error(
+			"Unable to build output definitions for Voting if the user can have more than one nomination. Vote "
 				+ content);
 	    } else {
 
-		ToolOutputDefinition definition = buildBooleanSetOutputDefinition(VoteOutputFactory.OUTPUT_NAME_NOMINATION_SELECTION);
+		ToolOutputDefinition definition = buildBooleanSetOutputDefinition(
+			VoteOutputFactory.OUTPUT_NAME_NOMINATION_SELECTION);
 		if (definition.getDefaultConditions() == null) {
 		    definition.setDefaultConditions(new ArrayList<BranchCondition>());
 		}
@@ -79,16 +81,17 @@ public class VoteOutputFactory extends OutputFactory {
 		if (content.isAllowText()) {
 		    defaultConditions.add(new BranchCondition(null, null, new Integer(conditionOrderId++),
 			    buildConditionName(VoteOutputFactory.OUTPUT_NAME_NOMINATION_SELECTION,
-				    VoteOutputFactory.FREE_TEXT_NOM_SELECTION_STR), getI18NText("label.open.vote",
-				    false), OutputType.OUTPUT_BOOLEAN.toString(), null, null, trueString));
+				    VoteOutputFactory.FREE_TEXT_NOM_SELECTION_STR),
+			    getI18NText("label.open.vote", false), OutputType.OUTPUT_BOOLEAN.toString(), null, null,
+			    trueString));
 		}
 
 		Iterator iter = content.getVoteQueContents().iterator();
 		while (iter.hasNext()) {
 		    VoteQueContent nomination = (VoteQueContent) iter.next();
 		    int displayOrder = nomination.getDisplayOrder();
-		    String name = buildConditionName(VoteOutputFactory.OUTPUT_NAME_NOMINATION_SELECTION, new Integer(
-			    displayOrder).toString());
+		    String name = buildConditionName(VoteOutputFactory.OUTPUT_NAME_NOMINATION_SELECTION,
+			    new Integer(displayOrder).toString());
 		    defaultConditions.add(new BranchCondition(null, null, new Integer(conditionOrderId++), name,
 			    VoteUtils.stripHTML(nomination.getQuestion()), OutputType.OUTPUT_BOOLEAN.toString(), null,
 			    null, trueString));
@@ -104,8 +107,8 @@ public class VoteOutputFactory extends OutputFactory {
 	return definitionMap;
     }
 
-    public SortedMap<String, ToolOutput> getToolOutput(List<String> names, IVoteService voteService,
-	    Long toolSessionId, Long learnerId) {
+    public SortedMap<String, ToolOutput> getToolOutput(List<String> names, IVoteService voteService, Long toolSessionId,
+	    Long learnerId) {
 
 	TreeMap<String, ToolOutput> output = null;
 	if (names == null) {
@@ -161,8 +164,8 @@ public class VoteOutputFactory extends OutputFactory {
 	    Set voteAttempts = queUser.getVoteUsrAttempts();
 	    if (voteAttempts.size() > 0) {
 		if (voteAttempts.size() > 1) {
-		    log
-			    .error("Attempting to match on nomination, but more than one nomination selected for this user. Will try to match on the given display order. User "
+		    log.error(
+			    "Attempting to match on nomination, but more than one nomination selected for this user. Will try to match on the given display order. User "
 				    + queUser);
 		}
 
@@ -220,8 +223,8 @@ public class VoteOutputFactory extends OutputFactory {
 	while (contentIter.hasNext()) {
 	    VoteQueContent nomination = (VoteQueContent) contentIter.next();
 	    int displayOrder = nomination.getDisplayOrder();
-	    String name = buildConditionName(VoteOutputFactory.OUTPUT_NAME_NOMINATION_SELECTION, new Integer(
-		    displayOrder).toString());
+	    String name = buildConditionName(VoteOutputFactory.OUTPUT_NAME_NOMINATION_SELECTION,
+		    new Integer(displayOrder).toString());
 	    boolean found = false;
 	    if (queUser != null) {
 		Set voteAttempts = queUser.getVoteUsrAttempts();

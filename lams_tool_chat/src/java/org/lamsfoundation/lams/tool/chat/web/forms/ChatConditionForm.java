@@ -5,7 +5,7 @@ import org.lamsfoundation.lams.web.TextSearchActionForm;
 
 /**
  * A text search form with additional parameters for Chat needs.
- * 
+ *
  * @author Marcin Cieslak
  *
  */
@@ -42,7 +42,7 @@ public class ChatConditionForm extends TextSearchActionForm {
     /**
      * Fills a new ChatCondition with data contained in this form. Note that some cruicial data is missing, so the
      * condition is NOT complete.
-     * 
+     *
      * @return created condition
      */
     public ChatCondition extractCondition() {

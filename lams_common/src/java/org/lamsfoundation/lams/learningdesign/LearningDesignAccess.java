@@ -30,9 +30,9 @@ import org.apache.commons.lang.builder.HashCodeBuilder;
 
 /**
  * Marks when an user used (opened, saved etc.) a learning design the last time.
- * 
+ *
  * @author Marcin Cieslak
- * 
+ *
  */
 public class LearningDesignAccess implements Serializable {
 

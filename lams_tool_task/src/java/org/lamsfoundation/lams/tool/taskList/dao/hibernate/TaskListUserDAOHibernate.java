@@ -2,21 +2,21 @@
  * Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
  * =============================================================
  * License Information: http://lamsfoundation.org/licensing/lams/2.0/
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301
  * USA
- * 
+ *
  * http://www.gnu.org/licenses/gpl.txt
  * ****************************************************************
  */
@@ -41,7 +41,7 @@ import org.springframework.stereotype.Repository;
 
 /**
  * Hibernate implementation of <code>TaskListUserDAO</code>.
- * 
+ *
  * @author Andrey Balan
  * @see org.lamsfoundation.lams.tool.taskList.dao.TaskListUserDAO
  */
@@ -58,16 +58,18 @@ public class TaskListUserDAOHibernate extends LAMSBaseDAO implements TaskListUse
     @Override
     public TaskListUser getUserByUserIDAndSessionID(Long userID, Long sessionId) {
 	List list = this.doFind(FIND_BY_USER_ID_SESSION_ID, new Object[] { userID, sessionId });
-	if (list == null || list.size() == 0)
+	if (list == null || list.size() == 0) {
 	    return null;
+	}
 	return (TaskListUser) list.get(0);
     }
 
     @Override
     public TaskListUser getUserByUserIDAndContentID(Long userId, Long contentId) {
 	List list = this.doFind(FIND_BY_USER_ID_CONTENT_ID, new Object[] { userId, contentId });
-	if (list == null || list.size() == 0)
+	if (list == null || list.size() == 0) {
 	    return null;
+	}
 	return (TaskListUser) list.get(0);
     }
 
@@ -80,19 +82,17 @@ public class TaskListUserDAOHibernate extends LAMSBaseDAO implements TaskListUse
     @Override
     public Collection<TaskListUserDTO> getPagedUsersBySession(Long sessionId, int page, int size, String sortBy,
 	    String sortOrder, String searchString) {
-	
-	String LOAD_USERS = "SELECT user.uid, CONCAT(user.last_name, ' ', user.first_name), user.is_verified_by_monitor, visitLog.taskList_item_uid" +
-		    " FROM tl_latask10_user user" + 
-		    " INNER JOIN tl_latask10_session session" +
-		    " ON user.session_uid=session.uid" +
-		    
-		    " LEFT OUTER JOIN tl_latask10_item_log visitLog " +
-		    " ON visitLog.user_uid = user.uid" +
-		    " 	AND visitLog.complete = 1" +
-		    
-		    " WHERE session.session_id = :sessionId " +
-		    " AND (CONCAT(user.last_name, ' ', user.first_name) LIKE CONCAT('%', :searchString, '%')) " +
-		    " ORDER BY CONCAT(user.last_name, ' ', user.first_name) " + sortOrder;
+
+	String LOAD_USERS = "SELECT user.uid, CONCAT(user.last_name, ' ', user.first_name), user.is_verified_by_monitor, visitLog.taskList_item_uid"
+		+ " FROM tl_latask10_user user" + " INNER JOIN tl_latask10_session session"
+		+ " ON user.session_uid=session.uid" +
+
+		" LEFT OUTER JOIN tl_latask10_item_log visitLog " + " ON visitLog.user_uid = user.uid"
+		+ " 	AND visitLog.complete = 1" +
+
+		" WHERE session.session_id = :sessionId "
+		+ " AND (CONCAT(user.last_name, ' ', user.first_name) LIKE CONCAT('%', :searchString, '%')) "
+		+ " ORDER BY CONCAT(user.last_name, ' ', user.first_name) " + sortOrder;
 
 	SQLQuery query = getSession().createSQLQuery(LOAD_USERS);
 	query.setLong("sessionId", sessionId);
@@ -102,7 +102,7 @@ public class TaskListUserDAOHibernate extends LAMSBaseDAO implements TaskListUse
 	query.setFirstResult(page * size);
 	query.setMaxResults(size);
 	List<Object[]> list = query.list();
-	
+
 	//group by userId as long as it returns all completed visitLogs for each user
 	HashMap<Long, TaskListUserDTO> userIdToUserDto = new LinkedHashMap<Long, TaskListUserDTO>();
 	if (list != null && list.size() > 0) {
@@ -121,33 +121,29 @@ public class TaskListUserDAOHibernate extends LAMSBaseDAO implements TaskListUse
 		userDto.getCompletedTaskUids().add(completedTaskUid);
 
 		userIdToUserDto.put(userId, userDto);
-	    }	    
+	    }
 	}
 
 	return userIdToUserDto.values();
     }
-    
+
     @Override
-    public Collection<TaskListUserDTO> getPagedUsersBySessionAndItem(Long sessionId, Long taskListItemUid, int page, int size, String sortBy,
-	    String sortOrder, String searchString) {
-	
-	String LOAD_USERS = "SELECT user.user_id, CONCAT(user.last_name, ' ', user.first_name), visitLog.complete, visitLog.access_date" +
-		    " FROM tl_latask10_user user" + 
-		    " INNER JOIN tl_latask10_session session" +
-		    " ON user.session_uid=session.uid" +
-		    
-		    " LEFT OUTER JOIN tl_latask10_item_log visitLog " +
-		    " ON visitLog.user_uid = user.uid" +
-		    "   AND visitLog.taskList_item_uid = :taskListItemUid" +
-		    
-		    " WHERE session.session_id = :sessionId " +
-		    " AND (CONCAT(user.last_name, ' ', user.first_name) LIKE CONCAT('%', :searchString, '%')) " +
-		    " ORDER BY " + 
-		    " CASE " +
-			" WHEN :sortBy='userName' THEN CONCAT(user.last_name, ' ', user.first_name) " +
-			" WHEN :sortBy='completed' THEN visitLog.complete " +
-			" WHEN :sortBy='accessDate' THEN visitLog.access_date " +
-		    " END " + sortOrder;
+    public Collection<TaskListUserDTO> getPagedUsersBySessionAndItem(Long sessionId, Long taskListItemUid, int page,
+	    int size, String sortBy, String sortOrder, String searchString) {
+
+	String LOAD_USERS = "SELECT user.user_id, CONCAT(user.last_name, ' ', user.first_name), visitLog.complete, visitLog.access_date"
+		+ " FROM tl_latask10_user user" + " INNER JOIN tl_latask10_session session"
+		+ " ON user.session_uid=session.uid" +
+
+		" LEFT OUTER JOIN tl_latask10_item_log visitLog " + " ON visitLog.user_uid = user.uid"
+		+ "   AND visitLog.taskList_item_uid = :taskListItemUid" +
+
+		" WHERE session.session_id = :sessionId "
+		+ " AND (CONCAT(user.last_name, ' ', user.first_name) LIKE CONCAT('%', :searchString, '%')) "
+		+ " ORDER BY " + " CASE "
+		+ " WHEN :sortBy='userName' THEN CONCAT(user.last_name, ' ', user.first_name) "
+		+ " WHEN :sortBy='completed' THEN visitLog.complete "
+		+ " WHEN :sortBy='accessDate' THEN visitLog.access_date " + " END " + sortOrder;
 
 	SQLQuery query = getSession().createSQLQuery(LOAD_USERS);
 	query.setLong("sessionId", sessionId);
@@ -159,7 +155,7 @@ public class TaskListUserDAOHibernate extends LAMSBaseDAO implements TaskListUse
 	query.setFirstResult(page * size);
 	query.setMaxResults(size);
 	List<Object[]> list = query.list();
-	
+
 	Collection<TaskListUserDTO> userDtos = new LinkedList<TaskListUserDTO>();
 	if (list != null && list.size() > 0) {
 	    for (Object[] element : list) {
@@ -173,10 +169,11 @@ public class TaskListUserDAOHibernate extends LAMSBaseDAO implements TaskListUse
 		userDto.setUserId(userId);
 		userDto.setFullName(fullName);
 		userDto.setCompleted(isCompleted);
-		userDto.setAccessDate(accessDate);;
+		userDto.setAccessDate(accessDate);
+		;
 
 		userDtos.add(userDto);
-	    }	    
+	    }
 	}
 
 	return userDtos;

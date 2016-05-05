@@ -11,44 +11,42 @@ import org.lamsfoundation.lams.learningdesign.dao.ICompetenceMappingDAO;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public class CompetenceMappingDAO extends LAMSBaseDAO implements ICompetenceMappingDAO
-{
+public class CompetenceMappingDAO extends LAMSBaseDAO implements ICompetenceMappingDAO {
 
-	private static final String LOAD_COMPETENCE_MAPPING_BY_ACTIVITY_AND_COMPETENCE= "from lams_competence_mapping in class " + CompetenceMapping.class.getName() 
-	+ " where competence_id=? AND activity_id=?";
-	
-	public void saveOrUpdate(CompetenceMapping competenceMapping)
-	{
-		this.getSession().saveOrUpdate(competenceMapping);
-	}
-	
-	public CompetenceMapping getCompetenceMapping(ToolActivity toolActivity, Competence competence)
-	{
-			if ( toolActivity != null && competence != null ) {
-			Long activityId = toolActivity.getActivityId();
-			Long competenceId = competence.getCompetenceId();
-			Query query = getSession().createQuery(LOAD_COMPETENCE_MAPPING_BY_ACTIVITY_AND_COMPETENCE);
-			query.setLong(0,competenceId);
-			query.setLong(1,activityId.longValue());
-			return (CompetenceMapping) query.uniqueResult();
-		}
-		return null;
-	}
-	
-	public void delete(CompetenceMapping competenceMapping)
-	{
-		this.getSession().delete(competenceMapping);
-	}
-	
-	public void deleteAll(Set<CompetenceMapping> competenceMappings)
-	{
-		this.doDeleteAll(competenceMappings);
-	}
+    private static final String LOAD_COMPETENCE_MAPPING_BY_ACTIVITY_AND_COMPETENCE = "from lams_competence_mapping in class "
+	    + CompetenceMapping.class.getName() + " where competence_id=? AND activity_id=?";
 
-	@Override
-	public void insert(CompetenceMapping competenceMapping) {
-		super.insert(competenceMapping);
+    @Override
+    public void saveOrUpdate(CompetenceMapping competenceMapping) {
+	this.getSession().saveOrUpdate(competenceMapping);
+    }
+
+    @Override
+    public CompetenceMapping getCompetenceMapping(ToolActivity toolActivity, Competence competence) {
+	if (toolActivity != null && competence != null) {
+	    Long activityId = toolActivity.getActivityId();
+	    Long competenceId = competence.getCompetenceId();
+	    Query query = getSession().createQuery(LOAD_COMPETENCE_MAPPING_BY_ACTIVITY_AND_COMPETENCE);
+	    query.setLong(0, competenceId);
+	    query.setLong(1, activityId.longValue());
+	    return (CompetenceMapping) query.uniqueResult();
 	}
-	
-	
+	return null;
+    }
+
+    @Override
+    public void delete(CompetenceMapping competenceMapping) {
+	this.getSession().delete(competenceMapping);
+    }
+
+    @Override
+    public void deleteAll(Set<CompetenceMapping> competenceMappings) {
+	this.doDeleteAll(competenceMappings);
+    }
+
+    @Override
+    public void insert(CompetenceMapping competenceMapping) {
+	super.insert(competenceMapping);
+    }
+
 }

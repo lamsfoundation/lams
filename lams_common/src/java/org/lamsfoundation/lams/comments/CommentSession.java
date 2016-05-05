@@ -18,9 +18,9 @@
  *
  * http://www.gnu.org/licenses/gpl.txt
  * ****************************************************************
- */ 
- 
-/* $Id$ */ 
+ */
+
+/* $Id$ */
 package org.lamsfoundation.lams.comments;
 
 /**
@@ -33,41 +33,40 @@ public class CommentSession implements Cloneable {
     private Long externalId;
     private Integer externalIdType;
     private String externalSignature;
-    
+
     public CommentSession() {
     }
 
     public Long getUid() {
-        return uid;
+	return uid;
     }
 
     public void setUid(Long uid) {
-        this.uid = uid;
+	this.uid = uid;
     }
 
     public Long getExternalId() {
-        return externalId;
+	return externalId;
     }
 
     public void setExternalId(Long externalId) {
-        this.externalId = externalId;
+	this.externalId = externalId;
     }
 
     public Integer getExternalIdType() {
-        return externalIdType;
+	return externalIdType;
     }
 
     public void setExternalIdType(Integer externalIdType) {
-        this.externalIdType = externalIdType;
+	this.externalIdType = externalIdType;
     }
 
     public String getExternalSignature() {
-        return externalSignature;
+	return externalSignature;
     }
 
     public void setExternalSignature(String externalSignature) {
-        this.externalSignature = externalSignature;
+	this.externalSignature = externalSignature;
     }
-
 
 }

@@ -2,21 +2,21 @@
  * Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
  * =============================================================
  * License Information: http://lamsfoundation.org/licensing/lams/2.0/
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License version 2.0 
+ * it under the terms of the GNU General Public License version 2.0
  * as published by the Free Software Foundation.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301
  * USA
- * 
+ *
  * http://www.gnu.org/licenses/gpl.txt
  * ****************************************************************
  */
@@ -60,12 +60,12 @@ import org.lamsfoundation.lams.util.FileUtil;
 import org.lamsfoundation.lams.util.FileUtilException;
 
 /**
- * 
+ *
  * @author Jacky Fang
  * @since 2005-3-17
- * 
+ *
  * @author Ozgur Demirtas 24/06/2005
- * 
+ *
  */
 public class LamsToolService implements ILamsToolService {
     private static Logger log = Logger.getLogger(LamsToolService.class);
@@ -129,7 +129,7 @@ public class LamsToolService implements ILamsToolService {
 
     /**
      * Get the tool session object using the toolSessionId
-     * 
+     *
      * @param toolSessionId
      * @return
      */
@@ -153,13 +153,13 @@ public class LamsToolService implements ILamsToolService {
 
     @Override
     public String getActivityEvaluation(Long toolContentId) {
-	
+
 	List<Activity> activities = toolContentDAO.findByProperty(Activity.class, "toolContentId", toolContentId);
 	if (activities.size() != 1) {
 	    log.debug("ToolContent contains multiple activities, can't get ActivityEvaluation.");
 	    return null;
 	}
-	
+
 	ToolActivity toolActivity = (ToolActivity) activities.get(0);
 	Set<ActivityEvaluation> activityEvaluations = toolActivity.getActivityEvaluations();
 	if (activityEvaluations.isEmpty()) {
@@ -169,10 +169,10 @@ public class LamsToolService implements ILamsToolService {
 	    return activityEvaluation.getToolOutputDefinition();
 	}
     }
-    
+
     @Override
     public void setActivityEvaluation(Long toolContentId, String toolOutputDefinition) {
-	
+
 	List<Activity> activities = toolContentDAO.findByProperty(Activity.class, "toolContentId", toolContentId);
 	if (activities.size() != 1) {
 	    throw new LamsToolServiceException(
@@ -181,10 +181,10 @@ public class LamsToolService implements ILamsToolService {
 	if (StringUtils.isEmpty(toolOutputDefinition)) {
 	    return;
 	}
-	
+
 	ToolActivity toolActivity = (ToolActivity) activities.get(0);
 	Set<ActivityEvaluation> activityEvaluations = toolActivity.getActivityEvaluations();
-	
+
 	// Get the first (only) ActivityEvaluation if it exists
 	ActivityEvaluation activityEvaluation;
 	boolean isToolOutputDefinitionChanged = false;
@@ -207,18 +207,18 @@ public class LamsToolService implements ILamsToolService {
 	// update the parent toolActivity
 	toolActivity.setActivityEvaluations(activityEvaluations);
 	activityDAO.insertOrUpdate(toolActivity);
-	
+
 	//update gradebook marks if required
 	if (isToolOutputDefinitionChanged) {
 	    Lesson lesson = lessonDAO.getLessonForActivity(toolActivity.getActivityId());
 	    List<User> users = learnerProgressDAO.getLearnersCompletedActivity(toolActivity);
-	    
+
 	    //update for all users in activity
-	    for (User user: users) {
+	    for (User user : users) {
 		gradebookService.updateUserActivityGradebookMark(lesson, toolActivity, user);
 	    }
 	}
-	
+
     }
 
     @Override
@@ -333,15 +333,15 @@ public class LamsToolService implements ILamsToolService {
     public void setToolDAO(IToolDAO toolDAO) {
 	this.toolDAO = toolDAO;
     }
-    
+
     public void setActivityDAO(IActivityDAO activityDAO) {
 	this.activityDAO = activityDAO;
     }
-    
+
     public void setLearnerProgressDAO(ILearnerProgressDAO learnerProgressDAO) {
 	this.learnerProgressDAO = learnerProgressDAO;
     }
-    
+
     public void setLessonDAO(ILessonDAO lessonDAO) {
 	this.lessonDAO = lessonDAO;
     }
@@ -351,7 +351,7 @@ public class LamsToolService implements ILamsToolService {
     }
 
     /**
-     * 
+     *
      * @param toolContentDAO
      */
     public void setToolContentDAO(IToolContentDAO toolContentDAO) {
@@ -363,7 +363,7 @@ public class LamsToolService implements ILamsToolService {
     }
 
     /**
-     * 
+     *
      * @param toolContentDAO
      */
     public void setLamsCoreToolService(ILamsCoreToolService lamsCoreToolService) {

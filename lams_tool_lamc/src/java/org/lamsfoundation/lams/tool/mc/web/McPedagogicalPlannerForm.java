@@ -68,8 +68,7 @@ public class McPedagogicalPlannerForm extends PedagogicalPlannerActivityForm {
 	    for (String item : question) {
 		if (item != null || !StringUtils.isEmpty(item)) {
 		    try {
-			List<McOptionDTO> candidateAnswerList = extractCandidateAnswers(request,
-				questionIndex);
+			List<McOptionDTO> candidateAnswerList = extractCandidateAnswers(request, questionIndex);
 			if (candidateAnswerList != null) {
 			    boolean answersEmpty = true;
 			    ActionMessage correctAnswerBlankError = null;
@@ -138,7 +137,8 @@ public class McPedagogicalPlannerForm extends PedagogicalPlannerActivityForm {
 		setQuestion(questionDisplayOrder - 1, questionText);
 		List<McOptionDTO> candidateAnswers = item.getListCandidateAnswersDTO();
 
-		for (int candidateAnswerIndex = 1; candidateAnswerIndex <= candidateAnswers.size(); candidateAnswerIndex++) {
+		for (int candidateAnswerIndex = 1; candidateAnswerIndex <= candidateAnswers
+			.size(); candidateAnswerIndex++) {
 
 		    McOptionDTO candidateAnswer = candidateAnswers.get(candidateAnswerIndex - 1);
 
@@ -202,7 +202,7 @@ public class McPedagogicalPlannerForm extends PedagogicalPlannerActivityForm {
 	List<McOptionDTO> candidateAnswerList = new ArrayList<McOptionDTO>();
 	for (int index = 1; index <= count; index++) {
 	    param = paramMap.get(McAppConstants.CANDIDATE_ANSWER_PREFIX + questionIndex + "-" + index);
-	    String answer = ((String[]) param)[0];
+	    String answer = param[0];
 	    if (answer != null) {
 		McOptionDTO candidateAnswer = new McOptionDTO();
 		candidateAnswer.setCandidateAnswer(answer);

@@ -2,21 +2,21 @@
  * Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
  * =============================================================
  * License Information: http://lamsfoundation.org/licensing/lams/2.0/
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License version 2.0
  * as published by the Free Software Foundation.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301
  * USA
- * 
+ *
  * http://www.gnu.org/licenses/gpl.txt
  * ***********************************************************************/
 
@@ -37,7 +37,7 @@ import org.lamsfoundation.lams.tool.vote.VoteAppConstants;
  * <p>
  * ActionForm for the Learning environment
  * </p>
- * 
+ *
  * @author Ozgur Demirtas
  */
 public class VoteLearningForm extends ActionForm implements VoteAppConstants {
@@ -124,6 +124,7 @@ public class VoteLearningForm extends ActionForm implements VoteAppConstants {
     /** The check boxes selected on the first voting screen */
     protected String[] checkedVotes;
 
+    @Override
     public void reset(ActionMapping mapping, HttpServletRequest request) {
 	checkedVotes = new String[0];
     }
@@ -897,15 +898,16 @@ public class VoteLearningForm extends ActionForm implements VoteAppConstants {
 	this.submitReflection = submitReflection;
     }
 
+    @Override
     public String toString() {
 	return new ToStringBuilder(this).append("activityInstructions: ", activityInstructions)
 		.append("activityTitle: ", activityTitle).append("revisitingUser: ", revisitingUser)
 		.append("userEntry: ", userEntry).append("castVoteCount: ", castVoteCount)
 		.append("maxNominationCountReached: ", maxNominationCountReached)
-		.append("toolSessionID: ", toolSessionID)
-		.append("learningMode: ", learningMode).append("toolContentID: ", toolContentID)
-		.append("nominationsSubmited: ", nominationsSubmited).append("toolContentUID: ", toolContentUID)
-		.append("previewOnly: ", previewOnly).append("reportViewOnly: ", reportViewOnly)
+		.append("toolSessionID: ", toolSessionID).append("learningMode: ", learningMode)
+		.append("toolContentID: ", toolContentID).append("nominationsSubmited: ", nominationsSubmited)
+		.append("toolContentUID: ", toolContentUID).append("previewOnly: ", previewOnly)
+		.append("reportViewOnly: ", reportViewOnly)
 		.append("mapGeneralCheckedOptionsContent: ", mapGeneralCheckedOptionsContent).toString();
     }
 
@@ -954,7 +956,7 @@ public class VoteLearningForm extends ActionForm implements VoteAppConstants {
     public void setGroupLeaderName(String groupLeaderName) {
 	this.groupLeaderName = groupLeaderName;
     }
-    
+
     public boolean isUserLeader() {
 	return isUserLeader;
     }

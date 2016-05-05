@@ -1,12 +1,10 @@
 package org.lamsfoundation.lams.statistics.dto;
 
-import java.util.ArrayList;
-
 /**
  * Class representing the overall statistics for the server
- * 
+ *
  * @author lfoxton
- * 
+ *
  */
 public class StatisticsDTO {
 

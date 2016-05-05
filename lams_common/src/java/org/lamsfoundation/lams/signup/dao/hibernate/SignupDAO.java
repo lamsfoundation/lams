@@ -15,8 +15,7 @@ public class SignupDAO extends LAMSBaseDAO implements ISignupDAO {
 
     @Override
     public SignupOrganisation getSignupOrganisation(String context) {
-	List list = doFind(
-		"from SignupOrganisation s where s.disabled=" + Boolean.FALSE + " and s.context=?", context);
+	List list = doFind("from SignupOrganisation s where s.disabled=" + Boolean.FALSE + " and s.context=?", context);
 	if (list != null && list.size() > 0) {
 	    return (SignupOrganisation) list.get(0);
 	}
@@ -38,10 +37,11 @@ public class SignupDAO extends LAMSBaseDAO implements ISignupDAO {
     @Override
     public boolean usernameExists(String username) {
 	List list = super.findByProperty(User.class, "login", username);
-	if (list != null && list.size() > 0)
+	if (list != null && list.size() > 0) {
 	    return true;
-	else
+	} else {
 	    return false;
+	}
     }
 
     @Override
@@ -51,10 +51,11 @@ public class SignupDAO extends LAMSBaseDAO implements ISignupDAO {
 	values[0] = soid;
 	values[1] = context;
 	List list = doFind(query, values);
-	if (list != null && list.size() > 0)
+	if (list != null && list.size() > 0) {
 	    return true;
-	else
+	} else {
 	    return false;
+	}
     }
 
     @Override
@@ -64,9 +65,10 @@ public class SignupDAO extends LAMSBaseDAO implements ISignupDAO {
 	values[0] = context;
 	values[1] = courseKey;
 	List list = doFind(query, values);
-	if (list != null && list.size() > 0)
+	if (list != null && list.size() > 0) {
 	    return true;
-	else
+	} else {
 	    return false;
+	}
     }
 }

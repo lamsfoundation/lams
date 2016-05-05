@@ -2,21 +2,21 @@
  * Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
  * =============================================================
  * License Information: http://lamsfoundation.org/licensing/lams/2.0/
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License version 2.0 
+ * it under the terms of the GNU General Public License version 2.0
  * as published by the Free Software Foundation.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301
  * USA
- * 
+ *
  * http://www.gnu.org/licenses/gpl.txt
  * ****************************************************************
  */
@@ -68,7 +68,7 @@ import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 
 /**
- * 
+ *
  * @author Andrey Balan
  */
 public class LearningAction extends Action {
@@ -100,11 +100,12 @@ public class LearningAction extends Action {
     }
 
     /**
-     * Read commonCartridge data from database and put them into HttpSession. It will redirect to init.do directly after this
+     * Read commonCartridge data from database and put them into HttpSession. It will redirect to init.do directly after
+     * this
      * method run successfully.
-     * 
+     *
      * This method will avoid read database again and lost un-saved resouce item lost when user "refresh page",
-     * 
+     *
      */
     private ActionForward start(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) {
@@ -128,8 +129,8 @@ public class LearningAction extends Action {
 	if (mode != null && mode.isTeacher()) {
 	    // monitoring mode - user is specified in URL
 	    // commonCartridgeUser may be null if the user was force completed.
-	    commonCartridgeUser = getSpecifiedUser(service, sessionId, WebUtil.readIntParam(request,
-		    AttributeNames.PARAM_USER_ID, false));
+	    commonCartridgeUser = getSpecifiedUser(service, sessionId,
+		    WebUtil.readIntParam(request, AttributeNames.PARAM_USER_ID, false));
 	} else {
 	    commonCartridgeUser = getCurrentUser(service, sessionId);
 	}
@@ -140,7 +141,8 @@ public class LearningAction extends Action {
 	commonCartridge = service.getCommonCartridgeBySessionId(sessionId);
 
 	// check whehter finish lock is on/off
-	boolean lock = commonCartridge.getLockWhenFinished() && commonCartridgeUser != null && commonCartridgeUser.isSessionFinished();
+	boolean lock = commonCartridge.getLockWhenFinished() && commonCartridgeUser != null
+		&& commonCartridgeUser.isSessionFinished();
 
 	// check whether there is only one commonCartridge item and run auto flag is true or not.
 	boolean runAuto = false;
@@ -148,7 +150,8 @@ public class LearningAction extends Action {
 	if (commonCartridge.getCommonCartridgeItems() != null) {
 	    itemsNumber = commonCartridge.getCommonCartridgeItems().size();
 	    if (commonCartridge.isRunAuto() && itemsNumber == 1) {
-		CommonCartridgeItem item = (CommonCartridgeItem) commonCartridge.getCommonCartridgeItems().iterator().next();
+		CommonCartridgeItem item = (CommonCartridgeItem) commonCartridge.getCommonCartridgeItems().iterator()
+			.next();
 		// only visible item can be run auto.
 		if (!item.isHide()) {
 		    runAuto = true;
@@ -172,7 +175,8 @@ public class LearningAction extends Action {
 	sessionMap.put(CommonCartridgeConstants.ATTR_RESOURCE_INSTRUCTION, commonCartridge.getInstructions());
 	sessionMap.put(CommonCartridgeConstants.ATTR_FINISH_LOCK, lock);
 	sessionMap.put(CommonCartridgeConstants.ATTR_LOCK_ON_FINISH, commonCartridge.getLockWhenFinished());
-	sessionMap.put(CommonCartridgeConstants.ATTR_USER_FINISHED, commonCartridgeUser != null && commonCartridgeUser.isSessionFinished());
+	sessionMap.put(CommonCartridgeConstants.ATTR_USER_FINISHED,
+		commonCartridgeUser != null && commonCartridgeUser.isSessionFinished());
 
 	sessionMap.put(AttributeNames.PARAM_TOOL_SESSION_ID, sessionId);
 	sessionMap.put(AttributeNames.ATTR_MODE, mode);
@@ -224,7 +228,7 @@ public class LearningAction extends Action {
 
     /**
      * Finish learning session.
-     * 
+     *
      * @param mapping
      * @param form
      * @param request
@@ -277,7 +281,7 @@ public class LearningAction extends Action {
 
     /**
      * Display empty reflection form.
-     * 
+     *
      * @param mapping
      * @param form
      * @param request
@@ -317,7 +321,7 @@ public class LearningAction extends Action {
 
     /**
      * Submit reflection form input database.
-     * 
+     *
      * @param mapping
      * @param form
      * @param request
@@ -369,8 +373,8 @@ public class LearningAction extends Action {
 	// if current user view less than reqired view count number, then just return error message.
 	if (miniViewFlag > 0) {
 	    ActionErrors errors = new ActionErrors();
-	    errors.add(ActionMessages.GLOBAL_MESSAGE, new ActionMessage("lable.learning.minimum.view.number.less",
-		    miniViewFlag));
+	    errors.add(ActionMessages.GLOBAL_MESSAGE,
+		    new ActionMessage("lable.learning.minimum.view.number.less", miniViewFlag));
 	    this.addErrors(request, errors);
 	    return false;
 	}
@@ -379,14 +383,14 @@ public class LearningAction extends Action {
     }
 
     private ICommonCartridgeService getCommonCartridgeService() {
-	WebApplicationContext wac = WebApplicationContextUtils.getRequiredWebApplicationContext(getServlet()
-		.getServletContext());
+	WebApplicationContext wac = WebApplicationContextUtils
+		.getRequiredWebApplicationContext(getServlet().getServletContext());
 	return (ICommonCartridgeService) wac.getBean(CommonCartridgeConstants.RESOURCE_SERVICE);
     }
 
     /**
      * List save current commonCartridge items.
-     * 
+     *
      * @param request
      * @return
      */
@@ -402,7 +406,7 @@ public class LearningAction extends Action {
 
     /**
      * Get <code>java.util.List</code> from HttpSession by given name.
-     * 
+     *
      * @param request
      * @param name
      * @return
@@ -421,7 +425,8 @@ public class LearningAction extends Action {
 	HttpSession ss = SessionManager.getSession();
 	// get back login user DTO
 	UserDTO user = (UserDTO) ss.getAttribute(AttributeNames.USER);
-	CommonCartridgeUser commonCartridgeUser = service.getUserByIDAndSession(new Long(user.getUserID().intValue()), sessionId);
+	CommonCartridgeUser commonCartridgeUser = service.getUserByIDAndSession(new Long(user.getUserID().intValue()),
+		sessionId);
 
 	if (commonCartridgeUser == null) {
 	    CommonCartridgeSession session = service.getCommonCartridgeSessionBySessionId(sessionId);
@@ -443,7 +448,7 @@ public class LearningAction extends Action {
 
     /**
      * Set complete flag for given commonCartridge item.
-     * 
+     *
      * @param request
      * @param sessionId
      */
@@ -470,13 +475,13 @@ public class LearningAction extends Action {
 	    }
 	}
     }
-    
+
     /**
      * Return ResourceService bean.
      */
     private MessageService getMessageService() {
-	WebApplicationContext wac = WebApplicationContextUtils.getRequiredWebApplicationContext(getServlet()
-		.getServletContext());
+	WebApplicationContext wac = WebApplicationContextUtils
+		.getRequiredWebApplicationContext(getServlet().getServletContext());
 	return (MessageService) wac.getBean("basicLTIMessageService");
     }
 

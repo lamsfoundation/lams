@@ -23,7 +23,6 @@
 /* $Id$ */
 package org.lamsfoundation.lams.learningdesign;
 
-
 public class OptionsWithSequencesActivity extends OptionsActivity {
     private Integer startXcoord;
     private Integer startYcoord;

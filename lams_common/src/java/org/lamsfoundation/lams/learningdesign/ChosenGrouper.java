@@ -2,21 +2,21 @@
  * Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
  * =============================================================
  * License Information: http://lamsfoundation.org/licensing/lams/2.0/
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License version 2.0 
+ * it under the terms of the GNU General Public License version 2.0
  * as published by the Free Software Foundation.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301
  * USA
- * 
+ *
  * http://www.gnu.org/licenses/gpl.txt
  * ****************************************************************
  */
@@ -35,11 +35,11 @@ import org.lamsfoundation.lams.usermanagement.User;
 
 /**
  * The chosen grouper algorithm implementation. It creates a new group for the learners that the teacher requested.
- * 
+ *
  * @author Jacky Fang
  * @since 2005-3-24
  * @version 1.1
- * 
+ *
  */
 public class ChosenGrouper extends Grouper implements Serializable {
 
@@ -126,7 +126,7 @@ public class ChosenGrouper extends Grouper implements Serializable {
     /**
      * If the group exists add them to the group, otherwise creates a new group. If group is not supplied, then
      * groupName must be supplied.
-     * 
+     *
      * @param chosenGrouping
      *            (Mandatory)
      * @param group
@@ -147,7 +147,7 @@ public class ChosenGrouper extends Grouper implements Serializable {
     /**
      * Create an empty group for the given grouping. If the current number of groups = max number of groups then a
      * grouping exception is thrown.
-     * 
+     *
      * @param grouping
      *            (mandatory)
      * @param groupName

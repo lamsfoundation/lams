@@ -2,21 +2,21 @@
  * Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
  * =============================================================
  * License Information: http://lamsfoundation.org/licensing/lams/2.0/
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License version 2.0 
+ * it under the terms of the GNU General Public License version 2.0
  * as published by the Free Software Foundation.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301
  * USA
- * 
+ *
  * http://www.gnu.org/licenses/gpl.txt
  * ****************************************************************
  */
@@ -107,9 +107,10 @@ public class UniversalLoginModule implements LoginModule {
 	}
 
 	/*
-	If the login method completed successfully as indicated by
-	loginOK == true, this method adds the identity value to the subject's principals set. It also adds the members of
-	each Group returned by getRoleSets() to the subject's principals Set.
+	 * If the login method completed successfully as indicated by
+	 * loginOK == true, this method adds the identity value to the subject's principals set. It also adds the
+	 * members of
+	 * each Group returned by getRoleSets() to the subject's principals Set.
 	 */
 	Set<Principal> principals = subject.getPrincipals();
 	principals.add(identity);
@@ -130,7 +131,7 @@ public class UniversalLoginModule implements LoginModule {
 
     /**
      * Method to abort the authentication process (phase 2).
-     * 
+     *
      * @return true alaways
      */
     @Override
@@ -141,7 +142,7 @@ public class UniversalLoginModule implements LoginModule {
 
     /**
      * Remove the user identity and roles added to the Subject during commit.
-     * 
+     *
      * @return true always.
      */
     @Override
@@ -156,7 +157,7 @@ public class UniversalLoginModule implements LoginModule {
     /**
      * Find or create a Group with the given name. Subclasses should use this method to locate the 'Roles' group or
      * create additional types of groups.
-     * 
+     *
      * @return A named Group from the principals set.
      */
     private Group createGroup(String name, Set<Principal> principals) {
@@ -223,7 +224,7 @@ public class UniversalLoginModule implements LoginModule {
     /**
      * Called by login() to acquire the username and password strings for authentication. This method does no validation
      * of either.
-     * 
+     *
      * @return String[], [0] = username, [1] = password
      */
     private String[] getUsernameAndPassword() throws LoginException {
@@ -409,7 +410,7 @@ public class UniversalLoginModule implements LoginModule {
     /**
      * According to Lams's security policy, all the authorization must be done locally, in other word, through Lams
      * database or other "local"(logically) data resource.
-     * 
+     *
      * @return Group[] containing the sets of roles
      */
     private Group[] getRoleSets() throws LoginException {

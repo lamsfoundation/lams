@@ -2,21 +2,21 @@
  * Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
  * =============================================================
  * License Information: http://lamsfoundation.org/licensing/lams/2.0/
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License version 2.0 
+ * it under the terms of the GNU General Public License version 2.0
  * as published by the Free Software Foundation.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301
  * USA
- * 
+ *
  * http://www.gnu.org/licenses/gpl.txt
  * ***********************************************************************/
 /* $$Id$$ */
@@ -50,16 +50,16 @@ import org.lamsfoundation.lams.usermanagement.User;
  * Holds data that describes the Users progress through a lesson. It records the
  * exact position that a learner is in regarding a lesson.
  * </p>
- * 
+ *
  * <p>
  * It also helps lams to rebuild the learner page and progress bar whenever an
  * unexpected error condition is identified.
  * </p>
- * 
+ *
  * @author Chris
  * @author Jacky Fang
  * @version 1.1
- * 
+ *
  */
 public class LearnerProgress implements Serializable {
     private static final long serialVersionUID = -7866830317967062822L;
@@ -175,11 +175,11 @@ public class LearnerProgress implements Serializable {
 
     /**
      * Chain constructor to create new learner progress with minimum data.
-     * 
+     *
      * @param user
-     *                the learner.
+     *            the learner.
      * @param lesson
-     *                the lesson that currently is running.
+     *            the lesson that currently is running.
      */
     public LearnerProgress(User user, Lesson lesson) {
 	this(null, user, lesson, new TreeMap<Activity, Date>(new ActivityOrderComparator()),
@@ -201,8 +201,8 @@ public class LearnerProgress implements Serializable {
     // Getters and Setters
     //---------------------------------------------------------------------
     /**
-     * 
-     * 
+     *
+     *
      */
     public Long getLearnerProgressId() {
 	return this.learnerProgressId;
@@ -213,7 +213,7 @@ public class LearnerProgress implements Serializable {
     }
 
     /**
-     * 
+     *
      */
     public User getUser() {
 	return this.user;
@@ -224,7 +224,7 @@ public class LearnerProgress implements Serializable {
     }
 
     /**
-     * 
+     *
      */
     public Lesson getLesson() {
 	return this.lesson;
@@ -235,8 +235,8 @@ public class LearnerProgress implements Serializable {
     }
 
     /**
-     * 
-     * 
+     *
+     *
      */
     public Map<Activity, Date> getAttemptedActivities() {
 	return this.attemptedActivities;
@@ -248,8 +248,8 @@ public class LearnerProgress implements Serializable {
     }
 
     /**
-     * 
-     * 
+     *
+     *
      */
     public Map<Activity, CompletedActivityProgress> getCompletedActivities() {
 
@@ -261,26 +261,31 @@ public class LearnerProgress implements Serializable {
 	this.completedActivities = completedActivities;
     }
 
+    @Override
     public String toString() {
 	return new ToStringBuilder(this).append("learnerProgressId", getLearnerProgressId()).toString();
     }
 
+    @Override
     public boolean equals(Object other) {
-	if ((this == other))
+	if ((this == other)) {
 	    return true;
-	if (!(other instanceof LearnerProgress))
+	}
+	if (!(other instanceof LearnerProgress)) {
 	    return false;
+	}
 	LearnerProgress castOther = (LearnerProgress) other;
 	return new EqualsBuilder().append(this.getLearnerProgressId(), castOther.getLearnerProgressId()).isEquals();
     }
 
+    @Override
     public int hashCode() {
 	return new HashCodeBuilder().append(getLearnerProgressId()).toHashCode();
     }
 
     /**
      * Getter for property currentActivity.
-     * 
+     *
      * @return Value of property currentActivity.
      */
     public Activity getCurrentActivity() {
@@ -289,9 +294,9 @@ public class LearnerProgress implements Serializable {
 
     /**
      * Setter for property currentActivity.
-     * 
+     *
      * @param currentActivity
-     *                New value of property currentActivity.
+     *            New value of property currentActivity.
      */
     public void setCurrentActivity(Activity currentActivity) {
 	this.currentActivity = currentActivity;
@@ -299,9 +304,9 @@ public class LearnerProgress implements Serializable {
 
     /**
      * Gives the progress state of the specific activity.
-     * 
+     *
      * @param the
-     *                activity whose progress state is required.
+     *            activity whose progress state is required.
      * @return <code>ACTIVITY_COMPLETED</code>,
      *         <code>ACTIVITY_ATTEMPTED</code> or
      *         <code>ACTIVITY_NOT_ATTEMPTED</code>.
@@ -318,24 +323,24 @@ public class LearnerProgress implements Serializable {
 
     /**
      * Sets the progress state for an activity.
-     * 
+     *
      * If the activity is moving from completed to not completed, then the call
      * is recursive - it will reset all contained completed activities to the
      * input state.
-     * 
+     *
      * Only want to "take action" ie add/remove if the state has really changed.
      * Otherwise the recursive call to remove the completed flag will cause
      * unexpected side effects when a Completed activity is reset to Completed
-     * 
+     *
      * @param activity
-     *                whose progress is to be set
+     *            whose progress is to be set
      * @param state
-     *                one of <code>ACTIVITY_COMPLETED</code>,
-     *                <code>ACTIVITY_ATTEMPTED</code> or
-     *                <code>ACTIVITY_NOT_ATTEMPTED</code>.
+     *            one of <code>ACTIVITY_COMPLETED</code>,
+     *            <code>ACTIVITY_ATTEMPTED</code> or
+     *            <code>ACTIVITY_NOT_ATTEMPTED</code>.
      * @param activityDAO
-     *                needed to get any child activities correctly from
-     *                Hibernate (grr - shouldn't be required)
+     *            needed to get any child activities correctly from
+     *            Hibernate (grr - shouldn't be required)
      */
     public void setProgressState(Activity activity, byte state, IActivityDAO activityDAO) {
 	// remove activity from current set
@@ -347,15 +352,15 @@ public class LearnerProgress implements Serializable {
 
 	Date activityStartDate = attemptedActivities.get(activity);
 
-	if (oldState == LearnerProgress.ACTIVITY_NOT_ATTEMPTED)
+	if (oldState == LearnerProgress.ACTIVITY_NOT_ATTEMPTED) {
 	    ;
-	else if (oldState == LearnerProgress.ACTIVITY_ATTEMPTED) {
+	} else if (oldState == LearnerProgress.ACTIVITY_ATTEMPTED) {
 	    this.attemptedActivities.remove(activity);
 	} else if (oldState == LearnerProgress.ACTIVITY_COMPLETED) {
 	    this.completedActivities.remove(activity);
 	    if (activity.isComplexActivity()) {
-		ComplexActivity complex = (ComplexActivity) activityDAO.getActivityByActivityId(activity
-			.getActivityId(), ComplexActivity.class);
+		ComplexActivity complex = (ComplexActivity) activityDAO
+			.getActivityByActivityId(activity.getActivityId(), ComplexActivity.class);
 		Iterator iter = complex.getActivities().iterator();
 		while (iter.hasNext()) {
 		    Activity child = (Activity) iter.next();
@@ -365,12 +370,13 @@ public class LearnerProgress implements Serializable {
 	}
 
 	// add activity to new set
-	if (state == LearnerProgress.ACTIVITY_NOT_ATTEMPTED)
+	if (state == LearnerProgress.ACTIVITY_NOT_ATTEMPTED) {
 	    ;
-	else if (state == LearnerProgress.ACTIVITY_ATTEMPTED) {
+	} else if (state == LearnerProgress.ACTIVITY_ATTEMPTED) {
 	    this.attemptedActivities.put(activity, new Date());
 	} else if (state == LearnerProgress.ACTIVITY_COMPLETED) {
-	    this.completedActivities.put(activity, new CompletedActivityProgress(this, activity, activityStartDate, new Date()));
+	    this.completedActivities.put(activity,
+		    new CompletedActivityProgress(this, activity, activityStartDate, new Date()));
 	}
     }
 
@@ -385,7 +391,7 @@ public class LearnerProgress implements Serializable {
 
     /**
      * The "real" value for lessonComplete.
-     * 
+     *
      * @return LESSON_NOT_COMPLETE, LESSON_END_OF_DESIGN_COMPLETE,
      *         LESSON_IN_DESIGN_COMPLETE
      */
@@ -395,9 +401,9 @@ public class LearnerProgress implements Serializable {
 
     /**
      * Setter for property lessonComplete.
-     * 
+     *
      * @param lessonComplete
-     *                New value of property lessonComplete.
+     *            New value of property lessonComplete.
      */
     public void setLessonComplete(Byte lessonComplete) {
 	this.lessonComplete = lessonComplete;
@@ -405,7 +411,7 @@ public class LearnerProgress implements Serializable {
 
     /**
      * Getter for property nextActivity.
-     * 
+     *
      * @return Value of property nextActivity.
      */
     public Activity getNextActivity() {
@@ -415,9 +421,9 @@ public class LearnerProgress implements Serializable {
 
     /**
      * Setter for property nextActivity.
-     * 
+     *
      * @param nextActivity
-     *                New value of property nextActivity.
+     *            New value of property nextActivity.
      */
     public void setNextActivity(Activity nextActivity) {
 
@@ -433,7 +439,7 @@ public class LearnerProgress implements Serializable {
 
     /**
      * @param previousActivity
-     *                The previousActivity to set.
+     *            The previousActivity to set.
      */
     public void setPreviousActivity(Activity previousActivity) {
 	this.previousActivity = previousActivity;
@@ -448,7 +454,7 @@ public class LearnerProgress implements Serializable {
 
     /**
      * @param isParallelWaiting
-     *                The isParallelWaiting to set.
+     *            The isParallelWaiting to set.
      */
     public void setParallelWaiting(byte parallelWaiting) {
 	this.parallelWaiting = parallelWaiting;
@@ -463,7 +469,7 @@ public class LearnerProgress implements Serializable {
 
     /**
      * @param completedActivitiesList
-     *                The currentCompletedActivitiesList to set.
+     *            The currentCompletedActivitiesList to set.
      */
     public void setCurrentCompletedActivitiesList(List completedActivitiesList) {
 	this.currentCompletedActivitiesList = new LinkedList();
@@ -479,7 +485,7 @@ public class LearnerProgress implements Serializable {
 
     /**
      * @param isRestarting
-     *                The isRestarting to set.
+     *            The isRestarting to set.
      */
     public void setRestarting(boolean restarting) {
 	this.restarting = restarting;
@@ -495,16 +501,16 @@ public class LearnerProgress implements Serializable {
 
 	return new LearnerProgressDTO(this.lesson.getLessonId(), this.lesson.getLessonName(), this.user.getLogin(),
 		this.user.getLastName(), this.user.getFirstName(), this.user.getUserId(),
-		this.currentActivity != null ? this.currentActivity.getActivityId() : null, this
-			.createIdArrayFrom(this.attemptedActivities.keySet()), this
-			.createIdArrayFrom(this.completedActivities.keySet()), isComplete());
+		this.currentActivity != null ? this.currentActivity.getActivityId() : null,
+		this.createIdArrayFrom(this.attemptedActivities.keySet()),
+		this.createIdArrayFrom(this.completedActivities.keySet()), isComplete());
     }
 
     public LearnerProgressCompletedDTO getLearnerProgressCompletedData() {
-	return new LearnerProgressCompletedDTO(this.lesson.getLessonId(), this.lesson.getLessonName(), this.user
-		.getLogin(), this.user.getLastName(), this.user.getFirstName(), this.user.getUserId(),
-		createCompletedActivityArrayFromMap(this.completedActivities), isComplete(), this.lesson
-			.getStartDateTime().getTime(), this.startDate.getTime());
+	return new LearnerProgressCompletedDTO(this.lesson.getLessonId(), this.lesson.getLessonName(),
+		this.user.getLogin(), this.user.getLastName(), this.user.getFirstName(), this.user.getUserId(),
+		createCompletedActivityArrayFromMap(this.completedActivities), isComplete(),
+		this.lesson.getStartDateTime().getTime(), this.startDate.getTime());
 
     }
 
@@ -513,13 +519,14 @@ public class LearnerProgress implements Serializable {
     //---------------------------------------------------------------------
     /**
      * Extract the Id from activities and set them into an array.
-     * 
+     *
      * @param activities
-     *                the activities that is being used to create the array.
+     *            the activities that is being used to create the array.
      */
     private Long[] createIdArrayFrom(Set activities) {
-	if (activities == null)
+	if (activities == null) {
 	    throw new IllegalArgumentException("Fail to create id array" + " from null activity set");
+	}
 
 	ArrayList<Long> activitiesIds = new ArrayList<Long>();
 	for (Iterator i = activities.iterator(); i.hasNext();) {
@@ -527,7 +534,7 @@ public class LearnerProgress implements Serializable {
 	    activitiesIds.add(activity.getActivityId());
 	}
 
-	return (Long[]) activitiesIds.toArray(new Long[activitiesIds.size()]);
+	return activitiesIds.toArray(new Long[activitiesIds.size()]);
     }
 
     //---------------------------------------------------------------------
@@ -536,30 +543,30 @@ public class LearnerProgress implements Serializable {
 
     private CompletedActivityDTO[] createCompletedActivityArrayFromMap(
 	    Map<Activity, CompletedActivityProgress> completedActivityProgs) {
-	if (completedActivityProgs == null)
+	if (completedActivityProgs == null) {
 	    throw new IllegalArgumentException("Fail to create id array" + " from null activity set");
+	}
 
 	ArrayList<CompletedActivityDTO> activitiesCompleted = new ArrayList<CompletedActivityDTO>();
-	
-	for (Entry<Activity, CompletedActivityProgress> ent : completedActivityProgs.entrySet() ) {
+
+	for (Entry<Activity, CompletedActivityProgress> ent : completedActivityProgs.entrySet()) {
 	    Activity activity = ent.getKey();
 	    CompletedActivityProgress compProg = ent.getValue();
-	    
+
 	    if (compProg != null) {
 		Date end = compProg.getFinishDate();
 		Date start = compProg.getStartDate();
-			if (end != null && start != null && startDate != null) {
-			    Long completedTime = end.getTime() - startDate.getTime();
-			    Long startTime = start.getTime() - startDate.getTime();
-			    activitiesCompleted.add(new CompletedActivityDTO(activity, startTime, completedTime));
-			}
+		if (end != null && start != null && startDate != null) {
+		    Long completedTime = end.getTime() - startDate.getTime();
+		    Long startTime = start.getTime() - startDate.getTime();
+		    activitiesCompleted.add(new CompletedActivityDTO(activity, startTime, completedTime));
+		}
 	    }
 	}
 
-	return (CompletedActivityDTO[]) activitiesCompleted
-		.toArray(new CompletedActivityDTO[activitiesCompleted.size()]);
+	return activitiesCompleted.toArray(new CompletedActivityDTO[activitiesCompleted.size()]);
     }
-    
+
     public Date getFinishDate() {
 	return finishDate;
     }

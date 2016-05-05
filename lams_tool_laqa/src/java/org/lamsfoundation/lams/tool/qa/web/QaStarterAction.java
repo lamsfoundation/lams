@@ -2,21 +2,21 @@
  * Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
  * =============================================================
  * License Information: http://lamsfoundation.org/licensing/lams/2.0/
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301
  * USA
- * 
+ *
  * http://www.gnu.org/licenses/gpl.txt
  * ****************************************************************
  */
@@ -64,8 +64,8 @@ import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.lamsfoundation.lams.web.util.SessionMap;
 
 /**
- * Initializes the tool's authoring mode  
- * 
+ * Initializes the tool's authoring mode
+ *
  * @author Ozgur Demirtas
  */
 public class QaStarterAction extends Action implements QaAppConstants {
@@ -129,7 +129,7 @@ public class QaStarterAction extends Action implements QaAppConstants {
 	}
 
 	prepareDTOandForm(request, qaAuthoringForm, qaContent, qaService, qaGeneralAuthoringDTO, sessionMap);
-	
+
 	ToolAccessMode mode = getAccessMode(request);
 	// request is from monitoring module
 	if (mode.isTeacher()) {
@@ -140,16 +140,16 @@ public class QaStarterAction extends Action implements QaAppConstants {
 	SortedSet<QaCondition> conditionList = getQaConditionList(sessionMap);
 	conditionList.clear();
 	conditionList.addAll(qaContent.getConditions());
-	
+
 	qaGeneralAuthoringDTO.setAllowRichEditor(qaContent.isAllowRichEditor());
 	qaAuthoringForm.setAllowRichEditor(qaContent.isAllowRichEditor());
-	
+
 	qaGeneralAuthoringDTO.setUseSelectLeaderToolOuput(qaContent.isUseSelectLeaderToolOuput());
 	qaAuthoringForm.setUseSelectLeaderToolOuput(qaContent.isUseSelectLeaderToolOuput());
-	
+
 	sessionMap.put(QaAppConstants.ATTR_QA_AUTHORING_FORM, qaAuthoringForm);
 	request.getSession().setAttribute(sessionMap.getSessionID(), sessionMap);
-	
+
 	// get rating criterias from DB
 	List<RatingCriteria> ratingCriterias = qaService.getRatingCriterias(qaContent.getQaContentId());
 	sessionMap.put(AttributeNames.ATTR_RATING_CRITERIAS, ratingCriterias);
@@ -161,7 +161,7 @@ public class QaStarterAction extends Action implements QaAppConstants {
 
     /**
      * retrives the existing content information from the db and prepares the data for presentation purposes.
-     * 
+     *
      * @param request
      * @param mapping
      * @param qaAuthoringForm
@@ -230,12 +230,12 @@ public class QaStarterAction extends Action implements QaAppConstants {
 	    }
 	}
 	sessionMap.put(QaAppConstants.ATTR_CONDITION_SET, conditionSet);
-	
+
 	List<QaQuestionDTO> listDeletedQuestionDTOs = new ArrayList<QaQuestionDTO>();
 	sessionMap.put(QaAppConstants.LIST_DELETED_QUESTION_DTOS, listDeletedQuestionDTOs);
 
 	qaAuthoringForm.resetUserAction();
-	
+
 	return qaContent;
     }
 
@@ -244,14 +244,14 @@ public class QaStarterAction extends Action implements QaAppConstants {
      * The default tool content id and other depending content ids are obtained
      * in this method. if all the default content has been setup properly the
      * method persists DEFAULT_CONTENT_ID in the session.
-     * 
+     *
      * @param request
      * @param mapping
      * @return ActionForward
      */
     public boolean validateDefaultContent(HttpServletRequest request, ActionMapping mapping, IQaService qaService,
 	    QaGeneralAuthoringDTO qaGeneralAuthoringDTO, QaAuthoringForm qaAuthoringForm) {
-	
+
 	/*
 	 * retrieve the default content id based on tool signature
 	 */
@@ -279,7 +279,7 @@ public class QaStarterAction extends Action implements QaAppConstants {
 		persistError(request, "error.defaultContent.notSetup");
 		return false;
 	    }
-	    
+
 	} catch (Exception e) {
 	    QaStarterAction.logger.error("Exception occured: No default question content");
 	    persistError(request, "error.defaultContent.notSetup");
@@ -291,7 +291,7 @@ public class QaStarterAction extends Action implements QaAppConstants {
 
     /**
      * persists error messages to request scope
-     * 
+     *
      * @param request
      * @param message
      */
@@ -309,10 +309,10 @@ public class QaStarterAction extends Action implements QaAppConstants {
 	}
 	return list;
     }
-    
+
     /**
      * Get ToolAccessMode from HttpRequest parameters. Default value is AUTHOR mode.
-     * 
+     *
      * @param request
      * @return
      */

@@ -2,21 +2,21 @@
  * Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
  * =============================================================
  * License Information: http://lamsfoundation.org/licensing/lams/2.0/
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License version 2.0
  * as published by the Free Software Foundation.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301
  * USA
- * 
+ *
  * http://www.gnu.org/licenses/gpl.txt
  * ***********************************************************************/
 
@@ -49,18 +49,22 @@ public class VoteContentDAO extends LAMSBaseDAO implements IVoteContentDAO {
     private static final String LOAD_VOTE_BY_SESSION = "select vote from VoteContent vote left join fetch "
 	    + "vote.voteSessions session where session.voteSessionId=:sessionId";
 
+    @Override
     public VoteContent getVoteContentByUID(Long uid) {
 	return (VoteContent) this.getSession().get(VoteContent.class, uid);
     }
 
+    @Override
     public void saveOrUpdateVote(VoteContent vote) {
 	getSessionFactory().getCurrentSession().setFlushMode(FlushMode.AUTO);
 	this.getSession().saveOrUpdate(vote);
     }
 
+    @Override
     public VoteContent getVoteContentByContentId(Long voteContentId) {
 	String query = "from VoteContent as vote where vote.voteContentId = ?";
-	List list = getSessionFactory().getCurrentSession().createQuery(query).setLong(0, voteContentId.longValue()).list();
+	List list = getSessionFactory().getCurrentSession().createQuery(query).setLong(0, voteContentId.longValue())
+		.list();
 
 	if (list != null && list.size() > 0) {
 	    VoteContent vote = (VoteContent) list.get(0);
@@ -69,21 +73,25 @@ public class VoteContentDAO extends LAMSBaseDAO implements IVoteContentDAO {
 	return null;
     }
 
-	public VoteContent getVoteContentBySession(final Long voteSessionId) {
-		return (VoteContent) getSession().createQuery(VoteContentDAO.LOAD_VOTE_BY_SESSION)
-				.setLong("sessionId", voteSessionId.longValue()).uniqueResult();
-	}
+    @Override
+    public VoteContent getVoteContentBySession(final Long voteSessionId) {
+	return (VoteContent) getSession().createQuery(VoteContentDAO.LOAD_VOTE_BY_SESSION)
+		.setLong("sessionId", voteSessionId.longValue()).uniqueResult();
+    }
 
+    @Override
     public void saveVoteContent(VoteContent voteContent) {
 	getSessionFactory().getCurrentSession().setFlushMode(FlushMode.AUTO);
 	this.getSession().saveOrUpdate(voteContent);
     }
 
+    @Override
     public void updateVoteContent(VoteContent voteContent) {
 	getSessionFactory().getCurrentSession().setFlushMode(FlushMode.AUTO);
 	this.getSession().update(voteContent);
     }
 
+    @Override
     public void removeVoteById(Long voteContentId) {
 	if (voteContentId != null) {
 	    List list = getSessionFactory().getCurrentSession().createQuery(VoteContentDAO.FIND_VOTE_CONTENT)
@@ -98,10 +106,12 @@ public class VoteContentDAO extends LAMSBaseDAO implements IVoteContentDAO {
 	}
     }
 
+    @Override
     public void removeVoteSessions(VoteContent voteContent) {
 	deleteAll(voteContent.getVoteSessions());
     }
 
+    @Override
     public void addVoteSession(Long voteContentId, VoteSession voteSession) {
 	VoteContent content = getVoteContentByContentId(voteContentId);
 	voteSession.setVoteContent(content);
@@ -111,22 +121,24 @@ public class VoteContentDAO extends LAMSBaseDAO implements IVoteContentDAO {
 
     }
 
+    @Override
     public void removeQuestionsFromCache(VoteContent voteContent) {
 	if (voteContent != null) {
 	    for (VoteQueContent question : (Set<VoteQueContent>) voteContent.getVoteQueContents()) {
-	    	getSession().evict(question);
+		getSession().evict(question);
 	    }
 	}
     }
-    
+
+    @Override
     public void removeVoteContentFromCache(VoteContent voteContent) {
 	if (voteContent != null) {
-		getSession().evict(voteContent);
+	    getSession().evict(voteContent);
 	}
     }
 
     @Override
     public void delete(Object object) {
-    	getSession().delete(object);
+	getSession().delete(object);
     }
 }

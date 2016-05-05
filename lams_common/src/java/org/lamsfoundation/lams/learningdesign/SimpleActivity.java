@@ -2,21 +2,21 @@
  * Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
  * =============================================================
  * License Information: http://lamsfoundation.org/licensing/lams/2.0/
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License version 2.0 
+ * it under the terms of the GNU General Public License version 2.0
  * as published by the Free Software Foundation.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301
  * USA
- * 
+ *
  * http://www.gnu.org/licenses/gpl.txt
  * ****************************************************************
  */
@@ -38,11 +38,11 @@ public abstract class SimpleActivity extends Activity implements Serializable {
     protected SimpleActivityStrategy simpleActivityStrategy;
 
     /** full constructor */
-    public SimpleActivity(Long activityId, Integer id, String description, String title, Integer xcoord,
-	    Integer ycoord, Integer orderId, Date createDateTime, LearningLibrary learningLibrary,
-	    Activity parentActivity, Activity libraryActivity, Integer parentUIID, LearningDesign learningDesign,
-	    Grouping grouping, Integer activityTypeId, Transition transitionTo, Transition transitionFrom,
-	    String languageFile, Boolean stopAfterActivity, Set inputActivities, Set branchActivityEntries) {
+    public SimpleActivity(Long activityId, Integer id, String description, String title, Integer xcoord, Integer ycoord,
+	    Integer orderId, Date createDateTime, LearningLibrary learningLibrary, Activity parentActivity,
+	    Activity libraryActivity, Integer parentUIID, LearningDesign learningDesign, Grouping grouping,
+	    Integer activityTypeId, Transition transitionTo, Transition transitionFrom, String languageFile,
+	    Boolean stopAfterActivity, Set inputActivities, Set branchActivityEntries) {
 	super(activityId, id, description, title, xcoord, ycoord, orderId, createDateTime, learningLibrary,
 		parentActivity, libraryActivity, parentUIID, learningDesign, grouping, activityTypeId, transitionTo,
 		transitionFrom, languageFile, stopAfterActivity, inputActivities, branchActivityEntries);
@@ -63,6 +63,7 @@ public abstract class SimpleActivity extends Activity implements Serializable {
 		transitionTo, transitionFrom);
     }
 
+    @Override
     public String toString() {
 	return new ToStringBuilder(this).append("activityId", getActivityId()).toString();
     }

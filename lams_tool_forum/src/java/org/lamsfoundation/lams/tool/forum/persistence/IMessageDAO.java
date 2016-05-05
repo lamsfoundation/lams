@@ -11,12 +11,12 @@ public interface IMessageDAO extends IBaseDAO {
     void update(Message message);
 
     Message getByIdForUpdate(Long messageId);
-    
+
     Message getById(Long messageId);
 
     /**
      * Get all root (first level) topics in a special Session.
-     * 
+     *
      * @param sessionId
      * @return
      */
@@ -24,7 +24,7 @@ public interface IMessageDAO extends IBaseDAO {
 
     /**
      * Get all message posted by author role in a special forum.
-     * 
+     *
      * @param forumUid
      * @return
      */
@@ -34,7 +34,7 @@ public interface IMessageDAO extends IBaseDAO {
 
     /**
      * Get all children message from the given parent topic ID.
-     * 
+     *
      * @param parentId
      * @return
      */
@@ -42,7 +42,7 @@ public interface IMessageDAO extends IBaseDAO {
 
     /**
      * Get all messages according to special user and session.
-     * 
+     *
      * @param userUid
      * @param sessionId
      * @return
@@ -51,7 +51,7 @@ public interface IMessageDAO extends IBaseDAO {
 
     /**
      * Get all messages according to special session.
-     * 
+     *
      * @param sessionId
      * @return
      */
@@ -59,7 +59,7 @@ public interface IMessageDAO extends IBaseDAO {
 
     /**
      * Return how many post from this user and session. DOES NOT include posts from author.
-     * 
+     *
      * @param userID
      * @param sessionId
      * @return

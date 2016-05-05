@@ -37,7 +37,7 @@ public class GBActivityGridRowDTO extends GradebookGridRowDTO {
 
     public static final String VIEW_USER = "userView";
     public static final String VIEW_ACTIVITY = "activityView";
-    
+
     private String competences;
 
     // Properties for user view
@@ -49,11 +49,11 @@ public class GBActivityGridRowDTO extends GradebookGridRowDTO {
     private Long groupId;
 
     public Long getGroupId() {
-        return groupId;
+	return groupId;
     }
 
     public void setGroupId(Long groupId) {
-        this.groupId = groupId;
+	this.groupId = groupId;
     }
 
     public GBActivityGridRowDTO(ToolActivity activity, String groupName, Long groupId) {
@@ -61,7 +61,7 @@ public class GBActivityGridRowDTO extends GradebookGridRowDTO {
 	if (groupName != null && groupId != null) {
 	    // Need to make the id unique, so appending the group id for this row
 	    this.id = activity.getActivityId().toString() + "_" + groupId.toString();
-	    
+
 	    this.groupId = groupId;
 	    // If grouped acitivty, append group name
 	    this.rowName = StringEscapeUtils.escapeHtml(activity.getTitle()) + " (" + groupName + ")";
@@ -70,7 +70,7 @@ public class GBActivityGridRowDTO extends GradebookGridRowDTO {
 
 	    this.rowName = StringEscapeUtils.escapeHtml(activity.getTitle());
 	}
-	
+
 	//Constructs the competences for this activity.
 	Set<CompetenceMapping> competenceMappings = activity.getCompetenceMappings();
 	String competenceMappingsStr = "";
@@ -95,7 +95,7 @@ public class GBActivityGridRowDTO extends GradebookGridRowDTO {
 
 	if (view == GBGridView.MON_USER) {
 	    ret.add(marksAvailable != null ? marksAvailable.toString() : "");
-	    
+
 	    if (activityUrl != null && activityUrl.length() != 0) {
 		ret.add("<a href='javascript:launchPopup(\"" + activityUrl + "\",\"" + rowName + "\",796,570)'>"
 			+ rowName + "</a>");
@@ -108,7 +108,7 @@ public class GBActivityGridRowDTO extends GradebookGridRowDTO {
 	    ret.add(mark != null ? GradebookUtil.niceFormatting(mark) : CELL_EMPTY);
 
 	} else if (view == GBGridView.MON_ACTIVITY) {
-	    
+
 	    ret.add(groupId != null ? groupId.toString() : "");
 
 	    if (monitorUrl != null && monitorUrl.length() != 0) {
@@ -117,22 +117,22 @@ public class GBActivityGridRowDTO extends GradebookGridRowDTO {
 	    } else {
 		ret.add(rowName);
 	    }
-	    
+
 	    ret.add((averageTimeTaken != null) ? convertTimeToString(averageTimeTaken) : CELL_EMPTY);
 	    ret.add(competences);
-	    ret.add(averageMark != null ? GradebookUtil.niceFormatting(averageMark) : CELL_EMPTY); 
-	    
+	    ret.add(averageMark != null ? GradebookUtil.niceFormatting(averageMark) : CELL_EMPTY);
+
 	} else if (view == GBGridView.LRN_ACTIVITY) {
 	    ret.add(rowName);
 	    ret.add(status);
 	    ret.add(feedback);
 	    ret.add((averageTimeTaken != null) ? convertTimeToString(averageTimeTaken) : CELL_EMPTY);
 	    ret.add((timeTaken != null) ? convertTimeToString(timeTaken) : CELL_EMPTY);
-	    ret.add(averageMark != null ? GradebookUtil.niceFormatting(averageMark) : CELL_EMPTY); 
-	    ret.add(mark != null ? GradebookUtil.niceFormatting(mark) : CELL_EMPTY);  
-	    
+	    ret.add(averageMark != null ? GradebookUtil.niceFormatting(averageMark) : CELL_EMPTY);
+	    ret.add(mark != null ? GradebookUtil.niceFormatting(mark) : CELL_EMPTY);
+
 	}
-	
+
 	return ret;
     }
 
@@ -161,10 +161,10 @@ public class GBActivityGridRowDTO extends GradebookGridRowDTO {
     }
 
     public Date getStartDate() {
-        return startDate;
+	return startDate;
     }
 
     public void setStartDate(Date startDate) {
-        this.startDate = startDate;
+	this.startDate = startDate;
     }
 }

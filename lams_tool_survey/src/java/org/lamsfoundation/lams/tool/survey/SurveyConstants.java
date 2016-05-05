@@ -2,21 +2,21 @@
  * Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
  * =============================================================
  * License Information: http://lamsfoundation.org/licensing/lams/2.0/
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301
  * USA
- * 
+ *
  * http://www.gnu.org/licenses/gpl.txt
  * ****************************************************************
  */
@@ -45,11 +45,11 @@ public class SurveyConstants {
     public static final String DEFINE_LATER = "definelater";
 
     public static final String FORWARD_RESULT = "result";
-    
+
     // for submission deadline
-    
+
     public static final String ATTR_SUBMISSION_DEADLINE = "submissionDeadline";
-    
+
     public static final String ATTR_IS_SUBMISSION_DEADLINE_PASSED = "isSubmissionDeadlinePassed";
 
     // for parameters' name
@@ -62,7 +62,7 @@ public class SurveyConstants {
     public static final String PARAM_TITLE = "title";
 
     public static final String ATTR_USER_UID = "userUid";
-    
+
     public static final String ATTR_USER = "user";
 
     public static final String ATTR_USER_NAME = "userName";
@@ -145,7 +145,7 @@ public class SurveyConstants {
     public static final String FORWARD_CHOICE_QUESTION = "question";
 
     public static final String ATTR_SHOW_ON_ONE_PAGE = "showOnOnePage";
-    
+
     public static final String ATTR_SHOW_OTHER_USERS_ANSWERS = "showOtherUsersAnswers";
 
     public static final String PREFIX_QUESTION_CHOICE = "optionChoice";
@@ -165,11 +165,11 @@ public class SurveyConstants {
     public static final String ATTR_SURVEY = "survey";
 
     public static final String ATTR_USER_FINISHED = "userFinished";
-    
+
     public static final String ATTR_IS_GROUPED_ACTIVITY = "isGroupedActivity";
-    
+
     public static final String ATTR_COUNT_FINISHED_USERS = "countFinishedUser";
-    
+
     public static final String ATTR_REFLECTION = "notebookEntry";
 
     public static final int SORT_BY_DEAFAULT = 0;
@@ -177,7 +177,7 @@ public class SurveyConstants {
     public static final int SORT_BY_ANSWER_DESC = 2;
     public static final int SORT_BY_NAME_ASC = 3;
     public static final int SORT_BY_NAME_DESC = 4;
-    
+
     // POSITION
     public static int POSITION_INSIDE = 0;
 

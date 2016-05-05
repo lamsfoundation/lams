@@ -46,7 +46,7 @@ import io.undertow.servlet.spec.HttpSessionImpl;
 
 /**
  * Allows access to LAMS WARs when an user logs in.
- * 
+ *
  * @author Marcin Cieslak
  *
  */
@@ -72,7 +72,7 @@ public class SsoHandler implements ServletExtension {
 		    SsoHandler.setJvmRoute(request);
 		}
 
-		// recreate session here in case it was invalidated in login.jsp by sysadmin's LoginAs 
+		// recreate session here in case it was invalidated in login.jsp by sysadmin's LoginAs
 		HttpSession session = request.getSession();
 
 		// LoginRequestServlet (integrations) and LoginAsAction (sysadmin) set this parameter
@@ -81,8 +81,10 @@ public class SsoHandler implements ServletExtension {
 		    SsoHandler.handleRedirectBack(context, redirectURL);
 		}
 
-		/* Fetch UserDTO before completing request so putting it later in session is done ASAP
-		 * Response is sent in another thread and if UserDTO is not present in session when browser completes redirect,
+		/*
+		 * Fetch UserDTO before completing request so putting it later in session is done ASAP
+		 * Response is sent in another thread and if UserDTO is not present in session when browser completes
+		 * redirect,
 		 * it results in error. Winning this race is the easiest option.
 		 */
 		UserDTO userDTO = null;

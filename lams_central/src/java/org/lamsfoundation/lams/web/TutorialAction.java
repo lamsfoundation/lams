@@ -46,7 +46,7 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
 
 /**
  * Manages tutorial videos - the ones displayed on top of pages, explaining how to use certain features of LAMS.
- * 
+ *
  *
  */
 public class TutorialAction extends DispatchAction {
@@ -56,7 +56,7 @@ public class TutorialAction extends DispatchAction {
 
     /**
      * Invoked when an user chose not to show a certain video again.
-     * 
+     *
      * @param mapping
      * @param form
      * @param req
@@ -82,7 +82,7 @@ public class TutorialAction extends DispatchAction {
 
     /**
      * Invoked when an user asked to show a certain video again.
-     * 
+     *
      * @param mapping
      * @param form
      * @param req
@@ -108,7 +108,7 @@ public class TutorialAction extends DispatchAction {
 
     /**
      * Gets the value for "Do not show again" checkbox for a cerain video.
-     * 
+     *
      * @param mapping
      * @param form
      * @param req
@@ -136,7 +136,7 @@ public class TutorialAction extends DispatchAction {
     /**
      * Turns off tutorials. Same as going to user profile and turning them off. Used for dialog displayed after user's
      * first login.
-     * 
+     *
      * @param mapping
      * @param form
      * @param req
@@ -161,8 +161,8 @@ public class TutorialAction extends DispatchAction {
 
     private IUserManagementService getService() {
 	if (TutorialAction.service == null) {
-	    WebApplicationContext ctx = WebApplicationContextUtils.getRequiredWebApplicationContext(getServlet()
-		    .getServletContext());
+	    WebApplicationContext ctx = WebApplicationContextUtils
+		    .getRequiredWebApplicationContext(getServlet().getServletContext());
 	    TutorialAction.service = (IUserManagementService) ctx.getBean("userManagementService");
 	}
 	return TutorialAction.service;

@@ -2,21 +2,21 @@
  * Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
  * =============================================================
  * License Information: http://lamsfoundation.org/licensing/lams/2.0/
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301
  * USA
- * 
+ *
  * http://www.gnu.org/licenses/gpl.txt
  * ***********************************************************************/
 /* $$Id$$ */
@@ -49,7 +49,7 @@ import org.lamsfoundation.lams.web.util.AttributeNames;
 
 /**
  * Keeps all operations needed for Authoring mode.
- * 
+ *
  * @author Ozgur Demirtas
  */
 public class AuthoringUtil implements McAppConstants {
@@ -98,7 +98,7 @@ public class AuthoringUtil implements McAppConstants {
 	int queIndex = 0;
 	Iterator<McQuestionDTO> iter = questionDTOs.iterator();
 	while (iter.hasNext()) {
-	    McQuestionDTO questionDto = (McQuestionDTO) iter.next();
+	    McQuestionDTO questionDto = iter.next();
 	    queIndex++;
 	    McQuestionDTO tempQuestion = new McQuestionDTO();
 
@@ -234,7 +234,7 @@ public class AuthoringUtil implements McAppConstants {
 	Iterator<McQuestionDTO> iter = questionDTOs.iterator();
 	int queIndex = 0;
 	while (iter.hasNext()) {
-	    McQuestionDTO questionDto = (McQuestionDTO) iter.next();
+	    McQuestionDTO questionDto = iter.next();
 
 	    queIndex++;
 	    mapQuestionContent.put(new Integer(queIndex).toString(), questionDto.getQuestion());
@@ -251,7 +251,7 @@ public class AuthoringUtil implements McAppConstants {
 	int queIndex = 0;
 	Iterator<McQuestionDTO> iter = questionDTOs.iterator();
 	while (iter.hasNext()) {
-	    McQuestionDTO questionDto = (McQuestionDTO) iter.next();
+	    McQuestionDTO questionDto = iter.next();
 
 	    String question = questionDto.getQuestion();
 
@@ -363,8 +363,8 @@ public class AuthoringUtil implements McAppConstants {
     /**
      * persisting content
      */
-    public static McContent saveOrUpdateMcContent(IMcService mcService, HttpServletRequest request,
-	    McContent mcContent, String strToolContentID) {
+    public static McContent saveOrUpdateMcContent(IMcService mcService, HttpServletRequest request, McContent mcContent,
+	    String strToolContentID) {
 	UserDTO toolUser = (UserDTO) SessionManager.getSession().getAttribute(AttributeNames.USER);
 
 	String richTextTitle = request.getParameter(McAppConstants.TITLE);
@@ -512,7 +512,7 @@ public class AuthoringUtil implements McAppConstants {
 	    intTotalMark = new Integer(totalMark).intValue();
 	}
 
-	Map passMarksMap = buildPassMarkMap(intTotalMark, false);
+	Map passMarksMap = AuthoringUtil.buildPassMarkMap(intTotalMark, false);
 	return passMarksMap;
     }
 
@@ -532,7 +532,7 @@ public class AuthoringUtil implements McAppConstants {
 
     /**
      * Map buildMarksMap()
-     * 
+     *
      * @return
      */
     public static Map buildMarksMap() {
@@ -546,7 +546,7 @@ public class AuthoringUtil implements McAppConstants {
 
     /**
      * Map buildCorrectMap()
-     * 
+     *
      * @return
      */
     public static Map buildCorrectMap() {

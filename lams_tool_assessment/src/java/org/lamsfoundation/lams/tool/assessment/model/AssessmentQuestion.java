@@ -2,21 +2,21 @@
  * Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
  * =============================================================
  * License Information: http://lamsfoundation.org/licensing/lams/2.0/
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301
  * USA
- * 
+ *
  * http://www.gnu.org/licenses/gpl.txt
  * ****************************************************************
  */
@@ -37,9 +37,9 @@ import org.lamsfoundation.lams.tool.assessment.util.SequencableComparator;
 
 /**
  * Assessment Question
- * 
+ *
  * @author Andrey Balan
- * 
+ *
  *
  */
 public class AssessmentQuestion implements Cloneable, Sequencable, Comparable {
@@ -135,18 +135,19 @@ public class AssessmentQuestion implements Cloneable, Sequencable, Comparable {
 	units = new TreeSet<AssessmentUnit>(new SequencableComparator());
     }
 
+    @Override
     public Object clone() {
 	AssessmentQuestion obj = null;
 	try {
 	    obj = (AssessmentQuestion) super.clone();
-	    ((AssessmentQuestion) obj).setUid(null);
+	    obj.setUid(null);
 
 	    // clone options
 	    if (options != null) {
 		Iterator<AssessmentQuestionOption> iter = options.iterator();
 		Set<AssessmentQuestionOption> set = new TreeSet<AssessmentQuestionOption>(new SequencableComparator());
 		while (iter.hasNext()) {
-		    AssessmentQuestionOption answerOption = (AssessmentQuestionOption) iter.next();
+		    AssessmentQuestionOption answerOption = iter.next();
 		    AssessmentQuestionOption newAnswerOption = (AssessmentQuestionOption) answerOption.clone();
 		    set.add(newAnswerOption);
 		}
@@ -158,7 +159,7 @@ public class AssessmentQuestion implements Cloneable, Sequencable, Comparable {
 		Iterator<AssessmentUnit> iter = units.iterator();
 		Set<AssessmentUnit> set = new TreeSet<AssessmentUnit>(new SequencableComparator());
 		while (iter.hasNext()) {
-		    AssessmentUnit unit = (AssessmentUnit) iter.next();
+		    AssessmentUnit unit = iter.next();
 		    AssessmentUnit newUnit = (AssessmentUnit) unit.clone();
 		    set.add(newUnit);
 		}
@@ -174,10 +175,12 @@ public class AssessmentQuestion implements Cloneable, Sequencable, Comparable {
 
     @Override
     public boolean equals(Object o) {
-	if (this == o)
+	if (this == o) {
 	    return true;
-	if (!(o instanceof AssessmentQuestion))
+	}
+	if (!(o instanceof AssessmentQuestion)) {
 	    return false;
+	}
 
 	final AssessmentQuestion genericEntity = (AssessmentQuestion) o;
 
@@ -189,7 +192,7 @@ public class AssessmentQuestion implements Cloneable, Sequencable, Comparable {
     public int compareTo(Object o) {
 	if ((o != null) && o instanceof AssessmentQuestion) {
 	    AssessmentQuestion anotherQuestion = (AssessmentQuestion) o;
-	    return (int) (sequenceId - anotherQuestion.getSequenceId());
+	    return sequenceId - anotherQuestion.getSequenceId();
 	} else {
 	    return 1;
 	}
@@ -262,30 +265,32 @@ public class AssessmentQuestion implements Cloneable, Sequencable, Comparable {
 
     /**
      * Returns image sequence number.
-     * 
+     *
      * @return image sequence number
-     * 
+     *
      *
      */
+    @Override
     public int getSequenceId() {
 	return sequenceId;
     }
 
     /**
      * Sets image sequence number.
-     * 
+     *
      * @param sequenceId
      *            image sequence number
      */
+    @Override
     public void setSequenceId(int sequenceId) {
 	this.sequenceId = sequenceId;
     }
 
     /**
      * Default grade set in author. To be used only in author
-     * 
      *
-     * 
+     *
+     *
      * @return
      */
     public int getDefaultGrade() {
@@ -470,7 +475,7 @@ public class AssessmentQuestion implements Cloneable, Sequencable, Comparable {
 
     /**
      *
-     * 
+     *
      * @return
      */
     public AssessmentUser getCreateBy() {
@@ -482,11 +487,11 @@ public class AssessmentQuestion implements Cloneable, Sequencable, Comparable {
     }
 
     /**
-     * 
      *
      *
      *
-     * 
+     *
+     *
      * @return a set of options to this AssessmentQuestion.
      */
     public Set<AssessmentQuestionOption> getOptions() {
@@ -502,11 +507,11 @@ public class AssessmentQuestion implements Cloneable, Sequencable, Comparable {
     }
 
     /**
-     * 
      *
      *
      *
-     * 
+     *
+     *
      * @return a set of units to this AssessmentQuestion.
      */
     public Set<AssessmentUnit> getUnits() {
@@ -523,9 +528,9 @@ public class AssessmentQuestion implements Cloneable, Sequencable, Comparable {
 
     /**
      * maxWordsLimit set in author. Used only for essay type of questions
-     * 
      *
-     * 
+     *
+     *
      * @return
      */
     public int getMaxWordsLimit() {
@@ -542,9 +547,9 @@ public class AssessmentQuestion implements Cloneable, Sequencable, Comparable {
 
     /**
      * minWordsLimit set in author. Used only for essay type of questions
-     * 
      *
-     * 
+     *
+     *
      * @return
      */
     public int getMinWordsLimit() {
@@ -667,10 +672,10 @@ public class AssessmentQuestion implements Cloneable, Sequencable, Comparable {
     }
 
     public float getAnswerTotalGrade() {
-        return answerTotalGrade;
+	return answerTotalGrade;
     }
 
     public void setAnswerTotalGrade(float answerTotalGrade) {
-        this.answerTotalGrade = answerTotalGrade;
+	this.answerTotalGrade = answerTotalGrade;
     }
 }

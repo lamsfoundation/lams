@@ -18,30 +18,30 @@
  *
  * http://www.gnu.org/licenses/gpl.txt
  * ****************************************************************
- */ 
- 
-/* $Id$ */ 
-package org.lamsfoundation.lams.gradebook.dto.comparators; 
+ */
+
+/* $Id$ */
+package org.lamsfoundation.lams.gradebook.dto.comparators;
 
 import java.util.Comparator;
 
 import org.lamsfoundation.lams.gradebook.dto.GradebookGridRowDTO;
- 
+
 @SuppressWarnings("unchecked")
-public class GBTimeTakenComparator implements Comparator{
+public class GBTimeTakenComparator implements Comparator {
+    @Override
     public int compare(Object gradebookGridRow, Object anotherGradebookGridRow) {
 
 	if (gradebookGridRow instanceof GradebookGridRowDTO && anotherGradebookGridRow instanceof GradebookGridRowDTO) {
-	   
+
 	    Long timeTaken1 = ((GradebookGridRowDTO) gradebookGridRow).getTimeTaken();
 	    Long timeTaken2 = ((GradebookGridRowDTO) anotherGradebookGridRow).getTimeTaken();
-	    
+
 	    timeTaken1 = (timeTaken1 == null) ? 0 : timeTaken1;
 	    timeTaken2 = (timeTaken2 == null) ? 0 : timeTaken2;
-	    return new Double(timeTaken1 - timeTaken2).intValue();    
+	    return new Double(timeTaken1 - timeTaken2).intValue();
 	} else {
 	    return 0;
 	}
     }
 }
- 

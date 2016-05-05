@@ -17,9 +17,9 @@ import org.lamsfoundation.lams.util.Emailer;
 
 /**
  * Allows sending mail from the configured mail server.
- * 
+ *
  * @author Marcin Cieslak
- * 
+ *
  */
 public class DeliveryMethodMail extends AbstractDeliveryMethod {
     private static final Logger log = Logger.getLogger(DeliveryMethodMail.class);
@@ -75,6 +75,7 @@ public class DeliveryMethodMail extends AbstractDeliveryMethod {
 	}
     }
 
+    @Override
     protected boolean lastOperationFailed(Subscription subscription) {
 	return subscription.getLastOperationMessage() != null;
     }
@@ -85,12 +86,12 @@ public class DeliveryMethodMail extends AbstractDeliveryMethod {
 
     /**
      * Sends an email to the address provided by the admin.
-     * 
+     *
      * @param subject
      *            subject of the message
      * @param body
      *            text of the message
-     * 
+     *
      * @param isHtmlFormat
      *            whether the message is of HTML content-type or plain text
      * @throws UnsupportedEncodingException

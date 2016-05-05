@@ -2,21 +2,21 @@
  * Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
  * =============================================================
  * License Information: http://lamsfoundation.org/licensing/lams/2.0/
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License version 2.0 
+ * it under the terms of the GNU General Public License version 2.0
  * as published by the Free Software Foundation.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301
  * USA
- * 
+ *
  * http://www.gnu.org/licenses/gpl.txt
  * ****************************************************************
  */
@@ -25,9 +25,6 @@
 package org.lamsfoundation.lams.tool.forum.web.actions;
 
 import java.io.IOException;
-import java.text.DateFormat;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -69,7 +66,6 @@ import org.lamsfoundation.lams.tool.forum.persistence.ForumUser;
 import org.lamsfoundation.lams.tool.forum.persistence.Message;
 import org.lamsfoundation.lams.tool.forum.persistence.MessageSeq;
 import org.lamsfoundation.lams.tool.forum.persistence.PersistenceException;
-import org.lamsfoundation.lams.tool.forum.persistence.Timestamp;
 import org.lamsfoundation.lams.tool.forum.service.ForumServiceProxy;
 import org.lamsfoundation.lams.tool.forum.service.IForumService;
 import org.lamsfoundation.lams.tool.forum.util.ForumConstants;
@@ -78,9 +74,9 @@ import org.lamsfoundation.lams.tool.forum.web.forms.ReflectionForm;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.util.Configuration;
 import org.lamsfoundation.lams.util.ConfigurationKeys;
+import org.lamsfoundation.lams.util.DateUtil;
 import org.lamsfoundation.lams.util.FileValidatorUtil;
 import org.lamsfoundation.lams.util.WebUtil;
-import org.lamsfoundation.lams.util.DateUtil;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.lamsfoundation.lams.web.util.SessionMap;
@@ -169,9 +165,9 @@ public class LearningAction extends Action {
     // ==========================================================================================
     /**
      * Display root topics of a forum. This page will be the initial page of Learner page.
-     * 
+     *
      * @throws Exception
-     * 
+     *
      */
     private ActionForward viewForum(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) throws Exception {
@@ -348,7 +344,7 @@ public class LearningAction extends Action {
 
     /**
      * Learner click "finish" button in forum page, this method will turn on session status flag for this learner.
-     * 
+     *
      * @param mapping
      * @param form
      * @param request
@@ -402,7 +398,7 @@ public class LearningAction extends Action {
 
     /**
      * Submit reflection form input database.
-     * 
+     *
      * @param mapping
      * @param form
      * @param request
@@ -438,7 +434,7 @@ public class LearningAction extends Action {
 
     /**
      * Display empty reflection form.
-     * 
+     *
      * @param mapping
      * @param form
      * @param request
@@ -483,7 +479,7 @@ public class LearningAction extends Action {
     /**
      * Display the messages for a particular topic. The Topic will arranged by Tree structure and loaded thread by
      * thread (with paging).
-     * 
+     *
      * @param mapping
      * @param form
      * @param request
@@ -528,7 +524,7 @@ public class LearningAction extends Action {
 	updateMesssageFlag(msgDtoList);
 	request.setAttribute(ForumConstants.AUTHORING_TOPIC_THREAD, msgDtoList);
 
-	// check if we can still make posts in this topic 
+	// check if we can still make posts in this topic
 	int numOfPosts = forumService.getNumOfPostsByTopic(forumUser.getUserId(), rootTopicId);
 	boolean noMorePosts = forum.getMaximumReply() != 0 && numOfPosts >= forum.getMaximumReply()
 		&& !forum.isAllowNewTopic() ? Boolean.TRUE : Boolean.FALSE;
@@ -545,7 +541,7 @@ public class LearningAction extends Action {
     /**
      * Display the messages for a particular thread in a particular topic. Returns all messages for this thread - does
      * not need paging.
-     * 
+     *
      * @param mapping
      * @param form
      * @param request
@@ -573,7 +569,7 @@ public class LearningAction extends Action {
 	updateMesssageFlag(msgDtoList);
 	request.setAttribute(ForumConstants.AUTHORING_TOPIC_THREAD, msgDtoList);
 
-	// check if we can still make posts in this topic 
+	// check if we can still make posts in this topic
 	int numOfPosts = forumService.getNumOfPostsByTopic(forumUser.getUserId(), rootTopicId);
 	boolean noMorePosts = forum.getMaximumReply() != 0 && numOfPosts >= forum.getMaximumReply()
 		&& !forum.isAllowNewTopic() ? Boolean.TRUE : Boolean.FALSE;
@@ -592,7 +588,7 @@ public class LearningAction extends Action {
 
     /**
      * Display a single message.
-     * 
+     *
      * @param mapping
      * @param form
      * @param request
@@ -619,7 +615,7 @@ public class LearningAction extends Action {
 	updateMesssageFlag(msgDtoList);
 	request.setAttribute(ForumConstants.AUTHORING_TOPIC_THREAD, msgDtoList);
 
-	// check if we can still make posts in this topic 
+	// check if we can still make posts in this topic
 	int numOfPosts = forumService.getNumOfPostsByTopic(forumUser.getUserId(), rootTopicId);
 	boolean noMorePosts = forum.getMaximumReply() != 0 && numOfPosts >= forum.getMaximumReply()
 		&& !forum.isAllowNewTopic() ? Boolean.TRUE : Boolean.FALSE;
@@ -638,7 +634,7 @@ public class LearningAction extends Action {
 
     /**
      * Display empty page for a new topic in forum
-     * 
+     *
      * @param mapping
      * @param form
      * @param request
@@ -655,7 +651,7 @@ public class LearningAction extends Action {
 
     /**
      * Create a new root topic.
-     * 
+     *
      * @param mapping
      * @param form
      * @param request
@@ -715,7 +711,7 @@ public class LearningAction extends Action {
 
     /**
      * Display replay topic page. Message form subject will include parent topics same subject.
-     * 
+     *
      * @param mapping
      * @param form
      * @param request
@@ -768,7 +764,7 @@ public class LearningAction extends Action {
 
     /**
      * Create a replayed topic for a parent topic.
-     * 
+     *
      * @param mapping
      * @param form
      * @param request
@@ -821,7 +817,7 @@ public class LearningAction extends Action {
 
     /**
      * Create a replayed topic for a parent topic.
-     * 
+     *
      * @param mapping
      * @param form
      * @param request
@@ -882,7 +878,7 @@ public class LearningAction extends Action {
 
     /**
      * Display a editable form for a special topic in order to update it.
-     * 
+     *
      * @param mapping
      * @param form
      * @param request
@@ -921,7 +917,7 @@ public class LearningAction extends Action {
     /**
      * Delete attachment from topic. This method only reset attachment information in memory. The finally update will
      * happen in <code>updateTopic</code> method. So topic can keep this attachment if user choose "Cancel" edit topic.
-     * 
+     *
      * @param mapping
      * @param form
      * @param request
@@ -944,7 +940,7 @@ public class LearningAction extends Action {
 
     /**
      * Update a topic.
-     * 
+     *
      * @param mapping
      * @param form
      * @param request
@@ -1007,7 +1003,7 @@ public class LearningAction extends Action {
 
     /**
      * Update a topic.
-     * 
+     *
      * @param mapping
      * @param form
      * @param request
@@ -1041,7 +1037,7 @@ public class LearningAction extends Action {
 
     /**
      * Sets the visibility of a message by updating the hide flag for a message
-     * 
+     *
      * @param mapping
      * @param form
      * @param request
@@ -1087,7 +1083,7 @@ public class LearningAction extends Action {
 
     /**
      * Rates postings submitted by other learners.
-     * 
+     *
      * @param mapping
      * @param form
      * @param request
@@ -1107,7 +1103,7 @@ public class LearningAction extends Action {
 	int forumMaximumRate = (Integer) sessionMap.get(ForumConstants.ATTR_MAXIMUM_RATE);
 	int forumMinimumRate = (Integer) sessionMap.get(ForumConstants.ATTR_MINIMUM_RATE);
 
-	float rating = Float.parseFloat((String) request.getParameter("rate"));
+	float rating = Float.parseFloat(request.getParameter("rate"));
 	Long responseId = WebUtil.readLongParam(request, "idBox");
 	Long toolSessionID = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_SESSION_ID);
 	UserDTO user = (UserDTO) SessionManager.getSession().getAttribute(AttributeNames.USER);
@@ -1178,7 +1174,7 @@ public class LearningAction extends Action {
     /**
      * This method will set flag in message DTO:
      * <li>If this topic is created by current login user, then set Author mark true.</li>
-     * 
+     *
      * @param msgDtoList
      */
     private void updateMesssageFlag(List msgDtoList) {
@@ -1215,7 +1211,7 @@ public class LearningAction extends Action {
     /**
      * Get login user information from system level session. Check it whether it exists in database or not, and save it
      * if it does not exists. Return an instance of PO of ForumUser.
-     * 
+     *
      * @param request
      * @param sessionId
      * @return Current user instance
@@ -1237,7 +1233,7 @@ public class LearningAction extends Action {
 
     /**
      * Get Forum Service.
-     * 
+     *
      * @return
      */
     private IForumService getForumManager() {

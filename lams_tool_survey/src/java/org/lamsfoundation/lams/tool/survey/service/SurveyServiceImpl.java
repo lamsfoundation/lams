@@ -2,21 +2,21 @@
  * Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
  * =============================================================
  * License Information: http://lamsfoundation.org/licensing/lams/2.0/
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301
  * USA
- * 
+ *
  * http://www.gnu.org/licenses/gpl.txt
  * ****************************************************************
  */
@@ -24,7 +24,6 @@
 package org.lamsfoundation.lams.tool.survey.service;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
@@ -461,7 +460,7 @@ public class SurveyServiceImpl implements ISurveyService, ToolContentManager, To
 
     /**
      * Creates data for export methods. Suitable both for single/multiple users
-     * 
+     *
      * @param sessionToUsersMap
      *            map containing all session to users pairs that require data to be exported
      * @return
@@ -942,16 +941,16 @@ public class SurveyServiceImpl implements ISurveyService, ToolContentManager, To
 
     /**
      * Used by the Rest calls to create content.
-     * 
+     *
      * Mandatory fields in toolContentJSON: title, instructions, questions. Optional fields are lockWhenFinished
      * (default true), showOnePage (default true), notifyTeachersOnAnswerSumbit (default false), showOtherUsersAnswers
      * (default false), reflectOnActivity, reflectInstructions, submissionDeadline
-     * 
+     *
      * Questions must contain a JSONArray of JSONObject objects, which have the following mandatory fields:
      * questionText, type (1=one answer,2=multiple answers,3=free text entry) and answers. Answers is a JSONArray of
      * strings, which are the answer text. A question may also have the optional fields: allowOtherTextEntry (default
      * false), required (default true)
-     * 
+     *
      * There should be at least one question object in the Questions array and at least one option in the Options array.
      */
     @Override

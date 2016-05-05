@@ -18,19 +18,18 @@
  *
  * http://www.gnu.org/licenses/gpl.txt
  * ****************************************************************
- */ 
- 
-/* $Id$ */ 
-package org.lamsfoundation.lams.config; 
- 
+ */
 
-/** 
- * 
+/* $Id$ */
+package org.lamsfoundation.lams.config;
+
+/**
+ *
  *
  */
 public class Registration {
     private long uid;
-    
+
     private String siteName;
     private String organisation;
     private String name;
@@ -40,129 +39,128 @@ public class Registration {
     private boolean enableLamsCommunityIntegration;
     private String serverKey;
     private String serverID;
-    
-    public Registration() {}
+
+    public Registration() {
+    }
 
     /**
      *
-     * 
+     *
      */
     public long getUid() {
-        return uid;
+	return uid;
     }
 
     public void setUid(long uid) {
-        this.uid = uid;
+	this.uid = uid;
     }
 
     /**
      *
-     * 
+     *
      */
     public String getSiteName() {
-        return siteName;
+	return siteName;
     }
 
     public void setSiteName(String siteName) {
-        this.siteName = siteName;
+	this.siteName = siteName;
     }
 
     /**
      *
-     * 
+     *
      */
     public String getOrganisation() {
-        return organisation;
+	return organisation;
     }
 
     public void setOrganisation(String organisation) {
-        this.organisation = organisation;
+	this.organisation = organisation;
     }
 
     /**
      *
-     * 
+     *
      */
     public String getName() {
-        return name;
+	return name;
     }
 
     public void setName(String name) {
-        this.name = name;
+	this.name = name;
     }
 
     /**
      *
-     * 
+     *
      */
     public String getEmail() {
-        return email;
+	return email;
     }
 
     public void setEmail(String email) {
-        this.email = email;
+	this.email = email;
     }
 
     /**
      *
-     * 
+     *
      */
     public String getServerCountry() {
-        return serverCountry;
+	return serverCountry;
     }
 
     public void setServerCountry(String serverCountry) {
-        this.serverCountry = serverCountry;
+	this.serverCountry = serverCountry;
     }
 
     /**
      *
-     * 
+     *
      */
     public boolean isPublicDirectory() {
-        return publicDirectory;
+	return publicDirectory;
     }
 
     public void setPublicDirectory(boolean publicDirectory) {
-        this.publicDirectory = publicDirectory;
+	this.publicDirectory = publicDirectory;
     }
 
     /**
      *
-     * 
+     *
      */
     public boolean isEnableLamsCommunityIntegration() {
-        return enableLamsCommunityIntegration;
+	return enableLamsCommunityIntegration;
     }
 
     public void setEnableLamsCommunityIntegration(boolean enableLamsCommunityIntegration) {
-        this.enableLamsCommunityIntegration = enableLamsCommunityIntegration;
+	this.enableLamsCommunityIntegration = enableLamsCommunityIntegration;
     }
 
     /**
      *
-     * 
+     *
      */
     public String getServerKey() {
-        return serverKey;
+	return serverKey;
     }
 
     public void setServerKey(String serverKey) {
-        this.serverKey = serverKey;
+	this.serverKey = serverKey;
     }
 
     /**
      *
-     * 
+     *
      */
     public String getServerID() {
-        return serverID;
+	return serverID;
     }
 
     public void setServerID(String serverID) {
-        this.serverID = serverID;
+	this.serverID = serverID;
     }
-    
-    
+
 }
- 

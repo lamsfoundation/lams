@@ -2,21 +2,21 @@
  * Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
  * =============================================================
  * License Information: http://lamsfoundation.org/licensing/lams/2.0/
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License version 2.0
  * as published by the Free Software Foundation.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301
  * USA
- * 
+ *
  * http://www.gnu.org/licenses/gpl.txt
  * ***********************************************************************/
 
@@ -29,9 +29,9 @@ import org.lamsfoundation.lams.tool.vote.service.IVoteService;
  * <p>
  * ActionForm for the Authoring environment
  * </p>
- * 
+ *
  * @author Ozgur Demirtas
- * 
+ *
  */
 public class VoteAuthoringForm extends VoteLearningForm implements VoteAppConstants {
     /* form controllers */
@@ -155,7 +155,7 @@ public class VoteAuthoringForm extends VoteLearningForm implements VoteAppConsta
 	allowText = null;
 	showResults = null;
 	maxNominationCount = null;
-	minNominationCount=null;	
+	minNominationCount = null;
 
 	summaryMonitoring = null;
 	instructionsMonitoring = null;
@@ -184,7 +184,7 @@ public class VoteAuthoringForm extends VoteLearningForm implements VoteAppConsta
 
     /**
      * @param isRemoveContent
-     *                The isRemoveContent to set.
+     *            The isRemoveContent to set.
      */
     public void setIsRemoveContent(String isRemoveContent) {
 	this.isRemoveContent = isRemoveContent;
@@ -200,7 +200,7 @@ public class VoteAuthoringForm extends VoteLearningForm implements VoteAppConsta
 
     /**
      * @param questionIndex
-     *                The questionIndex to set.
+     *            The questionIndex to set.
      */
     @Override
     public void setQuestionIndex(String questionIndex) {
@@ -216,7 +216,7 @@ public class VoteAuthoringForm extends VoteLearningForm implements VoteAppConsta
 
     /**
      * @param addContent
-     *                The addContent to set.
+     *            The addContent to set.
      */
     public void setAddContent(String addContent) {
 	this.addContent = addContent;
@@ -231,7 +231,7 @@ public class VoteAuthoringForm extends VoteLearningForm implements VoteAppConsta
 
     /**
      * @param removeContent
-     *                The removeContent to set.
+     *            The removeContent to set.
      */
     public void setRemoveContent(String removeContent) {
 	this.removeContent = removeContent;
@@ -246,7 +246,7 @@ public class VoteAuthoringForm extends VoteLearningForm implements VoteAppConsta
 
     /**
      * @param removeAllContent
-     *                The removeAllContent to set.
+     *            The removeAllContent to set.
      */
     public void setRemoveAllContent(String removeAllContent) {
 	this.removeAllContent = removeAllContent;
@@ -261,7 +261,7 @@ public class VoteAuthoringForm extends VoteLearningForm implements VoteAppConsta
 
     /**
      * @param submitAllContent
-     *                The submitAllContent to set.
+     *            The submitAllContent to set.
      */
     public void setSubmitAllContent(String submitAllContent) {
 	this.submitAllContent = submitAllContent;
@@ -276,7 +276,7 @@ public class VoteAuthoringForm extends VoteLearningForm implements VoteAppConsta
 
     /**
      * @param instructions
-     *                The instructions to set.
+     *            The instructions to set.
      */
     public void setInstructions(String instructions) {
 	this.instructions = instructions;
@@ -291,7 +291,7 @@ public class VoteAuthoringForm extends VoteLearningForm implements VoteAppConsta
 
     /**
      * @param title
-     *                The title to set.
+     *            The title to set.
      */
     public void setTitle(String title) {
 	this.title = title;
@@ -306,7 +306,7 @@ public class VoteAuthoringForm extends VoteLearningForm implements VoteAppConsta
 
     /**
      * @param choiceAdvanced
-     *                The choiceAdvanced to set.
+     *            The choiceAdvanced to set.
      */
     public void setChoiceAdvanced(String choiceAdvanced) {
 	this.choiceAdvanced = choiceAdvanced;
@@ -321,7 +321,7 @@ public class VoteAuthoringForm extends VoteLearningForm implements VoteAppConsta
 
     /**
      * @param choiceBasic
-     *                The choiceBasic to set.
+     *            The choiceBasic to set.
      */
     public void setChoiceBasic(String choiceBasic) {
 	this.choiceBasic = choiceBasic;
@@ -336,7 +336,7 @@ public class VoteAuthoringForm extends VoteLearningForm implements VoteAppConsta
 
     /**
      * @param choiceInstructions
-     *                The choiceInstructions to set.
+     *            The choiceInstructions to set.
      */
     public void setChoiceInstructions(String choiceInstructions) {
 	this.choiceInstructions = choiceInstructions;
@@ -351,7 +351,7 @@ public class VoteAuthoringForm extends VoteLearningForm implements VoteAppConsta
 
     /**
      * @param choice
-     *                The choice to set.
+     *            The choice to set.
      */
     public void setChoice(String choice) {
 	this.choice = choice;
@@ -366,7 +366,7 @@ public class VoteAuthoringForm extends VoteLearningForm implements VoteAppConsta
 
     /**
      * @param submitTabDone
-     *                The submitTabDone to set.
+     *            The submitTabDone to set.
      */
     public void setSubmitTabDone(String submitTabDone) {
 	this.submitTabDone = submitTabDone;
@@ -381,7 +381,7 @@ public class VoteAuthoringForm extends VoteLearningForm implements VoteAppConsta
 
     /**
      * @param editActivityMonitoring
-     *                The editActivityMonitoring to set.
+     *            The editActivityMonitoring to set.
      */
     public void setEditActivityMonitoring(String editActivityMonitoring) {
 	this.editActivityMonitoring = editActivityMonitoring;
@@ -396,7 +396,7 @@ public class VoteAuthoringForm extends VoteLearningForm implements VoteAppConsta
 
     /**
      * @param instructionsMonitoring
-     *                The instructionsMonitoring to set.
+     *            The instructionsMonitoring to set.
      */
     public void setInstructionsMonitoring(String instructionsMonitoring) {
 	this.instructionsMonitoring = instructionsMonitoring;
@@ -411,7 +411,7 @@ public class VoteAuthoringForm extends VoteLearningForm implements VoteAppConsta
 
     /**
      * @param statsMonitoring
-     *                The statsMonitoring to set.
+     *            The statsMonitoring to set.
      */
     public void setStatsMonitoring(String statsMonitoring) {
 	this.statsMonitoring = statsMonitoring;
@@ -426,7 +426,7 @@ public class VoteAuthoringForm extends VoteLearningForm implements VoteAppConsta
 
     /**
      * @param summaryMonitoring
-     *                The summaryMonitoring to set.
+     *            The summaryMonitoring to set.
      */
     public void setSummaryMonitoring(String summaryMonitoring) {
 	this.summaryMonitoring = summaryMonitoring;
@@ -441,7 +441,7 @@ public class VoteAuthoringForm extends VoteLearningForm implements VoteAppConsta
 
     /**
      * @param edit
-     *                The edit to set.
+     *            The edit to set.
      */
     public void setEdit(String edit) {
 	this.edit = edit;
@@ -456,7 +456,7 @@ public class VoteAuthoringForm extends VoteLearningForm implements VoteAppConsta
 
     /**
      * @param addOptionContent
-     *                The addOptionContent to set.
+     *            The addOptionContent to set.
      */
     public void setAddOptionContent(String addOptionContent) {
 	this.addOptionContent = addOptionContent;
@@ -471,7 +471,7 @@ public class VoteAuthoringForm extends VoteLearningForm implements VoteAppConsta
 
     /**
      * @param removeOptionContent
-     *                The removeOptionContent to set.
+     *            The removeOptionContent to set.
      */
     public void setRemoveOptionContent(String removeOptionContent) {
 	this.removeOptionContent = removeOptionContent;
@@ -487,7 +487,7 @@ public class VoteAuthoringForm extends VoteLearningForm implements VoteAppConsta
 
     /**
      * @param optionIndex
-     *                The optionIndex to set.
+     *            The optionIndex to set.
      */
     @Override
     public void setOptionIndex(String optionIndex) {
@@ -503,7 +503,7 @@ public class VoteAuthoringForm extends VoteLearningForm implements VoteAppConsta
 
     /**
      * @param selectedIndex
-     *                The selectedIndex to set.
+     *            The selectedIndex to set.
      */
     public void setSelectedIndex(String selectedIndex) {
 	this.selectedIndex = selectedIndex;
@@ -518,7 +518,7 @@ public class VoteAuthoringForm extends VoteLearningForm implements VoteAppConsta
 
     /**
      * @param deletableOptionIndex
-     *                The deletableOptionIndex to set.
+     *            The deletableOptionIndex to set.
      */
     public void setDeletableOptionIndex(String deletableOptionIndex) {
 	this.deletableOptionIndex = deletableOptionIndex;
@@ -533,7 +533,7 @@ public class VoteAuthoringForm extends VoteLearningForm implements VoteAppConsta
 
     /**
      * @param currentTab
-     *                The currentTab to set.
+     *            The currentTab to set.
      */
     public void setCurrentTab(String currentTab) {
 	this.currentTab = currentTab;
@@ -548,7 +548,7 @@ public class VoteAuthoringForm extends VoteLearningForm implements VoteAppConsta
 
     /**
      * @param submit
-     *                The submit to set.
+     *            The submit to set.
      */
     public void setSubmit(String submit) {
 	this.submit = submit;
@@ -563,7 +563,7 @@ public class VoteAuthoringForm extends VoteLearningForm implements VoteAppConsta
 
     /**
      * @param optIndex
-     *                The optIndex to set.
+     *            The optIndex to set.
      */
     public void setOptIndex(String optIndex) {
 	this.optIndex = optIndex;
@@ -579,7 +579,7 @@ public class VoteAuthoringForm extends VoteLearningForm implements VoteAppConsta
 
     /**
      * @param lockOnFinish
-     *                The lockOnFinish to set.
+     *            The lockOnFinish to set.
      */
     @Override
     public void setLockOnFinish(String lockOnFinish) {
@@ -595,7 +595,7 @@ public class VoteAuthoringForm extends VoteLearningForm implements VoteAppConsta
 
     /**
      * @param allowText
-     *                The allowText to set.
+     *            The allowText to set.
      */
     public void setAllowText(String allowText) {
 	this.allowText = allowText;
@@ -611,25 +611,29 @@ public class VoteAuthoringForm extends VoteLearningForm implements VoteAppConsta
 
     /**
      * @param maxNominationCount
-     *                The maxNominationCount to set.
+     *            The maxNominationCount to set.
      */
     @Override
     public void setMaxNominationCount(String maxNominationCount) {
 	this.maxNominationCount = maxNominationCount;
     }
-    
+
     /**
      * @return Returns the minNominationCount.
      */
+    @Override
     public String getMinNominationCount() {
-        return minNominationCount;
+	return minNominationCount;
     }
+
     /**
-     * @param minNominationCount The minNominationCount to set.
+     * @param minNominationCount
+     *            The minNominationCount to set.
      */
+    @Override
     public void setMinNominationCount(String minNominationCount) {
-        this.minNominationCount = minNominationCount;
-    }    
+	this.minNominationCount = minNominationCount;
+    }
 
     /**
      * @return Returns the exceptionMaxNominationInvalid.
@@ -640,7 +644,7 @@ public class VoteAuthoringForm extends VoteLearningForm implements VoteAppConsta
 
     /**
      * @param exceptionMaxNominationInvalid
-     *                The exceptionMaxNominationInvalid to set.
+     *            The exceptionMaxNominationInvalid to set.
      */
     public void setExceptionMaxNominationInvalid(String exceptionMaxNominationInvalid) {
 	this.exceptionMaxNominationInvalid = exceptionMaxNominationInvalid;
@@ -656,7 +660,7 @@ public class VoteAuthoringForm extends VoteLearningForm implements VoteAppConsta
 
     /**
      * @param toolContentID
-     *                The toolContentID to set.
+     *            The toolContentID to set.
      */
     @Override
     public void setToolContentID(String toolContentID) {
@@ -672,7 +676,7 @@ public class VoteAuthoringForm extends VoteLearningForm implements VoteAppConsta
 
     /**
      * @param voteService
-     *                The voteService to set.
+     *            The voteService to set.
      */
     public void setVoteService(IVoteService voteService) {
 	this.voteService = voteService;
@@ -687,15 +691,16 @@ public class VoteAuthoringForm extends VoteLearningForm implements VoteAppConsta
 
     /**
      * @param httpSessionID
-     *                The httpSessionID to set.
+     *            The httpSessionID to set.
      */
     public void setHttpSessionID(String httpSessionID) {
 	this.httpSessionID = httpSessionID;
     }
-    
+
     /**
      * @return Returns the useSelectLeaderToolOuput.
      */
+    @Override
     public String getUseSelectLeaderToolOuput() {
 	return useSelectLeaderToolOuput;
     }
@@ -704,6 +709,7 @@ public class VoteAuthoringForm extends VoteLearningForm implements VoteAppConsta
      * @param useSelectLeaderToolOuput
      *            The useSelectLeaderToolOuput to set.
      */
+    @Override
     public void setUseSelectLeaderToolOuput(String useSelectLeaderToolOuput) {
 	this.useSelectLeaderToolOuput = useSelectLeaderToolOuput;
     }
@@ -717,7 +723,7 @@ public class VoteAuthoringForm extends VoteLearningForm implements VoteAppConsta
 
     /**
      * @param reflect
-     *                The reflect to set.
+     *            The reflect to set.
      */
     public void setReflect(String reflect) {
 	this.reflect = reflect;
@@ -732,7 +738,7 @@ public class VoteAuthoringForm extends VoteLearningForm implements VoteAppConsta
 
     /**
      * @param reflectionSubject
-     *                The reflectionSubject to set.
+     *            The reflectionSubject to set.
      */
     public void setReflectionSubject(String reflectionSubject) {
 	this.reflectionSubject = reflectionSubject;
@@ -747,7 +753,7 @@ public class VoteAuthoringForm extends VoteLearningForm implements VoteAppConsta
 
     /**
      * @param addSingleQuestion
-     *                The addSingleQuestion to set.
+     *            The addSingleQuestion to set.
      */
     public void setAddSingleQuestion(String addSingleQuestion) {
 	this.addSingleQuestion = addSingleQuestion;
@@ -762,7 +768,7 @@ public class VoteAuthoringForm extends VoteLearningForm implements VoteAppConsta
 
     /**
      * @param contentFolderID
-     *                The contentFolderID to set.
+     *            The contentFolderID to set.
      */
     public void setContentFolderID(String contentFolderID) {
 	this.contentFolderID = contentFolderID;
@@ -777,7 +783,7 @@ public class VoteAuthoringForm extends VoteLearningForm implements VoteAppConsta
 
     /**
      * @param editableQuestionIndex
-     *                The editableQuestionIndex to set.
+     *            The editableQuestionIndex to set.
      */
     public void setEditableQuestionIndex(String editableQuestionIndex) {
 	this.editableQuestionIndex = editableQuestionIndex;
@@ -792,7 +798,7 @@ public class VoteAuthoringForm extends VoteLearningForm implements VoteAppConsta
 
     /**
      * @param editQuestionBoxRequest
-     *                The editQuestionBoxRequest to set.
+     *            The editQuestionBoxRequest to set.
      */
     public void setEditQuestionBoxRequest(String editQuestionBoxRequest) {
 	this.editQuestionBoxRequest = editQuestionBoxRequest;
@@ -807,7 +813,7 @@ public class VoteAuthoringForm extends VoteLearningForm implements VoteAppConsta
 
     /**
      * @param editableNominationIndex
-     *                The editableNominationIndex to set.
+     *            The editableNominationIndex to set.
      */
     public void setEditableNominationIndex(String editableNominationIndex) {
 	this.editableNominationIndex = editableNominationIndex;

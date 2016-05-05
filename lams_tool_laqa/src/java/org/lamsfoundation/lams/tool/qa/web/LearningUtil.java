@@ -2,21 +2,21 @@
  * Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
  * =============================================================
  * License Information: http://lamsfoundation.org/licensing/lams/2.0/
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301
  * USA
- * 
+ *
  * http://www.gnu.org/licenses/gpl.txt
  * ****************************************************************
  */
@@ -42,7 +42,7 @@ import org.lamsfoundation.lams.web.util.AttributeNames;
 
 /**
  * Keeps all operations needed for Learning mode.
- * 
+ *
  * @author Ozgur Demirtas
  */
 public class LearningUtil implements QaAppConstants {
@@ -67,17 +67,19 @@ public class LearningUtil implements QaAppConstants {
 	generalLearnerFlowDTO.setActivityInstructions(qaContent.getInstructions());
 	generalLearnerFlowDTO.setReportTitleLearner(qaContent.getReportTitle());
 
-	if (qaContent.isQuestionsSequenced())
+	if (qaContent.isQuestionsSequenced()) {
 	    generalLearnerFlowDTO.setQuestionListingMode(QUESTION_LISTING_MODE_SEQUENTIAL);
-	else
+	} else {
 	    generalLearnerFlowDTO.setQuestionListingMode(QUESTION_LISTING_MODE_COMBINED);
+	}
 
 	generalLearnerFlowDTO.setUserNameVisible(new Boolean(qaContent.isUsernameVisible()).toString());
 	generalLearnerFlowDTO.setShowOtherAnswers(new Boolean(qaContent.isShowOtherAnswers()).toString());
 	generalLearnerFlowDTO.setAllowRichEditor(new Boolean(qaContent.isAllowRichEditor()).toString());
-	generalLearnerFlowDTO.setUseSelectLeaderToolOuput(new Boolean(qaContent.isUseSelectLeaderToolOuput()).toString());
+	generalLearnerFlowDTO
+		.setUseSelectLeaderToolOuput(new Boolean(qaContent.isUseSelectLeaderToolOuput()).toString());
 	generalLearnerFlowDTO.setAllowRateAnswers(new Boolean(qaContent.isAllowRateAnswers()).toString());
-	
+
 	generalLearnerFlowDTO.setTotalQuestionCount(new Integer(qaContent.getQaQueContents().size()));
 
 	//create mapQuestions
@@ -91,27 +93,27 @@ public class LearningUtil implements QaAppConstants {
 	    }
 	}
 	generalLearnerFlowDTO.setMapQuestionContentLearner(mapQuestions);
-	
+
 	return generalLearnerFlowDTO;
     }
-    
+
     /**
      */
     public static void populateAnswers(Map sessionMap, QaContent qaContent, QaQueUsr user,
 	    Map<Integer, QaQuestionDTO> mapQuestions, GeneralLearnerFlowDTO generalLearnerFlowDTO,
 	    IQaService qaService) {
-	
+
 	//create mapAnswers
 	Map<String, String> mapAnswers = (Map<String, String>) sessionMap.get(MAP_ALL_RESULTS_KEY);
 	if (mapAnswers == null) {
 	    mapAnswers = new TreeMap<String, String>(new QaComparator());
-	    
+
 	    // get responses from DB
 	    Map<String, String> mapAnswersFromDb = new TreeMap<String, String>();
 	    for (QaQueContent question : qaContent.getQaQueContents()) {
 		Long questionUid = question.getUid();
 		QaUsrResp response = qaService.getResponseByUserAndQuestion(user.getQueUsrId(), questionUid);
-		
+
 		String answer;
 		if (response == null) {
 		    answer = null;
@@ -121,8 +123,8 @@ public class LearningUtil implements QaAppConstants {
 		    answer = response.getAnswer();
 		}
 		mapAnswersFromDb.put(String.valueOf(question.getDisplayOrder()), answer);
-	    }	    
-	    
+	    }
+
 	    // maybe we have come in from the review screen, if so get the answers from db.
 	    if (mapAnswersFromDb.size() > 0) {
 		mapAnswers.putAll(mapAnswersFromDb);
@@ -132,7 +134,7 @@ public class LearningUtil implements QaAppConstants {
 		}
 	    }
 	}
-	String currentAnswer = (String) mapAnswers.get("1");
+	String currentAnswer = mapAnswers.get("1");
 	generalLearnerFlowDTO.setCurrentQuestionIndex(new Integer(1));
 	generalLearnerFlowDTO.setCurrentAnswer(currentAnswer);
 	sessionMap.put(MAP_SEQUENTIAL_ANSWERS_KEY, mapAnswers);

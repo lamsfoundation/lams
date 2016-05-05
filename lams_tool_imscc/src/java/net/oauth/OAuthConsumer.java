@@ -25,7 +25,7 @@ import net.oauth.http.HttpMessage;
 /**
  * Properties of an OAuth Consumer. Properties may be added freely, e.g. to
  * support extensions.
- * 
+ *
  * @author John Kristian
  */
 public class OAuthConsumer implements Serializable {
@@ -37,22 +37,22 @@ public class OAuthConsumer implements Serializable {
     public final String consumerSecret;
     public final OAuthServiceProvider serviceProvider;
 
-    public OAuthConsumer(String callbackURL, String consumerKey,
-            String consumerSecret, OAuthServiceProvider serviceProvider) {
-        this.callbackURL = callbackURL;
-        this.consumerKey = consumerKey;
-        this.consumerSecret = consumerSecret;
-        this.serviceProvider = serviceProvider;
+    public OAuthConsumer(String callbackURL, String consumerKey, String consumerSecret,
+	    OAuthServiceProvider serviceProvider) {
+	this.callbackURL = callbackURL;
+	this.consumerKey = consumerKey;
+	this.consumerSecret = consumerSecret;
+	this.serviceProvider = serviceProvider;
     }
 
     private final Map<String, Object> properties = new HashMap<String, Object>();
 
     public Object getProperty(String name) {
-        return properties.get(name);
+	return properties.get(name);
     }
 
     public void setProperty(String name, Object value) {
-        properties.put(name, value);
+	properties.put(name, value);
     }
 
     /**

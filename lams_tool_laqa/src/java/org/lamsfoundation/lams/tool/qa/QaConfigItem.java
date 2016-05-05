@@ -46,7 +46,7 @@ public class QaConfigItem {
 
     /**
      *
-     * 
+     *
      */
     public Long getUid() {
 	return uid;

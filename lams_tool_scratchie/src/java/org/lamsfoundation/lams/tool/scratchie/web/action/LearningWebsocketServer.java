@@ -30,7 +30,7 @@ import org.lamsfoundation.lams.web.util.AttributeNames;
 
 /**
  * Sends Scratchies actions to non-leaders.
- * 
+ *
  * @author Marcin Cieslak
  */
 @ServerEndpoint("/learningWebsocket")

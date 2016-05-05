@@ -32,7 +32,7 @@ import org.apache.log4j.Logger;
 /**
  * This class maps to a single category in the q&a wizard, it contains a set of
  * cognitive skills
- * 
+ *
  *
  */
 public class QaWizardCategory implements Serializable, Comparable<QaWizardCategory>, Cloneable {
@@ -56,7 +56,7 @@ public class QaWizardCategory implements Serializable, Comparable<QaWizardCatego
 
     /**
      *
-     * 
+     *
      */
     public Long getUid() {
 	return uid;
@@ -81,7 +81,7 @@ public class QaWizardCategory implements Serializable, Comparable<QaWizardCatego
      *
      *
      *
-     * 
+     *
      */
     public Set<QaWizardCognitiveSkill> getCognitiveSkills() {
 	return cognitiveSkills;
@@ -91,6 +91,7 @@ public class QaWizardCategory implements Serializable, Comparable<QaWizardCatego
 	this.cognitiveSkills = cognitiveSkills;
     }
 
+    @Override
     public int compareTo(QaWizardCategory category) {
 	if (category.getUid() != null && uid != null) {
 	    return category.getUid().compareTo(uid) * -1;
@@ -99,6 +100,7 @@ public class QaWizardCategory implements Serializable, Comparable<QaWizardCatego
 	}
     }
 
+    @Override
     public Object clone() {
 
 	QaWizardCategory category = null;

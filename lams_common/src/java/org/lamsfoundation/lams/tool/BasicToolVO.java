@@ -2,21 +2,21 @@
  * Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
  * =============================================================
  * License Information: http://lamsfoundation.org/licensing/lams/2.0/
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License version 2.0 
+ * it under the terms of the GNU General Public License version 2.0
  * as published by the Free Software Foundation.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301
  * USA
- * 
+ *
  * http://www.gnu.org/licenses/gpl.txt
  * ****************************************************************
  */
@@ -147,7 +147,9 @@ public class BasicToolVO implements Serializable, IToolVO {
 	this.toolVersion = toolVersion;
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see org.lamsfoundation.lams.tool.IToolVO#getAuthorUrl()
      */
     @Override
@@ -155,7 +157,9 @@ public class BasicToolVO implements Serializable, IToolVO {
 	return authorUrl;
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see org.lamsfoundation.lams.tool.IToolVO#setAuthorUrl(java.lang.String)
      */
     @Override
@@ -163,7 +167,9 @@ public class BasicToolVO implements Serializable, IToolVO {
 	this.authorUrl = authorUrl;
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see org.lamsfoundation.lams.tool.IToolVO#getHelpUrl()
      */
     @Override
@@ -171,7 +177,9 @@ public class BasicToolVO implements Serializable, IToolVO {
 	return helpUrl;
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see org.lamsfoundation.lams.tool.IToolVO#setHelpUrl(java.lang.String)
      */
     @Override
@@ -179,7 +187,9 @@ public class BasicToolVO implements Serializable, IToolVO {
 	this.helpUrl = helpUrl;
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see org.lamsfoundation.lams.tool.IToolVO#getCreateDateTime()
      */
     @Override
@@ -187,7 +197,9 @@ public class BasicToolVO implements Serializable, IToolVO {
 	return createDateTime;
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see org.lamsfoundation.lams.tool.IToolVO#setCreateDateTime(java.util.Date)
      */
     @Override
@@ -195,7 +207,9 @@ public class BasicToolVO implements Serializable, IToolVO {
 	this.createDateTime = createDateTime;
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see org.lamsfoundation.lams.tool.IToolVO#getDefaultToolContentId()
      */
     @Override
@@ -203,7 +217,9 @@ public class BasicToolVO implements Serializable, IToolVO {
 	return defaultToolContentId;
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see org.lamsfoundation.lams.tool.IToolVO#setDefaultToolContentId(long)
      */
     @Override
@@ -211,7 +227,9 @@ public class BasicToolVO implements Serializable, IToolVO {
 	this.defaultToolContentId = defaultToolContentId;
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see org.lamsfoundation.lams.tool.IToolVO#getDescription()
      */
     @Override
@@ -223,7 +241,9 @@ public class BasicToolVO implements Serializable, IToolVO {
 	this.description = description;
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see org.lamsfoundation.lams.tool.IToolVO#getGroupingSupportTypeId()
      */
     @Override
@@ -235,7 +255,9 @@ public class BasicToolVO implements Serializable, IToolVO {
 	this.groupingSupportTypeId = groupingSupportTypeId;
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see org.lamsfoundation.lams.tool.IToolVO#getLanguageFile()
      */
     @Override
@@ -247,7 +269,9 @@ public class BasicToolVO implements Serializable, IToolVO {
 	this.languageFile = languageFile;
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see org.lamsfoundation.lams.tool.IToolVO#getLearnerPreviewUrl()
      */
     @Override
@@ -259,7 +283,9 @@ public class BasicToolVO implements Serializable, IToolVO {
 	this.learnerPreviewUrl = learnerPreviewUrl;
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see org.lamsfoundation.lams.tool.IToolVO#getLearnerProgressUrl()
      */
     @Override
@@ -271,7 +297,9 @@ public class BasicToolVO implements Serializable, IToolVO {
 	this.learnerProgressUrl = learnerProgressUrl;
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see org.lamsfoundation.lams.tool.IToolVO#getLearnerUrl()
      */
     @Override
@@ -283,7 +311,9 @@ public class BasicToolVO implements Serializable, IToolVO {
 	this.learnerUrl = learnerUrl;
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see org.lamsfoundation.lams.tool.IToolVO#getMonitorUrl()
      */
     @Override
@@ -295,7 +325,9 @@ public class BasicToolVO implements Serializable, IToolVO {
 	this.monitorUrl = monitorUrl;
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see org.lamsfoundation.lams.tool.IToolVO#getServiceName()
      */
     @Override
@@ -307,7 +339,9 @@ public class BasicToolVO implements Serializable, IToolVO {
 	this.serviceName = serviceName;
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see org.lamsfoundation.lams.tool.IToolVO#isSupportsGrouping()
      */
     @Override
@@ -319,7 +353,9 @@ public class BasicToolVO implements Serializable, IToolVO {
 	this.supportsGrouping = supportsGrouping;
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see org.lamsfoundation.lams.tool.IToolVO#getToolDisplayName()
      */
     @Override
@@ -331,7 +367,9 @@ public class BasicToolVO implements Serializable, IToolVO {
 	this.toolDisplayName = toolDisplayName;
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see org.lamsfoundation.lams.tool.IToolVO#getToolId()
      */
     @Override
@@ -343,7 +381,9 @@ public class BasicToolVO implements Serializable, IToolVO {
 	this.toolId = toolId;
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see org.lamsfoundation.lams.tool.IToolVO#getToolIdentifier()
      */
     @Override
@@ -355,7 +395,9 @@ public class BasicToolVO implements Serializable, IToolVO {
 	this.toolIdentifier = toolIdentifier;
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see org.lamsfoundation.lams.tool.IToolVO#getToolSignature()
      */
     @Override
@@ -367,7 +409,9 @@ public class BasicToolVO implements Serializable, IToolVO {
 	this.toolSignature = toolSignature;
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see org.lamsfoundation.lams.tool.IToolVO#getToolVersion()
      */
     @Override
@@ -379,7 +423,9 @@ public class BasicToolVO implements Serializable, IToolVO {
 	this.toolVersion = toolVersion;
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see org.lamsfoundation.lams.tool.IToolVO#isValid()
      */
     @Override
@@ -391,7 +437,9 @@ public class BasicToolVO implements Serializable, IToolVO {
 	this.valid = valid;
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see org.lamsfoundation.lams.tool.IToolVO#isSupportsOutputs()
      */
     @Override
@@ -399,7 +447,9 @@ public class BasicToolVO implements Serializable, IToolVO {
 	return supportsGrouping;
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see org.lamsfoundation.lams.tool.IToolVO#getExtLmsId()
      */
     @Override

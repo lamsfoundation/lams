@@ -1,9 +1,7 @@
 package org.lamsfoundation.lams.learningdesign;
 
-import org.lamsfoundation.lams.learningdesign.dto.CompetenceDTO;
-
 /**
- * 
+ *
  *
  */
 public class Competence {
@@ -53,7 +51,7 @@ public class Competence {
     /**
      *
      *
-     * 
+     *
      */
     public org.lamsfoundation.lams.learningdesign.LearningDesign getLearningDesign() {
 	return this.learningDesign;

@@ -2,21 +2,21 @@
  * Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
  * =============================================================
  * License Information: http://lamsfoundation.org/licensing/lams/2.0/
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301
  * USA
- * 
+ *
  * http://www.gnu.org/licenses/gpl.txt
  * ****************************************************************
  */
@@ -30,7 +30,6 @@ import java.util.Set;
 
 import org.lamsfoundation.lams.events.IEventNotificationService;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
-import org.lamsfoundation.lams.tool.scratchie.dto.BurningQuestionDTO;
 import org.lamsfoundation.lams.tool.scratchie.dto.BurningQuestionItemDTO;
 import org.lamsfoundation.lams.tool.scratchie.dto.GroupSummary;
 import org.lamsfoundation.lams.tool.scratchie.dto.ReflectDTO;
@@ -45,44 +44,45 @@ import org.lamsfoundation.lams.util.ExcelCell;
 
 /**
  * Interface that defines the contract that all ShareScratchie service provider must follow.
- * 
+ *
  * @author Andrey Balan
  */
 public interface IScratchieService {
 
     /**
      * Get <code>Scratchie</code> by toolContentID.
-     * 
+     *
      * @param contentId
      * @return
      */
     Scratchie getScratchieByContentId(Long contentId);
-    
+
     /**
      * Set specified user as a leader. Also the previous leader (if any) is marked as non-leader.
-     * 
+     *
      * @param userId
      * @param toolSessionId
      */
     ScratchieUser checkLeaderSelectToolForSessionLeader(ScratchieUser user, Long toolSessionId);
-    
-    List<ScratchieBurningQuestion> getBurningQuestionsBySession(Long sessionId);    
-    
+
+    List<ScratchieBurningQuestion> getBurningQuestionsBySession(Long sessionId);
+
     /**
      * Save or update burningQuestion into database.
-     * 
+     *
      * @param sessionId
-     * @param itemUid item uid, if it's null - it signifies general burning question
+     * @param itemUid
+     *            item uid, if it's null - it signifies general burning question
      * @param question
      */
     void saveBurningQuestion(Long sessionId, Long itemUid, String question);
-    
-    ScratchieAnswer getScratchieAnswerByUid (Long answerUid);
+
+    ScratchieAnswer getScratchieAnswerByUid(Long answerUid);
 
     /**
      * Get a cloned copy of tool default tool content (Scratchie) and assign the toolContentId of that copy as the given
      * <code>contentId</code>
-     * 
+     *
      * @param contentId
      * @return
      * @throws ScratchieApplicationException
@@ -91,7 +91,7 @@ public interface IScratchieService {
 
     /**
      * Get list of scratchie items by given scratchieUid. These scratchie items must be created by author.
-     * 
+     *
      * @param scratchieUid
      * @return
      */
@@ -105,24 +105,24 @@ public interface IScratchieService {
 
     /**
      * Get user by sessionID and UserID
-     * 
+     *
      * @param userId
      * @param sessionId
      * @return
      */
     ScratchieUser getUserByIDAndSession(Long userId, Long sessionId);
-    
+
     /**
      * Get users by given toolSessionId.
-     * 
+     *
      * @param long1
      * @return
      */
     List<ScratchieUser> getUsersBySession(Long toolSessionId);
-    
+
     /**
      * Save specified user.
-     * 
+     *
      * @param long1
      * @return
      */
@@ -130,21 +130,21 @@ public interface IScratchieService {
 
     /**
      * Save or update scratchie into database.
-     * 
+     *
      * @param Scratchie
      */
     void saveOrUpdateScratchie(Scratchie scratchie);
 
     /**
      * Delete resoruce item from database.
-     * 
+     *
      * @param uid
      */
     void deleteScratchieItem(Long uid);
 
     /**
      * Get scratchie which is relative with the special toolSession.
-     * 
+     *
      * @param sessionId
      * @return
      */
@@ -152,7 +152,7 @@ public interface IScratchieService {
 
     /**
      * Get scratchie toolSession by toolSessionId
-     * 
+     *
      * @param sessionId
      * @return
      */
@@ -160,32 +160,37 @@ public interface IScratchieService {
 
     /**
      * Save or update scratchie session.
-     * 
+     *
      * @param resSession
      */
     void saveOrUpdateScratchieSession(ScratchieSession resSession);
-    
+
     /**
      * Fills in which order the student selects answers
-     * 
+     *
      * @param items
      * @param user
      */
     void getScratchesOrder(Collection<ScratchieItem> items, Long toolSessionId);
-    
+
     /**
-     * Fill in scratchieItems with information about whether they were unraveled; and answers with information on their scratched.
-     * 
+     * Fill in scratchieItems with information about whether they were unraveled; and answers with information on their
+     * scratched.
+     *
      * @param scratchieItemList
-     * @param item item parameter is optional. In case it's provided - these item collection is used instead of quering DB 
+     * @param item
+     *            item parameter is optional. In case it's provided - these item collection is used instead of quering
+     *            DB
      */
     Collection<ScratchieItem> getItemsWithIndicatedScratches(Long toolSessionId);
 
     /**
-     * The same as getItemsWithIndicatedScratches(Long toolSessionId), but items are provided as parameter and not queried from DB.
-     * 
+     * The same as getItemsWithIndicatedScratches(Long toolSessionId), but items are provided as parameter and not
+     * queried from DB.
+     *
      * @param scratchieItemList
-     * @param item this item collection is used instead of quering DB 
+     * @param item
+     *            this item collection is used instead of quering DB
      */
     Collection<ScratchieItem> getItemsWithIndicatedScratches(Long toolSessionId, Collection<ScratchieItem> items);
 
@@ -194,19 +199,19 @@ public interface IScratchieService {
      * update all the marks.
      */
     void recordItemScratched(Long toolSessionId, Long scratchieItemUid);
-    
+
     void recalculateMarkForSession(Long sessionId, boolean isPropagateToGradebook);
-    
+
     /**
      * Mark all users in agroup as ScratchingFinished so that users can't continue scratching after this.
-     * 
+     *
      * @param toolSessionId
      */
     void setScratchingFinished(Long toolSessionId);
 
     /**
      * If success return next activity's url, otherwise return null.
-     * 
+     *
      * @param toolSessionId
      * @param userId
      * @return
@@ -214,32 +219,35 @@ public interface IScratchieService {
     String finishToolSession(Long toolSessionId, Long userId) throws ScratchieApplicationException;
 
     ScratchieItem getScratchieItemByUid(Long itemUid);
-    
+
     /**
      * @param contentId
-     * @param isIncludeOnlyLeaders if true - return Summaries only for leader, all users in a group otherwise
+     * @param isIncludeOnlyLeaders
+     *            if true - return Summaries only for leader, all users in a group otherwise
      * @return
      */
     List<GroupSummary> getMonitoringSummary(Long contentId, boolean isIncludeOnlyLeaders);
-    
+
     List<GroupSummary> getQuestionSummary(Long contentId, Long itemUid);
-    
+
     /**
      * In order to group BurningQuestions by items, organise them as a list of BurningQuestionItemDTOs.
-     * 
+     *
      * @param scratchie
-     * @param sessionId optional parameter, if it's specified, BurningQuestionDTOs will also contain information what leader of this group has liked
+     * @param sessionId
+     *            optional parameter, if it's specified, BurningQuestionDTOs will also contain information what leader
+     *            of this group has liked
      * @return
      */
     List<BurningQuestionItemDTO> getBurningQuestionDtos(Scratchie scratchie, Long sessionId);
-    
+
     boolean addLike(Long burningQuestionUid, Long sessionId);
-    
+
     void removeLike(Long burningQuestionUid, Long sessionId);
-    
+
     /**
      * Export excel spreadheet
-     * 
+     *
      * @param scratchie
      * @return
      */
@@ -247,7 +255,7 @@ public interface IScratchieService {
 
     /**
      * Create refection entry into notebook tool.
-     * 
+     *
      * @param sessionId
      * @param notebook_tool
      * @param tool_signature
@@ -259,7 +267,7 @@ public interface IScratchieService {
 
     /**
      * Get reflection entry from notebook tool.
-     * 
+     *
      * @param sessionId
      * @param idType
      * @param signature
@@ -275,7 +283,7 @@ public interface IScratchieService {
 
     /**
      * Get Reflection list grouped by sessionID.
-     * 
+     *
      * @param contentId
      * @return
      */
@@ -283,7 +291,7 @@ public interface IScratchieService {
 
     /**
      * Get user by UID
-     * 
+     *
      * @param uid
      * @return
      */
@@ -293,43 +301,43 @@ public interface IScratchieService {
 
     /**
      * Gets a message from scratchie bundle. Same as <code><fmt:message></code> in JSP pages.
-     * 
+     *
      * @param key
-     *                key of the message
+     *            key of the message
      * @return message content
      */
     String getMessage(String key);
-    
+
     /**
      * Returns whether activity is grouped and therefore it is expected more than one tool session.
-     * 
+     *
      * @param toolContentID
      * @return
      */
     boolean isGroupedActivity(long toolContentID);
-    
+
     /**
      * Return all leaders in activity for all groups
-     * 
+     *
      * @param contentId
      * @return
      */
     Set<ScratchieUser> getAllLeaders(Long contentId);
-    
+
     void changeUserMark(Long userId, Long userUid, Integer newMark);
-    
+
     /**
      * Recalculate marks after editing content from monitoring.
-     * 
+     *
      * @param scratchie
      * @param oldItems
      * @param newItems
      */
     void recalculateUserAnswers(Scratchie scratchie, Set<ScratchieItem> oldItems, Set<ScratchieItem> newItems,
 	    List<ScratchieItem> deletedItems);
-    
+
     void releaseItemsFromCache(Scratchie scratchie);
-    
+
     ScratchieConfigItem getConfigItem(String key);
 
     void saveOrUpdateScratchieConfigItem(ScratchieConfigItem item);

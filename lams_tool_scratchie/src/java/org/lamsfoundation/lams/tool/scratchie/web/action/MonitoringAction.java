@@ -2,21 +2,21 @@
  * Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
  * =============================================================
  * License Information: http://lamsfoundation.org/licensing/lams/2.0/
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License version 2.0 
+ * it under the terms of the GNU General Public License version 2.0
  * as published by the Free Software Foundation.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301
  * USA
- * 
+ *
  * http://www.gnu.org/licenses/gpl.txt
  * ****************************************************************
  */
@@ -45,7 +45,6 @@ import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.lamsfoundation.lams.tool.scratchie.ScratchieConstants;
-import org.lamsfoundation.lams.tool.scratchie.dto.BurningQuestionDTO;
 import org.lamsfoundation.lams.tool.scratchie.dto.BurningQuestionItemDTO;
 import org.lamsfoundation.lams.tool.scratchie.dto.GroupSummary;
 import org.lamsfoundation.lams.tool.scratchie.dto.ReflectDTO;
@@ -68,7 +67,7 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
 
 public class MonitoringAction extends Action {
     public static Logger log = Logger.getLogger(MonitoringAction.class);
-    
+
     private static IScratchieService service;
 
     @Override
@@ -111,7 +110,7 @@ public class MonitoringAction extends Action {
 
 	Scratchie scratchie = service.getScratchieByContentId(contentId);
 	Set<ScratchieUser> learners = service.getAllLeaders(contentId);
-	
+
 	//set SubmissionDeadline, if any
 	if (scratchie.getSubmissionDeadline() != null) {
 	    Date submissionDeadline = scratchie.getSubmissionDeadline();
@@ -132,7 +131,7 @@ public class MonitoringAction extends Action {
 	sessionMap.put(AttributeNames.PARAM_CONTENT_FOLDER_ID,
 		WebUtil.readStrParam(request, AttributeNames.PARAM_CONTENT_FOLDER_ID));
 	sessionMap.put(ScratchieConstants.ATTR_REFLECTION_ON, scratchie.isReflectOnActivity());
-	
+
 	// Create BurningQuestionsDtos if BurningQuestions is enabled.
 	if (scratchie.isBurningQuestionsEnabled()) {
 	    List<BurningQuestionItemDTO> burningQuestionItemDtos = service.getBurningQuestionDtos(scratchie, null);
@@ -153,7 +152,8 @@ public class MonitoringAction extends Action {
 
 	initializeScratchieService();
 	String sessionMapID = request.getParameter(ScratchieConstants.ATTR_SESSION_MAP_ID);
-	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession().getAttribute(sessionMapID);
+	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
+		.getAttribute(sessionMapID);
 	request.setAttribute(ScratchieConstants.ATTR_SESSION_MAP_ID, sessionMap.getSessionID());
 
 	Long itemUid = WebUtil.readLongParam(request, ScratchieConstants.ATTR_ITEM_UID);
@@ -165,11 +165,12 @@ public class MonitoringAction extends Action {
 
 	Long contentId = (Long) sessionMap.get(ScratchieConstants.ATTR_TOOL_CONTENT_ID);
 	List<GroupSummary> summaryList = service.getQuestionSummary(contentId, itemUid);
-	
+
 	// escape JS sensitive characters in answer descriptions
 	for (GroupSummary summary : summaryList) {
 	    for (ScratchieAnswer answer : summary.getAnswers()) {
-		String description = (answer.getDescription() == null) ? "" : StringEscapeUtils.escapeJavaScript(answer.getDescription());
+		String description = (answer.getDescription() == null) ? ""
+			: StringEscapeUtils.escapeJavaScript(answer.getDescription());
 		answer.setDescription(description);
 	    }
 	}
@@ -177,7 +178,7 @@ public class MonitoringAction extends Action {
 	request.setAttribute(ScratchieConstants.ATTR_SUMMARY_LIST, summaryList);
 	return mapping.findForward(ScratchieConstants.SUCCESS);
     }
-    
+
     private ActionForward saveUserMark(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) {
 
@@ -185,7 +186,7 @@ public class MonitoringAction extends Action {
 		&& !StringUtils.isEmpty(request.getParameter(ScratchieConstants.ATTR_USER_ID))
 		&& !StringUtils.isEmpty(request.getParameter(ScratchieConstants.PARAM_SESSION_ID))) {
 	    initializeScratchieService();
-	    
+
 	    Long userId = WebUtil.readLongParam(request, ScratchieConstants.ATTR_USER_ID);
 	    Long sessionId = WebUtil.readLongParam(request, ScratchieConstants.PARAM_SESSION_ID);
 	    Integer newMark = Integer.valueOf(request.getParameter(ScratchieConstants.PARAM_MARK));
@@ -194,10 +195,10 @@ public class MonitoringAction extends Action {
 
 	return null;
     }
-    
+
     /**
      * Set Submission Deadline
-     * 
+     *
      * @param mapping
      * @param form
      * @param request
@@ -207,10 +208,10 @@ public class MonitoringAction extends Action {
     private ActionForward setSubmissionDeadline(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) {
 	initializeScratchieService();
-	
+
 	Long contentID = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_CONTENT_ID);
 	Scratchie scratchie = service.getScratchieByContentId(contentID);
-	
+
 	Long dateParameter = WebUtil.readLongParam(request, ScratchieConstants.ATTR_SUBMISSION_DEADLINE, true);
 	Date tzSubmissionDeadline = null;
 	if (dateParameter != null) {
@@ -228,16 +229,18 @@ public class MonitoringAction extends Action {
 
     /**
      * Exports tool results into excel.
-     * @throws IOException 
+     * 
+     * @throws IOException
      */
     private ActionForward exportExcel(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws IOException  {
+	    HttpServletResponse response) throws IOException {
 
 	initializeScratchieService();
 	String sessionMapID = request.getParameter(ScratchieConstants.ATTR_SESSION_MAP_ID);
-	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession().getAttribute(sessionMapID);
+	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
+		.getAttribute(sessionMapID);
 	Scratchie scratchie = (Scratchie) sessionMap.get(ScratchieConstants.ATTR_SCRATCHIE);
-	
+
 	LinkedHashMap<String, ExcelCell[][]> dataToExport = service.exportExcel(scratchie.getContentId());
 
 	String fileName = "scratchie_export.xlsx";
@@ -258,8 +261,8 @@ public class MonitoringAction extends Action {
     // *************************************************************************************
     private void initializeScratchieService() {
 	if (service == null) {
-	    WebApplicationContext wac = WebApplicationContextUtils.getRequiredWebApplicationContext(getServlet()
-		    .getServletContext());
+	    WebApplicationContext wac = WebApplicationContextUtils
+		    .getRequiredWebApplicationContext(getServlet().getServletContext());
 	    service = (IScratchieService) wac.getBean(ScratchieConstants.SCRATCHIE_SERVICE);
 	}
     }

@@ -2,21 +2,21 @@
  * Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
  * =============================================================
  * License Information: http://lamsfoundation.org/licensing/lams/2.0/
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301
  * USA
- * 
+ *
  * http://www.gnu.org/licenses/gpl.txt
  * ****************************************************************
  */
@@ -157,10 +157,10 @@ public class SimpleContentPackageConverter {
     /**
      * Process the given element. Returns a newly formatted Element if the element is a visible item, null otherwise.
      * Will also set the value "defaultItemURL" while processing, if it finds the default item.
-     * 
+     *
      * First time through, the element will be an organization and parentOrgIdentifier will be null. After that,
      * elements are expected to be items and parentOrgIdentifier should not be null.
-     * 
+     *
      * parentOrgIdentifier is the parent organization of an item. An item is the default item if either: (a) the
      * defaultOrgIdentifier is null and it is the first item encountered which has a resource or (b)
      * parentOrgIdentifier==defaultOrgIdentifier and it is the first item encountered which has a resource.
@@ -185,7 +185,7 @@ public class SimpleContentPackageConverter {
 	String idRef = element.getAttribute("identifierref");
 	// find matching resource
 	String resourceURL = getText("/manifest/resources/resource[@identifier='" + idRef + "']/@href", manifestDoc);
-	setAttribute(itref, "resource", resourceURL); // optional 
+	setAttribute(itref, "resource", resourceURL); // optional
 
 	if (StringUtils.isNotBlank(resourceURL) && (this.defaultItem == null)
 		&& ((defaultOrgIdentifier == null) || defaultOrgIdentifier.equals(parentOrgIdentifier))) {

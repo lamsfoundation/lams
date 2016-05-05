@@ -24,9 +24,9 @@ import org.lamsfoundation.lams.util.hibernate.HibernateSessionManager;
 
 /**
  * Provides tools for managing events and notifing users.
- * 
+ *
  * @author Marcin Cieslak
- * 
+ *
  */
 public class EventNotificationService implements IEventNotificationService {
 
@@ -151,7 +151,7 @@ public class EventNotificationService implements IEventNotificationService {
 
     /**
      * Sends the message to the user. Properties storing information of the last notification attempt are updated.
-     * 
+     *
      * @param subject
      *            subject of the message; <code>null</code> if not applicable
      * @param message
@@ -272,7 +272,7 @@ public class EventNotificationService implements IEventNotificationService {
 
     /**
      * See {@link IEventNotificationService#subscribe(String, String, Long, Long, AbstractDeliveryMethod, Long)
-     * 
+     *
      */
     private void subscribe(Event event, Integer userId, AbstractDeliveryMethod deliveryMethod)
 	    throws InvalidParameterException {
@@ -354,7 +354,7 @@ public class EventNotificationService implements IEventNotificationService {
 
 	    /*
 	     * if any of the notifications failed,
-	     * a copy of the event is created in order to repeat the attempt later 
+	     * a copy of the event is created in order to repeat the attempt later
 	     */
 	    if (eventFailCopy != null) {
 		eventFailCopy.setFailTime(new Date());

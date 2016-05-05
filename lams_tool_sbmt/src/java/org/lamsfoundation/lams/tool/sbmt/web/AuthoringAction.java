@@ -2,21 +2,21 @@
  * Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
  * =============================================================
  * License Information: http://lamsfoundation.org/licensing/lams/2.0/
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License version 2.0 
+ * it under the terms of the GNU General Public License version 2.0
  * as published by the Free Software Foundation.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301
  * USA
- * 
+ *
  * http://www.gnu.org/licenses/gpl.txt
  * ****************************************************************
  */
@@ -26,12 +26,7 @@
 package org.lamsfoundation.lams.tool.sbmt.web;
 
 import java.lang.reflect.InvocationTargetException;
-import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Set;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -44,16 +39,13 @@ import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.apache.struts.action.ActionMessages;
-import org.apache.struts.upload.FormFile;
 import org.lamsfoundation.lams.authoring.web.AuthoringConstants;
-import org.lamsfoundation.lams.contentrepository.client.IToolContentHandler;
 import org.lamsfoundation.lams.tool.ToolAccessMode;
 import org.lamsfoundation.lams.tool.sbmt.SubmitFilesContent;
 import org.lamsfoundation.lams.tool.sbmt.SubmitUser;
 import org.lamsfoundation.lams.tool.sbmt.form.AuthoringForm;
 import org.lamsfoundation.lams.tool.sbmt.service.ISubmitFilesService;
 import org.lamsfoundation.lams.tool.sbmt.service.SubmitFilesServiceProxy;
-import org.lamsfoundation.lams.tool.sbmt.util.SbmtConstants;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.action.LamsDispatchAction;
@@ -64,10 +56,10 @@ import org.lamsfoundation.lams.web.util.SessionMap;
 /**
  * @author Manpreet Minhas
  * @author Steve Ni
- * 
  *
  *
- * 
+ *
+ *
  *
  *
  */
@@ -79,10 +71,10 @@ public class AuthoringAction extends LamsDispatchAction {
     /**
      * This page will display initial submit tool content. Or just a blank page if the toolContentID does not exist
      * before.
-     * 
+     *
      * <BR>
      * Define later will use this method to initial page as well.
-     * 
+     *
      * @see org.apache.struts.actions.DispatchAction#unspecified(org.apache.struts.action.ActionMapping,
      *      org.apache.struts.action.ActionForm, javax.servlet.http.HttpServletRequest,
      *      javax.servlet.http.HttpServletResponse)
@@ -137,7 +129,7 @@ public class AuthoringAction extends LamsDispatchAction {
 
     /**
      * Update all content for submit tool except online/offline instruction files list.
-     * 
+     *
      * @param mapping
      * @param form
      * @param request
@@ -217,7 +209,7 @@ public class AuthoringAction extends LamsDispatchAction {
     // ***********************************************************
     /**
      * The private method to get content from ActionForm parameters (web page).
-     * 
+     *
      * @param form
      * @return
      */
@@ -241,7 +233,7 @@ public class AuthoringAction extends LamsDispatchAction {
 
     /**
      * Get submit file service bean.
-     * 
+     *
      * @return
      */
     private ISubmitFilesService getService() {

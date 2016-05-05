@@ -2,21 +2,21 @@
  * Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
  * =============================================================
  * License Information: http://lamsfoundation.org/licensing/lams/2.0/
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301
  * USA
- * 
+ *
  * http://www.gnu.org/licenses/gpl.txt
  * ****************************************************************
  */
@@ -84,7 +84,7 @@ public class Mindmap implements java.io.Serializable, Cloneable {
     // Property accessors
     /**
      *
-     * 
+     *
      */
     public Long getUid() {
 	return uid;
@@ -96,7 +96,7 @@ public class Mindmap implements java.io.Serializable, Cloneable {
 
     /**
      *
-     * 
+     *
      */
     public Date getCreateDate() {
 	return createDate;
@@ -108,7 +108,7 @@ public class Mindmap implements java.io.Serializable, Cloneable {
 
     /**
      *
-     * 
+     *
      */
     public Date getUpdateDate() {
 	return updateDate;
@@ -117,10 +117,10 @@ public class Mindmap implements java.io.Serializable, Cloneable {
     public void setUpdateDate(Date updateDate) {
 	this.updateDate = updateDate;
     }
-    
+
     /**
      * Returns deadline for learner's submission
-     * 
+     *
      * @return submissionDeadline
      *
      */
@@ -130,7 +130,7 @@ public class Mindmap implements java.io.Serializable, Cloneable {
 
     /**
      * Sets deadline for learner's submission
-     * 
+     *
      * @param submissionDeadline
      */
     public void setSubmissionDeadline(Date submissionDeadline) {
@@ -139,7 +139,7 @@ public class Mindmap implements java.io.Serializable, Cloneable {
 
     /**
      *
-     * 
+     *
      */
     public Long getCreateBy() {
 	return createBy;
@@ -151,7 +151,7 @@ public class Mindmap implements java.io.Serializable, Cloneable {
 
     /**
      *
-     * 
+     *
      */
     public String getTitle() {
 	return title;
@@ -163,7 +163,7 @@ public class Mindmap implements java.io.Serializable, Cloneable {
 
     /**
      *
-     * 
+     *
      */
     public String getInstructions() {
 	return instructions;
@@ -175,7 +175,7 @@ public class Mindmap implements java.io.Serializable, Cloneable {
 
     /**
      *
-     * 
+     *
      */
     public boolean isLockOnFinished() {
 	return lockOnFinished;
@@ -199,7 +199,7 @@ public class Mindmap implements java.io.Serializable, Cloneable {
 
     /**
      *
-     * 
+     *
      */
     public boolean isContentInUse() {
 	return contentInUse;
@@ -211,7 +211,7 @@ public class Mindmap implements java.io.Serializable, Cloneable {
 
     /**
      *
-     * 
+     *
      */
     public boolean isDefineLater() {
 	return defineLater;
@@ -231,14 +231,14 @@ public class Mindmap implements java.io.Serializable, Cloneable {
     public void setToolContentId(Long toolContentId) {
 	this.toolContentId = toolContentId;
     }
-    
+
     /**
      *
      */
     public String getMindmapExportContent() {
 	return mindmapExportContent;
     }
-    
+
     public void setMindmapExportContent(String mindmapExportContent) {
 	this.mindmapExportContent = mindmapExportContent;
     }
@@ -269,7 +269,7 @@ public class Mindmap implements java.io.Serializable, Cloneable {
      *
      *
      *
-     * 
+     *
      */
     public Set getMindmapSessions() {
 	return mindmapSessions;
@@ -281,7 +281,7 @@ public class Mindmap implements java.io.Serializable, Cloneable {
 
     /**
      * toString
-     * 
+     *
      * @return String
      */
     @Override
@@ -310,8 +310,8 @@ public class Mindmap implements java.io.Serializable, Cloneable {
 	}
 	Mindmap castOther = (Mindmap) other;
 
-	return this.getUid() == castOther.getUid() || this.getUid() != null && castOther.getUid() != null
-		&& this.getUid().equals(castOther.getUid());
+	return this.getUid() == castOther.getUid()
+		|| this.getUid() != null && castOther.getUid() != null && this.getUid().equals(castOther.getUid());
     }
 
     @Override

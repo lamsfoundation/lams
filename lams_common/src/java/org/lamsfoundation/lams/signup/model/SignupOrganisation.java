@@ -5,10 +5,10 @@ import java.util.Date;
 import org.lamsfoundation.lams.usermanagement.Organisation;
 
 /**
- * Signup organisation. 
+ * Signup organisation.
  */
 public class SignupOrganisation {
-    
+
     /**
      * Link on Lams wiki signup help page.
      */
@@ -61,19 +61,19 @@ public class SignupOrganisation {
     }
 
     public Boolean getAddWithAuthor() {
-        return addWithAuthor;
+	return addWithAuthor;
     }
 
     public void setAddWithAuthor(Boolean addWithAuthor) {
-        this.addWithAuthor = addWithAuthor;
+	this.addWithAuthor = addWithAuthor;
     }
 
     public Boolean getAddWithMonitor() {
-        return addWithMonitor;
+	return addWithMonitor;
     }
 
     public void setAddWithMonitor(Boolean addWithMonitor) {
-        this.addWithMonitor = addWithMonitor;
+	this.addWithMonitor = addWithMonitor;
     }
 
     public String getCourseKey() {
@@ -107,7 +107,7 @@ public class SignupOrganisation {
     public void setDisabled(Boolean disabled) {
 	this.disabled = disabled;
     }
-    
+
     public Boolean getLoginTabActive() {
 	return loginTabActive;
     }
@@ -117,11 +117,11 @@ public class SignupOrganisation {
     }
 
     public String getContext() {
-        return context;
+	return context;
     }
 
     public void setContext(String context) {
-        this.context = context;
+	this.context = context;
     }
 
 }

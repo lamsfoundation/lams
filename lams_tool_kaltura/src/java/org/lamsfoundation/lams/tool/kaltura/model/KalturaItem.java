@@ -1,26 +1,26 @@
-/**************************************************************** 
- * Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org) 
- * ============================================================= 
- * License Information: http://lamsfoundation.org/licensing/lams/2.0/ 
- * 
- * This program is free software; you can redistribute it and/or modify 
- * it under the terms of the GNU General Public License version 2.0 
- * as published by the Free Software Foundation. 
- * 
- * This program is distributed in the hope that it will be useful, 
- * but WITHOUT ANY WARRANTY; without even the implied warranty of 
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the 
- * GNU General Public License for more details. 
- * 
- * You should have received a copy of the GNU General Public License 
- * along with this program; if not, write to the Free Software 
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 * USA 
- * 
- * http://www.gnu.org/licenses/gpl.txt 
- * **************************************************************** 
- */  
- 
-/* $Id$ */  
+/****************************************************************
+ * Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
+ * =============================================================
+ * License Information: http://lamsfoundation.org/licensing/lams/2.0/
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License version 2.0
+ * as published by the Free Software Foundation.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 * USA
+ *
+ * http://www.gnu.org/licenses/gpl.txt
+ * ****************************************************************
+ */
+
+/* $Id$ */
 package org.lamsfoundation.lams.tool.kaltura.model;
 
 import java.util.Date;
@@ -34,11 +34,11 @@ import org.lamsfoundation.lams.tool.kaltura.dto.AverageRatingDTO;
 
 /**
  * KalturaItem
- * 
  *
- * 
+ *
+ *
  * @author Andrey Balan
- * 
+ *
  */
 public class KalturaItem implements Cloneable {
 
@@ -49,41 +49,41 @@ public class KalturaItem implements Cloneable {
     private String title;
 
     private String entryId;
-    
+
     private int duration;
 
     private int sequenceId;
 
     private boolean isHidden;
-    
+
     private boolean isCreateByAuthor;
 
     private Date createDate;
-    
+
     private KalturaUser createdBy;
-    
+
     private Long kalturaUid;
-    
+
     private Long mark;
 
     //Set of user comments
     private Set comments;
-    
+
     // ***********************************************
     // Non persistant fields:
-    
+
     private AverageRatingDTO averageRatingDto;
-    
+
     private Set<KalturaComment> groupComments;
-    
+
     /**
      * Default contruction method.
-     * 
+     *
      */
     public KalturaItem() {
 	comments = new HashSet();
 	groupComments = new HashSet<KalturaComment>();
-    }  
+    }
 
     @Override
     public Object clone() {
@@ -115,7 +115,7 @@ public class KalturaItem implements Cloneable {
 
 	return item;
     }
-    
+
     @Override
     public boolean equals(Object o) {
 	if (this == o) {
@@ -127,7 +127,8 @@ public class KalturaItem implements Cloneable {
 
 	final KalturaItem genericEntity = (KalturaItem) o;
 
-	return new EqualsBuilder().append(this.getUid(), genericEntity.getUid()).append(this.getSequenceId(), genericEntity.getSequenceId()).isEquals();
+	return new EqualsBuilder().append(this.getUid(), genericEntity.getUid())
+		.append(this.getSequenceId(), genericEntity.getSequenceId()).isEquals();
     }
 
     // **********************************************************
@@ -143,7 +144,7 @@ public class KalturaItem implements Cloneable {
 
     /**
      * @param uid
-     *                The uid to set.
+     *            The uid to set.
      */
     public void setUid(Long uid) {
 	this.uid = uid;
@@ -160,7 +161,7 @@ public class KalturaItem implements Cloneable {
     public void setTitle(String title) {
 	this.title = title;
     }
-    
+
     /**
      *
      * @return duration of the corresponding Kaltura video
@@ -170,14 +171,15 @@ public class KalturaItem implements Cloneable {
     }
 
     /**
-     * @param duration duration of the Kaltura video
+     * @param duration
+     *            duration of the Kaltura video
      */
     public void setDuration(int duration) {
 	this.duration = duration;
     }
-    
+
     public Date getDurationDate() {
-	return new Date(duration*1000);
+	return new Date(duration * 1000);
     }
 
     /**
@@ -194,9 +196,9 @@ public class KalturaItem implements Cloneable {
 
     /**
      * Returns item sequence number.
-     * 
+     *
      * @return item sequence number
-     * 
+     *
      *
      */
     public int getSequenceId() {
@@ -205,9 +207,9 @@ public class KalturaItem implements Cloneable {
 
     /**
      * Sets item sequence number.
-     * 
+     *
      * @param sequenceId
-     *                item sequence number
+     *            item sequence number
      */
     public void setSequenceId(int sequenceId) {
 	this.sequenceId = sequenceId;
@@ -215,7 +217,7 @@ public class KalturaItem implements Cloneable {
 
     /**
      *
-     * 
+     *
      * @return
      */
     public KalturaUser getCreatedBy() {
@@ -249,7 +251,7 @@ public class KalturaItem implements Cloneable {
     public void setCreateByAuthor(boolean isCreateByAuthor) {
 	this.isCreateByAuthor = isCreateByAuthor;
     }
-    
+
     /**
      *
      * @return
@@ -261,7 +263,7 @@ public class KalturaItem implements Cloneable {
     public void setKalturaUid(Long kalturaUid) {
 	this.kalturaUid = kalturaUid;
     }
-    
+
     /**
      *
      * @return
@@ -285,12 +287,12 @@ public class KalturaItem implements Cloneable {
     public void setHidden(boolean isHidden) {
 	this.isHidden = isHidden;
     }
-    
+
     /**
      *
      *
      *
-     * 
+     *
      * @return a set of Comments to this Image.
      */
     public Set getComments() {
@@ -300,7 +302,7 @@ public class KalturaItem implements Cloneable {
     public void setComments(Set comments) {
 	this.comments = comments;
     }
-    
+
     public AverageRatingDTO getAverageRatingDto() {
 	return averageRatingDto;
     }
@@ -308,12 +310,12 @@ public class KalturaItem implements Cloneable {
     public void setAverageRatingDto(AverageRatingDTO averageRatingDto) {
 	this.averageRatingDto = averageRatingDto;
     }
-    
+
     public Set<KalturaComment> getGroupComments() {
 	return groupComments;
     }
 
-    public void setGroupComments(Set <KalturaComment> groupComments) {
+    public void setGroupComments(Set<KalturaComment> groupComments) {
 	this.groupComments = groupComments;
     }
 }

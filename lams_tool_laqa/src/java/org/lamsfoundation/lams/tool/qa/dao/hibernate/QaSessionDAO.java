@@ -1,21 +1,21 @@
 /****************************************************************
  * =============================================================
  * License Information: http://lamsfoundation.org/licensing/lams/2.0/
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301
  * USA
- * 
+ *
  * http://www.gnu.org/licenses/gpl.txt
  * ****************************************************************
  */
@@ -32,7 +32,7 @@ import org.springframework.stereotype.Repository;
 
 /**
  * @author Ozgur Demirtas
- * 
+ *
  */
 @Repository
 public class QaSessionDAO extends LAMSBaseDAO implements IQaSessionDAO {
@@ -40,6 +40,7 @@ public class QaSessionDAO extends LAMSBaseDAO implements IQaSessionDAO {
     /**
      * @see org.lamsfoundation.lams.tool.survey.dao.interfaces.ISurveySessionDAO#getSurveySessionById(long)
      */
+    @Override
     public QaSession getQaSessionById(long qaSessionId) {
 	String query = "from QaSession as qus where qus.qaSessionId = ?";
 	List list = getSessionFactory().getCurrentSession().createQuery(query).setLong(0, qaSessionId).list();
@@ -54,6 +55,7 @@ public class QaSessionDAO extends LAMSBaseDAO implements IQaSessionDAO {
     /**
      * @see org.lamsfoundation.lams.tool.survey.dao.interfaces.ISurveySessionDAO#CreateSurveySession(com.lamsinternational.tool.survey.domain.SurveySession)
      */
+    @Override
     public void createSession(QaSession session) {
 	getSession().save(session);
     }
@@ -61,6 +63,7 @@ public class QaSessionDAO extends LAMSBaseDAO implements IQaSessionDAO {
     /**
      * @see org.lamsfoundation.lams.tool.survey.dao.interfaces.ISurveySessionDAO#UpdateSurveySession(com.lamsinternational.tool.survey.domain.SurveySession)
      */
+    @Override
     public void UpdateQaSession(QaSession session) {
 	getSession().update(session);
     }
@@ -68,6 +71,7 @@ public class QaSessionDAO extends LAMSBaseDAO implements IQaSessionDAO {
     /**
      * @see org.lamsfoundation.lams.tool.survey.dao.interfaces.ISurveySessionDAO#deleteSurveySession(com.lamsinternational.tool.survey.domain.SurveySession)
      */
+    @Override
     public void deleteQaSession(QaSession qaSession) {
 	getSession().delete(qaSession);
     }

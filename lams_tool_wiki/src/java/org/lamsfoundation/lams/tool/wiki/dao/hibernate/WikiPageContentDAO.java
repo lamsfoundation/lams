@@ -8,8 +8,9 @@ import org.springframework.stereotype.Repository;
 @Repository
 public class WikiPageContentDAO extends LAMSBaseDAO implements IWikiPageContentDAO {
 
+    @Override
     public void saveOrUpdate(WikiPageContent content) {
-    	getSession().saveOrUpdate(content);
+	getSession().saveOrUpdate(content);
     }
 
 }

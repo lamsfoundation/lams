@@ -2,21 +2,21 @@
  * Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
  * =============================================================
  * License Information: http://lamsfoundation.org/licensing/lams/2.0/
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License version 2.0 
+ * it under the terms of the GNU General Public License version 2.0
  * as published by the Free Software Foundation.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301
  * USA
- * 
+ *
  * http://www.gnu.org/licenses/gpl.txt
  * ****************************************************************
  */
@@ -56,9 +56,9 @@ public class AuthoringForm extends ActionForm {
     boolean lockOnFinished;
 
     boolean reflectOnActivity;
-    
+
     boolean allowViewOthersImages;
-    
+
     String reflectInstructions;
 
     FormFile onlineFile;
@@ -74,22 +74,21 @@ public class AuthoringForm extends ActionForm {
     Long deleteFileUuid;
 
     SessionMap sessionMap;
-    
+
     String contentFolderID;
-    
+
     Long toolContentID;
-    
+
     String existingImageFileName;
-    
+
     String mode;
-    
+
     // flag of this item has attachment or not
     private boolean hasFile;
     private Long fileUuid;
     private Long fileVersionId;
     private String fileName;
     private FormFile file;
-    
 
     @Override
     public ActionErrors validate(ActionMapping arg0, HttpServletRequest arg1) {
@@ -194,101 +193,101 @@ public class AuthoringForm extends ActionForm {
     public void setDeleteFileUuid(Long deleteFile) {
 	this.deleteFileUuid = deleteFile;
     }
-    
+
     public boolean isReflectOnActivity() {
-        return reflectOnActivity;
+	return reflectOnActivity;
     }
 
     public void setReflectOnActivity(boolean reflectOnActivity) {
-        this.reflectOnActivity = reflectOnActivity;
+	this.reflectOnActivity = reflectOnActivity;
     }
 
     public boolean isHasFile() {
-        return hasFile;
+	return hasFile;
     }
 
     public void setHasFile(boolean hasFile) {
-        this.hasFile = hasFile;
+	this.hasFile = hasFile;
     }
 
     public Long getFileUuid() {
-        return fileUuid;
+	return fileUuid;
     }
 
     public void setFileUuid(Long fileUuid) {
-        this.fileUuid = fileUuid;
+	this.fileUuid = fileUuid;
     }
 
     public Long getFileVersionId() {
-        return fileVersionId;
+	return fileVersionId;
     }
 
     public void setFileVersionId(Long fileVersionId) {
-        this.fileVersionId = fileVersionId;
+	this.fileVersionId = fileVersionId;
     }
 
     public String getFileName() {
-        return fileName;
+	return fileName;
     }
 
     public void setFileName(String fileName) {
-        this.fileName = fileName;
+	this.fileName = fileName;
     }
 
     public FormFile getFile() {
-        return file;
+	return file;
     }
 
     public void setFile(FormFile file) {
-        this.file = file;
+	this.file = file;
     }
 
     public String getContentFolderID() {
-        return contentFolderID;
+	return contentFolderID;
     }
 
     public void setContentFolderID(String contentFolderID) {
-        this.contentFolderID = contentFolderID;
+	this.contentFolderID = contentFolderID;
     }
 
     public Long getToolContentID() {
-        return toolContentID;
+	return toolContentID;
     }
 
     public void setToolContentID(Long toolContentID) {
-        this.toolContentID = toolContentID;
+	this.toolContentID = toolContentID;
     }
 
     public String getMode() {
-        return mode;
+	return mode;
     }
 
     public void setMode(String mode) {
-        this.mode = mode;
+	this.mode = mode;
     }
 
     public String getExistingImageFileName() {
-        return existingImageFileName;
+	return existingImageFileName;
     }
 
     public void setExistingImageFileName(String existingImageFileName) {
-        this.existingImageFileName = existingImageFileName;
+	this.existingImageFileName = existingImageFileName;
     }
 
     public String getReflectInstructions() {
-        return reflectInstructions;
+	return reflectInstructions;
     }
 
     public void setReflectInstructions(String reflectInstructions) {
-        this.reflectInstructions = reflectInstructions;
+	this.reflectInstructions = reflectInstructions;
     }
 
     public boolean isAllowViewOthersImages() {
-        return allowViewOthersImages;
+	return allowViewOthersImages;
     }
 
     public void setAllowViewOthersImages(boolean allowViewOthersImages) {
-        this.allowViewOthersImages = allowViewOthersImages;
+	this.allowViewOthersImages = allowViewOthersImages;
     }
-    
+
 }

@@ -3,9 +3,9 @@ package org.lamsfoundation.lams.tool.imageGallery.dto;
 import org.lamsfoundation.lams.tool.imageGallery.model.ImageGalleryUser;
 
 /**
- * 
+ *
  * @author Dapeng Ni
- * 
+ *
  */
 public class ReflectDTO {
     private Long userUid;

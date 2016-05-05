@@ -28,7 +28,7 @@ import java.io.Serializable;
 /**
  * Similar to DataOutputDefinition. It's bound with DataTransitions. It defines what outputs the source tool can
  * provide. Teacher can rename the data flow object so it's more meaningful to him.
- * 
+ *
  *
  */
 public class DataFlowObject implements Serializable {
@@ -69,7 +69,7 @@ public class DataFlowObject implements Serializable {
 
     /**
      *
-     * 
+     *
      */
     public Long getDataFlowObjectId() {
 	return dataFlowObjectId;
@@ -82,7 +82,7 @@ public class DataFlowObject implements Serializable {
     /**
      *
      *
-     * 
+     *
      */
     public DataTransition getDataTransition() {
 	return dataTransition;
@@ -137,7 +137,8 @@ public class DataFlowObject implements Serializable {
     }
 
     public static DataFlowObject createCopy(DataFlowObject originalDataFlowObject, DataTransition newDataTransition) {
-	return new DataFlowObject(null, newDataTransition, originalDataFlowObject.getName(), originalDataFlowObject
-		.getDisplayName(), originalDataFlowObject.getOrderId(), originalDataFlowObject.getToolAssigmentId());
+	return new DataFlowObject(null, newDataTransition, originalDataFlowObject.getName(),
+		originalDataFlowObject.getDisplayName(), originalDataFlowObject.getOrderId(),
+		originalDataFlowObject.getToolAssigmentId());
     }
 }

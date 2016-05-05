@@ -2,21 +2,21 @@
  * Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
  * =============================================================
  * License Information: http://lamsfoundation.org/licensing/lams/2.0/
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General License version 2.0 
+ * it under the terms of the GNU General License version 2.0
  * as published by the Free Software Foundation.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General License for more details.
- * 
+ *
  * You should have received a copy of the GNU General License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301
  * USA
- * 
+ *
  * http://www.gnu.org/licenses/gpl.txt
  * ****************************************************************
  */
@@ -43,7 +43,7 @@ import org.lamsfoundation.lams.workspace.dto.FolderContentDTO;
 public interface IWorkspaceManagementService {
     /**
      * I18n Message service. The Workspace action class needs access to the message service.
-     * 
+     *
      * @param messageSource
      */
     MessageService getMessageService();
@@ -58,27 +58,27 @@ public interface IWorkspaceManagementService {
      * This method returns the contents of the folder with given <code>workspaceFolderID</code> depending upon the
      * <code>mode</code>. Before it does so, it checks whether the given <code>User</code> is authorized to perform this
      * action.
-     * 
+     *
      * The <code>mode</code> can be either of the following
      * <ul>
      * <li>AUTHORING In which case all the Learning Designs in the given folder are returned OR</li>
      * <li>MONITORING In which case only those Learning Designs that are valid are returned</li>
      * </ul>
-     * 
-     * 
+     *
+     *
      * <p>
      * <b>Note: </b>It only returns the top level contents. To navigate to the contents of the sub-folders of the given
      * <code>WorkspaceFolder</code> we have to call this method again with there <code>workspaceFolderID</code>
      * </p>
-     * 
+     *
      * <p>
      * <b>For Example:</b>
      * </p>
      * <p>
      * For a folder with given tree structure<b>
-     * 
+     *
      * <pre>
-     *                       A	 						
+     *                       A
      * 					     |
      * 				--------------------
      * 				|        |          |
@@ -88,10 +88,10 @@ public interface IWorkspaceManagementService {
      * 			|		|
      * 		   AA1	   AA2
      * </pre>
-     * 
+     *
      * </b> This function will only retun A1, A2 and A3 and to get the contents if A1 we have to again call this method
      * with workspaceFolderID of A1.
-     * 
+     *
      * @param userID
      *            The <code>user_id</code> of the <code>User</code> who has requested the contents
      * @param workspaceFolder
@@ -109,7 +109,7 @@ public interface IWorkspaceManagementService {
      * the folder. This is useful to Authoring as when the user's organisation is listed, the client doesn't want the
      * home directory returned as the client already knows about the folder from the getAccessibleWorkspaceFolders()
      * call.
-     * 
+     *
      * @param userID
      *            The <code>user_id</code> of the <code>User</code> who has requested the contents
      * @param workspaceFolder
@@ -152,7 +152,7 @@ public interface IWorkspaceManagementService {
 
     /**
      * This method creates a new folder under the given parentFolder inside the user's default workspace.
-     * 
+     *
      * @param parentFolderID
      *            The <code>parent_folder_id</code> of the <code>WorkspaceFolder</code> under which the new folder has
      *            to be created
@@ -172,7 +172,7 @@ public interface IWorkspaceManagementService {
      * works out what the resource is and then calls the other deletion methods. Currently folders, files and learning
      * designs are supported - all other types return an error.
      * <p>
-     * 
+     *
      * @param resourceID
      *            The <code>id</code> to be deleted. May be a learning design id or a folder id.
      * @param resourceType
@@ -186,7 +186,7 @@ public interface IWorkspaceManagementService {
     /**
      * This method copies one folder inside another folder, or a learning design to another folder. If it is a learning
      * design then it also needs the copyType parameter.
-     * 
+     *
      * @param resourceID
      *            The <code>WorkspaceFolder</code> or <code>LearningDesign</code> to be copied.
      * @param resourceType
@@ -207,11 +207,11 @@ public interface IWorkspaceManagementService {
 
     /**
      * This method returns a list of organisation workspace folders.
-     * 
+     *
      * The organisation folders returned are determined based on whether the user has "write" access. A user can
      * write/save his content in an organisation folder the user is a MEMBER of the organisation to which the folder
      * belongs and the user has one or all of the follwing roles (SYSADMIN. ADMIN, AUTHOR, STAFF, TEACHER)
-     * 
+     *
      * @param userID
      *            The <code>user_id</code> of the user for whom the folders have to fetched
      * @return List of folders, in a format suitable for WDDX
@@ -223,7 +223,7 @@ public interface IWorkspaceManagementService {
 
     /**
      * This method returns the root workspace folder for a particular user.
-     * 
+     *
      * @param userID
      *            The <code>user_id</code> of the user for whom the folders have to fetched
      * @return FolderContentDTO for the user's root workspace folder
@@ -233,7 +233,7 @@ public interface IWorkspaceManagementService {
 
     /**
      * This method returns the workspace folder for the server.
-     * 
+     *
      * @param userID
      *            The <code>user_id</code> of the user for whom the folders have to fetched
      * @return FolderContentDTO for the workspace folder
@@ -246,7 +246,7 @@ public interface IWorkspaceManagementService {
      * <code>newName</code>.
      * <p>
      * Currently only folders and learning designs are supported - all other types return an error.
-     * 
+     *
      * @param resourceID
      *            The <code>id</code> to be moved. May be a learning design id or a folder id.
      * @param resourceType
@@ -265,7 +265,7 @@ public interface IWorkspaceManagementService {
     /**
      * This method checks whether the user is authorized to create a new folder or learning design or modify the
      * existing contents under the given WorkspaceFolder.
-     * 
+     *
      * @param folderID
      *            The <code>workspace_folder_id</code> of the <code>WorkspaceFolder<code>
      * 				   under which the User wants to create/copy folder, file, update learning design, etc

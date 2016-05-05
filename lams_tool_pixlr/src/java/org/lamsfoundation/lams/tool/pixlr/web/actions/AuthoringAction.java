@@ -2,21 +2,21 @@
  * Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
  * =============================================================
  * License Information: http://lamsfoundation.org/licensing/lams/2.0/
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301
  * USA
- * 
+ *
  * http://www.gnu.org/licenses/gpl.txt
  * ****************************************************************
  */
@@ -28,11 +28,6 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.util.Date;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Set;
 
 import javax.imageio.ImageIO;
 import javax.servlet.http.HttpServletRequest;
@@ -48,7 +43,6 @@ import org.apache.struts.action.ActionMessage;
 import org.apache.struts.action.ActionMessages;
 import org.apache.struts.upload.FormFile;
 import org.lamsfoundation.lams.authoring.web.AuthoringConstants;
-import org.lamsfoundation.lams.contentrepository.client.IToolContentHandler;
 import org.lamsfoundation.lams.tool.ToolAccessMode;
 import org.lamsfoundation.lams.tool.pixlr.model.Pixlr;
 import org.lamsfoundation.lams.tool.pixlr.service.IPixlrService;
@@ -68,10 +62,10 @@ import org.lamsfoundation.lams.web.util.SessionMap;
 /**
  * @author
  * @version
- * 
  *
  *
- * 
+ *
+ *
  *
  *
  */
@@ -85,13 +79,12 @@ public class AuthoringAction extends LamsDispatchAction {
     private static final String KEY_TOOL_CONTENT_ID = "toolContentID";
     private static final String KEY_CONTENT_FOLDER_ID = "contentFolderID";
     private static final String KEY_MODE = "mode";
-    
- 
+
     /**
      * Default method when no dispatch parameter is specified. It is expected
      * that the parameter <code>toolContentID</code> will be passed in. This
      * will be used to retrieve content for this tool.
-     * 
+     *
      */
     @Override
     protected ActionForward unspecified(ActionMapping mapping, ActionForm form, HttpServletRequest request,
@@ -156,7 +149,8 @@ public class AuthoringAction extends LamsDispatchAction {
 	authForm.setContentFolderID(contentFolderID);
 
 	// Set up sessionMap
-	SessionMap<String, Object> map = createSessionMap(pixlr, getAccessMode(request), contentFolderID, toolContentID);
+	SessionMap<String, Object> map = createSessionMap(pixlr, getAccessMode(request), contentFolderID,
+		toolContentID);
 	authForm.setSessionMapID(map.getSessionID());
 
 	// add the sessionMap to HTTPSession.
@@ -167,7 +161,7 @@ public class AuthoringAction extends LamsDispatchAction {
     }
 
     public ActionForward updateContent(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws PixlrException{
+	    HttpServletResponse response) throws PixlrException {
 	// TODO need error checking.
 
 	// get authForm and session map.
@@ -177,8 +171,9 @@ public class AuthoringAction extends LamsDispatchAction {
 
 	// get pixlr content.
 	Pixlr pixlr = pixlrService.getPixlrByContentId((Long) map.get(AuthoringAction.KEY_TOOL_CONTENT_ID));
-	ActionErrors errors = new ActionErrors();;
-	
+	ActionErrors errors = new ActionErrors();
+	;
+
 	try {
 	    // TODO: Need to check if this is an edit, if so, delete the old image
 	    if (authForm.getExistingImageFileName().equals(PixlrConstants.DEFAULT_IMAGE_FILE_NAME)
@@ -199,11 +194,10 @@ public class AuthoringAction extends LamsDispatchAction {
 	    }
 	} catch (Exception e) {
 	    logger.error("Problem uploading image", e);
-	    errors.add(ActionMessages.GLOBAL_MESSAGE,
-			new ActionMessage(PixlrConstants.ERROR_MSG_FILE_UPLOAD));
+	    errors.add(ActionMessages.GLOBAL_MESSAGE, new ActionMessage(PixlrConstants.ERROR_MSG_FILE_UPLOAD));
 	    //throw new PixlrException("Problem uploading image", e);
 	}
-	
+
 	// update pixlr content using form inputs.
 	updatePixlr(pixlr, authForm, mode);
 
@@ -236,12 +230,12 @@ public class AuthoringAction extends LamsDispatchAction {
 
     /**
      * Updates Pixlr content using AuthoringForm inputs.
-     * 
+     *
      * @param authForm
      * @param mode
      * @return
      */
-    private void updatePixlr(Pixlr pixlr, AuthoringForm authForm, ToolAccessMode mode){
+    private void updatePixlr(Pixlr pixlr, AuthoringForm authForm, ToolAccessMode mode) {
 	pixlr.setTitle(authForm.getTitle());
 	pixlr.setInstructions(authForm.getInstructions());
 	if (mode.isAuthor()) { // Teacher cannot modify following
@@ -254,7 +248,7 @@ public class AuthoringAction extends LamsDispatchAction {
 
     /**
      * Updates AuthoringForm using Pixlr content.
-     * 
+     *
      * @param pixlr
      * @param authForm
      * @return
@@ -277,7 +271,7 @@ public class AuthoringAction extends LamsDispatchAction {
 
     /**
      * Updates SessionMap using Pixlr content.
-     * 
+     *
      * @param pixlr
      * @param mode
      */
@@ -296,7 +290,7 @@ public class AuthoringAction extends LamsDispatchAction {
     /**
      * Get ToolAccessMode from HttpRequest parameters. Default value is AUTHOR
      * mode.
-     * 
+     *
      * @param request
      * @return
      */
@@ -313,7 +307,7 @@ public class AuthoringAction extends LamsDispatchAction {
 
     /**
      * Retrieve the SessionMap from the HttpSession.
-     * 
+     *
      * @param request
      * @param authForm
      * @return
@@ -325,7 +319,7 @@ public class AuthoringAction extends LamsDispatchAction {
 
     /**
      * Validate imageGallery item.
-     * 
+     *
      * @param itemForm
      * @return
      */
@@ -343,10 +337,9 @@ public class AuthoringAction extends LamsDispatchAction {
 	// check for allowed format : gif, png, jpg
 	if (itemForm.getFile() != null) {
 	    String contentType = itemForm.getFile().getContentType();
-	    if (StringUtils.isEmpty(contentType)
-		    || !(contentType.equals("image/gif") || contentType.equals("image/png")
-			    || contentType.equals("image/jpg") || contentType.equals("image/jpeg") || contentType
-			    .equals("image/pjpeg"))) {
+	    if (StringUtils.isEmpty(contentType) || !(contentType.equals("image/gif") || contentType.equals("image/png")
+		    || contentType.equals("image/jpg") || contentType.equals("image/jpeg")
+		    || contentType.equals("image/pjpeg"))) {
 		errors.add(ActionMessages.GLOBAL_MESSAGE,
 			new ActionMessage(PixlrConstants.ERROR_MSG_NOT_ALLOWED_FORMAT));
 	    }
@@ -357,20 +350,20 @@ public class AuthoringAction extends LamsDispatchAction {
 
     /**
      * Upload the image to the open www/images/pixlr folder
-     * 
+     *
      * @param request
      * @param imageForm
      * @throws ImageGalleryException
      */
     private void uploadFormImage(AuthoringForm imageForm, Pixlr pixlr) throws Exception {
-	
+
 	String filename = PixlrConstants.DEFAULT_IMAGE_FILE_NAME;
 
 	// set up pixlrService
 	if (pixlrService == null) {
 	    pixlrService = PixlrServiceProxy.getPixlrService(this.getServlet().getServletContext());
 	}
-	
+
 	if (imageForm.getFile() != null) {
 
 	    // check the directory exists, then create it if it doesnt
@@ -380,19 +373,19 @@ public class AuthoringAction extends LamsDispatchAction {
 	    }
 
 	    FormFile formFile = imageForm.getFile();
-	    
+
 	    filename = FileUtil.generateUniqueContentFolderID() + pixlrService.getFileExtension(formFile.getFileName());
 	    String fileWriteName = PixlrConstants.LAMS_PIXLR_BASE_DIR + File.separator + filename;
 	    File uploadFile = new File(fileWriteName);
 	    FileOutputStream out = new FileOutputStream(uploadFile);
-	    
+
 	    out.write(formFile.getFileData());
-	    
+
 	    // Now save the image size
 	    BufferedImage imageFile = ImageIO.read(uploadFile);
 	    int width = imageFile.getWidth();
 	    int height = imageFile.getHeight();
-	    
+
 	    pixlr.setImageFileName(filename);
 	    pixlr.setImageHeight(new Long(height));
 	    pixlr.setImageWidth(new Long(width));

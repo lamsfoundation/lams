@@ -18,53 +18,52 @@
  *
  * http://www.gnu.org/licenses/gpl.txt
  * ****************************************************************
- */ 
- 
-/* $Id$ */ 
-package org.lamsfoundation.lams.usermanagement; 
+ */
+
+/* $Id$ */
+package org.lamsfoundation.lams.usermanagement;
 
 import java.io.Serializable;
- 
+
 /**
  * @author jliew
  *
  */
 public class UserOrganisationCollapsed implements Serializable {
 
-	private Integer userOrganisationId;
-	private Boolean collapsed;
-	private UserOrganisation userOrganisation;
-	
-	public UserOrganisationCollapsed() {
-	}
-	
-	public UserOrganisationCollapsed(Boolean collapsed, UserOrganisation uo) {
-		this.userOrganisation = uo;
-		this.collapsed = collapsed;
-	}
-	
+    private Integer userOrganisationId;
+    private Boolean collapsed;
+    private UserOrganisation userOrganisation;
+
+    public UserOrganisationCollapsed() {
+    }
+
+    public UserOrganisationCollapsed(Boolean collapsed, UserOrganisation uo) {
+	this.userOrganisation = uo;
+	this.collapsed = collapsed;
+    }
+
     public Integer getUserOrganisationId() {
-        return this.userOrganisationId;
+	return this.userOrganisationId;
     }
 
     public void setUserOrganisationId(Integer userOrganisationId) {
-        this.userOrganisationId = userOrganisationId;
+	this.userOrganisationId = userOrganisationId;
     }
-    
+
     public Boolean getCollapsed() {
-        return this.collapsed;
+	return this.collapsed;
     }
 
     public void setCollapsed(Boolean collapsed) {
-        this.collapsed = collapsed;
+	this.collapsed = collapsed;
     }
-    
+
     public UserOrganisation getUserOrganisation() {
-        return this.userOrganisation;
+	return this.userOrganisation;
     }
 
     public void setUserOrganisation(UserOrganisation userOrganisation) {
-        this.userOrganisation = userOrganisation;
+	this.userOrganisation = userOrganisation;
     }
 }
- 

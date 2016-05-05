@@ -21,7 +21,7 @@ public class PopulateMarksServlet extends HttpServlet {
 
     private static final long serialVersionUID = 121580330937986546L;
     private static Logger log = Logger.getLogger(PopulateMarksServlet.class);
-    
+
     private IMcService service;
 
     @Override
@@ -30,23 +30,26 @@ public class PopulateMarksServlet extends HttpServlet {
 	super.init();
     }
 
-    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+    @Override
+    protected void doGet(HttpServletRequest request, HttpServletResponse response)
+	    throws ServletException, IOException {
 
 	PrintWriter out = response.getWriter();
-	    Long lessonId = WebUtil.readLongParam(request, AttributeNames.PARAM_LESSON_ID);
+	Long lessonId = WebUtil.readLongParam(request, AttributeNames.PARAM_LESSON_ID);
 
-	    HttpSession ss = SessionManager.getSession();
-	    UserDTO userDTO = (UserDTO) ss.getAttribute(AttributeNames.USER);
+	HttpSession ss = SessionManager.getSession();
+	UserDTO userDTO = (UserDTO) ss.getAttribute(AttributeNames.USER);
 
-	    service.recalculateMarkForLesson(userDTO, lessonId);
-	    log.debug("recalculateMarkForLesson lessonId:" + lessonId);
-	    out.println("recalculateMarkForLesson uid:" + lessonId);
+	service.recalculateMarkForLesson(userDTO, lessonId);
+	log.debug("recalculateMarkForLesson lessonId:" + lessonId);
+	out.println("recalculateMarkForLesson uid:" + lessonId);
 
 	out.println("OK. User marks have been updated.");
     }
 
-    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException,
-	    IOException {
+    @Override
+    protected void doPost(HttpServletRequest request, HttpServletResponse response)
+	    throws ServletException, IOException {
 	doGet(request, response);
     }
 

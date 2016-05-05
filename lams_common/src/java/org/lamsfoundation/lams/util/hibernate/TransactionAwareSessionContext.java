@@ -32,7 +32,7 @@ import org.springframework.transaction.support.TransactionSynchronizationManager
  * cleanup and properly close Sessions when transactions finish. If there's no synchronization strategy available, the
  * session will never be closed.
  * </p>
- * 
+ *
  * @author Matias Mirabelli
  */
 public class TransactionAwareSessionContext implements CurrentSessionContext {
@@ -146,7 +146,7 @@ public class TransactionAwareSessionContext implements CurrentSessionContext {
 
     /**
      * Creates a transaction synchronization object for the specified session.
-     * 
+     *
      * @param session
      *            Session to synchronize using the created object. Cannot be null.
      * @return A valid transaction synchronization. Never returns null.

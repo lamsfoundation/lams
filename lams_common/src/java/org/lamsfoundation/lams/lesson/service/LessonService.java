@@ -2,21 +2,21 @@
  * Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
  * =============================================================
  * License Information: http://lamsfoundation.org/licensing/lams/2.0/
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License version 2.0 
+ * it under the terms of the GNU General Public License version 2.0
  * as published by the Free Software Foundation.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301
  * USA
- * 
+ *
  * http://www.gnu.org/licenses/gpl.txt
  * ****************************************************************
  */
@@ -55,7 +55,7 @@ import org.lamsfoundation.lams.util.MessageService;
 
 /**
  * Access the general lesson details.
- * 
+ *
  * A lesson has three different "lists" of learners.
  * <OL>
  * <LI>The learners who are in the learner group attached to the lesson. This is fixed when the lesson is started and is
@@ -63,12 +63,12 @@ import org.lamsfoundation.lams.util.MessageService;
  * <LI>The learners who have started the lesson. They may or may not be logged in currently, or if they are logged in
  * they may or may not be doing this lesson. This is available via getActiveLessonLearners().
  * </OL>
- * 
+ *
  * There used to be a list of all the learners who were logged into a lesson. This has been removed as we do not need
  * the functionality at present. If this is required later it should be combined with the user's shared session logic
  * and will need to purge users who haven't done anything for a while - otherwise a user whose PC has crashed and then
  * never returns to a lesson will staying in the cache forever.
- * 
+ *
  */
 public class LessonService implements ILessonService {
     private static Logger log = Logger.getLogger(LessonService.class);
@@ -80,7 +80,7 @@ public class LessonService implements ILessonService {
     private IBaseDAO baseDAO;
     private ILearnerProgressDAO learnerProgressDAO;
 
-    /*  Spring injection methods */
+    /* Spring injection methods */
     public void setLessonDAO(ILessonDAO lessonDAO) {
 	this.lessonDAO = lessonDAO;
     }

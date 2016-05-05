@@ -2,21 +2,21 @@
  * Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
  * =============================================================
  * License Information: http://lamsfoundation.org/licensing/lams/2.0/
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License version 2.0 
+ * it under the terms of the GNU General Public License version 2.0
  * as published by the Free Software Foundation.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301
  * USA
- * 
+ *
  * http://www.gnu.org/licenses/gpl.txt
  * ****************************************************************
  */
@@ -33,7 +33,7 @@ public interface ForumConstants {
     public static final String TOOL_SIGNATURE = "lafrum11";
 
     public static final String TOOL_CONTENT_HANDLER_NAME = "forumToolContentHandler";
-    
+
     public static final int SORT_BY_NO = 0;
     public static final int SORT_BY_USER_NAME_ASC = 1;
     public static final int SORT_BY_USER_NAME_DESC = 2;
@@ -53,7 +53,7 @@ public interface ForumConstants {
     public static final int STATUS_CONTENT_COPYED = 1;
 
     public static final int SESSION_STATUS_FINISHED = 1;
-    
+
     public final static String FORUM_SERVICE = "forumService";
 
     public final static String CONTENT_HANDLER = "toolContentHandler";
@@ -67,7 +67,7 @@ public interface ForumConstants {
     public static final String AUTHORING_TOPIC_THREAD = "topicThread";
 
     public static final String AUTHORING_TOPIC = "topic";
-    
+
     public static final String AUTHORING_FORUM = "forum";
 
     public static final String DEFAULT_TITLE = "Forum";
@@ -76,7 +76,7 @@ public interface ForumConstants {
     public static final String TOOL_URL_BASE = "/lams/tool/lafrum11/";
 
     public static final String ATTR_FORUM_ID = "forum_id";
-    
+
     public static final String ATTR_FORUM_UID = "forumUid";
 
     public static final String ATTR_ALLOW_EDIT = "allowEdit";
@@ -84,15 +84,15 @@ public interface ForumConstants {
     public static final String ATTR_ALLOW_UPLOAD = "allowUpload";
 
     public static final String ATTR_ALLOW_NEW_TOPICS = "allowNewTopics";
-    
+
     public static final String ATTR_ALLOW_RICH_EDITOR = "allowRichEditor";
-    
+
     public static final String ATTR_ALLOW_RATE_MESSAGES = "allowRateMessages";
-    
+
     public static final String ATTR_MINIMUM_RATE = "minimumRate";
-    
+
     public static final String ATTR_MAXIMUM_RATE = "maximumRate";
-    
+
     public static final String ATTR_MIN_CHARACTERS = "minCharacters";
 
     public static final String ATTR_MAX_CHARACTERS = "maxCharacters";
@@ -108,9 +108,9 @@ public interface ForumConstants {
     public static final String ATTR_FINISHED_LOCK = "finishedLock";
 
     public static final String ATTR_USER_FINISHED = "userFinished";
-    
+
     public static final String ATTR_UPLOAD_MAX_FILE_SIZE = "uploadMaxFileSize";
-    
+
     public static final String ATTR_SESSION_DTOS = "sessionDtos";
 
     // for submission deadline
@@ -147,11 +147,11 @@ public interface ForumConstants {
     public static final String ATTR_NO_MORE_POSTS = "noMorePosts";
 
     public static final String ATTR_NUM_OF_POSTS = "numOfPosts";
-    
+
     public static final String ATTR_NO_MORE_RATINGSS = "noMoreRatings";
-    
+
     public static final String ATTR_NUM_OF_RATINGS = "numOfRatings";
-    
+
     public static final String ATTR_IS_MIN_RATINGS_COMPLETED = "isMinRatingsCompleted";
 
     public static final String ATTR_SESSION_MAP_ID = "sessionMapID";
@@ -166,7 +166,7 @@ public interface ForumConstants {
     public static final String ATTR_REFLECTION_ON = "reflectOn";
 
     public static final String ATTR_REFLECTION_INSTRUCTION = "reflectInstructions";
-    
+
     public static final String DELETED_ATTACHMENT_LIST = "deletedAttachmentList";
 
     public static final String ATTR_REFLECTION_ENTRY = "reflectEntry";
@@ -203,7 +203,7 @@ public interface ForumConstants {
 
     public static final int PATTERN_MATCHING_OPTIONS = Pattern.CASE_INSENSITIVE | Pattern.UNICODE_CASE
 	    | Pattern.MULTILINE;
-    
+
     // for paging long topics & inlining reply
     public static final String PAGE_LAST_ID = "pageLastId";
     public static final String PAGE_SIZE = "size";

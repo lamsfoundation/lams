@@ -2,21 +2,21 @@
  * Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
  * =============================================================
  * License Information: http://lamsfoundation.org/licensing/lams/2.0/
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License version 2.0 
+ * it under the terms of the GNU General Public License version 2.0
  * as published by the Free Software Foundation.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301
  * USA
- * 
+ *
  * http://www.gnu.org/licenses/gpl.txt
  * ****************************************************************
  */
@@ -48,7 +48,7 @@ import org.springframework.web.filter.OncePerRequestFilter;
  * <p>
  * <b>This filter must set after <code>org.lamsfoundation.lams.web.session.SystemSessionFilter</code> in web.xml because
  * it need get value from SystemSession .</b>
- * 
+ *
  * @author Steve.Ni, Marcin Cieslak
  */
 public class LocaleFilter extends OncePerRequestFilter {
@@ -61,8 +61,8 @@ public class LocaleFilter extends OncePerRequestFilter {
     public void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain)
 	    throws IOException, ServletException {
 	// setting encoding in standalone.xml does not do the trick (yet?), so set it here
-	 request.setCharacterEncoding("UTF-8");
-	
+	request.setCharacterEncoding("UTF-8");
+
 	Locale preferredLocale = null;
 	String direction = null;
 	TimeZone tz = null;
@@ -87,7 +87,8 @@ public class LocaleFilter extends OncePerRequestFilter {
 	// get default locale from configuration
 	if (preferredLocale == null) {
 	    String defaults[] = LanguageUtil.getDefaultLangCountry();
-	    preferredLocale = new Locale(defaults[0] == null ? "" : defaults[0], defaults[1] == null ? "" : defaults[1]);
+	    preferredLocale = new Locale(defaults[0] == null ? "" : defaults[0],
+		    defaults[1] == null ? "" : defaults[1]);
 	}
 	if (direction == null) {
 	    direction = LanguageUtil.getDefaultDirection();

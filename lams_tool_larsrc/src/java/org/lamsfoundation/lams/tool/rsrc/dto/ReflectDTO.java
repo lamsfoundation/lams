@@ -69,7 +69,7 @@ public class ReflectDTO {
     public void setUserUid(Long userUid) {
 	this.userUid = userUid;
     }
-    
+
     public Date getDate() {
 	return date;
     }

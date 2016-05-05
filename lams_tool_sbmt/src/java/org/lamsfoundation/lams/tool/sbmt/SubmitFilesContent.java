@@ -2,21 +2,21 @@
  * Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
  * =============================================================
  * License Information: http://lamsfoundation.org/licensing/lams/2.0/
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License version 2.0 
+ * it under the terms of the GNU General Public License version 2.0
  * as published by the Free Software Foundation.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301
  * USA
- * 
+ *
  * http://www.gnu.org/licenses/gpl.txt
  * ****************************************************************
  */
@@ -85,7 +85,7 @@ public class SubmitFilesContent implements Serializable, Cloneable {
 
     /**
      * Copy constructor to create a new SubmitFiles tool's content.
-     * 
+     *
      * @param content
      *            The original tool content
      * @param newContentID
@@ -148,8 +148,8 @@ public class SubmitFilesContent implements Serializable, Cloneable {
 	}
 	SubmitFilesContent castOther = (SubmitFilesContent) other;
 	return new EqualsBuilder().append(this.getContentID(), castOther.getContentID())
-		.append(this.getTitle(), castOther.getTitle())
-		.append(this.getInstruction(), castOther.getInstruction()).isEquals();
+		.append(this.getTitle(), castOther.getTitle()).append(this.getInstruction(), castOther.getInstruction())
+		.isEquals();
     }
 
     @Override
@@ -185,7 +185,7 @@ public class SubmitFilesContent implements Serializable, Cloneable {
     }
 
     /**
-     * 
+     *
      *
      * @return Returns the lockOnFinished.
      */
@@ -208,7 +208,7 @@ public class SubmitFilesContent implements Serializable, Cloneable {
 	    content = (SubmitFilesContent) super.clone();
 	    // never clone key!
 	    content.setContentID(null);
-	    
+
 	    // clone SubmitUser as well
 	    if (createdBy != null) {
 		content.setCreatedBy((SubmitUser) createdBy.clone());
@@ -282,7 +282,7 @@ public class SubmitFilesContent implements Serializable, Cloneable {
 
     /**
      *
-     * 
+     *
      * @return
      */
     public SubmitUser getCreatedBy() {

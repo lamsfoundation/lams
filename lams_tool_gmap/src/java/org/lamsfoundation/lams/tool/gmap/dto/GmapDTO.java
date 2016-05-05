@@ -2,21 +2,21 @@
  * Copyright (C) 2008 LAMS Foundation (http://lamsfoundation.org)
  * =============================================================
  * License Information: http://lamsfoundation.org/licensing/lams/2.0/
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License version 2.0 
+ * it under the terms of the GNU General Public License version 2.0
  * as published by the Free Software Foundation.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301
  * USA
- * 
+ *
  * http://www.gnu.org/licenses/gpl.txt
  * ****************************************************************
  */
@@ -32,296 +32,297 @@ import java.util.Set;
 import java.util.TreeSet;
 
 import org.apache.log4j.Logger;
-import org.lamsfoundation.lams.contentrepository.client.IToolContentHandler;
 import org.lamsfoundation.lams.tool.gmap.model.Gmap;
 import org.lamsfoundation.lams.tool.gmap.model.GmapMarker;
 import org.lamsfoundation.lams.tool.gmap.model.GmapSession;
 
 /**
  * DTO for gmap, contains all the same variables as gmap persistance object + session
+ * 
  * @author lfoxton
  *
  */
 public class GmapDTO {
 
-	private static Logger logger = Logger.getLogger(GmapDTO.class);
+    private static Logger logger = Logger.getLogger(GmapDTO.class);
 
-	public Long toolContentId;
+    public Long toolContentId;
 
-	public String title;
+    public String title;
 
-	public String instructions;
-	
-	public boolean defineLater;
-	
-	public boolean contentInUse;
-	
-	//public boolean allowRichEditor;
-	
-	public boolean lockOnFinish;
-	
-	public boolean allowEditMarkers;
-	
-	public boolean allowShowAllMarkers;
-	
-	public boolean limitMarkers;
-	
-	public int maxMarkers;
-	
-	public boolean allowZoom;
-	
-	public boolean allowTerrain;
-	
-	public boolean allowSatellite;
-	
-	public boolean allowHybrid;
-	
-	public Double mapCenterLatitude;
-	
-	public Double mapCenterLongitude;
-	
-	public int mapZoom;
-	
-	public String mapType;
-	
-	public boolean reflectOnActivity;
-	
-	public String reflectInstructions;
-	
-	String defaultGeocoderAddress;
-	
-	public Set<GmapMarkerDTO> gmapMarkers = new HashSet<GmapMarkerDTO>();
+    public String instructions;
 
-	public Set<GmapSessionDTO> sessionDTOs = new TreeSet<GmapSessionDTO>();
-	
-	/* Constructors */
-	public GmapDTO(){}
-	
-	public GmapDTO(Gmap gmap) {
-		toolContentId = gmap.getToolContentId();
-		title = gmap.getTitle();
-		instructions = gmap.getInstructions();
-		contentInUse = gmap.isContentInUse();
-		//allowRichEditor = gmap.isAllowRichEditor();	
-		lockOnFinish = gmap.isLockOnFinished();
-		allowEditMarkers = gmap.isAllowEditMarkers();		
-		allowShowAllMarkers = gmap.isAllowShowAllMarkers();		
-		limitMarkers = gmap.isLimitMarkers();		
-		maxMarkers = gmap.getMaxMarkers();
-		allowZoom = gmap.isAllowZoom();		
-		allowTerrain = gmap.isAllowTerrain();		
-		allowSatellite = gmap.isAllowSatellite();		
-		allowHybrid = gmap.isAllowHybrid();		
-		mapCenterLatitude = gmap.getMapCenterLatitude();		
-		mapCenterLongitude = gmap.getMapCenterLongitude();		
-		mapZoom = gmap.getMapZoom();
-		mapType = gmap.getMapType();
-		reflectOnActivity = gmap.isReflectOnActivity();
-		reflectInstructions = gmap.getReflectInstructions();
-		defaultGeocoderAddress = gmap.getDefaultGeocoderAddress();
-		
-		for (Iterator<GmapSession> iter = gmap.getGmapSessions().iterator(); iter.hasNext();) {
-			GmapSession session = (GmapSession) iter.next();
-			GmapSessionDTO sessionDTO = new GmapSessionDTO(session);			
-			sessionDTOs.add(sessionDTO);
-		}
+    public boolean defineLater;
+
+    public boolean contentInUse;
+
+    //public boolean allowRichEditor;
+
+    public boolean lockOnFinish;
+
+    public boolean allowEditMarkers;
+
+    public boolean allowShowAllMarkers;
+
+    public boolean limitMarkers;
+
+    public int maxMarkers;
+
+    public boolean allowZoom;
+
+    public boolean allowTerrain;
+
+    public boolean allowSatellite;
+
+    public boolean allowHybrid;
+
+    public Double mapCenterLatitude;
+
+    public Double mapCenterLongitude;
+
+    public int mapZoom;
+
+    public String mapType;
+
+    public boolean reflectOnActivity;
+
+    public String reflectInstructions;
+
+    String defaultGeocoderAddress;
+
+    public Set<GmapMarkerDTO> gmapMarkers = new HashSet<GmapMarkerDTO>();
+
+    public Set<GmapSessionDTO> sessionDTOs = new TreeSet<GmapSessionDTO>();
+
+    /* Constructors */
+    public GmapDTO() {
+    }
+
+    public GmapDTO(Gmap gmap) {
+	toolContentId = gmap.getToolContentId();
+	title = gmap.getTitle();
+	instructions = gmap.getInstructions();
+	contentInUse = gmap.isContentInUse();
+	//allowRichEditor = gmap.isAllowRichEditor();	
+	lockOnFinish = gmap.isLockOnFinished();
+	allowEditMarkers = gmap.isAllowEditMarkers();
+	allowShowAllMarkers = gmap.isAllowShowAllMarkers();
+	limitMarkers = gmap.isLimitMarkers();
+	maxMarkers = gmap.getMaxMarkers();
+	allowZoom = gmap.isAllowZoom();
+	allowTerrain = gmap.isAllowTerrain();
+	allowSatellite = gmap.isAllowSatellite();
+	allowHybrid = gmap.isAllowHybrid();
+	mapCenterLatitude = gmap.getMapCenterLatitude();
+	mapCenterLongitude = gmap.getMapCenterLongitude();
+	mapZoom = gmap.getMapZoom();
+	mapType = gmap.getMapType();
+	reflectOnActivity = gmap.isReflectOnActivity();
+	reflectInstructions = gmap.getReflectInstructions();
+	defaultGeocoderAddress = gmap.getDefaultGeocoderAddress();
+
+	for (Iterator<GmapSession> iter = gmap.getGmapSessions().iterator(); iter.hasNext();) {
+	    GmapSession session = iter.next();
+	    GmapSessionDTO sessionDTO = new GmapSessionDTO(session);
+	    sessionDTOs.add(sessionDTO);
 	}
+    }
 
-	/* Getters / Setters */
-	public Set<GmapSessionDTO> getSessionDTOs() {
-		return sessionDTOs;
-	}
-	
-	public void setSessionDTOs(Set<GmapSessionDTO> sessionDTOs) {
-		this.sessionDTOs = sessionDTOs;
-	}
+    /* Getters / Setters */
+    public Set<GmapSessionDTO> getSessionDTOs() {
+	return sessionDTOs;
+    }
 
-	public String getInstructions() {
-		return instructions;
-	}
+    public void setSessionDTOs(Set<GmapSessionDTO> sessionDTOs) {
+	this.sessionDTOs = sessionDTOs;
+    }
 
-	public void setInstructions(String instructions) {
-		this.instructions = instructions;
-	}
+    public String getInstructions() {
+	return instructions;
+    }
 
-	public String getTitle() {
-		return title;
-	}
+    public void setInstructions(String instructions) {
+	this.instructions = instructions;
+    }
 
-	public void setTitle(String title) {
-		this.title = title;
-	}
+    public String getTitle() {
+	return title;
+    }
 
-	public Long getToolContentId() {
-		return toolContentId;
-	}
+    public void setTitle(String title) {
+	this.title = title;
+    }
 
-	public void setToolContentId(Long toolContentID) {
-		this.toolContentId = toolContentID;
-	}
+    public Long getToolContentId() {
+	return toolContentId;
+    }
 
-	public Boolean getContentInUse() {
-		return contentInUse;
-	}
+    public void setToolContentId(Long toolContentID) {
+	this.toolContentId = toolContentID;
+    }
 
-	public void setContentInUse(Boolean contentInUse) {
-		this.contentInUse = contentInUse;
-	}
+    public Boolean getContentInUse() {
+	return contentInUse;
+    }
 
-	public boolean isAllowEditMarkers() {
-		return allowEditMarkers;
-	}
+    public void setContentInUse(Boolean contentInUse) {
+	this.contentInUse = contentInUse;
+    }
 
-	public void setAllowEditMarkers(boolean allowEditMarkers) {
-		this.allowEditMarkers = allowEditMarkers;
-	}
+    public boolean isAllowEditMarkers() {
+	return allowEditMarkers;
+    }
 
-	public boolean isAllowShowAllMarkers() {
-		return allowShowAllMarkers;
-	}
+    public void setAllowEditMarkers(boolean allowEditMarkers) {
+	this.allowEditMarkers = allowEditMarkers;
+    }
 
-	public void setAllowShowAllMarkers(boolean allowShowAllMarkers) {
-		this.allowShowAllMarkers = allowShowAllMarkers;
-	}
+    public boolean isAllowShowAllMarkers() {
+	return allowShowAllMarkers;
+    }
 
-	public boolean isLimitMarkers() {
-		return limitMarkers;
-	}
+    public void setAllowShowAllMarkers(boolean allowShowAllMarkers) {
+	this.allowShowAllMarkers = allowShowAllMarkers;
+    }
 
-	public void setLimitMarkers(boolean limitMarkers) {
-		this.limitMarkers = limitMarkers;
-	}
+    public boolean isLimitMarkers() {
+	return limitMarkers;
+    }
 
-	public int getMaxMarkers() {
-		return maxMarkers;
-	}
+    public void setLimitMarkers(boolean limitMarkers) {
+	this.limitMarkers = limitMarkers;
+    }
 
-	public void setMaxMarkers(int maxMarkers) {
-		this.maxMarkers = maxMarkers;
-	}
+    public int getMaxMarkers() {
+	return maxMarkers;
+    }
 
-	public boolean isAllowZoom() {
-		return allowZoom;
-	}
+    public void setMaxMarkers(int maxMarkers) {
+	this.maxMarkers = maxMarkers;
+    }
 
-	public void setAllowZoom(boolean allowZoom) {
-		this.allowZoom = allowZoom;
-	}
+    public boolean isAllowZoom() {
+	return allowZoom;
+    }
 
-	public boolean isAllowTerrain() {
-		return allowTerrain;
-	}
+    public void setAllowZoom(boolean allowZoom) {
+	this.allowZoom = allowZoom;
+    }
 
-	public void setAllowTerrain(boolean allowTerrain) {
-		this.allowTerrain = allowTerrain;
-	}
+    public boolean isAllowTerrain() {
+	return allowTerrain;
+    }
 
-	public boolean isAllowSatellite() {
-		return allowSatellite;
-	}
+    public void setAllowTerrain(boolean allowTerrain) {
+	this.allowTerrain = allowTerrain;
+    }
 
-	public void setAllowSatellite(boolean allowSatellite) {
-		this.allowSatellite = allowSatellite;
-	}
+    public boolean isAllowSatellite() {
+	return allowSatellite;
+    }
 
-	public boolean isAllowHybrid() {
-		return allowHybrid;
-	}
+    public void setAllowSatellite(boolean allowSatellite) {
+	this.allowSatellite = allowSatellite;
+    }
 
-	public void setAllowHybrid(boolean allowHybrid) {
-		this.allowHybrid = allowHybrid;
-	}
+    public boolean isAllowHybrid() {
+	return allowHybrid;
+    }
 
-	public Double getMapCenterLatitude() {
-		return mapCenterLatitude;
-	}
+    public void setAllowHybrid(boolean allowHybrid) {
+	this.allowHybrid = allowHybrid;
+    }
 
-	public void setMapCenterLatitude(Double mapCenterLatitude) {
-		this.mapCenterLatitude = mapCenterLatitude;
-	}
+    public Double getMapCenterLatitude() {
+	return mapCenterLatitude;
+    }
 
-	public Double getMapCenterLongitude() {
-		return mapCenterLongitude;
-	}
+    public void setMapCenterLatitude(Double mapCenterLatitude) {
+	this.mapCenterLatitude = mapCenterLatitude;
+    }
 
-	public void setMapCenterLongitude(Double mapCenterLongitude) {
-		this.mapCenterLongitude = mapCenterLongitude;
-	}
+    public Double getMapCenterLongitude() {
+	return mapCenterLongitude;
+    }
 
-	public int getMapZoom() {
-		return mapZoom;
-	}
+    public void setMapCenterLongitude(Double mapCenterLongitude) {
+	this.mapCenterLongitude = mapCenterLongitude;
+    }
 
-	public void setMapZoom(int mapZoom) {
-		this.mapZoom = mapZoom;
-	}
+    public int getMapZoom() {
+	return mapZoom;
+    }
 
-	public String getMapType() {
-		return mapType;
-	}
+    public void setMapZoom(int mapZoom) {
+	this.mapZoom = mapZoom;
+    }
 
-	public void setMapType(String mapType) {
-		this.mapType = mapType;
-	}
+    public String getMapType() {
+	return mapType;
+    }
 
-	public Set<GmapMarkerDTO> getGmapMarkers() {
-		return gmapMarkers;
-	}
+    public void setMapType(String mapType) {
+	this.mapType = mapType;
+    }
 
-	public void setGmapMarkers(List<GmapMarker> gmapMarkers) {
-		
-		for (Iterator<GmapMarker> i = gmapMarkers.iterator(); i.hasNext();) {
-			GmapMarker marker = (GmapMarker) i.next();
-			GmapMarkerDTO markerDTO = new GmapMarkerDTO(marker);
-			this.gmapMarkers.add(markerDTO);
-		}
-	}
+    public Set<GmapMarkerDTO> getGmapMarkers() {
+	return gmapMarkers;
+    }
 
-	public boolean isDefineLater() {
-		return defineLater;
-	}
+    public void setGmapMarkers(List<GmapMarker> gmapMarkers) {
 
-	public void setDefineLater(boolean defineLater) {
-		this.defineLater = defineLater;
+	for (Iterator<GmapMarker> i = gmapMarkers.iterator(); i.hasNext();) {
+	    GmapMarker marker = i.next();
+	    GmapMarkerDTO markerDTO = new GmapMarkerDTO(marker);
+	    this.gmapMarkers.add(markerDTO);
 	}
+    }
 
-	public boolean isLockOnFinish() {
-		return lockOnFinish;
-	}
+    public boolean isDefineLater() {
+	return defineLater;
+    }
 
-	public void setLockOnFinish(boolean lockOnFinish) {
-		this.lockOnFinish = lockOnFinish;
-	}
+    public void setDefineLater(boolean defineLater) {
+	this.defineLater = defineLater;
+    }
 
-	public void setContentInUse(boolean contentInUse) {
-		this.contentInUse = contentInUse;
-	}
+    public boolean isLockOnFinish() {
+	return lockOnFinish;
+    }
 
-	public void setGmapMarkers(Set<GmapMarkerDTO> gmapMarkers) {
-		this.gmapMarkers = gmapMarkers;
-	}
+    public void setLockOnFinish(boolean lockOnFinish) {
+	this.lockOnFinish = lockOnFinish;
+    }
 
-	public boolean isReflectOnActivity() {
-		return reflectOnActivity;
-	}
+    public void setContentInUse(boolean contentInUse) {
+	this.contentInUse = contentInUse;
+    }
 
-	public void setReflectOnActivity(boolean reflectOnActivity) {
-		this.reflectOnActivity = reflectOnActivity;
-	}
+    public void setGmapMarkers(Set<GmapMarkerDTO> gmapMarkers) {
+	this.gmapMarkers = gmapMarkers;
+    }
 
-	public String getReflectInstructions() {
-		return reflectInstructions;
-	}
+    public boolean isReflectOnActivity() {
+	return reflectOnActivity;
+    }
 
-	public void setReflectInstructions(String reflectInstructions) {
-		this.reflectInstructions = reflectInstructions;
-	}
+    public void setReflectOnActivity(boolean reflectOnActivity) {
+	this.reflectOnActivity = reflectOnActivity;
+    }
 
-	public String getDefaultGeocoderAddress() {
-		return defaultGeocoderAddress;
-	}
+    public String getReflectInstructions() {
+	return reflectInstructions;
+    }
 
-	public void setDefaultGeocoderAddress(String defaultGeocoderAddress) {
-		this.defaultGeocoderAddress = defaultGeocoderAddress;
-	}
+    public void setReflectInstructions(String reflectInstructions) {
+	this.reflectInstructions = reflectInstructions;
+    }
+
+    public String getDefaultGeocoderAddress() {
+	return defaultGeocoderAddress;
+    }
+
+    public void setDefaultGeocoderAddress(String defaultGeocoderAddress) {
+	this.defaultGeocoderAddress = defaultGeocoderAddress;
+    }
 }

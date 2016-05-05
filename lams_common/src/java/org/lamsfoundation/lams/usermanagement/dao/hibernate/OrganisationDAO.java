@@ -73,18 +73,18 @@ public class OrganisationDAO extends LAMSBaseDAO implements IOrganisationDAO {
 	    String sortBy, String sortOrder, String searchString) {
 	String sortByParam = "o.name";
 	switch (sortBy) {
-	case "id":
-	    sortByParam = "o.organisationId";
-	    break;
-	case "name":
-	    sortByParam = "o.name";
-	    break;
-	case "code":
-	    sortByParam = "o.code";
-	    break;
-	case "description":
-	    sortByParam = "o.description";
-	    break;
+	    case "id":
+		sortByParam = "o.organisationId";
+		break;
+	    case "name":
+		sortByParam = "o.name";
+		break;
+	    case "code":
+		sortByParam = "o.code";
+		break;
+	    case "description":
+		sortByParam = "o.description";
+		break;
 	}
 
 	Query query = getSession().createQuery(OrganisationDAO.GET_PAGED_COURSES + sortByParam + " " + sortOrder);

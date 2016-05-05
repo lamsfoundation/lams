@@ -2,21 +2,21 @@
  * Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
  * =============================================================
  * License Information: http://lamsfoundation.org/licensing/lams/2.0/
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License version 2.0 
+ * it under the terms of the GNU General Public License version 2.0
  * as published by the Free Software Foundation.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301
  * USA
- * 
+ *
  * http://www.gnu.org/licenses/gpl.txt
  * ****************************************************************
  */
@@ -127,9 +127,9 @@ import org.quartz.TriggerKey;
  * It needs to implement <code>ApplicationContextAware<code> interface because we need to load up tool's service
  * dynamically according to the selected learning design.
  * </p>
- * 
+ *
  * TODO Analyse the efficiency of the grouping algorithms for adding/removing users. Possible performance issue.
- * 
+ *
  * @author Jacky Fang
  * @author Manpreet Minhas
  * @since 2/02/2005
@@ -233,7 +233,7 @@ public class MonitoringService implements IMonitoringService {
     }
 
     /**
-     * 
+     *
      * @param learnerService
      */
     public void setLearnerService(ICoreLearnerService learnerService) {
@@ -241,7 +241,7 @@ public class MonitoringService implements IMonitoringService {
     }
 
     /**
-     * 
+     *
      * @param lessonService
      */
     public void setLessonService(ILessonService lessonService) {
@@ -806,7 +806,7 @@ public class MonitoringService implements IMonitoringService {
 
     /**
      * Set a lesson to a particular state. Copies the current state to the previous lesson state.
-     * 
+     *
      * @param requestedLesson
      * @param status
      */
@@ -820,7 +820,7 @@ public class MonitoringService implements IMonitoringService {
 
     /**
      * Sets a lesson back to its previous state. Used when we "unsuspend" or "unarchive"
-     * 
+     *
      * @param requestedLesson
      * @param status
      */
@@ -883,7 +883,7 @@ public class MonitoringService implements IMonitoringService {
 
 	// remove each Tool activity content
 	// It has to be done before removing BranchEntries as fetching Tool content
-	// in its own transaction would re-add connected BranchEntries (Hibernate error) 
+	// in its own transaction would re-add connected BranchEntries (Hibernate error)
 	Set<Activity> systemActivities = new HashSet<Activity>();
 	for (Activity activity : (Set<Activity>) learningDesign.getActivities()) {
 	    // get the real object, not the proxy
@@ -1075,11 +1075,11 @@ public class MonitoringService implements IMonitoringService {
 
     /**
      * Recursive method to step through a design and do the force complete.
-     * 
+     *
      * Special Cases: Gate -- LearnerService.knockGate(GateActivity gate, User knocker, List lessonLearners) Y -
      * continue N - Stop Group -- getGroup -> exist? Y - continue N - PermissionGroup - Stop RandomGroup - create group,
      * then complete it and continue.
-     * 
+     *
      * As we process an activity, we stick it in touchedActivityIds. Then we check this list before forwarding to an
      * activity - this will stop us going into loops on the parallel activities and other complex activities that return
      * to the parent activity after the child.
@@ -1476,104 +1476,104 @@ public class MonitoringService implements IMonitoringService {
 
 	Collection<User> users = new LinkedList<User>();
 	switch (searchType) {
-	case MonitoringConstants.LESSON_TYPE_ASSIGNED_TO_LESSON:
-	    users = lesson.getAllLearners();
-	    break;
+	    case MonitoringConstants.LESSON_TYPE_ASSIGNED_TO_LESSON:
+		users = lesson.getAllLearners();
+		break;
 
-	case MonitoringConstants.LESSON_TYPE_HAVENT_FINISHED_LESSON:
-	    Set<User> allUsers = lesson.getAllLearners();
-	    List<User> usersCompletedLesson = getUsersCompletedLesson(lessonId, null, null, true);
-	    users = CollectionUtils.subtract(allUsers, usersCompletedLesson);
-	    break;
+	    case MonitoringConstants.LESSON_TYPE_HAVENT_FINISHED_LESSON:
+		Set<User> allUsers = lesson.getAllLearners();
+		List<User> usersCompletedLesson = getUsersCompletedLesson(lessonId, null, null, true);
+		users = CollectionUtils.subtract(allUsers, usersCompletedLesson);
+		break;
 
-	case MonitoringConstants.LESSON_TYPE_HAVE_FINISHED_LESSON:
-	case MonitoringConstants.COURSE_TYPE_HAVE_FINISHED_PARTICULAR_LESSON:
-	    users = getUsersCompletedLesson(lessonId, null, null, true);
-	    break;
+	    case MonitoringConstants.LESSON_TYPE_HAVE_FINISHED_LESSON:
+	    case MonitoringConstants.COURSE_TYPE_HAVE_FINISHED_PARTICULAR_LESSON:
+		users = getUsersCompletedLesson(lessonId, null, null, true);
+		break;
 
-	case MonitoringConstants.LESSON_TYPE_HAVENT_STARTED_LESSON:
-	case MonitoringConstants.COURSE_TYPE_HAVENT_STARTED_PARTICULAR_LESSON:
-	    allUsers = lesson.getAllLearners();
-	    List<User> usersStartedLesson = lessonService.getActiveLessonLearners(lessonId);
-	    users = CollectionUtils.subtract(allUsers, usersStartedLesson);
-	    break;
+	    case MonitoringConstants.LESSON_TYPE_HAVENT_STARTED_LESSON:
+	    case MonitoringConstants.COURSE_TYPE_HAVENT_STARTED_PARTICULAR_LESSON:
+		allUsers = lesson.getAllLearners();
+		List<User> usersStartedLesson = lessonService.getActiveLessonLearners(lessonId);
+		users = CollectionUtils.subtract(allUsers, usersStartedLesson);
+		break;
 
-	case MonitoringConstants.LESSON_TYPE_HAVE_STARTED_LESSON:
-	    users = lessonService.getActiveLessonLearners(lessonId);
-	    break;
+	    case MonitoringConstants.LESSON_TYPE_HAVE_STARTED_LESSON:
+		users = lessonService.getActiveLessonLearners(lessonId);
+		break;
 
-	case MonitoringConstants.LESSON_TYPE_HAVENT_REACHED_PARTICULAR_ACTIVITY:
-	    Activity activity = learnerService.getActivity(activityId);
-	    allUsers = lesson.getAllLearners();
-	    List<User> usersAttemptedActivity = lessonService.getLearnersAttemptedOrCompletedActivity(activity);
-	    users = CollectionUtils.subtract(allUsers, usersAttemptedActivity);
-	    break;
+	    case MonitoringConstants.LESSON_TYPE_HAVENT_REACHED_PARTICULAR_ACTIVITY:
+		Activity activity = learnerService.getActivity(activityId);
+		allUsers = lesson.getAllLearners();
+		List<User> usersAttemptedActivity = lessonService.getLearnersAttemptedOrCompletedActivity(activity);
+		users = CollectionUtils.subtract(allUsers, usersAttemptedActivity);
+		break;
 
-	case MonitoringConstants.LESSON_TYPE_LESS_THAN_X_DAYS_TO_DEADLINE:
-	    Date now = new Date();
-	    Calendar currentTimePlusXDays = Calendar.getInstance();
-	    currentTimePlusXDays.setTime(now);
-	    currentTimePlusXDays.add(Calendar.DATE, xDaystoFinish);
+	    case MonitoringConstants.LESSON_TYPE_LESS_THAN_X_DAYS_TO_DEADLINE:
+		Date now = new Date();
+		Calendar currentTimePlusXDays = Calendar.getInstance();
+		currentTimePlusXDays.setTime(now);
+		currentTimePlusXDays.add(Calendar.DATE, xDaystoFinish);
 
-	    Date scheduleEndDate = lesson.getScheduleEndDate();
-	    if (scheduleEndDate != null) {
-		if (now.before(scheduleEndDate) && currentTimePlusXDays.getTime().after(scheduleEndDate)) {
-		    users = lesson.getAllLearners();
+		Date scheduleEndDate = lesson.getScheduleEndDate();
+		if (scheduleEndDate != null) {
+		    if (now.before(scheduleEndDate) && currentTimePlusXDays.getTime().after(scheduleEndDate)) {
+			users = lesson.getAllLearners();
+		    }
+
+		} else if (lesson.isScheduledToCloseForIndividuals()) {
+		    users = groupUserDAO.getUsersWithLessonEndingSoonerThan(lesson, currentTimePlusXDays.getTime());
+		}
+		break;
+
+	    case MonitoringConstants.COURSE_TYPE_HAVENT_STARTED_ANY_LESSONS:
+		List<User> allUSers = learnerService.getUserManagementService().getUsersFromOrganisation(orgId);
+		Set<User> usersStartedAtLest1Lesson = new TreeSet<User>();
+
+		Organisation org = (Organisation) learnerService.getUserManagementService().findById(Organisation.class,
+			orgId);
+		Set<Lesson> lessons = org.getLessons();
+		for (Lesson les : lessons) {
+		    Activity firstActivity = les.getLearningDesign().getFirstActivity();
+		    List<User> usersStartedFirstActivity = learnerProgressDAO
+			    .getLearnersAttemptedOrCompletedActivity(firstActivity);
+		    usersStartedAtLest1Lesson.addAll(usersStartedFirstActivity);
 		}
 
-	    } else if (lesson.isScheduledToCloseForIndividuals()) {
-		users = groupUserDAO.getUsersWithLessonEndingSoonerThan(lesson, currentTimePlusXDays.getTime());
-	    }
-	    break;
+		users = CollectionUtils.subtract(allUSers, usersStartedAtLest1Lesson);
 
-	case MonitoringConstants.COURSE_TYPE_HAVENT_STARTED_ANY_LESSONS:
-	    List<User> allUSers = learnerService.getUserManagementService().getUsersFromOrganisation(orgId);
-	    Set<User> usersStartedAtLest1Lesson = new TreeSet<User>();
+		break;
 
-	    Organisation org = (Organisation) learnerService.getUserManagementService().findById(Organisation.class,
-		    orgId);
-	    Set<Lesson> lessons = org.getLessons();
-	    for (Lesson les : lessons) {
-		Activity firstActivity = les.getLearningDesign().getFirstActivity();
-		List<User> usersStartedFirstActivity = learnerProgressDAO
-			.getLearnersAttemptedOrCompletedActivity(firstActivity);
-		usersStartedAtLest1Lesson.addAll(usersStartedFirstActivity);
-	    }
-
-	    users = CollectionUtils.subtract(allUSers, usersStartedAtLest1Lesson);
-
-	    break;
-
-	case MonitoringConstants.COURSE_TYPE_HAVE_FINISHED_THESE_LESSONS:
-	    int i = 0;
-	    for (String lessonIdStr : lessonIds) {
-		lessonId = Long.parseLong(lessonIdStr);
-		List<User> completedLesson = getUsersCompletedLesson(lessonId, null, null, true);
-		if (i++ == 0) {
-		    users = completedLesson;
-		} else {
-		    users = CollectionUtils.intersection(users, completedLesson);
+	    case MonitoringConstants.COURSE_TYPE_HAVE_FINISHED_THESE_LESSONS:
+		int i = 0;
+		for (String lessonIdStr : lessonIds) {
+		    lessonId = Long.parseLong(lessonIdStr);
+		    List<User> completedLesson = getUsersCompletedLesson(lessonId, null, null, true);
+		    if (i++ == 0) {
+			users = completedLesson;
+		    } else {
+			users = CollectionUtils.intersection(users, completedLesson);
+		    }
 		}
-	    }
-	    break;
+		break;
 
-	case MonitoringConstants.COURSE_TYPE_HAVENT_FINISHED_THESE_LESSONS:
-	    users = new TreeSet<User>();
+	    case MonitoringConstants.COURSE_TYPE_HAVENT_FINISHED_THESE_LESSONS:
+		users = new TreeSet<User>();
 
-	    // add all available users from selected lessons
-	    for (String lessonIdStr : lessonIds) {
-		lessonId = Long.parseLong(lessonIdStr);
-		lesson = learnerService.getLesson(lessonId);
-		users.addAll(lesson.getAllLearners());
-	    }
+		// add all available users from selected lessons
+		for (String lessonIdStr : lessonIds) {
+		    lessonId = Long.parseLong(lessonIdStr);
+		    lesson = learnerService.getLesson(lessonId);
+		    users.addAll(lesson.getAllLearners());
+		}
 
-	    // subtract the ones which have completed any of the selected lessons
-	    for (String lessonIdStr : lessonIds) {
-		lessonId = Long.parseLong(lessonIdStr);
-		List<User> completedLesson = getUsersCompletedLesson(lessonId, null, null, true);
-		users = CollectionUtils.subtract(users, completedLesson);
-	    }
-	    break;
+		// subtract the ones which have completed any of the selected lessons
+		for (String lessonIdStr : lessonIds) {
+		    lessonId = Long.parseLong(lessonIdStr);
+		    List<User> completedLesson = getUsersCompletedLesson(lessonId, null, null, true);
+		    users = CollectionUtils.subtract(users, completedLesson);
+		}
+		break;
 	}
 
 	Set<User> sortedUsers = new TreeSet<User>(new Comparator<User>() {
@@ -1590,7 +1590,7 @@ public class MonitoringService implements IMonitoringService {
 
     /**
      * Returns list of users who has already finished specified lesson.
-     * 
+     *
      * @param lessonId
      *            specified lesson
      * @return
@@ -1695,7 +1695,7 @@ public class MonitoringService implements IMonitoringService {
     // ---------------------------------------------------------------------
     /**
      * Create a new lesson and setup all the staffs and learners who will be participating this less.
-     * 
+     *
      * @param organisation
      *            the organization this lesson belongs to.
      * @param organizationUsers
@@ -1724,7 +1724,7 @@ public class MonitoringService implements IMonitoringService {
 
     /**
      * Setup a new lesson object without class and insert it into the database.
-     * 
+     *
      * @param lessonName
      *            the name of the lesson
      * @param lessonDescription
@@ -1735,9 +1735,9 @@ public class MonitoringService implements IMonitoringService {
      *            the copied learning design
      * @param enableLessonNotifications
      *            enable "email notifications" link for the current lesson
-     * 
+     *
      * @return the lesson object without class.
-     * 
+     *
      */
     private Lesson createNewLesson(String lessonName, String lessonDescription, User user,
 	    LearningDesign copiedLearningDesign, Boolean enableLessonIntro, Boolean displayDesignImage,
@@ -1759,7 +1759,7 @@ public class MonitoringService implements IMonitoringService {
 
     /**
      * Setup the empty lesson class according to the run-time learning design copy.
-     * 
+     *
      * @param copiedLearningDesign
      *            the run-time learning design instance.
      * @return the new empty lesson class.
@@ -1843,11 +1843,11 @@ public class MonitoringService implements IMonitoringService {
 
     /**
      * Get the grouping appropriate for this activity.
-     * 
+     *
      * If the activity is a grouping activity, then set useCreatingGrouping = true to base the list on the create
      * grouping. Otherwise leave it false and it will use the grouping applied to the activity - this is used for
      * branching activities.
-     * 
+     *
      * If it is a teacher chosen branching activity and the grouping doesn't exist, it creates one.
      */
     private Grouping getGroupingForActivity(Activity activity, boolean useCreateGrouping, String methodName) {
@@ -2306,7 +2306,7 @@ public class MonitoringService implements IMonitoringService {
 
     /**
      * Write out audit log entry
-     * 
+     *
      * @param messageKey
      * @param args
      */

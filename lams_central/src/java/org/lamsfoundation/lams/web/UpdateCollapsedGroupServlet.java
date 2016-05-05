@@ -56,8 +56,8 @@ public class UpdateCollapsedGroupServlet extends HttpServlet {
 	Integer orgId = WebUtil.readIntParam(request, "orgId", false);
 	String collapsed = request.getParameter("collapsed");
 
-	WebApplicationContext ctx = WebApplicationContextUtils.getWebApplicationContext(SessionManager
-		.getServletContext());
+	WebApplicationContext ctx = WebApplicationContextUtils
+		.getWebApplicationContext(SessionManager.getServletContext());
 	UserManagementService service = (UserManagementService) ctx.getBean("userManagementService");
 
 	Organisation org = (Organisation) service.findById(Organisation.class, orgId);

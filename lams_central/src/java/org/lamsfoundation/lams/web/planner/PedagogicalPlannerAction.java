@@ -2,21 +2,21 @@
  * Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
  * =============================================================
  * License Information: http://lamsfoundation.org/licensing/lams/2.0/
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License version 2.0 
+ * it under the terms of the GNU General Public License version 2.0
  * as published by the Free Software Foundation.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301
  * USA
- * 
+ *
  * http://www.gnu.org/licenses/gpl.txt
  * ****************************************************************
  */
@@ -129,15 +129,15 @@ import com.thoughtworks.xstream.security.AnyTypePermission;
 
 /**
  * Action managing Pedagogical Planner base page and non-tool activities.
- * 
+ *
  * @author Marcin Cieslak
- * 
  *
  *
  *
  *
  *
- * 
+ *
+ *
  *
  *
  *
@@ -344,7 +344,7 @@ public class PedagogicalPlannerAction extends LamsDispatchAction {
 
     /**
      * The main method for opening and parsing template (chosen learning desing).
-     * 
+     *
      * @param request
      * @param learningDesign
      * @return
@@ -429,7 +429,7 @@ public class PedagogicalPlannerAction extends LamsDispatchAction {
 
     /**
      * Copies LearningDesign to common folder.
-     * 
+     *
      * @throws ServletException
      */
     private LearningDesign copyLearningDesign(Long originalDesignId, ActionMessages errors) throws ServletException {
@@ -457,7 +457,7 @@ public class PedagogicalPlannerAction extends LamsDispatchAction {
     /**
      * Recognises activitiy type and creates proper DTO for web pages use. For branching and options it can be called
      * recursevely.
-     * 
+     *
      * @param learningDesign
      *            learning design from which activity was taken
      * @param activities
@@ -670,7 +670,7 @@ public class PedagogicalPlannerAction extends LamsDispatchAction {
 
     /**
      * Starts a lesson preview, both in sequence chooser and in template base.
-     * 
+     *
      * @param mapping
      * @param form
      * @param request
@@ -709,7 +709,7 @@ public class PedagogicalPlannerAction extends LamsDispatchAction {
     /**
      * Reads UID of the node and goes straight to
      * {@link #openSequenceNode(ActionMapping, ActionForm, HttpServletRequest, Long)}
-     * 
+     *
      * @param mapping
      * @param form
      * @param request
@@ -726,7 +726,7 @@ public class PedagogicalPlannerAction extends LamsDispatchAction {
 
     /**
      * Opens a sequence node and fill the necessary data into DTO and form.
-     * 
+     *
      * @param mapping
      * @param form
      * @param request
@@ -846,7 +846,7 @@ public class PedagogicalPlannerAction extends LamsDispatchAction {
 
     /**
      * Saves the created/edited sequence node.
-     * 
+     *
      * @param mapping
      * @param form
      * @param request
@@ -998,7 +998,7 @@ public class PedagogicalPlannerAction extends LamsDispatchAction {
 
     /**
      * Validates node form fields.
-     * 
+     *
      * @param node
      * @param form
      * @return
@@ -1021,7 +1021,7 @@ public class PedagogicalPlannerAction extends LamsDispatchAction {
 
     /**
      * Validates form file. Used both for templates and exported nodes.
-     * 
+     *
      * @param form
      * @return
      */
@@ -1051,7 +1051,7 @@ public class PedagogicalPlannerAction extends LamsDispatchAction {
 
     /**
      * Removes the selected node and all of its subnodes
-     * 
+     *
      * @param mapping
      * @param form
      * @param request
@@ -1109,7 +1109,7 @@ public class PedagogicalPlannerAction extends LamsDispatchAction {
 
     /**
      * Exports the selected node to a ZIP file. Method is based on a similar one for exporting learning designs.
-     * 
+     *
      * @param mapping
      * @param form
      * @param request
@@ -1158,7 +1158,7 @@ public class PedagogicalPlannerAction extends LamsDispatchAction {
 
     /**
      * The proper method for exporting nodes.
-     * 
+     *
      * @param nodeUid
      * @return
      * @throws ZipFileUtilException
@@ -1223,7 +1223,7 @@ public class PedagogicalPlannerAction extends LamsDispatchAction {
 
     /**
      * Imports a zipped node. This method is based on a similar one for importing learning designs.
-     * 
+     *
      * @param mapping
      * @param form
      * @param request
@@ -1296,7 +1296,7 @@ public class PedagogicalPlannerAction extends LamsDispatchAction {
 
     /**
      * Imports a learning design to bind it with a certain node.
-     * 
+     *
      * @param fileUuid
      * @param fileName
      * @param errors
@@ -1386,7 +1386,7 @@ public class PedagogicalPlannerAction extends LamsDispatchAction {
 
     /**
      * Returns current user stored in session.
-     * 
+     *
      * @throws ServletException
      */
     private User getUser() throws ServletException {
@@ -1401,7 +1401,7 @@ public class PedagogicalPlannerAction extends LamsDispatchAction {
 
     /**
      * Export the subnodes' templates into the selected dir.
-     * 
+     *
      * @param node
      * @param outputDir
      * @throws ExportToolContentException
@@ -1445,7 +1445,7 @@ public class PedagogicalPlannerAction extends LamsDispatchAction {
 
     /**
      * Imports back the subnodes' templates. Also sets all the nodes' UIDs to NULL.
-     * 
+     *
      * @param node
      * @param inputDir
      * @throws ServletException
@@ -1480,7 +1480,7 @@ public class PedagogicalPlannerAction extends LamsDispatchAction {
     /**
      * Finds all node's descendants matching the query. Results can be not only the subnodes of the node, but also
      * deeper descendants. This method uses Lucene project for query parsing and searchig.
-     * 
+     *
      * @param node
      * @param filterText
      * @return set of nodes' uids
@@ -1531,7 +1531,7 @@ public class PedagogicalPlannerAction extends LamsDispatchAction {
 
     /**
      * Adds documents made of subnodes' title, descriptions and uid, then descents deeper into descendants.
-     * 
+     *
      * @param node
      *            its subnodes will be parsed
      * @return documents made of all of node's descendants
@@ -1587,7 +1587,7 @@ public class PedagogicalPlannerAction extends LamsDispatchAction {
 
     /**
      * Saves parameters of the grouping form, depending on the grouping type.
-     * 
+     *
      * @param mapping
      * @param form
      * @param request
@@ -1655,7 +1655,7 @@ public class PedagogicalPlannerAction extends LamsDispatchAction {
     /**
      * Adds the Learning Design to the list of recenlty edited sequences. It puts the selected LD on the top of the
      * list.
-     * 
+     *
      * @param learningDesignId
      */
     private void updateRecentLearningDesignList(Long learningDesignId) throws ServletException {
@@ -1686,7 +1686,7 @@ public class PedagogicalPlannerAction extends LamsDispatchAction {
 
     /**
      * Saves additional, non tool-bound template details - currently only the title.
-     * 
+     *
      * @param mapping
      * @param form
      * @param request

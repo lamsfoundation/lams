@@ -2,21 +2,21 @@
  * Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
  * =============================================================
  * License Information: http://lamsfoundation.org/licensing/lams/2.0/
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License version 2.0
  * as published by the Free Software Foundation.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301
  * USA
- * 
+ *
  * http://www.gnu.org/licenses/gpl.txt
  * ***********************************************************************/
 
@@ -76,12 +76,13 @@ public class VoteLearningAction extends LamsDispatchAction implements VoteAppCon
     static Logger logger = Logger.getLogger(VoteLearningAction.class.getName());
 
     /**
-     * 
+     *
      * main content/question content management and workflow logic
-     * 
+     *
      * if the passed toolContentID exists in the db, we need to get the relevant
      * data into the Map if not, create the default Map
      */
+    @Override
     public ActionForward unspecified(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) throws IOException, ServletException {
 	VoteLearningForm voteLearningForm = (VoteLearningForm) form;
@@ -133,7 +134,8 @@ public class VoteLearningAction extends LamsDispatchAction implements VoteAppCon
 	existingVoteQueUsr.setFinalScreenRequested(true);
 	voteService.updateVoteUser(existingVoteQueUsr);
 
-	Set<String> userAttempts = voteService.getAttemptsForUserAndSession(existingVoteQueUsr.getUid(), toolSessionUid);
+	Set<String> userAttempts = voteService.getAttemptsForUserAndSession(existingVoteQueUsr.getUid(),
+		toolSessionUid);
 	request.setAttribute(LIST_GENERAL_CHECKED_OPTIONS_CONTENT, userAttempts);
 
 	voteService.prepareChartData(request, toolContentID, toolSessionUid, voteGeneralLearnerFlowDTO);
@@ -146,10 +148,9 @@ public class VoteLearningAction extends LamsDispatchAction implements VoteAppCon
 
 	request.setAttribute(VOTE_GENERAL_LEARNER_FLOW_DTO, voteGeneralLearnerFlowDTO);
 
+	LearningWebUtil.putActivityPositionInRequestByToolSessionId(new Long(toolSessionID), request,
+		getServlet().getServletContext());
 
-	LearningWebUtil.putActivityPositionInRequestByToolSessionId(new Long(toolSessionID), request, getServlet()
-		.getServletContext());
-	
 	return (mapping.findForward(ALL_NOMINATIONS));
     }
 
@@ -215,8 +216,8 @@ public class VoteLearningAction extends LamsDispatchAction implements VoteAppCon
 	voteLearningForm.resetCommands();
 
 	request.setAttribute(VOTE_GENERAL_LEARNER_FLOW_DTO, voteGeneralLearnerFlowDTO);
-	LearningWebUtil.putActivityPositionInRequestByToolSessionId(new Long(toolSessionID), request, getServlet()
-		.getServletContext());
+	LearningWebUtil.putActivityPositionInRequestByToolSessionId(new Long(toolSessionID), request,
+		getServlet().getServletContext());
 	return (mapping.findForward(VIEW_ANSWERS));
     }
 
@@ -334,7 +335,7 @@ public class VoteLearningAction extends LamsDispatchAction implements VoteAppCon
 
 	voteLearningForm.resetCommands();
 
-	/* pay attention here*/
+	/* pay attention here */
 	response.sendRedirect(nextUrl);
 
 	return null;
@@ -358,7 +359,7 @@ public class VoteLearningAction extends LamsDispatchAction implements VoteAppCon
 
 	String maxNominationCount = request.getParameter(MAX_NOMINATION_COUNT);
 	voteLearningForm.setMaxNominationCount(maxNominationCount);
-	
+
 	String minNominationCount = request.getParameter(MIN_NOMINATION_COUNT);
 	voteLearningForm.setMinNominationCount(minNominationCount);
 
@@ -383,8 +384,9 @@ public class VoteLearningAction extends LamsDispatchAction implements VoteAppCon
 	}
 
 	int intMaxNominationCount = 0;
-	if (maxNominationCount != null)
+	if (maxNominationCount != null) {
 	    intMaxNominationCount = new Integer(maxNominationCount).intValue();
+	}
 
 	if (castVoteCount > intMaxNominationCount) {
 	    voteLearningForm.setMaxNominationCountReached(new Boolean(true).toString());
@@ -410,13 +412,16 @@ public class VoteLearningAction extends LamsDispatchAction implements VoteAppCon
 
 	VoteQueUsr user = voteService.getVoteUserBySession(new Long(userID), session.getUid());
 	if (user == null) {
-	    throw new VoteApplicationException("User with userId= " + userID + " and sessionUid= "
-		    + session.getUid() + " doesn't exist.");
+	    throw new VoteApplicationException(
+		    "User with userId= " + userID + " and sessionUid= " + session.getUid() + " doesn't exist.");
 	}
-	
+
 	voteService.removeAttemptsForUserandSession(user.getUid(), session.getUid());
 
-	/* to minimize changes to working code, convert the String[] array to the mapGeneralCheckedOptionsContent structure */
+	/*
+	 * to minimize changes to working code, convert the String[] array to the mapGeneralCheckedOptionsContent
+	 * structure
+	 */
 	Map<String, String> mapGeneralCheckedOptionsContent = voteService.buildQuestionMap(voteContent,
 		voteDisplayOrderIds);
 
@@ -510,7 +515,7 @@ public class VoteLearningAction extends LamsDispatchAction implements VoteAppCon
 
     /**
      * persists error messages to request scope
-     * 
+     *
      * @param request
      * @param message
      */
@@ -519,21 +524,21 @@ public class VoteLearningAction extends LamsDispatchAction implements VoteAppCon
 	errors.add(Globals.ERROR_KEY, new ActionMessage(message));
 	saveErrors(request, errors);
     }
-    
+
     /**
      * checks Leader Progress
      */
     public ActionForward checkLeaderProgress(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) throws JSONException, IOException {
-	
+
 	IVoteService voteService = VoteServiceProxy.getVoteService(getServlet().getServletContext());
 	Long toolSessionId = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_SESSION_ID);
 
 	VoteSession session = voteService.getSessionBySessionId(toolSessionId);
 	VoteQueUsr leader = session.getGroupLeader();
-	
+
 	boolean isLeaderResponseFinalized = leader.isResponseFinalised();
-	
+
 	JSONObject JSONObject = new JSONObject();
 	JSONObject.put("isLeaderResponseFinalized", isLeaderResponseFinalized);
 	response.setContentType("application/x-json;charset=utf-8");
@@ -560,7 +565,7 @@ public class VoteLearningAction extends LamsDispatchAction implements VoteAppCon
 	voteService.createNotebookEntry(new Long(toolSessionID), CoreNotebookConstants.NOTEBOOK_TOOL, MY_SIGNATURE,
 		new Integer(userID), reflectionEntry);
 
-	voteLearningForm.resetUserActions(); /*resets all except submitAnswersContent */
+	voteLearningForm.resetUserActions(); /* resets all except submitAnswersContent */
 	return learnerFinished(mapping, form, request, response);
     }
 
@@ -584,8 +589,8 @@ public class VoteLearningAction extends LamsDispatchAction implements VoteAppCon
 	String userID = request.getParameter("userID");
 	voteLearningForm.setUserID(userID);
 
-	NotebookEntry notebookEntry = voteService.getEntry(new Long(toolSessionID),
-		CoreNotebookConstants.NOTEBOOK_TOOL, MY_SIGNATURE, new Integer(userID));
+	NotebookEntry notebookEntry = voteService.getEntry(new Long(toolSessionID), CoreNotebookConstants.NOTEBOOK_TOOL,
+		MY_SIGNATURE, new Integer(userID));
 
 	if (notebookEntry != null) {
 	    String notebookEntryPresentable = notebookEntry.getEntry();
@@ -597,9 +602,9 @@ public class VoteLearningAction extends LamsDispatchAction implements VoteAppCon
 
 	voteLearningForm.resetCommands();
 
-	LearningWebUtil.putActivityPositionInRequestByToolSessionId(new Long(toolSessionID), request, getServlet()
-		.getServletContext());
-	
+	LearningWebUtil.putActivityPositionInRequestByToolSessionId(new Long(toolSessionID), request,
+		getServlet().getServletContext());
+
 	return (mapping.findForward(NOTEBOOK));
     }
 
@@ -618,10 +623,10 @@ public class VoteLearningAction extends LamsDispatchAction implements VoteAppCon
 
 	String maxNominationCount = request.getParameter(MAX_NOMINATION_COUNT);
 	voteLearningForm.setMaxNominationCount(maxNominationCount);
-	
+
 	String minNominationCount = request.getParameter(MIN_NOMINATION_COUNT);
 	voteLearningForm.setMinNominationCount(minNominationCount);
-	
+
 	String useSelectLeaderToolOuput = request.getParameter(USE_SELECT_LEADER_TOOL_OUTPUT);
 	voteLearningForm.setUseSelectLeaderToolOuput(useSelectLeaderToolOuput);
 
@@ -639,10 +644,10 @@ public class VoteLearningAction extends LamsDispatchAction implements VoteAppCon
 
 	String userEntry = request.getParameter(USER_ENTRY);
 	voteLearningForm.setUserEntry(userEntry);
-	
+
 	String groupLeaderName = request.getParameter(ATTR_GROUP_LEADER_NAME);
 	voteLearningForm.setGroupLeaderName(groupLeaderName);
-	
+
 	boolean isUserLeader = WebUtil.readBooleanParam(request, "userLeader");
 	voteLearningForm.setIsUserLeader(isUserLeader);
     }
@@ -651,6 +656,6 @@ public class VoteLearningAction extends LamsDispatchAction implements VoteAppCon
      * Return ResourceService bean.
      */
     private MessageService getMessageService() {
-	return (MessageService) VoteServiceProxy.getMessageService(getServlet().getServletContext());
+	return VoteServiceProxy.getMessageService(getServlet().getServletContext());
     }
 }

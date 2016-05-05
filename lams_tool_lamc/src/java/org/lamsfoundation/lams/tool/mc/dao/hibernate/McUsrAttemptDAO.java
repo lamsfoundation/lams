@@ -2,21 +2,21 @@
  * Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
  * =============================================================
  * License Information: http://lamsfoundation.org/licensing/lams/2.0/
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301
  * USA
- * 
+ *
  * http://www.gnu.org/licenses/gpl.txt
  * ***********************************************************************/
 /* $$Id$$ */
@@ -47,25 +47,23 @@ import org.springframework.stereotype.Repository;
 public class McUsrAttemptDAO extends LAMSBaseDAO implements IMcUsrAttemptDAO {
 
     private static final String LOAD_PARTICULAR_QUESTION_ATTEMPT = "from attempt in class McUsrAttempt where attempt.mcQueUsr.uid=:queUsrUid"
-	    + " and attempt.mcQueContentId=:mcQueContentId"
-	    + " order by attempt.mcOptionsContent.uid";
+	    + " and attempt.mcQueContentId=:mcQueContentId" + " order by attempt.mcOptionsContent.uid";
 
     private static final String LOAD_ALL_QUESTION_ATTEMPTS = "from attempt in class McUsrAttempt where attempt.mcQueUsr.uid=:queUsrUid"
 	    + " AND attempt.mcQueUsr.responseFinalised = true order by attempt.mcQueContentId, attempt.mcOptionsContent.uid";
-    
-    private static final String FIND_ATTEMPTS_COUNT_BY_OPTION = "select count(*) from "
-	    + McUsrAttempt.class.getName()
+
+    private static final String FIND_ATTEMPTS_COUNT_BY_OPTION = "select count(*) from " + McUsrAttempt.class.getName()
 	    + " as attempt where attempt.mcOptionsContent.uid=? AND attempt.mcQueUsr.responseFinalised = true";
-    
+
     private static final String FIND_USER_TOTAL_MARK = "select COALESCE(SUM(attempt.mark),0) from "
 	    + McUsrAttempt.class.getName()
 	    + " as attempt where attempt.mcQueUsr.uid=:userUid AND attempt.mcQueUsr.responseFinalised = true";
-    
+
     @Override
     public McUsrAttempt getUserAttemptByUid(Long uid) {
 	return (McUsrAttempt) this.getSession().get(McUsrAttempt.class, uid);
     }
-    
+
     @Override
     public void saveMcUsrAttempt(McUsrAttempt mcUsrAttempt) {
 	this.getSession().saveOrUpdate(mcUsrAttempt);
@@ -73,24 +71,26 @@ public class McUsrAttemptDAO extends LAMSBaseDAO implements IMcUsrAttemptDAO {
 
     @Override
     public List<McUsrAttempt> getFinalizedUserAttempts(final Long userUid) {
-	return (List<McUsrAttempt>) getSessionFactory().getCurrentSession().createQuery(LOAD_ALL_QUESTION_ATTEMPTS)
+	return getSessionFactory().getCurrentSession().createQuery(LOAD_ALL_QUESTION_ATTEMPTS)
 		.setLong("queUsrUid", userUid.longValue()).list();
     }
-    
+
     @Override
     public int getUserTotalMark(final Long userUid) {
-	List list = getSessionFactory().getCurrentSession().createQuery(FIND_USER_TOTAL_MARK).setLong("userUid", userUid.longValue()).list();
-	
+	List list = getSessionFactory().getCurrentSession().createQuery(FIND_USER_TOTAL_MARK)
+		.setLong("userUid", userUid.longValue()).list();
+
 	if (list == null || list.size() == 0) {
 	    return 0;
 	}
-	    
+
 	return ((Number) list.get(0)).intValue();
     }
 
+    @Override
     @SuppressWarnings("unchecked")
     public McUsrAttempt getUserAttemptByQuestion(final Long queUsrUid, final Long mcQueContentId) {
-	List<McUsrAttempt> userAttemptList = (List<McUsrAttempt>) getSessionFactory().getCurrentSession()
+	List<McUsrAttempt> userAttemptList = getSessionFactory().getCurrentSession()
 		.createQuery(LOAD_PARTICULAR_QUESTION_ATTEMPT).setLong("queUsrUid", queUsrUid.longValue())
 		.setLong("mcQueContentId", mcQueContentId.longValue()).list();
 	if (userAttemptList.size() > 1) {
@@ -111,24 +111,25 @@ public class McUsrAttemptDAO extends LAMSBaseDAO implements IMcUsrAttemptDAO {
     public void removeAllUserAttempts(Long queUserUid) {
 	getSessionFactory().getCurrentSession().setFlushMode(FlushMode.AUTO);
 
-	List<McUsrAttempt> userAttempts = (List<McUsrAttempt>) getSessionFactory().getCurrentSession().createQuery(LOAD_ALL_QUESTION_ATTEMPTS)
-		.setLong("queUsrUid", queUserUid.longValue()).list();
+	List<McUsrAttempt> userAttempts = getSessionFactory().getCurrentSession()
+		.createQuery(LOAD_ALL_QUESTION_ATTEMPTS).setLong("queUsrUid", queUserUid.longValue()).list();
 
 	for (McUsrAttempt userAttempt : userAttempts) {
 	    this.getSession().delete(userAttempt);
 	}
     }
-    
+
     @Override
     public void removeAttempt(McUsrAttempt userAttempt) {
 	this.getSession().delete(userAttempt);
     }
-    
+
     @Override
     public int getAttemptsCountPerOption(Long optionUid) {
 	List list = doFind(FIND_ATTEMPTS_COUNT_BY_OPTION, new Object[] { optionUid });
-	if (list == null || list.size() == 0)
+	if (list == null || list.size() == 0) {
 	    return 0;
+	}
 	return ((Number) list.get(0)).intValue();
     }
 

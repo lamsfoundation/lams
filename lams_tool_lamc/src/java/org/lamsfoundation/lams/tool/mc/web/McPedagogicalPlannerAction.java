@@ -2,21 +2,21 @@
  * Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
  * =============================================================
  * License Information: http://lamsfoundation.org/licensing/lams/2.0/
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301
  * USA
- * 
+ *
  * http://www.gnu.org/licenses/gpl.txt
  * ****************************************************************
  */
@@ -86,8 +86,7 @@ public class McPedagogicalPlannerAction extends LamsDispatchAction {
 
 	    do {
 		question = plannerForm.getQuestion(questionIndex - 1);
-		List<McOptionDTO> candidateAnswerDTOList = plannerForm.extractCandidateAnswers(request,
-			questionIndex);
+		List<McOptionDTO> candidateAnswerDTOList = plannerForm.extractCandidateAnswers(request, questionIndex);
 		boolean removeQuestion = true;
 		if (!StringUtils.isEmpty(question)) {
 		    if (candidateAnswerDTOList != null) {
@@ -103,8 +102,8 @@ public class McPedagogicalPlannerAction extends LamsDispatchAction {
 		    plannerForm.removeQuestion(questionIndex - 1);
 		} else {
 		    if (questionIndex <= mcContent.getMcQueContents().size()) {
-			McQueContent mcQueContent = getMcService().getQuestionByDisplayOrder(
-				(long) questionIndex, mcContent.getUid());
+			McQueContent mcQueContent = getMcService().getQuestionByDisplayOrder((long) questionIndex,
+				mcContent.getUid());
 			mcQueContent.setQuestion(question);
 			int candidateAnswerDTOIndex = 0;
 			Set<McOptsContent> candidateAnswers = mcQueContent.getMcOptionsContents();
@@ -130,7 +129,8 @@ public class McPedagogicalPlannerAction extends LamsDispatchAction {
 			mcQueContent.setQuestion(question);
 			mcQueContent.setMark(McAppConstants.QUESTION_DEFAULT_MARK);
 			Set<McOptsContent> candidateAnswers = mcQueContent.getMcOptionsContents();
-			for (int candidateAnswerDTOIndex = 0; candidateAnswerDTOIndex < candidateAnswerDTOList.size(); candidateAnswerDTOIndex++) {
+			for (int candidateAnswerDTOIndex = 0; candidateAnswerDTOIndex < candidateAnswerDTOList
+				.size(); candidateAnswerDTOIndex++) {
 			    McOptionDTO answerDTO = candidateAnswerDTOList.get(candidateAnswerDTOIndex);
 			    McOptsContent candidateAnswer = new McOptsContent(candidateAnswerDTOIndex + 1,
 				    McAppConstants.CORRECT.equals(answerDTO.getCorrect()),
@@ -175,8 +175,8 @@ public class McPedagogicalPlannerAction extends LamsDispatchAction {
     }
 
     private IMcService getMcService() {
-	WebApplicationContext wac = WebApplicationContextUtils.getRequiredWebApplicationContext(getServlet()
-		.getServletContext());
+	WebApplicationContext wac = WebApplicationContextUtils
+		.getRequiredWebApplicationContext(getServlet().getServletContext());
 	return McServiceProxy.getMcService(getServlet().getServletContext());
     }
 

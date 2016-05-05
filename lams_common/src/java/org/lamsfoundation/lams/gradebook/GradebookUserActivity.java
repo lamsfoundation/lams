@@ -30,9 +30,9 @@ import org.lamsfoundation.lams.usermanagement.User;
 
 /**
  * @author lfoxton
- * 
- * This class maps to one activity mark for a learner
- * 
+ *
+ *         This class maps to one activity mark for a learner
+ *
  *
  */
 public class GradebookUserActivity {
@@ -49,8 +49,8 @@ public class GradebookUserActivity {
 	markedInGradebook = false;
 	updateDate = new Date();
     }
-    
-    public GradebookUserActivity(ToolActivity activity, User learner){
+
+    public GradebookUserActivity(ToolActivity activity, User learner) {
 	this.activity = activity;
 	this.learner = learner;
 	markedInGradebook = false;
@@ -80,7 +80,7 @@ public class GradebookUserActivity {
 	this.activity = activity;
     }
 
-    /** 
+    /**
      *
      *
      */
@@ -107,24 +107,24 @@ public class GradebookUserActivity {
      *
      */
     public String getFeedback() {
-        return feedback;
+	return feedback;
     }
 
     public void setFeedback(String feedback) {
-        this.feedback = feedback;
+	this.feedback = feedback;
     }
 
     /**
      *
      */
     public Boolean getMarkedInGradebook() {
-        return markedInGradebook;
+	return markedInGradebook;
     }
 
     public void setMarkedInGradebook(Boolean markedInGradebook) {
-        this.markedInGradebook = markedInGradebook;
+	this.markedInGradebook = markedInGradebook;
     }
-    
+
     /**
      *
      * @return

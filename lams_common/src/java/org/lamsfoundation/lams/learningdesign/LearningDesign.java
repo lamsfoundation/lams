@@ -2,21 +2,21 @@
  * Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
  * =============================================================
  * License Information: http://lamsfoundation.org/licensing/lams/2.0/
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License version 2.0 
+ * it under the terms of the GNU General Public License version 2.0
  * as published by the Free Software Foundation.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301
  * USA
- * 
+ *
  * http://www.gnu.org/licenses/gpl.txt
  * ****************************************************************
  */
@@ -156,7 +156,8 @@ public class LearningDesign implements Serializable {
     /** persistent field */
     private String designType;
 
-    /* If the values for createDateTime and/or lastModifiedDateTime
+    /*
+     * If the values for createDateTime and/or lastModifiedDateTime
      * are null, then it will default to the current datetime.
      */
 
@@ -239,7 +240,7 @@ public class LearningDesign implements Serializable {
      * Create a new learning design based on an existing learning design. If setOriginalDesign is true, then set the
      * input design as the original design in the copied design - this is used when runtime copies of a design are
      * created. It is not used for user based copying of a design.
-     * 
+     *
      * @param design
      *            Design to be copied
      * @param designCopyType

@@ -2,21 +2,21 @@
  * Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
  * =============================================================
  * License Information: http://lamsfoundation.org/licensing/lams/2.0/
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License version 2.0 
+ * it under the terms of the GNU General Public License version 2.0
  * as published by the Free Software Foundation.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301
  * USA
- * 
+ *
  * http://www.gnu.org/licenses/gpl.txt
  * ****************************************************************
  */
@@ -98,7 +98,7 @@ public class WorkspaceAction extends LamsDispatchAction {
 
     /**
      * For details please refer to org.lamsfoundation.lams.workspace.service.IWorkspaceManagementService
-     * 
+     *
      * @param mapping
      * @param form
      * @param request
@@ -111,7 +111,7 @@ public class WorkspaceAction extends LamsDispatchAction {
      */
     public ActionForward createFolder(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response)
-		    throws ServletException, IOException, UserException, WorkspaceFolderException {
+	    throws ServletException, IOException, UserException, WorkspaceFolderException {
 	Integer parentFolderID = WebUtil.readIntParam(request, "parentFolderID", false);
 	String folderName = WebUtil.readStrParam(request, "name", false);
 	Integer userID = getUserId();
@@ -123,7 +123,7 @@ public class WorkspaceAction extends LamsDispatchAction {
 
     /**
      * For details please refer to org.lamsfoundation.lams.workspace.service.IWorkspaceManagementService
-     * 
+     *
      * @param mapping
      * @param form
      * @param request
@@ -149,7 +149,7 @@ public class WorkspaceAction extends LamsDispatchAction {
 
     /**
      * For details please refer to org.lamsfoundation.lams.workspace.service.IWorkspaceManagementService
-     * 
+     *
      * @param mapping
      * @param form
      * @param request
@@ -162,8 +162,8 @@ public class WorkspaceAction extends LamsDispatchAction {
      * @throws LearningDesignException
      */
     public ActionForward copyResource(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws ServletException, IOException, LearningDesignException, UserException,
-		    WorkspaceFolderException {
+	    HttpServletResponse response)
+	    throws ServletException, IOException, LearningDesignException, UserException, WorkspaceFolderException {
 	Long resourceID = WebUtil.readLongParam(request, WorkspaceAction.RESOURCE_ID, false);
 	String resourceType = WebUtil.readStrParam(request, WorkspaceAction.RESOURCE_TYPE, false);
 	Integer targetFolderID = WebUtil.readIntParam(request, "targetFolderID", false);
@@ -182,7 +182,7 @@ public class WorkspaceAction extends LamsDispatchAction {
 
     public ActionForward renameResource(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response)
-		    throws IOException, ServletException, UserException, WorkspaceFolderException {
+	    throws IOException, ServletException, UserException, WorkspaceFolderException {
 	Integer userID = getUserId();
 	Long resourceID = new Long(WebUtil.readLongParam(request, WorkspaceAction.RESOURCE_ID));
 	String resourceType = WebUtil.readStrParam(request, WorkspaceAction.RESOURCE_TYPE);

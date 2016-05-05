@@ -2,21 +2,21 @@
  * Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
  * =============================================================
  * License Information: http://lamsfoundation.org/licensing/lams/2.0/
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301
  * USA
- * 
+ *
  * http://www.gnu.org/licenses/gpl.txt
  * ****************************************************************
  */
@@ -149,11 +149,11 @@ public class AuthoringAction extends Action {
     /**
      * Read imageGallery data from database and put them into HttpSession. It will redirect to init.do directly after
      * this method run successfully.
-     * 
+     *
      * This method will avoid read database again and lost un-saved resouce item lost when user "refresh page",
-     * 
+     *
      * @throws ServletException
-     * 
+     *
      */
     private ActionForward start(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) throws ServletException {
@@ -234,7 +234,7 @@ public class AuthoringAction extends Action {
 
     /**
      * Display same entire authoring page content from HttpSession variable.
-     * 
+     *
      * @param mapping
      * @param form
      * @param request
@@ -265,7 +265,7 @@ public class AuthoringAction extends Action {
 
     /**
      * This method will persist all inforamtion in this authoring page, include all imageGallery item, information etc.
-     * 
+     *
      * @param mapping
      * @param form
      * @param request
@@ -373,7 +373,7 @@ public class AuthoringAction extends Action {
 	    ImageGalleryItem delAtt = (ImageGalleryItem) iter.next();
 	    iter.remove();
 	}
-	
+
 	// **********************************************
 	// finally persist imageGalleryPO again
 	service.saveOrUpdateImageGallery(imageGalleryPO);
@@ -398,7 +398,7 @@ public class AuthoringAction extends Action {
 
     /**
      * Display empty page for new imageGallery item.
-     * 
+     *
      * @param mapping
      * @param form
      * @param request
@@ -415,7 +415,7 @@ public class AuthoringAction extends Action {
 
     /**
      * Display edit page for existed imageGallery item.
-     * 
+     *
      * @param mapping
      * @param form
      * @param request
@@ -446,7 +446,7 @@ public class AuthoringAction extends Action {
      * Remove imageGallery item attachment, such as single file, learning object ect. It is a ajax call and just
      * temporarily remove from page, all permenant change will happen only when user sumbit this imageGallery item
      * again.
-     * 
+     *
      * @param mapping
      * @param form
      * @param request
@@ -464,7 +464,7 @@ public class AuthoringAction extends Action {
      * <code>HttpSession</code> ImageGalleryItemList. Notice, this save is not persist them into database, just save
      * <code>HttpSession</code> temporarily. Only they will be persist when the entire authoring page is being
      * persisted.
-     * 
+     *
      * @param mapping
      * @param form
      * @param request
@@ -487,8 +487,8 @@ public class AuthoringAction extends Action {
 	    extractFormToImageGalleryItem(request, itemForm);
 	} catch (Exception e) {
 	    // any upload exception will display as normal error message rather then throw exception directly
-	    errors.add(ActionMessages.GLOBAL_MESSAGE, new ActionMessage(ImageGalleryConstants.ERROR_MSG_UPLOAD_FAILED,
-		    e.getMessage()));
+	    errors.add(ActionMessages.GLOBAL_MESSAGE,
+		    new ActionMessage(ImageGalleryConstants.ERROR_MSG_UPLOAD_FAILED, e.getMessage()));
 	    if (!errors.isEmpty()) {
 		this.addErrors(request, errors);
 		return mapping.findForward("image");
@@ -502,7 +502,7 @@ public class AuthoringAction extends Action {
 
     /**
      * Move up current item.
-     * 
+     *
      * @param mapping
      * @param form
      * @param request
@@ -516,7 +516,7 @@ public class AuthoringAction extends Action {
 
     /**
      * Move down current item.
-     * 
+     *
      * @param mapping
      * @param form
      * @param request
@@ -540,10 +540,11 @@ public class AuthoringAction extends Action {
 	    // get current and the target item, and switch their sequnece
 	    ImageGalleryItem image = rList.get(imageIdx);
 	    ImageGalleryItem repImage;
-	    if (up)
+	    if (up) {
 		repImage = rList.get(--imageIdx);
-	    else
+	    } else {
 		repImage = rList.get(++imageIdx);
+	    }
 	    int upSeqId = repImage.getSequenceId();
 	    repImage.setSequenceId(image.getSequenceId());
 	    image.setSequenceId(upSeqId);
@@ -559,7 +560,7 @@ public class AuthoringAction extends Action {
 
     /**
      * Display empty page for muiltiple image upload.
-     * 
+     *
      * @param mapping
      * @param form
      * @param request
@@ -579,7 +580,7 @@ public class AuthoringAction extends Action {
      * <code>HttpSession</code> ImageGalleryItemList. Notice, this save is not persist them into database, just save
      * <code>HttpSession</code> temporarily. Only they will be persist when the entire authoring page is being
      * persisted.
-     * 
+     *
      * @param mapping
      * @param form
      * @param request
@@ -602,8 +603,8 @@ public class AuthoringAction extends Action {
 	    extractMultipleFormToImageGalleryItems(request, multipleForm);
 	} catch (Exception e) {
 	    // any upload exception will display as normal error message rather then throw exception directly
-	    errors.add(ActionMessages.GLOBAL_MESSAGE, new ActionMessage(ImageGalleryConstants.ERROR_MSG_UPLOAD_FAILED,
-		    e.getMessage()));
+	    errors.add(ActionMessages.GLOBAL_MESSAGE,
+		    new ActionMessage(ImageGalleryConstants.ERROR_MSG_UPLOAD_FAILED, e.getMessage()));
 	    if (!errors.isEmpty()) {
 		this.addErrors(request, errors);
 		return mapping.findForward("images");
@@ -618,7 +619,7 @@ public class AuthoringAction extends Action {
     /**
      * Remove imageGallery item from HttpSession list and update page display. As authoring rule, all persist only
      * happen when user submit whole page. So this remove is just impact HttpSession values.
-     * 
+     *
      * @param mapping
      * @param form
      * @param request
@@ -655,14 +656,14 @@ public class AuthoringAction extends Action {
      * Return ImageGalleryService bean.
      */
     private IImageGalleryService getImageGalleryService() {
-	WebApplicationContext wac = WebApplicationContextUtils.getRequiredWebApplicationContext(getServlet()
-		.getServletContext());
+	WebApplicationContext wac = WebApplicationContextUtils
+		.getRequiredWebApplicationContext(getServlet().getServletContext());
 	return (IImageGalleryService) wac.getBean(ImageGalleryConstants.IMAGE_GALLERY_SERVICE);
     }
 
     /**
      * List save current imageGallery items.
-     * 
+     *
      * @param request
      * @return
      */
@@ -678,7 +679,7 @@ public class AuthoringAction extends Action {
 
     /**
      * List save deleted imageGallery items, which could be persisted or non-persisted items.
-     * 
+     *
      * @param request
      * @return
      */
@@ -690,7 +691,7 @@ public class AuthoringAction extends Action {
      * If a imageGallery item has attahment file, and the user edit this item and change the attachment to new file,
      * then the old file need be deleted when submitting the whole authoring page. Save the file uuid and version id
      * into ImageGalleryItem object for temporarily use.
-     * 
+     *
      * @param request
      * @return
      */
@@ -700,7 +701,7 @@ public class AuthoringAction extends Action {
 
     /**
      * Get <code>java.util.List</code> from HttpSession by given name.
-     * 
+     *
      * @param request
      * @param name
      * @return
@@ -716,7 +717,7 @@ public class AuthoringAction extends Action {
 
     /**
      * This method will populate imageGallery item information to its form for edit use.
-     * 
+     *
      * @param itemIdx
      * @param item
      * @param form
@@ -742,7 +743,7 @@ public class AuthoringAction extends Action {
 
     /**
      * Extract web form content to imageGallery item.
-     * 
+     *
      * @param request
      * @param imageForm
      * @throws ImageGalleryException
@@ -823,7 +824,7 @@ public class AuthoringAction extends Action {
 
     /**
      * Extract web form content to imageGallery items.
-     * 
+     *
      * @param request
      * @param multipleForm
      * @throws ImageGalleryException
@@ -872,7 +873,7 @@ public class AuthoringAction extends Action {
 
     /**
      * Validate imageGallery.
-     * 
+     *
      * @param imageGalleryForm
      * @return
      */
@@ -890,7 +891,7 @@ public class AuthoringAction extends Action {
 
     /**
      * Validate imageGallery item.
-     * 
+     *
      * @param itemForm
      * @return
      */
@@ -909,8 +910,8 @@ public class AuthoringAction extends Action {
 	if (itemForm.getFile() != null) {
 	    String contentType = itemForm.getFile().getContentType();
 	    if (isContentTypeForbidden(contentType)) {
-		errors.add(ActionMessages.GLOBAL_MESSAGE, new ActionMessage(
-			ImageGalleryConstants.ERROR_MSG_NOT_ALLOWED_FORMAT));
+		errors.add(ActionMessages.GLOBAL_MESSAGE,
+			new ActionMessage(ImageGalleryConstants.ERROR_MSG_NOT_ALLOWED_FORMAT));
 	    }
 	}
 
@@ -919,7 +920,7 @@ public class AuthoringAction extends Action {
 
     /**
      * Validate imageGallery item.
-     * 
+     *
      * @param multipleForm
      * @return
      */
@@ -935,8 +936,8 @@ public class AuthoringAction extends Action {
 	    // check for allowed format : gif, png, jpg
 	    String contentType = file.getContentType();
 	    if (isContentTypeForbidden(contentType)) {
-		errors.add(ActionMessages.GLOBAL_MESSAGE, new ActionMessage(
-			ImageGalleryConstants.ERROR_MSG_NOT_ALLOWED_FORMAT_FOR, file.getFileName()));
+		errors.add(ActionMessages.GLOBAL_MESSAGE,
+			new ActionMessage(ImageGalleryConstants.ERROR_MSG_NOT_ALLOWED_FORMAT_FOR, file.getFileName()));
 	    }
 	}
 
@@ -945,7 +946,7 @@ public class AuthoringAction extends Action {
 
     /**
      * Create file list from multiple form.
-     * 
+     *
      * @param multipleForm
      * @return
      */
@@ -973,22 +974,21 @@ public class AuthoringAction extends Action {
 
     /**
      * Checks if the format is allowed.
-     * 
+     *
      * @param contentType
      * @return
      */
     private boolean isContentTypeForbidden(String contentType) {
-	boolean isContentTypeForbidden = StringUtils.isEmpty(contentType)
-		|| !(contentType.equals("image/gif") || contentType.equals("image/png")
-			|| contentType.equals("image/jpg") || contentType.equals("image/jpeg") || contentType
-			    .equals("image/pjpeg"));
+	boolean isContentTypeForbidden = StringUtils.isEmpty(contentType) || !(contentType.equals("image/gif")
+		|| contentType.equals("image/png") || contentType.equals("image/jpg")
+		|| contentType.equals("image/jpeg") || contentType.equals("image/pjpeg"));
 
 	return isContentTypeForbidden;
     }
 
     /**
      * Get ToolAccessMode from HttpRequest parameters. Default value is AUTHOR mode.
-     * 
+     *
      * @param request
      * @return
      */

@@ -60,7 +60,7 @@ import org.lamsfoundation.lams.util.LanguageUtil;
 
 /**
  * @author jliew
- * 
+ *
  */
 public class LdapService implements ILdapService {
 
@@ -522,15 +522,15 @@ public class LdapService implements ILdapService {
 			if ((login != null) && (login.trim().length() > 0)) {
 			    int code = bulkUpdateLDAPUser(login, attrs, disabled);
 			    switch (code) {
-			    case BULK_UPDATE_CREATED:
-				createdUsers++;
-				break;
-			    case BULK_UPDATE_UPDATED:
-				updatedUsers++;
-				break;
-			    case BULK_UPDATE_DISABLED:
-				disabledUsers++;
-				break;
+				case BULK_UPDATE_CREATED:
+				    createdUsers++;
+				    break;
+				case BULK_UPDATE_UPDATED:
+				    updatedUsers++;
+				    break;
+				case BULK_UPDATE_DISABLED:
+				    disabledUsers++;
+				    break;
 			    }
 			} else {
 			    log.error("Couldn't find login attribute for user using attribute name: "

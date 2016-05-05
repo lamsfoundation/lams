@@ -24,18 +24,18 @@
 package org.lamsfoundation.lams.monitoring.web;
 
 /**
-* The action servlet that provides the support for the tool output based branching.
-* 
-* @author Fiona Malikoff
-*
-* 
-*
-*
-*
-*
-* 
-*
-*/
-public class ToolOutputBranchingAction extends BranchingAction{
+ * The action servlet that provides the support for the tool output based branching.
+ * 
+ * @author Fiona Malikoff
+ *
+ * 
+ *
+ *
+ *
+ *
+ * 
+ *
+ */
+public class ToolOutputBranchingAction extends BranchingAction {
 
 }

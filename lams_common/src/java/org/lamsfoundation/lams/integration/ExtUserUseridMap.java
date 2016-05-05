@@ -1,6 +1,7 @@
 package org.lamsfoundation.lams.integration;
 
 import java.io.Serializable;
+
 import org.apache.commons.lang.builder.ToStringBuilder;
 import org.lamsfoundation.lams.usermanagement.User;
 
@@ -36,7 +37,7 @@ public class ExtUserUseridMap implements Serializable {
 
     /**
      *
-     * 
+     *
      */
     public Integer getSid() {
 	return this.sid;
@@ -48,7 +49,7 @@ public class ExtUserUseridMap implements Serializable {
 
     /**
      *
-     * 
+     *
      */
     public String getExtUsername() {
 	return this.extUsername;
@@ -61,7 +62,7 @@ public class ExtUserUseridMap implements Serializable {
     /**
      *
      *
-     * 
+     *
      */
     public User getUser() {
 	return this.user;
@@ -74,7 +75,7 @@ public class ExtUserUseridMap implements Serializable {
     /**
      *
      *
-     * 
+     *
      */
     public ExtServerOrgMap getExtServerOrgMap() {
 	return this.extServerOrgMap;
@@ -84,6 +85,7 @@ public class ExtUserUseridMap implements Serializable {
 	this.extServerOrgMap = extServerOrgMap;
     }
 
+    @Override
     public String toString() {
 	return new ToStringBuilder(this).append("sid", getSid()).append("extUsername", getExtUsername()).toString();
     }

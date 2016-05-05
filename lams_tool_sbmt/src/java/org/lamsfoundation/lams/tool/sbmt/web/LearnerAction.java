@@ -2,21 +2,21 @@
  * Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
  * =============================================================
  * License Information: http://lamsfoundation.org/licensing/lams/2.0/
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License version 2.0 
+ * it under the terms of the GNU General Public License version 2.0
  * as published by the Free Software Foundation.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301
  * USA
- * 
+ *
  * http://www.gnu.org/licenses/gpl.txt
  * ****************************************************************
  */
@@ -45,7 +45,6 @@ import org.apache.struts.action.ActionMessage;
 import org.apache.struts.action.ActionMessages;
 import org.apache.struts.actions.DispatchAction;
 import org.apache.struts.upload.FormFile;
-import org.lamsfoundation.lams.events.DeliveryMethodMail;
 import org.lamsfoundation.lams.events.IEventNotificationService;
 import org.lamsfoundation.lams.learning.web.util.LearningWebUtil;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
@@ -64,7 +63,6 @@ import org.lamsfoundation.lams.tool.sbmt.form.LearnerForm;
 import org.lamsfoundation.lams.tool.sbmt.service.ISubmitFilesService;
 import org.lamsfoundation.lams.tool.sbmt.service.SubmitFilesServiceProxy;
 import org.lamsfoundation.lams.tool.sbmt.util.SbmtConstants;
-import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.util.DateUtil;
 import org.lamsfoundation.lams.util.FileUtil;
@@ -80,12 +78,12 @@ import org.lamsfoundation.lams.web.util.SessionMap;
  * @author Steve.Ni
  *
  *
- * 
  *
  *
  *
- * 
- * 
+ *
+ *
+ *
  */
 public class LearnerAction extends DispatchAction {
 
@@ -95,7 +93,7 @@ public class LearnerAction extends DispatchAction {
 
     /**
      * The initial page of learner in Submission tool. This page will list all uploaded files and learn
-     * 
+     *
      * @param mapping
      * @param form
      * @param request
@@ -209,7 +207,7 @@ public class LearnerAction extends DispatchAction {
     /**
      * Implements learner upload submission function. This function also display the page again for learner uploading
      * more submission use.
-     * 
+     *
      * @param mapping
      * @param form
      * @param request
@@ -280,7 +278,7 @@ public class LearnerAction extends DispatchAction {
     /**
      * Learner choose finish upload button, will invoke this function. This function will mark the <code>finished</code>
      * field by special toolSessionID and userID.
-     * 
+     *
      * @param mapping
      * @param form
      * @param request
@@ -370,10 +368,10 @@ public class LearnerAction extends DispatchAction {
     }
 
     /**
-     * 
+     *
      * Set information into learner DTO object for page display. Fill file list uploaded by the special user into web
      * form. Remove the unauthorized mark and comments.
-     * 
+     *
      * @param request
      * @param sessionMap
      * @param sessionID

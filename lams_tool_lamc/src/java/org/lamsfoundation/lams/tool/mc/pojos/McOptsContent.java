@@ -2,21 +2,21 @@
  * Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
  * =============================================================
  * License Information: http://lamsfoundation.org/licensing/lams/2.0/
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301
  * USA
- * 
+ *
  * http://www.gnu.org/licenses/gpl.txt
  * ***********************************************************************/
 /* $$Id$$ */
@@ -29,7 +29,7 @@ import org.apache.commons.lang.builder.ToStringBuilder;
 /**
  * Persistent object/bean that defines the content for the MCQ tool. Provides accessors and mutators to get/set
  * attributes It maps to database table: tl_lamc11_options_content
- * 
+ *
  * @author Ozgur Demirtas
  */
 public class McOptsContent implements Serializable, Comparable<McOptsContent> {
@@ -56,7 +56,8 @@ public class McOptsContent implements Serializable, Comparable<McOptsContent> {
 
     private String escapedOptionText;
 
-    public McOptsContent(Integer displayOrder, boolean correctOption, String mcQueOptionText, McQueContent mcQueContent) {
+    public McOptsContent(Integer displayOrder, boolean correctOption, String mcQueOptionText,
+	    McQueContent mcQueContent) {
 	this.displayOrder = displayOrder;
 	this.correctOption = correctOption;
 	this.mcQueOptionText = mcQueOptionText;
@@ -105,6 +106,7 @@ public class McOptsContent implements Serializable, Comparable<McOptsContent> {
 	this.mcQueContent = mcQueContent;
     }
 
+    @Override
     public String toString() {
 	return new ToStringBuilder(this).append("uid", getUid()).toString();
     }
@@ -124,12 +126,14 @@ public class McOptsContent implements Serializable, Comparable<McOptsContent> {
 	this.mcQueContentId = mcQueContentId;
     }
 
+    @Override
     public int compareTo(McOptsContent optContent) {
 	// if the object does not exist yet, then just return any one of 0, -1, 1. Should not make a difference.
-	if (uid == null)
+	if (uid == null) {
 	    return 1;
-	else
+	} else {
 	    return (int) (uid.longValue() - optContent.uid.longValue());
+	}
     }
 
     /**

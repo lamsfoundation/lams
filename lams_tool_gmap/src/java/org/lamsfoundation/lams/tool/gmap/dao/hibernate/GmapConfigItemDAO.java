@@ -6,18 +6,19 @@ import org.lamsfoundation.lams.tool.gmap.model.GmapConfigItem;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public class GmapConfigItemDAO extends LAMSBaseDAO implements IGmapConfigItemDAO
-{
-	private static final String LOAD_CONFIG_ITEM_BY_KEY = "from GmapConfigItem configuration" 
-	+ " where configuration.configKey=:key";
-	
-	public GmapConfigItem getConfigItemByKey(final String configKey)
-    {
-		return (GmapConfigItem) getSession().createQuery(LOAD_CONFIG_ITEM_BY_KEY).setString("key", configKey).uniqueResult();
+public class GmapConfigItemDAO extends LAMSBaseDAO implements IGmapConfigItemDAO {
+    private static final String LOAD_CONFIG_ITEM_BY_KEY = "from GmapConfigItem configuration"
+	    + " where configuration.configKey=:key";
+
+    @Override
+    public GmapConfigItem getConfigItemByKey(final String configKey) {
+	return (GmapConfigItem) getSession().createQuery(LOAD_CONFIG_ITEM_BY_KEY).setString("key", configKey)
+		.uniqueResult();
     }
-	
-	public void saveOrUpdate(GmapConfigItem mdlForumConfigItem) {
-		getSession().saveOrUpdate(mdlForumConfigItem);
-		getSession().flush();
-	}
+
+    @Override
+    public void saveOrUpdate(GmapConfigItem mdlForumConfigItem) {
+	getSession().saveOrUpdate(mdlForumConfigItem);
+	getSession().flush();
+    }
 }

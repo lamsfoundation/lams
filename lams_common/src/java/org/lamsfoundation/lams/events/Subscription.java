@@ -5,10 +5,10 @@ import java.security.InvalidParameterException;
 /**
  * Subscription for an event notification. This class binds an user to an event and stores some information on the
  * notification attempts.
- * 
+ *
  *
  * @author Marcin Cieslak
- * 
+ *
  */
 public class Subscription {
     /**
@@ -47,7 +47,7 @@ public class Subscription {
 
     /**
      * Standard consctructor used by Events.
-     * 
+     *
      * @param userId
      * @param deliveryMethod
      * @param periodicity

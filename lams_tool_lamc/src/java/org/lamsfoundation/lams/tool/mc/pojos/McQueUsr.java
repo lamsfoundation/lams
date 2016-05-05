@@ -2,21 +2,21 @@
  * Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
  * =============================================================
  * License Information: http://lamsfoundation.org/licensing/lams/2.0/
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301
  * USA
- * 
+ *
  * http://www.gnu.org/licenses/gpl.txt
  * ***********************************************************************/
 /* $$Id$$ */
@@ -32,7 +32,7 @@ import org.apache.commons.lang.builder.ToStringBuilder;
  * Persistent object/bean that defines the user for the MCQ tool. Provides accessors and mutators to get/set attributes
  * It maps to database table: tl_lamc11_que_usr
  * </p>
- * 
+ *
  * @author Ozgur Demirtas
  */
 public class McQueUsr implements Serializable, Comparable<McQueUsr> {
@@ -60,14 +60,13 @@ public class McQueUsr implements Serializable, Comparable<McQueUsr> {
     private Integer numberOfAttempts;
 
     private Integer lastAttemptTotalMark;
-    
+
     /** default constructor */
     public McQueUsr() {
     }
 
     /** full constructor */
-    public McQueUsr(Long queUsrId, String username, String fullname,
-	    McSession mcSession, Set mcUsrAttempts) {
+    public McQueUsr(Long queUsrId, String username, String fullname, McSession mcSession, Set mcUsrAttempts) {
 	this.queUsrId = queUsrId;
 	this.username = username;
 	this.fullname = fullname;
@@ -130,6 +129,7 @@ public class McQueUsr implements Serializable, Comparable<McQueUsr> {
 	this.mcSession = mcSession;
     }
 
+    @Override
     public String toString() {
 	return new ToStringBuilder(this).append("uid", getUid()).append("queUsrId", getQueUsrId())
 		.append("username", getUsername()).append("fullname", getFullname())
@@ -139,8 +139,9 @@ public class McQueUsr implements Serializable, Comparable<McQueUsr> {
     }
 
     /**
-     * Please pay attention this is *sessionUid* and not sessionId (this is due to Ozgur gave wrongly name to this field)
-     * 
+     * Please pay attention this is *sessionUid* and not sessionId (this is due to Ozgur gave wrongly name to this
+     * field)
+     *
      * @return Returns the mcSessionId.
      */
     public Long getMcSessionId() {
@@ -192,12 +193,14 @@ public class McQueUsr implements Serializable, Comparable<McQueUsr> {
 	return false;
     }
 
+    @Override
     public int compareTo(McQueUsr other) {
- 	// if the object does not exist yet, then just return any one of 0, -1, 1. Should not make a difference.
- 	if (uid == null)
- 	    return 1;
- 	else
- 	    return (int) (uid.longValue() - other.uid.longValue());
-     }
+	// if the object does not exist yet, then just return any one of 0, -1, 1. Should not make a difference.
+	if (uid == null) {
+	    return 1;
+	} else {
+	    return (int) (uid.longValue() - other.uid.longValue());
+	}
+    }
 
 }

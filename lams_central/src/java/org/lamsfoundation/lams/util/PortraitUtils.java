@@ -38,7 +38,7 @@ import org.apache.log4j.Logger;
 
 /**
  * @author jliew
- * @author Andrey Balan 
+ * @author Andrey Balan
  */
 public class PortraitUtils {
 
@@ -50,7 +50,7 @@ public class PortraitUtils {
      * weighted stepping method to gradually reduce the image size for better results, i.e. larger steps to start with
      * then smaller steps to finish with. Note: always writes a JPEG because GIF is protected or something - so always
      * make your outFilename end in 'jpg' PNG's with transparency are given white backgrounds
-     * 
+     *
      * @param is
      *            original image's input stream
      * @param largestDimension

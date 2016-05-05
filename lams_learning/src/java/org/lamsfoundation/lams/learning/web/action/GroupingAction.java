@@ -2,21 +2,21 @@
  * Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
  * =============================================================
  * License Information: http://lamsfoundation.org/licensing/lams/2.0/
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License version 2.0 
+ * it under the terms of the GNU General Public License version 2.0
  * as published by the Free Software Foundation.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301
  * USA
- * 
+ *
  * http://www.gnu.org/licenses/gpl.txt
  * ****************************************************************
  */
@@ -58,29 +58,29 @@ import org.lamsfoundation.lams.web.action.LamsDispatchAction;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 
 /**
- * 
+ *
  * <p>
  * The action servlet that triggers the system driven grouping (random grouping) and allows the learner to view the
  * result of the grouping.
  * </p>
- * 
+ *
  * <p>
  * Has a special override key - if the parameter force is set and the lesson is a preview lesson, any chosen grouping
  * will be overridden.
  * </p>
- * 
+ *
  * @author Jacky Fang
  * @since 2005-3-29
  * @version 1.1
- * 
- *
- * 
  *
  *
  *
  *
  *
- * 
+ *
+ *
+ *
+ *
  */
 public class GroupingAction extends LamsDispatchAction {
 
@@ -115,7 +115,7 @@ public class GroupingAction extends LamsDispatchAction {
     /**
      * Perform the grouping for the users who are currently running the lesson. If force is set to true, then we should
      * be in preview mode, and we want to override the chosen grouping to make it group straight away.
-     * 
+     *
      * @param mapping
      * @param form
      * @param request
@@ -171,7 +171,7 @@ public class GroupingAction extends LamsDispatchAction {
 
     /**
      * Load up the grouping information and forward to the jsp page to display all the groups and members.
-     * 
+     *
      * @param mapping
      * @param form
      * @param request
@@ -195,7 +195,7 @@ public class GroupingAction extends LamsDispatchAction {
 
     /**
      * Complete the current tool activity and forward to the url of next activity in the learning design.
-     * 
+     *
      * @param mapping
      * @param form
      * @param request
@@ -220,7 +220,7 @@ public class GroupingAction extends LamsDispatchAction {
 
     /**
      * Inserts into the request most of the data required by JSP page. This method is common for several pages.
-     * 
+     *
      * @param request
      */
     @SuppressWarnings("unchecked")
@@ -251,7 +251,7 @@ public class GroupingAction extends LamsDispatchAction {
 
     /**
      * Responds to a learner's group choice. Might forward back to group choice page if the chosen group was full.
-     * 
+     *
      * @param mapping
      * @param form
      * @param request

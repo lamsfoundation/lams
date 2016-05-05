@@ -47,7 +47,7 @@ public class BranchDTO implements Serializable, Comparable {
     /**
      * Get the groups currently assigned to this branch. For a teacher chosen branching activity, there will be one
      * group per branch.
-     * 
+     *
      * @return
      */
     public SortedSet<Group> getGroups() {
@@ -58,11 +58,13 @@ public class BranchDTO implements Serializable, Comparable {
 	this.groups = groups;
     }
 
+    @Override
     public String toString() {
 	return new ToStringBuilder(this).append("branchName", branchName).append("branchId", branchId)
 		.append("groups", groups).toString();
     }
 
+    @Override
     public int compareTo(Object other) {
 	BranchDTO otherBranch = (BranchDTO) other;
 	return new CompareToBuilder().append(branchName, otherBranch.branchName).append(branchId, otherBranch.branchId)

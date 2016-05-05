@@ -18,19 +18,19 @@
  *
  * http://www.gnu.org/licenses/gpl.txt
  * ****************************************************************
- */ 
- 
-/* $Id$ */ 
-package org.lamsfoundation.lams.gradebook; 
+ */
+
+/* $Id$ */
+package org.lamsfoundation.lams.gradebook;
 
 import org.lamsfoundation.lams.lesson.Lesson;
 import org.lamsfoundation.lams.usermanagement.User;
 
 /**
  * @author lfoxton
- * 
- * This class maps to one learner's entire mark for a lesson
- * 
+ *
+ *         This class maps to one learner's entire mark for a lesson
+ *
  *
  */
 public class GradebookUserLesson {
@@ -39,9 +39,10 @@ public class GradebookUserLesson {
     private User learner;
     private Double mark;
     private String feedback;
-    
-    public GradebookUserLesson() {}
-    
+
+    public GradebookUserLesson() {
+    }
+
     public GradebookUserLesson(Lesson lesson, User learner) {
 	this.lesson = lesson;
 	this.learner = learner;
@@ -51,11 +52,11 @@ public class GradebookUserLesson {
      *
      */
     public long getUid() {
-        return uid;
+	return uid;
     }
 
     public void setUid(long uid) {
-        this.uid = uid;
+	this.uid = uid;
     }
 
     /**
@@ -63,45 +64,44 @@ public class GradebookUserLesson {
      *
      */
     public Lesson getLesson() {
-        return lesson;
+	return lesson;
     }
 
     public void setLesson(Lesson lesson) {
-        this.lesson = lesson;
+	this.lesson = lesson;
     }
 
-    /** 
+    /**
      *
      *
      */
     public User getLearner() {
-        return learner;
+	return learner;
     }
 
     public void setLearner(User learner) {
-        this.learner = learner;
+	this.learner = learner;
     }
 
     /**
      *
      */
     public Double getMark() {
-        return mark;
+	return mark;
     }
 
     public void setMark(Double mark) {
-        this.mark = mark;
+	this.mark = mark;
     }
-    
+
     /**
      *
      */
     public String getFeedback() {
-        return feedback;
+	return feedback;
     }
 
     public void setFeedback(String feedback) {
-        this.feedback = feedback;
+	this.feedback = feedback;
     }
 }
- 

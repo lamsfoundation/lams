@@ -2,21 +2,21 @@
  * Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
  * =============================================================
  * License Information: http://lamsfoundation.org/licensing/lams/2.0/
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License version 2.0 
+ * it under the terms of the GNU General Public License version 2.0
  * as published by the Free Software Foundation.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301
  * USA
- * 
+ *
  * http://www.gnu.org/licenses/gpl.txt
  * ****************************************************************
  */
@@ -67,19 +67,19 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
 
 /**
  * @version
- * 
+ *
  * <p>
  * <a href="ProfileAction.java.html"><i>View Source</i></a>
  * </p>
- * 
+ *
  * @author <a href="mailto:fyang@melcoe.mq.edu.au">Fei Yang</a>
- * 
+ *
  * Created at 14:21:53 on 28/06/2006
  */
 
 /**
  *
- * 
+ *
  *
  *
  *
@@ -101,7 +101,7 @@ public class ProfileAction extends LamsDispatchAction {
     public ActionForward view(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) throws Exception {
 
-	User requestor = (User) getService().getUserByLogin(request.getRemoteUser());
+	User requestor = getService().getUserByLogin(request.getRemoteUser());
 	String fullName = (requestor.getTitle() != null ? requestor.getTitle() + " " : "") + requestor.getFirstName()
 		+ " " + requestor.getLastName();
 	String email = requestor.getEmail();
@@ -118,7 +118,7 @@ public class ProfileAction extends LamsDispatchAction {
 	    HttpServletResponse response) throws Exception {
 
 	// list all active lessons for this learner (single sql query)
-	User requestor = (User) getService().getUserByLogin(request.getRemoteUser());
+	User requestor = getService().getUserByLogin(request.getRemoteUser());
 	LessonDTO[] lessons = getLearnerService().getActiveLessonsFor(requestor.getUserId());
 
 	// make org-sorted beans out of the lessons
@@ -220,7 +220,7 @@ public class ProfileAction extends LamsDispatchAction {
 	    saveErrors(request, errors);
 	}
 
-	User requestor = (User) getService().getUserByLogin(request.getRemoteUser());
+	User requestor = getService().getUserByLogin(request.getRemoteUser());
 	DynaActionForm userForm = (DynaActionForm) form;
 	BeanUtils.copyProperties(userForm, requestor);
 	SupportedLocale locale = requestor.getLocale();

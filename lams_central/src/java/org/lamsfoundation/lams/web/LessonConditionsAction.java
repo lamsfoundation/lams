@@ -65,9 +65,9 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
 
 /**
  * This Action takes care of operations on lesson conditional release based on preceding lesson completion.
- * 
+ *
  * @author Marcin Cieslak
- * 
+ *
  *
  *
  */
@@ -90,9 +90,9 @@ public class LessonConditionsAction extends DispatchAction {
 
     /**
      * Prepares data for thickbox displayed on Index page.
-     * 
+     *
      * @throws IOException
-     * 
+     *
      * @throws InvalidParameterException
      */
     @SuppressWarnings("unchecked")
@@ -154,9 +154,9 @@ public class LessonConditionsAction extends DispatchAction {
 
     /**
      * Removes given lesson from dependecies and displays updated list in thickbox.
-     * 
+     *
      * @throws IOException
-     * 
+     *
      * @throws InvalidParameterException
      */
     public ActionForward removeLessonDependency(ActionMapping mapping, ActionForm form, HttpServletRequest request,
@@ -185,9 +185,9 @@ public class LessonConditionsAction extends DispatchAction {
 
     /**
      * Adds given lesson to dependecies and displays updated list in thickbox.
-     * 
+     *
      * @throws IOException
-     * 
+     *
      * @throws InvalidParameterException
      */
     public ActionForward addLessonDependency(ActionMapping mapping, ActionForm form, HttpServletRequest request,
@@ -214,7 +214,7 @@ public class LessonConditionsAction extends DispatchAction {
 
     /**
      * Sets lesson finish date, either for individuals or lesson as a whole. If days<=0, schedule is removed.
-     * 
+     *
      * @throws IOException
      */
     public ActionForward setDaysToLessonFinish(ActionMapping mapping, ActionForm form, HttpServletRequest request,

@@ -2,21 +2,21 @@
  * Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
  * =============================================================
  * License Information: http://lamsfoundation.org/licensing/lams/2.0/
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License version 2.0 
+ * it under the terms of the GNU General Public License version 2.0
  * as published by the Free Software Foundation.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301
  * USA
- * 
+ *
  * http://www.gnu.org/licenses/gpl.txt
  * ****************************************************************
  */
@@ -49,30 +49,30 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
 
 /**
  * @author lfoxton
- * 
+ *
  *         This action is used for notification emails. It is designed to enable direct linking to either monitor or
  *         learner so that links can be sent in the email. This must be done through LAMS central so it correctly
  *         redirects the user to the login page (if they have no session) before returning them to the correct location.
- * 
+ *
  *         This action takes one parameter "h" which is a Base64 hash of a comma-separated value (relativeUrlPath,
  *         toolSessionID, accessMode) where: relativeUrlPath = Relative path to resource eg /tool/lawiki10/learner.do
  *         toolSessionID = A valid tool session ID for the lesson accessMode = l or t (learner or teacher)
- * 
+ *
  *         The parameters are hashed to prevent people from identifying the url, and attempting to access content to
  *         which they are unauthorised, see LDEV-1978
- * 
+ *
  *         The toolSessionID and accessMode are used to determine the permissions of this user so it someone forwards
  *         the email to an unauthorised user, they still cannot access the link unless they are part of the correct
  *         group. These checks may become unneccessary on the completion of LDEV-1978
- * 
+ *
  *         Note that parameter names have been made as short as possible here to attempt to shorten the entire link
  *         required, and hopefully prevent email clients cutting them off and making a newline which sometimes breaks
  *         links.
- * 
  *
  *
  *
- * 
+ *
+ *
  */
 public class RedirectAction extends LamsAction {
 

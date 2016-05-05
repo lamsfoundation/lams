@@ -29,28 +29,28 @@ import org.apache.struts.upload.FormFile;
 
 /**
  * @author jliew
- *  
+ *
  *
  */
 public class PortraitActionForm extends ActionForm {
-	
-	private Long portraitUuid;
-	private FormFile file;
-	
-	public Long getPortraitUuid() {
-		return portraitUuid;
-	}
-	
-	public void setPortraitUuid(Long uuid) {
-		this.portraitUuid = uuid;
-	}
-	
-	public FormFile getFile() {
-		return file;
-	}
-	
-	public void setFile(FormFile file) {
-		this.file = file;
-	}
+
+    private Long portraitUuid;
+    private FormFile file;
+
+    public Long getPortraitUuid() {
+	return portraitUuid;
+    }
+
+    public void setPortraitUuid(Long uuid) {
+	this.portraitUuid = uuid;
+    }
+
+    public FormFile getFile() {
+	return file;
+    }
+
+    public void setFile(FormFile file) {
+	this.file = file;
+    }
 
 }

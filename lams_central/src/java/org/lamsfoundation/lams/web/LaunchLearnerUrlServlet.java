@@ -2,21 +2,21 @@
  * Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
  * =============================================================
  * License Information: http://lamsfoundation.org/licensing/lams/2.0/
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License version 2.0 
+ * it under the terms of the GNU General Public License version 2.0
  * as published by the Free Software Foundation.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301
  * USA
- * 
+ *
  * http://www.gnu.org/licenses/gpl.txt
  * ****************************************************************
  */
@@ -24,10 +24,7 @@
 package org.lamsfoundation.lams.web;
 
 import java.io.IOException;
-import java.io.PrintWriter;
-import java.util.Date;
 
-import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -35,22 +32,18 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
-import org.apache.struts.action.ActionForm;
-import org.apache.struts.action.ActionForward;
-import org.apache.struts.action.ActionMapping;
 import org.lamsfoundation.lams.lesson.Lesson;
 import org.lamsfoundation.lams.lesson.service.ILessonService;
 import org.lamsfoundation.lams.util.Configuration;
 import org.lamsfoundation.lams.util.ConfigurationKeys;
 import org.lamsfoundation.lams.util.WebUtil;
-import org.lamsfoundation.lams.web.action.LamsAction;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 
 /**
  * Sends redirect to lams learner. Format: launchlearner.do?lessonID=<encodedLessonId>
- * 
+ *
  *
  *
  */
@@ -69,6 +62,7 @@ public class LaunchLearnerUrlServlet extends HttpServlet {
 	return lessonService;
     }
 
+    @Override
     public void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 	String encodedLessonId = request.getPathInfo();
 
@@ -81,21 +75,20 @@ public class LaunchLearnerUrlServlet extends HttpServlet {
 
 	// cut off the first '/'
 	encodedLessonId = encodedLessonId.substring(1);
-	
+
 	Long lessonId;
 	try {
 	    String decodedLessonId = WebUtil.decodeLessonId(encodedLessonId);
 	    lessonId = Long.valueOf(decodedLessonId);
-	    
+
 	} catch (IllegalArgumentException e) {
 	    log.warn("Supplied lessonId: " + encodedLessonId + " has wrong format.");
-	     response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Supplied lessonId: " + encodedLessonId + " has wrong format.");
+	    response.sendError(HttpServletResponse.SC_BAD_REQUEST,
+		    "Supplied lessonId: " + encodedLessonId + " has wrong format.");
 //	     return mapping.findForward("error");
 //	    displayMessage(request, response, "error.lessonid.has.wrong.format");
 	    return;
 	}
-	    
-	
 
 	Lesson lesson = lessonId != null ? getLessonService().getLesson(lessonId) : null;
 	if (lesson != null) {
@@ -118,6 +111,7 @@ public class LaunchLearnerUrlServlet extends HttpServlet {
 	// request.getRequestDispatcher("/launchlearner.do").forward(request, response);
     }
 
+    @Override
     public void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 	doPost(request, response);
     }

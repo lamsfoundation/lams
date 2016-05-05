@@ -2,21 +2,21 @@
  * Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
  * =============================================================
  * License Information: http://lamsfoundation.org/licensing/lams/2.0/
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301
  * USA
- * 
+ *
  * http://www.gnu.org/licenses/gpl.txt
  * ****************************************************************
  */
@@ -26,7 +26,6 @@ package org.lamsfoundation.lams.tool.wiki.service;
 
 import java.util.List;
 
-import org.apache.struts.upload.FormFile;
 import org.lamsfoundation.lams.events.IEventNotificationService;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.tool.wiki.model.Wiki;
@@ -34,7 +33,6 @@ import org.lamsfoundation.lams.tool.wiki.model.WikiPage;
 import org.lamsfoundation.lams.tool.wiki.model.WikiPageContent;
 import org.lamsfoundation.lams.tool.wiki.model.WikiSession;
 import org.lamsfoundation.lams.tool.wiki.model.WikiUser;
-import org.lamsfoundation.lams.tool.wiki.util.WikiException;
 import org.lamsfoundation.lams.tool.wiki.web.forms.WikiPageForm;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
@@ -45,7 +43,7 @@ import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 public interface IWikiService {
     /**
      * Makes a copy of the default content and assigns it a newContentID
-     * 
+     *
      * @params newContentID
      * @return
      */
@@ -53,14 +51,14 @@ public interface IWikiService {
 
     /**
      * Returns an instance of the Wiki tools default content.
-     * 
+     *
      * @return
      */
     public Wiki getDefaultContent();
 
     /**
      * Returns an instance of the Wiki tools default content.
-     * 
+     *
      * @param toolSignature
      * @return
      */
@@ -68,7 +66,7 @@ public interface IWikiService {
 
     /**
      * Gets a wiki instance by its content id
-     * 
+     *
      * @param toolContentID
      * @return
      */
@@ -76,14 +74,14 @@ public interface IWikiService {
 
     /**
      * Saves or updates a wiki instance
-     * 
+     *
      * @param wiki
      */
     public void saveOrUpdateWiki(Wiki wiki);
 
     /**
      * Saves or updates a wiki page
-     * 
+     *
      * @param wikiPage
      */
     public void saveOrUpdateWikiPage(WikiPage wikiPage);
@@ -91,9 +89,9 @@ public interface IWikiService {
     /**
      * Updates a wiki page with the given content in the WikiPageForm A new
      * WikiPageContent is to be created for each edit so we have a history
-     * 
+     *
      * If the user is null it signifies that this edit was done in author
-     * 
+     *
      * @param wikiPageForm
      * @param wikiPage
      * @param user
@@ -102,10 +100,10 @@ public interface IWikiService {
 
     /**
      * Creates a new wiki page from the content in the WikiPageForm
-     * 
+     *
      * If the user and session is null it signifies that this edit was done in
      * author
-     * 
+     *
      * @param wikiPageForm
      * @param wiki
      * @param user
@@ -115,31 +113,31 @@ public interface IWikiService {
 
     /**
      * Delete an existing wiki page
-     * 
+     *
      * @param wikiPage
      */
     public void deleteWikiPage(WikiPage wikiPage);
-    
+
     /**
      * Mark an existing wiki page as deleted, but do not remove it for real.
-     * 
+     *
      * @param wikiPage
      */
     public void markWikiPageAsDeleted(WikiPage wikiPage);
-    
+
     /**
      * Mark an existing wiki page as not deleted.
-     * 
+     *
      * @param wikiPage
      */
     public void restoreWikiPage(WikiPage wikiPage);
-    
+
     /**
      * Gets a wiki page by wiki and title
-     * 
+     *
      * This method should only be called by author as it will only retrieve
      * wikipages where the toolSession is null
-     * 
+     *
      * @param wiki
      * @param title
      * @return
@@ -148,10 +146,10 @@ public interface IWikiService {
 
     /**
      * Gets a wiki page by session and title
-     * 
+     *
      * This method should only be called at runtime because it requires a tool
      * session
-     * 
+     *
      * @param wikiSession
      * @param title
      * @return
@@ -160,7 +158,7 @@ public interface IWikiService {
 
     /**
      * Gets a wiki page by its uid
-     * 
+     *
      * @param uid
      * @return
      */
@@ -168,7 +166,7 @@ public interface IWikiService {
 
     /**
      * Gets a page content by its uid
-     * 
+     *
      * @param uid
      * @return
      */
@@ -176,14 +174,14 @@ public interface IWikiService {
 
     /**
      * Saves or updates a wiki page content
-     * 
+     *
      * @param wikiPageContent
      */
     public void saveOrUpdateWikiPageContent(WikiPageContent wikiPageContent);
 
     /**
      * Gets a tool session
-     * 
+     *
      * @param toolSessionId
      * @return
      */
@@ -191,14 +189,14 @@ public interface IWikiService {
 
     /**
      * Saves or updates a wiki session
-     * 
+     *
      * @param wikiSession
      */
     public void saveOrUpdateWikiSession(WikiSession wikiSession);
 
     /**
      * Gets a WikiUser from the session and thier LAMS user id
-     * 
+     *
      * @param userId
      * @param toolSessionId
      * @return
@@ -207,7 +205,7 @@ public interface IWikiService {
 
     /**
      * Gets a WikiUser by their uid
-     * 
+     *
      * @param uid
      * @return
      */
@@ -215,14 +213,14 @@ public interface IWikiService {
 
     /**
      * Saves or updates a wiki user
-     * 
+     *
      * @param wikiUser
      */
     public void saveOrUpdateWikiUser(WikiUser wikiUser);
 
     /**
      * Creates a new wiki user
-     * 
+     *
      * @param user
      * @param wikiSession
      * @return
@@ -231,7 +229,7 @@ public interface IWikiService {
 
     /**
      * Creates a core notebook entry
-     * 
+     *
      * @param id
      * @param idType
      * @param signature
@@ -243,13 +241,13 @@ public interface IWikiService {
 
     /**
      * Gets the entry from the database
-     * 
+     *
      */
     NotebookEntry getEntry(Long sessionId, Integer idType, String signature, Integer userID);
 
     /**
      * Updates an existing notebook entry
-     * 
+     *
      */
     void updateEntry(NotebookEntry notebookEntry);
 
@@ -257,7 +255,7 @@ public interface IWikiService {
      * This method compares two strings and returns a java html diff of the two
      * The returned value will be a html div that prints unchanged lines as is
      * new lines with a green background and removed lines with a red background
-     * 
+     *
      * @param old
      * @param current
      * @return
@@ -267,7 +265,7 @@ public interface IWikiService {
     /**
      * this method gets the number of edits by a learner in a tool session, this
      * is used for tool outputs
-     * 
+     *
      * @param learnerId
      * @param toolSessionId
      * @return
@@ -277,7 +275,7 @@ public interface IWikiService {
     /**
      * this method gets the number of added pages by a learner in a tool
      * session, this is used for tool outputs
-     * 
+     *
      * @param learnerId
      * @param toolSessionId
      * @return
@@ -287,42 +285,42 @@ public interface IWikiService {
     /**
      * Gets a message from resource bundle. Same as <code><fmt:message></code>
      * in JSP pages.
-     * 
+     *
      * @param key
-     *                key of the message
+     *            key of the message
      * @param args
-     *                arguments for the message
+     *            arguments for the message
      * @return message content
      */
     String getLocalisedMessage(String key, Object[] args);
 
     /**
      * Fetches the wiki notification service
-     * 
+     *
      * @return
      */
     IEventNotificationService getEventNotificationService();
-    
+
     /**
      * Gets a list of monitors for the given tool session
-     * 
+     *
      * @param sessionId
      * @return
      */
     List<User> getMonitorsByToolSessionId(Long sessionId);
-    
+
     /**
      * Returns whether activity is grouped and therefore it is expected more than one tool session.
-     * 
+     *
      * @param toolContentID
      * @return
      */
     boolean isGroupedActivity(long toolContentID);
-    
+
     /**
      * Return content folder (unique to each learner and lesson) which is used for storing user generated content.
      * It's been used by CKEditor.
-     * 
+     *
      * @param toolSessionId
      * @param userId
      * @return

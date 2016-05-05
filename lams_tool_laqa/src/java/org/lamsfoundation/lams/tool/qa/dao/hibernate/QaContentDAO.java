@@ -2,21 +2,21 @@
  * Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
  * =============================================================
  * License Information: http://lamsfoundation.org/licensing/lams/2.0/
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301
  * USA
- * 
+ *
  * http://www.gnu.org/licenses/gpl.txt
  * ****************************************************************
  */
@@ -24,7 +24,6 @@
 package org.lamsfoundation.lams.tool.qa.dao.hibernate;
 
 import java.util.List;
-import java.util.Set;
 
 import org.lamsfoundation.lams.dao.hibernate.LAMSBaseDAO;
 import org.lamsfoundation.lams.tool.qa.QaCondition;
@@ -35,11 +34,12 @@ import org.springframework.stereotype.Repository;
 
 /**
  * @author Ozgur Demirtas
- * 
+ *
  */
 @Repository
 public class QaContentDAO extends LAMSBaseDAO implements IQaContentDAO {
 
+    @Override
     public QaContent getQaByContentId(long qaId) {
 	String query = "from QaContent as qa where qa.qaContentId = ?";
 	List list = getSessionFactory().getCurrentSession().createQuery(query).setLong(0, qaId).list();
@@ -51,14 +51,17 @@ public class QaContentDAO extends LAMSBaseDAO implements IQaContentDAO {
 	return null;
     }
 
+    @Override
     public void updateQa(QaContent qa) {
 	getSession().update(qa);
     }
 
+    @Override
     public void saveQa(QaContent qa) {
 	getSession().save(qa);
     }
 
+    @Override
     public void saveOrUpdateQa(QaContent qa) {
 	getSession().saveOrUpdate(qa);
     }
@@ -67,48 +70,57 @@ public class QaContentDAO extends LAMSBaseDAO implements IQaContentDAO {
 	getSession().save(qa);
     }
 
+    @Override
     public void removeAllQaSession(QaContent qaContent) {
-    	deleteAll(qaContent.getQaSessions());
+	deleteAll(qaContent.getQaSessions());
     }
 
+    @Override
     public void removeQa(Long qaContentId) {
 	if (qaContentId != null) {
 	    String query = "from qa in class org.lamsfoundation.lams.tool.qa.QaContent" + " where qa.qaContentId = ?";
-	    Object obj = getSessionFactory().getCurrentSession().createQuery(query).setLong(0, qaContentId.longValue()).uniqueResult();
+	    Object obj = getSessionFactory().getCurrentSession().createQuery(query).setLong(0, qaContentId.longValue())
+		    .uniqueResult();
 	    getSession().delete(obj);
 	}
     }
 
+    @Override
     public void deleteQa(QaContent qaContent) {
 	getSession().delete(qaContent);
     }
 
+    @Override
     public void removeQaById(Long qaId) {
 	removeQa(qaId);
     }
 
+    @Override
     public void flush() {
-    	getSession().flush();
+	getSession().flush();
     }
 
+    @Override
     public void deleteCondition(QaCondition condition) {
 	if (condition != null && condition.getConditionId() != null) {
 	    getSession().delete(condition);
 	}
     }
-    
+
+    @Override
     public void removeQaContentFromCache(QaContent qaContent) {
 	if (qaContent != null) {
-		getSession().evict(qaContent);
+	    getSession().evict(qaContent);
 	}
 
     }
 
+    @Override
     public void removeQuestionsFromCache(QaContent qaContent) {
 	if (qaContent != null) {
 
-	    for (QaQueContent question : (Set<QaQueContent>) qaContent.getQaQueContents()) {
-	    	getSession().evict(question);
+	    for (QaQueContent question : qaContent.getQaQueContents()) {
+		getSession().evict(question);
 	    }
 	}
 
@@ -116,6 +128,6 @@ public class QaContentDAO extends LAMSBaseDAO implements IQaContentDAO {
 
     @Override
     public void delete(Object object) {
-    	getSession().delete(object);
+	getSession().delete(object);
     }
 }

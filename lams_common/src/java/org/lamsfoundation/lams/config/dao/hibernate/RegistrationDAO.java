@@ -35,19 +35,21 @@ public class RegistrationDAO extends LAMSBaseDAO implements IRegistrationDAO {
 
     private static final String LOAD_REG = "from registration in class " + Registration.class.getName();
 
+    @Override
     public void saveOrUpdate(Registration reg) {
-    	saveOrUpdate(reg);
+	saveOrUpdate(reg);
     }
 
-	@SuppressWarnings("unchecked")
-	public Registration get() {
-		List list = doFind(LOAD_REG);
+    @Override
+    @SuppressWarnings("unchecked")
+    public Registration get() {
+	List list = doFind(LOAD_REG);
 
-		if (list != null && list.size() > 0) {
-			return (Registration) list.get(0);
-		} else {
-			return null;
-		}
+	if (list != null && list.size() > 0) {
+	    return (Registration) list.get(0);
+	} else {
+	    return null;
 	}
+    }
 
 }

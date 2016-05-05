@@ -1,53 +1,52 @@
 package org.lamsfoundation.lams.learningdesign.dto;
 
 import org.lamsfoundation.lams.learningdesign.Competence;
-import org.lamsfoundation.lams.learningdesign.LearningDesign;
 
-public class CompetenceDTO 
-{
-	private Long competenceId;
-	private Long learningDesignID;
-	private String title;
-	private String description;
-	public CompetenceDTO() {}
-	
-	public CompetenceDTO(Competence competence)
-	{
-		this.competenceId = competence.getCompetenceId();
-		this.learningDesignID = competence.getLearningDesign().getLearningDesignId();
-		this.description = competence.getDescription();
-		this.title = competence.getTitle();
-	}
+public class CompetenceDTO {
+    private Long competenceId;
+    private Long learningDesignID;
+    private String title;
+    private String description;
 
-	public Long getCompetenceId() {
-		return competenceId;
-	}
+    public CompetenceDTO() {
+    }
 
-	public void setCompetenceId(Long competenceId) {
-		this.competenceId = competenceId;
-	}
+    public CompetenceDTO(Competence competence) {
+	this.competenceId = competence.getCompetenceId();
+	this.learningDesignID = competence.getLearningDesign().getLearningDesignId();
+	this.description = competence.getDescription();
+	this.title = competence.getTitle();
+    }
 
-	public Long getLearningDesignID() {
-		return learningDesignID;
-	}
+    public Long getCompetenceId() {
+	return competenceId;
+    }
 
-	public void setLearningDesignID(Long learningDesignID) {
-		this.learningDesignID = learningDesignID;
-	}
+    public void setCompetenceId(Long competenceId) {
+	this.competenceId = competenceId;
+    }
 
-	public String getTitle() {
-		return title;
-	}
+    public Long getLearningDesignID() {
+	return learningDesignID;
+    }
 
-	public void setTitle(String title) {
-		this.title = title;
-	}
+    public void setLearningDesignID(Long learningDesignID) {
+	this.learningDesignID = learningDesignID;
+    }
 
-	public String getDescription() {
-		return description;
-	}
+    public String getTitle() {
+	return title;
+    }
 
-	public void setDescription(String description) {
-		this.description = description;
-	}
+    public void setTitle(String title) {
+	this.title = title;
+    }
+
+    public String getDescription() {
+	return description;
+    }
+
+    public void setDescription(String description) {
+	this.description = description;
+    }
 }

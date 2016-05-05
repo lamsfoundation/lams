@@ -2,20 +2,20 @@
  * Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
  * ============================================================= License
  * Information: http://lamsfoundation.org/licensing/lams/2.0/
- * 
+ *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License version 2.0 as published by the
  * Free Software Foundation.
- * 
+ *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more
  * details.
- * 
+ *
  * You should have received a copy of the GNU General Public License along with
  * this program; if not, write to the Free Software Foundation, Inc., 51
  * Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
- * 
+ *
  * http://www.gnu.org/licenses/gpl.txt
  * ****************************************************************
  */
@@ -100,16 +100,16 @@ import org.lamsfoundation.lams.util.JsonUtil;
 /**
  * @author Manpreet Minhas
  * @author Mailing Truong
- * 
+ *
  *         This is a utility class for extracting the information from the JSON packet sent by Authoring.
- * 
+ *
  *         The following rules are applied: The client sends a subset of all possible data. If a field is included, then
  *         the value associated with this field should be persisted (the value maybe a new value or an unchanged value)
  *         If a field is not included then the server should assume that the value is unchanged. If the value of a field
  *         is one of the special null values, then null should be persisted.
- * 
+ *
  *         Object extractor has member data, so it should not be used as a singleton.
- * 
+ *
  */
 public class ObjectExtractor implements IObjectExtractor {
 
@@ -443,7 +443,7 @@ public class ObjectExtractor implements IObjectExtractor {
      * Also tidy up the order ids for sequence activities so that they are in the same order as the transitions - needed
      * for the IMSLD export conversion to work. Not all the transitions may be drawn yet, so number off the others best
      * we can.
-     * 
+     *
      * @throws ObjectExtractorException
      */
     private void progressDefaultChildActivities() throws ObjectExtractorException {
@@ -1285,9 +1285,10 @@ public class ObjectExtractor implements IObjectExtractor {
 
 	if (existingTransition == null) {
 	    if (false/*
-		     * It will eventually be implemented in Authoring. Now we need to check what kind of transition are we
-		     * dealing with transitionType.equals(Transition.DATA_TRANSITION_TYPE)
-		     */) {
+		      * It will eventually be implemented in Authoring. Now we need to check what kind of transition are
+		      * we
+		      * dealing with transitionType.equals(Transition.DATA_TRANSITION_TYPE)
+		      */) {
 		transition = new DataTransition();
 	    } else {
 		transition = new Transition();
@@ -1361,7 +1362,7 @@ public class ObjectExtractor implements IObjectExtractor {
     /**
      * Search in learning design for existing object. Can't go to database as that will trigger a Flush, and we haven't
      * updated the rest of the design, so this would trigger a "deleted object would be re-saved by cascade" error.
-     * 
+     *
      * Check both the UUID for a match, and the to and from for a match. If the user deletes a transition then redraws
      * it between the same activities, then inserting a new one in the db will trigger a duplicate key exception. So we
      * need to reuse any that have the same to/from.

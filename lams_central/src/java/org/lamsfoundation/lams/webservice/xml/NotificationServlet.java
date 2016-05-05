@@ -33,7 +33,7 @@ import org.w3c.dom.ls.LSSerializer;
 
 /**
  * Allows notifications access for integrated environments.
- * 
+ *
  * @author Marcin Cieslak
  *
  */

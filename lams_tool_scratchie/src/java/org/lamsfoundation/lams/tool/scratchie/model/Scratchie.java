@@ -2,21 +2,21 @@
  * Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
  * =============================================================
  * License Information: http://lamsfoundation.org/licensing/lams/2.0/
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301
  * USA
- * 
+ *
  * http://www.gnu.org/licenses/gpl.txt
  * ****************************************************************
  */
@@ -34,11 +34,11 @@ import org.apache.log4j.Logger;
 
 /**
  * Scratchie
- * 
- * @author Andrey Balan
- * 
  *
- * 
+ * @author Andrey Balan
+ *
+ *
+ *
  */
 public class Scratchie implements Cloneable {
 
@@ -62,14 +62,14 @@ public class Scratchie implements Cloneable {
     private Date created;
 
     private Date updated;
-    
+
     private Date submissionDeadline;
 
     // scratchie Items
     private Set scratchieItems;
-    
+
     private boolean extraPoint;
-    
+
     private boolean burningQuestionsEnabled;
 
     private boolean reflectOnActivity;
@@ -78,7 +78,7 @@ public class Scratchie implements Cloneable {
 
     /**
      * Default contruction method.
-     * 
+     *
      */
     public Scratchie() {
 	scratchieItems = new HashSet();
@@ -138,7 +138,8 @@ public class Scratchie implements Cloneable {
 
     @Override
     public int hashCode() {
-	return new HashCodeBuilder().append(uid).append(title).append(instructions).append(created).append(updated).toHashCode();
+	return new HashCodeBuilder().append(uid).append(title).append(instructions).append(created).append(updated)
+		.toHashCode();
     }
 
     /**
@@ -158,7 +159,7 @@ public class Scratchie implements Cloneable {
     // **********************************************************
     /**
      * Returns the object's creation date
-     * 
+     *
      * @return date
      *
      */
@@ -168,7 +169,7 @@ public class Scratchie implements Cloneable {
 
     /**
      * Sets the object's creation date
-     * 
+     *
      * @param created
      */
     public void setCreated(Date created) {
@@ -177,7 +178,7 @@ public class Scratchie implements Cloneable {
 
     /**
      * Returns the object's date of last update
-     * 
+     *
      * @return date updated
      *
      */
@@ -187,16 +188,16 @@ public class Scratchie implements Cloneable {
 
     /**
      * Sets the object's date of last update
-     * 
+     *
      * @param updated
      */
     public void setUpdated(Date updated) {
 	this.updated = updated;
     }
-    
+
     /**
      * Returns deadline for learner's submission
-     * 
+     *
      * @return submissionDeadline
      *
      */
@@ -206,7 +207,7 @@ public class Scratchie implements Cloneable {
 
     /**
      * Sets deadline for learner's submission
-     * 
+     *
      * @param submissionDeadline
      */
     public void setSubmissionDeadline(Date submissionDeadline) {
@@ -226,9 +227,9 @@ public class Scratchie implements Cloneable {
 
     /**
      * @return Returns the title.
-     * 
      *
-     * 
+     *
+     *
      */
     public String getTitle() {
 	return title;
@@ -244,7 +245,7 @@ public class Scratchie implements Cloneable {
 
     /**
      * @return Returns the instructions set by the teacher.
-     * 
+     *
      *
      */
     public String getInstructions() {
@@ -256,12 +257,12 @@ public class Scratchie implements Cloneable {
     }
 
     /**
-     * 
-     * 
      *
      *
      *
-     * 
+     *
+     *
+     *
      * @return
      */
     public Set<ScratchieItem> getScratchieItems() {
@@ -319,7 +320,7 @@ public class Scratchie implements Cloneable {
     public void setReflectOnActivity(boolean reflectOnActivity) {
 	this.reflectOnActivity = reflectOnActivity;
     }
-    
+
     /**
      *
      * @return
@@ -331,7 +332,7 @@ public class Scratchie implements Cloneable {
     public void setExtraPoint(boolean extraPoint) {
 	this.extraPoint = extraPoint;
     }
-    
+
     /**
      *
      * @return

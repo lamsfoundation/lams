@@ -2,21 +2,21 @@
  * Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
  * =============================================================
  * License Information: http://lamsfoundation.org/licensing/lams/2.0/
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301
  * USA
- * 
+ *
  * http://www.gnu.org/licenses/gpl.txt
  * ****************************************************************
  */
@@ -30,9 +30,9 @@ import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 
 /**
  * Survey
- * 
+ *
  * @author Dapeng Ni
- * 
+ *
  *
  */
 public class SurveyUser implements Cloneable {
@@ -73,7 +73,7 @@ public class SurveyUser implements Cloneable {
 	this.survey = content;
 	this.responseFinalized = false;
     }
-    
+
     public SurveyUser(Long userId, String firstName, String lastName, String login, Survey content) {
 	this.userId = userId;
 	this.firstName = firstName;
@@ -84,10 +84,10 @@ public class SurveyUser implements Cloneable {
 	this.responseFinalized = false;
     }
 
-
     /**
      * Clone method from <code>java.lang.Object</code>
      */
+    @Override
     public Object clone() {
 
 	SurveyUser user = null;
@@ -209,7 +209,7 @@ public class SurveyUser implements Cloneable {
     public void setSessionFinished(boolean sessionFinished) {
 	this.sessionFinished = sessionFinished;
     }
-    
+
     /**
      *
      * @return Returns the responseFinalized.
@@ -220,17 +220,20 @@ public class SurveyUser implements Cloneable {
 
     /**
      * @param responseFinalized
-     *                The responseFinalized to set.
+     *            The responseFinalized to set.
      */
     public void setResponseFinalized(boolean responseFinalized) {
 	this.responseFinalized = responseFinalized;
     }
 
+    @Override
     public boolean equals(Object obj) {
-	if (this == obj)
+	if (this == obj) {
 	    return true;
-	if (!(obj instanceof SurveyUser))
+	}
+	if (!(obj instanceof SurveyUser)) {
 	    return false;
+	}
 
 	final SurveyUser user = (SurveyUser) obj;
 
@@ -239,6 +242,7 @@ public class SurveyUser implements Cloneable {
 
     }
 
+    @Override
     public int hashCode() {
 	return new HashCodeBuilder().append(uid).append(firstName).append(lastName).append(loginName).toHashCode();
     }

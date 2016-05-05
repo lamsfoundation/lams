@@ -1,23 +1,23 @@
-/**************************************************************** 
- * Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org) 
- * ============================================================= 
- * License Information: http://lamsfoundation.org/licensing/lams/2.0/ 
- * 
- * This program is free software; you can redistribute it and/or modify 
- * it under the terms of the GNU General Public License version 2.0 
- * as published by the Free Software Foundation. 
- * 
- * This program is distributed in the hope that it will be useful, 
- * but WITHOUT ANY WARRANTY; without even the implied warranty of 
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the 
- * GNU General Public License for more details. 
- * 
- * You should have received a copy of the GNU General Public License 
- * along with this program; if not, write to the Free Software 
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 * USA 
- * 
- * http://www.gnu.org/licenses/gpl.txt 
- * **************************************************************** 
+/****************************************************************
+ * Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
+ * =============================================================
+ * License Information: http://lamsfoundation.org/licensing/lams/2.0/
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License version 2.0
+ * as published by the Free Software Foundation.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 * USA
+ *
+ * http://www.gnu.org/licenses/gpl.txt
+ * ****************************************************************
  */
 
 /* $Id$ */
@@ -53,9 +53,9 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
 
 /**
  * @author Andrey Balan, Marcin Cieslak
- * 
  *
- * 
+ *
+ *
  *
  */
 public class EmailUserAction extends LamsDispatchAction {
@@ -111,11 +111,11 @@ public class EmailUserAction extends LamsDispatchAction {
 	boolean IS_HTML_FORMAT = false;
 	getEventNotificationService().sendMessage(currentUser.getUserID(), userId.intValue(),
 		IEventNotificationService.DELIVERY_METHOD_MAIL, subject, body, IS_HTML_FORMAT);
-	
+
 	String ccEmail = emailForm.getCcEmail();
 	if (StringUtils.isNotBlank(ccEmail) && ValidationUtil.isEmailValid(ccEmail, false)) {
 	    Emailer.sendFromSupportEmail(subject, ccEmail, body, IS_HTML_FORMAT);
-	    
+
 	    if (EmailUserAction.log.isDebugEnabled()) {
 		EmailUserAction.log.debug("User " + currentUser.getLogin() + " (" + currentUser.getEmail() + ") "
 			+ " sent email to user ID " + userId + ": \n[subject] " + subject + "\n[message] " + body);
@@ -135,8 +135,8 @@ public class EmailUserAction extends LamsDispatchAction {
 
     private IEventNotificationService getEventNotificationService() {
 	if (EmailUserAction.eventNotificationService == null) {
-	    WebApplicationContext ctx = WebApplicationContextUtils.getRequiredWebApplicationContext(getServlet()
-		    .getServletContext());
+	    WebApplicationContext ctx = WebApplicationContextUtils
+		    .getRequiredWebApplicationContext(getServlet().getServletContext());
 	    EmailUserAction.eventNotificationService = (IEventNotificationService) ctx
 		    .getBean("eventNotificationService");
 	}
@@ -145,8 +145,8 @@ public class EmailUserAction extends LamsDispatchAction {
 
     private MessageService getMessageService() {
 	if (EmailUserAction.messageService == null) {
-	    WebApplicationContext ctx = WebApplicationContextUtils.getRequiredWebApplicationContext(getServlet()
-		    .getServletContext());
+	    WebApplicationContext ctx = WebApplicationContextUtils
+		    .getRequiredWebApplicationContext(getServlet().getServletContext());
 	    EmailUserAction.messageService = (MessageService) ctx
 		    .getBean(CentralConstants.CENTRAL_MESSAGE_SERVICE_BEAN_NAME);
 
@@ -156,8 +156,8 @@ public class EmailUserAction extends LamsDispatchAction {
 
     private IUserManagementService getUserManagementService() {
 	if (EmailUserAction.userManagementService == null) {
-	    WebApplicationContext ctx = WebApplicationContextUtils.getRequiredWebApplicationContext(getServlet()
-		    .getServletContext());
+	    WebApplicationContext ctx = WebApplicationContextUtils
+		    .getRequiredWebApplicationContext(getServlet().getServletContext());
 	    EmailUserAction.userManagementService = (IUserManagementService) ctx.getBean("userManagementService");
 	}
 	return EmailUserAction.userManagementService;
@@ -182,7 +182,8 @@ public class EmailUserAction extends LamsDispatchAction {
 	    }
 	    if (!StringUtils.isBlank(orgId)) {
 		result = getUserManagementService().isUserInRole(currentUser.getUserID(), new Integer(orgId),
-			Role.MONITOR) || getUserManagementService().isUserInRole(currentUser.getUserID(), new Integer(orgId),
+			Role.MONITOR)
+			|| getUserManagementService().isUserInRole(currentUser.getUserID(), new Integer(orgId),
 				Role.GROUP_MANAGER);
 	    }
 	}

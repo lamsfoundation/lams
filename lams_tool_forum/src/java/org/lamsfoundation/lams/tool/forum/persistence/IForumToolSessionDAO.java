@@ -5,15 +5,15 @@ import java.util.List;
 import org.lamsfoundation.lams.dao.IBaseDAO;
 
 public interface IForumToolSessionDAO extends IBaseDAO {
-	
-	ForumToolSession getBySessionId(Long sessionId);
 
-	void saveOrUpdate(ForumToolSession session);
+    ForumToolSession getBySessionId(Long sessionId);
 
-	List getByContentId(Long contentID);
+    void saveOrUpdate(ForumToolSession session);
 
-	void delete(Long sessionId);
+    List getByContentId(Long contentID);
 
-	void delete(ForumToolSession session);
-	
+    void delete(Long sessionId);
+
+    void delete(ForumToolSession session);
+
 }

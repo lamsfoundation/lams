@@ -62,15 +62,15 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
 
 /**
  * @author lfoxton
- * 
+ *
  *         Handles the monitor interfaces for gradebook
- * 
+ *
  *         This is where marking for an activity/lesson takes place
- * 
- * 
  *
  *
- * 
+ *
+ *
+ *
  *
  *
  *
@@ -149,7 +149,7 @@ public class GradebookMonitoringAction extends LamsDispatchAction {
 
     /**
      * Updates a user's mark or feedback for an entire lesson
-     * 
+     *
      * @param mapping
      * @param form
      * @param request
@@ -168,8 +168,8 @@ public class GradebookMonitoringAction extends LamsDispatchAction {
 	Integer userID = WebUtil.readIntParam(request, GradebookConstants.PARAM_ID);
 	User learner = (User) getUserService().findById(User.class, userID);
 	if (learner == null) {
-	    GradebookMonitoringAction.log.error("User with ID " + userID
-		    + " could not be found to update his lesson gradebook");
+	    GradebookMonitoringAction.log
+		    .error("User with ID " + userID + " could not be found to update his lesson gradebook");
 	    response.sendError(HttpServletResponse.SC_BAD_REQUEST, "User could not be found");
 	    return null;
 	}
@@ -190,7 +190,7 @@ public class GradebookMonitoringAction extends LamsDispatchAction {
 
     /**
      * Updates a user's mark or feedback for an activity, then aggregates their total lesson mark
-     * 
+     *
      * @param mapping
      * @param form
      * @param request
@@ -201,7 +201,8 @@ public class GradebookMonitoringAction extends LamsDispatchAction {
     public ActionForward updateUserActivityGradebookData(ActionMapping mapping, ActionForm form,
 	    HttpServletRequest request, HttpServletResponse response) throws Exception {
 	Long lessonID = WebUtil.readLongParam(request, AttributeNames.PARAM_LESSON_ID);
-	if (!getSecurityService().isLessonMonitor(lessonID, getUser().getUserID(), "update activity gradebook", false)) {
+	if (!getSecurityService().isLessonMonitor(lessonID, getUser().getUserID(), "update activity gradebook",
+		false)) {
 	    response.sendError(HttpServletResponse.SC_FORBIDDEN, "User is not a monitor in the lesson");
 	    return null;
 	}
@@ -231,16 +232,16 @@ public class GradebookMonitoringAction extends LamsDispatchAction {
 
 	Activity activity = getGradebookService().getActivityById(activityID);
 	if ((activity == null) || !activity.isToolActivity()) {
-	    GradebookMonitoringAction.log.error("Activity with ID " + activityID
-		    + " could not be found or it is not a Tool Activity");
+	    GradebookMonitoringAction.log
+		    .error("Activity with ID " + activityID + " could not be found or it is not a Tool Activity");
 	    response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Wrong activity");
 	    return null;
 	}
 
 	User learner = (User) getUserService().findById(User.class, userID);
 	if (learner == null) {
-	    GradebookMonitoringAction.log.error("User with ID " + userID
-		    + " could not be found to update his activity gradebook");
+	    GradebookMonitoringAction.log
+		    .error("User with ID " + userID + " could not be found to update his activity gradebook");
 	    response.sendError(HttpServletResponse.SC_BAD_REQUEST, "User could not be found");
 	    return null;
 	}
@@ -262,7 +263,7 @@ public class GradebookMonitoringAction extends LamsDispatchAction {
 
     /**
      * Toggles the release mark flag for a lesson
-     * 
+     *
      * @param mapping
      * @param form
      * @param request
@@ -279,7 +280,8 @@ public class GradebookMonitoringAction extends LamsDispatchAction {
 	}
 
 	getGradebookService().toggleMarksReleased(lessonID);
-	writeResponse(response, LamsDispatchAction.CONTENT_TYPE_TEXT_PLAIN, LamsDispatchAction.ENCODING_UTF8, "success");
+	writeResponse(response, LamsDispatchAction.CONTENT_TYPE_TEXT_PLAIN, LamsDispatchAction.ENCODING_UTF8,
+		"success");
 	return null;
     }
 
@@ -337,8 +339,8 @@ public class GradebookMonitoringAction extends LamsDispatchAction {
 	if (GradebookMonitoringAction.log.isDebugEnabled()) {
 	    GradebookMonitoringAction.log.debug("Exporting to a spreadsheet course: " + organisationID);
 	}
-	LinkedHashMap<String, ExcelCell[][]> dataToExport = getGradebookService().exportCourseGradebook(
-		user.getUserID(), organisationID);
+	LinkedHashMap<String, ExcelCell[][]> dataToExport = getGradebookService()
+		.exportCourseGradebook(user.getUserID(), organisationID);
 
 	String fileName = organisation.getName().replaceAll(" ", "_") + ".xlsx";
 	fileName = FileUtil.encodeFilenameForDownload(request, fileName);
@@ -378,8 +380,8 @@ public class GradebookMonitoringAction extends LamsDispatchAction {
 	    GradebookMonitoringAction.log.debug("Exporting to a spreadsheet lessons " + Arrays.toString(lessonIds)
 		    + " from course: " + organisationID);
 	}
-	LinkedHashMap<String, ExcelCell[][]> dataToExport = getGradebookService().exportSelectedLessonsGradebook(
-		user.getUserID(), organisationID, lessonIds);
+	LinkedHashMap<String, ExcelCell[][]> dataToExport = getGradebookService()
+		.exportSelectedLessonsGradebook(user.getUserID(), organisationID, lessonIds);
 
 	String fileName = organisation.getName().replaceAll(" ", "_") + ".xlsx";
 	fileName = FileUtil.encodeFilenameForDownload(request, fileName);
@@ -412,8 +414,8 @@ public class GradebookMonitoringAction extends LamsDispatchAction {
 
     private IUserManagementService getUserService() {
 	if (GradebookMonitoringAction.userService == null) {
-	    WebApplicationContext ctx = WebApplicationContextUtils.getRequiredWebApplicationContext(getServlet()
-		    .getServletContext());
+	    WebApplicationContext ctx = WebApplicationContextUtils
+		    .getRequiredWebApplicationContext(getServlet().getServletContext());
 	    GradebookMonitoringAction.userService = (IUserManagementService) ctx.getBean("userManagementService");
 	}
 	return GradebookMonitoringAction.userService;
@@ -421,8 +423,8 @@ public class GradebookMonitoringAction extends LamsDispatchAction {
 
     private ILessonService getLessonService() {
 	if (GradebookMonitoringAction.lessonService == null) {
-	    WebApplicationContext ctx = WebApplicationContextUtils.getRequiredWebApplicationContext(getServlet()
-		    .getServletContext());
+	    WebApplicationContext ctx = WebApplicationContextUtils
+		    .getRequiredWebApplicationContext(getServlet().getServletContext());
 	    GradebookMonitoringAction.lessonService = (ILessonService) ctx.getBean("lessonService");
 	}
 	return GradebookMonitoringAction.lessonService;
@@ -430,8 +432,8 @@ public class GradebookMonitoringAction extends LamsDispatchAction {
 
     private IGradebookService getGradebookService() {
 	if (GradebookMonitoringAction.gradebookService == null) {
-	    WebApplicationContext ctx = WebApplicationContextUtils.getRequiredWebApplicationContext(getServlet()
-		    .getServletContext());
+	    WebApplicationContext ctx = WebApplicationContextUtils
+		    .getRequiredWebApplicationContext(getServlet().getServletContext());
 	    GradebookMonitoringAction.gradebookService = (IGradebookService) ctx.getBean("gradebookService");
 	}
 	return GradebookMonitoringAction.gradebookService;
@@ -439,8 +441,8 @@ public class GradebookMonitoringAction extends LamsDispatchAction {
 
     private ISecurityService getSecurityService() {
 	if (GradebookMonitoringAction.securityService == null) {
-	    WebApplicationContext ctx = WebApplicationContextUtils.getRequiredWebApplicationContext(getServlet()
-		    .getServletContext());
+	    WebApplicationContext ctx = WebApplicationContextUtils
+		    .getRequiredWebApplicationContext(getServlet().getServletContext());
 	    GradebookMonitoringAction.securityService = (ISecurityService) ctx.getBean("securityService");
 	}
 	return GradebookMonitoringAction.securityService;

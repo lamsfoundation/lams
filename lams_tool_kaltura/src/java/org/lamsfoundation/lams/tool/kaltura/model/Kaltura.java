@@ -2,21 +2,21 @@
  * Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
  * =============================================================
  * License Information: http://lamsfoundation.org/licensing/lams/2.0/
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301
  * USA
- * 
+ *
  * http://www.gnu.org/licenses/gpl.txt
  * ****************************************************************
  */
@@ -24,16 +24,12 @@
 
 package org.lamsfoundation.lams.tool.kaltura.model;
 
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Set;
 
-import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
-import org.lamsfoundation.lams.contentrepository.client.IToolContentHandler;
 import org.lamsfoundation.lams.tool.kaltura.service.KalturaService;
 
 /**
@@ -41,7 +37,7 @@ import org.lamsfoundation.lams.tool.kaltura.service.KalturaService;
  */
 
 public class Kaltura implements java.io.Serializable, Cloneable {
-    
+
     public static final int TYPE_LEARNER_CONTRIBUTION_LIMIT_UNLIMITED = -1;
 
     private static final long serialVersionUID = 579733009969321015L;
@@ -62,11 +58,11 @@ public class Kaltura implements java.io.Serializable, Cloneable {
     private String instructions;
 
     private boolean lockOnFinished;
-    
+
     private boolean allowContributeVideos;
 
     private boolean allowSeeingOtherUsersRecordings;
-    
+
     private int learnerContributionLimit;
 
     private boolean allowComments;
@@ -80,7 +76,7 @@ public class Kaltura implements java.io.Serializable, Cloneable {
     private Date submissionDeadline;
 
     private Long toolContentId;
-    
+
     private boolean reflectOnActivity;
 
     private String reflectInstructions;
@@ -99,7 +95,7 @@ public class Kaltura implements java.io.Serializable, Cloneable {
     // Property accessors
     /**
      *
-     * 
+     *
      */
     public Long getUid() {
 	return uid;
@@ -111,7 +107,7 @@ public class Kaltura implements java.io.Serializable, Cloneable {
 
     /**
      *
-     * 
+     *
      */
     public Date getCreateDate() {
 	return createDate;
@@ -123,7 +119,7 @@ public class Kaltura implements java.io.Serializable, Cloneable {
 
     /**
      *
-     * 
+     *
      */
     public Date getUpdateDate() {
 	return updateDate;
@@ -135,7 +131,7 @@ public class Kaltura implements java.io.Serializable, Cloneable {
 
     /**
      *
-     * 
+     *
      */
     public KalturaUser getCreatedBy() {
 	return createdBy;
@@ -147,7 +143,7 @@ public class Kaltura implements java.io.Serializable, Cloneable {
 
     /**
      *
-     * 
+     *
      */
     public String getTitle() {
 	return title;
@@ -159,7 +155,7 @@ public class Kaltura implements java.io.Serializable, Cloneable {
 
     /**
      *
-     * 
+     *
      */
     public String getInstructions() {
 	return instructions;
@@ -179,7 +175,7 @@ public class Kaltura implements java.io.Serializable, Cloneable {
     public void setLockOnFinished(boolean lockOnFinished) {
 	this.lockOnFinished = lockOnFinished;
     }
-    
+
     /**
      *
      */
@@ -213,7 +209,7 @@ public class Kaltura implements java.io.Serializable, Cloneable {
     public void setLearnerContributionLimit(int learnerContributionLimit) {
 	this.learnerContributionLimit = learnerContributionLimit;
     }
-    
+
     /**
      *
      */
@@ -263,7 +259,7 @@ public class Kaltura implements java.io.Serializable, Cloneable {
     }
 
     /**
-     * 
+     *
      *
      * @return date submissionDeadline
      */
@@ -281,7 +277,7 @@ public class Kaltura implements java.io.Serializable, Cloneable {
     public void setToolContentId(Long toolContentId) {
 	this.toolContentId = toolContentId;
     }
-    
+
     /**
      *
      * @return
@@ -311,14 +307,14 @@ public class Kaltura implements java.io.Serializable, Cloneable {
      *
      *
      */
-   public Set getKalturaSessions() {
+    public Set getKalturaSessions() {
 	return kalturaSessions;
     }
 
     public void setKalturaSessions(Set kalturaSessions) {
 	this.kalturaSessions = kalturaSessions;
     }
-    
+
     /**
      *
      *
@@ -332,7 +328,7 @@ public class Kaltura implements java.io.Serializable, Cloneable {
 	this.kalturaItems = kalturaItems;
     }
 
-   @Override
+    @Override
     public String toString() {
 	StringBuffer buffer = new StringBuffer();
 
@@ -358,8 +354,8 @@ public class Kaltura implements java.io.Serializable, Cloneable {
 	}
 	Kaltura castOther = (Kaltura) other;
 
-	return this.getUid() == castOther.getUid() || this.getUid() != null && castOther.getUid() != null
-		&& this.getUid().equals(castOther.getUid());
+	return this.getUid() == castOther.getUid()
+		|| this.getUid() != null && castOther.getUid() != null && this.getUid().equals(castOther.getUid());
     }
 
     @Override
@@ -374,7 +370,7 @@ public class Kaltura implements java.io.Serializable, Cloneable {
 	toContent = (Kaltura) fromContent.clone();
 	toContent.setToolContentId(toContentId);
 	toContent.setCreateDate(new Date());
-	
+
 	//reset user info as well
 	if (toContent.getCreatedBy() != null) {
 	    toContent.getCreatedBy().setKaltura(toContent);
@@ -383,7 +379,7 @@ public class Kaltura implements java.io.Serializable, Cloneable {
 		item.setCreatedBy(toContent.getCreatedBy());
 	    }
 	}
-	
+
 	return toContent;
     }
 
@@ -394,7 +390,7 @@ public class Kaltura implements java.io.Serializable, Cloneable {
 	try {
 	    kaltura = (Kaltura) super.clone();
 	    kaltura.setUid(null);
-	    
+
 	    if (kalturaItems != null) {
 		Iterator iter = kalturaItems.iterator();
 		Set<KalturaItem> set = new HashSet<KalturaItem>();
@@ -406,12 +402,12 @@ public class Kaltura implements java.io.Serializable, Cloneable {
 		}
 		kaltura.kalturaItems = set;
 	    }
-	    
+
 	    // clone KalturaUser as well
 	    if (createdBy != null) {
 		kaltura.setCreatedBy((KalturaUser) createdBy.clone());
 	    }
-	    
+
 	    // create an empty set for the kalturaSession
 	    kaltura.kalturaSessions = new HashSet();
 

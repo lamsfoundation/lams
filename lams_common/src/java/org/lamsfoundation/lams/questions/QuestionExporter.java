@@ -53,9 +53,9 @@ import org.w3c.dom.Element;
 /**
  * Packs questions and answers into files. They can be later used in question-based 3rd party applications. Currently it
  * supports only IMS QTI but other methods can be added as needed.
- * 
+ *
  * @author Marcin Cieslak
- * 
+ *
  */
 public class QuestionExporter {
     private static final Logger log = Logger.getLogger(QuestionExporter.class);
@@ -116,7 +116,7 @@ public class QuestionExporter {
 
     /**
      * Builds a QTI ZIP package (manifest, QTI file, resources) with the given questions.
-     * 
+     *
      * @return Path to the created ZIP file
      */
     public String exportQTIPackage() {
@@ -159,7 +159,7 @@ public class QuestionExporter {
 
     /**
      * Builds QTI XML file containing structured questions & answers content.
-     * 
+     *
      * @return XML file content
      */
     public String exportQTIFile() {
@@ -657,7 +657,7 @@ public class QuestionExporter {
 
     /**
      * Fill the existing template file with current data.
-     * 
+     *
      * @return contents of XML template file
      */
     private String createManifest() throws IOException {

@@ -1,23 +1,23 @@
-/**************************************************************** 
- * Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org) 
- * ============================================================= 
- * License Information: http://lamsfoundation.org/licensing/lams/2.0/ 
- * 
- * This program is free software; you can redistribute it and/or modify 
- * it under the terms of the GNU General Public License version 2.0 
- * as published by the Free Software Foundation. 
- * 
- * This program is distributed in the hope that it will be useful, 
- * but WITHOUT ANY WARRANTY; without even the implied warranty of 
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the 
- * GNU General Public License for more details. 
- * 
- * You should have received a copy of the GNU General Public License 
- * along with this program; if not, write to the Free Software 
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 * USA 
- * 
- * http://www.gnu.org/licenses/gpl.txt 
- * **************************************************************** 
+/****************************************************************
+ * Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
+ * =============================================================
+ * License Information: http://lamsfoundation.org/licensing/lams/2.0/
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License version 2.0
+ * as published by the Free Software Foundation.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 * USA
+ *
+ * http://www.gnu.org/licenses/gpl.txt
+ * ****************************************************************
  */
 
 /* RuntimeStatsServlet.java,v 1.1 2015/04/28 11:52:07 marcin Exp */
@@ -80,22 +80,23 @@ public class RuntimeStatsServlet extends HttpServlet {
 	Date date = new Date();
 	MBeanServer server = ManagementFactory.getPlatformMBeanServer();
 	try {
-	    /*   ObjectName serviceRef = new ObjectName("*.*:*");
-	    Set<ObjectName> mbeans = server.queryNames(serviceRef, null);
-	    for (ObjectName on : mbeans) {
-	    System.out.println("\nObjectName : " + on);
-	    MBeanInfo info = server.getMBeanInfo(on);
-	    MBeanAttributeInfo[] attrInfo = info.getAttributes();
-	    MBeanOperationInfo[] operInfo = info.getOperations();
-	    System.out.println(">Attributes:");
-	    for (MBeanAttributeInfo attr : attrInfo) {
-	        System.out.println("  " + attr.getName() + "\n");
-	    }
-	    System.out.println(">Operations:");
-	    for (MBeanOperationInfo attr : operInfo) {
-	        System.out.println("  " + attr.getName() + "\n");
-	    }
-	    }
+	    /*
+	     * ObjectName serviceRef = new ObjectName("*.*:*");
+	     * Set<ObjectName> mbeans = server.queryNames(serviceRef, null);
+	     * for (ObjectName on : mbeans) {
+	     * System.out.println("\nObjectName : " + on);
+	     * MBeanInfo info = server.getMBeanInfo(on);
+	     * MBeanAttributeInfo[] attrInfo = info.getAttributes();
+	     * MBeanOperationInfo[] operInfo = info.getOperations();
+	     * System.out.println(">Attributes:");
+	     * for (MBeanAttributeInfo attr : attrInfo) {
+	     * System.out.println("  " + attr.getName() + "\n");
+	     * }
+	     * System.out.println(">Operations:");
+	     * for (MBeanOperationInfo attr : operInfo) {
+	     * System.out.println("  " + attr.getName() + "\n");
+	     * }
+	     * }
 	     */
 
 	    ObjectName dataSourceName = new ObjectName(
@@ -143,13 +144,15 @@ public class RuntimeStatsServlet extends HttpServlet {
 		    .append(threadBean.getThreadCount()).append("/").append(threadBean.getPeakThreadCount())
 		    .append("\n");
 
-	    /* Connector statistics do not seem to be present for WF 8.
+	    /*
+	     * Connector statistics do not seem to be present for WF 8.
 	     * They should be available in WF 9+ (WFLY-4420).
-	    ObjectName connectorName = new ObjectName("jboss.as.expr:subsystem=io,worker=default");
-	    Integer busyThreads = (Integer) server.getAttribute(connectorName, "ioThreads");
-	    Integer maxThreads = (Integer) server.getAttribute(connectorName, "taskMaxThreads");
-	    resp.append("IO threads [io/task max]: ").append(busyThreads).append("/").append(maxThreads).append("\n");
-	    */
+	     * ObjectName connectorName = new ObjectName("jboss.as.expr:subsystem=io,worker=default");
+	     * Integer busyThreads = (Integer) server.getAttribute(connectorName, "ioThreads");
+	     * Integer maxThreads = (Integer) server.getAttribute(connectorName, "taskMaxThreads");
+	     * resp.append("IO threads [io/task max]: "
+	     * ).append(busyThreads).append("/").append(maxThreads).append("\n");
+	     */
 
 	    resp.append("Active sessions : ").append(SessionManager.getSessionCount()).append("\n");
 

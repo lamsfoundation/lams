@@ -2,21 +2,21 @@
  * Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
  * =============================================================
  * License Information: http://lamsfoundation.org/licensing/lams/2.0/
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301
  * USA
- * 
+ *
  * http://www.gnu.org/licenses/gpl.txt
  * ****************************************************************
  */
@@ -70,13 +70,10 @@ import org.lamsfoundation.lams.web.action.LamsDispatchAction;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 
-import com.thoughtworks.xstream.XStream;
-import com.thoughtworks.xstream.converters.reflection.SunUnsafeReflectionProvider;
-
 /**
  * @author Ruslan Kazakov
  * @version 1.0.1
- * 
+ *
  *
  *
  *
@@ -92,7 +89,7 @@ public class LearningAction extends LamsDispatchAction {
     /**
      * Default action on page load. Clones Mindmap Nodes for each Learner in single-user mode. Uses shared (runtime
      * created in CopyToolContent method) Mindmap Nodes in multi-user mode.
-     * 
+     *
      * @param mapping
      * @param form
      * @param request
@@ -268,7 +265,7 @@ public class LearningAction extends LamsDispatchAction {
 
     /**
      * Clones Mindmap Nodes for each Learner (used in single-user mode only).
-     * 
+     *
      * @param fromMindmapNode
      * @param toMindmapNode
      * @param fromContent
@@ -293,7 +290,7 @@ public class LearningAction extends LamsDispatchAction {
 
     /**
      * Gets the Notify Requests (Actions) from Flash and returns proper Notify Responses
-     * 
+     *
      * @param mapping
      * @param form
      * @param request
@@ -370,7 +367,7 @@ public class LearningAction extends LamsDispatchAction {
 		NodeConceptModel nodeConceptModel = notifyRequestModel.getConcept();
 
 		Long uniqueId = // node unique ID
-		mindmapService.getNodeLastUniqueIdByMindmapUidSessionId(mindmapId, toolSessionId) + 1;
+			mindmapService.getNodeLastUniqueIdByMindmapUidSessionId(mindmapId, toolSessionId) + 1;
 
 		mindmapService.saveMindmapNode(null, mindmapNode, uniqueId, nodeConceptModel.getText(),
 			nodeConceptModel.getColor(), mindmapService.getUserByUID(userId),
@@ -428,7 +425,7 @@ public class LearningAction extends LamsDispatchAction {
 
     /**
      * Saves Notify Requests to database
-     * 
+     *
      * @param mindmapRequest
      * @param requestType
      * @param notifyRequestModel
@@ -453,7 +450,7 @@ public class LearningAction extends LamsDispatchAction {
 
     /**
      * Generated Notify Responses
-     * 
+     *
      * @param ok
      * @param id
      * @param data
@@ -471,7 +468,7 @@ public class LearningAction extends LamsDispatchAction {
 
     /**
      * Returns lists of Poll Requests (Actions) on Mindmap Nodes made by other learners
-     * 
+     *
      * @param mapping
      * @param form
      * @param request
@@ -573,7 +570,7 @@ public class LearningAction extends LamsDispatchAction {
 
     /**
      * Returns the serialized XML of the Mindmap Nodes from Database
-     * 
+     *
      * @param mapping
      * @param form
      * @param request
@@ -700,7 +697,7 @@ public class LearningAction extends LamsDispatchAction {
 
     /**
      * Returns the serialized XML of the Mindmap Nodes from Database
-     * 
+     *
      * @param mapping
      * @param form
      * @param request
@@ -723,7 +720,7 @@ public class LearningAction extends LamsDispatchAction {
 
     /**
      * Returns current learner
-     * 
+     *
      * @param toolSessionId
      * @return mindmapUser
      */
@@ -744,7 +741,7 @@ public class LearningAction extends LamsDispatchAction {
 
     /**
      * Saving Mindmap nodes and proceed to reflection.
-     * 
+     *
      * @param mapping
      * @param form
      * @param request
@@ -791,7 +788,7 @@ public class LearningAction extends LamsDispatchAction {
 
     /**
      * Finish Mindmap Activity and save reflection if appropriate.
-     * 
+     *
      * @param mapping
      * @param form
      * @param request

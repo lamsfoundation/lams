@@ -2,21 +2,21 @@
  * Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
  * =============================================================
  * License Information: http://lamsfoundation.org/licensing/lams/2.0/
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License version 2.0 
+ * it under the terms of the GNU General Public License version 2.0
  * as published by the Free Software Foundation.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write toUser the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301
  * USA
- * 
+ *
  * http://www.gnu.org/licenses/gpl.txt
  * ****************************************************************
  */
@@ -31,142 +31,142 @@ import org.apache.commons.lang.builder.ToStringBuilder;
 
 /**
  * Represents a message sent by a user toUser a groupchat session
- * 
+ *
  * @author Anthony Sukkar
- * 
+ *
  *
  */
 public class ChatMessage implements java.io.Serializable {
 
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = -3976906267301586708L;
-    
-        public static final String MESSAGE_TYPE_PUBLIC = "groupchat";
-    
-        public static final String MESSAGE_TYPE_PRIVATE = "chat";
+    /**
+     * 
+     */
+    private static final long serialVersionUID = -3976906267301586708L;
 
-	// Fields
-	private Long uid;
+    public static final String MESSAGE_TYPE_PUBLIC = "groupchat";
 
-	private ChatSession chatSession;
+    public static final String MESSAGE_TYPE_PRIVATE = "chat";
 
-	private ChatUser fromUser;
+    // Fields
+    private Long uid;
 
-	private ChatUser toUser;
+    private ChatSession chatSession;
 
-	private String type;
+    private ChatUser fromUser;
 
-	private String body;
+    private ChatUser toUser;
 
-	private Date sendDate;
+    private String type;
 
-	private boolean hidden;
+    private String body;
 
-	/** default constructor */
-	public ChatMessage() {
-	}
+    private Date sendDate;
 
-	// Property accessors
+    private boolean hidden;
 
-	/**
-	 *
-	 */
-	public Long getUid() {
-		return uid;
-	}
+    /** default constructor */
+    public ChatMessage() {
+    }
 
-	public void setUid(Long uid) {
-		this.uid = uid;
-	}
+    // Property accessors
 
-	/**
-	 *
-	 */
-	public ChatSession getChatSession() {
-		return chatSession;
-	}
+    /**
+     *
+     */
+    public Long getUid() {
+	return uid;
+    }
 
-	public void setChatSession(ChatSession chatSession) {
-		this.chatSession = chatSession;
-	}
+    public void setUid(Long uid) {
+	this.uid = uid;
+    }
 
-	/**
-	 *
-	 *
-	 * 
-	 */
-	public ChatUser getFromUser() {
-		return fromUser;
-	}
+    /**
+     *
+     */
+    public ChatSession getChatSession() {
+	return chatSession;
+    }
 
-	public void setFromUser(ChatUser from) {
-		this.fromUser = from;
-	}
+    public void setChatSession(ChatSession chatSession) {
+	this.chatSession = chatSession;
+    }
 
-	/**
-	 *
-	 *
-	 * 
-	 * The toUser field is null when the type is "groupchat", and non null when
-	 * the type is "chat"
-	 */
-	public ChatUser getToUser() {
-		return toUser;
-	}
+    /**
+     *
+     *
+     * 
+     */
+    public ChatUser getFromUser() {
+	return fromUser;
+    }
 
-	public void setToUser(ChatUser to) {
-		this.toUser = to;
-	}
+    public void setFromUser(ChatUser from) {
+	this.fromUser = from;
+    }
 
-	/**
-	 *
-	 */
-	public String getType() {
-		return type;
-	}
+    /**
+     *
+     *
+     * 
+     * The toUser field is null when the type is "groupchat", and non null when
+     * the type is "chat"
+     */
+    public ChatUser getToUser() {
+	return toUser;
+    }
 
-	public void setType(String type) {
-		this.type = type;
-	}
+    public void setToUser(ChatUser to) {
+	this.toUser = to;
+    }
 
-	/**
-	 *
-	 */
-	public String getBody() {
-		return body;
-	}
+    /**
+     *
+     */
+    public String getType() {
+	return type;
+    }
 
-	public void setBody(String body) {
-		this.body = body;
-	}
+    public void setType(String type) {
+	this.type = type;
+    }
 
-	/**
-	 *
-	 */
-	public Date getSendDate() {
-		return sendDate;
-	}
+    /**
+     *
+     */
+    public String getBody() {
+	return body;
+    }
 
-	public void setSendDate(Date sendDate) {
-		this.sendDate = sendDate;
-	}
+    public void setBody(String body) {
+	this.body = body;
+    }
 
-	/**
-	 * 
-	 *
-	 */
-	public boolean isHidden() {
-		return hidden;
-	}
+    /**
+     *
+     */
+    public Date getSendDate() {
+	return sendDate;
+    }
 
-	public void setHidden(boolean hidden) {
-		this.hidden = hidden;
-	}
+    public void setSendDate(Date sendDate) {
+	this.sendDate = sendDate;
+    }
 
-	public String toString() {
-		return new ToStringBuilder(this).append("uid", uid)
-				.append("body", body).toString();
-	}
+    /**
+     * 
+     *
+     */
+    public boolean isHidden() {
+	return hidden;
+    }
+
+    public void setHidden(boolean hidden) {
+	this.hidden = hidden;
+    }
+
+    @Override
+    public String toString() {
+	return new ToStringBuilder(this).append("uid", uid).append("body", body).toString();
+    }
 }

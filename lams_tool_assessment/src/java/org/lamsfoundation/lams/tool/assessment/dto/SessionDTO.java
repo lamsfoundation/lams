@@ -2,21 +2,21 @@
  * Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
  * =============================================================
  * License Information: http://lamsfoundation.org/licensing/lams/2.0/
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License version 2.0 
+ * it under the terms of the GNU General Public License version 2.0
  * as published by the Free Software Foundation.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301
  * USA
- * 
+ *
  * http://www.gnu.org/licenses/gpl.txt
  * ****************************************************************
  */
@@ -29,8 +29,8 @@ import java.util.List;
 import org.lamsfoundation.lams.tool.assessment.model.AssessmentResult;
 
 /**
- * 
- * 
+ *
+ *
  * @author Andrey Balan
  */
 public class SessionDTO {
@@ -38,7 +38,7 @@ public class SessionDTO {
     private Long sessionId;
     private String sessionName;
     private int numberLearners;
-    
+
     //used for export purposes only
     private List<AssessmentResult> assessmentResults;
 
@@ -47,9 +47,9 @@ public class SessionDTO {
 
     /**
      * Contruction method for monitoring summary function.
-     * 
+     *
      * <B>Don't not set isInitGroup and viewNumber fields</B>
-     * 
+     *
      * @param sessionName
      * @param question
      * @param isInitGroup
@@ -58,7 +58,7 @@ public class SessionDTO {
 	this.sessionId = sessionId;
 	this.sessionName = sessionName;
     }
-    
+
     public Long getSessionId() {
 	return sessionId;
     }
@@ -82,7 +82,7 @@ public class SessionDTO {
     public void setAssessmentResults(List<AssessmentResult> assessmentResults) {
 	this.assessmentResults = assessmentResults;
     }
-    
+
     public int getNumberLearners() {
 	return numberLearners;
     }

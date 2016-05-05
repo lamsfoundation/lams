@@ -24,27 +24,30 @@ import java.util.Random;
 
 /**
  * RandomPasswordGenerator generates a random password with the specified length.
- * 
+ *
  * @author <a href="mailto:anthony.xiao@lamsinternational.com">Anthony Xiao</a>
  */
 public class RandomPasswordGenerator {
-    
+
     //define the legal characters in our random password
-    private static final char[] CHAR_ARRAY = "ABCDEFGHIJKLMNOPQRSTUVWXYZabedefghijklmnopqrstuvwxyz01234567890".toCharArray();
+    private static final char[] CHAR_ARRAY = "ABCDEFGHIJKLMNOPQRSTUVWXYZabedefghijklmnopqrstuvwxyz01234567890"
+	    .toCharArray();
 
     /**
      * Get the next random password
-     * 
-     * @param length - the length of the password
+     *
+     * @param length
+     *            - the length of the password
      * @return the next random password
      */
-    public static String nextPassword(int length){
-        char res[] = new char[length];
-        Random generator = new Random();
-        
-        for(int i=0; i<length; i++)
-            res[i] = CHAR_ARRAY[generator.nextInt(CHAR_ARRAY.length)];
+    public static String nextPassword(int length) {
+	char res[] = new char[length];
+	Random generator = new Random();
 
-        return new String(res);
+	for (int i = 0; i < length; i++) {
+	    res[i] = CHAR_ARRAY[generator.nextInt(CHAR_ARRAY.length)];
+	}
+
+	return new String(res);
     }
 }

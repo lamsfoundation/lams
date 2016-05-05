@@ -2,21 +2,21 @@
  * Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
  * =============================================================
  * License Information: http://lamsfoundation.org/licensing/lams/2.0/
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License version 2.0 
+ * it under the terms of the GNU General Public License version 2.0
  * as published by the Free Software Foundation.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301
  * USA
- * 
+ *
  * http://www.gnu.org/licenses/gpl.txt
  * ****************************************************************
  */
@@ -61,25 +61,25 @@ import org.lamsfoundation.lams.web.util.AttributeNames;
  * gate. The knocking process will be triggered by the lams progress engine in the first place. The learner can also
  * trigger the knocking process by clicking on the button on the waiting page.
  * </p>
- * 
+ *
  * <p>
  * Learner will progress to the next activity if the gate is open. Otherwise, the learner should see the waiting page.
  * </p>
- * 
+ *
  * <p>
  * Has a special override key - if the parameter force is set and the lesson is a preview lesson, then the gate will be
  * opened straight away. This allows the author to see gate shut initially but override it and open it rather than being
  * held up by the gate.
  * </p>
- * 
+ *
  * @author Jacky Fang
  * @since 2005-4-7
  * @version 1.1
- * 
  *
- * 
  *
- * 
+ *
+ *
+ *
  *
  *
  *
@@ -107,7 +107,7 @@ public class GateAction extends LamsDispatchAction {
     // Struts Dispatch Method
     // ---------------------------------------------------------------------
     /**
-     * 
+     *
      * @param mapping
      * @param form
      * @param request
@@ -164,7 +164,7 @@ public class GateAction extends LamsDispatchAction {
     // ---------------------------------------------------------------------
     /**
      * Dispatch view the according to the gate type.
-     * 
+     *
      * @param mapping
      *            An ActionMapping class that will be used by the Action class to tell the ActionServlet where to send
      *            the end-user.

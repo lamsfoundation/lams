@@ -2,21 +2,21 @@
  * Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
  * =============================================================
  * License Information: http://lamsfoundation.org/licensing/lams/2.0/
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License version 2.0 
+ * it under the terms of the GNU General Public License version 2.0
  * as published by the Free Software Foundation.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301
  * USA
- * 
+ *
  * http://www.gnu.org/licenses/gpl.txt
  * ****************************************************************
  */
@@ -89,7 +89,7 @@ public abstract class GateActivity extends SimpleActivity implements Serializabl
     /**
      *
      *
-     * 
+     *
      */
     public Integer getGateActivityLevelId() {
 	return gateActivityLevelId;
@@ -113,7 +113,7 @@ public abstract class GateActivity extends SimpleActivity implements Serializabl
 
     /**
      * Delegate to strategy class to calculate whether we should open the gate for this learner.
-     * 
+     *
      * @param learner
      *            the learner who wants to go through the gate.
      * @return the gate is open or closed.
@@ -130,7 +130,7 @@ public abstract class GateActivity extends SimpleActivity implements Serializabl
     /**
      * Force the gate to open, irrespective of the strategy. Used for preview. Opens the gate and clears any "waiting"
      * list.
-     * 
+     *
      * @return the gate is open or closed.
      */
     public void forceGateOpen() {

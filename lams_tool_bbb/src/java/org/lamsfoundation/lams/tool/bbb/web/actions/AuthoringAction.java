@@ -2,21 +2,21 @@
  * Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
  * =============================================================
  * License Information: http://lamsfoundation.org/licensing/lams/2.0/
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301
  * USA
- * 
+ *
  * http://www.gnu.org/licenses/gpl.txt
  * ****************************************************************
  */
@@ -26,11 +26,6 @@ package org.lamsfoundation.lams.tool.bbb.web.actions;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.Date;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Set;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -41,18 +36,14 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
-import org.apache.struts.action.ActionMessages;
 import org.apache.struts.actions.DispatchAction;
-import org.apache.struts.upload.FormFile;
 import org.lamsfoundation.lams.authoring.web.AuthoringConstants;
-import org.lamsfoundation.lams.contentrepository.client.IToolContentHandler;
 import org.lamsfoundation.lams.tool.ToolAccessMode;
 import org.lamsfoundation.lams.tool.bbb.model.Bbb;
 import org.lamsfoundation.lams.tool.bbb.service.BbbServiceProxy;
 import org.lamsfoundation.lams.tool.bbb.service.IBbbService;
 import org.lamsfoundation.lams.tool.bbb.util.Constants;
 import org.lamsfoundation.lams.tool.bbb.web.forms.AuthoringForm;
-import org.lamsfoundation.lams.util.FileValidatorUtil;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.lamsfoundation.lams.web.util.SessionMap;
@@ -60,9 +51,9 @@ import org.lamsfoundation.lams.web.util.SessionMap;
 /**
  * @author
  * @version
- * 
  *
- * 
+ *
+ *
  *
  */
 public class AuthoringAction extends DispatchAction {
@@ -84,10 +75,11 @@ public class AuthoringAction extends DispatchAction {
     /**
      * Default method when no dispatch parameter is specified. It is expected that the parameter
      * <code>toolContentID</code> will be passed in. This will be used to retrieve content for this tool.
-     * 
+     *
      * @throws ServletException
-     * 
+     *
      */
+    @Override
     protected ActionForward unspecified(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) throws ServletException {
 
@@ -120,8 +112,7 @@ public class AuthoringAction extends DispatchAction {
 	copyProperties(authForm, bbb);
 
 	// Set up sessionMap
-	SessionMap<String, Object> map = createSessionMap(bbb, getAccessMode(request), contentFolderID,
-		toolContentID);
+	SessionMap<String, Object> map = createSessionMap(bbb, getAccessMode(request), contentFolderID, toolContentID);
 	authForm.setSessionMapID(map.getSessionID());
 
 	// add the sessionMap to HTTPSession.
@@ -167,7 +158,7 @@ public class AuthoringAction extends DispatchAction {
 
     /**
      * Updates Bbb content using AuthoringForm inputs.
-     * 
+     *
      * @param authForm
      * @param mode
      * @return
@@ -179,13 +170,13 @@ public class AuthoringAction extends DispatchAction {
 	    bbb.setReflectOnActivity(authForm.isReflectOnActivity());
 	    bbb.setReflectInstructions(authForm.getReflectInstructions());
 	    bbb.setLockOnFinished(authForm.isLockOnFinished());
-	    
+
 	}
     }
 
     /**
      * Updates AuthoringForm using Bbb content.
-     * 
+     *
      * @param bbb
      * @param authForm
      * @return
@@ -203,7 +194,7 @@ public class AuthoringAction extends DispatchAction {
 
     /**
      * Updates SessionMap using Bbb content.
-     * 
+     *
      * @param bbb
      * @param mode
      */
@@ -221,7 +212,7 @@ public class AuthoringAction extends DispatchAction {
 
     /**
      * Get ToolAccessMode from HttpRequest parameters. Default value is AUTHOR mode.
-     * 
+     *
      * @param request
      * @return
      */
@@ -238,7 +229,7 @@ public class AuthoringAction extends DispatchAction {
 
     /**
      * Retrieve the SessionMap from the HttpSession.
-     * 
+     *
      * @param request
      * @param authForm
      * @return

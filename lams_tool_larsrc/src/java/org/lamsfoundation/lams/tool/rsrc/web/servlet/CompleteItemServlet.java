@@ -26,99 +26,93 @@ import java.util.TreeSet;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
-import javax.servlet.http.HttpSession;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.PrintWriter;
+import javax.servlet.http.HttpSession;
 
+import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.tool.rsrc.ResourceConstants;
 import org.lamsfoundation.lams.tool.rsrc.model.ResourceItem;
-import org.lamsfoundation.lams.tool.rsrc.model.ResourceUser;
 import org.lamsfoundation.lams.tool.rsrc.service.IResourceService;
 import org.lamsfoundation.lams.tool.rsrc.service.ResourceServiceProxy;
 import org.lamsfoundation.lams.tool.rsrc.util.ResourceItemComparator;
 import org.lamsfoundation.lams.tool.rsrc.util.ResourceToolContentHandler;
-
-import org.lamsfoundation.lams.web.util.AttributeNames;
-import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
-import org.lamsfoundation.lams.web.util.SessionMap;
 import org.lamsfoundation.lams.web.session.SessionManager;
-
-import org.apache.log4j.Logger;
+import org.lamsfoundation.lams.web.util.AttributeNames;
+import org.lamsfoundation.lams.web.util.SessionMap;
 
 /**
- * 
- * 
+ *
+ *
  * @author mseaton
  */
 @SuppressWarnings("serial")
 public class CompleteItemServlet extends HttpServlet {
-	private static Logger log = Logger.getLogger(CompleteItemServlet.class);
-	
-	private ResourceToolContentHandler handler;
-	private IResourceService service;
-	
-	@Override
-	public void init() throws ServletException {
-		service = ResourceServiceProxy.getResourceService(getServletContext());
-		super.init();
-	}
-	
-	/**
-	 * The doGet method of the servlet. <br>
-	 * 
-	 * 
-	 * @param request
-	 *            the request send by the client to the server
-	 * @param response
-	 *            the response send by the server to the client
-	 * @throws ServletException
-	 *             if an error occurred
-	 * @throws IOException
-	 *             if an error occurred
-	 */
-	public void doGet(HttpServletRequest request, HttpServletResponse response)
-		throws ServletException, IOException {
-        	String mode = request.getParameter(AttributeNames.ATTR_MODE);
-        	String sessionMapID = request.getParameter(ResourceConstants.ATTR_SESSION_MAP_ID);
-        	SessionMap sessionMap = (SessionMap) request.getSession().getAttribute(sessionMapID);
-        
-        	Long resourceItemUid = new Long(request.getParameter(ResourceConstants.PARAM_RESOURCE_ITEM_UID));
-        	
-        	HttpSession ss = SessionManager.getSession();
-        	
-        	// get back login user DTO
-        	UserDTO user = (UserDTO) ss.getAttribute(AttributeNames.USER);
-        
-        	Long sessionId = (Long) sessionMap.get(ResourceConstants.ATTR_TOOL_SESSION_ID);
-        	service.setItemComplete(resourceItemUid, new Long(user.getUserID().intValue()), sessionId);
-        
-        	// set resource item complete tag
-        	SortedSet<ResourceItem> resourceItemList = getResourceItemList(sessionMap);
-        	for (ResourceItem item : resourceItemList) {
-        	    if (item.getUid().equals(resourceItemUid)) {
-        			item.setComplete(true);
-        			break;
-        	    }
-        	}
-	}
-	
-	/**
-     * List save current resource items.
+    private static Logger log = Logger.getLogger(CompleteItemServlet.class);
+
+    private ResourceToolContentHandler handler;
+    private IResourceService service;
+
+    @Override
+    public void init() throws ServletException {
+	service = ResourceServiceProxy.getResourceService(getServletContext());
+	super.init();
+    }
+
+    /**
+     * The doGet method of the servlet. <br>
      * 
+     * 
+     * @param request
+     *            the request send by the client to the server
+     * @param response
+     *            the response send by the server to the client
+     * @throws ServletException
+     *             if an error occurred
+     * @throws IOException
+     *             if an error occurred
+     */
+    @Override
+    public void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+	String mode = request.getParameter(AttributeNames.ATTR_MODE);
+	String sessionMapID = request.getParameter(ResourceConstants.ATTR_SESSION_MAP_ID);
+	SessionMap sessionMap = (SessionMap) request.getSession().getAttribute(sessionMapID);
+
+	Long resourceItemUid = new Long(request.getParameter(ResourceConstants.PARAM_RESOURCE_ITEM_UID));
+
+	HttpSession ss = SessionManager.getSession();
+
+	// get back login user DTO
+	UserDTO user = (UserDTO) ss.getAttribute(AttributeNames.USER);
+
+	Long sessionId = (Long) sessionMap.get(ResourceConstants.ATTR_TOOL_SESSION_ID);
+	service.setItemComplete(resourceItemUid, new Long(user.getUserID().intValue()), sessionId);
+
+	// set resource item complete tag
+	SortedSet<ResourceItem> resourceItemList = getResourceItemList(sessionMap);
+	for (ResourceItem item : resourceItemList) {
+	    if (item.getUid().equals(resourceItemUid)) {
+		item.setComplete(true);
+		break;
+	    }
+	}
+    }
+
+    /**
+     * List save current resource items.
+     *
      * @param request
      * @return
      */
     private SortedSet<ResourceItem> getResourceItemList(SessionMap sessionMap) {
-		SortedSet<ResourceItem> list = (SortedSet<ResourceItem>) sessionMap
-			.get(ResourceConstants.ATTR_RESOURCE_ITEM_LIST);
-		if (list == null) {
-		    list = new TreeSet<ResourceItem>(new ResourceItemComparator());
-		    sessionMap.put(ResourceConstants.ATTR_RESOURCE_ITEM_LIST, list);
-		}
-		return list;
+	SortedSet<ResourceItem> list = (SortedSet<ResourceItem>) sessionMap
+		.get(ResourceConstants.ATTR_RESOURCE_ITEM_LIST);
+	if (list == null) {
+	    list = new TreeSet<ResourceItem>(new ResourceItemComparator());
+	    sessionMap.put(ResourceConstants.ATTR_RESOURCE_ITEM_LIST, list);
+	}
+	return list;
     }
-	
+
 }
-	

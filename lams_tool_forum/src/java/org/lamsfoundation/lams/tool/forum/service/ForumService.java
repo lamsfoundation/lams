@@ -2,21 +2,21 @@
  * Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
  * =============================================================
  * License Information: http://lamsfoundation.org/licensing/lams/2.0/
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License version 2.0 
+ * it under the terms of the GNU General Public License version 2.0
  * as published by the Free Software Foundation.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301
  * USA
- * 
+ *
  * http://www.gnu.org/licenses/gpl.txt
  * ****************************************************************
  */
@@ -114,9 +114,9 @@ import org.lamsfoundation.lams.util.MessageService;
 import org.lamsfoundation.lams.util.audit.IAuditService;
 
 /**
- * 
+ *
  * @author Steve.Ni
- * 
+ *
  * @version $Revision$
  */
 public class ForumService implements IForumService, ToolContentManager, ToolSessionManager, ToolRestManager {
@@ -712,7 +712,7 @@ public class ForumService implements IForumService, ToolContentManager, ToolSess
     private MessageDTO makeDTOSetRating(MessageSeq msgSeq, Message message) {
 	MessageDTO dto = MessageDTO.getMessageDTO(message);
 	dto.setLevel(msgSeq.getMessageLevel());
-	//set averageRating 
+	//set averageRating
 	if (message.getForum().isAllowRateMessages()) {
 	    AverageRatingDTO averageRating = getAverageRatingDTOByMessage(message.getUid());
 	    dto.setAverageRating(averageRating.getRating());
@@ -723,7 +723,7 @@ public class ForumService implements IForumService, ToolContentManager, ToolSess
 
     /**
      * Process an uploaded file.
-     * 
+     *
      * @param forumForm
      * @throws FileNotFoundException
      * @throws IOException
@@ -752,10 +752,10 @@ public class ForumService implements IForumService, ToolContentManager, ToolSess
     /**
      * This method verifies the credentials of the SubmitFiles Tool and gives it the <code>Ticket</code> to login and
      * access the Content Repository.
-     * 
+     *
      * A valid ticket is needed in order to access the content from the repository. This method would be called evertime
      * the tool needs to upload/download files from the content repository.
-     * 
+     *
      * @return ITicket The ticket for repostory access
      * @throws SubmitFilesException
      */
@@ -1200,7 +1200,7 @@ public class ForumService implements IForumService, ToolContentManager, ToolSess
 
     /**
      * Sends marks straight to gradebook from a forum report
-     * 
+     *
      * @param user
      * @param toolSessionID
      */
@@ -1393,7 +1393,7 @@ public class ForumService implements IForumService, ToolContentManager, ToolSess
 
     /**
      * Get number of new postings.
-     * 
+     *
      * @param messageId
      * @param userId
      * @return
@@ -1512,7 +1512,7 @@ public class ForumService implements IForumService, ToolContentManager, ToolSess
 	// submissionDeadline is set in monitoring
 
 	// *******************************Handle user*******************
-	// Code taken from AuthoringAction TODO 
+	// Code taken from AuthoringAction TODO
 	//	    String contentFolderID = (String) sessionMap.get(AttributeNames.PARAM_CONTENT_FOLDER_ID);
 	// check whether it is sysadmin:LDEV-906
 	//	if (!StringUtils.equals(contentFolderID, "-1")) {

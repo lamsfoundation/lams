@@ -2,21 +2,21 @@
  * Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
  * =============================================================
  * License Information: http://lamsfoundation.org/licensing/lams/2.0/
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License version 2.0 
+ * it under the terms of the GNU General Public License version 2.0
  * as published by the Free Software Foundation.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301
  * USA
- * 
+ *
  * http://www.gnu.org/licenses/gpl.txt
  * ****************************************************************
  */
@@ -149,9 +149,9 @@ import com.thoughtworks.xstream.security.AnyTypePermission;
 
 /**
  * Export tool content service bean.
- * 
+ *
  * @author Steve.Ni
- * 
+ *
  * @version $Revision$
  */
 public class ExportToolContentService implements IExportToolContentService, ApplicationContextAware {
@@ -373,9 +373,9 @@ public class ExportToolContentService implements IExportToolContentService, Appl
     /**
      * This class is just for later system extent tool compaiblity strategy use. Currently, it just simple to get tool
      * by same signature.
-     * 
+     *
      * @author Steve.Ni
-     * 
+     *
      * @version $Revision$
      */
     public class ToolCompatibleStrategy {
@@ -538,7 +538,7 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 
     /**
      * @throws ExportToolContentException
-     * 
+     *
      */
     @Override
     public void exportToolContent(Long toolContentId, Object toolContentObj, IToolContentHandler toolContentHandler,
@@ -614,7 +614,7 @@ public class ExportToolContentService implements IExportToolContentService, Appl
     /**
      * Import the learning design from the given path. Set the importer as the creator. If the workspaceFolderUid is
      * null then saves the design in the user's own workspace folder.
-     * 
+     *
      * @param designFile
      * @param importer
      * @param workspaceFolderUid
@@ -624,7 +624,7 @@ public class ExportToolContentService implements IExportToolContentService, Appl
      *         <li>Object[1] = ldErrors when importing (List<String>)</li>
      *         <li>Object[2] = toolErrors when importing (List<String>)</li>
      *         </ul>
-     * 
+     *
      * @throws ImportToolContentException
      */
     @Override
@@ -846,7 +846,7 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 
     /**
      * Transform main XML file to correct version format.
-     * 
+     *
      * @param fullFilePath
      * @param versionString
      * @return
@@ -1014,7 +1014,7 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 
     /**
      * Transform tool XML file to correct version format.
-     * 
+     *
      * @param toVersion
      * @param fromVersion
      * @throws IllegalAccessException
@@ -1419,7 +1419,7 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 
     /**
      * Method to sort activity DTO according to the rule: Parents is before their children.
-     * 
+     *
      * @param activities
      * @return
      */
@@ -1466,9 +1466,9 @@ public class ExportToolContentService implements IExportToolContentService, Appl
      * <li>lams_workspace_folder - An input parameters to let user choose import workspace</li>
      * <li>User - The person who execute import action</li>
      * <li>OriginalLearningDesign - set to null</li>
-     * 
+     *
      * @param activityMapper
-     * 
+     *
      * @return
      * @throws ImportToolContentException
      */
@@ -1556,7 +1556,7 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 
     /**
      * Return Grouping object from given GroupingDTO.
-     * 
+     *
      * @param groupingDto
      * @return
      */
@@ -1622,7 +1622,7 @@ public class ExportToolContentService implements IExportToolContentService, Appl
      * Creates the map entry between a branch sequence activity and a group. We need the group maps and the activity
      * maps so that we can update the ids to the groups and the activities. Therefore this method must be done after all
      * the groups are imported and the activities are imported.
-     * 
+     *
      * Note: there isn't an set in the learning design for the branch mappings. The group objects actually contain the
      * link to the mappings, so this method updates the group objects.
      */
@@ -1743,7 +1743,7 @@ public class ExportToolContentService implements IExportToolContentService, Appl
     }
 
     /**
-     * 
+     *
      * @param actDto
      * @param activityMapper
      * @param groupingList
@@ -1761,81 +1761,86 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 
 	Activity act = Activity.getActivityInstance(type);
 	switch (act.getActivityTypeId()) {
-	case Activity.TOOL_ACTIVITY_TYPE:
-	    // get back the toolContent in new system by activityID in
-	    // old system.
-	    ToolContent content = toolMapper.get(actDto.getActivityID());
-	    // if activity can not find matching tool, the content should be
-	    // null.
-	    if (content != null) {
-		((ToolActivity) act).setTool(content.getTool());
-		((ToolActivity) act).setToolContentId(content.getToolContentId());
-		((ToolActivity) act).setToolSessions(null);
-	    }
-	    if (actDto.getPlannerMetadataDTO() != null) {
-		PedagogicalPlannerActivityMetadata plannerMetadata = actDto.getPlannerMetadataDTO().toPlannerMetadata();
-		plannerMetadata.setActivity(((ToolActivity) act));
-		((ToolActivity) act).setPlannerMetadata(plannerMetadata);
-	    }
+	    case Activity.TOOL_ACTIVITY_TYPE:
+		// get back the toolContent in new system by activityID in
+		// old system.
+		ToolContent content = toolMapper.get(actDto.getActivityID());
+		// if activity can not find matching tool, the content should be
+		// null.
+		if (content != null) {
+		    ((ToolActivity) act).setTool(content.getTool());
+		    ((ToolActivity) act).setToolContentId(content.getToolContentId());
+		    ((ToolActivity) act).setToolSessions(null);
+		}
+		if (actDto.getPlannerMetadataDTO() != null) {
+		    PedagogicalPlannerActivityMetadata plannerMetadata = actDto.getPlannerMetadataDTO()
+			    .toPlannerMetadata();
+		    plannerMetadata.setActivity(((ToolActivity) act));
+		    ((ToolActivity) act).setPlannerMetadata(plannerMetadata);
+		}
 
-	    act.setLearningLibrary(learningLibraryDAO.getLearningLibraryById(actDto.getLearningLibraryID()));
-	    break;
-	case Activity.GROUPING_ACTIVITY_TYPE:
-	    newGrouping = groupingList.get(actDto.getCreateGroupingID());
-	    ((GroupingActivity) act).setCreateGrouping(newGrouping);
-	    ((GroupingActivity) act).setCreateGroupingUIID(newGrouping.getGroupingUIID());
-	    ((GroupingActivity) act).setSystemTool(systemToolDAO.getSystemToolByID(SystemTool.GROUPING));
-	    break;
-	case Activity.SYNCH_GATE_ACTIVITY_TYPE:
-	    ((SynchGateActivity) act).setGateActivityLevelId(actDto.getGateActivityLevelID());
-	    // always set false
-	    ((SynchGateActivity) act).setGateOpen(false);
-	    ((SynchGateActivity) act).setSystemTool(systemToolDAO.getSystemToolByID(SystemTool.SYNC_GATE));
-	    break;
-	case Activity.SCHEDULE_GATE_ACTIVITY_TYPE:
-	    ((ScheduleGateActivity) act).setGateActivityLevelId(actDto.getGateActivityLevelID());
-	    // always set false
-	    ((ScheduleGateActivity) act).setGateOpen(false);
+		act.setLearningLibrary(learningLibraryDAO.getLearningLibraryById(actDto.getLearningLibraryID()));
+		break;
+	    case Activity.GROUPING_ACTIVITY_TYPE:
+		newGrouping = groupingList.get(actDto.getCreateGroupingID());
+		((GroupingActivity) act).setCreateGrouping(newGrouping);
+		((GroupingActivity) act).setCreateGroupingUIID(newGrouping.getGroupingUIID());
+		((GroupingActivity) act).setSystemTool(systemToolDAO.getSystemToolByID(SystemTool.GROUPING));
+		break;
+	    case Activity.SYNCH_GATE_ACTIVITY_TYPE:
+		((SynchGateActivity) act).setGateActivityLevelId(actDto.getGateActivityLevelID());
+		// always set false
+		((SynchGateActivity) act).setGateOpen(false);
+		((SynchGateActivity) act).setSystemTool(systemToolDAO.getSystemToolByID(SystemTool.SYNC_GATE));
+		break;
+	    case Activity.SCHEDULE_GATE_ACTIVITY_TYPE:
+		((ScheduleGateActivity) act).setGateActivityLevelId(actDto.getGateActivityLevelID());
+		// always set false
+		((ScheduleGateActivity) act).setGateOpen(false);
 
-	    ((ScheduleGateActivity) act).setGateStartTimeOffset(actDto.getGateStartTimeOffset());
-	    ((ScheduleGateActivity) act).setGateEndTimeOffset(actDto.getGateEndTimeOffset());
-	    ((ScheduleGateActivity) act).setGateActivityCompletionBased(actDto.getGateActivityCompletionBased());
-	    ((ScheduleGateActivity) act).setSystemTool(systemToolDAO.getSystemToolByID(SystemTool.SCHEDULE_GATE));
-	    break;
-	case Activity.PERMISSION_GATE_ACTIVITY_TYPE:
-	    ((PermissionGateActivity) act).setGateActivityLevelId(actDto.getGateActivityLevelID());
-	    ((PermissionGateActivity) act).setGateOpen(false);
-	    ((PermissionGateActivity) act).setSystemTool(systemToolDAO.getSystemToolByID(SystemTool.PERMISSION_GATE));
-	    break;
-	case Activity.CONDITION_GATE_ACTIVITY_TYPE:
-	    ((ConditionGateActivity) act).setGateActivityLevelId(actDto.getGateActivityLevelID());
-	    ((ConditionGateActivity) act).setGateOpen(false);
-	    ((ConditionGateActivity) act).setSystemTool(systemToolDAO.getSystemToolByID(SystemTool.PERMISSION_GATE));
-	    break;
-	case Activity.PARALLEL_ACTIVITY_TYPE:
-	    act.setLearningLibrary(learningLibraryDAO.getLearningLibraryById(actDto.getLearningLibraryID()));
-	    break;
-	case Activity.OPTIONS_ACTIVITY_TYPE:
-	case Activity.OPTIONS_WITH_SEQUENCES_TYPE:
-	    ((OptionsActivity) act).setMaxNumberOfOptions(actDto.getMaxOptions());
-	    ((OptionsActivity) act).setMinNumberOfOptions(actDto.getMinOptions());
-	    ((OptionsActivity) act).setOptionsInstructions(actDto.getOptionsInstructions());
-	    break;
-	case Activity.SEQUENCE_ACTIVITY_TYPE:
-	    break;
-	case Activity.CHOSEN_BRANCHING_ACTIVITY_TYPE:
-	    ((BranchingActivity) act)
-		    .setSystemTool(systemToolDAO.getSystemToolByID(SystemTool.TEACHER_CHOSEN_BRANCHING));
-	    processBranchingFields((BranchingActivity) act, actDto);
-	    break;
-	case Activity.GROUP_BRANCHING_ACTIVITY_TYPE:
-	    ((BranchingActivity) act).setSystemTool(systemToolDAO.getSystemToolByID(SystemTool.GROUP_BASED_BRANCHING));
-	    processBranchingFields((BranchingActivity) act, actDto);
-	    break;
-	case Activity.TOOL_BRANCHING_ACTIVITY_TYPE:
-	    ((BranchingActivity) act).setSystemTool(systemToolDAO.getSystemToolByID(SystemTool.TOOL_BASED_BRANCHING));
-	    processBranchingFields((BranchingActivity) act, actDto);
-	    break;
+		((ScheduleGateActivity) act).setGateStartTimeOffset(actDto.getGateStartTimeOffset());
+		((ScheduleGateActivity) act).setGateEndTimeOffset(actDto.getGateEndTimeOffset());
+		((ScheduleGateActivity) act).setGateActivityCompletionBased(actDto.getGateActivityCompletionBased());
+		((ScheduleGateActivity) act).setSystemTool(systemToolDAO.getSystemToolByID(SystemTool.SCHEDULE_GATE));
+		break;
+	    case Activity.PERMISSION_GATE_ACTIVITY_TYPE:
+		((PermissionGateActivity) act).setGateActivityLevelId(actDto.getGateActivityLevelID());
+		((PermissionGateActivity) act).setGateOpen(false);
+		((PermissionGateActivity) act)
+			.setSystemTool(systemToolDAO.getSystemToolByID(SystemTool.PERMISSION_GATE));
+		break;
+	    case Activity.CONDITION_GATE_ACTIVITY_TYPE:
+		((ConditionGateActivity) act).setGateActivityLevelId(actDto.getGateActivityLevelID());
+		((ConditionGateActivity) act).setGateOpen(false);
+		((ConditionGateActivity) act)
+			.setSystemTool(systemToolDAO.getSystemToolByID(SystemTool.PERMISSION_GATE));
+		break;
+	    case Activity.PARALLEL_ACTIVITY_TYPE:
+		act.setLearningLibrary(learningLibraryDAO.getLearningLibraryById(actDto.getLearningLibraryID()));
+		break;
+	    case Activity.OPTIONS_ACTIVITY_TYPE:
+	    case Activity.OPTIONS_WITH_SEQUENCES_TYPE:
+		((OptionsActivity) act).setMaxNumberOfOptions(actDto.getMaxOptions());
+		((OptionsActivity) act).setMinNumberOfOptions(actDto.getMinOptions());
+		((OptionsActivity) act).setOptionsInstructions(actDto.getOptionsInstructions());
+		break;
+	    case Activity.SEQUENCE_ACTIVITY_TYPE:
+		break;
+	    case Activity.CHOSEN_BRANCHING_ACTIVITY_TYPE:
+		((BranchingActivity) act)
+			.setSystemTool(systemToolDAO.getSystemToolByID(SystemTool.TEACHER_CHOSEN_BRANCHING));
+		processBranchingFields((BranchingActivity) act, actDto);
+		break;
+	    case Activity.GROUP_BRANCHING_ACTIVITY_TYPE:
+		((BranchingActivity) act)
+			.setSystemTool(systemToolDAO.getSystemToolByID(SystemTool.GROUP_BASED_BRANCHING));
+		processBranchingFields((BranchingActivity) act, actDto);
+		break;
+	    case Activity.TOOL_BRANCHING_ACTIVITY_TYPE:
+		((BranchingActivity) act)
+			.setSystemTool(systemToolDAO.getSystemToolByID(SystemTool.TOOL_BASED_BRANCHING));
+		processBranchingFields((BranchingActivity) act, actDto);
+		break;
 	}
 
 	if (act.isComplexActivity() && (actDto.getDefaultActivityUIID() != null)) {

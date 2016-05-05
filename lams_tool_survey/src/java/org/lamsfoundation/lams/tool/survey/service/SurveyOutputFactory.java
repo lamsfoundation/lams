@@ -1,23 +1,23 @@
-/**************************************************************** 
- * Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org) 
- * ============================================================= 
- * License Information: http://lamsfoundation.org/licensing/lams/2.0/ 
- * 
- * This program is free software; you can redistribute it and/or modify 
- * it under the terms of the GNU General Public License version 2.0 
- * as published by the Free Software Foundation. 
- * 
- * This program is distributed in the hope that it will be useful, 
- * but WITHOUT ANY WARRANTY; without even the implied warranty of 
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the 
- * GNU General Public License for more details. 
- * 
- * You should have received a copy of the GNU General Public License 
- * along with this program; if not, write to the Free Software 
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 * USA 
- * 
- * http://www.gnu.org/licenses/gpl.txt 
- * **************************************************************** 
+/****************************************************************
+ * Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
+ * =============================================================
+ * License Information: http://lamsfoundation.org/licensing/lams/2.0/
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License version 2.0
+ * as published by the Free Software Foundation.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 * USA
+ *
+ * http://www.gnu.org/licenses/gpl.txt
+ * ****************************************************************
  */
 
 /* $Id$ */
@@ -46,7 +46,7 @@ import org.lamsfoundation.lams.tool.survey.model.SurveyUser;
 /**
  * Output factory for Survey tool. Currently it provides only one type of output - a user answers represented by an
  * array of strings (output type "OUTPUT_COMPLEX").
- * 
+ *
  * @author Marcin Cieslak
  */
 public class SurveyOutputFactory extends OutputFactory {
@@ -55,15 +55,15 @@ public class SurveyOutputFactory extends OutputFactory {
      * {@inheritDoc}
      */
     @Override
-    public SortedMap<String, ToolOutputDefinition> getToolOutputDefinitions(Object toolContentObject, int definitionType)
-	    throws ToolException {
+    public SortedMap<String, ToolOutputDefinition> getToolOutputDefinitions(Object toolContentObject,
+	    int definitionType) throws ToolException {
 	SortedMap<String, ToolOutputDefinition> definitionMap = new TreeMap<String, ToolOutputDefinition>();
 	Class stringArrayClass = new String[] {}.getClass();
 	if (toolContentObject != null) {
 	    ToolOutputDefinition allAnswersDefinition = buildComplexOutputDefinition(
 		    SurveyConstants.TEXT_SEARCH_DEFINITION_NAME, stringArrayClass);
 	    Survey survey = (Survey) toolContentObject;
-	    
+
 	    // adding all existing conditions
 	    allAnswersDefinition.setDefaultConditions(new ArrayList<BranchCondition>(survey.getConditions()));
 
@@ -76,7 +76,7 @@ public class SurveyOutputFactory extends OutputFactory {
 
     /**
      * Follows {@link QaServicePOJO#getToolOutput(List, Long, Long)}.
-     * 
+     *
      */
     public SortedMap<String, ToolOutput> getToolOutput(List<String> names, ISurveyService surveyService,
 	    Long toolSessionId, Long learnerId) {
@@ -131,7 +131,8 @@ public class SurveyOutputFactory extends OutputFactory {
 	    String[] textAnswers = null;
 	    List<String> answersList = new ArrayList<String>();
 	    SurveyUser user = surveyService.getUserByIDAndSession(learnerId, toolSessionId);
-	    List<AnswerDTO> answerDTOs = user == null ? null : surveyService.getQuestionAnswers(toolSessionId, user.getUid());
+	    List<AnswerDTO> answerDTOs = user == null ? null
+		    : surveyService.getQuestionAnswers(toolSessionId, user.getUid());
 	    if (answerDTOs != null && !answerDTOs.isEmpty()) {
 		for (AnswerDTO answerDTO : answerDTOs) {
 		    SurveyAnswer surveyAnswer = answerDTO.getAnswer();
@@ -165,9 +166,9 @@ public class SurveyOutputFactory extends OutputFactory {
 
     /**
      * Creates a default condition so teachers know how to use complex conditions for this tool.
-     * 
+     *
      * @param survey
-     *                content of the tool
+     *            content of the tool
      * @return default survey condition
      */
     protected SurveyCondition createDefaultComplexCondition(Survey survey) {
@@ -183,8 +184,8 @@ public class SurveyOutputFactory extends OutputFactory {
 	}
 	String name = buildConditionName(SurveyConstants.TEXT_SEARCH_DEFINITION_NAME, survey.getContentId().toString());
 	// Default condition checks if the first answer contains word "LAMS"
-	return new SurveyCondition(null, null, 1, name, getI18NText(
-		SurveyConstants.TEXT_SEARCH_DEFAULT_CONDITION_DISPLAY_NAME_KEY, false), "LAMS", null, null, null,
-		questions);
+	return new SurveyCondition(null, null, 1, name,
+		getI18NText(SurveyConstants.TEXT_SEARCH_DEFAULT_CONDITION_DISPLAY_NAME_KEY, false), "LAMS", null, null,
+		null, questions);
     }
 }

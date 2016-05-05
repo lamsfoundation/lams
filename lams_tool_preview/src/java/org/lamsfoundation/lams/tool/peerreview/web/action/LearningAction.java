@@ -2,21 +2,21 @@
  * Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
  * =============================================================
  * License Information: http://lamsfoundation.org/licensing/lams/2.0/
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License version 2.0 
+ * it under the terms of the GNU General Public License version 2.0
  * as published by the Free Software Foundation.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301
  * USA
- * 
+ *
  * http://www.gnu.org/licenses/gpl.txt
  * ****************************************************************
  */
@@ -110,13 +110,14 @@ public class LearningAction extends Action {
     /**
      * Read peerreview data from database and put them into HttpSession. It will redirect to init.do directly after this
      * method run successfully.
-     * 
+     *
      * This method will avoid read database again and lost un-saved resouce item lost when user "refresh page",
-     * @throws IOException 
      * 
+     * @throws IOException
+     *
      */
     private ActionForward start(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws IOException  {
+	    HttpServletResponse response) throws IOException {
 
 	IPeerreviewService service = getPeerreviewService();
 
@@ -137,7 +138,7 @@ public class LearningAction extends Action {
 	// until the user is created. The user will be created by the UserCreateThread(), which should
 	// always be run as even if this user exists, others may have been added to the lesson/group
 	// and need to be included for this user. If it is an update, the user won't see them this time
-	// but they will if they choose to refresh the activity. 
+	// but they will if they choose to refresh the activity.
 	PeerreviewUser user = null;
 	if (mode != null && mode.isTeacher()) {
 	    // monitoring mode - user is specified in URL
@@ -147,17 +148,17 @@ public class LearningAction extends Action {
 	} else {
 	    user = getCurrentUser(service, sessionId);
 	}
-	
+
 	try {
 	    Thread t = new Thread(new UserCreateThread(sessionId, service));
 	    t.start();
-	} catch ( Throwable e ) {
+	} catch (Throwable e) {
 	    throw new IOException(e);
 	}
 
 	if (user == null) {
 	    // goto refresh screen TODO create a specialised page
-	    request.setAttribute(PeerreviewConstants.ATTR_CREATING_USERS,"true"); 
+	    request.setAttribute(PeerreviewConstants.ATTR_CREATING_USERS, "true");
 	    return mapping.findForward("defineLater");
 	} else {
 	    // goto standard screen
@@ -167,38 +168,41 @@ public class LearningAction extends Action {
     }
 
     private class UserCreateThread implements Runnable {
- 	private Long toolSessionId;
- 	private IPeerreviewService service;
+	private Long toolSessionId;
+	private IPeerreviewService service;
 
- 	private Logger log = Logger.getLogger(UserCreateThread.class);
+	private Logger log = Logger.getLogger(UserCreateThread.class);
 
- 	public UserCreateThread(Long toolSessionId, IPeerreviewService service) {
- 	    this.toolSessionId = toolSessionId;
- 	    this.service = service;
- 	}
+	public UserCreateThread(Long toolSessionId, IPeerreviewService service) {
+	    this.toolSessionId = toolSessionId;
+	    this.service = service;
+	}
 
- 	public void run() {
- 	    try {
- 		service.createUsersFromLesson(toolSessionId);
- 	    } catch (Throwable e) {
- 		String message = e.getMessage() != null ? e.getMessage() : e.getClass().getName();
- 		this.log.error("Exception thrown creating Peer Review users for session "+toolSessionId+": "+message,e);
- 		e.printStackTrace();
- 	    } 
- 	}
+	@Override
+	public void run() {
+	    try {
+		service.createUsersFromLesson(toolSessionId);
+	    } catch (Throwable e) {
+		String message = e.getMessage() != null ? e.getMessage() : e.getClass().getName();
+		this.log.error(
+			"Exception thrown creating Peer Review users for session " + toolSessionId + ": " + message, e);
+		e.printStackTrace();
+	    }
+	}
     } // end Thread class
- 		
+
     /**
      * Read peerreview data from database and put them into HttpSession. It will redirect to init.do directly after this
      * method run successfully.
-     * 
+     *
      * This method will avoid read database again and lost un-saved resouce item lost when user "refresh page",
-     * @throws IOException 
      * 
+     * @throws IOException
+     *
      */
     private ActionForward startRating(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response, IPeerreviewService service, SessionMap sessionMap, Long sessionId, 
-	    PeerreviewUser user, ToolAccessMode mode) throws IOException  {
+	    HttpServletResponse response, IPeerreviewService service, SessionMap sessionMap, Long sessionId,
+	    PeerreviewUser user, ToolAccessMode mode) throws IOException {
 
 	Peerreview peerreview = service.getPeerreviewBySessionId(sessionId);
 
@@ -229,7 +233,6 @@ public class LearningAction extends Action {
 	    return mapping.findForward("defineLater");
 	}
 
-	
 	// handle rating criterias
 	boolean isCommentsEnabled = service.isCommentsEnabled(peerreview.getContentId());
 	sessionMap.put("isCommentsEnabled", isCommentsEnabled);
@@ -249,15 +252,15 @@ public class LearningAction extends Action {
 	ActivityPositionDTO activityPosition = LearningWebUtil.putActivityPositionInRequestByToolSessionId(sessionId,
 		request, getServlet().getServletContext());
 	sessionMap.put(AttributeNames.ATTR_ACTIVITY_POSITION, activityPosition);
-	
+
 	//markUser as not Finished if it's redo
 	boolean isRedo = WebUtil.readBooleanParam(request, "isRedo", false);
 	if (!mode.isTeacher() && !peerreview.getLockWhenFinished() && isRedo && user.isSessionFinished()) {
 	    user.setSessionFinished(false);
 	    service.createUser(user);
 	}
-	sessionMap.put("isDisabled", peerreview.getLockWhenFinished() && user.isSessionFinished() || (mode != null)
-		&& mode.isTeacher());
+	sessionMap.put("isDisabled",
+		peerreview.getLockWhenFinished() && user.isSessionFinished() || (mode != null) && mode.isTeacher());
 	sessionMap.put(PeerreviewConstants.ATTR_USER_FINISHED, user.isSessionFinished());
 	sessionMap.put("isSessionCompleted", user.getSession().getStatus() == PeerreviewConstants.COMPLETED);
 
@@ -283,21 +286,21 @@ public class LearningAction extends Action {
 
 	// get back SessionMap
 	String sessionMapID = request.getParameter(PeerreviewConstants.ATTR_SESSION_MAP_ID);
-	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession().getAttribute(
-		sessionMapID);
+	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
+		.getAttribute(sessionMapID);
 	request.setAttribute(PeerreviewConstants.ATTR_SESSION_MAP_ID, sessionMapID);
-	
+
 	ToolAccessMode mode = (ToolAccessMode) sessionMap.get(AttributeNames.ATTR_MODE);
 	Long sessionId = (Long) sessionMap.get(PeerreviewConstants.PARAM_TOOL_SESSION_ID);
 	Peerreview peerreview = (Peerreview) sessionMap.get(PeerreviewConstants.ATTR_PEERREVIEW);
 	PeerreviewUser user = (PeerreviewUser) sessionMap.get(PeerreviewConstants.ATTR_USER);
-	
+
 	//markUserFinished if it hasn't been done previously
 	if (!mode.isTeacher() && !user.isSessionFinished()) {
 	    service.markUserFinished(sessionId, user.getUserId());
 	    sessionMap.put(PeerreviewConstants.ATTR_USER_FINISHED, true);
 	}
-	
+
 	// ratings left by the user
 	List<Long> itemIds = new LinkedList<Long>();
 	List<PeerreviewUser> sessionUsers = service.getUsersBySession(sessionId);
@@ -307,20 +310,20 @@ public class LearningAction extends Action {
 		itemIds.add(userIter.getUserId());
 	    }
 	}
-	
+
 	//filter out not rated by user
 	List<ItemRatingDTO> itemRatingDtos = service.getRatingCriteriaDtos(peerreview.getContentId(), itemIds, false,
 		user.getUserId());
 	List<ItemRatingDTO> ratedByUser = new ArrayList<ItemRatingDTO>();
-	for (ItemRatingDTO itemRatingDto: itemRatingDtos) {
+	for (ItemRatingDTO itemRatingDto : itemRatingDtos) {
 	    boolean isRatedByUser = itemRatingDto.getCommentPostedByUser() != null;
-	    
-	    for (ItemRatingCriteriaDTO criteriaDto: itemRatingDto.getCriteriaDtos()) {
+
+	    for (ItemRatingCriteriaDTO criteriaDto : itemRatingDto.getCriteriaDtos()) {
 		if (StringUtils.isNotBlank(criteriaDto.getUserRating())) {
 		    isRatedByUser = true;
 		}
 	    }
-	    
+
 	    if (isRatedByUser) {
 		ratedByUser.add(itemRatingDto);
 	    }
@@ -328,7 +331,7 @@ public class LearningAction extends Action {
 	request.setAttribute("itemRatingDtos", ratedByUser);
 
 	// ratings left by others for this user
-	List<Long> userIdList = Collections.singletonList(user.getUserId()); 
+	List<Long> userIdList = Collections.singletonList(user.getUserId());
 	List<ItemRatingDTO> userRatingDtos = service.getRatingCriteriaDtos(peerreview.getContentId(), userIdList, true,
 		user.getUserId());
 	ItemRatingDTO userRatingDto = null;
@@ -336,7 +339,7 @@ public class LearningAction extends Action {
 	    userRatingDto = userRatingDtos.get(0);
 	}
 	request.setAttribute("itemRatingDto", userRatingDto);
-	
+
 	//user name map
 	HashMap<Long, String> userNameMap = new HashMap<Long, String>();
 	for (PeerreviewUser userIter : sessionUsers) {
@@ -346,7 +349,7 @@ public class LearningAction extends Action {
 
 	// check whether finish lock is enabled
 	sessionMap.put(PeerreviewConstants.ATTR_FINISH_LOCK, peerreview.getLockWhenFinished());
-	
+
 	// store how many items are rated
 	int countRatedUsers = service.getCountItemsRatedByUser(peerreview.getContentId(), user.getUserId().intValue());
 	sessionMap.put(AttributeNames.ATTR_COUNT_RATED_ITEMS, countRatedUsers);
@@ -363,10 +366,10 @@ public class LearningAction extends Action {
 
 	// get back SessionMap
 	String sessionMapID = request.getParameter(PeerreviewConstants.ATTR_SESSION_MAP_ID);
-	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession().getAttribute(
-		sessionMapID);
+	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
+		.getAttribute(sessionMapID);
 	Peerreview peerreview = (Peerreview) sessionMap.get(PeerreviewConstants.ATTR_PEERREVIEW);
-	
+
 	Long toolContentId = WebUtil.readLongParam(request, "toolContentId");
 	Long toolSessionId = WebUtil.readLongParam(request, "toolSessionId");
 
@@ -444,8 +447,8 @@ public class LearningAction extends Action {
 
 	    // handle comments
 	    userRow.put("commentsCriteriaId", itemRatingDto.getCommentsCriteriaId());
-	    String commentPostedByUser = itemRatingDto.getCommentPostedByUser() == null ? "" : itemRatingDto
-		    .getCommentPostedByUser().getComment();
+	    String commentPostedByUser = itemRatingDto.getCommentPostedByUser() == null ? ""
+		    : itemRatingDto.getCommentPostedByUser().getComment();
 	    userRow.put("commentPostedByUser", StringEscapeUtils.escapeCsv(commentPostedByUser));
 	    if (itemRatingDto.getCommentDtos() != null) {
 		JSONArray comments = new JSONArray();
@@ -466,7 +469,7 @@ public class LearningAction extends Action {
 
     /**
      * Finish learning session.
-     * 
+     *
      * @param mapping
      * @param form
      * @param request
@@ -478,8 +481,8 @@ public class LearningAction extends Action {
 
 	// get back SessionMap
 	String sessionMapID = request.getParameter(PeerreviewConstants.ATTR_SESSION_MAP_ID);
-	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession().getAttribute(
-		sessionMapID);
+	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
+		.getAttribute(sessionMapID);
 
 	// get mode and ToolSessionID from sessionMAP
 	Long sessionId = (Long) sessionMap.get(PeerreviewConstants.PARAM_TOOL_SESSION_ID);
@@ -503,7 +506,7 @@ public class LearningAction extends Action {
 
     /**
      * Display empty reflection form.
-     * 
+     *
      * @param mapping
      * @param form
      * @param request
@@ -540,7 +543,7 @@ public class LearningAction extends Action {
 
     /**
      * Submit reflection form input database.
-     * 
+     *
      * @param mapping
      * @param form
      * @param request
@@ -553,8 +556,8 @@ public class LearningAction extends Action {
 	Integer userId = refForm.getUserID();
 
 	String sessionMapID = WebUtil.readStrParam(request, PeerreviewConstants.ATTR_SESSION_MAP_ID);
-	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession().getAttribute(
-		sessionMapID);
+	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
+		.getAttribute(sessionMapID);
 	Long sessionId = (Long) sessionMap.get(PeerreviewConstants.PARAM_TOOL_SESSION_ID);
 
 	IPeerreviewService service = getPeerreviewService();
@@ -582,8 +585,8 @@ public class LearningAction extends Action {
     // *************************************************************************************
 
     private IPeerreviewService getPeerreviewService() {
-	WebApplicationContext wac = WebApplicationContextUtils.getRequiredWebApplicationContext(getServlet()
-		.getServletContext());
+	WebApplicationContext wac = WebApplicationContextUtils
+		.getRequiredWebApplicationContext(getServlet().getServletContext());
 	return (IPeerreviewService) wac.getBean(PeerreviewConstants.PEERREVIEW_SERVICE);
     }
 

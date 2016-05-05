@@ -2,21 +2,21 @@
  * Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
  * =============================================================
  * License Information: http://lamsfoundation.org/licensing/lams/2.0/
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License version 2.0 
+ * it under the terms of the GNU General Public License version 2.0
  * as published by the Free Software Foundation.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301
  * USA
- * 
+ *
  * http://www.gnu.org/licenses/gpl.txt
  * ****************************************************************
  */
@@ -65,15 +65,16 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
 
 /**
  * *
- * 
  *
  *
  *
  *
  *
  *
- * 
+ *
+ *
  * Import tool content servlet. It needs an uploaded learning design zip file.
+ *
  * @author Steve.Ni
  */
 public class ImportToolContentAction extends LamsAction {
@@ -122,7 +123,7 @@ public class ImportToolContentAction extends LamsAction {
 	    return mapping.findForward("importLC");
 	} else if (StringUtils.equals(param, "importLCFinish")) {
 
-	    // uploading the file from lams commmunity, have to feed the 
+	    // uploading the file from lams commmunity, have to feed the
 	    // location from the request
 	    String learningDesignLocation = WebUtil.readStrParam(request, PARAM_LEARNING_DESIGN_LOCATION);
 
@@ -169,16 +170,16 @@ public class ImportToolContentAction extends LamsAction {
 	    while (iter.hasNext()) {
 		FileItem fi = (FileItem) iter.next();
 		//UPLOAD_FILE is input field from HTML page
-		if (!fi.getFieldName().equalsIgnoreCase("UPLOAD_FILE"))
+		if (!fi.getFieldName().equalsIgnoreCase("UPLOAD_FILE")) {
 		    params.put(fi.getFieldName(), fi.getString());
-		else {
+		} else {
 		    // filename on the client
 		    filename = FileUtil.getFileName(fi.getName());
 		    designFile = new File(uploadPath + filename);
 		    fi.write(designFile);
 
 		}
-		workspaceFolderUid = NumberUtils.createInteger((String) params.get("WORKSPACE_FOLDER_UID"));
+		workspaceFolderUid = NumberUtils.createInteger(params.get("WORKSPACE_FOLDER_UID"));
 	    }
 
 	    // get customCSV for tool adapters if it was an external LMS request
@@ -222,7 +223,7 @@ public class ImportToolContentAction extends LamsAction {
 
     /**
      * Import a LD from a url.
-     * 
+     *
      * @param request
      */
     @SuppressWarnings("unchecked")
@@ -310,20 +311,20 @@ public class ImportToolContentAction extends LamsAction {
     // Private method
     //***************************************************************************************
     private IUserManagementService getUserService() {
-	WebApplicationContext webContext = WebApplicationContextUtils.getRequiredWebApplicationContext(this
-		.getServlet().getServletContext());
+	WebApplicationContext webContext = WebApplicationContextUtils
+		.getRequiredWebApplicationContext(this.getServlet().getServletContext());
 	return (IUserManagementService) webContext.getBean(USER_SERVICE_BEAN_NAME);
     }
 
     private IExportToolContentService getExportService() {
-	WebApplicationContext webContext = WebApplicationContextUtils.getRequiredWebApplicationContext(this
-		.getServlet().getServletContext());
+	WebApplicationContext webContext = WebApplicationContextUtils
+		.getRequiredWebApplicationContext(this.getServlet().getServletContext());
 	return (IExportToolContentService) webContext.getBean(EXPORT_TOOLCONTENT_SERVICE_BEAN_NAME);
     }
 
     private MessageService getMessageService() {
-	WebApplicationContext webContext = WebApplicationContextUtils.getRequiredWebApplicationContext(this
-		.getServlet().getServletContext());
+	WebApplicationContext webContext = WebApplicationContextUtils
+		.getRequiredWebApplicationContext(this.getServlet().getServletContext());
 	return (MessageService) webContext.getBean(MESSAGE_SERVICE_BEAN_NAME);
     }
 

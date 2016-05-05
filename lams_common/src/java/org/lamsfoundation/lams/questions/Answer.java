@@ -25,7 +25,6 @@ package org.lamsfoundation.lams.questions;
 
 import org.apache.commons.lang.builder.HashCodeBuilder;
 
-
 public class Answer {
     private String text;
     private String feedback;

@@ -39,7 +39,7 @@ public interface ILdapService {
 
     /**
      * Updates a LAMS user's profile with LDAP attributes.
-     * 
+     *
      * @param user
      * @param attrs
      */
@@ -47,7 +47,7 @@ public interface ILdapService {
 
     /**
      * Creates a LAMS user from LDAP attributes. Returns false on failure.
-     * 
+     *
      * @param attrs
      * @return boolean
      */
@@ -56,7 +56,7 @@ public interface ILdapService {
     /**
      * Returns LDAP attribute name, removing prefixed '!' char if necessary, which is used to toggle the
      * enabled/disabled meaning of the ldap attribute.
-     * 
+     *
      * @param ldapAttr
      * @return ldapAttr
      */
@@ -66,7 +66,7 @@ public interface ILdapService {
 
     /**
      * Convert the LDAP disabled attribute value string to a boolean.
-     * 
+     *
      * @param attrs
      * @return boolean
      */
@@ -75,7 +75,7 @@ public interface ILdapService {
     /**
      * Adds user to organisation with roles specified by the LDAPOrgField, LDAPOrgAttr, LDAPRolesAttr attributes.
      * Returns false if it can't do one of these tasks.
-     * 
+     *
      * @param attrs
      * @param userId
      * @return boolean
@@ -84,7 +84,7 @@ public interface ILdapService {
 
     /**
      * Bulk updates LAMS with LDAP users.
-     * 
+     *
      * @return stats on result of bulk update.
      */
     public BulkUpdateResultDTO bulkUpdate();

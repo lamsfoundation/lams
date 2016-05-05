@@ -2,21 +2,21 @@
  * Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
  * =============================================================
  * License Information: http://lamsfoundation.org/licensing/lams/2.0/
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301
  * USA
- * 
+ *
  * http://www.gnu.org/licenses/gpl.txt
  * ****************************************************************
  */
@@ -38,29 +38,29 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
  * service layer. Therefore we can feel free to switch the business logic
  * implementation.
  * </p>
- * 
+ *
  * @author Ozgur Demirtas
- * 
+ *
  */
 public class QaServiceProxy {
     /**
      * Return the q/a domain service object. It will delegate to the Spring
      * helper method to retrieve the proper bean from Spring bean factory.
-     * 
+     *
      * @param servletContext
-     *                the servletContext for current application
+     *            the servletContext for current application
      * @return qaService object.
      */
     public static final IQaService getQaService(ServletContext servletContext) {
-	return (IQaService) getQaDomainService(servletContext);
+	return (IQaService) QaServiceProxy.getQaDomainService(servletContext);
     }
 
     public static final ToolSessionManager getQaSessionManager(ServletContext servletContext) {
-	return (ToolSessionManager) getQaDomainService(servletContext);
+	return (ToolSessionManager) QaServiceProxy.getQaDomainService(servletContext);
     }
 
     public static final ToolContentManager getQaContentManager(ServletContext servletContext) {
-	return (ToolContentManager) getQaDomainService(servletContext);
+	return (ToolContentManager) QaServiceProxy.getQaDomainService(servletContext);
     }
 
     private static Object getQaDomainService(ServletContext servletContext) {

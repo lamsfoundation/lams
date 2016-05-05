@@ -41,7 +41,7 @@ import com.tacitknowledge.util.migration.jdbc.DataSourceMigrationContext;
 
 /**
  * @author jliew
- * 
+ *
  *         Fix workspace folder names for groups that have been renamed -
  *         LDEV1447.
  */
@@ -69,6 +69,7 @@ public class Patch0012FixWorkspaceNames extends MigrationTaskSupport {
 	setName(NAME);
     }
 
+    @Override
     public void migrate(MigrationContext context) throws MigrationException {
 
 	// using data source defined in application container

@@ -1,23 +1,23 @@
-/**************************************************************** 
- * Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org) 
- * ============================================================= 
- * License Information: http://lamsfoundation.org/licensing/lams/2.0/ 
- * 
- * This program is free software; you can redistribute it and/or modify 
- * it under the terms of the GNU General Public License version 2.0 
- * as published by the Free Software Foundation. 
- * 
- * This program is distributed in the hope that it will be useful, 
- * but WITHOUT ANY WARRANTY; without even the implied warranty of 
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the 
- * GNU General Public License for more details. 
- * 
- * You should have received a copy of the GNU General Public License 
- * along with this program; if not, write to the Free Software 
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 * USA 
- * 
- * http://www.gnu.org/licenses/gpl.txt 
- * **************************************************************** 
+/****************************************************************
+ * Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
+ * =============================================================
+ * License Information: http://lamsfoundation.org/licensing/lams/2.0/
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License version 2.0
+ * as published by the Free Software Foundation.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 * USA
+ *
+ * http://www.gnu.org/licenses/gpl.txt
+ * ****************************************************************
  */
 
 /* $Id$ */
@@ -46,9 +46,9 @@ import org.xml.sax.SAXException;
 /**
  * SimpleContentPackageConverter contains the code required for parsing the IMS Content Package and converting the info
  * into our own structures.
- * 
+ *
  * Note: this class has instance data, so do not use it as a singleton.
- * 
+ *
  * @author Fiona Malikoff, Marcin Cieslak
  */
 public class SimpleCommonCartridgeConverter {
@@ -89,7 +89,7 @@ public class SimpleCommonCartridgeConverter {
     /**
      * Set up a package converter, using the supplied directory as the package. The package should be parsed
      * automatically and the values readied for calls to getSchema(), getTitle(), etc.
-     * 
+     *
      * @param directoryName
      *            : directory containing an expanded IMS content package.
      * @throws IOException
@@ -104,7 +104,7 @@ public class SimpleCommonCartridgeConverter {
     /**
      * Parse IMS content package expanded out into the supplied directory. Note: the manifest file is expected to be in
      * the root of the supplied directory.
-     * 
+     *
      * @throws ImscpApplicationException
      * @throws IMSManifestException
      */

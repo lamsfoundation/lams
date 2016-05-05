@@ -2,21 +2,21 @@
  * Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
  * =============================================================
  * License Information: http://lamsfoundation.org/licensing/lams/2.0/
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301
  * USA
- * 
+ *
  * http://www.gnu.org/licenses/gpl.txt
  * ****************************************************************
  */
@@ -39,14 +39,14 @@ import org.lamsfoundation.lams.tool.rsrc.model.ResourceUser;
 
 /**
  * @author Dapeng.Ni
- * 
+ *
  *         Interface that defines the contract that all ShareResource service provider must follow.
  */
 public interface IResourceService {
 
     /**
      * Get file <code>IVersiondNode</code> by given package id and path.
-     * 
+     *
      * @param packageId
      * @param relPathString
      * @return
@@ -56,7 +56,7 @@ public interface IResourceService {
 
     /**
      * Get <code>Resource</code> by toolContentID.
-     * 
+     *
      * @param contentId
      * @return
      */
@@ -65,7 +65,7 @@ public interface IResourceService {
     /**
      * Get a cloned copy of tool default tool content (Resource) and assign the toolContentId of that copy as the given
      * <code>contentId</code>
-     * 
+     *
      * @param contentId
      * @return
      * @throws ResourceApplicationException
@@ -74,7 +74,7 @@ public interface IResourceService {
 
     /**
      * Get list of resource items by given resourceUid. These resource items must be created by author.
-     * 
+     *
      * @param resourceUid
      * @return
      */
@@ -82,7 +82,7 @@ public interface IResourceService {
 
     /**
      * Upload resource item file to repository. i.e., single file, websize zip file, or learning object zip file.
-     * 
+     *
      * @param item
      * @param file
      * @throws UploadResourceFileException
@@ -97,7 +97,7 @@ public interface IResourceService {
 
     /**
      * Get user by given userID and toolContentID.
-     * 
+     *
      * @param long1
      * @return
      */
@@ -105,7 +105,7 @@ public interface IResourceService {
 
     /**
      * Get user by sessionID and UserID
-     * 
+     *
      * @param long1
      * @param sessionId
      * @return
@@ -120,21 +120,21 @@ public interface IResourceService {
 
     /**
      * Save or update resource into database.
-     * 
+     *
      * @param Resource
      */
     void saveOrUpdateResource(Resource Resource);
 
     /**
      * Delete resoruce item from database.
-     * 
+     *
      * @param uid
      */
     void deleteResourceItem(Long uid);
 
     /**
      * Return all reource items within the given toolSessionID.
-     * 
+     *
      * @param sessionId
      * @return
      */
@@ -142,7 +142,7 @@ public interface IResourceService {
 
     /**
      * Get resource which is relative with the special toolSession.
-     * 
+     *
      * @param sessionId
      * @return
      */
@@ -150,7 +150,7 @@ public interface IResourceService {
 
     /**
      * Get resource toolSession by toolSessionId
-     * 
+     *
      * @param sessionId
      * @return
      */
@@ -158,7 +158,7 @@ public interface IResourceService {
 
     /**
      * Save or update resource session.
-     * 
+     *
      * @param resSession
      */
     void saveOrUpdateResourceSession(ResourceSession resSession);
@@ -171,7 +171,7 @@ public interface IResourceService {
 
     /**
      * the reqired number minus the count of view of the given user.
-     * 
+     *
      * @param userUid
      * @return
      */
@@ -179,7 +179,7 @@ public interface IResourceService {
 
     /**
      * If success return next activity's url, otherwise return null.
-     * 
+     *
      * @param toolSessionId
      * @param userId
      * @return
@@ -190,7 +190,7 @@ public interface IResourceService {
 
     /**
      * Return monitoring summary list. The return value is list of resource summaries for each groups.
-     * 
+     *
      * @param contentId
      * @return
      */
@@ -205,7 +205,7 @@ public interface IResourceService {
 
     /**
      * Set a resource item visible or not.
-     * 
+     *
      * @param itemUid
      * @param visible
      *            true, item is visible. False, item is invisible.
@@ -214,7 +214,7 @@ public interface IResourceService {
 
     /**
      * Create refection entry into notebook tool.
-     * 
+     *
      * @param sessionId
      * @param notebook_tool
      * @param tool_signature
@@ -226,7 +226,7 @@ public interface IResourceService {
 
     /**
      * Get reflection entry from notebook tool.
-     * 
+     *
      * @param sessionId
      * @param idType
      * @param signature
@@ -242,7 +242,7 @@ public interface IResourceService {
 
     /**
      * Get Reflect DTO list.
-     * 
+     *
      * @param contentId
      * @return
      */
@@ -250,7 +250,7 @@ public interface IResourceService {
 
     /**
      * Get user by UID
-     * 
+     *
      * @param uid
      * @return
      */
@@ -263,7 +263,7 @@ public interface IResourceService {
 
     /**
      * Returns whether activity is grouped and therefore it is expected more than one tool session.
-     * 
+     *
      * @param toolContentID
      * @return
      */

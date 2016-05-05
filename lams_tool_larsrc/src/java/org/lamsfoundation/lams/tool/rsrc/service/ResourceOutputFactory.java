@@ -1,23 +1,23 @@
-/**************************************************************** 
- * Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org) 
- * ============================================================= 
- * License Information: http://lamsfoundation.org/licensing/lams/2.0/ 
- * 
- * This program is free software; you can redistribute it and/or modify 
- * it under the terms of the GNU General Public License version 2.0 
- * as published by the Free Software Foundation. 
- * 
- * This program is distributed in the hope that it will be useful, 
- * but WITHOUT ANY WARRANTY; without even the implied warranty of 
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the 
- * GNU General Public License for more details. 
- * 
- * You should have received a copy of the GNU General Public License 
- * along with this program; if not, write to the Free Software 
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 * USA 
- * 
- * http://www.gnu.org/licenses/gpl.txt 
- * **************************************************************** 
+/****************************************************************
+ * Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
+ * =============================================================
+ * License Information: http://lamsfoundation.org/licensing/lams/2.0/
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License version 2.0
+ * as published by the Free Software Foundation.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 * USA
+ *
+ * http://www.gnu.org/licenses/gpl.txt
+ * ****************************************************************
  */
 
 /* $Id$ */
@@ -45,25 +45,25 @@ public class ResourceOutputFactory extends OutputFactory {
      * {@inheritDoc}
      */
     @Override
-    public SortedMap<String, ToolOutputDefinition> getToolOutputDefinitions(Object toolContentObject, int definitionType)
-	    throws ToolException {
+    public SortedMap<String, ToolOutputDefinition> getToolOutputDefinitions(Object toolContentObject,
+	    int definitionType) throws ToolException {
 	TreeMap<String, ToolOutputDefinition> definitionMap = new TreeMap<String, ToolOutputDefinition>();
 	Class simpleUrlArrayClass = SimpleURL[].class;
 	switch (definitionType) {
-	case ToolOutputDefinition.DATA_OUTPUT_DEFINITION_TYPE_CONDITION:
-	    break;
-	case ToolOutputDefinition.DATA_OUTPUT_DEFINITION_TYPE_DATA_FLOW:
-	    ToolOutputDefinition sharedItemsDefinition = buildComplexOutputDefinition(
-		    ResourceConstants.SHARED_ITEMS_DEFINITION_NAME, simpleUrlArrayClass);
-	    definitionMap.put(ResourceConstants.SHARED_ITEMS_DEFINITION_NAME, sharedItemsDefinition);
-	    break;
+	    case ToolOutputDefinition.DATA_OUTPUT_DEFINITION_TYPE_CONDITION:
+		break;
+	    case ToolOutputDefinition.DATA_OUTPUT_DEFINITION_TYPE_DATA_FLOW:
+		ToolOutputDefinition sharedItemsDefinition = buildComplexOutputDefinition(
+			ResourceConstants.SHARED_ITEMS_DEFINITION_NAME, simpleUrlArrayClass);
+		definitionMap.put(ResourceConstants.SHARED_ITEMS_DEFINITION_NAME, sharedItemsDefinition);
+		break;
 	}
 	return definitionMap;
     }
 
     /**
      * Follows {@link PixlrService#getToolOutput(List, Long, Long)}.
-     * 
+     *
      */
     public SortedMap<String, ToolOutput> getToolOutput(List<String> names, IResourceService resourceService,
 	    Long toolSessionId, Long learnerId) {
@@ -112,8 +112,8 @@ public class ResourceOutputFactory extends OutputFactory {
 
 			String path = uploadedItem.getUrl();
 			if (path == null) {
-			    path = serverUrl + "download/?uuid=" + uploadedItem.getFileUuid()
-				    + "&preferDownload=false&" + AttributeNames.PARAM_TOOL_CONTENT_HANDLER_NAME + "="
+			    path = serverUrl + "download/?uuid=" + uploadedItem.getFileUuid() + "&preferDownload=false&"
+				    + AttributeNames.PARAM_TOOL_CONTENT_HANDLER_NAME + "="
 				    + ResourceConstants.TOOL_CONTENT_HANDLER_NAME;
 
 			}
@@ -123,8 +123,8 @@ public class ResourceOutputFactory extends OutputFactory {
 			uploadedItemUrls[uploadedItemIndex] = url;
 			uploadedItemIndex++;
 		    }
-		    return new ToolOutput(ResourceConstants.SHARED_ITEMS_DEFINITION_NAME, getI18NText(
-			    ResourceConstants.SHARED_ITEMS_DEFINITION_NAME, true), uploadedItemUrls, false);
+		    return new ToolOutput(ResourceConstants.SHARED_ITEMS_DEFINITION_NAME,
+			    getI18NText(ResourceConstants.SHARED_ITEMS_DEFINITION_NAME, true), uploadedItemUrls, false);
 		}
 
 	    }

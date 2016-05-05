@@ -2,21 +2,21 @@
  * Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
  * =============================================================
  * License Information: http://lamsfoundation.org/licensing/lams/2.0/
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301
  * USA
- * 
+ *
  * http://www.gnu.org/licenses/gpl.txt
  * ****************************************************************
  */
@@ -31,7 +31,7 @@ import org.apache.commons.lang.builder.ToStringBuilder;
  * <p>
  * DTO that holds reflections from users
  * </p>
- * 
+ *
  * @author Ozgur Demirtas
  */
 public class ReflectionDTO implements Comparable {
@@ -44,21 +44,25 @@ public class ReflectionDTO implements Comparable {
     protected String reflectionUid;
 
     protected String entry;
-    
+
     protected Date date;
 
+    @Override
     public int compareTo(Object o) {
 	ReflectionDTO reflectionDTO = (ReflectionDTO) o;
 
-	if (reflectionDTO == null)
+	if (reflectionDTO == null) {
 	    return 1;
-	else
+	} else {
 	    return 0;
+	}
     }
 
+    @Override
     public String toString() {
-	return new ToStringBuilder(this).append("userName: ", userName).append("userId: ", userId).append(
-		"sessionId: ", sessionId).append("reflectionUid: ", reflectionUid).append("entry: ", entry).toString();
+	return new ToStringBuilder(this).append("userName: ", userName).append("userId: ", userId)
+		.append("sessionId: ", sessionId).append("reflectionUid: ", reflectionUid).append("entry: ", entry)
+		.toString();
     }
 
     /**
@@ -70,7 +74,7 @@ public class ReflectionDTO implements Comparable {
 
     /**
      * @param entry
-     *                The entry to set.
+     *            The entry to set.
      */
     public void setEntry(String entry) {
 	this.entry = entry;
@@ -85,7 +89,7 @@ public class ReflectionDTO implements Comparable {
 
     /**
      * @param sessionId
-     *                The sessionId to set.
+     *            The sessionId to set.
      */
     public void setSessionId(String sessionId) {
 	this.sessionId = sessionId;
@@ -100,7 +104,7 @@ public class ReflectionDTO implements Comparable {
 
     /**
      * @param reflectionUid
-     *                The reflectionUid to set.
+     *            The reflectionUid to set.
      */
     public void setReflectionUid(String reflectionUid) {
 	this.reflectionUid = reflectionUid;
@@ -115,7 +119,7 @@ public class ReflectionDTO implements Comparable {
 
     /**
      * @param userId
-     *                The userId to set.
+     *            The userId to set.
      */
     public void setUserId(String userId) {
 	this.userId = userId;
@@ -130,12 +134,12 @@ public class ReflectionDTO implements Comparable {
 
     /**
      * @param userName
-     *                The userName to set.
+     *            The userName to set.
      */
     public void setUserName(String userName) {
 	this.userName = userName;
     }
-    
+
     public Date getDate() {
 	return date;
     }

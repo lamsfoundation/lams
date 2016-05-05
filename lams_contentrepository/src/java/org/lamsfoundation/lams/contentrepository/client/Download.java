@@ -2,21 +2,21 @@
  * Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
  * =============================================================
  * License Information: http://lamsfoundation.org/licensing/lams/2.0/
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License version 2.0 
+ * it under the terms of the GNU General Public License version 2.0
  * as published by the Free Software Foundation.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301
  * USA
- * 
+ *
  * http://www.gnu.org/licenses/gpl.txt
  * ****************************************************************
  */
@@ -70,7 +70,7 @@ import org.lamsfoundation.lams.web.util.AttributeNames;
  * This is an abstract class, to allow other modules to customise the repository access. To implement, you must
  * implement getTicket() and getRepositoryService(). If you are using ToolContentHandler, then you can use ToolDownload,
  * which is a concrete implementation of this class using the ToolContentHandler.
- * 
+ *
  * @author Fiona Malikoff
  * @see org.lamsfoundation.lams.contentrepository.client.ToolDownload
  */
@@ -80,10 +80,10 @@ import org.lamsfoundation.lams.web.util.AttributeNames;
  * package - or by using the property in the node that specifies the path to the first file and go back to the
  * repository and get that node. In a roundabout way, this servlet uses the second method - it redirects to the path for
  * the first file.
- * 
+ *
  * method 1: the package node returns a stream which is the first file. InputStream = node.getFile(); set up any header
  * variables <set up any header variables>
- * 
+ *
  * method 2: get initial path node and download that IValue value = node.getProperty(PropertyName.INITIALPATH); String
  * initialPath = value != null ? value.getString() : null; IVersionedNode childNode =
  * getRepository().getFileItem(ticket,uuid, initialPath, null); InputStream = node.getFile(); <set up any header
@@ -112,17 +112,17 @@ public abstract class Download extends HttpServlet {
 
     /**
      * The doGet method of the servlet. <br>
-     * 
+     *
      * This method is called when a form has its tag value method equals to get.
-     * 
+     *
      * @param request
-     *                the request send by the client to the server
+     *            the request send by the client to the server
      * @param response
-     *                the response send by the server to the client
+     *            the response send by the server to the client
      * @throws ServletException
-     *                 if an error occurred
+     *             if an error occurred
      * @throws IOException
-     *                 if an error occurred
+     *             if an error occurred
      */
     @Override
     public void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
@@ -136,8 +136,8 @@ public abstract class Download extends HttpServlet {
 	}
     }
 
-    private void handleCall(HttpServletRequest request, HttpServletResponse response) throws ServletException,
-	    IOException, RepositoryCheckedException {
+    private void handleCall(HttpServletRequest request, HttpServletResponse response)
+	    throws ServletException, IOException, RepositoryCheckedException {
 
 	long start = System.currentTimeMillis();
 
@@ -153,15 +153,15 @@ public abstract class Download extends HttpServlet {
 	    throw new RepositoryCheckedException("Unable to get ticket - getTicket(false) returned null");
 	}
 
-	Long uuid = getLong(request.getParameter(Download.UUID_NAME));
+	Long uuid = Download.getLong(request.getParameter(Download.UUID_NAME));
 	Long version = null;
-	boolean saveFile = getBoolean(request.getParameter(Download.PREFER_DOWNLOAD));
+	boolean saveFile = Download.getBoolean(request.getParameter(Download.PREFER_DOWNLOAD));
 
 	String callId = null;
 
 	if (uuid != null) {
 
-	    version = getLong(request.getParameter(Download.VERSION_NAME));
+	    version = Download.getLong(request.getParameter(Download.VERSION_NAME));
 
 	    IVersionedNode node = getFileItem(ticket, uuid, version, null);
 
@@ -174,8 +174,8 @@ public abstract class Download extends HttpServlet {
 		IValue value = node.getProperty(PropertyName.INITIALPATH);
 		String initialPage = value != null ? value.getString() : null;
 		if (initialPage == null || initialPage.length() == 0) {
-		    throw new RepositoryCheckedException("No initial page found for this set of content. Node Data is "
-			    + node.toString());
+		    throw new RepositoryCheckedException(
+			    "No initial page found for this set of content. Node Data is " + node.toString());
 		}
 
 		// redirect to the initial path
@@ -192,8 +192,8 @@ public abstract class Download extends HttpServlet {
 		handleFileNode(response, request, node, saveFile);
 
 	    } else {
-		throw new RepositoryCheckedException("Unsupported node type " + node.getNodeType() + ". Node Data is "
-			+ node.toString(), null);
+		throw new RepositoryCheckedException(
+			"Unsupported node type " + node.getNodeType() + ". Node Data is " + node.toString(), null);
 	    }
 
 	} else {
@@ -201,8 +201,8 @@ public abstract class Download extends HttpServlet {
 	    // using the /download/<id>/<filename> format - must be a file node!
 	    String pathString = request.getPathInfo();
 	    String[] strings = deriveIdFile(pathString);
-	    uuid = getLong(strings[0]);
-	    version = getLong(strings[1]);
+	    uuid = Download.getLong(strings[0]);
+	    version = Download.getLong(strings[1]);
 	    String relPathString = strings[2];
 
 	    callId = "download " + Math.random() + " " + uuid;
@@ -221,8 +221,8 @@ public abstract class Download extends HttpServlet {
 
 	    IVersionedNode node = getFileItem(ticket, uuid, version, relPathString);
 	    if (!node.isNodeType(NodeType.FILENODE)) {
-		throw new RepositoryCheckedException("Unexpected type of node " + node.getNodeType()
-			+ " Expected File node. Data is " + node);
+		throw new RepositoryCheckedException(
+			"Unexpected type of node " + node.getNodeType() + " Expected File node. Data is " + node);
 	    }
 	    handleFileNode(response, request, node, saveFile);
 
@@ -350,17 +350,17 @@ public abstract class Download extends HttpServlet {
 
     /**
      * The doPost method of the servlet. <br>
-     * 
+     *
      * This method is called when a form has its tag value method equals to post.
-     * 
+     *
      * @param request
-     *                the request send by the client to the server
+     *            the request send by the client to the server
      * @param response
-     *                the response send by the server to the client
+     *            the response send by the server to the client
      * @throws ServletException
-     *                 if an error occurred
+     *             if an error occurred
      * @throws IOException
-     *                 if an error occurred
+     *             if an error occurred
      */
     @Override
     public void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {

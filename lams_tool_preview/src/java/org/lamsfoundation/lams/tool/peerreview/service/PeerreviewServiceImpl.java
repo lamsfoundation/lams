@@ -2,21 +2,21 @@
  * Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
  * =============================================================
  * License Information: http://lamsfoundation.org/licensing/lams/2.0/
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301
  * USA
- * 
+ *
  * http://www.gnu.org/licenses/gpl.txt
  * ****************************************************************
  */
@@ -31,7 +31,6 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.SortedMap;
 import java.util.SortedSet;
 import java.util.TreeMap;
@@ -323,10 +322,10 @@ public class PeerreviewServiceImpl
 	    int numberPotentialLearners = toolService.getCountUsersForActivity(toolSessionId);
 	    int numberActualLearners = peerreviewUserDao.getCountUsersBySession(toolSessionId);
 	    int numUsersCreated = 0;
-	    if ( numberActualLearners != numberPotentialLearners ) {
+	    if (numberActualLearners != numberPotentialLearners) {
 		numUsersCreated = peerreviewUserDao.createUsersForSession(session);
 	    }
-	    
+
 //	    log.debug("Peer Review UserCreateThread " + toolSessionId + ": numUsersCreated "+numUsersCreated+" took: "
 //	    	    + (System.currentTimeMillis() - start) + "ms.");
 
@@ -397,7 +396,7 @@ public class PeerreviewServiceImpl
 	if (toolContentObj == null) {
 	    throw new DataMissingException("Unable to find default content for the peerreview tool");
 	}
-	
+
 	// don't export following fields
 	for (LearnerItemRatingCriteria criteria : toolContentObj.getRatingCriterias()) {
 	    criteria.setToolContentId(null);
