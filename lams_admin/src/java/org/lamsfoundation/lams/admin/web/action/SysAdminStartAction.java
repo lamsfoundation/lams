@@ -44,49 +44,47 @@ import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
  *
  */
 public class SysAdminStartAction extends Action {
-	
-	private static IUserManagementService service;
-	
-	public ActionForward execute(ActionMapping mapping,
-            ActionForm form,
-            HttpServletRequest request,
-            HttpServletResponse response) throws Exception {
-		
-		service = AdminServiceProxy.getService(getServlet().getServletContext());
-		
-		ArrayList<LinkBean> links = new ArrayList<LinkBean>();
-		if (request.isUserInRole(Role.SYSADMIN)) {
-			links.add(new LinkBean("cleanup.do", "sysadmin.batch.temp.file.delete"));
-			links.add(new LinkBean("config.do", "sysadmin.config.settings.edit"));
-			links.add(new LinkBean("toolcontentlist.do", "sysadmin.tool.management"));
-			links.add(new LinkBean("usersearch.do", "admin.user.find"));
-			links.add(new LinkBean("importgroups.do", "sysadmin.import.groups.title"));
-			links.add(new LinkBean("importexcel.do", "admin.user.import"));
-			links.add(new LinkBean("ldap.do", "sysadmin.ldap.configuration"));
-			links.add(new LinkBean("disabledmanage.do", "admin.list.disabled.users"));
-			links.add(new LinkBean("loginmaintain.do", "sysadmin.maintain.loginpage"));
-			links.add(new LinkBean("serverlist.do", "sysadmin.maintain.external.servers"));
-			links.add(new LinkBean("register.do", "sysadmin.register.server"));
-			links.add(new LinkBean("statistics.do", "admin.statistics.title"));
-			links.add(new LinkBean("signupManagement.do", "admin.signup.title"));
-			links.add(new LinkBean("themeManagement.do", "admin.themes.title"));
-			links.add(new LinkBean("timezonemanagement.do", "admin.timezone.title"));
-		} else if (service.isUserGlobalGroupAdmin()) {
-			LinkBean linkBean = new LinkBean("usersearch.do", "admin.user.find");
-			links.add(linkBean);
-			links.add(new LinkBean("importgroups.do", "sysadmin.import.groups.title"));
-			links.add(new LinkBean("importexcel.do", "admin.user.import"));
-			links.add(new LinkBean("disabledmanage.do", "admin.list.disabled.users"));
-		} else {
-			request.setAttribute("errorName", "SysAdminStartAction");
-			request.setAttribute("errorMessage", AdminServiceProxy
-					.getMessageService(getServlet().getServletContext())
-					.getMessage("error.authorisation"));
-			return mapping.findForward("error");
-		}
-		
-		request.setAttribute("links", links);
-		return mapping.findForward("sysadmin");
+
+    private static IUserManagementService service;
+
+    @Override
+    public ActionForward execute(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+	    HttpServletResponse response) throws Exception {
+
+	service = AdminServiceProxy.getService(getServlet().getServletContext());
+
+	ArrayList<LinkBean> links = new ArrayList<LinkBean>();
+	if (request.isUserInRole(Role.SYSADMIN)) {
+	    links.add(new LinkBean("cleanup.do", "sysadmin.batch.temp.file.delete"));
+	    links.add(new LinkBean("config.do", "sysadmin.config.settings.edit"));
+	    links.add(new LinkBean("toolcontentlist.do", "sysadmin.tool.management"));
+	    links.add(new LinkBean("usersearch.do", "admin.user.find"));
+	    links.add(new LinkBean("importgroups.do", "sysadmin.import.groups.title"));
+	    links.add(new LinkBean("importexcel.do", "admin.user.import"));
+	    links.add(new LinkBean("ldap.do", "sysadmin.ldap.configuration"));
+	    links.add(new LinkBean("disabledmanage.do", "admin.list.disabled.users"));
+	    links.add(new LinkBean("loginmaintain.do", "sysadmin.maintain.loginpage"));
+	    links.add(new LinkBean("serverlist.do", "sysadmin.maintain.external.servers"));
+	    links.add(new LinkBean("register.do", "sysadmin.register.server"));
+	    links.add(new LinkBean("statistics.do", "admin.statistics.title"));
+	    links.add(new LinkBean("signupManagement.do", "admin.signup.title"));
+	    links.add(new LinkBean("themeManagement.do", "admin.themes.title"));
+	    links.add(new LinkBean("timezonemanagement.do", "admin.timezone.title"));
+	} else if (service.isUserGlobalGroupAdmin()) {
+	    LinkBean linkBean = new LinkBean("usersearch.do", "admin.user.find");
+	    links.add(linkBean);
+	    links.add(new LinkBean("importgroups.do", "sysadmin.import.groups.title"));
+	    links.add(new LinkBean("importexcel.do", "admin.user.import"));
+	    links.add(new LinkBean("disabledmanage.do", "admin.list.disabled.users"));
+	} else {
+	    request.setAttribute("errorName", "SysAdminStartAction");
+	    request.setAttribute("errorMessage", AdminServiceProxy.getMessageService(getServlet().getServletContext())
+		    .getMessage("error.authorisation"));
+	    return mapping.findForward("error");
 	}
+
+	request.setAttribute("links", links);
+	return mapping.findForward("sysadmin");
+    }
 
 }

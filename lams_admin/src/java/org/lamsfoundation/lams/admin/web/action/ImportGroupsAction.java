@@ -39,41 +39,40 @@ import org.lamsfoundation.lams.admin.web.ImportExcelForm;
 
 /**
  * @author jliew
- * 
  *
  *
  *
  *
- * 
+ *
+ *
  *
  *
  *
  */
 public class ImportGroupsAction extends Action {
-	
-	public ActionForward execute(ActionMapping mapping,
-            ActionForm form,
-            HttpServletRequest request,
-            HttpServletResponse response) throws Exception {
-		
-		if (isCancelled(request)) {
-			return mapping.findForward("sysadmin");
-		}
-		
-		IImportService importService = AdminServiceProxy.getImportService(getServlet().getServletContext());
-		ImportExcelForm importForm = (ImportExcelForm)form;
-		importForm.setOrgId(0);
-		FormFile file = importForm.getFile();
-		
-		// validation
-		if (file==null || file.getFileSize()<=0) {
-			return mapping.findForward("importGroups");
-		}
-		
-		List results = importService.parseGroupSpreadsheet(file);
-		request.setAttribute("results", results);
-		
-		return mapping.findForward("importGroups");
+
+    @Override
+    public ActionForward execute(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+	    HttpServletResponse response) throws Exception {
+
+	if (isCancelled(request)) {
+	    return mapping.findForward("sysadmin");
 	}
+
+	IImportService importService = AdminServiceProxy.getImportService(getServlet().getServletContext());
+	ImportExcelForm importForm = (ImportExcelForm) form;
+	importForm.setOrgId(0);
+	FormFile file = importForm.getFile();
+
+	// validation
+	if (file == null || file.getFileSize() <= 0) {
+	    return mapping.findForward("importGroups");
+	}
+
+	List results = importService.parseGroupSpreadsheet(file);
+	request.setAttribute("results", results);
+
+	return mapping.findForward("importGroups");
+    }
 
 }

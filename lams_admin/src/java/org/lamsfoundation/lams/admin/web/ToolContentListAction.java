@@ -63,9 +63,9 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
 
 /**
  * @author jliew
- * 
  *
- * 
+ *
+ *
  *
  *
  *
@@ -104,10 +104,8 @@ public class ToolContentListAction extends Action {
 	// check permission
 	if (!(request.isUserInRole(Role.SYSADMIN))) {
 	    request.setAttribute(ToolContentListAction.ATTRIBUTE_ERROR_NAME, "ToolContentListAction");
-	    request.setAttribute(
-		    ToolContentListAction.ATTRIBUTE_ERROR_MESSAGE,
-		    AdminServiceProxy.getMessageService(getServlet().getServletContext()).getMessage(
-			    "error.authorisation"));
+	    request.setAttribute(ToolContentListAction.ATTRIBUTE_ERROR_MESSAGE, AdminServiceProxy
+		    .getMessageService(getServlet().getServletContext()).getMessage("error.authorisation"));
 	    return mapping.findForward(ToolContentListAction.FORWARD_ERROR);
 	}
 
@@ -211,10 +209,8 @@ public class ToolContentListAction extends Action {
     private boolean checkPriviledge(HttpServletRequest request) {
 	if (!getUserManagementService().isUserSysAdmin()) {
 	    request.setAttribute(ToolContentListAction.ATTRIBUTE_ERROR_NAME, "ToolContentListAction");
-	    request.setAttribute(
-		    ToolContentListAction.ATTRIBUTE_ERROR_MESSAGE,
-		    AdminServiceProxy.getMessageService(getServlet().getServletContext()).getMessage(
-			    "error.no.sysadmin.priviledge"));
+	    request.setAttribute(ToolContentListAction.ATTRIBUTE_ERROR_MESSAGE, AdminServiceProxy
+		    .getMessageService(getServlet().getServletContext()).getMessage("error.no.sysadmin.priviledge"));
 	    return false;
 	}
 	return true;
@@ -241,8 +237,8 @@ public class ToolContentListAction extends Action {
     private ActionForward openLearningLibraryGroups(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) throws JSONException, IOException {
 	// build full list of available learning libraries
-	List<LearningLibraryDTO> learningLibraries = getLearningDesignService().getAllLearningLibraryDetails(
-		getUserLanguage());
+	List<LearningLibraryDTO> learningLibraries = getLearningDesignService()
+		.getAllLearningLibraryDetails(getUserLanguage());
 	JSONArray learningLibrariesJSON = new JSONArray();
 	for (LearningLibraryDTO learningLibrary : learningLibraries) {
 	    JSONObject learningLibraryJSON = new JSONObject();
@@ -272,7 +268,6 @@ public class ToolContentListAction extends Action {
 	return mapping.findForward(ToolContentListAction.FORWARD_GROUPS);
     }
 
-    
     private void saveLearningLibraryGroups(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) throws JSONException, IOException {
 	// extract groups from JSON and persist them
@@ -292,20 +287,21 @@ public class ToolContentListAction extends Action {
 
 	    group.setLearningLibraries(new HashSet<LearningLibrary>());
 	    JSONArray learningLibrariesJSON = groupJSON.getJSONArray("learningLibraries");
-	    for (int learningLibraryIndex = 0; learningLibraryIndex < learningLibrariesJSON.length(); learningLibraryIndex++) {
+	    for (int learningLibraryIndex = 0; learningLibraryIndex < learningLibrariesJSON
+		    .length(); learningLibraryIndex++) {
 		long learningLibraryId = learningLibrariesJSON.getLong(learningLibraryIndex);
 		LearningLibrary learningLibrary = getLearningDesignService().getLearningLibrary(learningLibraryId);
 		group.getLearningLibraries().add(learningLibrary);
 	    }
 	}
-	
+
 	getLearningDesignService().saveLearningLibraryGroups(groups);
     }
 
     private ILearningDesignService getLearningDesignService() {
 	if (ToolContentListAction.learningDesignService == null) {
-	    WebApplicationContext ctx = WebApplicationContextUtils.getRequiredWebApplicationContext(getServlet()
-		    .getServletContext());
+	    WebApplicationContext ctx = WebApplicationContextUtils
+		    .getRequiredWebApplicationContext(getServlet().getServletContext());
 	    ToolContentListAction.learningDesignService = (ILearningDesignService) ctx.getBean("learningDesignService");
 	}
 	return ToolContentListAction.learningDesignService;
@@ -313,8 +309,8 @@ public class ToolContentListAction extends Action {
 
     private IUserManagementService getUserManagementService() {
 	if (ToolContentListAction.userManagementService == null) {
-	    WebApplicationContext ctx = WebApplicationContextUtils.getRequiredWebApplicationContext(getServlet()
-		    .getServletContext());
+	    WebApplicationContext ctx = WebApplicationContextUtils
+		    .getRequiredWebApplicationContext(getServlet().getServletContext());
 	    ToolContentListAction.userManagementService = (IUserManagementService) ctx.getBean("userManagementService");
 	}
 	return ToolContentListAction.userManagementService;
@@ -322,8 +318,8 @@ public class ToolContentListAction extends Action {
 
     private DataSource getDataSource() {
 	if (ToolContentListAction.dataSource == null) {
-	    WebApplicationContext ctx = WebApplicationContextUtils.getRequiredWebApplicationContext(getServlet()
-		    .getServletContext());
+	    WebApplicationContext ctx = WebApplicationContextUtils
+		    .getRequiredWebApplicationContext(getServlet().getServletContext());
 	    ToolContentListAction.dataSource = (DataSource) ctx.getBean("dataSource");
 	}
 	return ToolContentListAction.dataSource;

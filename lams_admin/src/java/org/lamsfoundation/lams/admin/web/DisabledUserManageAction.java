@@ -41,35 +41,33 @@ import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
 
 /**
  * @author jliew
- *  
+ * 
  *
  *
  *
  */
 public class DisabledUserManageAction extends Action {
-	
-	private static final Logger log = Logger.getLogger(DisabledUserManageAction.class);
-	
-	public ActionForward execute(ActionMapping mapping,
-            ActionForm form,
-            HttpServletRequest request,
-            HttpServletResponse response) throws Exception {
-		
-		IUserManagementService service = AdminServiceProxy.getService(getServlet().getServletContext());
-		
-		if (!(request.isUserInRole(Role.SYSADMIN) || service.isUserGlobalGroupAdmin())) {
-			request.setAttribute("errorName","DisabledUserManageAction");
-			request.setAttribute("errorMessage",AdminServiceProxy
-					.getMessageService(getServlet().getServletContext())
-					.getMessage("error.need.sysadmin"));
-			return mapping.findForward("error");
-		}
-		
-		List users = service.findByProperty(User.class, "disabledFlag", true);
-		log.debug("got "+users.size()+" disabled users");
-		request.setAttribute("users", users);
-		
-		return mapping.findForward("disabledlist");
+
+    private static final Logger log = Logger.getLogger(DisabledUserManageAction.class);
+
+    @Override
+    public ActionForward execute(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+	    HttpServletResponse response) throws Exception {
+
+	IUserManagementService service = AdminServiceProxy.getService(getServlet().getServletContext());
+
+	if (!(request.isUserInRole(Role.SYSADMIN) || service.isUserGlobalGroupAdmin())) {
+	    request.setAttribute("errorName", "DisabledUserManageAction");
+	    request.setAttribute("errorMessage", AdminServiceProxy.getMessageService(getServlet().getServletContext())
+		    .getMessage("error.need.sysadmin"));
+	    return mapping.findForward("error");
 	}
+
+	List users = service.findByProperty(User.class, "disabledFlag", true);
+	log.debug("got " + users.size() + " disabled users");
+	request.setAttribute("users", users);
+
+	return mapping.findForward("disabledlist");
+    }
 
 }

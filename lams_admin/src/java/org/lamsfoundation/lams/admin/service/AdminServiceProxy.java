@@ -65,8 +65,8 @@ public class AdminServiceProxy {
 
     public static final IUserManagementService getService(ServletContext servletContext) {
 	if (AdminServiceProxy.manageService == null) {
-	    AdminServiceProxy.manageService = (IUserManagementService) AdminServiceProxy.getDomainService(
-		    servletContext, "userManagementService");
+	    AdminServiceProxy.manageService = (IUserManagementService) AdminServiceProxy
+		    .getDomainService(servletContext, "userManagementService");
 	}
 	return AdminServiceProxy.manageService;
     }
@@ -82,8 +82,8 @@ public class AdminServiceProxy {
 
     public static final IIntegrationService getIntegrationService(ServletContext servletContext) {
 	if (AdminServiceProxy.integrationService == null) {
-	    AdminServiceProxy.integrationService = (IIntegrationService) AdminServiceProxy.getDomainService(
-		    servletContext, "integrationService");
+	    AdminServiceProxy.integrationService = (IIntegrationService) AdminServiceProxy
+		    .getDomainService(servletContext, "integrationService");
 	}
 	return AdminServiceProxy.integrationService;
     }
@@ -114,8 +114,8 @@ public class AdminServiceProxy {
 
     public static final IStatisticsService getStatisticsService(ServletContext servletContext) {
 	if (AdminServiceProxy.statisticsService == null) {
-	    AdminServiceProxy.statisticsService = (IStatisticsService) AdminServiceProxy.getDomainService(
-		    servletContext, "statisticsService");
+	    AdminServiceProxy.statisticsService = (IStatisticsService) AdminServiceProxy
+		    .getDomainService(servletContext, "statisticsService");
 	}
 	return AdminServiceProxy.statisticsService;
     }
@@ -146,8 +146,8 @@ public class AdminServiceProxy {
 
     public static final IMonitoringService getMonitoringService(ServletContext servletContext) {
 	if (AdminServiceProxy.monitoringService == null) {
-	    AdminServiceProxy.monitoringService = (IMonitoringService) AdminServiceProxy.getDomainService(
-		    servletContext, "monitoringService");
+	    AdminServiceProxy.monitoringService = (IMonitoringService) AdminServiceProxy
+		    .getDomainService(servletContext, "monitoringService");
 	}
 	return AdminServiceProxy.monitoringService;
     }

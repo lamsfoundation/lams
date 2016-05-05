@@ -49,7 +49,7 @@ import org.lamsfoundation.lams.web.action.LamsDispatchAction;
 
 /**
  * @author jliew
- * 
+ *
  *
  *
  *
@@ -60,6 +60,7 @@ public class UserSearchAction extends LamsDispatchAction {
     private static IUserManagementService service;
     private static MessageService messageService;
 
+    @Override
     public ActionForward unspecified(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) throws Exception {
 	initServices();
@@ -123,7 +124,7 @@ public class UserSearchAction extends LamsDispatchAction {
 	responcedata.put("total_rows", service.getCountUsers(searchString));
 
 	JSONArray rows = new JSONArray();
-	for (UserDTO userDto: userDtos) {
+	for (UserDTO userDto : userDtos) {
 
 	    JSONObject responseRow = new JSONObject();
 	    responseRow.put("userId", userDto.getUserID());

@@ -26,7 +26,7 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
 /**
  *
  *
- * 
+ *
  *
  *
  *
@@ -37,18 +37,19 @@ public class SignupManagementAction extends Action {
     private static ISignupService signupService = null;
     private static IUserManagementService userManagementService = null;
 
+    @Override
     public ActionForward execute(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) {
 
 	try {
 	    if (signupService == null) {
-		WebApplicationContext wac = WebApplicationContextUtils.getRequiredWebApplicationContext(getServlet()
-			.getServletContext());
+		WebApplicationContext wac = WebApplicationContextUtils
+			.getRequiredWebApplicationContext(getServlet().getServletContext());
 		signupService = (ISignupService) wac.getBean("signupService");
 	    }
 	    if (userManagementService == null) {
-		WebApplicationContext wac = WebApplicationContextUtils.getRequiredWebApplicationContext(getServlet()
-			.getServletContext());
+		WebApplicationContext wac = WebApplicationContextUtils
+			.getRequiredWebApplicationContext(getServlet().getServletContext());
 		userManagementService = (IUserManagementService) wac.getBean("userManagementService");
 	    }
 
