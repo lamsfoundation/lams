@@ -31,31 +31,31 @@ import java.util.List;
  */
 public class UserOrgRoleDTO {
 
-	private String orgName;
-	private List<String> roles;
-	private List<UserOrgRoleDTO> childDTOs;
-	
-	public String getOrgName() {
-		return orgName;
-	}
-	
-	public void setOrgName(String orgName) {
-		this.orgName = orgName;
-	}
-	
-	public List<String> getRoles() {
-		return roles;
-	}
-	
-	public void setRoles(List<String> roles) {
-		this.roles = roles;
-	}
-	
-	public List<UserOrgRoleDTO> getChildDTOs() {
-		return childDTOs;
-	}
-	
-	public void setChildDTOs(List<UserOrgRoleDTO> childDTOs) {
-		this.childDTOs = childDTOs;
-	}
+    private String orgName;
+    private List<String> roles;
+    private List<UserOrgRoleDTO> childDTOs;
+
+    public String getOrgName() {
+	return orgName;
+    }
+
+    public void setOrgName(String orgName) {
+	this.orgName = orgName;
+    }
+
+    public List<String> getRoles() {
+	return roles;
+    }
+
+    public void setRoles(List<String> roles) {
+	this.roles = roles;
+    }
+
+    public List<UserOrgRoleDTO> getChildDTOs() {
+	return childDTOs;
+    }
+
+    public void setChildDTOs(List<UserOrgRoleDTO> childDTOs) {
+	this.childDTOs = childDTOs;
+    }
 }

@@ -26,7 +26,6 @@ package org.lamsfoundation.lams.admin.web;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -39,14 +38,12 @@ import org.apache.struts.action.ActionMapping;
 import org.apache.struts.action.ActionMessage;
 import org.apache.struts.action.ActionMessages;
 import org.lamsfoundation.lams.admin.service.AdminServiceProxy;
-import org.lamsfoundation.lams.usermanagement.Organisation;
-import org.lamsfoundation.lams.usermanagement.OrganisationType;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
 
 /**
  * @author jliew
- * 
+ *
  * Saves roles for users that were just added.
  * Uses session scope because using request scope doesn't copy the form data
  * into UserOrgRoleForm's userBeans ArrayList (the list becomes empty).
@@ -55,7 +52,7 @@ import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
 
 /**
  * struts doclets
- * 
+ *
  * @struts:action path="/userorgrolesave"
  *                name="UserOrgRoleForm"
  *                input=".userorgrole"
@@ -66,55 +63,54 @@ import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
  * @struts:action-forward name="userorg" path="/userorg.do"
  */
 public class UserOrgRoleSaveAction extends Action {
-	
-	private static Logger log = Logger.getLogger(UserOrgRoleSaveAction.class);
-	private static IUserManagementService service;
-	
-	public ActionForward execute(ActionMapping mapping,
-            ActionForm form,
-            HttpServletRequest request,
-            HttpServletResponse response) throws Exception {
-		
-		service = AdminServiceProxy.getService(getServlet().getServletContext());
-		UserOrgRoleForm userOrgRoleForm = (UserOrgRoleForm)form;
-		
-		ArrayList userBeans = userOrgRoleForm.getUserBeans();
-		log.debug("userBeans is null? "+userBeans==null);
-		Integer orgId = (Integer)userOrgRoleForm.getOrgId();
-		log.debug("orgId: "+orgId);
-		
-		request.setAttribute("org",orgId);
-		request.getSession().removeAttribute("UserOrgRoleForm");		
-		
-		if(isCancelled(request)){
-			return mapping.findForward("userlist");
-		}
-		
-		// save UserOrganisation memberships, and the associated roles;
-		// for subgroups, if user is not a member of the parent group then add to that as well.
-		for(int i=0; i<userBeans.size(); i++){
-			UserBean bean = (UserBean)userBeans.get(i);
-			User user = (User)service.findById(User.class, bean.getUserId());
-			log.debug("userId: "+bean.getUserId());
-			String[] roleIds = bean.getRoleIds();
-			if (roleIds.length==0) {
-				// TODO forward to userorgrole.do, not userorg.do
-				ActionMessages errors = new ActionMessages();
-				errors.add("roles", new ActionMessage("error.roles.empty"));
-				saveErrors(request,errors);
-				request.setAttribute("orgId", orgId);
-				return mapping.findForward("userorg");
-			}
-			service.setRolesForUserOrganisation(user, orgId, (List<String>)Arrays.asList(roleIds));
-			// FMALIKOFF 5/7/7 Commented out the following code that set the roles in the course if the current org is a class, as the logic 
-			// is done in service.setRolesForUserOrganisation()
-			//if (organisation.getOrganisationType().getOrganisationTypeId().equals(OrganisationType.CLASS_TYPE)) {
-			//	if (service.getUserOrganisation(bean.getUserId(), organisation.getParentOrganisation().getOrganisationId())==null) {
-			//		service.setRolesForUserOrganisation(user, organisation.getParentOrganisation(), (List<String>)Arrays.asList(roleIds));
-			//	}
-			//}
-		}
-		return mapping.findForward("userlist");
+
+    private static Logger log = Logger.getLogger(UserOrgRoleSaveAction.class);
+    private static IUserManagementService service;
+
+    @Override
+    public ActionForward execute(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+	    HttpServletResponse response) throws Exception {
+
+	service = AdminServiceProxy.getService(getServlet().getServletContext());
+	UserOrgRoleForm userOrgRoleForm = (UserOrgRoleForm) form;
+
+	ArrayList userBeans = userOrgRoleForm.getUserBeans();
+	log.debug("userBeans is null? " + userBeans == null);
+	Integer orgId = userOrgRoleForm.getOrgId();
+	log.debug("orgId: " + orgId);
+
+	request.setAttribute("org", orgId);
+	request.getSession().removeAttribute("UserOrgRoleForm");
+
+	if (isCancelled(request)) {
+	    return mapping.findForward("userlist");
 	}
+
+	// save UserOrganisation memberships, and the associated roles;
+	// for subgroups, if user is not a member of the parent group then add to that as well.
+	for (int i = 0; i < userBeans.size(); i++) {
+	    UserBean bean = (UserBean) userBeans.get(i);
+	    User user = (User) service.findById(User.class, bean.getUserId());
+	    log.debug("userId: " + bean.getUserId());
+	    String[] roleIds = bean.getRoleIds();
+	    if (roleIds.length == 0) {
+		// TODO forward to userorgrole.do, not userorg.do
+		ActionMessages errors = new ActionMessages();
+		errors.add("roles", new ActionMessage("error.roles.empty"));
+		saveErrors(request, errors);
+		request.setAttribute("orgId", orgId);
+		return mapping.findForward("userorg");
+	    }
+	    service.setRolesForUserOrganisation(user, orgId, Arrays.asList(roleIds));
+	    // FMALIKOFF 5/7/7 Commented out the following code that set the roles in the course if the current org is a class, as the logic 
+	    // is done in service.setRolesForUserOrganisation()
+	    //if (organisation.getOrganisationType().getOrganisationTypeId().equals(OrganisationType.CLASS_TYPE)) {
+	    //	if (service.getUserOrganisation(bean.getUserId(), organisation.getParentOrganisation().getOrganisationId())==null) {
+	    //		service.setRolesForUserOrganisation(user, organisation.getParentOrganisation(), (List<String>)Arrays.asList(roleIds));
+	    //	}
+	    //}
+	}
+	return mapping.findForward("userlist");
+    }
 
 }

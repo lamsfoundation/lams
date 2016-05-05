@@ -48,9 +48,9 @@ import org.lamsfoundation.lams.web.session.SessionManager;
 
 /**
  * @author jliew
- * 
+ *
  * @struts:action path="/ldap" scope="request" validate="false"
- * 
+ *
  * @struts:action-forward name="ldap" path=".ldap"
  * @struts:action-forward name="sysadmin" path="/sysadminstart.do"
  */
@@ -90,17 +90,21 @@ public class LdapConfigAction extends Action {
 	return configurationService;
     }
 
+    @Override
     public ActionForward execute(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) throws Exception {
 
 	String action = WebUtil.readStrParam(request, "action", true);
 	if (action != null) {
-	    if (StringUtils.equals(action, "sync"))
+	    if (StringUtils.equals(action, "sync")) {
 		return sync(mapping, form, request, response);
-	    if (StringUtils.equals(action, "waiting"))
+	    }
+	    if (StringUtils.equals(action, "waiting")) {
 		return waiting(mapping, form, request, response);
-	    if (StringUtils.equals(action, "results"))
+	    }
+	    if (StringUtils.equals(action, "results")) {
 		return results(mapping, form, request, response);
+	    }
 	}
 
 	request.setAttribute("config", getConfiguration().arrangeItems(Configuration.ITEMS_ONLY_LDAP));
@@ -114,7 +118,7 @@ public class LdapConfigAction extends Action {
     public ActionForward sync(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) throws Exception {
 
-	String sessionId = (String) SessionManager.getSession().getId();
+	String sessionId = SessionManager.getSession().getId();
 	Thread t = new Thread(new LdapSyncThread(sessionId));
 	t.start();
 
@@ -205,6 +209,7 @@ public class LdapConfigAction extends Action {
 	    this.sessionId = sessionId;
 	}
 
+	@Override
 	public void run() {
 	    this.log.info("=== Beginning LDAP user sync ===");
 	    long start = System.currentTimeMillis();

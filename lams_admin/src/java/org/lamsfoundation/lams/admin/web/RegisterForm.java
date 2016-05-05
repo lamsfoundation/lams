@@ -28,9 +28,9 @@ import org.apache.struts.action.ActionForm;
 /**
  * Form for registering a LAMS instance in lamscommunity, also used to get the
  * server key for lams community integrations
- * 
+ *
  * @author lfoxton
- * 
+ *
  */
 
 /**
@@ -68,70 +68,69 @@ public class RegisterForm extends ActionForm {
     }
 
     public String getSiteName() {
-        return siteName;
+	return siteName;
     }
 
     public void setSiteName(String siteName) {
-        this.siteName = siteName;
+	this.siteName = siteName;
     }
 
     public String getOrganisation() {
-        return organisation;
+	return organisation;
     }
 
     public void setOrganisation(String organisation) {
-        this.organisation = organisation;
+	this.organisation = organisation;
     }
 
     public String getName() {
-        return name;
+	return name;
     }
 
     public void setName(String name) {
-        this.name = name;
+	this.name = name;
     }
 
     public String getEmail() {
-        return email;
+	return email;
     }
 
     public void setEmail(String email) {
-        this.email = email;
+	this.email = email;
     }
 
     public String getServerCountry() {
-        return serverCountry;
+	return serverCountry;
     }
 
     public void setServerCountry(String serverCountry) {
-        this.serverCountry = serverCountry;
+	this.serverCountry = serverCountry;
     }
 
     public boolean isPublicDirectory() {
-        return publicDirectory;
+	return publicDirectory;
     }
 
     public void setPublicDirectory(boolean publicDirectory) {
-        this.publicDirectory = publicDirectory;
+	this.publicDirectory = publicDirectory;
     }
 
     public boolean isEnableLamsCommunityIntegration() {
-        return enableLamsCommunityIntegration;
+	return enableLamsCommunityIntegration;
     }
 
     public void setEnableLamsCommunityIntegration(boolean enableLamsCommunityIntegration) {
-        this.enableLamsCommunityIntegration = enableLamsCommunityIntegration;
+	this.enableLamsCommunityIntegration = enableLamsCommunityIntegration;
     }
 
     public String getMethod() {
-        return method;
+	return method;
     }
 
     public void setMethod(String method) {
-        this.method = method;
+	this.method = method;
     }
 
-    
 //    public int getGroupNumber() {
 //        return groupNumber;
 //    }

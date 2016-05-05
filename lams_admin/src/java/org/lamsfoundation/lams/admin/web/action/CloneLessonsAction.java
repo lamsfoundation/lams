@@ -52,9 +52,9 @@ import org.lamsfoundation.lams.util.WebUtil;
 
 /**
  * @author jliew
- * 
+ *
  * @struts:action path="/clone" scope="request" validate="false"
- * 
+ *
  * @struts:action-forward name="start" path=".clone-start"
  * @struts:action-forward name="availableLessonsPart" path="/organisation/parts/availableLessons.jsp"
  * @struts:action-forward name="selectStaffPart" path="/organisation/parts/selectStaff.jsp"
@@ -68,6 +68,7 @@ public class CloneLessonsAction extends Action {
     private static ILessonService lessonService;
     private static IMonitoringService monitoringService;
 
+    @Override
     public ActionForward execute(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) throws UserAccessDeniedException {
 
@@ -117,8 +118,8 @@ public class CloneLessonsAction extends Action {
 		OrganisationState.ACTIVE);
 	for (Object o : groups) {
 	    Organisation org = (Organisation) o;
-	    response.getWriter().println(
-		    "<option value='" + org.getOrganisationId() + "'>" + org.getName() + "</option>");
+	    response.getWriter()
+		    .println("<option value='" + org.getOrganisationId() + "'>" + org.getName() + "</option>");
 	}
 
 	return null;
@@ -143,8 +144,8 @@ public class CloneLessonsAction extends Action {
 	    List groups = userManagementService.findByProperties(Organisation.class, properties);
 	    for (Object o : groups) {
 		Organisation org = (Organisation) o;
-		response.getWriter().println(
-			"<option value='" + org.getOrganisationId() + "'>" + org.getName() + "</option>");
+		response.getWriter()
+			.println("<option value='" + org.getOrganisationId() + "'>" + org.getName() + "</option>");
 	    }
 	}
 
@@ -220,8 +221,8 @@ public class CloneLessonsAction extends Action {
 
 	Organisation group = (Organisation) userManagementService.findById(Organisation.class, groupId);
 	if (group != null) {
-	    result = monitoringService
-		    .cloneLessons(lessonIds, addAllStaff, addAllLearners, staffIds, learnerIds, group);
+	    result = monitoringService.cloneLessons(lessonIds, addAllStaff, addAllLearners, staffIds, learnerIds,
+		    group);
 	} else {
 	    throw new UserException("Couldn't find Organisation based on id=" + groupId);
 	}

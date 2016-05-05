@@ -49,45 +49,45 @@ import org.lamsfoundation.lams.web.session.SessionManager;
  */
 public class ImportUserResultAction extends Action {
 
-	private static Logger log = Logger.getLogger(ImportUserResultAction.class);
-	
-	public ActionForward execute(ActionMapping mapping,
-            ActionForm form,
-            HttpServletRequest request,
-            HttpServletResponse response) throws Exception {
-		
-		MessageService messageService = AdminServiceProxy.getMessageService(getServlet().getServletContext());
-		IImportService importService = AdminServiceProxy.getImportService(getServlet().getServletContext());
-		HttpSession ss = SessionManager.getSession();
-		
-		List results = (List)ss.getAttribute(IImportService.IMPORT_RESULTS);
-		String successMessageKey = "";
-		try {
-			FormFile file = (FormFile)ss.getAttribute(IImportService.IMPORT_FILE);
-			successMessageKey = (importService.isUserSpreadsheet(file) ? "msg.users.created" : "msg.users.added");
-		} catch (Exception e) {
-			log.error("Couldn't check spreadsheet type!", e);
-		}
-		
-		int successful = 0;
-		for(int i=0; i<results.size(); i++) {
-			ArrayList rowResult = (ArrayList)results.get(i);
-			if (rowResult.isEmpty()) successful++;
-		}
-		String[] args = new String[1];
-		args[0] = String.valueOf(successful);
-		
-		request.setAttribute("results", results);
-		request.setAttribute("successful", messageService.getMessage(successMessageKey, args));
-		
-		// remove temporary session vars that allowed status to be displayed
-		// to user during import
-		ss.removeAttribute(IImportService.STATUS_IMPORT_TOTAL);
-		ss.removeAttribute(IImportService.STATUS_IMPORTED);
-		ss.removeAttribute(IImportService.IMPORT_FILE);
-		ss.removeAttribute(IImportService.IMPORT_RESULTS);
-		
-		
-		return mapping.findForward("importresult");
+    private static Logger log = Logger.getLogger(ImportUserResultAction.class);
+
+    @Override
+    public ActionForward execute(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+	    HttpServletResponse response) throws Exception {
+
+	MessageService messageService = AdminServiceProxy.getMessageService(getServlet().getServletContext());
+	IImportService importService = AdminServiceProxy.getImportService(getServlet().getServletContext());
+	HttpSession ss = SessionManager.getSession();
+
+	List results = (List) ss.getAttribute(IImportService.IMPORT_RESULTS);
+	String successMessageKey = "";
+	try {
+	    FormFile file = (FormFile) ss.getAttribute(IImportService.IMPORT_FILE);
+	    successMessageKey = (importService.isUserSpreadsheet(file) ? "msg.users.created" : "msg.users.added");
+	} catch (Exception e) {
+	    log.error("Couldn't check spreadsheet type!", e);
 	}
+
+	int successful = 0;
+	for (int i = 0; i < results.size(); i++) {
+	    ArrayList rowResult = (ArrayList) results.get(i);
+	    if (rowResult.isEmpty()) {
+		successful++;
+	    }
+	}
+	String[] args = new String[1];
+	args[0] = String.valueOf(successful);
+
+	request.setAttribute("results", results);
+	request.setAttribute("successful", messageService.getMessage(successMessageKey, args));
+
+	// remove temporary session vars that allowed status to be displayed
+	// to user during import
+	ss.removeAttribute(IImportService.STATUS_IMPORT_TOTAL);
+	ss.removeAttribute(IImportService.STATUS_IMPORTED);
+	ss.removeAttribute(IImportService.IMPORT_FILE);
+	ss.removeAttribute(IImportService.IMPORT_RESULTS);
+
+	return mapping.findForward("importresult");
+    }
 }

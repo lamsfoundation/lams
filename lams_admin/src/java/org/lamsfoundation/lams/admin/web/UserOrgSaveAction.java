@@ -2,21 +2,21 @@
  * Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
  * =============================================================
  * License Information: http://lamsfoundation.org/licensing/lams/2.0/
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License version 2.0 
+ * it under the terms of the GNU General Public License version 2.0
  * as published by the Free Software Foundation.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301
  * USA
- * 
+ *
  * http://www.gnu.org/licenses/gpl.txt
  * ****************************************************************
  */
@@ -54,9 +54,9 @@ import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
 
 /**
  * struts doclets
- * 
+ *
  * @struts:action path="/userorgsave" name="UserOrgForm" input=".userorg" scope="request" validate="false"
- * 
+ *
  * @struts:action-forward name="userlist" path="/usermanage.do"
  * @struts:action-forward name="userorgrole" path="/userorgrole.do"
  */
@@ -66,6 +66,7 @@ public class UserOrgSaveAction extends Action {
     private static IUserManagementService service;
     private List<Role> rolelist;
 
+    @Override
     @SuppressWarnings("unchecked")
     public ActionForward execute(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) throws Exception {
@@ -80,8 +81,9 @@ public class UserOrgSaveAction extends Action {
 	}
 
 	service = AdminServiceProxy.getService(getServlet().getServletContext());
-	if (rolelist == null)
+	if (rolelist == null) {
 	    rolelist = service.findAll(Role.class);
+	}
 
 	Organisation organisation = (Organisation) service.findById(Organisation.class, orgId);
 	Set uos = organisation.getUserOrganisations();
@@ -109,7 +111,7 @@ public class UserOrgSaveAction extends Action {
 	// add UserOrganisations that are in form data
 	List newUserOrganisations = new ArrayList();
 	for (int i = 0; i < userIdList.size(); i++) {
-	    Integer userId = new Integer((String) userIdList.get(i));
+	    Integer userId = new Integer(userIdList.get(i));
 	    Iterator iter2 = uos.iterator();
 	    Boolean alreadyInOrg = false;
 	    while (iter2.hasNext()) {

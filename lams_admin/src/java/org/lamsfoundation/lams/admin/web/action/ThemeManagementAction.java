@@ -2,21 +2,21 @@
  * Copyright (C) 2006 LAMS Foundation (http://lamsfoundation.org)
  * =============================================================
  * License Information: http://lamsfoundation.org/licensing/lams/2.0/
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License version 2.0 
+ * it under the terms of the GNU General Public License version 2.0
  * as published by the Free Software Foundation.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301
  * USA
- * 
+ *
  * http://www.gnu.org/licenses/gpl.txt
  * ****************************************************************
  */
@@ -32,23 +32,21 @@ import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.lamsfoundation.lams.admin.service.AdminServiceProxy;
 import org.lamsfoundation.lams.admin.web.form.ThemeForm;
-import org.lamsfoundation.lams.config.ConfigurationItem;
 import org.lamsfoundation.lams.themes.Theme;
 import org.lamsfoundation.lams.themes.service.IThemeService;
 import org.lamsfoundation.lams.usermanagement.Role;
 import org.lamsfoundation.lams.util.CSSThemeUtil;
 import org.lamsfoundation.lams.util.Configuration;
 import org.lamsfoundation.lams.util.ConfigurationKeys;
-import org.lamsfoundation.lams.util.MessageService;
 import org.lamsfoundation.lams.web.action.LamsDispatchAction;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 
 /**
  * @author Luke Foxton
- * 
+ *
  *         Actions for maintaining and altering system themes
- * 
+ *
  * @struts.action path="/themeManagement" parameter="method" name="themeForm"
  *                input=".themeManagement" scope="request" validate="false"
  * @struts.action-forward name="success" path=".themeManagement"
@@ -59,12 +57,15 @@ public class ThemeManagementAction extends LamsDispatchAction {
     private static IThemeService themeService;
     private static Configuration configurationService;
 
-    public ActionForward unspecified(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception {
+    @Override
+    public ActionForward unspecified(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+	    HttpServletResponse response) throws Exception {
 
 	// check permission
 	if (!request.isUserInRole(Role.SYSADMIN)) {
 	    request.setAttribute("errorName", "RegisterAction");
-	    request.setAttribute("errorMessage", AdminServiceProxy.getMessageService(getServlet().getServletContext()).getMessage("error.authorisation"));
+	    request.setAttribute("errorMessage", AdminServiceProxy.getMessageService(getServlet().getServletContext())
+		    .getMessage("error.authorisation"));
 	    return mapping.findForward("error");
 	}
 
@@ -85,7 +86,8 @@ public class ThemeManagementAction extends LamsDispatchAction {
 	    }
 
 	    theme.setNotEditable(Boolean.FALSE);
-	    if (theme.getName().equals(CSSThemeUtil.DEFAULT_HTML_THEME) || theme.getName().equals(CSSThemeUtil.DEFAULT_FLASH_THEME)) {
+	    if (theme.getName().equals(CSSThemeUtil.DEFAULT_HTML_THEME)
+		    || theme.getName().equals(CSSThemeUtil.DEFAULT_FLASH_THEME)) {
 		theme.setNotEditable(Boolean.TRUE);
 	    }
 	}
@@ -94,9 +96,9 @@ public class ThemeManagementAction extends LamsDispatchAction {
 	return mapping.findForward("success");
     }
 
-    public ActionForward addOrEditTheme(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception {
+    public ActionForward addOrEditTheme(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+	    HttpServletResponse response) throws Exception {
 	ThemeForm themeForm = (ThemeForm) form;
-
 
 	// Update the theme
 	Theme theme = null;
@@ -137,8 +139,9 @@ public class ThemeManagementAction extends LamsDispatchAction {
 	return unspecified(mapping, themeForm, request, response);
     }
 
-    public ActionForward removeTheme(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception {
-	
+    public ActionForward removeTheme(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+	    HttpServletResponse response) throws Exception {
+
 	// Remove the theme
 	ThemeForm themeForm = (ThemeForm) form;
 	if (themeForm.getId() != null) {
@@ -164,7 +167,8 @@ public class ThemeManagementAction extends LamsDispatchAction {
 	return unspecified(mapping, themeForm, request, response);
     }
 
-    public ActionForward setAsDefault(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception {
+    public ActionForward setAsDefault(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+	    HttpServletResponse response) throws Exception {
 	ThemeForm themeForm = (ThemeForm) form;
 	if (themeForm.getName() != null) {
 	    Configuration.updateItem(ConfigurationKeys.DEFAULT_HTML_THEME, themeForm.getName());
@@ -184,7 +188,8 @@ public class ThemeManagementAction extends LamsDispatchAction {
 
     private Configuration getConfiguration() {
 	if (configurationService == null) {
-	    WebApplicationContext ctx = WebApplicationContextUtils.getRequiredWebApplicationContext(getServlet().getServletContext());
+	    WebApplicationContext ctx = WebApplicationContextUtils
+		    .getRequiredWebApplicationContext(getServlet().getServletContext());
 	    configurationService = (Configuration) ctx.getBean("configurationService");
 
 	}

@@ -2,21 +2,21 @@
  * Copyright (C) 2006 LAMS Foundation (http://lamsfoundation.org)
  * =============================================================
  * License Information: http://lamsfoundation.org/licensing/lams/2.0/
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License version 2.0 
+ * it under the terms of the GNU General Public License version 2.0
  * as published by the Free Software Foundation.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301
  * USA
- * 
+ *
  * http://www.gnu.org/licenses/gpl.txt
  * ****************************************************************
  */
@@ -43,100 +43,98 @@ import org.lamsfoundation.lams.web.action.LamsDispatchAction;
  */
 /**
  * struts doclets
- * 
- * @struts.action path="/config" parameter="method" name="ConfigForm" input=".editconfig" scope="request" validate="false"
+ *
+ * @struts.action path="/config" parameter="method" name="ConfigForm" input=".editconfig" scope="request"
+ *                validate="false"
  * @struts.action-forward name="config" path=".editconfig"
  * @struts.action-forward name="ldap" path=".ldap"
  * @struts.action-forward name="sysadmin" path="/sysadminstart.do"
  */
 public class ConfigAction extends LamsDispatchAction {
 
-	private static Configuration configurationService;
-	private static MessageService messageService;
+    private static Configuration configurationService;
+    private static MessageService messageService;
 
-	private Configuration getConfiguration() {
-		if (configurationService == null) {
-		    configurationService = AdminServiceProxy.getConfiguration(getServlet().getServletContext());
-		}
-		return configurationService;
+    private Configuration getConfiguration() {
+	if (configurationService == null) {
+	    configurationService = AdminServiceProxy.getConfiguration(getServlet().getServletContext());
 	}
-	
-	private MessageService getMessageService() {
-		if (messageService == null) {
-			messageService = AdminServiceProxy.getMessageService(getServlet().getServletContext());
-		}
-		return messageService;
+	return configurationService;
+    }
+
+    private MessageService getMessageService() {
+	if (messageService == null) {
+	    messageService = AdminServiceProxy.getMessageService(getServlet().getServletContext());
+	}
+	return messageService;
+    }
+
+    @Override
+    public ActionForward unspecified(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+	    HttpServletResponse response) throws Exception {
+
+	request.setAttribute("config", getConfiguration().arrangeItems(Configuration.ITEMS_NON_LDAP));
+
+	return mapping.findForward("config");
+    }
+
+    public ActionForward save(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+	    HttpServletResponse response) throws Exception {
+
+	if (isCancelled(request)) {
+	    return mapping.findForward("sysadmin");
 	}
 
-	public ActionForward unspecified(ActionMapping mapping,
-            ActionForm form,
-            HttpServletRequest request,
-            HttpServletResponse response) throws Exception{
-		
-		request.setAttribute("config", getConfiguration().arrangeItems(Configuration.ITEMS_NON_LDAP));
-		
-		return mapping.findForward("config");
-	}
-	
-	public ActionForward save(ActionMapping mapping,
-            ActionForm form,
-            HttpServletRequest request,
-            HttpServletResponse response) throws Exception{
-		
-		if (isCancelled(request)) {
-			return mapping.findForward("sysadmin");
+	DynaActionForm configForm = (DynaActionForm) form;
+	String[] keys = (String[]) configForm.get("key");
+	String[] values = (String[]) configForm.get("value");
+
+	String errorForward = "config";
+
+	for (int i = 0; i < keys.length; i++) {
+	    ConfigurationItem item = getConfiguration().getConfigItemByKey(keys[i]);
+
+	    // return to ldap page if that's where we came from
+	    if (StringUtils.contains(item.getHeaderName(), "config.header.ldap")) {
+		errorForward = "ldap";
+	    }
+
+	    if (item != null) {
+		if (item.getRequired()) {
+		    if (!(values[i] != null && values[i].length() > 0)) {
+			request.setAttribute("error", getRequiredError(item.getDescriptionKey()));
+			request.setAttribute("config", getConfiguration().arrangeItems(Configuration.ITEMS_NON_LDAP));
+			return mapping.findForward(errorForward);
+		    }
 		}
-		
-		DynaActionForm configForm = (DynaActionForm) form;
-		String[] keys = (String[])configForm.get("key");
-		String[] values = (String[])configForm.get("value");
-		
-		String errorForward = "config";
-		
-		for(int i=0; i<keys.length; i++) {
-			ConfigurationItem item = getConfiguration().getConfigItemByKey(keys[i]);
-			
-			// return to ldap page if that's where we came from
-			if (StringUtils.contains(item.getHeaderName(), "config.header.ldap")) {
-			    errorForward = "ldap";
-			}
-			
-			if (item!=null) {
-				if (item.getRequired()) {
-					if (!(values[i]!=null && values[i].length()>0)) {
-						request.setAttribute("error", getRequiredError(item.getDescriptionKey()));
-						request.setAttribute("config", getConfiguration().arrangeItems(Configuration.ITEMS_NON_LDAP));
-						return mapping.findForward(errorForward);
-					}
-				}
-				String format = item.getFormat();
-				if (format!=null && format.equals(ConfigurationItem.LONG_FORMAT)) {
-					try {
-						Long.parseLong(values[i]);
-					} catch (NumberFormatException e) {
-						request.setAttribute("error", getNumericError(item.getDescriptionKey()));
-						request.setAttribute("config", getConfiguration().arrangeItems(Configuration.ITEMS_NON_LDAP));
-						return mapping.findForward(errorForward);
-					}
-				}
-				Configuration.updateItem(keys[i], values[i]);
-			}
+		String format = item.getFormat();
+		if (format != null && format.equals(ConfigurationItem.LONG_FORMAT)) {
+		    try {
+			Long.parseLong(values[i]);
+		    } catch (NumberFormatException e) {
+			request.setAttribute("error", getNumericError(item.getDescriptionKey()));
+			request.setAttribute("config", getConfiguration().arrangeItems(Configuration.ITEMS_NON_LDAP));
+			return mapping.findForward(errorForward);
+		    }
 		}
-		getConfiguration().persistUpdate();
-		
-		return mapping.findForward("sysadmin");
+		Configuration.updateItem(keys[i], values[i]);
+	    }
 	}
-	
-	private String getRequiredError(String arg) {
-		String[] args = new String[1];
-		args[0] = getMessageService().getMessage(arg);
-		return getMessageService().getMessage("error.required", args);
-	}
-	
-	private String getNumericError(String arg) {
-		String[] args = new String[1];
-		args[0] = getMessageService().getMessage(arg);
-		return getMessageService().getMessage("error.numeric", args);
-	}
-	
+	getConfiguration().persistUpdate();
+
+	return mapping.findForward("sysadmin");
+    }
+
+    private String getRequiredError(String arg) {
+	String[] args = new String[1];
+	args[0] = getMessageService().getMessage(arg);
+	return getMessageService().getMessage("error.required", args);
+    }
+
+    private String getNumericError(String arg) {
+	String[] args = new String[1];
+	args[0] = getMessageService().getMessage(arg);
+	return getMessageService().getMessage("error.numeric", args);
+    }
+
 }
