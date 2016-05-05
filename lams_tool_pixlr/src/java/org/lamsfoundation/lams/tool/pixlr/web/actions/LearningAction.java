@@ -2,21 +2,21 @@
  * Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
  * =============================================================
  * License Information: http://lamsfoundation.org/licensing/lams/2.0/
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301
  * USA
- * 
+ *
  * http://www.gnu.org/licenses/gpl.txt
  * ****************************************************************
  */
@@ -36,8 +36,8 @@ import java.net.URLEncoder;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Set;
 import java.util.Map.Entry;
+import java.util.Set;
 
 import javax.imageio.ImageIO;
 import javax.servlet.http.HttpServletRequest;
@@ -77,7 +77,7 @@ import org.lamsfoundation.lams.web.util.AttributeNames;
 /**
  * @author
  * @version
- * 
+ *
  *
  *
  *
@@ -95,6 +95,7 @@ public class LearningAction extends LamsDispatchAction {
 
     private IPixlrService pixlrService;
 
+    @Override
     public ActionForward unspecified(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) throws Exception {
 
@@ -143,9 +144,9 @@ public class LearningAction extends LamsDispatchAction {
 	    pixlr.setContentInUse(new Boolean(true));
 	    pixlrService.saveOrUpdatePixlr(pixlr);
 	}
-	
-	LearningWebUtil.putActivityPositionInRequestByToolSessionId(toolSessionID, request, getServlet()
-		.getServletContext());
+
+	LearningWebUtil.putActivityPositionInRequestByToolSessionId(toolSessionID, request,
+		getServlet().getServletContext());
 
 	// get the user
 	PixlrUser pixlrUser;
@@ -230,7 +231,8 @@ public class LearningAction extends LamsDispatchAction {
 	}
 
 	try {
-	    InputStream is = getResponseInputStreamFromExternalServer(imageURL, new HashMap<String, String>());
+	    InputStream is = LearningAction.getResponseInputStreamFromExternalServer(imageURL,
+		    new HashMap<String, String>());
 
 	    String realBaseDir = Configuration.get(ConfigurationKeys.LAMS_EAR_DIR) + File.separator
 		    + FileUtil.LAMS_WWW_DIR + File.separator + "images" + File.separator + "pixlr";
@@ -244,7 +246,7 @@ public class LearningAction extends LamsDispatchAction {
 	    while ((len = is.read(buf)) > 0) {
 		out.write(buf, 0, len);
 	    }
-	    
+
 	    pixlrUser.setImageFileName(imageName);
 
 	    // Now save the image size
@@ -294,8 +296,8 @@ public class LearningAction extends LamsDispatchAction {
 		    + "and toolSessionID: " + toolSessionID);
 	}
 
-	ToolSessionManager sessionMgrService = PixlrServiceProxy.getPixlrSessionManager(getServlet()
-		.getServletContext());
+	ToolSessionManager sessionMgrService = PixlrServiceProxy
+		.getPixlrSessionManager(getServlet().getServletContext());
 
 	String nextActivityUrl;
 	try {
@@ -314,8 +316,9 @@ public class LearningAction extends LamsDispatchAction {
 
     public static InputStream getResponseInputStreamFromExternalServer(String urlStr, HashMap<String, String> params)
 	    throws ToolException, IOException {
-	if (!urlStr.endsWith("?"))
+	if (!urlStr.endsWith("?")) {
 	    urlStr += "?";
+	}
 
 	for (Entry<String, String> entry : params.entrySet()) {
 	    urlStr += "&" + entry.getKey() + "=" + entry.getValue();
@@ -364,9 +367,9 @@ public class LearningAction extends LamsDispatchAction {
 	if (notebookEntry != null) {
 	    lrnForm.setEntryText(notebookEntry.getEntry());
 	}
-	
-	LearningWebUtil.putActivityPositionInRequestByToolSessionId(pixlrUser.getPixlrSession().getSessionId(),
-		request, getServlet().getServletContext());
+
+	LearningWebUtil.putActivityPositionInRequestByToolSessionId(pixlrUser.getPixlrSession().getSessionId(), request,
+		getServlet().getServletContext());
 
 	return mapping.findForward("notebook");
     }
@@ -429,7 +432,7 @@ public class LearningAction extends LamsDispatchAction {
 	    pixlrUser = getCurrentUser(toolSessionID);
 	}
 
-	// set completed 
+	// set completed
 	pixlrUser.setFinishedActivity(true);
 	pixlrService.saveOrUpdatePixlrUser(pixlrUser);
 
@@ -452,23 +455,23 @@ public class LearningAction extends LamsDispatchAction {
 	request.setAttribute("pixlrDTO", new PixlrDTO(pixlr));
 	request.setAttribute("mode", mode);
 	request.setAttribute("pixlrImageFolderURL", PixlrConstants.LAMS_WWW_PIXLR_FOLDER_URL);
-	
-	LearningWebUtil.putActivityPositionInRequestByToolSessionId(toolSessionID, request, getServlet()
-		.getServletContext());
-	
+
+	LearningWebUtil.putActivityPositionInRequestByToolSessionId(toolSessionID, request,
+		getServlet().getServletContext());
+
 	return mapping.findForward("viewAll");
     }
 
     /**
      * Work out if this user's language is supported by pixlr
-     * 
+     *
      * @return
      */
     private String getPixlrLocale() {
 	String locale = "en";
 
-	String languagesCSV = pixlrService.getConfigItem(PixlrConfigItem.KEY_LANGUAGE_CSV) != null ? pixlrService
-		.getConfigItem(PixlrConfigItem.KEY_LANGUAGE_CSV).getConfigValue() : null;
+	String languagesCSV = pixlrService.getConfigItem(PixlrConfigItem.KEY_LANGUAGE_CSV) != null
+		? pixlrService.getConfigItem(PixlrConfigItem.KEY_LANGUAGE_CSV).getConfigValue() : null;
 
 	if (languagesCSV != null && !languagesCSV.equals("")) {
 	    UserDTO user = (UserDTO) SessionManager.getSession().getAttribute(AttributeNames.USER);

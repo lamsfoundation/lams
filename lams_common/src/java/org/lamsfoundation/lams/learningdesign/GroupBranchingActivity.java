@@ -2,21 +2,21 @@
  * Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
  * =============================================================
  * License Information: http://lamsfoundation.org/licensing/lams/2.0/
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License version 2.0 
+ * it under the terms of the GNU General Public License version 2.0
  * as published by the Free Software Foundation.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301
  * USA
- * 
+ *
  * http://www.gnu.org/licenses/gpl.txt
  * ****************************************************************
  */
@@ -36,7 +36,7 @@ import org.lamsfoundation.lams.util.MessageService;
 /**
  * @author Mitchell Seaton
  * @version 2.1
- * 
+ *
  *
  */
 public class GroupBranchingActivity extends BranchingActivity implements Serializable {
@@ -75,9 +75,10 @@ public class GroupBranchingActivity extends BranchingActivity implements Seriali
 
     /**
      * Makes a copy of the BranchingActivity for authoring, preview and monitoring environment
-     * 
+     *
      * @return BranchingActivity Returns a deep-copy of the originalActivity
      */
+    @Override
     public Activity createCopy(int uiidOffset) {
 
 	GroupBranchingActivity newBranchingActivity = new GroupBranchingActivity();
@@ -86,22 +87,24 @@ public class GroupBranchingActivity extends BranchingActivity implements Seriali
 	return newBranchingActivity;
     }
 
+    @Override
     public String toString() {
 	return new ToStringBuilder(this).append("activityId", getActivityId()).toString();
     }
 
     /**
      * Validate the branching activity. A Grouping must be applied to the branching activity.
-     * 
+     *
      * @return error message key
      */
+    @Override
     public Vector validateActivity(MessageService messageService) {
 	Vector listOfValidationErrors = new Vector();
 	if (getActivities() == null || getActivities().size() == 0) {
-	    listOfValidationErrors.add(new ValidationErrorDTO(
-		    ValidationErrorDTO.BRANCHING_ACTIVITY_MUST_HAVE_A_BRANCH_ERROR_CODE, messageService
-			    .getMessage(ValidationErrorDTO.BRANCHING_ACTIVITY_MUST_HAVE_A_BRANCH), this
-			    .getActivityUIID()));
+	    listOfValidationErrors
+		    .add(new ValidationErrorDTO(ValidationErrorDTO.BRANCHING_ACTIVITY_MUST_HAVE_A_BRANCH_ERROR_CODE,
+			    messageService.getMessage(ValidationErrorDTO.BRANCHING_ACTIVITY_MUST_HAVE_A_BRANCH),
+			    this.getActivityUIID()));
 	}
 
 	if (getGrouping() == null) {
@@ -110,9 +113,10 @@ public class GroupBranchingActivity extends BranchingActivity implements Seriali
 	} else {
 	    Set<Group> groups = getGrouping().getGroups();
 	    if (groups == null || groups.size() == 0) {
-		listOfValidationErrors.add(new ValidationErrorDTO(
-			ValidationErrorDTO.BRANCHING_ACTVITY_GROUPING_ERROR_CODE, messageService
-				.getMessage(ValidationErrorDTO.BRANCHING_ACTVITY_GROUPING), this.getActivityUIID()));
+		listOfValidationErrors
+			.add(new ValidationErrorDTO(ValidationErrorDTO.BRANCHING_ACTVITY_GROUPING_ERROR_CODE,
+				messageService.getMessage(ValidationErrorDTO.BRANCHING_ACTVITY_GROUPING),
+				this.getActivityUIID()));
 	    } else {
 		for (Group group : groups) {
 		    boolean foundEntry = false;
@@ -124,12 +128,11 @@ public class GroupBranchingActivity extends BranchingActivity implements Seriali
 			}
 		    }
 		    if (!foundEntry) {
-			listOfValidationErrors
-				.add(new ValidationErrorDTO(
-					ValidationErrorDTO.BRANCHING_ACTVITY_MUST_HAVE_ALL_GROUPS_ALLOCATED_ERROR_CODE,
-					messageService
-						.getMessage(ValidationErrorDTO.BRANCHING_ACTVITY_MUST_HAVE_ALL_GROUPS_ALLOCATED),
-					this.getActivityUIID()));
+			listOfValidationErrors.add(new ValidationErrorDTO(
+				ValidationErrorDTO.BRANCHING_ACTVITY_MUST_HAVE_ALL_GROUPS_ALLOCATED_ERROR_CODE,
+				messageService.getMessage(
+					ValidationErrorDTO.BRANCHING_ACTVITY_MUST_HAVE_ALL_GROUPS_ALLOCATED),
+				this.getActivityUIID()));
 			break;
 		    }
 		}

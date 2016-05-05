@@ -2,21 +2,21 @@
  * Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
  * =============================================================
  * License Information: http://lamsfoundation.org/licensing/lams/2.0/
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License version 2.0 
+ * it under the terms of the GNU General Public License version 2.0
  * as published by the Free Software Foundation.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301
  * USA
- * 
+ *
  * http://www.gnu.org/licenses/gpl.txt
  * ****************************************************************
  */
@@ -25,8 +25,6 @@
 package org.lamsfoundation.lams.tool.peerreview.web.action;
 
 import java.io.IOException;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -44,8 +42,6 @@ import org.apache.struts.action.ActionMapping;
 import org.apache.tomcat.util.json.JSONArray;
 import org.apache.tomcat.util.json.JSONException;
 import org.apache.tomcat.util.json.JSONObject;
-import org.lamsfoundation.lams.notebook.model.NotebookEntry;
-import org.lamsfoundation.lams.notebook.service.CoreNotebookConstants;
 import org.lamsfoundation.lams.rating.dto.ItemRatingCriteriaDTO;
 import org.lamsfoundation.lams.rating.dto.ItemRatingDTO;
 import org.lamsfoundation.lams.rating.dto.RatingCommentDTO;
@@ -54,7 +50,6 @@ import org.lamsfoundation.lams.tool.peerreview.PeerreviewConstants;
 import org.lamsfoundation.lams.tool.peerreview.dto.GroupSummary;
 import org.lamsfoundation.lams.tool.peerreview.dto.ReflectDTO;
 import org.lamsfoundation.lams.tool.peerreview.model.Peerreview;
-import org.lamsfoundation.lams.tool.peerreview.model.PeerreviewSession;
 import org.lamsfoundation.lams.tool.peerreview.model.PeerreviewUser;
 import org.lamsfoundation.lams.tool.peerreview.service.IPeerreviewService;
 import org.lamsfoundation.lams.util.WebUtil;
@@ -124,7 +119,7 @@ public class MonitoringAction extends Action {
 	sessionMap.put(PeerreviewConstants.ATTR_IS_GROUPED_ACTIVITY, service.isGroupedActivity(contentId));
 	return mapping.findForward(PeerreviewConstants.SUCCESS);
     }
-    
+
     /**
      * Refreshes user list.
      */
@@ -134,7 +129,7 @@ public class MonitoringAction extends Action {
 
 	Long toolContentId = WebUtil.readLongParam(request, "toolContentId");
 	Long toolSessionId = WebUtil.readLongParam(request, "toolSessionId");
-	
+
 	// Getting the params passed in from the jqGrid
 	int page = WebUtil.readIntParam(request, PeerreviewConstants.PARAM_PAGE) - 1;
 	int size = WebUtil.readIntParam(request, PeerreviewConstants.PARAM_ROWS);
@@ -157,10 +152,10 @@ public class MonitoringAction extends Action {
 	JSONObject responcedata = new JSONObject();
 	JSONArray rows = new JSONArray();
 
-	responcedata.put("page", page+1);
-	responcedata.put("total", Math.ceil((float)service.getCountUsersBySession(toolSessionId, userId)/size));
+	responcedata.put("page", page + 1);
+	responcedata.put("total", Math.ceil((float) service.getCountUsersBySession(toolSessionId, userId) / size));
 	responcedata.put("records", service.getCountUsersBySession(toolSessionId, userId));
-	
+
 	// handle rating criterias
 	List<ItemRatingDTO> itemRatingDtos = null;
 	if (!users.isEmpty()) {
@@ -181,7 +176,7 @@ public class MonitoringAction extends Action {
 	    rowData.put(user.getUserId());
 	    rowData.put(StringEscapeUtils.escapeHtml(user.getFirstName()) + " "
 		    + StringEscapeUtils.escapeHtml(user.getLastName()));
-	    
+
 	    // find corresponding itemRatingDto
 	    ItemRatingDTO itemRatingDto = null;
 	    for (ItemRatingDTO itemRatingDtoIter : itemRatingDtos) {
@@ -190,7 +185,7 @@ public class MonitoringAction extends Action {
 		    break;
 		}
 	    }
-	    
+
 	    String criteriasString = "<div class='rating-stars-holder'>";
 	    for (ItemRatingCriteriaDTO criteriaDto : itemRatingDto.getCriteriaDtos()) {
 		Long ratingCriteriaId = criteriaDto.getRatingCriteria().getRatingCriteriaId();
@@ -199,19 +194,22 @@ public class MonitoringAction extends Action {
 		String numberOfVotes = criteriaDto.getNumberOfVotes();
 
 		criteriasString += "<b>";
-		criteriasString += 	title;
+		criteriasString += title;
 		criteriasString += "</b>";
 
-		criteriasString += "<div class='rating-stars-disabled rating-stars-new' data-average='" + averageRating + "' data-id='" + ratingCriteriaId + "'>";
+		criteriasString += "<div class='rating-stars-disabled rating-stars-new' data-average='" + averageRating
+			+ "' data-id='" + ratingCriteriaId + "'>";
 		criteriasString += "</div>";
 
-		criteriasString += "<div class='rating-stars-caption' id='rating-stars-caption-" + ratingCriteriaId + "' >";
-		String msg = service.getLocalisedMessage("label.average.rating", new Object[] { averageRating, numberOfVotes });
+		criteriasString += "<div class='rating-stars-caption' id='rating-stars-caption-" + ratingCriteriaId
+			+ "' >";
+		String msg = service.getLocalisedMessage("label.average.rating",
+			new Object[] { averageRating, numberOfVotes });
 		criteriasString += msg;
 		criteriasString += "</div>";
 
 	    }
-	    criteriasString += 	"</div>";
+	    criteriasString += "</div>";
 	    rowData.put(criteriasString);
 
 	    JSONObject row = new JSONObject();
@@ -231,8 +229,8 @@ public class MonitoringAction extends Action {
 	    HttpServletResponse response) throws JSONException, IOException {
 	IPeerreviewService service = getPeerreviewService();
 	String sessionMapID = request.getParameter(PeerreviewConstants.ATTR_SESSION_MAP_ID);
-	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession().getAttribute(
-		sessionMapID);
+	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
+		.getAttribute(sessionMapID);
 	HashMap<Long, String> userNameMap = (HashMap<Long, String>) sessionMap.get("userNameMap");
 
 	Long userId = WebUtil.readLongParam(request, AttributeNames.PARAM_USER_ID);
@@ -248,8 +246,8 @@ public class MonitoringAction extends Action {
 	    for (RatingDTO ratingDto : criteriaDto.getRatingDtos()) {
 		JSONArray userData = new JSONArray();
 		userData.put(i);
-		String userName = StringEscapeUtils.escapeHtml(ratingDto.getLearner().getFirstName() + " "
-			+ ratingDto.getLearner().getLastName());
+		String userName = StringEscapeUtils
+			.escapeHtml(ratingDto.getLearner().getFirstName() + " " + ratingDto.getLearner().getLastName());
 		userData.put(userName);
 		userData.put(ratingDto.getRating());
 		String title = StringEscapeUtils.escapeHtml(criteriaDto.getRatingCriteria().getTitle());
@@ -296,8 +294,8 @@ public class MonitoringAction extends Action {
     // Private method
     // *************************************************************************************
     private IPeerreviewService getPeerreviewService() {
-	WebApplicationContext wac = WebApplicationContextUtils.getRequiredWebApplicationContext(getServlet()
-		.getServletContext());
+	WebApplicationContext wac = WebApplicationContextUtils
+		.getRequiredWebApplicationContext(getServlet().getServletContext());
 	return (IPeerreviewService) wac.getBean(PeerreviewConstants.PEERREVIEW_SERVICE);
     }
 }

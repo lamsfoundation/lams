@@ -2,21 +2,21 @@
  * Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
  * =============================================================
  * License Information: http://lamsfoundation.org/licensing/lams/2.0/
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License version 2.0 
+ * it under the terms of the GNU General Public License version 2.0
  * as published by the Free Software Foundation.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301
  * USA
- * 
+ *
  * http://www.gnu.org/licenses/gpl.txt
  * ****************************************************************
  */
@@ -76,7 +76,7 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
 
 /**
  * @author Steve.Ni
- * 
+ *
  * @version $Revision$
  */
 public class LearningAction extends Action {
@@ -120,7 +120,7 @@ public class LearningAction extends Action {
 
     /**
      * Initial page for add resource item (single file or URL).
-     * 
+     *
      * @param mapping
      * @param form
      * @param request
@@ -138,9 +138,9 @@ public class LearningAction extends Action {
     /**
      * Read resource data from database and put them into HttpSession. It will redirect to init.do directly after this
      * method run successfully.
-     * 
+     *
      * This method will avoid read database again and lost un-saved resouce item lost when user "refresh page",
-     * 
+     *
      */
     private ActionForward start(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) {
@@ -261,7 +261,7 @@ public class LearningAction extends Action {
 
     /**
      * Finish learning session.
-     * 
+     *
      * @param mapping
      * @param form
      * @param request
@@ -314,7 +314,7 @@ public class LearningAction extends Action {
 
     /**
      * Save file or url resource item into database.
-     * 
+     *
      * @param mapping
      * @param form
      * @param request
@@ -404,7 +404,7 @@ public class LearningAction extends Action {
 
     /**
      * Display empty reflection form.
-     * 
+     *
      * @param mapping
      * @param form
      * @param request
@@ -444,7 +444,7 @@ public class LearningAction extends Action {
 
     /**
      * Submit reflection form input database.
-     * 
+     *
      * @param mapping
      * @param form
      * @param request
@@ -516,7 +516,7 @@ public class LearningAction extends Action {
 
     /**
      * List save current resource items.
-     * 
+     *
      * @param request
      * @return
      */
@@ -532,7 +532,7 @@ public class LearningAction extends Action {
 
     /**
      * Get <code>java.util.List</code> from HttpSession by given name.
-     * 
+     *
      * @param request
      * @param name
      * @return
@@ -548,7 +548,7 @@ public class LearningAction extends Action {
 
     /**
      * Return <code>ActionForward</code> according to resource item type.
-     * 
+     *
      * @param type
      * @param mapping
      * @return
@@ -556,21 +556,21 @@ public class LearningAction extends Action {
     private ActionForward findForward(short type, ActionMapping mapping) {
 	ActionForward forward;
 	switch (type) {
-	case ResourceConstants.RESOURCE_TYPE_URL:
-	    forward = mapping.findForward("url");
-	    break;
-	case ResourceConstants.RESOURCE_TYPE_FILE:
-	    forward = mapping.findForward("file");
-	    break;
-	case ResourceConstants.RESOURCE_TYPE_WEBSITE:
-	    forward = mapping.findForward("website");
-	    break;
-	case ResourceConstants.RESOURCE_TYPE_LEARNING_OBJECT:
-	    forward = mapping.findForward("learningobject");
-	    break;
-	default:
-	    forward = null;
-	    break;
+	    case ResourceConstants.RESOURCE_TYPE_URL:
+		forward = mapping.findForward("url");
+		break;
+	    case ResourceConstants.RESOURCE_TYPE_FILE:
+		forward = mapping.findForward("file");
+		break;
+	    case ResourceConstants.RESOURCE_TYPE_WEBSITE:
+		forward = mapping.findForward("website");
+		break;
+	    case ResourceConstants.RESOURCE_TYPE_LEARNING_OBJECT:
+		forward = mapping.findForward("learningobject");
+		break;
+	    default:
+		forward = null;
+		break;
 	}
 	return forward;
     }
@@ -648,7 +648,7 @@ public class LearningAction extends Action {
 
     /**
      * Set complete flag for given resource item.
-     * 
+     *
      * @param request
      * @param sessionId
      */

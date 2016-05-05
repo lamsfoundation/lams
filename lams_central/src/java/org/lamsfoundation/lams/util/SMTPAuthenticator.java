@@ -32,6 +32,7 @@ public class SMTPAuthenticator extends javax.mail.Authenticator {
 	authentication = new PasswordAuthentication(username, password);
     }
 
+    @Override
     protected PasswordAuthentication getPasswordAuthentication() {
 	return authentication;
     }

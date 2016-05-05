@@ -2,21 +2,21 @@
  * Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
  * =============================================================
  * License Information: http://lamsfoundation.org/licensing/lams/2.0/
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301
  * USA
- * 
+ *
  * http://www.gnu.org/licenses/gpl.txt
  * ****************************************************************
  */
@@ -84,7 +84,7 @@ import org.lamsfoundation.lams.util.MessageService;
 
 /**
  * Class implements <code>org.lamsfoundation.lams.tool.taskList.service.ITaskListService</code>.
- * 
+ *
  * @author Andrey Balan
  * @see org.lamsfoundation.lams.tool.taskList.service.ITaskListService
  */
@@ -854,7 +854,7 @@ public class TaskListServiceImpl implements ITaskListService, ToolContentManager
 
     /**
      * Get the tool output for the given tool output name.
-     * 
+     *
      * @see org.lamsfoundation.lams.tool.ToolSessionManager#getToolOutput(java.lang.String, java.lang.Long,
      *      java.lang.Long)
      */
@@ -897,7 +897,7 @@ public class TaskListServiceImpl implements ITaskListService, ToolContentManager
 
     /**
      * Returns list of tasks from authoring + the tasks added by members of that group.
-     * 
+     *
      * @param contentId
      * @param sessionId
      *            sessionId which defines Group
@@ -942,7 +942,7 @@ public class TaskListServiceImpl implements ITaskListService, ToolContentManager
 
     /**
      * Process an uploaded file.
-     * 
+     *
      * @throws TaskListException
      * @throws FileNotFoundException
      * @throws IOException

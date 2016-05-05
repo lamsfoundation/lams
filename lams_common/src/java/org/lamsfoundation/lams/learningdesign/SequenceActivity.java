@@ -2,21 +2,21 @@
  * Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
  * =============================================================
  * License Information: http://lamsfoundation.org/licensing/lams/2.0/
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License version 2.0 
+ * it under the terms of the GNU General Public License version 2.0
  * as published by the Free Software Foundation.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301
  * USA
- * 
+ *
  * http://www.gnu.org/licenses/gpl.txt
  * ****************************************************************
  */
@@ -85,9 +85,10 @@ public class SequenceActivity extends ComplexActivity implements Serializable, I
 
     /**
      * Makes a copy of the SequenceActivity for authoring, preview and monitoring environment
-     * 
+     *
      * @return SequenceActivity Returns a deep-copy of the originalActivity
      */
+    @Override
     public Activity createCopy(int uiidOffset) {
 	SequenceActivity newSequenceActivity = new SequenceActivity();
 	copyToNewComplexActivity(newSequenceActivity, uiidOffset);
@@ -114,6 +115,7 @@ public class SequenceActivity extends ComplexActivity implements Serializable, I
 	return newSequenceActivity;
     }
 
+    @Override
     public String toString() {
 	return new ToStringBuilder(this).append("activityId", getActivityId()).toString();
     }
@@ -121,6 +123,7 @@ public class SequenceActivity extends ComplexActivity implements Serializable, I
     /**
      * @see org.lamsfoundation.lams.util.Nullable#isNull()
      */
+    @Override
     public boolean isNull() {
 	return false;
     }
@@ -129,10 +132,12 @@ public class SequenceActivity extends ComplexActivity implements Serializable, I
      *
      *
      */
+    @Override
     public SystemTool getSystemTool() {
 	return systemTool;
     }
 
+    @Override
     public void setSystemTool(SystemTool systemTool) {
 	this.systemTool = systemTool;
     }
@@ -140,7 +145,7 @@ public class SequenceActivity extends ComplexActivity implements Serializable, I
     /**
      * Get the set of the branch to group mappings used for this branching activity. The set contains
      * BranchActivityEntry entries
-     * 
+     *
      *
      *
      *
@@ -197,9 +202,10 @@ public class SequenceActivity extends ComplexActivity implements Serializable, I
      * Validate the sequence activity. If the sequence is part of an optional activity then there must be children. If a
      * sequence is part of branching then it may be empty but if there is any child activities then the default activity
      * (the first activity in the sequence) must be set.
-     * 
+     *
      * @return error message key
      */
+    @Override
     public Vector validateActivity(MessageService messageService) {
 	Vector listOfValidationErrors = new Vector();
 	if (getActivities() != null && getActivities().size() > 0 && getDefaultActivity() == null) {

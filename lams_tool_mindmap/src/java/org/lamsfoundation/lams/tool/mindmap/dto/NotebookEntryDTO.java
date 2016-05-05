@@ -5,52 +5,52 @@ import java.util.Date;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 
 public class NotebookEntryDTO {
-	
-	private Long uid;
 
-	private String entry;
-	
-	private Date createDate;
-	
-	private Date lastModified;
+    private Long uid;
 
-	public NotebookEntryDTO(NotebookEntry entry) {
-		this.uid = entry.getUid();
-		this.entry = entry.getEntry();
-		this.createDate = entry.getCreateDate();
-		this.lastModified = entry.getLastModified();		
-	}
+    private String entry;
 
-	public Date getCreateDate() {
-		return createDate;
-	}
+    private Date createDate;
 
-	public void setCreateDate(Date createDate) {
-		this.createDate = createDate;
-	}
+    private Date lastModified;
 
-	public String getEntry() {
-		return entry;
-	}
+    public NotebookEntryDTO(NotebookEntry entry) {
+	this.uid = entry.getUid();
+	this.entry = entry.getEntry();
+	this.createDate = entry.getCreateDate();
+	this.lastModified = entry.getLastModified();
+    }
 
-	public void setEntry(String entry) {
-		this.entry = entry;
-	}
+    public Date getCreateDate() {
+	return createDate;
+    }
 
-	public Date getLastModified() {
-		return lastModified;
-	}
+    public void setCreateDate(Date createDate) {
+	this.createDate = createDate;
+    }
 
-	public void setLastModified(Date lastModified) {
-		this.lastModified = lastModified;
-	}
+    public String getEntry() {
+	return entry;
+    }
 
-	public Long getUid() {
-		return uid;
-	}
+    public void setEntry(String entry) {
+	this.entry = entry;
+    }
 
-	public void setUid(Long uid) {
-		this.uid = uid;
-	}
-	
+    public Date getLastModified() {
+	return lastModified;
+    }
+
+    public void setLastModified(Date lastModified) {
+	this.lastModified = lastModified;
+    }
+
+    public Long getUid() {
+	return uid;
+    }
+
+    public void setUid(Long uid) {
+	this.uid = uid;
+    }
+
 }

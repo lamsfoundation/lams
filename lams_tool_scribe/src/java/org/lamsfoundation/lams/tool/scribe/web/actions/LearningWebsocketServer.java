@@ -35,7 +35,7 @@ import org.lamsfoundation.lams.web.util.AttributeNames;
 
 /**
  * Receives, processes and sends Scribe reports and votes to Learners.
- * 
+ *
  * @author Marcin Cieslak
  */
 @ServerEndpoint("/learningWebsocket")
@@ -256,12 +256,12 @@ public class LearningWebsocketServer {
 	}
 	JSONObject requestJSON = new JSONObject(input);
 	switch (requestJSON.getString("type")) {
-	case "vote":
-	    LearningWebsocketServer.vote(websocket);
-	    break;
-	case "submitReport":
-	    LearningWebsocketServer.submitReport(requestJSON, websocket);
-	    break;
+	    case "vote":
+		LearningWebsocketServer.vote(websocket);
+		break;
+	    case "submitReport":
+		LearningWebsocketServer.submitReport(requestJSON, websocket);
+		break;
 	}
     }
 
@@ -276,7 +276,7 @@ public class LearningWebsocketServer {
 		toolSessionId);
 	if (learner != null) {
 	    learner.setReportApproved(true);
-	    getScribeService().saveOrUpdateScribeUser(learner);
+	    LearningWebsocketServer.getScribeService().saveOrUpdateScribeUser(learner);
 	}
     }
 

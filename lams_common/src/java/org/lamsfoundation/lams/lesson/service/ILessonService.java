@@ -2,21 +2,21 @@
  * Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
  * =============================================================
  * License Information: http://lamsfoundation.org/licensing/lams/2.0/
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301
  * USA
- * 
+ *
  * http://www.gnu.org/licenses/gpl.txt
  * ****************************************************************
  */
@@ -41,7 +41,7 @@ import org.lamsfoundation.lams.usermanagement.User;
 
 /**
  * Access the general lesson details and access to grouping.
- * 
+ *
  * A lesson has two different "lists" of learners.
  * <OL>
  * <LI>The learners who are in the learner group attached to the lesson. This is fixed when the lesson is started and is
@@ -49,14 +49,14 @@ import org.lamsfoundation.lams.usermanagement.User;
  * <LI>The learners who have started the lesson. They may or may not be logged in currently, or if they are logged in
  * they may or may not be doing this lesson. This is available via getActiveLessonLearners().
  * </OL>
- * 
+ *
  * There used to be a list of all the learners who were logged into a lesson. This has been removed as we do not need
  * the functionality at present. If this is required later it should be combined with the user's shared session logic
  * and will need to purge users who haven't done anything for a while - otherwise a user whose PC has crashed and then
  * never returns to a lesson will staying in the cache forever.
- * 
+ *
  * @author lfoxton
- * 
+ *
  */
 public interface ILessonService {
 
@@ -90,7 +90,7 @@ public interface ILessonService {
      * Get the lesson details for the LAMS client. Suitable for the monitoring client. Contains a count of the total
      * number of learners in the lesson and the number of active learners. This is a pretty intensive call as it counts
      * all the learners in the lessons' learner group, and determines the number of active learners.
-     * 
+     *
      * @param lessonId
      * @return lesson details
      */
@@ -98,7 +98,7 @@ public interface ILessonService {
 
     /**
      * Get the lesson object.
-     * 
+     *
      * @param lessonId
      * @return lesson details
      */
@@ -109,7 +109,7 @@ public interface ILessonService {
      * lesson, based on the grouping activity. Currently used for random grouping. This method should be used when we do
      * have an grouping activity and learner that is already part of the Hibernate session. (e.g. from the
      * ForceComplete)
-     * 
+     *
      * @param lessonId
      *            lesson id (mandatory)
      * @param groupingActivity
@@ -121,7 +121,7 @@ public interface ILessonService {
 
     /**
      * Perform the grouping, setting the given list of learners as one group.
-     * 
+     *
      * @param groupingActivity
      *            the activity that has create grouping. (mandatory)
      * @param groupName
@@ -135,7 +135,7 @@ public interface ILessonService {
     /**
      * Perform the grouping, setting the given list of learners as one group. Used in suitations where there is a
      * grouping but no grouping activity (e.g. in branching).
-     * 
+     *
      * @param grouping
      *            the object on which to perform the grouing. (mandatory)
      * @param groupName
@@ -148,7 +148,7 @@ public interface ILessonService {
     /**
      * Perform grouping for all the learners who have started the lesson, based on the grouping. Currently used for
      * chosen grouping and branching
-     * 
+     *
      * @param lessonId
      *            lesson id (mandatory)
      * @param groupId
@@ -160,7 +160,7 @@ public interface ILessonService {
 
     /**
      * Perform grouping for the given learner.
-     * 
+     *
      * @param grouping
      *            the object on which to perform the grouing. (mandatory)
      * @param groupId
@@ -173,7 +173,7 @@ public interface ILessonService {
 
     /**
      * Remove learners from the given group.
-     * 
+     *
      * @param grouping
      *            the grouping from which to remove the learners (mandatory)
      * @param groupName
@@ -186,7 +186,7 @@ public interface ILessonService {
     /**
      * Create an empty group for the given grouping. If the group name already exists then it will force the name to be
      * unique.
-     * 
+     *
      * @param grouping
      *            the grouping. (mandatory)
      * @param groupName
@@ -198,7 +198,7 @@ public interface ILessonService {
     /**
      * Remove a group for the given grouping. If the group is already used (e.g. a tool session exists) then it throws a
      * GroupingException.
-     * 
+     *
      * @param grouping
      *            the grouping that contains the group to remove. (mandatory)
      * @param groupName
@@ -208,7 +208,7 @@ public interface ILessonService {
 
     /**
      * Add a learner to the lesson class. Checks for duplicates.
-     * 
+     *
      * @paran userId new learner id
      * @return true if added user, returns false if the user already a learner and hence not added.
      */
@@ -216,11 +216,11 @@ public interface ILessonService {
 
     /**
      * Add a set of learners to the lesson class.
-     * 
+     *
      * If version of the method is designed to be called from Moodle or some other external system, and is less
      * efficient in that it has to look up the user from the user id. If we don't do this, then we may get a a session
      * closed issue if this code is called from the LoginRequestValve (as the users will be from a previous session)
-     * 
+     *
      * @param lessonId
      *            new learner id
      * @param userIds
@@ -231,7 +231,7 @@ public interface ILessonService {
     /**
      * Add a set of learners to the lesson class. To be called within LAMS - see addLearners(Long lessonId, Integer[]
      * userIds) if calling from an external system.
-     * 
+     *
      * @param lesson
      *            lesson
      * @param users
@@ -247,7 +247,7 @@ public interface ILessonService {
     /**
      * Set the learners in a lesson class. Learners not in the users collection will be removed. To be called within
      * LAMS.
-     * 
+     *
      * @param lesson
      *            lesson
      * @param users
@@ -257,7 +257,7 @@ public interface ILessonService {
 
     /**
      * Add a new staff member to the lesson class. Checks for duplicates.
-     * 
+     *
      * @paran userId new learner id
      * @return true if added user, returns false if the user already a staff member and hence not added.
      */
@@ -265,11 +265,11 @@ public interface ILessonService {
 
     /**
      * Add a set of staff to the lesson class.
-     * 
+     *
      * If version of the method is designed to be called from Moodle or some other external system, and is less
      * efficient in that it has to look up the user from the user id. If we don't do this, then we may get a a session
      * closed issue if this code is called from the LoginRequestValve (as the users will be from a previous session)
-     * 
+     *
      * @param lessonId
      * @param userIds
      *            array of new staff ids
@@ -279,7 +279,7 @@ public interface ILessonService {
     /**
      * Add a set of staff members to the lesson class. To be called within LAMS - see addLearners(Long lessonId,
      * Integer[] userIds) if calling from an external system.
-     * 
+     *
      * @param lesson
      *            lesson
      * @param users
@@ -293,7 +293,7 @@ public interface ILessonService {
     /**
      * Set the staff members in a lesson class. Staff members not in the users collection will be removed. To be called
      * within LAMS.
-     * 
+     *
      * @param lesson
      *            lesson
      * @param users
@@ -304,7 +304,7 @@ public interface ILessonService {
     /**
      * Remove references to an activity from all learner progress entries. Used by Live Edit, to remove any references
      * to the system gates
-     * 
+     *
      * @param activity
      *            The activity for which learner progress references should be removed.
      */
@@ -313,7 +313,7 @@ public interface ILessonService {
     /**
      * Mark any learner progresses for this lesson as not completed. Called when Live Edit ends, to ensure that if there
      * were any completed progress records, and the design was extended, then they are no longer marked as completed.
-     * 
+     *
      * @param lessonId
      *            The lesson for which learner progress entries should be updated.
      */
@@ -335,7 +335,7 @@ public interface ILessonService {
 
     /**
      * Returns map of lessons in an organisation for a particular learner or staff user.
-     * 
+     *
      * @param userId
      *            user's id
      * @param orgId
@@ -347,9 +347,9 @@ public interface ILessonService {
     Map<Long, IndexLessonBean> getLessonsByOrgAndUserWithCompletedFlag(Integer userId, Integer orgId, Integer userRole);
 
     /**
-     * 
+     *
      * Returns list of lessons in a group (including sub-groups) for a particular user
-     * 
+     *
      * @param userId
      * @param organisationId
      * @return list of lessons
@@ -358,7 +358,7 @@ public interface ILessonService {
 
     /**
      * Return list of organisation's non-removed lessons.
-     * 
+     *
      * @param organisationId
      * @return list of lessons
      */
@@ -367,7 +367,7 @@ public interface ILessonService {
     /**
      * Gets the learner's progress details for a particular lesson. Will return null if the user has not started the
      * lesson.
-     * 
+     *
      * @param learnerId
      *            user's id
      * @param lessonId
@@ -378,7 +378,7 @@ public interface ILessonService {
 
     /**
      * Gets the progresses for learners in a particular lesson.
-     * 
+     *
      * @param lessonId
      *            lesson's id
      * @return learner's progress
@@ -387,7 +387,7 @@ public interface ILessonService {
 
     /**
      * Gets list of lessons which are originally based on the given learning design id.
-     * 
+     *
      * @param ldId
      * @param orgId
      * @return list of lessons
@@ -396,7 +396,7 @@ public interface ILessonService {
 
     /**
      * Finds out which lesson the given tool content belongs to and returns its monitoring users.
-     * 
+     *
      * @param sessionId
      *            tool session ID
      * @return list of teachers that monitor the lesson which contains the tool with given session ID

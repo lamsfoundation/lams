@@ -2,21 +2,21 @@
  * Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
  * =============================================================
  * License Information: http://lamsfoundation.org/licensing/lams/2.0/
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License version 2.0 
+ * it under the terms of the GNU General Public License version 2.0
  * as published by the Free Software Foundation.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301
  * USA
- * 
+ *
  * http://www.gnu.org/licenses/gpl.txt
  * ****************************************************************
  */
@@ -83,9 +83,10 @@ public class RatingService implements IRatingService {
     public int getCountItemsRatedByUser(final Long toolContentId, final Integer userId) {
 	return ratingDAO.getCountItemsRatedByUser(toolContentId, userId);
     }
-    
+
     @Override
-    public Map<Long, Long> countUsersRatedEachItem(final Long contentId, final Collection<Long> itemIds, Integer excludeUserId) {
+    public Map<Long, Long> countUsersRatedEachItem(final Long contentId, final Collection<Long> itemIds,
+	    Integer excludeUserId) {
 	return ratingDAO.countUsersRatedEachItem(contentId, itemIds, excludeUserId);
     }
 
@@ -95,7 +96,8 @@ public class RatingService implements IRatingService {
     }
 
     @Override
-    public ItemRatingCriteriaDTO rateItem(RatingCriteria ratingCriteria, Integer userId, Long itemId, float ratingFloat) {
+    public ItemRatingCriteriaDTO rateItem(RatingCriteria ratingCriteria, Integer userId, Long itemId,
+	    float ratingFloat) {
 	Long ratingCriteriaId = ratingCriteria.getRatingCriteriaId();
 	Rating rating = ratingDAO.getRating(ratingCriteriaId, userId, itemId);
 
@@ -119,8 +121,7 @@ public class RatingService implements IRatingService {
 
     @Override
     public void commentItem(RatingCriteria ratingCriteria, Integer userId, Long itemId, String comment) {
-	RatingComment ratingComment = ratingCommentDAO.getComment(ratingCriteria.getRatingCriteriaId(), userId,
-		itemId);
+	RatingComment ratingComment = ratingCommentDAO.getComment(ratingCriteria.getRatingCriteriaId(), userId, itemId);
 
 	// persist MessageRating changes in DB
 	if (ratingComment == null) { // add
@@ -138,7 +139,8 @@ public class RatingService implements IRatingService {
     }
 
     @Override
-    public List<ItemRatingDTO> getRatingCriteriaDtos(Long contentId, Collection<Long> itemIds, boolean isCommentsByOtherUsersRequired, Long userId) {
+    public List<ItemRatingDTO> getRatingCriteriaDtos(Long contentId, Collection<Long> itemIds,
+	    boolean isCommentsByOtherUsersRequired, Long userId) {
 
 	//initial preparations
 	NumberFormat numberFormat = NumberFormat.getInstance(Locale.US);
@@ -146,17 +148,18 @@ public class RatingService implements IRatingService {
 	List<RatingCriteria> criterias = getCriteriasByToolContentId(contentId);
 	boolean isSingleItem = itemIds.size() == 1;
 	Long singleItemId = isSingleItem ? itemIds.iterator().next() : null;
-	
+
 	//handle comments criteria
-	List<ItemRatingDTO> itemDtos = handleCommentsCriteria(criterias, itemIds, isCommentsByOtherUsersRequired, userId);
-	
+	List<ItemRatingDTO> itemDtos = handleCommentsCriteria(criterias, itemIds, isCommentsByOtherUsersRequired,
+		userId);
+
 	//get all data from DB
 	List<Rating> userRatings = ratingDAO.getRatingsByUser(contentId, userId.intValue());
 	List<Object[]> itemsStatistics;
 	if (isSingleItem) {
 	    itemsStatistics = ratingDAO.getRatingAverageByContentAndItem(contentId, singleItemId);
-	    
-	// query DB using itemIds
+
+	    // query DB using itemIds
 	} else {
 	    itemsStatistics = ratingDAO.getRatingAverageByContentAndItems(contentId, itemIds);
 	}
@@ -169,12 +172,12 @@ public class RatingService implements IRatingService {
 
 	    for (RatingCriteria criteria : criterias) {
 		Long criteriaId = criteria.getRatingCriteriaId();
-		
+
 		//comments' criteria are handled earlier, at the beginning of this function
 		if (criteria.isCommentsEnabled()) {
 		    continue;
 		}
-		    
+
 		ItemRatingCriteriaDTO criteriaDto = new ItemRatingCriteriaDTO();
 		criteriaDto.setRatingCriteria(criteria);
 
@@ -213,13 +216,13 @@ public class RatingService implements IRatingService {
 
 	return itemDtos;
     }
-    
+
     /*
      * Fetches all required comments from the DB.
      */
     private List<ItemRatingDTO> handleCommentsCriteria(List<RatingCriteria> criterias, Collection<Long> itemIds,
 	    boolean isCommentsByOtherUsersRequired, Long userId) {
-	
+
 	boolean isSingleItem = itemIds.size() == 1;
 	Long singleItemId = isSingleItem ? itemIds.iterator().next() : null;
 
@@ -230,61 +233,61 @@ public class RatingService implements IRatingService {
 	    itemDto.setItemId(itemId);
 	    itemDtos.add(itemDto);
 	}
-	
+
 	//handle comments criteria
 	for (RatingCriteria criteria : criterias) {
 	    if (criteria.isCommentsEnabled()) {
 		Long commentCriteriaId = criteria.getRatingCriteriaId();
-		
+
 		List<RatingCommentDTO> commentDtos;
 		if (isSingleItem) {
 		    commentDtos = ratingCommentDAO.getCommentsByCriteriaAndItem(commentCriteriaId, singleItemId);
-		
-		//query DB using itemIds
+
+		    //query DB using itemIds
 		} else if (isCommentsByOtherUsersRequired) {
 		    commentDtos = ratingCommentDAO.getCommentsByCriteriaAndItems(commentCriteriaId, itemIds);
-		    
-		// get only comments done by the specified user
+
+		    // get only comments done by the specified user
 		} else {
 		    commentDtos = ratingCommentDAO.getCommentsByCriteriaAndItemsAndUser(commentCriteriaId, itemIds,
 			    userId.intValue());
 		}
-		
-		for (ItemRatingDTO itemDto: itemDtos) {
+
+		for (ItemRatingDTO itemDto : itemDtos) {
 		    itemDto.setCommentsEnabled(true);
 		    itemDto.setCommentsCriteriaId(commentCriteriaId);
 		    itemDto.setCommentsMinWordsLimit(criteria.getCommentsMinWordsLimit());
-		    
+
 		    //assign commentDtos by the appropriate items
 		    List<RatingCommentDTO> commentDtosPerItem = new LinkedList<RatingCommentDTO>();
-		    for (RatingCommentDTO commentDto: commentDtos) {
+		    for (RatingCommentDTO commentDto : commentDtos) {
 			if (commentDto.getItemId().equals(itemDto.getItemId())) {
 			    commentDtosPerItem.add(commentDto);
-			    
+
 			    //fill in commentPostedByUser field
 			    if (commentDto.getUserId().equals(userId)) {
 				itemDto.setCommentPostedByUser(commentDto);
 			    }
 			}
 		    }
-		    
+
 		    itemDto.setCommentDtos(commentDtosPerItem);
 		}
-		
+
 		break;
 	    }
 	}
-	
+
 	return itemDtos;
     }
-    
+
     @Override
     public ItemRatingDTO getRatingCriteriaDtoWithActualRatings(Long contentId, Long itemId) {
 
 	NumberFormat numberFormat = NumberFormat.getInstance(Locale.US);
 	numberFormat.setMaximumFractionDigits(1);
 	List<RatingCriteria> criterias = getCriteriasByToolContentId(contentId);
-	
+
 	// handle comments criteria
 	List<Long> itemIds = Collections.singletonList(itemId);
 	boolean isCommentsByOtherUsersRequired = false;// not important as it's not used
@@ -292,7 +295,7 @@ public class RatingService implements IRatingService {
 	List<ItemRatingDTO> itemDtos = handleCommentsCriteria(criterias, itemIds, isCommentsByOtherUsersRequired,
 		userId);
 	ItemRatingDTO itemDto = itemDtos.get(0);
-	
+
 	//get all data from DB
 	List<Rating> itemRatings = ratingDAO.getRatingsByItem(contentId, itemId);
 
@@ -309,7 +312,7 @@ public class RatingService implements IRatingService {
 	    ItemRatingCriteriaDTO criteriaDto = new ItemRatingCriteriaDTO();
 	    criteriaDto.setRatingCriteria(criteria);
 	    List<RatingDTO> ratingDtos = new ArrayList<RatingDTO>();
-	    
+
 	    //find according to that criteria itemRatings
 	    for (Rating itemRating : itemRatings) {
 		if (itemRating.getRatingCriteria().getRatingCriteriaId().equals(criteria.getRatingCriteriaId())) {
@@ -325,7 +328,7 @@ public class RatingService implements IRatingService {
 	    criteriaDtos.add(criteriaDto);
 	}
 	itemDto.setCriteriaDtos(criteriaDtos);
-	
+
 	return itemDto;
     }
 
@@ -367,7 +370,7 @@ public class RatingService implements IRatingService {
 		// modify existing one if it exists. add otherwise
 		if (ratingCriteria == null) {
 		    ratingCriteria = new LearnerItemRatingCriteria();
-		    ratingCriteria.setRatingCriteriaTypeId(LearnerItemRatingCriteria.LEARNER_ITEM_CRITERIA_TYPE);
+		    ratingCriteria.setRatingCriteriaTypeId(RatingCriteria.LEARNER_ITEM_CRITERIA_TYPE);
 		    ((LearnerItemRatingCriteria) ratingCriteria).setToolContentId(toolContentId);
 		}
 
@@ -398,8 +401,7 @@ public class RatingService implements IRatingService {
 	if (isCommentsEnabled) {
 	    if (commentsResponsibleCriteria == null) {
 		commentsResponsibleCriteria = new LearnerItemRatingCriteria();
-		commentsResponsibleCriteria
-			.setRatingCriteriaTypeId(LearnerItemRatingCriteria.LEARNER_ITEM_CRITERIA_TYPE);
+		commentsResponsibleCriteria.setRatingCriteriaTypeId(RatingCriteria.LEARNER_ITEM_CRITERIA_TYPE);
 		((LearnerItemRatingCriteria) commentsResponsibleCriteria).setToolContentId(toolContentId);
 		commentsResponsibleCriteria.setOrderId(0);
 		commentsResponsibleCriteria.setCommentsEnabled(true);
@@ -417,12 +419,12 @@ public class RatingService implements IRatingService {
 	    }
 	}
     }
-    
+
     @Override
-    public boolean isCommentsEnabled(Long toolContentId) {	
+    public boolean isCommentsEnabled(Long toolContentId) {
 	return ratingCriteriaDAO.isCommentsEnabledForToolContent(toolContentId);
     }
-    
+
     @Override
     public int getCommentsMinWordsLimit(Long toolContentId) {
 	return ratingCriteriaDAO.getCommentsMinWordsLimitForToolContent(toolContentId);
@@ -443,7 +445,7 @@ public class RatingService implements IRatingService {
     }
 
     /**
-     * 
+     *
      * @param IUserManagementService
      *            The userManagementService to set.
      */

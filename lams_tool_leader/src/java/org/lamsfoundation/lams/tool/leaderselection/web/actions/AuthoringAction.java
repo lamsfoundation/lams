@@ -2,21 +2,21 @@
  * Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
  * =============================================================
  * License Information: http://lamsfoundation.org/licensing/lams/2.0/
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301
  * USA
- * 
+ *
  * http://www.gnu.org/licenses/gpl.txt
  * ****************************************************************
  */
@@ -25,11 +25,6 @@
 package org.lamsfoundation.lams.tool.leaderselection.web.actions;
 
 import java.util.Date;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Set;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -39,17 +34,13 @@ import org.apache.log4j.Logger;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
-import org.apache.struts.action.ActionMessages;
-import org.apache.struts.upload.FormFile;
 import org.lamsfoundation.lams.authoring.web.AuthoringConstants;
-import org.lamsfoundation.lams.contentrepository.client.IToolContentHandler;
 import org.lamsfoundation.lams.tool.ToolAccessMode;
 import org.lamsfoundation.lams.tool.leaderselection.model.Leaderselection;
 import org.lamsfoundation.lams.tool.leaderselection.service.ILeaderselectionService;
 import org.lamsfoundation.lams.tool.leaderselection.service.LeaderselectionServiceProxy;
 import org.lamsfoundation.lams.tool.leaderselection.util.LeaderselectionConstants;
 import org.lamsfoundation.lams.tool.leaderselection.web.forms.AuthoringForm;
-import org.lamsfoundation.lams.util.FileValidatorUtil;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.action.LamsDispatchAction;
 import org.lamsfoundation.lams.web.util.AttributeNames;
@@ -57,7 +48,7 @@ import org.lamsfoundation.lams.web.util.SessionMap;
 
 /**
  *
- * 
+ *
  *
  */
 public class AuthoringAction extends LamsDispatchAction {
@@ -74,7 +65,7 @@ public class AuthoringAction extends LamsDispatchAction {
     /**
      * Default method when no dispatch parameter is specified. It is expected that the parameter
      * <code>toolContentID</code> will be passed in. This will be used to retrieve content for this tool.
-     * 
+     *
      */
     @Override
     protected ActionForward unspecified(ActionMapping mapping, ActionForm form, HttpServletRequest request,
@@ -89,8 +80,8 @@ public class AuthoringAction extends LamsDispatchAction {
 
 	// set up leaderselectionService
 	if (leaderselectionService == null) {
-	    leaderselectionService = LeaderselectionServiceProxy.getLeaderselectionService(this.getServlet()
-		    .getServletContext());
+	    leaderselectionService = LeaderselectionServiceProxy
+		    .getLeaderselectionService(this.getServlet().getServletContext());
 	}
 
 	// retrieving Leaderselection with given toolContentID
@@ -135,11 +126,12 @@ public class AuthoringAction extends LamsDispatchAction {
 
 	// get authForm and session map.
 	AuthoringForm authForm = (AuthoringForm) form;
-	SessionMap<String, Object> map = (SessionMap<String, Object>) request.getSession().getAttribute(authForm.getSessionMapID());
+	SessionMap<String, Object> map = (SessionMap<String, Object>) request.getSession()
+		.getAttribute(authForm.getSessionMapID());
 
 	// get leaderselection content.
-	Leaderselection leaderselection = leaderselectionService.getContentByContentId((Long) map
-		.get(AuthoringAction.KEY_TOOL_CONTENT_ID));
+	Leaderselection leaderselection = leaderselectionService
+		.getContentByContentId((Long) map.get(AuthoringAction.KEY_TOOL_CONTENT_ID));
 
 	// update leaderselection content using form inputs.
 	ToolAccessMode mode = (ToolAccessMode) map.get(AuthoringAction.KEY_MODE);
@@ -168,7 +160,7 @@ public class AuthoringAction extends LamsDispatchAction {
 
     /**
      * Get ToolAccessMode from HttpRequest parameters. Default value is AUTHOR mode.
-     * 
+     *
      * @param request
      * @return
      */

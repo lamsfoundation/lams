@@ -2,21 +2,21 @@
  * Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
  * =============================================================
  * License Information: http://lamsfoundation.org/licensing/lams/2.0/
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301
  * USA
- * 
+ *
  * http://www.gnu.org/licenses/gpl.txt
  * ****************************************************************
  */
@@ -24,13 +24,11 @@
 
 package org.lamsfoundation.lams.tool.bbb.service;
 
-import org.apache.struts.upload.FormFile;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.tool.bbb.model.Bbb;
 import org.lamsfoundation.lams.tool.bbb.model.BbbConfig;
 import org.lamsfoundation.lams.tool.bbb.model.BbbSession;
 import org.lamsfoundation.lams.tool.bbb.model.BbbUser;
-import org.lamsfoundation.lams.tool.bbb.util.BbbException;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 
 /**
@@ -39,7 +37,7 @@ import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 public interface IBbbService {
     /**
      * Makes a copy of the default content and assigns it a newContentID
-     * 
+     *
      * @params newContentID
      * @return
      */
@@ -47,7 +45,7 @@ public interface IBbbService {
 
     /**
      * Returns an instance of the Bbb tools default content.
-     * 
+     *
      * @return
      */
     public Bbb getDefaultContent();
@@ -81,7 +79,7 @@ public interface IBbbService {
     public void saveOrUpdateBbbSession(BbbSession bbbSession);
 
     /**
-     * 
+     *
      * @param userId
      * @param toolSessionId
      * @return
@@ -89,20 +87,20 @@ public interface IBbbService {
     public BbbUser getUserByUserIdAndSessionId(Long userId, Long toolSessionId);
 
     /**
-     * 
+     *
      * @param uid
      * @return
      */
     public BbbUser getUserByUID(Long uid);
 
     /**
-     * 
+     *
      * @param bbbUser
      */
     public void saveOrUpdateBbbUser(BbbUser bbbUser);
 
     /**
-     * 
+     *
      * @param user
      * @param bbbSession
      * @return
@@ -110,7 +108,7 @@ public interface IBbbService {
     public BbbUser createBbbUser(UserDTO user, BbbSession bbbSession);
 
     /**
-     * 
+     *
      * @param id
      * @param idType
      * @param signature
@@ -122,20 +120,20 @@ public interface IBbbService {
     Long createNotebookEntry(Long id, Integer idType, String signature, Integer userID, String entry);
 
     /**
-     * 
+     *
      * @param uid
      * @return
      */
     NotebookEntry getNotebookEntry(Long uid);
 
     /**
-     * 
+     *
      * @param notebookEntry
      */
     void updateNotebookEntry(NotebookEntry notebookEntry);
 
     /**
-     * 
+     *
      * @param uid
      * @param title
      * @param entry
@@ -143,19 +141,19 @@ public interface IBbbService {
     void updateNotebookEntry(Long uid, String entry);
 
     /**
-     * 
+     *
      * @param key
      */
     BbbConfig getConfig(String key);
 
     /**
-     * 
+     *
      * @param key
      */
     String getConfigValue(String key);
 
     /**
-     * 
+     *
      * @param key
      * @param value
      */
@@ -163,20 +161,19 @@ public interface IBbbService {
 
     /**
      * Start a standard meeting
-     * 
+     *
      * @param meetingKey
      * @param attendeePassword
      * @param moderatorPassword
      * @return Meeting url
      * @throws Exception
      */
-    String startConference(String meetingKey, String atendeePassword, String moderatorPassword, 
-    		String returnURL, String welcomeMessage)
-	    throws Exception;
+    String startConference(String meetingKey, String atendeePassword, String moderatorPassword, String returnURL,
+	    String welcomeMessage) throws Exception;
 
     /**
      * Join a standard meeting
-     * 
+     *
      * @param userDTO
      * @param meetingKey
      * @param password
@@ -184,7 +181,6 @@ public interface IBbbService {
      */
     String getJoinMeetingURL(UserDTO userDTO, String meetingKey, String password) throws Exception;
 
-	Boolean isMeetingRunning(String meetingKey)  throws Exception;
-
+    Boolean isMeetingRunning(String meetingKey) throws Exception;
 
 }

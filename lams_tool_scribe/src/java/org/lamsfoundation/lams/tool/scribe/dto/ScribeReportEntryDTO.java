@@ -2,47 +2,48 @@ package org.lamsfoundation.lams.tool.scribe.dto;
 
 import org.lamsfoundation.lams.tool.scribe.model.ScribeReportEntry;
 
-public class ScribeReportEntryDTO implements Comparable<ScribeReportEntryDTO>{
-	
-	private Long uid;
+public class ScribeReportEntryDTO implements Comparable<ScribeReportEntryDTO> {
 
-	private String entryText;
-	
-	private ScribeHeadingDTO headingDTO;
-	
-	public ScribeReportEntryDTO(ScribeReportEntry reportEntry) {
-		this.uid = reportEntry.getUid();
-		this.entryText = reportEntry.getEntryText();
-		this.headingDTO = new ScribeHeadingDTO(reportEntry.getScribeHeading());
-	}
-	
-	public int compareTo(ScribeReportEntryDTO o) {
-		return this.headingDTO.compareTo(o.headingDTO);
-	}
-	
-	// Getters / Setters
-	public ScribeHeadingDTO getHeadingDTO() {
-		return headingDTO;
-	}
+    private Long uid;
 
-	public void setHeadingDTO(ScribeHeadingDTO headingDTO) {
-		this.headingDTO = headingDTO;
-	}
+    private String entryText;
 
-	public String getEntryText() {
-		return entryText;
-	}
+    private ScribeHeadingDTO headingDTO;
 
-	public void setEntryText(String entryText) {
-		this.entryText = entryText;
-	}
+    public ScribeReportEntryDTO(ScribeReportEntry reportEntry) {
+	this.uid = reportEntry.getUid();
+	this.entryText = reportEntry.getEntryText();
+	this.headingDTO = new ScribeHeadingDTO(reportEntry.getScribeHeading());
+    }
 
-	public Long getUid() {
-		return uid;
-	}
+    @Override
+    public int compareTo(ScribeReportEntryDTO o) {
+	return this.headingDTO.compareTo(o.headingDTO);
+    }
 
-	public void setUid(Long uid) {
-		this.uid = uid;
-	}
-	
+    // Getters / Setters
+    public ScribeHeadingDTO getHeadingDTO() {
+	return headingDTO;
+    }
+
+    public void setHeadingDTO(ScribeHeadingDTO headingDTO) {
+	this.headingDTO = headingDTO;
+    }
+
+    public String getEntryText() {
+	return entryText;
+    }
+
+    public void setEntryText(String entryText) {
+	this.entryText = entryText;
+    }
+
+    public Long getUid() {
+	return uid;
+    }
+
+    public void setUid(Long uid) {
+	this.uid = uid;
+    }
+
 }

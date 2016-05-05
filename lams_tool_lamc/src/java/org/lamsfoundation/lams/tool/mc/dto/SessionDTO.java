@@ -5,7 +5,7 @@ public class SessionDTO {
     private Long sessionId;
     private String sessionName;
 
-    public SessionDTO () {
+    public SessionDTO() {
     }
 
     public Long getSessionId() {

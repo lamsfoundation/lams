@@ -24,7 +24,9 @@ public class StatisticsService implements IStatisticsService {
     private IBaseDAO baseDAO;
     private IUserManagementService userService;
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see org.lamsfoundation.lams.statistics.service.IStatisticsService#getOverallStatistics()
      */
     @Override
@@ -52,7 +54,9 @@ public class StatisticsService implements IStatisticsService {
 
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see org.lamsfoundation.lams.statistics.service.IStatisticsService#getGroupStatisticsDTO(java.lang.Integer)
      */
     @Override

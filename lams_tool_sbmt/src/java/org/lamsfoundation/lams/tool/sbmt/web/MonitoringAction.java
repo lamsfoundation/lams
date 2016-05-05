@@ -2,21 +2,21 @@
  * Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
  * =============================================================
  * License Information: http://lamsfoundation.org/licensing/lams/2.0/
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License version 2.0 
+ * it under the terms of the GNU General Public License version 2.0
  * as published by the Free Software Foundation.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301
  * USA
- * 
+ *
  * http://www.gnu.org/licenses/gpl.txt
  * ****************************************************************
  */
@@ -35,7 +35,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.SortedSet;
 import java.util.TimeZone;
-import java.util.TreeMap;
 import java.util.TreeSet;
 
 import javax.servlet.http.HttpServletRequest;
@@ -82,14 +81,14 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
  * @author Manpreet Minhas
  *
  *
- * 
  *
  *
- * 
  *
- * 
  *
- * 
+ *
+ *
+ *
+ *
  *
  */
 public class MonitoringAction extends LamsDispatchAction {
@@ -97,6 +96,7 @@ public class MonitoringAction extends LamsDispatchAction {
     public ISubmitFilesService submitFilesService;
 
     private class SessionComparator implements Comparator<SessionDTO> {
+	@Override
 	public int compare(SessionDTO o1, SessionDTO o2) {
 	    if (o1 != null && o2 != null) {
 		return o1.getSessionName().compareTo(o2.getSessionName());
@@ -109,6 +109,7 @@ public class MonitoringAction extends LamsDispatchAction {
     }
 
     private class StatisticComparator implements Comparator<StatisticDTO> {
+	@Override
 	public int compare(StatisticDTO o1, StatisticDTO o2) {
 	    if (o1 != null && o2 != null) {
 		return o1.getSessionName().compareTo(o2.getSessionName());
@@ -156,7 +157,7 @@ public class MonitoringAction extends LamsDispatchAction {
 	    Date tzSubmissionDeadline = DateUtil.convertToTimeZoneFromDefault(teacherTimeZone, submissionDeadline);
 	    request.setAttribute(SbmtConstants.ATTR_SUBMISSION_DEADLINE, tzSubmissionDeadline.getTime());
 	}
-	
+
 	DynaActionForm smbtMonitoringForm = (DynaActionForm) form;
 	// smbtMonitoringForm.set("currentTab", WebUtil.readStrParam(request, AttributeNames.PARAM_CURRENT_TAB,true));
 
@@ -164,8 +165,8 @@ public class MonitoringAction extends LamsDispatchAction {
     }
 
     /** Ajax call to populate the tablesorter */
-    public ActionForward getUsers(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) 
-	    throws JSONException, IOException {
+    public ActionForward getUsers(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+	    HttpServletResponse response) throws JSONException, IOException {
 
 	Long sessionID = new Long(WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_SESSION_ID));
 	Long contentId = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_CONTENT_ID);
@@ -176,21 +177,23 @@ public class MonitoringAction extends LamsDispatchAction {
 	Integer sortByName = WebUtil.readIntParam(request, "column[0]", true);
 	Integer sortByNumFiles = WebUtil.readIntParam(request, "column[1]", true);
 	Integer sortByMarked = WebUtil.readIntParam(request, "column[2]", true);
-	String searchString = request.getParameter("fcol[0]"); 
+	String searchString = request.getParameter("fcol[0]");
 
 	int sorting = SbmtConstants.SORT_BY_NO;
-	if ( sortByName != null ) {
-	    sorting = sortByName.equals(0) ? SbmtConstants.SORT_BY_USERNAME_ASC : SbmtConstants.SORT_BY_USERNAME_DESC; 
-	} else if ( sortByNumFiles !=null ) {
-	    sorting = sortByNumFiles.equals(0) ? SbmtConstants.SORT_BY_NUM_FILES_ASC : SbmtConstants.SORT_BY_NUM_FILES_DESC; 
-	} else if ( sortByMarked !=null ) {
-	    sorting = sortByMarked.equals(0) ? SbmtConstants.SORT_BY_MARKED_ASC : SbmtConstants.SORT_BY_MARKED_DESC; 
+	if (sortByName != null) {
+	    sorting = sortByName.equals(0) ? SbmtConstants.SORT_BY_USERNAME_ASC : SbmtConstants.SORT_BY_USERNAME_DESC;
+	} else if (sortByNumFiles != null) {
+	    sorting = sortByNumFiles.equals(0) ? SbmtConstants.SORT_BY_NUM_FILES_ASC
+		    : SbmtConstants.SORT_BY_NUM_FILES_DESC;
+	} else if (sortByMarked != null) {
+	    sorting = sortByMarked.equals(0) ? SbmtConstants.SORT_BY_MARKED_ASC : SbmtConstants.SORT_BY_MARKED_DESC;
 	}
 
 	//return user list according to the given sessionID
 	ISubmitFilesService service = getSubmitFilesService();
 	SubmitFilesContent spreadsheet = service.getSubmitFilesContent(contentId);
-	List<Object[]> users = service.getUsersForTablesorter(sessionID, page, size, sorting, searchString, spreadsheet.isReflectOnActivity());
+	List<Object[]> users = service.getUsersForTablesorter(sessionID, page, size, sorting, searchString,
+		spreadsheet.isReflectOnActivity());
 
 	JSONArray rows = new JSONArray();
 	JSONObject responsedata = new JSONObject();
@@ -205,31 +208,31 @@ public class MonitoringAction extends LamsDispatchAction {
 	    responseRow.put(SbmtConstants.USER_ID, user.getUserID());
 	    responseRow.put(SbmtConstants.ATTR_USER_FULLNAME, StringEscapeUtils.escapeHtml(user.getFullName()));
 
-	    if ( userAndReflection.length > 1 ) {
+	    if (userAndReflection.length > 1) {
 		responseRow.put(SbmtConstants.ATTR_USER_NUM_FILE, userAndReflection[1]);
 	    }
-	    
-	    if ( userAndReflection.length > 2 ) {
-		responseRow.put(SbmtConstants.ATTR_USER_FILE_MARKED, (Integer)userAndReflection[2] > 0);
+
+	    if (userAndReflection.length > 2) {
+		responseRow.put(SbmtConstants.ATTR_USER_FILE_MARKED, (Integer) userAndReflection[2] > 0);
 	    }
-	    
-	    if ( userAndReflection.length > 3 ) {
+
+	    if (userAndReflection.length > 3) {
 		responseRow.put(SbmtConstants.ATTR_USER_REFLECTION, userAndReflection[3]);
 	    }
 
 	    rows.put(responseRow);
 	}
-	    
+
 	responsedata.put("rows", rows);
 	response.setContentType("application/json;charset=utf-8");
 	response.getWriter().print(new String(responsedata.toString()));
-	return null;	
+	return null;
 
     }
 
     /**
      * AJAX call to refresh statistic page.
-     * 
+     *
      * @param mapping
      * @param form
      * @param request
@@ -238,7 +241,7 @@ public class MonitoringAction extends LamsDispatchAction {
      */
     public ActionForward doStatistic(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) {
-	
+
 	Long contentID = new Long(WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_CONTENT_ID));
 	submitFilesService = getSubmitFilesService();
 	statistic(request, contentID);
@@ -252,10 +255,9 @@ public class MonitoringAction extends LamsDispatchAction {
 	request.setAttribute("statisticList", statistics);
     }
 
-
     /**
      * Release mark
-     * 
+     *
      * @param mapping
      * @param form
      * @param request
@@ -287,7 +289,7 @@ public class MonitoringAction extends LamsDispatchAction {
 
     /**
      * Download submit file marks by MS Excel file format.
-     * 
+     *
      * @param mapping
      * @param form
      * @param request
@@ -391,10 +393,10 @@ public class MonitoringAction extends LamsDispatchAction {
 
 	return null;
     }
-    
+
     /**
      * Set Submission Deadline
-     * 
+     *
      * @param mapping
      * @param form
      * @param request
@@ -404,10 +406,10 @@ public class MonitoringAction extends LamsDispatchAction {
     public ActionForward setSubmissionDeadline(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) {
 	submitFilesService = getSubmitFilesService();
-	
+
 	Long contentID = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_CONTENT_ID);
 	SubmitFilesContent content = submitFilesService.getSubmitFilesContent(contentID);
-	
+
 	Long dateParameter = WebUtil.readLongParam(request, SbmtConstants.ATTR_SUBMISSION_DEADLINE, true);
 	Date tzSubmissionDeadline = null;
 	if (dateParameter != null) {
@@ -428,7 +430,7 @@ public class MonitoringAction extends LamsDispatchAction {
     // **********************************************************
     /**
      * Display special user's marks information.
-     * 
+     *
      * @param mapping
      * @param form
      * @param request
@@ -451,7 +453,7 @@ public class MonitoringAction extends LamsDispatchAction {
 
     /**
      * View mark of all learner from same tool content ID.
-     * 
+     *
      * @param mapping
      * @param form
      * @param request
@@ -485,27 +487,28 @@ public class MonitoringAction extends LamsDispatchAction {
      * Return ResourceService bean.
      */
     private MessageService getMessageService() {
-	WebApplicationContext wac = WebApplicationContextUtils.getRequiredWebApplicationContext(getServlet()
-		.getServletContext());
+	WebApplicationContext wac = WebApplicationContextUtils
+		.getRequiredWebApplicationContext(getServlet().getServletContext());
 	return (MessageService) wac.getBean("sbmtMessageService");
     }
 
     /**
      * Save file mark information into HttpRequest
-     * 
+     *
      * @param request
      * @param sessionID
      * @param userID
      * @param detailID
      * @param updateMode
      */
-    private void setMarkPage(HttpServletRequest request, Long sessionID, Long userID, Long detailID, String updateMode) {
+    private void setMarkPage(HttpServletRequest request, Long sessionID, Long userID, Long detailID,
+	    String updateMode) {
 
     }
 
     /**
      * Save Summary information into HttpRequest.
-     * 
+     *
      * @param request
      * @param submitFilesSessionList
      */

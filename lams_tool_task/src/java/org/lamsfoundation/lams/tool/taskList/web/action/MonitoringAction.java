@@ -2,21 +2,21 @@
  * Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
  * =============================================================
  * License Information: http://lamsfoundation.org/licensing/lams/2.0/
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License version 2.0 
+ * it under the terms of the GNU General Public License version 2.0
  * as published by the Free Software Foundation.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301
  * USA
- * 
+ *
  * http://www.gnu.org/licenses/gpl.txt
  * ****************************************************************
  */
@@ -76,6 +76,7 @@ public class MonitoringAction extends Action {
     private static String TOOL_URL = Configuration.get(ConfigurationKeys.SERVER_URL) + "/tool/"
 	    + TaskListConstants.TOOL_SIGNATURE + "/";
 
+    @Override
     public ActionForward execute(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) throws IOException, ServletException, JSONException {
 	String param = mapping.getParameter();
@@ -137,7 +138,7 @@ public class MonitoringAction extends Action {
 	    Date tzSubmissionDeadline = DateUtil.convertToTimeZoneFromDefault(teacherTimeZone, submissionDeadline);
 	    sessionMap.put(TaskListConstants.ATTR_SUBMISSION_DEADLINE, tzSubmissionDeadline.getTime());
 	}
-	
+
 	// Create reflectList if reflection is enabled.
 	if (taskList.isReflectOnActivity()) {
 	    List<ReflectDTO> reflectList = service.getReflectList(taskList.getContentId());
@@ -158,9 +159,9 @@ public class MonitoringAction extends Action {
 
 	Long contentId = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_CONTENT_ID);
 	Long itemUid = WebUtil.readLongParam(request, TaskListConstants.PARAM_ITEM_UID);
-	
+
 	TaskListItem item = service.getTaskListItemByUid(itemUid);
-	
+
 	// create sessionList depending on whether the item was created by author or by learner
 	List<SessionDTO> sessionDtos = new ArrayList<SessionDTO>();
 	if (item.isCreateByAuthor()) {
@@ -169,7 +170,7 @@ public class MonitoringAction extends Action {
 		SessionDTO sessionDto = new SessionDTO(session);
 		sessionDtos.add(sessionDto);
 	    }
-		
+
 	} else {
 	    TaskListSession userSession = item.getCreateBy().getSession();
 	    SessionDTO sessionDto = new SessionDTO(userSession);
@@ -178,7 +179,7 @@ public class MonitoringAction extends Action {
 
 	request.setAttribute(TaskListConstants.ATTR_SESSION_DTOS, sessionDtos);
 	request.setAttribute(TaskListConstants.ATTR_TASK_LIST_ITEM, item);
-	
+
 	return mapping.findForward(TaskListConstants.SUCCESS);
     }
 
@@ -188,14 +189,14 @@ public class MonitoringAction extends Action {
     public ActionForward getPagedUsers(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse res) throws IOException, ServletException, JSONException {
 	ITaskListService service = getTaskListService();
-	
+
 	String sessionMapID = request.getParameter(TaskListConstants.ATTR_SESSION_MAP_ID);
 	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
 		.getAttribute(sessionMapID);
 	TaskList tasklist = (TaskList) sessionMap.get(TaskListConstants.ATTR_TASKLIST);
 	Long sessionId = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_SESSION_ID);
 	List<SessionDTO> sessionDtos = (List<SessionDTO>) sessionMap.get(TaskListConstants.ATTR_SESSION_DTOS);
-	
+
 	//find according sessionDto
 	SessionDTO sessionDto = null;
 	for (SessionDTO sessionDtoIter : sessionDtos) {
@@ -232,7 +233,7 @@ public class MonitoringAction extends Action {
 	    userData.put(userDto.getUserId());
 	    String fullName = StringEscapeUtils.escapeHtml(userDto.getFullName());
 	    userData.put(fullName);
-	    
+
 	    Set<Long> completedTaskUids = userDto.getCompletedTaskUids();
 	    for (TaskListItem item : items) {
 		String completionImage = completedTaskUids.contains(item.getUid())
@@ -276,7 +277,7 @@ public class MonitoringAction extends Action {
     public ActionForward getPagedUsersByItem(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse res) throws IOException, ServletException, JSONException {
 	ITaskListService service = getTaskListService();
-	
+
 	Long sessionId = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_SESSION_ID);
 	Long itemUid = WebUtil.readLongParam(request, TaskListConstants.PARAM_ITEM_UID);
 
@@ -298,13 +299,13 @@ public class MonitoringAction extends Action {
 	int totalPages = new Double(
 		Math.ceil(new Integer(countSessionUsers).doubleValue() / new Integer(rowLimit).doubleValue()))
 			.intValue();
-	
+
 	//date formatters
 	DateFormat dateFormatter = new SimpleDateFormat("d-MMM-yyyy h:mm a");
 	HttpSession ss = SessionManager.getSession();
 	UserDTO monitorDto = (UserDTO) ss.getAttribute(AttributeNames.USER);
 	TimeZone monitorTimeZone = monitorDto.getTimeZone();
-	
+
 	//get all comments and attachments
 	TaskListItem item = service.getTaskListItemByUid(itemUid);
 	Set<TaskListItemComment> itemComments = item.getComments();
@@ -314,24 +315,25 @@ public class MonitoringAction extends Action {
 	int i = 0;
 	JSONArray rows = new JSONArray();
 	for (TaskListUserDTO userDto : userDtos) {
-	    
+
 	    JSONArray userData = new JSONArray();
 	    String fullName = StringEscapeUtils.escapeHtml(userDto.getFullName());
 	    userData.put(fullName);
-	    
+
 	    String completionImage = userDto.isCompleted()
 		    ? "<img src='" + TOOL_URL + "/includes/images/completeitem.gif' border='0'>"
 		    : "<img src='" + TOOL_URL + "/includes/images/dash.gif' border='0'>";
 	    userData.put(completionImage);
-	    
-	    String accessDate = (userDto.getAccessDate() == null) ? "" : dateFormatter.format(DateUtil
-		    .convertToTimeZoneFromDefault(monitorTimeZone, userDto.getAccessDate()));
+
+	    String accessDate = (userDto.getAccessDate() == null) ? ""
+		    : dateFormatter
+			    .format(DateUtil.convertToTimeZoneFromDefault(monitorTimeZone, userDto.getAccessDate()));
 	    userData.put(accessDate);
 
 	    // fill up with comments and attachments made by this user
 	    if (item.isCommentsAllowed() || item.isFilesAllowed()) {
 		String commentsFiles = "<ul>";
-		
+
 		ArrayList<String> userComments = new ArrayList<String>();
 		for (TaskListItemComment comment : itemComments) {
 		    if (userDto.getUserId().equals(comment.getCreateBy().getUserId())) {
@@ -342,7 +344,7 @@ public class MonitoringAction extends Action {
 		    commentsFiles += "<li>";
 		    for (String userComment : userComments) {
 			commentsFiles += StringEscapeUtils.escapeHtml(userComment);
-		    }    
+		    }
 		    commentsFiles += "</li>";
 		}
 
@@ -357,15 +359,15 @@ public class MonitoringAction extends Action {
 		    for (TaskListItemAttachment userAttachment : userAttachments) {
 			commentsFiles += StringEscapeUtils.escapeHtml(userAttachment.getFileName()) + " ";
 			commentsFiles += "<a href='" + TOOL_URL + "/download/?uuid=" + userAttachment.getFileUuid()
-				+ "&versionID=" + userAttachment.getFileVersionId() + "&preferDownload=true'>" + label + "</a>";
+				+ "&versionID=" + userAttachment.getFileVersionId() + "&preferDownload=true'>" + label
+				+ "</a>";
 		    }
 		    commentsFiles += "</li>";
-		}		
-		
+		}
+
 		commentsFiles += "</ul>";
-		
-		
-//		
+
+//
 //		<c:forEach var="attachment" items="${visitLogSummary.attachments}">
 //			<li>
 //				<c:out value="${attachment.fileName}" />
@@ -381,7 +383,7 @@ public class MonitoringAction extends Action {
 //		</c:forEach>
 		userData.put(commentsFiles);
 	    }
-	    
+
 	    JSONObject userRow = new JSONObject();
 	    userRow.put("id", i++);
 	    userRow.put("cell", userData);
@@ -402,13 +404,13 @@ public class MonitoringAction extends Action {
 
     /**
      * Mark taskList user as verified.
-     * 
+     *
      * @param mapping
      * @param form
      * @param request
      * @param response
      * @return
-     * @throws IOException 
+     * @throws IOException
      */
     private ActionForward setVerifiedByMonitor(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) throws IOException {
@@ -417,8 +419,8 @@ public class MonitoringAction extends Action {
 	ITaskListService service = getTaskListService();
 	TaskListUser user = service.getUser(userUid);
 	user.setVerifiedByMonitor(true);
-	service.createUser(user); 
-	
+	service.createUser(user);
+
 	response.setContentType("text/html");
 	PrintWriter out = response.getWriter();
 	out.write(userUid.toString());
@@ -429,7 +431,7 @@ public class MonitoringAction extends Action {
 
     /**
      * Set Submission Deadline
-     * 
+     *
      * @param mapping
      * @param form
      * @param request

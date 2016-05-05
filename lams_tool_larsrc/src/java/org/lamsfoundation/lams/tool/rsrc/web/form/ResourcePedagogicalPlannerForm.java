@@ -113,12 +113,12 @@ public class ResourcePedagogicalPlannerForm extends PedagogicalPlannerActivityFo
 		    setTitle(topicIndex, item.getTitle());
 		    setType(topicIndex, itemType);
 		    setUrl(topicIndex, itemType == ResourceConstants.RESOURCE_TYPE_URL ? item.getUrl() : null);
-		    setFileName(topicIndex, itemType == ResourceConstants.RESOURCE_TYPE_FILE ? item.getFileName()
-			    : null);
-		    setFileUuid(topicIndex, itemType == ResourceConstants.RESOURCE_TYPE_FILE ? item.getFileUuid()
-			    : null);
-		    setFileVersion(topicIndex, itemType == ResourceConstants.RESOURCE_TYPE_FILE ? item
-			    .getFileVersionId() : null);
+		    setFileName(topicIndex,
+			    itemType == ResourceConstants.RESOURCE_TYPE_FILE ? item.getFileName() : null);
+		    setFileUuid(topicIndex,
+			    itemType == ResourceConstants.RESOURCE_TYPE_FILE ? item.getFileUuid() : null);
+		    setFileVersion(topicIndex,
+			    itemType == ResourceConstants.RESOURCE_TYPE_FILE ? item.getFileVersionId() : null);
 		    topicIndex++;
 		}
 	    }
@@ -283,11 +283,11 @@ public class ResourcePedagogicalPlannerForm extends PedagogicalPlannerActivityFo
      * mismatch excpetion since browser tried to fill an empty string to file field. Now in pedagogicalPlanner.js in
      * lams_central it is detected and the field name is changed to fileDummy, which sets the file to <code>NULLM</code>
      * here in Java form file.
-     * 
+     *
      * @param number
-     *                where to set the empty file
+     *            where to set the empty file
      * @param emptyString
-     *                never used; the file is set to <code>NULL</code> anyway
+     *            never used; the file is set to <code>NULL</code> anyway
      */
     public void setFileDummy(int number, String emptyString) {
 	setFile(number, null);

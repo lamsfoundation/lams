@@ -2,21 +2,21 @@
  * Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
  * =============================================================
  * License Information: http://lamsfoundation.org/licensing/lams/2.0/
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301
  * USA
- * 
+ *
  * http://www.gnu.org/licenses/gpl.txt
  * ***********************************************************************/
 /* $$Id$$ */
@@ -35,7 +35,7 @@ import org.apache.commons.lang.builder.ToStringBuilder;
  * Persistent object/bean that defines the question content for the MCQ tool. Provides accessors and mutators to get/set
  * attributes It maps to database table: tl_lamc11_que_content
  * </p>
- * 
+ *
  * @author Ozgur Demirtas
  */
 public class McQueContent implements Serializable, Comparable<McQueContent> {
@@ -85,9 +85,9 @@ public class McQueContent implements Serializable, Comparable<McQueContent> {
 
     /**
      * gets called by copyToolContent
-     * 
+     *
      * Copy constructor
-     * 
+     *
      * @param queContent
      *            the original qa question content
      * @return the new qa question content object
@@ -151,8 +151,9 @@ public class McQueContent implements Serializable, Comparable<McQueContent> {
     }
 
     public Set getMcOptionsContents() {
-	if (this.mcOptionsContents == null)
+	if (this.mcOptionsContents == null) {
 	    setMcOptionsContents(new HashSet());
+	}
 	return this.mcOptionsContents;
     }
 
@@ -167,12 +168,14 @@ public class McQueContent implements Serializable, Comparable<McQueContent> {
 	Iterator iter = getMcOptionsContents().iterator();
 	while (iter.hasNext()) {
 	    McOptsContent elem = (McOptsContent) iter.next();
-	    if (elem.getUid().equals(uid))
+	    if (elem.getUid().equals(uid)) {
 		return elem;
+	    }
 	}
 	return null;
     }
 
+    @Override
     public String toString() {
 	return new ToStringBuilder(this).append("uid", getUid()).toString();
     }
@@ -207,12 +210,14 @@ public class McQueContent implements Serializable, Comparable<McQueContent> {
 	this.feedback = feedback;
     }
 
+    @Override
     public int compareTo(McQueContent queContent) {
 	// if the object does not exist yet, then just return any one of 0, -1, 1. Should not make a difference.
-	if (mcQueContentId == null)
+	if (mcQueContentId == null) {
 	    return 1;
-	else
+	} else {
 	    return (int) (mcQueContentId.longValue() - queContent.mcQueContentId.longValue());
+	}
     }
 
     /**
@@ -229,7 +234,7 @@ public class McQueContent implements Serializable, Comparable<McQueContent> {
     public void setMark(Integer mark) {
 	this.mark = mark;
     }
-    
+
     public String getEscapedQuestion() {
 	return this.escapedQuestion;
     }

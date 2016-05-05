@@ -2,21 +2,21 @@
  * Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
  * =============================================================
  * License Information: http://lamsfoundation.org/licensing/lams/2.0/
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License version 2.0 
+ * it under the terms of the GNU General Public License version 2.0
  * as published by the Free Software Foundation.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301
  * USA
- * 
+ *
  * http://www.gnu.org/licenses/gpl.txt
  * ****************************************************************
  */
@@ -27,127 +27,128 @@ package org.lamsfoundation.lams.tool.chat.dto;
 
 import org.lamsfoundation.lams.tool.chat.model.ChatUser;
 
-public class ChatUserDTO implements Comparable{
-	
-	public Long uid;
-	
-	public String loginName;
-	
-	public String nickname;
-	
-	public String firstName;
-	
-	public String lastName;
-	
-	public Long userID;
-	
-	public String notebookEntry;
-	
-	public boolean finishedReflection;
-	
-	public int postCount;
-	
-	public boolean finishedActivity;
-	
-	public ChatUserDTO(ChatUser user) {
-		this.uid = user.getUid();
-		this.loginName = user.getLoginName();
-		this.nickname = user.getNickname();
-		this.firstName = user.getFirstName();
-		this.lastName = user.getLastName();
-		this.userID = user.getUserId();
-		this.finishedActivity = user.isFinishedActivity();
-		postCount=0; // this needs to be set manually.
-	}
+public class ChatUserDTO implements Comparable {
 
-	public int compareTo(Object o) {
-		int returnValue;
-		ChatUserDTO toUser = (ChatUserDTO)o;
-		returnValue = this.lastName.compareTo(toUser.lastName);
-		if (returnValue == 0) {
-			returnValue = this.uid.compareTo(toUser.uid);			
-		}
-		return returnValue;		
-	}
+    public Long uid;
 
-	public String getFirstName() {
-		return firstName;
-	}
+    public String loginName;
 
-	public void setFirstName(String firstName) {
-		this.firstName = firstName;
-	}
+    public String nickname;
 
-	public String getNickname() {
-		return nickname;
-	}
+    public String firstName;
 
-	public void setNickname(String nickname) {
-		this.nickname = nickname;
-	}
+    public String lastName;
 
-	public String getLastName() {
-		return lastName;
-	}
+    public Long userID;
 
-	public void setLastName(String lastName) {
-		this.lastName = lastName;
-	}
+    public String notebookEntry;
 
-	public String getLoginName() {
-		return loginName;
-	}
+    public boolean finishedReflection;
 
-	public void setLoginName(String loginName) {
-		this.loginName = loginName;
-	}
+    public int postCount;
 
-	public int getPostCount() {
-		return postCount;
-	}
+    public boolean finishedActivity;
 
-	public void setPostCount(int postCount) {
-		this.postCount = postCount;
-	}
+    public ChatUserDTO(ChatUser user) {
+	this.uid = user.getUid();
+	this.loginName = user.getLoginName();
+	this.nickname = user.getNickname();
+	this.firstName = user.getFirstName();
+	this.lastName = user.getLastName();
+	this.userID = user.getUserId();
+	this.finishedActivity = user.isFinishedActivity();
+	postCount = 0; // this needs to be set manually.
+    }
 
-	public Long getUid() {
-		return uid;
+    @Override
+    public int compareTo(Object o) {
+	int returnValue;
+	ChatUserDTO toUser = (ChatUserDTO) o;
+	returnValue = this.lastName.compareTo(toUser.lastName);
+	if (returnValue == 0) {
+	    returnValue = this.uid.compareTo(toUser.uid);
 	}
+	return returnValue;
+    }
 
-	public void setUid(Long uid) {
-		this.uid = uid;
-	}
+    public String getFirstName() {
+	return firstName;
+    }
 
-	public Long getUserID() {
-		return userID;
-	}
+    public void setFirstName(String firstName) {
+	this.firstName = firstName;
+    }
 
-	public void setUserID(Long userID) {
-		this.userID = userID;
-	}
+    public String getNickname() {
+	return nickname;
+    }
 
-	public boolean isFinishedActivity() {
-		return finishedActivity;
-	}
+    public void setNickname(String nickname) {
+	this.nickname = nickname;
+    }
 
-	public void setFinishedActivity(boolean finishedActivity) {
-		this.finishedActivity = finishedActivity;
-	}
+    public String getLastName() {
+	return lastName;
+    }
 
-	public String getNotebookEntry() {
-		return notebookEntry;
-	}
+    public void setLastName(String lastName) {
+	this.lastName = lastName;
+    }
 
-	public void setNotebookEntry(String notebookEntry) {
-		this.notebookEntry = notebookEntry;
-	}
+    public String getLoginName() {
+	return loginName;
+    }
 
-	public boolean isFinishedReflection() {
-		return finishedReflection;
-	}
+    public void setLoginName(String loginName) {
+	this.loginName = loginName;
+    }
 
-	public void setFinishedReflection(boolean finishedReflection) {
-		this.finishedReflection = finishedReflection;
-	}
-	
+    public int getPostCount() {
+	return postCount;
+    }
+
+    public void setPostCount(int postCount) {
+	this.postCount = postCount;
+    }
+
+    public Long getUid() {
+	return uid;
+    }
+
+    public void setUid(Long uid) {
+	this.uid = uid;
+    }
+
+    public Long getUserID() {
+	return userID;
+    }
+
+    public void setUserID(Long userID) {
+	this.userID = userID;
+    }
+
+    public boolean isFinishedActivity() {
+	return finishedActivity;
+    }
+
+    public void setFinishedActivity(boolean finishedActivity) {
+	this.finishedActivity = finishedActivity;
+    }
+
+    public String getNotebookEntry() {
+	return notebookEntry;
+    }
+
+    public void setNotebookEntry(String notebookEntry) {
+	this.notebookEntry = notebookEntry;
+    }
+
+    public boolean isFinishedReflection() {
+	return finishedReflection;
+    }
+
+    public void setFinishedReflection(boolean finishedReflection) {
+	this.finishedReflection = finishedReflection;
+    }
+
 }

@@ -60,7 +60,7 @@ public class LoginRequestDispatcher {
     public static final String PARAM_COUNTRY = "country";
 
     public static final String PARAM_LANGUAGE = "lang";
-    
+
     public static final String PARAM_IS_UPDATE_USER_DETAILS = "isUpdateUserDetails";
 
     public static final String PARAM_REQUEST_SRC = "requestSrc";
@@ -76,9 +76,9 @@ public class LoginRequestDispatcher {
     public static final String PARAM_CUSTOM_CSV = "customCSV";
 
     public static final String PARAM_EXT_LMS_ID = "extlmsid";
-    
+
     public static final String PARAM_MODE = "mode";
-    
+
     public static final String MODE_GRADEBOOK = "gradebook";
 
     public static final String METHOD_AUTHOR = "author";
@@ -86,14 +86,14 @@ public class LoginRequestDispatcher {
     public static final String METHOD_MONITOR = "monitor";
 
     public static final String METHOD_LEARNER = "learner";
-    
+
     // the same as METHOD_LEARNER but additionally requires hash to contain lsId in order to prevent users tampering
     // with lesson id parameter
-   public static final String METHOD_LEARNER_STRICT_AUTHENTICATION = "learnerStrictAuth";
+    public static final String METHOD_LEARNER_STRICT_AUTHENTICATION = "learnerStrictAuth";
 
-   public static final String PARAM_LEARNING_DESIGN_ID = "ldId";
+    public static final String PARAM_LEARNING_DESIGN_ID = "ldId";
 
-   public static final String PARAM_LESSON_ID = "lsid";
+    public static final String PARAM_LESSON_ID = "lsid";
 
     private static final String URL_DEFAULT = "/index.jsp";
 
@@ -102,7 +102,7 @@ public class LoginRequestDispatcher {
     private static final String URL_LEARNER = "/home.do?method=learner&lessonID=";
 
     private static final String URL_MONITOR = "/home.do?method=monitorLesson&lessonID=";
-    
+
     private static final String URL_GRADEBOOK = "/services/Gradebook?";
 
     private static IIntegrationService integrationService = null;
@@ -115,17 +115,18 @@ public class LoginRequestDispatcher {
      * fetches the method parameter from HttpServletRequest and builds the redirect url.
      * If the method parameter is used and a lessonId is supplied, then the user is added
      * to the LessonClass.
-     * 
+     *
      * @param request
      * @return
      */
-    
+
     public static String getRequestURL(HttpServletRequest request) throws ServletException {
 
 	// get the location from an explicit parameter if it exists
 	String redirect = request.getParameter("redirectURL");
-	if ( redirect != null )
+	if (redirect != null) {
 	    return request.getContextPath() + "/" + redirect;
+	}
 
 	String method = request.getParameter(PARAM_METHOD);
 	String lessonId = request.getParameter(PARAM_LESSON_ID);
@@ -133,14 +134,14 @@ public class LoginRequestDispatcher {
 
 	if (lessonId != null) {
 	    try {
-		addUserToLessonClass(request, lessonId, method);
+		LoginRequestDispatcher.addUserToLessonClass(request, lessonId, method);
 	    } catch (UserInfoFetchException e) {
 		throw new ServletException(e);
 	    } catch (UserInfoValidationException e) {
 		throw new ServletException(e);
 	    }
 	}
-	
+
 	if (MODE_GRADEBOOK.equals(mode)) {
 	    return request.getContextPath() + URL_GRADEBOOK + request.getQueryString();
 	}
@@ -162,11 +163,13 @@ public class LoginRequestDispatcher {
 		parameters = ldID != null ? parameters + "&learningDesignID" + "=" + ldID : parameters;
 		parameters = customCSV != null ? parameters + "&" + PARAM_CUSTOM_CSV + "=" + customCSV : parameters;
 		parameters = extLmsId != null ? parameters + "&" + PARAM_EXT_LMS_ID + "=" + extLmsId : parameters;
-		parameters = requestSrc != null ? parameters + "&" + PARAM_REQUEST_SRC + "="
-			+ URLEncoder.encode(requestSrc, "UTF8") : parameters;
+		parameters = requestSrc != null
+			? parameters + "&" + PARAM_REQUEST_SRC + "=" + URLEncoder.encode(requestSrc, "UTF8")
+			: parameters;
 		parameters = notifyCloseURL != null ? parameters + "&" + AttributeNames.PARAM_NOTIFY_CLOSE_URL + "="
 			+ URLEncoder.encode(notifyCloseURL, "UTF8") : parameters;
-		parameters = isPostMessageToParent != null ? parameters + "&" + PARAM_IS_POST_MESSAGE_TO_PARENT + "=" + isPostMessageToParent : parameters;
+		parameters = isPostMessageToParent != null
+			? parameters + "&" + PARAM_IS_POST_MESSAGE_TO_PARENT + "=" + isPostMessageToParent : parameters;
 	    } catch (UnsupportedEncodingException e) {
 		log.error(e);
 	    }
@@ -178,7 +181,8 @@ public class LoginRequestDispatcher {
 	    return request.getContextPath() + URL_MONITOR + lessonId;
 	}
 	/** LEARNER * */
-	else if ((METHOD_LEARNER.equals(method) || METHOD_LEARNER_STRICT_AUTHENTICATION.equals(method)) && lessonId != null) {
+	else if ((METHOD_LEARNER.equals(method) || METHOD_LEARNER_STRICT_AUTHENTICATION.equals(method))
+		&& lessonId != null) {
 	    String url = request.getContextPath() + URL_LEARNER + lessonId;
 	    if (mode != null) {
 		url += "&" + PARAM_MODE + "=" + mode;
@@ -192,12 +196,14 @@ public class LoginRequestDispatcher {
     private static void addUserToLessonClass(HttpServletRequest request, String lessonId, String method)
 	    throws UserInfoFetchException, UserInfoValidationException {
 	if (integrationService == null) {
-	    integrationService = (IntegrationService) WebApplicationContextUtils.getRequiredWebApplicationContext(
-		    request.getSession().getServletContext()).getBean("integrationService");
+	    integrationService = (IntegrationService) WebApplicationContextUtils
+		    .getRequiredWebApplicationContext(request.getSession().getServletContext())
+		    .getBean("integrationService");
 	}
 	if (lessonService == null) {
-	    lessonService = (ILessonService) WebApplicationContextUtils.getRequiredWebApplicationContext(
-		    request.getSession().getServletContext()).getBean("lessonService");
+	    lessonService = (ILessonService) WebApplicationContextUtils
+		    .getRequiredWebApplicationContext(request.getSession().getServletContext())
+		    .getBean("lessonService");
 	}
 	String serverId = request.getParameter(PARAM_SERVER_ID);
 	String extUsername = request.getParameter(PARAM_USER_ID);
@@ -210,9 +216,10 @@ public class LoginRequestDispatcher {
 	    throw new UserInfoFetchException(error);
 	}
 
-	if (METHOD_LEARNER.equals(method) || METHOD_LEARNER_STRICT_AUTHENTICATION.equals(method))
+	if (METHOD_LEARNER.equals(method) || METHOD_LEARNER_STRICT_AUTHENTICATION.equals(method)) {
 	    lessonService.addLearner(Long.parseLong(lessonId), user.getUserId());
-	else if (METHOD_MONITOR.equals(method))
+	} else if (METHOD_MONITOR.equals(method)) {
 	    lessonService.addStaffMember(Long.parseLong(lessonId), user.getUserId());
+	}
     }
 }

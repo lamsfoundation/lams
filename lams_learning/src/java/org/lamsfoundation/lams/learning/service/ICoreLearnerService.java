@@ -2,21 +2,21 @@
  * Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
  * =============================================================
  * License Information: http://lamsfoundation.org/licensing/lams/2.0/
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General License version 2.0 
+ * it under the terms of the GNU General License version 2.0
  * as published by the Free Software Foundation.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General License for more details.
- * 
+ *
  * You should have received a copy of the GNU General License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301
  * USA
- * 
+ *
  * http://www.gnu.org/licenses/gpl.txt
  * ****************************************************************
  */
@@ -41,7 +41,7 @@ import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
 
 /**
- * 
+ *
  * All Learner service methods that are available within the core. These methods may require all the tool's Spring
  * context files to be loaded, in addition to the core Spring context files. Hence it should only be used from
  * lams-learning, lams-monitoring, lams-central wars.
@@ -52,13 +52,13 @@ public interface ICoreLearnerService extends ILearnerService {
 
     /**
      * Gets the lesson object for the given key.
-     * 
+     *
      */
     Lesson getLesson(Long lessonID);
 
     /**
      * Joins a User to a a new lesson as a learner
-     * 
+     *
      * @param learnerId
      *            the Learner's userID
      * @param lessionID
@@ -72,7 +72,7 @@ public interface ICoreLearnerService extends ILearnerService {
      * This method navigate through all the tool activities for the given activity. For each tool activity, we look up
      * the database to check up the existance of correspondent tool session. If the tool session doesn't exist, we
      * create a new tool session instance.
-     * 
+     *
      * @param learnerProgress
      *            the learner progress we are processing.
      * @throws LamsToolServiceException
@@ -81,7 +81,7 @@ public interface ICoreLearnerService extends ILearnerService {
 
     /**
      * Returns the current progress data of the User.
-     * 
+     *
      * @param learnerId
      *            the Learner's userID
      * @param lessonId
@@ -94,7 +94,7 @@ public interface ICoreLearnerService extends ILearnerService {
 
     /**
      * Returns the current progress data, in the DTO format required by the jsp progress screen, of the User.
-     * 
+     *
      * @param learnerId
      *            the Learner's userID
      * @param lessonId
@@ -107,7 +107,7 @@ public interface ICoreLearnerService extends ILearnerService {
 
     /**
      * Return the current progress data against progress id.
-     * 
+     *
      * @param progressId
      * @return
      */
@@ -115,7 +115,7 @@ public interface ICoreLearnerService extends ILearnerService {
 
     /**
      * Marks an activity as attempted. Called when a user selects an OptionsActivity.
-     * 
+     *
      * @param learnerId
      *            the Learner's userID
      * @param lessonId
@@ -132,7 +132,7 @@ public interface ICoreLearnerService extends ILearnerService {
     /**
      * Calculates learner progress and returns the data required to be displayed to the learner (including URL(s)). This
      * method is included in the interface for testing purposes.
-     * 
+     *
      * @param completedActivityID
      *            identifies the activity just completed
      * @param learner
@@ -148,7 +148,7 @@ public interface ICoreLearnerService extends ILearnerService {
      * Complete the activity in the progress engine and delegate to the progress engine to calculate the next activity
      * in the learning design. It is currently triggered by various progress engine related action classes, which then
      * calculate the url to go to next, based on the ActivityMapping class.
-     * 
+     *
      * @param learnerId
      *            the learner who are running this activity in the design.
      * @param activity
@@ -161,7 +161,7 @@ public interface ICoreLearnerService extends ILearnerService {
 
     /**
      * If specified activity is set to produce ToolOutput, calculates and stores mark to gradebook.
-     * 
+     *
      * @param toolActivity
      * @param progress
      */
@@ -170,9 +170,9 @@ public interface ICoreLearnerService extends ILearnerService {
     /**
      * Same as LearnerProgress completeActivity(Integer learnerId,Activity activity,LearnerProgress progress) except
      * that the it works out the current learner's progress from the given lesson id.
-     * 
+     *
      * Use the other method if you already have the learner progress, as this method looks up the learner progress.
-     * 
+     *
      * @param learnerId
      *            the learner who are running this activity in the design.
      * @param activity
@@ -186,7 +186,7 @@ public interface ICoreLearnerService extends ILearnerService {
     /**
      * Retrieve all lessons that has been started, suspended or finished. All finished but archived lesson should not be
      * loaded.
-     * 
+     *
      * @param learner
      *            the user who intend to start a lesson
      * @return a list of active lessons.
@@ -195,7 +195,7 @@ public interface ICoreLearnerService extends ILearnerService {
 
     /**
      * Returns an activity according to the activity id.
-     * 
+     *
      * @param activityId
      *            the activity id.
      * @return the activity requested.
@@ -204,7 +204,7 @@ public interface ICoreLearnerService extends ILearnerService {
 
     /**
      * Perform grouping for the learners who have started the lesson, based on the grouping activity.
-     * 
+     *
      * @param lessonId
      *            lesson id
      * @param groupingActivityId
@@ -220,7 +220,7 @@ public interface ICoreLearnerService extends ILearnerService {
 
     /**
      * Perform grouping for the learner, depending on his/hers choice.
-     * 
+     *
      * @param lessonId
      *            lesson id
      * @param groupingActivityId
@@ -237,7 +237,7 @@ public interface ICoreLearnerService extends ILearnerService {
 
     /**
      * Returns the maximum number of learners per group in learner's choice grouping.
-     * 
+     *
      * @param lessonId
      *            id of the lesson
      * @param groupingId
@@ -252,7 +252,7 @@ public interface ICoreLearnerService extends ILearnerService {
     /**
      * Check up the gate status to go through the gate. This also updates the gate. This method should be used when we
      * do not have an grouping activity that is already part of the Hibernate session.
-     * 
+     *
      * @param gateid
      *            the gate that current learner is facing. It could be synch gate, schedule gate or permission gate.
      * @param knocker
@@ -266,7 +266,7 @@ public interface ICoreLearnerService extends ILearnerService {
     /**
      * Check up the gate status to go through the gate. This also updates the gate. This method should be used when we
      * do have an grouping activity that is already part of the Hibernate session.
-     * 
+     *
      * @param gate
      *            the gate that current learner is facing. It could be synch gate, schedule gate or permission gate.
      *            Don't supply the actual gate from the cached web version as it might be out of date or not attached to
@@ -288,7 +288,7 @@ public interface ICoreLearnerService extends ILearnerService {
     Lesson getLessonByActivity(Activity activity);
 
     /**
-     * 
+     *
      * @param learnerId
      *            the learner who triggers the move
      * @param lessonId
@@ -304,7 +304,7 @@ public interface ICoreLearnerService extends ILearnerService {
     /**
      * Work out which branch to which a user should go. If the current lesson is a preview lesson, it will force the
      * user to a branch if at all possible.
-     * 
+     *
      * @param lesson
      *            current lesson.
      * @param BranchingActivity
@@ -318,7 +318,7 @@ public interface ICoreLearnerService extends ILearnerService {
 
     /**
      * Select a particular branch - we are in preview mode and the author has selected a particular activity.
-     * 
+     *
      * @param lesson
      *            current lesson.
      * @param BranchingActivity

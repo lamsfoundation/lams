@@ -79,7 +79,8 @@ public class OrganisationGroupServlet extends HttpServlet {
 	String courseId = request.getParameter(CentralConstants.PARAM_COURSE_ID);
 
 	// first, check if request contains all the details required for authentication
-	if ((username == null) || (serverId == null) || (datetime == null) || (hashValue == null) || (courseId == null)) {
+	if ((username == null) || (serverId == null) || (datetime == null) || (hashValue == null)
+		|| (courseId == null)) {
 	    response.sendError(HttpServletResponse.SC_BAD_REQUEST,
 		    "Course group action failed - authentication parameters missing");
 	    return;
@@ -115,7 +116,8 @@ public class OrganisationGroupServlet extends HttpServlet {
 	    }
 	} catch (AuthenticationException e) {
 	    OrganisationGroupServlet.log.error(e);
-	    response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Course group action failed - authentication error");
+	    response.sendError(HttpServletResponse.SC_UNAUTHORIZED,
+		    "Course group action failed - authentication error");
 	    return;
 	} catch (UserInfoFetchException e) {
 	    OrganisationGroupServlet.log.error(e);
@@ -201,8 +203,8 @@ public class OrganisationGroupServlet extends HttpServlet {
 	getUserManagementService().delete(grouping);
 
 	if (OrganisationGroupServlet.log.isDebugEnabled()) {
-	    OrganisationGroupServlet.log.debug("Deleted course grouping with ID " + groupingName
-		    + " from organisation with ID " + organisationId);
+	    OrganisationGroupServlet.log.debug(
+		    "Deleted course grouping with ID " + groupingName + " from organisation with ID " + organisationId);
 	}
     }
 

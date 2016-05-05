@@ -45,14 +45,14 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
 
 /**
  * @author lfoxton
- * 
- *         Handles the learner interfaces for gradebook
- * 
- *         This is where marking for an activity/lesson takes place
- * 
- * 
  *
- * 
+ *         Handles the learner interfaces for gradebook
+ *
+ *         This is where marking for an activity/lesson takes place
+ *
+ *
+ *
+ *
  *
  *
  *
@@ -81,8 +81,8 @@ public class GradebookLearningAction extends LamsDispatchAction {
 		return mapping.findForward("error");
 	    }
 	    if (!getSecurityService().hasOrgRole(oranisationID, user.getUserID(),
-		    new String[] { Role.GROUP_MANAGER, Role.MONITOR, Role.LEARNER },
-		    "get course gradebook for learner", false)) {
+		    new String[] { Role.GROUP_MANAGER, Role.MONITOR, Role.LEARNER }, "get course gradebook for learner",
+		    false)) {
 		response.sendError(HttpServletResponse.SC_FORBIDDEN, "User is not a participant in the organisation");
 		return null;
 	    }
@@ -109,8 +109,8 @@ public class GradebookLearningAction extends LamsDispatchAction {
 
     private IUserManagementService getUserService() {
 	if (GradebookLearningAction.userService == null) {
-	    WebApplicationContext ctx = WebApplicationContextUtils.getRequiredWebApplicationContext(getServlet()
-		    .getServletContext());
+	    WebApplicationContext ctx = WebApplicationContextUtils
+		    .getRequiredWebApplicationContext(getServlet().getServletContext());
 	    GradebookLearningAction.userService = (IUserManagementService) ctx.getBean("userManagementService");
 	}
 	return GradebookLearningAction.userService;
@@ -118,8 +118,8 @@ public class GradebookLearningAction extends LamsDispatchAction {
 
     private ISecurityService getSecurityService() {
 	if (GradebookLearningAction.securityService == null) {
-	    WebApplicationContext ctx = WebApplicationContextUtils.getRequiredWebApplicationContext(getServlet()
-		    .getServletContext());
+	    WebApplicationContext ctx = WebApplicationContextUtils
+		    .getRequiredWebApplicationContext(getServlet().getServletContext());
 	    GradebookLearningAction.securityService = (ISecurityService) ctx.getBean("securityService");
 	}
 	return GradebookLearningAction.securityService;

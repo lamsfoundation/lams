@@ -31,54 +31,54 @@ import org.lamsfoundation.lams.notebook.model.NotebookEntry;
  */
 public class ReflectionDTO {
 
-	private Long userId;
-	private String username;
-	private String fullName;
-	private String entry;
-	private Long externalId;
-	
-	public ReflectionDTO(NotebookEntry nbEntry) {
-		this.entry = nbEntry.getEntry();
-	}
-	
-	public Long getUserId() {
-		return userId;
-	}
-	
-	public void setUserId(Long userId) {
-		this.userId = userId;
-	}
-	
-	public String getUsername() {
-		return username;
-	}
-	
-	public void setUsername(String username) {
-		this.username = username;
-	}
-	
-	public String getFullName() {
-		return fullName;
-	}
-	
-	public void setFullName(String fullName) {
-		this.fullName = fullName;
-	}
-	
-	public String getEntry() {
-		return entry;
-	}
-	
-	public void setEntry(String entry) {
-		this.entry = entry;
-	}
-	
-	public Long getExternalId() {
-		return externalId;
-	}
-	
-	public void setExternalId(Long externalId) {
-		this.externalId = externalId;
-	}
-	
+    private Long userId;
+    private String username;
+    private String fullName;
+    private String entry;
+    private Long externalId;
+
+    public ReflectionDTO(NotebookEntry nbEntry) {
+	this.entry = nbEntry.getEntry();
+    }
+
+    public Long getUserId() {
+	return userId;
+    }
+
+    public void setUserId(Long userId) {
+	this.userId = userId;
+    }
+
+    public String getUsername() {
+	return username;
+    }
+
+    public void setUsername(String username) {
+	this.username = username;
+    }
+
+    public String getFullName() {
+	return fullName;
+    }
+
+    public void setFullName(String fullName) {
+	this.fullName = fullName;
+    }
+
+    public String getEntry() {
+	return entry;
+    }
+
+    public void setEntry(String entry) {
+	this.entry = entry;
+    }
+
+    public Long getExternalId() {
+	return externalId;
+    }
+
+    public void setExternalId(Long externalId) {
+	this.externalId = externalId;
+    }
+
 }

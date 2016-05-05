@@ -18,10 +18,10 @@
  *
  * http://www.gnu.org/licenses/gpl.txt
  * ****************************************************************
- */ 
- 
-/* $Id$ */ 
-package org.lamsfoundation.lams.web; 
+ */
+
+/* $Id$ */
+package org.lamsfoundation.lams.web;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -41,15 +41,14 @@ import org.lamsfoundation.lams.usermanagement.Role;
 import org.lamsfoundation.lams.usermanagement.UserOrganisationRole;
 import org.lamsfoundation.lams.usermanagement.service.UserManagementService;
 import org.lamsfoundation.lams.util.WebUtil;
-import org.lamsfoundation.lams.web.session.SessionManager;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
- 
+
 /**
- * Used by main.jsp to persist the ordering of lessonIds when lessons are 
- * ordered by a staff member for a group.  Currently stores lessonIds as a
+ * Used by main.jsp to persist the ordering of lessonIds when lessons are
+ * ordered by a staff member for a group. Currently stores lessonIds as a
  * single comma separated string in lams_organisation.
- * 
+ *
  * @author jliew
  *
  *
@@ -57,119 +56,121 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
  */
 public class LessonOrderServlet extends HttpServlet {
 
-	private static Logger log = Logger.getLogger(LessonOrderServlet.class);
-	
-	public void doGet(HttpServletRequest request, HttpServletResponse response) 
-		throws ServletException, IOException {
-	    	// even though response is empty, it is needed so Firefox does not show parsing error
-	    	response.setContentType("text/html;charset=utf-8");
-	    
-		Integer orgId = WebUtil.readIntParam(request, "orgId", false);
-		String ids = request.getParameter("ids");
-		
-		WebApplicationContext ctx = WebApplicationContextUtils.getWebApplicationContext(this.getServletContext());
-		UserManagementService service = (UserManagementService) ctx.getBean("userManagementService");
-		
-		if (orgId != null && ids != null) {
-			Organisation org = (Organisation)service.findById(Organisation.class, orgId);
-						
-			if (org != null) {
-				// make sure user has permission to sort org lessons
-				boolean allowSorting = false;
-				List<Integer> roles = new ArrayList<Integer>();
-				List<UserOrganisationRole> userOrganisationRoles = service.getUserOrganisationRoles(orgId,request.getRemoteUser());
-				for(UserOrganisationRole userOrganisationRole:userOrganisationRoles){
-					Integer roleId = userOrganisationRole.getRole().getRoleId();
-					roles.add(roleId);
-					if (roleId.equals(Role.ROLE_GROUP_MANAGER) || roleId.equals(Role.ROLE_MONITOR)) {
-						allowSorting = true;
-						break;
-					}
-				}
-				if (!allowSorting) {
-					log.warn("User " + request.getRemoteUser() + " tried to sort lessons in orgId " + orgId);
-					response.sendError(HttpServletResponse.SC_FORBIDDEN);
-					return;
-				}
-				
-				// make sure we record lesson ids that belong to this org
-				List<String> idList = Arrays.asList(ids.split(","));
-				List lessons = service.findByProperty(Lesson.class, "organisation", org);
-				for (String id : idList) {
-					try {
-						Long l = new Long(Long.parseLong(id));
-						if (!contains(lessons, l)) {
-							log.warn("Lesson with id " + l + " doesn't belong in org with id " + orgId);
-							response.sendError(HttpServletResponse.SC_BAD_REQUEST);
-							return;
-						}
-					} catch(NumberFormatException e) {
-						continue;
-					}
-				}
-				
-				String oldIds = org.getOrderedLessonIds();
-				String updatedIds = mergeLessonIds((oldIds!=null ? oldIds : ""), ids);
-				org.setOrderedLessonIds(updatedIds);
-				service.save(org);
-			}
+    private static Logger log = Logger.getLogger(LessonOrderServlet.class);
+
+    @Override
+    public void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+	// even though response is empty, it is needed so Firefox does not show parsing error
+	response.setContentType("text/html;charset=utf-8");
+
+	Integer orgId = WebUtil.readIntParam(request, "orgId", false);
+	String ids = request.getParameter("ids");
+
+	WebApplicationContext ctx = WebApplicationContextUtils.getWebApplicationContext(this.getServletContext());
+	UserManagementService service = (UserManagementService) ctx.getBean("userManagementService");
+
+	if (orgId != null && ids != null) {
+	    Organisation org = (Organisation) service.findById(Organisation.class, orgId);
+
+	    if (org != null) {
+		// make sure user has permission to sort org lessons
+		boolean allowSorting = false;
+		List<Integer> roles = new ArrayList<Integer>();
+		List<UserOrganisationRole> userOrganisationRoles = service.getUserOrganisationRoles(orgId,
+			request.getRemoteUser());
+		for (UserOrganisationRole userOrganisationRole : userOrganisationRoles) {
+		    Integer roleId = userOrganisationRole.getRole().getRoleId();
+		    roles.add(roleId);
+		    if (roleId.equals(Role.ROLE_GROUP_MANAGER) || roleId.equals(Role.ROLE_MONITOR)) {
+			allowSorting = true;
+			break;
+		    }
 		}
-		
-	}
-	
-	private boolean contains(List lessons, Long id) {
-		if (lessons != null) {
-			Iterator it = lessons.iterator();
-			while (it.hasNext()) {
-				Lesson lesson = (Lesson)it.next();
-				if (lesson.getLessonId().equals(id)) return true;
-			}
+		if (!allowSorting) {
+		    log.warn("User " + request.getRemoteUser() + " tried to sort lessons in orgId " + orgId);
+		    response.sendError(HttpServletResponse.SC_FORBIDDEN);
+		    return;
 		}
-		return false;
-	}
-	
-	// take the updated list and insert elements of the old list that don't exist in it;
-	private String mergeLessonIds(String old, String updated) {
-		List<String> oldIds = Arrays.asList(old.split(","));
-		List<String> updatedIds = Arrays.asList(updated.split(","));
-		ArrayList<String> mergedIds = new ArrayList<String>(updatedIds);
-		
-		for (int i=0; i<oldIds.size(); i++) {
-			String current = oldIds.get(i);
-			if (!updatedIds.contains(current)) {
-				int indexNextExistingId = indexNextExistingId(i, oldIds, mergedIds);
-				if (indexNextExistingId < 0) {
-					mergedIds.add(current);
-				} else {
-					mergedIds.add(indexNextExistingId, current);
-				}
+
+		// make sure we record lesson ids that belong to this org
+		List<String> idList = Arrays.asList(ids.split(","));
+		List lessons = service.findByProperty(Lesson.class, "organisation", org);
+		for (String id : idList) {
+		    try {
+			Long l = new Long(Long.parseLong(id));
+			if (!contains(lessons, l)) {
+			    log.warn("Lesson with id " + l + " doesn't belong in org with id " + orgId);
+			    response.sendError(HttpServletResponse.SC_BAD_REQUEST);
+			    return;
 			}
+		    } catch (NumberFormatException e) {
+			continue;
+		    }
 		}
-		return joinString(mergedIds);
+
+		String oldIds = org.getOrderedLessonIds();
+		String updatedIds = mergeLessonIds((oldIds != null ? oldIds : ""), ids);
+		org.setOrderedLessonIds(updatedIds);
+		service.save(org);
+	    }
 	}
-	
-	// find the index of the next lesson Id in the old list that exists in the updated list
-	private int indexNextExistingId(int i, List<String> oldIds, List<String> updatedIds) {
-		for (int j=i; j<oldIds.size(); j++) {
-			String current = oldIds.get(j);
-			int index = updatedIds.indexOf(current);
-			if (index > -1) {
-				return index;
-			}
+
+    }
+
+    private boolean contains(List lessons, Long id) {
+	if (lessons != null) {
+	    Iterator it = lessons.iterator();
+	    while (it.hasNext()) {
+		Lesson lesson = (Lesson) it.next();
+		if (lesson.getLessonId().equals(id)) {
+		    return true;
 		}
-		return -1;
+	    }
 	}
-	
-	// implode strings in list separated by commas
-	private String joinString(List<String> list) {
-		String s = "";
-		if (list != null) {
-			for (String i : list) {
-				s += i + ",";
-			}
-			s = s.substring(0, s.length()-1);
+	return false;
+    }
+
+    // take the updated list and insert elements of the old list that don't exist in it;
+    private String mergeLessonIds(String old, String updated) {
+	List<String> oldIds = Arrays.asList(old.split(","));
+	List<String> updatedIds = Arrays.asList(updated.split(","));
+	ArrayList<String> mergedIds = new ArrayList<String>(updatedIds);
+
+	for (int i = 0; i < oldIds.size(); i++) {
+	    String current = oldIds.get(i);
+	    if (!updatedIds.contains(current)) {
+		int indexNextExistingId = indexNextExistingId(i, oldIds, mergedIds);
+		if (indexNextExistingId < 0) {
+		    mergedIds.add(current);
+		} else {
+		    mergedIds.add(indexNextExistingId, current);
 		}
-		return s;
+	    }
 	}
+	return joinString(mergedIds);
+    }
+
+    // find the index of the next lesson Id in the old list that exists in the updated list
+    private int indexNextExistingId(int i, List<String> oldIds, List<String> updatedIds) {
+	for (int j = i; j < oldIds.size(); j++) {
+	    String current = oldIds.get(j);
+	    int index = updatedIds.indexOf(current);
+	    if (index > -1) {
+		return index;
+	    }
+	}
+	return -1;
+    }
+
+    // implode strings in list separated by commas
+    private String joinString(List<String> list) {
+	String s = "";
+	if (list != null) {
+	    for (String i : list) {
+		s += i + ",";
+	    }
+	    s = s.substring(0, s.length() - 1);
+	}
+	return s;
+    }
 }
- 

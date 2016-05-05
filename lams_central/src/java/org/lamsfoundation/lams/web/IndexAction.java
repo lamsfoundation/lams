@@ -2,21 +2,21 @@
  * Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
  * =============================================================
  * License Information: http://lamsfoundation.org/licensing/lams/2.0/
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License version 2.0 
+ * it under the terms of the GNU General Public License version 2.0
  * as published by the Free Software Foundation.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301
  * USA
- * 
+ *
  * http://www.gnu.org/licenses/gpl.txt
  * ****************************************************************
  */
@@ -54,20 +54,20 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
 
 /**
  * @version
- * 
+ *
  * <p>
  * <a href="IndexAction.java.html"><i>View Source</i></a>
  * </p>
- * 
+ *
  * @author <a href="mailto:fyang@melcoe.mq.edu.au">Fei Yang</a>
- * 
+ *
  * Created at 16:59:28 on 13/06/2006
  */
 /**
  * struts doclet
- * 
  *
- * 
+ *
+ *
  *
  *
  *
@@ -93,7 +93,7 @@ public class IndexAction extends Action {
     public ActionForward execute(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) throws Exception {
 
-	setHeaderLinks(request);
+	IndexAction.setHeaderLinks(request);
 	setAdminLinks(request);
 
 	// check if this is user's first login; some action (like displaying a dialog for disabling tutorials) can be
@@ -155,7 +155,7 @@ public class IndexAction extends Action {
     private static void setHeaderLinks(HttpServletRequest request) {
 	List<IndexLinkBean> headerLinks = new ArrayList<IndexLinkBean>();
 	if (request.isUserInRole(Role.AUTHOR)) {
-	    if (isPedagogicalPlannerAvailable()) {
+	    if (IndexAction.isPedagogicalPlannerAvailable()) {
 		headerLinks.add(new IndexLinkBean("index.planner", "javascript:openPedagogicalPlanner()"));
 	    }
 	    headerLinks.add(new IndexLinkBean("index.author", "javascript:showAuthoringDialog()"));

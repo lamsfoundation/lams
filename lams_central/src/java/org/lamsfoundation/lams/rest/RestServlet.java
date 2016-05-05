@@ -57,7 +57,7 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
 
 /**
  * Base class for LAMS REST servlets.
- * 
+ *
  * @author Marcin Cieslak
  */
 public abstract class RestServlet extends HttpServlet {
@@ -113,8 +113,8 @@ public abstract class RestServlet extends HttpServlet {
     }
 
     @Override
-    protected final void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException,
-	    IOException {
+    protected final void doPost(HttpServletRequest request, HttpServletResponse response)
+	    throws ServletException, IOException {
 	String requestBody = IOUtils.toString(request.getInputStream(), "UTF-8");
 	JSONObject requestJSON = null;
 	JSONObject authenticationJSON = null;

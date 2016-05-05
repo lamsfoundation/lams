@@ -29,9 +29,9 @@ import java.util.TreeSet;
 
 /**
  * Different type of transition - does not indicate lesson progress, but rather data flow between tools.
- * 
+ *
  * @author Marcin Cieslak
- * 
+ *
  */
 public class DataTransition extends Transition {
     /**
@@ -51,7 +51,8 @@ public class DataTransition extends Transition {
     }
 
     public DataTransition(Long transitionId, Integer id, String description, String title, Date createDateTime,
-	    Activity toActivity, Activity fromActivity, LearningDesign learningDesign, Integer toUIID, Integer fromUIID) {
+	    Activity toActivity, Activity fromActivity, LearningDesign learningDesign, Integer toUIID,
+	    Integer fromUIID) {
 	super(transitionId, id, description, title, createDateTime, toActivity, fromActivity, learningDesign, toUIID,
 		fromUIID);
 	transitionType = Transition.DATA_TRANSITION_TYPE;
@@ -59,10 +60,10 @@ public class DataTransition extends Transition {
 
     /**
      *
-     *                sort="org.lamsfoundation.lams.learningdesign.DataFlowObjectComparator"
+     * sort="org.lamsfoundation.lams.learningdesign.DataFlowObjectComparator"
      *
      *
-     * 
+     *
      */
     public Set<DataFlowObject> getDataFlowObjects() {
 	return dataFlowObjects;

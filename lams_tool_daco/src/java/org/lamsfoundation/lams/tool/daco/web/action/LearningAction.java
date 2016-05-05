@@ -2,21 +2,21 @@
  * Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
  * =============================================================
  * License Information: http://lamsfoundation.org/licensing/lams/2.0/
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License version 2.0 
+ * it under the terms of the GNU General Public License version 2.0
  * as published by the Free Software Foundation.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301
  * USA
- * 
+ *
  * http://www.gnu.org/licenses/gpl.txt
  * ****************************************************************
  */
@@ -82,9 +82,9 @@ import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 
 /**
- * 
+ *
  * @author Marcin Cieslak
- * 
+ *
  * @version $Revision$
  */
 public class LearningAction extends Action {
@@ -146,20 +146,21 @@ public class LearningAction extends Action {
      * @return
      */
     protected ActionForward diplayHorizontalRecordList(ActionMapping mapping, HttpServletRequest request) {
-	request.setAttribute(DacoConstants.ATTR_SESSION_MAP_ID, request
-			.getParameter(DacoConstants.ATTR_SESSION_MAP_ID));
-	Long userUid = WebUtil.readLongParam(request, DacoConstants.USER_UID , true);
-	if ( userUid != null )
+	request.setAttribute(DacoConstants.ATTR_SESSION_MAP_ID,
+		request.getParameter(DacoConstants.ATTR_SESSION_MAP_ID));
+	Long userUid = WebUtil.readLongParam(request, DacoConstants.USER_UID, true);
+	if (userUid != null) {
 	    request.setAttribute(DacoConstants.USER_UID, userUid);
+	}
 	return mapping.findForward(DacoConstants.SUCCESS);
     }
 
     /**
      * Read daco data from database and put them into HttpSession. It will redirect to init.do directly after this
      * method run successfully.
-     * 
+     *
      * This method will avoid read database again and lost un-saved resouce question lost when user "refresh page",
-     * 
+     *
      */
     protected ActionForward start(ActionMapping mapping, HttpServletRequest request) {
 
@@ -182,8 +183,8 @@ public class LearningAction extends Action {
 	if (mode != null && mode.isTeacher()) {
 	    // monitoring mode - user is specified in URL
 	    // dacoUser may be null if the user was force completed.
-	    dacoUser = getSpecifiedUser(service, sessionId, WebUtil.readIntParam(request, AttributeNames.PARAM_USER_ID,
-		    false));
+	    dacoUser = getSpecifiedUser(service, sessionId,
+		    WebUtil.readIntParam(request, AttributeNames.PARAM_USER_ID, false));
 	} else {
 	    dacoUser = getCurrentUser(service, sessionId, daco);
 	}
@@ -219,10 +220,10 @@ public class LearningAction extends Action {
 	Integer totalRecordCount = service.getGroupRecordCount(dacoUser.getSession().getSessionId());
 	sessionMap.put(DacoConstants.ATTR_TOTAL_RECORD_COUNT, totalRecordCount);
 
-	ActivityPositionDTO activityPosition = LearningWebUtil.putActivityPositionInRequestByToolSessionId(sessionId, request, getServlet()
-		.getServletContext());
+	ActivityPositionDTO activityPosition = LearningWebUtil.putActivityPositionInRequestByToolSessionId(sessionId,
+		request, getServlet().getServletContext());
 	sessionMap.put(AttributeNames.ATTR_ACTIVITY_POSITION, activityPosition);
-	
+
 	// add define later support
 	if (daco.isDefineLater()) {
 	    return mapping.findForward(DacoConstants.DEFINE_LATER);
@@ -244,7 +245,7 @@ public class LearningAction extends Action {
 
     /**
      * Finish learning session.
-     * 
+     *
      * @param mapping
      * @param form
      * @param request
@@ -264,8 +265,8 @@ public class LearningAction extends Action {
 	ActionErrors errors = validateBeforeFinish(request, sessionMapID);
 	if (!errors.isEmpty()) {
 	    this.addErrors(request, errors);
-	    request.setAttribute(DacoConstants.ATTR_DISPLAYED_RECORD_NUMBER, request
-		    .getParameter(DacoConstants.ATTR_DISPLAYED_RECORD_NUMBER));
+	    request.setAttribute(DacoConstants.ATTR_DISPLAYED_RECORD_NUMBER,
+		    request.getParameter(DacoConstants.ATTR_DISPLAYED_RECORD_NUMBER));
 	    return mapping.getInputForward();
 	}
 
@@ -289,7 +290,7 @@ public class LearningAction extends Action {
 
     /**
      * Save file or textfield daco question into database.
-     * 
+     *
      * @param mapping
      * @param form
      * @param request
@@ -311,8 +312,9 @@ public class LearningAction extends Action {
 	request.setAttribute(DacoConstants.ATTR_SESSION_MAP_ID, sessionMapID);
 	sessionMap.put(DacoConstants.ATTR_LEARNING_CURRENT_TAB, 1);
 
-	/* design decision - assume users will not have a lot of records each. If very large record sets 
-	 * we should go to the db and just get the size & the next id, and the record to be updated, 
+	/*
+	 * design decision - assume users will not have a lot of records each. If very large record sets
+	 * we should go to the db and just get the size & the next id, and the record to be updated,
 	 * rather than manipulating the full list of records.
 	 */
 	List<DacoAnswer> record = null;
@@ -320,17 +322,18 @@ public class LearningAction extends Action {
 	int recordCount = records.size();
 	int displayedRecordNumber = recordForm.getDisplayedRecordNumber();
 
-	/* Cannot use the displayRecordNumber as the new record id as records may be deleted and there will 
-	 * be missing numbers in the recordId sequence. Just using displayRecordNumber will add entries to 
+	/*
+	 * Cannot use the displayRecordNumber as the new record id as records may be deleted and there will
+	 * be missing numbers in the recordId sequence. Just using displayRecordNumber will add entries to
 	 * existing records.
 	 */
 	int nextRecordId = 1;
-	if ( recordCount > 0 ) {
+	if (recordCount > 0) {
 	    // records should be in recordId order, so find the next record id based on the last record
 	    List<DacoAnswer> lastRecord = records.get(recordCount - 1);
 	    DacoAnswer lastRecordAnswer = lastRecord.get(0);
-	    if ( lastRecordAnswer.getRecordId() >= nextRecordId ) {
-		    nextRecordId = lastRecordAnswer.getRecordId() + 1;
+	    if (lastRecordAnswer.getRecordId() >= nextRecordId) {
+		nextRecordId = lastRecordAnswer.getRecordId() + 1;
 	    }
 	}
 
@@ -372,118 +375,118 @@ public class LearningAction extends Action {
 	    answer.setCreateDate(new Date());
 
 	    switch (question.getType()) {
-	    case DacoConstants.QUESTION_TYPE_NUMBER: {
-		String formAnswer = recordForm.getAnswer(formAnswerNumber);
-		if (StringUtils.isBlank(formAnswer)) {
-		    answer.setAnswer(null);
-		} else {
-		    if (question.getDigitsDecimal() != null) {
-			formAnswer = NumberUtil.formatLocalisedNumber(Double.parseDouble(formAnswer), (Locale) null,
-				question.getDigitsDecimal());
+		case DacoConstants.QUESTION_TYPE_NUMBER: {
+		    String formAnswer = recordForm.getAnswer(formAnswerNumber);
+		    if (StringUtils.isBlank(formAnswer)) {
+			answer.setAnswer(null);
+		    } else {
+			if (question.getDigitsDecimal() != null) {
+			    formAnswer = NumberUtil.formatLocalisedNumber(Double.parseDouble(formAnswer), (Locale) null,
+				    question.getDigitsDecimal());
+			}
+			answer.setAnswer(formAnswer);
 		    }
-		    answer.setAnswer(formAnswer);
+		    formAnswerNumber++;
 		}
-		formAnswerNumber++;
-	    }
-		break;
-	    case DacoConstants.QUESTION_TYPE_DATE: {
-		String[] dateParts = new String[] { recordForm.getAnswer(formAnswerNumber++),
-			recordForm.getAnswer(formAnswerNumber++), recordForm.getAnswer(formAnswerNumber) };
-		if (!(StringUtils.isBlank(dateParts[0]) || StringUtils.isBlank(dateParts[1]) || StringUtils
-			.isBlank(dateParts[2]))) {
+		    break;
+		case DacoConstants.QUESTION_TYPE_DATE: {
+		    String[] dateParts = new String[] { recordForm.getAnswer(formAnswerNumber++),
+			    recordForm.getAnswer(formAnswerNumber++), recordForm.getAnswer(formAnswerNumber) };
+		    if (!(StringUtils.isBlank(dateParts[0]) || StringUtils.isBlank(dateParts[1])
+			    || StringUtils.isBlank(dateParts[2]))) {
 
-		    Calendar calendar = Calendar.getInstance();
-		    calendar.clear();
-		    calendar.set(Integer.parseInt(dateParts[2]), Integer.parseInt(dateParts[1]) - 1, Integer
-			    .parseInt(dateParts[0]));
-		    answer.setAnswer(DacoConstants.DEFAULT_DATE_FORMAT.format(calendar.getTime()));
-		} else {
-		    answer.setAnswer(null);
+			Calendar calendar = Calendar.getInstance();
+			calendar.clear();
+			calendar.set(Integer.parseInt(dateParts[2]), Integer.parseInt(dateParts[1]) - 1,
+				Integer.parseInt(dateParts[0]));
+			answer.setAnswer(DacoConstants.DEFAULT_DATE_FORMAT.format(calendar.getTime()));
+		    } else {
+			answer.setAnswer(null);
+		    }
 		}
-	    }
-		formAnswerNumber++;
-		break;
-	    case DacoConstants.QUESTION_TYPE_CHECKBOX: {
-		String formAnswer = recordForm.getAnswer(formAnswerNumber);
-		String[] checkboxes = formAnswer.split("&");
-		if (isEdit) {
-		    DacoAnswer localAnswer = answer;
-		    answerNumber--;
-		    do {
-			service.deleteDacoAnswer(localAnswer.getUid());
-			record.remove(answerNumber);
-			if (answerNumber <= record.size()) {
-			    localAnswer = record.get(answerNumber);
-			    if (localAnswer.getQuestion().getType() != DacoConstants.QUESTION_TYPE_CHECKBOX) {
+		    formAnswerNumber++;
+		    break;
+		case DacoConstants.QUESTION_TYPE_CHECKBOX: {
+		    String formAnswer = recordForm.getAnswer(formAnswerNumber);
+		    String[] checkboxes = formAnswer.split("&");
+		    if (isEdit) {
+			DacoAnswer localAnswer = answer;
+			answerNumber--;
+			do {
+			    service.deleteDacoAnswer(localAnswer.getUid());
+			    record.remove(answerNumber);
+			    if (answerNumber <= record.size()) {
+				localAnswer = record.get(answerNumber);
+				if (localAnswer.getQuestion().getType() != DacoConstants.QUESTION_TYPE_CHECKBOX) {
+				    localAnswer = null;
+				}
+			    } else {
 				localAnswer = null;
 			    }
-			} else {
-			    localAnswer = null;
-			}
-		    } while (localAnswer != null);
-		    answer = (DacoAnswer) answer.clone();
+			} while (localAnswer != null);
+			answer = (DacoAnswer) answer.clone();
 
-		}
-		if (StringUtils.isBlank(formAnswer)) {
-		    answer.setAnswer(null);
-		} else {
-		    for (int checkboxNumber = 0; checkboxNumber < checkboxes.length; checkboxNumber++) {
-			answer.setAnswer(checkboxes[checkboxNumber]);
-			if (checkboxNumber < checkboxes.length - 1) {
-			    service.saveOrUpdateAnswer(answer);
-			    if (isEdit) {
-				record.add(answerNumber++, answer);
-			    } else {
-				record.add(answer);
+		    }
+		    if (StringUtils.isBlank(formAnswer)) {
+			answer.setAnswer(null);
+		    } else {
+			for (int checkboxNumber = 0; checkboxNumber < checkboxes.length; checkboxNumber++) {
+			    answer.setAnswer(checkboxes[checkboxNumber]);
+			    if (checkboxNumber < checkboxes.length - 1) {
+				service.saveOrUpdateAnswer(answer);
+				if (isEdit) {
+				    record.add(answerNumber++, answer);
+				} else {
+				    record.add(answer);
+				}
+
+				answer = (DacoAnswer) answer.clone();
 			    }
-
-			    answer = (DacoAnswer) answer.clone();
+			}
+		    }
+		    if (isEdit) {
+			record.add(answerNumber++, answer);
+		    }
+		}
+		    formAnswerNumber++;
+		    break;
+		case DacoConstants.QUESTION_TYPE_LONGLAT: {
+		    answer.setAnswer(recordForm.getAnswer(formAnswerNumber++));
+		    service.saveOrUpdateAnswer(answer);
+		    if (isEdit) {
+			answer = record.get(answerNumber++);
+		    } else {
+			record.add(answer);
+			answer = (DacoAnswer) answer.clone();
+		    }
+		    answer.setAnswer(recordForm.getAnswer(formAnswerNumber));
+		}
+		    formAnswerNumber++;
+		    break;
+		case DacoConstants.QUESTION_TYPE_FILE:
+		case DacoConstants.QUESTION_TYPE_IMAGE: {
+		    FormFile file = recordForm.getFile(fileNumber);
+		    if (file != null) {
+			try {
+			    service.uploadDacoAnswerFile(answer, file);
+			} catch (UploadDacoFileException e) {
+			    LearningAction.log.error("Failed upload Resource File " + e.toString());
+			    e.printStackTrace();
 			}
 		    }
 		}
-		if (isEdit) {
-		    record.add(answerNumber++, answer);
+		    fileNumber++;
+		    break;
+		case DacoConstants.QUESTION_TYPE_DROPDOWN: {
+		    String formAnswer = recordForm.getAnswer(formAnswerNumber);
+		    answer.setAnswer("0".equals(formAnswer) ? null : formAnswer);
 		}
-	    }
-		formAnswerNumber++;
-		break;
-	    case DacoConstants.QUESTION_TYPE_LONGLAT: {
-		answer.setAnswer(recordForm.getAnswer(formAnswerNumber++));
-		service.saveOrUpdateAnswer(answer);
-		if (isEdit) {
-		    answer = record.get(answerNumber++);
-		} else {
-		    record.add(answer);
-		    answer = (DacoAnswer) answer.clone();
-		}
-		answer.setAnswer(recordForm.getAnswer(formAnswerNumber));
-	    }
-		formAnswerNumber++;
-		break;
-	    case DacoConstants.QUESTION_TYPE_FILE:
-	    case DacoConstants.QUESTION_TYPE_IMAGE: {
-		FormFile file = recordForm.getFile(fileNumber);
-		if (file != null) {
-		    try {
-			service.uploadDacoAnswerFile(answer, file);
-		    } catch (UploadDacoFileException e) {
-			LearningAction.log.error("Failed upload Resource File " + e.toString());
-			e.printStackTrace();
-		    }
-		}
-	    }
-		fileNumber++;
-		break;
-	    case DacoConstants.QUESTION_TYPE_DROPDOWN: {
-		String formAnswer = recordForm.getAnswer(formAnswerNumber);
-		answer.setAnswer("0".equals(formAnswer) ? null : formAnswer);
-	    }
-		formAnswerNumber++;
-		break;
-	    default:
-		answer.setAnswer(recordForm.getAnswer(formAnswerNumber));
-		formAnswerNumber++;
-		break;
+		    formAnswerNumber++;
+		    break;
+		default:
+		    answer.setAnswer(recordForm.getAnswer(formAnswerNumber));
+		    formAnswerNumber++;
+		    break;
 	    }
 
 	    service.saveOrUpdateAnswer(answer);
@@ -514,7 +517,7 @@ public class LearningAction extends Action {
 
     /**
      * Display empty reflection form.
-     * 
+     *
      * @param mapping
      * @param form
      * @param request
@@ -530,8 +533,8 @@ public class LearningAction extends Action {
 	if (!errors.isEmpty()) {
 	    this.addErrors(request, errors);
 	    refreshQuestionSummaries(mapping, request);
-	    request.setAttribute(DacoConstants.ATTR_DISPLAYED_RECORD_NUMBER, request
-		    .getParameter(DacoConstants.ATTR_DISPLAYED_RECORD_NUMBER));
+	    request.setAttribute(DacoConstants.ATTR_DISPLAYED_RECORD_NUMBER,
+		    request.getParameter(DacoConstants.ATTR_DISPLAYED_RECORD_NUMBER));
 	    return mapping.getInputForward();
 	}
 	SessionMap sessionMap = (SessionMap) request.getSession().getAttribute(sessionMapID);
@@ -561,7 +564,7 @@ public class LearningAction extends Action {
 
     /**
      * Submit reflection form input database.
-     * 
+     *
      * @param mapping
      * @param form
      * @param request
@@ -601,21 +604,21 @@ public class LearningAction extends Action {
 	Daco daco = (Daco) sessionMap.get(DacoConstants.ATTR_DACO);
 	Short min = daco.getMinRecords();
 	if (min != null && min > 0 && recordCount < min) {
-	    errors.add(ActionMessages.GLOBAL_MESSAGE, new ActionMessage(DacoConstants.ERROR_MSG_RECORD_NOTENOUGH, daco
-		    .getMinRecords()));
+	    errors.add(ActionMessages.GLOBAL_MESSAGE,
+		    new ActionMessage(DacoConstants.ERROR_MSG_RECORD_NOTENOUGH, daco.getMinRecords()));
 	}
 	return errors;
     }
 
     protected IDacoService getDacoService() {
-	WebApplicationContext wac = WebApplicationContextUtils.getRequiredWebApplicationContext(getServlet()
-		.getServletContext());
+	WebApplicationContext wac = WebApplicationContextUtils
+		.getRequiredWebApplicationContext(getServlet().getServletContext());
 	return (IDacoService) wac.getBean(DacoConstants.DACO_SERVICE);
     }
 
     /**
      * List save current daco questions.
-     * 
+     *
      * @param request
      * @return
      */
@@ -630,7 +633,7 @@ public class LearningAction extends Action {
 
     /**
      * Get <code>java.util.List</code> from HttpSession by given name.
-     * 
+     *
      * @param request
      * @param name
      * @return
@@ -675,8 +678,8 @@ public class LearningAction extends Action {
 	ActionErrors errors = new ActionErrors();
 	Short maxRecords = daco.getMaxRecords();
 	if (maxRecords != null && maxRecords > 0 && recordCount > maxRecords) {
-	    errors.add(ActionMessages.GLOBAL_MESSAGE, new ActionMessage(DacoConstants.ERROR_MSG_RECORD_TOOMUCH, daco
-		    .getMaxRecords()));
+	    errors.add(ActionMessages.GLOBAL_MESSAGE,
+		    new ActionMessage(DacoConstants.ERROR_MSG_RECORD_TOOMUCH, daco.getMaxRecords()));
 	}
 
 	Iterator<DacoQuestion> questionIterator = questionList.iterator();
@@ -688,239 +691,239 @@ public class LearningAction extends Action {
 	while (questionIterator.hasNext()) {
 	    question = questionIterator.next();
 	    switch (question.getType()) {
-	    case DacoConstants.QUESTION_TYPE_TEXTFIELD:
-	    case DacoConstants.QUESTION_TYPE_RADIO:
-		if (question.isRequired() && StringUtils.isBlank(recordForm.getAnswer(answerNumber))) {
-		    errors.add(ActionMessages.GLOBAL_MESSAGE, new ActionMessage(DacoConstants.ERROR_MSG_RECORD_BLANK,
-			    questionNumber));
+		case DacoConstants.QUESTION_TYPE_TEXTFIELD:
+		case DacoConstants.QUESTION_TYPE_RADIO:
+		    if (question.isRequired() && StringUtils.isBlank(recordForm.getAnswer(answerNumber))) {
+			errors.add(ActionMessages.GLOBAL_MESSAGE,
+				new ActionMessage(DacoConstants.ERROR_MSG_RECORD_BLANK, questionNumber));
 
-		}
-		answerNumber++;
-		break;
-	    case DacoConstants.QUESTION_TYPE_TEXTAREA: {
-		if (StringUtils.isBlank(recordForm.getAnswer(answerNumber))) {
-		    if (question.isRequired()) {
-			errors.add(ActionMessages.GLOBAL_MESSAGE, new ActionMessage(
-				DacoConstants.ERROR_MSG_RECORD_BLANK, questionNumber));
 		    }
-		} else if (question.getMax() != null) {
-		    long words = 0;
-		    int index = 0;
-		    boolean prevWhiteSpace = true;
-		    while (index < recordForm.getAnswer(answerNumber).length()) {
-			char c = recordForm.getAnswer(answerNumber).charAt(index++);
-			boolean currWhiteSpace = Character.isWhitespace(c);
-			if (prevWhiteSpace && !currWhiteSpace) {
-			    words++;
+		    answerNumber++;
+		    break;
+		case DacoConstants.QUESTION_TYPE_TEXTAREA: {
+		    if (StringUtils.isBlank(recordForm.getAnswer(answerNumber))) {
+			if (question.isRequired()) {
+			    errors.add(ActionMessages.GLOBAL_MESSAGE,
+				    new ActionMessage(DacoConstants.ERROR_MSG_RECORD_BLANK, questionNumber));
 			}
-			prevWhiteSpace = currWhiteSpace;
-		    }
-		    int max = question.getMax().intValue();
-		    if (words > max) {
-			errors.add(ActionMessages.GLOBAL_MESSAGE, new ActionMessage(
-				DacoConstants.ERROR_MSG_RECORD_TEXTAREA_LONG, questionNumber, max));
-		    }
-		}
-	    }
-		answerNumber++;
-		break;
-	    case DacoConstants.QUESTION_TYPE_NUMBER: {
-		if (StringUtils.isBlank(recordForm.getAnswer(answerNumber))) {
-		    if (question.isRequired()) {
-			errors.add(ActionMessages.GLOBAL_MESSAGE, new ActionMessage(
-				DacoConstants.ERROR_MSG_RECORD_BLANK, questionNumber));
-		    }
-		} else {
-		    try {
-			float number = Float.parseFloat(recordForm.getAnswer(answerNumber));
-			Float min = question.getMin();
-			Float max = question.getMax();
-			if (min != null && number < min) {
-			    errors.add(ActionMessages.GLOBAL_MESSAGE, new ActionMessage(
-				    DacoConstants.ERROR_MSG_RECORD_NUMBER_MIN, questionNumber, min));
-			} else if (max != null && number > max) {
-			    errors.add(ActionMessages.GLOBAL_MESSAGE, new ActionMessage(
-				    DacoConstants.ERROR_MSG_RECORD_NUMBER_MAX, questionNumber, max));
+		    } else if (question.getMax() != null) {
+			long words = 0;
+			int index = 0;
+			boolean prevWhiteSpace = true;
+			while (index < recordForm.getAnswer(answerNumber).length()) {
+			    char c = recordForm.getAnswer(answerNumber).charAt(index++);
+			    boolean currWhiteSpace = Character.isWhitespace(c);
+			    if (prevWhiteSpace && !currWhiteSpace) {
+				words++;
+			    }
+			    prevWhiteSpace = currWhiteSpace;
 			}
-		    } catch (NumberFormatException e) {
-			errors.add(ActionMessages.GLOBAL_MESSAGE, new ActionMessage(
-				DacoConstants.ERROR_MSG_RECORD_NUMBER_FLOAT, questionNumber));
+			int max = question.getMax().intValue();
+			if (words > max) {
+			    errors.add(ActionMessages.GLOBAL_MESSAGE, new ActionMessage(
+				    DacoConstants.ERROR_MSG_RECORD_TEXTAREA_LONG, questionNumber, max));
+			}
 		    }
 		}
-	    }
-		answerNumber++;
-		break;
-	    case DacoConstants.QUESTION_TYPE_DATE: {
-		String day = recordForm.getAnswer(answerNumber++);
-		String month = recordForm.getAnswer(answerNumber++);
-		String year = recordForm.getAnswer(answerNumber);
-		if (StringUtils.isBlank(day) && StringUtils.isBlank(month) && StringUtils.isBlank(year)) {
-		    if (question.isRequired()) {
-			errors.add(ActionMessages.GLOBAL_MESSAGE, new ActionMessage(
-				DacoConstants.ERROR_MSG_RECORD_BLANK, questionNumber));
-		    }
-		} else {
-		    Integer yearNum = null;
-		    Integer monthNum = null;
-		    if (StringUtils.isBlank(year)) {
-			errors.add(ActionMessages.GLOBAL_MESSAGE, new ActionMessage(
-				DacoConstants.ERROR_MSG_RECORD_DATE_YEAR_BLANK, questionNumber));
+		    answerNumber++;
+		    break;
+		case DacoConstants.QUESTION_TYPE_NUMBER: {
+		    if (StringUtils.isBlank(recordForm.getAnswer(answerNumber))) {
+			if (question.isRequired()) {
+			    errors.add(ActionMessages.GLOBAL_MESSAGE,
+				    new ActionMessage(DacoConstants.ERROR_MSG_RECORD_BLANK, questionNumber));
+			}
 		    } else {
 			try {
-			    yearNum = Integer.parseInt(year);
+			    float number = Float.parseFloat(recordForm.getAnswer(answerNumber));
+			    Float min = question.getMin();
+			    Float max = question.getMax();
+			    if (min != null && number < min) {
+				errors.add(ActionMessages.GLOBAL_MESSAGE, new ActionMessage(
+					DacoConstants.ERROR_MSG_RECORD_NUMBER_MIN, questionNumber, min));
+			    } else if (max != null && number > max) {
+				errors.add(ActionMessages.GLOBAL_MESSAGE, new ActionMessage(
+					DacoConstants.ERROR_MSG_RECORD_NUMBER_MAX, questionNumber, max));
+			    }
 			} catch (NumberFormatException e) {
-			    errors.add(ActionMessages.GLOBAL_MESSAGE, new ActionMessage(
-				    DacoConstants.ERROR_MSG_RECORD_DATE_YEAR_INT, questionNumber));
+			    errors.add(ActionMessages.GLOBAL_MESSAGE,
+				    new ActionMessage(DacoConstants.ERROR_MSG_RECORD_NUMBER_FLOAT, questionNumber));
 			}
 		    }
-		    boolean monthValid = false;
-		    if (StringUtils.isBlank(month)) {
-			errors.add(ActionMessages.GLOBAL_MESSAGE, new ActionMessage(
-				DacoConstants.ERROR_MSG_RECORD_DATE_MONTH_BLANK, questionNumber));
+		}
+		    answerNumber++;
+		    break;
+		case DacoConstants.QUESTION_TYPE_DATE: {
+		    String day = recordForm.getAnswer(answerNumber++);
+		    String month = recordForm.getAnswer(answerNumber++);
+		    String year = recordForm.getAnswer(answerNumber);
+		    if (StringUtils.isBlank(day) && StringUtils.isBlank(month) && StringUtils.isBlank(year)) {
+			if (question.isRequired()) {
+			    errors.add(ActionMessages.GLOBAL_MESSAGE,
+				    new ActionMessage(DacoConstants.ERROR_MSG_RECORD_BLANK, questionNumber));
+			}
 		    } else {
-			try {
-			    monthNum = Integer.parseInt(month);
-			    if (monthNum < 1 || monthNum > 12) {
+			Integer yearNum = null;
+			Integer monthNum = null;
+			if (StringUtils.isBlank(year)) {
+			    errors.add(ActionMessages.GLOBAL_MESSAGE,
+				    new ActionMessage(DacoConstants.ERROR_MSG_RECORD_DATE_YEAR_BLANK, questionNumber));
+			} else {
+			    try {
+				yearNum = Integer.parseInt(year);
+			    } catch (NumberFormatException e) {
 				errors.add(ActionMessages.GLOBAL_MESSAGE, new ActionMessage(
-					DacoConstants.ERROR_MSG_RECORD_DATE_MONTH_LIMIT, questionNumber));
-			    } else {
-				monthValid = true;
+					DacoConstants.ERROR_MSG_RECORD_DATE_YEAR_INT, questionNumber));
 			    }
-			} catch (NumberFormatException e) {
-			    errors.add(ActionMessages.GLOBAL_MESSAGE, new ActionMessage(
-				    DacoConstants.ERROR_MSG_RECORD_DATE_MONTH_INT, questionNumber));
 			}
-		    }
-
-		    if (StringUtils.isBlank(day)) {
-			errors.add(ActionMessages.GLOBAL_MESSAGE, new ActionMessage(
-				DacoConstants.ERROR_MSG_RECORD_DATE_DAY_BLANK, questionNumber));
-		    } else if (monthValid) {
-			try {
-
-			    int dayNum = Integer.parseInt(day);
-			    Integer maxDays = yearNum == null || monthNum == null ? null
-				    : getMaxDays(monthNum, yearNum);
-			    if (dayNum < 1 || maxDays != null && dayNum > maxDays) {
+			boolean monthValid = false;
+			if (StringUtils.isBlank(month)) {
+			    errors.add(ActionMessages.GLOBAL_MESSAGE,
+				    new ActionMessage(DacoConstants.ERROR_MSG_RECORD_DATE_MONTH_BLANK, questionNumber));
+			} else {
+			    try {
+				monthNum = Integer.parseInt(month);
+				if (monthNum < 1 || monthNum > 12) {
+				    errors.add(ActionMessages.GLOBAL_MESSAGE, new ActionMessage(
+					    DacoConstants.ERROR_MSG_RECORD_DATE_MONTH_LIMIT, questionNumber));
+				} else {
+				    monthValid = true;
+				}
+			    } catch (NumberFormatException e) {
 				errors.add(ActionMessages.GLOBAL_MESSAGE, new ActionMessage(
-					DacoConstants.ERROR_MSG_RECORD_DATE_DAY_LIMIT, questionNumber, maxDays));
+					DacoConstants.ERROR_MSG_RECORD_DATE_MONTH_INT, questionNumber));
 			    }
-			} catch (NumberFormatException e) {
-			    errors.add(ActionMessages.GLOBAL_MESSAGE, new ActionMessage(
-				    DacoConstants.ERROR_MSG_RECORD_DATE_DAY_INT, questionNumber));
+			}
+
+			if (StringUtils.isBlank(day)) {
+			    errors.add(ActionMessages.GLOBAL_MESSAGE,
+				    new ActionMessage(DacoConstants.ERROR_MSG_RECORD_DATE_DAY_BLANK, questionNumber));
+			} else if (monthValid) {
+			    try {
+
+				int dayNum = Integer.parseInt(day);
+				Integer maxDays = yearNum == null || monthNum == null ? null
+					: getMaxDays(monthNum, yearNum);
+				if (dayNum < 1 || maxDays != null && dayNum > maxDays) {
+				    errors.add(ActionMessages.GLOBAL_MESSAGE, new ActionMessage(
+					    DacoConstants.ERROR_MSG_RECORD_DATE_DAY_LIMIT, questionNumber, maxDays));
+				}
+			    } catch (NumberFormatException e) {
+				errors.add(ActionMessages.GLOBAL_MESSAGE,
+					new ActionMessage(DacoConstants.ERROR_MSG_RECORD_DATE_DAY_INT, questionNumber));
+			    }
 			}
 		    }
 		}
-	    }
-		answerNumber++;
-		break;
-	    case DacoConstants.QUESTION_TYPE_FILE: {
-		FormFile file = recordForm.getFile(fileNumber);
-		if (file == null || file.getFileSize() == 0) {
-		    if (question.isRequired()) {
-			errors.add(ActionMessages.GLOBAL_MESSAGE, new ActionMessage(
-				DacoConstants.ERROR_MSG_RECORD_BLANK, questionNumber));
-		    }
-		} else {
-		    FileValidatorUtil.validateFileSize(file, true, errors);
-		}
-		fileNumber++;
-	    }
-		break;
-	    case DacoConstants.QUESTION_TYPE_IMAGE: {
-		FormFile file = recordForm.getFile(fileNumber);
-		if (file == null || file.getFileSize() == 0) {
-		    if (question.isRequired()) {
-			errors.add(ActionMessages.GLOBAL_MESSAGE, new ActionMessage(
-				DacoConstants.ERROR_MSG_RECORD_BLANK, questionNumber));
-		    }
-		} else {
-		    String fileName = file.getFileName();
-		    boolean isImage = false;
-		    if (fileName.length() > 5) {
-
-			String extension = fileName.substring(fileName.length() - 3);
-			for (String acceptedExtension : DacoConstants.IMAGE_EXTENSIONS) {
-			    if (extension.equalsIgnoreCase(acceptedExtension)) {
-				isImage = true;
-				break;
-			    }
+		    answerNumber++;
+		    break;
+		case DacoConstants.QUESTION_TYPE_FILE: {
+		    FormFile file = recordForm.getFile(fileNumber);
+		    if (file == null || file.getFileSize() == 0) {
+			if (question.isRequired()) {
+			    errors.add(ActionMessages.GLOBAL_MESSAGE,
+				    new ActionMessage(DacoConstants.ERROR_MSG_RECORD_BLANK, questionNumber));
 			}
-		    }
-		    if (!isImage) {
-			errors.add(ActionMessages.GLOBAL_MESSAGE, new ActionMessage(
-				DacoConstants.ERROR_MSG_RECORD_IMAGE_FORMAT, questionNumber));
 		    } else {
 			FileValidatorUtil.validateFileSize(file, true, errors);
 		    }
+		    fileNumber++;
 		}
-		fileNumber++;
-	    }
-		break;
-	    case DacoConstants.QUESTION_TYPE_DROPDOWN: {
-		if (question.isRequired() && "0".equals(recordForm.getAnswer(answerNumber))) {
-		    errors.add(ActionMessages.GLOBAL_MESSAGE, new ActionMessage(DacoConstants.ERROR_MSG_RECORD_BLANK,
-			    questionNumber));
-
-		}
-	    }
-		answerNumber++;
-		break;
-	    case DacoConstants.QUESTION_TYPE_CHECKBOX: {
-		if (StringUtils.isBlank(recordForm.getAnswer(answerNumber))) {
-		    if (question.isRequired()) {
-			errors.add(ActionMessages.GLOBAL_MESSAGE, new ActionMessage(
-				DacoConstants.ERROR_MSG_RECORD_BLANK, questionNumber));
-		    }
-		} else {
-		    int count = recordForm.getAnswer(answerNumber).split("&").length;
-		    Float min = question.getMin();
-		    Float max = question.getMax();
-		    if (min != null && count < min) {
-			errors.add(ActionMessages.GLOBAL_MESSAGE, new ActionMessage(
-				DacoConstants.ERROR_MSG_RECORD_CHECKBOX_MIN, questionNumber, min.intValue()));
-		    } else if (max != null && count > max) {
-			errors.add(ActionMessages.GLOBAL_MESSAGE, new ActionMessage(
-				DacoConstants.ERROR_MSG_RECORD_CHECKBOX_MAX, questionNumber, max.intValue()));
-		    }
-		}
-	    }
-		answerNumber++;
-		break;
-	    case DacoConstants.QUESTION_TYPE_LONGLAT: {
-		String longitude = recordForm.getAnswer(answerNumber++);
-		String latitude = recordForm.getAnswer(answerNumber);
-		if (StringUtils.isBlank(longitude)) {
-		    if (StringUtils.isBlank(latitude)) {
+		    break;
+		case DacoConstants.QUESTION_TYPE_IMAGE: {
+		    FormFile file = recordForm.getFile(fileNumber);
+		    if (file == null || file.getFileSize() == 0) {
 			if (question.isRequired()) {
-			    errors.add(ActionMessages.GLOBAL_MESSAGE, new ActionMessage(
-				    DacoConstants.ERROR_MSG_RECORD_BLANK, questionNumber));
+			    errors.add(ActionMessages.GLOBAL_MESSAGE,
+				    new ActionMessage(DacoConstants.ERROR_MSG_RECORD_BLANK, questionNumber));
 			}
 		    } else {
-			errors.add(ActionMessages.GLOBAL_MESSAGE, new ActionMessage(
-				DacoConstants.ERROR_MSG_RECORD_LONGITUDE_BLANK, questionNumber));
-		    }
+			String fileName = file.getFileName();
+			boolean isImage = false;
+			if (fileName.length() > 5) {
 
-		} else if (StringUtils.isBlank(latitude)) {
-		    errors.add(ActionMessages.GLOBAL_MESSAGE, new ActionMessage(
-			    DacoConstants.ERROR_MSG_RECORD_LATITUDE_BLANK, questionNumber));
-		} else {
-		    try {
-			Float.parseFloat(longitude);
-		    } catch (NumberFormatException e) {
-			errors.add(ActionMessages.GLOBAL_MESSAGE, new ActionMessage(
-				DacoConstants.ERROR_MSG_RECORD_LONGITUDE_FLOAT, questionNumber));
+			    String extension = fileName.substring(fileName.length() - 3);
+			    for (String acceptedExtension : DacoConstants.IMAGE_EXTENSIONS) {
+				if (extension.equalsIgnoreCase(acceptedExtension)) {
+				    isImage = true;
+				    break;
+				}
+			    }
+			}
+			if (!isImage) {
+			    errors.add(ActionMessages.GLOBAL_MESSAGE,
+				    new ActionMessage(DacoConstants.ERROR_MSG_RECORD_IMAGE_FORMAT, questionNumber));
+			} else {
+			    FileValidatorUtil.validateFileSize(file, true, errors);
+			}
 		    }
-		    try {
-			Float.parseFloat(latitude);
-		    } catch (NumberFormatException e) {
-			errors.add(ActionMessages.GLOBAL_MESSAGE, new ActionMessage(
-				DacoConstants.ERROR_MSG_RECORD_LATITUDE_FLOAT, questionNumber));
+		    fileNumber++;
+		}
+		    break;
+		case DacoConstants.QUESTION_TYPE_DROPDOWN: {
+		    if (question.isRequired() && "0".equals(recordForm.getAnswer(answerNumber))) {
+			errors.add(ActionMessages.GLOBAL_MESSAGE,
+				new ActionMessage(DacoConstants.ERROR_MSG_RECORD_BLANK, questionNumber));
+
 		    }
 		}
-	    }
-		answerNumber++;
-		break;
+		    answerNumber++;
+		    break;
+		case DacoConstants.QUESTION_TYPE_CHECKBOX: {
+		    if (StringUtils.isBlank(recordForm.getAnswer(answerNumber))) {
+			if (question.isRequired()) {
+			    errors.add(ActionMessages.GLOBAL_MESSAGE,
+				    new ActionMessage(DacoConstants.ERROR_MSG_RECORD_BLANK, questionNumber));
+			}
+		    } else {
+			int count = recordForm.getAnswer(answerNumber).split("&").length;
+			Float min = question.getMin();
+			Float max = question.getMax();
+			if (min != null && count < min) {
+			    errors.add(ActionMessages.GLOBAL_MESSAGE, new ActionMessage(
+				    DacoConstants.ERROR_MSG_RECORD_CHECKBOX_MIN, questionNumber, min.intValue()));
+			} else if (max != null && count > max) {
+			    errors.add(ActionMessages.GLOBAL_MESSAGE, new ActionMessage(
+				    DacoConstants.ERROR_MSG_RECORD_CHECKBOX_MAX, questionNumber, max.intValue()));
+			}
+		    }
+		}
+		    answerNumber++;
+		    break;
+		case DacoConstants.QUESTION_TYPE_LONGLAT: {
+		    String longitude = recordForm.getAnswer(answerNumber++);
+		    String latitude = recordForm.getAnswer(answerNumber);
+		    if (StringUtils.isBlank(longitude)) {
+			if (StringUtils.isBlank(latitude)) {
+			    if (question.isRequired()) {
+				errors.add(ActionMessages.GLOBAL_MESSAGE,
+					new ActionMessage(DacoConstants.ERROR_MSG_RECORD_BLANK, questionNumber));
+			    }
+			} else {
+			    errors.add(ActionMessages.GLOBAL_MESSAGE,
+				    new ActionMessage(DacoConstants.ERROR_MSG_RECORD_LONGITUDE_BLANK, questionNumber));
+			}
+
+		    } else if (StringUtils.isBlank(latitude)) {
+			errors.add(ActionMessages.GLOBAL_MESSAGE,
+				new ActionMessage(DacoConstants.ERROR_MSG_RECORD_LATITUDE_BLANK, questionNumber));
+		    } else {
+			try {
+			    Float.parseFloat(longitude);
+			} catch (NumberFormatException e) {
+			    errors.add(ActionMessages.GLOBAL_MESSAGE,
+				    new ActionMessage(DacoConstants.ERROR_MSG_RECORD_LONGITUDE_FLOAT, questionNumber));
+			}
+			try {
+			    Float.parseFloat(latitude);
+			} catch (NumberFormatException e) {
+			    errors.add(ActionMessages.GLOBAL_MESSAGE,
+				    new ActionMessage(DacoConstants.ERROR_MSG_RECORD_LATITUDE_FLOAT, questionNumber));
+			}
+		    }
+		}
+		    answerNumber++;
+		    break;
 	    }
 	    questionNumber++;
 	}
@@ -1000,7 +1003,8 @@ public class LearningAction extends Action {
 			recordForm.setAnswer(formAnswerNumber++, dateParts[0]);
 			recordForm.setAnswer(formAnswerNumber++, dateParts[1]);
 			recordForm.setAnswer(formAnswerNumber++, dateParts[2]);
-		    } else if (!(questionType == DacoConstants.QUESTION_TYPE_FILE || questionType == DacoConstants.QUESTION_TYPE_IMAGE)) {
+		    } else if (!(questionType == DacoConstants.QUESTION_TYPE_FILE
+			    || questionType == DacoConstants.QUESTION_TYPE_IMAGE)) {
 			recordForm.setAnswer(formAnswerNumber++, answer.getAnswer());
 		    }
 		}
@@ -1040,10 +1044,10 @@ public class LearningAction extends Action {
 	String sessionMapID = WebUtil.readStrParam(request, DacoConstants.ATTR_SESSION_MAP_ID);
 	SessionMap sessionMap = (SessionMap) request.getSession().getAttribute(sessionMapID);
 	request.setAttribute(DacoConstants.ATTR_SESSION_MAP_ID, sessionMapID);
-	request.setAttribute(DacoConstants.ATTR_DISPLAYED_RECORD_NUMBER, WebUtil.readIntParam(request,
-		DacoConstants.ATTR_DISPLAYED_RECORD_NUMBER));
-	request.setAttribute(DacoConstants.ATTR_LEARNING_CURRENT_TAB, WebUtil.readIntParam(request,
-		DacoConstants.ATTR_LEARNING_CURRENT_TAB));
+	request.setAttribute(DacoConstants.ATTR_DISPLAYED_RECORD_NUMBER,
+		WebUtil.readIntParam(request, DacoConstants.ATTR_DISPLAYED_RECORD_NUMBER));
+	request.setAttribute(DacoConstants.ATTR_LEARNING_CURRENT_TAB,
+		WebUtil.readIntParam(request, DacoConstants.ATTR_LEARNING_CURRENT_TAB));
 	String currentView = (String) sessionMap.get(DacoConstants.ATTR_LEARNING_VIEW);
 	if (DacoConstants.LEARNING_VIEW_HORIZONTAL.equals(currentView)) {
 	    sessionMap.put(DacoConstants.ATTR_LEARNING_VIEW, DacoConstants.LEARNING_VIEW_VERTICAL);
@@ -1066,13 +1070,13 @@ public class LearningAction extends Action {
 	if (mode != null && mode.isTeacher()) {
 	    // monitoring mode - user is specified in URL
 	    // user may be null if the user was force completed.
-	    user = getSpecifiedUser(service, sessionId, WebUtil.readIntParam(request, AttributeNames.PARAM_USER_ID,
-		    false));
+	    user = getSpecifiedUser(service, sessionId,
+		    WebUtil.readIntParam(request, AttributeNames.PARAM_USER_ID, false));
 	} else {
 	    user = getCurrentUser(service, sessionId, daco);
 	}
 
-	if ( user != null ) {
+	if (user != null) {
 	    List<QuestionSummaryDTO> summaries = service.getQuestionSummaries(user.getUid());
 	    sessionMap.put(DacoConstants.ATTR_QUESTION_SUMMARIES, summaries);
 	    Integer totalRecordCount = service.getGroupRecordCount(user.getSession().getSessionId());

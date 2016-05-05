@@ -2,21 +2,21 @@
  * Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
  * =============================================================
  * License Information: http://lamsfoundation.org/licensing/lams/2.0/
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301
  * USA
- * 
+ *
  * http://www.gnu.org/licenses/gpl.txt
  * ****************************************************************
  */
@@ -31,11 +31,11 @@ import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 
 /**
  * Peerreview User
- * 
- * @author Dapeng Ni
- * 
  *
- * 
+ * @author Dapeng Ni
+ *
+ *
+ *
  */
 public class PeerreviewUser implements Cloneable {
     private static final long serialVersionUID = -7043502180037866257L;
@@ -77,6 +77,7 @@ public class PeerreviewUser implements Cloneable {
     /**
      * Clone method from <code>java.lang.Object</code>
      */
+    @Override
     public Object clone() {
 
 	PeerreviewUser user = null;
@@ -199,11 +200,14 @@ public class PeerreviewUser implements Cloneable {
 	this.sessionFinished = sessionFinished;
     }
 
+    @Override
     public boolean equals(Object obj) {
-	if (this == obj)
+	if (this == obj) {
 	    return true;
-	if (!(obj instanceof PeerreviewUser))
+	}
+	if (!(obj instanceof PeerreviewUser)) {
 	    return false;
+	}
 
 	final PeerreviewUser user = (PeerreviewUser) obj;
 
@@ -212,6 +216,7 @@ public class PeerreviewUser implements Cloneable {
 
     }
 
+    @Override
     public int hashCode() {
 	return new HashCodeBuilder().append(uid).append(firstName).append(lastName).append(loginName).toHashCode();
     }

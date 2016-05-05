@@ -46,7 +46,9 @@ public class MCOutputFactory extends OutputFactory {
     /**
      * @see org.lamsfoundation.lams.tool.OutputDefinitionFactory#getToolOutputDefinitions(java.lang.Object)
      */
-    public SortedMap<String, ToolOutputDefinition> getToolOutputDefinitions(Object toolContentObject, int definitionType) {
+    @Override
+    public SortedMap<String, ToolOutputDefinition> getToolOutputDefinitions(Object toolContentObject,
+	    int definitionType) {
 
 	TreeMap<String, ToolOutputDefinition> definitionMap = new TreeMap<String, ToolOutputDefinition>();
 	ToolOutputDefinition definition = buildBooleanOutputDefinition(OUTPUT_NAME_LEARNER_ALL_CORRECT);
@@ -55,11 +57,12 @@ public class MCOutputFactory extends OutputFactory {
 	if (toolContentObject != null) {
 	    McContent content = (McContent) toolContentObject;
 
-	    definition = buildRangeDefinition(OUTPUT_NAME_LEARNER_MARK, new Long(0), new Long(content
-		    .getTotalMarksPossible().longValue()), true);
+	    definition = buildRangeDefinition(OUTPUT_NAME_LEARNER_MARK, new Long(0),
+		    new Long(content.getTotalMarksPossible().longValue()), true);
 	    definitionMap.put(OUTPUT_NAME_LEARNER_MARK, definition);
 	} else {
-	    log.error("Unable to build content based output definitions for Multiple Choice as no tool content object supplied. Only including the definitions that do not need any content.");
+	    log.error(
+		    "Unable to build content based output definitions for Multiple Choice as no tool content object supplied. Only including the definitions that do not need any content.");
 	}
 
 	return definitionMap;
@@ -117,8 +120,8 @@ public class MCOutputFactory extends OutputFactory {
 	} else {
 	    mark = new Long(0);
 	}
-	return new ToolOutput(MCOutputFactory.OUTPUT_NAME_LEARNER_MARK, getI18NText(
-		MCOutputFactory.OUTPUT_NAME_LEARNER_MARK, true), mark);
+	return new ToolOutput(MCOutputFactory.OUTPUT_NAME_LEARNER_MARK,
+		getI18NText(MCOutputFactory.OUTPUT_NAME_LEARNER_MARK, true), mark);
     }
 
     /**
@@ -127,8 +130,8 @@ public class MCOutputFactory extends OutputFactory {
      */
     private ToolOutput getLearnerAllCorrect(IMcService mcService, McQueUsr queUser) {
 	boolean allCorrect = allQuestionsCorrect(mcService, queUser);
-	return new ToolOutput(MCOutputFactory.OUTPUT_NAME_LEARNER_ALL_CORRECT, getI18NText(
-		MCOutputFactory.OUTPUT_NAME_LEARNER_ALL_CORRECT, true), allCorrect);
+	return new ToolOutput(MCOutputFactory.OUTPUT_NAME_LEARNER_ALL_CORRECT,
+		getI18NText(MCOutputFactory.OUTPUT_NAME_LEARNER_ALL_CORRECT, true), allCorrect);
     }
 
     // written to cope with more than one correct option for each question but only tested with
@@ -139,7 +142,7 @@ public class MCOutputFactory extends OutputFactory {
 	// we can abort as we know there is a wrong answer.
 	// Otherwise count the number of correct options overall (for comparison later).
 	long correctlearnerOptions = 0;
-	List<McUsrAttempt> userAttempts = (List<McUsrAttempt>) mcService.getFinalizedUserAttempts(user);
+	List<McUsrAttempt> userAttempts = mcService.getFinalizedUserAttempts(user);
 	for (McUsrAttempt userAttempt : userAttempts) {
 	    McOptsContent option = userAttempt.getMcOptionsContent();
 	    if (!option.isCorrectOption()) {

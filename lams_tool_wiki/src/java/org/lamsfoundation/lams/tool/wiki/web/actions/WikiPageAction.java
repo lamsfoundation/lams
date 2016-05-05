@@ -2,21 +2,21 @@
  * Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
  * =============================================================
  * License Information: http://lamsfoundation.org/licensing/lams/2.0/
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301
  * USA
- * 
+ *
  * http://www.gnu.org/licenses/gpl.txt
  * ****************************************************************
  */
@@ -59,9 +59,9 @@ import org.lamsfoundation.lams.web.util.AttributeNames;
 
 /**
  * An abstract class used for wiki actions common to monitor, learner and author
- * 
+ *
  * @author lfoxton
- * 
+ *
  */
 public abstract class WikiPageAction extends LamsDispatchAction {
 
@@ -78,7 +78,7 @@ public abstract class WikiPageAction extends LamsDispatchAction {
 
     /**
      * This action returns to the current wiki by updating the form accordingly
-     * 
+     *
      * @param mapping
      * @param form
      * @param request
@@ -92,7 +92,7 @@ public abstract class WikiPageAction extends LamsDispatchAction {
 
     /**
      * Edit a page and make a new page content entry
-     * 
+     *
      * @param mapping
      * @param form
      * @param request
@@ -161,7 +161,7 @@ public abstract class WikiPageAction extends LamsDispatchAction {
 
     /**
      * Revert to a previous page content in the page history
-     * 
+     *
      * @param mapping
      * @param form
      * @param request
@@ -212,7 +212,7 @@ public abstract class WikiPageAction extends LamsDispatchAction {
 
     /**
      * Compare two page content history items and return the result
-     * 
+     *
      * @param mapping
      * @param form
      * @param request
@@ -250,7 +250,7 @@ public abstract class WikiPageAction extends LamsDispatchAction {
 
     /**
      * View a page content from a wiki page's history
-     * 
+     *
      * @param mapping
      * @param form
      * @param request
@@ -286,7 +286,7 @@ public abstract class WikiPageAction extends LamsDispatchAction {
 
     /**
      * Change the active page of the wiki form
-     * 
+     *
      * @param mapping
      * @param form
      * @param request
@@ -334,7 +334,7 @@ public abstract class WikiPageAction extends LamsDispatchAction {
 
     /**
      * Add a new wiki page to this wiki instance
-     * 
+     *
      * @param mapping
      * @param form
      * @param request
@@ -404,7 +404,7 @@ public abstract class WikiPageAction extends LamsDispatchAction {
 
     /**
      * Remove a wiki page from the wiki instance
-     * 
+     *
      * @param mapping
      * @param form
      * @param request
@@ -475,7 +475,7 @@ public abstract class WikiPageAction extends LamsDispatchAction {
 
     /**
      * Toggles whether a learner wants to receive notifications for wiki changes
-     * 
+     *
      * @param mapping
      * @param form
      * @param request

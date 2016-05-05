@@ -2,21 +2,21 @@
  * Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
  * =============================================================
  * License Information: http://lamsfoundation.org/licensing/lams/2.0/
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License version 2.0 
+ * it under the terms of the GNU General Public License version 2.0
  * as published by the Free Software Foundation.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301
  * USA
- * 
+ *
  * http://www.gnu.org/licenses/gpl.txt
  * ****************************************************************
  */
@@ -28,13 +28,13 @@ import java.util.List;
 
 /**
  * Tool Deployer Main Class
- * 
+ *
  * Command Line Parameters: properties_file_path: mandatory forcedb: optional, defaults to false. if true, deletes any
  * old entries in db.
- * 
+ *
  * Only use forceDB for development - not designed for production. If forceDB is set, then toolSignature and
  * toolTablesDeleteScriptPath are needed.
- * 
+ *
  * @author Chris Perfect, modifications by Fiona Malikoff, Luke Foxton
  */
 public class Deploy {
@@ -45,9 +45,9 @@ public class Deploy {
 
     /**
      * Runs the Deploy
-     * 
+     *
      * @param args
-     *                the command line arguments
+     *            the command line arguments
      */
     public static void main(String[] args) throws Exception {
 
@@ -155,7 +155,8 @@ public class Deploy {
 	    dbDeployTask.setToolLibraryInsertScriptPath(config.getToolLibraryInsertScriptPath());
 	    dbDeployTask.setToolActivityInsertScriptPath(config.getToolActivityInsertScriptPath());
 	    dbDeployTask.setToolTablesScriptPath(config.getToolTablesScriptPath());
-	    if (config.getToolDBVersionScriptPath() != null && config.getToolDBVersionScriptPath().trim().length() > 0) {
+	    if (config.getToolDBVersionScriptPath() != null
+		    && config.getToolDBVersionScriptPath().trim().length() > 0) {
 		dbDeployTask.setToolDBVersionScriptPath(config.getToolDBVersionScriptPath());
 	    }
 	    dbDeployTask.execute();

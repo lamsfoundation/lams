@@ -2,21 +2,21 @@
  * Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
  * =============================================================
  * License Information: http://lamsfoundation.org/licensing/lams/2.0/
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301
  * USA
- * 
+ *
  * http://www.gnu.org/licenses/gpl.txt
  * ****************************************************************
  */
@@ -56,9 +56,9 @@ import org.lamsfoundation.lams.web.util.SessionMap;
 /**
  * @author
  * @version
- * 
  *
- * 
+ *
+ *
  *
  */
 public class AuthoringAction extends LamsDispatchAction {
@@ -75,7 +75,7 @@ public class AuthoringAction extends LamsDispatchAction {
     /**
      * Default method when no dispatch parameter is specified. It is expected that the parameter
      * <code>toolContentID</code> will be passed in. This will be used to retrieve content for this tool.
-     * 
+     *
      */
     @Override
     protected ActionForward unspecified(ActionMapping mapping, ActionForm form, HttpServletRequest request,
@@ -185,7 +185,7 @@ public class AuthoringAction extends LamsDispatchAction {
 
     /**
      * Updates Notebook content using AuthoringForm inputs.
-     * 
+     *
      * @param authForm
      * @param mode
      * @return
@@ -202,7 +202,7 @@ public class AuthoringAction extends LamsDispatchAction {
 
     /**
      * Updates AuthoringForm using Notebook content.
-     * 
+     *
      * @param notebook
      * @param authForm
      * @return
@@ -217,7 +217,7 @@ public class AuthoringAction extends LamsDispatchAction {
 
     /**
      * Updates SessionMap using Notebook content.
-     * 
+     *
      * @param notebook
      * @param mode
      */
@@ -242,7 +242,7 @@ public class AuthoringAction extends LamsDispatchAction {
 
     /**
      * Get ToolAccessMode from HttpRequest parameters. Default value is AUTHOR mode.
-     * 
+     *
      * @param request
      * @return
      */
@@ -259,7 +259,7 @@ public class AuthoringAction extends LamsDispatchAction {
 
     /**
      * Retrieve the SessionMap from the HttpSession.
-     * 
+     *
      * @param request
      * @param authForm
      * @return
@@ -270,7 +270,7 @@ public class AuthoringAction extends LamsDispatchAction {
 
     /**
      * Lists deleted Notebook conditions, which could be persisted or non-persisted items.
-     * 
+     *
      * @param request
      * @return
      */

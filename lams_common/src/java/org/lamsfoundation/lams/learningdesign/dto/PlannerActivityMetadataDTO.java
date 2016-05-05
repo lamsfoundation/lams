@@ -29,7 +29,7 @@ import org.lamsfoundation.lams.planner.PedagogicalPlannerActivityMetadata;
 
 /**
  * Holds additional information about activities used in Pedagogical Planner only.
- * 
+ *
  * @author Marcin Cieslak
  */
 public class PlannerActivityMetadataDTO implements Serializable, Cloneable {

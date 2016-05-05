@@ -2,21 +2,21 @@
  * Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
  * =============================================================
  * License Information: http://lamsfoundation.org/licensing/lams/2.0/
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License version 2.0 
+ * it under the terms of the GNU General Public License version 2.0
  * as published by the Free Software Foundation.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301
  * USA
- * 
+ *
  * http://www.gnu.org/licenses/gpl.txt
  * ****************************************************************
  */
@@ -131,11 +131,11 @@ public class LearningAction extends Action {
     /**
      * Read scratchie data from database and put them into HttpSession. It will redirect to init.do directly after this
      * method run successfully.
-     * 
+     *
      * This method will avoid read database again and lost un-saved resouce item lost when user "refresh page",
-     * 
+     *
      * @throws ScratchieApplicationException
-     * 
+     *
      */
     private ActionForward start(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) throws ScratchieApplicationException {
@@ -382,7 +382,7 @@ public class LearningAction extends Action {
 
     /**
      * Record in DB that leader has scratched specified answer. And return whether scratchie answer is correct or not
-     * 
+     *
      * @throws ScratchieApplicationException
      */
     private ActionForward recordItemScratched(ActionMapping mapping, ActionForm form, HttpServletRequest request,
@@ -434,7 +434,7 @@ public class LearningAction extends Action {
 
     /**
      * Displays results page. When leader gets to this page, scratchingFinished column is set to true for all users.
-     * 
+     *
      * @param mapping
      * @param form
      * @param request
@@ -571,7 +571,7 @@ public class LearningAction extends Action {
 
     /**
      * Finish learning session.
-     * 
+     *
      * @param mapping
      * @param form
      * @param request
@@ -604,7 +604,7 @@ public class LearningAction extends Action {
 
     /**
      * Displays burning questions page.
-     * 
+     *
      * @param mapping
      * @param form
      * @param request
@@ -637,7 +637,7 @@ public class LearningAction extends Action {
 
     /**
      * Submit reflection form input database. Only leaders can submit reflections.
-     * 
+     *
      * @param mapping
      * @param form
      * @param request
@@ -695,7 +695,7 @@ public class LearningAction extends Action {
 
     /**
      * Display empty reflection form.
-     * 
+     *
      * @param mapping
      * @param form
      * @param request
@@ -740,7 +740,7 @@ public class LearningAction extends Action {
 
     /**
      * Submit reflection form input database. Only leaders can submit reflections.
-     * 
+     *
      * @param mapping
      * @param form
      * @param request

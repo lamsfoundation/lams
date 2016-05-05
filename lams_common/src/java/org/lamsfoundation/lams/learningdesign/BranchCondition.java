@@ -36,7 +36,7 @@ import org.lamsfoundation.lams.tool.ToolOutputValue;
  * The ToolOutputBranchActivityEntries record the branch selection details for tool output based branching. During
  * authoring, the tool will have supplied a ToolOutputDefinition object and this will have been used to configure which
  * tool outputs match to a particular branch. This mapping is as a ToolOutputBranchActivityEntry.
- * 
+ *
  * There should be one branch condition for each ToolOutputBranchActivityEntry.
  */
 public class BranchCondition implements Comparable {
@@ -83,9 +83,9 @@ public class BranchCondition implements Comparable {
 
     /** Create a condition object based on an existing DTO object. Copies all fields including the id field */
     public BranchCondition(BranchConditionDTO conditionDTO) {
-	this(conditionDTO.getConditionId(), conditionDTO.getConditionUIID(), conditionDTO.getOrderID(), conditionDTO
-		.getName(), conditionDTO.getDisplayName(), conditionDTO.getType(), conditionDTO.getStartValue(),
-		conditionDTO.getEndValue(), conditionDTO.getExactMatchValue());
+	this(conditionDTO.getConditionId(), conditionDTO.getConditionUIID(), conditionDTO.getOrderID(),
+		conditionDTO.getName(), conditionDTO.getDisplayName(), conditionDTO.getType(),
+		conditionDTO.getStartValue(), conditionDTO.getEndValue(), conditionDTO.getExactMatchValue());
     }
 
     public Long getConditionId() {
@@ -167,9 +167,9 @@ public class BranchCondition implements Comparable {
     @Override
     public String toString() {
 	return new ToStringBuilder(this).append("conditionId", conditionId).append("conditionUIID", conditionUIID)
-		.append("orderId", orderId).append("name", name).append("displayName", displayName)
-		.append("type", type).append("startValue", startValue).append("endValue", endValue).append(
-			"exactMatchValue", exactMatchValue).toString();
+		.append("orderId", orderId).append("name", name).append("displayName", displayName).append("type", type)
+		.append("startValue", startValue).append("endValue", endValue)
+		.append("exactMatchValue", exactMatchValue).toString();
     }
 
     /**
@@ -196,6 +196,7 @@ public class BranchCondition implements Comparable {
 	return new BranchCondition(null, null, orderId, name, displayName, type, startValue, endValue, exactMatchValue);
     }
 
+    @Override
     public int compareTo(Object arg0) {
 	BranchCondition other = (BranchCondition) arg0;
 	return new CompareToBuilder().append(orderId, other.getOrderId()).append(conditionId, other.getConditionId())

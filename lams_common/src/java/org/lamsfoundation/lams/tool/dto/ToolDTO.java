@@ -86,19 +86,19 @@ public class ToolDTO {
     }
 
     public String getLearningLibraryTitle() {
-        return learningLibraryTitle;
+	return learningLibraryTitle;
     }
 
     public void setLearningLibraryTitle(String learningLibraryTitle) {
-        this.learningLibraryTitle = learningLibraryTitle;
+	this.learningLibraryTitle = learningLibraryTitle;
     }
 
     public Long getDefaultToolContentId() {
-        return defaultToolContentId;
+	return defaultToolContentId;
     }
 
     public void setDefaultToolContentId(Long defaultToolContentId) {
-        this.defaultToolContentId = defaultToolContentId;
+	this.defaultToolContentId = defaultToolContentId;
     }
 
     public Long[] getChildToolIds() {

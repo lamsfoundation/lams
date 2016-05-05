@@ -18,21 +18,21 @@
  *
  * http://www.gnu.org/licenses/gpl.txt
  * ****************************************************************
- */ 
- 
-/* $Id$ */ 
-package org.lamsfoundation.lams.config.dao; 
+ */
+
+/* $Id$ */
+package org.lamsfoundation.lams.config.dao;
 
 import org.lamsfoundation.lams.config.Registration;
 import org.lamsfoundation.lams.dao.IBaseDAO;
- 
+
 /**
- * 
+ *
  * @author lfoxton
  *
  */
-public interface IRegistrationDAO extends IBaseDAO{
+public interface IRegistrationDAO extends IBaseDAO {
     public void saveOrUpdate(Registration reg);
+
     public Registration get();
 }
- 

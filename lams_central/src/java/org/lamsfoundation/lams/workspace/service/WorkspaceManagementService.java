@@ -2,21 +2,21 @@
  * Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
  * =============================================================
  * License Information: http://lamsfoundation.org/licensing/lams/2.0/
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License version 2.0 
+ * it under the terms of the GNU General Public License version 2.0
  * as published by the Free Software Foundation.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301
  * USA
- * 
+ *
  * http://www.gnu.org/licenses/gpl.txt
  * ****************************************************************
  */
@@ -79,7 +79,7 @@ public class WorkspaceManagementService implements IWorkspaceManagementService {
     protected IUserManagementService userMgmtService;
     protected MessageService messageService;
 
-    // To support integrations that need a type for the learning design, any designs that do not have a type field set, 
+    // To support integrations that need a type for the learning design, any designs that do not have a type field set,
     // return "default" in the type field. Also, the integrations can search for designs that do not have a type field
     // set by setting type = default. This setup is done in the FolderContentDTO. See LDEV-3523
     protected static final String DEFAULT_DESIGN_TYPE = "default";
@@ -88,7 +88,7 @@ public class WorkspaceManagementService implements IWorkspaceManagementService {
 
     /**
      * i18n Message service
-     * 
+     *
      * @param messageSource
      */
     public void setMessageService(MessageService messageService) {
@@ -97,7 +97,7 @@ public class WorkspaceManagementService implements IWorkspaceManagementService {
 
     /**
      * i18n Message service. The Workspace action class needs access to the message service.
-     * 
+     *
      * @param messageSource
      */
     @Override
@@ -143,7 +143,7 @@ public class WorkspaceManagementService implements IWorkspaceManagementService {
 
     /**
      * (non-Javadoc)
-     * 
+     *
      * @see org.lamsfoundation.lams.workspace.service.IWorkspaceManagementService#deleteResource(java.lang.Integer,
      *      java.lang.String, java.lang.Integer)
      */
@@ -161,7 +161,7 @@ public class WorkspaceManagementService implements IWorkspaceManagementService {
     /**
      * This method deletes the <code>WorkspaceFolder</code> with given <code>workspaceFolderID</code>. But before it
      * does so it checks whether the <code>User</code> is authorized to perform this action <br>
-     * 
+     *
      * <p>
      * <b>Note:</b><br>
      * </p>
@@ -172,7 +172,7 @@ public class WorkspaceManagementService implements IWorkspaceManagementService {
      * <li>It should not be the root folder of any <code>Organisation</code> or <code>User</code></li>
      * </ul>
      * </p>
-     * 
+     *
      * @param workspaceFolderID
      *            The <code>WorkspaceFolder</code> to be deleted
      * @param userID
@@ -198,7 +198,7 @@ public class WorkspaceManagementService implements IWorkspaceManagementService {
      * returned indicating which resource it was unable to delete. If all resources inside that <code>folder</code> are
      * successfully deleted, then the folder will be deleted and an error will be returned indicating it was
      * successfully deleted.
-     * 
+     *
      * @param folder
      */
     private void deleteFolderContents(WorkspaceFolder folder, User user, boolean isSysAuthorAdmin) throws IOException {
@@ -274,7 +274,7 @@ public class WorkspaceManagementService implements IWorkspaceManagementService {
     /**
      * Get the contents of a folder. Internal method used for both getFolderContentsExcludeHome() and
      * getFolderContents(). If skipContentId is not null, then skip any contents found with this id.
-     * 
+     *
      * @throws UserAccessDeniedException
      * @throws RepositoryCheckedException
      */
@@ -495,7 +495,7 @@ public class WorkspaceManagementService implements IWorkspaceManagementService {
 	    }
 
 	    // what is the total number (so the pager knows whether to allow paging)
-	    // if we did a search, then no paging just return the whole lot. 
+	    // if we did a search, then no paging just return the whole lot.
 	    // otherwise need the whole count from the db.
 	    numDesigns = searchPattern != null ? result.length()
 		    : learningDesignDAO.countAllLearningDesigns(folderId, !allowInvalidDesigns);
@@ -511,7 +511,7 @@ public class WorkspaceManagementService implements IWorkspaceManagementService {
 
     /**
      * This method returns the permissions specific to the given <code>workspaceFolder</code> for the given user.
-     * 
+     *
      * @param workspaceFolder
      *            The workspaceFolder for which we need the permissions
      * @param user
@@ -590,13 +590,13 @@ public class WorkspaceManagementService implements IWorkspaceManagementService {
      * <code>WorkspaceFolder</code> to be authorized to do so.</li>
      * <ul>
      * </p>
-     * 
+     *
      * <p>
      * <b>Note: </b> By default the copied folder has the same name as that of the one being copied. But in case the
      * target <code>WorkspaceFolder</code> already has a folder with the same name, an additional "C" is appended to the
      * name of the folder thus created.
      * </p>
-     * 
+     *
      * @param folderID
      *            The <code>WorkspaceFolder</code> to be copied.
      * @param targetFolderID
@@ -630,7 +630,7 @@ public class WorkspaceManagementService implements IWorkspaceManagementService {
     /**
      * This method checks whether the user is authorized to create a new folder or learning design under the given
      * WorkspaceFolder.
-     * 
+     *
      * @param folderID
      *            The <code>workspace_folder_id</code> of the <code>WorkspaceFolder<code>
      * 				   under which the User wants to create/copy folder
@@ -756,11 +756,11 @@ public class WorkspaceManagementService implements IWorkspaceManagementService {
      * <code>LearningDesign's</code></li>
      * </ul>
      * </p>
-     * 
+     *
      * TODO Deleting a LearningDesign would mean deleting all its corresponding activities, transitions and the content
      * related to such activities. Deletion of content has to be yet taken care of. Since Tools manage there own
      * content.Just need to cross-check this once tools are functional
-     * 
+     *
      * @param learningDesignID
      *            The <code>learning_design_id</code> of the <code>LearningDesign</code> to be deleted.
      * @param userID
@@ -790,7 +790,7 @@ public class WorkspaceManagementService implements IWorkspaceManagementService {
 
     /**
      * This method deletes all versions of the given content (FILE/PACKAGE) fom the repository.
-     * 
+     *
      * @param folderContentID
      *            The content to be deleted
      * @throws Exception
@@ -805,7 +805,7 @@ public class WorkspaceManagementService implements IWorkspaceManagementService {
 
     /**
      * (non-Javadoc)
-     * 
+     *
      * @see org.lamsfoundation.lams.workspace.service.IWorkspaceManagementService#getAccessibleOrganisationWorkspaceFolders(java.lang.Integer)
      */
     @Override
@@ -817,7 +817,7 @@ public class WorkspaceManagementService implements IWorkspaceManagementService {
 
     /**
      * (non-Javadoc)
-     * 
+     *
      * @see org.lamsfoundation.lams.workspace.service.IWorkspaceManagementService#getAccessibleOrganisationWorkspaceFolders(java.lang.Integer)
      */
     @Override
@@ -884,7 +884,7 @@ public class WorkspaceManagementService implements IWorkspaceManagementService {
 
     /**
      * (non-Javadoc)
-     * 
+     *
      * @see org.lamsfoundation.lams.workspace.service.IWorkspaceManagementService#getUserWorkspaceFolder(java.lang.Integer)
      */
     @Override
@@ -919,7 +919,7 @@ public class WorkspaceManagementService implements IWorkspaceManagementService {
 
     /**
      * (non-Javadoc)
-     * 
+     *
      * @see org.lamsfoundation.lams.workspace.service.IWorkspaceManagementService#getPublicWorkspaceFolder(java.lang.Integer)
      */
     @Override
@@ -947,7 +947,7 @@ public class WorkspaceManagementService implements IWorkspaceManagementService {
     /**
      * This a utility method that checks whether user has write access. He can save his contents to a folder only if he
      * is an AUTHOR,TEACHER or STAFF
-     * 
+     *
      * @param roles
      *            Set of roles that the user has
      * @return boolean A boolean value indicating whether the user has "write" access or not.
@@ -983,7 +983,7 @@ public class WorkspaceManagementService implements IWorkspaceManagementService {
     /**
      * This method renames the <code>workspaceFolder</code> with the given <code>workspaceFolderID</code> to
      * <code>newName</code>. But before it does that it checks if the user is authorized to do so.
-     * 
+     *
      * @param workspaceFolderID
      *            The <code>workspaceFolder</code> to be renamed
      * @param newName
@@ -1018,7 +1018,7 @@ public class WorkspaceManagementService implements IWorkspaceManagementService {
     /**
      * This method renames the Learning design with given <code>learningDesignID</code> to the new <code>title</code>.
      * But before it does that it checks if the user is authorized to do so.
-     * 
+     *
      * @param learningDesignID
      *            The <code>learning_design_id</code> of the design to be renamed
      * @param title

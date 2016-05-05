@@ -2,21 +2,21 @@
  * Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
  * =============================================================
  * License Information: http://lamsfoundation.org/licensing/lams/2.0/
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301
  * USA
- * 
+ *
  * http://www.gnu.org/licenses/gpl.txt
  * ****************************************************************
  */
@@ -24,12 +24,7 @@
 package org.lamsfoundation.lams.tool.spreadsheet.web.action;
 
 import java.sql.Timestamp;
-import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Set;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -44,18 +39,14 @@ import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.apache.struts.action.ActionMessages;
-import org.apache.struts.upload.FormFile;
 import org.lamsfoundation.lams.authoring.web.AuthoringConstants;
-import org.lamsfoundation.lams.contentrepository.client.IToolContentHandler;
 import org.lamsfoundation.lams.tool.ToolAccessMode;
 import org.lamsfoundation.lams.tool.spreadsheet.SpreadsheetConstants;
 import org.lamsfoundation.lams.tool.spreadsheet.model.Spreadsheet;
 import org.lamsfoundation.lams.tool.spreadsheet.model.SpreadsheetUser;
 import org.lamsfoundation.lams.tool.spreadsheet.service.ISpreadsheetService;
-import org.lamsfoundation.lams.tool.spreadsheet.service.UploadSpreadsheetFileException;
 import org.lamsfoundation.lams.tool.spreadsheet.web.form.SpreadsheetForm;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
-import org.lamsfoundation.lams.util.FileValidatorUtil;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
@@ -69,6 +60,7 @@ public class AuthoringAction extends Action {
 
     private static Logger log = Logger.getLogger(AuthoringAction.class);
 
+    @Override
     public ActionForward execute(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) throws Exception {
 
@@ -77,10 +69,11 @@ public class AuthoringAction extends Action {
 	if (param.equals("start")) {
 	    ToolAccessMode mode = getAccessMode(request);
 	    // teacher mode "check for new" button enter.
-	    if (mode != null)
+	    if (mode != null) {
 		request.setAttribute(AttributeNames.ATTR_MODE, mode.toString());
-	    else
+	    } else {
 		request.setAttribute(AttributeNames.ATTR_MODE, ToolAccessMode.AUTHOR.toString());
+	    }
 	    return start(mapping, form, request, response);
 	}
 	if (param.equals("definelater")) {
@@ -109,11 +102,11 @@ public class AuthoringAction extends Action {
     /**
      * Read spreadsheet data from database and put them into HttpSession. It will redirect to init.do directly after
      * this method run successfully.
-     * 
+     *
      * This method will avoid read database again and lost un-saved resouce item lost when user "refresh page",
-     * 
+     *
      * @throws ServletException
-     * 
+     *
      */
     private ActionForward start(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) throws ServletException {
@@ -156,7 +149,7 @@ public class AuthoringAction extends Action {
 
     /**
      * Display same entire authoring page content from HttpSession variable.
-     * 
+     *
      * @param mapping
      * @param form
      * @param request
@@ -178,15 +171,16 @@ public class AuthoringAction extends Action {
 	}
 
 	ToolAccessMode mode = getAccessMode(request);
-	if (mode.isAuthor())
+	if (mode.isAuthor()) {
 	    return mapping.findForward(SpreadsheetConstants.SUCCESS);
-	else
+	} else {
 	    return mapping.findForward(SpreadsheetConstants.DEFINE_LATER);
+	}
     }
 
     /**
      * This method will persist all inforamtion in this authoring page, include all spreadsheet item, information etc.
-     * 
+     *
      * @param mapping
      * @param form
      * @param request
@@ -206,10 +200,11 @@ public class AuthoringAction extends Action {
 	ActionMessages errors = validate(spreadsheetForm, mapping, request);
 	if (!errors.isEmpty()) {
 	    saveErrors(request, errors);
-	    if (mode.isAuthor())
+	    if (mode.isAuthor()) {
 		return mapping.findForward("author");
-	    else
+	    } else {
 		return mapping.findForward("monitor");
+	    }
 	}
 
 	Spreadsheet spreadsheet = spreadsheetForm.getSpreadsheet();
@@ -257,10 +252,11 @@ public class AuthoringAction extends Action {
 	spreadsheetForm.setSpreadsheet(spreadsheetPO);
 
 	request.setAttribute(AuthoringConstants.LAMS_AUTHORING_SUCCESS_FLAG, Boolean.TRUE);
-	if (mode.isAuthor())
+	if (mode.isAuthor()) {
 	    return mapping.findForward("author");
-	else
+	} else {
 	    return mapping.findForward("monitor");
+	}
     }
 
     // *************************************************************************************
@@ -270,28 +266,30 @@ public class AuthoringAction extends Action {
      * Return SpreadsheetService bean.
      */
     private ISpreadsheetService getSpreadsheetService() {
-	WebApplicationContext wac = WebApplicationContextUtils.getRequiredWebApplicationContext(getServlet()
-		.getServletContext());
+	WebApplicationContext wac = WebApplicationContextUtils
+		.getRequiredWebApplicationContext(getServlet().getServletContext());
 	return (ISpreadsheetService) wac.getBean(SpreadsheetConstants.RESOURCE_SERVICE);
     }
 
     /**
      * Get ToolAccessMode from HttpRequest parameters. Default value is AUTHOR mode.
-     * 
+     *
      * @param request
      * @return
      */
     private ToolAccessMode getAccessMode(HttpServletRequest request) {
 	ToolAccessMode mode;
 	String modeStr = request.getParameter(AttributeNames.ATTR_MODE);
-	if (StringUtils.equalsIgnoreCase(modeStr, ToolAccessMode.TEACHER.toString()))
+	if (StringUtils.equalsIgnoreCase(modeStr, ToolAccessMode.TEACHER.toString())) {
 	    mode = ToolAccessMode.TEACHER;
-	else
+	} else {
 	    mode = ToolAccessMode.AUTHOR;
+	}
 	return mode;
     }
 
-    private ActionMessages validate(SpreadsheetForm spreadsheetForm, ActionMapping mapping, HttpServletRequest request) {
+    private ActionMessages validate(SpreadsheetForm spreadsheetForm, ActionMapping mapping,
+	    HttpServletRequest request) {
 	ActionMessages errors = new ActionMessages();
 	// if (StringUtils.isBlank(spreadsheetForm.getSpreadsheet().getTitle())) {
 	// ActionMessage error = new ActionMessage("error.resource.item.title.blank");

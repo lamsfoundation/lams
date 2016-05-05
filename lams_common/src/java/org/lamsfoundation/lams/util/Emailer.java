@@ -15,13 +15,13 @@ import org.apache.commons.lang.StringUtils;
 
 /**
  * A class that handles emails
- * 
+ *
  * @author lfoxton
  */
 public class Emailer {
     /**
      * Sends an email sourced from support email
-     * 
+     *
      * @param subject
      *            the subject of the email
      * @param to
@@ -40,7 +40,7 @@ public class Emailer {
     /**
      * Creates a mail session with authentication if it is required, ie if it has been set up with SMTP authentication
      * in the config page
-     * 
+     *
      * @param properties
      * @return
      */
@@ -65,7 +65,7 @@ public class Emailer {
 
     /**
      * Send email to recipients
-     * 
+     *
      * @param subject
      *            the subject of the email
      * @param to

@@ -1,6 +1,7 @@
 package org.lamsfoundation.lams.integration;
 
 import java.io.Serializable;
+
 import org.apache.commons.lang.builder.ToStringBuilder;
 import org.lamsfoundation.lams.usermanagement.Organisation;
 
@@ -63,6 +64,7 @@ public class ExtCourseClassMap implements Serializable {
 	this.organisation = organisation;
     }
 
+    @Override
     public String toString() {
 	return new ToStringBuilder(this).append("sid", getSid()).append("courseid", getCourseid()).toString();
     }

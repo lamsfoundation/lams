@@ -1,21 +1,13 @@
 package org.lamsfoundation.lams.tool.sbmt.form;
 
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Set;
-
 import javax.servlet.http.HttpServletRequest;
 
-import org.apache.commons.lang.StringUtils;
 import org.apache.struts.action.ActionMapping;
-import org.apache.struts.upload.FormFile;
 import org.apache.struts.validator.ValidatorForm;
-import org.lamsfoundation.lams.contentrepository.client.IToolContentHandler;
 import org.lamsfoundation.lams.tool.sbmt.SubmitFilesContent;
 
 /**
- * 
+ *
  * @author Dapeng.Ni
  *
  */

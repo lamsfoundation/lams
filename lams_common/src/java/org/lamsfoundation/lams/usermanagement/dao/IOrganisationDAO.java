@@ -35,7 +35,7 @@ public interface IOrganisationDAO extends IBaseDAO {
 
     /**
      * Get list of orgIds of active groups.
-     * 
+     *
      * @param userId
      * @param isSysadmin
      * @return list of orgIds
@@ -44,7 +44,7 @@ public interface IOrganisationDAO extends IBaseDAO {
 
     /**
      * Returns courses with specified type, state and parent course.
-     * 
+     *
      * @param parentOrgId
      * @param typeId
      * @param stateId
@@ -61,7 +61,7 @@ public interface IOrganisationDAO extends IBaseDAO {
 
     /**
      * Counts courses with specified type, state and parent course.
-     * 
+     *
      * @param parentOrgId
      * @param typeId
      * @param stateId

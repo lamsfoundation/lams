@@ -2,21 +2,21 @@
  * Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
  * =============================================================
  * License Information: http://lamsfoundation.org/licensing/lams/2.0/
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License version 2.0
  * as published by the Free Software Foundation.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301
  * USA
- * 
+ *
  * http://www.gnu.org/licenses/gpl.txt
  * ***********************************************************************/
 
@@ -55,7 +55,7 @@ import org.lamsfoundation.lams.util.MessageService;
 
 /**
  * @author Ozgur Demirtas
- * 
+ *
  *         Interface that defines the contract Voting service provider must follow.
  */
 public interface IVoteService {
@@ -66,8 +66,9 @@ public interface IVoteService {
     MessageService getMessageService();
 
     /**
-
-    /**
+     * 
+     * /**
+     * 
      * @param user
      * @param toolSessionId
      * @return
@@ -76,7 +77,7 @@ public interface IVoteService {
 
     /**
      * Set specified user as a leader. Also the previous leader (if any) is marked as non-leader.
-     * 
+     *
      * @param userId
      * @param toolSessionID
      */
@@ -84,7 +85,7 @@ public interface IVoteService {
 
     /**
      * Check user has the same answers logs as group leader. If not - creates missing ones.
-     * 
+     *
      * @param user
      * @param leader
      */
@@ -92,7 +93,7 @@ public interface IVoteService {
 
     /**
      * Generates chart data for the learner module and monitoring module Summary tab (Individual Sessions mode)
-     * 
+     *
      * @param request
      * @param voteService
      * @param toolContentID
@@ -103,7 +104,7 @@ public interface IVoteService {
 
     /**
      * Generates data for all sessions, including all sessions summary.
-     * 
+     *
      * @param toolContentID
      * @return
      */
@@ -111,12 +112,12 @@ public interface IVoteService {
 
     /**
      * Generates data for all sessions in the Monitoring Summary, including all sessions summary.
-     * 
+     *
      * @param toolContentID
      * @return
      */
     SortedSet<SummarySessionDTO> getMonitoringSessionDTOs(Long toolContentID);
-    
+
     List<VoteMonitoredAnswersDTO> getOpenVotes(Long voteContentUid, Long currentSessionId, Long userId);
 
     List<ReflectionDTO> getReflectionData(VoteContent voteContent, Long userID);
@@ -150,7 +151,7 @@ public interface IVoteService {
     List<VoteUsrAttempt> getAttemptsForQuestionContentAndSessionUid(final Long questionUid, final Long voteSessionUid);
 
     List<VoteUsrAttempt> getAttemptsForUserAndQuestionContent(final Long userUid, final Long questionUid);
-    
+
     /**
      * creates a new vote record in the database
      */
@@ -164,18 +165,18 @@ public interface IVoteService {
     VoteQueContent getVoteQueContentByUID(Long uid);
 
     void saveOrUpdateVoteQueContent(VoteQueContent voteQueContent);
-    
+
     VoteContent createQuestions(List<VoteQuestionDTO> questionDTOs, VoteContent voteContent);
 
     /**
      * Build a map of the display ids -> nomination text. If checkedOptions != null then only include the display ids in
      * the checkedOptions list.
-     * 
+     *
      * @param request
      * @param voteContent
-     *                the content of the vote from the database
+     *            the content of the vote from the database
      * @param checkedOptions
-     *                collection of String display IDs to which to restrict the map (optional)
+     *            collection of String display IDs to which to restrict the map (optional)
      * @return Map of display id -> nomination text.
      */
     Map<String, String> buildQuestionMap(VoteContent voteContent, Collection<String> checkedOptions);
@@ -198,13 +199,13 @@ public interface IVoteService {
 
     /**
      * checks the parameter content in the user responses table
-     * 
+     *
      * @param voteContent
      * @return boolean
      * @throws VoteApplicationException
      */
     boolean studentActivityOccurredGlobal(VoteContent voteContent);
-    
+
     void recalculateUserAnswers(VoteContent content, Set<VoteQueContent> oldQuestions,
 	    List<VoteQuestionDTO> questionDTOs, List<VoteQuestionDTO> deletedQuestions);
 
@@ -241,7 +242,7 @@ public interface IVoteService {
     NotebookEntry getEntry(Long id, Integer idType, String signature, Integer userID);
 
     void removeQuestionsFromCache(VoteContent voteContent);
-    
+
     void removeVoteContentFromCache(VoteContent voteContent);
 
     ToolOutput getToolInput(Long requestingToolContentId, Integer learnerId);
@@ -254,31 +255,34 @@ public interface IVoteService {
 
     /**
      * Returns whether activity is grouped and therefore it is expected more than one tool session.
-     * 
+     *
      * @param toolContentID
      * @return
      */
     boolean isGroupedActivity(long toolContentID);
-    
-    /** 
-     * Gets the basic details about an attempt for a nomination. questionUid must not be null, sessionUid may be NULL. This is
+
+    /**
+     * Gets the basic details about an attempt for a nomination. questionUid must not be null, sessionUid may be NULL.
+     * This is
      * unusual for these methods - usually sessionId may not be null. In this case if sessionUid is null then you get
      * the values for the whole class, not just the group.
-     * 
+     *
      * Will return List<[login (String), fullname(String), attemptTime(Timestamp]>
      */
-    List<Object[]> getUserAttemptsForTablesorter(Long sessionUid, Long questionUid, int page, int size,
-	    int sorting, String searchString);
-	
+    List<Object[]> getUserAttemptsForTablesorter(Long sessionUid, Long questionUid, int page, int size, int sorting,
+	    String searchString);
+
     int getCountUsersBySession(Long sessionUid, Long questionUid, String searchString);
-    
+
     List<Object[]> getUserReflectionsForTablesorter(Long sessionUid, int page, int size, int sorting,
 	    String searchString);
-    
+
     List<VoteStatsDTO> getStatisticsBySession(Long toolContentId);
-    
-    /** Gets the details for the open text nominations  */
+
+    /** Gets the details for the open text nominations */
     List<OpenTextAnswerDTO> getUserOpenTextAttemptsForTablesorter(Long sessionUid, Long contentUid, int page, int size,
 	    int sorting, String searchStringVote, String searchStringUsername);
-    int getCountUsersForOpenTextEntries(Long sessionUid, Long contentUid, String searchStringVote, String searchStringUsername);
+
+    int getCountUsersForOpenTextEntries(Long sessionUid, Long contentUid, String searchStringVote,
+	    String searchStringUsername);
 }

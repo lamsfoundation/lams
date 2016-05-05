@@ -36,7 +36,7 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
 
 /**
  * Receives, processes and sends Lesson Chat messages to Learners.
- * 
+ *
  * @author Marcin Cieslak
  */
 @ServerEndpoint("/presenceChatWebsocket")
@@ -286,7 +286,7 @@ public class PresenceWebsocketServer {
 
     /**
      * Receives a message sent by Learner via a websocket.
-     * 
+     *
      * @throws IOException
      */
     @OnMessage
@@ -296,12 +296,12 @@ public class PresenceWebsocketServer {
 	}
 	JSONObject requestJSON = new JSONObject(input);
 	switch (requestJSON.getString("type")) {
-	case "message":
-	    PresenceWebsocketServer.storeMessage(requestJSON, session);
-	    break;
-	case "fetchConversation":
-	    PresenceWebsocketServer.sendConversation(requestJSON, session);
-	    break;
+	    case "message":
+		PresenceWebsocketServer.storeMessage(requestJSON, session);
+		break;
+	    case "fetchConversation":
+		PresenceWebsocketServer.sendConversation(requestJSON, session);
+		break;
 	}
     }
 

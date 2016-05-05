@@ -37,7 +37,7 @@ import org.springframework.transaction.UnexpectedRollbackException;
 /**
  * Retries proxied method in case of an exception. First attempt is processed as usual. Retrying requires a new
  * transaction, which is done by the service.
- * 
+ *
  * @author Marcin Cieslak
  *
  */

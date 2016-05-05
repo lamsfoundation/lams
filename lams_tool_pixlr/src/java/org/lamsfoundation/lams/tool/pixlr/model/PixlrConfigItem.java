@@ -35,12 +35,13 @@ public class PixlrConfigItem {
     Long id;
     String configKey;
     String configValue;
-    
-    public PixlrConfigItem() {}
-    
+
+    public PixlrConfigItem() {
+    }
+
     /**
      *
-     * 
+     *
      */
     public Long getId() {
 	return id;

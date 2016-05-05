@@ -2,21 +2,21 @@
  * Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
  * =============================================================
  * License Information: http://lamsfoundation.org/licensing/lams/2.0/
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301
  * USA
- * 
+ *
  * http://www.gnu.org/licenses/gpl.txt
  * ****************************************************************
  */
@@ -48,19 +48,20 @@ import org.lamsfoundation.lams.web.util.AttributeNames;
 /**
  * @author
  * @version
- * 
- *
- *
- * 
  *
  *
  *
- * 
+ *
+ *
+ *
+ *
+ *
  */
 public class MonitoringAction extends LamsDispatchAction {
 
     public IPixlrService pixlrService;
 
+    @Override
     public ActionForward unspecified(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) {
 
@@ -77,10 +78,10 @@ public class MonitoringAction extends LamsDispatchAction {
 	}
 
 	PixlrDTO pixlrDT0 = new PixlrDTO(pixlr);
-	
+
 	for (PixlrSessionDTO sessionDTO : pixlrDT0.getSessionDTOs()) {
 	    Long toolSessionID = sessionDTO.getSessionID();
-	   
+
 	    for (PixlrUserDTO userDTO : sessionDTO.getUserDTOs()) {
 		// get the notebook entry.
 		NotebookEntry notebookEntry = pixlrService.getEntry(toolSessionID, CoreNotebookConstants.NOTEBOOK_TOOL,
@@ -89,7 +90,7 @@ public class MonitoringAction extends LamsDispatchAction {
 		    userDTO.notebookEntry = notebookEntry.getEntry();
 		    userDTO.setFinishedReflection(true);
 		}
-		
+
 	    }
 	}
 
@@ -128,10 +129,10 @@ public class MonitoringAction extends LamsDispatchAction {
 	    pixlrService = PixlrServiceProxy.getPixlrService(this.getServlet().getServletContext());
 	}
     }
-    
+
     /**
      * Opens a user's reflection
-     * 
+     *
      * @param mapping
      * @param form
      * @param request
@@ -157,10 +158,10 @@ public class MonitoringAction extends LamsDispatchAction {
 
 	return mapping.findForward("notebook");
     }
-    
+
     /**
      * Opens a user's reflection
-     * 
+     *
      * @param mapping
      * @param form
      * @param request
@@ -173,13 +174,10 @@ public class MonitoringAction extends LamsDispatchAction {
 	setupService();
 	MonitoringForm monitorForm = (MonitoringForm) form;
 	PixlrUser pixlrUser = pixlrService.getUserByUID(monitorForm.getHideUserImageUid());
-	
-	if (pixlrUser.isImageHidden())
-	{
+
+	if (pixlrUser.isImageHidden()) {
 	    pixlrUser.setImageHidden(false);
-	}
-	else
-	{
+	} else {
 	    pixlrUser.setImageHidden(true);
 	}
 	pixlrService.saveOrUpdatePixlrUser(pixlrUser);

@@ -2,21 +2,21 @@
  * Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
  * =============================================================
  * License Information: http://lamsfoundation.org/licensing/lams/2.0/
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301
  * USA
- * 
+ *
  * http://www.gnu.org/licenses/gpl.txt
  * ****************************************************************
  */
@@ -76,7 +76,7 @@ import org.lamsfoundation.lams.web.util.SessionMap;
 
 /**
  * @author Andrey Balan
- * 
+ *
  *
  *
  *
@@ -92,6 +92,7 @@ public class LearningAction extends LamsDispatchAction {
 
     private IKalturaService service;
 
+    @Override
     public ActionForward unspecified(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) throws Exception {
 
@@ -119,11 +120,11 @@ public class LearningAction extends LamsDispatchAction {
 	if (kaltura.getCreatedBy() != null) {
 	    kaltura.getCreatedBy().getLoginName();
 	}
-	
+
 	//if this parameter true - this request is sent when Monitoring Group
 	boolean isGroupMonitoring = WebUtil.readBooleanParam(request, KalturaConstants.ATTR_IS_GROUP_MONITORING, false);
 	sessionMap.put(KalturaConstants.ATTR_IS_GROUP_MONITORING, isGroupMonitoring);
-	
+
 	KalturaUser user;
 	if (mode.equals(ToolAccessMode.TEACHER) && !isGroupMonitoring) {
 	    Long userID = WebUtil.readLongParam(request, AttributeNames.PARAM_USER_ID, false);
@@ -132,7 +133,7 @@ public class LearningAction extends LamsDispatchAction {
 	    //in case of lerning and group monitoring create new user
 	    user = getCurrentUser(toolSessionId);
 	}
-	
+
 	// check defineLater
 	if (kaltura.isDefineLater()) {
 	    return mapping.findForward("defineLater");
@@ -144,8 +145,8 @@ public class LearningAction extends LamsDispatchAction {
 	    service.saveOrUpdateKaltura(kaltura);
 	}
 
-	ActivityPositionDTO activityPosition = LearningWebUtil.putActivityPositionInRequestByToolSessionId(toolSessionId, request, getServlet()
-		.getServletContext());
+	ActivityPositionDTO activityPosition = LearningWebUtil
+		.putActivityPositionInRequestByToolSessionId(toolSessionId, request, getServlet().getServletContext());
 	sessionMap.put(AttributeNames.ATTR_ACTIVITY_POSITION, activityPosition);
 
 	// reflection information
@@ -181,10 +182,10 @@ public class LearningAction extends LamsDispatchAction {
 		return mapping.findForward("submissionDeadline");
 	    }
 	}
-	
+
 	sessionMap.put(KalturaConstants.ATTR_KALTURA, kaltura);
 	sessionMap.put(AttributeNames.USER, user);
-	
+
 	TreeSet<KalturaItem> items = getItems(mode, kaltura, toolSessionId, user.getUserId());
 	//skip the next parameter if the tool doesn't contain videos
 	if (items.isEmpty()) {
@@ -221,13 +222,13 @@ public class LearningAction extends LamsDispatchAction {
 	if (mode.isLearner()) {
 	    service.logItemWatched(item.getUid(), userId, toolSessionId);
 	}
-	
+
 	//items from DB
 	TreeSet<KalturaItem> items = getItems(mode, kaltura, toolSessionId, userId);
-	
+
 	//filter comments and store current item comments to sessionMap
 	if (kaltura.isAllowComments()) {
-	    
+
 	    //filter out comments from the other groups. We need this to display number of comments
 	    for (KalturaItem dbItem : items) {
 		Set<KalturaComment> groupComments = getGroupComments(dbItem, toolSessionId, mode);
@@ -235,12 +236,13 @@ public class LearningAction extends LamsDispatchAction {
 		dbItem.setGroupComments(groupComments);
 	    }
 	}
-	
+
 	if (kaltura.isAllowRatings()) {
-	    boolean isUserItemAuthor = (item.getCreatedBy() == null) && (kaltura.getCreatedBy() != null) && kaltura.getCreatedBy().getUserId().equals(userId) 
+	    boolean isUserItemAuthor = (item.getCreatedBy() == null) && (kaltura.getCreatedBy() != null)
+		    && kaltura.getCreatedBy().getUserId().equals(userId)
 		    || (item.getCreatedBy() != null) && item.getCreatedBy().equals(user);
 	    sessionMap.put(KalturaConstants.ATTR_IS_USER_ITEM_AUTHOR, isUserItemAuthor);
-	    
+
 	    for (KalturaItem dbItem : items) {
 		AverageRatingDTO averageRatingDto = service.getAverageRatingDto(dbItem.getUid(), toolSessionId);
 		dbItem.setAverageRatingDto(averageRatingDto);
@@ -248,7 +250,7 @@ public class LearningAction extends LamsDispatchAction {
 	}
 
 	sessionMap.put(KalturaConstants.ATTR_IS_ALLOW_UPLOADS, isAllowUpload(sessionMap, items));
-	
+
 	//refresh items
 	items.remove(item);
 	sessionMap.put(KalturaConstants.ATTR_ITEM, item);
@@ -256,30 +258,31 @@ public class LearningAction extends LamsDispatchAction {
 
 	return mapping.findForward(KalturaConstants.SUCCESS);
     }
-    
+
     /**
      * Stores uploaded entryId(s).
      */
     public ActionForward saveNewItem(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) throws JSONException, IOException {
 	initKalturaService();
-	
+
 	String sessionMapID = WebUtil.readStrParam(request, KalturaConstants.ATTR_SESSION_MAP_ID);
-	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession().getAttribute(sessionMapID);
+	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
+		.getAttribute(sessionMapID);
 	KalturaUser user = (KalturaUser) sessionMap.get(AttributeNames.USER);
 	Long toolSessionId = (Long) sessionMap.get(AttributeNames.PARAM_TOOL_SESSION_ID);
-	
+
 	KalturaSession kalturaSession = service.getSessionBySessionId(toolSessionId);
 	Kaltura kaltura = kalturaSession.getKaltura();
 	TreeSet<KalturaItem> allItems = new TreeSet<KalturaItem>(new KalturaItemComparator());
 	allItems.addAll(kaltura.getKalturaItems());
-	
+
 	// check user can upload item
 	boolean isAllowUpload = isAllowUpload(sessionMap, allItems);
 	if (!isAllowUpload) {
 	    return null;
 	}
-	
+
 	KalturaItem item = new KalturaItem();
 	item.setCreateDate(new Timestamp(new Date().getTime()));
 	int maxSeq = 1;
@@ -295,10 +298,10 @@ public class LearningAction extends LamsDispatchAction {
 	    title = itemLocalized + " " + maxSeq;
 	}
 	item.setTitle(title);
-	
+
 	int duration = WebUtil.readIntParam(request, KalturaConstants.PARAM_ITEM_DURATION);
 	item.setDuration(duration);
-	
+
 	String entryId = WebUtil.readStrParam(request, KalturaConstants.PARAM_ITEM_ENTRY_ID);
 	if (StringUtils.isBlank(entryId)) {
 	    String errorMsg = "Add item failed due to missing entityId (received from Kaltura server).";
@@ -312,7 +315,7 @@ public class LearningAction extends LamsDispatchAction {
 	item.setHidden(false);
 	item.setKalturaUid(kaltura.getUid());
 	service.saveKalturaItem(item);
-	
+
 	JSONObject JSONObject = new JSONObject();
 	JSONObject.put(KalturaConstants.PARAM_ITEM_UID, item.getUid());
 	response.setContentType("application/json;charset=utf-8");
@@ -321,8 +324,8 @@ public class LearningAction extends LamsDispatchAction {
     }
 
     /**
-     *Comment current item.
-     * 
+     * Comment current item.
+     *
      * @param mapping
      * @param form
      * @param request
@@ -333,7 +336,8 @@ public class LearningAction extends LamsDispatchAction {
 	    HttpServletResponse response) {
 	initKalturaService();
 	String sessionMapID = WebUtil.readStrParam(request, KalturaConstants.ATTR_SESSION_MAP_ID);
-	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession().getAttribute(sessionMapID);
+	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
+		.getAttribute(sessionMapID);
 	request.setAttribute(KalturaConstants.ATTR_SESSION_MAP_ID, sessionMapID);
 	Long toolSessionId = (Long) sessionMap.get(AttributeNames.PARAM_TOOL_SESSION_ID);
 	ToolAccessMode mode = (ToolAccessMode) sessionMap.get(AttributeNames.ATTR_MODE);
@@ -349,7 +353,8 @@ public class LearningAction extends LamsDispatchAction {
 	KalturaComment comment = new KalturaComment();
 	comment.setComment(commentMessage);
 	UserDTO user = (UserDTO) SessionManager.getSession().getAttribute(AttributeNames.USER);
-	KalturaUser kalturaUser = service.getUserByUserIdAndSessionId(new Long(user.getUserID().intValue()), toolSessionId);
+	KalturaUser kalturaUser = service.getUserByUserIdAndSessionId(new Long(user.getUserID().intValue()),
+		toolSessionId);
 	comment.setCreateBy(kalturaUser);
 	comment.setCreateDate(new Timestamp(new Date().getTime()));
 
@@ -370,7 +375,7 @@ public class LearningAction extends LamsDispatchAction {
 
     /**
      * Rates items submitted by other learners.
-     * 
+     *
      * @param mapping
      * @param form
      * @param request
@@ -386,19 +391,20 @@ public class LearningAction extends LamsDispatchAction {
 
 	initKalturaService();
 	String sessionMapID = WebUtil.readStrParam(request, KalturaConstants.ATTR_SESSION_MAP_ID);
-	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession().getAttribute(sessionMapID);
+	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
+		.getAttribute(sessionMapID);
 	Long toolSessionId = (Long) sessionMap.get(AttributeNames.PARAM_TOOL_SESSION_ID);
 	KalturaUser user = (KalturaUser) sessionMap.get(AttributeNames.USER);
 
-	float rating = Float.parseFloat((String) request.getParameter("rate"));
+	float rating = Float.parseFloat(request.getParameter("rate"));
 	Long itemUid = WebUtil.readLongParam(request, "idBox");
-	
+
 	AverageRatingDTO averageRatingDto = service.rateMessage(itemUid, user.getUserId(), toolSessionId, rating);
-	
+
 	//refresh averageRatingDto in sessionMap
 	KalturaItem item = (KalturaItem) sessionMap.get(KalturaConstants.ATTR_ITEM);
 	item.setAverageRatingDto(averageRatingDto);
-	
+
 	JSONObject JSONObject = new JSONObject();
 	JSONObject.put("averageRating", averageRatingDto.getRating());
 	JSONObject.put("numberOfVotes", averageRatingDto.getNumberOfVotes());
@@ -409,7 +415,7 @@ public class LearningAction extends LamsDispatchAction {
 
     /**
      * Display empty reflection form.
-     * 
+     *
      * @param mapping
      * @param form
      * @param request
@@ -444,7 +450,7 @@ public class LearningAction extends LamsDispatchAction {
 
     /**
      * Submit reflection form input database.
-     * 
+     *
      * @param mapping
      * @param form
      * @param request
@@ -459,8 +465,8 @@ public class LearningAction extends LamsDispatchAction {
 	Integer userId = refForm.getUserID();
 
 	String sessionMapID = WebUtil.readStrParam(request, KalturaConstants.ATTR_SESSION_MAP_ID);
-	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession().getAttribute(
-		sessionMapID);
+	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
+		.getAttribute(sessionMapID);
 	Long sessionId = (Long) sessionMap.get(AttributeNames.PARAM_TOOL_SESSION_ID);
 
 	// check for existing notebook entry
@@ -468,8 +474,8 @@ public class LearningAction extends LamsDispatchAction {
 
 	if (entry == null) {
 	    // create new entry
-	    service.createNotebookEntry(sessionId, CoreNotebookConstants.NOTEBOOK_TOOL,
-		    KalturaConstants.TOOL_SIGNATURE, userId, refForm.getEntryText());
+	    service.createNotebookEntry(sessionId, CoreNotebookConstants.NOTEBOOK_TOOL, KalturaConstants.TOOL_SIGNATURE,
+		    userId, refForm.getEntryText());
 	} else {
 	    // update existing entry
 	    entry.setEntry(refForm.getEntryText());
@@ -486,8 +492,8 @@ public class LearningAction extends LamsDispatchAction {
 
 	// get back SessionMap
 	String sessionMapID = request.getParameter(KalturaConstants.ATTR_SESSION_MAP_ID);
-	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession().getAttribute(
-		sessionMapID);
+	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
+		.getAttribute(sessionMapID);
 
 	Long sessionId = (Long) sessionMap.get(AttributeNames.PARAM_TOOL_SESSION_ID);
 
@@ -510,7 +516,7 @@ public class LearningAction extends LamsDispatchAction {
     // *************************************************************************************
     // Private methods
     // *************************************************************************************
-    
+
     /**
      * Gets items from the DB. IF the mode is learner filters them based on the group sessionId
      */
@@ -519,17 +525,17 @@ public class LearningAction extends LamsDispatchAction {
 	// Create set of images, along with this filtering out items added by users from other groups
 	TreeSet<KalturaItem> items = new TreeSet<KalturaItem>(new KalturaItemComparator());
 	items.addAll(service.getGroupItems(kaltura.getToolContentId(), toolSessionId, userId, mode.isTeacher()));
-	
+
 	for (KalturaItem item : items) {
 	    // initialize login name to avoid session close error in proxy object
 	    if (item.getCreatedBy() != null) {
 		item.getCreatedBy().getLoginName();
 	    }
 	}
-	
+
 	return items;
     }
-    
+
     /**
      * Checks whether further upload is allowed.
      */
@@ -537,7 +543,7 @@ public class LearningAction extends LamsDispatchAction {
 	Kaltura kaltura = (Kaltura) sessionMap.get(KalturaConstants.ATTR_KALTURA);
 	ToolAccessMode mode = (ToolAccessMode) sessionMap.get(AttributeNames.ATTR_MODE);
 	KalturaUser user = (KalturaUser) sessionMap.get(AttributeNames.USER);
-	
+
 	boolean isAllowUpload = false;
 	if (kaltura.isAllowContributeVideos() && !mode.equals(ToolAccessMode.TEACHER)) {
 	    int numberOfUploadedItems = 0;
@@ -550,17 +556,17 @@ public class LearningAction extends LamsDispatchAction {
 	    isAllowUpload = (learnerContributionLimit == Kaltura.TYPE_LEARNER_CONTRIBUTION_LIMIT_UNLIMITED)
 		    || (numberOfUploadedItems < kaltura.getLearnerContributionLimit());
 	}
-	
+
 	return isAllowUpload;
     }
-    
+
     /**
      * Returns all comments done by teacher and learners of the specified group.
      */
     private Set<KalturaComment> getGroupComments(KalturaItem item, Long sessionId, ToolAccessMode mode) {
 	TreeSet<KalturaComment> comments = new TreeSet<KalturaComment>(new KalturaCommentComparator());
 	Set<KalturaComment> itemComments = item.getComments();
-	
+
 	//only authored items can be seen by different groups
 	if (item.isCreateByAuthor()) {
 	    for (KalturaComment comment : itemComments) {
@@ -568,17 +574,17 @@ public class LearningAction extends LamsDispatchAction {
 		//skip hidden comments
 		if (comment.isHidden() && mode.isLearner()) {
 		    continue;
-		    
-		// if made by teacher - add
+
+		    // if made by teacher - add
 		} else if (comment.getCreateBy() == null) {
 		    comments.add(comment);
 
-		// if made by learner of the specified group - also add
+		    // if made by learner of the specified group - also add
 		} else if (comment.getCreateBy().getSession().getSessionId().equals(sessionId)) {
 		    comments.add(comment);
 		}
 	    }
-	    
+
 	} else {
 	    comments.addAll(itemComments);
 	}

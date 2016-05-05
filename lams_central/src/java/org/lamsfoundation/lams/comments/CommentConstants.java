@@ -18,9 +18,9 @@
  *
  * http://www.gnu.org/licenses/gpl.txt
  * ****************************************************************
- */ 
- 
-/* $Id$ */ 
+ */
+
+/* $Id$ */
 package org.lamsfoundation.lams.comments;
 
 public class CommentConstants {
@@ -44,7 +44,7 @@ public class CommentConstants {
     public static final String ATTR_READ_ONLY = "readOnly";
     public static final String ATTR_SORT_BY = "sortBy"; // 0 date, 1 likes
     public static final String ATTR_STICKY = "sticky"; // 0 date, 1 likes
-    
+
     // for paging long topics & inlining reply
     public static final String PAGE_LAST_ID = "pageLastId";
     public static final String PAGE_SIZE = "pageSize";
@@ -52,10 +52,8 @@ public class CommentConstants {
     public static final String ATTR_NO_MORE_PAGES = "noMorePages";
 
     public static final int MAX_BODY_LENGTH = 5000;
-    
+
     // message keys
     public static final String KEY_BODY_VALIDATION = "label.comment.body.validation";
 
-    
 }
-

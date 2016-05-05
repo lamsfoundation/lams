@@ -2,21 +2,21 @@
  * Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
  * =============================================================
  * License Information: http://lamsfoundation.org/licensing/lams/2.0/
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301
  * USA
- * 
+ *
  * http://www.gnu.org/licenses/gpl.txt
  * ****************************************************************
  */
@@ -62,7 +62,7 @@ import org.lamsfoundation.lams.web.util.AttributeNames;
 /**
  * @author
  * @version
- * 
+ *
  *
  *
  *
@@ -125,8 +125,8 @@ public class LearningAction extends LamsDispatchAction {
 	    notebookService.saveOrUpdateNotebook(notebook);
 	}
 
-	LearningWebUtil.putActivityPositionInRequestByToolSessionId(toolSessionID, request, getServlet()
-		.getServletContext());
+	LearningWebUtil.putActivityPositionInRequestByToolSessionId(toolSessionID, request,
+		getServlet().getServletContext());
 
 	NotebookUser notebookUser;
 	if (mode.equals(ToolAccessMode.TEACHER)) {
@@ -144,18 +144,18 @@ public class LearningAction extends LamsDispatchAction {
 	if (nbEntry != null) {
 	    learningForm.setEntryText(nbEntry.getEntry());
 	}
-	
+
 	// set readOnly flag.
 	if (mode.equals(ToolAccessMode.TEACHER) || (notebook.isLockOnFinished() && notebookUser.isFinishedActivity())) {
 	    request.setAttribute("contentEditable", false);
 	} else {
 	    request.setAttribute("contentEditable", true);
 	}
-	
+
 	if (notebookUser != null) {
-		// get teacher's comment if available
+	    // get teacher's comment if available
 	    request.setAttribute("teachersComment", notebookUser.getTeachersComment());
-		
+
 	    request.setAttribute("finishedActivity", notebookUser.isFinishedActivity());
 	    request.setAttribute(AttributeNames.ATTR_LEARNER_CONTENT_FOLDER,
 		    notebookService.getLearnerContentFolder(toolSessionID, notebookUser.getUserId()));
@@ -201,13 +201,13 @@ public class LearningAction extends LamsDispatchAction {
 	Long toolSessionID = WebUtil.readLongParam(request, "toolSessionID");
 	LearningForm learningForm = (LearningForm) form;
 	NotebookUser notebookUser = getCurrentUser(toolSessionID);
-	
+
 	if (learningForm.getContentEditable()) {
 	    // TODO fix idType to use real value not 999
 	    if (notebookUser.getEntryUID() == null) {
 		notebookUser.setEntryUID(notebookService.createNotebookEntry(toolSessionID,
-			CoreNotebookConstants.NOTEBOOK_TOOL, NotebookConstants.TOOL_SIGNATURE, notebookUser.getUserId()
-				.intValue(), learningForm.getEntryText()));
+			CoreNotebookConstants.NOTEBOOK_TOOL, NotebookConstants.TOOL_SIGNATURE,
+			notebookUser.getUserId().intValue(), learningForm.getEntryText()));
 	    } else {
 		// update existing entry.
 		notebookService.updateEntry(notebookUser.getEntryUID(), learningForm.getEntryText());
@@ -217,8 +217,8 @@ public class LearningAction extends LamsDispatchAction {
 	    notebookService.saveOrUpdateNotebookUser(notebookUser);
 	}
 
-	ToolSessionManager sessionMgrService = NotebookServiceProxy.getNotebookSessionManager(getServlet()
-		.getServletContext());
+	ToolSessionManager sessionMgrService = NotebookServiceProxy
+		.getNotebookSessionManager(getServlet().getServletContext());
 
 	try {
 	    String nextActivityUrl = sessionMgrService.leaveToolSession(toolSessionID, notebookUser.getUserId());

@@ -2,21 +2,21 @@
  * Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
  * =============================================================
  * License Information: http://lamsfoundation.org/licensing/lams/2.0/
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License version 2.0 
+ * it under the terms of the GNU General Public License version 2.0
  * as published by the Free Software Foundation.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301
  * USA
- * 
+ *
  * http://www.gnu.org/licenses/gpl.txt
  * ****************************************************************
  */
@@ -26,14 +26,14 @@ import java.util.List;
 
 /**
  * @version
- * 
- * <p>
- * 	<a href="IndexLessonBean.java.html"><i>View Source</i></a>
- * </p>
- * 
+ *
+ *          <p>
+ *          <a href="IndexLessonBean.java.html"><i>View Source</i></a>
+ *          </p>
+ *
  * @author <a href="mailto:fyang@melcoe.mq.edu.au">Fei Yang</a>
- * 
- * Created at 10:13:43 on 14/06/2006
+ *
+ *         Created at 10:13:43 on 14/06/2006
  */
 public class IndexLessonBean implements Comparable {
     private Long id;
@@ -118,6 +118,7 @@ public class IndexLessonBean implements Comparable {
 	this.name = name;
     }
 
+    @Override
     public int compareTo(Object o) {
 	return name.compareTo(((IndexLessonBean) o).getName());
     }
@@ -163,18 +164,18 @@ public class IndexLessonBean implements Comparable {
     }
 
     public boolean isDependent() {
-        return dependent;
+	return dependent;
     }
 
     public void setDependent(boolean hasDependencies) {
-        this.dependent = hasDependencies;
+	this.dependent = hasDependencies;
     }
 
     public boolean isScheduledFinish() {
-        return scheduledFinish;
+	return scheduledFinish;
     }
 
     public void setScheduledFinish(boolean scheduledFinish) {
-        this.scheduledFinish = scheduledFinish;
+	this.scheduledFinish = scheduledFinish;
     }
 }

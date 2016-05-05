@@ -2,21 +2,21 @@
  * Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
  * =============================================================
  * License Information: http://lamsfoundation.org/licensing/lams/2.0/
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License version 2.0 
+ * it under the terms of the GNU General Public License version 2.0
  * as published by the Free Software Foundation.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301
  * USA
- * 
+ *
  * http://www.gnu.org/licenses/gpl.txt
  * ****************************************************************
  */
@@ -65,6 +65,7 @@ public class ViewItemAction extends Action {
 
     private static ICommonCartridgeService commonCartridgeService;
 
+    @Override
     public ActionForward execute(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) throws IOException, ServletException {
 
@@ -91,7 +92,7 @@ public class ViewItemAction extends Action {
 
     /**
      * Open url in popup window page.
-     * 
+     *
      * @param mapping
      * @param form
      * @param request
@@ -105,15 +106,15 @@ public class ViewItemAction extends Action {
 	SessionMap sessionMap = (SessionMap) request.getSession().getAttribute(sessionMapID);
 	CommonCartridgeItem item = getCommonCartridgeItem(request, sessionMap, mode);
 	int itemIdx = NumberUtils.stringToInt(request.getParameter(CommonCartridgeConstants.PARAM_ITEM_INDEX));
-	
+
 	String launchBasicLTIUrl;
 	if (CommonCartridgeConstants.MODE_AUTHOR_SESSION.equals(mode)) {
 	    launchBasicLTIUrl = "/launchBasicLTI.do?" + AttributeNames.ATTR_MODE + "=" + mode + "&"
 		    + CommonCartridgeConstants.PARAM_ITEM_INDEX + "=" + itemIdx + "&"
 		    + CommonCartridgeConstants.ATTR_SESSION_MAP_ID + "=" + sessionMapID;
 	} else {
-	    launchBasicLTIUrl = "/launchBasicLTI.do?" + CommonCartridgeConstants.PARAM_RESOURCE_ITEM_UID + "=" + item.getUid()
-		    + "&" + CommonCartridgeConstants.ATTR_SESSION_MAP_ID + "=" + sessionMapID;
+	    launchBasicLTIUrl = "/launchBasicLTI.do?" + CommonCartridgeConstants.PARAM_RESOURCE_ITEM_UID + "="
+		    + item.getUid() + "&" + CommonCartridgeConstants.ATTR_SESSION_MAP_ID + "=" + sessionMapID;
 	}
 	request.setAttribute(CommonCartridgeConstants.PARAM_OPEN_URL_POPUP, launchBasicLTIUrl);
 	request.setAttribute(CommonCartridgeConstants.PARAM_TITLE, item.getTitle());
@@ -122,7 +123,7 @@ public class ViewItemAction extends Action {
 
     /**
      * Return next instrucion to page. It need four input parameters, mode, itemIndex or itemUid, and insIdx.
-     * 
+     *
      * @param mapping
      * @param form
      * @param request
@@ -138,18 +139,18 @@ public class ViewItemAction extends Action {
 
     /**
      * Display main frame to display instrcution and item content.
-     * 
+     *
      * @param mapping
      * @param form
      * @param request
      * @param response
      * @return
-     * @throws IOException 
+     * @throws IOException
      */
     private ActionForward reviewItem(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) throws IOException {
 	String mode = request.getParameter(AttributeNames.ATTR_MODE);
-	
+
 	String sessionMapID = WebUtil.readStrParam(request, CommonCartridgeConstants.ATTR_SESSION_MAP_ID);
 	SessionMap sessionMap = (SessionMap) request.getSession().getAttribute(sessionMapID);
 
@@ -173,28 +174,27 @@ public class ViewItemAction extends Action {
 
 	int itemIdx = NumberUtils.stringToInt(request.getParameter(CommonCartridgeConstants.PARAM_ITEM_INDEX));
 
-	
 	short type = item.getType();
 	String url = null;
 	switch (type) {
-	case CommonCartridgeConstants.RESOURCE_TYPE_BASIC_LTI:
-	    if (item.isOpenUrlNewWindow()) {
-		url = "/openUrlPopup.do?";
-	    } else {
-		url = "/launchBasicLTI.do?";
-	    }
-	    if (CommonCartridgeConstants.MODE_AUTHOR_SESSION.equals(mode)) {
-		url += AttributeNames.ATTR_MODE + "=" + mode + "&" + CommonCartridgeConstants.PARAM_ITEM_INDEX + "="
-			+ itemIdx + "&" + CommonCartridgeConstants.ATTR_SESSION_MAP_ID + "=" + sessionMapID;
-	    } else {
-		url += CommonCartridgeConstants.PARAM_RESOURCE_ITEM_UID + "=" + item.getUid() + "&"
-			+ CommonCartridgeConstants.ATTR_SESSION_MAP_ID + "=" + sessionMapID;
-	    }
-		
-	    break;
-	case CommonCartridgeConstants.RESOURCE_TYPE_COMMON_CARTRIDGE:
-	    url = "/download/?uuid=" + item.getFileUuid() + "&preferDownload=false";
-	    break;
+	    case CommonCartridgeConstants.RESOURCE_TYPE_BASIC_LTI:
+		if (item.isOpenUrlNewWindow()) {
+		    url = "/openUrlPopup.do?";
+		} else {
+		    url = "/launchBasicLTI.do?";
+		}
+		if (CommonCartridgeConstants.MODE_AUTHOR_SESSION.equals(mode)) {
+		    url += AttributeNames.ATTR_MODE + "=" + mode + "&" + CommonCartridgeConstants.PARAM_ITEM_INDEX + "="
+			    + itemIdx + "&" + CommonCartridgeConstants.ATTR_SESSION_MAP_ID + "=" + sessionMapID;
+		} else {
+		    url += CommonCartridgeConstants.PARAM_RESOURCE_ITEM_UID + "=" + item.getUid() + "&"
+			    + CommonCartridgeConstants.ATTR_SESSION_MAP_ID + "=" + sessionMapID;
+		}
+
+		break;
+	    case CommonCartridgeConstants.RESOURCE_TYPE_COMMON_CARTRIDGE:
+		url = "/download/?uuid=" + item.getFileUuid() + "&preferDownload=false";
+		break;
 	}
 	request.setAttribute(CommonCartridgeConstants.ATTR_RESOURCE_REVIEW_URL, url);
 
@@ -215,13 +215,13 @@ public class ViewItemAction extends Action {
     // *************************************************************************************
     /**
      * Submit reflection form input database.
-     * 
+     *
      * @param mapping
      * @param form
      * @param request
      * @param response
      * @return
-     * @throws Exception 
+     * @throws Exception
      */
     private ActionForward launchBasicLTI(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) throws IOException {
@@ -229,12 +229,12 @@ public class ViewItemAction extends Action {
 	String sessionMapID = WebUtil.readStrParam(request, CommonCartridgeConstants.ATTR_SESSION_MAP_ID);
 	SessionMap sessionMap = (SessionMap) request.getSession().getAttribute(sessionMapID);
 	CommonCartridgeItem item = getCommonCartridgeItem(request, sessionMap, mode);
-	
+
 	ICommonCartridgeService service = getCommonCartridgeService();
-	WebApplicationContext wac = WebApplicationContextUtils.getRequiredWebApplicationContext(getServlet()
-		.getServletContext());
+	WebApplicationContext wac = WebApplicationContextUtils
+		.getRequiredWebApplicationContext(getServlet().getServletContext());
 	MessageService messageService = (MessageService) wac.getBean("commonCartridgeMessageService");
-	
+
 	// Get the post data for the placement
 	String returnValues = LamsBasicLTIUtil.postLaunchHTML(service, messageService, item);
 
@@ -243,7 +243,8 @@ public class ViewItemAction extends Action {
 	    response.setCharacterEncoding("utf-8");
 	    response.addDateHeader("Expires", System.currentTimeMillis() - (1000L * 60L * 60L * 24L * 365L));
 	    response.addDateHeader("Last-Modified", System.currentTimeMillis());
-	    response.addHeader("Cache-Control", "no-store, no-cache, must-revalidate, max-age=0, post-check=0, pre-check=0");
+	    response.addHeader("Cache-Control",
+		    "no-store, no-cache, must-revalidate, max-age=0, post-check=0, pre-check=0");
 	    response.addHeader("Pragma", "no-cache");
 	    ServletOutputStream out = response.getOutputStream();
 
@@ -262,10 +263,10 @@ public class ViewItemAction extends Action {
 
 	return null;
     }
-    
+
     /**
      * Return resoruce item according to ToolAccessMode.
-     * 
+     *
      * @param request
      * @param sessionMap
      * @param mode
@@ -280,8 +281,8 @@ public class ViewItemAction extends Action {
 		    getCommonCartridgeItemList(sessionMap));
 	    item = commonCartridgeList.get(itemIdx);
 	} else {
-	    Long itemUid = NumberUtils.createLong(request
-		    .getParameter(CommonCartridgeConstants.PARAM_RESOURCE_ITEM_UID));
+	    Long itemUid = NumberUtils
+		    .createLong(request.getParameter(CommonCartridgeConstants.PARAM_RESOURCE_ITEM_UID));
 	    // get back the commonCartridge and item list and display them on page
 	    ICommonCartridgeService service = getCommonCartridgeService();
 	    item = service.getCommonCartridgeItemByUid(itemUid);
@@ -290,41 +291,43 @@ public class ViewItemAction extends Action {
     }
 
     private ICommonCartridgeService getCommonCartridgeService() {
-	WebApplicationContext wac = WebApplicationContextUtils.getRequiredWebApplicationContext(getServlet()
-		.getServletContext());
+	WebApplicationContext wac = WebApplicationContextUtils
+		.getRequiredWebApplicationContext(getServlet().getServletContext());
 	return (ICommonCartridgeService) wac.getBean(CommonCartridgeConstants.RESOURCE_SERVICE);
     }
 
-    private static Pattern wikipediaPattern = Pattern.compile("wikipedia", Pattern.CASE_INSENSITIVE
-	    | Pattern.UNICODE_CASE);
+    private static Pattern wikipediaPattern = Pattern.compile("wikipedia",
+	    Pattern.CASE_INSENSITIVE | Pattern.UNICODE_CASE);
 
     private Object getReviewUrl(CommonCartridgeItem item, String sessionMapID, String mode, int itemIdx) {
 	short type = item.getType();
 	String url = null;
 	switch (type) {
-	case CommonCartridgeConstants.RESOURCE_TYPE_BASIC_LTI:
-	    if (item.isOpenUrlNewWindow()) {
-		if (CommonCartridgeConstants.MODE_AUTHOR_SESSION.equals(mode)) {
-		    url = "/openUrlPopup.do?" + AttributeNames.ATTR_MODE + "=" + mode + "&"
-			    + CommonCartridgeConstants.PARAM_ITEM_INDEX + "=" + itemIdx + "&"
-			    + CommonCartridgeConstants.ATTR_SESSION_MAP_ID + "=" + sessionMapID;
+	    case CommonCartridgeConstants.RESOURCE_TYPE_BASIC_LTI:
+		if (item.isOpenUrlNewWindow()) {
+		    if (CommonCartridgeConstants.MODE_AUTHOR_SESSION.equals(mode)) {
+			url = "/openUrlPopup.do?" + AttributeNames.ATTR_MODE + "=" + mode + "&"
+				+ CommonCartridgeConstants.PARAM_ITEM_INDEX + "=" + itemIdx + "&"
+				+ CommonCartridgeConstants.ATTR_SESSION_MAP_ID + "=" + sessionMapID;
+		    } else {
+			url = "/openUrlPopup.do?" + CommonCartridgeConstants.PARAM_RESOURCE_ITEM_UID + "="
+				+ item.getUid() + "&" + CommonCartridgeConstants.ATTR_SESSION_MAP_ID + "="
+				+ sessionMapID;
+		    }
 		} else {
-		    url = "/openUrlPopup.do?" + CommonCartridgeConstants.PARAM_RESOURCE_ITEM_UID + "=" + item.getUid()
-			    + "&" + CommonCartridgeConstants.ATTR_SESSION_MAP_ID + "=" + sessionMapID;
+		    url = CommonCartridgeWebUtils.protocol(item.getUrl());
 		}
-	    } else
-		url = CommonCartridgeWebUtils.protocol(item.getUrl());
-	    break;
-	case CommonCartridgeConstants.RESOURCE_TYPE_COMMON_CARTRIDGE:
-	    url = "/download/?uuid=" + item.getFileUuid() + "&preferDownload=false";
-	    break;
+		break;
+	    case CommonCartridgeConstants.RESOURCE_TYPE_COMMON_CARTRIDGE:
+		url = "/download/?uuid=" + item.getFileUuid() + "&preferDownload=false";
+		break;
 	}
 	return url;
     }
 
     /**
      * List save current commonCartridge items.
-     * 
+     *
      * @param request
      * @return
      */

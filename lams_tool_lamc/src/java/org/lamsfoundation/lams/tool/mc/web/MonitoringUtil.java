@@ -2,21 +2,21 @@
  * Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
  * =============================================================
  * License Information: http://lamsfoundation.org/licensing/lams/2.0/
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301
  * USA
- * 
+ *
  * http://www.gnu.org/licenses/gpl.txt
  * ***********************************************************************/
 /* $$Id$$ */
@@ -52,14 +52,14 @@ import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 
 /**
- * 
+ *
  * Keeps all operations needed for Monitoring mode.
- * 
+ *
  * @author Ozgur Demirtas
- * 
+ *
  */
 public class MonitoringUtil implements McAppConstants {
-    
+
     /**
      * Escapes all characters that may brake JS code on assigning Java value to JS String variable (particularly
      * escapes all quotes in the following way \").
@@ -106,19 +106,20 @@ public class MonitoringUtil implements McAppConstants {
 	mcGeneralMonitoringDTO.setCountAllUsers(new Integer(countAllUsers));
 	mcGeneralMonitoringDTO.setCountSessionComplete(new Integer(countSessionComplete));
 
-	if (countSessionComplete > 0)
+	if (countSessionComplete > 0) {
 	    mcGeneralMonitoringDTO.setUserExceptionNoToolSessions(Boolean.FALSE.toString());
+	}
     }
 
     /**
      * Sets up auxiliary parameters. Used by all monitoring action methods.
-     * 
+     *
      * @param request
      * @param content
      * @param mcService
      */
     protected static void setupAllSessionsData(HttpServletRequest request, McContent content, IMcService mcService) {
-	
+
 	//set up sessionDTOs list
 	Set<McSession> sessions = new TreeSet<McSession>(new McSessionComparator());
 	sessions.addAll(content.getMcSessions());
@@ -127,7 +128,7 @@ public class MonitoringUtil implements McAppConstants {
 	    SessionDTO sessionDto = new SessionDTO();
 	    sessionDto.setSessionId(session.getMcSessionId());
 	    sessionDto.setSessionName(session.getSession_name());
-	    
+
 	    sessionDtos.add(sessionDto);
 	}
 	request.setAttribute(SESSION_DTOS, sessionDtos);
@@ -136,18 +137,20 @@ public class MonitoringUtil implements McAppConstants {
 
 	String strPassMark = "";
 	Integer passMark = content.getPassMark();
-	if (passMark == null)
+	if (passMark == null) {
 	    strPassMark = " ";
-	else if ((passMark != null) && (passMark.equals("0")))
+	} else if ((passMark != null) && (passMark.equals("0"))) {
 	    strPassMark = " ";
-	else
+	} else {
 	    strPassMark = passMark.toString();
-	if (strPassMark.trim().equals("0"))
+	}
+	if (strPassMark.trim().equals("0")) {
 	    strPassMark = " ";
+	}
 	request.setAttribute(PASSMARK, strPassMark);
 
 	// setting up the advanced summary
-	
+
 	request.setAttribute(ATTR_CONTENT, content);
 	request.setAttribute("questionsSequenced", content.isQuestionsSequenced());
 	request.setAttribute("showMarks", content.isShowMarks());

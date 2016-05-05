@@ -3,7 +3,7 @@ package org.lamsfoundation.lams.tool.scratchie.dto;
 import org.lamsfoundation.lams.usermanagement.User;
 
 /**
- * 
+ *
  * @author Andrey Balan
  */
 public class ReflectDTO {
@@ -23,7 +23,7 @@ public class ReflectDTO {
     public void setFullName(String fullName) {
 	this.fullName = fullName;
     }
-    
+
     public boolean isGroupLeader() {
 	return isGroupLeader;
     }
@@ -31,7 +31,7 @@ public class ReflectDTO {
     public void setIsGroupLeader(boolean isGroupLeader) {
 	this.isGroupLeader = isGroupLeader;
     }
-    
+
     public String getGroupName() {
 	return groupName;
     }
@@ -39,7 +39,7 @@ public class ReflectDTO {
     public void setGroupName(String groupName) {
 	this.groupName = groupName;
     }
-    
+
     public String getReflection() {
 	return reflection;
     }

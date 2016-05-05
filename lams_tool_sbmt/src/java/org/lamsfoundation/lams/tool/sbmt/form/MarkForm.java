@@ -28,13 +28,13 @@ import org.apache.struts.upload.FormFile;
 
 /**
  * @author lfoxton
- * 
+ *
  *
  */
 public class MarkForm extends ActionForm {
 
     private static final long serialVersionUID = -8680214759155659983L;
-    
+
     private Long toolSessionID;
     private Integer userID;
     private Long detailID;
@@ -45,86 +45,87 @@ public class MarkForm extends ActionForm {
     private String updateMode;
     private Long markFileUUID;
     private Long markFileVersionID;
-    
-    public MarkForm() {}
+
+    public MarkForm() {
+    }
 
     public Long getToolSessionID() {
-        return toolSessionID;
+	return toolSessionID;
     }
 
     public void setToolSessionID(Long toolSessionID) {
-        this.toolSessionID = toolSessionID;
+	this.toolSessionID = toolSessionID;
     }
 
     public Integer getUserID() {
-        return userID;
+	return userID;
     }
 
     public void setUserID(Integer userID) {
-        this.userID = userID;
+	this.userID = userID;
     }
 
     public Long getDetailID() {
-        return detailID;
+	return detailID;
     }
 
     public void setDetailID(Long detailID) {
-        this.detailID = detailID;
+	this.detailID = detailID;
     }
 
     public Long getReportID() {
-        return reportID;
+	return reportID;
     }
 
     public void setReportID(Long reportID) {
-        this.reportID = reportID;
+	this.reportID = reportID;
     }
 
     public String getMarks() {
-        return marks;
+	return marks;
     }
 
     public void setMarks(String marks) {
-        this.marks = marks;
+	this.marks = marks;
     }
 
     public FormFile getMarkFile() {
-        return markFile;
+	return markFile;
     }
 
     public void setMarkFile(FormFile markFile) {
-        this.markFile = markFile;
+	this.markFile = markFile;
     }
 
     public String getComments() {
-        return comments;
+	return comments;
     }
 
     public void setComments(String comments) {
-        this.comments = comments;
+	this.comments = comments;
     }
 
     public String getUpdateMode() {
-        return updateMode;
+	return updateMode;
     }
 
     public void setUpdateMode(String updateMode) {
-        this.updateMode = updateMode;
+	this.updateMode = updateMode;
     }
 
     public Long getMarkFileUUID() {
-        return markFileUUID;
+	return markFileUUID;
     }
 
     public void setMarkFileUUID(Long markFileUUID) {
-        this.markFileUUID = markFileUUID;
+	this.markFileUUID = markFileUUID;
     }
 
     public Long getMarkFileVersionID() {
-        return markFileVersionID;
+	return markFileVersionID;
     }
 
     public void setMarkFileVersionID(Long markFileVersionID) {
-        this.markFileVersionID = markFileVersionID;
+	this.markFileVersionID = markFileVersionID;
     }
 }

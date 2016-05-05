@@ -2,21 +2,21 @@
  * Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
  * =============================================================
  * License Information: http://lamsfoundation.org/licensing/lams/2.0/
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301
  * USA
- * 
+ *
  * http://www.gnu.org/licenses/gpl.txt
  * ****************************************************************
  */
@@ -34,7 +34,7 @@ import org.lamsfoundation.lams.rating.model.LearnerItemRatingCriteria;
 
 /**
  * Peerreview
- * 
+ *
  * @author Dapeng Ni
  */
 public class Peerreview implements Cloneable {
@@ -50,11 +50,11 @@ public class Peerreview implements Cloneable {
     private String title;
 
     private String instructions;
-    
+
     private int maximumRates;
 
     private int minimumRates;
-    
+
     private Set<LearnerItemRatingCriteria> ratingCriterias;
 
     // advance
@@ -71,9 +71,9 @@ public class Peerreview implements Cloneable {
     private Date updated;
 
     private PeerreviewUser createdBy;
-    
+
     private int maximumRatesPerUser;
-    
+
     private boolean showRatingsLeftForUser;
 
     private boolean reflectOnActivity;
@@ -87,7 +87,7 @@ public class Peerreview implements Cloneable {
 	Peerreview toContent = new Peerreview();
 	toContent = (Peerreview) defaultContent.clone();
 	toContent.setContentId(contentId);
-	
+
 	// reset contentId
 	if (toContent.getRatingCriterias() != null) {
 	    Set<LearnerItemRatingCriteria> criterias = toContent.getRatingCriterias();
@@ -95,7 +95,7 @@ public class Peerreview implements Cloneable {
 		criteria.setToolContentId(contentId);
 	    }
 	}
-	
+
 	return toContent;
     }
 
@@ -106,23 +106,23 @@ public class Peerreview implements Cloneable {
 	try {
 	    peerreview = (Peerreview) super.clone();
 	    peerreview.setUid(null);
-	    
+
 	    // clone ReourceUser as well
 	    if (createdBy != null) {
 		peerreview.setCreatedBy((PeerreviewUser) createdBy.clone());
 	    }
-	    
+
 	    // clone ratingCriterias as well
 	    if (ratingCriterias != null) {
 		Set<LearnerItemRatingCriteria> newCriterias = new HashSet<LearnerItemRatingCriteria>();
-		for (LearnerItemRatingCriteria criteria : (Set<LearnerItemRatingCriteria>) ratingCriterias) {
+		for (LearnerItemRatingCriteria criteria : ratingCriterias) {
 		    LearnerItemRatingCriteria newCriteria = (LearnerItemRatingCriteria) criteria.clone();
 		    // just clone old file without duplicate it in repository
 		    newCriterias.add(newCriteria);
 		}
 		peerreview.ratingCriterias = newCriterias;
 	    }
-	    
+
 	} catch (CloneNotSupportedException e) {
 	    Peerreview.log.error("When clone " + Peerreview.class + " failed");
 	}
@@ -169,7 +169,7 @@ public class Peerreview implements Cloneable {
     // **********************************************************
     /**
      * Returns the object's creation date
-     * 
+     *
      * @return date
      */
     public Date getCreated() {
@@ -178,7 +178,7 @@ public class Peerreview implements Cloneable {
 
     /**
      * Sets the object's creation date
-     * 
+     *
      * @param created
      */
     public void setCreated(Date created) {
@@ -187,7 +187,7 @@ public class Peerreview implements Cloneable {
 
     /**
      * Returns the object's date of last update
-     * 
+     *
      * @return date updated
      */
     public Date getUpdated() {
@@ -196,7 +196,7 @@ public class Peerreview implements Cloneable {
 
     /**
      * Sets the object's date of last update
-     * 
+     *
      * @param updated
      */
     public void setUpdated(Date updated) {
@@ -205,7 +205,7 @@ public class Peerreview implements Cloneable {
 
     /**
      * @return Returns the userid of the user who created the Share peerreview.
-     * 
+     *
      */
     public PeerreviewUser getCreatedBy() {
 	return createdBy;
@@ -231,7 +231,7 @@ public class Peerreview implements Cloneable {
 
     /**
      * @return Returns the title.
-     * 
+     *
      */
     public String getTitle() {
 	return title;
@@ -247,7 +247,7 @@ public class Peerreview implements Cloneable {
 
     /**
      * @return Returns the lockWhenFinish.
-     * 
+     *
      */
     public boolean getLockWhenFinished() {
 	return lockWhenFinished;
@@ -271,7 +271,7 @@ public class Peerreview implements Cloneable {
     public void setInstructions(String instructions) {
 	this.instructions = instructions;
     }
-    
+
     /**
      * @return
      */
@@ -293,9 +293,9 @@ public class Peerreview implements Cloneable {
     public void setMinimumRates(int minimumRates) {
 	this.minimumRates = minimumRates;
     }
-    
+
     /**
-     * 
+     *
      * @return
      */
     public Set<LearnerItemRatingCriteria> getRatingCriterias() {
@@ -338,7 +338,7 @@ public class Peerreview implements Cloneable {
     public void setContentId(Long contentId) {
 	this.contentId = contentId;
     }
-    
+
     /**
      * @return
      */
@@ -349,7 +349,7 @@ public class Peerreview implements Cloneable {
     public void setMaximumRatesPerUser(int maximumRatesPerUser) {
 	this.maximumRatesPerUser = maximumRatesPerUser;
     }
-    
+
     /**
      * @return
      */

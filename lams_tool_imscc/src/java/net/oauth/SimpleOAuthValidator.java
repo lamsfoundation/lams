@@ -44,16 +44,16 @@ public class SimpleOAuthValidator implements OAuthValidator {
      * This limitation is specified by OAuth Core <a
      * href="http://oauth.net/core/1.0#anchor7">section 5</a>.
      */
-    public static final Set<String> SINGLE_PARAMETERS = constructSingleParameters();
+    public static final Set<String> SINGLE_PARAMETERS = SimpleOAuthValidator.constructSingleParameters();
 
     private static Set<String> constructSingleParameters() {
-        Set<String> s = new HashSet<String>();
-        for (String p : new String[] { OAuth.OAUTH_CONSUMER_KEY, OAuth.OAUTH_TOKEN, OAuth.OAUTH_TOKEN_SECRET,
-                OAuth.OAUTH_CALLBACK, OAuth.OAUTH_SIGNATURE_METHOD, OAuth.OAUTH_SIGNATURE, OAuth.OAUTH_TIMESTAMP,
-                OAuth.OAUTH_NONCE, OAuth.OAUTH_VERSION }) {
-            s.add(p);
-        }
-        return Collections.unmodifiableSet(s);
+	Set<String> s = new HashSet<String>();
+	for (String p : new String[] { OAuth.OAUTH_CONSUMER_KEY, OAuth.OAUTH_TOKEN, OAuth.OAUTH_TOKEN_SECRET,
+		OAuth.OAUTH_CALLBACK, OAuth.OAUTH_SIGNATURE_METHOD, OAuth.OAUTH_SIGNATURE, OAuth.OAUTH_TIMESTAMP,
+		OAuth.OAUTH_NONCE, OAuth.OAUTH_VERSION }) {
+	    s.add(p);
+	}
+	return Collections.unmodifiableSet(s);
     }
 
     /**
@@ -62,7 +62,7 @@ public class SimpleOAuthValidator implements OAuthValidator {
      * signature.
      */
     public SimpleOAuthValidator() {
-        this(DEFAULT_TIMESTAMP_WINDOW, Double.parseDouble(OAuth.VERSION_1_0));
+	this(DEFAULT_TIMESTAMP_WINDOW, Double.parseDouble(OAuth.VERSION_1_0));
     }
 
     /**
@@ -75,96 +75,97 @@ public class SimpleOAuthValidator implements OAuthValidator {
      *            the maximum acceptable oauth_version
      */
     public SimpleOAuthValidator(long timestampWindowMsec, double maxVersion) {
-        this.timestampWindow = timestampWindowMsec;
-        this.maxVersion = maxVersion;
+	this.timestampWindow = timestampWindowMsec;
+	this.maxVersion = maxVersion;
     }
 
     protected final double minVersion = 1.0;
     protected final double maxVersion;
     protected final long timestampWindow;
 
-    /** {@inherit} 
-     * @throws URISyntaxException */
+    /**
+     * {@inherit}
+     * 
+     * @throws URISyntaxException
+     */
+    @Override
     public void validateMessage(OAuthMessage message, OAuthAccessor accessor)
-    throws OAuthException, IOException, URISyntaxException {
-        checkSingleParameters(message);
-        validateVersion(message);
-        validateTimestampAndNonce(message);
-        validateSignature(message, accessor);
+	    throws OAuthException, IOException, URISyntaxException {
+	checkSingleParameters(message);
+	validateVersion(message);
+	validateTimestampAndNonce(message);
+	validateSignature(message, accessor);
     }
 
     /** Throw an exception if any SINGLE_PARAMETERS occur repeatedly. */
     protected void checkSingleParameters(OAuthMessage message) throws IOException, OAuthException {
-        // Check for repeated oauth_ parameters:
-        boolean repeated = false;
-        Map<String, Collection<String>> nameToValues = new HashMap<String, Collection<String>>();
-        for (Map.Entry<String, String> parameter : message.getParameters()) {
-            String name = parameter.getKey();
-            if (SINGLE_PARAMETERS.contains(name)) {
-                Collection<String> values = nameToValues.get(name);
-                if (values == null) {
-                    values = new ArrayList<String>();
-                    nameToValues.put(name, values);
-                } else {
-                    repeated = true;
-                }
-                values.add(parameter.getValue());
-            }
-        }
-        if (repeated) {
-            Collection<OAuth.Parameter> rejected = new ArrayList<OAuth.Parameter>();
-            for (Map.Entry<String, Collection<String>> p : nameToValues.entrySet()) {
-                String name = p.getKey();
-                Collection<String> values = p.getValue();
-                if (values.size() > 1) {
-                    for (String value : values) {
-                        rejected.add(new OAuth.Parameter(name, value));
-                    }
-                }
-            }
-            OAuthProblemException problem = new OAuthProblemException(OAuth.Problems.PARAMETER_REJECTED);
-            problem.setParameter(OAuth.Problems.OAUTH_PARAMETERS_REJECTED, OAuth.formEncode(rejected));
-            throw problem;
-        }
+	// Check for repeated oauth_ parameters:
+	boolean repeated = false;
+	Map<String, Collection<String>> nameToValues = new HashMap<String, Collection<String>>();
+	for (Map.Entry<String, String> parameter : message.getParameters()) {
+	    String name = parameter.getKey();
+	    if (SINGLE_PARAMETERS.contains(name)) {
+		Collection<String> values = nameToValues.get(name);
+		if (values == null) {
+		    values = new ArrayList<String>();
+		    nameToValues.put(name, values);
+		} else {
+		    repeated = true;
+		}
+		values.add(parameter.getValue());
+	    }
+	}
+	if (repeated) {
+	    Collection<OAuth.Parameter> rejected = new ArrayList<OAuth.Parameter>();
+	    for (Map.Entry<String, Collection<String>> p : nameToValues.entrySet()) {
+		String name = p.getKey();
+		Collection<String> values = p.getValue();
+		if (values.size() > 1) {
+		    for (String value : values) {
+			rejected.add(new OAuth.Parameter(name, value));
+		    }
+		}
+	    }
+	    OAuthProblemException problem = new OAuthProblemException(OAuth.Problems.PARAMETER_REJECTED);
+	    problem.setParameter(OAuth.Problems.OAUTH_PARAMETERS_REJECTED, OAuth.formEncode(rejected));
+	    throw problem;
+	}
     }
 
-    protected void validateVersion(OAuthMessage message)
-    throws OAuthException, IOException {
-        String versionString = message.getParameter(OAuth.OAUTH_VERSION);
-        if (versionString != null) {
-            double version = Double.parseDouble(versionString);
-            if (version < minVersion || maxVersion < version) {
-                OAuthProblemException problem = new OAuthProblemException(OAuth.Problems.VERSION_REJECTED);
-                problem.setParameter(OAuth.Problems.OAUTH_ACCEPTABLE_VERSIONS, minVersion + "-" + maxVersion);
-                throw problem;
-            }
-        }
+    protected void validateVersion(OAuthMessage message) throws OAuthException, IOException {
+	String versionString = message.getParameter(OAuth.OAUTH_VERSION);
+	if (versionString != null) {
+	    double version = Double.parseDouble(versionString);
+	    if (version < minVersion || maxVersion < version) {
+		OAuthProblemException problem = new OAuthProblemException(OAuth.Problems.VERSION_REJECTED);
+		problem.setParameter(OAuth.Problems.OAUTH_ACCEPTABLE_VERSIONS, minVersion + "-" + maxVersion);
+		throw problem;
+	    }
+	}
     }
 
     /** This implementation doesn't check the nonce value. */
-    protected void validateTimestampAndNonce(OAuthMessage message)
-    throws IOException, OAuthProblemException {
-        message.requireParameters(OAuth.OAUTH_TIMESTAMP, OAuth.OAUTH_NONCE);
-        long timestamp = Long.parseLong(message.getParameter(OAuth.OAUTH_TIMESTAMP)) * 1000L;
-        long now = currentTimeMsec();
-        long min = now - timestampWindow;
-        long max = now + timestampWindow;
-        if (timestamp < min || max < timestamp) {
-            OAuthProblemException problem = new OAuthProblemException(OAuth.Problems.TIMESTAMP_REFUSED);
-            problem.setParameter(OAuth.Problems.OAUTH_ACCEPTABLE_TIMESTAMPS, min + "-" + max);
-            throw problem;
-        }
+    protected void validateTimestampAndNonce(OAuthMessage message) throws IOException, OAuthProblemException {
+	message.requireParameters(OAuth.OAUTH_TIMESTAMP, OAuth.OAUTH_NONCE);
+	long timestamp = Long.parseLong(message.getParameter(OAuth.OAUTH_TIMESTAMP)) * 1000L;
+	long now = currentTimeMsec();
+	long min = now - timestampWindow;
+	long max = now + timestampWindow;
+	if (timestamp < min || max < timestamp) {
+	    OAuthProblemException problem = new OAuthProblemException(OAuth.Problems.TIMESTAMP_REFUSED);
+	    problem.setParameter(OAuth.Problems.OAUTH_ACCEPTABLE_TIMESTAMPS, min + "-" + max);
+	    throw problem;
+	}
     }
 
     protected void validateSignature(OAuthMessage message, OAuthAccessor accessor)
-    throws OAuthException, IOException, URISyntaxException {
-        message.requireParameters(OAuth.OAUTH_CONSUMER_KEY,
-                OAuth.OAUTH_SIGNATURE_METHOD, OAuth.OAUTH_SIGNATURE);
-        OAuthSignatureMethod.newSigner(message, accessor).validate(message);
+	    throws OAuthException, IOException, URISyntaxException {
+	message.requireParameters(OAuth.OAUTH_CONSUMER_KEY, OAuth.OAUTH_SIGNATURE_METHOD, OAuth.OAUTH_SIGNATURE);
+	OAuthSignatureMethod.newSigner(message, accessor).validate(message);
     }
 
     protected long currentTimeMsec() {
-        return System.currentTimeMillis();
+	return System.currentTimeMillis();
     }
 
 }

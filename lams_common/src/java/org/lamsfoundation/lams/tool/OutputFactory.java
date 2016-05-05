@@ -43,33 +43,34 @@ import org.springframework.context.i18n.LocaleContextHolder;
  * tool that creates the output definition and output values for a tool. Each tool that has outputs should create its
  * own factory class that extends this class and uses the methods implemented in this class to create the actual
  * ToolOutputDefinition and ToolOutput objects.
- * 
+ *
  * The implemented factory (in the tool) needs to supply either (a) its own messageService bean (a Spring bean normally
  * defined in the tool's applicationContext file in the toolMessageService property or (b) the name of its I18N language
  * package/filename AND the the loadedMessageSourceService (which is defined as a Spring bean in the core context). One
  * of the two options (but not both) is required so that the getDescription() method can get the internationalised
  * description of the output definition from the tool's internationalisation files. If neither the messageService or the
  * I18N name is not supplied then the name if the output definition will appear in the description field.
- * 
+ *
  * The implemented factory should implement public SortedMap<String, ToolOutputDefinition>
  * getToolOutputDefinitions(Object toolContentObject) and this method should call the buildBlahDefinition() calls to
  * build the definitions.
- * 
+ *
  * It should also implement two methods similar to SortedMap<String, ToolOutput> getToolOutput(List<String> names,
  * various tool objects) and ToolOutput getToolOutput(String name, various tool objects) to get the actual outputs. The
  * "various tool objects" will vary from tool to tool - some tools may wish to pass in the raw session and user ids,
  * others may pass in specific tool objects. As these inputs will vary greatly from tool to tool, no abstract method has
  * been included in this parent class. Putting these calls in the factory allows all the "work" of the output generation
  * to be grouped together and it also allows the getToolOutput() logic to get to getDescription() logic in the factory.
- * 
+ *
  * Example definitions for tool factories: <bean id="mcOuputFactory"
  * class="org.lamsfoundation.lams.tool.mc.service.MCOutputFactory"> <property name="loadedMessageSourceService"><ref
- * bean="loadedMessageSourceService"/></property> <property name="languageFilename"><value>org.lamsfoundation.lams.tool.mc.ApplicationResources</value></property>
+ * bean="loadedMessageSourceService"/></property>
+ * <property name="languageFilename"><value>org.lamsfoundation.lams.tool.mc.ApplicationResources</value></property>
  * </bean>
- * 
+ *
  * <bean id="forumOuputDefinitionFactory" class="org.lamsfoundation.lams.tool.forum.service.ForumOutputFactory">
  * <property name="toolMessageService"><ref bean="forumMessageService"/></property> </bean>
- * 
+ *
  */
 public abstract class OutputFactory {
 
@@ -87,11 +88,11 @@ public abstract class OutputFactory {
      * Create a map of the tool output definitions, suitable for returning from the method getToolOutputDefinitions() in
      * the ToolContentManager interface. The class for the toolContentObject will be unique to each tool e.g. for
      * Multiple Choice tool it will be the McContent object.
-     * 
+     *
      * If the toolContentObject should not be null - if the toolContentId supplied in the call to
      * getToolOutputDefinitions(Long toolContentId) does not match to any existing content, the content should be the
      * tool's default tool content.
-     * 
+     *
      * @param toolContentObject
      * @return SortedMap of ToolOutputDefinitions where the key is the name from each definition
      * @throws ToolException
@@ -140,11 +141,11 @@ public abstract class OutputFactory {
      * the key and hence get the text. Otherwise if the tool has supplied a I18N languageFilename then it is accessed
      * via the shared toolActMessageService. If neither are supplied or the key is not found, then any "." in the name
      * are converted to space and this is used as the return value.
-     * 
+     *
      * This is normally used to get the description for a definition, in whic case the key should be in the format
      * output.desc.[definition name], key = definition name and addPrefix = true. For example a definition name of
      * "learner.mark" becomes output.desc.learner.mark.
-     * 
+     *
      * If you want to use this to get an arbitrary string from the I18N files, then set addPrefix = false and the
      * output.desc will not be added to the beginning.
      */
@@ -164,10 +165,8 @@ public abstract class OutputFactory {
 			+ " as no matching key found in the msgSource");
 	    }
 	} else {
-	    log
-		    .warn("Unable to internationalise the text for key "
-			    + key
-			    + " as no matching key found in the msgSource. The tool's OutputDefinition factory needs to set either (a) messageSource or (b) loadedMessageSourceService and languageFilename.");
+	    log.warn("Unable to internationalise the text for key " + key
+		    + " as no matching key found in the msgSource. The tool's OutputDefinition factory needs to set either (a) messageSource or (b) loadedMessageSourceService and languageFilename.");
 	}
 
 	if (translatedText == null || translatedText.length() == 0) {
@@ -217,8 +216,8 @@ public abstract class OutputFactory {
     protected ToolOutputDefinition buildDefinition(String definitionName, OutputType type, Object startValue,
 	    Object endValue, Object complexValue, Boolean showConditionNameOnly, Boolean isDefaultGradebookMark,
 	    Class valueClass) {
-	ToolOutputDefinition definition = this.buildDefinition(definitionName, type, startValue, endValue,
-		complexValue, showConditionNameOnly, valueClass);
+	ToolOutputDefinition definition = this.buildDefinition(definitionName, type, startValue, endValue, complexValue,
+		showConditionNameOnly, valueClass);
 	definition.setIsDefaultGradebookMark(isDefaultGradebookMark);
 	return definition;
     }
@@ -289,13 +288,13 @@ public abstract class OutputFactory {
 		Boolean.FALSE, Boolean.class);
 
 	List<BranchCondition> defaultConditions = new ArrayList<BranchCondition>();
-	defaultConditions.add(new BranchCondition(null, null, new Integer(1), definitionName, getI18NText(
-		definitionName + ".true", true), OutputType.OUTPUT_BOOLEAN.toString(), null, null, Boolean.TRUE
-		.toString()));
+	defaultConditions.add(new BranchCondition(null, null, new Integer(1), definitionName,
+		getI18NText(definitionName + ".true", true), OutputType.OUTPUT_BOOLEAN.toString(), null, null,
+		Boolean.TRUE.toString()));
 
-	defaultConditions.add(new BranchCondition(null, null, new Integer(2), definitionName, getI18NText(
-		definitionName + ".false", true), OutputType.OUTPUT_BOOLEAN.toString(), null, null, Boolean.FALSE
-		.toString()));
+	defaultConditions.add(new BranchCondition(null, null, new Integer(2), definitionName,
+		getI18NText(definitionName + ".false", true), OutputType.OUTPUT_BOOLEAN.toString(), null, null,
+		Boolean.FALSE.toString()));
 
 	definition.setDefaultConditions(defaultConditions);
 
@@ -336,11 +335,11 @@ public abstract class OutputFactory {
      * Build a condition name based on a definition name. For user customised conditions, the conditions name MUST start
      * with the definition name for UI to be able to match conditions to definition in the authoring interface, but
      * then each condition name needs to be unique, hence "uniquePart".
-     * 
+     *
      * @param definitionName:
-     *                Must not be null
+     *            Must not be null
      * @param uniquePart:
-     *                May be null if the condition names are to be the same as the definition name.
+     *            May be null if the condition names are to be the same as the definition name.
      * @return combined string
      */
     protected String buildConditionName(String definitionName, String uniquePart) {
@@ -350,9 +349,9 @@ public abstract class OutputFactory {
 
     /**
      * Given a condition name built with buildConditionName, split is back into its definition name and unique part.
-     * 
+     *
      * @param conditionName:
-     *                Must not be null
+     *            Must not be null
      * @return String[definition name, unique part]
      */
     protected String[] splitConditionName(String conditionName) {
@@ -373,7 +372,7 @@ public abstract class OutputFactory {
      * non matching inputs will be filtered off in Authoring. IMPORTANT: For compatibility, NULL means that all
      * definitions are accepted! If the return value is not NULL, the definitions should be limited only to the matching
      * ones.
-     * 
+     *
      * @param definitionType
      * @return
      */

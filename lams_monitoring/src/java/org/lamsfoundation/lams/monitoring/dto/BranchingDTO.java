@@ -1,17 +1,10 @@
 package org.lamsfoundation.lams.monitoring.dto;
 
 import java.io.Serializable;
-import java.util.Iterator;
-import java.util.Set;
 import java.util.SortedSet;
-import java.util.TreeSet;
 
 import org.apache.commons.lang.builder.CompareToBuilder;
 import org.apache.commons.lang.builder.ToStringBuilder;
-import org.lamsfoundation.lams.learningdesign.BranchingActivity;
-import org.lamsfoundation.lams.learningdesign.Group;
-import org.lamsfoundation.lams.learningdesign.BranchActivityEntry;
-import org.lamsfoundation.lams.learningdesign.SequenceActivity;
 
 /**
  * Represents an overall branching activity. Used by the Teacher Chosen Grouping screen for allocating learners to
@@ -23,11 +16,13 @@ public class BranchingDTO implements Serializable, Comparable {
     private String branchActivityName;
     private SortedSet<BranchDTO> branches;
 
+    @Override
     public String toString() {
 	return new ToStringBuilder(this).append("branchActivityId", branchActivityId)
 		.append("branchActivityName", branchActivityName).append("branches", branches).toString();
     }
 
+    @Override
     public int compareTo(Object other) {
 	BranchingDTO otherBranch = (BranchingDTO) other;
 	return new CompareToBuilder().append(branchActivityId, otherBranch.branchActivityId)

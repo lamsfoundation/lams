@@ -2,21 +2,21 @@
  * Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
  * =============================================================
  * License Information: http://lamsfoundation.org/licensing/lams/2.0/
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301
  * USA
- * 
+ *
  * http://www.gnu.org/licenses/gpl.txt
  * ****************************************************************
  */
@@ -30,11 +30,11 @@ import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 
 /**
  * Scratchie
- * 
- * @author Andrey Balan
- * 
  *
- * 
+ * @author Andrey Balan
+ *
+ *
+ *
  */
 public class ScratchieUser implements Cloneable, Comparable {
     private static final long serialVersionUID = -7043502180037866257L;
@@ -66,6 +66,7 @@ public class ScratchieUser implements Cloneable, Comparable {
     /**
      * Clone method from <code>java.lang.Object</code>
      */
+    @Override
     public Object clone() {
 
 	ScratchieUser user = null;
@@ -80,7 +81,8 @@ public class ScratchieUser implements Cloneable, Comparable {
 
 	return user;
     }
-    
+
+    @Override
     public int compareTo(Object user) {
 	ScratchieUser u = (ScratchieUser) user;
 	return loginName.compareTo(u.getLoginName());
@@ -193,11 +195,14 @@ public class ScratchieUser implements Cloneable, Comparable {
 	this.sessionFinished = sessionFinished;
     }
 
+    @Override
     public boolean equals(Object obj) {
-	if (this == obj)
+	if (this == obj) {
 	    return true;
-	if (!(obj instanceof ScratchieUser))
+	}
+	if (!(obj instanceof ScratchieUser)) {
 	    return false;
+	}
 
 	final ScratchieUser user = (ScratchieUser) obj;
 
@@ -206,6 +211,7 @@ public class ScratchieUser implements Cloneable, Comparable {
 
     }
 
+    @Override
     public int hashCode() {
 	return new HashCodeBuilder().append(uid).append(firstName).append(lastName).append(loginName).toHashCode();
     }

@@ -4,7 +4,7 @@ import java.util.ArrayList;
 
 /**
  * DTO for group specific statistics
- * 
+ *
  * @author lfoxton
  *
  */
@@ -16,65 +16,65 @@ public class GroupStatisticsDTO {
     private long monitors;
     private long authors;
     private long lessons;
-    
+
     private ArrayList<GroupStatisticsDTO> subGroups;
 
-    public GroupStatisticsDTO () {
+    public GroupStatisticsDTO() {
     }
 
     public String getName() {
-        return name;
+	return name;
     }
 
     public void setName(String name) {
-        this.name = name;
+	this.name = name;
     }
-    
+
     public long getTotalUsers() {
-        return totalUsers;
+	return totalUsers;
     }
 
     public void setTotalUsers(long totalUsers) {
-        this.totalUsers = totalUsers;
+	this.totalUsers = totalUsers;
     }
 
     public long getLearners() {
-        return learners;
+	return learners;
     }
 
     public void setLearners(long learners) {
-        this.learners = learners;
+	this.learners = learners;
     }
 
     public long getMonitors() {
-        return monitors;
+	return monitors;
     }
 
     public void setMonitors(long monitors) {
-        this.monitors = monitors;
+	this.monitors = monitors;
     }
 
     public long getAuthors() {
-        return authors;
+	return authors;
     }
 
     public void setAuthors(long authors) {
-        this.authors = authors;
+	this.authors = authors;
     }
 
     public long getLessons() {
-        return lessons;
+	return lessons;
     }
 
     public void setLessons(long lessons) {
-        this.lessons = lessons;
+	this.lessons = lessons;
     }
 
     public ArrayList<GroupStatisticsDTO> getSubGroups() {
-        return subGroups;
+	return subGroups;
     }
 
     public void setSubGroups(ArrayList<GroupStatisticsDTO> subGroups) {
-        this.subGroups = subGroups;
+	this.subGroups = subGroups;
     }
 }

@@ -2,21 +2,21 @@
  * Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
  * =============================================================
  * License Information: http://lamsfoundation.org/licensing/lams/2.0/
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301
  * USA
- * 
+ *
  * http://www.gnu.org/licenses/gpl.txt
  * ****************************************************************
  */
@@ -113,7 +113,8 @@ import org.lamsfoundation.lams.util.audit.IAuditService;
 /**
  * @author Andrey Balan
  */
-public class AssessmentServiceImpl implements IAssessmentService, ToolContentManager, ToolSessionManager, ToolRestManager {
+public class AssessmentServiceImpl
+	implements IAssessmentService, ToolContentManager, ToolSessionManager, ToolRestManager {
     private static Logger log = Logger.getLogger(AssessmentServiceImpl.class.getName());
 
     private AssessmentDAO assessmentDao;
@@ -408,7 +409,7 @@ public class AssessmentServiceImpl implements IAssessmentService, ToolContentMan
 	    if (lastResult.getFinishDate() == null) {
 		return;
 
-	    // mark previous attempt as being not the latest any longer
+		// mark previous attempt as being not the latest any longer
 	    } else {
 		lastResult.setLatest(false);
 		assessmentResultDao.saveObject(lastResult);
@@ -439,7 +440,7 @@ public class AssessmentServiceImpl implements IAssessmentService, ToolContentMan
 		}
 	    }
 	}
-	
+
 	assessmentResultDao.saveObject(result);
     }
 
@@ -518,7 +519,7 @@ public class AssessmentServiceImpl implements IAssessmentService, ToolContentMan
 
     /**
      * Stores given AssessmentQuestion's answer.
-     * 
+     *
      * @param isAutosave
      *            in case of autosave there is no need to calculate marks
      * @return grade that user scored by answering that question
@@ -737,17 +738,17 @@ public class AssessmentServiceImpl implements IAssessmentService, ToolContentMan
     public Float getLastTotalScoreByUser(Long assessmentUid, Long userId) {
 	return assessmentResultDao.getLastTotalScoreByUser(assessmentUid, userId);
     }
-    
+
     @Override
     public Float getBestTotalScoreByUser(Long sessionId, Long userId) {
 	return assessmentResultDao.getBestTotalScoreByUser(sessionId, userId);
     }
-    
+
     @Override
     public Float getFirstTotalScoreByUser(Long sessionId, Long userId) {
 	return assessmentResultDao.getFirstTotalScoreByUser(sessionId, userId);
     }
-    
+
     @Override
     public Float getAvergeTotalScoreByUser(Long sessionId, Long userId) {
 	return assessmentResultDao.getAvergeTotalScoreByUser(sessionId, userId);
@@ -1454,24 +1455,24 @@ public class AssessmentServiceImpl implements IAssessmentService, ToolContentMan
      */
     private String getQuestionTypeLanguageLabel(short type) {
 	switch (type) {
-	case AssessmentConstants.QUESTION_TYPE_ESSAY:
-	    return "Essay";
-	case AssessmentConstants.QUESTION_TYPE_MATCHING_PAIRS:
-	    return "Matching Pairs";
-	case AssessmentConstants.QUESTION_TYPE_MULTIPLE_CHOICE:
-	    return "Multiple Choice";
-	case AssessmentConstants.QUESTION_TYPE_NUMERICAL:
-	    return "Numerical";
-	case AssessmentConstants.QUESTION_TYPE_ORDERING:
-	    return "Ordering";
-	case AssessmentConstants.QUESTION_TYPE_SHORT_ANSWER:
-	    return "Short Answer";
-	case AssessmentConstants.QUESTION_TYPE_TRUE_FALSE:
-	    return "True/False";
-	case AssessmentConstants.QUESTION_TYPE_MARK_HEDGING:
-	    return "Mark Hedging";
-	default:
-	    return null;
+	    case AssessmentConstants.QUESTION_TYPE_ESSAY:
+		return "Essay";
+	    case AssessmentConstants.QUESTION_TYPE_MATCHING_PAIRS:
+		return "Matching Pairs";
+	    case AssessmentConstants.QUESTION_TYPE_MULTIPLE_CHOICE:
+		return "Multiple Choice";
+	    case AssessmentConstants.QUESTION_TYPE_NUMERICAL:
+		return "Numerical";
+	    case AssessmentConstants.QUESTION_TYPE_ORDERING:
+		return "Ordering";
+	    case AssessmentConstants.QUESTION_TYPE_SHORT_ANSWER:
+		return "Short Answer";
+	    case AssessmentConstants.QUESTION_TYPE_TRUE_FALSE:
+		return "True/False";
+	    case AssessmentConstants.QUESTION_TYPE_MARK_HEDGING:
+		return "Mark Hedging";
+	    default:
+		return null;
 	}
     }
 
@@ -1814,7 +1815,7 @@ public class AssessmentServiceImpl implements IAssessmentService, ToolContentMan
 	/*
 	 * Hibernate CGLIB is failing to load the first activity in the sequence as a ToolActivity for some mysterious
 	 * reason Causes a ClassCastException when you try to cast it, even if it is a ToolActivity.
-	 * 
+	 *
 	 * THIS IS A HACK to retrieve the first tool activity manually so it can be cast as a ToolActivity - if it is
 	 * one
 	 */
@@ -1897,9 +1898,9 @@ public class AssessmentServiceImpl implements IAssessmentService, ToolContentMan
     public String getActivityEvaluation(Long toolContentId) {
 	return toolService.getActivityEvaluation(toolContentId);
     }
-    
+
     @Override
-    public void setActivityEvaluation(Long toolContentId, String toolOutputDefinition) {	
+    public void setActivityEvaluation(Long toolContentId, String toolOutputDefinition) {
 	toolService.setActivityEvaluation(toolContentId, toolOutputDefinition);
     }
 
@@ -2210,7 +2211,7 @@ public class AssessmentServiceImpl implements IAssessmentService, ToolContentMan
 
     /**
      * Get the tool output for the given tool output names.
-     * 
+     *
      * @see org.lamsfoundation.lams.tool.ToolSessionManager#getToolOutput(java.util.List<String>, java.lang.Long,
      *      java.lang.Long)
      */
@@ -2221,7 +2222,7 @@ public class AssessmentServiceImpl implements IAssessmentService, ToolContentMan
 
     /**
      * Get the tool output for the given tool output name.
-     * 
+     *
      * @see org.lamsfoundation.lams.tool.ToolSessionManager#getToolOutput(java.lang.String, java.lang.Long,
      *      java.lang.Long)
      */
@@ -2349,14 +2350,14 @@ public class AssessmentServiceImpl implements IAssessmentService, ToolContentMan
     /**
      * Rest call to create a new Assessment content. Required fields in toolContentJSON: "title", "instructions",
      * "questions", "firstName", "lastName", "lastName", "questions" and "references".
-     * 
+     *
      * The questions entry should be a JSONArray containing JSON objects, which in turn must contain "questionTitle",
      * "questionText", "displayOrder" (Integer), "type" (Integer). If the type is Multiple Choice, Numerical or Matching
      * Pairs then a JSONArray "answers" is required.
-     * 
+     *
      * The answers entry should be JSONArray containing JSON objects, which in turn must contain "answerText" or
      * "answerFloat", "displayOrder" (Integer), "grade" (Integer).
-     * 
+     *
      * The references entry should be a JSONArray containing JSON objects, which in turn must contain "displayOrder"
      * (Integer), "questionDisplayOrder" (Integer - to match to the question). It may also have "defaultGrade" (Integer)
      * and "randomQuestion" (Boolean)

@@ -2,21 +2,21 @@
  * Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
  * =============================================================
  * License Information: http://lamsfoundation.org/licensing/lams/2.0/
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License version 2.0 
+ * it under the terms of the GNU General Public License version 2.0
  * as published by the Free Software Foundation.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301
  * USA
- * 
+ *
  * http://www.gnu.org/licenses/gpl.txt
  * ****************************************************************
  */
@@ -41,9 +41,9 @@ import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.lamsfoundation.lams.learningdesign.Activity;
+import org.lamsfoundation.lams.learningdesign.BranchActivityEntry;
 import org.lamsfoundation.lams.learningdesign.BranchingActivity;
 import org.lamsfoundation.lams.learningdesign.Group;
-import org.lamsfoundation.lams.learningdesign.BranchActivityEntry;
 import org.lamsfoundation.lams.learningdesign.SequenceActivity;
 import org.lamsfoundation.lams.monitoring.dto.BranchDTO;
 import org.lamsfoundation.lams.monitoring.dto.BranchingDTO;
@@ -57,11 +57,11 @@ import org.lamsfoundation.lams.web.util.AttributeNames;
 
 /**
  * The action servlet that provides the support for the
- * 
+ *
  * <UL>
  * <LI>View only screen for Group Based and Tool Based branching</LI>
  * </UL>
- * 
+ *
  * Due to how XDoclet works, we have to have a separate subclass of BranchingAction for each branching type, and include
  *
  *
@@ -97,7 +97,7 @@ public class BranchingAction extends LamsDispatchAction {
 
     protected ActionForward viewBranching(BranchingActivity activity, Long lessonId, boolean useLocalFiles,
 	    ActionMapping mapping, HttpServletRequest request, IMonitoringService monitoringService)
-		    throws IOException, ServletException {
+	    throws IOException, ServletException {
 
 	// in general the progress engine expects the activity and lesson id to be in the request,
 	// so follow that standard.
@@ -122,7 +122,7 @@ public class BranchingAction extends LamsDispatchAction {
 
     // Can't do this in BranchingDTO (although that's where it should be) as we have
     // to get the SequenceActivities via the getActivityById to get around Hibernate
-    // not allowing us to cast the cglib classes. 
+    // not allowing us to cast the cglib classes.
     private BranchingDTO getBranchingDTO(BranchingActivity activity, IMonitoringService monitoringService) {
 	BranchingDTO dto = new BranchingDTO();
 
@@ -139,7 +139,7 @@ public class BranchingAction extends LamsDispatchAction {
 
 	    // If it is a grouped based or teacher chosen branching, the users will be in groups.
 	    // If not get the user based on the progress engine and create a dummy group.
-	    // Can't use tool session as sequence activities don't have a tool session! 
+	    // Can't use tool session as sequence activities don't have a tool session!
 	    SortedSet<Group> groups = new TreeSet<Group>();
 	    if (activity.isChosenBranchingActivity() || activity.isGroupBranchingActivity()) {
 		for (BranchActivityEntry entry : mappingEntries) {

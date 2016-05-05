@@ -32,9 +32,9 @@ import org.lamsfoundation.lams.learningdesign.RandomGrouping;
 
 /**
  * Form for grouping activities in Pedagogical Planner.
- * 
+ *
  * @author Marcin Cieslak
- * 
+ *
  */
 public class PedagogicalPlannerGroupingForm extends PedagogicalPlannerActivityForm {
     private Integer groupingTypeId;
@@ -61,37 +61,37 @@ public class PedagogicalPlannerGroupingForm extends PedagogicalPlannerActivityFo
 
     /**
      * Fills the form properties with existing grouping object.
-     * 
+     *
      * @param grouping
-     *                persistent object to use
+     *            persistent object to use
      */
     public void fillForm(Grouping grouping) {
 	if (grouping != null) {
 	    setGroupingTypeId(grouping.getGroupingTypeId());
 	    if (grouping.isRandomGrouping()) {
 		RandomGrouping randomGrouping = (RandomGrouping) grouping;
-		String number = randomGrouping.getNumberOfGroups() == null ? null : String.valueOf(randomGrouping
-			.getNumberOfGroups());
+		String number = randomGrouping.getNumberOfGroups() == null ? null
+			: String.valueOf(randomGrouping.getNumberOfGroups());
 		setNumberOfGroups(number);
 
-		number = randomGrouping.getLearnersPerGroup() == null ? null : String.valueOf(randomGrouping
-			.getLearnersPerGroup());
+		number = randomGrouping.getLearnersPerGroup() == null ? null
+			: String.valueOf(randomGrouping.getLearnersPerGroup());
 		setLearnersPerGroup(number);
 	    } else if (grouping.isLearnerChoiceGrouping()) {
 		LearnerChoiceGrouping learnerChoiceGrouping = (LearnerChoiceGrouping) grouping;
-		String number = learnerChoiceGrouping.getNumberOfGroups() == null ? null : String
-			.valueOf(learnerChoiceGrouping.getNumberOfGroups());
+		String number = learnerChoiceGrouping.getNumberOfGroups() == null ? null
+			: String.valueOf(learnerChoiceGrouping.getNumberOfGroups());
 		setNumberOfGroups(number);
 
-		number = learnerChoiceGrouping.getLearnersPerGroup() == null ? null : String
-			.valueOf(learnerChoiceGrouping.getLearnersPerGroup());
+		number = learnerChoiceGrouping.getLearnersPerGroup() == null ? null
+			: String.valueOf(learnerChoiceGrouping.getLearnersPerGroup());
 		setLearnersPerGroup(number);
 
 		setEqualGroupSizes(learnerChoiceGrouping.getEqualNumberOfLearnersPerGroup());
 		setViewStudentsBeforeSelection(learnerChoiceGrouping.getViewStudentsBeforeSelection());
 	    } else {
-		String numberOfGroups = grouping.getMaxNumberOfGroups() == null ? null : String.valueOf(grouping
-			.getMaxNumberOfGroups());
+		String numberOfGroups = grouping.getMaxNumberOfGroups() == null ? null
+			: String.valueOf(grouping.getMaxNumberOfGroups());
 		setNumberOfGroups(numberOfGroups);
 	    }
 	}

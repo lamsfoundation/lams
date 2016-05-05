@@ -40,7 +40,7 @@ public class CentralConstants {
     public static final String PARAM_COURSE_ID = "courseId";
 
     public static final String PARAM_COURSE_NAME = "courseName";
-    
+
     public static final String PARAM_USE_PREFIX = "usePrefix";
 
     public static final String PARAM_LEARNING_DESIGN_ID = "ldId";
@@ -58,7 +58,7 @@ public class CentralConstants {
     public static final String PARAM_LANG = "lang";
 
     public static final String PARAM_METHOD = "method";
-    
+
     public static final String PARAM_MODE = "mode";
 
     public static final String PARAM_FILEPATH = "filePath";
@@ -70,7 +70,7 @@ public class CentralConstants {
     public static final String PARAM_MONITOR_IDS = "monitorIds";
 
     public static final String PARAM_CUSTOM_CSV = "customCSV";
-    
+
     public static final String PARAM_USER_ID = "userId";
 
     public static final String METHOD_START = "start";
@@ -88,7 +88,7 @@ public class CentralConstants {
     public static final String METHOD_SINGLE_STUDENT_PROGRESS = "singleStudentProgress";
 
     public static final String METHOD_JOIN_LESSON = "join";
-    
+
     public static final String METHOD_VERIFY_EXT_SERVER = "verify";
 
     public static final String METHOD_LIST_MONITOR = "listMonitor";
@@ -140,7 +140,7 @@ public class CentralConstants {
     public static final String PARAM_CALL_ATTEMPTED_ID = "callAttemptedID";
 
     public static final String PARAM_SEQUENCE_TITLE = "sequenceTitle";
-    
+
     public static final String PARAM_ACTIVITY_METADATA = "activityMetadataField";
 
     public static final String PARAM_FORM_MESSAGE = "formMessage";
@@ -172,8 +172,8 @@ public class CentralConstants {
     public static final String CENTRAL_TOOL_CONTENT_HANDLER_BEAN_NAME = "centralToolContentHandler";
 
     public static final String PARAM_EDIT = "edit";
-    
-    public static final String PARAM_COPY_MODE= "copyMode";
+
+    public static final String PARAM_COPY_MODE = "copyMode";
 
     public static final String USER_MANAGEMENT_SERVICE_BEAN_NAME = "userManagementService";
 

@@ -2,53 +2,38 @@
  * Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
  * =============================================================
  * License Information: http://lamsfoundation.org/licensing/lams/2.0/
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License version 2.0 
+ * it under the terms of the GNU General Public License version 2.0
  * as published by the Free Software Foundation.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301
  * USA
- * 
+ *
  * http://www.gnu.org/licenses/gpl.txt
  * ****************************************************************
  */
 
-/* $$Id$$ */	
+/* $$Id$$ */
 package org.lamsfoundation.lams.tool.forum.web.forms;
-
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Set;
 
 import javax.servlet.http.HttpServletRequest;
 
-import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
-import org.apache.struts.action.ActionErrors;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionMapping;
-import org.apache.struts.action.ActionMessage;
-import org.apache.struts.action.ActionMessages;
-import org.apache.struts.upload.FormFile;
-import org.lamsfoundation.lams.contentrepository.client.IToolContentHandler;
-import org.lamsfoundation.lams.tool.ToolAccessMode;
-import org.lamsfoundation.lams.tool.forum.persistence.Attachment;
 import org.lamsfoundation.lams.tool.forum.persistence.Forum;
-import org.lamsfoundation.lams.util.UploadFileUtil;
-import org.lamsfoundation.lams.web.util.AttributeNames;
 
 /**
  *
- * 	Message Form.
+ * Message Form.
  *
  *
  * User: conradb
@@ -56,14 +41,14 @@ import org.lamsfoundation.lams.web.util.AttributeNames;
  * Time: 15:44:36
  */
 public class ForumForm extends ActionForm {
-	private static final long serialVersionUID = -6054354910960460120L;
-	private static Logger logger = Logger.getLogger(ForumForm.class.getName());
+    private static final long serialVersionUID = -6054354910960460120L;
+    private static Logger logger = Logger.getLogger(ForumForm.class.getName());
 
-	//Forum fields
-	private Long toolContentID;
-	private String currentTab;
-	private String sessionMapID;
-	private String contentFolderID;
+    //Forum fields
+    private Long toolContentID;
+    private String currentTab;
+    private String sessionMapID;
+    private String contentFolderID;
 
     private Forum forum;
 
@@ -71,70 +56,77 @@ public class ForumForm extends ActionForm {
      * Empty construction method
      */
     public ForumForm() {
-    	
-    	this.toolContentID = new Long(0);
-        this.forum = new Forum();
-        this.forum.setTitle("");
-        this.currentTab = "";
+
+	this.toolContentID = new Long(0);
+	this.forum = new Forum();
+	this.forum.setTitle("");
+	this.currentTab = "";
     }
+
     /**
      * Initialize this form by given <code>Forum</code> instance.
+     * 
      * @param forum
      */
     public void setForum(Forum forum) {
-        this.forum = forum;
-        //set Form special varaible from given forum
-        if(forum != null){
-        	this.toolContentID = forum.getContentId();
-        }else{
-        	logger.error("Initial ForumForm failed by null value of Forum.");
-        }
-        
+	this.forum = forum;
+	//set Form special varaible from given forum
+	if (forum != null) {
+	    this.toolContentID = forum.getContentId();
+	} else {
+	    logger.error("Initial ForumForm failed by null value of Forum.");
+	}
+
     }
-  
-    public void reset(ActionMapping mapping, HttpServletRequest request){
-    	forum.setAllowEdit(false);
-    	forum.setAllowAnonym(false);
-    	forum.setAllowRichEditor(false);
-    	forum.setLimitedMaxCharacters(false);
-    	forum.setLockWhenFinished(false);
-    	forum.setAllowNewTopic(false);
-    	forum.setAllowUpload(false);
-    	forum.setAllowRateMessages(false);
-    	forum.setReflectOnActivity(false);
+
+    @Override
+    public void reset(ActionMapping mapping, HttpServletRequest request) {
+	forum.setAllowEdit(false);
+	forum.setAllowAnonym(false);
+	forum.setAllowRichEditor(false);
+	forum.setLimitedMaxCharacters(false);
+	forum.setLockWhenFinished(false);
+	forum.setAllowNewTopic(false);
+	forum.setAllowUpload(false);
+	forum.setAllowRateMessages(false);
+	forum.setReflectOnActivity(false);
     }
+
     //-------------------------get/set methods----------------
     public Forum getForum() {
-        return forum;
+	return forum;
     }
 
-	public String getCurrentTab() {
-		return currentTab;
-	}
+    public String getCurrentTab() {
+	return currentTab;
+    }
 
-	public void setCurrentTab(String currentTab) {
-		this.currentTab = currentTab;
-	}
+    public void setCurrentTab(String currentTab) {
+	this.currentTab = currentTab;
+    }
 
-	public Long getToolContentID() {
-		return toolContentID;
-	}
+    public Long getToolContentID() {
+	return toolContentID;
+    }
 
-	public void setToolContentID(Long toolContentID) {
-		this.toolContentID = toolContentID;
-	}
-	
-	public String getSessionMapID() {
-		return sessionMapID;
-	}
-	public void setSessionMapID(String sessionMapID) {
-		this.sessionMapID = sessionMapID;
-	}
-	public String getContentFolderID() {
-		return contentFolderID;
-	}
-	public void setContentFolderID(String contentFolderID) {
-		this.contentFolderID = contentFolderID;
-	}
+    public void setToolContentID(Long toolContentID) {
+	this.toolContentID = toolContentID;
+    }
+
+    public String getSessionMapID() {
+	return sessionMapID;
+    }
+
+    public void setSessionMapID(String sessionMapID) {
+	this.sessionMapID = sessionMapID;
+    }
+
+    public String getContentFolderID() {
+	return contentFolderID;
+    }
+
+    public void setContentFolderID(String contentFolderID) {
+	this.contentFolderID = contentFolderID;
+    }
 
 }

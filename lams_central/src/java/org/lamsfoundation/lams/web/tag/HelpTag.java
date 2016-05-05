@@ -2,21 +2,21 @@
  * Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
  * =============================================================
  * License Information: http://lamsfoundation.org/licensing/lams/2.0/
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License version 2.0 
+ * it under the terms of the GNU General Public License version 2.0
  * as published by the Free Software Foundation.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301
  * USA
- * 
+ *
  * http://www.gnu.org/licenses/gpl.txt
  * ***********************************************************************/
 /* $$Id$$ */
@@ -46,9 +46,9 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
 
 /**
  * Generates a help link to a contextualised tool help page.
- * 
  *
- * 
+ *
+ *
  * @author Fiona Malikoff
  */
 public class HelpTag extends TagSupport {
@@ -60,8 +60,8 @@ public class HelpTag extends TagSupport {
     private String style = null;
 
     /**
-	 * 
-	 */
+     *
+     */
     public HelpTag() {
 	super();
     }
@@ -78,24 +78,24 @@ public class HelpTag extends TagSupport {
 		writer.println("<div class='help-no-tabs'>");
 		div = true;
 	    }
-	    
-	    if (! StringUtils.equals(style, "small")) {
-		MessageService msgService = (MessageService) getContext().getBean(
-			    CentralConstants.CENTRAL_MESSAGE_SERVICE_BEAN_NAME);
+
+	    if (!StringUtils.equals(style, "small")) {
+		MessageService msgService = (MessageService) getContext()
+			.getBean(CentralConstants.CENTRAL_MESSAGE_SERVICE_BEAN_NAME);
 		helpWord = msgService.getMessage("label.help");
-	    } 
-	    
+	    }
+
 	    try {
 
 		HttpSession session = ((HttpServletRequest) this.pageContext.getRequest()).getSession();
 		Locale locale = (Locale) session.getAttribute(LocaleFilter.PREFERRED_LOCALE_KEY);
 		String languageCode = locale != null ? locale.getLanguage() : "";
-		
+
 		if ((toolSignature != null) && (module != null)) {
 
 		    // retrieve help URL for tool
-		    ILamsToolService toolService = (ILamsToolService) getContext().getBean(
-			    AuthoringConstants.TOOL_SERVICE_BEAN_NAME);
+		    ILamsToolService toolService = (ILamsToolService) getContext()
+			    .getBean(AuthoringConstants.TOOL_SERVICE_BEAN_NAME);
 		    IToolVO tool = toolService.getToolBySignature(toolSignature);
 
 		    String fullURL = HelpUtil.constructToolURL(tool.getHelpUrl(), toolSignature, module, languageCode);
@@ -104,26 +104,24 @@ public class HelpTag extends TagSupport {
 			return Tag.SKIP_BODY;
 		    }
 
-		    writer.println("<span onclick=\"window.open('" + fullURL +"', 'help')\" id=\"help-tag\">"
-		    	+ "<i class=\"fa fa-question-circle\" ></i> " + helpWord
-		    	+ "</span>");
+		    writer.println("<span onclick=\"window.open('" + fullURL + "', 'help')\" id=\"help-tag\">"
+			    + "<i class=\"fa fa-question-circle\" ></i> " + helpWord + "</span>");
 
 		} else if (page != null) {
 
 		    String fullURL = HelpUtil.constructPageURL(page, languageCode);
 
-		    writer.println("<span onclick=\"window.open('" + fullURL +"', 'help')\" id=\"help-tag\">"
-			    	+ "<i class=\"fa fa-question-circle\" ></i> " + helpWord
-			    	+ "</span>");
+		    writer.println("<span onclick=\"window.open('" + fullURL + "', 'help')\" id=\"help-tag\">"
+			    + "<i class=\"fa fa-question-circle\" ></i> " + helpWord + "</span>");
 
 		} else {
 		    HelpTag.log.error("HelpTag unable to write out due to unspecified values.");
 		    writer.println("<i class=\"fa fa-times-circle\"></i>");
 		}
 	    } catch (NullPointerException npe) {
-		HelpTag.log
-			.error("HelpTag unable to write out due to NullPointerException. Most likely a required paramater was unspecified or incorrect.",
-				npe);
+		HelpTag.log.error(
+			"HelpTag unable to write out due to NullPointerException. Most likely a required paramater was unspecified or incorrect.",
+			npe);
 		// don't throw a JSPException as we want the system to still function.
 
 	    }
@@ -146,7 +144,7 @@ public class HelpTag extends TagSupport {
 
     /**
      * @return module
-     * 
+     *
      *
      */
     public String getModule() {
@@ -154,7 +152,7 @@ public class HelpTag extends TagSupport {
     }
 
     /**
-     * 
+     *
      * @param module
      */
     public void setModule(String module) {
@@ -162,14 +160,14 @@ public class HelpTag extends TagSupport {
     }
 
     private WebApplicationContext getContext() {
-	WebApplicationContext ctx = WebApplicationContextUtils.getRequiredWebApplicationContext(pageContext
-		.getServletContext());
+	WebApplicationContext ctx = WebApplicationContextUtils
+		.getRequiredWebApplicationContext(pageContext.getServletContext());
 	return ctx;
     }
-    
+
     /**
      * @return
-     * 
+     *
      *
      */
     public String getToolSignature() {
@@ -177,7 +175,7 @@ public class HelpTag extends TagSupport {
     }
 
     /**
-     * 
+     *
      * @param toolSignature
      */
     public void setToolSignature(String toolSignature) {
@@ -186,7 +184,7 @@ public class HelpTag extends TagSupport {
 
     /**
      * @return page
-     * 
+     *
      *
      */
     public String getPage() {
@@ -194,7 +192,7 @@ public class HelpTag extends TagSupport {
     }
 
     /**
-     * 
+     *
      * @param page
      */
     public void setPage(String page) {
@@ -203,7 +201,7 @@ public class HelpTag extends TagSupport {
 
     /**
      * @return style
-     * 
+     *
      *
      */
     public String getStyle() {
@@ -211,7 +209,7 @@ public class HelpTag extends TagSupport {
     }
 
     /**
-     * 
+     *
      * @param style
      */
     public void setStyle(String style) {

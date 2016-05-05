@@ -32,7 +32,7 @@ public interface ISecurityDAO {
     boolean hasOrgRole(Integer orgId, Integer userId, String... roles);
 
     boolean isGroupManager(Integer orgId, Integer userId);
-    
+
     boolean isLessonLearner(Long lessonId, Integer userId);
 
     boolean isLessonMonitor(Long lessonId, Integer userId, boolean ownerAccepted);

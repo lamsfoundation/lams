@@ -27,10 +27,10 @@ package org.lamsfoundation.lams.learningdesign;
  * This is a POJO bean object for an evaluation criteria for a given activity.
  * This object exists at the learning design level. Ie it can be designed,
  * copied and exported in author.
- * 
+ *
  * @author lfoxton
- * 
- * 
+ *
+ *
  *
  */
 public class ActivityEvaluation {
@@ -78,6 +78,5 @@ public class ActivityEvaluation {
     public void setToolOutputDefinition(String toolOutputDefinition) {
 	this.toolOutputDefinition = toolOutputDefinition;
     }
-
 
 }

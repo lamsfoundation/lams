@@ -2,21 +2,21 @@
  * Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
  * =============================================================
  * License Information: http://lamsfoundation.org/licensing/lams/2.0/
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License version 2.0 
+ * it under the terms of the GNU General Public License version 2.0
  * as published by the Free Software Foundation.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301
  * USA
- * 
+ *
  * http://www.gnu.org/licenses/gpl.txt
  * ***********************************************************************/
 /* $$Id$$ */
@@ -43,10 +43,10 @@ import org.lamsfoundation.lams.web.filter.LocaleFilter;
  * exports the default and then the user's style sheet. If the user doesn't have a theme then it just exports the
  * default. This way, if the user's entry points to a stylesheet that doesn't exist, the default one is always
  * available.
- * 
  *
- *          on the user preferences."
- * 
+ *
+ * on the user preferences."
+ *
  * @author Fiona Malikoff
  */
 public class CssTag extends TagSupport {
@@ -129,10 +129,11 @@ public class CssTag extends TagSupport {
 
     /**
      *
-     *                index page use core"
-     * 
-     *                Sets whether to use blah.css (style="core") or blah_learner.css (style=learner). If this parameter
-     *                is left blank, you get blah_learner.css e.g. default_learner.css
+     * index page use core"
+     *
+     * Sets whether to use blah.css (style="core") or blah_learner.css (style=learner). If this parameter
+     * is left blank, you get blah_learner.css e.g. default_learner.css
+     *
      * @return Returns style.
      */
     public String getStyle() {

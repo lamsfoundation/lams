@@ -27,19 +27,19 @@ import org.lamsfoundation.lams.tool.SystemTool;
 
 /**
  * An activity that implements the ISystemToolActivity interface has a matching record in the lams_system_tool table.
- * 
+ *
  * Can't be done easily with regular inheritance as some system tools (Gates, Grouping) are simple activities, whereas
  * others (branching) are complex activities.
- * 
+ *
  * If you add a new activity that is a system tool, just make sure you set up the system_tool_id column in the
- * hibernate mapping, add the system tool to the constructor and add a line to the createCopy method that copies 
+ * hibernate mapping, add the system tool to the constructor and add a line to the createCopy method that copies
  * the system tool field.
  *
  */
 public interface ISystemToolActivity {
 
-	public SystemTool getSystemTool();
+    public SystemTool getSystemTool();
 
-	public void setSystemTool(SystemTool systemTool); 
+    public void setSystemTool(SystemTool systemTool);
 
 }

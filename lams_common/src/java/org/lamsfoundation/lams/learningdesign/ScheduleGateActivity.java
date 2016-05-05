@@ -2,21 +2,21 @@
  * Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
  * =============================================================
  * License Information: http://lamsfoundation.org/licensing/lams/2.0/
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License version 2.0 
+ * it under the terms of the GNU General Public License version 2.0
  * as published by the Free Software Foundation.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301
  * USA
- * 
+ *
  * http://www.gnu.org/licenses/gpl.txt
  * ****************************************************************
  */
@@ -42,15 +42,15 @@ import org.lamsfoundation.lams.util.MessageService;
  * The hibernate object that wraps the information to schedule a gate in the sequence engine. The schedule gate is
  * defined either by offset to the lesson start time or by the absolute time set by the teacher.
  * <p>
- * 
+ *
  * <p>
  * Interms of gate level, schedule gate only cares about class level at the moment. we leaves the complexity of apply
  * schdule gate to group and individual level to the future release.
  * </p>
- * 
+ *
  * @author Chris Perfect
  * @author Jacky Fang
- * 
+ *
  *
  */
 public class ScheduleGateActivity extends GateActivity implements Serializable {
@@ -66,7 +66,7 @@ public class ScheduleGateActivity extends GateActivity implements Serializable {
      * The relative time that gate will be closed from the lesson start time. For example, if the lesson starts at
      * 3:00pm and offset is 2, the gate will be closed at 5:00pm.
      * </p>
-     * 
+     *
      * Note it must be larger than <code>gateStartTimeOffset</code>.
      */
     private Long gateEndTimeOffset;
@@ -122,7 +122,7 @@ public class ScheduleGateActivity extends GateActivity implements Serializable {
 
     /**
      * Makes a copy of the ScheduleGateActivity for authoring, preview and monitoring enviornment
-     * 
+     *
      * @return ScheduleGateActivity Returns a deep-copy of the originalActivity
      */
     @Override
@@ -172,19 +172,19 @@ public class ScheduleGateActivity extends GateActivity implements Serializable {
      * <p>
      * Returns the gate open time for a particular lesson according to the s ettings done by the author.
      * </p>
-     * 
+     *
      * <p>
      * If the gate is scheduled against time offset and the scheduler has never run this gate before, the lesson gate
      * open time will be the lesson start time plus the time offset. Otherwise, the lesson gate open time will be the
      * same as start time.
      * </p>
-     * 
+     *
      * <b>Note:</b> the time will also be translated against server timezone.
-     * 
+     *
      * @param referenceTime
      *            the start time of the lesson. this should be the server local time. the UTC time is only used for
      *            persistent.
-     * 
+     *
      * @return the server local date time that the gate will be opened.
      */
     public Date getGateOpenTime(Date referenceTime) {
@@ -202,16 +202,16 @@ public class ScheduleGateActivity extends GateActivity implements Serializable {
      * <p>
      * Returns the real gate close time for a particular lesson according to the settings done by the author.
      * </p>
-     * 
+     *
      * <p>
      * If the gate is scheduled against time offset, the lesson gate close time will be the lesson start time plus the
      * time offset. Otherwise, the lesson gate open time will be the same as close time.
      * </p>
-     * 
+     *
      * <b>Note:</b> the time will also be translated against proper timezone.
-     * 
+     *
      * @param referenceTime
-     * 
+     *
      * @return the date time that the gate will be closed.
      */
     public Date getGateCloseTime(Date referenceTime) {
@@ -240,7 +240,7 @@ public class ScheduleGateActivity extends GateActivity implements Serializable {
 
     /**
      * Validate schedule gate activity (offset conditions)
-     * 
+     *
      * @return error message key
      */
     @SuppressWarnings({ "rawtypes", "unchecked" })
@@ -264,7 +264,7 @@ public class ScheduleGateActivity extends GateActivity implements Serializable {
 
     /**
      * Helper method that determines the way of sheduling gate.
-     * 
+     *
      * @return is the gate scheduled by time offset
      */
     private boolean isScheduledByTimeOffset() {
@@ -273,7 +273,7 @@ public class ScheduleGateActivity extends GateActivity implements Serializable {
 
     /**
      * Helper method that determines way of scheduling a gate.
-     * 
+     *
      * @return is the gate scheduled by start time offset
      */
     private boolean isScheduledByStartTimeOffset() {
@@ -282,7 +282,7 @@ public class ScheduleGateActivity extends GateActivity implements Serializable {
 
     /**
      * Helper method that determines way of scheduling a gate.
-     * 
+     *
      * @return is the gate scheduled by start time offset
      */
     private boolean isScheduledByEndTimeOffset() {

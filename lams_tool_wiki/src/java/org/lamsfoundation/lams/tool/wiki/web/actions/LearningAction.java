@@ -2,21 +2,21 @@
  * Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
  * =============================================================
  * License Information: http://lamsfoundation.org/licensing/lams/2.0/
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301
  * USA
- * 
+ *
  * http://www.gnu.org/licenses/gpl.txt
  * ****************************************************************
  */
@@ -36,7 +36,6 @@ import org.apache.log4j.Logger;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
-import org.lamsfoundation.lams.events.IEventNotificationService;
 import org.lamsfoundation.lams.learning.web.util.LearningWebUtil;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.notebook.service.CoreNotebookConstants;
@@ -66,14 +65,14 @@ import org.lamsfoundation.lams.web.util.AttributeNames;
 /**
  * This action handles all the learning actions, which include opening learner,
  * relection, going to the next activity, and all the wikipage actions
- * 
+ *
  * It inherits from the WikiPageAction which inherits from the
  * LamsDispatchAction so that common actions can be used in learner, monitor and
  * author
- * 
+ *
  * @author lfoxton
  * @version
- * 
+ *
  *
  *
  *
@@ -94,6 +93,7 @@ public class LearningAction extends WikiPageAction {
      * unspecified loads the learner window with the current wiki page as well
      * as setting all the advanced options and user-specifice info
      */
+    @Override
     protected ActionForward unspecified(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) throws Exception {
 
@@ -137,9 +137,9 @@ public class LearningAction extends WikiPageAction {
 	    wiki.setContentInUse(new Boolean(true));
 	    wikiService.saveOrUpdateWiki(wiki);
 	}
-	
-	LearningWebUtil.putActivityPositionInRequestByToolSessionId(toolSessionID, request, getServlet()
-		.getServletContext());
+
+	LearningWebUtil.putActivityPositionInRequestByToolSessionId(toolSessionID, request,
+		getServlet().getServletContext());
 
 	// get the user
 	WikiUser wikiUser;
@@ -160,19 +160,19 @@ public class LearningAction extends WikiPageAction {
 		wikiUserDTO.setNotebookEntry(notebookEntry.getEntry());
 	    }
 	}
-	
+
 	// Set whether the user has enabled notifications
-	if (wikiService.getEventNotificationService().eventExists(WikiConstants.TOOL_SIGNATURE, WikiConstants.EVENT_NOTIFY_LEARNERS,
-		toolSessionID)
-		&& wikiService.getEventNotificationService().isSubscribed(WikiConstants.TOOL_SIGNATURE, WikiConstants.EVENT_NOTIFY_LEARNERS,
-			toolSessionID, wikiUser.getUserId().longValue())) {
-	    
+	if (wikiService.getEventNotificationService().eventExists(WikiConstants.TOOL_SIGNATURE,
+		WikiConstants.EVENT_NOTIFY_LEARNERS, toolSessionID)
+		&& wikiService.getEventNotificationService().isSubscribed(WikiConstants.TOOL_SIGNATURE,
+			WikiConstants.EVENT_NOTIFY_LEARNERS, toolSessionID, wikiUser.getUserId().longValue())) {
+
 	    wikiUserDTO.setNotificationEnabled(true);
 	}
-	
+
 	// add the userDTO to attributes
 	request.setAttribute(WikiConstants.ATTR_USER_DTO, wikiUserDTO);
-	
+
 	// Set whether user has reached maximum edits
 	int maxEdits = wiki.getMaximumEdits();
 	Boolean maxEditsReached = (maxEdits != 0 && wikiUser.getWikiEdits() >= maxEdits);
@@ -230,6 +230,7 @@ public class LearningAction extends WikiPageAction {
      * Wrapper method to make sure that the correct wiki is returned to from the
      * WikiPageAction class
      */
+    @Override
     protected ActionForward returnToWiki(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response, Long currentWikiPageId) throws Exception {
 	LearningForm learnForm = (LearningForm) form;
@@ -239,9 +240,10 @@ public class LearningAction extends WikiPageAction {
 
     /**
      * Gets the current user by toolSessionId
-     * 
+     *
      * @param toolSessionId
      */
+    @Override
     protected WikiUser getCurrentUser(Long toolSessionId) {
 	UserDTO user = (UserDTO) SessionManager.getSession().getAttribute(AttributeNames.USER);
 
@@ -260,7 +262,7 @@ public class LearningAction extends WikiPageAction {
     /**
      * Finish the activity, we dont need to save anything here, as that is done
      * by the wikipage actions
-     * 
+     *
      * @param mapping
      * @param form
      * @param request
@@ -301,7 +303,7 @@ public class LearningAction extends WikiPageAction {
 
     /**
      * Opens the notebook page for reflections
-     * 
+     *
      * @param mapping
      * @param form
      * @param request
@@ -325,16 +327,16 @@ public class LearningAction extends WikiPageAction {
 	if (notebookEntry != null) {
 	    lrnForm.setEntryText(notebookEntry.getEntry());
 	}
-	
-	LearningWebUtil.putActivityPositionInRequestByToolSessionId(lrnForm.getToolSessionID(), request, getServlet()
-		.getServletContext());
-	
+
+	LearningWebUtil.putActivityPositionInRequestByToolSessionId(lrnForm.getToolSessionID(), request,
+		getServlet().getServletContext());
+
 	return mapping.findForward("notebook");
     }
 
     /**
      * Submit reflections
-     * 
+     *
      * @param mapping
      * @param form
      * @param request

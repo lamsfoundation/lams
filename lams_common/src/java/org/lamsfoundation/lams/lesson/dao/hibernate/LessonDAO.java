@@ -2,21 +2,21 @@
  * Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
  * =============================================================
  * License Information: http://lamsfoundation.org/licensing/lams/2.0/
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License version 2.0 
+ * it under the terms of the GNU General Public License version 2.0
  * as published by the Free Software Foundation.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301
  * USA
- * 
+ *
  * http://www.gnu.org/licenses/gpl.txt
  * ****************************************************************
  */
@@ -44,7 +44,7 @@ import org.springframework.stereotype.Repository;
 
 /**
  * Hibernate implementation of ILessonDAO
- * 
+ *
  * @author chris
  */
 @Repository
@@ -84,7 +84,7 @@ public class LessonDAO extends LAMSBaseDAO implements ILessonDAO {
 
     /**
      * Retrieves the Lesson. Used in instances where it cannot be lazy loaded so it forces an initialize.
-     * 
+     *
      * @param lessonId
      *            identifies the lesson to get
      * @return the lesson
@@ -104,7 +104,7 @@ public class LessonDAO extends LAMSBaseDAO implements ILessonDAO {
 
     /**
      * Gets all lessons that are active for a learner.
-     * 
+     *
      * @param learner
      *            a User that identifies the learner.
      * @return a List with all active lessons in it.
@@ -185,7 +185,7 @@ public class LessonDAO extends LAMSBaseDAO implements ILessonDAO {
 
     /**
      * Saves or Updates a Lesson.
-     * 
+     *
      * @param lesson
      */
     @Override
@@ -195,7 +195,7 @@ public class LessonDAO extends LAMSBaseDAO implements ILessonDAO {
 
     /**
      * Deletes a Lesson <b>permanently</b>.
-     * 
+     *
      * @param lesson
      */
     @Override
@@ -205,7 +205,7 @@ public class LessonDAO extends LAMSBaseDAO implements ILessonDAO {
 
     /**
      * Update the lesson data
-     * 
+     *
      * @see org.lamsfoundation.lams.lesson.dao.ILessonDAO#updateLesson(org.lamsfoundation.lams.lesson.Lesson)
      */
     @Override
@@ -216,7 +216,7 @@ public class LessonDAO extends LAMSBaseDAO implements ILessonDAO {
     /**
      * Returns the list of available Lessons created by a given user. Does not return disabled lessons or preview
      * lessons.
-     * 
+     *
      * @param userID
      *            The user_id of the user
      * @return List The list of Lessons for the given user
@@ -229,7 +229,7 @@ public class LessonDAO extends LAMSBaseDAO implements ILessonDAO {
 
     /**
      * Get all the preview lessons more with the creation date before the given date.
-     * 
+     *
      * @param startDate
      *            UTC date
      * @return the list of Lessons

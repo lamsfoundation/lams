@@ -1,26 +1,26 @@
-/**************************************************************** 
- * Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org) 
- * ============================================================= 
- * License Information: http://lamsfoundation.org/licensing/lams/2.0/ 
- * 
- * This program is free software; you can redistribute it and/or modify 
- * it under the terms of the GNU General Public License version 2.0 
- * as published by the Free Software Foundation. 
- * 
- * This program is distributed in the hope that it will be useful, 
- * but WITHOUT ANY WARRANTY; without even the implied warranty of 
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the 
- * GNU General Public License for more details. 
- * 
- * You should have received a copy of the GNU General Public License 
- * along with this program; if not, write to the Free Software 
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 * USA 
- * 
- * http://www.gnu.org/licenses/gpl.txt 
- * **************************************************************** 
- */  
- 
-/* $Id$ */  
+/****************************************************************
+ * Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
+ * =============================================================
+ * License Information: http://lamsfoundation.org/licensing/lams/2.0/
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License version 2.0
+ * as published by the Free Software Foundation.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 * USA
+ *
+ * http://www.gnu.org/licenses/gpl.txt
+ * ****************************************************************
+ */
+
+/* $Id$ */
 package org.lamsfoundation.lams.timezone.dto;
 
 import java.util.Date;
@@ -28,12 +28,12 @@ import java.util.TimeZone;
 
 /**
  * DTO object for {@link org.lamsfoundation.lams.timezone.Timezone}
- * 
+ *
  * @author Andrey Balan
  *
  */
 public class TimezoneDTO {
-    
+
     /**
      * timezone id.
      */
@@ -55,13 +55,13 @@ public class TimezoneDTO {
      */
     private String displayName;
     /**
-     * If this timezone is selected.  
+     * If this timezone is selected.
      */
     private boolean selected;
-    
+
     /**
      * Returns new <code>Timezone</code> object with populated values.
-     * 
+     *
      * @param timeZone
      * @param selected
      * @return
@@ -72,52 +72,57 @@ public class TimezoneDTO {
 	int timeZoneRawOffset = timeZone.getRawOffset();
 	timezoneDTO.rawOffset = new Date(Math.abs(timeZoneRawOffset));
 	timezoneDTO.isRawOffsetNegative = timeZoneRawOffset < 0;
-	timezoneDTO.dstOffset = (int) timeZone.getDSTSavings() /60000;
+	timezoneDTO.dstOffset = timeZone.getDSTSavings() / 60000;
 	timezoneDTO.displayName = timeZone.getDisplayName();
-	timezoneDTO.selected = selected;	
+	timezoneDTO.selected = selected;
 	return timezoneDTO;
     }
 
     public String getTimeZoneId() {
 	return timeZoneId;
     }
+
     public void setTimeZoneId(String timeZoneId) {
 	this.timeZoneId = timeZoneId;
     }
-    
+
     public String getDisplayName() {
 	return displayName;
     }
+
     public void setDisplayName(String displayName) {
 	this.displayName = displayName;
-    }    
+    }
 
     public boolean isSelected() {
 	return selected;
     }
+
     public void setSelected(boolean selected) {
 	this.selected = selected;
     }
-    
+
     public Date getRawOffset() {
-        return rawOffset;
+	return rawOffset;
     }
+
     public void setRawOffset(Date rawOffset) {
-        this.rawOffset = rawOffset;
+	this.rawOffset = rawOffset;
     }
 
     public boolean isRawOffsetNegative() {
-        return isRawOffsetNegative;
+	return isRawOffsetNegative;
     }
+
     public void setRawOffsetNegative(boolean isRawOffsetNegative) {
-        this.isRawOffsetNegative = isRawOffsetNegative;
+	this.isRawOffsetNegative = isRawOffsetNegative;
     }
 
     public int getDstOffset() {
-        return dstOffset;
+	return dstOffset;
     }
-    public void setDstOffset(int dstOffset) {
-        this.dstOffset = dstOffset;
-    }    
-}
 
+    public void setDstOffset(int dstOffset) {
+	this.dstOffset = dstOffset;
+    }
+}

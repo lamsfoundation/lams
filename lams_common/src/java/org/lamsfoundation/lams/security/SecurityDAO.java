@@ -63,8 +63,7 @@ public class SecurityDAO extends LAMSBaseDAO implements ISecurityDAO {
     /**
      * Checks if user has a global role of SYSADMIN.
      */
-    private static final String CHECK_SYSADMIN = "FROM "
-	    + UserOrganisation.class.getName()
+    private static final String CHECK_SYSADMIN = "FROM " + UserOrganisation.class.getName()
 	    + " AS userOrganisation INNER JOIN userOrganisation.userOrganisationRoles AS userOrganisationRole "
 	    + "WHERE userOrganisation.organisation.organisationType.organisationTypeId = 1 AND userOrganisation.user.userId = ? "
 	    + "AND userOrganisationRole.role.name = '" + Role.SYSADMIN + "'";
@@ -77,8 +76,7 @@ public class SecurityDAO extends LAMSBaseDAO implements ISecurityDAO {
 
     @Override
     public boolean hasOrgRole(Integer orgId, Integer userId, String... roles) {
-	Query query = getSession()
-		.createQuery(SecurityDAO.CHECK_ORG_ROLE);
+	Query query = getSession().createQuery(SecurityDAO.CHECK_ORG_ROLE);
 	query.setParameter("orgId", orgId);
 	query.setParameter("userId", userId);
 	query.setParameterList("roles", roles);
@@ -99,8 +97,7 @@ public class SecurityDAO extends LAMSBaseDAO implements ISecurityDAO {
 
     @Override
     public boolean isLessonLearner(Long lessonId, Integer userId) {
-	SQLQuery query = getSession()
-		.createSQLQuery(SecurityDAO.CHECK_LESSON_LEARNER);
+	SQLQuery query = getSession().createSQLQuery(SecurityDAO.CHECK_LESSON_LEARNER);
 	query.setLong(0, lessonId);
 	query.setInteger(1, userId);
 	return !query.list().isEmpty();
@@ -108,8 +105,7 @@ public class SecurityDAO extends LAMSBaseDAO implements ISecurityDAO {
 
     @Override
     public boolean isLessonMonitor(Long lessonId, Integer userId, boolean ownerAccepted) {
-	boolean result = !doFind(SecurityDAO.CHECK_LESSON_MONITOR,
-		new Object[] { lessonId, userId }).isEmpty();
+	boolean result = !doFind(SecurityDAO.CHECK_LESSON_MONITOR, new Object[] { lessonId, userId }).isEmpty();
 	Lesson lesson = null;
 	if (!result && ownerAccepted) {
 	    lesson = (Lesson) find(Lesson.class, lessonId);

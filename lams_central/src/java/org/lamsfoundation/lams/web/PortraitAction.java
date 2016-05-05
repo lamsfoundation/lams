@@ -43,34 +43,34 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
  *
  *
  *
- * 
+ *
  *
  */
 public class PortraitAction extends Action {
-	
-	private static Logger log = Logger.getLogger(PortraitAction.class);
-	private static IUserManagementService service;
-	
-	public ActionForward execute(ActionMapping mapping,
-            ActionForm form,
-            HttpServletRequest request,
-            HttpServletResponse response) throws Exception {
-	
-		PortraitActionForm portraitForm = (PortraitActionForm)form;
-		Long portraitUuid = (Long)getService().getUserByLogin(request.getRemoteUser()).getPortraitUuid();
-		log.debug("using portraitUuid="+portraitUuid);
-		// if no portrait has been uploaded, set the uuid to 0
-		portraitForm.setPortraitUuid(portraitUuid==null?0:portraitUuid);
-		request.setAttribute("tab", "profile");
-		return mapping.findForward("portrait");
+
+    private static Logger log = Logger.getLogger(PortraitAction.class);
+    private static IUserManagementService service;
+
+    @Override
+    public ActionForward execute(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+	    HttpServletResponse response) throws Exception {
+
+	PortraitActionForm portraitForm = (PortraitActionForm) form;
+	Long portraitUuid = getService().getUserByLogin(request.getRemoteUser()).getPortraitUuid();
+	log.debug("using portraitUuid=" + portraitUuid);
+	// if no portrait has been uploaded, set the uuid to 0
+	portraitForm.setPortraitUuid(portraitUuid == null ? 0 : portraitUuid);
+	request.setAttribute("tab", "profile");
+	return mapping.findForward("portrait");
+    }
+
+    private IUserManagementService getService() {
+	if (service == null) {
+	    WebApplicationContext ctx = WebApplicationContextUtils
+		    .getRequiredWebApplicationContext(getServlet().getServletContext());
+	    service = (IUserManagementService) ctx.getBean("userManagementService");
 	}
-	
-	private IUserManagementService getService(){
-		if(service==null){
-			WebApplicationContext ctx = WebApplicationContextUtils.getRequiredWebApplicationContext(getServlet().getServletContext());
-			service = (IUserManagementService) ctx.getBean("userManagementService");
-		}
-		return service;
-	}
+	return service;
+    }
 
 }

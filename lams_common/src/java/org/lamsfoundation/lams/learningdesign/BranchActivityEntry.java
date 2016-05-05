@@ -34,11 +34,11 @@ import org.lamsfoundation.lams.learningdesign.dto.ToolOutputGateActivityEntryDTO
 /**
  * Models the relationship between a group and a branch for Chosen or Group based branching. Links the group to the
  * sequence activity that makes up a branch within a branching activity.
- * 
+ *
  * Models the relationship between a group and a branch for Tool Output Based branching. Links the condition that
  * controls the set of users that access the sequence activity that makes up a branch within a branching activity. From
  * the condition, a group can be created and populated.
- * 
+ *
  * @author Fiona Malikoff
  * @version 2.1
  */
@@ -115,7 +115,8 @@ public class BranchActivityEntry {
 	return branchSequenceActivity;
     }
 
-    public void setBranchSequenceActivity(org.lamsfoundation.lams.learningdesign.SequenceActivity branchSequenceActivity) {
+    public void setBranchSequenceActivity(
+	    org.lamsfoundation.lams.learningdesign.SequenceActivity branchSequenceActivity) {
 	this.branchSequenceActivity = branchSequenceActivity;
     }
 
@@ -183,8 +184,8 @@ public class BranchActivityEntry {
 	    return false;
 	}
 	BranchActivityEntry castOther = (BranchActivityEntry) other;
-	return new EqualsBuilder().append(this.getEntryId(), castOther.getEntryId()).append(this.getEntryUIID(),
-		castOther.getEntryUIID()).isEquals();
+	return new EqualsBuilder().append(this.getEntryId(), castOther.getEntryId())
+		.append(this.getEntryUIID(), castOther.getEntryUIID()).isEquals();
     }
 
     @Override
@@ -194,15 +195,16 @@ public class BranchActivityEntry {
 
     public int compareTo(Object other) {
 	BranchActivityEntry castOther = (BranchActivityEntry) other;
-	return new CompareToBuilder().append(this.getEntryId(), castOther.getEntryId()).append(this.getEntryUIID(),
-		castOther.getEntryUIID()).toComparison();
+	return new CompareToBuilder().append(this.getEntryId(), castOther.getEntryId())
+		.append(this.getEntryUIID(), castOther.getEntryUIID()).toComparison();
     }
 
     @Override
     public String toString() {
-	return new ToStringBuilder(this).append("entryId", getEntryId()).append("entryUIID", getEntryUIID()).append(
-		"group", getGroup() != null ? getGroup().getGroupId().toString() : "").append("sequence activity",
-		getBranchSequenceActivity() != null ? getBranchSequenceActivity().getActivityId().toString() : "")
+	return new ToStringBuilder(this).append("entryId", getEntryId()).append("entryUIID", getEntryUIID())
+		.append("group", getGroup() != null ? getGroup().getGroupId().toString() : "")
+		.append("sequence activity", getBranchSequenceActivity() != null
+			? getBranchSequenceActivity().getActivityId().toString() : "")
 		.toString();
     }
 

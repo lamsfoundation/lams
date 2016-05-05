@@ -2,21 +2,21 @@
  * Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
  * =============================================================
  * License Information: http://lamsfoundation.org/licensing/lams/2.0/
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License version 2.0 
+ * it under the terms of the GNU General Public License version 2.0
  * as published by the Free Software Foundation.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301
  * USA
- * 
+ *
  * http://www.gnu.org/licenses/gpl.txt
  * ****************************************************************
  */
@@ -79,7 +79,7 @@ import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 
 /**
- * 
+ *
  * @author Andrey Balan
  */
 public class LearningAction extends Action {
@@ -137,7 +137,7 @@ public class LearningAction extends Action {
      * Read imageGallery data from database and put them into HttpSession. It will redirect to init.do directly after
      * this method run successfully. This method will avoid read database again and lost un-saved resouce item lost when
      * user "refresh page",
-     * 
+     *
      */
     private ActionForward start(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) {
@@ -262,7 +262,7 @@ public class LearningAction extends Action {
 
     /**
      * Finish learning session.
-     * 
+     *
      * @param mapping
      * @param form
      * @param request
@@ -299,7 +299,7 @@ public class LearningAction extends Action {
 
     /**
      * Initial page for add imageGallery item (single file or URL).
-     * 
+     *
      * @param mapping
      * @param form
      * @param request
@@ -310,7 +310,7 @@ public class LearningAction extends Action {
 	    HttpServletResponse response) {
 	String sessionMapID = WebUtil.readStrParam(request, ImageGalleryConstants.ATTR_SESSION_MAP_ID);
 	request.setAttribute(ImageGalleryConstants.ATTR_SESSION_MAP_ID, sessionMapID);
-	
+
 	ImageGalleryItemForm itemForm = (ImageGalleryItemForm) form;
 	itemForm.setSessionMapID(sessionMapID);
 	return mapping.findForward(ImageGalleryConstants.SUCCESS);
@@ -318,7 +318,7 @@ public class LearningAction extends Action {
 
     /**
      * Save file or url imageGallery item into database.
-     * 
+     *
      * @param mapping
      * @param form
      * @param request
@@ -339,8 +339,8 @@ public class LearningAction extends Action {
 	    extractFormToImageGalleryItem(request, itemForm);
 	} catch (Exception e) {
 	    // any upload exception will display as normal error message rather then throw exception directly
-	    errors.add(ActionMessages.GLOBAL_MESSAGE, new ActionMessage(ImageGalleryConstants.ERROR_MSG_UPLOAD_FAILED,
-		    e.getMessage()));
+	    errors.add(ActionMessages.GLOBAL_MESSAGE,
+		    new ActionMessage(ImageGalleryConstants.ERROR_MSG_UPLOAD_FAILED, e.getMessage()));
 	    if (!errors.isEmpty()) {
 		this.addErrors(request, errors);
 		return mapping.findForward("image");
@@ -360,7 +360,7 @@ public class LearningAction extends Action {
 
     /**
      * Initial page for add imageGallery item (single file or URL).
-     * 
+     *
      * @param mapping
      * @param form
      * @param request
@@ -371,7 +371,7 @@ public class LearningAction extends Action {
 	    HttpServletResponse response) {
 	String sessionMapID = WebUtil.readStrParam(request, ImageGalleryConstants.ATTR_SESSION_MAP_ID);
 	request.setAttribute(ImageGalleryConstants.ATTR_SESSION_MAP_ID, sessionMapID);
-	
+
 	MultipleImagesForm multipleForm = (MultipleImagesForm) form;
 	multipleForm.setSessionMapID(sessionMapID);
 	return mapping.findForward(ImageGalleryConstants.SUCCESS);
@@ -379,7 +379,7 @@ public class LearningAction extends Action {
 
     /**
      * Save file or url imageGallery item into database.
-     * 
+     *
      * @param mapping
      * @param form
      * @param request
@@ -400,8 +400,8 @@ public class LearningAction extends Action {
 	    extractMultipleFormToImageGalleryItems(request, multipleForm);
 	} catch (Exception e) {
 	    // any upload exception will display as normal error message rather then throw exception directly
-	    errors.add(ActionMessages.GLOBAL_MESSAGE, new ActionMessage(ImageGalleryConstants.ERROR_MSG_UPLOAD_FAILED,
-		    e.getMessage()));
+	    errors.add(ActionMessages.GLOBAL_MESSAGE,
+		    new ActionMessage(ImageGalleryConstants.ERROR_MSG_UPLOAD_FAILED, e.getMessage()));
 	    if (!errors.isEmpty()) {
 		this.addErrors(request, errors);
 		return mapping.findForward("images");
@@ -421,7 +421,7 @@ public class LearningAction extends Action {
 
     /**
      * Save file or url imageGallery item into database.
-     * 
+     *
      * @param mapping
      * @param form
      * @param request
@@ -450,7 +450,7 @@ public class LearningAction extends Action {
 
     /**
      * Sets Image data to session variable, to be shown on main learning page.
-     * 
+     *
      * @param mapping
      * @param form
      * @param request
@@ -461,7 +461,8 @@ public class LearningAction extends Action {
 	    HttpServletResponse response) {
 	// get back sessionMAP
 	String sessionMapID = WebUtil.readStrParam(request, ImageGalleryConstants.ATTR_SESSION_MAP_ID);
-	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession().getAttribute(sessionMapID);
+	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
+		.getAttribute(sessionMapID);
 	IImageGalleryService service = getImageGalleryService();
 	ImageGallery imageGallery = (ImageGallery) sessionMap.get(ImageGalleryConstants.ATTR_IMAGE_GALLERY);
 	Long userId = ((Integer) sessionMap.get(AttributeNames.PARAM_USER_ID)).longValue();
@@ -478,13 +479,13 @@ public class LearningAction extends Action {
 	if (createdBy != null) {
 	    image.getCreateBy().getLoginName();
 	}
-	
+
 	//handle rating criterias
 	int commentsMinWordsLimit = 0;
 	boolean isCommentsEnabled = false;
 	int countRatedImages = 0;
 	if (imageGallery.isAllowRank()) {
-	    
+
 	    ItemRatingDTO itemRatingDto = service.getRatingCriteriaDtos(imageGallery.getContentId(), imageUid, userId);
 	    sessionMap.put(AttributeNames.ATTR_ITEM_RATING_DTO, itemRatingDto);
 
@@ -518,7 +519,7 @@ public class LearningAction extends Action {
 
     /**
      * Move down current item.
-     * 
+     *
      * @param mapping
      * @param form
      * @param request
@@ -554,7 +555,7 @@ public class LearningAction extends Action {
 
     /**
      * Display empty reflection form.
-     * 
+     *
      * @param mapping
      * @param form
      * @param request
@@ -591,7 +592,7 @@ public class LearningAction extends Action {
 
     /**
      * Submit reflection form input database.
-     * 
+     *
      * @param mapping
      * @param form
      * @param request
@@ -631,8 +632,8 @@ public class LearningAction extends Action {
     // Private methods
     // *************************************************************************************
     private IImageGalleryService getImageGalleryService() {
-	WebApplicationContext wac = WebApplicationContextUtils.getRequiredWebApplicationContext(getServlet()
-		.getServletContext());
+	WebApplicationContext wac = WebApplicationContextUtils
+		.getRequiredWebApplicationContext(getServlet().getServletContext());
 	return (IImageGalleryService) wac.getBean(ImageGalleryConstants.IMAGE_GALLERY_SERVICE);
     }
 
@@ -664,7 +665,7 @@ public class LearningAction extends Action {
 
     /**
      * Extract web form content to imageGallery item.
-     * 
+     *
      * @param request
      * @param imageForm
      * @throws ImageGalleryException
@@ -731,7 +732,7 @@ public class LearningAction extends Action {
 
     /**
      * Extract web form content to imageGallery items.
-     * 
+     *
      * @param request
      * @param multipleForm
      * @throws ImageGalleryException
@@ -752,7 +753,7 @@ public class LearningAction extends Action {
 
     /**
      * Validate imageGallery item.
-     * 
+     *
      * @param itemForm
      * @return
      */
@@ -770,8 +771,8 @@ public class LearningAction extends Action {
 	if (itemForm.getFile() != null) {
 	    String contentType = itemForm.getFile().getContentType();
 	    if (isContentTypeForbidden(contentType)) {
-		errors.add(ActionMessages.GLOBAL_MESSAGE, new ActionMessage(
-			ImageGalleryConstants.ERROR_MSG_NOT_ALLOWED_FORMAT));
+		errors.add(ActionMessages.GLOBAL_MESSAGE,
+			new ActionMessage(ImageGalleryConstants.ERROR_MSG_NOT_ALLOWED_FORMAT));
 	    }
 	}
 
@@ -780,7 +781,7 @@ public class LearningAction extends Action {
 
     /**
      * Validate imageGallery items.
-     * 
+     *
      * @param multipleForm
      * @return
      */
@@ -796,8 +797,8 @@ public class LearningAction extends Action {
 	    // check for allowed format : gif, png, jpg
 	    String contentType = file.getContentType();
 	    if (isContentTypeForbidden(contentType)) {
-		errors.add(ActionMessages.GLOBAL_MESSAGE, new ActionMessage(
-			ImageGalleryConstants.ERROR_MSG_NOT_ALLOWED_FORMAT_FOR, file.getFileName()));
+		errors.add(ActionMessages.GLOBAL_MESSAGE,
+			new ActionMessage(ImageGalleryConstants.ERROR_MSG_NOT_ALLOWED_FORMAT_FOR, file.getFileName()));
 	    }
 	}
 
@@ -806,7 +807,7 @@ public class LearningAction extends Action {
 
     /**
      * Create file list from multiple form.
-     * 
+     *
      * @param multipleForm
      * @return
      */
@@ -834,15 +835,14 @@ public class LearningAction extends Action {
 
     /**
      * Checks if the format is allowed.
-     * 
+     *
      * @param contentType
      * @return
      */
     private boolean isContentTypeForbidden(String contentType) {
-	boolean isContentTypeForbidden = StringUtils.isEmpty(contentType)
-		|| !(contentType.equals("image/gif") || contentType.equals("image/png")
-			|| contentType.equals("image/jpg") || contentType.equals("image/jpeg") || contentType
-			    .equals("image/pjpeg"));
+	boolean isContentTypeForbidden = StringUtils.isEmpty(contentType) || !(contentType.equals("image/gif")
+		|| contentType.equals("image/png") || contentType.equals("image/jpg")
+		|| contentType.equals("image/jpeg") || contentType.equals("image/pjpeg"));
 
 	return isContentTypeForbidden;
     }

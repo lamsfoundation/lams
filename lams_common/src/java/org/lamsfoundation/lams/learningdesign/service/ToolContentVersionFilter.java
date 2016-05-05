@@ -23,14 +23,14 @@ import org.w3c.dom.NodeList;
  * <li>upXXXToXXX</li>
  * <li>downXXXToXXX</li>
  * </ol>
- * 
+ *
  * The XXX must be integer format, which is Tool version number.
  * <p>
  * For more detail, in
  * <a href="http://wiki.lamsfoundation.org/display/lams/How+to+implement+export+and+import+tool+content">wiki</a>.
- * 
+ *
  * @author Dapeng.Ni
- * 
+ *
  */
 public class ToolContentVersionFilter {
 
@@ -86,7 +86,7 @@ public class ToolContentVersionFilter {
     /**
      * When a field is removed to tool Hibernate POJO class, this method must be call in upXXXToYYY()/downXXXToYYY()
      * methods.
-     * 
+     *
      * @param ownerClass
      * @param fieldname
      */
@@ -97,7 +97,7 @@ public class ToolContentVersionFilter {
     /**
      * When a field is added to tool Hibernate POJO class, this method is optional in upXXXToYYY()/downXXXToYYY()
      * methods. It could set default value for this added fields.
-     * 
+     *
      * @param ownerClass
      * @param fieldname
      */
@@ -108,7 +108,7 @@ public class ToolContentVersionFilter {
     /**
      * When a field is renamed in tool Hibernate POJO class, this method must be call in upXXXToYYY()/downXXXToYYY()
      * methods.
-     * 
+     *
      * @param ownerClass
      * @param fieldname
      */
@@ -118,7 +118,7 @@ public class ToolContentVersionFilter {
 
     /**
      * Call by lams import tool service core. Do not use it in tool version filter class.
-     * 
+     *
      * @param toolFilePath
      * @throws IOException
      */

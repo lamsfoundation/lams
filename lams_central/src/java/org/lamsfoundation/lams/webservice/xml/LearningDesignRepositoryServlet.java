@@ -220,9 +220,9 @@ public class LearningDesignRepositoryServlet extends HttpServlet {
 
     /**
      * The doGet method of the servlet. <br>
-     * 
+     *
      * This method is called when a form has its tag value method equals to get.
-     * 
+     *
      * @param request
      *            the request send by the client to the server
      * @param response
@@ -467,7 +467,7 @@ public class LearningDesignRepositoryServlet extends HttpServlet {
 
     /**
      * Initialization of the servlet. <br>
-     * 
+     *
      * @throws ServletException
      *             if an error occure
      */

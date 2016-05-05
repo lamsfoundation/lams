@@ -2,21 +2,21 @@
  * Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
  * =============================================================
  * License Information: http://lamsfoundation.org/licensing/lams/2.0/
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301
  * USA
- * 
+ *
  * http://www.gnu.org/licenses/gpl.txt
  * ****************************************************************
  */
@@ -29,15 +29,14 @@ import java.util.Iterator;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
-import org.lamsfoundation.lams.contentrepository.NodeKey;
 
 /**
  * Resource
- * 
- * @author Dapeng Ni
- * 
  *
- * 
+ * @author Dapeng Ni
+ *
+ *
+ *
  */
 public class ResourceItem implements Cloneable {
     private static final Logger log = Logger.getLogger(ResourceItem.class);
@@ -82,6 +81,7 @@ public class ResourceItem implements Cloneable {
     // DTO fields:
     private boolean complete;
 
+    @Override
     public Object clone() {
 	ResourceItem obj = null;
 	try {
@@ -97,10 +97,11 @@ public class ResourceItem implements Cloneable {
 		}
 		obj.itemInstructions = set;
 	    }
-	    ((ResourceItem) obj).setUid(null);
+	    obj.setUid(null);
 	    // clone ReourceUser as well
-	    if (this.createBy != null)
-		((ResourceItem) obj).setCreateBy((ResourceUser) this.createBy.clone());
+	    if (this.createBy != null) {
+		obj.setCreateBy((ResourceUser) this.createBy.clone());
+	    }
 
 	} catch (CloneNotSupportedException e) {
 	    log.error("When clone " + ResourceItem.class + " failed");
@@ -130,7 +131,7 @@ public class ResourceItem implements Cloneable {
 
     /**
      *
-     * 
+     *
      * @return
      */
     public Long getFileUuid() {
@@ -243,7 +244,7 @@ public class ResourceItem implements Cloneable {
 
     /**
      *
-     * 
+     *
      * @return
      */
     public ResourceUser getCreateBy() {
@@ -335,17 +336,17 @@ public class ResourceItem implements Cloneable {
     public void setOpenUrlNewWindow(boolean openUrlNewWindow) {
 	this.openUrlNewWindow = openUrlNewWindow;
     }
-    
+
     /**
      *
      * @return
      */
     public Integer getOrderId() {
-        return orderId;
+	return orderId;
     }
 
     public void setOrderId(Integer orderId) {
-        this.orderId = orderId;
+	this.orderId = orderId;
     }
 
     public void setComplete(boolean complete) {

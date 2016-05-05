@@ -18,69 +18,62 @@
  *
  * http://www.gnu.org/licenses/gpl.txt
  * ****************************************************************
- */ 
- 
-/* $Id$ */ 
+ */
+
+/* $Id$ */
 
 package org.lamsfoundation.lams.tool.deploy;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
-public class AddModuleToApplicationXmlTask extends UpdateApplicationXmlTask
-{
-	/** Creates a new instance of AddWebAppToApplicationXmlTask */
-    public AddModuleToApplicationXmlTask()
-    {
+public class AddModuleToApplicationXmlTask extends UpdateApplicationXmlTask {
+    /** Creates a new instance of AddWebAppToApplicationXmlTask */
+    public AddModuleToApplicationXmlTask() {
     }
-    
+
     /**
      * Add the web uri and context root elements to the Application xml
      */
-    protected void updateApplicationXml(Document doc) throws DeployException
-    {
-        Element moduleElement = findElementWithModule(doc);
-        if ( moduleElement != null ) {
-            doc.getDocumentElement().removeChild(moduleElement);
-        }
+    @Override
+    protected void updateApplicationXml(Document doc) throws DeployException {
+	Element moduleElement = findElementWithModule(doc);
+	if (moduleElement != null) {
+	    doc.getDocumentElement().removeChild(moduleElement);
+	}
 
-        //create new module
-        moduleElement = doc.createElement("module");
-        Element javaElement = doc.createElement("java");
-        javaElement.appendChild(doc.createTextNode(module));
-        moduleElement.appendChild(javaElement);
-        
-        doc.getDocumentElement().appendChild(moduleElement);
-        
+	//create new module
+	moduleElement = doc.createElement("module");
+	Element javaElement = doc.createElement("java");
+	javaElement.appendChild(doc.createTextNode(module));
+	moduleElement.appendChild(javaElement);
+
+	doc.getDocumentElement().appendChild(moduleElement);
+
     }
-    
+
     /**
      * Add the given module to the application.xml file
-     * @param args 
+     * 
+     * @param args
      * @throws Exception
      */
-    public static void main(String[] args) throws Exception
-    {
-        
-        if ((args.length < 2) || (args[0] == null))
-        {
-            throw new IllegalArgumentException("Usage: AddModuleToApplicationXmlTask <lams.ear path> <module>");
-        }
-        try
-        {
-            System.out.println("Attempting to update " + args[0] + "/META-INF/application.xml");          
-            AddModuleToApplicationXmlTask addModuleTask =  new AddModuleToApplicationXmlTask();
-            addModuleTask.setLamsEarPath(args[0]);
-            addModuleTask.setModule(args[1]);
-            addModuleTask.execute();
-            System.out.println("application.xml update completed");
-            
-            
-        }
-        catch (Exception ex)
-        {
-            System.out.println("Application.xml update failed: " + ex.getMessage());
-            ex.printStackTrace();
-        }
+    public static void main(String[] args) throws Exception {
+
+	if ((args.length < 2) || (args[0] == null)) {
+	    throw new IllegalArgumentException("Usage: AddModuleToApplicationXmlTask <lams.ear path> <module>");
+	}
+	try {
+	    System.out.println("Attempting to update " + args[0] + "/META-INF/application.xml");
+	    AddModuleToApplicationXmlTask addModuleTask = new AddModuleToApplicationXmlTask();
+	    addModuleTask.setLamsEarPath(args[0]);
+	    addModuleTask.setModule(args[1]);
+	    addModuleTask.execute();
+	    System.out.println("application.xml update completed");
+
+	} catch (Exception ex) {
+	    System.out.println("Application.xml update failed: " + ex.getMessage());
+	    ex.printStackTrace();
+	}
     }
 }

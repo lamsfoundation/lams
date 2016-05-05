@@ -2,21 +2,21 @@
  * Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
  * =============================================================
  * License Information: http://lamsfoundation.org/licensing/lams/2.0/
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License version 2.0
  * as published by the Free Software Foundation.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301
  * USA
- * 
+ *
  * http://www.gnu.org/licenses/gpl.txt
  * ***********************************************************************/
 
@@ -51,14 +51,17 @@ public class VoteSessionDAO extends LAMSBaseDAO implements IVoteSessionDAO {
 
     private static final String COUNT_SESSION_COMPLETE = "from voteSession in class VoteSession where voteSession.sessionStatus='COMPLETE'";
 
+    @Override
     public VoteSession getVoteSessionByUID(Long sessionUid) {
 	return (VoteSession) this.getSession().get(VoteSession.class, sessionUid);
     }
 
+    @Override
     public VoteSession getSessionBySessionId(Long voteSessionId) {
 	String query = "from VoteSession votes where votes.voteSessionId=?";
 
-	List list = getSessionFactory().getCurrentSession().createQuery(query).setLong(0, voteSessionId.longValue()).list();
+	List list = getSessionFactory().getCurrentSession().createQuery(query).setLong(0, voteSessionId.longValue())
+		.list();
 
 	if (list != null && list.size() > 0) {
 	    VoteSession vote = (VoteSession) list.get(0);
@@ -67,34 +70,40 @@ public class VoteSessionDAO extends LAMSBaseDAO implements IVoteSessionDAO {
 	return null;
     }
 
+    @Override
     public int countSessionComplete() {
 	List list = getSessionFactory().getCurrentSession().createQuery(COUNT_SESSION_COMPLETE).list();
 
 	if (list != null && list.size() > 0) {
 	    return list.size();
-	} else
+	} else {
 	    return 0;
+	}
     }
 
+    @Override
     public void saveVoteSession(VoteSession voteSession) {
 	this.getSession().save(voteSession);
     }
 
+    @Override
     public void updateVoteSession(VoteSession voteSession) {
 	getSessionFactory().getCurrentSession().setFlushMode(FlushMode.AUTO);
 	this.getSession().update(voteSession);
     }
 
+    @Override
     public void removeVoteSessionByUID(Long uid) {
 	VoteSession votes = (VoteSession) getSession().get(VoteSession.class, uid);
 	this.getSession().delete(votes);
     }
 
+    @Override
     public void removeVoteSessionById(Long voteSessionId) {
 
 	if (voteSessionId != null) {
-	    List list = getSessionFactory().getCurrentSession().createQuery(FIND_VOTE_SESSION_CONTENT).setLong(0, voteSessionId.longValue())
-		    .list();
+	    List list = getSessionFactory().getCurrentSession().createQuery(FIND_VOTE_SESSION_CONTENT)
+		    .setLong(0, voteSessionId.longValue()).list();
 
 	    if (list != null && list.size() > 0) {
 		VoteSession vote = (VoteSession) list.get(0);
@@ -106,20 +115,24 @@ public class VoteSessionDAO extends LAMSBaseDAO implements IVoteSessionDAO {
 
     }
 
+    @Override
     public void removeVoteSession(VoteSession voteSession) {
 	getSessionFactory().getCurrentSession().setFlushMode(FlushMode.AUTO);
 	this.getSession().delete(voteSession);
     }
 
-	public VoteSession getVoteSessionByUser(final Long userId) {
-		return (VoteSession) getSession().createQuery(LOAD_VOTESESSION_BY_USER).setLong("userId", userId.longValue())
-				.uniqueResult();
-	}
-
-    public void removeVoteUsers(VoteSession voteSession) {
-    	deleteAll(voteSession.getVoteQueUsers());
+    @Override
+    public VoteSession getVoteSessionByUser(final Long userId) {
+	return (VoteSession) getSession().createQuery(LOAD_VOTESESSION_BY_USER).setLong("userId", userId.longValue())
+		.uniqueResult();
     }
 
+    @Override
+    public void removeVoteUsers(VoteSession voteSession) {
+	deleteAll(voteSession.getVoteQueUsers());
+    }
+
+    @Override
     public void addVoteUsers(Long voteSessionId, VoteQueUsr user) {
 	VoteSession session = getSessionBySessionId(voteSessionId);
 	user.setVoteSession(session);
@@ -129,8 +142,10 @@ public class VoteSessionDAO extends LAMSBaseDAO implements IVoteSessionDAO {
 
     }
 
+    @Override
     @SuppressWarnings("unchecked")
     public List<Long> getSessionsFromContent(VoteContent voteContent) {
-	return (List<Long>) (doFindByNamedParam(GET_SESSIONS_FROM_CONTENT, new String[]{"voteContent"}, new Object[]{voteContent}));
+	return (List<Long>) (doFindByNamedParam(GET_SESSIONS_FROM_CONTENT, new String[] { "voteContent" },
+		new Object[] { voteContent }));
     }
 }

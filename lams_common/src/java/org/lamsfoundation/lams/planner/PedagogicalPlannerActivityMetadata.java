@@ -29,7 +29,7 @@ import org.lamsfoundation.lams.learningdesign.ToolActivity;
 
 /**
  * Holds additional information about activities used in Pedagogical Planner only.
- * 
+ *
  * @author Marcin Cieslak
  *
  *
@@ -60,6 +60,7 @@ public class PedagogicalPlannerActivityMetadata implements Serializable, Cloneab
      */
     private String editingAdvice;
 
+    @Override
     public PedagogicalPlannerActivityMetadata clone() {
 	PedagogicalPlannerActivityMetadata plannerMetadata = new PedagogicalPlannerActivityMetadata();
 	plannerMetadata.setCollapsed(this.collapsed);

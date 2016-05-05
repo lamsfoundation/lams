@@ -30,10 +30,11 @@ import org.lamsfoundation.lams.gradebook.dto.GradebookGridRowDTO;
 @SuppressWarnings("unchecked")
 public class GBRowNameComparator implements Comparator {
 
+    @Override
     public int compare(Object gradebookGridRow, Object anotherGradebookGridRow) {
 	if (gradebookGridRow instanceof GradebookGridRowDTO && anotherGradebookGridRow instanceof GradebookGridRowDTO) {
 	    String name1 = ((GradebookGridRowDTO) gradebookGridRow).getRowName().toLowerCase();
-	    String name2 = ((GradebookGridRowDTO) anotherGradebookGridRow).getRowName().toLowerCase();    
+	    String name2 = ((GradebookGridRowDTO) anotherGradebookGridRow).getRowName().toLowerCase();
 	    int ret = name1.compareTo(name2);
 	    return ret;
 	} else {
@@ -41,4 +42,3 @@ public class GBRowNameComparator implements Comparator {
 	}
     }
 }
- 

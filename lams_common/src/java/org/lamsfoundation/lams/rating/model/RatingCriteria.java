@@ -2,25 +2,25 @@
  * Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
  * =============================================================
  * License Information: http://lamsfoundation.org/licensing/lams/2.0/
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License version 2.0 
+ * it under the terms of the GNU General Public License version 2.0
  * as published by the Free Software Foundation.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301
  * USA
- * 
+ *
  * http://www.gnu.org/licenses/gpl.txt
  * ************************************************************************
  */
-/* $Id$ */ 
+/* $Id$ */
 package org.lamsfoundation.lams.rating.model;
 
 import java.io.Serializable;
@@ -47,7 +47,7 @@ public abstract class RatingCriteria implements Serializable, Nullable, Comparab
      * static final variables indicating the type of activities available for a LearningDesign. As new types of
      * activities are added, these constants must be updated, as well as
      * RatingCriteriaDAO.getRatingCriteriaByRatingCriteriaId()
-     * 
+     *
      * OPTIONS_WITH_SEQUENCES_TYPE is set up just to support Flash. The server treads OptionsRatingCriteria and
      * OptionalSequenceRatingCriteria the same.
      */
@@ -82,9 +82,9 @@ public abstract class RatingCriteria implements Serializable, Nullable, Comparab
 
     /** The type of ratingCriteria */
     private Integer ratingCriteriaTypeId;
-    
+
     private boolean commentsEnabled;
-    
+
     private int commentsMinWordsLimit;
 
     // ---------------------------------------------------------------------
@@ -121,19 +121,19 @@ public abstract class RatingCriteria implements Serializable, Nullable, Comparab
 	// also default to a sensible category type
 	RatingCriteria ratingCriteria = null;
 	switch (ratingCriteriaType) {
-	case TOOL_ACTIVITY_CRITERIA_TYPE:
-	    ratingCriteria = new ToolActivityRatingCriteria();
-	    break;
-	case AUTHORED_ITEM_CRITERIA_TYPE:
-	    ratingCriteria = new AuthoredItemRatingCriteria();
-	    break;	    
-	case LEARNER_ITEM_CRITERIA_TYPE:
-	    ratingCriteria = new LearnerItemRatingCriteria();
-	    break;
-	case LESSON_CRITERIA_TYPE:
-	default:	    
-	    ratingCriteria = new LessonRatingCriteria();
-	    break;
+	    case TOOL_ACTIVITY_CRITERIA_TYPE:
+		ratingCriteria = new ToolActivityRatingCriteria();
+		break;
+	    case AUTHORED_ITEM_CRITERIA_TYPE:
+		ratingCriteria = new AuthoredItemRatingCriteria();
+		break;
+	    case LEARNER_ITEM_CRITERIA_TYPE:
+		ratingCriteria = new LearnerItemRatingCriteria();
+		break;
+	    case LESSON_CRITERIA_TYPE:
+	    default:
+		ratingCriteria = new LessonRatingCriteria();
+		break;
 	}
 	ratingCriteria.setRatingCriteriaTypeId(new Integer(ratingCriteriaType));
 	return ratingCriteria;
@@ -173,7 +173,7 @@ public abstract class RatingCriteria implements Serializable, Nullable, Comparab
     public void setRatingCriteriaTypeId(Integer ratingCriteriaTypeId) {
 	this.ratingCriteriaTypeId = ratingCriteriaTypeId;
     }
-    
+
     public boolean isCommentsEnabled() {
 	return commentsEnabled;
     }
@@ -181,7 +181,7 @@ public abstract class RatingCriteria implements Serializable, Nullable, Comparab
     public void setCommentsEnabled(boolean commentsEnabled) {
 	this.commentsEnabled = commentsEnabled;
     }
-    
+
     public int getCommentsMinWordsLimit() {
 	return commentsMinWordsLimit;
     }
@@ -204,8 +204,7 @@ public abstract class RatingCriteria implements Serializable, Nullable, Comparab
 	    return false;
 	}
 	RatingCriteria castOther = (RatingCriteria) other;
-	return new EqualsBuilder().append(this.getOrderId(), castOther.getOrderId())
-		.isEquals();
+	return new EqualsBuilder().append(this.getOrderId(), castOther.getOrderId()).isEquals();
     }
 
     @Override
@@ -222,7 +221,7 @@ public abstract class RatingCriteria implements Serializable, Nullable, Comparab
     // ---------------------------------------------------------------------
     /**
      * Check up whether an ratingCriteria is tool ratingCriteria or not.
-     * 
+     *
      * @return is this ratingCriteria a tool ratingCriteria?
      */
     public boolean isToolActivityRatingCriteria() {
@@ -231,7 +230,7 @@ public abstract class RatingCriteria implements Serializable, Nullable, Comparab
 
     /**
      * Check up whether an ratingCriteria is authored ratingCriteria or not.
-     * 
+     *
      * @return is this ratingCriteria authored?
      */
     public boolean isAuthoredItemRatingCriteria() {
@@ -249,7 +248,7 @@ public abstract class RatingCriteria implements Serializable, Nullable, Comparab
     // ---------------------------------------------------------------------
     // Data Transfer object creation methods
     // ---------------------------------------------------------------------
-    
+
     @Override
     public Object clone() {
 	RatingCriteria criteria = null;
@@ -263,11 +262,12 @@ public abstract class RatingCriteria implements Serializable, Nullable, Comparab
 	return criteria;
     }
 
+    @Override
     public int compareTo(Object o) {
-	
+
 	if ((o != null) && o instanceof RatingCriteria) {
 	    RatingCriteria anotherCriteria = (RatingCriteria) o;
-	    return (int) (orderId - anotherCriteria.getOrderId());
+	    return orderId - anotherCriteria.getOrderId();
 	} else {
 	    return 1;
 	}

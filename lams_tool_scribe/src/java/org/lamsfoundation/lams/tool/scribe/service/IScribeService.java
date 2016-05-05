@@ -2,21 +2,21 @@
  * Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
  * =============================================================
  * License Information: http://lamsfoundation.org/licensing/lams/2.0/
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301
  * USA
- * 
+ *
  * http://www.gnu.org/licenses/gpl.txt
  * ****************************************************************
  */
@@ -38,7 +38,7 @@ import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 public interface IScribeService {
     /**
      * Makes a copy of the default content and assigns it a newContentID
-     * 
+     *
      * @params newContentID
      * @return
      */
@@ -46,7 +46,7 @@ public interface IScribeService {
 
     /**
      * Returns an instance of the Scribe tools default content.
-     * 
+     *
      * @return
      */
     public Scribe getDefaultContent();
@@ -80,7 +80,7 @@ public interface IScribeService {
     public void saveOrUpdateScribeSession(ScribeSession scribeSession);
 
     /**
-     * 
+     *
      * @param userId
      * @param toolSessionId
      * @return
@@ -88,7 +88,7 @@ public interface IScribeService {
     public ScribeUser getUserByUserIdAndSessionId(Long userId, Long toolSessionId);
 
     /**
-     * 
+     *
      * @param loginName
      * @param sessionID
      * @return
@@ -96,20 +96,20 @@ public interface IScribeService {
     public ScribeUser getUserByLoginNameAndSessionId(String loginName, Long sessionId);
 
     /**
-     * 
+     *
      * @param uid
      * @return
      */
     public ScribeUser getUserByUID(Long uid);
 
     /**
-     * 
+     *
      * @param scribeUser
      */
     public void saveOrUpdateScribeUser(ScribeUser scribeUser);
 
     /**
-     * 
+     *
      * @param user
      * @param scribeSession
      * @return
@@ -122,14 +122,14 @@ public interface IScribeService {
 
     /**
      * Delete heading's report by given heading UID.
-     * 
+     *
      * @param uid
      */
     public void deleteHeadingReport(Long uid);
 
     /**
      * Clone heading from scribe content.
-     * 
+     *
      * @param toolSessionId
      */
     public void createReportEntry(Long toolSessionId);

@@ -39,7 +39,7 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
 
 /**
  * Receives, processes and sends Chat messages to Learners.
- * 
+ *
  * @author Marcin Cieslak
  */
 @ServerEndpoint("/learningWebsocket")

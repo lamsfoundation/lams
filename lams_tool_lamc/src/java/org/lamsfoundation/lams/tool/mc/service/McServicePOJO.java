@@ -2,21 +2,21 @@
  * Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
  * =============================================================
  * License Information: http://lamsfoundation.org/licensing/lams/2.0/
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301
  * USA
- * 
+ *
  * http://www.gnu.org/licenses/gpl.txt
  * ***********************************************************************/
 /* $$Id$$ */
@@ -116,10 +116,10 @@ import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.springframework.dao.DataAccessException;
 
 /**
- * 
+ *
  * The POJO implementation of Mc service. All business logics of MCQ tool are implemented in this class. It translate
  * the request from presentation layer and perform appropriate database operation.
- * 
+ *
  * @author Ozgur Demirtas
  */
 public class McServicePOJO
@@ -943,8 +943,8 @@ public class McServicePOJO
 	Integer organisationToCheckPermission = (organisation.getOrganisationType().getOrganisationTypeId()
 		.equals(OrganisationType.COURSE_TYPE)) ? organisation.getOrganisationId()
 			: organisation.getParentOrganisation().getOrganisationId();
-	boolean isGroupManager = userManagementService.isUserInRole(requestUser.getUserId(), organisationToCheckPermission,
-		Role.GROUP_MANAGER);
+	boolean isGroupManager = userManagementService.isUserInRole(requestUser.getUserId(),
+		organisationToCheckPermission, Role.GROUP_MANAGER);
 	if (!(lesson.getLessonClass().isStaffMember(requestUser) || isGroupManager)) {
 	    return;
 	}
@@ -954,7 +954,7 @@ public class McServicePOJO
 	/*
 	 * Hibernate CGLIB is failing to load the first activity in the sequence as a ToolActivity for some mysterious
 	 * reason Causes a ClassCastException when you try to cast it, even if it is a ToolActivity.
-	 * 
+	 *
 	 * THIS IS A HACK to retrieve the first tool activity manually so it can be cast as a ToolActivity - if it is
 	 * one
 	 */
@@ -967,8 +967,8 @@ public class McServicePOJO
 	for (Activity activity : lessonActivities) {
 
 	    // check if it's assessment activity
-	    if ((activity instanceof ToolActivity) && ((ToolActivity) activity).getTool().getToolSignature()
-		    .equals(McAppConstants.MY_SIGNATURE)) {
+	    if ((activity instanceof ToolActivity)
+		    && ((ToolActivity) activity).getTool().getToolSignature().equals(McAppConstants.MY_SIGNATURE)) {
 		ToolActivity mcqActivity = (ToolActivity) activity;
 
 		for (ToolSession toolSession : (Set<ToolSession>) mcqActivity.getToolSessions()) {
@@ -992,25 +992,25 @@ public class McServicePOJO
 			    copyAnswersFromLeader(user, leader);
 
 			    // propagade total mark to Gradebook
-			    gradebookService.updateActivityMark(leaderMark, null, user.getQueUsrId().intValue(), toolSessionId,
-				    false);
+			    gradebookService.updateActivityMark(leaderMark, null, user.getQueUsrId().intValue(),
+				    toolSessionId, false);
 			}
 		    } else {
 
 			// update marks for all learners in a group
 			Set<McQueUsr> users = mcSession.getMcQueUsers();
 			for (McQueUsr user : users) {
-			    
+
 			    // if leader hasn't submitted any attempts - no point in updating gradebook marks
 			    if (user.getNumberOfAttempts() == 0) {
 				continue;
 			    }
-				
+
 			    final Double userMark = new Double(user.getLastAttemptTotalMark());
 
 			    // propagade total mark to Gradebook
-			    gradebookService.updateActivityMark(userMark, null, user.getQueUsrId().intValue(), toolSessionId,
-				    false);
+			    gradebookService.updateActivityMark(userMark, null, user.getQueUsrId().intValue(),
+				    toolSessionId, false);
 			}
 		    }
 
@@ -1496,7 +1496,7 @@ public class McServicePOJO
     /**
      * it is possible that the tool session id already exists in the tool sessions table as the users from the same
      * session are involved. existsSession(long toolSessionId)
-     * 
+     *
      * @param toolSessionId
      * @return boolean
      */
@@ -1724,7 +1724,7 @@ public class McServicePOJO
     public void setUserManagementService(IUserManagementService userManagementService) {
 	this.userManagementService = userManagementService;
     }
-    
+
     public void setLessonService(ILessonService lessonService) {
 	this.lessonService = lessonService;
     }
@@ -1897,7 +1897,7 @@ public class McServicePOJO
      * "questions". The questions entry should be JSONArray containing JSON objects, which in turn must contain
      * "questionText", "displayOrder" (Integer) and a JSONArray "answers". The answers entry should be JSONArray
      * containing JSON objects, which in turn must contain "answerText", "displayOrder" (Integer), "correct" (Boolean).
-     * 
+     *
      * Retries are controlled by lockWhenFinished, which defaults to true (no retries).
      */
     @SuppressWarnings("unchecked")
@@ -1949,7 +1949,7 @@ public class McServicePOJO
 	    saveOrUpdateMcQueContent(question);
 	}
 
-	// TODO    
+	// TODO
 	// mcq.setContent(content) - can't find in database
 	// mcq.setConditions(conditions);
 

@@ -2,21 +2,21 @@
  * Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
  * =============================================================
  * License Information: http://lamsfoundation.org/licensing/lams/2.0/
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301
  * USA
- * 
+ *
  * http://www.gnu.org/licenses/gpl.txt
  * ****************************************************************
  */
@@ -30,7 +30,6 @@ import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
@@ -58,7 +57,6 @@ import org.apache.struts.action.ActionMessage;
 import org.apache.struts.action.ActionMessages;
 import org.apache.struts.upload.FormFile;
 import org.lamsfoundation.lams.authoring.web.AuthoringConstants;
-import org.lamsfoundation.lams.contentrepository.client.IToolContentHandler;
 import org.lamsfoundation.lams.tool.ToolAccessMode;
 import org.lamsfoundation.lams.tool.rsrc.ResourceConstants;
 import org.lamsfoundation.lams.tool.rsrc.model.Resource;
@@ -94,7 +92,8 @@ public class AuthoringAction extends Action {
     private static Logger log = Logger.getLogger(AuthoringAction.class);
 
     @Override
-    public ActionForward execute(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception {
+    public ActionForward execute(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+	    HttpServletResponse response) throws Exception {
 
 	String param = mapping.getParameter();
 	// -----------------------Resource Author function
@@ -127,7 +126,7 @@ public class AuthoringAction extends Action {
 	if (param.equals("updateContent")) {
 	    return updateContent(mapping, form, request, response);
 	}
-	
+
 	// ----------------------- Add resource item function
 	// ---------------------------
 	if (param.equals("newItemInit")) {
@@ -174,14 +173,15 @@ public class AuthoringAction extends Action {
      * ect. It is a ajax call and just temporarily remove from page, all
      * permenant change will happen only when user sumbit this resource item
      * again.
-     * 
+     *
      * @param mapping
      * @param form
      * @param request
      * @param response
      * @return
      */
-    private ActionForward removeItemAttachment(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) {
+    private ActionForward removeItemAttachment(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+	    HttpServletResponse response) {
 	request.setAttribute("itemAttachment", null);
 	return mapping.findForward(ResourceConstants.SUCCESS);
     }
@@ -190,14 +190,15 @@ public class AuthoringAction extends Action {
      * Remove resource item from HttpSession list and update page display. As
      * authoring rule, all persist only happen when user submit whole page. So
      * this remove is just impact HttpSession values.
-     * 
+     *
      * @param mapping
      * @param form
      * @param request
      * @param response
      * @return
      */
-    private ActionForward removeItem(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) {
+    private ActionForward removeItem(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+	    HttpServletResponse response) {
 
 	// get back sessionMAP
 	String sessionMapID = WebUtil.readStrParam(request, ResourceConstants.ATTR_SESSION_MAP_ID);
@@ -221,14 +222,15 @@ public class AuthoringAction extends Action {
 
     /**
      * Display edit page for existed resource item.
-     * 
+     *
      * @param mapping
      * @param form
      * @param request
      * @param response
      * @return
      */
-    private ActionForward editItemInit(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) {
+    private ActionForward editItemInit(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+	    HttpServletResponse response) {
 
 	// get back sessionMAP
 	String sessionMapID = WebUtil.readStrParam(request, ResourceConstants.ATTR_SESSION_MAP_ID);
@@ -249,14 +251,15 @@ public class AuthoringAction extends Action {
 
     /**
      * Display empty page for new resource item.
-     * 
+     *
      * @param mapping
      * @param form
      * @param request
      * @param response
      * @return
      */
-    private ActionForward newItemlInit(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) {
+    private ActionForward newItemlInit(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+	    HttpServletResponse response) {
 	String sessionMapID = WebUtil.readStrParam(request, ResourceConstants.ATTR_SESSION_MAP_ID);
 	((ResourceItemForm) form).setSessionMapID(sessionMapID);
 
@@ -275,7 +278,7 @@ public class AuthoringAction extends Action {
      * this save is not persist them into database, just save
      * <code>HttpSession</code> temporarily. Only they will be persist when the
      * entire authoring page is being persisted.
-     * 
+     *
      * @param mapping
      * @param form
      * @param request
@@ -283,7 +286,8 @@ public class AuthoringAction extends Action {
      * @return
      * @throws ServletException
      */
-    private ActionForward saveOrUpdateItem(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) {
+    private ActionForward saveOrUpdateItem(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+	    HttpServletResponse response) {
 	// get instructions:
 	List<String> instructionList = getInstructionsFromRequest(request);
 
@@ -301,7 +305,8 @@ public class AuthoringAction extends Action {
 	} catch (Exception e) {
 	    // any upload exception will display as normal error message rather
 	    // then throw exception directly
-	    errors.add(ActionMessages.GLOBAL_MESSAGE, new ActionMessage(ResourceConstants.ERROR_MSG_UPLOAD_FAILED, e.getMessage()));
+	    errors.add(ActionMessages.GLOBAL_MESSAGE,
+		    new ActionMessage(ResourceConstants.ERROR_MSG_UPLOAD_FAILED, e.getMessage()));
 	    if (!errors.isEmpty()) {
 		this.addErrors(request, errors);
 		request.setAttribute(ResourceConstants.ATTR_INSTRUCTION_LIST, instructionList);
@@ -317,15 +322,16 @@ public class AuthoringAction extends Action {
     /**
      * Ajax call, will add one more input line for new resource item
      * instruction.
-     * 
+     *
      * @param mapping
      * @param form
      * @param request
      * @param response
      * @return
      */
-    private ActionForward newInstruction(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) {
-	int numberOfInstructions = WebUtil.readIntParam(request, INSTRUCTION_ITEM_COUNT); 
+    private ActionForward newInstruction(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+	    HttpServletResponse response) {
+	int numberOfInstructions = WebUtil.readIntParam(request, INSTRUCTION_ITEM_COUNT);
 	List<String> instructionList = new ArrayList<String>(++numberOfInstructions);
 	for (int idx = 0; idx < numberOfInstructions; idx++) {
 	    String item = request.getParameter(AuthoringAction.INSTRUCTION_ITEM_DESC_PREFIX + idx);
@@ -341,14 +347,15 @@ public class AuthoringAction extends Action {
 
     /**
      * Ajax call, remove the given line of instruction of resource item.
-     * 
+     *
      * @param mapping
      * @param form
      * @param request
      * @param response
      * @return
      */
-    private ActionForward removeInstruction(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) {
+    private ActionForward removeInstruction(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+	    HttpServletResponse response) {
 	int numberOfInstructions = WebUtil.readIntParam(request, INSTRUCTION_ITEM_COUNT);
 	int removeIdx = WebUtil.readIntParam(request, "removeIdx");
 	List<String> instructionList = new ArrayList<String>(numberOfInstructions - 1);
@@ -370,14 +377,15 @@ public class AuthoringAction extends Action {
     /**
      * Read resource data from database and put them into HttpSession. It will
      * redirect to init.do directly after this method run successfully.
-     * 
+     *
      * This method will avoid read database again and lost un-saved resouce item
      * lost when user "refresh page",
-     * 
+     *
      * @throws ServletException
-     * 
+     *
      */
-    private ActionForward start(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws ServletException {
+    private ActionForward start(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+	    HttpServletResponse response) throws ServletException {
 
 	// save toolContentID into HTTPSession
 	Long contentId = new Long(WebUtil.readLongParam(request, ResourceConstants.PARAM_TOOL_CONTENT_ID));
@@ -441,8 +449,7 @@ public class AuthoringAction extends Action {
 	SortedSet<ResourceItem> resourceItemList = getResourceItemList(sessionMap);
 	resourceItemList.clear();
 	resourceItemList.addAll(items);
-	
-	
+
 	// If there is no order id, set it up
 	int i = 1;
 	for (ResourceItem resourceItem : resourceItemList) {
@@ -460,7 +467,7 @@ public class AuthoringAction extends Action {
 
     /**
      * Display same entire authoring page content from HttpSession variable.
-     * 
+     *
      * @param mapping
      * @param form
      * @param request
@@ -468,7 +475,8 @@ public class AuthoringAction extends Action {
      * @return
      * @throws ServletException
      */
-    private ActionForward initPage(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws ServletException {
+    private ActionForward initPage(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+	    HttpServletResponse response) throws ServletException {
 	String sessionMapID = WebUtil.readStrParam(request, ResourceConstants.ATTR_SESSION_MAP_ID);
 	SessionMap sessionMap = (SessionMap) request.getSession().getAttribute(sessionMapID);
 	ResourceForm existForm = (ResourceForm) sessionMap.get(ResourceConstants.ATTR_RESOURCE_FORM);
@@ -491,7 +499,7 @@ public class AuthoringAction extends Action {
     /**
      * This method will persist all inforamtion in this authoring page, include
      * all resource item, information etc.
-     * 
+     *
      * @param mapping
      * @param form
      * @param request
@@ -499,7 +507,8 @@ public class AuthoringAction extends Action {
      * @return
      * @throws ServletException
      */
-    private ActionForward updateContent(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception {
+    private ActionForward updateContent(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+	    HttpServletResponse response) throws Exception {
 	ResourceForm resourceForm = (ResourceForm) form;
 
 	// get back sessionMAP
@@ -549,7 +558,8 @@ public class AuthoringAction extends Action {
 	HttpSession ss = SessionManager.getSession();
 	// get back login user DTO
 	UserDTO user = (UserDTO) ss.getAttribute(AttributeNames.USER);
-	ResourceUser resourceUser = service.getUserByIDAndContent(new Long(user.getUserID().intValue()), resourceForm.getResource().getContentId());
+	ResourceUser resourceUser = service.getUserByIDAndContent(new Long(user.getUserID().intValue()),
+		resourceForm.getResource().getContentId());
 	if (resourceUser == null) {
 	    resourceUser = new ResourceUser(user, resourcePO);
 	}
@@ -615,18 +625,20 @@ public class AuthoringAction extends Action {
      * Return ResourceService bean.
      */
     private IResourceService getResourceService() {
-	WebApplicationContext wac = WebApplicationContextUtils.getRequiredWebApplicationContext(getServlet().getServletContext());
+	WebApplicationContext wac = WebApplicationContextUtils
+		.getRequiredWebApplicationContext(getServlet().getServletContext());
 	return (IResourceService) wac.getBean(ResourceConstants.RESOURCE_SERVICE);
     }
 
     /**
      * List save current resource items.
-     * 
+     *
      * @param request
      * @return
      */
     private SortedSet<ResourceItem> getResourceItemList(SessionMap sessionMap) {
-	SortedSet<ResourceItem> list = (SortedSet<ResourceItem>) sessionMap.get(ResourceConstants.ATTR_RESOURCE_ITEM_LIST);
+	SortedSet<ResourceItem> list = (SortedSet<ResourceItem>) sessionMap
+		.get(ResourceConstants.ATTR_RESOURCE_ITEM_LIST);
 	if (list == null) {
 	    list = new TreeSet<ResourceItem>(new ResourceItemComparator());
 	    sessionMap.put(ResourceConstants.ATTR_RESOURCE_ITEM_LIST, list);
@@ -637,7 +649,7 @@ public class AuthoringAction extends Action {
     /**
      * List save deleted resource items, which could be persisted or
      * non-persisted items.
-     * 
+     *
      * @param request
      * @return
      */
@@ -650,7 +662,7 @@ public class AuthoringAction extends Action {
      * change the attachment to new file, then the old file need be deleted when
      * submitting the whole authoring page. Save the file uuid and version id
      * into ResourceItem object for temporarily use.
-     * 
+     *
      * @param request
      * @return
      */
@@ -660,7 +672,7 @@ public class AuthoringAction extends Action {
 
     /**
      * Get <code>java.util.List</code> from HttpSession by given name.
-     * 
+     *
      * @param request
      * @param name
      * @return
@@ -676,7 +688,7 @@ public class AuthoringAction extends Action {
 
     /**
      * Get resource items instruction from <code>HttpRequest</code>
-     * 
+     *
      * @param request
      */
     private List<String> getInstructionsFromRequest(HttpServletRequest request) {
@@ -701,8 +713,9 @@ public class AuthoringAction extends Action {
 
 	for (int idx = 0; idx < count; idx++) {
 	    String item = paramMap.get(AuthoringAction.INSTRUCTION_ITEM_DESC_PREFIX + idx);
-	    if (item == null)
+	    if (item == null) {
 		continue;
+	    }
 
 	    instructionList.add(item);
 	}
@@ -713,7 +726,7 @@ public class AuthoringAction extends Action {
 
     /**
      * Get back relative <code>ActionForward</code> from request.
-     * 
+     *
      * @param type
      * @param mapping
      * @return
@@ -721,21 +734,21 @@ public class AuthoringAction extends Action {
     private ActionForward findForward(short type, ActionMapping mapping) {
 	ActionForward forward;
 	switch (type) {
-	case ResourceConstants.RESOURCE_TYPE_URL:
-	    forward = mapping.findForward("url");
-	    break;
-	case ResourceConstants.RESOURCE_TYPE_FILE:
-	    forward = mapping.findForward("file");
-	    break;
-	case ResourceConstants.RESOURCE_TYPE_WEBSITE:
-	    forward = mapping.findForward("website");
-	    break;
-	case ResourceConstants.RESOURCE_TYPE_LEARNING_OBJECT:
-	    forward = mapping.findForward("learningobject");
-	    break;
-	default:
-	    forward = null;
-	    break;
+	    case ResourceConstants.RESOURCE_TYPE_URL:
+		forward = mapping.findForward("url");
+		break;
+	    case ResourceConstants.RESOURCE_TYPE_FILE:
+		forward = mapping.findForward("file");
+		break;
+	    case ResourceConstants.RESOURCE_TYPE_WEBSITE:
+		forward = mapping.findForward("website");
+		break;
+	    case ResourceConstants.RESOURCE_TYPE_LEARNING_OBJECT:
+		forward = mapping.findForward("learningobject");
+		break;
+	    default:
+		forward = null;
+		break;
 	}
 	return forward;
     }
@@ -743,7 +756,7 @@ public class AuthoringAction extends Action {
     /**
      * This method will populate resource item information to its form for edit
      * use.
-     * 
+     *
      * @param itemIdx
      * @param item
      * @param form
@@ -783,13 +796,14 @@ public class AuthoringAction extends Action {
 
     /**
      * Extract web from content to resource item.
-     * 
+     *
      * @param request
      * @param instructionList
      * @param itemForm
      * @throws ResourceApplicationException
      */
-    private void extractFormToResourceItem(HttpServletRequest request, List<String> instructionList, ResourceItemForm itemForm) throws Exception {
+    private void extractFormToResourceItem(HttpServletRequest request, List<String> instructionList,
+	    ResourceItemForm itemForm) throws Exception {
 	/*
 	 * BE CAREFUL: This method will copy nessary info from request form to a
 	 * old or new ResourceItem instance. It gets all info EXCEPT
@@ -817,14 +831,15 @@ public class AuthoringAction extends Action {
 	/*
 	 * Set following fields regards to the type: item.setFileUuid();
 	 * item.setFileVersionId(); item.setFileType(); item.setFileName();
-	 * 
+	 *
 	 * item.getInitialItem() item.setImsSchema() item.setOrganizationXml()
 	 */
 	// if the item is edit (not new add) then the getFile may return null
 	// it may throw exception, so put it as first, to avoid other invlidate
 	// update:
 	if (itemForm.getFile() != null) {
-	    if (type == ResourceConstants.RESOURCE_TYPE_WEBSITE || type == ResourceConstants.RESOURCE_TYPE_LEARNING_OBJECT
+	    if (type == ResourceConstants.RESOURCE_TYPE_WEBSITE
+		    || type == ResourceConstants.RESOURCE_TYPE_LEARNING_OBJECT
 		    || type == ResourceConstants.RESOURCE_TYPE_FILE) {
 		// if it has old file, and upload a new, then save old to
 		// deleteList
@@ -888,7 +903,7 @@ public class AuthoringAction extends Action {
     /**
      * Vaidate resource item regards to their type (url/file/learning
      * object/website zip file)
-     * 
+     *
      * @param itemForm
      * @return
      */
@@ -917,12 +932,14 @@ public class AuthoringAction extends Action {
 	// errors.add(ActionMessages.GLOBAL_MESSAGE,new
 	// ActionMessage(ResourceConstants.ERROR_MSG_DESC_BLANK));
 	// }
-	if (itemForm.getItemType() == ResourceConstants.RESOURCE_TYPE_WEBSITE || itemForm.getItemType() == ResourceConstants.RESOURCE_TYPE_LEARNING_OBJECT
+	if (itemForm.getItemType() == ResourceConstants.RESOURCE_TYPE_WEBSITE
+		|| itemForm.getItemType() == ResourceConstants.RESOURCE_TYPE_LEARNING_OBJECT
 		|| itemForm.getItemType() == ResourceConstants.RESOURCE_TYPE_FILE) {
 	    // validate item size
 	    FileValidatorUtil.validateFileSize(itemForm.getFile(), true, errors);
 	    // for edit validate: file already exist
-	    if (!itemForm.isHasFile() && (itemForm.getFile() == null || StringUtils.isEmpty(itemForm.getFile().getFileName()))) {
+	    if (!itemForm.isHasFile()
+		    && (itemForm.getFile() == null || StringUtils.isEmpty(itemForm.getFile().getFileName()))) {
 		errors.add(ActionMessages.GLOBAL_MESSAGE, new ActionMessage(ResourceConstants.ERROR_MSG_FILE_BLANK));
 	    }
 	}
@@ -932,7 +949,7 @@ public class AuthoringAction extends Action {
     /**
      * Get ToolAccessMode from HttpRequest parameters. Default value is AUTHOR
      * mode.
-     * 
+     *
      * @param request
      * @return
      */
@@ -977,8 +994,8 @@ public class AuthoringAction extends Action {
 	return mapping.findForward(ResourceConstants.SUCCESS);
     }
 
-    public ActionForward saveOrUpdatePedagogicalPlannerForm(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response)
-	    throws IOException {
+    public ActionForward saveOrUpdatePedagogicalPlannerForm(ActionMapping mapping, ActionForm form,
+	    HttpServletRequest request, HttpServletResponse response) throws IOException {
 	ResourcePedagogicalPlannerForm plannerForm = (ResourcePedagogicalPlannerForm) form;
 	ActionMessages errors = plannerForm.validate();
 	if (errors.isEmpty()) {
@@ -993,13 +1010,13 @@ public class AuthoringAction extends Action {
 	    LinkedList<ResourceItem> resourceItems = new LinkedList<ResourceItem>(taskList.getResourceItems());
 	    Iterator<ResourceItem> taskListItemIterator = resourceItems.iterator();
 	    /*
-	      Not the case anymore (why?):
-	      We need to reverse the order, since the items are delivered newest-first
-	      LinkedList<ResourceItem> reversedResourceItems = new LinkedList<ResourceItem>();
-	      while (taskListItemIterator.hasNext()) {
-	      	reversedResourceItems.addFirst(taskListItemIterator.next());
-	      }
-	      taskListItemIterator = reversedResourceItems.iterator();
+	     * Not the case anymore (why?):
+	     * We need to reverse the order, since the items are delivered newest-first
+	     * LinkedList<ResourceItem> reversedResourceItems = new LinkedList<ResourceItem>();
+	     * while (taskListItemIterator.hasNext()) {
+	     * reversedResourceItems.addFirst(taskListItemIterator.next());
+	     * }
+	     * taskListItemIterator = reversedResourceItems.iterator();
 	     */
 	    do {
 		title = plannerForm.getTitle(itemIndex);
@@ -1016,8 +1033,8 @@ public class AuthoringAction extends Action {
 
 			HttpSession session = SessionManager.getSession();
 			UserDTO user = (UserDTO) session.getAttribute(AttributeNames.USER);
-			ResourceUser taskListUser = getResourceService().getUserByIDAndContent(new Long(user.getUserID().intValue()),
-				plannerForm.getToolContentID());
+			ResourceUser taskListUser = getResourceService().getUserByIDAndContent(
+				new Long(user.getUserID().intValue()), plannerForm.getToolContentID());
 			resourceItem.setCreateBy(taskListUser);
 
 			newItems.add(resourceItem);
@@ -1082,8 +1099,8 @@ public class AuthoringAction extends Action {
 	return mapping.findForward(ResourceConstants.SUCCESS);
     }
 
-    public ActionForward createPedagogicalPlannerItem(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response)
-	    throws IOException, ServletException {
+    public ActionForward createPedagogicalPlannerItem(ActionMapping mapping, ActionForm form,
+	    HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
 	ResourcePedagogicalPlannerForm plannerForm = (ResourcePedagogicalPlannerForm) form;
 	int insertIndex = plannerForm.getItemCount();
 	plannerForm.setTitle(insertIndex, "");
@@ -1096,7 +1113,8 @@ public class AuthoringAction extends Action {
 	return mapping.findForward(ResourceConstants.SUCCESS);
     }
 
-    private ActionForward switchResourceItemPosition(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) {
+    private ActionForward switchResourceItemPosition(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+	    HttpServletResponse response) {
 
 	String sessionMapID = WebUtil.readStrParam(request, "sessionMapID");
 	int resourceItemOrderID1 = WebUtil.readIntParam(request, "resourceItemOrderID1");

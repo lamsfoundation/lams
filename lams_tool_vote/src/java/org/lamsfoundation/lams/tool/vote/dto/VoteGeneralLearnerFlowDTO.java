@@ -2,21 +2,21 @@
  * Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
  * =============================================================
  * License Information: http://lamsfoundation.org/licensing/lams/2.0/
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301
  * USA
- * 
+ *
  * http://www.gnu.org/licenses/gpl.txt
  * ***********************************************************************/
 /* $$Id$$ */
@@ -32,7 +32,7 @@ import org.apache.commons.lang.builder.ToStringBuilder;
  * <p>
  * DTO that holds learner flow decision properties and some other view-only properties
  * </p>
- * 
+ *
  * @author Ozgur Demirtas
  */
 public class VoteGeneralLearnerFlowDTO implements Comparable {
@@ -63,7 +63,7 @@ public class VoteGeneralLearnerFlowDTO implements Comparable {
     protected String maxNominationCount;
 
     protected String minNominationCount;
-    
+
     protected String useSelectLeaderToolOuput;
 
     protected String allowTextEntry;
@@ -106,7 +106,7 @@ public class VoteGeneralLearnerFlowDTO implements Comparable {
 
     protected Map<Long, Long> mapStandardToolSessionUid;
 
- //   protected List listMonitoredAnswersContainerDto;
+    //   protected List listMonitoredAnswersContainerDto;
 
     protected List listUserEntries;
 
@@ -244,7 +244,7 @@ public class VoteGeneralLearnerFlowDTO implements Comparable {
     public void setToolSessionID(String toolSessionID) {
 	this.toolSessionID = toolSessionID;
     }
-    
+
     /**
      * @return Returns the useSelectLeaderToolOuput.
      */
@@ -395,24 +395,27 @@ public class VoteGeneralLearnerFlowDTO implements Comparable {
 	this.listUserEntries = listUserEntries;
     }
 
+    @Override
     public int compareTo(Object o) {
 	VoteGeneralLearnerFlowDTO voteGeneralLearnerFlowDTO = (VoteGeneralLearnerFlowDTO) o;
 
-	if (voteGeneralLearnerFlowDTO == null)
+	if (voteGeneralLearnerFlowDTO == null) {
 	    return 1;
-	else
+	} else {
 	    return 0;
+	}
     }
 
+    @Override
     public String toString() {
 	return new ToStringBuilder(this).append("activityInstructions: ", activityInstructions)
 		.append("activityTitle: ", activityTitle).append("revisitingUser: ", revisitingUser)
 		.append("userEntry: ", userEntry).append("castVoteCount: ", castVoteCount)
-		.append("maxNominationCountReached: ", maxNominationCountReached)
-		.append("learningMode: ", learningMode).append("maxNominationCount: ", maxNominationCount)
-		.append("allowTextEntry: ", allowTextEntry).append("showResults: ", showResults)
-		.append("lockOnFinish: ", lockOnFinish).append("toolContentID: ", toolContentID)
-		.append("toolContentUID: ", toolContentUID).append("requestLearningReport: ", requestLearningReport)
+		.append("maxNominationCountReached: ", maxNominationCountReached).append("learningMode: ", learningMode)
+		.append("maxNominationCount: ", maxNominationCount).append("allowTextEntry: ", allowTextEntry)
+		.append("showResults: ", showResults).append("lockOnFinish: ", lockOnFinish)
+		.append("toolContentID: ", toolContentID).append("toolContentUID: ", toolContentUID)
+		.append("requestLearningReport: ", requestLearningReport)
 		.append("requestLearningReportProgress: ", requestLearningReportProgress)
 		.append("nominationsSubmited: ", nominationsSubmited)
 		.append("mapGeneralCheckedOptionsContent: ", mapGeneralCheckedOptionsContent)

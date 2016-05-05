@@ -2,411 +2,406 @@
  * Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
  * =============================================================
  * License Information: http://lamsfoundation.org/licensing/lams/2.0/
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301
  * USA
- * 
+ *
  * http://www.gnu.org/licenses/gpl.txt
  * ****************************************************************
  */
 /* $Id$ */
 package org.lamsfoundation.lams.tool.daco.model;
 
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.LinkedHashSet;
-import java.util.List;
 import java.util.Set;
 
-import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.log4j.Logger;
-import org.lamsfoundation.lams.contentrepository.client.IToolContentHandler;
-import org.lamsfoundation.lams.tool.daco.util.DacoToolContentHandler;
 
 /**
  * Daco
- * 
- * @author Marcin Cieslak
- * 
  *
- * 
+ * @author Marcin Cieslak
+ *
+ *
+ *
  */
 public class Daco implements Cloneable {
 
-	private static final Logger log = Logger.getLogger(Daco.class);
+    private static final Logger log = Logger.getLogger(Daco.class);
 
-	// key
-	private Long uid;
+    // key
+    private Long uid;
 
-	// tool contentID
-	private Long contentId;
+    // tool contentID
+    private Long contentId;
 
-	private String title;
+    private String title;
 
-	private String instructions;
+    private String instructions;
 
-	// advance
+    // advance
 
-	private boolean lockOnFinished;
+    private boolean lockOnFinished;
 
-	private boolean defineLater;
+    private boolean defineLater;
 
-	private boolean contentInUse;
+    private boolean contentInUse;
 
-	private Short minRecords;
+    private Short minRecords;
 
-	private Short maxRecords;
+    private Short maxRecords;
 
-	// general infomation
-	private Date created;
+    // general infomation
+    private Date created;
 
-	private Date updated;
+    private Date updated;
 
-	private DacoUser createdBy;
+    private DacoUser createdBy;
 
-	// daco Questions
-	private Set<DacoQuestion> dacoQuestions = new LinkedHashSet();
+    // daco Questions
+    private Set<DacoQuestion> dacoQuestions = new LinkedHashSet();
 
-	private boolean reflectOnActivity;
+    private boolean reflectOnActivity;
 
-	private String reflectInstructions;
+    private String reflectInstructions;
 
-	private boolean notifyTeachersOnLearnerEntry;
+    private boolean notifyTeachersOnLearnerEntry;
 
-	private boolean notifyTeachersOnRecordSumbit;
+    private boolean notifyTeachersOnRecordSumbit;
 
-	// **********************************************************
-	// Function method for Daco
-	// **********************************************************
-	public static Daco newInstance(Daco defaultContent, Long contentId) {
-		Daco toContent = new Daco();
-		toContent = (Daco) defaultContent.clone();
-		toContent.setContentId(contentId);
+    // **********************************************************
+    // Function method for Daco
+    // **********************************************************
+    public static Daco newInstance(Daco defaultContent, Long contentId) {
+	Daco toContent = new Daco();
+	toContent = (Daco) defaultContent.clone();
+	toContent.setContentId(contentId);
 
-		// reset user info as well
-		if (toContent.getCreatedBy() != null) {
-			toContent.getCreatedBy().setDaco(toContent);
-			Set<DacoQuestion> questions = toContent.getDacoQuestions();
-			for (DacoQuestion question : questions) {
-				question.setCreateBy(toContent.getCreatedBy());
-			}
-		}
-		return toContent;
+	// reset user info as well
+	if (toContent.getCreatedBy() != null) {
+	    toContent.getCreatedBy().setDaco(toContent);
+	    Set<DacoQuestion> questions = toContent.getDacoQuestions();
+	    for (DacoQuestion question : questions) {
+		question.setCreateBy(toContent.getCreatedBy());
+	    }
+	}
+	return toContent;
+    }
+
+    @Override
+    public Object clone() {
+
+	Daco daco = null;
+	try {
+	    daco = (Daco) super.clone();
+	    daco.setUid(null);
+	    daco.setDacoQuestions(new LinkedHashSet<DacoQuestion>(dacoQuestions.size()));
+	    for (DacoQuestion question : dacoQuestions) {
+		DacoQuestion clonedQuestion = (DacoQuestion) question.clone();
+		clonedQuestion.setDaco(daco);
+		daco.getDacoQuestions().add(clonedQuestion);
+	    }
+
+	    if (createdBy != null) {
+		daco.setCreatedBy((DacoUser) createdBy.clone());
+	    }
+	} catch (CloneNotSupportedException e) {
+	    Daco.log.error("When clone " + Daco.class + " failed");
 	}
 
-	@Override
-	public Object clone() {
+	return daco;
+    }
 
-		Daco daco = null;
-		try {
-			daco = (Daco) super.clone();
-			daco.setUid(null);
-			daco.setDacoQuestions(new LinkedHashSet<DacoQuestion>(dacoQuestions.size()));
-			for (DacoQuestion question : dacoQuestions) {
-				DacoQuestion clonedQuestion = (DacoQuestion) question.clone();
-				clonedQuestion.setDaco(daco);
-				daco.getDacoQuestions().add(clonedQuestion);
-			}
-
-			if (createdBy != null) {
-				daco.setCreatedBy((DacoUser) createdBy.clone());
-			}
-		}
-		catch (CloneNotSupportedException e) {
-			Daco.log.error("When clone " + Daco.class + " failed");
-		}
-
-		return daco;
+    @Override
+    public boolean equals(Object o) {
+	if (this == o) {
+	    return true;
+	}
+	if (!(o instanceof Daco)) {
+	    return false;
 	}
 
-	@Override
-	public boolean equals(Object o) {
-		if (this == o) {
-			return true;
-		}
-		if (!(o instanceof Daco)) {
-			return false;
-		}
+	final Daco genericEntity = (Daco) o;
 
-		final Daco genericEntity = (Daco) o;
+	return new EqualsBuilder().append(uid, genericEntity.uid).append(title, genericEntity.title)
+		.append(instructions, genericEntity.instructions).append(created, genericEntity.created)
+		.append(updated, genericEntity.updated).append(createdBy, genericEntity.createdBy).isEquals();
+    }
 
-		return new EqualsBuilder().append(uid, genericEntity.uid).append(title, genericEntity.title).append(instructions,
-				genericEntity.instructions).append(created, genericEntity.created).append(updated,
-				genericEntity.updated).append(createdBy, genericEntity.createdBy).isEquals();
+    @Override
+    public int hashCode() {
+	return new HashCodeBuilder().append(uid).append(title).append(instructions).append(created).append(updated)
+		.append(createdBy).toHashCode();
+    }
+
+    /**
+     * Updates the modification data for this entity.
+     */
+    public void updateModificationData() {
+
+	long now = System.currentTimeMillis();
+	if (created == null) {
+	    this.setCreated(new Date(now));
 	}
+	this.setUpdated(new Date(now));
+    }
 
-	@Override
-	public int hashCode() {
-		return new HashCodeBuilder().append(uid).append(title).append(instructions).append(created).append(updated).append(createdBy).toHashCode();
-	}
+    // **********************************************************
+    // get/set methods
+    // **********************************************************
+    /**
+     * Returns the object's creation date
+     * 
+     * @return date
+     *
+     */
+    public Date getCreated() {
+	return created;
+    }
 
-	/**
-	 * Updates the modification data for this entity.
-	 */
-	public void updateModificationData() {
+    /**
+     * Sets the object's creation date
+     * 
+     * @param created
+     */
+    public void setCreated(Date created) {
+	this.created = created;
+    }
 
-		long now = System.currentTimeMillis();
-		if (created == null) {
-			this.setCreated(new Date(now));
-		}
-		this.setUpdated(new Date(now));
-	}
+    /**
+     * Returns the object's date of last update
+     * 
+     * @return date updated
+     *
+     */
+    public Date getUpdated() {
+	return updated;
+    }
 
-	// **********************************************************
-	// get/set methods
-	// **********************************************************
-	/**
-	 * Returns the object's creation date
-	 * 
-	 * @return date
-	 *
-	 */
-	public Date getCreated() {
-		return created;
-	}
+    /**
+     * Sets the object's date of last update
+     * 
+     * @param updated
+     */
+    public void setUpdated(Date updated) {
+	this.updated = updated;
+    }
 
-	/**
-	 * Sets the object's creation date
-	 * 
-	 * @param created
-	 */
-	public void setCreated(Date created) {
-		this.created = created;
-	}
+    /**
+     *
+     * @return Returns the userid of the user who created the Share daco.
+     * 
+     */
+    public DacoUser getCreatedBy() {
+	return createdBy;
+    }
 
-	/**
-	 * Returns the object's date of last update
-	 * 
-	 * @return date updated
-	 *
-	 */
-	public Date getUpdated() {
-		return updated;
-	}
+    /**
+     * @param createdBy
+     *            The userid of the user who created this Share daco.
+     */
+    public void setCreatedBy(DacoUser createdBy) {
+	this.createdBy = createdBy;
+    }
 
-	/**
-	 * Sets the object's date of last update
-	 * 
-	 * @param updated
-	 */
-	public void setUpdated(Date updated) {
-		this.updated = updated;
-	}
+    /**
+     *
+     */
+    public Long getUid() {
+	return uid;
+    }
 
-	/**
-	 *
-	 * @return Returns the userid of the user who created the Share daco.
-	 * 
-	 */
-	public DacoUser getCreatedBy() {
-		return createdBy;
-	}
+    public void setUid(Long uid) {
+	this.uid = uid;
+    }
 
-	/**
-	 * @param createdBy
-	 *            The userid of the user who created this Share daco.
-	 */
-	public void setCreatedBy(DacoUser createdBy) {
-		this.createdBy = createdBy;
-	}
+    /**
+     * @return Returns the title.
+     * 
+     *
+     * 
+     */
+    public String getTitle() {
+	return title;
+    }
 
-	/**
-	 *
-	 */
-	public Long getUid() {
-		return uid;
-	}
+    /**
+     * @param title
+     *            The title to set.
+     */
+    public void setTitle(String title) {
+	this.title = title;
+    }
 
-	public void setUid(Long uid) {
-		this.uid = uid;
-	}
+    /**
+     * @return Returns the lockOnFinish.
+     * 
+     *
+     * 
+     */
+    public boolean getLockOnFinished() {
+	return lockOnFinished;
+    }
 
-	/**
-	 * @return Returns the title.
-	 * 
-	 *
-	 * 
-	 */
-	public String getTitle() {
-		return title;
-	}
+    /**
+     * @param lockOnFinished
+     *            Set to true to lock the daco for finished users.
+     */
+    public void setLockOnFinished(boolean lockOnFinished) {
+	this.lockOnFinished = lockOnFinished;
+    }
 
-	/**
-	 * @param title
-	 *            The title to set.
-	 */
-	public void setTitle(String title) {
-		this.title = title;
-	}
+    /**
+     * @return Returns the instructions set by the teacher.
+     * 
+     *
+     */
+    public String getInstructions() {
+	return instructions;
+    }
 
-	/**
-	 * @return Returns the lockOnFinish.
-	 * 
-	 *
-	 * 
-	 */
-	public boolean getLockOnFinished() {
-		return lockOnFinished;
-	}
+    public void setInstructions(String instructions) {
+	this.instructions = instructions;
+    }
 
-	/**
-	 * @param lockOnFinished
-	 *            Set to true to lock the daco for finished users.
-	 */
-	public void setLockOnFinished(boolean lockOnFinished) {
-		this.lockOnFinished = lockOnFinished;
-	}
+    /**
+     * 
+     * 
+     *
+     *
+     *
+     * 
+     * @return
+     */
+    public Set<DacoQuestion> getDacoQuestions() {
+	return dacoQuestions;
+    }
 
-	/**
-	 * @return Returns the instructions set by the teacher.
-	 * 
-	 *
-	 */
-	public String getInstructions() {
-		return instructions;
-	}
+    public void setDacoQuestions(Set<DacoQuestion> dacoQuestions) {
+	this.dacoQuestions = dacoQuestions;
+    }
 
-	public void setInstructions(String instructions) {
-		this.instructions = instructions;
-	}
+    /**
+     *
+     * @return
+     */
+    public boolean isContentInUse() {
+	return contentInUse;
+    }
 
-	/**
-	 * 
-	 * 
-	 *
-	 *
-	 *
-	 * 
-	 * @return
-	 */
-	public Set<DacoQuestion> getDacoQuestions() {
-		return dacoQuestions;
-	}
+    public void setContentInUse(boolean contentInUse) {
+	this.contentInUse = contentInUse;
+    }
 
-	public void setDacoQuestions(Set<DacoQuestion> dacoQuestions) {
-		this.dacoQuestions = dacoQuestions;
-	}
+    /**
+     *
+     * @return
+     */
+    public boolean isDefineLater() {
+	return defineLater;
+    }
 
-	/**
-	 *
-	 * @return
-	 */
-	public boolean isContentInUse() {
-		return contentInUse;
-	}
+    public void setDefineLater(boolean defineLater) {
+	this.defineLater = defineLater;
+    }
 
-	public void setContentInUse(boolean contentInUse) {
-		this.contentInUse = contentInUse;
-	}
+    /**
+     *
+     * @return
+     */
+    public Long getContentId() {
+	return contentId;
+    }
 
-	/**
-	 *
-	 * @return
-	 */
-	public boolean isDefineLater() {
-		return defineLater;
-	}
+    public void setContentId(Long contentId) {
+	this.contentId = contentId;
+    }
 
-	public void setDefineLater(boolean defineLater) {
-		this.defineLater = defineLater;
-	}
+    /**
+     *
+     * @return
+     */
+    public String getReflectInstructions() {
+	return reflectInstructions;
+    }
 
-	/**
-	 *
-	 * @return
-	 */
-	public Long getContentId() {
-		return contentId;
-	}
+    public void setReflectInstructions(String reflectInstructions) {
+	this.reflectInstructions = reflectInstructions;
+    }
 
-	public void setContentId(Long contentId) {
-		this.contentId = contentId;
-	}
+    /**
+     *
+     * @return
+     */
+    public boolean isReflectOnActivity() {
+	return reflectOnActivity;
+    }
 
-	/**
-	 *
-	 * @return
-	 */
-	public String getReflectInstructions() {
-		return reflectInstructions;
-	}
+    public void setReflectOnActivity(boolean reflectOnActivity) {
+	this.reflectOnActivity = reflectOnActivity;
+    }
 
-	public void setReflectInstructions(String reflectInstructions) {
-		this.reflectInstructions = reflectInstructions;
-	}
+    /**
+     * @return Returns the instructions set by the teacher.
+     * 
+     *
+     */
+    public Short getMinRecords() {
+	return minRecords;
+    }
 
-	/**
-	 *
-	 * @return
-	 */
-	public boolean isReflectOnActivity() {
-		return reflectOnActivity;
-	}
+    public void setMinRecords(Short minRecords) {
+	this.minRecords = minRecords;
+    }
 
-	public void setReflectOnActivity(boolean reflectOnActivity) {
-		this.reflectOnActivity = reflectOnActivity;
-	}
+    /**
+     * @return Returns the instructions set by the teacher.
+     * 
+     *
+     */
+    public Short getMaxRecords() {
+	return maxRecords;
+    }
 
-	/**
-	 * @return Returns the instructions set by the teacher.
-	 * 
-	 *
-	 */
-	public Short getMinRecords() {
-		return minRecords;
-	}
+    public void setMaxRecords(Short maxRecords) {
+	this.maxRecords = maxRecords;
+    }
 
-	public void setMinRecords(Short minRecords) {
-		this.minRecords = minRecords;
-	}
+    /**
+     *
+     * @return
+     */
+    public boolean isNotifyTeachersOnLearnerEntry() {
+	return notifyTeachersOnLearnerEntry;
+    }
 
-	/**
-	 * @return Returns the instructions set by the teacher.
-	 * 
-	 *
-	 */
-	public Short getMaxRecords() {
-		return maxRecords;
-	}
+    public void setNotifyTeachersOnLearnerEntry(boolean notifyTeachersOnLearnerEntry) {
+	this.notifyTeachersOnLearnerEntry = notifyTeachersOnLearnerEntry;
+    }
 
-	public void setMaxRecords(Short maxRecords) {
-		this.maxRecords = maxRecords;
-	}
+    /**
+     *
+     * @return
+     */
+    public boolean isNotifyTeachersOnRecordSumbit() {
+	return notifyTeachersOnRecordSumbit;
+    }
 
-	/**
-	 *
-	 * @return
-	 */
-	public boolean isNotifyTeachersOnLearnerEntry() {
-		return notifyTeachersOnLearnerEntry;
-	}
-
-	public void setNotifyTeachersOnLearnerEntry(boolean notifyTeachersOnLearnerEntry) {
-		this.notifyTeachersOnLearnerEntry = notifyTeachersOnLearnerEntry;
-	}
-
-	/**
-	 *
-	 * @return
-	 */
-	public boolean isNotifyTeachersOnRecordSumbit() {
-		return notifyTeachersOnRecordSumbit;
-	}
-
-	public void setNotifyTeachersOnRecordSumbit(boolean notifyTeachersOnRecordSumbit) {
-		this.notifyTeachersOnRecordSumbit = notifyTeachersOnRecordSumbit;
-	}
+    public void setNotifyTeachersOnRecordSumbit(boolean notifyTeachersOnRecordSumbit) {
+	this.notifyTeachersOnRecordSumbit = notifyTeachersOnRecordSumbit;
+    }
 }

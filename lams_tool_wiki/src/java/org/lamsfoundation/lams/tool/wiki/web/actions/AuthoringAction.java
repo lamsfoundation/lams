@@ -2,21 +2,21 @@
  * Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
  * =============================================================
  * License Information: http://lamsfoundation.org/licensing/lams/2.0/
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301
  * USA
- * 
+ *
  * http://www.gnu.org/licenses/gpl.txt
  * ****************************************************************
  */
@@ -25,11 +25,6 @@
 package org.lamsfoundation.lams.tool.wiki.web.actions;
 
 import java.util.Date;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
@@ -41,10 +36,7 @@ import org.apache.log4j.Logger;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
-import org.apache.struts.action.ActionMessages;
-import org.apache.struts.upload.FormFile;
 import org.lamsfoundation.lams.authoring.web.AuthoringConstants;
-import org.lamsfoundation.lams.contentrepository.client.IToolContentHandler;
 import org.lamsfoundation.lams.tool.ToolAccessMode;
 import org.lamsfoundation.lams.tool.wiki.dto.WikiPageContentDTO;
 import org.lamsfoundation.lams.tool.wiki.dto.WikiPageDTO;
@@ -56,7 +48,6 @@ import org.lamsfoundation.lams.tool.wiki.service.IWikiService;
 import org.lamsfoundation.lams.tool.wiki.service.WikiServiceProxy;
 import org.lamsfoundation.lams.tool.wiki.util.WikiConstants;
 import org.lamsfoundation.lams.tool.wiki.web.forms.AuthoringForm;
-import org.lamsfoundation.lams.util.FileValidatorUtil;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.lamsfoundation.lams.web.util.SessionMap;
@@ -64,13 +55,13 @@ import org.lamsfoundation.lams.web.util.SessionMap;
 /**
  * This action handles all the authoring actions, which include opening author, saving, uploading instruction files and
  * all the wikipage actions
- * 
+ *
  * It inherits from the WikiPageAction which inherits from the LamsDispatchAction so that common actions can be used in
  * learner, monitor and author
- * 
+ *
  * @author lfoxton
  * @version
- * 
+ *
  *
  *
  *
@@ -93,7 +84,7 @@ public class AuthoringAction extends WikiPageAction {
     /**
      * Default method when no dispatch parameter is specified. It is expected that the parameter
      * <code>toolContentID</code> will be passed in. This will be used to retrieve content for this tool.
-     * 
+     *
      */
     @Override
     protected ActionForward unspecified(ActionMapping mapping, ActionForm form, HttpServletRequest request,
@@ -146,7 +137,7 @@ public class AuthoringAction extends WikiPageAction {
 	    currentWikiPage = wikiService.getWikiPageByUid(currentPageUid);
 	} else {
 	    // get real instance instead of lazily initialized handler
-	    currentWikiPage = wiki.getMainPage(); 
+	    currentWikiPage = wiki.getMainPage();
 	}
 	WikiPageDTO currentPageDTO = new WikiPageDTO(currentWikiPage);
 	request.setAttribute(WikiConstants.ATTR_CURRENT_WIKI, currentPageDTO);
@@ -184,6 +175,7 @@ public class AuthoringAction extends WikiPageAction {
 	return mapping.findForward("success");
     }
 
+    @Override
     public ActionForward removePage(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) throws Exception {
 	Long toolContentID = new Long(WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_CONTENT_ID));
@@ -229,9 +221,9 @@ public class AuthoringAction extends WikiPageAction {
 
     /**
      * Saves the Wiki content including uploaded files and advance options
-     * 
+     *
      * The WikiPage content is not saved here as that is done in the WikiPageAction
-     * 
+     *
      * @param mapping
      * @param form
      * @param request
@@ -271,10 +263,9 @@ public class AuthoringAction extends WikiPageAction {
 	return mapping.findForward("success");
     }
 
-
     /**
      * Updates Wiki content using AuthoringForm inputs.
-     * 
+     *
      * @param authForm
      * @param mode
      * @return
@@ -305,7 +296,7 @@ public class AuthoringAction extends WikiPageAction {
 
     /**
      * Updates AuthoringForm using Wiki content.
-     * 
+     *
      * @param wiki
      * @param authForm
      * @return
@@ -325,7 +316,7 @@ public class AuthoringAction extends WikiPageAction {
 
     /**
      * Updates SessionMap using Wiki content.
-     * 
+     *
      * @param wiki
      * @param mode
      */
@@ -343,7 +334,7 @@ public class AuthoringAction extends WikiPageAction {
 
     /**
      * Get ToolAccessMode from HttpRequest parameters. Default value is AUTHOR mode.
-     * 
+     *
      * @param request
      * @return
      */
@@ -357,7 +348,7 @@ public class AuthoringAction extends WikiPageAction {
 
     /**
      * Retrieve the SessionMap from the HttpSession.
-     * 
+     *
      * @param request
      * @param authForm
      * @return

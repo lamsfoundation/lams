@@ -2,24 +2,23 @@
  * Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
  * =============================================================
  * License Information: http://lamsfoundation.org/licensing/lams/2.0/
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License version 2.0
  * as published by the Free Software Foundation.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301
  * USA
- * 
+ *
  * http://www.gnu.org/licenses/gpl.txt
  * ***********************************************************************/
-
 
 package org.lamsfoundation.lams.tool.vote.web;
 
@@ -71,21 +70,22 @@ import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 
 /**
- * 
+ *
  * @author Ozgur Demirtas
  *
- * Note:  Because of Voting learning reporting structure, Show Learner Report is always ON even if in authoring it is set to false.
+ *         Note: Because of Voting learning reporting structure, Show Learner Report is always ON even if in authoring
+ *         it is set to false.
  */
 public class VoteLearningStarterAction extends Action implements VoteAppConstants {
     private static Logger logger = Logger.getLogger(VoteLearningStarterAction.class.getName());
-    
+
     private static IVoteService voteService;
 
     /*
      * By now, the passed tool session id MUST exist in the db through the calling of: public void
      * createToolSession(Long toolSessionID, Long toolContentId) by the container.
-     * 
-     * 
+     *
+     *
      * make sure this session exists in tool's session table by now.
      */
     @Override
@@ -93,7 +93,7 @@ public class VoteLearningStarterAction extends Action implements VoteAppConstant
 	    HttpServletResponse response) throws IOException, ServletException, VoteApplicationException {
 
 	VoteUtils.cleanUpUserExceptions(request);
-	
+
 	if (voteService == null) {
 	    voteService = VoteServiceProxy.getVoteService(getServlet().getServletContext());
 	}
@@ -161,10 +161,10 @@ public class VoteLearningStarterAction extends Action implements VoteAppConstant
 
 	String mode = voteLearningForm.getLearningMode();
 	voteGeneralLearnerFlowDTO.setLearningMode(mode);
-	
+
 	String userId = voteLearningForm.getUserID();
-	NotebookEntry notebookEntry = voteService.getEntry(new Long(toolSessionID),
-		CoreNotebookConstants.NOTEBOOK_TOOL, VoteAppConstants.MY_SIGNATURE, new Integer(userId));
+	NotebookEntry notebookEntry = voteService.getEntry(new Long(toolSessionID), CoreNotebookConstants.NOTEBOOK_TOOL,
+		VoteAppConstants.MY_SIGNATURE, new Integer(userId));
 	if (notebookEntry != null) {
 	    //String notebookEntryPresentable = VoteUtils.replaceNewLines(notebookEntry.getEntry());
 	    voteGeneralLearnerFlowDTO.setNotebookEntry(notebookEntry.getEntry());
@@ -174,7 +174,7 @@ public class VoteLearningStarterAction extends Action implements VoteAppConstant
 	request.setAttribute(VoteAppConstants.MAP_QUESTION_CONTENT_LEARNER, mapQuestions);
 
 	request.setAttribute(VoteAppConstants.VOTE_GENERAL_LEARNER_FLOW_DTO, voteGeneralLearnerFlowDTO);
-	
+
 	VoteQueUsr user = null;
 	if ((mode != null) && mode.equals(ToolAccessMode.TEACHER.toString())) {
 	    // monitoring mode - user is specified in URL
@@ -183,7 +183,7 @@ public class VoteLearningStarterAction extends Action implements VoteAppConstant
 	} else {
 	    user = getCurrentUser(toolSessionID);
 	}
-	
+
 	// check if there is submission deadline
 	Date submissionDeadline = voteContent.getSubmissionDeadline();
 
@@ -203,20 +203,20 @@ public class VoteLearningStarterAction extends Action implements VoteAppConstant
 	    }
 	}
 
-	LearningWebUtil.putActivityPositionInRequestByToolSessionId(new Long(toolSessionID), request, getServlet()
-		.getServletContext());
+	LearningWebUtil.putActivityPositionInRequestByToolSessionId(new Long(toolSessionID), request,
+		getServlet().getServletContext());
 
 	/* find out if the content is being modified at the moment. */
 	if (voteContent.isDefineLater()) {
 	    VoteUtils.cleanUpUserExceptions(request);
 	    return mapping.findForward(VoteAppConstants.DEFINE_LATER);
 	}
-	
+
 	//process group leader
 	VoteQueUsr groupLeader = null;
 	if (voteContent.isUseSelectLeaderToolOuput()) {
 	    groupLeader = voteService.checkLeaderSelectToolForSessionLeader(user, new Long(toolSessionID));
-	    
+
 	    // forwards to the leaderSelection page
 	    if (groupLeader == null && !mode.equals(ToolAccessMode.TEACHER.toString())) {
 
@@ -239,7 +239,7 @@ public class VoteLearningStarterAction extends Action implements VoteAppConstant
 		user.setResponseFinalised(true);
 		voteService.updateVoteUser(user);
 	    }
-	    
+
 	    // store group leader information
 	    voteLearningForm.setGroupLeaderName(groupLeader.getFullname());
 	    boolean isUserLeader = voteService.isUserGroupLeader(user, new Long(toolSessionID));
@@ -287,8 +287,7 @@ public class VoteLearningStarterAction extends Action implements VoteAppConstant
 		    voteGeneralLearnerFlowDTO.setReportViewOnly(new Boolean(true).toString());
 		}
 
-		Set userAttempts = voteService.getAttemptsForUserAndSessionUseOpenAnswer(user.getUid(),
-			sessionUid);
+		Set userAttempts = voteService.getAttemptsForUserAndSessionUseOpenAnswer(user.getUid(), sessionUid);
 		request.setAttribute(VoteAppConstants.LIST_GENERAL_CHECKED_OPTIONS_CONTENT, userAttempts);
 
 		voteService.prepareChartData(request, voteContent.getVoteContentId(), voteSession.getUid(),
@@ -357,7 +356,7 @@ public class VoteLearningStarterAction extends Action implements VoteAppConstant
     /**
      * sets up session scope attributes based on content linked to the passed tool session id
      * setupAttributes(HttpServletRequest request, VoteContent voteContent)
-     * 
+     *
      * @param request
      * @param voteContent
      */
@@ -380,8 +379,8 @@ public class VoteLearningStarterAction extends Action implements VoteAppConstant
 	voteGeneralLearnerFlowDTO.setActivityInstructions(voteContent.getInstructions());
 	voteGeneralLearnerFlowDTO.setMaxNominationCount(voteContent.getMaxNominationCount());
 	voteGeneralLearnerFlowDTO.setMinNominationCount(voteContent.getMinNominationCount());
-	voteGeneralLearnerFlowDTO.setUseSelectLeaderToolOuput(new Boolean(voteContent.isUseSelectLeaderToolOuput())
-		.toString());
+	voteGeneralLearnerFlowDTO
+		.setUseSelectLeaderToolOuput(new Boolean(voteContent.isUseSelectLeaderToolOuput()).toString());
 	voteGeneralLearnerFlowDTO.setAllowTextEntry(new Boolean(voteContent.isAllowText()).toString());
 	voteGeneralLearnerFlowDTO.setLockOnFinish(new Boolean(voteContent.isLockOnFinish()).toString());
 	voteGeneralLearnerFlowDTO.setActivityTitle(voteContent.getTitle());
@@ -447,7 +446,8 @@ public class VoteLearningStarterAction extends Action implements VoteAppConstant
 
     boolean isSessionCompleted(String userSessionId, IVoteService voteService) {
 	VoteSession voteSession = voteService.getSessionBySessionId(new Long(userSessionId));
-	if (voteSession.getSessionStatus() != null && voteSession.getSessionStatus().equals(VoteAppConstants.COMPLETED)) {
+	if (voteSession.getSessionStatus() != null
+		&& voteSession.getSessionStatus().equals(VoteAppConstants.COMPLETED)) {
 	    return true;
 	}
 	return false;
@@ -455,7 +455,7 @@ public class VoteLearningStarterAction extends Action implements VoteAppConstant
 
     /**
      * persists error messages to request scope
-     * 
+     *
      * @param request
      * @param message
      */
@@ -464,7 +464,7 @@ public class VoteLearningStarterAction extends Action implements VoteAppConstant
 	errors.add(Globals.ERROR_KEY, new ActionMessage(message));
 	saveErrors(request, errors);
     }
-    
+
     private VoteQueUsr getCurrentUser(String toolSessionId) {
 
 	// get back login user DTO

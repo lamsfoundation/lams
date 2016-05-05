@@ -13,8 +13,8 @@ import org.springframework.stereotype.Repository;
 @Repository
 public class WikiPageDAO extends LAMSBaseDAO implements IWikiPageDAO {
 
-    public static final String GET_BY_WIKI_AND_TITLE = "from tl_lawiki10_wiki_page in class "
-	    + WikiPage.class.getName() + " where wiki_uid=? AND title=? AND wiki_session_uid=null";
+    public static final String GET_BY_WIKI_AND_TITLE = "from tl_lawiki10_wiki_page in class " + WikiPage.class.getName()
+	    + " where wiki_uid=? AND title=? AND wiki_session_uid=null";
 
     public static final String GET_BY_SESSION_AND_TITLE = "from tl_lawiki10_wiki_page in class "
 	    + WikiPage.class.getName() + " where wiki_session_uid=? AND title=?";
@@ -25,10 +25,12 @@ public class WikiPageDAO extends LAMSBaseDAO implements IWikiPageDAO {
 
     public static final String CHANGE_WIKI_JAVASCRIPT_METHOD = "javascript:changeWikiPage('?')";
 
+    @Override
     public void saveOrUpdate(WikiPage wikiPage) {
-    	getSession().saveOrUpdate(wikiPage);
+	getSession().saveOrUpdate(wikiPage);
     }
 
+    @Override
     public WikiPage getByWikiAndTitle(Wiki wiki, String title) {
 	if (wiki != null && title != null && title.length() > 0) {
 	    Long wikiId = wiki.getUid();
@@ -40,6 +42,7 @@ public class WikiPageDAO extends LAMSBaseDAO implements IWikiPageDAO {
 	return null;
     }
 
+    @Override
     public WikiPage getBySessionAndTitle(WikiSession wikiSession, String title) {
 	if (wikiSession != null && title != null && title.length() > 0) {
 	    Long wikiId = wikiSession.getUid();
@@ -51,6 +54,7 @@ public class WikiPageDAO extends LAMSBaseDAO implements IWikiPageDAO {
 	return null;
     }
 
+    @Override
     public void delete(Object object) {
 	// remove references to the removed page
 	WikiPage removedWikiPage = (WikiPage) object;
@@ -63,7 +67,7 @@ public class WikiPageDAO extends LAMSBaseDAO implements IWikiPageDAO {
 	query.setString(0, codeToReplace);
 	query.setString(1, replacementCode);
 	query.setLong(2, removedWikiPage.getParentWiki().getUid());
-	
+
 	super.delete(object);
 	query.executeUpdate();
     }

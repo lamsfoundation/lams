@@ -2,21 +2,21 @@
  * Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
  * =============================================================
  * License Information: http://lamsfoundation.org/licensing/lams/2.0/
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License version 2.0
  * as published by the Free Software Foundation.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301
  * USA
- * 
+ *
  * http://www.gnu.org/licenses/gpl.txt
  * ***********************************************************************/
 
@@ -33,7 +33,7 @@ import org.apache.commons.lang.builder.ToStringBuilder;
  * Persistent object/bean that defines the content for the Voting tool. Provides accessors and mutators to get/set
  * attributes It maps to database table: tl_lavote11_session
  * </p>
- * 
+ *
  * @author Ozgur Demirtas
  */
 public class VoteSession implements Serializable, Comparable<VoteSession> {
@@ -67,7 +67,7 @@ public class VoteSession implements Serializable, Comparable<VoteSession> {
 
     /** persistent field */
     private Set voteQueUsers;
-    
+
     /** persistent field */
     private VoteQueUsr groupLeader;
 
@@ -93,6 +93,7 @@ public class VoteSession implements Serializable, Comparable<VoteSession> {
 	this.uid = uid;
     }
 
+    @Override
     public String toString() {
 	return new ToStringBuilder(this).append("uid", getUid()).toString();
     }
@@ -216,7 +217,7 @@ public class VoteSession implements Serializable, Comparable<VoteSession> {
     public void setVoteQueUsers(Set voteQueUsers) {
 	this.voteQueUsers = voteQueUsers;
     }
-    
+
     /**
      * @return Returns the groupLeader.
      */
@@ -231,14 +232,15 @@ public class VoteSession implements Serializable, Comparable<VoteSession> {
     public void setGroupLeader(VoteQueUsr groupLeader) {
 	this.groupLeader = groupLeader;
     }
-    
+
+    @Override
     public int compareTo(VoteSession other) {
 	// if the object does not exist yet, then just return any one of 0, -1, 1. Should not make a difference.
-	if (uid == null)
+	if (uid == null) {
 	    return 1;
-	else
+	} else {
 	    return (int) (uid.longValue() - other.uid.longValue());
+	}
     }
-
 
 }

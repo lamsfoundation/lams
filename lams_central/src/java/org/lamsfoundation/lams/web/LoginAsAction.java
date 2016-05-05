@@ -46,7 +46,7 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
 
 /**
  * @author jliew
- * 
+ *
  *
  *
  */
@@ -56,8 +56,8 @@ public class LoginAsAction extends Action {
     public ActionForward execute(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) throws Exception {
 
-	WebApplicationContext ctx = WebApplicationContextUtils.getRequiredWebApplicationContext(getServlet()
-		.getServletContext());
+	WebApplicationContext ctx = WebApplicationContextUtils
+		.getRequiredWebApplicationContext(getServlet().getServletContext());
 	IUserManagementService service = (IUserManagementService) ctx.getBean("userManagementService");
 	MessageService messageService = (MessageService) ctx.getBean("centralMessageService");
 	String login = WebUtil.readStrParam(request, "login", false);

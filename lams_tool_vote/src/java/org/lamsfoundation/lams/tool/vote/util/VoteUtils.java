@@ -2,21 +2,21 @@
  * Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
  * =============================================================
  * License Information: http://lamsfoundation.org/licensing/lams/2.0/
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License version 2.0
  * as published by the Free Software Foundation.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301
  * USA
- * 
+ *
  * http://www.gnu.org/licenses/gpl.txt
  * ***********************************************************************/
 
@@ -30,7 +30,7 @@ import org.lamsfoundation.lams.tool.vote.service.IVoteService;
 
 /**
  * Common Voting utility functions live here.
- * 
+ *
  * @author Ozgur Demirtas
  */
 public abstract class VoteUtils implements VoteAppConstants {
@@ -60,8 +60,9 @@ public abstract class VoteUtils implements VoteAppConstants {
 			String srcEntry = htmlText.substring(index + 1, indexStop);
 			// get rid of any leading path and just get the filename;
 			index = srcEntry.lastIndexOf("/");
-			if (index == srcEntry.length() - 1)
+			if (index == srcEntry.length() - 1) {
 			    index = srcEntry.lastIndexOf("/", index);
+			}
 			if (index > -1) {
 			    srcEntry = srcEntry.substring(index + 1);
 			}
@@ -69,14 +70,16 @@ public abstract class VoteUtils implements VoteAppConstants {
 		    }
 		}
 	    }
-	    if (htmlText.length() > 50)
+	    if (htmlText.length() > 50) {
 		return htmlText.substring(0, 51);
-	    else
+	    } else {
 		return htmlText;
+	    }
 	}
 
-	if (noHtmlNoNewLineStr.length() > 50)
+	if (noHtmlNoNewLineStr.length() > 50) {
 	    return noHtmlNoNewLineStr.substring(0, 51);
+	}
 
 	return noHtmlNoNewLineStr;
     }

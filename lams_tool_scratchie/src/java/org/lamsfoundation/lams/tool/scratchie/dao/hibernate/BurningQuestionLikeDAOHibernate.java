@@ -7,28 +7,29 @@ import org.lamsfoundation.lams.tool.scratchie.dao.BurningQuestionLikeDAO;
 import org.lamsfoundation.lams.tool.scratchie.model.BurningQuestionLike;
 
 public class BurningQuestionLikeDAOHibernate extends LAMSBaseDAO implements BurningQuestionLikeDAO {
-    
+
     private static String INSERT_LIKE = "INSERT IGNORE INTO tl_lascrt11_burning_que_like(burning_question_uid, session_id) VALUES (:burningQuestionUid,:sessionId);";
-	    
+
+    @Override
     public boolean addLike(Long burningQuestionUid, Long sessionId) {
-	int status = getSession().createSQLQuery(INSERT_LIKE)
-		.setParameter("burningQuestionUid", burningQuestionUid)
-		.setParameter("sessionId", sessionId)
-		.executeUpdate();
+	int status = getSession().createSQLQuery(INSERT_LIKE).setParameter("burningQuestionUid", burningQuestionUid)
+		.setParameter("sessionId", sessionId).executeUpdate();
 	return status == 1;
     }
-    
+
+    @Override
     public void removeLike(Long burningQuestionUid, Long sessionId) {
 
 	final String FIND_BY_SESSION_AND_BURNING_QUESTION = "from " + BurningQuestionLike.class.getName()
 		+ " as l where l.sessionId=? and l.burningQuestion.uid = ?";
-	
-	List<BurningQuestionLike> list = find(FIND_BY_SESSION_AND_BURNING_QUESTION, new Object[] {sessionId, burningQuestionUid});
+
+	List<BurningQuestionLike> list = find(FIND_BY_SESSION_AND_BURNING_QUESTION,
+		new Object[] { sessionId, burningQuestionUid });
 	if (list == null || list.size() == 0) {
 	    return;
 	}
 	BurningQuestionLike like = list.get(0);
-	
+
 	if (like != null) {
 	    delete(like);
 	}

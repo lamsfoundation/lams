@@ -8,7 +8,7 @@ import org.lamsfoundation.lams.usermanagement.User;
 /**
  *
  * @author Marcin Cieslak
- * 
+ *
  */
 public class PedagogicalPlannerSequenceNode {
     // user bit encoding to compact permissions into a single integer
@@ -22,7 +22,7 @@ public class PedagogicalPlannerSequenceNode {
     public static final int PERMISSION_TEACHER_VIEW_IN_FULL_AUTHOR = 1 << 7;
     public static final int PERMISSION_TEACHER_EXPORT = 1 << 8;
     public static final int PERMISSION_TEACHER_SAVE = 1 << 9;
-    
+
     public static final int PERMISSION_DEFAULT_SETTING = PERMISSION_EDITOR_VIEW + PERMISSION_EDITOR_MODIFY
 	    + PERMISSION_TEACHER_VIEW + PERMISSION_TEACHER_COPY + PERMISSION_TEACHER_PREVIEW
 	    + PERMISSION_TEACHER_VIEW_IN_FULL_AUTHOR + PERMISSION_TEACHER_EXPORT + PERMISSION_TEACHER_SAVE;
@@ -107,7 +107,7 @@ public class PedagogicalPlannerSequenceNode {
     public void setFullDescription(String fullDescription) {
 	this.fullDescription = fullDescription;
     }
-    
+
     /**
      *
      * @return
@@ -170,16 +170,16 @@ public class PedagogicalPlannerSequenceNode {
     public void setContentFolderId(String contentFolderId) {
 	this.contentFolderId = contentFolderId;
     }
-    
+
     /**
      *
      */
     public Integer getPermissions() {
-        return permissions;
+	return permissions;
     }
 
     public void setPermissions(Integer permissions) {
-        this.permissions = permissions;
+	this.permissions = permissions;
     }
 
     /**
@@ -190,6 +190,6 @@ public class PedagogicalPlannerSequenceNode {
     }
 
     public void setUser(User user) {
-        this.user = user;
+	this.user = user;
     }
 }

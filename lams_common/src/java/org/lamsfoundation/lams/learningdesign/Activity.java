@@ -2,21 +2,21 @@
  * Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
  * =============================================================
  * License Information: http://lamsfoundation.org/licensing/lams/2.0/
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License version 2.0 
+ * it under the terms of the GNU General Public License version 2.0
  * as published by the Free Software Foundation.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301
  * USA
- * 
+ *
  * http://www.gnu.org/licenses/gpl.txt
  * ************************************************************************
  */
@@ -57,7 +57,7 @@ public abstract class Activity implements Serializable, Nullable, Comparable<Act
     /*
      * static final variables indicating the type of activities available for a LearningDesign. As new types of
      * activities are added, these constants must be updated, as well as ActivityDAO.getActivityByActivityId()
-     * 
+     *
      * OPTIONS_WITH_SEQUENCES_TYPE is set up just to support Authoring. The server treads OptionsActivity and
      * OptionalSequenceActivity the same.
      */
@@ -296,66 +296,66 @@ public abstract class Activity implements Serializable, Nullable, Comparable<Act
 	// also default to a sensible category type
 	Activity activity = null;
 	switch (activityType) {
-	case TOOL_ACTIVITY_TYPE:
-	    activity = new ToolActivity();
-	    activity.setActivityCategoryID(Activity.CATEGORY_CONTENT);
-	    break;
-	case OPTIONS_ACTIVITY_TYPE:
-	    activity = new OptionsActivity();
-	    activity.setActivityCategoryID(Activity.CATEGORY_SYSTEM);
-	    break;
-	case PARALLEL_ACTIVITY_TYPE:
-	    activity = new ParallelActivity();
-	    activity.setActivityCategoryID(Activity.CATEGORY_SPLIT);
-	    break;
-	case SEQUENCE_ACTIVITY_TYPE:
-	    activity = new SequenceActivity();
-	    activity.setActivityCategoryID(Activity.CATEGORY_SYSTEM);
-	    break;
-	case SYNCH_GATE_ACTIVITY_TYPE:
-	    activity = new SynchGateActivity();
-	    activity.setActivityCategoryID(Activity.CATEGORY_SYSTEM);
-	    break;
-	case SCHEDULE_GATE_ACTIVITY_TYPE:
-	    activity = new ScheduleGateActivity();
-	    activity.setActivityCategoryID(Activity.CATEGORY_SYSTEM);
-	    break;
-	case PERMISSION_GATE_ACTIVITY_TYPE:
-	    activity = new PermissionGateActivity();
-	    activity.setActivityCategoryID(Activity.CATEGORY_SYSTEM);
-	    break;
-	case SYSTEM_GATE_ACTIVITY_TYPE:
-	    activity = new SystemGateActivity();
-	    activity.setActivityCategoryID(Activity.CATEGORY_SYSTEM);
-	    break;
-	case CONDITION_GATE_ACTIVITY_TYPE:
-	    activity = new ConditionGateActivity();
-	    activity.setActivityCategoryID(Activity.CATEGORY_SYSTEM);
-	    break;
-	case CHOSEN_BRANCHING_ACTIVITY_TYPE:
-	    activity = new ChosenBranchingActivity();
-	    activity.setActivityCategoryID(Activity.CATEGORY_SYSTEM);
-	    break;
-	case GROUP_BRANCHING_ACTIVITY_TYPE:
-	    activity = new GroupBranchingActivity();
-	    activity.setActivityCategoryID(Activity.CATEGORY_SYSTEM);
-	    break;
-	case TOOL_BRANCHING_ACTIVITY_TYPE:
-	    activity = new ToolBranchingActivity();
-	    activity.setActivityCategoryID(Activity.CATEGORY_SYSTEM);
-	    break;
-	case OPTIONS_WITH_SEQUENCES_TYPE:
-	    activity = new OptionsWithSequencesActivity();
-	    activity.setActivityCategoryID(Activity.CATEGORY_SYSTEM);
-	    break;
-	case FLOATING_ACTIVITY_TYPE:
-	    activity = new FloatingActivity();
-	    activity.setActivityCategoryID(Activity.CATEGORY_SYSTEM);
-	    break;
-	default:
-	    activity = new GroupingActivity();
-	    activity.setActivityCategoryID(Activity.CATEGORY_SYSTEM);
-	    break;
+	    case TOOL_ACTIVITY_TYPE:
+		activity = new ToolActivity();
+		activity.setActivityCategoryID(Activity.CATEGORY_CONTENT);
+		break;
+	    case OPTIONS_ACTIVITY_TYPE:
+		activity = new OptionsActivity();
+		activity.setActivityCategoryID(Activity.CATEGORY_SYSTEM);
+		break;
+	    case PARALLEL_ACTIVITY_TYPE:
+		activity = new ParallelActivity();
+		activity.setActivityCategoryID(Activity.CATEGORY_SPLIT);
+		break;
+	    case SEQUENCE_ACTIVITY_TYPE:
+		activity = new SequenceActivity();
+		activity.setActivityCategoryID(Activity.CATEGORY_SYSTEM);
+		break;
+	    case SYNCH_GATE_ACTIVITY_TYPE:
+		activity = new SynchGateActivity();
+		activity.setActivityCategoryID(Activity.CATEGORY_SYSTEM);
+		break;
+	    case SCHEDULE_GATE_ACTIVITY_TYPE:
+		activity = new ScheduleGateActivity();
+		activity.setActivityCategoryID(Activity.CATEGORY_SYSTEM);
+		break;
+	    case PERMISSION_GATE_ACTIVITY_TYPE:
+		activity = new PermissionGateActivity();
+		activity.setActivityCategoryID(Activity.CATEGORY_SYSTEM);
+		break;
+	    case SYSTEM_GATE_ACTIVITY_TYPE:
+		activity = new SystemGateActivity();
+		activity.setActivityCategoryID(Activity.CATEGORY_SYSTEM);
+		break;
+	    case CONDITION_GATE_ACTIVITY_TYPE:
+		activity = new ConditionGateActivity();
+		activity.setActivityCategoryID(Activity.CATEGORY_SYSTEM);
+		break;
+	    case CHOSEN_BRANCHING_ACTIVITY_TYPE:
+		activity = new ChosenBranchingActivity();
+		activity.setActivityCategoryID(Activity.CATEGORY_SYSTEM);
+		break;
+	    case GROUP_BRANCHING_ACTIVITY_TYPE:
+		activity = new GroupBranchingActivity();
+		activity.setActivityCategoryID(Activity.CATEGORY_SYSTEM);
+		break;
+	    case TOOL_BRANCHING_ACTIVITY_TYPE:
+		activity = new ToolBranchingActivity();
+		activity.setActivityCategoryID(Activity.CATEGORY_SYSTEM);
+		break;
+	    case OPTIONS_WITH_SEQUENCES_TYPE:
+		activity = new OptionsWithSequencesActivity();
+		activity.setActivityCategoryID(Activity.CATEGORY_SYSTEM);
+		break;
+	    case FLOATING_ACTIVITY_TYPE:
+		activity = new FloatingActivity();
+		activity.setActivityCategoryID(Activity.CATEGORY_SYSTEM);
+		break;
+	    default:
+		activity = new GroupingActivity();
+		activity.setActivityCategoryID(Activity.CATEGORY_SYSTEM);
+		break;
 	}
 	activity.setActivityTypeId(new Integer(activityType));
 	return activity;
@@ -619,10 +619,10 @@ public abstract class Activity implements Serializable, Nullable, Comparable<Act
     /**
      * This function returns the Transition that STARTS FROM THIS ACTIVITY. In simpler words the next activity in the
      * transition.
-     * 
+     *
      * For example, if we have a transition as following A --> B --> C. For activity B this function would return C.
      * That is the Transition FROM activity B.
-     * 
+     *
      * @return Returns the transitionFrom.
      */
     public Transition getTransitionFrom() {
@@ -640,10 +640,10 @@ public abstract class Activity implements Serializable, Nullable, Comparable<Act
     /**
      * This function returns the Transition that POINTS TO THIS ACTIVITY and NOT the transition that this activity
      * points to.
-     * 
+     *
      * For example, if we have a transition as following A --> B --> C. For activity B this function would return A.
      * That is the Transition that points TO activity B.
-     * 
+     *
      * @return Returns the transitionTo.
      */
     public Transition getTransitionTo() {
@@ -712,12 +712,12 @@ public abstract class Activity implements Serializable, Nullable, Comparable<Act
 
     /**
      * This method that get all tool activities belong to the current activity.
-     * 
+     *
      * As the activity object structure might be infinite, we recursively loop through the entire structure and added
      * all tool activities into the set that we want to return. This method calls a method getToolActivitiesInActivity()
      * which must be defined in subclasses for tool or a complex activities. This handles the polymorphic aspect of this
      * function. (Note: we can't use instanceOf as we are dealing with Hibernate proxies.)
-     * 
+     *
      * @return the set of all tool activities.
      */
     public Set getAllToolActivities() {
@@ -735,7 +735,7 @@ public abstract class Activity implements Serializable, Nullable, Comparable<Act
     /**
      * Return the group information for the requested user when he is running current activity instance, based on the
      * grouping data in the activity.
-     * 
+     *
      * @param learner
      *            the requested user
      * @return the group that this user belongs to.
@@ -750,7 +750,7 @@ public abstract class Activity implements Serializable, Nullable, Comparable<Act
      * <P>
      * If we are using the grouping set up in the activity, the grouping will be this.getGrouping(). If the activity
      * isn't grouped, then it should use the class grouping.
-     * 
+     *
      * @param learner
      *            the requested user
      * @return the group that this user belongs to.
@@ -773,7 +773,7 @@ public abstract class Activity implements Serializable, Nullable, Comparable<Act
     // ---------------------------------------------------------------------
     /**
      * Check up whether an activity is tool activity or not.
-     * 
+     *
      * @return is this activity a tool activity?
      */
     public boolean isToolActivity() {
@@ -782,7 +782,7 @@ public abstract class Activity implements Serializable, Nullable, Comparable<Act
 
     /**
      * Check up whether an activity is sequence activity or not.
-     * 
+     *
      * @return is this activity a sequence activity?
      */
     public boolean isSequenceActivity() {
@@ -827,7 +827,7 @@ public abstract class Activity implements Serializable, Nullable, Comparable<Act
 
     /**
      * Check up whether an activity is synch gate activity or not.
-     * 
+     *
      * @return is this activity a synch gate activity?
      */
     public boolean isSynchGate() {
@@ -836,7 +836,7 @@ public abstract class Activity implements Serializable, Nullable, Comparable<Act
 
     /**
      * Check up whether an activity is permission gate activity or not.
-     * 
+     *
      * @return is this activity a permission gate activity.
      */
     public boolean isPermissionGate() {
@@ -845,7 +845,7 @@ public abstract class Activity implements Serializable, Nullable, Comparable<Act
 
     /**
      * Check up whether an activity is schedule gate activity or not.
-     * 
+     *
      * @return is this activity a schedule gate activity.
      */
     public boolean isScheduleGate() {
@@ -858,7 +858,7 @@ public abstract class Activity implements Serializable, Nullable, Comparable<Act
 
     /**
      * Check up whether an activity is schedule gate activity or not.
-     * 
+     *
      * @return is this activity a schedule gate activity.
      */
     public boolean isSystemGate() {
@@ -867,7 +867,7 @@ public abstract class Activity implements Serializable, Nullable, Comparable<Act
 
     /**
      * /** Check up whether an activity is grouping activity or not.
-     * 
+     *
      * @return is this activity a grouping activity
      */
     public boolean isGroupingActivity() {
@@ -876,7 +876,7 @@ public abstract class Activity implements Serializable, Nullable, Comparable<Act
 
     /**
      * Check up whether an activity is some sort of branching activity or not
-     * 
+     *
      * @return is this activity a branching activity
      */
     public boolean isBranchingActivity() {
@@ -887,7 +887,7 @@ public abstract class Activity implements Serializable, Nullable, Comparable<Act
 
     /**
      * Check up whether an activity is branching activity based on the monitor choice or not.
-     * 
+     *
      * @return is this activity a branching activity
      */
     public boolean isChosenBranchingActivity() {
@@ -896,7 +896,7 @@ public abstract class Activity implements Serializable, Nullable, Comparable<Act
 
     /**
      * Check up whether an activity is branching activity based on an existing group or not.
-     * 
+     *
      * @return is this activity a branching activity
      */
     public boolean isGroupBranchingActivity() {
@@ -905,7 +905,7 @@ public abstract class Activity implements Serializable, Nullable, Comparable<Act
 
     /**
      * Check up whether an activity is branching activity based on another activity's output or not.
-     * 
+     *
      * @return is this activity a branching activity
      */
     public boolean isToolBranchingActivity() {
@@ -914,7 +914,7 @@ public abstract class Activity implements Serializable, Nullable, Comparable<Act
 
     /**
      * Check up whether an activity is floating activity.
-     * 
+     *
      * @return is this activity a floating activity
      */
     public boolean isFloatingActivity() {
@@ -930,7 +930,7 @@ public abstract class Activity implements Serializable, Nullable, Comparable<Act
     // ---------------------------------------------------------------------
     /**
      * Return the activity dto for progress view.
-     * 
+     *
      * @return the activity dto.
      */
     public ProgressActivityDTO getProgressActivityData() {
@@ -954,7 +954,7 @@ public abstract class Activity implements Serializable, Nullable, Comparable<Act
     /**
      * Create a deep copy of the this activity. It should return the same subclass as the activity being copied.
      * Generally doesn't copy the "link" type fields like transitions, learning design, etc.
-     * 
+     *
      * @param uiidOffset
      *            - this should be added to UIID fields in any new objects. Used when importing a design into another
      *            design.
@@ -1004,7 +1004,7 @@ public abstract class Activity implements Serializable, Nullable, Comparable<Act
 
     /**
      * Validate activity
-     * 
+     *
      */
     public Vector<ValidationErrorDTO> validateActivity(MessageService messageService) {
 	return null;

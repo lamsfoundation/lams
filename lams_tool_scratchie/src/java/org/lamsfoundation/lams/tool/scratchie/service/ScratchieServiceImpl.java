@@ -2,21 +2,21 @@
  * Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
  * =============================================================
  * License Information: http://lamsfoundation.org/licensing/lams/2.0/
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301
  * USA
- * 
+ *
  * http://www.gnu.org/licenses/gpl.txt
  * ****************************************************************
  */
@@ -320,7 +320,7 @@ public class ScratchieServiceImpl
 
     /**
      * Recalculate mark for leader and sets it to all members of a group
-     * 
+     *
      * @param leader
      * @param answerUid
      */
@@ -620,7 +620,7 @@ public class ScratchieServiceImpl
 
     /**
      * Check if the specified item was unraveled by user
-     * 
+     *
      * @param item
      *            specified item
      * @param userLogs
@@ -649,7 +649,7 @@ public class ScratchieServiceImpl
     }
 
     /**
-     * 
+     *
      * @param scratchie
      * @param item
      * @param userLogs
@@ -786,7 +786,7 @@ public class ScratchieServiceImpl
 
 	List<BurningQuestionDTO> burningQuestionDtos = scratchieBurningQuestionDao
 		.getBurningQuestionsByContentId(scratchie.getUid(), sessionId);
-	
+
 	//in order to group BurningQuestions by items, organise them as a list of BurningQuestionItemDTOs
 	List<BurningQuestionItemDTO> burningQuestionItemDtos = new ArrayList<BurningQuestionItemDTO>();
 	for (ScratchieItem item : items) {
@@ -795,13 +795,14 @@ public class ScratchieServiceImpl
 
 	    for (BurningQuestionDTO burningQuestionDto : burningQuestionDtos) {
 		ScratchieBurningQuestion burningQuestion = burningQuestionDto.getBurningQuestion();
-		
-		//general burning question is handled further down 
-		if (!burningQuestion.isGeneralQuestion() && item.getUid().equals(burningQuestion.getScratchieItem().getUid())) {
+
+		//general burning question is handled further down
+		if (!burningQuestion.isGeneralQuestion()
+			&& item.getUid().equals(burningQuestion.getScratchieItem().getUid())) {
 		    burningQuestionDtosOfSpecifiedItem.add(burningQuestionDto);
 		}
 	    }
-	    
+
 	    BurningQuestionItemDTO burningQuestionItemDto = new BurningQuestionItemDTO();
 	    burningQuestionItemDto.setScratchieItem(item);
 	    burningQuestionItemDto.setBurningQuestionDtos(burningQuestionDtosOfSpecifiedItem);
@@ -818,34 +819,34 @@ public class ScratchieServiceImpl
 	List<BurningQuestionDTO> burningQuestionDtosOfSpecifiedItem = new ArrayList<BurningQuestionDTO>();
 	for (BurningQuestionDTO burningQuestionDto : burningQuestionDtos) {
 	    ScratchieBurningQuestion burningQuestion = burningQuestionDto.getBurningQuestion();
-	    
+
 	    if (burningQuestion.isGeneralQuestion()) {
 		burningQuestionDtosOfSpecifiedItem.add(burningQuestionDto);
 	    }
 	}
 	generalBurningQuestionItemDto.setBurningQuestionDtos(burningQuestionDtosOfSpecifiedItem);
 	burningQuestionItemDtos.add(generalBurningQuestionItemDto);
-	
+
 	//escape for Javascript
 	for (BurningQuestionItemDTO burningQuestionItemDto : burningQuestionItemDtos) {
 	    for (BurningQuestionDTO burningQuestionDto : burningQuestionItemDto.getBurningQuestionDtos()) {
 		String escapedSessionName = StringEscapeUtils.escapeJavaScript(burningQuestionDto.getSessionName());
 		burningQuestionDto.setSessionName(escapedSessionName);
 
-		String escapedBurningQuestion = StringEscapeUtils
-			.escapeJavaScript(burningQuestionDto.getBurningQuestion().getQuestion().replaceAll("\\n", "<br>"));
+		String escapedBurningQuestion = StringEscapeUtils.escapeJavaScript(
+			burningQuestionDto.getBurningQuestion().getQuestion().replaceAll("\\n", "<br>"));
 		burningQuestionDto.setEscapedBurningQuestion(escapedBurningQuestion);
 	    }
 	}
 
 	return burningQuestionItemDtos;
     }
-    
+
     @Override
     public boolean addLike(Long burningQuestionUid, Long sessionId) {
 	return burningQuestionLikeDao.addLike(burningQuestionUid, sessionId);
     }
-    
+
     @Override
     public void removeLike(Long burningQuestionUid, Long sessionId) {
 	burningQuestionLikeDao.removeLike(burningQuestionUid, sessionId);
@@ -1470,10 +1471,10 @@ public class ScratchieServiceImpl
 
 	ExcelCell[][] fourthPageData = rowList.toArray(new ExcelCell[][] {});
 	dataToExport.put(getMessage("label.spss.analysis"), fourthPageData);
-	
+
 	// ======================================================= Burning questions page
 	// =======================================
-	
+
 	if (scratchie.isBurningQuestionsEnabled()) {
 	    rowList = new LinkedList<ExcelCell[]>();
 
@@ -1481,7 +1482,7 @@ public class ScratchieServiceImpl
 	    row[0] = new ExcelCell(getMessage("label.burning.questions"), true);
 	    rowList.add(row);
 	    rowList.add(ScratchieServiceImpl.EMPTY_ROW);
-	    
+
 	    row = new ExcelCell[3];
 	    row[0] = new ExcelCell(getMessage("label.monitoring.summary.user.name"), IndexedColors.BLUE);
 	    row[1] = new ExcelCell(getMessage("label.burning.questions"), IndexedColors.BLUE);
@@ -1494,7 +1495,7 @@ public class ScratchieServiceImpl
 		row = new ExcelCell[1];
 		row[0] = new ExcelCell(item.getTitle(), false);
 		rowList.add(row);
-		
+
 		List<BurningQuestionDTO> burningQuestionDtos = burningQuestionItemDto.getBurningQuestionDtos();
 		for (BurningQuestionDTO burningQuestionDto : burningQuestionDtos) {
 		    String burningQuestion = burningQuestionDto.getBurningQuestion().getQuestion();
@@ -1755,7 +1756,7 @@ public class ScratchieServiceImpl
      * that are always available for the tool (e.g. number of marks for Multiple Choice) or a custom definition created
      * for a particular activity such as the answer to the third question contains the word Koala and hence the need for
      * the toolContentId
-     * 
+     *
      * @return SortedMap of ToolOutputDefinitions with the key being the name of each definition
      * @throws ScratchieApplicationException
      */

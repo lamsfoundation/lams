@@ -25,7 +25,7 @@ package org.lamsfoundation.lams.usermanagement.dto;
 
 /**
  * @author jliew
- * 
+ *
  */
 public class CollapsedOrgDTO {
 

@@ -2,21 +2,21 @@
  * Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
  * =============================================================
  * License Information: http://lamsfoundation.org/licensing/lams/2.0/
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301
  * USA
- * 
+ *
  * http://www.gnu.org/licenses/gpl.txt
  * ****************************************************************
  */
@@ -32,13 +32,13 @@ import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.commons.lang.builder.ToStringBuilder;
 
 /**
- * 
+ *
  * @author Ozgur Demirtas
- * 
- * The value object that maps to our model database table:
- * tl_laqa11_que_usr The relevant hibernate mapping resides in: QaQueUsr.hbm.xml
- * 
- * Represents tool users.
+ *
+ *         The value object that maps to our model database table:
+ *         tl_laqa11_que_usr The relevant hibernate mapping resides in: QaQueUsr.hbm.xml
+ *
+ *         Represents tool users.
  */
 public class QaQueUsr implements Serializable, Nullable, Comparable<QaQueUsr> {
 
@@ -70,8 +70,7 @@ public class QaQueUsr implements Serializable, Nullable, Comparable<QaQueUsr> {
     };
 
     /** full constructor */
-    public QaQueUsr(Long queUsrId, String username, String fullname, QaSession qaSession,
-	    Set qaUsrResps)
+    public QaQueUsr(Long queUsrId, String username, String fullname, QaSession qaSession, Set qaUsrResps)
 
     {
 	this.queUsrId = queUsrId;
@@ -83,9 +82,9 @@ public class QaQueUsr implements Serializable, Nullable, Comparable<QaQueUsr> {
 
     /**
      * Copy construtor; We copy all data except the hibernate id field.
-     * 
+     *
      * @param queUsr
-     *                the original survey question user object.
+     *            the original survey question user object.
      * @return the survey question user object.
      */
     public QaQueUsr newInstance(QaQueUsr queUsr) {
@@ -102,7 +101,7 @@ public class QaQueUsr implements Serializable, Nullable, Comparable<QaQueUsr> {
 
     /**
      * @param fullName
-     *                The fullName to set.
+     *            The fullName to set.
      */
     public void setFullname(String fullname) {
 	this.fullname = fullname;
@@ -117,7 +116,7 @@ public class QaQueUsr implements Serializable, Nullable, Comparable<QaQueUsr> {
 
     /**
      * @param qaSession
-     *                The qaSession to set.
+     *            The qaSession to set.
      */
     public void setQaSession(QaSession qaSession) {
 	this.qaSession = qaSession;
@@ -127,14 +126,15 @@ public class QaQueUsr implements Serializable, Nullable, Comparable<QaQueUsr> {
      * @return Returns the qaUsrResps.
      */
     public Set getQaUsrResps() {
-	if (this.qaUsrResps == null)
+	if (this.qaUsrResps == null) {
 	    setQaUsrResps(new TreeSet());
+	}
 	return this.qaUsrResps;
     }
 
     /**
      * @param qaUsrResps
-     *                The qaUsrResps to set.
+     *            The qaUsrResps to set.
      */
     public void setQaUsrResps(Set qaUsrResps) {
 	this.qaUsrResps = qaUsrResps;
@@ -149,7 +149,7 @@ public class QaQueUsr implements Serializable, Nullable, Comparable<QaQueUsr> {
 
     /**
      * @param queUsrId
-     *                The queUsrId to set.
+     *            The queUsrId to set.
      */
     public void setQueUsrId(Long queUsrId) {
 	this.queUsrId = queUsrId;
@@ -164,28 +164,33 @@ public class QaQueUsr implements Serializable, Nullable, Comparable<QaQueUsr> {
 
     /**
      * @param username
-     *                The username to set.
+     *            The username to set.
      */
     public void setUsername(String username) {
 	this.username = username;
     }
 
+    @Override
     public String toString() {
-	return new ToStringBuilder(this).append("queUsrId", getQueUsrId()).append("username", getUsername()).append(
-		"full name", getFullname()).toString();
+	return new ToStringBuilder(this).append("queUsrId", getQueUsrId()).append("username", getUsername())
+		.append("full name", getFullname()).toString();
     }
 
+    @Override
     public boolean equals(Object other) {
-	if (!(other instanceof QaQueUsr))
+	if (!(other instanceof QaQueUsr)) {
 	    return false;
+	}
 	QaQueUsr castOther = (QaQueUsr) other;
 	return new EqualsBuilder().append(this.getQueUsrId(), castOther.getQueUsrId()).isEquals();
     }
 
+    @Override
     public int hashCode() {
 	return new HashCodeBuilder().append(getQueUsrId()).toHashCode();
     }
 
+    @Override
     public boolean isNull() {
 	return false;
     }
@@ -199,7 +204,7 @@ public class QaQueUsr implements Serializable, Nullable, Comparable<QaQueUsr> {
 
     /**
      * @param uid
-     *                The uid to set.
+     *            The uid to set.
      */
     public void setUid(Long uid) {
 	this.uid = uid;
@@ -214,7 +219,7 @@ public class QaQueUsr implements Serializable, Nullable, Comparable<QaQueUsr> {
 
     /**
      * @param responseFinalized
-     *                The responseFinalized to set.
+     *            The responseFinalized to set.
      */
     public void setResponseFinalized(boolean responseFinalized) {
 	this.responseFinalized = responseFinalized;
@@ -229,12 +234,13 @@ public class QaQueUsr implements Serializable, Nullable, Comparable<QaQueUsr> {
 
     /**
      * @param learnerFinished
-     *                The learnerFinished to set.
+     *            The learnerFinished to set.
      */
     public void setLearnerFinished(boolean learnerFinished) {
 	this.learnerFinished = learnerFinished;
     }
-    
+
+    @Override
     public int compareTo(QaQueUsr user) {
 	if (user.getUid() != null && uid != null) {
 	    return user.getUid().compareTo(uid) * -1;

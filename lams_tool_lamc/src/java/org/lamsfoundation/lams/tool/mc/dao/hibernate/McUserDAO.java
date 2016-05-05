@@ -2,21 +2,21 @@
  * Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
  * =============================================================
  * License Information: http://lamsfoundation.org/licensing/lams/2.0/
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301
  * USA
- * 
+ *
  * http://www.gnu.org/licenses/gpl.txt
  * ***********************************************************************/
 /* $$Id$$ */
@@ -27,8 +27,8 @@ import java.util.List;
 
 import org.hibernate.FlushMode;
 import org.hibernate.Query;
-import org.lamsfoundation.lams.tool.mc.McUserMarkDTO;
 import org.lamsfoundation.lams.dao.hibernate.LAMSBaseDAO;
+import org.lamsfoundation.lams.tool.mc.McUserMarkDTO;
 import org.lamsfoundation.lams.tool.mc.dao.IMcUserDAO;
 import org.lamsfoundation.lams.tool.mc.pojos.McQueUsr;
 import org.springframework.stereotype.Repository;
@@ -47,14 +47,16 @@ public class McUserDAO extends LAMSBaseDAO implements IMcUserDAO {
 
     private static final String GET_USER_BY_USER_ID_SESSION = "from mcQueUsr in class McQueUsr where mcQueUsr.queUsrId=:queUsrId and mcQueUsr.mcSessionId=:mcSessionUid";
 
+    @Override
     public McQueUsr getMcUserByUID(Long uid) {
 	return (McQueUsr) this.getSession().get(McQueUsr.class, uid);
     }
 
+    @Override
     public McQueUsr getMcUserBySession(final Long queUsrId, final Long mcSessionUid) {
 
-	List list = getSessionFactory().getCurrentSession().createQuery(GET_USER_BY_USER_ID_SESSION).setLong("queUsrId", queUsrId.longValue())
-		.setLong("mcSessionUid", mcSessionUid.longValue()).list();
+	List list = getSessionFactory().getCurrentSession().createQuery(GET_USER_BY_USER_ID_SESSION)
+		.setLong("queUsrId", queUsrId.longValue()).setLong("mcSessionUid", mcSessionUid.longValue()).list();
 
 	if (list != null && list.size() > 0) {
 	    McQueUsr usr = (McQueUsr) list.get(0);
@@ -63,20 +65,24 @@ public class McUserDAO extends LAMSBaseDAO implements IMcUserDAO {
 	return null;
     }
 
+    @Override
     public void saveMcUser(McQueUsr mcUser) {
 	this.getSession().save(mcUser);
     }
 
+    @Override
     public void updateMcUser(McQueUsr mcUser) {
 	this.getSession().update(mcUser);
     }
 
+    @Override
     public void removeMcUser(McQueUsr mcUser) {
 	getSessionFactory().getCurrentSession().setFlushMode(FlushMode.AUTO);
 	this.getSession().delete(mcUser);
     }
 
     /** Get the max, min and average mark (in that order) for a session */
+    @Override
     public Integer[] getMarkStatisticsForSession(Long sessionUid) {
 	Object[] stats = (Object[]) getSessionFactory().getCurrentSession().createQuery(CALC_MARK_STATS_FOR_SESSION)
 		.setLong("mcSessionUid", sessionUid.longValue()).uniqueResult();
@@ -95,19 +101,15 @@ public class McUserDAO extends LAMSBaseDAO implements IMcUserDAO {
 
     }
 
+    @Override
     public List<McUserMarkDTO> getPagedUsersBySession(Long sessionId, int page, int size, String sortBy,
 	    String sortOrder, String searchString) {
-	
-	
-	final String LOAD_USERS = "SELECT DISTINCT user.uid, user.fullname, user.lastAttemptTotalMark " +
- 		"FROM "+ McQueUsr.class.getName() + " user " +
- 		"WHERE user.mcSession.mcSessionId = :sessionId " +
-			" AND (user.fullname LIKE CONCAT('%', :searchString, '%')) " +
-		" ORDER BY " +
-		" CASE " +
-		" 	WHEN :sortBy='userName' THEN user.fullname " +
-		" 	WHEN :sortBy='total' THEN user.lastAttemptTotalMark " +
-		" END " + sortOrder;
+
+	final String LOAD_USERS = "SELECT DISTINCT user.uid, user.fullname, user.lastAttemptTotalMark " + "FROM "
+		+ McQueUsr.class.getName() + " user " + "WHERE user.mcSession.mcSessionId = :sessionId "
+		+ " AND (user.fullname LIKE CONCAT('%', :searchString, '%')) " + " ORDER BY " + " CASE "
+		+ " 	WHEN :sortBy='userName' THEN user.fullname "
+		+ " 	WHEN :sortBy='total' THEN user.lastAttemptTotalMark " + " END " + sortOrder;
 
 	Query query = getSession().createQuery(LOAD_USERS);
 	query.setLong("sessionId", sessionId);

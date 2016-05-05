@@ -2,29 +2,27 @@
  * Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
  * =============================================================
  * License Information: http://lamsfoundation.org/licensing/lams/2.0/
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301
  * USA
- * 
+ *
  * http://www.gnu.org/licenses/gpl.txt
  * ****************************************************************
  */
 /* $$Id$$ */
 
 package org.lamsfoundation.lams.tool.leaderselection.web.actions;
-
-import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -33,12 +31,9 @@ import org.apache.log4j.Logger;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
-import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.tool.leaderselection.dto.LeaderselectionDTO;
 import org.lamsfoundation.lams.tool.leaderselection.dto.LeaderselectionSessionDTO;
-import org.lamsfoundation.lams.tool.leaderselection.dto.LeaderselectionUserDTO;
 import org.lamsfoundation.lams.tool.leaderselection.model.Leaderselection;
-import org.lamsfoundation.lams.tool.leaderselection.model.LeaderselectionUser;
 import org.lamsfoundation.lams.tool.leaderselection.service.ILeaderselectionService;
 import org.lamsfoundation.lams.tool.leaderselection.service.LeaderselectionServiceProxy;
 import org.lamsfoundation.lams.tool.leaderselection.util.LeaderselectionConstants;
@@ -49,7 +44,7 @@ import org.lamsfoundation.lams.web.util.SessionMap;
 
 /**
  *
- * 
+ *
  *
  *
  */
@@ -59,6 +54,7 @@ public class MonitoringAction extends LamsDispatchAction {
 
     private ILeaderselectionService service;
 
+    @Override
     public ActionForward unspecified(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) {
 
@@ -104,8 +100,8 @@ public class MonitoringAction extends LamsDispatchAction {
     public ActionForward manageLeaders(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) {
 	String sessionMapID = request.getParameter(LeaderselectionConstants.ATTR_SESSION_MAP_ID);
-	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession().getAttribute(
-		sessionMapID);
+	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
+		.getAttribute(sessionMapID);
 	request.setAttribute(LeaderselectionConstants.ATTR_SESSION_MAP_ID, sessionMap.getSessionID());
 	return mapping.findForward("manageLeaders");
     }
@@ -116,8 +112,8 @@ public class MonitoringAction extends LamsDispatchAction {
     public ActionForward saveLeaders(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) {
 	String sessionMapID = request.getParameter(LeaderselectionConstants.ATTR_SESSION_MAP_ID);
-	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession().getAttribute(
-		sessionMapID);
+	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
+		.getAttribute(sessionMapID);
 	request.setAttribute(LeaderselectionConstants.ATTR_SESSION_MAP_ID, sessionMap.getSessionID());
 	initService();
 

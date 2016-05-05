@@ -42,11 +42,11 @@ public interface IGradebookDAO extends IBaseDAO {
     Double getGradebookUserActivityMarkSum(Long lessonID, Integer userID);
 
     List<GradebookUserActivity> getAllGradebookUserActivitiesForActivity(Long activityID);
-    
+
     /**
      * The same as getAllGradebookUserActivitiesForActivity(Long activityID) except it returns not all
      * GradebookUserActivity but for specified users.
-     * 
+     *
      * @param activityID
      * @param userIds
      * @return
@@ -64,11 +64,12 @@ public interface IGradebookDAO extends IBaseDAO {
     Double getAverageMarkForGroupedActivity(Long activityID, Long groupID);
 
     long getAverageDurationForGroupedActivity(Long activityID, Long groupID);
-    
+
     List<Lesson> getLessonsByGroupAndUser(final Integer userId, final Integer orgId, int page, int size, String sortBy,
 	    String sortOrder, String searchString);
-    
-    List<User> getUsersByLesson(Long lessonId, int page, int size, String sortBy, String sortOrder, String searchString);
+
+    List<User> getUsersByLesson(Long lessonId, int page, int size, String sortBy, String sortOrder,
+	    String searchString);
 
     List<User> getUsersByGroup(Long lessonId, Long activityId, Long groupId, int page, int size, String sortBy,
 	    String sortOrder, String searchString);
@@ -77,27 +78,27 @@ public interface IGradebookDAO extends IBaseDAO {
 	    String searchString);
 
     int getCountUsersByLesson(Long lessonId, String searchString);
-    
+
     List<User> getUsersFromOrganisation(Integer orgId, int page, int size, String sortOrder, String searchString);
-    
+
     int getCountUsersByOrganisation(Integer orgId, String searchString);
-    
+
     /**
      * Get all GradebookUserLessons by lessonId.
-     * 
+     *
      * @param lesson
      * @return
      */
     List<GradebookUserLesson> getGradebookUserLessons(Lesson lesson);
-    
+
     /**
      * Get GradebookUserLessons from lesson and restricted userIds list.
-     * 
+     *
      * @param lesson
      * @param userIds
      * @return
      */
     List<GradebookUserLesson> getGradebookUserLessons(Lesson lesson, List<Integer> userIds);
-    
+
     List<GradebookUserLesson> getGradebookUserLessons(List<Long> lessonIds);
 }

@@ -2,21 +2,21 @@
  * Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
  * =============================================================
  * License Information: http://lamsfoundation.org/licensing/lams/2.0/
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301
  * USA
- * 
+ *
  * http://www.gnu.org/licenses/gpl.txt
  * ****************************************************************
  */
@@ -34,11 +34,11 @@ import org.apache.log4j.Logger;
 
 /**
  * Resource
- * 
- * @author Dapeng Ni
- * 
  *
- * 
+ * @author Dapeng Ni
+ *
+ *
+ *
  */
 public class Resource implements Cloneable {
 
@@ -94,7 +94,7 @@ public class Resource implements Cloneable {
 
     /**
      * Default contruction method.
-     * 
+     *
      */
     public Resource() {
 	resourceItems = new HashSet();
@@ -187,7 +187,7 @@ public class Resource implements Cloneable {
     // **********************************************************
     /**
      * Returns the object's creation date
-     * 
+     *
      * @return date
      *
      */
@@ -197,7 +197,7 @@ public class Resource implements Cloneable {
 
     /**
      * Sets the object's creation date
-     * 
+     *
      * @param created
      */
     public void setCreated(Date created) {
@@ -206,7 +206,7 @@ public class Resource implements Cloneable {
 
     /**
      * Returns the object's date of last update
-     * 
+     *
      * @return date updated
      *
      */
@@ -216,7 +216,7 @@ public class Resource implements Cloneable {
 
     /**
      * Sets the object's date of last update
-     * 
+     *
      * @param updated
      */
     public void setUpdated(Date updated) {
@@ -225,9 +225,9 @@ public class Resource implements Cloneable {
 
     /**
      * @return Returns the userid of the user who created the Share resources.
-     * 
      *
-     * 
+     *
+     *
      */
     public ResourceUser getCreatedBy() {
 	return createdBy;
@@ -254,9 +254,9 @@ public class Resource implements Cloneable {
 
     /**
      * @return Returns the title.
-     * 
      *
-     * 
+     *
+     *
      */
     public String getTitle() {
 	return title;
@@ -272,9 +272,9 @@ public class Resource implements Cloneable {
 
     /**
      * @return Returns the lockWhenFinish.
-     * 
      *
-     * 
+     *
+     *
      */
     public boolean getLockWhenFinished() {
 	return lockWhenFinished;
@@ -290,7 +290,7 @@ public class Resource implements Cloneable {
 
     /**
      * @return Returns the instructions set by the teacher.
-     * 
+     *
      *
      */
     public String getInstructions() {
@@ -302,12 +302,12 @@ public class Resource implements Cloneable {
     }
 
     /**
-     * 
-     * 
      *
      *
      *
-     * 
+     *
+     *
+     *
      * @return
      */
     public Set getResourceItems() {
@@ -404,7 +404,7 @@ public class Resource implements Cloneable {
 
     /**
      * For display use
-     * 
+     *
      * @return
      */
     public String getMiniViewNumberStr() {

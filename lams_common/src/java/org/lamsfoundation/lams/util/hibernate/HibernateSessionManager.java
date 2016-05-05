@@ -9,7 +9,7 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
 
 /**
  * Helper for Hibernate sessions.
- * 
+ *
  * @author Marcin Cieslak
  */
 public class HibernateSessionManager {

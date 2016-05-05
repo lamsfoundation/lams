@@ -39,19 +39,18 @@ import org.apache.struts.action.ActionMapping;
  *
  *
  *
- * 
+ *
  *
  */
 public class PasswordAction extends Action {
-		
-	public ActionForward execute(ActionMapping mapping,
-            ActionForm form,
-            HttpServletRequest request,
-            HttpServletResponse response) throws Exception {
-	
-		PasswordChangeActionForm passwordChangeForm = (PasswordChangeActionForm)form;
-		passwordChangeForm.setLogin(request.getRemoteUser());
-		request.setAttribute("tab", "profile");
-		return mapping.findForward("passwordChange");
-	}
+
+    @Override
+    public ActionForward execute(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+	    HttpServletResponse response) throws Exception {
+
+	PasswordChangeActionForm passwordChangeForm = (PasswordChangeActionForm) form;
+	passwordChangeForm.setLogin(request.getRemoteUser());
+	request.setAttribute("tab", "profile");
+	return mapping.findForward("passwordChange");
+    }
 }

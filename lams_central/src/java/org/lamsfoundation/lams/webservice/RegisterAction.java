@@ -1,23 +1,23 @@
-/**************************************************************** 
- * Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org) 
- * ============================================================= 
- * License Information: http://lamsfoundation.org/licensing/lams/2.0/ 
- * 
- * This program is free software; you can redistribute it and/or modify 
- * it under the terms of the GNU General Public License version 2.0 
- * as published by the Free Software Foundation. 
- * 
- * This program is distributed in the hope that it will be useful, 
- * but WITHOUT ANY WARRANTY; without even the implied warranty of 
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the 
- * GNU General Public License for more details. 
- * 
- * You should have received a copy of the GNU General Public License 
- * along with this program; if not, write to the Free Software 
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 * USA 
- * 
- * http://www.gnu.org/licenses/gpl.txt 
- * **************************************************************** 
+/****************************************************************
+ * Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
+ * =============================================================
+ * License Information: http://lamsfoundation.org/licensing/lams/2.0/
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License version 2.0
+ * as published by the Free Software Foundation.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 * USA
+ *
+ * http://www.gnu.org/licenses/gpl.txt
+ * ****************************************************************
  */
 
 /* $Id$ */
@@ -42,7 +42,6 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
-import org.lamsfoundation.lams.events.DeliveryMethodMail;
 import org.lamsfoundation.lams.events.IEventNotificationService;
 import org.lamsfoundation.lams.integration.ExtCourseClassMap;
 import org.lamsfoundation.lams.integration.ExtServerOrgMap;
@@ -76,12 +75,12 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
 
 /**
  * @author Andrey Balan
- * 
- *
- * 
  *
  *
- * 
+ *
+ *
+ *
+ *
  */
 public class RegisterAction extends HttpServlet {
 
@@ -103,6 +102,7 @@ public class RegisterAction extends HttpServlet {
 
     private static MessageService messageService = null;
 
+    @Override
     public synchronized void doGet(HttpServletRequest request, HttpServletResponse response)
 	    throws ServletException, IOException {
 
@@ -121,10 +121,11 @@ public class RegisterAction extends HttpServlet {
 
     /**
      * Initialization of the servlet. <br>
-     * 
+     *
      * @throws ServletException
      *             if an error occured
      */
+    @Override
     public void init() throws ServletException {
 	learnerProgressDAO = (ILearnerProgressDAO) WebApplicationContextUtils
 		.getRequiredWebApplicationContext(getServletContext()).getBean("learnerProgressDAO");
@@ -154,15 +155,15 @@ public class RegisterAction extends HttpServlet {
 
     /**
      * Add user to group lessons.
-     * 
+     *
      * External server call must follow the next format: http://<
      * <yourlamsserver>>/lams/central/Register.do?method=addUserToGroupLessons &serverId=%serverId%&datetime=%datetime%
      * &hashValue=%hashValue%&courseId=%courseId%&username=%username%&firstName=
      * %firstName%&lastName=%lastName%&email=%email&isJoinLesson=%isJoinLesson%
      * &isEmailParticipant=%isEmailParticipant%&isEmailCoordinator=%isEmailCoordinator%
-     * 
+     *
      * Here are the parameters explanation:
-     * 
+     *
      * @param method
      *            =addUserToGroupLessons - selfexplanatory.
      * @param serverId
@@ -201,7 +202,7 @@ public class RegisterAction extends HttpServlet {
 	    if (!serverToServerEnable) {
 		String msg = "Server to server registration is not enabled";
 		logger.error(msg);
-		response.sendError(response.SC_METHOD_NOT_ALLOWED, msg);
+		response.sendError(HttpServletResponse.SC_METHOD_NOT_ALLOWED, msg);
 		return;
 	    }
 	    String method = request.getParameter(CentralConstants.PARAM_METHOD);
@@ -222,7 +223,7 @@ public class RegisterAction extends HttpServlet {
 	    if (serverId == null || datetime == null || hashValue == null || username == null) {
 		String msg = "Parameters missing";
 		logger.error(msg);
-		response.sendError(response.SC_BAD_REQUEST, "Parameters missing");
+		response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Parameters missing");
 	    }
 
 	    // authenticate external server
@@ -241,8 +242,8 @@ public class RegisterAction extends HttpServlet {
 	    }
 
 	    // get user from the DB if exists, create it otherwise
-	    ExtUserUseridMap userMap = integrationService.getImplicitExtUserUseridMap(extServer, username,
-		    passwordHash, salt, firstName, lastName, email);
+	    ExtUserUseridMap userMap = integrationService.getImplicitExtUserUseridMap(extServer, username, passwordHash,
+		    salt, firstName, lastName, email);
 	    User user = userMap.getUser();
 
 	    HashSet<Lesson> lessonsToJoin = new HashSet<Lesson>();
@@ -335,13 +336,13 @@ public class RegisterAction extends HttpServlet {
 
     /**
      * Remove user from group lessons.
-     * 
+     *
      * External server call must follow the next format: http://<
      * <yourlamsserver>>/lams/central/Register.do?method=removeUserFromGroup &serverId=%serverId%&datetime=%datetime%
      * &hashValue=%hashValue%&courseId=%courseId%&username=%username%&isRemoveFromAllCourses=%isRemoveFromAllCourses%
-     * 
+     *
      * Here are the parameters explanation:
-     * 
+     *
      * @param method
      *            =removeUserFromGroup - selfexplanatory.
      * @param serverId
@@ -368,7 +369,7 @@ public class RegisterAction extends HttpServlet {
 	    if (!serverToServerEnable) {
 		String msg = "Server to server registration is not enabled";
 		logger.error(msg);
-		response.sendError(response.SC_METHOD_NOT_ALLOWED, msg);
+		response.sendError(HttpServletResponse.SC_METHOD_NOT_ALLOWED, msg);
 		return;
 	    }
 	    String method = request.getParameter(CentralConstants.PARAM_METHOD);
@@ -383,7 +384,7 @@ public class RegisterAction extends HttpServlet {
 	    if (serverId == null || datetime == null || hashValue == null || username == null) {
 		String msg = "Parameters missing";
 		logger.error(msg);
-		response.sendError(response.SC_BAD_REQUEST, "Parameters missing");
+		response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Parameters missing");
 	    }
 
 	    // authenticate external server
@@ -436,13 +437,13 @@ public class RegisterAction extends HttpServlet {
     /**
      * Resets user's time limit for all lessons in a group with scheduledToCloseForIndividuals setting on. In case
      * lesson's time limit is not individual it does nothing.
-     * 
+     *
      * External server call must follow the next format: http://<
      * <yourlamsserver>>/lams/central/Register.do?method=resetUserTimeLimit &serverId=%serverId%&datetime=%datetime%
      * &hashValue=%hashValue%&courseId=%courseId%&username=%username%
-     * 
+     *
      * Here are the parameters explanation:
-     * 
+     *
      * @param method
      *            =resetUserTimeLimit - selfexplanatory.
      * @param serverId
@@ -467,7 +468,7 @@ public class RegisterAction extends HttpServlet {
 	    if (!serverToServerEnable) {
 		String msg = "Server to server registration is not enabled";
 		logger.error(msg);
-		response.sendError(response.SC_METHOD_NOT_ALLOWED, msg);
+		response.sendError(HttpServletResponse.SC_METHOD_NOT_ALLOWED, msg);
 		return;
 	    }
 
@@ -482,7 +483,7 @@ public class RegisterAction extends HttpServlet {
 	    if (serverId == null || datetime == null || hashValue == null || username == null || courseId == null) {
 		String msg = "Parameters missing";
 		logger.error(msg);
-		response.sendError(response.SC_BAD_REQUEST, "Parameters missing");
+		response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Parameters missing");
 	    }
 
 	    // authenticate external server
@@ -519,7 +520,7 @@ public class RegisterAction extends HttpServlet {
 
     /**
      * resetUserTimeLimit
-     * 
+     *
      * @param lesson
      * @param user
      */

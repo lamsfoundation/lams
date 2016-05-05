@@ -2,26 +2,26 @@
  * Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
  * =============================================================
  * License Information: http://lamsfoundation.org/licensing/lams/2.0/
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License version 2.0 
+ * it under the terms of the GNU General Public License version 2.0
  * as published by the Free Software Foundation.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301
  * USA
- * 
+ *
  * http://www.gnu.org/licenses/gpl.txt
  * ****************************************************************
  */
 
-/* $$Id$$ */	
+/* $$Id$$ */
 package org.lamsfoundation.lams.tool.forum.persistence;
 
 import java.util.Date;
@@ -38,10 +38,10 @@ import org.lamsfoundation.lams.tool.forum.util.AttachmentComparator;
 
 /**
  * @author conradb
- * 
  *
  *
- * 
+ *
+ *
  */
 public class Message implements Cloneable {
 
@@ -86,6 +86,7 @@ public class Message implements Cloneable {
     /**
      * <em>This method DOES NOT deep clone <code>Forum</code> to avoid dead loop in clone.</em>
      */
+    @Override
     public Object clone() {
 
 	Message msg = null;
@@ -168,11 +169,14 @@ public class Message implements Cloneable {
 	this.setUpdated(new Date(now));
     }
 
+    @Override
     public boolean equals(Object o) {
-	if (this == o)
+	if (this == o) {
 	    return true;
-	if (!(o instanceof Message))
+	}
+	if (!(o instanceof Message)) {
 	    return false;
+	}
 
 	Message genericEntity = (Message) o;
 
@@ -180,8 +184,7 @@ public class Message implements Cloneable {
 	// ConditionTopicComparator.compare()
 	return new EqualsBuilder()
 		// .append(this.uid,genericEntity.getUid())
-		.append(this.subject, genericEntity.getSubject())
-		.append(this.body, genericEntity.getBody())
+		.append(this.subject, genericEntity.getSubject()).append(this.body, genericEntity.getBody())
 		.append(this.replyNumber, genericEntity.getReplyNumber())
 		// .append(this.lastReplyDate,genericEntity.lastReplyDate)
 		// .append(this.created,genericEntity.created)
@@ -190,6 +193,7 @@ public class Message implements Cloneable {
 		.append(this.modifiedBy, genericEntity.getModifiedBy()).isEquals();
     }
 
+    @Override
     public int hashCode() {
 	return new HashCodeBuilder().append(uid).append(subject).append(body).append(created).append(updated)
 		.append(createdBy).append(modifiedBy).toHashCode();
@@ -200,7 +204,7 @@ public class Message implements Cloneable {
     // **********************************************************
     /**
      * Returns the object's creation date
-     * 
+     *
      * @return date
      *
      */
@@ -210,7 +214,7 @@ public class Message implements Cloneable {
 
     /**
      * Sets the object's creation date
-     * 
+     *
      * @param created
      */
     public void setCreated(Date created) {
@@ -219,7 +223,7 @@ public class Message implements Cloneable {
 
     /**
      * Returns this topic last reply date
-     * 
+     *
      * @return date
      *
      */
@@ -233,7 +237,7 @@ public class Message implements Cloneable {
 
     /**
      * Returns the object's date of last update
-     * 
+     *
      * @return date updated
      *
      */
@@ -243,7 +247,7 @@ public class Message implements Cloneable {
 
     /**
      * Sets the object's date of last update
-     * 
+     *
      * @param updated
      */
     public void setUpdated(Date updated) {
@@ -252,9 +256,9 @@ public class Message implements Cloneable {
 
     /**
      * @return Returns the userid of the user who created the Forum.
-     * 
      *
-     * 
+     *
+     *
      */
     public ForumUser getCreatedBy() {
 	return createdBy;
@@ -270,7 +274,7 @@ public class Message implements Cloneable {
 
     /**
      *
-     * 
+     *
      * @return Returns the userid of the user who modified the posting.
      */
     public ForumUser getModifiedBy() {
@@ -298,9 +302,9 @@ public class Message implements Cloneable {
 
     /**
      * @return Returns the subject of the Message.
-     * 
      *
-     * 
+     *
+     *
      */
     public String getSubject() {
 	return subject;
@@ -316,9 +320,9 @@ public class Message implements Cloneable {
 
     /**
      * @return Returns the body of the Message.
-     * 
      *
-     * 
+     *
+     *
      */
     public String getBody() {
 	return body;
@@ -334,9 +338,9 @@ public class Message implements Cloneable {
 
     /**
      * Returns Message sequence number.
-     * 
+     *
      * @return Message sequence number
-     * 
+     *
      *
      */
     public int getSequenceId() {
@@ -345,7 +349,7 @@ public class Message implements Cloneable {
 
     /**
      * Sets Message sequence number.
-     * 
+     *
      * @param sequenceId
      *            Message sequence number
      */
@@ -355,9 +359,9 @@ public class Message implements Cloneable {
 
     /**
      * @return Returns true if the Message was an Authored Message.
-     * 
      *
-     * 
+     *
+     *
      */
     public boolean getIsAuthored() {
 	return isAuthored;
@@ -373,9 +377,9 @@ public class Message implements Cloneable {
 
     /**
      * @return Returns whether the Message should be shown as an Annonymous message.
-     * 
      *
-     * 
+     *
+     *
      */
     public boolean getIsAnonymous() {
 	return isAnonymous;
@@ -391,10 +395,10 @@ public class Message implements Cloneable {
 
     /**
      * Gets the toolSession
-     * 
      *
      *
-     * 
+     *
+     *
      */
     public ForumToolSession getToolSession() {
 	return toolSession;
@@ -426,11 +430,11 @@ public class Message implements Cloneable {
 
     /**
      * @return a set of Attachments to this Message.
-     * 
      *
      *
      *
-     * 
+     *
+     *
      */
     public Set getAttachments() {
 	return attachments;
@@ -493,11 +497,11 @@ public class Message implements Cloneable {
 
     /**
      * @return the set of all messages cloned from this message.
-     * 
      *
      *
      *
-     * 
+     *
+     *
      */
     public Set getSessionClones() {
 	return sessionClones;
@@ -510,6 +514,7 @@ public class Message implements Cloneable {
 	this.sessionClones = sessionClones;
     }
 
+    @Override
     public String toString() {
 	return new ToStringBuilder(this).append("uid", uid).append("subject", subject).append("body", body).toString();
     }

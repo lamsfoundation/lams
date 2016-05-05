@@ -2,21 +2,21 @@
  * Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
  * =============================================================
  * License Information: http://lamsfoundation.org/licensing/lams/2.0/
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301
  * USA
- * 
+ *
  * http://www.gnu.org/licenses/gpl.txt
  * ****************************************************************
  */
@@ -29,9 +29,7 @@ import java.util.Date;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
-import java.util.SortedSet;
 import java.util.TimeZone;
 import java.util.TreeSet;
 
@@ -41,27 +39,18 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import org.apache.log4j.Logger;
-import org.apache.struts.Globals;
 import org.apache.struts.action.Action;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
-import org.apache.struts.action.ActionMessage;
-import org.apache.struts.action.ActionMessages;
-import org.lamsfoundation.lams.learningdesign.TextSearchConditionComparator;
-import org.lamsfoundation.lams.rating.dto.ItemRatingDTO;
 import org.lamsfoundation.lams.tool.qa.QaAppConstants;
-import org.lamsfoundation.lams.tool.qa.QaCondition;
 import org.lamsfoundation.lams.tool.qa.QaContent;
 import org.lamsfoundation.lams.tool.qa.QaQueContent;
 import org.lamsfoundation.lams.tool.qa.QaQueUsr;
 import org.lamsfoundation.lams.tool.qa.QaSession;
-import org.lamsfoundation.lams.tool.qa.QaUsrResp;
 import org.lamsfoundation.lams.tool.qa.dto.GroupDTO;
-import org.lamsfoundation.lams.tool.qa.dto.QaMonitoredAnswersDTO;
 import org.lamsfoundation.lams.tool.qa.dto.QaQuestionDTO;
 import org.lamsfoundation.lams.tool.qa.dto.QaStatsDTO;
-import org.lamsfoundation.lams.tool.qa.dto.ReflectionDTO;
 import org.lamsfoundation.lams.tool.qa.service.IQaService;
 import org.lamsfoundation.lams.tool.qa.service.QaServiceProxy;
 import org.lamsfoundation.lams.tool.qa.util.QaApplicationException;
@@ -73,16 +62,16 @@ import org.lamsfoundation.lams.util.DateUtil;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
-import org.lamsfoundation.lams.web.util.SessionMap;
 
 /**
  * Starts up the monitoring module
- * 
- * @author Ozgur Demirtas 
+ *
+ * @author Ozgur Demirtas
  */
 public class QaMonitoringStarterAction extends Action implements QaAppConstants {
     private static Logger logger = Logger.getLogger(QaMonitoringStarterAction.class.getName());
 
+    @Override
     public ActionForward execute(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) throws IOException, ServletException, QaApplicationException {
 	QaUtils.cleanUpSessionAbsolute(request);
@@ -148,7 +137,7 @@ public class QaMonitoringStarterAction extends Action implements QaAppConstants 
 
 	boolean isGroupedActivity = qaService.isGroupedActivity(qaContent.getQaContentId());
 	request.setAttribute("isGroupedActivity", isGroupedActivity);
-	
+
 	//rating stuff
 	boolean isCommentsEnabled = qaService.isCommentsEnabled(qaContent.getQaContentId());
 	request.setAttribute("isCommentsEnabled", isCommentsEnabled);
@@ -180,7 +169,7 @@ public class QaMonitoringStarterAction extends Action implements QaAppConstants 
 	qaStatsDTO.setCountAllUsers(new Integer(countAllUsers).toString());
 	qaStatsDTO.setCountSessionComplete(new Integer(countSessionComplete).toString());
 	request.setAttribute(QA_STATS_DTO, qaStatsDTO);
-	
+
 	// set SubmissionDeadline, if any
 	if (qaContent.getSubmissionDeadline() != null) {
 	    Date submissionDeadline = qaContent.getSubmissionDeadline();
@@ -196,11 +185,11 @@ public class QaMonitoringStarterAction extends Action implements QaAppConstants 
 
     /**
      * validates request paramaters based on tool contract
-     * 
+     *
      * @param request
      * @param mapping
      * @return ActionForward
-     * @throws ServletException 
+     * @throws ServletException
      */
     protected ActionForward validateParameters(HttpServletRequest request, ActionMapping mapping,
 	    QaMonitoringForm qaMonitoringForm) throws ServletException {

@@ -2,21 +2,21 @@
  * Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
  * =============================================================
  * License Information: http://lamsfoundation.org/licensing/lams/2.0/
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License version 2.0 
+ * it under the terms of the GNU General Public License version 2.0
  * as published by the Free Software Foundation.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301
  * USA
- * 
+ *
  * http://www.gnu.org/licenses/gpl.txt
  * ****************************************************************
  */
@@ -85,7 +85,7 @@ public class Group implements Serializable, Nullable, Comparable {
     /**
      * Creation Constructor for initializing learner group without tool sessions The order is generated using
      * synchornize method on grouping. If a group of this name already exists, returns null.
-     * 
+     *
      * @param grouping
      *            the grouping this group belongs to.
      * @param users
@@ -103,7 +103,7 @@ public class Group implements Serializable, Nullable, Comparable {
     /**
      * Creation Constructor for initializing learner group with tool sessions The order is generated using synchornize
      * method on grouping. If a group of this name already exists, returns null.
-     * 
+     *
      * @param grouping
      *            the grouping this group belongs to.
      * @param name
@@ -125,14 +125,14 @@ public class Group implements Serializable, Nullable, Comparable {
 
     /**
      * Creation constructor for initializing staff group. The order is created using default constant.
-     * 
+     *
      * @param grouping
      *            the grouping this group belongs to.
      * @param name
      *            of this group
      * @param staffs
      *            the users in this group.
-     * 
+     *
      * @return the new staff group.
      */
     public static Group createStaffGroup(Grouping grouping, String groupName, Set staffs) {
@@ -203,7 +203,7 @@ public class Group implements Serializable, Nullable, Comparable {
      *
      *
      *
-     * 
+     *
      */
     public Set getToolSessions() {
 	return this.toolSessions;
@@ -217,11 +217,11 @@ public class Group implements Serializable, Nullable, Comparable {
      * Maps the branch activities appropriate for this Group. Normally there is only one branch per branching activity
      * that is applicable to a group, but this may be changed in the future. If the group is applied to multiple
      * branching activities, then there will be multiple branches - one for each branching activity.
-     * 
      *
      *
      *
-     * 
+     *
+     *
      */
     public Set getBranchActivities() {
 	return this.branchActivities;
@@ -259,7 +259,7 @@ public class Group implements Serializable, Nullable, Comparable {
 
     /**
      * Sort the groups using order id.
-     * 
+     *
      * @see java.lang.Comparable#compareTo(java.lang.Object)
      */
     @Override
@@ -275,7 +275,7 @@ public class Group implements Serializable, Nullable, Comparable {
     // ---------------------------------------------------------------------
     /**
      * Return whether the target user is in this group or not.
-     * 
+     *
      * @param learner
      *            the target user
      * @return boolean value to indicate whether the user is in.

@@ -43,9 +43,9 @@ import org.lamsfoundation.lams.util.WebUtil;
 /**
  * A text search condition with a set of questions on answers to which the
  * search should be performed.
- * 
+ *
  * @author Marcin Cieslak
- * 
+ *
  */
 public class QaCondition extends TextSearchCondition {
     /**
@@ -152,7 +152,7 @@ public class QaCondition extends TextSearchCondition {
 
 	Set<QaQueContent> questionsCopy = new TreeSet<QaQueContent>(new QaQueContentComparator());
 	for (QaQueContent conditionQuestion : getQuestions()) {
-	    for (QaQueContent contentQuestion : (Set<QaQueContent>) qaContent.getQaQueContents()) {
+	    for (QaQueContent contentQuestion : qaContent.getQaQueContents()) {
 		if (conditionQuestion.getDisplayOrder() == contentQuestion.getDisplayOrder()) {
 		    questionsCopy.add(contentQuestion);
 		}

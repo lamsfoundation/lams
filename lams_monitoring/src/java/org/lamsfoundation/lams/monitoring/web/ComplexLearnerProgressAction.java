@@ -73,8 +73,8 @@ public class ComplexLearnerProgressAction extends Action {
 	Long lessonID = WebUtil.readLongParam(request, AttributeNames.PARAM_LESSON_ID, false);
 	Integer userID = WebUtil.readIntParam(request, AttributeNames.PARAM_USER_ID, false);
 
-	IMonitoringService monitoringService = MonitoringServiceProxy.getMonitoringService(getServlet()
-		.getServletContext());
+	IMonitoringService monitoringService = MonitoringServiceProxy
+		.getMonitoringService(getServlet().getServletContext());
 	Activity activity = monitoringService.getActivityById(activityID);
 
 	HttpSession ss = SessionManager.getSession();
@@ -138,10 +138,8 @@ public class ComplexLearnerProgressAction extends Action {
 		    } else {
 			if (status.equals(LearnerProgress.ACTIVITY_ATTEMPTED)
 				|| status.equals(LearnerProgress.ACTIVITY_COMPLETED)) {
-			    urlMap.put(
-				    a.getActivityId(),
-				    monitoringService.getLearnerActivityURL(lessonID, a.getActivityId(), userID,
-					    user.getUserID()));
+			    urlMap.put(a.getActivityId(), monitoringService.getLearnerActivityURL(lessonID,
+				    a.getActivityId(), userID, user.getUserID()));
 			}
 		    }
 		}
@@ -180,13 +178,13 @@ public class ComplexLearnerProgressAction extends Action {
     /**
      * Process the children of the sequence. Best done by traversing the transitions, with the first activity being the
      * default activity for the sequence.
-     * 
+     *
      * If the page is for a SequenceActivity the subActivities list should be included as a parameter and
      * parentContributeActivityDTO will be null.
-     * 
+     *
      * If the page is for a Branching or Optional Sequence activity then subActivities will be null (as the sequence
      * activities go in the subactivities list) but parentContributeActivityDTO should not be null.
-     * 
+     *
      * @param lessonID
      * @param userID
      * @param monitoringService
@@ -207,12 +205,11 @@ public class ComplexLearnerProgressAction extends Action {
 	while (child != null) {
 	    Byte status = learnerProgress.getProgressState(child);
 	    statusMap.put(child.getActivityId(), status);
-	    if (status.equals(LearnerProgress.ACTIVITY_ATTEMPTED) || status.equals(LearnerProgress.ACTIVITY_COMPLETED)) {
+	    if (status.equals(LearnerProgress.ACTIVITY_ATTEMPTED)
+		    || status.equals(LearnerProgress.ACTIVITY_COMPLETED)) {
 		// learner progress url
-		urlMap.put(
-			child.getActivityId(),
-			monitoringService.getLearnerActivityURL(lessonID, child.getActivityId(), userID,
-				user.getUserID()));
+		urlMap.put(child.getActivityId(), monitoringService.getLearnerActivityURL(lessonID,
+			child.getActivityId(), userID, user.getUserID()));
 	    }
 
 	    ContributeActivityDTO dto = new ContributeActivityDTO(child);

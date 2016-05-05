@@ -1,23 +1,23 @@
-/**************************************************************** 
- * Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org) 
- * ============================================================= 
- * License Information: http://lamsfoundation.org/licensing/lams/2.0/ 
- * 
- * This program is free software; you can redistribute it and/or modify 
- * it under the terms of the GNU General Public License version 2.0 
- * as published by the Free Software Foundation. 
- * 
- * This program is distributed in the hope that it will be useful, 
- * but WITHOUT ANY WARRANTY; without even the implied warranty of 
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the 
- * GNU General Public License for more details. 
- * 
- * You should have received a copy of the GNU General Public License 
- * along with this program; if not, write to the Free Software 
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 * USA 
- * 
- * http://www.gnu.org/licenses/gpl.txt 
- * **************************************************************** 
+/****************************************************************
+ * Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
+ * =============================================================
+ * License Information: http://lamsfoundation.org/licensing/lams/2.0/
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License version 2.0
+ * as published by the Free Software Foundation.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 * USA
+ *
+ * http://www.gnu.org/licenses/gpl.txt
+ * ****************************************************************
  */
 
 /* $Id$ */
@@ -25,7 +25,6 @@ package org.lamsfoundation.lams.web;
 
 import java.io.IOException;
 import java.text.NumberFormat;
-import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
@@ -41,9 +40,7 @@ import org.apache.log4j.Logger;
 import org.apache.tomcat.util.json.JSONException;
 import org.apache.tomcat.util.json.JSONObject;
 import org.lamsfoundation.lams.rating.dto.ItemRatingCriteriaDTO;
-import org.lamsfoundation.lams.rating.dto.ItemRatingDTO;
 import org.lamsfoundation.lams.rating.model.LearnerItemRatingCriteria;
-import org.lamsfoundation.lams.rating.model.Rating;
 import org.lamsfoundation.lams.rating.model.RatingCriteria;
 import org.lamsfoundation.lams.rating.model.ToolActivityRatingCriteria;
 import org.lamsfoundation.lams.rating.service.RatingService;
@@ -56,9 +53,9 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
 
 /**
  * Stores rating.
- * 
+ *
  * @author Andrey Balan
- * 
+ *
  *
  *
  */
@@ -67,6 +64,7 @@ public class RatingServlet extends HttpServlet {
     private static Logger log = Logger.getLogger(RatingServlet.class);
     private static RatingService ratingService;
 
+    @Override
     public void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 
 	JSONObject JSONObject = new JSONObject();
@@ -83,35 +81,40 @@ public class RatingServlet extends HttpServlet {
 	// get rating value as either float or comment String
 	try {
 	    boolean doSave = true;
-	    
+
 	    Long maxRatingsForItem = WebUtil.readLongParam(request, "maxRatingsForItem", true);
-	    log.debug("RatingServlet: Check Max rates for an item reached. Item "+itemId+" criteria id "+criteria.getRatingCriteriaId()+" maxRatingsForItem "+maxRatingsForItem);
-	    if ( maxRatingsForItem != null && maxRatingsForItem > 0) {
-		if ( ! ToolActivityRatingCriteria.class.isInstance(criteria) ) {
-		    log.error("Unable to enforce max ratings on a non ToolActivityRatingCritera class. Need tool content id to do the db lookup!");
+	    log.debug("RatingServlet: Check Max rates for an item reached. Item " + itemId + " criteria id "
+		    + criteria.getRatingCriteriaId() + " maxRatingsForItem " + maxRatingsForItem);
+	    if (maxRatingsForItem != null && maxRatingsForItem > 0) {
+		if (!ToolActivityRatingCriteria.class.isInstance(criteria)) {
+		    log.error(
+			    "Unable to enforce max ratings on a non ToolActivityRatingCritera class. Need tool content id to do the db lookup!");
 		} else {
 		    ToolActivityRatingCriteria toolCriteria = (ToolActivityRatingCriteria) criteria;
 		    List<Long> itemIds = new LinkedList<Long>();
 		    itemIds.add(itemId);
-		    Map<Long, Long> itemIdToRatedUsersCountMap = ratingService.countUsersRatedEachItem(toolCriteria.getToolContentId(), itemIds, userId.intValue());
+		    Map<Long, Long> itemIdToRatedUsersCountMap = ratingService
+			    .countUsersRatedEachItem(toolCriteria.getToolContentId(), itemIds, userId.intValue());
 		    Long currentRatings = itemIdToRatedUsersCountMap.get(itemId);
-		    if ( currentRatings != null && maxRatingsForItem.compareTo(currentRatings) <= 0 ) {
+		    if (currentRatings != null && maxRatingsForItem.compareTo(currentRatings) <= 0) {
 			JSONObject.put("error", true);
-			JSONObject.put("message", "Maximum number of ratings for this item has been reached. No more may be saved.");
-			log.debug("RatingServlet: Max rates for an item reached. Item "+itemId+" criteria id "+criteria.getRatingCriteriaId()+" count "+currentRatings);
+			JSONObject.put("message",
+				"Maximum number of ratings for this item has been reached. No more may be saved.");
+			log.debug("RatingServlet: Max rates for an item reached. Item " + itemId + " criteria id "
+				+ criteria.getRatingCriteriaId() + " count " + currentRatings);
 			doSave = false;
 		    }
 		}
 	    }
 
-	    if ( doSave ) {
+	    if (doSave) {
 		if (criteria.isCommentsEnabled()) {
 		    String comment = WebUtil.readStrParam(request, "comment");
 		    ratingService.commentItem(criteria, userId, itemId, comment);
 		    JSONObject.put("comment", StringEscapeUtils.escapeCsv(comment));
 
 		} else {
-		    float rating = Float.parseFloat((String) request.getParameter("rate"));
+		    float rating = Float.parseFloat(request.getParameter("rate"));
 
 		    ItemRatingCriteriaDTO averageRatingDTO = ratingService.rateItem(criteria, userId, itemId, rating);
 
@@ -121,7 +124,6 @@ public class RatingServlet extends HttpServlet {
 		    JSONObject.put("averageRating", averageRatingDTO.getAverageRating());
 		    JSONObject.put("numberOfVotes", averageRatingDTO.getNumberOfVotes());
 		}
-
 
 		boolean hasRatingLimits = WebUtil.readBooleanParam(request, "hasRatingLimits", false);
 
@@ -144,8 +146,8 @@ public class RatingServlet extends HttpServlet {
     }
 
     @Override
-    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException,
-	    IOException {
+    protected void doPost(HttpServletRequest request, HttpServletResponse response)
+	    throws ServletException, IOException {
 	doGet(request, response);
     }
 

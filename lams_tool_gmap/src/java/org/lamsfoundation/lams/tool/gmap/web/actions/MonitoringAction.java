@@ -2,21 +2,21 @@
  * Copyright (C) 2008 LAMS Foundation (http://lamsfoundation.org)
  * =============================================================
  * License Information: http://lamsfoundation.org/licensing/lams/2.0/
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301
  * USA
- * 
+ *
  * http://www.gnu.org/licenses/gpl.txt
  * ****************************************************************
  */
@@ -26,12 +26,13 @@ package org.lamsfoundation.lams.tool.gmap.web.actions;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.util.Iterator;
 
 import org.apache.log4j.Logger;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
+import org.lamsfoundation.lams.notebook.model.NotebookEntry;
+import org.lamsfoundation.lams.notebook.service.CoreNotebookConstants;
 import org.lamsfoundation.lams.tool.gmap.dto.GmapDTO;
 import org.lamsfoundation.lams.tool.gmap.dto.GmapSessionDTO;
 import org.lamsfoundation.lams.tool.gmap.dto.GmapUserDTO;
@@ -39,31 +40,29 @@ import org.lamsfoundation.lams.tool.gmap.model.Gmap;
 import org.lamsfoundation.lams.tool.gmap.model.GmapConfigItem;
 import org.lamsfoundation.lams.tool.gmap.model.GmapSession;
 import org.lamsfoundation.lams.tool.gmap.model.GmapUser;
-import org.lamsfoundation.lams.tool.gmap.service.IGmapService;
 import org.lamsfoundation.lams.tool.gmap.service.GmapServiceProxy;
-import org.lamsfoundation.lams.tool.gmap.util.GmapException;
+import org.lamsfoundation.lams.tool.gmap.service.IGmapService;
 import org.lamsfoundation.lams.tool.gmap.util.GmapConstants;
+import org.lamsfoundation.lams.tool.gmap.util.GmapException;
 import org.lamsfoundation.lams.tool.gmap.web.forms.MonitoringForm;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.action.LamsDispatchAction;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
-import org.lamsfoundation.lams.notebook.model.NotebookEntry;
-import org.lamsfoundation.lams.notebook.service.CoreNotebookConstants;
 
 /**
  * @author
  * @version
- * 
- *
- *
- * 
  *
  *
  *
  *
- * 
+ *
+ *
+ *
+ *
+ *
  */
 public class MonitoringAction extends LamsDispatchAction {
 
@@ -71,6 +70,7 @@ public class MonitoringAction extends LamsDispatchAction {
 
     public IGmapService gmapService;
 
+    @Override
     public ActionForward unspecified(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) {
 
@@ -98,8 +98,8 @@ public class MonitoringAction extends LamsDispatchAction {
 		for (GmapUserDTO userDTO : sessionDTO.getUserDTOs()) {
 		    // get the notebook entry.
 		    NotebookEntry notebookEntry = gmapService.getEntry(toolSessionID,
-			    CoreNotebookConstants.NOTEBOOK_TOOL, GmapConstants.TOOL_SIGNATURE, userDTO.getUserId()
-				    .intValue());
+			    CoreNotebookConstants.NOTEBOOK_TOOL, GmapConstants.TOOL_SIGNATURE,
+			    userDTO.getUserId().intValue());
 		    if (notebookEntry != null) {
 			userDTO.setFinishedReflection(true);
 			//userDTO.setNotebookEntry(notebookEntry.getEntry());
@@ -135,7 +135,7 @@ public class MonitoringAction extends LamsDispatchAction {
 
     /**
      * Allows teachers to edit/remove existing markers
-     * 
+     *
      * @param mapping
      * @param form
      * @param request
@@ -154,7 +154,7 @@ public class MonitoringAction extends LamsDispatchAction {
 
 	if (gmapUser != null) {
 
-	    //MonitoringForm monitoringForm = (MonitoringForm) form;	
+	    //MonitoringForm monitoringForm = (MonitoringForm) form;
 
 	    // Retrieve the session and content.
 	    GmapSession gmapSession = gmapService.getSessionBySessionId(toolSessionID);
@@ -176,7 +176,7 @@ public class MonitoringAction extends LamsDispatchAction {
 
     /**
      * Get the current user
-     * 
+     *
      * @param toolSessionId
      * @return
      */
@@ -197,7 +197,7 @@ public class MonitoringAction extends LamsDispatchAction {
 
     /**
      * Opens a user's reflection
-     * 
+     *
      * @param mapping
      * @param form
      * @param request

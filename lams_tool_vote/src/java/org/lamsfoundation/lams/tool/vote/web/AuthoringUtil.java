@@ -2,21 +2,21 @@
  * Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
  * =============================================================
  * License Information: http://lamsfoundation.org/licensing/lams/2.0/
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License version 2.0
  * as published by the Free Software Foundation.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301
  * USA
- * 
+ *
  * http://www.gnu.org/licenses/gpl.txt
  * ***********************************************************************/
 
@@ -36,7 +36,6 @@ import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.tool.vote.VoteAppConstants;
 import org.lamsfoundation.lams.tool.vote.dto.VoteQuestionDTO;
 import org.lamsfoundation.lams.tool.vote.pojos.VoteContent;
-import org.lamsfoundation.lams.tool.vote.pojos.VoteQueContent;
 import org.lamsfoundation.lams.tool.vote.service.IVoteService;
 import org.lamsfoundation.lams.tool.vote.util.VoteComparator;
 import org.lamsfoundation.lams.tool.vote.web.form.VoteAuthoringForm;
@@ -46,7 +45,7 @@ import org.lamsfoundation.lams.web.util.AttributeNames;
 
 /**
  * Keeps all operations needed for Authoring mode.
- * 
+ *
  * @author Ozgur Demirtas
  */
 public class AuthoringUtil implements VoteAppConstants {
@@ -66,9 +65,9 @@ public class AuthoringUtil implements VoteAppConstants {
 	    replacedQuestionIndex = --intQuestionIndex;
 	}
 
-	VoteQuestionDTO mainQuestion = getQuestionAtDisplayOrder(questionDTOs, intOriginalQuestionIndex);
+	VoteQuestionDTO mainQuestion = AuthoringUtil.getQuestionAtDisplayOrder(questionDTOs, intOriginalQuestionIndex);
 
-	VoteQuestionDTO replacedQuestion = getQuestionAtDisplayOrder(questionDTOs, replacedQuestionIndex);
+	VoteQuestionDTO replacedQuestion = AuthoringUtil.getQuestionAtDisplayOrder(questionDTOs, replacedQuestionIndex);
 
 	List<VoteQuestionDTO> newQuestionDtos = new LinkedList<VoteQuestionDTO>();
 
@@ -81,11 +80,11 @@ public class AuthoringUtil implements VoteAppConstants {
 		    && !questionDTO.getDisplayOrder().equals(new Integer(replacedQuestionIndex).toString())) {
 		// normal copy
 		tempQuestion = questionDTO;
-		
+
 	    } else if (questionDTO.getDisplayOrder().equals(new Integer(intOriginalQuestionIndex).toString())) {
 		// move type 1
 		tempQuestion = replacedQuestion;
-		
+
 	    } else if (questionDTO.getDisplayOrder().equals(new Integer(replacedQuestionIndex).toString())) {
 		// move type 1
 		tempQuestion = mainQuestion;
@@ -97,7 +96,8 @@ public class AuthoringUtil implements VoteAppConstants {
 	return newQuestionDtos;
     }
 
-    protected static VoteQuestionDTO getQuestionAtDisplayOrder(List<VoteQuestionDTO> questionDTOs, int intOriginalQuestionIndex) {
+    protected static VoteQuestionDTO getQuestionAtDisplayOrder(List<VoteQuestionDTO> questionDTOs,
+	    int intOriginalQuestionIndex) {
 
 	Iterator<VoteQuestionDTO> iter = questionDTOs.iterator();
 	while (iter.hasNext()) {
@@ -116,7 +116,7 @@ public class AuthoringUtil implements VoteAppConstants {
 	int queIndex = 0;
 	Iterator<VoteQuestionDTO> iter = listQuestionDTO.iterator();
 	while (iter.hasNext()) {
-	    VoteQuestionDTO voteQuestionDTO = (VoteQuestionDTO) iter.next();
+	    VoteQuestionDTO voteQuestionDTO = iter.next();
 
 	    String question = voteQuestionDTO.getNomination();
 
@@ -137,7 +137,7 @@ public class AuthoringUtil implements VoteAppConstants {
 
     public static boolean checkDuplicateNominations(List listQuestionDTO, String newQuestion) {
 
-	Map mapQuestion = extractMapQuestion(listQuestionDTO);
+	Map mapQuestion = AuthoringUtil.extractMapQuestion(listQuestionDTO);
 
 	Iterator itMap = mapQuestion.entrySet().iterator();
 	while (itMap.hasNext()) {
@@ -302,7 +302,5 @@ public class AuthoringUtil implements VoteAppConstants {
 
 	return voteContent;
     }
-
-
 
 }

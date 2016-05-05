@@ -2,21 +2,21 @@
  * Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
  * =============================================================
  * License Information: http://lamsfoundation.org/licensing/lams/2.0/
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301
  * USA
- * 
+ *
  * http://www.gnu.org/licenses/gpl.txt
  * ****************************************************************
  */
@@ -28,7 +28,6 @@ import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.sql.Timestamp;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -171,11 +170,11 @@ public class AuthoringAction extends Action {
     /**
      * Read scratchie data from database and put them into HttpSession. It will redirect to init.do directly after this
      * method run successfully.
-     * 
+     *
      * This method will avoid read database again and lost un-saved resouce item lost when user "refresh page",
-     * 
+     *
      * @throws ServletException
-     * 
+     *
      */
     private ActionForward start(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) throws ServletException {
@@ -194,7 +193,7 @@ public class AuthoringAction extends Action {
 	SessionMap<String, Object> sessionMap = new SessionMap<String, Object>();
 	request.getSession().setAttribute(sessionMap.getSessionID(), sessionMap);
 	scratchieForm.setSessionMapID(sessionMap.getSessionID());
-	
+
 	ScratchieConfigItem isEnabledExtraPointOption = service
 		.getConfigItem(ScratchieConfigItem.KEY_IS_ENABLED_EXTRA_POINT_OPTION);
 	sessionMap.put(ScratchieConfigItem.KEY_IS_ENABLED_EXTRA_POINT_OPTION,
@@ -261,7 +260,8 @@ public class AuthoringAction extends Action {
     private ActionForward initPage(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) throws ServletException {
 	String sessionMapID = WebUtil.readStrParam(request, ScratchieConstants.ATTR_SESSION_MAP_ID);
-	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession().getAttribute(sessionMapID);
+	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
+		.getAttribute(sessionMapID);
 	ScratchieForm existForm = (ScratchieForm) sessionMap.get(ScratchieConstants.ATTR_RESOURCE_FORM);
 
 	ScratchieForm scratchieForm = (ScratchieForm) form;
@@ -273,7 +273,7 @@ public class AuthoringAction extends Action {
 
 	ToolAccessMode mode = getAccessMode(request);
 	request.setAttribute(AttributeNames.ATTR_MODE, mode.toString());
-	
+
 	return mapping.findForward(ScratchieConstants.SUCCESS);
     }
 
@@ -285,7 +285,8 @@ public class AuthoringAction extends Action {
 	ScratchieForm scratchieForm = (ScratchieForm) form;
 
 	// get back sessionMAP
-	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession().getAttribute(scratchieForm.getSessionMapID());
+	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
+		.getAttribute(scratchieForm.getSessionMapID());
 
 	ToolAccessMode mode = getAccessMode(request);
 
@@ -296,26 +297,26 @@ public class AuthoringAction extends Action {
 	Scratchie scratchiePO = service.getScratchieByContentId(scratchieForm.getScratchie().getContentId());
 
 	Set<ScratchieItem> oldItems = null;
-	
+
 	//allow using old and modified questions and references altogether
 	if (mode.isTeacher()) {
 	    oldItems = (scratchiePO == null) ? new HashSet<ScratchieItem>() : scratchiePO.getScratchieItems();
-	    
+
 	    // initialize oldItems' answers
 	    for (ScratchieItem oldItem : oldItems) {
 		for (ScratchieAnswer answer : (Set<ScratchieAnswer>) oldItem.getAnswers()) {
 		}
 	    }
-	    
+
 	    service.releaseItemsFromCache(scratchiePO);
 	}
-	
+
 	if (scratchiePO == null) {
 	    // new Scratchie, create it.
 	    scratchiePO = scratchie;
 	    scratchiePO.setCreated(new Timestamp(new Date().getTime()));
 	    scratchiePO.setUpdated(new Timestamp(new Date().getTime()));
-	    
+
 	} else {
 	    Long uid = scratchiePO.getUid();
 	    PropertyUtils.copyProperties(scratchiePO, scratchie);
@@ -326,7 +327,7 @@ public class AuthoringAction extends Action {
 	    if (mode.isTeacher()) {
 		scratchiePO.setDefineLater(false);
 	    }
-	    
+
 	    scratchiePO.setUpdated(new Timestamp(new Date().getTime()));
 	}
 
@@ -342,13 +343,13 @@ public class AuthoringAction extends Action {
 	    }
 	}
 	scratchiePO.setScratchieItems(items);
-	
+
 	//recalculate results in case content is edited from monitoring
 	List<ScratchieItem> deletedItems = getDeletedItemList(sessionMap);
 	if (mode.isTeacher()) {
 	    service.recalculateUserAnswers(scratchiePO, oldItems, newItems, deletedItems);
 	}
-	
+
 	// delete items from database.
 	iter = deletedItems.iterator();
 	while (iter.hasNext()) {
@@ -367,7 +368,7 @@ public class AuthoringAction extends Action {
 
 	request.setAttribute(AuthoringConstants.LAMS_AUTHORING_SUCCESS_FLAG, Boolean.TRUE);
 	request.setAttribute(AttributeNames.ATTR_MODE, mode.toString());
-	
+
 	return mapping.findForward("author");
     }
 
@@ -378,7 +379,8 @@ public class AuthoringAction extends Action {
 	    HttpServletResponse response) {
 
 	String sessionMapID = WebUtil.readStrParam(request, ScratchieConstants.ATTR_SESSION_MAP_ID);
-	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession().getAttribute(sessionMapID);
+	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
+		.getAttribute(sessionMapID);
 	String contentFolderID = (String) sessionMap.get(AttributeNames.PARAM_CONTENT_FOLDER_ID);
 	ScratchieItemForm itemForm = (ScratchieItemForm) form;
 	itemForm.setSessionMapID(sessionMapID);
@@ -404,7 +406,8 @@ public class AuthoringAction extends Action {
 
 	// get back sessionMAP
 	String sessionMapID = WebUtil.readStrParam(request, ScratchieConstants.ATTR_SESSION_MAP_ID);
-	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession().getAttribute(sessionMapID);
+	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
+		.getAttribute(sessionMapID);
 	String contentFolderID = (String) sessionMap.get(AttributeNames.PARAM_CONTENT_FOLDER_ID);
 
 	int itemIdx = NumberUtils.toInt(request.getParameter(ScratchieConstants.PARAM_ITEM_INDEX), -1);
@@ -441,7 +444,8 @@ public class AuthoringAction extends Action {
 	    HttpServletResponse response) {
 
 	ScratchieItemForm itemForm = (ScratchieItemForm) form;
-	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession().getAttribute(itemForm.getSessionMapID());
+	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
+		.getAttribute(itemForm.getSessionMapID());
 	// check whether it is "edit(old Question)" or "add(new Question)"
 	SortedSet<ScratchieItem> itemList = getItemList(sessionMap);
 	int itemIdx = NumberUtils.toInt(itemForm.getItemIndex(), -1);
@@ -488,7 +492,8 @@ public class AuthoringAction extends Action {
 	    HttpServletResponse response) throws UnsupportedEncodingException {
 	// big part of code was taken from saveItem() method
 	String sessionMapId = request.getParameter(ScratchieConstants.ATTR_SESSION_MAP_ID);
-	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession().getAttribute(sessionMapId);
+	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
+		.getAttribute(sessionMapId);
 	String contentFolderID = (String) sessionMap.get(AttributeNames.PARAM_CONTENT_FOLDER_ID);
 	SortedSet<ScratchieItem> itemList = getItemList(sessionMap);
 
@@ -504,7 +509,7 @@ public class AuthoringAction extends Action {
 	    item.setOrderId(maxSeq);
 	    item.setTitle(question.getTitle());
 	    item.setDescription(QuestionParser.processHTMLField(question.getText(), false, contentFolderID,
-			question.getResourcesFolderPath()));
+		    question.getResourcesFolderPath()));
 
 	    TreeSet<ScratchieAnswer> answerList = new TreeSet<ScratchieAnswer>(new ScratchieAnswerComparator());
 	    String correctAnswer = null;
@@ -512,7 +517,7 @@ public class AuthoringAction extends Action {
 	    if (question.getAnswers() != null) {
 		for (Answer answer : question.getAnswers()) {
 		    String answerText = QuestionParser.processHTMLField(answer.getText(), false, contentFolderID,
-				question.getResourcesFolderPath());
+			    question.getResourcesFolderPath());
 		    if (correctAnswer != null && correctAnswer.equals(answerText)) {
 			log.warn("Skipping an answer with same text as the correct answer: " + answerText);
 			continue;
@@ -526,7 +531,8 @@ public class AuthoringAction extends Action {
 			    scratchieAnswer.setCorrect(true);
 			    correctAnswer = answerText;
 			} else {
-			    log.warn("Choosing only first correct answer, despite another one was found: " + answerText);
+			    log.warn(
+				    "Choosing only first correct answer, despite another one was found: " + answerText);
 			    scratchieAnswer.setCorrect(false);
 			}
 		    } else {
@@ -552,7 +558,7 @@ public class AuthoringAction extends Action {
 	request.setAttribute(ScratchieConstants.ATTR_SESSION_MAP_ID, sessionMapId);
 	return mapping.findForward(ScratchieConstants.SUCCESS);
     }
-    
+
     /**
      * Prepares Scratchie content for QTI packing
      */
@@ -560,17 +566,18 @@ public class AuthoringAction extends Action {
     private ActionForward exportQTI(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) throws UnsupportedEncodingException {
 	String sessionMapID = WebUtil.readStrParam(request, ScratchieConstants.ATTR_SESSION_MAP_ID);
-	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession().getAttribute(sessionMapID);
+	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
+		.getAttribute(sessionMapID);
 	SortedSet<ScratchieItem> itemList = getItemList(sessionMap);
 	List<Question> questions = new LinkedList<Question>();
 
 	for (ScratchieItem item : itemList) {
 	    Question question = new Question();
-	    
+
 	    question.setType(Question.QUESTION_TYPE_MULTIPLE_CHOICE);
 	    question.setTitle(item.getTitle());
 	    question.setText(item.getDescription());
-	    
+
 	    List<Answer> answers = new ArrayList<Answer>();
 	    Set<ScratchieAnswer> scratchieAnswers = new TreeSet<ScratchieAnswer>(new ScratchieAnswerComparator());
 	    scratchieAnswers.addAll(item.getAnswers());
@@ -578,7 +585,7 @@ public class AuthoringAction extends Action {
 	    for (ScratchieAnswer itemAnswer : scratchieAnswers) {
 		Answer answer = new Answer();
 		answer.setText(itemAnswer.getDescription());
-		// there is no LAMS interface to adjust, so use the default 1 point 
+		// there is no LAMS interface to adjust, so use the default 1 point
 		Float score = itemAnswer.isCorrect() ? 1F : 0;
 		answer.setScore(score);
 		answers.add(answer);
@@ -597,7 +604,7 @@ public class AuthoringAction extends Action {
 
     /**
      * Ajax call, remove the given line of instruction of resource item.
-     * 
+     *
      * @param mapping
      * @param form
      * @param request
@@ -609,7 +616,8 @@ public class AuthoringAction extends Action {
 
 	String sessionMapID = WebUtil.readStrParam(request, ScratchieConstants.ATTR_SESSION_MAP_ID);
 	request.setAttribute(ScratchieConstants.ATTR_SESSION_MAP_ID, sessionMapID);
-	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession().getAttribute(sessionMapID);
+	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
+		.getAttribute(sessionMapID);
 	SortedSet<ScratchieItem> itemList = getItemList(sessionMap);
 
 	int itemIndex = NumberUtils.toInt(request.getParameter(ScratchieConstants.PARAM_ITEM_INDEX), -1);
@@ -630,7 +638,7 @@ public class AuthoringAction extends Action {
 
     /**
      * Move up current item.
-     * 
+     *
      * @param mapping
      * @param form
      * @param request
@@ -644,7 +652,7 @@ public class AuthoringAction extends Action {
 
     /**
      * Move down current item.
-     * 
+     *
      * @param mapping
      * @param form
      * @param request
@@ -659,7 +667,8 @@ public class AuthoringAction extends Action {
     private ActionForward switchItem(ActionMapping mapping, HttpServletRequest request, boolean up) {
 	String sessionMapID = WebUtil.readStrParam(request, ScratchieConstants.ATTR_SESSION_MAP_ID);
 	request.setAttribute(ScratchieConstants.ATTR_SESSION_MAP_ID, sessionMapID);
-	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession().getAttribute(sessionMapID);
+	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
+		.getAttribute(sessionMapID);
 	SortedSet<ScratchieItem> itemList = getItemList(sessionMap);
 
 	int itemIndex = NumberUtils.toInt(request.getParameter(ScratchieConstants.PARAM_ITEM_INDEX), -1);
@@ -692,7 +701,7 @@ public class AuthoringAction extends Action {
 
     /**
      * Ajax call, will add one more input line for new resource item instruction.
-     * 
+     *
      * @param mapping
      * @param form
      * @param request
@@ -721,7 +730,7 @@ public class AuthoringAction extends Action {
 
     /**
      * Ajax call, remove the given answer.
-     * 
+     *
      * @param mapping
      * @param form
      * @param request
@@ -749,7 +758,7 @@ public class AuthoringAction extends Action {
 
     /**
      * Move up current answer.
-     * 
+     *
      * @param mapping
      * @param form
      * @param request
@@ -763,7 +772,7 @@ public class AuthoringAction extends Action {
 
     /**
      * Move down current answer.
-     * 
+     *
      * @param mapping
      * @param form
      * @param request
@@ -838,14 +847,14 @@ public class AuthoringAction extends Action {
      * Return ScratchieService bean.
      */
     private IScratchieService getScratchieService() {
-	WebApplicationContext wac = WebApplicationContextUtils.getRequiredWebApplicationContext(getServlet()
-		.getServletContext());
+	WebApplicationContext wac = WebApplicationContextUtils
+		.getRequiredWebApplicationContext(getServlet().getServletContext());
 	return (IScratchieService) wac.getBean(ScratchieConstants.SCRATCHIE_SERVICE);
     }
 
     /**
      * List save current scratchie items.
-     * 
+     *
      * @param request
      * @return
      */
@@ -860,7 +869,7 @@ public class AuthoringAction extends Action {
 
     /**
      * List save deleted scratchie items, which could be persisted or non-persisted items.
-     * 
+     *
      * @param request
      * @return
      */
@@ -870,7 +879,7 @@ public class AuthoringAction extends Action {
 
     /**
      * Get <code>java.util.List</code> from HttpSession by given name.
-     * 
+     *
      * @param request
      * @param name
      * @return
@@ -886,11 +895,11 @@ public class AuthoringAction extends Action {
 
     /**
      * Get answer options from <code>HttpRequest</code>
-     * 
+     *
      * @param request
      * @param isForSaving
      *            whether the blank options will be preserved or not
-     * 
+     *
      */
     private TreeSet<ScratchieAnswer> getAnswersFromRequest(HttpServletRequest request, boolean isForSaving) {
 	Map<String, String> paramMap = splitRequestParameter(request, ScratchieConstants.ATTR_ANSWER_LIST);
@@ -927,7 +936,7 @@ public class AuthoringAction extends Action {
 
     /**
      * Split Request Parameter from <code>HttpRequest</code>
-     * 
+     *
      * @param request
      * @param parameterName
      *            parameterName
@@ -943,8 +952,9 @@ public class AuthoringAction extends Action {
 	String[] pair;
 	for (String item : params) {
 	    pair = item.split("=");
-	    if (pair == null || pair.length != 2)
+	    if (pair == null || pair.length != 2) {
 		continue;
+	    }
 	    try {
 		paramMap.put(pair[0], URLDecoder.decode(pair[1], "UTF-8"));
 	    } catch (UnsupportedEncodingException e) {
@@ -974,7 +984,7 @@ public class AuthoringAction extends Action {
 
     /**
      * Get ToolAccessMode from HttpRequest parameters. Default value is AUTHOR mode.
-     * 
+     *
      * @param request
      * @return
      */

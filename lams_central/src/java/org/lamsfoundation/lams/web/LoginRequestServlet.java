@@ -50,7 +50,7 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
 /**
  * The LoginRequestServlet handles login request by an integrated external system. This servlet checks for the UserId,
  * Timestamp, Hash and ServerId if it's valid it passes it to login.jsp
- * 
+ *
  * @author Fei Yang, Anthony Xiao
  */
 @SuppressWarnings("serial")
@@ -62,9 +62,9 @@ public class LoginRequestServlet extends HttpServlet {
 
     /**
      * The doGet method of the servlet. <br>
-     * 
+     *
      * This method is called when a form has its tag value method equals to get.
-     * 
+     *
      * @param request
      *            the request send by the client to the server
      * @param response
@@ -181,9 +181,9 @@ public class LoginRequestServlet extends HttpServlet {
 
     /**
      * The doPost method of the servlet. <br>
-     * 
+     *
      * This method is called when a form has its tag value method equals to post.
-     * 
+     *
      * @param request
      *            the request send by the client to the server
      * @param response

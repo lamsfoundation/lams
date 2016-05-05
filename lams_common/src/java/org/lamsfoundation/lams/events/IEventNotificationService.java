@@ -7,9 +7,9 @@ import java.util.Set;
 
 /**
  * Provides tools for managing events and notifing users.
- * 
+ *
  * @author Marcin Cieslak
- * 
+ *
  */
 public interface IEventNotificationService {
 
@@ -51,7 +51,7 @@ public interface IEventNotificationService {
 
     /**
      * Creates an event and saves it into the database.
-     * 
+     *
      * @param scope
      *            scope of the event
      * @param name
@@ -73,7 +73,7 @@ public interface IEventNotificationService {
 
     /**
      * Checks if event with the given parameters exists in the database.
-     * 
+     *
      * @param scope
      *            scope of the event
      * @param name
@@ -88,7 +88,7 @@ public interface IEventNotificationService {
 
     /**
      * Gets the available delivery methods that can be used when subscribing an user to an event.
-     * 
+     *
      * @return set of available delivery methods in the system
      */
     Set<AbstractDeliveryMethod> getAvailableDeliveryMethods();
@@ -100,7 +100,7 @@ public interface IEventNotificationService {
 
     /**
      * Checks if an user is subscribed to the given event.
-     * 
+     *
      * @param scope
      *            scope of the event
      * @param name
@@ -118,7 +118,7 @@ public interface IEventNotificationService {
 
     /**
      * Notify lesson monitors with the specified message
-     * 
+     *
      * @param sessionId
      *            tool session to which monitors belong
      * @param message
@@ -132,7 +132,7 @@ public interface IEventNotificationService {
     /**
      * Sends a single message to the given users.If it fails, an event is created for the needs of the resending
      * mechanism.
-     * 
+     *
      * @param toUserId
      *            ID of users to send the message to
      * @param deliveryMethod
@@ -151,10 +151,10 @@ public interface IEventNotificationService {
 	    String message, boolean isHtmlFormat) throws InvalidParameterException;
 
     /**
-     * 
+     *
      * Sends a single message to the given user. If it fails, an event is created for the needs of the resending
      * mechanism.
-     * 
+     *
      * @param toUserIds
      *            IDs of users to send the message to
      * @param deliveryMethod
@@ -173,7 +173,7 @@ public interface IEventNotificationService {
 
     /**
      * Registeres an user for notification of the event.
-     * 
+     *
      * @param scope
      *            scope of the event
      * @param name
@@ -192,7 +192,7 @@ public interface IEventNotificationService {
 
     /**
      * Triggers the event with the default (or previously set) subject and message. Each subscribed user is notified.
-     * 
+     *
      * @param scope
      *            scope of the event
      * @param name
@@ -207,7 +207,7 @@ public interface IEventNotificationService {
     /**
      * Triggers the event with the default subject and message, modifying placeholders (<code>{0}, {1}, {2}</code>...)
      * in the message body with the <code>parameterValues</code>. Each subscribed user is notified.
-     * 
+     *
      * @param scope
      *            scope of the event
      * @param name
@@ -229,7 +229,7 @@ public interface IEventNotificationService {
     /**
      * Triggers the event with given subject and message. Each subscribed user is notified. Default message and subject
      * are overridden.
-     * 
+     *
      * @param scope
      *            scope of the event
      * @param name
@@ -251,7 +251,7 @@ public interface IEventNotificationService {
     /**
      * Notifies only a single user of the event using the default subject and message. Does not set the event as
      * "triggered".
-     * 
+     *
      * @param scope
      *            scope of the event
      * @param name
@@ -270,7 +270,7 @@ public interface IEventNotificationService {
      * Notifies only a single user of the event using the default subject and message, modifying placeholders (
      * <code>{0}, {1}, {2}</code>...) in the message body with the <code>parameterValues</code>. Does not set the event
      * as "triggered".
-     * 
+     *
      * @param scope
      *            scope of the event
      * @param name
@@ -292,7 +292,7 @@ public interface IEventNotificationService {
     /**
      * Notifies only a single user of the event using the given subject and message. Does not set the event as
      * "triggered". Default subject and message are NOT overridden.
-     * 
+     *
      * @param scope
      *            scope of the event
      * @param name
@@ -313,7 +313,7 @@ public interface IEventNotificationService {
 
     /**
      * Unregister an user from notification of the event.
-     * 
+     *
      * @param scope
      *            scope of the event
      * @param name
@@ -329,7 +329,7 @@ public interface IEventNotificationService {
 
     /**
      * Unregister delivery method of the user from notification of the event.
-     * 
+     *
      * @param scope
      *            scope of the event
      * @param name

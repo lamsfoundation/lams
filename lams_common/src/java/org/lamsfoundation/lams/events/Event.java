@@ -9,10 +9,10 @@ import org.apache.commons.lang.StringUtils;
 
 /**
  * A event that users can subscribe to and at some point can be triggered, notifing the users.
- * 
+ *
  *
  * @author Marcin Cieslak
- * 
+ *
  */
 public class Event {
 
@@ -69,7 +69,7 @@ public class Event {
 
     /**
      * Standard constructor used by EventNotificationService.
-     * 
+     *
      * @param scope
      *            scope of the event
      * @param name
@@ -153,11 +153,11 @@ public class Event {
     }
 
     /**
-     * 
      *
      *
      *
-     * 
+     *
+     *
      * @return
      */
     public Set<Subscription> getSubscriptions() {

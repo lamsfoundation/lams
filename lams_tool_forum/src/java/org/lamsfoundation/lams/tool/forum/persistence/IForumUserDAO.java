@@ -21,8 +21,7 @@ public interface IForumUserDAO extends IBaseDAO {
 
     int getCountUsersBySession(Long sessionId, String searchString);
 
-    List<Object[]> getUsersForTablesorter(final Long sessionId, int page, int size, int sorting, String searchString, 
+    List<Object[]> getUsersForTablesorter(final Long sessionId, int page, int size, int sorting, String searchString,
 	    boolean getNotebookEntries, ICoreNotebookService coreNotebookService);
-
 
 }

@@ -2,21 +2,21 @@
  * Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
  * =============================================================
  * License Information: http://lamsfoundation.org/licensing/lams/2.0/
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License version 2.0 
+ * it under the terms of the GNU General Public License version 2.0
  * as published by the Free Software Foundation.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301
  * USA
- * 
+ *
  * http://www.gnu.org/licenses/gpl.txt
  * ****************************************************************
  */
@@ -29,7 +29,7 @@ import java.util.Locale;
 
 /**
  * Various internationalisation (internationalization) utilities for numbers
- * 
+ *
  * @author Fiona Malikoff
  *
  */
@@ -43,7 +43,7 @@ public class NumberUtil {
     /**
      * Format a given float or double to the I18N format specified by the locale. If no locale supplied, uses LAMS
      * server's default locale.
-     * 
+     *
      * @param mark
      * @param locale
      * @param numFractionDigits
@@ -62,7 +62,7 @@ public class NumberUtil {
     /**
      * Format a given float or double to the I18N format specified by the numberFormat. If no numberFormat supplied,
      * uses LAMS server's default numberFormat based on the server locale.
-     * 
+     *
      * @param mark
      * @param locale
      * @param numFractionDigits
@@ -78,7 +78,7 @@ public class NumberUtil {
      * Convert a string back into a Float. Assumes string was formatted using formatLocalisedNumber originally. Should
      * ensure that it is using the same locale/number format as when it was formatted. If no locale is suppied, it will
      * use the server's locale
-     * 
+     *
      * Need to strip out any spaces as spaces are valid group separators in some European locales (e.g. Polish) but they
      * seem to come back from Firefox as a plain space rather than the special separating space.
      */
@@ -104,7 +104,7 @@ public class NumberUtil {
      * Convert a string back into a Float. Assumes string was formatted using formatLocalisedNumber originally. Should
      * ensure that it is using the same locale/number format as when it was formatted. If no locale is suppied, it will
      * use the server's locale.
-     * 
+     *
      * Need to strip out any spaces as spaces are valid group separators in some European locales (e.g. Polish) but they
      * seem to come back from Firefox as a plain space rather than the special separating space.
      */

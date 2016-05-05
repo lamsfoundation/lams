@@ -32,7 +32,6 @@ import javax.servlet.http.HttpSession;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
-import org.apache.struts.action.Action;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
@@ -40,14 +39,12 @@ import org.apache.struts.action.ActionMessage;
 import org.apache.struts.action.ActionMessages;
 import org.apache.struts.upload.FormFile;
 import org.lamsfoundation.lams.contentrepository.NodeKey;
-import org.lamsfoundation.lams.contentrepository.client.IToolContentHandler;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.usermanagement.exception.UserAccessDeniedException;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
 import org.lamsfoundation.lams.util.CentralToolContentHandler;
 import org.lamsfoundation.lams.util.FileUtilException;
-import org.lamsfoundation.lams.util.MessageService;
 import org.lamsfoundation.lams.util.PortraitUtils;
 import org.lamsfoundation.lams.web.action.LamsDispatchAction;
 import org.lamsfoundation.lams.web.session.SessionManager;
@@ -58,9 +55,9 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
 /**
  * @author jliew
  * @author Andrey Balan
- * 
  *
- * 
+ *
+ *
  *
  *
  */
@@ -74,6 +71,7 @@ public class PortraitSaveAction extends LamsDispatchAction {
     /**
      * Upload portrait image.
      */
+    @Override
     public ActionForward unspecified(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) throws Exception {
 
@@ -86,8 +84,8 @@ public class PortraitSaveAction extends LamsDispatchAction {
 	PortraitActionForm portraitForm = (PortraitActionForm) form;
 	FormFile file = portraitForm.getFile();
 	String fileName = file.getFileName();
-	PortraitSaveAction.log.debug("got file: " + fileName + " of type: " + file.getContentType() + " with size: "
-		+ file.getFileSize());
+	PortraitSaveAction.log.debug(
+		"got file: " + fileName + " of type: " + file.getContentType() + " with size: " + file.getFileSize());
 
 	User user = getService().getUserByLogin(request.getRemoteUser());
 
@@ -111,7 +109,7 @@ public class PortraitSaveAction extends LamsDispatchAction {
 	NodeKey node = null;
 	if ((file != null) && !StringUtils.isEmpty(fileName)) {
 	    try {
-		fileName = fileName.substring(0, fileName.indexOf('.')) + ".jpg";		
+		fileName = fileName.substring(0, fileName.indexOf('.')) + ".jpg";
 		node = getCentralToolContentHandler().uploadFile(is, fileName, file.getContentType());
 		is.close();
 	    } catch (Exception e) {
@@ -131,8 +129,7 @@ public class PortraitSaveAction extends LamsDispatchAction {
 
 	return mapping.findForward("profile");
     }
-    
-    
+
     /**
      * Save portrait taken from web camera.
      */
@@ -175,11 +172,11 @@ public class PortraitSaveAction extends LamsDispatchAction {
 
 	return null;
     }
-    
+
     private CentralToolContentHandler getCentralToolContentHandler() {
 	if (centralToolContentHandler == null) {
-	    WebApplicationContext wac = WebApplicationContextUtils.getRequiredWebApplicationContext(getServlet()
-		    .getServletContext());
+	    WebApplicationContext wac = WebApplicationContextUtils
+		    .getRequiredWebApplicationContext(getServlet().getServletContext());
 	    centralToolContentHandler = (CentralToolContentHandler) wac.getBean("centralToolContentHandler");
 	}
 	return centralToolContentHandler;
@@ -187,11 +184,10 @@ public class PortraitSaveAction extends LamsDispatchAction {
 
     private IUserManagementService getService() {
 	if (PortraitSaveAction.service == null) {
-	    WebApplicationContext ctx = WebApplicationContextUtils.getRequiredWebApplicationContext(getServlet()
-		    .getServletContext());
+	    WebApplicationContext ctx = WebApplicationContextUtils
+		    .getRequiredWebApplicationContext(getServlet().getServletContext());
 	    PortraitSaveAction.service = (IUserManagementService) ctx.getBean("userManagementService");
 	}
 	return service;
     }
 }
-

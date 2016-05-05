@@ -10,9 +10,9 @@ import org.apache.log4j.Logger;
 
 /**
  * Provides methods to notify users of an event.
- * 
+ *
  * @author Marcin Cieslak
- * 
+ *
  */
 public abstract class AbstractDeliveryMethod {
     /**
@@ -30,7 +30,7 @@ public abstract class AbstractDeliveryMethod {
 
     /**
      * Standard constructor.
-     * 
+     *
      * @param id
      *            ID of the delivery method
      */
@@ -40,7 +40,7 @@ public abstract class AbstractDeliveryMethod {
 
     /**
      * Sends the message to the user.
-     * 
+     *
      * @param toUserId
      *            ID of the user
      * @param subject

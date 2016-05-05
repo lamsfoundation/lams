@@ -2,21 +2,21 @@
  * Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
  * =============================================================
  * License Information: http://lamsfoundation.org/licensing/lams/2.0/
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License version 2.0 
+ * it under the terms of the GNU General Public License version 2.0
  * as published by the Free Software Foundation.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301
  * USA
- * 
+ *
  * http://www.gnu.org/licenses/gpl.txt
  * ****************************************************************
  */
@@ -41,11 +41,11 @@ import org.lamsfoundation.lams.web.util.AttributeNames;
 
 /**
  * Date utility class that helps the conversion between time
- * 
+ *
  * @author Jacky Fang
  * @since 2005-4-14
  * @version 1.1
- * 
+ *
  */
 public class DateUtil {
 
@@ -57,7 +57,7 @@ public class DateUtil {
     /**
      * Convert your local time to Universal Time Coordinator. TODO conversion is not working properly. The returned Date
      * object still contain server local timezone rather than GMT time zone.
-     * 
+     *
      * @param time
      *            your local time
      * @return the date UTC time which is the same as GMT.
@@ -77,7 +77,7 @@ public class DateUtil {
 
     /**
      * Convert from UTC time to your local time. <b>Note: </b>it is your responsibility to pass in the correct UTC date.
-     * 
+     *
      * @param localTimeZone
      *            your local time zone.
      * @param UTCDate
@@ -93,7 +93,7 @@ public class DateUtil {
 
     /**
      * Convert from local time to your client (time zone) time.
-     * 
+     *
      * @param targetTimeZone
      *            time zone converting to.
      * @param date
@@ -109,7 +109,7 @@ public class DateUtil {
 
     /**
      * Convert from client (time zone) time to your local time.
-     * 
+     *
      * @param targetTimeZone
      *            time zone converting from.
      * @param date
@@ -125,15 +125,16 @@ public class DateUtil {
 
     /**
      * Convert from String formatted date to a Date. Tries the following date formats: (WDDX) YYYY-MM-ddTHH:mm:ss
-     * 
+     *
      * @param dateString
      *            the date as a string
      * @return converted Date
      * @throws ParseException
      */
     public static Date convertFromString(String dateString) throws ParseException {
-	if (dateString == null)
+	if (dateString == null) {
 	    return null;
+	}
 
 	// Replace this implementation with commons.lang.time.DateUtils.parseDate()
 	// if/when we upgrade to commons 2.1
@@ -159,7 +160,7 @@ public class DateUtil {
 
     /**
      * Convert from String formatted date to a Date given the supplied SimpleDateFormat pattern
-     * 
+     *
      * @param dateString
      *            the date as a string
      * @param dateFormat
@@ -168,8 +169,9 @@ public class DateUtil {
      * @throws ParseException
      */
     public static Date convertFromString(String dateString, String dateFormat) throws ParseException {
-	if (dateString == null)
+	if (dateString == null) {
 	    return null;
+	}
 
 	SimpleDateFormat parser = new SimpleDateFormat(dateFormat);
 	return parser.parse(dateString);
@@ -182,19 +184,19 @@ public class DateUtil {
     /**
      * Equivalent of <LAMS:Date value="value"/>. Use for processing a date to send to the client via JSON. Locale comes
      * from request.getLocale(); Same as calling convertToStringForJSON(value, DateFormat.MEDIUM, TYPE_BOTH, locale)
-     * 
+     *
      * @param value
      * @param locale
      * @return
      */
     public static String convertToStringForJSON(Date value, Locale locale) {
-	return convertToStringForJSON(value, DateFormat.MEDIUM, TYPE_BOTH, locale);
+	return DateUtil.convertToStringForJSON(value, DateFormat.MEDIUM, TYPE_BOTH, locale);
     }
 
     /**
      * Equivalent of <LAMS:Date value="value" style="short|full|medium" type="date|time|both"/>. Use for processing a
      * date to send to the client via JSON. Locale comes from request.getLocale();
-     * 
+     *
      * @param value
      * @param style
      *            DateFormat.MEDIUM, DateFormat.SHORT, DateFormat.FULL
@@ -204,13 +206,13 @@ public class DateUtil {
      * @return
      */
     public static String convertToStringForJSON(Date value, Integer style, Locale locale) {
-	return convertToStringForJSON(value, style, TYPE_BOTH, locale);
+	return DateUtil.convertToStringForJSON(value, style, TYPE_BOTH, locale);
     }
 
     /**
      * Equivalent of <LAMS:Date value="value" type="date|time|both"/>. Use for processing a date to send to the client
      * via JSON. Locale comes from request.getLocale();
-     * 
+     *
      * @param value
      * @param type
      *            TYPE_BOTH (both data and time), TYPE_DATE or TYPE_TIME
@@ -225,33 +227,34 @@ public class DateUtil {
 
 	int dateStyle, timeStyle;
 	switch (style) {
-	case DateFormat.SHORT:
-	    dateStyle = DateFormat.SHORT;
-	    timeStyle = DateFormat.SHORT;
-	    break;
-	case DateFormat.FULL:
-	    dateStyle = DateFormat.LONG;
-	    timeStyle = DateFormat.FULL;
-	    break;
-	default:
-	    dateStyle = DateFormat.LONG;
-	    timeStyle = DateFormat.MEDIUM;
+	    case DateFormat.SHORT:
+		dateStyle = DateFormat.SHORT;
+		timeStyle = DateFormat.SHORT;
+		break;
+	    case DateFormat.FULL:
+		dateStyle = DateFormat.LONG;
+		timeStyle = DateFormat.FULL;
+		break;
+	    default:
+		dateStyle = DateFormat.LONG;
+		timeStyle = DateFormat.MEDIUM;
 	}
 
 	DateFormat df = null;
 	switch (type) {
-	case TYPE_DATE:
-	    df = DateFormat.getDateInstance(dateStyle, locale);
-	    break;
-	case TYPE_TIME:
-	    df = DateFormat.getTimeInstance(timeStyle, locale);
-	    break;
-	default:
-	    df = DateFormat.getDateTimeInstance(dateStyle, timeStyle, locale);
+	    case TYPE_DATE:
+		df = DateFormat.getDateInstance(dateStyle, locale);
+		break;
+	    case TYPE_TIME:
+		df = DateFormat.getTimeInstance(timeStyle, locale);
+		break;
+	    default:
+		df = DateFormat.getDateTimeInstance(dateStyle, timeStyle, locale);
 	}
 
-	if (tz != null)
+	if (tz != null) {
 	    df.setTimeZone(tz);
+	}
 
 	return df.format(value);
     }

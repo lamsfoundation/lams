@@ -30,7 +30,7 @@ import org.apache.log4j.Logger;
 /**
  * This class maps to a sample question in the q&a wizard, it has a parent
  * cognitive skill which in turn has a parent category
- * 
+ *
  *
  */
 public class QaWizardQuestion implements Serializable, Comparable<QaWizardQuestion>, Cloneable {
@@ -54,7 +54,7 @@ public class QaWizardQuestion implements Serializable, Comparable<QaWizardQuesti
 
     /**
      *
-     * 
+     *
      */
     public Long getUid() {
 	return uid;
@@ -65,11 +65,11 @@ public class QaWizardQuestion implements Serializable, Comparable<QaWizardQuesti
     }
 
     /**
-     * 
      *
      *
      *
-     * 
+     *
+     *
      */
     public QaWizardCognitiveSkill getCognitiveSkill() {
 	return cognitiveSkill;
@@ -90,6 +90,7 @@ public class QaWizardQuestion implements Serializable, Comparable<QaWizardQuesti
 	this.question = question;
     }
 
+    @Override
     public int compareTo(QaWizardQuestion question) {
 	if (question.getUid() != null && uid != null) {
 	    return question.getUid().compareTo(uid) * -1;
@@ -98,6 +99,7 @@ public class QaWizardQuestion implements Serializable, Comparable<QaWizardQuesti
 	}
     }
 
+    @Override
     public Object clone() {
 	QaWizardQuestion question = null;
 	try {

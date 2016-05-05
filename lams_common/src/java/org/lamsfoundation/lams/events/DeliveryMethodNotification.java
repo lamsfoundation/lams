@@ -6,9 +6,9 @@ import org.apache.log4j.Logger;
 
 /**
  * Allows sending mail from the configured mail server.
- * 
+ *
  * @author Marcin Cieslak
- * 
+ *
  */
 public class DeliveryMethodNotification extends AbstractDeliveryMethod {
     private static final Logger log = Logger.getLogger(DeliveryMethodNotification.class);

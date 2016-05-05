@@ -9,9 +9,9 @@ import org.springframework.web.context.support.SpringBeanAutowiringSupport;
 /**
  * Quartz job for resending messages. This job is scheduled from the start-up and periodically attempts to resend failed
  * and marked for resending messages.
- * 
+ *
  * @author Marcin Cieslak
- * 
+ *
  */
 public class ResendMessagesJob extends QuartzJobBean {
     @Autowired

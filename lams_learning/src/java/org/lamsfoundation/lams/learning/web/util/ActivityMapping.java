@@ -2,21 +2,21 @@
  * Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
  * =============================================================
  * License Information: http://lamsfoundation.org/licensing/lams/2.0/
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License version 2.0 
+ * it under the terms of the GNU General Public License version 2.0
  * as published by the Free Software Foundation.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301
  * USA
- * 
+ *
  * http://www.gnu.org/licenses/gpl.txt
  * ****************************************************************
  */
@@ -51,9 +51,9 @@ import org.lamsfoundation.lams.web.util.AttributeNames;
 /**
  * This class contains the standard struts action mappings for errors as well as methods that get required Action/URL to
  * display an Activity or LearnerProgress.
- * 
+ *
  * In order to return a URL this class needs to know the baseURL. This can be set using in the application context.
- * 
+ *
  * @author daveg
  *
  */
@@ -74,7 +74,7 @@ public class ActivityMapping implements Serializable {
 
     /**
      * Creates a Struts ActionForward to display an activity.
-     * 
+     *
      * @param activity,
      *            the Activity to be displayed
      * @param progress,
@@ -102,7 +102,7 @@ public class ActivityMapping implements Serializable {
     /**
      * Creates a Struts ActionForward to display a next activity. If the previous activity was a ParallelActivity then
      * the frames will be cleared.
-     * 
+     *
      * @param progress,
      *            the LearnerProgress associated with the Activity and learner
      * @param redirect,
@@ -159,7 +159,7 @@ public class ActivityMapping implements Serializable {
     /**
      * Call the requestDisplay.do action to break out of any frames. Doesn't need to redirect this forward, as the
      * requestDisplay.do does a redirect
-     * 
+     *
      * @param activityURL
      *            URL to which we will be redirected. Does not need to be encoded as this method will encode it.
      * @param progressId
@@ -184,7 +184,7 @@ public class ActivityMapping implements Serializable {
     /**
      * Generates an ActivityURL for an Activity using it's progress. The URL is for the client and so includes hostname
      * etc. Note that the URL could also be a wait message or a jsp to clear the frames.
-     * 
+     *
      * @param activity,
      *            the Activity to be displayed
      * @param progress,
@@ -198,7 +198,7 @@ public class ActivityMapping implements Serializable {
     /**
      * Generates an ActivityURL for a Tool Activity or SystemToolActivity. The URL is for the tool and not for the tool
      * loading page. The URL also includes toolSessionId or toolContentId and all other required data.
-     * 
+     *
      * @param activity,
      *            the Activity to be displayed
      * @param progress,
@@ -218,7 +218,7 @@ public class ActivityMapping implements Serializable {
 
     /**
      * Creates a URL for a struts action and an activity.
-     * 
+     *
      * @param strutsAction,
      *            the struts action path.
      * @param activity,
@@ -243,7 +243,7 @@ public class ActivityMapping implements Serializable {
 
     /**
      * Creates a Struts ActionForward for an action and activity.
-     * 
+     *
      * @param strutsAction,
      *            the struts action
      * @param activity,
@@ -277,7 +277,7 @@ public class ActivityMapping implements Serializable {
 
     /**
      * Calculate the activity url for progress view at learner side.
-     * 
+     *
      * @param learner
      *            the learner who owns the progress data
      * @param activity

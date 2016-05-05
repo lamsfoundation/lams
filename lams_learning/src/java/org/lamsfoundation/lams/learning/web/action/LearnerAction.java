@@ -2,21 +2,21 @@
  * Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
  * =============================================================
  * License Information: http://lamsfoundation.org/licensing/lams/2.0/
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License version 2.0 
+ * it under the terms of the GNU General Public License version 2.0
  * as published by the Free Software Foundation.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301
  * USA
- * 
+ *
  * http://www.gnu.org/licenses/gpl.txt
  * ****************************************************************
  */
@@ -56,26 +56,26 @@ import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 
 /**
- * 
+ *
  * <p>
  * The action servlet that interacts with learner to start a lams learner module, join a user to the lesson and allows a
  * user to exit a lesson.
  * </p>
- * 
+ *
  * <p>
  * It is also responsible for the interaction between lams server and UI. UI will call method implemented in this class
  * to get progress data or trigger a lams server calculation here
  * </p>
- * 
+ *
  * <b>Note:</b>It needs to extend the <code>LamsDispatchAction</code> which has been customized to accomodate struts
  * features to solve duplicate submission problem.
- * 
+ *
  * @author Jacky Fang
  * @since 3/03/2005
  * @version 1.1
- * 
  *
- * 
+ *
+ *
  *
  *
  *
@@ -106,11 +106,11 @@ public class LearnerAction extends LamsDispatchAction {
      * <p>
      * The structs dispatch action that joins a learner into a lesson. This call is used for a user to start a lesson.
      * </p>
-     * 
+     *
      * @param mapping
      *            An ActionMapping class that will be used by the Action class to tell the ActionServlet where to send
      *            the end-user.
-     * 
+     *
      * @param form
      *            The ActionForm class that will contain any data submitted by the end-user via a form.
      * @param request
@@ -119,7 +119,7 @@ public class LearnerAction extends LamsDispatchAction {
      *            A standard Servlet HttpServletResponse class.
      * @return An ActionForward class that will be returned to the ActionServlet indicating where the user is to go
      *         next.
-     * 
+     *
      * @throws IOException
      * @throws ServletException
      */
@@ -229,7 +229,7 @@ public class LearnerAction extends LamsDispatchAction {
 
     /**
      * Gets the same url as getLearnerActivityURL() but forwards directly to the url.
-     * 
+     *
      * @param mapping
      *            An ActionMapping class that will be used by the Action class to tell the ActionServlet where to send
      *            the end-user.

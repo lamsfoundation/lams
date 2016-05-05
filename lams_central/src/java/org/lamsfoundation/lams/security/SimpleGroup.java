@@ -2,21 +2,21 @@
  * Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
  * =============================================================
  * License Information: http://lamsfoundation.org/licensing/lams/2.0/
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License version 2.0 
+ * it under the terms of the GNU General Public License version 2.0
  * as published by the Free Software Foundation.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301
  * USA
- * 
+ *
  * http://www.gnu.org/licenses/gpl.txt
  * ****************************************************************
  */
@@ -42,7 +42,7 @@ public class SimpleGroup extends SimplePrincipal implements Group {
 
     /**
      * Adds the specified member to the group.
-     * 
+     *
      * @param user
      *            the principal to add to this group.
      * @return true if the member was successfully added, false if the principal was already a member.
@@ -59,7 +59,7 @@ public class SimpleGroup extends SimplePrincipal implements Group {
     /**
      * Returns true if the passed principal is a member of the group. This method does a recursive search, so if a
      * principal belongs to a group which is a member of this group, true is returned.
-
+     *
      * @param member
      *            the principal whose membership is to be checked.
      * @return true if the principal is a member of this group, false otherwise.
@@ -73,7 +73,7 @@ public class SimpleGroup extends SimplePrincipal implements Group {
     /**
      * Returns an enumeration of the members in the group. The returned objects can be instances of either Principal or
      * Group (which is a subinterface of Principal).
-     * 
+     *
      * @return an enumeration of the group members.
      */
     @Override
@@ -83,7 +83,7 @@ public class SimpleGroup extends SimplePrincipal implements Group {
 
     /**
      * Removes the specified member from the group.
-     * 
+     *
      * @param user
      *            the principal to remove from this group.
      * @return true if the principal was removed, or false if the principal was not a member.

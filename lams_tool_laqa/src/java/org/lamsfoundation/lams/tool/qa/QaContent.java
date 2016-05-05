@@ -2,21 +2,21 @@
  * Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
  * =============================================================
  * License Information: http://lamsfoundation.org/licensing/lams/2.0/
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301
  * USA
- * 
+ *
  * http://www.gnu.org/licenses/gpl.txt
  * ****************************************************************
  */
@@ -39,9 +39,9 @@ import org.lamsfoundation.lams.rating.model.LearnerItemRatingCriteria;
 /**
  * QaContent Value Object The value object that maps to our model database table: tl_laqa11_content The relevant
  * hibernate mapping resides in: QaContent.hbm.xml
- * 
+ *
  * Holds content representation for the tool. Default content is made available to the tool by the database.
- * 
+ *
  * @author Ozgur Demirtas
  */
 public class QaContent implements Serializable {
@@ -103,9 +103,9 @@ public class QaContent implements Serializable {
     private Date updateDate;
 
     private Date submissionDeadline;
-    
+
     private boolean showOtherAnswersAfterDeadline;
-    
+
     private int maximumRates;
 
     private int minimumRates;
@@ -162,7 +162,7 @@ public class QaContent implements Serializable {
     /**
      * Copy Construtor to create a new qa content instance. Note that we don't copy the qa session data here because the
      * qa session will be created after we copied tool content.
-     * 
+     *
      * @param qa
      *            the original qa content.
      * @param newContentId
@@ -387,7 +387,7 @@ public class QaContent implements Serializable {
     public void setSubmissionDeadline(Date submissionDeadline) {
 	this.submissionDeadline = submissionDeadline;
     }
-    
+
     /**
      * @return Returns the showOtherAnswersAfterDeadline.
      */
@@ -618,7 +618,7 @@ public class QaContent implements Serializable {
     }
 
     /**
-     * 
+     *
      * @return
      */
     public Set<LearnerItemRatingCriteria> getRatingCriterias() {

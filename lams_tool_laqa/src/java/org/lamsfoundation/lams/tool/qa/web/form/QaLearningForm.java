@@ -2,21 +2,21 @@
  * Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
  * =============================================================
  * License Information: http://lamsfoundation.org/licensing/lams/2.0/
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301
  * USA
- * 
+ *
  * http://www.gnu.org/licenses/gpl.txt
  * ****************************************************************
  */
@@ -76,7 +76,7 @@ public class QaLearningForm extends ActionForm implements QaAppConstants {
 
     /**
      * @param btnCombined
-     *                The btnCombined to set.
+     *            The btnCombined to set.
      */
     public void setBtnCombined(String btnCombined) {
 	this.btnCombined = btnCombined;
@@ -91,7 +91,7 @@ public class QaLearningForm extends ActionForm implements QaAppConstants {
 
     /**
      * @param btnDone
-     *                The btnDone to set.
+     *            The btnDone to set.
      */
     public void setBtnDone(String btnDone) {
 	this.btnDone = btnDone;
@@ -106,7 +106,7 @@ public class QaLearningForm extends ActionForm implements QaAppConstants {
 
     /**
      * @param btnGetNext
-     *                The btnGetNext to set.
+     *            The btnGetNext to set.
      */
     public void setBtnGetNext(String btnGetNext) {
 	this.btnGetNext = btnGetNext;
@@ -121,7 +121,7 @@ public class QaLearningForm extends ActionForm implements QaAppConstants {
 
     /**
      * @param btnGetPrevious
-     *                The btnGetPrevious to set.
+     *            The btnGetPrevious to set.
      */
     public void setBtnGetPrevious(String btnGetPrevious) {
 	this.btnGetPrevious = btnGetPrevious;
@@ -129,9 +129,9 @@ public class QaLearningForm extends ActionForm implements QaAppConstants {
 
     /**
      * reset user actions in learning mode
-     * 
+     *
      * @param qaAuthoringForm
-     *                return void
+     *            return void
      */
 
     public void resetUserActions() {
@@ -174,7 +174,7 @@ public class QaLearningForm extends ActionForm implements QaAppConstants {
 
     /**
      * @param currentQuestionIndex
-     *                The currentQuestionIndex to set.
+     *            The currentQuestionIndex to set.
      */
     public void setCurrentQuestionIndex(String currentQuestionIndex) {
 	this.currentQuestionIndex = currentQuestionIndex;
@@ -189,7 +189,7 @@ public class QaLearningForm extends ActionForm implements QaAppConstants {
 
     /**
      * @param answer
-     *                The answer to set.
+     *            The answer to set.
      */
     public void setAnswer(String answer) {
 	this.answer = answer;
@@ -204,7 +204,7 @@ public class QaLearningForm extends ActionForm implements QaAppConstants {
 
     /**
      * @param getNextQuestion
-     *                The getNextQuestion to set.
+     *            The getNextQuestion to set.
      */
     public void setGetNextQuestion(String getNextQuestion) {
 	this.getNextQuestion = getNextQuestion;
@@ -219,7 +219,7 @@ public class QaLearningForm extends ActionForm implements QaAppConstants {
 
     /**
      * @param getPreviousQuestion
-     *                The getPreviousQuestion to set.
+     *            The getPreviousQuestion to set.
      */
     public void setGetPreviousQuestion(String getPreviousQuestion) {
 	this.getPreviousQuestion = getPreviousQuestion;
@@ -234,7 +234,7 @@ public class QaLearningForm extends ActionForm implements QaAppConstants {
 
     /**
      * @param submitAnswersContent
-     *                The submitAnswersContent to set.
+     *            The submitAnswersContent to set.
      */
     public void setSubmitAnswersContent(String submitAnswersContent) {
 	this.submitAnswersContent = submitAnswersContent;
@@ -249,7 +249,7 @@ public class QaLearningForm extends ActionForm implements QaAppConstants {
 
     /**
      * @param endLearning
-     *                The endLearning to set.
+     *            The endLearning to set.
      */
     public void setEndLearning(String endLearning) {
 	this.endLearning = endLearning;
@@ -264,7 +264,7 @@ public class QaLearningForm extends ActionForm implements QaAppConstants {
 
     /**
      * @param responseId
-     *                The responseId to set.
+     *            The responseId to set.
      */
     public void setResponseId(String responseId) {
 	this.responseId = responseId;
@@ -279,7 +279,7 @@ public class QaLearningForm extends ActionForm implements QaAppConstants {
 
     /**
      * @param method
-     *                The method to set.
+     *            The method to set.
      */
     public void setMethod(String method) {
 	this.method = method;
@@ -294,7 +294,7 @@ public class QaLearningForm extends ActionForm implements QaAppConstants {
 
     /**
      * @param viewAllResults
-     *                The viewAllResults to set.
+     *            The viewAllResults to set.
      */
     public void setViewAllResults(String viewAllResults) {
 	this.viewAllResults = viewAllResults;
@@ -309,7 +309,7 @@ public class QaLearningForm extends ActionForm implements QaAppConstants {
 
     /**
      * @param toolSessionID
-     *                The toolSessionID to set.
+     *            The toolSessionID to set.
      */
     public void setToolSessionID(String toolSessionID) {
 	this.toolSessionID = toolSessionID;
@@ -324,7 +324,7 @@ public class QaLearningForm extends ActionForm implements QaAppConstants {
 
     /**
      * @param httpSessionID
-     *                The httpSessionID to set.
+     *            The httpSessionID to set.
      */
     public void setHttpSessionID(String httpSessionID) {
 	this.httpSessionID = httpSessionID;
@@ -339,7 +339,7 @@ public class QaLearningForm extends ActionForm implements QaAppConstants {
 
     /**
      * @param userID
-     *                The userID to set.
+     *            The userID to set.
      */
     public void setUserID(String userID) {
 	this.userID = userID;
@@ -356,7 +356,7 @@ public class QaLearningForm extends ActionForm implements QaAppConstants {
 
     /**
      * @param mode
-     *                The mode to set.
+     *            The mode to set.
      */
     public void setMode(String mode) {
 	this.mode = mode;
@@ -371,7 +371,7 @@ public class QaLearningForm extends ActionForm implements QaAppConstants {
 
     /**
      * @param questionIndex
-     *                The questionIndex to set.
+     *            The questionIndex to set.
      */
     public void setQuestionIndex(String questionIndex) {
 	this.questionIndex = questionIndex;
@@ -386,7 +386,7 @@ public class QaLearningForm extends ActionForm implements QaAppConstants {
 
     /**
      * @param totalQuestionCount
-     *                The totalQuestionCount to set.
+     *            The totalQuestionCount to set.
      */
     public void setTotalQuestionCount(String totalQuestionCount) {
 	this.totalQuestionCount = totalQuestionCount;
@@ -401,7 +401,7 @@ public class QaLearningForm extends ActionForm implements QaAppConstants {
 
     /**
      * @param requestLearningReport
-     *                The requestLearningReport to set.
+     *            The requestLearningReport to set.
      */
     public void setRequestLearningReport(String requestLearningReport) {
 	this.requestLearningReport = requestLearningReport;
@@ -416,7 +416,7 @@ public class QaLearningForm extends ActionForm implements QaAppConstants {
 
     /**
      * @param requestLearningReportProgress
-     *                The requestLearningReportProgress to set.
+     *            The requestLearningReportProgress to set.
      */
     public void setRequestLearningReportProgress(String requestLearningReportProgress) {
 	this.requestLearningReportProgress = requestLearningReportProgress;
@@ -431,7 +431,7 @@ public class QaLearningForm extends ActionForm implements QaAppConstants {
 
     /**
      * @param requestLearningReportViewOnly
-     *                The requestLearningReportViewOnly to set.
+     *            The requestLearningReportViewOnly to set.
      */
     public void setRequestLearningReportViewOnly(String requestLearningReportViewOnly) {
 	this.requestLearningReportViewOnly = requestLearningReportViewOnly;
@@ -446,7 +446,7 @@ public class QaLearningForm extends ActionForm implements QaAppConstants {
 
     /**
      * @param redoQuestions
-     *                The redoQuestions to set.
+     *            The redoQuestions to set.
      */
     public void setRedoQuestions(String redoQuestions) {
 	this.redoQuestions = redoQuestions;
@@ -461,7 +461,7 @@ public class QaLearningForm extends ActionForm implements QaAppConstants {
 
     /**
      * @param refreshAnswers
-     *                The refreshAnswers to set.
+     *            The refreshAnswers to set.
      */
     public void setRefreshAnswers(String refreshAnswers) {
 	this.refreshAnswers = refreshAnswers;
@@ -476,7 +476,7 @@ public class QaLearningForm extends ActionForm implements QaAppConstants {
 
     /**
      * @param entryText
-     *                The entryText to set.
+     *            The entryText to set.
      */
     public void setEntryText(String entryText) {
 	this.entryText = entryText;
@@ -491,7 +491,7 @@ public class QaLearningForm extends ActionForm implements QaAppConstants {
 
     /**
      * @param forwardtoReflection
-     *                The forwardtoReflection to set.
+     *            The forwardtoReflection to set.
      */
     public void setForwardtoReflection(String forwardtoReflection) {
 	this.forwardtoReflection = forwardtoReflection;
@@ -506,7 +506,7 @@ public class QaLearningForm extends ActionForm implements QaAppConstants {
 
     /**
      * @param submitReflection
-     *                The submitReflection to set.
+     *            The submitReflection to set.
      */
     public void setSubmitReflection(String submitReflection) {
 	this.submitReflection = submitReflection;
@@ -521,7 +521,7 @@ public class QaLearningForm extends ActionForm implements QaAppConstants {
 
     /**
      * @param viewAll
-     *                The viewAll to set.
+     *            The viewAll to set.
      */
     public void setViewAll(String viewAll) {
 	this.viewAll = viewAll;
@@ -536,7 +536,7 @@ public class QaLearningForm extends ActionForm implements QaAppConstants {
 
     /**
      * @param updateReflection
-     *                The updateReflection to set.
+     *            The updateReflection to set.
      */
     public void setUpdateReflection(String updateReflection) {
 	this.updateReflection = updateReflection;

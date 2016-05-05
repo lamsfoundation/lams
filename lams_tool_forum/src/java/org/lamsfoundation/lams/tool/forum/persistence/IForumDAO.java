@@ -3,25 +3,25 @@ package org.lamsfoundation.lams.tool.forum.persistence;
 import org.lamsfoundation.lams.dao.IBaseDAO;
 
 public interface IForumDAO extends IBaseDAO {
-	
-	void saveOrUpdate(Forum forum);
 
-	Forum getById(Long forumId);
+    void saveOrUpdate(Forum forum);
 
-	/**
-	 * NOTE: before call this method, must be sure delete all messages in this forum. Example code like this:
-	 * 
-	 * <pre>
-	 * <code>
-	 * messageDao.deleteForumMessage(forum.getUuid());
-	 * </code>
-	 * </pre>
-	 * 
-	 * @param forum
-	 */
-	void delete(Forum forum);
+    Forum getById(Long forumId);
 
-	Forum getByContentId(Long contentID);
+    /**
+     * NOTE: before call this method, must be sure delete all messages in this forum. Example code like this:
+     * 
+     * <pre>
+     * <code>
+     * messageDao.deleteForumMessage(forum.getUuid());
+     * </code>
+     * </pre>
+     * 
+     * @param forum
+     */
+    void delete(Forum forum);
 
-	void deleteCondition(ForumCondition condition);
+    Forum getByContentId(Long contentID);
+
+    void deleteCondition(ForumCondition condition);
 }

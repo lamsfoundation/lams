@@ -2,21 +2,21 @@
  * Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
  * =============================================================
  * License Information: http://lamsfoundation.org/licensing/lams/2.0/
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301
  * USA
- * 
+ *
  * http://www.gnu.org/licenses/gpl.txt
  * ****************************************************************
  */
@@ -64,7 +64,8 @@ public class AuthoringAction extends Action {
     private static Logger log = Logger.getLogger(AuthoringAction.class);
 
     @Override
-    public ActionForward execute(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception {
+    public ActionForward execute(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+	    HttpServletResponse response) throws Exception {
 
 	String param = mapping.getParameter();
 	// -----------------------Peerreview Author function
@@ -104,14 +105,15 @@ public class AuthoringAction extends Action {
     /**
      * Read peerreview data from database and put them into HttpSession. It will
      * redirect to init.do directly after this method run successfully.
-     * 
+     *
      * This method will avoid read database again and lost un-saved resouce item
      * lost when user "refresh page",
-     * 
+     *
      * @throws ServletException
-     * 
+     *
      */
-    private ActionForward start(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws ServletException {
+    private ActionForward start(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+	    HttpServletResponse response) throws ServletException {
 
 	// save toolContentID into HTTPSession
 	Long contentId = new Long(WebUtil.readLongParam(request, PeerreviewConstants.PARAM_TOOL_CONTENT_ID));
@@ -143,7 +145,7 @@ public class AuthoringAction extends Action {
 	    AuthoringAction.log.error(e);
 	    throw new ServletException(e);
 	}
-	
+
 	// get rating criterias from DB
 	List<RatingCriteria> ratingCriterias = service.getRatingCriterias(contentId);
 	sessionMap.put(AttributeNames.ATTR_RATING_CRITERIAS, ratingCriterias);
@@ -156,7 +158,7 @@ public class AuthoringAction extends Action {
 
     /**
      * Display same entire authoring page content from HttpSession variable.
-     * 
+     *
      * @param mapping
      * @param form
      * @param request
@@ -164,9 +166,11 @@ public class AuthoringAction extends Action {
      * @return
      * @throws ServletException
      */
-    private ActionForward initPage(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws ServletException {
+    private ActionForward initPage(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+	    HttpServletResponse response) throws ServletException {
 	String sessionMapID = WebUtil.readStrParam(request, PeerreviewConstants.ATTR_SESSION_MAP_ID);
-	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession().getAttribute(sessionMapID);
+	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
+		.getAttribute(sessionMapID);
 	PeerreviewForm existForm = (PeerreviewForm) sessionMap.get(PeerreviewConstants.ATTR_PEERREVIEW_FORM);
 
 	PeerreviewForm peerreviewForm = (PeerreviewForm) form;
@@ -187,7 +191,7 @@ public class AuthoringAction extends Action {
     /**
      * This method will persist all inforamtion in this authoring page, include
      * all peerreview item, information etc.
-     * 
+     *
      * @param mapping
      * @param form
      * @param request
@@ -195,11 +199,13 @@ public class AuthoringAction extends Action {
      * @return
      * @throws ServletException
      */
-    private ActionForward updateContent(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception {
+    private ActionForward updateContent(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+	    HttpServletResponse response) throws Exception {
 	PeerreviewForm peerreviewForm = (PeerreviewForm) form;
 
 	// get back sessionMAP
-	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession().getAttribute(peerreviewForm.getSessionMapID());
+	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
+		.getAttribute(peerreviewForm.getSessionMapID());
 
 	ToolAccessMode mode = getAccessMode(request);
 
@@ -245,16 +251,17 @@ public class AuthoringAction extends Action {
 	HttpSession ss = SessionManager.getSession();
 	// get back login user DTO
 	UserDTO user = (UserDTO) ss.getAttribute(AttributeNames.USER);
-	PeerreviewUser peerreviewUser = service.getUserByIDAndContent(new Long(user.getUserID().intValue()), peerreviewForm.getPeerreview().getContentId());
+	PeerreviewUser peerreviewUser = service.getUserByIDAndContent(new Long(user.getUserID().intValue()),
+		peerreviewForm.getPeerreview().getContentId());
 	if (peerreviewUser == null) {
 	    peerreviewUser = new PeerreviewUser(user, peerreviewPO);
 	}
 
 	peerreviewPO.setCreatedBy(peerreviewUser);
 
-	// finally persist peerreviewPO 
+	// finally persist peerreviewPO
 	service.saveOrUpdatePeerreview(peerreviewPO);
-	
+
 	// ************************* Handle rating criterias *******************
 	Long contentId = peerreview.getContentId();
 	List<RatingCriteria> oldCriterias = (List<RatingCriteria>) sessionMap.get(AttributeNames.ATTR_RATING_CRITERIAS);
@@ -277,14 +284,15 @@ public class AuthoringAction extends Action {
      * Return PeerreviewService bean.
      */
     private IPeerreviewService getPeerreviewService() {
-	WebApplicationContext wac = WebApplicationContextUtils.getRequiredWebApplicationContext(getServlet().getServletContext());
+	WebApplicationContext wac = WebApplicationContextUtils
+		.getRequiredWebApplicationContext(getServlet().getServletContext());
 	return (IPeerreviewService) wac.getBean(PeerreviewConstants.PEERREVIEW_SERVICE);
     }
-    
+
     /**
      * Get ToolAccessMode from HttpRequest parameters. Default value is AUTHOR
      * mode.
-     * 
+     *
      * @param request
      * @return
      */

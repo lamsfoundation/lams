@@ -34,14 +34,16 @@ public class QaConfigItemDAO extends LAMSBaseDAO implements IQaConfigItemDAO {
     private static final String LOAD_CONFIG_ITEM_BY_KEY = "from QaConfigItem configuration"
 	    + " where configuration.configKey=:key";
 
+    @Override
     public QaConfigItem getConfigItemByKey(final String configKey) {
-		return (QaConfigItem) getSession().createQuery(LOAD_CONFIG_ITEM_BY_KEY).setString("key", configKey)
-				.uniqueResult();
-	}
+	return (QaConfigItem) getSession().createQuery(LOAD_CONFIG_ITEM_BY_KEY).setString("key", configKey)
+		.uniqueResult();
+    }
 
-	public void saveOrUpdate(QaConfigItem qaConfigItem) {
-		getSession().saveOrUpdate(qaConfigItem);
-		getSession().flush();
-	}
+    @Override
+    public void saveOrUpdate(QaConfigItem qaConfigItem) {
+	getSession().saveOrUpdate(qaConfigItem);
+	getSession().flush();
+    }
 
 }

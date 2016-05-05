@@ -30,10 +30,10 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
 
 /**
  * Servlet to handle forgot password requests
- * 
+ *
  * This servlet handles two type of requests, one to save the request and send an email to the user, and one to save the
  * new password
- * 
+ *
  * @author lfoxton
  *
  *
@@ -90,7 +90,7 @@ public class ForgotPasswordServlet extends HttpServlet {
     /**
      * Handles the first step of the forgot login process, sending the email to the user. An email is sent with a link
      * and key attached to identify the forgot login request
-     * 
+     *
      * @param findByEmail
      *            true if the forgot login request was for an email, false if it was for a login
      * @param param
@@ -220,7 +220,7 @@ public class ForgotPasswordServlet extends HttpServlet {
 
     /**
      * Updates the user's password
-     * 
+     *
      * @param key
      *            the key of the forgot password request
      */
@@ -270,7 +270,7 @@ public class ForgotPasswordServlet extends HttpServlet {
 
     /**
      * Generates the unique key used for the forgot password request
-     * 
+     *
      * @return a unique key
      * @throws FileUtilException
      * @throws IOException

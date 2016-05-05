@@ -2,21 +2,21 @@
  * Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
  * =============================================================
  * License Information: http://lamsfoundation.org/licensing/lams/2.0/
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301
  * USA
- * 
+ *
  * http://www.gnu.org/licenses/gpl.txt
  * ****************************************************************
  */
@@ -57,13 +57,13 @@ import org.lamsfoundation.lams.web.util.AttributeNames;
 /**
  * @author
  * @version
- * 
  *
- * 
  *
- * 
  *
- * 
+ *
+ *
+ *
+ *
  */
 public class MonitoringAction extends LamsDispatchAction {
 
@@ -71,6 +71,7 @@ public class MonitoringAction extends LamsDispatchAction {
 
     public IScribeService scribeService;
 
+    @Override
     public ActionForward unspecified(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) {
 	log.info("excuting monitoring action");
@@ -147,7 +148,7 @@ public class MonitoringAction extends LamsDispatchAction {
 	scribeService.saveOrUpdateScribeSession(session);
 
 	LearningWebsocketServer.sendCloseRequest(session.getSessionId());
-	
+
 	ScribeDTO scribeDTO = setupScribeDTO(session.getScribe());
 	request.setAttribute("monitoringDTO", scribeDTO);
 	request.setAttribute("contentFolderID", monForm.getContentFolderID());
@@ -172,8 +173,8 @@ public class MonitoringAction extends LamsDispatchAction {
 
 		// get the notebook entry.
 		NotebookEntry notebookEntry = scribeService.getEntry(session.getSessionId(),
-			CoreNotebookConstants.NOTEBOOK_TOOL, ScribeConstants.TOOL_SIGNATURE, user.getUserId()
-				.intValue());
+			CoreNotebookConstants.NOTEBOOK_TOOL, ScribeConstants.TOOL_SIGNATURE,
+			user.getUserId().intValue());
 		if (notebookEntry != null) {
 		    userDTO.finishedReflection = true;
 		} else {

@@ -1,23 +1,23 @@
-/**************************************************************** 
- * Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org) 
- * ============================================================= 
- * License Information: http://lamsfoundation.org/licensing/lams/2.0/ 
- * 
- * This program is free software; you can redistribute it and/or modify 
- * it under the terms of the GNU General Public License version 2.0 
- * as published by the Free Software Foundation. 
- * 
- * This program is distributed in the hope that it will be useful, 
- * but WITHOUT ANY WARRANTY; without even the implied warranty of 
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the 
- * GNU General Public License for more details. 
- * 
- * You should have received a copy of the GNU General Public License 
- * along with this program; if not, write to the Free Software 
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 * USA 
- * 
- * http://www.gnu.org/licenses/gpl.txt 
- * **************************************************************** 
+/****************************************************************
+ * Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
+ * =============================================================
+ * License Information: http://lamsfoundation.org/licensing/lams/2.0/
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License version 2.0
+ * as published by the Free Software Foundation.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 * USA
+ *
+ * http://www.gnu.org/licenses/gpl.txt
+ * ****************************************************************
  */
 
 /* $Id$ */
@@ -50,7 +50,7 @@ import org.lamsfoundation.lams.tool.qa.QaUsrResp;
  * Output factory for Q&A tool. For conditions it provides only one type of output - a user answers represented by an
  * array of strings (output type "OUTPUT_COMPLEX"). For data flow between tools it provides all users' answers (from
  * current group) and questions asked.
- * 
+ *
  * @author Marcin Cieslak
  */
 public class QaOutputFactory extends OutputFactory {
@@ -59,8 +59,8 @@ public class QaOutputFactory extends OutputFactory {
      * {@inheritDoc}
      */
     @Override
-    public SortedMap<String, ToolOutputDefinition> getToolOutputDefinitions(Object toolContentObject, int definitionType)
-	    throws ToolException {
+    public SortedMap<String, ToolOutputDefinition> getToolOutputDefinitions(Object toolContentObject,
+	    int definitionType) throws ToolException {
 	SortedMap<String, ToolOutputDefinition> definitionMap = new TreeMap<String, ToolOutputDefinition>();
 	if (toolContentObject != null) {
 	    QaContent qaContent = (QaContent) toolContentObject;
@@ -68,26 +68,27 @@ public class QaOutputFactory extends OutputFactory {
 	    Class stringArrayClass = String[].class;
 	    Class arrayofStringArraysClass = String[][].class;
 	    switch (definitionType) {
-	    case ToolOutputDefinition.DATA_OUTPUT_DEFINITION_TYPE_CONDITION: {
-		ToolOutputDefinition userAnswersDefinition = buildComplexOutputDefinition(
-			QaAppConstants.USER_ANSWERS_DEFINITION_NAME, stringArrayClass);
+		case ToolOutputDefinition.DATA_OUTPUT_DEFINITION_TYPE_CONDITION: {
+		    ToolOutputDefinition userAnswersDefinition = buildComplexOutputDefinition(
+			    QaAppConstants.USER_ANSWERS_DEFINITION_NAME, stringArrayClass);
 
-		// adding all existing conditions
-		userAnswersDefinition.setDefaultConditions(new ArrayList<BranchCondition>(qaContent.getConditions()));
-		userAnswersDefinition.setShowConditionNameOnly(true);
-		definitionMap.put(QaAppConstants.USER_ANSWERS_DEFINITION_NAME, userAnswersDefinition);
-	    }
-		break;
-	    case ToolOutputDefinition.DATA_OUTPUT_DEFINITION_TYPE_DATA_FLOW: {
-		ToolOutputDefinition groupAnswersDefinition = buildComplexOutputDefinition(
-			QaAppConstants.GROUP_ANSWERS_DEFINITION_NAME, arrayofStringArraysClass);
-		definitionMap.put(QaAppConstants.GROUP_ANSWERS_DEFINITION_NAME, groupAnswersDefinition);
+		    // adding all existing conditions
+		    userAnswersDefinition
+			    .setDefaultConditions(new ArrayList<BranchCondition>(qaContent.getConditions()));
+		    userAnswersDefinition.setShowConditionNameOnly(true);
+		    definitionMap.put(QaAppConstants.USER_ANSWERS_DEFINITION_NAME, userAnswersDefinition);
+		}
+		    break;
+		case ToolOutputDefinition.DATA_OUTPUT_DEFINITION_TYPE_DATA_FLOW: {
+		    ToolOutputDefinition groupAnswersDefinition = buildComplexOutputDefinition(
+			    QaAppConstants.GROUP_ANSWERS_DEFINITION_NAME, arrayofStringArraysClass);
+		    definitionMap.put(QaAppConstants.GROUP_ANSWERS_DEFINITION_NAME, groupAnswersDefinition);
 
-		ToolOutputDefinition questionsDefinition = buildComplexOutputDefinition(
-			QaAppConstants.QUESTIONS_DEFINITION_NAME, stringArrayClass);
-		definitionMap.put(QaAppConstants.QUESTIONS_DEFINITION_NAME, questionsDefinition);
-	    }
-		break;
+		    ToolOutputDefinition questionsDefinition = buildComplexOutputDefinition(
+			    QaAppConstants.QUESTIONS_DEFINITION_NAME, stringArrayClass);
+		    definitionMap.put(QaAppConstants.QUESTIONS_DEFINITION_NAME, questionsDefinition);
+		}
+		    break;
 	    }
 	}
 
@@ -96,7 +97,7 @@ public class QaOutputFactory extends OutputFactory {
 
     /**
      * Follows {@link QaServicePOJO#getToolOutput(List, Long, Long)}.
-     * 
+     *
      */
     public SortedMap<String, ToolOutput> getToolOutput(List<String> names, IQaService qaService, Long toolSessionId,
 	    Long learnerId) {
@@ -175,7 +176,8 @@ public class QaOutputFactory extends OutputFactory {
 		    long lastAttemptTime = Long.MAX_VALUE;
 		    for (QaQueContent question : questions) {
 
-			QaUsrResp response = qaService.getResponseByUserAndQuestion(user.getQueUsrId(), question.getUid());
+			QaUsrResp response = qaService.getResponseByUserAndQuestion(user.getQueUsrId(),
+				question.getUid());
 
 			if (response != null) {
 			    // we get the time of the attempt - the "lastAttemptTime" will the time of the whole answer
@@ -249,9 +251,9 @@ public class QaOutputFactory extends OutputFactory {
 
     /**
      * Creates a default condition so teachers know how to use complex conditions for this tool.
-     * 
+     *
      * @param qaContent
-     *                content of the tool
+     *            content of the tool
      * @return default Q&A condition
      */
     protected QaCondition createDefaultComplexUserAnswersCondition(QaContent qaContent) {
@@ -259,12 +261,12 @@ public class QaOutputFactory extends OutputFactory {
 	    return null;
 	}
 	Set<QaQueContent> questions = new HashSet<QaQueContent>();
-	questions.add((QaQueContent) qaContent.getQaQueContents().iterator().next());
-	String name = buildConditionName(QaAppConstants.USER_ANSWERS_DEFINITION_NAME, qaContent.getQaContentId()
-		.toString());
+	questions.add(qaContent.getQaQueContents().iterator().next());
+	String name = buildConditionName(QaAppConstants.USER_ANSWERS_DEFINITION_NAME,
+		qaContent.getQaContentId().toString());
 	// Default condition checks if the first answer contains word "LAMS"
-	return new QaCondition(null, null, 1, name, getI18NText(
-		QaAppConstants.USER_ANSWERS_DEFAULT_CONDITION_DISPLAY_NAME_KEY, false), "LAMS", null, null, null,
-		questions);
+	return new QaCondition(null, null, 1, name,
+		getI18NText(QaAppConstants.USER_ANSWERS_DEFAULT_CONDITION_DISPLAY_NAME_KEY, false), "LAMS", null, null,
+		null, questions);
     }
 }

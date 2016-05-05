@@ -9,7 +9,7 @@ import org.apache.log4j.Logger;
  * Each instance of WikiPage represents a page on the wiki (can be the main
  * page) Each WikiPage instance has 0 to many edits, and therefore has 0 to many
  * WikiContent instances
- * 
+ *
  * @author lfoxton
  *
  */
@@ -33,7 +33,7 @@ public class WikiPage implements java.io.Serializable, Cloneable {
 
     /**
      *
-     * 
+     *
      */
     public Long getUid() {
 	return uid;
@@ -46,7 +46,7 @@ public class WikiPage implements java.io.Serializable, Cloneable {
     /**
      *
      *
-     * 
+     *
      */
     public Wiki getParentWiki() {
 	return parentWiki;
@@ -58,7 +58,7 @@ public class WikiPage implements java.io.Serializable, Cloneable {
 
     /**
      *
-     * 
+     *
      */
     public String getTitle() {
 	return title;
@@ -70,7 +70,7 @@ public class WikiPage implements java.io.Serializable, Cloneable {
 
     /**
      *
-     * 
+     *
      */
     public Boolean getEditable() {
 	return editable;
@@ -79,25 +79,25 @@ public class WikiPage implements java.io.Serializable, Cloneable {
     public void setEditable(Boolean editable) {
 	this.editable = editable;
     }
-    
+
     /**
      *
-     * 
+     *
      */
     public Boolean getDeleted() {
-        return deleted;
+	return deleted;
     }
 
     public void setDeleted(Boolean deleted) {
-        this.deleted = deleted;
+	this.deleted = deleted;
     }
-    
+
     /**
      *
      *
      *
      *
-     * 
+     *
      */
     public Set<WikiPageContent> getWikiContentVersions() {
 	return wikiContentVersions;
@@ -110,7 +110,7 @@ public class WikiPage implements java.io.Serializable, Cloneable {
     /**
      *
      *
-     * 
+     *
      */
     public WikiPageContent getCurrentWikiContent() {
 	return currentWikiContent;
@@ -120,27 +120,26 @@ public class WikiPage implements java.io.Serializable, Cloneable {
 	this.currentWikiContent = currentWikiContent;
     }
 
-    
     /**
      *
      *
-     * 
+     *
      */
     public WikiUser getAddedBy() {
-        return addedBy;
+	return addedBy;
     }
 
     public void setAddedBy(WikiUser addedBy) {
-        this.addedBy = addedBy;
+	this.addedBy = addedBy;
     }
 
     /**
      * Gets the toolSession
-     * 
      *
      *
      *
-     * 
+     *
+     *
      */
     public WikiSession getWikiSession() {
 	return wikiSession;
@@ -150,6 +149,7 @@ public class WikiPage implements java.io.Serializable, Cloneable {
 	this.wikiSession = wikiSession;
     }
 
+    @Override
     public Object clone() {
 
 	WikiPage wikiPage = null;

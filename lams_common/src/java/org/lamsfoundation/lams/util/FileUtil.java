@@ -2,21 +2,21 @@
  * Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
  * =============================================================
  * License Information: http://lamsfoundation.org/licensing/lams/2.0/
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License version 2.0 
+ * it under the terms of the GNU General Public License version 2.0
  * as published by the Free Software Foundation.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301
  * USA
- * 
+ *
  * http://www.gnu.org/licenses/gpl.txt
  * ****************************************************************
  */
@@ -97,11 +97,11 @@ public class FileUtil {
     /**
      * Deleting a directory using File.delete() only works if the directory is empty. This method deletes a directory
      * and all of its contained files.
-     * 
+     *
      * This method is not transactional - if it fails to delete some contained files or directories, it will continue
      * deleting all the other files in the directory. If only a partial deletion is done, then the files and directories
      * that could not be deleted are listed in the log file, and the method returns false.
-     * 
+     *
      * This method has not been tested in Linux or Unix systems, so the behaviour across symbolic links is unknown.
      */
     public static boolean deleteDirectory(File directory) {
@@ -183,7 +183,7 @@ public class FileUtil {
      * Create a temporary directory with the name in the form lamstmp_timestamp_suffix inside the default temporary-file
      * directory for the system. This method is protected (rather than private) so that it may be called by the junit
      * tests for this class.
-     * 
+     *
      * @param zipFileName
      * @return name of the new directory
      * @throws ZipFileUtilException
@@ -233,9 +233,9 @@ public class FileUtil {
     /**
      * This method creates a directory with the name <code>directoryName</code>. Also creates any necessary parent
      * directories that may not yet exist.
-     * 
+     *
      * If the directoryname is null or an empty string, a FileUtilException is thrown
-     * 
+     *
      * @param directoryName
      *            the name of the directory to create
      * @return boolean. Returns true if the directory is created and false otherwise
@@ -258,10 +258,10 @@ public class FileUtil {
     /**
      * Creates a subdirectory under the parent directory <code>parentDirName</code> If the parent or child directory is
      * null, FileUtilException is thrown.
-     * 
+     *
      * If the parent directory has not been created yet, it will be created.
-     * 
-     * 
+     *
+     *
      * @param parentDirName
      *            The name of the parent directory in which the subdirectory should be created in
      * @param subDirName
@@ -302,7 +302,7 @@ public class FileUtil {
      * If the directory name specified has a slash at the end of it such as "directoryName/", then the slash will be
      * removed and "directoryName" will be returned. The createDirectory(parentdir, childdir) method requires that there
      * is no slash at the end of the directory name.
-     * 
+     *
      * @param stringToModify
      * @return
      */
@@ -313,7 +313,7 @@ public class FileUtil {
 
     /**
      * Checks to see if there is a slash at the end of the string.
-     * 
+     *
      * @param stringToCheck
      *            the directoryName to check
      * @return boolean. Returns true if there is a slash at the end and false if not.
@@ -335,7 +335,7 @@ public class FileUtil {
     /**
      * get file name from a string which may include directory information. For example : "c:\\dir\\ndp\\pp.txt"; will
      * return pp.txt.? If file has no path infomation, then just return input fileName.
-     * 
+     *
      */
     public static String getFileName(String fileName) {
 	if (fileName == null) {
@@ -356,7 +356,7 @@ public class FileUtil {
 
     /**
      * Get file directory info.
-     * 
+     *
      * @param fileName
      *            with path info.
      * @return return only path info with the given fileName
@@ -381,7 +381,7 @@ public class FileUtil {
 
     /**
      * Merge two input parameter into full path and adjust File.separator to OS default separator as well.
-     * 
+     *
      * @param path
      * @param file
      *            could be file name,or sub directory path.
@@ -429,7 +429,7 @@ public class FileUtil {
     /**
      * Check whether file is executable according to its extenstion and executable extension name list from LAMS
      * configuaration.
-     * 
+     *
      * @param filename
      * @return
      */
@@ -457,7 +457,7 @@ public class FileUtil {
 
     /**
      * Verify if a file with such extension is allowed to be uploaded.
-     * 
+     *
      * @param fileType
      *            file type can be of the following values:File, Image, Flash, Media
      * @param fileName
@@ -499,9 +499,9 @@ public class FileUtil {
      * Clean up any old directories in the java tmp directory, where the directory name starts with lamszip_ or lamstmp_
      * and is <numdays> days old or older. This has the potential to be a heavy call - it has to do complete directory
      * listing and then recursively delete the files and directories as needed.
-     * 
+     *
      * Note: this method has not been tested as it is rather hard to write a junit test for!
-     * 
+     *
      * @param directories
      * @return number of directories deleted
      */
@@ -523,7 +523,7 @@ public class FileUtil {
 
     /**
      * List files in temp directory older than numDays.
-     * 
+     *
      * @param numDays
      *            Number of days old that the directory should be to be deleted. Must be greater than 0
      * @return array of files older than input date
@@ -550,7 +550,7 @@ public class FileUtil {
 
     /**
      * Recursively calculates size in bytes of given file or directory.
-     * 
+     *
      * @param file
      * @return Size in bytes.
      */
@@ -578,7 +578,7 @@ public class FileUtil {
 
     /**
      * Remove chars from a file name that may be invalid on a file system.
-     * 
+     *
      * @param name
      * @return a filename that can be saved to a file system.
      */
@@ -601,7 +601,7 @@ public class FileUtil {
     /**
      * Encode a filename in such a way that the UTF-8 characters won't be munged during the download by a browser. Need
      * the request to work out the user's browser type
-     * 
+     *
      * @return encoded filename
      * @throws UnsupportedEncodingException
      */
@@ -646,7 +646,7 @@ public class FileUtil {
     /**
      * Return content folder (unique to each learner and lesson) which is used for storing user generated content. It's
      * been used by CKEditor.
-     * 
+     *
      * @param toolSessionId
      * @param userId
      * @return
@@ -657,7 +657,7 @@ public class FileUtil {
 
     /**
      * Return lesson's content folder which is used for storing user generated content. It's been used by CKEditor.
-     * 
+     *
      * @param toolSessionId
      * @param userId
      * @return
@@ -671,20 +671,20 @@ public class FileUtil {
      * added fields, remove the field using the ToolContentVersionFilter functionality and try to reparse. We can't
      * nominate the problem fields in advance as we are making XML created by newer versions of LAMS compatible with an
      * older version.
-     * 
+     *
      * This logic depends on the exception message containing the text. When we upgrade xstream, we must check that this
      * message doesn't change.
-     * 
+     *
      * <pre>
      * 	com.thoughtworks.xstream.converters.ConversionException: unknownField : unknownField
      * 	---- Debugging information ----
-     * 	required-type       : org.lamsfoundation.lams.learningdesign.dto.LearningDesignDTO 
-     * 	cause-message       : unknownField : unknownField 
-     * 	class               : org.lamsfoundation.lams.learningdesign.dto.LearningDesignDTO 
-     * 	message             : unknownField : unknownField 
-     * 	line number         : 15 
-     * 	path                : /org.lamsfoundation.lams.learningdesign.dto.LearningDesignDTO/unknownField 
-     * 	cause-exception     : com.thoughtworks.xstream.alias.CannotResolveClassException 
+     * 	required-type       : org.lamsfoundation.lams.learningdesign.dto.LearningDesignDTO
+     * 	cause-message       : unknownField : unknownField
+     * 	class               : org.lamsfoundation.lams.learningdesign.dto.LearningDesignDTO
+     * 	message             : unknownField : unknownField
+     * 	line number         : 15
+     * 	path                : /org.lamsfoundation.lams.learningdesign.dto.LearningDesignDTO/unknownField
+     * 	cause-exception     : com.thoughtworks.xstream.alias.CannotResolveClassException
      * 	-------------------------------
      * </pre>
      */
@@ -791,7 +791,7 @@ public class FileUtil {
 
     /**
      * Gets the temp dir, creates if not exists, returns java system temp dir if inaccessible
-     * 
+     *
      * @return
      */
     public static String getTempDir() {

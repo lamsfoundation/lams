@@ -2,21 +2,21 @@
  * Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
  * =============================================================
  * License Information: http://lamsfoundation.org/licensing/lams/2.0/
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301
  * USA
- * 
+ *
  * http://www.gnu.org/licenses/gpl.txt
  * ****************************************************************
  */
@@ -29,13 +29,11 @@ import java.util.TreeSet;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
 
 import org.apache.log4j.Logger;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
-import org.lamsfoundation.lams.events.IEventNotificationService;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.notebook.service.CoreNotebookConstants;
 import org.lamsfoundation.lams.tool.wiki.dto.WikiDTO;
@@ -59,25 +57,25 @@ import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 
 /**
- * This action handles all the monitoring actions, which include opening 
+ * This action handles all the monitoring actions, which include opening
  * monitor, and all the wikipage actions
- * 
- * It inherits from the WikiPageAction which inherits from the 
+ *
+ * It inherits from the WikiPageAction which inherits from the
  * LamsDispatchAction so that common actions can be used in learner, monitor and
  * author
- * 
+ *
  * @author lfoxton
  * @version
- * 
- *
- *
- * 
  *
  *
  *
  *
  *
- * 
+ *
+ *
+ *
+ *
+ *
  */
 public class MonitoringAction extends WikiPageAction {
 
@@ -89,6 +87,7 @@ public class MonitoringAction extends WikiPageAction {
      * Sets up the main authoring page which lists the tool sessions and allows
      * you to view their respective WikiPages
      */
+    @Override
     public ActionForward unspecified(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) throws Exception {
 
@@ -105,7 +104,7 @@ public class MonitoringAction extends WikiPageAction {
 	    WikiSession session = wikiService.getSessionBySessionId(toolSessionID);
 	    wiki = session.getWiki();
 	    toolContentID = wiki.getToolContentId();
-	    
+
 	} else {
 	    wiki = wikiService.getWikiByContentId(toolContentID);
 	}
@@ -118,7 +117,7 @@ public class MonitoringAction extends WikiPageAction {
 
 	Long currentTab = WebUtil.readLongParam(request, AttributeNames.PARAM_CURRENT_TAB, true);
 	wikiDT0.setCurrentTab(currentTab);
-	
+
 	request.setAttribute(WikiConstants.ATTR_WIKI_DTO, wikiDT0);
 	request.setAttribute(WikiConstants.ATTR_CONTENT_FOLDER_ID, contentFolderID);
 	request.setAttribute(WikiConstants.ATTR_IS_GROUPED_ACTIVITY, wikiService.isGroupedActivity(toolContentID));
@@ -129,6 +128,7 @@ public class MonitoringAction extends WikiPageAction {
      * Wrapper method to make sure that the correct wiki is returned to from the
      * WikiPageAction class
      */
+    @Override
     protected ActionForward returnToWiki(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response, Long currentWikiPageId) throws Exception {
 	MonitoringForm monitoringForm = (MonitoringForm) form;
@@ -138,9 +138,10 @@ public class MonitoringAction extends WikiPageAction {
 
     /**
      * Gets the current user by toolSessionId
-     * 
+     *
      * @param toolSessionId
      */
+    @Override
     protected WikiUser getCurrentUser(Long toolSessionId) {
 	UserDTO user = (UserDTO) SessionManager.getSession().getAttribute(AttributeNames.USER);
 
@@ -158,6 +159,7 @@ public class MonitoringAction extends WikiPageAction {
 
     /**
      * Shows a specific wiki based on the session id
+     * 
      * @param mapping
      * @param form
      * @param request
@@ -201,7 +203,7 @@ public class MonitoringAction extends WikiPageAction {
 
 	    wikiPageDTOs.add(pageDTO);
 	}
-	
+
 	request.setAttribute(WikiConstants.ATTR_WIKI_PAGES, wikiPageDTOs);
 	request.setAttribute(WikiConstants.ATTR_MAIN_WIKI_PAGE, new WikiPageDTO(wikiSession.getMainPage()));
 
