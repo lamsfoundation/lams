@@ -2,21 +2,21 @@
  * Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
  * =============================================================
  * License Information: http://lamsfoundation.org/licensing/lams/2.0/
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301
  * USA
- * 
+ *
  * http://www.gnu.org/licenses/gpl.txt
  * ****************************************************************
  */
@@ -29,14 +29,12 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.struts.upload.FormFile;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.tool.chat.model.Chat;
 import org.lamsfoundation.lams.tool.chat.model.ChatCondition;
 import org.lamsfoundation.lams.tool.chat.model.ChatMessage;
 import org.lamsfoundation.lams.tool.chat.model.ChatSession;
 import org.lamsfoundation.lams.tool.chat.model.ChatUser;
-import org.lamsfoundation.lams.tool.chat.util.ChatException;
 import org.lamsfoundation.lams.tool.chat.util.ChatMessageFilter;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 
@@ -46,7 +44,7 @@ import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 public interface IChatService {
     /**
      * Makes a copy of the default content and assigns it a newContentID
-     * 
+     *
      * @params newContentID
      * @return
      */
@@ -54,7 +52,7 @@ public interface IChatService {
 
     /**
      * Returns an instance of the Chat tools default content.
-     * 
+     *
      * @return
      */
     public Chat getDefaultContent();
@@ -90,7 +88,7 @@ public interface IChatService {
     public List<ChatUser> getUsersActiveBySessionId(Long toolSessionId);
 
     /**
-     * 
+     *
      * @param userId
      * @param toolSessionId
      * @return
@@ -98,7 +96,7 @@ public interface IChatService {
     public ChatUser getUserByUserIdAndSessionId(Long userId, Long toolSessionId);
 
     /**
-     * 
+     *
      * @param loginName
      * @param sessionID
      * @return
@@ -106,14 +104,14 @@ public interface IChatService {
     public ChatUser getUserByLoginNameAndSessionId(String loginName, Long sessionId);
 
     /**
-     * 
+     *
      * @param uid
      * @return
      */
     public ChatUser getUserByUID(Long uid);
 
     /**
-     * 
+     *
      * @param nickname
      * @param sessionID
      * @return
@@ -123,26 +121,26 @@ public interface IChatService {
     public void updateUserPresence(Map<Long, Date> presence);
 
     /**
-     * 
+     *
      * @param chatUser
      */
     public void saveOrUpdateChatUser(ChatUser chatUser);
 
     /**
-     * 
+     *
      * @param chatUser
      * @return
      */
     public List<ChatMessage> getMessagesForUser(ChatUser chatUser);
 
     /**
-     * 
+     *
      * @param chatMessage
      */
     public void saveOrUpdateChatMessage(ChatMessage chatMessage);
 
     /**
-     * 
+     *
      * @param user
      * @param chatSession
      * @return
@@ -150,7 +148,7 @@ public interface IChatService {
     public ChatUser createChatUser(UserDTO user, ChatSession chatSession);
 
     /**
-     * 
+     *
      * @param toolContentID
      * @param pattern
      */
@@ -159,7 +157,7 @@ public interface IChatService {
     public String filterMessage(String message, Chat chat);
 
     /**
-     * 
+     *
      * @param messageUID
      * @return
      */
@@ -187,7 +185,7 @@ public interface IChatService {
 
     /**
      * Gets all messages sent by the given user.
-     * 
+     *
      * @param userUid
      *            UID of the user
      * @return list of his/hers messages

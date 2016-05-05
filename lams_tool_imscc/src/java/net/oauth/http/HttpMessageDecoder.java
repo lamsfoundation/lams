@@ -29,19 +29,18 @@ public class HttpMessageDecoder extends HttpResponseMessage {
 
     /**
      * Decode the given message if necessary and possible.
-     * 
+     *
      * @return a decorator that decodes the body of the given message; or the
      *         given message if this class can't decode it.
      */
-    public static HttpResponseMessage decode(HttpResponseMessage message)
-            throws IOException {
-        if (message != null) {
-            String encoding = getEncoding(message);
-            if (encoding != null) {
-                return new HttpMessageDecoder(message, encoding);
-            }
-        }
-        return message;
+    public static HttpResponseMessage decode(HttpResponseMessage message) throws IOException {
+	if (message != null) {
+	    String encoding = HttpMessageDecoder.getEncoding(message);
+	    if (encoding != null) {
+		return new HttpMessageDecoder(message, encoding);
+	    }
+	}
+	return message;
     }
 
     public static final String GZIP = "gzip";
@@ -49,48 +48,46 @@ public class HttpMessageDecoder extends HttpResponseMessage {
     public static final String ACCEPTED = GZIP + "," + DEFLATE;
 
     private static String getEncoding(HttpMessage message) {
-        String encoding = message.getHeader(CONTENT_ENCODING);
-        if (encoding == null) {
-            // That's easy.
-        } else if (GZIP.equalsIgnoreCase(encoding)
-                || ("x-" + GZIP).equalsIgnoreCase(encoding)) {
-            return GZIP;
-        } else if (DEFLATE.equalsIgnoreCase(encoding)) {
-            return DEFLATE;
-        }
-        return null;
+	String encoding = message.getHeader(CONTENT_ENCODING);
+	if (encoding == null) {
+	    // That's easy.
+	} else if (GZIP.equalsIgnoreCase(encoding) || ("x-" + GZIP).equalsIgnoreCase(encoding)) {
+	    return GZIP;
+	} else if (DEFLATE.equalsIgnoreCase(encoding)) {
+	    return DEFLATE;
+	}
+	return null;
     }
 
-    private HttpMessageDecoder(HttpResponseMessage in, String encoding)
-            throws IOException {
-        super(in.method, in.url);
-        this.headers.addAll(in.headers);
-        removeHeaders(CONTENT_ENCODING); // handled here
-        removeHeaders(CONTENT_LENGTH); // unpredictable
-        InputStream body = in.getBody();
-        if (body != null) {
-            if (encoding == GZIP) {
-                body = new GZIPInputStream(body);
-            } else if (encoding == DEFLATE) {
-                body = new InflaterInputStream(body);
-            } else {
-                assert false;
-            }
-        }
-        this.body = body;
-        this.in = in;
+    private HttpMessageDecoder(HttpResponseMessage in, String encoding) throws IOException {
+	super(in.method, in.url);
+	this.headers.addAll(in.headers);
+	removeHeaders(CONTENT_ENCODING); // handled here
+	removeHeaders(CONTENT_LENGTH); // unpredictable
+	InputStream body = in.getBody();
+	if (body != null) {
+	    if (encoding == GZIP) {
+		body = new GZIPInputStream(body);
+	    } else if (encoding == DEFLATE) {
+		body = new InflaterInputStream(body);
+	    } else {
+		assert false;
+	    }
+	}
+	this.body = body;
+	this.in = in;
     }
 
     private final HttpResponseMessage in;
 
     @Override
     public void dump(Map<String, Object> into) throws IOException {
-        in.dump(into);
+	in.dump(into);
     }
 
     @Override
     public int getStatusCode() throws IOException {
-        return in.getStatusCode();
+	return in.getStatusCode();
     }
 
 }

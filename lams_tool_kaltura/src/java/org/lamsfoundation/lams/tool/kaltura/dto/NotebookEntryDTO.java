@@ -13,7 +13,7 @@ public class NotebookEntryDTO {
     private Date createDate;
 
     private Date lastModified;
-    
+
     private String fullName;
 
     public NotebookEntryDTO(NotebookEntry entry) {
@@ -54,7 +54,7 @@ public class NotebookEntryDTO {
     public void setUid(Long uid) {
 	this.uid = uid;
     }
-    
+
     public String getFullName() {
 	return fullName;
     }

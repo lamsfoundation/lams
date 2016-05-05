@@ -45,8 +45,8 @@ import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.lamsfoundation.lams.web.util.SessionMap;
 
 /**
- * 
- * 
+ *
+ *
  * @author mseaton
  */
 @SuppressWarnings("serial")
@@ -64,8 +64,8 @@ public class CompleteItemServlet extends HttpServlet {
 
     /**
      * The doGet method of the servlet. <br>
-     * 
-     * 
+     *
+     *
      * @param request
      *            the request send by the client to the server
      * @param response
@@ -75,6 +75,7 @@ public class CompleteItemServlet extends HttpServlet {
      * @throws IOException
      *             if an error occurred
      */
+    @Override
     public void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 	String sessionMapID = request.getParameter(CommonCartridgeConstants.ATTR_SESSION_MAP_ID);
 	SessionMap sessionMap = (SessionMap) request.getSession().getAttribute(sessionMapID);
@@ -120,7 +121,7 @@ public class CompleteItemServlet extends HttpServlet {
 
     /**
      * List save current commonCartridge items.
-     * 
+     *
      * @param request
      * @return
      */

@@ -2,6 +2,7 @@ package org.lamsfoundation.lams.integration;
 
 import java.io.Serializable;
 import java.util.Set;
+
 import org.apache.commons.lang.builder.ToStringBuilder;
 import org.lamsfoundation.lams.usermanagement.Organisation;
 
@@ -29,23 +30,23 @@ public class ExtServerOrgMap implements Serializable, Comparable {
 
     /** persistent field */
     private String userinfoUrl;
-    
+
     /** persistent field */
     private String serverUrl;
 
     /** persistent field */
     private String timeoutUrl;
-    
+
     /** persistent field */
     private String lessonFinishUrl;
-    
+
     private String extGroupsUrl;
 
     /** persistent field */
     private Boolean disabled;
-    
+
     private Boolean timeToLiveLoginRequestEnabled;
-    
+
     /** persistent field */
     private int timeToLiveLoginRequest;
 
@@ -114,7 +115,7 @@ public class ExtServerOrgMap implements Serializable, Comparable {
     public String getUserinfoUrl() {
 	return this.userinfoUrl;
     }
-    
+
     public void setUserinfoUrl(String userinfoUrl) {
 	this.userinfoUrl = userinfoUrl;
     }
@@ -124,7 +125,7 @@ public class ExtServerOrgMap implements Serializable, Comparable {
     }
 
     public void setServerUrl(String serverUrl) {
-        this.serverUrl = serverUrl;
+	this.serverUrl = serverUrl;
     }
 
     public String getTimeoutUrl() {
@@ -142,7 +143,7 @@ public class ExtServerOrgMap implements Serializable, Comparable {
     public void setLessonFinishUrl(String lessonFinishUrl) {
 	this.lessonFinishUrl = lessonFinishUrl;
     }
-    
+
     public String getExtGroupsUrl() {
 	return this.extGroupsUrl;
     }
@@ -158,7 +159,7 @@ public class ExtServerOrgMap implements Serializable, Comparable {
     public void setDisabled(Boolean disabled) {
 	this.disabled = disabled;
     }
-    
+
     public Boolean getTimeToLiveLoginRequestEnabled() {
 	return this.timeToLiveLoginRequestEnabled;
     }
@@ -166,10 +167,10 @@ public class ExtServerOrgMap implements Serializable, Comparable {
     public void setTimeToLiveLoginRequestEnabled(Boolean timeToLiveLoginRequestEnabled) {
 	this.timeToLiveLoginRequestEnabled = timeToLiveLoginRequestEnabled;
     }
-    
+
     /**
      * Measured in minutes.
-     * 
+     *
      * @return
      */
     public int getTimeToLiveLoginRequest() {
@@ -204,11 +205,13 @@ public class ExtServerOrgMap implements Serializable, Comparable {
 	this.extUserUseridMaps = extUserUseridMaps;
     }
 
+    @Override
     public String toString() {
-	return new ToStringBuilder(this).append("sid", getSid()).append("serverid", getServerid()).append("serverkey",
-		getServerkey()).append("servername", getServername()).toString();
+	return new ToStringBuilder(this).append("sid", getSid()).append("serverid", getServerid())
+		.append("serverkey", getServerkey()).append("servername", getServername()).toString();
     }
 
+    @Override
     public int compareTo(Object o) {
 	return serverid.compareToIgnoreCase(((ExtServerOrgMap) o).getServerid());
     }

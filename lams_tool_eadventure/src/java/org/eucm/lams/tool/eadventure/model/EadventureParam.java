@@ -18,22 +18,22 @@
  *
  * http://www.gnu.org/licenses/gpl.txt
  * ****************************************************************
- */ 
- 
-/* $Id$ */ 
-package org.eucm.lams.tool.eadventure.model; 
+ */
+
+/* $Id$ */
+package org.eucm.lams.tool.eadventure.model;
 
 import org.apache.log4j.Logger;
- 
 
 /**
  * Eadventure
+ * 
  * @author Angel del Blanco
  *
- * @hibernate.class  table="tl_eueadv10_param"
+ * @hibernate.class table="tl_eueadv10_param"
  *
  */
-public class EadventureParam implements Cloneable{
+public class EadventureParam implements Cloneable {
     private static final Logger log = Logger.getLogger(EadventureParam.class);
 
     private Long uid;
@@ -42,92 +42,93 @@ public class EadventureParam implements Cloneable{
     private boolean input;
     private Long eadventure_uid;
 
-    
-    public EadventureParam(){
-	
+    public EadventureParam() {
+
     }
-    public EadventureParam(String name, String type, boolean input ){
+
+    public EadventureParam(String name, String type, boolean input) {
 	this.name = name;
 	this.type = type;
 	this.input = input;
     }
-    
-    public Object clone(){
+
+    @Override
+    public Object clone() {
 	Object obj = null;
 	try {
-		obj = super.clone();
-		((EadventureParam)obj).setUid(null);
-		/*if (eadventure != null) {
-		    ((EadventureParam)obj).setEadventure((Eadventure)eadventure.clone());
-		    
-		}*/
+	    obj = super.clone();
+	    ((EadventureParam) obj).setUid(null);
+	    /*
+	     * if (eadventure != null) {
+	     * ((EadventureParam)obj).setEadventure((Eadventure)eadventure.clone());
+	     * 
+	     * }
+	     */
 	} catch (CloneNotSupportedException e) {
-		log.error("When clone " + EadventureParam.class + " failed");
+	    log.error("When clone " + EadventureParam.class + " failed");
 	}
-	
-	return obj;
-}
-    
-    /**
-	 * @hibernate.id generator-class="native" type="java.lang.Long" column="uid"
-	 * @return Returns the log Uid.
-	 */
-    public Long getUid() {
-        return uid;
-    }
-    public void setUid(Long uid) {
-        this.uid = uid;
-    }
-    /**
-	 * @hibernate.property  column="name"
-	 * @return
-	 */
-    public String getName() {
-        return name;
-    }
-    public void setName(String name) {
-        this.name = name;
-    }
-    
-    /**
-	 * @hibernate.property  column="type"
-	 * @return
-	 */
-    public String getType() {
-        return type;
-    }
-    public void setType(String type) {
-        this.type = type;
-    }
-    
-    /**
-	 * @hibernate.property column="input"
-	 * @return
-	 */
-    public boolean isInput() {
-        return input;
-    }
-    public void setInput(boolean input) {
-        this.input = input;
-    }
-    
-    
-    /**
-	 * @hibernate.property column="eadventure_uid"
-	 * @return
-	 */
-    public Long getEadventure_uid() {
-        return eadventure_uid;
-    }
-    public void setEadventure_uid(Long eadventure_uid) {
-        this.eadventure_uid = eadventure_uid;
-    }
-   
-    
-  
-    
 
-    
-    
+	return obj;
+    }
+
+    /**
+     * @hibernate.id generator-class="native" type="java.lang.Long" column="uid"
+     * @return Returns the log Uid.
+     */
+    public Long getUid() {
+	return uid;
+    }
+
+    public void setUid(Long uid) {
+	this.uid = uid;
+    }
+
+    /**
+     * @hibernate.property column="name"
+     * @return
+     */
+    public String getName() {
+	return name;
+    }
+
+    public void setName(String name) {
+	this.name = name;
+    }
+
+    /**
+     * @hibernate.property column="type"
+     * @return
+     */
+    public String getType() {
+	return type;
+    }
+
+    public void setType(String type) {
+	this.type = type;
+    }
+
+    /**
+     * @hibernate.property column="input"
+     * @return
+     */
+    public boolean isInput() {
+	return input;
+    }
+
+    public void setInput(boolean input) {
+	this.input = input;
+    }
+
+    /**
+     * @hibernate.property column="eadventure_uid"
+     * @return
+     */
+    public Long getEadventure_uid() {
+	return eadventure_uid;
+    }
+
+    public void setEadventure_uid(Long eadventure_uid) {
+	this.eadventure_uid = eadventure_uid;
+    }
+
 }
- 

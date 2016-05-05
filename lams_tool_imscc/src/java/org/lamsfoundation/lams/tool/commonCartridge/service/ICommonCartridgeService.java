@@ -2,21 +2,21 @@
  * Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
  * =============================================================
  * License Information: http://lamsfoundation.org/licensing/lams/2.0/
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301
  * USA
- * 
+ *
  * http://www.gnu.org/licenses/gpl.txt
  * ****************************************************************
  */
@@ -43,14 +43,14 @@ import org.lamsfoundation.lams.usermanagement.User;
 
 /**
  * @author Andrey Balan
- * 
- * Interface that defines the contract that all ShareCommonCartridge service provider must follow.
+ *
+ *         Interface that defines the contract that all ShareCommonCartridge service provider must follow.
  */
 public interface ICommonCartridgeService {
 
     /**
      * Get file <code>IVersiondNode</code> by given package id and path.
-     * 
+     *
      * @param packageId
      * @param relPathString
      * @return
@@ -60,16 +60,17 @@ public interface ICommonCartridgeService {
 
     /**
      * Get <code>CommonCartridge</code> by toolContentID.
-     * 
+     *
      * @param contentId
      * @return
      */
     CommonCartridge getCommonCartridgeByContentId(Long contentId);
 
     /**
-     * Get a cloned copy of tool default tool content (CommonCartridge) and assign the toolContentId of that copy as the given
+     * Get a cloned copy of tool default tool content (CommonCartridge) and assign the toolContentId of that copy as the
+     * given
      * <code>contentId</code>
-     * 
+     *
      * @param contentId
      * @return
      * @throws CommonCartridgeApplicationException
@@ -77,8 +78,9 @@ public interface ICommonCartridgeService {
     CommonCartridge getDefaultContent(Long contentId) throws CommonCartridgeApplicationException;
 
     /**
-     * Get list of commonCartridge items by given commonCartridgeUid. These commonCartridge items must be created by author.
-     * 
+     * Get list of commonCartridge items by given commonCartridgeUid. These commonCartridge items must be created by
+     * author.
+     *
      * @param commonCartridgeUid
      * @return
      */
@@ -86,13 +88,14 @@ public interface ICommonCartridgeService {
 
     /**
      * Upload commonCartridge item file to repository. i.e., single file, websize zip file, or learning object zip file.
-     * 
+     *
      * @param item
      * @param file
-     * @return 
+     * @return
      * @throws UploadCommonCartridgeFileException
      */
-    List<CommonCartridgeItem> uploadCommonCartridgeFile(CommonCartridgeItem item, FormFile file) throws UploadCommonCartridgeFileException;
+    List<CommonCartridgeItem> uploadCommonCartridgeFile(CommonCartridgeItem item, FormFile file)
+	    throws UploadCommonCartridgeFileException;
 
     // ********** for user methods *************
     /**
@@ -102,7 +105,7 @@ public interface ICommonCartridgeService {
 
     /**
      * Get user by given userID and toolContentID.
-     * 
+     *
      * @param long1
      * @return
      */
@@ -110,7 +113,7 @@ public interface ICommonCartridgeService {
 
     /**
      * Get user by sessionID and UserID
-     * 
+     *
      * @param long1
      * @param sessionId
      * @return
@@ -125,21 +128,21 @@ public interface ICommonCartridgeService {
 
     /**
      * Save or update commonCartridge into database.
-     * 
+     *
      * @param CommonCartridge
      */
     void saveOrUpdateCommonCartridge(CommonCartridge CommonCartridge);
 
     /**
      * Delete resoruce item from database.
-     * 
+     *
      * @param uid
      */
     void deleteCommonCartridgeItem(Long uid);
 
     /**
      * Return all reource items within the given toolSessionID.
-     * 
+     *
      * @param sessionId
      * @return
      */
@@ -147,7 +150,7 @@ public interface ICommonCartridgeService {
 
     /**
      * Get commonCartridge which is relative with the special toolSession.
-     * 
+     *
      * @param sessionId
      * @return
      */
@@ -155,7 +158,7 @@ public interface ICommonCartridgeService {
 
     /**
      * Get commonCartridge toolSession by toolSessionId
-     * 
+     *
      * @param sessionId
      * @return
      */
@@ -163,7 +166,7 @@ public interface ICommonCartridgeService {
 
     /**
      * Save or update commonCartridge session.
-     * 
+     *
      * @param resSession
      */
     void saveOrUpdateCommonCartridgeSession(CommonCartridgeSession resSession);
@@ -176,7 +179,7 @@ public interface ICommonCartridgeService {
 
     /**
      * the reqired number minus the count of view of the given user.
-     * 
+     *
      * @param userUid
      * @return
      */
@@ -184,7 +187,7 @@ public interface ICommonCartridgeService {
 
     /**
      * If success return next activity's url, otherwise return null.
-     * 
+     *
      * @param toolSessionId
      * @param userId
      * @return
@@ -195,7 +198,7 @@ public interface ICommonCartridgeService {
 
     /**
      * Return monitoring summary list. The return value is list of commonCartridge summaries for each groups.
-     * 
+     *
      * @param contentId
      * @return
      */
@@ -205,20 +208,20 @@ public interface ICommonCartridgeService {
 
     /**
      * Set a commonCartridge item visible or not.
-     * 
+     *
      * @param itemUid
      * @param visible
-     *                true, item is visible. False, item is invisible.
+     *            true, item is visible. False, item is invisible.
      */
     void setItemVisible(Long itemUid, boolean visible);
 
     /**
      * Get commonCartridge item <code>Summary</code> list according to sessionId and skipHide flag.
-     * 
+     *
      * @param sessionId
      * @param skipHide
-     *                true, don't get commonCartridge item if its <code>isHide</code> flag is true. Otherwise, get all
-     *                commonCartridge item
+     *            true, don't get commonCartridge item if its <code>isHide</code> flag is true. Otherwise, get all
+     *            commonCartridge item
      * @return
      */
     public List<Summary> exportBySessionId(Long sessionId, boolean skipHide);
@@ -227,7 +230,7 @@ public interface ICommonCartridgeService {
 
     /**
      * Create refection entry into notebook tool.
-     * 
+     *
      * @param sessionId
      * @param notebook_tool
      * @param tool_signature
@@ -239,7 +242,7 @@ public interface ICommonCartridgeService {
 
     /**
      * Get reflection entry from notebook tool.
-     * 
+     *
      * @param sessionId
      * @param idType
      * @param signature
@@ -255,7 +258,7 @@ public interface ICommonCartridgeService {
 
     /**
      * Get Reflect DTO list grouped by sessionID.
-     * 
+     *
      * @param contentId
      * @return
      */
@@ -263,17 +266,17 @@ public interface ICommonCartridgeService {
 
     /**
      * Get user by UID
-     * 
+     *
      * @param uid
      * @return
      */
     CommonCartridgeUser getUser(Long uid);
 
     public IEventNotificationService getEventNotificationService();
-    
+
     /**
      * Get the CommonCartridge config item by key
-     * 
+     *
      * @param key
      * @return
      */
@@ -281,27 +284,27 @@ public interface ICommonCartridgeService {
 
     /**
      * Save a CommonCartridge configItem
-     * 
+     *
      * @param item
      */
-    public void saveOrUpdateConfigItem(CommonCartridgeConfigItem item); 
+    public void saveOrUpdateConfigItem(CommonCartridgeConfigItem item);
 
     /**
      * Gets a message from commonCartridge bundle. Same as <code><fmt:message></code> in JSP pages.
-     * 
+     *
      * @param key
-     *                key of the message
+     *            key of the message
      * @param args
-     *                arguments for the message
+     *            arguments for the message
      * @return message content
      */
     String getLocalisedMessage(String key, Object[] args);
 
     /**
      * Finds out which lesson the given tool content belongs to and returns its monitoring users.
-     * 
+     *
      * @param sessionId
-     *                tool session ID
+     *            tool session ID
      * @return list of teachers that monitor the lesson which contains the tool with given session ID
      */
     public List<User> getMonitorsByToolSessionId(Long sessionId);

@@ -2,27 +2,27 @@
  * Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
  * =============================================================
  * License Information: http://lamsfoundation.org/licensing/lams/2.0/
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License version 2.0 
+ * it under the terms of the GNU General Public License version 2.0
  * as published by the Free Software Foundation.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301
  * USA
- * 
+ *
  * http://www.gnu.org/licenses/gpl.txt
  * ****************************************************************
  */
 
 /* $Id$ */
- 
+
 package org.lamsfoundation.lams.tool.videoRecorder.web.forms;
 
 import javax.servlet.http.HttpServletRequest;
@@ -40,205 +40,205 @@ import org.lamsfoundation.lams.web.util.SessionMap;
  */
 public class AuthoringForm extends ActionForm {
 
-	private static final long serialVersionUID = 3950453134542135495L;
+    private static final long serialVersionUID = 3950453134542135495L;
 
-	// Properties
+    // Properties
 
-	String title;
+    String title;
 
-	String instructions;
+    String instructions;
 
-	String offlineInstruction;
+    String offlineInstruction;
 
-	String onlineInstruction;
+    String onlineInstruction;
 
-	boolean lockOnFinished;
-	
-	boolean allowUseVoice;
-	
-	boolean allowUseCamera;
-		
-	boolean allowLearnerVideoVisibility;
-	
-	boolean allowComments;
-	
-	boolean allowRatings;
-	
-	boolean exportAll;
-	
-	boolean exportOffline;
-	
-	FormFile onlineFile; 
+    boolean lockOnFinished;
 
-	FormFile offlineFile;
+    boolean allowUseVoice;
 
-	String currentTab;
+    boolean allowUseCamera;
 
-	String dispatch;
-	
-	String sessionMapID;
-	
-	Long deleteFileUuid;
+    boolean allowLearnerVideoVisibility;
 
-	SessionMap sessionMap;
+    boolean allowComments;
 
-	@Override
-	public ActionErrors validate(ActionMapping arg0, HttpServletRequest arg1) {
-		ActionErrors ac = new ActionErrors();
-		ac.add(ActionMessages.GLOBAL_MESSAGE, new ActionMessage("this is an error"));
-		
-		return ac;
-	}
-	
-	public String getSessionMapID() {
-		return sessionMapID;
-	}
+    boolean allowRatings;
 
-	public void setSessionMapID(String sessionMapID) {
-		this.sessionMapID = sessionMapID;
-	}
+    boolean exportAll;
 
-	public String getCurrentTab() {
-		return currentTab;
-	}
+    boolean exportOffline;
 
-	public void setCurrentTab(String currentTab) {
-		this.currentTab = currentTab;
-	}
+    FormFile onlineFile;
 
-	public String getDispatch() {
-		return dispatch;
-	}
+    FormFile offlineFile;
 
-	public void setDispatch(String dispatch) {
-		this.dispatch = dispatch;
-	}
+    String currentTab;
 
-	public String getInstructions() {
-		return instructions;
-	}
+    String dispatch;
 
-	public void setInstructions(String instructions) {
-		this.instructions = instructions;
-	}
+    String sessionMapID;
 
-	public boolean isLockOnFinished() {
-		return lockOnFinished;
-	}
+    Long deleteFileUuid;
 
-	public void setLockOnFinished(boolean lockOnFinished) {
-		this.lockOnFinished = lockOnFinished;
-	}
+    SessionMap sessionMap;
 
-	public FormFile getOfflineFile() {
-		return offlineFile;
-	}
+    @Override
+    public ActionErrors validate(ActionMapping arg0, HttpServletRequest arg1) {
+	ActionErrors ac = new ActionErrors();
+	ac.add(ActionMessages.GLOBAL_MESSAGE, new ActionMessage("this is an error"));
 
-	public void setOfflineFile(FormFile offlineFile) {
-		this.offlineFile = offlineFile;
-	}
+	return ac;
+    }
 
-	public String getOfflineInstruction() {
-		return offlineInstruction;
-	}
+    public String getSessionMapID() {
+	return sessionMapID;
+    }
 
-	public void setOfflineInstruction(String offlineInstruction) {
-		this.offlineInstruction = offlineInstruction;
-	}
+    public void setSessionMapID(String sessionMapID) {
+	this.sessionMapID = sessionMapID;
+    }
 
-	public FormFile getOnlineFile() {
-		return onlineFile;
-	}
+    public String getCurrentTab() {
+	return currentTab;
+    }
 
-	public void setOnlineFile(FormFile onlineFile) {
-		this.onlineFile = onlineFile;
-	}
-	
-	public String getOnlineInstruction() {
-		return onlineInstruction;
-	}
+    public void setCurrentTab(String currentTab) {
+	this.currentTab = currentTab;
+    }
 
-	public void setOnlineInstruction(String onlineInstruction) {
-		this.onlineInstruction = onlineInstruction;
-	}
-	
-	public String getTitle() {
-		return title;
-	}
+    public String getDispatch() {
+	return dispatch;
+    }
 
-	public void setTitle(String title) {
-		this.title = title;
-	}
+    public void setDispatch(String dispatch) {
+	this.dispatch = dispatch;
+    }
 
-	public void setSessionMap(SessionMap sessionMap) {
-		this.sessionMap = sessionMap;
-	}
+    public String getInstructions() {
+	return instructions;
+    }
 
-	public SessionMap getSessionMap() {
-		return sessionMap;
-	}
+    public void setInstructions(String instructions) {
+	this.instructions = instructions;
+    }
 
-	public Long getDeleteFileUuid() {
-		return deleteFileUuid;
-	}
+    public boolean isLockOnFinished() {
+	return lockOnFinished;
+    }
 
-	public void setDeleteFileUuid(Long deleteFile) {
-		this.deleteFileUuid = deleteFile;
-	}
+    public void setLockOnFinished(boolean lockOnFinished) {
+	this.lockOnFinished = lockOnFinished;
+    }
 
-	public boolean isAllowUseVoice() {
-		return allowUseVoice;
-	}
+    public FormFile getOfflineFile() {
+	return offlineFile;
+    }
 
-	public void setAllowUseVoice(boolean allowUseVoice) {
-		this.allowUseVoice = allowUseVoice;
-	}
-	
-	public boolean isAllowUseCamera() {
-		return allowUseCamera;
-	}
+    public void setOfflineFile(FormFile offlineFile) {
+	this.offlineFile = offlineFile;
+    }
 
-	public void setAllowUseCamera(boolean allowUseCamera) {
-		this.allowUseCamera = allowUseCamera;
-	}
-	
-	public boolean isAllowLearnerVideoVisibility() {
-		return allowLearnerVideoVisibility;
-	}
+    public String getOfflineInstruction() {
+	return offlineInstruction;
+    }
 
-	public void setAllowLearnerVideoVisibility(boolean allowLearnerVideoVisibility) {
-		this.allowLearnerVideoVisibility = allowLearnerVideoVisibility;
-	}
-		
-	public boolean isAllowComments() {
-		return allowComments;
-	}
+    public void setOfflineInstruction(String offlineInstruction) {
+	this.offlineInstruction = offlineInstruction;
+    }
 
-	public void setAllowComments(boolean allowComments) {
-		this.allowComments = allowComments;
-	}
-	
-	public boolean isAllowRatings() {
-		return allowRatings;
-	}
+    public FormFile getOnlineFile() {
+	return onlineFile;
+    }
 
-	public void setAllowRatings(boolean allowRatings) {
-		this.allowRatings = allowRatings;
-	}
+    public void setOnlineFile(FormFile onlineFile) {
+	this.onlineFile = onlineFile;
+    }
 
-	public boolean isExportAll() {
-		return exportAll;
-	}
+    public String getOnlineInstruction() {
+	return onlineInstruction;
+    }
 
-	public void setExportAll(boolean exportAll) {
-		this.exportAll = exportAll;
-	}
-	
-	public boolean isExportOffline() {
-		return exportOffline;
-	}
+    public void setOnlineInstruction(String onlineInstruction) {
+	this.onlineInstruction = onlineInstruction;
+    }
 
-	public void setExportOffline(boolean exportOffline) {
-		this.exportOffline = exportOffline;
-	}
+    public String getTitle() {
+	return title;
+    }
+
+    public void setTitle(String title) {
+	this.title = title;
+    }
+
+    public void setSessionMap(SessionMap sessionMap) {
+	this.sessionMap = sessionMap;
+    }
+
+    public SessionMap getSessionMap() {
+	return sessionMap;
+    }
+
+    public Long getDeleteFileUuid() {
+	return deleteFileUuid;
+    }
+
+    public void setDeleteFileUuid(Long deleteFile) {
+	this.deleteFileUuid = deleteFile;
+    }
+
+    public boolean isAllowUseVoice() {
+	return allowUseVoice;
+    }
+
+    public void setAllowUseVoice(boolean allowUseVoice) {
+	this.allowUseVoice = allowUseVoice;
+    }
+
+    public boolean isAllowUseCamera() {
+	return allowUseCamera;
+    }
+
+    public void setAllowUseCamera(boolean allowUseCamera) {
+	this.allowUseCamera = allowUseCamera;
+    }
+
+    public boolean isAllowLearnerVideoVisibility() {
+	return allowLearnerVideoVisibility;
+    }
+
+    public void setAllowLearnerVideoVisibility(boolean allowLearnerVideoVisibility) {
+	this.allowLearnerVideoVisibility = allowLearnerVideoVisibility;
+    }
+
+    public boolean isAllowComments() {
+	return allowComments;
+    }
+
+    public void setAllowComments(boolean allowComments) {
+	this.allowComments = allowComments;
+    }
+
+    public boolean isAllowRatings() {
+	return allowRatings;
+    }
+
+    public void setAllowRatings(boolean allowRatings) {
+	this.allowRatings = allowRatings;
+    }
+
+    public boolean isExportAll() {
+	return exportAll;
+    }
+
+    public void setExportAll(boolean exportAll) {
+	this.exportAll = exportAll;
+    }
+
+    public boolean isExportOffline() {
+	return exportOffline;
+    }
+
+    public void setExportOffline(boolean exportOffline) {
+	this.exportOffline = exportOffline;
+    }
 }

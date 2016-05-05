@@ -2,21 +2,21 @@
  * Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
  * =============================================================
  * License Information: http://lamsfoundation.org/licensing/lams/2.0/
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301
  * USA
- * 
+ *
  * http://www.gnu.org/licenses/gpl.txt
  * ****************************************************************
  */
@@ -57,12 +57,13 @@ import org.lamsfoundation.lams.web.util.SessionMap;
 
 /**
  * A Map data structure is used to present the UI.
- * 
+ *
  * @author Ozgur Demirtas
  */
 public class McStarterAction extends Action implements McAppConstants {
     private static Logger logger = Logger.getLogger(McStarterAction.class.getName());
 
+    @Override
     public ActionForward execute(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) throws IOException, ServletException, McApplicationException {
 
@@ -86,7 +87,8 @@ public class McStarterAction extends Action implements McAppConstants {
 
 	mcGeneralAuthoringDTO.setCurrentTab("1");
 
-	boolean validateSignature = validateDefaultContent(request, mapping, mcService, mcGeneralAuthoringDTO, mcAuthoringForm);
+	boolean validateSignature = validateDefaultContent(request, mapping, mcService, mcGeneralAuthoringDTO,
+		mcAuthoringForm);
 	if (validateSignature == false) {
 	    logger.debug("error during validation");
 	}
@@ -115,24 +117,24 @@ public class McStarterAction extends Action implements McAppConstants {
 	}
 
 	mcAuthoringForm.setToolContentID(strToolContentID);
-	
+
 	McContent mcContent = mcService.getMcContent(new Long(strToolContentID));
-	
+
 	// if mcContent does not exist, try to use default content instead.
 	if (mcContent == null) {
 	    long defaultContentID = mcService.getToolDefaultContentIdBySignature(MY_SIGNATURE);
 	    mcContent = mcService.getMcContent(new Long(defaultContentID));
 	    mcContent = McContent.newInstance(mcContent, new Long(strToolContentID));
 	}
-	
-	prepareDTOandForm(request, mapping, mcAuthoringForm, new Long(strToolContentID).longValue(),
-		mcContent, mcGeneralAuthoringDTO, sessionMap);
+
+	prepareDTOandForm(request, mapping, mcAuthoringForm, new Long(strToolContentID).longValue(), mcContent,
+		mcGeneralAuthoringDTO, sessionMap);
 
 	List<McQuestionDTO> questionDtos = AuthoringUtil.buildDefaultQuestions(mcContent);
 	request.setAttribute(TOTAL_QUESTION_COUNT, new Integer(questionDtos.size()));
 	request.setAttribute(LIST_QUESTION_DTOS, questionDtos);
 	sessionMap.put(LIST_QUESTION_DTOS, questionDtos);
-	
+
 	List<McQuestionDTO> listDeletedQuestionDTOs = new ArrayList<McQuestionDTO>();
 	sessionMap.put(LIST_DELETED_QUESTION_DTOS, listDeletedQuestionDTOs);
 
@@ -149,8 +151,9 @@ public class McStarterAction extends Action implements McAppConstants {
 
 	String passMark = " ";
 
-	if ((mcContent.getPassMark() != null) && (mcContent.getPassMark().intValue() != 0))
+	if ((mcContent.getPassMark() != null) && (mcContent.getPassMark().intValue() != 0)) {
 	    passMark = mcContent.getPassMark().toString();
+	}
 
 	mcGeneralAuthoringDTO.setPassMarkValue(passMark);
 
@@ -164,7 +167,7 @@ public class McStarterAction extends Action implements McAppConstants {
 
     /**
      * prepares the data for presentation purposes.
-     * 
+     *
      * @param request
      * @param mapping
      * @param mcAuthoringForm
@@ -216,7 +219,7 @@ public class McStarterAction extends Action implements McAppConstants {
      * each tool has a signature. MC tool's signature is stored in MY_SIGNATURE. The default tool content id and other
      * depending content ids are obtained in this method. if all the default content has been setup properly the method
      * persists DEFAULT_CONTENT_ID in the session.
-     * 
+     *
      * @param request
      * @param mapping
      * @return ActionForward
@@ -257,7 +260,7 @@ public class McStarterAction extends Action implements McAppConstants {
 
     /**
      * persists error messages to request scope
-     * 
+     *
      * @param request
      * @param message
      */
@@ -266,10 +269,10 @@ public class McStarterAction extends Action implements McAppConstants {
 	errors.add(Globals.ERROR_KEY, new ActionMessage(message));
 	saveErrors(request, errors);
     }
-    
+
     /**
      * Get ToolAccessMode from HttpRequest parameters. Default value is AUTHOR mode.
-     * 
+     *
      * @param request
      * @return
      */

@@ -44,8 +44,8 @@ public class DacoOutputFactory extends OutputFactory {
      * @see org.lamsfoundation.lams.tool.OutputDefinitionFactory#getToolOutputDefinitions(java.lang.Object)
      */
     @Override
-    public SortedMap<String, ToolOutputDefinition> getToolOutputDefinitions(Object toolContentObject, int definitionType)
-	    throws ToolException {
+    public SortedMap<String, ToolOutputDefinition> getToolOutputDefinitions(Object toolContentObject,
+	    int definitionType) throws ToolException {
 
 	SortedMap<String, ToolOutputDefinition> definitionMap = new TreeMap<String, ToolOutputDefinition>();
 
@@ -56,13 +56,12 @@ public class DacoOutputFactory extends OutputFactory {
 	return definitionMap;
     }
 
-    public SortedMap<String, ToolOutput> getToolOutput(List<String> names, IDacoService dacoService,
-	    Long toolSessionId, Long learnerId) {
+    public SortedMap<String, ToolOutput> getToolOutput(List<String> names, IDacoService dacoService, Long toolSessionId,
+	    Long learnerId) {
 	TreeMap<String, ToolOutput> map = new TreeMap<String, ToolOutput>();
 	if (names == null || names.contains(DacoConstants.LEARNER_NUM_POSTS_DEFINITION_NAME)) {
-	    map
-		    .put(DacoConstants.LEARNER_NUM_POSTS_DEFINITION_NAME, getNumRecords(dacoService, learnerId,
-			    toolSessionId));
+	    map.put(DacoConstants.LEARNER_NUM_POSTS_DEFINITION_NAME,
+		    getNumRecords(dacoService, learnerId, toolSessionId));
 	}
 	return map;
 
@@ -79,7 +78,7 @@ public class DacoOutputFactory extends OutputFactory {
 
     private ToolOutput getNumRecords(IDacoService dacoService, Long learnerId, Long toolSessionId) {
 	int num = dacoService.getRecordNum(learnerId, toolSessionId);
-	return new ToolOutput(DacoConstants.LEARNER_NUM_POSTS_DEFINITION_NAME, getI18NText(
-		DacoConstants.LEARNER_NUM_POSTS_DEFINITION_NAME, true), new Long(num));
+	return new ToolOutput(DacoConstants.LEARNER_NUM_POSTS_DEFINITION_NAME,
+		getI18NText(DacoConstants.LEARNER_NUM_POSTS_DEFINITION_NAME, true), new Long(num));
     }
 }

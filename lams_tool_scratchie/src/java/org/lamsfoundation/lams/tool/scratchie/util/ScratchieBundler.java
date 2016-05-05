@@ -1,23 +1,23 @@
-/**************************************************************** 
- * Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org) 
- * ============================================================= 
- * License Information: http://lamsfoundation.org/licensing/lams/2.0/ 
- * 
- * This program is free software; you can redistribute it and/or modify 
- * it under the terms of the GNU General Public License version 2.0 
- * as published by the Free Software Foundation. 
- * 
- * This program is distributed in the hope that it will be useful, 
- * but WITHOUT ANY WARRANTY; without even the implied warranty of 
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the 
- * GNU General Public License for more details. 
- * 
- * You should have received a copy of the GNU General Public License 
- * along with this program; if not, write to the Free Software 
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 * USA 
- * 
- * http://www.gnu.org/licenses/gpl.txt 
- * **************************************************************** 
+/****************************************************************
+ * Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
+ * =============================================================
+ * License Information: http://lamsfoundation.org/licensing/lams/2.0/
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License version 2.0
+ * as published by the Free Software Foundation.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 * USA
+ *
+ * http://www.gnu.org/licenses/gpl.txt
+ * ****************************************************************
  */
 
 /* $Id$ */
@@ -48,7 +48,7 @@ public class ScratchieBundler extends Bundler {
 
     /**
      * This method bundles the files to the given output dir
-     * 
+     *
      * @param request
      *            the request for the export
      * @param cookies
@@ -63,7 +63,7 @@ public class ScratchieBundler extends Bundler {
 
     /**
      * See bundle
-     * 
+     *
      * @param request
      * @param cookies
      * @param outputDirectory
@@ -95,23 +95,20 @@ public class ScratchieBundler extends Bundler {
 		+ URL_SEPARATOR + "includes" + URL_SEPARATOR + "images" + URL_SEPARATOR;
 
 	String urlToConnectTo = JAVASCRIPT_FOLDER + "jquery.jqGrid.js";
-	HttpUrlConnectionUtil
-		.writeResponseToFile(urlToConnectTo, FOLDER_TO_STORE_FILE, "jquery.jqGrid.js", cookies);
+	HttpUrlConnectionUtil.writeResponseToFile(urlToConnectTo, FOLDER_TO_STORE_FILE, "jquery.jqGrid.js", cookies);
 	urlToConnectTo = JAVASCRIPT_FOLDER + "jquery.jqGrid.locale-en.js";
 	HttpUrlConnectionUtil.writeResponseToFile(urlToConnectTo, FOLDER_TO_STORE_FILE, "jquery.jqGrid.locale-en.js",
 		cookies);
 	urlToConnectTo = JAVASCRIPT_FOLDER + "jquery.js";
 	HttpUrlConnectionUtil.writeResponseToFile(urlToConnectTo, FOLDER_TO_STORE_FILE, "jquery.js", cookies);
 	urlToConnectTo = JAVASCRIPT_FOLDER + "jquery-ui.js";
-	HttpUrlConnectionUtil.writeResponseToFile(urlToConnectTo, FOLDER_TO_STORE_FILE,
-		"jquery-ui.js", cookies);
+	HttpUrlConnectionUtil.writeResponseToFile(urlToConnectTo, FOLDER_TO_STORE_FILE, "jquery-ui.js", cookies);
 
 	urlToConnectTo = CSS_FOLDER + "jquery-ui-redmond-theme.css";
-	HttpUrlConnectionUtil.writeResponseToFile(urlToConnectTo, FOLDER_TO_STORE_FILE,
-		"jquery-ui-redmond-theme.css", cookies);
-	urlToConnectTo = CSS_FOLDER + "jquery.jqGrid.css";
-	HttpUrlConnectionUtil.writeResponseToFile(urlToConnectTo, FOLDER_TO_STORE_FILE, "jquery.jqGrid.css",
+	HttpUrlConnectionUtil.writeResponseToFile(urlToConnectTo, FOLDER_TO_STORE_FILE, "jquery-ui-redmond-theme.css",
 		cookies);
+	urlToConnectTo = CSS_FOLDER + "jquery.jqGrid.css";
+	HttpUrlConnectionUtil.writeResponseToFile(urlToConnectTo, FOLDER_TO_STORE_FILE, "jquery.jqGrid.css", cookies);
 
 	urlToConnectTo = IMAGE_FOLDER + "scratchie-correct.gif";
 	HttpUrlConnectionUtil.writeResponseToFile(urlToConnectTo, FOLDER_TO_STORE_FILE, "scratchie-correct.gif",
@@ -125,7 +122,8 @@ public class ScratchieBundler extends Bundler {
     private String getServerUrl() {
 	String serverUrl = Configuration.get(ConfigurationKeys.SERVER_URL);
 	if (serverUrl == null) {
-	    log.error("Unable to get path to the LAMS Spreadsheet URL from the configuration table. Spreadsheet javascript files export failed");
+	    log.error(
+		    "Unable to get path to the LAMS Spreadsheet URL from the configuration table. Spreadsheet javascript files export failed");
 	    return "";
 	} else {
 

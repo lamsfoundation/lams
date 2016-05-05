@@ -25,7 +25,6 @@ package org.eucm.lams.tool.eadventure.web.form;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.struts.action.ActionMessage;
@@ -95,33 +94,35 @@ public class EadventurePedagogicalPlannerForm extends PedagogicalPlannerActivity
     }
 
     public void fillForm(Eadventure eadventure) {
-/*	if (eadventure != null) {
-	    setToolContentID(eadventure.getContentId());
-	    setInstructions(eadventure.getInstructions());
-
-	    title = new ArrayList<String>();
-	    url = new ArrayList<String>();
-	    fileName = new ArrayList<String>();
-	    file = new ArrayList<FormFile>();
-	    type = new ArrayList<Short>();
-	    Set<EadventureItem> items = eadventure.getEadventureItems();
-	    if (items != null) {
-		int topicIndex = 0;
-		for (EadventureItem item : items) {
-		    short itemType = item.getType();
-		    setTitle(topicIndex, item.getTitle());
-		    setType(topicIndex, itemType);
-		    setUrl(topicIndex, itemType == EadventureConstants.RESOURCE_TYPE_URL ? item.getUrl() : null);
-		    setFileName(topicIndex, itemType == EadventureConstants.RESOURCE_TYPE_FILE ? item.getFileName()
-			    : null);
-		    setFileUuid(topicIndex, itemType == EadventureConstants.RESOURCE_TYPE_FILE ? item.getFileUuid()
-			    : null);
-		    setFileVersion(topicIndex, itemType == EadventureConstants.RESOURCE_TYPE_FILE ? item
-			    .getFileVersionId() : null);
-		    topicIndex++;
-		}
-	    }
-	}*/
+/*
+ * if (eadventure != null) {
+ * setToolContentID(eadventure.getContentId());
+ * setInstructions(eadventure.getInstructions());
+ * 
+ * title = new ArrayList<String>();
+ * url = new ArrayList<String>();
+ * fileName = new ArrayList<String>();
+ * file = new ArrayList<FormFile>();
+ * type = new ArrayList<Short>();
+ * Set<EadventureItem> items = eadventure.getEadventureItems();
+ * if (items != null) {
+ * int topicIndex = 0;
+ * for (EadventureItem item : items) {
+ * short itemType = item.getType();
+ * setTitle(topicIndex, item.getTitle());
+ * setType(topicIndex, itemType);
+ * setUrl(topicIndex, itemType == EadventureConstants.RESOURCE_TYPE_URL ? item.getUrl() : null);
+ * setFileName(topicIndex, itemType == EadventureConstants.RESOURCE_TYPE_FILE ? item.getFileName()
+ * : null);
+ * setFileUuid(topicIndex, itemType == EadventureConstants.RESOURCE_TYPE_FILE ? item.getFileUuid()
+ * : null);
+ * setFileVersion(topicIndex, itemType == EadventureConstants.RESOURCE_TYPE_FILE ? item
+ * .getFileVersionId() : null);
+ * topicIndex++;
+ * }
+ * }
+ * }
+ */
     }
 
     public void setTitle(int number, String formTitle) {
@@ -282,11 +283,11 @@ public class EadventurePedagogicalPlannerForm extends PedagogicalPlannerActivity
      * mismatch excpetion since browser tried to fill an empty string to file field. Now in pedagogicalPlanner.js in
      * lams_central it is detected and the field name is changed to fileDummy, which sets the file to <code>NULLM</code>
      * here in Java form file.
-     * 
+     *
      * @param number
-     *                where to set the empty file
+     *            where to set the empty file
      * @param emptyString
-     *                never used; the file is set to <code>NULL</code> anyway
+     *            never used; the file is set to <code>NULL</code> anyway
      */
     public void setFileDummy(int number, String emptyString) {
 	setFile(number, null);

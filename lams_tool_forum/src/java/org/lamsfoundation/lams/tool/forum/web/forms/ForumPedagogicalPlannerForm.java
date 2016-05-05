@@ -78,7 +78,7 @@ public class ForumPedagogicalPlannerForm extends PedagogicalPlannerActivityForm 
 	    messages.addAll(forum.getMessages());
 	    if (messages != null) {
 		int topicIndex = 0;
-		for (Message message : (Set<Message>) messages) {
+		for (Message message : messages) {
 		    if (message.getIsAuthored() && message.getToolSession() == null) {
 			setTopic(topicIndex++, message.getBody());
 		    }

@@ -2,21 +2,21 @@
  * Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
  * =============================================================
  * License Information: http://lamsfoundation.org/licensing/lams/2.0/
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License version 2.0 
+ * it under the terms of the GNU General Public License version 2.0
  * as published by the Free Software Foundation.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301
  * USA
- * 
+ *
  * http://www.gnu.org/licenses/gpl.txt
  * ****************************************************************
  */
@@ -47,9 +47,9 @@ import org.lamsfoundation.lams.util.wddx.WDDXProcessor;
 import com.allaire.wddx.WddxDeserializationException;
 
 /**
- * 
+ *
  * @author Mitchell Seaton
- * 
+ *
  */
 public class ThemeService implements IThemeService {
 
@@ -66,7 +66,7 @@ public class ThemeService implements IThemeService {
 
     /**********************************************
      * Setter Methods
-     * *******************************************/
+     *******************************************/
 
     /**
      * @return Returns the themeDAO.
@@ -76,7 +76,7 @@ public class ThemeService implements IThemeService {
     }
 
     /**
-     * 
+     *
      * @param themeDAO
      *            The ICSSThemeDAO to set.
      */
@@ -85,7 +85,7 @@ public class ThemeService implements IThemeService {
     }
 
     /**
-     * 
+     *
      * @param IUserManagementService
      *            The userManagementService to set.
      */
@@ -96,6 +96,7 @@ public class ThemeService implements IThemeService {
     /**
      * Set i18n MessageService
      */
+    @Override
     public void setMessageService(MessageService messageService) {
 	this.messageService = messageService;
     }
@@ -103,17 +104,18 @@ public class ThemeService implements IThemeService {
     /**
      * Get i18n MessageService
      */
+    @Override
     public MessageService getMessageService() {
 	return this.messageService;
     }
 
     /**********************************************
      * Utility/Service Methods
-     * *******************************************/
+     *******************************************/
 
     /**
      * Store a theme created on a client.
-     * 
+     *
      * @param wddxPacket
      *            The WDDX packet received from Flash
      * @return String The acknowledgement in WDDX format that the theme has been
@@ -122,6 +124,7 @@ public class ThemeService implements IThemeService {
      * @throws WddxDeserializationException
      * @throws Exception
      */
+    @Override
     public String storeTheme(String wddxPacket) throws Exception {
 
 	FlashMessage flashMessage = null;
@@ -152,18 +155,19 @@ public class ThemeService implements IThemeService {
 
     /**
      * Returns a string representing the requested theme in WDDX format
-     * 
+     *
      * @param themeId
      *            The id of the theme whose WDDX packet is requested
      * @return String The requested theme in WDDX format
      * @throws Exception
      */
+    @Override
     public String getThemeWDDX(Long themeId) throws IOException {
 	FlashMessage flashMessage = null;
 	Theme theme = getTheme(themeId);
-	if (theme == null)
+	if (theme == null) {
 	    flashMessage = FlashMessage.getNoSuchTheme("wddxPacket", themeId);
-	else {
+	} else {
 	    CSSThemeDTO dto = new CSSThemeDTO(theme);
 	    flashMessage = new FlashMessage("getTheme", dto);
 	}
@@ -173,6 +177,7 @@ public class ThemeService implements IThemeService {
     /**
      * Returns a theme
      */
+    @Override
     public Theme getTheme(Long themeId) {
 	return themeDAO.getThemeById(themeId);
     }
@@ -180,21 +185,24 @@ public class ThemeService implements IThemeService {
     /**
      * Returns a theme based on the name.
      */
+    @Override
     public Theme getTheme(String themeName) {
 	List themes = themeDAO.getThemeByName(themeName);
-	if (themes != null && themes.size() > 0)
+	if (themes != null && themes.size() > 0) {
 	    return (Theme) themes.get(0);
-	else
+	} else {
 	    return null;
+	}
     }
 
     /**
      * This method returns a list of all available themes in WDDX format. We
      * need to work out if this should be restricted by user.
-     * 
+     *
      * @return String The required information in WDDX format
      * @throws IOException
      */
+    @Override
     public String getThemes() throws IOException {
 	FlashMessage flashMessage = null;
 	List themes = themeDAO.getAllThemes();
@@ -210,33 +218,33 @@ public class ThemeService implements IThemeService {
 
     /**
      * Set the User's theme
-     * 
+     *
      * @return String The acknowledgement or error in WDDX format
      * @throws IOException
      */
-    private FlashMessage setTheme(Integer userId, Long themeId, String type) throws IOException, ThemeException,
-	    UserException {
+    private FlashMessage setTheme(Integer userId, Long themeId, String type)
+	    throws IOException, ThemeException, UserException {
 	FlashMessage flashMessage = null;
 	User user = (User) userManagementService.findById(User.class, userId);
 	Theme theme = themeDAO.getThemeById(themeId);
 
-	if (theme == null)
+	if (theme == null) {
 	    throw new ThemeException(messageService.getMessage(IThemeService.NO_SUCH_THEME_KEY));
-	else if (user == null)
+	} else if (user == null) {
 	    throw new UserException(messageService.getMessage(IThemeService.NO_SUCH_USER_KEY));
-	else {
+	} else {
 	    if (type == null) {
 		user.setHtmlTheme(theme);
 		user.setFlashTheme(theme);
-	    } else if (type.equals(IThemeService.FLASH_KEY))
+	    } else if (type.equals(IThemeService.FLASH_KEY)) {
 		user.setFlashTheme(theme);
-
-	    else if (type.equals(IThemeService.HTML_KEY))
+	    } else if (type.equals(IThemeService.HTML_KEY)) {
 		user.setHtmlTheme(theme);
+	    }
 
 	    userManagementService.save(user);
-	    flashMessage = new FlashMessage("setTheme", messageService
-		    .getMessage(IThemeService.SET_THEME_SAVED_MESSAGE_KEY));
+	    flashMessage = new FlashMessage("setTheme",
+		    messageService.getMessage(IThemeService.SET_THEME_SAVED_MESSAGE_KEY));
 	}
 
 	return flashMessage;
@@ -244,60 +252,74 @@ public class ThemeService implements IThemeService {
 
     /**
      * Set the User's theme (Common)
-     * 
+     *
      * @return FlashMessage The acknowledgement or error in WDDX format
      * @throws IOException
      */
+    @Override
     public FlashMessage setTheme(Integer userId, Long themeId) throws IOException, ThemeException, UserException {
 	return setTheme(userId, themeId, null);
     }
 
     /**
      * Set the User's HTML theme
-     * 
+     *
      * @return FlashMessage The acknowledgement or error in WDDX format
      * @throws IOException
      */
+    @Override
     public FlashMessage setHtmlTheme(Integer userId, Long themeId) throws IOException, ThemeException, UserException {
 	return setTheme(userId, themeId, IThemeService.HTML_KEY);
     }
 
     /**
      * Set the User's Flash theme
-     * 
+     *
      * @return FlashMessage The acknowledgement or error in WDDX format
      * @throws IOException
      */
+    @Override
     public FlashMessage setFlashTheme(Integer userId, Long themeId) throws IOException, ThemeException, UserException {
 	return setTheme(userId, themeId, IThemeService.FLASH_KEY);
     }
-    
-    
-    /* (non-Javadoc)
+
+    /*
+     * (non-Javadoc)
+     * 
      * @see org.lamsfoundation.lams.themes.service.IThemeService#getAllThemes()
      */
+    @Override
     @SuppressWarnings("unchecked")
-    public List<Theme> getAllThemes(){
-	return (List<Theme>)themeDAO.getAllThemes();
+    public List<Theme> getAllThemes() {
+	return themeDAO.getAllThemes();
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see org.lamsfoundation.lams.themes.service.IThemeService#removeTheme(java.lang.Long)
      */
+    @Override
     public void removeTheme(Long themeId) {
 	themeDAO.deleteThemeById(themeId);
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see org.lamsfoundation.lams.themes.service.IThemeService#saveOrUpdateTheme(org.lamsfoundation.lams.themes.Theme)
      */
+    @Override
     public void saveOrUpdateTheme(Theme theme) {
 	themeDAO.saveOrUpdateTheme(theme);
     }
-    
-    /* (non-Javadoc)
+
+    /*
+     * (non-Javadoc)
+     * 
      * @see org.lamsfoundation.lams.themes.service.IThemeService#getDefaultTheme()
      */
+    @Override
     public Theme getDefaultCSSTheme() {
 	List<Theme> themes = getAllThemes();
 	String defaultTheme = Configuration.get(ConfigurationKeys.DEFAULT_HTML_THEME);
@@ -306,13 +328,16 @@ public class ThemeService implements IThemeService {
 		return theme;
 	    }
 	}
-	
+
 	return null;
     }
-    
-    /* (non-Javadoc)
+
+    /*
+     * (non-Javadoc)
+     * 
      * @see org.lamsfoundation.lams.themes.service.IThemeService#getDefaultTheme()
      */
+    @Override
     public Theme getDefaultFlashTheme() {
 	List<Theme> themes = getAllThemes();
 	String defaultTheme = Configuration.get(ConfigurationKeys.DEFAULT_FLASH_THEME);
@@ -324,16 +349,22 @@ public class ThemeService implements IThemeService {
 	return null;
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see org.lamsfoundation.lams.themes.service.IThemeService#getAlCSSThemes()
      */
+    @Override
     public List<Theme> getAllCSSThemes() {
 	return themeDAO.getAllCSSThemes();
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see org.lamsfoundation.lams.themes.service.IThemeService#getAlFlashThemes()
      */
+    @Override
     public List<Theme> getAllFlashThemes() {
 	return themeDAO.getAllFlashThemes();
     }

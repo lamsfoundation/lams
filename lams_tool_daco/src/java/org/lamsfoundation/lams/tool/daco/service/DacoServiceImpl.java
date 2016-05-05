@@ -2,21 +2,21 @@
  * Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
  * =============================================================
  * License Information: http://lamsfoundation.org/licensing/lams/2.0/
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301
  * USA
- * 
+ *
  * http://www.gnu.org/licenses/gpl.txt
  * ****************************************************************
  */
@@ -259,9 +259,11 @@ public class DacoServiceImpl implements IDacoService, ToolContentManager, ToolSe
 	    for (DacoAnswer answer : answers) {
 		if (recordId != answer.getRecordId()) {
 		    recordId = answer.getRecordId();
-		    /* LDEV-3771: need to check we aren't adding a blank record 
-		     * if there isn't a record for record id 1 due to deletion. */
-		    if ( record.size() > 0) {
+		    /*
+		     * LDEV-3771: need to check we aren't adding a blank record
+		     * if there isn't a record for record id 1 due to deletion.
+		     */
+		    if (record.size() > 0) {
 			result.add(record);
 		    }
 		    record = new LinkedList<DacoAnswer>();
@@ -367,7 +369,7 @@ public class DacoServiceImpl implements IDacoService, ToolContentManager, ToolSe
     /**
      * Try to get the file. If forceLogin = false and an access denied exception occurs, call this method again to get a
      * new ticket and retry file lookup. If forceLogin = true and it then fails then throw exception.
-     * 
+     *
      * @param uuid
      * @param versionId
      * @param relativePath
@@ -455,50 +457,53 @@ public class DacoServiceImpl implements IDacoService, ToolContentManager, ToolSe
     }
 
     @Override
-    public List<Object[]> getUsersForTablesorter(final Long sessionId, int page, int size, int sorting, 
+    public List<Object[]> getUsersForTablesorter(final Long sessionId, int page, int size, int sorting,
 	    String searchString, boolean getNotebookEntries) {
-	return dacoUserDao.getUsersForTablesorter(sessionId, page, size, sorting, searchString, 
-		getNotebookEntries, coreNotebookService);
+	return dacoUserDao.getUsersForTablesorter(sessionId, page, size, sorting, searchString, getNotebookEntries,
+		coreNotebookService);
     }
 
-    public int getCountUsersBySession(final Long sessionId, String searchString) { 
-	return dacoUserDao.getCountUsersBySession( sessionId, searchString);
+    @Override
+    public int getCountUsersBySession(final Long sessionId, String searchString) {
+	return dacoUserDao.getCountUsersBySession(sessionId, searchString);
     }
 
+    @Override
     public List<MonitoringSummarySessionDTO> getSessionStatistics(Long toolContentUid) {
-	return dacoSessionDao.statistics(toolContentUid);	
+	return dacoSessionDao.statistics(toolContentUid);
     }
-    
-    public MonitoringSummarySessionDTO getAnswersAsRecords(final Long sessionId, final Long userId, int sorting)
-    {
+
+    @Override
+    public MonitoringSummarySessionDTO getAnswersAsRecords(final Long sessionId, final Long userId, int sorting) {
 	DacoSession session = dacoSessionDao.getSessionBySessionId(sessionId);
-	MonitoringSummarySessionDTO monitoringRecordList = new MonitoringSummarySessionDTO(session.getSessionId(),  session.getSessionName());
-	
+	MonitoringSummarySessionDTO monitoringRecordList = new MonitoringSummarySessionDTO(session.getSessionId(),
+		session.getSessionName());
+
 	List<MonitoringSummaryUserDTO> monitoringUsers = new ArrayList<MonitoringSummaryUserDTO>();
-	if ( userId == null ) {
+	if (userId == null) {
 	    List<DacoUser> users = dacoUserDao.getBySessionId(sessionId, sorting);
-	    for ( DacoUser user : users ) {
-		monitoringUsers.add(getAnswersAsRecordsForUser(user));	    
+	    for (DacoUser user : users) {
+		monitoringUsers.add(getAnswersAsRecordsForUser(user));
 	    }
 	} else {
 	    monitoringUsers.add(getAnswersAsRecordsForUser(getUserByUserIdAndSessionId(userId, sessionId)));
 	}
-	
+
 	monitoringRecordList.setUsers(monitoringUsers);
 	return monitoringRecordList;
     }
-    
+
     // called by getAnswersAsRecords
     private MonitoringSummaryUserDTO getAnswersAsRecordsForUser(DacoUser user) {
 	MonitoringSummaryUserDTO monitoringUser = new MonitoringSummaryUserDTO(user.getUid(),
-		user.getUserId().intValue(), user.getFullName(),
-		user.getLoginName());
+		user.getUserId().intValue(), user.getFullName(), user.getLoginName());
 	List<List<DacoAnswer>> records = getDacoAnswersByUser(user);
 	monitoringUser.setRecords(records);
 	monitoringUser.setRecordCount(records.size());
 	return monitoringUser;
     }
-    
+
+    @Override
     public List<MonitoringSummarySessionDTO> getExportPortfolioSummary(Long contentId, Long userUid) {
 	List<DacoSession> sessions = dacoSessionDao.getByContentId(contentId);
 	List<MonitoringSummarySessionDTO> result = new ArrayList<MonitoringSummarySessionDTO>(sessions.size());
@@ -511,8 +516,7 @@ public class DacoServiceImpl implements IDacoService, ToolContentManager, ToolSe
 	    List<MonitoringSummaryUserDTO> monitoringUsers = new ArrayList<MonitoringSummaryUserDTO>(users.size());
 	    for (DacoUser user : users) {
 		MonitoringSummaryUserDTO monitoringUser = new MonitoringSummaryUserDTO(user.getUid(),
-			user.getUserId().intValue(), user.getFullName(),
-			user.getLoginName());
+			user.getUserId().intValue(), user.getFullName(), user.getLoginName());
 		List<List<DacoAnswer>> records = getDacoAnswersByUser(user);
 		/*
 		 * If the user provided as "userUid" matches current user UID, the summary is filled with additional
@@ -546,37 +550,38 @@ public class DacoServiceImpl implements IDacoService, ToolContentManager, ToolSe
 	if (questions.size() > 0) {
 	    for (DacoQuestion question : questions) {
 		switch (question.getType()) {
-		case DacoConstants.QUESTION_TYPE_NUMBER: {
-		    /*
-		     * For numbers, first "single answer" is a summary for the whole question. Other "single answers"
-		     * are summaries for the real answers provided by a learner.
-		     */
-		    QuestionSummaryDTO summary = new QuestionSummaryDTO();
-		    summary.addUserSummarySingleAnswer(0, new QuestionSummarySingleAnswerDTO());
-		    summary.addGroupSummarySingleAnswer(0, new QuestionSummarySingleAnswerDTO());
-		    summary.setQuestionUid(question.getUid());
-		    result.add(summary);
-		}
-		    break;
-		case DacoConstants.QUESTION_TYPE_RADIO:
-		case DacoConstants.QUESTION_TYPE_DROPDOWN:
-		case DacoConstants.QUESTION_TYPE_CHECKBOX: {
-		    int answerOptionCount = question.getAnswerOptions().size();
-		    QuestionSummaryDTO summary = new QuestionSummaryDTO();
-		    summary.setQuestionUid(question.getUid());
-		    for (int answerOption = 0; answerOption < answerOptionCount; answerOption++) {
-			QuestionSummarySingleAnswerDTO singleAnswer = new QuestionSummarySingleAnswerDTO(
-				String.valueOf(answerOption + 1), null, "0%", "0");
-			summary.addUserSummarySingleAnswer(answerOption, singleAnswer);
-			singleAnswer = (QuestionSummarySingleAnswerDTO) singleAnswer.clone();
-			summary.addGroupSummarySingleAnswer(answerOption, singleAnswer);
+		    case DacoConstants.QUESTION_TYPE_NUMBER: {
+			/*
+			 * For numbers, first "single answer" is a summary for the whole question. Other
+			 * "single answers"
+			 * are summaries for the real answers provided by a learner.
+			 */
+			QuestionSummaryDTO summary = new QuestionSummaryDTO();
+			summary.addUserSummarySingleAnswer(0, new QuestionSummarySingleAnswerDTO());
+			summary.addGroupSummarySingleAnswer(0, new QuestionSummarySingleAnswerDTO());
+			summary.setQuestionUid(question.getUid());
+			result.add(summary);
 		    }
-		    result.add(summary);
-		}
-		    break;
-		default:
-		    result.add(null);
-		    break;
+			break;
+		    case DacoConstants.QUESTION_TYPE_RADIO:
+		    case DacoConstants.QUESTION_TYPE_DROPDOWN:
+		    case DacoConstants.QUESTION_TYPE_CHECKBOX: {
+			int answerOptionCount = question.getAnswerOptions().size();
+			QuestionSummaryDTO summary = new QuestionSummaryDTO();
+			summary.setQuestionUid(question.getUid());
+			for (int answerOption = 0; answerOption < answerOptionCount; answerOption++) {
+			    QuestionSummarySingleAnswerDTO singleAnswer = new QuestionSummarySingleAnswerDTO(
+				    String.valueOf(answerOption + 1), null, "0%", "0");
+			    summary.addUserSummarySingleAnswer(answerOption, singleAnswer);
+			    singleAnswer = (QuestionSummarySingleAnswerDTO) singleAnswer.clone();
+			    summary.addGroupSummarySingleAnswer(answerOption, singleAnswer);
+			}
+			result.add(summary);
+		    }
+			break;
+		    default:
+			result.add(null);
+			break;
 		}
 	    }
 	    result = dacoAnswerDao.getQuestionSummaries(userUid, result);
@@ -599,10 +604,10 @@ public class DacoServiceImpl implements IDacoService, ToolContentManager, ToolSe
     /**
      * This method verifies the credentials of the Daco Tool and gives it the <code>Ticket</code> to login and access
      * the Content Repository.
-     * 
+     *
      * A valid ticket is needed in order to access the content from the repository. This method would be called evertime
      * the tool needs to upload/download files from the content repository.
-     * 
+     *
      * @return ITicket The ticket for repostory access
      * @throws DacoApplicationException
      */
@@ -770,7 +775,7 @@ public class DacoServiceImpl implements IDacoService, ToolContentManager, ToolSe
 
     /**
      * Process an uploaded file.
-     * 
+     *
      * @throws DacoApplicationException
      * @throws FileNotFoundException
      * @throws IOException

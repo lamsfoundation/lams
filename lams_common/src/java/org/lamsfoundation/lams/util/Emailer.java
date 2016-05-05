@@ -15,13 +15,13 @@ import org.masukomi.aspirin.core.MailQue;
 
 /**
  * A class that handles emails
- * 
+ *
  * @author lfoxton
  */
 public class Emailer {
     /**
      * Sends an email sourced from support email
-     * 
+     *
      * @param subject
      *            the subject of the email
      * @param to
@@ -41,14 +41,14 @@ public class Emailer {
     /**
      * Creates a mail session with authentication if it is required, ie if it has been set up with SMTP authentication
      * in the config page
-     * 
+     *
      * @param properties
      * @return
      */
     public static Session getMailSession(Properties properties) {
 	Session session;
-	boolean useInternalSMTPServer = Boolean.parseBoolean(Configuration
-		.get(ConfigurationKeys.USE_INTERNAL_SMTP_SERVER));
+	boolean useInternalSMTPServer = Boolean
+		.parseBoolean(Configuration.get(ConfigurationKeys.USE_INTERNAL_SMTP_SERVER));
 	if (!useInternalSMTPServer) {
 	    String smtpServer = Configuration.get(ConfigurationKeys.SMTP_SERVER);
 	    properties.put("mail.smtp.host", smtpServer);
@@ -69,7 +69,7 @@ public class Emailer {
 
     /**
      * Send email to recipients
-     * 
+     *
      * @param subject
      *            the subject of the email
      * @param to
@@ -90,7 +90,7 @@ public class Emailer {
 
     /**
      * Send email to recipients
-     * 
+     *
      * @param subject
      *            the subject of the email
      * @param to
@@ -107,12 +107,12 @@ public class Emailer {
      *            whether the message is of HTML content-type or plain text
      */
     public static void send(String subject, String to, String toPerson, String from, String fromPerson, String body,
-	    boolean isHtmlFormat, Properties mailServerConfig) throws AddressException, MessagingException,
-	    UnsupportedEncodingException {
+	    boolean isHtmlFormat, Properties mailServerConfig)
+	    throws AddressException, MessagingException, UnsupportedEncodingException {
 
 	Session session = Emailer.getMailSession(mailServerConfig);
-	boolean useInternalSMTPServer = Boolean.parseBoolean(Configuration
-		.get(ConfigurationKeys.USE_INTERNAL_SMTP_SERVER));
+	boolean useInternalSMTPServer = Boolean
+		.parseBoolean(Configuration.get(ConfigurationKeys.USE_INTERNAL_SMTP_SERVER));
 
 	MimeMessage message = new MimeMessage(session);
 	message.setFrom(new InternetAddress(from, fromPerson));

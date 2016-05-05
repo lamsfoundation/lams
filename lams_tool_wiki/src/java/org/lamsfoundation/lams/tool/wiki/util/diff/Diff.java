@@ -1,6 +1,14 @@
 package org.lamsfoundation.lams.tool.wiki.util.diff;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.ListIterator;
+import java.util.Map;
+import java.util.TreeMap;
 
 /**
  * Compares two collections, returning a list of the additions, changes, and
@@ -11,7 +19,7 @@ import java.util.*;
  * <code>equals</code> and <code>compareTo</code> methods will be invoked on
  * the instances in the "from" and "to" collections; otherwise, for speed, hash
  * codes from the objects will be used instead for comparison.
- * 
+ *
  * <p>
  * The file FileDiff.java shows an example usage of this class, in an
  * application similar to the Unix "diff" program.
@@ -321,7 +329,7 @@ public class Diff {
 	    }
 	}
 
-	return toArray(matches);
+	return Diff.toArray(matches);
     }
 
     /**
@@ -391,12 +399,12 @@ public class Diff {
      * Inserts the given values into the threshold map.
      */
     protected Integer insert(Integer j, Integer k) {
-	if (isNonzero(k) && isGreaterThan(k, j) && isLessThan(new Integer(k.intValue() - 1), j)) {
+	if (Diff.isNonzero(k) && isGreaterThan(k, j) && isLessThan(new Integer(k.intValue() - 1), j)) {
 	    thresh.put(k, j);
 	} else {
 	    int hi = -1;
 
-	    if (isNonzero(k)) {
+	    if (Diff.isNonzero(k)) {
 		hi = k.intValue();
 	    } else if (thresh.size() > 0) {
 		hi = ((Integer) thresh.lastKey()).intValue();

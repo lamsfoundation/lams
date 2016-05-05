@@ -20,7 +20,7 @@ import java.io.Serializable;
 
 /**
  * Properties of an OAuth Service Provider.
- * 
+ *
  * @author John Kristian
  */
 public class OAuthServiceProvider implements Serializable {
@@ -31,11 +31,10 @@ public class OAuthServiceProvider implements Serializable {
     public final String userAuthorizationURL;
     public final String accessTokenURL;
 
-    public OAuthServiceProvider(String requestTokenURL,
-            String userAuthorizationURL, String accessTokenURL) {
-        this.requestTokenURL = requestTokenURL;
-        this.userAuthorizationURL = userAuthorizationURL;
-        this.accessTokenURL = accessTokenURL;
+    public OAuthServiceProvider(String requestTokenURL, String userAuthorizationURL, String accessTokenURL) {
+	this.requestTokenURL = requestTokenURL;
+	this.userAuthorizationURL = userAuthorizationURL;
+	this.accessTokenURL = accessTokenURL;
     }
 
 }

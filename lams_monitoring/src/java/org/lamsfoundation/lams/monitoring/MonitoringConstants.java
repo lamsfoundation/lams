@@ -2,21 +2,21 @@
  * Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
  * =============================================================
  * License Information: http://lamsfoundation.org/licensing/lams/2.0/
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License version 2.0 
+ * it under the terms of the GNU General Public License version 2.0
  * as published by the Free Software Foundation.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301
  * USA
- * 
+ *
  * http://www.gnu.org/licenses/gpl.txt
  * ****************************************************************
  */
@@ -49,10 +49,10 @@ public class MonitoringConstants {
     public static final String KEY_GROUP_ORDER_ID = "orderID";
     public static final String KEY_GROUP_LEARNERS = "learners";
     public static final Object KEY_USERS = "users";
-	
+
     // ---------------------------------------------------------------------
     // Search type constants used in EmailNotificationsAction
-    // ---------------------------------------------------------------------	
+    // ---------------------------------------------------------------------
     public static final int LESSON_TYPE_ASSIGNED_TO_LESSON = 0;
     public static final int LESSON_TYPE_HAVENT_FINISHED_LESSON = 1;
     public static final int LESSON_TYPE_HAVE_FINISHED_LESSON = 2;
@@ -65,7 +65,7 @@ public class MonitoringConstants {
     public static final int COURSE_TYPE_HAVENT_STARTED_ANY_LESSONS = 9;
     public static final int COURSE_TYPE_HAVE_FINISHED_THESE_LESSONS = 10;
     public static final int COURSE_TYPE_HAVENT_FINISHED_THESE_LESSONS = 11;
-    
+
     // how many times show info box in sequence tab
     public static final short SEQUENCE_TAB_SHOW_INFO_MAX_COUNT = 2;
 }

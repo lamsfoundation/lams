@@ -2,21 +2,21 @@
  * Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
  * =============================================================
  * License Information: http://lamsfoundation.org/licensing/lams/2.0/
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301
  * USA
- * 
+ *
  * http://www.gnu.org/licenses/gpl.txt
  * ****************************************************************
  */
@@ -50,9 +50,9 @@ import org.lamsfoundation.lams.tool.bbb.model.BbbSession;
 import org.lamsfoundation.lams.tool.bbb.model.BbbUser;
 import org.lamsfoundation.lams.tool.bbb.service.BbbServiceProxy;
 import org.lamsfoundation.lams.tool.bbb.service.IBbbService;
-import org.lamsfoundation.lams.tool.bbb.util.Constants;
 import org.lamsfoundation.lams.tool.bbb.util.BbbException;
 import org.lamsfoundation.lams.tool.bbb.util.BbbUtil;
+import org.lamsfoundation.lams.tool.bbb.util.Constants;
 import org.lamsfoundation.lams.tool.bbb.web.forms.LearningForm;
 import org.lamsfoundation.lams.tool.exception.DataMissingException;
 import org.lamsfoundation.lams.tool.exception.ToolException;
@@ -64,7 +64,7 @@ import org.lamsfoundation.lams.web.util.AttributeNames;
 
 /**
  * @author Ernie Ghiglione
- * 
+ *
  * @struts.action path="/learning" parameter="dispatch" scope="request" name="learningForm"
  * @struts.action-forward name="bbb" path="tiles:/learning/main"
  * @struts.action-forward name="notebook" path="tiles:/learning/notebook"
@@ -99,9 +99,9 @@ public class LearningAction extends DispatchAction {
 	    LearningForm learningForm = (LearningForm) form;
 
 	    if (user.getNotebookEntryUID() == null) {
-		user.setNotebookEntryUID(bbbService.createNotebookEntry(toolSessionID,
-			CoreNotebookConstants.NOTEBOOK_TOOL, Constants.TOOL_SIGNATURE, user.getUserId().intValue(),
-			learningForm.getEntryText()));
+		user.setNotebookEntryUID(
+			bbbService.createNotebookEntry(toolSessionID, CoreNotebookConstants.NOTEBOOK_TOOL,
+				Constants.TOOL_SIGNATURE, user.getUserId().intValue(), learningForm.getEntryText()));
 	    } else {
 		// update existing entry.
 		bbbService.updateNotebookEntry(user.getNotebookEntryUID(), learningForm.getEntryText());
@@ -113,8 +113,7 @@ public class LearningAction extends DispatchAction {
 	    logger.error("finishActivity(): couldn't find/create BbbUser in toolSessionID: " + toolSessionID);
 	}
 
-	ToolSessionManager sessionMgrService = BbbServiceProxy.getBbbSessionManager(getServlet()
-		.getServletContext());
+	ToolSessionManager sessionMgrService = BbbServiceProxy.getBbbSessionManager(getServlet().getServletContext());
 
 	String nextActivityUrl;
 	try {
@@ -156,16 +155,16 @@ public class LearningAction extends DispatchAction {
 
 	org.lamsfoundation.lams.usermanagement.dto.UserDTO lamsUserDTO = (org.lamsfoundation.lams.usermanagement.dto.UserDTO) SessionManager
 		.getSession().getAttribute(AttributeNames.USER);
-	
+
 	BbbSession session = bbbService.getSessionBySessionId(user.getBbbSession().getSessionId());
-	
+
 	String password = session.getAttendeePassword();
 	String meetingKey = BbbUtil.getMeetingKey(user.getBbbSession().getSessionId(), password);
-	
+
 	String meetingURL = bbbService.getJoinMeetingURL(lamsUserDTO, meetingKey, password);
-    response.sendRedirect(meetingURL);
+	response.sendRedirect(meetingURL);
 	return null;
-	
+
     }
 
     public ActionForward openNotebook(ActionMapping mapping, ActionForm form, HttpServletRequest request,
@@ -185,8 +184,8 @@ public class LearningAction extends DispatchAction {
 	    lrnForm.setEntryText(notebookEntry.getEntry());
 	}
 
-	LearningWebUtil.putActivityPositionInRequestByToolSessionId(lrnForm.getToolSessionID(), request, getServlet()
-		.getServletContext());
+	LearningWebUtil.putActivityPositionInRequestByToolSessionId(lrnForm.getToolSessionID(), request,
+		getServlet().getServletContext());
 
 	return mapping.findForward("notebook");
 
@@ -209,16 +208,15 @@ public class LearningAction extends DispatchAction {
 	String moderatorPassword = RandomPasswordGenerator.nextPassword(20);
 	MessageResources resources = MessageResources.getMessageResources(Constants.APP_RESOURCES);
 	String meetingKey = BbbUtil.getMeetingKey(session.getSessionId(), attendeePassword);
-	
+
 	// Get default localized welcome message
-	
+
 	String welcomeMessage = resources.getMessage("activity.welcome.message");
-	
+
 	logger.debug("Creating new room with meetingKey =" + meetingKey);
 
-	String meetingStartResponse = bbbService
-		.startConference(meetingKey, attendeePassword, moderatorPassword, BbbUtil
-				.getReturnURL(request), welcomeMessage);
+	String meetingStartResponse = bbbService.startConference(meetingKey, attendeePassword, moderatorPassword,
+		BbbUtil.getReturnURL(request), welcomeMessage);
 
 	if (meetingStartResponse == Constants.RESPONSE_SUCCESS) {
 	    session.setMeetingCreated(true);
@@ -265,6 +263,7 @@ public class LearningAction extends DispatchAction {
 	return finishActivity(mapping, form, request, response);
     }
 
+    @Override
     public ActionForward unspecified(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) throws Exception {
 
@@ -307,8 +306,8 @@ public class LearningAction extends DispatchAction {
 	    bbbService.saveOrUpdateBbb(bbb);
 	}
 
-	LearningWebUtil.putActivityPositionInRequestByToolSessionId(toolSessionID, request, getServlet()
-		.getServletContext());
+	LearningWebUtil.putActivityPositionInRequestByToolSessionId(toolSessionID, request,
+		getServlet().getServletContext());
 
 	BbbUser user;
 	if (mode.equals(ToolAccessMode.TEACHER)) {
@@ -325,8 +324,6 @@ public class LearningAction extends DispatchAction {
 	    userDTO.setNotebookEntryDTO(new NotebookEntryDTO(entry));
 	}
 	request.setAttribute(Constants.ATTR_USER_DTO, userDTO);
-
-
 
 	String securitySalt = bbbService.getConfigValue(Constants.CFG_SECURITYSALT);
 	if (securitySalt == null) {

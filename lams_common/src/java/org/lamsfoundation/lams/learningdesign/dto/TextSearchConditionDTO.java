@@ -28,9 +28,9 @@ import org.lamsfoundation.lams.learningdesign.TextSearchCondition;
 /**
  * Stores additional information from TextSearchCondition that should be serialized. All tools that have their own
  * TextSearchConditions must also have TextSearchConditionDTOs, otherwise learning design will not be properly exported.
- * 
+ *
  * @author Marcin Cieslak
- * 
+ *
  */
 public class TextSearchConditionDTO extends BranchConditionDTO {
     /**

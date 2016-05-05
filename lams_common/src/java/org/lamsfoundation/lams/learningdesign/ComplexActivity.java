@@ -2,21 +2,21 @@
  * Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
  * =============================================================
  * License Information: http://lamsfoundation.org/licensing/lams/2.0/
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License version 2.0 
+ * it under the terms of the GNU General Public License version 2.0
  * as published by the Free Software Foundation.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301
  * USA
- * 
+ *
  * http://www.gnu.org/licenses/gpl.txt
  * ****************************************************************
  */
@@ -26,7 +26,6 @@ package org.lamsfoundation.lams.learningdesign;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
 import java.util.SortedSet;
@@ -36,7 +35,6 @@ import org.apache.commons.lang.builder.ToStringBuilder;
 import org.lamsfoundation.lams.learningdesign.dto.AuthoringActivityDTO;
 import org.lamsfoundation.lams.learningdesign.dto.BranchActivityEntryDTO;
 import org.lamsfoundation.lams.learningdesign.strategy.ComplexActivityStrategy;
-import org.lamsfoundation.lams.learningdesign.strategy.SimpleActivityStrategy;
 import org.lamsfoundation.lams.lesson.LearnerProgress;
 
 /**
@@ -78,6 +76,7 @@ public abstract class ComplexActivity extends Activity implements Serializable {
 	this.activities = activities;
     }
 
+    @Override
     public String toString() {
 	return new ToStringBuilder(this).append("activityId", getActivityId()).toString();
     }
@@ -87,7 +86,7 @@ public abstract class ComplexActivity extends Activity implements Serializable {
      *                sort="org.lamsfoundation.lams.learningdesign.ActivityOrderComparator"
      * @hibernate.collection-key column="parent_activity_id"
      * @hibernate.collection-one-to-many class="org.lamsfoundation.lams.learningdesign.Activity"
-     * 
+     *
      */
     public Set getActivities() {
 	if (this.activities == null) {
@@ -104,7 +103,7 @@ public abstract class ComplexActivity extends Activity implements Serializable {
      * <p>
      * A tool based branching activity has to have a default branch in case the conditions don't match to any other
      * branch.
-     * 
+     *
      * @hibernate.many-to-one not-null="false"
      * @hibernate.column name="default_activity_id"
      */
@@ -126,7 +125,7 @@ public abstract class ComplexActivity extends Activity implements Serializable {
 
     /**
      * Return the requested child activity based on the id.
-     * 
+     *
      * @param activityId
      *            the requested activity id.
      * @return the child activity.
@@ -134,15 +133,16 @@ public abstract class ComplexActivity extends Activity implements Serializable {
     public Activity getChildActivityById(long activityId) {
 	for (Iterator i = this.activities.iterator(); i.hasNext();) {
 	    Activity child = (Activity) i.next();
-	    if (child.getActivityId().longValue() == activityId)
+	    if (child.getActivityId().longValue() == activityId) {
 		return child;
+	    }
 	}
 	return new NullActivity();
     }
 
     /**
      * Delegate to activity strategy to check up the status of all children.
-     * 
+     *
      * @param learnerProgress
      *            the progress data that record what has been completed
      * @return true if all children are completed.
@@ -155,10 +155,10 @@ public abstract class ComplexActivity extends Activity implements Serializable {
      * <p>
      * Delegate to activity strategy to calculate what is the next activity within the parent activity.
      * </p>
-     * 
+     *
      * <b>Note:</b> The logic of what is the next activity here is progress engine specific now. Please see the
      * <code>ActivityStrategy</code> for details explanation of what is next.
-     * 
+     *
      * @return the next activity within a parent activity
      */
     public Activity getNextActivityByParent(Activity currentChild) {
@@ -169,6 +169,7 @@ public abstract class ComplexActivity extends Activity implements Serializable {
      * Get all the tool activities in this activity. Called by Activity.getAllToolActivities(). Recursively get tool
      * activity from its children.
      */
+    @Override
     protected void getToolActivitiesInActivity(SortedSet toolActivities) {
 
 	for (Iterator i = this.getActivities().iterator(); i.hasNext();) {
@@ -178,6 +179,7 @@ public abstract class ComplexActivity extends Activity implements Serializable {
 
     }
 
+    @Override
     public Set<AuthoringActivityDTO> getAuthoringActivityDTOSet(ArrayList<BranchActivityEntryDTO> branchMappings,
 	    String languageCode) {
 	Set<AuthoringActivityDTO> dtoSet = new TreeSet<AuthoringActivityDTO>(new ActivityDTOOrderComparator());

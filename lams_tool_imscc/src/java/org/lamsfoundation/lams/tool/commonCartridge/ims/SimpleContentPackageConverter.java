@@ -2,21 +2,21 @@
  * Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
  * =============================================================
  * License Information: http://lamsfoundation.org/licensing/lams/2.0/
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301
  * USA
- * 
+ *
  * http://www.gnu.org/licenses/gpl.txt
  * ****************************************************************
  */
@@ -43,9 +43,9 @@ import uk.ac.reload.moonunit.contentpackaging.CP_Core;
 /**
  * SimpleContentPackageConverter contains the code required for parsing the IMS Content Package and converting the info
  * into our own structures.
- * 
+ *
  * Note: this class has instance data, so do not use it as a singleton.
- * 
+ *
  * @author Andrey Balan
  */
 public class SimpleContentPackageConverter implements IContentPackageConverter {
@@ -71,7 +71,7 @@ public class SimpleContentPackageConverter implements IContentPackageConverter {
     /**
      * Set up a package converter, using the supplied directory as the package. The package should be parsed
      * automatically and the values readied for calls to getSchema(), getTitle(), etc.
-     * 
+     *
      * @param directoryName
      *            : directory containing an expanded IMS content package.
      * @throws IMSManifestException
@@ -95,7 +95,7 @@ public class SimpleContentPackageConverter implements IContentPackageConverter {
     /**
      * Parse IMS content package expanded out into the supplied directory. Note: the manifest file is expected to be in
      * the root of the supplied directory.
-     * 
+     *
      * @throws ImscpApplicationException
      * @throws IMSManifestException
      */
@@ -143,7 +143,7 @@ public class SimpleContentPackageConverter implements IContentPackageConverter {
     /**
      * Finds a value at the given xmlPath. If only one element, uses that value. If more than one element, tries to find
      * an English value.
-     * 
+     *
      * @param xmlPath
      * @return Value of the element found at xmlPath.
      */
@@ -240,8 +240,9 @@ public class SimpleContentPackageConverter implements IContentPackageConverter {
 	// the organization and the commonCartridge.
 	Element defaultOrg = cpCore.getDefaultOrganization(orgsElement);
 	String defaultOrgIdentifier = null;
-	if (defaultOrg != null)
+	if (defaultOrg != null) {
 	    defaultOrgIdentifier = defaultOrg.getAttributeValue("identifier");
+	}
 
 	log.debug("cpCore default org id: " + defaultOrgIdentifier);
 
@@ -254,8 +255,9 @@ public class SimpleContentPackageConverter implements IContentPackageConverter {
 	for (int i = 0; i < orgs.length; i++) {
 
 	    Element organizationElement = processItem(orgs[i], nm, defaultOrgIdentifier, null);
-	    if (initOrganizationElement == null)
+	    if (initOrganizationElement == null) {
 		initOrganizationElement = organizationElement;
+	    }
 
 	    newRootElement.addContent(organizationElement);
 	}
@@ -274,14 +276,14 @@ public class SimpleContentPackageConverter implements IContentPackageConverter {
     /**
      * Process the given element. Returns a newly formatted Element if the element is a visible item, null otherwise.
      * Will also set the value "defaultItemURL" while processing, if it finds the default item.
-     * 
+     *
      * First time through, the element will be an organization and parentOrgIdentifier will be null. After that,
      * elements are expected to be items and parentOrgIdentifier should not be null.
-     * 
+     *
      * parentOrgIdentifier is the parent organization of an item. An item is the default item if either: (a) the
      * defaultOrgIdentifier is null and it is the first item encountered which has a commonCartridge or (b)
      * parentOrgIdentifier==defaultOrgIdentifier and it is the first item encountered which has a commonCartridge.
-     * 
+     *
      * @param element
      * @return New version of element combining organization/item/commonCartridge details
      */
@@ -299,8 +301,9 @@ public class SimpleContentPackageConverter implements IContentPackageConverter {
 	    setAttribute(itref, OrganizationXMLDef.PARAMETERS, element.getAttributeValue(CP_Core.PARAMETERS)); // optional
 	    setAttribute(itref, OrganizationXMLDef.TITLE, element.getChildText(CP_Core.TITLE, nm)); // optional
 	    String commonCartridgeURL = getCommonCartridgeURL(element);
-	    if (commonCartridgeURL != null)
+	    if (commonCartridgeURL != null) {
 		setAttribute(itref, OrganizationXMLDef.RESOURCE, commonCartridgeURL); // optional
+	    }
 
 	    if (commonCartridgeURL != null && this.defaultItem == null
 		    && (defaultOrgIdentifier == null || defaultOrgIdentifier.equals(parentOrgIdentifier))) {
@@ -315,8 +318,9 @@ public class SimpleContentPackageConverter implements IContentPackageConverter {
 	    while (iter.hasNext()) {
 		Element itrefChild = processItem((Element) iter.next(), nm, defaultOrgIdentifier,
 			parentOrgIdentifier != null ? parentOrgIdentifier : id);
-		if (itrefChild != null)
+		if (itrefChild != null) {
 		    itref.addContent(itrefChild);
+		}
 	    }
 
 	    return itref;
@@ -342,32 +346,38 @@ public class SimpleContentPackageConverter implements IContentPackageConverter {
     }
 
     private void setAttribute(Element element, String attributeName, String value) {
-	if (element != null && attributeName != null && value != null)
+	if (element != null && attributeName != null && value != null) {
 	    element.setAttribute(attributeName, value);
+	}
     }
 
     /*
-     * Get the commonCartridge relating to this item. First time called it will get a list of allowed commonCartridge it will cache
-     * the value in cachedCommonCartridgeList. After that, it will go to the cache. If it doesn't find the commonCartridge, then it
+     * Get the commonCartridge relating to this item. First time called it will get a list of allowed commonCartridge it
+     * will cache
+     * the value in cachedCommonCartridgeList. After that, it will go to the cache. If it doesn't find the
+     * commonCartridge, then it
      * will regenerate the list of commonCartridge.
-     * 
-     * This is done for performance - it is assumed that most items will have access to the same commonCartridge. This may not
-     * be true if sub-manifests are used, hence the regneration of the array if the commonCartridge isn't found in the cache.
-     * 
+     *
+     * This is done for performance - it is assumed that most items will have access to the same commonCartridge. This
+     * may not
+     * be true if sub-manifests are used, hence the regneration of the array if the commonCartridge isn't found in the
+     * cache.
+     *
      * Note: assumes all reference ids are unique across the whole of the manifest file.
-     * 
+     *
      * @param item Element of type ITEM
-     * 
+     *
      * @return relative path of the commonCartridge, null if no IDENTIFIERREF found
-     * 
+     *
      * @throws IMSManifestException if IDENTIFIERREF is not null but the commonCartridge could not found.
      */
     private String getCommonCartridgeURL(Element itemElement) throws IMSManifestException {
 
 	if (cachedCommonCartridgeList == null) {
 	    cachedCommonCartridgeList = cpCore.getReferencedElementsAllowed(itemElement);
-	    if (log.isDebugEnabled())
+	    if (log.isDebugEnabled()) {
 		log.debug("CommonCartridge are " + cachedCommonCartridgeList);
+	    }
 	}
 
 	String identifierRef = itemElement.getAttributeValue(CP_Core.IDENTIFIERREF);
@@ -386,8 +396,9 @@ public class SimpleContentPackageConverter implements IContentPackageConverter {
 		// Note: this may case the list to be generated twice first time if the
 		// commonCartridge is missing. Too bad!
 		cachedCommonCartridgeList = cpCore.getReferencedElementsAllowed(itemElement);
-		if (log.isDebugEnabled())
+		if (log.isDebugEnabled()) {
 		    log.debug("CommonCartridge are " + cachedCommonCartridgeList);
+		}
 
 		commonCartridge = getCommonCartridge2(identifierRef);
 	    }
@@ -420,6 +431,7 @@ public class SimpleContentPackageConverter implements IContentPackageConverter {
     /**
      * @return Returns the defaultItem.
      */
+    @Override
     public String getDefaultItem() {
 	return defaultItem;
     }
@@ -435,6 +447,7 @@ public class SimpleContentPackageConverter implements IContentPackageConverter {
     /**
      * @return Returns the description.
      */
+    @Override
     public String getDescription() {
 	return description;
     }
@@ -450,6 +463,7 @@ public class SimpleContentPackageConverter implements IContentPackageConverter {
     /**
      * @return Returns the organzationXML.
      */
+    @Override
     public String getOrganzationXML() {
 	return organzationXML;
     }
@@ -465,6 +479,7 @@ public class SimpleContentPackageConverter implements IContentPackageConverter {
     /**
      * @return Returns the schema.
      */
+    @Override
     public String getSchema() {
 	return schema;
     }
@@ -480,6 +495,7 @@ public class SimpleContentPackageConverter implements IContentPackageConverter {
     /**
      * @return Returns the title.
      */
+    @Override
     public String getTitle() {
 	return title;
     }

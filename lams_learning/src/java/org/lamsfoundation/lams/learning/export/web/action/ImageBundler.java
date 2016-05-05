@@ -1,23 +1,23 @@
-/**************************************************************** 
- * Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org) 
- * ============================================================= 
- * License Information: http://lamsfoundation.org/licensing/lams/2.0/ 
- * 
- * This program is free software; you can redistribute it and/or modify 
- * it under the terms of the GNU General Public License version 2.0 
- * as published by the Free Software Foundation. 
- * 
- * This program is distributed in the hope that it will be useful, 
- * but WITHOUT ANY WARRANTY; without even the implied warranty of 
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the 
- * GNU General Public License for more details. 
- * 
- * You should have received a copy of the GNU General Public License 
- * along with this program; if not, write to the Free Software 
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 * USA 
- * 
- * http://www.gnu.org/licenses/gpl.txt 
- * **************************************************************** 
+/****************************************************************
+ * Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
+ * =============================================================
+ * License Information: http://lamsfoundation.org/licensing/lams/2.0/
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License version 2.0
+ * as published by the Free Software Foundation.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 * USA
+ *
+ * http://www.gnu.org/licenses/gpl.txt
+ * ****************************************************************
  */
 
 /* $Id$ */
@@ -39,9 +39,9 @@ import org.lamsfoundation.lams.util.ConfigurationKeys;
 /**
  * Auxiliary class for supporting portfolio export. Copying all images and files uploaded by user into export temporary
  * folder, plus the FCKEditor smileys, plus a few misc common images.
- * 
+ *
  * @author AndreyB
- * 
+ *
  */
 public class ImageBundler extends Bundler {
 
@@ -72,8 +72,8 @@ public class ImageBundler extends Bundler {
 
 	String lamsEarDir = Configuration.get(ConfigurationKeys.LAMS_EAR_DIR);
 	if (lamsEarDir == null) {
-	    ImageBundler.log
-		    .error("Unable to get path to the LAMS ear from the configuration file - the exported portfolios will be missing User generated content and FCKEditor smileys.");
+	    ImageBundler.log.error(
+		    "Unable to get path to the LAMS ear from the configuration file - the exported portfolios will be missing User generated content and FCKEditor smileys.");
 	} else {
 	    lamsWwwPath = lamsEarDir + File.separator + "lams-www.war";
 	    lamsCentralPath = lamsEarDir + File.separator + "lams-central.war";
@@ -82,7 +82,7 @@ public class ImageBundler extends Bundler {
 
     /**
      * Bundle all images and files uploaded by user, also CKEditor smileys.
-     * 
+     *
      * @throws IOException
      */
     public void bundleImages() throws IOException {
@@ -92,18 +92,18 @@ public class ImageBundler extends Bundler {
 	    ImageBundler.log.debug("Copying user generated content from path " + lamsWwwPath);
 
 	    // copy content folder to output
-	    File contentFolderDir = new File(lamsWwwPath + File.separatorChar + "secure" + File.separatorChar
-		    + contentFolderId);
+	    File contentFolderDir = new File(
+		    lamsWwwPath + File.separatorChar + "secure" + File.separatorChar + contentFolderId);
 	    if (contentFolderDir.exists() && contentFolderDir.isDirectory()) {
 		File destDir = new File(outputDirectory + File.separatorChar + contentFolderId);
 		FileUtils.copyDirectory(contentFolderDir, destDir);
 	    } else {
 		ImageBundler.log.debug("Folder for contentFolderId:" + contentFolderId + "doesn't exist");
 	    }
-	    
+
 	    // copy learner content folder to output
-	    File learnerContentFolderDir = new File(lamsWwwPath + File.separatorChar + "secure" + File.separatorChar
-		    + learnerContentFolder);
+	    File learnerContentFolderDir = new File(
+		    lamsWwwPath + File.separatorChar + "secure" + File.separatorChar + learnerContentFolder);
 	    if (learnerContentFolderDir.exists() && learnerContentFolderDir.isDirectory()) {
 		File destDir = new File(outputDirectory + File.separatorChar + learnerContentFolder);
 		FileUtils.copyDirectory(learnerContentFolderDir, destDir);

@@ -47,7 +47,7 @@ import org.w3c.dom.Node;
 
 /**
  * Servlet to upload and browse files.<br>
- * 
+ *
  * This servlet accepts 4 commands used to retrieve and create files and folders from a server directory. The allowed
  * commands are:
  * <ul>
@@ -56,20 +56,20 @@ import org.w3c.dom.Node;
  * <li>CreateFolder: Create a new directory under the current folder
  * <li>FileUpload: Send a new file to the server (must be sent with a POST)
  * </ul>
- * 
+ *
  * This servlet has been modified for LAMS to support the lams_www/secure/[design folder] format. The design folder is a
  * folder with a unique numeric name. Whenever a new design is created (using "New" in the client), a new design folder
  * name is assigned. The [design folder] is passed in as DesignFolder and the CurrentFolder is the folder within the
  * DesignFolder (but not the type folder). This support the multi-level folders that are available in the File browser
  * but is different to the LAMSUploadServlet.
- * 
+ *
  * @author Simone Chiaretta (simo@users.sourceforge.net)
  * @author Mitchell Seaton
- * 
+ *
  * @web:servlet name="Connector" load-on-startup = "1"
  * @web.servlet-init-param name = "baseDir" value = "secure"
  * @web.servlet-init-param name = "debug" value = "true"
- * 
+ *
  * @web:servlet-mapping url-pattern="/ckeditor/filemanager/browser/default/connectors/jsp/connector"
  */
 
@@ -87,7 +87,7 @@ public class LAMSConnectorServlet extends HttpServlet {
      * Initialize the servlet.<br>
      * Retrieve from the servlet configuration the "baseDir" which is the root of the file repository:<br>
      * If not specified the value of "/UserFiles/" will be used.
-     * 
+     *
      */
     @Override
     public void init() throws ServletException {
@@ -108,12 +108,12 @@ public class LAMSConnectorServlet extends HttpServlet {
 
     /**
      * Manage the Get requests (GetFolders, GetFoldersAndFiles, CreateFolder).<br>
-     * 
+     *
      * The servlet accepts commands sent in the following format:<br>
      * connector?Command=CommandName&Type=ResourceType&CurrentFolder=FolderPath<br>
      * <br>
      * It execute the command and then return the results to the client in XML format.
-     * 
+     *
      */
     @Override
     public void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
@@ -230,13 +230,13 @@ public class LAMSConnectorServlet extends HttpServlet {
 
     /**
      * Manage the Post requests (FileUpload).<br>
-     * 
+     *
      * The servlet accepts commands sent in the following format:<br>
      * connector?Command=FileUpload&Type=ResourceType&CurrentFolder=FolderPath<br>
      * <br>
      * It store the file (renaming it in case a file with the same name exists) and then return an HTML file with a
      * javascript command in it.
-     * 
+     *
      */
     @Override
     public void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
@@ -297,8 +297,8 @@ public class LAMSConnectorServlet extends HttpServlet {
 	}
     }
 
-    private String createNewFile(String validCurrentDirPath, HttpServletRequest request, StringBuilder retVal, String fileType)
-	    throws FileUploadException, IOException, Exception {
+    private String createNewFile(String validCurrentDirPath, HttpServletRequest request, StringBuilder retVal,
+	    String fileType) throws FileUploadException, IOException, Exception {
 	if (LAMSConnectorServlet.debug) {
 	    log.debug("File save started");
 	}
@@ -323,7 +323,7 @@ public class LAMSConnectorServlet extends HttpServlet {
 	fileNameLong = fileNameLong.replace('\\', '/');
 	String[] pathParts = fileNameLong.split("/");
 	String fileName = pathParts[pathParts.length - 1];
-	
+
 	if (FileUtil.isExtensionAllowed(fileType, fileName)) {
 	    File pathToSave = new File(validCurrentDirPath, fileName);
 
@@ -347,12 +347,12 @@ public class LAMSConnectorServlet extends HttpServlet {
 	    if (LAMSConnectorServlet.debug) {
 		log.debug("File save finished");
 	    }
-	    
+
 	} else {
 	    if (LAMSConnectorServlet.debug) {
 		log.debug("File extension is prohibited for upload " + fileName);
 	    }
-	    
+
 	    //will generate client-side alert message 'Invalid file type'
 	    retVal.append("204");
 	}
@@ -440,7 +440,8 @@ public class LAMSConnectorServlet extends HttpServlet {
 	}
     }
 
-    private Node CreateCommonXml(Document doc, String commandStr, String typeStr, String currentPath, String currentUrl) {
+    private Node CreateCommonXml(Document doc, String commandStr, String typeStr, String currentPath,
+	    String currentUrl) {
 
 	Element root = doc.createElement("Connector");
 	doc.appendChild(root);

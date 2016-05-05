@@ -2,21 +2,21 @@
  * Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
  * =============================================================
  * License Information: http://lamsfoundation.org/licensing/lams/2.0/
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301
  * USA
- * 
+ *
  * http://www.gnu.org/licenses/gpl.txt
  * ****************************************************************
  */
@@ -264,11 +264,13 @@ public class SurveyServiceImpl implements ISurveyService, ToolContentManager, To
 	return map;
     }
 
+    @Override
     public List<Object[]> getUserReflectionsForTablesorter(final Long sessionId, int page, int size, int sorting,
 	    String searchString) {
-	return surveyUserDao.getUserReflectionsForTablesorter(sessionId, page, size, sorting, searchString, coreNotebookService);
+	return surveyUserDao.getUserReflectionsForTablesorter(sessionId, page, size, sorting, searchString,
+		coreNotebookService);
     }
-	    
+
     @Override
     public Long createNotebookEntry(Long sessionId, Integer notebookToolType, String toolSignature, Integer userId,
 	    String entryText) {
@@ -334,8 +336,8 @@ public class SurveyServiceImpl implements ISurveyService, ToolContentManager, To
     }
 
     @Override
-    public List<Object[]> getQuestionAnswersForTablesorter(Long sessionId, Long questionId,
-	    int page, int size, int sorting, String searchString) {
+    public List<Object[]> getQuestionAnswersForTablesorter(Long sessionId, Long questionId, int page, int size,
+	    int sorting, String searchString) {
 
 	return surveyUserDao.getUsersForTablesorter(sessionId, questionId, page, size, sorting, searchString);
     }
@@ -344,7 +346,7 @@ public class SurveyServiceImpl implements ISurveyService, ToolContentManager, To
     public int getCountUsersBySession(final Long sessionId, String searchString) {
 	return surveyUserDao.getCountUsersBySession(sessionId, searchString);
     }
-    
+
     @Override
     public void updateAnswerList(List<SurveyAnswer> answerList) {
 	for (SurveyAnswer ans : answerList) {
@@ -373,7 +375,7 @@ public class SurveyServiceImpl implements ISurveyService, ToolContentManager, To
 	}
 
 	Integer numFreeChoice = null;
-	if ( answerDto.isAppendText() || (answerDto.getType() == SurveyConstants.QUESTION_TYPE_TEXT_ENTRY) ) {
+	if (answerDto.isAppendText() || (answerDto.getType() == SurveyConstants.QUESTION_TYPE_TEXT_ENTRY)) {
 	    numFreeChoice = getCountResponsesBySessionAndQuestion(sessionId, questionUid);
 	    numberAnswers += numFreeChoice;
 	}
@@ -398,7 +400,6 @@ public class SurveyServiceImpl implements ISurveyService, ToolContentManager, To
 
 	return answerDto;
     }
-
 
     @Override
     public List<String> getOpenResponsesForTablesorter(final Long qaSessionId, final Long questionId, int page,
@@ -437,12 +438,12 @@ public class SurveyServiceImpl implements ISurveyService, ToolContentManager, To
     @Override
     public SortedMap<SurveySession, Integer> getStatistic(Long contentId) {
 	SortedMap<SurveySession, Integer> result = new TreeMap<SurveySession, Integer>(new SurveySessionComparator());
-	
+
 	List<Object[]> stats = surveyUserDao.getStatisticsBySession(contentId);
-	for ( Object[] stat : stats) {
+	for (Object[] stat : stats) {
 	    SurveySession session = (SurveySession) stat[0];
 	    Integer numUsers = (Integer) stat[1];
-	    result.put(session,numUsers);
+	    result.put(session, numUsers);
 	}
 	return result;
 
@@ -496,7 +497,7 @@ public class SurveyServiceImpl implements ISurveyService, ToolContentManager, To
 
     /**
      * Creates data for export methods. Suitable both for single/multiple users
-     * 
+     *
      * @param sessionToUsersMap
      *            map containing all session to users pairs that require data to be exported
      * @return
@@ -1124,16 +1125,16 @@ public class SurveyServiceImpl implements ISurveyService, ToolContentManager, To
 
     /**
      * Used by the Rest calls to create content.
-     * 
+     *
      * Mandatory fields in toolContentJSON: title, instructions, questions. Optional fields are lockWhenFinished
      * (default true), showOnePage (default true), notifyTeachersOnAnswerSumbit (default false), showOtherUsersAnswers
      * (default false), reflectOnActivity, reflectInstructions, submissionDeadline
-     * 
+     *
      * Questions must contain a JSONArray of JSONObject objects, which have the following mandatory fields:
      * questionText, type (1=one answer,2=multiple answers,3=free text entry) and answers. Answers is a JSONArray of
      * strings, which are the answer text. A question may also have the optional fields: allowOtherTextEntry (default
      * false), required (default true)
-     * 
+     *
      * There should be at least one question object in the Questions array and at least one option in the Options array.
      */
     @Override

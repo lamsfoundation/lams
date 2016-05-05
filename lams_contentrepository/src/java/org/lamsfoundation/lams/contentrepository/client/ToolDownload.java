@@ -2,21 +2,21 @@
  * Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
  * =============================================================
  * License Information: http://lamsfoundation.org/licensing/lams/2.0/
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License version 2.0 
+ * it under the terms of the GNU General Public License version 2.0
  * as published by the Free Software Foundation.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301
  * USA
- * 
+ *
  * http://www.gnu.org/licenses/gpl.txt
  * ****************************************************************
  */
@@ -38,13 +38,13 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
  * The servlet accesses the content repository via a tool's ToolContentHandler implementation. It looks for the bean
  * that implements IToolContentHandler in the web based Spring context. The name of the bean is specified using the
  * "toolContentHandlerBeanName" parameter in the servlet definition in web.xml.
- * 
+ *
  * If you do not have a ToolContentHandler implementation then this servlet will not work. If you need to set up the
  * content repository access differently to the implementation in the Tool Content Handler, then derive a new concrete
  * class from the Download servlet.
  * <p>
  * Sample servlet definition:<BR>
- * 
+ *
  * <pre>
  *  &lt;servlet&gt;
  *      &lt;description&gt;Noticeboard Instructions Download&lt;/description&gt;
@@ -58,20 +58,20 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
  *      &lt;load-on-startup&gt;3&lt;/load-on-startup&gt;
  *  &lt;/servlet&gt;
  * </pre>
- * 
+ *
  * <p>
  * Sample mapping definition:<BR>
- * 
+ *
  * <pre>
  * 	&lt;servlet-mapping&gt;
  * 	&lt;servlet-name&gt;download&lt;/servlet-name&gt;
  * 	&lt;url-pattern&gt;/download/*&lt;/url-pattern&gt;
  * 	&lt;/servlet-mapping&gt;
  * </pre>
- * 
+ *
  * <p>
  * Sample HTML calls:<BR>
- * 
+ *
  * <pre>
  *  &lt;table&gt;
  *  &lt;tr&gt;
@@ -85,7 +85,7 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
  *   &lt;td&gt;&lt;a href=&quot;/lams/tool/lafrum11/download/?uuid=19&amp;preferDownload=true&quot;&gt;Download&lt;/a&gt;&lt;/td&gt;
  *  &lt;/tr&gt;
  * </pre>
- * 
+ *
  * <p>
  * The launchInstructionsPopup() method is defined in common.js, available as
  * http://.../lams/includes/javascript/common.js.
@@ -94,7 +94,7 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
  * jsps/authoring/forum/instructions.jsp calls the servlet and includes/header.jsp loads the common.js file.
  * <p>
  * For more details on the request parameters recognised by the ToolDownload servlet, see the parent class (Download).
- * 
+ *
  * @author Fiona Malikoff
  * @see org.lamsfoundation.lams.contentrepository.client.IToolContentHandler
  * @see org.lamsfoundation.lams.contentrepository.client.Download
@@ -106,7 +106,7 @@ public class ToolDownload extends Download {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.lamsfoundation.lams.contentrepository.client.Download#getTicket()
      */
     @Override
@@ -124,7 +124,7 @@ public class ToolDownload extends Download {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.lamsfoundation.lams.contentrepository.client.Download#getRepositoryService()
      */
     @Override

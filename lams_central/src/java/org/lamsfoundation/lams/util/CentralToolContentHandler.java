@@ -28,41 +28,50 @@ import org.lamsfoundation.lams.contentrepository.client.ToolContentHandler;
 
 /**
  * Simple client for accessing the content repository.
- * 
+ *
  * @author Fiona Malikoff
  */
 public class CentralToolContentHandler extends ToolContentHandler {
 
-	private static String repositoryWorkspaceName = "centralworkspace";
+    private static String repositoryWorkspaceName = "centralworkspace";
     private static String repositoryUser = "central";
-    private static char[] repositoryId = {'l','a','m','s','-','c','e','n','t','r','a','l'};
+    private static char[] repositoryId = { 'l', 'a', 'm', 's', '-', 'c', 'e', 'n', 't', 'r', 'a', 'l' };
 
     /**
-     * 
+     *
      */
     public CentralToolContentHandler() {
-        super();
+	super();
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see org.lamsfoundation.lams.contentrepository.client.ToolContentHandler#getRepositoryWorkspaceName()
      */
+    @Override
     public String getRepositoryWorkspaceName() {
-        return repositoryWorkspaceName;
+	return repositoryWorkspaceName;
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see org.lamsfoundation.lams.contentrepository.client.ToolContentHandler#getRepositoryUser()
      */
+    @Override
     public String getRepositoryUser() {
-        return repositoryUser;
+	return repositoryUser;
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see org.lamsfoundation.lams.contentrepository.client.ToolContentHandler#getRepositoryId()
      */
+    @Override
     public char[] getRepositoryId() {
-        return repositoryId;
+	return repositoryId;
     }
 
 }

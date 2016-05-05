@@ -2,21 +2,21 @@
  * Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
  * =============================================================
  * License Information: http://lamsfoundation.org/licensing/lams/2.0/
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License version 2.0 
+ * it under the terms of the GNU General Public License version 2.0
  * as published by the Free Software Foundation.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301
  * USA
- * 
+ *
  * http://www.gnu.org/licenses/gpl.txt
  * ****************************************************************
  */
@@ -36,17 +36,17 @@ public class MindmapUserDTO implements Comparable {
     public boolean finishedActivity;
     public NotebookEntryDTO entryDTO;
     public Long entryUID;
-	
+
     public MindmapUserDTO(MindmapUser user, NotebookEntry entry) {
-		this.uid = user.getUid();
-		this.loginName = user.getLoginName();
-		this.firstName = user.getFirstName();
-		this.lastName = user.getLastName();
-		this.finishedActivity = user.isFinishedActivity();
-		this.entryUID = user.getEntryUID();
-		this.entryDTO = new NotebookEntryDTO(entry);
+	this.uid = user.getUid();
+	this.loginName = user.getLoginName();
+	this.firstName = user.getFirstName();
+	this.lastName = user.getLastName();
+	this.finishedActivity = user.isFinishedActivity();
+	this.entryUID = user.getEntryUID();
+	this.entryDTO = new NotebookEntryDTO(entry);
     }
-    
+
     public MindmapUserDTO(MindmapUser user) {
 	this.uid = user.getUid();
 	this.loginName = user.getLoginName();
@@ -54,7 +54,8 @@ public class MindmapUserDTO implements Comparable {
 	this.lastName = user.getLastName();
 	this.finishedActivity = user.isFinishedActivity();
     }
-    
+
+    @Override
     public int compareTo(Object o) {
 	int returnValue;
 	MindmapUserDTO toUser = (MindmapUserDTO) o;
@@ -104,11 +105,11 @@ public class MindmapUserDTO implements Comparable {
     public void setFinishedActivity(boolean finishedActivity) {
 	this.finishedActivity = finishedActivity;
     }
-    
+
     public void setEntryDTO(NotebookEntryDTO entryDTO) {
 	this.entryDTO = entryDTO;
     }
-    
+
     public NotebookEntryDTO getEntryDTO() {
 	return entryDTO;
     }

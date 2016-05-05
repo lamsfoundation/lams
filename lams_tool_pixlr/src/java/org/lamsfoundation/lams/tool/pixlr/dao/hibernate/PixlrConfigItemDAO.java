@@ -11,8 +11,10 @@ public class PixlrConfigItemDAO extends BaseDAO implements IPixlrConfigItemDAO {
     private static final String LOAD_CONFIG_ITEM_BY_KEY = "from PixlrConfigItem configuration"
 	    + " where configuration.configKey=:key";
 
+    @Override
     public PixlrConfigItem getConfigItemByKey(final String configKey) {
 	return (PixlrConfigItem) getHibernateTemplate().execute(new HibernateCallback() {
+	    @Override
 	    public Object doInHibernate(Session session) throws HibernateException {
 		return session.createQuery(LOAD_CONFIG_ITEM_BY_KEY).setString("key", configKey).uniqueResult();
 	    }
@@ -20,6 +22,7 @@ public class PixlrConfigItemDAO extends BaseDAO implements IPixlrConfigItemDAO {
 
     }
 
+    @Override
     public void saveOrUpdate(PixlrConfigItem mdlForumConfigItem) {
 	this.getHibernateTemplate().saveOrUpdate(mdlForumConfigItem);
 	this.getHibernateTemplate().flush();

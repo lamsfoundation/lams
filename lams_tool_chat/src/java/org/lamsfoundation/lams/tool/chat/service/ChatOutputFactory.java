@@ -1,23 +1,23 @@
-/**************************************************************** 
- * Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org) 
- * ============================================================= 
- * License Information: http://lamsfoundation.org/licensing/lams/2.0/ 
- * 
- * This program is free software; you can redistribute it and/or modify 
- * it under the terms of the GNU General Public License version 2.0 
- * as published by the Free Software Foundation. 
- * 
- * This program is distributed in the hope that it will be useful, 
- * but WITHOUT ANY WARRANTY; without even the implied warranty of 
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the 
- * GNU General Public License for more details. 
- * 
- * You should have received a copy of the GNU General Public License 
- * along with this program; if not, write to the Free Software 
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 * USA 
- * 
- * http://www.gnu.org/licenses/gpl.txt 
- * **************************************************************** 
+/****************************************************************
+ * Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
+ * =============================================================
+ * License Information: http://lamsfoundation.org/licensing/lams/2.0/
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License version 2.0
+ * as published by the Free Software Foundation.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 * USA
+ *
+ * http://www.gnu.org/licenses/gpl.txt
+ * ****************************************************************
  */
 
 /* $Id$ */
@@ -42,7 +42,7 @@ import org.lamsfoundation.lams.tool.exception.ToolException;
 
 /**
  * Output factory for Chat tool. Currently it provides only one type of output - all messages that a user sent.
- * 
+ *
  * @author Marcin Cieslak
  */
 public class ChatOutputFactory extends OutputFactory {
@@ -51,26 +51,26 @@ public class ChatOutputFactory extends OutputFactory {
      * {@inheritDoc}
      */
     @Override
-    public SortedMap<String, ToolOutputDefinition> getToolOutputDefinitions(Object toolContentObject, int definitionType)
-	    throws ToolException {
+    public SortedMap<String, ToolOutputDefinition> getToolOutputDefinitions(Object toolContentObject,
+	    int definitionType) throws ToolException {
 	SortedMap<String, ToolOutputDefinition> definitionMap = new TreeMap<String, ToolOutputDefinition>();
 	Class stringArrayClass = new String[] {}.getClass();
 	switch (definitionType) {
-	case ToolOutputDefinition.DATA_OUTPUT_DEFINITION_TYPE_CONDITION:
-	    if (toolContentObject != null) {
-		ToolOutputDefinition chatMessagesDefinition = buildComplexOutputDefinition(
-			ChatConstants.USER_MESSAGES_DEFINITION_NAME, stringArrayClass);
-		Chat chat = (Chat) toolContentObject;
-		// adding all existing conditions
-		chatMessagesDefinition.setDefaultConditions(new ArrayList<BranchCondition>(chat.getConditions()));
-		chatMessagesDefinition.setShowConditionNameOnly(true);
-		definitionMap.put(ChatConstants.USER_MESSAGES_DEFINITION_NAME, chatMessagesDefinition);
-	    }
-	case ToolOutputDefinition.DATA_OUTPUT_DEFINITION_TYPE_DATA_FLOW:
-	    ToolOutputDefinition allUsersMessagesDefinition = buildComplexOutputDefinition(
-		    ChatConstants.ALL_USERS_MESSAGES_DEFINITION_NAME, stringArrayClass);
-	    definitionMap.put(ChatConstants.ALL_USERS_MESSAGES_DEFINITION_NAME, allUsersMessagesDefinition);
-	    break;
+	    case ToolOutputDefinition.DATA_OUTPUT_DEFINITION_TYPE_CONDITION:
+		if (toolContentObject != null) {
+		    ToolOutputDefinition chatMessagesDefinition = buildComplexOutputDefinition(
+			    ChatConstants.USER_MESSAGES_DEFINITION_NAME, stringArrayClass);
+		    Chat chat = (Chat) toolContentObject;
+		    // adding all existing conditions
+		    chatMessagesDefinition.setDefaultConditions(new ArrayList<BranchCondition>(chat.getConditions()));
+		    chatMessagesDefinition.setShowConditionNameOnly(true);
+		    definitionMap.put(ChatConstants.USER_MESSAGES_DEFINITION_NAME, chatMessagesDefinition);
+		}
+	    case ToolOutputDefinition.DATA_OUTPUT_DEFINITION_TYPE_DATA_FLOW:
+		ToolOutputDefinition allUsersMessagesDefinition = buildComplexOutputDefinition(
+			ChatConstants.ALL_USERS_MESSAGES_DEFINITION_NAME, stringArrayClass);
+		definitionMap.put(ChatConstants.ALL_USERS_MESSAGES_DEFINITION_NAME, allUsersMessagesDefinition);
+		break;
 	}
 
 	return definitionMap;
@@ -78,10 +78,10 @@ public class ChatOutputFactory extends OutputFactory {
 
     /**
      * Follows {@link ChatService#getToolOutput(List, Long, Long)}.
-     * 
+     *
      */
-    public SortedMap<String, ToolOutput> getToolOutput(List<String> names, IChatService chatService,
-	    Long toolSessionId, Long learnerId) {
+    public SortedMap<String, ToolOutput> getToolOutput(List<String> names, IChatService chatService, Long toolSessionId,
+	    Long learnerId) {
 
 	TreeMap<String, ToolOutput> outputs = new TreeMap<String, ToolOutput>();
 	// tool output cache
@@ -175,16 +175,17 @@ public class ChatOutputFactory extends OutputFactory {
 
     /**
      * Creates a default condition so teachers know how to use complex conditions for this tool.
-     * 
+     *
      * @param chat
-     *                content of the tool
+     *            content of the tool
      * @return default chat condition
      */
     protected ChatCondition createDefaultUserMessagesCondition(Chat chat) {
-	String name = buildConditionName(ChatConstants.USER_MESSAGES_DEFINITION_NAME, chat.getToolContentId()
-		.toString());
+	String name = buildConditionName(ChatConstants.USER_MESSAGES_DEFINITION_NAME,
+		chat.getToolContentId().toString());
 	// Default condition checks if messages contain word "LAMS"
-	return new ChatCondition(null, null, 1, name, getI18NText(
-		ChatConstants.USER_MESSAGES_DEFAULT_CONDITION_DISPLAY_NAME_KEY, false), "LAMS", null, null, null);
+	return new ChatCondition(null, null, 1, name,
+		getI18NText(ChatConstants.USER_MESSAGES_DEFAULT_CONDITION_DISPLAY_NAME_KEY, false), "LAMS", null, null,
+		null);
     }
 }

@@ -2,21 +2,21 @@
  * Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
  * =============================================================
  * License Information: http://lamsfoundation.org/licensing/lams/2.0/
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License version 2.0 
+ * it under the terms of the GNU General Public License version 2.0
  * as published by the Free Software Foundation.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301
  * USA
- * 
+ *
  * http://www.gnu.org/licenses/gpl.txt
  * ****************************************************************
  */
@@ -34,11 +34,19 @@ import org.lamsfoundation.lams.tool.commonCartridge.util.CommonCartridgeWebUtils
 
 /**
  * List contains following element: <br>
- * 
- * <li>session_id</li> <li>session_name</li> <li>CommonCartridgeItem.uid</li> <li>CommonCartridgeItem.item_type</li> <li>
- * CommonCartridgeItem.create_by_author</li> <li>CommonCartridgeItem.is_hide</li> <li>CommonCartridgeItem.title</li> <li>
- * User.login_name</li> <li>count(commonCartridge_item_uid)</li>
- * 
+ *
+ * <li>session_id</li>
+ * <li>session_name</li>
+ * <li>CommonCartridgeItem.uid</li>
+ * <li>CommonCartridgeItem.item_type</li>
+ * <li>
+ * CommonCartridgeItem.create_by_author</li>
+ * <li>CommonCartridgeItem.is_hide</li>
+ * <li>CommonCartridgeItem.title</li>
+ * <li>
+ * User.login_name</li>
+ * <li>count(commonCartridge_item_uid)</li>
+ *
  * @author Andrey Balan
  */
 public class Summary {
@@ -69,9 +77,9 @@ public class Summary {
 
     /**
      * Contruction method for monitoring summary function.
-     * 
+     *
      * <B>Don't not set isInitGroup and viewNumber fields</B>
-     * 
+     *
      * @param sessionName
      * @param item
      * @param isInitGroup
@@ -90,15 +98,16 @@ public class Summary {
 	    this.fileName = item.getFileName();
 	    this.fileUuid = item.getFileUuid();
 	    this.fileVersionId = item.getFileVersionId();
-	} else
+	} else {
 	    this.itemUid = new Long(-1);
+	}
     }
 
     /**
      * Contruction method for export profolio function.
-     * 
+     *
      * <B>Don't not set sessionId and viewNumber fields</B>
-     * 
+     *
      * @param sessionName
      * @param item
      * @param isInitGroup
@@ -122,8 +131,9 @@ public class Summary {
 		    .getItemInstructions()) {
 		itemInstructions.add(instruction.getDescription());
 	    }
-	} else
+	} else {
 	    this.itemUid = new Long(-1);
+	}
 	this.isInitGroup = isInitGroup;
     }
 

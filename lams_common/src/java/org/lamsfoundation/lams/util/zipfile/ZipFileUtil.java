@@ -2,21 +2,21 @@
  * Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
  * =============================================================
  * License Information: http://lamsfoundation.org/licensing/lams/2.0/
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License version 2.0 
+ * it under the terms of the GNU General Public License version 2.0
  * as published by the Free Software Foundation.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301
  * USA
- * 
+ *
  * http://www.gnu.org/licenses/gpl.txt
  * ****************************************************************
  */
@@ -41,7 +41,7 @@ import org.lamsfoundation.lams.util.FileUtilException;
 
 /**
  * Handles zip files - expands them to a temporary directory, and deletes them on request.
- * 
+ *
  * @author Fiona Malikoff
  */
 public class ZipFileUtil {
@@ -52,15 +52,15 @@ public class ZipFileUtil {
 
     /**
      * Given a zip file as an input stream and the name of the zip file, expand the zip file to a temporary directory.
-     * 
+     *
      * The directory will be in the directory specified in the system property "java.io.tmpdir". This will normally be
      * the o/s level temporary directory. e.g. /tmp or c:/temp.
-     * 
+     *
      * A zip file name.zip will be expanded to something like lamszip_1212121212_name. It tries 100 different names,
      * based on the current time in milliseconds and a counter. If it hasn't found a unique name by then, it fails. So
      * potentially, it will fail if the system has to expand more than 100 zip files in a millisecond, where the zip
      * files all have the same name. Want to bet on those chances?
-     * 
+     *
      * @param is
      * @param zipFileName
      * @throws ZipFileUtilException
@@ -78,7 +78,7 @@ public class ZipFileUtil {
     /**
      * Create a temporary directory in which the zip file contents will go. This method is protected (rather than
      * private) so that it may be called by the junit tests for this class.
-     * 
+     *
      * @param zipFileName
      * @return name of the new directory
      * @throws ZipFileUtilException
@@ -190,7 +190,7 @@ public class ZipFileUtil {
     /**
      * Delete a temporary directory. Checks that the directory name supplied looks like a temporary directory (ie is in
      * the java tmp directory and starts with lamszip_)
-     * 
+     *
      * @param directoryName
      * @return false if directoryName == null or one or more of the files/directories could not be deleted. See log for
      *         list of not deleted files.
@@ -201,10 +201,9 @@ public class ZipFileUtil {
 	if (directoryName != null) {
 	    String tempSysDirNamePrefix = System.getProperty("java.io.tmpdir") + File.separator + ZipFileUtil.prefix;
 	    if (!directoryName.startsWith(tempSysDirNamePrefix)) {
-		throw new ZipFileUtilException(
-			"Invalid directory delete request. Received request to delete directory " + directoryName
-				+ " but name doesn't start with the temporary directory location ("
-				+ tempSysDirNamePrefix + "). Not deleting directory");
+		throw new ZipFileUtilException("Invalid directory delete request. Received request to delete directory "
+			+ directoryName + " but name doesn't start with the temporary directory location ("
+			+ tempSysDirNamePrefix + "). Not deleting directory");
 	    }
 
 	    return FileUtil.deleteDirectory(new File(directoryName));
@@ -223,7 +222,7 @@ public class ZipFileUtil {
     /**
      * Creates a ZIP file and places it in the current working directory. The zip file is compressed at the default
      * compression level of the Deflater.
-     * 
+     *
      * @param zipFileName
      *            the filename of the zip to create
      * @param directoryToZip
@@ -247,8 +246,8 @@ public class ZipFileUtil {
 											   // contain .zip extension
 
 	try {
-	    ZipOutputStream out = new ZipOutputStream(new BufferedOutputStream(new FileOutputStream(
-		    fileNameOfZipToCreate)));
+	    ZipOutputStream out = new ZipOutputStream(
+		    new BufferedOutputStream(new FileOutputStream(fileNameOfZipToCreate)));
 	    File directory = new File(directoryToZip);
 	    if (!directory.exists()) {
 		throw new ZipFileUtilException("The specified directory " + directoryToZip + " does not exist");
@@ -258,8 +257,8 @@ public class ZipFileUtil {
 	    ZipFileUtil.zipFiles(out, files, directory.getCanonicalPath());
 	    out.close();
 	} catch (IOException e1) {
-	    throw new ZipFileUtilException("An error has occurred while trying to zip the files. Error message is: "
-		    + e1.getMessage(), e1);
+	    throw new ZipFileUtilException(
+		    "An error has occurred while trying to zip the files. Error message is: " + e1.getMessage(), e1);
 	}
 
 	return fileNameOfZipToCreate;
@@ -268,7 +267,7 @@ public class ZipFileUtil {
     /**
      * Creates a ZIP file and places it in the specified directory. The zip file is compressed at the default
      * compression level of the Deflater.
-     * 
+     *
      * @param zipFileName
      *            the filename of the zip to create
      * @param directoryToZip
@@ -288,8 +287,8 @@ public class ZipFileUtil {
 	    try {
 		FileUtil.createDirectory(directoryToPlaceZip);
 	    } catch (FileUtilException e) {
-		throw new ZipFileUtilException("The temporary directory to place the zip file could be not created: "
-			+ e.getMessage(), e);
+		throw new ZipFileUtilException(
+			"The temporary directory to place the zip file could be not created: " + e.getMessage(), e);
 	    }
 	}
 
@@ -300,8 +299,8 @@ public class ZipFileUtil {
 	String fileNameOfZipToCreate = directoryToPlaceZip + File.separator + zipFile;
 
 	try {
-	    ZipOutputStream out = new ZipOutputStream(new BufferedOutputStream(new FileOutputStream(
-		    fileNameOfZipToCreate)));
+	    ZipOutputStream out = new ZipOutputStream(
+		    new BufferedOutputStream(new FileOutputStream(fileNameOfZipToCreate)));
 
 	    File directory = new File(directoryToZip);
 	    if (!directory.exists()) {
@@ -312,8 +311,8 @@ public class ZipFileUtil {
 	    ZipFileUtil.zipFiles(out, files, directory.getCanonicalPath());
 	    out.close();
 	} catch (IOException e1) {
-	    throw new ZipFileUtilException("An error has occurred while trying to zip the files. Error message is: "
-		    + e1.getMessage(), e1);
+	    throw new ZipFileUtilException(
+		    "An error has occurred while trying to zip the files. Error message is: " + e1.getMessage(), e1);
 	}
 
 	return fileNameOfZipToCreate;
@@ -357,15 +356,15 @@ public class ZipFileUtil {
 
 	    }
 	} catch (IOException e) {
-	    throw new ZipFileUtilException("An error has occurred while trying to zip the files. Error message is: "
-		    + e.getMessage(), e);
+	    throw new ZipFileUtilException(
+		    "An error has occurred while trying to zip the files. Error message is: " + e.getMessage(), e);
 	}
     }
 
     /**
      * Helper method used to cut off the root directory path from the absolute path of the file. We want the relative
      * path so that when zipped up, the upper directories arent shown.
-     * 
+     *
      * @param absoluteFilePath
      *            the absolute pathname of the file
      * @param rootDirPath

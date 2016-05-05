@@ -30,10 +30,10 @@ import org.lamsfoundation.lams.web.TextSearchActionForm;
 
 /**
  * A text search form with additional parameters for Forum needs.
- * 
+ *
  * @struts.form name="forumConditionForm"
  * @author Marcin Cieslak
- * 
+ *
  */
 public class ForumConditionForm extends TextSearchActionForm {
     /**
@@ -98,7 +98,7 @@ public class ForumConditionForm extends TextSearchActionForm {
     /**
      * Fills a new ForumCondition with data contained in this form. Note that some cruicial data is missing, so the
      * condition is NOT complete.
-     * 
+     *
      * @return created condition
      */
     public ForumCondition extractCondition() {

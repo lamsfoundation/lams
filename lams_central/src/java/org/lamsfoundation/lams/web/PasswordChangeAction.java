@@ -2,21 +2,21 @@
  * Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
  * =============================================================
  * License Information: http://lamsfoundation.org/licensing/lams/2.0/
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License version 2.0 
+ * it under the terms of the GNU General Public License version 2.0
  * as published by the Free Software Foundation.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301
  * USA
- * 
+ *
  * http://www.gnu.org/licenses/gpl.txt
  * ****************************************************************
  */
@@ -44,10 +44,10 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
 
 /**
  * @author Fei Yang
- * 
+ *
  * @struts:action path="/passwordChanged" name="PasswordChangeActionForm" scope="request" input=".passwordChange"
  *                validate="false"
- * 
+ *
  * @struts:action-forward name="okay" path="/index.do?state=active&amp;tab=passwordChanged"
  * @struts:action-forward name="cancelled" path="/index.do?state=active&amp;tab=profile"
  * @struts:action-forward name="errors" path="/index.do?state=active&amp;tab=password"
@@ -65,8 +65,9 @@ public class PasswordChangeAction extends Action {
      *            The HTTP request we are processing
      * @param response
      *            The HTTP response we are creating
-     * 
+     *
      */
+    @Override
     public ActionForward execute(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) throws Exception {
 	// -- isCancelled?
@@ -93,8 +94,8 @@ public class PasswordChangeAction extends Action {
 		} else {
 		    // WebApplicationContext ctx =
 		    // WebApplicationContextUtils.getWebApplicationContext(request.getSession(true).getServletContext());
-		    WebApplicationContext ctx = WebApplicationContextUtils.getWebApplicationContext(getServlet()
-			    .getServletContext());
+		    WebApplicationContext ctx = WebApplicationContextUtils
+			    .getWebApplicationContext(getServlet().getServletContext());
 		    UserManagementService service = (UserManagementService) ctx.getBean("userManagementService");
 
 		    User user = service.getUserByLogin(login);

@@ -2,21 +2,21 @@
  * Copyright (C) 2006 LAMS Foundation (http://lamsfoundation.org)
  * =============================================================
  * License Information: http://lamsfoundation.org/licensing/lams/2.0/
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License version 2.0 
+ * it under the terms of the GNU General Public License version 2.0
  * as published by the Free Software Foundation.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301
  * USA
- * 
+ *
  * http://www.gnu.org/licenses/gpl.txt
  * ****************************************************************
  */
@@ -47,13 +47,13 @@ public class TestSuite implements Runnable {
     private LearnerTest learnerTest;
     private boolean finished = false;
 
-    public TestSuite(TestManager manager, int suiteIndex, String targetServer, String contextRoot,
-	    AdminTest adminTest, AuthorTest authorTest, MonitorTest monitorTest, LearnerTest learnerTest) {
+    public TestSuite(TestManager manager, int suiteIndex, String targetServer, String contextRoot, AdminTest adminTest,
+	    AuthorTest authorTest, MonitorTest monitorTest, LearnerTest learnerTest) {
 	this.manager = manager;
 	this.suiteIndex = suiteIndex;
 	this.targetServer = targetServer == null ? "localhost" : targetServer;
 	this.contextRoot = (contextRoot == null) || contextRoot.equals("/") ? "" : contextRoot;
-	
+
 	this.adminTest = adminTest;
 	adminTest.setTestSuite(this);
 	this.authorTest = authorTest;

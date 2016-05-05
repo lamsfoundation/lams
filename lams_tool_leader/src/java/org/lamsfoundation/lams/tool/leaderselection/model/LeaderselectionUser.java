@@ -2,21 +2,21 @@
  * Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
  * =============================================================
  * License Information: http://lamsfoundation.org/licensing/lams/2.0/
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301
  * USA
- * 
+ *
  * http://www.gnu.org/licenses/gpl.txt
  * ****************************************************************
  */
@@ -27,18 +27,18 @@ package org.lamsfoundation.lams.tool.leaderselection.model;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 
 /**
- * 
+ *
  * Caches the user details. This allows the tool to be more efficient at displaying user names but means that when
  * people's names change, they won't change in the "old" tool data.
- * 
+ *
  * @hibernate.class table="tl_lalead11_user"
  */
 
 public class LeaderselectionUser implements java.io.Serializable {
 
     /**
-	 * 
-	 */
+     * 
+     */
     private static final long serialVersionUID = -3701664859818409197L;
 
     // Fields
@@ -94,7 +94,7 @@ public class LeaderselectionUser implements java.io.Serializable {
 
     /**
      * @hibernate.property column="user_id" length="20"
-     * 
+     *
      */
     public Long getUserId() {
 	return this.userId;
@@ -106,7 +106,7 @@ public class LeaderselectionUser implements java.io.Serializable {
 
     /**
      * @hibernate.property column="last_name" length="255"
-     * 
+     *
      */
     public String getLastName() {
 	return this.lastName;
@@ -118,7 +118,7 @@ public class LeaderselectionUser implements java.io.Serializable {
 
     /**
      * @hibernate.property column="login_name" length="255"
-     * 
+     *
      */
     public String getLoginName() {
 	return loginName;
@@ -130,7 +130,7 @@ public class LeaderselectionUser implements java.io.Serializable {
 
     /**
      * @hibernate.property column="first_name" length="255"
-     * 
+     *
      */
     public String getFirstName() {
 	return this.firstName;
@@ -154,7 +154,7 @@ public class LeaderselectionUser implements java.io.Serializable {
     /**
      * @hibernate.many-to-one not-null="true"
      * @hibernate.column name="leaderselection_session_uid"
-     * 
+     *
      */
     public LeaderselectionSession getLeaderselectionSession() {
 	return this.leaderselectionSession;
@@ -166,9 +166,10 @@ public class LeaderselectionUser implements java.io.Serializable {
 
     /**
      * toString
-     * 
+     *
      * @return String
      */
+    @Override
     public String toString() {
 	StringBuffer buffer = new StringBuffer();
 
@@ -179,19 +180,24 @@ public class LeaderselectionUser implements java.io.Serializable {
 	return buffer.toString();
     }
 
+    @Override
     public boolean equals(Object other) {
-	if ((this == other))
+	if ((this == other)) {
 	    return true;
-	if ((other == null))
+	}
+	if ((other == null)) {
 	    return false;
-	if (!(other instanceof LeaderselectionUser))
+	}
+	if (!(other instanceof LeaderselectionUser)) {
 	    return false;
+	}
 	LeaderselectionUser castOther = (LeaderselectionUser) other;
 
-	return ((this.getUid() == castOther.getUid()) || (this.getUid() != null && castOther.getUid() != null && this
-		.getUid().equals(castOther.getUid())));
+	return ((this.getUid() == castOther.getUid())
+		|| (this.getUid() != null && castOther.getUid() != null && this.getUid().equals(castOther.getUid())));
     }
 
+    @Override
     public int hashCode() {
 	int result = 17;
 	result = 37 * result + (getUid() == null ? 0 : this.getUid().hashCode());

@@ -23,9 +23,9 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
 
 /**
  * Edit a learning design (Edit-On-The-Fly)
- * 
+ *
  * @author Mitch Seaton
- * 
+ *
  * @web:servlet name="editLD"
  * @web:servlet-mapping url-pattern="/eof/authoring/editLearningDesign"
  */
@@ -38,7 +38,8 @@ public class EditOnFlyServlet extends HttpServlet {
     private static IAuditService auditService;
 
     @Override
-    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+    protected void doGet(HttpServletRequest request, HttpServletResponse response)
+	    throws ServletException, IOException {
 	String returnPacket = null;
 
 	// Set to expire far in the past.
@@ -65,8 +66,8 @@ public class EditOnFlyServlet extends HttpServlet {
 	    // Don't want exceptions flowing back to Flash if we can help it.
 
 	    FlashMessage flashMessage = FlashMessage.getExceptionOccured(
-		    IAuthoringService.START_EDIT_ON_FLY_MESSAGE_KEY, e.getMessage() == null ? e.getClass().getName()
-			    : e.getMessage());
+		    IAuthoringService.START_EDIT_ON_FLY_MESSAGE_KEY,
+		    e.getMessage() == null ? e.getClass().getName() : e.getMessage());
 
 	    writer.write(flashMessage.serializeMessage());
 
@@ -80,8 +81,8 @@ public class EditOnFlyServlet extends HttpServlet {
      * @see javax.servlet.http.HttpServlet#doPost(HttpServletRequest, HttpServletResponse)
      */
     @Override
-    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException,
-	    IOException {
+    protected void doPost(HttpServletRequest request, HttpServletResponse response)
+	    throws ServletException, IOException {
 	doGet(request, response);
 
     }
@@ -127,8 +128,8 @@ public class EditOnFlyServlet extends HttpServlet {
 
     private IAuditService getAuditService() {
 	if (EditOnFlyServlet.auditService == null) {
-	    WebApplicationContext ctx = WebApplicationContextUtils.getRequiredWebApplicationContext(this
-		    .getServletContext());
+	    WebApplicationContext ctx = WebApplicationContextUtils
+		    .getRequiredWebApplicationContext(this.getServletContext());
 	    EditOnFlyServlet.auditService = (IAuditService) ctx.getBean("auditService");
 	}
 	return EditOnFlyServlet.auditService;

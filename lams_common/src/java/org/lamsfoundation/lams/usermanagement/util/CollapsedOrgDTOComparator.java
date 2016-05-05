@@ -18,9 +18,9 @@
  *
  * http://www.gnu.org/licenses/gpl.txt
  * ****************************************************************
- */ 
- 
-/* $Id$ */ 
+ */
+
+/* $Id$ */
 package org.lamsfoundation.lams.usermanagement.util;
 
 import java.util.Comparator;

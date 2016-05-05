@@ -2,21 +2,21 @@
  * Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
  * =============================================================
  * License Information: http://lamsfoundation.org/licensing/lams/2.0/
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License version 2.0 
+ * it under the terms of the GNU General Public License version 2.0
  * as published by the Free Software Foundation.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301
  * USA
- * 
+ *
  * http://www.gnu.org/licenses/gpl.txt
  * ****************************************************************
  */
@@ -103,7 +103,8 @@ public class SystemTool implements Serializable {
     /** full constructor */
     public SystemTool(Long systemToolId, Integer activityTypeId, String displayName, String description,
 	    String learnerUrl, String learnerPreviewUrl, String learnerProgressUrl, String exportPortfolioLearnerUrl,
-	    String exportPortfolioClassUrl, String monitorUrl, String contributeUrl, String helpUrl, Date createDateTime) {
+	    String exportPortfolioClassUrl, String monitorUrl, String contributeUrl, String helpUrl,
+	    Date createDateTime) {
 	this.systemToolId = systemToolId;
 	this.activityTypeId = activityTypeId;
 	toolDisplayName = displayName;
@@ -206,7 +207,7 @@ public class SystemTool implements Serializable {
 
     /**
      * @param helpUrl
-     *                The helpUrl to set.
+     *            The helpUrl to set.
      */
     public void setAdminUrl(String adminUrl) {
 	this.adminUrl = adminUrl;
@@ -221,7 +222,7 @@ public class SystemTool implements Serializable {
 
     /**
      * @param createDateTime
-     *                The createDateTime to set.
+     *            The createDateTime to set.
      */
     public void setCreateDateTime(Date createDateTime) {
 	this.createDateTime = createDateTime;
@@ -244,7 +245,7 @@ public class SystemTool implements Serializable {
 
     /**
      * @param contributeUrl
-     *                The contributUrl to set.
+     *            The contributUrl to set.
      */
     public void setContributeUrl(String contributeUrl) {
 	this.contributeUrl = contributeUrl;
@@ -259,7 +260,7 @@ public class SystemTool implements Serializable {
 
     /**
      * @param monitorUrl
-     *                The monitorUrl to set.
+     *            The monitorUrl to set.
      */
     public void setMonitorUrl(String monitorUrl) {
 	this.monitorUrl = monitorUrl;
@@ -274,7 +275,7 @@ public class SystemTool implements Serializable {
 
     /**
      * @param helpUrl
-     *                The helpUrl to set.
+     *            The helpUrl to set.
      */
     public void setHelpUrl(String helpUrl) {
 	this.helpUrl = helpUrl;
@@ -282,8 +283,8 @@ public class SystemTool implements Serializable {
 
     @Override
     public String toString() {
-	return new ToStringBuilder(this).append("systemToolId", getSystemToolId()).append("activityTypeId",
-		getActivityTypeId()).toString();
+	return new ToStringBuilder(this).append("systemToolId", getSystemToolId())
+		.append("activityTypeId", getActivityTypeId()).toString();
     }
 
     @Override

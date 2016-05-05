@@ -2,21 +2,21 @@
  * Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
  * =============================================================
  * License Information: http://lamsfoundation.org/licensing/lams/2.0/
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301
  * USA
- * 
+ *
  * http://www.gnu.org/licenses/gpl.txt
  * ****************************************************************
  */
@@ -36,11 +36,11 @@ import org.lamsfoundation.lams.learningdesign.TextSearchConditionComparator;
 
 /**
  * Survey
- * 
+ *
  * @author Dapeng Ni
- * 
+ *
  * @hibernate.class table="tl_lasurv11_survey"
- * 
+ *
  */
 public class Survey implements Cloneable {
 
@@ -79,7 +79,7 @@ public class Survey implements Cloneable {
 
     /**
      * Default contruction method.
-     * 
+     *
      */
     public Survey() {
 	questions = new HashSet<SurveyQuestion>();
@@ -151,14 +151,15 @@ public class Survey implements Cloneable {
 
 	final Survey genericEntity = (Survey) o;
 
-	return new EqualsBuilder().append(uid, genericEntity.uid).append(title, genericEntity.title).append(
-		instructions, genericEntity.instructions).append(created, genericEntity.created)
+	return new EqualsBuilder().append(uid, genericEntity.uid).append(title, genericEntity.title)
+		.append(instructions, genericEntity.instructions).append(created, genericEntity.created)
 		.append(updated, genericEntity.updated).append(createdBy, genericEntity.createdBy).isEquals();
     }
 
     @Override
     public int hashCode() {
-	return new HashCodeBuilder().append(uid).append(title).append(instructions).append(created).append(updated).append(createdBy).toHashCode();
+	return new HashCodeBuilder().append(uid).append(title).append(instructions).append(created).append(updated)
+		.append(createdBy).toHashCode();
     }
 
     /**
@@ -178,7 +179,7 @@ public class Survey implements Cloneable {
     // **********************************************************
     /**
      * Returns the object's creation date
-     * 
+     *
      * @return date
      * @hibernate.property column="create_date"
      */
@@ -188,7 +189,7 @@ public class Survey implements Cloneable {
 
     /**
      * Sets the object's creation date
-     * 
+     *
      * @param created
      */
     public void setCreated(Date created) {
@@ -197,7 +198,7 @@ public class Survey implements Cloneable {
 
     /**
      * Returns the object's date of last update
-     * 
+     *
      * @return date updated
      * @hibernate.property column="update_date"
      */
@@ -207,7 +208,7 @@ public class Survey implements Cloneable {
 
     /**
      * Sets the object's date of last update
-     * 
+     *
      * @param updated
      */
     public void setUpdated(Date updated) {
@@ -216,9 +217,9 @@ public class Survey implements Cloneable {
 
     /**
      * @return Returns the userid of the user who created the Share surveys.
-     * 
+     *
      * @hibernate.many-to-one cascade="save-update" column="create_by"
-     * 
+     *
      */
     public SurveyUser getCreatedBy() {
 	return createdBy;
@@ -226,7 +227,7 @@ public class Survey implements Cloneable {
 
     /**
      * @param createdBy
-     *                The userid of the user who created this Share surveys.
+     *            The userid of the user who created this Share surveys.
      */
     public void setCreatedBy(SurveyUser createdBy) {
 	this.createdBy = createdBy;
@@ -245,9 +246,9 @@ public class Survey implements Cloneable {
 
     /**
      * @return Returns the title.
-     * 
+     *
      * @hibernate.property column="title"
-     * 
+     *
      */
     public String getTitle() {
 	return title;
@@ -255,7 +256,7 @@ public class Survey implements Cloneable {
 
     /**
      * @param title
-     *                The title to set.
+     *            The title to set.
      */
     public void setTitle(String title) {
 	this.title = title;
@@ -263,9 +264,9 @@ public class Survey implements Cloneable {
 
     /**
      * @return Returns the lockWhenFinish.
-     * 
+     *
      * @hibernate.property column="lock_on_finished"
-     * 
+     *
      */
     public boolean getLockWhenFinished() {
 	return lockWhenFinished;
@@ -273,7 +274,7 @@ public class Survey implements Cloneable {
 
     /**
      * @param lockWhenFinished
-     *                Set to true to lock the survey for finished users.
+     *            Set to true to lock the survey for finished users.
      */
     public void setLockWhenFinished(boolean lockWhenFinished) {
 	this.lockWhenFinished = lockWhenFinished;
@@ -281,7 +282,7 @@ public class Survey implements Cloneable {
 
     /**
      * @return Returns the instructions set by the teacher.
-     * 
+     *
      * @hibernate.property column="instructions" type="text"
      */
     public String getInstructions() {
@@ -293,12 +294,12 @@ public class Survey implements Cloneable {
     }
 
     /**
-     * 
-     * 
+     *
+     *
      * @hibernate.set lazy="true" inverse="false" cascade="all" order-by="sequence_id asc"
      * @hibernate.collection-key column="survey_uid"
      * @hibernate.collection-one-to-many class="org.lamsfoundation.lams.tool.survey.model.SurveyQuestion"
-     * 
+     *
      * @return
      */
     public Set<SurveyQuestion> getQuestions() {
@@ -380,7 +381,7 @@ public class Survey implements Cloneable {
     public void setShowOnePage(boolean showOnePage) {
 	this.showOnePage = showOnePage;
     }
-    
+
     /**
      * @hibernate.property column="show_other_users_answers"
      * @return
@@ -410,7 +411,7 @@ public class Survey implements Cloneable {
      *                sort="org.lamsfoundation.lams.learningdesign.TextSearchConditionComparator"
      * @hibernate.collection-key column="content_uid"
      * @hibernate.collection-one-to-many class="org.lamsfoundation.lams.tool.survey.model.SurveyCondition"
-     * 
+     *
      */
     public Set<SurveyCondition> getConditions() {
 	return conditions;
@@ -420,17 +421,15 @@ public class Survey implements Cloneable {
 	this.conditions = conditions;
     }
 
-
-    
-	/**
+    /**
      * @hibernate.property column="submission_deadline"
-	 * @return date submissionDeadline
-	 */
-	public Date getSubmissionDeadline() {
-		return submissionDeadline;
-	}
-	
-	public void setSubmissionDeadline(Date submissionDeadline) {
-		this.submissionDeadline = submissionDeadline;
-	}
+     * @return date submissionDeadline
+     */
+    public Date getSubmissionDeadline() {
+	return submissionDeadline;
+    }
+
+    public void setSubmissionDeadline(Date submissionDeadline) {
+	this.submissionDeadline = submissionDeadline;
+    }
 }

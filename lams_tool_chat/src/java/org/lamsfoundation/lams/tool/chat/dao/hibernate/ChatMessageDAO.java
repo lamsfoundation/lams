@@ -2,21 +2,21 @@
  * Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
  * =============================================================
  * License Information: http://lamsfoundation.org/licensing/lams/2.0/
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License version 2.0 
+ * it under the terms of the GNU General Public License version 2.0
  * as published by the Free Software Foundation.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301
  * USA
- * 
+ *
  * http://www.gnu.org/licenses/gpl.txt
  * ****************************************************************
  */
@@ -45,8 +45,7 @@ public class ChatMessageDAO extends BaseDAO implements IChatMessageDAO {
     // + "f.chatSession=? and (f.type='groupchat' or "
     // + "(f.type='chat' and (f.fromUser.userId=? or f.toUser.userId=?)))";
 
-    public static final String SQL_QUERY_FIND_USER_MESSAGE_HISTORY = "from "
-	    + ChatMessage.class.getName()
+    public static final String SQL_QUERY_FIND_USER_MESSAGE_HISTORY = "from " + ChatMessage.class.getName()
 	    + " as f where "
 	    + "f.chatSession.uid=? and f.hidden='false' and (f.type='groupchat' or (f.type='chat' and (f.fromUser.uid=? or f.toUser.uid=?)))";
 
@@ -64,20 +63,23 @@ public class ChatMessageDAO extends BaseDAO implements IChatMessageDAO {
     public static final String SQL_QUERY_FIND_MESSAGES_SENT_BY_USER = "FROM " + ChatMessage.class.getName()
 	    + " AS f WHERE f.fromUser.uid=?";
 
+    @Override
     public void saveOrUpdate(ChatMessage chatMessage) {
 	this.getHibernateTemplate().saveOrUpdate(chatMessage);
 	this.getHibernateTemplate().flush();
     }
 
+    @Override
     public List getForUser(ChatUser chatUser) {
 	return this.getHibernateTemplate().find(ChatMessageDAO.SQL_QUERY_FIND_USER_MESSAGE_HISTORY,
 		new Object[] { chatUser.getChatSession().getUid(), chatUser.getUid(), chatUser.getUid() });
     }
 
+    @Override
     public ChatMessage getByUID(Long uid) {
 	// TODO Auto-generated method stub
-	List list = this.getHibernateTemplate()
-		.find(ChatMessageDAO.SQL_QUERY_FIND_MESSAGE_BY_UID, new Object[] { uid });
+	List list = this.getHibernateTemplate().find(ChatMessageDAO.SQL_QUERY_FIND_MESSAGE_BY_UID,
+		new Object[] { uid });
 
 	if (list != null && list.size() > 0) {
 	    return (ChatMessage) list.get(0);
@@ -87,10 +89,11 @@ public class ChatMessageDAO extends BaseDAO implements IChatMessageDAO {
 
     }
 
+    @Override
     public List getLatest(ChatSession chatSession, int max) {
 	try {
-	    Query query = this.getSession().createQuery(
-		    ChatMessageDAO.SQL_QUERY_FIND_MESSAGE_BY_SESSION_ORDER_BY_DATE_ASC);
+	    Query query = this.getSession()
+		    .createQuery(ChatMessageDAO.SQL_QUERY_FIND_MESSAGE_BY_SESSION_ORDER_BY_DATE_ASC);
 	    query.setLong(0, chatSession.getUid());
 	    query.setMaxResults(max);
 	    return query.list();
@@ -100,6 +103,7 @@ public class ChatMessageDAO extends BaseDAO implements IChatMessageDAO {
 	}
     }
 
+    @Override
     public Map<Long, Integer> getCountBySession(Long chatUID) {
 	List list = this.getHibernateTemplate().find(ChatMessageDAO.SQL_QUERY_FIND_MESSAGE_COUNT_BY_SESSION,
 		new Object[] { chatUID });
@@ -112,6 +116,7 @@ public class ChatMessageDAO extends BaseDAO implements IChatMessageDAO {
 	return resultMap;
     }
 
+    @Override
     public Map<Long, Integer> getCountByFromUser(Long sessionUID) {
 	List list = this.getHibernateTemplate().find(ChatMessageDAO.SQL_QUERY_FIND_MESSAGE_COUNT_BY_FROM_USER,
 		new Object[] { sessionUID });
@@ -124,6 +129,7 @@ public class ChatMessageDAO extends BaseDAO implements IChatMessageDAO {
 	return resultMap;
     }
 
+    @Override
     public List<ChatMessage> getSentByUser(Long userUid) {
 	return this.getHibernateTemplate().find(ChatMessageDAO.SQL_QUERY_FIND_MESSAGES_SENT_BY_USER,
 		new Object[] { userUid });

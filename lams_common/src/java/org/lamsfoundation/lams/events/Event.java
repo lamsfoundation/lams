@@ -11,10 +11,10 @@ import org.apache.commons.lang.StringUtils;
 
 /**
  * A event that users can subscribe to and at some point can be triggered, notifing the users.
- * 
+ *
  * @hibernate.class table="lams_events"
  * @author Marcin Cieslak
- * 
+ *
  */
 public class Event {
 
@@ -110,7 +110,7 @@ public class Event {
 
     /**
      * Standard constructor used by EventNotificationService.
-     * 
+     *
      * @param scope
      *            scope of the event
      * @param name
@@ -143,7 +143,7 @@ public class Event {
 
     /**
      * Build a string that identifies the event.
-     * 
+     *
      * @param scope
      *            scope of the event
      * @param name
@@ -236,11 +236,11 @@ public class Event {
     }
 
     /**
-     * 
+     *
      * @hibernate.set cascade="all-delete-orphan" order-by="last_operation_time desc" outer-join="true"
      * @hibernate.collection-key column="event_uid"
      * @hibernate.collection-one-to-many class="org.lamsfoundation.lams.events.Subscription"
-     * 
+     *
      * @return
      */
     protected Set<Subscription> getSubscriptions() {
@@ -316,7 +316,7 @@ public class Event {
 
     /**
      * See {@link IEventNotificationService#subscribe(String, String, Long, Long, AbstractDeliveryMethod, Long)
-	 * 
+     *
      */
     protected boolean subscribe(Integer userId, AbstractDeliveryMethod deliveryMethod, Long periodicity)
 	    throws InvalidParameterException {
@@ -397,7 +397,7 @@ public class Event {
 
 		    /*
 		     * if any of the notifications failed,
-		     * a copy of the event is created in order to repeat the attempt later 
+		     * a copy of the event is created in order to repeat the attempt later
 		     */
 		    if ((eventFailCopy != null) && !eventFailCopy.getSubscriptions().isEmpty()) {
 			eventFailCopy.setFailTime(new Date());
@@ -434,7 +434,8 @@ public class Event {
     /**
      * See {@link IEventNotificationService#unsubscribe(String, String, Long, Long, AbstractDeliveryMethod)
      */
-    protected boolean unsubscribe(Integer userId, AbstractDeliveryMethod deliveryMethod) throws InvalidParameterException {
+    protected boolean unsubscribe(Integer userId, AbstractDeliveryMethod deliveryMethod)
+	    throws InvalidParameterException {
 	if (userId == null) {
 	    throw new InvalidParameterException("User ID can not be null.");
 	}

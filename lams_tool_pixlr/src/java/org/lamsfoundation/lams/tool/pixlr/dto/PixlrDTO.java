@@ -2,21 +2,21 @@
  * Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
  * =============================================================
  * License Information: http://lamsfoundation.org/licensing/lams/2.0/
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License version 2.0 
+ * it under the terms of the GNU General Public License version 2.0
  * as published by the Free Software Foundation.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301
  * USA
- * 
+ *
  * http://www.gnu.org/licenses/gpl.txt
  * ****************************************************************
  */
@@ -30,7 +30,6 @@ import java.util.Set;
 import java.util.TreeSet;
 
 import org.apache.log4j.Logger;
-import org.lamsfoundation.lams.contentrepository.client.IToolContentHandler;
 import org.lamsfoundation.lams.tool.pixlr.model.Pixlr;
 import org.lamsfoundation.lams.tool.pixlr.model.PixlrSession;
 
@@ -57,13 +56,13 @@ public class PixlrDTO {
     public Long currentTab;
 
     private String imageFileName;
-    
+
     private String reflectInstructions;
-    
+
     boolean allowViewOthersImages;
-    
+
     private Long imageWidth;
-    
+
     private Long imageHeight;
 
     /* Constructors */
@@ -82,7 +81,7 @@ public class PixlrDTO {
 	this.allowViewOthersImages = pixlr.isAllowViewOthersImages();
 
 	for (Iterator<PixlrSession> iter = pixlr.getPixlrSessions().iterator(); iter.hasNext();) {
-	    PixlrSession session = (PixlrSession) iter.next();
+	    PixlrSession session = iter.next();
 	    PixlrSessionDTO sessionDTO = new PixlrSessionDTO(session);
 
 	    sessionDTOs.add(sessionDTO);
@@ -131,11 +130,11 @@ public class PixlrDTO {
     }
 
     public boolean isReflectOnActivity() {
-        return reflectOnActivity;
+	return reflectOnActivity;
     }
 
     public void setReflectOnActivity(boolean reflectOnActivity) {
-        this.reflectOnActivity = reflectOnActivity;
+	this.reflectOnActivity = reflectOnActivity;
     }
 
     public boolean isLockOnFinish() {
@@ -155,46 +154,46 @@ public class PixlrDTO {
     }
 
     public String getImageFileName() {
-        return imageFileName;
+	return imageFileName;
     }
 
     public void getImageFileName(String imageFileName) {
-        this.imageFileName = imageFileName;
+	this.imageFileName = imageFileName;
     }
 
     public void setImageFileName(String imageFileName) {
-        this.imageFileName = imageFileName;
+	this.imageFileName = imageFileName;
     }
 
     public String getReflectInstructions() {
-        return reflectInstructions;
+	return reflectInstructions;
     }
 
     public void setReflectInstructions(String reflectInstructions) {
-        this.reflectInstructions = reflectInstructions;
+	this.reflectInstructions = reflectInstructions;
     }
 
     public boolean isAllowViewOthersImages() {
-        return allowViewOthersImages;
+	return allowViewOthersImages;
     }
 
     public void setAllowViewOthersImages(boolean allowViewOthersImages) {
-        this.allowViewOthersImages = allowViewOthersImages;
+	this.allowViewOthersImages = allowViewOthersImages;
     }
 
     public Long getImageWidth() {
-        return imageWidth;
+	return imageWidth;
     }
 
     public void setImageWidth(Long imageWidth) {
-        this.imageWidth = imageWidth;
+	this.imageWidth = imageWidth;
     }
 
     public Long getImageHeight() {
-        return imageHeight;
+	return imageHeight;
     }
 
     public void setImageHeight(Long imageHeight) {
-        this.imageHeight = imageHeight;
+	this.imageHeight = imageHeight;
     }
 }

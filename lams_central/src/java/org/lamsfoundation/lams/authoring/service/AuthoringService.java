@@ -2,21 +2,21 @@
  * Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
  * =============================================================
  * License Information: http://lamsfoundation.org/licensing/lams/2.0/
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License version 2.0 
+ * it under the terms of the GNU General Public License version 2.0
  * as published by the Free Software Foundation.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301
  * USA
- * 
+ *
  * http://www.gnu.org/licenses/gpl.txt
  * ****************************************************************
  */
@@ -216,7 +216,7 @@ public class AuthoringService implements IAuthoringService, BeanFactoryAware {
     }
 
     /**
-     * 
+     *
      * @return
      */
     public CompetenceDAO getCompetenceDAO() {
@@ -224,7 +224,7 @@ public class AuthoringService implements IAuthoringService, BeanFactoryAware {
     }
 
     /**
-     * 
+     *
      * @param competenceDAO
      */
     public void setCompetenceDAO(CompetenceDAO competenceDAO) {
@@ -232,7 +232,7 @@ public class AuthoringService implements IAuthoringService, BeanFactoryAware {
     }
 
     /**
-     * 
+     *
      * @return
      */
     public CompetenceMappingDAO getCompetenceMappingDAO() {
@@ -240,7 +240,7 @@ public class AuthoringService implements IAuthoringService, BeanFactoryAware {
     }
 
     /**
-     * 
+     *
      * @param competenceMappingDAO
      */
     public void setCompetenceMappingDAO(CompetenceMappingDAO competenceMappingDAO) {
@@ -403,7 +403,7 @@ public class AuthoringService implements IAuthoringService, BeanFactoryAware {
 
     /**
      * Helper method to retrieve the user data. Gets the id from the user details in the shared session
-     * 
+     *
      * @return the user id
      */
     public static Integer getUserId() {
@@ -622,9 +622,9 @@ public class AuthoringService implements IAuthoringService, BeanFactoryAware {
     /**
      * Remove a temporary System Gate from the design. Requires removing the gate from any learner progress entries -
      * should only be a current activity but remove it from previous and next, just in case.
-     * 
+     *
      * This will leave a "hole" in the learner progress, but the progress engine can take care of that.
-     * 
+     *
      * @return Learning Design with removed System Gate
      */
     private LearningDesign removeTempSystemGate(Long gateId, Long learningDesignId) {
@@ -850,7 +850,7 @@ public class AuthoringService implements IAuthoringService, BeanFactoryAware {
     @Override
     public LearningDesign copyLearningDesign(Long originalDesignID, Integer copyType, Integer userID,
 	    Integer workspaceFolderID, boolean setOriginalDesign)
-		    throws UserException, LearningDesignException, WorkspaceFolderException, IOException {
+	    throws UserException, LearningDesignException, WorkspaceFolderException, IOException {
 
 	LearningDesign originalDesign = learningDesignDAO.getLearningDesignById(originalDesignID);
 	if (originalDesign == null) {
@@ -939,7 +939,7 @@ public class AuthoringService implements IAuthoringService, BeanFactoryAware {
     @Override
     public LearningDesign insertLearningDesign(Long originalDesignID, Long designToImportID, Integer userID,
 	    boolean createNewLearningDesign, String newDesignName, Integer workspaceFolderID, String customCSV)
-		    throws UserException, WorkspaceFolderException, IOException {
+	    throws UserException, WorkspaceFolderException, IOException {
 
 	User user = (User) baseDAO.find(User.class, userID);
 	if (user == null) {
@@ -1072,12 +1072,12 @@ public class AuthoringService implements IAuthoringService, BeanFactoryAware {
     /**
      * Updates the Activity information in the newLearningDesign based on the originalLearningDesign. This any grouping
      * details.
-     * 
+     *
      * As new activities are created, the UIID is incremented by the uiidOffset. If we are just copying a sequence this
      * will be set to 0. But if we are importing a sequence into another sequence, this will be an offset value so we
      * new ids guaranteed to be outside of the range of the main sequence (this may mean gaps in the uiids but that
      * doesn't matter).
-     * 
+     *
      * @param originalLearningDesign
      *            The LearningDesign to be copied
      * @param newLearningDesign
@@ -1220,7 +1220,7 @@ public class AuthoringService implements IAuthoringService, BeanFactoryAware {
      * As part of updateDesignActivities(), process an activity and, via recursive calls, the activity's child
      * activities. Need to keep track of any new groupings created so we can go back and update the grouped activities
      * with their new groupings at the end. Also copies the tool content.
-     * 
+     *
      * @param activity
      *            Activity to process. May not be null.
      * @param newLearningDesign
@@ -1290,7 +1290,7 @@ public class AuthoringService implements IAuthoringService, BeanFactoryAware {
 
     /**
      * Updates the Transition information in the newLearningDesign based on the originalLearningDesign
-     * 
+     *
      * @param originalLearningDesign
      *            The LearningDesign to be copied
      * @param newLearningDesign
@@ -1346,7 +1346,7 @@ public class AuthoringService implements IAuthoringService, BeanFactoryAware {
 
     /**
      * Updates the competence information in the newLearningDesign based on the originalLearningDesign
-     * 
+     *
      * @param originalLearningDesign
      *            The LearningDesign to be copied
      * @param newLearningDesign
@@ -1449,7 +1449,7 @@ public class AuthoringService implements IAuthoringService, BeanFactoryAware {
 
     /**
      * Updates the competence information in the newLearningDesign based on the originalLearningDesign
-     * 
+     *
      * @param originalLearningDesign
      *            The LearningDesign to be copied
      * @param newLearningDesign
@@ -1498,7 +1498,7 @@ public class AuthoringService implements IAuthoringService, BeanFactoryAware {
 
     /**
      * Determines the type of activity and returns a deep-copy of the same
-     * 
+     *
      * @param activity
      *            The object to be deep-copied
      * @param newGroupings
@@ -1525,7 +1525,7 @@ public class AuthoringService implements IAuthoringService, BeanFactoryAware {
 
     /**
      * Returns a set of child activities for the given parent activity
-     * 
+     *
      * @param parentActivity
      *            The parent activity
      * @return HashSet Set of the activities that belong to the parentActivity
@@ -1542,12 +1542,12 @@ public class AuthoringService implements IAuthoringService, BeanFactoryAware {
     /**
      * This method saves a new Learning Design to the database. It received a WDDX packet from flash, deserializes it
      * and then finally persists it to the database.
-     * 
+     *
      * A user may update an existing learning design if they have user/owner rights to the folder or they are doing live
      * edit. A user may create a new learning design only if they have user/owner rights to the folder.
-     * 
+     *
      * Note: it does not validate the design - that must be done separately.
-     * 
+     *
      * @param wddxPacket
      *            The WDDX packet received from Flash
      * @return Long learning design id
@@ -1665,10 +1665,10 @@ public class AuthoringService implements IAuthoringService, BeanFactoryAware {
 
     /**
      * Validate the learning design, updating the valid flag appropriately.
-     * 
+     *
      * This needs to be run in a separate transaction to storeLearningDesignDetails to ensure the database is fully
      * updated before the validation occurs (due to some quirks we are finding using Hibernate)
-     * 
+     *
      * @param learningDesignId
      * @throws Exception
      */
@@ -1715,7 +1715,7 @@ public class AuthoringService implements IAuthoringService, BeanFactoryAware {
     /**
      * This is a utility method used by the method <code>getAllLearningDesignDetails</code> to pack the required
      * information in a data transfer object.
-     * 
+     *
      * @param iterator
      * @return Hashtable The required information in a Hashtable
      */
@@ -1731,7 +1731,7 @@ public class AuthoringService implements IAuthoringService, BeanFactoryAware {
 
     /**
      * (non-Javadoc)
-     * 
+     *
      * @see org.lamsfoundation.lams.authoring.service.IAuthoringService#getAllLearningLibraryDetails()
      */
     @Override
@@ -1877,7 +1877,7 @@ public class AuthoringService implements IAuthoringService, BeanFactoryAware {
      * learning design has duplicated name in same folder, then the new name will have a timestamp. The new name format
      * will be oldname_ddMMYYYY_idx. The idx will be auto incremental index number, start from 1. Warning - this may be
      * quite intensive as it gets all the learning designs in a folder.
-     * 
+     *
      * @param originalLearningDesign
      * @param workspaceFolder
      * @param copyType
@@ -1918,8 +1918,8 @@ public class AuthoringService implements IAuthoringService, BeanFactoryAware {
      */
     @Override
     @SuppressWarnings("unchecked")
-    public Long insertSingleActivityLearningDesign(String learningDesignTitle, Long toolID, Long toolContentID, Long learningLibraryID,
-	    String contentFolderID, Integer organisationID) {
+    public Long insertSingleActivityLearningDesign(String learningDesignTitle, Long toolID, Long toolContentID,
+	    Long learningLibraryID, String contentFolderID, Integer organisationID) {
 	Integer userID = AuthoringService.getUserId();
 	User user = (User) baseDAO.find(User.class, userID);
 

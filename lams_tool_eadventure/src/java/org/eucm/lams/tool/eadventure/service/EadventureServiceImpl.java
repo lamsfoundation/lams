@@ -2,21 +2,21 @@
  * Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
  * =============================================================
  * License Information: http://lamsfoundation.org/licensing/lams/2.0/
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301
  * USA
- * 
+ *
  * http://www.gnu.org/licenses/gpl.txt
  * ****************************************************************
  */
@@ -111,9 +111,9 @@ import org.lamsfoundation.lams.util.zipfile.ZipFileUtil;
 import org.lamsfoundation.lams.util.zipfile.ZipFileUtilException;
 
 /**
- * 
+ *
  * @author Dapeng.Ni
- * 
+ *
  */
 public class EadventureServiceImpl
 	implements IEadventureService, ToolContentManager, ToolSessionManager, ToolContentImport102Manager {
@@ -179,7 +179,7 @@ public class EadventureServiceImpl
     /**
      * Try to get the file. If forceLogin = false and an access denied exception occurs, call this method again to get a
      * new ticket and retry file lookup. If forceLogin = true and it then fails then throw exception.
-     * 
+     *
      * @param uuid
      * @param versionId
      * @param relativePath
@@ -218,10 +218,10 @@ public class EadventureServiceImpl
     /**
      * This method verifies the credentials of the Eadventure Tool and gives it the <code>Ticket</code> to login and
      * access the Content Repository.
-     * 
+     *
      * A valid ticket is needed in order to access the content from the repository. This method would be called evertime
      * the tool needs to upload/download files from the content repository.
-     * 
+     *
      * @return ITicket The ticket for repostory access
      * @throws EadventureApplicationException
      */
@@ -263,9 +263,11 @@ public class EadventureServiceImpl
     }
 
     // TODO revisar
-    /*  public List getAuthoredItems(Long eadventureUid) {
-    return eadventureItemDao.getAuthoringItems(eadventureUid);
-    }*/
+    /*
+     * public List getAuthoredItems(Long eadventureUid) {
+     * return eadventureItemDao.getAuthoringItems(eadventureUid);
+     * }
+     */
 
     @Override
     public void createUser(EadventureUser eadventureUser) {
@@ -457,16 +459,18 @@ public class EadventureServiceImpl
 	eadventureSessionDao.saveObject(resSession);
     }
 
-    /* public void retrieveComplete(SortedSet<EadventureItem> eadventureItemList, EadventureUser user) {
-    for (EadventureItem item : eadventureItemList) {
-        EadventureItemVisitLog log = eadventureItemVisitDao.getEadventureItemLog(item.getUid(), user.getUserId());
-        if (log == null) {
-    	item.setComplete(false);
-        } else {
-    	item.setComplete(log.isComplete());
-        }
-    }
-    }*/
+    /*
+     * public void retrieveComplete(SortedSet<EadventureItem> eadventureItemList, EadventureUser user) {
+     * for (EadventureItem item : eadventureItemList) {
+     * EadventureItemVisitLog log = eadventureItemVisitDao.getEadventureItemLog(item.getUid(), user.getUserId());
+     * if (log == null) {
+     * item.setComplete(false);
+     * } else {
+     * item.setComplete(log.isComplete());
+     * }
+     * }
+     * }
+     */
 
     @Override
     public void setItemComplete(Long eadventureItemUid, Long userId, Long sessionId) {
@@ -632,23 +636,25 @@ public class EadventureServiceImpl
     // TODO revisar Monitoring!!!
     @Override
     public void setItemVisible(Long itemUid, boolean visible) {
-	/*EadventureItem item = eadventureItemDao.getByUid(itemUid);
-	if (item != null) {
-	    // createBy should be null for system default value.
-	    Long userId = 0L;
-	    String loginName = "No user";
-	    if (item.getCreateBy() != null) {
-		userId = item.getCreateBy().getUserId();
-		loginName = item.getCreateBy().getLoginName();
-	    }
-	    if (visible) {
-		auditService.logShowEntry(EadventureConstants.TOOL_SIGNATURE, userId, loginName, item.toString());
-	    } else {
-		auditService.logHideEntry(EadventureConstants.TOOL_SIGNATURE, userId, loginName, item.toString());
-	    }
-	    item.setHide(!visible);
-	    eadventureItemDao.saveObject(item);
-	}*/
+	/*
+	 * EadventureItem item = eadventureItemDao.getByUid(itemUid);
+	 * if (item != null) {
+	 * // createBy should be null for system default value.
+	 * Long userId = 0L;
+	 * String loginName = "No user";
+	 * if (item.getCreateBy() != null) {
+	 * userId = item.getCreateBy().getUserId();
+	 * loginName = item.getCreateBy().getLoginName();
+	 * }
+	 * if (visible) {
+	 * auditService.logShowEntry(EadventureConstants.TOOL_SIGNATURE, userId, loginName, item.toString());
+	 * } else {
+	 * auditService.logHideEntry(EadventureConstants.TOOL_SIGNATURE, userId, loginName, item.toString());
+	 * }
+	 * item.setHide(!visible);
+	 * eadventureItemDao.saveObject(item);
+	 * }
+	 */
     }
 
     @Override
@@ -817,7 +823,7 @@ public class EadventureServiceImpl
 
     /**
      * Find out default.htm/html or index.htm/html in the given directory folder
-     * 
+     *
      * @param packageDirectory
      * @return
      */
@@ -972,10 +978,12 @@ public class EadventureServiceImpl
 	    toolContentObj.setCreatedBy(user);
 	    // TODO revisar!! que no falte nada al objeto de EAD
 	    // reset all eadventureItem createBy user
-	    /*Set<EadventureItem> items = toolContentObj.getEadventureItems();
-	    for (EadventureItem item : items) {
-	    item.setCreateBy(user);
-	    }*/
+	    /*
+	     * Set<EadventureItem> items = toolContentObj.getEadventureItems();
+	     * for (EadventureItem item : items) {
+	     * item.setCreateBy(user);
+	     * }
+	     */
 	    // TODO ver si esto es correcto:
 	    Set par = toolContentObj.getParams();
 	    List listPar = new ArrayList(par);
@@ -1002,7 +1010,7 @@ public class EadventureServiceImpl
      * that are always available for the tool (e.g. number of marks for Multiple Choice) or a custom definition created
      * for a particular activity such as the answer to the third question contains the word Koala and hence the need for
      * the toolContentId
-     * 
+     *
      * @return SortedMap of ToolOutputDefinitions with the key being the name of each definition
      * @throws EadventureApplicationException
      */
@@ -1050,14 +1058,16 @@ public class EadventureServiceImpl
 
 	// TODO no hace nada... pero comprobar que no de problema
 	// save eadventure items as well
-	/*Set items = toContent.getEadventureItems();
-	if (items != null) {
-	    Iterator iter = items.iterator();
-	    while (iter.hasNext()) {
-		EadventureItem item = (EadventureItem) iter.next();
-		// createRootTopic(toContent.getUid(),null,msg);
-	    }
-	}*/
+	/*
+	 * Set items = toContent.getEadventureItems();
+	 * if (items != null) {
+	 * Iterator iter = items.iterator();
+	 * while (iter.hasNext()) {
+	 * EadventureItem item = (EadventureItem) iter.next();
+	 * // createRootTopic(toContent.getUid(),null,msg);
+	 * }
+	 * }
+	 */
     }
 
     @Override
@@ -1086,7 +1096,7 @@ public class EadventureServiceImpl
 	    EadventureServiceImpl.log
 		    .warn("Can not remove the tool content as it does not exist. ID: " + toolContentId);
 	}
-	
+
 	for (EadventureSession session : eadventureSessionDao.getByContentId(toolContentId)) {
 	    List<NotebookEntry> entries = coreNotebookService.getEntry(session.getSessionId(),
 		    CoreNotebookConstants.NOTEBOOK_TOOL, EadventureConstants.TOOL_SIGNATURE);
@@ -1259,62 +1269,64 @@ public class EadventureServiceImpl
 	    // order.
 	    // So read them all in first, then go through and assign the dates in the correct order and then save.
 	    // TODO nos cargamos la parte de los items.... comprobar que se pase todo bien y no de ning�n problema
-	    /* Vector urls = (Vector) importValues.get(ToolContentImport102Manager.CONTENT_URL_URLS);
-	    SortedMap<Integer, EadventureItem> items = new TreeMap<Integer, EadventureItem>();
-	    if (urls != null) {
-	    Iterator iter = urls.iterator();
-	    while (iter.hasNext()) {
-	        Hashtable urlMap = (Hashtable) iter.next();
-	        Integer itemOrder = WDDXProcessor.convertToInteger(urlMap,
-	    	    ToolContentImport102Manager.CONTENT_URL_URL_VIEW_ORDER);
-	        EadventureItem item = new EadventureItem();
-	        item.setTitle((String) urlMap.get(ToolContentImport102Manager.CONTENT_TITLE));
-	        item.setCreateBy(ruser);
-	        item.setCreateByAuthor(true);
-	        item.setHide(false);
-	    
-	        Vector instructions = (Vector) urlMap
-	    	    .get(ToolContentImport102Manager.CONTENT_URL_URL_INSTRUCTION_ARRAY);
-	        if (instructions != null && instructions.size() > 0) {
-	    	item.setItemInstructions(new HashSet());
-	    	Iterator insIter = instructions.iterator();
-	    	while (insIter.hasNext()) {
-	    	    item.getItemInstructions().add(createInstruction((Hashtable) insIter.next()));
-	    	}
-	        }
-	    
-	        String eadventureType = (String) urlMap.get(ToolContentImport102Manager.CONTENT_URL_URL_TYPE);
-	        if (ToolContentImport102Manager.URL_RESOURCE_TYPE_URL.equals(eadventureType)) {
-	    	item.setType(EadventureConstants.RESOURCE_TYPE_URL);
-	    	item.setUrl((String) urlMap.get(ToolContentImport102Manager.CONTENT_URL_URL_URL));
-	    	item.setOpenUrlNewWindow(false);
-	        } else if (ToolContentImport102Manager.URL_RESOURCE_TYPE_WEBSITE.equals(eadventureType)) {
-	    	item.setType(EadventureConstants.RESOURCE_TYPE_WEBSITE);
-	        } else if (ToolContentImport102Manager.URL_RESOURCE_TYPE_FILE.equals(eadventureType)) {
-	    	item.setType(EadventureConstants.RESOURCE_TYPE_FILE);
-	        } else {
-	    	throw new ToolException("Invalid eadventure type. Type was " + eadventureType);
-	        }
-	    
-	        items.put(itemOrder, item);
-	    }
-	    }
-	    
-	    Iterator iter = items.values().iterator();
-	    Date itemDate = null;
-	    while (iter.hasNext()) {
-	    if (itemDate != null) {
-	        try {
-	    	Thread.sleep(1000);
-	        } catch (Exception e) {
-	        }
-	    }
-	    itemDate = new Date();
-	    
-	    EadventureItem item = (EadventureItem) iter.next();
-	    item.setCreateDate(itemDate);
-	    toolContentObj.getEadventureItems().add(item);
-	    }*/
+	    /*
+	     * Vector urls = (Vector) importValues.get(ToolContentImport102Manager.CONTENT_URL_URLS);
+	     * SortedMap<Integer, EadventureItem> items = new TreeMap<Integer, EadventureItem>();
+	     * if (urls != null) {
+	     * Iterator iter = urls.iterator();
+	     * while (iter.hasNext()) {
+	     * Hashtable urlMap = (Hashtable) iter.next();
+	     * Integer itemOrder = WDDXProcessor.convertToInteger(urlMap,
+	     * ToolContentImport102Manager.CONTENT_URL_URL_VIEW_ORDER);
+	     * EadventureItem item = new EadventureItem();
+	     * item.setTitle((String) urlMap.get(ToolContentImport102Manager.CONTENT_TITLE));
+	     * item.setCreateBy(ruser);
+	     * item.setCreateByAuthor(true);
+	     * item.setHide(false);
+	     * 
+	     * Vector instructions = (Vector) urlMap
+	     * .get(ToolContentImport102Manager.CONTENT_URL_URL_INSTRUCTION_ARRAY);
+	     * if (instructions != null && instructions.size() > 0) {
+	     * item.setItemInstructions(new HashSet());
+	     * Iterator insIter = instructions.iterator();
+	     * while (insIter.hasNext()) {
+	     * item.getItemInstructions().add(createInstruction((Hashtable) insIter.next()));
+	     * }
+	     * }
+	     * 
+	     * String eadventureType = (String) urlMap.get(ToolContentImport102Manager.CONTENT_URL_URL_TYPE);
+	     * if (ToolContentImport102Manager.URL_RESOURCE_TYPE_URL.equals(eadventureType)) {
+	     * item.setType(EadventureConstants.RESOURCE_TYPE_URL);
+	     * item.setUrl((String) urlMap.get(ToolContentImport102Manager.CONTENT_URL_URL_URL));
+	     * item.setOpenUrlNewWindow(false);
+	     * } else if (ToolContentImport102Manager.URL_RESOURCE_TYPE_WEBSITE.equals(eadventureType)) {
+	     * item.setType(EadventureConstants.RESOURCE_TYPE_WEBSITE);
+	     * } else if (ToolContentImport102Manager.URL_RESOURCE_TYPE_FILE.equals(eadventureType)) {
+	     * item.setType(EadventureConstants.RESOURCE_TYPE_FILE);
+	     * } else {
+	     * throw new ToolException("Invalid eadventure type. Type was " + eadventureType);
+	     * }
+	     * 
+	     * items.put(itemOrder, item);
+	     * }
+	     * }
+	     * 
+	     * Iterator iter = items.values().iterator();
+	     * Date itemDate = null;
+	     * while (iter.hasNext()) {
+	     * if (itemDate != null) {
+	     * try {
+	     * Thread.sleep(1000);
+	     * } catch (Exception e) {
+	     * }
+	     * }
+	     * itemDate = new Date();
+	     * 
+	     * EadventureItem item = (EadventureItem) iter.next();
+	     * item.setCreateDate(itemDate);
+	     * toolContentObj.getEadventureItems().add(item);
+	     * }
+	     */
 
 	} catch (WDDXProcessorConversionException e) {
 	    EadventureServiceImpl.log.error("Unable to content for activity " + toolContentObj.getTitle()
@@ -1328,29 +1340,31 @@ public class EadventureServiceImpl
     }
 
     // TODO comprobar que no hay problema por quitar esto
-    /*private EadventureItemInstruction createInstruction(Hashtable instructionEntry)
-        throws WDDXProcessorConversionException {
-    
-    Integer instructionOrder = WDDXProcessor.convertToInteger(instructionEntry,
-    	ToolContentImport102Manager.CONTENT_URL_URL_VIEW_ORDER);
-    
-    // the description column in 1.0.2 was longer than 255 chars, so truncate.
-    String instructionText = (String) instructionEntry.get(ToolContentImport102Manager.CONTENT_URL_INSTRUCTION);
-    if (instructionText != null && instructionText.length() > 255) {
-        if (EadventureServiceImpl.log.isDebugEnabled()) {
-    	EadventureServiceImpl.log
-    		.debug("1.0.2 Import truncating Item Instruction to 255 characters. Original text was\'"
-    			+ instructionText + "\'");
-        }
-        instructionText = instructionText.substring(0, 255);
-    }
-    
-    EadventureItemInstruction instruction = new EadventureItemInstruction();
-    instruction.setDescription(instructionText);
-    instruction.setSequenceId(instructionOrder);
-    
-    return instruction;
-    }*/
+    /*
+     * private EadventureItemInstruction createInstruction(Hashtable instructionEntry)
+     * throws WDDXProcessorConversionException {
+     * 
+     * Integer instructionOrder = WDDXProcessor.convertToInteger(instructionEntry,
+     * ToolContentImport102Manager.CONTENT_URL_URL_VIEW_ORDER);
+     * 
+     * // the description column in 1.0.2 was longer than 255 chars, so truncate.
+     * String instructionText = (String) instructionEntry.get(ToolContentImport102Manager.CONTENT_URL_INSTRUCTION);
+     * if (instructionText != null && instructionText.length() > 255) {
+     * if (EadventureServiceImpl.log.isDebugEnabled()) {
+     * EadventureServiceImpl.log
+     * .debug("1.0.2 Import truncating Item Instruction to 255 characters. Original text was\'"
+     * + instructionText + "\'");
+     * }
+     * instructionText = instructionText.substring(0, 255);
+     * }
+     * 
+     * EadventureItemInstruction instruction = new EadventureItemInstruction();
+     * instruction.setDescription(instructionText);
+     * instruction.setSequenceId(instructionOrder);
+     * 
+     * return instruction;
+     * }
+     */
 
     /** Set the description, throws away the title value as this is not supported in 2.0 */
     @Override
@@ -1417,7 +1431,7 @@ public class EadventureServiceImpl
 
     /**
      * Finds out which lesson the given tool content belongs to and returns its monitoring users.
-     * 
+     *
      * @param sessionId
      *            tool session ID
      * @return list of teachers that monitor the lesson which contains the tool with given session ID
@@ -1429,9 +1443,11 @@ public class EadventureServiceImpl
 
     // TODO Resultado de la actualizaci�n a la brach de release 2.3.5, ver si afecta!!!
 
-    /*public Class[] getSupportedToolOutputDefinitionClasses(int definitionType) {
-    return getEadventureOutputFactory().getSupportedDefinitionClasses(definitionType);
-    }*/
+    /*
+     * public Class[] getSupportedToolOutputDefinitionClasses(int definitionType) {
+     * return getEadventureOutputFactory().getSupportedDefinitionClasses(definitionType);
+     * }
+     */
 
     public EadventureOutputFactory getEadventureOutputFactory() {
 	return eadventureOutputFactory;

@@ -13,14 +13,14 @@ import org.lamsfoundation.lams.util.Configuration;
 import org.lamsfoundation.lams.util.ConfigurationKeys;
 
 /**
- * 
+ *
  * @author lfoxton
- * 
+ *
  *         A servlet that loads at startup to do some maintainence like removing
  *         temp directories
- * 
+ *
  * @web:servlet name="lamsStartupServlet" load-on-startup = "1"
- * 
+ *
  * @web:servlet-mapping url-pattern="/lamsstartupservlet"
  */
 
@@ -34,21 +34,22 @@ public class LamsStartupServlet extends HttpServlet {
      * Retrieve from the servlet configuration the "baseDir" which is the root
      * of the file repository:<br>
      * If not specified the value of "/UserFiles/" will be used.
-     * 
+     *
      */
+    @Override
     public void init() throws ServletException {
 
 	// Removing all the files in the temp directory
 	String tempDirStr = Configuration.get(ConfigurationKeys.LAMS_TEMP_DIR);
 	File tempDir = new File(tempDirStr);
 
-	if (tempDir != null) { 
+	if (tempDir != null) {
 	    // create temp directory if it doesn't exist
 	    if (!tempDir.exists()) {
 		tempDir.mkdirs();
 	    }
 	    if (tempDir.canWrite()) {
-    	    	File[] files = tempDir.listFiles();
+		File[] files = tempDir.listFiles();
 		log.info("Deleting temporary files from: " + tempDir);
 		for (File file : files) {
 
@@ -65,16 +66,17 @@ public class LamsStartupServlet extends HttpServlet {
 			    log.error("Failed to delete " + file);
 			}
 		    }
-		    
+
 		}
 		return;
 	    }
 	}
-	
+
 	log.error("Cannot delete temporary files, do not have permission for folder: " + tempDirStr);
 
     }
 
+    @Override
     public void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
     }
 

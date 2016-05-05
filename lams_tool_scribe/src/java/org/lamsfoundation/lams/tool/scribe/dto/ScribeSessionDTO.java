@@ -2,21 +2,21 @@
  * Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
  * =============================================================
  * License Information: http://lamsfoundation.org/licensing/lams/2.0/
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License version 2.0 
+ * it under the terms of the GNU General Public License version 2.0
  * as published by the Free Software Foundation.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301
  * USA
- * 
+ *
  * http://www.gnu.org/licenses/gpl.txt
  * ****************************************************************
  */
@@ -34,141 +34,142 @@ import org.lamsfoundation.lams.tool.scribe.model.ScribeSession;
 import org.lamsfoundation.lams.tool.scribe.model.ScribeUser;
 
 public class ScribeSessionDTO implements Comparable {
-	
-	Long sessionID;
 
-	String sessionName;
-	
-	Set<ScribeUserDTO> userDTOs;
-	
-	int numberOfVotes;
-	
-	int numberOfLearners;
-	
-	int VotePercentage;
-	
-	String appointedScribe;
-	
-	Set<ScribeReportEntryDTO> reportDTOs;
-	
-	boolean forceComplete;
-	
-	boolean reportSubmitted;
-	
-	public ScribeSessionDTO(ScribeSession session) {
-		this.sessionID = session.getSessionId();
-		this.sessionName = session.getSessionName();
-		this.forceComplete = session.isForceComplete();
-		this.reportSubmitted = session.isReportSubmitted();
-		
-		ScribeUser appointedScribe = session.getAppointedScribe();
-		if (appointedScribe == null) {
-			this.appointedScribe = null;
-		} else {
-			this.appointedScribe = appointedScribe.getFirstName() + " " + appointedScribe.getLastName();
-		}
-				
-		userDTOs = new TreeSet<ScribeUserDTO>();
-		reportDTOs = new TreeSet<ScribeReportEntryDTO>();
-		
-		// add the report DTOs
-		for (Iterator iter = session.getScribeReportEntries().iterator(); iter.hasNext();) {
-			ScribeReportEntry report = (ScribeReportEntry) iter.next();
-			reportDTOs.add(new ScribeReportEntryDTO(report));
-		}
-	}
-	
-	public ScribeSessionDTO() {
-		userDTOs = new TreeSet<ScribeUserDTO>();
-	}
-	
-	public Long getSessionID() {
-		return sessionID;
+    Long sessionID;
+
+    String sessionName;
+
+    Set<ScribeUserDTO> userDTOs;
+
+    int numberOfVotes;
+
+    int numberOfLearners;
+
+    int VotePercentage;
+
+    String appointedScribe;
+
+    Set<ScribeReportEntryDTO> reportDTOs;
+
+    boolean forceComplete;
+
+    boolean reportSubmitted;
+
+    public ScribeSessionDTO(ScribeSession session) {
+	this.sessionID = session.getSessionId();
+	this.sessionName = session.getSessionName();
+	this.forceComplete = session.isForceComplete();
+	this.reportSubmitted = session.isReportSubmitted();
+
+	ScribeUser appointedScribe = session.getAppointedScribe();
+	if (appointedScribe == null) {
+	    this.appointedScribe = null;
+	} else {
+	    this.appointedScribe = appointedScribe.getFirstName() + " " + appointedScribe.getLastName();
 	}
 
-	public void setSessionID(Long sessionID) {
-		this.sessionID = sessionID;
-	}
+	userDTOs = new TreeSet<ScribeUserDTO>();
+	reportDTOs = new TreeSet<ScribeReportEntryDTO>();
 
-	public String getSessionName() {
-		return sessionName;
+	// add the report DTOs
+	for (Iterator iter = session.getScribeReportEntries().iterator(); iter.hasNext();) {
+	    ScribeReportEntry report = (ScribeReportEntry) iter.next();
+	    reportDTOs.add(new ScribeReportEntryDTO(report));
 	}
+    }
 
-	public void setSessionName(String sessionName) {
-		this.sessionName = sessionName;
-	}
+    public ScribeSessionDTO() {
+	userDTOs = new TreeSet<ScribeUserDTO>();
+    }
 
-	public int compareTo(Object o) {
-		int returnValue;
-		ScribeSessionDTO toSession = (ScribeSessionDTO)o;
-		returnValue = this.sessionName.compareTo(toSession.sessionName);
-		if (returnValue == 0) {
-			returnValue = this.sessionID.compareTo(toSession.sessionID);			
-		}
-		return returnValue;		
-	}
+    public Long getSessionID() {
+	return sessionID;
+    }
 
-	public Set<ScribeUserDTO> getUserDTOs() {
-		return userDTOs;
-	}
+    public void setSessionID(Long sessionID) {
+	this.sessionID = sessionID;
+    }
 
-	public void setUserDTOs(Set<ScribeUserDTO> scribeUsers) {
-		this.userDTOs = scribeUsers;
-	}
+    public String getSessionName() {
+	return sessionName;
+    }
 
-	public int getNumberOfLearners() {
-		return numberOfLearners;
-	}
+    public void setSessionName(String sessionName) {
+	this.sessionName = sessionName;
+    }
 
-	public void setNumberOfLearners(int numberOfLearners) {
-		this.numberOfLearners = numberOfLearners;
+    @Override
+    public int compareTo(Object o) {
+	int returnValue;
+	ScribeSessionDTO toSession = (ScribeSessionDTO) o;
+	returnValue = this.sessionName.compareTo(toSession.sessionName);
+	if (returnValue == 0) {
+	    returnValue = this.sessionID.compareTo(toSession.sessionID);
 	}
+	return returnValue;
+    }
 
-	public int getNumberOfVotes() {
-		return numberOfVotes;
-	}
+    public Set<ScribeUserDTO> getUserDTOs() {
+	return userDTOs;
+    }
 
-	public void setNumberOfVotes(int numberOfVotes) {
-		this.numberOfVotes = numberOfVotes;
-	}
+    public void setUserDTOs(Set<ScribeUserDTO> scribeUsers) {
+	this.userDTOs = scribeUsers;
+    }
 
-	public Set<ScribeReportEntryDTO> getReportDTOs() {
-		return reportDTOs;
-	}
+    public int getNumberOfLearners() {
+	return numberOfLearners;
+    }
 
-	public void setReportDTOs(Set<ScribeReportEntryDTO> reportDTOs) {
-		this.reportDTOs = reportDTOs;
-	}
+    public void setNumberOfLearners(int numberOfLearners) {
+	this.numberOfLearners = numberOfLearners;
+    }
 
-	public String getAppointedScribe() {
-		return appointedScribe;
-	}
+    public int getNumberOfVotes() {
+	return numberOfVotes;
+    }
 
-	public void setAppointedScribe(String appointedScribe) {
-		this.appointedScribe = appointedScribe;
-	}
+    public void setNumberOfVotes(int numberOfVotes) {
+	this.numberOfVotes = numberOfVotes;
+    }
 
-	public int getVotePercentage() {
-		return VotePercentage;
-	}
+    public Set<ScribeReportEntryDTO> getReportDTOs() {
+	return reportDTOs;
+    }
 
-	public void setVotePercentage(int votePercentage) {
-		VotePercentage = votePercentage;
-	}
+    public void setReportDTOs(Set<ScribeReportEntryDTO> reportDTOs) {
+	this.reportDTOs = reportDTOs;
+    }
 
-	public boolean isForceComplete() {
-		return forceComplete;
-	}
+    public String getAppointedScribe() {
+	return appointedScribe;
+    }
 
-	public void setForceComplete(boolean forceComplete) {
-		this.forceComplete = forceComplete;
-	}
+    public void setAppointedScribe(String appointedScribe) {
+	this.appointedScribe = appointedScribe;
+    }
 
-	public boolean isReportSubmitted() {
-		return reportSubmitted;
-	}
+    public int getVotePercentage() {
+	return VotePercentage;
+    }
 
-	public void setReportSubmitted(boolean reportSubmitted) {
-		this.reportSubmitted = reportSubmitted;
-	}
+    public void setVotePercentage(int votePercentage) {
+	VotePercentage = votePercentage;
+    }
+
+    public boolean isForceComplete() {
+	return forceComplete;
+    }
+
+    public void setForceComplete(boolean forceComplete) {
+	this.forceComplete = forceComplete;
+    }
+
+    public boolean isReportSubmitted() {
+	return reportSubmitted;
+    }
+
+    public void setReportSubmitted(boolean reportSubmitted) {
+	this.reportSubmitted = reportSubmitted;
+    }
 }

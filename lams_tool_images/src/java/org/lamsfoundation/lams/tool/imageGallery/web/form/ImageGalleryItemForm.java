@@ -2,21 +2,21 @@
  * Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
  * =============================================================
  * License Information: http://lamsfoundation.org/licensing/lams/2.0/
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301
  * USA
- * 
+ *
  * http://www.gnu.org/licenses/gpl.txt
  * ****************************************************************
  */
@@ -28,7 +28,7 @@ import org.apache.struts.upload.FormFile;
 
 /**
  * ImageGallery Item Form.
- * 
+ *
  * @struts.form name="imageGalleryItemForm"
  * @author Andrey Balan
  */
@@ -50,10 +50,10 @@ public class ImageGalleryItemForm extends ActionForm {
 
     //used only in monitoring
     private String imageUid;
-    
+
     /**
      * Returns ImageGallery order index.
-     * 
+     *
      * @return ImageGallery order index
      */
     public String getImageIndex() {
@@ -62,14 +62,14 @@ public class ImageGalleryItemForm extends ActionForm {
 
     /**
      * Sets ImageGallery order index.
-     * 
+     *
      * @param imageIndex
      *            ImageGallery order index
      */
     public void setImageIndex(String imageIndex) {
 	this.imageIndex = imageIndex;
     }
-    
+
     public String getSessionMapID() {
 	return sessionMapID;
     }
@@ -85,7 +85,7 @@ public class ImageGalleryItemForm extends ActionForm {
     public void setMode(String mode) {
 	this.mode = mode;
     }
-    
+
     public String getTitle() {
 	return title;
     }
@@ -93,7 +93,7 @@ public class ImageGalleryItemForm extends ActionForm {
     public void setTitle(String title) {
 	this.title = title;
     }
-    
+
     public String getDescription() {
 	return description;
     }
@@ -141,7 +141,7 @@ public class ImageGalleryItemForm extends ActionForm {
     public void setFile(FormFile file) {
 	this.file = file;
     }
-    
+
     public String getImageUid() {
 	return imageUid;
     }

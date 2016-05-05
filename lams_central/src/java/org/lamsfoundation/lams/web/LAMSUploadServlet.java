@@ -8,9 +8,7 @@ package org.lamsfoundation.lams.web;
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -28,37 +26,37 @@ import org.lamsfoundation.lams.util.UploadFileUtil;
 
 /**
  * Servlet to upload files.<br>
- * 
+ *
  * This servlet accepts just file uploads, eventually with a parameter specifying file type
- * 
+ *
  * This servlet has been modified for LAMS to support the lams_www/secure/[design folder] format. The design folder is a
  * folder with a unique numeric name. Whenever a new design is created (using "New" in the client), a new design folder
  * name is assigned. The [design folder] is passed in as the CurrentFolder. This servlet supports the image and link
  * windows, not the browse window.
- * 
- * 
+ *
+ *
  * @author Simone Chiaretta (simo@users.sourceforge.net)
  * @author Mitchell Seaton
- * 
+ *
  * @web:servlet name="SimpleUploader" load-on-startup = "1"
  * @web:servlet-mapping url-pattern="/ckeditor/filemanager/upload/simpleuploader"
- * 
+ *
  */
 
 public class LAMSUploadServlet extends HttpServlet {
-    
+
     private static final long serialVersionUID = 7839808388592495717L;
     private static final Logger log = Logger.getLogger(LAMSUploadServlet.class);
 
     /**
      * Manage the Upload requests.<br>
-     * 
+     *
      * The servlet accepts commands sent in the following format:<br>
      * simpleUploader?Type=ResourceType<br>
      * <br>
      * It store the file (renaming it in case a file with the same name exists) and then return an HTML file with a
      * javascript command in it.
-     * 
+     *
      */
     @SuppressWarnings("unchecked")
     @Override

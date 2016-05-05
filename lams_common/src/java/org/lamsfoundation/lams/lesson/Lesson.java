@@ -2,21 +2,21 @@
  * Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
  * =============================================================
  * License Information: http://lamsfoundation.org/licensing/lams/2.0/
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License version 2.0 
+ * it under the terms of the GNU General Public License version 2.0
  * as published by the Free Software Foundation.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301
  * USA
- * 
+ *
  * http://www.gnu.org/licenses/gpl.txt
  * ***********************************************************************/
 /* $$Id$$ */
@@ -230,7 +230,7 @@ public class Lesson implements Serializable {
     /**
      * Factory method that create a new lesson with lesson class and organization. It is design to allow user create a
      * lesson first and modify organization and lesson class data later.
-     * 
+     *
      * @param user
      *            the user who want to create a lesson.
      * @param learnerExportAvailable
@@ -531,7 +531,7 @@ public class Lesson implements Serializable {
     /**
      * Create lesson data transfer object for flash and java learner interaction. Does not include the counts of the
      * users.
-     * 
+     *
      * @return the lesson data transfer object.
      */
     public LessonDTO getLessonData() {
@@ -540,7 +540,7 @@ public class Lesson implements Serializable {
 
     /**
      * Create lesson data transfer object for flash and java monitoring interaction. Includes counts of the learners.
-     * 
+     *
      * @return the monitoring lesson data transfer object.
      */
     public LessonDetailsDTO getLessonDetails() {
@@ -571,8 +571,8 @@ public class Lesson implements Serializable {
      * Finished lessons.
      */
     public boolean isLessonAccessibleForLearner() {
-	return ((lessonStateId != null) && (lessonStateId.equals(Lesson.STARTED_STATE) || lessonStateId
-		.equals(Lesson.FINISHED_STATE)));
+	return ((lessonStateId != null)
+		&& (lessonStateId.equals(Lesson.STARTED_STATE) || lessonStateId.equals(Lesson.FINISHED_STATE)));
     }
 
     public Set<GradebookUserLesson> getGradebookUserLessons() {

@@ -1,6 +1,6 @@
 /****************************************************************************
- * Copyright (c) 1998-2009 AOL LLC. 
- * 
+ * Copyright (c) 1998-2009 AOL LLC.
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -22,7 +22,7 @@ import java.math.BigInteger;
 /**
  * An ASN.1 TLV. The object is not parsed. It can
  * only handle integers and strings.
- * 
+ *
  * @author zhang
  *
  */
@@ -36,8 +36,10 @@ class Asn1Object {
     /**
      * Construct a ASN.1 TLV. The TLV could be either a
      * constructed or primitive entity.
+     *
+     * <p/>
+     * The first byte in DER encoding is made of following fields,
      * 
-     * <p/>The first byte in DER encoding is made of following fields,
      * <pre>
      *-------------------------------------------------
      *|Bit 8|Bit 7|Bit 6|Bit 5|Bit 4|Bit 3|Bit 2|Bit 1|
@@ -52,99 +54,104 @@ class Asn1Object {
      * indicates data type (Integer, String) or a construct
      * (sequence, choice, set).
      * </ul>
-     * 
-     * @param tag Tag or Identifier
-     * @param length Length of the field
-     * @param value Encoded octet string for the field.
+     *
+     * @param tag
+     *            Tag or Identifier
+     * @param length
+     *            Length of the field
+     * @param value
+     *            Encoded octet string for the field.
      */
     public Asn1Object(int tag, int length, byte[] value) {
-        this.tag = tag;
-        this.type = tag & 0x1F;
-        this.length = length;
-        this.value = value;
+	this.tag = tag;
+	this.type = tag & 0x1F;
+	this.length = length;
+	this.value = value;
     }
 
     public int getType() {
-        return type;
+	return type;
     }
 
     public int getLength() {
-        return length;
+	return length;
     }
 
     public byte[] getValue() {
-        return value;
+	return value;
     }
 
     public boolean isConstructed() {
-        return  (tag & DerParser.CONSTRUCTED) == DerParser.CONSTRUCTED;
+	return (tag & DerParser.CONSTRUCTED) == DerParser.CONSTRUCTED;
     }
 
     /**
      * For constructed field, return a parser for its content.
-     * 
+     *
      * @return A parser for the construct.
      * @throws IOException
      */
     public DerParser getParser() throws IOException {
-        if (!isConstructed()) 
-            throw new IOException("Invalid DER: can't parse primitive entity"); //$NON-NLS-1$
+	if (!isConstructed()) {
+	    throw new IOException("Invalid DER: can't parse primitive entity"); //$NON-NLS-1$
+	}
 
-        return new DerParser(value);
+	return new DerParser(value);
     }
 
     /**
      * Get the value as integer
-     * 
+     *
      * @return BigInteger
      * @throws IOException
      */
     public BigInteger getInteger() throws IOException {
-        if (type != DerParser.INTEGER)
-            throw new IOException("Invalid DER: object is not integer"); //$NON-NLS-1$
+	if (type != DerParser.INTEGER) {
+	    throw new IOException("Invalid DER: object is not integer"); //$NON-NLS-1$
+	}
 
-        return new BigInteger(value);
+	return new BigInteger(value);
     }
 
     /**
      * Get value as string. Most strings are treated
      * as Latin-1.
-     * 
+     *
      * @return Java string
      * @throws IOException
      */
     public String getString() throws IOException {
 
-        String encoding;
+	String encoding;
 
-        switch (type) {
+	switch (type) {
 
-        // Not all are Latin-1 but it's the closest thing
-        case DerParser.NUMERIC_STRING:
-        case DerParser.PRINTABLE_STRING:
-        case DerParser.VIDEOTEX_STRING:
-        case DerParser.IA5_STRING:
-        case DerParser.GRAPHIC_STRING:
-        case DerParser.ISO646_STRING:
-        case DerParser.GENERAL_STRING:
-            encoding = "ISO-8859-1"; //$NON-NLS-1$
-            break;
+	    // Not all are Latin-1 but it's the closest thing
+	    case DerParser.NUMERIC_STRING:
+	    case DerParser.PRINTABLE_STRING:
+	    case DerParser.VIDEOTEX_STRING:
+	    case DerParser.IA5_STRING:
+	    case DerParser.GRAPHIC_STRING:
+	    case DerParser.ISO646_STRING:
+	    case DerParser.GENERAL_STRING:
+		encoding = "ISO-8859-1"; //$NON-NLS-1$
+		break;
 
-        case DerParser.BMP_STRING:
-            encoding = "UTF-16BE"; //$NON-NLS-1$
-            break;
+	    case DerParser.BMP_STRING:
+		encoding = "UTF-16BE"; //$NON-NLS-1$
+		break;
 
-        case DerParser.UTF8_STRING:
-            encoding = "UTF-8"; //$NON-NLS-1$
-            break;
+	    case DerParser.UTF8_STRING:
+		encoding = "UTF-8"; //$NON-NLS-1$
+		break;
 
-        case DerParser.UNIVERSAL_STRING:
-            throw new IOException("Invalid DER: can't handle UCS-4 string"); //$NON-NLS-1$
+	    case DerParser.UNIVERSAL_STRING:
+		throw new IOException("Invalid DER: can't handle UCS-4 string"); //$NON-NLS-1$
 
-        default:
-            throw new IOException("Invalid DER: object is not a string"); //$NON-NLS-1$
-        }
+	    default:
+		throw new IOException("Invalid DER: object is not a string"); //$NON-NLS-1$
+	}
 
-        return new String(value, encoding);
+	return new String(value, encoding);
     }
 }

@@ -2,21 +2,21 @@
  * Copyright (C) 2006 LAMS Foundation (http://lamsfoundation.org)
  * =============================================================
  * License Information: http://lamsfoundation.org/licensing/lams/2.0/
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License version 2.0 
+ * it under the terms of the GNU General Public License version 2.0
  * as published by the Free Software Foundation.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301
  * USA
- * 
+ *
  * http://www.gnu.org/licenses/gpl.txt
  * ****************************************************************
  */
@@ -74,73 +74,76 @@ public class TestReporter {
 	    switch (TemplateCompiler.whichFirst(TemplateCompiler.convert(listStartIndex, source),
 		    TemplateCompiler.convert(ifStartIndex, source), TemplateCompiler.convert(elStartIndex, source),
 		    source.length())) {
-	    case LIST_FIRST:
-		int listEndIndex = source.indexOf(TemplateCompiler.LIST_END, listStartIndex);
-		int listStartTagIndex = source.indexOf(TemplateCompiler.TAG_END, listStartIndex);
-		int listAsIndex = source.indexOf(TemplateCompiler.LIST_AS, listStartIndex);
-		if (listStartTagIndex == -1) {
-		    throw new TestHarnessException("'list' tag missing '>'");
-		}
-		if (listAsIndex == -1) {
-		    throw new TestHarnessException("'as' is required for 'list'");
-		}
-		if (listEndIndex == -1) {
-		    throw new TestHarnessException("'list' tag unclosed");
-		}
-		StringBuilder middle = new StringBuilder();
-		String middlePart = source.substring(listStartTagIndex + 1, listEndIndex);
-		String collection = TemplateCompiler.extract(source.substring(listStartIndex
-			+ TemplateCompiler.LIST_START.length(), listAsIndex));
-		String element = TemplateCompiler.extract(
-			source.substring(listAsIndex + TemplateCompiler.LIST_AS.length(), listStartTagIndex)).trim();
-		for (Object o : (List<Object>) TemplateCompiler.compileEL(collection)) {
-		    // log.debug("Put " + o + " into context as "+element);
-		    TemplateCompiler.context.put(element, o);
-		    middle.append(TemplateCompiler.compile(middlePart));
-		}
-		String frontEnd = source.substring(0, listStartIndex);
-		String backEnd = source.substring(listEndIndex + TemplateCompiler.LIST_END.length());
-		return TemplateCompiler.compile(frontEnd) + middle.toString() + TemplateCompiler.compile(backEnd);
-	    case IF_FIRST:
-		int ifEndIndex = source.indexOf(TemplateCompiler.IF_END, ifStartIndex);
-		int ifStartTagIndex = source.indexOf(TemplateCompiler.TAG_END, ifStartIndex);
-		int elseIndex = source.indexOf(TemplateCompiler.IF_ELSE, ifStartIndex);
-		if (ifStartTagIndex == -1) {
-		    throw new TestHarnessException("'if' tag missing '>'");
-		}
-		if (ifEndIndex == -1) {
-		    throw new TestHarnessException("'if' tag unclosed");
-		}
-		String condition = TemplateCompiler.extract(source.substring(
-			ifStartIndex + TemplateCompiler.IF_START.length(), ifStartTagIndex));
-		Boolean b = (Boolean) TemplateCompiler.compileEL(condition);
-		String ifBlock;
-		if (elseIndex != -1) {
-		    String middlePart1 = source.substring(ifStartTagIndex + 1, elseIndex);
-		    String middlePart2 = source.substring(elseIndex + TemplateCompiler.IF_ELSE.length(), ifEndIndex);
-		    ifBlock = b ? middlePart1 : middlePart2;
-		} else {
-		    String middlePart1 = source.substring(ifStartTagIndex + 1, ifEndIndex);
-		    ifBlock = b ? middlePart1 : "";
-		}
-		String ifFrontEnd = source.substring(0, ifStartIndex);
-		String ifBackEnd = source.substring(ifEndIndex + TemplateCompiler.IF_END.length());
-		return TemplateCompiler.compile(ifFrontEnd) + TemplateCompiler.compile(ifBlock)
-			+ TemplateCompiler.compile(ifBackEnd);
-	    case EL_FIRST:
-		int elEndIndex = source.indexOf(TemplateCompiler.EL_END, elStartIndex);
-		if (elEndIndex == -1) {
-		    throw new TestHarnessException("'}' expected");
-		}
-		String elBlock = TemplateCompiler.compileEL(
-			source.substring(elStartIndex + TemplateCompiler.EL_START.length(), elEndIndex)).toString();
-		String elFrontEnd = source.substring(0, elStartIndex);
-		String elBackEnd = source.substring(elEndIndex + 1);
-		return TemplateCompiler.compile(elFrontEnd) + elBlock + TemplateCompiler.compile(elBackEnd);
-	    case TEXT_FIRST:
-		return source;
-	    default:
-		throw new TestHarnessException("Unknown error");
+		case LIST_FIRST:
+		    int listEndIndex = source.indexOf(TemplateCompiler.LIST_END, listStartIndex);
+		    int listStartTagIndex = source.indexOf(TemplateCompiler.TAG_END, listStartIndex);
+		    int listAsIndex = source.indexOf(TemplateCompiler.LIST_AS, listStartIndex);
+		    if (listStartTagIndex == -1) {
+			throw new TestHarnessException("'list' tag missing '>'");
+		    }
+		    if (listAsIndex == -1) {
+			throw new TestHarnessException("'as' is required for 'list'");
+		    }
+		    if (listEndIndex == -1) {
+			throw new TestHarnessException("'list' tag unclosed");
+		    }
+		    StringBuilder middle = new StringBuilder();
+		    String middlePart = source.substring(listStartTagIndex + 1, listEndIndex);
+		    String collection = TemplateCompiler.extract(
+			    source.substring(listStartIndex + TemplateCompiler.LIST_START.length(), listAsIndex));
+		    String element = TemplateCompiler.extract(
+			    source.substring(listAsIndex + TemplateCompiler.LIST_AS.length(), listStartTagIndex))
+			    .trim();
+		    for (Object o : (List<Object>) TemplateCompiler.compileEL(collection)) {
+			// log.debug("Put " + o + " into context as "+element);
+			TemplateCompiler.context.put(element, o);
+			middle.append(TemplateCompiler.compile(middlePart));
+		    }
+		    String frontEnd = source.substring(0, listStartIndex);
+		    String backEnd = source.substring(listEndIndex + TemplateCompiler.LIST_END.length());
+		    return TemplateCompiler.compile(frontEnd) + middle.toString() + TemplateCompiler.compile(backEnd);
+		case IF_FIRST:
+		    int ifEndIndex = source.indexOf(TemplateCompiler.IF_END, ifStartIndex);
+		    int ifStartTagIndex = source.indexOf(TemplateCompiler.TAG_END, ifStartIndex);
+		    int elseIndex = source.indexOf(TemplateCompiler.IF_ELSE, ifStartIndex);
+		    if (ifStartTagIndex == -1) {
+			throw new TestHarnessException("'if' tag missing '>'");
+		    }
+		    if (ifEndIndex == -1) {
+			throw new TestHarnessException("'if' tag unclosed");
+		    }
+		    String condition = TemplateCompiler.extract(
+			    source.substring(ifStartIndex + TemplateCompiler.IF_START.length(), ifStartTagIndex));
+		    Boolean b = (Boolean) TemplateCompiler.compileEL(condition);
+		    String ifBlock;
+		    if (elseIndex != -1) {
+			String middlePart1 = source.substring(ifStartTagIndex + 1, elseIndex);
+			String middlePart2 = source.substring(elseIndex + TemplateCompiler.IF_ELSE.length(),
+				ifEndIndex);
+			ifBlock = b ? middlePart1 : middlePart2;
+		    } else {
+			String middlePart1 = source.substring(ifStartTagIndex + 1, ifEndIndex);
+			ifBlock = b ? middlePart1 : "";
+		    }
+		    String ifFrontEnd = source.substring(0, ifStartIndex);
+		    String ifBackEnd = source.substring(ifEndIndex + TemplateCompiler.IF_END.length());
+		    return TemplateCompiler.compile(ifFrontEnd) + TemplateCompiler.compile(ifBlock)
+			    + TemplateCompiler.compile(ifBackEnd);
+		case EL_FIRST:
+		    int elEndIndex = source.indexOf(TemplateCompiler.EL_END, elStartIndex);
+		    if (elEndIndex == -1) {
+			throw new TestHarnessException("'}' expected");
+		    }
+		    String elBlock = TemplateCompiler
+			    .compileEL(source.substring(elStartIndex + TemplateCompiler.EL_START.length(), elEndIndex))
+			    .toString();
+		    String elFrontEnd = source.substring(0, elStartIndex);
+		    String elBackEnd = source.substring(elEndIndex + 1);
+		    return TemplateCompiler.compile(elFrontEnd) + elBlock + TemplateCompiler.compile(elBackEnd);
+		case TEXT_FIRST:
+		    return source;
+		default:
+		    throw new TestHarnessException("Unknown error");
 	    }
 	}
 

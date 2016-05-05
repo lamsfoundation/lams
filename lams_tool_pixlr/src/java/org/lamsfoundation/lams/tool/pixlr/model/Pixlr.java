@@ -2,21 +2,21 @@
  * Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
  * =============================================================
  * License Information: http://lamsfoundation.org/licensing/lams/2.0/
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301
  * USA
- * 
+ *
  * http://www.gnu.org/licenses/gpl.txt
  * ****************************************************************
  */
@@ -26,11 +26,9 @@ package org.lamsfoundation.lams.tool.pixlr.model;
 
 import java.util.Date;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
-import org.lamsfoundation.lams.contentrepository.client.IToolContentHandler;
 import org.lamsfoundation.lams.tool.pixlr.service.PixlrService;
 
 /**
@@ -40,7 +38,7 @@ import org.lamsfoundation.lams.tool.pixlr.service.PixlrService;
 public class Pixlr implements java.io.Serializable, Cloneable {
 
     /**
-     * 
+     *
      */
     private static final long serialVersionUID = 579733009969321015L;
 
@@ -48,7 +46,7 @@ public class Pixlr implements java.io.Serializable, Cloneable {
 
     // Fields
     /**
-     * 
+     *
      */
     private Long uid;
 
@@ -65,7 +63,7 @@ public class Pixlr implements java.io.Serializable, Cloneable {
     private boolean lockOnFinished;
 
     private boolean reflectOnActivity;
-    
+
     private boolean allowViewOthersImages;
 
     private String reflectInstructions;
@@ -77,9 +75,9 @@ public class Pixlr implements java.io.Serializable, Cloneable {
     private Long toolContentId;
 
     private String imageFileName; // Image uploaded for pixlr
-    
+
     private Long imageWidth;
-    
+
     private Long imageHeight;
 
     private Set<PixlrSession> pixlrSessions;
@@ -116,7 +114,7 @@ public class Pixlr implements java.io.Serializable, Cloneable {
     // Property accessors
     /**
      * @hibernate.id generator-class="native" type="java.lang.Long" column="uid"
-     * 
+     *
      */
 
     public Long getUid() {
@@ -129,7 +127,7 @@ public class Pixlr implements java.io.Serializable, Cloneable {
 
     /**
      * @hibernate.property column="create_date"
-     * 
+     *
      */
 
     public Date getCreateDate() {
@@ -142,7 +140,7 @@ public class Pixlr implements java.io.Serializable, Cloneable {
 
     /**
      * @hibernate.property column="update_date"
-     * 
+     *
      */
 
     public Date getUpdateDate() {
@@ -155,7 +153,7 @@ public class Pixlr implements java.io.Serializable, Cloneable {
 
     /**
      * @hibernate.property column="create_by" length="20"
-     * 
+     *
      */
 
     public Long getCreateBy() {
@@ -168,7 +166,7 @@ public class Pixlr implements java.io.Serializable, Cloneable {
 
     /**
      * @hibernate.property column="title" length="255"
-     * 
+     *
      */
 
     public String getTitle() {
@@ -181,7 +179,7 @@ public class Pixlr implements java.io.Serializable, Cloneable {
 
     /**
      * @hibernate.property column="instructions" length="65535"
-     * 
+     *
      */
 
     public String getInstructions() {
@@ -194,7 +192,7 @@ public class Pixlr implements java.io.Serializable, Cloneable {
 
     /**
      * @hibernate.property column="lock_on_finished" length="1"
-     * 
+     *
      */
 
     public boolean isLockOnFinished() {
@@ -215,21 +213,21 @@ public class Pixlr implements java.io.Serializable, Cloneable {
     public void setReflectOnActivity(boolean reflectOnActivity) {
 	this.reflectOnActivity = reflectOnActivity;
     }
-    
+
     /**
      * @hibernate.property column="allow_view_others_images" length="1"
      */
     public boolean isAllowViewOthersImages() {
-        return allowViewOthersImages;
+	return allowViewOthersImages;
     }
 
     public void setAllowViewOthersImages(boolean allowViewOthersImages) {
-        this.allowViewOthersImages = allowViewOthersImages;
+	this.allowViewOthersImages = allowViewOthersImages;
     }
 
     /**
      * @hibernate.property column="content_in_use" length="1"
-     * 
+     *
      */
 
     public boolean isContentInUse() {
@@ -242,7 +240,7 @@ public class Pixlr implements java.io.Serializable, Cloneable {
 
     /**
      * @hibernate.property column="define_later" length="1"
-     * 
+     *
      */
 
     public boolean isDefineLater() {
@@ -255,7 +253,7 @@ public class Pixlr implements java.io.Serializable, Cloneable {
 
     /**
      * @hibernate.property column="tool_content_id" length="20"
-     * 
+     *
      */
 
     public Long getToolContentId() {
@@ -270,7 +268,7 @@ public class Pixlr implements java.io.Serializable, Cloneable {
      * @hibernate.set lazy="true" inverse="true" cascade="none"
      * @hibernate.collection-key column="pixlr_uid"
      * @hibernate.collection-one-to-many class="org.lamsfoundation.lams.tool.pixlr.model.PixlrSession"
-     * 
+     *
      */
 
     public Set<PixlrSession> getPixlrSessions() {
@@ -283,7 +281,7 @@ public class Pixlr implements java.io.Serializable, Cloneable {
 
     /**
      * toString
-     * 
+     *
      * @return String
      */
     @Override
@@ -312,8 +310,8 @@ public class Pixlr implements java.io.Serializable, Cloneable {
 	}
 	Pixlr castOther = (Pixlr) other;
 
-	return this.getUid() == castOther.getUid() || this.getUid() != null && castOther.getUid() != null
-		&& this.getUid().equals(castOther.getUid());
+	return this.getUid() == castOther.getUid()
+		|| this.getUid() != null && castOther.getUid() != null && this.getUid().equals(castOther.getUid());
     }
 
     @Override
@@ -350,7 +348,7 @@ public class Pixlr implements java.io.Serializable, Cloneable {
 
     /**
      * @hibernate.property column="image_file_name" length="511"
-     * 
+     *
      */
 
     public String getImageFileName() {
@@ -360,31 +358,31 @@ public class Pixlr implements java.io.Serializable, Cloneable {
     public void setImageFileName(String imageFileName) {
 	this.imageFileName = imageFileName;
     }
-    
+
     /**
-     * @hibernate.property column="image_width" 
-     * 
+     * @hibernate.property column="image_width"
+     *
      */
 
     public Long getImageWidth() {
-        return imageWidth;
+	return imageWidth;
     }
 
     public void setImageWidth(Long imageWidth) {
-        this.imageWidth = imageWidth;
+	this.imageWidth = imageWidth;
     }
 
     /**
-     * @hibernate.property column="image_height" 
-     * 
+     * @hibernate.property column="image_height"
+     *
      */
-    
+
     public Long getImageHeight() {
-        return imageHeight;
+	return imageHeight;
     }
 
     public void setImageHeight(Long imageHeight) {
-        this.imageHeight = imageHeight;
+	this.imageHeight = imageHeight;
     }
 
     /**

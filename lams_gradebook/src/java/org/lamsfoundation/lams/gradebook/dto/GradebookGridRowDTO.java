@@ -60,13 +60,13 @@ public abstract class GradebookGridRowDTO {
 
     // Number of marks available where applicable
     protected Long marksAvailable;
-    
+
     protected String status;
     protected String feedback;
 
     /**
      * A shared function to convert milliseconds into a readable string
-     * 
+     *
      * @param timeInMillis
      * @return
      */
@@ -105,8 +105,9 @@ public abstract class GradebookGridRowDTO {
 
     /**
      * A shared function to convert date into a readable string
-     * 
-     * @param date to format
+     *
+     * @param date
+     *            to format
      * @return formatted date
      */
     protected String convertDateToString(Date date, DateFormat format) {
@@ -120,7 +121,7 @@ public abstract class GradebookGridRowDTO {
     protected String markToString() {
 	if (mark != null) {
 	    String markStr = new DecimalFormat("##0.00").format(mark);
-		if (marksAvailable != null) {
+	    if (marksAvailable != null) {
 		return "<font color='green'>" + markStr + "/" + marksAvailable.toString() + "</font>";
 	    } else {
 		return markStr;
@@ -196,10 +197,10 @@ public abstract class GradebookGridRowDTO {
     public Long getAverageTimeTaken() {
 	return averageTimeTaken;
     }
-    
+
     public Long getAverageTimeTakenSeconds() {
 	if (averageTimeTaken != null) {
-	    return averageTimeTaken/1000;
+	    return averageTimeTaken / 1000;
 	} else {
 	    return null;
 	}

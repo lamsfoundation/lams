@@ -2,21 +2,21 @@
  * Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
  * =============================================================
  * License Information: http://lamsfoundation.org/licensing/lams/2.0/
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License version 2.0
  * as published by the Free Software Foundation.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301
  * USA
- * 
+ *
  * http://www.gnu.org/licenses/gpl.txt
  * ***********************************************************************/
 
@@ -27,12 +27,8 @@ import java.util.Date;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 import java.util.SortedSet;
-import java.util.Map.Entry;
-import java.util.Set;
 import java.util.TimeZone;
-import java.util.TreeMap;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -45,23 +41,15 @@ import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.lamsfoundation.lams.tool.vote.VoteAppConstants;
-import org.lamsfoundation.lams.tool.vote.dto.ReflectionDTO;
-import org.lamsfoundation.lams.tool.vote.dto.SessionDTO;
 import org.lamsfoundation.lams.tool.vote.dto.SummarySessionDTO;
 import org.lamsfoundation.lams.tool.vote.dto.VoteGeneralAuthoringDTO;
 import org.lamsfoundation.lams.tool.vote.dto.VoteGeneralMonitoringDTO;
-import org.lamsfoundation.lams.tool.vote.dto.VoteMonitoredAnswersDTO;
-import org.lamsfoundation.lams.tool.vote.dto.VoteMonitoredUserDTO;
 import org.lamsfoundation.lams.tool.vote.dto.VoteQuestionDTO;
 import org.lamsfoundation.lams.tool.vote.pojos.VoteContent;
 import org.lamsfoundation.lams.tool.vote.pojos.VoteQueContent;
-import org.lamsfoundation.lams.tool.vote.pojos.VoteQueUsr;
-import org.lamsfoundation.lams.tool.vote.pojos.VoteSession;
-import org.lamsfoundation.lams.tool.vote.pojos.VoteUsrAttempt;
 import org.lamsfoundation.lams.tool.vote.service.IVoteService;
 import org.lamsfoundation.lams.tool.vote.service.VoteApplicationException;
 import org.lamsfoundation.lams.tool.vote.service.VoteServiceProxy;
-import org.lamsfoundation.lams.tool.vote.util.VoteComparator;
 import org.lamsfoundation.lams.tool.vote.util.VoteUtils;
 import org.lamsfoundation.lams.tool.vote.web.form.VoteMonitoringForm;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
@@ -72,7 +60,7 @@ import org.lamsfoundation.lams.web.util.SessionMap;
 
 /**
  * Starts up the monitoring module
- * 
+ *
  * @author Ozgur Demirtas
  */
 public class VoteMonitoringStarterAction extends Action implements VoteAppConstants {
@@ -114,7 +102,7 @@ public class VoteMonitoringStarterAction extends Action implements VoteAppConsta
 	voteGeneralMonitoringDTO.setActivityInstructions(voteContent.getInstructions());
 
 	/* this section is related to summary tab. Starts here. */
-	
+
 	SortedSet<SummarySessionDTO> sessionDTOs = voteService.getMonitoringSessionDTOs(new Long(toolContentID));
 	request.setAttribute("sessionDTOs", sessionDTOs);
 

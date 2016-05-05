@@ -2,21 +2,21 @@
  * Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
  * =============================================================
  * License Information: http://lamsfoundation.org/licensing/lams/2.0/
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301
  * USA
- * 
+ *
  * http://www.gnu.org/licenses/gpl.txt
  * ****************************************************************
  */
@@ -32,11 +32,11 @@ import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 
 /**
  * Assessment User
- * 
+ *
  * @author Andrey Balan
- * 
+ *
  * @hibernate.class table="tl_laasse10_user"
- * 
+ *
  */
 public class AssessmentUser implements Cloneable {
     private static final long serialVersionUID = -7043502180037866257L;
@@ -82,6 +82,7 @@ public class AssessmentUser implements Cloneable {
     /**
      * Clone method from <code>java.lang.Object</code>
      */
+    @Override
     public Object clone() {
 
 	AssessmentUser user = null;
@@ -204,19 +205,23 @@ public class AssessmentUser implements Cloneable {
 	this.sessionFinished = sessionFinished;
     }
 
+    @Override
     public boolean equals(Object obj) {
-	if (this == obj)
+	if (this == obj) {
 	    return true;
-	if (!(obj instanceof AssessmentUser))
+	}
+	if (!(obj instanceof AssessmentUser)) {
 	    return false;
+	}
 
 	final AssessmentUser user = (AssessmentUser) obj;
 
-	return new EqualsBuilder().append(this.uid, user.uid).append(this.firstName, user.firstName).append(
-		this.lastName, user.lastName).append(this.loginName, user.loginName).isEquals();
+	return new EqualsBuilder().append(this.uid, user.uid).append(this.firstName, user.firstName)
+		.append(this.lastName, user.lastName).append(this.loginName, user.loginName).isEquals();
 
     }
 
+    @Override
     public int hashCode() {
 	return new HashCodeBuilder().append(uid).append(firstName).append(lastName).append(loginName).toHashCode();
     }
@@ -228,7 +233,7 @@ public class AssessmentUser implements Cloneable {
     public void setAccessDate(Date accessDate) {
 	this.accessDate = accessDate;
     }
-    
+
     public String getFullName() {
 	if (firstName == null || lastName == null) {
 	    return null;

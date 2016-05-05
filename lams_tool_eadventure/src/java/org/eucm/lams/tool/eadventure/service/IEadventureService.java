@@ -2,21 +2,21 @@
  * Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
  * =============================================================
  * License Information: http://lamsfoundation.org/licensing/lams/2.0/
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301
  * USA
- * 
+ *
  * http://www.gnu.org/licenses/gpl.txt
  * ****************************************************************
  */
@@ -45,36 +45,35 @@ import org.lamsfoundation.lams.usermanagement.User;
 
 /**
  * @author Dapeng.Ni
- * 
- * Interface that defines the contract that all ShareEadventure service provider must follow.
+ *
+ *         Interface that defines the contract that all ShareEadventure service provider must follow.
  */
 public interface IEadventureService {
 
-    
     public void removeParams(Long toolContentId);
-    
+
     public List<EadventureParam> getEadventureParamByContentId(Long contentId);
-    
-    public EadventureVars getEadventureVars(Long itemVisitLogID,String name);
-    
-    public EadventureItemVisitLog getEadventureItemLog(Long itemUid,Long userId);
-  
+
+    public EadventureVars getEadventureVars(Long itemVisitLogID, String name);
+
+    public EadventureItemVisitLog getEadventureItemLog(Long itemUid, Long userId);
+
     /**
      * Recibir report del applet
      */
-    void setReportInput(String name,String value, String userId, String toolSessionID);
-    
-    
+    void setReportInput(String name, String value, String userId, String toolSessionID);
+
     /**
      * Get applet params and set it values in the associated eadventure vars.
-     * @return true if the eadventure is not completed and it was defined as defineCompleted 
-     * 		in order to indicate VarsExchangeServlet to send or not javascript order.
+     * 
+     * @return true if the eadventure is not completed and it was defined as defineCompleted
+     *         in order to indicate VarsExchangeServlet to send or not javascript order.
      */
-    boolean setAppletInput(String name,String value, String userId, String toolSessionID);
-    
+    boolean setAppletInput(String name, String value, String userId, String toolSessionID);
+
     /**
      * Get file <code>IVersiondNode</code> by given package id and path.
-     * 
+     *
      * @param packageId
      * @param relPathString
      * @return
@@ -84,16 +83,17 @@ public interface IEadventureService {
 
     /**
      * Get <code>Eadventure</code> by toolContentID.
-     * 
+     *
      * @param contentId
      * @return
      */
     Eadventure getEadventureByContentId(Long contentId);
 
     /**
-     * Get a cloned copy of tool default tool content (Eadventure) and assign the toolContentId of that copy as the given
+     * Get a cloned copy of tool default tool content (Eadventure) and assign the toolContentId of that copy as the
+     * given
      * <code>contentId</code>
-     * 
+     *
      * @param contentId
      * @return
      * @throws EadventureApplicationException
@@ -102,15 +102,15 @@ public interface IEadventureService {
 
     /**
      * Get list of eadventure items by given eadventureUid. These eadventure items must be created by author.
-     * 
+     *
      * @param eadventureUid
      * @return
      */
-   // List getAuthoredItems(Long eadventureUid);
+    // List getAuthoredItems(Long eadventureUid);
 
     /**
      * Upload eadventure file to repository.
-     * 
+     *
      * @param eAdventure
      * @param file
      * @throws UploadEadventureFileException
@@ -125,7 +125,7 @@ public interface IEadventureService {
 
     /**
      * Get user by given userID and toolContentID.
-     * 
+     *
      * @param long1
      * @return
      */
@@ -133,7 +133,7 @@ public interface IEadventureService {
 
     /**
      * Get user by sessionID and UserID
-     * 
+     *
      * @param long1
      * @param sessionId
      * @return
@@ -148,35 +148,33 @@ public interface IEadventureService {
 
     /**
      * Save or update eadventure into database.
-     * 
+     *
      * @param Eadventure
      */
     void saveOrUpdateEadventure(Eadventure Eadventure);
 
-
     public void saveOrUpdateEadventureConditions(Set<EadventureCondition> eadConditions);
-    
+
     public void saveOrUpdateEadventureExpressions(Set<EadventureExpression> eadExpressions, Long condUID);
-    
+
     public void saveOrUpdateEadventureCondition(EadventureCondition eadCondition);
-    
+
     public void saveOrUpdateEadventureExpression(EadventureExpression eadExpression);
-    
-    
+
     public void deleteEadventureCondition(Long conditionUid);
-    
+
     public void deleteEadventureExpression(Long expressionUid);
-    
+
     /**
      * Delete resoruce item from database.
-     * 
+     *
      * @param uid
      */
     //void deleteEadventureItem(Long uid);
 
     /**
      * Return all reource items within the given toolSessionID.
-     * 
+     *
      * @param sessionId
      * @return
      */
@@ -184,7 +182,7 @@ public interface IEadventureService {
 
     /**
      * Get eadventure which is relative with the special toolSession.
-     * 
+     *
      * @param sessionId
      * @return
      */
@@ -192,16 +190,15 @@ public interface IEadventureService {
 
     /**
      * Get eadventure toolSession by toolSessionId
-     * 
+     *
      * @param sessionId
      * @return
      */
     EadventureSession getEadventureSessionBySessionId(Long sessionId);
 
-    
     /**
      * Save or update eadventure session.
-     * 
+     *
      * @param resSession
      */
     void saveOrUpdateEadventureSession(EadventureSession resSession);
@@ -214,15 +211,15 @@ public interface IEadventureService {
 
     /**
      * the reqired number minus the count of view of the given user.
-     * 
+     *
      * @param userUid
      * @return
      */
-   // int checkMiniView(Long toolSessionId, Long userId);
+    // int checkMiniView(Long toolSessionId, Long userId);
 
     /**
      * If success return next activity's url, otherwise return null.
-     * 
+     *
      * @param toolSessionId
      * @param userId
      * @return
@@ -230,12 +227,12 @@ public interface IEadventureService {
     String finishToolSession(Long toolSessionId, Long userId) throws EadventureApplicationException;
 
     //EadventureItem getEadventureItemByUid(Long itemUid);
-    
+
     void saveOrUpdateEadventureParams(Set<EadventureParam> eadParams);
 
     /**
      * Return monitoring summary list. The return value is list of eadventure summaries for each groups.
-     * 
+     *
      * @param contentId
      * @return
      */
@@ -245,16 +242,16 @@ public interface IEadventureService {
 
     /**
      * Set a eadventure item visible or not.
-     * 
+     *
      * @param itemUid
      * @param visible
-     *                true, item is visible. False, item is invisible.
+     *            true, item is visible. False, item is invisible.
      */
     void setItemVisible(Long itemUid, boolean visible);
 
     /**
-     * Get eadventure item <code>Summary</code> list according to sessionId 
-     * 
+     * Get eadventure item <code>Summary</code> list according to sessionId
+     *
      * @return
      */
     public List<Summary> exportBySessionId(Long sessionId, Long userId);
@@ -263,7 +260,7 @@ public interface IEadventureService {
 
     /**
      * Create refection entry into notebook tool.
-     * 
+     *
      * @param sessionId
      * @param notebook_tool
      * @param tool_signature
@@ -275,7 +272,7 @@ public interface IEadventureService {
 
     /**
      * Get reflection entry from notebook tool.
-     * 
+     *
      * @param sessionId
      * @param idType
      * @param signature
@@ -291,7 +288,7 @@ public interface IEadventureService {
 
     /**
      * Get Reflect DTO list grouped by sessionID.
-     * 
+     *
      * @param contentId
      * @return
      */
@@ -299,7 +296,7 @@ public interface IEadventureService {
 
     /**
      * Get user by UID
-     * 
+     *
      * @param uid
      * @return
      */
@@ -309,25 +306,25 @@ public interface IEadventureService {
 
     /**
      * Gets a message from eadventure bundle. Same as <code><fmt:message></code> in JSP pages.
-     * 
+     *
      * @param key
-     *                key of the message
+     *            key of the message
      * @param args
-     *                arguments for the message
+     *            arguments for the message
      * @return message content
      */
     String getLocalisedMessage(String key, Object[] args);
 
     /**
      * Finds out which lesson the given tool content belongs to and returns its monitoring users.
-     * 
+     *
      * @param sessionId
-     *                tool session ID
+     *            tool session ID
      * @return list of teachers that monitor the lesson which contains the tool with given session ID
      */
     public List<User> getMonitorsByToolSessionId(Long sessionId);
-    
+
     public boolean checkCondition(String conditionName, Long toolSessionId, Long userUid);
-    
+
     public void removeParam(EadventureParam eadParams);
 }

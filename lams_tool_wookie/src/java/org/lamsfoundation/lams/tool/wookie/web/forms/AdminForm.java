@@ -40,7 +40,6 @@ public class AdminForm extends ActionForm {
 
     String apiKey;
     String wookieServerUrl;
-    
 
     public AdminForm() {
     }
@@ -53,18 +52,18 @@ public class AdminForm extends ActionForm {
     }
 
     public String getApiKey() {
-        return apiKey;
+	return apiKey;
     }
 
     public void setApiKey(String apiKey) {
-        this.apiKey = apiKey;
+	this.apiKey = apiKey;
     }
 
     public String getWookieServerUrl() {
-        return wookieServerUrl;
+	return wookieServerUrl;
     }
 
     public void setWookieServerUrl(String wookieServerUrl) {
-        this.wookieServerUrl = wookieServerUrl;
+	this.wookieServerUrl = wookieServerUrl;
     }
 }

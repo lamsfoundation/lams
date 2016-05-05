@@ -2,21 +2,21 @@
  * Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
  * =============================================================
  * License Information: http://lamsfoundation.org/licensing/lams/2.0/
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License version 2.0 
+ * it under the terms of the GNU General Public License version 2.0
  * as published by the Free Software Foundation.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301
  * USA
- * 
+ *
  * http://www.gnu.org/licenses/gpl.txt
  * ****************************************************************
  */
@@ -30,9 +30,9 @@ import java.util.TreeSet;
 
 /**
  * Models the portfolio for any type of activity, including tools, groupings, gates, optional and parallel activities
- * 
+ *
  * @author mtruong, fmalikoff
- * 
+ *
  */
 public class ActivityPortfolio {
 
@@ -145,7 +145,7 @@ public class ActivityPortfolio {
     /**
      * Generate just a heading for this portfolio, don't try to link to a page. This is used for Parallel and Sequence
      * activities in both learner and teacher modes, and for Branching in learner mode.
-     * 
+     *
      * @return
      */
     public boolean isHeadingNoPage() {
@@ -158,7 +158,7 @@ public class ActivityPortfolio {
 
     /**
      * Identifies this portfolio as of a Floating Activity
-     * 
+     *
      * @return
      */
     public boolean isFloating() {

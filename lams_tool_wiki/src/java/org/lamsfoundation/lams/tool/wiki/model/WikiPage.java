@@ -9,7 +9,7 @@ import org.apache.log4j.Logger;
  * Each instance of WikiPage represents a page on the wiki (can be the main
  * page) Each WikiPage instance has 0 to many edits, and therefore has 0 to many
  * WikiContent instances
- * 
+ *
  * @author lfoxton
  * @hibernate.class table="tl_lawiki10_wiki_page"
  */
@@ -33,7 +33,7 @@ public class WikiPage implements java.io.Serializable, Cloneable {
 
     /**
      * @hibernate.id generator-class="native" type="java.lang.Long" column="uid"
-     * 
+     *
      */
     public Long getUid() {
 	return uid;
@@ -46,7 +46,7 @@ public class WikiPage implements java.io.Serializable, Cloneable {
     /**
      * @hibernate.many-to-one not-null="true"
      * @hibernate.column name="wiki_uid"
-     * 
+     *
      */
     public Wiki getParentWiki() {
 	return parentWiki;
@@ -58,7 +58,7 @@ public class WikiPage implements java.io.Serializable, Cloneable {
 
     /**
      * @hibernate.property column="title" length="255"
-     * 
+     *
      */
     public String getTitle() {
 	return title;
@@ -70,7 +70,7 @@ public class WikiPage implements java.io.Serializable, Cloneable {
 
     /**
      * @hibernate.property column="editable" length="1"
-     * 
+     *
      */
     public Boolean getEditable() {
 	return editable;
@@ -79,25 +79,25 @@ public class WikiPage implements java.io.Serializable, Cloneable {
     public void setEditable(Boolean editable) {
 	this.editable = editable;
     }
-    
+
     /**
      * @hibernate.property column="deleted" length="1"
-     * 
+     *
      */
     public Boolean getDeleted() {
-        return deleted;
+	return deleted;
     }
 
     public void setDeleted(Boolean deleted) {
-        this.deleted = deleted;
+	this.deleted = deleted;
     }
-    
+
     /**
      * @hibernate.set lazy="true" inverse="false" cascade="all-delete-orphan"
      *                order-by="uid asc"
      * @hibernate.collection-key column="wiki_page_uid"
      * @hibernate.collection-one-to-many class="org.lamsfoundation.lams.tool.wiki.model.WikiPageContent"
-     * 
+     *
      */
     public Set<WikiPageContent> getWikiContentVersions() {
 	return wikiContentVersions;
@@ -110,7 +110,7 @@ public class WikiPage implements java.io.Serializable, Cloneable {
     /**
      * @hibernate.many-to-one not-null="true"
      * @hibernate.column name="wiki_current_content"
-     * 
+     *
      */
     public WikiPageContent getCurrentWikiContent() {
 	return currentWikiContent;
@@ -120,27 +120,26 @@ public class WikiPage implements java.io.Serializable, Cloneable {
 	this.currentWikiContent = currentWikiContent;
     }
 
-    
     /**
      * @hibernate.many-to-one not-null="true"
      * @hibernate.column name="added_by"
-     * 
+     *
      */
     public WikiUser getAddedBy() {
-        return addedBy;
+	return addedBy;
     }
 
     public void setAddedBy(WikiUser addedBy) {
-        this.addedBy = addedBy;
+	this.addedBy = addedBy;
     }
 
     /**
      * Gets the toolSession
-     * 
+     *
      * @hibernate.many-to-one cascade="none"
      *                        class="org.lamsfoundation.lams.tool.wiki.model.WikiSession"
      *                        column="wiki_session_uid"
-     * 
+     *
      */
     public WikiSession getWikiSession() {
 	return wikiSession;
@@ -150,6 +149,7 @@ public class WikiPage implements java.io.Serializable, Cloneable {
 	this.wikiSession = wikiSession;
     }
 
+    @Override
     public Object clone() {
 
 	WikiPage wikiPage = null;

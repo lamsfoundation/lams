@@ -37,9 +37,9 @@ import org.lamsfoundation.lams.web.TextSearchActionForm;
 /**
  * Condition that is based on text search. Several properties set what needs to be found in a tool output. Based on the
  * result of the text scan, the condition is safisfied or not.
- * 
+ *
  * @author Marcin Cieslak
- * 
+ *
  */
 public class TextSearchCondition extends BranchCondition implements Cloneable {
 
@@ -109,7 +109,7 @@ public class TextSearchCondition extends BranchCondition implements Cloneable {
 
     /**
      * Creates the condition based on a DTO.
-     * 
+     *
      * @param conditionDTO
      */
     public TextSearchCondition(TextSearchConditionDTO conditionDTO) {
@@ -185,9 +185,9 @@ public class TextSearchCondition extends BranchCondition implements Cloneable {
 
     /**
      * Checks if the given text contain the words provided in the condition parameters (case insensitive).
-     * 
+     *
      * @param text
-     *                string to check
+     *            string to check
      * @return <code>true</code> if text satisfies this condition
      */
     public boolean matches(String text) {
@@ -206,8 +206,9 @@ public class TextSearchCondition extends BranchCondition implements Cloneable {
 	if (getExcludedWordsCondition() != null) {
 	    stringPattern = new StringBuilder();
 	    for (String excludedWord : getExcludedWordsCondition()) {
-		stringPattern.append("(?:").append(TextSearchCondition.NON_WORD_DELIMITER_REGEX).append(
-			Pattern.quote(excludedWord)).append(TextSearchCondition.NON_WORD_DELIMITER_REGEX).append(")|");
+		stringPattern.append("(?:").append(TextSearchCondition.NON_WORD_DELIMITER_REGEX)
+			.append(Pattern.quote(excludedWord)).append(TextSearchCondition.NON_WORD_DELIMITER_REGEX)
+			.append(")|");
 	    }
 	    stringPattern.deleteCharAt(stringPattern.length() - 1);
 	    regexPattern = Pattern.compile(stringPattern.toString(), TextSearchCondition.PATTERN_MATCHING_OPTIONS);
@@ -220,8 +221,8 @@ public class TextSearchCondition extends BranchCondition implements Cloneable {
 	    stringPattern = new StringBuilder();
 
 	    for (String word : getAnyWordsCondition()) {
-		stringPattern.append("(?:").append(TextSearchCondition.NON_WORD_DELIMITER_REGEX).append(
-			Pattern.quote(word)).append(TextSearchCondition.NON_WORD_DELIMITER_REGEX).append(")|");
+		stringPattern.append("(?:").append(TextSearchCondition.NON_WORD_DELIMITER_REGEX)
+			.append(Pattern.quote(word)).append(TextSearchCondition.NON_WORD_DELIMITER_REGEX).append(")|");
 	    }
 	    stringPattern.deleteCharAt(stringPattern.length() - 1);
 	    regexPattern = Pattern.compile(stringPattern.toString(), TextSearchCondition.PATTERN_MATCHING_OPTIONS);
@@ -244,8 +245,8 @@ public class TextSearchCondition extends BranchCondition implements Cloneable {
 
 	if (getAllWordsCondition() != null) {
 	    for (String word : getAllWordsCondition()) {
-		stringPattern = new StringBuilder(TextSearchCondition.NON_WORD_DELIMITER_REGEX).append(
-			Pattern.quote(word)).append(TextSearchCondition.NON_WORD_DELIMITER_REGEX);
+		stringPattern = new StringBuilder(TextSearchCondition.NON_WORD_DELIMITER_REGEX)
+			.append(Pattern.quote(word)).append(TextSearchCondition.NON_WORD_DELIMITER_REGEX);
 		regexPattern = Pattern.compile(stringPattern.toString(), TextSearchCondition.PATTERN_MATCHING_OPTIONS);
 		matcher = regexPattern.matcher(text);
 		if (!matcher.find()) {
@@ -265,7 +266,7 @@ public class TextSearchCondition extends BranchCondition implements Cloneable {
 
     /**
      * Splits condition parameters into lists of words for easier usage.
-     * 
+     *
      * @param allWordsString
      * @param phraseString
      * @param anyWordsString
@@ -282,9 +283,9 @@ public class TextSearchCondition extends BranchCondition implements Cloneable {
 
     /**
      * Fills the condition parameters using strings provided by an user in the form.
-     * 
+     *
      * @param textSearchActionForm
-     *                form to parse
+     *            form to parse
      */
     public void parseConditionStrings(TextSearchActionForm textSearchActionForm) {
 	parseConditionStrings(textSearchActionForm.getAllWords(), textSearchActionForm.getPhrase(),
@@ -337,9 +338,9 @@ public class TextSearchCondition extends BranchCondition implements Cloneable {
 
     /**
      * Splits the given string into words using configured delimiter.
-     * 
+     *
      * @param sentence
-     *                string to split
+     *            string to split
      * @return list of non-empty words
      */
     private List<String> splitSentence(String sentence, String regex) {

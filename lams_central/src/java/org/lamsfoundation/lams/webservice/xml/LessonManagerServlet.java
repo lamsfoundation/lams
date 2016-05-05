@@ -96,9 +96,9 @@ public class LessonManagerServlet extends HttpServlet {
 
     /**
      * The doGet method of the servlet. <br>
-     * 
+     *
      * This method is called when a form has its tag value method equals to get.
-     * 
+     *
      * @param request
      *            the request send by the client to the server
      * @param response
@@ -340,9 +340,9 @@ public class LessonManagerServlet extends HttpServlet {
 
     /**
      * The doPost method of the servlet. <br>
-     * 
+     *
      * This method is called when a form has its tag value method equals to post.
-     * 
+     *
      * @param request
      *            the request send by the client to the server
      * @param response
@@ -389,7 +389,7 @@ public class LessonManagerServlet extends HttpServlet {
     private Long scheduleLesson(String serverId, String datetime, String hashValue, String username, long ldId,
 	    String courseId, String title, String desc, String startDate, String countryIsoCode, String langIsoCode,
 	    String customCSV, boolean exportPortfolioEnable, boolean presenceEnable, boolean imEnable)
-		    throws RemoteException {
+	    throws RemoteException {
 	try {
 	    ExtServerOrgMap serverMap = LessonManagerServlet.integrationService.getExtServerOrgMap(serverId);
 	    Authenticator.authenticate(serverMap, datetime, username, hashValue);
@@ -792,7 +792,7 @@ public class LessonManagerServlet extends HttpServlet {
 
     /**
      * Initialization of the servlet. <br>
-     * 
+     *
      * @throws ServletException
      *             if an error occured
      */
@@ -869,7 +869,7 @@ public class LessonManagerServlet extends HttpServlet {
 	/**
 	 * Adds each user in learnerIds and monitorIds as learner and staff to the given lesson id; authenticates using
 	 * the 3rd party server requestor's username.
-	 * 
+	 *
 	 * @param serverId
 	 * @param datetime
 	 * @param hashValue
@@ -1001,7 +1001,7 @@ public class LessonManagerServlet extends HttpServlet {
 
     /**
      * This method gets the tool outputs for a lesson or a specific user and returns them in XML format.
-     * 
+     *
      * @param document
      * @param serverId
      * @param datetime
@@ -1129,7 +1129,7 @@ public class LessonManagerServlet extends HttpServlet {
 
     /**
      * This method gets the tool outputs for a lesson or a specific user and returns them in XML format.
-     * 
+     *
      * @param document
      * @param serverId
      * @param datetime
@@ -1146,7 +1146,7 @@ public class LessonManagerServlet extends HttpServlet {
     @SuppressWarnings("unchecked")
     public Element getToolOutputs(Document document, String serverId, String datetime, String hashValue,
 	    String username, Long lessonId, String courseID, boolean isAuthoredToolOutputs, String outputsUser)
-		    throws Exception {
+	    throws Exception {
 
 	ExtServerOrgMap serverMap = LessonManagerServlet.integrationService.getExtServerOrgMap(serverId);
 	Authenticator.authenticate(serverMap, datetime, username, hashValue);
@@ -1259,7 +1259,7 @@ public class LessonManagerServlet extends HttpServlet {
 	/*
 	 * Hibernate CGLIB is failing to load the first activity in the sequence as a ToolActivity for some mysterious
 	 * reason Causes a ClassCastException when you try to cast it, even if it is a ToolActivity.
-	 * 
+	 *
 	 * THIS IS A HACK to retrieve the first tool activity manually so it can be cast as a ToolActivity - if it is
 	 * one
 	 */
@@ -1281,7 +1281,7 @@ public class LessonManagerServlet extends HttpServlet {
     /**
      * Verifies external server. Also it has a WSDL analog
      * <code>org.lamsfoundation.lams.webservice.VerificationServiceSoapBindingImpl</code>
-     * 
+     *
      * @param serverId
      * @param datetime
      * @param hash
@@ -1301,7 +1301,7 @@ public class LessonManagerServlet extends HttpServlet {
 
     /**
      * Gets the tool output for a specified activity and learner and returns an XML representation of the data
-     * 
+     *
      * @param document
      * @param activity
      * @param learner
@@ -1374,7 +1374,7 @@ public class LessonManagerServlet extends HttpServlet {
 
     /**
      * Returns an XML element containing the tool output data for one instance
-     * 
+     *
      * @param document
      * @param toolOutput
      * @return
@@ -1412,7 +1412,7 @@ public class LessonManagerServlet extends HttpServlet {
 
     /**
      * Gets the total marks available for a tool output definition
-     * 
+     *
      * @param activity
      * @return
      */
@@ -1427,7 +1427,7 @@ public class LessonManagerServlet extends HttpServlet {
 
     /**
      * Checks whether request method is POST, throws SecurityException if not.
-     * 
+     *
      * @param request
      * @return
      * @throws SecurityException
@@ -1466,7 +1466,7 @@ public class LessonManagerServlet extends HttpServlet {
 	    lessonElem.setAttribute(CentralConstants.ATTR_NAME, bean.getName());
 	    lessonElem.setAttribute("description", bean.getDescription());
 	    lessonElem.setAttribute("state", bean.getState().toString());
-	    
+
 	    lessonsElem.appendChild(lessonElem);
 	}
 

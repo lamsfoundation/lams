@@ -2,21 +2,21 @@
  * Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
  * =============================================================
  * License Information: http://lamsfoundation.org/licensing/lams/2.0/
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License version 2.0 
+ * it under the terms of the GNU General Public License version 2.0
  * as published by the Free Software Foundation.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301
  * USA
- * 
+ *
  * http://www.gnu.org/licenses/gpl.txt
  * ***********************************************************************/
 /* $$Id$$ */
@@ -46,9 +46,9 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
 
 /**
  * Generates a help link to a contextualised tool help page.
- * 
+ *
  * @jsp.tag name="help" body-content="empty" display-name="Help tag" description="Help tag"
- * 
+ *
  * @author Fiona Malikoff
  */
 public class HelpTag extends TagSupport {
@@ -60,8 +60,8 @@ public class HelpTag extends TagSupport {
     private String style = null;
 
     /**
-	 * 
-	 */
+     * 
+     */
     public HelpTag() {
 	super();
     }
@@ -91,8 +91,8 @@ public class HelpTag extends TagSupport {
 		if ((toolSignature != null) && (module != null)) {
 
 		    // retrieve help URL for tool
-		    ILamsToolService toolService = (ILamsToolService) getContext().getBean(
-			    AuthoringConstants.TOOL_SERVICE_BEAN_NAME);
+		    ILamsToolService toolService = (ILamsToolService) getContext()
+			    .getBean(AuthoringConstants.TOOL_SERVICE_BEAN_NAME);
 		    IToolVO tool = toolService.getToolBySignature(toolSignature);
 
 		    String fullURL = HelpUtil.constructToolURL(tool.getHelpUrl(), toolSignature, module, languageCode);
@@ -120,9 +120,9 @@ public class HelpTag extends TagSupport {
 			    + "\"/>");
 		}
 	    } catch (NullPointerException npe) {
-		HelpTag.log
-			.error("HelpTag unable to write out due to NullPointerException. Most likely a required paramater was unspecified or incorrect.",
-				npe);
+		HelpTag.log.error(
+			"HelpTag unable to write out due to NullPointerException. Most likely a required paramater was unspecified or incorrect.",
+			npe);
 		// don't throw a JSPException as we want the system to still function.
 
 	    }
@@ -145,7 +145,7 @@ public class HelpTag extends TagSupport {
 
     /**
      * @return module
-     * 
+     *
      * @jsp.attribute required="false" rtexprvalue="true" description="Module Name"
      */
     public String getModule() {
@@ -153,7 +153,7 @@ public class HelpTag extends TagSupport {
     }
 
     /**
-     * 
+     *
      * @param module
      */
     public void setModule(String module) {
@@ -161,14 +161,14 @@ public class HelpTag extends TagSupport {
     }
 
     private WebApplicationContext getContext() {
-	WebApplicationContext ctx = WebApplicationContextUtils.getRequiredWebApplicationContext(pageContext
-		.getServletContext());
+	WebApplicationContext ctx = WebApplicationContextUtils
+		.getRequiredWebApplicationContext(pageContext.getServletContext());
 	return ctx;
     }
 
     /**
      * @return
-     * 
+     *
      * @jsp.attribute required="false" rtexprvalue="true" description="Tool Signature"
      */
     public String getToolSignature() {
@@ -176,7 +176,7 @@ public class HelpTag extends TagSupport {
     }
 
     /**
-     * 
+     *
      * @param toolSignature
      */
     public void setToolSignature(String toolSignature) {
@@ -185,7 +185,7 @@ public class HelpTag extends TagSupport {
 
     /**
      * @return page
-     * 
+     *
      * @jsp.attribute required="false" rtexprvalue="true" description="Page Name"
      */
     public String getPage() {
@@ -193,7 +193,7 @@ public class HelpTag extends TagSupport {
     }
 
     /**
-     * 
+     *
      * @param page
      */
     public void setPage(String page) {
@@ -202,7 +202,7 @@ public class HelpTag extends TagSupport {
 
     /**
      * @return style
-     * 
+     *
      * @jsp.attribute required="false" rtexprvalue="true" description="Style"
      */
     public String getStyle() {
@@ -210,7 +210,7 @@ public class HelpTag extends TagSupport {
     }
 
     /**
-     * 
+     *
      * @param style
      */
     public void setStyle(String style) {

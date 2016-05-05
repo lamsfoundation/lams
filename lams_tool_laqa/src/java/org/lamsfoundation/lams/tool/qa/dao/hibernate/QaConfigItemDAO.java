@@ -35,8 +35,10 @@ public class QaConfigItemDAO extends BaseDAO implements IQaConfigItemDAO {
     private static final String LOAD_CONFIG_ITEM_BY_KEY = "from QaConfigItem configuration"
 	    + " where configuration.configKey=:key";
 
+    @Override
     public QaConfigItem getConfigItemByKey(final String configKey) {
 	return (QaConfigItem) getHibernateTemplate().execute(new HibernateCallback() {
+	    @Override
 	    public Object doInHibernate(Session session) throws HibernateException {
 		return session.createQuery(LOAD_CONFIG_ITEM_BY_KEY).setString("key", configKey).uniqueResult();
 	    }
@@ -44,6 +46,7 @@ public class QaConfigItemDAO extends BaseDAO implements IQaConfigItemDAO {
 
     }
 
+    @Override
     public void saveOrUpdate(QaConfigItem qaConfigItem) {
 	this.getHibernateTemplate().saveOrUpdate(qaConfigItem);
 	this.getHibernateTemplate().flush();

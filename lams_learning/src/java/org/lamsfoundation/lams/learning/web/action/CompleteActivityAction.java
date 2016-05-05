@@ -2,21 +2,21 @@
  * Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
  * =============================================================
  * License Information: http://lamsfoundation.org/licensing/lams/2.0/
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License version 2.0 
+ * it under the terms of the GNU General Public License version 2.0
  * as published by the Free Software Foundation.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301
  * USA
- * 
+ *
  * http://www.gnu.org/licenses/gpl.txt
  * ****************************************************************
  */
@@ -46,11 +46,11 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
 
 /**
  * @author daveg
- * 
+ *
  *         XDoclet definition:
- * 
+ *
  * @struts:action path="/CompleteActivity" name="activityForm" validate="false" scope="request"
- * 
+ *
  */
 public class CompleteActivityAction extends ActivityAction {
 
@@ -59,13 +59,14 @@ public class CompleteActivityAction extends ActivityAction {
 
     /**
      * Sets the current activity as complete and uses the progress engine to find the next activity (may be null).
-     * 
+     *
      * Called when completing an optional activity, or triggered by completeToolSession (via a tool call). The activity
      * to be marked as complete must
-     * 
+     *
      * @throws IOException
      * @throws ServletException
      */
+    @Override
     public ActionForward execute(ActionMapping mapping, ActionForm actionForm, HttpServletRequest request,
 	    HttpServletResponse response) throws IOException, ServletException {
 	ActivityMapping actionMappings = LearningWebUtil.getActivityMapping(this.getServlet().getServletContext());
@@ -78,8 +79,8 @@ public class CompleteActivityAction extends ActivityAction {
 	// This must get the learner progress from the progress id, not cached from the request,
 	// otherwise we may be using an old version of a lesson while a teacher is starting a
 	// live edit, and then the lock flag can't be checked correctly.
-	LearnerProgress progress = learnerService.getProgressById(WebUtil.readLongParam(request,
-		LearningWebUtil.PARAM_PROGRESS_ID, true));
+	LearnerProgress progress = learnerService
+		.getProgressById(WebUtil.readLongParam(request, LearningWebUtil.PARAM_PROGRESS_ID, true));
 
 	// if user has already completed the lesson - we need to let integrations servers know to come and pick up
 	// updated marks (as it won't happen at lessoncomplete.jsp page)
@@ -94,8 +95,8 @@ public class CompleteActivityAction extends ActivityAction {
 	ActionForward forward = null;
 	// Set activity as complete
 	try {
-	    forward = LearningWebUtil.completeActivity(request, response, actionMappings, progress, activity,
-		    learnerId, learnerService, false);
+	    forward = LearningWebUtil.completeActivity(request, response, actionMappings, progress, activity, learnerId,
+		    learnerService, false);
 	} catch (LearnerServiceException e) {
 	    return mapping.findForward("error");
 	}
@@ -103,11 +104,11 @@ public class CompleteActivityAction extends ActivityAction {
 	LearningWebUtil.setupProgressInRequest((ActivityForm) actionForm, request, progress);
 	return forward;
     }
-    
+
     private IntegrationService getIntegrationService() {
 	if (integrationService == null) {
-	    integrationService = (IntegrationService) WebApplicationContextUtils.getRequiredWebApplicationContext(
-		    getServlet().getServletContext()).getBean("integrationService");
+	    integrationService = (IntegrationService) WebApplicationContextUtils
+		    .getRequiredWebApplicationContext(getServlet().getServletContext()).getBean("integrationService");
 	}
 	return integrationService;
     }

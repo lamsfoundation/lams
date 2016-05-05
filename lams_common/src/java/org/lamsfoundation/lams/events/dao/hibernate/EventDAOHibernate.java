@@ -16,6 +16,7 @@ class EventDAOHibernate extends HibernateDaoSupport implements EventDAO {
 	    + " AS e, Subscription AS s WHERE s.event = e AND (e.failTime IS NOT NULL OR "
 	    + "(s.periodicity > 0 AND (NOW()- s.lastOperationTime >= s.periodicity)))";
 
+    @Override
     public Event getEvent(String scope, String name, Long sessionId) throws InvalidParameterException {
 	List<Event> events = getHibernateTemplate().find(EventDAOHibernate.GET_EVENT_QUERY,
 		new Object[] { scope, name, sessionId });
@@ -28,14 +29,17 @@ class EventDAOHibernate extends HibernateDaoSupport implements EventDAO {
 	return events.get(0);
     }
 
+    @Override
     public List<Event> getEventsToResend() {
 	return getHibernateTemplate().find(EventDAOHibernate.GET_EVENTS_TO_RESEND_QUERY);
     }
 
+    @Override
     public void deleteEvent(Event event) {
 	getHibernateTemplate().delete(event);
     }
 
+    @Override
     public void saveEvent(Event event) {
 	getHibernateTemplate().saveOrUpdate(event);
     }

@@ -1,29 +1,28 @@
-/**************************************************************** 
- * Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org) 
- * ============================================================= 
- * License Information: http://lamsfoundation.org/licensing/lams/2.0/ 
- * 
- * This program is free software; you can redistribute it and/or modify 
- * it under the terms of the GNU General Public License version 2.0 
- * as published by the Free Software Foundation. 
- * 
- * This program is distributed in the hope that it will be useful, 
- * but WITHOUT ANY WARRANTY; without even the implied warranty of 
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the 
- * GNU General Public License for more details. 
- * 
- * You should have received a copy of the GNU General Public License 
- * along with this program; if not, write to the Free Software 
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 * USA 
- * 
- * http://www.gnu.org/licenses/gpl.txt 
- * **************************************************************** 
+/****************************************************************
+ * Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
+ * =============================================================
+ * License Information: http://lamsfoundation.org/licensing/lams/2.0/
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License version 2.0
+ * as published by the Free Software Foundation.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 * USA
+ *
+ * http://www.gnu.org/licenses/gpl.txt
+ * ****************************************************************
  */
 
 /* $Id$ */
 package org.lamsfoundation.lams.webservice;
 
-import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -56,9 +55,9 @@ public class LearningDesignSVGServlet extends HttpServlet {
 
     /**
      * The doGet method of the servlet. <br>
-     * 
+     *
      * This method is called when a form has its tag value method equals to get.
-     * 
+     *
      * @param request
      *            the request send by the client to the server
      * @param response
@@ -68,6 +67,7 @@ public class LearningDesignSVGServlet extends HttpServlet {
      * @throws IOException
      *             if an error occurred
      */
+    @Override
     public void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 
 	try {
@@ -96,7 +96,8 @@ public class LearningDesignSVGServlet extends HttpServlet {
 
 	    // LDEV-2196 preserve character encoding if necessary
 	    if (request.getCharacterEncoding() == null) {
-		log.debug("request.getCharacterEncoding is empty, parsing username and courseName as 8859_1 to UTF-8...");
+		log.debug(
+			"request.getCharacterEncoding is empty, parsing username and courseName as 8859_1 to UTF-8...");
 		username = new String(username.getBytes("8859_1"), "UTF-8");
 	    }
 
@@ -131,21 +132,23 @@ public class LearningDesignSVGServlet extends HttpServlet {
 
     }
 
+    @Override
     public void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 	doGet(request, response);
     }
 
     /**
      * Initialization of the servlet. <br>
-     * 
+     *
      * @throws ServletException
      *             if an error occure
      */
+    @Override
     public void init() throws ServletException {
-	integrationService = (IntegrationService) WebApplicationContextUtils.getRequiredWebApplicationContext(
-		getServletContext()).getBean("integrationService");
+	integrationService = (IntegrationService) WebApplicationContextUtils
+		.getRequiredWebApplicationContext(getServletContext()).getBean("integrationService");
 
-	learningDesignService = (ILearningDesignService) WebApplicationContextUtils.getRequiredWebApplicationContext(
-		getServletContext()).getBean("learningDesignService");
+	learningDesignService = (ILearningDesignService) WebApplicationContextUtils
+		.getRequiredWebApplicationContext(getServletContext()).getBean("learningDesignService");
     }
 }

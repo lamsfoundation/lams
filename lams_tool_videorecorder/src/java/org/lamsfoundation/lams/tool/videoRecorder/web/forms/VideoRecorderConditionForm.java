@@ -5,7 +5,7 @@ import org.lamsfoundation.lams.web.TextSearchActionForm;
 
 /**
  * A text search form with additional parameters for VideoRecorder needs.
- * 
+ *
  * @author Marcin Cieslak
  * @struts.form name="videoRecorderConditionForm"
  */
@@ -40,9 +40,10 @@ public class VideoRecorderConditionForm extends TextSearchActionForm {
     }
 
     /**
-     * Fills a new VideoRecorderCondition with data contained in this form. Note that some cruicial data is missing, so the
+     * Fills a new VideoRecorderCondition with data contained in this form. Note that some cruicial data is missing, so
+     * the
      * condition is NOT complete.
-     * 
+     *
      * @return created condition
      */
     public VideoRecorderCondition extractCondition() {

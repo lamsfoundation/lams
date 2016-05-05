@@ -2,21 +2,21 @@
  * Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
  * =============================================================
  * License Information: http://lamsfoundation.org/licensing/lams/2.0/
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License version 2.0
  * as published by the Free Software Foundation.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301
  * USA
- * 
+ *
  * http://www.gnu.org/licenses/gpl.txt
  * ***********************************************************************/
 
@@ -45,7 +45,7 @@ import org.springframework.orm.hibernate3.support.HibernateDaoSupport;
 
 /**
  * Hibernate implementation for database access to VoteUsrAttemptDAO for the voting tool.
- * 
+ *
  * @author Ozgur Demirtas repaired by lfoxton
  */
 public class VoteUsrAttemptDAO extends HibernateDaoSupport implements IVoteUsrAttemptDAO {
@@ -57,8 +57,8 @@ public class VoteUsrAttemptDAO extends HibernateDaoSupport implements IVoteUsrAt
     private static final String COUNT_ATTEMPT_FOR_QUESTION_CONTENT_AND_SESSION = "select count(*) from voteUsrAttempt in class VoteUsrAttempt where voteUsrAttempt.voteQueContent.uid=:voteQueContentId and voteUsrAttempt.voteQueUsr.voteSession.uid=:sessionUid";
 
     private static final String LOAD_ATTEMPT_FOR_USER_AND_QUESTION_CONTENT = "from voteUsrAttempt in class VoteUsrAttempt where voteUsrAttempt.queUsrId=:queUsrId and voteUsrAttempt.voteQueContent.uid=:voteQueContentId";
-    
-   private static final String LOAD_ATTEMPT_FOR_USER_AND_QUESTION_CONTENT_AND_SESSION = "from voteUsrAttempt in class VoteUsrAttempt where voteUsrAttempt.queUsrId=:queUsrId and voteUsrAttempt.voteQueContent.uid=:voteQueContentId and voteUsrAttempt.voteQueUsr.voteSession.uid=:sessionUid";
+
+    private static final String LOAD_ATTEMPT_FOR_USER_AND_QUESTION_CONTENT_AND_SESSION = "from voteUsrAttempt in class VoteUsrAttempt where voteUsrAttempt.queUsrId=:queUsrId and voteUsrAttempt.voteQueContent.uid=:voteQueContentId and voteUsrAttempt.voteQueUsr.voteSession.uid=:sessionUid";
 
     private static final String LOAD_ATTEMPT_FOR_USER_AND_SESSION = "from voteUsrAttempt in class VoteUsrAttempt where voteUsrAttempt.queUsrId=:queUsrId and voteUsrAttempt.voteQueUsr.voteSession.uid=:sessionUid";
 
@@ -124,7 +124,7 @@ public class VoteUsrAttemptDAO extends HibernateDaoSupport implements IVoteUsrAt
 
     @Override
     public List<VoteUsrAttempt> getSessionOpenTextUserEntries(final Long voteSessionUid) {
-	return (List<VoteUsrAttempt>) getSession().createQuery(VoteUsrAttemptDAO.LOAD_OPEN_TEXT_ENTRIES_BY_SESSION_UID)
+	return getSession().createQuery(VoteUsrAttemptDAO.LOAD_OPEN_TEXT_ENTRIES_BY_SESSION_UID)
 		.setLong("voteSessionUid", voteSessionUid).list();
     }
 
@@ -148,16 +148,15 @@ public class VoteUsrAttemptDAO extends HibernateDaoSupport implements IVoteUsrAt
 
     @Override
     public int getStandardAttemptsForQuestionContentAndSessionUid(final Long questionUid, final Long sessionUid) {
-	List<Number> list = getSession()
-		.createQuery(VoteUsrAttemptDAO.COUNT_ATTEMPT_FOR_QUESTION_CONTENT_AND_SESSION)
-		.setLong("voteQueContentId", questionUid.longValue())
-		.setLong("sessionUid", sessionUid.longValue()).list();
+	List<Number> list = getSession().createQuery(VoteUsrAttemptDAO.COUNT_ATTEMPT_FOR_QUESTION_CONTENT_AND_SESSION)
+		.setLong("voteQueContentId", questionUid.longValue()).setLong("sessionUid", sessionUid.longValue())
+		.list();
 
 	if (list == null || list.size() == 0) {
 	    return 0;
 	}
-	return ((Number) list.get(0)).intValue();
-	
+	return list.get(0).intValue();
+
     }
 
     @Override
@@ -165,8 +164,8 @@ public class VoteUsrAttemptDAO extends HibernateDaoSupport implements IVoteUsrAt
 	    final Long sessionUid) {
 	List<VoteUsrAttempt> list = getSession()
 		.createQuery(VoteUsrAttemptDAO.LOAD_ATTEMPT_FOR_QUESTION_CONTENT_AND_SESSION)
-		.setLong("voteQueContentId", questionUid.longValue())
-		.setLong("sessionUid", sessionUid.longValue()).list();
+		.setLong("voteQueContentId", questionUid.longValue()).setLong("sessionUid", sessionUid.longValue())
+		.list();
 
 	List<VoteUsrAttempt> userEntries = new ArrayList();
 	if ((list != null) && (list.size() > 0)) {
@@ -180,15 +179,14 @@ public class VoteUsrAttemptDAO extends HibernateDaoSupport implements IVoteUsrAt
     public List<VoteUsrAttempt> getAttemptsForUserAndQuestionContent(final Long queUsrId, final Long questionUid) {
 	List<VoteUsrAttempt> list = getSession()
 		.createQuery(VoteUsrAttemptDAO.LOAD_ATTEMPT_FOR_USER_AND_QUESTION_CONTENT)
-		.setLong("queUsrId", queUsrId.longValue()).setLong("voteQueContentId", questionUid.longValue())
-		.list();
+		.setLong("queUsrId", queUsrId.longValue()).setLong("voteQueContentId", questionUid.longValue()).list();
 
 	return list;
     }
 
     @Override
-    public VoteUsrAttempt getAttemptForUserAndQuestionContentAndSession(final Long queUsrId,
-	    final Long questionUid, final Long sessionUid) {
+    public VoteUsrAttempt getAttemptForUserAndQuestionContentAndSession(final Long queUsrId, final Long questionUid,
+	    final Long sessionUid) {
 	List<VoteUsrAttempt> list = getSession()
 		.createQuery(VoteUsrAttemptDAO.LOAD_ATTEMPT_FOR_USER_AND_QUESTION_CONTENT_AND_SESSION)
 		.setLong("queUsrId", queUsrId.longValue()).setLong("voteQueContentId", questionUid.longValue())
@@ -224,10 +222,10 @@ public class VoteUsrAttemptDAO extends HibernateDaoSupport implements IVoteUsrAt
     @Override
     public List<VoteUsrAttempt> getAttemptsForUserAndSessionUseOpenAnswer(final Long queUsrId, final Long sessionUid) {
 
-	 return getSession().createQuery(VoteUsrAttemptDAO.LOAD_ATTEMPT_FOR_USER_AND_SESSION)
+	return getSession().createQuery(VoteUsrAttemptDAO.LOAD_ATTEMPT_FOR_USER_AND_SESSION)
 		.setLong("queUsrId", queUsrId.longValue()).setLong("sessionUid", sessionUid.longValue()).list();
 
-   }
+    }
 
     @Override
     public int getSessionEntriesCount(final Long voteSessionUid) {
@@ -248,47 +246,50 @@ public class VoteUsrAttemptDAO extends HibernateDaoSupport implements IVoteUsrAt
 	this.getSession().setFlushMode(FlushMode.AUTO);
 	this.getHibernateTemplate().delete(voteUsrAttempt);
     }
-    
+
     // Used by Monitoring
-    
+
     private static final String FIND_USER_ANSWERS_BY_QUESTION_UID = "SELECT user.username username, user.fullname fullname, attempt.attempt_time attemptTime"
 	    + " FROM tl_lavote11_usr user "
 	    + " JOIN tl_lavote11_usr_attempt attempt on user.uid = attempt.que_usr_id AND attempt.vote_nomination_content_id = :questionUid ";
     private static final String FIND_USER_ANSWERS_BY_QUESTION_UID_SESSION_ADDITION = " AND user.vote_session_id = :sessionUid ";
 
+    @Override
     @SuppressWarnings("unchecked")
-    /** 
-     * Gets the basic details about an attempt for a nomination. questionUid must not be null, sessionUid may be NULL. This is
+    /**
+     * Gets the basic details about an attempt for a nomination. questionUid must not be null, sessionUid may be NULL.
+     * This is
      * unusual for these methods - usually sessionId may not be null. In this case if sessionUid is null then you get
      * the values for the whole class, not just the group.
-     * 
+     *
      * Will return List<[login (String), fullname(String), attemptTime(Timestamp]>
      */
     public List<Object[]> getUserAttemptsForTablesorter(Long sessionUid, Long questionUid, int page, int size,
 	    int sorting, String searchString) {
 	String sortingOrder;
 	switch (sorting) {
-	case VoteAppConstants.SORT_BY_NAME_ASC:
-	    sortingOrder = "user.fullname ASC";
-	    break;
-	case VoteAppConstants.SORT_BY_NAME_DESC:
-	    sortingOrder = "user.fullname DESC";
-	    break;
-	case VoteAppConstants.SORT_BY_DATE_ASC:
-	    sortingOrder = "attempt.attempt_time ASC";
-	    break;
-	case VoteAppConstants.SORT_BY_DATE_DESC:
-	    sortingOrder = "attempt.attempt_time DESC";
-	    break;
-	default:
-	    sortingOrder = "user.uid";
+	    case VoteAppConstants.SORT_BY_NAME_ASC:
+		sortingOrder = "user.fullname ASC";
+		break;
+	    case VoteAppConstants.SORT_BY_NAME_DESC:
+		sortingOrder = "user.fullname DESC";
+		break;
+	    case VoteAppConstants.SORT_BY_DATE_ASC:
+		sortingOrder = "attempt.attempt_time ASC";
+		break;
+	    case VoteAppConstants.SORT_BY_DATE_DESC:
+		sortingOrder = "attempt.attempt_time DESC";
+		break;
+	    default:
+		sortingOrder = "user.uid";
 	}
 
 	// Basic select for the user records
 	StringBuilder queryText = new StringBuilder(FIND_USER_ANSWERS_BY_QUESTION_UID);
-	
-	if ( sessionUid != null )
+
+	if (sessionUid != null) {
 	    queryText.append(FIND_USER_ANSWERS_BY_QUESTION_UID_SESSION_ADDITION);
+	}
 
 	// If filtering by name add a name based where clause
 	buildNameSearch(searchString, queryText, true);
@@ -297,13 +298,12 @@ public class VoteUsrAttemptDAO extends HibernateDaoSupport implements IVoteUsrAt
 	queryText.append(" ORDER BY " + sortingOrder);
 
 	SQLQuery query = getSession().createSQLQuery(queryText.toString());
-	query.addScalar("username", Hibernate.STRING)
-		.addScalar("fullname", Hibernate.STRING)
-		.addScalar("attemptTime", Hibernate.TIMESTAMP)
-		.setLong("questionUid", questionUid.longValue())
+	query.addScalar("username", Hibernate.STRING).addScalar("fullname", Hibernate.STRING)
+		.addScalar("attemptTime", Hibernate.TIMESTAMP).setLong("questionUid", questionUid.longValue())
 		.setFirstResult(page * size).setMaxResults(size);
-	if ( sessionUid != null ) 
-		query.setLong("sessionUid", sessionUid.longValue());
+	if (sessionUid != null) {
+	    query.setLong("sessionUid", sessionUid.longValue());
+	}
 
 	return query.list();
     }
@@ -313,21 +313,20 @@ public class VoteUsrAttemptDAO extends HibernateDaoSupport implements IVoteUsrAt
 	    String[] tokens = searchString.trim().split("\\s+");
 	    for (String token : tokens) {
 		String escToken = StringEscapeUtils.escapeSql(token);
-		sqlBuilder.append(useWhere ? " WHERE " : " AND ")
-			.append("(user.fullname LIKE '%").append(escToken)
+		sqlBuilder.append(useWhere ? " WHERE " : " AND ").append("(user.fullname LIKE '%").append(escToken)
 			.append("%' OR user.username LIKE '%").append(escToken).append("%') ");
 	    }
 	}
     }
 
-    private static final String COUNT_USERS_BY_QUESTION_UID = "SELECT count(*) "
-	    + " FROM tl_lavote11_usr user "
+    private static final String COUNT_USERS_BY_QUESTION_UID = "SELECT count(*) " + " FROM tl_lavote11_usr user "
 	    + " JOIN tl_lavote11_usr_attempt attempt ON user.uid = attempt.que_usr_id AND attempt.vote_nomination_content_id = :questionUid ";
     private static final String COUNT_USERS_BY_QUESTION_UID_SESSION_ADDITION = " AND user.vote_session_id = :sessionUid ";
-    
+
     private static final String COUNT_USERS_BY_SESSION_UID = "SELECT count(*) "
 	    + " FROM tl_lavote11_usr user WHERE user.vote_session_id = :sessionUid ";
 
+    @Override
     @SuppressWarnings("rawtypes")
     public int getCountUsersBySession(Long sessionUid, Long questionUid, String searchString) {
 
@@ -340,19 +339,21 @@ public class VoteUsrAttemptDAO extends HibernateDaoSupport implements IVoteUsrAt
 	    buildNameSearch(searchString, queryText, false); // all ready have a WHERE so need an AND
 	    query = getSession().createSQLQuery(queryText.toString());
 	    query.setLong("sessionUid", sessionUid.longValue());
-	    
+
 	} else {
 
 	    // get all the users by a question, possibly restricting by session
 	    StringBuilder queryText = new StringBuilder(COUNT_USERS_BY_QUESTION_UID);
-	    if (sessionUid != null)
+	    if (sessionUid != null) {
 		queryText.append(COUNT_USERS_BY_QUESTION_UID_SESSION_ADDITION);
+	    }
 	    buildNameSearch(searchString, queryText, true);
 
 	    query = getSession().createSQLQuery(queryText.toString());
 	    query.setLong("questionUid", questionUid.longValue());
-	    if (sessionUid != null)
+	    if (sessionUid != null) {
 		query.setLong("sessionUid", sessionUid.longValue());
+	    }
 	}
 
 	List list = query.list();
@@ -361,23 +362,24 @@ public class VoteUsrAttemptDAO extends HibernateDaoSupport implements IVoteUsrAt
 	}
 	return ((Number) list.get(0)).intValue();
     }
-    
+
+    @Override
     @SuppressWarnings("unchecked")
-    /** 
+    /**
      * Will return List<[login (String), fullname(String), String (notebook entry)]>
      */
     public List<Object[]> getUserReflectionsForTablesorter(final Long sessionUid, int page, int size, int sorting,
 	    String searchString, ICoreNotebookService coreNotebookService) {
 	String sortingOrder;
 	switch (sorting) {
-	case VoteAppConstants.SORT_BY_NAME_ASC:
-	    sortingOrder = "user.fullname ASC";
-	    break;
-	case VoteAppConstants.SORT_BY_NAME_DESC:
-	    sortingOrder = "user.fullname DESC";
-	    break;
-	default:
-	    sortingOrder = "user.uid";
+	    case VoteAppConstants.SORT_BY_NAME_ASC:
+		sortingOrder = "user.fullname ASC";
+		break;
+	    case VoteAppConstants.SORT_BY_NAME_DESC:
+		sortingOrder = "user.fullname DESC";
+		break;
+	    default:
+		sortingOrder = "user.uid";
 	}
 
 	// If the session uses notebook, then get the sql to join across to get the entries
@@ -389,7 +391,8 @@ public class VoteUsrAttemptDAO extends HibernateDaoSupport implements IVoteUsrAt
 	queryText.append("SELECT user.username username, user.fullname fullname ");
 	queryText.append(notebookEntryStrings[0]);
 	queryText.append(" FROM tl_lavote11_usr user ");
-	queryText.append(" JOIN tl_lavote11_session session ON user.vote_session_id = :sessionUid AND user.vote_session_id = session.uid ");
+	queryText.append(
+		" JOIN tl_lavote11_session session ON user.vote_session_id = :sessionUid AND user.vote_session_id = session.uid ");
 
 	// Add the notebook join
 	queryText.append(notebookEntryStrings[1]);
@@ -401,10 +404,8 @@ public class VoteUsrAttemptDAO extends HibernateDaoSupport implements IVoteUsrAt
 	queryText.append(" ORDER BY " + sortingOrder);
 
 	SQLQuery query = getSession().createSQLQuery(queryText.toString());
-	query.addScalar("username", Hibernate.STRING)
-		.addScalar("fullname", Hibernate.STRING)
-		.addScalar("notebookEntry", Hibernate.STRING)
-		.setLong("sessionUid", sessionUid.longValue())
+	query.addScalar("username", Hibernate.STRING).addScalar("fullname", Hibernate.STRING)
+		.addScalar("notebookEntry", Hibernate.STRING).setLong("sessionUid", sessionUid.longValue())
 		.setFirstResult(page * size).setMaxResults(size);
 
 	return query.list();
@@ -416,57 +417,59 @@ public class VoteUsrAttemptDAO extends HibernateDaoSupport implements IVoteUsrAt
 	    + " JOIN tl_lavote11_usr_attempt attempt ON user.uid = attempt.que_usr_id AND attempt.vote_nomination_content_id = 1 ";
 
     private static final String FIND_USER_OPEN_TEXT_SESSION_UID_ADD = "AND user.vote_session_id=:sessionUid";
-    private static final String FIND_USER_OPEN_TEXT_CONTENT_UID_ADD = 
-	    "JOIN tl_lavote11_session session ON user.vote_session_id = session.uid "
+    private static final String FIND_USER_OPEN_TEXT_CONTENT_UID_ADD = "JOIN tl_lavote11_session session ON user.vote_session_id = session.uid "
 	    + " JOIN tl_lavote11_content content ON session.vote_content_id = content.uid and content.content_id = :toolContentId";
-    
-     @SuppressWarnings("unchecked")
-    /** 
-     * Gets the details about an open text entry. Either sessionUid or toolContentId must be supplied - if sessionUid is supplied
+
+    @Override
+    @SuppressWarnings("unchecked")
+    /**
+     * Gets the details about an open text entry. Either sessionUid or toolContentId must be supplied - if sessionUid is
+     * supplied
      * then it will be restricted to that session. Due to the large number of fields needed, a DTO will be returned.
-     * 
+     *
      * Will return List<OpenTextAnswerDTO>
      */
-    public List<OpenTextAnswerDTO> getUserOpenTextAttemptsForTablesorter(Long sessionUid, Long toolContentId, int page, int size,
-	    int sorting, String searchStringVote, String searchStringUsername) {
+    public List<OpenTextAnswerDTO> getUserOpenTextAttemptsForTablesorter(Long sessionUid, Long toolContentId, int page,
+	    int size, int sorting, String searchStringVote, String searchStringUsername) {
 	String sortingOrder;
 	switch (sorting) {
-	case VoteAppConstants.SORT_BY_NAME_ASC:
-	    sortingOrder = "user.fullname ASC";
-	    break;
-	case VoteAppConstants.SORT_BY_NAME_DESC:
-	    sortingOrder = "user.fullname DESC";
-	    break;
-	case VoteAppConstants.SORT_BY_DATE_ASC:
-	    sortingOrder = "attempt.attempt_time ASC";
-	    break;
-	case VoteAppConstants.SORT_BY_DATE_DESC:
-	    sortingOrder = "attempt.attempt_time DESC";
-	    break;
-	case VoteAppConstants.SORT_BY_ENTRY_ASC:
-	    sortingOrder = "attempt.userEntry ASC";
-	    break;
-	case VoteAppConstants.SORT_BY_ENTRY_DESC:
-	    sortingOrder = "attempt.userEntry DESC";
-	    break;
-	case VoteAppConstants.SORT_BY_VISIBLE_ASC:
-	    sortingOrder = "attempt.visible ASC";
-	    break;
-	case VoteAppConstants.SORT_BY_VISIBLE_DESC:
-	    sortingOrder = "attempt.visible DESC";
-	    break;
-	default:
-	    sortingOrder = "user.uid";
+	    case VoteAppConstants.SORT_BY_NAME_ASC:
+		sortingOrder = "user.fullname ASC";
+		break;
+	    case VoteAppConstants.SORT_BY_NAME_DESC:
+		sortingOrder = "user.fullname DESC";
+		break;
+	    case VoteAppConstants.SORT_BY_DATE_ASC:
+		sortingOrder = "attempt.attempt_time ASC";
+		break;
+	    case VoteAppConstants.SORT_BY_DATE_DESC:
+		sortingOrder = "attempt.attempt_time DESC";
+		break;
+	    case VoteAppConstants.SORT_BY_ENTRY_ASC:
+		sortingOrder = "attempt.userEntry ASC";
+		break;
+	    case VoteAppConstants.SORT_BY_ENTRY_DESC:
+		sortingOrder = "attempt.userEntry DESC";
+		break;
+	    case VoteAppConstants.SORT_BY_VISIBLE_ASC:
+		sortingOrder = "attempt.visible ASC";
+		break;
+	    case VoteAppConstants.SORT_BY_VISIBLE_DESC:
+		sortingOrder = "attempt.visible DESC";
+		break;
+	    default:
+		sortingOrder = "user.uid";
 	}
 
 	// Basic select for the user records
 	StringBuilder queryText = new StringBuilder(FIND_USER_OPEN_TEXT);
-	
-	if ( sessionUid != null )
+
+	if (sessionUid != null) {
 	    queryText.append(FIND_USER_OPEN_TEXT_SESSION_UID_ADD);
-	else
+	} else {
 	    queryText.append(FIND_USER_OPEN_TEXT_CONTENT_UID_ADD);
-	    
+	}
+
 	// If filtering by name/entry add a where clause
 	buildCombinedSearch(searchStringVote, searchStringUsername, queryText);
 
@@ -474,21 +477,18 @@ public class VoteUsrAttemptDAO extends HibernateDaoSupport implements IVoteUsrAt
 	queryText.append(" ORDER BY " + sortingOrder);
 
 	SQLQuery query = getSession().createSQLQuery(queryText.toString());
-	query.addScalar("userUid", Hibernate.LONG)
-		.addScalar("login", Hibernate.STRING)
-		.addScalar("fullName", Hibernate.STRING)
-		.addScalar("userEntryUid", Hibernate.LONG)
-		.addScalar("userEntry", Hibernate.STRING)
-		.addScalar("attemptTime", Hibernate.TIMESTAMP)
-		.addScalar("visible", Hibernate.BOOLEAN)
-		.setFirstResult(page * size).setMaxResults(size)
+	query.addScalar("userUid", Hibernate.LONG).addScalar("login", Hibernate.STRING)
+		.addScalar("fullName", Hibernate.STRING).addScalar("userEntryUid", Hibernate.LONG)
+		.addScalar("userEntry", Hibernate.STRING).addScalar("attemptTime", Hibernate.TIMESTAMP)
+		.addScalar("visible", Hibernate.BOOLEAN).setFirstResult(page * size).setMaxResults(size)
 		.setResultTransformer(Transformers.aliasToBean(OpenTextAnswerDTO.class));
-	
-	if ( sessionUid != null ) 
+
+	if (sessionUid != null) {
 	    query.setLong("sessionUid", sessionUid);
-	else 
+	} else {
 	    query.setLong("toolContentId", toolContentId);
-	    
+	}
+
 	return query.list();
     }
 
@@ -509,8 +509,10 @@ public class VoteUsrAttemptDAO extends HibernateDaoSupport implements IVoteUsrAt
 	    + " FROM tl_lavote11_usr user "
 	    + " JOIN tl_lavote11_usr_attempt attempt ON user.uid = attempt.que_usr_id AND attempt.vote_nomination_content_id = 1 ";
 
+    @Override
     @SuppressWarnings("rawtypes")
-    public int getCountUsersForOpenTextEntries(Long sessionUid, Long toolContentId, String searchStringVote, String searchStringUsername) {
+    public int getCountUsersForOpenTextEntries(Long sessionUid, Long toolContentId, String searchStringVote,
+	    String searchStringUsername) {
 
 	SQLQuery query;
 	StringBuilder queryText = new StringBuilder(COUNT_USERS_OPEN_TEXT_BY_SESSION_UID);
@@ -521,16 +523,16 @@ public class VoteUsrAttemptDAO extends HibernateDaoSupport implements IVoteUsrAt
 	    buildCombinedSearch(searchStringVote, searchStringUsername, queryText);
 	    query = getSession().createSQLQuery(queryText.toString());
 	    query.setLong("sessionUid", sessionUid);
-	
-	} else { 
+
+	} else {
 
 	    // get all the users for this content (more than one session potentially)
 	    queryText.append(FIND_USER_OPEN_TEXT_CONTENT_UID_ADD);
 	    buildCombinedSearch(searchStringVote, searchStringUsername, queryText);
 	    query = getSession().createSQLQuery(queryText.toString());
 	    query.setLong("toolContentId", toolContentId);
-	    
-	} 
+
+	}
 
 	List list = query.list();
 	if (list == null || list.size() == 0) {
@@ -538,28 +540,22 @@ public class VoteUsrAttemptDAO extends HibernateDaoSupport implements IVoteUsrAt
 	}
 	return ((Number) list.get(0)).intValue();
     }
-    
 
     private static final String GET_STATISTICS = "SELECT session.session_name sessionName, session.uid sessionUid, SUM(user.responseFinalised) countUsersComplete "
-	    +" FROM tl_lavote11_usr user "
-	    +" JOIN tl_lavote11_session session ON user.vote_session_id = session.uid "
-	    +" JOIN tl_lavote11_content content ON session.vote_content_id = content.uid and content.content_id = :contentId "
-	    +" GROUP BY sessionUid "
-	    +" ORDER BY sessionUid";
- 
+	    + " FROM tl_lavote11_usr user " + " JOIN tl_lavote11_session session ON user.vote_session_id = session.uid "
+	    + " JOIN tl_lavote11_content content ON session.vote_content_id = content.uid and content.content_id = :contentId "
+	    + " GROUP BY sessionUid " + " ORDER BY sessionUid";
+
+    @Override
     @SuppressWarnings("unchecked")
     public List<VoteStatsDTO> getStatisticsBySession(Long toolContentId) {
 
-	    SQLQuery query =  getSession().createSQLQuery(GET_STATISTICS);
-	    query.addScalar("sessionUid", Hibernate.LONG)
-		.addScalar("sessionName", Hibernate.STRING)
-		.addScalar("countUsersComplete", Hibernate.INTEGER)
-		.setLong("contentId", toolContentId)
-	    	.setResultTransformer(Transformers.aliasToBean(VoteStatsDTO.class));
-	    
-	    return (List<VoteStatsDTO>) query.list();
-	}
+	SQLQuery query = getSession().createSQLQuery(GET_STATISTICS);
+	query.addScalar("sessionUid", Hibernate.LONG).addScalar("sessionName", Hibernate.STRING)
+		.addScalar("countUsersComplete", Hibernate.INTEGER).setLong("contentId", toolContentId)
+		.setResultTransformer(Transformers.aliasToBean(VoteStatsDTO.class));
 
-       
-    
+	return query.list();
+    }
+
 }

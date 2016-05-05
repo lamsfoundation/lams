@@ -34,11 +34,11 @@ import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 
 /**
- * 
+ *
  * @author asukkar
- * 
+ *
  * @struts.action path="/findUserLessons" parameter="dispatch" validate="false"
- * 
+ *
  * @struts.action-forward name="success-getResults" path="/findUserLessons.jsp"
  */
 public class FindUserLessonsAction extends DispatchAction {
@@ -131,7 +131,7 @@ public class FindUserLessonsAction extends DispatchAction {
 	response.getWriter().print(jsonArray);
 	return null;
     }
-    
+
     private Integer getUserId() {
 	HttpSession ss = SessionManager.getSession();
 	UserDTO user = (UserDTO) ss.getAttribute(AttributeNames.USER);
@@ -140,8 +140,8 @@ public class FindUserLessonsAction extends DispatchAction {
 
     private IUserManagementService getUserManagementService() {
 	if (FindUserLessonsAction.userManagementService == null) {
-	    WebApplicationContext wac = WebApplicationContextUtils.getRequiredWebApplicationContext(getServlet()
-		    .getServletContext());
+	    WebApplicationContext wac = WebApplicationContextUtils
+		    .getRequiredWebApplicationContext(getServlet().getServletContext());
 	    FindUserLessonsAction.userManagementService = (IUserManagementService) wac
 		    .getBean(CentralConstants.USER_MANAGEMENT_SERVICE_BEAN_NAME);
 	}
@@ -150,8 +150,8 @@ public class FindUserLessonsAction extends DispatchAction {
 
     private ILessonService getLessonService() {
 	if (FindUserLessonsAction.lessonService == null) {
-	    WebApplicationContext ctx = WebApplicationContextUtils.getRequiredWebApplicationContext(getServlet()
-		    .getServletContext());
+	    WebApplicationContext ctx = WebApplicationContextUtils
+		    .getRequiredWebApplicationContext(getServlet().getServletContext());
 	    FindUserLessonsAction.lessonService = (ILessonService) ctx.getBean("lessonService");
 	}
 	return FindUserLessonsAction.lessonService;
@@ -159,8 +159,8 @@ public class FindUserLessonsAction extends DispatchAction {
 
     private ISecurityService getSecurityService() {
 	if (FindUserLessonsAction.securityService == null) {
-	    WebApplicationContext ctx = WebApplicationContextUtils.getRequiredWebApplicationContext(getServlet()
-		    .getServletContext());
+	    WebApplicationContext ctx = WebApplicationContextUtils
+		    .getRequiredWebApplicationContext(getServlet().getServletContext());
 	    FindUserLessonsAction.securityService = (ISecurityService) ctx.getBean("securityService");
 	}
 	return FindUserLessonsAction.securityService;

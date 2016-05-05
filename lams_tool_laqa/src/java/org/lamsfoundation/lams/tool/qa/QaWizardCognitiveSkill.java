@@ -33,7 +33,7 @@ import org.apache.log4j.Logger;
 /**
  * This class maps to a single cognitive skill in the q&a wizard, it contains a
  * set of questions
- * 
+ *
  * @hibernate.class table="tl_laqa11_wizard_cognitive_skill"
  */
 public class QaWizardCognitiveSkill implements Serializable, Comparable<QaWizardCognitiveSkill>, Cloneable {
@@ -60,7 +60,7 @@ public class QaWizardCognitiveSkill implements Serializable, Comparable<QaWizard
 
     /**
      * @hibernate.id generator-class="native" type="java.lang.Long" column="uid"
-     * 
+     *
      */
     public Long getUid() {
 	return uid;
@@ -82,11 +82,11 @@ public class QaWizardCognitiveSkill implements Serializable, Comparable<QaWizard
     }
 
     /**
-     * 
+     *
      * @hibernate.many-to-one cascade="none"
      *                        class="org.lamsfoundation.lams.tool.qa.QaWizardCategory"
      *                        column="category_uid"
-     * 
+     *
      */
     public QaWizardCategory getCategory() {
 	return category;
@@ -101,7 +101,7 @@ public class QaWizardCognitiveSkill implements Serializable, Comparable<QaWizard
      *                order-by="uid asc"
      * @hibernate.collection-key column="cognitive_skill_uid"
      * @hibernate.collection-one-to-many class="org.lamsfoundation.lams.tool.qa.QaWizardQuestion"
-     * 
+     *
      */
     public Set<QaWizardQuestion> getQuestions() {
 	return questions;
@@ -111,6 +111,7 @@ public class QaWizardCognitiveSkill implements Serializable, Comparable<QaWizard
 	this.questions = questions;
     }
 
+    @Override
     public int compareTo(QaWizardCognitiveSkill skill) {
 	if (skill.getUid() != null && uid != null) {
 	    return skill.getUid().compareTo(uid) * -1;
@@ -119,6 +120,7 @@ public class QaWizardCognitiveSkill implements Serializable, Comparable<QaWizard
 	}
     }
 
+    @Override
     public Object clone() {
 
 	QaWizardCognitiveSkill skill = null;

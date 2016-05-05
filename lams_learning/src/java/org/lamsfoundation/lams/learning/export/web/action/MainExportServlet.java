@@ -2,21 +2,21 @@
  * Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
  * =============================================================
  * License Information: http://lamsfoundation.org/licensing/lams/2.0/
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License version 2.0 
+ * it under the terms of the GNU General Public License version 2.0
  * as published by the Free Software Foundation.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301
  * USA
- * 
+ *
  * http://www.gnu.org/licenses/gpl.txt
  * ****************************************************************
  */
@@ -66,13 +66,13 @@ import org.lamsfoundation.lams.web.util.AttributeNames;
 
 /**
  * @author mtruong
- * 
+ *
  *         MainExportServlet is responsible for calling the export service, which is responsible for calling all tools
  *         to do its export. The main page will be generated after all tools have completed its export. At the time of
  *         writing, the html for the main page is done manually. All of the outputs of the export will be zipped up and
  *         placed in the temporary export directory. The relative path of the file location of this zip file is
  *         returned.
- * 
+ *
  */
 public class MainExportServlet extends HttpServlet {
 
@@ -82,14 +82,14 @@ public class MainExportServlet extends HttpServlet {
     private String exportTmpDir;
 
     @Override
-    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException,
-	    IOException {
+    protected void doPost(HttpServletRequest request, HttpServletResponse response)
+	    throws ServletException, IOException {
 	doGet(request, response);
     }
 
     @Override
-    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException,
-	    IOException, ExportPortfolioException {
+    protected void doGet(HttpServletRequest request, HttpServletResponse response)
+	    throws ServletException, IOException, ExportPortfolioException {
 	Portfolio portfolios = null;
 	String exportFilename = "";
 	String role = WebUtil.readStrParam(request, AttributeNames.PARAM_ROLE, true);
@@ -104,12 +104,12 @@ public class MainExportServlet extends HttpServlet {
 	Cookie[] cookies = request.getCookies();
 	if (MainExportServlet.log.isDebugEnabled()) {
 	    int numCookies = cookies != null ? cookies.length : 0;
-	    MainExportServlet.log.debug("Export portfolio: mode " + mode + " # cookies "
-		    + new Integer(numCookies).toString());
+	    MainExportServlet.log
+		    .debug("Export portfolio: mode " + mode + " # cookies " + new Integer(numCookies).toString());
 	}
 
-	IExportPortfolioService exportService = ExportPortfolioServiceProxy.getExportPortfolioService(this
-		.getServletContext());
+	IExportPortfolioService exportService = ExportPortfolioServiceProxy
+		.getExportPortfolioService(this.getServletContext());
 	ILessonService lessonService = ExportPortfolioServiceProxy.getLessonService(this.getServletContext());
 	ISecurityService securityService = ExportPortfolioServiceProxy.getSecurityService(this.getServletContext());
 	Lesson lesson = lessonService.getLesson(lessonID);
@@ -123,8 +123,9 @@ public class MainExportServlet extends HttpServlet {
 		}
 
 		if (!securityService.isLessonLearner(lesson.getLessonId(), currentUserId, "export portfolio", false)) {
-		    // the way that LAMS works here will make 403 actually send 200, so it's better to use 500 
-		    response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "The user is not a learner in the lesson");
+		    // the way that LAMS works here will make 403 actually send 200, so it's better to use 500
+		    response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
+			    "The user is not a learner in the lesson");
 		    return;
 		}
 		LearnerProgress learnerProgress = lessonService.getUserProgressForLesson(currentUserId,
@@ -135,9 +136,11 @@ public class MainExportServlet extends HttpServlet {
 		    response.sendError(HttpServletResponse.SC_NO_CONTENT, "The learner has not finished the lesson");
 		    return;
 		}
-	    } else if (!securityService.isLessonMonitor(lesson.getLessonId(), currentUserId, "export portfolio", false)) {
-		// the way that LAMS works here will make 403 actually send 200, so it's better to use 500 
-		response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "The user is not a learner in the lesson");
+	    } else if (!securityService.isLessonMonitor(lesson.getLessonId(), currentUserId, "export portfolio",
+		    false)) {
+		// the way that LAMS works here will make 403 actually send 200, so it's better to use 500
+		response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
+			"The user is not a learner in the lesson");
 		return;
 	    }
 
@@ -149,8 +152,9 @@ public class MainExportServlet extends HttpServlet {
 		    + learnerLogin + ".zip";
 	} else if (mode.equals(ToolAccessMode.TEACHER.toString())) {
 	    if (!securityService.isLessonMonitor(lesson.getLessonId(), currentUserId, "export portfolio", false)) {
-		// the way that LAMS works here will make 403 actually send 200, so it's better to use 500 
-		response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "The user is not a monitor in the lesson");
+		// the way that LAMS works here will make 403 actually send 200, so it's better to use 500
+		response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
+			"The user is not a monitor in the lesson");
 		return;
 	    }
 
@@ -205,7 +209,7 @@ public class MainExportServlet extends HttpServlet {
 
     /**
      * Corrects links in all html files in temporary directory and its subdirectories.
-     * 
+     *
      * @param contentFolderI
      *            32-character content folder name
      * @param learnerContentFolder
@@ -227,7 +231,7 @@ public class MainExportServlet extends HttpServlet {
 
     /**
      * Corrects links in current particular html file.
-     * 
+     *
      * @param filename
      *            filename
      * @param contentFolderID

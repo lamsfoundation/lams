@@ -2,21 +2,21 @@
  * Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
  * =============================================================
  * License Information: http://lamsfoundation.org/licensing/lams/2.0/
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License version 2.0 
+ * it under the terms of the GNU General Public License version 2.0
  * as published by the Free Software Foundation.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301
  * USA
- * 
+ *
  * http://www.gnu.org/licenses/gpl.txt
  * ****************************************************************
  */
@@ -31,7 +31,7 @@ import java.util.Map;
 /**
  * @version
  *
- * 	 <p>
+ *          <p>
  *          <a href="IBaseDAO.java.html"><i>View Source</i></a>
  *          </p>
  *
@@ -45,7 +45,7 @@ public interface IBaseDAO {
 
     /**
      * Insert an object into the database. Should only be used if the object has not been persisted previously.
-     * 
+     *
      * @param object
      *            The object to be inserted
      */
@@ -53,7 +53,7 @@ public interface IBaseDAO {
 
     /**
      * Update a previously inserted object into the database.
-     * 
+     *
      * @param object
      *            The object to be updated
      */
@@ -62,7 +62,7 @@ public interface IBaseDAO {
     /**
      * Insert or update an object into the database. It is up to the persistence engine to decide whether to insert or
      * update.
-     * 
+     *
      * @param object
      *            The object to be inserted/updated
      */
@@ -76,7 +76,7 @@ public interface IBaseDAO {
 
     /**
      * Just a wrapper of the method in HibernateTemplate shouldn't be used unless a complicated query needed
-     * 
+     *
      * @param queryString
      * @return void
      */
@@ -84,7 +84,7 @@ public interface IBaseDAO {
 
     /**
      * Just a wrapper of the method in HibernateTemplate shouldn't be used unless a complicated query needed
-     * 
+     *
      * @param queryString
      * @param value
      * @return void
@@ -93,7 +93,7 @@ public interface IBaseDAO {
 
     /**
      * Just a wrapper of the method in HibernateTemplate shouldn't be used unless a complicated query needed
-     * 
+     *
      * @param queryString
      * @param values
      * @return void
@@ -143,7 +143,7 @@ public interface IBaseDAO {
 
     /**
      * These 2 objects have to be instances of the Class
-     * 
+     *
      * @param clazz
      * @param newValues
      *            in a object
@@ -155,7 +155,7 @@ public interface IBaseDAO {
 
     /**
      * Remove an object from the database.
-     * 
+     *
      * @param object
      *            The object to be deleted
      */
@@ -163,7 +163,7 @@ public interface IBaseDAO {
 
     /**
      * Be careful to use this method. It will clean up the whole table for the Class
-     * 
+     *
      * @param clazz
      * @return void
      */
@@ -202,7 +202,7 @@ public interface IBaseDAO {
 
     /**
      * Delete any object which has the same non-null property values as the object
-     * 
+     *
      * @param object
      * @return void
      */
@@ -210,7 +210,7 @@ public interface IBaseDAO {
 
     /**
      * Find an object. If the object is not found then it will return null
-     * 
+     *
      * @param clazz
      * @param id
      */
@@ -239,7 +239,7 @@ public interface IBaseDAO {
 
     /**
      * Find any object which has the same non-null property values as the object
-     * 
+     *
      * @param object
      * @return a list of objects which has the same non-null property values as the object
      */
@@ -247,7 +247,7 @@ public interface IBaseDAO {
 
     /**
      * Just a wrapper of the method in HibernateTemplate shouldn't be used unless a complicated query needed
-     * 
+     *
      * @param queryString
      * @return void
      */
@@ -255,7 +255,7 @@ public interface IBaseDAO {
 
     /**
      * Just a wrapper of the method in HibernateTemplate shouldn't be used unless a complicated query needed
-     * 
+     *
      * @param queryString
      * @param value
      * @return void
@@ -264,7 +264,7 @@ public interface IBaseDAO {
 
     /**
      * Just a wrapper of the method in HibernateTemplate shouldn't be used unless a complicated query needed
-     * 
+     *
      * @param queryString
      * @param values
      * @return void
@@ -273,7 +273,7 @@ public interface IBaseDAO {
 
     /**
      * Just a wrapper of the method in HibernateTemplate shouldn't be used unless a complicated query needed
-     * 
+     *
      * @param queryName
      * @return void
      */
@@ -281,7 +281,7 @@ public interface IBaseDAO {
 
     /**
      * Just a wrapper of the method in HibernateTemplate shouldn't be used unless a complicated query needed
-     * 
+     *
      * @param queryName
      * @param value
      * @return void
@@ -290,7 +290,7 @@ public interface IBaseDAO {
 
     /**
      * Just a wrapper of the method in HibernateTemplate shouldn't be used unless a complicated query needed
-     * 
+     *
      * @param queryName
      * @param values
      * @return void
@@ -332,7 +332,7 @@ public interface IBaseDAO {
 
     /**
      * Force initialization of a Hibernate proxy or persistent collection
-     * 
+     *
      * @param proxy
      *            of persistent object or a collection
      */
@@ -340,7 +340,7 @@ public interface IBaseDAO {
 
     /**
      * Count all rows in a table for a hibernate-mapped class
-     * 
+     *
      * @param clazz
      * @return
      */
@@ -348,7 +348,7 @@ public interface IBaseDAO {
 
     /**
      * Create a query based on the properties, and count the result
-     * 
+     *
      * @param properties
      *            a map of property names and values
      * @return a list of objects which have the same property values

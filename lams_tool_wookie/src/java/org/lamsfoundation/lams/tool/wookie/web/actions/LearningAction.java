@@ -2,21 +2,21 @@
  * Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
  * =============================================================
  * License Information: http://lamsfoundation.org/licensing/lams/2.0/
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301
  * USA
- * 
+ *
  * http://www.gnu.org/licenses/gpl.txt
  * ****************************************************************
  */
@@ -71,7 +71,7 @@ import org.lamsfoundation.lams.web.util.AttributeNames;
 /**
  * @author
  * @version
- * 
+ *
  * @struts.action path="/learning" parameter="dispatch" scope="request"
  *                name="learningForm"
  * @struts.action-forward name="wookie" path="tiles:/learning/main"
@@ -87,6 +87,7 @@ public class LearningAction extends LamsDispatchAction {
 
     private IWookieService wookieService;
 
+    @Override
     public ActionForward unspecified(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) throws Exception {
 
@@ -129,9 +130,9 @@ public class LearningAction extends LamsDispatchAction {
 	    wookie.setContentInUse(new Boolean(true));
 	    wookieService.saveOrUpdateWookie(wookie);
 	}
-	
-	LearningWebUtil.putActivityPositionInRequestByToolSessionId(toolSessionID, request, getServlet()
-		.getServletContext());
+
+	LearningWebUtil.putActivityPositionInRequestByToolSessionId(toolSessionID, request,
+		getServlet().getServletContext());
 
 	// get the user
 	WookieUser wookieUser;
@@ -145,8 +146,8 @@ public class LearningAction extends LamsDispatchAction {
 	// Create a new widget instance for the user if required.
 	if (!StringUtils.isEmpty(wookieSession.getWidgetSharedDataKey())) {
 	    if (wookieUser.getUserWidgetURL() == null || wookieUser.getUserWidgetURL().equals("")) {
-		String userWidgetURL = initiateWidget(wookieSession.getWidgetIdentifier(), wookieSession
-			.getWidgetSharedDataKey());
+		String userWidgetURL = initiateWidget(wookieSession.getWidgetIdentifier(),
+			wookieSession.getWidgetSharedDataKey());
 		wookieUser.setUserWidgetURL(userWidgetURL);
 		wookieService.saveOrUpdateWookieUser(wookieUser);
 	    }
@@ -241,8 +242,8 @@ public class LearningAction extends LamsDispatchAction {
 	    log.error("finishActivity(): couldn't find WookieUser with tool session id: " + toolSessionID);
 	}
 
-	ToolSessionManager sessionMgrService = WookieServiceProxy.getWookieSessionManager(getServlet()
-		.getServletContext());
+	ToolSessionManager sessionMgrService = WookieServiceProxy
+		.getWookieSessionManager(getServlet().getServletContext());
 
 	String nextActivityUrl;
 	try {
@@ -261,8 +262,9 @@ public class LearningAction extends LamsDispatchAction {
 
     public static InputStream getResponseInputStreamFromExternalServer(String urlStr, HashMap<String, String> params)
 	    throws ToolException, IOException {
-	if (!urlStr.endsWith("?"))
+	if (!urlStr.endsWith("?")) {
 	    urlStr += "?";
+	}
 
 	for (Entry<String, String> entry : params.entrySet()) {
 	    urlStr += "&" + entry.getKey() + "=" + entry.getValue();
@@ -312,8 +314,8 @@ public class LearningAction extends LamsDispatchAction {
 	    lrnForm.setEntryText(notebookEntry.getEntry());
 	}
 
-	LearningWebUtil.putActivityPositionInRequestByToolSessionId(lrnForm.getToolSessionID(), request, getServlet()
-		.getServletContext());
+	LearningWebUtil.putActivityPositionInRequestByToolSessionId(lrnForm.getToolSessionID(), request,
+		getServlet().getServletContext());
 
 	return mapping.findForward("notebook");
     }

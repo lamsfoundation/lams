@@ -2,21 +2,21 @@
  * Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
  * =============================================================
  * License Information: http://lamsfoundation.org/licensing/lams/2.0/
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301
  * USA
- * 
+ *
  * http://www.gnu.org/licenses/gpl.txt
  * ****************************************************************
  */
@@ -82,7 +82,7 @@ import org.lamsfoundation.lams.util.WebUtil;
 
 /**
  * An implementation of the IWikiService interface.
- * 
+ *
  * As a requirement, all LAMS tool's service bean must implement ToolContentManager and ToolSessionManager.
  */
 public class WikiService
@@ -321,13 +321,13 @@ public class WikiService
 
 	for (WikiSession session : wiki.getWikiSessions()) {
 	    /*
-	    for (WikiPage page : session.getWikiPages()) {
-	        if (page.getAddedBy() != null && page.getAddedBy().getUserId().equals(userId.longValue())) {
-	            page.setDeleted(true);
-	            wikiPageDAO.update(page);
-	        }
-	    }
-	    */
+	     * for (WikiPage page : session.getWikiPages()) {
+	     * if (page.getAddedBy() != null && page.getAddedBy().getUserId().equals(userId.longValue())) {
+	     * page.setDeleted(true);
+	     * wikiPageDAO.update(page);
+	     * }
+	     * }
+	     */
 
 	    WikiUser user = wikiUserDAO.getByUserIdAndSessionId(userId.longValue(), session.getSessionId());
 	    if (user != null) {
@@ -420,7 +420,7 @@ public class WikiService
 
     /**
      * (non-Javadoc)
-     * 
+     *
      * @see org.lamsfoundation.lams.tool.wiki.service.IWikiService#createNotebookEntry(java.lang.Long,
      *      java.lang.Integer, java.lang.String, java.lang.Integer, java.lang.String)
      */
@@ -431,7 +431,7 @@ public class WikiService
 
     /**
      * (non-Javadoc)
-     * 
+     *
      * @see org.lamsfoundation.lams.tool.wiki.service.IWikiService#getEntry(org.lamsfoundation.lams.notebook.model.NotebookEntry)
      */
     @Override
@@ -446,7 +446,7 @@ public class WikiService
 
     /**
      * (non-Javadoc)
-     * 
+     *
      * @see org.lamsfoundation.lams.tool.wiki.service.IWikiService#updateEntry(org.lamsfoundation.lams.notebook.model.NotebookEntry)
      */
     @Override
@@ -456,7 +456,7 @@ public class WikiService
 
     /**
      * (non-Javadoc)
-     * 
+     *
      * @see org.lamsfoundation.lams.tool.wiki.service.IWikiService#comparePages(String,String)
      */
     @Override
@@ -530,7 +530,7 @@ public class WikiService
 
     /**
      * (non-Javadoc)
-     * 
+     *
      * @see org.lamsfoundation.lams.tool.wiki.service.IWikiService#getDefaultContentIdBySignature(String)
      */
     @Override
@@ -547,7 +547,7 @@ public class WikiService
 
     /**
      * (non-Javadoc)
-     * 
+     *
      * @see org.lamsfoundation.lams.tool.wiki.service.IWikiService#getDefaultContent()
      */
     @Override
@@ -564,7 +564,7 @@ public class WikiService
 
     /**
      * (non-Javadoc)
-     * 
+     *
      * @see org.lamsfoundation.lams.tool.wiki.service.IWikiService#copyDefaultContent(Long)
      */
     @Override
@@ -587,7 +587,7 @@ public class WikiService
     /**
      * Takes a transient wiki object and iterates down the tree ensureing each object is saved to the db and all
      * references are maintained
-     * 
+     *
      * @param wiki
      * @return
      */
@@ -654,7 +654,7 @@ public class WikiService
 
     /**
      * (non-Javadoc)
-     * 
+     *
      * @see org.lamsfoundation.lams.tool.wiki.service.IWikiService#updateWikiPage(org.lamsfoundation.lams.tool.wiki.web.forms.WikiPageForm,
      *      org.lamsfoundation.lams.tool.wiki.model.WikiPage, org.lamsfoundation.lams.tool.wiki.model.WikiUser)
      */
@@ -691,7 +691,7 @@ public class WikiService
 
     /**
      * (non-Javadoc)
-     * 
+     *
      * @see org.lamsfoundation.lams.tool.wiki.service.IWikiService#insertWikiPage(org.lamsfoundation.lams.tool.wiki.web.forms.WikiPageForm,
      *      org.lamsfoundation.lams.tool.wiki.model.Wiki, org.lamsfoundation.lams.tool.wiki.model.WikiUser,
      *      org.lamsfoundation.lams.tool.wiki.model.WikiSession)
@@ -823,7 +823,7 @@ public class WikiService
     }
 
     /**
-     * 
+     *
      * @param learnerId
      * @param toolSessionId
      * @return
@@ -847,7 +847,7 @@ public class WikiService
     }
 
     /**
-     * 
+     *
      * @param learnerId
      * @param toolSessionId
      * @return
@@ -1057,12 +1057,12 @@ public class WikiService
 
     /**
      * Used by the Rest calls to create content.
-     * 
+     *
      * Mandatory fields in toolContentJSON: title, instructions, pages. Optional fields reflectInstructions,
      * reflectOnActivity, lockWhenFinished (default False), allowLearnerAttachImages (default True),
      * allowLearnerCreatePages (default True), allowLearnerInsertLinks (default True) notifyUpdates (default False),
      * minimumEdits and maximumEdits (default 0, no min/max)
-     * 
+     *
      * Pages is a JSONArray of JSONObjects, where each object represents a Wiki page. The first entry in the array
      * becomes the main page. Withing the wiki page object, mandatory fields are title and body. Optional field is
      * readOnly, which defaults to false (ie the user can edit the page).

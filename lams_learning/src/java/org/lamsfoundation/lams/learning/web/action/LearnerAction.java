@@ -2,21 +2,21 @@
  * Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
  * =============================================================
  * License Information: http://lamsfoundation.org/licensing/lams/2.0/
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License version 2.0 
+ * it under the terms of the GNU General Public License version 2.0
  * as published by the Free Software Foundation.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301
  * USA
- * 
+ *
  * http://www.gnu.org/licenses/gpl.txt
  * ****************************************************************
  */
@@ -64,26 +64,26 @@ import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 
 /**
- * 
+ *
  * <p>
  * The action servlet that interacts with learner to start a lams learner module, join a user to the lesson and allows a
  * user to exit a lesson.
  * </p>
- * 
+ *
  * <p>
  * It is also responsible for the interaction between lams server and flash. Flash will call method implemented in this
  * class to get progress data or trigger a lams server calculation here
  * </p>
- * 
+ *
  * <b>Note:</b>It needs to extend the <code>LamsDispatchAction</code> which has been customized to accomodate struts
  * features to solve duplicate submission problem.
- * 
+ *
  * @author Jacky Fang
  * @since 3/03/2005
  * @version 1.1
- * 
+ *
  *          ----------------XDoclet Tags--------------------
- * 
+ *
  * @struts:action path="/learner" parameter="method" validate="false"
  * @struts:action-forward name="displayActivity" path="/DisplayActivity.do"
  * @struts:action-forward name="displayProgress" path="/mobile/progress.jsp"
@@ -115,7 +115,7 @@ public class LearnerAction extends LamsDispatchAction {
     /**
      * Handle an exception - either thrown by the service or by the web layer. Allows the exception to be logged
      * properly and ensure that an actual message goes back to Flash.
-     * 
+     *
      * @param e
      * @param methodKey
      * @param learnerService
@@ -136,11 +136,11 @@ public class LearnerAction extends LamsDispatchAction {
      * <p>
      * The structs dispatch action that joins a learner into a lesson. This call is used for a user to start a lesson.
      * </p>
-     * 
+     *
      * @param mapping
      *            An ActionMapping class that will be used by the Action class to tell the ActionServlet where to send
      *            the end-user.
-     * 
+     *
      * @param form
      *            The ActionForm class that will contain any data submitted by the end-user via a form.
      * @param request
@@ -149,7 +149,7 @@ public class LearnerAction extends LamsDispatchAction {
      *            A standard Servlet HttpServletResponse class.
      * @return An ActionForward class that will be returned to the ActionServlet indicating where the user is to go
      *         next.
-     * 
+     *
      * @throws IOException
      * @throws ServletException
      */
@@ -212,11 +212,11 @@ public class LearnerAction extends LamsDispatchAction {
      * <p>
      * The structs dispatch action that joins a learner into a lesson. This call is used for a user to resume a lesson.
      * </p>
-     * 
+     *
      * @param mapping
      *            An ActionMapping class that will be used by the Action class to tell the ActionServlet where to send
      *            the end-user.
-     * 
+     *
      * @param form
      *            The ActionForm class that will contain any data submitted by the end-user via a form.
      * @param request
@@ -225,7 +225,7 @@ public class LearnerAction extends LamsDispatchAction {
      *            A standard Servlet HttpServletResponse class.
      * @return An ActionForward class that will be returned to the ActionServlet indicating where the user is to go
      *         next.
-     * 
+     *
      * @throws IOException
      * @throws ServletException
      */
@@ -280,11 +280,11 @@ public class LearnerAction extends LamsDispatchAction {
      * <p>
      * Exit the current lesson that is running in the leaner window. It expects lesson id passed as parameter from flash
      * component.
-     * 
+     *
      * @param mapping
      *            An ActionMapping class that will be used by the Action class to tell the ActionServlet where to send
      *            the end-user.
-     * 
+     *
      * @param form
      *            The ActionForm class that will contain any data submitted by the end-user via a form.
      * @param request
@@ -293,7 +293,7 @@ public class LearnerAction extends LamsDispatchAction {
      *            A standard Servlet HttpServletResponse class.
      * @return An ActionForward class that will be returned to the ActionServlet indicating where the user is to go
      *         next.
-     * 
+     *
      * @throws IOException
      * @throws ServletException
      */
@@ -370,11 +370,11 @@ public class LearnerAction extends LamsDispatchAction {
      * The struts dispatch action to view the activity. This will be called by flash progress bar to check up the
      * activity component. The lams side will calculate the url and send a flash message back to the flash component.
      * </p>
-     * 
+     *
      * @param mapping
      *            An ActionMapping class that will be used by the Action class to tell the ActionServlet where to send
      *            the end-user.
-     * 
+     *
      * @param form
      *            The ActionForm class that will contain any data submitted by the end-user via a form.
      * @param request
@@ -490,7 +490,7 @@ public class LearnerAction extends LamsDispatchAction {
     /**
      * Gets the same url as getLearnerActivityURL() but forwards directly to the url, rather than returning the url in a
      * Flash packet.
-     * 
+     *
      * @param mapping
      *            An ActionMapping class that will be used by the Action class to tell the ActionServlet where to send
      *            the end-user.
@@ -521,7 +521,7 @@ public class LearnerAction extends LamsDispatchAction {
 
     /**
      * Forces a move to a destination Activity in the learning sequence, returning a WDDX packet
-     * 
+     *
      * @param mapping
      *            An ActionMapping class that will be used by the Action class to tell the ActionServlet where to send
      *            the end-user.
@@ -568,7 +568,7 @@ public class LearnerAction extends LamsDispatchAction {
     /**
      * Forces a move to a destination Activity in the learning sequence, redirecting to the new page rather than
      * returning a WDDX packet.
-     * 
+     *
      * @param mapping
      *            An ActionMapping class that will be used by the Action class to tell the ActionServlet where to send
      *            the end-user.
@@ -659,7 +659,7 @@ public class LearnerAction extends LamsDispatchAction {
 
     /**
      * Get AuditService bean.
-     * 
+     *
      * @return
      */
     private IAuditService getAuditService() {
@@ -674,7 +674,7 @@ public class LearnerAction extends LamsDispatchAction {
     /**
      * Gets the same url as getLearnerActivityURL() but forwards directly to the url, rather than returning the url in a
      * Flash packet.
-     * 
+     *
      * @param mapping
      *            An ActionMapping class that will be used by the Action class to tell the ActionServlet where to send
      *            the end-user.

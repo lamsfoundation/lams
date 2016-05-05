@@ -2,21 +2,21 @@
  * Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
  * =============================================================
  * License Information: http://lamsfoundation.org/licensing/lams/2.0/
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301
  * USA
- * 
+ *
  * http://www.gnu.org/licenses/gpl.txt
  * ****************************************************************
  */
@@ -58,7 +58,7 @@ public interface VideoRecorderConstants {
     public static final String ERROR_MSG_CONDITION = "error.condition";
     public static final String ERROR_MSG_NAME_BLANK = "error.condition.name.blank";
     public static final String ERROR_MSG_NAME_DUPLICATED = "error.condition.duplicated.name";
-    
+
     public static final String NB_RECORDINGS_DEFINITION_NAME = "number.recordings.definition.videoRecorder";
     public static final String NB_COMMENTS_DEFINITION_NAME = "number.comments.definition.videoRecorder";
     public static final String NB_RATINGS_DEFINITION_NAME = "number.ratings.definition.videoRecorder";

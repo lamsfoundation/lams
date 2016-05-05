@@ -2,21 +2,21 @@
  * Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
  * =============================================================
  * License Information: http://lamsfoundation.org/licensing/lams/2.0/
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License version 2.0
  * as published by the Free Software Foundation.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301
  * USA
- * 
+ *
  * http://www.gnu.org/licenses/gpl.txt
  * ***********************************************************************/
 
@@ -111,7 +111,7 @@ import org.springframework.dao.DataAccessException;
 /**
  * The POJO implementation of Voting service. All business logic of Voting tool is implemented in this class. It
  * translates the request from presentation layer and performs appropriate database operation.
- * 
+ *
  * @author Ozgur Demirtas
  */
 public class VoteServicePOJO implements IVoteService, ToolContentManager, ToolSessionManager,
@@ -245,10 +245,11 @@ public class VoteServicePOJO implements IVoteService, ToolContentManager, ToolSe
 	List<VoteUsrAttempt> userEntries = null;
 	if (toolSessionUid != null) {
 	    entriesCount = voteUsrAttemptDAO.getSessionEntriesCount(toolSessionUid);
-	    if ( voteContent.isAllowText() )
+	    if (voteContent.isAllowText()) {
 		userEntries = voteUsrAttemptDAO.getSessionOpenTextUserEntries(toolSessionUid);
-	    else
+	    } else {
 		userEntries = new ArrayList<VoteUsrAttempt>(0);
+	    }
 	}
 
 	Long mapIndex = 1L;
@@ -481,7 +482,7 @@ public class VoteServicePOJO implements IVoteService, ToolContentManager, ToolSe
 	    int totalStandardVotesCount = 0;
 
 	    for (VoteQueContent question : (Set<VoteQueContent>) voteContent.getVoteQueContents()) {
-		
+
 		SessionNominationDTO nominationDTO = new SessionNominationDTO();
 		nominationDTO.setQuestionUid(question.getUid());
 		nominationDTO.setNomination(question.getQuestion());
@@ -491,7 +492,7 @@ public class VoteServicePOJO implements IVoteService, ToolContentManager, ToolSe
 		totalStandardVotesCount += votesCount;
 
 		nominationDTO.setNumberOfVotes(votesCount);
-		nominationDTO.setPercentageOfVotes( (entriesCount != 0) ? ((votesCount * 100) / entriesCount) : 0d );
+		nominationDTO.setPercentageOfVotes((entriesCount != 0) ? ((votesCount * 100) / entriesCount) : 0d);
 		sessionDTO.getNominations().add(nominationDTO);
 
 	    }
@@ -523,10 +524,10 @@ public class VoteServicePOJO implements IVoteService, ToolContentManager, ToolSe
 	    int totalVotes = 0;
 	    for (SummarySessionDTO sessionDTO : sessionDTOs) {
 
-		for ( SessionNominationDTO nomination : sessionDTO.getNominations() ) {
+		for (SessionNominationDTO nomination : sessionDTO.getNominations()) {
 		    Long questionUid = nomination.getQuestionUid();
 		    SessionNominationDTO dto = nominationsTotals.get(questionUid);
-		    if ( dto == null ) {
+		    if (dto == null) {
 			dto = new SessionNominationDTO();
 			dto.setQuestionUid(questionUid);
 			dto.setNomination(nomination.getNomination());
@@ -535,17 +536,19 @@ public class VoteServicePOJO implements IVoteService, ToolContentManager, ToolSe
 			totalSessionDTO.getNominations().add(dto);
 		    }
 		    totalVotes += nomination.getNumberOfVotes();
-		    dto.setNumberOfVotes(dto.getNumberOfVotes()+nomination.getNumberOfVotes());
-		} 
-		
+		    dto.setNumberOfVotes(dto.getNumberOfVotes() + nomination.getNumberOfVotes());
+		}
+
 		totalVotes += sessionDTO.getOpenTextNumberOfVotes();
 		totalOpenVotes += sessionDTO.getOpenTextNumberOfVotes();
 	    }
-	    for ( SessionNominationDTO nomination : totalSessionDTO.getNominations() ) {
-		nomination.setPercentageOfVotes( (totalVotes != 0) ? ((nomination.getNumberOfVotes() * 100) / totalVotes) : 0d);
+	    for (SessionNominationDTO nomination : totalSessionDTO.getNominations()) {
+		nomination.setPercentageOfVotes(
+			(totalVotes != 0) ? ((nomination.getNumberOfVotes() * 100) / totalVotes) : 0d);
 	    }
 	    totalSessionDTO.setOpenTextNumberOfVotes(totalOpenVotes);
-	    totalSessionDTO.setOpenTextPercentageOfVotes( (totalVotes != 0) ? ((totalOpenVotes * 100) / totalVotes) : 0d);
+	    totalSessionDTO
+		    .setOpenTextPercentageOfVotes((totalVotes != 0) ? ((totalOpenVotes * 100) / totalVotes) : 0d);
 	    sessionDTOs.add(totalSessionDTO);
 	}
 
@@ -556,7 +559,7 @@ public class VoteServicePOJO implements IVoteService, ToolContentManager, ToolSe
      * Get the count of all the potential learners for the vote session. This will include the people that have never
      * logged into the lesson. Not great, but it is a better estimate of how many users there will be eventually than
      * the number of people already known to the tool.
-     * 
+     *
      * @param voteSessionId
      *            The tool session id
      */
@@ -734,7 +737,7 @@ public class VoteServicePOJO implements IVoteService, ToolContentManager, ToolSe
     @Override
     public Set<String> getAttemptsForUserAndSessionUseOpenAnswer(final Long userUid, final Long sessionUid) {
 	List<VoteUsrAttempt> list = voteUsrAttemptDAO.getAttemptsForUserAndSessionUseOpenAnswer(userUid, sessionUid);
-	
+
 	String openAnswer = "";
 	Set<String> userEntries = new HashSet<String>();
 	if ((list != null) && (list.size() > 0)) {
@@ -748,10 +751,11 @@ public class VoteServicePOJO implements IVoteService, ToolContentManager, ToolSe
 		} else {
 		    // this is a user entered vote
 		    if (attempt.getUserEntry().length() > 0) {
-			if ( attempt.isVisible() )
+			if (attempt.isVisible()) {
 			    userEntries.add(attempt.getUserEntry());
-			else 
+			} else {
 			    userEntries.add(getMessageService().getMessage("label.hidden"));
+			}
 		    }
 
 		}
@@ -1184,7 +1188,6 @@ public class VoteServicePOJO implements IVoteService, ToolContentManager, ToolSe
     public boolean studentActivityOccurredGlobal(VoteContent voteContent) {
 	return !voteContent.getVoteSessions().isEmpty();
     }
-
 
     @Override
     public void recalculateUserAnswers(VoteContent content, Set<VoteQueContent> oldQuestions,
@@ -1693,48 +1696,59 @@ public class VoteServicePOJO implements IVoteService, ToolContentManager, ToolSe
 	return voteQueContentDAO.getAllQuestionsSorted(voteContentId);
     }
 
-    
     /******** Tablesorter methods ************/
-    /** 
-     * Gets the basic details about an attempt for a nomination. questionUid must not be null, sessionUid may be NULL. This is
+    /**
+     * Gets the basic details about an attempt for a nomination. questionUid must not be null, sessionUid may be NULL.
+     * This is
      * unusual for these methods - usually sessionId may not be null. In this case if sessionUid is null then you get
      * the values for the whole class, not just the group.
-     * 
+     *
      * Will return List<[login (String), fullname(String), attemptTime(Timestamp]>
      */
+    @Override
     public List<Object[]> getUserAttemptsForTablesorter(Long sessionUid, Long questionUid, int page, int size,
 	    int sorting, String searchString) {
-	return voteUsrAttemptDAO.getUserAttemptsForTablesorter(sessionUid, questionUid, page, size, sorting, searchString);
+	return voteUsrAttemptDAO.getUserAttemptsForTablesorter(sessionUid, questionUid, page, size, sorting,
+		searchString);
     }
-	
+
+    @Override
     public int getCountUsersBySession(Long sessionUid, Long questionUid, String searchString) {
 	return voteUsrAttemptDAO.getCountUsersBySession(sessionUid, questionUid, searchString);
     }
-    
+
+    @Override
     public List<Object[]> getUserReflectionsForTablesorter(Long sessionUid, int page, int size, int sorting,
 	    String searchString) {
-	return voteUsrAttemptDAO.getUserReflectionsForTablesorter(sessionUid, page, size, sorting, searchString, getCoreNotebookService());
+	return voteUsrAttemptDAO.getUserReflectionsForTablesorter(sessionUid, page, size, sorting, searchString,
+		getCoreNotebookService());
     }
-    
+
+    @Override
     public List<VoteStatsDTO> getStatisticsBySession(Long toolContentId) {
 
 	List<VoteStatsDTO> stats = voteUsrAttemptDAO.getStatisticsBySession(toolContentId);
-	for ( VoteStatsDTO stat : stats ) {
+	for (VoteStatsDTO stat : stats) {
 	    stat.setCountAllUsers(getVoteSessionPotentialLearnersCount(stat.getSessionUid()));
 	}
 	return stats;
     }
-    
-    /** Gets the details for the open text nominations  */
-    public List<OpenTextAnswerDTO> getUserOpenTextAttemptsForTablesorter(Long sessionUid, Long contentUid, int page, int size,
-	    int sorting, String searchStringVote, String searchStringUsername) {
-	return voteUsrAttemptDAO.getUserOpenTextAttemptsForTablesorter(sessionUid, contentUid, page, size, sorting, searchStringVote, searchStringUsername);
+
+    /** Gets the details for the open text nominations */
+    @Override
+    public List<OpenTextAnswerDTO> getUserOpenTextAttemptsForTablesorter(Long sessionUid, Long contentUid, int page,
+	    int size, int sorting, String searchStringVote, String searchStringUsername) {
+	return voteUsrAttemptDAO.getUserOpenTextAttemptsForTablesorter(sessionUid, contentUid, page, size, sorting,
+		searchStringVote, searchStringUsername);
     }
-    
-    public int getCountUsersForOpenTextEntries(Long sessionUid, Long contentUid, String searchStringVote, String searchStringUsername) {
-	return voteUsrAttemptDAO.getCountUsersForOpenTextEntries(sessionUid, contentUid, searchStringVote, searchStringUsername);
+
+    @Override
+    public int getCountUsersForOpenTextEntries(Long sessionUid, Long contentUid, String searchStringVote,
+	    String searchStringUsername) {
+	return voteUsrAttemptDAO.getCountUsersForOpenTextEntries(sessionUid, contentUid, searchStringVote,
+		searchStringUsername);
     }
-    
+
     /**
      * @return Returns the toolService.
      */
@@ -1986,6 +2000,7 @@ public class VoteServicePOJO implements IVoteService, ToolContentManager, ToolSe
     /**
      * @return Returns the MessageService.
      */
+    @Override
     public MessageService getMessageService() {
 	return messageService;
     }

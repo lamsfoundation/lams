@@ -26,12 +26,13 @@ package org.lamsfoundation.lams.planner.dto;
 public class PedagogicalPlannerActivityDTO {
     private String pedagogicalPlannerUrl;
     private String authorUrl;
+
     public String getAuthorUrl() {
-        return authorUrl;
+	return authorUrl;
     }
 
     public void setAuthorUrl(String authorUrl) {
-        this.authorUrl = authorUrl;
+	this.authorUrl = authorUrl;
     }
 
     private String toolIconUrl;
@@ -47,7 +48,7 @@ public class PedagogicalPlannerActivityDTO {
     private Boolean collapsed = false;
     private Boolean expanded = false;
     private String editingAdvice;
-    
+
     public static final short TYPE_BRANCHING_ACTIVITY = 1;
     public static final short TYPE_OPTIONAL_ACTIVITY = 2;
     public static final short TYPE_PARALLEL_ACTIVITY = 3;
@@ -70,11 +71,10 @@ public class PedagogicalPlannerActivityDTO {
 
     public PedagogicalPlannerActivityDTO(
 //	    String type, String title,
-	    Boolean supportsPlanner,
-	    String pedagogicalPlannerUrl
+	    Boolean supportsPlanner, String pedagogicalPlannerUrl
 //	    , String authorUrl, String toolIconUrl, String checkEditingAdviceUrl,
 //	    String editingAdviceUrl
-	    ) {
+    ) {
 	this.supportsPlanner = supportsPlanner;
 	this.pedagogicalPlannerUrl = pedagogicalPlannerUrl;
 //	this.authorUrl = authorUrl;
@@ -151,34 +151,34 @@ public class PedagogicalPlannerActivityDTO {
     }
 
     public Boolean getHidden() {
-        return hidden;
+	return hidden;
     }
 
     public void setHidden(Boolean hidden) {
-        this.hidden = hidden;
+	this.hidden = hidden;
     }
 
     public Boolean getCollapsed() {
-        return collapsed;
+	return collapsed;
     }
 
     public void setCollapsed(Boolean collapsed) {
-        this.collapsed = collapsed;
+	this.collapsed = collapsed;
     }
 
     public Boolean getExpanded() {
-        return expanded;
+	return expanded;
     }
 
     public void setExpanded(Boolean expanded) {
-        this.expanded = expanded;
+	this.expanded = expanded;
     }
 
     public String getEditingAdvice() {
-        return editingAdvice;
+	return editingAdvice;
     }
 
     public void setEditingAdvice(String editingAdvice) {
-        this.editingAdvice = editingAdvice;
+	this.editingAdvice = editingAdvice;
     }
 }

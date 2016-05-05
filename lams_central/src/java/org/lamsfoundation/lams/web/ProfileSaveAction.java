@@ -24,9 +24,6 @@
 /* $Id$ */
 package org.lamsfoundation.lams.web;
 
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
@@ -55,12 +52,12 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
 
 /**
  * @author jliew
- * 
+ *
  */
 
 /**
  * @struts.action path="/saveprofile" name="UserForm" input=".editprofile" scope="request" validate="false"
- * 
+ *
  * @struts.action-forward name="profile" path="/index.do?state=active&amp;tab=profile" redirect="true"
  * @struts.action-forward name="editprofile" path="/index.do?state=active&amp;tab=editprofile"
  */
@@ -69,6 +66,7 @@ public class ProfileSaveAction extends Action {
     private static Logger log = Logger.getLogger(ProfileSaveAction.class);
     private static IUserManagementService service;
 
+    @Override
     public ActionForward execute(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) throws Exception {
 
@@ -84,7 +82,7 @@ public class ProfileSaveAction extends Action {
 	    }
 	}
 
-	User requestor = (User) getService().getUserByLogin(request.getRemoteUser());
+	User requestor = getService().getUserByLogin(request.getRemoteUser());
 	DynaActionForm userForm = (DynaActionForm) form;
 
 	// check requestor is same as user being edited
@@ -103,7 +101,7 @@ public class ProfileSaveAction extends Action {
 	} else if (!ValidationUtil.isFirstLastNameValid(firstName)) {
 	    errors.add("firstName", new ActionMessage("error.firstname.invalid.characters"));
 	}
-	
+
 	//last name validation
 	String lastName = (userForm.get("lastName") == null) ? null : (String) userForm.get("lastName");
 	if (StringUtils.isBlank(lastName)) {
@@ -165,8 +163,8 @@ public class ProfileSaveAction extends Action {
 
     private IUserManagementService getService() {
 	if (service == null) {
-	    WebApplicationContext ctx = WebApplicationContextUtils.getRequiredWebApplicationContext(getServlet()
-		    .getServletContext());
+	    WebApplicationContext ctx = WebApplicationContextUtils
+		    .getRequiredWebApplicationContext(getServlet().getServletContext());
 	    service = (IUserManagementService) ctx.getBean("userManagementService");
 	}
 	return service;

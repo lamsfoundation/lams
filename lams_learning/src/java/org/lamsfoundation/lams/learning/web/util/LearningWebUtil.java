@@ -2,21 +2,21 @@
  * Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
  * =============================================================
  * License Information: http://lamsfoundation.org/licensing/lams/2.0/
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License version 2.0 
+ * it under the terms of the GNU General Public License version 2.0
  * as published by the Free Software Foundation.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301
  * USA
- * 
+ *
  * http://www.gnu.org/licenses/gpl.txt
  * ****************************************************************
  */
@@ -43,7 +43,6 @@ import org.lamsfoundation.lams.learning.web.bean.ActivityURL;
 import org.lamsfoundation.lams.learning.web.form.ActivityForm;
 import org.lamsfoundation.lams.learningdesign.Activity;
 import org.lamsfoundation.lams.learningdesign.LearningDesign;
-import org.lamsfoundation.lams.learningdesign.ToolActivity;
 import org.lamsfoundation.lams.lesson.LearnerProgress;
 import org.lamsfoundation.lams.lesson.Lesson;
 import org.lamsfoundation.lams.usermanagement.User;
@@ -55,11 +54,11 @@ import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 
 /**
- * 
+ *
  * @author Jacky Fang
  * @since 2005-3-10
  * @version
- * 
+ *
  */
 public class LearningWebUtil {
 
@@ -74,7 +73,7 @@ public class LearningWebUtil {
 
     /**
      * Helper method to retrieve the user data. Gets the id from the user details in the shared session
-     * 
+     *
      * @return the user id
      */
     public static Integer getUserId() {
@@ -90,8 +89,8 @@ public class LearningWebUtil {
     public static User getUser(ICoreLearnerService learnerService) {
 	HttpSession ss = SessionManager.getSession();
 	UserDTO learner = (UserDTO) ss.getAttribute(AttributeNames.USER);
-	return learner != null ? (User) learnerService.getUserManagementService().findById(User.class,
-		learner.getUserID()) : null;
+	return learner != null
+		? (User) learnerService.getUserManagementService().findById(User.class, learner.getUserID()) : null;
     }
 
     /**
@@ -108,10 +107,10 @@ public class LearningWebUtil {
 
     /**
      * Get the current learner progress. Check the request - in some cases it may be there.
-     * 
+     *
      * If not, the learner progress id might be in the request (if we've just come from complete activity). If so, get
      * it from the db using the learner progress.
-     * 
+     *
      * If the learner progress id isn't available, then we have to look it up using activity based on the activity /
      * activity id in the request.
      */
@@ -162,7 +161,7 @@ public class LearningWebUtil {
     /**
      * Get the activity from request. We assume there is a parameter coming in if there is no activity can be found in
      * the http request. Then the activity id parameter is used to retrieve from database.
-     * 
+     *
      * @param request
      * @return
      */
@@ -185,7 +184,7 @@ public class LearningWebUtil {
     /**
      * Put an activity into the request. Calls LearnerService to get the activity, to ensure that it is a "real"
      * activity, not one of the cglib proxies. activity.
-     * 
+     *
      * @param request
      * @param activity
      */
@@ -202,7 +201,7 @@ public class LearningWebUtil {
     /**
      * "Complete" an activity from the web layer's perspective. Used for CompleteActivityAction and the Gate and
      * Grouping actions. Calls the learningService to actually complete the activity and progress.
-     * 
+     *
      * @param redirect
      *            Should this call redirect to the next screen (true) or use a forward (false)
      * @param windowName
@@ -210,12 +209,12 @@ public class LearningWebUtil {
      *            (normal learner window)
      * @throws UnsupportedEncodingException
      * @throws InterruptedException
-     * 
+     *
      */
     public static ActionForward completeActivity(HttpServletRequest request, HttpServletResponse response,
 	    ActivityMapping actionMappings, LearnerProgress currentProgress, Activity currentActivity,
-	    Integer learnerId, ICoreLearnerService learnerService, boolean redirect) throws LearnerServiceException,
-	    UnsupportedEncodingException {
+	    Integer learnerId, ICoreLearnerService learnerService, boolean redirect)
+	    throws LearnerServiceException, UnsupportedEncodingException {
 
 	LearnerProgress progress = currentProgress;
 	Lesson lesson = progress.getLesson();
@@ -226,7 +225,7 @@ public class LearningWebUtil {
 
 	    // recalculate activity mark and pass it to gradebook
 	    learnerService.updateGradebookMark(currentActivity, progress);
-	    
+
 	    return actionMappings.getCloseForward(currentActivity, lesson.getLessonId());
 	} else {
 	    progress = learnerService.completeActivity(learnerId, currentActivity, progress);

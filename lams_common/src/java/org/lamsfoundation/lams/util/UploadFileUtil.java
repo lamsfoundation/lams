@@ -2,21 +2,21 @@
  * Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
  * =============================================================
  * License Information: http://lamsfoundation.org/licensing/lams/2.0/
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License version 2.0 
+ * it under the terms of the GNU General Public License version 2.0
  * as published by the Free Software Foundation.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301
  * USA
- * 
+ *
  * http://www.gnu.org/licenses/gpl.txt
  * ****************************************************************
  */
@@ -37,9 +37,9 @@ import org.lamsfoundation.lams.authoring.web.AuthoringConstants;
 /**
  * Wraps up interface to the Commons FileUpload as much as possible. Reads configuration information such the maximum
  * size of a file from lams.xml using the ConfigurationService.
- * 
+ *
  * @author fmalikoff Fei Yang
- * 
+ *
  */
 public class UploadFileUtil {
     private static Logger log = Logger.getLogger(UploadFileUtil.class);
@@ -55,7 +55,7 @@ public class UploadFileUtil {
      * Given the current servlet request and the name of a temporary directory, get a list of all the uploaded items
      * from a multipart form. This includes any uploaded files and the "normal" input fields on the form. Gets the
      * temporary directory from the configuration file. Equivalent to getUploadItems(request, useLargeFileSize, null)
-     * 
+     *
      * @param request
      *            - current servlet request
      * @param useLargeFileSize
@@ -70,7 +70,7 @@ public class UploadFileUtil {
     /**
      * Given the current servlet request and the name of a temporary directory, get a list of all the uploaded items
      * from a multipart form. This includes any uploaded files and the "normal" input fields on the form.
-     * 
+     *
      * @param request
      *            - current servlet request
      * @param useLargeFileSize
@@ -94,16 +94,16 @@ public class UploadFileUtil {
 	    if (tempInt != -1) {
 		max_size = tempInt;
 	    } else {
-		UploadFileUtil.log.warn("Default Large Max Size for file upload missing, using "
-			+ UploadFileUtil.DEFAULT_MAX_SIZE);
+		UploadFileUtil.log.warn(
+			"Default Large Max Size for file upload missing, using " + UploadFileUtil.DEFAULT_MAX_SIZE);
 	    }
 	} else {
 	    tempInt = Configuration.getAsInt(ConfigurationKeys.UPLOAD_FILE_MAX_SIZE);
 	    if (tempInt != -1) {
 		max_size = tempInt;
 	    } else {
-		UploadFileUtil.log.warn("Default Max Size for file upload missing, using "
-			+ UploadFileUtil.DEFAULT_MAX_SIZE);
+		UploadFileUtil.log
+			.warn("Default Max Size for file upload missing, using " + UploadFileUtil.DEFAULT_MAX_SIZE);
 	    }
 	}
 
@@ -111,8 +111,8 @@ public class UploadFileUtil {
 	if (tempInt != -1) {
 	    max_memory_size = tempInt;
 	} else {
-	    UploadFileUtil.log.warn("Default Max Memory Size for file upload missing, using "
-		    + UploadFileUtil.DEFAULT_MEMORY_SIZE);
+	    UploadFileUtil.log.warn(
+		    "Default Max Memory Size for file upload missing, using " + UploadFileUtil.DEFAULT_MEMORY_SIZE);
 	    max_memory_size = UploadFileUtil.DEFAULT_MEMORY_SIZE;
 	}
 

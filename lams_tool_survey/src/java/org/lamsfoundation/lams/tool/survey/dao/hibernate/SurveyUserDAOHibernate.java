@@ -2,21 +2,21 @@
  * Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
  * =============================================================
  * License Information: http://lamsfoundation.org/licensing/lams/2.0/
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301
  * USA
- * 
+ *
  * http://www.gnu.org/licenses/gpl.txt
  * ****************************************************************
  */
@@ -47,24 +47,30 @@ public class SurveyUserDAOHibernate extends BaseDAOHibernate implements SurveyUs
 	    + SurveyUser.class.getName()
 	    + " AS u WHERE u.session.sessionId=? AND (u.sessionFinished is true OR u.responseFinalized is true)";
 
+    @Override
     public SurveyUser getUserByUserIDAndSessionID(Long userID, Long sessionId) {
 	List list = this.getHibernateTemplate().find(FIND_BY_USER_ID_SESSION_ID, new Object[] { userID, sessionId });
-	if (list == null || list.size() == 0)
+	if (list == null || list.size() == 0) {
 	    return null;
+	}
 	return (SurveyUser) list.get(0);
     }
 
+    @Override
     public SurveyUser getUserByUserIDAndContentID(Long userId, Long contentId) {
 	List list = this.getHibernateTemplate().find(FIND_BY_USER_ID_CONTENT_ID, new Object[] { userId, contentId });
-	if (list == null || list.size() == 0)
+	if (list == null || list.size() == 0) {
 	    return null;
+	}
 	return (SurveyUser) list.get(0);
     }
 
+    @Override
     public List<SurveyUser> getBySessionID(Long sessionId) {
 	return this.getHibernateTemplate().find(FIND_BY_SESSION_ID, sessionId);
     }
 
+    @Override
     public int getCountFinishedUsers(Long sessionId) {
 	List list = getHibernateTemplate().find(GET_COUNT_FINISHED_USERS_FOR_SESSION, new Object[] { sessionId });
 	if (list == null || list.size() == 0) {
@@ -78,8 +84,10 @@ public class SurveyUserDAOHibernate extends BaseDAOHibernate implements SurveyUs
 	    + " JOIN tl_lasurv11_session session ON user.session_uid = session.uid and session.session_id = :sessionId "
 	    + " LEFT JOIN tl_lasurv11_answer answer ON user.uid = answer.user_uid and answer.question_uid = :questionId ";
 
+    @Override
     @SuppressWarnings("unchecked")
-    /** Will return List<[SurveyUser, String, String], [SurveyUser, String, String], ... , [SurveyUser, String, String]>
+    /**
+     * Will return List<[SurveyUser, String, String], [SurveyUser, String, String], ... , [SurveyUser, String, String]>
      * where the first String is answer choices (for multiple choice) and the second String is the answer text for
      * free entry choice.
      */
@@ -87,14 +95,14 @@ public class SurveyUserDAOHibernate extends BaseDAOHibernate implements SurveyUs
 	    int sorting, String searchString) {
 	String sortingOrder;
 	switch (sorting) {
-	case SurveyConstants.SORT_BY_NAME_ASC:
-	    sortingOrder = "user.last_name ASC, user.first_name ASC";
-	    break;
-	case SurveyConstants.SORT_BY_NAME_DESC:
-	    sortingOrder = "user.last_name DESC, user.first_name DESC";
-	    break;
-	default:
-	    sortingOrder = "user.uid";
+	    case SurveyConstants.SORT_BY_NAME_ASC:
+		sortingOrder = "user.last_name ASC, user.first_name ASC";
+		break;
+	    case SurveyConstants.SORT_BY_NAME_DESC:
+		sortingOrder = "user.last_name DESC, user.first_name DESC";
+		break;
+	    default:
+		sortingOrder = "user.uid";
 	}
 
 	// Basic select for the user records
@@ -107,12 +115,9 @@ public class SurveyUserDAOHibernate extends BaseDAOHibernate implements SurveyUs
 	queryText.append(" ORDER BY " + sortingOrder);
 
 	SQLQuery query = getSession().createSQLQuery(queryText.toString());
-	query.addEntity("user", SurveyUser.class)
-		.addScalar("answerChoices", Hibernate.STRING)
-		.addScalar("answerText", Hibernate.STRING)
-		.setLong("sessionId", sessionId.longValue())
-		.setLong("questionId", questionId.longValue())
-		.setFirstResult(page * size).setMaxResults(size);
+	query.addEntity("user", SurveyUser.class).addScalar("answerChoices", Hibernate.STRING)
+		.addScalar("answerText", Hibernate.STRING).setLong("sessionId", sessionId.longValue())
+		.setLong("questionId", questionId.longValue()).setFirstResult(page * size).setMaxResults(size);
 	return query.list();
     }
 
@@ -122,18 +127,19 @@ public class SurveyUserDAOHibernate extends BaseDAOHibernate implements SurveyUs
 	    for (String token : tokens) {
 		String escToken = StringEscapeUtils.escapeSql(token);
 		sqlBuilder.append(" WHERE (user.first_name LIKE '%").append(escToken)
-			.append("%' OR user.last_name LIKE '%").append(escToken)
-			.append("%' OR user.login_name LIKE '%").append(escToken).append("%') ");
+			.append("%' OR user.last_name LIKE '%").append(escToken).append("%' OR user.login_name LIKE '%")
+			.append(escToken).append("%') ");
 	    }
 	}
     }
 
+    @Override
     @SuppressWarnings("rawtypes")
     public int getCountUsersBySession(final Long sessionId, String searchString) {
 
 	StringBuilder queryText = new StringBuilder("SELECT count(*) FROM tl_lasurv11_user user ");
-	queryText
-		.append(" JOIN tl_lasurv11_session session ON user.session_uid = session.uid and session.session_id = :sessionId");
+	queryText.append(
+		" JOIN tl_lasurv11_session session ON user.session_uid = session.uid and session.session_id = :sessionId");
 	buildNameSearch(searchString, queryText);
 
 	List list = getSession().createSQLQuery(queryText.toString()).setLong("sessionId", sessionId.longValue())
@@ -143,22 +149,25 @@ public class SurveyUserDAOHibernate extends BaseDAOHibernate implements SurveyUs
 	}
 	return ((Number) list.get(0)).intValue();
     }
-    
+
+    @Override
     @SuppressWarnings("unchecked")
-    /** Will return List<[SurveyUser, String (notebook entry)], [SurveyUser, String (notebook entry)], ... , [SurveyUser, String (notebook entry)]>
+    /**
+     * Will return List<[SurveyUser, String (notebook entry)], [SurveyUser, String (notebook entry)], ... , [SurveyUser,
+     * String (notebook entry)]>
      */
     public List<Object[]> getUserReflectionsForTablesorter(final Long sessionId, int page, int size, int sorting,
 	    String searchString, ICoreNotebookService coreNotebookService) {
 	String sortingOrder;
 	switch (sorting) {
-	case SurveyConstants.SORT_BY_NAME_ASC:
-	    sortingOrder = "user.last_name ASC, user.first_name ASC";
-	    break;
-	case SurveyConstants.SORT_BY_NAME_DESC:
-	    sortingOrder = "user.last_name DESC, user.first_name DESC";
-	    break;
-	default:
-	    sortingOrder = "user.uid";
+	    case SurveyConstants.SORT_BY_NAME_ASC:
+		sortingOrder = "user.last_name ASC, user.first_name ASC";
+		break;
+	    case SurveyConstants.SORT_BY_NAME_DESC:
+		sortingOrder = "user.last_name DESC, user.first_name DESC";
+		break;
+	    default:
+		sortingOrder = "user.uid";
 	}
 
 	// If the session uses notebook, then get the sql to join across to get the entries
@@ -170,8 +179,8 @@ public class SurveyUserDAOHibernate extends BaseDAOHibernate implements SurveyUs
 	queryText.append("SELECT user.* ");
 	queryText.append(notebookEntryStrings[0]);
 	queryText.append(" FROM tl_lasurv11_user user ");
-	queryText
-		.append(" JOIN tl_lasurv11_session session ON user.session_uid = session.uid and session.session_id = :sessionId ");
+	queryText.append(
+		" JOIN tl_lasurv11_session session ON user.session_uid = session.uid and session.session_id = :sessionId ");
 
 	// Add the notebook join
 	queryText.append(notebookEntryStrings[1]);
@@ -189,18 +198,17 @@ public class SurveyUserDAOHibernate extends BaseDAOHibernate implements SurveyUs
     }
 
     private static final String GET_STATISTICS = "SELECT session.*, COUNT(*) numUsers "
-		+ "  FROM tl_lasurv11_session session, tl_lasurv11_survey survey, tl_lasurv11_user user "
-		+ "  WHERE survey.content_id = :contentId and session.survey_uid = survey.uid  and user.session_uid = session.uid "
-		+ "  GROUP BY session.session_id";
- 
+	    + "  FROM tl_lasurv11_session session, tl_lasurv11_survey survey, tl_lasurv11_user user "
+	    + "  WHERE survey.content_id = :contentId and session.survey_uid = survey.uid  and user.session_uid = session.uid "
+	    + "  GROUP BY session.session_id";
+
+    @Override
     @SuppressWarnings("unchecked")
-    /** Returns < [surveySession, numUsers] ...  [surveySession, numUsers]> */
+    /** Returns < [surveySession, numUsers] ... [surveySession, numUsers]> */
     public List<Object[]> getStatisticsBySession(final Long contentId) {
 
 	SQLQuery query = getSession().createSQLQuery(GET_STATISTICS);
-	query.addEntity(SurveySession.class)
-		.addScalar("numUsers", Hibernate.INTEGER)
-		.setLong("contentId", contentId);
+	query.addEntity(SurveySession.class).addScalar("numUsers", Hibernate.INTEGER).setLong("contentId", contentId);
 	return query.list();
     }
 

@@ -16,10 +16,10 @@ import org.lamsfoundation.lams.tool.chat.dto.ChatConditionDTO;
 
 /**
  * A text search condition with a set of messages on which the search should be performed.
- * 
- * 
+ *
+ *
  * @author Marcin Cieslak
- * 
+ *
  */
 public class ChatCondition extends TextSearchCondition {
 
@@ -92,11 +92,11 @@ public class ChatCondition extends TextSearchCondition {
 
     /**
      * It filters the given text in order to find any of the unwanted words.
-     * 
+     *
      * @param excludedWords
-     *                words to search for
+     *            words to search for
      * @param textToMatch
-     *                string to be filtered
+     *            string to be filtered
      * @return <code>true</code> if at least one of the words from the list is found in the text
      */
     private boolean matchExcludedWordsOnly(List<String> excludedWords, String textToMatch) {
@@ -105,8 +105,9 @@ public class ChatCondition extends TextSearchCondition {
 	}
 	StringBuilder stringPattern = new StringBuilder();
 	for (String excludedWord : excludedWords) {
-	    stringPattern.append("(?:").append(TextSearchCondition.NON_WORD_DELIMITER_REGEX).append(
-		    Pattern.quote(excludedWord)).append(TextSearchCondition.NON_WORD_DELIMITER_REGEX).append(")|");
+	    stringPattern.append("(?:").append(TextSearchCondition.NON_WORD_DELIMITER_REGEX)
+		    .append(Pattern.quote(excludedWord)).append(TextSearchCondition.NON_WORD_DELIMITER_REGEX)
+		    .append(")|");
 	}
 	stringPattern.deleteCharAt(stringPattern.length() - 1);
 	Pattern regexPattern = Pattern.compile(stringPattern.toString(), TextSearchCondition.PATTERN_MATCHING_OPTIONS);

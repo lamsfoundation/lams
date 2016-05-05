@@ -18,21 +18,22 @@
  *
  * http://www.gnu.org/licenses/gpl.txt
  * ****************************************************************
- */ 
- 
-/* $Id$ */ 
-package org.lamsfoundation.lams.gradebook.dto.comparators; 
+ */
+
+/* $Id$ */
+package org.lamsfoundation.lams.gradebook.dto.comparators;
 
 import java.util.Comparator;
 
 import org.lamsfoundation.lams.gradebook.dto.GradebookGridRowDTO;
 
 @SuppressWarnings("unchecked")
-public class GBIDComparator implements Comparator{
+public class GBIDComparator implements Comparator {
+    @Override
     public int compare(Object gradebookRow, Object anotherGradebookRow) {
 
 	if (gradebookRow instanceof GradebookGridRowDTO && anotherGradebookRow instanceof GradebookGridRowDTO) {
-	   
+
 	    Long id1;
 	    Long id2;
 	    try {
@@ -41,15 +42,14 @@ public class GBIDComparator implements Comparator{
 	    } catch (NumberFormatException e) {
 		return 0;
 	    }
-	    
+
 	    if (id1 == null || id2 == null) {
 		return 0;
 	    }
 	    Long ret = id1 - id2;
-	    return ret.intValue();    
+	    return ret.intValue();
 	} else {
 	    return 0;
 	}
     }
 }
- 

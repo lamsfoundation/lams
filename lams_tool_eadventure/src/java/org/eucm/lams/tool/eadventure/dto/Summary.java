@@ -2,21 +2,21 @@
  * Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
  * =============================================================
  * License Information: http://lamsfoundation.org/licensing/lams/2.0/
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License version 2.0 
+ * it under the terms of the GNU General Public License version 2.0
  * as published by the Free Software Foundation.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301
  * USA
- * 
+ *
  * http://www.gnu.org/licenses/gpl.txt
  * ****************************************************************
  */
@@ -24,25 +24,28 @@
 /* $Id$ */
 package org.eucm.lams.tool.eadventure.dto;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
-
 
 import org.eucm.lams.tool.eadventure.model.Eadventure;
 import org.eucm.lams.tool.eadventure.model.EadventureUser;
-import org.eucm.lams.tool.eadventure.util.EadventureWebUtils;
 
 /**
  * List contains following element: <br>
- * 
- * <li>session_id</li> <li>session_name</li> <li>EadventureItem.uid</li> <li>
- * EadventureItem.item_type</li> <li>EadventureItem.create_by_author</li> <li>
- * EadventureItem.is_hide</li> <li>EadventureItem.title</li> <li>User.login_name</li>
+ *
+ * <li>session_id</li>
+ * <li>session_name</li>
+ * <li>EadventureItem.uid</li>
+ * <li>
+ * EadventureItem.item_type</li>
+ * <li>EadventureItem.create_by_author</li>
+ * <li>
+ * EadventureItem.is_hide</li>
+ * <li>EadventureItem.title</li>
+ * <li>User.login_name</li>
  * <li>count(eadventure_item_uid)</li>
- * 
+ *
  * @author Steve.Ni
- * 
+ *
  * @version $Revision$
  */
 public class Summary {
@@ -60,8 +63,8 @@ public class Summary {
     //TODO ver que pasa con itemHide
     private boolean itemHide;
     private String itemTitle;
-   //TODO ver que pasa con item instructions
-  //  private List<String> itemInstructions = new ArrayList<String>();
+    //TODO ver que pasa con item instructions
+    //  private List<String> itemInstructions = new ArrayList<String>();
     private String username;
     //TODO Cuidado, = viewNumber y numberOfLearners....
     private int viewNumber;
@@ -81,43 +84,44 @@ public class Summary {
 
     /**
      * Contruction method for monitoring summary function.
-     * 
+     *
      * <B>Don't not set isInitGroup and viewNumber fields</B>
-     * 
+     *
      * @param sessionName
      * @param item
      * @param isInitGroup
      */
-   public Summary(Long sessionId, String sessionName, Eadventure ead) {
+    public Summary(Long sessionId, String sessionName, Eadventure ead) {
 	this.sessionId = sessionId;
 	this.sessionName = sessionName;
 	if (ead != null) {
 	    this.eadventureUid = ead.getUid();
 	    //this.itemType = ead.getType();
-	   // this.itemCreateByAuthor = ead.isCreatedByAuthor();
-	   
+	    // this.itemCreateByAuthor = ead.isCreatedByAuthor();
+
 	    //TODO ver que pasa con hide
 	    // this.itemHide = ead.isHide();
 	    this.itemTitle = ead.getTitle();
 	    this.username = ead.getCreatedBy() == null ? "" : ead.getCreatedBy().getLoginName();
-	  //  this.url = ead.protocol(ead.getUrl());
+	    //  this.url = ead.protocol(ead.getUrl());
 	    this.fileName = ead.getFileName();
 	    this.fileUuid = ead.getFileUuid();
 	    this.fileVersionId = ead.getFileVersionId();
-	} else
+	} else {
 	    this.eadventureUid = new Long(-1);
+	}
     }
 
     /**
      * Contruction method for export profolio function.
-     * 
+     *
      * <B>Don't not set sessionId and viewNumber fields</B>
-     * 
+     *
      * @param sessionName
      * @param item
      * @param isInitGroup
      */
-   public Summary(Long sessionId, String sessionName, Eadventure ead, boolean isInitGroup) {
+    public Summary(Long sessionId, String sessionName, Eadventure ead, boolean isInitGroup) {
 	this.sessionId = sessionId;
 	this.sessionName = sessionName;
 	if (ead != null) {
@@ -126,18 +130,16 @@ public class Summary {
 	    //this.itemHide = ead.isHide();
 	    this.itemTitle = ead.getTitle();
 	    this.username = ead.getCreatedBy() == null ? "" : ead.getCreatedBy().getLoginName();
-	   // this.url = EadventureWebUtils.protocol(item.getUrl());
+	    // this.url = EadventureWebUtils.protocol(item.getUrl());
 	    this.fileName = ead.getFileName();
 	    this.fileUuid = ead.getFileUuid();
 	    this.fileVersionId = ead.getFileVersionId();
 
-	    
-	} else
+	} else {
 	    this.eadventureUid = new Long(-1);
-	//this.isInitGroup = isInitGroup;
+	    //this.isInitGroup = isInitGroup;
+	}
     }
-
-   
 
     public boolean isItemHide() {
 	return itemHide;
@@ -154,8 +156,6 @@ public class Summary {
     public void setItemTitle(String itemTitle) {
 	this.itemTitle = itemTitle;
     }
-
-   
 
     public Long getItemUid() {
 	return eadventureUid;
@@ -188,8 +188,6 @@ public class Summary {
     public void setUsername(String username) {
 	this.username = username;
     }
-
-   
 
     public Long getFileUuid() {
 	return fileUuid;
@@ -240,53 +238,51 @@ public class Summary {
     }
 
     public int getViewNumber() {
-        return viewNumber;
+	return viewNumber;
     }
 
     public void setViewNumber(int viewNumber) {
-        this.viewNumber = viewNumber;
+	this.viewNumber = viewNumber;
     }
 
     public boolean[] getExistList() {
-        return existList;
+	return existList;
     }
 
     public void setExistList(boolean[] existList) {
-        this.existList = existList;
+	this.existList = existList;
     }
 
     public List<EadventureUser> getUsers() {
-        return users;
+	return users;
     }
 
     public void setUsers(List<EadventureUser> users) {
-        this.users = users;
+	this.users = users;
     }
 
     public int getNumberOfLearners() {
-        return numberOfLearners;
+	return numberOfLearners;
     }
 
     public void setNumberOfLearners(int numberOfLearners) {
-        this.numberOfLearners = numberOfLearners;
+	this.numberOfLearners = numberOfLearners;
     }
 
     public int getNumberOfFinishedLearners() {
-        return numberOfFinishedLearners;
+	return numberOfFinishedLearners;
     }
 
     public void setNumberOfFinishedLearners(int numberOfFinishedLearners) {
-        this.numberOfFinishedLearners = numberOfFinishedLearners;
+	this.numberOfFinishedLearners = numberOfFinishedLearners;
     }
 
     public String[] getReportList() {
-        return reportList;
+	return reportList;
     }
 
     public void setReportList(String[] reportList) {
-        this.reportList = reportList;
+	this.reportList = reportList;
     }
-
-    
 
 }

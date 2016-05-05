@@ -2,21 +2,21 @@
  * Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
  * =============================================================
  * License Information: http://lamsfoundation.org/licensing/lams/2.0/
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301
  * USA
- * 
+ *
  * http://www.gnu.org/licenses/gpl.txt
  * ****************************************************************
  */
@@ -39,9 +39,9 @@ import org.lamsfoundation.lams.rating.model.LearnerItemRatingCriteria;
 /**
  * QaContent Value Object The value object that maps to our model database table: tl_laqa11_content The relevant
  * hibernate mapping resides in: QaContent.hbm.xml
- * 
+ *
  * Holds content representation for the tool. Default content is made available to the tool by the database.
- * 
+ *
  * @author Ozgur Demirtas
  */
 public class QaContent implements Serializable {
@@ -82,7 +82,7 @@ public class QaContent implements Serializable {
     private boolean questionsSequenced;
 
     private boolean lockWhenFinished;
-    
+
     private boolean noReeditAllowed;
 
     private boolean showOtherAnswers;
@@ -106,9 +106,9 @@ public class QaContent implements Serializable {
     private Date updateDate;
 
     private Date submissionDeadline;
-    
+
     private boolean showOtherAnswersAfterDeadline;
-    
+
     private int maximumRates;
 
     private int minimumRates;
@@ -130,11 +130,11 @@ public class QaContent implements Serializable {
     /** full constructor */
     public QaContent(Long qaContentId, String content, String title, String instructions, String reportTitle,
 	    String monitoringReportTitle, long createdBy, boolean questionsSequenced, boolean usernameVisible,
-	    boolean allowRateAnswers, boolean notifyTeachersOnResponseSubmit, boolean lockWhenFinished, boolean noReeditAllowed,
-	    boolean showOtherAnswers, boolean reflect, String reflectionSubject, Date creationDate, Date updateDate,
-	    Set<QaQueContent> qaQueContents, Set qaSessions, Set<QaCondition> conditions, boolean allowRichEditor,
-	    boolean useSelectLeaderToolOuput, int maximumRates, int minimumRates,
-	    Set<LearnerItemRatingCriteria> ratingCriterias) {
+	    boolean allowRateAnswers, boolean notifyTeachersOnResponseSubmit, boolean lockWhenFinished,
+	    boolean noReeditAllowed, boolean showOtherAnswers, boolean reflect, String reflectionSubject,
+	    Date creationDate, Date updateDate, Set<QaQueContent> qaQueContents, Set qaSessions,
+	    Set<QaCondition> conditions, boolean allowRichEditor, boolean useSelectLeaderToolOuput, int maximumRates,
+	    int minimumRates, Set<LearnerItemRatingCriteria> ratingCriterias) {
 	this.qaContentId = qaContentId;
 	this.content = content;
 	this.title = title;
@@ -166,7 +166,7 @@ public class QaContent implements Serializable {
     /**
      * Copy Construtor to create a new qa content instance. Note that we don't copy the qa session data here because the
      * qa session will be created after we copied tool content.
-     * 
+     *
      * @param qa
      *            the original qa content.
      * @param newContentId
@@ -177,19 +177,19 @@ public class QaContent implements Serializable {
 	QaContent newContent = new QaContent(newContentId, qa.getContent(), qa.getTitle(), qa.getInstructions(),
 		qa.getReportTitle(), qa.getMonitoringReportTitle(), qa.getCreatedBy(), qa.isQuestionsSequenced(),
 		qa.isUsernameVisible(), qa.isAllowRateAnswers(), qa.isNotifyTeachersOnResponseSubmit(),
-		qa.isLockWhenFinished(), qa.isNoReeditAllowed(), qa.isShowOtherAnswers(), qa.isReflect(), qa.getReflectionSubject(),
-		qa.getCreationDate(), qa.getUpdateDate(), new TreeSet(), new TreeSet(), new TreeSet<QaCondition>(
-			new TextSearchConditionComparator()), qa.isAllowRichEditor(), qa.isUseSelectLeaderToolOuput(),
-		qa.maximumRates, qa.minimumRates, new TreeSet());
+		qa.isLockWhenFinished(), qa.isNoReeditAllowed(), qa.isShowOtherAnswers(), qa.isReflect(),
+		qa.getReflectionSubject(), qa.getCreationDate(), qa.getUpdateDate(), new TreeSet(), new TreeSet(),
+		new TreeSet<QaCondition>(new TextSearchConditionComparator()), qa.isAllowRichEditor(),
+		qa.isUseSelectLeaderToolOuput(), qa.maximumRates, qa.minimumRates, new TreeSet());
 
 	newContent.setQaQueContents(qa.deepCopyQaQueContent(newContent));
-	
+
 	newContent.setRatingCriterias(qa.deepCopyRatingCriterias(newContent));
 
 	newContent.setConditions(qa.deepCopyConditions(newContent));
 	return newContent;
     }
-    
+
     public Set<LearnerItemRatingCriteria> deepCopyRatingCriterias(QaContent newQaContent) {
 
 	Set<LearnerItemRatingCriteria> newCriterias = new TreeSet<LearnerItemRatingCriteria>();
@@ -205,7 +205,7 @@ public class QaContent implements Serializable {
     public Set<QaQueContent> deepCopyQaQueContent(QaContent newQaContent) {
 	Set<QaQueContent> newQaQueContent = new TreeSet<QaQueContent>();
 	for (Iterator<QaQueContent> i = this.getQaQueContents().iterator(); i.hasNext();) {
-	    QaQueContent queContent = (QaQueContent) i.next();
+	    QaQueContent queContent = i.next();
 	    newQaQueContent.add(QaQueContent.newInstance(queContent, newQaContent));
 	}
 	return newQaQueContent;
@@ -283,10 +283,9 @@ public class QaContent implements Serializable {
     public String toString() {
 	return new ToStringBuilder(this).append("qaContentId:", getQaContentId()).append("qa title:", getTitle())
 		.append("qa instructions:", getInstructions()).append("creator user id", getCreatedBy())
-		.append("username_visible:", isUsernameVisible())
-		.append("allow to rate answers:", isAllowRateAnswers()).append("defineLater", isDefineLater())
-		.append("report_title: ", getReportTitle()).append("reflection subject: ", getReflectionSubject())
-		.toString();
+		.append("username_visible:", isUsernameVisible()).append("allow to rate answers:", isAllowRateAnswers())
+		.append("defineLater", isDefineLater()).append("report_title: ", getReportTitle())
+		.append("reflection subject: ", getReflectionSubject()).toString();
     }
 
     @Override
@@ -392,7 +391,7 @@ public class QaContent implements Serializable {
     public void setSubmissionDeadline(Date submissionDeadline) {
 	this.submissionDeadline = submissionDeadline;
     }
-    
+
     /**
      * @return Returns the showOtherAnswersAfterDeadline.
      */
@@ -568,7 +567,7 @@ public class QaContent implements Serializable {
     public void setLockWhenFinished(boolean lockWhenFinished) {
 	this.lockWhenFinished = lockWhenFinished;
     }
-    
+
     /**
      * @return Returns the noReeditAllowed.
      */
@@ -614,7 +613,7 @@ public class QaContent implements Serializable {
     public void setShowOtherAnswers(boolean showOtherAnswers) {
 	this.showOtherAnswers = showOtherAnswers;
     }
-    
+
     /**
      * @return
      */
@@ -638,7 +637,7 @@ public class QaContent implements Serializable {
     }
 
     /**
-     * 
+     *
      * @return
      */
     public Set<LearnerItemRatingCriteria> getRatingCriterias() {

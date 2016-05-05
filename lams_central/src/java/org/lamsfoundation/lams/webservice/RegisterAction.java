@@ -1,23 +1,23 @@
-/**************************************************************** 
- * Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org) 
- * ============================================================= 
- * License Information: http://lamsfoundation.org/licensing/lams/2.0/ 
- * 
- * This program is free software; you can redistribute it and/or modify 
- * it under the terms of the GNU General Public License version 2.0 
- * as published by the Free Software Foundation. 
- * 
- * This program is distributed in the hope that it will be useful, 
- * but WITHOUT ANY WARRANTY; without even the implied warranty of 
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the 
- * GNU General Public License for more details. 
- * 
- * You should have received a copy of the GNU General Public License 
- * along with this program; if not, write to the Free Software 
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 * USA 
- * 
- * http://www.gnu.org/licenses/gpl.txt 
- * **************************************************************** 
+/****************************************************************
+ * Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
+ * =============================================================
+ * License Information: http://lamsfoundation.org/licensing/lams/2.0/
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License version 2.0
+ * as published by the Free Software Foundation.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 * USA
+ *
+ * http://www.gnu.org/licenses/gpl.txt
+ * ****************************************************************
  */
 
 /* $Id$ */
@@ -42,7 +42,6 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
-import org.lamsfoundation.lams.events.DeliveryMethodMail;
 import org.lamsfoundation.lams.events.IEventNotificationService;
 import org.lamsfoundation.lams.integration.ExtCourseClassMap;
 import org.lamsfoundation.lams.integration.ExtServerOrgMap;
@@ -76,12 +75,12 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
 
 /**
  * @author Andrey Balan
- * 
+ *
  *         ----------------XDoclet Tags--------------------
- * 
+ *
  * @web:servlet name="RegisterServlet"
  * @web:servlet-mapping url-pattern="/services/Register/*"
- * 
+ *
  */
 public class RegisterAction extends HttpServlet {
 
@@ -103,8 +102,9 @@ public class RegisterAction extends HttpServlet {
 
     private static MessageService messageService = null;
 
-    public synchronized void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException,
-	    IOException {
+    @Override
+    public synchronized void doGet(HttpServletRequest request, HttpServletResponse response)
+	    throws ServletException, IOException {
 
 	String method = request.getParameter(CentralConstants.PARAM_METHOD);
 	if (method.equals("addUserToGroupLessons")) {
@@ -121,48 +121,50 @@ public class RegisterAction extends HttpServlet {
 
     /**
      * Initialization of the servlet. <br>
-     * 
+     *
      * @throws ServletException
      *             if an error occured
      */
+    @Override
     public void init() throws ServletException {
-	learnerProgressDAO = (ILearnerProgressDAO) WebApplicationContextUtils.getRequiredWebApplicationContext(
-		getServletContext()).getBean("learnerProgressDAO");
+	learnerProgressDAO = (ILearnerProgressDAO) WebApplicationContextUtils
+		.getRequiredWebApplicationContext(getServletContext()).getBean("learnerProgressDAO");
 
-	integrationService = (IntegrationService) WebApplicationContextUtils.getRequiredWebApplicationContext(
-		getServletContext()).getBean("integrationService");
+	integrationService = (IntegrationService) WebApplicationContextUtils
+		.getRequiredWebApplicationContext(getServletContext()).getBean("integrationService");
 
-	lessonService = (ILessonService) WebApplicationContextUtils.getRequiredWebApplicationContext(
-		getServletContext()).getBean("lessonService");
+	lessonService = (ILessonService) WebApplicationContextUtils
+		.getRequiredWebApplicationContext(getServletContext()).getBean("lessonService");
 
-	learnerService = (ICoreLearnerService) WebApplicationContextUtils.getRequiredWebApplicationContext(
-		getServletContext()).getBean("learnerService");
+	learnerService = (ICoreLearnerService) WebApplicationContextUtils
+		.getRequiredWebApplicationContext(getServletContext()).getBean("learnerService");
 
 	groupUserDAO = (IGroupUserDAO) WebApplicationContextUtils.getRequiredWebApplicationContext(getServletContext())
 		.getBean("groupUserDAO");
 
-	userManagementService = (IUserManagementService) WebApplicationContextUtils.getRequiredWebApplicationContext(
-		getServletContext()).getBean("userManagementService");
+	userManagementService = (IUserManagementService) WebApplicationContextUtils
+		.getRequiredWebApplicationContext(getServletContext()).getBean("userManagementService");
 
 	eventNotificationService = (IEventNotificationService) WebApplicationContextUtils
 		.getRequiredWebApplicationContext(getServletContext()).getBean("eventNotificationService");
 
-	messageService = (MessageService) WebApplicationContextUtils.getRequiredWebApplicationContext(
-		getServletContext()).getBean(CentralConstants.CENTRAL_MESSAGE_SERVICE_BEAN_NAME);
+	messageService = (MessageService) WebApplicationContextUtils
+		.getRequiredWebApplicationContext(getServletContext())
+		.getBean(CentralConstants.CENTRAL_MESSAGE_SERVICE_BEAN_NAME);
     }
 
     /**
      * Add user to group lessons.
-     * 
+     *
      * External server call must follow the next format:
      * http://<<yourlamsserver>>/lams/central/Register.do?method=addUserToGroupLessons
      * &serverId=%serverId%&datetime=%datetime%
      * &hashValue=%hashValue%&courseId=%courseId%&username=%username%&firstName=
      * %firstName%&lastName=%lastName%&email=%email&isJoinLesson=%isJoinLesson%
      * &isEmailParticipant=%isEmailParticipant%&isEmailCoordinator=%isEmailCoordinator%
-     * 
+     *
      * Here are the parameters explanation:
-     * 
+     *
      * @param method
      *            =addUserToGroupLessons - selfexplanatory.
      * @param serverId
@@ -201,7 +203,7 @@ public class RegisterAction extends HttpServlet {
 	    if (!serverToServerEnable) {
 		String msg = "Server to server registration is not enabled";
 		logger.error(msg);
-		response.sendError(response.SC_METHOD_NOT_ALLOWED, msg);
+		response.sendError(HttpServletResponse.SC_METHOD_NOT_ALLOWED, msg);
 		return;
 	    }
 	    String method = request.getParameter(CentralConstants.PARAM_METHOD);
@@ -222,7 +224,7 @@ public class RegisterAction extends HttpServlet {
 	    if (serverId == null || datetime == null || hashValue == null || username == null) {
 		String msg = "Parameters missing";
 		logger.error(msg);
-		response.sendError(response.SC_BAD_REQUEST, "Parameters missing");
+		response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Parameters missing");
 	    }
 
 	    // authenticate external server
@@ -273,8 +275,8 @@ public class RegisterAction extends HttpServlet {
 	    for (Lesson lesson : lessonsToJoin) {
 		boolean isAdded = lessonService.addLearner(lesson.getLessonId(), user.getUserId());
 		if (isAdded) {
-		    logger.debug("Added user:" + user.getLogin() + " to lesson:" + lesson.getLessonName()
-			    + " as a learner");
+		    logger.debug(
+			    "Added user:" + user.getLogin() + " to lesson:" + lesson.getLessonName() + " as a learner");
 		}
 	    }
 
@@ -285,8 +287,8 @@ public class RegisterAction extends HttpServlet {
 		    LearnerProgress learnerProgress = learnerProgressDAO.getLearnerProgressByLearner(user.getUserId(),
 			    lesson.getLessonId());
 		    if (learnerProgress == null) {
-			logger.debug("The learner:" + user.getLogin() + " is joining the lesson:"
-				+ lesson.getLessonId());
+			logger.debug(
+				"The learner:" + user.getLogin() + " is joining the lesson:" + lesson.getLessonId());
 			learnerService.joinLesson(user.getUserId(), lesson.getLessonId());
 		    } else {// don't join to lessons which user is a part of already but make sure time limit is reset
 			resetUserTimeLimit(lesson, user);
@@ -317,10 +319,11 @@ public class RegisterAction extends HttpServlet {
 
 		String registeredUserName = firstName + " " + lastName + " (" + username + ")";
 		eventNotificationService.sendMessage(null, coordinator.getUserId(),
-			IEventNotificationService.DELIVERY_METHOD_MAIL, messageService
-				.getMessage("notify.coordinator.register.user.email.subject"), messageService
-				.getMessage("notify.coordinator.register.user.email.body",
-					new Object[] { registeredUserName }), isHtmlFormat);
+			IEventNotificationService.DELIVERY_METHOD_MAIL,
+			messageService.getMessage("notify.coordinator.register.user.email.subject"),
+			messageService.getMessage("notify.coordinator.register.user.email.body",
+				new Object[] { registeredUserName }),
+			isHtmlFormat);
 	    }
 
 	    writeAJAXOKResponse(response);
@@ -333,14 +336,14 @@ public class RegisterAction extends HttpServlet {
 
     /**
      * Remove user from group lessons.
-     * 
+     *
      * External server call must follow the next format:
      * http://<<yourlamsserver>>/lams/central/Register.do?method=removeUserFromGroup
      * &serverId=%serverId%&datetime=%datetime%
      * &hashValue=%hashValue%&courseId=%courseId%&username=%username%&isRemoveFromAllCourses=%isRemoveFromAllCourses%
-     * 
+     *
      * Here are the parameters explanation:
-     * 
+     *
      * @param method
      *            =removeUserFromGroup - selfexplanatory.
      * @param serverId
@@ -367,7 +370,7 @@ public class RegisterAction extends HttpServlet {
 	    if (!serverToServerEnable) {
 		String msg = "Server to server registration is not enabled";
 		logger.error(msg);
-		response.sendError(response.SC_METHOD_NOT_ALLOWED, msg);
+		response.sendError(HttpServletResponse.SC_METHOD_NOT_ALLOWED, msg);
 		return;
 	    }
 	    String method = request.getParameter(CentralConstants.PARAM_METHOD);
@@ -382,7 +385,7 @@ public class RegisterAction extends HttpServlet {
 	    if (serverId == null || datetime == null || hashValue == null || username == null) {
 		String msg = "Parameters missing";
 		logger.error(msg);
-		response.sendError(response.SC_BAD_REQUEST, "Parameters missing");
+		response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Parameters missing");
 	    }
 
 	    // authenticate external server
@@ -435,13 +438,13 @@ public class RegisterAction extends HttpServlet {
     /**
      * Resets user's time limit for all lessons in a group with scheduledToCloseForIndividuals setting on. In case
      * lesson's time limit is not individual it does nothing.
-     * 
+     *
      * External server call must follow the next format:
      * http://<<yourlamsserver>>/lams/central/Register.do?method=resetUserTimeLimit
      * &serverId=%serverId%&datetime=%datetime% &hashValue=%hashValue%&courseId=%courseId%&username=%username%
-     * 
+     *
      * Here are the parameters explanation:
-     * 
+     *
      * @param method
      *            =resetUserTimeLimit - selfexplanatory.
      * @param serverId
@@ -466,7 +469,7 @@ public class RegisterAction extends HttpServlet {
 	    if (!serverToServerEnable) {
 		String msg = "Server to server registration is not enabled";
 		logger.error(msg);
-		response.sendError(response.SC_METHOD_NOT_ALLOWED, msg);
+		response.sendError(HttpServletResponse.SC_METHOD_NOT_ALLOWED, msg);
 		return;
 	    }
 
@@ -481,7 +484,7 @@ public class RegisterAction extends HttpServlet {
 	    if (serverId == null || datetime == null || hashValue == null || username == null || courseId == null) {
 		String msg = "Parameters missing";
 		logger.error(msg);
-		response.sendError(response.SC_BAD_REQUEST, "Parameters missing");
+		response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Parameters missing");
 	    }
 
 	    // authenticate external server
@@ -518,7 +521,7 @@ public class RegisterAction extends HttpServlet {
 
     /**
      * resetUserTimeLimit
-     * 
+     *
      * @param lesson
      * @param user
      */

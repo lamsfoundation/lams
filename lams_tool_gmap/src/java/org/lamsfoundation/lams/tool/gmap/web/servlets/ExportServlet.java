@@ -2,21 +2,21 @@
  * Copyright (C) 2008 LAMS Foundation (http://lamsfoundation.org)
  * =============================================================
  * License Information: http://lamsfoundation.org/licensing/lams/2.0/
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License version 2.0 
+ * it under the terms of the GNU General Public License version 2.0
  * as published by the Free Software Foundation.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301
  * USA
- * 
+ *
  * http://www.gnu.org/licenses/gpl.txt
  * ****************************************************************
  */
@@ -31,9 +31,10 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
-import org.lamsfoundation.lams.tool.ToolAccessMode;
+import org.lamsfoundation.lams.learning.export.web.action.CustomToolImageBundler;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.notebook.service.CoreNotebookConstants;
+import org.lamsfoundation.lams.tool.ToolAccessMode;
 import org.lamsfoundation.lams.tool.gmap.dto.GmapDTO;
 import org.lamsfoundation.lams.tool.gmap.dto.GmapSessionDTO;
 import org.lamsfoundation.lams.tool.gmap.dto.GmapUserDTO;
@@ -41,10 +42,10 @@ import org.lamsfoundation.lams.tool.gmap.model.Gmap;
 import org.lamsfoundation.lams.tool.gmap.model.GmapConfigItem;
 import org.lamsfoundation.lams.tool.gmap.model.GmapSession;
 import org.lamsfoundation.lams.tool.gmap.model.GmapUser;
-import org.lamsfoundation.lams.tool.gmap.service.IGmapService;
 import org.lamsfoundation.lams.tool.gmap.service.GmapServiceProxy;
-import org.lamsfoundation.lams.tool.gmap.util.GmapException;
+import org.lamsfoundation.lams.tool.gmap.service.IGmapService;
 import org.lamsfoundation.lams.tool.gmap.util.GmapConstants;
+import org.lamsfoundation.lams.tool.gmap.util.GmapException;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.util.Configuration;
 import org.lamsfoundation.lams.util.ConfigurationKeys;
@@ -52,7 +53,6 @@ import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.servlet.AbstractExportPortfolioServlet;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
-import org.lamsfoundation.lams.learning.export.web.action.CustomToolImageBundler;
 
 public class ExportServlet extends AbstractExportPortfolioServlet {
 
@@ -68,6 +68,7 @@ public class ExportServlet extends AbstractExportPortfolioServlet {
 
     private IGmapService gmapService;
 
+    @Override
     protected String doExport(HttpServletRequest request, HttpServletResponse response, String directoryName,
 	    Cookie[] cookies) {
 
@@ -93,8 +94,7 @@ public class ExportServlet extends AbstractExportPortfolioServlet {
 	    request.getSession().setAttribute(GmapConstants.ATTR_GMAP_KEY, gmapKey.getConfigValue());
 	}
 
-	String basePath = WebUtil.getBaseServerURL()
-		+ request.getContextPath();
+	String basePath = WebUtil.getBaseServerURL() + request.getContextPath();
 
 	// Attempting to export required images
 	try {
@@ -182,8 +182,8 @@ public class ExportServlet extends AbstractExportPortfolioServlet {
 		for (GmapUserDTO gmapUserDTO : gmapSessionDTO.getUserDTOs()) {
 		    // get the entry.
 		    NotebookEntry entry = gmapService.getEntry(gmapSessionDTO.getSessionID(),
-			    CoreNotebookConstants.NOTEBOOK_TOOL, GmapConstants.TOOL_SIGNATURE, gmapUserDTO.getUserId()
-				    .intValue());
+			    CoreNotebookConstants.NOTEBOOK_TOOL, GmapConstants.TOOL_SIGNATURE,
+			    gmapUserDTO.getUserId().intValue());
 		    if (entry != null) {
 			gmapUserDTO.finishedReflection = true;
 			gmapUserDTO.notebookEntry = entry.getEntry();
@@ -201,8 +201,8 @@ public class ExportServlet extends AbstractExportPortfolioServlet {
     private String getImagesUrlDir() {
 	String gmapUrlPath = Configuration.get(ConfigurationKeys.SERVER_URL);
 	if (gmapUrlPath == null) {
-	    logger
-		    .error("Unable to get path to the LAMS Gmap URL from the configuration table. Gmap images export failed");
+	    logger.error(
+		    "Unable to get path to the LAMS Gmap URL from the configuration table. Gmap images export failed");
 	    return "";
 	} else {
 	    gmapUrlPath = gmapUrlPath + "/tool/" + GmapConstants.TOOL_SIGNATURE + "/images/";

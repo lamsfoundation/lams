@@ -2,21 +2,21 @@
  * Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
  * =============================================================
  * License Information: http://lamsfoundation.org/licensing/lams/2.0/
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301
  * USA
- * 
+ *
  * http://www.gnu.org/licenses/gpl.txt
  * ****************************************************************
  */
@@ -49,7 +49,7 @@ import org.lamsfoundation.lams.util.audit.IAuditService;
 
 /**
  * This interface define the contract that all Q/A service provider must follow.
- * 
+ *
  * @author Ozgur Demirtas
  */
 public interface IQaService extends ToolRatingManager {
@@ -63,7 +63,7 @@ public interface IQaService extends ToolRatingManager {
 
     /**
      * Set specified user as a leader. Also the previous leader (if any) is marked as non-leader.
-     * 
+     *
      * @param userId
      * @param toolSessionID
      */
@@ -71,17 +71,17 @@ public interface IQaService extends ToolRatingManager {
 
     /**
      * Check user has the same answers logs as group leader. If not - creates missing ones.
-     * 
+     *
      * @param user
      * @param leader
      */
     void copyAnswersFromLeader(QaQueUsr user, QaQueUsr leader);
-    
+
     void setDefineLater(String strToolContentID, boolean value);
 
     /**
      * Get users by given toolSessionID.
-     * 
+     *
      * @param toolSessionID
      * @return
      */
@@ -89,7 +89,7 @@ public interface IQaService extends ToolRatingManager {
 
     /**
      * Return the qa object according to the requested content id.
-     * 
+     *
      * @param toolContentId
      *            the tool content id
      * @return the qa object
@@ -100,27 +100,30 @@ public interface IQaService extends ToolRatingManager {
     void saveOrUpdateQaContent(QaContent qa);
 
     void updateUser(QaQueUsr qaQueUsr);
-    
+
     List<QaUsrResp> getResponsesByUserUid(final Long userUid);
 
     QaUsrResp getResponseByUserAndQuestion(final Long queUsrId, final Long qaQueContentId);
-    
-    List<QaUsrResp> getResponseBySessionAndQuestion(final Long qaSessionId, final Long questionId);
-    
-    List<QaUsrResp> getResponsesForTablesorter(final Long toolContentId, final Long qaSessionId, final Long questionId, final Long excludeUserId,
-	    int page, int size, int sorting, String searchString);
 
-    int getCountResponsesBySessionAndQuestion(final Long qaSessionId, final Long questionId, final Long excludeUserId, String searchString);
-    
+    List<QaUsrResp> getResponseBySessionAndQuestion(final Long qaSessionId, final Long questionId);
+
+    List<QaUsrResp> getResponsesForTablesorter(final Long toolContentId, final Long qaSessionId, final Long questionId,
+	    final Long excludeUserId, int page, int size, int sorting, String searchString);
+
+    int getCountResponsesBySessionAndQuestion(final Long qaSessionId, final Long questionId, final Long excludeUserId,
+	    String searchString);
+
     /**
      * Creates or updates response with answer submitted by user.
-     * 
+     *
      * @param newAnswer
      * @param toolSessionID
      * @param questionDisplayOrder
-     * @param isAutosave whether it's requested by autosave feature
+     * @param isAutosave
+     *            whether it's requested by autosave feature
      */
-    void updateResponseWithNewAnswer(String newAnswer, String toolSessionID, Long questionDisplayOrder, boolean isAutosave);
+    void updateResponseWithNewAnswer(String newAnswer, String toolSessionID, Long questionDisplayOrder,
+	    boolean isAutosave);
 
     void createQuestion(QaQueContent qaQuestion);
 
@@ -142,7 +145,7 @@ public interface IQaService extends ToolRatingManager {
 
     /**
      * Return the qa session object according to the requested session id.
-     * 
+     *
      * @param qaSessionId
      *            qa session id
      * @return the qa session object
@@ -172,7 +175,7 @@ public interface IQaService extends ToolRatingManager {
 
     /**
      * copyToolContent(Long fromContentId, Long toContentId) return void
-     * 
+     *
      * @param fromContentId
      * @param toContentId
      */
@@ -180,7 +183,7 @@ public interface IQaService extends ToolRatingManager {
 
     /**
      * checks the paramter content in the user responses table
-     * 
+     *
      * @param qa
      * @return boolean
      * @throws QaApplicationException
@@ -189,10 +192,10 @@ public interface IQaService extends ToolRatingManager {
 
     /**
      * createToolSession(Long toolSessionId,String toolSessionName, Long toolContentId)
-     * 
+     *
      * It is also defined here since in development we want to be able call it directly from the web-layer instead of it
      * being called by the container.
-     * 
+     *
      * @param toolSessionId
      * @param toolContentId
      */
@@ -200,10 +203,10 @@ public interface IQaService extends ToolRatingManager {
 
     /**
      * leaveToolSession(Long toolSessionId, Long learnerId)
-     * 
+     *
      * It is also defined here since in development we want to be able call it directly from our web-layer instead of it
      * being called by the container.
-     * 
+     *
      * @param toolSessionId
      * @param toolContentId
      */
@@ -230,7 +233,7 @@ public interface IQaService extends ToolRatingManager {
     /**
      * Creates an unique name for a QaCondition. It consists of the tool output definition name and a unique positive
      * integer number.
-     * 
+     *
      * @param existingConditions
      *            existing conditions; required to check if a condition with the same name does not exist.
      * @return unique QaCondition name
@@ -243,7 +246,7 @@ public interface IQaService extends ToolRatingManager {
 
     /**
      * Gets the qa config item with the given key
-     * 
+     *
      * @param configKey
      * @return
      */
@@ -251,42 +254,42 @@ public interface IQaService extends ToolRatingManager {
 
     /**
      * Saves or updates a qa config item
-     * 
+     *
      * @param configItem
      */
     void saveOrUpdateConfigItem(QaConfigItem configItem);
 
     /**
      * Gets the set of wizard categories from the database
-     * 
+     *
      * @return
      */
     SortedSet<QaWizardCategory> getWizardCategories();
 
     /**
      * Saves the entire set of QaWizardCategories (including the child cognitive skills and questions)
-     * 
+     *
      * @param categories
      */
     void saveOrUpdateQaWizardCategories(SortedSet<QaWizardCategory> categories);
 
     /**
      * Deletes a wizard category from the db
-     * 
+     *
      * @param uid
      */
     void deleteWizardCategoryByUID(Long uid);
 
     /**
      * Deletes a wizard cognitive skill from the db
-     * 
+     *
      * @param uid
      */
     void deleteWizardSkillByUID(Long uid);
 
     /**
      * Deletes a wizard question from the db
-     * 
+     *
      * @param uid
      */
     void deleteWizardQuestionByUID(Long uid);
@@ -302,7 +305,7 @@ public interface IQaService extends ToolRatingManager {
 
     /**
      * Returns whether activity is grouped and therefore it is expected more than one tool session.
-     * 
+     *
      * @param toolContentID
      * @return
      */
@@ -311,7 +314,7 @@ public interface IQaService extends ToolRatingManager {
     /**
      * Return content folder (unique to each learner and lesson) which is used for storing user generated content. It's
      * been used by CKEditor.
-     * 
+     *
      * @param toolSessionId
      * @param userId
      * @return
@@ -319,47 +322,49 @@ public interface IQaService extends ToolRatingManager {
     String getLearnerContentFolder(Long toolSessionId, Long userId);
 
     /**
-     * Return reflection data for all sessions. Used for Export Portfolio. For monitoring use getUserReflectionsForTablesorter
-     * 
+     * Return reflection data for all sessions. Used for Export Portfolio. For monitoring use
+     * getUserReflectionsForTablesorter
+     *
      * @param content
      * @param userID
      * @return
      */
     List<ReflectionDTO> getReflectList(QaContent content, String userID);
-    
-    /** 
-     * 
+
+    /**
+     *
      * Takes the tool session id as the main input.
      */
 
     /**
      * Return username and reflections for a sessions. Paged. Used for monitoring.
      * Will return List<[username (String), fullname(String), String (notebook entry)]>
-     * 
+     *
      * @param content
      * @param userID
      * @return
      */
-    List<Object[]> getUserReflectionsForTablesorter(Long toolSessionId, int page, int size, int sorting, String searchString);
+    List<Object[]> getUserReflectionsForTablesorter(Long toolSessionId, int page, int size, int sorting,
+	    String searchString);
+
     int getCountUsersBySessionWithSearch(Long toolSessionId, String searchString);
-    
+
     /**
      * ends up populating the attempt history for all the users of all the tool sessions for a content
-     * 
+     *
      * User id is needed if isUserNamesVisible is false && is learnerRequest = true, as it is required to work out if
      * the data being analysed is the current user.
      */
     List exportLearner(QaContent qaContent, boolean isUserNamesVisible, boolean isLearnerRequest, String sessionId,
 	    String userId);
-    
+
     List<GroupDTO> exportTeacher(QaContent qaContent);
 
     /**
      * notifyTeachersOnResponseSubmit
-     * 
+     *
      * @param sessionId
      */
     void notifyTeachersOnResponseSubmit(Long sessionId);
-
 
 }

@@ -2,21 +2,21 @@
  * Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
  * =============================================================
  * License Information: http://lamsfoundation.org/licensing/lams/2.0/
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301
  * USA
- * 
+ *
  * http://www.gnu.org/licenses/gpl.txt
  * ****************************************************************
  */
@@ -100,9 +100,9 @@ import org.lamsfoundation.lams.util.zipfile.ZipFileUtil;
 import org.lamsfoundation.lams.util.zipfile.ZipFileUtilException;
 
 /**
- * 
+ *
  * @author Andrey Balan
- * 
+ *
  */
 public class CommonCartridgeServiceImpl
 	implements ICommonCartridgeService, ToolContentManager, ToolSessionManager, ToolContentImport102Manager {
@@ -161,7 +161,7 @@ public class CommonCartridgeServiceImpl
     /**
      * Try to get the file. If forceLogin = false and an access denied exception occurs, call this method again to get a
      * new ticket and retry file lookup. If forceLogin = true and it then fails then throw exception.
-     * 
+     *
      * @param uuid
      * @param versionId
      * @param relativePath
@@ -200,10 +200,10 @@ public class CommonCartridgeServiceImpl
     /**
      * This method verifies the credentials of the CommonCartridge Tool and gives it the <code>Ticket</code> to login
      * and access the Content Repository.
-     * 
+     *
      * A valid ticket is needed in order to access the content from the repository. This method would be called evertime
      * the tool needs to upload/download files from the content repository.
-     * 
+     *
      * @return ITicket The ticket for repostory access
      * @throws CommonCartridgeApplicationException
      */
@@ -870,7 +870,7 @@ public class CommonCartridgeServiceImpl
      * that are always available for the tool (e.g. number of marks for Multiple Choice) or a custom definition created
      * for a particular activity such as the answer to the third question contains the word Koala and hence the need for
      * the toolContentId
-     * 
+     *
      * @return SortedMap of ToolOutputDefinitions with the key being the name of each definition
      */
     @Override
@@ -1169,7 +1169,7 @@ public class CommonCartridgeServiceImpl
 
     /**
      * Finds out which lesson the given tool content belongs to and returns its monitoring users.
-     * 
+     *
      * @param sessionId
      *            tool session ID
      * @return list of teachers that monitor the lesson which contains the tool with given session ID

@@ -2,21 +2,21 @@
  * Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
  * =============================================================
  * License Information: http://lamsfoundation.org/licensing/lams/2.0/
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License version 2.0 
+ * it under the terms of the GNU General Public License version 2.0
  * as published by the Free Software Foundation.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301
  * USA
- * 
+ *
  * http://www.gnu.org/licenses/gpl.txt
  * ****************************************************************
  */
@@ -74,12 +74,12 @@ import org.lamsfoundation.lams.web.util.AttributeNames;
 /**
  * Generates the learner and teacher portfolios. These are designed to be offline versions of a sequence, so that
  * learners and teachers can refer to them after the lesson has finished.
- * 
+ *
  * In general, anything that the learner sees should be in their portfolio. The teacher version should have the details
  * for all students in the lesson.
- * 
+ *
  * @author mtruong,fmalikoff
- * 
+ *
  */
 public class ExportPortfolioService implements IExportPortfolioService {
 
@@ -217,8 +217,8 @@ public class ExportPortfolioService implements IExportPortfolioService {
 
 		    if (portfolios.size() >= 0) {
 			exports = doExport(portfolios, notes, cookies, lesson);
-			exports.setLearnerName(learner.getFirstName() + " " + learner.getLastName() + " ("
-				+ learner.getLogin() + ")");
+			exports.setLearnerName(
+				learner.getFirstName() + " " + learner.getLastName() + " (" + learner.getLogin() + ")");
 		    } else {
 			ExportPortfolioService.log.error("The learner has not completed or attempted any activities");
 		    }
@@ -334,8 +334,8 @@ public class ExportPortfolioService implements IExportPortfolioService {
 
 	    // Some activities (parallel, optional, sequence) don't have export urls.
 	    if (!activityPortfolio.isHeadingNoPage()) {
-		activityPortfolio.setExportUrl(HttpUrlConnectionUtil.getLamsLocalAddress()
-			+ activityPortfolio.getExportUrl());
+		activityPortfolio
+			.setExportUrl(HttpUrlConnectionUtil.getLamsLocalAddress() + activityPortfolio.getExportUrl());
 		activityPortfolio.setExportUrl(WebUtil.appendParameterToURL(activityPortfolio.getExportUrl(),
 			AttributeNames.PARAM_DIRECTORY_NAME, relativePath));
 
@@ -348,7 +348,8 @@ public class ExportPortfolioService implements IExportPortfolioService {
 		activityPortfolio.setToolLink(toolLink);
 	    }
 
-	    if ((activityPortfolio.getChildPortfolios() != null) && (activityPortfolio.getChildPortfolios().size() > 0)) {
+	    if ((activityPortfolio.getChildPortfolios() != null)
+		    && (activityPortfolio.getChildPortfolios().size() > 0)) {
 		processPortfolios(activityPortfolio.getChildPortfolios(), cookies, tempDirectoryName);
 	    }
 	}
@@ -381,7 +382,7 @@ public class ExportPortfolioService implements IExportPortfolioService {
     /**
      * Helper method which calls the FileUtil to create a subdirectory. This method might not be needed, can be used why
      * calling the FileUtil directly.
-     * 
+     *
      * @param parentDir
      *            The name of the parent directory
      * @param subDir
@@ -405,7 +406,7 @@ public class ExportPortfolioService implements IExportPortfolioService {
      * Helper method which calls the FileUtil to create directory. It will check whether the directory exists, if so,
      * then it will overwrite the existing directory. (It is assumed that the cron jobs should delete the directory +
      * files anyway, after the export is done)
-     * 
+     *
      * @param parentDir
      *            The name of the parent directory
      * @param subDir
@@ -432,8 +433,8 @@ public class ExportPortfolioService implements IExportPortfolioService {
 	    }
 	    if (filename == null) {
 		filename = ExportPortfolioConstants.EXPORT_ERROR_FILENAME;
-		ExportPortfolioService.log
-			.error("A problem has occurred while connecting to the tool's export url. The export url may be invalid or may not exist");
+		ExportPortfolioService.log.error(
+			"A problem has occurred while connecting to the tool's export url. The export url may be invalid or may not exist");
 		writeErrorMessageToFile(directoryToStoreErrorFile, activityName);
 	    }
 
@@ -444,8 +445,8 @@ public class ExportPortfolioService implements IExportPortfolioService {
 	    ExportPortfolioService.log.error("The directory " + directoryToStoreErrorFile + " may not exist.", e);
 	    writeErrorMessageToFile(directoryToStoreErrorFile, activityName);
 	} catch (IOException e) {
-	    ExportPortfolioService.log.error("A problem has occurred while writing the contents of " + exportURL
-		    + " to file.", e);
+	    ExportPortfolioService.log
+		    .error("A problem has occurred while writing the contents of " + exportURL + " to file.", e);
 	    writeErrorMessageToFile(directoryToStoreErrorFile, activityName);
 
 	}

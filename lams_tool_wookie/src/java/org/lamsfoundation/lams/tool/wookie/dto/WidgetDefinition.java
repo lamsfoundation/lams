@@ -18,15 +18,15 @@
  *
  * http://www.gnu.org/licenses/gpl.txt
  * ****************************************************************
- */ 
- 
-/* $Id$ */ 
-package org.lamsfoundation.lams.tool.wookie.dto; 
- 
+ */
+
+/* $Id$ */
+package org.lamsfoundation.lams.tool.wookie.dto;
+
 /**
- * This class represents an instance of a widget as read from the wookie 
+ * This class represents an instance of a widget as read from the wookie
  * "advertise" page
- * 
+ *
  * @author lfoxton
  *
  */
@@ -35,39 +35,39 @@ public class WidgetDefinition {
     public String title;
     public String description;
     public String icon;
-    
-    public WidgetDefinition() {}
+
+    public WidgetDefinition() {
+    }
 
     public String getIdentifier() {
-        return identifier;
+	return identifier;
     }
 
     public void setIdentifier(String identifier) {
-        this.identifier = identifier;
+	this.identifier = identifier;
     }
 
     public String getTitle() {
-        return title;
+	return title;
     }
 
     public void setTitle(String title) {
-        this.title = title;
+	this.title = title;
     }
 
     public String getDescription() {
-        return description;
+	return description;
     }
 
     public void setDescription(String description) {
-        this.description = description;
+	this.description = description;
     }
 
     public String getIcon() {
-        return icon;
+	return icon;
     }
 
     public void setIcon(String icon) {
-        this.icon = icon;
+	this.icon = icon;
     }
 }
- 

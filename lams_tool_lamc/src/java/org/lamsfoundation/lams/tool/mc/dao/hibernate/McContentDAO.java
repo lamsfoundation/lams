@@ -2,21 +2,21 @@
  * Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
  * =============================================================
  * License Information: http://lamsfoundation.org/licensing/lams/2.0/
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301
  * USA
- * 
+ *
  * http://www.gnu.org/licenses/gpl.txt
  * ***********************************************************************/
 /* $$Id$$ */
@@ -41,10 +41,12 @@ public class McContentDAO extends HibernateDaoSupport implements IMcContentDAO {
 
     private static final String FIND_MC_CONTENT = "from " + McContent.class.getName() + " as mc where content_id=?";
 
+    @Override
     public McContent getMcContentByUID(Long uid) {
 	return (McContent) this.getHibernateTemplate().get(McContent.class, uid);
     }
 
+    @Override
     public McContent findMcContentById(Long mcContentId) {
 	String query = "from McContent as mc where mc.mcContentId = ?";
 	HibernateTemplate templ = this.getHibernateTemplate();
@@ -58,21 +60,25 @@ public class McContentDAO extends HibernateDaoSupport implements IMcContentDAO {
 	return null;
     }
 
+    @Override
     public void saveMcContent(McContent mcContent) {
 	this.getSession().setFlushMode(FlushMode.AUTO);
 	this.getHibernateTemplate().saveOrUpdate(mcContent);
     }
 
+    @Override
     public void updateMcContent(McContent mcContent) {
 	this.getSession().setFlushMode(FlushMode.AUTO);
 	this.getHibernateTemplate().update(mcContent);
     }
 
+    @Override
     public void saveOrUpdateMc(McContent mc) {
 	this.getSession().setFlushMode(FlushMode.AUTO);
 	this.getHibernateTemplate().saveOrUpdate(mc);
     }
 
+    @Override
     public void removeMcById(Long mcContentId) {
 	HibernateTemplate templ = this.getHibernateTemplate();
 	if (mcContentId != null) {
@@ -87,10 +93,12 @@ public class McContentDAO extends HibernateDaoSupport implements IMcContentDAO {
 	}
     }
 
+    @Override
     public void removeMcSessions(McContent mcContent) {
 	this.getHibernateTemplate().deleteAll(mcContent.getMcSessions());
     }
 
+    @Override
     public void addMcSession(Long mcContentId, McSession mcSession) {
 	McContent content = findMcContentById(mcContentId);
 	mcSession.setMcContent(content);
@@ -99,11 +107,13 @@ public class McContentDAO extends HibernateDaoSupport implements IMcContentDAO {
 	this.getHibernateTemplate().saveOrUpdate(content);
     }
 
+    @Override
     public List findAll(Class objClass) {
 	String query = "from obj in class " + objClass.getName();
 	return this.getHibernateTemplate().find(query);
     }
 
+    @Override
     public void flush() {
 	this.getHibernateTemplate().flush();
     }

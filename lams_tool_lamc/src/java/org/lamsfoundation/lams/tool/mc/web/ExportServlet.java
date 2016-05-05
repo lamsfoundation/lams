@@ -2,21 +2,21 @@
  * Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
  * =============================================================
  * License Information: http://lamsfoundation.org/licensing/lams/2.0/
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License version 2.0 
+ * it under the terms of the GNU General Public License version 2.0
  * as published by the Free Software Foundation.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301
  * USA
- * 
+ *
  * http://www.gnu.org/licenses/gpl.txt
  * ****************************************************************
  */
@@ -64,7 +64,7 @@ import org.lamsfoundation.lams.web.servlet.AbstractExportPortfolioServlet;
  * <p>
  * Enables exporting portfolio for teacher and learner modes.
  * </p>
- * 
+ *
  * @author Ozgur Demirtas
  */
 
@@ -73,6 +73,7 @@ public class ExportServlet extends AbstractExportPortfolioServlet implements McA
     private static final long serialVersionUID = -17790L;
     private final String FILENAME = "mcq_main.html";
 
+    @Override
     public String doExport(HttpServletRequest request, HttpServletResponse response, String directoryName,
 	    Cookie[] cookies) {
 	String basePath = WebUtil.getBaseServerURL() + request.getContextPath();
@@ -90,15 +91,16 @@ public class ExportServlet extends AbstractExportPortfolioServlet implements McA
 
     /**
      * learner(HttpServletRequest request, HttpServletResponse response, String directoryName, Cookie[] cookies)
-     * 
+     *
      * generates report for learner mode
-     * 
+     *
      * @param request
      * @param response
      * @param directoryName
      * @param cookies
      */
-    public void learner(HttpServletRequest request, HttpServletResponse response, String directoryName, Cookie[] cookies) {
+    public void learner(HttpServletRequest request, HttpServletResponse response, String directoryName,
+	    Cookie[] cookies) {
 
 	IMcService mcService = McServiceProxy.getMcService(getServletContext());
 
@@ -126,8 +128,8 @@ public class ExportServlet extends AbstractExportPortfolioServlet implements McA
 	request.getSession().setAttribute(PORTFOLIO_EXPORT_MODE, "learner");
 
 	if (learner != null) {
-	    List listMonitoredAnswersContainerDTO = buildGroupsQuestionDataForExportLearner(content, mcService,
-		    mcSession, learner);
+	    List listMonitoredAnswersContainerDTO = ExportServlet.buildGroupsQuestionDataForExportLearner(content,
+		    mcService, mcSession, learner);
 	    request.getSession().setAttribute(LIST_MONITORED_ANSWERS_CONTAINER_DTO, listMonitoredAnswersContainerDTO);
 
 	    request.getSession().setAttribute(LEARNER_MARK, learner.getLastAttemptTotalMark());
@@ -142,15 +144,16 @@ public class ExportServlet extends AbstractExportPortfolioServlet implements McA
 
     /**
      * teacher(HttpServletRequest request, HttpServletResponse response, String directoryName, Cookie[] cookies)
-     * 
+     *
      * generates report for teacher mode
-     * 
+     *
      * @param request
      * @param response
      * @param directoryName
      * @param cookies
      */
-    public void teacher(HttpServletRequest request, HttpServletResponse response, String directoryName, Cookie[] cookies) {
+    public void teacher(HttpServletRequest request, HttpServletResponse response, String directoryName,
+	    Cookie[] cookies) {
 
 	IMcService mcService = McServiceProxy.getMcService(getServletContext());
 
@@ -168,7 +171,8 @@ public class ExportServlet extends AbstractExportPortfolioServlet implements McA
 	    throw new McApplicationException(error);
 	}
 
-	List<McMonitoredAnswersDTO> listMonitoredAnswersContainerDTO = buildGroupsQuestionData(content, mcService);
+	List<McMonitoredAnswersDTO> listMonitoredAnswersContainerDTO = ExportServlet.buildGroupsQuestionData(content,
+		mcService);
 	request.getSession().setAttribute(LIST_MONITORED_ANSWERS_CONTAINER_DTO, listMonitoredAnswersContainerDTO);
 
 	List<McSessionMarkDTO> listMonitoredMarksContainerDTO = mcService.buildGroupsMarkData(content, true);
@@ -185,7 +189,7 @@ public class ExportServlet extends AbstractExportPortfolioServlet implements McA
 
     /**
      * creates create spreadsheet of class data
-     * 
+     *
      * @param request
      * @param response
      * @param directoryName
@@ -210,8 +214,9 @@ public class ExportServlet extends AbstractExportPortfolioServlet implements McA
 	    logger.error("exception creating spreadsheet: ", e);
 	} finally {
 	    try {
-		if (out != null)
+		if (out != null) {
 		    out.close();
+		}
 	    } catch (IOException e) {
 	    }
 	}
@@ -219,9 +224,9 @@ public class ExportServlet extends AbstractExportPortfolioServlet implements McA
     }
 
     /**
-     * 
+     *
      * ends up populating the attempt history for all the users of all the tool sessions for a content
-     * 
+     *
      * @param request
      * @param mcContent
      * @return List
@@ -251,7 +256,7 @@ public class ExportServlet extends AbstractExportPortfolioServlet implements McA
 		    Set<McQueUsr> users = session.getMcQueUsers();
 		    List<McMonitoredUserDTO> monitoredUserDTOs = new LinkedList<McMonitoredUserDTO>();
 		    for (McQueUsr user : users) {
-			McMonitoredUserDTO monitoredUserDTO = getUserAttempt(mcService, user, session,
+			McMonitoredUserDTO monitoredUserDTO = ExportServlet.getUserAttempt(mcService, user, session,
 				question.getUid());
 			monitoredUserDTOs.add(monitoredUserDTO);
 		    }
@@ -268,7 +273,7 @@ public class ExportServlet extends AbstractExportPortfolioServlet implements McA
     }
 
     /**
-     * 
+     *
      * @param request
      * @param mcContent
      * @param mcService
@@ -298,7 +303,7 @@ public class ExportServlet extends AbstractExportPortfolioServlet implements McA
 
 		// Get the attempts for this user. The maps must match the maps in buildGroupsAttemptData or the jsp
 		// won't work.
-		McMonitoredUserDTO mcMonitoredUserDTO = getUserAttempt(mcService, mcQueUsr, mcSession,
+		McMonitoredUserDTO mcMonitoredUserDTO = ExportServlet.getUserAttempt(mcService, mcQueUsr, mcSession,
 			question.getUid());
 		List<McMonitoredUserDTO> listMonitoredUserContainerDTO = new LinkedList();
 		listMonitoredUserContainerDTO.add(mcMonitoredUserDTO);
@@ -313,7 +318,7 @@ public class ExportServlet extends AbstractExportPortfolioServlet implements McA
     }
 
     /**
-     * 
+     *
      */
     private static McMonitoredUserDTO getUserAttempt(IMcService mcService, McQueUsr mcQueUsr, McSession mcSession,
 	    Long questionUid) {

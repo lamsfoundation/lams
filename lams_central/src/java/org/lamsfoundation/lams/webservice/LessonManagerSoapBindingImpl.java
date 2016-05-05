@@ -2,21 +2,21 @@
  * Copyright (C) 2006 LAMS Foundation (http://lamsfoundation.org)
  * =============================================================
  * License Information: http://lamsfoundation.org/licensing/lams/2.0/
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License version 2.0 
+ * it under the terms of the GNU General Public License version 2.0
  * as published by the Free Software Foundation.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301
  * USA
- * 
+ *
  * http://www.gnu.org/licenses/gpl.txt
  * ****************************************************************
  */
@@ -52,7 +52,7 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
  * <p>
  * <a href="LessonManagerSoapBindingImpl.java.html"><i>View Source</i><a>
  * </p>
- * 
+ *
  * @author <a href="mailto:fyang@melcoe.mq.edu.au">Fei Yang</a>
  */
 public class LessonManagerSoapBindingImpl implements LessonManager {
@@ -62,12 +62,14 @@ public class LessonManagerSoapBindingImpl implements LessonManager {
     private static IntegrationService integrationService = (IntegrationService) WebApplicationContextUtils
 	    .getRequiredWebApplicationContext(
 		    ((HttpServlet) LessonManagerSoapBindingImpl.context.getProperty(HTTPConstants.MC_HTTP_SERVLET))
-			    .getServletContext()).getBean("integrationService");
+			    .getServletContext())
+	    .getBean("integrationService");
 
     private static IMonitoringService monitoringService = (IMonitoringService) WebApplicationContextUtils
 	    .getRequiredWebApplicationContext(
 		    ((HttpServlet) LessonManagerSoapBindingImpl.context.getProperty(HTTPConstants.MC_HTTP_SERVLET))
-			    .getServletContext()).getBean("monitoringService");
+			    .getServletContext())
+	    .getBean("monitoringService");
 
     @Override
     public Long startLesson(String serverId, String datetime, String hashValue, String username, long ldId,
@@ -81,14 +83,14 @@ public class LessonManagerSoapBindingImpl implements LessonManager {
 	    ExtCourseClassMap orgMap = LessonManagerSoapBindingImpl.integrationService.getExtCourseClassMap(serverMap,
 		    userMap, courseId, countryIsoCode, langIsoCode, null, LoginRequestDispatcher.METHOD_MONITOR);
 	    // 1. init lesson
-	    Lesson lesson = LessonManagerSoapBindingImpl.monitoringService.initializeLesson(title, desc, ldId, orgMap
-		    .getOrganisation().getOrganisationId(), userMap.getUser().getUserId(), customCSV, false, false,
-		    true, false, false, false, false, false, null, null);
+	    Lesson lesson = LessonManagerSoapBindingImpl.monitoringService.initializeLesson(title, desc, ldId,
+		    orgMap.getOrganisation().getOrganisationId(), userMap.getUser().getUserId(), customCSV, false,
+		    false, true, false, false, false, false, false, null, null);
 	    // 2. create lessonClass for lesson
 	    createLessonClass(lesson, orgMap.getOrganisation(), userMap.getUser());
 	    // 3. start lesson
-	    LessonManagerSoapBindingImpl.monitoringService.startLesson(lesson.getLessonId(), userMap.getUser()
-		    .getUserId());
+	    LessonManagerSoapBindingImpl.monitoringService.startLesson(lesson.getLessonId(),
+		    userMap.getUser().getUserId());
 	    return lesson.getLessonId();
 	} catch (Exception e) {
 	    throw new RemoteException(e.getMessage(), e);
@@ -107,15 +109,15 @@ public class LessonManagerSoapBindingImpl implements LessonManager {
 	    ExtCourseClassMap orgMap = LessonManagerSoapBindingImpl.integrationService.getExtCourseClassMap(serverMap,
 		    userMap, courseId, countryIsoCode, langIsoCode, null, LoginRequestDispatcher.METHOD_MONITOR);
 	    // 1. init lesson
-	    Lesson lesson = LessonManagerSoapBindingImpl.monitoringService.initializeLesson(title, desc, ldId, orgMap
-		    .getOrganisation().getOrganisationId(), userMap.getUser().getUserId(), customCSV, false, false,
-		    true, false, false, false, false, false, null, null);
+	    Lesson lesson = LessonManagerSoapBindingImpl.monitoringService.initializeLesson(title, desc, ldId,
+		    orgMap.getOrganisation().getOrganisationId(), userMap.getUser().getUserId(), customCSV, false,
+		    false, true, false, false, false, false, false, null, null);
 	    // 2. create lessonClass for lesson
 	    createLessonClass(lesson, orgMap.getOrganisation(), userMap.getUser());
 	    // 3. schedule lesson
 	    Date date = DateUtil.convertFromLAMSFlashFormat(startDate);
-	    LessonManagerSoapBindingImpl.monitoringService.startLessonOnSchedule(lesson.getLessonId(), date, userMap
-		    .getUser().getUserId());
+	    LessonManagerSoapBindingImpl.monitoringService.startLessonOnSchedule(lesson.getLessonId(), date,
+		    userMap.getUser().getUserId());
 	    return lesson.getLessonId();
 	} catch (Exception e) {
 	    throw new RemoteException(e.getMessage(), e);
@@ -145,9 +147,10 @@ public class LessonManagerSoapBindingImpl implements LessonManager {
 	IUserManagementService userManagementService = (IUserManagementService) WebApplicationContextUtils
 		.getRequiredWebApplicationContext(
 			((HttpServlet) LessonManagerSoapBindingImpl.context.getProperty(HTTPConstants.MC_HTTP_SERVLET))
-				.getServletContext()).getBean("userManagementService");
-	Vector<User> learnerVector = userManagementService.getUsersFromOrganisationByRole(
-		organisation.getOrganisationId(), Role.LEARNER, false, true);
+				.getServletContext())
+		.getBean("userManagementService");
+	Vector<User> learnerVector = userManagementService
+		.getUsersFromOrganisationByRole(organisation.getOrganisationId(), Role.LEARNER, false, true);
 	learnerList.addAll(learnerVector);
 	LessonManagerSoapBindingImpl.monitoringService.createLessonClassForLesson(lesson.getLessonId(), organisation,
 		organisation.getName() + "Learners", learnerList, organisation.getName() + "Staff", staffList,

@@ -2,21 +2,21 @@
  * Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
  * =============================================================
  * License Information: http://lamsfoundation.org/licensing/lams/2.0/
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301
  * USA
- * 
+ *
  * http://www.gnu.org/licenses/gpl.txt
  * ****************************************************************
  */
@@ -42,14 +42,14 @@ import org.lamsfoundation.lams.util.MessageService;
 
 /**
  * Interface that defines the contract that all TaskLisk service providers must follow.
- * 
+ *
  * @author Andrey Balan
  */
 public interface ITaskListService {
 
     /**
      * Returns number of tasks completed by user. Used in <code>TaskListOutputFactory</code>.
-     * 
+     *
      * @param toolSessionId
      * @param userUid
      * @return
@@ -59,7 +59,7 @@ public interface ITaskListService {
     /**
      * Checks current condition for matching. This condition belongs to the taskList from this particular
      * toolSession.Used in <code>TaskListOutputFactory</code>.
-     * 
+     *
      * @param conditionName
      *            name of a condition
      * @param toolSessionId
@@ -72,7 +72,7 @@ public interface ITaskListService {
 
     /**
      * Get <code>TaskList</code> by toolContentID.
-     * 
+     *
      * @param contentId
      * @return
      */
@@ -81,7 +81,7 @@ public interface ITaskListService {
     /**
      * Get a cloned copy of tool default tool content (TaskList) and assign the toolContentId of that copy as the given
      * <code>contentId</code>
-     * 
+     *
      * @param contentId
      * @return
      * @throws TaskListException
@@ -90,7 +90,7 @@ public interface ITaskListService {
 
     /**
      * Get list of taskList items by given taskListUid. These taskList items must be created by author.
-     * 
+     *
      * @param taskListUid
      * @return
      */
@@ -98,7 +98,7 @@ public interface ITaskListService {
 
     /**
      * Upload tasklistItem file to repository.
-     * 
+     *
      * @param uploadFile
      * @param userLogin
      * @return
@@ -109,7 +109,7 @@ public interface ITaskListService {
 
     /**
      * Returns Message service. It makes available to have access to message resources files.
-     * 
+     *
      * @return MessageService
      */
     MessageService getMessageService();
@@ -122,7 +122,7 @@ public interface ITaskListService {
 
     /**
      * Get user by given userID and toolContentID.
-     * 
+     *
      * @param long1
      * @return
      */
@@ -130,7 +130,7 @@ public interface ITaskListService {
 
     /**
      * Get user by sessionID and UserID
-     * 
+     *
      * @param long1
      * @param sessionId
      * @return
@@ -139,7 +139,7 @@ public interface ITaskListService {
 
     /**
      * Get user list by sessionId and itemUid
-     * 
+     *
      * @param sessionId
      * @param uid
      * @return
@@ -148,7 +148,7 @@ public interface ITaskListService {
 
     /**
      * Get user list by sessionId. (thus users belonging to one group)
-     * 
+     *
      * @param sessionId
      * @return
      */
@@ -156,7 +156,7 @@ public interface ITaskListService {
 
     /**
      * Get user by UID
-     * 
+     *
      * @param uid
      * @return
      */
@@ -166,28 +166,28 @@ public interface ITaskListService {
 
     /**
      * Save or update taskList into database.
-     * 
+     *
      * @param TaskList
      */
     void saveOrUpdateTaskList(TaskList TaskList);
 
     /**
      * Delete resoruce item from database.
-     * 
+     *
      * @param uid
      */
     void deleteTaskListItem(Long uid);
 
     /**
      * Delete tasklist condition from the database.
-     * 
+     *
      * @param uid
      */
     void deleteTaskListCondition(Long uid);
 
     /**
      * Get taskList which is relative with the special toolSession.
-     * 
+     *
      * @param sessionId
      * @return
      */
@@ -195,7 +195,7 @@ public interface ITaskListService {
 
     /**
      * Get taskList with the specified itemUid.
-     * 
+     *
      * @param itemUid
      * @return
      */
@@ -203,7 +203,7 @@ public interface ITaskListService {
 
     /**
      * Save/update current TaskListItem.
-     * 
+     *
      * @param item
      *            current TaskListItem
      * @return
@@ -212,7 +212,7 @@ public interface ITaskListService {
 
     /**
      * Fill in taskListItemList's complete flags.
-     * 
+     *
      * @param taskListItemList
      * @param user
      */
@@ -220,7 +220,7 @@ public interface ITaskListService {
 
     /**
      * Mark taskListItem as completed.
-     * 
+     *
      * @param taskListItemUid
      * @param userId
      * @param sessionId
@@ -229,7 +229,7 @@ public interface ITaskListService {
 
     /**
      * Creates a new TaskListItemVisitLog describing access to specifeid taskListItem.
-     * 
+     *
      * @param taskListItemUid
      *            Uid of the specified taskListItem
      * @param userId
@@ -238,10 +238,10 @@ public interface ITaskListService {
      *            id of a session during which it occured
      */
     void setItemAccess(Long taskListItemUid, Long userId, Long sessionId);
-    
+
     /**
      * Get all available sessions for contentId.
-     * 
+     *
      * @param contentId
      * @return
      */
@@ -249,7 +249,7 @@ public interface ITaskListService {
 
     /**
      * Get taskList toolSession by toolSessionId
-     * 
+     *
      * @param sessionId
      * @return
      */
@@ -257,14 +257,14 @@ public interface ITaskListService {
 
     /**
      * Save or update taskList session.
-     * 
+     *
      * @param resSession
      */
     void saveOrUpdateSession(TaskListSession resSession);
 
     /**
      * If success return next activity's url, otherwise return null.
-     * 
+     *
      * @param toolSessionId
      * @param userId
      * @return
@@ -273,7 +273,7 @@ public interface ITaskListService {
 
     /**
      * Create refection entry into notebook tool.
-     * 
+     *
      * @param sessionId
      * @param notebook_tool
      * @param tool_signature
@@ -285,7 +285,7 @@ public interface ITaskListService {
 
     /**
      * Get reflection entry from notebook tool.
-     * 
+     *
      * @param sessionId
      * @param idType
      * @param signature
@@ -303,7 +303,7 @@ public interface ITaskListService {
 
     /**
      * Make an export for the specified learner.
-     * 
+     *
      * @param sessionId
      * @param learner
      *            user which portfolio is being exported
@@ -314,15 +314,15 @@ public interface ITaskListService {
 
     /**
      * Make an export for the whole TaskList.
-     * 
+     *
      * @param contentUid
      * @return
      */
     List<ItemSummary> exportForTeacher(Long contentUid);
-    
+
     /**
      * Returns paged users for jqGrid based on sessionId.
-     * 
+     *
      * @param sessionId
      * @param page
      * @param size
@@ -333,10 +333,10 @@ public interface ITaskListService {
      */
     Collection<TaskListUserDTO> getPagedUsersBySession(Long sessionId, int page, int size, String sortBy,
 	    String sortOrder, String searchString);
-    
+
     /**
      * Returns paged users for jqGrid based on sessionId and taskListItemUid.
-     * 
+     *
      * @param sessionId
      * @param taskListItemUid
      * @param page
@@ -346,12 +346,12 @@ public interface ITaskListService {
      * @param searchString
      * @return
      */
-    Collection<TaskListUserDTO> getPagedUsersBySessionAndItem(Long sessionId, Long taskListItemUid, int page, int size, String sortBy,
-	    String sortOrder, String searchString);
+    Collection<TaskListUserDTO> getPagedUsersBySessionAndItem(Long sessionId, Long taskListItemUid, int page, int size,
+	    String sortBy, String sortOrder, String searchString);
 
     /**
      * Returns total number of users in a specified session.
-     * 
+     *
      * @param sessionId
      * @param searchString
      * @return
@@ -360,28 +360,28 @@ public interface ITaskListService {
 
     /**
      * Return summary list for the specified TaskList. Used in monitoring.
-     * 
+     *
      * @param contentId
      *            specified TaskList uid
      * @return
      */
     List<SessionDTO> getSummary(Long contentId);
-    
+
     NotebookEntry getEntry(Long sessionId, Integer userId);
-    
+
     List<ReflectDTO> getReflectList(Long contentId);
 
     /**
      * Returns whether activity is grouped and therefore it is expected more than one tool session.
-     * 
+     *
      * @param toolContentID
      * @return
      */
     boolean isGroupedActivity(long toolContentID);
-    
+
     /**
      * Get localized message.
-     * 
+     *
      * @param key
      * @return
      */

@@ -160,6 +160,7 @@ public class ToolOutputDefinition implements Comparable {
 	return new HashCodeBuilder().append(name).append(type).toHashCode();
     }
 
+    @Override
     public int compareTo(Object o) {
 
 	ToolOutputDefinition myClass = (ToolOutputDefinition) o;
@@ -169,7 +170,7 @@ public class ToolOutputDefinition implements Comparable {
     /**
      * Default Conditions are sample conditions that should be presented to the user as a starting point for using this
      * OutputDefinition
-     * 
+     *
      * @return
      */
     public List<BranchCondition> getDefaultConditions() {
@@ -195,7 +196,7 @@ public class ToolOutputDefinition implements Comparable {
     /**
      * If set, this flag makes the current tool output definition the default output to go straight to gradebook marks
      * when the user completes an activity. There should only be one of these per tool.
-     * 
+     *
      * @return
      */
     public Boolean isDefaultGradebookMark() {

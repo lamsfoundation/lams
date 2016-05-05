@@ -2,21 +2,21 @@
  * Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
  * =============================================================
  * License Information: http://lamsfoundation.org/licensing/lams/2.0/
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301
  * USA
- * 
+ *
  * http://www.gnu.org/licenses/gpl.txt
  * ****************************************************************
  */
@@ -31,11 +31,11 @@ import org.lamsfoundation.lams.tool.scratchie.ScratchieConstants;
 
 /**
  * Scratchie
- * 
+ *
  * @author Andrey Balan
- * 
+ *
  * @hibernate.class table="tl_lascrt11_session"
- * 
+ *
  */
 public class ScratchieSession {
 
@@ -84,7 +84,7 @@ public class ScratchieSession {
 
     /**
      * @hibernate.property column="session_start_date"
-     * 
+     *
      * @return
      */
     public Date getSessionStartDate() {
@@ -140,7 +140,7 @@ public class ScratchieSession {
     }
 
     /**
-     * 
+     *
      * @param sessionName
      *            The session name to set.
      */
@@ -149,12 +149,12 @@ public class ScratchieSession {
     }
 
     /**
-     * 
-     * 
+     *
+     *
      * @hibernate.set lazy="true" inverse="false" cascade="all" order-by="create_date desc"
      * @hibernate.collection-key column="session_uid"
      * @hibernate.collection-one-to-many class="org.lamsfoundation.lams.tool.scratchie.model.ScratchieItem"
-     * 
+     *
      * @return
      */
     public Set getScratchieItems() {
@@ -164,7 +164,7 @@ public class ScratchieSession {
     public void setScratchieItems(Set scratchieItems) {
 	this.scratchieItems = scratchieItems;
     }
-    
+
     /**
      * @hibernate.many-to-one not-null="true"
      * @hibernate.column name="group_leader_uid"
@@ -176,16 +176,16 @@ public class ScratchieSession {
     public void setGroupLeader(ScratchieUser groupLeader) {
 	this.groupLeader = groupLeader;
     }
-    
+
     public boolean isUserGroupLeader(Long userUid) {
 
 	boolean isUserLeader = (this.groupLeader != null) && userUid.equals(this.groupLeader.getUid());
 	return isUserLeader;
     }
-    
+
     /**
      * Mark scored by a leader and shared by all users in a group.
-     * 
+     *
      * @hibernate.property column="mark"
      * @return
      */
@@ -196,11 +196,11 @@ public class ScratchieSession {
     public void setMark(int mark) {
 	this.mark = mark;
     }
-    
+
     /**
      * Indicates whether leader has pressed Continue button in learning thus finishing scratching. And is shared by all
      * users in a group.
-     * 
+     *
      * @hibernate.property column="scratching_finished"
      * @return
      */

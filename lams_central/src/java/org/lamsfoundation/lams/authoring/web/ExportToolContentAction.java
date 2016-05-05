@@ -2,21 +2,21 @@
  * Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
  * =============================================================
  * License Information: http://lamsfoundation.org/licensing/lams/2.0/
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License version 2.0 
+ * it under the terms of the GNU General Public License version 2.0
  * as published by the Free Software Foundation.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301
  * USA
- * 
+ *
  * http://www.gnu.org/licenses/gpl.txt
  * ****************************************************************
  */
@@ -54,13 +54,13 @@ import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 
 /**
- * 
+ *
  * @struts.action path = "/authoring/exportToolContent" validate = "false"
  * @struts.action-forward name = "choice" path = "/toolcontent/exportchoice.jsp"
  * @struts.action-forward name = "loading" path = "/toolcontent/exportloading.jsp"
  * @struts.action-forward name = "result" path = "/toolcontent/exportresult.jsp"
- * 
- * Export tool content action. It needs learingDesignID as input parameter.
+ *
+ *                        Export tool content action. It needs learingDesignID as input parameter.
  * @author Steve.Ni
  * @version $Revision$
  */
@@ -107,9 +107,9 @@ public class ExportToolContentAction extends LamsAction {
 	List<String> toolsErrorMsgs = new ArrayList<String>();
 
 	try {
-	    File xslt = new File(this.getServlet().getServletContext().getRealPath(
-		    ExportToolContentAction.IMS_XSLT_PATH)
-		    + File.separator + ExportToolContentAction.IMS_XSLT_NAME);
+	    File xslt = new File(
+		    this.getServlet().getServletContext().getRealPath(ExportToolContentAction.IMS_XSLT_PATH)
+			    + File.separator + ExportToolContentAction.IMS_XSLT_NAME);
 	    String zipFilename = service.exportLearningDesign(learningDesignId, toolsErrorMsgs, format, xslt);
 
 	    // get only filename
@@ -172,13 +172,14 @@ public class ExportToolContentAction extends LamsAction {
 
     /**
      * Exports the learning design to lamscommunity
-     * 
+     *
      * @param mapping
      * @param request
      * @param response
      * @return
      */
-    private ActionForward exportLDToLC(ActionMapping mapping, HttpServletRequest request, HttpServletResponse response) {
+    private ActionForward exportLDToLC(ActionMapping mapping, HttpServletRequest request,
+	    HttpServletResponse response) {
 	Long learningDesignId = WebUtil.readLongParam(request, ExportToolContentAction.PARAM_LEARING_DESIGN_ID);
 	int format = WebUtil.readIntParam(request, ExportToolContentAction.PARAM_EXPORT_FORMAT);
 	IExportToolContentService service = getExportService();
@@ -186,9 +187,9 @@ public class ExportToolContentAction extends LamsAction {
 	List<String> toolsErrorMsgs = new ArrayList<String>();
 
 	try {
-	    File xslt = new File(this.getServlet().getServletContext().getRealPath(
-		    ExportToolContentAction.IMS_XSLT_PATH)
-		    + File.separator + ExportToolContentAction.IMS_XSLT_NAME);
+	    File xslt = new File(
+		    this.getServlet().getServletContext().getRealPath(ExportToolContentAction.IMS_XSLT_PATH)
+			    + File.separator + ExportToolContentAction.IMS_XSLT_NAME);
 	    String zipFilename = service.exportLearningDesign(learningDesignId, toolsErrorMsgs, format, xslt);
 
 	    // get only filename
@@ -232,8 +233,8 @@ public class ExportToolContentAction extends LamsAction {
     // Private method
     // ***************************************************************************************
     private IExportToolContentService getExportService() {
-	WebApplicationContext webContext = WebApplicationContextUtils.getRequiredWebApplicationContext(this
-		.getServlet().getServletContext());
+	WebApplicationContext webContext = WebApplicationContextUtils
+		.getRequiredWebApplicationContext(this.getServlet().getServletContext());
 	return (IExportToolContentService) webContext.getBean(CentralConstants.EXPORT_TOOLCONTENT_SERVICE_BEAN_NAME);
     }
 }

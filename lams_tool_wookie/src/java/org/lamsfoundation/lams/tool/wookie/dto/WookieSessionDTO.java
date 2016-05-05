@@ -2,21 +2,21 @@
  * Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
  * =============================================================
  * License Information: http://lamsfoundation.org/licensing/lams/2.0/
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License version 2.0 
+ * it under the terms of the GNU General Public License version 2.0
  * as published by the Free Software Foundation.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301
  * USA
- * 
+ *
  * http://www.gnu.org/licenses/gpl.txt
  * ****************************************************************
  */
@@ -58,7 +58,7 @@ public class WookieSessionDTO implements Comparable<Object> {
 
 	numberOfFinishedLearners = 0;
 	for (Iterator<WookieUser> iterator = session.getWookieUsers().iterator(); iterator.hasNext();) {
-	    WookieUser user = (WookieUser) iterator.next();
+	    WookieUser user = iterator.next();
 	    WookieUserDTO userDTO = new WookieUserDTO(user);
 	    if (userDTO.getEntryUID() != null) {
 		numberOfFinishedLearners++;
@@ -67,7 +67,7 @@ public class WookieSessionDTO implements Comparable<Object> {
 	}
 
 	numberOfLearners = userDTOs.size();
-	
+
 	// Set the wookie properties
 	this.widgetHeight = session.getWidgetHeight();
 	this.widgetIdentifier = session.getWidgetIdentifier();
@@ -95,6 +95,7 @@ public class WookieSessionDTO implements Comparable<Object> {
 	this.sessionName = sessionName;
     }
 
+    @Override
     public int compareTo(Object o) {
 	int returnValue;
 	WookieSessionDTO toSession = (WookieSessionDTO) o;
@@ -130,50 +131,50 @@ public class WookieSessionDTO implements Comparable<Object> {
     }
 
     public String getWidgetSharedDataKey() {
-        return widgetSharedDataKey;
+	return widgetSharedDataKey;
     }
 
     public void setWidgetSharedDataKey(String widgetSharedDataKey) {
-        this.widgetSharedDataKey = widgetSharedDataKey;
+	this.widgetSharedDataKey = widgetSharedDataKey;
     }
 
     public Integer getWidgetHeight() {
-        return widgetHeight;
+	return widgetHeight;
     }
 
     public void setWidgetHeight(Integer widgetHeight) {
-        this.widgetHeight = widgetHeight;
+	this.widgetHeight = widgetHeight;
     }
 
     public Integer getWidgetWidth() {
-        return widgetWidth;
+	return widgetWidth;
     }
 
     public void setWidgetWidth(Integer widgetWidth) {
-        this.widgetWidth = widgetWidth;
+	this.widgetWidth = widgetWidth;
     }
 
     public Boolean getWidgetMaximise() {
-        return widgetMaximise;
+	return widgetMaximise;
     }
 
     public void setWidgetMaximise(Boolean widgetMaximise) {
-        this.widgetMaximise = widgetMaximise;
+	this.widgetMaximise = widgetMaximise;
     }
 
     public String getWidgetIdentifier() {
-        return widgetIdentifier;
+	return widgetIdentifier;
     }
 
     public void setWidgetIdentifier(String widgetIdentifier) {
-        this.widgetIdentifier = widgetIdentifier;
+	this.widgetIdentifier = widgetIdentifier;
     }
 
     public String getSessionUserWidgetUrl() {
-        return sessionUserWidgetUrl;
+	return sessionUserWidgetUrl;
     }
 
     public void setSessionUserWidgetUrl(String sessionUserWidgetUrl) {
-        this.sessionUserWidgetUrl = sessionUserWidgetUrl;
+	this.sessionUserWidgetUrl = sessionUserWidgetUrl;
     }
 }

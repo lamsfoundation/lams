@@ -2,21 +2,21 @@
  * Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
  * =============================================================
  * License Information: http://lamsfoundation.org/licensing/lams/2.0/
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License version 2.0 
+ * it under the terms of the GNU General Public License version 2.0
  * as published by the Free Software Foundation.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301
  * USA
- * 
+ *
  * http://www.gnu.org/licenses/gpl.txt
  * ****************************************************************
  */
@@ -68,13 +68,13 @@ import org.springframework.context.i18n.LocaleContextHolder;
 /**
  * The LearningDesignService class contains methods which applies validation rules to determine the validity of a
  * learning design. For the validation rules, please see the AuthoringDesignDoc in lams_documents.
- * 
+ *
  * If no errors are found, a learning design is considered valid, it will set the valid_design_flag to true. If
  * validation fails, the validation messages will be returned in the response packet. The validation messages are a list
  * of ValidationErrorDTO objects.
- * 
+ *
  * @author mtruong
- * 
+ *
  */
 public class LearningDesignService implements ILearningDesignService {
 
@@ -90,14 +90,14 @@ public class LearningDesignService implements ILearningDesignService {
 
     /*
      * Default constructor
-     * 
+     *
      */
     public LearningDesignService() {
     }
 
     /**********************************************
      * Setter/Getter Methods
-     * *******************************************/
+     *******************************************/
     /**
      * Set i18n MessageService
      */
@@ -142,11 +142,11 @@ public class LearningDesignService implements ILearningDesignService {
 
     /**********************************************
      * Service Methods
-     * *******************************************/
+     *******************************************/
 
     /**
      * Get the learning design DTO, suitable to send to Flash via WDDX
-     * 
+     *
      * @param learningDesignId
      * @param languageCode
      *            Two letter language code needed to I18N the help url
@@ -162,7 +162,7 @@ public class LearningDesignService implements ILearningDesignService {
     /**
      * This method calls other validation methods which apply the validation rules to determine whether or not the
      * learning design is valid.
-     * 
+     *
      * @param learningDesign
      * @return list of validation errors
      */
@@ -232,8 +232,8 @@ public class LearningDesignService implements ILearningDesignService {
 	ArrayList<LearningLibraryDTO> libraries = new ArrayList<LearningLibraryDTO>();
 	while (iterator.hasNext()) {
 	    LearningLibrary learningLibrary = iterator.next();
-	    List<Activity> templateActivities = activityDAO.getActivitiesByLibraryID(learningLibrary
-		    .getLearningLibraryId());
+	    List<Activity> templateActivities = activityDAO
+		    .getActivitiesByLibraryID(learningLibrary.getLearningLibraryId());
 
 	    if ((templateActivities != null) & (templateActivities.size() == 0)) {
 		log.error("Learning Library with ID " + learningLibrary.getLearningLibraryId()
@@ -278,10 +278,10 @@ public class LearningDesignService implements ILearningDesignService {
 		    toolDTO.setToolId(libraryActivityDTO.getToolID());
 		}
 		toolDTO.setLearningLibraryId(learningLibrary.getLearningLibraryID());
-		toolDTO.setToolDisplayName(isParallel ? learningLibrary.getTitle() : libraryActivityDTO
-			.getActivityTitle());
-		toolDTO.setActivityCategoryID(isParallel ? Activity.CATEGORY_SPLIT : libraryActivityDTO
-			.getActivityCategoryID());
+		toolDTO.setToolDisplayName(
+			isParallel ? learningLibrary.getTitle() : libraryActivityDTO.getActivityTitle());
+		toolDTO.setActivityCategoryID(
+			isParallel ? Activity.CATEGORY_SPLIT : libraryActivityDTO.getActivityCategoryID());
 
 		if (libraryActivityDTO.getToolID() == null) {
 		    String iconPath = libraryActivityDTO.getLibraryActivityUIImage();
@@ -377,7 +377,8 @@ public class LearningDesignService implements ILearningDesignService {
 	// construct absolute filePath to SVG
 	String earFolder = Configuration.get(ConfigurationKeys.LAMS_EAR_DIR);
 	if (StringUtils.isBlank(earFolder)) {
-	    log.error("Unable to get path to the LAMS Server URL from the configuration table. SVG image creation failed");
+	    log.error(
+		    "Unable to get path to the LAMS Server URL from the configuration table. SVG image creation failed");
 	    return null;
 	}
 	String directoryToStoreFile = FileUtil.getFullPath(earFolder, "lams-www.war\\secure\\learning-design-images");

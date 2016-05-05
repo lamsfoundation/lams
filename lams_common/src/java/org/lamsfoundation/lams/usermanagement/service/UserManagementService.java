@@ -2,21 +2,21 @@
  * Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
  * =============================================================
  * License Information: http://lamsfoundation.org/licensing/lams/2.0/
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License version 2.0 
+ * it under the terms of the GNU General Public License version 2.0
  * as published by the Free Software Foundation.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301
  * USA
- * 
+ *
  * http://www.gnu.org/licenses/gpl.txt
  * ****************************************************************
  */
@@ -40,7 +40,6 @@ import java.util.Vector;
 import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
-import org.hibernate.Query;
 import org.lamsfoundation.lams.dao.IBaseDAO;
 import org.lamsfoundation.lams.learningdesign.dao.IGroupDAO;
 import org.lamsfoundation.lams.themes.Theme;
@@ -83,11 +82,11 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
  * <p>
  * <a href="UserManagementService.java.html"> <i>View Source </i> </a>
  * </p>
- * 
+ *
  * Manually caches the user objects (by user id) in the shared cache. Whenever a user object is modified, the cached
  * version must be removed. TODO complete the caching - need to remove the user from the cache on modification of
  * user/organisation details.
- * 
+ *
  * @author Fei Yang, Manpreet Minhas
  */
 public class UserManagementService implements IUserManagementService {
@@ -103,7 +102,7 @@ public class UserManagementService implements IUserManagementService {
     private IRoleDAO roleDAO;
 
     private IOrganisationDAO organisationDAO;
-    
+
     private IUserDAO userDAO;
 
     private IUserOrganisationDAO userOrganisationDAO;
@@ -111,11 +110,12 @@ public class UserManagementService implements IUserManagementService {
     protected MessageService messageService;
 
     private static IAuditService auditService;
-    
+
     // ---------------------------------------------------------------------
     // Service Methods
     // ---------------------------------------------------------------------
 
+    @Override
     public void save(Object object) {
 	try {
 	    if (object instanceof User) {
@@ -152,6 +152,7 @@ public class UserManagementService implements IUserManagementService {
 	return user;
     }
 
+    @Override
     public void saveOrganisationGrouping(OrganisationGrouping grouping, Collection<OrganisationGroup> newGroups) {
 	if (grouping.getGroupingId() == null) {
 	    grouping.setGroups(new HashSet<OrganisationGroup>());
@@ -192,6 +193,7 @@ public class UserManagementService implements IUserManagementService {
 	}
     }
 
+    @Override
     public void saveAll(Collection objects) {
 	for (Object o : objects) {
 	    if (o instanceof User) {
@@ -203,54 +205,67 @@ public class UserManagementService implements IUserManagementService {
 	baseDAO.insertOrUpdateAll(objects);
     }
 
+    @Override
     public void delete(Object object) {
 	baseDAO.delete(object);
     }
 
+    @Override
     public void deleteAll(Class clazz) {
 	baseDAO.deleteAll(clazz);
     }
 
+    @Override
     public void deleteAll(Collection objects) {
 	baseDAO.deleteAll(objects);
     }
 
+    @Override
     public void deleteById(Class clazz, Serializable id) {
 	baseDAO.deleteById(clazz, id);
     }
 
+    @Override
     public void deleteByProperty(Class clazz, String name, Object value) {
 	baseDAO.deleteByProperty(clazz, name, value);
     }
 
+    @Override
     public void deleteByProperties(Class clazz, Map<String, Object> properties) {
 	baseDAO.deleteByProperties(clazz, properties);
     }
 
+    @Override
     public void deleteAnythingLike(Object object) {
 	baseDAO.deleteAnythingLike(object);
     }
 
+    @Override
     public Object findById(Class clazz, Serializable id) {
 	return baseDAO.find(clazz, id);
     }
 
+    @Override
     public List findAll(Class clazz) {
 	return baseDAO.findAll(clazz);
     }
 
+    @Override
     public List findByProperty(Class clazz, String name, Object value) {
 	return baseDAO.findByProperty(clazz, name, value);
     }
 
+    @Override
     public List findByProperties(Class clazz, Map<String, Object> properties) {
 	return baseDAO.findByProperties(clazz, properties);
     }
 
+    @Override
     public List findAnythingLike(Object object) {
 	return baseDAO.findAnythingLike(object);
     }
 
+    @Override
     public List searchByStringProperties(Class clazz, Map<String, String> properties) {
 	return baseDAO.searchByStringProperties(clazz, properties);
     }
@@ -316,7 +331,7 @@ public class UserManagementService implements IUserManagementService {
 
     /**
      * Go through the roles for this user organisation and add the roles to the dto.
-     * 
+     *
      * @param restrictToRoleNames
      * @param userOrganisation
      * @param dto
@@ -396,7 +411,7 @@ public class UserManagementService implements IUserManagementService {
 	// it's ugly to put query string here, but it is a convention of this class so let's stick to it for now
 	String query = "SELECT uo.user FROM UserOrganisation uo INNER JOIN uo.userOrganisationRoles r WHERE uo.organisation.organisationId="
 		+ organisationID + " AND r.role.name= '" + roleName + "'";
-	List<User> queryResult = (List<User>) baseDAO.find(query);
+	List<User> queryResult = baseDAO.find(query);
 
 	for (User user : queryResult) {
 	    if (isFlashCall && !getUser) {
@@ -1023,12 +1038,14 @@ public class UserManagementService implements IUserManagementService {
 	return requestorId != null ? isUserInRole(requestorId, rootOrgId, Role.GROUP_ADMIN) : false;
     }
 
+    @Override
     public boolean isUserSysAdmin() {
 	Integer rootOrgId = getRootOrganisation().getOrganisationId();
 	Integer requestorId = getRequestorId();
 	return requestorId != null ? isUserInRole(requestorId, rootOrgId, Role.SYSADMIN) : false;
     }
 
+    @Override
     public Integer getCountRoleForSystem(Integer roleId) {
 	Integer count = roleDAO.getCountRoleForSystem(roleId);
 	if (count != null) {
@@ -1038,6 +1055,7 @@ public class UserManagementService implements IUserManagementService {
 	}
     }
 
+    @Override
     public Integer getCountRoleForOrg(Integer orgId, Integer roleId, String searchPhrase) {
 	Integer count = roleDAO.getCountRoleForOrg(roleId, orgId, searchPhrase);
 	if (count != null) {
@@ -1047,18 +1065,21 @@ public class UserManagementService implements IUserManagementService {
 	}
     }
 
+    @Override
     public Theme getDefaultFlashTheme() {
 	String flashName = Configuration.get(ConfigurationKeys.DEFAULT_FLASH_THEME);
 	List list = findByProperty(Theme.class, "name", flashName);
 	return list != null ? (Theme) list.get(0) : null;
     }
 
+    @Override
     public Theme getDefaultHtmlTheme() {
 	String htmlName = Configuration.get(ConfigurationKeys.DEFAULT_HTML_THEME);
 	List list = findByProperty(Theme.class, "name", htmlName);
 	return list != null ? (Theme) list.get(0) : null;
     }
 
+    @Override
     public void auditPasswordChanged(User user, String moduleName) {
 	String[] args = new String[1];
 	args[0] = user.getLogin() + "(" + user.getUserId() + ")";
@@ -1066,6 +1087,7 @@ public class UserManagementService implements IUserManagementService {
 	getAuditService().log(moduleName, message);
     }
 
+    @Override
     public void auditUserCreated(User user, String moduleName) {
 	String[] args = new String[2];
 	args[0] = user.getLogin() + "(" + user.getUserId() + ")";
@@ -1073,13 +1095,13 @@ public class UserManagementService implements IUserManagementService {
 	String message = messageService.getMessage("audit.user.create", args);
 	getAuditService().log(moduleName, message);
     }
-    
+
     @Override
     public Integer getCountUsers() {
 	String query = "SELECT count(u) FROM User u";
 	return getFindIntegerResult(query);
     }
-    
+
     @Override
     public int getCountUsers(String searchString) {
 	return userDAO.getCountUsers(searchString);
@@ -1193,7 +1215,7 @@ public class UserManagementService implements IUserManagementService {
 	String query = "from User u where u.disabledFlag=0 order by u.login";
 	return baseDAO.find(query);
     }
-    
+
     @Override
     public List getAllUsersPaged(int page, int size, String sortBy, String sortOrder, String searchString) {
 	return userDAO.getAllUsersPaged(page, size, sortBy, sortOrder, searchString);
@@ -1237,22 +1259,25 @@ public class UserManagementService implements IUserManagementService {
 	return false;
     }
 
+    @Override
     public ForgotPasswordRequest getForgotPasswordRequest(String key) {
 	List results = baseDAO.findByProperty(ForgotPasswordRequest.class, "requestKey", key);
 	return results.isEmpty() ? null : (ForgotPasswordRequest) results.get(0);
     }
 
+    @Override
     public int removeUserFromOtherGroups(Integer userId, Integer orgId) {
 	List uos = userOrganisationDAO.userOrganisationsNotById(userId, orgId);
 	deleteAll(uos);
 	return uos.size();
     }
 
+    @Override
     public User getUserDTOByOpenidURL(String openidURL) {
 	List results = baseDAO.findByProperty(User.class, "openidURL", openidURL);
 	return results.isEmpty() ? null : (User) results.get(0);
     }
-    
+
     // ---------------------------------------------------------------------
     // Inversion of Control Methods - Method injection
     // ---------------------------------------------------------------------
@@ -1279,7 +1304,7 @@ public class UserManagementService implements IUserManagementService {
     public void setOrganisationDAO(IOrganisationDAO organisationDAO) {
 	this.organisationDAO = organisationDAO;
     }
-    
+
     public void setUserDAO(IUserDAO userDAO) {
 	this.userDAO = userDAO;
     }

@@ -2,20 +2,20 @@
  * Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
  * ============================================================= License
  * Information: http://lamsfoundation.org/licensing/lams/2.0/
- * 
+ *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License version 2.0 as published by the
  * Free Software Foundation.
- * 
+ *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more
  * details.
- * 
+ *
  * You should have received a copy of the GNU General Public License along with
  * this program; if not, write to the Free Software Foundation, Inc., 51
  * Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
- * 
+ *
  * http://www.gnu.org/licenses/gpl.txt
  * ****************************************************************
  */
@@ -106,16 +106,16 @@ import org.lamsfoundation.lams.util.wddx.WDDXTAGS;
 /**
  * @author Manpreet Minhas
  * @author Mailing Truong
- * 
+ *
  *         This is a utility class for extracting the information from the WDDX packet sent by the FLASH.
- * 
+ *
  *         The following rules are applied: The client sends a subset of all possible data. If a field is included, then
  *         the value associated with this field should be persisted (the value maybe a new value or an unchanged value)
  *         If a field is not included then the server should assume that the value is unchanged. If the value of a field
  *         is one of the special null values, then null should be persisted.
- * 
+ *
  *         Object extractor has member data, so it should not be used as a singleton.
- * 
+ *
  */
 public class ObjectExtractor implements IObjectExtractor {
 
@@ -321,13 +321,13 @@ public class ObjectExtractor implements IObjectExtractor {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.lamsfoundation.lams.authoring.IObjectExtractor#extractSaveLearningDesign(java.util.Hashtable)
      */
     @Override
     public LearningDesign extractSaveLearningDesign(Hashtable table, LearningDesign existingLearningDesign,
-	    WorkspaceFolder workspaceFolder, User user) throws WDDXProcessorConversionException,
-	    ObjectExtractorException {
+	    WorkspaceFolder workspaceFolder, User user)
+	    throws WDDXProcessorConversionException, ObjectExtractorException {
 
 	// if the learningDesign already exists, update it, otherwise create a
 	// new one.
@@ -551,14 +551,14 @@ public class ObjectExtractor implements IObjectExtractor {
 	learningDesign.setMaxID((Integer) JsonUtil.opt(ldJSON, AuthoringJsonTags.MAX_ID));
 	learningDesign.setReadOnly((Boolean) JsonUtil.opt(ldJSON, AuthoringJsonTags.READ_ONLY));
 	learningDesign.setEditOverrideLock((Boolean) JsonUtil.opt(ldJSON, AuthoringJsonTags.EDIT_OVERRIDE_LOCK));
-	learningDesign.setDateReadOnly(DateUtil.convertFromString((String) JsonUtil.opt(ldJSON,
-		AuthoringJsonTags.DATE_READ_ONLY)));
+	learningDesign.setDateReadOnly(
+		DateUtil.convertFromString((String) JsonUtil.opt(ldJSON, AuthoringJsonTags.DATE_READ_ONLY)));
 	learningDesign.setHelpText((String) JsonUtil.opt(ldJSON, AuthoringJsonTags.HELP_TEXT));
 	String version = (String) JsonUtil.opt(ldJSON, AuthoringJsonTags.VERSION);
 	if (version == null) {
 	    version = Configuration.get(ConfigurationKeys.SERVER_VERSION_NUMBER);
 	}
-	learningDesign.setDesignType((String)JsonUtil.opt(ldJSON, AuthoringJsonTags.DESIGN_TYPE));
+	learningDesign.setDesignType((String) JsonUtil.opt(ldJSON, AuthoringJsonTags.DESIGN_TYPE));
 	learningDesign.setVersion(version);
 	learningDesign.setDuration(JsonUtil.optLong(ldJSON, AuthoringJsonTags.DURATION));
 
@@ -589,7 +589,8 @@ public class ObjectExtractor implements IObjectExtractor {
 	// now process the "parts" of the learning design
 	parseGroupings((JSONArray) JsonUtil.opt(ldJSON, AuthoringJsonTags.GROUPINGS));
 	parseActivities((JSONArray) JsonUtil.opt(ldJSON, AuthoringJsonTags.ACTIVITIES));
-	parseActivitiesToMatchUpParentandInputActivities((JSONArray) JsonUtil.opt(ldJSON, AuthoringJsonTags.ACTIVITIES));
+	parseActivitiesToMatchUpParentandInputActivities(
+		(JSONArray) JsonUtil.opt(ldJSON, AuthoringJsonTags.ACTIVITIES));
 	parseTransitions((JSONArray) JsonUtil.opt(ldJSON, AuthoringJsonTags.TRANSITIONS));
 	parseBranchMappings((JSONArray) JsonUtil.opt(ldJSON, AuthoringJsonTags.BRANCH_MAPPINGS));
 	parseAnnotations((JSONArray) JsonUtil.opt(ldJSON, AuthoringJsonTags.ANNOTATIONS));
@@ -611,9 +612,9 @@ public class ObjectExtractor implements IObjectExtractor {
      * Also tidy up the order ids for sequence activities so that they are in the same order as the transitions - needed
      * for the IMSLD export conversion to work. Not all the transitions may be drawn yet, so number off the others best
      * we can.
-     * 
+     *
      * @throws ObjectExtractorException
-     * 
+     *
      * @throws WDDXProcessorConversionException
      */
     private void progressDefaultChildActivities() throws ObjectExtractorException {
@@ -638,18 +639,19 @@ public class ObjectExtractor implements IObjectExtractor {
 			defaultActivity.setOrderId(1);
 
 			int nextOrderId = 2;
-			Activity nextActivity = defaultActivity.getTransitionFrom() != null ? defaultActivity
-				.getTransitionFrom().getToActivity() : null;
+			Activity nextActivity = defaultActivity.getTransitionFrom() != null
+				? defaultActivity.getTransitionFrom().getToActivity() : null;
 			while (nextActivity != null) {
 			    boolean removed = unprocessedChildren.remove(nextActivity);
 			    if (!removed) {
-				log.error("Next activity should be a child of the current sequence, but it isn't. Could we have a loop in the transitions? Aborting the ordering of ids based on transitions. Sequence activity "
-					+ complex + " next activity " + nextActivity);
+				log.error(
+					"Next activity should be a child of the current sequence, but it isn't. Could we have a loop in the transitions? Aborting the ordering of ids based on transitions. Sequence activity "
+						+ complex + " next activity " + nextActivity);
 				break;
 			    }
 			    nextActivity.setOrderId(nextOrderId++);
-			    nextActivity = nextActivity.getTransitionFrom() != null ? nextActivity.getTransitionFrom()
-				    .getToActivity() : null;
+			    nextActivity = nextActivity.getTransitionFrom() != null
+				    ? nextActivity.getTransitionFrom().getToActivity() : null;
 			}
 
 			if (unprocessedChildren.size() > 0) {
@@ -681,8 +683,8 @@ public class ObjectExtractor implements IObjectExtractor {
     }
 
     private void intialiseBranchActivityMappings() {
-	oldbranchActivityEntryList = branchActivityEntryDAO.getEntriesByLearningDesign(learningDesign
-		.getLearningDesignId());
+	oldbranchActivityEntryList = branchActivityEntryDAO
+		.getEntriesByLearningDesign(learningDesign.getLearningDesignId());
     }
 
     /**
@@ -727,22 +729,16 @@ public class ObjectExtractor implements IObjectExtractor {
 
 			Activity activity = oldActivityMap.get(uiid);
 			if (toolSessions.size() > 1) {
-			    throw new ObjectExtractorException(
-				    "More than one tool session exists for activity "
-					    + activity.getTitle()
-					    + " ("
-					    + uiid
-					    + ") but this shouldn't be possible. Cannot delete this tool session so editing is not allowed!");
+			    throw new ObjectExtractorException("More than one tool session exists for activity "
+				    + activity.getTitle() + " (" + uiid
+				    + ") but this shouldn't be possible. Cannot delete this tool session so editing is not allowed!");
 			} else if (toolSessions.size() == 1) {
 
 			    ToolSession toolSession = (ToolSession) toolSessions.get(0);
 			    if (activity.isGroupingActivity()) {
-				throw new ObjectExtractorException(
-					"Activity "
-						+ activity.getTitle()
-						+ " ("
-						+ activity.getActivityUIID()
-						+ ") has a tool session but it is grouped. Cannot delete this tool session so editing is not allowed!");
+				throw new ObjectExtractorException("Activity " + activity.getTitle() + " ("
+					+ activity.getActivityUIID()
+					+ ") has a tool session but it is grouped. Cannot delete this tool session so editing is not allowed!");
 			    }
 
 			    // all okay, do ahead and delete the tool session
@@ -764,7 +760,7 @@ public class ObjectExtractor implements IObjectExtractor {
      * Parses the groupings array sent from the WDDX packet. It will create the groupings object (ChosenGrouping,
      * RandomGrouping) so that when the GroupingActivity is processed, it can link to the grouping object that has been
      * created by this method.
-     * 
+     *
      * @param groupingsList
      * @throws WDDXProcessorConversionException
      */
@@ -846,8 +842,8 @@ public class ObjectExtractor implements IObjectExtractor {
 	}
 
 	if (keyExists(groupingDetails, WDDXTAGS.MAX_NUMBER_OF_GROUPS)) {
-	    grouping.setMaxNumberOfGroups(WDDXProcessor
-		    .convertToInteger(groupingDetails, WDDXTAGS.MAX_NUMBER_OF_GROUPS));
+	    grouping.setMaxNumberOfGroups(
+		    WDDXProcessor.convertToInteger(groupingDetails, WDDXTAGS.MAX_NUMBER_OF_GROUPS));
 	}
 
 	Set<Group> groupsToDelete = new HashSet<Group>(grouping.getGroups());
@@ -949,13 +945,14 @@ public class ObjectExtractor implements IObjectExtractor {
     }
 
     @SuppressWarnings("unchecked")
-    private Group extractGroupObject(Hashtable groupDetails, Grouping grouping) throws WDDXProcessorConversionException {
+    private Group extractGroupObject(Hashtable groupDetails, Grouping grouping)
+	    throws WDDXProcessorConversionException {
 
 	Group group = null;
 	Integer groupUIID = WDDXProcessor.convertToInteger(groupDetails, WDDXTAGS.GROUP_UIID);
 	if (groupUIID == null) {
-	    throw new WDDXProcessorConversionException("Group is missing its UUID. Group " + groupDetails
-		    + " grouping " + grouping);
+	    throw new WDDXProcessorConversionException(
+		    "Group is missing its UUID. Group " + groupDetails + " grouping " + grouping);
 	}
 	Long groupID = WDDXProcessor.convertToLong(groupDetails, WDDXTAGS.GROUP_ID);
 
@@ -1094,14 +1091,15 @@ public class ObjectExtractor implements IObjectExtractor {
      * design will be compared with the new list of activities. Any new activities will be added to the database,
      * existing activities will be updated, and any activities that are not present in the list of activities from the
      * wddx packet (but appear in the list of current activities) are deleted.
-     * 
+     *
      * @param activitiesList
      *            The list of activities from the WDDX packet.
      * @throws WDDXProcessorConversionException
      * @throws ObjectExtractorException
      */
     @SuppressWarnings("unchecked")
-    private void parseActivities(List activitiesList) throws WDDXProcessorConversionException, ObjectExtractorException {
+    private void parseActivities(List activitiesList)
+	    throws WDDXProcessorConversionException, ObjectExtractorException {
 
 	if (activitiesList != null) {
 	    Iterator iterator = activitiesList.iterator();
@@ -1169,14 +1167,14 @@ public class ObjectExtractor implements IObjectExtractor {
 
     /**
      * This method extracts and saves the evaluation object for each activity.
-     * 
+     *
      * Here we would normally go through the tool activity evaluation list and check if there have been any
      * added/removed. But since our current implementation only allows 1 tool output per activity to go to Gradebook, we
      * only need to fetch the first.
-     * 
+     *
      * This implementation will need to be changed if we ever choose to allow more than one output per activity to go to
      * Gradebook
-     * 
+     *
      * @param activityDetails
      * @param toolActivity
      */
@@ -1198,8 +1196,8 @@ public class ObjectExtractor implements IObjectExtractor {
 		&& !WDDXProcessor.convertToString(activityDetails, WDDXTAGS.TOOL_OUTPUT_DEFINITION).equals("")) {
 	    activityEvaluations = new HashSet<ActivityEvaluation>();
 	    activityEvaluation.setActivity(toolActivity);
-	    activityEvaluation.setToolOutputDefinition(WDDXProcessor.convertToString(activityDetails,
-		    WDDXTAGS.TOOL_OUTPUT_DEFINITION));
+	    activityEvaluation.setToolOutputDefinition(
+		    WDDXProcessor.convertToString(activityDetails, WDDXTAGS.TOOL_OUTPUT_DEFINITION));
 	    activityEvaluations.add(activityEvaluation);
 	    toolActivity.setActivityEvaluations(activityEvaluations);
 	    baseDAO.insertOrUpdate(activityEvaluation);
@@ -1253,15 +1251,15 @@ public class ObjectExtractor implements IObjectExtractor {
     /**
      * Parses the list of activities sent from the WDDX packet for competence mappings. Each activity's new set of
      * competenceMapping is compared against the old set and the db is updated accordingly
-     * 
+     *
      * @param activitiesList
      *            The list of activities from the WDDX packet.
      * @throws WDDXProcessorConversionException
      * @throws ObjectExtractorException
      */
     @SuppressWarnings("unchecked")
-    private void parseCompetenceMappings(List activitiesList) throws WDDXProcessorConversionException,
-	    ObjectExtractorException {
+    private void parseCompetenceMappings(List activitiesList)
+	    throws WDDXProcessorConversionException, ObjectExtractorException {
 
 	if (activitiesList != null) {
 	    Iterator iterator = activitiesList.iterator();
@@ -1304,8 +1302,8 @@ public class ObjectExtractor implements IObjectExtractor {
 
 			    // Now get the competence mapping using the tool
 			    // activity and the competence as reference
-			    CompetenceMapping competenceMapping = competenceMappingDAO.getCompetenceMapping(
-				    toolActivity, competence);
+			    CompetenceMapping competenceMapping = competenceMappingDAO
+				    .getCompetenceMapping(toolActivity, competence);
 
 			    // Only save new competence mappings, no need to
 			    // update existing
@@ -1363,7 +1361,7 @@ public class ObjectExtractor implements IObjectExtractor {
      * design will be compared with the new list of competences. Any new competences will be added to the database,
      * existing competences will be updated, and any competences that are not present in the list of competences from
      * the wddx packet (but appear in the list of current competences) are deleted.
-     * 
+     *
      * @param activitiesList
      *            The list of activities from the WDDX packet.
      * @throws WDDXProcessorConversionException
@@ -1488,8 +1486,8 @@ public class ObjectExtractor implements IObjectExtractor {
 	    LearningDesignAnnotation annotation = null;
 
 	    for (LearningDesignAnnotation existingAnnotation : existingAnnotations) {
-		if (existingAnnotation.getAnnotationUIID().equals(
-			annotationJSON.getInt(AuthoringJsonTags.ANNOTATION_UIID))) {
+		if (existingAnnotation.getAnnotationUIID()
+			.equals(annotationJSON.getInt(AuthoringJsonTags.ANNOTATION_UIID))) {
 		    annotation = existingAnnotation;
 		    found = true;
 		    break;
@@ -1537,7 +1535,7 @@ public class ObjectExtractor implements IObjectExtractor {
      * Because the activities list was processed before by the method parseActivities, it is assumed that all activities
      * have already been saved into the database. So now we can go through and find the any parent activity or input
      * activities for an activity.
-     * 
+     *
      * @param activitiesList
      * @param learningDesign
      * @throws WDDXProcessorConversionException
@@ -1560,9 +1558,9 @@ public class ObjectExtractor implements IObjectExtractor {
 		    if (parentUIID != null) {
 			Activity parentActivity = newActivityMap.get(parentUIID);
 			if (parentActivity == null) {
-			    throw new ObjectExtractorException("Parent activity " + parentUIID
-				    + " missing for activity " + existingActivity.getTitle() + ": "
-				    + existingActivity.getActivityUIID());
+			    throw new ObjectExtractorException(
+				    "Parent activity " + parentUIID + " missing for activity "
+					    + existingActivity.getTitle() + ": " + existingActivity.getActivityUIID());
 			}
 			existingActivity.setParentActivity(parentActivity);
 			existingActivity.setParentUIID(parentUIID);
@@ -1588,9 +1586,9 @@ public class ObjectExtractor implements IObjectExtractor {
 		if (inputActivityUIID != null) {
 		    Activity inputActivity = newActivityMap.get(inputActivityUIID);
 		    if (inputActivity == null) {
-			throw new ObjectExtractorException("Input activity " + inputActivityUIID
-				+ " missing for activity " + existingActivity.getTitle() + ": "
-				+ existingActivity.getActivityUIID());
+			throw new ObjectExtractorException(
+				"Input activity " + inputActivityUIID + " missing for activity "
+					+ existingActivity.getTitle() + ": " + existingActivity.getActivityUIID());
 		    }
 		    existingActivity.getInputActivities().add(inputActivity);
 		}
@@ -1642,9 +1640,9 @@ public class ObjectExtractor implements IObjectExtractor {
 		if (inputActivityUIID != null) {
 		    Activity inputActivity = newActivityMap.get(inputActivityUIID);
 		    if (inputActivity == null) {
-			throw new ObjectExtractorException("Input activity " + inputActivityUIID
-				+ " missing for activity " + existingActivity.getTitle() + ": "
-				+ existingActivity.getActivityUIID());
+			throw new ObjectExtractorException(
+				"Input activity " + inputActivityUIID + " missing for activity "
+					+ existingActivity.getTitle() + ": " + existingActivity.getActivityUIID());
 		    }
 		    existingActivity.getInputActivities().add(inputActivity);
 		}
@@ -1657,7 +1655,7 @@ public class ObjectExtractor implements IObjectExtractor {
     /**
      * Like parseActivities, parseTransitions parses the list of transitions from the wddx packet. New transitions will
      * be added, existing transitions updated and any transitions that are no longer needed are deleted.
-     * 
+     *
      * @param transitionsList
      *            The list of transitions from the wddx packet
      * @param learningDesign
@@ -1813,15 +1811,15 @@ public class ObjectExtractor implements IObjectExtractor {
 
 	activity.setActivityCategoryID((Integer) JsonUtil.opt(activityDetails, AuthoringJsonTags.ACTIVITY_CATEGORY_ID));
 	activity.setLibraryActivityUiImage((String) JsonUtil.opt(activityDetails, AuthoringJsonTags.LIBRARY_IMAGE));
-	activity.setGroupingSupportType((Integer) JsonUtil
-		.opt(activityDetails, AuthoringJsonTags.GROUPING_SUPPORT_TYPE));
-	activity.setStopAfterActivity((Boolean) JsonUtil.opt(activityDetails, AuthoringJsonTags.STOP_AFTER_ACTIVITY, false));
+	activity.setGroupingSupportType(
+		(Integer) JsonUtil.opt(activityDetails, AuthoringJsonTags.GROUPING_SUPPORT_TYPE));
+	activity.setStopAfterActivity(JsonUtil.opt(activityDetails, AuthoringJsonTags.STOP_AFTER_ACTIVITY, false));
 
 	return activity;
     }
 
-    public Activity extractActivityObject(Hashtable activityDetails) throws WDDXProcessorConversionException,
-	    ObjectExtractorException {
+    public Activity extractActivityObject(Hashtable activityDetails)
+	    throws WDDXProcessorConversionException, ObjectExtractorException {
 
 	// it is assumed that the activityUUID will always be sent by flash.
 	Integer activityUUID = WDDXProcessor.convertToInteger(activityDetails, WDDXTAGS.ACTIVITY_UIID);
@@ -1904,20 +1902,21 @@ public class ObjectExtractor implements IObjectExtractor {
 	}
 
 	if (keyExists(activityDetails, WDDXTAGS.ACTIVITY_CATEGORY_ID)) {
-	    activity.setActivityCategoryID(WDDXProcessor.convertToInteger(activityDetails,
-		    WDDXTAGS.ACTIVITY_CATEGORY_ID));
+	    activity.setActivityCategoryID(
+		    WDDXProcessor.convertToInteger(activityDetails, WDDXTAGS.ACTIVITY_CATEGORY_ID));
 	}
 	if (keyExists(activityDetails, WDDXTAGS.LIBRARY_IMAGE)) {
 	    activity.setLibraryActivityUiImage(WDDXProcessor.convertToString(activityDetails, WDDXTAGS.LIBRARY_IMAGE));
 	}
 
 	if (keyExists(activityDetails, WDDXTAGS.GROUPING_SUPPORT_TYPE)) {
-	    activity.setGroupingSupportType(WDDXProcessor.convertToInteger(activityDetails,
-		    WDDXTAGS.GROUPING_SUPPORT_TYPE));
+	    activity.setGroupingSupportType(
+		    WDDXProcessor.convertToInteger(activityDetails, WDDXTAGS.GROUPING_SUPPORT_TYPE));
 	}
 
 	if (keyExists(activityDetails, WDDXTAGS.STOP_AFTER_ACTIVITY)) {
-	    activity.setStopAfterActivity(WDDXProcessor.convertToBoolean(activityDetails, WDDXTAGS.STOP_AFTER_ACTIVITY));
+	    activity.setStopAfterActivity(
+		    WDDXProcessor.convertToBoolean(activityDetails, WDDXTAGS.STOP_AFTER_ACTIVITY));
 	}
 
 	return activity;
@@ -1963,8 +1962,8 @@ public class ObjectExtractor implements IObjectExtractor {
 	}
     }
 
-    private void processActivityType(Activity activity, JSONObject activityDetails) throws ObjectExtractorException,
-	    JSONException {
+    private void processActivityType(Activity activity, JSONObject activityDetails)
+	    throws ObjectExtractorException, JSONException {
 	if (activity.isGroupingActivity()) {
 	    buildGroupingActivity((GroupingActivity) activity, activityDetails);
 	} else if (activity.isToolActivity()) {
@@ -1985,8 +1984,8 @@ public class ObjectExtractor implements IObjectExtractor {
 	activity.getActivities().clear();
 
 	activity.setDefaultActivity(null);
-	Integer defaultActivityMapUIID = WDDXProcessor
-		.convertToInteger(activityDetails, WDDXTAGS.DEFAULT_ACTIVITY_UIID);
+	Integer defaultActivityMapUIID = WDDXProcessor.convertToInteger(activityDetails,
+		WDDXTAGS.DEFAULT_ACTIVITY_UIID);
 	if (defaultActivityMapUIID != null) {
 	    defaultActivityMap.put(defaultActivityMapUIID, activity);
 	}
@@ -2036,8 +2035,8 @@ public class ObjectExtractor implements IObjectExtractor {
     private void buildFloatingActivity(FloatingActivity floatingActivity, Hashtable activityDetails)
 	    throws WDDXProcessorConversionException, ObjectExtractorException {
 	if (keyExists(activityDetails, WDDXTAGS.MAX_ACTIVITIES)) {
-	    floatingActivity.setMaxNumberOfActivities(WDDXProcessor.convertToInteger(activityDetails,
-		    WDDXTAGS.MAX_ACTIVITIES));
+	    floatingActivity
+		    .setMaxNumberOfActivities(WDDXProcessor.convertToInteger(activityDetails, WDDXTAGS.MAX_ACTIVITIES));
 	}
 
 	SystemTool systemTool = getSystemTool(SystemTool.FLOATING_ACTIVITIES);
@@ -2046,8 +2045,8 @@ public class ObjectExtractor implements IObjectExtractor {
 
     private void buildFloatingActivity(FloatingActivity floatingActivity, JSONObject activityDetails)
 	    throws ObjectExtractorException, JSONException {
-	floatingActivity.setMaxNumberOfActivities((Integer) JsonUtil.opt(activityDetails,
-		AuthoringJsonTags.MAX_ACTIVITIES));
+	floatingActivity
+		.setMaxNumberOfActivities((Integer) JsonUtil.opt(activityDetails, AuthoringJsonTags.MAX_ACTIVITIES));
 
 	SystemTool systemTool = getSystemTool(SystemTool.FLOATING_ACTIVITIES);
 	floatingActivity.setSystemTool(systemTool);
@@ -2136,16 +2135,17 @@ public class ObjectExtractor implements IObjectExtractor {
 		    .setMinNumberOfOptions(WDDXProcessor.convertToInteger(activityDetails, WDDXTAGS.MIN_OPTIONS));
 	}
 	if (keyExists(activityDetails, WDDXTAGS.OPTIONS_INSTRUCTIONS)) {
-	    optionsActivity.setOptionsInstructions(WDDXProcessor.convertToString(activityDetails,
-		    WDDXTAGS.OPTIONS_INSTRUCTIONS));
+	    optionsActivity.setOptionsInstructions(
+		    WDDXProcessor.convertToString(activityDetails, WDDXTAGS.OPTIONS_INSTRUCTIONS));
 	}
     }
 
-    private void buildOptionsActivity(OptionsActivity optionsActivity, JSONObject activityDetails) throws JSONException {
+    private void buildOptionsActivity(OptionsActivity optionsActivity, JSONObject activityDetails)
+	    throws JSONException {
 	optionsActivity.setMaxNumberOfOptions((Integer) JsonUtil.opt(activityDetails, AuthoringJsonTags.MAX_OPTIONS));
 	optionsActivity.setMinNumberOfOptions((Integer) JsonUtil.opt(activityDetails, AuthoringJsonTags.MIN_OPTIONS));
-	optionsActivity.setOptionsInstructions((String) JsonUtil.opt(activityDetails,
-		AuthoringJsonTags.OPTIONS_INSTRUCTIONS));
+	optionsActivity
+		.setOptionsInstructions((String) JsonUtil.opt(activityDetails, AuthoringJsonTags.OPTIONS_INSTRUCTIONS));
     }
 
     private void buildOptionsWithSequencesActivity(OptionsWithSequencesActivity optionsActivity,
@@ -2181,9 +2181,8 @@ public class ObjectExtractor implements IObjectExtractor {
 	    }
 	}
 	if (log.isDebugEnabled()) {
-	    log.debug("In tool activity UUID "
-		    + WDDXProcessor.convertToInteger(activityDetails, WDDXTAGS.ACTIVITY_UIID) + " tool content id "
-		    + toolContentId);
+	    log.debug("In tool activity UUID " + WDDXProcessor.convertToInteger(activityDetails, WDDXTAGS.ACTIVITY_UIID)
+		    + " tool content id " + toolContentId);
 	}
 	toolActivity.setToolContentId(toolContentId);
     }
@@ -2218,8 +2217,8 @@ public class ObjectExtractor implements IObjectExtractor {
 	    buildScheduleGateActivity((ScheduleGateActivity) activity, activityDetails);
 	}
 	GateActivity gateActivity = (GateActivity) activity;
-	gateActivity.setGateActivityLevelId(WDDXProcessor.convertToInteger(activityDetails,
-		WDDXTAGS.GATE_ACTIVITY_LEVEL_ID));
+	gateActivity.setGateActivityLevelId(
+		WDDXProcessor.convertToInteger(activityDetails, WDDXTAGS.GATE_ACTIVITY_LEVEL_ID));
 	gateActivity.setGateOpen(WDDXProcessor.convertToBoolean(activityDetails, WDDXTAGS.GATE_OPEN));
 
     }
@@ -2237,8 +2236,8 @@ public class ObjectExtractor implements IObjectExtractor {
 	    buildScheduleGateActivity((ScheduleGateActivity) activity, activityDetails);
 	}
 	GateActivity gateActivity = (GateActivity) activity;
-	gateActivity.setGateActivityLevelId((Integer) JsonUtil.opt(activityDetails,
-		AuthoringJsonTags.GATE_ACTIVITY_LEVEL_ID));
+	gateActivity.setGateActivityLevelId(
+		(Integer) JsonUtil.opt(activityDetails, AuthoringJsonTags.GATE_ACTIVITY_LEVEL_ID));
 	gateActivity.setGateOpen((Boolean) JsonUtil.opt(activityDetails, AuthoringJsonTags.GATE_OPEN));
 
     }
@@ -2269,8 +2268,8 @@ public class ObjectExtractor implements IObjectExtractor {
 	    throws JSONException {
 	activity.setGateStartTimeOffset(JsonUtil.optLong(activityDetails, AuthoringJsonTags.GATE_START_OFFSET));
 	activity.setGateEndTimeOffset(JsonUtil.optLong(activityDetails, AuthoringJsonTags.GATE_END_OFFSET));
-	activity.setGateActivityCompletionBased((Boolean) JsonUtil.opt(activityDetails,
-		AuthoringJsonTags.GATE_ACTIVITY_COMPLETION_BASED));
+	activity.setGateActivityCompletionBased(
+		(Boolean) JsonUtil.opt(activityDetails, AuthoringJsonTags.GATE_ACTIVITY_COMPLETION_BASED));
 	SystemTool systemTool = getSystemTool(SystemTool.SCHEDULE_GATE);
 	activity.setSystemTool(systemTool);
     }
@@ -2303,7 +2302,7 @@ public class ObjectExtractor implements IObjectExtractor {
      * Assumes that all the activities have been read and are in the newActivityMap. The toActivity and fromActivity are
      * only set if the activity exists in the newActivityMap. If this leaves the transition with no to/from activities
      * then null is returned.
-     * 
+     *
      * @param transitionDetails
      * @throws WDDXProcessorConversionException
      */
@@ -2331,9 +2330,9 @@ public class ObjectExtractor implements IObjectExtractor {
 
 	if (existingTransition == null) {
 	    if (false/*
-		     * It will soon be implemented in Flash. Now we need to check what kind of transition are we
-		     * dealing with transitionType.equals(Transition.DATA_TRANSITION_TYPE)
-		     */) {
+		      * It will soon be implemented in Flash. Now we need to check what kind of transition are we
+		      * dealing with transitionType.equals(Transition.DATA_TRANSITION_TYPE)
+		      */) {
 		transition = new DataTransition();
 	    } else {
 		transition = new Transition();
@@ -2402,9 +2401,9 @@ public class ObjectExtractor implements IObjectExtractor {
 
 	if (existingTransition == null) {
 	    if (false/*
-		     * It will soon be implemented in Flash. Now we need to check what kind of transition are we
-		     * dealing with transitionType.equals(Transition.DATA_TRANSITION_TYPE)
-		     */) {
+		      * It will soon be implemented in Flash. Now we need to check what kind of transition are we
+		      * dealing with transitionType.equals(Transition.DATA_TRANSITION_TYPE)
+		      */) {
 		transition = new DataTransition();
 	    } else {
 		transition = new Transition();
@@ -2478,12 +2477,13 @@ public class ObjectExtractor implements IObjectExtractor {
     /**
      * Search in learning design for existing object. Can't go to database as that will trigger a Flush, and we haven't
      * updated the rest of the design, so this would trigger a "deleted object would be re-saved by cascade" error.
-     * 
+     *
      * Check both the UUID for a match, and the to and from for a match. If the user deletes a transition then redraws
      * it between the same activities, then inserting a new one in the db will trigger a duplicate key exception. So we
      * need to reuse any that have the same to/from.
      */
-    private Transition findTransition(Integer transitionUUID, Integer toUIID, Integer fromUIID, Integer transitionType) {
+    private Transition findTransition(Integer transitionUUID, Integer toUIID, Integer fromUIID,
+	    Integer transitionType) {
 	Transition existingTransition = null;
 	Set transitions = learningDesign.getTransitions();
 	Iterator iter = transitions.iterator();
@@ -2504,7 +2504,7 @@ public class ObjectExtractor implements IObjectExtractor {
     /**
      * Checks whether the hashtable contains the key specified by <code>key</code> If the key exists, returns true,
      * otherwise return false.
-     * 
+     *
      * @param table
      *            The hashtable to check
      * @param key
@@ -2532,11 +2532,11 @@ public class ObjectExtractor implements IObjectExtractor {
     /**
      * Parses the mappings used for branching. They map groups to the sequence activities that form a branch within a
      * branching activity.
-     * 
+     *
      * Must be done after all the other parsing as we need to match up activities and groups.
-     * 
+     *
      * Will also delete any old (now unused) mappings
-     * 
+     *
      * @param branchMappingsList
      * @throws WDDXProcessorConversionException
      */
@@ -2614,8 +2614,8 @@ public class ObjectExtractor implements IObjectExtractor {
 	Long entryId = WDDXProcessor.convertToLong(details, WDDXTAGS.BRANCH_ACTIVITY_ENTRY_ID);
 	Integer entryUIID = WDDXProcessor.convertToInteger(details, WDDXTAGS.BRANCH_ACTIVITY_ENTRY_UIID);
 	if (entryUIID == null) {
-	    throw new WDDXProcessorConversionException("Group based branch mapping entry is missing its UUID. Entry "
-		    + details);
+	    throw new WDDXProcessorConversionException(
+		    "Group based branch mapping entry is missing its UUID. Entry " + details);
 	}
 
 	Integer sequenceActivityUIID = WDDXProcessor.convertToInteger(details, WDDXTAGS.BRANCH_SEQUENCE_ACTIVITY_UIID);
@@ -2763,8 +2763,8 @@ public class ObjectExtractor implements IObjectExtractor {
 	return entry;
     }
 
-    private BranchActivityEntry extractBranchActivityEntry(JSONObject details) throws JSONException,
-	    ObjectExtractorException {
+    private BranchActivityEntry extractBranchActivityEntry(JSONObject details)
+	    throws JSONException, ObjectExtractorException {
 
 	Long entryId = JsonUtil.optLong(details, AuthoringJsonTags.BRANCH_ACTIVITY_ENTRY_ID);
 	Integer entryUIID = details.getInt(AuthoringJsonTags.BRANCH_ACTIVITY_ENTRY_UIID);
@@ -2932,8 +2932,9 @@ public class ObjectExtractor implements IObjectExtractor {
 		condition = entry.getCondition();
 	    }
 	    if ((condition != null) && (conditionID != null) && !condition.getConditionId().equals(conditionID)) {
-		log.warn("Unexpected behaviour: condition supplied in WDDX packet has a different ID to matching branch activity entry in the database. Dropping old database condition."
-			+ " Old db condition " + condition + " new entry in WDDX " + conditionTable);
+		log.warn(
+			"Unexpected behaviour: condition supplied in WDDX packet has a different ID to matching branch activity entry in the database. Dropping old database condition."
+				+ " Old db condition " + condition + " new entry in WDDX " + conditionTable);
 		condition = null; // Hibernate should dispose of it
 		// automatically via the cascade
 	    }
@@ -2962,8 +2963,9 @@ public class ObjectExtractor implements IObjectExtractor {
 		    condition.setConditionUIID(conditionUIID);
 		}
 	    } else if (condition == null) {
-		condition = new BranchCondition(null, conditionUIID, WDDXProcessor.convertToInteger(conditionTable,
-			WDDXTAGS.ORDER_ID), WDDXProcessor.convertToString(conditionTable, WDDXTAGS.CONDITION_NAME),
+		condition = new BranchCondition(null, conditionUIID,
+			WDDXProcessor.convertToInteger(conditionTable, WDDXTAGS.ORDER_ID),
+			WDDXProcessor.convertToString(conditionTable, WDDXTAGS.CONDITION_NAME),
 			WDDXProcessor.convertToString(conditionTable, WDDXTAGS.CONDITION_DISPLAY_NAME),
 			WDDXProcessor.convertToString(conditionTable, WDDXTAGS.CONDITION_TYPE),
 			WDDXProcessor.convertToString(conditionTable, WDDXTAGS.CONDITION_START_VALUE),
@@ -2974,8 +2976,8 @@ public class ObjectExtractor implements IObjectExtractor {
 		condition
 			.setDisplayName(WDDXProcessor.convertToString(conditionTable, WDDXTAGS.CONDITION_DISPLAY_NAME));
 		condition.setEndValue(WDDXProcessor.convertToString(conditionTable, WDDXTAGS.CONDITION_END_VALUE));
-		condition.setExactMatchValue(WDDXProcessor.convertToString(conditionTable,
-			WDDXTAGS.CONDITION_EXACT_MATCH_VALUE));
+		condition.setExactMatchValue(
+			WDDXProcessor.convertToString(conditionTable, WDDXTAGS.CONDITION_EXACT_MATCH_VALUE));
 		condition.setName(WDDXProcessor.convertToString(conditionTable, WDDXTAGS.CONDITION_NAME));
 		condition.setOrderId(WDDXProcessor.convertToInteger(conditionTable, WDDXTAGS.ORDER_ID));
 		condition.setStartValue(WDDXProcessor.convertToString(conditionTable, WDDXTAGS.CONDITION_START_VALUE));
@@ -2997,8 +2999,9 @@ public class ObjectExtractor implements IObjectExtractor {
 		condition = entry.getCondition();
 	    }
 	    if ((condition != null) && (conditionID != null) && !condition.getConditionId().equals(conditionID)) {
-		log.warn("Unexpected behaviour: condition supplied in WDDX packet has a different ID to matching branch activity entry in the database. Dropping old database condition."
-			+ " Old db condition " + condition + " new entry in WDDX " + conditionDetails);
+		log.warn(
+			"Unexpected behaviour: condition supplied in WDDX packet has a different ID to matching branch activity entry in the database. Dropping old database condition."
+				+ " Old db condition " + condition + " new entry in WDDX " + conditionDetails);
 		condition = null; // Hibernate should dispose of it
 		// automatically via the cascade
 	    }
@@ -3028,20 +3031,20 @@ public class ObjectExtractor implements IObjectExtractor {
 			conditionDetails.getInt(AuthoringJsonTags.ORDER_ID),
 			conditionDetails.getString(AuthoringJsonTags.CONDITION_NAME),
 			conditionDetails.getString(AuthoringJsonTags.CONDITION_DISPLAY_NAME),
-			conditionDetails.getString(AuthoringJsonTags.CONDITION_TYPE), (String) JsonUtil.opt(
-				conditionDetails, AuthoringJsonTags.CONDITION_START_VALUE), (String) JsonUtil.opt(
-				conditionDetails, AuthoringJsonTags.CONDITION_END_VALUE), (String) JsonUtil.opt(
-				conditionDetails, AuthoringJsonTags.CONDITION_EXACT_MATCH_VALUE));
+			conditionDetails.getString(AuthoringJsonTags.CONDITION_TYPE),
+			(String) JsonUtil.opt(conditionDetails, AuthoringJsonTags.CONDITION_START_VALUE),
+			(String) JsonUtil.opt(conditionDetails, AuthoringJsonTags.CONDITION_END_VALUE),
+			(String) JsonUtil.opt(conditionDetails, AuthoringJsonTags.CONDITION_EXACT_MATCH_VALUE));
 	    } else {
 		condition.setConditionUIID(conditionUIID);
 		condition.setDisplayName(conditionDetails.getString(AuthoringJsonTags.CONDITION_DISPLAY_NAME));
 		condition.setEndValue((String) JsonUtil.opt(conditionDetails, AuthoringJsonTags.CONDITION_END_VALUE));
-		condition.setExactMatchValue((String) JsonUtil.opt(conditionDetails,
-			AuthoringJsonTags.CONDITION_EXACT_MATCH_VALUE));
+		condition.setExactMatchValue(
+			(String) JsonUtil.opt(conditionDetails, AuthoringJsonTags.CONDITION_EXACT_MATCH_VALUE));
 		condition.setName(conditionDetails.getString(AuthoringJsonTags.CONDITION_NAME));
 		condition.setOrderId(conditionDetails.getInt(AuthoringJsonTags.ORDER_ID));
-		condition.setStartValue((String) JsonUtil
-			.opt(conditionDetails, AuthoringJsonTags.CONDITION_START_VALUE));
+		condition.setStartValue(
+			(String) JsonUtil.opt(conditionDetails, AuthoringJsonTags.CONDITION_START_VALUE));
 		condition.setType(conditionDetails.getString(AuthoringJsonTags.CONDITION_TYPE));
 	    }
 	}
@@ -3112,8 +3115,8 @@ public class ObjectExtractor implements IObjectExtractor {
 		learnerChoiceGrouping.setEqualNumberOfLearnersPerGroup(equalNumberOfLearnersPerGroup);
 	    }
 	}
-	learnerChoiceGrouping.setViewStudentsBeforeSelection((Boolean) JsonUtil.opt(groupingDetails,
-		AuthoringJsonTags.VIEW_STUDENTS_BEFORE_SELECTION));
+	learnerChoiceGrouping.setViewStudentsBeforeSelection(
+		(Boolean) JsonUtil.opt(groupingDetails, AuthoringJsonTags.VIEW_STUDENTS_BEFORE_SELECTION));
     }
 
     private void buildConditionGateActivity(ConditionGateActivity activity) {

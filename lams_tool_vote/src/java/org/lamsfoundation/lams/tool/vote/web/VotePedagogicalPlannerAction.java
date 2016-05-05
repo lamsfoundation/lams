@@ -2,21 +2,21 @@
  * Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
  * =============================================================
  * License Information: http://lamsfoundation.org/licensing/lams/2.0/
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301
  * USA
- * 
+ *
  * http://www.gnu.org/licenses/gpl.txt
  * ****************************************************************
  */
@@ -82,8 +82,8 @@ public class VotePedagogicalPlannerAction extends LamsDispatchAction {
 		    plannerForm.removeNomination(nominationIndex - 1);
 		} else {
 		    if (nominationIndex <= voteContent.getVoteQueContents().size()) {
-			VoteQueContent voteQueContent = getVoteService().getQuestionByDisplayOrder(
-				(long) nominationIndex, voteContent.getUid());
+			VoteQueContent voteQueContent = getVoteService()
+				.getQuestionByDisplayOrder((long) nominationIndex, voteContent.getUid());
 			voteQueContent.setQuestion(nomination);
 			getVoteService().saveOrUpdateVoteQueContent(voteQueContent);
 
@@ -102,8 +102,8 @@ public class VotePedagogicalPlannerAction extends LamsDispatchAction {
 		getVoteService().removeQuestionsFromCache(voteContent);
 		getVoteService().removeVoteContentFromCache(voteContent);
 		for (; nominationIndex <= voteContent.getVoteQueContents().size(); nominationIndex++) {
-		    VoteQueContent voteQueContent = getVoteService().getQuestionByDisplayOrder(
-			    (long) nominationIndex, voteContent.getUid());
+		    VoteQueContent voteQueContent = getVoteService().getQuestionByDisplayOrder((long) nominationIndex,
+			    voteContent.getUid());
 		    getVoteService().removeVoteQueContent(voteQueContent);
 		}
 	    }
@@ -121,8 +121,8 @@ public class VotePedagogicalPlannerAction extends LamsDispatchAction {
     }
 
     private IVoteService getVoteService() {
-	WebApplicationContext wac = WebApplicationContextUtils.getRequiredWebApplicationContext(getServlet()
-		.getServletContext());
+	WebApplicationContext wac = WebApplicationContextUtils
+		.getRequiredWebApplicationContext(getServlet().getServletContext());
 	return VoteServiceProxy.getVoteService(getServlet().getServletContext());
     }
 }

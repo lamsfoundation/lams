@@ -18,52 +18,50 @@
  *
  * http://www.gnu.org/licenses/gpl.txt
  * ****************************************************************
- */ 
- 
-/* $Id$ */ 
-package org.lamsfoundation.lams.usermanagement.dto; 
+ */
+
+/* $Id$ */
+package org.lamsfoundation.lams.usermanagement.dto;
 
 import java.util.List;
- 
+
 /**
  * @author jliew
  *
  */
 public class BulkUpdateResultDTO {
 
-	private int numSearchResults;
-	private int numUsersCreated;
-	private int numUsersUpdated;
-	private int numUsersDisabled;
-	private List<String> messages;
-	
-	public BulkUpdateResultDTO(int results, int created, 
-			int updated, int disabled, List<String> messages) {
-		this.numSearchResults = results;
-		this.numUsersCreated = created;
-		this.numUsersUpdated = updated;
-		this.numUsersDisabled = disabled;
-		this.messages = messages;
-	}
-	
-	public int getNumSearchResults() {
-		return numSearchResults;
-	}
-	
-	public int getNumUsersCreated() {
-		return numUsersCreated;
-	}
-	
-	public int getNumUsersUpdated() {
-		return numUsersUpdated;
-	}
-	
-	public int getNumUsersDisabled() {
-		return numUsersDisabled;
-	}
-	
-	public List<String> getMessages() {
-		return messages;
-	}
+    private int numSearchResults;
+    private int numUsersCreated;
+    private int numUsersUpdated;
+    private int numUsersDisabled;
+    private List<String> messages;
+
+    public BulkUpdateResultDTO(int results, int created, int updated, int disabled, List<String> messages) {
+	this.numSearchResults = results;
+	this.numUsersCreated = created;
+	this.numUsersUpdated = updated;
+	this.numUsersDisabled = disabled;
+	this.messages = messages;
+    }
+
+    public int getNumSearchResults() {
+	return numSearchResults;
+    }
+
+    public int getNumUsersCreated() {
+	return numUsersCreated;
+    }
+
+    public int getNumUsersUpdated() {
+	return numUsersUpdated;
+    }
+
+    public int getNumUsersDisabled() {
+	return numUsersDisabled;
+    }
+
+    public List<String> getMessages() {
+	return messages;
+    }
 }
- 

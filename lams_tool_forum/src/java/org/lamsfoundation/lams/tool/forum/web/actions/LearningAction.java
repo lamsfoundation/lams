@@ -2,21 +2,21 @@
  * Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
  * =============================================================
  * License Information: http://lamsfoundation.org/licensing/lams/2.0/
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License version 2.0 
+ * it under the terms of the GNU General Public License version 2.0
  * as published by the Free Software Foundation.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301
  * USA
- * 
+ *
  * http://www.gnu.org/licenses/gpl.txt
  * ****************************************************************
  */
@@ -25,9 +25,6 @@
 package org.lamsfoundation.lams.tool.forum.web.actions;
 
 import java.io.IOException;
-import java.text.DateFormat;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -69,7 +66,6 @@ import org.lamsfoundation.lams.tool.forum.persistence.ForumUser;
 import org.lamsfoundation.lams.tool.forum.persistence.Message;
 import org.lamsfoundation.lams.tool.forum.persistence.MessageSeq;
 import org.lamsfoundation.lams.tool.forum.persistence.PersistenceException;
-import org.lamsfoundation.lams.tool.forum.persistence.Timestamp;
 import org.lamsfoundation.lams.tool.forum.service.ForumServiceProxy;
 import org.lamsfoundation.lams.tool.forum.service.IForumService;
 import org.lamsfoundation.lams.tool.forum.util.ForumConstants;
@@ -78,9 +74,9 @@ import org.lamsfoundation.lams.tool.forum.web.forms.ReflectionForm;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.util.Configuration;
 import org.lamsfoundation.lams.util.ConfigurationKeys;
+import org.lamsfoundation.lams.util.DateUtil;
 import org.lamsfoundation.lams.util.FileValidatorUtil;
 import org.lamsfoundation.lams.util.WebUtil;
-import org.lamsfoundation.lams.util.DateUtil;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.lamsfoundation.lams.web.util.SessionMap;
@@ -169,9 +165,9 @@ public class LearningAction extends Action {
     // ==========================================================================================
     /**
      * Display root topics of a forum. This page will be the initial page of Learner page.
-     * 
+     *
      * @throws Exception
-     * 
+     *
      */
     private ActionForward viewForum(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) throws Exception {
@@ -260,8 +256,8 @@ public class LearningAction extends Action {
 	int numOfRatings = forumService.getNumOfRatingsByUserAndForum(forumUser.getUid(), forum.getUid());
 	boolean noMoreRatings = (forum.getMaximumRate() != 0) && (numOfRatings >= forum.getMaximumRate())
 		&& forum.isAllowRateMessages();
-	boolean isMinRatingsCompleted = (forum.getMinimumRate() == 0) || (numOfRatings >= forum.getMinimumRate())
-		&& forum.isAllowRateMessages();
+	boolean isMinRatingsCompleted = (forum.getMinimumRate() == 0)
+		|| (numOfRatings >= forum.getMinimumRate()) && forum.isAllowRateMessages();
 	sessionMap.put(ForumConstants.ATTR_NO_MORE_RATINGSS, noMoreRatings);
 	sessionMap.put(ForumConstants.ATTR_IS_MIN_RATINGS_COMPLETED, isMinRatingsCompleted);
 	sessionMap.put(ForumConstants.ATTR_NUM_OF_RATINGS, numOfRatings);
@@ -301,8 +297,8 @@ public class LearningAction extends Action {
 	if (!forum.isAllowNewTopic()) {
 	    // add the number post the learner has made for each topic.
 	    for (MessageDTO messageDTO : rootTopics) {
-		int numOfPosts = forumService.getNumOfPostsByTopic(forumUser.getUserId(), messageDTO.getMessage()
-			.getUid());
+		int numOfPosts = forumService.getNumOfPostsByTopic(forumUser.getUserId(),
+			messageDTO.getMessage().getUid());
 		messageDTO.setNumOfPosts(numOfPosts);
 	    }
 	}
@@ -348,7 +344,7 @@ public class LearningAction extends Action {
 
     /**
      * Learner click "finish" button in forum page, this method will turn on session status flag for this learner.
-     * 
+     *
      * @param mapping
      * @param form
      * @param request
@@ -379,8 +375,8 @@ public class LearningAction extends Action {
 
 		// finish current session for user
 		forumService.finishUserSession(getCurrentUser(request, sessionId));
-		ToolSessionManager sessionMgrService = ForumServiceProxy.getToolSessionManager(getServlet()
-			.getServletContext());
+		ToolSessionManager sessionMgrService = ForumServiceProxy
+			.getToolSessionManager(getServlet().getServletContext());
 		nextActivityUrl = sessionMgrService.leaveToolSession(sessionId, userID);
 		response.sendRedirect(nextActivityUrl);
 	    } catch (DataMissingException e) {
@@ -402,7 +398,7 @@ public class LearningAction extends Action {
 
     /**
      * Submit reflection form input database.
-     * 
+     *
      * @param mapping
      * @param form
      * @param request
@@ -438,7 +434,7 @@ public class LearningAction extends Action {
 
     /**
      * Display empty reflection form.
-     * 
+     *
      * @param mapping
      * @param form
      * @param request
@@ -481,9 +477,9 @@ public class LearningAction extends Action {
     // ==========================================================================================
 
     /**
-     * Display the messages for a particular topic. The Topic will arranged by Tree structure and loaded 
+     * Display the messages for a particular topic. The Topic will arranged by Tree structure and loaded
      * thread by thread (with paging).
-     * 
+     *
      * @param mapping
      * @param form
      * @param request
@@ -507,7 +503,7 @@ public class LearningAction extends Action {
 
 	Long lastMsgSeqId = WebUtil.readLongParam(request, ForumConstants.PAGE_LAST_ID, true);
 	Long pageSize = WebUtil.readLongParam(request, ForumConstants.PAGE_SIZE, true);
-	
+
 	setupViewTopicPagedDTOList(request, rootTopicId, sessionMapID, forumUser, forum, lastMsgSeqId, pageSize);
 
 	// Should we show the reflection or not? We shouldn't show it when the View Forum screen is accessed
@@ -528,7 +524,7 @@ public class LearningAction extends Action {
 	updateMesssageFlag(msgDtoList);
 	request.setAttribute(ForumConstants.AUTHORING_TOPIC_THREAD, msgDtoList);
 
-	// check if we can still make posts in this topic 
+	// check if we can still make posts in this topic
 	int numOfPosts = forumService.getNumOfPostsByTopic(forumUser.getUserId(), rootTopicId);
 	boolean noMorePosts = forum.getMaximumReply() != 0 && numOfPosts >= forum.getMaximumReply()
 		&& !forum.isAllowNewTopic() ? Boolean.TRUE : Boolean.FALSE;
@@ -543,8 +539,9 @@ public class LearningAction extends Action {
     }
 
     /**
-     * Display the messages for a particular thread in a particular topic. Returns all messages for this thread - does not need paging.
-     * 
+     * Display the messages for a particular thread in a particular topic. Returns all messages for this thread - does
+     * not need paging.
+     *
      * @param mapping
      * @param form
      * @param request
@@ -572,15 +569,15 @@ public class LearningAction extends Action {
 	updateMesssageFlag(msgDtoList);
 	request.setAttribute(ForumConstants.AUTHORING_TOPIC_THREAD, msgDtoList);
 
-	// check if we can still make posts in this topic 
+	// check if we can still make posts in this topic
 	int numOfPosts = forumService.getNumOfPostsByTopic(forumUser.getUserId(), rootTopicId);
 	boolean noMorePosts = forum.getMaximumReply() != 0 && numOfPosts >= forum.getMaximumReply()
 		&& !forum.isAllowNewTopic() ? Boolean.TRUE : Boolean.FALSE;
 	request.setAttribute(ForumConstants.ATTR_NO_MORE_POSTS, noMorePosts);
 	request.setAttribute(ForumConstants.ATTR_NUM_OF_POSTS, numOfPosts);
 	request.setAttribute(ForumConstants.ATTR_NO_MORE_PAGES, true);
-	
-	if ( highlightMessageUid != null ) {
+
+	if (highlightMessageUid != null) {
 	    request.setAttribute(ForumConstants.ATTR_MESS_ID, highlightMessageUid);
 	}
 	// transfer SessionMapID as well
@@ -591,7 +588,7 @@ public class LearningAction extends Action {
 
     /**
      * Display a single message.
-     * 
+     *
      * @param mapping
      * @param form
      * @param request
@@ -618,15 +615,15 @@ public class LearningAction extends Action {
 	updateMesssageFlag(msgDtoList);
 	request.setAttribute(ForumConstants.AUTHORING_TOPIC_THREAD, msgDtoList);
 
-	// check if we can still make posts in this topic 
+	// check if we can still make posts in this topic
 	int numOfPosts = forumService.getNumOfPostsByTopic(forumUser.getUserId(), rootTopicId);
 	boolean noMorePosts = forum.getMaximumReply() != 0 && numOfPosts >= forum.getMaximumReply()
 		&& !forum.isAllowNewTopic() ? Boolean.TRUE : Boolean.FALSE;
 	request.setAttribute(ForumConstants.ATTR_NO_MORE_POSTS, noMorePosts);
 	request.setAttribute(ForumConstants.ATTR_NUM_OF_POSTS, numOfPosts);
 	request.setAttribute(ForumConstants.ATTR_NO_MORE_PAGES, true);
-	
-	if ( messageUid != null ) {
+
+	if (messageUid != null) {
 	    request.setAttribute(ForumConstants.ATTR_MESS_ID, messageUid);
 	}
 	// transfer SessionMapID as well
@@ -637,7 +634,7 @@ public class LearningAction extends Action {
 
     /**
      * Display empty page for a new topic in forum
-     * 
+     *
      * @param mapping
      * @param form
      * @param request
@@ -654,7 +651,7 @@ public class LearningAction extends Action {
 
     /**
      * Create a new root topic.
-     * 
+     *
      * @param mapping
      * @param form
      * @param request
@@ -714,7 +711,7 @@ public class LearningAction extends Action {
 
     /**
      * Display replay topic page. Message form subject will include parent topics same subject.
-     * 
+     *
      * @param mapping
      * @param form
      * @param request
@@ -767,7 +764,7 @@ public class LearningAction extends Action {
 
     /**
      * Create a replayed topic for a parent topic.
-     * 
+     *
      * @param mapping
      * @param form
      * @param request
@@ -809,8 +806,8 @@ public class LearningAction extends Action {
 	ForumToolSession session = forumService.getSessionBySessionId(sessionId);
 	Forum forum = session.getForum();
 
-	setupViewTopicPagedDTOList(request, rootTopicId, messageForm.getSessionMapID(), forumUser, forum, null, null); 
-	
+	setupViewTopicPagedDTOList(request, rootTopicId, messageForm.getSessionMapID(), forumUser, forum, null, null);
+
 	// notify learners and teachers
 	Long forumId = (Long) sessionMap.get(ForumConstants.ATTR_FORUM_ID);
 	forumService.sendNotificationsOnNewPosting(forumId, sessionId, message);
@@ -820,18 +817,19 @@ public class LearningAction extends Action {
 
     /**
      * Create a replayed topic for a parent topic.
-     * 
+     *
      * @param mapping
      * @param form
      * @param request
      * @param response
      * @return
      * @throws InterruptedException
-     * @throws JSONException 
-     * @throws IOException 
+     * @throws JSONException
+     * @throws IOException
      */
-    private synchronized ActionForward replyTopicInline(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws InterruptedException, JSONException, IOException {
+    private synchronized ActionForward replyTopicInline(ActionMapping mapping, ActionForm form,
+	    HttpServletRequest request, HttpServletResponse response)
+	    throws InterruptedException, JSONException, IOException {
 
 	MessageForm messageForm = (MessageForm) form;
 	SessionMap sessionMap = getSessionMap(request, messageForm);
@@ -880,7 +878,7 @@ public class LearningAction extends Action {
 
     /**
      * Display a editable form for a special topic in order to update it.
-     * 
+     *
      * @param mapping
      * @param form
      * @param request
@@ -919,7 +917,7 @@ public class LearningAction extends Action {
     /**
      * Delete attachment from topic. This method only reset attachment information in memory. The finally update will
      * happen in <code>updateTopic</code> method. So topic can keep this attachment if user choose "Cancel" edit topic.
-     * 
+     *
      * @param mapping
      * @param form
      * @param request
@@ -933,8 +931,8 @@ public class LearningAction extends Action {
 	MessageDTO dto = new MessageDTO();
 	dto.setHasAttachment(false);
 	request.setAttribute(ForumConstants.AUTHORING_TOPIC, dto);
-	SessionMap sessionMap = (SessionMap) request.getSession().getAttribute(
-		WebUtil.readStrParam(request, ForumConstants.ATTR_SESSION_MAP_ID));
+	SessionMap sessionMap = (SessionMap) request.getSession()
+		.getAttribute(WebUtil.readStrParam(request, ForumConstants.ATTR_SESSION_MAP_ID));
 	request.setAttribute(ForumConstants.ATTR_ALLOW_UPLOAD, sessionMap.get(ForumConstants.ATTR_ALLOW_UPLOAD));
 
 	return mapping.findForward("success");
@@ -942,7 +940,7 @@ public class LearningAction extends Action {
 
     /**
      * Update a topic.
-     * 
+     *
      * @param mapping
      * @param form
      * @param request
@@ -967,12 +965,12 @@ public class LearningAction extends Action {
 	ForumUser forumUser = getCurrentUser(request, (Long) sessionMap.get(AttributeNames.PARAM_TOOL_SESSION_ID));
 	Forum forum = forumUser.getSession().getForum();
 	setupViewTopicPagedDTOList(request, rootTopicId, messageForm.getSessionMapID(), forumUser, forum, null, null);
-		    
+
 	return mapping.findForward("success");
     }
 
-    private void doUpdateTopic(HttpServletRequest request, MessageForm messageForm, SessionMap sessionMap,
-	    Long topicId, Message message) {
+    private void doUpdateTopic(HttpServletRequest request, MessageForm messageForm, SessionMap sessionMap, Long topicId,
+	    Message message) {
 	boolean makeAuditEntry = ToolAccessMode.TEACHER.equals(sessionMap.get(AttributeNames.ATTR_MODE));
 	String oldMessageString = null;
 
@@ -994,8 +992,8 @@ public class LearningAction extends Action {
 		userId = message.getCreatedBy().getUserId();
 		loginName = message.getCreatedBy().getLoginName();
 	    }
-	    forumService.getAuditService().logChange(ForumConstants.TOOL_SIGNATURE, userId, loginName,
-		    oldMessageString, messagePO.toString());
+	    forumService.getAuditService().logChange(ForumConstants.TOOL_SIGNATURE, userId, loginName, oldMessageString,
+		    messagePO.toString());
 	}
 
 	// save message into database
@@ -1005,15 +1003,15 @@ public class LearningAction extends Action {
 
     /**
      * Update a topic.
-     * 
+     *
      * @param mapping
      * @param form
      * @param request
      * @param response
      * @return
      * @throws PersistenceException
-     * @throws JSONException 
-     * @throws IOException 
+     * @throws JSONException
+     * @throws IOException
      */
     public ActionForward updateTopicInline(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) throws PersistenceException, JSONException, IOException {
@@ -1039,7 +1037,7 @@ public class LearningAction extends Action {
 
     /**
      * Sets the visibility of a message by updating the hide flag for a message
-     * 
+     *
      * @param mapping
      * @param form
      * @param request
@@ -1085,7 +1083,7 @@ public class LearningAction extends Action {
 
     /**
      * Rates postings submitted by other learners.
-     * 
+     *
      * @param mapping
      * @param form
      * @param request
@@ -1097,26 +1095,25 @@ public class LearningAction extends Action {
 
 	forumService = getForumManager();
 	String sessionMapId = WebUtil.readStrParam(request, ForumConstants.ATTR_SESSION_MAP_ID);
-	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession().getAttribute(
-		sessionMapId);
+	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
+		.getAttribute(sessionMapId);
 	Long forumUid = (Long) sessionMap.get(ForumConstants.ATTR_FORUM_UID);
 	Long userUid = (Long) sessionMap.get(ForumConstants.ATTR_USER_UID);
 	boolean isAllowRateMessages = (Boolean) sessionMap.get(ForumConstants.ATTR_ALLOW_RATE_MESSAGES);
 	int forumMaximumRate = (Integer) sessionMap.get(ForumConstants.ATTR_MAXIMUM_RATE);
 	int forumMinimumRate = (Integer) sessionMap.get(ForumConstants.ATTR_MINIMUM_RATE);
-	
-	float rating = Float.parseFloat((String) request.getParameter("rate"));
+
+	float rating = Float.parseFloat(request.getParameter("rate"));
 	Long responseId = WebUtil.readLongParam(request, "idBox");
 	Long toolSessionID = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_SESSION_ID);
 	UserDTO user = (UserDTO) SessionManager.getSession().getAttribute(AttributeNames.USER);
 	Long userId = new Long(user.getUserID().intValue());
 
 	AverageRatingDTO averageRatingDTO = forumService.rateMessage(responseId, userId, toolSessionID, rating);
-	
+
 	//refresh numOfRatings and noMoreRatings
 	int numOfRatings = forumService.getNumOfRatingsByUserAndForum(userUid, forumUid);
-	boolean noMoreRatings = (forumMaximumRate != 0) && (numOfRatings >= forumMaximumRate)
-		&& isAllowRateMessages;
+	boolean noMoreRatings = (forumMaximumRate != 0) && (numOfRatings >= forumMaximumRate) && isAllowRateMessages;
 	boolean isMinRatingsCompleted = (forumMinimumRate != 0) && (numOfRatings >= forumMinimumRate)
 		&& isAllowRateMessages;
 	sessionMap.put(ForumConstants.ATTR_NO_MORE_RATINGSS, noMoreRatings);
@@ -1175,9 +1172,10 @@ public class LearningAction extends Action {
     }
 
     /**
-     * This method will set flag in message DTO: <li>If this topic is created by current login user, then set Author
+     * This method will set flag in message DTO:
+     * <li>If this topic is created by current login user, then set Author
      * mark true.</li>
-     * 
+     *
      * @param msgDtoList
      */
     private void updateMesssageFlag(List msgDtoList) {
@@ -1214,7 +1212,7 @@ public class LearningAction extends Action {
     /**
      * Get login user information from system level session. Check it whether it exists in database or not, and save it
      * if it does not exists. Return an instance of PO of ForumUser.
-     * 
+     *
      * @param request
      * @param sessionId
      * @return Current user instance
@@ -1236,13 +1234,13 @@ public class LearningAction extends Action {
 
     /**
      * Get Forum Service.
-     * 
+     *
      * @return
      */
     private IForumService getForumManager() {
 	if (forumService == null) {
-	    WebApplicationContext wac = WebApplicationContextUtils.getRequiredWebApplicationContext(getServlet()
-		    .getServletContext());
+	    WebApplicationContext wac = WebApplicationContextUtils
+		    .getRequiredWebApplicationContext(getServlet().getServletContext());
 	    forumService = (IForumService) wac.getBean(ForumConstants.FORUM_SERVICE);
 	}
 	return forumService;

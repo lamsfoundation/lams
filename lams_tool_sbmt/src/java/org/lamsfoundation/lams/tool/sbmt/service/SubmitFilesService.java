@@ -2,21 +2,21 @@
  * Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
  * =============================================================
  * License Information: http://lamsfoundation.org/licensing/lams/2.0/
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License version 2.0 
+ * it under the terms of the GNU General Public License version 2.0
  * as published by the Free Software Foundation.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301
  * USA
- * 
+ *
  * http://www.gnu.org/licenses/gpl.txt
  * ****************************************************************
  */
@@ -268,7 +268,7 @@ public class SubmitFilesService implements ToolContentManager, ToolSessionManage
 
     /**
      * Export the XML fragment for the tool's content, along with any files needed for the content.
-     * 
+     *
      * @throws ExportToolContentException
      */
     @Override
@@ -336,7 +336,7 @@ public class SubmitFilesService implements ToolContentManager, ToolSessionManage
      * that are always available for the tool (e.g. number of marks for Multiple Choice) or a custom definition created
      * for a particular activity such as the answer to the third question contains the word Koala and hence the need for
      * the toolContentId
-     * 
+     *
      * @return SortedMap of ToolOutputDefinitions with the key being the name of each definition
      */
     @Override
@@ -385,10 +385,10 @@ public class SubmitFilesService implements ToolContentManager, ToolSessionManage
     /**
      * This method verifies the credentials of the SubmitFiles Tool and gives it the <code>Ticket</code> to login and
      * access the Content Repository.
-     * 
+     *
      * A valid ticket is needed in order to access the content from the repository. This method would be called evertime
      * the tool needs to upload/download files from the content repository.
-     * 
+     *
      * @return ITicket The ticket for repostory access
      * @throws SubmitFilesException
      */
@@ -565,7 +565,7 @@ public class SubmitFilesService implements ToolContentManager, ToolSessionManage
 
     /**
      * Process an uploaded file.
-     * 
+     *
      * @param forumForm
      * @throws FileNotFoundException
      * @throws IOException
@@ -597,7 +597,7 @@ public class SubmitFilesService implements ToolContentManager, ToolSessionManage
 
     /**
      * (non-Javadoc)
-     * 
+     *
      * @see org.lamsfoundation.lams.tool.sbmt.service.ISubmitFilesService#getFilesUploadedByUserForContent(java.lang.Long,
      *      java.lang.Long)
      */
@@ -662,7 +662,7 @@ public class SubmitFilesService implements ToolContentManager, ToolSessionManage
 
     /**
      * (non-Javadoc)
-     * 
+     *
      * @see org.lamsfoundation.lams.tool.sbmt.service.ISubmitFilesService#getUsersBySession(java.lang.Long)
      */
     @Override
@@ -809,7 +809,7 @@ public class SubmitFilesService implements ToolContentManager, ToolSessionManage
 
     /**
      * Sends marks to gradebook
-     * 
+     *
      * @param user
      * @param toolSessionID
      */
@@ -840,8 +840,9 @@ public class SubmitFilesService implements ToolContentManager, ToolSessionManage
 
     /*
      * (non-Javadoc)
-     * 
-     * @see org.lamsfoundation.lams.tool.sbmt.service.ISubmitFilesService#getToolDefaultContentIdBySignature(java.lang.Long)
+     *
+     * @see
+     * org.lamsfoundation.lams.tool.sbmt.service.ISubmitFilesService#getToolDefaultContentIdBySignature(java.lang.Long)
      */
     @Override
     public Long getToolDefaultContentIdBySignature(String toolSignature) {
@@ -857,7 +858,7 @@ public class SubmitFilesService implements ToolContentManager, ToolSessionManage
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.lamsfoundation.lams.tool.sbmt.service.ISubmitFilesService#createDefaultContent(java.lang.Long)
      */
     @Override
@@ -984,8 +985,8 @@ public class SubmitFilesService implements ToolContentManager, ToolSessionManage
     @Override
     public List<Object[]> getUsersForTablesorter(final Long sessionId, int page, int size, int sorting,
 	    String searchString, boolean getNotebookEntries) {
-	return submitUserDAO.getUsersForTablesorter(sessionId, page, size, sorting, searchString,
-		getNotebookEntries, coreNotebookService);
+	return submitUserDAO.getUsersForTablesorter(sessionId, page, size, sorting, searchString, getNotebookEntries,
+		coreNotebookService);
     }
 
     @Override
@@ -997,7 +998,7 @@ public class SubmitFilesService implements ToolContentManager, ToolSessionManage
     public List<StatisticDTO> getStatisticsBySession(final Long contentId) {
 	return submitUserDAO.getStatisticsBySession(contentId);
     }
-    
+
     public SubmitUser createContentUser(Integer userId, String firstName, String lastName, String loginName,
 	    Long contentId) {
 	SubmitUser author = submitUserDAO.getContentUser(contentId, userId);

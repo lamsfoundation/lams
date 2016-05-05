@@ -12,13 +12,13 @@ import org.springframework.scheduling.quartz.QuartzJobBean;
 /**
  * Quartz job for resending messages. This job is scheduled from the start-up and periodically attempts to resend failed
  * and marked for resending messages.
- * 
+ *
  * @author Administrator
- * 
+ *
  */
 public class ResendMessagesJob extends QuartzJobBean {
     protected static final Logger log = Logger.getLogger(ResendMessagesJob.class);
-    
+
     /**
      * Period after which the thread gives up on attempting to resend messages. Currently - 2 days.
      */
@@ -40,12 +40,13 @@ public class ResendMessagesJob extends QuartzJobBean {
 		    event.notificationThread.join();
 		    if (event.getSubscriptions().isEmpty()) {
 			event.deleted = true;
-		    } else if (System.currentTimeMillis() - event.getFailTime().getTime() >= ResendMessagesJob.RESEND_TIME_LIMIT) {
+		    } else if (System.currentTimeMillis()
+			    - event.getFailTime().getTime() >= ResendMessagesJob.RESEND_TIME_LIMIT) {
 			event.deleted = true;
 			StringBuilder body = new StringBuilder(
-				ResendMessagesJob.messageService.getMessage("mail.resend.abandon.body1")).append(
-				event.getDefaultMessage()).append(
-				ResendMessagesJob.messageService.getMessage("mail.resend.abandon.body2"));
+				ResendMessagesJob.messageService.getMessage("mail.resend.abandon.body1"))
+					.append(event.getDefaultMessage()).append(ResendMessagesJob.messageService
+						.getMessage("mail.resend.abandon.body2"));
 			for (Subscription subscription : event.getSubscriptions()) {
 			    User user = (User) EventNotificationService.getInstance().getUserManagementService()
 				    .findById(User.class, subscription.getUserId());
@@ -57,13 +58,12 @@ public class ResendMessagesJob extends QuartzJobBean {
 		    }
 		} else {
 		    for (Subscription subscription : event.getSubscriptions()) {
-			if ((subscription.getLastOperationTime() != null)
-				&& (System.currentTimeMillis() - subscription.getLastOperationTime().getTime() > subscription
-					.getPeriodicity())) {
-			    String subject = event.getSubject() == null ? event.getDefaultSubject() : event
-				    .getSubject();
-			    String message = event.getMessage() == null ? event.getDefaultMessage() : event
-				    .getMessage();
+			if ((subscription.getLastOperationTime() != null) && (System.currentTimeMillis()
+				- subscription.getLastOperationTime().getTime() > subscription.getPeriodicity())) {
+			    String subject = event.getSubject() == null ? event.getDefaultSubject()
+				    : event.getSubject();
+			    String message = event.getMessage() == null ? event.getDefaultMessage()
+				    : event.getMessage();
 			    boolean isHtmlFormat = event.isHtmlFormat();
 			    subscription.notifyUser(subject, message, isHtmlFormat);
 			}

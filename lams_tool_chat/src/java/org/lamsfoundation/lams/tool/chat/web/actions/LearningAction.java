@@ -2,21 +2,21 @@
  * Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
  * =============================================================
  * License Information: http://lamsfoundation.org/licensing/lams/2.0/
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301
  * USA
- * 
+ *
  * http://www.gnu.org/licenses/gpl.txt
  * ****************************************************************
  */
@@ -74,7 +74,7 @@ import org.lamsfoundation.lams.web.util.AttributeNames;
 /**
  * @author
  * @version
- * 
+ *
  * @struts.action path="/learning" parameter="dispatch" scope="request" name="learningForm"
  * @struts.action-forward name="learning" path="tiles:/learning/main"
  * @struts.action-forward name="submissionDeadline" path="tiles:/learning/submissionDeadline"
@@ -103,8 +103,8 @@ public class LearningAction extends LamsDispatchAction {
 		activeUsers.clear();
 
 		// read active users from all nodes
-		List<ChatUser> storedActiveUsers = chatService.getUsersActiveBySessionId(user.getChatSession()
-			.getSessionId());
+		List<ChatUser> storedActiveUsers = chatService
+			.getUsersActiveBySessionId(user.getChatSession().getSessionId());
 		roster.clear();
 		for (ChatUser activeUser : storedActiveUsers) {
 		    roster.add(activeUser.getNickname());
@@ -176,8 +176,8 @@ public class LearningAction extends LamsDispatchAction {
 	    chatService.saveOrUpdateChat(chat);
 	}
 
-	LearningWebUtil.putActivityPositionInRequestByToolSessionId(toolSessionID, request, getServlet()
-		.getServletContext());
+	LearningWebUtil.putActivityPositionInRequestByToolSessionId(toolSessionID, request,
+		getServlet().getServletContext());
 
 	/* Check if submission deadline is null */
 
@@ -361,8 +361,8 @@ public class LearningAction extends LamsDispatchAction {
 		    // all messasges need to be written out, not only new ones,
 		    // as old ones could have been edited or hidden by Monitor
 		    if (!message.isHidden()) {
-			String filteredMessage = chatService.filterMessage(message.getBody(), chatUser.getChatSession()
-				.getChat());
+			String filteredMessage = chatService.filterMessage(message.getBody(),
+				chatUser.getChatSession().getChat());
 
 			JSONObject messageJSON = new JSONObject();
 			messageJSON.put("body", filteredMessage);

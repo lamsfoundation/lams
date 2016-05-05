@@ -2,21 +2,21 @@
  * Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
  * =============================================================
  * License Information: http://lamsfoundation.org/licensing/lams/2.0/
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301
  * USA
- * 
+ *
  * http://www.gnu.org/licenses/gpl.txt
  * ****************************************************************
  */
@@ -24,11 +24,9 @@
 package org.lamsfoundation.lams.tool.commonCartridge.web.action;
 
 import java.io.IOException;
-import java.io.PrintWriter;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
@@ -55,7 +53,6 @@ import org.apache.struts.action.ActionMessage;
 import org.apache.struts.action.ActionMessages;
 import org.apache.struts.upload.FormFile;
 import org.lamsfoundation.lams.authoring.web.AuthoringConstants;
-import org.lamsfoundation.lams.contentrepository.client.IToolContentHandler;
 import org.lamsfoundation.lams.tool.ToolAccessMode;
 import org.lamsfoundation.lams.tool.commonCartridge.CommonCartridgeConstants;
 import org.lamsfoundation.lams.tool.commonCartridge.model.CommonCartridge;
@@ -153,7 +150,7 @@ public class AuthoringAction extends Action {
     /**
      * Remove commonCartridge item from HttpSession list and update page display. As authoring rule, all persist only
      * happen when user submit whole page. So this remove is just impact HttpSession values.
-     * 
+     *
      * @param mapping
      * @param form
      * @param request
@@ -185,7 +182,7 @@ public class AuthoringAction extends Action {
 
     /**
      * Display edit page for existed commonCartridge item.
-     * 
+     *
      * @param mapping
      * @param form
      * @param request
@@ -214,7 +211,7 @@ public class AuthoringAction extends Action {
 
     /**
      * Display empty page for new commonCartridge item.
-     * 
+     *
      * @param mapping
      * @param form
      * @param request
@@ -235,7 +232,7 @@ public class AuthoringAction extends Action {
      * <code>HttpSession</code> CommonCartridgeItemList. Notice, this save is not persist them into database, just save
      * <code>HttpSession</code> temporarily. Only they will be persist when the entire authoring page is being
      * persisted.
-     * 
+     *
      * @param mapping
      * @param form
      * @param request
@@ -262,8 +259,8 @@ public class AuthoringAction extends Action {
 	    }
 	} catch (Exception e) {
 	    // any upload exception will display as normal error message rather then throw exception directly
-	    errors.add(ActionMessages.GLOBAL_MESSAGE, new ActionMessage(
-		    CommonCartridgeConstants.ERROR_MSG_UPLOAD_FAILED, e.getMessage()));
+	    errors.add(ActionMessages.GLOBAL_MESSAGE,
+		    new ActionMessage(CommonCartridgeConstants.ERROR_MSG_UPLOAD_FAILED, e.getMessage()));
 	    if (!errors.isEmpty()) {
 		this.addErrors(request, errors);
 		return findForward(itemForm.getItemType(), mapping);
@@ -272,17 +269,17 @@ public class AuthoringAction extends Action {
 	// set session map ID so that itemlist.jsp can get sessionMAP
 	request.setAttribute(CommonCartridgeConstants.ATTR_SESSION_MAP_ID, itemForm.getSessionMapID());
 	// return null to close this window
-	
+
 	if (type == CommonCartridgeConstants.RESOURCE_TYPE_COMMON_CARTRIDGE) {
 	    return mapping.findForward("selectResources");
 	} else {
 	    return mapping.findForward(CommonCartridgeConstants.SUCCESS);
-	}	
+	}
     }
-    
+
     /**
-     * 
-     * 
+     *
+     *
      * @param mapping
      * @param form
      * @param request
@@ -297,17 +294,17 @@ public class AuthoringAction extends Action {
 	SessionMap sessionMap = (SessionMap) request.getSession().getAttribute(sessionMapID);
 	List<CommonCartridgeItem> uploadedCartridgeResources = getUploadedCartridgeResources(sessionMap);
 	int countUploadedResources = uploadedCartridgeResources.size();
-	
+
 	SortedSet<CommonCartridgeItem> items = getCommonCartridgeItemList(sessionMap);
-	
+
 	for (int i = 0; i < countUploadedResources; i++) {
 	    String itemStr = request.getParameter(CommonCartridgeConstants.ATTR_ITEM + i);
 	    if (StringUtils.isBlank(itemStr)) {
 		continue;
 	    }
-	    
+
 	    CommonCartridgeItem resource = uploadedCartridgeResources.get(i);
-	    
+
 	    String launchUrl = request.getParameter(CommonCartridgeConstants.ATTR_LAUNCH_URL + i);
 	    resource.setLaunchUrl(launchUrl);
 	    String secureLaunchUrl = request.getParameter(CommonCartridgeConstants.ATTR_SECURE_LAUNCH_URL + i);
@@ -322,29 +319,27 @@ public class AuthoringAction extends Action {
 	    resource.setOpenUrlNewWindow(isOpenUrlNewWindow != null);
 	    int frameHeight = WebUtil.readIntParam(request, CommonCartridgeConstants.ATTR_FRAME_HEIGHT + i, true);
 	    resource.setFrameHeight(frameHeight);
-	    
+
 	    //add selected resource to item list
 	    items.add(resource);
 	}
-	
-	
+
 	// set session map ID so that itemlist.jsp can get sessionMAP
 	request.setAttribute(CommonCartridgeConstants.ATTR_SESSION_MAP_ID, sessionMapID);
 	// return null to close this window
-	
 
 	return mapping.findForward(CommonCartridgeConstants.SUCCESS);
-	
+
     }
 
     /**
      * Read commonCartridge data from database and put them into HttpSession. It will redirect to init.do directly after
      * this method run successfully.
-     * 
+     *
      * This method will avoid read database again and lost un-saved resouce item lost when user "refresh page",
-     * 
+     *
      * @throws ServletException
-     * 
+     *
      */
     private ActionForward start(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) throws ServletException {
@@ -419,7 +414,7 @@ public class AuthoringAction extends Action {
 
     /**
      * Display same entire authoring page content from HttpSession variable.
-     * 
+     *
      * @param mapping
      * @param form
      * @param request
@@ -452,7 +447,7 @@ public class AuthoringAction extends Action {
     /**
      * This method will persist all inforamtion in this authoring page, include all commonCartridge item, information
      * etc.
-     * 
+     *
      * @param mapping
      * @param form
      * @param request
@@ -483,8 +478,8 @@ public class AuthoringAction extends Action {
 	ICommonCartridgeService service = getCommonCartridgeService();
 
 	// **********************************Get CommonCartridge PO*********************
-	CommonCartridge commonCartridgePO = service.getCommonCartridgeByContentId(commonCartridgeForm
-		.getCommonCartridge().getContentId());
+	CommonCartridge commonCartridgePO = service
+		.getCommonCartridgeByContentId(commonCartridgeForm.getCommonCartridge().getContentId());
 	if (commonCartridgePO == null) {
 	    // new CommonCartridge, create it.
 	    commonCartridgePO = commonCartridge;
@@ -517,9 +512,9 @@ public class AuthoringAction extends Action {
 	}
 
 	commonCartridgePO.setCreatedBy(commonCartridgeUser);
-	
+
 	// ************************* Handle commonCartridge items *******************
-	
+
 	Set itemList = new LinkedHashSet();
 	SortedSet topics = getCommonCartridgeItemList(sessionMap);
 	Iterator iter = topics.iterator();
@@ -568,24 +563,24 @@ public class AuthoringAction extends Action {
      * Return CommonCartridgeService bean.
      */
     private ICommonCartridgeService getCommonCartridgeService() {
-	WebApplicationContext wac = WebApplicationContextUtils.getRequiredWebApplicationContext(getServlet()
-		.getServletContext());
+	WebApplicationContext wac = WebApplicationContextUtils
+		.getRequiredWebApplicationContext(getServlet().getServletContext());
 	return (ICommonCartridgeService) wac.getBean(CommonCartridgeConstants.RESOURCE_SERVICE);
     }
 
     /**
      * List items from fresh uploaded cartridge.
-     * 
+     *
      * @param request
      * @return
      */
     private List<CommonCartridgeItem> getUploadedCartridgeResources(SessionMap sessionMap) {
 	return getListFromSession(sessionMap, "uploadedCartridgeResources");
     }
-    
+
     /**
      * List save current commonCartridge items.
-     * 
+     *
      * @param request
      * @return
      */
@@ -601,7 +596,7 @@ public class AuthoringAction extends Action {
 
     /**
      * List save deleted commonCartridge items, which could be persisted or non-persisted items.
-     * 
+     *
      * @param request
      * @return
      */
@@ -611,7 +606,7 @@ public class AuthoringAction extends Action {
 
     /**
      * Get <code>java.util.List</code> from HttpSession by given name.
-     * 
+     *
      * @param request
      * @param name
      * @return
@@ -627,7 +622,7 @@ public class AuthoringAction extends Action {
 
     /**
      * Get back relative <code>ActionForward</code> from request.
-     * 
+     *
      * @param type
      * @param mapping
      * @return
@@ -635,22 +630,22 @@ public class AuthoringAction extends Action {
     private ActionForward findForward(short type, ActionMapping mapping) {
 	ActionForward forward;
 	switch (type) {
-	case CommonCartridgeConstants.RESOURCE_TYPE_BASIC_LTI:
-	    forward = mapping.findForward("basiclti");
-	    break;
-	case CommonCartridgeConstants.RESOURCE_TYPE_COMMON_CARTRIDGE:
-	    forward = mapping.findForward("commoncartridge");
-	    break;
-	default:
-	    forward = null;
-	    break;
+	    case CommonCartridgeConstants.RESOURCE_TYPE_BASIC_LTI:
+		forward = mapping.findForward("basiclti");
+		break;
+	    case CommonCartridgeConstants.RESOURCE_TYPE_COMMON_CARTRIDGE:
+		forward = mapping.findForward("commoncartridge");
+		break;
+	    default:
+		forward = null;
+		break;
 	}
 	return forward;
     }
 
     /**
      * This method will populate commonCartridge item information to its form for edit use.
-     * 
+     *
      * @param itemIdx
      * @param item
      * @param form
@@ -663,7 +658,7 @@ public class AuthoringAction extends Action {
 	if (itemIdx >= 0) {
 	    form.setItemIndex(new Integer(itemIdx).toString());
 	}
-	
+
 	if (StringUtils.isBlank(item.getLaunchUrl()) && StringUtils.isNotBlank(item.getSecureLaunchUrl())) {
 	    form.setUrl(item.getSecureLaunchUrl());
 	} else {
@@ -693,13 +688,14 @@ public class AuthoringAction extends Action {
 
     /**
      * Uploads common cartridge and parses it to commonCartridge items.
-     * 
+     *
      * @param request
      * @param itemForm
-     * @throws UploadCommonCartridgeFileException 
+     * @throws UploadCommonCartridgeFileException
      */
-    private void uploadCommonCartridge(HttpServletRequest request, CommonCartridgeItemForm itemForm) throws UploadCommonCartridgeFileException {
-		
+    private void uploadCommonCartridge(HttpServletRequest request, CommonCartridgeItemForm itemForm)
+	    throws UploadCommonCartridgeFileException {
+
 	// if the item is edit (not new add) then the getFile may return null
 	// it may throw exception, so put it as first, to avoid other invlidate update:
 	List<CommonCartridgeItem> items = null;
@@ -712,7 +708,7 @@ public class AuthoringAction extends Action {
 		throw e;
 	    }
 	}
-	
+
 	for (CommonCartridgeItem item : items) {
 	    item.setCreateDate(new Timestamp(new Date().getTime()));
 	    item.setType(CommonCartridgeConstants.RESOURCE_TYPE_BASIC_LTI);
@@ -729,7 +725,7 @@ public class AuthoringAction extends Action {
 
     /**
      * Extract web from content to commonCartridge item.
-     * 
+     *
      * @param request
      * @param itemForm
      * @throws CommonCartridgeApplicationException
@@ -758,19 +754,19 @@ public class AuthoringAction extends Action {
 	}
 	short type = itemForm.getItemType();
 	item.setType(itemForm.getItemType());
-	
+
 	item.setTitle(itemForm.getTitle());
 	item.setCreateByAuthor(true);
 	item.setHide(false);
 
 	if (type == CommonCartridgeConstants.RESOURCE_TYPE_BASIC_LTI) {
-	    
+
 	    if (StringUtils.isBlank(item.getLaunchUrl()) && StringUtils.isNotBlank(item.getSecureLaunchUrl())) {
 		item.setSecureLaunchUrl(itemForm.getUrl());
 	    } else {
 		item.setLaunchUrl(itemForm.getUrl());
 	    }
-	    
+
 	    item.setKey(itemForm.getKey());
 	    item.setSecret(itemForm.getSecret());
 	    item.setButtonText(itemForm.getButtonText());
@@ -787,7 +783,7 @@ public class AuthoringAction extends Action {
 
     /**
      * Vaidate commonCartridge item regards to their type (url/file/learning object/website zip file)
-     * 
+     *
      * @param itemForm
      * @return
      */
@@ -796,20 +792,20 @@ public class AuthoringAction extends Action {
 
 	if (itemForm.getItemType() == CommonCartridgeConstants.RESOURCE_TYPE_BASIC_LTI) {
 	    if (StringUtils.isBlank(itemForm.getTitle())) {
-		errors.add(ActionMessages.GLOBAL_MESSAGE, new ActionMessage(
-			CommonCartridgeConstants.ERROR_MSG_TITLE_BLANK));
-	    }	    
-	    
+		errors.add(ActionMessages.GLOBAL_MESSAGE,
+			new ActionMessage(CommonCartridgeConstants.ERROR_MSG_TITLE_BLANK));
+	    }
+
 	    if (StringUtils.isBlank(itemForm.getUrl())) {
-		errors.add(ActionMessages.GLOBAL_MESSAGE, new ActionMessage(
-			CommonCartridgeConstants.ERROR_MSG_URL_BLANK));
+		errors.add(ActionMessages.GLOBAL_MESSAGE,
+			new ActionMessage(CommonCartridgeConstants.ERROR_MSG_URL_BLANK));
 		// URL validation: Commom URL validate(1.3.0) work not very well: it can not support http://
 		// address:port format!!!
 		// UrlValidator validator = new UrlValidator();
 		// if(!validator.isValid(itemForm.getUrl()))
 		// errors.add(ActionMessages.GLOBAL_MESSAGE,new
 		// ActionMessage(CommonCartridgeConstants.ERROR_MSG_INVALID_URL));
-	    }    
+	    }
 	}
 	// if(itemForm.getItemType() == CommonCartridgeConstants.RESOURCE_TYPE_WEBSITE
 	// ||itemForm.getItemType() == CommonCartridgeConstants.RESOURCE_TYPE_LEARNING_OBJECT){
@@ -822,8 +818,8 @@ public class AuthoringAction extends Action {
 	    // for edit validate: file already exist
 	    if (!itemForm.isHasFile()
 		    && (itemForm.getFile() == null || StringUtils.isEmpty(itemForm.getFile().getFileName()))) {
-		errors.add(ActionMessages.GLOBAL_MESSAGE, new ActionMessage(
-			CommonCartridgeConstants.ERROR_MSG_FILE_BLANK));
+		errors.add(ActionMessages.GLOBAL_MESSAGE,
+			new ActionMessage(CommonCartridgeConstants.ERROR_MSG_FILE_BLANK));
 	    }
 	}
 	return errors;
@@ -831,7 +827,7 @@ public class AuthoringAction extends Action {
 
     /**
      * Get ToolAccessMode from HttpRequest parameters. Default value is AUTHOR mode.
-     * 
+     *
      * @param request
      * @return
      */
@@ -877,7 +873,7 @@ public class AuthoringAction extends Action {
 	    plannerForm.setContentFolderID(contentFolderId);
 	    return mapping.findForward(CommonCartridgeConstants.SUCCESS);
 	}
-	
+
 	return null;
 
     }
@@ -887,8 +883,8 @@ public class AuthoringAction extends Action {
 	CommonCartridgePedagogicalPlannerForm plannerForm = (CommonCartridgePedagogicalPlannerForm) form;
 	ActionMessages errors = plannerForm.validate();
 	if (errors.isEmpty()) {
-	    CommonCartridge taskList = getCommonCartridgeService().getCommonCartridgeByContentId(
-		    plannerForm.getToolContentID());
+	    CommonCartridge taskList = getCommonCartridgeService()
+		    .getCommonCartridgeByContentId(plannerForm.getToolContentID());
 	    taskList.setInstructions(plannerForm.getInstructions());
 
 	    int itemIndex = 0;

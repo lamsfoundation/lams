@@ -2,21 +2,21 @@
  * Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
  * =============================================================
  * License Information: http://lamsfoundation.org/licensing/lams/2.0/
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License version 2.0 
+ * it under the terms of the GNU General Public License version 2.0
  * as published by the Free Software Foundation.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301
  * USA
- * 
+ *
  * http://www.gnu.org/licenses/gpl.txt
  * ****************************************************************
  */
@@ -37,9 +37,9 @@ import org.springframework.orm.hibernate3.support.HibernateDaoSupport;
 
 /**
  * @version
- * 
+ *
  * 	 Wrapper of HibernteTemplate() with some more OO methods
- * 
+ *
  *          <p>
  *          <a href="BaseDAO.java.html"><i>View Source</i></a>
  *          </p>
@@ -80,7 +80,9 @@ public class BaseDAO extends HibernateDaoSupport implements IBaseDAO {
 	getHibernateTemplate().flush();
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see org.lamsfoundation.lams.dao.IBaseDAO#insert(java.lang.Object)
      */
     @Override
@@ -88,7 +90,9 @@ public class BaseDAO extends HibernateDaoSupport implements IBaseDAO {
 	getHibernateTemplate().save(object);
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see org.lamsfoundation.lams.dao.IBaseDAO#update(java.lang.Object)
      */
     @Override
@@ -96,7 +100,9 @@ public class BaseDAO extends HibernateDaoSupport implements IBaseDAO {
 	getHibernateTemplate().update(object);
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see org.lamsfoundation.lams.dao.IBaseDAO#insertOrUpdate(java.lang.Object)
      */
     @Override
@@ -104,7 +110,9 @@ public class BaseDAO extends HibernateDaoSupport implements IBaseDAO {
 	getHibernateTemplate().saveOrUpdate(object);
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see org.lamsfoundation.lams.dao.IBaseDAO#insertOrUpdateAll(java.util.Collection)
      */
     @Override
@@ -153,7 +161,9 @@ public class BaseDAO extends HibernateDaoSupport implements IBaseDAO {
 	// TODO implement me
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see org.lamsfoundation.lams.dao.IBaseDAO#delete(java.lang.Object)
      */
     @Override
@@ -161,7 +171,9 @@ public class BaseDAO extends HibernateDaoSupport implements IBaseDAO {
 	getHibernateTemplate().delete(object);
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see org.lamsfoundation.lams.dao.IBaseDAO#deleteAll(java.lang.Class)
      */
     @Override
@@ -170,7 +182,9 @@ public class BaseDAO extends HibernateDaoSupport implements IBaseDAO {
 	getHibernateTemplate().bulkUpdate(queryString);
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see org.lamsfoundation.lams.dao.IBaseDAO#deleteAll(java.util.Collection)
      */
     @Override
@@ -178,7 +192,9 @@ public class BaseDAO extends HibernateDaoSupport implements IBaseDAO {
 	getHibernateTemplate().deleteAll(objects);
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see org.lamsfoundation.lams.dao.IBaseDAO#deleteById(java.lang.Class, java.io.Serializable)
      */
     @Override
@@ -186,7 +202,9 @@ public class BaseDAO extends HibernateDaoSupport implements IBaseDAO {
 	delete(find(clazz, id));
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see org.lamsfoundation.lams.dao.IBaseDAO#deleteByProperty(java.lang.Class, java.lang.String, java.lang.Object)
      */
     @Override
@@ -195,7 +213,9 @@ public class BaseDAO extends HibernateDaoSupport implements IBaseDAO {
 	getHibernateTemplate().bulkUpdate(queryString, value);
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see org.lamsfoundation.lams.dao.IBaseDAO#deleteByProperties(java.lang.Class, java.util.Map)
      */
     @Override
@@ -204,7 +224,9 @@ public class BaseDAO extends HibernateDaoSupport implements IBaseDAO {
 	getHibernateTemplate().bulkUpdate(qv.queryString, qv.values);
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see org.lamsfoundation.lams.dao.IBaseDAO#deleteAnythingLike(java.lang.Object)
      */
     @Override
@@ -217,7 +239,9 @@ public class BaseDAO extends HibernateDaoSupport implements IBaseDAO {
 	}
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see org.lamsfoundation.lams.dao.IBaseDAO#find(java.lang.Class, java.io.Serializable)
      */
     @Override
@@ -225,7 +249,9 @@ public class BaseDAO extends HibernateDaoSupport implements IBaseDAO {
 	return getHibernateTemplate().get(clazz, id);
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see org.lamsfoundation.lams.dao.IBaseDAO#findAll(java.lang.Class)
      */
     @Override
@@ -233,7 +259,9 @@ public class BaseDAO extends HibernateDaoSupport implements IBaseDAO {
 	return getHibernateTemplate().loadAll(clazz);
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see org.lamsfoundation.lams.dao.IBaseDAO#findByProperty(java.lang.Class, java.lang.String, java.lang.Object)
      */
     @Override
@@ -242,7 +270,9 @@ public class BaseDAO extends HibernateDaoSupport implements IBaseDAO {
 	return getHibernateTemplate().find(queryString, value);
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see org.lamsfoundation.lams.dao.IBaseDAO#findByProperties(java.lang.Class, java.util.Map)
      */
     @Override
@@ -251,7 +281,9 @@ public class BaseDAO extends HibernateDaoSupport implements IBaseDAO {
 	return getHibernateTemplate().find(qv.queryString, qv.values);
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see org.lamsfoundation.lams.dao.IBaseDAO#findAnythingLike(java.lang.Object)
      */
     @Override
@@ -388,7 +420,9 @@ public class BaseDAO extends HibernateDaoSupport implements IBaseDAO {
 	getHibernateTemplate().initialize(proxy);
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see org.lamsfoundation.lams.dao.IBaseDAO#countAll(java.lang.Class)
      */
     @Override
@@ -404,7 +438,9 @@ public class BaseDAO extends HibernateDaoSupport implements IBaseDAO {
 	}
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see org.lamsfoundation.lams.dao.IBaseDAO#countByProperties(java.lang.Class, java.util.Map)
      */
     @Override

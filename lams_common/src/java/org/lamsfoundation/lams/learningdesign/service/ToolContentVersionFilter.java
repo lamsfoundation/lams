@@ -26,14 +26,14 @@ import com.thoughtworks.xstream.XStream;
  * <li>upXXXToXXX</li>
  * <li>downXXXToXXX</li>
  * </ol>
- * 
+ *
  * The XXX must be integer format, which is Tool version number.
  * <p>
  * For more detail, in <a
  * href="http://wiki.lamsfoundation.org/display/lams/How+to+implement+export+and+import+tool+content">wiki</a>.
- * 
+ *
  * @author Dapeng.Ni
- * 
+ *
  */
 public class ToolContentVersionFilter {
 
@@ -72,7 +72,7 @@ public class ToolContentVersionFilter {
 	    defaultValue = defaultValue2;
 	}
     }
-    
+
     // container class for renamed class
     class RenamedField {
 	public Class ownerClass;
@@ -89,7 +89,7 @@ public class ToolContentVersionFilter {
     /**
      * When a field is removed to tool Hibernate POJO class, this method must be call in upXXXToYYY()/downXXXToYYY()
      * methods.
-     * 
+     *
      * @param ownerClass
      * @param fieldname
      */
@@ -100,18 +100,18 @@ public class ToolContentVersionFilter {
     /**
      * When a field is added to tool Hibernate POJO class, this method is optional in upXXXToYYY()/downXXXToYYY()
      * methods. It could set default value for this added fields.
-     * 
+     *
      * @param ownerClass
      * @param fieldname
      */
     public void addField(Class ownerClass, String fieldname, Object defaultValue) {
 	addedFieldList.add(new AddedField(ownerClass, fieldname, defaultValue));
     }
-    
+
     /**
      * When a field is renamed in tool Hibernate POJO class, this method must be call in upXXXToYYY()/downXXXToYYY()
      * methods.
-     * 
+     *
      * @param ownerClass
      * @param fieldname
      */
@@ -121,7 +121,7 @@ public class ToolContentVersionFilter {
 
     /**
      * Call by lams import tool service core. Do not use it in tool version filter class.
-     * 
+     *
      * @param toolFilePath
      * @throws JDOMException
      * @throws IOException
@@ -169,7 +169,7 @@ public class ToolContentVersionFilter {
 			+ added.ownerClass.getName() + " is add by value " + added.defaultValue);
 	    }
 	}
-	
+
 	// rename all marked fields for this class
 	for (RenamedField renamed : renamedFieldList) {
 	    if (StringUtils.equals(root.getName(), renamed.ownerClass.getName())) {

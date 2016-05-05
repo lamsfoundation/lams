@@ -34,7 +34,7 @@ import org.apache.commons.lang.builder.HashCodeBuilder;
 public class Question {
     // just for convenience when returning from methods
     public static final Question[] QUESTION_ARRAY_TYPE = new Question[] {};
-    
+
     public static final String QUESTION_TYPE_MULTIPLE_CHOICE = "mc";
     public static final String QUESTION_TYPE_MULTIPLE_RESPONSE = "mr";
     public static final String QUESTION_TYPE_TRUE_FALSE = "tf";
@@ -42,10 +42,10 @@ public class Question {
     public static final String QUESTION_TYPE_MATCHING = "mt";
     public static final String QUESTION_TYPE_FILL_IN_BLANK = "fb";
     public static final String QUESTION_TYPE_MARK_HEDGING = "mh";
-    public static final Set<String> QUESTION_TYPES = new TreeSet<String>(Arrays.asList(new String[] {
-	    Question.QUESTION_TYPE_MULTIPLE_CHOICE, Question.QUESTION_TYPE_MULTIPLE_RESPONSE,
-	    Question.QUESTION_TYPE_TRUE_FALSE, Question.QUESTION_TYPE_ESSAY, Question.QUESTION_TYPE_MATCHING,
-	    Question.QUESTION_TYPE_FILL_IN_BLANK, Question.QUESTION_TYPE_MARK_HEDGING }));
+    public static final Set<String> QUESTION_TYPES = new TreeSet<String>(Arrays
+	    .asList(new String[] { Question.QUESTION_TYPE_MULTIPLE_CHOICE, Question.QUESTION_TYPE_MULTIPLE_RESPONSE,
+		    Question.QUESTION_TYPE_TRUE_FALSE, Question.QUESTION_TYPE_ESSAY, Question.QUESTION_TYPE_MATCHING,
+		    Question.QUESTION_TYPE_FILL_IN_BLANK, Question.QUESTION_TYPE_MARK_HEDGING }));
 
     private String type;
     private String title;

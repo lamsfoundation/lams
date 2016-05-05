@@ -1,30 +1,29 @@
-/**************************************************************** 
- * Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org) 
- * ============================================================= 
- * License Information: http://lamsfoundation.org/licensing/lams/2.0/ 
- * 
- * This program is free software; you can redistribute it and/or modify 
- * it under the terms of the GNU General Public License version 2.0 
- * as published by the Free Software Foundation. 
- * 
- * This program is distributed in the hope that it will be useful, 
- * but WITHOUT ANY WARRANTY; without even the implied warranty of 
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the 
- * GNU General Public License for more details. 
- * 
- * You should have received a copy of the GNU General Public License 
- * along with this program; if not, write to the Free Software 
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 * USA 
- * 
- * http://www.gnu.org/licenses/gpl.txt 
- * **************************************************************** 
+/****************************************************************
+ * Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
+ * =============================================================
+ * License Information: http://lamsfoundation.org/licensing/lams/2.0/
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License version 2.0
+ * as published by the Free Software Foundation.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 * USA
+ *
+ * http://www.gnu.org/licenses/gpl.txt
+ * ****************************************************************
  */
 
 /* $Id$ */
 package org.lamsfoundation.lams.tool.imageGallery.service;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
@@ -32,7 +31,6 @@ import java.util.SortedMap;
 import java.util.TreeMap;
 
 import org.lamsfoundation.lams.rating.dto.ItemRatingDTO;
-import org.lamsfoundation.lams.rating.model.RatingCriteria;
 import org.lamsfoundation.lams.tool.OutputFactory;
 import org.lamsfoundation.lams.tool.SimpleURL;
 import org.lamsfoundation.lams.tool.ToolOutput;
@@ -59,31 +57,32 @@ public class ImageGalleryOutputFactory extends OutputFactory {
      * @see org.lamsfoundation.lams.tool.OutputDefinitionFactory#getToolOutputDefinitions(java.lang.Object)
      */
     @Override
-    public SortedMap<String, ToolOutputDefinition> getToolOutputDefinitions(Object toolContentObject, int definitionType) {
+    public SortedMap<String, ToolOutputDefinition> getToolOutputDefinitions(Object toolContentObject,
+	    int definitionType) {
 
 	TreeMap<String, ToolOutputDefinition> definitionMap = new TreeMap<String, ToolOutputDefinition>();
 
 	Class simpleUrlArrayClass = SimpleURL[].class;
 	switch (definitionType) {
-	case ToolOutputDefinition.DATA_OUTPUT_DEFINITION_TYPE_CONDITION:
-	    ToolOutputDefinition definition = buildRangeDefinition(
-		    ImageGalleryOutputFactory.OUTPUT_NAME_LEARNER_NUM_IMAGES_UPLOADED, new Long(0), null);
-	    definitionMap.put(ImageGalleryOutputFactory.OUTPUT_NAME_LEARNER_NUM_IMAGES_UPLOADED, definition);
+	    case ToolOutputDefinition.DATA_OUTPUT_DEFINITION_TYPE_CONDITION:
+		ToolOutputDefinition definition = buildRangeDefinition(
+			ImageGalleryOutputFactory.OUTPUT_NAME_LEARNER_NUM_IMAGES_UPLOADED, new Long(0), null);
+		definitionMap.put(ImageGalleryOutputFactory.OUTPUT_NAME_LEARNER_NUM_IMAGES_UPLOADED, definition);
 
-	    definition = buildRangeDefinition(ImageGalleryOutputFactory.OUTPUT_NAME_LEARNER_NUM_COMMENTS, new Long(0),
-		    null);
-	    definitionMap.put(ImageGalleryOutputFactory.OUTPUT_NAME_LEARNER_NUM_COMMENTS, definition);
+		definition = buildRangeDefinition(ImageGalleryOutputFactory.OUTPUT_NAME_LEARNER_NUM_COMMENTS,
+			new Long(0), null);
+		definitionMap.put(ImageGalleryOutputFactory.OUTPUT_NAME_LEARNER_NUM_COMMENTS, definition);
 
-	    definition = buildRangeDefinition(ImageGalleryOutputFactory.OUTPUT_NAME_LEARNER_NUM_VOTES, new Long(0),
-		    null);
-	    definitionMap.put(ImageGalleryOutputFactory.OUTPUT_NAME_LEARNER_NUM_VOTES, definition);
-	    break;
-	case ToolOutputDefinition.DATA_OUTPUT_DEFINITION_TYPE_DATA_FLOW:
-	    ToolOutputDefinition allUsersUploadedImagesDefinition = buildComplexOutputDefinition(
-		    ImageGalleryOutputFactory.OUTPUT_NAME_UPLOADED_IMAGES_URLS, simpleUrlArrayClass);
-	    definitionMap.put(ImageGalleryOutputFactory.OUTPUT_NAME_UPLOADED_IMAGES_URLS,
-		    allUsersUploadedImagesDefinition);
-	    break;
+		definition = buildRangeDefinition(ImageGalleryOutputFactory.OUTPUT_NAME_LEARNER_NUM_VOTES, new Long(0),
+			null);
+		definitionMap.put(ImageGalleryOutputFactory.OUTPUT_NAME_LEARNER_NUM_VOTES, definition);
+		break;
+	    case ToolOutputDefinition.DATA_OUTPUT_DEFINITION_TYPE_DATA_FLOW:
+		ToolOutputDefinition allUsersUploadedImagesDefinition = buildComplexOutputDefinition(
+			ImageGalleryOutputFactory.OUTPUT_NAME_UPLOADED_IMAGES_URLS, simpleUrlArrayClass);
+		definitionMap.put(ImageGalleryOutputFactory.OUTPUT_NAME_UPLOADED_IMAGES_URLS,
+			allUsersUploadedImagesDefinition);
+		break;
 	}
 
 	return definitionMap;
@@ -96,18 +95,18 @@ public class ImageGalleryOutputFactory extends OutputFactory {
 	// tool output cache
 	TreeMap<String, ToolOutput> baseOutputs = new TreeMap<String, ToolOutput>();
 	if (names == null) {
-	    outputs.put(ImageGalleryOutputFactory.OUTPUT_NAME_LEARNER_NUM_IMAGES_UPLOADED, getToolOutput(
-		    ImageGalleryOutputFactory.OUTPUT_NAME_LEARNER_NUM_IMAGES_UPLOADED, imageGalleryService,
-		    toolSessionId, learnerId));
-	    outputs.put(ImageGalleryOutputFactory.OUTPUT_NAME_LEARNER_NUM_COMMENTS, getToolOutput(
-		    ImageGalleryOutputFactory.OUTPUT_NAME_LEARNER_NUM_COMMENTS, imageGalleryService, toolSessionId,
-		    learnerId));
-	    outputs.put(ImageGalleryOutputFactory.OUTPUT_NAME_LEARNER_NUM_VOTES, getToolOutput(
-		    ImageGalleryOutputFactory.OUTPUT_NAME_LEARNER_NUM_VOTES, imageGalleryService, toolSessionId,
-		    learnerId));
-	    outputs.put(ImageGalleryOutputFactory.OUTPUT_NAME_UPLOADED_IMAGES_URLS, getToolOutput(
-		    ImageGalleryOutputFactory.OUTPUT_NAME_UPLOADED_IMAGES_URLS, imageGalleryService, toolSessionId,
-		    learnerId));
+	    outputs.put(ImageGalleryOutputFactory.OUTPUT_NAME_LEARNER_NUM_IMAGES_UPLOADED,
+		    getToolOutput(ImageGalleryOutputFactory.OUTPUT_NAME_LEARNER_NUM_IMAGES_UPLOADED,
+			    imageGalleryService, toolSessionId, learnerId));
+	    outputs.put(ImageGalleryOutputFactory.OUTPUT_NAME_LEARNER_NUM_COMMENTS,
+		    getToolOutput(ImageGalleryOutputFactory.OUTPUT_NAME_LEARNER_NUM_COMMENTS, imageGalleryService,
+			    toolSessionId, learnerId));
+	    outputs.put(ImageGalleryOutputFactory.OUTPUT_NAME_LEARNER_NUM_VOTES,
+		    getToolOutput(ImageGalleryOutputFactory.OUTPUT_NAME_LEARNER_NUM_VOTES, imageGalleryService,
+			    toolSessionId, learnerId));
+	    outputs.put(ImageGalleryOutputFactory.OUTPUT_NAME_UPLOADED_IMAGES_URLS,
+		    getToolOutput(ImageGalleryOutputFactory.OUTPUT_NAME_UPLOADED_IMAGES_URLS, imageGalleryService,
+			    toolSessionId, learnerId));
 	} else {
 	    for (String name : names) {
 		String[] nameParts = splitConditionName(name);
@@ -143,8 +142,8 @@ public class ImageGalleryOutputFactory extends OutputFactory {
 		    return getNumVotes(user, session, imageGalleryService);
 		} else if (nameParts[0].equals(ImageGalleryOutputFactory.OUTPUT_NAME_UPLOADED_IMAGES_URLS)) {
 		    List<SimpleURL> uploadedImagesUrls = new ArrayList<SimpleURL>();
-		    Set<ImageGalleryItem> sessionImages = imageGalleryService.getImagesForGroup(session
-			    .getImageGallery(), toolSessionId);
+		    Set<ImageGalleryItem> sessionImages = imageGalleryService
+			    .getImagesForGroup(session.getImageGallery(), toolSessionId);
 		    for (ImageGalleryItem image : sessionImages) {
 			if (!image.isCreateByAuthor()) {
 			    String serverUrl = Configuration.get(ConfigurationKeys.SERVER_URL);
@@ -159,9 +158,9 @@ public class ImageGalleryOutputFactory extends OutputFactory {
 			}
 		    }
 		    SimpleURL[] uploadedImagesUrlsArray = uploadedImagesUrls.toArray(new SimpleURL[] {});
-		    return new ToolOutput(ImageGalleryOutputFactory.OUTPUT_NAME_UPLOADED_IMAGES_URLS, getI18NText(
-			    ImageGalleryOutputFactory.OUTPUT_NAME_UPLOADED_IMAGES_URLS, true), uploadedImagesUrlsArray,
-			    false);
+		    return new ToolOutput(ImageGalleryOutputFactory.OUTPUT_NAME_UPLOADED_IMAGES_URLS,
+			    getI18NText(ImageGalleryOutputFactory.OUTPUT_NAME_UPLOADED_IMAGES_URLS, true),
+			    uploadedImagesUrlsArray, false);
 		}
 	    }
 	}
@@ -187,8 +186,8 @@ public class ImageGalleryOutputFactory extends OutputFactory {
 	    countImages = imageGallery.getImageGalleryItems().size();
 	}
 
-	return new ToolOutput(ImageGalleryOutputFactory.OUTPUT_NAME_LEARNER_NUM_IMAGES_UPLOADED, getI18NText(
-		ImageGalleryOutputFactory.OUTPUT_NAME_LEARNER_NUM_IMAGES_UPLOADED, true), countImages);
+	return new ToolOutput(ImageGalleryOutputFactory.OUTPUT_NAME_LEARNER_NUM_IMAGES_UPLOADED,
+		getI18NText(ImageGalleryOutputFactory.OUTPUT_NAME_LEARNER_NUM_IMAGES_UPLOADED, true), countImages);
     }
 
     /**
@@ -198,13 +197,13 @@ public class ImageGalleryOutputFactory extends OutputFactory {
 	    ImageGallerySession session) {
 	ImageGallery imageGallery = session.getImageGallery();
 	Long contentId = imageGallery.getContentId();
-	
+
 	Set<ImageGalleryItem> allImages = imageGallery.getImageGalleryItems();
 	List<Long> itemIds = new LinkedList<Long>();
 	for (ImageGalleryItem image : allImages) {
 	    itemIds.add(image.getUid());
 	}
-	
+
 	boolean isCommentsEnabled = imageGalleryService.isCommentsEnabled(contentId);
 
 	int countComments = 0;
@@ -230,8 +229,8 @@ public class ImageGalleryOutputFactory extends OutputFactory {
 	    }
 	}
 
-	return new ToolOutput(ImageGalleryOutputFactory.OUTPUT_NAME_LEARNER_NUM_IMAGES_UPLOADED, getI18NText(
-		ImageGalleryOutputFactory.OUTPUT_NAME_LEARNER_NUM_IMAGES_UPLOADED, true), countComments);
+	return new ToolOutput(ImageGalleryOutputFactory.OUTPUT_NAME_LEARNER_NUM_IMAGES_UPLOADED,
+		getI18NText(ImageGalleryOutputFactory.OUTPUT_NAME_LEARNER_NUM_IMAGES_UPLOADED, true), countComments);
     }
 
     /**
@@ -251,8 +250,8 @@ public class ImageGalleryOutputFactory extends OutputFactory {
 	    }
 	}
 
-	return new ToolOutput(ImageGalleryOutputFactory.OUTPUT_NAME_LEARNER_NUM_IMAGES_UPLOADED, getI18NText(
-		ImageGalleryOutputFactory.OUTPUT_NAME_LEARNER_NUM_IMAGES_UPLOADED, true), countVotes);
+	return new ToolOutput(ImageGalleryOutputFactory.OUTPUT_NAME_LEARNER_NUM_IMAGES_UPLOADED,
+		getI18NText(ImageGalleryOutputFactory.OUTPUT_NAME_LEARNER_NUM_IMAGES_UPLOADED, true), countVotes);
     }
 
 }

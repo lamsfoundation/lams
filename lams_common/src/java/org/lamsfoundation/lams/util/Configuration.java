@@ -2,21 +2,21 @@
  * Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
  * =============================================================
  * License Information: http://lamsfoundation.org/licensing/lams/2.0/
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License version 2.0 
+ * it under the terms of the GNU General Public License version 2.0
  * as published by the Free Software Foundation.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301
  * USA
- * 
+ *
  * http://www.gnu.org/licenses/gpl.txt
  * ****************************************************************
  */
@@ -47,7 +47,7 @@ import org.springframework.beans.factory.InitializingBean;
 
 /**
  * Configuration Object
- * 
+ *
  * @author Fei Yang
  * @author Mitchell Seaton
  * @author Luke Foxton
@@ -188,8 +188,8 @@ public class Configuration implements InitializingBean {
 	}
 
 	String refreshCacheIntervalString = Configuration.get(ConfigurationKeys.CONFIGURATION_CACHE_REFRESH_INTERVAL);
-	Long refreshCacheInterval = StringUtils.isBlank(refreshCacheIntervalString) ? null : Long
-		.valueOf(refreshCacheIntervalString);
+	Long refreshCacheInterval = StringUtils.isBlank(refreshCacheIntervalString) ? null
+		: Long.valueOf(refreshCacheIntervalString);
 	if ((refreshCacheInterval != null) && (refreshCacheInterval > 0)) {
 	    SimpleTrigger trigger = new SimpleTrigger("configurationCacheRefreshTrigger", null);
 	    trigger.setVolatility(true);
@@ -203,16 +203,16 @@ public class Configuration implements InitializingBean {
 	    try {
 		Configuration.scheduler.scheduleJob(jobDetail, trigger);
 	    } catch (SchedulerException e) {
-		Configuration.log
-			.error("Error while scheduling Configuration cache refresh. The cache will NOT be periodically updated.",
-				e);
+		Configuration.log.error(
+			"Error while scheduling Configuration cache refresh. The cache will NOT be periodically updated.",
+			e);
 	    }
 	}
     }
 
     /**
      * Get contents of lams_configuration and group them using header names as key. Includes ldap items.
-     * 
+     *
      * @return
      */
     public HashMap<String, ArrayList<ConfigurationItem>> arrangeItems() {
@@ -221,7 +221,7 @@ public class Configuration implements InitializingBean {
 
     /**
      * Get contents of lams_configuration and group them using header names as key.
-     * 
+     *
      * @param filter
      *            ITEMS_ALL: include all items; ITEMS_NON_LDAP: include non-ldap items only; ITEMS_ONLY_LDAP: include
      *            ldap-only items.
@@ -236,23 +236,23 @@ public class Configuration implements InitializingBean {
 	    String header = item.getHeaderName();
 
 	    switch (filter) {
-	    case ITEMS_ALL:
-		// all items included
-		break;
-	    case ITEMS_NON_LDAP:
-		// non-ldap items only
-		if (StringUtils.contains(header, "config.header.ldap")) {
-		    continue;
-		}
-		break;
-	    case ITEMS_ONLY_LDAP:
-		// ldap-only items
-		if (!StringUtils.contains(header, "config.header.ldap")) {
-		    continue;
-		}
-		break;
-	    default:
-		break;
+		case ITEMS_ALL:
+		    // all items included
+		    break;
+		case ITEMS_NON_LDAP:
+		    // non-ldap items only
+		    if (StringUtils.contains(header, "config.header.ldap")) {
+			continue;
+		    }
+		    break;
+		case ITEMS_ONLY_LDAP:
+		    // ldap-only items
+		    if (!StringUtils.contains(header, "config.header.ldap")) {
+			continue;
+		    }
+		    break;
+		default:
+		    break;
 	    }
 
 	    if (!groupedList.containsKey(header)) {
@@ -329,8 +329,8 @@ public class Configuration implements InitializingBean {
 	    publicFolder = list.get(0);
 	    String[] langCountry = LanguageUtil.getDefaultLangCountry();
 	    Locale locale = new Locale(langCountry[0], langCountry[1]);
-	    publicFolder.setName(Configuration.messageService.getMessageSource().getMessage("public.folder.name", null,
-		    locale));
+	    publicFolder.setName(
+		    Configuration.messageService.getMessageSource().getMessage("public.folder.name", null, locale));
 	    Configuration.configurationDAO.update(publicFolder);
 	}
     }

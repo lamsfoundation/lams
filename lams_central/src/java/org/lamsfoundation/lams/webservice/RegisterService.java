@@ -12,5 +12,6 @@ public interface RegisterService extends javax.xml.rpc.Service {
 
     public org.lamsfoundation.lams.webservice.Register getRegisterService() throws javax.xml.rpc.ServiceException;
 
-    public org.lamsfoundation.lams.webservice.Register getRegisterService(java.net.URL portAddress) throws javax.xml.rpc.ServiceException;
+    public org.lamsfoundation.lams.webservice.Register getRegisterService(java.net.URL portAddress)
+	    throws javax.xml.rpc.ServiceException;
 }

@@ -2,21 +2,21 @@
  * Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
  * =============================================================
  * License Information: http://lamsfoundation.org/licensing/lams/2.0/
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301
  * USA
- * 
+ *
  * http://www.gnu.org/licenses/gpl.txt
  * ****************************************************************
  */
@@ -37,7 +37,6 @@ import org.lamsfoundation.lams.tool.qa.QaContent;
 import org.lamsfoundation.lams.tool.qa.QaQueUsr;
 import org.lamsfoundation.lams.tool.qa.QaSession;
 import org.lamsfoundation.lams.tool.qa.dto.GeneralLearnerFlowDTO;
-import org.lamsfoundation.lams.tool.qa.dto.GroupDTO;
 import org.lamsfoundation.lams.tool.qa.dto.ReflectionDTO;
 import org.lamsfoundation.lams.tool.qa.service.IQaService;
 import org.lamsfoundation.lams.tool.qa.service.QaServiceProxy;
@@ -50,7 +49,7 @@ import org.lamsfoundation.lams.web.servlet.AbstractExportPortfolioServlet;
  * <p>
  * Enables exporting portfolio for teacher and learner modes.
  * </p>
- * 
+ *
  * @author Ozgur Demirtas
  */
 public class ExportServlet extends AbstractExportPortfolioServlet implements QaAppConstants {
@@ -58,6 +57,7 @@ public class ExportServlet extends AbstractExportPortfolioServlet implements QaA
     private static final long serialVersionUID = -1779093489007108143L;
     private final String FILENAME = "qa_main.html";
 
+    @Override
     public String doExport(HttpServletRequest request, HttpServletResponse response, String directoryName,
 	    Cookie[] cookies) {
 	String basePath = WebUtil.getBaseServerURL() + request.getContextPath();
@@ -82,7 +82,8 @@ public class ExportServlet extends AbstractExportPortfolioServlet implements QaA
 	return FILENAME;
     }
 
-    public void learner(HttpServletRequest request, HttpServletResponse response, String directoryName, Cookie[] cookies) {
+    public void learner(HttpServletRequest request, HttpServletResponse response, String directoryName,
+	    Cookie[] cookies) {
 	IQaService qaService = QaServiceProxy.getQaService(getServletContext());
 
 	if (userID == null || toolSessionID == null) {
@@ -127,7 +128,8 @@ public class ExportServlet extends AbstractExportPortfolioServlet implements QaA
 	request.getSession().setAttribute(PORTFOLIO_EXPORT_MODE, "learner");
     }
 
-    public void teacher(HttpServletRequest request, HttpServletResponse response, String directoryName, Cookie[] cookies) {
+    public void teacher(HttpServletRequest request, HttpServletResponse response, String directoryName,
+	    Cookie[] cookies) {
 	IQaService qaService = QaServiceProxy.getQaService(getServletContext());
 
 	if (toolContentID == null) {

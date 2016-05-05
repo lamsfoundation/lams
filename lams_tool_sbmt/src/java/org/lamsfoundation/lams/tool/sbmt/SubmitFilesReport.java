@@ -2,21 +2,21 @@
  * Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
  * =============================================================
  * License Information: http://lamsfoundation.org/licensing/lams/2.0/
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License version 2.0 
+ * it under the terms of the GNU General Public License version 2.0
  * as published by the Free Software Foundation.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301
  * USA
- * 
+ *
  * http://www.gnu.org/licenses/gpl.txt
  * ****************************************************************
  */
@@ -59,7 +59,7 @@ public class SubmitFilesReport implements Serializable, Cloneable {
 
     /** persistent field */
     private String markFileName;
-    
+
     /** persistent field */
     private Long markFileVersionID;
 
@@ -118,48 +118,52 @@ public class SubmitFilesReport implements Serializable, Cloneable {
     public void setDateMarksReleased(Date dateMarksReleased) {
 	this.dateMarksReleased = dateMarksReleased;
     }
-    
+
     /**
      * @hibernate.property column="mark_file_uuid"
      */
     public Long getMarkFileUUID() {
-        return markFileUUID;
+	return markFileUUID;
     }
 
     public void setMarkFileUUID(Long markFileUUID) {
-        this.markFileUUID = markFileUUID;
+	this.markFileUUID = markFileUUID;
     }
 
     /**
      * @hibernate.property column="mark_file_name" length="255"
      */
     public String getMarkFileName() {
-        return markFileName;
+	return markFileName;
     }
 
     public void setMarkFileName(String markFileName) {
-        this.markFileName = markFileName;
+	this.markFileName = markFileName;
     }
-    
+
     /**
      * @hibernate.property column="mark_file_version_id"
      */
     public Long getMarkFileVersionID() {
-        return markFileVersionID;
+	return markFileVersionID;
     }
 
     public void setMarkFileVersionID(Long markFileVersionID) {
-        this.markFileVersionID = markFileVersionID;
+	this.markFileVersionID = markFileVersionID;
     }
 
+    @Override
     public String toString() {
-	return new ToStringBuilder(this).append("reportID", getReportID()).append("comments", getComments()).append(
-		"marks", getMarks()).append("dateMarksReleased", getDateMarksReleased()).toString();
+	return new ToStringBuilder(this).append("reportID", getReportID()).append("comments", getComments())
+		.append("marks", getMarks()).append("dateMarksReleased", getDateMarksReleased()).toString();
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see java.lang.Object#clone()
      */
+    @Override
     public Object clone() {
 
 	Object obj = null;
@@ -173,19 +177,23 @@ public class SubmitFilesReport implements Serializable, Cloneable {
 	return obj;
     }
 
+    @Override
     public boolean equals(Object other) {
-	if ((this == other))
+	if ((this == other)) {
 	    return true;
-	if (!(other instanceof SubmitFilesReport))
+	}
+	if (!(other instanceof SubmitFilesReport)) {
 	    return false;
+	}
 	SubmitFilesReport castOther = (SubmitFilesReport) other;
-	return new EqualsBuilder().append(this.getReportID(), castOther.getReportID()).append(this.getComments(),
-		castOther.getComments()).append(this.getMarks(), castOther.getMarks()).append(
-		this.getDateMarksReleased(), castOther.getDateMarksReleased()).isEquals();
+	return new EqualsBuilder().append(this.getReportID(), castOther.getReportID())
+		.append(this.getComments(), castOther.getComments()).append(this.getMarks(), castOther.getMarks())
+		.append(this.getDateMarksReleased(), castOther.getDateMarksReleased()).isEquals();
     }
 
+    @Override
     public int hashCode() {
-	return new HashCodeBuilder().append(getReportID()).append(getComments()).append(getMarks()).append(
-		getDateMarksReleased()).toHashCode();
+	return new HashCodeBuilder().append(getReportID()).append(getComments()).append(getMarks())
+		.append(getDateMarksReleased()).toHashCode();
     }
 }

@@ -2,21 +2,21 @@
  * Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
  * =============================================================
  * License Information: http://lamsfoundation.org/licensing/lams/2.0/
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License version 2.0 
+ * it under the terms of the GNU General Public License version 2.0
  * as published by the Free Software Foundation.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301
  * USA
- * 
+ *
  * http://www.gnu.org/licenses/gpl.txt
  * ****************************************************************
  */
@@ -25,8 +25,6 @@
 package org.lamsfoundation.lams.tool.rsrc.web.action;
 
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
@@ -69,6 +67,7 @@ public class ViewItemAction extends Action {
 
     private static IResourceService resourceService;
 
+    @Override
     public ActionForward execute(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) throws IOException, ServletException {
 
@@ -91,7 +90,7 @@ public class ViewItemAction extends Action {
 
     /**
      * Display main frame to display instrcution and item content.
-     * 
+     *
      * @param mapping
      * @param form
      * @param request
@@ -103,8 +102,8 @@ public class ViewItemAction extends Action {
 	String mode = request.getParameter(AttributeNames.ATTR_MODE);
 
 	String sessionMapID = WebUtil.readStrParam(request, ResourceConstants.ATTR_SESSION_MAP_ID);
-	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession().getAttribute(
-		sessionMapID);
+	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
+		.getAttribute(sessionMapID);
 
 	ResourceItem item = getResourceItem(request, sessionMap, mode);
 
@@ -145,7 +144,7 @@ public class ViewItemAction extends Action {
 
     /**
      * Return next instrucion to page. It need four input parameters, mode, itemIndex or itemUid, and insIdx.
-     * 
+     *
      * @param mapping
      * @param form
      * @param request
@@ -157,8 +156,8 @@ public class ViewItemAction extends Action {
 	String mode = request.getParameter(AttributeNames.ATTR_MODE);
 
 	String sessionMapID = WebUtil.readStrParam(request, ResourceConstants.ATTR_SESSION_MAP_ID);
-	SessionMap<String, Object> sesionMap = (SessionMap<String, Object>) request.getSession().getAttribute(
-		sessionMapID);
+	SessionMap<String, Object> sesionMap = (SessionMap<String, Object>) request.getSession()
+		.getAttribute(sessionMapID);
 
 	ResourceItem item = getResourceItem(request, sesionMap, mode);
 	if (item == null) {
@@ -201,7 +200,7 @@ public class ViewItemAction extends Action {
 
     /**
      * Open url or file in a popup window page.
-     * 
+     *
      * @param mapping
      * @param form
      * @param request
@@ -217,18 +216,18 @@ public class ViewItemAction extends Action {
 	}
 
 	String sessionMapID = WebUtil.readStrParam(request, ResourceConstants.ATTR_SESSION_MAP_ID);
-	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession().getAttribute(
-		sessionMapID);
+	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
+		.getAttribute(sessionMapID);
 
 	ResourceItem item = getResourceItem(request, sessionMap, mode);
 
 	boolean isUrlItemType = item.getType() == ResourceConstants.RESOURCE_TYPE_URL;
 	request.setAttribute(ResourceConstants.ATTR_IS_URL_ITEM_TYPE, isUrlItemType);
 
-	String popupUrl = (isUrlItemType) ? item.getUrl() : "/download/?uuid=" + item.getFileUuid()
-		+ "&preferDownload=false";
+	String popupUrl = (isUrlItemType) ? item.getUrl()
+		: "/download/?uuid=" + item.getFileUuid() + "&preferDownload=false";
 	request.setAttribute(ResourceConstants.PARAM_OPEN_URL_POPUP, popupUrl);
-	
+
 	request.setAttribute(ResourceConstants.PARAM_TITLE, item.getTitle());
 	return mapping.findForward(ResourceConstants.SUCCESS);
     }
@@ -238,13 +237,14 @@ public class ViewItemAction extends Action {
     // *************************************************************************************
     /**
      * Return resoruce item according to ToolAccessMode.
-     * 
+     *
      * @param request
      * @param sessionMap
      * @param mode
      * @return
      */
-    private ResourceItem getResourceItem(HttpServletRequest request, SessionMap<String, Object> sessionMap, String mode) {
+    private ResourceItem getResourceItem(HttpServletRequest request, SessionMap<String, Object> sessionMap,
+	    String mode) {
 	ResourceItem item = null;
 	if (ResourceConstants.MODE_AUTHOR_SESSION.equals(mode)) {
 	    int itemIdx = NumberUtils.stringToInt(request.getParameter(ResourceConstants.PARAM_ITEM_INDEX), 0);
@@ -261,52 +261,52 @@ public class ViewItemAction extends Action {
     }
 
     private IResourceService getResourceService() {
-	WebApplicationContext wac = WebApplicationContextUtils.getRequiredWebApplicationContext(getServlet()
-		.getServletContext());
+	WebApplicationContext wac = WebApplicationContextUtils
+		.getRequiredWebApplicationContext(getServlet().getServletContext());
 	return (IResourceService) wac.getBean(ResourceConstants.RESOURCE_SERVICE);
     }
 
-    private static Pattern wikipediaPattern = Pattern.compile("wikipedia", Pattern.CASE_INSENSITIVE
-	    | Pattern.UNICODE_CASE);
+    private static Pattern wikipediaPattern = Pattern.compile("wikipedia",
+	    Pattern.CASE_INSENSITIVE | Pattern.UNICODE_CASE);
 
     private Object getReviewUrl(ResourceItem item, String sessionMapID, String mode, int itemIdx) {
 	short type = item.getType();
 	String url = null;
 	switch (type) {
-	case ResourceConstants.RESOURCE_TYPE_URL:
-	    // See LDEV-1736 regarding wikipedia regex
-	    Matcher matcher = wikipediaPattern.matcher(item.getUrl());
-	    boolean wikipediaInURL = matcher.find();
+	    case ResourceConstants.RESOURCE_TYPE_URL:
+		// See LDEV-1736 regarding wikipedia regex
+		Matcher matcher = wikipediaPattern.matcher(item.getUrl());
+		boolean wikipediaInURL = matcher.find();
 
-	    if (item.isOpenUrlNewWindow() || wikipediaInURL) {
-		url = constructUrlOpenInNewWindow(item, sessionMapID, mode, itemIdx);
-	    } else {
-		url = ResourceWebUtils.protocol(item.getUrl());
-	    }
-	    break;
+		if (item.isOpenUrlNewWindow() || wikipediaInURL) {
+		    url = constructUrlOpenInNewWindow(item, sessionMapID, mode, itemIdx);
+		} else {
+		    url = ResourceWebUtils.protocol(item.getUrl());
+		}
+		break;
 
-	case ResourceConstants.RESOURCE_TYPE_FILE:
-	    if (item.isOpenUrlNewWindow()) {
-		url = constructUrlOpenInNewWindow(item, sessionMapID, mode, itemIdx);
-	    } else {
+	    case ResourceConstants.RESOURCE_TYPE_FILE:
+		if (item.isOpenUrlNewWindow()) {
+		    url = constructUrlOpenInNewWindow(item, sessionMapID, mode, itemIdx);
+		} else {
+		    url = "/download/?uuid=" + item.getFileUuid() + "&preferDownload=false";
+		}
+		break;
+
+	    case ResourceConstants.RESOURCE_TYPE_WEBSITE:
 		url = "/download/?uuid=" + item.getFileUuid() + "&preferDownload=false";
-	    }
-	    break;
+		break;
 
-	case ResourceConstants.RESOURCE_TYPE_WEBSITE:
-	    url = "/download/?uuid=" + item.getFileUuid() + "&preferDownload=false";
-	    break;
-
-	case ResourceConstants.RESOURCE_TYPE_LEARNING_OBJECT:
-	    url = "/pages/learningobj/mainframe.jsp?sessionMapID=" + sessionMapID;
-	    break;
+	    case ResourceConstants.RESOURCE_TYPE_LEARNING_OBJECT:
+		url = "/pages/learningobj/mainframe.jsp?sessionMapID=" + sessionMapID;
+		break;
 	}
 	return url;
     }
-    
+
     /**
      * Creates url for opening in a new window depending whether it's authoring environment or not.
-     * 
+     *
      * @param item
      * @param sessionMapID
      * @param mode
@@ -316,20 +316,19 @@ public class ViewItemAction extends Action {
     private String constructUrlOpenInNewWindow(ResourceItem item, String sessionMapID, String mode, int itemIdx) {
 	String url;
 	if (ResourceConstants.MODE_AUTHOR_SESSION.equals(mode)) {
-	    url = "/openUrlPopup.do?" + AttributeNames.ATTR_MODE + "=" + mode + "&"
-		    + ResourceConstants.PARAM_ITEM_INDEX + "=" + itemIdx + "&"
-		    + ResourceConstants.ATTR_SESSION_MAP_ID + "=" + sessionMapID;
+	    url = "/openUrlPopup.do?" + AttributeNames.ATTR_MODE + "=" + mode + "&" + ResourceConstants.PARAM_ITEM_INDEX
+		    + "=" + itemIdx + "&" + ResourceConstants.ATTR_SESSION_MAP_ID + "=" + sessionMapID;
 	} else {
 	    url = "/openUrlPopup.do?" + ResourceConstants.PARAM_RESOURCE_ITEM_UID + "=" + item.getUid() + "&"
 		    + ResourceConstants.ATTR_SESSION_MAP_ID + "=" + sessionMapID;
 	}
-	
+
 	return url;
     }
 
     /**
      * List save current resource items.
-     * 
+     *
      * @param request
      * @return
      */

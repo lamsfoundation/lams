@@ -18,64 +18,55 @@
  *
  * http://www.gnu.org/licenses/gpl.txt
  * ****************************************************************
- */ 
- 
-/* $Id$ */ 
-package org.eucm.lams.tool.eadventure.web.form; 
+ */
+
+/* $Id$ */
+package org.eucm.lams.tool.eadventure.web.form;
 
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.upload.FormFile;
- 
 
 /**
  * Form responsible for representing <code>EadventureCondition</code> objects on a view layer.
- * 
+ *
  * @author Angel del Blanco
- * 
+ *
  * @struts.form name="eadventureGameForm"
  */
-public class EadventureGameForm  extends ActionForm {
+public class EadventureGameForm extends ActionForm {
 
-    
     private FormFile file;
-    
+
     private String sessionMapID;
-    
+
     private String fileName;
-    
-    
-    public EadventureGameForm(){
-	
-    }
-    
-    public String getSessionMapID() {
-        return sessionMapID;
+
+    public EadventureGameForm() {
+
     }
 
+    public String getSessionMapID() {
+	return sessionMapID;
+    }
 
     public void setSessionMapID(String sessionMapID) {
-        this.sessionMapID = sessionMapID;
-    }
-    
-    public FormFile getFile() {
-        return file;
+	this.sessionMapID = sessionMapID;
     }
 
+    public FormFile getFile() {
+	return file;
+    }
 
     public void setFile(FormFile file) {
-        this.file = file;
+	this.file = file;
     }
 
     public String getFileName() {
-        return fileName;
+	return fileName;
     }
 
     public void setFileName(String fileName) {
-        this.fileName = fileName;
+	this.fileName = fileName;
     }
-    
-    
-    
-    
+
 }
- 

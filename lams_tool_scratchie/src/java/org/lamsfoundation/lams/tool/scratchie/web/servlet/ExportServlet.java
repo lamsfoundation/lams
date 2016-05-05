@@ -2,21 +2,21 @@
  * Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
  * =============================================================
  * License Information: http://lamsfoundation.org/licensing/lams/2.0/
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License version 2.0 
+ * it under the terms of the GNU General Public License version 2.0
  * as published by the Free Software Foundation.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301
  * USA
- * 
+ *
  * http://www.gnu.org/licenses/gpl.txt
  * ****************************************************************
  */
@@ -28,7 +28,6 @@ package org.lamsfoundation.lams.tool.scratchie.web.servlet;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Set;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.Cookie;
@@ -55,7 +54,7 @@ import org.lamsfoundation.lams.web.util.SessionMap;
 
 /**
  * Export portfolio servlet to export all scratchie into offline HTML package.
- * 
+ *
  * @author Andrey Balan
  */
 public class ExportServlet extends AbstractExportPortfolioServlet {
@@ -75,6 +74,7 @@ public class ExportServlet extends AbstractExportPortfolioServlet {
 	super.init();
     }
 
+    @Override
     public String doExport(HttpServletRequest request, HttpServletResponse response, String directoryName,
 	    Cookie[] cookies) {
 
@@ -99,12 +99,11 @@ public class ExportServlet extends AbstractExportPortfolioServlet {
 	    ScratchieBundler imageBundler = new ScratchieBundler();
 	    imageBundler.bundle(request, cookies, directoryName);
 	} catch (Exception e) {
-	    logger.error(
-		    "Could not export spreadsheet javascript files, some files may be missing in export portfolio", e);
+	    logger.error("Could not export spreadsheet javascript files, some files may be missing in export portfolio",
+		    e);
 	}
 
-	String basePath = WebUtil.getBaseServerURL()
-		+ request.getContextPath();
+	String basePath = WebUtil.getBaseServerURL() + request.getContextPath();
 	writeResponseToFile(basePath + "/pages/export/exportportfolio.jsp?sessionMapID=" + sessionMap.getSessionID(),
 		directoryName, FILENAME, cookies);
 

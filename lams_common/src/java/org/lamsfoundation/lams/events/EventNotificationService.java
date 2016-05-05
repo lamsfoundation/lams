@@ -27,9 +27,9 @@ import org.quartz.Trigger;
 
 /**
  * Provides tools for managing events and notifing users.
- * 
+ *
  * @author Marcin Cieslak
- * 
+ *
  */
 class EventNotificationService implements IEventNotificationService {
     /**
@@ -40,7 +40,8 @@ class EventNotificationService implements IEventNotificationService {
     /**
      * Contains message delivery methods that are available for programmers.
      */
-    protected final static Set<AbstractDeliveryMethod> availableDeliveryMethods = new HashSet<AbstractDeliveryMethod>(2);
+    protected final static Set<AbstractDeliveryMethod> availableDeliveryMethods = new HashSet<AbstractDeliveryMethod>(
+	    2);
 
     /**
      * Contains events that are currently in use. Prevents multiple loading of an event from the database.
@@ -65,9 +66,9 @@ class EventNotificationService implements IEventNotificationService {
     protected IUserManagementService userManagementService;
 
     protected MessageService messageService;
-    
+
     protected ILessonService lessonService;
-    
+
     protected ILamsToolService toolService;
 
     /**
@@ -85,7 +86,7 @@ class EventNotificationService implements IEventNotificationService {
 
     /**
      * Default constructor. Should be called only once, since this class in a singleton.
-     * 
+     *
      * @param scheduler
      *            scheduler injected by Spring
      */
@@ -95,8 +96,8 @@ class EventNotificationService implements IEventNotificationService {
 	    this.scheduler = scheduler;
 	    EventNotificationService.availableDeliveryMethods.add(IEventNotificationService.DELIVERY_METHOD_MAIL);
 	    try {
-		JobDetail resendMessagesJobDetail = getScheduler().getJobDetail(
-			EventNotificationService.RESEND_MESSAGES_JOB_NAME, Scheduler.DEFAULT_GROUP);
+		JobDetail resendMessagesJobDetail = getScheduler()
+			.getJobDetail(EventNotificationService.RESEND_MESSAGES_JOB_NAME, Scheduler.DEFAULT_GROUP);
 		if (resendMessagesJobDetail == null) {
 		    resendMessagesJobDetail = new JobDetail(EventNotificationService.RESEND_MESSAGES_JOB_NAME,
 			    Scheduler.DEFAULT_GROUP, ResendMessagesJob.class);
@@ -115,7 +116,7 @@ class EventNotificationService implements IEventNotificationService {
 
     /**
      * Gets the only existing instance of the class.
-     * 
+     *
      * @return instance of this class
      */
     public static EventNotificationService getInstance() {
@@ -124,7 +125,7 @@ class EventNotificationService implements IEventNotificationService {
 
     /**
      * Allows to plug-in a delivery method.
-     * 
+     *
      * @param deliveryMethod
      *            delivery method to add
      * @return <code>true</code> if the delivery method with the same ID did not exist and the given delivery method was
@@ -217,8 +218,8 @@ class EventNotificationService implements IEventNotificationService {
     @Override
     public boolean sendMessage(Integer fromUserId, Integer toUserId, AbstractDeliveryMethod deliveryMethod,
 	    String subject, String message, boolean isHtmlFormat) throws InvalidParameterException {
-	Event eventFailCopy = new Event(IEventNotificationService.SINGLE_MESSAGE_SCOPE, String.valueOf(System
-		.currentTimeMillis()), null, subject, message, isHtmlFormat);
+	Event eventFailCopy = new Event(IEventNotificationService.SINGLE_MESSAGE_SCOPE,
+		String.valueOf(System.currentTimeMillis()), null, subject, message, isHtmlFormat);
 	String result = deliveryMethod.send(fromUserId, toUserId, subject, message, isHtmlFormat);
 	if (result != null) {
 	    EventNotificationService.log.warn("Error occured while sending message: " + result);
@@ -248,8 +249,8 @@ class EventNotificationService implements IEventNotificationService {
 	    if (toUserIds.length == 1) {
 		return sendMessage(fromUserId, toUserIds[0], deliveryMethod, subject, message, isHtmlFormat);
 	    } else {
-		final Event event = new Event(IEventNotificationService.SINGLE_MESSAGE_SCOPE, String.valueOf(System
-			.currentTimeMillis()), null, subject, message, isHtmlFormat);
+		final Event event = new Event(IEventNotificationService.SINGLE_MESSAGE_SCOPE,
+			String.valueOf(System.currentTimeMillis()), null, subject, message, isHtmlFormat);
 		event.referenceCounter++;
 		event.notificationThread = new Thread(new Runnable() {
 		    @Override
@@ -274,7 +275,7 @@ class EventNotificationService implements IEventNotificationService {
 	}
 	return true;
     }
-    
+
     @Override
     public boolean notifyLessonMonitors(Long sessionId, String message, boolean isHtmlFormat) {
 	final String NEW_LINE_CHARACTER = "\r\n";
@@ -283,29 +284,29 @@ class EventNotificationService implements IEventNotificationService {
 	if (monitoringUsers == null || monitoringUsers.isEmpty()) {
 	    return true;
 	}
-	
+
 	Integer[] monitoringUsersIds = new Integer[monitoringUsers.size()];
 	for (int i = 0; i < monitoringUsersIds.length; i++) {
 	    monitoringUsersIds[i] = monitoringUsers.get(i).getUserId();
 	}
-	
+
 	ToolSession toolSession = toolService.getToolSession(sessionId);
 	Lesson lesson = toolSession.getLesson();
 	ToolActivity toolActivity = toolSession.getToolActivity();
 	String lessonName = lesson.getLessonName();
 	String activityTitle = toolActivity.getTitle();
 	String toolName = toolActivity.getTool().getToolDisplayName();
-	String emailSubject = toolName + " " + messageService.getMessage("email.notifications.tool") + ": " + 
-		activityTitle + " " + messageService.getMessage("email.notifications.activity") + " - " + 
-		lessonName + " " + messageService.getMessage("email.notifications.lesson");
+	String emailSubject = toolName + " " + messageService.getMessage("email.notifications.tool") + ": "
+		+ activityTitle + " " + messageService.getMessage("email.notifications.activity") + " - " + lessonName
+		+ " " + messageService.getMessage("email.notifications.lesson");
 
 	String courseName = lesson.getOrganisation().getName();
 	String serverUrl = Configuration.get(ConfigurationKeys.SERVER_URL).trim();
-	String emailBody = messageService.getMessage("email.notifications.course") + ": " + courseName + NEW_LINE_CHARACTER + 
-		messageService.getMessage("email.notifications.lesson.caption") + ": " + lessonName + NEW_LINE_CHARACTER + NEW_LINE_CHARACTER + 
-		message	+ NEW_LINE_CHARACTER + NEW_LINE_CHARACTER + 
-		serverUrl;
-	
+	String emailBody = messageService.getMessage("email.notifications.course") + ": " + courseName
+		+ NEW_LINE_CHARACTER + messageService.getMessage("email.notifications.lesson.caption") + ": "
+		+ lessonName + NEW_LINE_CHARACTER + NEW_LINE_CHARACTER + message + NEW_LINE_CHARACTER
+		+ NEW_LINE_CHARACTER + serverUrl;
+
 	return sendMessage(null, monitoringUsersIds, IEventNotificationService.DELIVERY_METHOD_MAIL, emailSubject,
 		emailBody, isHtmlFormat);
     }
@@ -560,7 +561,7 @@ class EventNotificationService implements IEventNotificationService {
 
     /**
      * Gets the event, either from the database or the event pool.
-     * 
+     *
      * @param scope
      *            scope of the event
      * @param name
@@ -593,7 +594,7 @@ class EventNotificationService implements IEventNotificationService {
 
     /**
      * Saves the event into the database
-     * 
+     *
      * @param event
      *            event to be saved
      */
@@ -636,7 +637,7 @@ class EventNotificationService implements IEventNotificationService {
     protected MessageService getMessageService() {
 	return messageService;
     }
-    
+
     public void setLessonService(ILessonService lessonService) {
 	this.lessonService = lessonService;
     }
@@ -644,11 +645,11 @@ class EventNotificationService implements IEventNotificationService {
     protected ILessonService getLessonService() {
 	return lessonService;
     }
-    
+
     public void setToolService(ILamsToolService toolService) {
 	this.toolService = toolService;
     }
-    
+
     protected ILamsToolService getToolService() {
 	return toolService;
     }

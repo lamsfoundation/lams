@@ -2,21 +2,21 @@
  * Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
  * =============================================================
  * License Information: http://lamsfoundation.org/licensing/lams/2.0/
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License version 2.0 
+ * it under the terms of the GNU General Public License version 2.0
  * as published by the Free Software Foundation.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301
  * USA
- * 
+ *
  * http://www.gnu.org/licenses/gpl.txt
  * ****************************************************************
  */
@@ -96,13 +96,13 @@ public class Organisation implements Serializable, Comparable {
 
     /** persistent field */
     private Boolean enableGradebookForLearners;
-    
+
     /** persistent field */
     private Boolean enableSingleActivityLessons;
-    
+
     /** persistent field */
     private Boolean enableLiveEdit;
-    
+
     /** persistent field */
     private Boolean enableExportPortfolio;
 
@@ -269,17 +269,21 @@ public class Organisation implements Serializable, Comparable {
 	this.enableCourseNotifications = enableCourseNotifications;
     }
 
+    @Override
     public String toString() {
 	return new ToStringBuilder(this).append("organisationId", getOrganisationId()).toString();
     }
 
+    @Override
     public boolean equals(Object other) {
-	if (!(other instanceof Organisation))
+	if (!(other instanceof Organisation)) {
 	    return false;
+	}
 	Organisation castOther = (Organisation) other;
 	return new EqualsBuilder().append(this.getOrganisationId(), castOther.getOrganisationId()).isEquals();
     }
 
+    @Override
     public int hashCode() {
 	return new HashCodeBuilder().append(getOrganisationId()).toHashCode();
     }
@@ -296,6 +300,7 @@ public class Organisation implements Serializable, Comparable {
 	this.locale = locale;
     }
 
+    @Override
     public int compareTo(Object o) {
 	return name.compareToIgnoreCase(((Organisation) o).getName());
     }
@@ -333,26 +338,26 @@ public class Organisation implements Serializable, Comparable {
     }
 
     public Boolean getEnableSingleActivityLessons() {
-        return enableSingleActivityLessons;
+	return enableSingleActivityLessons;
     }
 
     public void setEnableSingleActivityLessons(Boolean enableSingleActivityLessons) {
-        this.enableSingleActivityLessons = enableSingleActivityLessons;
+	this.enableSingleActivityLessons = enableSingleActivityLessons;
     }
-    
+
     public Boolean getEnableLiveEdit() {
-        return enableLiveEdit;
+	return enableLiveEdit;
     }
 
     public void setEnableLiveEdit(Boolean enableLiveEdit) {
-        this.enableLiveEdit = enableLiveEdit;
+	this.enableLiveEdit = enableLiveEdit;
     }
-    
+
     public Boolean getEnableExportPortfolio() {
-        return enableExportPortfolio;
+	return enableExportPortfolio;
     }
 
     public void setEnableExportPortfolio(Boolean enableExportPortfolio) {
-        this.enableExportPortfolio = enableExportPortfolio;
+	this.enableExportPortfolio = enableExportPortfolio;
     }
 }

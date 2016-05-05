@@ -2,21 +2,21 @@
  * Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
  * =============================================================
  * License Information: http://lamsfoundation.org/licensing/lams/2.0/
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301
  * USA
- * 
+ *
  * http://www.gnu.org/licenses/gpl.txt
  * ****************************************************************
  */
@@ -28,7 +28,7 @@ import org.apache.struts.upload.FormFile;
 
 /**
  * CommonCartridge Item Form.
- * 
+ *
  * @struts.form name="commonCartridgeItemForm"
  * @author Steve.Ni
  */
@@ -50,7 +50,7 @@ public class CommonCartridgeItemForm extends ActionForm {
     private Long fileVersionId;
     private String fileName;
     private FormFile file;
-    
+
     private String launchUrl;
     private String secureLaunchUrl;
     private String key;
@@ -162,7 +162,7 @@ public class CommonCartridgeItemForm extends ActionForm {
     public void setMode(String mode) {
 	this.mode = mode;
     }
-    
+
     public String getKey() {
 	return key;
     }
@@ -170,7 +170,7 @@ public class CommonCartridgeItemForm extends ActionForm {
     public void setKey(String key) {
 	this.key = key;
     }
-    
+
     public String getSecret() {
 	return secret;
     }
@@ -178,15 +178,15 @@ public class CommonCartridgeItemForm extends ActionForm {
     public void setSecret(String secret) {
 	this.secret = secret;
     }
-    
-     public String getCustomStr() {
+
+    public String getCustomStr() {
 	return customStr;
     }
 
     public void setCustomStr(String customStr) {
 	this.customStr = customStr;
     }
-    
+
     public String getButtonText() {
 	return buttonText;
     }
@@ -194,13 +194,13 @@ public class CommonCartridgeItemForm extends ActionForm {
     public void setButtonText(String buttonText) {
 	this.buttonText = buttonText;
     }
-    
+
     public int getFrameHeight() {
 	return frameHeight;
     }
 
     public void setFrameHeight(int frameHeight) {
 	this.frameHeight = frameHeight;
-    }    
+    }
 
 }

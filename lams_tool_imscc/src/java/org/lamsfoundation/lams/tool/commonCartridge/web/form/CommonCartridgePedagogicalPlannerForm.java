@@ -113,18 +113,14 @@ public class CommonCartridgePedagogicalPlannerForm extends PedagogicalPlannerAct
 		    short itemType = item.getType();
 		    setTitle(topicIndex, item.getTitle());
 		    setType(topicIndex, itemType);
-		    setUrl(topicIndex, itemType == CommonCartridgeConstants.RESOURCE_TYPE_BASIC_LTI ? item.getUrl()
-			    : null);
-		    setFileName(topicIndex,
-			    itemType == CommonCartridgeConstants.RESOURCE_TYPE_COMMON_CARTRIDGE ? item.getFileName()
-				    : null);
-		    setFileUuid(topicIndex,
-			    itemType == CommonCartridgeConstants.RESOURCE_TYPE_COMMON_CARTRIDGE ? item.getFileUuid()
-				    : null);
-		    setFileVersion(
-			    topicIndex,
-			    itemType == CommonCartridgeConstants.RESOURCE_TYPE_COMMON_CARTRIDGE ? item
-				    .getFileVersionId() : null);
+		    setUrl(topicIndex,
+			    itemType == CommonCartridgeConstants.RESOURCE_TYPE_BASIC_LTI ? item.getUrl() : null);
+		    setFileName(topicIndex, itemType == CommonCartridgeConstants.RESOURCE_TYPE_COMMON_CARTRIDGE
+			    ? item.getFileName() : null);
+		    setFileUuid(topicIndex, itemType == CommonCartridgeConstants.RESOURCE_TYPE_COMMON_CARTRIDGE
+			    ? item.getFileUuid() : null);
+		    setFileVersion(topicIndex, itemType == CommonCartridgeConstants.RESOURCE_TYPE_COMMON_CARTRIDGE
+			    ? item.getFileVersionId() : null);
 		    topicIndex++;
 		}
 	    }
@@ -289,7 +285,7 @@ public class CommonCartridgePedagogicalPlannerForm extends PedagogicalPlannerAct
      * mismatch excpetion since browser tried to fill an empty string to file field. Now in pedagogicalPlanner.js in
      * lams_central it is detected and the field name is changed to fileDummy, which sets the file to <code>NULLM</code>
      * here in Java form file.
-     * 
+     *
      * @param number
      *            where to set the empty file
      * @param emptyString

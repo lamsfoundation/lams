@@ -1,35 +1,35 @@
-/**************************************************************** 
- * Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org) 
- * ============================================================= 
- * License Information: http://lamsfoundation.org/licensing/lams/2.0/ 
- * 
- * This program is free software; you can redistribute it and/or modify 
- * it under the terms of the GNU General Public License version 2.0 
- * as published by the Free Software Foundation. 
- * 
- * This program is distributed in the hope that it will be useful, 
- * but WITHOUT ANY WARRANTY; without even the implied warranty of 
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the 
- * GNU General Public License for more details. 
- * 
- * You should have received a copy of the GNU General Public License 
- * along with this program; if not, write to the Free Software 
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 * USA 
- * 
- * http://www.gnu.org/licenses/gpl.txt 
- * **************************************************************** 
- */  
- 
-/* $Id$ */  
-package org.lamsfoundation.lams.tool.assessment.model;  
+/****************************************************************
+ * Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
+ * =============================================================
+ * License Information: http://lamsfoundation.org/licensing/lams/2.0/
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License version 2.0
+ * as published by the Free Software Foundation.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 * USA
+ *
+ * http://www.gnu.org/licenses/gpl.txt
+ * ****************************************************************
+ */
+
+/* $Id$ */
+package org.lamsfoundation.lams.tool.assessment.model;
 
 import org.apache.log4j.Logger;
- 
+
 /**
  * AssessmentOverallFeedback
- * 
+ *
  * @author Andrey Balan
- * 
+ *
  * @hibernate.class table="tl_laasse10_assessment_overall_feedback"
  */
 public class AssessmentOverallFeedback implements Cloneable, Sequencable {
@@ -38,7 +38,7 @@ public class AssessmentOverallFeedback implements Cloneable, Sequencable {
     private Long uid;
 
     private Integer sequenceId;
-    
+
     private Integer gradeBoundary;
 
     private String feedback;
@@ -61,28 +61,30 @@ public class AssessmentOverallFeedback implements Cloneable, Sequencable {
 
     /**
      * Returns image sequence number.
-     * 
+     *
      * @return image sequence number
-     * 
+     *
      * @hibernate.property column="sequence_id"
      */
+    @Override
     public int getSequenceId() {
 	return sequenceId;
     }
 
     /**
      * Sets image sequence number.
-     * 
+     *
      * @param sequenceId
-     *                image sequence number
+     *            image sequence number
      */
+    @Override
     public void setSequenceId(int sequenceId) {
 	this.sequenceId = sequenceId;
     }
 
     /**
      * @hibernate.property column="grade_boundary"
-     * 
+     *
      * @return Returns grade Boundary.
      */
     public Integer getGradeBoundary() {
@@ -92,10 +94,10 @@ public class AssessmentOverallFeedback implements Cloneable, Sequencable {
     public void setGradeBoundary(Integer gradeBoundary) {
 	this.gradeBoundary = gradeBoundary;
     }
-    
+
     /**
      * @hibernate.property column="feedback" type="text"
-     * 
+     *
      * @return Returns feedback on this answer option.
      */
     public String getFeedback() {
@@ -119,5 +121,3 @@ public class AssessmentOverallFeedback implements Cloneable, Sequencable {
 	return obj;
     }
 }
-
- 

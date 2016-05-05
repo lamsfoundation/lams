@@ -18,30 +18,28 @@
  *
  * http://www.gnu.org/licenses/gpl.txt
  * ****************************************************************
- */ 
- 
-/* $Id$ */ 
-package org.eucm.lams.tool.eadventure.dao.hibernate; 
+ */
+
+/* $Id$ */
+package org.eucm.lams.tool.eadventure.dao.hibernate;
 
 import java.util.List;
 
 import org.eucm.lams.tool.eadventure.dao.EadventureVarsDAO;
-import org.eucm.lams.tool.eadventure.model.EadventureItemVisitLog;
 import org.eucm.lams.tool.eadventure.model.EadventureVars;
- 
+
 public class EadventureVarsDAOHibernate extends BaseDAOHibernate implements EadventureVarsDAO {
 
-    
-    
     private static final String FIND_BY_ITEM_AND_NAME = "from " + EadventureVars.class.getName()
-	+ " as r where r.visitLog.uid = ? and r.name =?";
-    
-    public EadventureVars getEadventureVars(Long itemVisitLogID,String name){
-	List list = getHibernateTemplate().find(FIND_BY_ITEM_AND_NAME,new Object[]{itemVisitLogID,name});
-	if(list == null || list.size() ==0)
-		return null;
-	
-	return (EadventureVars)list.get(0);
+	    + " as r where r.visitLog.uid = ? and r.name =?";
+
+    @Override
+    public EadventureVars getEadventureVars(Long itemVisitLogID, String name) {
+	List list = getHibernateTemplate().find(FIND_BY_ITEM_AND_NAME, new Object[] { itemVisitLogID, name });
+	if (list == null || list.size() == 0) {
+	    return null;
+	}
+
+	return (EadventureVars) list.get(0);
     }
 }
- 

@@ -2,21 +2,21 @@
  * Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
  * =============================================================
  * License Information: http://lamsfoundation.org/licensing/lams/2.0/
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License version 2.0 
+ * it under the terms of the GNU General Public License version 2.0
  * as published by the Free Software Foundation.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301
  * USA
- * 
+ *
  * http://www.gnu.org/licenses/gpl.txt
  * ****************************************************************
  */
@@ -27,7 +27,7 @@ package org.lamsfoundation.lams.web.util;
  * <p>
  * <a href="AttributeNames.java.html"><i>View Source</i></a>
  * </p>
- * 
+ *
  * @author <a href="mailto:fyang@melcoe.mq.edu.au">Fei Yang</a>
  */
 public class AttributeNames {
@@ -76,7 +76,7 @@ public class AttributeNames {
     public static final String PARAM_EXT_LMS_ID = "extlmsid";
     public static final String PARAM_CREATE_DATE_TIME = "createDateTime";
     public static final String PARAM_NOTIFY_CLOSE_URL = "notifyCloseURL";
-    
+
     // jqGrid parameters
     public static final String PARAM_PAGE = "page";
     public static final String PARAM_ROWS = "rows";
@@ -91,7 +91,7 @@ public class AttributeNames {
     public static final String ATTR_SESSION_STATUS = "sessionStatus";
     public static final String ATTR_ACTIVITY_POSITION = "activityPosition";
     public static final String ATTR_LEARNER_CONTENT_FOLDER = "learnerContentFolder";
-    
+
     public static final String ATTR_RATING_CRITERIAS = "ratingCriterias";
     public static final String ATTR_RATINGS = "ratings";
     public static final String ATTR_ITEM_RATING_DTO = "itemRatingDto";

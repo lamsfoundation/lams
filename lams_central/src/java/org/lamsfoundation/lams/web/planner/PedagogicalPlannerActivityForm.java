@@ -32,9 +32,9 @@ import org.apache.struts.action.ActionMessages;
 /**
  * The base for any Pedagogical Planner Action Forms that other activities. All Java forms need to inherit from this
  * class and forms on JSP pages need to have these properties declared as hidden elements.
- * 
+ *
  * @author Marcin Cieslak
- * 
+ *
  */
 public abstract class PedagogicalPlannerActivityForm extends ActionForm {
     /**
@@ -50,7 +50,7 @@ public abstract class PedagogicalPlannerActivityForm extends ActionForm {
      * Set when submitting form in base.jsp page.
      */
     private Integer callID;
-    
+
     /**
      * Only to save. It is loaded straight from the tool.
      */
@@ -89,7 +89,7 @@ public abstract class PedagogicalPlannerActivityForm extends ActionForm {
     /**
      * Validates form. Must set {@link #valid} property. Can be overriden by inheriting classes, although call to this
      * method is only in activities themselves (and not on a higher level like lams_central).
-     * 
+     *
      * @return
      */
     public ActionMessages validate() {
@@ -106,10 +106,10 @@ public abstract class PedagogicalPlannerActivityForm extends ActionForm {
     }
 
     public String getEditingAdvice() {
-        return editingAdvice;
+	return editingAdvice;
     }
 
     public void setEditingAdvice(String editingAdvice) {
-        this.editingAdvice = editingAdvice;
+	this.editingAdvice = editingAdvice;
     }
 }

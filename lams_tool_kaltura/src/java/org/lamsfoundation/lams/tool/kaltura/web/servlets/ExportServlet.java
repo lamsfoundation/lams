@@ -2,21 +2,21 @@
  * Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
  * =============================================================
  * License Information: http://lamsfoundation.org/licensing/lams/2.0/
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License version 2.0 
+ * it under the terms of the GNU General Public License version 2.0
  * as published by the Free Software Foundation.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301
  * USA
- * 
+ *
  * http://www.gnu.org/licenses/gpl.txt
  * ****************************************************************
  */
@@ -32,8 +32,6 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.tool.ToolAccessMode;
-import org.lamsfoundation.lams.tool.kaltura.model.Kaltura;
-import org.lamsfoundation.lams.tool.kaltura.model.KalturaSession;
 import org.lamsfoundation.lams.tool.kaltura.service.IKalturaService;
 import org.lamsfoundation.lams.tool.kaltura.service.KalturaServiceProxy;
 import org.lamsfoundation.lams.tool.kaltura.util.KalturaException;
@@ -51,6 +49,7 @@ public class ExportServlet extends AbstractExportPortfolioServlet {
 
     private IKalturaService kalturaService;
 
+    @Override
     protected String doExport(HttpServletRequest request, HttpServletResponse response, String directoryName,
 	    Cookie[] cookies) {
 
@@ -70,8 +69,7 @@ public class ExportServlet extends AbstractExportPortfolioServlet {
 	    logger.error("Cannot perform export for kaltura tool.");
 	}
 
-	String basePath =WebUtil.getBaseServerURL()
-		+ request.getContextPath();
+	String basePath = WebUtil.getBaseServerURL() + request.getContextPath();
 	writeResponseToFile(basePath + "/pages/export/exportPortfolio.jsp", directoryName, FILENAME, cookies);
 
 	return FILENAME;

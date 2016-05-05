@@ -33,10 +33,12 @@ public class RegistrationDAO extends BaseDAO implements IRegistrationDAO {
 
     private static final String LOAD_REG = "from registration in class " + Registration.class.getName();
 
+    @Override
     public void saveOrUpdate(Registration reg) {
 	getHibernateTemplate().saveOrUpdate(reg);
     }
 
+    @Override
     @SuppressWarnings("unchecked")
     public Registration get() {
 	List list = getHibernateTemplate().find(LOAD_REG);

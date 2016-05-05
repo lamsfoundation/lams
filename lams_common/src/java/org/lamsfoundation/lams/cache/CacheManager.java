@@ -2,21 +2,21 @@
  * Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
  * =============================================================
  * License Information: http://lamsfoundation.org/licensing/lams/2.0/
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License version 2.0 
+ * it under the terms of the GNU General Public License version 2.0
  * as published by the Free Software Foundation.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301
  * USA
- * 
+ *
  * http://www.gnu.org/licenses/gpl.txt
  * ****************************************************************
  */
@@ -30,23 +30,14 @@ import java.util.Set;
 import java.util.TreeMap;
 import java.util.TreeSet;
 
-import javax.management.MBeanServer;
-import javax.management.MBeanServerInvocationHandler;
-import javax.management.ObjectName;
-
 import org.apache.commons.lang.NotImplementedException;
 import org.apache.log4j.Logger;
 import org.hibernate.SessionFactory;
-import org.hibernate.metadata.ClassMetadata;
 import org.hibernate.persister.collection.AbstractCollectionPersister;
 import org.hibernate.persister.entity.EntityPersister;
 import org.jboss.cache.Cache;
 import org.jboss.cache.CacheException;
 import org.jboss.cache.Fqn;
-import org.jboss.cache.jmx.CacheJmxWrapperMBean;
-import org.jboss.mx.remoting.JMXUtil;
-import org.lamsfoundation.lams.util.Configuration;
-import org.lamsfoundation.lams.util.ConfigurationKeys;
 
 /**
  * Wraps the JBOSS cache. See ICacheManager for more details.
@@ -75,47 +66,49 @@ public class CacheManager implements ICacheManager {
      */
     private Cache getCache() {
 	throw new NotImplementedException("You can not retrieve Cache using JMX on current JBoss version");
-	
-	/* OLD implementation, to be revised on next JBoss upgrade
-	 
-	 
-	if (cache == null) {
 
-	    try {
-		if (cacheObjectName == null) {
-		    cacheObjectName = DEFAULT_CACHE_OBJECT_NAME;
-		}
-		/*
-		 * When migrating to JBoss 5, the way the Cache is accessed had to be changed. Also, currently Cache is
-		 * not exposed by JMX, so it is also unavailable for Cache Manager. Trying to retrieve it causes an
-		 * error. This will be fixed in the future.
-		 * /
-	
-		MBeanServer server = JMXUtil.getMBeanServer();
-		CacheJmxWrapperMBean wrapper = (CacheJmxWrapperMBean) MBeanServerInvocationHandler.newProxyInstance(
-			server, ObjectName.getInstance(cacheObjectName), CacheJmxWrapperMBean.class, false);
-		cache = wrapper.getCache();
-
-		// cache = (Cache) server.getObjectInstance(ObjectName.getInstance(cacheObjectName));
-		// cache = (Cache) server.createMBean(Cache.class.getName(), );
-
-		if (Configuration.getAsBoolean(ConfigurationKeys.USE_CACHE_DEBUG_LISTENER)) {
-		    if (listener != null) {
-			cache.removeCacheListener(listener);
-		    }
-		    listener = new CacheDebugListener();
-		    cache.addCacheListener(listener);
-		    log.info("Added tree cache listener.");
-		}
-	    } catch (Exception e) {
-		log.error("Unable to access the JBOSS cache mbean " + cacheObjectName + ". Cache not available.", e);
-	    }
-	}
-	return cache;
-	*/
+	/*
+	 * OLD implementation, to be revised on next JBoss upgrade
+	 * 
+	 * 
+	 * if (cache == null) {
+	 * 
+	 * try {
+	 * if (cacheObjectName == null) {
+	 * cacheObjectName = DEFAULT_CACHE_OBJECT_NAME;
+	 * }
+	 * /*
+	 * When migrating to JBoss 5, the way the Cache is accessed had to be changed. Also, currently Cache is
+	 * not exposed by JMX, so it is also unavailable for Cache Manager. Trying to retrieve it causes an
+	 * error. This will be fixed in the future.
+	 * /
+	 * 
+	 * MBeanServer server = JMXUtil.getMBeanServer();
+	 * CacheJmxWrapperMBean wrapper = (CacheJmxWrapperMBean) MBeanServerInvocationHandler.newProxyInstance(
+	 * server, ObjectName.getInstance(cacheObjectName), CacheJmxWrapperMBean.class, false);
+	 * cache = wrapper.getCache();
+	 * 
+	 * // cache = (Cache) server.getObjectInstance(ObjectName.getInstance(cacheObjectName));
+	 * // cache = (Cache) server.createMBean(Cache.class.getName(), );
+	 * 
+	 * if (Configuration.getAsBoolean(ConfigurationKeys.USE_CACHE_DEBUG_LISTENER)) {
+	 * if (listener != null) {
+	 * cache.removeCacheListener(listener);
+	 * }
+	 * listener = new CacheDebugListener();
+	 * cache.addCacheListener(listener);
+	 * log.info("Added tree cache listener.");
+	 * }
+	 * } catch (Exception e) {
+	 * log.error("Unable to access the JBOSS cache mbean " + cacheObjectName + ". Cache not available.", e);
+	 * }
+	 * }
+	 * return cache;
+	 */
     }
 
     /** Get the String[] version of the objects class name. */
+    @Override
     public String[] getPartsFromClass(Class clasz) {
 	return clasz.getName().split("\\.");
     }
@@ -138,9 +131,10 @@ public class CacheManager implements ICacheManager {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.lamsfoundation.lams.cache.ICacheManager#getItem(java.lang.String[], java.lang.Object)
      */
+    @Override
     public Object getItem(String[] classNameParts, Object key) {
 	if (key == null || classNameParts == null) {
 	    return null;
@@ -151,9 +145,10 @@ public class CacheManager implements ICacheManager {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.lamsfoundation.lams.cache.ICacheManager#getItem(java.lang.Class, java.lang.Object)
      */
+    @Override
     public Object getItem(Class clasz, Object key) {
 	if (key == null || clasz == null) {
 	    return null;
@@ -185,9 +180,10 @@ public class CacheManager implements ICacheManager {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.lamsfoundation.lams.cache.ICacheManager#addItem(java.lang.String[], java.lang.Object, java.lang.Object)
      */
+    @Override
     public void addItem(String[] classNameParts, Object key, Object item) {
 	if (item != null && key != null && classNameParts != null) {
 	    addItem(getFqn(classNameParts), key, item);
@@ -196,9 +192,10 @@ public class CacheManager implements ICacheManager {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.lamsfoundation.lams.cache.ICacheManager#addItem(java.lang.Class, java.lang.Object, java.lang.Object)
      */
+    @Override
     public void addItem(Class clasz, Object key, Object item) {
 	if (item != null && key != null && clasz != null) {
 	    addItem(getFqn(clasz), key, item);
@@ -221,7 +218,8 @@ public class CacheManager implements ICacheManager {
 	}
     }
 
-    public Map<String,Set<String>> getCachedItems() {
+    @Override
+    public Map<String, Set<String>> getCachedItems() {
 	Cache cache = getCache();
 	Map allChildNames = new TreeMap();
 	if (cache == null) {
@@ -232,6 +230,7 @@ public class CacheManager implements ICacheManager {
 	return allChildNames;
     }
 
+    @Override
     public Set<String> getCachedClasses() {
 	Set<String> cachedClasses = new TreeSet<String>();
 
@@ -251,7 +250,8 @@ public class CacheManager implements ICacheManager {
 
 	return cachedClasses;
     }
-    
+
+    @Override
     public void clearCachedClass(String className) {
 	for (Entry<String, EntityPersister> cacheEntry : ((Map<String, EntityPersister>) getSessionFactory()
 		.getAllClassMetadata()).entrySet()) {
@@ -301,6 +301,7 @@ public class CacheManager implements ICacheManager {
     /**
      * Clear all the nodes in the cache with the given key. Works on nodes starting with /org, /com and /net
      */
+    @Override
     public void clearCache(String node) {
 	Cache cache = getCache();
 
@@ -316,6 +317,7 @@ public class CacheManager implements ICacheManager {
     }
 
     /** Remove a particular item from the cache. */
+    @Override
     public void removeItem(String[] classNameParts, Object key) {
 	Cache cache = getCache();
 	if (cache == null) {
@@ -341,10 +343,10 @@ public class CacheManager implements ICacheManager {
     }
 
     public SessionFactory getSessionFactory() {
-        return sessionFactory;
+	return sessionFactory;
     }
 
     public void setSessionFactory(SessionFactory sessionFactory) {
-        this.sessionFactory = sessionFactory;
+	this.sessionFactory = sessionFactory;
     }
 }

@@ -12,19 +12,20 @@ public interface IUserDAO extends IBaseDAO {
 
     /**
      * Get all users (paged), except for disabled users.
-     * 
+     *
      * @param page
      * @param size
      * @param sortBy
      * @param sortOrder
-     * @param searchString filters results by course name. It can be null and then doesn't affect results
+     * @param searchString
+     *            filters results by course name. It can be null and then doesn't affect results
      * @return paged list of users
      */
     List<UserDTO> getAllUsersPaged(int page, int size, String sortBy, String sortOrder, String searchString);
-    
+
     /**
      * Count total number of users excluding disabled ones and applying searchString filter.
-     * 
+     *
      * @param searchString
      * @return
      */

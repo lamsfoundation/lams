@@ -143,7 +143,7 @@ public class BranchConditionDTO {
      * appropriate branching activity. It is here to make life easier on the Flash side - so that it has the UIID
      * somewhere if the user changes from a tool based branch -> group/teacher based and back to tool based without
      * saving.
-     * 
+     *
      * @return toolActivityUIID
      */
     public Integer getToolActivityUIID() {

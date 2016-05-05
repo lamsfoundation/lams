@@ -18,60 +18,60 @@
  *
  * http://www.gnu.org/licenses/gpl.txt
  * ****************************************************************
- */ 
- 
-/* $Id$ */ 
-package org.lamsfoundation.lams.web.lamscommunity; 
+ */
+
+/* $Id$ */
+package org.lamsfoundation.lams.web.lamscommunity;
 
 import org.apache.struts.action.ActionForm;
- 
+
 /**
- * 
+ *
  * @author lfoxton
- * 
+ *
  * @struts.form name="lamsCommunityLoginForm" include-pk="true" include-all="true"
  */
 public class LamsCommunityLoginForm extends ActionForm {
-    
+
     public static final long serialVersionUID = 82738272773582375L;
-    
+
     public String lcUserName;
     public String lcPassword;
     public String dest;
     public String dispatch;
-    
-    public LamsCommunityLoginForm() {}
+
+    public LamsCommunityLoginForm() {
+    }
 
     public String getLcUserName() {
-        return lcUserName;
+	return lcUserName;
     }
 
     public void setLcUserName(String lcUserName) {
-        this.lcUserName = lcUserName;
+	this.lcUserName = lcUserName;
     }
 
     public String getLcPassword() {
-        return lcPassword;
+	return lcPassword;
     }
 
     public void setLcPassword(String lcPassword) {
-        this.lcPassword = lcPassword;
+	this.lcPassword = lcPassword;
     }
 
     public String getDispatch() {
-        return dispatch;
+	return dispatch;
     }
 
     public void setDispatch(String dispatch) {
-        this.dispatch = dispatch;
+	this.dispatch = dispatch;
     }
 
     public String getDest() {
-        return dest;
+	return dest;
     }
 
     public void setDest(String dest) {
-        this.dest = dest;
+	this.dest = dest;
     }
 }
- 

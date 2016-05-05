@@ -2,21 +2,21 @@
  * Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
  * =============================================================
  * License Information: http://lamsfoundation.org/licensing/lams/2.0/
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License version 2.0 
+ * it under the terms of the GNU General Public License version 2.0
  * as published by the Free Software Foundation.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301
  * USA
- * 
+ *
  * http://www.gnu.org/licenses/gpl.txt
  * ****************************************************************
  */
@@ -55,7 +55,7 @@ import org.springframework.web.filter.OncePerRequestFilter;
 /**
  * Filter checks if user has sufficient permission level to access given lesson. Initial implementation prevents
  * unauthorised cross-course traversal, but this filter can be extended for more generic use.
- * 
+ *
  * @author Marcin Cieslak
  */
 public class AccessPermissionFilter extends OncePerRequestFilter {
@@ -72,7 +72,8 @@ public class AccessPermissionFilter extends OncePerRequestFilter {
     private static IToolContentDAO toolContentDAO;
 
     /*
-     * Requests to specific Tool's Monitor and Learner are processed by Tool itself, so they do not go through filters defined in Central.
+     * Requests to specific Tool's Monitor and Learner are processed by Tool itself, so they do not go through filters
+     * defined in Central.
      * This means that every Tool has its own instance of this filter for its own chain of request processing.
      * One disadvantage is that filter configuration needs to be repeated for every tool.
      * An advantage is that filter can be Tool-aware and get its exact Monitor and Learner URLs.
@@ -206,18 +207,18 @@ public class AccessPermissionFilter extends OncePerRequestFilter {
 
 			if (isStaffMember) {
 			    if (AccessPermissionFilter.log.isTraceEnabled()) {
-				AccessPermissionFilter.log.trace("OK, user "
-					+ user.getLogin()
-					+ " is a monitor in the requested lesson."
-					+ (lesson == null ? "" : " Lesson ID: " + lesson.getLessonId() + ", name: "
-						+ lesson.getLessonName()));
+				AccessPermissionFilter.log
+					.trace("OK, user " + user.getLogin() + " is a monitor in the requested lesson."
+						+ (lesson == null ? ""
+							: " Lesson ID: " + lesson.getLessonId() + ", name: "
+								+ lesson.getLessonName()));
 			    }
 			} else {
-			    throw new SecurityException("User "
-				    + user.getLogin()
-				    + " is not a monitor in the requested lesson."
-				    + (lesson == null ? "" : " Lesson ID: " + lesson.getLessonId() + ", name: "
-					    + lesson.getLessonName()));
+			    throw new SecurityException(
+				    "User " + user.getLogin() + " is not a monitor in the requested lesson."
+					    + (lesson == null ? ""
+						    : " Lesson ID: " + lesson.getLessonId() + ", name: "
+							    + lesson.getLessonName()));
 			}
 		    }
 		}
@@ -253,8 +254,8 @@ public class AccessPermissionFilter extends OncePerRequestFilter {
 
     private IUserManagementService getUserManagementService() {
 	if (AccessPermissionFilter.userManagementService == null) {
-	    WebApplicationContext ctx = WebApplicationContextUtils.getRequiredWebApplicationContext(getFilterConfig()
-		    .getServletContext());
+	    WebApplicationContext ctx = WebApplicationContextUtils
+		    .getRequiredWebApplicationContext(getFilterConfig().getServletContext());
 	    AccessPermissionFilter.userManagementService = (IUserManagementService) ctx
 		    .getBean("userManagementService");
 	}
@@ -263,8 +264,8 @@ public class AccessPermissionFilter extends OncePerRequestFilter {
 
     private ILamsToolService getLamsToolService() {
 	if (AccessPermissionFilter.lamsToolService == null) {
-	    WebApplicationContext ctx = WebApplicationContextUtils.getRequiredWebApplicationContext(getFilterConfig()
-		    .getServletContext());
+	    WebApplicationContext ctx = WebApplicationContextUtils
+		    .getRequiredWebApplicationContext(getFilterConfig().getServletContext());
 	    AccessPermissionFilter.lamsToolService = (ILamsToolService) ctx.getBean("lamsToolService");
 	}
 	return AccessPermissionFilter.lamsToolService;
@@ -272,8 +273,8 @@ public class AccessPermissionFilter extends OncePerRequestFilter {
 
     private ILamsCoreToolService getLamsCoreToolService() {
 	if (AccessPermissionFilter.lamsCoreToolService == null) {
-	    WebApplicationContext ctx = WebApplicationContextUtils.getRequiredWebApplicationContext(getFilterConfig()
-		    .getServletContext());
+	    WebApplicationContext ctx = WebApplicationContextUtils
+		    .getRequiredWebApplicationContext(getFilterConfig().getServletContext());
 	    AccessPermissionFilter.lamsCoreToolService = (ILamsCoreToolService) ctx.getBean("lamsCoreToolService");
 	}
 	return AccessPermissionFilter.lamsCoreToolService;
@@ -281,8 +282,8 @@ public class AccessPermissionFilter extends OncePerRequestFilter {
 
     private ILessonService getLessonService() {
 	if (AccessPermissionFilter.lessonService == null) {
-	    WebApplicationContext ctx = WebApplicationContextUtils.getRequiredWebApplicationContext(getFilterConfig()
-		    .getServletContext());
+	    WebApplicationContext ctx = WebApplicationContextUtils
+		    .getRequiredWebApplicationContext(getFilterConfig().getServletContext());
 	    AccessPermissionFilter.lessonService = (ILessonService) ctx.getBean("lessonService");
 	}
 	return AccessPermissionFilter.lessonService;
@@ -290,8 +291,8 @@ public class AccessPermissionFilter extends OncePerRequestFilter {
 
     private IToolContentDAO getToolContentDAO() {
 	if (AccessPermissionFilter.toolContentDAO == null) {
-	    WebApplicationContext ctx = WebApplicationContextUtils.getRequiredWebApplicationContext(getFilterConfig()
-		    .getServletContext());
+	    WebApplicationContext ctx = WebApplicationContextUtils
+		    .getRequiredWebApplicationContext(getFilterConfig().getServletContext());
 	    AccessPermissionFilter.toolContentDAO = (IToolContentDAO) ctx.getBean("toolContentDAO");
 	}
 	return AccessPermissionFilter.toolContentDAO;

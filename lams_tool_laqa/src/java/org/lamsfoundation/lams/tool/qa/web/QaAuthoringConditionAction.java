@@ -1,23 +1,23 @@
-/**************************************************************** 
- * Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org) 
- * ============================================================= 
- * License Information: http://lamsfoundation.org/licensing/lams/2.0/ 
- * 
- * This program is free software; you can redistribute it and/or modify 
- * it under the terms of the GNU General Public License version 2.0 
- * as published by the Free Software Foundation. 
- * 
- * This program is distributed in the hope that it will be useful, 
- * but WITHOUT ANY WARRANTY; without even the implied warranty of 
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the 
- * GNU General Public License for more details. 
- * 
- * You should have received a copy of the GNU General Public License 
- * along with this program; if not, write to the Free Software 
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 * USA 
- * 
- * http://www.gnu.org/licenses/gpl.txt 
- * **************************************************************** 
+/****************************************************************
+ * Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
+ * =============================================================
+ * License Information: http://lamsfoundation.org/licensing/lams/2.0/
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License version 2.0
+ * as published by the Free Software Foundation.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 * USA
+ *
+ * http://www.gnu.org/licenses/gpl.txt
+ * ****************************************************************
  */
 
 /* $$Id$$ */
@@ -58,7 +58,7 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
 /**
  * Auxiliary action in author mode. It contains operations with QaCondition. The
  * rest of operations are located in <code>QaAction</code> action.
- * 
+ *
  * @author Marcin Cieslak
  * @see org.lamsfoundation.lams.tool.qa.web.QaAction
  */
@@ -93,7 +93,7 @@ public class QaAuthoringConditionAction extends Action {
 
     /**
      * Display empty page for a new condition.
-     * 
+     *
      * @param mapping
      * @param form
      * @param request
@@ -110,7 +110,7 @@ public class QaAuthoringConditionAction extends Action {
 
     /**
      * Display edit page for an existing condition.
-     * 
+     *
      * @param mapping
      * @param form
      * @param request
@@ -145,7 +145,7 @@ public class QaAuthoringConditionAction extends Action {
      * save is not persist them into database, just save
      * <code>HttpSession</code> temporarily. Only they will be persist when
      * the entire authoring page is being persisted.
-     * 
+     *
      * @param mapping
      * @param form
      * @param request
@@ -186,7 +186,7 @@ public class QaAuthoringConditionAction extends Action {
      * Remove condition from HttpSession list and update page display. As
      * authoring rule, all persist only happen when user submit whole page. So
      * this remove is just impact HttpSession values.
-     * 
+     *
      * @param mapping
      * @param form
      * @param request
@@ -223,7 +223,7 @@ public class QaAuthoringConditionAction extends Action {
 
     /**
      * Move up current item.
-     * 
+     *
      * @param mapping
      * @param form
      * @param request
@@ -237,7 +237,7 @@ public class QaAuthoringConditionAction extends Action {
 
     /**
      * Move down current item.
-     * 
+     *
      * @param mapping
      * @param form
      * @param request
@@ -286,14 +286,14 @@ public class QaAuthoringConditionAction extends Action {
      * Return QaService bean.
      */
     private IQaService getQaService() {
-	WebApplicationContext wac = WebApplicationContextUtils.getRequiredWebApplicationContext(getServlet()
-		.getServletContext());
+	WebApplicationContext wac = WebApplicationContextUtils
+		.getRequiredWebApplicationContext(getServlet().getServletContext());
 	return QaServiceProxy.getQaService(getServlet().getServletContext());
     }
 
     /**
      * List save current taskList items.
-     * 
+     *
      * @param request
      * @return
      */
@@ -308,13 +308,12 @@ public class QaAuthoringConditionAction extends Action {
 
     /**
      * List save current taskList items.
-     * 
+     *
      * @param request
      * @return
      */
     private List<QaQuestionDTO> getQuestionList(SessionMap sessionMap) {
-	List<QaQuestionDTO> list = (List<QaQuestionDTO>) sessionMap
-		.get(QaAppConstants.LIST_QUESTION_DTOS);
+	List<QaQuestionDTO> list = (List<QaQuestionDTO>) sessionMap.get(QaAppConstants.LIST_QUESTION_DTOS);
 	if (list == null) {
 	    list = new LinkedList<QaQuestionDTO>();
 	    sessionMap.put(QaAppConstants.LIST_QUESTION_DTOS, list);
@@ -325,7 +324,7 @@ public class QaAuthoringConditionAction extends Action {
     /**
      * Get the deleted condition list, which could be persisted or non-persisted
      * items.
-     * 
+     *
      * @param request
      * @return
      */
@@ -335,7 +334,7 @@ public class QaAuthoringConditionAction extends Action {
 
     /**
      * Get <code>java.util.List</code> from HttpSession by given name.
-     * 
+     *
      * @param request
      * @param name
      * @return
@@ -351,7 +350,7 @@ public class QaAuthoringConditionAction extends Action {
 
     /**
      * This method will populate condition information to its form for edit use.
-     * 
+     *
      * @param orderId
      * @param condition
      * @param form
@@ -367,7 +366,7 @@ public class QaAuthoringConditionAction extends Action {
 
     /**
      * This method will populate questions to choose to the form for edit use.
-     * 
+     *
      * @param sequenceId
      * @param condition
      * @param form
@@ -402,7 +401,7 @@ public class QaAuthoringConditionAction extends Action {
 
     /**
      * Extract form content to QaCondition.
-     * 
+     *
      * @param request
      * @param form
      * @throws QaException
@@ -448,7 +447,7 @@ public class QaAuthoringConditionAction extends Action {
 
     /**
      * Validate QaCondition
-     * 
+     *
      * @param conditionForm
      * @return
      */

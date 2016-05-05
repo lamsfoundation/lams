@@ -2,40 +2,40 @@
  * Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
  * =============================================================
  * License Information: http://lamsfoundation.org/licensing/lams/2.0/
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License version 2.0 
+ * it under the terms of the GNU General Public License version 2.0
  * as published by the Free Software Foundation.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301
  * USA
- * 
+ *
  * http://www.gnu.org/licenses/gpl.txt
  * ****************************************************************
  */
 
-/* $$Id$$ */	
+/* $$Id$$ */
 package org.lamsfoundation.lams.contentrepository;
 
 import java.io.Serializable;
 import java.util.Set;
+
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.commons.lang.builder.ToStringBuilder;
 
-
-/** 
- *        @hibernate.class
- *         table="lams_cr_credential"
- *     
-*/
+/**
+ * @hibernate.class
+ * 		 table="lams_cr_credential"
+ * 
+ */
 public class CrCredential implements Serializable {
 
     /** identifier field */
@@ -52,107 +52,105 @@ public class CrCredential implements Serializable {
 
     /** full constructor */
     public CrCredential(String name, String password, Set crWorkspaceCredentials) {
-        this.name = name;
-        this.password = password;
-        this.crWorkspaceCredentials = crWorkspaceCredentials;
+	this.name = name;
+	this.password = password;
+	this.crWorkspaceCredentials = crWorkspaceCredentials;
     }
 
     /** default constructor */
     public CrCredential() {
     }
 
-    /** 
-     *            @hibernate.id
-     *             generator-class="native"
-     *             type="java.lang.Long"
-     *             column="credential_id"
-     *             unsaved-value="0"
-     *         
+    /**
+     * @hibernate.id
+     * 	      generator-class="native"
+     *               type="java.lang.Long"
+     *               column="credential_id"
+     *               unsaved-value="0"
+     * 
      */
     public Long getCredentialId() {
-        return this.credentialId;
+	return this.credentialId;
     }
 
     public void setCredentialId(Long credentialId) {
-        this.credentialId = credentialId;
+	this.credentialId = credentialId;
     }
 
-    /** 
-     *            @hibernate.property
-     *             column="name"
-     *             unique="true"
-     *             length="255"
-     *             not-null="true"
-     *         
+    /**
+     * @hibernate.property
+     * 		    column="name"
+     *                     unique="true"
+     *                     length="255"
+     *                     not-null="true"
+     * 
      */
     public String getName() {
-        return this.name;
+	return this.name;
     }
 
     public void setName(String name) {
-        this.name = name;
+	this.name = name;
     }
 
-    /** 
-     *            @hibernate.property
-     *             column="password"
-     *             length="255"
-     *             not-null="true"
-     *         
+    /**
+     * @hibernate.property
+     * 		    column="password"
+     *                     length="255"
+     *                     not-null="true"
+     * 
      */
     public String getPassword() {
-        return this.password;
+	return this.password;
     }
 
     public void setPassword(String password) {
-        this.password = password;
+	this.password = password;
     }
 
-    /** 
-     * bi-directional one-to-many association to CrWorkspaceCredential 
+    /**
+     * bi-directional one-to-many association to CrWorkspaceCredential
+     *
+     * @hibernate.set
+     * 	       lazy="true"
+     *                inverse="true"
+     *                cascade="none"
+     * @hibernate.collection-key
+     * 			  column="credential_id"
+     * @hibernate.collection-one-to-many
+     * 				  class="org.lamsfoundation.lams.contentrepository.CrWorkspaceCredential"
      * 
-     *            @hibernate.set
-     *             lazy="true"
-     *             inverse="true"
-     *             cascade="none"
-     *            @hibernate.collection-key
-     *             column="credential_id"
-     *            @hibernate.collection-one-to-many
-     *             class="org.lamsfoundation.lams.contentrepository.CrWorkspaceCredential"
-     *         
      */
     public Set getCrWorkspaceCredentials() {
-        return this.crWorkspaceCredentials;
+	return this.crWorkspaceCredentials;
     }
 
     public void setCrWorkspaceCredentials(Set crWorkspaceCredentials) {
-        this.crWorkspaceCredentials = crWorkspaceCredentials;
+	this.crWorkspaceCredentials = crWorkspaceCredentials;
     }
 
+    @Override
     public String toString() {
-        return new ToStringBuilder(this)
-            .append("credentialId", getCredentialId())
-            .append("name", getName())
-            .toString();
+	return new ToStringBuilder(this).append("credentialId", getCredentialId()).append("name", getName()).toString();
     }
 
+    @Override
     public boolean equals(Object other) {
-        if ( (this == other ) ) return true;
-        if ( !(other instanceof CrCredential) ) return false;
-        CrCredential castOther = (CrCredential) other;
-        return new EqualsBuilder()
-            .append(this.getCredentialId(), castOther.getCredentialId())
-            .append(this.getName(), castOther.getName())
-            .append(this.getPassword(), castOther.getPassword())
-            .isEquals();
+	if ((this == other)) {
+	    return true;
+	}
+	if (!(other instanceof CrCredential)) {
+	    return false;
+	}
+	CrCredential castOther = (CrCredential) other;
+	return new EqualsBuilder().append(this.getCredentialId(), castOther.getCredentialId())
+		.append(this.getName(), castOther.getName()).append(this.getPassword(), castOther.getPassword())
+		.isEquals();
     }
 
+    @Override
     public int hashCode() {
-        return new HashCodeBuilder()
-            .append(getCredentialId())
-            .append(getName())
-            .append(getPassword())
-            .toHashCode();
+	return new HashCodeBuilder().append(getCredentialId()).append(getName()).append(getPassword()).toHashCode();
     }
 
 }

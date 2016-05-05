@@ -1,23 +1,23 @@
-/**************************************************************** 
- * Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org) 
- * ============================================================= 
- * License Information: http://lamsfoundation.org/licensing/lams/2.0/ 
- * 
- * This program is free software; you can redistribute it and/or modify 
- * it under the terms of the GNU General Public License version 2.0 
- * as published by the Free Software Foundation. 
- * 
- * This program is distributed in the hope that it will be useful, 
- * but WITHOUT ANY WARRANTY; without even the implied warranty of 
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the 
- * GNU General Public License for more details. 
- * 
- * You should have received a copy of the GNU General Public License 
- * along with this program; if not, write to the Free Software 
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 * USA 
- * 
- * http://www.gnu.org/licenses/gpl.txt 
- * **************************************************************** 
+/****************************************************************
+ * Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
+ * =============================================================
+ * License Information: http://lamsfoundation.org/licensing/lams/2.0/
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License version 2.0
+ * as published by the Free Software Foundation.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 * USA
+ *
+ * http://www.gnu.org/licenses/gpl.txt
+ * ****************************************************************
  */
 
 package org.lamsfoundation.lams.tool.notebook.web.actions;
@@ -54,10 +54,10 @@ import org.lamsfoundation.lams.web.util.SessionMap;
 /**
  * Auxiliary action in author mode. It contains operations with NotebookCondition. The rest of operations are located in
  * <code>AuthoringAction</code> action.
- * 
+ *
  * @author Marcin Cieslak
  * @see org.lamsfoundation.lams.tool.notebook.web.action.AuthoringAction
- * 
+ *
  */
 public class AuthoringNotebookConditionAction extends Action {
     public INotebookService notebookService;
@@ -92,7 +92,7 @@ public class AuthoringNotebookConditionAction extends Action {
 
     /**
      * Display empty page for new taskList item.
-     * 
+     *
      * @param mapping
      * @param form
      * @param request
@@ -109,7 +109,7 @@ public class AuthoringNotebookConditionAction extends Action {
 
     /**
      * Display edit page for existed taskList item.
-     * 
+     *
      * @param mapping
      * @param form
      * @param request
@@ -141,7 +141,7 @@ public class AuthoringNotebookConditionAction extends Action {
      * <code>HttpSession</code> NotebookItemList. Notice, this save is not persist them into database, just save
      * <code>HttpSession</code> temporarily. Only they will be persist when the entire authoring page is being
      * persisted.
-     * 
+     *
      * @param mapping
      * @param form
      * @param request
@@ -164,8 +164,8 @@ public class AuthoringNotebookConditionAction extends Action {
 	    extractFormToNotebookCondition(request, conditionForm);
 	} catch (Exception e) {
 	    // any upload exception will display as normal error message rather then throw exception directly
-	    errors.add(ActionMessages.GLOBAL_MESSAGE, new ActionMessage(NotebookConstants.ERROR_MSG_CONDITION, e
-		    .getMessage()));
+	    errors.add(ActionMessages.GLOBAL_MESSAGE,
+		    new ActionMessage(NotebookConstants.ERROR_MSG_CONDITION, e.getMessage()));
 	    if (!errors.isEmpty()) {
 		this.addErrors(request, errors);
 		return mapping.findForward("addcondition");
@@ -180,7 +180,7 @@ public class AuthoringNotebookConditionAction extends Action {
     /**
      * Remove taskList item from HttpSession list and update page display. As authoring rule, all persist only happen
      * when user submit whole page. So this remove is just impact HttpSession values.
-     * 
+     *
      * @param mapping
      * @param form
      * @param request
@@ -217,7 +217,7 @@ public class AuthoringNotebookConditionAction extends Action {
 
     /**
      * Move up current item.
-     * 
+     *
      * @param mapping
      * @param form
      * @param request
@@ -231,7 +231,7 @@ public class AuthoringNotebookConditionAction extends Action {
 
     /**
      * Move down current item.
-     * 
+     *
      * @param mapping
      * @param form
      * @param request
@@ -279,7 +279,7 @@ public class AuthoringNotebookConditionAction extends Action {
 
     /**
      * List save current taskList items.
-     * 
+     *
      * @param request
      * @return
      */
@@ -295,7 +295,7 @@ public class AuthoringNotebookConditionAction extends Action {
 
     /**
      * List save deleted taskList items, which could be persisted or non-persisted items.
-     * 
+     *
      * @param request
      * @return
      */
@@ -305,7 +305,7 @@ public class AuthoringNotebookConditionAction extends Action {
 
     /**
      * Get <code>java.util.List</code> from HttpSession by given name.
-     * 
+     *
      * @param request
      * @param name
      * @return
@@ -321,7 +321,7 @@ public class AuthoringNotebookConditionAction extends Action {
 
     /**
      * This method will populate taskList item information to its form for edit use.
-     * 
+     *
      * @param orderId
      * @param condition
      * @param form
@@ -337,7 +337,7 @@ public class AuthoringNotebookConditionAction extends Action {
 
     /**
      * Extract form content to taskListContent.
-     * 
+     *
      * @param request
      * @param form
      * @throws NotebookException
@@ -376,7 +376,7 @@ public class AuthoringNotebookConditionAction extends Action {
 
     /**
      * Validate taskListCondition
-     * 
+     *
      * @param conditionForm
      * @return
      */
@@ -396,8 +396,8 @@ public class AuthoringNotebookConditionAction extends Action {
 	    for (NotebookCondition condition : conditionList) {
 		if (formConditionName.equals(condition.getName())
 			&& !formConditionSequenceId.equals(new Integer(condition.getOrderId() - 1).toString())) {
-		    errors.add(ActionMessages.GLOBAL_MESSAGE, new ActionMessage(
-			    NotebookConstants.ERROR_MSG_NAME_DUPLICATED));
+		    errors.add(ActionMessages.GLOBAL_MESSAGE,
+			    new ActionMessage(NotebookConstants.ERROR_MSG_NAME_DUPLICATED));
 		    break;
 		}
 	    }

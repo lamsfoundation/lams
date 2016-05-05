@@ -46,7 +46,7 @@ public class QaConfigItem {
 
     /**
      * @hibernate.id generator-class="native" type="java.lang.Long" column="uid"
-     * 
+     *
      */
     public Long getUid() {
 	return uid;

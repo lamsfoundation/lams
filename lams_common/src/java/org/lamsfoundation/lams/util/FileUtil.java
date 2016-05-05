@@ -2,21 +2,21 @@
  * Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
  * =============================================================
  * License Information: http://lamsfoundation.org/licensing/lams/2.0/
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License version 2.0 
+ * it under the terms of the GNU General Public License version 2.0
  * as published by the Free Software Foundation.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301
  * USA
- * 
+ *
  * http://www.gnu.org/licenses/gpl.txt
  * ****************************************************************
  */
@@ -27,13 +27,11 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.Reader;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
-import java.nio.channels.FileChannel;
 import java.util.Date;
 import java.util.Properties;
 
@@ -69,7 +67,7 @@ public class FileUtil {
     public static final String LAMS_RUNTIME_CONTENT_DIR = "runtime";
     private static final long numMilliSecondsInADay = 24 * 60 * 60 * 1000;
     private static final int FILE_COPY_BUFFER_SIZE = 1024;
-    
+
     public static final String ALLOWED_EXTENSIONS_FLASH = ".swf,.fla";
     public static final String ALLOWED_EXTENSIONS_IMAGE = ".jpg,.gif,.jpeg,.png,.bmp";
     public static final String ALLOWED_EXTENSIONS_MEDIA = ".3gp,.avi,.flv,.m4v,.mkv,.mov,.mp3,.mp4,.mpe,.mpeg,.mpg,.mpv,.mts,.m2ts,ogg,.wma,.wmv";
@@ -79,11 +77,11 @@ public class FileUtil {
     /**
      * Deleting a directory using File.delete() only works if the directory is empty. This method deletes a directory
      * and all of its contained files.
-     * 
+     *
      * This method is not transactional - if it fails to delete some contained files or directories, it will continue
      * deleting all the other files in the directory. If only a partial deletion is done, then the files and directories
      * that could not be deleted are listed in the log file, and the method returns false.
-     * 
+     *
      * This method has not been tested in Linux or Unix systems, so the behaviour across symbolic links is unknown.
      */
     public static boolean deleteDirectory(File directory) {
@@ -94,7 +92,7 @@ public class FileUtil {
 	    for (int i = 0; i < files.length; i++) {
 		File file = files[i];
 		if (file.isDirectory()) {
-		    deleteDirectory(file);
+		    FileUtil.deleteDirectory(file);
 		} else if (!file.delete()) {
 		    FileUtil.log.error("Unable to delete file " + file.getName());
 		    retValue = false;
@@ -115,7 +113,7 @@ public class FileUtil {
 	}
 
 	File dir = new File(directoryName);
-	isDeleted = deleteDirectory(dir);
+	isDeleted = FileUtil.deleteDirectory(dir);
 
 	return isDeleted;
 
@@ -132,7 +130,7 @@ public class FileUtil {
 	    throw new FileUtilException("A directory name must be specified");
 	}
 
-	return isEmptyDirectory(new File(directoryName), checkSubdirectories);
+	return FileUtil.isEmptyDirectory(new File(directoryName), checkSubdirectories);
 
     }
 
@@ -148,7 +146,7 @@ public class FileUtil {
 		    boolean isEmpty = true;
 		    for (int i = 0; i < files.length && isEmpty; i++) {
 			File file = files[i];
-			isEmpty = file.isDirectory() ? isEmptyDirectory(file, true) : false;
+			isEmpty = file.isDirectory() ? FileUtil.isEmptyDirectory(file, true) : false;
 		    }
 		    return isEmpty;
 		}
@@ -165,7 +163,7 @@ public class FileUtil {
      * Create a temporary directory with the name in the form lamstmp_timestamp_suffix inside the default temporary-file
      * directory for the system. This method is protected (rather than private) so that it may be called by the junit
      * tests for this class.
-     * 
+     *
      * @param zipFileName
      * @return name of the new directory
      * @throws ZipFileUtilException
@@ -174,7 +172,7 @@ public class FileUtil {
      */
     public static String createTempDirectory(String suffix) throws FileUtilException {
 
-	String tempSysDirName = getTempDir();
+	String tempSysDirName = FileUtil.getTempDir();
 	if (tempSysDirName == null) {
 	    throw new FileUtilException(
 		    "No temporary directory known to the server. [System.getProperty( \"java.io.tmpdir\" ) returns null. ]\n Cannot upload package.");
@@ -189,16 +187,16 @@ public class FileUtil {
 	    tempSysDirName = javaTemp;
 	}
 
-	String tempDirName = tempSysDirName + File.separator + FileUtil.prefix + generateUniqueContentFolderID() + "_"
-		+ suffix;
+	String tempDirName = tempSysDirName + File.separator + FileUtil.prefix
+		+ FileUtil.generateUniqueContentFolderID() + "_" + suffix;
 	File tempDir = new File(tempDirName);
 
 	// try 100 different variations. If I can't find a unique
 	// one in 100 tries, then give up.
 	int i = 0;
 	while (tempDir.exists() && i < 100) {
-	    tempDirName = tempSysDirName + File.separator + FileUtil.prefix + generateUniqueContentFolderID() + "_"
-		    + suffix;
+	    tempDirName = tempSysDirName + File.separator + FileUtil.prefix + FileUtil.generateUniqueContentFolderID()
+		    + "_" + suffix;
 	    tempDir = new File(tempDirName);
 	    i++;
 	}
@@ -215,9 +213,9 @@ public class FileUtil {
     /**
      * This method creates a directory with the name <code>directoryName</code>. Also creates any necessary parent
      * directories that may not yet exist.
-     * 
+     *
      * If the directoryname is null or an empty string, a FileUtilException is thrown
-     * 
+     *
      * @param directoryName
      *            the name of the directory to create
      * @return boolean. Returns true if the directory is created and false otherwise
@@ -240,10 +238,10 @@ public class FileUtil {
     /**
      * Creates a subdirectory under the parent directory <code>parentDirName</code> If the parent or child directory is
      * null, FileUtilException is thrown.
-     * 
+     *
      * If the parent directory has not been created yet, it will be created.
-     * 
-     * 
+     *
+     *
      * @param parentDirName
      *            The name of the parent directory in which the subdirectory should be created in
      * @param subDirName
@@ -262,19 +260,19 @@ public class FileUtil {
 
 	File parentDir = new File(parentDirName);
 	if (!parentDir.exists()) {
-	    isParentDirCreated = createDirectory(parentDirName);
+	    isParentDirCreated = FileUtil.createDirectory(parentDirName);
 	} else {
 	    isParentDirCreated = true; // parent directory already exists
 	}
 
-	if (trailingForwardSlashPresent(parentDirName)) {
-	    parentDirName = removeTrailingForwardSlash(parentDirName);
+	if (FileUtil.trailingForwardSlashPresent(parentDirName)) {
+	    parentDirName = FileUtil.removeTrailingForwardSlash(parentDirName);
 	}
 
 	// concatenate the two together
 	String combinedDirName = parentDirName + File.separator + subDirName;
 
-	isSubDirCreated = createDirectory(combinedDirName);
+	isSubDirCreated = FileUtil.createDirectory(combinedDirName);
 
 	return isSubDirCreated && isParentDirCreated;
     }
@@ -283,7 +281,7 @@ public class FileUtil {
      * If the directory name specified has a slash at the end of it such as "directoryName/", then the slash will be
      * removed and "directoryName" will be returned. The createDirectory(parentdir, childdir) method requires that there
      * is no slash at the end of the directory name.
-     * 
+     *
      * @param stringToModify
      * @return
      */
@@ -294,7 +292,7 @@ public class FileUtil {
 
     /**
      * Checks to see if there is a slash at the end of the string.
-     * 
+     *
      * @param stringToCheck
      *            the directoryName to check
      * @return boolean. Returns true if there is a slash at the end and false if not.
@@ -317,9 +315,9 @@ public class FileUtil {
 	// get dump directory name and make sure directory exists
 	String dumpDirectory = Configuration.get(ConfigurationKeys.LAMS_DUMP_DIR);
 	if (dumpDirectory == null) {
-	    dumpDirectory = getTempDir();
+	    dumpDirectory = FileUtil.getTempDir();
 	}
-	createDirectory(dumpDirectory);
+	FileUtil.createDirectory(dumpDirectory);
 
 	String dumpFilename = dumpDirectory + File.separator + id + System.currentTimeMillis()
 		+ (extension != null ? "." + extension : "");
@@ -332,8 +330,8 @@ public class FileUtil {
 	    dumpFile = new File(dumpFilename);
 	}
 	if (dumpFile.exists()) {
-	    throw new FileUtilException("Unable to create dump file. The filename that we would use already exists: "
-		    + dumpFile);
+	    throw new FileUtilException(
+		    "Unable to create dump file. The filename that we would use already exists: " + dumpFile);
 	}
 
 	return dumpFilename;
@@ -342,11 +340,11 @@ public class FileUtil {
     /**
      * Dump some data to a file in the Dump Directory. The directory is set in the LAMS configuration file. These dumps
      * are primarily for support/debugging/problem reporting uses.
-     * 
+     *
      * If the dump directory is not set, it will revert to the system temp directory.
-     * 
+     *
      * Used by the FlashCrashDump servlet initially, may be used by other dump methods in future.
-     * 
+     *
      * @param data
      *            data to dump
      * @param id
@@ -354,12 +352,12 @@ public class FileUtil {
      * @param extension
      *            optional extension to be added to filename e.g. xml. Note: do not include the "." - that will be added
      *            automatically.
-     * 
+     *
      * @author Fiona Malikoff
      * @throws FileUtilException
      */
     public static String createDumpFile(byte[] data, String id, String extension) throws FileUtilException {
-	String dumpFilename = generateDumpFilename(id, extension);
+	String dumpFilename = FileUtil.generateDumpFilename(id, extension);
 	OutputStream dumpFile = null;
 	try {
 	    dumpFile = new FileOutputStream(dumpFilename);
@@ -385,7 +383,7 @@ public class FileUtil {
     /**
      * get file name from a string which may include directory information. For example : "c:\\dir\\ndp\\pp.txt"; will
      * return pp.txt.? If file has no path infomation, then just return input fileName.
-     * 
+     *
      */
     public static String getFileName(String fileName) {
 	if (fileName == null) {
@@ -406,7 +404,7 @@ public class FileUtil {
 
     /**
      * Get file directory info.
-     * 
+     *
      * @param fileName
      *            with path info.
      * @return return only path info with the given fileName
@@ -431,7 +429,7 @@ public class FileUtil {
 
     /**
      * Merge two input parameter into full path and adjust File.separator to OS default separator as well.
-     * 
+     *
      * @param path
      * @param file
      *            could be file name,or sub directory path.
@@ -445,7 +443,7 @@ public class FileUtil {
 	    fullpath = path + File.separator + file;
 	}
 
-	return makeCanonicalPath(fullpath);
+	return FileUtil.makeCanonicalPath(fullpath);
 
     }
 
@@ -479,7 +477,7 @@ public class FileUtil {
     /**
      * Check whether file is executable according to its extenstion and executable extension name list from LAMS
      * configuaration.
-     * 
+     *
      * @param filename
      * @return
      */
@@ -507,8 +505,9 @@ public class FileUtil {
 
     /**
      * Verify if a file with such extension is allowed to be uploaded.
-     * 
-     * @param fileType file type can be of the following values:File, Image, Flash, Media
+     *
+     * @param fileType
+     *            file type can be of the following values:File, Image, Flash, Media
      * @param fileName
      */
     public static boolean isExtensionAllowed(String fileType, String fileName) {
@@ -518,7 +517,7 @@ public class FileUtil {
 
 	if ("File".equals(fileType)) {
 	    // executables are not allowed
-	    return !isExecutableFile(fileName);
+	    return !FileUtil.isExecutableFile(fileName);
 
 	} else if ("Image".equals(fileType)) {
 	    allowedExtensions = ALLOWED_EXTENSIONS_IMAGE;
@@ -540,7 +539,7 @@ public class FileUtil {
 		return true;
 	    }
 	}
-	
+
 	return false;
     }
 
@@ -548,9 +547,9 @@ public class FileUtil {
      * Clean up any old directories in the java tmp directory, where the directory name starts with lamszip_ or lamstmp_
      * and is <numdays> days old or older. This has the potential to be a heavy call - it has to do complete directory
      * listing and then recursively delete the files and directories as needed.
-     * 
+     *
      * Note: this method has not been tested as it is rather hard to write a junit test for!
-     * 
+     *
      * @param directories
      * @return number of directories deleted
      */
@@ -572,7 +571,7 @@ public class FileUtil {
 
     /**
      * List files in temp directory older than numDays.
-     * 
+     *
      * @param numDays
      *            Number of days old that the directory should be to be deleted. Must be greater than 0
      * @return array of files older than input date
@@ -589,17 +588,17 @@ public class FileUtil {
 	// calculate comparison date
 	long newestDateToKeep = System.currentTimeMillis() - numDays * FileUtil.numMilliSecondsInADay;
 	Date date = new Date(newestDateToKeep);
-	FileUtil.log.info("Getting all temp zipfile expanded directories before " + date.toString()
-		+ " (server time) (" + newestDateToKeep + ")");
+	FileUtil.log.info("Getting all temp zipfile expanded directories before " + date.toString() + " (server time) ("
+		+ newestDateToKeep + ")");
 
-	File tempSysDir = new File(getTempDir());
+	File tempSysDir = new File(FileUtil.getTempDir());
 	File candidates[] = tempSysDir.listFiles(new TempDirectoryFilter(newestDateToKeep, FileUtil.log));
 	return candidates;
     }
 
     /**
      * Recursively calculates size in bytes of given file or directory.
-     * 
+     *
      * @param file
      * @return Size in bytes.
      */
@@ -612,7 +611,7 @@ public class FileUtil {
 		long totalSize = 0;
 		if (fileList != null) {
 		    for (int i = 0; i < fileList.length; i++) {
-			totalSize += calculateFileSize(fileList[i]);
+			totalSize += FileUtil.calculateFileSize(fileList[i]);
 		    }
 		    return totalSize;
 		} else {
@@ -627,7 +626,7 @@ public class FileUtil {
 
     /**
      * Remove chars from a file name that may be invalid on a file system.
-     * 
+     *
      * @param name
      * @return a filename that can be saved to a file system.
      */
@@ -650,7 +649,7 @@ public class FileUtil {
     /**
      * Encode a filename in such a way that the UTF-8 characters won't be munged during the download by a browser. Need
      * the request to work out the user's browser type
-     * 
+     *
      * @return encoded filename
      * @throws UnsupportedEncodingException
      */
@@ -691,11 +690,11 @@ public class FileUtil {
 
 	return newUniqueContentFolderID;
     }
-    
+
     /**
      * Return content folder (unique to each learner and lesson) which is used for storing user generated content.
      * It's been used by CKEditor.
-     * 
+     *
      * @param toolSessionId
      * @param userId
      * @return
@@ -703,11 +702,11 @@ public class FileUtil {
     public static String getLearnerContentFolder(Long lessonId, Long userId) {
 	return LAMS_RUNTIME_CONTENT_DIR + "/" + lessonId + "/" + userId;
     }
-    
+
     /**
      * Return lesson's content folder which is used for storing user generated content.
      * It's been used by CKEditor.
-     * 
+     *
      * @param toolSessionId
      * @param userId
      * @return
@@ -721,20 +720,20 @@ public class FileUtil {
      * added fields, remove the field using the ToolContentVersionFilter functionality and try to reparse. We can't
      * nominate the problem fields in advance as we are making XML created by newer versions of LAMS compatible with an
      * older version.
-     * 
+     *
      * This logic depends on the exception message containing the text. When we upgrade xstream, we must check that this
      * message doesn't change.
-     * 
+     *
      * <pre>
      * 	com.thoughtworks.xstream.converters.ConversionException: unknownField : unknownField
      * 	---- Debugging information ----
-     * 	required-type       : org.lamsfoundation.lams.learningdesign.dto.LearningDesignDTO 
-     * 	cause-message       : unknownField : unknownField 
-     * 	class               : org.lamsfoundation.lams.learningdesign.dto.LearningDesignDTO 
-     * 	message             : unknownField : unknownField 
-     * 	line number         : 15 
-     * 	path                : /org.lamsfoundation.lams.learningdesign.dto.LearningDesignDTO/unknownField 
-     * 	cause-exception     : com.thoughtworks.xstream.alias.CannotResolveClassException 
+     * 	required-type       : org.lamsfoundation.lams.learningdesign.dto.LearningDesignDTO
+     * 	cause-message       : unknownField : unknownField
+     * 	class               : org.lamsfoundation.lams.learningdesign.dto.LearningDesignDTO
+     * 	message             : unknownField : unknownField
+     * 	line number         : 15
+     * 	path                : /org.lamsfoundation.lams.learningdesign.dto.LearningDesignDTO/unknownField
+     * 	cause-exception     : com.thoughtworks.xstream.alias.CannotResolveClassException
      * 	-------------------------------
      * </pre>
      */
@@ -774,8 +773,8 @@ public class FileUtil {
 		} else {
 		    // try removing the field from our XML and retry
 		    String message = ce.getMessage();
-		    String classname = extractValue(message, "required-type");
-		    String fieldname = extractValue(message, "message");
+		    String classname = FileUtil.extractValue(message, "required-type");
+		    String fieldname = FileUtil.extractValue(message, "message");
 		    if (fieldname == null || fieldname.equals("")
 			    || lastFieldRemoved.equals(classname + "." + fieldname)) {
 			// can't retry, so get out of here!
@@ -785,7 +784,7 @@ public class FileUtil {
 			    contentFilter = new ToolContentVersionFilter();
 			}
 
-			Class problemClass = getClass(classname);
+			Class problemClass = FileUtil.getClass(classname);
 			if (problemClass == null) {
 			    // can't retry, so get out of here!
 			    break;
@@ -839,7 +838,7 @@ public class FileUtil {
 
     /**
      * Gets the temp dir, creates if not exists, returns java system temp dir if inaccessible
-     * 
+     *
      * @return
      */
     public static String getTempDir() {

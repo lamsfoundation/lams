@@ -1,23 +1,23 @@
-/**************************************************************** 
- * Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org) 
- * ============================================================= 
- * License Information: http://lamsfoundation.org/licensing/lams/2.0/ 
- * 
- * This program is free software; you can redistribute it and/or modify 
- * it under the terms of the GNU General Public License version 2.0 
- * as published by the Free Software Foundation. 
- * 
- * This program is distributed in the hope that it will be useful, 
- * but WITHOUT ANY WARRANTY; without even the implied warranty of 
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the 
- * GNU General Public License for more details. 
- * 
- * You should have received a copy of the GNU General Public License 
- * along with this program; if not, write to the Free Software 
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 * USA 
- * 
- * http://www.gnu.org/licenses/gpl.txt 
- * **************************************************************** 
+/****************************************************************
+ * Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
+ * =============================================================
+ * License Information: http://lamsfoundation.org/licensing/lams/2.0/
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License version 2.0
+ * as published by the Free Software Foundation.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 * USA
+ *
+ * http://www.gnu.org/licenses/gpl.txt
+ * ****************************************************************
  */
 
 /* $Id$ */
@@ -79,17 +79,17 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
  * <p>
  * Responsible for "Email notification" functionality.
  * </p>
- * 
+ *
  * @author Andrey Balan
- * 
+ *
  *         ----------------XDoclet Tags--------------------
- * 
+ *
  * @struts:action path="/emailNotifications" parameter="method" validate="false"
  * @struts.action-forward name = "lessonView" path = "/emailnotifications/lessonNotifications.jsp"
  * @struts.action-forward name = "courseView" path = "/emailnotifications/courseNotifications.jsp"
  * @struts.action-forward name = "userList" path = "/emailnotifications/userList.jsp"
  * @struts.action-forward name = "scheduledEmailList" path = "/emailnotifications/scheduledEmailList.jsp"
- * 
+ *
  *                        ----------------XDoclet Tags--------------------
  */
 public class EmailNotificationsAction extends LamsDispatchAction {
@@ -142,8 +142,8 @@ public class EmailNotificationsAction extends LamsDispatchAction {
     public ActionForward getCourseView(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) throws IOException, ServletException {
 	int orgId = WebUtil.readIntParam(request, AttributeNames.PARAM_ORGANISATION_ID);
-	if (!getSecurityService()
-		.isGroupMonitor(orgId, getUser().getUserID(), "show course email notifications", false)) {
+	if (!getSecurityService().isGroupMonitor(orgId, getUser().getUserID(), "show course email notifications",
+		false)) {
 	    response.sendError(HttpServletResponse.SC_FORBIDDEN, "User is not a monitor in the organisation");
 	    return null;
 	}
@@ -245,8 +245,8 @@ public class EmailNotificationsAction extends LamsDispatchAction {
 	    HttpServletResponse response) throws IOException, ServletException, JSONException {
 
 	JSONObject JSONObject = new JSONObject();
-	IMonitoringService monitoringService = MonitoringServiceProxy.getMonitoringService(getServlet()
-		.getServletContext());
+	IMonitoringService monitoringService = MonitoringServiceProxy
+		.getMonitoringService(getServlet().getServletContext());
 
 	String emailBody = WebUtil.readStrParam(request, "emailBody");
 	Long scheduleDateParameter = WebUtil.readLongParam(request, "scheduleDate", true);
@@ -260,8 +260,8 @@ public class EmailNotificationsAction extends LamsDispatchAction {
 		boolean isHtmlFormat = false;
 		isSuccessfullySent &= getEventNotificationService().sendMessage(null, userId,
 			IEventNotificationService.DELIVERY_METHOD_MAIL, monitoringService.getMessageService()
-				.getMessage("event.emailnotifications.email.subject", new Object[] {}), emailBody,
-			isHtmlFormat);
+				.getMessage("event.emailnotifications.email.subject", new Object[] {}),
+			emailBody, isHtmlFormat);
 	    }
 
 	    JSONObject.put("isSuccessfullySent", isSuccessfullySent);
@@ -284,8 +284,9 @@ public class EmailNotificationsAction extends LamsDispatchAction {
 		copySearchParametersFromRequestToMap(request, emailScheduleMessageJob.getJobDataMap());
 
 		// create customized triggers
-		Trigger startLessonTrigger = new SimpleTrigger(EmailNotificationsAction.TRIGGER_PREFIX_NAME
-			+ now.getTimeInMillis(), Scheduler.DEFAULT_GROUP, scheduleDate);
+		Trigger startLessonTrigger = new SimpleTrigger(
+			EmailNotificationsAction.TRIGGER_PREFIX_NAME + now.getTimeInMillis(), Scheduler.DEFAULT_GROUP,
+			scheduleDate);
 		// start the scheduling job
 		Scheduler scheduler = getScheduler();
 		scheduler.scheduleJob(emailScheduleMessageJob, startLessonTrigger);
@@ -326,9 +327,9 @@ public class EmailNotificationsAction extends LamsDispatchAction {
 		return null;
 	    }
 	}
-	
-	IMonitoringService monitoringService = MonitoringServiceProxy.getMonitoringService(getServlet()
-		.getServletContext());
+
+	IMonitoringService monitoringService = MonitoringServiceProxy
+		.getMonitoringService(getServlet().getServletContext());
 	ICoreLearnerService learnerService = MonitoringServiceProxy.getLearnerService(getServlet().getServletContext());
 
 	int searchType = (Integer) map.get("searchType");
@@ -364,7 +365,7 @@ public class EmailNotificationsAction extends LamsDispatchAction {
 
     /**
      * Copies search parameters from request to specified map. Validates parameters along the way.
-     * 
+     *
      * @param request
      * @param map
      *            specified map
@@ -374,54 +375,54 @@ public class EmailNotificationsAction extends LamsDispatchAction {
 	map.put("searchType", searchType);
 
 	switch (searchType) {
-	case MonitoringConstants.LESSON_TYPE_ASSIGNED_TO_LESSON:
-	case MonitoringConstants.LESSON_TYPE_HAVENT_FINISHED_LESSON:
-	case MonitoringConstants.LESSON_TYPE_HAVE_FINISHED_LESSON:
-	case MonitoringConstants.LESSON_TYPE_HAVENT_STARTED_LESSON:
-	case MonitoringConstants.LESSON_TYPE_HAVE_STARTED_LESSON:
-	case MonitoringConstants.LESSON_TYPE_HAVENT_REACHED_PARTICULAR_ACTIVITY:
-	case MonitoringConstants.LESSON_TYPE_LESS_THAN_X_DAYS_TO_DEADLINE:
-	    Long lessonId = WebUtil.readLongParam(request, AttributeNames.PARAM_LESSON_ID);
-	    Assert.notNull(lessonId);
-	    map.put(AttributeNames.PARAM_LESSON_ID, lessonId);
-	    break;
+	    case MonitoringConstants.LESSON_TYPE_ASSIGNED_TO_LESSON:
+	    case MonitoringConstants.LESSON_TYPE_HAVENT_FINISHED_LESSON:
+	    case MonitoringConstants.LESSON_TYPE_HAVE_FINISHED_LESSON:
+	    case MonitoringConstants.LESSON_TYPE_HAVENT_STARTED_LESSON:
+	    case MonitoringConstants.LESSON_TYPE_HAVE_STARTED_LESSON:
+	    case MonitoringConstants.LESSON_TYPE_HAVENT_REACHED_PARTICULAR_ACTIVITY:
+	    case MonitoringConstants.LESSON_TYPE_LESS_THAN_X_DAYS_TO_DEADLINE:
+		Long lessonId = WebUtil.readLongParam(request, AttributeNames.PARAM_LESSON_ID);
+		Assert.notNull(lessonId);
+		map.put(AttributeNames.PARAM_LESSON_ID, lessonId);
+		break;
 
-	case MonitoringConstants.COURSE_TYPE_HAVENT_STARTED_ANY_LESSONS:
-	case MonitoringConstants.COURSE_TYPE_HAVE_FINISHED_PARTICULAR_LESSON:
-	case MonitoringConstants.COURSE_TYPE_HAVENT_STARTED_PARTICULAR_LESSON:
-	case MonitoringConstants.COURSE_TYPE_HAVE_FINISHED_THESE_LESSONS:
-	case MonitoringConstants.COURSE_TYPE_HAVENT_FINISHED_THESE_LESSONS:
-	    Integer organisationId = WebUtil.readIntParam(request, AttributeNames.PARAM_ORGANISATION_ID);
-	    Assert.notNull(organisationId);
-	    map.put(AttributeNames.PARAM_ORGANISATION_ID, organisationId);
-	    break;
+	    case MonitoringConstants.COURSE_TYPE_HAVENT_STARTED_ANY_LESSONS:
+	    case MonitoringConstants.COURSE_TYPE_HAVE_FINISHED_PARTICULAR_LESSON:
+	    case MonitoringConstants.COURSE_TYPE_HAVENT_STARTED_PARTICULAR_LESSON:
+	    case MonitoringConstants.COURSE_TYPE_HAVE_FINISHED_THESE_LESSONS:
+	    case MonitoringConstants.COURSE_TYPE_HAVENT_FINISHED_THESE_LESSONS:
+		Integer organisationId = WebUtil.readIntParam(request, AttributeNames.PARAM_ORGANISATION_ID);
+		Assert.notNull(organisationId);
+		map.put(AttributeNames.PARAM_ORGANISATION_ID, organisationId);
+		break;
 	}
 
 	switch (searchType) {
-	case MonitoringConstants.LESSON_TYPE_HAVENT_REACHED_PARTICULAR_ACTIVITY:
-	    Long activityId = WebUtil.readLongParam(request, AttributeNames.PARAM_ACTIVITY_ID);
-	    Assert.notNull(activityId);
-	    map.put(AttributeNames.PARAM_ACTIVITY_ID, activityId);
-	    break;
+	    case MonitoringConstants.LESSON_TYPE_HAVENT_REACHED_PARTICULAR_ACTIVITY:
+		Long activityId = WebUtil.readLongParam(request, AttributeNames.PARAM_ACTIVITY_ID);
+		Assert.notNull(activityId);
+		map.put(AttributeNames.PARAM_ACTIVITY_ID, activityId);
+		break;
 
-	case MonitoringConstants.LESSON_TYPE_LESS_THAN_X_DAYS_TO_DEADLINE:
-	    Integer xDaystoFinish = WebUtil.readIntParam(request, "daysToDeadline");
-	    Assert.notNull(xDaystoFinish);
-	    map.put("daysToDeadline", xDaystoFinish);
-	    break;
+	    case MonitoringConstants.LESSON_TYPE_LESS_THAN_X_DAYS_TO_DEADLINE:
+		Integer xDaystoFinish = WebUtil.readIntParam(request, "daysToDeadline");
+		Assert.notNull(xDaystoFinish);
+		map.put("daysToDeadline", xDaystoFinish);
+		break;
 
-	case MonitoringConstants.COURSE_TYPE_HAVE_FINISHED_PARTICULAR_LESSON:
-	case MonitoringConstants.COURSE_TYPE_HAVENT_STARTED_PARTICULAR_LESSON:
-	    Long lessonId = WebUtil.readLongParam(request, AttributeNames.PARAM_LESSON_ID);
-	    Assert.notNull(lessonId);
-	    map.put(AttributeNames.PARAM_LESSON_ID, lessonId);
-	    break;
-	case MonitoringConstants.COURSE_TYPE_HAVE_FINISHED_THESE_LESSONS:
-	case MonitoringConstants.COURSE_TYPE_HAVENT_FINISHED_THESE_LESSONS:
-	    String[] lessonIds = request.getParameterValues(AttributeNames.PARAM_LESSON_ID);
-	    Assert.notNull(lessonIds);
-	    map.put("lessonIDs", lessonIds);
-	    break;
+	    case MonitoringConstants.COURSE_TYPE_HAVE_FINISHED_PARTICULAR_LESSON:
+	    case MonitoringConstants.COURSE_TYPE_HAVENT_STARTED_PARTICULAR_LESSON:
+		Long lessonId = WebUtil.readLongParam(request, AttributeNames.PARAM_LESSON_ID);
+		Assert.notNull(lessonId);
+		map.put(AttributeNames.PARAM_LESSON_ID, lessonId);
+		break;
+	    case MonitoringConstants.COURSE_TYPE_HAVE_FINISHED_THESE_LESSONS:
+	    case MonitoringConstants.COURSE_TYPE_HAVENT_FINISHED_THESE_LESSONS:
+		String[] lessonIds = request.getParameterValues(AttributeNames.PARAM_LESSON_ID);
+		Assert.notNull(lessonIds);
+		map.put("lessonIDs", lessonIds);
+		break;
 	}
 
     }
@@ -433,8 +434,8 @@ public class EmailNotificationsAction extends LamsDispatchAction {
 
     private IEventNotificationService getEventNotificationService() {
 	if (EmailNotificationsAction.eventNotificationService == null) {
-	    WebApplicationContext ctx = WebApplicationContextUtils.getRequiredWebApplicationContext(getServlet()
-		    .getServletContext());
+	    WebApplicationContext ctx = WebApplicationContextUtils
+		    .getRequiredWebApplicationContext(getServlet().getServletContext());
 	    EmailNotificationsAction.eventNotificationService = (IEventNotificationService) ctx
 		    .getBean("eventNotificationService");
 	}
@@ -443,8 +444,8 @@ public class EmailNotificationsAction extends LamsDispatchAction {
 
     private IUserManagementService getUserManagementService() {
 	if (EmailNotificationsAction.userManagementService == null) {
-	    WebApplicationContext ctx = WebApplicationContextUtils.getRequiredWebApplicationContext(getServlet()
-		    .getServletContext());
+	    WebApplicationContext ctx = WebApplicationContextUtils
+		    .getRequiredWebApplicationContext(getServlet().getServletContext());
 	    EmailNotificationsAction.userManagementService = (IUserManagementService) ctx
 		    .getBean("userManagementService");
 	}
@@ -453,8 +454,8 @@ public class EmailNotificationsAction extends LamsDispatchAction {
 
     private IAuditService getAuditService() {
 	if (EmailNotificationsAction.auditService == null) {
-	    WebApplicationContext ctx = WebApplicationContextUtils.getRequiredWebApplicationContext(getServlet()
-		    .getServletContext());
+	    WebApplicationContext ctx = WebApplicationContextUtils
+		    .getRequiredWebApplicationContext(getServlet().getServletContext());
 	    EmailNotificationsAction.auditService = (IAuditService) ctx.getBean("auditService");
 	}
 	return EmailNotificationsAction.auditService;
@@ -462,8 +463,8 @@ public class EmailNotificationsAction extends LamsDispatchAction {
 
     private ISecurityService getSecurityService() {
 	if (EmailNotificationsAction.securityService == null) {
-	    WebApplicationContext webContext = WebApplicationContextUtils.getRequiredWebApplicationContext(getServlet()
-		    .getServletContext());
+	    WebApplicationContext webContext = WebApplicationContextUtils
+		    .getRequiredWebApplicationContext(getServlet().getServletContext());
 	    EmailNotificationsAction.securityService = (ISecurityService) webContext.getBean("securityService");
 	}
 
@@ -471,22 +472,22 @@ public class EmailNotificationsAction extends LamsDispatchAction {
     }
 
     /**
-     * 
+     *
      * @return the bean that defines emailScheduleMessageJob.
      */
     private JobDetail getEmailScheduleMessageJob() {
-	WebApplicationContext ctx = WebApplicationContextUtils.getRequiredWebApplicationContext(getServlet()
-		.getServletContext());
+	WebApplicationContext ctx = WebApplicationContextUtils
+		.getRequiredWebApplicationContext(getServlet().getServletContext());
 	return (JobDetail) ctx.getBean(MonitoringConstants.JOB_EMAIL_MESSAGE);
     }
 
     /**
-     * 
+     *
      * @return the bean that defines Scheduler.
      */
     private Scheduler getScheduler() {
-	WebApplicationContext ctx = WebApplicationContextUtils.getRequiredWebApplicationContext(getServlet()
-		.getServletContext());
+	WebApplicationContext ctx = WebApplicationContextUtils
+		.getRequiredWebApplicationContext(getServlet().getServletContext());
 	return (Scheduler) ctx.getBean("scheduler");
     }
 }

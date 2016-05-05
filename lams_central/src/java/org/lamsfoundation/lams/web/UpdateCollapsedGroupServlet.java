@@ -18,10 +18,10 @@
  *
  * http://www.gnu.org/licenses/gpl.txt
  * ****************************************************************
- */ 
- 
-/* $Id$ */ 
-package org.lamsfoundation.lams.web; 
+ */
+
+/* $Id$ */
+package org.lamsfoundation.lams.web;
 
 import java.io.IOException;
 
@@ -30,7 +30,6 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.usermanagement.Organisation;
 import org.lamsfoundation.lams.usermanagement.Role;
 import org.lamsfoundation.lams.usermanagement.User;
@@ -41,7 +40,7 @@ import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.util.HttpSessionManager;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
- 
+
 /**
  * @author jliew
  *
@@ -49,36 +48,38 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
  * @web:servlet-mapping url-pattern="/servlet/updateCollapsedGroup"
  */
 public class UpdateCollapsedGroupServlet extends HttpServlet {
-		
-	public void doGet(HttpServletRequest request, HttpServletResponse response) 
-	throws ServletException, IOException {
-		
-		// get request parameters
-		Integer orgId = WebUtil.readIntParam(request, "orgId", false);
-		String collapsed = request.getParameter("collapsed");
-		
-		WebApplicationContext ctx = WebApplicationContextUtils.getWebApplicationContext(HttpSessionManager.getInstance().getServletContext());
-		UserManagementService service = (UserManagementService) ctx.getBean("userManagementService");
-		
-		Organisation org = (Organisation)service.findById(Organisation.class, orgId);
-		User user = service.getUserByLogin(request.getRemoteUser());
-		
-		// sysadmins always have non-collapsed groups; they aren't always members of the org anyway
-		if (request.isUserInRole(Role.SYSADMIN)) return;
-		
-		// insert or update userorg's collapsed status
-		if (org != null && collapsed != null && user != null) {
-			UserOrganisation uo = (UserOrganisation)service.getUserOrganisation(user.getUserId(), orgId);
-			UserOrganisationCollapsed uoc = uo.getUserOrganisationCollapsed();
-			if (uoc != null) {
-				uoc.setCollapsed(new Boolean(collapsed));
-			} else {
-				// new row in lams_user_organisation_collapsed
-				uoc = new UserOrganisationCollapsed(new Boolean(collapsed), uo);
-			}
-			service.save(uoc);
-		}
+
+    @Override
+    public void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+
+	// get request parameters
+	Integer orgId = WebUtil.readIntParam(request, "orgId", false);
+	String collapsed = request.getParameter("collapsed");
+
+	WebApplicationContext ctx = WebApplicationContextUtils
+		.getWebApplicationContext(HttpSessionManager.getInstance().getServletContext());
+	UserManagementService service = (UserManagementService) ctx.getBean("userManagementService");
+
+	Organisation org = (Organisation) service.findById(Organisation.class, orgId);
+	User user = service.getUserByLogin(request.getRemoteUser());
+
+	// sysadmins always have non-collapsed groups; they aren't always members of the org anyway
+	if (request.isUserInRole(Role.SYSADMIN)) {
+	    return;
 	}
 
+	// insert or update userorg's collapsed status
+	if (org != null && collapsed != null && user != null) {
+	    UserOrganisation uo = service.getUserOrganisation(user.getUserId(), orgId);
+	    UserOrganisationCollapsed uoc = uo.getUserOrganisationCollapsed();
+	    if (uoc != null) {
+		uoc.setCollapsed(new Boolean(collapsed));
+	    } else {
+		// new row in lams_user_organisation_collapsed
+		uoc = new UserOrganisationCollapsed(new Boolean(collapsed), uo);
+	    }
+	    service.save(uoc);
+	}
+    }
+
 }
- 

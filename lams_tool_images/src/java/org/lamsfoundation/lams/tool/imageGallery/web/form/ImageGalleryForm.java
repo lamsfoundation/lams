@@ -2,21 +2,21 @@
  * Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
  * =============================================================
  * License Information: http://lamsfoundation.org/licensing/lams/2.0/
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301
  * USA
- * 
+ *
  * http://www.gnu.org/licenses/gpl.txt
  * ****************************************************************
  */
@@ -33,12 +33,12 @@ import org.apache.struts.upload.FormFile;
 import org.lamsfoundation.lams.tool.imageGallery.model.ImageGallery;
 
 /**
- * 
+ *
  * ImageGallery Form.
- * 
+ *
  * @struts.form name="imageGalleryForm"
- * 
- * User: Andrey Balan
+ *
+ *              User: Andrey Balan
  */
 public class ImageGalleryForm extends ActionForm {
     private static final long serialVersionUID = 3599879328307492312L;
@@ -69,6 +69,7 @@ public class ImageGalleryForm extends ActionForm {
 	}
     }
 
+    @Override
     public void reset(ActionMapping mapping, HttpServletRequest request) {
 	String param = mapping.getParameter();
 	// if it is start page, all data read out from database or current session
@@ -125,7 +126,7 @@ public class ImageGalleryForm extends ActionForm {
     public void setContentFolderID(String contentFolderID) {
 	this.contentFolderID = contentFolderID;
     }
-    
+
     public boolean isAllowRatingsOrVote() {
 	return allowRatingsOrVote;
     }

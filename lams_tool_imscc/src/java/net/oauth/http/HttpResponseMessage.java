@@ -24,23 +24,23 @@ import java.util.Map;
 // The sticky part is deleting the method OAuthMessage.toHttpRequest.
 /**
  * An HTTP response.
- * 
+ *
  * @author John Kristian
  */
 public abstract class HttpResponseMessage extends HttpMessage {
 
     protected HttpResponseMessage(String method, URL url) {
-        super(method, url);
+	super(method, url);
     }
 
     @Override
     public void dump(Map<String, Object> into) throws IOException {
-        super.dump(into);
-        into.put(STATUS_CODE, Integer.valueOf(getStatusCode()));
-        String location = getHeader(LOCATION);
-        if (location != null) {
-            into.put(LOCATION, location);
-        }
+	super.dump(into);
+	into.put(STATUS_CODE, Integer.valueOf(getStatusCode()));
+	String location = getHeader(LOCATION);
+	if (location != null) {
+	    into.put(LOCATION, location);
+	}
     }
 
     public abstract int getStatusCode() throws IOException;

@@ -31,6 +31,7 @@ import org.lamsfoundation.lams.gradebook.dto.GradebookGridRowDTO;
 
 @SuppressWarnings("unchecked")
 public class GBStartDateComparator implements Comparator {
+    @Override
     public int compare(Object actGridRow, Object anotherActGridRow) {
 	if (actGridRow instanceof GBActivityGridRowDTO && anotherActGridRow instanceof GBActivityGridRowDTO) {
 

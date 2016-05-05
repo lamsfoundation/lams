@@ -2,21 +2,21 @@
  * Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
  * =============================================================
  * License Information: http://lamsfoundation.org/licensing/lams/2.0/
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301
  * USA
- * 
+ *
  * http://www.gnu.org/licenses/gpl.txt
  * ****************************************************************
  */
@@ -32,11 +32,11 @@ import org.apache.log4j.Logger;
 
 /**
  * CommonCartridge
- * 
+ *
  * @author Andrey Balan
- * 
+ *
  * @hibernate.class table="tl_laimsc11_commoncartridge_item"
- * 
+ *
  */
 public class CommonCartridgeItem implements Cloneable {
     private static final Logger log = Logger.getLogger(CommonCartridgeItem.class);
@@ -86,6 +86,7 @@ public class CommonCartridgeItem implements Cloneable {
     // DTO fields:
     private boolean complete;
 
+    @Override
     public Object clone() {
 	CommonCartridgeItem obj = null;
 	try {
@@ -101,10 +102,11 @@ public class CommonCartridgeItem implements Cloneable {
 		}
 		obj.itemInstructions = set;
 	    }
-	    ((CommonCartridgeItem) obj).setUid(null);
+	    obj.setUid(null);
 	    // clone ReourceUser as well
-	    if (this.createBy != null)
-		((CommonCartridgeItem) obj).setCreateBy((CommonCartridgeUser) this.createBy.clone());
+	    if (this.createBy != null) {
+		obj.setCreateBy((CommonCartridgeUser) this.createBy.clone());
+	    }
 
 	} catch (CloneNotSupportedException e) {
 	    log.error("When clone " + CommonCartridgeItem.class + " failed");
@@ -134,7 +136,7 @@ public class CommonCartridgeItem implements Cloneable {
 
     /**
      * @hibernate.property column="file_uuid"
-     * 
+     *
      * @return
      */
     public Long getFileUuid() {
@@ -196,8 +198,9 @@ public class CommonCartridgeItem implements Cloneable {
     /**
      * @hibernate.set lazy="false" cascade="all-delete-orphan" inverse="false" order-by="sequence_id asc"
      * @hibernate.collection-key column="item_uid"
-     * @hibernate.collection-one-to-many 
-     *                                   class="org.lamsfoundation.lams.tool.commonCartridge.model.CommonCartridgeItemInstruction"
+     * @hibernate.collection-one-to-many
+     * 				  class=
+     *                                   "org.lamsfoundation.lams.tool.commonCartridge.model.CommonCartridgeItemInstruction"
      * @return
      */
     public Set getItemInstructions() {
@@ -246,7 +249,7 @@ public class CommonCartridgeItem implements Cloneable {
 
     /**
      * @hibernate.many-to-one cascade="none" column="create_by"
-     * 
+     *
      * @return
      */
     public CommonCartridgeUser getCreateBy() {
@@ -338,7 +341,7 @@ public class CommonCartridgeItem implements Cloneable {
     public void setOpenUrlNewWindow(boolean openUrlNewWindow) {
 	this.openUrlNewWindow = openUrlNewWindow;
     }
-    
+
     /**
      * @hibernate.property column="launch_url" length="255"
      * @return
@@ -350,7 +353,7 @@ public class CommonCartridgeItem implements Cloneable {
     public void setLaunchUrl(String launchUrl) {
 	this.launchUrl = launchUrl;
     }
-    
+
     /**
      * @hibernate.property column="secure_launch_url" length="255"
      * @return
@@ -362,7 +365,7 @@ public class CommonCartridgeItem implements Cloneable {
     public void setSecureLaunchUrl(String secureLaunchUrl) {
 	this.secureLaunchUrl = secureLaunchUrl;
     }
-    
+
     /**
      * @hibernate.property column="tool_key" length="255"
      * @return
@@ -374,7 +377,7 @@ public class CommonCartridgeItem implements Cloneable {
     public void setKey(String key) {
 	this.key = key;
     }
-    
+
     /**
      * @hibernate.property column="tool_secret" length="255"
      * @return
@@ -386,7 +389,7 @@ public class CommonCartridgeItem implements Cloneable {
     public void setSecret(String secret) {
 	this.secret = secret;
     }
-    
+
     /**
      * @hibernate.property column="custom_str" length="65535"
      * @return
@@ -398,7 +401,7 @@ public class CommonCartridgeItem implements Cloneable {
     public void setCustomStr(String customStr) {
 	this.customStr = customStr;
     }
-    
+
     /**
      * @hibernate.property column="button_text" length="255"
      * @return
@@ -410,7 +413,7 @@ public class CommonCartridgeItem implements Cloneable {
     public void setButtonText(String buttonText) {
 	this.buttonText = buttonText;
     }
-    
+
     /**
      * @hibernate.property column="frame_height"
      * @return
@@ -421,7 +424,7 @@ public class CommonCartridgeItem implements Cloneable {
 
     public void setFrameHeight(int frameHeight) {
 	this.frameHeight = frameHeight;
-    }    
+    }
 
     public void setComplete(boolean complete) {
 	this.complete = complete;

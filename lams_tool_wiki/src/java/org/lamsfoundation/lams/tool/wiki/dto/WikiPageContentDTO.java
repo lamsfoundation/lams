@@ -66,6 +66,7 @@ public class WikiPageContentDTO implements Comparable<WikiPageContentDTO> {
 	this.version = version;
     }
 
+    @Override
     public int compareTo(WikiPageContentDTO wikiPageContentDTO) {
 	return wikiPageContentDTO.getUid().compareTo(uid) * -1;
     }

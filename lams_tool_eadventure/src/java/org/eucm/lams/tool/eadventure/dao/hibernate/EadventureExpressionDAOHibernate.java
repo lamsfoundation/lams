@@ -18,14 +18,13 @@
  *
  * http://www.gnu.org/licenses/gpl.txt
  * ****************************************************************
- */ 
- 
-/* $Id$ */ 
-package org.eucm.lams.tool.eadventure.dao.hibernate; 
+ */
+
+/* $Id$ */
+package org.eucm.lams.tool.eadventure.dao.hibernate;
 
 import org.eucm.lams.tool.eadventure.dao.EadventureExpressionDAO;
- 
+
 public class EadventureExpressionDAOHibernate extends BaseDAOHibernate implements EadventureExpressionDAO {
 
 }
- 

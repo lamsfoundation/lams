@@ -2,21 +2,21 @@
  * Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
  * =============================================================
  * License Information: http://lamsfoundation.org/licensing/lams/2.0/
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301
  * USA
- * 
+ *
  * http://www.gnu.org/licenses/gpl.txt
  * ****************************************************************
  */
@@ -37,18 +37,18 @@ import org.lamsfoundation.lams.web.util.AttributeNames;
  */
 /*
  * Relies on the followig two entries in the log4j configuration file:
- * 
+ *
  * <category name="org.lamsfoundation.lams.util.audit" additivity="false"> <priority value="INFO"/> <appender-ref
  * ref="AUDITFILE"/> </category>
- * 
- * 
+ *
+ *
  * <appender name="AUDITFILE" class="org.jboss.logging.appender.DailyRollingFileAppender"> <errorHandler
  * class="org.jboss.logging.util.OnlyOnceErrorHandler"/> <param name="File"
  * value="${jboss.server.home.dir}/log/audit.log"/> <param name="Append" value="true"/> <param name="Threshold"
  * value="INFO"/>
- * 
+ *
  * <!-- Rollover at midnight each day --> <param name="DatePattern" value="'.'yyyy-MM-dd"/>
- * 
+ *
  * <layout class="org.apache.log4j.PatternLayout"> <param name="ConversionPattern"
  * value="%d{ABSOLUTE} [%t:%x] %-5p %c - %m%n"/> </layout> </appender>
  */
@@ -77,14 +77,17 @@ public class AuditService implements IAuditService {
 	return userDTO.getLogin() + "(" + userDTO.getUserID() + "): ";
     }
 
+    @Override
     public void log(String moduleName, String message) {
 	logger.info(getUserString() + moduleName + ": " + message);
     }
 
+    @Override
     public void log(UserDTO userDTO, String moduleName, String message) {
 	logger.info(getUserString(userDTO) + moduleName + ": " + message);
     }
 
+    @Override
     public void logChange(String moduleName, Long originalUserId, String originalUserLogin, String originalText,
 	    String newText) {
 	String[] args = new String[3];
@@ -95,6 +98,7 @@ public class AuditService implements IAuditService {
 	log(moduleName, message);
     }
 
+    @Override
     public void logMarkChange(String moduleName, Long originalUserId, String originalUserLogin, String originalMark,
 	    String newMark) {
 	String[] args = new String[3];
@@ -105,6 +109,7 @@ public class AuditService implements IAuditService {
 	log(moduleName, message);
     }
 
+    @Override
     public void logHideEntry(String moduleName, Long originalUserId, String originalUserLogin, String hiddenItem) {
 	String[] args = new String[3];
 	args[0] = originalUserLogin + "(" + originalUserId + ")";
@@ -113,6 +118,7 @@ public class AuditService implements IAuditService {
 	log(moduleName, message);
     }
 
+    @Override
     public void logShowEntry(String moduleName, Long originalUserId, String originalUserLogin, String hiddenItem) {
 	String[] args = new String[3];
 	args[0] = originalUserLogin + "(" + originalUserId + ")";

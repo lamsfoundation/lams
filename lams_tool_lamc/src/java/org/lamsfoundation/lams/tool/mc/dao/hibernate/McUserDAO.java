@@ -2,21 +2,21 @@
  * Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
  * =============================================================
  * License Information: http://lamsfoundation.org/licensing/lams/2.0/
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301
  * USA
- * 
+ *
  * http://www.gnu.org/licenses/gpl.txt
  * ***********************************************************************/
 /* $$Id$$ */
@@ -45,10 +45,12 @@ public class McUserDAO extends HibernateDaoSupport implements IMcUserDAO {
 
     private static final String GET_USER_BY_USER_ID_SESSION = "from mcQueUsr in class McQueUsr where mcQueUsr.queUsrId=:queUsrId and mcQueUsr.mcSessionId=:mcSessionUid";
 
+    @Override
     public McQueUsr getMcUserByUID(Long uid) {
 	return (McQueUsr) this.getHibernateTemplate().get(McQueUsr.class, uid);
     }
 
+    @Override
     public McQueUsr getMcUserBySession(final Long queUsrId, final Long mcSessionUid) {
 
 	List list = getSession().createQuery(GET_USER_BY_USER_ID_SESSION).setLong("queUsrId", queUsrId.longValue())
@@ -61,20 +63,24 @@ public class McUserDAO extends HibernateDaoSupport implements IMcUserDAO {
 	return null;
     }
 
+    @Override
     public void saveMcUser(McQueUsr mcUser) {
 	this.getHibernateTemplate().save(mcUser);
     }
 
+    @Override
     public void updateMcUser(McQueUsr mcUser) {
 	this.getHibernateTemplate().update(mcUser);
     }
 
+    @Override
     public void removeMcUser(McQueUsr mcUser) {
 	this.getSession().setFlushMode(FlushMode.AUTO);
 	this.getHibernateTemplate().delete(mcUser);
     }
 
     /** Get the max, min and average mark (in that order) for a session */
+    @Override
     public Integer[] getMarkStatisticsForSession(Long sessionUid) {
 	Object[] stats = (Object[]) getSession().createQuery(CALC_MARK_STATS_FOR_SESSION)
 		.setLong("mcSessionUid", sessionUid.longValue()).uniqueResult();
@@ -93,19 +99,15 @@ public class McUserDAO extends HibernateDaoSupport implements IMcUserDAO {
 
     }
 
+    @Override
     public List<McUserMarkDTO> getPagedUsersBySession(Long sessionId, int page, int size, String sortBy,
 	    String sortOrder, String searchString) {
-	
-	
-	final String LOAD_USERS = "SELECT DISTINCT user.uid, user.fullname, user.lastAttemptTotalMark " +
- 		"FROM "+ McQueUsr.class.getName() + " user " +
- 		"WHERE user.mcSession.mcSessionId = :sessionId " +
-			" AND (user.fullname LIKE CONCAT('%', :searchString, '%')) " +
-		" ORDER BY " +
-		" CASE " +
-		" 	WHEN :sortBy='userName' THEN user.fullname " +
-		" 	WHEN :sortBy='total' THEN user.lastAttemptTotalMark " +
-		" END " + sortOrder;
+
+	final String LOAD_USERS = "SELECT DISTINCT user.uid, user.fullname, user.lastAttemptTotalMark " + "FROM "
+		+ McQueUsr.class.getName() + " user " + "WHERE user.mcSession.mcSessionId = :sessionId "
+		+ " AND (user.fullname LIKE CONCAT('%', :searchString, '%')) " + " ORDER BY " + " CASE "
+		+ " 	WHEN :sortBy='userName' THEN user.fullname "
+		+ " 	WHEN :sortBy='total' THEN user.lastAttemptTotalMark " + " END " + sortOrder;
 
 	Query query = getSession().createQuery(LOAD_USERS);
 	query.setLong("sessionId", sessionId);

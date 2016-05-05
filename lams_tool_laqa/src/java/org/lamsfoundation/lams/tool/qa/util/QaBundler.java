@@ -1,26 +1,26 @@
-/**************************************************************** 
- * Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org) 
- * ============================================================= 
- * License Information: http://lamsfoundation.org/licensing/lams/2.0/ 
- * 
- * This program is free software; you can redistribute it and/or modify 
- * it under the terms of the GNU General Public License version 2.0 
- * as published by the Free Software Foundation. 
- * 
- * This program is distributed in the hope that it will be useful, 
- * but WITHOUT ANY WARRANTY; without even the implied warranty of 
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the 
- * GNU General Public License for more details. 
- * 
- * You should have received a copy of the GNU General Public License 
- * along with this program; if not, write to the Free Software 
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 * USA 
- * 
- * http://www.gnu.org/licenses/gpl.txt 
- * **************************************************************** 
- */  
- 
-/* $Id$ */  
+/****************************************************************
+ * Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
+ * =============================================================
+ * License Information: http://lamsfoundation.org/licensing/lams/2.0/
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License version 2.0
+ * as published by the Free Software Foundation.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 * USA
+ *
+ * http://www.gnu.org/licenses/gpl.txt
+ * ****************************************************************
+ */
+
+/* $Id$ */
 package org.lamsfoundation.lams.tool.qa.util;
 
 import java.io.File;
@@ -39,7 +39,7 @@ import org.lamsfoundation.lams.util.ConfigurationKeys;
 import org.lamsfoundation.lams.util.HttpUrlConnectionUtil;
 
 public class QaBundler extends Bundler {
-    
+
     private static final char URL_SEPARATOR = '/';
 
     public QaBundler() {
@@ -47,7 +47,7 @@ public class QaBundler extends Bundler {
 
     /**
      * This method bundles the files to the given output dir
-     * 
+     *
      * @param request
      *            the request for the export
      * @param cookies
@@ -62,7 +62,7 @@ public class QaBundler extends Bundler {
 
     /**
      * See bundle
-     * 
+     *
      * @param request
      * @param cookies
      * @param outputDirectory
@@ -79,33 +79,37 @@ public class QaBundler extends Bundler {
 	}
 	this.createDirectories(directories);
 
-	String[] imageNames = new String[] { "jquery.jRating-background.png", "jquery.jRating-stars.png", "jquery.jRating-small.png" };
+	String[] imageNames = new String[] { "jquery.jRating-background.png", "jquery.jRating-stars.png",
+		"jquery.jRating-small.png" };
 	for (String imageName : imageNames) {
 	    String urlToConnectTo = getServerUrl() + "images" + URL_SEPARATOR + "css" + URL_SEPARATOR + imageName;
-	    String directoryToStoreFile = outputDirectory + File. separator + "images" + File.separator + "css";
+	    String directoryToStoreFile = outputDirectory + File.separator + "images" + File.separator + "css";
 	    HttpUrlConnectionUtil.writeResponseToFile(urlToConnectTo, directoryToStoreFile, imageName, cookies);// cookies aren't really needed here.
 	}
-	
+
 	// JS files
-	String urlToConnectTo = getServerUrl() + "includes" + URL_SEPARATOR + "javascript" + URL_SEPARATOR + "jquery.js";
+	String urlToConnectTo = getServerUrl() + "includes" + URL_SEPARATOR + "javascript" + URL_SEPARATOR
+		+ "jquery.js";
 	String directoryToStoreFile = outputDirectory + File.separator + "javascript";
-	HttpUrlConnectionUtil.writeResponseToFile(urlToConnectTo, directoryToStoreFile, "jquery.js", cookies); 
-	
-	urlToConnectTo = getServerUrl() + "includes" + URL_SEPARATOR + "javascript" + URL_SEPARATOR + "jquery.jRating.js";
+	HttpUrlConnectionUtil.writeResponseToFile(urlToConnectTo, directoryToStoreFile, "jquery.js", cookies);
+
+	urlToConnectTo = getServerUrl() + "includes" + URL_SEPARATOR + "javascript" + URL_SEPARATOR
+		+ "jquery.jRating.js";
 	directoryToStoreFile = outputDirectory + File.separator + "javascript";
-	HttpUrlConnectionUtil.writeResponseToFile(urlToConnectTo, directoryToStoreFile, "jquery.jRating.js", cookies); 
+	HttpUrlConnectionUtil.writeResponseToFile(urlToConnectTo, directoryToStoreFile, "jquery.jRating.js", cookies);
 
 	//CSS files
 	urlToConnectTo = getServerUrl() + "css" + URL_SEPARATOR + "jquery.jRating.css";
 	directoryToStoreFile = outputDirectory + File.separator + "css";
-	HttpUrlConnectionUtil.writeResponseToFile(urlToConnectTo, directoryToStoreFile, "jquery.jRating.css", cookies); 
+	HttpUrlConnectionUtil.writeResponseToFile(urlToConnectTo, directoryToStoreFile, "jquery.jRating.css", cookies);
 
     }
 
     private String getServerUrl() {
 	String serverUrl = Configuration.get(ConfigurationKeys.SERVER_URL);
 	if (serverUrl == null) {
-	    log.error("Unable to get path to the LAMS Server URL from the configuration table. Q&A javascript files export failed");
+	    log.error(
+		    "Unable to get path to the LAMS Server URL from the configuration table. Q&A javascript files export failed");
 	    return "";
 	} else {
 	    if (!serverUrl.endsWith("/")) {

@@ -32,15 +32,15 @@ import org.apache.log4j.Logger;
 
 /**
  * Superclass for any files "bundled" as part of the export portfolio. For code reuse.
- * 
+ *
  */
 public class Bundler {
 
     protected static Logger log = Logger.getLogger(Bundler.class);
 
     /**
-	 * 
-	 */
+     * 
+     */
     public Bundler() {
 	super();
     }

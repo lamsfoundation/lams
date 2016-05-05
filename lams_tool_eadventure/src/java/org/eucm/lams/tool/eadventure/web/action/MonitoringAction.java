@@ -2,21 +2,21 @@
  * Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
  * =============================================================
  * License Information: http://lamsfoundation.org/licensing/lams/2.0/
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License version 2.0 
+ * it under the terms of the GNU General Public License version 2.0
  * as published by the Free Software Foundation.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301
  * USA
- * 
+ *
  * http://www.gnu.org/licenses/gpl.txt
  * ****************************************************************
  */
@@ -24,12 +24,7 @@
 /* $Id$ */
 package org.eucm.lams.tool.eadventure.web.action;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -43,8 +38,6 @@ import org.apache.struts.action.Action;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
-import org.lamsfoundation.lams.notebook.model.NotebookEntry;
-import org.lamsfoundation.lams.notebook.service.CoreNotebookConstants;
 import org.eucm.lams.tool.eadventure.EadventureConstants;
 import org.eucm.lams.tool.eadventure.dto.ReflectDTO;
 import org.eucm.lams.tool.eadventure.dto.Summary;
@@ -54,7 +47,8 @@ import org.eucm.lams.tool.eadventure.model.EadventureSession;
 import org.eucm.lams.tool.eadventure.model.EadventureUser;
 import org.eucm.lams.tool.eadventure.model.EadventureVars;
 import org.eucm.lams.tool.eadventure.service.IEadventureService;
-import org.lamsfoundation.lams.tool.ToolOutput;
+import org.lamsfoundation.lams.notebook.model.NotebookEntry;
+import org.lamsfoundation.lams.notebook.service.CoreNotebookConstants;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.lamsfoundation.lams.web.util.SessionMap;
@@ -93,28 +87,27 @@ public class MonitoringAction extends Action {
 
 	return mapping.findForward(EadventureConstants.ERROR);
     }
-    
+
     private ActionForward showReport(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) {
-	
+
 	// get back SessionMap
 	String sessionMapID = request.getParameter(EadventureConstants.ATTR_SESSION_MAP_ID);
 	//SessionMap sessionMap = (SessionMap) request.getSession().getAttribute(sessionMapID);
 	//request.setAttribute(EadventureConstants.ATTR_SESSION_MAP_ID, sessionMap.getSessionID());
 
-	
 	IEadventureService service = getEadventureService();
 	Long sessionId = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_SESSION_ID);
 	EadventureSession session = service.getEadventureSessionBySessionId(sessionId);
 	Eadventure ead = session.getEadventure();
 	Long uid = WebUtil.readLongParam(request, EadventureConstants.ATTR_USER_UID);
 	EadventureUser user = service.getUser(uid);
-	
+
 	//TODO gestionar el report
 	//EadventureResult result = service.getLastEadventureResult(ead.getUid(), user.getUserId());
 	//
 	EadventureItemVisitLog log = service.getEadventureItemLog(ead.getUid(), user.getUserId());
-	
+
 	EadventureVars var = service.getEadventureVars(log.getUid(), EadventureConstants.VAR_NAME_REPORT);
 	request.setAttribute("html", var.getValue());
 	return mapping.findForward(EadventureConstants.SUCCESS);
@@ -181,8 +174,8 @@ public class MonitoringAction extends Action {
 	request.getSession().setAttribute(sessionMap.getSessionID(), sessionMap);
 	request.setAttribute(EadventureConstants.ATTR_SESSION_MAP_ID, sessionMap.getSessionID());
 	// save contentFolderID into session
-	sessionMap.put(AttributeNames.PARAM_CONTENT_FOLDER_ID, WebUtil.readStrParam(request,
-		AttributeNames.PARAM_CONTENT_FOLDER_ID));
+	sessionMap.put(AttributeNames.PARAM_CONTENT_FOLDER_ID,
+		WebUtil.readStrParam(request, AttributeNames.PARAM_CONTENT_FOLDER_ID));
 
 	Long contentId = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_CONTENT_ID);
 	IEadventureService service = getEadventureService();
@@ -191,7 +184,7 @@ public class MonitoringAction extends Action {
 	Eadventure eadventure = service.getEadventureByContentId(contentId);
 
 	Map<Long, Set<ReflectDTO>> relectList = service.getReflectList(contentId, false);
-	
+
 	// cache into sessionMap
 	sessionMap.put(EadventureConstants.ATTR_SUMMARY_LIST, groupList);
 	sessionMap.put(EadventureConstants.PAGE_EDITABLE, eadventure.isContentInUse());
@@ -217,19 +210,19 @@ public class MonitoringAction extends Action {
 	Eadventure ead = session.getEadventure();
 	Long uid = WebUtil.readLongParam(request, EadventureConstants.ATTR_USER_UID);
 	EadventureUser user = service.getUser(uid);
-	
+
 	//TODO gestionar el report
 	//EadventureResult result = service.getLastEadventureResult(ead.getUid(), user.getUserId());
 	EadventureItemVisitLog log = service.getEadventureItemLog(ead.getUid(), user.getUserId());
-	
+
 	EadventureVars var = service.getEadventureVars(log.getUid(), EadventureConstants.VAR_NAME_REPORT);
-	
-	
+
 	int exist;
-	if (var!=null)
-	    exist=0;
-	else
-	    exist=1;
+	if (var != null) {
+	    exist = 0;
+	} else {
+	    exist = 1;
+	}
 	String sessionMapID = request.getParameter(EadventureConstants.ATTR_SESSION_MAP_ID);
 	SessionMap sessionMap = (SessionMap) request.getSession().getAttribute(sessionMapID);
 	request.setAttribute(EadventureConstants.ATTR_SESSION_MAP_ID, sessionMap.getSessionID());
@@ -270,8 +263,8 @@ public class MonitoringAction extends Action {
     // Private method
     // *************************************************************************************
     private IEadventureService getEadventureService() {
-	WebApplicationContext wac = WebApplicationContextUtils.getRequiredWebApplicationContext(getServlet()
-		.getServletContext());
+	WebApplicationContext wac = WebApplicationContextUtils
+		.getRequiredWebApplicationContext(getServlet().getServletContext());
 	return (IEadventureService) wac.getBean(EadventureConstants.RESOURCE_SERVICE);
     }
 }

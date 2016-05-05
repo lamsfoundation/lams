@@ -2,21 +2,21 @@
  * Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
  * =============================================================
  * License Information: http://lamsfoundation.org/licensing/lams/2.0/
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301
  * USA
- * 
+ *
  * http://www.gnu.org/licenses/gpl.txt
  * ****************************************************************
  */
@@ -63,7 +63,7 @@ public class QaAuthoringForm extends QaLearningForm implements QaAppConstants {
     protected String lockWhenFinished;
     protected String noReeditAllowed;
     protected String reflect;
-    protected String reflectionSubject;    
+    protected String reflectionSubject;
     protected int maximumRates;
     protected int minimumRates;
 
@@ -83,7 +83,7 @@ public class QaAuthoringForm extends QaLearningForm implements QaAppConstants {
     private String editQuestionBoxRequest;
 
     protected IQaService qaService;
-    
+
     protected boolean allowRichEditor;
     protected boolean useSelectLeaderToolOuput;
 
@@ -161,7 +161,7 @@ public class QaAuthoringForm extends QaLearningForm implements QaAppConstants {
 
     /**
      * @param isRemoveContent
-     *                The isRemoveContent to set.
+     *            The isRemoveContent to set.
      */
     public void setIsRemoveContent(String isRemoveContent) {
 	this.isRemoveContent = isRemoveContent;
@@ -170,14 +170,16 @@ public class QaAuthoringForm extends QaLearningForm implements QaAppConstants {
     /**
      * @return Returns the questionIndex.
      */
+    @Override
     public String getQuestionIndex() {
 	return questionIndex;
     }
 
     /**
      * @param questionIndex
-     *                The questionIndex to set.
+     *            The questionIndex to set.
      */
+    @Override
     public void setQuestionIndex(String questionIndex) {
 	this.questionIndex = questionIndex;
     }
@@ -191,7 +193,7 @@ public class QaAuthoringForm extends QaLearningForm implements QaAppConstants {
 
     /**
      * @param addContent
-     *                The addContent to set.
+     *            The addContent to set.
      */
     public void setAddContent(String addContent) {
 	this.addContent = addContent;
@@ -206,7 +208,7 @@ public class QaAuthoringForm extends QaLearningForm implements QaAppConstants {
 
     /**
      * @param removeContent
-     *                The removeContent to set.
+     *            The removeContent to set.
      */
     public void setRemoveContent(String removeContent) {
 	this.removeContent = removeContent;
@@ -221,7 +223,7 @@ public class QaAuthoringForm extends QaLearningForm implements QaAppConstants {
 
     /**
      * @param removeAllContent
-     *                The removeAllContent to set.
+     *            The removeAllContent to set.
      */
     public void setRemoveAllContent(String removeAllContent) {
 	this.removeAllContent = removeAllContent;
@@ -236,7 +238,7 @@ public class QaAuthoringForm extends QaLearningForm implements QaAppConstants {
 
     /**
      * @param submitAllContent
-     *                The submitAllContent to set.
+     *            The submitAllContent to set.
      */
     public void setSubmitAllContent(String submitAllContent) {
 	this.submitAllContent = submitAllContent;
@@ -251,7 +253,7 @@ public class QaAuthoringForm extends QaLearningForm implements QaAppConstants {
 
     /**
      * @param instructions
-     *                The instructions to set.
+     *            The instructions to set.
      */
     public void setInstructions(String instructions) {
 	this.instructions = instructions;
@@ -266,7 +268,7 @@ public class QaAuthoringForm extends QaLearningForm implements QaAppConstants {
 
     /**
      * @param title
-     *                The title to set.
+     *            The title to set.
      */
     public void setTitle(String title) {
 	this.title = title;
@@ -281,7 +283,7 @@ public class QaAuthoringForm extends QaLearningForm implements QaAppConstants {
 
     /**
      * @param choiceAdvanced
-     *                The choiceAdvanced to set.
+     *            The choiceAdvanced to set.
      */
     public void setChoiceAdvanced(String choiceAdvanced) {
 	this.choiceAdvanced = choiceAdvanced;
@@ -296,7 +298,7 @@ public class QaAuthoringForm extends QaLearningForm implements QaAppConstants {
 
     /**
      * @param choiceBasic
-     *                The choiceBasic to set.
+     *            The choiceBasic to set.
      */
     public void setChoiceBasic(String choiceBasic) {
 	this.choiceBasic = choiceBasic;
@@ -311,7 +313,7 @@ public class QaAuthoringForm extends QaLearningForm implements QaAppConstants {
 
     /**
      * @param choiceInstructions
-     *                The choiceInstructions to set.
+     *            The choiceInstructions to set.
      */
     public void setChoiceInstructions(String choiceInstructions) {
 	this.choiceInstructions = choiceInstructions;
@@ -326,7 +328,7 @@ public class QaAuthoringForm extends QaLearningForm implements QaAppConstants {
 
     /**
      * @param choice
-     *                The choice to set.
+     *            The choice to set.
      */
     public void setChoice(String choice) {
 	this.choice = choice;
@@ -341,7 +343,7 @@ public class QaAuthoringForm extends QaLearningForm implements QaAppConstants {
 
     /**
      * @param reportTitle
-     *                The reportTitle to set.
+     *            The reportTitle to set.
      */
     public void setReportTitle(String reportTitle) {
 	this.reportTitle = reportTitle;
@@ -356,12 +358,12 @@ public class QaAuthoringForm extends QaLearningForm implements QaAppConstants {
 
     /**
      * @param usernameVisible
-     *                The usernameVisible to set.
+     *            The usernameVisible to set.
      */
     public void setUsernameVisible(String usernameVisible) {
 	this.usernameVisible = usernameVisible;
     }
-    
+
     /**
      * @return Returns the allowRateAnswers.
      */
@@ -371,12 +373,12 @@ public class QaAuthoringForm extends QaLearningForm implements QaAppConstants {
 
     /**
      * @param allowRateAnswers
-     *                The allowRateAnswers to set.
+     *            The allowRateAnswers to set.
      */
     public void setAllowRateAnswers(String allowRateAnswers) {
 	this.allowRateAnswers = allowRateAnswers;
     }
-    
+
     /**
      * @return Returns the notifyTeachersOnResponseSubmit.
      */
@@ -386,7 +388,7 @@ public class QaAuthoringForm extends QaLearningForm implements QaAppConstants {
 
     /**
      * @param notifyTeachersOnResponseSubmit
-     *                The notifyTeachersOnResponseSubmit to set.
+     *            The notifyTeachersOnResponseSubmit to set.
      */
     public void setNotifyTeachersOnResponseSubmit(String notifyTeachersOnResponseSubmit) {
 	this.notifyTeachersOnResponseSubmit = notifyTeachersOnResponseSubmit;
@@ -401,7 +403,7 @@ public class QaAuthoringForm extends QaLearningForm implements QaAppConstants {
 
     /**
      * @param submitTabDone
-     *                The submitTabDone to set.
+     *            The submitTabDone to set.
      */
     public void setSubmitTabDone(String submitTabDone) {
 	this.submitTabDone = submitTabDone;
@@ -416,12 +418,12 @@ public class QaAuthoringForm extends QaLearningForm implements QaAppConstants {
 
     /**
      * @param questionsSequenced
-     *                The questionsSequenced to set.
+     *            The questionsSequenced to set.
      */
     public void setQuestionsSequenced(String questionsSequenced) {
 	this.questionsSequenced = questionsSequenced;
     }
-    
+
     /**
      * @return
      */
@@ -453,7 +455,7 @@ public class QaAuthoringForm extends QaLearningForm implements QaAppConstants {
 
     /**
      * @param endLearningMessage
-     *                The endLearningMessage to set.
+     *            The endLearningMessage to set.
      */
     public void setEndLearningMessage(String endLearningMessage) {
 	this.endLearningMessage = endLearningMessage;
@@ -468,7 +470,7 @@ public class QaAuthoringForm extends QaLearningForm implements QaAppConstants {
 
     /**
      * @param monitoringReportTitle
-     *                The monitoringReportTitle to set.
+     *            The monitoringReportTitle to set.
      */
     public void setMonitoringReportTitle(String monitoringReportTitle) {
 	this.monitoringReportTitle = monitoringReportTitle;
@@ -483,7 +485,7 @@ public class QaAuthoringForm extends QaLearningForm implements QaAppConstants {
 
     /**
      * @param editActivityMonitoring
-     *                The editActivityMonitoring to set.
+     *            The editActivityMonitoring to set.
      */
     public void setEditActivityMonitoring(String editActivityMonitoring) {
 	this.editActivityMonitoring = editActivityMonitoring;
@@ -498,7 +500,7 @@ public class QaAuthoringForm extends QaLearningForm implements QaAppConstants {
 
     /**
      * @param instructionsMonitoring
-     *                The instructionsMonitoring to set.
+     *            The instructionsMonitoring to set.
      */
     public void setInstructionsMonitoring(String instructionsMonitoring) {
 	this.instructionsMonitoring = instructionsMonitoring;
@@ -513,7 +515,7 @@ public class QaAuthoringForm extends QaLearningForm implements QaAppConstants {
 
     /**
      * @param statsMonitoring
-     *                The statsMonitoring to set.
+     *            The statsMonitoring to set.
      */
     public void setStatsMonitoring(String statsMonitoring) {
 	this.statsMonitoring = statsMonitoring;
@@ -528,7 +530,7 @@ public class QaAuthoringForm extends QaLearningForm implements QaAppConstants {
 
     /**
      * @param summaryMonitoring
-     *                The summaryMonitoring to set.
+     *            The summaryMonitoring to set.
      */
     public void setSummaryMonitoring(String summaryMonitoring) {
 	this.summaryMonitoring = summaryMonitoring;
@@ -543,7 +545,7 @@ public class QaAuthoringForm extends QaLearningForm implements QaAppConstants {
 
     /**
      * @param edit
-     *                The edit to set.
+     *            The edit to set.
      */
     public void setEdit(String edit) {
 	this.edit = edit;
@@ -558,7 +560,7 @@ public class QaAuthoringForm extends QaLearningForm implements QaAppConstants {
 
     /**
      * @param dispatch
-     *                The dispatch to set.
+     *            The dispatch to set.
      */
     public void setDispatch(String dispatch) {
 	this.dispatch = dispatch;
@@ -573,7 +575,7 @@ public class QaAuthoringForm extends QaLearningForm implements QaAppConstants {
 
     /**
      * @param toolContentID
-     *                The toolContentID to set.
+     *            The toolContentID to set.
      */
     public void setToolContentID(String toolContentID) {
 	this.toolContentID = toolContentID;
@@ -588,7 +590,7 @@ public class QaAuthoringForm extends QaLearningForm implements QaAppConstants {
 
     /**
      * @param currentTab
-     *                The currentTab to set.
+     *            The currentTab to set.
      */
     public void setCurrentTab(String currentTab) {
 	this.currentTab = currentTab;
@@ -603,7 +605,7 @@ public class QaAuthoringForm extends QaLearningForm implements QaAppConstants {
 
     /**
      * @param qaService
-     *                The qaService to set.
+     *            The qaService to set.
      */
     public void setQaService(IQaService qaService) {
 	this.qaService = qaService;
@@ -618,7 +620,7 @@ public class QaAuthoringForm extends QaLearningForm implements QaAppConstants {
 
     /**
      * @param reflect
-     *                The reflect to set.
+     *            The reflect to set.
      */
     public void setReflect(String reflect) {
 	this.reflect = reflect;
@@ -633,7 +635,7 @@ public class QaAuthoringForm extends QaLearningForm implements QaAppConstants {
 
     /**
      * @param reflectionSubject
-     *                The reflectionSubject to set.
+     *            The reflectionSubject to set.
      */
     public void setReflectionSubject(String reflectionSubject) {
 	this.reflectionSubject = reflectionSubject;
@@ -648,7 +650,7 @@ public class QaAuthoringForm extends QaLearningForm implements QaAppConstants {
 
     /**
      * @param contentFolderID
-     *                The contentFolderID to set.
+     *            The contentFolderID to set.
      */
     public void setContentFolderID(String contentFolderID) {
 	this.contentFolderID = contentFolderID;
@@ -663,7 +665,7 @@ public class QaAuthoringForm extends QaLearningForm implements QaAppConstants {
 
     /**
      * @param addSingleQuestion
-     *                The addSingleQuestion to set.
+     *            The addSingleQuestion to set.
      */
     public void setAddSingleQuestion(String addSingleQuestion) {
 	this.addSingleQuestion = addSingleQuestion;
@@ -678,7 +680,7 @@ public class QaAuthoringForm extends QaLearningForm implements QaAppConstants {
 
     /**
      * @param editableQuestionIndex
-     *                The editableQuestionIndex to set.
+     *            The editableQuestionIndex to set.
      */
     public void setEditableQuestionIndex(String editableQuestionIndex) {
 	this.editableQuestionIndex = editableQuestionIndex;
@@ -693,7 +695,7 @@ public class QaAuthoringForm extends QaLearningForm implements QaAppConstants {
 
     /**
      * @param feedback
-     *                The feedback to set.
+     *            The feedback to set.
      */
     public void setFeedback(String feedback) {
 	this.feedback = feedback;
@@ -708,7 +710,7 @@ public class QaAuthoringForm extends QaLearningForm implements QaAppConstants {
 
     /**
      * @param editQuestionBoxRequest
-     *                The editQuestionBoxRequest to set.
+     *            The editQuestionBoxRequest to set.
      */
     public void setEditQuestionBoxRequest(String editQuestionBoxRequest) {
 	this.editQuestionBoxRequest = editQuestionBoxRequest;
@@ -723,12 +725,12 @@ public class QaAuthoringForm extends QaLearningForm implements QaAppConstants {
 
     /**
      * @param lockWhenFinished
-     *                The lockWhenFinished to set.
+     *            The lockWhenFinished to set.
      */
     public void setLockWhenFinished(String lockWhenFinished) {
 	this.lockWhenFinished = lockWhenFinished;
     }
-    
+
     /**
      * @return Returns the noReeditAllowed.
      */
@@ -753,36 +755,36 @@ public class QaAuthoringForm extends QaLearningForm implements QaAppConstants {
 
     /**
      * @param showOtherAnswers
-     *                The showOtherAnswers to set.
+     *            The showOtherAnswers to set.
      */
     public void setShowOtherAnswers(String showOtherAnswers) {
 	this.showOtherAnswers = showOtherAnswers;
     }
 
     public boolean isAllowRichEditor() {
-        return allowRichEditor;
+	return allowRichEditor;
     }
 
     public void setAllowRichEditor(boolean allowRichEditor) {
-        this.allowRichEditor = allowRichEditor;
+	this.allowRichEditor = allowRichEditor;
     }
-    
+
     public boolean isUseSelectLeaderToolOuput() {
-        return useSelectLeaderToolOuput;
+	return useSelectLeaderToolOuput;
     }
 
     public void setUseSelectLeaderToolOuput(boolean useSelectLeaderToolOuput) {
-        this.useSelectLeaderToolOuput = useSelectLeaderToolOuput;
+	this.useSelectLeaderToolOuput = useSelectLeaderToolOuput;
     }
 
     public boolean isRequired() {
-        return required;
+	return required;
     }
 
     public void setRequired(boolean required) {
-        this.required = required;
+	this.required = required;
     }
-    
+
     public void setMinWordsLimit(int minWordsLimit) {
 	this.minWordsLimit = minWordsLimit;
     }

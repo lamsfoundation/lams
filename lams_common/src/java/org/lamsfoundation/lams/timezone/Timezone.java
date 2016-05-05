@@ -1,52 +1,52 @@
-/**************************************************************** 
- * Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org) 
- * ============================================================= 
- * License Information: http://lamsfoundation.org/licensing/lams/2.0/ 
- * 
- * This program is free software; you can redistribute it and/or modify 
- * it under the terms of the GNU General Public License version 2.0 
- * as published by the Free Software Foundation. 
- * 
- * This program is distributed in the hope that it will be useful, 
- * but WITHOUT ANY WARRANTY; without even the implied warranty of 
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the 
- * GNU General Public License for more details. 
- * 
- * You should have received a copy of the GNU General Public License 
- * along with this program; if not, write to the Free Software 
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 * USA 
- * 
- * http://www.gnu.org/licenses/gpl.txt 
- * **************************************************************** 
- */  
- 
-/* $$Id$$ */  
+/****************************************************************
+ * Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
+ * =============================================================
+ * License Information: http://lamsfoundation.org/licensing/lams/2.0/
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License version 2.0
+ * as published by the Free Software Foundation.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 * USA
+ *
+ * http://www.gnu.org/licenses/gpl.txt
+ * ****************************************************************
+ */
+
+/* $$Id$$ */
 package org.lamsfoundation.lams.timezone;
 
 import java.io.Serializable;
 
 /**
- * Contains timezone id. 
- * 
+ * Contains timezone id.
+ *
  * @author Andrey Balan
  * @see java.util.TimeZone
- * 
+ *
  * @hibernate.class table="lams_timezone"
  */
 public class Timezone implements Serializable {
-    
+
     /**
      * Link on Lams wiki timezone help page.
      */
     public static String TIMEZONE_HELP_PAGE = "LAMS+Configuration";
 
     private static final long serialVersionUID = 6736816209131888523L;
-    
+
     /** identifier field */
     private Long id;
-    
+
     private String timezoneId;
-    
+
     private boolean serverTimezone;
 
     /** default constructor */
@@ -66,34 +66,37 @@ public class Timezone implements Serializable {
     public Long getId() {
 	return this.id;
     }
+
     public void setId(Long id) {
 	this.id = id;
     }
 
     /**
      * Timezone id. This value is a copy of <code>java.util.TimeZone<code> ID.
-     * 
+     *
      * @hibernate.property column="timezone_id" length="255"
      */
     public String getTimezoneId() {
 	return this.timezoneId;
     }
+
     public void setTimezoneId(String timezoneId) {
 	this.timezoneId = timezoneId;
     }
-    
+
     /**
      * If this timezone is server's default one.
-     * 
+     *
      * @hibernate.property column="server_timezone" length="1" not-null="true"
-     */    
+     */
     public boolean isServerTimezone() {
 	return this.serverTimezone;
     }
+
     public void setServerTimezone(boolean serverTimezone) {
 	this.serverTimezone = serverTimezone;
     }
-    
+
     @Override
     public int hashCode() {
 	final int prime = 31;
@@ -105,22 +108,27 @@ public class Timezone implements Serializable {
 
     @Override
     public boolean equals(Object obj) {
-	if (this == obj)
+	if (this == obj) {
 	    return true;
-	if (obj == null)
+	}
+	if (obj == null) {
 	    return false;
-	if (getClass() != obj.getClass())
+	}
+	if (getClass() != obj.getClass()) {
 	    return false;
+	}
 	Timezone other = (Timezone) obj;
-	if (serverTimezone != other.serverTimezone)
+	if (serverTimezone != other.serverTimezone) {
 	    return false;
+	}
 	if (timezoneId == null) {
-	    if (other.timezoneId != null)
+	    if (other.timezoneId != null) {
 		return false;
-	} else if (!timezoneId.equals(other.timezoneId))
+	    }
+	} else if (!timezoneId.equals(other.timezoneId)) {
 	    return false;
+	}
 	return true;
     }
-    
-}
 
+}

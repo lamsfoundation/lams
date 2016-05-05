@@ -91,17 +91,17 @@ public class QaMonitoringAction extends LamsDispatchAction implements QaAppConst
     public ActionForward updateResponseVisibility(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) throws IOException, ServletException, ToolException {
 	IQaService qaService = QaServiceProxy.getQaService(getServlet().getServletContext());
-	
+
 	Long responseUid = WebUtil.readLongParam(request, QaAppConstants.RESPONSE_UID);
 	boolean isHideItem = WebUtil.readBooleanParam(request, QaAppConstants.IS_HIDE_ITEM);
 	qaService.updateResponseVisibility(responseUid, isHideItem);
-	
+
 	return null;
     }
-    
+
     /**
      * Set Submission Deadline
-     * 
+     *
      * @param mapping
      * @param form
      * @param request
@@ -111,10 +111,10 @@ public class QaMonitoringAction extends LamsDispatchAction implements QaAppConst
     public ActionForward setSubmissionDeadline(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) {
 	IQaService qaService = getQAService();
-	
+
 	Long contentID = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_CONTENT_ID);
 	QaContent content = qaService.getQaContent(contentID);
-	
+
 	Long dateParameter = WebUtil.readLongParam(request, QaAppConstants.ATTR_SUBMISSION_DEADLINE, true);
 	Date tzSubmissionDeadline = null;
 	if (dateParameter != null) {
@@ -123,7 +123,7 @@ public class QaMonitoringAction extends LamsDispatchAction implements QaAppConst
 	    UserDTO teacher = (UserDTO) ss.getAttribute(AttributeNames.USER);
 	    TimeZone teacherTimeZone = teacher.getTimeZone();
 	    tzSubmissionDeadline = DateUtil.convertFromTimeZoneToDefault(teacherTimeZone, submissionDeadline);
-	    
+
 	} else {
 	    //set showOtherAnswersAfterDeadline to false
 	    content.setShowOtherAnswersAfterDeadline(false);
@@ -133,24 +133,25 @@ public class QaMonitoringAction extends LamsDispatchAction implements QaAppConst
 
 	return null;
     }
-    
+
     /**
      * Set Submission Deadline
-     * 
+     *
      * @param mapping
      * @param form
      * @param request
      * @param response
      * @return
      */
-    public ActionForward setShowOtherAnswersAfterDeadline(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) {
+    public ActionForward setShowOtherAnswersAfterDeadline(ActionMapping mapping, ActionForm form,
+	    HttpServletRequest request, HttpServletResponse response) {
 	IQaService qaService = getQAService();
-	
+
 	Long contentID = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_CONTENT_ID);
 	QaContent content = qaService.getQaContent(contentID);
-	
-	boolean showOtherAnswersAfterDeadline = WebUtil.readBooleanParam(request, QaAppConstants.PARAM_SHOW_OTHER_ANSWERS_AFTER_DEADLINE);
+
+	boolean showOtherAnswersAfterDeadline = WebUtil.readBooleanParam(request,
+		QaAppConstants.PARAM_SHOW_OTHER_ANSWERS_AFTER_DEADLINE);
 	content.setShowOtherAnswersAfterDeadline(showOtherAnswersAfterDeadline);
 	qaService.saveOrUpdateQaContent(content);
 
@@ -158,12 +159,12 @@ public class QaMonitoringAction extends LamsDispatchAction implements QaAppConst
     }
 
     private IQaService getQAService() {
-    	return QaServiceProxy.getQaService(getServlet().getServletContext());
+	return QaServiceProxy.getQaService(getServlet().getServletContext());
     }
-    
+
     /**
      * Get Paged Reflections
-     * 
+     *
      * @param mapping
      * @param form
      * @param request
@@ -172,32 +173,34 @@ public class QaMonitoringAction extends LamsDispatchAction implements QaAppConst
      */
     public ActionForward getReflectionsJSON(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) throws IOException, ServletException, ToolException, JSONException {
-	
+
 	Long toolSessionId = WebUtil.readLongParam(request, QaAppConstants.TOOL_SESSION_ID);
-	
+
 	// paging parameters of tablesorter
 	int size = WebUtil.readIntParam(request, "size");
 	int page = WebUtil.readIntParam(request, "page");
 	Integer sortByName = WebUtil.readIntParam(request, "column[0]", true);
-	String searchString = request.getParameter("fcol[0]"); 
-	
+	String searchString = request.getParameter("fcol[0]");
+
 	int sorting = QaAppConstants.SORT_BY_NO;
-	if ( sortByName != null ) 
-	    sorting = sortByName.equals(0) ? QaAppConstants.SORT_BY_USERNAME_ASC : QaAppConstants.SORT_BY_USERNAME_DESC; 
-	    
+	if (sortByName != null) {
+	    sorting = sortByName.equals(0) ? QaAppConstants.SORT_BY_USERNAME_ASC : QaAppConstants.SORT_BY_USERNAME_DESC;
+	}
+
 	//return user list according to the given sessionID
 	IQaService qaService = getQAService();
-	List<Object[]> users = qaService.getUserReflectionsForTablesorter(toolSessionId, page, size, sorting, searchString);
-	
+	List<Object[]> users = qaService.getUserReflectionsForTablesorter(toolSessionId, page, size, sorting,
+		searchString);
+
 	JSONArray rows = new JSONArray();
 	JSONObject responsedata = new JSONObject();
 	responsedata.put("total_rows", qaService.getCountUsersBySessionWithSearch(toolSessionId, searchString));
 
-	for (Object[] userAndReflection: users) {
+	for (Object[] userAndReflection : users) {
 	    JSONObject responseRow = new JSONObject();
 	    responseRow.put("username", StringEscapeUtils.escapeHtml((String) userAndReflection[1]));
-	    if ( userAndReflection.length > 2 && userAndReflection[2] != null) {
-		String reflection = StringEscapeUtils.escapeHtml((String)userAndReflection[2]);
+	    if (userAndReflection.length > 2 && userAndReflection[2] != null) {
+		String reflection = StringEscapeUtils.escapeHtml((String) userAndReflection[2]);
 		responseRow.put(QaAppConstants.NOTEBOOK, reflection.replaceAll("\n", "<br>"));
 	    }
 	    rows.put(responseRow);

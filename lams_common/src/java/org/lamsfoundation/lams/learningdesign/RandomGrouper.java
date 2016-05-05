@@ -2,21 +2,21 @@
  * Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
  * =============================================================
  * License Information: http://lamsfoundation.org/licensing/lams/2.0/
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License version 2.0 
+ * it under the terms of the GNU General Public License version 2.0
  * as published by the Free Software Foundation.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301
  * USA
- * 
+ *
  * http://www.gnu.org/licenses/gpl.txt
  * ***********************************************************************/
 /* $$Id$$ */
@@ -38,24 +38,24 @@ import org.lamsfoundation.lams.usermanagement.User;
  * from user interface: <code>numberOfGroups</code> and <code>learnersPerGroup</code>. If any of these two attribute has
  * be set, the random grouping will be done correspondently.
  * </p>
- * 
+ *
  * <p>
  * In the case of random grouping by number of groups, the number of groups will be fixed, and learners are evenly
  * allocated into the groups. For example, there are 10 users and <code>numberOfGroups=3</code>, the number of learners
  * in three groups will 4,3,3. And if there are 1 user and <code>numberOfGroups=3</code>, all three groups still will be
  * created with learner number 1,0,0.
  * </p>
- * 
+ *
  * <p>
  * In the case of random grouping by learners per group, groups are only created if the total learner number exceeds the
  * existing group capacity. Learners are also evenly allocated into the groups.For example, if there is 5 users and
  * <code>learnerPerGroup=3</code>, only 2 groups will be created.
  * </p>
- * 
+ *
  * @author Jacky Fang
  * @since 2005-3-24
  * @version 1.1
- * 
+ *
  */
 public class RandomGrouper extends Grouper implements Serializable {
     private static final long serialVersionUID = -3696368461795411181L;
@@ -67,7 +67,7 @@ public class RandomGrouper extends Grouper implements Serializable {
     // ---------------------------------------------------------------------
     /**
      * Do the grouping for single new learner.
-     * 
+     *
      * @see org.lamsfoundation.lams.learningdesign.Grouper#doGrouping(org.lamsfoundation.lams.learningdesign.Grouping,
      *      java.lang.String,org.lamsfoundation.lams.usermanagement.User)
      */
@@ -82,7 +82,7 @@ public class RandomGrouper extends Grouper implements Serializable {
 
     /**
      * Do the grouping for a list of new learners.
-     * 
+     *
      * @see org.lamsfoundation.lams.learningdesign.Grouper#doGrouping(org.lamsfoundation.lams.learningdesign.Grouping,java.lang.String,
      *      java.util.List)
      */
@@ -104,7 +104,7 @@ public class RandomGrouper extends Grouper implements Serializable {
     /**
      * Need to be able to force a user into a particular group for group based branching in preview. So this is a
      * non-random random. Bleah!
-     * 
+     *
      * @throws GroupingException
      * @see org.lamsfoundation.lams.learningdesign.Grouper#doGrouping(org.lamsfoundation.lams.learningdesign.Grouping,java.lang.Long,
      *      java.util.List)
@@ -139,7 +139,7 @@ public class RandomGrouper extends Grouper implements Serializable {
     /**
      * Compute the number of new groups needs to be created based on passed in grouping. It figures out group by number
      * of groups or group by learner per group automatically.
-     * 
+     *
      * @param randomGrouping
      *            the grouping we used to group learner
      * @param learners
@@ -161,7 +161,7 @@ public class RandomGrouper extends Grouper implements Serializable {
 
     /**
      * Create new groups and insert them into the grouping. Group names are Group 1, Group 2, etc.
-     * 
+     *
      * @param randomGrouping
      *            the requested grouping.
      * @param numOfGroupsTobeCreated
@@ -184,7 +184,7 @@ public class RandomGrouper extends Grouper implements Serializable {
 
     /**
      * Allocate the learner into groups within the specified grouping.
-     * 
+     *
      * @param randomGrouping
      *            the specified grouping.
      * @param learners
@@ -207,7 +207,7 @@ public class RandomGrouper extends Grouper implements Serializable {
     /**
      * Always choose the group with the least member to join. Therefore, we ensure the members are evenly allocated into
      * groups.
-     * 
+     *
      * @param randomGrouping
      *            the specified grouping.
      * @return the desirable group
@@ -221,7 +221,7 @@ public class RandomGrouper extends Grouper implements Serializable {
     // ---------------------------------------------------------------------
     /**
      * Calculate number of new groups according to doGrouping by learner per group.
-     * 
+     *
      * @param randomGrouping
      *            the requested grouping.
      * @param learners
@@ -246,7 +246,7 @@ public class RandomGrouper extends Grouper implements Serializable {
 
     /**
      * Calculate number of new groups according to doGrouping by number of groups.
-     * 
+     *
      * @param randomGrouping
      *            the requested grouping.
      * @param isInitialization

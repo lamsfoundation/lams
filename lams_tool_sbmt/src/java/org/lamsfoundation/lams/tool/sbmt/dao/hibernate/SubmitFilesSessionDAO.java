@@ -2,26 +2,26 @@
  * Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
  * =============================================================
  * License Information: http://lamsfoundation.org/licensing/lams/2.0/
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License version 2.0 
+ * it under the terms of the GNU General Public License version 2.0
  * as published by the Free Software Foundation.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301
  * USA
- * 
+ *
  * http://www.gnu.org/licenses/gpl.txt
  * ****************************************************************
  */
 
-/* $$Id$$ */	
+/* $$Id$$ */
 
 package org.lamsfoundation.lams.tool.sbmt.dao.hibernate;
 
@@ -34,36 +34,40 @@ import org.lamsfoundation.lams.tool.sbmt.dao.ISubmitFilesSessionDAO;
 /**
  * @author Manpreet Minhas
  */
-public class SubmitFilesSessionDAO extends BaseDAO implements
-		ISubmitFilesSessionDAO {
+public class SubmitFilesSessionDAO extends BaseDAO implements ISubmitFilesSessionDAO {
 
-    private static final String FIND_LEARNER_BY_CONTENT_ID = 
-        " from " + SubmitFilesSession.class.getName() + 
-        " as session where session.content.contentID = :contentID";
+    private static final String FIND_LEARNER_BY_CONTENT_ID = " from " + SubmitFilesSession.class.getName()
+	    + " as session where session.content.contentID = :contentID";
 
-    
-	/**
-	 * (non-Javadoc)
-	 * @see org.lamsfoundation.lams.tool.sbmt.dao.ISubmitFilesSessionDAO#getSessionByID(java.lang.Long)
-	 */
-	public SubmitFilesSession getSessionByID(Long sessionID) {		
-		 return (SubmitFilesSession) super.find(SubmitFilesSession.class,sessionID);
+    /**
+     * (non-Javadoc)
+     * 
+     * @see org.lamsfoundation.lams.tool.sbmt.dao.ISubmitFilesSessionDAO#getSessionByID(java.lang.Long)
+     */
+    @Override
+    public SubmitFilesSession getSessionByID(Long sessionID) {
+	return (SubmitFilesSession) super.find(SubmitFilesSession.class, sessionID);
+    }
+
+    /*
+     * (non-Javadoc)
+     * 
+     * @see
+     * org.lamsfoundation.lams.tool.sbmt.dao.ISubmitFilesSessionDAO#createSession(org.lamsfoundation.lams.tool.sbmt.
+     * SubmitFilesSession)
+     */
+    @Override
+    public void createSession(SubmitFilesSession submitSession) {
+	this.getHibernateTemplate().save(submitSession);
+    }
+
+    @Override
+    public List<SubmitFilesSession> getSubmitFilesSessionByContentID(Long contentID) {
+	if (contentID != null) {
+	    return this.getSession().createQuery(FIND_LEARNER_BY_CONTENT_ID).setLong("contentID", contentID.longValue())
+		    .list();
 	}
-
-	/* (non-Javadoc)
-	 * @see org.lamsfoundation.lams.tool.sbmt.dao.ISubmitFilesSessionDAO#createSession(org.lamsfoundation.lams.tool.sbmt.SubmitFilesSession)
-	 */
-	public void createSession(SubmitFilesSession submitSession) {
-		 this.getHibernateTemplate().save(submitSession);
-	}
-    
-    public List<SubmitFilesSession> getSubmitFilesSessionByContentID(Long contentID){
-        if ( contentID != null ) {
-            return this.getSession().createQuery(FIND_LEARNER_BY_CONTENT_ID)
-                .setLong("contentID", contentID.longValue())
-                .list();
-        }
-        return null;
+	return null;
     }
 
 }

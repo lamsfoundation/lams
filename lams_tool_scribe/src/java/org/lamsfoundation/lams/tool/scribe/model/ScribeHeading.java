@@ -2,21 +2,21 @@
  * Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
  * =============================================================
  * License Information: http://lamsfoundation.org/licensing/lams/2.0/
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
  * USA
- * 
+ *
  * http://www.gnu.org/licenses/gpl.txt
  * ****************************************************************
  */
@@ -28,107 +28,108 @@ import org.apache.log4j.Logger;
 
 /**
  * @author Anthony Sukkar
- * 
+ *
  * @hibernate.class table="tl_lascrb11_heading"
- * 
+ *
  */
-public class ScribeHeading implements java.io.Serializable, Comparable<ScribeHeading>, Cloneable{
+public class ScribeHeading implements java.io.Serializable, Comparable<ScribeHeading>, Cloneable {
 
-	private static final long serialVersionUID = -5643334348072895714L;
-	
-	private static final Logger log = Logger.getLogger(ScribeHeading.class);
+    private static final long serialVersionUID = -5643334348072895714L;
 
-	// Properties
-	private Long uid;
-	
-	private Scribe scribe;
+    private static final Logger log = Logger.getLogger(ScribeHeading.class);
 
-	private String headingText;
-	
-	private int displayOrder;
+    // Properties
+    private Long uid;
 
-	public ScribeHeading() {
-	}
-	
-	public ScribeHeading(int displayOrder) {
-		this.displayOrder = displayOrder;
-	}
-	
-	// Getters / Setters
+    private Scribe scribe;
 
-	/**
-	 * @hibernate.property column="heading" type="text"
-	 */
-	public String getHeadingText() {
-		return headingText;
-	}
+    private String headingText;
 
-	public void setHeadingText(String headingText) {
-		this.headingText = headingText;
-	}
+    private int displayOrder;
 
-	/**
-	 * 
-	 * @hibernate.many-to-one not-null="true"
-	 * @hibernate.column name="scribe_uid"
-	 */
-	public Scribe getScribe() {
-		return scribe;
-	}
+    public ScribeHeading() {
+    }
 
-	public void setScribe(Scribe scribe) {
-		this.scribe = scribe;
-	}
+    public ScribeHeading(int displayOrder) {
+	this.displayOrder = displayOrder;
+    }
 
-	/**
-	 * @hibernate.id generator-class="native" type="java.lang.Long" column="uid"
-	 * 
-	 */
-	public Long getUid() {
-		return uid;
-	}
+    // Getters / Setters
 
-	public void setUid(Long uid) {
-		this.uid = uid;
-	}
+    /**
+     * @hibernate.property column="heading" type="text"
+     */
+    public String getHeadingText() {
+	return headingText;
+    }
 
-	/**
-	 * 
-	 * @hibernate.property column="display_order"
-	 */
-	public int getDisplayOrder() {
-		return displayOrder;
-	}
-	
-	public void setDisplayOrder(int displayOrder) {
-		this.displayOrder = displayOrder;
-	}
-	
-	@Override
-	public Object clone() {
-		Object obj = null;
-		try {
-			obj = super.clone();
-			((ScribeHeading) obj).setUid(null);
-		} catch (CloneNotSupportedException e) {
-			log.error("Failed to clone " + ScribeHeading.class);
-		}
+    public void setHeadingText(String headingText) {
+	this.headingText = headingText;
+    }
 
-		return obj;
+    /**
+     * 
+     * @hibernate.many-to-one not-null="true"
+     * @hibernate.column name="scribe_uid"
+     */
+    public Scribe getScribe() {
+	return scribe;
+    }
+
+    public void setScribe(Scribe scribe) {
+	this.scribe = scribe;
+    }
+
+    /**
+     * @hibernate.id generator-class="native" type="java.lang.Long" column="uid"
+     * 
+     */
+    public Long getUid() {
+	return uid;
+    }
+
+    public void setUid(Long uid) {
+	this.uid = uid;
+    }
+
+    /**
+     * 
+     * @hibernate.property column="display_order"
+     */
+    public int getDisplayOrder() {
+	return displayOrder;
+    }
+
+    public void setDisplayOrder(int displayOrder) {
+	this.displayOrder = displayOrder;
+    }
+
+    @Override
+    public Object clone() {
+	Object obj = null;
+	try {
+	    obj = super.clone();
+	    ((ScribeHeading) obj).setUid(null);
+	} catch (CloneNotSupportedException e) {
+	    log.error("Failed to clone " + ScribeHeading.class);
 	}
 
-	public int compareTo(ScribeHeading o) {
-		int returnValue;
-		
-		returnValue = new Integer(this.displayOrder).compareTo(new Integer(o.displayOrder));
-		
-		if (!this.equals(o) && returnValue == 0) {
-			// something is wrong.  return -1 to maintain natural ordering.
-			log.debug("Encountered two different scribe headings with equal displayOrder");
-			returnValue = -1;
-		}
-		
-		return returnValue;
+	return obj;
+    }
+
+    @Override
+    public int compareTo(ScribeHeading o) {
+	int returnValue;
+
+	returnValue = new Integer(this.displayOrder).compareTo(new Integer(o.displayOrder));
+
+	if (!this.equals(o) && returnValue == 0) {
+	    // something is wrong.  return -1 to maintain natural ordering.
+	    log.debug("Encountered two different scribe headings with equal displayOrder");
+	    returnValue = -1;
 	}
+
+	return returnValue;
+    }
 
 }

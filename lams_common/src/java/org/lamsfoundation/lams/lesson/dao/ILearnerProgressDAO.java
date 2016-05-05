@@ -2,21 +2,21 @@
  * Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
  * =============================================================
  * License Information: http://lamsfoundation.org/licensing/lams/2.0/
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License version 2.0 
+ * it under the terms of the GNU General Public License version 2.0
  * as published by the Free Software Foundation.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301
  * USA
- * 
+ *
  * http://www.gnu.org/licenses/gpl.txt
  * ****************************************************************
  */
@@ -32,14 +32,14 @@ import org.lamsfoundation.lams.usermanagement.User;
 
 /**
  * Inteface defines Lesson DAO Methods
- * 
+ *
  * @author chris
  */
 public interface ILearnerProgressDAO {
 
     /**
      * Retrieves the Lesson
-     * 
+     *
      * @param lessonId
      *            identifies the lesson to get
      * @return the lesson
@@ -48,7 +48,7 @@ public interface ILearnerProgressDAO {
 
     /**
      * Retrieves the learner progress object for user in a lesson.
-     * 
+     *
      * @param learnerId
      *            the user who owns the learner progress data.
      * @param lessonId
@@ -59,7 +59,7 @@ public interface ILearnerProgressDAO {
 
     /**
      * Saves or Updates learner progress data.
-     * 
+     *
      * @param learnerProgress
      *            holds the learne progress data
      */
@@ -67,21 +67,21 @@ public interface ILearnerProgressDAO {
 
     /**
      * Deletes a LearnerProgress data <b>permanently</b>.
-     * 
+     *
      * @param learnerProgress
      */
     void deleteLearnerProgress(LearnerProgress learnerProgress);
 
     /**
      * Update learner progress data.
-     * 
+     *
      * @param learnerProgress
      */
     void updateLearnerProgress(LearnerProgress learnerProgress);
 
     /**
      * Get all the learner progress records where the current, previous or next activity is the given activity.
-     * 
+     *
      * @param activity
      * @return List<LearnerProgress>
      */
@@ -110,7 +110,7 @@ public interface ILearnerProgressDAO {
 
     /**
      * Get learner progress records for a lesson where the progress is marked as completed.
-     * 
+     *
      * @param lessonId
      * @return List<LearnerProgress>
      */
@@ -119,7 +119,7 @@ public interface ILearnerProgressDAO {
 
     /**
      * Get all the learner progress records for a lesson.
-     * 
+     *
      * @param lessonId
      * @return
      */
@@ -127,7 +127,7 @@ public interface ILearnerProgressDAO {
 
     /**
      * Get all the learner progress records for a lesson restricted by list of these user ids.
-     * 
+     *
      * @param lessonId
      * @param userIds
      *            return progresses for only these users
@@ -137,7 +137,7 @@ public interface ILearnerProgressDAO {
 
     /**
      * Get all the learner progresses for a lesson list.
-     * 
+     *
      * @param lessonIds
      * @return
      */
@@ -148,17 +148,17 @@ public interface ILearnerProgressDAO {
      * progress records to determine the users.
      */
     List<User> getLearnersAttemptedActivity(Activity activity);
-    
+
     /**
      * Get all the users records where the user has completed the given activity. Uses the progress records to determine
      * the users.
      */
-    List<User> getLearnersCompletedActivity(Activity activity);   
+    List<User> getLearnersCompletedActivity(Activity activity);
 
     /**
      * Get all the users records where the user has ever attempted the given activity. Uses the progress records to
      * determine the users.
-     * 
+     *
      * @param activityId
      * @return List<User>
      */
@@ -167,7 +167,7 @@ public interface ILearnerProgressDAO {
     /**
      * Count of the number of users that have attempted or completed an activity. Useful for activities that don't have
      * tool sessions.
-     * 
+     *
      * @param activityId
      * @return List<User>
      */
@@ -176,7 +176,7 @@ public interface ILearnerProgressDAO {
     /**
      * Count of the number of users that have completed an activity. Useful for activities that don't have tool
      * sessions.
-     * 
+     *
      * @param activityId
      * @return List<User>
      */

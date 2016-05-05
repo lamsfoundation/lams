@@ -2,21 +2,21 @@
  * Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
  * =============================================================
  * License Information: http://lamsfoundation.org/licensing/lams/2.0/
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License version 2.0 
+ * it under the terms of the GNU General Public License version 2.0
  * as published by the Free Software Foundation.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301
  * USA
- * 
+ *
  * http://www.gnu.org/licenses/gpl.txt
  * ****************************************************************
  */
@@ -81,15 +81,16 @@ import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 
 /**
- * 
+ *
  * @author Steve.Ni
- * 
+ *
  * @version $Revision$
  */
 public class LearningAction extends Action {
 
     private static Logger log = Logger.getLogger(LearningAction.class);
 
+    @Override
     public ActionForward execute(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) throws IOException, ServletException, UploadTaskListFileException {
 
@@ -135,9 +136,9 @@ public class LearningAction extends Action {
     /**
      * Read taskList data from database and put them into HttpSession. It will redirect to init.do directly after this
      * method run successfully.
-     * 
+     *
      * This method will avoid read database again and lost un-saved resouce item lost when user "refresh page",
-     * 
+     *
      */
     private ActionForward start(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) {
@@ -178,8 +179,9 @@ public class LearningAction extends Action {
 
 	    for (TaskListItem item : allTaskListItems) {
 		for (TaskListUser grouppedUser : grouppedUsers) {
-		    if (item.isCreateByAuthor() || grouppedUser.getUserId().equals(item.getCreateBy().getUserId()))
+		    if (item.isCreateByAuthor() || grouppedUser.getUserId().equals(item.getCreateBy().getUserId())) {
 			items.add(item);
+		    }
 		}
 	    }
 
@@ -201,17 +203,20 @@ public class LearningAction extends Action {
 	}
 
 	// set complete flag for display purpose
-	if (taskListUser != null)
+	if (taskListUser != null) {
 	    service.retrieveComplete(items, taskListUser);
+	}
 
 	TreeSet<TasListItemDTO> itemDTOs = new TreeSet<TasListItemDTO>(new Comparator<TasListItemDTO>() {
+	    @Override
 	    public int compare(TasListItemDTO o1, TasListItemDTO o2) {
 		if (o1 != null && o2 != null) {
 		    return o1.getTaskListItem().getSequenceId() - o2.getTaskListItem().getSequenceId();
-		} else if (o1 != null)
+		} else if (o1 != null) {
 		    return 1;
-		else
+		} else {
 		    return -1;
+		}
 	    }
 	});
 
@@ -225,8 +230,9 @@ public class LearningAction extends Action {
 		isCommentRequirementsMet = false;
 		Set<TaskListItemComment> comments = item.getComments();
 		for (TaskListItemComment comment : comments) {
-		    if (taskListUser.getUserId().equals(comment.getCreateBy().getUserId()))
+		    if (taskListUser.getUserId().equals(comment.getCreateBy().getUserId())) {
 			isCommentRequirementsMet = true;
+		    }
 		}
 	    }
 	    itemDTO.setCommentRequirementsMet(isCommentRequirementsMet);
@@ -237,8 +243,9 @@ public class LearningAction extends Action {
 		isAttachmentRequirementsMet = false;
 		Set<TaskListItemAttachment> attachments = item.getAttachments();
 		for (TaskListItemAttachment attachment : attachments) {
-		    if (taskListUser.getUserId().equals(attachment.getCreateBy().getUserId()))
+		    if (taskListUser.getUserId().equals(attachment.getCreateBy().getUserId())) {
 			isAttachmentRequirementsMet = true;
+		    }
 		}
 	    }
 	    itemDTO.setAttachmentRequirementsMet(isAttachmentRequirementsMet);
@@ -247,8 +254,9 @@ public class LearningAction extends Action {
 	    boolean isAllowedByParent = true;
 	    if (item.isChildTask()) {
 		for (TaskListItem parentItem : items) {
-		    if (parentItem.getTitle().equals(item.getParentTaskName()) && !parentItem.isComplete())
+		    if (parentItem.getTitle().equals(item.getParentTaskName()) && !parentItem.isComplete()) {
 			isAllowedByParent = false;
+		    }
 		}
 	    }
 	    itemDTO.setAllowedByParent(isAllowedByParent);
@@ -275,15 +283,17 @@ public class LearningAction extends Action {
 
 		for (TaskListItemComment comment : comments) {
 		    for (TaskListUser grouppedUser : grouppedUsers) {
-			if (grouppedUser.getUserId().equals(comment.getCreateBy().getUserId()))
+			if (grouppedUser.getUserId().equals(comment.getCreateBy().getUserId())) {
 			    filteredComments.add(comment);
+			}
 		    }
 		}
 
 		for (TaskListItemAttachment attachment : attachments) {
 		    for (TaskListUser grouppedUser : grouppedUsers) {
-			if (grouppedUser.getUserId().equals(attachment.getCreateBy().getUserId()))
+			if (grouppedUser.getUserId().equals(attachment.getCreateBy().getUserId())) {
 			    filteredAttachments.add(attachment);
+			}
 		    }
 		}
 	    } else {
@@ -357,7 +367,7 @@ public class LearningAction extends Action {
 
     /**
      * Mark taskList item as complete status.
-     * 
+     *
      * @param mapping
      * @param form
      * @param request
@@ -381,7 +391,7 @@ public class LearningAction extends Action {
 
     /**
      * Finish learning session.
-     * 
+     *
      * @param mapping
      * @param form
      * @param request
@@ -405,11 +415,13 @@ public class LearningAction extends Action {
 	    // NOTE:So far this flag is useless(31/08/2006).
 	    // set flag, then finish page can know redir target is parent(AUTO_RUN) or self(normal)
 	    request.setAttribute(TaskListConstants.ATTR_RUN_AUTO, true);
-	} else
+	} else {
 	    request.setAttribute(TaskListConstants.ATTR_RUN_AUTO, false);
+	}
 
-	if (!validateBeforeFinish(request, sessionMapID))
+	if (!validateBeforeFinish(request, sessionMapID)) {
 	    return mapping.getInputForward();
+	}
 
 	ITaskListService service = getTaskListService();
 	// get sessionId from HttpServletRequest
@@ -430,7 +442,7 @@ public class LearningAction extends Action {
 
     /**
      * Initial page for add taskList item (single file or URL).
-     * 
+     *
      * @param mapping
      * @param form
      * @param request
@@ -447,7 +459,7 @@ public class LearningAction extends Action {
 
     /**
      * Save new user task into database.
-     * 
+     *
      * @param mapping
      * @param form
      * @param request
@@ -485,8 +497,9 @@ public class LearningAction extends Action {
 	Set<TaskListItem> taskListItems = taskList.getTaskListItems();
 	int maxSeq = 0;
 	for (TaskListItem dbItem : taskListItems) {
-	    if (dbItem.getSequenceId() > maxSeq)
+	    if (dbItem.getSequenceId() > maxSeq) {
 		maxSeq = dbItem.getSequenceId();
+	    }
 	}
 	maxSeq++;
 	item.setSequenceId(maxSeq);
@@ -503,7 +516,7 @@ public class LearningAction extends Action {
 
     /**
      * Adds new user commment.
-     * 
+     *
      * @param mapping
      * @param form
      * @param request
@@ -519,10 +532,11 @@ public class LearningAction extends Action {
 	Long sessionId = (Long) sessionMap.get(TaskListConstants.ATTR_TOOL_SESSION_ID);
 
 	boolean isTestHarness = Boolean.valueOf(request.getParameter("testHarness"));
-	String commentMessage = isTestHarness ? request.getParameter("comment__textarea") : taskListItemForm
-		.getComment();
-	if (commentMessage == null || StringUtils.isBlank(commentMessage))
+	String commentMessage = isTestHarness ? request.getParameter("comment__textarea")
+		: taskListItemForm.getComment();
+	if (commentMessage == null || StringUtils.isBlank(commentMessage)) {
 	    return mapping.findForward("refresh");
+	}
 
 	TaskListItemComment comment = new TaskListItemComment();
 	comment.setComment(commentMessage);
@@ -552,7 +566,7 @@ public class LearningAction extends Action {
 
     /**
      * Uploads specified file to repository and associates it with current TaskListItem.
-     * 
+     *
      * @param mapping
      * @param form
      * @param type
@@ -569,10 +583,11 @@ public class LearningAction extends Action {
 	request.setAttribute(TaskListConstants.ATTR_SESSION_MAP_ID, sessionMap.getSessionID());
 	Long sessionId = (Long) sessionMap.get(TaskListConstants.ATTR_TOOL_SESSION_ID);
 
-	FormFile file = (FormFile) taskListItemForm.getUploadedFile();
+	FormFile file = taskListItemForm.getUploadedFile();
 
-	if (file == null || StringUtils.isBlank(file.getFileName()))
+	if (file == null || StringUtils.isBlank(file.getFileName())) {
 	    return mapping.findForward("refresh");
+	}
 
 	// validate file size
 	ActionMessages errors = new ActionMessages();
@@ -608,7 +623,7 @@ public class LearningAction extends Action {
 
     /**
      * Display empty reflection form.
-     * 
+     *
      * @param mapping
      * @param form
      * @param request
@@ -621,8 +636,9 @@ public class LearningAction extends Action {
 	// get session value
 	String sessionMapID = WebUtil.readStrParam(request, TaskListConstants.ATTR_SESSION_MAP_ID);
 
-	if (!validateBeforeFinish(request, sessionMapID))
+	if (!validateBeforeFinish(request, sessionMapID)) {
 	    return mapping.getInputForward();
+	}
 
 	ReflectionForm refForm = (ReflectionForm) form;
 	HttpSession ss = SessionManager.getSession();
@@ -648,7 +664,7 @@ public class LearningAction extends Action {
 
     /**
      * Submit reflection form input database.
-     * 
+     *
      * @param mapping
      * @param form
      * @param request
@@ -688,8 +704,8 @@ public class LearningAction extends Action {
     // Private method
     // *************************************************************************************
     private ITaskListService getTaskListService() {
-	WebApplicationContext wac = WebApplicationContextUtils.getRequiredWebApplicationContext(getServlet()
-		.getServletContext());
+	WebApplicationContext wac = WebApplicationContextUtils
+		.getRequiredWebApplicationContext(getServlet().getServletContext());
 	return (ITaskListService) wac.getBean(TaskListConstants.TASKLIST_SERVICE);
     }
 
@@ -723,8 +739,9 @@ public class LearningAction extends Action {
      */
     private ActionErrors validateTaskListItem(TaskListItemForm itemForm) {
 	ActionErrors errors = new ActionErrors();
-	if (StringUtils.isBlank(itemForm.getTitle()))
+	if (StringUtils.isBlank(itemForm.getTitle())) {
 	    errors.add(ActionMessages.GLOBAL_MESSAGE, new ActionMessage(TaskListConstants.ERROR_MSG_TITLE_BLANK));
+	}
 
 	return errors;
     }
@@ -744,8 +761,8 @@ public class LearningAction extends Action {
 	// if current user view less than reqired view count number, then just return error message.
 	if ((minimumNumberTasks - numberCompletedTasks) > 0) {
 	    ActionErrors errors = new ActionErrors();
-	    errors.add(ActionMessages.GLOBAL_MESSAGE, new ActionMessage("lable.learning.minimum.view.number",
-		    minimumNumberTasks, numberCompletedTasks));
+	    errors.add(ActionMessages.GLOBAL_MESSAGE,
+		    new ActionMessage("lable.learning.minimum.view.number", minimumNumberTasks, numberCompletedTasks));
 	    this.addErrors(request, errors);
 	    return false;
 	}
@@ -755,7 +772,7 @@ public class LearningAction extends Action {
 
     /**
      * Set complete flag for given taskList item.
-     * 
+     *
      * @param request
      * @param sessionId
      */

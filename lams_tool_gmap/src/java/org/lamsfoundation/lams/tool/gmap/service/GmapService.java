@@ -2,21 +2,21 @@
  * Copyright (C) 2008 LAMS Foundation (http://lamsfoundation.org)
  * =============================================================
  * License Information: http://lamsfoundation.org/licensing/lams/2.0/
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301
  * USA
- * 
+ *
  * http://www.gnu.org/licenses/gpl.txt
  * ****************************************************************
  */
@@ -79,7 +79,7 @@ import org.xml.sax.InputSource;
 
 /**
  * An implementation of the IGmapService interface.
- * 
+ *
  * As a requirement, all LAMS tool's service bean must implement ToolContentManager and ToolSessionManager.
  */
 
@@ -274,7 +274,7 @@ public class GmapService implements ToolSessionManager, ToolContentManager, IGma
 
     /**
      * Export the XML fragment for the tool's content, along with any files needed for the content.
-     * 
+     *
      * @throws DataMissingException
      *             if no tool content matches the toolSessionId
      * @throws ToolException
@@ -320,7 +320,7 @@ public class GmapService implements ToolSessionManager, ToolContentManager, IGma
 
     /**
      * Import the XML fragment for the tool's content, along with any files needed for the content.
-     * 
+     *
      * @throws ToolException
      *             if any other error occurs
      */
@@ -371,7 +371,7 @@ public class GmapService implements ToolSessionManager, ToolContentManager, IGma
      * that are always available for the tool (e.g. number of marks for Multiple Choice) or a custom definition created
      * for a particular activity such as the answer to the third question contains the word Koala and hence the need for
      * the toolContentId
-     * 
+     *
      * @return SortedMap of ToolOutputDefinitions with the key being the name of each definition
      */
     @Override
@@ -509,10 +509,10 @@ public class GmapService implements ToolSessionManager, ToolContentManager, IGma
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.lamsfoundation.lams.tool.gmap.service.IGmapService#updateMarkerListFromXML(java.lang.String,
-     *      org.lamsfoundation.lams.tool.gmap.model.Gmap, org.lamsfoundation.lams.tool.gmap.model.GmapUser, boolean,
-     *      org.lamsfoundation.lams.tool.gmap.model.GmapSession)
+     * org.lamsfoundation.lams.tool.gmap.model.Gmap, org.lamsfoundation.lams.tool.gmap.model.GmapUser, boolean,
+     * org.lamsfoundation.lams.tool.gmap.model.GmapSession)
      */
     @Override
     public void updateMarkerListFromXML(String markerXML, Gmap gmap, GmapUser guser, boolean isAuthored,

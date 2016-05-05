@@ -41,16 +41,16 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
  * The RegisterService exists to provide a SOAP interface to 3rd parties wishing to manipulate user accounts on a LAMS
  * server. You can create user accounts, add users to groups, and add users to the groups' lessons.
  * </p>
- * 
+ *
  * <p>
  * It is disabled in LAMS by default. To enable, uncomment the RegisterService block in the file
  * JBOSS_HOME/server/default/deploy/lams.ear/lams-central.war/WEB-INF/server-config.wsdd.
  * </p>
- * 
+ *
  * <p>
  * To authenticate your request to LAMS, each method accepts a datetime, server id, and hash parameter.
  * </p>
- * 
+ *
  * <ul>
  * <li>server id: On the LAMS server you must setup your 3rd party server id and secret key by logging in as a sysadmin
  * and going to 'Maintain integrated servers'. All other fields are irrelevant for the RegisterService.
@@ -64,9 +64,9 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
  * <li>$hashvalue = sha1(strtolower($rawstring));
  * </ul>
  * </ul>
- * 
+ *
  * @author jliew
- * 
+ *
  */
 public class RegisterServiceSoapBindingImpl implements Register {
 
@@ -76,29 +76,31 @@ public class RegisterServiceSoapBindingImpl implements Register {
 
     private static IUserManagementService service = (IUserManagementService) WebApplicationContextUtils
 	    .getRequiredWebApplicationContext(
-		    ((HttpServlet) context.getProperty(HTTPConstants.MC_HTTP_SERVLET)).getServletContext()).getBean(
-		    "userManagementService");
+		    ((HttpServlet) context.getProperty(HTTPConstants.MC_HTTP_SERVLET)).getServletContext())
+	    .getBean("userManagementService");
 
     private static ILessonService lessonService = (ILessonService) WebApplicationContextUtils
 	    .getRequiredWebApplicationContext(
-		    ((HttpServlet) context.getProperty(HTTPConstants.MC_HTTP_SERVLET)).getServletContext()).getBean(
-		    "lessonService");
+		    ((HttpServlet) context.getProperty(HTTPConstants.MC_HTTP_SERVLET)).getServletContext())
+	    .getBean("lessonService");
 
     private static IIntegrationService integrationService = (IIntegrationService) WebApplicationContextUtils
 	    .getRequiredWebApplicationContext(
-		    ((HttpServlet) context.getProperty(HTTPConstants.MC_HTTP_SERVLET)).getServletContext()).getBean(
-		    "integrationService");
+		    ((HttpServlet) context.getProperty(HTTPConstants.MC_HTTP_SERVLET)).getServletContext())
+	    .getBean("integrationService");
 
     /**
      * Creates a user account in LAMS with the given username.
      */
+    @Override
     public boolean createUser(String username, String password, String firstName, String lastName, String email,
 	    String serverId, String datetime, String hash) throws java.rmi.RemoteException {
 	try {
 	    ExtServerOrgMap extServer = integrationService.getExtServerOrgMap(serverId);
 	    Authenticator.authenticate(extServer, datetime, hash);
-	    if (service.getUserByLogin(username) != null)
+	    if (service.getUserByLogin(username) != null) {
 		return false;
+	    }
 	    ExtUserUseridMap userMap = integrationService.getImplicitExtUserUseridMap(extServer, username, password,
 		    firstName, lastName, email);
 	    return true;
@@ -111,6 +113,7 @@ public class RegisterServiceSoapBindingImpl implements Register {
     /**
      * Create a new group with the given name.
      */
+    @Override
     public int createOrganisation(String name, String code, String description, String owner, String serverId,
 	    String datetime, String hash) throws java.rmi.RemoteException {
 	try {
@@ -120,16 +123,16 @@ public class RegisterServiceSoapBindingImpl implements Register {
 			+ "organisation name cannot contain any of these characters < > ^ * @ % $. External serverId:"
 			+ serverId + ", orgName:" + name);
 	    }
-	    
+
 	    Organisation org = new Organisation();
 	    org.setName(name);
 	    org.setCode(code);
 	    org.setDescription(description);
 	    org.setParentOrganisation(service.getRootOrganisation());
-	    org.setOrganisationType((OrganisationType) service.findById(OrganisationType.class,
-		    OrganisationType.COURSE_TYPE));
-	    org.setOrganisationState((OrganisationState) service.findById(OrganisationState.class,
-		    OrganisationState.ACTIVE));
+	    org.setOrganisationType(
+		    (OrganisationType) service.findById(OrganisationType.class, OrganisationType.COURSE_TYPE));
+	    org.setOrganisationState(
+		    (OrganisationState) service.findById(OrganisationState.class, OrganisationState.ACTIVE));
 	    SupportedLocale locale = LanguageUtil.getDefaultLocale();
 	    org.setLocale(locale);
 	    User user = service.getUserByLogin(owner);
@@ -145,6 +148,7 @@ public class RegisterServiceSoapBindingImpl implements Register {
      * Add the given username to the given group or subgroup. User and group/subgroup must exist. If asStaff is true,
      * user is given Learner, Author, and Monitor roles; otherwise only Learner.
      */
+    @Override
     public boolean addUserToOrganisation(String login, Integer organisationId, Boolean asStaff, String serverId,
 	    String datetime, String hash) throws java.rmi.RemoteException {
 	try {
@@ -175,7 +179,8 @@ public class RegisterServiceSoapBindingImpl implements Register {
 		    roles = new Integer[] { Role.ROLE_LEARNER };
 		}
 		for (Integer roleId : roles) {
-		    UserOrganisationRole uor = new UserOrganisationRole(uo, (Role) service.findById(Role.class, roleId));
+		    UserOrganisationRole uor = new UserOrganisationRole(uo,
+			    (Role) service.findById(Role.class, roleId));
 		    service.save(uor);
 		    uo.addUserOrganisationRole(uor);
 		}
@@ -202,13 +207,14 @@ public class RegisterServiceSoapBindingImpl implements Register {
      * lams_ext_course_class_map table (i.e. new external 3rd party course), a new group is created. If it does exist,
      * the group name is updated.
      * </p>
-     * 
+     *
      * <p>
      * If the username doesn't exist, this method will fail unless there is a working user callback url configured for
      * this 3rd party server id. However the usual way of creating users with the RegisterService is to use the
      * createUser method.
      * </p>
      */
+    @Override
     public boolean addUserToGroup(String username, String serverId, String datetime, String hash, String courseId,
 	    String courseName, String countryIsoCode, String langIsoCode, Boolean isTeacher)
 	    throws java.rmi.RemoteException {
@@ -221,9 +227,9 @@ public class RegisterServiceSoapBindingImpl implements Register {
 	    ExtUserUseridMap userMap = integrationService.getExtUserUseridMap(serverMap, username);
 
 	    // add user to org, creating org if necessary
-	    ExtCourseClassMap orgMap = integrationService.getExtCourseClassMap(serverMap, userMap, courseId,
-		    courseName, countryIsoCode, langIsoCode, service.getRootOrganisation().getOrganisationId()
-			    .toString(), isTeacher, false);
+	    ExtCourseClassMap orgMap = integrationService.getExtCourseClassMap(serverMap, userMap, courseId, courseName,
+		    countryIsoCode, langIsoCode, service.getRootOrganisation().getOrganisationId().toString(),
+		    isTeacher, false);
 	    return true;
 	} catch (Exception e) {
 	    log.debug(e.getMessage(), e);
@@ -234,6 +240,7 @@ public class RegisterServiceSoapBindingImpl implements Register {
     /**
      * Same as addUserToGroup, except adds user to the given aubgroup (and creates it if it doesn't exist).
      */
+    @Override
     public boolean addUserToSubgroup(String username, String serverId, String datetime, String hash, String courseId,
 	    String courseName, String countryIsoCode, String langIsoCode, String subgroupId, String subgroupName,
 	    Boolean isTeacher) throws java.rmi.RemoteException {
@@ -244,9 +251,9 @@ public class RegisterServiceSoapBindingImpl implements Register {
 
 	    // get group to use for this request
 	    ExtUserUseridMap userMap = integrationService.getExtUserUseridMap(serverMap, username);
-	    ExtCourseClassMap orgMap = integrationService.getExtCourseClassMap(serverMap, userMap, courseId,
-		    courseName, countryIsoCode, langIsoCode, service.getRootOrganisation().getOrganisationId()
-			    .toString(), isTeacher, false);
+	    ExtCourseClassMap orgMap = integrationService.getExtCourseClassMap(serverMap, userMap, courseId, courseName,
+		    countryIsoCode, langIsoCode, service.getRootOrganisation().getOrganisationId().toString(),
+		    isTeacher, false);
 	    Organisation group = orgMap.getOrganisation();
 
 	    // add user to subgroup, creating subgroup if necessary
@@ -261,16 +268,17 @@ public class RegisterServiceSoapBindingImpl implements Register {
 
     /**
      * <p>
-     * Adds given username as learner or monitor (as specified by asStaff parameter) to all lessons in 
+     * Adds given username as learner or monitor (as specified by asStaff parameter) to all lessons in
      * given LAMS group.
      * </p>
-     * 
+     *
      * <p>
-     * The LAMS group is identified by the external courseId parameter.  If the courseId doesn't exist in the
-     * lams_ext_course_class_map table, then a new LAMS group is created.  If it does exist, the group name is
+     * The LAMS group is identified by the external courseId parameter. If the courseId doesn't exist in the
+     * lams_ext_course_class_map table, then a new LAMS group is created. If it does exist, the group name is
      * updated.
      * </p>
      */
+    @Override
     public boolean addUserToGroupLessons(String username, String serverId, String datetime, String hash,
 	    String courseId, String courseName, String countryIsoCode, String langIsoCode, Boolean asStaff)
 	    throws java.rmi.RemoteException {
@@ -281,9 +289,9 @@ public class RegisterServiceSoapBindingImpl implements Register {
 
 	    // get group to use for this request
 	    ExtUserUseridMap userMap = integrationService.getExtUserUseridMap(serverMap, username);
-	    ExtCourseClassMap orgMap = integrationService.getExtCourseClassMap(serverMap, userMap, courseId,
-		    courseName, countryIsoCode, langIsoCode, service.getRootOrganisation().getOrganisationId()
-			    .toString(), asStaff, false);
+	    ExtCourseClassMap orgMap = integrationService.getExtCourseClassMap(serverMap, userMap, courseId, courseName,
+		    countryIsoCode, langIsoCode, service.getRootOrganisation().getOrganisationId().toString(), asStaff,
+		    false);
 	    Organisation org = orgMap.getOrganisation();
 
 	    // add user to lessons
@@ -299,6 +307,7 @@ public class RegisterServiceSoapBindingImpl implements Register {
     /**
      * Same as addUserToLessons, except adds user to lessons in given subgroup.
      */
+    @Override
     public boolean addUserToSubgroupLessons(String username, String serverId, String datetime, String hash,
 	    String courseId, String courseName, String countryIsoCode, String langIsoCode, String subgroupId,
 	    String subgroupName, Boolean asStaff) throws java.rmi.RemoteException {
@@ -309,9 +318,9 @@ public class RegisterServiceSoapBindingImpl implements Register {
 
 	    // get group to use for this request
 	    ExtUserUseridMap userMap = integrationService.getExtUserUseridMap(serverMap, username);
-	    ExtCourseClassMap orgMap = integrationService.getExtCourseClassMap(serverMap, userMap, courseId,
-		    courseName, countryIsoCode, langIsoCode, service.getRootOrganisation().getOrganisationId()
-			    .toString(), asStaff, false);
+	    ExtCourseClassMap orgMap = integrationService.getExtCourseClassMap(serverMap, userMap, courseId, courseName,
+		    countryIsoCode, langIsoCode, service.getRootOrganisation().getOrganisationId().toString(), asStaff,
+		    false);
 	    Organisation group = orgMap.getOrganisation();
 
 	    // get subgroup to add user to
@@ -338,8 +347,9 @@ public class RegisterServiceSoapBindingImpl implements Register {
 	    while (iter2.hasNext()) {
 		Lesson lesson = (Lesson) iter2.next();
 		lessonService.addLearner(lesson.getLessonId(), user.getUserId());
-		if (asStaff)
+		if (asStaff) {
 		    lessonService.addStaffMember(lesson.getLessonId(), user.getUserId());
+		}
 		if (log.isDebugEnabled()) {
 		    log.debug("Added " + user.getLogin() + " to " + lesson.getLessonName()
 			    + (asStaff ? " as staff, and" : " as learner"));

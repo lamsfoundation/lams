@@ -1,26 +1,26 @@
-/**************************************************************** 
- * Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org) 
- * ============================================================= 
- * License Information: http://lamsfoundation.org/licensing/lams/2.0/ 
- * 
- * This program is free software; you can redistribute it and/or modify 
- * it under the terms of the GNU General Public License version 2.0 
- * as published by the Free Software Foundation. 
- * 
- * This program is distributed in the hope that it will be useful, 
- * but WITHOUT ANY WARRANTY; without even the implied warranty of 
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the 
- * GNU General Public License for more details. 
- * 
- * You should have received a copy of the GNU General Public License 
- * along with this program; if not, write to the Free Software 
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 * USA 
- * 
- * http://www.gnu.org/licenses/gpl.txt 
- * **************************************************************** 
- */  
- 
-/* $Id$ */  
+/****************************************************************
+ * Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
+ * =============================================================
+ * License Information: http://lamsfoundation.org/licensing/lams/2.0/
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License version 2.0
+ * as published by the Free Software Foundation.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 * USA
+ *
+ * http://www.gnu.org/licenses/gpl.txt
+ * ****************************************************************
+ */
+
+/* $Id$ */
 package org.lamsfoundation.lams.tool.forum.persistence;
 
 import java.io.Serializable;
@@ -30,9 +30,9 @@ import org.apache.commons.lang.builder.HashCodeBuilder;
 
 /**
  * MessageRating
- * 
+ *
  * @author Andrey Balan
- * 
+ *
  * @hibernate.class table="tl_lafrum11_message_rating"
  */
 public class MessageRating implements Serializable {
@@ -48,11 +48,14 @@ public class MessageRating implements Serializable {
     // Function methods for ResponseRating
     // **********************************************************
 
+    @Override
     public boolean equals(Object o) {
-	if (this == o)
+	if (this == o) {
 	    return true;
-	if (!(o instanceof MessageRating))
+	}
+	if (!(o instanceof MessageRating)) {
 	    return false;
+	}
 
 	final MessageRating genericEntity = (MessageRating) o;
 
@@ -60,6 +63,7 @@ public class MessageRating implements Serializable {
 		.append(this.user, genericEntity.user).isEquals();
     }
 
+    @Override
     public int hashCode() {
 	return new HashCodeBuilder().append(uid).append(rating).append(user).toHashCode();
     }
@@ -82,7 +86,7 @@ public class MessageRating implements Serializable {
 
     /**
      * Returns user rated this message.
-     * 
+     *
      * @hibernate.many-to-one column="user_id" cascade="none"
      * @return
      */
@@ -105,7 +109,7 @@ public class MessageRating implements Serializable {
     public void setRating(float rating) {
 	this.rating = rating;
     }
-    
+
     /**
      * @hibernate.many-to-one column="message_id" cascade="none"
      * @return
@@ -116,6 +120,6 @@ public class MessageRating implements Serializable {
 
     public void setMessage(Message message) {
 	this.message = message;
-    }    
-    
+    }
+
 }

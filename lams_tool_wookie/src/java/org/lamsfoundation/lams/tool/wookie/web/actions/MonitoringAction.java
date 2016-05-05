@@ -2,21 +2,21 @@
  * Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
  * =============================================================
  * License Information: http://lamsfoundation.org/licensing/lams/2.0/
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301
  * USA
- * 
+ *
  * http://www.gnu.org/licenses/gpl.txt
  * ****************************************************************
  */
@@ -52,19 +52,20 @@ import org.lamsfoundation.lams.web.util.AttributeNames;
 /**
  * @author
  * @version
- * 
+ *
  * @struts.action path="/monitoring" parameter="dispatch" scope="request"
  *                name="monitoringForm" validate="false"
- * 
+ *
  * @struts.action-forward name="success" path="tiles:/monitoring/main"
  * @struts.action-forward name="wookie_display"
  *                        path="tiles:/monitoring/wookie_display"
- * 
+ *
  */
 public class MonitoringAction extends LamsDispatchAction {
 
     public IWookieService wookieService;
 
+    @Override
     public ActionForward unspecified(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) {
 
@@ -87,15 +88,14 @@ public class MonitoringAction extends LamsDispatchAction {
 
 	    // Initiate the wookie widget for the monitor
 	    if (!StringUtils.isEmpty(sessionDTO.getWidgetSharedDataKey())) {
-		String sessionUserWidgetUrl = initiateWidget(sessionDTO.getWidgetIdentifier(), sessionDTO
-			.getWidgetSharedDataKey());
+		String sessionUserWidgetUrl = initiateWidget(sessionDTO.getWidgetIdentifier(),
+			sessionDTO.getWidgetSharedDataKey());
 		sessionDTO.setSessionUserWidgetUrl(sessionUserWidgetUrl);
 	    }
 	    for (WookieUserDTO userDTO : sessionDTO.getUserDTOs()) {
 		// get the notebook entry.
-		NotebookEntry notebookEntry = wookieService.getEntry(toolSessionID,
-			CoreNotebookConstants.NOTEBOOK_TOOL, WookieConstants.TOOL_SIGNATURE, userDTO.getUserId()
-				.intValue());
+		NotebookEntry notebookEntry = wookieService.getEntry(toolSessionID, CoreNotebookConstants.NOTEBOOK_TOOL,
+			WookieConstants.TOOL_SIGNATURE, userDTO.getUserId().intValue());
 		if (notebookEntry != null) {
 		    userDTO.notebookEntry = notebookEntry.getEntry();
 		    userDTO.setFinishedReflection(true);
@@ -104,7 +104,7 @@ public class MonitoringAction extends LamsDispatchAction {
 	    }
 	}
 
-	// Set a flag if there is only one session 
+	// Set a flag if there is only one session
 	boolean multipleSessionFlag = false;
 	if (wookieDT0.getSessionDTOs() != null && wookieDT0.getSessionDTOs().size() > 1) {
 	    multipleSessionFlag = true;
@@ -169,7 +169,7 @@ public class MonitoringAction extends LamsDispatchAction {
 
     /**
      * Opens a user's reflection
-     * 
+     *
      * @param mapping
      * @param form
      * @param request

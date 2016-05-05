@@ -2,21 +2,21 @@
  * Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
  * =============================================================
  * License Information: http://lamsfoundation.org/licensing/lams/2.0/
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License version 2.0 
+ * it under the terms of the GNU General Public License version 2.0
  * as published by the Free Software Foundation.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301
  * USA
- * 
+ *
  * http://www.gnu.org/licenses/gpl.txt
  * ****************************************************************
  */
@@ -28,7 +28,6 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.Date;
 import java.util.List;
-import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 import java.util.SortedMap;
@@ -56,12 +55,8 @@ import org.apache.struts.action.ActionMessage;
 import org.apache.tomcat.util.json.JSONArray;
 import org.apache.tomcat.util.json.JSONException;
 import org.apache.tomcat.util.json.JSONObject;
-import org.lamsfoundation.lams.notebook.model.NotebookEntry;
-import org.lamsfoundation.lams.notebook.service.CoreNotebookConstants;
-import org.lamsfoundation.lams.notebook.service.ICoreNotebookService;
 import org.lamsfoundation.lams.tool.survey.SurveyConstants;
 import org.lamsfoundation.lams.tool.survey.dto.AnswerDTO;
-import org.lamsfoundation.lams.tool.survey.dto.ReflectDTO;
 import org.lamsfoundation.lams.tool.survey.model.Survey;
 import org.lamsfoundation.lams.tool.survey.model.SurveyOption;
 import org.lamsfoundation.lams.tool.survey.model.SurveyQuestion;
@@ -127,7 +122,7 @@ public class MonitoringAction extends Action {
 
     /**
      * Summary page action.
-     * 
+     *
      * @param mapping
      * @param form
      * @param request
@@ -154,7 +149,7 @@ public class MonitoringAction extends Action {
 	Long contentId = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_CONTENT_ID);
 	ISurveyService service = getSurveyService();
 
-	// get summary 
+	// get summary
 	SortedMap<SurveySession, List<AnswerDTO>> summary = service.getSummary(contentId);
 
 	// get survey
@@ -200,9 +195,10 @@ public class MonitoringAction extends Action {
 	request.setAttribute(AttributeNames.PARAM_TOOL_SESSION_ID, sessionId);
 	return mapping.findForward(SurveyConstants.SUCCESS);
     }
+
     private ActionForward getAnswersJSON(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) throws JSONException, IOException {
-	
+
 	Long sessionId = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_SESSION_ID);
 	Long questionUid = WebUtil.readLongParam(request, SurveyConstants.ATTR_QUESTION_UID);
 
@@ -210,46 +206,49 @@ public class MonitoringAction extends Action {
 	int size = WebUtil.readIntParam(request, "size");
 	int page = WebUtil.readIntParam(request, "page");
 	Integer sortByName = WebUtil.readIntParam(request, "column[0]", true);
-	String searchString = request.getParameter("fcol[0]"); 
-	
+	String searchString = request.getParameter("fcol[0]");
+
 	int sorting = SurveyConstants.SORT_BY_DEAFAULT;
-	if ( sortByName != null ) 
-	    sorting = sortByName.equals(0) ? SurveyConstants.SORT_BY_NAME_ASC : SurveyConstants.SORT_BY_NAME_DESC; 
+	if (sortByName != null) {
+	    sorting = sortByName.equals(0) ? SurveyConstants.SORT_BY_NAME_ASC : SurveyConstants.SORT_BY_NAME_DESC;
+	}
 
 	//return user list according to the given sessionID
 	ISurveyService service = getSurveyService();
 	SurveyQuestion question = service.getQuestion(questionUid);
-	List<Object[]> users = service.getQuestionAnswersForTablesorter(sessionId, questionUid, page, size, sorting, searchString);
-	
+	List<Object[]> users = service.getQuestionAnswersForTablesorter(sessionId, questionUid, page, size, sorting,
+		searchString);
+
 	JSONArray rows = new JSONArray();
 	JSONObject responsedata = new JSONObject();
 	responsedata.put("total_rows", service.getCountUsersBySession(sessionId, searchString));
 
-	for (Object[] userAndAnswers: users) {
+	for (Object[] userAndAnswers : users) {
 
 	    JSONObject responseRow = new JSONObject();
-	    
-	    SurveyUser user = (SurveyUser) userAndAnswers[0];
-	    responseRow.put(SurveyConstants.ATTR_USER_NAME, StringEscapeUtils.escapeHtml(user.getLastName() + " " + user.getFirstName()));
 
-	    if ( userAndAnswers.length > 1 && userAndAnswers[1] != null) {
-		responseRow.put("choices", SurveyWebUtils.getChoiceList((String)userAndAnswers[1]));
-	    } 
-	    if ( userAndAnswers.length > 2 && userAndAnswers[2] != null) {
+	    SurveyUser user = (SurveyUser) userAndAnswers[0];
+	    responseRow.put(SurveyConstants.ATTR_USER_NAME,
+		    StringEscapeUtils.escapeHtml(user.getLastName() + " " + user.getFirstName()));
+
+	    if (userAndAnswers.length > 1 && userAndAnswers[1] != null) {
+		responseRow.put("choices", SurveyWebUtils.getChoiceList((String) userAndAnswers[1]));
+	    }
+	    if (userAndAnswers.length > 2 && userAndAnswers[2] != null) {
 		// Data is handled differently in learner depending on whether it is an extra text added
 		// to a multiple choice, or a free text entry. So need to handle the output differently.
-		// See learner/result.jsp and its handling of question.type == 3 vs question.appendText 
+		// See learner/result.jsp and its handling of question.type == 3 vs question.appendText
 		String answer;
-		if ( question.getType() == SurveyConstants.QUESTION_TYPE_TEXT_ENTRY )  {
+		if (question.getType() == SurveyConstants.QUESTION_TYPE_TEXT_ENTRY) {
 		    // don't escape as it was escaped & BR'd before saving
-		    answer = (String)userAndAnswers[2];
+		    answer = (String) userAndAnswers[2];
 		} else {
 		    // need to escape it, as it isn't escaped in the database
-		    answer = StringEscapeUtils.escapeHtml((String)userAndAnswers[2]);
+		    answer = StringEscapeUtils.escapeHtml((String) userAndAnswers[2]);
 		    answer.replaceAll("\n", "<br>");
 		}
 		responseRow.put("answerText", answer);
-	    } 
+	    }
 	    rows.put(responseRow);
 	}
 	responsedata.put("rows", rows);
@@ -262,33 +261,34 @@ public class MonitoringAction extends Action {
 	    HttpServletResponse response) {
 
 	Long sessionId = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_SESSION_ID);
-	
+
 	ISurveyService service = getSurveyService();
 	Survey survey = service.getSurveyBySessionId(sessionId);
-	
+
 	request.setAttribute(AttributeNames.PARAM_TOOL_SESSION_ID, sessionId);
 	return mapping.findForward(SurveyConstants.SUCCESS);
     }
-    
+
     private ActionForward getReflectionsJSON(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) throws JSONException, IOException {
-	
+
 	Long sessionId = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_SESSION_ID);
 
 	// paging parameters of tablesorter
 	int size = WebUtil.readIntParam(request, "size");
 	int page = WebUtil.readIntParam(request, "page");
 	Integer sortByName = WebUtil.readIntParam(request, "column[0]", true);
-	String searchString = request.getParameter("fcol[0]"); 
-	
+	String searchString = request.getParameter("fcol[0]");
+
 	int sorting = SurveyConstants.SORT_BY_DEAFAULT;
-	if ( sortByName != null ) 
-	    sorting = sortByName.equals(0) ? SurveyConstants.SORT_BY_NAME_ASC : SurveyConstants.SORT_BY_NAME_DESC; 
+	if (sortByName != null) {
+	    sorting = sortByName.equals(0) ? SurveyConstants.SORT_BY_NAME_ASC : SurveyConstants.SORT_BY_NAME_DESC;
+	}
 
 	//return user list according to the given sessionID
 	ISurveyService service = getSurveyService();
 	List<Object[]> users = service.getUserReflectionsForTablesorter(sessionId, page, size, sorting, searchString);
-	
+
 	JSONArray rows = new JSONArray();
 	JSONObject responsedata = new JSONObject();
 	responsedata.put("total_rows", service.getCountUsersBySession(sessionId, searchString));
@@ -296,15 +296,16 @@ public class MonitoringAction extends Action {
 	for (Object[] userAndReflection : users) {
 
 	    JSONObject responseRow = new JSONObject();
-	    
-	    SurveyUser user = (SurveyUser) userAndReflection[0];
-	    responseRow.put(SurveyConstants.ATTR_USER_NAME, StringEscapeUtils.escapeHtml(user.getLastName() + " " + user.getFirstName()));
 
-	    if ( userAndReflection.length > 1 && userAndReflection[1] != null) {
-		String reflection = StringEscapeUtils.escapeHtml((String)userAndReflection[1]);
+	    SurveyUser user = (SurveyUser) userAndReflection[0];
+	    responseRow.put(SurveyConstants.ATTR_USER_NAME,
+		    StringEscapeUtils.escapeHtml(user.getLastName() + " " + user.getFirstName()));
+
+	    if (userAndReflection.length > 1 && userAndReflection[1] != null) {
+		String reflection = StringEscapeUtils.escapeHtml((String) userAndReflection[1]);
 		responseRow.put(SurveyConstants.ATTR_REFLECTION, reflection.replaceAll("\n", "<br>"));
 	    }
-		
+
 	    rows.put(responseRow);
 	}
 	responsedata.put("rows", rows);
@@ -312,10 +313,10 @@ public class MonitoringAction extends Action {
 	response.getWriter().print(new String(responsedata.toString()));
 	return null;
     }
-    
+
     /**
      * Export Excel format survey data.
-     * 
+     *
      * @param mapping
      * @param form
      * @param request
@@ -433,7 +434,7 @@ public class MonitoringAction extends Action {
 		    cellIdx++;
 		    cell = row.createCell(cellIdx);
 		    cell.setCellValue(resource.getMessage(MonitoringAction.MSG_LABEL_LEARNER_NAME));
-		    
+
 		    int optionsNum = options.size();
 
 		    int iterOpts;
@@ -447,11 +448,12 @@ public class MonitoringAction extends Action {
 		    for (AnswerDTO answer : answers) {
 			row = sheet.createRow(idx++);
 			cellIdx = 0;
-                        cell = row.createCell(cellIdx);
-                        cell.setCellValue(answer.getReplier().getLoginName());
+			cell = row.createCell(cellIdx);
+			cell.setCellValue(answer.getReplier().getLoginName());
 			cellIdx++;
 			cell = row.createCell(cellIdx);
-			cell.setCellValue(answer.getReplier().getLastName() + ", " + answer.getReplier().getFirstName());
+			cell.setCellValue(
+				answer.getReplier().getLastName() + ", " + answer.getReplier().getFirstName());
 
 			// for answer's options
 			for (SurveyOption option : options) {
@@ -477,16 +479,16 @@ public class MonitoringAction extends Action {
 
 		    }
 		}
-	    } 
+	    }
 
 	    String fileName = "lams_survey_" + toolSessionID + ".xlsx";
 	    response.setContentType("application/x-download");
 	    response.setHeader("Content-Disposition", "attachment;filename=" + fileName);
-	    
+
 	    ServletOutputStream out = response.getOutputStream();
 	    workbook.write(out);
 	    out.close();
-	    
+
 	} catch (Exception e) {
 	    MonitoringAction.log.error(e);
 	    errors = new ActionMessage("error.monitoring.export.excel", e.toString()).toString();
@@ -505,7 +507,7 @@ public class MonitoringAction extends Action {
 
     /**
      * Set Submission Deadline
-     * 
+     *
      * @param mapping
      * @param form
      * @param request
@@ -536,7 +538,7 @@ public class MonitoringAction extends Action {
 
     /**
      * Removes all the html tags from a string
-     * 
+     *
      * @param string
      * @return
      */
@@ -548,8 +550,8 @@ public class MonitoringAction extends Action {
     // Private method
     // *************************************************************************************
     private ISurveyService getSurveyService() {
-	WebApplicationContext wac = WebApplicationContextUtils.getRequiredWebApplicationContext(getServlet()
-		.getServletContext());
+	WebApplicationContext wac = WebApplicationContextUtils
+		.getRequiredWebApplicationContext(getServlet().getServletContext());
 	return (ISurveyService) wac.getBean(SurveyConstants.SURVEY_SERVICE);
     }
 
@@ -557,8 +559,8 @@ public class MonitoringAction extends Action {
      * Return ResourceService bean.
      */
     private MessageService getMessageService() {
-	WebApplicationContext wac = WebApplicationContextUtils.getRequiredWebApplicationContext(getServlet()
-		.getServletContext());
+	WebApplicationContext wac = WebApplicationContextUtils
+		.getRequiredWebApplicationContext(getServlet().getServletContext());
 	return (MessageService) wac.getBean("lasurvMessageService");
     }
 }

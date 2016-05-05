@@ -2,21 +2,21 @@
  * Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
  * =============================================================
  * License Information: http://lamsfoundation.org/licensing/lams/2.0/
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301
  * USA
- * 
+ *
  * http://www.gnu.org/licenses/gpl.txt
  * ****************************************************************
  */
@@ -34,11 +34,11 @@ import org.apache.log4j.Logger;
 
 /**
  * TaskList
- * 
+ *
  * @author Andrey Balan
- * 
+ *
  * @hibernate.class table="tl_latask10_tasklist_item"
- * 
+ *
  */
 public class TaskListItem implements Cloneable {
 
@@ -80,7 +80,7 @@ public class TaskListItem implements Cloneable {
 
     /**
      * Default contruction method.
-     * 
+     *
      */
     public TaskListItem() {
 	attachments = new HashSet();
@@ -90,6 +90,7 @@ public class TaskListItem implements Cloneable {
     // **********************************************************
     // Function method for TaskList
     // **********************************************************
+    @Override
     public Object clone() {
 
 	TaskListItem taskListItem = null;
@@ -134,11 +135,14 @@ public class TaskListItem implements Cloneable {
 	return taskListItem;
     }
 
+    @Override
     public boolean equals(Object o) {
-	if (this == o)
+	if (this == o) {
 	    return true;
-	if (!(o instanceof TaskListItem))
+	}
+	if (!(o instanceof TaskListItem)) {
 	    return false;
+	}
 
 	final TaskListItem genericEntity = (TaskListItem) o;
 
@@ -147,6 +151,7 @@ public class TaskListItem implements Cloneable {
 		.append(this.createBy, genericEntity.createBy).isEquals();
     }
 
+    @Override
     public int hashCode() {
 	return new HashCodeBuilder().append(uid).append(title).append(description).append(createDate).append(createBy)
 		.toHashCode();
@@ -222,7 +227,7 @@ public class TaskListItem implements Cloneable {
 
     /**
      * @hibernate.many-to-one cascade="none" column="create_by"
-     * 
+     *
      * @return
      */
     public TaskListUser getCreateBy() {
@@ -267,9 +272,9 @@ public class TaskListItem implements Cloneable {
 
     /**
      * Returns taskListItem sequence number.
-     * 
+     *
      * @return taskListItem sequence number
-     * 
+     *
      * @hibernate.property column="sequence_id"
      */
     public int getSequenceId() {
@@ -278,7 +283,7 @@ public class TaskListItem implements Cloneable {
 
     /**
      * Sets taskListItem sequence number.
-     * 
+     *
      * @param sequenceId
      *            taskListItem sequence number
      */
@@ -400,7 +405,7 @@ public class TaskListItem implements Cloneable {
      * @hibernate.set lazy="true" cascade="all" inverse="false" order-by="create_date asc"
      * @hibernate.collection-key column="taskList_item_uid"
      * @hibernate.collection-one-to-many class="org.lamsfoundation.lams.tool.taskList.model.TaskListItemAttachment"
-     * 
+     *
      * @return a set of Attachments to this TaskListItem.
      */
     public Set getAttachments() {
@@ -415,7 +420,7 @@ public class TaskListItem implements Cloneable {
      * @hibernate.set lazy="true" cascade="all" inverse="false" order-by="create_date asc"
      * @hibernate.collection-key column="taskList_item_uid"
      * @hibernate.collection-one-to-many class="org.lamsfoundation.lams.tool.taskList.model.TaskListItemComment"
-     * 
+     *
      * @return a set of Comments to this TaskListItem.
      */
     public Set getComments() {

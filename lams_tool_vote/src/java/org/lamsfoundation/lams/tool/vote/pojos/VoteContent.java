@@ -2,21 +2,21 @@
  * Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
  * =============================================================
  * License Information: http://lamsfoundation.org/licensing/lams/2.0/
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License version 2.0
  * as published by the Free Software Foundation.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301
  * USA
- * 
+ *
  * http://www.gnu.org/licenses/gpl.txt
  * ***********************************************************************/
 package org.lamsfoundation.lams.tool.vote.pojos;
@@ -35,7 +35,7 @@ import org.apache.commons.lang.builder.ToStringBuilder;
  * Persistent object/bean that defines the content for the Voting tool. Provides accessors and mutators to get/set
  * attributes It maps to database table: tl_lavote11_content
  * </p>
- * 
+ *
  * @author Ozgur Demirtas
  */
 public class VoteContent implements Serializable {
@@ -68,7 +68,7 @@ public class VoteContent implements Serializable {
 
     /** nullable persistent field */
     private long createdBy;
-    
+
     private boolean useSelectLeaderToolOuput;
 
     private boolean reflect;
@@ -89,7 +89,7 @@ public class VoteContent implements Serializable {
 
     /** persistent field */
     private Set voteSessions;
-    
+
     private Date submissionDeadline;
 
     /**
@@ -144,10 +144,10 @@ public class VoteContent implements Serializable {
 
     /**
      * gets called as part of the copyToolContent
-     * 
+     *
      * Copy Construtor to create a new mc content instance. Note that we don't copy the mc session data here because the
      * mc session will be created after we copied tool content.
-     * 
+     *
      * @param mc
      *            the original mc content.
      * @param newContentId
@@ -169,7 +169,7 @@ public class VoteContent implements Serializable {
 
     /**
      * gets called as part of the copyToolContent
-     * 
+     *
      * @param newQaContent
      * @return Set
      */
@@ -396,20 +396,20 @@ public class VoteContent implements Serializable {
     public void setReflect(boolean reflect) {
 	this.reflect = reflect;
     }
-    
+
     /**
      * @param useSelectLeaderToolOuput
      *            The useSelectLeaderToolOuput to set.
      */
     public boolean isUseSelectLeaderToolOuput() {
-        return useSelectLeaderToolOuput;
+	return useSelectLeaderToolOuput;
     }
 
     /**
      * @return Returns the useSelectLeaderToolOuput.
      */
     public void setUseSelectLeaderToolOuput(boolean useSelectLeaderToolOuput) {
-        this.useSelectLeaderToolOuput = useSelectLeaderToolOuput;
+	this.useSelectLeaderToolOuput = useSelectLeaderToolOuput;
     }
 
     /**
@@ -458,12 +458,12 @@ public class VoteContent implements Serializable {
     public void setExternalInputsAdded(Short externalInputsAdded) {
 	this.externalInputsAdded = externalInputsAdded;
     }
-    
-   	public void setSubmissionDeadline(Date submissionDeadline) {
-		this.submissionDeadline = submissionDeadline;
-	}
 
-	public Date getSubmissionDeadline() {
-		return submissionDeadline;
-	}
+    public void setSubmissionDeadline(Date submissionDeadline) {
+	this.submissionDeadline = submissionDeadline;
+    }
+
+    public Date getSubmissionDeadline() {
+	return submissionDeadline;
+    }
 }

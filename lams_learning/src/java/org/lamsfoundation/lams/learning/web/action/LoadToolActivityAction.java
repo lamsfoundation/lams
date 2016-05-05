@@ -2,21 +2,21 @@
  * Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
  * =============================================================
  * License Information: http://lamsfoundation.org/licensing/lams/2.0/
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License version 2.0 
+ * it under the terms of the GNU General Public License version 2.0
  * as published by the Free Software Foundation.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301
  * USA
- * 
+ *
  * http://www.gnu.org/licenses/gpl.txt
  * ****************************************************************
  */
@@ -48,14 +48,14 @@ import org.springframework.transaction.UnexpectedRollbackException;
  * Action class to forward the user to a Tool using an intermediate loading page. Can handle regular tools + grouping
  * and gates (system tools). Displays the activity that is in the request. This allows it to show any arbitrary
  * activity, not just the current activity.
- * 
+ *
  * XDoclet definition:
- * 
+ *
  * @struts:action path="/LoadToolActivity" name="activityForm" validate="false" scope="request"
- * 
+ *
  * @struts:action-forward name="displayTool" path=".loadToolActivity"
  * @struts:action-forward name="message" path=".message"
- * 
+ *
  */
 public class LoadToolActivityAction extends ActivityAction {
 
@@ -67,6 +67,7 @@ public class LoadToolActivityAction extends ActivityAction {
     /**
      * Gets an activity from the request (attribute) and forwards onto a loading page.
      */
+    @Override
     public ActionForward execute(ActionMapping mapping, ActionForm actionForm, HttpServletRequest request,
 	    HttpServletResponse response) {
 
@@ -77,7 +78,8 @@ public class LoadToolActivityAction extends ActivityAction {
 	LearnerProgress learnerProgress = LearningWebUtil.getLearnerProgress(request, learnerService);
 	Activity activity = LearningWebUtil.getActivityFromRequest(request, learnerService);
 
-	/* Synchronise calls to the same activity and attempt to create a session, if it does not exist.
+	/*
+	 * Synchronise calls to the same activity and attempt to create a session, if it does not exist.
 	 * Even though the method creating sessions in LamsCoreToolService is synchronised,
 	 * subsequent reads from DB are (probably) dirty,
 	 * i.e. they show that session does not exist while it is already there,
@@ -85,7 +87,7 @@ public class LoadToolActivityAction extends ActivityAction {
 	 * Reattempting session creation from within transaction not only is broken (because of the dirty reads)
 	 * but also does not make sense, because if the session already exists,
 	 * there is no point in repeating a failed attempt to create it.
-	 * 
+	 *
 	 * The synchronisation code below prevents threads from creating sessions at the same time.
 	 */
 	Object toolSessionCreationLock = null;
@@ -100,12 +102,12 @@ public class LoadToolActivityAction extends ActivityAction {
 	synchronized (toolSessionCreationLock) {
 	    try {
 		learnerService.createToolSessionsIfNecessary(activity, learnerProgress);
-		
+
 	    } catch (UnexpectedRollbackException e) {
 		log.warn("Got exception while trying to create a tool session, but carrying on.", e);
-		
+
 	    } catch (RequiredGroupMissingException e) {
-		
+
 		//got here when activity requires existing grouping but no group for user exists yet
 		log.warn(e.getMessage());
 		request.setAttribute("messageKey", e.getMessage());

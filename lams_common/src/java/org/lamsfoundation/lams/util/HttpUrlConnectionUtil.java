@@ -2,21 +2,21 @@
  * Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
  * =============================================================
  * License Information: http://lamsfoundation.org/licensing/lams/2.0/
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License version 2.0 
+ * it under the terms of the GNU General Public License version 2.0
  * as published by the Free Software Foundation.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301
  * USA
- * 
+ *
  * http://www.gnu.org/licenses/gpl.txt
  * ****************************************************************
  */
@@ -55,7 +55,7 @@ import org.apache.log4j.Logger;
 
 /**
  * @author mtruong
- * 
+ *
  */
 public class HttpUrlConnectionUtil {
     private static Logger log = Logger.getLogger(HttpUrlConnectionUtil.class);
@@ -73,7 +73,7 @@ public class HttpUrlConnectionUtil {
 
     /**
      * Write URL connection repsonse to <code>OutputStream</code>.
-     * 
+     *
      * @see writeResponseToFile(String , String , String filename, Cookie[] )
      * @param urlToConnectTo
      *            The url in which the HttpUrlConnection is to be made
@@ -119,9 +119,8 @@ public class HttpUrlConnectionUtil {
 	    }
 
 	} else {
-	    HttpUrlConnectionUtil.log
-		    .error("URL Connection Error: A problem has occurred while connecting to this url "
-			    + urlToConnectTo);
+	    HttpUrlConnectionUtil.log.error(
+		    "URL Connection Error: A problem has occurred while connecting to this url " + urlToConnectTo);
 	}
 
 	return status;
@@ -133,7 +132,7 @@ public class HttpUrlConnectionUtil {
      * needed in the form JSESSIONID=XXXX;JSESSIONIDSSO=XXXX;SYSSESSIONID=XXXX If the Http Status-Code returned is 200,
      * then it will proceed to write the contents to a file. Otherwise it will return the value -1 to indicate that an
      * error has occurred. It is up to the calling function on how this error is dealt with.
-     * 
+     *
      * @param urlToConnectTo
      *            The url in which the HttpUrlConnection is to be made
      * @param directoryToStoreFile
@@ -179,9 +178,8 @@ public class HttpUrlConnectionUtil {
 	    }
 
 	} else {
-	    HttpUrlConnectionUtil.log
-		    .error("URL Connection Error: A problem has occurred while connecting to this url "
-			    + urlToConnectTo);
+	    HttpUrlConnectionUtil.log.error(
+		    "URL Connection Error: A problem has occurred while connecting to this url " + urlToConnectTo);
 	}
 
 	return status;
@@ -192,9 +190,9 @@ public class HttpUrlConnectionUtil {
      * Method used by the export service method. It will mimic a browser and connects to the tools export url via a
      * HttpUrlConnection. If the Http Status-Code returned is 200, then it will proceed to read the main file name
      * returned by the tool.
-     * 
+     *
      * Otherwise this method will return null. It is up to the calling function to deal with this.
-     * 
+     *
      * @param toolsExportUrl
      *            The url in which the HttpUrlConnection is to be made
      * @param cookies
@@ -204,8 +202,8 @@ public class HttpUrlConnectionUtil {
      * @throws FileNotFoundException
      * @throws IOException
      */
-    public static String connectToToolExportURL(String toolsExportUrl, Cookie[] cookies) throws MalformedURLException,
-	    FileNotFoundException, IOException {
+    public static String connectToToolExportURL(String toolsExportUrl, Cookie[] cookies)
+	    throws MalformedURLException, FileNotFoundException, IOException {
 	int status;
 	int statusCode;
 	String mainFileName = null;
@@ -239,16 +237,16 @@ public class HttpUrlConnectionUtil {
 							 // anyway
 
 	switch (statusCode) {
-	case HttpURLConnection.HTTP_OK:
-	    status = HttpUrlConnectionUtil.STATUS_OK;
-	    break;
-	case HttpURLConnection.HTTP_INTERNAL_ERROR: // 500
-	    status = HttpUrlConnectionUtil.STATUS_ERROR;
-	    break;
+	    case HttpURLConnection.HTTP_OK:
+		status = HttpUrlConnectionUtil.STATUS_OK;
+		break;
+	    case HttpURLConnection.HTTP_INTERNAL_ERROR: // 500
+		status = HttpUrlConnectionUtil.STATUS_ERROR;
+		break;
 
-	case HttpURLConnection.HTTP_NOT_FOUND: // 404
-	    status = HttpUrlConnectionUtil.STATUS_ERROR;
-	    break;
+	    case HttpURLConnection.HTTP_NOT_FOUND: // 404
+		status = HttpUrlConnectionUtil.STATUS_ERROR;
+		break;
 	}
 
 	return status;
@@ -257,7 +255,7 @@ public class HttpUrlConnectionUtil {
     /**
      * This helper method sets up the string which is passed as a parameter to conn.setRequestProperty("Cookie"
      * cookeString). It formulates a string of the form JSESSIONID=XXXX;JSESSIONIDSSO=XXXX;SYSSESSIONID=XXXX
-     * 
+     *
      * @param cookies
      * @return
      */

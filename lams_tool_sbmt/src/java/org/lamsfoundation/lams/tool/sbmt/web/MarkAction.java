@@ -30,7 +30,6 @@ import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.lang.StringUtils;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
@@ -39,15 +38,10 @@ import org.apache.struts.action.ActionMessage;
 import org.apache.struts.action.ActionMessages;
 import org.lamsfoundation.lams.contentrepository.InvalidParameterException;
 import org.lamsfoundation.lams.contentrepository.RepositoryCheckedException;
-import org.lamsfoundation.lams.events.IEventNotificationService;
-import org.lamsfoundation.lams.tool.sbmt.SubmitFilesSession;
 import org.lamsfoundation.lams.tool.sbmt.dto.FileDetailsDTO;
 import org.lamsfoundation.lams.tool.sbmt.form.MarkForm;
 import org.lamsfoundation.lams.tool.sbmt.service.ISubmitFilesService;
 import org.lamsfoundation.lams.tool.sbmt.service.SubmitFilesServiceProxy;
-import org.lamsfoundation.lams.tool.sbmt.util.SbmtConstants;
-import org.lamsfoundation.lams.util.Configuration;
-import org.lamsfoundation.lams.util.ConfigurationKeys;
 import org.lamsfoundation.lams.util.NumberUtil;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.action.LamsDispatchAction;
@@ -57,13 +51,13 @@ import org.lamsfoundation.lams.web.util.AttributeNames;
  * @author lfoxton
  * @struts.action path="/mark" parameter="method" scope="request"
  *                validate="false" name="sbmtMarkForm"
- * 
+ *
  * @struts.action-forward name="listMark" path="/monitoring/mark/mark.jsp"
  * @struts.action-forward name="updateMark"
  *                        path="/monitoring/mark/updatemark.jsp"
  * @struts.action-forward name="listAllMarks"
  *                        path="/monitoring/mark/allmarks.jsp"
- * 
+ *
  */
 public class MarkAction extends LamsDispatchAction {
 
@@ -71,14 +65,14 @@ public class MarkAction extends LamsDispatchAction {
 
     /**
      * Update mark.
-     * 
+     *
      * @param mapping
      * @param form
      * @param request
      * @param response
      * @return
-     * @throws RepositoryCheckedException 
-     * @throws InvalidParameterException 
+     * @throws RepositoryCheckedException
+     * @throws InvalidParameterException
      */
     public ActionForward updateMark(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) throws InvalidParameterException, RepositoryCheckedException {
@@ -135,7 +129,7 @@ public class MarkAction extends LamsDispatchAction {
 
     /**
      * Display update mark initial page.
-     * 
+     *
      * @param mapping
      * @param form
      * @param request
@@ -166,6 +160,7 @@ public class MarkAction extends LamsDispatchAction {
 
     /**
      * Update the form
+     * 
      * @param markForm
      * @param fileDetailsDTO
      */
@@ -182,7 +177,7 @@ public class MarkAction extends LamsDispatchAction {
 
     /**
      * Remove a mark file
-     * 
+     *
      * @param mapping
      * @param form
      * @param request
@@ -197,8 +192,8 @@ public class MarkAction extends LamsDispatchAction {
 	    submitFilesService = getSubmitFilesService();
 	}
 
-	submitFilesService.removeMarkFile(markForm.getReportID(), markForm.getMarkFileUUID(), markForm
-		.getMarkFileVersionID());
+	submitFilesService.removeMarkFile(markForm.getReportID(), markForm.getMarkFileUUID(),
+		markForm.getMarkFileVersionID());
 
 	FileDetailsDTO fileDetailsDTO = submitFilesService.getFileDetails(markForm.getDetailID(), request.getLocale());
 	updateMarkForm(markForm, fileDetailsDTO);

@@ -2,21 +2,21 @@
  * Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
  * =============================================================
  * License Information: http://lamsfoundation.org/licensing/lams/2.0/
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301
  * USA
- * 
+ *
  * http://www.gnu.org/licenses/gpl.txt
  * ****************************************************************
  */
@@ -32,7 +32,7 @@ import org.apache.commons.lang.builder.ToStringBuilder;
  * <p>
  * DTO that holds users attempt history data for jsp purposes
  * </p>
- * 
+ *
  * @author Ozgur Demirtas
  */
 public class QaMonitoredUserDTO implements Comparable {
@@ -71,16 +71,17 @@ public class QaMonitoredUserDTO implements Comparable {
 
     /**
      * @param queUsrId
-     *                The queUsrId to set.
+     *            The queUsrId to set.
      */
     public void setQueUsrId(String queUsrId) {
 	this.queUsrId = queUsrId;
     }
 
+    @Override
     public String toString() {
-	return new ToStringBuilder(this).append("sessionId:", sessionId).append("userName:", userName).append(
-		"queUsrId:", queUsrId).append("questionUid:", questionUid).append("response:", response).append(
-		"visible:", visible).append("usersAttempts:", usersAttempts).toString();
+	return new ToStringBuilder(this).append("sessionId:", sessionId).append("userName:", userName)
+		.append("queUsrId:", queUsrId).append("questionUid:", questionUid).append("response:", response)
+		.append("visible:", visible).append("usersAttempts:", usersAttempts).toString();
     }
 
     /**
@@ -92,19 +93,21 @@ public class QaMonitoredUserDTO implements Comparable {
 
     /**
      * @param usersAttempts
-     *                The usersAttempts to set.
+     *            The usersAttempts to set.
      */
     public void setUsersAttempts(Map usersAttempts) {
 	this.usersAttempts = usersAttempts;
     }
 
+    @Override
     public int compareTo(Object o) {
 	QaMonitoredUserDTO qaMonitoredUserDTO = (QaMonitoredUserDTO) o;
 
-	if (qaMonitoredUserDTO == null)
+	if (qaMonitoredUserDTO == null) {
 	    return 1;
-	else
+	} else {
 	    return (int) (new Long(queUsrId).longValue() - new Long(qaMonitoredUserDTO.queUsrId).longValue());
+	}
     }
 
     /**
@@ -116,7 +119,7 @@ public class QaMonitoredUserDTO implements Comparable {
 
     /**
      * @param isCorrect
-     *                The isCorrect to set.
+     *            The isCorrect to set.
      */
     public void setIsCorrect(String isCorrect) {
 	this.isCorrect = isCorrect;
@@ -131,7 +134,7 @@ public class QaMonitoredUserDTO implements Comparable {
 
     /**
      * @param response
-     *                The response to set.
+     *            The response to set.
      */
     public void setResponse(String response) {
 	this.response = response;
@@ -146,7 +149,7 @@ public class QaMonitoredUserDTO implements Comparable {
 
     /**
      * @param timeZone
-     *                The timeZone to set.
+     *            The timeZone to set.
      */
     public void setTimeZone(String timeZone) {
 	this.timeZone = timeZone;
@@ -161,7 +164,7 @@ public class QaMonitoredUserDTO implements Comparable {
 
     /**
      * @param uid
-     *                The uid to set.
+     *            The uid to set.
      */
     public void setUid(String uid) {
 	this.uid = uid;
@@ -176,7 +179,7 @@ public class QaMonitoredUserDTO implements Comparable {
 
     /**
      * @param userName
-     *                The userName to set.
+     *            The userName to set.
      */
     public void setUserName(String userName) {
 	this.userName = userName;
@@ -191,7 +194,7 @@ public class QaMonitoredUserDTO implements Comparable {
 
     /**
      * @param sessionId
-     *                The sessionId to set.
+     *            The sessionId to set.
      */
     public void setSessionId(String sessionId) {
 	this.sessionId = sessionId;
@@ -206,7 +209,7 @@ public class QaMonitoredUserDTO implements Comparable {
 
     /**
      * @param questionUid
-     *                The questionUid to set.
+     *            The questionUid to set.
      */
     public void setQuestionUid(String questionUid) {
 	this.questionUid = questionUid;
@@ -221,7 +224,7 @@ public class QaMonitoredUserDTO implements Comparable {
 
     /**
      * @param visible
-     *                The visible to set.
+     *            The visible to set.
      */
     public void setVisible(String visible) {
 	this.visible = visible;
@@ -236,7 +239,7 @@ public class QaMonitoredUserDTO implements Comparable {
 
     /**
      * @param attemptTime
-     *                The attemptTime to set.
+     *            The attemptTime to set.
      */
     public void setAttemptTime(Date attemptTime) {
 	this.attemptTime = attemptTime;
@@ -251,7 +254,7 @@ public class QaMonitoredUserDTO implements Comparable {
 
     /**
      * @param responsePresentable
-     *                The responsePresentable to set.
+     *            The responsePresentable to set.
      */
     public void setResponsePresentable(String responsePresentable) {
 	this.responsePresentable = responsePresentable;
