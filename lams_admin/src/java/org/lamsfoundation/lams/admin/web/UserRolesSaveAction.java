@@ -54,55 +54,56 @@ import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
  *
  *
  *
- * 
+ *
  *
  *
  */
 public class UserRolesSaveAction extends Action {
-	
-	private static Logger log = Logger.getLogger(UserRolesSaveAction.class);
-	private static IUserManagementService service;
-	private static List<Role> rolelist;
-	
-	public ActionForward execute(ActionMapping mapping, ActionForm form,
-			HttpServletRequest request, HttpServletResponse response)
-			throws Exception {
-		
-		service = AdminServiceProxy.getService(getServlet().getServletContext());
-		if (rolelist==null) {
-			rolelist = service.findAll(Role.class);
-			Collections.sort(rolelist);
-		}
-		
-		ActionMessages errors = new ActionMessages();
-		DynaActionForm userRolesForm = (DynaActionForm) form;
-		Integer orgId = (Integer) userRolesForm.get("orgId");
-		Integer userId = (Integer) userRolesForm.get("userId");
-		String[] roles = (String[]) userRolesForm.get("roles");
-		
-		request.setAttribute("org", orgId);
-				
-		if (isCancelled(request)) {
-			return mapping.findForward("userlist");
-		}
-		
-		log.debug("userId: "+userId+", orgId: "+orgId+" will have "+roles.length+" roles");
-		Organisation org = (Organisation)service.findById(Organisation.class, orgId);
-		User user = (User)service.findById(User.class, userId);
-		
-		// user must have at least 1 role
-		if (roles.length < 1) {
-			errors.add("roles", new ActionMessage("error.roles.empty"));
-			saveErrors(request,errors);
-			request.setAttribute("rolelist",service.filterRoles(rolelist,request.isUserInRole(Role.SYSADMIN),org.getOrganisationType()));
-			request.setAttribute("login", user.getLogin());
-			request.setAttribute("fullName", user.getFullName());
-			return mapping.findForward("userroles");
-		}
-	
-		service.setRolesForUserOrganisation(user, orgId, (List<String>)Arrays.asList(roles));
-		
-		return mapping.findForward("userlist");
+
+    private static Logger log = Logger.getLogger(UserRolesSaveAction.class);
+    private static IUserManagementService service;
+    private static List<Role> rolelist;
+
+    @Override
+    public ActionForward execute(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+	    HttpServletResponse response) throws Exception {
+
+	service = AdminServiceProxy.getService(getServlet().getServletContext());
+	if (rolelist == null) {
+	    rolelist = service.findAll(Role.class);
+	    Collections.sort(rolelist);
 	}
+
+	ActionMessages errors = new ActionMessages();
+	DynaActionForm userRolesForm = (DynaActionForm) form;
+	Integer orgId = (Integer) userRolesForm.get("orgId");
+	Integer userId = (Integer) userRolesForm.get("userId");
+	String[] roles = (String[]) userRolesForm.get("roles");
+
+	request.setAttribute("org", orgId);
+
+	if (isCancelled(request)) {
+	    return mapping.findForward("userlist");
+	}
+
+	log.debug("userId: " + userId + ", orgId: " + orgId + " will have " + roles.length + " roles");
+	Organisation org = (Organisation) service.findById(Organisation.class, orgId);
+	User user = (User) service.findById(User.class, userId);
+
+	// user must have at least 1 role
+	if (roles.length < 1) {
+	    errors.add("roles", new ActionMessage("error.roles.empty"));
+	    saveErrors(request, errors);
+	    request.setAttribute("rolelist",
+		    service.filterRoles(rolelist, request.isUserInRole(Role.SYSADMIN), org.getOrganisationType()));
+	    request.setAttribute("login", user.getLogin());
+	    request.setAttribute("fullName", user.getFullName());
+	    return mapping.findForward("userroles");
+	}
+
+	service.setRolesForUserOrganisation(user, orgId, Arrays.asList(roles));
+
+	return mapping.findForward("userlist");
+    }
 
 }

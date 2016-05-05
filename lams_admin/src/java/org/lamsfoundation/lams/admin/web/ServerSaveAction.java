@@ -2,21 +2,21 @@
  * Copyright (C) 2006 LAMS Foundation (http://lamsfoundation.org)
  * =============================================================
  * License Information: http://lamsfoundation.org/licensing/lams/2.0/
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License version 2.0 
+ * it under the terms of the GNU General Public License version 2.0
  * as published by the Free Software Foundation.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301
  * USA
- * 
+ *
  * http://www.gnu.org/licenses/gpl.txt
  * ****************************************************************
  */
@@ -58,9 +58,9 @@ import org.lamsfoundation.lams.web.util.AttributeNames;
  * <p>
  * <a href="ServerSaveAction.java.html"><i>View Source</i><a>
  * </p>
- * 
+ *
  * @author <a href="mailto:fyang@melcoe.mq.edu.au">Fei Yang</a>
- * 
+ *
  *
  *
  */
@@ -70,6 +70,7 @@ public class ServerSaveAction extends Action {
     private static IUserManagementService userService;
     private static MessageService messageService;
 
+    @Override
     @SuppressWarnings("unchecked")
     public ActionForward execute(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) throws Exception {
@@ -87,31 +88,31 @@ public class ServerSaveAction extends Action {
 	String[] requiredFields = { "serverid", "serverkey", "servername", "prefix", "userinfoUrl", "timeoutUrl" };
 	for (String requiredField : requiredFields) {
 	    if (StringUtils.trimToNull(serverOrgMapForm.getString(requiredField)) == null) {
-		errors.add(requiredField, new ActionMessage("error.required", messageService.getMessage("sysadmin."
-			+ requiredField)));
+		errors.add(requiredField,
+			new ActionMessage("error.required", messageService.getMessage("sysadmin." + requiredField)));
 	    }
 	}
 	Organisation org = null;
 	UserDTO user = (UserDTO) SessionManager.getSession().getAttribute(AttributeNames.USER);
 	if ((Boolean) serverOrgMapForm.get("newOrg")) {
-	    
+
 	    String orgName = serverOrgMapForm.getString("orgName");
 	    if (StringUtils.trimToNull(orgName) == null) {
 		errors.add("orgId",
 			new ActionMessage("error.required", messageService.getMessage("sysadmin.organisation")));
-		
+
 	    } else if (!ValidationUtil.isOrgNameValid(orgName)) {
 		errors.add("orgId", new ActionMessage("error.name.invalid.characters"));
-		
+
 	    } else {
-		
+
 		org = new Organisation();
 		org.setName(orgName);
 		org.setParentOrganisation(userService.getRootOrganisation());
-		org.setOrganisationType((OrganisationType) userService.findById(OrganisationType.class,
-			OrganisationType.COURSE_TYPE));
-		org.setOrganisationState((OrganisationState) userService.findById(OrganisationState.class,
-			OrganisationState.ACTIVE));
+		org.setOrganisationType(
+			(OrganisationType) userService.findById(OrganisationType.class, OrganisationType.COURSE_TYPE));
+		org.setOrganisationState(
+			(OrganisationState) userService.findById(OrganisationState.class, OrganisationState.ACTIVE));
 		SupportedLocale locale = LanguageUtil.getDefaultLocale();
 		org.setLocale(locale);
 		userService.saveOrganisation(org, user.getUserID());
@@ -119,7 +120,7 @@ public class ServerSaveAction extends Action {
 		serverOrgMapForm.set("newOrg", false);
 		serverOrgMapForm.set("orgName", null);
 	    }
-	    
+
 	} else {
 	    Integer orgId = (Integer) serverOrgMapForm.get("orgId");
 	    if (orgId.equals(-1)) {
@@ -130,20 +131,20 @@ public class ServerSaveAction extends Action {
 	    }
 	}
 	Integer sid = (Integer) serverOrgMapForm.get("sid");
-	if (errors.isEmpty()) {//check duplication 
+	if (errors.isEmpty()) {//check duplication
 	    String[] uniqueFields = { "serverid", "prefix" };
 	    for (String uniqueField : uniqueFields) {
-		List list = userService.findByProperty(ExtServerOrgMap.class, uniqueField, serverOrgMapForm
-			.get(uniqueField));
+		List list = userService.findByProperty(ExtServerOrgMap.class, uniqueField,
+			serverOrgMapForm.get(uniqueField));
 		if (list != null && list.size() > 0) {
 		    if (sid.equals(-1)) {//new map
-			errors.add(uniqueField, new ActionMessage("error.not.unique", messageService
-				.getMessage("sysadmin." + uniqueField)));
+			errors.add(uniqueField, new ActionMessage("error.not.unique",
+				messageService.getMessage("sysadmin." + uniqueField)));
 		    } else {
 			ExtServerOrgMap map = (ExtServerOrgMap) list.get(0);
 			if (!map.getSid().equals(sid)) {
-			    errors.add(uniqueField, new ActionMessage("error.not.unique", messageService
-				    .getMessage("sysadmin." + uniqueField)));
+			    errors.add(uniqueField, new ActionMessage("error.not.unique",
+				    messageService.getMessage("sysadmin." + uniqueField)));
 			}
 		    }
 

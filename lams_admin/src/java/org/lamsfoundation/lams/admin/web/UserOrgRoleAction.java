@@ -46,14 +46,14 @@ import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
 
 /**
  * @author jliew
- * 
+ *
  * Called when a user has added users to an organisation.
  *
  */
 
 /**
  * struts doclets
- * 
+ *
  *
  *
  *
@@ -63,57 +63,59 @@ import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
  *
  */
 public class UserOrgRoleAction extends Action {
-	
-	private static Logger log = Logger.getLogger(UserOrgRoleAction.class);
-	private static IUserManagementService service;
-	
-	public ActionForward execute(ActionMapping mapping,
-            ActionForm form,
-            HttpServletRequest request,
-            HttpServletResponse response) throws Exception {
-				
-		service = AdminServiceProxy.getService(getServlet().getServletContext());
-		UserOrgRoleForm userOrgRoleForm = (UserOrgRoleForm)form;
-		// make sure we don't have left overs from any previous attempt
-		userOrgRoleForm.setUserBeans(new ArrayList());
-		
-		// set list of roles appropriate for the organisation type
-		List roles = (List)request.getAttribute("roles");
-		request.setAttribute("numroles", roles.size());
-		Collections.sort(roles);
-		request.setAttribute("roles",roles);
-		
-		Organisation organisation = (Organisation)service.findById(Organisation.class, (Integer)request.getAttribute("orgId"));
-		userOrgRoleForm.setOrgId(organisation.getOrganisationId());
-		
-		// display breadcrumb links
-		request.setAttribute("orgName", organisation.getName());
-		Organisation parentOrg = organisation.getParentOrganisation();
-		if(parentOrg!=null && !parentOrg.equals(service.getRootOrganisation())){
-			request.setAttribute("pOrgId",parentOrg.getOrganisationId());
-			request.setAttribute("pOrgName",parentOrg.getName());
-		}
-		request.setAttribute("orgType",organisation.getOrganisationType().getOrganisationTypeId());
-		
-		// populate form with users
-		ArrayList userOrgs = (ArrayList)request.getAttribute("newUserOrganisations");
-		for(int i=0; i<userOrgs.size(); i++){
-			UserBean userBean = new UserBean();
-			User user = ((UserOrganisation)userOrgs.get(i)).getUser();
-			BeanUtils.copyProperties(userBean,user);
-			// flag users that will be added to parent group if necessary
-			userBean.setMemberOfParent(true);
-			if (organisation.getOrganisationType().getOrganisationTypeId().equals(OrganisationType.CLASS_TYPE)) {
-				if (service.getUserOrganisation(user.getUserId(), organisation.getParentOrganisation().getOrganisationId())==null)
-					userBean.setMemberOfParent(false);
-			}
-			userOrgRoleForm.addUserBean(userBean);
-			log.debug("ready to assign role for user="+userBean.getUserId());
-		}
-		log.debug("ready to assign roles for "+userOrgRoleForm.getUserBeans().size()+" new users in organisation "+organisation.getName());
 
-		return mapping.findForward("userorgrole");		
+    private static Logger log = Logger.getLogger(UserOrgRoleAction.class);
+    private static IUserManagementService service;
+
+    @Override
+    public ActionForward execute(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+	    HttpServletResponse response) throws Exception {
+
+	service = AdminServiceProxy.getService(getServlet().getServletContext());
+	UserOrgRoleForm userOrgRoleForm = (UserOrgRoleForm) form;
+	// make sure we don't have left overs from any previous attempt
+	userOrgRoleForm.setUserBeans(new ArrayList());
+
+	// set list of roles appropriate for the organisation type
+	List roles = (List) request.getAttribute("roles");
+	request.setAttribute("numroles", roles.size());
+	Collections.sort(roles);
+	request.setAttribute("roles", roles);
+
+	Organisation organisation = (Organisation) service.findById(Organisation.class,
+		(Integer) request.getAttribute("orgId"));
+	userOrgRoleForm.setOrgId(organisation.getOrganisationId());
+
+	// display breadcrumb links
+	request.setAttribute("orgName", organisation.getName());
+	Organisation parentOrg = organisation.getParentOrganisation();
+	if (parentOrg != null && !parentOrg.equals(service.getRootOrganisation())) {
+	    request.setAttribute("pOrgId", parentOrg.getOrganisationId());
+	    request.setAttribute("pOrgName", parentOrg.getName());
 	}
+	request.setAttribute("orgType", organisation.getOrganisationType().getOrganisationTypeId());
 
+	// populate form with users
+	ArrayList userOrgs = (ArrayList) request.getAttribute("newUserOrganisations");
+	for (int i = 0; i < userOrgs.size(); i++) {
+	    UserBean userBean = new UserBean();
+	    User user = ((UserOrganisation) userOrgs.get(i)).getUser();
+	    BeanUtils.copyProperties(userBean, user);
+	    // flag users that will be added to parent group if necessary
+	    userBean.setMemberOfParent(true);
+	    if (organisation.getOrganisationType().getOrganisationTypeId().equals(OrganisationType.CLASS_TYPE)) {
+		if (service.getUserOrganisation(user.getUserId(),
+			organisation.getParentOrganisation().getOrganisationId()) == null) {
+		    userBean.setMemberOfParent(false);
+		}
+	    }
+	    userOrgRoleForm.addUserBean(userBean);
+	    log.debug("ready to assign role for user=" + userBean.getUserId());
+	}
+	log.debug("ready to assign roles for " + userOrgRoleForm.getUserBeans().size() + " new users in organisation "
+		+ organisation.getName());
+
+	return mapping.findForward("userorgrole");
+    }
 
 }

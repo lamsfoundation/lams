@@ -39,23 +39,22 @@ import org.lamsfoundation.lams.util.WebUtil;
  *
  *
  *
- * 
+ *
  *
  */
 public class ImportExcelAction extends Action {
-	
-	public ActionForward execute(ActionMapping mapping,
-            ActionForm form,
-            HttpServletRequest request,
-            HttpServletResponse response) throws Exception {
-		
-		Integer orgId = WebUtil.readIntParam(request,"orgId",true);
-		//if (orgId==null) orgId = (Integer)request.getAttribute("orgId");
-		
-		ImportExcelForm importExcelForm = (ImportExcelForm)form;
-		importExcelForm.setOrgId(orgId);
-	
-		return mapping.findForward("importexcel");
-	}
+
+    @Override
+    public ActionForward execute(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+	    HttpServletResponse response) throws Exception {
+
+	Integer orgId = WebUtil.readIntParam(request, "orgId", true);
+	//if (orgId==null) orgId = (Integer)request.getAttribute("orgId");
+
+	ImportExcelForm importExcelForm = (ImportExcelForm) form;
+	importExcelForm.setOrgId(orgId);
+
+	return mapping.findForward("importexcel");
+    }
 
 }
