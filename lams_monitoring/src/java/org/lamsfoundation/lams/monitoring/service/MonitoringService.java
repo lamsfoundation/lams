@@ -95,7 +95,6 @@ import org.lamsfoundation.lams.tool.service.ILamsCoreToolService;
 import org.lamsfoundation.lams.usermanagement.Organisation;
 import org.lamsfoundation.lams.usermanagement.Role;
 import org.lamsfoundation.lams.usermanagement.User;
-import org.lamsfoundation.lams.usermanagement.Workspace;
 import org.lamsfoundation.lams.usermanagement.WorkspaceFolder;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.usermanagement.exception.UserAccessDeniedException;
@@ -373,25 +372,17 @@ public class MonitoringService implements IMonitoringService, ApplicationContext
 
 	Lesson precedingLesson = (precedingLessonId == null) ? null : lessonDAO.getLesson(precedingLessonId);
 
-	// The duplicated sequence should go in the run sequences folder under
-	// the given organisation
+	// The duplicated sequence should go in the run sequences folder under the given organisation
+	Organisation org = (Organisation) baseDAO.find(Organisation.class, organisationId);
 	WorkspaceFolder runSeqFolder = null;
 	int MAX_DEEP_LEVEL_FOLDER = 50;
-	if (organisationId != null) {
-	    Organisation org = (Organisation) baseDAO.find(Organisation.class, organisationId);
-	    // Don't use unlimited loop to avoid dead lock. For instance, orgA
-	    // is orgB parent, but orgB parent is orgA as well.
-	    for (int idx = 0; idx < MAX_DEEP_LEVEL_FOLDER; idx++) {
-		if ((org == null) || (runSeqFolder != null)) {
-		    break;
-		}
-		Workspace workspace = org.getWorkspace();
-		if (workspace != null) {
-		    runSeqFolder = workspace.getDefaultRunSequencesFolder();
-		}
-		if (runSeqFolder == null) {
-		    org = org.getParentOrganisation();
-		}
+	for (int idx = 0; idx < MAX_DEEP_LEVEL_FOLDER; idx++) {
+	    if ((org == null) || (runSeqFolder != null)) {
+		break;
+	    }
+	    runSeqFolder = org.getRunSequencesFolder();
+	    if (runSeqFolder == null) {
+		org = org.getParentOrganisation();
 	    }
 	}
 

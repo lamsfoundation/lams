@@ -178,7 +178,7 @@ public class IntegrationService implements IIntegrationService {
 		}
 
 		org.setName(requestedCourseName);
-		service.updateOrganisationandWorkspaceNames(org);
+		service.updateOrganisationAndWorkspaceFolderNames(org);
 	    }
 	}
 

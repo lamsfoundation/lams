@@ -53,9 +53,7 @@ import org.lamsfoundation.lams.usermanagement.Role;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.UserOrganisation;
 import org.lamsfoundation.lams.usermanagement.UserOrganisationRole;
-import org.lamsfoundation.lams.usermanagement.Workspace;
 import org.lamsfoundation.lams.usermanagement.WorkspaceFolder;
-import org.lamsfoundation.lams.usermanagement.WorkspaceWorkspaceFolder;
 import org.lamsfoundation.lams.usermanagement.dao.IOrganisationDAO;
 import org.lamsfoundation.lams.usermanagement.dao.IRoleDAO;
 import org.lamsfoundation.lams.usermanagement.dao.IUserOrganisationDAO;
@@ -133,18 +131,13 @@ public class UserManagementService implements IUserManagementService {
 	    // create user
 	    if (user.getUserId() == null) {
 		baseDAO.insertOrUpdate(user); // creating a workspace needs a userId
-		user = createWorkspaceForUser(user);
+		user = createWorkspaceFolderForUser(user);
 	    }
 	    // LDEV-2030 update workspace name if name changed
-	    Workspace workspace = user.getWorkspace();
-	    if ((workspace != null) && !StringUtils.equals(user.getFullName(), workspace.getName())) {
-		workspace.setName(user.getFullName());
-		save(workspace);
-		WorkspaceFolder folder = workspace.getDefaultFolder();
-		if (folder != null) {
-		    folder.setName(workspace.getName());
-		    save(folder);
-		}
+	    WorkspaceFolder workspaceFolder = user.getWorkspaceFolder();
+	    if ((workspaceFolder != null) && !StringUtils.equals(user.getFullName(), workspaceFolder.getName())) {
+		workspaceFolder.setName(user.getFullName());
+		save(workspaceFolder);
 	    }
 	    // LDEV-1356 modification date
 	    user.setModifiedDate(new Date());
@@ -197,9 +190,8 @@ public class UserManagementService implements IUserManagementService {
     public void saveAll(Collection objects) {
 	for (Object o : objects) {
 	    if (o instanceof User) {
-		baseDAO.insertOrUpdate(o); // creating a workspace needs
-		// a userId
-		o = createWorkspaceForUser((User) o);
+		baseDAO.insertOrUpdate(o); // creating a workspace needs a userId
+		o = createWorkspaceFolderForUser((User) o);
 	    }
 	}
 	baseDAO.insertOrUpdateAll(objects);
@@ -520,44 +512,34 @@ public class UserManagementService implements IUserManagementService {
 	return results.isEmpty() ? null : (UserOrganisation) results.get(0);
     }
 
-    private User createWorkspaceForUser(User user) {
-	Workspace workspace = new Workspace(user.getFullName());
-	save(workspace);
-	WorkspaceFolder folder = new WorkspaceFolder(workspace.getName(), user.getUserId(), new Date(), new Date(),
+    private User createWorkspaceFolderForUser(User user) {
+	WorkspaceFolder folder = new WorkspaceFolder(user.getFullName(), user.getUserId(), new Date(), new Date(),
 		WorkspaceFolder.NORMAL);
 	save(folder);
-	workspace.addFolder(folder);
-	workspace.setDefaultFolder(folder);
-	user.setWorkspace(workspace);
+	user.setWorkspaceFolder(folder);
 	return user;
     }
 
-    @SuppressWarnings("unchecked")
-    private Workspace createWorkspaceForOrganisation(String workspaceName, Integer userID, Date createDateTime) {
-
-	// this method is public so it can be accessed from the junit test
-
-	WorkspaceFolder workspaceFolder = new WorkspaceFolder(workspaceName, userID, createDateTime, createDateTime,
-		WorkspaceFolder.NORMAL);
+    private void createWorkspaceFoldersForOrganisation(Organisation organisation, Integer userID, Date createDateTime) {
+	WorkspaceFolder workspaceFolder = new WorkspaceFolder(organisation.getName(), userID, createDateTime,
+		createDateTime, WorkspaceFolder.NORMAL);
+	workspaceFolder.setOrganisationID(organisation.getOrganisationId());
 	save(workspaceFolder);
 
-	String description = getRunSequencesFolderName(workspaceName);
+	String description = getRunSequencesFolderName(organisation.getName());
 	WorkspaceFolder workspaceFolder2 = new WorkspaceFolder(description, userID, createDateTime, createDateTime,
 		WorkspaceFolder.RUN_SEQUENCES);
+	workspaceFolder2.setOrganisationID(organisation.getOrganisationId());
 	workspaceFolder2.setParentWorkspaceFolder(workspaceFolder);
 	save(workspaceFolder2);
 
 	workspaceFolder.addChild(workspaceFolder2);
 	save(workspaceFolder);
 
-	Workspace workspace = new Workspace(workspaceName);
-	workspace.setDefaultFolder(workspaceFolder);
-	workspace.setDefaultRunSequencesFolder(workspaceFolder2);
-	workspace.addFolder(workspaceFolder);
-	workspace.addFolder(workspaceFolder2);
-	save(workspace);
-
-	return workspace;
+	Set<WorkspaceFolder> folders = new HashSet<WorkspaceFolder>();
+	folders.add(workspaceFolder);
+	folders.add(workspaceFolder2);
+	organisation.setWorkspaceFolders(folders);
     }
 
     @Override
@@ -571,12 +553,11 @@ public class UserManagementService implements IUserManagementService {
 	    organisation.setCreateDate(createDateTime);
 	    organisation.setCreatedBy(creator);
 
-	    if (organisation.getOrganisationType().getOrganisationTypeId().equals(OrganisationType.COURSE_TYPE)) {
-		Workspace workspace = createWorkspaceForOrganisation(organisation.getName(), userID, createDateTime);
-		organisation.setWorkspace(workspace);
-	    }
-
 	    save(organisation);
+
+	    if (organisation.getOrganisationType().getOrganisationTypeId().equals(OrganisationType.COURSE_TYPE)) {
+		createWorkspaceFoldersForOrganisation(organisation, userID, createDateTime);
+	    }
 
 	    if (organisation.getOrganisationType().getOrganisationTypeId().equals(OrganisationType.CLASS_TYPE)) {
 		Organisation pOrg = organisation.getParentOrganisation();
@@ -620,46 +601,22 @@ public class UserManagementService implements IUserManagementService {
 	    }
 	} else {
 	    // update workspace/folder names
-	    Workspace workspace = organisation.getWorkspace();
-	    if (workspace != null) {
-		workspace.setName(organisation.getName());
-		WorkspaceFolder defaultFolder = workspace.getDefaultFolder();
-		if (defaultFolder != null) {
-		    defaultFolder.setName(organisation.getName());
-		}
-		WorkspaceFolder runSeqFolder = workspace.getDefaultRunSequencesFolder();
-		if (runSeqFolder != null) {
-		    runSeqFolder.setName(getRunSequencesFolderName(organisation.getName()));
-		}
-	    }
+	    organisation.getNormalFolder().setName(organisation.getName());
+	    organisation.getRunSequencesFolder().setName(getRunSequencesFolderName(organisation.getName()));
 	}
 
 	return organisation;
     }
 
     @Override
-    @SuppressWarnings("unchecked")
-    public void updateOrganisationandWorkspaceNames(Organisation organisation) {
+    public void updateOrganisationAndWorkspaceFolderNames(Organisation organisation) {
 	baseDAO.update(organisation);
-	if (organisation.getOrganisationId() != null) {
-	    Workspace workspace = organisation.getWorkspace();
-	    if (workspace != null) {
-		workspace.setName(organisation.getName());
-		baseDAO.update(workspace);
-
-		WorkspaceFolder defaultFolder = workspace.getDefaultFolder();
-		if (defaultFolder != null) {
-		    defaultFolder.setName(organisation.getName());
-		}
-		baseDAO.update(defaultFolder);
-
-		WorkspaceFolder runSeqFolder = workspace.getDefaultRunSequencesFolder();
-		if (runSeqFolder != null) {
-		    runSeqFolder.setName(getRunSequencesFolderName(organisation.getName()));
-		}
-		baseDAO.update(runSeqFolder);
-	    }
-	}
+	WorkspaceFolder folder = organisation.getNormalFolder();
+	folder.setName(organisation.getName());
+	baseDAO.update(folder);
+	folder = organisation.getRunSequencesFolder();
+	folder.setName(getRunSequencesFolderName(organisation.getName()));
+	baseDAO.update(folder);
     }
 
     private String getRunSequencesFolderName(String workspaceName) {
@@ -706,44 +663,14 @@ public class UserManagementService implements IUserManagementService {
 
     @Override
     public void removeUser(Integer userId) throws Exception {
-
 	User user = (User) findById(User.class, userId);
 	if (user != null) {
-
 	    if (userHasData(user)) {
 		throw new Exception("Cannot remove User ID " + userId + ". User has data.");
 	    }
 
-	    // write out an entry in the audit log.
-
-	    Workspace workspace = user.getWorkspace();
-	    Set wwfs = workspace != null ? workspace.getWorkspaceWorkspaceFolders() : null;
-
-	    Set<WorkspaceFolder> foldersToDelete = new HashSet<WorkspaceFolder>();
-	    if (wwfs != null) {
-		Iterator iter = wwfs.iterator();
-		while (iter.hasNext()) {
-		    WorkspaceWorkspaceFolder wwf = (WorkspaceWorkspaceFolder) iter.next();
-		    foldersToDelete.add(wwf.getWorkspaceFolder());
-
-		    log.debug("deleting wkspc_wkspc_folder: " + wwf.getId());
-		    delete(wwf);
-		}
-	    }
-
-	    for (WorkspaceFolder wf : foldersToDelete) {
-		log.debug("deleting wkspc_folder: " + wf.getName());
-		delete(wf);
-	    }
-
-	    if (workspace != null) {
-		log.debug("deleting workspace: " + workspace.getName());
-		delete(workspace);
-	    }
-
 	    log.debug("deleting user " + user.getLogin());
 	    delete(user);
-
 	} else {
 	    log.error("Requested delete of a user who does not exist. User ID " + userId);
 	}
@@ -869,8 +796,8 @@ public class UserManagementService implements IUserManagementService {
 	    uors.add(uor);
 	    // when a user gets these roles, they need a workspace
 	    if (role.getName().equals(Role.AUTHOR) || role.getName().equals(Role.SYSADMIN)) {
-		if (user.getWorkspace() == null) {
-		    createWorkspaceForUser(user);
+		if (user.getWorkspaceFolder() == null) {
+		    createWorkspaceFolderForUser(user);
 		}
 	    }
 	}

@@ -416,16 +416,6 @@ public interface IWorkspaceManagementService {
     String renameResource(Long resourceID, String resourceType, String newName, Integer userID) throws IOException;
 
     /**
-     * This method returns the workspace for the given User
-     * 
-     * @param userID
-     *            The <code>userID</code> of the
-     * @return String The required information in WDDX format
-     * @throws IOException
-     */
-    String getWorkspace(Integer userID) throws IOException;
-
-    /**
      * Retrieves a tree of organisations in which the user has the specified role.
      * If courseID is not set, then returns all organisations
      * If courseID only is set, then return course organisationDTO and its children as its nodes

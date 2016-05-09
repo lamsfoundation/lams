@@ -1,281 +1,137 @@
 <?xml version="1.0"?>
-<!DOCTYPE hibernate-mapping PUBLIC
-    "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
-    "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd" >
-
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+                                   "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
 <hibernate-mapping>
-	<!-- 
-		Created by the Middlegen Hibernate plugin 2.1
-		
-		http://boss.bekk.no/boss/middlegen/
-		http://www.hibernate.org/
-	-->
-
-	<class name="org.lamsfoundation.lams.usermanagement.Organisation"
-		table="lams_organisation">
-		<meta attribute="class-description" inherit="false">
-			@hibernate.class table="lams_organisation"
-		</meta>
+	<!-- Created by the Middlegen Hibernate plugin 2.1 http://boss.bekk.no/boss/middlegen/ http://www.hibernate.org/ -->
+	<class name="org.lamsfoundation.lams.usermanagement.Organisation" table="lams_organisation">
+		<meta attribute="class-description" inherit="false">@hibernate.class table="lams_organisation"</meta>
 		<meta attribute="implement-equals" inherit="false">true</meta>
-
-		<cache usage="transactional" />
-
-		<id name="organisationId" type="java.lang.Integer"
-			column="organisation_id">
-			<meta attribute="field-description">
-				@hibernate.id generator-class="native"
-				type="java.lang.Integer" column="organisation_id"
-
-
-			</meta>
+		<cache include="all" usage="transactional" />
+		<id column="organisation_id" name="organisationId" type="java.lang.Integer">
+			<meta attribute="field-description">@hibernate.id generator-class="native" type="java.lang.Integer" column="organisation_id"</meta>
 			<meta attribute="use-in-equals">true</meta>
 			<generator class="native" />
 		</id>
-
-		<property name="name" type="java.lang.String" column="name"
-			length="250">
-			<meta attribute="field-description">
-				@hibernate.property column="name" length="250"
-			</meta>
+		<property column="name" generated="never" lazy="false" length="250" name="name" type="java.lang.String">
+			<meta attribute="field-description">@hibernate.property column="name" length="250"</meta>
 		</property>
-		<property name="code" type="java.lang.String" column="code"
-			length="250">
-			<meta attribute="field-description">
-				@hibernate.property column="code" length="250"
-			</meta>
+		<property column="code" generated="never" lazy="false" length="250" name="code" type="java.lang.String">
+			<meta attribute="field-description">@hibernate.property column="code" length="250"</meta>
 		</property>
-
-		<property name="description" type="java.lang.String"
-			column="description" length="250">
-			<meta attribute="field-description">
-				@hibernate.property column="description" length="250"
-			</meta>
+		<property column="description" generated="never" lazy="false" length="250" name="description" type="java.lang.String">
+			<meta attribute="field-description">@hibernate.property column="description" length="250"</meta>
 		</property>
-		<property name="createDate" type="java.sql.Timestamp"
-			column="create_date" not-null="true" length="19">
-			<meta attribute="field-description">
-				@hibernate.property column="create_date" length="19"
-				not-null="true"
-			</meta>
+		<property column="create_date" generated="never" lazy="false" length="19" name="createDate" not-null="true"
+			type="java.sql.Timestamp">
+			<meta attribute="field-description">@hibernate.property column="create_date" length="19" not-null="true"</meta>
 		</property>
-
-		<!--  The following admin fields are NOT NULL DEFAULT 0 in the database -->
-		<property name="courseAdminCanAddNewUsers"
-			type="java.lang.Boolean" column="admin_add_new_users"
-			not-null="true" length="1">
-			<meta attribute="field-description">
-				@hibernate.property column="admin_add_new_users"
-				length="1" not-null="true"
-			</meta>
+		<!-- The following admin fields are NOT NULL DEFAULT 0 in the database -->
+		<property column="admin_add_new_users" generated="never" lazy="false" length="1" name="courseAdminCanAddNewUsers"
+			not-null="true" type="java.lang.Boolean">
+			<meta attribute="field-description">@hibernate.property column="admin_add_new_users" length="1" not-null="true"</meta>
 		</property>
-
-		<property name="courseAdminCanBrowseAllUsers"
-			type="java.lang.Boolean" column="admin_browse_all_users"
-			not-null="true" length="1">
-			<meta attribute="field-description">
-				@hibernate.property column="admin_browse_all_users"
-				length="1" not-null="true"
-			</meta>
+		<property column="admin_browse_all_users" generated="never" lazy="false" length="1" name="courseAdminCanBrowseAllUsers"
+			not-null="true" type="java.lang.Boolean">
+			<meta attribute="field-description">@hibernate.property column="admin_browse_all_users" length="1" not-null="true"</meta>
 		</property>
-
-		<property name="courseAdminCanChangeStatusOfCourse"
-			type="java.lang.Boolean" column="admin_change_status"
-			not-null="true" length="1">
-			<meta attribute="field-description">
-				@hibernate.property column="admin_change_status"
-				length="1" not-null="true"
-			</meta>
+		<property column="admin_change_status" generated="never" lazy="false" length="1" name="courseAdminCanChangeStatusOfCourse"
+			not-null="true" type="java.lang.Boolean">
+			<meta attribute="field-description">@hibernate.property column="admin_change_status" length="1" not-null="true"</meta>
 		</property>
-
-		<property name="courseAdminCanCreateGuestAccounts"
-			type="java.lang.Boolean" column="admin_create_guest" not-null="true"
-			length="1">
-			<meta attribute="field-description">
-				@hibernate.property column="admin_create_guest"
-				length="1" not-null="true"
-			</meta>
+		<property column="admin_create_guest" generated="never" lazy="false" length="1" name="courseAdminCanCreateGuestAccounts"
+			not-null="true" type="java.lang.Boolean">
+			<meta attribute="field-description">@hibernate.property column="admin_create_guest" length="1" not-null="true"</meta>
 		</property>
-		
-		<property name="enableCourseNotifications"
-			type="java.lang.Boolean" column="enable_course_notifications" not-null="true"
-			length="1">
-			<meta attribute="field-description">
-				@hibernate.property column="enable_course_notifications"
-				length="1" not-null="true"
-			</meta>
+		<property column="enable_course_notifications" generated="never" lazy="false" length="1" name="enableCourseNotifications"
+			not-null="true" type="java.lang.Boolean">
+			<meta attribute="field-description">@hibernate.property column="enable_course_notifications" length="1" not-null="true"</meta>
 		</property>
-		
-		<property name="enableGradebookForMonitors"
-			type="java.lang.Boolean" column="enable_monitor_gradebook"
-			not-null="true" length="1">
-			<meta attribute="field-description">
-				@hibernate.property column="enable_monitor_gradebook"
-				length="1" not-null="true"
-			</meta>
+		<property column="enable_monitor_gradebook" generated="never" lazy="false" length="1" name="enableGradebookForMonitors"
+			not-null="true" type="java.lang.Boolean">
+			<meta attribute="field-description">@hibernate.property column="enable_monitor_gradebook" length="1" not-null="true"</meta>
 		</property>
-		
-		<property name="enableGradebookForLearners"
-			type="java.lang.Boolean" column="enable_learner_gradebook"
-			not-null="true" length="1">
-			<meta attribute="field-description">
-				@hibernate.property column="enable_learner_gradebook"
-				length="1" not-null="true"
-			</meta>
+		<property column="enable_learner_gradebook" generated="never" lazy="false" length="1" name="enableGradebookForLearners"
+			not-null="true" type="java.lang.Boolean">
+			<meta attribute="field-description">@hibernate.property column="enable_learner_gradebook" length="1" not-null="true"</meta>
 		</property>
-		
-		<property name="enableSingleActivityLessons"
-			type="java.lang.Boolean" column="enable_single_activity_lessons"
-			not-null="true" length="1">
-			<meta attribute="field-description">
-				@hibernate.property column="enable_single_activity_lessons"
-				length="1" not-null="true"
-			</meta>
+		<property column="enable_single_activity_lessons" generated="never" lazy="false" length="1" name="enableSingleActivityLessons"
+			not-null="true" type="java.lang.Boolean">
+			<meta attribute="field-description">@hibernate.property column="enable_single_activity_lessons" length="1" not-null="true"</meta>
 		</property>
-		
-		<property name="enableLiveEdit"
-			type="java.lang.Boolean" column="enable_live_edit"
-			not-null="true" length="1">
-			<meta attribute="field-description">
-				@hibernate.property column="enable_live_edit"
-				length="1" not-null="true"
-			</meta>
+		<property column="enable_live_edit" generated="never" lazy="false" length="1" name="enableLiveEdit" not-null="true"
+			type="java.lang.Boolean">
+			<meta attribute="field-description">@hibernate.property column="enable_live_edit" length="1" not-null="true"</meta>
 		</property>
-		
-		<property name="enableExportPortfolio"
-			type="java.lang.Boolean" column="enable_export_portfolio"
-			not-null="true" length="1">
-			<meta attribute="field-description">
-				@hibernate.property column="enable_export_portfolio"
-				length="1" not-null="true"
-			</meta>
+		<property column="enable_export_portfolio" generated="never" lazy="false" length="1" name="enableExportPortfolio"
+			not-null="true" type="java.lang.Boolean">
+			<meta attribute="field-description">@hibernate.property column="enable_export_portfolio" length="1" not-null="true"</meta>
 		</property>
-		
-
-		<!-- Associations -->
-
-		<!-- bi-directional many-to-one association to the User who created the organisation -->
-		<many-to-one name="createdBy"
-			class="org.lamsfoundation.lams.usermanagement.User"
-			not-null="true">
-			<meta attribute="field-description">
-				@hibernate.many-to-one not-null="true" @hibernate.column
-				name="created_by"
-			</meta>
+		<!-- Associations bi-directional many-to-one association to the User who created the organisation -->
+		<many-to-one class="org.lamsfoundation.lams.usermanagement.User" name="createdBy" not-null="true">
+			<meta attribute="field-description">@hibernate.many-to-one not-null="true" @hibernate.column name="created_by"</meta>
 			<column name="created_by" />
 		</many-to-one>
-
 		<!-- bi-directional many-to-one association to OrganisationState -->
-		<many-to-one name="organisationState"
-			class="org.lamsfoundation.lams.usermanagement.OrganisationState"
-			not-null="true">
-			<meta attribute="field-description">
-				@hibernate.many-to-one not-null="true" @hibernate.column
-				name="organisation_state_id"
-			</meta>
+		<many-to-one class="org.lamsfoundation.lams.usermanagement.OrganisationState" name="organisationState" not-null="true">
+			<meta attribute="field-description">@hibernate.many-to-one not-null="true" @hibernate.column name="organisation_state_id"</meta>
 			<column name="organisation_state_id" />
 		</many-to-one>
-
-		<!-- bi-directional many-to-one association to Workspace -->
-		<many-to-one name="workspace"
-			class="org.lamsfoundation.lams.usermanagement.Workspace"
-			cascade="all" not-null="false">
-			<meta attribute="field-description">
-				@hibernate.many-to-one cascade="all" not-null="false"
-				@hibernate.column name="workspace_id"
-			</meta>
-			<column name="workspace_id" />
-		</many-to-one>
 		<!-- bi-directional many-to-one association to OrganisationType -->
-		<many-to-one name="organisationType"
-			class="org.lamsfoundation.lams.usermanagement.OrganisationType"
-			not-null="true">
-			<meta attribute="field-description">
-				@hibernate.many-to-one not-null="true" @hibernate.column
-				name="organisation_type_id"
-			</meta>
+		<many-to-one class="org.lamsfoundation.lams.usermanagement.OrganisationType" name="organisationType" not-null="true">
+			<meta attribute="field-description">@hibernate.many-to-one not-null="true" @hibernate.column name="organisation_type_id"</meta>
 			<column name="organisation_type_id" />
 		</many-to-one>
 		<!-- bi-directional one-to-many association to UserOrganisation -->
-		<set name="userOrganisations" lazy="true" inverse="true"
-			cascade="all-delete-orphan">
-			<meta attribute="field-description">
-				@hibernate.set lazy="true" inverse="true"
-				cascade="all-delete-orphan"
-
-				@hibernate.collection-key column="organisation_id"
-
-				@hibernate.collection-one-to-many
-				class="org.lamsfoundation.lams.usermanagement.UserOrganisation"
-			</meta>
-
+		<set cascade="all-delete-orphan" inverse="true" lazy="true" name="userOrganisations" sort="unsorted">
+			<meta attribute="field-description">@hibernate.set lazy="true" inverse="true" cascade="all-delete-orphan" @hibernate.collection-key
+				column="organisation_id" @hibernate.collection-one-to-many class="org.lamsfoundation.lams.usermanagement.UserOrganisation"</meta>
 			<key>
 				<column name="organisation_id" />
 			</key>
-			<one-to-many
-				class="org.lamsfoundation.lams.usermanagement.UserOrganisation" />
+			<one-to-many class="org.lamsfoundation.lams.usermanagement.UserOrganisation" />
 		</set>
-		<!-- bi-directional one-to-many association to WorkspaceFolder -->
-		<set name="childOrganisations" lazy="true" inverse="true"
-			cascade="all-delete-orphan">
-			<meta attribute="field-description">
-				@hibernate.set lazy="true" inverse="true" cascade="none"
-
-				@hibernate.collection-key
-				column="parent_organisation_id"
-
-				@hibernate.collection-one-to-many
-				class="org.lamsfoundation.lams.usermanagement.Organisation"
-			</meta>
-
-			<cache usage="transactional" />
+		<!-- bi-directional one-to-many association to Organisation -->
+		<set cascade="all-delete-orphan" inverse="true" lazy="true" name="childOrganisations" sort="unsorted">
+			<meta attribute="field-description">@hibernate.set lazy="true" inverse="true" cascade="none" @hibernate.collection-key
+				column="parent_organisation_id" @hibernate.collection-one-to-many class="org.lamsfoundation.lams.usermanagement.Organisation"</meta>
+			<cache include="all" usage="transactional" />
 			<key>
 				<column name="parent_organisation_id" />
 			</key>
-			<one-to-many
-				class="org.lamsfoundation.lams.usermanagement.Organisation" />
+			<one-to-many class="org.lamsfoundation.lams.usermanagement.Organisation" />
 		</set>
 		<!-- bi-directional many-to-one association to Organisation -->
-		<many-to-one name="parentOrganisation"
-			class="org.lamsfoundation.lams.usermanagement.Organisation">
-			<meta attribute="field-description">
-				@hibernate.many-to-one @hibernate.column
-				name="parent_organisation_id"
-			</meta>
+		<many-to-one class="org.lamsfoundation.lams.usermanagement.Organisation" name="parentOrganisation">
+			<meta attribute="field-description">@hibernate.many-to-one @hibernate.column name="parent_organisation_id"</meta>
 			<column name="parent_organisation_id" />
 		</many-to-one>
 		<!-- bi-directional one-to-many association to Lesson -->
-		<set name="lessons" lazy="extra" inverse="true" cascade="none">
-			<meta attribute="field-description">
-				@hibernate.set lazy="true" inverse="true" cascade="none"
-
-				@hibernate.collection-key column="organisation_id"
-
-				@hibernate.collection-one-to-many
-				class="org.lamsfoundation.lams.lesson.Lesson"
-			</meta>
+		<set inverse="true" lazy="extra" name="lessons" sort="unsorted">
+			<meta attribute="field-description">@hibernate.set lazy="true" inverse="true" cascade="none" @hibernate.collection-key
+				column="organisation_id" @hibernate.collection-one-to-many class="org.lamsfoundation.lams.lesson.Lesson"</meta>
 			<key>
 				<column name="organisation_id" />
 			</key>
 			<one-to-many class="org.lamsfoundation.lams.lesson.Lesson" />
 		</set>
 
+		<!-- bi-directional one-to-many association to WorkspaceFolder -->
+		<set cascade="all-delete-orphan" inverse="true" lazy="true" name="workspaceFolders" sort="unsorted">
+			<key>
+				<column name="organisation_id" />
+			</key>
+			<one-to-many class="org.lamsfoundation.lams.usermanagement.WorkspaceFolder" />
+		</set>
 		<!-- bi-directional many-to-one association to SupportedLocale -->
-		<many-to-one name="locale"
-			class="org.lamsfoundation.lams.usermanagement.SupportedLocale"
-			not-null="true">
-			<meta attribute="field-description">
-				@hibernate.many-to-one not-null="true" @hibernate.column
-				name="locale_id"
-			</meta>
+		<many-to-one class="org.lamsfoundation.lams.usermanagement.SupportedLocale" name="locale" not-null="true">
+			<meta attribute="field-description">@hibernate.many-to-one not-null="true" @hibernate.column name="locale_id"</meta>
 			<column name="locale_id" />
 		</many-to-one>
+		<property column="archived_date" generated="never" insert="true" lazy="false" length="19" name="archivedDate" type="java.util.Date"
+			update="true" />
+		<property column="ordered_lesson_ids" generated="never" insert="true" lazy="false" length="65535" name="orderedLessonIds"
+			type="java.lang.String" update="true" />
 
-		<property name="archivedDate" type="java.util.Date"
-			update="true" insert="true" column="archived_date" length="19"
-			not-null="false" />
 
-		<property name="orderedLessonIds" type="java.lang.String"
-			update="true" insert="true" column="ordered_lesson_ids"
-			length="65535" />
 	</class>
 </hibernate-mapping>
