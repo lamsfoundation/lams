@@ -5,7 +5,6 @@
 <c:set var="tool">
 	<lams:WebAppURL />
 </c:set>
-	<script type="text/javascript" src="${lams}includes/javascript/prototype.js"></script>
 
 <script type="text/javascript">
      //<![CDATA[

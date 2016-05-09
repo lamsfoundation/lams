@@ -8,18 +8,19 @@
 	 * Launches the popup window for the instruction files
 	 */
 	function showConditionMessage(url) {
-		var area=document.getElementById("conditionInputArea");
-		if(area != null){
-			area.style.width="650px";
-			area.style.height="100%";
-			area.src=url;
-			area.style.display="block";
-		}
-		var elem = document.getElementById("saveCancelButtons");
-		if (elem != null) {
-			elem.style.display="none";
-		}
-		location.hash = "conditionInputArea";
+		$("#conditionInputArea").load(url, function() {
+			var area=document.getElementById("conditionInputArea");
+			if(area != null){
+				area.style.width="100%";
+				area.style.height="100%";
+				area.style.display="block";
+			}
+			var elem = document.getElementById("saveCancelButtons");
+			if (elem != null) {
+				elem.style.display="none";
+			}
+			location.hash = "conditionInputArea";
+		});
 	}
 	function hideConditionMessage(){
 		var area=document.getElementById("conditionInputArea");
@@ -44,46 +45,56 @@
 	function deleteCondition(orderId,sessionMapID){
 		var url = "<c:url value="/authoring/removeCondition.do"/>";
 	    var reqIDVar = new Date();
-		var param = "orderId=" + orderId +"&sessionMapID="+sessionMapID;;
-	    var myAjax = new Ajax.Updater(
-		    	conditionListTargetDiv,
-		    	url,
-		    	{
-		    		method:'get',
-		    		parameters:param,
-		    		evalScripts:true
-		    	}
-	    );
+		var param = "orderId=" + orderId +"&sessionMapID="+sessionMapID;
+		$.ajax({
+            type: 'get', 
+            url: url,
+            data: param,
+            success: function(data) {
+            	$("#"+conditionListTargetDiv).html(data);
+            }
+        });
 	}
 	
 	function upCondition(orderId,sessionMapID){
 		var url = "<c:url value="/authoring/upCondition.do"/>";
 	    var reqIDVar = new Date();
 		var param = "orderId=" + orderId + "&sessionMapID="+sessionMapID;;
-	    var myAjax = new Ajax.Updater(
-		    	conditionListTargetDiv,
-		    	url,
-		    	{
-		    		method:'get',
-		    		parameters:param,
-		    		evalScripts:true
-		    	}
-	    );
+		$.ajax({
+            type: 'get', 
+            url: url,
+            data: param,
+            success: function(data) {
+            	$("#"+conditionListTargetDiv).html(data);
+            }
+        });
 	}
 	function downCondition(orderId,sessionMapID){
 		var url = "<c:url value="/authoring/downCondition.do"/>";
 	    var reqIDVar = new Date();
 		var param = "orderId=" + orderId + "&sessionMapID="+sessionMapID;;
-	    var myAjax = new Ajax.Updater(
-		    	conditionListTargetDiv,
-		    	url,
-		    	{
-		    		method:'get',
-		    		parameters:param,
-		    		evalScripts:true
-		    	}
-	    );
+		$.ajax({
+            type: 'get', 
+            url: url,
+            data: param,
+            success: function(data) {
+            	$("#"+conditionListTargetDiv).html(data);
+            }
+        });
 	}
+	
+	//Packs additional elements and submits the question form
+	function submitCondition(){
+	
+	    $.ajax({ // create an AJAX call...
+           	type: $("#forumConditionForm").attr('method'),
+			url: $("#forumConditionForm").attr('action'),
+			data: $("#forumConditionForm").serialize(), 
+			success: function(data) {
+               $('#forumConditionForm').html(data);
+			}
+	    });
+	}   
 
 </script>
 
@@ -93,18 +104,10 @@
 	<c:set var="sessionMapID" value="${formBean.sessionMapID}" />
 	<%@ include file="/jsps/authoring/conditionList.jsp"%>
 </div>
+ 
+ <div class="form-inline">
+	<a href="javascript:showConditionMessage('<html:rewrite page="/authoring/newConditionInit.do?sessionMapID=${formBean.sessionMapID}"/>');" 
+		class="btn btn-default btn-sm"><i class="fa fa-plus"></i>&nbsp;<fmt:message key="label.authoring.conditions.add.condition" /></a> 
+</div>
 
-<p class="small-space-bottom">
-	<a href="javascript:showConditionMessage('<html:rewrite page="/authoring/newConditionInit.do?sessionMapID=${formBean.sessionMapID}"/>');" class="button-add-item">
-	<fmt:message key="label.authoring.conditions.add.condition" /></a> 
-</p>
-
-
-<p>
-	<iframe
-		onload="javascript:this.style.height=this.contentWindow.document.body.scrollHeight+'px'"
-		id="conditionInputArea" name="conditionInputArea"
-		style="width:0px;height:0px;border:0px;display:none" frameborder="no"
-		scrolling="no">
-	</iframe>
-</p>
+<div id="conditionInputArea" name="conditionInputArea" class="voffset10"></div>

@@ -1,7 +1,16 @@
 <%@ include file="/common/taglibs.jsp"%>
 
-<%-- If you change this file, remember to update the copy made for CNG-12 --%>
+<c:if test="${not empty param.sessionMapID}">
+	<c:set var="sessionMapID" value="${param.sessionMapID}" />
+</c:if>
+<c:set var="sessionMap" value="${sessionScope[sessionMapID]}" />
 
+<c:if test="${empty topicList}">
+	<lams:Alert type="info" id="no-session-summary" close="false">
+		<fmt:message key="message.monitoring.summary.no.session" />
+	</lams:Alert>
+</c:if>
+	
 <c:forEach var="element" items="${topicList}">
 	<c:set var="toolSessionDto" value="${element.key}" />
 	<c:set var="sessionTopicList" value="${element.value}" />
@@ -16,43 +25,19 @@
 		</c:if>
 	</c:forEach>
 
-	<h2>
-		<fmt:message key="message.session.name" />: <c:out value="${toolSessionDto.sessionName}" />
-	</h2>
-	
-	<table cellpadding="0" class="alternative-color">
-		<tr>
-			<th scope="col" width="50%">
-				<fmt:message key="lable.topic.title.subject" />
-			</th>
-			<th scope="col" width="25%">
-				<fmt:message key="lable.topic.title.message.number" />
-			</th>
-			<th scope="col" width="25%">
-				<fmt:message key="lable.topic.title.average.mark" />
-			</th>
-		</tr>
-		<c:forEach items="${sessionTopicList}" var="topic">
-			<tr>
-				<td valign="MIDDLE" width="48%">
-					<c:set var="viewtopic">
-						<html:rewrite page="/monitoring/viewTopicTree.do?topicID=${topic.message.uid}&create=${topic.message.created.time}" />
-					</c:set>
-					<html:link href="javascript:launchPopup('${viewtopic}');">
-						<c:out value="${topic.message.subject}" />
-					</html:link>
-				</td>
-				<td>
-					<c:out value="${topic.message.replyNumber+1}" />
-				</td>
-				<td>
-					<fmt:formatNumber value="${topic.mark}"  maxFractionDigits="2"/>
-				</td>
-			</tr>
-		</c:forEach>
-	</table>
+	<c:if test="${sessionMap.isGroupedActivity}">	
+	    <div class="panel panel-default" >
+        <div class="panel-heading" id="heading${toolSessionDto.sessionID}">
+			<span class="panel-title">
+				<fmt:message key="message.session.name" />: <c:out value="${toolSessionDto.sessionName}" />
+			</span>
+        </div>
 
-	<table cellpadding="0" style="padding-left: 20px;">
+        <div class="panel-body">
+	</c:if>
+
+	<h4><fmt:message key="monitoring.tab.summary"/></h4>
+	<table class="table table-condensed table-no-border">
 		<tr>
 			<td class="field-name" width="30%">
 				<fmt:message key="lable.monitoring.statistic.total.message" />
@@ -72,4 +57,43 @@
 			</td>
 		</tr>
 	</table>
+
+	<table class="table table-condensed table-striped">
+		<tr>
+			<th scope="col" width="50%">
+				<fmt:message key="lable.topic.title.subject" />
+			</th>
+			<th scope="col" width="25%">
+				<fmt:message key="lable.topic.title.message.number" />
+			</th>
+			<th scope="col" width="25%">
+				<fmt:message key="lable.topic.title.average.mark" />
+			</th>
+		</tr>
+		<c:forEach items="${sessionTopicList}" var="topic">
+			<tr>
+				<td valign="MIDDLE" width="48%">
+					<c:set var="viewtopic">
+						<html:rewrite page="/learning/viewTopic.do?sessionMapID=${sessionMapID}&toolSessionID=${toolSessionDto.sessionID}&topicID=${topic.message.uid}&mode=teacher&hideReflection=true&pageLastId=0" />
+					</c:set>
+					<html:link href="javascript:launchPopup('${viewtopic}');">
+						<c:out value="${topic.message.subject}" />
+					</html:link>
+				</td>
+				<td>
+					<c:out value="${topic.message.replyNumber+1}" />
+				</td>
+				<td>
+					<fmt:formatNumber value="${topic.mark}"  maxFractionDigits="2"/>
+				</td>
+			</tr>
+		</c:forEach>
+	</table>
+
+	<c:if test="${sessionMap.isGroupedActivity}">	
+		</div>
+		</div>
+	</c:if>
+
 </c:forEach>
+

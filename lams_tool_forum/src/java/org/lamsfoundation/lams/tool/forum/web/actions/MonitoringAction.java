@@ -573,6 +573,7 @@ public class MonitoringAction extends Action {
 	request.setAttribute("topicList", sessionTopicsMap);
 	request.setAttribute("markAverage", sessionAvaMarkMap);
 	request.setAttribute("totalMessage", sessionTotalMsgMap);
+	request.setAttribute(ForumConstants.ATTR_SESSION_MAP_ID, WebUtil.readStrParam(request, ForumConstants.ATTR_SESSION_MAP_ID));
     }
 
     /**

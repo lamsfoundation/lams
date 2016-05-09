@@ -10,21 +10,22 @@
 		<%@ include file="/common/header.jsp"%>
 	</lams:head>
 	<body class="stripes">
+			
+			<c:set var="title">
+			<tiles:useAttribute name="pageTitleKey" scope="request" />
+			<bean:define name="pageTitleKey" id="pTitleKey" type="String" />
+			<logic:notEmpty name="pTitleKey">
+					<fmt:message key="<%=pTitleKey %>" />
+			</logic:notEmpty>
+			</c:set>
 
-			<div id="content">
-				<tiles:useAttribute name="pageTitleKey" scope="request" />
-				<bean:define name="pageTitleKey" id="pTitleKey" type="String" />
-				<logic:notEmpty name="pTitleKey">
-					<h1>
-						<fmt:message key="<%=pTitleKey %>" />
-					</h1>
-				</logic:notEmpty>
+			<lams:Page type="learner" title="${title}">
 
-				<tiles:insert attribute="body" />
-			</div>
+			<tiles:insert attribute="body" />
 
 			<div id="footer">
 			</div>
 
+			</lams:Page>
 	</body>
 </lams:html>

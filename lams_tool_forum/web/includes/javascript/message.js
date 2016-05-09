@@ -11,16 +11,16 @@
 	    var reqIDVar = new Date();
 	    var param = "reqID="+reqIDVar.getTime();
 	    removeItemAttachmentLoading();
-	    var myAjax = new Ajax.Updater(
-		    	itemAttachmentTargetDiv,
-		    	url,
-		    	{
-		    		method:'get',
-		    		parameters:param,
-		    		onComplete:removeItemAttachmentComplete,
-		    		evalScripts:true
-		    	}
-	    );
+	    
+		$.ajax({
+            type: 'get',
+            url: url,
+            data: param,
+            success: function(data) {
+            	$("#"+itemAttachmentTargetDiv).html(data);
+            	removeItemAttachmentComplete();
+            }
+        });
 	}
 	function removeItemAttachmentLoading(){
 		showBusy(itemAttachmentTargetDiv);
@@ -28,14 +28,15 @@
 	function removeItemAttachmentComplete(){
 		hideBusy(itemAttachmentTargetDiv);
 	}
+
 	function showBusy(targetDiv){
 		if($(targetDiv+"_Busy") != null){
-			Element.show(targetDiv+"_Busy");
+			$(targetDiv+"_Busy").show();
 		}
 	}
 	function hideBusy(targetDiv){
 		if($(targetDiv+"_Busy") != null){
-			Element.hide(targetDiv+"_Busy");
+			$(targetDiv+"_Busy").hide();
 		}				
 	}
 	

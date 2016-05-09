@@ -9,19 +9,21 @@
 	 * Launches the popup window for the instruction files
 	 */
 	function showMessage(url) {
-		var area=document.getElementById("messageArea");
-		if(area != null){
-			area.style.width="100%";
-			area.src=url;
-			area.style.display="block";
-		}
+		$("#messageArea").load(url, function() {
+			var area=document.getElementById("messageArea");
+			if(area != null){
+				area.style.width="100%";
+				area.style.height="100%";
+				area.style.display="block";
+			}
+			
+			var elem = document.getElementById("saveCancelButtons");
+			if (elem != null) {
+				elem.style.display="none";
+			}
 		
-		var elem = document.getElementById("saveCancelButtons");
-		if (elem != null) {
-			elem.style.display="none";
-		}
-		
-		location.hash = "messageArea";
+			location.hash = "messageArea";
+		});
 	}
 	function hideMessage(){
 		var area=document.getElementById("messageArea");
@@ -45,6 +47,7 @@
 	//The panel of taskList list panel
 	var topicListTargetDiv = "messageListArea";
 	function deleteTopic(topicIndex, sessionMapID){
+
 		var	deletionConfirmed = confirm("<fmt:message key='label.authoring.basic.do.you.want.to.delete'></fmt:message>");
 		
 		if (deletionConfirmed) {
@@ -52,16 +55,15 @@
 		    var reqIDVar = new Date();
 			var param = "topicIndex=" + topicIndex +"&reqID="+reqIDVar.getTime()+"&sessionMapID="+sessionMapID;;
 			deleteItemLoading();
-		    var myAjax = new Ajax.Updater(
-		    		topicListTargetDiv,
-			    	url,
-			    	{
-			    		method:'get',
-			    		parameters:param,
-			    		onComplete:deleteItemComplete,
-			    		evalScripts:true
-			    	}
-		    );
+			$.ajax({
+	            type: 'get', 
+	            url: url,
+	            data: param,
+	            success: function(data) {
+	            	$("#messageListArea").html(data);
+	            	deleteItemComplete();
+	            }
+	        });
  		}
 		
 	}
@@ -77,61 +79,63 @@
 	    var reqIDVar = new Date();
 		var param = "topicIndex=" + topicIndex +"&reqID="+reqIDVar.getTime()+"&sessionMapID="+sessionMapID;;
 		deleteItemLoading();
-	    var myAjax = new Ajax.Updater(
-	    		topicListTargetDiv,
-		    	url,
-		    	{
-		    		method:'get',
-		    		parameters:param,
-		    		onComplete:deleteItemComplete,
-		    		evalScripts:true
-		    	}
-	    );
+		$.ajax({
+            type: 'get',
+            url: url,
+            data: param,
+            success: function(data) {
+            	$("#messageListArea").html(data);
+            	deleteItemComplete();
+            }
+        });
 	}
 	function downTopic(topicIndex, sessionMapID){
 		var url = "<c:url value="/authoring/downTopic.do"/>";
 	    var reqIDVar = new Date();
 		var param = "topicIndex=" + topicIndex +"&reqID="+reqIDVar.getTime()+"&sessionMapID="+sessionMapID;;
 		deleteItemLoading();
-	    var myAjax = new Ajax.Updater(
-	    		topicListTargetDiv,
-		    	url,
-		    	{
-		    		method:'get',
-		    		parameters:param,
-		    		onComplete:deleteItemComplete,
-		    		evalScripts:true
-		    	}
-	    );
+		$.ajax({
+            type: 'get',
+            url: url,
+            data: param,
+            success: function(data) {
+            	$("#messageListArea").html(data);
+            	deleteItemComplete();
+            }
+        });
 	}	
 
-	function resizeOnMessageFrameLoad(){
-            	var messageAreaFrame = document.getElementById("messageArea");
-        	messageAreaFrame.style.height=messageAreaFrame.contentWindow.document.body.scrollHeight+'px';
- 	}
+	//Packs additional elements and submits the question form
+	function submitMessage(){
+	
+		if ( typeof CKEDITOR !== 'undefined' ) {
+			for ( instance in CKEDITOR.instances )
+				CKEDITOR.instances[instance].updateElement();
+		}
 
+		var formData = new FormData(document.getElementById("topicFormId"));
+		
+	    $.ajax({ // create an AJAX call...
+			data: formData, 
+	        processData: false, // tell jQuery not to process the data
+	        contentType: false, // tell jQuery not to set contentType
+           	type: $("#topicFormId").attr('method'),
+			url: $("#topicFormId").attr('action'),
+			success: function(data) {
+               $('#messageArea').html(data);
+			}
+	    });
+	}   
 </script>
 
-<table>
-	<tr>
-		<td colspan="2">
-			<div class="field-name">
-				<fmt:message key="label.authoring.basic.title"></fmt:message>
-			</div>
-			<html:text property="forum.title" style="width: 99%;"></html:text>
-		</td>
-	</tr>
-	<tr>
-		<td colspan="2">
-			<div class="field-name">
-				<fmt:message key="label.authoring.basic.instruction"></fmt:message>
-			</div>
-			<lams:CKEditor id="forum.instructions"
-				value="${formBean.forum.instructions}"
-				contentFolderID="${formBean.contentFolderID}"></lams:CKEditor>
-		</td>
-	</tr>
-</table>
+<div class="form-group">
+    <label for="forum.title"><fmt:message key="label.authoring.basic.title"/></label>
+    <html:text property="forum.title" styleClass="form-control"></html:text>
+</div>
+<div class="form-group">
+    <label for="forum.instructions"><fmt:message key="label.authoring.basic.instruction" /></label>
+    <lams:CKEditor id="forum.instructions" value="${formBean.forum.instructions}" contentFolderID="${formBean.contentFolderID}"></lams:CKEditor>
+</div>
 
 <!-- Topics List Row -->
 <div id="messageListArea">
@@ -139,19 +143,10 @@
 	<%@ include file="/jsps/authoring/message/topiclist.jsp"%>
 </div>
 
-<p class="small-space-bottom">
-	<a
-		href="javascript:showMessage('<html:rewrite page="/authoring/newTopic.do?sessionMapID=${formBean.sessionMapID}"/>');" id="addTopic" 
-		class="button-add-item"> <fmt:message
-			key="label.authoring.create.new.topic" /> 
-	</a>
-</p>
+<div class="form-inline">
+<a href="javascript:showMessage('<html:rewrite page="/authoring/newTopic.do?sessionMapID=${formBean.sessionMapID}"/>');" id="addTopic" 
+		class="btn btn-default btn-sm"><i class="fa fa-plus"></i>&nbsp;<fmt:message key="label.authoring.create.new.topic" /> 
+</a>
+</div>
 
-<p>
-	<iframe
-		onload="javascript:resizeOnMessageFrameLoad();"
-		id="messageArea" name="messageArea"
-		style="width:0px;height:0px;border:0px;display:none" frameborder="no"
-		scrolling="no">
-	</iframe>
-</p>
+<div id="messageArea" name="messageArea" class="voffset10"></div>

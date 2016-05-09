@@ -498,7 +498,18 @@ public class LearningAction extends Action {
 	sessionMap.put(ForumConstants.ATTR_ROOT_TOPIC_UID, rootTopicId);
 
 	// get forum user and forum
-	ForumUser forumUser = getCurrentUser(request, (Long) sessionMap.get(AttributeNames.PARAM_TOOL_SESSION_ID));
+	// if coming from topic list, the toolSessionId is in the SessionMap.
+	// if coming from the monitoring statistics window, it is passed in as a parameter.
+	Long toolSessionId = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_SESSION_ID, true);
+	if ( toolSessionId != null ) {
+	    sessionMap.put(AttributeNames.PARAM_TOOL_SESSION_ID, toolSessionId);
+	    String mode = WebUtil.readStrParam(request, AttributeNames.PARAM_MODE, true);
+	    if ( mode != null )
+		sessionMap.put(AttributeNames.PARAM_MODE, mode);
+	} else {
+	    toolSessionId = (Long) sessionMap.get(AttributeNames.PARAM_TOOL_SESSION_ID);
+	}
+	ForumUser forumUser = getCurrentUser(request, toolSessionId);
 	Forum forum = forumUser.getSession().getForum();
 
 	Long lastMsgSeqId = WebUtil.readLongParam(request, ForumConstants.PAGE_LAST_ID, true);

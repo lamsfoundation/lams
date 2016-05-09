@@ -14,7 +14,7 @@
 					</a>
 				</c:forEach>	
 				
-				<a href="#" onclick="removeItemAttachment()" class="space-left"> 
+				<a href="#" onclick="removeItemAttachment()" class="btn btn-default btn-xs"> 
 					<fmt:message key="label.delete" /> 
 				</a>
 				
@@ -25,6 +25,6 @@
 
 	</c:when>
 	<c:otherwise>
-		<input type="file" name="attachmentFile" />
+		<input type="file" name="attachmentFile" class="form-control" />
 	</c:otherwise>
 </c:choose>

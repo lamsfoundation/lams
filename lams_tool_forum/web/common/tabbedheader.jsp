@@ -16,10 +16,18 @@
 
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 
-<lams:css style="main"/>
+<lams:css/>
 
 <!-- ********************  javascript ********************** -->
 <script type="text/javascript" src="${lams}includes/javascript/common.js"></script>
-<script type="text/javascript" src="${lams}includes/javascript/tabcontroller.js"></script>
+<script type="text/javascript" src="${lams}includes/javascript/jquery.js"></script>
+<script type="text/javascript" src="${lams}includes/javascript/jquery-ui.js"></script>
+<script type="text/javascript" src="${lams}includes/javascript/jquery-ui.timepicker.js"></script>
+<script type="text/javascript" src="${lams}includes/javascript/jquery.blockUI.js"></script>  
+<script type="text/javascript" src="${lams}includes/javascript/jquery.tablesorter.js"></script> 
+<script type="text/javascript" src="${lams}includes/javascript/jquery.tablesorter-widgets.js"></script> 
+<script type="text/javascript" src="${lams}includes/javascript/jquery.tablesorter-pager.js"></script> 
+<script type="text/javascript" src="${lams}includes/javascript/bootstrap.min.js"></script>
+<script type="text/javascript" src="${lams}includes/javascript/bootstrap.tabcontroller.js"></script>
 <script type="text/javascript" src="${tool}includes/javascript/message.js"></script>
 
