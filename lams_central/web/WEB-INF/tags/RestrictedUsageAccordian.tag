@@ -25,7 +25,7 @@
 	/**
 	 * AdvancedAccordian.tag
 	 *	Author: Fiona Malikoff
-	 *	Description: Creates the show/hide entry for the Advanced Settings in Montoring.
+	 *	Description: Creates the show/hide entry for the Restricted Usage Settings in Monitoring.
 	 * Wiki: 
 	 */
 %>
@@ -35,17 +35,18 @@
 <%@ taglib uri="tags-fmt" prefix="fmt"%>
 <%@ taglib uri="tags-lams" prefix="lams"%>
 
-<div class="panel-group" id="accordionAdvanced" role="tablist" aria-multiselectable="true"> 
+<div class="panel-group" id="accordionRestrictUsageDiv" role="tablist" aria-multiselectable="true"> 
     <div class="panel panel-default" >
-        <div class="panel-heading collapsable-icon-left" id="headingAdvanced">
+        <div class="panel-heading collapsable-icon-left" id="headingRestrictedUsageDiv">
         	<span class="panel-title">
-	    	<a class="collapsed" role="button" data-toggle="collapse" href="#collapseAdvanced" aria-expanded="false" aria-controls="collapseAdvanced" >
+	    	<a class="collapsed" role="button" data-toggle="collapse" href="#restrictUsageDiv" aria-expanded="false" aria-controls="restrictUsageDiv" >
           	${title}
         	</a>
       		</span>
         </div>
 
-        <div id="collapseAdvanced" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingAdvanced">
+
+		<div id="restrictUsageDiv" class="panel-body panel-collapse collapse" role="tabpanel" aria-labelledby="headingRestrictedUsageDiv">
 		<jsp:doBody />
 		</div>
 	</div>

@@ -1,9 +1,11 @@
 
 // Toggles whether to display advanced options in monitor summary for tools
+// TODO remove method once bootstrapping is completed
 function toggleAdvancedOptionsVisibility(div, img, imageUrl)
 {
-	var treeClosedIcon = imageUrl + "/images/tree_closed.gif";
+	var treeClosedIcon = imageUrl + "/images/tree_closed.gif"; // 
 	var treeOpenIcon = imageUrl + "/images/tree_open.gif";
+
 	if (div.style.display == "block")
 	{
 		div.style.display = "none";
@@ -25,8 +27,14 @@ if ((typeof jQuery != 'undefined') && (typeof submissionDeadlineSettings != 'und
 			var date = new Date(eval(submissionDeadlineSettings.submissionDeadline));
 			$("#dateInfo").html( formatDate(date) );
 			
-			//open up date restriction area
-			toggleAdvancedOptionsVisibility(document.getElementById('restrictUsageDiv'), document.getElementById('restrictUsageTreeIcon'),submissionDeadlineSettings.lams);
+			if ( $("#restrictUsageDiv").hasClass("collapse") )  {
+				// new version - using the according
+				//open up date restriction area
+				$("#restrictUsageDiv").addClass("in");
+			} else {
+				// old code - remove once bootstrapping is completed.
+				toggleAdvancedOptionsVisibility(document.getElementById('restrictUsageDiv'), document.getElementById('restrictUsageTreeIcon'),submissionDeadlineSettings.lams);
+			}
 		}
 	});	
 	
@@ -54,7 +62,6 @@ if ((typeof jQuery != 'undefined') && (typeof submissionDeadlineSettings != 'und
 		
 		var url = submissionDeadlineSettings.setSubmissionDeadlineUrl + parameterDelimiter + "toolContentID=" + submissionDeadlineSettings.toolContentID + "&submissionDeadline=" +
 					+ date.getTime() + "&reqID=" + reqIDVar.getTime();
-
 		$.ajax({
 			url : url,
 			success : function() {
