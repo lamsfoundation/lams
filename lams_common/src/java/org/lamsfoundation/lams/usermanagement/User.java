@@ -117,13 +117,13 @@ public class User implements Serializable, Comparable {
     private Date createDate;
 
     /** persistent field */
-    private Workspace workspace;
+    private WorkspaceFolder workspaceFolder;
 
     /** persistent field */
     private AuthenticationMethod authenticationMethod;
 
     /** persistent field */
-    private Set userOrganisations;
+    private Set<UserOrganisation> userOrganisations;
 
     /** persistent field */
     private Theme theme;
@@ -346,12 +346,12 @@ public class User implements Serializable, Comparable {
 	this.createDate = createDate;
     }
 
-    public Workspace getWorkspace() {
-	return workspace;
+    public WorkspaceFolder getWorkspaceFolder() {
+	return workspaceFolder;
     }
 
-    public void setWorkspace(Workspace workspace) {
-	this.workspace = workspace;
+    public void setWorkspaceFolder(WorkspaceFolder workspace) {
+	this.workspaceFolder = workspace;
     }
 
     public AuthenticationMethod getAuthenticationMethod() {
@@ -506,23 +506,16 @@ public class User implements Serializable, Comparable {
      * Membership access means that the user has read and write access but cannot modify anybody else's content/stuff
      */
     public boolean hasMemberAccess(WorkspaceFolder workspaceFolder) {
-	boolean foundMemberFolder = false;
-	Integer workspaceFolderID = workspaceFolder != null ? workspaceFolder.getWorkspaceFolderId() : null;
-	if (workspaceFolderID != null) {
-	    Iterator iterator = userOrganisations.iterator();
-	    while (iterator.hasNext() && !foundMemberFolder) {
-		UserOrganisation userOrganisation = (UserOrganisation) iterator.next();
+	for (UserOrganisation userOrganisation : userOrganisations) {
 		// not all orgs have a folder
-		Workspace workspace = userOrganisation.getOrganisation().getWorkspace();
-		if (workspace != null) {
-		    Set<WorkspaceFolder> folders = workspace.getFolders();
-		    // sometimes mapping is missing, make sure that the folder is taken into account
-		    folders.add(workspace.getDefaultFolder());
-		    foundMemberFolder = checkFolders(folders, workspaceFolderID);
+	    Set<WorkspaceFolder> folders = userOrganisation.getOrganisation().getWorkspaceFolders();
+	    if (folders != null) {
+		if (checkFolders(folders, workspaceFolder.getWorkspaceFolderId())) {
+		    return true;
 		}
 	    }
 	}
-	return foundMemberFolder;
+	return false;
     }
 
     private boolean checkFolders(Set folders, Integer desiredWorkspaceFolderId) {

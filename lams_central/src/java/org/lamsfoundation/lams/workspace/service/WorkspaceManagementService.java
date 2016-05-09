@@ -50,7 +50,6 @@ import org.lamsfoundation.lams.usermanagement.Role;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.UserOrganisation;
 import org.lamsfoundation.lams.usermanagement.UserOrganisationRole;
-import org.lamsfoundation.lams.usermanagement.Workspace;
 import org.lamsfoundation.lams.usermanagement.WorkspaceFolder;
 import org.lamsfoundation.lams.usermanagement.exception.UserAccessDeniedException;
 import org.lamsfoundation.lams.usermanagement.exception.UserException;
@@ -260,8 +259,7 @@ public class WorkspaceManagementService implements IWorkspaceManagementService {
     public Vector<FolderContentDTO> getFolderContentsExcludeHome(Integer userID, WorkspaceFolder folder, Integer mode)
 	    throws UserAccessDeniedException, RepositoryCheckedException {
 	User user = (User) baseDAO.find(User.class, userID);
-	return getFolderContentsInternal(user, folder, mode, "getFolderContentsExcludeHome",
-		(user.getWorkspace() != null) ? user.getWorkspace().getDefaultFolder() : null);
+	return getFolderContentsInternal(user, folder, mode, "getFolderContentsExcludeHome", user.getWorkspaceFolder());
     }
 
     @Override
@@ -699,20 +697,16 @@ public class WorkspaceManagementService implements IWorkspaceManagementService {
 
 	    User user = (User) baseDAO.find(User.class, userID);
 	    if (user != null) {
-		Workspace workspace = user.getWorkspace();
-		WorkspaceFolder workspaceFolder = new WorkspaceFolder(name, workspace.getWorkspaceId(), parentFolder,
-			userID, new Date(), new Date(), newWorkspaceFolderType);
+		WorkspaceFolder workspaceFolder = new WorkspaceFolder(name, parentFolder, userID, new Date(),
+			new Date(), newWorkspaceFolderType);
 		baseDAO.insert(workspaceFolder);
 		return workspaceFolder;
-	    } else {
+	    }
 		throw new UserException(messageService.getMessage("no.such.user", new Object[] { userID }));
 	    }
-
-	} else {
 	    throw new WorkspaceFolderException(
 		    messageService.getMessage("no.such.workspace", new Object[] { parentFolderID }));
 	}
-    }
 
     private boolean ifNameExists(WorkspaceFolder targetFolder, String folderName) {
 	List folders = baseDAO.findByProperty(WorkspaceFolder.class, "parentWorkspaceFolder.workspaceFolderId",
@@ -842,14 +836,8 @@ public class WorkspaceManagementService implements IWorkspaceManagementService {
 				|| OrganisationState.REMOVED.equals(orgStateId))) {
 
 			    // Only courses have folders - classes don't!
-			    Workspace workspace = org.getWorkspace();
+			    WorkspaceFolder orgFolder = org.getNormalFolder();
 
-			    if (workspace != null) {
-				// TODO get all the folders for the workspace but only return those that are at the
-				// "top" of the hierarchy
-				// for this user. Not needed at present but will be needed when we have multiple folders
-				// in a user's workspace (ie shared folders)
-				WorkspaceFolder orgFolder = workspace.getDefaultFolder();
 				if (orgFolder != null) {
 				    // Check if the user has write access, which is available
 				    // only if the user has an AUTHOR, TEACHER or STAFF role. If
@@ -864,7 +852,6 @@ public class WorkspaceManagementService implements IWorkspaceManagementService {
 				}
 			    }
 			}
-		    }
 
 		}
 	    } else {
@@ -892,25 +879,14 @@ public class WorkspaceManagementService implements IWorkspaceManagementService {
 	User user = (User) baseDAO.find(User.class, userID);
 
 	if (user != null) {
-	    // TODO get all the folders for the workspace but only return those that are at the "top" of the hierarchy
-	    // for this user. Not needed at present but will be needed when we have multiple folders in a user's
-	    // workspace (ie shared folders)
-	    Workspace workspace = user.getWorkspace();
+	    WorkspaceFolder workspaceFolder = user.getWorkspaceFolder();
 
-	    if (workspace != null) {
-		WorkspaceFolder privateFolder = workspace.getDefaultFolder();
-		if (privateFolder != null) {
-		    Integer permissions = getPermissions(privateFolder, user);
-		    return new FolderContentDTO(privateFolder, permissions, user);
-		} else {
-		    log.warn("getUserWorkspaceFolder: User " + userID
-			    + " does not have a root folder. Returning no folders.");
+	    if (workspaceFolder != null) {
+		Integer permissions = getPermissions(workspaceFolder, user);
+		return new FolderContentDTO(workspaceFolder, permissions, user);
 		}
+	    log.warn("getUserWorkspaceFolder: User " + userID + " does not have a root folder. Returning no folders.");
 	    } else {
-		log.warn(
-			"getUserWorkspaceFolder: User " + userID + " does not have a workspace. Returning no folders.");
-	    }
-	} else {
 	    log.warn("getUserWorkspaceFolder: User " + userID + " does not exist. Returning no folders.");
 	}
 
