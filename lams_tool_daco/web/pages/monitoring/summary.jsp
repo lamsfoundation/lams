@@ -84,12 +84,8 @@
 			            
 			    	}				
 				}})
-			// bind to pager events
-            .bind('pagerInitialized pagerComplete', function(event, options){
-                initializeJRating();
-            });
-		});
-  	})
+			});
+	  	})
 </script>
 
 <div class="panel">

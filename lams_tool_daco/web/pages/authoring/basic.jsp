@@ -102,4 +102,4 @@
 </html:link></p></div>
 <a name="questionInputAreaAnchor"></a>
 <p><div onload="javascript:window.location.hash = '#questionInputArea';" id="questionInputArea"
-	name="questionInputArea"> </div></p>
+	name="questionInputArea" style="voffset10"> </div></p>
