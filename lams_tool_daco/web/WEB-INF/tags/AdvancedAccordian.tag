@@ -38,11 +38,11 @@
 <div class="panel-group" id="accordionAdvanced" role="tablist" aria-multiselectable="true"> 
     <div class="panel panel-default" >
         <div class="panel-heading collapsable-icon-left" id="headingAdvanced">
-        	<h4 class="panel-title">
+        	<span class="panel-title">
 	    	<a class="collapsed" role="button" data-toggle="collapse" href="#collapseAdvanced" aria-expanded="false" aria-controls="collapseAdvanced" >
           	${title}
         	</a>
-      		</h4>
+      		</span>
         </div>
 
         <div id="collapseAdvanced" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingAdvanced">

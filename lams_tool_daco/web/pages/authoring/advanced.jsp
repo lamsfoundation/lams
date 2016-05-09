@@ -9,7 +9,7 @@
 
 <!-- Advance Tab Content -->
 <div class="form-group form-inline voffset10">
-<label><strong></strong><fmt:message key="label.authoring.advanced.record" /></strong></label><BR/>
+<label><strong><fmt:message key="label.authoring.advanced.record" /></strong></label><BR/>
 <!-- Minimum number of records learner must provide -->
 <label for="daco.minRecords"><fmt:message key="label.common.min" /></label> 
 <html:select property="daco.minRecords" styleClass="roffset5 form-control">
