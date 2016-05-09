@@ -26,7 +26,6 @@ package org.lamsfoundation.lams.usermanagement;
 import java.io.Serializable;
 import java.util.Date;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.Set;
 
 import org.apache.commons.lang.builder.EqualsBuilder;
@@ -65,9 +64,6 @@ public class WorkspaceFolder implements Serializable {
     private WorkspaceFolder parentWorkspaceFolder;
 
     /** persistent field */
-    private Set workspaceWorkspaceFolders;
-
-    /** persistent field */
     private Set childWorkspaceFolders;
 
     private Set learningDesigns;
@@ -77,6 +73,8 @@ public class WorkspaceFolder implements Serializable {
      * user who created/owns the workspace folder
      */
     private Integer userID;
+
+    private Integer organisationID;
 
     /** non-nullable persistent field */
     private Date creationDate;
@@ -107,8 +105,8 @@ public class WorkspaceFolder implements Serializable {
 	this.workspaceFolderType = workspaceFolderType;
     }
 
-    public WorkspaceFolder(String name, Integer workspaceID, WorkspaceFolder parentWorkspaceFolder, Integer userID,
-	    Date creationDate, Date lastModifiedDate, Integer workspaceFolderType) {
+    public WorkspaceFolder(String name, WorkspaceFolder parentWorkspaceFolder, Integer userID, Date creationDate,
+	    Date lastModifiedDate, Integer workspaceFolderType) {
 	super();
 	this.name = name;
 	this.parentWorkspaceFolder = parentWorkspaceFolder;
@@ -134,11 +132,9 @@ public class WorkspaceFolder implements Serializable {
     }
 
     /** full constructor */
-    public WorkspaceFolder(String name, WorkspaceFolder parentWorkspaceFolder, Set workspaces,
-	    Set childWorkspaceFolders) {
+    public WorkspaceFolder(String name, WorkspaceFolder parentWorkspaceFolder, Set childWorkspaceFolders) {
 	this.name = name;
 	this.parentWorkspaceFolder = parentWorkspaceFolder;
-	this.workspaceWorkspaceFolders = workspaces;
 	this.childWorkspaceFolders = childWorkspaceFolders;
     }
 
@@ -168,35 +164,6 @@ public class WorkspaceFolder implements Serializable {
 
     public void setParentWorkspaceFolder(WorkspaceFolder parentWorkspaceFolder) {
 	this.parentWorkspaceFolder = parentWorkspaceFolder;
-    }
-
-    /**
-     * WorkspaceWorkspaceFolder is a join object that links a workspace folder to its workspaces.
-     */
-    protected Set getWorkspaceWorkspaceFolders() {
-	return workspaceWorkspaceFolders;
-    }
-
-    protected void setWorkspaceWorkspaceFolders(Set workspaceWorkspaceFolders) {
-	this.workspaceWorkspaceFolders = workspaceWorkspaceFolders;
-    }
-
-    /**
-     * Get all the workspaces for this folder, based on the lams_workspace_workspace join table. This set is not a
-     * persistent
-     * set so to add a folder you cannot use "addWorkspace(workspace)". You must go to the Workspace and do
-     * workspace.addFolder(folder).
-     */
-    public Set<Workspace> getWorkspaces() {
-	HashSet<Workspace> set = new HashSet<Workspace>();
-	if (getWorkspaceWorkspaceFolders() != null) {
-	    Iterator iter = getWorkspaceWorkspaceFolders().iterator();
-	    while (iter.hasNext()) {
-		WorkspaceWorkspaceFolder wwf = (WorkspaceWorkspaceFolder) iter.next();
-		set.add(wwf.getWorkspace());
-	    }
-	}
-	return set;
     }
 
     public Set getChildWorkspaceFolders() {
@@ -240,6 +207,14 @@ public class WorkspaceFolder implements Serializable {
      */
     public void setUserID(Integer userID) {
 	this.userID = userID;
+    }
+
+    public Integer getOrganisationID() {
+	return organisationID;
+    }
+
+    public void setOrganisationID(Integer organisationID) {
+	this.organisationID = organisationID;
     }
 
     /**
