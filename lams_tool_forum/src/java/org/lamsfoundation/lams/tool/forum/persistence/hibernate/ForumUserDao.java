@@ -159,13 +159,13 @@ public class ForumUserDao extends LAMSBaseDAO implements IForumUserDAO {
 	    }
 	}
 
+	// If filtering by name add a name based where clause (LDEV-3779: must come before the Notebook JOIN statement)
+	buildNameSearch(queryText, searchString);
+
 	// If using notebook, add the notebook join
 	if (notebookEntryStrings != null) {
 	    queryText.append(notebookEntryStrings[1]);
 	}
-
-	// If filtering by name add a name based where clause
-	buildNameSearch(queryText, searchString);
 
 	if (sortOnMessage) {
 	    queryText.append(" GROUP BY user.user_id");
