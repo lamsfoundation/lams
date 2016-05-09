@@ -3,7 +3,7 @@
 	<lams:WebAppURL />
 </c:set>
 <div id="topiclist">
-	<table class="alternative-color" cellspacing="0">
+	<table class="table table-striped table-condensed">
 		<tr>
 			<th colspan="4"><fmt:message key="lable.topic.title.subject"/></th>
 		</tr>
@@ -21,62 +21,31 @@
 						<img src="<html:rewrite page="/images/paperclip.gif" />">
 					</c:if>
 				</td>
-				
-				<td width="40px" align="center">
+			
+				<td class="arrows" style="width:5%">
+					<!-- Don't display up icon if first line -->
 					<c:if test="${not status.first}">
-						<img src="<html:rewrite page='/images/uparrow.gif'/>"
-							border="0" title="<fmt:message key="label.authoring.up"/>"
-							onclick="upTopic(${status.index},'${sessionMapID}')">
-						<c:if test="${status.last}">
-							<img
-								src="<html:rewrite page='/images/downarrow_disabled.gif'/>"
-								border="0" title="<fmt:message key="label.authoring.down"/>">
-						</c:if>
-					</c:if>
-
+		 				<lams:Arrow state="up" title="<fmt:message key='label.authoring.up'/>" onclick="upTopic(${status.index},'${sessionMapID}')"/>
+		 			</c:if>
+					<!-- Don't display down icon if last line -->
 					<c:if test="${not status.last}">
-						<c:if test="${status.first}">
-							<img
-								src="<html:rewrite page='/images/uparrow_disabled.gif'/>"
-								border="0" title="<fmt:message key="label.authoring.up"/>">
-						</c:if>
-
-						<img src="<html:rewrite page='/images/downarrow.gif'/>"
-							border="0" title="<fmt:message key="label.authoring.down"/>"
-							onclick="downTopic(${status.index},'${sessionMapID}')">
-					</c:if>
+						<lams:Arrow state="down" title="<fmt:message key='label.authoring.down'/>" onclick="downTopic(${status.index},'${sessionMapID}')"/>
+		 			</c:if>
 				</td>
 				
-				<td width="20px">
-					<img src="${tool}images/edit.gif"
-						title="<fmt:message key="label.edit" />" id="edit${status.index}" 
-						onclick="editTopic(${status.index},'${sessionMapID}')" />
-                </td>
-                
-				<td width="20px">
-					<img src="${tool}images/delete.gif"
-						title="<fmt:message key="label.delete" />" id="delete${status.index}" 
-						onclick="deleteTopic(${status.index},'${sessionMapID}')" />
-				</td>				
+				<td align="center" style="width:5%"><i class="fa fa-pencil"	title="<fmt:message key="label.edit" />" id="edit${status.index}"
+					onclick="editTopic(${status.index},'${sessionMapID}')"></i></td>
+					
+				<td  align="center" style="width:5%"><i class="fa fa-times"	title="<fmt:message key="label.delete" />" id="delete${status.index}" 
+					onclick="deleteTopic(${status.index},'${sessionMapID}')"></i></td>
+				
 			</tr>
 		</c:forEach>
 	</table>
 </div>
-<%-- This script will works when a new resoruce item submit in order to refresh "Resource List" panel. --%>
-<script lang="javascript">
-	var win = null;
-	try {
-		if (window.parent && window.parent.hideMessage) {
-			win = window.parent;
-		} else if (window.top && window.top.hideMessage) {
-			win = window.top;
-		}
-	} catch(err) {
-		// mute cross-domain iframe access errors
-	}
-	if (win) {
-		win.hideMessage();
-		var obj = win.document.getElementById('messageListArea');
-		obj.innerHTML= document.getElementById("topiclist").innerHTML;
-	}
+<%-- This script will works when a new topic is submitted in order to refresh "Topic List" panel. --%>
+<script type="text/javascript">
+	hideMessage();
+	var obj = document.getElementById('messageListArea');
+	obj.innerHTML= document.getElementById("topiclist").innerHTML;
 </script>

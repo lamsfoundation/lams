@@ -8,9 +8,9 @@
 	<html:hidden property="hideReflection" value="${sessionMap.hideReflection}"/>
 
 	<p>
-		<fmt:message key="message.assign.mark" />
-		<c:out value="${user.firstName}" />
-		<c:out value="${user.lastName}" />
+		<fmt:message key="message.assign.mark" />&nbsp;
+		<c:out value="${user.firstName}" />&nbsp;
+		<c:out value="${user.lastName}" />&nbsp;
 		(<lams:Date value="${topic.message.updated}"/>):
 	</p>		
 	
@@ -26,49 +26,36 @@
 		</c:if>
 	</p>
 	
-	<table>
-		<tr>
-			<td colspan="2">
-				<%@ include file="/common/messages.jsp"%>
-			</td>
-		</tr>
-		<tr>
-			<td class="field-name" width="100">
-				<fmt:message key="lable.topic.title.mark" />*
-			</td>
-			<td>
-				<html:text property="mark"/>
-			</td>
-		</tr>
-		<tr>
-			<td colspan="2">
-				<c:set var="formBean" value="<%= request.getAttribute(org.apache.struts.taglib.html.Constants.BEAN_KEY) %>" />		
-				<span  class="field-name"><fmt:message key="lable.topic.title.comment" /><BR></span>
-				<lams:CKEditor id="comment"
-					value="${formBean.comment}"
-					toolbarSet="DefaultMonitor">
-				</lams:CKEditor>
-			</td>
-		</tr>
-		<tr>
-			<td colspan="2">
-				<div style="float:right; padding: 15px 5px 0;">
-					<input type="submit" value="<fmt:message key="lable.update.mark"/>" class="button" />
+	<%@ include file="/common/messages.jsp"%>
+
+	<div class="form-group">
+		<label for="mark"><fmt:message key="lable.topic.title.mark" />*</label>
+		<html:text property="mark" styleClass="form-control form-control-inline"/>
+	</div>
+	<div class="form-group">
+		<c:set var="formBean" value="<%= request.getAttribute(org.apache.struts.taglib.html.Constants.BEAN_KEY) %>" />		
+		<label for="comment"><fmt:message key="lable.topic.title.comment" /></label>
+		<lams:CKEditor id="comment"	value="${formBean.comment}" toolbarSet="DefaultMonitor">
+		</lams:CKEditor>
+	</div>
+
+
+	<div class="pull-right">
+		<input type="submit" value="<fmt:message key="lable.update.mark"/>" class="btn btn-default" />
 					
-					<c:if test="${sessionMap.updateMode == 'listMarks'}">
-						<c:set var="cancelUrl">
-							<c:url value="/monitoring/viewUserMark.do"/>?sessionMapID=${formBean.sessionMapID}&userUid=${user.uid}&toolSessionID=${sessionMap.toolSessionID}
-						</c:set>
-					</c:if>
+		<c:if test="${sessionMap.updateMode == 'listMarks'}">
+			<c:set var="cancelUrl">
+				<c:url value="/monitoring/viewUserMark.do"/>?sessionMapID=${formBean.sessionMapID}&userUid=${user.uid}&toolSessionID=${sessionMap.toolSessionID}
+			</c:set>
+		</c:if>
 					
-					<c:if test="${sessionMap.updateMode == 'viewForum'}">
-						<c:set var="cancelUrl">
-							<c:url value="/learning/viewTopic.do"/>?sessionMapID=${formBean.sessionMapID}&topicID=${sessionMap.rootUid}&hideReflection=${sessionMap.hideReflection}
-						</c:set>
-					</c:if>
-					<input type="button" onclick="location.href='${cancelUrl}';" class="button" value="<fmt:message key="button.cancel"/>">
-				</div>
-			</td>
-		</tr>
-	</table>
+		<c:if test="${sessionMap.updateMode == 'viewForum'}">
+			<c:set var="cancelUrl">
+					<c:url value="/learning/viewTopic.do"/>?sessionMapID=${formBean.sessionMapID}&topicID=${sessionMap.rootUid}&hideReflection=${sessionMap.hideReflection}
+			</c:set>
+		</c:if>
+	
+		<input type="button" onclick="location.href='${cancelUrl}';" class="btn btn-default" value="<fmt:message key="button.cancel"/>">
+	</div>
+
 </html:form>

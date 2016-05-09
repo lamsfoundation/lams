@@ -29,7 +29,7 @@
 	}
 	
 	function doStatistic(){
-		var url = "<c:url value="/monitoring/statistic.do"/>";
+		var url = "<c:url value="/monitoring/statistic.do?sessionMapID=${sessionMapID}"/>";
 		
 		$("#statisticArea_Busy").show();
 		$("#statisticArea").load(

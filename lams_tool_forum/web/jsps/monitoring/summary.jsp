@@ -7,42 +7,11 @@
 <c:set var="sessionMap" value="${sessionScope[sessionMapID]}" />
 <c:set var="forum" value="${sessionMap.forum}" />
 
-<%-- If you change this file, remember to update the copy made for CNG-12 --%>
-
 <link type="text/css" href="${lams}/css/jquery-ui-smoothness-theme.css" rel="stylesheet">
 <link type="text/css" href="${lams}/css/jquery-ui.timepicker.css" rel="stylesheet">
-<link type="text/css" href="${lams}css/jquery.tablesorter.theme-blue.css" rel="stylesheet">
+<link rel="stylesheet" href="${lams}css/jquery.tablesorter.theme.bootstrap.css">
 <link type="text/css" href="${lams}css/jquery.tablesorter.pager.css" rel="stylesheet">
-
-<style media="screen,projection" type="text/css">
-	#message-area {
-		margin-bottom: 20px;
-		display: none;
-	}
 	
-	.collapsed-headers {
-		padding-bottom: 20px;
-	}
-	
-	#buttons {
-		margin-bottom: 80px;
-		margin-top: 20px;
-	}
-	
-	.tablesorter-holder {
-		padding-right: 20px;
-	}
-	
-	.tablesorter, .pager {
-		margin-left: 10px;
-	}
-	
-	.box {
-		display: block;
-	}
-	
-</style>
-
 <script type="text/javascript">
 	//pass settings to monitorToolSummaryAdvanced.js
 	var submissionDeadlineSettings = {
@@ -55,15 +24,7 @@
 		messageRestrictionRemoved: '<fmt:message key="monitor.summary.date.restriction.removed" />'
 	};
 </script>
-<script type="text/javascript" src="${lams}includes/javascript/jquery.js"></script>
-<script type="text/javascript" src="${lams}includes/javascript/jquery-ui.js"></script>
-<script type="text/javascript" src="${lams}includes/javascript/jquery-ui.timepicker.js"></script>
-<script type="text/javascript" src="${lams}includes/javascript/jquery.blockUI.js"></script>  
 <script type="text/javascript" src="${lams}/includes/javascript/monitorToolSummaryAdvanced.js" ></script>
-<script type="text/javascript" src="${lams}includes/javascript/jquery.tablesorter.js"></script>
-<script type="text/javascript" src="${lams}includes/javascript/jquery.tablesorter-widgets.js"></script>
-<script type="text/javascript" src="${lams}includes/javascript/jquery.tablesorter-pager.js"></script>
-
 <script type="text/javascript">
 
 	function releaseMarks(sessionId){
@@ -84,12 +45,13 @@
 	}
 	
   	$(document).ready(function(){
-	    
+
 		$(".tablesorter").tablesorter({
-			theme: 'blue',
+			theme: 'bootstrap',
+			headerTemplate : '{content} {icon}',
 		    sortInitialOrder: 'desc',
             sortList: [[0]],
-            widgets: [ "resizable", "filter" ],
+            widgets: [ "uitheme", "resizable", "filter" ],
             headers: { 1: { filter: false}, 2: { filter: false}, 3: { filter: false}, 4: { filter: false} }, 
             widgetOptions: {
             	resizable: true,
@@ -103,6 +65,11 @@
 		$(".tablesorter").each(function() {
 			$(this).tablesorterPager({
 				savePages: false,
+	            container: $(this).find(".ts-pager"),
+	            output: '{startRow} to {endRow} ({totalRows})',
+	            cssPageDisplay: '.pagedisplay',
+	            cssPageSize: '.pagesize',
+	            cssDisabled: 'disabled',
 				ajaxUrl : "<c:url value='/monitoring/getUsers.do'/>?sessionMapID=${sessionMapID}&page={page}&size={size}&{sortList:column}&{filterList:fcol}&sessionId=" + $(this).attr('data-session-id'),
 				ajaxProcessing: function (data, table) {
 			    	if (data && data.hasOwnProperty('rows')) {
@@ -158,141 +125,108 @@
 						return json;
 			            
 			    	}
-				},					
-			    container: $(this).next(".pager"),
-			    output: '{startRow} to {endRow} ({totalRows})',
-			    // css class names of pager arrows
-			    cssNext: '.tablesorter-next', // next page arrow
-				cssPrev: '.tablesorter-prev', // previous page arrow
-				cssFirst: '.tablesorter-first', // go to first page arrow
-				cssLast: '.tablesorter-last', // go to last page arrow
-				cssGoto: '.gotoPage', // select dropdown to allow choosing a page
-				cssPageDisplay: '.pagedisplay', // location of where the "output" is displayed
-				cssPageSize: '.pagesize', // page size selector - select dropdown that sets the "size" option
-				// class added to arrows when at the extremes (i.e. prev/first arrows are "disabled" when on the first page)
-				cssDisabled: 'disabled' // Note there is no period "." in front of this class name
-			})
-		});
-  	})
+				}})
+			});
+	  	})
+
 </script>
 
-<h1>
-    <c:out value="${title}" escapeXml="true"/>
-</h1>
-<div class="instructions space-top">
-    <c:out value="${instruction}" escapeXml="false"/>
-</div>
-<br/>
-
-<c:if test="${empty sessionMap.sessionDtos}">
-	<p>
-		<fmt:message key="message.monitoring.summary.no.session" />
-	</p>
-</c:if>
-
-<c:forEach var="sessionDto" items="${sessionMap.sessionDtos}">
+<div class="panel">
+	<h4>
+	    <c:out value="${title}" escapeXml="true"/>
+	</h4>
+	<div class="instructions voffset5">
+	    <c:out value="${instruction}" escapeXml="false"/>
+	</div>
+	
+	<c:if test="${empty sessionMap.sessionDtos}">
+		<lams:Alert type="info" id="no-session-summary" close="false">
+			<fmt:message key="message.monitoring.summary.no.session" />
+		</lams:Alert>
+	</c:if>
 	
 	<!--For release marks feature-->
 	<img src="${tool}/images/indicator.gif" style="display:none" id="message-area-busy" />
 	<div id="message-area"></div>
 
+</div>
+
+<c:if test="${sessionMap.isGroupedActivity}">
+<div class="panel-group" id="accordionSessions" role="tablist" aria-multiselectable="true"> 
+</c:if>
+
+<c:forEach var="sessionDto" items="${sessionMap.sessionDtos}" varStatus="status">
+
 	<c:if test="${sessionMap.isGroupedActivity}">	
-		<h2>
-			<fmt:message key="message.session.name" />:	<c:out value="${sessionDto.sessionName}" />
-		</h2>
+	    <div class="panel panel-default" >
+        <div class="panel-heading" id="heading${sessionDto.sessionID}">
+        	<span class="panel-title collapsable-icon-left">
+        	<a class="${status.first ? '' : 'collapsed'}" role="button" data-toggle="collapse" href="#collapse${sessionDto.sessionID}" 
+					aria-expanded="${status.first ? 'false' : 'true'}" aria-controls="collapse${sessionDto.sessionID}" >
+			<fmt:message key="message.session.name" />:	<c:out value="${sessionDto.sessionName}" /></a>
+			</span>
+        </div>
+        
+        <div id="collapse${sessionDto.sessionID}" class="panel-collapse collapse ${status.first ? 'in' : ''}" role="tabpanel" aria-labelledby="heading${sessionSummary.sessionId}">
 	</c:if>
 	
-	<div class="tablesorter-holder">
-	<table class="tablesorter" data-session-id="${sessionDto.sessionID}">
-		<thead>
-			<tr>
-				<th>
-					<fmt:message key="monitoring.user.fullname"/>
-				</th>
-				<th width="5%" align="center"> 
-					<fmt:message key="label.number.of.posts"/>
-				</th>
-				<c:choose>
-				  <c:when test="${forum.reflectOnActivity}">
-				     <th width="15%" align="center">
-				  </c:when>
-				  <c:otherwise>
-				     <th width="25%" align="center">
-				  </c:otherwise>
-				</c:choose>
-					<fmt:message key="label.latest.posting.date"/>
-				</th>
-				<th width="10%" align="center">
-					<fmt:message key="monitoring.marked.question"/>
-				</th>
-				<c:if test="${forum.reflectOnActivity}">
-					<th width="40%" align="center" class="sorter-false">
-						<fmt:message key="monitoring.user.reflection"/>
-					</th>
-				</c:if>
-			</tr>
-		</thead>
-			
-		<tbody>
-		</tbody>
-	</table>
+		<c:choose>
+		<c:when test="${forum.reflectOnActivity}">
+			<c:set var="numColumns">5</c:set>
+			<c:set var="postingWidth">15%</c:set>
+		</c:when>
+		<c:otherwise>
+			<c:set var="numColumns">4</c:set>
+			<c:set var="postingWidth">25%</c:set>
+		</c:otherwise>
+		</c:choose>
 		
-	<!-- pager -->
-	<div class="pager">
-		<form>
-			<img class="tablesorter-first"/>
-			<img class="tablesorter-prev"/>
-			<span class="pagedisplay"></span> <!-- this can be any element, including an input -->
-			<img class="tablesorter-next"/>
-			<img class="tablesorter-last"/>
-			<select class="pagesize">
-				<option selected="selected" value="10">10</option>
-				<option value="20">20</option>
-				<option value="30">30</option>
-				<option value="40">40</option>
-				<option value="50">50</option>
-				<option value="100">100</option>
-			</select>
-		</form>
-	</div>
-	</div>
+		<lams:TSTable numColumns="${numColumns}" dataId="data-session-id='${sessionDto.sessionID}'" test="fred">
+				<th><fmt:message key="monitoring.user.fullname"/></th>
+				<th width="5%" align="center"><fmt:message key="label.number.of.posts"/></th>
+				<th width="${postingWidth}" align="center"><fmt:message key="label.latest.posting.date"/></th>
+				<th width="10%" align="center"><fmt:message key="monitoring.marked.question"/></th>
+				<c:if test="${forum.reflectOnActivity}">
+					<th width="40%" align="center" class="sorter-false"><fmt:message key="monitoring.user.reflection"/></th>
+				</c:if>
+		</lams:TSTable>
 
-	<div id="buttons">
-		<div style="float:left;padding:5px;margin-left:5px">
-			<html:form action="/learning/viewForum.do" target="_blank">
-				<html:hidden property="mode" value="teacher"/>
-				<html:hidden property="toolSessionID" value="${sessionDto.sessionID}" />
-				<html:hidden property="hideReflection" value="true"/>
-				<html:submit property="viewForum" styleClass="button">
-					<fmt:message key="label.monitoring.summary.view.forum" />
-				</html:submit>
-			</html:form>
-		</div>
-		<div style="float:left;padding:5px;margin-left:5px">
-			<html:button property="releaseMarks" onclick="releaseMarks(${sessionDto.sessionID})" styleClass="button">
+		<P style="display: inline"> 
+			<c:set var="viewforum">
+				<html:rewrite page="/learning/viewForum.do?toolSessionID=${sessionDto.sessionID}&topicID=${topic.message.uid}&mode=teacher&hideReflection=true" />
+			</c:set>
+			<html:link href="javascript:launchPopup('${viewforum}');" styleClass="btn btn-default loffset5 voffset10">
+				<fmt:message key="label.monitoring.summary.view.forum"/>
+			</html:link>
+			<html:button property="releaseMarks" onclick="releaseMarks(${sessionDto.sessionID})" styleClass="btn btn-default loffset5 voffset10" >
 				<fmt:message key="button.release.mark" />
 			</html:button>
-		</div>
-		<div style="float:left;padding:5px;margin-left:5px">
-			<html:form action="/monitoring/downloadMarks">
+			<html:form action="/monitoring/downloadMarks"  style="display:inline">
 				<html:hidden property="toolSessionID" value="${sessionDto.sessionID}" />
-				<html:submit property="downloadMarks" styleClass="button">
+				<html:submit property="downloadMarks" styleClass="btn btn-default loffset5 voffset10" >
 					<fmt:message key="message.download.marks" />
 				</html:submit>
 			</html:form>
-		</div>
-		<div style="float:left;padding:9px">
 			<c:url value="/monitoring.do" var="refreshMonitoring">
 				<c:param name="contentFolderID" value="${contentFolderID}"/>
 				<c:param name="toolContentID" value="${toolContentID}" />
 			</c:url>
-			<html:link href="${refreshMonitoring}" styleClass="button">
+			<html:link href="${refreshMonitoring}" styleClass="btn btn-default loffset5 voffset10" >
 					<fmt:message key="label.refresh" />
 			</html:link>
-		</div>
-	</div>
+		</P>
+	
+	<c:if test="${sessionMap.isGroupedActivity}">
+		</div> <!-- end collapse area  -->
+		</div> <!-- end collapse panel  -->
+	</c:if>
+	${ !sessionMap.isGroupedActivity || ! status.last ? '<div class="voffset5">&nbsp;</div>' :  ''}
+
 </c:forEach>
 
+<c:if test="${sessionMap.isGroupedActivity}">
+	</div> <!--  end panel group -->
+</c:if>
 <%@include file="parts/advanceOptions.jsp"%>
 
 <%@include file="parts/daterestriction.jsp"%>

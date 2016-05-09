@@ -1,33 +1,26 @@
 <%@ include file="/common/taglibs.jsp"%>
 
-<%-- If you change this file, remember to update the copy made for CNG-12 --%>
-
 <!--   Advance Tab Content    -->
 
-<p class="small-space-top">
-	<html:checkbox property="forum.lockWhenFinished" styleClass="noBorder" styleId="lockWhenFinished"/>
-	<label for="lockWhenFinished">
-		<fmt:message key="label.authoring.advance.lock.on.finished" />
-	</label>
-</p>
+<div class="checkbox">
+<label for="lockWhenFinished"><html:checkbox property="forum.lockWhenFinished" styleId="lockWhenFinished" />
+<fmt:message key="label.authoring.advance.lock.on.finished" /></label>
+</div>
 
-<p>
-	<html:checkbox property="forum.allowEdit" styleClass="noBorder" styleId="allowEdit"/>
-	<label for="allowEdit">
-		<fmt:message key="label.authoring.advance.allow.edit" />
-	</label>
-</p>
+<div class="checkbox">
+<label for="allowEdit"><html:checkbox property="forum.allowEdit" styleId="allowEdit" />
+<fmt:message key="label.authoring.advance.allow.edit" /></label>
+</div>
 
-<p>
-	<html:checkbox property="forum.allowRateMessages" styleClass="noBorder" styleId="allowRateMessages" onclick="checkRating()" />
-	<label for="allowRateMessages">
-		<fmt:message key="label.authoring.advance.allow.rate.postings" />
-	</label>
-</p>
+<div class="checkbox">
+<label for="allowRateMessages"><html:checkbox property="forum.allowRateMessages" styleId="allowRateMessages"  onclick="checkRating()"/>
+<fmt:message key="label.authoring.advance.allow.rate.postings" /></label>
+</div>
 
-<p style="margin-left:60px;">
-	<fmt:message key="label.authoring.advance.minimum.reply" />
-	<html:select property="forum.minimumRate" styleId="minimumRate"  onmouseup="validateRatings(true);">
+<div class="form-inline loffset20">
+	<div class="form-group">
+	<label for="minimumRate"><fmt:message key="label.authoring.advance.minimum.reply" /></label>
+	<html:select property="forum.minimumRate" styleId="minimumRate"  onmouseup="validateRatings(true);" styleClass="form-control input-sm">
 		<html:option value="0">
 			<fmt:message key="label.authoring.advance.no.minimum" />
 		</html:option>
@@ -42,9 +35,10 @@
 		<html:option value="9">9</html:option>
 		<html:option value="10">10</html:option>
 	</html:select>
-
-	<fmt:message key="label.authoring.advance.maximum.reply" />
-	<html:select property="forum.maximumRate" styleId="maximumRate"   onmouseup="validateRatings(false);">
+	</div>
+	<div class="form-group">
+	<label for="maximumRate"><fmt:message key="label.authoring.advance.maximum.reply" /></label>
+	<html:select property="forum.maximumRate" styleId="maximumRate"   onmouseup="validateRatings(false);"  styleClass="form-control input-sm">
 		<html:option value="0">
 			<fmt:message key="label.authoring.advance.no.maximum" />
 		</html:option>
@@ -59,73 +53,60 @@
 		<html:option value="9">9</html:option>
 		<html:option value="10">10</html:option>
 	</html:select>
-</p>
+	</div>
+</div>
 
-<p>
-	<html:checkbox property="forum.allowUpload" styleId="allow-upload" styleClass="noBorder"/>
-	<label for="allow-upload">
-		<fmt:message key="label.authoring.advance.allow.upload" />
-	</label>
-</p>
+<div class="checkbox">
+<label for="allow-upload"><html:checkbox property="forum.allowUpload" styleId="allow-upload"/>
+<fmt:message key="label.authoring.advance.allow.upload" /></label>
+</div>
 
-<p>
-	<html:checkbox property="forum.allowRichEditor" styleId="rich-editor" styleClass="noBorder"/>
-	<label for="rich-editor">
-		<fmt:message key="label.authoring.advance.use.richeditor" />
-	</label>
-</p>
+<div class="checkbox">
+<label for="rich-editor"><html:checkbox property="forum.allowRichEditor" styleId="rich-editor"/>
+<fmt:message key="label.authoring.advance.use.richeditor" /></label>
+</div>
 
-<p>
-	<html:checkbox property="forum.limitedMinCharacters" styleId="limited-min-characters" styleClass="noBorder"/>
-	<label for="limited-min-characters">
-		<fmt:message key="label.authoring.advance.min.limited.input" />
-	</label>
+<div class="checkbox">
+<label for="limited-min-characters"><html:checkbox property="forum.limitedMinCharacters" styleId="limited-min-characters"/>
+<fmt:message key="label.authoring.advance.min.limited.input" />
+</label>
+<html:text property="forum.minCharacters" styleId="min-characters"  styleClass="form-control form-control-inline input-sm"/>
+</div>
 
-	<html:text property="forum.minCharacters" styleId="min-characters" />
-</p>
+<div class="checkbox">
+<label for="limited-max-characters"><html:checkbox property="forum.limitedMaxCharacters" styleId="limited-max-characters"/>
+<fmt:message key="label.authoring.advance.limited.input" /></label>
+<html:text property="forum.maxCharacters" styleId="max-characters"  styleClass="form-control form-control-inline input-sm"/>
+</div>
 
-<p>
-	<html:checkbox property="forum.limitedMaxCharacters" styleId="limited-max-characters" styleClass="noBorder"/>
-	<label for="limited-max-characters">
-		<fmt:message key="label.authoring.advance.limited.input" />
-	</label>
+<div class="form-group">
+<label><fmt:message key="label.authoring.advanced.send.emails.to" /></label>
+<div class="form-inline">
+	<div class="checkbox loffset20">
+	<label for="notifyLearnersOnForumPosting"><html:checkbox property="forum.notifyLearnersOnForumPosting" styleId="notifyLearnersOnForumPosting"/>&nbsp;
+	<fmt:message key="label.authoring.advanced.learners" /></label>
+	</div>
+	<div class="checkbox loffset10">
+	<label for="notifyTeachersOnForumPosting"><html:checkbox property="forum.notifyTeachersOnForumPosting" styleId="notifyTeachersOnForumPosting"/>&nbsp;
+	<fmt:message key="label.authoring.advanced.teachers" /></label>
+	</div>
+</div>
+</div>
 
-	<html:text property="forum.maxCharacters" styleId="max-characters" />
-</p>
+<div class="checkbox">
+<label for="notifyLearnersOnMarkRelease"><html:checkbox property="forum.notifyLearnersOnMarkRelease" styleId="notifyLearnersOnMarkRelease"/>
+<fmt:message key="label.authoring.advanced.notify.mark.release" /></label>
+</div>
 
-<p style="margin-bottom: 15px;"><fmt:message key="label.authoring.advanced.send.emails.to" /> </p>
-<p style="margin-left: 60px; ">
-	<html:checkbox property="forum.notifyLearnersOnForumPosting" styleId="notifyLearnersOnForumPosting" styleClass="noBorder"/>
-	<label for="notifyLearnersOnForumPosting">
-		<fmt:message key="label.authoring.advanced.learners" />
-	</label>
-</p>
-<p style="margin-left: 60px;">
-	<html:checkbox property="forum.notifyTeachersOnForumPosting" styleId="notifyTeachersOnForumPosting" styleClass="noBorder"/>
-	<label for="notifyTeachersOnForumPosting">
-		<fmt:message key="label.authoring.advanced.teachers" />
-	</label>
-</p>
+<div class="checkbox">
+<label for="reflectOn"><html:checkbox property="forum.reflectOnActivity"	styleId="reflectOn"/>
+<fmt:message key="advanced.reflectOnActivity" /></label>
+</div>
+<div class="form-group">
+<html:textarea property="forum.reflectInstructions" styleId="reflectInstructions"  styleClass="form-control" rows="3"
+	onkeyup="javascript:turnOnReflect()"/>
+</div>
 
-<p>
-	<html:checkbox property="forum.notifyLearnersOnMarkRelease" styleId="notifyLearnersOnMarkRelease" styleClass="noBorder"/>
-	<label for="notifyLearnersOnMarkRelease">
-		<fmt:message key="label.authoring.advanced.notify.mark.release" />
-	</label>
-</p>
-
-<p>
-	<html:checkbox property="forum.reflectOnActivity" styleClass="noBorder"	styleId="reflectOn"/>
-	<label for="reflectOn">
-		<fmt:message key="advanced.reflectOnActivity" />
-	</label>
-</p>
-
-<p>
-	<span class="space-left"> 
-		<html:textarea property="forum.reflectInstructions" styleId="reflectInstructions" cols="30" rows="3" /> 
-	</span>
-</p>
 <script type="text/javascript">
 	//automatically turn on refect option if there are text input in refect instruction area
 	var ra = document.getElementById("reflectInstructions");
@@ -143,29 +124,28 @@
 	ra.onkeyup = turnOnRefect;
 </script>
 
-<h2>
+<h4>
 	<fmt:message key="message.posting.limiting" />
-</h2>
+</h4>
 
-<p>
-	<html:radio property="forum.allowNewTopic" value="true"
-		onclick="allowNewTopic()" styleId="allowNewTopic1" styleClass="noBorder"/>
-	<label for="allowNewTopic1">
-		<fmt:message key="label.authoring.advance.allow.new.topics" />
-	</label>
-</p>
+<div class="radio">
+<label for="allowNewTopic1">
+<html:radio property="forum.allowNewTopic" value="true"	onclick="allowNewTopic()" styleId="allowNewTopic1"/>
+<fmt:message key="label.authoring.advance.allow.new.topics" />
+</label>
+</div>
 
-<p>
-	<html:radio property="forum.allowNewTopic" value="false"
-		onclick="allowNewTopic()" styleId="allowNewTopic2" styleClass="noBorder"/>
-	<label for="allowNewTopic2">
-		<fmt:message key="label.authoring.advance.number.reply" />
-	</label>
-</p>
+<div class="radio">
+<label for="allowNewTopic2">
+<html:radio property="forum.allowNewTopic" value="false" onclick="allowNewTopic()" styleId="allowNewTopic2"/>
+<fmt:message key="label.authoring.advance.number.reply" />
+</label>
+</div>
 
-<p>
-	<fmt:message key="label.authoring.advance.minimum.reply" />
-	<html:select property="forum.minimumReply" styleId="minimumReply">
+<div class="form-inline loffset20">
+	<div class="form-group">
+	<label for="minimumReply"><fmt:message key="label.authoring.advance.minimum.reply" /></label>
+	<html:select property="forum.minimumReply" styleId="minimumReply" styleClass="form-control input-sm">
 		<html:option value="0">
 			<fmt:message key="label.authoring.advance.no.minimum" />
 		</html:option>
@@ -180,9 +160,11 @@
 		<html:option value="9">9</html:option>
 		<html:option value="10">10</html:option>
 	</html:select>
-
+	</div>
+	<div class="form-group">
+	<label for="maximumReply"><fmt:message key="label.authoring.advance.maximum.reply" /></label>
 	<fmt:message key="label.authoring.advance.maximum.reply" />
-	<html:select property="forum.maximumReply" styleId="maximumReply">
+	<html:select property="forum.maximumReply" styleId="maximumReply" styleClass="form-control input-sm">
 		<html:option value="0">
 			<fmt:message key="label.authoring.advance.no.maximum" />
 		</html:option>
@@ -197,8 +179,8 @@
 		<html:option value="9">9</html:option>
 		<html:option value="10">10</html:option>
 	</html:select>
-
-</p>
+	</div>
+</div>
 
 <script type="text/javascript">
 
@@ -303,3 +285,4 @@
 		}
 	}
 </script>
+

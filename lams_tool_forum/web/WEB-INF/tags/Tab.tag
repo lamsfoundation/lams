@@ -24,8 +24,8 @@
 
 	/**
 	 * Tab.tag
-	 *	Author: Mitchell Seaton
-	 *	Description: Creates a tab element.
+	 *	Author: Fiona Malikoff
+	 *	Description: Creates a tab element within the Hybrid Tab Header.
 	 * Wiki: 
 	 */
 %>
@@ -54,6 +54,9 @@
 <%--
 	Usually methodCall is selectTab, but the calling code can override methodCall if desired.
 	this is handy if the page needs different logic on initialisation and user switching tabs
+	
+	-- 			onclick="${methodCall}(${id});return false;">
+	
 --%>
 
 <c:if test="${methodCall == null}">
@@ -73,13 +76,14 @@
 	</c:set>
 </c:if>
 
-<div class="nav-box">
-	<div class="tab-left" id="tab-left-${id}"></div>
-	<div class="tab-middle" id="tab-middle-${id}">
-		<a class="tab-middle-link" id="tab-middle-link-${id}" href="#"
-			onclick="${methodCall}(${id});return false;">
-			${tabTitle}
-		</a>
-	</div>
-	<div class="tab-right" id="tab-right-${id}"></div>
-</div>
+<c:set var="class" value=""/>
+<c:if test="${id == 1}">
+	<c:set var="class">class="active"</c:set>
+</c:if>
+	
+<c:set var="disabled" value=""/>
+<c:if test="${inactive}">
+	<c:set var="class">class="disabled"</c:set>
+</c:if>
+
+<li role="presentation" ${class}><a href="#t${id}" aria-controls="t${id}" role="tab" onclick="${methodCall}(${id});return false;">${tabTitle}</a></li>
