@@ -507,8 +507,11 @@ function showAuthoringDialog(learningDesignID){
 		'title' : 'Authoring',
 		'beforeClose' : function(){
 			// if LD was modified, ask the user if he really wants to exit
-			var canClose = $('iframe', this)[0].contentWindow.GeneralLib.canClose();
-			if (canClose || confirm(LABELS.NAVIGATE_AWAY_CONFIRM)) {
+			var innerLib = $('iframe', this)[0].contentWindow.GeneralLib,
+				// no innerLib means that an exception occured in Authoring
+				// and the interface is not usable anyway
+				canClose = !innerLib || innerLib.canClose() || confirm(LABELS.NAVIGATE_AWAY_CONFIRM);
+			if (canClose) {
 				$('iframe', this).attr('src', null);
 			} else {
 				return false;
