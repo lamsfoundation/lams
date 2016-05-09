@@ -1385,8 +1385,8 @@ public class PedagogicalPlannerAction extends LamsDispatchAction {
     @SuppressWarnings("unchecked")
     private WorkspaceFolder getCommonWorkspaceFolderId(Integer userID) {
 	String name = PedagogicalPlannerAction.PLANNER_FOLDER_NAME;
-	WorkspaceFolder parentFolder = getUserManagementService().getRootOrganisation().getWorkspace()
-		.getDefaultFolder();
+
+	WorkspaceFolder parentFolder = getUserManagementService().getRootOrganisation().getNormalFolder();
 	Integer workspaceFolderType = WorkspaceFolder.PUBLIC_SEQUENCES;
 
 	Map<String, Object> properties = new HashMap<String, Object>();
@@ -1400,7 +1400,7 @@ public class PedagogicalPlannerAction extends LamsDispatchAction {
 	if ((workspaceFolderList != null) && (workspaceFolderList.size() > 0)) {
 	    workspaceFolder = workspaceFolderList.get(0);
 	} else {
-	    workspaceFolder = new WorkspaceFolder(name, null, parentFolder, userID, new Date(), new Date(),
+	    workspaceFolder = new WorkspaceFolder(name, parentFolder, userID, new Date(), new Date(),
 		    WorkspaceFolder.PUBLIC_SEQUENCES);
 	    PedagogicalPlannerAction.userManagementService.save(workspaceFolder);
 	}
@@ -1811,7 +1811,7 @@ public class PedagogicalPlannerAction extends LamsDispatchAction {
 		// if temporary copy (only for browsing) was edited and now saved,
 		// we move it to user's folder as a hard copy
 		User user = getUser();
-		WorkspaceFolder userFolder = user.getWorkspace().getDefaultFolder();
+		WorkspaceFolder userFolder = user.getWorkspaceFolder();
 		learningDesign.setWorkspaceFolder(userFolder);
 	    }
 	    getAuthoringService().saveLearningDesign(learningDesign);

@@ -103,7 +103,6 @@ import org.lamsfoundation.lams.tool.exception.ToolException;
 import org.lamsfoundation.lams.tool.service.ILamsCoreToolService;
 import org.lamsfoundation.lams.usermanagement.Organisation;
 import org.lamsfoundation.lams.usermanagement.User;
-import org.lamsfoundation.lams.usermanagement.Workspace;
 import org.lamsfoundation.lams.usermanagement.WorkspaceFolder;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.usermanagement.exception.UserAccessDeniedException;
@@ -1930,7 +1929,7 @@ public class AuthoringService implements IAuthoringService, BeanFactoryAware {
 	WorkspaceFolder folder = null;
 
 	if (organisationID == null) {
-	    folder = user.getWorkspace().getDefaultFolder();
+	    folder = user.getWorkspaceFolder();
 	    learningDesign.setCopyTypeID(LearningDesign.COPY_TYPE_NONE);
 	} else {
 	    learningDesign.setCopyTypeID(LearningDesign.COPY_TYPE_LESSON);
@@ -1941,10 +1940,7 @@ public class AuthoringService implements IAuthoringService, BeanFactoryAware {
 		if ((organisation == null) || (folder != null)) {
 		    break;
 		}
-		Workspace workspace = organisation.getWorkspace();
-		if (workspace != null) {
-		    folder = workspace.getDefaultRunSequencesFolder();
-		}
+		folder = organisation.getRunSequencesFolder();
 		if (folder == null) {
 		    organisation = organisation.getParentOrganisation();
 		}

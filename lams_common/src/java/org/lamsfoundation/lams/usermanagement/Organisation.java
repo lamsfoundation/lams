@@ -58,7 +58,7 @@ public class Organisation implements Serializable, Comparable {
     private User createdBy;
 
     /** persistent field */
-    private Workspace workspace;
+    private Set<WorkspaceFolder> workspaceFolders;
 
     /** persistent field */
     private OrganisationType organisationType;
@@ -181,12 +181,34 @@ public class Organisation implements Serializable, Comparable {
 	this.createdBy = createdBy;
     }
 
-    public Workspace getWorkspace() {
-	return this.workspace;
+    public Set<WorkspaceFolder> getWorkspaceFolders() {
+	return this.workspaceFolders;
     }
 
-    public void setWorkspace(Workspace workspace) {
-	this.workspace = workspace;
+    public WorkspaceFolder getNormalFolder() {
+	if (workspaceFolders != null) {
+	    for (WorkspaceFolder workspaceFolder : workspaceFolders) {
+		if (WorkspaceFolder.NORMAL.equals(workspaceFolder.getWorkspaceFolderType())) {
+		    return workspaceFolder;
+		}
+	    }
+	}
+	return null;
+    }
+
+    public WorkspaceFolder getRunSequencesFolder() {
+	if (workspaceFolders != null) {
+	    for (WorkspaceFolder workspaceFolder : workspaceFolders) {
+		if (WorkspaceFolder.RUN_SEQUENCES.equals(workspaceFolder.getWorkspaceFolderType())) {
+		    return workspaceFolder;
+		}
+	    }
+	}
+	return null;
+    }
+
+    public void setWorkspaceFolders(Set<WorkspaceFolder> workspaceFolders) {
+	this.workspaceFolders = workspaceFolders;
     }
 
     public OrganisationType getOrganisationType() {

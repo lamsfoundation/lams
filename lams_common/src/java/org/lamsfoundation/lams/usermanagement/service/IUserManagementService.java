@@ -350,7 +350,7 @@ public interface IUserManagementService {
      *
      * @param organisation
      */
-    void updateOrganisationandWorkspaceNames(Organisation organisation);
+    void updateOrganisationAndWorkspaceFolderNames(Organisation organisation);
 
     List<UserManageBean> getUserManageBeans(Integer orgId);
 
