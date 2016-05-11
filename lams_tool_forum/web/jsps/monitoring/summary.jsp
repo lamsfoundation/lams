@@ -181,7 +181,7 @@
 		</c:otherwise>
 		</c:choose>
 		
-		<lams:TSTable numColumns="${numColumns}" dataId="data-session-id='${sessionDto.sessionID}'" test="fred">
+		<lams:TSTable numColumns="${numColumns}" dataId="data-session-id='${sessionDto.sessionID}'">
 				<th><fmt:message key="monitoring.user.fullname"/></th>
 				<th width="5%" align="center"><fmt:message key="label.number.of.posts"/></th>
 				<th width="${postingWidth}" align="center"><fmt:message key="label.latest.posting.date"/></th>
