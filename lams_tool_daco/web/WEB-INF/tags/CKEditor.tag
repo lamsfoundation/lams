@@ -24,8 +24,8 @@
 	<c:set var="toolbarSet" value="Default" />
 </c:if>
 
-<c:if test="${fn:containsIgnoreCase(method,'replace')}">
-	<c:set var="toolbarSet">${toolbarSet}Replace</c:set>
+<c:if test="${fn:containsIgnoreCase(method,'Inline')}">
+	<c:set var="toolbarSet">${toolbarSet}Inline</c:set>
 </c:if>
 
 <c:if test="${empty displayExpanded}">
