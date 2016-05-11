@@ -21,7 +21,7 @@
  * ****************************************************************
  */
 
-/* $$Id$$ */
+
 package org.lamsfoundation.lams.tool.scratchie.web.form;
 
 import org.apache.log4j.Logger;

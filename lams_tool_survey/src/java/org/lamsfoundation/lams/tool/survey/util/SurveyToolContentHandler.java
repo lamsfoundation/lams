@@ -20,7 +20,7 @@
  * http://www.gnu.org/licenses/gpl.txt
  * ****************************************************************
  */
-/* $$Id$$ */
+
 package org.lamsfoundation.lams.tool.survey.util;
 
 import org.lamsfoundation.lams.contentrepository.client.ToolContentHandler;

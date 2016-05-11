@@ -20,7 +20,7 @@
  * ****************************************************************
  */
 
-/* $Id$ */
+
 package org.lamsfoundation.lams.tool.wookie.web.forms;
 
 import javax.servlet.http.HttpServletRequest;

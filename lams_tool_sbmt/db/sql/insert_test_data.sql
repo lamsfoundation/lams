@@ -1,4 +1,4 @@
--- $Id$
+
 
 INSERT INTO tl_lasbmt11_content (content_id,title,instruction,define_later,run_offline,content_in_use,lock_on_finished) values(2,"Test Submission","Submit your a file",0,0,0,0);
 INSERT INTO tl_lasbmt11_session (session_id,content_id,status) values(3,2,1);

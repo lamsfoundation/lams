@@ -1,4 +1,4 @@
-<!-- $Id$ -->
+
 
 <context-param>
 	<param-name>javax.servlet.jsp.jstl.fmt.localizationContext</param-name>

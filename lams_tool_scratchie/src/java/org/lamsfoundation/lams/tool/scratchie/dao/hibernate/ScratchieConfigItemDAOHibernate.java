@@ -20,7 +20,7 @@
  * ****************************************************************
  */
 
-/* $Id$ */
+
 package org.lamsfoundation.lams.tool.scratchie.dao.hibernate;
 
 import org.hibernate.HibernateException;

@@ -20,7 +20,7 @@
  * ****************************************************************
  */
 
-/* $Id$ */
+
 package org.lamsfoundation.lams.tool.scratchie.web.form;
 
 import org.lamsfoundation.lams.tool.scratchie.model.Scratchie;

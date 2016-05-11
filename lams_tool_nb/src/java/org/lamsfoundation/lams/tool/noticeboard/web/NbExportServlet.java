@@ -21,7 +21,7 @@
  * ****************************************************************
  */
 
-/* $$Id$$ */
+
 package org.lamsfoundation.lams.tool.noticeboard.web;
 
 import javax.servlet.http.Cookie;
