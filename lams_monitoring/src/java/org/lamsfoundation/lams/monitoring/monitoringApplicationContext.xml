@@ -76,6 +76,7 @@
 				<prop key="force*">PROPAGATION_REQUIRED</prop>
 				<prop key="check*">PROPAGATION_REQUIRED,readOnly</prop>
 				<prop key="cloneLesson">PROPAGATION_REQUIRED</prop>
+				<prop key="toggle*">PROPAGATION_REQUIRED</prop>
 			</props>
 		</property>
 	</bean>    
