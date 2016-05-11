@@ -40,7 +40,7 @@ package org.apache.commons.lang;
  * @author Matthew Hawthorne
  * @author Gary Gregory
  * @since 2.0
- * @version $Id$
+ *
  */
 public class IllegalClassException extends IllegalArgumentException {
 

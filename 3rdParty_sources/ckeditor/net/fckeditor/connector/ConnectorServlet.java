@@ -40,7 +40,7 @@ import org.slf4j.LoggerFactory;
  * cycle, forwards requests to the {@link Dispatcher dispatcher} and ends the
  * request cycle with an appropriate {@link net.fckeditor.response response}.
  * 
- * @version $Id$
+ *
  */
 public class ConnectorServlet extends HttpServlet {
 	private static final long serialVersionUID = -5742008970929377161L;

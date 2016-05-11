@@ -29,6 +29,6 @@
  * <img src="doc-files/sequence-diagram.png" alt="Request Life Cycle Diagram"
  * title="Request Life Cycle Diagram" />
  * </p>
- * @version $Id$
+ *
  */
 package net.fckeditor.requestcycle;

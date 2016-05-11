@@ -41,7 +41,7 @@ import net.fckeditor.requestcycle.impl.ServerRootPathBuilder;
  * </p>
  * Use the {@link ServerRootPathBuilder} in conjunction with this class.
  * 
- * @version $Id$
+ *
  */
 public class LocalConnector extends AbstractLocalFileSystemConnector {
 

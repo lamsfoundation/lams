@@ -32,7 +32,7 @@ import java.util.Map;
  * @author Apache Software Foundation
  * @author Gary Gregory
  * @since 1.0
- * @version $Id$
+ *
  */
 public class EnumUtils {
 

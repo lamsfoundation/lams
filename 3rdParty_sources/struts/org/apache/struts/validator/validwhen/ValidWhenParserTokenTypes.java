@@ -1,7 +1,7 @@
 // $ANTLR 2.7.2: "validWhenParser.g" -> "ValidWhenParser.java"$
 
 /*
- * $Id$ 
+ *
  *
  * Copyright 2003,2004 The Apache Software Foundation.
  * 

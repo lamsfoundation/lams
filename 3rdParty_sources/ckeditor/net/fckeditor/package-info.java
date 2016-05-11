@@ -22,6 +22,6 @@
 /**
  * Core objects to manage the FCKeditor text input form.
  * 
- * @version $Id$
+ *
  */
 package net.fckeditor;

@@ -22,6 +22,6 @@
 /**
  * Default implementations for the locale resolver interface.
  * 
- * @version $Id$
+ *
  */
 package net.fckeditor.localization.impl;

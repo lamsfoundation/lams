@@ -22,6 +22,6 @@
 /**
  * Different handlers for various purposes used in the entire system.
  * 
- * @version $Id$
+ *
  */
 package net.fckeditor.handlers;

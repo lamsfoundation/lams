@@ -34,7 +34,7 @@ import net.fckeditor.tool.Utils;
  * Tag creates and configures a {@link FCKeditor} instance. The setter methods
  * are the same as in the FCKeditor class itself.
  * 
- * @version $Id$
+ *
  */
 public class EditorTag extends TagSupport {
 

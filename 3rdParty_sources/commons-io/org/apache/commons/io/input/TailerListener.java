@@ -19,7 +19,7 @@ package org.apache.commons.io.input;
 /**
  * Listener for events from a {@link Tailer}.
  *
- * @version $Id$
+ *
  * @since 2.0
  */
 public interface TailerListener {

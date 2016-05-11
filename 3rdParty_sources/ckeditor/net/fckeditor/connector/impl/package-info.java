@@ -22,6 +22,6 @@
 /**
  * Default implementations for the connector interface.
  * 
- * @version $Id$
+ *
  */
 package net.fckeditor.connector.impl;

@@ -66,7 +66,7 @@ import org.apache.commons.lang.Validate;
  * @author Apache Software Foundation
  * @author Matt Benson
  * @since 2.4
- * @version $Id$
+ *
  */
 public class ExtendedMessageFormat extends MessageFormat {
     private static final long serialVersionUID = -2362048321261811743L;

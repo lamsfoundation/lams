@@ -22,6 +22,6 @@
 /**
  * Various tool classes.
  * 
- * @version $Id$
+ *
  */
 package net.fckeditor.tool;

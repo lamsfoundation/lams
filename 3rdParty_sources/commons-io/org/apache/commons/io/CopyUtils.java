@@ -102,7 +102,7 @@ import java.io.Writer;
  * <p>
  * Origin of code: Excalibur.
  *
- * @version $Id$
+ *
  * @deprecated Use IOUtils. Will be removed in 2.0.
  *  Methods renamed to IOUtils.write() or IOUtils.copy().
  *  Null handling behaviour changed in IOUtils (null data does not

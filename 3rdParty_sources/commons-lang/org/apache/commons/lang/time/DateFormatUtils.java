@@ -33,7 +33,7 @@ import java.util.TimeZone;
  * @author <a href="mailto:stefan.bodewig@epost.de">Stefan Bodewig</a>
  * @author <a href="mailto:ggregory@seagullsw.com">Gary Gregory</a>
  * @since 2.0
- * @version $Id$
+ *
  */
 public class DateFormatUtils {
 

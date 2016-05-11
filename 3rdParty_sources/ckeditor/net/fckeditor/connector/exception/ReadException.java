@@ -23,7 +23,7 @@ package net.fckeditor.connector.exception;
 /**
  * Thrown to indicate that an error has occurred during some read action.
  * 
- * @version $Id$
+ *
  */
 public class ReadException extends Exception {
 

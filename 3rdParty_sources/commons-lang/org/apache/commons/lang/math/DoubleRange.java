@@ -25,7 +25,7 @@ import org.apache.commons.lang.text.StrBuilder;
  *
  * @author Apache Software Foundation
  * @since 2.0
- * @version $Id$
+ *
  */
 public final class DoubleRange extends Range implements Serializable {
     

@@ -27,7 +27,7 @@ import java.io.OutputStream;
  * <p>
  * Origin of code: POI.
  *
- * @version $Id$
+ *
  */
 public class HexDump {
 

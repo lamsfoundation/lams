@@ -45,7 +45,7 @@ import org.apache.commons.io.IOUtils;
  * 
  *
  * @since 1.4
- * @version $Id$
+ *
  */
 public class FileWriterWithEncoding extends Writer {
     // Cannot extend ProxyWriter, as requires writer to be

@@ -35,7 +35,7 @@ import org.slf4j.LoggerFactory;
  * This class instantiates the the chosen implementations and acts as a proxy
  * for their methods/access.
  * 
- * @version $Id$
+ *
  */
 public class RequestCycleHandler {
 	private static final Logger logger = LoggerFactory

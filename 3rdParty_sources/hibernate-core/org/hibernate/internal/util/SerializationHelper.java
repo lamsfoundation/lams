@@ -59,7 +59,7 @@ import org.jboss.logging.Logger;
  * @author Stephen Colebourne
  * @author Jeff Varszegi
  * @author Gary Gregory
- * @version $Id$
+ *
  * @since 1.0
  */
 public final class SerializationHelper {

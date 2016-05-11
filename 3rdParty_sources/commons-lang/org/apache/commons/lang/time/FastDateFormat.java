@@ -67,7 +67,7 @@ import org.apache.commons.lang.text.StrBuilder;
  * @author Gary Gregory
  * @author Nikolay Metchev
  * @since 2.0
- * @version $Id$
+ *
  */
 public class FastDateFormat extends Format {
     // A lot of the speed in this class comes from caching, but some comes

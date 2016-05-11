@@ -22,6 +22,6 @@
 /**
  * Interfaces and classes for the locale resolution and localized messages.
  * 
- * @version $Id$
+ *
  */
 package net.fckeditor.localization;

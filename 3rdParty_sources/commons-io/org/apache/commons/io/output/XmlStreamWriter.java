@@ -33,7 +33,7 @@ import org.apache.commons.io.input.XmlStreamReader;
  * Character stream that handles all the necessary Voodo to figure out the
  * charset encoding of the XML document written to the stream.
  *
- * @version $Id$
+ *
  * @see XmlStreamReader
  * @since 2.0
  */

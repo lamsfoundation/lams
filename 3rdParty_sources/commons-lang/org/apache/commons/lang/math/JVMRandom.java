@@ -35,7 +35,7 @@ import java.util.Random;
  * to MAX_VALUE (exclusive).
  * 
  * @since 2.0
- * @version $Id$
+ *
  */
 public final class JVMRandom extends Random {
 

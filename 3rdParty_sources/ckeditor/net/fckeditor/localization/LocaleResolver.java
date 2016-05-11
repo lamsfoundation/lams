@@ -31,7 +31,7 @@ import javax.servlet.http.HttpServletRequest;
  * need it, in other words your return values can be global, regardless of the
  * request, or on a per-request basis.
  * </p> 
- * @version $Id$
+ *
  */
 public interface LocaleResolver {
 

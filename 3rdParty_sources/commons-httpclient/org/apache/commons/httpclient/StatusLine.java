@@ -51,7 +51,7 @@ package org.apache.commons.httpclient;
  * @see HttpStatus
  * @author <a href="mailto:jsdever@apache.org">Jeff Dever</a>
  * @author <a href="mailto:mbowler@GargoyleSoftware.com">Mike Bowler</a>
- * @version $Id$
+ *
  * @since 2.0
  */
 public class StatusLine {

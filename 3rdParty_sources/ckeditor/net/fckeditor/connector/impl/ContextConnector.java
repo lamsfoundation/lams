@@ -44,7 +44,7 @@ import org.slf4j.LoggerFactory;
  * </p>
  * Use the {@link ContextPathBuilder} in conjunction with this class.
  * 
- * @version $Id$
+ *
  */
 public class ContextConnector extends AbstractLocalFileSystemConnector {
 	

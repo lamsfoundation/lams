@@ -23,7 +23,7 @@ package net.fckeditor.connector.exception;
 /**
  * Thrown to indicate that an error has occurred during some write action.
  * 
- * @version $Id$
+ *
  */
 public class WriteException extends Exception {
 

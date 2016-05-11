@@ -38,7 +38,7 @@ import org.slf4j.LoggerFactory;
  * In the regular case, you will use an already created instance of this class.
  * </p>
  * 
- * @version $Id$
+ *
  */
 public class Context {
 	// This is just a helper class which has no relevance for the logger

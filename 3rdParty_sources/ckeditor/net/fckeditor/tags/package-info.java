@@ -23,6 +23,6 @@
  * 	JSP tags to create and configure the {@link net.fckeditor.FCKeditor FCKeditor}
  * object.
  * 
- * @version $Id$
+ *
  */
 package net.fckeditor.tags;

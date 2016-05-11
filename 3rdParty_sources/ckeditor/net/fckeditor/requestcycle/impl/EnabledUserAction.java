@@ -27,7 +27,7 @@ import net.fckeditor.requestcycle.UserAction;
 /**
  * UserAction implementation which always returns {@code true}.
  * 
- * @version $Id$
+ *
  */
 public class EnabledUserAction implements UserAction {
 

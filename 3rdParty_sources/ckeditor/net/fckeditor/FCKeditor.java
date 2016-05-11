@@ -36,7 +36,7 @@ import net.fckeditor.tool.XHtmlTagTool;
  * valid values, only {@code request}, {@code instanceName} and {@code inputName}
  * will be checked for sanity.
  * 
- * @version $Id$
+ *
  */
 public class FCKeditor {
 

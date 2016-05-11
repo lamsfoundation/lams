@@ -22,7 +22,7 @@
  * Boston, MA  02110-1301  USA
  */
 
-// $Id$
+
 
 package org.hibernate.cfg;
 

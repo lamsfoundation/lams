@@ -43,7 +43,7 @@ import java.io.File;
  * @author Rafal Krupinski
  * @author Jason Gritman
  * @since 1.0
- * @version $Id$
+ *
  */
 public class SystemUtils {
 

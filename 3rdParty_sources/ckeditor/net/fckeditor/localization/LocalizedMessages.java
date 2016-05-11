@@ -53,7 +53,7 @@ import org.slf4j.LoggerFactory;
  * retrieval.
  * </p>
  * 
- * @version $Id$
+ *
  */
 public class LocalizedMessages {
 

@@ -44,7 +44,7 @@ import org.slf4j.LoggerFactory;
  * Moreover, you can set properties programmatically too but make sure to
  * override them <em>before</em> the first call of that specific property.
  * 
- * @version $Id$
+ *
  */
 public class PropertiesLoader {
 	private static final Logger logger = LoggerFactory

@@ -28,7 +28,7 @@ import javax.servlet.http.HttpServletRequest;
  * static access to the aforementioned objects for the current File Browse
  * request. This means that this class is thread-safe.
  * 
- * @version $Id$
+ *
  */
 public class ThreadLocalData {
 	private static ThreadLocal<HttpServletRequest> request = new ThreadLocal<HttpServletRequest>();

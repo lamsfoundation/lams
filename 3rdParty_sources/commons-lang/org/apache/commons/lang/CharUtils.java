@@ -26,7 +26,7 @@ package org.apache.commons.lang;
  * <p>#ThreadSafe#</p>
  * @author Apache Software Foundation
  * @since 2.1
- * @version $Id$
+ *
  */
 public class CharUtils {
     

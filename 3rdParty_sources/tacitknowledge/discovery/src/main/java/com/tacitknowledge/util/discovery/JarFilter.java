@@ -7,7 +7,7 @@ import java.io.FileFilter;
  * 
  * 
  * @author  Jun-Dir Liew (jliew@melcoe.mq.edu.au)
- * @version $Id$
+ *
  */
 class JarFilter implements FileFilter
 {

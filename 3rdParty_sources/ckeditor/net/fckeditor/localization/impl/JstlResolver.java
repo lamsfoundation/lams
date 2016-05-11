@@ -31,7 +31,7 @@ import net.fckeditor.localization.LocaleResolver;
  * JSTL implementation of the locale resolver. It resolves the locale against
  * the user session.
  * 
- * @version $Id$
+ *
  */
 public class JstlResolver implements LocaleResolver {
 

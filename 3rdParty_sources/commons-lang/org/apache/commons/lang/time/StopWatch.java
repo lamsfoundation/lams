@@ -54,7 +54,7 @@ package org.apache.commons.lang.time;
  * 
  * @author Apache Software Foundation
  * @since 2.0
- * @version $Id$
+ *
  */
 public class StopWatch {
 

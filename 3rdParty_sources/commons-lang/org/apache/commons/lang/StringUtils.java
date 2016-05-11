@@ -122,7 +122,7 @@ import org.apache.commons.lang.text.StrBuilder;
  * @author Chris Hyzer
  * @author Scott Johnson
  * @since 1.0
- * @version $Id$
+ *
  */
 //@Immutable
 public class StringUtils {

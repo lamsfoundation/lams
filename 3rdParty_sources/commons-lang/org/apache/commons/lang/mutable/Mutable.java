@@ -29,7 +29,7 @@ package org.apache.commons.lang.mutable;
  * @author Apache Software Foundation
  * @author Matthew Hawthorne
  * @since 2.1
- * @version $Id$
+ *
  */
 public interface Mutable {
 

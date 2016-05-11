@@ -48,7 +48,7 @@ import org.w3c.dom.Element;
  * target="_blank">XML response</a> for the File Browser <code>GET</code>
  * requests.
  * 
- * @version $Id$
+ *
  */
 public class GetResponse {
 

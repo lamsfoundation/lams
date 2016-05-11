@@ -77,7 +77,7 @@ import java.util.Stack;
  * <p>
  * Origin of code: Excalibur, Alexandria, Tomcat, Commons-Utils.
  *
- * @version $Id$
+ *
  * @since 1.1
  */
 public class FilenameUtils {

@@ -22,6 +22,6 @@
 /**
  * Response objects for {@code GET} and {@code POST} requests.
  * 
- * @version $Id$
+ *
  */
 package net.fckeditor.response;

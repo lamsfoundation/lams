@@ -42,7 +42,7 @@ import net.fckeditor.tool.Utils;
  * <li>QuickUpload</li>
  *</ul>
  * 
- * @version $Id$
+ *
  */
 public class Command {
 

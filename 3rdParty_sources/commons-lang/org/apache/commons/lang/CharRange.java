@@ -32,7 +32,7 @@ import org.apache.commons.lang.text.StrBuilder;
  * @author Chris Feldhacker
  * @author Gary Gregory
  * @since 1.0
- * @version $Id$
+ *
  */
 public final class CharRange implements Serializable {
 

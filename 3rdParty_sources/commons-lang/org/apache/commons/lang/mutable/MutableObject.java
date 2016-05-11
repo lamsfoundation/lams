@@ -24,7 +24,7 @@ import java.io.Serializable;
  * 
  * @since 2.1
  * @author Apache Software Foundation
- * @version $Id$
+ *
  */
 public class MutableObject implements Mutable, Serializable {
 

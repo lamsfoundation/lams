@@ -23,7 +23,7 @@ package org.apache.commons.lang.math;
  *
  * @since 2.4
  * @author Apache Software Foundation
- * @version $Id$
+ *
  */
 public class IEEE754rUtils {
     

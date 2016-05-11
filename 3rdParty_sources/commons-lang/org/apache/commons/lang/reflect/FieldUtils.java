@@ -33,7 +33,7 @@ import org.apache.commons.lang.ClassUtils;
  * @author Apache Software Foundation
  * @author Matt Benson
  * @since 2.5
- * @version $Id$
+ *
  */
 public class FieldUtils {
 
