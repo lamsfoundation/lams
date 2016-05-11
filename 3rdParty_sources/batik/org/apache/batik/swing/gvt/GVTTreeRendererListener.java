@@ -22,7 +22,7 @@ package org.apache.batik.swing.gvt;
  * This interface represents a listener to the GVTTreeRendererEvent events.
  *
  * @author <a href="mailto:stephane@hillion.org">Stephane Hillion</a>
- * @version $Id$
+ *
  */
 public interface GVTTreeRendererListener {
 

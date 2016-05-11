@@ -32,7 +32,7 @@ import org.apache.batik.util.ParsedURL;
  * Bridge class for the &lt;font-face> element.
  *
  * @author <a href="mailto:bella.robinson@cmis.csiro.au">Bella Robinson</a>
- * @version $Id$
+ *
  */
 public class SVGFontFaceElementBridge extends AbstractSVGBridge
                                       implements ErrorConstants {

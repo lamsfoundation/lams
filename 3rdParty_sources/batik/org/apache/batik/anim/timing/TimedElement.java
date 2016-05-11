@@ -38,7 +38,7 @@ import org.w3c.dom.events.EventTarget;
  * creating new DOM classes that inherit from these elements.
  *
  * @author <a href="mailto:cam%40mcc%2eid%2eau">Cameron McCormack</a>
- * @version $Id$
+ *
  */
 public abstract class TimedElement implements SMILConstants {
 

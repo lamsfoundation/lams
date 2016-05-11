@@ -33,7 +33,7 @@ import org.apache.batik.ext.awt.image.PadMode;
  * This is an implementation of a Pad operation as a RenderedImage.
  *
  * @author <a href="mailto:Thomas.DeWeeese@Kodak.com">Thomas DeWeese</a>
- * @version $Id$ */
+ *
 public class PadRed extends AbstractRed {
 
     static final boolean DEBUG=false;

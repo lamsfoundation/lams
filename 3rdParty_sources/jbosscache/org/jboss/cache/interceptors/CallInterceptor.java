@@ -52,7 +52,7 @@ import javax.transaction.Transaction;
  * this interceptor unless it is a call the OptimisticNodeInterceptor knows nothing about.
  *
  * @author Bela Ban
- * @version $Id$
+ *
  */
 public class CallInterceptor extends CommandInterceptor
 {

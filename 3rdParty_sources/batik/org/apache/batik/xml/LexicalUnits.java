@@ -22,7 +22,7 @@ package org.apache.batik.xml;
  * This interface defines the constants that represent XML lexical units.
  *
  * @author <a href="mailto:stephane@hillion.org">Stephane Hillion</a>
- * @version $Id$
+ *
  */
 public interface LexicalUnits {
     

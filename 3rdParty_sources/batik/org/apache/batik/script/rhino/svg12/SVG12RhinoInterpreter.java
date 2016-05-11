@@ -30,7 +30,7 @@ import org.mozilla.javascript.ScriptableObject;
  * A RhinoInterpreter for SVG 1.2 documents.
  *
  * @author <a href="mailto:cam%40mcc%2eid%2eau">Cameron McCormack</a>
- * @version $Id$
+ *
  */
 public class SVG12RhinoInterpreter extends RhinoInterpreter {
 

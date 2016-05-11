@@ -28,7 +28,7 @@ import java.util.Collection;
  * Interface for GVT Renderers that render into raster images.
  *
  * @author <a href="mailto:vincent.hardy@eng.sun.com">Vincent Hardy</a>
- * @version $Id$
+ *
  */
 public interface ImageRenderer extends Renderer{
 

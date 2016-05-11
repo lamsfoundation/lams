@@ -38,7 +38,7 @@ import org.apache.batik.ext.awt.image.codec.util.SeekableStream;
  * as floating-point samples) has also been added. In all other cases, support
  * is limited to Baseline specifications.
  *
- * @version $Id$
+ *
  */
 public class TIFFImageDecoder extends ImageDecoderImpl {
 

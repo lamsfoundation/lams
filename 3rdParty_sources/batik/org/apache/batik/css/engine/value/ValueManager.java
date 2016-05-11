@@ -30,7 +30,7 @@ import org.w3c.dom.DOMException;
  * with a property.
  *
  * @author <a href="mailto:stephane@hillion.org">Stephane Hillion</a>
- * @version $Id$
+ *
  */
 public interface ValueManager {
 

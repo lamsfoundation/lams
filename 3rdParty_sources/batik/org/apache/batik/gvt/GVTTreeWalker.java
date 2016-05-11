@@ -24,7 +24,7 @@ import java.util.List;
  * <tt>GVTTreeWalker</tt> objects are used to navigate a GVT tree or subtree.
  *
  * @author <a href="mailto:tkormann@apache.org">Thierry Kormann</a>
- * @version $Id$
+ *
  */
 public class GVTTreeWalker {
 

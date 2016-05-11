@@ -35,7 +35,7 @@ import org.apache.batik.util.SMILConstants;
  * An animation class for 'animateMotion' animations.
  *
  * @author <a href="mailto:cam%40mcc%2eid%2eau">Cameron McCormack</a>
- * @version $Id$
+ *
  */
 public class MotionAnimation extends InterpolatingAnimation {
 

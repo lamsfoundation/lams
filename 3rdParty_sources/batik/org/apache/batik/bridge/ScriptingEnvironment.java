@@ -66,7 +66,7 @@ import org.w3c.dom.svg.SVGDocument;
  * This class contains the informations needed by the SVG scripting.
  *
  * @author <a href="mailto:stephane@hillion.org">Stephane Hillion</a>
- * @version $Id$
+ *
  */
 public class ScriptingEnvironment extends BaseScriptingEnvironment {
 

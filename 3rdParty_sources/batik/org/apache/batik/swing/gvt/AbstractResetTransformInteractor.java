@@ -27,7 +27,7 @@ import java.awt.event.MouseEvent;
  * of the associated document.
  *
  * @author <a href="mailto:stephane@hillion.org">Stephane Hillion</a>
- * @version $Id$
+ *
  */
 public abstract class AbstractResetTransformInteractor implements Interactor {
     

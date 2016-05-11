@@ -6,7 +6,7 @@ package org.jgroups.blocks;
  * by multiple DistributedLockManagers. This can happen after a merge for example.
  * 
  * @author Robert Schaffar-Taurok (robert@fusion.at)
- * @version $Id$
+ *
  */
 public class LockMultiLockedException extends Exception {
 

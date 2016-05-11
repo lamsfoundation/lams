@@ -47,7 +47,7 @@ import java.util.StringTokenizer;
  * @author Stephen Colebourne
  * @author <a href="mailto:ggregory@seagullsw.com">Gary Gregory</a>
  * @author Pete Gieser
- * @version $Id$
+ *
  * @since 1.0
  */
 public final class ExceptionUtils {

@@ -30,7 +30,7 @@ import org.apache.batik.util.SVGTypes;
  * Bridge class for the 'animateColor' animation element.
  *
  * @author <a href="mailto:cam%40mcc%2eid%2eau">Cameron McCormack</a>
- * @version $Id$
+ *
  */
 public class SVGAnimateColorElementBridge extends SVGAnimateElementBridge {
 

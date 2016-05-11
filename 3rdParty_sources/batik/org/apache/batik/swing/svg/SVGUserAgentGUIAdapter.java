@@ -31,7 +31,7 @@ import org.apache.batik.util.gui.JErrorPane;
  *    displayMessage
  *
  * @author <a href="mailto:deweese@apache.org">deweese</a>
- * @version $Id$
+ *
  */
 public class SVGUserAgentGUIAdapter extends SVGUserAgentAdapter{
     public Component parentComponent;

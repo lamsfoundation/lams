@@ -30,7 +30,7 @@ import org.w3c.dom.svg.SVGAnimatedInteger;
  * This class implements the {@link SVGAnimatedInteger} interface.
  *
  * @author <a href="mailto:stephane@hillion.org">Stephane Hillion</a>
- * @version $Id$
+ *
  */
 public class SVGOMAnimatedInteger
         extends AbstractSVGAnimatedValue

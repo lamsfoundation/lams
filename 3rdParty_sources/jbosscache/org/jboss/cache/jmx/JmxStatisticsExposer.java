@@ -27,7 +27,7 @@ import java.util.Map;
  * Interface containing common cache management operations
  *
  * @author Jerry Gauthier
- * @version $Id$
+ *
  */
 public interface JmxStatisticsExposer
 {

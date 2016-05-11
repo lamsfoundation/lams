@@ -39,7 +39,7 @@ import org.apache.batik.ext.awt.image.GraphicsUtil;
  * GraphicsNode on demand for tiles.
  *
  * @author <a href="mailto:vincent.hardy@eng.sun.com">Vincent Hardy</a>
- * @version $Id$
+ *
  */
 public class GaussianBlurRed8Bit extends AbstractRed {
 

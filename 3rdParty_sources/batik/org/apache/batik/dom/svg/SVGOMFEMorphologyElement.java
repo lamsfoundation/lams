@@ -32,7 +32,7 @@ import org.w3c.dom.svg.SVGFEMorphologyElement;
  * This class implements {@link SVGFEMorphologyElement}.
  *
  * @author <a href="mailto:stephane@hillion.org">Stephane Hillion</a>
- * @version $Id$
+ *
  */
 public class SVGOMFEMorphologyElement
     extends    SVGOMFilterPrimitiveStandardAttributes

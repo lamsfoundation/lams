@@ -22,7 +22,7 @@ package org.apache.batik.util;
  * Provider interface for new url protocols, used by the ParsedURL class.
  *
  * @author <a href="mailto:thomas.deweese@kodak.com">Thomas DeWeese</a>
- * @version $Id$
+ *
  */
 public interface ParsedURLProtocolHandler {
     /**

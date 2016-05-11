@@ -27,7 +27,7 @@ import java.awt.geom.AffineTransform;
  *
  * @author <a href="mailto:vincent.hardy@eng.sun.com">Vincent Hardy</a>
  * @author <a href="mailto:paul_evenblij@compuware.com">Paul Evenblij</a>
- * @version $Id$
+ *
  */
 public abstract class TransformStackElement implements Cloneable{
 

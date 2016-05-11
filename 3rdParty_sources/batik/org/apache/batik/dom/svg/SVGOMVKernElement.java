@@ -27,7 +27,7 @@ import org.w3c.dom.svg.SVGVKernElement;
  * This class implements {@link SVGVKernElement}.
  *
  * @author <a href="mailto:stephane@hillion.org">Stephane Hillion</a>
- * @version $Id$
+ *
  */
 public class SVGOMVKernElement
     extends    SVGOMElement

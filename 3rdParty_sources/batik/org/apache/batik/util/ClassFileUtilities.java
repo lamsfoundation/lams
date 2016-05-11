@@ -39,7 +39,7 @@ import java.util.Set;
  * This class contains utility methods to manipulate Java classes.
  *
  * @author <a href="mailto:stephane@hillion.org">Stephane Hillion</a>
- * @version $Id$
+ *
  */
 public class ClassFileUtilities {
 

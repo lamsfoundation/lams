@@ -31,7 +31,7 @@ import org.w3c.dom.DOMException;
  * 'margin' shorthand property.
  *
  * @author <a href="mailto:stephane@hillion.org">Stephane Hillion</a>
- * @version $Id$
+ *
  */
 public class MarginShorthandManager
     extends AbstractValueFactory

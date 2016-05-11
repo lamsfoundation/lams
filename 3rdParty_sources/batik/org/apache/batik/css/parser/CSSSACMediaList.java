@@ -24,7 +24,7 @@ import org.w3c.css.sac.SACMediaList;
  * This class implements the {@link SACMediaList} interface.
  *
  * @author <a href="mailto:stephane@hillion.org">Stephane Hillion</a>
- * @version $Id$
+ *
  */
 public class CSSSACMediaList implements SACMediaList {
 

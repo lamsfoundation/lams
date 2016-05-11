@@ -27,7 +27,7 @@ import java.util.List;
  * a BufferedImageOp filter.
  *
  * @author <a href="mailto:vincent.hardy@eng.sun.com">Vincent Hardy</a>
- * @version $Id$
+ *
  * @see           org.apache.batik.svggen.SVGFilterDescriptor
  */
 public interface SVGFilterConverter extends SVGSyntax {

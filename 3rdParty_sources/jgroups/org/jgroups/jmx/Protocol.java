@@ -6,7 +6,7 @@ import java.util.Map;
 
 /**
  * @author Bela Ban
- * @version $Id$
+ *
  */
 public class Protocol implements ProtocolMBean {
     org.jgroups.stack.Protocol prot;

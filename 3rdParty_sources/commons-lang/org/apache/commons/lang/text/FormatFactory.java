@@ -24,7 +24,7 @@ import java.util.Locale;
  * 
  * @author Apache Software Foundation
  * @since 2.4
- * @version $Id$
+ *
  */
 public interface FormatFactory {
 

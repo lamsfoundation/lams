@@ -59,7 +59,7 @@ import org.w3c.dom.NodeList;
  *
  * @author <a href="mailto:cjolif">Christophe Jolif</a>
  * @author <a href="mailto:vincent.hardy@eng.sun.com">Vincent Hardy</a>
- * @version $Id$
+ *
  */
 public class DOMTreeManager implements SVGSyntax, ErrorConstants {
 

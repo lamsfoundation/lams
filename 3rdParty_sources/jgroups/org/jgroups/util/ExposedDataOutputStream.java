@@ -6,7 +6,7 @@ import java.io.IOException;
 
 /**
  * @author Bela Ban
- * @version $Id$
+ *
  */
 public class ExposedDataOutputStream extends DataOutputStream {
     /**

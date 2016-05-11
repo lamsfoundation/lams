@@ -71,7 +71,7 @@ import org.apache.batik.util.resources.ResourceManager;
  * This class contains the main method of an SVG viewer.
  *
  * @author <a href="mailto:stephane@hillion.org">Stephane Hillion</a>
- * @version $Id$
+ *
  */
 public class Main implements Application {
     /**

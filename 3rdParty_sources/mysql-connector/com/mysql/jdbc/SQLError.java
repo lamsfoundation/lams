@@ -45,7 +45,7 @@ import com.mysql.jdbc.exceptions.MySQLTransactionRollbackException;
  * as is required by the JDBC spec.
  * 
  * @author Mark Matthews <mmatthew_at_worldserver.com>
- * @version $Id$
+ *
  */
 public class SQLError {
 	static final int ER_WARNING_NOT_COMPLETE_ROLLBACK = 1196;

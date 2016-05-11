@@ -36,7 +36,7 @@ import org.w3c.dom.css.Rect;
  * {@link org.w3c.dom.css.CSSValueList} interfaces.
  *
  * @author <a href="mailto:stephane@hillion.org">Stephane Hillion</a>
- * @version $Id$
+ *
  */
 public class CSSOMValue
     implements CSSPrimitiveValue,

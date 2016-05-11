@@ -27,7 +27,7 @@ import org.w3c.dom.svg.SVGPolylineElement;
  * This class implements {@link SVGPolylineElement}.
  *
  * @author <a href="mailto:stephane@hillion.org">Stephane Hillion</a>
- * @version $Id$
+ *
  */
 public class SVGOMPolylineElement
     extends    SVGPointShapeElement

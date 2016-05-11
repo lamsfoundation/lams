@@ -40,7 +40,7 @@ import org.w3c.dom.css.CSSValue;
  * This class provides a manager for the 'cursor' property values.
  *
  * @author <a href="mailto:stephane@hillion.org">Stephane Hillion</a>
- * @version $Id$
+ *
  */
 public class CursorManager extends AbstractValueManager {
 

@@ -33,7 +33,7 @@ import org.w3c.dom.svg.SVGScriptElement;
  * This class implements {@link org.w3c.dom.svg.SVGScriptElement}.
  *
  * @author <a href="mailto:stephane@hillion.org">Stephane Hillion</a>
- * @version $Id$
+ *
  */
 public class SVGOMScriptElement
     extends    SVGOMURIReferenceElement

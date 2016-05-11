@@ -41,7 +41,7 @@ import org.apache.batik.gvt.text.Mark;
  * This class represents an object which manage GVT text nodes selection.
  *
  * @author <a href="mailto:stephane@hillion.org">Stephane Hillion</a>
- * @version $Id$
+ *
  */
 public class TextSelectionManager {
 

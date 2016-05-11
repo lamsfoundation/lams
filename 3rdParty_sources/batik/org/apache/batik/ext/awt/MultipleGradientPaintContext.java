@@ -45,7 +45,7 @@ import org.apache.batik.ext.awt.image.GraphicsUtil;
  *
  * @author Nicholas Talian, Vincent Hardy, Jim Graham, Jerry Evans
  * @author <a href="mailto:vincent.hardy@eng.sun.com">Vincent Hardy</a>
- * @version $Id$
+ *
  */
 abstract class MultipleGradientPaintContext implements PaintContext {
 

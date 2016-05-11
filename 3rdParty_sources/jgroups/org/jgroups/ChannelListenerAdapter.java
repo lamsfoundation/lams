@@ -3,7 +3,7 @@ package org.jgroups;
 /**
  * Class which implements {@link org.jgroups.ChannelListener}
  * @author Bela Ban
- * @version $Id$
+ *
  */
 public class ChannelListenerAdapter implements ChannelListener {
     public void channelConnected(Channel channel) {

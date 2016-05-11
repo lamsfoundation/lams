@@ -31,7 +31,7 @@ import org.w3c.dom.views.DocumentView;
  * of the elements of a document.
  *
  * @author <a href="mailto:stephane@hillion.org">Stephane Hillion</a>
- * @version $Id$
+ *
  */
 public class CSSOMViewCSS implements ViewCSS {
     

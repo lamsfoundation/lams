@@ -26,7 +26,7 @@ import java.util.List;
  * An abstract base class for time container elements.
  *
  * @author <a href="mailto:cam%40mcc%2eid%2eau">Cameron McCormack</a>
- * @version $Id$
+ *
  */
 public abstract class TimeContainer extends TimedElement {
 

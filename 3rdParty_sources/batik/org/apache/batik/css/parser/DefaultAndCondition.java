@@ -25,7 +25,7 @@ import org.w3c.css.sac.Condition;
  * {@link org.w3c.css.sac.CombinatorCondition} interface.
  *
  * @author <a href="mailto:stephane@hillion.org">Stephane Hillion</a>
- * @version $Id$
+ *
  */
 public class DefaultAndCondition extends AbstractCombinatorCondition {
 

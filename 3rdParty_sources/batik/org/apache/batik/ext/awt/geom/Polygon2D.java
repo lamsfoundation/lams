@@ -33,7 +33,7 @@ import java.io.Serializable;
 /**
  * This class is a Polygon with float coordinates.
  *
- * @version $Id$
+ *
  */
 public class Polygon2D implements Shape, Cloneable, Serializable {
 

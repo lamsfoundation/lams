@@ -34,7 +34,7 @@ import org.w3c.dom.svg.SVGRect;
  * This class provides support for the SVGLocatable interface.
  *
  * @author <a href="mailto:stephane@hillion.org">Stephane Hillion</a>
- * @version $Id$
+ *
  */
 public class SVGLocatableSupport {
 

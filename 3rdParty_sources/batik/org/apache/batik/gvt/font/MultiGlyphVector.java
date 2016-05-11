@@ -34,7 +34,7 @@ import org.apache.batik.gvt.text.AttributedCharacterSpanIterator;
 
 /**
  *
- * @version $Id$
+ *
  */
 public class MultiGlyphVector implements GVTGlyphVector {
 

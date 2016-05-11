@@ -39,7 +39,7 @@ import org.w3c.dom.svg.SVGDocument;
  * This class represents a &lt;font-face> element or @font-face rule
  *
  * @author <a href="mailto:bella.robinson@cmis.csiro.au">Bella Robinson</a>
- * @version $Id$
+ *
  */
 public abstract class FontFace extends GVTFontFace
     implements ErrorConstants  {

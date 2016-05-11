@@ -34,7 +34,7 @@ import java.util.Map;
  * Serializable representation of the data of a node (FQN and attributes)
  *
  * @author Bela Ban
- * @version $Id$
+ *
  */
 // TODO: 3.0.0: remove Externalizable and rely on the CacheMarshaller.
 public class NodeData<K, V> implements Externalizable

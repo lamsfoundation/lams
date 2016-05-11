@@ -25,7 +25,7 @@ import java.awt.GridBagConstraints;
  * provide some utility methods.
  *
  * @author <a href="mailto:stephane@hillion.org">Stephane Hillion</a>
- * @version $Id$
+ *
  */
 public class ExtendedGridBagConstraints extends GridBagConstraints {
 

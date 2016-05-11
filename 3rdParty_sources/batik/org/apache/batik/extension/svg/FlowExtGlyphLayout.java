@@ -34,7 +34,7 @@ import org.apache.batik.gvt.text.GlyphLayout;
  * A GlyphLayout class for SVG 1.2 flowing text.
  *
  * @author <a href="mailto:deweese@apache.org">deweese</a>
- * @version $Id$
+ *
  */
 public class FlowExtGlyphLayout extends GlyphLayout {
 

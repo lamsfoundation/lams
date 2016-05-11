@@ -37,7 +37,7 @@ import java.sql.SQLException;
  * 
  * @author Mark Matthews
  * 
- * @version $Id: CommunicationsException.java,v 1.1.2.1 2005/05/13 18:58:37
+ *
  *          mmatthews Exp $
  */
 public class CommunicationsException extends SQLException {

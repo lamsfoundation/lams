@@ -28,7 +28,7 @@ import javax.swing.JCheckBox;
  * This class represents a panel to control svg encoding options.
  *
  * @author <a href="mailto:tkormann@apache.org">Thierry Kormann</a>
- * @version $Id$
+ *
  */
 public class SVGOptionPanel extends OptionPanel {
     /**

@@ -24,7 +24,7 @@ import org.w3c.css.sac.SACMediaList;
  * This class represents a @media CSS rule.
  *
  * @author <a href="mailto:stephane@hillion.org">Stephane Hillion</a>
- * @version $Id$
+ *
  */
 public class MediaRule extends StyleSheet implements Rule {
 

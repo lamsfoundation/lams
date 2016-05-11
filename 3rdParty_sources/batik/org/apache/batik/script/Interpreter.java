@@ -27,7 +27,7 @@ import java.io.Writer;
  * a particular scripting language.
  *
  * @author <a href="mailto:cjolif@ilog.fr">Christophe Jolif</a>
- * @version $Id$
+ *
  */
 public interface Interpreter extends org.apache.batik.i18n.Localizable {
 

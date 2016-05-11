@@ -30,7 +30,7 @@ import org.w3c.dom.svg.SVGFEPointLightElement;
  * This class implements {@link SVGFEPointLightElement}.
  *
  * @author <a href="mailto:stephane@hillion.org">Stephane Hillion</a>
- * @version $Id$
+ *
  */
 public class SVGOMFEPointLightElement
     extends    SVGOMElement

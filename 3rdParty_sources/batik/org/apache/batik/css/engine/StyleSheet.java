@@ -24,7 +24,7 @@ import org.w3c.css.sac.SACMediaList;
  * This class represents a list of rules.
  *
  * @author <a href="mailto:stephane@hillion.org">Stephane Hillion</a>
- * @version $Id$
+ *
  */
 public class StyleSheet {
 

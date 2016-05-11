@@ -52,7 +52,7 @@ import org.apache.batik.util.resources.ResourceManager;
  * This class represents a dialog to select the user style sheet.
  *
  * @author <a href="mailto:stephane@hillion.org">Stephane Hillion</a>
- * @version $Id$
+ *
  */
 public class UserStyleDialog extends JDialog implements ActionMap {
 

@@ -28,7 +28,7 @@ import org.apache.batik.ext.awt.image.PadMode;
  * specified in the user coordinate system of this Renderable.
  *
  * @author <a href="mailto:Thomas.DeWeeese@Kodak.com">Thomas DeWeese</a>
- * @version $Id$ */
+ *
 public interface PadRable extends Filter {
     /**
      * Returns the source to be padded

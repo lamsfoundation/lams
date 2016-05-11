@@ -26,7 +26,7 @@ import java.awt.geom.Point2D;
  * rotating the marker when drawing it.
  *
  * @author <a href="mailto:vincent.hardy@eng.sun.com">Vincent Hardy</a>
- * @version $Id$ 
+ *
  */
 public class Marker {
 

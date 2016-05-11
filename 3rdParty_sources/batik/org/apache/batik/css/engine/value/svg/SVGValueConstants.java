@@ -30,7 +30,7 @@ import org.w3c.dom.css.CSSPrimitiveValue;
  * This interface provides constants for SVG values.
  *
  * @author <a href="mailto:stephane@hillion.org">Stephane Hillion</a>
- * @version $Id$
+ *
  */
 public interface SVGValueConstants extends ValueConstants {
     

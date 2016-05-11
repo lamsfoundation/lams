@@ -26,7 +26,7 @@ import org.w3c.dom.DOMException;
  * 'flood-color'...
  *
  * @author <a href="mailto:stephane@hillion.org">Stephane Hillion</a>
- * @version $Id$
+ *
  */
 public interface SVGValue extends Value {
     

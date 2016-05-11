@@ -30,7 +30,7 @@ import org.w3c.dom.svg.SVGPointList;
  * defined with a 'points' attribute (i.e., polygon and polyline).
  *
  * @author <a href="mailto:cam%40mcc%2eid%2eau">Cameron McCormack</a>
- * @version $Id$
+ *
  */
 public abstract class SVGPointShapeElement
     extends    SVGGraphicsElement

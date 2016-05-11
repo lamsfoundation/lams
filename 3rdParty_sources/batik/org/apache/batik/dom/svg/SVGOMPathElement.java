@@ -52,7 +52,7 @@ import org.w3c.dom.svg.SVGPoint;
  * This class implements {@link SVGPathElement}.
  *
  * @author <a href="mailto:stephane@hillion.org">Stephane Hillion</a>
- * @version $Id$
+ *
  */
 public class SVGOMPathElement
     extends    SVGGraphicsElement

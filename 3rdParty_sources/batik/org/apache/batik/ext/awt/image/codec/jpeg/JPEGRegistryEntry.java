@@ -42,7 +42,7 @@ import com.sun.image.codec.jpeg.TruncatedFileException;
 
 /**
  *
- * @version $Id$
+ *
  */
 public class JPEGRegistryEntry
     extends MagicNumberRegistryEntry {

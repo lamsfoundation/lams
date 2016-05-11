@@ -61,7 +61,7 @@ import java.util.TimeZone;
  * JDBC Interface for MySQL-4.1 and newer server-side PreparedStatements.
  * 
  * @author Mark Matthews
- * @version $Id: ServerPreparedStatement.java,v 1.1.2.2 2005/05/17 14:58:56
+ *
  *          mmatthews Exp $
  */
 public class ServerPreparedStatement extends PreparedStatement {

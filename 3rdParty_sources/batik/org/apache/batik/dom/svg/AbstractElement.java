@@ -36,7 +36,7 @@ import org.w3c.dom.events.MutationEvent;
  * an element interoperable with the SVG elements.
  *
  * @author <a href="mailto:stephane@hillion.org">Stephane Hillion</a>
- * @version $Id$
+ *
  */
 public abstract class AbstractElement
         extends org.apache.batik.dom.AbstractElement

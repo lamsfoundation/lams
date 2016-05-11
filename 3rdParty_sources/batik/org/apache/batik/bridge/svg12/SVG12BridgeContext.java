@@ -54,7 +54,7 @@ import org.w3c.dom.svg.SVGDocument;
  * XBL events to bridges and for handling resource documents.
  *
  * @author <a href="mailto:cam%40mcc%2eid%2eau">Cameron McCormack</a>
- * @version $Id$
+ *
  */
 public class SVG12BridgeContext extends BridgeContext {
 

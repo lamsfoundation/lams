@@ -31,7 +31,7 @@ import java.util.List;
  *
  * @author <a href="mailto:Thierry.Kormann@sophia.inria.fr">Thierry Kormann</a>
  * @author <a href="mailto:stephane@hillion.org">Stephane Hillion</a>
- * @version $Id$
+ *
  */
 public abstract class AbstractEvent
         implements Event, OriginalEvent, Cloneable {

@@ -82,7 +82,7 @@ import org.w3c.dom.svg.SVGDocument;
  *
  * @author <a href="mailto:tkormann@apache.org">Thierry Kormann</a>
  * @author <a href="mailto:stephane@hillion.org">Stephane Hillion</a>
- * @version $Id$
+ *
  */
 public class JSVGCanvas extends JSVGComponent {
 

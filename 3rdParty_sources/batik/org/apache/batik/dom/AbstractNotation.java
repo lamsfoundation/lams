@@ -26,7 +26,7 @@ import org.w3c.dom.Notation;
  * This class implements the {@link org.w3c.dom.Notation} interface.
  *
  * @author <a href="mailto:stephane@hillion.org">Stephane Hillion</a>
- * @version $Id$
+ *
  */
 public abstract class AbstractNotation
     extends    AbstractNode

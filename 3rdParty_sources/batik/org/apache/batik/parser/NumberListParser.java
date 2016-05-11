@@ -25,7 +25,7 @@ import java.io.IOException;
  * list values.
  *
  * @author  tonny@kiyut.com
- * @version $Id$
+ *
  */
 public class NumberListParser extends NumberParser {
     /**

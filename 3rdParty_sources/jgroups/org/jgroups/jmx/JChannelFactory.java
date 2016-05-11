@@ -8,7 +8,7 @@ import javax.management.MBeanServer;
 
 /**
  * @author Bela Ban
- * @version $Id$
+ *
  */
 public class JChannelFactory implements JChannelFactoryMBean, MBeanRegistration {
     org.jgroups.JChannelFactory factory=new org.jgroups.JChannelFactory();

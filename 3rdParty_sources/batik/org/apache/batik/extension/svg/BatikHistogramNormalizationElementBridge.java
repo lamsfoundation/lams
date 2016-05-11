@@ -36,7 +36,7 @@ import org.w3c.dom.Element;
  * Bridge class for a histogram normalization element.
  *
  * @author <a href="mailto:thomas.deweese@kodak.com">Thomas Deweese</a>
- * @version $Id$
+ *
  */
 public class BatikHistogramNormalizationElementBridge
     extends AbstractSVGFilterPrimitiveElementBridge

@@ -36,7 +36,7 @@ import java.util.List;
  * caches.
  *
  *
- * @version $Id$
+ *
  */
 public class SpanQueryFilter extends SpanFilter {
   protected SpanQuery query;

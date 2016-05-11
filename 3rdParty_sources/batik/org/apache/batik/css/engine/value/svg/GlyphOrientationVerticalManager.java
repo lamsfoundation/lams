@@ -31,7 +31,7 @@ import org.w3c.dom.css.CSSPrimitiveValue;
  * property values.
  *
  * @author <a href="mailto:stephane@hillion.org">Stephane Hillion</a>
- * @version $Id$
+ *
  */
 public class GlyphOrientationVerticalManager
     extends GlyphOrientationManager {

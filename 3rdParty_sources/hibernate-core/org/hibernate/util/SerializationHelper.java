@@ -59,7 +59,7 @@ import org.slf4j.LoggerFactory;
  * @author Jeff Varszegi
  * @author Gary Gregory
  * @since 1.0
- * @version $Id$
+ *
  */
 public final class SerializationHelper {
 

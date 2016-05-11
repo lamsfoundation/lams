@@ -26,7 +26,7 @@ import java.util.EventObject;
  * from a GVTTreeRenderer instance.
  *
  * @author <a href="mailto:stephane@hillion.org">Stephane Hillion</a>
- * @version $Id$
+ *
  */
 public class GVTTreeRendererEvent extends EventObject {
 

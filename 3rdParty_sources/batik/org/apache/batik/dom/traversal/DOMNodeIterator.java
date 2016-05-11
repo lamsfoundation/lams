@@ -29,7 +29,7 @@ import org.w3c.dom.traversal.NodeIterator;
  * interface.
  *
  * @author <a href="mailto:stephane@hillion.org">Stephane Hillion</a>
- * @version $Id$
+ *
  */
 public class DOMNodeIterator implements NodeIterator {
 

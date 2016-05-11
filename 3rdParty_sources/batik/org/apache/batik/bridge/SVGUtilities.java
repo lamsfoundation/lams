@@ -51,7 +51,7 @@ import org.w3c.dom.svg.SVGNumberList;
  *
  * @author <a href="mailto:tkormann@apache.org">Thierry Kormann</a>
  * @author <a href="mailto:stephane@hillion.org">Stephane Hillion</a>
- * @version $Id$
+ *
  */
 public abstract class SVGUtilities implements SVGConstants, ErrorConstants {
 

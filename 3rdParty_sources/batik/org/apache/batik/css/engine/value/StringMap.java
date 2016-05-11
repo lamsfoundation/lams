@@ -23,7 +23,7 @@ package org.apache.batik.css.engine.value;
  * equality test made with '=='.
  *
  * @author <a href="mailto:stephane@hillion.org">Stephane Hillion</a>
- * @version $Id$
+ *
  */
 public class StringMap {
 

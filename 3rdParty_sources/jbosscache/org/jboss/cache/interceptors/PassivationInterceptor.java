@@ -43,7 +43,7 @@ import java.util.concurrent.atomic.AtomicLong;
  * CacheLoader, either before each method call (no TXs), or at TX commit.
  *
  * @author <a href="mailto:{hmesha@novell.com}">{Hany Mesha}</a>
- * @version $Id$
+ *
  */
 public class PassivationInterceptor extends JmxStatsCommandInterceptor
 {

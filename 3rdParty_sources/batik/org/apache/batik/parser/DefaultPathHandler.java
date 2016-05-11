@@ -22,7 +22,7 @@ package org.apache.batik.parser;
  * The class provides an adapter for PathHandler.
  *
  * @author <a href="mailto:stephane@hillion.org">Stephane Hillion</a>
- * @version $Id$
+ *
  */
 public class DefaultPathHandler implements PathHandler {
 

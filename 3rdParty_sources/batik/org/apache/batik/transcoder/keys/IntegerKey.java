@@ -24,7 +24,7 @@ import org.apache.batik.transcoder.TranscodingHints;
  * A transcoding Key represented as an int.
  *
  * @author <a href="mailto:Thierry.Kormann@sophia.inria.fr">Thierry Kormann</a>
- * @version $Id$
+ *
  */
 public class IntegerKey extends TranscodingHints.Key {
 

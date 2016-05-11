@@ -30,7 +30,7 @@ import org.w3c.dom.svg.SVGFETileElement;
  * This class implements {@link SVGFETileElement}.
  *
  * @author <a href="mailto:stephane@hillion.org">Stephane Hillion</a>
- * @version $Id$
+ *
  */
 public class SVGOMFETileElement
     extends    SVGOMFilterPrimitiveStandardAttributes

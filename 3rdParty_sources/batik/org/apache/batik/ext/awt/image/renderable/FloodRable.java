@@ -25,7 +25,7 @@ import java.awt.geom.Rectangle2D;
  * Fills the input image with a given paint
  *
  * @author <a href="mailto:dean@w3.org">Dean Jackson</a>
- * @version $Id$
+ *
  */
 
 public interface FloodRable extends Filter {

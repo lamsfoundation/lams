@@ -31,7 +31,7 @@ import java.security.AccessControlException;
  *
  * @author Filip Hanik (<a href="mailto:filip@filip.net">filip@filip.net)
  * @author Bela Ban
- * @version $Id$
+ *
  */
 public class ConfiguratorFactory {
     public static final String JAXP_MISSING_ERROR_MSG=

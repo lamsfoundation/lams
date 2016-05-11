@@ -23,7 +23,7 @@ package org.apache.batik.bridge;
  *
  * @author <a href="mailto:vhardy@apache.org">Vincent Hardy</a>
  * @author <a href="mailto:tkormann@apache.org">Thierry Kormann</a>
- * @version $Id$
+ *
  */
 public class SVGTitleElementBridge extends SVGDescriptiveElementBridge {
 

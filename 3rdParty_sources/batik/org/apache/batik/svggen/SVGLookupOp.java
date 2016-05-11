@@ -36,7 +36,7 @@ import org.w3c.dom.Element;
  * of the lookup table.
  *
  * @author <a href="mailto:vincent.hardy@eng.sun.com">Vincent Hardy</a>
- * @version $Id$
+ *
  * @see                org.apache.batik.svggen.SVGBufferedImageOp
  */
 public class SVGLookupOp extends AbstractSVGFilterConverter {

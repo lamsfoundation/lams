@@ -32,7 +32,7 @@ import org.w3c.dom.DOMException;
  * This class provides a factory for the 'stroke-width' property values.
  *
  * @author <a href="mailto:stephane@hillion.org">Stephane Hillion</a>
- * @version $Id$
+ *
  */
 public class StrokeWidthManager extends LengthManager {
 

@@ -31,7 +31,7 @@ import org.apache.batik.ext.awt.image.rendered.ComponentTransferRed;
 
 /**
  *
- * @version $Id$
+ *
  */
 public class BatikHistogramNormalizationFilter8Bit
     extends      AbstractColorInterpolationRable

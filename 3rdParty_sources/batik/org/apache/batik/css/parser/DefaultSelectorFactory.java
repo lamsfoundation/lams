@@ -35,7 +35,7 @@ import org.w3c.css.sac.SimpleSelector;
  * This class implements the {@link org.w3c.css.sac.SelectorFactory} interface.
  *
  * @author <a href="mailto:stephane@hillion.org">Stephane Hillion</a>
- * @version $Id$
+ *
  */
 
 public class DefaultSelectorFactory implements SelectorFactory {

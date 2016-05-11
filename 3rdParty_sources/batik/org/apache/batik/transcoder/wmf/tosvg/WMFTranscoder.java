@@ -87,7 +87,7 @@ import org.w3c.dom.Element;
  *  </li>
  *  </ul>
  *
- * @version $Id$
+ *
  */
 public class WMFTranscoder extends ToSVGAbstractTranscoder {
 

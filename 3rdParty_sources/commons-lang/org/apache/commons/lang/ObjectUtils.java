@@ -39,7 +39,7 @@ import org.apache.commons.lang.reflect.MethodUtils;
  * @author Mario Winterer
  * @author <a href="mailto:david@davidkarlsen.com">David J. M. Karlsen</a>
  * @since 1.0
- * @version $Id$
+ *
  */
 //@Immutable
 public class ObjectUtils {

@@ -33,7 +33,7 @@ import java.awt.image.ColorModel;
  *
  * @author Nicholas Talian, Vincent Hardy, Jim Graham, Jerry Evans
  * @author <a href="mailto:vincent.hardy@eng.sun.com">Vincent Hardy</a>
- * @version $Id$
+ *
  * @see java.awt.PaintContext
  * @see java.awt.Paint
  * @see java.awt.GradientPaint

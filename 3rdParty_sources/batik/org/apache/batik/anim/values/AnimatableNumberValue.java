@@ -24,7 +24,7 @@ import org.apache.batik.dom.anim.AnimationTarget;
  * A number value in the animation system.
  *
  * @author <a href="mailto:cam%40mcc%2eid%2eau">Cameron McCormack</a>
- * @version $Id$
+ *
  */
 public class AnimatableNumberValue extends AnimatableValue {
 

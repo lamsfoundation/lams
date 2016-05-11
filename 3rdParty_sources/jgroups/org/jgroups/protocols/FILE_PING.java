@@ -18,7 +18,7 @@ import java.util.Properties;
  * added to our transport's UUID-PhysicalAddress cache.<p/>
  * The design is at doc/design/FILE_PING.txt
  * @author Bela Ban
- * @version $Id$
+ *
  */
 public class FILE_PING extends Discovery {
     private static final String name="FILE_PING";

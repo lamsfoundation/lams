@@ -26,7 +26,7 @@ import java.io.RandomAccessFile;
 /**
  * An <code>OutputStream</code> which can seek to an arbitrary offset.
  *
- * @version $Id$
+ *
  */
 public class SeekableOutputStream extends OutputStream {
 

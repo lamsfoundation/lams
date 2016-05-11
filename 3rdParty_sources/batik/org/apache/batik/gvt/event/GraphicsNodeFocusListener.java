@@ -25,7 +25,7 @@ import java.util.EventListener;
  * graphics node.
  *
  * @author <a href="mailto:Thierry.Kormann@sophia.inria.fr">Thierry Kormann</a>
- * @version $Id$
+ *
  */
 public interface GraphicsNodeFocusListener extends EventListener {
 

@@ -75,7 +75,7 @@ import java.util.Set;
  * <p/>
  *
  * @author Elias Ross
- * @version $Id$
+ *
  */
 @ThreadSafe
 @SuppressWarnings("unchecked")

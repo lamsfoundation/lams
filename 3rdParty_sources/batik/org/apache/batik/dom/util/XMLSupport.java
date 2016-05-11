@@ -28,7 +28,7 @@ import org.w3c.dom.Node;
  * This class provides support for XML features.
  *
  * @author <a href="mailto:stephane@hillion.org">Stephane Hillion</a>
- * @version $Id$
+ *
  */
 public final class XMLSupport implements XMLConstants {
 

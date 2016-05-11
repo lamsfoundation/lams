@@ -37,7 +37,7 @@ import org.w3c.dom.css.CSSValue;
  * This class provides a factory for the 'stroke-dasharray' property values.
  *
  * @author <a href="mailto:stephane@hillion.org">Stephane Hillion</a>
- * @version $Id$
+ *
  */
 public class StrokeDasharrayManager extends LengthManager {
     

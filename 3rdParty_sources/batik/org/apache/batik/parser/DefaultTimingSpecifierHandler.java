@@ -24,7 +24,7 @@ import java.util.Calendar;
  * An adapter class for {@link TimingSpecifierHandler}.
  *
  * @author <a href="mailto:cam%40mcc%2eid%2eau">Cameron McCormack</a>
- * @version $Id$
+ *
  */
 public class DefaultTimingSpecifierHandler implements TimingSpecifierHandler {
 

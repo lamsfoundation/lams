@@ -23,7 +23,7 @@
  *
  */
 
-//$Id$
+
 package org.hibernate.hql.ast.tree;
 
 import org.hibernate.hql.ast.util.ColumnHelper;

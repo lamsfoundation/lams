@@ -30,7 +30,7 @@ import org.w3c.dom.Element;
  * allow caching of raster images in generated SVG content.
  *
  * @author <a href="mailto:vincent.hardy@sun.com">Vincent Hardy</a>
- * @version $Id$
+ *
  */
 public interface GenericImageHandler {
     /**

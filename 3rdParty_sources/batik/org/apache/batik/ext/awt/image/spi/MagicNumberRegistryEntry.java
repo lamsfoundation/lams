@@ -31,7 +31,7 @@ import java.io.StreamCorruptedException;
  * of Magic Numbers that correspond to your format (Some formats have
  * multiple magic numbers associated with them).
  *
- * @version $Id$
+ *
  */
 public abstract class MagicNumberRegistryEntry
     extends AbstractRegistryEntry

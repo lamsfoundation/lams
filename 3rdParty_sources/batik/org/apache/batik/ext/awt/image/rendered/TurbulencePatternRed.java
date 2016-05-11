@@ -60,7 +60,7 @@ import java.awt.image.WritableRaster;
  *
  * @author     <a href="mailto:vincent.hardy@eng.sun.com">Vincent Hardy</a>
  * @author     <a href="mailto:DeWeese@apache.org">Thomas DeWeese</a>
- * @version $Id$ */
+ *
 public final class TurbulencePatternRed extends AbstractRed {
     /**
      * Inner class to store tile stitching info.

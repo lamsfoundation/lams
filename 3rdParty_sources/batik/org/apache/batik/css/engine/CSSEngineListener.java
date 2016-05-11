@@ -22,7 +22,7 @@ package org.apache.batik.css.engine;
  * This class must be implemented in order to be notified of CSS events.
  *
  * @author <a href="mailto:stephane@hillion.org">Stephane Hillion</a>
- * @version $Id$
+ *
  */
 public interface CSSEngineListener {
     

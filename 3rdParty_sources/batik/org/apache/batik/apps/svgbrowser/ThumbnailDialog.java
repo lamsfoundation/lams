@@ -65,7 +65,7 @@ import org.w3c.dom.svg.SVGSVGElement;
  * document.
  *
  * @author <a href="mailto:tkormann@apache.org">Thierry Kormann</a>
- * @version $Id$
+ *
  */
 public class ThumbnailDialog extends JDialog {
 

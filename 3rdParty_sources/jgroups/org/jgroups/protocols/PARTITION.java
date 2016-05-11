@@ -13,7 +13,7 @@ import org.jgroups.stack.Protocol;
  * methods startPartition() or stopPartition() directly. This can also be done via JMX.<p/>
  * A partition simply discards all messages, but let's other events pass.
  * @author Bela Ban
- * @version $Id$
+ *
  */
 public class PARTITION extends Protocol {
     protected boolean partition_on=false;

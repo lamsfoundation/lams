@@ -86,7 +86,7 @@ import java.util.Stack;
  * @author Martin Cooper
  * @author <a href="mailto:jeremias@apache.org">Jeremias Maerki</a>
  * @author Stephen Colebourne
- * @version $Id$
+ *
  * @since Commons IO 1.1
  */
 public class FilenameUtils {

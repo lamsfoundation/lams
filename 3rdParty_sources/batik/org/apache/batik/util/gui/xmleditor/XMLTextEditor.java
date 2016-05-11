@@ -40,7 +40,7 @@ import javax.swing.undo.UndoManager;
  * </pre>
  *
  * @author <a href="mailto:tonny@kiyut.com">Tonny Kohar</a>
- * @version $Id$
+ *
  */
 public class XMLTextEditor extends JEditorPane {
 

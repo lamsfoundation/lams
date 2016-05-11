@@ -27,7 +27,7 @@ import org.apache.batik.gvt.event.SelectionListener;
  * Interface which allows selection of GraphicsNodes and their contents.
  *
  * @author <a href="mailto:bill.haneman@ireland.sun.com">Bill Haneman</a>
- * @version $Id$
+ *
  */
 public interface Selector extends GraphicsNodeMouseListener,
                                   GraphicsNodeKeyListener,

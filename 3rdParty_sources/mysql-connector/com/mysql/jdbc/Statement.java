@@ -56,7 +56,7 @@ import java.util.TimerTask;
  * </p>
  * 
  * @author Mark Matthews
- * @version $Id: Statement.java 4624 2005-11-28 14:24:29 -0600 (Mon, 28 Nov
+ *
  *          2005) mmatthews $
  * 
  * @see java.sql.Statement

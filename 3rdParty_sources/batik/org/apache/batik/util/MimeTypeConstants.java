@@ -22,7 +22,7 @@ package org.apache.batik.util;
  * This interface defines constants for Various Mime Types
  *
  * @author <a href="mailto:deweese@apache.org">Thomas DeWeese</a>
- * @version $Id$
+ *
  */
 public interface MimeTypeConstants {
     //

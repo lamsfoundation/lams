@@ -8,7 +8,7 @@ import java.io.InputStream;
 
 /**
  * @author Bela Ban
- * @version $Id$
+ *
  */
 public class ExposedBufferedInputStream extends BufferedInputStream {
     private final static Log log=LogFactory.getLog(ExposedBufferedInputStream.class);

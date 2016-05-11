@@ -32,7 +32,7 @@ import org.w3c.dom.svg.SVGRectElement;
  * This class implements {@link SVGRectElement}.
  *
  * @author <a href="mailto:stephane@hillion.org">Stephane Hillion</a>
- * @version $Id$
+ *
  */
 public class SVGOMRectElement
     extends    SVGGraphicsElement

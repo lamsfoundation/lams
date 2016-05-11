@@ -32,7 +32,7 @@ import org.apache.batik.util.EncodingUtilities;
  * A collection of utility functions for XML.
  *
  * @author <a href="mailto:stephane@hillion.org">Stephane Hillion</a>
- * @version $Id$
+ *
  */
 public class XMLUtilities extends XMLCharacters {
 

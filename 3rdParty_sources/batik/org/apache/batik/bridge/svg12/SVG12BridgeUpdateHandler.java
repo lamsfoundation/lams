@@ -27,7 +27,7 @@ import org.w3c.dom.Element;
  * for XBL event notification.
  *
  * @author <a href="mailto:cam%40mcc%2eid%2eau">Cameron McCormack</a>
- * @version $Id$
+ *
  */
 public interface SVG12BridgeUpdateHandler extends BridgeUpdateHandler {
 

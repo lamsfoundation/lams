@@ -65,7 +65,7 @@ import org.apache.batik.gvt.text.TextSpanLayout;
  * @see org.apache.batik.gvt.text.GVTAttributedCharacterIterator
  *
  * @author <a href="mailto:bill.haneman@ireland.sun.com">Bill Haneman</a>
- * @version $Id$
+ *
  */
 public class StrokingTextPainter extends BasicTextPainter {
 

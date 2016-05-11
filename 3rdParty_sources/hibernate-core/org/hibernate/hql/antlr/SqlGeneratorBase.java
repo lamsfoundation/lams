@@ -1,6 +1,6 @@
 // $ANTLR 2.7.6 (2005-12-22): "sql-gen.g" -> "SqlGeneratorBase.java"$
 
-//   $Id$
+
 package org.hibernate.hql.antlr;
 
 import org.slf4j.Logger;

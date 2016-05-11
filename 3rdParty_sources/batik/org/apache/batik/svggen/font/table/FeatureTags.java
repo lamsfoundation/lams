@@ -21,7 +21,7 @@ package org.apache.batik.svggen.font.table;
 /**
  * Definition of Feature tags
  *
- * @version $Id$
+ *
  * @author <a href="mailto:vincent.hardy@eng.sun.com">Vincent Hardy</a>
  */
 public interface FeatureTags {

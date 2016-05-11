@@ -47,7 +47,7 @@ import org.apache.batik.ext.awt.image.GraphicsUtil;
  *
  * @author <a href="mailto:deweese@apache.org">Thomas DeWeese</a>
  * @author <a href="mailto:jun@oop-reserch.com">Jun Inamori</a>
- * @version $Id$ 
+ *
  */
 
 public class IndexImage{

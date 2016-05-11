@@ -98,7 +98,7 @@ import org.apache.commons.lang.ArrayUtils;
  * @author Gary Gregory
  * @author Pete Gieser
  * @since 1.0
- * @version $Id$
+ *
  */
 public class HashCodeBuilder {
     /**

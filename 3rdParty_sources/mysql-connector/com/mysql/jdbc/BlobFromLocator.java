@@ -48,7 +48,7 @@ import java.util.List;
  * 
  * @author Mark Matthews
  * 
- * @version $Id: BlobFromLocator.java,v 1.1.4.1 2005/05/19 18:31:49 mmatthews
+ *
  *          Exp $
  */
 public class BlobFromLocator implements java.sql.Blob {

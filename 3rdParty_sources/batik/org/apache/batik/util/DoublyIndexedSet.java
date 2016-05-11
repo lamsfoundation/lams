@@ -23,7 +23,7 @@ package org.apache.batik.util;
  * A set that uses two keys.
  *
  * @author <a href="mailto:cam%40mcc%2eid%2eau">Cameron McCormack</a>
- * @version $Id$
+ *
  */
 public class DoublyIndexedSet {
 

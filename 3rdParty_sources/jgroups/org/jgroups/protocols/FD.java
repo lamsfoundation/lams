@@ -31,7 +31,7 @@ import java.util.concurrent.locks.ReentrantLock;
  * NOT_MEMBER message. That member will then leave the group (and possibly rejoin). This is only done if
  * <code>shun</code> is true.
  * @author Bela Ban
- * @version $Id$
+ *
  */
 public class FD extends Protocol {
     Address               local_addr=null;

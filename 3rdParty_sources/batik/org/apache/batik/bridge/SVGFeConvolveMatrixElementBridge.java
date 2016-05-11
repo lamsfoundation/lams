@@ -37,7 +37,7 @@ import org.w3c.dom.Element;
  * Bridge class for the &lt;feConvolveMatrix> element.
  *
  * @author <a href="mailto:tkormann@apache.org">Thierry Kormann</a>
- * @version $Id$
+ *
  */
 public class SVGFeConvolveMatrixElementBridge
     extends AbstractSVGFilterPrimitiveElementBridge {

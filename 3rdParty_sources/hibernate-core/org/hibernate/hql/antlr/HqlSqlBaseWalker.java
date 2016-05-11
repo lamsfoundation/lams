@@ -1,6 +1,6 @@
 // $ANTLR 2.7.6 (2005-12-22): "hql-sql.g" -> "HqlSqlBaseWalker.java"$
 
-// $Id$
+
 package org.hibernate.hql.antlr;
 
 import org.slf4j.Logger;

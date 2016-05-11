@@ -31,7 +31,7 @@ import java.util.Vector;
  * constructor !</b>
  *
  * @author Bela Ban
- * @version $Id$
+ *
  */
 public abstract class Protocol {
     protected final Properties props=new Properties();

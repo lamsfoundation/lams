@@ -36,7 +36,7 @@ import java.util.Vector;
  * It essentially ignores the dependency and dirty region methods.
  *
  * @author <a href="mailto:Thomas.DeWeeese@Kodak.com">Thomas DeWeese</a>
- * @version $Id$
+ *
  */
 public class RenderedImageCachableRed implements CachableRed {
 

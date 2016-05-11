@@ -39,7 +39,7 @@ import org.w3c.dom.svg.SVGTransformList;
  * This class is the implementation of the SVGAnimatedTransformList interface.
  *
  * @author <a href="mailto:nicolas.socheleau@bitflash.com">Nicolas Socheleau</a>
- * @version $Id$
+ *
  */
 public class SVGOMAnimatedTransformList
         extends AbstractSVGAnimatedValue

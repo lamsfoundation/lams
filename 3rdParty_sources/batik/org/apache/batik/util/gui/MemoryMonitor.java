@@ -66,7 +66,7 @@ import org.apache.batik.util.resources.ResourceManager;
  * track and display the memory usage.
  *
  * @author <a href="mailto:stephane@hillion.org">Stephane Hillion</a>
- * @version $Id$
+ *
  */
 public class MemoryMonitor extends JFrame implements ActionMap {
     /**

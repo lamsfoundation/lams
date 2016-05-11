@@ -35,7 +35,7 @@ import org.apache.batik.util.gui.ExtendedGridBagConstraints;
  * This class represents a panel to control jpeg encoding quality.
  *
  * @author <a href="mailto:tkormann@apache.org">Thierry Kormann</a>
- * @version $Id$
+ *
  */
 public class JPEGOptionPanel extends OptionPanel {
     /**

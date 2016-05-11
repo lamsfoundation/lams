@@ -28,7 +28,7 @@ import org.xml.sax.XMLFilter;
  * This class represents a single output for a <tt>Transcoder</tt>.
  *
  * @author <a href="mailto:Thierry.Kormann@sophia.inria.fr">Thierry Kormann</a>
- * @version $Id$
+ *
  */
 public class TranscoderOutput {
 

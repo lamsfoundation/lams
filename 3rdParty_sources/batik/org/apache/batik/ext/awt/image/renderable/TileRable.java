@@ -24,7 +24,7 @@ import java.awt.geom.Rectangle2D;
  * A renderable that can tile its source into the tile region.
  *
  * @author <a href="mailto:vincent.hardy@eng.sun.com">Vincent Hardy</a>
- * @version $Id$
+ *
  */
 public interface TileRable extends FilterColorInterpolation {
     /**

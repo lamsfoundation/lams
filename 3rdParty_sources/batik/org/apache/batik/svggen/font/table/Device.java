@@ -24,7 +24,7 @@ import java.io.RandomAccessFile;
 /**
  *
  * @author <a href="mailto:david@steadystate.co.uk">David Schweinsberg</a>
- * @version $Id$
+ *
  */
 public class Device {
 

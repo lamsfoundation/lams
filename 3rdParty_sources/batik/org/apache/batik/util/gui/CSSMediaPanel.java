@@ -62,7 +62,7 @@ import org.apache.batik.util.resources.ResourceManager;
  * This class represents a panel to edit/add/remove CSS media.
  *
  * @author <a href="mailto:tkormann@apache.org">Thierry Kormann</a>
- * @version $Id$
+ *
  */
 public class CSSMediaPanel extends JPanel implements ActionMap {
 

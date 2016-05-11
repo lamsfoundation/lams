@@ -29,7 +29,7 @@ import org.apache.batik.util.SVGConstants;
  * context attribute.
  *
  * @author <a href="mailto:vincent.hardy@eng.sun.com">Vincent Hardy</a>
- * @version $Id$
+ *
  */
 public class SVGGraphicContext implements SVGConstants, ErrorConstants {
     // this properties can only be set of leaf nodes =>

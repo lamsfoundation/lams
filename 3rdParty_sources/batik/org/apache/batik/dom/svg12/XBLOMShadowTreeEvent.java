@@ -26,7 +26,7 @@ import org.apache.batik.dom.xbl.XBLShadowTreeElement;
  * This class implements the {@link ShadowTreeEvent} event class.
  *
  * @author <a href="mailto:cam%40mcc%2eid%2eau">Cameron McCormack</a>
- * @version $Id$
+ *
  */
 public class XBLOMShadowTreeEvent extends AbstractEvent
                                   implements ShadowTreeEvent {

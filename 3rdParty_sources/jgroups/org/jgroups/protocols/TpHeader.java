@@ -11,7 +11,7 @@ import java.io.*;
 /**
  * Generic transport header, used by TP.
  * @author Bela Ban
- * @version $Id$
+ *
  */
 public class TpHeader extends Header implements Streamable {
     public String channel_name=null;

@@ -32,7 +32,7 @@ import org.w3c.dom.svg.SVGMPathElement;
  * This class implements {@link SVGMPathElement}.
  *
  * @author <a href="mailto:stephane@hillion.org">Stephane Hillion</a>
- * @version $Id$
+ *
  */
 public class SVGOMMPathElement
     extends    SVGOMURIReferenceElement

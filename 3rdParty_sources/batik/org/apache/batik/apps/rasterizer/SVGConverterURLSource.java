@@ -26,7 +26,7 @@ import org.apache.batik.util.ParsedURL;
 
 /*
  * @author <a href="mailto:vhardy@apache.org">Vincent Hardy</a>
- * @version $Id$
+ *
  */
 public class SVGConverterURLSource implements SVGConverterSource {
     /** 

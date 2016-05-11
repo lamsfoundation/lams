@@ -30,7 +30,7 @@ import org.apache.batik.util.SMILConstants;
  * An animation class for 'animate' animations.
  *
  * @author <a href="mailto:cam%40mcc%2eid%2eau">Cameron McCormack</a>
- * @version $Id$
+ *
  */
 public class SimpleAnimation extends InterpolatingAnimation {
 

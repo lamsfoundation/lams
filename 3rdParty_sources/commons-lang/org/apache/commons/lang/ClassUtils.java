@@ -43,7 +43,7 @@ import org.apache.commons.lang.text.StrBuilder;
  * @author Alban Peignier
  * @author Tomasz Blachowicz
  * @since 2.0
- * @version $Id$
+ *
  */
 public class ClassUtils {
 

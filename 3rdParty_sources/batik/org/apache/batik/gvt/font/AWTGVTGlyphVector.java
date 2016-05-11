@@ -43,7 +43,7 @@ import org.apache.batik.gvt.text.TextPaintInfo;
  * This is a wrapper class for a java.awt.font.GlyphVector instance.
  *
  * @author <a href="mailto:bella.robinson@cmis.csiro.au">Bella Robinson</a>
- * @version $Id$
+ *
  */
 public class AWTGVTGlyphVector implements GVTGlyphVector {
 

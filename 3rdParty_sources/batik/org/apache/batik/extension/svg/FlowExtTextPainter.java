@@ -34,7 +34,7 @@ import org.apache.batik.gvt.renderer.StrokingTextPainter;
  * Complete Class Desc
  *
  * @author <a href="mailto:deweese@apache.org">deweese</a>
- * @version $Id$
+ *
  */
 public class FlowExtTextPainter extends StrokingTextPainter {
 

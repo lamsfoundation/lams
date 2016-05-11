@@ -29,7 +29,7 @@ import org.w3c.dom.svg.SVGTests;
  * Bridge class for the &lt;switch> element.
  *
  * @author <a href="mailto:tkormann@apache.org">Thierry Kormann</a>
- * @version $Id$
+ *
  */
 public class SVGSwitchElementBridge extends SVGGElementBridge {
 

@@ -32,7 +32,7 @@ import org.w3c.dom.svg.SVGFECompositeElement;
  * This class implements {@link SVGFECompositeElement}.
  *
  * @author <a href="mailto:stephane@hillion.org">Stephane Hillion</a>
- * @version $Id$
+ *
  */
 public class SVGOMFECompositeElement
     extends    SVGOMFilterPrimitiveStandardAttributes

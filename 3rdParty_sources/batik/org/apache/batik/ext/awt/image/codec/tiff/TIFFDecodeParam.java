@@ -69,7 +69,7 @@ import  org.apache.batik.ext.awt.image.codec.util.ImageDecodeParam;
  *
  * @see TIFFDirectory
  *
- * @version $Id$
+ *
  */
 public class TIFFDecodeParam implements ImageDecodeParam {
 

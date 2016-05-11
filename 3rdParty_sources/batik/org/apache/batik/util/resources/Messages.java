@@ -28,7 +28,7 @@ import org.apache.batik.i18n.LocalizableSupport;
  * This class manages the message for the utilities classes.
  *
  * @author <a href="mailto:Thierry.Kormann@sophia.inria.fr">Thierry Kormann</a>
- * @version $Id$
+ *
  */
 public class Messages {
     /**

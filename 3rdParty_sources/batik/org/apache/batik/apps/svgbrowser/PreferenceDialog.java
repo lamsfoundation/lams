@@ -81,7 +81,7 @@ import org.apache.batik.util.gui.LanguageDialog;
  * Dialog that displays user preferences.
  *
  * @author <a href="mailto:vhardy@apache.org">Vincent Hardy</a>
- * @version $Id$
+ *
  */
 public class PreferenceDialog extends JDialog
     implements GridBagConstants {

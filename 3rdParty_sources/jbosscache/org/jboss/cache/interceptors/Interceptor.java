@@ -32,7 +32,7 @@ import org.jboss.cache.interceptors.base.CommandInterceptor;
  * Class representing an interceptor.
  *
  * @author Bela Ban
- * @version $Id$
+ *
  * @deprecated this will be removed in a 3.x release.  Please use {@link org.jboss.cache.interceptors.base.CommandInterceptor} instead, since it provides strongly typed callbacks which are more efficient.
  */
 @Deprecated

@@ -22,7 +22,7 @@ package org.apache.commons.lang.mutable;
  * @see Short
  * @since 2.1
  * @author Apache Software Foundation
- * @version $Id$
+ *
  */
 public class MutableShort extends Number implements Comparable, Mutable {
 

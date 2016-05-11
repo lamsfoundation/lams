@@ -22,7 +22,7 @@ package org.apache.batik.util;
  * String constants used by the DOM classes.
  *
  * @author <a href="mailto:cam%40mcc%2eid%2eau">Cameron McCormack</a>
- * @version $Id$
+ *
  */
 public interface DOMConstants {
 

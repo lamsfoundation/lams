@@ -25,7 +25,7 @@ package org.apache.batik.ext.awt.image;
  * of the SVG specification.
  *
  * @author <a href="mailto:sheng.pei@sun.com">Sheng Pei</a>
- * @version $Id$
+ *
  */
 public class DiscreteTransfer implements TransferFunction {
     /**

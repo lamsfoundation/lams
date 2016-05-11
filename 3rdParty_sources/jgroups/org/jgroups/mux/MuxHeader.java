@@ -10,7 +10,7 @@ import java.io.*;
 /**
  * Header used for multiplexing and de-multiplexing between service components on top of a Multiplexer (Channel)
  * @author Bela Ban
- * @version $Id$
+ *
  */
 public class MuxHeader extends Header implements Streamable {
     String      id=null;

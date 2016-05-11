@@ -36,7 +36,7 @@ import org.w3c.dom.svg.SVGDocument;
  *
  * @author <a href="mailto:cjolif@ilog.fr">Christophe Jolif</a>
  * @author <a href="mailto:stephane@hillion.org">Stephane Hillion</a>
- * @version $Id$
+ *
  */
 public interface UserAgent {
 

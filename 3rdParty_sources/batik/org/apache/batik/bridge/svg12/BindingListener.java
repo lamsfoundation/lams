@@ -26,7 +26,7 @@ import org.w3c.dom.Element;
  * The interface for listening to binding changes on bindable elements.
  *
  * @author <a href="mailto:cam%40mcc%2eid%2eau">Cameron McCormack</a>
- * @version $Id$
+ *
  */
 public interface BindingListener extends EventListener {
 

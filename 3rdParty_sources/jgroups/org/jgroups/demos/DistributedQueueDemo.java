@@ -1,4 +1,4 @@
-// $Id$
+
 package org.jgroups.demos;
 
 import org.jgroups.ChannelException;

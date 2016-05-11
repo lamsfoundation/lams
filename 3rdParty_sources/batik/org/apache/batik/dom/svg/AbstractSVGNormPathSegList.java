@@ -34,7 +34,7 @@ import org.w3c.dom.svg.SVGPathSeg;
  * <code>SVGPathSegList</code>.
  *
  * @author <a href="mailto:andrest@world-affair.com">Andres Toussaint</a>
- * @version $Id$
+ *
  */
 public abstract class AbstractSVGNormPathSegList extends AbstractSVGPathSegList {
 

@@ -281,7 +281,7 @@ import org.apache.commons.lang.StringUtils;
  * @author Mike Bowler
  * @author Matthias Eichel
  * @since 2.1 (class existed in enum package from v1.0)
- * @version $Id$
+ *
  */
 public abstract class Enum implements Comparable, Serializable {
 

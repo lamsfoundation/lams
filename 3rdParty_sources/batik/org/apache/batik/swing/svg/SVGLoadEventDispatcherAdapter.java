@@ -23,7 +23,7 @@ package org.apache.batik.swing.svg;
  * interface.
  *
  * @author <a href="mailto:stephane@hillion.org">Stephane Hillion</a>
- * @version $Id$
+ *
  */
 public class SVGLoadEventDispatcherAdapter
     implements SVGLoadEventDispatcherListener {

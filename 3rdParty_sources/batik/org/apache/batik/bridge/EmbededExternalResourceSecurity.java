@@ -26,7 +26,7 @@ import org.apache.batik.util.ParsedURL;
  * embeded with the data protocol.
  *
  * @author <a href="mailto:vhardy@apache.org">Vincent Hardy</a>
- * @version $Id$
+ *
  */
 public class EmbededExternalResourceSecurity implements ExternalResourceSecurity {
     public static final String DATA_PROTOCOL = "data";

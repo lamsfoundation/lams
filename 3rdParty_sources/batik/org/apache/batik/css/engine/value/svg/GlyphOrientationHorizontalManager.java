@@ -26,7 +26,7 @@ import org.apache.batik.util.CSSConstants;
  * property values.
  *
  * @author <a href="mailto:stephane@hillion.org">Stephane Hillion</a>
- * @version $Id$
+ *
  */
 public class GlyphOrientationHorizontalManager
     extends GlyphOrientationManager {

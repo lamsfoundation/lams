@@ -22,7 +22,7 @@ package org.apache.batik.anim.timing;
  * An adapter class for {@link TimegraphListener}s.
  *
  * @author <a href="mailto:cam%40mcc%2eid%2eau">Cameron McCormack</a>
- * @version $Id$
+ *
  */
 public class TimegraphAdapter implements TimegraphListener {
 

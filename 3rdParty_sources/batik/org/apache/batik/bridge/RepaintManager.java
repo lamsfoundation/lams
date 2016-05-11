@@ -36,7 +36,7 @@ import org.apache.batik.ext.awt.geom.RectListManager;
  *
  * @author <a href="mailto:stephane@hillion.org">Stephane Hillion</a>
  * @author <a href="mailto:vincent.hardy@sun.com">Vincent Hardy</a>
- * @version $Id$
+ *
  */
 public class RepaintManager {
     static final int COPY_OVERHEAD      = 10000;

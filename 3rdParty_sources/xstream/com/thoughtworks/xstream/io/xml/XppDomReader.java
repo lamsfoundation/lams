@@ -4,7 +4,7 @@ import com.thoughtworks.xstream.io.xml.xppdom.Xpp3Dom;
 
 /**
  * @author <a href="mailto:jason@maven.org">Jason van Zyl</a>
- * @version $Id$
+ *
  */
 public class XppDomReader extends AbstractDocumentReader {
 

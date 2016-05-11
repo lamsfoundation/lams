@@ -32,7 +32,7 @@ import java.awt.geom.PathIterator;
  * contract for that class.
  *
  * @author <a href="mailto:deweese@apache.org">Thomas DeWeese</a>
- * @version $Id$
+ *
  */
 public interface ExtendedPathIterator {
 

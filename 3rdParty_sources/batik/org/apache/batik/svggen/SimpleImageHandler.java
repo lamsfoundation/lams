@@ -32,7 +32,7 @@ import org.w3c.dom.Element;
  * attribute on the elements it creates.
  *
  * @author <a href="mailto:vincent.hardy@sun.com">Vincent Hardy</a>
- * @version $Id$
+ *
  */
 public class SimpleImageHandler implements GenericImageHandler, SVGSyntax, ErrorConstants {
     // duplicate the string here to remove dependencies on

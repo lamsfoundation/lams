@@ -34,7 +34,7 @@ import javax.swing.JRadioButtonMenuItem;
  * browser frame.
  *
  * @author <a href="mailto:stephane@hillion.org">Stephane Hillion</a>
- * @version $Id$
+ *
  */
 public class LocalHistory {
     /**

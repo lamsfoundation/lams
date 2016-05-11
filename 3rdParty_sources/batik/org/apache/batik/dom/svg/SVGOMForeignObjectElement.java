@@ -30,7 +30,7 @@ import org.w3c.dom.svg.SVGForeignObjectElement;
  * This class implements {@link SVGForeignObjectElement}.
  *
  * @author <a href="mailto:stephane@hillion.org">Stephane Hillion</a>
- * @version $Id$
+ *
  */
 public class SVGOMForeignObjectElement
     extends    SVGGraphicsElement

@@ -28,7 +28,7 @@ import org.w3c.dom.svg.SVGPathSeg;
  * parsing path data.
  *
  * @author <a href="mailto:cam%40mcc%2eid%2eau">Cameron McCormack</a>
- * @version $Id$
+ *
  */
 public class PathArrayProducer implements PathHandler {
 

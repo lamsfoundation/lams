@@ -24,7 +24,7 @@ import java.util.Map;
  * This class defines an API for transcoding.
  *
  * @author <a href="mailto:Thierry.Kormann@sophia.inria.fr">Thierry Kormann</a>
- * @version $Id$
+ *
  */
 public interface Transcoder {
 

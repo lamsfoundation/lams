@@ -43,7 +43,7 @@ import org.w3c.dom.NodeList;
  * A collection of utility functions for the DOM.
  *
  * @author <a href="mailto:stephane@hillion.org">Stephane Hillion</a>
- * @version $Id$
+ *
  */
 public class DOMUtilities extends XMLUtilities {
     /**

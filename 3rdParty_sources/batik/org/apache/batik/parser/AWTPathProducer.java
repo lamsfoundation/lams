@@ -30,7 +30,7 @@ import org.apache.batik.ext.awt.geom.ExtendedGeneralPath;
  * a Shape from the value of a path's 'd' attribute.
  *
  * @author <a href="mailto:stephane@hillion.org">Stephane Hillion</a>
- * @version $Id$
+ *
  */
 public class AWTPathProducer implements PathHandler, ShapeProducer {
 

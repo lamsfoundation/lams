@@ -42,7 +42,7 @@ import java.util.ArrayList;
  * </p>
  *
  * @author <a href="mailto:dean.jackson@cmis.csiro.au">Dean Jackson</a>
- * @version $Id$
+ *
  */
 public class PathLength {
 

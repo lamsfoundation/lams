@@ -31,7 +31,7 @@ import org.w3c.dom.svg.SVGFEDiffuseLightingElement;
  * This class implements {@link SVGFEDiffuseLightingElement}.
  *
  * @author <a href="mailto:stephane@hillion.org">Stephane Hillion</a>
- * @version $Id$
+ *
  */
 public class SVGOMFEDiffuseLightingElement
     extends    SVGOMFilterPrimitiveStandardAttributes

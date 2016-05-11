@@ -36,7 +36,7 @@ import org.w3c.dom.events.MutationEvent;
  * Bridge class for an SVGDocument node.
  *
  * @author <a href="mailto:cam%40mcc%2eid%2eau">Cameron McCormack</a>
- * @version $Id$
+ *
  */
 public class SVGDocumentBridge implements DocumentBridge, BridgeUpdateHandler,
                                           SVGContext {

@@ -24,7 +24,7 @@ import org.apache.batik.anim.timing.TimedElement;
  * An exception class for SMIL animation exceptions.
  *
  * @author <a href="mailto:cam%40mcc%2eid%2eau">Cameron McCormack</a>
- * @version $Id$
+ *
  */
 public class AnimationException extends RuntimeException {
 

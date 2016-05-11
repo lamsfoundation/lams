@@ -28,7 +28,7 @@ import org.apache.batik.gvt.text.GVTAttributedCharacterIterator;
 
 /**
  *
- * @version $Id$
+ *
  */
 public class TextLineBreaks {
     public static final AttributedCharacterIterator.Attribute WORD_LIMIT =

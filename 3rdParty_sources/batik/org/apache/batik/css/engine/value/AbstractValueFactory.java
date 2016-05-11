@@ -25,7 +25,7 @@ import org.w3c.dom.DOMException;
  * This class provides a base implementation for the value factories.
  *
  * @author <a href="mailto:stephane@hillion.org">Stephane Hillion</a>
- * @version $Id$
+ *
  */
 public abstract class AbstractValueFactory {
     

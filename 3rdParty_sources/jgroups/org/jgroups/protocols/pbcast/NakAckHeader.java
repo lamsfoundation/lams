@@ -14,7 +14,7 @@ import java.io.*;
 
 /**
  * @author Bela Ban
- * @version $Id$
+ *
  */
 public class NakAckHeader extends Header implements Streamable {
     public static final byte MSG=1;       // regular msg

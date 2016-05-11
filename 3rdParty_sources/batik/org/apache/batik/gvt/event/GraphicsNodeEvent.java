@@ -26,7 +26,7 @@ import org.apache.batik.gvt.GraphicsNode;
  * A low-level event for GraphicsNode.
  *
  * @author <a href="mailto:Thierry.Kormann@sophia.inria.fr">Thierry Kormann</a>
- * @version $Id$
+ *
  */
 public class GraphicsNodeEvent extends EventObject {
 

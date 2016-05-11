@@ -34,7 +34,7 @@ import org.apache.batik.util.io.StringNormalizingReader;
  * This class represents a scanner for XML documents.
  *
  * @author <a href="mailto:stephane@hillion.org">Stephane Hillion</a>
- * @version $Id$
+ *
  */
 public class XMLScanner implements Localizable {
 

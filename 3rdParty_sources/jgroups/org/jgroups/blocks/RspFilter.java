@@ -8,7 +8,7 @@ import org.jgroups.Address;
  * request will not return (assuming timeout is 0) when the first response has been received, but when the filter
  * passed
  * @author Bela Ban
- * @version $Id$
+ *
  */
 public interface RspFilter {
 

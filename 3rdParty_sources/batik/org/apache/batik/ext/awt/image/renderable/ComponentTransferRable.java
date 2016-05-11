@@ -25,7 +25,7 @@ import org.apache.batik.ext.awt.image.ComponentTransferFunction;
  * transfer operation.
  *
  * @author <a href="mailto:vincent.hardy@eng.sun.com">Vincent Hardy</a>
- * @version $Id$
+ *
  */
 public interface ComponentTransferRable extends FilterColorInterpolation {
 

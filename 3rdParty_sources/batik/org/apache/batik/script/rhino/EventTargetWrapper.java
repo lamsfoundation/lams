@@ -46,7 +46,7 @@ import org.w3c.dom.events.EventTarget;
  * a parameter instead of a function provided the fact that this object
  * has a <code>handleEvent</code> method.
  * @author <a href="mailto:cjolif@ilog.fr">Christophe Jolif</a>
- * @version $Id$
+ *
  */
 class EventTargetWrapper extends NativeJavaObject {
 

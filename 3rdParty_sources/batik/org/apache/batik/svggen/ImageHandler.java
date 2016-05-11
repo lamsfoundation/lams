@@ -33,7 +33,7 @@ import org.w3c.dom.Element;
  * in SVG source. <br>
  *
  * @author <a href="mailto:vincent.hardy@eng.sun.com">Vincent Hardy</a>
- * @version $Id$
+ *
  * @see             org.apache.batik.svggen.SVGGraphics2D
  */
 public interface ImageHandler extends SVGSyntax {

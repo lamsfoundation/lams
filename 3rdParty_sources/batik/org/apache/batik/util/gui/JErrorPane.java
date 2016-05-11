@@ -54,7 +54,7 @@ import org.apache.batik.util.resources.ResourceManager;
  * This class represents a dialog to display an error (message + Exception).
  *
  * @author <a href="mailto:tkormann@apache.org">Thierry Kormann</a>
- * @version $Id$
+ *
  */
 public class JErrorPane extends JPanel implements ActionMap {
 

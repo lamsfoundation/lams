@@ -23,7 +23,7 @@ package org.apache.batik.ext.awt.image.renderable;
  * defined by standard deviations along the x and y axis.
  *
  * @author <a href="mailto:vincent.hardy@eng.sun.com">Vincent Hardy</a>
- * @version $Id$
+ *
  */
 public interface GaussianBlurRable extends FilterColorInterpolation {
 

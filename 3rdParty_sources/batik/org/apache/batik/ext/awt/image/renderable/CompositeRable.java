@@ -27,7 +27,7 @@ import org.apache.batik.ext.awt.image.CompositeRule;
  * the image are applied in the order they are in the List given.
  *
  * @author <a href="mailto:Thomas.DeWeeese@Kodak.com">Thomas DeWeese</a>
- * @version $Id$
+ *
  */
 public interface CompositeRable extends FilterColorInterpolation {
 

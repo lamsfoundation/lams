@@ -1,4 +1,4 @@
-// $Id$
+
 
 package org.jgroups.blocks;
 
@@ -32,7 +32,7 @@ import java.util.*;
  * initial state (using the state exchange funclet <code>StateExchangeFunclet</code>.
  * @author Bela Ban
  * @author <a href="mailto:aolias@yahoo.com">Alfonso Olias-Sanz</a>
- * @version $Id$
+ *
  * @deprecated Use {@link org.jgroups.blocks.ReplicatedHashMap} instead
  */
 public class DistributedHashtable extends Hashtable implements ExtendedMessageListener, ExtendedMembershipListener {

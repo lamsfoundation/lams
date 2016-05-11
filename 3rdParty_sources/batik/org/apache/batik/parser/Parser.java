@@ -26,7 +26,7 @@ import org.apache.batik.i18n.Localizable;
  * This interface represents a parser.
  *
  * @author <a href="mailto:stephane@hillion.org">Stephane Hillion</a>
- * @version $Id$
+ *
  */
 public interface Parser extends Localizable {
     /**

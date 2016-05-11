@@ -25,7 +25,7 @@ import java.net.URL;
  * instances for a particular script language.
  *
  * @author <a href="mailto:cjolif@ilog.fr">Christophe Jolif</a>
- * @version $Id$
+ *
  */
 public interface InterpreterFactory {
 

@@ -29,7 +29,7 @@ import org.apache.batik.gvt.text.GVTAttributedCharacterIterator;
  * A font family class for AWT fonts.
  *
  * @author <a href="mailto:bella.robinson@cmis.csiro.au">Bella Robinson</a>
- * @version $Id$
+ *
  */
 public class AWTFontFamily implements GVTFontFamily {
 

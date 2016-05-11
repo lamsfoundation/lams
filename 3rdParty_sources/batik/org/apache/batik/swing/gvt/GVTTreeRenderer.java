@@ -35,7 +35,7 @@ import org.apache.batik.util.HaltingThread;
  * a GVT tree.
  *
  * @author <a href="mailto:stephane@hillion.org">Stephane Hillion</a>
- * @version $Id$
+ *
  */
 public class GVTTreeRenderer extends HaltingThread {
 

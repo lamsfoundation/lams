@@ -29,7 +29,7 @@ import org.w3c.dom.events.EventTarget;
  * <code>EventTarget</code> objects as DOM Level 2 recommendation
  * required.
  * @author <a href="mailto:cjolif@ilog.fr">Christophe Jolif</a>
- * @version $Id$
+ *
  */
 class BatikWrapFactory extends WrapFactory {
     private RhinoInterpreter interpreter;

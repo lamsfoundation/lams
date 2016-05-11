@@ -25,7 +25,7 @@ import org.w3c.dom.DOMImplementation;
  * A transcoding Key represented as a DOMImplementation.
  *
  * @author <a href="mailto:Thierry.Kormann@sophia.inria.fr">Thierry Kormann</a>
- * @version $Id$
+ *
  */
 public class DOMImplementationKey extends TranscodingHints.Key {
 

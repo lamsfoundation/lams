@@ -30,7 +30,7 @@ import org.xml.sax.XMLReader;
  * This interface represents an object which can build a Document.
  *
  * @author <a href="mailto:stephane@hillion.org">Stephane Hillion</a>
- * @version $Id$
+ *
  */
 public interface DocumentFactory {
 

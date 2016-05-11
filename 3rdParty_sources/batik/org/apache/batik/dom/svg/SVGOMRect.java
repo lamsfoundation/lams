@@ -26,7 +26,7 @@ import org.w3c.dom.svg.SVGRect;
  * attribute.
  *
  * @author <a href="mailto:thomas.deweese@kodak.com">Thomas DeWeese</a>
- * @version $Id$
+ *
  */
 public class SVGOMRect implements SVGRect {
 

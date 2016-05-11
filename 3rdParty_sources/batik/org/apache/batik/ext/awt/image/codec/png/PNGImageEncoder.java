@@ -259,7 +259,7 @@ class IDATOutputStream extends FilterOutputStream {
  * An ImageEncoder for the PNG file format.
  *
  * @since EA4
- * @version $Id$
+ *
  */
 public class PNGImageEncoder extends ImageEncoderImpl {
 

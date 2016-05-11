@@ -21,7 +21,7 @@ import java.io.*;
  * <em>Note that SFC supports only flow control for multicast messages; unicast flow control is not supported ! Use FC if
  * unicast flow control is required.</em>
  * @author Bela Ban
- * @version $Id$
+ *
  */
 public class SFC extends Protocol {
     static final String name="SFC";

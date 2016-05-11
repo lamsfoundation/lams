@@ -51,7 +51,7 @@ import org.apache.commons.lang.StringUtils;
  * @author Phil Steitz
  * @author Robert Scholte
  * @since 2.0
- * @version $Id$
+ *
  */
 public class DateUtils {
     

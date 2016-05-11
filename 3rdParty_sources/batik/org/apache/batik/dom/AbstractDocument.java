@@ -83,7 +83,7 @@ import org.w3c.dom.xpath.XPathResult;
  * This class implements the {@link org.w3c.dom.Document} interface.
  *
  * @author <a href="mailto:stephane@hillion.org">Stephane Hillion</a>
- * @version $Id$
+ *
  */
 public abstract class AbstractDocument
     extends    AbstractParentNode

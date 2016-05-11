@@ -38,7 +38,7 @@ import org.apache.batik.ext.awt.image.rendered.RenderedImageCachableRed;
  * according the the SVG Mask operation.
  *
  * @author <a href="mailto:Thomas.DeWeese@Kodak.com">Thomas DeWeese</a>
- * @version $Id$
+ *
  */
 public class FilterAsAlphaRable
     extends    AbstractRable {

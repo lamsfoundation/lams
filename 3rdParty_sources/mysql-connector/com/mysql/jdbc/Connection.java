@@ -81,7 +81,7 @@ import java.util.TreeMap;
  * </p>
  * 
  * @author Mark Matthews
- * @version $Id$
+ *
  * @see java.sql.Connection
  */
 public class Connection extends ConnectionProperties implements

@@ -25,7 +25,7 @@ import java.awt.Graphics;
  * in a JGVTComponent.
  *
  * @author <a href="mailto:stephane@hillion.org">Stephane Hillion</a>
- * @version $Id$
+ *
  */
 public interface Overlay {
     

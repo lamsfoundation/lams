@@ -21,7 +21,7 @@ package org.apache.batik.svggen.font.table;
 import java.io.ByteArrayInputStream;
 
 /**
- * @version $Id$
+ *
  * @author <a href="mailto:david@steadystate.co.uk">David Schweinsberg</a>
  */
 public abstract class GlyfDescript extends Program implements GlyphDescription {

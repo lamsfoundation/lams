@@ -30,7 +30,7 @@ import org.w3c.dom.Node;
  * Base class for all XBL elements to inherit from.
  *
  * @author <a href="mailto:cam%40mcc%2eid%2eau">Cameron McCormack</a>
- * @version $Id$
+ *
  */
 public abstract class XBLOMElement extends SVGOMElement
                                    implements XBLConstants {

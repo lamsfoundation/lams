@@ -27,7 +27,7 @@ import org.w3c.dom.Node;
  * This class implements a regular polygon extension to SVG
  *
  * @author <a href="mailto:thomas.deweese@kodak.com">Thomas DeWeese</a>
- * @version $Id$
+ *
  */
 public class   SVGOMFlowSpanElement 
     extends    SVGOMTextPositioningElement {

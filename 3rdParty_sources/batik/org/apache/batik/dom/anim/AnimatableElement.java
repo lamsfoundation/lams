@@ -26,7 +26,7 @@ import org.apache.batik.anim.values.AnimatableValue;
  * {@link org.apache.batik.anim.AbstractAnimation}.
  * 
  * @author <a href="mailto:cam%40mcc%2eid%2eau">Cameron McCormack</a>
- * @version $Id$
+ *
  */
 public interface AnimatableElement {
 

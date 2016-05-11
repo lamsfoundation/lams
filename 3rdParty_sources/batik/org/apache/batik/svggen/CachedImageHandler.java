@@ -24,7 +24,7 @@ package org.apache.batik.svggen;
  * allow caching of raster images in generated SVG content.
  *
  * @author <a href="mailto:paul_evenblij@compuware.com">Paul Evenblij</a>
- * @version $Id$
+ *
  */
 public interface CachedImageHandler extends GenericImageHandler {
     /**

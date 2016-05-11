@@ -24,7 +24,7 @@ package org.apache.batik.transcoder;
  * a message when a warning or an error occured.
  *
  * @author <a href="mailto:Thierry.Kormann@sophia.inria.fr">Thierry Kormann</a>
- * @version $Id$
+ *
  */
 public class DefaultErrorHandler implements ErrorHandler {
 

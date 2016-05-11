@@ -26,7 +26,7 @@ import org.apache.batik.dom.util.XMLSupport;
  * descriptive text.
  *
  * @author <a href="mailto:stephane@hillion.org">Stephane Hillion</a>
- * @version $Id$
+ *
  */
 public abstract class SVGDescriptiveElement extends SVGStylableElement {
 

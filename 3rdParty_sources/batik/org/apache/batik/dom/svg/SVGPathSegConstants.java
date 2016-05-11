@@ -22,7 +22,7 @@ package org.apache.batik.dom.svg;
  * Constants for the SVGPathSeg interface.
  *
  * @author <a href="mailto:nicolas.socheleau@bitflash.com">Nicolas Socheleau</a>
- * @version $Id$
+ *
  */
 public interface SVGPathSegConstants {
 

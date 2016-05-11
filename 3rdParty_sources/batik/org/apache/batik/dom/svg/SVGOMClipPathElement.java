@@ -30,7 +30,7 @@ import org.w3c.dom.svg.SVGClipPathElement;
  * This class implements {@link SVGClipPathElement}.
  *
  * @author <a href="mailto:stephane@hillion.org">Stephane Hillion</a>
- * @version $Id$
+ *
  */
 public class SVGOMClipPathElement
     extends    SVGGraphicsElement

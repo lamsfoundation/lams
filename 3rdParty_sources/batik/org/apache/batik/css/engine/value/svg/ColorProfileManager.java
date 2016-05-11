@@ -34,7 +34,7 @@ import org.w3c.dom.css.CSSPrimitiveValue;
  * This class provides a manager for the 'color-interpolation' property values.
  *
  * @author <a href="mailto:stephane@hillion.org">Stephane Hillion</a>
- * @version $Id$
+ *
  */
 public class ColorProfileManager extends AbstractValueManager {
     

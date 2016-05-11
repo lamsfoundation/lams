@@ -27,7 +27,7 @@ import org.w3c.dom.Element;
  * Bridge class for vending <tt>Paint</tt> objects.
  *
  * @author <a href="mailto:tkormann@apache.org">Thierry Kormann</a>
- * @version $Id$
+ *
  */
 public interface PaintBridge extends Bridge {
 

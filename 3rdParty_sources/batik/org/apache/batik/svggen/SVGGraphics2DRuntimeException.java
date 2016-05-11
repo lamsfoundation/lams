@@ -22,7 +22,7 @@ package org.apache.batik.svggen;
  * Thrown when an SVG Generator method receives an illegal argument in parameter.
  *
  * @author <a href="mailto:cjolif@ilog.fr">Christophe Jolif</a>
- * @version $Id$
+ *
  */
 public class SVGGraphics2DRuntimeException extends RuntimeException {
     /** The enclosed exception. */

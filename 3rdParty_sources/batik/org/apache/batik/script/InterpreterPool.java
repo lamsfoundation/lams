@@ -40,7 +40,7 @@ import org.w3c.dom.Document;
  * files).</p>
  *
  * @author <a href="mailto:cjolif@ilog.fr">Christophe Jolif</a>
- * @version $Id$
+ *
  */
 public class InterpreterPool {
 

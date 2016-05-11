@@ -5,7 +5,7 @@ import org.jgroups.protocols.*;
 
 /**
  * @author Bela Ban
- * @version $Id$
+ *
  */
 public class STATS extends org.jgroups.jmx.Protocol implements STATSMBean {
     org.jgroups.protocols.STATS p;

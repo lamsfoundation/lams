@@ -30,7 +30,7 @@ import org.w3c.dom.Element;
  * A base Bridge class for the kerning elements.
  *
  * @author <a href="mailto:dean.jackson@cmis.csiro.au">Dean Jackson</a>
- * @version $Id$
+ *
  */
 public abstract class SVGKernElementBridge extends AbstractSVGBridge {
 

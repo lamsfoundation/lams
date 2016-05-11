@@ -26,7 +26,7 @@ import org.w3c.dom.svg.SVGFEFuncAElement;
  * This class implements {@link SVGFEFuncAElement}.
  *
  * @author <a href="mailto:stephane@hillion.org">Stephane Hillion</a>
- * @version $Id$
+ *
  */
 public class SVGOMFEFuncAElement
     extends    SVGOMComponentTransferFunctionElement

@@ -7,7 +7,7 @@ import java.util.Date;
 
 /**
  * @author Bela Ban
- * @version $Id$
+ *
  */
 public interface FD_SOCKMBean extends ProtocolMBean {
     String getLocalAddress();

@@ -22,7 +22,7 @@ package org.apache.batik.dom.util;
  * This class represents a stack of HashTable objects.
  *
  * @author <a href="mailto:stephane@hillion.org">Stephane Hillion</a>
- * @version $Id$
+ *
  */
 public class HashTableStack {
     /**

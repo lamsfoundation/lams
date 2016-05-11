@@ -32,7 +32,7 @@ import org.w3c.dom.svg.SVGPreserveAspectRatio;
  * This is the base implementation for SVGPreservAspectRatio
  *
  * @author  Tonny Kohar
- * @version $Id$
+ *
  */
 public abstract class AbstractSVGPreserveAspectRatio
         implements SVGPreserveAspectRatio,

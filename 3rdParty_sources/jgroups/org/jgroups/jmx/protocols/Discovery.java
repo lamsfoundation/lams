@@ -6,7 +6,7 @@ import java.util.Vector;
 
 /**
  * @author Bela Ban
- * @version $Id$
+ *
  */
 public class Discovery extends Protocol implements DiscoveryMBean {
     org.jgroups.protocols.Discovery p;

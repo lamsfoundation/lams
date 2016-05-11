@@ -25,7 +25,7 @@ import java.util.NoSuchElementException;
  * This class represents a doubly indexed hash table.
  *
  * @author <a href="mailto:stephane@hillion.org">Stephane Hillion</a>
- * @version $Id$
+ *
  */
 public class DoublyIndexedTable {
 

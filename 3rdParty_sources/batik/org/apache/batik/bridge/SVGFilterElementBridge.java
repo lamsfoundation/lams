@@ -42,7 +42,7 @@ import org.w3c.dom.Node;
  * Bridge class for the &lt;filter> element.
  *
  * @author <a href="mailto:tkormann@apache.org">Thierry Kormann</a>
- * @version $Id$
+ *
  */
 public class SVGFilterElementBridge extends AnimatableGenericSVGBridge
         implements FilterBridge, ErrorConstants {

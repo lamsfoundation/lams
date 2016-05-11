@@ -27,7 +27,7 @@ import org.w3c.dom.svg.SVGLength;
  *
  * @author <a href="mailto:stephane@hillion.org">Stephane Hillion</a>
  * @author <a href="mailto:tkormann@apache.org">Thierry Kormann</a>
- * @version $Id$
+ *
  */
 public abstract class UnitProcessor {
 

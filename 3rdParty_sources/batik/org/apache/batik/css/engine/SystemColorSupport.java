@@ -33,7 +33,7 @@ import org.w3c.dom.css.CSSPrimitiveValue;
  * This class provides support for AWT system colors.
  *
  * @author <a href="mailto:stephane@hillion.org">Stephane Hillion</a>
- * @version $Id$
+ *
  */
 public class SystemColorSupport implements CSSConstants {
 

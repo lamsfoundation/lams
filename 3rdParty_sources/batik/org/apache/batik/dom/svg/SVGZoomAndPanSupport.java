@@ -28,7 +28,7 @@ import org.w3c.dom.svg.SVGZoomAndPan;
  * This class provides support for SVGZoomAndPan features.
  *
  * @author <a href="mailto:stephane@hillion.org">Stephane Hillion</a>
- * @version $Id$
+ *
  */
 public class SVGZoomAndPanSupport implements SVGConstants {
 

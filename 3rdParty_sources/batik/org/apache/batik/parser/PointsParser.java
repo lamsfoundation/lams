@@ -25,7 +25,7 @@ import java.io.IOException;
  * attribute values (used with polyline and polygon elements).
  *
  * @author <a href="mailto:stephane@hillion.org">Stephane Hillion</a>
- * @version $Id$
+ *
  */
 public class PointsParser extends NumberParser {
 

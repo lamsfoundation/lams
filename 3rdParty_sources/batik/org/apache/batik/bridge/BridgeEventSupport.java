@@ -57,7 +57,7 @@ import org.w3c.dom.events.EventTarget;
  * fowarding them to the DOM as regular DOM MouseEvent.
  *
  * @author <a href="mailto:tkormann@ilog.fr">Thierry Kormann</a>
- * @version $Id$
+ *
  */
 public abstract class BridgeEventSupport implements SVGConstants {
 

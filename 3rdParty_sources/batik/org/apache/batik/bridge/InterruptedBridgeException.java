@@ -23,7 +23,7 @@ package org.apache.batik.bridge;
  * current thread was interrupted.
  *
  * @author <a href="mailto:stephane@hillion.org">Stephane Hillion</a>
- * @version $Id$
+ *
  */
 public class InterruptedBridgeException extends RuntimeException {
 

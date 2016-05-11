@@ -32,7 +32,7 @@ import java.io.OutputStream;
  * <p><b> This class is not a committed part of the JAI API.  It may
  * be removed or changed in future releases of JAI.</b>
  *
- * @version $Id$
+ *
  */
 public abstract class ImageEncoderImpl implements ImageEncoder {
 

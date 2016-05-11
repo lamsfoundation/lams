@@ -38,7 +38,7 @@ import java.util.LinkedList;
  * afterCompletion() <em>before</em> the TransactionInterceptor's.
  *
  * @author Bela Ban
- * @version $Id$
+ *
  */
 public class OrderedSynchronizationHandler implements Synchronization
 {

@@ -27,7 +27,7 @@ import org.w3c.dom.Node;
  * This class implements the {@link org.w3c.dom.EntityReference} interface.
  *
  * @author <a href="mailto:stephane@hillion.org">Stephane Hillion</a>
- * @version $Id$
+ *
  */
 public abstract class AbstractEntityReference
     extends    AbstractParentChildNode

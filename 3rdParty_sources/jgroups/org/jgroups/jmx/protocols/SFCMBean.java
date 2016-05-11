@@ -4,7 +4,7 @@ import org.jgroups.jmx.ProtocolMBean;
 
 /**
  * @author Bela Ban
- * @version $Id$
+ *
  */
 public interface SFCMBean extends ProtocolMBean {
     long getMaxCredits();

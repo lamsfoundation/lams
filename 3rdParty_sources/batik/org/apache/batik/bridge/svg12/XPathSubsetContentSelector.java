@@ -34,7 +34,7 @@ import org.w3c.dom.NodeList;
  * A class to handle the XPath subset syntax for XBL content elements.
  *
  * @author <a href="mailto:cam%40mcc%2eid%2eau">Cameron McCormack</a>
- * @version $Id$
+ *
  */
 public class XPathSubsetContentSelector extends AbstractContentSelector {
 

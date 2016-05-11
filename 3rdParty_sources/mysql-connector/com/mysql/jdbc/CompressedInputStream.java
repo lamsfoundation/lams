@@ -39,7 +39,7 @@ import java.util.zip.Inflater;
  * 
  * @author Mark Matthews
  * 
- * @version $Id: CompressedInputStream.java,v 1.1.2.1 2005/05/13 18:58:37
+ *
  *          mmatthews Exp $
  */
 class CompressedInputStream extends InputStream {

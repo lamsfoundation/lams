@@ -33,7 +33,7 @@ import org.w3c.dom.svg.SVGDocument;
  * This class is used to resolve the URI that can be found in a SVG document.
  *
  * @author <a href="mailto:stephane@hillion.org">Stephane Hillion</a>
- * @version $Id$
+ *
  */
 public class URIResolver {
     /**

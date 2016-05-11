@@ -37,7 +37,7 @@ import org.apache.batik.ext.awt.image.rendered.DisplacementMapRed;
  * another image to spatially displace the input image
  *
  * @author <a href="mailto:sheng.pei@eng.sun.com">Sheng Pei</a>
- * @version $Id$
+ *
  */
 public class DisplacementMapRable8Bit
     extends    AbstractColorInterpolationRable

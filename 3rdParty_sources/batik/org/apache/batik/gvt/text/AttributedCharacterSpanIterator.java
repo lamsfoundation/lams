@@ -31,7 +31,7 @@ import java.util.Set;
  * AttributedString.
  *
  * @author <a href="mailto:bill.haneman@ireland.sun.com">Bill Haneman</a>
- * @version $Id$
+ *
  */
 
 public class AttributedCharacterSpanIterator implements

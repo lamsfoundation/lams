@@ -27,7 +27,7 @@ import org.apache.batik.util.ParsedURL;
  * simply displays an SVG file into the JSVGCanvas.
  *
  * @author <a mailto="vincent.hardy@sun.com">Vincent Hardy</a>
- * @version $Id$
+ *
  */
 public class SVGInputHandler implements SquiggleInputHandler {
     public static final String[] SVG_MIME_TYPES = 

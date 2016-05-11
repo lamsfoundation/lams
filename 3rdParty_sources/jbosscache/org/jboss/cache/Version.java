@@ -27,14 +27,14 @@ import net.jcip.annotations.Immutable;
  * Contains version information about this release of JBoss Cache.
  *
  * @author Bela Ban
- * @version $Id$
+ *
  */
 @Immutable
 public class Version
 {
    public static final String version = "3.1.0.GA";
    public static final String codename = "Cascabel";
-   //public static final String cvs = "$Id$";
+
    static final byte[] version_id = {'0', '3', '1', '0', 'G', 'A'};
 
    private static final int MAJOR_SHIFT = 11;

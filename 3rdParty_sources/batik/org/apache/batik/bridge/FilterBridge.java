@@ -27,7 +27,7 @@ import org.w3c.dom.Element;
  *
  * @author <a href="mailto:vincent.hardy@eng.sun.com">Vincent Hardy</a>
  * @author <a href="mailto:tkormann@apache.org">Thierry Kormann</a>
- * @version $Id$
+ *
  */
 public interface FilterBridge extends Bridge {
 

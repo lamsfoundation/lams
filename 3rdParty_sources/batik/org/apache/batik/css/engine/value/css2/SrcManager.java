@@ -40,7 +40,7 @@ import org.w3c.css.sac.LexicalUnit;
  * Complete Class Desc
  *
  * @author <a href="mailto:deweese@apache.org">l449433</a>
- * @version $Id$
+ *
  */
 public class SrcManager extends IdentifierManager {
 

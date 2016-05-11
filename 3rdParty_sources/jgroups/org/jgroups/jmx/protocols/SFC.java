@@ -6,7 +6,7 @@ import java.util.Map;
 
 /**
  * @author Bela Ban
- * @version $Id$
+ *
  */
 public class SFC extends Protocol implements SFCMBean {
     org.jgroups.protocols.SFC p;

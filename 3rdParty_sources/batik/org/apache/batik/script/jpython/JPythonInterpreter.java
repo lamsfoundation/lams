@@ -30,7 +30,7 @@ import org.python.util.PythonInterpreter;
  * A simple implementation of <code>Interpreter</code> interface to use
  * JPython python parser.
  * @author <a href="mailto:cjolif@ilog.fr">Christophe Jolif</a>
- * @version $Id$
+ *
  */
 public class JPythonInterpreter implements org.apache.batik.script.Interpreter {
     private PythonInterpreter interpreter = null;

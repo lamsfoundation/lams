@@ -37,7 +37,7 @@ import org.w3c.dom.smil.TimeEvent;
  * Class that provides utilities for animation support.
  *
  * @author <a href="mailto:cam%40mcc%2eid%2eau">Cameron McCormack</a>
- * @version $Id$
+ *
  */
 public abstract class AnimationSupport {
 

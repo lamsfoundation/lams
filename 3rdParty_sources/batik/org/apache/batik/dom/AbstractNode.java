@@ -52,7 +52,7 @@ import org.w3c.dom.events.MutationEvent;
  * This class implements the {@link org.w3c.dom.Node} interface.
  *
  * @author <a href="mailto:stephane@hillion.org">Stephane Hillion</a>
- * @version $Id$
+ *
  */
 public abstract class AbstractNode
     implements ExtendedNode,

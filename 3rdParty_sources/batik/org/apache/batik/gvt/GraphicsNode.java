@@ -39,7 +39,7 @@ import org.apache.batik.gvt.filter.Mask;
  *
  * @author <a href="mailto:Thierry.Kormann@sophia.inria.fr">Thierry Kormann</a>
  * @author <a href="mailto:etissandier@ilog.fr">Emmanuel Tissandier</a>
- * @version $Id$
+ *
  */
 public interface GraphicsNode {
 

@@ -14,7 +14,7 @@ import org.apache.commons.logging.LogFactory;
  * @author Vladimir Blagojevic
  * @see ThreadPoolExecutor
  * @see RejectedExecutionHandler
- * @version $Id: ShutdownRejectedExecutionHandler.java,v 1.101 2008/04/08
+ *
  *          14:49:05 belaban Exp $
  */
 public class ShutdownRejectedExecutionHandler implements RejectedExecutionHandler {

@@ -23,7 +23,7 @@ package org.apache.batik.css.parser;
  * {@link org.w3c.css.sac.AttributeCondition} interface.
  *
  * @author <a href="mailto:stephane@hillion.org">Stephane Hillion</a>
- * @version $Id$
+ *
  */
 public class DefaultBeginHyphenAttributeCondition
     extends DefaultAttributeCondition {

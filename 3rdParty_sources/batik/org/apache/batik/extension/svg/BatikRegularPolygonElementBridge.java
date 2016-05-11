@@ -33,7 +33,7 @@ import org.w3c.dom.Element;
  * Bridge class for a regular polygon element.
  *
  * @author <a href="mailto:thomas.deweese@kodak.com">Thomas Deweese</a>
- * @version $Id$
+ *
  */
 public class BatikRegularPolygonElementBridge
     extends SVGDecoratedShapeElementBridge

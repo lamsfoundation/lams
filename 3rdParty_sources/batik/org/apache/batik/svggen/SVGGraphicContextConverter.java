@@ -33,7 +33,7 @@ import org.apache.batik.ext.awt.g2d.TransformStackElement;
  * SVG attributes.
  *
  * @author <a href="mailto:vincent.hardy@eng.sun.com">Vincent Hardy</a>
- * @version $Id$
+ *
  */
 public class SVGGraphicContextConverter {
     private static final int GRAPHIC_CONTEXT_CONVERTER_COUNT = 6;

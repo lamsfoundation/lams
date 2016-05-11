@@ -31,7 +31,7 @@ import org.w3c.dom.Text;
  * This class implements the {@link org.w3c.dom.Text} interface.
  *
  * @author <a href="mailto:stephane@hillion.org">Stephane Hillion</a>
- * @version $Id$
+ *
  */
 
 public abstract class AbstractText

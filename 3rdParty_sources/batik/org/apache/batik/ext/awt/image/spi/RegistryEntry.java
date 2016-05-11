@@ -25,7 +25,7 @@ import java.util.List;
  * probably need to implement on of the flavors of registry entries (such as
  * StreamRegistryEntry or URLRegistryEntry).
  *
- * @version $Id$
+ *
  */
 public interface RegistryEntry {
 

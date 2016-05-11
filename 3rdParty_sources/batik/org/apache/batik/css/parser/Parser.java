@@ -47,7 +47,7 @@ import org.w3c.css.sac.SimpleSelector;
  * This class implements the {@link org.w3c.css.sac.Parser} interface.
  *
  * @author <a href="mailto:stephane@hillion.org">Stephane Hillion</a>
- * @version $Id$
+ *
  */
 public class Parser implements ExtendedParser, Localizable {
 

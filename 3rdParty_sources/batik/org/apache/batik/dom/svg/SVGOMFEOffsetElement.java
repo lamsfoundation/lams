@@ -31,7 +31,7 @@ import org.w3c.dom.svg.SVGFEOffsetElement;
  * This class implements {@link SVGFEOffsetElement}.
  *
  * @author <a href="mailto:stephane@hillion.org">Stephane Hillion</a>
- * @version $Id$
+ *
  */
 public class SVGOMFEOffsetElement
     extends    SVGOMFilterPrimitiveStandardAttributes

@@ -34,7 +34,7 @@ import org.w3c.dom.svg.SVGTransform;
  * Bridge class for the 'animateTransform' animation element.
  *
  * @author <a href="mailto:cam%40mcc%2eid%2eau">Cameron McCormack</a>
- * @version $Id$
+ *
  */
 public class SVGAnimateTransformElementBridge extends SVGAnimateElementBridge {
 

@@ -24,7 +24,7 @@ package org.apache.batik.dom;
  * DOM tree.
  *
  * @author <a href="mailto:thomas.deweese@kodak.com">Thomas DeWeese</a>
- * @version $Id$
+ *
  */
 public interface DomExtension {
 

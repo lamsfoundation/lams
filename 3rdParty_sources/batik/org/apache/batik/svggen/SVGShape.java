@@ -41,7 +41,7 @@ import org.w3c.dom.Element;
  * + Any custom Shape implementation is mapped to path as well.
  *
  * @author <a href="mailto:vincent.hardy@eng.sun.com">Vincent Hardy</a>
- * @version $Id$
+ *
  */
 public class SVGShape extends SVGGraphicObjectConverter {
     /*

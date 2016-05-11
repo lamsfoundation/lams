@@ -32,7 +32,7 @@ import javax.management.ObjectName;
  *
  * @author Jerry Gauthier
  * @author Manik Surtani
- * @version $Id$
+ *
  */
 @Deprecated
 public class JmxUtil

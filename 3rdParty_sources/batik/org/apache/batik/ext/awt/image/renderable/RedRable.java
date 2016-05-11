@@ -35,7 +35,7 @@ import org.apache.batik.ext.awt.image.rendered.TranslateRed;
  * RenderableImage world.
  *
  * @author <a href="mailto:Thomas.DeWeese@Kodak.com">Thomas DeWeese</a>
- * @version $Id$
+ *
  */
 public class RedRable
     extends    AbstractRable {

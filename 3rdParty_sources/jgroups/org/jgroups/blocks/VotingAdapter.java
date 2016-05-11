@@ -27,7 +27,7 @@ import java.util.*;
  * 
  * @author Roman Rokytskyy (rrokytskyy@acm.org)
  * @author Robert Schaffar-Taurok (robert@fusion.at)
- * @version $Id$
+ *
  */
 public class VotingAdapter implements MessageListener, MembershipListener, VoteResponseProcessor {
 

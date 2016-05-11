@@ -22,7 +22,7 @@ package org.apache.batik.util.resources;
  * Signals a format error in a resource bundle
  *
  * @author <a href="mailto:stephane@hillion.org">Stephane Hillion</a>
- * @version $Id$
+ *
  */
 public class ResourceFormatException extends RuntimeException {
 

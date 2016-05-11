@@ -24,7 +24,7 @@ import java.util.Set;
  * Exposes the SVG feature strings that Batik supports.
  *
  * @author <a href="mailto:cam%40mcc%2eid%2eau">Cameron McCormack</a>
- * @version $Id$
+ *
  */
 public class SVGFeatureStrings {
 

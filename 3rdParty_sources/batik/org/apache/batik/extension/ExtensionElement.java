@@ -26,7 +26,7 @@ import org.apache.batik.dom.svg.SVGOMElement;
  * to be usable as a foreign element within an SVGOMDocument.
  *
  * @author <a href="mailto:stephane@hillion.org">Stephane Hillion</a>
- * @version $Id$
+ *
  */
 public abstract class ExtensionElement 
     extends SVGOMElement {

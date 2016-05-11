@@ -25,7 +25,7 @@ import java.awt.geom.AffineTransform;
  * org.w3c.dom.svg.SVGMatrix} interface.
  *
  * @author <a href="mailto:stephane@hillion.org">Stephane Hillion</a>
- * @version $Id$
+ *
  */
 public class SVGOMMatrix extends AbstractSVGMatrix {
     

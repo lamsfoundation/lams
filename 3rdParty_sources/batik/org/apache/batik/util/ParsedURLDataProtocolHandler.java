@@ -29,7 +29,7 @@ import java.util.Iterator;
  * http://www.ietf.org/rfc/rfc2397.txt
  *
  * @author <a href="mailto:deweese@apache.org">Thomas DeWeese</a>
- * @version $Id$ 
+ *
  */
 public class ParsedURLDataProtocolHandler 
     extends AbstractParsedURLProtocolHandler {

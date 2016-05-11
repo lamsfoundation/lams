@@ -26,7 +26,7 @@ import org.w3c.dom.Node;
  * This class implements a star shape extension to sVG
  *
  * @author <a href="mailto:thomas.deweese@kodak.com">Thomas DeWeese</a>
- * @version $Id$
+ *
  */
 public class BatikStarElement
     extends    GraphicsExtensionElement 

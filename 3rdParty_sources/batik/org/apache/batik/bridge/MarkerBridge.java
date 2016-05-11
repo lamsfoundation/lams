@@ -25,7 +25,7 @@ import org.w3c.dom.Element;
  * Factory class for vending <tt>Marker</tt> objects.
  *
  * @author <a href="mailto:vincent.hardy@eng.sun.com">Vincent Hardy</a>
- * @version $Id$
+ *
  */
 public interface MarkerBridge extends Bridge {
 

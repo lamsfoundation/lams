@@ -24,7 +24,7 @@ import java.util.Arrays;
 /**
  * An abstract class for path segments.
  *
- * @version $Id$
+ *
  */
 public abstract class AbstractSegment implements Segment {
 

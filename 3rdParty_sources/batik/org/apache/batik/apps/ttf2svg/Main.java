@@ -27,7 +27,7 @@ import org.apache.batik.svggen.font.SVGFont;
  * to the SVG Font format.
  *
  * @author <a href="mailto:vhardy@apache.org">Vincent Hardy</a>
- * @version $Id$
+ *
  */
 public class Main {
     public static void main(String[] args){

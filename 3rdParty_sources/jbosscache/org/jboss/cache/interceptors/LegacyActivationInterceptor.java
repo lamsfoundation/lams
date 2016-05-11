@@ -50,7 +50,7 @@ import java.util.concurrent.ConcurrentHashMap;
  * their attributes have been initialized and their children have been loaded in memory.
  *
  * @author <a href="mailto:{hmesha@novell.com}">{Hany Mesha}</a>
- * @version $Id$
+ *
  * @deprecated will be removed along with optimistic and pessimistic locking.
  */
 @Deprecated

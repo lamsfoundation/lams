@@ -32,7 +32,7 @@ import org.w3c.dom.svg.SVGNumberList;
  * This class is the implementation of {@link SVGNumberList}.
  *
  * @author <a href="mailto:tonny@kiyut.com">Tonny Kohar</a>
- * @version $Id$
+ *
  */
 public abstract class AbstractSVGNumberList
         extends AbstractSVGList

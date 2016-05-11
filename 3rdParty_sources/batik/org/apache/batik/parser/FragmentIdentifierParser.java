@@ -27,7 +27,7 @@ import org.apache.batik.xml.XMLUtilities;
  * fragment identifiers.
  *
  * @author <a href="mailto:stephane@hillion.org">Stephane Hillion</a>
- * @version $Id$
+ *
  */
 public class FragmentIdentifierParser extends NumberParser {
 

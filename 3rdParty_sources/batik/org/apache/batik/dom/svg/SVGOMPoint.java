@@ -27,7 +27,7 @@ import org.w3c.dom.svg.SVGPoint;
  * attribute.
  *
  * @author <a href="mailto:stephane@hillion.org">Stephane Hillion</a>
- * @version $Id$
+ *
  */
 public class SVGOMPoint implements SVGPoint {
 

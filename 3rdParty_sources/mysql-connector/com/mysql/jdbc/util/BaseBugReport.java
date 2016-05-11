@@ -89,7 +89,7 @@ import com.mysql.jdbc.Driver;
  * written using this class.
  * 
  * @author Mark Matthews
- * @version $Id$
+ *
  */
 public abstract class BaseBugReport {
 

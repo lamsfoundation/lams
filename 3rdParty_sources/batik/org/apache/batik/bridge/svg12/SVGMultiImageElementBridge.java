@@ -71,7 +71,7 @@ import org.w3c.dom.Node;
  *
  *
  * @author <a href="mailto:deweese@apache.org">Thomas DeWeese</a>
- * @version $Id$
+ *
  */
 public class SVGMultiImageElementBridge extends SVGImageElementBridge {
 

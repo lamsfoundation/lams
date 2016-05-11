@@ -23,7 +23,7 @@ package org.apache.batik.swing.gvt;
  * <tt>GVTTreeRendererEvent</tt> events.
  *
  * @author <a href="mailto:tkormann@apache.org">Thierry Kormann</a>
- * @version $Id$
+ *
  */
 public abstract class GVTTreeRendererAdapter implements GVTTreeRendererListener {
 

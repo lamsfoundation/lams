@@ -26,7 +26,7 @@ import org.w3c.css.sac.ErrorHandler;
  * {@link ErrorHandler} interface.
  *
  * @author <a href="mailto:stephane@hillion.org">Stephane Hillion</a>
- * @version $Id$
+ *
  */
 public class DefaultErrorHandler implements ErrorHandler {
 

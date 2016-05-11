@@ -31,7 +31,7 @@ import java.util.List;
  * Represents an in-memory result set
  * 
  * @author dgan
- * @version $Id$
+ *
  */
 public class RowDataStatic implements RowData {
 	private int index;

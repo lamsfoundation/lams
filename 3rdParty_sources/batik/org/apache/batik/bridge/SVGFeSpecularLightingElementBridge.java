@@ -31,7 +31,7 @@ import org.w3c.dom.Element;
  * Bridge class for the &lt;feSpecularLighting> element.
  *
  * @author <a href="mailto:tkormann@apache.org">Thierry Kormann</a>
- * @version $Id$
+ *
  */
 public class SVGFeSpecularLightingElementBridge
     extends AbstractSVGLightingElementBridge {

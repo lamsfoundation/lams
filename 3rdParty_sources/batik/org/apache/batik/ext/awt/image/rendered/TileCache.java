@@ -22,7 +22,7 @@ import java.awt.image.RenderedImage;
 
 /**
  *
- * @version $Id$
+ *
  */
 public class TileCache {
         private static LRUCache cache = new LRUCache(50);

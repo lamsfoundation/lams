@@ -24,7 +24,7 @@ import org.apache.batik.css.engine.value.Value;
  * This class represents objects which contains property/value mappings.
  *
  * @author <a href="mailto:stephane@hillion.org">Stephane Hillion</a>
- * @version $Id$
+ *
  */
 public class StyleMap {
 

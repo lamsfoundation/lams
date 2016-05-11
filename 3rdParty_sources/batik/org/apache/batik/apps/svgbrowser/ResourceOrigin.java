@@ -23,7 +23,7 @@ package org.apache.batik.apps.svgbrowser;
  * origins.
  *
  * @author <a href="mailto:vhardy@apache.org">Vincent Hardy</a>
- * @version $Id$
+ *
  */
 public interface ResourceOrigin {
     /**

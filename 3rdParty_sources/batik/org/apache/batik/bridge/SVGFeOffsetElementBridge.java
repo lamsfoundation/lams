@@ -34,7 +34,7 @@ import org.w3c.dom.Element;
  * Bridge class for the &lt;feOffset> element.
  *
  * @author <a href="mailto:tkormann@apache.org">Thierry Kormann</a>
- * @version $Id$
+ *
  */
 public class SVGFeOffsetElementBridge
     extends AbstractSVGFilterPrimitiveElementBridge {

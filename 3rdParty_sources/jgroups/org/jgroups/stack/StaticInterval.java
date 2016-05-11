@@ -10,7 +10,7 @@ import org.jgroups.annotations.GuardedBy;
  * so it shouldn't be shared between instances, as {@link #next()} will modify the state.
  * @author John Giorgiadis
  * @author Bela Ban
- * @version $Id$
+ *
  */
 public class StaticInterval implements Interval {
     private int          next=0;

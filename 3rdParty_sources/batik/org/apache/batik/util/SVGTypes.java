@@ -23,7 +23,7 @@ package org.apache.batik.util;
  * move into o.a.b.util.SVGConstants.
  *
  * @author <a href="mailto:cam%40mcc%2eid%2eau">Cameron McCormack</a>
- * @version $Id$
+ *
  */
 public abstract class SVGTypes {
 

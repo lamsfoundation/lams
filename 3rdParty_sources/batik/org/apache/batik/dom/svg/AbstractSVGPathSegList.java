@@ -50,7 +50,7 @@ import org.w3c.dom.svg.SVGPathSegMovetoRel;
  * <code>SVGPathSegList</code>.
  *
  * @author nicolas.socheleau@bitflash.com
- * @version $Id$
+ *
  */
 public abstract class AbstractSVGPathSegList
     extends AbstractSVGList

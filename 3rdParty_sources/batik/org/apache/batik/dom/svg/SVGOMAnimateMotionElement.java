@@ -27,7 +27,7 @@ import org.w3c.dom.svg.SVGAnimateMotionElement;
  * This class implements {@link SVGAnimateMotionElement}.
  *
  * @author <a href="mailto:stephane@hillion.org">Stephane Hillion</a>
- * @version $Id$
+ *
  */
 public class SVGOMAnimateMotionElement
     extends    SVGOMAnimationElement

@@ -23,7 +23,7 @@ import org.apache.batik.ext.awt.image.renderable.FilterColorInterpolation;
 
 /**
  *
- * @version $Id$
+ *
  */
 public interface BatikHistogramNormalizationFilter
     extends FilterColorInterpolation {

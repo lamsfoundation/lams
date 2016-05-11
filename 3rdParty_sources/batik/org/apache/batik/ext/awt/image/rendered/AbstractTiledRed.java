@@ -38,7 +38,7 @@ import org.apache.batik.util.HaltingThread;
  * the subclass implementation.
  *
  * @author <a href="mailto:Thomas.DeWeeese@Kodak.com">Thomas DeWeese</a>
- * @version $Id$
+ *
  */
 public abstract class AbstractTiledRed
     extends    AbstractRed

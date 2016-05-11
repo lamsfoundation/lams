@@ -24,7 +24,7 @@ import org.apache.batik.util.ParsedURL;
  * This class represents a @import CSS rule.
  *
  * @author <a href="mailto:stephane@hillion.org">Stephane Hillion</a>
- * @version $Id$
+ *
  */
 public class ImportRule extends MediaRule {
 

@@ -46,7 +46,7 @@ import java.util.NoSuchElementException;
  *
  * @author Stephen Colebourne
  * @author Sandy McArthur
- * @version $Id$
+ *
  * @since Commons IO 1.2
  */
 public class LineIterator implements Iterator<String> {

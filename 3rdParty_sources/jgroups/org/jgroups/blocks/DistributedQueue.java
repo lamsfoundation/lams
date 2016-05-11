@@ -1,4 +1,4 @@
-// $Id$
+
 package org.jgroups.blocks;
 
 import org.apache.commons.logging.Log;

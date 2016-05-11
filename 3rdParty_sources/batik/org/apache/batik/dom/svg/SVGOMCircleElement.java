@@ -30,7 +30,7 @@ import org.w3c.dom.svg.SVGCircleElement;
  * This class implements {@link SVGCircleElement}.
  *
  * @author <a href="mailto:stephane@hillion.org">Stephane Hillion</a>
- * @version $Id$
+ *
  */
 public class SVGOMCircleElement
     extends    SVGGraphicsElement

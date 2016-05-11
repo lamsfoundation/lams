@@ -22,7 +22,7 @@ import java.io.*;
  * expired members, and suspect those.
  * 
  * @author Bela Ban
- * @version $Id$
+ *
  */
 public class FD_ALL extends Protocol {
     /** Map of addresses and timestamps of last updates */

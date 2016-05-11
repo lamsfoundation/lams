@@ -34,7 +34,7 @@ import org.w3c.dom.svg.SVGFEImageElement;
  * This class implements {@link SVGFEImageElement}.
  *
  * @author <a href="mailto:stephane@hillion.org">Stephane Hillion</a>
- * @version $Id$
+ *
  */
 public class SVGOMFEImageElement
     extends    SVGOMFilterPrimitiveStandardAttributes

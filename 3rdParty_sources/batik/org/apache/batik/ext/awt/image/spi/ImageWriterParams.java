@@ -22,7 +22,7 @@ package org.apache.batik.ext.awt.image.spi;
  * Parameters for the encoder which is accessed through the
  * ImageWriter interface.
  *
- * @version $Id$
+ *
  */
 public class ImageWriterParams {
     

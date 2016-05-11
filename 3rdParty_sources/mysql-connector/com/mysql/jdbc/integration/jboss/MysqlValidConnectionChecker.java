@@ -35,7 +35,7 @@ import com.mysql.jdbc.SQLError;
 /**
  * A more efficient connection checker for JBoss.
  * 
- * @version $Id: MysqlValidConnectionChecker.java,v 1.1.2.1 2005/05/13 18:58:42
+ *
  *          mmatthews Exp $
  */
 public final class MysqlValidConnectionChecker implements

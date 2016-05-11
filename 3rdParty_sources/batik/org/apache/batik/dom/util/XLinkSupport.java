@@ -27,7 +27,7 @@ import org.w3c.dom.Element;
  * This class provides support for XLink features.
  *
  * @author <a href="mailto:stephane@hillion.org">Stephane Hillion</a>
- * @version $Id$
+ *
  */
 public class XLinkSupport implements XMLConstants {
 

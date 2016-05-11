@@ -46,7 +46,7 @@ import javax.swing.SwingConstants;
  * window that asks for User ID and password for the system.
  *
  * @author <a href="mailto:thomas.deweese@kodak.com">Thomas DeWeese</a>
- * @version $Id$
+ *
  */
 public class JAuthenticator extends Authenticator {
 

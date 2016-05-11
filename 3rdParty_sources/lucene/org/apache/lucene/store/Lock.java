@@ -29,7 +29,7 @@ import java.io.IOException;
  * </pre>
  *
  *
- * @version $Id$
+ *
  * @see Directory#makeLock(String)
  */
 public abstract class Lock {

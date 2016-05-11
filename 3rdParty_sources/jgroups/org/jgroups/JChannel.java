@@ -72,7 +72,7 @@ import java.util.concurrent.Exchanger;
  * the construction of the stack will be aborted.
  *
  * @author Bela Ban
- * @version $Id$
+ *
  */
 public class JChannel extends Channel {
 

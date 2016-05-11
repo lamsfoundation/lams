@@ -4,7 +4,7 @@ import java.io.ByteArrayInputStream;
 
 /**
  * @author Bela Ban
- * @version $Id$
+ *
  */
 public class ExposedByteArrayInputStream extends ByteArrayInputStream {
 

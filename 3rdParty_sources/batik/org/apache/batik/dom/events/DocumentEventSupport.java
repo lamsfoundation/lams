@@ -26,7 +26,7 @@ import org.w3c.dom.events.Event;
  * This class implements the behavior of DocumentEvent.
  *
  * @author <a href="mailto:stephane@hillion.org">Stephane Hillion</a>
- * @version $Id$
+ *
  */
 public class DocumentEventSupport {
     

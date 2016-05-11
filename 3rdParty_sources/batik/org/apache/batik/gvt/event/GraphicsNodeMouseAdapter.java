@@ -31,7 +31,7 @@ package org.apache.batik.gvt.event;
  * methods for events you care about.)
  *
  * @author <a href="mailto:Thierry.Kormann@sophia.inria.fr">Thierry Kormann</a>
- * @version $Id$
+ *
  */
 public abstract class GraphicsNodeMouseAdapter
         implements GraphicsNodeMouseListener {

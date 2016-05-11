@@ -42,7 +42,7 @@ import org.w3c.dom.Text;
  * for Sun's Project X by David Brownell.
  *
  * @author <a href="mailto:vincent.hardy@eng.sun.com">Vincent Hardy</a>
- * @version $Id$
+ *
  */
 class XmlWriter implements SVGConstants {
 

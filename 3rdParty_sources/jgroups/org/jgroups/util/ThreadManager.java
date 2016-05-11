@@ -5,7 +5,7 @@ package org.jgroups.util;
  * {@link ThreadDecorator} to allow it to alter their state.
  * 
  * @author Brian Stansberry
- * @version $Id$
+ *
  */
 public interface ThreadManager {
    /**

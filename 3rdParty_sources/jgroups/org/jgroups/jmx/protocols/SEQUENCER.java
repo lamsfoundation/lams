@@ -6,7 +6,7 @@ import java.util.Map;
 
 /**
  * @author Bela Ban
- * @version $Id$
+ *
  */
 public class SEQUENCER extends Protocol implements SEQUENCERMBean {
     org.jgroups.protocols.SEQUENCER p;

@@ -40,7 +40,7 @@ import org.apache.batik.util.Service;
  * instances of RegistryEntry in this package.
  *
  * @author <a href="mailto:Thomas.DeWeeese@Kodak.com">Thomas DeWeese</a>
- * @version $Id$
+ *
  */
 public class ImageTagRegistry implements ErrorConstants {
 

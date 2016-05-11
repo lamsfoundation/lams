@@ -32,7 +32,7 @@ import org.w3c.dom.Node;
  * This class is responsible for creating a GVT tree using an SVG DOM tree.
  *
  * @author <a href="mailto:tkormann@apache.org">Thierry Kormann</a>
- * @version $Id$
+ *
  */
 public class GVTBuilder implements SVGConstants {
 

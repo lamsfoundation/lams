@@ -27,7 +27,7 @@ import org.apache.batik.gvt.GraphicsNode;
  * filter) changes due to a modification of the DOM.
  *
  * @author <a href="mailto:etissandier@ilog.fr">Emmanuel Tissandier</a>
- * @version $Id$
+ *
  */
 public class StyleReference {
 

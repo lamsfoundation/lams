@@ -32,7 +32,7 @@ import java.sql.Types;
  * Field is a class used to describe fields in a ResultSet
  *
  * @author Mark Matthews
- * @version $Id$
+ *
  */
 public class Field {
 

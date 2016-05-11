@@ -27,7 +27,7 @@ import org.apache.batik.ext.awt.g2d.GraphicContext;
  * a set of SVG style attributes
  *
  * @author <a href="mailto:vincent.hardy@eng.sun.com">Vincent Hardy</a>
- * @version $Id$
+ *
  */
 public class SVGBasicStroke extends AbstractSVGConverter{
     /**

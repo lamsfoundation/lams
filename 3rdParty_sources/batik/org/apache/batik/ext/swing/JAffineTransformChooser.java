@@ -51,7 +51,7 @@ import javax.swing.text.Document;
  * make up an <tt>AffineTransform</tt>
  *
  * @author <a href="mailto:vincent.hardy@eng.sun.com">Vincent Hardy</a>
- * @version $Id$
+ *
  */
 public class JAffineTransformChooser extends JGridBagPanel{
     public static final String LABEL_ANGLE

@@ -37,7 +37,7 @@ import org.apache.batik.gvt.text.TextLayoutFactory;
  *
  * @author <a href="mailto:bill.haneman@ireland.sun.com">Bill Haneman</a>
  * @author <a href="mailto:vincent.hardy@sun.com">Vincent Hardy</a>
- * @version $Id$
+ *
  */
 public abstract class BasicTextPainter implements TextPainter {
 

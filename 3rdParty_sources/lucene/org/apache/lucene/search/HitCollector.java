@@ -21,7 +21,7 @@ package org.apache.lucene.search;
  * <br>HitCollectors are primarily meant to be used to implement queries,
  * sorting and filtering.
  * @see Searcher#search(Query,HitCollector)
- * @version $Id$
+ *
  */
 public abstract class HitCollector {
   /** Called once for every document matching a query, with the document

@@ -25,7 +25,7 @@ import java.util.EventListener;
  * The listener interface for receiving selection events.
  *
  * @author <a href="mailto:bill.haneman@ireland.sun.com">Bill Haneman</a>
- * @version $Id$
+ *
  */
 public interface SelectionListener extends EventListener {
 

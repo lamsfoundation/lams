@@ -7,7 +7,7 @@ import java.util.List;
 
 /**
  * @author Bela Ban
- * @version $Id$
+ *
  */
 public interface MPINGMBean extends PINGMBean {
     InetAddress getBindAddr();

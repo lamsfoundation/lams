@@ -23,7 +23,7 @@ package org.apache.batik.svggen;
  * how the error will be set on an SVG <code>Element</code>.
  *
  * @author <a href="mailto:cjolif@ilog.fr">Christophe Jolif</a>
- * @version $Id$
+ *
  */
 public class DefaultErrorHandler implements ErrorHandler {
     /**

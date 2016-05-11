@@ -100,7 +100,7 @@ import org.apache.commons.lang.ClassUtils;
  * @author Apache Avalon project
  * @author Apache Software Foundation
  * @since 1.0
- * @version $Id$
+ *
  */
 public abstract class ValuedEnum extends Enum {
     

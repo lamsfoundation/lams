@@ -32,7 +32,7 @@ import org.w3c.dom.events.MutationEvent;
  * This class implements the Node interface with support for children.
  *
  * @author <a href="mailto:stephane@hillion.org">Stephane Hillion</a>
- * @version $Id$
+ *
  */
 public abstract class AbstractParentNode extends AbstractNode {
 

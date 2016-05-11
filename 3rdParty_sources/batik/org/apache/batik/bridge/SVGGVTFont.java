@@ -48,7 +48,7 @@ import org.w3c.dom.Element;
  * Represents an SVG font.
  *
  * @author <a href="mailto:bella.robinson@cmis.csiro.au">Bella Robinson</a>
- * @version $Id$
+ *
  */
 public final class SVGGVTFont implements GVTFont, SVGConstants {
 

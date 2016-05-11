@@ -22,7 +22,7 @@ package org.apache.batik.parser;
  * This class provides an adapter for FragmentIdentifierHandler.
  *
  * @author <a href="mailto:stephane@hillion.org">Stephane Hillion</a>
- * @version $Id$
+ *
  */
 public class DefaultFragmentIdentifierHandler
     extends DefaultPreserveAspectRatioHandler

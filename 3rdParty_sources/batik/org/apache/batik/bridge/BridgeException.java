@@ -28,7 +28,7 @@ import org.w3c.dom.svg.SVGDocument;
  * Thrown when the bridge has detected an error.
  *
  * @author <a href="mailto:tkormann@apache.org">Thierry Kormann</a>
- * @version $Id$
+ *
  */
 public class BridgeException extends RuntimeException {
 

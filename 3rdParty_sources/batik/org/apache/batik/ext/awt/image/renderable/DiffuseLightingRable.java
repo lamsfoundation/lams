@@ -33,7 +33,7 @@ import org.apache.batik.ext.awt.image.Light;
  * the SVG 1.0 specification.
  *
  * @author <a href="mailto:vincent.hardy@eng.sun.com">Vincent Hardy</a>
- * @version $Id$
+ *
  */
 public interface DiffuseLightingRable extends FilterColorInterpolation {
     /**

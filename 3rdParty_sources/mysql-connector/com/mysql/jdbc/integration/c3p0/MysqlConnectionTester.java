@@ -37,7 +37,7 @@ import com.mysql.jdbc.CommunicationsException;
  * exceptions based on SQLState or class of 'CommunicationsException' for
  * handling exceptions.
  * 
- * @version $Id: MysqlConnectionTester.java,v 1.1.2.1 2005/05/13 18:58:39
+ *
  *          mmatthews Exp $
  */
 public final class MysqlConnectionTester implements QueryConnectionTester {

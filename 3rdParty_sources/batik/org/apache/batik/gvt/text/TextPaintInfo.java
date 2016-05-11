@@ -28,7 +28,7 @@ import java.awt.Stroke;
  * Complete Class Desc
  *
  * @author <a href="mailto:deweese@apache.org">deweese</a>
- * @version $Id$
+ *
  */
 public class TextPaintInfo {
     public boolean   visible;

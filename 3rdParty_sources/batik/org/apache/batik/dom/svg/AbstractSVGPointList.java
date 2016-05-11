@@ -31,7 +31,7 @@ import org.w3c.dom.svg.SVGPointList;
  * Abstract implementation of {@link SVGPointList}.
  *
  * @author <a href="mailto:nicolas.socheleau@bitflash.com">Nicolas Socheleau</a>
- * @version $Id$
+ *
  */
 public abstract class AbstractSVGPointList
     extends AbstractSVGList

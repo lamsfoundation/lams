@@ -8,7 +8,7 @@ import org.jgroups.TimeoutException;
  * matches the expected result, or a timeout occurs. First version used WaitableBoolean from util.concurrent, but
  * that class would not allow for timeouts.
  * @author Bela Ban
- * @version $Id$
+ *
  */
 public class CondVar {
     Object cond;

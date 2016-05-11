@@ -36,7 +36,7 @@ import org.apache.batik.ext.awt.image.renderable.PadRable8Bit;
  * defined as a GVT Tree.
  *
  * @author <a href="mailto:vincent.hardy@eng.sun.com">Vincent Hardy</a>
- * @version $Id$
+ *
  */
 public class PatternPaint implements Paint {
 

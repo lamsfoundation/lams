@@ -36,7 +36,7 @@ import org.w3c.dom.NodeList;
  * A font family class for SVG fonts.
  *
  * @author <a href="mailto:bella.robinson@cmis.csiro.au">Bella Robinson</a>
- * @version $Id$
+ *
  */
 public class SVGFontFamily implements GVTFontFamily {
 

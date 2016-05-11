@@ -31,7 +31,7 @@ import org.w3c.dom.svg.SVGFESpecularLightingElement;
  * This class implements {@link SVGFESpecularLightingElement}.
  *
  * @author <a href="mailto:stephane@hillion.org">Stephane Hillion</a>
- * @version $Id$
+ *
  */
 public class SVGOMFESpecularLightingElement
     extends    SVGOMFilterPrimitiveStandardAttributes

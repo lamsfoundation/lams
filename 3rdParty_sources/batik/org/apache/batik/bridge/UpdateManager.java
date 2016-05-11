@@ -50,7 +50,7 @@ import org.w3c.dom.events.EventTarget;
  * This class provides features to manage the update of an SVG document.
  *
  * @author <a href="mailto:stephane@hillion.org">Stephane Hillion</a>
- * @version $Id$
+ *
  */
 public class UpdateManager  {
 

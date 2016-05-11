@@ -25,7 +25,7 @@ import org.apache.batik.transcoder.TranscodingHints;
  * A transcoding Key represented as a length.
  *
  * @author <a href="mailto:Thierry.Kormann@sophia.inria.fr">Thierry Kormann</a>
- * @version $Id$
+ *
  */
 public class LengthKey extends TranscodingHints.Key {
 

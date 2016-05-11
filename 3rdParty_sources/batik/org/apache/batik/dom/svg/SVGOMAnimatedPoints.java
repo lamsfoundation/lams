@@ -38,7 +38,7 @@ import org.w3c.dom.svg.SVGPointList;
  * This class is the implementation of the SVGAnimatedPoints interface.
  *
  * @author <a href="mailto:nicolas.socheleau@bitflash.com">Nicolas Socheleau</a>
- * @version $Id$
+ *
  */
 public class SVGOMAnimatedPoints
         extends AbstractSVGAnimatedValue

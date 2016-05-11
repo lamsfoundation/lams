@@ -32,7 +32,7 @@ import org.apache.batik.ext.awt.image.SpotLight;
 /**
  * 
  * @author <a href="mailto:vincent.hardy@eng.sun.com">Vincent Hardy</a>
- * @version $Id$
+ *
  */
 public class SpecularLightingRed extends AbstractTiledRed{
     /**

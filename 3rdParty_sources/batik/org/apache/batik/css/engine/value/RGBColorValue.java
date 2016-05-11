@@ -25,7 +25,7 @@ import org.w3c.dom.css.CSSPrimitiveValue;
  * This class represents RGB colors.
  *
  * @author <a href="mailto:stephane@hillion.org">Stephane Hillion</a>
- * @version $Id$
+ *
  */
 public class RGBColorValue extends AbstractValue {
 

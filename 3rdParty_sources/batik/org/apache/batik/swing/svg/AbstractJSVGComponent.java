@@ -198,7 +198,7 @@ import org.w3c.dom.svg.SVGSVGElement;
  * building/rendering a document (invalid XML file, missing attributes...).</p>
  *
  * @author <a href="mailto:stephane@hillion.org">Stephane Hillion</a>
- * @version $Id$
+ *
  */
 public class AbstractJSVGComponent extends JGVTComponent {
 

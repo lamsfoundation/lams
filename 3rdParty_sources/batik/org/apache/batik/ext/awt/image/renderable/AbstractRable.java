@@ -45,7 +45,7 @@ import org.apache.batik.ext.awt.image.rendered.RenderedImageCachableRed;
  * implementation.
  *
  * @author <a href="mailto:Thomas.DeWeeese@Kodak.com">Thomas DeWeese</a>
- * @version $Id$
+ *
  */
 public abstract class AbstractRable implements Filter {
 

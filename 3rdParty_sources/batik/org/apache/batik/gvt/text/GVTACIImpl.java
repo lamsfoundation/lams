@@ -38,7 +38,7 @@ import java.util.Set;
  * GVTAttributedCharacterIterator.TextAttributes.
  *
  * @author <a href="mailto:bill.haneman@ireland.sun.com">Bill Haneman</a>
- * @version $Id$
+ *
  */
 
 public class GVTACIImpl

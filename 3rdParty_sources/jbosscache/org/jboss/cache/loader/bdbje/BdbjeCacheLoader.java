@@ -63,7 +63,7 @@ import java.util.concurrent.ConcurrentHashMap;
  *
  * @author Mark Hayes May 16, 2004
  * @author Bela Ban
- * @version $Id$
+ *
  */
 @ThreadSafe
 public class BdbjeCacheLoader extends AbstractCacheLoader

@@ -31,7 +31,7 @@ import org.w3c.dom.svg.SVGAnimatedEnumeration;
  * SVGAnimatedEnumeration} interface.
  *
  * @author <a href="mailto:stephane@hillion.org">Stephane Hillion</a>
- * @version $Id$
+ *
  */
 public class SVGOMAnimatedEnumeration extends AbstractSVGAnimatedValue
                                       implements SVGAnimatedEnumeration {

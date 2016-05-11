@@ -42,7 +42,7 @@ package org.apache.commons.httpclient;
  * 
  * TODO: Internationalization of reason phrases 
  * 
- * @version $Id$
+ *
  */
 public class HttpStatus {
 

@@ -23,7 +23,7 @@ import org.apache.batik.svggen.font.table.GlyphDescription;
 
 /**
  * An individual glyph within a font.
- * @version $Id$
+ *
  * @author <a href="mailto:david@steadystate.co.uk">David Schweinsberg</a>
  */
 public class Glyph {

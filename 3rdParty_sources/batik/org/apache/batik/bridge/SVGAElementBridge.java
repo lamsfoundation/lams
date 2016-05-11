@@ -41,7 +41,7 @@ import org.w3c.dom.svg.SVGAElement;
  * Bridge class for the &lt;a> element.
  *
  * @author <a href="mailto:tkormann@apache.org">Thierry Kormann</a>
- * @version $Id$
+ *
  */
 public class SVGAElementBridge extends SVGGElementBridge {
 

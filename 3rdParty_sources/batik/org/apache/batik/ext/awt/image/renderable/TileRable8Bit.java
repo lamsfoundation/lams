@@ -40,7 +40,7 @@ import org.apache.batik.ext.awt.image.rendered.TileRed;
  * 8 bit TileRable implementation
  *
  * @author <a href="mailto:vhardy@apache.org">Vincent Hardy</a>
- * @version $Id$
+ *
  */
 public class TileRable8Bit
     extends    AbstractColorInterpolationRable

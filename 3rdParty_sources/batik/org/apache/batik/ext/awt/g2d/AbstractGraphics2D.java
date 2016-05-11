@@ -61,7 +61,7 @@ import java.util.Map;
  * are implemented by <tt>AbstractGraphics2D</tt>
  *
  * @author <a href="mailto:vincent.hardy@eng.sun.com">Vincent Hardy</a>
- * @version $Id$
+ *
  * @see org.apache.batik.ext.awt.g2d.GraphicContext
  */
 public abstract class AbstractGraphics2D extends Graphics2D implements Cloneable {

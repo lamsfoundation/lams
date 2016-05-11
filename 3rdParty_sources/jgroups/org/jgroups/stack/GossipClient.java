@@ -20,7 +20,7 @@ import java.util.*;
  * Requires JDK >= 1.3 due to the use of Timer.
  * 
  * @author Bela Ban Oct 4 2001
- * @version $Id$
+ *
  */
 public class GossipClient {
     Timer timer=new Timer(true);

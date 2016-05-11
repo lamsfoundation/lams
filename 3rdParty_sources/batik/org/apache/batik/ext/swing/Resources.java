@@ -29,7 +29,7 @@ import org.apache.batik.util.resources.ResourceManager;
  * This class manages the message for the Swing extensions.
  *
  * @author <a href="mailto:vhardy@apache.org">Vincent Hardy</a>
- * @version $Id$
+ *
  */
 public class Resources {
 

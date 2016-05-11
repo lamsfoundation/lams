@@ -76,7 +76,7 @@ import java.util.MissingResourceException;
  * default group common to each instance of LocalizableSupport.
  *
  * @author <a href="mailto:stephane@hillion.org">Stephane Hillion</a>
- * @version $Id$
+ *
  */
 public class LocalizableSupport implements Localizable {
     /**

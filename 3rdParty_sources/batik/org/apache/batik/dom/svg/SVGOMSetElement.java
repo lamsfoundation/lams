@@ -27,7 +27,7 @@ import org.w3c.dom.svg.SVGSetElement;
  * This class implements {@link SVGSetElement}.
  *
  * @author <a href="mailto:stephane@hillion.org">Stephane Hillion</a>
- * @version $Id$
+ *
  */
 public class SVGOMSetElement
     extends    SVGOMAnimationElement

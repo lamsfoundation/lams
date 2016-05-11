@@ -25,7 +25,7 @@ import java.io.IOException;
  * attribute values.
  *
  * @author <a href="mailto:stephane@hillion.org">Stephane Hillion</a>
- * @version $Id$
+ *
  */
 public class TransformListParser extends NumberParser {
 

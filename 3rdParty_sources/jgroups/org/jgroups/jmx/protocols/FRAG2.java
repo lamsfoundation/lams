@@ -4,7 +4,7 @@ import org.jgroups.jmx.Protocol;
 
 /**
  * @author Bela Ban
- * @version $Id$
+ *
  */
 public class FRAG2 extends Protocol implements FRAG2MBean {
     org.jgroups.protocols.FRAG2 p;

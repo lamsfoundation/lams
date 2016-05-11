@@ -38,7 +38,7 @@ import org.apache.batik.util.resources.ResourceManager;
  * This class represents a panel to present users with options.
  *
  * @author <a href="mailto:deweese@apache.org">Thomas DeWeese</a>
- * @version $Id$
+ *
  */
 public class OptionPanel extends JPanel {
 

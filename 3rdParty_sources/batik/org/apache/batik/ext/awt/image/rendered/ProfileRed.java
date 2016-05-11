@@ -43,7 +43,7 @@ import org.apache.batik.ext.awt.color.ICCColorSpaceExt;
  * on its source
  *
  * @author <a href="mailto:vincent.hardy@eng.sun.com">Vincent Hardy</a>
- * @version $Id$
+ *
  */
 public class ProfileRed extends AbstractRed {
     private static final ColorSpace sRGBCS

@@ -29,7 +29,7 @@ import org.w3c.dom.svg.SVGTransform;
  * An animation class for 'animateTransform' animations.
  *
  * @author <a href="mailto:cam%40mcc%2eid%2eau">Cameron McCormack</a>
- * @version $Id$
+ *
  */
 public class TransformAnimation extends SimpleAnimation {
 

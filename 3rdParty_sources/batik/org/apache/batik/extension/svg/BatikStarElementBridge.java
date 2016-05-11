@@ -33,7 +33,7 @@ import org.w3c.dom.Element;
  * Bridge class for a star element.
  *
  * @author <a href="mailto:thomas.deweese@kodak.com">Thomas Deweese</a>
- * @version $Id$
+ *
  */
 public class BatikStarElementBridge
     extends SVGDecoratedShapeElementBridge

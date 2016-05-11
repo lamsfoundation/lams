@@ -30,7 +30,7 @@ import org.apache.batik.transcoder.wmf.WMFConstants;
  * Reads a WMF file, including an Aldus Placable Metafile Header.
  *
  * @author <a href="mailto:luano@asd.ie">Luan O'Carroll</a>
- * @version $Id$
+ *
  */
 public class WMFRecordStore extends AbstractWMFReader {
 

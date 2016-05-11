@@ -22,7 +22,7 @@ package org.apache.batik.dom.svg12;
  * Interface for a global scripting object.
  * Eventually will move to a W3C package.
  *
- * @version $Id$
+ *
  */
 public interface Global {
 }

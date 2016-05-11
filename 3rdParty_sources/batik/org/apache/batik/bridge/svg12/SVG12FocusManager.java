@@ -38,7 +38,7 @@ import org.w3c.dom.events.EventTarget;
  * focus events are set appropriately for sXBL. support.
  *
  * @author <a href="mailto:cam%40mcc%2eid%2eau">Cameron McCormack</a>
- * @version $Id$
+ *
  */
 public class SVG12FocusManager extends FocusManager {
 

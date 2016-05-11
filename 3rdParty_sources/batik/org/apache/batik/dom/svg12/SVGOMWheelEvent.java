@@ -26,7 +26,7 @@ import org.w3c.dom.views.AbstractView;
  * SVG 1.2 mouse wheel event.
  *
  * @author <a href="mailto:cam%40mcc%2eid%2eau">Cameron McCormack</a>
- * @version $Id$
+ *
  */
 public class SVGOMWheelEvent extends DOMUIEvent {
 

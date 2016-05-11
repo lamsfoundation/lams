@@ -31,7 +31,7 @@ import org.apache.batik.gvt.font.GVTLineMetrics;
 
 /**
  *
- * @version $Id$
+ *
  */
 public class GlyphIterator {
     public static final AttributedCharacterIterator.Attribute PREFORMATTED

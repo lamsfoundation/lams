@@ -23,7 +23,7 @@ package org.apache.batik.transcoder.wmf;
  * Contains the definitions of WMF constants.
  *
  * @author <a href="mailto:luano@asd.ie">Luan O'Carroll</a>
- * @version $Id$
+ *
  */
 public interface WMFConstants
 {

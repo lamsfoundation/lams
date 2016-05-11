@@ -33,7 +33,7 @@ import java.util.Set;
  * SVGAttributedCharacterIterator.TextAttributes.
  *
  * @author <a href="mailto:bill.haneman@ireland.sun.com">Bill Haneman</a>
- * @version $Id$
+ *
  */
 
 public interface GVTAttributedCharacterIterator extends AttributedCharacterIterator {

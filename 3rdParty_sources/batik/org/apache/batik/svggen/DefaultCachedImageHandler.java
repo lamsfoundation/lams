@@ -37,7 +37,7 @@ import org.w3c.dom.Element;
  * for handlers implementing a caching strategy.
  *
  * @author <a href="mailto:vincent.hardy@eng.sun.com">Vincent Hardy</a>
- * @version $Id$
+ *
  * @see             org.apache.batik.svggen.SVGGraphics2D
  */
 public abstract class DefaultCachedImageHandler

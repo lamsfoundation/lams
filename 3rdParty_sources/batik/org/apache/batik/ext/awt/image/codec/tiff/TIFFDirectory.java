@@ -48,7 +48,7 @@ import org.apache.batik.ext.awt.image.codec.util.SeekableStream;
  * be removed or changed in future releases of JAI.</b>
  *
  * @see TIFFField
- * @version $Id$
+ *
  */
 public class TIFFDirectory implements Serializable {
 

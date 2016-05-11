@@ -28,7 +28,7 @@ import org.apache.batik.ext.awt.ColorSpaceHintKey;
  * This strips out the source alpha channel into a one band image.
  *
  * @author <a href="mailto:Thomas.DeWeeese@Kodak.com">Thomas DeWeese</a>
- * @version $Id$ */
+ *
 public class FilterAlphaRed extends AbstractRed {
 
     /**

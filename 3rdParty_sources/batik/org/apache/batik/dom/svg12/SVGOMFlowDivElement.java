@@ -28,7 +28,7 @@ import org.w3c.dom.svg.SVGTextContentElement;
  * This class implements the flowDiv element from SVG 1.2
  *
  * @author <a href="mailto:thomas.deweese@kodak.com">Thomas DeWeese</a>
- * @version $Id$
+ *
  */
 public class SVGOMFlowDivElement 
     extends    SVGOMTextContentElement

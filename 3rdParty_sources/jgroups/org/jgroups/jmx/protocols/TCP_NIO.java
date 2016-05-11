@@ -2,7 +2,7 @@ package org.jgroups.jmx.protocols;
 
 /**
  * @author Scott Marlow
- * @version $Id$
+ *
  */
 public class TCP_NIO  extends TCP implements TCP_NIOMBean {
 

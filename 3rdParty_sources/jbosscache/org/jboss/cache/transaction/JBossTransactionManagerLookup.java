@@ -30,7 +30,7 @@ import javax.transaction.TransactionManager;
  * {@link TransactionManager} instance from "java:/TransactionManager".
  *
  * @author Bela Ban, Aug 26 2003
- * @version $Id$
+ *
  */
 public class JBossTransactionManagerLookup implements TransactionManagerLookup
 {

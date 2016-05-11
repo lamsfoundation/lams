@@ -32,7 +32,7 @@ import com.mysql.jdbc.SQLError;
  * 
  * @author Mark Matthews
  * 
- * @version $Id: ErrorMappingsDocGenerator.java,v 1.1.2.1 2005/05/13 18:58:39
+ *
  *          mmatthews Exp $
  */
 public class ErrorMappingsDocGenerator {

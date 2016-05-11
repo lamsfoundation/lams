@@ -59,7 +59,7 @@ import java.util.TreeMap;
  * </p>
  * 
  * @author Mark Matthews
- * @version $Id: DatabaseMetaData.java,v 1.27.4.66 2005/05/03 18:40:39 mmatthews
+ *
  *          Exp $
  */
 public class DatabaseMetaData implements java.sql.DatabaseMetaData {

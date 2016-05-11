@@ -30,7 +30,7 @@ import org.w3c.dom.svg.SVGFEMergeNodeElement;
  * This class implements {@link SVGFEMergeNodeElement}.
  *
  * @author <a href="mailto:stephane@hillion.org">Stephane Hillion</a>
- * @version $Id$
+ *
  */
 public class SVGOMFEMergeNodeElement
     extends    SVGOMElement

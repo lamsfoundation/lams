@@ -52,7 +52,7 @@ import org.apache.batik.util.HaltingThread;
  * rendering in an offscreen buffer image.
  *
  * @author <a href="mailto:vincent.hardy@eng.sun.com">Vincent Hardy</a>
- * @version $Id$
+ *
  */
 public class StaticRenderer implements ImageRenderer {
 

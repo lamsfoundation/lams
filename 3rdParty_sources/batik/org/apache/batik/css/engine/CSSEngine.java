@@ -60,7 +60,7 @@ import org.w3c.dom.events.MutationEvent;
  * This is the base class for all the CSS engines.
  *
  * @author <a href="mailto:stephane@hillion.org">Stephane Hillion</a>
- * @version $Id$
+ *
  */
 public abstract class CSSEngine {
 

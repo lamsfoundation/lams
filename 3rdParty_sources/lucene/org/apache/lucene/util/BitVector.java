@@ -33,7 +33,7 @@ import org.apache.lucene.store.IndexOutput;
   </ul>
 
 
-  @version $Id$
+
   */
 public final class BitVector {
 

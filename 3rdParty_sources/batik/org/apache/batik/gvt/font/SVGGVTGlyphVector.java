@@ -36,7 +36,7 @@ import org.apache.batik.gvt.text.TextPaintInfo;
  * A GVTGlyphVector class for SVG fonts.
  *
  * @author <a href="mailto:bella.robinson@cmis.csiro.au">Bella Robinson</a>
- * @version $Id$
+ *
  */
 public final class SVGGVTGlyphVector implements GVTGlyphVector {
 

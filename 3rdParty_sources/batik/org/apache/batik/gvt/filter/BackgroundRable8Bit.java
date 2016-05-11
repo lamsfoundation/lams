@@ -44,7 +44,7 @@ import org.apache.batik.gvt.GraphicsNode;
  * createRendering methods.
  *
  * @author <a href="mailto:vincent.hardy@eng.sun.com">Vincent Hardy</a>
- * @version $Id$
+ *
  */
 public class BackgroundRable8Bit
     extends    AbstractRable {

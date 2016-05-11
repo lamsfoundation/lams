@@ -31,7 +31,7 @@ import java.rmi.server.UnicastRemoteObject;
 /**
  * A remote searchable implementation.
  *
- * @version $Id$
+ *
  */
 public class RemoteSearchable
   extends UnicastRemoteObject

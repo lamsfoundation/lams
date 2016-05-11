@@ -45,7 +45,7 @@ import org.apache.commons.lang.text.StrBuilder;
  * @author <a href="mailto:stefan.bodewig@epost.de">Stefan Bodewig</a>
  * @author <a href="mailto:ggregory@seagullsw.com">Gary Gregory</a>
  * @since 2.1
- * @version $Id$
+ *
  */
 public class DurationFormatUtils {
 

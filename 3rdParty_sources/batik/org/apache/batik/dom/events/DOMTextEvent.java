@@ -25,7 +25,7 @@ import org.w3c.dom.views.AbstractView;
  * Class to implement DOM 3 Text events.
  *
  * @author <a href="mailto:cam%40mcc%2eid%2eau">Cameron McCormack</a>
- * @version $Id$
+ *
  */
 public class DOMTextEvent extends DOMUIEvent implements TextEvent {
 

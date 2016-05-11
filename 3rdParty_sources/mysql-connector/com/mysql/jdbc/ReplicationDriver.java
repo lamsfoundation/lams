@@ -48,7 +48,7 @@ import java.sql.SQLException;
  * @see org.gjt.mm.mysql.Connection
  * @see java.sql.Driver
  * @author Mark Matthews
- * @version $Id: ReplicationDriver.java,v 1.1.2.1 2005/05/13 18:58:38 mmatthews
+ *
  *          Exp $
  */
 public class ReplicationDriver extends NonRegisteringReplicationDriver

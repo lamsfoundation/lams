@@ -40,7 +40,7 @@ import org.apache.lucene.util.ToStringUtils;
  * @see ConstantScoreRangeQuery
  * 
  *
- * @version $Id$
+ *
  */
 public class RangeQuery extends Query
 {

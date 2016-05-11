@@ -118,7 +118,7 @@ import org.w3c.dom.events.MutationEvent;
  * The components of this class are used to view a DOM tree.
  *
  * @author <a href="mailto:stephane@hillion.org">Stephane Hillion</a>
- * @version $Id$
+ *
  */
 public class DOMViewer extends JFrame implements ActionMap {
 

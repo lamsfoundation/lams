@@ -34,7 +34,7 @@ import org.apache.batik.ext.awt.image.rendered.TurbulencePatternRed;
  * Creates a sourceless image from a turbulence function.
  *
  * @author <a href="mailto:Thomas.DeWeeese@Kodak.com">Thomas DeWeese</a>
- * @version $Id$
+ *
  */
 public class TurbulenceRable8Bit
     extends    AbstractColorInterpolationRable

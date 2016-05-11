@@ -25,7 +25,7 @@ import org.apache.commons.lang.exception.NestableRuntimeException;
  *
  * @author Apache Software Foundation
  * @since 1.0
- * @version $Id$
+ *
  */
 public class SerializationException extends NestableRuntimeException {
 

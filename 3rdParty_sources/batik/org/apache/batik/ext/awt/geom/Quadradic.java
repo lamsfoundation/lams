@@ -25,7 +25,7 @@ import java.awt.geom.Rectangle2D;
 /**
  * A class representing a quadratic path segment.
  *
- * @version $Id$
+ *
  */
 public class Quadradic extends AbstractSegment {
     public Point2D.Double p1, p2, p3;

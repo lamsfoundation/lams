@@ -20,7 +20,7 @@ import java.util.concurrent.TimeUnit;
  * Access patterns: this instance is always accessed by the thread pool only ! Concurrent take() or poll() methods,
  * but only a single thread at a time calls put() !
  * @author Bela Ban
- * @version $Id$
+ *
  */
 public class SizeBoundedQueue implements BlockingQueue {
     int max_size=1000 * 1000;

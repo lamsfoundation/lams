@@ -34,7 +34,7 @@ import org.w3c.dom.Node;
  * Bridge class for the "color switch" extension element.
  *
  * @author <a href="mailto:thomas.deweese@kodak.com">Thomas Deweese</a>
- * @version $Id$
+ *
  */
 public class ColorSwitchBridge 
     extends AbstractSVGBridge

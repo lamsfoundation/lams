@@ -70,7 +70,7 @@ import org.w3c.dom.svg.SVGSVGElement;
  * </ul>
  *
  * @author <a href="mailto:Thierry.Kormann@sophia.inria.fr">Thierry Kormann</a>
- * @version $Id$
+ *
  */
 public abstract class SVGAbstractTranscoder extends XMLAbstractTranscoder {
     /**

@@ -28,7 +28,7 @@ package org.apache.batik.xml;
  * exceptions, it must wrap those exceptions in a XMLException.
  *
  * @author <a href="mailto:stephane@hillion.org">Stephane Hillion</a>
- * @version $Id$
+ *
  */
 public class XMLException extends RuntimeException {
 

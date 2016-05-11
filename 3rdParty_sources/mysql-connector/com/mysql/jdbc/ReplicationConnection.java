@@ -36,7 +36,7 @@ import java.util.Properties;
  * another to one or more slaves, and decides to use master when the connection
  * is not read-only, and use slave(s) when the connection is read-only.
  * 
- * @version $Id: ReplicationConnection.java,v 1.1.2.1 2005/05/13 18:58:38
+ *
  *          mmatthews Exp $
  */
 public class ReplicationConnection implements java.sql.Connection, PingTarget {

@@ -27,7 +27,7 @@ import org.jboss.cache.Fqn;
  * Responsible for storing and retrieving objects to/from secondary storage.
  *
  * @author Bela Ban Oct 31, 2003
- * @version $Id$
+ *
  */
 public interface CacheLoaderAop extends CacheLoader
 {

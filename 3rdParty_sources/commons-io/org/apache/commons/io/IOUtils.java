@@ -79,7 +79,7 @@ import org.apache.commons.io.output.StringBuilderWriter;
  * @author Gareth Davis
  * @author Ian Springer
  * @author Sandy McArthur
- * @version $Id$
+ *
  */
 public class IOUtils {
     // NOTE: This class is focussed on InputStream, OutputStream, Reader and

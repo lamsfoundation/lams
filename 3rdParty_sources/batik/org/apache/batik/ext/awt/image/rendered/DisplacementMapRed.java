@@ -36,7 +36,7 @@ import org.apache.batik.ext.awt.image.PadMode;
  * GraphicsNode on demand for tiles.
  *
  * @author <a href="mailto:vincent.hardy@eng.sun.com">Vincent Hardy</a>
- * @version $Id$
+ *
  */
 public class DisplacementMapRed extends AbstractRed {
     // Use these to control timing and Nearest Neighbot vs. Bilinear Interp.

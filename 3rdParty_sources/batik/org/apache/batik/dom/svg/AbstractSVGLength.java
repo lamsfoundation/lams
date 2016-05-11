@@ -43,7 +43,7 @@ import org.w3c.dom.svg.SVGLength;
  * held by this object.
  *
  * @author nicolas.socheleau@bitflash.com
- * @version $Id$
+ *
  */
 public abstract class AbstractSVGLength
     implements SVGLength {

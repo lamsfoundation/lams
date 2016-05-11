@@ -35,7 +35,7 @@ import java.util.Set;
  * in a text run will all have the same bidi level.
  *
  * @author <a href="mailto:bella.robinson@cmis.csiro.au">Bella Robinson</a>
- * @version $Id$
+ *
  */
 public class BidiAttributedCharacterIterator implements AttributedCharacterIterator {
 

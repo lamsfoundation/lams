@@ -30,7 +30,7 @@ import org.w3c.dom.Element;
  * object into an SVG element.
  *
  * @author <a href="mailto:vincent.hardy@eng.sun.com">Vincent Hardy</a>
- * @version $Id$
+ *
  */
 public class SVGRectangle extends SVGGraphicObjectConverter {
     /**

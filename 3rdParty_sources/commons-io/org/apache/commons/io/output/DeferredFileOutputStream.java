@@ -39,7 +39,7 @@ import org.apache.commons.io.IOUtils;
  * @author <a href="mailto:martinc@apache.org">Martin Cooper</a>
  * @author gaxzerow
  *
- * @version $Id$
+ *
  */
 public class DeferredFileOutputStream
     extends ThresholdingOutputStream

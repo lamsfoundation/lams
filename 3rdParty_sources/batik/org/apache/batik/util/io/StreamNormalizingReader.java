@@ -31,7 +31,7 @@ import org.apache.batik.util.EncodingUtilities;
  * bytes.
  *
  * @author <a href="mailto:stephane@hillion.org">Stephane Hillion</a>
- * @version $Id$
+ *
  */
 public class StreamNormalizingReader extends NormalizingReader {
 

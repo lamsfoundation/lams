@@ -22,7 +22,7 @@ package org.apache.batik.gvt.renderer;
  * Interface for a factory of ImageRenderers
  *
  * @author <a href="mailto:vincent.hardy@eng.sun.com">Vincent Hardy</a>
- * @version $Id$
+ *
  */
 public interface ImageRendererFactory extends RendererFactory{
     /**

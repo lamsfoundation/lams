@@ -36,7 +36,7 @@ import org.w3c.dom.NodeList;
  * Bridge class for the &lt;xbl:content&gt; element.
  *
  * @author <a href="mailto:cam%40mcc%2eid%2eau">Cameron McCormack</a>
- * @version $Id$
+ *
  */
 public class XBLContentElementBridge extends AbstractGraphicsNodeBridge {
     

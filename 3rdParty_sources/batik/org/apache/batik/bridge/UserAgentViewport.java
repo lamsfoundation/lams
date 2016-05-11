@@ -22,7 +22,7 @@ package org.apache.batik.bridge;
  * Defines a viewport for a <tt>UserAgent</tt>.
  *
  * @author <a href="mailto:Thierry.Kormann@sophia.inria.fr">Thierry Kormann</a>
- * @version $Id$
+ *
  */
 public class UserAgentViewport implements Viewport {
 

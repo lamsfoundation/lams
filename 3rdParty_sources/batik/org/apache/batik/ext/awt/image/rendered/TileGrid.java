@@ -27,7 +27,7 @@ import org.apache.batik.util.HaltingThread;
  * This makes it pretty quick, but it can use a fair amount of
  * memory for large tile grids.
  *
- * @version $Id$
+ *
  */
 public class TileGrid implements TileStore {
     private static final boolean DEBUG = false;

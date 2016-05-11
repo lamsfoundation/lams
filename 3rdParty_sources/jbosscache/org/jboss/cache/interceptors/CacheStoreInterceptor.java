@@ -65,7 +65,7 @@ import java.util.Set;
  * through the CacheLoader, either after each method call (no TXs), or at TX commit.
  *
  * @author Bela Ban
- * @version $Id$
+ *
  */
 public class CacheStoreInterceptor extends SkipCheckChainedInterceptor
 {

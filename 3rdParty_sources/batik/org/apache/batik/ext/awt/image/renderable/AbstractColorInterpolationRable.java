@@ -32,7 +32,7 @@ import org.apache.batik.ext.awt.image.rendered.CachableRed;
  * gamma corrected sRBG).
  *
  * @author <a href="mailto:Thomas.DeWeeese@Kodak.com">Thomas DeWeese</a>
- * @version $Id$
+ *
  */
 public abstract class AbstractColorInterpolationRable extends AbstractRable {
 

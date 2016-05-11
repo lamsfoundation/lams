@@ -28,7 +28,7 @@ import org.apache.batik.gvt.font.GVTLineMetrics;
  * Complete Class Desc
  *
  * @author <a href="mailto:deweese@apache.org">deweese</a>
- * @version $Id$
+ *
  */
 class WordInfo {
     int      index = -1;

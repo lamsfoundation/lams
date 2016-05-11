@@ -23,7 +23,7 @@ package org.apache.batik.bridge;
  * does not allow scripts to be loaded.
  *
  * @author <a href="mailto:vhardy@apache.org">Vincent Hardy</a>
- * @version $Id$
+ *
  */
 public class NoLoadScriptSecurity implements ScriptSecurity {
 

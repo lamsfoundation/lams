@@ -22,7 +22,7 @@ package org.apache.batik.ext.awt.image.renderable;
  * Adjusts the input images coordinate system by dx, dy.
  *
  * @author <a href="mailto:Thomas.DeWeeese@Kodak.com">Thomas DeWeese</a>
- * @version $Id$
+ *
  */
 public interface OffsetRable extends Filter {
       /**

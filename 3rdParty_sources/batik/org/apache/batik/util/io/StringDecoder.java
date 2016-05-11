@@ -24,7 +24,7 @@ import java.io.IOException;
  * This class reads a string.
  *
  * @author <a href="mailto:stephane@hillion.org">Stephane Hillion</a>
- * @version $Id$
+ *
  */
 public class StringDecoder implements CharDecoder {
 

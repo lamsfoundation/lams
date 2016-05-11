@@ -25,7 +25,7 @@ package org.jboss.cache;
  * Thrown when a member is suspected during remote method invocation
  *
  * @author Bela Ban
- * @version $Id$
+ *
  */
 public class SuspectException extends CacheException
 {

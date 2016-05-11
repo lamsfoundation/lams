@@ -24,7 +24,7 @@ import java.util.ArrayList;
  * Abstract compound command. Supports the execute / undo / redo of more than
  * one command
  *
- * @version $Id$
+ *
  */
 public abstract class AbstractCompoundCommand extends AbstractUndoableCommand {
 

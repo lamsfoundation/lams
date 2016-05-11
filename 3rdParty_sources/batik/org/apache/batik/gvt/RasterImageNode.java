@@ -30,7 +30,7 @@ import org.apache.batik.ext.awt.image.renderable.Filter;
  *
  * @author <a href="mailto:Thierry.Kormann@sophia.inria.fr">Thierry Kormann</a>
  * @author <a href="mailto:Thomas.DeWeese@Kodak.com">Thomas DeWeese</a>
- * @version $Id$
+ *
  */
 public class RasterImageNode extends AbstractGraphicsNode {
 

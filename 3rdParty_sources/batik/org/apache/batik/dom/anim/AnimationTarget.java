@@ -27,7 +27,7 @@ import org.w3c.dom.svg.SVGLength;
  * An interface for targets of animation to provide context information.
  *
  * @author <a href="mailto:cam%40mcc%2eid%2eau">Cameron McCormack</a>
- * @version $Id$
+ *
  */
 public interface AnimationTarget {
 

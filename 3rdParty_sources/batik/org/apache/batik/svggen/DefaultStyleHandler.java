@@ -33,7 +33,7 @@ import org.w3c.dom.Element;
  * way to style an SVG <code>Element</code>.
  *
  * @author <a href="mailto:cjolif@ilog.fr">Christophe Jolif</a>
- * @version $Id$
+ *
  */
 public class DefaultStyleHandler implements StyleHandler, SVGConstants {
     

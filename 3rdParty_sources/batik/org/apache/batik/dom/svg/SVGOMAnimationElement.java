@@ -33,7 +33,7 @@ import org.w3c.dom.svg.SVGStringList;
  * This class provides an implementation of the {@link SVGAnimationElement} interface.
  *
  * @author <a href="mailto:stephane@hillion.org">Stephane Hillion</a>
- * @version $Id$
+ *
  */
 public abstract class SVGOMAnimationElement
     extends SVGOMElement

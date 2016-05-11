@@ -22,7 +22,7 @@ package org.apache.batik.parser;
  * An handler interface for parsing NumberLists.
  *
  * @author  tonny@kiyut.com
- * @version $Id$
+ *
  */
 public interface NumberListHandler {
     /**

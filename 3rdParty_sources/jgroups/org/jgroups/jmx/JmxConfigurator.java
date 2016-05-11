@@ -12,7 +12,7 @@ import java.util.Iterator;
 
 /**
  * @author Bela Ban
- * @version $Id$
+ *
  */
 public class JmxConfigurator {
     static final Log log=LogFactory.getLog(JmxConfigurator.class);

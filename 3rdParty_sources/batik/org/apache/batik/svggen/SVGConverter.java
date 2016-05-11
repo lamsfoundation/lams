@@ -27,7 +27,7 @@ import org.apache.batik.ext.awt.g2d.GraphicContext;
  * part or all of a GraphicContext.
  *
  * @author <a href="mailto:vincent.hardy@eng.sun.com">Vincent Hardy</a>
- * @version $Id$
+ *
  * @see           org.apache.batik.ext.awt.g2d.GraphicContext
  */
 public interface SVGConverter extends SVGSyntax{

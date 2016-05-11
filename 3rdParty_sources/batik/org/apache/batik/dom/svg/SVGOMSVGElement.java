@@ -62,7 +62,7 @@ import org.w3c.dom.views.DocumentView;
  * This class implements {@link org.w3c.dom.svg.SVGSVGElement}.
  *
  * @author <a href="mailto:stephane@hillion.org">Stephane Hillion</a>
- * @version $Id$
+ *
  */
 public class SVGOMSVGElement
     extends    SVGStylableElement

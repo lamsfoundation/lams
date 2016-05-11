@@ -28,7 +28,7 @@ import org.apache.batik.gvt.text.Mark;
  * Renders the attributed character iterator of a <tt>TextNode</tt>.
  *
  * @author <a href="mailto:Thierry.Kormann@sophia.inria.fr">Thierry Kormann</a>
- * @version $Id$
+ *
  */
 public interface TextPainter {
 

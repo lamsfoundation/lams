@@ -36,7 +36,7 @@ import java.io.IOException;
  * <p>Created: Apr 21, 2004 5:08:38 PM
  *
  *
- * @version $Id$
+ *
  * @since   1.4
  */
 public abstract class SortComparator

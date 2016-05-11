@@ -28,7 +28,7 @@ import org.w3c.dom.css.CSSStyleDeclaration;
  * of the elements of a SVG document.
  *
  * @author <a href="mailto:stephane@hillion.org">Stephane Hillion</a>
- * @version $Id$
+ *
  */
 public class CSSOMSVGViewCSS extends CSSOMViewCSS {
     

@@ -29,7 +29,7 @@ import org.apache.batik.script.rhino.svg12.SVG12RhinoInterpreter;
  *
  * @author <a href="mailto:cjolif@ilog.fr">Christophe Jolif</a>
  * @author <a href="mailto:vhardy@apache.org">Vincent Hardy</a>
- * @version $Id$
+ *
  */
 public class RhinoInterpreterFactory implements InterpreterFactory {
 

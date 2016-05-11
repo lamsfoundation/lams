@@ -26,7 +26,7 @@ import org.apache.batik.transcoder.wmf.WMFConstants;
  *  {@link org.apache.batik.transcoder.wmf.tosvg.AbstractWMFReader}s and
  *  {@link org.apache.batik.transcoder.wmf.tosvg.AbstractWMFPainter}s
  *
- * @version $Id$
+ *
  */
 public class WMFUtilities {
 

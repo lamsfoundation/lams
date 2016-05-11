@@ -39,7 +39,7 @@ import org.apache.batik.ext.awt.image.rendered.PadRed;
  * Implementation of the DiffuseLightRable interface.
  *
  * @author <a href="mailto:vincent.hardy@eng.sun.com">Vincent Hardy</a>
- * @version $Id$
+ *
  */
 public class DiffuseLightingRable8Bit
     extends AbstractColorInterpolationRable

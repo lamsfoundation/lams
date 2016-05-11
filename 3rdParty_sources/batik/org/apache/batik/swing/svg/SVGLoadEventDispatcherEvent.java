@@ -27,7 +27,7 @@ import org.apache.batik.gvt.GraphicsNode;
  * from a SVGLoadEventDispatcher instance.
  *
  * @author <a href="mailto:stephane@hillion.org">Stephane Hillion</a>
- * @version $Id$
+ *
  */
 public class SVGLoadEventDispatcherEvent extends EventObject {
     

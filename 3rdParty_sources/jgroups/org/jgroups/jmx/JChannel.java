@@ -15,7 +15,7 @@ import java.util.Map;
 
 /**
  * @author Bela Ban
- * @version $Id$
+ *
  */
 public class JChannel implements JChannelMBean {
     /** Ref to the original JGroups channel */

@@ -31,7 +31,7 @@ import org.w3c.dom.svg.SVGColorProfileElement;
  * This class implements {@link org.w3c.dom.svg.SVGColorProfileElement}.
  *
  * @author <a href="mailto:stephane@hillion.org">Stephane Hillion</a>
- * @version $Id$
+ *
  */
 public class SVGOMColorProfileElement
     extends    SVGOMURIReferenceElement

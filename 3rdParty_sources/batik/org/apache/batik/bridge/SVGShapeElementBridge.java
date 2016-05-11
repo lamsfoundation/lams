@@ -31,7 +31,7 @@ import org.w3c.dom.Element;
  * The base bridge class for shapes. Subclasses bridge <tt>ShapeNode</tt>.
  *
  * @author <a href="mailto:tkormann@apache.org">Thierry Kormann</a>
- * @version $Id$
+ *
  */
 public abstract class SVGShapeElementBridge extends AbstractGraphicsNodeBridge {
 

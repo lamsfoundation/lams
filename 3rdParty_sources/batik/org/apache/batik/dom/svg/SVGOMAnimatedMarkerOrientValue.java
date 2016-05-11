@@ -35,7 +35,7 @@ import org.w3c.dom.svg.SVGMarkerElement;
  * 'orient' attribute.
  *
  * @author <a href="mailto:cam%40mcc%2eid%2eau">Cameron McCormack</a>
- * @version $Id$
+ *
  */
 public class SVGOMAnimatedMarkerOrientValue extends AbstractSVGAnimatedValue {
 

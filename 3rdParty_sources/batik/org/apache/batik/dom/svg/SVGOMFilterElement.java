@@ -36,7 +36,7 @@ import org.w3c.dom.svg.SVGFilterElement;
  * This class implements {@link SVGFilterElement}.
  *
  * @author <a href="mailto:stephane@hillion.org">Stephane Hillion</a>
- * @version $Id$
+ *
  */
 public class SVGOMFilterElement
     extends    SVGStylableElement

@@ -30,7 +30,7 @@ import org.w3c.dom.svg.SVGAnimatedString;
  * This class implements the {@link SVGAnimatedString} interface.
  *
  * @author <a href="mailto:stephane@hillion.org">Stephane Hillion</a>
- * @version $Id$
+ *
  */
 public class SVGOMAnimatedString extends AbstractSVGAnimatedValue
                                  implements SVGAnimatedString {

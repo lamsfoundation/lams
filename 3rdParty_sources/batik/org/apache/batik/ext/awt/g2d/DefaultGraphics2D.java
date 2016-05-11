@@ -43,7 +43,7 @@ import java.text.AttributedCharacterIterator;
  * implementing a <tt>Graphic2D</tt> piece-meal.
  *
  * @author <a href="mailto:vincent.hardy@eng.sun.com">Vincent Hardy</a>
- * @version $Id$
+ *
  * @see org.apache.batik.ext.awt.g2d.AbstractGraphics2D
  */
 public class DefaultGraphics2D extends AbstractGraphics2D {

@@ -24,7 +24,7 @@ import java.awt.Font;
 /**
  * Represent a WMF Font, encountered in a Metafile.
  *
- * @version $Id$
+ *
  */
 public class WMFFont {
     public Font font;

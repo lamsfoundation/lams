@@ -52,7 +52,7 @@ import org.apache.batik.ext.awt.image.codec.util.PropertyUtil;
 import org.apache.batik.ext.awt.image.codec.util.SimpleRenderedImage;
 
 /**
- * @version $Id$
+ *
  */
 public class PNGImageDecoder extends ImageDecoderImpl {
 

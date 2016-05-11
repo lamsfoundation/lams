@@ -29,7 +29,7 @@ import org.apache.batik.ext.awt.image.spi.ImageWriterRegistry;
  * GenericImageHandler which caches PNG images.
  *
  * @author <a href="mailto:paul_evenblij@compuware.com">Paul Evenblij</a>
- * @version $Id$
+ *
  */
 public class CachedImageHandlerPNGEncoder extends DefaultCachedImageHandler {
     public static final String CACHED_PNG_PREFIX = "pngImage";

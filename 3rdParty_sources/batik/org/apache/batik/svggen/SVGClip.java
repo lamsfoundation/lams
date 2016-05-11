@@ -29,7 +29,7 @@ import org.w3c.dom.Element;
  * Utility class that converts a Path object into an SVG clip
  *
  * @author <a href="mailto:vincent.hardy@eng.sun.com">Vincent Hardy</a>
- * @version $Id$
+ *
  */
 public class SVGClip extends AbstractSVGConverter {
     /**

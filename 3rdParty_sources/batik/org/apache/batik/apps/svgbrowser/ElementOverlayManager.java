@@ -36,7 +36,7 @@ import org.w3c.dom.Element;
 /**
  * Manages element overlay on the canvas.
  *
- * @version $Id$
+ *
  */
 public class ElementOverlayManager {
 

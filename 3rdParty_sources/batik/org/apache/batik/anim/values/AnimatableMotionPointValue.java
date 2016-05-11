@@ -24,7 +24,7 @@ import org.apache.batik.dom.anim.AnimationTarget;
  * A point value in the animation system from a motion animation.
  *
  * @author <a href="mailto:cam%40mcc%2eid%2eau">Cameron McCormack</a>
- * @version $Id$
+ *
  */
 public class AnimatableMotionPointValue extends AnimatableValue {
 

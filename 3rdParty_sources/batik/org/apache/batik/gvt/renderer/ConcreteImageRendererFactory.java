@@ -23,7 +23,7 @@ package org.apache.batik.gvt.renderer;
  * This class provides a factory for renderers.
  *
  * @author <a href="mailto:stephane@hillion.org">Stephane Hillion</a>
- * @version $Id$
+ *
  */
 public class ConcreteImageRendererFactory implements ImageRendererFactory {
 

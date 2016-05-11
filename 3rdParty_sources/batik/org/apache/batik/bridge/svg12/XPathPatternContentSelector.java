@@ -36,7 +36,7 @@ import org.w3c.dom.xpath.XPathException;
  * A class to handle the XPath Pattern syntax for XBL content elements.
  *
  * @author <a href="mailto:cam%40mcc%2eid%2eau">Cameron McCormack</a>
- * @version $Id$
+ *
  */
 public class XPathPatternContentSelector extends AbstractContentSelector {
 

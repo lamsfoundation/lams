@@ -23,7 +23,7 @@ package org.apache.batik.dom.util;
  * <br>Note: This implementation is not Thread-safe.
  *
  * @author <a href="mailto:stephane@hillion.org">Stephane Hillion</a>
- * @version $Id$
+ *
  */
 public class TriplyIndexedTable {
 

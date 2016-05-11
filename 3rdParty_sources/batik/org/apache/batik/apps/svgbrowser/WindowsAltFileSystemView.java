@@ -33,7 +33,7 @@ import javax.swing.filechooser.FileSystemView;
  * Using JFileChooser in WebStart-deployed application</a>
  *
  * @author <a href="mailto:vhardy@apache.org">Vincent Hardy</a>
- * @version $Id$
+ *
  */
 
 // This class is necessary due to an annoying bug on Windows NT where

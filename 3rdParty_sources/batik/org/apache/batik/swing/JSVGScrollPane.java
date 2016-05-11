@@ -80,7 +80,7 @@ import org.w3c.dom.events.EventListener;
  *   implementing the Scrollable interface.
  * </p>
  * @author Zach DelProposto
- * @version $Id$
+ *
  */
 public class JSVGScrollPane extends JPanel
 {

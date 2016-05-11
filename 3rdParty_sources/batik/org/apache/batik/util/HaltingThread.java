@@ -25,7 +25,7 @@ package org.apache.batik.util;
  * checked periodically during expensive processing.
  *
  * @author <a href="mailto:deweese@apache.org">deweese</a>
- * @version $Id$
+ *
  */
 public class HaltingThread extends Thread {
     /**

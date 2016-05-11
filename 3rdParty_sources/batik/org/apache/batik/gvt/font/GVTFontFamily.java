@@ -26,7 +26,7 @@ import java.util.Map;
  * An interface for all font family classes.
  *
  * @author <a href="mailto:bella.robinson@cmis.csiro.au">Bella Robinson</a>
- * @version $Id$
+ *
  */
 public interface GVTFontFamily {
 

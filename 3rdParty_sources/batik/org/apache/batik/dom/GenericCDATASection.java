@@ -26,7 +26,7 @@ import org.w3c.dom.Text;
  * This class implements the {@link org.w3c.dom.CDATASection} interface.
  *
  * @author <a href="mailto:stephane@hillion.org">Stephane Hillion</a>
- * @version $Id$
+ *
  */
 public class GenericCDATASection
         extends AbstractText

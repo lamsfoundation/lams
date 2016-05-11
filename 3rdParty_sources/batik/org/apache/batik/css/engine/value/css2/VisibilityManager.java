@@ -31,7 +31,7 @@ import org.apache.batik.util.SVGTypes;
  * This class provides a manager for the 'visibility' property values.
  *
  * @author <a href="mailto:stephane@hillion.org">Stephane Hillion</a>
- * @version $Id$
+ *
  */
 public class VisibilityManager extends IdentifierManager {
 

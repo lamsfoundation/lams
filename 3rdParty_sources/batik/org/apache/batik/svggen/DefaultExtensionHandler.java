@@ -29,7 +29,7 @@ import java.awt.image.BufferedImageOp;
  * Java 2D API extensions.
  *
  * @author <a href="mailto:vincent.hardy@eng.sun.com">Vincent Hardy</a>
- * @version $Id$
+ *
  * @see               org.apache.batik.svggen.ExtensionHandler
  */
 public class DefaultExtensionHandler implements ExtensionHandler {

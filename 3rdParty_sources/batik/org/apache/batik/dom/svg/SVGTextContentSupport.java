@@ -30,7 +30,7 @@ import org.w3c.dom.svg.SVGRect;
  * This class provides support for the SVGTextContentElement interface.
  *
  * @author nicolas.socheleau@bitflash.com
- * @version $Id$
+ *
  */
 public class SVGTextContentSupport {
 

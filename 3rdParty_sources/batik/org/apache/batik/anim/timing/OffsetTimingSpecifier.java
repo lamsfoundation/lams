@@ -22,7 +22,7 @@ package org.apache.batik.anim.timing;
  * A class to handle offset SMIL timing specifiers.
  *
  * @author <a href="mailto:cam%40mcc%2eid%2eau">Cameron McCormack</a>
- * @version $Id$
+ *
  */
 public class OffsetTimingSpecifier extends TimingSpecifier {
 

@@ -33,7 +33,7 @@ import org.w3c.dom.Element;
  * Bridge class for the &lt;textPath> element.
  *
  * @author <a href="mailto:bella.robinson@cmis.csiro.au">Bella Robinson</a>
- * @version $Id$
+ *
  */
 public class SVGTextPathElementBridge extends AnimatableGenericSVGBridge
                                       implements ErrorConstants {

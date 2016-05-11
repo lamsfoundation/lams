@@ -55,7 +55,7 @@ import org.w3c.dom.Node;
  * from an URI using SAX2.
  *
  * @author <a href="mailto:stephane@hillion.org">Stephane Hillion</a>
- * @version $Id$
+ *
  */
 public class SAXDocumentFactory
     extends    DefaultHandler

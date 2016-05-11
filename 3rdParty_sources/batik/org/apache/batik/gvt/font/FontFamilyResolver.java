@@ -31,7 +31,7 @@ import java.util.ArrayList;
  * The is a utility class that is used for resolving UnresolvedFontFamilies.
  *
  * @author <a href="mailto:bella.robinson@cmis.csiro.au">Bella Robinson</a>
- * @version $Id$
+ *
  */
 public class FontFamilyResolver {
 

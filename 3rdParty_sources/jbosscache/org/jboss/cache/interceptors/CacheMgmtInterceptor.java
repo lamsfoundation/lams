@@ -40,7 +40,7 @@ import java.util.Map;
  * Captures cache management statistics
  *
  * @author Jerry Gauthier
- * @version $Id$
+ *
  */
 public class CacheMgmtInterceptor extends JmxStatsCommandInterceptor
 {

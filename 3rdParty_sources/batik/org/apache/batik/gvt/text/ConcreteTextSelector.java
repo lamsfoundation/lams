@@ -41,7 +41,7 @@ import org.apache.batik.gvt.event.SelectionListener;
  * A simple implementation of GraphicsNodeMouseListener for text selection.
  *
  * @author <a href="mailto:bill.haneman@ireland.sun.com">Bill Haneman</a>
- * @version $Id$
+ *
  */
 
 public class ConcreteTextSelector implements Selector {

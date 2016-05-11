@@ -4,7 +4,7 @@ import org.jgroups.jmx.Protocol;
 
 /**
  * @author Bela Ban
- * @version $Id$
+ *
  */
 public class STATE_TRANSFER extends Protocol implements STATE_TRANSFERMBean {
     org.jgroups.protocols.pbcast.STATE_TRANSFER p;

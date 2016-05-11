@@ -6,7 +6,7 @@ import java.util.Vector;
 
 /**
  * @author Bela Ban
- * @version $Id$
+ *
  */
 public interface DiscoveryMBean extends ProtocolMBean {
     long getTimeout();

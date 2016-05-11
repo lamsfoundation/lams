@@ -29,7 +29,7 @@ import java.lang.ref.SoftReference;
  *
  * @author <a href="mailto:stephane@hillion.org">Stephane Hillion</a>
  * @author <a href="mailto:tkormann@ilog.fr">Thierry Kormann</a>
- * @version $Id$
+ *
  */
 public class AWTGlyphGeometryCache {
 

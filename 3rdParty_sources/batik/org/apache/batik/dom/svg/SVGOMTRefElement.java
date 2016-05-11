@@ -26,7 +26,7 @@ import org.w3c.dom.svg.SVGTRefElement;
  * This class implements {@link SVGTRefElement}.
  *
  * @author <a href="mailto:stephane@hillion.org">Stephane Hillion</a>
- * @version $Id$
+ *
  */
 public class SVGOMTRefElement
     extends    SVGURIReferenceTextPositioningElement

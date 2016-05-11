@@ -8,7 +8,7 @@ import javax.mail.Transport;
  * <p>This is the JMX bean of Aspirin configuration. Some configuration 
  * parameter could be applied immediately.</p>
  *
- * @version $Id$
+ *
  *
  */
 public interface ConfigurationMBean {

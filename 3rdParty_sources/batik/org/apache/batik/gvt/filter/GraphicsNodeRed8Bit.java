@@ -40,7 +40,7 @@ import org.apache.batik.gvt.GraphicsNode;
  * GraphicsNode on demand for tiles.
  *
  * @author <a href="mailto:vincent.hardy@eng.sun.com">Vincent Hardy</a>
- * @version $Id$
+ *
  */
 public class GraphicsNodeRed8Bit extends AbstractRed {
 

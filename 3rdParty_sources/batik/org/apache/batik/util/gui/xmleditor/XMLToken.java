@@ -22,7 +22,7 @@ package org.apache.batik.util.gui.xmleditor;
  * XML Token
  * 
  * @author <a href="mailto:tonny@kiyut.com">Tonny Kohar</a>
- * @version $Id$
+ *
  */
 public class XMLToken {
 

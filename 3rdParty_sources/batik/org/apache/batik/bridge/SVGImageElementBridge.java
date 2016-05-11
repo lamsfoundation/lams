@@ -72,7 +72,7 @@ import org.w3c.dom.svg.SVGSVGElement;
  * Bridge class for the &lt;image> element.
  *
  * @author <a href="mailto:tkormann@apache.org">Thierry Kormann</a>
- * @version $Id$
+ *
  */
 public class SVGImageElementBridge extends AbstractGraphicsNodeBridge {
 

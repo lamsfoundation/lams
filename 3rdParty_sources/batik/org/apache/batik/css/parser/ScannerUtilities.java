@@ -23,7 +23,7 @@ package org.apache.batik.css.parser;
  * A collection of utility functions for a CSS scanner.
  *
  * @author <a href="mailto:stephane@hillion.org">Stephane Hillion</a>
- * @version $Id$
+ *
  */
 public class ScannerUtilities {
 

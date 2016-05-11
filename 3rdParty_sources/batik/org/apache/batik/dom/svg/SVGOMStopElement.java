@@ -30,7 +30,7 @@ import org.w3c.dom.svg.SVGStopElement;
  * This class implements {@link org.w3c.dom.svg.SVGStopElement}.
  *
  * @author <a href="mailto:stephane@hillion.org">Stephane Hillion</a>
- * @version $Id$
+ *
  */
 public class SVGOMStopElement
     extends    SVGStylableElement

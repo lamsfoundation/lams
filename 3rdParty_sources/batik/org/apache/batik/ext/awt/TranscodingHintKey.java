@@ -25,7 +25,7 @@ import java.awt.RenderingHints;
  * TranscodingHint as to what the destination of the drawing is.
  *
  * @author <a href="mailto:deweese@apache.org">Thomas DeWeese</a>
- * @version $Id$
+ *
  */
 final class TranscodingHintKey extends RenderingHints.Key {
 

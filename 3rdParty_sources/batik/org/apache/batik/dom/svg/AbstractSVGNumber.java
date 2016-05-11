@@ -24,7 +24,7 @@ import org.w3c.dom.svg.SVGNumber;
  * Implementation of {@link SVGNumber}.
  *
  * @author <a href="mailto:tonny@kiyut.com">Tonny Kohar</a>
- * @version $Id$
+ *
  */
 public abstract class AbstractSVGNumber implements SVGNumber {
 

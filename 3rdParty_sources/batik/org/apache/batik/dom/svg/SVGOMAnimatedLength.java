@@ -23,7 +23,7 @@ package org.apache.batik.dom.svg;
  * org.w3c.dom.svg.SVGAnimatedLength} interface.
  *
  * @author <a href="mailto:stephane@hillion.org">Stephane Hillion</a>
- * @version $Id$
+ *
  */
 public class SVGOMAnimatedLength extends AbstractSVGAnimatedLength {
 

@@ -70,7 +70,7 @@ import java.util.Map;
  * current method and unlock when the method returns.
  *
  * @author Bela Ban
- * @version $Id$
+ *
  * @deprecated will be removed along with optimistic and pessimistic locking.
  */
 @Deprecated

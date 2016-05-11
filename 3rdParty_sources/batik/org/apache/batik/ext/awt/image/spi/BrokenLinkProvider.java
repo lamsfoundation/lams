@@ -27,7 +27,7 @@ import org.apache.batik.ext.awt.image.renderable.Filter;
  * generating a placeholder image when the ImageTagRegistry
  * fails to handle a given reference.
  *
- * @version $Id$
+ *
  */
 public abstract class BrokenLinkProvider {
 

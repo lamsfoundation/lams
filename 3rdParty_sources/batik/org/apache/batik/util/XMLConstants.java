@@ -22,7 +22,7 @@ package org.apache.batik.util;
  * Contains common XML constants.
  *
  * @author <a href="mailto:vhardy@eng.sun.com">Vincent Hardy</a>
- * @version $Id$
+ *
  */
 public interface XMLConstants {
 

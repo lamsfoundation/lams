@@ -40,7 +40,7 @@ import org.w3c.dom.Element;
  * This class implements caching functionality for raster images.
  *
  * @author <a href="mailto:paul_evenblij@compuware.com">Paul Evenblij</a>
- * @version $Id$
+ *
  */
 public abstract class ImageCacher implements SVGSyntax, ErrorConstants {
 

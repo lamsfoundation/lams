@@ -61,7 +61,7 @@ import org.w3c.dom.svg.EventListenerInitializer;
  * This class is the base class for SVG scripting.
  *
  * @author <a href="mailto:stephane@hillion.org">Stephane Hillion</a>
- * @version $Id$
+ *
  */
 public class BaseScriptingEnvironment {
     /**

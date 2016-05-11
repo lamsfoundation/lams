@@ -28,7 +28,7 @@ import org.w3c.dom.Element;
  * an equivalent SVG filter.
  *
  * @author <a href="mailto:vincent.hardy@eng.sun.com">Vincent Hardy</a>
- * @version $Id$
+ *
  * @see                org.apache.batik.svggen.SVGBufferedImageOp
  */
 public class SVGCustomBufferedImageOp extends AbstractSVGFilterConverter {

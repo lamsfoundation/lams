@@ -29,7 +29,7 @@ import org.w3c.dom.svg.SVGAngle;
  * Implementation of an {@link SVGAngle} not associated with any attribute.
  *
  * @author <a href="mailto:cam%40mcc%2eid%2eau">Cameron McCormack</a>
- * @version $Id$
+ *
  */
 public class SVGOMAngle implements SVGAngle {
 

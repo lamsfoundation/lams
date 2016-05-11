@@ -30,7 +30,7 @@ import org.apache.batik.ext.awt.image.spi.ImageWriterRegistry;
  * GenericImageHandler which caches JPEG images.
  *
  * @author <a href="mailto:paul_evenblij@compuware.com">Paul Evenblij</a>
- * @version $Id$
+ *
  */
 public class CachedImageHandlerJPEGEncoder extends DefaultCachedImageHandler {
     public static final String CACHED_JPEG_PREFIX = "jpegImage";

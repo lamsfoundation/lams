@@ -30,7 +30,7 @@ import org.w3c.dom.svg.SVGLineElement;
  * This class implements {@link SVGLineElement}.
  *
  * @author <a href="mailto:stephane@hillion.org">Stephane Hillion</a>
- * @version $Id$
+ *
  */
 public class SVGOMLineElement
     extends    SVGGraphicsElement

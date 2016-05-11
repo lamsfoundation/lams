@@ -23,7 +23,7 @@ package org.apache.batik.bridge;
  * It's methods do nothing.
  *
  * @author <a href="mailto:stephane@hillion.org">Stephane Hillion</a>
- * @version $Id$
+ *
  */
 public class UpdateManagerAdapter implements UpdateManagerListener {
 

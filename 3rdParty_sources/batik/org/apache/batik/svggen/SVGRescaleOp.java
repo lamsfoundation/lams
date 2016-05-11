@@ -34,7 +34,7 @@ import org.w3c.dom.Element;
  * offsets.
  *
  * @author <a href="mailto:vincent.hardy@eng.sun.com">Vincent Hardy</a>
- * @version $Id$
+ *
  * @see                org.apache.batik.svggen.SVGBufferedImageOp
  */
 public class SVGRescaleOp extends AbstractSVGFilterConverter {

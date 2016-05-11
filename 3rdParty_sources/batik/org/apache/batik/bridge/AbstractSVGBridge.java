@@ -24,7 +24,7 @@ import org.apache.batik.util.SVGConstants;
  * The base bridge class for SVG elements.
  *
  * @author <a href="mailto:tkormann@apache.org">Thierry Kormann</a>
- * @version $Id$
+ *
  */
 public abstract class AbstractSVGBridge implements Bridge, SVGConstants {
 

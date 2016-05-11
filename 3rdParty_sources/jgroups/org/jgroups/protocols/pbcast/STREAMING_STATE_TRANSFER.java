@@ -68,7 +68,7 @@ import java.util.concurrent.atomic.AtomicLong;
  * @see org.jgroups.protocols.pbcast.STATE_TRANSFER
  * @since 2.4
  * 
- * @version $Id$
+ *
  * 
  */
 public class STREAMING_STATE_TRANSFER extends Protocol {

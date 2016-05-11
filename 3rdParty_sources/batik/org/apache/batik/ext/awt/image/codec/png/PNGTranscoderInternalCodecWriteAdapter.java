@@ -32,7 +32,7 @@ import org.apache.batik.transcoder.image.PNGTranscoder;
  * This class is a helper to <tt>PNGTranscoder</tt> that writes PNG images
  * through the internal PNG codec.
  *
- * @version $Id$
+ *
  */
 public class PNGTranscoderInternalCodecWriteAdapter implements
         PNGTranscoder.WriteAdapter {

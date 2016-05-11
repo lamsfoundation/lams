@@ -37,7 +37,7 @@ import java.util.Enumeration;
  * the document referencing them.
  *
  * @author <a mailto="vincent.hardy@sun.com">Vincent Hardy</a>
- * @version $Id$
+ *
  */
 public class DocumentJarClassLoader extends URLClassLoader {
     /**

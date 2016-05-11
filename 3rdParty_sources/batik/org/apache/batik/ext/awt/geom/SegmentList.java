@@ -29,7 +29,7 @@ import java.util.Iterator;
 /**
  * A class representing a list of path segments.
  *
- * @version $Id$
+ *
  */
 public class SegmentList {
     List segments = new LinkedList();

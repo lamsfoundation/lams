@@ -35,7 +35,7 @@ import org.apache.batik.ext.awt.image.spi.ImageWriterRegistry;
  * image elements it handles.
  *
  * @author <a href="mailto:vincent.hardy@eng.sun.com">Vincent Hardy</a>
- * @version $Id$
+ *
  * @see             org.apache.batik.svggen.SVGGraphics2D
  * @see             org.apache.batik.svggen.ImageHandlerJPEGEncoder
  * @see             org.apache.batik.svggen.ImageHandlerPNGEncoder

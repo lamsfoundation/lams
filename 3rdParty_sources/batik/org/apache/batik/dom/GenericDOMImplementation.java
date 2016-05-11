@@ -27,7 +27,7 @@ import org.w3c.dom.DocumentType;
  * This class implements the {@link org.w3c.dom.DOMImplementation}.
  *
  * @author <a href="mailto:stephane@hillion.org">Stephane Hillion</a>
- * @version $Id$
+ *
  */
 public class GenericDOMImplementation extends AbstractDOMImplementation {
     /**

@@ -48,7 +48,7 @@ import org.w3c.dom.Document;
  * </ul>
  *
  * @author <a href="mailto:Thierry.Kormann@sophia.inria.fr">Thierry Kormann</a>
- * @version $Id$
+ *
  */
 public abstract class XMLAbstractTranscoder extends AbstractTranscoder {
 

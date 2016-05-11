@@ -35,7 +35,7 @@ import org.w3c.dom.events.MutationEvent;
  * Bridge class for the &lt;xbl:shadowTree&gt; element.
  *
  * @author <a href="mailto:cam%40mcc%2eid%2eau">Cameron McCormack</a>
- * @version $Id$
+ *
  */
 public class XBLShadowTreeElementBridge extends AbstractGraphicsNodeBridge {
     

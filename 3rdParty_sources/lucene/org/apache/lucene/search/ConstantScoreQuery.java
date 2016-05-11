@@ -27,7 +27,7 @@ import java.util.Set;
  * query boost for every document in the filter.
  *
  *
- * @version $Id$
+ *
  */
 public class ConstantScoreQuery extends Query {
   protected final Filter filter;

@@ -30,7 +30,7 @@ import org.w3c.dom.svg.SVGFontElement;
  * This class implements {@link SVGFontElement}.
  *
  * @author <a href="mailto:stephane@hillion.org">Stephane Hillion</a>
- * @version $Id$
+ *
  */
 public class SVGOMFontElement
     extends    SVGStylableElement

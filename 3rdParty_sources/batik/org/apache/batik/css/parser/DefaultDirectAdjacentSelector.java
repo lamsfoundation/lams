@@ -26,7 +26,7 @@ import org.w3c.css.sac.SimpleSelector;
  * {@link org.w3c.css.sac.DescendantSelector} interface.
  *
  * @author <a href="mailto:stephane@hillion.org">Stephane Hillion</a>
- * @version $Id$
+ *
  */
 
 public class DefaultDirectAdjacentSelector extends AbstractSiblingSelector {

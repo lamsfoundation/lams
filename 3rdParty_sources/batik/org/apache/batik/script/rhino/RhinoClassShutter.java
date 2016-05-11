@@ -24,7 +24,7 @@ import org.mozilla.javascript.ClassShutter;
  * Class shutter that restricts access to Batik internals from script.
  *
  * @author <a href="mailto:deweese@apache.org">Thomas DeWeese</a>
- * @version $Id$
+ *
  */
 public class RhinoClassShutter implements ClassShutter {
     

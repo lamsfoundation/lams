@@ -27,7 +27,7 @@ import org.w3c.dom.svg.SVGPreserveAspectRatio;
  * An SVG preserveAspectRatio value in the animation system.
  *
  * @author <a href="mailto:cam%40mcc%2eid%2eau">Cameron McCormack</a>
- * @version $Id$
+ *
  */
 public class AnimatablePreserveAspectRatioValue extends AnimatableValue {
     

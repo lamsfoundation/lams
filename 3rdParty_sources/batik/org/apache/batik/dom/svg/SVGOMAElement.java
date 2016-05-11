@@ -32,7 +32,7 @@ import org.w3c.dom.svg.SVGAnimatedString;
  * This class implements {@link SVGAElement}.
  *
  * @author <a href="mailto:stephane@hillion.org">Stephane Hillion</a>
- * @version $Id$
+ *
  */
 public class SVGOMAElement
     extends    SVGURIReferenceGraphicsElement

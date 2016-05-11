@@ -37,7 +37,7 @@ import org.apache.batik.gvt.text.TextPaintInfo;
  * attributes.
  *
  * @author <a href="mailto:bella.robinson@cmis.csiro.au">Bella Robinson</a>
- * @version $Id$
+ *
  */
 public class Glyph {
 

@@ -33,7 +33,7 @@ import java.io.IOException;
  * Directory methods that would normally modify data throw an exception.
  *
  *
- * @version $Id$
+ *
  */
 class CompoundFileReader extends Directory {
 

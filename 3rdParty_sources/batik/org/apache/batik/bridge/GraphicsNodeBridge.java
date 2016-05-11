@@ -26,7 +26,7 @@ import org.w3c.dom.Element;
  * according to an <tt>Element</tt>.
  *
  * @author <a href="mailto:tkormann@apache.org">Thierry Kormann</a>
- * @version $Id$
+ *
  */
 public interface GraphicsNodeBridge extends Bridge {
 

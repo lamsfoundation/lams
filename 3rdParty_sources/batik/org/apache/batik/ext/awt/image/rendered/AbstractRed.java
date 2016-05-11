@@ -52,7 +52,7 @@ import org.apache.batik.ext.awt.image.GraphicsUtil;
  * the subclass implementation.
  *
  * @author <a href="mailto:Thomas.DeWeeese@Kodak.com">Thomas DeWeese</a>
- * @version $Id$
+ *
  */
 public abstract class AbstractRed implements CachableRed {
 

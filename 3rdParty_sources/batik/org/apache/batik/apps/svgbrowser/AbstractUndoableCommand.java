@@ -22,7 +22,7 @@ package org.apache.batik.apps.svgbrowser;
  * Represents abstract undoable/redoable command. Concrete commands should
  * extend this class
  *
- * @version $Id$
+ *
  */
 public abstract class AbstractUndoableCommand implements UndoableCommand {
 

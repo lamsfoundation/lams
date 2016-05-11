@@ -4,7 +4,7 @@ import org.jgroups.jmx.Protocol;
 
 /**
  * @author Bela Ban
- * @version $Id$
+ *
  */
 public class FD_SOCK extends Protocol implements FD_SOCKMBean {
     org.jgroups.protocols.FD_SOCK p;

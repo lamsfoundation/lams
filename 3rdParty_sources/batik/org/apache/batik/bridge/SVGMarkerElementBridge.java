@@ -36,7 +36,7 @@ import org.w3c.dom.Node;
  * Bridge class for the &lt;marker> element.
  *
  * @author <a href="mailto:tkormann@apache.org">Thierry Kormann</a>
- * @version $Id$
+ *
  */
 public class SVGMarkerElementBridge extends AnimatableGenericSVGBridge
         implements MarkerBridge, ErrorConstants {

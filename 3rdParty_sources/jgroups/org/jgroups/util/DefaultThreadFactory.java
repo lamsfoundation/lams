@@ -9,7 +9,7 @@ package org.jgroups.util;
  * 
  * @author Vladimir Blagojevic
  * @author Bela Ban
- * @version $Id: DefaultThreadFactory.java,v 1.3.2.4 2008/05/26 09:14:38 belaban
+ *
  *          Exp $
  */
 public class DefaultThreadFactory implements ThreadFactory, ThreadManager {

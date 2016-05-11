@@ -32,7 +32,7 @@ import org.w3c.dom.Element;
  * Abstract bridge class for those elements that can be animated.
  *
  * @author <a href="mailto:cam%40mcc%2eid%2eau">Cameron McCormack</a>
- * @version $Id$
+ *
  */
 public abstract class AnimatableSVGBridge
         extends AbstractSVGBridge

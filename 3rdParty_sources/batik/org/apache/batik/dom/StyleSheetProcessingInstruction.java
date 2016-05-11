@@ -31,7 +31,7 @@ import org.w3c.dom.stylesheets.StyleSheet;
  * instructions.
  *
  * @author <a href="mailto:stephane@hillion.org">Stephane Hillion</a>
- * @version $Id$
+ *
  */
 public class StyleSheetProcessingInstruction
     extends AbstractProcessingInstruction

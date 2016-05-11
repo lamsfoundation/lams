@@ -25,7 +25,7 @@ import java.lang.reflect.Method;
  * Platform specific functionality.
  *
  * @author <a href="mailto:cam%40mcc%2eid%2eau">Cameron McCormack</a>
- * @version $Id$
+ *
  */
 public abstract class Platform {
 
