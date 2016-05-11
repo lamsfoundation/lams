@@ -21,7 +21,7 @@
  * ****************************************************************
  */
 
-/* $Id$ */
+
 package org.lamsfoundation.lams.tool.leaderselection.web.actions;
 
 import javax.servlet.http.HttpSession;

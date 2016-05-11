@@ -21,7 +21,7 @@
  * ****************************************************************
  */
 
-/* $$Id$$ */
+
 package org.lamsfoundation.lams.tool.qa.dto;
 
 import org.apache.commons.lang.builder.ToStringBuilder;

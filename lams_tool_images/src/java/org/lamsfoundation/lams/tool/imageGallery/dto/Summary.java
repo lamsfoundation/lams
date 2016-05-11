@@ -21,7 +21,7 @@
  * ****************************************************************
  */
 
-/* $Id$ */
+
 package org.lamsfoundation.lams.tool.imageGallery.dto;
 
 import org.lamsfoundation.lams.rating.dto.ItemRatingDTO;

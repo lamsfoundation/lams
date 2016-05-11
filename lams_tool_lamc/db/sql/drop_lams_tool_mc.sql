@@ -1,4 +1,4 @@
--- $Id$
+
 
 SET FOREIGN_KEY_CHECKS=0;
 DROP TABLE tl_lamc11_uploadedFile;

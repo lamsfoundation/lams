@@ -20,7 +20,7 @@
  * ****************************************************************
  */
 
-/* $Id$ */
+
 package org.eucm.lams.tool.eadventure.dao.hibernate;
 
 import org.eucm.lams.tool.eadventure.dao.EadventureConditionDAO;

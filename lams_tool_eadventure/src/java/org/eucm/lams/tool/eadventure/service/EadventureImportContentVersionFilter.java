@@ -20,7 +20,7 @@
  * ****************************************************************
  */
 
-/* $Id$ */
+
 package org.eucm.lams.tool.eadventure.service;
 
 import org.eucm.lams.tool.eadventure.model.Eadventure;

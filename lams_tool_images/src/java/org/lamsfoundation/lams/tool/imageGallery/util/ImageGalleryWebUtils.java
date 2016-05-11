@@ -21,7 +21,7 @@
  * ****************************************************************
  */
 
-/* $$Id$$ */
+
 package org.lamsfoundation.lams.tool.imageGallery.util;
 
 import org.lamsfoundation.lams.tool.imageGallery.ImageGalleryConstants;

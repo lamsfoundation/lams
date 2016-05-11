@@ -20,7 +20,7 @@
  * ****************************************************************
  */
 
-/* $Id$ */
+
 package org.lamsfoundation.lams.tool.mindmap.service;
 
 import org.lamsfoundation.lams.learningdesign.service.ToolContentVersionFilter;

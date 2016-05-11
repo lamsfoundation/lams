@@ -20,7 +20,7 @@
  * ****************************************************************
  */
 
-/* $Id$ */
+
 package org.lamsfoundation.lams.tool.kaltura.dao;
 
 import org.lamsfoundation.lams.dao.IBaseDAO;

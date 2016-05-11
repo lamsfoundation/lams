@@ -21,7 +21,7 @@
  * ****************************************************************
  */
 
-/* $$Id$$ */
+
 package org.lamsfoundation.lams.tool.commonCartridge.util;
 
 import org.lamsfoundation.lams.tool.commonCartridge.CommonCartridgeConstants;

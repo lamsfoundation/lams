@@ -21,7 +21,7 @@
  * ****************************************************************
  */
 
-/* $$Id$$ */
+
 
 package org.eucm.lams.tool.eadventure.web.servlet;
 

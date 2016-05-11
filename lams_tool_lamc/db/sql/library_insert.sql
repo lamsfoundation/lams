@@ -1,4 +1,4 @@
--- $Id$
+
 
 INSERT INTO lams_learning_library
 (
