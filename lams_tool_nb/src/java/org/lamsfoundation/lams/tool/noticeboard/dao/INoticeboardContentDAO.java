@@ -21,7 +21,7 @@
  * ****************************************************************
  */
 
-/* $$Id$$ */
+
 package org.lamsfoundation.lams.tool.noticeboard.dao;
 
 import org.lamsfoundation.lams.tool.noticeboard.NoticeboardContent;

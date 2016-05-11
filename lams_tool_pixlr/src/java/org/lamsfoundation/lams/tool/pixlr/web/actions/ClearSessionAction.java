@@ -21,7 +21,7 @@
  * ****************************************************************
  */
 
-/* $Id$ */
+
 package org.lamsfoundation.lams.tool.pixlr.web.actions;
 
 import javax.servlet.http.HttpSession;

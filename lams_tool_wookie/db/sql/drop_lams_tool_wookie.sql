@@ -1,4 +1,4 @@
--- CVS ID: $Id$
+
  
 SET FOREIGN_KEY_CHECKS=0;
 DROP TABLE IF EXISTS tl_lawook10_user;

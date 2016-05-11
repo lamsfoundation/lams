@@ -21,7 +21,7 @@
  * ****************************************************************
  */
 
-/* $Id$ */
+
 package org.lamsfoundation.lams.tool.spreadsheet.web.action;
 
 import javax.servlet.http.HttpSession;

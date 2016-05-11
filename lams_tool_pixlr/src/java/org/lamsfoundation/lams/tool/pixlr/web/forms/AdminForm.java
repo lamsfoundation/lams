@@ -20,7 +20,7 @@
  * ****************************************************************
  */
 
-/* $Id$ */
+
 package org.lamsfoundation.lams.tool.pixlr.web.forms;
 
 import javax.servlet.http.HttpServletRequest;

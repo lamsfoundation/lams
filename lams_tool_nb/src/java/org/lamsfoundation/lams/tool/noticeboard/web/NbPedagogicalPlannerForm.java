@@ -20,7 +20,7 @@
  * ****************************************************************
  */
 
-/* $Id$ */
+
 package org.lamsfoundation.lams.tool.noticeboard.web;
 
 import org.lamsfoundation.lams.tool.noticeboard.NoticeboardContent;

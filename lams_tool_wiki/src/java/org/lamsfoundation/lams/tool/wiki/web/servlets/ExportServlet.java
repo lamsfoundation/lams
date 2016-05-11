@@ -21,7 +21,7 @@
  * ****************************************************************
  */
 
-/* $Id$ */
+
 
 package org.lamsfoundation.lams.tool.wiki.web.servlets;
 

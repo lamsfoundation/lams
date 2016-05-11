@@ -20,7 +20,7 @@
  * ****************************************************************
  */
 
-/* $Id$ */
+
 package org.lamsfoundation.lams.tool.taskList.dao.hibernate;
 
 import org.lamsfoundation.lams.tool.taskList.dao.TaskListConditionDAO;

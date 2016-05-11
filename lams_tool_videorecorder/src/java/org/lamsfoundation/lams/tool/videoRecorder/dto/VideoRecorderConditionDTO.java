@@ -20,7 +20,7 @@
  * ****************************************************************
  */
 
-/* $Id$ */
+
 package org.lamsfoundation.lams.tool.videoRecorder.dto;
 
 import org.lamsfoundation.lams.learningdesign.TextSearchCondition;

@@ -20,7 +20,7 @@
  * ****************************************************************
  */
 
-/* $$Id$$ */
+
 package org.lamsfoundation.lams.tool.survey.web.form;
 
 import org.apache.struts.util.LabelValueBean;

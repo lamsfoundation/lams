@@ -20,7 +20,7 @@
  * http://www.gnu.org/licenses/gpl.txt
  * ****************************************************************
  */
-/* $$Id$$ */
+
 package org.lamsfoundation.lams.tool.survey.dao;
 
 import org.lamsfoundation.lams.tool.survey.model.SurveyQuestion;
