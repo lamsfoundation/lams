@@ -20,7 +20,7 @@
  * ****************************************************************
  */
 
-/* $Id$ */
+
 package org.lamsfoundation.lams.planner;
 
 import org.lamsfoundation.lams.usermanagement.Role;

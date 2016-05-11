@@ -21,7 +21,7 @@
  * ****************************************************************
  */
 
-/* $Id$ */
+
 package org.lamsfoundation.lams.comments.web;
 
 import org.apache.commons.lang.StringUtils;

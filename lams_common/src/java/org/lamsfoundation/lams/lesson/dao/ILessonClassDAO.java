@@ -20,7 +20,7 @@
  * http://www.gnu.org/licenses/gpl.txt
  * ****************************************************************
  */
-/* $$Id$$ */
+
 package org.lamsfoundation.lams.lesson.dao;
 
 import org.lamsfoundation.lams.dao.IBaseDAO;

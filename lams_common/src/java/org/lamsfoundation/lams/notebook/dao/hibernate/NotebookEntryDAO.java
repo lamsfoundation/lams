@@ -21,7 +21,7 @@
  * ****************************************************************
  */
 
-/* $Id$ */
+
 
 package org.lamsfoundation.lams.notebook.dao.hibernate;
 
