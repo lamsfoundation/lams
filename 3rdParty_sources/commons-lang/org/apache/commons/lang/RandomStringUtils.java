@@ -34,7 +34,7 @@ import java.util.Random;
  * @author Gary Gregory
  * @author Phil Steitz
  * @since 1.0
- * @version $Id$
+ *
  */
 public class RandomStringUtils {
 

@@ -30,7 +30,7 @@ import java.nio.CharBuffer;
  * to increase reusability, because FilterReader changes the 
  * methods being called, such as read(char[]) to read(char[], int, int).
  * 
- * @version $Id$
+ *
  */
 public abstract class ProxyReader extends FilterReader {
 

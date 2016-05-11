@@ -27,7 +27,7 @@ package org.apache.commons.lang;
  * @author Pete Gieser
  * @author Gary Gregory
  * @since 2.0
- * @version $Id$
+ *
  */
 public class BitField {
     

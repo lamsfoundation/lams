@@ -23,7 +23,7 @@ package net.fckeditor.connector.exception;
 /**
  * Thrown when an improper/invalid current folder was provided/requested.
  * 
- * @version $Id$
+ *
  */
 public class InvalidCurrentFolderException extends Exception {
 

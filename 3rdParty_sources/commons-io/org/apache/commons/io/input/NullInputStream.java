@@ -58,7 +58,7 @@ import java.io.InputStream;
  * </pre>
  *
  * @since 1.3
- * @version $Id$
+ *
  */
 public class NullInputStream extends InputStream {
 

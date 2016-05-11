@@ -34,7 +34,7 @@ import net.fckeditor.FCKeditorConfig;
  * Sets {@link FCKeditorConfig configuration options} in the surrounding editor
  * tag only.
  * 
- * @version $Id$
+ *
  */
 public class ConfigTag extends TagSupport implements DynamicAttributes {
 

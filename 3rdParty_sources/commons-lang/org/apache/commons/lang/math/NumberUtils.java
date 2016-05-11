@@ -33,7 +33,7 @@ import org.apache.commons.lang.StringUtils;
  * @author <a href="mailto:ggregory@seagullsw.com">Gary Gregory</a>
  * @author <a href="mailto:fredrik@westermarck.com">Fredrik Westermarck</a>
  * @since 2.0
- * @version $Id$
+ *
  */
 public class NumberUtils {
     

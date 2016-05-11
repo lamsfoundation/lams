@@ -30,7 +30,7 @@ import net.fckeditor.FCKeditor;
 /**
  * Checks browser compatibility with the {@link FCKeditor editor}.
  * 
- * @version $Id$
+ *
  */
 public class Compatibility {
 

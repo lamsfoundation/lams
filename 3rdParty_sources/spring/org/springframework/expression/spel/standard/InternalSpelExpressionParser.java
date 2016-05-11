@@ -370,8 +370,8 @@ class InternalSpelExpressionParser extends TemplateAwareExpressionParser {
 	// : (POUND ID LPAREN) => function
 	// | var
 	//
-	// function : POUND id=ID methodArgs -> ^(FUNCTIONREF[$id] methodArgs);
-	// var : POUND id=ID -> ^(VARIABLEREF[$id]);
+
+
 	private boolean maybeEatFunctionOrVar() {
 		if (!peekToken(TokenKind.HASH)) {
 			return false;

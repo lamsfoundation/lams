@@ -48,7 +48,7 @@ import java.nio.charset.UnsupportedCharsetException;
  * 
  * @see <a href="http://docs.oracle.com/javase/6/docs/api/java/nio/charset/Charset.html">Standard charsets</a>
  * @since 2.3
- * @version $Id$
+ *
  */
 public class Charsets {
     //

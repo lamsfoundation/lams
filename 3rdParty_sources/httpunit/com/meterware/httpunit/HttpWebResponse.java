@@ -1,6 +1,6 @@
 package com.meterware.httpunit;
 /********************************************************************************************************************
-* $Id$
+
 *
 * Copyright (c) 2000-2004, Russell Gold
 *
@@ -89,7 +89,7 @@ class HttpWebResponse extends WebResponse {
     		} catch (java.io.FileNotFoundException fnfe) {
     			// as of JDK 1.5 a null inputstream might have been returned here
     			// see bug report [ 1283878 ] FileNotFoundException using Sun JDK 1.5 on empty error pages
-    			// by Roger Lindsjö
+    			// by Roger Lindsjï¿½
     			if (isErrorResponse(connection)) {
     				// fake an empty error stream
     				result=new ByteArrayInputStream(new byte[0]);

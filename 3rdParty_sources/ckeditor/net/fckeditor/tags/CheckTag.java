@@ -51,7 +51,7 @@ import net.fckeditor.tool.Compatibility;
  * Each call will emit a localized message (if available) about the command's
  * status.
  * 
- * @version $Id$
+ *
  */
 public class CheckTag extends TagSupport {
 

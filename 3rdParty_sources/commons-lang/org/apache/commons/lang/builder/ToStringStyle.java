@@ -65,7 +65,7 @@ import org.apache.commons.lang.SystemUtils;
  * @author Pete Gieser
  * @author Masato Tezuka
  * @since 1.0
- * @version $Id$
+ *
  */
 public abstract class ToStringStyle implements Serializable {
 

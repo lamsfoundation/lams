@@ -39,7 +39,7 @@ import java.util.List;
  * {@link #exitWhenFinished}, typically in
  * {@link javax.servlet.ServletContextListener#contextDestroyed} or similar.
  *
- * @version $Id$
+ *
  */
 public class FileCleaningTracker {
     /**

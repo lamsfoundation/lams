@@ -28,7 +28,7 @@ import org.apache.tomcat.util.buf.CharChunk;
  * Internet Message Bodies. Reference 1996
  *
  * @author Jeffrey Rodriguez
- * @version $Id$
+ *
  */
 public final class  Base64
 {

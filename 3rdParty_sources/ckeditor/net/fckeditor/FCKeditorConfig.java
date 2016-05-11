@@ -37,7 +37,7 @@ import org.slf4j.LoggerFactory;
  * FCKConfig instance to an editor, it will automatically override these
  * system-wide settings for the current instance only.
  * 
- * @version $Id$
+ *
  */
 public class FCKeditorConfig extends HashMap<String, String> {
 

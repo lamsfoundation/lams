@@ -80,7 +80,7 @@ import org.apache.commons.lang.ArrayUtils;
  * @author Pete Gieser
  * @author Arun Mammen Thomas
  * @since 1.0
- * @version $Id$
+ *
  */
 public class EqualsBuilder {
     

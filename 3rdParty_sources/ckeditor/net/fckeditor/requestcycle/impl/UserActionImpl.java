@@ -29,7 +29,7 @@ import net.fckeditor.requestcycle.UserAction;
  * <code>true</code>.<br/>
  * 
  * @see EnabledUserAction
- * @version $Id$
+ *
  * @deprecated Class will be removed in FCKeditor.Java 2.6, functionality now
  *             served by {@link EnabledUserAction}.
  */

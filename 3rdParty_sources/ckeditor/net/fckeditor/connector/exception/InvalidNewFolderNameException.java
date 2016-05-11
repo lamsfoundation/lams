@@ -23,7 +23,7 @@ package net.fckeditor.connector.exception;
 /**
  * Thrown when an improper/invalid new folder name was provided.
  * 
- * @version $Id$
+ *
  */
 public class InvalidNewFolderNameException extends Exception {
 

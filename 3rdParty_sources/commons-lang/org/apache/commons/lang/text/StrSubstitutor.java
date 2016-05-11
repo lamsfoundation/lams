@@ -99,7 +99,7 @@ import java.util.Properties;
  *
  * @author Apache Software Foundation
  * @author Oliver Heger
- * @version $Id$
+ *
  * @since 2.2
  */
 public class StrSubstitutor {

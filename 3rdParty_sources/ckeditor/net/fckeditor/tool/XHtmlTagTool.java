@@ -40,7 +40,7 @@ import java.util.Map;
  * {@link #SPACE} as the tag's value.</li>
  * </ul>
  * 
- * @version $Id$
+ *
  */
 public class XHtmlTagTool {
 

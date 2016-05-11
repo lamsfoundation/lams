@@ -32,7 +32,7 @@ import org.devlib.schmidt.imageinfo.ImageInfo;
 /**
  * Static helper methods for files.
  * 
- * @version $Id$
+ *
  */
 public class UtilsFile {
 	

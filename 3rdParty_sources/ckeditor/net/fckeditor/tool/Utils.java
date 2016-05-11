@@ -27,7 +27,7 @@ import java.util.StringTokenizer;
 /**
  * Static helper methods for strings.
  * 
- * @version $Id$
+ *
  */
 public class Utils {
 

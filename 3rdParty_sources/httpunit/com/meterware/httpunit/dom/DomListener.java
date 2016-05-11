@@ -2,7 +2,7 @@ package com.meterware.httpunit.dom;
 import org.w3c.dom.Node;
 import org.w3c.dom.Element;
 /********************************************************************************************************************
- * $Id$
+ *
  *
  * Copyright (c) 2007, Russell Gold
  *

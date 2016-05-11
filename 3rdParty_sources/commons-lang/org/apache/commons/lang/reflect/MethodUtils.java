@@ -51,7 +51,7 @@ import org.apache.commons.lang.ClassUtils;
  * @author Robert Burrell Donkin
  * @author Matt Benson
  * @since 2.5
- * @version $Id$
+ *
  */
 public class MethodUtils {
 

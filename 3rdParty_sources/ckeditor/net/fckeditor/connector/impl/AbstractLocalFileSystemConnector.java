@@ -58,7 +58,7 @@ import org.apache.commons.io.filefilter.FileFileFilter;
  * to subclass it and implement the abstract methods and override methods if
  * necessary.
  * 
- * @version $Id$
+ *
  */
 public abstract class AbstractLocalFileSystemConnector implements Connector {
 

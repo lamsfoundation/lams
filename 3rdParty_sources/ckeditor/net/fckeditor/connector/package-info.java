@@ -28,6 +28,6 @@
  * <img src="doc-files/sequence-diagram.png" alt="Connector Life Cycle Diagram" 
  * title="Connector Life Cycle Diagram" />
  * </p>
- * @version $Id$
+ *
  */
 package net.fckeditor.connector;

@@ -24,7 +24,7 @@ package net.fckeditor.connector.exception;
  * Thrown to indicate that the requested folder cannot be created because it
  * already exists.
  * 
- * @version $Id$
+ *
  */
 public class FolderAlreadyExistsException extends Exception {
 

@@ -33,7 +33,7 @@ import net.fckeditor.tool.Utils;
  * user locale by calling {@link ServletRequest#getLocale()} if and only if the
  * <code>Accept-Language</code> header is not empty.
  * 
- * @version $Id$
+ *
  */
 public class AcceptLanguageHeaderResolver implements LocaleResolver {
 

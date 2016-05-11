@@ -58,7 +58,7 @@ import net.fckeditor.requestcycle.ThreadLocalData;
  * </ol>
  * </p>
  * 
- * @version $Id$
+ *
  */
 public interface Connector {
 

@@ -22,6 +22,6 @@
 /**
  * Custom {@link net.fckeditor.connector.Connector connector} exceptions.
  *
- * @version $Id$
+ *
  */
 package net.fckeditor.connector.exception;

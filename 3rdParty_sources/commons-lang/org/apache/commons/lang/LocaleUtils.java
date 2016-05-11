@@ -35,7 +35,7 @@ import java.util.Set;
  *
  * @author Apache Software Foundation
  * @since 2.2
- * @version $Id$
+ *
  */
 public class LocaleUtils {
 

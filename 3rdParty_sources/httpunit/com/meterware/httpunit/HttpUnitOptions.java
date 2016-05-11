@@ -1,6 +1,6 @@
 package com.meterware.httpunit;
 /********************************************************************************************************************
-* $Id$
+
 *
 * Copyright (c) 2000-2008, Russell Gold
 *
@@ -42,7 +42,7 @@ public abstract class HttpUnitOptions {
 	 * ID for Revision Control System - will show in the class file and 
 	 * can be looked for using the ident command of RCS
 	 */
-	private final static String RCSID="$Id$";
+
 
 
     public static final String ORIGINAL_SCRIPTING_ENGINE_FACTORY = "com.meterware.httpunit.javascript.JavaScriptEngineFactory";

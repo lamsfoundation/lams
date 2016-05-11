@@ -45,7 +45,7 @@ import net.fckeditor.tool.Utils;
  * will fail.
  * </p>
  * 
- * @version $Id$
+ *
  */
 public class UploadResponse {
 

@@ -33,7 +33,7 @@ import java.io.OutputStream;
  * <p>
  * Origin of code: Excalibur
  *
- * @version $Id$
+ *
  * @see org.apache.commons.io.input.SwappedDataInputStream
  */
 public class EndianUtils {

@@ -40,7 +40,7 @@ import net.fckeditor.tool.Utils;
  * <li>Media</li>
  * </ul>
  * 
- * @version $Id$
+ *
  */
 public class ResourceType {
 

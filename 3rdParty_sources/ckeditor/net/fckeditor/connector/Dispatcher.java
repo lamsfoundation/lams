@@ -63,7 +63,7 @@ import org.slf4j.LoggerFactory;
  * connector and emits appropriate (localized) messages to the user. The
  * exceptions won't be logged, they simply indicate the connector state.
  * 
- * @version $Id$
+ *
  */
 public class Dispatcher {
 	private static final Logger logger = LoggerFactory.getLogger(Dispatcher.class);

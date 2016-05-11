@@ -25,7 +25,7 @@ import java.io.PrintWriter;
  * @author Daniel L. Rall
  * @see org.apache.commons.lang.exception.NestableException
  * @since 1.0
- * @version $Id$
+ *
  */
 public class NestableError extends Error implements Nestable {
 

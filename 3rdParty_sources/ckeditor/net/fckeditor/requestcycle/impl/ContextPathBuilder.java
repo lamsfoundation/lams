@@ -28,7 +28,7 @@ import javax.servlet.http.HttpServletRequest;
  * connector.userFiles*Path} properties and prepend the current context path to
  * {@link #getUserFilesPath(HttpServletRequest)} only.
  * 
- * @version $Id$
+ *
  */
 public class ContextPathBuilder extends ServerRootPathBuilder {
 

@@ -39,7 +39,7 @@ import java.util.StringTokenizer;
  * <li>Get the free space on a drive
  * </ul>
  *
- * @version $Id$
+ *
  * @since 1.1
  */
 public class FileSystemUtils {

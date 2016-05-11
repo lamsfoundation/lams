@@ -83,7 +83,7 @@ import java.util.NoSuchElementException;
  * @author Matthew Inger
  * @author Gary D. Gregory
  * @since 2.2
- * @version $Id$
+ *
  */
 public class StrTokenizer implements ListIterator, Cloneable {
 

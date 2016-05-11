@@ -22,6 +22,6 @@
 /**
  * Default implementations for the request life cycle interfaces.
  * 
- * @version $Id$
+ *
  */
 package net.fckeditor.requestcycle.impl;

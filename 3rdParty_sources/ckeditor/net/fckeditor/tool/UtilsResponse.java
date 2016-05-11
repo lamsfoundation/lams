@@ -25,7 +25,7 @@ import net.fckeditor.handlers.ResourceType;
 /**
  * Static helper methods for the servlet response.
  * 
- * @version $Id$
+ *
  */
 public class UtilsResponse {
 

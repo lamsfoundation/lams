@@ -28,7 +28,7 @@ import java.text.ParsePosition;
  * 
  * @author Apache Software Foundation
  * @author Archimedes Trajano
- * @version $Id$
+ *
  */
 public class CompositeFormat extends Format {
 

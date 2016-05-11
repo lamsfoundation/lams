@@ -34,7 +34,7 @@ import javax.servlet.http.HttpServletRequest;
  * request, or on a per-request basis.
  * </p>
  * 
- * @version $Id$
+ *
  */
 public interface UserPathBuilder {
 

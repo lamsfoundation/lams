@@ -1,5 +1,5 @@
 /*
- * $Id$ 
+ *
  *
  * Copyright 2003-2005 The Apache Software Foundation.
  * 

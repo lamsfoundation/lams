@@ -30,7 +30,7 @@ import net.fckeditor.requestcycle.UserPathBuilder;
  * In particular it returns the {@code connector.userFiles*Path} properties
  * as-is.
  * 
- * @version $Id$
+ *
  */
 public class ServerRootPathBuilder implements UserPathBuilder {
 

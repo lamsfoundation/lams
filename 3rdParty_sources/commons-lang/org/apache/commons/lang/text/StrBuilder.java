@@ -69,7 +69,7 @@ import org.apache.commons.lang.SystemUtils;
  *
  * @author Apache Software Foundation
  * @since 2.2
- * @version $Id$
+ *
  */
 public class StrBuilder implements Cloneable {
 
