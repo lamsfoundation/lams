@@ -145,7 +145,7 @@ function initLessonTab(){
 					$('#imAvailableField').attr({
 						'checked'  : null,
 						'disabled' : 'disabled'
-					});
+					}).change();
 					alert(LABELS.LESSON_PRESENCE_DISABLE_ALERT);
 				}
 			}
