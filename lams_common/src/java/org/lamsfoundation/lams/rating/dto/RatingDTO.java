@@ -20,7 +20,7 @@
  * ****************************************************************
  */
 
-/* $Id$ */
+
 package org.lamsfoundation.lams.rating.dto;
 
 import org.lamsfoundation.lams.usermanagement.User;

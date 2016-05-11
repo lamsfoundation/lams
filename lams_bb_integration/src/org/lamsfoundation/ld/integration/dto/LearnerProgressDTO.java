@@ -20,7 +20,7 @@
  * **************************************************************** 
  */
 
-/* $Id$ */
+
 package org.lamsfoundation.ld.integration.dto;
 
 public class LearnerProgressDTO {

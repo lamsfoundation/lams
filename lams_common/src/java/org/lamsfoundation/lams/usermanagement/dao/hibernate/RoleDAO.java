@@ -20,7 +20,7 @@
  * http://www.gnu.org/licenses/gpl.txt
  * ****************************************************************
  */
-/* $$Id$$ */
+
 package org.lamsfoundation.lams.usermanagement.dao.hibernate;
 
 import org.apache.commons.lang.StringUtils;

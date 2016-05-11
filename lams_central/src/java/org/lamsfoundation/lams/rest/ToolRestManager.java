@@ -20,7 +20,7 @@
  * ****************************************************************
  */
 
-/* $Id$ */
+
 package org.lamsfoundation.lams.rest;
 
 import org.apache.tomcat.util.json.JSONException;

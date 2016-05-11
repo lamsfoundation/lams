@@ -21,7 +21,7 @@
  * ****************************************************************
  */
 
-/* $Id$ */
+
 package org.lamsfoundation.lams.tool.dao.hibernate;
 
 import org.hibernate.HibernateException;

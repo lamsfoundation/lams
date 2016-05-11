@@ -21,7 +21,7 @@
  * ****************************************************************
  */
 
-/* $$Id$$ */
+
 package org.lamsfoundation.lams.contentrepository.dao.hibernate;
 
 import java.io.Serializable;

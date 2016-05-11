@@ -21,11 +21,11 @@
  * ****************************************************************
  */
 
-/* $Id$ */
+
 
 package org.lamsfoundation.lams.web.util;
 
-/* $Id$ */
+
 
 import java.util.HashMap;
 

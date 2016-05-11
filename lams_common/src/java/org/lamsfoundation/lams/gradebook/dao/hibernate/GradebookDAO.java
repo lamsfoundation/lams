@@ -20,7 +20,7 @@
  * ****************************************************************
  */
 
-/* $Id$ */
+
 package org.lamsfoundation.lams.gradebook.dao.hibernate;
 
 import java.util.Date;

@@ -20,7 +20,7 @@
  * ****************************************************************
  */
 
-/* $Id$ */
+
 package org.lamsfoundation.lams.learningdesign.dto;
 
 import org.apache.commons.lang.builder.ToStringBuilder;

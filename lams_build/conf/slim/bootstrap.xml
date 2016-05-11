@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
    The list of URLs for mc beans to load during bootstrap.
-   $Id$
+
 -->
 <bootstrap xmlns="urn:jboss:bootstrap:1.0">
 

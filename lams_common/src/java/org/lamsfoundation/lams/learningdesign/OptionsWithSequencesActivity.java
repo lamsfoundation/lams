@@ -20,7 +20,7 @@
  * ****************************************************************
  */
 
-/* $Id$ */
+
 package org.lamsfoundation.lams.learningdesign;
 
 public class OptionsWithSequencesActivity extends OptionsActivity {

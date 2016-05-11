@@ -21,7 +21,7 @@
  * ****************************************************************
  */
 
-/* $$Id$$ */
+
 package org.lamsfoundation.lams.monitoring.quartz.job;
 
 import org.lamsfoundation.lams.monitoring.service.IMonitoringService;

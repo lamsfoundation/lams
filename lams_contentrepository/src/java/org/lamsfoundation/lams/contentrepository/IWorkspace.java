@@ -21,7 +21,7 @@
  * ****************************************************************
  */
 
-/* $$Id$$ */package org.lamsfoundation.lams.contentrepository;
+package org.lamsfoundation.lams.contentrepository;
 
 /**
  * A workspace is a grouping of content, which is accessed by a ticket.
