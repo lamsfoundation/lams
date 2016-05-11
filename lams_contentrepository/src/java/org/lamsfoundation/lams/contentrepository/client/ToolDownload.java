@@ -21,7 +21,7 @@
  * ****************************************************************
  */
 
-/* $$Id$$ */
+
 package org.lamsfoundation.lams.contentrepository.client;
 
 import org.lamsfoundation.lams.contentrepository.ITicket;

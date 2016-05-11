@@ -20,7 +20,7 @@
  * ****************************************************************
  */
 
-/* $Id$ */
+
 package org.lamsfoundation.lams.rest;
 
 /** Commonly used JSON tags for the calling the REST servlets */

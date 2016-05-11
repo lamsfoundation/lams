@@ -21,7 +21,7 @@
  * ****************************************************************
  */
 
-/* $Id$ */
+
 package org.lamsfoundation.lams.admin.web;
 
 import javax.servlet.http.HttpServletRequest;

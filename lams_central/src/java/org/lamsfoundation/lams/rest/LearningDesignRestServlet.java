@@ -20,7 +20,7 @@
  * ****************************************************************
  */
 
-/* $Id$ */
+
 package org.lamsfoundation.lams.rest;
 
 import javax.servlet.http.HttpServletResponse;

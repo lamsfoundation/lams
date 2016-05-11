@@ -20,7 +20,7 @@
  * ****************************************************************
  */
 
-/* $Id$ */
+
 package org.lamsfoundation.lams.learningdesign;
 
 import org.apache.commons.lang.builder.CompareToBuilder;

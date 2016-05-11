@@ -21,7 +21,7 @@
  * ****************************************************************
  */
 
-/* $$Id$$ */
+
 package org.lamsfoundation.lams.learning.web.action;
 
 import org.lamsfoundation.lams.learning.service.ICoreLearnerService;

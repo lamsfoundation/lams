@@ -1,4 +1,4 @@
--- CVS ID: $Id$
+
 INSERT INTO lams_privilege VALUES (1,'Z','do anything');
 INSERT INTO lams_privilege VALUES (2,'A','add/remove/modify classes within the course');
 INSERT INTO lams_privilege VALUES (3,'B','create running instances of sequences and assign those to a class');

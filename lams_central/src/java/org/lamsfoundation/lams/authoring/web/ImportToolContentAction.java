@@ -21,7 +21,7 @@
  * ****************************************************************
  */
 
-/* $Id$ */
+
 package org.lamsfoundation.lams.authoring.web;
 
 import java.io.BufferedOutputStream;

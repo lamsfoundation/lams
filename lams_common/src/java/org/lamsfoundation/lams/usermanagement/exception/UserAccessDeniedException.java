@@ -20,7 +20,7 @@
  * http://www.gnu.org/licenses/gpl.txt
  * ****************************************************************
  */
-/* $$Id$$ */
+
 package org.lamsfoundation.lams.usermanagement.exception;
 
 import org.lamsfoundation.lams.usermanagement.User;
