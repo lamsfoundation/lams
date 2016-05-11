@@ -20,7 +20,7 @@
  * ****************************************************************
  */
 
-/* $Id$ */
+
 package org.lamsfoundation.lams.tool.imageGallery.model;
 
 import org.apache.commons.lang.builder.EqualsBuilder;
