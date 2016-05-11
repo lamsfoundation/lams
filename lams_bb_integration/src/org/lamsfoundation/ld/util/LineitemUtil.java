@@ -20,7 +20,7 @@
  * **************************************************************** 
  */
 
-/* $Id$ */
+
 package org.lamsfoundation.ld.util;
 
 import java.io.IOException;

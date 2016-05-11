@@ -20,7 +20,7 @@
  * ****************************************************************
  */
 
-/* $Id$ */
+
 package org.lamsfoundation.lams.learning.web.bean;
 
 import org.lamsfoundation.lams.learningdesign.GateActivity;

@@ -22,7 +22,7 @@ package org.lamsfoundation.lams.util.svg;
  * ****************************************************************
  */
 
-/* $Id$ */
+
 
 import java.awt.Dimension;
 import java.awt.Point;

@@ -1,4 +1,4 @@
--- CVS ID: $Id$
+
 
 # LAMS1.1: quartz 1.5.2 table definition
 #

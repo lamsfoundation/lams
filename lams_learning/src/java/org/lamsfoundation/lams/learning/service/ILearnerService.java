@@ -21,7 +21,7 @@
  * ****************************************************************
  */
 
-/* $$Id$$ */
+
 package org.lamsfoundation.lams.learning.service;
 
 import org.lamsfoundation.lams.learning.web.bean.ActivityPositionDTO;

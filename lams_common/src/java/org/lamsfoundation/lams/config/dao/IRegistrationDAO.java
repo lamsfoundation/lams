@@ -20,7 +20,7 @@
  * ****************************************************************
  */
 
-/* $Id$ */
+
 package org.lamsfoundation.lams.config.dao;
 
 import org.lamsfoundation.lams.config.Registration;

@@ -21,7 +21,7 @@
  * ****************************************************************
  */
 
-/* $$Id$$ */
+
 package org.lamsfoundation.lams.contentrepository.service;
 
 import org.apache.commons.lang.builder.EqualsBuilder;

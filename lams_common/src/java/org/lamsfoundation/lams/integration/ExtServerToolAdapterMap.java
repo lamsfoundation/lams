@@ -20,7 +20,7 @@
  * ****************************************************************
  */
 
-/* $Id$ */
+
 package org.lamsfoundation.lams.integration;
 
 import org.lamsfoundation.lams.tool.Tool;

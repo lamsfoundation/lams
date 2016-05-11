@@ -20,7 +20,7 @@
  * ****************************************************************
  */
 
-/* $$Id$$ */
+
 package org.lamsfoundation.lams.timezone;
 
 import java.io.Serializable;

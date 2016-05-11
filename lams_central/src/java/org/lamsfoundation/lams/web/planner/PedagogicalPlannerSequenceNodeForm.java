@@ -20,7 +20,7 @@
  * ****************************************************************
  */
 
-/* $Id$ */
+
 package org.lamsfoundation.lams.web.planner;
 
 import org.apache.struts.action.ActionForm;

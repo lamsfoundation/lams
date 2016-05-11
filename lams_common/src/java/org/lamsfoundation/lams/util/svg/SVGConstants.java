@@ -17,7 +17,7 @@ package org.lamsfoundation.lams.util.svg;
  * http://www.gnu.org/licenses/gpl.txt ****************************************************************
  */
 
-/* $Id$ */
+
 
 public class SVGConstants {
 

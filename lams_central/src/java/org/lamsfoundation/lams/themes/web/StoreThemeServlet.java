@@ -20,7 +20,7 @@
  * http://www.gnu.org/licenses/gpl.txt
  * ************************************************************************
  */
-/* $$Id$$ */
+
 package org.lamsfoundation.lams.themes.web;
 
 import javax.servlet.http.HttpServletRequest;

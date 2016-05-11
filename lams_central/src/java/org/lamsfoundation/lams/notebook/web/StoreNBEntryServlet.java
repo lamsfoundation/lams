@@ -20,7 +20,7 @@
  * http://www.gnu.org/licenses/gpl.txt
  * ************************************************************************
  */
-/* $$Id$$ */
+
 package org.lamsfoundation.lams.notebook.web;
 
 import java.util.Date;

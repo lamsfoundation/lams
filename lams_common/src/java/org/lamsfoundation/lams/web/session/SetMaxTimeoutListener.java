@@ -20,7 +20,7 @@
  * ****************************************************************
  */
 
-/* $Id$ */
+
 package org.lamsfoundation.lams.web.session;
 
 import javax.servlet.http.HttpSessionEvent;

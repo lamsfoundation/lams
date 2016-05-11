@@ -20,7 +20,7 @@
  * ****************************************************************
  */
 
-/* $Id$ */
+
 package org.lamsfoundation.lams.learningdesign;
 
 import org.lamsfoundation.lams.tool.SystemTool;

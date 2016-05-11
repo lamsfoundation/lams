@@ -21,7 +21,7 @@
  * ****************************************************************
  */
 
-/* $$Id$$ */
+
 package org.lamsfoundation.lams.contentrepository.struts.action;
 
 import javax.servlet.http.HttpServletRequest;

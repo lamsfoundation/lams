@@ -1,4 +1,4 @@
--- CVS ID: $Id$
+
 
 -- List all nodes, their versions and properties
 select * from lams_cr_node node
