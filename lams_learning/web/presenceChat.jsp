@@ -8,13 +8,13 @@
 
 <script type="text/javascript">
 	var messagePollInterval = 2 * 1000; // poll every 2 seconds
-		
+	
 	var lamsUrl = "<lams:LAMSURL/>";
 	var actionUrl = lamsUrl + "PresenceChat.do";
-	var lessonId = "${lessonID}";
-	var presenceEnabled = ${presenceEnabledPatch eq 'true'};
-	var presenceShown = ${presenceShown eq 'true'};
-	var presenceImEnabled = ${presenceImEnabled eq 'true'};
+	var lessonId = "${lessonID == null ? param.lessonID : lessonID}";
+	var presenceEnabled = ${presenceEnabledPatch eq 'true' || param.presenceEnabledPatch eq 'true' };
+	var presenceShown = ${presenceShown eq 'true' || param.presenceShown eq 'true'};
+	var presenceImEnabled = ${presenceImEnabled eq 'true' || param.presenceImEnabled eq 'true' };
 	<c:set var="displayName"><lams:user property="firstName"/> <lams:user property="lastName"/></c:set>
 	var nickname = "<c:out value='${displayName}'/>";
 	
@@ -29,52 +29,44 @@
 		presenceChat = $("#presenceChat");
 		rosterDiv = $("#presenceUserListings");
 		
-		// if browser is ie6
-		if($.browser.msie && parseInt($.browser.version) == 6){
-			// make warningvisible
-			$("#presenceChatWarning").removeClass("startHidden");
-		}
-		// otherwise enable presence chat
-		else {
-			// if presence im is enabled
-			if (presenceEnabled) {
-				// make visible
-				presenceChat.removeClass("startHidden");
-				
-				// create chat tabs
-				presenceChatTabs = $("#presenceChatTabs").tabs({
-					'scrollable'    : true,
-					// set default class for new panel
-					'panelTemplate' : '<div class="chatPanel"></div>',
-					'activate' : function(event, ui) {
-						// remove visual indicators of new message
-						var nick =  getUserFromTabIndex(presenceChatTabs.tabs('option','active'));
-						var tag = nickToTag(nick);
-						$("#" + tagToTabLabel(tag)).removeClass('presenceTabNewMessage');
-						
-						if (nick != groupChatInfo.nick) {
-							$("#" + tagToListing(tag)).removeClass('presenceListingNewMessage');
-						}
-						
-						updateChat();
+		// if presence im is enabled
+		if (presenceEnabled) {
+			// make visible
+			presenceChat.removeClass("startHidden");
+			
+			// create chat tabs
+			presenceChatTabs = $("#presenceChatTabs").tabs({
+				'scrollable'    : true,
+				// set default class for new panel
+				'panelTemplate' : '<div class="chatPanel"></div>',
+				'activate' : function(event, ui) {
+					// remove visual indicators of new message
+					var nick =  getUserFromTabIndex(presenceChatTabs.tabs('option','active'));
+					var tag = nickToTag(nick);
+					$("#" + tagToTabLabel(tag)).removeClass('presenceTabNewMessage');
+					
+					if (nick != groupChatInfo.nick) {
+						$("#" + tagToListing(tag)).removeClass('presenceListingNewMessage');
 					}
-				   });
-			}
-			
-			// create roster tab
-			$("#presenceChatRoster").tabs({ scrollable: false });
-			
-			// update chat now and every few seconds
-			updateChat();
-			setInterval(updateChat, messagePollInterval);
+					
+					updateChat();
+				}
+			   });
 		}
+		
+		// create roster tab
+		$("#presenceChatRoster").tabs({ scrollable: false });
+		
+		// update chat now and every few seconds
+		updateChat();
+		setInterval(updateChat, messagePollInterval);
 	});
 </script>
 
 <%-- initial html / presence.js adds on html into here --%>
 <div id="presenceChat" class="startHidden">
 	<%-- only pop the message box if im is enabled --%>
-	<c:if test="${presenceImEnabled}">
+	<c:if test="${presenceImEnabled eq 'true' || param.presenceImEnabled eq 'true'}">
 	<div id="presenceChatTabs">
 		<div id="tabWrapper">
 			<div id="leftSliderDiv">
