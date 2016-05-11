@@ -20,7 +20,7 @@
  * http://www.gnu.org/licenses/gpl.txt
  * ****************************************************************
  */
-/* $$Id$$ */
+
 package org.lamsfoundation.lams.tool.assessment.service;
 
 import java.lang.reflect.InvocationTargetException;
