@@ -7,7 +7,7 @@ import org.apache.commons.pool.ObjectPool;
  * <p>This object handles the RemoteDelivery thread objects in the ObjectPool.
  * </p>
  *
- * @version $Id$
+ *
  *
  */
 public class GenericPoolableRemoteDeliveryFactory extends BasePoolableObjectFactory {

@@ -33,7 +33,7 @@ import org.w3c.dom.DOMException;
  * This class provides a factory for the 'margin-*' properties values.
  *
  * @author <a href="mailto:stephane@hillion.org">Stephane Hillion</a>
- * @version $Id$
+ *
  */
 public class MarginLengthManager extends LengthManager {
 

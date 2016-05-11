@@ -25,7 +25,7 @@ import org.w3c.dom.Attr;
  * objects that must be updated when the attribute node is modified.
  *
  * @author <a href="mailto:stephane@hillion.org">Stephane Hillion</a>
- * @version $Id$
+ *
  */
 public interface LiveAttributeValue {
 

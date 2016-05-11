@@ -23,7 +23,7 @@ import org.w3c.dom.Element;
 /**
  * Provides the information to control the NodePickerPanel behaviour.
  *
- * @version $Id$
+ *
  */
 public interface NodePickerController {
 

@@ -34,7 +34,7 @@ import java.io.File;
  *
  * @author Noel Bergman
  * @author Martin Cooper
- * @version $Id$
+ *
  * @deprecated Use {@link FileCleaningTracker}
  */
 @Deprecated

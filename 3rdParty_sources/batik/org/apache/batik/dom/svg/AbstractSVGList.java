@@ -46,7 +46,7 @@ import org.w3c.dom.svg.SVGException;
  * </p>
  *
  * @author <a href="mailto:nicolas.socheleau@bitflash.com">Nicolas Socheleau</a>
- * @version $Id$
+ *
  */
 public abstract class AbstractSVGList {
 

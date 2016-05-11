@@ -1,4 +1,4 @@
-// $Id$
+
 
 package org.jgroups.protocols;
 
@@ -12,7 +12,7 @@ import org.jgroups.stack.Protocol;
 /**
  * Measures the time for a message to travel from the channel to the transport
  * @author Bela Ban
- * @version $Id$
+ *
  */
 public class PERF_TP extends Protocol {
     private Address local_addr=null;

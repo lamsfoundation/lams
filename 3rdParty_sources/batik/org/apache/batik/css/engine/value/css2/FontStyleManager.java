@@ -30,7 +30,7 @@ import org.apache.batik.util.SVGTypes;
  * This class provides a manager for the 'font-style' property values.
  *
  * @author <a href="mailto:stephane@hillion.org">Stephane Hillion</a>
- * @version $Id$
+ *
  */
 public class FontStyleManager extends IdentifierManager {
 

@@ -137,7 +137,7 @@ import org.apache.mailet.MailAddress;
  * </table>
  * 
  * @author Kate Rhodes masukomi at masukomi dot org
- * @version $Id$
+ *
  */
 public class Configuration implements ConfigurationMBean {
 	

@@ -26,7 +26,7 @@ import org.w3c.dom.Element;
  * Factory class for vending <tt>Mask</tt> objects.
  *
  * @author <a href="mailto:Thierry.Kormann@sophia.inria.fr">Thierry Kormann</a>
- * @version $Id$
+ *
  */
 public interface MaskBridge extends Bridge {
 

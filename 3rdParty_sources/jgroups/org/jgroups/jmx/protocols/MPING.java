@@ -6,7 +6,7 @@ import java.util.List;
 
 /**
  * @author Bela Ban
- * @version $Id$
+ *
  */
 public class MPING extends PING implements MPINGMBean {
     org.jgroups.protocols.MPING mping;

@@ -28,7 +28,7 @@ import org.w3c.dom.NodeList;
  * An XBL manager that performs no XBL processing.
  *
  * @author <a href="mailto:cam%40mcc%2eid%2eau">Cameron McCormack</a>
- * @version $Id$
+ *
  */
 public class GenericXBLManager implements XBLManager {
 

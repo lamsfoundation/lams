@@ -48,7 +48,7 @@ import org.w3c.dom.svg.SVGUseElement;
  * Bridge class for the &lt;use> element.
  *
  * @author <a href="mailto:tkormann@apache.org">Thierry Kormann</a>
- * @version $Id$
+ *
  */
 public class SVGUseElementBridge extends AbstractGraphicsNodeBridge {
 

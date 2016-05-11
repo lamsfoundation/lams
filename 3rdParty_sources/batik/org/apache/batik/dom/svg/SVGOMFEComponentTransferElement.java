@@ -30,7 +30,7 @@ import org.w3c.dom.svg.SVGFEComponentTransferElement;
  * This class implements {@link SVGFEComponentTransferElement}.
  *
  * @author <a href="mailto:stephane@hillion.org">Stephane Hillion</a>
- * @version $Id$
+ *
  */
 public class SVGOMFEComponentTransferElement
     extends    SVGOMFilterPrimitiveStandardAttributes

@@ -35,7 +35,7 @@ import org.w3c.dom.NodeList;
  * Bridge class for the &lt;altGlyph> element.
  *
  * @author <a href="mailto:bella.robinson@cmis.csiro.au">Bella Robinson</a>
- * @version $Id$
+ *
  */
 public class SVGAltGlyphElementBridge extends AbstractSVGBridge
                                       implements ErrorConstants {

@@ -58,7 +58,7 @@ import org.w3c.dom.svg.SVGDocument;
  * SVG document with an SVG root.
  *
  * @author <a mailto="vincent.hardy@sun.com">Vincent Hardy</a>
- * @version $Id$
+ *
  */
 public class XMLInputHandler implements SquiggleInputHandler {
     public static final String[] XVG_MIME_TYPES = 

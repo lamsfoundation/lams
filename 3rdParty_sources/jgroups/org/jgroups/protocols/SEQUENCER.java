@@ -14,7 +14,7 @@ import java.util.*;
 /**
  * Implementation of total order protocol using a sequencer. Consult doc/design/SEQUENCER.txt for details
  * @author Bela Ban
- * @version $Id$
+ *
  */
 public class SEQUENCER extends Protocol {
     private Address           local_addr=null, coord=null;

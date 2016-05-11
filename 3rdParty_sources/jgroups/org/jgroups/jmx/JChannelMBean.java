@@ -8,7 +8,7 @@ import java.util.Map;
 
 /**
  * @author Bela Ban
- * @version $Id$
+ *
  */
 public interface JChannelMBean {
     void create() throws Exception;

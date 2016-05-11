@@ -154,7 +154,7 @@ import org.w3c.dom.svg.SVGDocument;
  * This class represents a SVG viewer swing frame.
  *
  * @author <a href="mailto:stephane@hillion.org">Stephane Hillion</a>
- * @version $Id$
+ *
  */
 public class JSVGViewerFrame
     extends    JFrame

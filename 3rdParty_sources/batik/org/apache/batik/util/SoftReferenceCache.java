@@ -43,7 +43,7 @@ import java.util.Map;
  * </p>
  *
  * @author <a href="mailto:vhardy@apache.org">Vincent Hardy</a>
- * @version $Id$
+ *
  */
 public class SoftReferenceCache {
 

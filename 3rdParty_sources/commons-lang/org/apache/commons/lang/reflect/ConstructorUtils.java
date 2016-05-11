@@ -50,7 +50,7 @@ import org.apache.commons.lang.ClassUtils;
  * @author Robert Burrell Donkin
  * @author Rodney Waldhoff
  * @since 2.5
- * @version $Id$
+ *
  */
 public class ConstructorUtils {
 

@@ -32,7 +32,7 @@ import java.awt.image.WritableRaster;
 /**
  *  This class provides generic methods that must be used by a particular WMFPainter.
  *
- * @version $Id$
+ *
  */
 public class AbstractWMFPainter {
 

@@ -26,7 +26,7 @@ import org.w3c.dom.css.CSSValue;
  * This class represents an ICC color value.
  *
  * @author <a href="mailto:stephane@hillion.org">Stephane Hillion</a>
- * @version $Id$
+ *
  */
 public class ICCColor extends AbstractValue {
 

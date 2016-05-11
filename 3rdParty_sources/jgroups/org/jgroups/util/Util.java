@@ -30,7 +30,7 @@ import java.util.*;
 /**
  * Collection of various utility routines that can not be assigned to other classes.
  * @author Bela Ban
- * @version $Id$
+ *
  */
 public class Util {
 

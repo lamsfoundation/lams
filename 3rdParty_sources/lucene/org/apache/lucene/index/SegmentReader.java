@@ -39,7 +39,7 @@ import org.apache.lucene.util.BitVector;
 import org.apache.lucene.util.CloseableThreadLocal;
 
 /**
- * @version $Id$
+ *
  */
 class SegmentReader extends DirectoryIndexReader {
   private String segment;

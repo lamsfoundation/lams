@@ -42,7 +42,7 @@ import org.apache.batik.util.HaltingThread;
  * left corner of the tiled region.
  * 
  * @author <a href="mailto:vincent.hardy@eng.sun.com">Vincent Hardy</a>
- * @version $Id$
+ *
  */
 public class TileRed extends AbstractRed implements TileGenerator {
     static final AffineTransform IDENTITY = new AffineTransform();

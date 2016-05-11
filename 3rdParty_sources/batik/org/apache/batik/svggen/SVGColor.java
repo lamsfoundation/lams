@@ -30,7 +30,7 @@ import org.apache.batik.ext.awt.g2d.GraphicContext;
  * corresponding SVG attributes.
  *
  * @author <a href="mailto:vincent.hardy@eng.sun.com">Vincent Hardy</a>
- * @version $Id$
+ *
  * @see                 org.apache.batik.svggen.DOMTreeManager
  */
 public class SVGColor extends AbstractSVGConverter{

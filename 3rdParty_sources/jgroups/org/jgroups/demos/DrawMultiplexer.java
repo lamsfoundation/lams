@@ -5,7 +5,7 @@ import org.jgroups.JChannelFactory;
 
 /**
  * @author Bela Ban
- * @version $Id$
+ *
  */
 public class DrawMultiplexer {
     JChannelFactory factory;

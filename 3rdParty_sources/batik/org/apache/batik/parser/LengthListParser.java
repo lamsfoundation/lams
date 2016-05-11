@@ -25,7 +25,7 @@ import java.io.IOException;
  * list values.
  *
  * @author <a href="mailto:stephane@hillion.org">Stephane Hillion</a>
- * @version $Id$
+ *
  */
 public class LengthListParser extends LengthParser {
 

@@ -4,7 +4,7 @@ package org.jgroups.conf;
 /**
  * Data holder for protocol
  * @author Filip Hanik (<a href="mailto:filip@filip.net">filip@filip.net)
- * @version $Id$
+ *
  */
 
 import java.util.HashMap;

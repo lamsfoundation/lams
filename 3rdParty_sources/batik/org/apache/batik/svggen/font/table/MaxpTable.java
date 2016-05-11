@@ -22,7 +22,7 @@ import java.io.IOException;
 import java.io.RandomAccessFile;
 
 /**
- * @version $Id$
+ *
  * @author <a href="mailto:david@steadystate.co.uk">David Schweinsberg</a>
  */
 public class MaxpTable implements Table {

@@ -26,7 +26,7 @@ import org.apache.batik.dom.anim.AnimatableElement;
  * An animation class for 'animateColor' animations.
  *
  * @author <a href="mailto:cam%40mcc%2eid%2eau">Cameron McCormack</a>
- * @version $Id$
+ *
  */
 public class ColorAnimation extends SimpleAnimation {
 

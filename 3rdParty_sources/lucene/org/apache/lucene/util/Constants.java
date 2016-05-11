@@ -21,7 +21,7 @@ package org.apache.lucene.util;
  * Some useful constants.
  *
  *
- * @version $Id$
+ *
  **/
 
 public final class Constants {

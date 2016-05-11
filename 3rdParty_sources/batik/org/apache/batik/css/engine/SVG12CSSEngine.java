@@ -36,7 +36,7 @@ import org.w3c.dom.Document;
  * This class provides a CSS engine initialized for SVG.
  *
  * @author <a href="mailto:stephane@hillion.org">Stephane Hillion</a>
- * @version $Id$
+ *
  */
 public class SVG12CSSEngine extends SVGCSSEngine {
 

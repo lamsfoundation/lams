@@ -38,7 +38,7 @@ import org.apache.batik.util.ParsedURL;
 
 /**
  *
- * @version $Id$
+ *
  */
 public class PNGRegistryEntry
     extends MagicNumberRegistryEntry {

@@ -51,7 +51,7 @@ import org.apache.batik.util.resources.ResourceManager;
  * </pre>
  *
  * @author <a href="mailto:stephane@hillion.org">Stephane Hillion</a>
- * @version $Id$
+ *
  */
 public class ButtonFactory extends ResourceManager {
     // Constants

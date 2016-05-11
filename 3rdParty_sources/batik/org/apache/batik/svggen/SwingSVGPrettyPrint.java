@@ -40,7 +40,7 @@ import org.w3c.dom.Element;
  * that reflects the Swing composite structure (container/components).
  *
  * @author Vincent Hardy
- * @version $Id$
+ *
  */
 public abstract class SwingSVGPrettyPrint implements SVGSyntax {
 

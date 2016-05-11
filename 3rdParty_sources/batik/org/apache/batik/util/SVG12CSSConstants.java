@@ -24,7 +24,7 @@ package org.apache.batik.util;
  * Important: Constants must not contain uppercase characters.
  *
  * @author <a href="mailto:deweese@apache.org">deweese</a>
- * @version $Id$
+ *
  */
 public interface SVG12CSSConstants extends CSSConstants {
 

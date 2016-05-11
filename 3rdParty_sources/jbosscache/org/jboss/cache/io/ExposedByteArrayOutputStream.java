@@ -45,7 +45,7 @@ import java.io.ByteArrayOutputStream;
  * <p/>
  *
  * @author <a href="mailto://brian.stansberry@jboss.com">Brian Stansberry</a>
- * @version $Id$
+ *
  */
 @NotThreadSafe
 public class ExposedByteArrayOutputStream extends ByteArrayOutputStream

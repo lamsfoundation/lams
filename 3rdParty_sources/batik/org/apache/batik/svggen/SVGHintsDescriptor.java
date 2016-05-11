@@ -27,7 +27,7 @@ import java.util.Map;
  * Describes a set of SVG hints
  *
  * @author <a href="mailto:vincent.hardy@eng.sun.com">Vincent Hardy</a>
- * @version $Id$
+ *
  * @see             org.apache.batik.svggen.SVGRenderingHints
  */
 public class SVGHintsDescriptor implements SVGDescriptor, SVGSyntax {

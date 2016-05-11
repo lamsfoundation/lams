@@ -22,7 +22,7 @@ package org.apache.batik.css.parser;
  * This class implements the {@link org.w3c.css.sac.ElementSelector} interface.
  *
  * @author <a href="mailto:stephane@hillion.org">Stephane Hillion</a>
- * @version $Id$
+ *
  */
 public class DefaultElementSelector extends AbstractElementSelector {
     /**

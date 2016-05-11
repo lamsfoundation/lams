@@ -22,7 +22,7 @@ package org.apache.batik.dom.svg;
  * Adapter for the SVGItem interface.
  *
  * @author <a href="mailto:nicolas.socheleau@bitflash.com">Nicolas Socheleau</a>
- * @version $Id$
+ *
  */
 public abstract class AbstractSVGItem implements SVGItem {
 

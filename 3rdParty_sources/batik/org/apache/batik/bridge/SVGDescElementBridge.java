@@ -22,7 +22,7 @@ package org.apache.batik.bridge;
  * Bridge class for the &lt;desc&gt; element.
  *
  * @author <a href="mailto:vhardy@apache.org">Vincent Hardy</a>
- * @version $Id$
+ *
  */
 public class SVGDescElementBridge extends SVGDescriptiveElementBridge {
 

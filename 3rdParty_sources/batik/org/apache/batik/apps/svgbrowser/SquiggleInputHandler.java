@@ -30,7 +30,7 @@ import org.apache.batik.util.ParsedURL;
  * displaying them in an SVG canvas.
  *
  * @author <a mailto="vincent.hardy@sun.com">Vincent Hardy</a>
- * @version $Id$
+ *
  */
 public interface SquiggleInputHandler {
     /**

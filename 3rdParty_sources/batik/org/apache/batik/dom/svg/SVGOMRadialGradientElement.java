@@ -31,7 +31,7 @@ import org.w3c.dom.svg.SVGRadialGradientElement;
  * This class implements {@link SVGRadialGradientElement}.
  *
  * @author <a href="mailto:stephane@hillion.org">Stephane Hillion</a>
- * @version $Id$
+ *
  */
 public class SVGOMRadialGradientElement
     extends    SVGOMGradientElement

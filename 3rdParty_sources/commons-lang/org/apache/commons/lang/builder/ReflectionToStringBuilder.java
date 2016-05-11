@@ -91,7 +91,7 @@ import org.apache.commons.lang.ClassUtils;
  * @author Gary Gregory
  * @author Pete Gieser
  * @since 2.0
- * @version $Id$
+ *
  */
 public class ReflectionToStringBuilder extends ToStringBuilder {
 

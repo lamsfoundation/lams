@@ -48,7 +48,7 @@ import org.w3c.dom.css.CSSValue;
  * Bridge class for a regular polygon element.
  *
  * @author <a href="mailto:thomas.deweese@kodak.com">Thomas Deweese</a>
- * @version $Id$
+ *
  */
 public class SVGSolidColorElementBridge extends AnimatableGenericSVGBridge
         implements PaintBridge {

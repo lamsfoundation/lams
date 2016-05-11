@@ -32,7 +32,7 @@ import java.net.UnknownHostException;
  *
  * @author Bela Ban
  * @author Brian Stansberry
- * @version $Id$
+ *
  */
 public interface TcpCacheServerMBean extends Lifecycle
 {

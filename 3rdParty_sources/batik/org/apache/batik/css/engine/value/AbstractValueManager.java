@@ -30,7 +30,7 @@ import org.w3c.dom.DOMException;
  * interface.
  *
  * @author <a href="mailto:stephane@hillion.org">Stephane Hillion</a>
- * @version $Id$
+ *
  */
 public abstract class AbstractValueManager
     extends AbstractValueFactory

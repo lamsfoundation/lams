@@ -25,7 +25,7 @@ import org.w3c.dom.events.MutationNameEvent;
  * Class to implement DOM 3 MutationName events.
  *
  * @author <a href="mailto:cam%40mcc%2eid%2eau">Cameron McCormack</a>
- * @version $Id$
+ *
  */
 public class DOMMutationNameEvent
         extends DOMMutationEvent

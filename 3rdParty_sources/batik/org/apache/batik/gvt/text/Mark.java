@@ -24,7 +24,7 @@ import org.apache.batik.gvt.TextNode;
  * selection gesture.
  *
  * @author <a href="mailto:bill.haneman@ireland.sun.com">Bill Haneman</a>
- * @version $Id$
+ *
  */
 public interface Mark {
     /*

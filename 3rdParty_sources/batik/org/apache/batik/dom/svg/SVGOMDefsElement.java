@@ -26,7 +26,7 @@ import org.w3c.dom.svg.SVGDefsElement;
  * This class implements {@link SVGDefsElement}.
  *
  * @author <a href="mailto:stephane@hillion.org">Stephane Hillion</a>
- * @version $Id$
+ *
  */
 public class SVGOMDefsElement
     extends    SVGGraphicsElement

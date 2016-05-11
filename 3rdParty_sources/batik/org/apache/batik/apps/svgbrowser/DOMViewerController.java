@@ -27,7 +27,7 @@ import org.w3c.dom.Node;
  * Provides the information needed for the DOMViewer to show and edit the
  * document.
  *
- * @version $Id$
+ *
  */
 public interface DOMViewerController {
 

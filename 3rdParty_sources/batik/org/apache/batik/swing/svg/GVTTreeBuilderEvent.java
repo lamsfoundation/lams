@@ -27,7 +27,7 @@ import org.apache.batik.gvt.GraphicsNode;
  * from a GVTTreeBuilder instance.
  *
  * @author <a href="mailto:stephane@hillion.org">Stephane Hillion</a>
- * @version $Id$
+ *
  */
 public class GVTTreeBuilderEvent extends EventObject {
     

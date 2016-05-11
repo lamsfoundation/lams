@@ -30,7 +30,7 @@ import org.apache.batik.util.SVGTypes;
  * This class provides a manager for the 'overflow' property values.
  *
  * @author <a href="mailto:stephane@hillion.org">Stephane Hillion</a>
- * @version $Id$
+ *
  */
 public class OverflowManager extends IdentifierManager {
 

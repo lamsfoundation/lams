@@ -27,7 +27,7 @@ import java.util.Set;
  * to a given element type.
  *
  * @author <a href="mailto:vincent.hardy@eng.sun.com">Vincent Hardy</a>
- * @version $Id$
+ *
  */
 public class SVGAttribute {
     /**

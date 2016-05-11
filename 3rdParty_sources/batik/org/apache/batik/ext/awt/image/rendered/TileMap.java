@@ -28,7 +28,7 @@ import org.apache.batik.util.HaltingThread;
 
 /**
  *
- * @version $Id$
+ *
  */
 public class TileMap implements TileStore {
     private static final boolean DEBUG = false;

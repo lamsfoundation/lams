@@ -28,7 +28,7 @@ import org.apache.batik.css.engine.value.Value;
  * {@link org.apache.batik.css.engine.StyleDeclaration}.
  *
  * @author <a href="mailto:cam%40mcc%2eid%2eau">Cameron McCormack</a>
- * @version $Id$
+ *
  */
 public abstract class CSSOMStoredStyleDeclaration
     extends CSSOMSVGStyleDeclaration

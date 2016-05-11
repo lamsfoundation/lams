@@ -33,7 +33,7 @@ import org.apache.lucene.util.OpenBitSet;
  * week.  The QueryFilter and RangeQuery would only need to be reconstructed
  * once per day.
  *
- * @version $Id$
+ *
  */
 public class QueryWrapperFilter extends Filter {
   private Query query;

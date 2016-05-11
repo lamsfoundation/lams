@@ -24,7 +24,7 @@ package org.apache.batik.bridge;
  *
  *
  * @author <a href="mailto:vhardy@apache.org">Vincent Hardy</a>
- * @version $Id$
+ *
  */
 public interface ExternalResourceSecurity {
     /**

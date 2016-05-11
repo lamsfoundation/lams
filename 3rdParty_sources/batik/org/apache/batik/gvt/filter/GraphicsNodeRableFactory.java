@@ -26,7 +26,7 @@ import org.apache.batik.gvt.GraphicsNode;
  * implementation.
  *
  * @author <a href="mailto:vincent.hardy@eng.sun.com">Vincent Hardy</a>
- * @version $Id$
+ *
  */
 public interface GraphicsNodeRableFactory {
     /**

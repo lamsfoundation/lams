@@ -32,7 +32,7 @@ import org.w3c.dom.Element;
  * Bridge class for the &lt;feTurbulence> element.
  *
  * @author <a href="mailto:tkormann@apache.org">Thierry Kormann</a>
- * @version $Id$
+ *
  */
 public class SVGFeTurbulenceElementBridge
     extends AbstractSVGFilterPrimitiveElementBridge {

@@ -28,7 +28,7 @@ package org.apache.batik.dom.svg;
  * @see org.w3c.dom.svg.SVGSVGElement#createSVGLength()
  *
  * @author nicolas.socheleau@bitflash.com
- * @version $Id$
+ *
  */
 public class SVGOMLength extends AbstractSVGLength {
 

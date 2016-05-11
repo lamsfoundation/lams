@@ -30,7 +30,7 @@ import org.w3c.dom.svg.SVGAltGlyphElement;
  * This class implements {@link SVGAltGlyphElement}.
  *
  * @author <a href="mailto:stephane@hillion.org">Stephane Hillion</a>
- * @version $Id$
+ *
  */
 public class SVGOMAltGlyphElement
     extends    SVGURIReferenceTextPositioningElement

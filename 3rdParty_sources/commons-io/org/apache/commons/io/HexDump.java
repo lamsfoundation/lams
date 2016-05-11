@@ -29,7 +29,7 @@ import java.io.OutputStream;
  *
  * @author Scott Sanders
  * @author Marc Johnson
- * @version $Id$
+ *
  */
 public class HexDump {
 

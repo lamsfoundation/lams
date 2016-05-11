@@ -25,7 +25,7 @@ import org.w3c.dom.smil.TimeEvent;
  * A class to handle repeat event SMIL timing specifiers.
  *
  * @author <a href="mailto:cam%40mcc%2eid%2eau">Cameron McCormack</a>
- * @version $Id$
+ *
  */
 public class RepeatTimingSpecifier extends EventbaseTimingSpecifier {
 

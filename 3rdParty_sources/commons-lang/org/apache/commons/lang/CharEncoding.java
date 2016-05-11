@@ -37,7 +37,7 @@ import java.io.UnsupportedEncodingException;
  *      names</a>
  * @author Apache Software Foundation
  * @since 2.1
- * @version $Id$
+ *
  */
 public class CharEncoding {
 

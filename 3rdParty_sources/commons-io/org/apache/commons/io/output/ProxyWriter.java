@@ -29,7 +29,7 @@ import java.io.Writer;
  * and write(String) to write(String, int, int).
  * 
  * @author Stephen Colebourne
- * @version $Id$
+ *
  */
 public class ProxyWriter extends FilterWriter {
 

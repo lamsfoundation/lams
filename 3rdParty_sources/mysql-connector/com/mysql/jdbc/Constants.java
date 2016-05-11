@@ -29,7 +29,7 @@ package com.mysql.jdbc;
  * 
  * @author Mark Matthews
  * 
- * @version $Id$
+ *
  */
 class Constants {
 	/**

@@ -56,7 +56,7 @@ import org.apache.batik.util.resources.ResourceManager;
  *
  * @author <a href="mailto:stephane@hillion.org">Stephane Hillion</a>
  * @author <a href="mailto:cjolif@ilog.fr">Christophe Jolif</a>
- * @version $Id$
+ *
  */
 public class LanguageDialog extends JDialog implements ActionMap {
 

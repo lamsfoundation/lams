@@ -29,7 +29,7 @@ import org.w3c.dom.DOMException;
  * The class provides support for the SVGPath interface.
  *
  * @author <a href="mailto:deweese@apache.org">Thomas DeWeese</a>
- * @version $Id$
+ *
  */
 public class SVGPathSupport {
 

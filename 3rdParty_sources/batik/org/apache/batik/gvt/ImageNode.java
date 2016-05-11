@@ -26,7 +26,7 @@ import java.awt.geom.Rectangle2D;
  * A graphics node that represents an image described as a graphics node.
  *
  * @author <a href="mailto:Thierry.Kormann@sophia.inria.fr">Thierry Kormann</a>
- * @version $Id$
+ *
  */
 public class ImageNode extends CompositeGraphicsNode {
 

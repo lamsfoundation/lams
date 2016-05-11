@@ -27,7 +27,7 @@ import org.w3c.dom.svg.SVGMatrix;
  * This class is the implementation of the SVGTransform interface.
  *
  * @author <a href="mailto:nicolas.socheleau@bitflash.com">Nicolas Socheleau</a>
- * @version $Id$
+ *
  */
 public class SVGOMTransform extends AbstractSVGTransform {
 

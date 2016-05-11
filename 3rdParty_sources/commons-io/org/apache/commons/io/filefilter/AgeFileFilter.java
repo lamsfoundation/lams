@@ -40,7 +40,7 @@ import org.apache.commons.io.FileUtils;
  * </pre>
  *
  * @author Rahul Akolkar
- * @version $Id$
+ *
  * @see FileFilterUtils#ageFileFilter(Date)
  * @see FileFilterUtils#ageFileFilter(File)
  * @see FileFilterUtils#ageFileFilter(long)

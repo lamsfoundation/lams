@@ -20,7 +20,7 @@ package org.apache.batik.svggen;
 
 /**
  *
- * @version $Id$
+ *
  */
 public interface ErrorConstants {
     // general errors

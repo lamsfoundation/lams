@@ -69,7 +69,7 @@ import org.apache.batik.util.Platform;
  * support, which only exists in JDKs &gt;= 1.4.
  *
  * @author <a href="mailto:stephane@hillion.org">Stephane Hillion</a>
- * @version $Id$
+ *
  */
 public abstract class AbstractJGVTComponent extends JComponent {
 

@@ -41,7 +41,7 @@ package org.apache.commons.lang;
  * @author Apache Software Foundation
  * @author Matthew Hawthorne
  * @since 2.0
- * @version $Id$
+ *
  */
 public class NullArgumentException extends IllegalArgumentException {
 

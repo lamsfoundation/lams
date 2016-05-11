@@ -45,7 +45,7 @@ import java.util.StringTokenizer;
  * @author James Urie
  * @author Magnus Grimsell
  * @author Thomas Ledoux
- * @version $Id$
+ *
  * @since Commons IO 1.1
  */
 public class FileSystemUtils {

@@ -8,7 +8,7 @@ import org.jgroups.ChannelException;
  * 
  * @author Roman Rokytskyy (rrokytskyy@acm.org)
  * @author Robert Schaffar-Taurok (robert@fusion.at)
- * @version $Id$
+ *
  */
 public interface LockManager {
     

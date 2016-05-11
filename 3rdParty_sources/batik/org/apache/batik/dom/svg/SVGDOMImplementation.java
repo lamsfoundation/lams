@@ -58,7 +58,7 @@ import org.w3c.dom.stylesheets.StyleSheet;
  * It provides support the SVG 1.1 documents.
  *
  * @author <a href="mailto:stephane@hillion.org">Stephane Hillion</a>
- * @version $Id$
+ *
  */
 public class SVGDOMImplementation
     extends    ExtensibleDOMImplementation

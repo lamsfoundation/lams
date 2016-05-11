@@ -31,7 +31,7 @@ import org.apache.batik.util.io.UTF16Decoder;
  * management.
  *
  * @author <a href="mailto:stephane@hillion.org">Stephane Hillion</a>
- * @version $Id$
+ *
  */
 public class XMLStreamNormalizingReader extends StreamNormalizingReader {
     

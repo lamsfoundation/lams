@@ -33,7 +33,7 @@ import java.text.Collator;
  * (you can't select all but the first or last term without explicitly specifying the term to exclude.)
  *
  *
- * @version $Id$
+ *
  */
 
 public class ConstantScoreRangeQuery extends Query

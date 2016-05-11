@@ -46,7 +46,7 @@ import org.w3c.dom.Node;
  * in XML.
  *
  * @author <a href="mailto:stephane@hillion.org">Stephane Hillion</a>
- * @version $Id$
+ *
  */
 public class XMLPreferenceManager extends PreferenceManager {
     

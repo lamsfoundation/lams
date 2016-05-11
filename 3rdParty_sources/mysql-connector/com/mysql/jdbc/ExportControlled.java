@@ -33,7 +33,7 @@ import java.io.IOException;
  * 
  * @author Mark Matthews
  * 
- * @version $Id: ExportControlled.java,v 1.1.2.1 2005/05/13 18:58:38 mmatthews
+ *
  *          Exp $
  */
 public class ExportControlled {

@@ -28,7 +28,7 @@ import java.util.Map;
  * to values: an SVG paint value and an SVG opacity value
  *
  * @author <a href="mailto:vincent.hardy@eng.sun.com">Vincent Hardy</a>
- * @version $Id$
+ *
  */
 public class SVGStrokeDescriptor implements SVGDescriptor, SVGSyntax{
     private String strokeWidth;

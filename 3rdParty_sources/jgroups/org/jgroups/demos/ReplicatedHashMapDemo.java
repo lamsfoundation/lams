@@ -24,7 +24,7 @@ import java.io.Serializable;
  * read-only methods such as get() use the local copy. A ReplicatedtHashMap is created given the name
  * of a group; all hashmaps with the same name find each other and form a group.
  * @author Bela Ban
- * @version $Id$
+ *
  */
 public class ReplicatedHashMapDemo extends Frame implements WindowListener, ActionListener,
                                           ReplicatedHashMap.Notification {

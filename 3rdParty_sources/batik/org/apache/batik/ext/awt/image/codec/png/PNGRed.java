@@ -57,7 +57,7 @@ import org.apache.batik.ext.awt.image.rendered.CachableRed;
 
 /**
  *
- * @version $Id$
+ *
  */
 public class PNGRed extends AbstractRed {
 

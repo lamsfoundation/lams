@@ -33,7 +33,7 @@ import org.w3c.dom.Node;
  * Bridge class for the &lt;mask> element.
  *
  * @author <a href="mailto:tkormann@apache.org">Thierry Kormann</a>
- * @version $Id$
+ *
  */
 public class SVGMaskElementBridge extends AnimatableGenericSVGBridge
         implements MaskBridge {

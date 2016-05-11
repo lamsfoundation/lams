@@ -25,7 +25,7 @@ import org.w3c.dom.css.CSSValue;
  * This class represents a list of values.
  *
  * @author <a href="mailto:stephane@hillion.org">Stephane Hillion</a>
- * @version $Id$
+ *
  */
 public class ListValue extends AbstractValue {
 

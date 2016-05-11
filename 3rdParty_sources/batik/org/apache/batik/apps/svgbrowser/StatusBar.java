@@ -33,7 +33,7 @@ import org.apache.batik.util.resources.ResourceManager;
  * This class represents a viewer status bar.
  *
  * @author <a href="mailto:stephane@hillion.org">Stephane Hillion</a>
- * @version $Id$
+ *
  */
 public class StatusBar extends JPanel {
 

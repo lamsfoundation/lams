@@ -28,7 +28,7 @@ package org.apache.batik.css.parser;
  * exceptions, it must wrap those exceptions in a ParseException.
  *
  * @author <a href="mailto:stephane@hillion.org">Stephane Hillion</a>
- * @version $Id$
+ *
  */
 public class ParseException extends RuntimeException {
 

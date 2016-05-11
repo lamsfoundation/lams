@@ -30,7 +30,7 @@ import org.w3c.dom.Node;
  * Provides basic xml representation and description for most commonly used
  * nodes.
  *
- * @version $Id$
+ *
  */
 public class NodeTemplates {
 

@@ -27,7 +27,7 @@ import java.util.Arrays;
  *
  * @author Apache Software Foundation
  * @since 2.2
- * @version $Id$
+ *
  */
 public abstract class StrMatcher {
 

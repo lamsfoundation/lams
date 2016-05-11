@@ -29,7 +29,7 @@ package com.mysql.jdbc.log;
  * 
  * @author Mark Matthews
  * 
- * @version $Id$
+ *
  */
 public interface Log {
 	/**

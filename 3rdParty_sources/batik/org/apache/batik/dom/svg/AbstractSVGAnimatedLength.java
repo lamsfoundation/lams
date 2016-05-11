@@ -33,7 +33,7 @@ import org.w3c.dom.svg.SVGLength;
  * SVGAnimatedLength} interface.
  *
  * @author <a href="mailto:stephane@hillion.org">Stephane Hillion</a>
- * @version $Id$
+ *
  */
 public abstract class AbstractSVGAnimatedLength
     extends    AbstractSVGAnimatedValue

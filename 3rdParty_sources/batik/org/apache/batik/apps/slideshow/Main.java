@@ -56,7 +56,7 @@ import org.w3c.dom.svg.SVGDocument;
 
 /**
  *
- * @version $Id$
+ *
  */
 public class Main extends JComponent {
 

@@ -22,7 +22,7 @@ import org.apache.batik.util.DoublyLinkedList;
 
 /**
  *
- * @version $Id$
+ *
  */
 public class LRUCache {
 

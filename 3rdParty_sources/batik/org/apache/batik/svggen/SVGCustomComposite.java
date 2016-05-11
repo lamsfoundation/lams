@@ -28,7 +28,7 @@ import org.w3c.dom.Element;
  * a set of SVG properties and definitions.
  *
  * @author <a href="mailto:vincent.hardy@eng.sun.com">Vincent Hardy</a>
- * @version $Id$
+ *
  * @see                org.apache.batik.svggen.SVGComposite
  */
 public class SVGCustomComposite extends AbstractSVGConverter {

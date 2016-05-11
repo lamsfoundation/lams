@@ -26,7 +26,7 @@ import org.w3c.dom.Node;
  * This class implements {@link org.w3c.dom.DocumentFragment} interface.
  *
  * @author <a href="mailto:stephane@hillion.org">Stephane Hillion</a>
- * @version $Id$
+ *
  */
 
 public abstract class AbstractDocumentFragment

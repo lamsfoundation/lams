@@ -44,7 +44,7 @@ import org.apache.batik.util.resources.ResourceManager;
  * All entries are optional.
  *
  * @author <a href="mailto:stephane@hillion.org">Stephane Hillion</a>
- * @version $Id$
+ *
  */
 public class ToolBarFactory extends ResourceManager {
     // Constants

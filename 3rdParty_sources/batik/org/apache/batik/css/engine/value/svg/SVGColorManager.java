@@ -35,7 +35,7 @@ import org.w3c.dom.css.CSSValue;
  * This class provides a manager for the SVGColor property values.
  *
  * @author <a href="mailto:stephane@hillion.org">Stephane Hillion</a>
- * @version $Id$
+ *
  */
 public class SVGColorManager extends ColorManager {
 

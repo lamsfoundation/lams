@@ -30,7 +30,7 @@ import org.w3c.dom.Element;
  * {@link org.w3c.css.sac.LangCondition} interface.
  *
  * @author <a href="mailto:stephane@hillion.org">Stephane Hillion</a>
- * @version $Id$
+ *
  */
 
 public class CSSLangCondition

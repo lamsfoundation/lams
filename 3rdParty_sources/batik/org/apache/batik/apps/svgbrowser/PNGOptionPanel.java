@@ -33,7 +33,7 @@ import org.apache.batik.util.gui.ExtendedGridBagConstraints;
  * of the PNG, i.e. RGB or INDEXED.
  *
  * @author <a href="mailto:jun@oop-reserch.com">Jun Inamori</a>
- * @version $Id$
+ *
  */
 public class PNGOptionPanel extends OptionPanel {
 

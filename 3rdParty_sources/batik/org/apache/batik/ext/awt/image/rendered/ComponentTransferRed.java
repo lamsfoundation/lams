@@ -29,7 +29,7 @@ import org.apache.batik.ext.awt.image.TransferFunction;
 /**
  *
  * @author <a href="mailto:thomas.deweese@kodak.com">Thomas DeWeese</a>
- * @version $Id$
+ *
  */
 public class ComponentTransferRed extends AbstractRed {
     LookupOp operation;

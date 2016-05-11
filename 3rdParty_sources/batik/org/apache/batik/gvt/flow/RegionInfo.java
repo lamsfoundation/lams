@@ -28,7 +28,7 @@ import java.awt.Shape;
  * vertical alignment.
  *
  * @author <a href="mailto:thomas.deweese@kodak.com">Thomas DeWeese</a>
- * @version $Id$
+ *
  */
 public class RegionInfo {
 

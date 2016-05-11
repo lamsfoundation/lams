@@ -30,7 +30,7 @@ import org.apache.batik.ext.awt.g2d.TransformType;
  *
  * @author <a href="mailto:vincent.hardy@eng.sun.com">Vincent Hardy</a>
  * @author <a href="mailto:paul_evenblij@compuware.com">Paul Evenblij</a>
- * @version $Id$
+ *
  */
 public class SVGTransform extends AbstractSVGConverter{
     /**

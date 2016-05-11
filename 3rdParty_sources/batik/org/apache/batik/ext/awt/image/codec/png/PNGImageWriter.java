@@ -29,7 +29,7 @@ import org.apache.batik.ext.awt.image.spi.ImageWriterParams;
  * ImageWriter implementation that uses Batik's PNG codec to
  * write PNG files.
  *
- * @version $Id$
+ *
  */
 public class PNGImageWriter implements ImageWriter {
 

@@ -1,4 +1,4 @@
-// $Id$
+
 
 package org.jgroups;
 
@@ -11,7 +11,7 @@ package org.jgroups;
  * Encapsulates a state returned by <code>Channel.receive()</code>, as requested by
  * <code>Channel.getState(s)</code> previously.
  * @author Bela Ban
- * @version $Id$
+ *
  */
 public class SetStateEvent {
     byte[]     state=null;

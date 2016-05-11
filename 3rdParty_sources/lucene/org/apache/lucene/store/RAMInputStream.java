@@ -22,7 +22,7 @@ import java.io.IOException;
 /**
  * A memory-resident {@link IndexInput} implementation.
  * 
- * @version $Id$
+ *
  */
 
 class RAMInputStream extends IndexInput implements Cloneable {

@@ -44,7 +44,7 @@ import org.jboss.cache.transaction.TransactionContext;
  * 'side-ways' (see docs/design/Refactoring.txt).
  *
  * @author Bela Ban
- * @version $Id$
+ *
  */
 public class ReplicationInterceptor extends BaseRpcInterceptor
 {

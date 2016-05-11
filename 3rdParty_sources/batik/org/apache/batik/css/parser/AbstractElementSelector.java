@@ -25,7 +25,7 @@ import org.w3c.css.sac.ElementSelector;
  * {@link ElementSelector} interface.
  *
  * @author <a href="mailto:stephane@hillion.org">Stephane Hillion</a>
- * @version $Id$
+ *
  */
 public abstract class AbstractElementSelector
     implements ElementSelector {

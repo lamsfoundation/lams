@@ -28,7 +28,7 @@ import org.apache.batik.gvt.GraphicsNode;
  * of converting the GraphicsNode to a mask image.
  *
  * @author <a href="mailto:Thomas.DeWeeese@Kodak.com">Thomas DeWeese</a>
- * @version $Id$
+ *
  */
 public interface Mask extends Filter {
     /**

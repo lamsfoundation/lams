@@ -32,7 +32,7 @@ import javax.transaction.TransactionManager;
  * {@link Configuration#setTransactionManagerLookupClass}.
  *
  * @author Bela Ban, Aug 26 2003
- * @version $Id$
+ *
  */
 public interface TransactionManagerLookup
 {

@@ -8,7 +8,7 @@ import java.util.Map;
 /**
  * A mutable version of Digest (which is immutable
  * @author Bela Ban
- * @version $Id$
+ *
  */
 public class MutableDigest extends Digest {
     private boolean sealed=false;

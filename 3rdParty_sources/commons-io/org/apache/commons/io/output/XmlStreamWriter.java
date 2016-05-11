@@ -34,7 +34,7 @@ import org.apache.commons.io.input.XmlStreamReader;
  * charset encoding of the XML document written to the stream.
  *
  * @author Herve Boutemy
- * @version $Id$
+ *
  * @see XmlStreamReader
  * @since Commons IO 2.0
  */

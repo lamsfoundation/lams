@@ -36,7 +36,7 @@ import org.w3c.dom.Node;
  * Bridge class for the &lt;feComponentTransfer> element.
  *
  * @author <a href="mailto:tkormann@apache.org">Thierry Kormann</a>
- * @version $Id$
+ *
  */
 public class SVGFeComponentTransferElementBridge
     extends AbstractSVGFilterPrimitiveElementBridge {

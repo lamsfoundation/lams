@@ -56,7 +56,7 @@ import org.jgroups.util.Util;
  * additional administrative effort on the part of the user.<p>
  * @author Bela Ban
  * @author Ovidiu Feodorov <ovidiuf@users.sourceforge.net>
- * @version $Id$
+ *
  * @since 2.1.1
  */
 public class GossipRouter {

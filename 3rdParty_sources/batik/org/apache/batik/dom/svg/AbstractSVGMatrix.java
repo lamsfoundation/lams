@@ -30,7 +30,7 @@ import org.w3c.dom.svg.SVGMatrix;
  * interface.
  *
  * @author <a href="mailto:stephane@hillion.org">Stephane Hillion</a>
- * @version $Id$
+ *
  */
 public abstract class AbstractSVGMatrix implements SVGMatrix {
 

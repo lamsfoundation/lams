@@ -5,7 +5,7 @@ import java.io.OutputStream;
 
 /**
  * @author Bela Ban
- * @version $Id$
+ *
  */
 public class ExposedBufferedOutputStream extends BufferedOutputStream {
     /**

@@ -31,7 +31,7 @@ import org.w3c.dom.Element;
  * filled, stroked and can have markers.
  *
  * @author <a href="mailto:tkormann@apache.org">Thierry Kormann</a>
- * @version $Id$
+ *
  */
 public abstract class SVGDecoratedShapeElementBridge
         extends SVGShapeElementBridge {

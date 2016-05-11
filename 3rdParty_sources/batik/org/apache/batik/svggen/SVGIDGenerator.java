@@ -26,7 +26,7 @@ import java.util.Map;
  *
  * @author <a href="mailto:cjolif@ilog.fr">Christophe Jolif</a>
  * @author <a href="mailto:vincent.hardy@eng.sun.com">Vincent Hardy</a>
- * @version $Id$
+ *
  */
 public class SVGIDGenerator {
     private Map prefixMap = new HashMap();

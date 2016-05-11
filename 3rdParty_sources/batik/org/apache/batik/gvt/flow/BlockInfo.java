@@ -29,7 +29,7 @@ import org.apache.batik.gvt.font.GVTLineMetrics;
 
 /**
  *
- * @version $Id$
+ *
  */
 public class BlockInfo {
     public static final int ALIGN_START  = 0;

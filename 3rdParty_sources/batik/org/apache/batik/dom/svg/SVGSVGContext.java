@@ -31,7 +31,7 @@ import org.w3c.dom.Element;
  * and enclosure checking.
  *
  * @author <a href="mailto:deweese@apache.org">Thomas DeWeese</a>
- * @version $Id$
+ *
  */
 public interface SVGSVGContext extends SVGContext {
 

@@ -26,7 +26,7 @@ import java.awt.geom.Rectangle2D;
  * element.  Namely it holds the bounds of the region and the desired
  * vertical alignment.
  *
- * @version $Id$
+ *
  */
 public class RegionInfo
        extends Rectangle2D.Float

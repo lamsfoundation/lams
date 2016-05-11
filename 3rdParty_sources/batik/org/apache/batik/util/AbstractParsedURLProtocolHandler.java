@@ -23,7 +23,7 @@ package org.apache.batik.util;
  * Just handles the 'what protocol part'.
  *
  * @author <a href="mailto:thomas.deweese@kodak.com">Thomas DeWeese</a>
- * @version $Id$
+ *
  */
 public abstract class AbstractParsedURLProtocolHandler 
  implements ParsedURLProtocolHandler {

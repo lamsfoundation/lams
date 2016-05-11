@@ -46,7 +46,7 @@ import java.lang.reflect.Method;
  * If a transaction manager is not found, returns a {@link DummyTransactionManager}.
  *
  * @author Markus Plesser
- * @version $Id$
+ *
  */
 public class GenericTransactionManagerLookup implements TransactionManagerLookup
 {

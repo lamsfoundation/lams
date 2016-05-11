@@ -39,7 +39,7 @@ import org.apache.batik.ext.awt.image.rendered.SpecularLightingRed;
  * Implementation of the SpecularLightRable interface.
  *
  * @author <a href="mailto:vincent.hardy@eng.sun.com">Vincent Hardy</a>
- * @version $Id$
+ *
  */
 public class SpecularLightingRable8Bit
     extends AbstractColorInterpolationRable

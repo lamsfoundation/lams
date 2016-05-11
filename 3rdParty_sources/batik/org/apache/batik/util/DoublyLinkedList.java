@@ -23,7 +23,7 @@ package org.apache.batik.util;
  * O(n) behaviour on insert and delete.
  *
  * @author <a href="mailto:thomas.deweese@kodak.com">Thomas DeWeese</a>
- * @version $Id$
+ *
  */
 public class DoublyLinkedList {
 

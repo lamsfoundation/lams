@@ -56,7 +56,7 @@ import org.jboss.cache.config.CacheLoaderConfig.IndividualCacheLoaderConfig;
  * Browse operations lock the entire tree; eventually the JDBM team plans to fix this.
  *
  * @author Elias Ross
- * @version $Id$
+ *
  */
 @ThreadSafe
 public class JdbmCacheLoader2 extends JdbmCacheLoader

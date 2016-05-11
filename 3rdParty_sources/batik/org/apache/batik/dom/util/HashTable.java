@@ -24,7 +24,7 @@ import java.io.Serializable;
  * A simple hashtable, not synchronized, with fixed load factor.
  *
  * @author <a href="mailto:stephane@hillion.org">Stephane Hillion</a>
- * @version $Id$
+ *
  */
 public class HashTable implements Serializable {
 

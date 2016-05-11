@@ -34,7 +34,7 @@ import java.util.StringTokenizer;
  * to one or more slaves, and decides to use master when the connection is not
  * read-only, and use slave(s) when the connection is read-only.
  * 
- * @version $Id: NonRegisteringReplicationDriver.java,v 1.1.2.1 2005/05/13
+ *
  *          18:58:37 mmatthews Exp $
  */
 public class NonRegisteringReplicationDriver extends NonRegisteringDriver {

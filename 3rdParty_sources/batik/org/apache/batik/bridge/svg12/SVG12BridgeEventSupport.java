@@ -54,7 +54,7 @@ import org.w3c.dom.events.EventTarget;
  * that mouse events under sXBL have appropriate bubble limits.
  *
  * @author <a href="mailto:cam%40mcc%2eid%2eau">Cameron McCormack</a>
- * @version $Id$
+ *
  */
 public abstract class SVG12BridgeEventSupport extends BridgeEventSupport {
 

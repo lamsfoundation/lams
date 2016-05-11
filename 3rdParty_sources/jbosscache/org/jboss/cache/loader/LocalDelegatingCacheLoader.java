@@ -47,7 +47,7 @@ import java.util.Set;
  *
  * @author Bela Ban
  * @author Daniel Gredler
- * @version $Id$
+ *
  */
 public class LocalDelegatingCacheLoader extends AbstractCacheLoader
 {

@@ -31,7 +31,7 @@ import org.w3c.dom.svg.SVGFEGaussianBlurElement;
  * This class implements {@link SVGFEGaussianBlurElement}.
  *
  * @author <a href="mailto:stephane@hillion.org">Stephane Hillion</a>
- * @version $Id$
+ *
  */
 public class SVGOMFEGaussianBlurElement
     extends    SVGOMFilterPrimitiveStandardAttributes

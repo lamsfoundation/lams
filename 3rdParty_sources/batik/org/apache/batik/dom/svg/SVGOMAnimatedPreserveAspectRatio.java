@@ -33,7 +33,7 @@ import org.w3c.dom.svg.SVGPreserveAspectRatio;
  * This class implements the {@link SVGAnimatedPreserveAspectRatio} interface.
  *
  * @author <a href="mailto:tonny@kiyut.com">Tonny Kohar</a>
- * @version $Id$
+ *
  */
 public class SVGOMAnimatedPreserveAspectRatio
         extends AbstractSVGAnimatedValue

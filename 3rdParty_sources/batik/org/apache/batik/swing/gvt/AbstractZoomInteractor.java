@@ -34,7 +34,7 @@ import java.awt.geom.Line2D;
  * InteractorAdapter#startInteraction(InputEvent)} method.
  *
  * @author <a href="mailto:stephane@hillion.org">Stephane Hillion</a>
- * @version $Id$
+ *
  */
 public class AbstractZoomInteractor extends InteractorAdapter {
 

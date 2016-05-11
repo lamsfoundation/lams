@@ -74,7 +74,7 @@ import org.w3c.dom.Document;
  * </ul>
  *
  * @author <a href="mailto:vincent.hardy@eng.sun.com">Vincent Hardy</a>
- * @version $Id$
+ *
  */
 public class PrintTranscoder extends SVGAbstractTranscoder
     implements Printable {

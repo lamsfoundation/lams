@@ -33,7 +33,7 @@ import com.mysql.jdbc.profiler.ProfilerEvent;
  * Allows streaming of MySQL data.
  * 
  * @author dgan
- * @version $Id$
+ *
  */
 public class RowDataDynamic implements RowData {
 	// ~ Instance fields

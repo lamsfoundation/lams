@@ -25,7 +25,7 @@ import org.apache.batik.css.engine.value.FloatValue;
  * FloatValues except that it may be 'font-size' relative.
  *
  * @author <a href="mailto:stephane@hillion.org">Stephane Hillion</a>
- * @version $Id$
+ *
  */
 public class LineHeightValue extends FloatValue {
     

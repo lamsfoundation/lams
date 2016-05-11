@@ -26,7 +26,7 @@ import org.w3c.dom.Element;
  *
  * @author <a href="mailto:vincent.hardy@apache.org">Vincent Hardy</a>
  * @author <a href="mailto:Thierry.Kormann@sophia.inria.fr">Thierry Kormann</a>
- * @version $Id$
+ *
  */
 public interface GenericBridge extends Bridge {
 

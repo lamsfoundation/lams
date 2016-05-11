@@ -38,7 +38,7 @@ import org.apache.batik.transcoder.image.TIFFTranscoder;
  * This class is a helper to <tt>TIFFTranscoder</tt> that writes TIFF images
  * through the internal TIFF codec.
  *
- * @version $Id$
+ *
  */
 public class TIFFTranscoderInternalCodecWriteAdapter implements
         TIFFTranscoder.WriteAdapter {

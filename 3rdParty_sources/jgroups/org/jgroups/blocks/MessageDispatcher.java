@@ -38,7 +38,7 @@ import java.util.Vector;
  * the application instead of protocol level.
  *
  * @author Bela Ban
- * @version $Id$
+ *
  */
 public class MessageDispatcher implements RequestHandler {
     protected Channel channel=null;

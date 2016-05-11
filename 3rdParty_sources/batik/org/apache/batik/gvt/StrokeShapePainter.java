@@ -29,7 +29,7 @@ import java.awt.geom.Point2D;
  * A shape painter that can be used to draw the outline of a shape.
  *
  * @author <a href="mailto:Thierry.Kormann@sophia.inria.fr">Thierry Kormann</a>
- * @version $Id$
+ *
  */
 public class StrokeShapePainter implements ShapePainter {
 

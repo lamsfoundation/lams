@@ -33,7 +33,7 @@ import org.apache.commons.lang.text.StrBuilder;
  * @author Pete Gieser
  * @author C. Scott Ananian
  * @since 2.0
- * @version $Id$
+ *
  */
 public final class Fraction extends Number implements Comparable {
 

@@ -34,7 +34,7 @@ import org.w3c.dom.Document;
  * constructor.
  *
  * @author <a href="mailto:stephane@hillion.org">Stephane Hillion</a>
- * @version $Id$
+ *
  */
 public interface ScriptHandler {
 

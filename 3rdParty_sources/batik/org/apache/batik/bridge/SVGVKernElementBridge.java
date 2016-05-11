@@ -22,7 +22,7 @@ package org.apache.batik.bridge;
  * Bridge class for the &lt;vkern> element.
  *
  * @author <a href="mailto:dean.jackson@cmis.csiro.au">Dean Jackson</a>
- * @version $Id$
+ *
  */
 public class SVGVKernElementBridge extends SVGKernElementBridge {
 

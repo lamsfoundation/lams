@@ -25,7 +25,7 @@ import org.w3c.css.sac.SelectorList;
  * This class implements the {@link SelectorList} interface.
  *
  * @author <a href="mailto:stephane@hillion.org">Stephane Hillion</a>
- * @version $Id$
+ *
  */
 public class CSSSelectorList implements SelectorList {
 

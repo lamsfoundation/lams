@@ -33,7 +33,7 @@ import org.apache.batik.transcoder.keys.StringKey;
  * This class is an <tt>ImageTranscoder</tt> that produces a TIFF image.
  *
  * @author <a href="mailto:Thierry.Kormann@sophia.inria.fr">Thierry Kormann</a>
- * @version $Id$
+ *
  */
 public class TIFFTranscoder extends ImageTranscoder {
 
@@ -121,7 +121,7 @@ public class TIFFTranscoder extends ImageTranscoder {
      * This interface is used by <tt>TIFFTranscoder</tt> to write TIFF images 
      * through different codecs.
      *
-     * @version $Id$
+     *
      */
     public interface WriteAdapter {
         

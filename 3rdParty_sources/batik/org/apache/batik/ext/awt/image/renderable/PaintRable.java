@@ -25,7 +25,7 @@ import java.awt.Graphics2D;
  * action as a paint method instead of a RenderedImage when going to a
  * Graphics2D anyways.
  *
- * @version $Id$
+ *
  */
 public interface PaintRable {
     

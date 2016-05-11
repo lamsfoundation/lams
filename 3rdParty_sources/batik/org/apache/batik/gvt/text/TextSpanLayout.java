@@ -39,7 +39,7 @@ import org.apache.batik.gvt.font.GVTLineMetrics;
  * @see org.apache.batik.gvt.TextPainter
  *
  * @author <a href="mailto:bill.haneman@ireland.sun.com">Bill Haneman</a>
- * @version $Id$
+ *
  */
 public interface TextSpanLayout {
 

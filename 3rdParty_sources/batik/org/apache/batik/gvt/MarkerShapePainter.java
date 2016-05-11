@@ -37,7 +37,7 @@ import org.apache.batik.ext.awt.geom.ShapeExtender;
  * A shape painter that can be used to paint markers on a shape.
  *
  * @author <a href="mailto:vincent.hardy@eng.sun.com">Vincent Hardy</a>
- * @version $Id$
+ *
  */
 public class MarkerShapePainter implements ShapePainter {
 

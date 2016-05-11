@@ -25,7 +25,7 @@ package org.apache.batik.gvt.font;
  * (comma seperated) use a list of these.
  *
  * @author <a href="mailto:bella.robinson@cmis.csiro.au">Bella Robinson</a>
- * @version $Id$
+ *
  */
 public class UnicodeRange {
 

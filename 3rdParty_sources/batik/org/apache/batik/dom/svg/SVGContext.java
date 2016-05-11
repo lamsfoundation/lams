@@ -25,7 +25,7 @@ import java.awt.geom.Rectangle2D;
  * This interface is the placeholder for SVG application informations.
  *
  * @author <a href="mailto:stephane@hillion.org">Stephane Hillion</a>
- * @version $Id$
+ *
  */
 public interface SVGContext {
 

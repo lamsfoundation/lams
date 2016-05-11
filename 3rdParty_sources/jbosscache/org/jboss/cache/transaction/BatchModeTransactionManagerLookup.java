@@ -32,7 +32,7 @@ import javax.transaction.TransactionManager;
  * Returns an instance of {@link BatchModeTransactionManager}.
  *
  * @author Bela Ban Sept 5 2003
- * @version $Id$
+ *
  * @deprecated Use batching API on Cache instead.
  */
 @Deprecated

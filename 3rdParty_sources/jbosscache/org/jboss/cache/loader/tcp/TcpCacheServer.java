@@ -57,7 +57,7 @@ import java.util.Set;
  *
  * @author Bela Ban
  * @author Brian Stansberry
- * @version $Id$
+ *
  */
 public class TcpCacheServer implements TcpCacheServerMBean
 {

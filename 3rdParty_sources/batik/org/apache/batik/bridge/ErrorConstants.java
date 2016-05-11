@@ -22,7 +22,7 @@ package org.apache.batik.bridge;
  * The error code.
  *
  * @author <a href="mailto:tkormann@apache.org">Thierry Kormann</a>
- * @version $Id$
+ *
  */
 public interface ErrorConstants {
 

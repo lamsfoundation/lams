@@ -24,7 +24,7 @@ import org.apache.batik.util.DoublyIndexedTable;
  * This class is used by elements to initialize and reset their attributes.
  *
  * @author <a href="mailto:stephane@hillion.org">Stephane Hillion</a>
- * @version $Id$
+ *
  */
 public class AttributeInitializer {
 

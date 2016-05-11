@@ -34,7 +34,7 @@ import org.w3c.dom.views.AbstractView;
  * A Document that supports CSS styling.
  *
  * @author <a href="mailto:deweese@apache.org">deweese</a>
- * @version $Id$
+ *
  */
 public abstract class AbstractStylableDocument extends AbstractDocument
     implements DocumentCSS,

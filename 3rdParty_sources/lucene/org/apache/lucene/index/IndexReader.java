@@ -65,7 +65,7 @@ import java.util.Collection;
  if you want to make changes with the resulting IndexReader.
  </p>
 
- @version $Id$
+
 */
 public abstract class IndexReader {
 

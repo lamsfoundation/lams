@@ -35,7 +35,7 @@ import org.apache.batik.transcoder.svg2svg.SVGTranscoder;
  * svgpp is a pretty-printer for SVG source files.
  *
  * @author <a href="mailto:stephane@hillion.org">Stephane Hillion</a>
- * @version $Id$
+ *
  */
 public class Main {
 

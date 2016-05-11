@@ -40,7 +40,7 @@ import org.w3c.dom.NodeList;
  *
  * @author <a href="mailto:cjolif@ilog.fr">Christophe Jolif</a>
  * @author <a href="mailto:vincent.hardy@eng.sun.com">Vincent Hardy</a>
- * @version $Id$
+ *
  */
 public class SVGFont extends AbstractSVGConverter {
     public static final float EXTRA_LIGHT =

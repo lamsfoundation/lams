@@ -4,7 +4,7 @@ import org.jgroups.jmx.Protocol;
 
 /**
  * @author Bela Ban
- * @version $Id$
+ *
  */
 public class FD extends Protocol implements FDMBean {
     org.jgroups.protocols.FD p;

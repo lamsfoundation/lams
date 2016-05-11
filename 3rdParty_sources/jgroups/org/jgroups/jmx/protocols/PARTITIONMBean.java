@@ -7,7 +7,7 @@ import java.util.List;
 
 /**
  * @author Bela Ban
- * @version $Id$
+ *
  */
 public interface PARTITIONMBean extends ProtocolMBean {
     boolean isPartitionOn();

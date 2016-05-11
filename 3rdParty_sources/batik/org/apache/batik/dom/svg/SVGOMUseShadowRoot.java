@@ -30,7 +30,7 @@ import org.w3c.dom.Node;
  * It is used to implement the SVG use element behavioUr.
  *
  * @author <a href="mailto:stephane@hillion.org">Stephane Hillion</a>
- * @version $Id$
+ *
  */
 public class SVGOMUseShadowRoot
         extends AbstractDocumentFragment

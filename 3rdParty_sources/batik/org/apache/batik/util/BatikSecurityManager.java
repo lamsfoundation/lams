@@ -24,7 +24,7 @@ package org.apache.batik.util;
  * security related class.
  *
  * @author <a mailto="vincent.hardy@sun.com">Vincent Hardy</a>
- * @version $Id$
+ *
  */
 public class BatikSecurityManager extends SecurityManager {
     /**

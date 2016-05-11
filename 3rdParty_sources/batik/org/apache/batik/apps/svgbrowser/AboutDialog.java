@@ -45,7 +45,7 @@ import org.apache.batik.Version;
  * The dialog can be dismissed by click or by escaping.
  *
  * @author <a href="mailto:vincent.hardy@eng.sun.com">Vincent Hardy</a>
- * @version $Id$
+ *
  */
 public class AboutDialog extends JWindow {
 

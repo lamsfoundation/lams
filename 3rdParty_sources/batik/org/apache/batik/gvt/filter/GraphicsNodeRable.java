@@ -29,7 +29,7 @@ import org.apache.batik.gvt.GraphicsNode;
  * created through a <tt>GraphicsNodeRableFactory</tt>.
  *
  * @author <a href="mailto:vincent.hardy@eng.sun.com">Vincent Hardy</a>
- * @version $Id$
+ *
  */
 public interface GraphicsNodeRable extends Filter {
     /**

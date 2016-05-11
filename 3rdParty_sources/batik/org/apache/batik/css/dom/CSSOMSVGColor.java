@@ -40,7 +40,7 @@ import org.w3c.dom.svg.SVGNumberList;
  * This class implements the {@link SVGColor} interface.
  *
  * @author <a href="mailto:stephane@hillion.org">Stephane Hillion</a>
- * @version $Id$
+ *
  */
 public class CSSOMSVGColor
     implements SVGColor,

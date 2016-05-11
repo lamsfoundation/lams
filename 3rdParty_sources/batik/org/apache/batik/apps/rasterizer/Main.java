@@ -43,7 +43,7 @@ import org.apache.batik.util.ApplicationSecurityEnforcer;
  * <tt>SVGConverter</tt> which is used to perform the conversion.
  *
  * @author <a href="mailto:vhardy@apache.org">Vincent Hardy</a>
- * @version $Id$
+ *
  */
 public class Main implements SVGConverterController {
     /**

@@ -24,7 +24,7 @@ import java.io.RandomAccessFile;
 /**
  * Simple Macintosh cmap table, mapping only the ASCII character set to glyphs.
  *
- * @version $Id$
+ *
  * @author <a href="mailto:david@steadystate.co.uk">David Schweinsberg</a>
  */
 public class CmapFormat0 extends CmapFormat {

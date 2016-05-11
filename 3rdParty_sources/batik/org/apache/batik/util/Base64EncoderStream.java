@@ -33,7 +33,7 @@ import java.io.PrintStream;
  * @author <a href="mailto:deweese@apache.org">Thomas DeWeese</a>
  * @author <a href="mailto:vincent.hardy@eng.sun.com">Vincent Hardy</a>
  * @author      Chuck McManis
- * @version $Id$
+ *
  */
 public class Base64EncoderStream extends OutputStream {
 

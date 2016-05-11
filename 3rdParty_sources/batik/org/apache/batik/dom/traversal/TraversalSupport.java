@@ -34,7 +34,7 @@ import org.w3c.dom.traversal.TreeWalker;
  * This class provides support for traversal.
  *
  * @author <a href="mailto:stephane@hillion.org">Stephane Hillion</a>
- * @version $Id$
+ *
  */
 public class TraversalSupport {
     

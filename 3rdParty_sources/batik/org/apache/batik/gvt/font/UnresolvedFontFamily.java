@@ -26,7 +26,7 @@ import java.util.Map;
  * A font family class for unresolved fonts.
  *
  * @author <a href="mailto:bella.robinson@cmis.csiro.au">Bella Robinson</a>
- * @version $Id$
+ *
  */
 public class UnresolvedFontFamily implements GVTFontFamily {
 

@@ -22,7 +22,7 @@ package org.apache.batik.dom.events;
  * A simple event.
  *
  * @author <a href="mailto:stephane@hillion.org">Stephane Hillion</a>
- * @version $Id$
+ *
  */
 public class DOMEvent extends AbstractEvent {
     

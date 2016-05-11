@@ -25,7 +25,7 @@ import java.awt.Color;
  * constant over the whole surface.
  *
  * @author <a href="mailto:vincent.hardy@eng.sun.com">Vincent Hardy</a>
- * @version $Id$
+ *
  */
 public class DistantLight extends AbstractLight {
     /**

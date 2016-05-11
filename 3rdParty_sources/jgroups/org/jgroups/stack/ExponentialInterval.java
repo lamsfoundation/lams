@@ -2,7 +2,7 @@ package org.jgroups.stack;
 
 /**
  * @author Bela Ban
- * @version $Id$
+ *
  */
 public class ExponentialInterval implements Interval {
     private long value=30;

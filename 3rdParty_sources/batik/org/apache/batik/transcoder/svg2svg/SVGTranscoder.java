@@ -41,7 +41,7 @@ import org.w3c.dom.Document;
  * This class is a trancoder from SVG to SVG.
  *
  * @author <a href="mailto:stephane@hillion.org">Stephane Hillion</a>
- * @version $Id$
+ *
  */
 public class SVGTranscoder extends AbstractTranscoder {
 

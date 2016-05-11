@@ -36,7 +36,7 @@ import org.w3c.dom.svg.SVGDocument;
  * maintaining a cache.
  *
  * @author <a href="mailto:Thierry.Kormann@sophia.inria.fr">Thierry Kormann</a>
- * @version $Id$
+ *
  */
 public class DocumentLoader {
 

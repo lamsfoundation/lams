@@ -8,7 +8,7 @@ import java.io.*;
 
 /**
  * @author Bela Ban
- * @version $Id$
+ *
  */
 public class FragHeader extends Header implements Streamable {
     public long id=0;

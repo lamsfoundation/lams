@@ -31,7 +31,7 @@ import java.util.List;
  * an SVG filter.
  *
  * @author <a href="mailto:vincent.hardy@eng.sun.com">Vincent Hardy</a>
- * @version $Id$
+ *
  * @see                org.apache.batik.svggen.SVGCustomBufferedImageOp
  * @see                org.apache.batik.svggen.SVGLookupOp
  * @see                org.apache.batik.svggen.SVGRescaleOp

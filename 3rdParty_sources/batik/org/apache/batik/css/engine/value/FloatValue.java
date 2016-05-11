@@ -25,7 +25,7 @@ import org.w3c.dom.css.CSSPrimitiveValue;
  * This class represents float values.
  *
  * @author <a href="mailto:stephane@hillion.org">Stephane Hillion</a>
- * @version $Id$
+ *
  */
 public class FloatValue extends AbstractValue {
 

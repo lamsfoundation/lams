@@ -28,7 +28,7 @@ import java.awt.geom.Rectangle2D;
  * A shape painter which consists of multiple shape painters.
  *
  * @author <a href="mailto:Thierry.Kormann@sophia.inria.fr">Thierry Kormann</a>
- * @version $Id$
+ *
  */
 public class CompositeShapePainter implements ShapePainter {
 

@@ -33,7 +33,7 @@ import org.w3c.dom.svg.SVGSymbolElement;
  * This class implements {@link SVGSymbolElement}.
  *
  * @author <a href="mailto:stephane@hillion.org">Stephane Hillion</a>
- * @version $Id$
+ *
  */
 public class SVGOMSymbolElement
     extends    SVGStylableElement

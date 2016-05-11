@@ -25,7 +25,7 @@ package org.apache.batik.gvt.font;
  * when laying out glyphs.
  *
  * @author <a href="mailto:dean.jackson@cmis.csiro.au">Dean Jackson</a>
- * @version $Id$ 
+ *
  */
 public class KerningTable {
 

@@ -33,7 +33,7 @@ import org.w3c.dom.Element;
  * SVG pattern element
  *
  * @author <a href="mailto:vincent.hardy@eng.sun.com">Vincent Hardy</a>
- * @version $Id$
+ *
  */
 public class SVGTexturePaint extends AbstractSVGConverter {
     /**

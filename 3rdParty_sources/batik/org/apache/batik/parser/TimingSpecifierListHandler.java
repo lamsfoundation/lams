@@ -22,7 +22,7 @@ package org.apache.batik.parser;
  * An adapter class for {@link TimingSpecifierListHandler}.
  *
  * @author <a href="mailto:cam%40mcc%2eid%2eau">Cameron McCormack</a>
- * @version $Id$
+ *
  */
 public interface TimingSpecifierListHandler extends TimingSpecifierHandler {
 

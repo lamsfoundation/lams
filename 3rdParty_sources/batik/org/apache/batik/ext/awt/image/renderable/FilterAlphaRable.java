@@ -39,7 +39,7 @@ import org.apache.batik.ext.awt.image.rendered.RenderedImageCachableRed;
  * This sets RGB to black and Alpha to the source image's alpha channel.
  *
  * @author <a href="mailto:Thomas.DeWeese@Kodak.com">Thomas DeWeese</a>
- * @version $Id$
+ *
  */
 public class FilterAlphaRable
     extends    AbstractRable {

@@ -28,7 +28,7 @@ import javax.swing.JComponent;
  * This class represents a separator for the toolbar buttons.
  *
  * @author <a href="mailto:stephane@hillion.org">Stephane Hillion</a>
- * @version $Id$
+ *
  */
 public class JToolbarSeparator extends JComponent {
     /**

@@ -22,7 +22,7 @@ package org.apache.batik.css.parser;
  * This interface defines the constants that represent CSS lexical units.
  *
  * @author <a href="mailto:stephane@hillion.org">Stephane Hillion</a>
- * @version $Id$
+ *
  */
 public interface LexicalUnits {
 

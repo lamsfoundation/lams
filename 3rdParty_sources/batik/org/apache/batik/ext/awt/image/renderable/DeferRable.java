@@ -36,7 +36,7 @@ import java.util.Vector;
  * this is probably best represented using the Proxy class in the
  * Reflection APIs.
  *
- * @version $Id$
+ *
  */
 public class DeferRable implements Filter {
     Filter      src;

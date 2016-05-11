@@ -29,7 +29,7 @@ import org.apache.batik.util.SMILConstants;
  * 'keyTimes', 'keySplines', 'additive' and 'cumulative' attributes.
  *
  * @author <a href="mailto:cam%40mcc%2eid%2eau">Cameron McCormack</a>
- * @version $Id$
+ *
  */
 public abstract class InterpolatingAnimation extends AbstractAnimation {
 

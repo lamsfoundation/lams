@@ -30,7 +30,7 @@ import java.lang.ref.PhantomReference;
  * Complete Class Desc
  *
  * @author <a href="mailto:deweese@apache.org">l449433</a>
- * @version $Id$
+ *
  */
 public class CleanerThread extends Thread {
 

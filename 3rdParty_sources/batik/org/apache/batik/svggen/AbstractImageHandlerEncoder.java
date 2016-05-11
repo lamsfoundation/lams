@@ -40,7 +40,7 @@ import org.w3c.dom.Element;
  * of the file created by this handler.
  *
  * @author <a href="mailto:vincent.hardy@eng.sun.com">Vincent Hardy</a>
- * @version $Id$
+ *
  * @see             org.apache.batik.svggen.SVGGraphics2D
  * @see             org.apache.batik.svggen.ImageHandlerJPEGEncoder
  * @see             org.apache.batik.svggen.ImageHandlerPNGEncoder

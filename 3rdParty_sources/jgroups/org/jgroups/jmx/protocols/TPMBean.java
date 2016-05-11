@@ -8,7 +8,7 @@ import java.util.List;
 
 /**
  * @author Bela Ban
- * @version $Id$
+ *
  */
 public interface TPMBean extends ProtocolMBean {
     Address getLocalAddress();

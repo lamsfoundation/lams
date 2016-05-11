@@ -37,7 +37,7 @@ import org.w3c.dom.svg.SVGStyleElement;
  * This class implements {@link SVGStyleElement}.
  *
  * @author <a href="mailto:stephane@hillion.org">Stephane Hillion</a>
- * @version $Id$
+ *
  */
 public class SVGOMStyleElement
     extends    SVGOMElement

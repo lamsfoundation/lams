@@ -26,7 +26,7 @@ import org.w3c.dom.Element;
  * This class represents a CSS event fired by a CSSEngine.
  *
  * @author <a href="mailto:stephane@hillion.org">Stephane Hillion</a>
- * @version $Id$
+ *
  */
 public class CSSEngineEvent extends EventObject {
 

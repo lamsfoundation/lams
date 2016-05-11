@@ -27,7 +27,7 @@ import java.io.Reader;
  * synchronized.  The input is buffered.
  *
  * @author <a href="mailto:stephane@hillion.org">Stephane Hillion</a>
- * @version $Id$
+ *
  */
 public abstract class NormalizingReader extends Reader {
 

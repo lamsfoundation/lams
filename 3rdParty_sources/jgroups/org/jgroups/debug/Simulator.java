@@ -18,7 +18,7 @@ import java.util.Iterator;
 /**
  * Tests one or more protocols independently. Look at org.jgroups.tests.FCTest for an example of how to use it.
  * @author Bela Ban
- * @version $Id$
+ *
  */
 public class Simulator {
     private Protocol[] protStack=null;

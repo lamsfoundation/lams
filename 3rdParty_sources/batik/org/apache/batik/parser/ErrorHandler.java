@@ -23,7 +23,7 @@ package org.apache.batik.parser;
  * in order to be notified of parsing errors. 
  *
  * @author <a href="mailto:stephane@hillion.org">Stephane Hillion</a>
- * @version $Id$
+ *
  */
 public interface ErrorHandler {
     /**

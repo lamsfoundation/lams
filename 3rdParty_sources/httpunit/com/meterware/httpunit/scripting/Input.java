@@ -4,7 +4,7 @@ import java.io.IOException;
 import org.xml.sax.SAXException;
 
 /********************************************************************************************************************
- * $Id$
+ *
  *
  * Copyright (c) 2002-2008, Russell Gold
  *

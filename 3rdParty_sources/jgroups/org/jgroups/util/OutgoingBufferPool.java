@@ -8,7 +8,7 @@ import java.util.concurrent.BlockingQueue;
  * bytes, and almost always increases to 65K (max size of a UDP datagram). We save a few copies when the BAOS increases
  * its size by pooling those.
  * @author Bela Ban
- * @version $Id$
+ *
  */
 public class OutgoingBufferPool {
     private BlockingQueue<ExposedDataOutputStream> buffers;

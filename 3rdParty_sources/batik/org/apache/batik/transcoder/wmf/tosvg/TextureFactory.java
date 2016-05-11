@@ -34,7 +34,7 @@ import org.apache.batik.transcoder.wmf.WMFConstants;
  * This class generate Paints from WMF hatch definitions. All generated
  * Paints are cached for future use.
  *
- * @version $Id$
+ *
  */
 public class TextureFactory {
     private static TextureFactory fac = null;

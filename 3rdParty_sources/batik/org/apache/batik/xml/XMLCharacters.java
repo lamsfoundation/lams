@@ -23,7 +23,7 @@ package org.apache.batik.xml;
  * the type of the characters found in an XML document.
  *
  * @author <a href="mailto:stephane@hillion.org">Stephane Hillion</a>
- * @version $Id$
+ *
  */
 
 public class XMLCharacters {

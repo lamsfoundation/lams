@@ -26,7 +26,7 @@ import org.apache.batik.dom.anim.AnimationTargetListener;
  * to the element.
  *
  * @author <a href="mailto:cam%40mcc%2eid%2eau">Cameron McCormack</a>
- * @version $Id$
+ *
  */
 public interface SVGAnimationTargetContext extends SVGContext {
 

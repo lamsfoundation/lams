@@ -24,7 +24,7 @@ import org.apache.batik.util.SVGConstants;
  * Contains the definition of the SVG tags and attribute names.
  *
  * @author <a href="mailto:vincent.hardy@eng.sun.com">Vincent Hardy</a>
- * @version $Id$
+ *
  */
 public interface SVGSyntax extends SVGConstants {
 

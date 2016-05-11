@@ -25,7 +25,7 @@ import java.util.LinkedList;
  * A class that represents an interval for a timed element.
  *
  * @author <a href="mailto:cam%40mcc%2eid%2eau">Cameron McCormack</a>
- * @version $Id$
+ *
  */
 public class Interval {
 

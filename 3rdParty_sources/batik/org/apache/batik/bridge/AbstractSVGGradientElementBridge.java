@@ -38,7 +38,7 @@ import org.w3c.dom.Node;
  * Bridge class for vending gradients.
  *
  * @author <a href="mailto:tkormann@apache.org">Thierry Kormann</a>
- * @version $Id$
+ *
  */
 public abstract class AbstractSVGGradientElementBridge
         extends AnimatableGenericSVGBridge

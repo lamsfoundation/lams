@@ -25,7 +25,7 @@ import java.io.IOException;
 import java.util.Arrays;
 
 /**
- * @version $Id$
+ *
  */
 class TermVectorsReader implements Cloneable {
 

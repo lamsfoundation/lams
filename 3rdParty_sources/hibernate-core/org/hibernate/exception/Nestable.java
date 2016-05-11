@@ -36,7 +36,7 @@ import java.io.PrintWriter;
  * @author <a href="mailto:knielsen@apache.org">Kasper Nielsen</a>
  * @author <a href="mailto:steven@caswell.name">Steven Caswell</a>
  * @author Pete Gieser
- * @version $Id$
+ *
  * @since 1.0
  */
 public interface Nestable {

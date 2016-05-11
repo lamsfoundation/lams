@@ -30,7 +30,7 @@ import org.w3c.dom.svg.SVGFEFloodElement;
  * This class implements {@link SVGFEFloodElement}.
  *
  * @author <a href="mailto:stephane@hillion.org">Stephane Hillion</a>
- * @version $Id$
+ *
  */
 public class SVGOMFEFloodElement
     extends    SVGOMFilterPrimitiveStandardAttributes

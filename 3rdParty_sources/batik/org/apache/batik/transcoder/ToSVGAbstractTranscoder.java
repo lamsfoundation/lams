@@ -85,7 +85,7 @@ import org.w3c.dom.Element;
  *  </li>
  *  </ul>
  *
- * @version $Id$
+ *
  */
 public abstract class ToSVGAbstractTranscoder extends AbstractTranscoder
     implements SVGConstants {

@@ -30,7 +30,7 @@ import org.w3c.dom.svg.SVGAnimatedNumber;
  * This class implements the {@link SVGAnimatedNumber} interface.
  *
  * @author <a href="mailto:stephane@hillion.org">Stephane Hillion</a>
- * @version $Id$
+ *
  */
 public class SVGOMAnimatedNumber
         extends AbstractSVGAnimatedValue

@@ -29,7 +29,7 @@ import org.w3c.dom.Element;
  * Describes an SVG font
  *
  * @author <a href="mailto:vincent.hardy@eng.sun.com">Vincent Hardy</a>
- * @version $Id$
+ *
  * @see             org.apache.batik.svggen.SVGFont
  */
 public class SVGFontDescriptor implements SVGDescriptor, SVGSyntax {

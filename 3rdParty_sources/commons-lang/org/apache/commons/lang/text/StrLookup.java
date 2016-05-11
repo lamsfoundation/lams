@@ -33,7 +33,7 @@ import java.util.Map;
  *
  * @author Apache Software Foundation
  * @since 2.2
- * @version $Id$
+ *
  */
 public abstract class StrLookup {
 

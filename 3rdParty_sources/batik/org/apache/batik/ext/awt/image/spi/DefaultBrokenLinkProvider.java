@@ -30,7 +30,7 @@ import org.apache.batik.i18n.LocalizableSupport;
 
 /**
  *
- * @version $Id$
+ *
  */
 public class DefaultBrokenLinkProvider
     extends BrokenLinkProvider {

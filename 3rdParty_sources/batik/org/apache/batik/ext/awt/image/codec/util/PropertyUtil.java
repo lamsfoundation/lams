@@ -24,7 +24,7 @@ import org.apache.batik.i18n.LocalizableSupport;
 
 /**
  *
- * @version $Id$
+ *
  */
 public class PropertyUtil {
     protected static final String RESOURCES =

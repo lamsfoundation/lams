@@ -22,7 +22,7 @@ package org.apache.batik.dom.xbl;
  * An interface for XBL managers to associate data with nodes.
  *
  * @author <a href="mailto:cam%40mcc%2eid%2eau">Cameron McCormack</a>
- * @version $Id$
+ *
  */
 public interface XBLManagerData {
 

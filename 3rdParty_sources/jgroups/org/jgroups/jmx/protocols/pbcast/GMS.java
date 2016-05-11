@@ -4,7 +4,7 @@ import org.jgroups.jmx.Protocol;
 
 /**
  * @author Bela Ban
- * @version $Id$
+ *
  */
 public class GMS extends Protocol implements GMSMBean {
     org.jgroups.protocols.pbcast.GMS p;

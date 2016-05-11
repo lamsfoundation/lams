@@ -40,7 +40,7 @@ import org.apache.batik.gvt.text.ArabicTextHandler;
  * This is a wrapper class for a java.awt.Font instance.
  *
  * @author <a href="mailto:bella.robinson@cmis.csiro.au">Bella Robinson</a>
- * @version $Id$
+ *
  */
 public class AWTGVTFont implements GVTFont {
 

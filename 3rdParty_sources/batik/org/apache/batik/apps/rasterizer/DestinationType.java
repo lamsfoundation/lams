@@ -29,7 +29,7 @@ import org.apache.batik.transcoder.image.TIFFTranscoder;
  *
  * @author Henri Ruini
  * @author <a href="mailto:vhardy@apache.org">Vincent Hardy</a>
- * @version $Id$
+ *
  */
 public final class DestinationType {
     public static final String PNG_STR  = "image/png";

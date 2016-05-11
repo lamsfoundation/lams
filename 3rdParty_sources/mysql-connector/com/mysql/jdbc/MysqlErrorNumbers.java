@@ -30,7 +30,7 @@ package com.mysql.jdbc;
  * 
  * @author Mark Matthews
  * 
- * @version $Id: MysqlErrorNumbers.java,v 1.1.2.1 2005/05/13 18:58:38 mmatthews
+ *
  *          Exp $
  */
 public final class MysqlErrorNumbers {

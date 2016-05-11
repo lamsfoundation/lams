@@ -63,7 +63,7 @@ import org.w3c.dom.svg.SVGPreserveAspectRatio;
  * corresponding to the SVG built in cursors.
  *
  * @author <a href="mailto:vincent.hardy@sun.com">Vincent Hardy</a>
- * @version $Id$
+ *
  */
 public class CursorManager implements SVGConstants, ErrorConstants {
     /**

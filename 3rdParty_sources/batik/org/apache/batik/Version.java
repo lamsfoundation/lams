@@ -22,7 +22,7 @@ package org.apache.batik;
  * This class defines the Batik version number.
  *
  * @author <a href="mailto:vincent.hardy@sun.com">Vincent Hardy</a>
- * @version $Id$
+ *
  */
 public final class Version {
 

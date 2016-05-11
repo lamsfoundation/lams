@@ -51,7 +51,7 @@ import org.w3c.dom.css.CSSValue;
  * concrete objects regarding to CSS properties.
  *
  * @author <a href="mailto:tkormann@apache.org">Thierry Kormann</a>
- * @version $Id$
+ *
  */
 public abstract class CSSUtilities
     implements CSSConstants, ErrorConstants, XMLConstants {

@@ -4,7 +4,7 @@ import org.jgroups.Channel;
 
 /**
  * @author Bela Ban
- * @version $Id$
+ *
  */
 public interface JChannelFactoryMBean {
     String getMultiplexerConfig();

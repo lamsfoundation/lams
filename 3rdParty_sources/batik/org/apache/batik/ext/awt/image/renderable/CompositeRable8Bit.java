@@ -44,7 +44,7 @@ import org.apache.batik.ext.awt.image.rendered.FloodRed;
  * the image are applied in the order they are in the List given.
  *
  * @author <a href="mailto:Thomas.DeWeeese@Kodak.com">Thomas DeWeese</a>
- * @version $Id$
+ *
  */
 public class CompositeRable8Bit
     extends    AbstractColorInterpolationRable

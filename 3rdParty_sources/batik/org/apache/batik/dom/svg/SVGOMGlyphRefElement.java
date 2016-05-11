@@ -31,7 +31,7 @@ import org.w3c.dom.svg.SVGGlyphRefElement;
  * This class implements {@link SVGGlyphRefElement}.
  *
  * @author <a href="mailto:stephane@hillion.org">Stephane Hillion</a>
- * @version $Id$
+ *
  */
 public class SVGOMGlyphRefElement
     extends    SVGStylableElement

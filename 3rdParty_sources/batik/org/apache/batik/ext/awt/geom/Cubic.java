@@ -26,7 +26,7 @@ import java.awt.geom.Rectangle2D;
 /**
  * A class representing a cubic path segment.
  *
- * @version $Id$
+ *
  */
 public class Cubic extends AbstractSegment {
 

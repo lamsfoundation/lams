@@ -27,7 +27,7 @@ import org.apache.commons.lang.text.StrBuilder;
  * @author Apache Software Foundation
  * @author <a href="mailto:chrise@esha.com">Christopher Elkins</a>
  * @since 2.0 (previously in org.apache.commons.lang)
- * @version $Id$
+ *
  */
 public final class NumberRange extends Range implements Serializable {
     

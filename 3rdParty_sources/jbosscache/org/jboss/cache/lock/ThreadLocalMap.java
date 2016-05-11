@@ -31,7 +31,7 @@ import java.util.Set;
  * http://www.me.umn.edu/~shivane/blogs/cafefeed/2004/06/of-non-static-threadlocals-and-memory.html
  *
  * @author Brian Dueck
- * @version $Id$
+ *
  */
 public class ThreadLocalMap<K, V> implements Map<K, V>
 {

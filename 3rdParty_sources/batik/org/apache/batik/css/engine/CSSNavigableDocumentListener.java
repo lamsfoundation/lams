@@ -28,7 +28,7 @@ import org.w3c.dom.Node;
  * the tree rather than the actual DOM tree.
  *
  * @author <a href="mailto:cam%40mcc%2eid%2eau">Cameron McCormack</a>
- * @version $Id$
+ *
  */
 public interface CSSNavigableDocumentListener {
 

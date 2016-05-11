@@ -4,7 +4,7 @@ import org.jgroups.jmx.Protocol;
 
 /**
  * @author Bela Ban
- * @version $Id$
+ *
  */
 public class FD_ALL extends Protocol implements FD_ALLMBean {
     org.jgroups.protocols.FD_ALL p;

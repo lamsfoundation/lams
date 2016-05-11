@@ -26,7 +26,7 @@ import java.io.InputStream;
  * <tt>SVGConverter</tt>
  *
  * @author <a href="mailto:vhardy@apache.org">Vincent Hardy</a>
- * @version $Id$
+ *
  */
 public interface SVGConverterSource {
     /**

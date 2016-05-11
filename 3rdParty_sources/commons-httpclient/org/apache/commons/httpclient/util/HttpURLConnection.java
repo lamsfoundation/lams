@@ -62,7 +62,7 @@ import java.security.Permission;
  *
  * @since 2.0
  *
- * @version $Id$
+ *
  */
 public class HttpURLConnection extends java.net.HttpURLConnection {
 

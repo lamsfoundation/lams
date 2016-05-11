@@ -57,7 +57,7 @@ import org.apache.batik.transcoder.wmf.WMFConstants;
   * Core class for rendering the WMF image. It is able to render a
   * WMF file in a <tt>Graphics</tt> object.
   *
-  * @version $Id$
+  *
   * @author <a href="mailto:luano@asd.ie">Luan O'Carroll</a>
   */
 public class WMFPainter extends AbstractWMFPainter {

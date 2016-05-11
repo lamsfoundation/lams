@@ -29,7 +29,7 @@ import  java.lang.ref.SoftReference;
  * reference allowing for the recovery of the tile when the JVM is
  * not under memory pressure
  *
- * @version $Id$
+ *
  */
 public class TileLRUMember implements LRUCache.LRUObj {
     private static final boolean DEBUG = false;

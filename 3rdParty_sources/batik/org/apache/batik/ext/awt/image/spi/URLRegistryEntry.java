@@ -30,7 +30,7 @@ import org.apache.batik.util.ParsedURL;
  * URLStreamHandler using one of the methods listed in
  * @see java.net.URL#URL(java.lang.String, java.lang.String, int, java.lang.String)
  *
- * @version $Id$
+ *
  */
 public interface URLRegistryEntry extends RegistryEntry {
     /**

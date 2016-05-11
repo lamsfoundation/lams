@@ -25,7 +25,7 @@ import org.w3c.dom.smil.TimeEvent;
  * An event class for SMIL timing events.
  *
  * @author <a href="mailto:cam%40mcc%2eid%2eau">Cameron McCormack</a>
- * @version $Id$
+ *
  */
 public class DOMTimeEvent extends AbstractEvent implements TimeEvent {
 

@@ -35,7 +35,7 @@ import org.w3c.dom.Element;
  * encoder.
  *
  * @author <a href="mailto:paul_evenblij@compuware.com">Paul Evenblij</a>
- * @version $Id$
+ *
  */
 public class CachedImageHandlerBase64Encoder extends DefaultCachedImageHandler {
     /**

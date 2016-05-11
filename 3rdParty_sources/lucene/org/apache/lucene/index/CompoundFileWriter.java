@@ -47,7 +47,7 @@ import java.io.IOException;
  * with that file's name.
  *
  *
- * @version $Id$
+ *
  */
 final class CompoundFileWriter {
 

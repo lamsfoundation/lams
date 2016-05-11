@@ -33,7 +33,7 @@ import org.apache.batik.transcoder.wmf.WMFConstants;
  *  Probably WMFRecordStore is what you need.
  *
  * @author <a href="mailto:luano@asd.ie">Luan O'Carroll</a>
- * @version $Id$
+ *
  */
 public class RecordStore {
 

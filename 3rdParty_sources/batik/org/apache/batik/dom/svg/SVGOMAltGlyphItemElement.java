@@ -26,7 +26,7 @@ import org.w3c.dom.svg.SVGAltGlyphItemElement;
  * This class implements {@link SVGAltGlyphItemElement}.
  *
  * @author <a href="mailto:stephane@hillion.org">Stephane Hillion</a>
- * @version $Id$
+ *
  */
 public class SVGOMAltGlyphItemElement
     extends    SVGOMElement

@@ -25,7 +25,7 @@ import org.apache.batik.util.CSSConstants;
  * This class provides a manager for the 'color-interpolation' property values.
  *
  * @author <a href="mailto:stephane@hillion.org">Stephane Hillion</a>
- * @version $Id$
+ *
  */
 public class ColorInterpolationFiltersManager extends ColorInterpolationManager {
     

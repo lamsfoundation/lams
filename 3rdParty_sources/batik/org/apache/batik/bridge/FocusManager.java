@@ -34,7 +34,7 @@ import org.w3c.dom.events.MouseEvent;
  * A class that manages focus on elements.
  *
  * @author <a href="mailto:Thierry.Kormann@sophia.inria.fr">Thierry Kormann</a>
- * @version $Id$
+ *
  */
 public class FocusManager {
 

@@ -28,7 +28,7 @@ package org.apache.batik.dom.svg;
  * the values of the attribute.
  *
  * @author <a href="mailto:nicolas.socheleau@bitflash.com">Nicolas Socheleau</a>
- * @version $Id$
+ *
  */
 public interface ListHandler {
 

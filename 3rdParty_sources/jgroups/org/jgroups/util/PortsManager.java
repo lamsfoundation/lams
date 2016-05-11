@@ -7,7 +7,7 @@ import java.util.*;
  * Maintains a list of ports used on this host, associated with time stamps. The ports are persistet into the
  * temp file system.
  * @author Bela Ban
- * @version $Id$
+ *
  */
 public class PortsManager {
     private String filename="jgroups-ports.txt";

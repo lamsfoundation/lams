@@ -33,7 +33,7 @@ import org.w3c.dom.svg.SVGViewElement;
  * This class implements {@link org.w3c.dom.svg.SVGViewElement}.
  *
  * @author <a href="mailto:stephane@hillion.org">Stephane Hillion</a>
- * @version $Id$
+ *
  */
 public class SVGOMViewElement
     extends SVGOMElement

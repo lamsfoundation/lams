@@ -26,7 +26,7 @@ import org.w3c.dom.Node;
  * support for namespaces.
  *
  * @author <a href="mailto:stephane@hillion.org">Stephane Hillion</a>
- * @version $Id$
+ *
  */
 public class GenericAttrNS extends AbstractAttrNS {
 

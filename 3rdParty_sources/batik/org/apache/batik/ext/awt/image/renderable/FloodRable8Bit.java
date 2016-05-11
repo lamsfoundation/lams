@@ -37,7 +37,7 @@ import org.apache.batik.ext.awt.image.rendered.PadRed;
  * This fills the input image with a given flood paint
  *
  * @author <a href="mailto:dean@w3.org">Dean Jackson</a>
- * @version $Id$
+ *
  */
 
 public class FloodRable8Bit extends AbstractRable

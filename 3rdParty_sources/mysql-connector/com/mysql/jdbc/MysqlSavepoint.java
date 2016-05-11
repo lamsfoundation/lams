@@ -33,7 +33,7 @@ import java.sql.Savepoint;
  * 
  * @author Mark Matthews
  * 
- * @version $Id$
+ *
  */
 public class MysqlSavepoint implements Savepoint {
 	private static String getUniqueId() {

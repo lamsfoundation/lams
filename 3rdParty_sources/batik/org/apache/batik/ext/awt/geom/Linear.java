@@ -24,7 +24,7 @@ import java.awt.geom.Rectangle2D;
 /**
  * A class representing a linear path segment.
  *
- * @version $Id$
+ *
  */
 public class Linear implements Segment {
     public Point2D.Double p1, p2;

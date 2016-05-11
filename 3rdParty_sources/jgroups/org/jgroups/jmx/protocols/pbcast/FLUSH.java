@@ -4,7 +4,7 @@ import org.jgroups.jmx.Protocol;
 
 /**
  * @author Vladimir Blagojevic
- * @version $Id$
+ *
  */
 public class FLUSH extends Protocol implements FLUSHMBean {
     org.jgroups.protocols.pbcast.FLUSH p;

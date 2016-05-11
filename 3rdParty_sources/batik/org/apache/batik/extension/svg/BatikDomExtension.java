@@ -31,7 +31,7 @@ import org.w3c.dom.Element;
  * functionality of the Dom, to support new tags in the rendering tree.
  *
  * @author <a href="mailto:thomas.deweese@kodak.com">Thomas DeWeese</a>
- * @version $Id$
+ *
  */
 public class BatikDomExtension
     implements DomExtension, BatikExtConstants {

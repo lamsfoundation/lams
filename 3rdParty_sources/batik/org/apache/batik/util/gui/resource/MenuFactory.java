@@ -66,7 +66,7 @@ import org.apache.batik.util.resources.ResourceManager;
  * Consecutive RADIO items are put in a ButtonGroup
  *
  * @author <a href="mailto:stephane@hillion.org">Stephane Hillion</a>
- * @version $Id$
+ *
  */
 public class MenuFactory extends ResourceManager {
     // Constants

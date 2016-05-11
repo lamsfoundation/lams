@@ -76,7 +76,7 @@ import org.w3c.dom.svg.SVGSVGElement;
  * This class implements {@link SVGDocument}.
  *
  * @author <a href="mailto:stephane@hillion.org">Stephane Hillion</a>
- * @version $Id$
+ *
  */
 public class SVGOMDocument
     extends    AbstractStylableDocument

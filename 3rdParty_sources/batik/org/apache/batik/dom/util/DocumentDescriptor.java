@@ -26,7 +26,7 @@ import org.apache.batik.util.CleanerThread;
  * This class contains informations about a document.
  *
  * @author <a href="mailto:stephane@hillion.org">Stephane Hillion</a>
- * @version $Id$
+ *
  */
 public class DocumentDescriptor {
 

@@ -31,7 +31,7 @@ import org.apache.commons.lang.text.StrBuilder;
  * @author Phil Steitz
  * @author Gary Gregory
  * @since 1.0
- * @version $Id$
+ *
  */
 public class CharSetUtils {
 

@@ -26,7 +26,7 @@ import org.apache.batik.util.ParsedURL;
  * come from the same server as the document they are included into.
  *
  * @author <a href="mailto:vhardy@apache.org">Vincent Hardy</a>
- * @version $Id$
+ *
  */
 public class DefaultScriptSecurity implements ScriptSecurity {
     public static final String DATA_PROTOCOL = "data";

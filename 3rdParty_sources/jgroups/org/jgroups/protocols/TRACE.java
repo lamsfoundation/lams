@@ -1,4 +1,4 @@
-// $Id$
+
 
 package org.jgroups.protocols;
 import org.jgroups.Event;

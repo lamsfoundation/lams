@@ -34,7 +34,7 @@ import org.w3c.dom.Node;
  * instructions.
  *
  * @author <a href="mailto:stephane@hillion.org">Stephane Hillion</a>
- * @version $Id$
+ *
  */
 public class SVGStyleSheetProcessingInstruction
     extends StyleSheetProcessingInstruction

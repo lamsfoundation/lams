@@ -23,7 +23,7 @@ import org.apache.batik.dom.anim.AnimationTarget;
 /**
  * Stores information about a specific XML attribute or CSS property.
  *
- * @version $Id$
+ *
  */
 public class TraitInformation {
 

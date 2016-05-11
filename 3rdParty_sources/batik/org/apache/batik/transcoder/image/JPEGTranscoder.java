@@ -35,7 +35,7 @@ import org.apache.batik.transcoder.image.resources.Messages;
  * This class is an <tt>ImageTranscoder</tt> that produces a JPEG image.
  *
  * @author <a href="mailto:Thierry.Kormann@sophia.inria.fr">Thierry Kormann</a>
- * @version $Id$
+ *
  */
 public class JPEGTranscoder extends ImageTranscoder {
 

@@ -40,7 +40,7 @@ import org.apache.batik.ext.awt.image.GraphicsUtil;
  * new image.
  *
  * @author <a href="mailto:Thomas.DeWeeese@Kodak.com">Thomas DeWeese</a>
- * @version $Id$ */
+ *
 public class Any2LsRGBRed extends AbstractRed {
 
     boolean srcIssRGB = false;

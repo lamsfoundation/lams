@@ -18,7 +18,7 @@ import java.util.Map;
  * <br/>
  * This class is not synchronized
  * @author Bela Ban
- * @version $Id$
+ *
  */
 public class Headers {
     /** Used to store strings and headers, e.g: name-1 | header-1 | name-2 | header-2 | null | null | name-3 | header-3 */

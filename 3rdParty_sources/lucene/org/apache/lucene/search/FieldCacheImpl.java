@@ -35,7 +35,7 @@ import java.util.WeakHashMap;
  * <p>Created: May 19, 2004 4:40:36 PM
  *
  * @since   lucene 1.4
- * @version $Id$
+ *
  */
 class FieldCacheImpl
 implements FieldCache {

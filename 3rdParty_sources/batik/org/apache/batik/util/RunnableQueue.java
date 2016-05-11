@@ -26,7 +26,7 @@ import java.util.NoSuchElementException;
  * invocation in a single thread.
  *
  * @author <a href="mailto:stephane@hillion.org">Stephane Hillion</a>
- * @version $Id$
+ *
  */
 public class RunnableQueue implements Runnable {
 

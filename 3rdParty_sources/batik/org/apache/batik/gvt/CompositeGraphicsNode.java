@@ -40,7 +40,7 @@ import org.apache.batik.util.HaltingThread;
  * <br>Note: this class is a 'little bit aware of' other threads, but not really threadsafe.
  *
  * @author <a href="mailto:Thierry.Kormann@sophia.inria.fr">Thierry Kormann</a>
- * @version $Id$
+ *
  */
 public class CompositeGraphicsNode extends AbstractGraphicsNode
     implements List {

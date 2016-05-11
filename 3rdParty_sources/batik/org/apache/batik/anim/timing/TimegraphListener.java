@@ -22,7 +22,7 @@ package org.apache.batik.anim.timing;
  * An interface for listening to timing events in a timed document.
  *
  * @author <a href="mailto:cam%40mcc%2eid%2eau">Cameron McCormack</a>
- * @version $Id$
+ *
  */
 public interface TimegraphListener {
 

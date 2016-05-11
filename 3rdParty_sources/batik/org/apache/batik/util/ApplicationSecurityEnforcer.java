@@ -34,7 +34,7 @@ import java.security.Policy;
  * <br />
  *
  * @author <a mailto="vincent.hardy@sun.com">Vincent Hardy</a>
- * @version $Id$
+ *
  */
 public class ApplicationSecurityEnforcer {
     /**

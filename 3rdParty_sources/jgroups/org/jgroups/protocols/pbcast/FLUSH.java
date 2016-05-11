@@ -37,7 +37,7 @@ import java.util.concurrent.atomic.AtomicInteger;
  * 
  * 
  * @author Vladimir Blagojevic
- * @version $Id$
+ *
  * @since 2.4
  */
 public class FLUSH extends Protocol {

@@ -23,7 +23,7 @@ package org.apache.batik.ext.awt.g2d;
  * Enumeration for transformation types.
  *
  * @author <a href="mailto:vincent.hardy@eng.sun.com">Vincent Hardy</a>
- * @version $Id$
+ *
  */
 public class TransformType{
     /*

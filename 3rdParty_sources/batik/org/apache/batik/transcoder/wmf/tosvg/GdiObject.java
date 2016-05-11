@@ -22,7 +22,7 @@ package org.apache.batik.transcoder.wmf.tosvg;
 /**
  * Represents GDI Objects encountred in WMF Files.
  *
- * @version $Id$
+ *
  */
 public class GdiObject {
     GdiObject( int _id, boolean _used ) {

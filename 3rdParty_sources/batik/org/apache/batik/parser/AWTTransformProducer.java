@@ -26,7 +26,7 @@ import java.io.Reader;
  * an AffineTransform from the value of a 'transform' attribute.
  *
  * @author <a href="mailto:stephane@hillion.org">Stephane Hillion</a>
- * @version $Id$
+ *
  */
 public class AWTTransformProducer implements TransformListHandler {
     /**

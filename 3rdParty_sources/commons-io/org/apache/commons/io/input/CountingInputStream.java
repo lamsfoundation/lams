@@ -27,7 +27,7 @@ import java.io.InputStream;
  * read as expected.
  *
  * @author Marcelo Liberato
- * @version $Id$
+ *
  */
 public class CountingInputStream extends ProxyInputStream {
 

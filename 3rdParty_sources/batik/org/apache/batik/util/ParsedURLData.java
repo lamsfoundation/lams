@@ -36,7 +36,7 @@ import java.util.zip.ZipException;
  * Holds the data for more URLs.
  *
  * @author <a href="mailto:deweese@apache.org">Thomas DeWeese</a>
- * @version $Id$
+ *
  */
 public class ParsedURLData {
 

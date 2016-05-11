@@ -35,7 +35,7 @@ import org.apache.batik.xml.XMLScanner;
  * This class represents an SVG source files pretty-printer.
  *
  * @author <a href="mailto:stephane@hillion.org">Stephane Hillion</a>
- * @version $Id$
+ *
  */
 public class PrettyPrinter {
 

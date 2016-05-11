@@ -48,7 +48,7 @@ import org.w3c.css.sac.LexicalUnit;
  * number to be font-weight.
  *
  * @author <a href="mailto:deweese@apache.org">deweese</a>
- * @version $Id$
+ *
  */
 public class FontShorthandManager
     extends AbstractValueFactory

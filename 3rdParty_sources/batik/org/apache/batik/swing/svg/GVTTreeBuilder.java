@@ -40,7 +40,7 @@ import org.w3c.dom.svg.SVGDocument;
  * a GVT tree.
  *
  * @author <a href="mailto:stephane@hillion.org">Stephane Hillion</a>
- * @version $Id$
+ *
  */
 public class GVTTreeBuilder extends HaltingThread {
 

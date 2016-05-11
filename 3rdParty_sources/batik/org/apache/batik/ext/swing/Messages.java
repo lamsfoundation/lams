@@ -27,7 +27,7 @@ import org.apache.batik.i18n.LocalizableSupport;
  * This class manages the message for the Swing extensions.
  *
  * @author <a href="mailto:vhardy@apache.org">Vincent Hardy</a>
- * @version $Id$
+ *
  */
 public class Messages {
 

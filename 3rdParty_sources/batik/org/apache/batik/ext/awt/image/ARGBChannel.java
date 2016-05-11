@@ -24,7 +24,7 @@ import java.io.Serializable;
  * Enumerated type for an ARGB Channel selector.
  *
  * @author <a href="mailto:vincent.hardy@eng.sun.com">Vincent Hardy</a>
- * @version $Id$
+ *
  */
 public final class ARGBChannel implements Serializable{
     /**

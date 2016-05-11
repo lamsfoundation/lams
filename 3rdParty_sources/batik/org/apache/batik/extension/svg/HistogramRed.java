@@ -27,7 +27,7 @@ import org.apache.batik.ext.awt.image.rendered.CachableRed;
 /**
  *
  * @author <a href="mailto:vincent.hardy@eng.sun.com">Vincent Hardy</a>
- * @version $Id$
+ *
  */
 public class HistogramRed extends AbstractRed {
 

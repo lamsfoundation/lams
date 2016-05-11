@@ -2,7 +2,7 @@ package org.jgroups;
 
 /**
  * @author Bela Ban
- * @version $Id$
+ *
  */
 public interface ExtendedMembershipListener extends MembershipListener {
 

@@ -77,7 +77,7 @@ import java.util.Set;
  * The browse operations lock the entire tree; eventually the JDBM team plans to fix this.
  *
  * @author Elias Ross
- * @version $Id$
+ *
  */
 @ThreadSafe
 public class JdbmCacheLoader extends AbstractCacheLoader

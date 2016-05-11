@@ -39,7 +39,7 @@ import org.apache.batik.ext.awt.image.rendered.PadRed;
  * This pads the image to a specified rectangle in user coord system.
  *
  * @author <a href="mailto:Thomas.DeWeeese@Kodak.com">Thomas DeWeese</a>
- * @version $Id$
+ *
  */
 public class PadRable8Bit extends AbstractRable
     implements PadRable, PaintRable {

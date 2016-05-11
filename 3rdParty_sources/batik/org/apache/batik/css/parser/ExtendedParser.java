@@ -30,7 +30,7 @@ import org.w3c.css.sac.SelectorList;
  * set of custom methods.
  *
  * @author <a href="mailto:stephane@hillion.org">Stephane Hillion</a>
- * @version $Id$
+ *
  */
 public interface ExtendedParser extends org.w3c.css.sac.Parser {
     

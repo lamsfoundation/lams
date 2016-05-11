@@ -28,7 +28,7 @@ import java.util.ArrayList;
  * rerequesting significant numbers of tiles that are already
  * available.
  *
- * @version $Id$
+ *
  */
 public class TileBlock {
 

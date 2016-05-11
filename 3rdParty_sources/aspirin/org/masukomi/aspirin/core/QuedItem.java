@@ -38,7 +38,7 @@ import org.apache.mailet.MailAddress;
  * 
  * @author kate rhodes masukomi at masukomi dot org
  * 
- * @version $Id$
+ *
  * 
  */
 public class QuedItem implements Comparable<QuedItem> {

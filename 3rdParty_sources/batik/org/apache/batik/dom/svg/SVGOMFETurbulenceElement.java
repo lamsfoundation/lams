@@ -32,7 +32,7 @@ import org.w3c.dom.svg.SVGFETurbulenceElement;
  * This class implements {@link SVGFETurbulenceElement}.
  *
  * @author <a href="mailto:stephane@hillion.org">Stephane Hillion</a>
- * @version $Id$
+ *
  */
 public class SVGOMFETurbulenceElement
     extends    SVGOMFilterPrimitiveStandardAttributes

@@ -33,7 +33,7 @@ import org.apache.batik.ext.awt.g2d.GraphicContext;
  *
  * @author <a href="mailto:cjolif@ilog.fr">Christophe Jolif</a>
  * @author <a href="mailto:vincent.hardy@eng.sun.com">Vincent Hardy</a>
- * @version $Id$
+ *
  * @see              org.apache.batik.svggen.SVGLinearGradient
  * @see              org.apache.batik.svggen.SVGTexturePaint
  */

@@ -41,7 +41,7 @@ import java.util.List;
  * one image by a luminance image (the mask).
  *
  * @author <a href="mailto:Thomas.DeWeeese@Kodak.com">Thomas DeWeese</a>
- * @version $Id$ */
+ *
 public class MultiplyAlphaRed extends AbstractRed {
 
     /**

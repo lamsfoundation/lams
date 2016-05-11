@@ -1,4 +1,4 @@
-// $Id$
+
 
 package org.jgroups.protocols;
 
@@ -18,7 +18,7 @@ import java.util.Vector;
  * etc.<p/>
  * This protocol has not yet been completed and is experimental at best !
  * @author Bela Ban
- * @version $Id$
+ *
  */
 public class HTOTAL extends Protocol {
     Address coord=null;

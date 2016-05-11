@@ -29,7 +29,7 @@ import java.util.StringTokenizer;
  * resource bundle entries
  *
  * @author <a href="mailto:stephane@hillion.org">Stephane Hillion</a>
- * @version $Id$
+ *
  */
 public class ResourceManager {
 

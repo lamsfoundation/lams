@@ -54,7 +54,7 @@ import org.apache.batik.ext.awt.image.rendered.PadRed;
  *   Does not support edgeMode="wrap" - pending Tile code.
  *
  * @author <a href="mailto:Thomas.DeWeeese@Kodak.com">Thomas DeWeese</a>
- * @version $Id$
+ *
  */
 public class ConvolveMatrixRable8Bit
     extends    AbstractColorInterpolationRable

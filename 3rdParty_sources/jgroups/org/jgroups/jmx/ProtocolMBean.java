@@ -5,7 +5,7 @@ import java.util.Properties;
 
 /**
  * @author Bela Ban
- * @version $Id$
+ *
  */
 public interface ProtocolMBean {
     String getName();

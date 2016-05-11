@@ -31,7 +31,7 @@ import org.w3c.dom.DOMException;
  * 'marker' shorthand properties.
  *
  * @author <a href="mailto:stephane@hillion.org">Stephane Hillion</a>
- * @version $Id$
+ *
  */
 public class MarkerShorthandManager
     extends AbstractValueFactory

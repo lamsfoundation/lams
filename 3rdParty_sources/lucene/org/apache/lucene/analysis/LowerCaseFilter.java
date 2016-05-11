@@ -22,7 +22,7 @@ import java.io.IOException;
 /**
  * Normalizes token text to lower case.
  *
- * @version $Id$
+ *
  */
 public final class LowerCaseFilter extends TokenFilter {
   public LowerCaseFilter(TokenStream in) {

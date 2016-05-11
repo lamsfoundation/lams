@@ -26,7 +26,7 @@ import javax.swing.text.PlainDocument;
  * Helper class. Only allows an Double value in the document.
  *
  * @author <a href="mailto:vhardy@apache.org">Vincent Hardy</a>
- * @version $Id$
+ *
  */
 public class DoubleDocument extends PlainDocument {
 

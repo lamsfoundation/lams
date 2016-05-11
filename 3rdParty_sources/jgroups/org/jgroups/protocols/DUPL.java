@@ -9,7 +9,7 @@ import java.util.Properties;
 
 /** Duplicates outgoing or incoming messages by copying them
  * @author Bela Ban
- * @version $Id$
+ *
  */
 public class DUPL extends Protocol {
     private static enum Direction {UP,DOWN};

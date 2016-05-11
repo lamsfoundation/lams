@@ -28,7 +28,7 @@ import org.apache.batik.i18n.LocalizableSupport;
  * This class manages the message for the image transcoder module.
  *
  * @author <a href="mailto:tkormann@apache.org">Thierry Kormann</a>
- * @version $Id$
+ *
  */
 public class Messages {
     /**

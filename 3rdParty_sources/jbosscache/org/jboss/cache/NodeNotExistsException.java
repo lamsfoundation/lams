@@ -26,7 +26,7 @@ package org.jboss.cache;
  * Thrown when an operation is attempted on a non-existing node in the cache
  *
  * @author <a href="mailto:bela@jboss.com">Bela Ban</a>.
- * @version $Id$
+ *
  */
 
 public class NodeNotExistsException extends CacheException

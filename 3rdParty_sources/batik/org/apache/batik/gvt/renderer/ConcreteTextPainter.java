@@ -29,7 +29,7 @@ import org.apache.batik.gvt.TextNode;
  * Renders the attributed character iterator of a <tt>TextNode</tt>.
  *
  * @author <a href="mailto:vincent.hardy@eng.sun.com">Vincent Hardy</a>
- * @version $Id$
+ *
  */
 public abstract class ConcreteTextPainter extends BasicTextPainter {
 

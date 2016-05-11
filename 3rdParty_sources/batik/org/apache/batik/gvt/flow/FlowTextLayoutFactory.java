@@ -30,7 +30,7 @@ import org.apache.batik.gvt.text.TextSpanLayout;
  *
  * @see org.apache.batik.gvt.text.TextSpanLayout
  * @author <a href="mailto:dewese@apache.org">Thomas DeWeese</a>
- * @version $Id$
+ *
  */
 public class FlowTextLayoutFactory implements TextLayoutFactory {
 

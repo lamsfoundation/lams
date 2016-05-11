@@ -41,7 +41,7 @@ import java.util.concurrent.locks.ReentrantLock;
  * to do so.<p>
  * <b>Requirements</b>: lossless delivery, e.g. acknowledgment-based message confirmation.
  * @author Bela Ban
- * @version $Id$
+ *
  */
 public class GroupRequest implements RspCollector, Command {
     /** return only first response */

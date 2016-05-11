@@ -31,7 +31,7 @@ import org.apache.batik.ext.awt.image.rendered.ProfileRed;
  * operation
  *
  * @author <a href="mailto:vincent.hardy@eng.sun.com">Vincent Hardy</a>
- * @version $Id$
+ *
  */
 public class ProfileRable extends  AbstractRable{
     

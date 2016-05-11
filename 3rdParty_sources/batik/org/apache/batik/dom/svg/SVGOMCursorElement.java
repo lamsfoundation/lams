@@ -34,7 +34,7 @@ import org.w3c.dom.svg.SVGStringList;
  * This class implements {@link org.w3c.dom.svg.SVGCursorElement}.
  *
  * @author <a href="mailto:stephane@hillion.org">Stephane Hillion</a>
- * @version $Id$
+ *
  */
 public class SVGOMCursorElement
     extends    SVGOMURIReferenceElement

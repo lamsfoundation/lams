@@ -35,7 +35,7 @@ import java.sql.Types;
  * properties of the columns in a ResultSet
  * 
  * @author Mark Matthews
- * @version $Id: ResultSetMetaData.java,v 1.1.2.1 2005/05/13 18:58:38 mmatthews
+ *
  *          Exp $
  * 
  * @see java.sql.ResultSetMetaData

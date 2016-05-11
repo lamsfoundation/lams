@@ -41,7 +41,7 @@ import org.w3c.dom.Document;
  *
  * @see org.apache.batik.svggen.SVGGraphics2D#SVGGraphics2D(SVGGeneratorContext,boolean)
  * @author <a href="mailto:cjolif@ilog.fr">Christophe Jolif</a>
- * @version $Id$
+ *
  */
 public class SVGGeneratorContext implements ErrorConstants {
     // this fields are package access for read-only purpose

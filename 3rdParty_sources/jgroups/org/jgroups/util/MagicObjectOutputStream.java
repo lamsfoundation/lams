@@ -13,7 +13,7 @@ import java.io.OutputStream;
 /**
  * Uses magic numbers for class descriptors
  * @author Bela Ban
- * @version $Id$
+ *
  */
 public class MagicObjectOutputStream extends ObjectOutputStream {
     static volatile ClassConfigurator conf=null;

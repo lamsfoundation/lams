@@ -30,7 +30,7 @@ import org.apache.commons.lang.math.NumberUtils;
  * @author Matthew Hawthorne
  * @author Gary Gregory
  * @since 2.0
- * @version $Id$
+ *
  */
 public class BooleanUtils {
 

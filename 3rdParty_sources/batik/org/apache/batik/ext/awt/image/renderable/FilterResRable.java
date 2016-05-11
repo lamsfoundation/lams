@@ -23,7 +23,7 @@ package org.apache.batik.ext.awt.image.renderable;
  * Interface for implementing filter resolution.
  *
  * @author <a href="mailto:vincent.hardy@eng.sun.com">Vincent Hardy</a>
- * @version $Id$
+ *
  */
 public interface FilterResRable extends Filter {
     /**

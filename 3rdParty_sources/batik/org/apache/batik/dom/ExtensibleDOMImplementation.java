@@ -52,7 +52,7 @@ import org.w3c.dom.css.ViewCSS;
  * {@link org.apache.batik.util.Service}).
  *
  * @author <a href="mailto:stephane@hillion.org">Stephane Hillion</a>
- * @version $Id$
+ *
  */
 public abstract class ExtensibleDOMImplementation
     extends AbstractDOMImplementation

@@ -25,7 +25,7 @@ import java.util.Map;
  * support transcoding hints and/or error handler.
  *
  * @author <a href="mailto:Thierry.Kormann@sophia.inria.fr">Thierry Kormann</a>
- * @version $Id$
+ *
  */
 public class TranscoderSupport {
 

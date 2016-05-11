@@ -26,7 +26,7 @@ import java.io.OutputStream;
  * bytes written to it are ignored and lost.
  * 
  * @author Jeremias Maerki
- * @version $Id$
+ *
  */
 public class NullOutputStream extends OutputStream {
     

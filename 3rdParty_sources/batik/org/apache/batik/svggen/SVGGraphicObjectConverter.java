@@ -23,7 +23,7 @@ package org.apache.batik.svggen;
 /**
  *
  * @author <a href="mailto:vincent.hardy@eng.sun.com">Vincent Hardy</a>
- * @version $Id$
+ *
  */
 public abstract class SVGGraphicObjectConverter implements SVGSyntax {
     /**

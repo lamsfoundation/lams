@@ -30,7 +30,7 @@ import org.w3c.dom.svg.SVGFEDistantLightElement;
  * This class implements {@link SVGFEDistantLightElement}.
  *
  * @author <a href="mailto:stephane@hillion.org">Stephane Hillion</a>
- * @version $Id$
+ *
  */
 public class SVGOMFEDistantLightElement
     extends    SVGOMElement

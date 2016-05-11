@@ -4,7 +4,7 @@ import org.jgroups.jmx.Protocol;
 
 /**
  * @author Bela Ban
- * @version $Id$
+ *
  */
 public class NAKACK extends Protocol implements NAKACKMBean {
     org.jgroups.protocols.pbcast.NAKACK p;

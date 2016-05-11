@@ -56,7 +56,7 @@ import org.w3c.dom.Element;
  *
  * @author <a href="mailto:cjolif@ilog.fr">Christophe Jolif</a>
  * @author <a href="mailto:vincent.hardy@eng.sun.com">Vincent Hardy</a>
- * @version $Id$
+ *
  */
 public class DOMGroupManager implements SVGSyntax, ErrorConstants {
     public static final short DRAW = 0x01;

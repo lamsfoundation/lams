@@ -2,7 +2,7 @@ package org.jgroups.jmx.protocols;
 
 /**
  * @author Scott Marlow
- * @version $Id$
+ *
  */
 public interface TCP_NIOMBean extends TCPMBean {
 

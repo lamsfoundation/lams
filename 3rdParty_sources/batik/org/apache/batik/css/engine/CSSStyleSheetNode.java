@@ -23,7 +23,7 @@ package org.apache.batik.css.engine;
  * CSS style-sheets.
  *
  * @author <a href="mailto:stephane@hillion.org">Stephane Hillion</a>
- * @version $Id$
+ *
  */
 public interface CSSStyleSheetNode {
 

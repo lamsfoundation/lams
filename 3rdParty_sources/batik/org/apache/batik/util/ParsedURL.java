@@ -59,7 +59,7 @@ import org.apache.batik.Version;
  * </p>
  *
  * @author <a href="mailto:deweese@apache.org">Thomas DeWeese</a>
- * @version $Id$
+ *
  */
 public class ParsedURL {
 

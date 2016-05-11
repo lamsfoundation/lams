@@ -6,7 +6,7 @@ package org.jgroups.conf;
  *
  * @author Filip Hanik (<a href="mailto:filip@filip.net">filip@filip.net)
  * @author Bela Ban
- * @version $Id$
+ *
  */
 
 public class ProtocolParameter {

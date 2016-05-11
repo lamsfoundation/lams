@@ -26,7 +26,7 @@ import org.w3c.dom.svg.SVGGlyphElement;
  * This class implements {@link SVGGlyphElement}.
  *
  * @author <a href="mailto:stephane@hillion.org">Stephane Hillion</a>
- * @version $Id$
+ *
  */
 public class SVGOMGlyphElement
     extends    SVGStylableElement

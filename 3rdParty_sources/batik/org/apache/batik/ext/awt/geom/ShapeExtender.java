@@ -29,7 +29,7 @@ import java.awt.geom.Rectangle2D;
 /**
  * This class wraps a normal path into an extended path.
  * @author <a href="mailto:deweese@apache.org">Thomas DeWeese</a>
- * @version $Id$
+ *
  */
 public class ShapeExtender implements ExtendedShape {
     Shape shape;

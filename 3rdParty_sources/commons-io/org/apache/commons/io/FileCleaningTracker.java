@@ -41,7 +41,7 @@ import java.util.List;
  *
  * @author Noel Bergman
  * @author Martin Cooper
- * @version $Id$
+ *
  */
 public class FileCleaningTracker {
     /**

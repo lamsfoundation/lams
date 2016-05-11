@@ -30,7 +30,7 @@ import org.w3c.dom.svg.SVGAnimatedBoolean;
  * This class implements the {@link SVGAnimatedBoolean} interface.
  *
  * @author <a href="mailto:stephane@hillion.org">Stephane Hillion</a>
- * @version $Id$
+ *
  */
 public class SVGOMAnimatedBoolean
         extends    AbstractSVGAnimatedValue

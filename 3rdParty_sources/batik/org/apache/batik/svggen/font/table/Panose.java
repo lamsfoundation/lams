@@ -19,7 +19,7 @@
 package org.apache.batik.svggen.font.table;
 
 /**
- * @version $Id$
+ *
  * @author <a href="mailto:david@steadystate.co.uk">David Schweinsberg</a>
  */
 public class Panose {

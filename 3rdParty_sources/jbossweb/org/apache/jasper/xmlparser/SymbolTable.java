@@ -49,7 +49,7 @@ package org.apache.jasper.xmlparser;
  * </ul>
  *
  * @author Andy Clark
- * @version $Id$
+ *
  */
 public class SymbolTable {
 

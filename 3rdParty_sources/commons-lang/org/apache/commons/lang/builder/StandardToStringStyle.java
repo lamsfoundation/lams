@@ -29,7 +29,7 @@ package org.apache.commons.lang.builder;
  * @author Pete Gieser
  * @author Gary Gregory
  * @since 1.0
- * @version $Id$
+ *
  */
 public class StandardToStringStyle extends ToStringStyle {
     

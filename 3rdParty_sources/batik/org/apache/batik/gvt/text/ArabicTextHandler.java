@@ -30,7 +30,7 @@ import java.util.Map;
  * text is rendered using an AWT font.
  *
  * @author <a href="mailto:bella.robinson@cmis.csiro.au">Bella Robinson</a>
- * @version $Id$
+ *
  */
 public class ArabicTextHandler {
 

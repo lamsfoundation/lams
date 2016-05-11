@@ -13,7 +13,7 @@ import java.util.LinkedHashSet;
 
 /**
  * @author Bela Ban
- * @version $Id$
+ *
  */
 public class ParticipantGmsImpl extends GmsImpl {
     private final Vector<Address>   suspected_mbrs=new Vector<Address>(11);

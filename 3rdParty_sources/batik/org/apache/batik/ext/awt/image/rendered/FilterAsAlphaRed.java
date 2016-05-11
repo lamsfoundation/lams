@@ -36,7 +36,7 @@ import org.apache.batik.ext.awt.ColorSpaceHintKey;
  * This converts any source into a mask according to the SVG masking rules.
  *
  * @author <a href="mailto:Thomas.DeWeeese@Kodak.com">Thomas DeWeese</a>
- * @version $Id$ */
+ *
 public class FilterAsAlphaRed extends AbstractRed {
 
     /**

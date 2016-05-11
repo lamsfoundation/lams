@@ -41,7 +41,7 @@ import org.apache.batik.ext.awt.image.rendered.RenderedImageCachableRed;
  * ClipRable implementation
  *
  * @author <a href="mailto:Thomas.DeWeese@Kodak.com">Thomas DeWeese</a>
- * @version $Id$
+ *
  */
 public class ClipRable8Bit
     extends    AbstractRable

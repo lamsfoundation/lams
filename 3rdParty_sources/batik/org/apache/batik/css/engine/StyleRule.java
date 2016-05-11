@@ -24,7 +24,7 @@ import org.w3c.css.sac.SelectorList;
  * This class represents a style rule.
  *
  * @author <a href="mailto:stephane@hillion.org">Stephane Hillion</a>
- * @version $Id$
+ *
  */
 public class StyleRule implements Rule {
 

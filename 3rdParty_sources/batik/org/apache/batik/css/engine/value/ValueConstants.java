@@ -25,7 +25,7 @@ import org.w3c.dom.css.CSSPrimitiveValue;
  * This interface defines constants for CSS values.
  *
  * @author <a href="mailto:stephane@hillion.org">Stephane Hillion</a>
- * @version $Id$
+ *
  */
 public interface ValueConstants {
     

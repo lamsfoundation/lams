@@ -36,7 +36,7 @@ import org.w3c.dom.svg.SVGDocument;
  * This class dispatches the SVGLoadEvent event on a SVG document.
  *
  * @author <a href="mailto:stephane@hillion.org">Stephane Hillion</a>
- * @version $Id$
+ *
  */
 public class SVGLoadEventDispatcher extends HaltingThread {
 

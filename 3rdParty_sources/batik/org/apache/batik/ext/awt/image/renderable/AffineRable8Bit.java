@@ -34,7 +34,7 @@ import org.apache.batik.ext.awt.image.GraphicsUtil;
  * This adjusts the input images coordinate system by a general affine
  *
  * @author <a href="mailto:Thomas.DeWeeese@Kodak.com">Thomas DeWeese</a>
- * @version $Id$
+ *
  */
 public class AffineRable8Bit 
     extends    AbstractRable

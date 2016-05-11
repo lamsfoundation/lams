@@ -38,7 +38,7 @@ import org.w3c.dom.Text;
  * {@link org.w3c.dom.events.DocumentEvent}.
  *
  * @author <a href="mailto:stephane@hillion.org">Stephane Hillion</a>
- * @version $Id$
+ *
  */
 public class GenericDocument
     extends AbstractDocument {

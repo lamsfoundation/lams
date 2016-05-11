@@ -31,7 +31,7 @@ import org.w3c.dom.svg.SVGFEBlendElement;
  * This class implements {@link SVGFEBlendElement}.
  *
  * @author <a href="mailto:stephane@hillion.org">Stephane Hillion</a>
- * @version $Id$
+ *
  */
 public class SVGOMFEBlendElement
     extends    SVGOMFilterPrimitiveStandardAttributes

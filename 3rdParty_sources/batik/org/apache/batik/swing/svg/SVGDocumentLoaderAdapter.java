@@ -23,7 +23,7 @@ package org.apache.batik.swing.svg;
  * <tt>SVGDocumentLoaderEvent</tt> events.
  *
  * @author <a href="mailto:tkormann@apache.org">Thierry Kormann</a>
- * @version $Id$
+ *
  */
 public abstract class SVGDocumentLoaderAdapter
     implements SVGDocumentLoaderListener {

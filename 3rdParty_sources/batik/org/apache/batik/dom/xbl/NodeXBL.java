@@ -25,7 +25,7 @@ import org.w3c.dom.NodeList;
  * Interface implemented by all nodes that support XBL.
  * Eventually will move to org.w3c.dom.xbl (or some such package).
  *
- * @version $Id$
+ *
  */
 public interface NodeXBL {
 

@@ -42,7 +42,7 @@ import org.w3c.dom.Element;
  * opacity property on the nodes to be composited.
  *
  * @author <a href="mailto:vincent.hardy@eng.sun.com">Vincent Hardy</a>
- * @version $Id$
+ *
  * @see                org.apache.batik.svggen.SVGAlphaComposite
  */
 public class SVGAlphaComposite extends AbstractSVGConverter {

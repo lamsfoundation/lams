@@ -37,7 +37,7 @@ import org.mozilla.javascript.GeneratedClassLoader;
  * documentURL is null.
  *
  * @author <a href="mailto:vincent.hardy@sun.com">Vincent Hardy</a>
- * @version $Id$
+ *
  */
 public class RhinoClassLoader extends URLClassLoader implements GeneratedClassLoader {
     /**

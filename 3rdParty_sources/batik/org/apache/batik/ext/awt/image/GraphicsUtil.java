@@ -66,7 +66,7 @@ import org.apache.batik.ext.awt.image.rendered.TranslateRed;
  * implementations.
  *
  * @author <a href="mailto:Thomas.DeWeeese@Kodak.com">Thomas DeWeese</a>
- * @version $Id$
+ *
  */
 public class GraphicsUtil {
 

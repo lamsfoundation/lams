@@ -29,7 +29,7 @@ import java.util.Collection;
  * Provide lock ownership mapping.
  *
  * @author Ben Wang
- * @version $Id$
+ *
  */
 public class LockMap
 {

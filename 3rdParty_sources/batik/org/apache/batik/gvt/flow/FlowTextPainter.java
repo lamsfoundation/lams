@@ -46,7 +46,7 @@ import org.apache.batik.gvt.text.GlyphLayout;
  * Complete Class Desc
  *
  * @author <a href="mailto:deweese@apache.org">deweese</a>
- * @version $Id$
+ *
  */
 public class FlowTextPainter extends StrokingTextPainter {
     /**

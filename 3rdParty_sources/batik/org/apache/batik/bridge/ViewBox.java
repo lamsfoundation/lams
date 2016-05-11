@@ -42,7 +42,7 @@ import org.w3c.dom.svg.SVGRect;
  * This class provides convenient methods to handle viewport.
  *
  * @author <a href="mailto:tkormann@apache.org">Thierry Kormann</a>
- * @version $Id$
+ *
  */
 public abstract class ViewBox implements SVGConstants, ErrorConstants {
 

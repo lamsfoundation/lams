@@ -31,7 +31,7 @@ import org.w3c.dom.css.CSSValue;
  * This class represents a style declaration.
  *
  * @author <a href="mailto:stephane@hillion.org">Stephane Hillion</a>
- * @version $Id$
+ *
  */
 public class CSSOMStyleDeclaration implements CSSStyleDeclaration {
 

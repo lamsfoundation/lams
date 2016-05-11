@@ -21,7 +21,7 @@ import java.util.*;
  * sets its digest to D and then returns the state to the application.
  * 
  * @author Bela Ban
- * @version $Id$
+ *
  */
 public class STATE_TRANSFER extends Protocol {
     Address        local_addr=null;

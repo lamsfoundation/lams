@@ -24,7 +24,7 @@ import java.awt.geom.Rectangle2D;
 /**
  * An interface that path segments must implement.
  *
- * @version $Id$
+ *
  */
 public interface Segment extends Cloneable {
     double minX();

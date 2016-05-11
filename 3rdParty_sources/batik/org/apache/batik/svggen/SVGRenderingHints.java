@@ -38,7 +38,7 @@ import org.apache.batik.ext.awt.g2d.GraphicContext;
  * + TEXT_ANTIALIASING -> text-rendering
  *
  * @author <a href="mailto:vincent.hardy@eng.sun.com">Vincent Hardy</a>
- * @version $Id$
+ *
  */
 public class SVGRenderingHints extends AbstractSVGConverter{
     /**

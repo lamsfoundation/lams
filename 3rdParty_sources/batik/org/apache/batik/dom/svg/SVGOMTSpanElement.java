@@ -26,7 +26,7 @@ import org.w3c.dom.svg.SVGTSpanElement;
  * This class implements {@link SVGTSpanElement}.
  *
  * @author <a href="mailto:stephane@hillion.org">Stephane Hillion</a>
- * @version $Id$
+ *
  */
 public class SVGOMTSpanElement
     extends    SVGOMTextPositioningElement

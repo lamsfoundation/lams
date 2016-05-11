@@ -28,7 +28,7 @@ import javax.swing.JButton;
  * This class represents the buttons used in toolbars.
  *
  * @author <a href="mailto:stephane@hillion.org">Stephane Hillion</a>
- * @version $Id$
+ *
  */
 public class JToolbarButton extends JButton {
     /**

@@ -26,7 +26,7 @@ import java.util.Set;
  * are defined as styling properties in Stylable SVG.
  *
  * @author <a href="mailto:vincent.hardy@eng.sun.com">Vincent Hardy</a>
- * @version $Id$
+ *
  */
 public class SVGStylingAttributes implements SVGSyntax{
     static Set attrSet = new HashSet();

@@ -41,7 +41,7 @@ import org.apache.commons.pool.impl.GenericObjectPool;
  * 
  * @author masukomi
  * 
- * @version $Id$
+ *
  * 
  */
 class QueManager extends Thread implements ConfigurationChangeListener {

@@ -34,7 +34,7 @@ import org.w3c.dom.svg.SVGTextPathElement;
  * This class implements {@link org.w3c.dom.svg.SVGTextPathElement}.
  *
  * @author <a href="mailto:stephane@hillion.org">Stephane Hillion</a>
- * @version $Id$
+ *
  */
 public class SVGOMTextPathElement
     extends    SVGOMTextContentElement

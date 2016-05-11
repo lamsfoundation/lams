@@ -43,7 +43,7 @@ import org.apache.batik.ext.awt.image.rendered.RenderedImageCachableRed;
  * defined by radius along the x and y axis.
  *
  * @author <a href="mailto:vincent.hardy@eng.sun.com">Vincent Hardy</a>
- * @version $Id$
+ *
  */
 public class MorphologyRable8Bit 
     extends AbstractRable

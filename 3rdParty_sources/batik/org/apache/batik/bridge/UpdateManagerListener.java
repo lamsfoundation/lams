@@ -22,7 +22,7 @@ package org.apache.batik.bridge;
  * This interface represents a listener to the UpdateManagerEvent events.
  *
  * @author <a href="mailto:stephane@hillion.org">Stephane Hillion</a>
- * @version $Id$
+ *
  */
 public interface UpdateManagerListener {
 

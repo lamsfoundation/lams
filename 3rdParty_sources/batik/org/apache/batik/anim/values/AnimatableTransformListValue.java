@@ -33,7 +33,7 @@ import org.w3c.dom.svg.SVGTransform;
  * An SVG transform list value in the animation system.
  *
  * @author <a href="mailto:cam%40mcc%2eid%2eau">Cameron McCormack</a>
- * @version $Id$
+ *
  */
 public class AnimatableTransformListValue extends AnimatableValue {
 

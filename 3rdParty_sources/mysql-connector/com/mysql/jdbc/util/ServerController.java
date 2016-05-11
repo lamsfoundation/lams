@@ -36,7 +36,7 @@ import com.mysql.jdbc.StringUtils;
 /**
  * Controls a MySQL server using Java RunTime methods
  * 
- * @version $Id: ServerController.java,v 1.1.2.1 2005/05/13 18:58:39 mmatthews
+ *
  *          Exp $
  * @author Mark Matthews
  */

@@ -9,7 +9,7 @@ import java.util.*;
 
 /**
  * @author Bela Ban
- * @version $Id$
+ *
  */
 public class AckCollector {
     /** List<Object>: list of members from whom we haven't received an ACK yet */

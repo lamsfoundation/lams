@@ -28,7 +28,7 @@ import org.w3c.dom.css.CSSPrimitiveValue;
  * identifier values.
  *
  * @author <a href="mailto:stephane@hillion.org">Stephane Hillion</a>
- * @version $Id$
+ *
  */
 public abstract class IdentifierManager extends AbstractValueManager {
 

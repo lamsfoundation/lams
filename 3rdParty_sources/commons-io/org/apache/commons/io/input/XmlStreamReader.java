@@ -59,7 +59,7 @@ import org.apache.commons.io.ByteOrderMark;
  * Apache License 2.0.
  *
  * @author Alejandro Abdelnur
- * @version $Id$
+ *
  * @see org.apache.commons.io.output.XmlStreamWriter
  * @since Commons IO 2.0
  */

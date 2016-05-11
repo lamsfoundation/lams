@@ -38,7 +38,7 @@ import org.w3c.dom.svg.SVGTextElement;
  * This class implements {@link SVGTextElement}.
  *
  * @author <a href="mailto:stephane@hillion.org">Stephane Hillion</a>
- * @version $Id$
+ *
  */
 public class SVGOMTextElement
     extends    SVGOMTextPositioningElement

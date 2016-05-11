@@ -34,7 +34,7 @@ import org.w3c.dom.svg.SVGDocument;
  * fragment IDs within shadow trees to work properly.
  *
  * @author <a href="mailto:cam%40mcc%2eid%2eau">Cameron McCormack</a>
- * @version $Id$
+ *
  */
 public class SVG12URIResolver extends URIResolver {
 

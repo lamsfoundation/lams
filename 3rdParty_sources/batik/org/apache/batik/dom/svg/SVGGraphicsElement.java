@@ -39,7 +39,7 @@ import org.w3c.dom.svg.SVGStringList;
  * This class provides a common superclass for all graphics elements.
  *
  * @author <a href="mailto:stephane@hillion.org">Stephane Hillion</a>
- * @version $Id$
+ *
  */
 public abstract class SVGGraphicsElement
         extends SVGStylableElement

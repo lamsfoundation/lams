@@ -41,7 +41,7 @@ import org.apache.batik.util.HaltingThread;
  * Simple implementation of the Renderer that supports dynamic updates.
  *
  * @author <a href="mailto:Thierry.Kormann@sophia.inria.fr">Thierry Kormann</a>
- * @version $Id$
+ *
  */
 public class DynamicRenderer extends StaticRenderer {
 

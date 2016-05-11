@@ -28,7 +28,7 @@ import org.w3c.dom.Element;
  * a JSVGComponent.
  *
  * @author <a href="mailto:stephane@hillion.org">Stephane Hillion</a>
- * @version $Id$
+ *
  */
 public interface SVGUserAgent {
     

@@ -28,7 +28,7 @@ import org.w3c.dom.Node;
  * environment of a SVG document.
  *
  * @author <a href="mailto:stephane@hillion.org">Stephane Hillion</a>
- * @version $Id$
+ *
  */
 public interface Window {
     /**

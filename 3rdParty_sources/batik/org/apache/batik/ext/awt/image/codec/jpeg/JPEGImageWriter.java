@@ -35,7 +35,7 @@ import com.sun.image.codec.jpeg.JPEGImageEncoder;
  * ImageWriter implementation that uses the sun.com.image.codec.jpeg
  * intefaces to write JPEG files.
  *
- * @version $Id$
+ *
  */
 public class JPEGImageWriter implements ImageWriter {
 

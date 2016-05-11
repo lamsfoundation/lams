@@ -24,7 +24,7 @@ import org.apache.batik.xml.XMLUtilities;
  * XML scanner for parsing xml text
  *
  * @author <a href="mailto:tonny@kiyut.com">Tonny Kohar</a>
- * @version $Id$
+ *
  */
 public class XMLScanner {
 

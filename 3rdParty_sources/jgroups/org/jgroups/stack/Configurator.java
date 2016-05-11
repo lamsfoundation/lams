@@ -25,7 +25,7 @@ import java.util.concurrent.ConcurrentMap;
  * Future functionality will include the capability to dynamically modify the layering
  * of the protocol stack and the properties of each layer.
  * @author Bela Ban
- * @version $Id$
+ *
  */
 public class Configurator {
 

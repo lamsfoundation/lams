@@ -25,7 +25,7 @@ import org.w3c.dom.Node;
  * This class implements the {@link org.w3c.dom.Attr} interface.
  *
  * @author <a href="mailto:stephane@hillion.org">Stephane Hillion</a>
- * @version $Id$
+ *
  */
 public class GenericAttr extends AbstractAttr {
 

@@ -29,7 +29,7 @@ import java.io.IOException;
 
 /**
  *
- * @version $Id$
+ *
  */
 public class PrefixFilter extends Filter {
   protected final Term prefix;

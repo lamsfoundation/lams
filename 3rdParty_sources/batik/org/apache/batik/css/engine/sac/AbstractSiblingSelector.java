@@ -27,7 +27,7 @@ import org.w3c.css.sac.SimpleSelector;
  * org.w3c.css.sac.SiblingSelector} interface.
  *
  * @author <a href="mailto:stephane@hillion.org">Stephane Hillion</a>
- * @version $Id$
+ *
  */
 public abstract class AbstractSiblingSelector
     implements SiblingSelector,

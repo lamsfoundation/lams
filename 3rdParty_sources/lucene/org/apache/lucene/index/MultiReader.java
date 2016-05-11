@@ -31,7 +31,7 @@ import org.apache.lucene.index.MultiSegmentReader.MultiTermPositions;
 
 /** An IndexReader which reads multiple indexes, appending their content.
  *
- * @version $Id$
+ *
  */
 public class MultiReader extends IndexReader {
   protected IndexReader[] subReaders;

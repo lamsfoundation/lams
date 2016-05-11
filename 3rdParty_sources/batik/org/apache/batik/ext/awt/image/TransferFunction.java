@@ -23,7 +23,7 @@ package org.apache.batik.ext.awt.image;
  * functions, which can all be converted to a lookup table
  *
  * @author <a href="mailto:sheng.pei@eng.sun.com">Sheng Pei</a>
- * @version $Id$
+ *
  */
 public interface TransferFunction {
 

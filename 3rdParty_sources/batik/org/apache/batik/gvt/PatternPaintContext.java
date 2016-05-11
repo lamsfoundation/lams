@@ -42,7 +42,7 @@ import org.apache.batik.ext.awt.image.rendered.TileCacheRed;
  * paint implementation.
  *
  * @author <a href="mailto:vincent.hardy@eng.sun.com">Vincent Hardy</a>
- * @version $Id$
+ *
  */
 public class PatternPaintContext implements PaintContext {
 

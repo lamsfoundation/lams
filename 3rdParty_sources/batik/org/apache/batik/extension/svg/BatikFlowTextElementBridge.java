@@ -61,7 +61,7 @@ import org.w3c.dom.Node;
  * Bridge class for the &lt;flowText> element.
  *
  * @author <a href="mailto:deweese@apache.org">Thomas DeWeese</a>
- * @version $Id$
+ *
  */
 public class BatikFlowTextElementBridge extends SVGTextElementBridge
     implements BatikExtConstants {

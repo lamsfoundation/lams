@@ -26,7 +26,7 @@ import java.util.Map;
  * related definitions.
  *
  * @author <a href="mailto:vincent.hardy@eng.sun.com">Vincent Hardy</a>
- * @version $Id$
+ *
  * @see           org.apache.batik.ext.awt.g2d.GraphicContext
  */
 public interface SVGDescriptor{

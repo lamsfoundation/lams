@@ -35,7 +35,7 @@ import org.w3c.dom.Element;
  * Bridge class for the &lt;feComposite> element.
  *
  * @author <a href="mailto:tkormann@apache.org">Thierry Kormann</a>
- * @version $Id$
+ *
  */
 public class SVGFeCompositeElementBridge
     extends AbstractSVGFilterPrimitiveElementBridge {

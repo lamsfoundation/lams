@@ -31,7 +31,7 @@ import java.text.AttributedCharacterIterator;
  * An interface for all GVT GlyphVector classes.
  *
  * @author <a href="mailto:bella.robinson@cmis.csiro.au">Bella Robinson</a>
- * @version $Id$
+ *
  */
 public interface GVTGlyphVector {
 

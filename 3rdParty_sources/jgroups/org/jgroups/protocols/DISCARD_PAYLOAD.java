@@ -11,7 +11,7 @@ import java.util.Properties;
  * before passing it up. Used for unit testing
  * of OOB messages
  * @author Bela Ban
- * @version $Id$
+ *
  */
 public class DISCARD_PAYLOAD extends Protocol {
     long seqno=3; // drop 3

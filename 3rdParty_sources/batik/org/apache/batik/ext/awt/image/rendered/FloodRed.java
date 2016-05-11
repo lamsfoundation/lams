@@ -37,7 +37,7 @@ import org.apache.batik.ext.awt.image.GraphicsUtil;
  * out to infinity.
  *
  * @author <a href="mailto:vincent.hardy@eng.sun.com">Vincent Hardy</a>
- * @version $Id$ 
+ *
  */
 public class FloodRed extends AbstractRed {
 

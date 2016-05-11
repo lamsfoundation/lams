@@ -36,7 +36,7 @@ import java.util.zip.Inflater;
  * <p/>
  * It uses &lt;segment&gt;.fdt and &lt;segment&gt;.fdx; files.
  *
- * @version $Id$
+ *
  */
 final class FieldsReader {
   private final FieldInfos fieldInfos;

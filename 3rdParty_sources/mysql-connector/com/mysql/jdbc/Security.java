@@ -32,7 +32,7 @@ import java.security.NoSuchAlgorithmException;
  * 
  * @author Mark Matthews
  * 
- * @version $Id$
+ *
  */
 class Security {
 	private static final char PVERSION41_CHAR = '*';

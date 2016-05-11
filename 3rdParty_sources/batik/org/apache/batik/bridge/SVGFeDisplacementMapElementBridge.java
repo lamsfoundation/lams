@@ -36,7 +36,7 @@ import org.w3c.dom.Element;
  * Bridge class for the &lt;feDisplacementMap> element.
  *
  * @author <a href="mailto:tkormann@apache.org">Thierry Kormann</a>
- * @version $Id$
+ *
  */
 public class SVGFeDisplacementMapElementBridge
     extends AbstractSVGFilterPrimitiveElementBridge {

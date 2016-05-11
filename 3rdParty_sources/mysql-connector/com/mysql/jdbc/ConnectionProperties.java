@@ -50,7 +50,7 @@ import javax.naming.StringRefAddr;
  * expose properties as JDBC DriverPropertyInfo if required as well.
  *
  * @author Mark Matthews
- * @version $Id: ConnectionProperties.java,v 1.1.2.2 2005/05/17 14:58:56
+ *
  *          mmatthews Exp $
  */
 public class ConnectionProperties implements Serializable {

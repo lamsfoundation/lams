@@ -30,7 +30,7 @@ import org.w3c.dom.css.CSSValue;
  * This class represents the computed style of an SVG element.
  *
  * @author <a href="mailto:stephane@hillion.org">Stephane Hillion</a>
- * @version $Id$
+ *
  */
 public class CSSOMSVGComputedStyle extends CSSOMComputedStyle {
     

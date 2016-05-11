@@ -34,7 +34,7 @@ import org.w3c.dom.svg.SVGDocument;
  * This class represents an object which loads asynchroneaously a SVG document.
  *
  * @author <a href="mailto:stephane@hillion.org">Stephane Hillion</a>
- * @version $Id$
+ *
  */
 public class SVGDocumentLoader extends HaltingThread {
 

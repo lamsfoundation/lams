@@ -50,7 +50,7 @@ import org.apache.batik.util.resources.ResourceManager;
  * This class is a dialog used to enter an URI or to choose a local file.
  *
  * @author <a href="mailto:stephane@hillion.org">Stephane Hillion</a>
- * @version $Id$
+ *
  */
 public class URIChooser extends JDialog implements ActionMap {
 

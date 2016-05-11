@@ -37,7 +37,7 @@ import org.w3c.dom.svg.SVGMarkerElement;
  * This class implements {@link org.w3c.dom.svg.SVGMarkerElement}.
  *
  * @author <a href="mailto:stephane@hillion.org">Stephane Hillion</a>
- * @version $Id$
+ *
  */
 public class SVGOMMarkerElement
     extends    SVGStylableElement

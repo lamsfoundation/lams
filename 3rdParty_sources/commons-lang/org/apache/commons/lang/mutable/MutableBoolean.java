@@ -27,7 +27,7 @@ import org.apache.commons.lang.BooleanUtils;
  * @see Boolean
  * @since 2.2
  * @author Apache Software Foundation
- * @version $Id$
+ *
  */
 public class MutableBoolean implements Mutable, Serializable, Comparable {
 

@@ -31,7 +31,7 @@ import org.w3c.dom.svg.SVGComponentTransferFunctionElement;
  * This class represents the component transfer function elements.
  *
  * @author <a href="mailto:stephane@hillion.org">Stephane Hillion</a>
- * @version $Id$
+ *
  */
 public abstract class SVGOMComponentTransferFunctionElement
     extends    SVGOMElement

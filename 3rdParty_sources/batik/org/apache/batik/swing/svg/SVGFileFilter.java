@@ -28,7 +28,7 @@ import javax.swing.filechooser.FileFilter;
  *
  * @author <a href="mailto:vincent.hardy@eng.sun.com">Vincent Hardy</a>
  * @author <a href="mailto:cjolif@ilog.fr">Christophe Jolif</a>
- * @version $Id$
+ *
  */
 public class SVGFileFilter extends FileFilter {
     /**

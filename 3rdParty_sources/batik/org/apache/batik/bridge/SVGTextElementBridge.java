@@ -93,7 +93,7 @@ import org.w3c.dom.svg.SVGTextPositioningElement;
  *
  * @author <a href="mailto:stephane@hillion.org">Stephane Hillion</a>
  * @author <a href="mailto:bill.haneman@ireland.sun.com">Bill Haneman</a>
- * @version $Id$
+ *
  */
 public class SVGTextElementBridge extends AbstractGraphicsNodeBridge
     implements SVGTextContent {

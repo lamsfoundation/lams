@@ -34,7 +34,7 @@ import org.apache.batik.util.io.StringNormalizingReader;
  * and error handling methods.
  *
  * @author <a href="mailto:stephane@hillion.org">Stephane Hillion</a>
- * @version $Id$
+ *
  */
 public abstract class AbstractParser implements Parser {
 

@@ -41,7 +41,7 @@ import org.w3c.dom.svg.SVGPathSegList;
  *
  * @author <a href="mailto:nicolas.socheleau@bitflash.com">Nicolas Socheleau</a>
  * @author <a href="mailto:andrest@world-affair.com">Andres Toussaint</a>
- * @version $Id$
+ *
  */
 public class SVGOMAnimatedPathData
     extends AbstractSVGAnimatedValue

@@ -4,7 +4,7 @@ import java.net.UnknownHostException;
 
 /**
  * @author Bela Ban
- * @version $Id$
+ *
  */
 public class TCP extends TP implements TCPMBean {
     org.jgroups.protocols.TCP p;

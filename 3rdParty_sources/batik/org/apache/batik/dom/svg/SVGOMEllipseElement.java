@@ -30,7 +30,7 @@ import org.w3c.dom.svg.SVGEllipseElement;
  * This class implements {@link SVGEllipseElement}.
  *
  * @author <a href="mailto:stephane@hillion.org">Stephane Hillion</a>
- * @version $Id$
+ *
  */
 public class SVGOMEllipseElement
     extends    SVGGraphicsElement

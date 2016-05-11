@@ -27,7 +27,7 @@ import java.io.Serializable;
  * <p>Created: Apr 21, 2004 3:49:28 PM
  * 
  *
- * @version $Id$
+ *
  * @since   1.4
  */
 public interface SortComparatorSource

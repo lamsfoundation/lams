@@ -4,7 +4,7 @@
 // replacing SecretKey with SecretKey
 
 
-// $Id$
+
 
 package org.jgroups.protocols.obsolete;
 

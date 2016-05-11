@@ -4,7 +4,7 @@ import org.jgroups.stack.Protocol;
 
 /**
  * @author Bela Ban
- * @version $Id$
+ *
  */
 public class UDP extends org.jgroups.jmx.protocols.TP implements UDPMBean {
     org.jgroups.protocols.UDP udp;

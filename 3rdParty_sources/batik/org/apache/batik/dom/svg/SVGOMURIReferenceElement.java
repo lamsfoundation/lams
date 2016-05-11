@@ -28,7 +28,7 @@ import org.w3c.dom.svg.SVGURIReference;
  * This class implements {@link SVGURIReference}.
  *
  * @author <a href="mailto:stephane@hillion.org">Stephane Hillion</a>
- * @version $Id$
+ *
  */
 public abstract class SVGOMURIReferenceElement
     extends    SVGOMElement

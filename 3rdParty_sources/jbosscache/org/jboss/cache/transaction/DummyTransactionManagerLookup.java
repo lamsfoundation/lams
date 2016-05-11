@@ -30,7 +30,7 @@ import javax.transaction.UserTransaction;
  * Returns an instance of {@link DummyTransactionManager}.
  *
  * @author Bela Ban Sept 5 2003
- * @version $Id$
+ *
  */
 public class DummyTransactionManagerLookup implements TransactionManagerLookup
 {

@@ -30,7 +30,7 @@ import org.w3c.dom.Element;
  * to values: an SVG paint value and an SVG opacity value
  *
  * @author <a href="mailto:vincent.hardy@eng.sun.com">Vincent Hardy</a>
- * @version $Id$
+ *
  */
 public class SVGPaintDescriptor implements SVGDescriptor, SVGSyntax{
     private Element def;

@@ -30,7 +30,7 @@ import org.apache.batik.xml.XMLUtilities;
  * This class is responsible of the output of XML constructs.
  *
  * @author <a href="mailto:stephane@hillion.org">Stephane Hillion</a>
- * @version $Id$
+ *
  */
 public class OutputManager {
 

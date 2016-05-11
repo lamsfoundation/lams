@@ -25,7 +25,7 @@ import org.w3c.dom.svg.SVGEvent;
  * This class provides an implementation of the SVGEvent interface.
  *
  * @author <a href="mailto:stephane@hillion.org">Stephane Hillion</a>
- * @version $Id$
+ *
  */
 public class SVGOMEvent
     extends    AbstractEvent

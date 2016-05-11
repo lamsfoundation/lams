@@ -21,7 +21,7 @@ package org.apache.batik.apps.svgbrowser;
 /**
  * The undoable/redoable command.
  *
- * @version $Id$
+ *
  */
 public interface UndoableCommand {
 

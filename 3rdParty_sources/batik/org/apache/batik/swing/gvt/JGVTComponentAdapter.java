@@ -24,7 +24,7 @@ import java.awt.event.ComponentEvent;
  * An adapter class for {@link JGVTComponentListener}.
  *
  * @author <a href="mailto:thomas.deweese@kodak.com">Thomas DeWeese</a>
- * @version $Id$
+ *
  */
 public class JGVTComponentAdapter implements JGVTComponentListener {
 

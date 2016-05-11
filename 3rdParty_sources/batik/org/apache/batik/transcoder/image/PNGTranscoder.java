@@ -34,7 +34,7 @@ import org.apache.batik.transcoder.keys.IntegerKey;
  * This class is an <tt>ImageTranscoder</tt> that produces a PNG image.
  *
  * @author <a href="mailto:Thierry.Kormann@sophia.inria.fr">Thierry Kormann</a>
- * @version $Id$
+ *
  */
 public class PNGTranscoder extends ImageTranscoder {
 
@@ -128,7 +128,7 @@ public class PNGTranscoder extends ImageTranscoder {
      * This interface is used by <tt>PNGTranscoder</tt> to write PNG images 
      * through different codecs.
      *
-     * @version $Id$
+     *
      */
     public interface WriteAdapter {
         

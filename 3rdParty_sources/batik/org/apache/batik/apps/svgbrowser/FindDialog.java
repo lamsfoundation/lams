@@ -63,7 +63,7 @@ import org.apache.batik.util.gui.resource.MissingListenerException;
  * an SVG document.
  *
  * @author <a href="mailto:tkormann@apache.org">Thierry Kormann</a>
- * @version $Id$
+ *
  */
 public class FindDialog extends JDialog implements ActionMap {
 

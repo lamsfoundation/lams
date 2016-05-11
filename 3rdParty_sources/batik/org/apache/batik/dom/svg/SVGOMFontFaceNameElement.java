@@ -27,7 +27,7 @@ import org.w3c.dom.svg.SVGFontFaceNameElement;
  * This class implements {@link SVGFontFaceNameElement}.
  *
  * @author <a href="mailto:stephane@hillion.org">Stephane Hillion</a>
- * @version $Id$
+ *
  */
 public class SVGOMFontFaceNameElement
     extends    SVGOMElement

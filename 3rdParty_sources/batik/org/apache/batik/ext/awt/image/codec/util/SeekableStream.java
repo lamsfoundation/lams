@@ -82,7 +82,7 @@ import java.io.UTFDataFormatException;
  * <code>canSeekBackwards</code> parameter, determines whether support for
  * seeking backwards is required.
  *
- * @version $Id$
+ *
  */
 public abstract class SeekableStream extends InputStream implements DataInput {
 

@@ -28,7 +28,7 @@ import java.util.List;
  * or more simple glyphs, usually with some sort of transformation applied to
  * each.
  *
- * @version $Id$
+ *
  * @author <a href="mailto:david@steadystate.co.uk">David Schweinsberg</a>
  */
 public class GlyfCompositeDescript extends GlyfDescript {

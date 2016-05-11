@@ -59,7 +59,7 @@ import com.mysql.jdbc.util.ResultSetUtil;
  * This class is used by Connection for communicating with the MySQL server.
  *
  * @author Mark Matthews
- * @version $Id$
+ *
  *
  * @see java.sql.Connection
  */

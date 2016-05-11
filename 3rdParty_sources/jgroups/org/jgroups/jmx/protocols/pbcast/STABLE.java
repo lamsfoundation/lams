@@ -4,7 +4,7 @@ import org.jgroups.jmx.Protocol;
 
 /**
  * @author Bela Ban
- * @version $Id$
+ *
  */
 public class STABLE extends Protocol implements STABLEMBean {
     org.jgroups.protocols.pbcast.STABLE p;

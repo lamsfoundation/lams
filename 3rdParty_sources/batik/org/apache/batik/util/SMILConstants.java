@@ -22,7 +22,7 @@ package org.apache.batik.util;
  * Constants for SMIL animation element and attribute names and values.
  *
  * @author <a href="mailto:cam%40mcc%2eid%2eau">Cameron McCormack</a>
- * @version $Id$
+ *
  */
 public interface SMILConstants {
 

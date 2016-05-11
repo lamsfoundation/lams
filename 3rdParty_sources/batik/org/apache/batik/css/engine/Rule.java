@@ -22,7 +22,7 @@ package org.apache.batik.css.engine;
  * This interface represents a CSS rule.
  *
  * @author <a href="mailto:stephane@hillion.org">Stephane Hillion</a>
- * @version $Id$
+ *
  */
 public interface Rule {
 

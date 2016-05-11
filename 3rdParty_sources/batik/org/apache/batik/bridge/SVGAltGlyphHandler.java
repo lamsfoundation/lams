@@ -33,7 +33,7 @@ import org.w3c.dom.Element;
  * GVTGlyphVector for the altGlyph element.
  *
  * @author <a href="mailto:bella.robinson@cmis.csiro.au">Bella Robinson</a>
- * @version $Id$
+ *
  */
 public class SVGAltGlyphHandler implements AltGlyphHandler, SVGConstants {
 

@@ -24,7 +24,7 @@ import java.awt.GridBagConstraints;
  * <tt>GridBagConstraints</tt> constants.
  *
  * @author <a href="mailto:vhardy@eng.sun.com">Vincent Hardy</a>
- * @version $Id$
+ *
  */
 public interface GridBagConstants {
     /**

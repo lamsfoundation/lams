@@ -33,7 +33,7 @@ import java.sql.SQLException;
  * 
  * @author Mark Matthews
  * 
- * @version $Id$
+ *
  */
 public class ResultSetUtil {
 

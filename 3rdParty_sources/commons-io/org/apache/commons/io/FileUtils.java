@@ -79,7 +79,7 @@ import org.apache.commons.io.output.NullOutputStream;
  * @author Chris Eldredge
  * @author Jim Harrington
  * @author Sandy McArthur
- * @version $Id$
+ *
  */
 public class FileUtils {
 

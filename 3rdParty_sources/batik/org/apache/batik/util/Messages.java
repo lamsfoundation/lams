@@ -28,7 +28,7 @@ import org.apache.batik.util.resources.ResourceManager;
  * This class manages the message for the security utilities
  *
  * @author <a href="mailto:vhardy@apache.org">Vincent Hardy</a>
- * @version $Id$
+ *
  */
 public class Messages {
 

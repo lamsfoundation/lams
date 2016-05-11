@@ -31,7 +31,7 @@ import org.apache.batik.util.ParsedURL;
  * likely be asked to provide the decoded image next.
  * @see MagicNumberRegistryEntry
  *
- * @version $Id$
+ *
  */
 public interface StreamRegistryEntry extends RegistryEntry {
 

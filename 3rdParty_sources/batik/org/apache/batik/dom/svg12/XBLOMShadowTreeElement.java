@@ -29,7 +29,7 @@ import org.w3c.dom.Element;
  * This class implements the xbl:shadowTree element.
  *
  * @author <a href="mailto:cam%40mcc%2eid%2eau">Cameron McCormack</a>
- * @version $Id$
+ *
  */
 public class XBLOMShadowTreeElement
         extends XBLOMElement

@@ -24,7 +24,7 @@ import java.awt.font.LineMetrics;
  * GVTLineMetrics is a GVT version of java.awt.font.LineMetrics.
  *
  * @author <a href="mailto:bella.robinson@cmis.csiro.au">Bella Robinson</a>
- * @version $Id$
+ *
  */
 public class GVTLineMetrics {
 

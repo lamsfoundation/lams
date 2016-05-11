@@ -38,7 +38,7 @@ import org.apache.batik.gvt.GraphicsNode;
  * MaskRable implementation
  *
  * @author <a href="mailto:Thomas.DeWeese@Kodak.com">Thomas DeWeese</a>
- * @version $Id$
+ *
  */
 public class MaskRable8Bit
     extends    AbstractRable

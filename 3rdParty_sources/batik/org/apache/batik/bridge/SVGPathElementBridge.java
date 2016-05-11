@@ -40,7 +40,7 @@ import org.w3c.dom.svg.SVGPathSegList;
  * Bridge class for the &lt;path> element.
  *
  * @author <a href="mailto:tkormann@apache.org">Thierry Kormann</a>
- * @version $Id$
+ *
  */
 public class SVGPathElementBridge extends SVGDecoratedShapeElementBridge 
        implements SVGPathContext {

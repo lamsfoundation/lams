@@ -23,7 +23,7 @@ package org.apache.batik.script;
  * script by an <code>Interpreter</code> interface implementation.
  *
  * @author <a href="mailto:cjolif@ilog.fr">Christophe Jolif</a>
- * @version $Id$
+ *
  */
 public class InterpreterException extends RuntimeException {
     private int line = -1; // -1 when unknown

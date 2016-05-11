@@ -25,7 +25,7 @@ import java.beans.SimpleBeanInfo;
  * A <tt>BeanInfo</tt> for the <tt>JSVGCanvas</tt>.
  *
  * @author <a href="mailto:tkormann@apache.org">Thierry Kormann</a>
- * @version $Id$
+ *
  */
 public class JSVGCanvasBeanInfo extends SimpleBeanInfo {
 

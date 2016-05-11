@@ -29,7 +29,7 @@ import javax.swing.text.StyleContext;
  * A pool of styles and their associated resources
  *
  * @author <a href="mailto:tonny@kiyut.com">Tonny Kohar</a>
- * @version $Id$
+ *
  */
 public class XMLContext extends StyleContext {
 

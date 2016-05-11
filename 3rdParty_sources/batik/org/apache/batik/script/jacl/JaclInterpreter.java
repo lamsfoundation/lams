@@ -33,7 +33,7 @@ import tcl.lang.TclException;
  * A simple implementation of <code>Interpreter</code> interface to use
  * JACL Tcl parser.
  * @author <a href="mailto:cjolif@ilog.fr">Christophe Jolif</a>
- * @version $Id$
+ *
  */
 public class JaclInterpreter implements org.apache.batik.script.Interpreter {
     private Interp interpreter = null;

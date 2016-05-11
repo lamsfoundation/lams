@@ -31,7 +31,7 @@ import org.w3c.dom.NodeList;
  * present.
  *
  * @author <a href="mailto:cam%40mcc%2eid%2eau">Cameron McCormack</a>
- * @version $Id$
+ *
  */
 public class DefaultContentSelector extends AbstractContentSelector {
 

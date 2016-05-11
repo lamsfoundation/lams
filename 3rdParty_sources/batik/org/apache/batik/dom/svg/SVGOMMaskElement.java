@@ -31,7 +31,7 @@ import org.w3c.dom.svg.SVGMaskElement;
  * This class implements {@link org.w3c.dom.svg.SVGMaskElement}.
  *
  * @author <a href="mailto:stephane@hillion.org">Stephane Hillion</a>
- * @version $Id$
+ *
  */
 public class SVGOMMaskElement
     extends    SVGGraphicsElement

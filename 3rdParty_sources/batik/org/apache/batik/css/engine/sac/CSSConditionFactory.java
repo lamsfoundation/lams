@@ -34,7 +34,7 @@ import org.w3c.css.sac.PositionalCondition;
  * {@link org.w3c.css.sac.ConditionFactory} interface.
  *
  * @author <a href="mailto:stephane@hillion.org">Stephane Hillion</a>
- * @version $Id$
+ *
  */
 public class CSSConditionFactory implements ConditionFactory {
 

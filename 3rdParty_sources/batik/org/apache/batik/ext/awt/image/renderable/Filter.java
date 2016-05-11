@@ -28,7 +28,7 @@ import java.awt.image.renderable.RenderableImage;
  * dependancies.
  *
  * @author <a href="mailto:Thomas.DeWeeese@Kodak.com">Thomas DeWeese</a>
- * @version $Id$
+ *
  */
 public interface Filter extends RenderableImage {
 

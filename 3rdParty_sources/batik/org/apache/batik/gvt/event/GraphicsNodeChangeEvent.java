@@ -24,7 +24,7 @@ import org.apache.batik.gvt.GraphicsNode;
  * An event which indicates that a change action occurred on a graphics node.
  *
  * @author <a href="mailto:deweese@apache.org">Thomas DeWeese</a>
- * @version $Id$
+ *
  */
 public class GraphicsNodeChangeEvent extends GraphicsNodeEvent {
 

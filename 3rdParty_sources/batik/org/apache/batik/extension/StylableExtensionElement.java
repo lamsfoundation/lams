@@ -37,7 +37,7 @@ import org.w3c.dom.svg.SVGStylable;
  * attributes (ie: fill="red", ...).
  *
  * @author <a href="mailto:stephane@hillion.org">Stephane Hillion</a>
- * @version $Id$
+ *
  */
 public abstract class StylableExtensionElement
     extends ExtensionElement

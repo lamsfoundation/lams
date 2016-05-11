@@ -49,7 +49,7 @@ import org.w3c.dom.svg.SVGElement;
  * An abstract base class for the SVG animation element bridges.
  *
  * @author <a href="mailto:cam%40mcc%2eid%2eau">Cameron McCormack</a>
- * @version $Id$
+ *
  */
 public abstract class SVGAnimationElementBridge extends AbstractSVGBridge
         implements GenericBridge,

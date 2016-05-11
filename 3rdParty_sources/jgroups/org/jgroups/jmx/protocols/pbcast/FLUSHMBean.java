@@ -4,7 +4,7 @@ import org.jgroups.jmx.ProtocolMBean;
 
 /**
  * @author Vladimir Blagojevic
- * @version $Id$
+ *
  */
 public interface FLUSHMBean extends ProtocolMBean {
 

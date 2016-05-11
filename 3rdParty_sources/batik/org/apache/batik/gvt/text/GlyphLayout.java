@@ -48,7 +48,7 @@ import org.apache.batik.gvt.font.GVTLineMetrics;
  * @see org.apache.batik.gvt.text.TextSpanLayout
  *
  * @author <a href="mailto:bill.haneman@ireland.sun.com">Bill Haneman</a>
- * @version $Id$
+ *
  */
 public class GlyphLayout implements TextSpanLayout {
 

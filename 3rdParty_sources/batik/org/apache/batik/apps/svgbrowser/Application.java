@@ -24,7 +24,7 @@ import javax.swing.Action;
  * This interface represents a SVG viewer application.
  *
  * @author <a href="mailto:stephane@hillion.org">Stephane Hillion</a>
- * @version $Id$
+ *
  */
 public interface Application {
 

@@ -27,7 +27,7 @@ import java.util.Random;
  * 
  * @author Gary D. Gregory
  * @since 2.0
- * @version $Id$
+ *
  */
 public class RandomUtils {
 

@@ -55,7 +55,7 @@ import org.w3c.dom.events.EventTarget;
  * A simple implementation of <code>Interpreter</code> interface to use
  * Rhino ECMAScript interpreter.
  * @author <a href="mailto:cjolif@ilog.fr">Christophe Jolif</a>
- * @version $Id$
+ *
  */
 public class RhinoInterpreter implements Interpreter {
 

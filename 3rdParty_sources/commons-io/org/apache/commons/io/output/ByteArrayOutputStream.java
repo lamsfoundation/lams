@@ -51,7 +51,7 @@ import org.apache.commons.io.input.ClosedInputStream;
  * 
  * @author <a href="mailto:jeremias@apache.org">Jeremias Maerki</a>
  * @author Holger Hoffstatte
- * @version $Id$
+ *
  */
 public class ByteArrayOutputStream extends OutputStream {
 

@@ -33,7 +33,7 @@ import javax.swing.text.Utilities;
  * font family and size.
  *
  * @author <a href="mailto:tonny@kiyut.com">Tonny Kohar</a>
- * @version $Id$
+ *
  */
 public class XMLView extends PlainView {
 

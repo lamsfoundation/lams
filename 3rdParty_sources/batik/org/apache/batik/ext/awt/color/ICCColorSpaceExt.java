@@ -29,7 +29,7 @@ import java.awt.color.ICC_Profile;
  * relative colorimetric.
  *
  * @author <a href="mailto:vincent.hardy@eng.sun.com">Vincent Hardy</a>
- * @version $Id$
+ *
  */
 public class ICCColorSpaceExt extends ICC_ColorSpace {
     public static final int PERCEPTUAL = 0;

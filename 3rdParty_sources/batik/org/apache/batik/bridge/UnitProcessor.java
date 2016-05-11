@@ -28,7 +28,7 @@ import org.w3c.dom.Element;
  *
  * @author <a href="mailto:stephane@hillion.org">Stephane Hillion</a>
  * @author <a href="mailto:tkormann@apache.org">Thierry Kormann</a>
- * @version $Id$
+ *
  */
 public abstract class UnitProcessor
     extends org.apache.batik.parser.UnitProcessor {

@@ -4,7 +4,7 @@ import org.jgroups.jmx.Protocol;
 
 /**
  * @author Vladimir Blagojevic
- * @version $Id$
+ *
  */
 public class STREAMING_STATE_TRANSFER extends Protocol implements STREAMING_STATE_TRANSFERMBean {
     org.jgroups.protocols.pbcast.STREAMING_STATE_TRANSFER p;

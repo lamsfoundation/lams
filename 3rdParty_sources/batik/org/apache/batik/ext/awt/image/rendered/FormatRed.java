@@ -43,7 +43,7 @@ import org.apache.batik.ext.awt.image.GraphicsUtil;
  * alpha=1.  In all other cases bands are simply copied.
  *
  * @author <a href="mailto:Thomas.DeWeeese@Kodak.com">Thomas DeWeese</a>
- * @version $Id$
+ *
  */
 public class FormatRed extends AbstractRed {
 

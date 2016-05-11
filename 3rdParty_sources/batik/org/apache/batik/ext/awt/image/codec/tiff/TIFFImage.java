@@ -51,7 +51,7 @@ import com.sun.image.codec.jpeg.JPEGImageDecoder;
 
 /**
  *
- * @version $Id$
+ *
  */
 public class TIFFImage extends AbstractRed {
 

@@ -42,7 +42,7 @@ import org.w3c.dom.NodeList;
  * Utility class for SVG fonts.
  *
  * @author <a href="mailto:bella.robinson@cmis.csiro.au">Bella Robinson</a>
- * @version $Id$
+ *
  */
 public abstract class SVGFontUtilities implements SVGConstants {
 

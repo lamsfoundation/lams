@@ -31,7 +31,7 @@ import javax.swing.text.ViewFactory;
  * functioning editor for xml type document.
  *
  * @author <a href="mailto:tonny@kiyut.com">Tonny Kohar</a>
- * @version $Id$
+ *
  */
 public class XMLEditorKit extends DefaultEditorKit {
 

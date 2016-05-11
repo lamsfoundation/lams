@@ -23,7 +23,7 @@ package org.apache.batik.anim.timing;
  * specification.
  *
  * @author <a href="mailto:cam%40mcc%2eid%2eau">Cameron McCormack</a>
- * @version $Id$
+ *
  */
 public class InstanceTime implements Comparable {
 

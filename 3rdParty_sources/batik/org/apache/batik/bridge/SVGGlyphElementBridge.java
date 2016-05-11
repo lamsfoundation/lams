@@ -44,7 +44,7 @@ import org.w3c.dom.NodeList;
  * Bridge class for the &lt;glyph> element.
  *
  * @author <a href="mailto:bella.robinson@cmis.csiro.au">Bella Robinson</a>
- * @version $Id$
+ *
  */
 public class SVGGlyphElementBridge extends AbstractSVGBridge
     implements ErrorConstants {

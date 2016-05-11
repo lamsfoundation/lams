@@ -26,7 +26,7 @@ import org.apache.batik.transcoder.TranscodingHints;
  * A transcoding Key represented as a background paint.
  *
  * @author <a href="mailto:Thierry.Kormann@sophia.inria.fr">Thierry Kormann</a>
- * @version $Id$
+ *
  */
 public class PaintKey extends TranscodingHints.Key {
 

@@ -68,7 +68,7 @@ import org.w3c.dom.events.MutationEvent;
  * A full featured sXBL manager.
  *
  * @author <a href="mailto:cam%40mcc%2eid%2eau">Cameron McCormack</a>
- * @version $Id$
+ *
  */
 public class DefaultXBLManager implements XBLManager, XBLConstants {
 

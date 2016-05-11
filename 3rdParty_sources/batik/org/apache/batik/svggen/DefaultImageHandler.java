@@ -32,7 +32,7 @@ import org.w3c.dom.Element;
  * attribute and sets the width and height of the element.
  *
  * @author <a href="mailto:vincent.hardy@eng.sun.com">Vincent Hardy</a>
- * @version $Id$
+ *
  * @see             org.apache.batik.svggen.SVGGraphics2D
  */
 public class DefaultImageHandler

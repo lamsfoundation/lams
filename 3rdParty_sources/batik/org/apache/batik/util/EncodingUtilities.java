@@ -25,7 +25,7 @@ import java.util.Map;
  * This class contains utility functions to manage encodings.
  *
  * @author <a href="mailto:stephane@hillion.org">Stephane Hillion</a>
- * @version $Id$
+ *
  */
 public class EncodingUtilities {
 

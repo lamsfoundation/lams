@@ -26,7 +26,7 @@ import org.w3c.dom.svg.SVGMetadataElement;
  * This class implements {@link org.w3c.dom.svg.SVGMetadataElement}.
  *
  * @author <a href="mailto:stephane@hillion.org">Stephane Hillion</a>
- * @version $Id$
+ *
  */
 public class SVGOMMetadataElement
     extends    SVGOMElement

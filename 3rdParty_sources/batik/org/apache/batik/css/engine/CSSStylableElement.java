@@ -27,7 +27,7 @@ import org.w3c.dom.Element;
  * CSS support.
  *
  * @author <a href="mailto:stephane@hillion.org">Stephane Hillion</a>
- * @version $Id$
+ *
  */
 public interface CSSStylableElement extends Element {
     

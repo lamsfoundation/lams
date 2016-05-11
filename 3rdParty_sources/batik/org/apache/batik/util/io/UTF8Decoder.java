@@ -27,7 +27,7 @@ import java.io.InputStream;
  * a stream of bytes.
  *
  * @author <a href="mailto:stephane@hillion.org">Stephane Hillion</a>
- * @version $Id$
+ *
  */
 public class UTF8Decoder extends AbstractCharDecoder {
 

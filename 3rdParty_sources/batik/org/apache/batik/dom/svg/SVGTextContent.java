@@ -26,7 +26,7 @@ import java.awt.geom.Point2D;
  * for the bridge to implement.
  *
  * @author nicolas.socheleau@bitflash.com
- * @version $Id$
+ *
  */
 public interface SVGTextContent
 {

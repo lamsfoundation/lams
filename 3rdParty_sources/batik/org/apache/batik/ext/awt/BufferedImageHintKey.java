@@ -27,7 +27,7 @@ import java.lang.ref.Reference;
  * <code>GraphicsNode</code>.
  *
  * @author <a href="mailto:cjolif@ilog.fr">Christophe Jolif</a>
- * @version $Id$
+ *
  */
 final class BufferedImageHintKey extends RenderingHints.Key {
     BufferedImageHintKey(int number) { super(number); }

@@ -29,7 +29,7 @@ import org.apache.batik.parser.TimingSpecifierListParser;
  * {@link TimingSpecifier}s.
  *
  * @author <a href="mailto:cam%40mcc%2eid%2eau">Cameron McCormack</a>
- * @version $Id$
+ *
  */
 public class TimingSpecifierListProducer
         extends DefaultTimingSpecifierListHandler {

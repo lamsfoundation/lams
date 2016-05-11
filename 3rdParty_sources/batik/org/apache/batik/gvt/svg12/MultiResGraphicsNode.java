@@ -37,7 +37,7 @@ import org.w3c.dom.Element;
  * RenderableImage world.
  *
  * @author <a href="mailto:Thomas.DeWeese@Kodak.com">Thomas DeWeese</a>
- * @version $Id$
+ *
  */
 public class MultiResGraphicsNode
     extends AbstractGraphicsNode implements SVGConstants {

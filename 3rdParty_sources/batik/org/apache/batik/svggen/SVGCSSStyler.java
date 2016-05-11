@@ -32,7 +32,7 @@ import org.w3c.dom.NodeList;
  * attribute into one that uses the CSS style attribute instead.
  *
  * @author <a href="mailto:vincent.hardy@eng.sun.com">Vincent Hardy</a>
- * @version $Id$
+ *
  */
 public class SVGCSSStyler implements SVGSyntax{
 

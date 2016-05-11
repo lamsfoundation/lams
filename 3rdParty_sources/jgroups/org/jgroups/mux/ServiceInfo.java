@@ -10,7 +10,7 @@ import java.io.*;
 /**
  * Class used for service state communication between Multiplexers
  * @author Bela Ban
- * @version $Id$
+ *
  */
 public class ServiceInfo implements Externalizable, Streamable {       
     public static final byte SERVICE_UP        = 3;

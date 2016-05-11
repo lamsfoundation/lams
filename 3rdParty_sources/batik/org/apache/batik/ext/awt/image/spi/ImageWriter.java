@@ -25,7 +25,7 @@ import java.io.OutputStream;
 /**
  * Interface which allows image library independent image writing.
  *
- * @version $Id$
+ *
  */
 public interface ImageWriter {
 

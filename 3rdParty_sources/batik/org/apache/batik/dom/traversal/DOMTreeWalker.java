@@ -29,7 +29,7 @@ import org.w3c.dom.traversal.TreeWalker;
  * interface.
  *
  * @author <a href="mailto:stephane@hillion.org">Stephane Hillion</a>
- * @version $Id$
+ *
  */
 public class DOMTreeWalker implements TreeWalker {
 

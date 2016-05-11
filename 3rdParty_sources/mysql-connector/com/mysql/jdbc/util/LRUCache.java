@@ -29,7 +29,7 @@ import java.util.Map.Entry;
 
 /**
  * @author Mark Matthews
- * @version $Id$
+ *
  */
 public class LRUCache extends LinkedHashMap {
     private static final long serialVersionUID = 1L;

@@ -33,7 +33,7 @@ import org.w3c.dom.svg.SVGImageElement;
  * This class implements {@link SVGImageElement}.
  *
  * @author <a href="mailto:stephane@hillion.org">Stephane Hillion</a>
- * @version $Id$
+ *
  */
 public class SVGOMImageElement
     extends    SVGURIReferenceGraphicsElement

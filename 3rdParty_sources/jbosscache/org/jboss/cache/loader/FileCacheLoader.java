@@ -67,7 +67,7 @@ import java.util.regex.Pattern;
  * @author Bela Ban
  * @author <a href="mailto:galder.zamarreno@jboss.com">Galder Zamarreno</a>
  * @author <a href="mailto:manik AT jboss DOT org">Manik Surtani</a>
- * @version $Id$
+ *
  */
 @ThreadSafe
 public class FileCacheLoader extends AbstractCacheLoader

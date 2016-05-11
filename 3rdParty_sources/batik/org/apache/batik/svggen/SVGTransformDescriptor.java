@@ -27,7 +27,7 @@ import java.util.Map;
  * Describes an SVG transform
  *
  * @author <a href="mailto:vincent.hardy@eng.sun.com">Vincent Hardy</a>
- * @version $Id$
+ *
  * @see           org.apache.batik.ext.awt.g2d.GraphicContext
  */
 public class SVGTransformDescriptor implements SVGDescriptor, SVGSyntax{

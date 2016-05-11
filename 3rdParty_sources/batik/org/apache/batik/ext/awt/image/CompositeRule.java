@@ -23,7 +23,7 @@ package org.apache.batik.ext.awt.image;
  * the CompositeRable operation. (over, in, out, atop, xor, arith)
  *
  * @author <a href="mailto:Thomas.DeWeeese@Kodak.com">Thomas DeWeese</a>
- * @version $Id$
+ *
  */
 public final class CompositeRule implements java.io.Serializable {
 

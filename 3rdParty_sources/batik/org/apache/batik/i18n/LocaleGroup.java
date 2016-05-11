@@ -25,7 +25,7 @@ import java.util.Locale;
  * have a shared default locale.
  *
  * @author <a href="mailto:stephane@hillion.org">Stephane Hillion</a>
- * @version $Id$
+ *
  */
 public class LocaleGroup {
     /**

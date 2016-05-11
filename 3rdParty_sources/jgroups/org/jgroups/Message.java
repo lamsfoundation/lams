@@ -24,7 +24,7 @@ import java.util.concurrent.ConcurrentHashMap;
  * The byte buffer can point to a reference, and we can subset it using index and length. However,
  * when the message is serialized, we only write the bytes between index and length.
  * @author Bela Ban
- * @version $Id$
+ *
  */
 public class Message implements Externalizable, Streamable {
     protected Address dest_addr=null;

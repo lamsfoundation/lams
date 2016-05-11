@@ -33,7 +33,7 @@ import com.mysql.jdbc.SQLError;
  * 
  * @author Mark matthews
  * 
- * @version $Id$
+ *
  */
 abstract class WrapperBase {
 	protected MysqlPooledConnection pooledConnection;

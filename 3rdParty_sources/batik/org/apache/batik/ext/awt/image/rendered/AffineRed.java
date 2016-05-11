@@ -44,7 +44,7 @@ import org.apache.batik.ext.awt.image.GraphicsUtil;
  * to do the work.  Eventually this may move to be more tiled in nature.
  *
  * @author <a href="mailto:Thomas.DeWeeese@Kodak.com">Thomas DeWeese</a>
- * @version $Id$ */
+ *
 public class AffineRed extends AbstractRed {
 
     RenderingHints  hints;

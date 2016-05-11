@@ -35,7 +35,7 @@ package org.apache.batik.dom.svg;
  * @see AbstractSVGList#itemChanged()
  *
  * @author <a href="mailto:nicolas.socheleau@bitflash.com">Nicolas Socheleau</a>
- * @version $Id$
+ *
  */
 public interface SVGItem {
 

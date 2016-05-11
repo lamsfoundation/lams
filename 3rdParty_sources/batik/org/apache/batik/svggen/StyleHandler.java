@@ -27,7 +27,7 @@ import org.w3c.dom.Element;
  * how the style will be set on an SVG <code>Element</code>.
  *
  * @author <a href="mailto:cjolif@ilog.fr">Christophe Jolif</a>
- * @version $Id$
+ *
  */
 public interface StyleHandler {
     /**

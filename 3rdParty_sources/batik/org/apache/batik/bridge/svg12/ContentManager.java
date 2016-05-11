@@ -47,7 +47,7 @@ import org.w3c.dom.events.MutationEvent;
  * A class to manage all XBL content elements in a shadow tree.
  *
  * @author <a href="mailto:cam%40mcc%2eid%2eau">Cameron McCormack</a>
- * @version $Id$
+ *
  */
 public class ContentManager {
 

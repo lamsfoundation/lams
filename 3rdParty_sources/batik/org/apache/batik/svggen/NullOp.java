@@ -28,7 +28,7 @@ import java.awt.image.ColorModel;
 
 /**
  *
- * @version $Id$
+ *
  */
 class NullOp implements BufferedImageOp {
     public BufferedImage filter(BufferedImage src, BufferedImage dest){

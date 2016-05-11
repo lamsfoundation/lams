@@ -24,7 +24,7 @@ import java.util.List;
 
 /**
  *
- * @version $Id$
+ *
  */
 public abstract class AbstractRegistryEntry
     implements RegistryEntry, ErrorConstants {

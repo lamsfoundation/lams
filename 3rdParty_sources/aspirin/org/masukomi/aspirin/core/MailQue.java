@@ -43,7 +43,7 @@ import org.apache.james.core.MailImpl;
  * <p>This class represents the mailing queue of the Aspirin.</p>
  * 
  * @author masukomi
- * @version $Id$
+ *
  * 
  */
 public class MailQue {

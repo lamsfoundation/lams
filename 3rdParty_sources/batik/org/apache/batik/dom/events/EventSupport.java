@@ -39,7 +39,7 @@ import org.w3c.dom.events.EventListener;
  * @see NodeEventTarget
  * @author <a href="mailto:Thierry.Kormann@sophia.inria.fr">Thierry Kormann</a>
  * @author <a href="mailto:stephane@hillion.org">Stephane Hillion</a>
- * @version $Id$
+ *
  */
 public class EventSupport {
 

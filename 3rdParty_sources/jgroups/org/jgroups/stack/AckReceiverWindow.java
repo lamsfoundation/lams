@@ -22,7 +22,7 @@ import java.util.concurrent.locks.ReentrantLock;
  * a sorted set incurs overhead.
  *
  * @author Bela Ban
- * @version $Id$
+ *
  */
 public class AckReceiverWindow {
     long                    next_to_remove=0;

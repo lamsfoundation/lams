@@ -27,7 +27,7 @@ import org.w3c.dom.NodeList;
  * document's nodes.
  *
  * @author <a href="mailto:cam%40mcc%2eid%2eau">Cameron McCormack</a>
- * @version $Id$
+ *
  */
 public interface XBLManager {
 

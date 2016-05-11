@@ -24,7 +24,7 @@ import java.awt.geom.AffineTransform;
  * An interface for SVG elements that can be animated with 'animateMotion'.
  *
  * @author <a href="mailto:cam%40mcc%2eid%2eau">Cameron McCormack</a>
- * @version $Id$
+ *
  */
 public interface SVGMotionAnimatableElement {
 

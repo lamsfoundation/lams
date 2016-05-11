@@ -35,7 +35,7 @@ import java.io.Serializable;
  * be removed or changed in future releases of JAI.</b>
  *
  * @see TIFFDirectory
- * @version $Id$
+ *
  */
 public class TIFFField implements Comparable, Serializable {
 

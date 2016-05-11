@@ -22,7 +22,7 @@ package org.apache.batik.parser;
  * This class provides a default implementation of ErrorHandler.
  *
  * @author <a href="mailto:stephane@hillion.org">Stephane Hillion</a>
- * @version $Id$
+ *
  */
 
 public class DefaultErrorHandler implements ErrorHandler {

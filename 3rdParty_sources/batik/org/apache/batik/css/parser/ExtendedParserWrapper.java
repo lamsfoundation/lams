@@ -39,7 +39,7 @@ import org.w3c.css.sac.SelectorList;
  * interface by wrapping a standard {@link org.w3c.css.sac.Parser}.
  *
  * @author <a href="mailto:deweese@apache.org">Thomas DeWeese</a>
- * @version $Id$
+ *
  */
 public class ExtendedParserWrapper implements ExtendedParser {
 

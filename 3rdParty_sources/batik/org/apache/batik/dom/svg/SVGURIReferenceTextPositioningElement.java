@@ -30,7 +30,7 @@ import org.w3c.dom.svg.SVGURIReference;
  * and {@link SVGURIReference}..
  *
  * @author <a href="mailto:stephane@hillion.org">Stephane Hillion</a>
- * @version $Id$
+ *
  */
 public abstract class SVGURIReferenceTextPositioningElement
     extends    SVGOMTextPositioningElement

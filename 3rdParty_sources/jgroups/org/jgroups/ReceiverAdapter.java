@@ -2,7 +2,7 @@ package org.jgroups;
 
 /**
  * @author Bela Ban
- * @version $Id$
+ *
  */
 public class ReceiverAdapter implements Receiver {
 

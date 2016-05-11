@@ -27,7 +27,7 @@ import org.w3c.dom.svg.SVGPolygonElement;
  * This class implements {@link SVGPolygonElement}.
  *
  * @author <a href="mailto:stephane@hillion.org">Stephane Hillion</a>
- * @version $Id$
+ *
  */
 public class SVGOMPolygonElement
     extends    SVGPointShapeElement

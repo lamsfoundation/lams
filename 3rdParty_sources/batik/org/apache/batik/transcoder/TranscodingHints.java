@@ -27,7 +27,7 @@ import java.util.Map;
  * transcoding parameters or options to any transcoders.
  *
  * @author <a href="mailto:Thierry.Kormann@sophia.inria.fr">Thierry Kormann</a>
- * @version $Id$
+ *
  */
 public class TranscodingHints extends HashMap {
 

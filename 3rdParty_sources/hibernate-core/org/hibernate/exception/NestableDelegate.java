@@ -49,7 +49,7 @@ import java.util.List;
  * @author <a href="mailto:steven@caswell.name">Steven Caswell</a>
  * @author Sean C. Sullivan
  * @author Stephen Colebourne
- * @version $Id$
+ *
  * @since 1.0
  */
 public class NestableDelegate implements Serializable {

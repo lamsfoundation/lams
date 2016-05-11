@@ -27,7 +27,7 @@ import java.util.*;
  * multicast messages.
  * @author Bela Ban
  * @author Filip Hanik
- * @version $Id$
+ *
  */
 public class FRAG extends Protocol {
     private int frag_size=8192;  // conservative value

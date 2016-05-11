@@ -22,7 +22,7 @@ package org.apache.batik.ext.awt.image.spi;
  * The built in error codes.
  *
  * @author <a href="mailto:thomas.deweese@kodak.com">Thomas DeWeese</a>
- * @version $Id$
+ *
  */
 public interface ErrorConstants {
 

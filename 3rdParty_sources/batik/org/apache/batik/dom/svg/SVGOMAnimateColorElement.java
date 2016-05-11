@@ -27,7 +27,7 @@ import org.w3c.dom.svg.SVGAnimateColorElement;
  * This class implements {@link SVGAnimateColorElement}.
  *
  * @author <a href="mailto:stephane@hillion.org">Stephane Hillion</a>
- * @version $Id$
+ *
  */
 public class SVGOMAnimateColorElement
     extends    SVGOMAnimationElement

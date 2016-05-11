@@ -35,7 +35,7 @@ import org.apache.commons.io.IOCase;
  * every class you use.
  * 
  * @since Commons IO 1.0
- * @version $Id$
+ *
  * 
  * @author Stephen Colebourne
  * @author Jeremias Maerki

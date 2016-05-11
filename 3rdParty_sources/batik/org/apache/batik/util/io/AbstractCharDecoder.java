@@ -25,7 +25,7 @@ import java.io.InputStream;
  * This class is the superclass of all the char decoders.
  *
  * @author <a href="mailto:stephane@hillion.org">Stephane Hillion</a>
- * @version $Id$
+ *
  */
 public abstract class AbstractCharDecoder implements CharDecoder {
 

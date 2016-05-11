@@ -27,7 +27,7 @@ import org.apache.batik.gvt.event.GraphicsNodeChangeListener;
  * The top-level graphics node of the GVT tree.
  *
  * @author <a href="mailto:Thierry.Kormann@sophia.inria.fr">Thierry Kormann</a>
- * @version $Id$
+ *
  */
 public class RootGraphicsNode extends CompositeGraphicsNode {
 

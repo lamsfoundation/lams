@@ -27,7 +27,7 @@ import org.apache.batik.dom.svg12.XBLOMContentElement;
  * xbl;content element.
  *
  * @author <a href="mailto:cam%40mcc%2eid%2eau">Cameron McCormack</a>
- * @version $Id$
+ *
  */
 public class ContentSelectionChangedEvent extends EventObject {
 

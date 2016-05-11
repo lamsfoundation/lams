@@ -34,7 +34,7 @@ import java.awt.image.WritableRaster;
  * This provides an implementation of all the composite rules in SVG.
  *
  * @author <a href="mailto:Thomas.DeWeeese@Kodak.com">Thomas DeWeese</a>
- * @version $Id$
+ *
  */
 public class SVGComposite
     implements Composite {

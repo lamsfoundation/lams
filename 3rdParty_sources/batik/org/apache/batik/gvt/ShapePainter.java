@@ -27,7 +27,7 @@ import java.awt.geom.Point2D;
  * Renders the shape of a <tt>ShapeNode</tt>.
  *
  * @author <a href="mailto:Thierry.Kormann@sophia.inria.fr">Thierry Kormann</a>
- * @version $Id$
+ *
  */
 public interface ShapePainter {
 

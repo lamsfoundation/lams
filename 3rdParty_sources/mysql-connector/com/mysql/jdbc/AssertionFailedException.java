@@ -29,7 +29,7 @@ package com.mysql.jdbc;
  * 
  * @author Mark Matthews
  * 
- * @version $Id: AssertionFailedException.java,v 1.1.2.1 2005/05/13 18:58:37
+ *
  *          mmatthews Exp $
  */
 public class AssertionFailedException extends RuntimeException {

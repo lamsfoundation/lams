@@ -30,7 +30,7 @@ import java.io.OutputStream;
  * a stream with custom pre-, post- or error processing functionality.
  * 
  * @author Stephen Colebourne
- * @version $Id$
+ *
  */
 public class ProxyOutputStream extends FilterOutputStream {
 

@@ -27,7 +27,7 @@ import java.net.URL;
  * jar:<URL for jar file>!<path in jar file>
  *
  * @author <a href="mailto:deweese@apache.org">Thomas DeWeese</a>
- * @version $Id$ 
+ *
  */
 public class ParsedURLJarProtocolHandler 
     extends ParsedURLDefaultProtocolHandler {

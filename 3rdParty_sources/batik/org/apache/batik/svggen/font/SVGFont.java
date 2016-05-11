@@ -41,7 +41,7 @@ import org.apache.batik.util.XMLConstants;
 /**
  * Converts a TrueType font to an SVG embedded font.
  *
- * @version $Id$
+ *
  * @author <a href="mailto:david@steadystate.co.uk">David Schweinsberg</a>
  */
 public class SVGFont implements XMLConstants, SVGConstants, ScriptTags, FeatureTags {

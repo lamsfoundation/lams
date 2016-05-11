@@ -40,7 +40,7 @@ import org.apache.batik.gvt.text.TextSpanLayout;
  * A graphics node that represents text.
  *
  * @author <a href="mailto:Thierry.Kormann@sophia.inria.fr">Thierry Kormann</a>
- * @version $Id$
+ *
  */
 public class TextNode extends AbstractGraphicsNode implements Selectable {
 

@@ -25,7 +25,7 @@ import org.apache.batik.gvt.GraphicsNode;
  * lost the keyboard focus.
  *
  * @author <a href="mailto:Thierry.Kormann@sophia.inria.fr">Thierry Kormann</a>
- * @version $Id$
+ *
  */
 public class GraphicsNodeFocusEvent extends GraphicsNodeEvent {
 

@@ -65,7 +65,7 @@ import org.w3c.dom.svg.SVGTransformable;
  * </ul>
  *
  * @author <a href="mailto:tkormann@apache.org">Thierry Kormann</a>
- * @version $Id$
+ *
  */
 public abstract class AbstractGraphicsNodeBridge extends AnimatableSVGBridge
     implements SVGContext,

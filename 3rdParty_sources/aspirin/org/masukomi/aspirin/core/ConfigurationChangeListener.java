@@ -6,7 +6,7 @@ package org.masukomi.aspirin.core;
  * notified about these changes. It is requried to allow immediately dynamic 
  * configuration.</p>
  *
- * @version $Id$
+ *
  *
  */
 interface ConfigurationChangeListener {

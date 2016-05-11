@@ -22,7 +22,7 @@ package org.apache.batik.anim.timing;
  * An abstract class for SMIL timing specifiers.
  *
  * @author <a href="mailto:cam%40mcc%2eid%2eau">Cameron McCormack</a>
- * @version $Id$
+ *
  */
 public abstract class TimingSpecifier {
 

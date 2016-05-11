@@ -26,7 +26,7 @@ import java.io.IOException;
  * <p>Created: May 19, 2004 11:13:14 AM
  *
  * @since   lucene 1.4
- * @version $Id$
+ *
  */
 public interface FieldCache {
 

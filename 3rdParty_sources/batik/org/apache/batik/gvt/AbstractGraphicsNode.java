@@ -50,7 +50,7 @@ import org.apache.batik.util.HaltingThread;
  * @author <a href="mailto:Thierry.Kormann@sophia.inria.fr">Thierry Kormann</a>
  * @author <a href="mailto:etissandier@ilog.fr">Emmanuel Tissandier</a>
  * @author <a href="mailto:Thomas.DeWeeese@Kodak.com">Thomas DeWeese</a>
- * @version $Id$
+ *
  */
 public abstract class AbstractGraphicsNode implements GraphicsNode {
 

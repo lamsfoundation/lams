@@ -28,7 +28,7 @@ import org.apache.batik.ext.awt.geom.RectListManager;
  * Interface for GVT Renderers.
  *
  * @author <a href="mailto:vincent.hardy@eng.sun.com">Vincent Hardy</a>
- * @version $Id$
+ *
  */
 public interface Renderer {
 

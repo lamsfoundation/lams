@@ -12,7 +12,7 @@ import java.util.Properties;
 /**
  * Discards 2 JOIN-REQs then accepts 1, then discards 2 more and so on
  * @author Bela Ban
- * @version $Id$
+ *
  */
 public class DELAY_JOIN_REQ extends Protocol {
     private long delay=4000;

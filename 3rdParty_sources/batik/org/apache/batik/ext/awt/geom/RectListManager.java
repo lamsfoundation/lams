@@ -36,7 +36,7 @@ import java.util.NoSuchElementException;
  * this reason it uses Rectangle not Rectangle2D).
  *
  * @author <a href="mailto:deweese@apache.org">Thomas DeWeese</a>
- * @version $Id$
+ *
  */
 public class RectListManager implements Collection {
     Rectangle [] rects = null;

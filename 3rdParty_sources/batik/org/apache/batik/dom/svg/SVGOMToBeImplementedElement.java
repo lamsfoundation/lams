@@ -27,7 +27,7 @@ import org.w3c.dom.Node;
  * been put in.
  *
  * @author <a href="mailto:vincent.hardy@eng.sun.com">Vincent Hardy</a>
- * @version $Id$
+ *
  */
 public class SVGOMToBeImplementedElement
     extends SVGGraphicsElement {

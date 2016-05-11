@@ -31,7 +31,7 @@ import org.apache.batik.util.io.StringNormalizingReader;
  * units.
  *
  * @author <a href="mailto:stephane@hillion.org">Stephane Hillion</a>
- * @version $Id$
+ *
  */
 public class Scanner {
 

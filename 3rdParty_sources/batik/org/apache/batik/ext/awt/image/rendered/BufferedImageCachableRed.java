@@ -32,7 +32,7 @@ import org.apache.batik.ext.awt.image.GraphicsUtil;
  * It essentially ignores the dependency and dirty region methods.
  *
  * @author <a href="mailto:Thomas.DeWeeese@Kodak.com">Thomas DeWeese</a>
- * @version $Id$ */
+ *
 public class BufferedImageCachableRed extends AbstractRed {
     // The bufferedImage that we wrap...
     BufferedImage bi;

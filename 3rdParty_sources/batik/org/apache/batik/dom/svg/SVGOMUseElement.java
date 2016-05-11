@@ -33,7 +33,7 @@ import org.w3c.dom.svg.SVGUseElement;
  * This class implements {@link org.w3c.dom.svg.SVGUseElement}.
  *
  * @author <a href="mailto:stephane@hillion.org">Stephane Hillion</a>
- * @version $Id$
+ *
  */
 public class SVGOMUseElement
     extends    SVGURIReferenceGraphicsElement

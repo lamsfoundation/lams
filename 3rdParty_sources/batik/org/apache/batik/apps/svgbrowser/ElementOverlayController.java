@@ -21,7 +21,7 @@ package org.apache.batik.apps.svgbrowser;
 /**
  * Provides the information to control the ElementOverlay.
  *
- * @version $Id$
+ *
  */
 public interface ElementOverlayController {
 

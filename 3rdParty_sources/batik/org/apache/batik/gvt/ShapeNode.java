@@ -29,7 +29,7 @@ import org.apache.batik.util.HaltingThread;
  * A graphics node that represents a shape.
  *
  * @author <a href="mailto:Thierry.Kormann@sophia.inria.fr">Thierry Kormann</a>
- * @version $Id$
+ *
  */
 public class ShapeNode extends AbstractGraphicsNode {
 

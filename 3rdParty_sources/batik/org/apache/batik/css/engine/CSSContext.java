@@ -27,7 +27,7 @@ import org.w3c.dom.Element;
  * informations.
  *
  * @author <a href="mailto:stephane@hillion.org">Stephane Hillion</a>
- * @version $Id$
+ *
  */
 public interface CSSContext {
 

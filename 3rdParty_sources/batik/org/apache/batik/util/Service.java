@@ -40,7 +40,7 @@ import java.util.List;
  * be missing in the JDK.
  *
  * @author <a href="mailto:Thomas.DeWeeese@Kodak.com">Thomas DeWeese</a>
- * @version $Id$
+ *
  */
 public class Service {
 

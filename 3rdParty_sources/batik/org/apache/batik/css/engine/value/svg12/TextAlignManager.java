@@ -31,7 +31,7 @@ import org.apache.batik.util.SVGTypes;
  * This class provides a manager for the 'text-align' property values.
  *
  * @author <a href="mailto:deweese@apache.org">Thomas DeWeese</a>
- * @version $Id$
+ *
  */
 public class TextAlignManager extends IdentifierManager {
 

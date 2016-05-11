@@ -37,7 +37,7 @@ import org.w3c.dom.events.MutationEvent;
  * Bridge class for foreign namespace elements that can be bound with sXBL.
  *
  * @author <a href="mailto:cam%40mcc%2eid%2eau">Cameron McCormack</a>
- * @version $Id$
+ *
  */
 public class BindableElementBridge
         extends AbstractGraphicsNodeBridge

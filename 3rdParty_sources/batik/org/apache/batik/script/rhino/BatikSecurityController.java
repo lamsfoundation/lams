@@ -36,7 +36,7 @@ import org.mozilla.javascript.WrappedException;
  * no more.
  *
  * @author <a href="mailto:cjolif@ilog.fr">Christophe Jolif</a>
- * @version $Id$
+ *
  */
 public class BatikSecurityController extends SecurityController {
 

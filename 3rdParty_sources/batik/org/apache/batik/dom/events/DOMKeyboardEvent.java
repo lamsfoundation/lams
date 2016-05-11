@@ -27,7 +27,7 @@ import org.w3c.dom.views.AbstractView;
  * DOM 3 Keyboard event class.
  *
  * @author <a href="mailto:cam%40mcc%2eid%2eau">Cameron McCormack</a>
- * @version $Id$
+ *
  */
 public class DOMKeyboardEvent extends DOMUIEvent implements KeyboardEvent {
 

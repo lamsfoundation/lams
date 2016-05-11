@@ -35,7 +35,7 @@ import org.w3c.dom.svg.SVGFEConvolveMatrixElement;
  * This class implements {@link SVGFEConvolveMatrixElement}.
  *
  * @author <a href="mailto:stephane@hillion.org">Stephane Hillion</a>
- * @version $Id$
+ *
  */
 public class SVGOMFEConvolveMatrixElement
     extends    SVGOMFilterPrimitiveStandardAttributes

@@ -27,7 +27,7 @@ import java.lang.ref.SoftReference;
  * <br>This HashMap is not Thread-safe.
  *
  * @author <a href="mailto:stephane@hillion.org">Stephane Hillion</a>
- * @version $Id$
+ *
  */
 public class SoftDoublyIndexedTable {
 

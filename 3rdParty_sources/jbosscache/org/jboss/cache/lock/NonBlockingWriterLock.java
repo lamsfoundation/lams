@@ -34,7 +34,7 @@ package org.jboss.cache.lock;
  * granted.
  *
  * @author Ben Wang
- * @version $Id$
+ *
  */
 public class NonBlockingWriterLock extends ReadWriteLockWithUpgrade
 {

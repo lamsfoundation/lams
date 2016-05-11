@@ -32,7 +32,7 @@ import org.w3c.dom.Node;
  * The wrapper for the history browser. The commands for the historyBrowser
  * are implemented here
  *
- * @version $Id$
+ *
  */
 public class HistoryBrowserInterface {
 

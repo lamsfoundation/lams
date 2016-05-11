@@ -24,7 +24,7 @@ import org.w3c.dom.css.CSSPrimitiveValue;
  * This class represents uri values.
  *
  * @author <a href="mailto:stephane@hillion.org">Stephane Hillion</a>
- * @version $Id$
+ *
  */
 public class URIValue extends StringValue {
 

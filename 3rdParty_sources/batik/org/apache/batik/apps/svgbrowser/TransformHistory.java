@@ -26,7 +26,7 @@ import java.util.List;
  * This class implements a transform history mechanism.
  *
  * @author <a href="mailto:stephane@hillion.org">Stephane Hillion</a>
- * @version $Id$
+ *
  */
 public class TransformHistory {
     

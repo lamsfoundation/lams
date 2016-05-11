@@ -4,7 +4,7 @@ package org.jgroups.util;
  * Buffer with an offset and length. Will be replaced with NIO equivalent once JDK 1.4 becomes baseline. This class is
  * immutable
  * @author Bela Ban
- * @version $Id$
+ *
  */
 public class Buffer {
     private final byte[] buf;

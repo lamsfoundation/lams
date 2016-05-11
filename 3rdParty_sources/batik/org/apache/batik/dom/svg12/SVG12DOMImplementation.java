@@ -53,7 +53,7 @@ import org.w3c.dom.events.Event;
  * It provides support the SVG 1.2 documents.
  *
  * @author <a href="mailto:stephane@hillion.org">Stephane Hillion</a>
- * @version $Id$
+ *
  */
 public class SVG12DOMImplementation
     extends    SVGDOMImplementation {

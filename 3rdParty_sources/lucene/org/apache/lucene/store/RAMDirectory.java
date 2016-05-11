@@ -30,7 +30,7 @@ import java.util.Set;
  * implementation is by default the {@link SingleInstanceLockFactory}
  * but can be changed with {@link #setLockFactory}.
  *
- * @version $Id$
+ *
  */
 public class RAMDirectory extends Directory implements Serializable {
 

@@ -51,7 +51,7 @@ import org.apache.commons.io.IOUtils;
  * @author <a href="mailto:dlr@finemaltcoding.com">Daniel Rall</a>
  * @author Stephen Colebourne
  * @author Andy Lehane
- * @version $Id$
+ *
  */
 public class LockableFileWriter extends Writer {
     // Cannot extend ProxyWriter, as requires writer to be

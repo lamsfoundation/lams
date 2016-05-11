@@ -2,7 +2,7 @@ package org.jgroups.jmx.protocols;
 
 /**
  * @author Bela Ban
- * @version $Id$
+ *
  */
 public interface TCPMBean extends TPMBean {
     int getOpenConnections();

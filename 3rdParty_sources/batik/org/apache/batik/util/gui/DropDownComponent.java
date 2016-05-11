@@ -53,7 +53,7 @@ import org.apache.batik.util.resources.ResourceManager;
  * The drop down menu component. Supports drop down popup menu and the main
  * button.
  *
- * @version $Id$
+ *
  */
 public class DropDownComponent extends JPanel {
 

@@ -25,7 +25,7 @@ import org.w3c.css.sac.LangCondition;
  * {@link org.w3c.css.sac.LangCondition} interface.
  *
  * @author <a href="mailto:stephane@hillion.org">Stephane Hillion</a>
- * @version $Id$
+ *
  */
 public class DefaultLangCondition implements LangCondition {
 

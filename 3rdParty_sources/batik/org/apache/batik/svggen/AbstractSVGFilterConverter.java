@@ -32,7 +32,7 @@ import java.util.Map;
  * values.
  *
  * @author <a href="mailto:vincent.hardy@eng.sun.com">Vincent Hardy</a>
- * @version $Id$
+ *
  */
 public abstract class AbstractSVGFilterConverter
     implements SVGFilterConverter, ErrorConstants {

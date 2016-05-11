@@ -28,7 +28,7 @@ import java.math.BigInteger;
  * @author Eric Pugh
  * @author Phil Steitz
  * @since 1.0
- * @version $Id$
+ *
  * 
  * @deprecated Moved to org.apache.commons.lang.math.
  *             Class will be removed in Commons Lang 3.0.

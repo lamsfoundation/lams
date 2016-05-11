@@ -24,7 +24,7 @@ import org.w3c.dom.events.Event;
  * Abstract class from which all event-like timing specifier classes derive.
  *
  * @author <a href="mailto:cam%40mcc%2eid%2eau">Cameron McCormack</a>
- * @version $Id$
+ *
  */
 public abstract class EventLikeTimingSpecifier extends OffsetTimingSpecifier {
 

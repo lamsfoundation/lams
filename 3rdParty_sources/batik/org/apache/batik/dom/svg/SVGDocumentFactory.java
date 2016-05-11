@@ -29,7 +29,7 @@ import org.w3c.dom.svg.SVGDocument;
  * This interface represents an object which can build a SVGDocument.
  *
  * @author <a href="mailto:stephane@hillion.org">Stephane Hillion</a>
- * @version $Id$
+ *
  */
 public interface SVGDocumentFactory extends DocumentFactory {
 

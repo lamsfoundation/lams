@@ -28,7 +28,7 @@ import org.apache.batik.anim.values.AnimatableValue;
  * implements an {@link AnimatedAttributeListener} list.
  *
  * @author <a href="mailto:cam%40mcc%2eid%2eau">Cameron McCormack</a>
- * @version $Id$
+ *
  */
 public abstract class AbstractSVGAnimatedValue
     implements AnimatedLiveAttributeValue {

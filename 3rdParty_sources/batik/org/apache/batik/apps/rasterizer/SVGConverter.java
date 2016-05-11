@@ -92,7 +92,7 @@ import org.apache.batik.util.ParsedURL;
  *     to use when processing the SVG documents.</li>
  * </ul>
  *
- * @version $Id$
+ *
  * @author <a href="mailto:Henri.Ruini@nokia.com">Henri Ruini</a>
  * @author <a href="mailto:vhardy@apache.org">Vincent Hardy</a>
  */

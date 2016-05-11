@@ -23,7 +23,7 @@ package org.apache.batik.css.engine;
  * Keys are Strings and values are ints.
  *
  * @author <a href="mailto:stephane@hillion.org">Stephane Hillion</a>
- * @version $Id$
+ *
  */
 public class StringIntMap {
 

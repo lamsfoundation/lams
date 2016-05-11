@@ -31,7 +31,7 @@ package org.apache.batik.gvt.event;
  * methods for events you care about.)
  *
  * @author <a href="mailto:deweese@apache.org">Thomas DeWeese</a>
- * @version $Id$
+ *
  */
 public abstract class GraphicsNodeChangeAdapter
         implements GraphicsNodeChangeListener {

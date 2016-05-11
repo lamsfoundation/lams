@@ -24,7 +24,7 @@ import org.w3c.css.sac.LexicalUnit;
  * This class implements the {@link LexicalUnit} interface.
  *
  * @author <a href="mailto:stephane@hillion.org">Stephane Hillion</a>
- * @version $Id$
+ *
  */
 public abstract class CSSLexicalUnit implements LexicalUnit {
 

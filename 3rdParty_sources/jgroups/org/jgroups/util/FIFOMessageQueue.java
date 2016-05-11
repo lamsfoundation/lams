@@ -14,7 +14,7 @@ import java.util.concurrent.atomic.AtomicInteger;
  * Only when A1 is done will A2 be processed, same for B2: it will get processed when B1 is done. Thus, messages
  * for different services are processed concurrently; messages from the same service are processed FIFO.
  * @author Bela Ban
- * @version $Id$
+ *
  */
 public class FIFOMessageQueue<K, V> {
     /** Used for consolidated takes */

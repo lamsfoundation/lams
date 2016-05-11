@@ -26,7 +26,7 @@ import java.util.Map;
  * name.
  *
  * @author <a href="mailto:vincent.hardy@eng.sun.com">Vincent Hardy</a>
- * @version $Id$
+ *
  */
 public class SVGAttributeMap{
     /**

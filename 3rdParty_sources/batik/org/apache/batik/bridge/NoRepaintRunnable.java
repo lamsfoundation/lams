@@ -23,7 +23,7 @@ package org.apache.batik.bridge;
  * execution of this runnable.
  *
  * @author <a href="mailto:stephane@hillion.org">Stephane Hillion</a>
- * @version $Id$
+ *
  */
 public interface NoRepaintRunnable extends Runnable {
 }

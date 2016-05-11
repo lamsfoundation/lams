@@ -27,7 +27,7 @@ import org.apache.batik.ext.awt.image.PadMode;
  * Convolves an image with a convolution matrix.
  *
  * @author <a href="mailto:Thomas.DeWeeese@Kodak.com">Thomas DeWeese</a>
- * @version $Id$
+ *
  */
 public interface ConvolveMatrixRable extends FilterColorInterpolation {
 

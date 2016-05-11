@@ -56,7 +56,7 @@ import java.util.Set;
  * </pre>
  *
  * @author Bela Ban
- * @version $Id$
+ *
  */
 public class TcpDelegatingCacheLoader extends AbstractCacheLoader
 {

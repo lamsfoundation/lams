@@ -82,7 +82,7 @@ import org.w3c.dom.events.EventListener;
  * Bridge class for the &lt;flowRoot> element.
  *
  * @author <a href="mailto:deweese@apache.org">Thomas DeWeese</a>
- * @version $Id$
+ *
  */
 public class SVGFlowRootElementBridge extends SVG12TextElementBridge {
 

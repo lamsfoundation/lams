@@ -29,7 +29,7 @@ import org.w3c.dom.Node;
  * wrapping an Java List instace.
  *
  * @author <a href="mailto:deweese@apache.org">deweese</a>
- * @version $Id$
+ *
  */
 public class ListNodeList implements NodeList {
     protected List list;

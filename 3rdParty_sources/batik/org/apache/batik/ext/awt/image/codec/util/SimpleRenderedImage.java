@@ -42,7 +42,7 @@ import java.util.HashMap;
  * purpose, but in the interest of modularity the
  * use of <code>PlanarImage</code> has been avoided.
  *
- * @version $Id$
+ *
  */
 public abstract class SimpleRenderedImage implements RenderedImage {
 

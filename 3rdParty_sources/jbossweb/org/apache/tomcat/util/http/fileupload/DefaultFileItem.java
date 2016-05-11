@@ -51,7 +51,7 @@ import java.io.UnsupportedEncodingException;
  * @author <a href="mailto:martinc@apache.org">Martin Cooper</a>
  * @author Sean C. Sullivan
  *
- * @version $Id$
+ *
  */
 public class DefaultFileItem
     implements FileItem

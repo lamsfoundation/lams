@@ -28,7 +28,7 @@ import org.xml.sax.XMLReader;
  * This class represents a generic input of a <tt>Transcoder</tt>.
  *
  * @author <a href="mailto:Thierry.Kormann@sophia.inria.fr">Thierry Kormann</a>
- * @version $Id$
+ *
  */
 public class TranscoderInput {
 

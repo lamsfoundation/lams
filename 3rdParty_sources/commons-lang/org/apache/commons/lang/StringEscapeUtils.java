@@ -40,7 +40,7 @@ import org.apache.commons.lang.text.StrBuilder;
  * @author Phil Steitz
  * @author Pete Gieser
  * @since 2.0
- * @version $Id$
+ *
  */
 public class StringEscapeUtils {
 
