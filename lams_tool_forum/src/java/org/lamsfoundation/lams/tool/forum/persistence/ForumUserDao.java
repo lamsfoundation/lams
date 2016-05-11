@@ -21,8 +21,6 @@
  * ****************************************************************
  */
 
-/* $$Id$$ */
-
 package org.lamsfoundation.lams.tool.forum.persistence;
 
 import java.util.List;

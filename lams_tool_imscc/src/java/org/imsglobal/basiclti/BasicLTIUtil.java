@@ -1,6 +1,6 @@
 /*
  * $URL$
- * $Id$
+ *
  *
  * Copyright (c) 2008 IMS GLobal Learning Consortium
  *

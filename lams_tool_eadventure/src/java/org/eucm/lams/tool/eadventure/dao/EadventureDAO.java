@@ -20,7 +20,7 @@
  * http://www.gnu.org/licenses/gpl.txt
  * ****************************************************************
  */
-/* $$Id$$ */
+
 package org.eucm.lams.tool.eadventure.dao;
 
 import org.eucm.lams.tool.eadventure.model.Eadventure;

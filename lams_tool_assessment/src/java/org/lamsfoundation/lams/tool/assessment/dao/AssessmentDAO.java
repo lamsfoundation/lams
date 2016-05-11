@@ -20,7 +20,7 @@
  * http://www.gnu.org/licenses/gpl.txt
  * ****************************************************************
  */
-/* $$Id$$ */
+
 package org.lamsfoundation.lams.tool.assessment.dao;
 
 import org.lamsfoundation.lams.tool.assessment.model.Assessment;

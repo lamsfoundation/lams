@@ -20,7 +20,7 @@
  * ****************************************************************
  */
 
-/* $Id$ */
+
 package org.eucm.lams.tool.eadventure.web.action;
 
 import java.util.ArrayList;

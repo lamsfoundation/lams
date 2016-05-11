@@ -20,7 +20,7 @@
  * ****************************************************************
  */
 
-/* $Id$ */
+
 package org.lamsfoundation.lams.tool.imageGallery.dto;
 
 import org.lamsfoundation.lams.tool.imageGallery.model.ImageGalleryItem;

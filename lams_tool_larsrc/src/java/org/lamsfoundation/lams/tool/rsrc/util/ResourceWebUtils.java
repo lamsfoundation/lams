@@ -21,7 +21,7 @@
  * ****************************************************************
  */
 
-/* $$Id$$ */
+
 package org.lamsfoundation.lams.tool.rsrc.util;
 
 import org.lamsfoundation.lams.tool.rsrc.ResourceConstants;

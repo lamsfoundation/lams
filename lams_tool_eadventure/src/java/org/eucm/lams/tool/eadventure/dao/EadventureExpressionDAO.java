@@ -20,7 +20,7 @@
  * ****************************************************************
  */
 
-/* $Id$ */
+
 package org.eucm.lams.tool.eadventure.dao;
 
 public interface EadventureExpressionDAO extends DAO {

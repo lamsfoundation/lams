@@ -1,4 +1,4 @@
--- CVS ID: $Id$
+
  
 SET FOREIGN_KEY_CHECKS=0;
 

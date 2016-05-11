@@ -20,7 +20,7 @@
  * ****************************************************************
  */
 
-/* $Id$ */
+
 package org.lamsfoundation.lams.tool.chat.web.forms;
 
 import org.lamsfoundation.lams.tool.chat.model.Chat;

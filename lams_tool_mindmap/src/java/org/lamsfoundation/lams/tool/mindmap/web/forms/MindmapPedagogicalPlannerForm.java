@@ -20,7 +20,7 @@
  * ****************************************************************
  */
 
-/* $Id$ */
+
 package org.lamsfoundation.lams.tool.mindmap.web.forms;
 
 import org.lamsfoundation.lams.tool.mindmap.model.Mindmap;

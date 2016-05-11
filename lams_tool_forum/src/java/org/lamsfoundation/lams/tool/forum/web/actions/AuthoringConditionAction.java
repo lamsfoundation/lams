@@ -20,7 +20,7 @@
  * ****************************************************************
  */
 
-/* $$Id$$ */
+
 package org.lamsfoundation.lams.tool.forum.web.actions;
 
 import java.util.ArrayList;
