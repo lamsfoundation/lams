@@ -20,7 +20,7 @@
  * **************************************************************** 
  */  
  
-/* $Id$ */  
+  
 package org.lamsfoundation.ld.integration.blackboard;
 
 import java.io.IOException;
