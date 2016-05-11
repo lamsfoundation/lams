@@ -21,7 +21,7 @@
  * ****************************************************************
  */
 
-/* $Id$ */
+
 package org.lamsfoundation.lams.tool.qa.web;
 
 import javax.servlet.http.HttpSession;

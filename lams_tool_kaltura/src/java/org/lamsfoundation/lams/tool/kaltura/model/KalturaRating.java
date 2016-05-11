@@ -20,7 +20,7 @@
  * ****************************************************************
  */
 
-/* $Id$ */
+
 package org.lamsfoundation.lams.tool.kaltura.model;
 
 import org.apache.commons.lang.builder.EqualsBuilder;

@@ -20,7 +20,7 @@
  * ****************************************************************
  */
 
-/* $Id$ */
+
 package org.lamsfoundation.lams.tool.sbmt.web;
 
 import java.util.ArrayList;

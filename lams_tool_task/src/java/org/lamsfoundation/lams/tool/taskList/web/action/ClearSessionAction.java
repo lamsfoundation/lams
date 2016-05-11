@@ -21,7 +21,7 @@
  * ****************************************************************
  */
 
-/* $Id$ */
+
 package org.lamsfoundation.lams.tool.taskList.web.action;
 
 import javax.servlet.http.HttpSession;

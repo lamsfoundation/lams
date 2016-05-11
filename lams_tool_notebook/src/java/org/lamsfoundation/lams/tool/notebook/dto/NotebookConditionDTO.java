@@ -20,7 +20,7 @@
  * ****************************************************************
  */
 
-/* $Id$ */
+
 package org.lamsfoundation.lams.tool.notebook.dto;
 
 import org.lamsfoundation.lams.learningdesign.TextSearchCondition;

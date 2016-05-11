@@ -19,7 +19,7 @@
  *
  * http://www.gnu.org/licenses/gpl.txt
  * ***********************************************************************/
-/* $$Id$$ */
+
 package org.lamsfoundation.lams.tool.mc.util;
 
 import org.lamsfoundation.lams.contentrepository.client.ToolContentHandler;

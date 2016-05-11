@@ -20,7 +20,7 @@
 -- http://www.gnu.org/licenses/gpl.txt
 -- ****************************************************************
 --
--- $Id$
+
 
 INSERT INTO lams_learning_activity
 (

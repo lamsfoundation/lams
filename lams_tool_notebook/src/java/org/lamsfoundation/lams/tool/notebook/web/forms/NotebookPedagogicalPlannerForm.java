@@ -20,7 +20,7 @@
  * ****************************************************************
  */
 
-/* $Id$ */
+
 package org.lamsfoundation.lams.tool.notebook.web.forms;
 
 import org.lamsfoundation.lams.tool.notebook.model.Notebook;

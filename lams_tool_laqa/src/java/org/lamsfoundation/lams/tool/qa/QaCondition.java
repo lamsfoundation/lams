@@ -20,7 +20,7 @@
  * ****************************************************************
  */
 
-/* $$Id$$ */
+
 package org.lamsfoundation.lams.tool.qa;
 
 import java.util.Set;

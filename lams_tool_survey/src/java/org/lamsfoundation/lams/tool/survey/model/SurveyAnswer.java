@@ -21,7 +21,7 @@
  * ****************************************************************
  */
 
-/* $Id$ */
+
 package org.lamsfoundation.lams.tool.survey.model;
 
 import java.util.Date;

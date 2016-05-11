@@ -20,7 +20,7 @@
  * http://www.gnu.org/licenses/gpl.txt
  * ****************************************************************
  */
-/* $$Id$$ */
+
 package org.lamsfoundation.lams.tool.spreadsheet.dao.hibernate;
 
 import org.lamsfoundation.lams.dao.hibernate.LAMSBaseDAO;

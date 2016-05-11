@@ -19,7 +19,7 @@
  *
  * http://www.gnu.org/licenses/gpl.txt
  * ***********************************************************************/
-/* $$Id$$ */
+
 package org.lamsfoundation.lams.tool.vote.dto;
 
 import org.apache.commons.lang.builder.ToStringBuilder;

@@ -21,7 +21,7 @@
  * ****************************************************************
  */
 
-/* $Id$ */
+
 package org.lamsfoundation.lams.tool.mindmap.web.actions;
 
 import javax.servlet.http.HttpSession;

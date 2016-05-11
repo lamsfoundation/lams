@@ -20,7 +20,7 @@
  * ****************************************************************
  */
 
-/* $Id$ */
+
 package org.lamsfoundation.lams.tool.scratchie.dto;
 
 import org.lamsfoundation.lams.tool.scratchie.model.ScratchieBurningQuestion;

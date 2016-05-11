@@ -20,7 +20,7 @@
  * ****************************************************************
  */
 
-/* $Id$ */
+
 package org.lamsfoundation.lams.tool.kaltura.web.forms;
 
 import org.lamsfoundation.lams.tool.kaltura.model.Kaltura;
