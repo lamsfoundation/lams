@@ -20,7 +20,7 @@
  * ****************************************************************
  */
 
-/* $Id$ */
+
 package org.lamsfoundation.lams.tool.survey.service;
 
 import org.lamsfoundation.lams.learningdesign.service.ToolContentVersionFilter;

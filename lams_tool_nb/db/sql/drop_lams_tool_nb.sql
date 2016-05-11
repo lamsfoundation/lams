@@ -1,4 +1,4 @@
--- $Id$
+
 
 DROP TABLE IF EXISTS tl_lanb11_attachment;
 DROP TABLE IF EXISTS tl_lanb11_user;

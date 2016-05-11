@@ -20,7 +20,7 @@
  * ****************************************************************
  */
 
-/* $Id$ */
+
 package org.lamsfoundation.lams.tool.noticeboard.dto;
 
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;

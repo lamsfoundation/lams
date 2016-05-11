@@ -21,7 +21,7 @@
  * ****************************************************************
  */
 
-/* $$Id$$ */
+
 package org.lamsfoundation.lams.tool.survey.util;
 
 import org.lamsfoundation.lams.tool.survey.model.Survey;

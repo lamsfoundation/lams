@@ -20,7 +20,7 @@
  * ****************************************************************
  */
 
-/* $Id$ */
+
 package org.lamsfoundation.lams.tool.wiki.web.forms;
 
 import org.apache.commons.lang.StringUtils;

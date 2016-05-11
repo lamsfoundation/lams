@@ -21,7 +21,7 @@
  * ****************************************************************
  */
 
-/* $$Id$$ */
+
 package org.lamsfoundation.lams.tool.spreadsheet.util;
 
 import org.lamsfoundation.lams.tool.spreadsheet.SpreadsheetConstants;

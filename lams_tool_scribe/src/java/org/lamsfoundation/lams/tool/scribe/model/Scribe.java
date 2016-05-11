@@ -20,7 +20,7 @@
  * http://www.gnu.org/licenses/gpl.txt
  * ****************************************************************
  */
-/* $$Idx$ */
+
 
 package org.lamsfoundation.lams.tool.scribe.model;
 

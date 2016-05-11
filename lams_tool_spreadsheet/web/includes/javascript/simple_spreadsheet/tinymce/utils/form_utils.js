@@ -1,10 +1,10 @@
 /**
- * $Id$
+ *
  *
  * Various form utilitiy functions.
  *
  * @author Moxiecode
- * @copyright Copyright © 2004-2006, Moxiecode Systems AB, All rights reserved.
+ * @copyright Copyright ï¿½ 2004-2006, Moxiecode Systems AB, All rights reserved.
  */
 
 var themeBaseURL = tinyMCE.baseURL + '/themes/' + tinyMCE.getParam("theme");

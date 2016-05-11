@@ -21,7 +21,7 @@
  * ****************************************************************
  */
 
-/* $$Id$$ */
+
 package org.lamsfoundation.lams.tool.qa.util;
 
 import org.lamsfoundation.lams.contentrepository.client.ToolContentHandler;

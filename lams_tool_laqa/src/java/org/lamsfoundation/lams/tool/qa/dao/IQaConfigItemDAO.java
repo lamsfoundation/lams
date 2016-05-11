@@ -20,7 +20,7 @@
  * ****************************************************************
  */
 
-/* $Id$ */
+
 package org.lamsfoundation.lams.tool.qa.dao;
 
 import org.lamsfoundation.lams.dao.IBaseDAO;
