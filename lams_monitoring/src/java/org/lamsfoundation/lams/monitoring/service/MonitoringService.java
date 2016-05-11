@@ -1006,7 +1006,7 @@ public class MonitoringService implements IMonitoringService, ApplicationContext
     }
 
     @Override
-    public Boolean setPresenceAvailable(long lessonId, Integer userId, Boolean presenceAvailable) {
+    public Boolean togglePresenceAvailable(long lessonId, Integer userId, Boolean presenceAvailable) {
 	securityService.isLessonMonitor(lessonId, userId, "set presence available", true);
 	Lesson requestedLesson = lessonDAO.getLesson(new Long(lessonId));
 	requestedLesson.setLearnerPresenceAvailable(presenceAvailable != null ? presenceAvailable : Boolean.FALSE);
@@ -1015,7 +1015,7 @@ public class MonitoringService implements IMonitoringService, ApplicationContext
     }
 
     @Override
-    public Boolean setPresenceImAvailable(long lessonId, Integer userId, Boolean presenceImAvailable) {
+    public Boolean togglePresenceImAvailable(long lessonId, Integer userId, Boolean presenceImAvailable) {
 	securityService.isLessonMonitor(lessonId, userId, "set presence instant messaging available", true);
 	Lesson requestedLesson = lessonDAO.getLesson(new Long(lessonId));
 	requestedLesson.setLearnerImAvailable(presenceImAvailable != null ? presenceImAvailable : Boolean.FALSE);
@@ -1024,7 +1024,7 @@ public class MonitoringService implements IMonitoringService, ApplicationContext
     }
 
     @Override
-    public Boolean setLiveEditEnabled(long lessonId, Integer userId, Boolean liveEditEnabled) {
+    public Boolean toggleLiveEditEnabled(long lessonId, Integer userId, Boolean liveEditEnabled) {
 	securityService.isLessonMonitor(lessonId, userId, "set live edit available", true);
 	Lesson requestedLesson = lessonDAO.getLesson(new Long(lessonId));
 	requestedLesson.setLiveEditEnabled(liveEditEnabled != null ? liveEditEnabled : Boolean.FALSE);
