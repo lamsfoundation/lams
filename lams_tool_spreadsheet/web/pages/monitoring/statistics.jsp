@@ -1,5 +1,5 @@
 <%@ include file="/common/taglibs.jsp"%>
-<img src="${tool}/images/indicator.gif" style="display:none" id="statisticArea_Busy" />
+<i class="fa-spinner" style="display:none" id="statisticArea_Busy"></i>
 <div id="statisticArea">
 	<%@ include file="parts/statisticspart.jsp"%>
 </div>

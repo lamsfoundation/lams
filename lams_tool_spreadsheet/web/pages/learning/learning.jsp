@@ -77,46 +77,42 @@
 		<br>
 		
 		<c:if test="${spreadsheet.markingEnabled}">
- 			<div class="shading-bg">		
-				<table width="30%">
-					<tr>
-						<!--First row displaying the comments -->
-						<td class="field-name">
-							<fmt:message key="label.learning.comments" />
-						</td>
-						<td>
-							<c:choose>
-								<c:when test="${mark == null}">
-									<fmt:message key="label.learning.not.available" />
-								</c:when>
-								<c:otherwise>
-									<c:out value="${mark.comments}" escapeXml="false" />
-								</c:otherwise>
-							</c:choose>
-						</td>
-					</tr>
-		
-					<tr>
-						<!--Second row displaying the marks-->
-						<td class="field-name">
-							<fmt:message key="label.learning.marks" />
-						</td>
-						<td>
-							<c:choose>
-								<c:when test="${mark == null}">
-									<fmt:message key="label.learning.not.available" />
-								</c:when>
-								<c:otherwise>
-									<fmt:formatNumber type="number" maxFractionDigits="<%= SpreadsheetConstants.MARK_NUM_DEC_PLACES %>" value="${mark.marks}"/>
-								</c:otherwise>
-							</c:choose>
-						</td>
-					</tr>
-				</table>		
+		<div class="row no-gutter">
+			<div class="col-xs-12">
+			<div class="panel panel-default">
+				<div class="panel-body">
+				<div class="row no-gutter">
+					<div class="col-sm-2"><fmt:message key="label.learning.comments" /></div>
+					<div class="col-sm-10">
+						<c:choose>
+							<c:when test="${mark == null}">
+								<fmt:message key="label.learning.not.available" />
+							</c:when>
+							<c:otherwise>
+								<c:out value="${mark.comments}" escapeXml="false" />
+							</c:otherwise>
+						</c:choose>
+					</div>
+				</div>
+				<div class="row no-gutter">
+				<div class="col-sm-2"><fmt:message key="label.learning.marks" /></div>
+					<div class="col-sm-10">
+						<c:choose>
+							<c:when test="${mark == null}">
+								<fmt:message key="label.learning.not.available" />
+							</c:when>
+							<c:otherwise>
+								<fmt:formatNumber type="number" maxFractionDigits="<%= SpreadsheetConstants.MARK_NUM_DEC_PLACES %>" value="${mark.marks}"/>
+							</c:otherwise>
+						</c:choose>
+					</div>
+				</div>
+				</div>
 			</div>
-			<div class="last-item"></div>
-			<br>
+			</div>
+		</div>
 		</c:if>		
+
 		
 		<div class="row no-gutter">
 			<div class="col-xs-12">

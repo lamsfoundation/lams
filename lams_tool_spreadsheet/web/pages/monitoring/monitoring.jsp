@@ -36,26 +36,23 @@
 			    var reqIDVar = new Date();
 				var param = "toolContentID=" + ${param.toolContentID};
 				messageLoading();
-			    var myAjax = new Ajax.Updater(
-				    	statisticTargetDiv,
-				    	url,
-				    	{
-				    		method:'get',
-				    		parameters:param,
-				    		onComplete:messageComplete,
-				    		evalScripts:true
-				    	}
-			    );
+				$("#"+statisticTargetDiv).load(
+						url,
+						param,
+						function(data) {
+							messageComplete();
+						}
+				);
 			}
-		
+							
 			function showBusy(targetDiv){
 				if($(targetDiv+"_Busy") != null){
-					Element.show(targetDiv+"_Busy");
+					$(targetDiv+"_Busy").show();
 				}
 			}
 			function hideBusy(targetDiv){
 				if($(targetDiv+"_Busy") != null){
-					Element.hide(targetDiv+"_Busy");
+					$(targetDiv+"_Busy").hide();
 				}				
 			}
 			function messageLoading(){
@@ -68,26 +65,29 @@
 	    </script>		 
 	</lams:head>
 	<body class="stripes" onLoad="init()">
-	<div id="page">
-		<h1>
-			<fmt:message key="label.authoring.heading" />
-		</h1>
-	<div id="header">
-		<lams:Tabs useKey="true" control="true">
+
+	<c:set var="title"><fmt:message key="activity.title"/> ${lang}</c:set>
+	<lams:Page title="${title}" type="navbar">
+
+	 	<lams:Tabs control="true" title="${title}" helpToolSignature="<%= SpreadsheetConstants.TOOL_SIGNATURE %>" helpModule="monitoring">
 			<lams:Tab id="1" key="monitoring.tab.summary" />
 			<lams:Tab id="2" key="monitoring.tab.edit.activity" />			
 			<lams:Tab id="3" key="monitoring.tab.statistics" />
-		</lams:Tabs>
-	</div>
-	<div id="content">
-			<lams:help toolSignature="<%= SpreadsheetConstants.TOOL_SIGNATURE %>" module="monitoring"/>
-	
+	    </lams:Tabs>   
+
+		<lams:TabBodyArea>
+
+			<!--  Set up tabs  -->
+			<lams:TabBodys>
 			<lams:TabBody id="1" titleKey="monitoring.tab.summary" page="summary.jsp" />
 			<lams:TabBody id="2" titleKey="monitoring.tab.edit.activity" page="editactivity.jsp" />			
 			<lams:TabBody id="3" titleKey="monitoring.tab.statistics" page="statistics.jsp" />
-	</div>
+			</lams:TabBodys>
+			
+		</lams:TabBodyArea>
+
 	<div id="footer"></div>
-	
-	</div>
+	</lams:Page>
+
 	</body>
 </lams:html>

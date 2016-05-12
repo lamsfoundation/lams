@@ -251,5 +251,17 @@ public class SpreadsheetUser implements Cloneable, Serializable {
     public void setAccessDate(Date accessDate) {
 	this.accessDate = accessDate;
     }
+    
+    /** Username displayed in monitoring */
+    public String getFullUsername() {
+	StringBuilder buf = new StringBuilder();
+	buf.append(getLastName())
+	   .append(" ")
+	   .append(getFirstName())
+	   .append(" (")
+	   .append(getLoginName())
+	   .append(")");
+	return buf.toString();
+    }
 
 }

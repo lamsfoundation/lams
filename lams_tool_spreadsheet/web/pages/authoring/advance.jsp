@@ -3,57 +3,49 @@
 
 <!-- Advance Tab Content -->
 
-<p class="small-space-top">
-	<html:checkbox property="spreadsheet.lockWhenFinished"
-		styleClass="noBorder" styleId="lockWhenFinished">
-	</html:checkbox>
+<div class="checkbox">
+	<label for="lockWhenFinished"><html:checkbox property="spreadsheet.lockWhenFinished" styleId="lockWhenFinished" />
+	<fmt:message key="label.authoring.advance.lock.on.finished" /></label>
+</div>
 
-	<label for="lockWhenFinished">
-		<fmt:message key="label.authoring.advance.lock.on.finished" />
-	</label>
-</p>
-
-<p class="small-space-top">
+<div class="radio">
+	<label for="learnerNotAllowedToSave">
 	<input type="radio" name="spreadsheet.learnerAllowedToSave" value="${false}" styleId="learnerNotAllowedToSave"
 		<c:if test="${not formBean.spreadsheet.learnerAllowedToSave}">checked="checked"</c:if> 
 		onclick="document.spreadsheetForm.isMarkingEnabled.disabled = true;
 				 document.spreadsheetForm.isMarkingEnabled.checked = false;"
 	/>
-	<label for="learnerNotAllowedToSave">
 		<fmt:message key="label.authoring.advanced.play.only" />
 	</label>
-	<br><br>
+</div>
 
+<div class="radio">
+	<label for="learnerAllowedToSave">
 	<input type="radio" name="spreadsheet.learnerAllowedToSave" value="${true}" styleId="learnerAllowedToSave"
 		<c:if test="${formBean.spreadsheet.learnerAllowedToSave}">checked="checked"</c:if> 
 		onclick="document.spreadsheetForm.isMarkingEnabled.disabled = false;"
 	/>
-	<label for="learnerAllowedToSave">
 		<fmt:message key="label.authoring.advanced.learners.are.allowed.to.save" />
 	</label>
-	<br><br>
+</div>
 
-	&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-	<html:checkbox property="spreadsheet.markingEnabled" styleClass="noBorder" styleId="isMarkingEnabled"
+<div class="checkbox loffset10">
+	<label for="isMarkingEnabled">
+	<html:checkbox property="spreadsheet.markingEnabled" styleId="isMarkingEnabled"
 		disabled="${not formBean.spreadsheet.learnerAllowedToSave}" >
 	</html:checkbox>
-	<label for="isMarkingEnabled">
-		<fmt:message key="label.authoring.advanced.enable.spreadsheet.marking" />
+	<fmt:message key="label.authoring.advanced.enable.spreadsheet.marking" />
 	</label>
-</p>
+</div>
 
-<p>
-	<html:checkbox property="spreadsheet.reflectOnActivity"
-		styleClass="noBorder" styleId="reflectOn">
-	</html:checkbox>
-	<label for="reflectOn">
-		<fmt:message key="label.authoring.advanced.reflectOnActivity" />
-	</label>
-</p>
-
-<p>
-	<html:textarea property="spreadsheet.reflectInstructions" styleId="reflectInstructions" cols="30" rows="3" />
-</p>
+<div class="checkbox">
+	<label for="reflectOn"><html:checkbox property="spreadsheet.reflectOnActivity" styleId="reflectOn"/>
+	<fmt:message key="label.authoring.advanced.reflectOnActivity" /></label>
+	</div>
+	<div class="form-group">
+	<html:textarea property="spreadsheet.reflectInstructions" styleId="reflectInstructions"  styleClass="form-control" rows="3"
+		onkeyup="javascript:turnOnReflect()"/>
+</div>
 
 <script type="text/javascript">
 <!--

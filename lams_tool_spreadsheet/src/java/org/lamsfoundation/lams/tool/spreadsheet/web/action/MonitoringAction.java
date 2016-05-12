@@ -169,8 +169,7 @@ public class MonitoringAction extends Action {
 
 	    SpreadsheetUser user = (SpreadsheetUser) userAndReflection[0];
 	    responseRow.put(SpreadsheetConstants.ATTR_USER_UID, user.getUid());
-	    responseRow.put(SpreadsheetConstants.ATTR_USER_NAME,
-		    StringEscapeUtils.escapeHtml(user.getLastName() + " " + user.getFirstName()));
+	    responseRow.put(SpreadsheetConstants.ATTR_USER_NAME, StringEscapeUtils.escapeHtml(user.getFullUsername()));
 	    if (user.getUserModifiedSpreadsheet() != null) {
 		responseRow.put("userModifiedSpreadsheet", "true");
 		if (user.getUserModifiedSpreadsheet().getMark() != null) {
@@ -232,7 +231,9 @@ public class MonitoringAction extends Action {
 	List<SpreadsheetUser> userList = service.getUserListBySessionId(sessionId);
 	request.setAttribute(AttributeNames.PARAM_TOOL_SESSION_ID, sessionId);
 	request.setAttribute(SpreadsheetConstants.ATTR_USER_LIST, userList);
-
+	request.setAttribute(SpreadsheetConstants.ATTR_SESSION_MAP_ID, 
+		WebUtil.readStrParam(request, SpreadsheetConstants.ATTR_SESSION_MAP_ID));
+	
 	return mapping.findForward("viewAllMarks");
     }
 
@@ -380,14 +381,23 @@ public class MonitoringAction extends Action {
 	MarkForm markForm = (MarkForm) form;
 	markForm.setSessionMapID(sessionMapID);
 	markForm.setUserUid(user.getUid());
-	if (user.getUserModifiedSpreadsheet().getMark() != null) {
-	    SpreadsheetMark mark = user.getUserModifiedSpreadsheet().getMark();
-	    markForm.setMarks(NumberUtil.formatLocalisedNumber(mark.getMarks(), request.getLocale(),
-		    SpreadsheetConstants.MARK_NUM_DEC_PLACES));
-	    markForm.setComments(mark.getComments());
-	}
+	markForm.setUserName(user.getFullUsername());
 
-	return user == null ? null : mapping.findForward(SpreadsheetConstants.SUCCESS);
+	String code = null;
+	if (user.getUserModifiedSpreadsheet() != null) {
+	    markForm.setCode(user.getUserModifiedSpreadsheet().getUserModifiedSpreadsheet());
+
+	    if (user.getUserModifiedSpreadsheet().getMark() != null) {
+		SpreadsheetMark mark = user.getUserModifiedSpreadsheet().getMark();
+		markForm.setMarks(NumberUtil.formatLocalisedNumber(mark.getMarks(), request.getLocale(),
+			SpreadsheetConstants.MARK_NUM_DEC_PLACES));
+		markForm.setComments(mark.getComments());
+	    }
+
+	}
+	request.setAttribute(SpreadsheetConstants.ATTR_CODE, code);
+	
+	return mapping.findForward(SpreadsheetConstants.SUCCESS);
     }
 
     public ActionForward saveMark(ActionMapping mapping, ActionForm form, HttpServletRequest request,
