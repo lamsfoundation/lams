@@ -1,6 +1,6 @@
 <!DOCTYPE html>
-
 <%@ include file="/common/taglibs.jsp"%>
+
 <html:html locale="true">
 <lams:head>
 	<title><fmt:message key="label.author.title" /></title>
@@ -8,14 +8,9 @@
 	<%@ include file="/common/header.jsp"%>
 </lams:head>
 <body class="stripes">
-	<div id="content">
-	<div align="center">
-		<h1>
-			<fmt:message key="label.authoring.heading" />
-		</h1>
-
+	<c:set var="title"><fmt:message key="label.authoring.heading" /></c:set>
+	<lams:Page title="${title}" type="navbar">
 		<B><fmt:message key="message.monitoring.edit.activity.not.editable" /></B>
-	</div>
-	</div>
+	</lams:Page>
 </body>
 </html:html>
