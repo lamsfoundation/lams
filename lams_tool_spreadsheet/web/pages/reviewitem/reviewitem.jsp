@@ -1,7 +1,6 @@
 <!DOCTYPE html>
 
 <%@ include file="/common/taglibs.jsp"%>
-
 <lams:html>
 	<lams:head>
 		<title>
@@ -9,38 +8,35 @@
 		</title>	
 		<%@ include file="/common/header.jsp"%>
 	</lams:head>
+	
 	<body class="stripes">
 	
-		<div id="content">	
-			<h1><fmt:message key="label.reviewitem.spreadsheet.sent.by" /> ${userName}	</h1><br>
+		<c:set var="title"><fmt:message key="label.reviewitem.title" /></c:set>
+		<lams:Page type="learner" title="${title}">
 			
+			<p><fmt:message key="label.reviewitem.spreadsheet.sent.by" />&nbsp;<strong>${userName}</strong></p>
 			<c:choose>
 				<c:when test="${code == null}">
-					<br>
-					<div>
-						<b> <fmt:message key="label.reviewitem.user.hasnot.sent.spreadsheet" /> </b>
-					</div>
+					<lams:Alert type="info" id="no-spreadsheet" close="false">
+						<fmt:message key="label.reviewitem.user.hasnot.sent.spreadsheet" />
+					</lams:Alert>
 				</c:when>
 				<c:otherwise>
 				    <html:hidden property="spreadsheet.code" styleId="spreadsheet.code" value="${code}"/>	
 					<iframe
-						id="externalSpreadsheet" name="externalSpreadsheet" src="<html:rewrite page='/includes/javascript/simple_spreadsheet/spreadsheet_offline.html'/>?lang=<%=request.getLocale().getLanguage()%>"
-						style="width:635px;" frameborder="no" height="385px"
+						id="externalSpreadsheet" name="externalSpreadsheet" src="${spreadsheetURL}"
+						style="width:99%;" frameborder="no" height="385px"
 						scrolling="no">
-					</iframe>
-					<br><br><br>
-					<table cellpadding="0" style="width:655px;">
-						<tr>
-							<td align="right" >
-								<a href="javascript:window.close();" class="button"><fmt:message key="button.close"/></a>
-							</td>
-						</tr>
-					</table>
+					</iframe> 
+
+					<a href="javascript:window.close();" class="btn btn-default"><fmt:message key="button.close"/></a>
 					
 				</c:otherwise>
 			</c:choose>	
-		</div>
+
 		<div id="footer"></div>
 
+		</lams:Page>
+		
 	</body>
 </lams:html>

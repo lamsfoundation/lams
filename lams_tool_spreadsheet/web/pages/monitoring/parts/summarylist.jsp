@@ -4,24 +4,19 @@
 
 <div id="summaryList2">
 
-<link type="text/css" href="${lams}css/jquery.tablesorter.theme-blue.css" rel="stylesheet">
-<link type="text/css" href="${lams}css/jquery.tablesorter.pager.css" rel="stylesheet">
-
-<script type="text/javascript" src="${lams}includes/javascript/jquery.js"></script>
-<script type="text/javascript" src="${lams}includes/javascript/jquery.tablesorter.js"></script>
-<script type="text/javascript" src="${lams}includes/javascript/jquery.tablesorter-widgets.js"></script>
-<script type="text/javascript" src="${lams}includes/javascript/jquery.tablesorter-pager.js"></script>
+<link rel="stylesheet" href="${lams}css/jquery.tablesorter.theme.bootstrap.css">
+<link rel="stylesheet" href="${lams}css/jquery.tablesorter.pager.css">
 
 <script type="text/javascript">
-	// use noConflict() otherwise jQuery conflicts with prototype.js
-	jQuery.noConflict();
-	jQuery(document).ready(function($){
-	    
+
+	$(document).ready(function(){
+
 		$(".tablesorter").tablesorter({
-			theme: 'blue',
+			theme: 'bootstrap',
+			headerTemplate : '{content} {icon}',
 		    sortInitialOrder: 'desc',
             sortList: [[0]],
-            widgets: [ "resizable", "filter" ],
+            widgets: [ "uitheme", "resizable", "filter" ],
             <c:choose>
 			<c:when test="${spreadsheet.markingEnabled}">
             headers: { 1: { filter: false}, 2: { sorter: false, filter: false} }, 
@@ -42,7 +37,12 @@
 		$(".tablesorter").each(function() {
 			$(this).tablesorterPager({
 				savePages: false,
-				ajaxUrl : "<c:url value='/monitoring/getUsers.do'/>?sessionMapID=${sessionMapID}&toolContentID=${param.toolContentID}&page={page}&size={size}&{sortList:column}&{filterList:fcol}&toolSessionID=" + $(this).attr('data-session-id'),
+                container: $(this).find(".ts-pager"),
+                output: '{startRow} to {endRow} ({totalRows})',
+                cssPageDisplay: '.pagedisplay',
+                cssPageSize: '.pagesize',
+                cssDisabled: 'disabled',
+                ajaxUrl : "<c:url value='/monitoring/getUsers.do'/>?sessionMapID=${sessionMapID}&toolContentID=${param.toolContentID}&page={page}&size={size}&{sortList:column}&{filterList:fcol}&toolSessionID=" + $(this).attr('data-session-id'),
 				ajaxProcessing: function (data, table) {
 					if (data && data.hasOwnProperty('rows')) {
 			    		var rows = [],
@@ -55,7 +55,7 @@
 							rows += '<td>';
 							if ( ${spreadsheet.learnerAllowedToSave} ) {
 								var reviewURL = '<c:url value="/reviewItem.do"/>?userUid='+userData["userUid"];
-								rows += '<a href="javascript:launchPopup(\'' + reviewURL + '\')" style="margin-left: 7px;" styleClass="button">' + userData["userName"] + '</a>';
+								rows += '<a href="javascript:launchPopup(\'' + reviewURL + '\')">' + userData["userName"] + '</a>';
 							} else {
 								rows += userData["userName"];
 							}
@@ -70,7 +70,8 @@
 							}
 							rows += '</span>';
 							if ( userData["userModifiedSpreadsheet"] ) {
-								rows += '<a href="javascript:editMark(\''+userData["userUid"]+'\')" style="margin-left: 7px;"><fmt:message key="label.monitoring.summary.mark.button" /></a>';
+								var editUrl = '<c:url value="/monitoring/editMark.do"/>?userUid=' + userData["userUid"] +'&toolContentID=${param.toolContentID}&sessionMapID=${sessionMapID}';
+								rows += '<a href="javascript:launchPopup(\''+ editUrl +'\')" class="btn btn-default btn-xs loffset5"><fmt:message key="label.monitoring.summary.mark.button" /></a>';
 							}
 							rows += '</td>';
 							</c:if>
@@ -94,18 +95,6 @@
 			            
 			    	}
 				},					
-			    container: $(this).next(".pager"),
-			    output: '{startRow} to {endRow} ({totalRows})',
-			    // css class names of pager arrows
-			    cssNext: '.tablesorter-next', // next page arrow
-				cssPrev: '.tablesorter-prev', // previous page arrow
-				cssFirst: '.tablesorter-first', // go to first page arrow
-				cssLast: '.tablesorter-last', // go to last page arrow
-				cssGoto: '.gotoPage', // select dropdown to allow choosing a page
-				cssPageDisplay: '.pagedisplay', // location of where the "output" is displayed
-				cssPageSize: '.pagesize', // page size selector - select dropdown that sets the "size" option
-				// class added to arrows when at the extremes (i.e. prev/first arrows are "disabled" when on the first page)
-				cssDisabled: 'disabled' // Note there is no period "." in front of this class name
 			})
 		});
   	})
@@ -116,79 +105,83 @@
 <c:set var="spreadsheet" value="${sessionMap.spreadsheet}"/>
 
 <c:if test="${empty summaryList}">
-	<div align="center">
-		<b> <fmt:message key="message.monitoring.summary.no.session" /> </b>
-	</div>
+	<lams:Alert type="info" id="no-session-summary" close="false">
+		<fmt:message key="message.monitoring.summary.no.session" />
+	</lams:Alert>
 </c:if>
 
-	<c:forEach var="summary" items="${summaryList}">
-		<c:if test="${sessionMap.isGroupedActivity}">
-			<h1>
-				<fmt:message key="monitoring.label.group" /> ${summary.sessionName}	
-			</h1>
-		</c:if>
-		
-		<h2 style="color:black; margin-left: 20px;"><fmt:message key="label.monitoring.summary.overall.summary" />	</h2>
-		
-		<div class="tablesorter-holder">
-		<table class="tablesorter" data-session-id="${summary.sessionId}">
-			<thead>
-				<tr>
-					<th align="left">
-						<fmt:message key="label.monitoring.summary.learner" />
-					</th>
-					<c:if test="${spreadsheet.markingEnabled}">			
-						<th width="60px" align="center">
-							<fmt:message key="label.monitoring.summary.marked" />
-						</th>
-					</c:if>
-					<c:if test="${spreadsheet.reflectOnActivity}">			
-						<th width="50%" align="center">
-							<fmt:message key="label.monitoring.summary.reflection" />
-						</th>
-					</c:if>
-				</tr>
-			</thead>
-			<tbody>
-			</tbody>
-		</table>
-		
-		<!-- pager -->
-		<div class="pager">
-			<form>
-				<img class="tablesorter-first"/>
-				<img class="tablesorter-prev"/>
-				<span class="pagedisplay"></span> <!-- this can be any element, including an input -->
-				<img class="tablesorter-next"/>
-				<img class="tablesorter-last"/>
-				<select class="pagesize">
-					<option selected="selected" value="10">10</option>
-					<option value="20">20</option>
-					<option value="30">30</option>
-					<option value="40">40</option>
-					<option value="50">50</option>
-					<option value="100">100</option>
-				</select>
-			</form>
-		</div>
-		</div>
+<c:if test="${sessionMap.isGroupedActivity}">
+<div class="panel-group" id="accordionSessions" role="tablist" aria-multiselectable="true"> 
+</c:if>
+
+	<c:forEach var="summary" items="${summaryList}" varStatus="status">
 	
-		
-		<c:if test="${spreadsheet.markingEnabled}">	
-			<div class="space-bottom-top" style="position:relative; left:30px; ">
-				<html:link href="javascript:viewAllMarks(${summary.sessionId});"
-					property="viewAllMarks" styleClass="button">
-					<fmt:message key="label.monitoring.summary.viewAllMarks.button" />
-				</html:link>
-				<html:link href="javascript:releaseMarks(${summary.sessionId});"
-					property="releaseMarks" styleClass="button">
-					<fmt:message key="label.monitoring.summary.releaseMarks.button" />
-				</html:link>
- 				<html:link href="javascript:downloadMarks(${summary.sessionId});"
-					property="downloadMarks" styleClass="button">
-					<fmt:message key="label.monitoring.summary.downloadMarks.button" />
-				</html:link>
-			</div>
+		<c:if test="${sessionMap.isGroupedActivity}">
+			<div class="panel panel-default" >
+	        <div class="panel-heading" id="heading${summary.sessionId}">
+	        	<span class="panel-title collapsable-icon-left">
+	        	<a class="${status.first ? '' : 'collapsed'}" role="button" data-toggle="collapse" href="#collapse${summary.sessionId}" 
+						aria-expanded="${status.first ? 'false' : 'true'}" aria-controls="collapse$${summary.sessionId}" >
+				<fmt:message key="monitoring.label.group" />&nbsp;${summary.sessionName}</a>
+				</span>
+	        </div>
+		        
+		    <div id="collapse${summary.sessionId}" class="panel-collapse collapse ${status.first ? 'in' : ''}" role="tabpanel" aria-labelledby="heading${summary.sessionId}">
 		</c:if>
-	</c:forEach>		
+		
+			<c:set var="numColumns" value="1"/>
+			<c:if test="${spreadsheet.markingEnabled}"><c:set var="numColumns" value="${numColumns+1}"/></c:if>
+			<c:if test="${spreadsheet.reflectOnActivity}"><c:set var="numColumns" value="${numColumns+1}"/></c:if>
+			<lams:TSTable numColumns="${numColumns}" dataId='data-session-id="${summary.sessionId}"' test="fred"> 
+				<th align="left">
+					<fmt:message key="label.monitoring.summary.learner" />
+				</th>
+				<c:if test="${spreadsheet.markingEnabled}">			
+					<th width="20%" align="center">
+						<fmt:message key="label.monitoring.summary.marked" />
+					</th>
+				</c:if>
+				<c:if test="${spreadsheet.reflectOnActivity}">			
+					<th width="50%" align="center">
+						<fmt:message key="label.monitoring.summary.reflection" />
+					</th>
+				</c:if>
+			</lams:TSTable>
+			
+			<c:if test="${spreadsheet.markingEnabled}">	
+				<p>
+					<html:link href="javascript:viewAllMarks(${summary.sessionId});"
+						property="viewAllMarks" styleClass="btn btn-default voffset10 loffset5">
+						<fmt:message key="label.monitoring.summary.viewAllMarks.button" />
+					</html:link>
+					<html:link href="javascript:releaseMarks(${summary.sessionId});"
+						property="releaseMarks" styleClass="btn btn-default voffset10 loffset5">
+						<fmt:message key="label.monitoring.summary.releaseMarks.button" />
+					</html:link>
+	 				<html:link href="javascript:downloadMarks(${summary.sessionId});"
+						property="downloadMarks" styleClass="btn btn-default voffset10 loffset5">
+						<fmt:message key="label.monitoring.summary.downloadMarks.button" />
+					</html:link>
+					<c:url value="/monitoring/summary.do" var="refreshMonitoring">
+						<c:param name="contentFolderID" value="${sessionMap.contentFolderID}"/>
+						<c:param name="toolContentID" value="${sessionMap.toolContentID}" />
+					</c:url>
+					<html:link href="${refreshMonitoring}" styleClass="btn btn-default loffset5 voffset10" >
+						<fmt:message key="label.refresh" />
+					</html:link>
+				</p>
+			</c:if>
+		
+		<c:if test="${sessionMap.isGroupedActivity}">
+			</div> <!-- end collapse area  -->
+			</div> <!-- end collapse panel  -->
+		</c:if>
+	${ !sessionMap.isGroupedActivity || ! status.last ? '<div class="voffset5">&nbsp;</div>' :  ''}
+
+</c:forEach>
+
+<c:if test="${sessionMap.isGroupedActivity}">
+	</div> <!--  end panel group -->
+</c:if>
+
 </div>

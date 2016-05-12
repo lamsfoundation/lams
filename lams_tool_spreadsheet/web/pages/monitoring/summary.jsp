@@ -6,37 +6,11 @@
 
 <script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/monitorToolSummaryAdvanced.js"></script>
 <script type="text/javascript">
-	function showMessage(url) {
-		var area=document.getElementById("marksInputArea");
-		if(area != null){
-			area.style.width="95%";
-			area.src=url;
-			area.style.display="block";
-		}
-		location.hash = "marksInputArea";
-	}
-	function hideMessage(){
-		var area=document.getElementById("marksInputArea");
-		if(area != null){
-			area.style.width="0px";
-			area.style.height="0px";
-			area.style.display="none";
-		}
-	}
-	
-	function editMark(userUid){
+/* 	function editMark(userUid){
 		var url = "<c:url value="/monitoring/editMark.do?userUid="/>" + userUid +"&toolContentID=" + ${param.toolContentID} + "&sessionMapID=" + "${sessionMapID}";
 		showMessage(url);
 	}
-	
-	function updateMarkAfterSaving(userUid, mark) {
-		var span = document.getElementById('mark'+userUid);
-		while( span.firstChild ) {
-		    span.removeChild( span.firstChild );
-		}
-		span.appendChild( document.createTextNode(mark) );
-	}
-	
+ */	
 	function downloadMarks(sessionId){
 		var url = "<c:url value="/monitoring/downloadMarks.do"/>";
 	    var reqIDVar = new Date();
@@ -50,7 +24,8 @@
 		if(wd && wd.open && !wd.closed){
 			wd.close();
 		}
-		wd = window.open("<c:url value='/monitoring/viewAllMarks.do?toolSessionID='/>" + sessionId, "mark", 'resizable, width=796, height=570, scrollbars');
+		wd = window.open("<c:url value='/monitoring/viewAllMarks.do?toolSessionID='/>" + sessionId + "&sessionMapID=${sessionMapID}", 
+				"mark", 'resizable, width=796, height=570, scrollbars');
 		wd.window.focus();
 	}
 	
@@ -60,36 +35,38 @@
 	    var reqIDVar = new Date();
 		var param = "toolSessionID=" + sessionId +"&reqID="+reqIDVar.getTime();
 		messageLoading();
-	    var myAjax = new Ajax.Updater(
-		    	messageTargetDiv,
-		    	url,
-		    	{
-		    		method:'get',
-		    		parameters:param,
-		    		onComplete:messageComplete,
-		    		evalScripts:true
-		    	}
-	    );
-		
+		$("#"+messageTargetDiv).load(
+				url,
+				param,
+				function() {
+					messageComplete();
+				}
+		);
 	}	
 	function messageLoading(){
 		if($(messageTargetDiv+"_Busy") != null){
-			Element.show(messageTargetDiv+"_Busy");
+			$(messageTargetDiv+"_Busy").show();
 		}		
 	}
 	function messageComplete(){
 		if($(messageTargetDiv+"_Busy") != null){
-			Element.hide(messageTargetDiv+"_Busy");
+			$(messageTargetDiv+"_Busy").hide();
 		}
 	}	
 </script>
 
-<h1>
-	<c:out value="${spreadsheet.title}" escapeXml="true"/>
-</h1>
+<div class="panel">
+	<h4>
+	    <c:out value="${spreadsheet.title}" escapeXml="true"/>
+	</h4>
+	<div class="instructions voffset5">
+	    <c:out value="${spreadsheet.instructions}" escapeXml="false"/>
+	</div>
+	
+	<!--For release marks feature-->
+	<img src="${tool}/images/indicator.gif" style="display:none" id="message-area-busy" />
+	<div id="message-area"></div> 
 
-<div class="instructions space-top">
-	<c:out value="${spreadsheet.instructions}" escapeXml="false"/>
 </div>
 
 <%-- Summary list  --%>
@@ -102,16 +79,5 @@
 <div id="summariesArea">
 	<%@ include file="/pages/monitoring/parts/summarylist.jsp"%>
 </div>
-
-<c:if test="${spreadsheet.markingEnabled}">	
-	<p>
-		<iframe
-			onload="javascript:this.style.height=eval(this.contentWindow.document.body.scrollHeight+220)+'px'"
-			id="marksInputArea" name="marksInputArea"
-			style="width:0px;height:0px;border:0px;display:none" frameborder="no"
-			scrolling="no">
-		</iframe>
-	</p>
-</c:if>
 
 <%@ include file="parts/advanceoptions.jsp"%>

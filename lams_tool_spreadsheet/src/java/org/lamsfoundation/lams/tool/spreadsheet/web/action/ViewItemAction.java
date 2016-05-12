@@ -120,7 +120,7 @@ public class ViewItemAction extends Action {
 
 	Long userId = WebUtil.readLongParam(request, SpreadsheetConstants.ATTR_USER_UID);
 	SpreadsheetUser user = getSpreadsheetService().getUser(userId);
-	request.setAttribute(SpreadsheetConstants.ATTR_USER_NAME, user.getLoginName());
+	request.setAttribute(SpreadsheetConstants.ATTR_USER_NAME, user.getFullUsername());
 	String code = null;
 	if (user.getUserModifiedSpreadsheet() != null) {
 	    code = user.getUserModifiedSpreadsheet().getUserModifiedSpreadsheet();

@@ -36,7 +36,7 @@ if (agent=="msie" || agent=="safari") { // cursor keys only in keydown
 
 var init_data = "";
 var auto_recalc = true;
-var cols = 7;
+var cols = 9;
 var rows = 17;
 var row0 = 0;
 var col0 = 0;

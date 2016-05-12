@@ -1,15 +1,9 @@
-<h1>
-	<img src="<lams:LAMSURL/>/images/tree_closed.gif" id="treeIcon" onclick="javascript:toggleAdvancedOptionsVisibility(document.getElementById('advancedDiv'), document.getElementById('treeIcon'), '<lams:LAMSURL/>');" />
-
-	<a href="javascript:toggleAdvancedOptionsVisibility(document.getElementById('advancedDiv'), document.getElementById('treeIcon'),'<lams:LAMSURL/>');" >
-		<fmt:message key="label.monitoring.summary.advanced.settings"/>
-	</a>
-</h1>
-<br />
+<c:set var="adTitle"><fmt:message key="label.monitoring.summary.advanced.settings" /></c:set>
+<lams:AdvancedAccordian title="${adTitle}">
 
 <%-- Overall TaskList information  --%>
-<div class="monitoring-advanced" id="advancedDiv" style="display:none">
-	<table class="alternative-color">
+             
+<table class="table table-striped table-condensed">
 		<tr>
 			<td>
 				<fmt:message key="label.monitoring.summary.lock.when.finished" />
@@ -88,4 +82,5 @@
 		</tr>
 		</c:if>		
 	</table>
-</div>
+
+</lams:AdvancedAccordian>

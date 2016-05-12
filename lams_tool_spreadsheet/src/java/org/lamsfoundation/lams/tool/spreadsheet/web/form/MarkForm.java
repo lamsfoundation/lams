@@ -40,6 +40,8 @@ public class MarkForm extends ActionForm {
     private Long userUid;
     private String marks;
     private String comments;
+    private String code; // Read only. Needed to reload the screen on error
+    private String userName; // Read only. Needed to reload the screen on error
 
     public String getSessionMapID() {
 	return sessionMapID;
@@ -71,6 +73,22 @@ public class MarkForm extends ActionForm {
 
     public void setComments(String comments) {
 	this.comments = comments;
+    }
+
+    public String getCode() {
+        return code;
+    }
+
+    public void setCode(String code) {
+        this.code = code;
+    }
+
+    public String getUserName() {
+        return userName;
+    }
+
+    public void setUserName(String userName) {
+        this.userName = userName;
     }
 
 }
