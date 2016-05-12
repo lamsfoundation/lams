@@ -327,7 +327,29 @@ a.button-add-item:before {
    width: auto !important;
 }
 
+.table > tbody > tr > td {
+	vertical-align: middle;
+}
+
+.table .fa {
+	cursor: pointer;
+}
+
 .form-control-inline {
    width: auto !important;
    display: inline-block;
+}
+
+.rating-criteria-tag {
+	width: 70%;
+	padding-left: 20px;
+}
+.rating-criteria-tag input[type="text"] {
+	width: 100%;
+}
+#criterias-table {
+	margin-left: 0;
+}
+#criterias-table td {
+	vertical-align:middle;
 }
