@@ -13,7 +13,7 @@
 			<img src="${ctxPath}/includes/images/indicator.gif"	style="display:none" id="imageGalleryListArea_Busy" />
 		</div>
 
-		<table class="table table-condensed table-authoring" id="itemTable">
+		<table class="table table-condensed" id="itemTable">
 			<c:forEach var="image" items="${sessionMap.imageGalleryList}" varStatus="status">
 			
 				<tr>
