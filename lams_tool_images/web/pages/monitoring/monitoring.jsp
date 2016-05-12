@@ -1,5 +1,4 @@
 <!DOCTYPE html>
-
 <%@ include file="/common/taglibs.jsp"%>
 <%@ page import="org.lamsfoundation.lams.tool.imageGallery.ImageGalleryConstants"%>
 <c:set var="sessionMap" value="${sessionScope[sessionMapID]}"/>
@@ -13,35 +12,16 @@
 		
 		<link href="${lams}css/thickbox.css" rel="stylesheet" type="text/css" media="screen">
 		<link href="${lams}css/jquery.jRating.css" rel="stylesheet"/>
-		<link href="${lams}css/jquery.tablesorter.theme-blue.css" rel="stylesheet" >
+		<link href="${lams}css/jquery.tablesorter.theme.bootstrap.css" rel="stylesheet" >
 		<link rel="stylesheet" href="${lams}css/jquery.tablesorter.pager.css">
 		<style media="screen,projection" type="text/css">
-			.tablesorter {
-				margin: 15px 10px 5px;
-				width: 97%;
+			.tablesorter,.tablesorter tr {
+				border: 1px solid #ddd;
 			}
-			
-			.tablesorter tbody > tr:nth-child(odd) > td, .tablesorter tbody > tr:nth-child(odd) > th {
-			    background-color: #EBF2FA;
-			}
-			.tablesorter tbody > tr:nth-child(odd):hover > td, .tablesorter tbody > tr:nth-child(odd):hover > th {
-			    background-color: #bfbfbf;
-			}
-			.tablesorter tr:nth-child(odd):hover .jStar {background-image: url(${lams}images/css/jquery.jRating-stars-grey.png)!important;}
-			.tablesorter tr:nth-child(even):hover .jStar {background-image: url(${lams}images/css/jquery.jRating-stars-light-grey.png)!important;}
-			.tablesorter tr:nth-child(odd) .jStar {background-image: url(${lams}images/css/jquery.jRating-stars-light-blue.png)!important;}
-			
-			h4 {
-				color:#0087e5; 
-				font-size:11px;
-				margin-top:10px;
-				margin-bottom:10px;
-				padding:0;
-			}
-			.rating-comment-posted-by {
-				color: #47BC23;
-			}
-			
+			.tablesorter td {
+				padding-bottom: 10px;
+				padding-top: 10px;
+			]
 		</style>
 		
 		<script type="text/javascript">
@@ -61,7 +41,6 @@
 			WARN_COMMENTS_IS_BLANK_LABEL = '',
 			WARN_MIN_NUMBER_WORDS_LABEL = '';
 		</script>
-		<script type="text/javascript" src="${lams}includes/javascript/jquery.js"></script>
  		<script type="text/javascript" src="${lams}includes/javascript/thickbox.js"></script>
 		<script type="text/javascript" src="${lams}includes/javascript/monitorToolSummaryAdvanced.js" ></script>
 		<script type="text/javascript" src="${lams}includes/javascript/jquery.tablesorter.js"></script>
@@ -95,9 +74,9 @@
 			$(document).ready(function(){
 
 				$(".tablesorter").tablesorter({
-					theme: 'blue',
-				    widthFixed: true,
-				    widgets: ['zebra'],
+					theme: 'bootstrap',
+					headerTemplate : '{content} {icon}',
+				    widgets: ["uitheme", "resizable", "filter"],
 			        headers: {
 			            0: { sorter: false }
 			            <c:if test="${sessionMap.imageGallery.allowRank || sessionMap.imageGallery.allowVote}"> 
@@ -129,26 +108,24 @@
 	</lams:head>
 	
 	<body class="stripes" onLoad="init()">
-		<div id="page">
-			<h1>
-				<fmt:message key="label.authoring.heading" />
-			</h1>
-			<div id="header">
-				<lams:Tabs>
-					<lams:Tab id="1" key="monitoring.tab.summary" />
-					<lams:Tab id="2" key="monitoring.tab.edit.activity" />			
-					<lams:Tab id="3" key="monitoring.tab.statistics" />
-				</lams:Tabs>
-			</div>
-			<div id="content">
-				<lams:help toolSignature="<%= ImageGalleryConstants.TOOL_SIGNATURE %>" module="monitoring"/>
-			
-				<lams:TabBody id="1" titleKey="monitoring.tab.summary" page="summary.jsp" />
-				<lams:TabBody id="2" titleKey="monitoring.tab.edit.activity" page="editactivity.jsp" />			
-				<lams:TabBody id="3" titleKey="monitoring.tab.statistics" page="statistic.jsp" />
-			</div>
+		<c:set var="title"><fmt:message key="label.learning.heading" /></c:set>
+	 	<lams:Page type="navbar" title="${title}"> 
+	
+			<lams:Tabs control="true" title="${title}" helpToolSignature="<%= ImageGalleryConstants.TOOL_SIGNATURE %>" helpModule="monitoring" refreshOnClickAction="javascript:location.reload();">
+				<lams:Tab id="1" key="monitoring.tab.summary"/>
+				<lams:Tab id="2" key="monitoring.tab.edit.activity"/>
+				<lams:Tab id="3" key="monitoring.tab.statistics"/>
+			</lams:Tabs>
+	
+	  		<lams:TabBodyArea>
+				<lams:TabBodys>
+					<lams:TabBody id="1" titleKey="monitoring.tab.summary" page="summary.jsp" />
+					<lams:TabBody id="2" titleKey="monitoring.tab.edit.activity" page="editactivity.jsp" />			
+					<lams:TabBody id="3" titleKey="monitoring.tab.statistics" page="statistic.jsp" />
+				</lams:TabBodys> 
+			</lams:TabBodyArea> 
+	
 			<div id="footer"></div>
-		
-		</div>
-	</body>
+		</lams:Page>
+</body>
 </lams:html>

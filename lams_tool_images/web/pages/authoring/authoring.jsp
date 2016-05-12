@@ -1,7 +1,9 @@
 <!DOCTYPE html>
-
 <%@ include file="/common/taglibs.jsp"%>
 <%@ page import="org.lamsfoundation.lams.tool.imageGallery.ImageGalleryConstants"%>
+<%@ page import="org.lamsfoundation.lams.util.Configuration" %>
+<%@ page import="org.lamsfoundation.lams.util.ConfigurationKeys" %>
+<c:set var="UPLOAD_FILE_LARGE_MAX_SIZE"><%=Configuration.get(ConfigurationKeys.UPLOAD_FILE_LARGE_MAX_SIZE)%></c:set>
 
 <lams:html>
 <lams:head>
@@ -10,8 +12,17 @@
 	<%@ include file="/common/tabbedheader.jsp"%>
 	
 	<link href="${lams}css/jquery-ui-redmond-theme.css" rel="stylesheet" type="text/css" >
-	
-	<script type="text/javascript" src="${lams}includes/javascript/jquery.js"></script>
+
+	<script type="text/javascript">
+		<%-- used for  imageGalleryitem.js --%>
+		var removeItemAttachmentUrl = "<c:url value='/authoring/removeImageFile.do'/>";
+		var saveMultipleImagesUrl = "<c:url value='/authoring/saveMultipleImages.do'/>";
+		var UPLOAD_FILE_LARGE_MAX_SIZE = "${UPLOAD_FILE_LARGE_MAX_SIZE}";
+		var LABEL_ITEM_BLANK = '<fmt:message key="error.resource.item.file.blank"/>';
+		var LABEL_MAX_FILE_SIZE = '<fmt:message key="errors.maxfilesize"/>';
+		var LABEL_NOT_ALLOWED_FORMAT = '<fmt:message key="error.resource.image.not.alowed.format"/>';
+	</script>
+	<script type="text/javascript" src="<html:rewrite page='/includes/javascript/imageGalleryitem.js'/>"></script>
 	<script type="text/javascript" src="${lams}includes/javascript/jquery-ui.js"></script>
 	<script>
         function init(){
@@ -32,60 +43,48 @@
     </script>
  
 </lams:head>
+
 <body class="stripes" onLoad="init();">
-	<div id="page">
-		<h1>
-			<fmt:message key="label.authoring.heading" />
-		</h1>
-		<div id="header">
-			<lams:Tabs useKey="true" control="true">
+	<html:form action="authoring/update" method="post" styleId="authoringForm" enctype="multipart/form-data">
+		<c:set var="formBean" value="<%= request.getAttribute(org.apache.struts.taglib.html.Constants.BEAN_KEY) %>" />
+	
+		<c:set var="title"><fmt:message key="label.learning.heading" /></c:set>
+		<lams:Page title="${title}" type="navbar">
+		
+			<html:hidden property="imageGallery.contentId"/>
+			<html:hidden property="sessionMapID" />
+			<html:hidden property="contentFolderID" />
+			<html:hidden property="currentTab" styleId="currentTab" />
+	
+			<lams:Tabs control="true" title="${title}" helpToolSignature="<%= ImageGalleryConstants.TOOL_SIGNATURE %>" helpModule="authoring">
 				<lams:Tab id="1" key="label.authoring.heading.basic" />
 				<lams:Tab id="2" key="label.authoring.heading.advance" />
-			</lams:Tabs>
-		</div>
-	
-		<!-- start tabs -->
-		<div id="content">
-			<!-- end tab buttons -->
-			
-			<%@ include file="/common/messages.jsp"%>
-	
-			<html:form action="authoring/update" method="post" styleId="authoringForm" enctype="multipart/form-data">
-				<c:set var="formBean" value="<%= request.getAttribute(org.apache.struts.taglib.html.Constants.BEAN_KEY) %>" />
-				<html:hidden property="imageGallery.contentId" />
-				<html:hidden property="sessionMapID" />
-				<html:hidden property="contentFolderID" />
-				<html:hidden property="currentTab" styleId="currentTab" />
+			</lams:Tabs>	
 		
-				<lams:help toolSignature="<%= ImageGalleryConstants.TOOL_SIGNATURE %>" module="authoring"/>
+		 	<lams:TabBodyArea>
+		 		<%@ include file="/common/messages.jsp"%>
+		 		
+				<!--  Set up tabs  -->
+		 		<lams:TabBodys>
+   					<lams:TabBody id="1" titleKey="label.authoring.heading.basic.desc" page="basic.jsp" />
+ 					<lams:TabBody id="2" titleKey="label.authoring.heading.advance.desc" page="advance.jsp" />
+  				</lams:TabBodys>
 		
-					<!-- tab content 1 (Basic) -->
-					<lams:TabBody id="1" titleKey="label.authoring.heading.basic.desc" page="basic.jsp" />
-					<!-- end of content (Basic) -->
-		
-					<!-- tab content 2 (Advanced) -->
-					<lams:TabBody id="2" titleKey="label.authoring.heading.advance.desc" page="advance.jsp" />
-					<!-- end of content (Advanced) -->
-		
-					<!-- Button Row -->
-					<%--  Default value 
-						cancelButtonLabelKey="label.authoring.cancel.button"
-						saveButtonLabelKey="label.authoring.save.button"
-						cancelConfirmMsgKey="authoring.msg.cancel.save"
+				<!-- Button Row -->
+				<div id="saveCancelButtons">
+					<lams:AuthoringButton formID="authoringForm"
+						clearSessionActionUrl="/clearsession.do" toolSignature="<%=ImageGalleryConstants.TOOL_SIGNATURE%>"
+						toolContentID="${formBean.imageGallery.contentId}"
 						accessMode="author"
-					--%>
-					<lams:AuthoringButton formID="authoringForm" clearSessionActionUrl="/clearsession.do" 
-						toolSignature="<%=ImageGalleryConstants.TOOL_SIGNATURE%>" toolContentID="${formBean.imageGallery.contentId}" 
-						 customiseSessionID="${formBean.sessionMapID}"
-						 contentFolderID="${formBean.contentFolderID}" />
-			</html:form>
+						contentFolderID="${formBean.contentFolderID}" />
+				</div>
+			</lams:TabBodyArea>
 	
-		</div>
+			<div id="footer"></div>
 	
-		<div id="footer"></div>
-
-	<!-- end page div -->
-	</div>
-
+		<!-- end page div -->
+		</lams:Page>
+	
+	</html:form>
 </body>
 </lams:html>

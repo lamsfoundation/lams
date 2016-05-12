@@ -75,7 +75,7 @@
 					<input type="hidden" name="sessionMapID" value="${sessionMapID}"/>
 					<input type="hidden" name="imageUid" value="${sessionMap.currentImage.uid}"/>
 								
-					<p class="small-space-top" style="margin-right: 0px">
+					<p class="voffset5" style="margin-right: 0px">
 						<input type="checkbox" name="vote" class="noBorder" id="voting-form-checkbox" 
 								<c:if test="${finishedLock}">disabled="disabled"</c:if>	
 								<c:if test="${sessionMap.isVoted}">checked="checked"</c:if>	
@@ -104,7 +104,8 @@
 							
 				<c:if test="${not finishedLock}">
 					<br>
-					<a href="<html:rewrite page='/learning/newImageInit.do?sessionMapID='/>${sessionMapID}&KeepThis=true&TB_iframe=true&height=540&width=480&modal=true" class="btn btn-default voffset10 thickbox" id="add-new-image-button">  
+					<a href="<html:rewrite page='/learning/newImageInit.do?sessionMapID='/>${sessionMapID}&KeepThis=true&TB_iframe=true&height=540&width=480&modal=true" 
+							class="btn btn-default voffset10 thickbox" id="add-new-image-button">  
 						<fmt:message key="label.learning.add.new.image" />
 					</a>
 				</c:if>

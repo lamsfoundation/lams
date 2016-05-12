@@ -3,10 +3,10 @@
 <script lang="javascript">
 	$(document).ready(function() {
 	    $('#allowRank').click(function() {
-	        $("#criterias-holder").show("slow");
+	        $(".rating-criteria-tag").show("slow");
 	    });
 	    $('#allowVote').click(function() {
-	    	$("#criterias-holder").hide("slow");
+	    	$(".rating-criteria-tag").hide("slow");
 	    });//if(!$(this).is(":checked")) {
 	})
 
@@ -21,7 +21,7 @@
 		} else {
 			document.imageGalleryForm.allowVote.checked = false;
 			document.imageGalleryForm.allowRank.checked = false;
-			$("#criterias-holder").hide("slow");
+			$(".rating-criteria-tag").hide("slow");
 		}
 	}
 
@@ -29,7 +29,6 @@
 		document.imageGalleryForm.notifyTeachersOnImageSumbit.checked = false;
 		document.imageGalleryForm.notifyTeachersOnImageSumbit.disabled = ! eval(document.imageGalleryForm.notifyTeachersOnImageSumbit.disabled);
 	}
-
 </script>
 	
 <c:set var="formBean" value="<%=request.getAttribute(org.apache.struts.taglib.html.Constants.BEAN_KEY)%>" />
@@ -37,88 +36,88 @@
 
 <!-- Advance Tab Content -->
 
-<p class="small-space-top">
-	<html:checkbox property="imageGallery.lockWhenFinished"	styleClass="noBorder" styleId="lockWhenFinished">
-	</html:checkbox>
-
-	<label for="lockWhenFinished">
+<div class="checkbox">
+	<label for="lock-when-finished">
+		<html:checkbox property="imageGallery.lockWhenFinished" styleId="lock-when-finished"/>
 		<fmt:message key="label.authoring.advance.lock.on.finished" />
 	</label>
-</p>
+</div>
 
-<p>
-	<html:checkbox property="imageGallery.allowShareImages" styleClass="noBorder" styleId="allowShareImages"
-	onclick="uncheckNotifyTeachersOnImageSumbit();">
-	</html:checkbox>
+<div class="checkbox">
 	<label for="allowShareImages">
+		<html:checkbox property="imageGallery.allowShareImages" styleId="allowShareImages"
+				onclick="uncheckNotifyTeachersOnImageSumbit();"/>
 		<fmt:message key="label.authoring.advance.allow.learner.share.images" />
 	</label>
-</p>
+</div>
 
-<p style="margin-left:40px;">
-	<html:checkbox property="imageGallery.notifyTeachersOnImageSumbit" styleClass="noBorder" styleId="notifyTeachersOnImageSumbit"
-			disabled="${not formBean.imageGallery.allowShareImages}" >
-	</html:checkbox>
+<div class="checkbox loffset20">
 	<label for="notifyTeachersOnImageSumbit">
+		<html:checkbox property="imageGallery.notifyTeachersOnImageSumbit" styleId="notifyTeachersOnImageSumbit"
+				disabled="${not formBean.imageGallery.allowShareImages}"/>
 		<fmt:message key="label.authoring.advance.notify.monitoring.teachers" />
 	</label>
-</p>
+</div>
 
-<p>
-	<html:checkbox property="allowRatingsOrVote" styleClass="noBorder" styleId="allowRatingsOrVote"
-		onclick="allowRatingsOrVoteClicked();"
-	>
-	</html:checkbox>
+<div class="checkbox">
 	<label for="allowRatingsOrVote">
+		<html:checkbox property="allowRatingsOrVote" styleId="allowRatingsOrVote"
+				onclick="allowRatingsOrVoteClicked();"/>
 		<fmt:message key="label.authoring.advance.allow.learner.ratings.or.vote" />
 	</label>
+</div>
 	
-	<div style="margin-left:40px;">
-		<input type="radio" name="imageGallery.allowVote" value="${true}" id="allowVote"
-			<c:if test="${formBean.imageGallery.allowVote}">checked="checked"</c:if>
-			<c:if test="${not (formBean.imageGallery.allowVote or formBean.imageGallery.allowRank)}">disabled="disabled"</c:if> 
-		/>
+<div class="loffset20">
+
+	<div class="radio">
 		<label for="allowVote">
+			<input type="radio" name="imageGallery.allowVote" value="${true}" id="allowVote"
+				<c:if test="${formBean.imageGallery.allowVote}">checked="checked"</c:if>
+				<c:if test="${not (formBean.imageGallery.allowVote or formBean.imageGallery.allowRank)}">disabled="disabled"</c:if> 
+			/>
 			<fmt:message key="label.authoring.advance.allow.learner.vote" />
 		</label>
-		<br><br>
+	</div>
 	
-		<input type="radio" name="imageGallery.allowVote" value="${false}" id="allowRank"
-			<c:if test="${formBean.imageGallery.allowRank}">checked="checked"</c:if> 
-			<c:if test="${not (formBean.imageGallery.allowVote or formBean.imageGallery.allowRank)}">disabled="disabled"</c:if>		
-		/>
+	<div class="radio">
 		<label for="allowRank">
+			<input type="radio" name="imageGallery.allowVote" value="${false}" id="allowRank"
+				<c:if test="${formBean.imageGallery.allowRank}">checked="checked"</c:if> 
+				<c:if test="${not (formBean.imageGallery.allowVote or formBean.imageGallery.allowRank)}">disabled="disabled"</c:if>		
+			/>
 			<fmt:message key="label.authoring.advance.allow.learner.rank" />
 		</label>
-		
-		<div id="criterias-holder" <c:if test="${!formBean.imageGallery.allowRank}"> style="display:none;"</c:if> >
-			<lams:AuthoringRatingCriteria criterias="${sessionMap.ratingCriterias}" hasRatingLimits="true"
-				upLabel="label.authoring.up" downLabel="label.authoring.down"
-				allowCommentsLabel="label.authoring.advance.allow.learner.comment.images"
-				formContentPrefix="imageGallery"/>
-		</div>
 	</div>
-</p>
+		
+	<c:if test='${!formBean.imageGallery.allowRank}'><c:set var="styleId">display:none;</c:set></c:if>
+	<lams:AuthoringRatingCriteria criterias="${sessionMap.ratingCriterias}" hasRatingLimits="true"
+		upLabel="label.authoring.up" downLabel="label.authoring.down"
+		allowCommentsLabel="label.authoring.advance.allow.learner.comment.images"
+		formContentPrefix="imageGallery"
+	    styleId="${styleId}"/>
+	
+</div>
 
-<p>
-	<html:checkbox property="imageGallery.reflectOnActivity" styleClass="noBorder" styleId="reflectOn"/>
-	<label for="reflectOn">
+<div class="checkbox">
+	<label for="reflect-on">
+		<html:checkbox property="imageGallery.reflectOnActivity" styleId="reflect-on"/>
 		<fmt:message key="label.authoring.advanced.reflectOnActivity" />
 	</label>
-</p>
+</div>
 
-<p>
-	<html:textarea property="imageGallery.reflectInstructions" styleId="reflectInstructions" cols="30" rows="3" />
-</p>
+<div class="form-group">
+	<html:textarea property="imageGallery.reflectInstructions" cols="60" rows="3" styleId="reflect-instructions" styleClass="form-control"/>
+</div>
+
 <script type="text/javascript">
-//automatically turn on refect option if there are text input in refect instruction area
-	var ra = document.getElementById("reflectInstructions");
-	var rao = document.getElementById("reflectOn");
+	//automatically turn on refect option if there are text input in refect instruction area
+	var ra = document.getElementById("reflect-instructions");
+	var rao = document.getElementById("reflect-on");
 	function turnOnRefect(){
-		if(isEmpty(ra.value)){
+		if (isEmpty(ra.value)) {
 		//turn off	
 			rao.checked = false;
-		}else{
+		} else {
 		//turn on
 			rao.checked = true;		
 		}
