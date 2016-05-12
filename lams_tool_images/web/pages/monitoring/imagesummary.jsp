@@ -36,16 +36,21 @@
 		<script type="text/javascript" src="${lams}includes/javascript/jquery.jRating.js"></script>
 	</lams:head>
 	
-	<body class="stripes">
-		<div id="content">
+<body class="stripes">
+	<div class="panel panel-default">
+		<div class="panel-heading">
+			<div class="panel-title">
+				<fmt:message key="label.monitoring.imagesummary.image" />
+			</div>
+		</div>
+			
+		<div class="panel-body">
 
 			<html:form action="/monitoring/updateImage" method="post" styleId="imageGalleryItemForm">
+				<c:set var="formBean" value="<%=request.getAttribute(org.apache.struts.taglib.html.Constants.BEAN_KEY)%>" />
 				<html:hidden property="imageUid" />		
 				<html:hidden property="sessionMapID" value="${sessionMapID}"/>
 				
-				<div class="field-name space-top">
-					<fmt:message key="label.monitoring.imagesummary.image" />
-				</div>
 				<c:set var="mediumImagePath">
 			   		<html:rewrite page='/download/?uuid='/>${image.mediumFileUuid}&preferDownload=false
 				</c:set>	
@@ -54,17 +59,20 @@
 				</c:set>
 				<img src="${mediumImagePath}" alt="${title}" title="${title}"/>
 					
-				<div class="field-name space-top">
-					<fmt:message key="label.authoring.basic.resource.title.input" />
+				<div class="form-group voffset10">
+				    <label for="file-title">
+				    	<fmt:message key="label.authoring.basic.resource.title.input"/>
+				    </label>
+				    <html:text property="title" styleClass="form-control" styleId="file-title" tabindex="1"/>
 				</div>
-				<html:text property="title" size="55" tabindex="1" />
 				
-				<div class="field-name space-top">
-	            	<fmt:message key="label.authoring.basic.resource.description.input" />
-				</div>
-				<c:set var="formBean" value="<%=request.getAttribute(org.apache.struts.taglib.html.Constants.BEAN_KEY)%>" />
-				<div class="small-space-bottom" >
-					<lams:CKEditor id="description" value="${formBean.description}" contentFolderID="${sessionMap.contentFolderID}" />
+				<div class="form-group">
+					<label for="description">
+						<fmt:message key="label.authoring.basic.resource.description.input" />
+					</label>
+		            	
+					<lams:CKEditor id="description" value="${formBean.description}" width="99%" 
+						contentFolderID="${sessionMap.imageGalleryForm.contentFolderID}" />
 				</div>
 			</html:form>			
 			<br>
@@ -79,16 +87,15 @@
 			<c:if test="${imageGallery.allowVote}">
 			
 				<c:forEach var="groupSummary" items="${imageSummary}">
-					<h1><fmt:message key="monitoring.label.group" /> ${groupSummary[0].sessionName}	</h1>
+					<h4>
+						<fmt:message key="monitoring.label.group" />&nbsp;${groupSummary[0].sessionName}	
+					</h4>
 				
-					<ul>
-						<li>
-							<fmt:message key="label.monitoring.number.votes" />: ${groupSummary[0].numberOfVotesForImage}
-						</li>
-					</ul>
-					<br>
+					<div>
+						<fmt:message key="label.monitoring.number.votes" />: ${groupSummary[0].numberOfVotesForImage}
+					</div>
 				
-					<table cellpadding="0" class="alternative-color" >
+					<table class="table" >
 				
 						<tr>
 							<th width="150px">
@@ -126,20 +133,21 @@
 			</c:if>
 			<br>
 			
-			<lams:ImgButtonWrapper>
-				<a href="#" onclick="self.parent.tb_remove();" class="button right-buttons space-left">
-					<fmt:message key="label.cancel" /> 
-				</a>
-				<a href="#" onclick="document.imageGalleryItemForm.submit();" class="button right-buttons space-left">
+			<div class="voffset10 pull-right">
+				<a href="#nogo" onclick="javascript:document.imageGalleryItemForm.submit();" class="btn btn-default">
 					<fmt:message key="label.monitoring.imagesummary.save" /> 
 				</a>
-			</lams:ImgButtonWrapper>
+				<a href="#nogo" onclick="javascript:self.parent.tb_remove();" class="btn btn-default loffset5">
+					<fmt:message key="label.cancel" /> 
+				</a>
+			</div>
 		</div>
-		<!--closes content-->
 	
 		<div id="footer">
 		</div>
 		<!--closes footer-->
 		
-	</body>
+	</div>
+		
+</body>
 </lams:html>

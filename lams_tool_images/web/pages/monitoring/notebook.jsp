@@ -7,16 +7,14 @@
 	<%@ include file="/common/header.jsp"%>
 </lams:head>
 <body class="stripes">
-		
-	<div id="content">
-		<h1>
-			<fmt:message key="page.title.monitoring.view.reflection"/>
-		</h1>
+
+	<c:set var="title"><fmt:message key="page.title.monitoring.view.reflection" /></c:set>
+	<lams:Page type="learner" title="${title}">
 		
 		<c:out value="${userDTO.fullName}" escapeXml="true"/><BR><BR>
-		<table class="alternative-color" cellspacing="0">
+		<table class="table">
 			<tr>
-				<th class="first">
+				<th>
 					<lams:out value="${userDTO.reflectInstrctions}" escapeHtml="true"/>
 				</th>
 			</tr>
@@ -33,14 +31,11 @@
 				</td>
 			</tr>
 		</table>
-		<table cellpadding="0">
-			<tr>
-				<td>
-					<a href="javascript:window.close();" class="button"><fmt:message key="button.close"/></a>
-				</td>
-			</tr>
-		</table>
-	</div>
+		
+		<a href="javascript:window.close();" class="btn btn-primary">
+			<fmt:message key="button.close"/>
+		</a>
+	</lams:Page>
 			
 	<div id="footer"></div><!--closes footer-->
 </body>

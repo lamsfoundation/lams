@@ -1,102 +1,74 @@
 <%@ include file="/common/taglibs.jsp"%>
-
 <c:set var="ctxPath" value="${pageContext.request.contextPath}" scope="request" />
 <c:set var="tool">
 	<lams:WebAppURL />
 </c:set>
+<c:set var="sessionMap" value="${sessionScope[sessionMapID]}" />
 
 <div id="itemList" >
-	<h2 class="spacer-left">
-		<fmt:message key="label.authoring.basic.image.list" />
-		<img src="${ctxPath}/includes/images/indicator.gif"	style="display:none" id="imageGalleryListArea_Busy" />
-	</h2>
 
-	<table class="alternative-color" id="itemTable" cellspacing="0" > 
-		<c:set var="sessionMap" value="${sessionScope[sessionMapID]}" />
+	<div class="panel panel-default voffset5">
+		<div class="panel-heading panel-title">
+			<fmt:message key="label.authoring.basic.image.list" />
+			<img src="${ctxPath}/includes/images/indicator.gif"	style="display:none" id="imageGalleryListArea_Busy" />
+		</div>
 
-		<c:forEach var="image" items="${sessionMap.imageGalleryList}" varStatus="status">
-			<tr>
-				<td width="4%" align="center">
-					<c:set var="thumbnailPath">
-					   	<html:rewrite page='/download/?uuid='/>${image.thumbnailFileUuid}&preferDownload=false
-					</c:set>
-				 	<c:set var="mediumImagePath">
-	   					<html:rewrite page='/download/?uuid='/>${image.mediumFileUuid}&preferDownload=false
-					</c:set>					
-					<c:set var="title">
-						<c:out value="${image.title}" escapeXml="true"/>
-					</c:set>
-					<a href="${mediumImagePath}" rel="lyteframe" title="${title}" style="border-style: none;" rev="width: ${image.mediumImageWidth + 20}px; height: ${image.mediumImageHeight + 30}px; scrolling: no;">
-						<img src="${thumbnailPath}" alt="${title}" style="border-style: none;"/>
-					</a>
-				</td>
+		<table class="table table-condensed table-authoring" id="itemTable">
+			<c:forEach var="image" items="${sessionMap.imageGalleryList}" varStatus="status">
+			
+				<tr>
+					<td width="4%" >
+						<c:set var="thumbnailPath">
+						   	<html:rewrite page='/download/?uuid='/>${image.thumbnailFileUuid}&preferDownload=false
+						</c:set>
+					 	<c:set var="mediumImagePath">
+		   					<html:rewrite page='/download/?uuid='/>${image.mediumFileUuid}&preferDownload=false
+						</c:set>					
+						<c:set var="title">
+							<c:out value="${image.title}" escapeXml="true"/>
+						</c:set>
+						<a href="${mediumImagePath}" rel="lyteframe" title="${title}" style="border-style: none;" rev="width: ${image.mediumImageWidth + 20}px; height: ${image.mediumImageHeight + 30}px; scrolling: no;">
+							<img src="${thumbnailPath}" alt="${title}" style="border-style: none;"/>
+						</a>
+					</td>
+					
+					<td>
+						<a href="${mediumImagePath}" rel="lyteframe" title="${title}" rev="width: ${image.mediumImageWidth + 20}px; height: ${image.mediumImageHeight + 30}px; scrolling: auto;">
+							<c:out value="${image.title}" escapeXml="true"/>
+						</a>
+					</td>
+					
+					<td class="arrows">
+						<!-- Don't display up icon if first line -->
+						<c:if test="${not status.first}">
+			 				<lams:Arrow state="up" title="<fmt:message key='label.authoring.up'/>" onclick="javascript:upImage(${status.index},'${sessionMapID}')"/>
+			 			</c:if>
+						<!-- Don't display down icon if last line -->
+						<c:if test="${not status.last}">
+							<lams:Arrow state="down" title="<fmt:message key='label.authoring.down'/>" onclick="javascript:downImage(${status.index},'${sessionMapID}')"/>
+			 			</c:if>
+					</td>			
+					
+					<td width="30px">
+						<i class="fa fa-pencil"	title="<fmt:message key="label.authoring.basic.resource.edit" />"
+							onclick="javascript:editItem(${status.index},'${sessionMapID}')"></i>
+					</td>
+					<td width="30px">
+						<i class="fa fa-times" title="<fmt:message key="label.authoring.basic.resource.delete" />"
+							onclick="javascript:deleteItem(${status.index},'${sessionMapID}')"></i>
+					</td>
+				</tr>
 				
-				<td style="vertical-align:middle;">
-					<a href="${mediumImagePath}" rel="lyteframe" title="${title}" rev="width: ${image.mediumImageWidth + 20}px; height: ${image.mediumImageHeight + 30}px; scrolling: auto;">
-						<c:out value="${image.title}" escapeXml="true"/>
-					</a>
-				</td>
-
-				<td width="40px" style="vertical-align:middle;">
-					<c:if test="${not status.first}">
-						<img src="<html:rewrite page='/includes/images/uparrow.gif'/>"
-							border="0" title="<fmt:message key="label.authoring.up"/>"
-							onclick="upImage(${status.index},'${sessionMapID}')">
-						<c:if test="${status.last}">
-							<img
-								src="<html:rewrite page='/includes/images/downarrow_disabled.gif'/>"
-								border="0" title="<fmt:message key="label.authoring.down"/>">
-						</c:if>
-					</c:if>
-
-					<c:if test="${not status.last}">
-						<c:if test="${status.first}">
-							<img
-								src="<html:rewrite page='/includes/images/uparrow_disabled.gif'/>"
-								border="0" title="<fmt:message key="label.authoring.up"/>">
-						</c:if>
-
-						<img src="<html:rewrite page='/includes/images/downarrow.gif'/>"
-							border="0" title="<fmt:message key="label.authoring.down"/>"
-							onclick="downImage(${status.index},'${sessionMapID}')">
-					</c:if>
-				</td>
-				
-				<td width="20px" style="vertical-align:middle;">
-					<img src="${tool}includes/images/edit.gif"
-						title="<fmt:message key="label.authoring.basic.resource.edit" />"
-						onclick="editItem(${status.index},'${sessionMapID}')" />
-                </td>
-                
-				<td width="20px" style="vertical-align:middle;">
-					<img src="${tool}includes/images/cross.gif"
-						title="<fmt:message key="label.authoring.basic.resource.delete" />"
-						onclick="deleteItem(${status.index},'${sessionMapID}')" />
-				</td>
-			</tr>
-		</c:forEach>
-	</table>
-	
+			</c:forEach>
+		</table>
+		
+	</div>
 </div>
 
 <%-- This script will works when a new resoruce item submit in order to refresh "ImageGallery List" panel. --%>
 <script lang="javascript">
-	var win = null;
-	try {
-		if (window.parent && window.parent.hideMessage) {
-			win = window.parent;
-		} else if (window.top && window.top.hideMessage) {
-			win = window.top;
-		}
-	} catch(err) {
-		// mute cross-domain iframe access errors
-	}
-	if (win) {
-		win.hideMessage();
-		var obj = win.document.getElementById('imageGalleryListArea');
-		obj.innerHTML= document.getElementById("itemList").innerHTML;
-		
-		//call it from parent window as this one was just hidden
-		win.initLytebox();
-	}
+	hideMessage();
+	var obj = document.getElementById('imageGalleryListArea');
+	obj.innerHTML= document.getElementById("itemList").innerHTML;
+	initLytebox();
 </script>

@@ -4,10 +4,12 @@
 <c:set var="ctxPath" value="${pageContext.request.contextPath}" scope="request"/>
 
 <!-- ********************  CSS ********************** -->
+<lams:css/>
 <link href="<html:rewrite page='/includes/css/imageGallery.css'/>" rel="stylesheet" type="text/css">
-<lams:css style="main"/>
 
 <!-- ********************  javascript ********************** -->
 <script type="text/javascript" src="${lams}includes/javascript/common.js"></script>
+<script type="text/javascript" src="${lams}includes/javascript/jquery.js"></script>
+<script type="text/javascript" src="${lams}includes/javascript/bootstrap.min.js"></script>
+<script type="text/javascript" src="${lams}includes/javascript/bootstrap.tabcontroller.js"></script>
 <script type="text/javascript" src="<html:rewrite page='/includes/javascript/imageGallerycommon.js'/>"></script>
-<script type="text/javascript" src="${lams}includes/javascript/tabcontroller.js"></script>    

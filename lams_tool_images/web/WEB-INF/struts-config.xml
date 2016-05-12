@@ -300,11 +300,6 @@
 			scope="request" 
 			validate="false">
 			<forward name="success" path="/pages/monitoring/start.jsp" />
-		</action>			
-		<action path="/monitoring/listuser"
-			type="org.lamsfoundation.lams.tool.imageGallery.web.action.MonitoringAction"
-			parameter="listuser" >
-			<forward name="success" path="/pages/monitoring/userlist.jsp" />
 		</action>
 		<action path="/monitoring/hideitem"
 			type="org.lamsfoundation.lams.tool.imageGallery.web.action.MonitoringAction"

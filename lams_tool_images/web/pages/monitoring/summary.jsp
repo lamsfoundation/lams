@@ -2,40 +2,47 @@
 <c:set var="sessionMap" value="${sessionScope[sessionMapID]}"/>
 <c:set var="summaryList" value="${sessionMap.summaryList}"/>
 
-<h1>
-  <c:out value="${sessionMap.imageGallery.title}" escapeXml="true"/>
-</h1>
-
-<div class="instructions small-space-top small-space-bottom">
-  <c:out value="${sessionMap.imageGallery.instructions}" escapeXml="false"/>
+<div class="panel">
+	<h4>
+	  <c:out value="${sessionMap.imageGallery.title}" escapeXml="true"/>
+	</h4>
+	
+	<div class="instructions voffset5">
+	  <c:out value="${sessionMap.imageGallery.instructions}" escapeXml="false"/>
+	</div>
+	
+	<c:if test="${empty summaryList}">
+		<lams:Alert type="info" id="no-session-summary" close="false">
+			<fmt:message key="message.monitoring.summary.no.session" />
+		</lams:Alert>
+	</c:if>
 </div>
 
-<c:if test="${empty summaryList}">
-	<div align="center">
-		<b> <fmt:message key="message.monitoring.summary.no.session" /> </b>
-	</div>
+<c:if test="${sessionMap.isGroupedActivity}">
+	<div class="panel-group" id="accordionSessions" role="tablist" aria-multiselectable="true"> 
 </c:if>
 
-<c:forEach var="group" items="${summaryList}">
+<c:forEach var="group" items="${summaryList}" varStatus="status">
 
-	<c:choose>
-		 <c:when test="${sessionMap.isGroupedActivity}">
-			<h1>
-				<fmt:message key="monitoring.label.group" /> ${group[0].sessionName}	
-			</h1>
-		</c:when>
-		
-		<c:otherwise>
-			<h1>
-				<fmt:message key="label.monitoring.summary.overall.summary" />	
-		 	</h1>
-         </c:otherwise>
-	</c:choose>
+	<c:if test="${sessionMap.isGroupedActivity}">	
+	    <div class="panel panel-default" >
+	        <div class="panel-heading" id="heading${group[0].sessionId}">
+	        	<span class="panel-title collapsable-icon-left">
+	        		<a class="${status.first ? '' : 'collapsed'}" role="button" data-toggle="collapse" href="#collapse${group[0].sessionId}" 
+							aria-expanded="${status.first ? 'false' : 'true'}" aria-controls="collapse${group[0].sessionId}" >
+						<fmt:message key="monitoring.label.group" />:	<c:out value="${group[0].sessionName}" />
+					</a>
+				</span>
+	        </div>
+        
+        <div id="collapse${group[0].sessionId}" class="panel-collapse collapse ${status.first ? 'in' : ''}" 
+        		role="tabpanel" aria-labelledby="heading${sessionSummary.sessionId}">
+	</c:if>
 
 	<table class="tablesorter">
 		<thead>
 			<tr>
-				<th width="4%" align="center">
+				<th width="20%" align="center">
 					<!--thumbnail-->
 				</th>
 				<th>
@@ -43,7 +50,7 @@
 				</th>
 				<c:choose>
 					<c:when test="${sessionMap.imageGallery.allowRank}">
-						<th width="70px" style="padding-left:0px; text-align:center;">
+						<th width="170px" style="padding-left:0px; text-align:center;">
 							<fmt:message key="label.monitoring.average.rating" />
 						</th>
 						<c:if test="${sessionMap.isCommentsEnabled}">
@@ -58,7 +65,7 @@
 						</th>
 					</c:when>
 				</c:choose>				
-				<th width="75px" >
+				<th width="60px" >
 					<!--hide/show-->
 				</th>
 			</tr>
@@ -87,7 +94,7 @@
 						   	<html:rewrite page='/download/?uuid='/>${image.thumbnailFileUuid}&preferDownload=false
 						</c:set>
 						<c:set var="url" >
-							<c:url value='/monitoring/imageSummary.do'/>?sessionMapID=${sessionMapID}&imageUid=${image.uid}&resizeIframe=true&TB_iframe=true&height=640&width=740
+							<c:url value='/monitoring/imageSummary.do'/>?sessionMapID=${sessionMapID}&imageUid=${image.uid}&KeepThis=true&TB_iframe=true&height=640&width=740&modal=true
 						</c:set>				
 						<a href="${url}" class="thickbox" title="<fmt:message key='label.monitoring.imagesummary.image.summary' />" style="border-style: none;"> 
 							<c:set var="title">
@@ -125,7 +132,10 @@
 											${commentDto.comment}
 											
 											<div class="rating-comment-posted-by">
-												<fmt:message key="label.posted.by"><fmt:param>${commentDto.userFullName}</fmt:param><fmt:param><lams:Date value="${commentDto.postedDate}"/></fmt:param></fmt:message>
+												<fmt:message key="label.posted.by">
+													<fmt:param>${commentDto.userFullName}</fmt:param>
+													<fmt:param><lams:Date value="${commentDto.postedDate}"/></fmt:param>
+												</fmt:message>
 											</div>
 										</div>
 									</c:forEach>								
@@ -144,11 +154,15 @@
 					<td style="vertical-align:middle; padding-left: 0px; text-align: center;">
 						<c:choose>
 							<c:when test="${summary.itemHide}">
-								<a href="<c:url value='/monitoring/showitem.do'/>?sessionMapID=${sessionMapID}&imageUid=${summary.itemUid}" class="button"> <fmt:message key="monitoring.label.show" /> </a>
+								<a href="<c:url value='/monitoring/showitem.do'/>?sessionMapID=${sessionMapID}&imageUid=${summary.itemUid}" class="btn btn-default btn-xs loffset5"> 
+									<fmt:message key="monitoring.label.show" /> 
+								</a>
 							</c:when>
 							
 							<c:otherwise>
-								<a href="<c:url value='/monitoring/hideitem.do'/>?sessionMapID=${sessionMapID}&imageUid=${summary.itemUid}" class="button"> <fmt:message key="monitoring.label.hide" /> </a>
+								<a href="<c:url value='/monitoring/hideitem.do'/>?sessionMapID=${sessionMapID}&imageUid=${summary.itemUid}" class="btn btn-default btn-xs loffset5"> 
+									<fmt:message key="monitoring.label.hide" /> 
+								</a>
 							</c:otherwise>
 						</c:choose>
 					</td>
@@ -164,11 +178,11 @@
 	<%-- Reflection list  --%>
 	<c:if test="${sessionMap.imageGallery.reflectOnActivity && not (empty sessionId)}">	
 	
-		<h2 style="color:black; margin-left: 20px; " >
+		<h5>
 			<fmt:message key="label.monitoring.summary.title.reflection"/>
-		</h2>
+		</h5>
 	
-		<table cellpadding="0" class="alternative-color">			
+		<table class="table table-condensed">			
 		
 			<tr>
 				<th>
@@ -189,7 +203,7 @@
 						<c:set var="viewReflection">
 							<c:url value="/monitoring/viewReflection.do?toolSessionID=${sessionId}&userUid=${user.userUid}"/>
 						</c:set>
-						<html:link href="javascript:launchPopup('${viewReflection}')">
+						<html:link href="javascript:launchPopup('${viewReflection}')" styleClass="btn btn-default btn-xs loffset5">
 							<fmt:message key="label.view" />
 						</html:link>
 					</td>
@@ -197,13 +211,24 @@
 			</c:forEach>
 		</table>
 	</c:if>
+	
+	<c:if test="${sessionMap.isGroupedActivity}">
+		</div> <!-- end collapse area  -->
+		</div> <!-- end collapse panel  -->
+	</c:if>
+	${ !sessionMap.isGroupedActivity || ! status.last ? '<div class="voffset5">&nbsp;</div>' :  ''}
 
 </c:forEach>
 
-<div class="space-top space-left">
-	<a href="<html:rewrite page='/monitoring/newImageInit.do?sessionMapID='/>${sessionMapID}&KeepThis=true&TB_iframe=true&height=540&width=480&modal=true" class="button add_new_image thickbox">  
-		<fmt:message key="label.monitoring.summary.add.new.image" />
+<c:if test="${sessionMap.isGroupedActivity}">
+	</div> <!--  end panel group -->
+</c:if>
+
+<P style=" margin-bottom: 10px;">
+	<a href="<html:rewrite page='/monitoring/newImageInit.do?sessionMapID='/>${sessionMapID}&KeepThis=true&TB_iframe=true&height=540&width=480&modal=true" 
+			class="btn btn-default loffset5 voffset10 thickbox">  
+		<i class="fa fa-plus"></i>&nbsp;<fmt:message key="label.monitoring.summary.add.new.image" />
 	</a>
-</div>
+</P>
 
 <%@ include file="parts/advanceOptions.jsp"%>

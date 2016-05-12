@@ -3,16 +3,15 @@
 <c:set var="imageGallery" value="${sessionMap.imageGallery}"/>
 
 <c:if test="${sessionMap.isPageEditable}">
-	<p class="warning">
+	<lams:Alert type="warn" id="no-edit" close="false">
 		<fmt:message key="message.alertContentEdit" />
-	</p>
+	</lams:Alert>
 </c:if>
 
-<table cellpadding="0">
+<table class="table table-condensed">
 	<tr>
 		<td>
 			<fmt:message key="label.authoring.basic.title" />
-			:
 		</td>
 		<td>
 			<c:out value="${imageGallery.title}" escapeXml="true" />
@@ -22,7 +21,6 @@
 	<tr>
 		<td>
 			<fmt:message key="label.authoring.basic.instruction" />
-			:
 		</td>
 		<td>
 			<c:out value="${imageGallery.instructions}" escapeXml="false" />
@@ -35,7 +33,7 @@
 				<c:param name="toolContentID" value="${sessionMap.toolContentID}" />
 				<c:param name="contentFolderID" value="${sessionMap.contentFolderID}" />
 			</c:url>
-			<html:link href="javascript:;" onclick="launchPopup('${authoringUrl}','definelater')" styleClass="button">
+			<html:link href="#nogo" onclick="javascript:launchPopup('${authoringUrl}','definelater');" styleClass="btn btn-default">
 				<fmt:message key="label.monitoring.edit.activity.edit" />
 			</html:link>
 		</td>
