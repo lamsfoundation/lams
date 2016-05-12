@@ -4,57 +4,60 @@
 <c:set var="sessionMapID" value="${formBean.sessionMapID}" />
 <c:set var="tool"><lams:WebAppURL /></c:set>
 <!-- ========== Basic Tab ========== -->
-<table cellpadding="0" border='0'>
-	<tr>
-		<td>
-			<div class="field-name">
-				<fmt:message key="label.authoring.basic.title"></fmt:message>
-			</div>
-			<html:text property="title" style="width: 99%;"></html:text>
-		</td>
-	</tr>
-	<tr>
-		<td>
-			<div class="field-name">
-				<fmt:message key="label.authoring.basic.instructions"></fmt:message>
-			</div>
-			<lams:CKEditor id="instructions"
-				value="${formBean.instructions}"
+<div class="form-group">
+	<label for="title"><fmt:message key="label.authoring.basic.title"></fmt:message></label>
+	<html:text property="title" styleClass="form-control"></html:text>
+</div>
+
+<div class="form-group">
+	<label for="instructions"><fmt:message key="label.authoring.basic.instructions"></fmt:message></label>
+	<lams:CKEditor id="instructions" value="${formBean.instructions}"
 				contentFolderID="${sessionMap.contentFolderID}"></lams:CKEditor>
-		</td>		
-	</tr>
-	<tr>
-		<td>
-			<div class="field-name">
-				<fmt:message key="label.authoring.basic.map"></fmt:message>
-			</div>
-			
-			<div id="map_legend" style="width:100%;" >
-			<iframe marginwidth="0" align="left" height="60px" width="100%" frameborder="0" src="${tool}/common/mapLegend.jsp"></iframe>
-			</div>
-			<div id="map_canvas" style="float: left; width:80%; height:400px"><fmt:message key="error.cantLoadMap"></fmt:message></div>
-			<div id="sidebar" style="float: right; width:20%; overflow:auto; height:400px; background:WhiteSmoke; "></div>		
+</div>
 
-		</td>
-	</tr>
-	<tr>
-		<td>
-			<a href="javascript:addMarkerToCenter()" class="button"/><fmt:message key="button.addMarker"/></a>
-			<a href="javascript:fitMapMarkers()" class="button"/><fmt:message key="button.fitMarkers"/></a>
-		</td>
-	</tr>
-	<tr>
-		<td>
-			<div class="field-name">
-				<fmt:message key="label.authoring.basic.centerMap"></fmt:message>
+	<label><fmt:message key="label.authoring.basic.map"></fmt:message></label>
+	
+	<!-- map UI -->
+	<div class="panel panel-default">
+	<div class="panel-body">
+	    
+		<%@ include file="../../common/mapLegend.jsp"%>
+	
+		<div class="row no-gutter">
+			<div class="col-sm-9 col-md-7">
+				<div id="map_canvas" style="height:400px"><fmt:message key="error.cantLoadMap"></fmt:message></div>
 			</div>
-			
-			<html:text property="defaultGeocoderAddress" size="60" styleId="address" onkeypress="javascript:if (event.keyCode==13){showAddress(); return false;}"></html:text>
-       		<a href="javascript:showAddress()" class="button"/><fmt:message key="button.go"/></a>
-		</td>
-	</tr>
-</table>
-
+			<div class="col-sm-3 col-md-5">
+				<div id="sidebar" style="border:1px"></div>		
+			</div>	
+		</div>
+				
+		<div class="row no-gutter">
+			<div class="col-sm-12">
+				<a href="javascript:addMarkerToCenter()" class="btn btn-default btn-sm voffset5" role="button"/><fmt:message key="button.addMarker"/></a>
+				<a href="javascript:fitMapMarkers()" class="btn btn-default btn-sm  voffset5" role="button"/><fmt:message key="button.fitMarkers"/></a>
+			</div>
+		</div>
+					
+		<div class="row no-gutter voffset5">
+			<div class="col-sm-12">
+				<label><fmt:message key="label.authoring.basic.centerMap"></fmt:message></label>
+			</div>
+		</div>
+		
+		<div class="row no-gutter">
+			<div class="col-sm-12">
+				<c:set var="goText"><fmt:message key="button.go"/></c:set>
+				<html:text property="defaultGeocoderAddress" size="60" styleId="address" onkeypress="javascript:if (event.keyCode==13){showAddress(); return false;}" 
+					styleClass="form-control form-control-inline input-sm"></html:text>
+	       		<a href="javascript:showAddress()" class="btn btn-default btn-sm"/><i class="fa fa-search" title="${goText}"></i></a>
+			</div>
+		</div>		
+		
+	</div>	
+	</div>
+	<!-- end map UI -->
+	
 <script type="text/javascript">
 <!--
 
