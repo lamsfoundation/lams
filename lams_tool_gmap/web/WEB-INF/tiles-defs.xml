@@ -69,7 +69,7 @@
 		</definition>
 	-->
 	<definition name="tiles:/generic/message" extends="tiles:/layout:default">
-		<put name="pageTitleKey" value="pageTitle.authoring" />
+		<put name="pageTitleKey" value="activity.title" />
 		<put name="header" value="tiles:/header:default" />
 		<put name="body" value="/common/message.jsp"></put>
 	</definition>
@@ -78,7 +78,7 @@
 
 	<!-- Begin: Authoring -->
 	<definition name="tiles:/authoring/main" extends="tiles:/layout:tab">
-		<put name="pageTitleKey" value="pageTitle.authoring" />
+		<put name="pageTitleKey" value="activity.title" />
 		<put name="header" value="tiles:/header:authoring" type="definition" />
 		<put name="body" value="/pages/authoring/authoring.jsp" />
 	</definition>
@@ -104,13 +104,13 @@
 
 	<!-- Begin: Monitoring -->
 	<definition name="tiles:/monitoring/main" extends="tiles:/layout:tab">
-		<put name="pageTitleKey" value="pageTitle.monitoring" />
+		<put name="pageTitleKey" value="activity.title" />
 		<put name="header" value="tiles:/header:monitoring/main" type="definition" />
 		<put name="body" value="/pages/monitoring/monitoring.jsp" />
 	</definition>
 	
 	<definition name="tiles:/monitoring/gmap_display" extends="tiles:/layout:default">
-		<put name="pageTitleKey" value="pageTitle.monitoring" />
+		<put name="pageTitleKey" value="activity.title" />
 		<put name="header" value="tiles:/header:monitoring/main" type="definition" />
 		<!--  put name="body" value="/pages/monitoring/gmapDisplay.jsp" />	-->
 	</definition>

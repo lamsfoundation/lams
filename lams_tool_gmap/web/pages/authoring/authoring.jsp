@@ -24,45 +24,39 @@
 		<c:set var="defineLater" value="yes" />
 	</c:if>
 
-	<div id="header">
-		<!--  TITLE KEY PAGE GOES HERE -->
-		<lams:Tabs control="true">
-			<lams:Tab id="1" key="button.basic" />
-			<c:if test="${sessionMap.mode == 'author'}">
-				<lams:Tab id="2" key="button.advanced" />
-			</c:if>
-		</lams:Tabs>
-	</div>
-	<!--closes header-->
+	<html:hidden property="currentTab" styleId="currentTab" />
+	<html:hidden property="dispatch" value="updateContent" />
+	<html:hidden property="sessionMapID" />
+	<html:hidden property="markersXML" value="" styleId="markersXML" />
+	<html:hidden property="mapZoom" value="" styleId="mapZoom" />
+	<html:hidden property="mapCenterLatitude" value="" styleId="mapCenterLatitude" />
+	<html:hidden property="mapCenterLongitude" value="" styleId="mapCenterLongitude" />
+	<html:hidden property="mapType" value="" styleId="mapType" />
 
-	<div id="content">
-
-		<html:hidden property="currentTab" styleId="currentTab" />
-		<html:hidden property="dispatch" value="updateContent" />
-		<html:hidden property="sessionMapID" />
-		<html:hidden property="markersXML" value="" styleId="markersXML" />
-		<html:hidden property="mapZoom" value="" styleId="mapZoom" />
-		<html:hidden property="mapCenterLatitude" value="" styleId="mapCenterLatitude" />
-		<html:hidden property="mapCenterLongitude" value="" styleId="mapCenterLongitude" />
-		<html:hidden property="mapType" value="" styleId="mapType" />
-
-		<div id="message" style="text-align: center;">
-			<logic:messagesPresent>
-				<p class="warning">
-				        <html:messages id="error">
-				            <c:out value="${error}" escapeXml="false"/><br/>
-				        </html:messages>
-				</p>
-			</logic:messagesPresent>			
-		</div>
-
-		<lams:help toolSignature="<%=GmapConstants.TOOL_SIGNATURE%>" module="authoring" />
-
-		<%-- Page tabs --%>
-		<lams:TabBody id="1" titleKey="button.basic" page="basic.jsp" />
+	<c:set var="title"><fmt:message key="activity.title" /></c:set>
+	<lams:Tabs control="true" title="${title}" helpToolSignature="<%= GmapConstants.TOOL_SIGNATURE %>" helpModule="authoring">
+		<lams:Tab id="1" key="button.basic" />
 		<c:if test="${sessionMap.mode == 'author'}">
-			<lams:TabBody id="2" titleKey="button.advanced" page="advanced.jsp" />
+			<lams:Tab id="2" key="button.advanced" />
 		</c:if>
+	</lams:Tabs>
+	
+	<%-- Page tabs --%>
+	<lams:TabBodyArea>
+		<logic:messagesPresent>
+		<lams:Alert id="errorMessages" type="danger" close="false">
+		    <html:messages id="error">
+		        <c:out value="${error}" escapeXml="false"/><br/>
+		    </html:messages>
+		 </lams:Alert>
+		</logic:messagesPresent>
+                
+        <lams:TabBodys>
+			<lams:TabBody id="1" titleKey="button.basic" page="basic.jsp" />
+			<c:if test="${sessionMap.mode == 'author'}">
+				<lams:TabBody id="2" titleKey="button.advanced" page="advanced.jsp" />
+			</c:if>
+		</lams:TabBodys>
 
 		<lams:AuthoringButton formID="authoringForm"
 			clearSessionActionUrl="/clearsession.do" 
@@ -74,7 +68,6 @@
 			defineLater="${defineLater}"
 			customiseSessionID="${sessionMap.sessionID}" 
 			contentFolderID="${sessionMap.contentFolderID}" />
-	</div>
+	
+	</lams:TabBodyArea>
 </html:form>
-
-<div id="footer"></div>

@@ -3,36 +3,35 @@
 <!-- ========== Advanced Tab ========== -->
 
 
-<h2><fmt:message key="advanced.editingOptions" /></h2>
+<h4><fmt:message key="advanced.editingOptions" /></h4>
 
-<p class="small-space-top">
-	<html:checkbox property="lockOnFinished" value="1"
-		styleClass="noBorder" styleId="lockOnFinished"></html:checkbox>
-	<label for="lockOnFinished">
-		<fmt:message key="advanced.lockOnFinished" />
-	</label>
-</p>
+	<div class="checkbox">
+		<label for="lockOnFinished">
+		<html:checkbox property="lockOnFinished" value="1" styleId="lockOnFinished"></html:checkbox>
+		<fmt:message key="advanced.lockOnFinished" /></label>
+	</div>
+	
+	<div class="checkbox">
+		<label for="allowEditMarkers">
+		<html:checkbox property="allowEditMarkers" value="1" styleId="allowEditMarkers"></html:checkbox>
+		<fmt:message key="advanced.allowEditMarkers" /></label>
+	</div>
+	
+	<div class="checkbox">
+		<label for="allowShowAllMarkers">
+		<html:checkbox property="allowShowAllMarkers" value="1" styleId="allowShowAllMarkers"></html:checkbox>
+		<fmt:message key="advanced.allowShowAllMarkers" /></label>
+	</div>
 
-<p>
-	<html:checkbox property="allowEditMarkers" value="1"
-		styleClass="noBorder" styleId="allowEditMarkers"></html:checkbox>
-	<label for="allowEditMarkers">
-		<fmt:message key="advanced.allowEditMarkers" />
-	</label>
-</p>
+<h4><fmt:message key="advanced.limitMarkers" /></h4>
 
-<p>
-	<html:checkbox property="allowShowAllMarkers" value="1"
-		styleClass="noBorder" styleId="allowShowAllMarkers"></html:checkbox>
-	<label for="allowShowAllMarkers">
-		<fmt:message key="advanced.allowShowAllMarkers" />
-	</label>
-</p>
+	<div class="checkbox">
+		<label for="limitMarkers">
+		<html:checkbox property="limitMarkers" value="1" onclick="javascript:toggleMaxMarkerMenu()" styleId="limitMarkers"></html:checkbox>
+		<fmt:message key="advanced.markerLimitsMessage" />
+		</label>
 
-<h2><fmt:message key="advanced.limitMarkers" /></h2>
-
-<p>
-	<html:select property="maxMarkers" styleId="maxMarkers"  >
+	<html:select property="maxMarkers" styleId="maxMarkers" styleClass="form-control form-control-inline input-sm" >
 			<html:option value="1">1</html:option>
 			<html:option value="2">2</html:option>
 			<html:option value="3">3</html:option>
@@ -54,86 +53,71 @@
 			<html:option value="10">19</html:option>
 			<html:option value="10">20</html:option>
 	</html:select>
-
-	<html:checkbox property="limitMarkers" value="1" onclick="javascript:toggleMaxMarkerMenu()" styleClass="noBorder" styleId="limitMarkers"></html:checkbox>
-	<label for="limitMarkers">
-		<fmt:message key="advanced.markerLimitsMessage" />
-	</label>
-</p>
-
-<script type="text/javascript">
-<!--
-	toggleMaxMarkerMenu();
-	function toggleMaxMarkerMenu()
-	{
-		document.getElementById("maxMarkers").disabled = !document.getElementById("limitMarkers").checked
-	}
-//-->
-</script>
-
-<h2><fmt:message key="advanced.mapOptions" /></h2>
-
-<p>
-	<html:checkbox property="allowZoom" value="1"
-		styleClass="noBorder" styleId="allowZoom"></html:checkbox>
-	<label for="allowZoom">
-		<fmt:message key="advanced.allowZoom" />
-	</label>
-</p>
-
-<p>
-	<html:checkbox property="allowSatellite" value="1"
-		styleClass="noBorder" styleId="allowSatellite"></html:checkbox>
-	<label for="allowSatellite">
-		<fmt:message key="advanced.allowSatellite" />
-	</label>
-</p>
-
-<p>
-	<html:checkbox property="allowHybrid" value="1"
-		styleClass="noBorder" styleId="allowHybrid"></html:checkbox>
-	<label for="allowHybrid">
-		<fmt:message key="advanced.allowHybrid" />
-	</label>
-</p>
-
-<p>
-	<html:checkbox property="allowTerrain" value="1"
-		styleClass="noBorder" styleId="allowTerrain"></html:checkbox>
-	<label for="allowTerrain">
-		<fmt:message key="advanced.allowTerrain" />
-	</label>
-</p>
-
-<p>
-	<html:checkbox property="reflectOnActivity" value="1"
-		styleClass="noBorder" styleId="reflectOnActivity"></html:checkbox>
-
-	<label for="reflectOnActivity">
-		<fmt:message key="advanced.reflectOnActivity" />
-	</label>
-</p>
-<p>
-	<html:textarea property="reflectInstructions" cols="30" rows="3" styleId="reflectInstructions"/>
-</p>
-
-<script type="text/javascript">
-<!--
-//automatically turn on refect option if there are text input in refect instruction area
-	var ra = document.getElementById("reflectInstructions");
-	var rao = document.getElementById("reflectOnActivity");
-	function turnOnRefect(){
-		if(isEmpty(ra.value)){
-		//turn off	
-			rao.checked = false;
-		}else{
-		//turn on
-			rao.checked = true;		
+	
+	</div>
+	
+	<script type="text/javascript">
+	<!--
+		toggleMaxMarkerMenu();
+		function toggleMaxMarkerMenu()
+		{
+			document.getElementById("maxMarkers").disabled = !document.getElementById("limitMarkers").checked
 		}
-	}
+	//-->
+	</script>
 
-	ra.onkeyup=turnOnRefect;
-//-->
-</script>
+<h4><fmt:message key="advanced.mapOptions" /></h4>
+
+	<div class="checkbox">
+		<label for="allowZoom">
+		<html:checkbox property="allowZoom" value="1" styleId="allowZoom"></html:checkbox>
+		<fmt:message key="advanced.allowZoom" /></label>
+	</div>
+	
+	<div class="checkbox">
+		<label for="allowSatellite">
+		<html:checkbox property="allowSatellite" value="1" styleId="allowSatellite"></html:checkbox>
+		<fmt:message key="advanced.allowSatellite" /></label>
+	</div>
+	
+	<div class="checkbox">
+		<label for="allowHybrid">
+		<html:checkbox property="allowHybrid" value="1"	styleId="allowHybrid"></html:checkbox>
+		<fmt:message key="advanced.allowHybrid" /></label>
+	</div>
+	
+	<div class="checkbox">
+		<label for="allowTerrain">
+		<html:checkbox property="allowTerrain" value="1" styleId="allowTerrain"></html:checkbox>
+		<fmt:message key="advanced.allowTerrain" /></label>
+	</div>
+	
+	<div class="checkbox">
+		<label for="reflectOnActivity">
+		<html:checkbox property="reflectOnActivity" value="1" styleId="reflectOnActivity"></html:checkbox>
+		<fmt:message key="advanced.reflectOnActivity" /></label>
+	</div>
+	<div class="form-group">
+	<html:textarea property="reflectInstructions" rows="3" styleId="reflectInstructions"  styleClass="form-control"/>
+	</div>
+	
+	<script type="text/javascript">
+	<!--
+	//automatically turn on refect option if there are text input in refect instruction area
+		var ra = document.getElementById("reflectInstructions");
+		var rao = document.getElementById("reflectOnActivity");
+		function turnOnRefect(){
+			if(isEmpty(ra.value)){
+			//turn off	
+				rao.checked = false;
+			}else{
+			//turn on
+				rao.checked = true;		
+			}
+		}
+	
+		ra.onkeyup=turnOnRefect;
+	//-->
+	</script>
 
 
