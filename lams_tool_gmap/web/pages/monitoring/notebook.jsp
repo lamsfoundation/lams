@@ -9,46 +9,20 @@
 </c:set>
 
 <lams:html>
-
 	<lams:head>  
 		<title>
 			<fmt:message>pageTitle.monitoring.notebook</fmt:message>
 		</title>
-		
 		<lams:css/>
-		<script type="text/javascript" src="${lams}includes/javascript/common.js"></script>
-
-		
 	</lams:head>
-	
-	
+
 	<body class="stripes">
-	
-			<div id="content">
-			
-				<h1>
-					<fmt:message>pageTitle.monitoring.notebook</fmt:message>
-				</h1>
-				
-				<table>
-					<tr>
-						<td>
-							<h2>
-								<c:out value="${gmapUserDTO.firstName} ${gmapUserDTO.lastName}" escapeXml="true"/>
-							</h2>
-						</td>
-					</tr>
-					<tr>
-						<td>
-							<p>
-								<lams:out value="${gmapUserDTO.notebookEntry}" escapeHtml="true"/>
-							</p>
-						</td>
-					</tr>
-				</table>
-				
-			</div>
+		<c:set var="title"><fmt:message>pageTitle.monitoring.notebook</fmt:message></c:set>
+		<lams:Page type="learner" title="${title}">
+			<p><c:out value="${gmapUserDTO.firstName} ${gmapUserDTO.lastName} (${gmapUserDTO.loginName})" escapeXml="true"/></p>
+			<p><lams:out value="${gmapUserDTO.notebookEntry}" escapeHtml="true"/></p>
 			<div class="footer"></div>
+		</lams:Page>
 	</body>
 </lams:html>
 
