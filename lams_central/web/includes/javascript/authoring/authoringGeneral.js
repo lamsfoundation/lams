@@ -654,6 +654,7 @@ GeneralInitLib = {
 
 				            		var result = GeneralLib.saveLearningDesign(folderID, learningDesignID, title);
 				            		if (result) {
+				            			GeneralLib.openLearningDesign();
 				            			dialog.dialog('close');
 				            		}
 								}
@@ -1430,10 +1431,13 @@ GeneralLib = {
 	 * Replace current canvas contents with the loaded sequence.
 	 */
 	openLearningDesign : function(learningDesignID) {
+		if (!learningDesignID){
+			// do just a re-load
+			learningDesignID = layout.ld.learningDesignID;
+		}
 		// get LD details
 		$.ajax({
 			cache : false,
-			async : false,
 			url : LAMS_URL + "authoring/author.do",
 			dataType : 'json',
 			data : {
@@ -1453,7 +1457,7 @@ GeneralLib = {
 				// remove existing activities
 				GeneralLib.newLearningDesign(true, true);
 				layout.ld = {
-					'learningDesignID' : learningDesignID,
+					'learningDesignID' : ld.learningDesignID,
 					'folderID'		   : ld.workspaceFolderID,
 					'contentFolderID'  : ld.contentFolderID,
 					'title'			   : ld.title,
@@ -2506,70 +2510,9 @@ GeneralLib = {
 				}
 				
 				// if save (even partially) was successful
-				if (response.ld) {
+				if (response.learningDesignID) {
 					// assing the database-generated values
-					layout.ld.learningDesignID = response.ld.learningDesignID;
-					if (!layout.ld.contentFolderID) {
-						layout.ld.contentFolderID = response.ld.contentFolderID;
-					}
-					$('#ldDescriptionFieldTitle').html(GeneralLib.escapeHtml(title));
-					
-					// assign database-generated properties to activities
-					$.each(response.ld.activities, function() {
-						var updatedActivity = this;
-						$.each(layout.activities, function(){
-							var isBranching = this instanceof ActivityDefs.BranchingEdgeActivity,
-								found = false;
-							if (isBranching && !this.isStart) {
-								return true;
-							}
-							
-							if (isBranching) {
-								if (updatedActivity.activityUIID == this.branchingActivity.uiid){
-									this.branchingActivity.id = updatedActivity.activityID;
-									found = true;
-								} else {
-									$.each(this.branchingActivity.branches, function(){
-										if (updatedActivity.activityUIID == this.branchingActivity.uiid){
-											this.id = updatedActivity.activityID;
-										}
-									});
-								}
-							} else if (updatedActivity.activityUIID == this.uiid) {
-								this.id = updatedActivity.activityID;
-								this.toolContentID = updatedActivity.toolContentID;
-								found = true;
-							}
-							
-							// update transition IDs
-							$.each(this.transitions.from, function(){
-								var existingTransition = this;
-								$.each(response.ld.transitions, function(){
-									if (existingTransition.uiid == +this.transitionUIID) {
-										existingTransition.id = +this.transitionID || null;
-										return false;
-									}
-								});
-							});
-							
-							return !found;
-						});
-					});
-					
-					if (layout.floatingActivity) {
-						layout.floatingActivity.id = response.floatingActivityID;
-					}
-					
-					// update annotation IDs
-					$.each(response.ld.annotations, function(){
-						var updatedAnnotation = this;
-						$.each(layout.labels.concat(layout.regions), function(){
-							if (this.uiid == updatedAnnotation.annotationUIID) {
-								this.id = updatedAnnotation.uid;
-								return false;
-							}
-						});
-					});
+					layout.ld.learningDesignID = response.learningDesignID;
 					
 					if (layout.liveEdit) {
 						// let backend know that system gate needs to be removed
@@ -2630,24 +2573,20 @@ GeneralLib = {
 					var svgSaveSuccessful = GeneralLib.saveLearningDesignImage();
 					if (!svgSaveSuccessful) {
 						alert(LABELS.SVG_SAVE_ERROR);
-						return;
 					}
 					
 					if (response.validation.length == 0) {
 						alert(LABELS.SAVE_SUCCESSFUL);
 					}
 					
-					result = true;
 					GeneralLib.setModified(false);
+					result = true;
 				}
-				
-				GeneralLib.updateAccess(response.access);
 			},
 			error : function(){
 				alert(LABELS.SEQUENCE_SAVE_ERROR);
 			}
 		});
-		
 		return result;
 	},
 	
