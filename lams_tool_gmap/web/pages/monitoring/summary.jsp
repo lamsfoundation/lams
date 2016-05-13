@@ -2,274 +2,58 @@
 <c:set var="tool"><lams:WebAppURL /></c:set>
 <c:set var="dto" value="${gmapDTO}" />
 
-
-<h1>
-	<img src="<lams:LAMSURL/>/images/tree_closed.gif" id="treeIcon" onclick="javascript:toggleAdvancedOptionsVisibility(document.getElementById('advancedDiv'), document.getElementById('treeIcon'), '<lams:LAMSURL/>');" />
-
-	<a href="javascript:toggleAdvancedOptionsVisibility(document.getElementById('advancedDiv'), document.getElementById('treeIcon'),'<lams:LAMSURL/>');" >
-		<fmt:message key="monitor.summary.th.advancedSettings" />
-	</a>
-</h1>
-<br />
-
-<div class="monitoring-advanced" id="advancedDiv" style="display:none">
-<table class="alternative-color">
-
-	<tr>
-		<td>
-			<fmt:message key="advanced.lockOnFinished" />
-		</td>
-		
-		<td>
-			<c:choose>
-				<c:when test="${dto.lockOnFinish == true}">
-					<fmt:message key="label.on" />
-				</c:when>
-				<c:otherwise>
-					<fmt:message key="label.off" />
-				</c:otherwise>
-			</c:choose>	
-		</td>
-	</tr>
+<div class="panel">
+	<h4>
+	    <c:out value="${dto.title}" escapeXml="true"/>
+	</h4>
+	<div class="instructions voffset5">
+	    <c:out value="${dto.instructions}" escapeXml="false"/>
+	</div>
 	
-	<tr>
-		<td>
-			<fmt:message key="advanced.allowEditMarkers" />
-		</td>
-		<td>
-			<c:choose>
-				<c:when test="${dto.allowEditMarkers == true}">
-					<fmt:message key="label.on" />
-				</c:when>
-				<c:otherwise>
-					<fmt:message key="label.off" />
-				</c:otherwise>
-			</c:choose>	
-		</td>
-	</tr>
-
-	<tr>
-		<td>
-			<fmt:message key="advanced.allowShowAllMarkers" />
-		</td>
-		<td>	
-			<c:choose>
-				<c:when test="${dto.allowShowAllMarkers == true}">
-					<fmt:message key="label.on" />
-				</c:when>
-				<c:otherwise>
-					<fmt:message key="label.off" />
-				</c:otherwise>
-			</c:choose>	
-		</td>
-	</tr>
-	
-	
-	<tr>
-		<td>
-			<fmt:message key="advanced.markerLimitsMessage" />
-		</td>	
-		<td>
-			<c:choose>
-				<c:when test="${dto.limitMarkers == true}">
-					<fmt:message key="label.on" />, ${dto.maxMarkers}
-				</c:when>
-				<c:otherwise>
-					<fmt:message key="label.off" />
-				</c:otherwise>
-			</c:choose>
-		</td>
-	</tr>
-	 		
-	<tr>
-	 	<td>
-			<fmt:message key="advanced.allowZoom" />
-		</td>
-		<td>	
-			<c:choose>
-				<c:when test="${dto.allowZoom == true}">
-					<fmt:message key="label.on" />
-				</c:when>
-				<c:otherwise>
-					<fmt:message key="label.off" />
-				</c:otherwise>
-			</c:choose>	
-		</td>
-	</tr>
-
-	<tr>
-		<td>
-			<fmt:message key="advanced.allowTerrain" />
-		</td>
-		<td>	
-			<c:choose>
-				<c:when test="${dto.allowTerrain == true}">
-					<fmt:message key="label.on" />
-				</c:when>
-				<c:otherwise>
-					<fmt:message key="label.off" />
-				</c:otherwise>
-			</c:choose>	
-		</td>
-	</tr>
-
-	<tr>
-		<td>
-			<fmt:message key="advanced.allowSatellite" />
-		</td>
-		<td>	
-			<c:choose>
-				<c:when test="${dto.allowSatellite == true}">
-					<fmt:message key="label.on" />
-				</c:when>
-				<c:otherwise>
-					<fmt:message key="label.off" />
-				</c:otherwise>
-			</c:choose>	
-		</td>
-	</tr>
-	
-	<tr>
-		<td>
-			<fmt:message key="advanced.allowHybrid" />
-		</td>
-		<td>	
-			<c:choose>	
-				<c:when test="${dto.allowHybrid == true}">
-					<fmt:message key="label.on" />
-				</c:when>
-				<c:otherwise>
-					<fmt:message key="label.off" />
-				</c:otherwise>
-			</c:choose>	
-		</td>
-	</tr>
-	
-	<tr>
-		<td>
-			<fmt:message key="monitor.summary.td.addNotebook" />
-		</td>
-		
-		<td>
-			<c:choose>
-				<c:when test="${dto.reflectOnActivity == true}">
-					<fmt:message key="label.on" />
-				</c:when>
-				<c:otherwise>
-					<fmt:message key="label.off" />
-				</c:otherwise>
-			</c:choose>	
-		</td>
-	</tr>
-	
-	<c:choose>
-		<c:when test="${dto.reflectOnActivity == true}">
-			<tr>
-				<td>
-					<fmt:message key="monitor.summary.td.notebookInstructions" />
-				</td>
-				<td>
-					<lams:out value="${dto.reflectInstructions}" escapeHtml="true"/>
-				</td>
-			</tr>
-		</c:when>
-	</c:choose>
-</table>
 </div>
 
+<c:choose>
+<c:when test="${empty dto.sessionDTOs}">
+	<lams:Alert type="info" id="no-session-summary" close="false">
+		<fmt:message key="label.nogroups" />
+	</lams:Alert>
+</c:when>
+<c:otherwise>
 
+	<h4><fmt:message key="monitor.summary.title.groups"/></h4>
+	
+<c:choose>
+<c:when test="${dto.reflectOnActivity}">
+	
+	<div class="panel-group" id="accordionSessions" role="tablist" aria-multiselectable="true"> 
+	
+	<c:forEach var="session" items="${dto.sessionDTOs}" varStatus="status">
+		<c:set var="toggleJS">javascript:clearMap();addUsersForSession${session.sessionID}();addMarkersForSession${session.sessionID}();</c:set>
+		<div id="sessionDiv${session.sessionID}">
 
-	<div id="groupsTable">
-	<h1><fmt:message key="monitor.summary.title.groups"/></h1>
-	
-	<br />
-	
-	<table class="alternative-color">
-	<tr>
-		<th>
-			<fmt:message key="heading.table.group" />
-		</th>
-		<th>
-			<fmt:message key="heading.totalLearners" />
-		</th>
-	</tr>
-	
-	<c:if test="${empty dto.sessionDTOs}">
-		<td colspan="2"><i><fmt:message key="label.nogroups" /></i></td>
-	</c:if>
-	<c:forEach var="session" items="${dto.sessionDTOs}">
-		<tr>
-			<td>
-				<a href="javascript:clearMap();addUsersForSession${session.sessionID}();addMarkersForSession${session.sessionID}();makeReflectionDivVisible('reflectionDiv${session.sessionID}');">${session.sessionName}</a>
-			</td>
-			<td>
-				${session.numberOfLearners}
-			</td>
-		</tr>
-	</c:forEach>
-	</table>	
-	</div>
-
-	<html:form action="/monitoring" method="post">
-		<html:hidden property="dispatch" styleId = "dispatch" value="unspecified" />
-		<html:hidden property="markersXML" value="" styleId="markersXML" />
-		<html:hidden property="toolSessionID" styleId="toolSessionID"/>
-		<html:hidden property="toolContentID" />
-		<html:hidden property="contentFolderID" />
-	
-	<div id="gmapDiv">	
-	<h1><fmt:message key="monitor.summary.title.map"/></h1>
-	
-	<br />
-	<table>
-		<tr>
-			 <td>
-			 	<div id="map_legend" style="width:100%;" >
-				<iframe marginwidth="0" align="left" height="60px" width="100%" frameborder="0" src="${tool}/common/mapLegend.jsp"></iframe>
+	    <div class="panel panel-default" >
+        <div class="panel-heading" id="heading${session.sessionID}">
+			<div class="row no-gutter">
+				<div class="col-sm-5">
+					<span  class="collapsable-icon-left">
+		        	<a class="collapsed" role="button" data-toggle="collapse" href="#collapse${session.sessionID}" onClick="${toggleJS}"
+						aria-expanded="false" aria-controls="collapse${session.sessionID}" >
+					<b><c:out value="${session.sessionName}" /></b>
+					</span>
 				</div>
-			 	<div id="map_canvas" style="float: left; width:80%; height:400px"><fmt:message key="error.cantLoadMap"></fmt:message></div>
-				<div id="usersidebar" style="float: right; width:20%; overflow:auto; height:400px; background:WhiteSmoke; "></div>			 	
-			 </td> 			
-		</tr>
-		<tr>
-			<td>
-				<a href="javascript:addMarkerToCenterMonitoring()" class="button"/><fmt:message key="button.addMarker"/></a>
-				<a href="javascript:fitMapMarkers()" class="button"/><fmt:message key="button.fitMarkers"/></a>
-				<a href="javascript:if(confirmLeavePage()){refreshPage();}" class="button"/><fmt:message key="button.refresh"/></a>
-			</td>
-		</tr>
-	</table>
-	
-	<table>
-	<tr><td>
-		<input type="text" onkeypress="javascript:if (event.keyCode==13){showAddress();return false;}" size="60" name="address" id="address" value="${dto.defaultGeocoderAddress}" />			
-		<a href="javascript:showAddress()" class="button"/><fmt:message key="button.go"/></a>
-	</td></tr>
-	</table>
-	</div>
-	
-	<table><tr><td align="right">
-		<html:submit styleClass="button" styleId="finishButton" onclick="javascript:serialiseMarkers();document.getElementById('dispatch').value = 'saveMarkers';">
-			<fmt:message key="button.save"></fmt:message>
-		</html:submit>
-	</td></tr></table>
-	
-	<c:if test="${dto.reflectOnActivity}">
-	
-	
-	<c:forEach var="session" items="${dto.sessionDTOs}">
-		<div id="reflectionDiv${session.sessionID}" style="display:none;">
+				<div class="col-sm-5">
+					<fmt:message key="heading.totalLearners" />:&nbsp;${session.numberOfLearners}</a>
+				</div>
+				<div class="col-sm-2">
+					<a href="${toggleJS}"
+						class="btn btn-default btn-xs pull-right"><fmt:message key="label.show.on.map"/></a>
+				</div>
+			</div>
+        </div>
+        
+        <div id="collapse${session.sessionID}" class="panel-collapse collapse" role="tabpanel" aria-labelledby="heading${session.sessionID}">
 		
-		<h1>
-			<c:if test="${isGroupedActivity}">
-				${session.sessionName}
-			</c:if>	
-			<fmt:message key="heading.reflection"></fmt:message>
-		</h1>
-		<br />
-		
-		
-		<table class="alternative-color">
+		<table class="table table-condensed table-striped">
 		<c:forEach var="user" items="${session.userDTOs}">
 			<tr>
 				<td>
@@ -283,20 +67,117 @@
 							<c:param name="toolSessionID" value="${session.sessionID}" />
 						</c:url>
 				
-						<html:link
+						<html:link styleClass="btn btn-default btn-xs pull-right"
 							href="javascript:launchPopup('${openNotebook}')">
-							<fmt:message key="link.view" />
+							<fmt:message key="pageTitle.monitoring.notebook" />
 						</html:link>
 					</c:if>
 				</td>
 			</tr>	
 		</c:forEach>
 		</table>
+		
+		</div> <!-- end collapse area  -->
+		</div> <!-- end collapse panel  -->
+
+		<c:if test="${!status.last}"><div class="voffset5">&nbsp;</div></c:if>
+		
 		</div>
 	</c:forEach>
-	</c:if>
+
+	</div> <!--  end panel group -->
+
+</c:when> 
+
+<c:otherwise>
+    <div class="panel panel-default" >
+	<table class="table table-condensed table-striped">
+		<tr>
+			<th>
+				<fmt:message key="heading.table.group" />
+			</th>
+			<th>
+				<fmt:message key="heading.totalLearners" />
+			</th>
+			<th></th>
+		</tr>
+		
+		<c:forEach var="session" items="${dto.sessionDTOs}">
+			<tr>
+				<td>
+					${session.sessionName}
+				</td>
+				<td>
+					${session.numberOfLearners}
+				</td>
+				<td>
+					<a href="javascript:clearMap();addUsersForSession${session.sessionID}();addMarkersForSession${session.sessionID}();"
+					class="btn btn-default btn-xs pull-right">Show On Map</a>
+				</td>
+			</tr>
+		</c:forEach>
+	</table>	
+	</div>
+</c:otherwise>
+</c:choose>
+
+</c:otherwise>
+</c:choose>
+
+	<html:form action="/monitoring" method="post">
+		<html:hidden property="dispatch" styleId = "dispatch" value="unspecified" />
+		<html:hidden property="markersXML" value="" styleId="markersXML" />
+		<html:hidden property="toolSessionID" styleId="toolSessionID"/>
+		<html:hidden property="toolContentID" />
+		<html:hidden property="contentFolderID" />
+	
+	<div id="gmapDiv">	
+	<h4><fmt:message key="monitor.summary.title.map"/></h4>
+	
+	<!-- map UI -->
+	<div class="panel panel-default">
+	<div class="panel-body">
+	    
+		<%@ include file="../../common/mapLegend.jsp"%>
+	
+		<div class="row no-gutter">
+			<div class="col-sm-9 col-md-7">
+				<div id="map_canvas" style="height:400px"><fmt:message key="error.cantLoadMap"></fmt:message></div>
+			</div>
+			<div class="col-sm-3 col-md-5">
+				<div id="usersidebar" style="border:1px"></div>		
+			</div>	
+		</div>
+				
+		<div class="row no-gutter">
+			<div class="col-sm-12">
+				<a href="javascript:addMarkerToCenterMonitoring()" class="btn btn-default btn-sm voffset5" role="button"/><fmt:message key="button.addMarker"/></a>
+				<a href="javascript:fitMapMarkers()" class="btn btn-default btn-sm voffset5" role="button"/><fmt:message key="button.fitMarkers"/></a>
+				<a href="javascript:if(confirmLeavePage()){refreshPage();}" class="btn btn-default btn-sm voffset5" role="button"/><fmt:message key="button.refresh"/></a>
+			</div>
+		</div>
+					
+		<div class="row no-gutter">
+			<div class="col-sm-10">
+				<c:set var="goText"><fmt:message key="button.go"/></c:set>
+				<input type="text" onkeypress="javascript:if (event.keyCode==13){showAddress();return false;}" size="60" name="address" 
+					id="address" value="${dto.defaultGeocoderAddress}" class="form-control form-control-inline input-sm  voffset5"/>			
+				<a href="javascript:showAddress()" class="btn btn-default btn-sm"/><i class="fa fa-search" title="${goText}"></i></a>
+			</div>
+			<div class="col-sm-2">
+				<html:submit styleClass="btn btn-default pull-right" styleId="finishButton" onclick="javascript:serialiseMarkers();document.getElementById('dispatch').value = 'saveMarkers';">
+				<fmt:message key="button.save"></fmt:message>
+				</html:submit>
+			</div>
+		</div>
+	</div>	
+	</div>
+	<!-- end map UI -->
+	</div>
+
 </html:form>
 
+<%@include file="advancedOptions.jsp"%>
 	
 <script type="text/javascript">
 <!--
@@ -337,18 +218,6 @@
 		makeReflectionDivVisible('reflectionDiv${session.sessionID}');
 	</c:if>
 	</c:forEach>
-	
-	function makeReflectionDivVisible(id)
-	{
-		var i;
-		if (document.getElementById(id) != null)
-		{
-		<c:forEach var="session" items="${dto.sessionDTOs}">
-			document.getElementById("reflectionDiv${session.sessionID}").style.display = "none";
-		</c:forEach>
-		document.getElementById(id).style.display = "block";
-		}
-	}	
 	
 	function refreshPage()
 	{

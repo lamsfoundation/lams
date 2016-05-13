@@ -3,12 +3,12 @@
 <c:set var="dto" value="${gmapDTO}" />
 
 <c:if test="${dto.contentInUse}">
-	<p class="warning">
+	<lams:Alert type="warn" id="no-edit" close="false">
 		<fmt:message key="message.alertContentEdit" />
-	</p>
+	</lams:Alert>
 </c:if>
 
-<table cellspacing="0">
+<table class="table table-condensed">
 	<tbody>
 		<tr>
 			<td class="field-name" width="30%">
@@ -29,15 +29,13 @@
 	</tbody>
 </table>
 
-<p class="align-right">
-	<c:url value="/authoring.do" var="authoringUrl">
-		<c:param name="toolContentID" value="${dto.toolContentId}" />
-		<c:param name="mode" value="teacher" />
-		<c:param name="contentFolderID" value="${contentFolderID}" />
-	</c:url>
-	<html:link href="${authoringUrl}" styleClass="button" target="_blank">
-		<fmt:message key="button.editActivity" />
-	</html:link>
-</p>
+<c:url value="/authoring.do" var="authoringUrl">
+	<c:param name="toolContentID" value="${dto.toolContentId}" />
+	<c:param name="mode" value="teacher" />
+	<c:param name="contentFolderID" value="${contentFolderID}" />
+</c:url>
+<html:link href="javascript:;" onclick="launchPopup('${authoringUrl}')" styleClass="btn btn-default">
+	<fmt:message key="button.editActivity" />
+</html:link>
 
 
