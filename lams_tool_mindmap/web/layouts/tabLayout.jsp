@@ -10,6 +10,6 @@
 		<c:set var="title"><fmt:message key="${pTitleKey}" /></c:set>
 		<lams:Page title="${title}" type="navbar">
 			<tiles:insert attribute="body" />
-		</lams:Page></div>
+		</lams:Page>
 	</body>
 </lams:html>
