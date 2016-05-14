@@ -28,8 +28,7 @@ function getWindowSize(dim) {
 		return myWidth;
 }
 
-function makeNice()
-{
+function makeNice() {
 	var isIE = navigator.appName.indexOf("Microsoft") != -1;
 	flash = document.getElementById('flashContent');
 	container = document.getElementById('center12');

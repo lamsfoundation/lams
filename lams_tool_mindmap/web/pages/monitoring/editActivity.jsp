@@ -1,17 +1,16 @@
 <%@ include file="/common/taglibs.jsp"%>
-
 <c:set var="dto" value="${mindmapDTO}" />
 
 <!--<c:if test="${dto.contentInUse}">
-	<p class="warning">
+	<lams:Alert type="warn" id="alertContentEdit" close="false">
 		<fmt:message key="message.alertContentEdit" />
-	</p>
-</c:if> -->
+	</lams:Alert>
+</c:if>-->
 
-<table cellspacing="0">
+<table class="table table-condensed">
 	<tbody>
 		<tr>
-			<td class="field-name" width="10%" nowrap>
+			<td width="10%" nowrap>
 				<fmt:message key="label.authoring.basic.title" />
 			</td>
 			<td>
@@ -19,7 +18,7 @@
 			</td>
 		</tr>
 		<tr>
-			<td class="field-name" width="10%" nowrap valign="top">
+			<td width="10%" nowrap valign="top">
 				<fmt:message key="label.authoring.basic.instructions" />
 			</td>
 			<td>
@@ -37,7 +36,7 @@
 	</c:url>
 	
 	<c:if test="${dto.contentInUse == false}">
-		<html:link href="${authoringUrl}" styleClass="button" target="_blank">
+		<html:link href="${authoringUrl}" styleClass="btn btn-default" target="_blank">
 			<fmt:message key="button.editActivity" />
 		</html:link>
 	</c:if>

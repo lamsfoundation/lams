@@ -18,6 +18,7 @@
 <%-- Optional attribute --%>
 <%@ attribute name="hasRatingLimits" required="false" rtexprvalue="true" %>
 <%@ attribute name="formContentPrefix" required="false" rtexprvalue="true" %>
+<%@ attribute name="styleId" required="false" rtexprvalue="true" %>
 <%@ attribute name="headerLabel" required="false" rtexprvalue="true" %>
 <%@ attribute name="addLabel" required="false" rtexprvalue="true" %>
 <%@ attribute name="deleteLabel" required="false" rtexprvalue="true" %>
@@ -106,16 +107,16 @@ $(document).ready(function() {
 		jQuery('<tr/>').append(jQuery('<td/>', {
 			'class': 'criteria-info',
 		    html: '<input type="hidden" name="criteriaOrderId' + maxOrderId + '" value="' + maxOrderId + '">' + 
-		    		'<input type="text" name="criteriaTitle' + maxOrderId + '" value="">'
+		    		'<input type="text" name="criteriaTitle' + maxOrderId + '" value="" class="form-control">'
 		    		
 		})).append(jQuery('<td/>', {
 			width: '40px',
-			html: '<div class="up-arrow" title="<fmt:message key="${upLabel}"/>" />' + 
+			html: '<div class="fa fa-long-arrow-up fa-pull-left" title="<fmt:message key="${upLabel}"/>" />' + 
 		    		'<div class="down-arrow-disabled" title="<fmt:message key="${downLabel}"/>" />'
 		    		
 		})).append(jQuery('<td/>', {
 			width: '20px',
-			html: '<div class="delete-arrow" title="<fmt:message key="${deleteLabel}"/>" />'
+			html: '<i class="fa fa-times" title="<fmt:message key="${deleteLabel}"/>"></i>'
 		})).appendTo('#criterias-table');
 		
 		reactivateArrows();
@@ -124,6 +125,7 @@ $(document).ready(function() {
 		addCriteria(); 
 		addCriteria();
 	</c:if>
+	reactivateArrows();
 	
 	function reactivateArrows() {
 		$('#criterias-table tr').each(function() {
@@ -131,23 +133,21 @@ $(document).ready(function() {
 		    $this = $(this); // cache $(this)
 		    
 		    if ($this.is(':first-child')) {
-		    	$(".up-arrow", $this).addClass("up-arrow-disabled").removeClass("up-arrow");
-		        
+		    	$(".arrow-up", $this).removeClass("fa fa-long-arrow-up fa-pull-left");
 		    } else {
-		    	$(".up-arrow-disabled", $this).addClass("up-arrow").removeClass("up-arrow-disabled");
+		    	$(".arrow-up", $this).addClass("fa fa-long-arrow-up fa-pull-left");
 		    }
 		    
 		    if ($this.is(':last-child')) {
-		    	$(".down-arrow", $this).addClass("down-arrow-disabled").removeClass("down-arrow");
-		    	
+		    	$(".arrow-down", $this).removeClass("fa fa-long-arrow-down fa-pull-right");
 		    } else {
-		    	$(".down-arrow-disabled", $this).addClass("down-arrow").removeClass("down-arrow-disabled");
+		    	$(".arrow-down", $this).addClass("fa fa-long-arrow-down fa-pull-right");
 		    }
 		});
 	}
 	
 	//upCriteria
-	 $( "body" ).on( "click", ".up-arrow", function() {
+	 $( "body" ).on( "click", ".fa-long-arrow-up", function() {
 		var currentRow = $(this).closest('tr');
 		var currentCriteriaTd = $( ".criteria-info", currentRow);
 		var currentOrderId = $( "input[name^='criteriaOrderId']", currentCriteriaTd);
@@ -170,7 +170,7 @@ $(document).ready(function() {
 	 } );
 	 
 	//downCriteria
-	 $( "body" ).on( "click", ".down-arrow", function() {
+	 $( "body" ).on( "click", ".fa-long-arrow-down", function() {
 		var currentRow = $(this).closest('tr');
 		var currentCriteriaTd = $( ".criteria-info", currentRow);
 		var currentOrderId = $( "input[name^='criteriaOrderId']", currentCriteriaTd);
@@ -193,7 +193,7 @@ $(document).ready(function() {
 	 });
 	 
 	 //deleteCriteria
-	 $( "body" ).on( "click", ".delete-arrow", function() {
+	 $( "body" ).on( "click", ".fa-times", function() {
 		var currentRow = $(this).closest('tr');
 		currentRow.remove();
 		
@@ -241,112 +241,110 @@ $(document).ready(function() {
 	}
 </script>
 
-<div class="rating-criteria-tag">
-	<h2>
-		<fmt:message key="${headerLabel}" />
-	</h2>
-	<input type="hidden" name="criteriaMaxOrderId" id="criteria-max-order-id" value="${maxOrderId}">
+<div class="rating-criteria-tag" style="${styleId}">
 
-	<table class="alternative-color" cellspacing="0" id="criterias-table">
-
-		<c:forEach var="criteria" items="${criterias}" varStatus="status">
-			<c:if test="${!criteria.commentsEnabled}">
-				<tr>
-					
-					<td class="criteria-info">
-						<input type="hidden" name="criteriaOrderId${criteria.orderId}" value="${criteria.orderId}">
-						<input type="text" name="criteriaTitle${criteria.orderId}" value="${criteria.title}">
-					</td>
-					
-					<td width="40px">
-						<c:if test="${not status.first}">
-							<div class="up-arrow" title="<fmt:message key="${upLabel}"/>"></div>
-							<c:if test="${status.last}">
-								<div class="down-arrow-disabled" title="<fmt:message key="${downLabel}"/>"></div>
-							</c:if>
-						</c:if>
+	<div class="panel panel-default voffset5">
+		<div class="panel-heading panel-title">
+			<label><fmt:message key="${headerLabel}" /></label>
+		</div>
 	
-						<c:if test="${not status.last}">
-							<c:if test="${status.first}">
-								<div class="up-arrow-disabled" title="<fmt:message key="${upLabel}"/>"></div>
-							</c:if>
+		<div class="form-group roffset10 loffset10">
+			<input type="hidden" name="criteriaMaxOrderId" id="criteria-max-order-id" value="${maxOrderId}">
+			<table class="table table-condensed table-no-border" id="criterias-table">
+		
+				<c:forEach var="criteria" items="${criterias}" varStatus="status">
+					<c:set var="isFirst" value="${criteria.commentsEnabled && (status.index == 1) || !criteria.commentsEnabled && (status.index == 0)}"></c:set>
+					<c:if test="${!criteria.commentsEnabled}">
+						<tr>${ criteria.commentsEnabled }${status.index == 1}${status.last}${  isFirst }
+							
+							<td class="criteria-info">
+								<input type="hidden" name="criteriaOrderId${criteria.orderId}" value="${criteria.orderId}">
+								<input type="text" name="criteriaTitle${criteria.orderId}" value="${criteria.title}" class="form-control">
+							</td>
+							
+							<td width="40px">
+								<div class="arrow-up" title="<fmt:message key="${upLabel}"/>"></div>
+								<div class="arrow-down" title="<fmt:message key="${downLabel}"/>"></div>
+							</td>
+			                
+							<td width="20px">
+								<i class="fa fa-times" title="<fmt:message key="${deleteLabel}" />"></i>
+							</td>
+						</tr>
+					</c:if>
+				</c:forEach>
+			</table>
 	
-							<div class="down-arrow" title="<fmt:message key="${downLabel}"/>"></div>
-						</c:if>
-					</td>
-	                
-					<td width="20px">
-						<div class="delete-arrow" title="<fmt:message key="${deleteLabel}"/>" ></div>
-					</td>
-				</tr>
+			<div style="height: 25px; margin-top: -10px;">
+				<a href="#nogo" class="btn btn-default btn-xs pull-right" id="add-criteria">
+					<i class="fa fa-plus"></i>&nbsp;<fmt:message key="${addLabel}" /> 
+				</a>
+			</div>
+	
+			<c:if test="${hasRatingLimits}">
+				<div>
+					<label for="minimum-rates">
+						<fmt:message key="${minimumLabel}" />
+					</label>
+					<html:select property="${formContentPrefix}minimumRates" styleId="minimum-rates" onmouseup="validateRatingLimits(true);" 
+							styleClass="form-control form-control-inline">
+						<html:option value="0">
+							<fmt:message key="${noMinimumLabel}" />
+						</html:option>
+						<html:option value="1">1</html:option>
+						<html:option value="2">2</html:option>
+						<html:option value="3">3</html:option>
+						<html:option value="4">4</html:option>
+						<html:option value="5">5</html:option>
+						<html:option value="6">6</html:option>
+						<html:option value="7">7</html:option>
+						<html:option value="8">8</html:option>
+						<html:option value="9">9</html:option>
+						<html:option value="10">10</html:option>
+					</html:select>
+				
+					<label for="maximum-rates">
+						<fmt:message key="${maximumLabel}" />
+					</label>
+					<html:select property="${formContentPrefix}maximumRates" styleId="maximum-rates" onmouseup="validateRatingLimits(false);" 
+							styleClass="form-control form-control-inline">
+						<html:option value="0">
+							<fmt:message key="${noMaximumLabel}" />
+						</html:option>
+						<html:option value="1">1</html:option>
+						<html:option value="2">2</html:option>
+						<html:option value="3">3</html:option>
+						<html:option value="4">4</html:option>
+						<html:option value="5">5</html:option>
+						<html:option value="6">6</html:option>
+						<html:option value="7">7</html:option>
+						<html:option value="8">8</html:option>
+						<html:option value="9">9</html:option>
+						<html:option value="10">10</html:option>
+					</html:select>
+				</div>
 			</c:if>
-		</c:forEach>
-	</table>
 	
-	<div style="height: 30px;">
-		<a href="#nogo" class="button-add-item float-right" id="add-criteria">
-			<fmt:message key="${addLabel}" /> 
-		</a>
-	</div>
+			<div class="checkbox">
+				<label for="enable-comments">
+					<input type="checkbox" name="isCommentsEnabled" value="true" class="noBorder" id="enable-comments"
+						<c:if test="${isCommentsEnabled}">checked="checked"</c:if>
+					/>
+					<fmt:message key="${allowCommentsLabel}" />
+				</label>
+			</div>
 	
-	<c:if test="${hasRatingLimits}">
-		<div>
-			<fmt:message key="${minimumLabel}" />
-			<html:select property="${formContentPrefix}minimumRates" styleId="minimum-rates" onmouseup="validateRatingLimits(true);">
-				<html:option value="0">
-					<fmt:message key="${noMinimumLabel}" />
-				</html:option>
-				<html:option value="1">1</html:option>
-				<html:option value="2">2</html:option>
-				<html:option value="3">3</html:option>
-				<html:option value="4">4</html:option>
-				<html:option value="5">5</html:option>
-				<html:option value="6">6</html:option>
-				<html:option value="7">7</html:option>
-				<html:option value="8">8</html:option>
-				<html:option value="9">9</html:option>
-				<html:option value="10">10</html:option>
-			</html:select>
-		
-			<fmt:message key="${maximumLabel}" />
-			<html:select property="${formContentPrefix}maximumRates" styleId="maximum-rates" onmouseup="validateRatingLimits(false);">
-				<html:option value="0">
-					<fmt:message key="${noMaximumLabel}" />
-				</html:option>
-				<html:option value="1">1</html:option>
-				<html:option value="2">2</html:option>
-				<html:option value="3">3</html:option>
-				<html:option value="4">4</html:option>
-				<html:option value="5">5</html:option>
-				<html:option value="6">6</html:option>
-				<html:option value="7">7</html:option>
-				<html:option value="8">8</html:option>
-				<html:option value="9">9</html:option>
-				<html:option value="10">10</html:option>
-			</html:select>
+			<div>
+				<label for="comments-min-words-limit" id="comments-min-words-limit-label"
+					<c:if test="${!isCommentsEnabled}">class="gray-color"</c:if>
+				>
+					<fmt:message key="${minNumberWordsLabel}" >
+						<fmt:param> </fmt:param>
+					</fmt:message>
+				</label>
+				<input type="text" name="commentsMinWordsLimit" id="comments-min-words-limit" value="${commentsMinWordsLimit}"/>
+			</div>
 		</div>
-	</c:if>
-	
-	<div class="space-top">
-		<input type="checkbox" name="isCommentsEnabled" value="true" class="noBorder" id="enable-comments"
-			<c:if test="${isCommentsEnabled}">checked="checked"</c:if>
-		/>
-		<label for="enable-comments">
-			<fmt:message key="${allowCommentsLabel}" />
-		</label>
-		
-		<div class="small-space-top" >
-			<label for="comments-min-words-limit" id="comments-min-words-limit-label"
-				<c:if test="${!isCommentsEnabled}">class="gray-color"</c:if>
-			>
-				<fmt:message key="${minNumberWordsLabel}" >
-					<fmt:param> </fmt:param>
-				</fmt:message>
-			</label>
-			<input type="text" name="commentsMinWordsLimit" id="comments-min-words-limit" value="${commentsMinWordsLimit}"/>
-		</div>
-		
 	</div>
-	
 </div>
 <!-- end tab content -->

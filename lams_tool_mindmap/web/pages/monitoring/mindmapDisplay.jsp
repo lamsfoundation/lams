@@ -3,7 +3,6 @@
 <script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery.js"></script>
 <script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/swfobject.js"></script>
 <script type="text/javascript" src="includes/javascript/mindmap.resize.js"></script>
-
 <script type="text/javascript">
 //<![CDATA[
            
@@ -17,25 +16,21 @@
 
 	$(window).resize(makeNice);
 	
-	function embedFlashObject(x, y)
-	{
+	function embedFlashObject(x, y)	{
 		swfobject.embedSWF("${mindmapType}", "flashContent", x, y, "9.0.0", false, flashvars);
 	}
 	
-	function setToolContentID()
-	{
+	function setToolContentID()	{
 		var toolContentID = document.getElementById("toolContentID");
 		toolContentID.value = "${toolContentID}";
 	}
 	
-	function setUserId()
-	{
+	function setUserId() {
 		var userId = document.getElementById("userId");
 		userId.value = "${userDTO.uid}";
 	}
 	
-	function setMindmapContent()
-	{
+	function setMindmapContent() {
 		var mindmapContent = document.getElementById("mindmapContent");
 		if(mindmapContent != null) {
 			mindmapContent.value = document['flashContent'].getMindmap();
@@ -45,8 +40,7 @@
 		setToolContentID();
 	}
 
-	function updateContent()
-	{
+	function updateContent() {
 		$.post("${get}", { dispatch: "${dispatch}", mindmapId: "${mindmapId}", userId: "${userId}", 
 			content: document['flashContent'].getMindmap() } );
 	}
@@ -57,12 +51,10 @@
 	<html:hidden property="toolContentID" styleId="toolContentID" value="${toolContentID}" />
 	<html:hidden property="contentFolderID" styleId="contentFolderID" value="${contentFolderID}" />
 	
-	<table>
+	<table class="table">
 		<tr>
 			<td colspan="2">
-				<h2>
-					<c:out value="${userDTO.firstName} ${userDTO.lastName}" escapeXml="true"/>
-				</h2>
+				<c:out value="${userDTO.firstName} ${userDTO.lastName}" escapeXml="true"/>
 			</td>
 		</tr>
 		<tr>
@@ -77,22 +69,20 @@
 			<fmt:message>message.enableJavaScript</fmt:message>
 		</div>
 	</center>
-	
-	<div class="space-bottom-top align-right">
-		<html:button styleClass="button" property="backButton" onclick="history.go(-1)">
-			<fmt:message>button.back</fmt:message>
-		</html:button>
-
 		<c:choose>
 			<c:when test="${isMultiUserMode}">
 			</c:when>
 			<c:otherwise>
-				<html:submit styleClass="button" styleId="saveButton" onclick="updateContent()">
+				<html:submit styleClass="btn btn-primary voffset10 loffset5 pull-right" styleId="saveButton" onclick="updateContent()">
 					<fmt:message>button.save</fmt:message>
 				</html:submit>	
 			</c:otherwise>
 		</c:choose>
+	
+		<html:button styleClass="btn btn-primary voffset10 pull-right" property="backButton" onclick="history.go(-1)">
+			<fmt:message>button.back</fmt:message>
+		</html:button>
+
 		
-	</div>
 
 </html:form>
