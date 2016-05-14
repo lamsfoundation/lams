@@ -66,7 +66,7 @@
 		</definition>
 	-->
 	<definition name="tiles:/generic/message" extends="tiles:/layout:default">
-		<put name="pageTitleKey" value="pageTitle.authoring" />
+		<put name="pageTitleKey" value="activity.title" />
 		<put name="header" value="tiles:/header:default" />
 		<put name="body" value="/common/message.jsp"></put>
 	</definition>
@@ -75,7 +75,7 @@
 
 	<!-- Begin: Authoring -->
 	<definition name="tiles:/authoring/main" extends="tiles:/layout:tab">
-		<put name="pageTitleKey" value="pageTitle.authoring" />
+		<put name="pageTitleKey" value="activity.title" />
 		<put name="header" value="tiles:/header:authoring" type="definition" />
 		<put name="body" value="/pages/authoring/authoring.jsp" />
 	</definition>

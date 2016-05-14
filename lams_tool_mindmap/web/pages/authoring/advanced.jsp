@@ -2,39 +2,36 @@
 
 <!-- ========== Advanced Tab ========== -->
 
-<p class="small-space-top">
-	<html:checkbox property="lockOnFinished" value="1"
-		styleClass="noBorder" styleId="lockOnFinished"></html:checkbox>
-	<label for="lockOnFinished">
+<div class="checkbox">
+	<label for="lock-when-finished">
+		<html:checkbox property="lockOnFinished" styleId="lock-when-finished"/>
 		<fmt:message key="advanced.lockOnFinished" />
 	</label>
-</p>
+</div>
 
-<p>
-	<html:checkbox property="multiUserMode" value="1" styleClass="noBorder" styleId="multiUserMode"></html:checkbox>
+<div class="checkbox">
 	<label for="multiUserMode">
+		<html:checkbox property="multiUserMode" value="1" styleId="multiUserMode"/>
 		<fmt:message key="advanced.multiUserMode" />
 	</label>
-</p>
+</div>
 
 <!-- Reflection -->
-
-<p class="small-space-top">
-	<html:checkbox property="reflectOnActivity" value="1" styleClass="noBorder" styleId="reflectOnActivity"></html:checkbox>
-	<label for="reflectOnActivity">
+<div class="checkbox">
+	<label for="reflect-on">
+		<html:checkbox property="reflectOnActivity" styleId="reflect-on"/>
 		<fmt:message key="advanced.reflectOnActivity" />
 	</label>
-</p>
+</div>
 
-<p>
-	<html:textarea property="reflectInstructions" cols="30" rows="3"  styleId="reflectInstructions"/>
-</p>
+<div class="form-group">
+	<html:textarea property="reflectInstructions" cols="60" rows="3" styleId="reflect-instructions" styleClass="form-control"/>
+</div>
 
 <script type="text/javascript">
-<!--
 //automatically turn on refect option if there are text input in refect instruction area
-	var ra = document.getElementById("reflectInstructions");
-	var rao = document.getElementById("reflectOnActivity");
+	var ra = document.getElementById("reflect-instructions");
+	var rao = document.getElementById("reflect-on");
 
 	function turnOnRefect() {
 		if(isEmpty(ra.value)) {
@@ -47,5 +44,4 @@
 	}
 
 	ra.onkeyup = turnOnRefect;
-//-->
 </script>

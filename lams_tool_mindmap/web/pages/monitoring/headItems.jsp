@@ -4,6 +4,7 @@
 	<lams:WebAppURL />
 </c:set>
 
-<script type="text/javascript"
-	src="${tool}includes/javascript/monitoring.js">
+<script type="text/javascript">
+	var initialTabId = "${mindmapDTO.currentTab}";
 </script>
+<script type="text/javascript" src="${tool}includes/javascript/monitoring.js"></script>
