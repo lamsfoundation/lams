@@ -111,8 +111,8 @@ $(document).ready(function() {
 		    		
 		})).append(jQuery('<td/>', {
 			width: '40px',
-			html: '<div class="fa fa-long-arrow-up fa-pull-left" title="<fmt:message key="${upLabel}"/>" />' + 
-		    		'<div class="down-arrow-disabled" title="<fmt:message key="${downLabel}"/>" />'
+			html: '<div class="arrow-up fa fa-long-arrow-up fa-pull-left" title="<fmt:message key="${upLabel}"/>" />' + 
+		    		'<div class="arrow-down fa fa-long-arrow-down fa-pull-right" title="<fmt:message key="${downLabel}"/>" />'
 		    		
 		})).append(jQuery('<td/>', {
 			width: '20px',
@@ -253,9 +253,8 @@ $(document).ready(function() {
 			<table class="table table-condensed table-no-border" id="criterias-table">
 		
 				<c:forEach var="criteria" items="${criterias}" varStatus="status">
-					<c:set var="isFirst" value="${criteria.commentsEnabled && (status.index == 1) || !criteria.commentsEnabled && (status.index == 0)}"></c:set>
 					<c:if test="${!criteria.commentsEnabled}">
-						<tr>${ criteria.commentsEnabled }${status.index == 1}${status.last}${  isFirst }
+						<tr>
 							
 							<td class="criteria-info">
 								<input type="hidden" name="criteriaOrderId${criteria.orderId}" value="${criteria.orderId}">
@@ -342,7 +341,7 @@ $(document).ready(function() {
 						<fmt:param> </fmt:param>
 					</fmt:message>
 				</label>
-				<input type="text" name="commentsMinWordsLimit" id="comments-min-words-limit" value="${commentsMinWordsLimit}"/>
+				<input type="text" name="commentsMinWordsLimit" id="comments-min-words-limit" value="${commentsMinWordsLimit}" class="form-control-sm"/>
 			</div>
 		</div>
 	</div>
