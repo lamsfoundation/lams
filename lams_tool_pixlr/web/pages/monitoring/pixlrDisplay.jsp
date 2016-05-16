@@ -1,6 +1,6 @@
 <%@ include file="/common/taglibs.jsp"%>
 
-<table>
+<table class="table">
 	<tr>
 		<td colspan="2">
 			<h2>
@@ -8,17 +8,18 @@
 			</h2>
 		</td>
 	</tr>
+	
 	<tr>
-		<td class="field-name" width="20%">
+		<td width="20%">
 			<fmt:message key="label.created" />
 		</td>
 		<td>
 			<lams:Date value="${userDTO.entryDTO.createDate }"></lams:Date>
-			
 		</td>
 	</tr>
+	
 	<tr>
-		<td class="field-name" width="20%">
+		<td width="20%">
 			<fmt:message key="label.lastModified" />
 		</td>
 		<td>
@@ -27,7 +28,7 @@
 	</tr>
 
 	<tr>
-		<td class="field-name">
+		<td>
 			<fmt:message key="label.notebookEntry" />
 		</td>
 		<td>

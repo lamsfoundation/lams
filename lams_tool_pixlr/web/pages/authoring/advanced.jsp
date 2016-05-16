@@ -2,50 +2,46 @@
 
 <!-- ========== Advanced Tab ========== -->
 
-<p class="small-space-top">
-	<html:checkbox property="lockOnFinished" value="1"
-		styleClass="noBorder" styleId="lockOnFinished"></html:checkbox>
-	<label for="lockOnFinished">
+<div class="checkbox">
+	<label for="lock-when-finished">
+		<html:checkbox property="lockOnFinished" styleId="lock-when-finished"/>
 		<fmt:message key="advanced.lockOnFinished" />
 	</label>
-</p>
+</div>
 
-<p class="small-space-top">
-	<html:checkbox property="allowViewOthersImages" value="1"
-		styleClass="noBorder" styleId="allowViewOthersImages"></html:checkbox>
+<div class="checkbox">
 	<label for="allowViewOthersImages">
+		<html:checkbox property="allowViewOthersImages" value="1" styleId="allowViewOthersImages"/>
 		<fmt:message key="advanced.allowViewOthersImages" />
 	</label>
-</p>
+</div>
 
-<p>
-	<html:checkbox property="reflectOnActivity" value="1"
-		styleClass="noBorder" styleId="reflectOnActivity"></html:checkbox>
-
-	<label for="reflectOnActivity">
+<!-- Reflection -->
+<div class="checkbox">
+	<label for="reflect-on-activity">
+		<html:checkbox property="reflectOnActivity" styleId="reflect-on-activity"/>
 		<fmt:message key="advanced.reflectOnActivity" />
 	</label>
-</p>
-<p>
-	<html:textarea property="reflectInstructions" cols="30" rows="3" styleId="reflectInstructions"/>
-</p>
+</div>
+
+<div class="form-group">
+	<html:textarea property="reflectInstructions" cols="60" rows="3" styleId="reflect-instructions" styleClass="form-control"/>
+</div>
 
 <script type="text/javascript">
-<!--
-//automatically turn on refect option if there are text input in refect instruction area
-	var ra = document.getElementById("reflectInstructions");
-	var rao = document.getElementById("reflectOnActivity");
+	//automatically turn on refect option if there are text input in refect instruction area
+	var ra = document.getElementById("reflect-instructions");
+	var rao = document.getElementById("reflect-on-activity");
 	function turnOnRefect(){
-		if(isEmpty(ra.value)){
+		if (isEmpty(ra.value)) {
 		//turn off	
 			rao.checked = false;
-		}else{
+		} else {
 		//turn on
 			rao.checked = true;		
 		}
 	}
 
 	ra.onkeyup=turnOnRefect;
-//-->
 </script>
 

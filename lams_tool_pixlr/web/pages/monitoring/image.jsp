@@ -1,26 +1,18 @@
-<!DOCTYPE html>
-        
+<!DOCTYPE html>      
 <%@ include file="/common/taglibs.jsp"%>
-
-<%
-String imageURL = request.getParameter("imageURL");
-%>
 
 <html>
 	<head>
-	
 		<script type="text/javascript">
-		<!--
-			function resize() 
-			{
+			function resize() {
 				var image = document.getElementById("image");
 				window.resizeBy(image.width, image.height); 
 			}
-		-->
 		</script>
 	</head>
+	
 	<body onload="resize();">
-		<img id="image" src='<%= imageURL %>' />
+		<img id="image" src='<%= request.getParameter("imageURL") %>' />
 	</body>
 </html>
 	

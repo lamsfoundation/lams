@@ -42,8 +42,8 @@
 				
 				<c:choose>
 					<c:when test="${!empty learnerDTOs}">
-						<c:forEach var="learner" items="${learnerDTOs}">
-							<table >
+						<table class="table">
+							<c:forEach var="learner" items="${learnerDTOs}">
 								<tr>
 									<td width="30%">
 										<a href="javascript:openPopup('${pixlrImageFolderURL}/${learner.imageFileName}', ${learner.imageHeight}, ${learner.imageWidth})">
@@ -66,13 +66,9 @@
 											</c:otherwise>
 										</c:choose>
 									</td>
-								</tr>
-							</table>
-								
-							<br />
-							<hr />
-						</c:forEach>
-						<br />
+								</tr>	
+							</c:forEach>
+						</table>
 					</c:when>
 						
 					<c:otherwise>
@@ -83,12 +79,12 @@
 				</c:choose>
 					
 				<%--Bottom buttons--------------------------------------------------%>
-				<html:submit styleClass="btn btn-default" onclick="javascript:document.getElementById('dispatch').value = 'viewAllImages';">
+				<html:submit styleClass="btn btn-default btn-sm" onclick="javascript:document.getElementById('dispatch').value = 'viewAllImages';">
 					<fmt:message key="button.refresh" />
 				</html:submit>
 					
 				<c:if test="${!pixlrDTO.lockOnFinish}">
-					<html:submit styleClass="btn btn-default" onclick="javascript:document.getElementById('dispatch').value = 'unspecified';">
+					<html:submit styleClass="btn btn-default btn-sm loffset5" onclick="javascript:document.getElementById('dispatch').value = 'unspecified';">
 						<fmt:message key="button.redo" />
 					</html:submit>
 				</c:if>
