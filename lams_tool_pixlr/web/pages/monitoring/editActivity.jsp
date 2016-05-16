@@ -1,17 +1,16 @@
 <%@ include file="/common/taglibs.jsp"%>
-
 <c:set var="dto" value="${pixlrDTO}" />
 
 <c:if test="${dto.contentInUse}">
-	<p class="warning">
+	<lams:Alert type="warn" id="alertContentEdit" close="false">
 		<fmt:message key="message.alertContentEdit" />
-	</p>
+	</lams:Alert>
 </c:if>
 
-<table cellspacing="0">
+<table class="table table-condensed">
 	<tbody>
 		<tr>
-			<td class="field-name" width="30%">
+			<td width="30%">
 				<fmt:message key="label.authoring.basic.title" />
 			</td>
 			<td>
@@ -19,7 +18,7 @@
 			</td>
 		</tr>
 		<tr>
-			<td class="field-name" width="30%">
+			<td width="30%">
 				<fmt:message key="label.authoring.basic.instructions" />
 			</td>
 			<td>
@@ -29,15 +28,13 @@
 	</tbody>
 </table>
 
-<p class="align-right">
-	<c:url value="/authoring.do" var="authoringUrl">
-		<c:param name="toolContentID" value="${dto.toolContentId}" />
-		<c:param name="mode" value="teacher" />
-		<c:param name="contentFolderID" value="${contentFolderID}" />
-	</c:url>
-	<html:link href="${authoringUrl}" styleClass="button" target="_blank">
-		<fmt:message key="button.editActivity" />
-	</html:link>
-</p>
+<c:url value="/authoring.do" var="authoringUrl">
+	<c:param name="toolContentID" value="${dto.toolContentId}" />
+	<c:param name="mode" value="teacher" />
+	<c:param name="contentFolderID" value="${contentFolderID}" />
+</c:url>
+<html:link href="${authoringUrl}" styleClass="btn btn-default pull-right" target="_blank">
+	<fmt:message key="button.editActivity" />
+</html:link>
 
 

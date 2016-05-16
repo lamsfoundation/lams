@@ -1,18 +1,17 @@
 <!DOCTYPE html>
-            
-
 <%@ include file="/common/taglibs.jsp"%>
 
 <lams:html>
 	<tiles:insert attribute="header" />
 	<body class="stripes" onload="init();">
-		<div id="page">
-			<tiles:useAttribute name="pageTitleKey" />
-			<bean:define name="pageTitleKey" id="pTitleKey" type="String" />
-			<h1>
-				<fmt:message key="${pTitleKey}" />
-			</h1>
+	
+		<tiles:useAttribute name="pageTitleKey" />
+		<bean:define name="pageTitleKey" id="pTitleKey" type="String" />
+		<c:set var="title"><fmt:message key="${pTitleKey}" /></c:set>
+		
+		<lams:Page title="${title}" type="navbar">
 			<tiles:insert attribute="body" />
-		</div>
+		</lams:Page>
+
 	</body>
 </lams:html>

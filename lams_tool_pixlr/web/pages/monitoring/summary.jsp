@@ -1,8 +1,7 @@
 <%@ include file="/common/taglibs.jsp"%>
-<script type="text/javascript" src="<lams:LAMSURL/>/includes/javascript/monitorToolSummaryAdvanced.js" ></script>
-
 <c:set var="dto" value="${pixlrDTO}" />
 
+<script type="text/javascript" src="<lams:LAMSURL/>/includes/javascript/monitorToolSummaryAdvanced.js" ></script>
 <script type="text/javascript">
 	function submitForm(method, uid) {
 		document.getElementById("dispatch").value = method;
@@ -11,13 +10,26 @@
 	}
 </script>
 
-<h1>
-	<c:out value="${dto.title}" escapeXml="true" />
-</h1>
-<div class="instructions small-space-top">
-	<c:out value="${dto.instructions}" escapeXml="false" />	
+<div class="panel">
+	<h4>
+	  <c:out value="${dto.title}" escapeXml="true"/>
+	</h4>
+	
+	<div class="instructions voffset5">
+	  <c:out value="${dto.instructions}" escapeXml="false"/>
+	</div>
+	
+	<c:if test="${empty dto.sessionDTOs}">
+		<lams:Alert type="info" id="no-session-summary" close="false">
+			<fmt:message key="message.summary" />
+		</lams:Alert>
+	</c:if>
 </div>
-<br/>
+
+<c:if test="${isGroupedActivity}">
+	<div class="panel-group" id="accordionSessions" role="tablist" aria-multiselectable="true"> 
+</c:if>
+
 <html:form action="/monitoring" method="post" styleId="monitoringForm">
 	
 	<html:hidden property="dispatch" styleId="dispatch" value="toggleHideImage" />
@@ -25,42 +37,56 @@
 	<html:hidden property="toolContentID" value="${toolContentID}"/>
 	<html:hidden property="hideUserImageUid" styleId="hideUserImageUid"/>
 	
-	<c:forEach var="session" items="${dto.sessionDTOs}">
+	<c:forEach var="session" items="${dto.sessionDTOs}" varStatus="status">
 	
-		<c:if test="${isGroupedActivity}">
-			<h2>
-				${session.sessionName}
-			</h2>
+		<c:if test="${isGroupedActivity}">	
+		    <div class="panel panel-default" >
+		        <div class="panel-heading" id="heading${session.sessionID}">
+		        	<span class="panel-title collapsable-icon-left">
+		        		<a class="${status.first ? '' : 'collapsed'}" role="button" data-toggle="collapse" href="#collapse${session.sessionID}" 
+								aria-expanded="${status.first ? 'false' : 'true'}" aria-controls="collapse${session.sessionID}" >
+							<fmt:message key="heading.group" >
+								<fmt:param><c:out value="${session.sessionName}" /></fmt:param>
+							</fmt:message>
+						</a>
+					</span>
+		        </div>
+	        
+				<div id="collapse${session.sessionID}" class="panel-collapse collapse ${status.first ? 'in' : ''}" 
+	        			role="tabpanel" aria-labelledby="heading${session.sessionID}">
 		</c:if>
 	
-		<table cellpadding="0">
+		<table class="table table-centered voffset10">
 			<tr>
-				<td class="field-name" width="30%">
-					<fmt:message key="heading.totalLearners" />
-				</td>
-				<td width="70%">
-					${session.numberOfLearners}
-				</td>
-			</tr>
-		</table>
-	
-		<table cellpadding="0" class="alternative-color">
-			<tr>
-				<th><fmt:message key="monitoring.th.learner" /></th>
-				<th><fmt:message key="monitoring.th.image" /></th>
+				<th>
+					<fmt:message key="monitoring.th.learner" />
+				</th>
+				<th>
+					<fmt:message key="monitoring.th.image" />
+				</th>
 				<c:if test="${pixlrDTO.reflectOnActivity}">
-					<th><fmt:message key="monitoring.th.reflection" /></th>
+					<th>
+						<fmt:message key="monitoring.th.reflection" />
+					</th>
 				</c:if>
 			</tr>
 			
 			<c:forEach var="user" items="${session.userDTOs}">
 				<tr>
 					<td>
-						<a href="javascript:openPopup('${pixlrImageFolderURL}/${user.imageFileName}', ${user.imageHeight}, ${user.imageWidth})">
-							<c:out value="${user.firstName} ${user.lastName}" escapeXml="true"/>
-						</a>
+						<c:choose>
+							<c:when test="${user.imageFileName != null && user.imageFileName != pixlrDTO.imageFileName}">
+								<a href="javascript:openPopup('${pixlrImageFolderURL}/${user.imageFileName}', ${user.imageHeight}, ${user.imageWidth})">
+									<c:out value="${user.firstName} ${user.lastName}" escapeXml="true"/>
+								</a>
+							</c:when>
+							<c:otherwise>
+								<c:out value="${user.firstName} ${user.lastName}" escapeXml="true"/>
+							</c:otherwise>
+						</c:choose>
 					</td>
-					<td align="center">
+					
+					<td>
 						<c:choose>
 							<c:when test="${user.imageFileName != null && user.imageFileName != pixlrDTO.imageFileName}">
 								<img src="${pixlrImageFolderURL}/${user.imageFileName}" 
@@ -90,7 +116,7 @@
 					</td>
 					
 					<c:if test="${pixlrDTO.reflectOnActivity}">
-						<td >
+						<td>
 							<c:choose>
 								<c:when test="${user.finishedReflection}">
 									<lams:out escapeHtml="true" value="${user.notebookEntry}" />
@@ -104,85 +130,19 @@
 				</tr>
 			</c:forEach>
 		</table>
+		
+		<c:if test="${isGroupedActivity}">
+			</div> <!-- end collapse area  -->
+			</div> <!-- end collapse panel  -->
+		</c:if>
+		${ !isGroupedActivity || ! status.last ? '<div class="voffset5">&nbsp;</div>' :  ''}
 	
 	</c:forEach>
 
 </html:form>
 
+<c:if test="${isGroupedActivity}">
+	</div> <!--  end panel group -->
+</c:if>
 
-<h1>
-	<img src="<lams:LAMSURL/>/images/tree_closed.gif" id="treeIcon" onclick="javascript:toggleAdvancedOptionsVisibility(document.getElementById('advancedDiv'), document.getElementById('treeIcon'), '<lams:LAMSURL/>');" />
-
-	<a href="javascript:toggleAdvancedOptionsVisibility(document.getElementById('advancedDiv'), document.getElementById('treeIcon'),'<lams:LAMSURL/>');" >
-		<fmt:message key="monitor.summary.th.advancedSettings" />
-	</a>
-</h1>
-<br />
-
-<div class="monitoring-advanced" id="advancedDiv" style="display:none">
-<table class="alternative-color">
-
-	<tr>
-		<td>
-			<fmt:message key="advanced.lockOnFinished" />
-		</td>
-		
-		<td>
-			<c:choose>
-				<c:when test="${dto.lockOnFinish}">
-					<fmt:message key="label.on" />
-				</c:when>
-				<c:otherwise>
-					<fmt:message key="label.off" />
-				</c:otherwise>
-			</c:choose>	
-		</td>
-	</tr>
-	<tr>
-		<td>
-			<fmt:message key="advanced.allowViewOthersImages" />
-		</td>
-		
-		<td>
-			<c:choose>
-				<c:when test="${dto.allowViewOthersImages}">
-					<fmt:message key="label.on" />
-				</c:when>
-				<c:otherwise>
-					<fmt:message key="label.off" />
-				</c:otherwise>
-			</c:choose>	
-		</td>
-	</tr>
-	<tr>
-		<td>
-			<fmt:message key="monitor.summary.td.addNotebook" />
-		</td>
-		
-		<td>
-			<c:choose>
-				<c:when test="${dto.reflectOnActivity == true}">
-					<fmt:message key="label.on" />
-				</c:when>
-				<c:otherwise>
-					<fmt:message key="label.off" />
-				</c:otherwise>
-			</c:choose>	
-		</td>
-	</tr>
-	
-	<c:choose>
-		<c:when test="${dto.reflectOnActivity == true}">
-			<tr>
-				<td>
-					<fmt:message key="monitor.summary.td.notebookInstructions" />
-				</td>
-				<td>
-					<lams:out value="${dto.reflectInstructions}" escapeHtml="true"/>	
-				</td>
-			</tr>
-		</c:when>
-	</c:choose>
-</table>
-</div>
-
+<%@ include file="advanceOptions.jsp"%>
