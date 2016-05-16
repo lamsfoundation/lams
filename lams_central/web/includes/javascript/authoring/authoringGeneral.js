@@ -1437,6 +1437,7 @@ GeneralLib = {
 		}
 		// get LD details
 		$.ajax({
+			async : false,
 			cache : false,
 			url : LAMS_URL + "authoring/author.do",
 			dataType : 'json',
