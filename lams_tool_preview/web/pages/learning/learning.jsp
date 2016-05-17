@@ -332,6 +332,7 @@
 				<html:button property="FinishButton" styleId="finishButton" onclick="refresh()" styleClass="btn btn-default voffset5 pull-left">
 					<fmt:message key="label.refresh" />
 				</html:button>
+				<div id="learner-submit"> <!-- div needed to enforce min num of ratings -->
 				<c:choose>
 					<c:when test="${peerreview.showRatingsLeftForUser}">
 						<html:button property="FinishButton" styleId="finishButton" onclick="return showResults()" styleClass="btn btn-primary voffset5 pull-right">
@@ -349,6 +350,7 @@
 						</html:link>
 					</c:otherwise>
 				</c:choose>
+				</div>
 		</c:if>
 		
 	</lams:Page>
