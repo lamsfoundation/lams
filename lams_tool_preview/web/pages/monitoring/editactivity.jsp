@@ -2,13 +2,14 @@
 <c:set var="sessionMap" value="${sessionScope[sessionMapID]}"/>
 <c:set var="peerreview" value="${sessionMap.peerreview}"/>
 
+
 <c:if test="${sessionMap.isPageEditable}">
-	<div class="warning">
+	<lams:Alert type="warn" id="no-edit" close="false">
 		<fmt:message key="message.alertContentEdit" />
-	</div>
+	</lams:Alert>
 </c:if>
 
-<table cellpadding="0">
+<table class="table table-condensed">
 	<tr>
 		<td width="15%" nowrap>
 			<fmt:message key="label.authoring.basic.title" />:
@@ -33,7 +34,7 @@
 				<c:param name="toolContentID" value="${sessionMap.toolContentID}" />
 				<c:param name="contentFolderID" value="${sessionMap.contentFolderID}" />
 			</c:url>
-			<html:link href="javascript:;" onclick="launchPopup('${authoringUrl}','definelater')" styleClass="button">
+			<html:link href="javascript:;" onclick="launchPopup('${authoringUrl}','definelater')" styleClass="btn btn-default">
 				<fmt:message key="label.monitoring.edit.activity.edit" />
 			</html:link>
 		</td>
