@@ -2,19 +2,16 @@
 
 <!-- ========== Advanced Tab ========== -->
 
-<p class="small-space-top">
-	<html:checkbox property="lockOnFinished" value="1"
-		styleClass="noBorder" styleId="lockOnFinished"></html:checkbox>
+<div class="checkbox">
 	<label for="lockOnFinished">
+		<html:checkbox property="lockOnFinished" styleId="lockOnFinished" />
 		<fmt:message key="advanced.lockOnFinished" />
 	</label>
-</p>
+</div>
 
-<p>
-	<html:checkbox property="allowRichEditor" value="1"
-		styleClass="noBorder" styleId="allowRichEditor"></html:checkbox>
+<div class="checkbox">
 	<label for="allowRichEditor">
+		<html:checkbox property="allowRichEditor" styleId="allowRichEditor" />
 		<fmt:message key="advanced.allowRichEditor" />
 	</label>
-</p>
-
+</div>

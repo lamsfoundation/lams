@@ -1,58 +1,37 @@
-<!DOCTYPE html>
-		
 <%@ include file="/common/taglibs.jsp"%>
 
-<lams:html>
-	<lams:head>
-		<%@ include file="/common/taglibs.jsp"%>
+<div class="panel panel-default">
+	<div class="panel-heading">
+		<div class="panel-title">
+			<fmt:message key="label.authoring.conditions.add.condition" />
+		</div>
+	</div>
 
-		<c:set var="tool">
-			<lams:WebAppURL />
-		</c:set>
-		<title>
-			<fmt:message key="activity.title" />
-		</title>
-		<lams:headItems />
-		<lams:css style="main" />
-		
-		<script type="text/javascript"> 
-			function callHideConditionMessage() {
-				try {
-					if (window.parent && window.parent.hideConditionMessage) {
-						window.parent.hideConditionMessage();
-					} else if (window.top && window.top.hideConditionMessage) {
-						window.top.hideConditionMessage();
-					}
-				} catch(err) {
-					// mute cross-domain iframe access errors
-				}
-			}
-		</script>
-	</lams:head>
-	<body class="tabpart">
+	<div class="panel-body">
+
 		<!-- Basic Info Form-->
 		<%@ include file="/common/messages.jsp"%>
-		<html:form action="/authoring/saveOrUpdateCondition" method="post" styleId="notebookConditionForm" focus="displayName" >
+		<html:form action="/authoring/saveOrUpdateCondition" method="post"
+			styleId="notebookConditionForm" focus="displayName">
 			<html:hidden property="orderId" />
-			<h2 class="no-space-left">
-				<fmt:message key="label.authoring.conditions.add.condition" />
-			</h2>
 
-			<div class="field-name">
-            	<fmt:message key="label.authoring.conditions.condition.name" />
+			<div class="form-group">
+				<label for="displayName"><fmt:message
+						key="label.authoring.conditions.condition.name" /> *</label>
+				<html:text tabindex="1" property="displayName" size="51"
+					styleClass="form-control" />
 			</div>
-			<div class="small-space-bottom">
-         		<html:text property="displayName" size="51"/>
-			</div>
+
 			<%-- Text search form fields are being included --%>
-			<lams:TextSearch wrapInFormTag="false" sessionMapID="${sessionMapID}"  />
+			<lams:TextSearch wrapInFormTag="false" sessionMapID="${sessionMapID}" />
 		</html:form>
 
-		<lams:ImgButtonWrapper>
-			<a href="javascript:;" onclick="javascript:notebookConditionForm.submit();" class="button-add-item"><fmt:message
-					key="button.save" /> </a>
-			<a href="javascript:;" onclick="javascript:callHideConditionMessage()"
-				class="button space-left"><fmt:message key="label.cancel" /> </a>
-		</lams:ImgButtonWrapper>
-	</body>
-</lams:html>
+		<div class="voffset5">
+			<a href="#" onclick="submitCondition()"
+				class="btn btn-default btn-xs"><fmt:message key="label.save" />
+			</a> <a href="#" onclick="hideConditionMessage()"
+				class="btn btn-default btn-xs"><fmt:message key="button.cancel" />
+			</a>
+		</div>
+	</div>
+</div>
