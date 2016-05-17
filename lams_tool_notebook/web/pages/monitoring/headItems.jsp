@@ -1,9 +1,3 @@
-<%@ include file="/common/taglibs.jsp"%>
+<%@ taglib uri="tags-lams" prefix="lams"%>
 
-<c:set var="tool">
-	<lams:WebAppURL />
-</c:set>
-
-<script type="text/javascript"
-	src="${tool}includes/javascript/monitoring.js">
-</script>
+<script type="text/javascript" src="<lams:WebAppURL />includes/javascript/monitoring.js"></script>
