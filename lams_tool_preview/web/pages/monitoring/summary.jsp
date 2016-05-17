@@ -3,14 +3,12 @@
 <c:set var="sessionMap" value="${sessionScope[sessionMapID]}"/>
 <c:set var="summaryList" value="${sessionMap.summaryList}"/>
 
-<link type="text/css" href="${lams}css/jquery-ui-redmond-theme.css" rel="stylesheet">
+<link type="text/css" href="${lams}css/jquery-ui-smoothness-theme.css" rel="stylesheet">
 <link type="text/css" href="${lams}css/jquery.jqGrid.css" rel="stylesheet" />
 <link type="text/css" href="${lams}css/jquery.jRating.css" rel="stylesheet"/>
 <link rel="stylesheet" href="<html:rewrite page='/includes/css/learning.css'/>">
-<style media="screen,projection" type="text/css">
+<!-- <style media="screen,projection" type="text/css">
 	#user-dropdown-div {padding-left: 30px; margin-top: -5px; margin-bottom: 50px;}
-	.bottom-buttons {margin: 20px 20px 0px; padding-bottom: 20px;}
-	.section-header {padding-left: 20px; margin-bottom: 15px; margin-top: 60px;}
 	.ui-jqgrid tr.jqgrow td {
 	    white-space: normal !important;
 	    height:auto;
@@ -22,15 +20,15 @@
 		display:none !important;
 	}
 	
-	.subgrid-data td[colspan]:not([colspan="1"]) {
+ 	.subgrid-data td[colspan]:not([colspan="1"]) {
 		background: #F0F0F0;
-	}
+	} 
 	
 	.ui-jqgrid tr.jqgrow td {
 		vertical-align: top;
 	}
 </style>
-
+ -->
 <script type="text/javascript">
 	//var for jquery.jRating.js
 	var pathToImageFolder = "${lams}images/css/";
@@ -81,7 +79,7 @@
 				loadComplete: function(){
 					initializeJRating();
 				},
-			   	caption: "${groupSummary.sessionName}",
+			   	// caption: "${groupSummary.sessionName}" use Bootstrap panels as the title bar
 				subGrid: true,
 				subGridOptions: {
 					reloadOnExpand : false 
@@ -133,7 +131,7 @@
 		//jqgrid autowidth (http://stackoverflow.com/a/1610197)
 		$(window).bind('resize', function() {
 			var grid;
-		    if (grid = jQuery(".ui-jqgrid-btable:visible")) {
+		    if (grid = jQuery(".ui-jqgrid-btable")) {
 		    	grid.each(function(index) {
 		        	var gridId = $(this).attr('id');
 		        	var gridParentWidth = jQuery('#gbox_' + gridId).parent().width();
@@ -148,39 +146,60 @@
 
 </script>
 
-<h1>
-	<c:out value="${sessionMap.peerreview.title}" escapeXml="true"/>
-</h1>
-
-<div class="instructions">
-	<c:out value="${sessionMap.peerreview.instructions}" escapeXml="false"/>
+<div class="panel">
+	<h4>
+	    <c:out value="${sessionMap.peerreview.title}" escapeXml="true"/>
+	</h4>
+	<div class="instructions voffset5">
+		<c:out value="${sessionMap.peerreview.instructions}" escapeXml="false"/>
+	</div>
+	
+	<c:if test="${empty summaryList}">
+		<lams:Alert type="info" id="no-session-summary" close="false">
+			<fmt:message key="message.monitoring.summary.no.session" />
+		</lams:Alert>
+	</c:if>
+	
 </div>
 
-<br/>
-
-<c:if test="${empty summaryList}">
-	<div align="center">
-		<b> <fmt:message key="message.monitoring.summary.no.session" /> </b>
-	</div>
+<c:if test="${sessionMap.isGroupedActivity}">
+<div class="panel-group" id="accordionSessions" role="tablist" aria-multiselectable="true"> 
 </c:if>
 
-<c:forEach var="groupSummary" items="${summaryList}">
+<c:forEach var="groupSummary" items="${summaryList}" varStatus="status">
 	
-	<c:if test="${sessionMap.isGroupedActivity}">
-		<h1>
-			<fmt:message key="monitoring.label.group" /> ${groupSummary.sessionName}
-		</h1>
-		<br>
+ 	<c:if test="${sessionMap.isGroupedActivity}">
+	    <div class="panel panel-default" >
+        <div class="panel-heading" id="heading${groupSummary.sessionId}">
+        	<span class="panel-title collapsable-icon-left">
+        	<a role="button" data-toggle="collapse" href="#collapse${groupSummary.sessionId}" 
+					aria-expanded="true" aria-controls="collapse${groupSummary.sessionId}">
+			<fmt:message key="monitoring.label.group" />: ${groupSummary.sessionName}</a>
+			</span>
+        </div>
+        
+        <div id="collapse${groupSummary.sessionId}" class="panel-collapse collapse in" role="tabpanel" aria-labelledby="heading${groupSummary.sessionId}">
 	</c:if>
-
+	
 	<table id="group${groupSummary.sessionId}" class="scroll" cellpadding="0" cellspacing="0"></table>
 	<div id="pager${groupSummary.sessionId}"></div> 
-	<br>
-		
-</c:forEach>
+	<div class="voffset5">&nbsp;</div>
 	
+	<c:if test="${sessionMap.isGroupedActivity}">
+		</div> <!-- end collapse area  -->
+		</div> <!-- end collapse panel  -->
+	</c:if>
+	${ !sessionMap.isGroupedActivity || ! status.last || sessionMap.peerreview.reflectOnActivity ? '<div class="voffset5">&nbsp;</div>' :  ''}
+
+</c:forEach>
+
 <c:if test="${sessionMap.peerreview.reflectOnActivity}">
 	<%@ include file="reflections.jsp"%>
 </c:if>
+
+<c:if test="${sessionMap.isGroupedActivity}">
+	</div> <!--  end panel group -->
+</c:if>		
+
 
 <%@ include file="advanceoptions.jsp"%>
