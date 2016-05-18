@@ -1,16 +1,6 @@
-
-function init() {
-	if (initialTabId) {
-		selectTab(initialTabId);
-	} else {
-		selectTab(1);
-	}
-}
 function doSelectTab(tabId) {
+	if (tabId == 3) {
+		$("#statisticArea").load(statisticsURL + (new Date()).getTime());
+	}
 	selectTab(tabId);
 }
-function doSubmit(method, tabId) {
-	document.monitoringForm.method.value = method;
-	document.monitoringForm.submit();
-}
-

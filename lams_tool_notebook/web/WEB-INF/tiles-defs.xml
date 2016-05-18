@@ -28,6 +28,7 @@
 	<!--  Begin: Layouts -->
 	<definition name="tiles:/layout" path="/layouts/layout.jsp">
 		<put name="header" value=""/>
+		<put name="body" value=""/>
 	</definition>
 	<!--  End: Layouts -->
 
@@ -42,14 +43,17 @@
 
 	<!-- Begin: Learning -->
 	<definition name="tiles:/learning/main" extends="tiles:/layout">
+		<put name="header" value="/pages/learning/headItems.jsp" />
 		<put name="body" value="/pages/learning/notebook.jsp" />
 	</definition>
 
 	<definition name="tiles:/learning/submissionDeadline" extends="tiles:/layout">
+		<put name="header" value="/pages/learning/headItems.jsp" />
 		<put name="body" value="/pages/learning/submissionDeadline.jsp" />
 	</definition>
 	
 	<definition name="tiles:/learning/defineLater" extends="tiles:/layout">
+		<put name="header" value="/pages/learning/headItems.jsp" />
 		<put name="body" value="/pages/learning/defineLater.jsp" />
 	</definition>
 	<!-- End: Learning -->
