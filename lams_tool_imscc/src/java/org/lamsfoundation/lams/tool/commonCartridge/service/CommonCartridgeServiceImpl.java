@@ -286,24 +286,6 @@ public class CommonCartridgeServiceImpl implements ICommonCartridgeService, Tool
     }
 
     @Override
-    public List<CommonCartridgeItem> getCommonCartridgeItemsBySessionId(Long sessionId) {
-	CommonCartridgeSession session = commonCartridgeSessionDao.getSessionBySessionId(sessionId);
-	if (session == null) {
-	    CommonCartridgeServiceImpl.log.error("Failed get CommonCartridgeSession by ID [" + sessionId + "]");
-	    return null;
-	}
-	// add commonCartridge items from Authoring
-	CommonCartridge commonCartridge = session.getCommonCartridge();
-	List<CommonCartridgeItem> items = new ArrayList<CommonCartridgeItem>();
-	items.addAll(commonCartridge.getCommonCartridgeItems());
-
-	// add commonCartridge items from CommonCartridgeSession
-	items.addAll(session.getCommonCartridgeItems());
-
-	return items;
-    }
-
-    @Override
     public CommonCartridge getCommonCartridgeBySessionId(Long sessionId) {
 	CommonCartridgeSession session = commonCartridgeSessionDao.getSessionBySessionId(sessionId);
 	// to skip CGLib problem
@@ -421,35 +403,20 @@ public class CommonCartridgeServiceImpl implements ICommonCartridgeService, Tool
 	Map<Long, Integer> visitCountMap = commonCartridgeItemVisitDao.getSummary(contentId);
 
 	CommonCartridge commonCartridge = commonCartridgeDao.getByContentId(contentId);
-	Set<CommonCartridgeItem> resItemList = commonCartridge.getCommonCartridgeItems();
+	Set<CommonCartridgeItem> items = commonCartridge.getCommonCartridgeItems();
 
-	// get all sessions in a commonCartridge and retrieve all commonCartridge items under this session
-	// plus initial commonCartridge items by author creating (resItemList)
-	List<CommonCartridgeSession> sessionList = commonCartridgeSessionDao.getByContentId(contentId);
-	for (CommonCartridgeSession session : sessionList) {
+	List<CommonCartridgeSession> sessions = commonCartridgeSessionDao.getByContentId(contentId);
+	for (CommonCartridgeSession session : sessions) {
 	    // one new group for one session.
 	    group = new ArrayList<Summary>();
 	    // firstly, put all initial commonCartridge item into this group.
-	    for (CommonCartridgeItem item : resItemList) {
+	    for (CommonCartridgeItem item : items) {
 		Summary sum = new Summary(session.getSessionId(), session.getSessionName(), item);
 		// set viewNumber according visit log
 		if (visitCountMap.containsKey(item.getUid())) {
 		    sum.setViewNumber(visitCountMap.get(item.getUid()).intValue());
 		}
 		group.add(sum);
-	    }
-	    // get this session's all commonCartridge items
-	    Set<CommonCartridgeItem> sessItemList = session.getCommonCartridgeItems();
-	    for (CommonCartridgeItem item : sessItemList) {
-		// to skip all item create by author
-		if (!item.isCreateByAuthor()) {
-		    Summary sum = new Summary(session.getSessionId(), session.getSessionName(), item);
-		    // set viewNumber according visit log
-		    if (visitCountMap.containsKey(item.getUid())) {
-			sum.setViewNumber(visitCountMap.get(item.getUid()).intValue());
-		    }
-		    group.add(sum);
-		}
 	    }
 	    // so far no any item available, so just put session name info to Summary
 	    if (group.size() == 0) {

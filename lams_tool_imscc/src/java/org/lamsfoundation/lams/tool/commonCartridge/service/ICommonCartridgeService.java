@@ -140,14 +140,6 @@ public interface ICommonCartridgeService {
     void deleteCommonCartridgeItem(Long uid);
 
     /**
-     * Return all reource items within the given toolSessionID.
-     *
-     * @param sessionId
-     * @return
-     */
-    List<CommonCartridgeItem> getCommonCartridgeItemsBySessionId(Long sessionId);
-
-    /**
      * Get commonCartridge which is relative with the special toolSession.
      *
      * @param sessionId

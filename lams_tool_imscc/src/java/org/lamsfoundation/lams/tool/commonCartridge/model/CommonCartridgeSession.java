@@ -32,9 +32,6 @@ import org.apache.log4j.Logger;
  * CommonCartridge
  * 
  * @author Andrey Balan
- *
- *
- *
  */
 public class CommonCartridgeSession {
 
@@ -48,12 +45,10 @@ public class CommonCartridgeSession {
     private Date sessionEndDate;
     //finish or not
     private int status;
-    //commonCartridge Items
-    private Set commonCartridgeItems;
 
-//  **********************************************************
-    //		Get/Set methods
-//  **********************************************************
+    // **********************************************************
+    // Get/Set methods
+    // **********************************************************
     /**
      *
      * @return Returns the learnerID.
@@ -143,26 +138,6 @@ public class CommonCartridgeSession {
      */
     public void setSessionName(String sessionName) {
 	this.sessionName = sessionName;
-    }
-
-    /**
-     * 
-     * 
-     *
-     *
-     *
-     *
-     *
-     *
-     * 
-     * @return
-     */
-    public Set getCommonCartridgeItems() {
-	return commonCartridgeItems;
-    }
-
-    public void setCommonCartridgeItems(Set commonCartridgeItems) {
-	this.commonCartridgeItems = commonCartridgeItems;
     }
 
 }

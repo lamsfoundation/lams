@@ -135,10 +135,9 @@ public class LearningAction extends Action {
 	    commonCartridgeUser = getCurrentUser(service, sessionId);
 	}
 
-	List<CommonCartridgeItem> items = null;
-	CommonCartridge commonCartridge;
-	items = service.getCommonCartridgeItemsBySessionId(sessionId);
-	commonCartridge = service.getCommonCartridgeBySessionId(sessionId);
+	CommonCartridge commonCartridge = service.getCommonCartridgeBySessionId(sessionId);
+	List<CommonCartridgeItem> items = new ArrayList<CommonCartridgeItem>();
+	items.addAll(commonCartridge.getCommonCartridgeItems());
 
 	// check whehter finish lock is on/off
 	boolean lock = commonCartridge.getLockWhenFinished() && commonCartridgeUser != null

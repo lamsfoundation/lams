@@ -66,7 +66,6 @@ public class MonitoringAction extends Action {
 	if (param.equals("summary")) {
 	    return summary(mapping, form, request, response);
 	}
-
 	if (param.equals("listuser")) {
 	    return listuser(mapping, form, request, response);
 	}
@@ -92,7 +91,7 @@ public class MonitoringAction extends Action {
 
 	// get back SessionMap
 	String sessionMapID = request.getParameter(CommonCartridgeConstants.ATTR_SESSION_MAP_ID);
-	SessionMap sessionMap = (SessionMap) request.getSession().getAttribute(sessionMapID);
+	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession().getAttribute(sessionMapID);
 	request.setAttribute(CommonCartridgeConstants.ATTR_SESSION_MAP_ID, sessionMap.getSessionID());
 
 	// update session value
@@ -119,7 +118,7 @@ public class MonitoringAction extends Action {
 
 	// get back SessionMap
 	String sessionMapID = request.getParameter(CommonCartridgeConstants.ATTR_SESSION_MAP_ID);
-	SessionMap sessionMap = (SessionMap) request.getSession().getAttribute(sessionMapID);
+	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession().getAttribute(sessionMapID);
 	request.setAttribute(CommonCartridgeConstants.ATTR_SESSION_MAP_ID, sessionMap.getSessionID());
 
 	// update session value
@@ -140,7 +139,7 @@ public class MonitoringAction extends Action {
     private ActionForward summary(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) {
 	// initial Session Map
-	SessionMap sessionMap = new SessionMap();
+	SessionMap<String, Object> sessionMap = new SessionMap<String, Object>();
 	request.getSession().setAttribute(sessionMap.getSessionID(), sessionMap);
 	request.setAttribute(CommonCartridgeConstants.ATTR_SESSION_MAP_ID, sessionMap.getSessionID());
 	// save contentFolderID into session
@@ -149,14 +148,14 @@ public class MonitoringAction extends Action {
 
 	Long contentId = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_CONTENT_ID);
 	ICommonCartridgeService service = getCommonCartridgeService();
-	List<List<Summary>> groupList = service.getSummary(contentId);
+	List<List<Summary>> summaryList = service.getSummary(contentId);
 
 	CommonCartridge commonCartridge = service.getCommonCartridgeByContentId(contentId);
 
 	Map<Long, Set<ReflectDTO>> relectList = service.getReflectList(contentId, false);
 
 	// cache into sessionMap
-	sessionMap.put(CommonCartridgeConstants.ATTR_SUMMARY_LIST, groupList);
+	sessionMap.put(CommonCartridgeConstants.ATTR_SUMMARY_LIST, summaryList);
 	sessionMap.put(CommonCartridgeConstants.PAGE_EDITABLE, commonCartridge.isContentInUse());
 	sessionMap.put(CommonCartridgeConstants.ATTR_RESOURCE, commonCartridge);
 	sessionMap.put(CommonCartridgeConstants.ATTR_TOOL_CONTENT_ID, contentId);

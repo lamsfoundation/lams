@@ -34,9 +34,6 @@ import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
  * CommonCartridge
  * 
  * @author Andrey Balan
- *
- *
- *
  */
 public class CommonCartridgeUser implements Cloneable {
     private static final long serialVersionUID = -7043502180037866257L;
