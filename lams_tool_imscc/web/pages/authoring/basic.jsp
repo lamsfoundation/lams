@@ -1,16 +1,16 @@
 <%@ include file="/common/taglibs.jsp"%>
 <c:set var="formBean" value="<%=request.getAttribute(org.apache.struts.taglib.html.Constants.BEAN_KEY)%>" />
+
 <script lang="javascript">
 
-	function previewItem(type,idx,sessionMapID){
-		//1:url, 2:file, 3:website,4:learning object
+	function previewItem(type,idx,sessionMapID) {
 		//This mode is special for unsaved author page. It is different with the author mode in preview 
 		var myUrl = "<c:url value='/reviewItem.do?mode=author_session&itemIndex='/>"+idx+"&sessionMapID="+sessionMapID;
 		launchPopup(myUrl,"Review");
 	}
 	
 	var commonCartridgeListTargetDiv = "#commonCartridgeListArea";
-	function deleteItem(idx,sessionMapID){
+	function deleteItem(idx,sessionMapID) {
 		var	deletionConfirmed = confirm("<fmt:message key="warning.msg.authoring.do.you.want.to.delete"></fmt:message>");
 
 		if (deletionConfirmed) {
@@ -32,14 +32,14 @@
 		};
 	}
 	
-	function deleteItemLoading(){
+	function deleteItemLoading() {
 		showBusy(commonCartridgeListTargetDiv);
 	}
-	function deleteItemComplete(){
+	function deleteItemComplete() {
 		hideBusy(commonCartridgeListTargetDiv);
 	}
 	
-	function refreshThickbox(){   
+	function refreshThickbox() {   
 		tb_init('a.thickbox, area.thickbox, input.thickbox');//pass where to apply thickbox
 	};
 	
@@ -52,7 +52,7 @@
 		    	// alert("using clientHeight");
 		    }
 			// alert("doc height "+height);
-		    height -= document.getElementById('TB_iframeContent').offsetTop + 60;
+		    height -= document.getElementById('TB_iframeContent').offsetTop + 260;
 		    document.getElementById('TB_iframeContent').style.height = height +"px";
 	
 			TB_HEIGHT = height + 28;
@@ -61,30 +61,24 @@
 	};
 	window.onresize = resizeIframe;
 
-
 </script>
-<!-- Basic Tab Content -->
-<table>
-	<tr>
-		<td colspan="2">
-			<div class="field-name">
-				<fmt:message key="label.authoring.basic.title"></fmt:message>
-			</div>
-			<html:text property="commonCartridge.title" style="width: 99%;"></html:text>
-		</td>
-	</tr>
-	<tr>
-		<td colspan="2">
-			<div class="field-name">
-				<fmt:message key="label.authoring.basic.instruction"></fmt:message>
-			</div>
-			<lams:CKEditor id="commonCartridge.instructions"
-				value="${formBean.commonCartridge.instructions}"
-				contentFolderID="${formBean.contentFolderID}"></lams:CKEditor>
-		</td>
-	</tr>
 
-</table>
+<!-- Basic Tab Content -->
+<div class="form-group">
+    <label for="commonCartridge.title">
+    	<fmt:message key="label.authoring.basic.title"/>
+    </label>
+    <html:text property="commonCartridge.title" styleClass="form-control"/>
+</div>
+
+<div class="form-group">
+    <label for="commonCartridge.instructions">
+    	<fmt:message key="label.authoring.basic.instruction"/>
+    </label>
+	<lams:CKEditor id="commonCartridge.instructions" value="${formBean.commonCartridge.instructions}"
+			contentFolderID="${formBean.contentFolderID}" height="400">
+	</lams:CKEditor>
+</div>
 
 <div id="commonCartridgeListArea">
 	<c:set var="sessionMapID" value="${formBean.sessionMapID}" />
@@ -97,7 +91,7 @@
 		<fmt:message key="label.authoring.basic.add.basiclti.tool" />
 	</a>
 -->	
-	<a href="<html:rewrite page="/authoring/newItemInit.do?sessionMapID=${formBean.sessionMapID}&itemType=2"/>&KeepThis=true&TB_iframe=true&height=540&width=850&modal=true" class="space-left thickbox">
+	<a href="<html:rewrite page="/authoring/newItemInit.do?sessionMapID=${formBean.sessionMapID}&itemType=2"/>&KeepThis=true&TB_iframe=true&height=540&width=580&modal=true" class="btn btn-default btn-sm thickbox">
 		<fmt:message key="label.authoring.basic.upload.common.cartridge" />
 	</a>
 </p>

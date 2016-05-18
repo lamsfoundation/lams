@@ -1,12 +1,9 @@
 <!DOCTYPE html>
-		
-
 <%@ include file="/common/taglibs.jsp"%>
+
 <lams:html>
-<lams:head>
-	
-	
-	<lams:css style="core" />
+<lams:head>	
+	<lams:css />
 	<style type="text/css">
 		a {
 			margin: 10px 2px 0px 0px;
@@ -35,11 +32,11 @@
 		}
 	</style>
 	
-	<script language="JavaScript" type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery.js"></script>
-  	<script language="JavaScript" type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery.form.js"></script>
+	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery.js"></script>
+  	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery.form.js"></script>
   	<script type="text/javascript">
   		var url = "<c:url value='/authoring/createPedagogicalPlannerItem.do' />";
-  		function createItem(itemType){
+  		function createItem(itemType) {
   			var currentUrl = url + "?addType=" + itemType;
   			$('#pedagogicalPlannerForm').ajaxSubmit({
   				url: currentUrl,
@@ -58,18 +55,19 @@
   			});
   		}
   		
-	  	function prepareFormData(){
+	  	function prepareFormData() {
 			//CKeditor content is not submitted when sending by jQuery; we need to do this
 			var instructions = CKEDITOR.instances.instructions.getData();
 			document.getElementById("instructions").value=instructions;
 		}
 		
-		function clearEntry(entryIndex){
+		function clearEntry(entryIndex) {
 			document.getElementById("title"+entryIndex).value="";
 			document.getElementById("entry"+entryIndex).value="";
 		}
   	</script>
 </lams:head>
+
 <body id="body">
 	<%@ include file="/common/messages.jsp"%>
 	<html:form enctype="multipart/form-data" action="/authoring/saveOrUpdatePedagogicalPlannerForm.do" styleId="pedagogicalPlannerForm" method="post">

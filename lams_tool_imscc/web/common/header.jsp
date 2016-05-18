@@ -4,13 +4,14 @@
 <c:set var="ctxPath" value="${pageContext.request.contextPath}" scope="request"/>
 
 <!-- ********************  CSS ********************** -->
-<link href="<html:rewrite page='/includes/css/commonCartridge.css'/>" rel="stylesheet" type="text/css">
 <lams:css />
+<link href="<html:rewrite page='/includes/css/commonCartridge.css'/>" rel="stylesheet" type="text/css">
 
 <!-- ********************  javascript ********************** -->
 <script type="text/javascript" src="${lams}includes/javascript/common.js"></script>
 <script type="text/javascript" src="${lams}includes/javascript/jquery.js"></script>
+<script type="text/javascript" src="${lams}includes/javascript/bootstrap.min.js"></script>
+<script type="text/javascript" src="${lams}includes/javascript/bootstrap.tabcontroller.js"></script>
 <script type="text/javascript" src="<html:rewrite page='/includes/javascript/commonCartridgecommon.js'/>"></script>
-<script type="text/javascript" src="${lams}includes/javascript/tabcontroller.js"></script>    
 
 	
