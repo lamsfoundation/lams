@@ -2,7 +2,7 @@
 <c:set scope="request" var="lams"><lams:LAMSURL/></c:set>
 <c:set scope="request" var="tool"><lams:WebAppURL/></c:set>
 
-<link type="text/css" href="${lams}css/jquery-ui-redmond-theme.css" rel="stylesheet">
+<link type="text/css" href="${lams}css/jquery-ui-smoothness-theme.css" rel="stylesheet">
 <link type="text/css" href="${lams}/css/jquery-ui.timepicker.css" rel="stylesheet">
 <link type="text/css" href="${lams}css/jquery.jqGrid.css" rel="stylesheet"/>
 <style media="screen,projection" type="text/css">
@@ -60,28 +60,12 @@
 		messageRestrictionSet: '<fmt:message key="monitor.summary.date.restriction.set" />',
 		messageRestrictionRemoved: '<fmt:message key="monitor.summary.date.restriction.removed" />'
 	};
-</script>
-<script type="text/javascript" src="${lams}includes/javascript/jquery.js"></script>
-<script type="text/javascript" src="${lams}includes/javascript/jquery-ui.js"></script>
-<script type="text/javascript" src="${lams}includes/javascript/jquery-ui.timepicker.js"></script>
-<script type="text/javascript" src="${lams}includes/javascript/jquery.blockUI.js"></script>
-<script type="text/javascript" src="${lams}includes/javascript/monitorToolSummaryAdvanced.js" ></script>
-<script type="text/javascript" src="${lams}includes/javascript/jquery.jqGrid.locale-en.js"></script>
-<script type="text/javascript" src="${lams}includes/javascript/jquery.jqGrid.js"></script>
-<script type="text/javascript" src="${tool}includes/javascript/jinplace-1.0.1.js"></script>
-<script type="text/javascript">
+
 	$(document).ready(function(){
 		<c:forEach var="sessionEntry" items="${notebookDTO.sessions}">
 			<c:set var="sessionId" value ="${sessionEntry.key}"/>
 			<c:set var="sessionName" value ="${sessionEntry.value}"/>
-   			<c:choose>
-				<c:when test="${isGroupedActivity}">
-					<c:set var="gridCaption" value="${sessionName}"/>
-				</c:when>
-				<c:otherwise>
-					<c:set var="gridCaption"><fmt:message key='label.notebook.entries' /></c:set>
-				</c:otherwise>
-			</c:choose>
+			<c:set var="gridCaption"><fmt:message key='label.notebook.entries' /></c:set>
 			
 			jQuery("#group${sessionId}").jqGrid({
 			
@@ -167,7 +151,7 @@
 				rowList:[10,20,30,40,50,100],
 				
 				height: 'auto',
-				width: 780,
+				width: 685,
 				
 			   	colNames:['#',
 						'userUid',
@@ -208,37 +192,57 @@
 	});
 
 </script>
+<script type="text/javascript" src="${lams}/includes/javascript/monitorToolSummaryAdvanced.js" ></script>
 
-<h1>
-	<c:out value="${notebookDTO.title}" escapeXml="true"/>
-</h1>
-
-<div class="instructions space-top">
-	<c:out value="${notebookDTO.instructions}" escapeXml="false"/>
+<div class="panel">
+	<h4>
+	    <c:out value="${notebookDTO.title}" escapeXml="true"/>
+	</h4>
+	<div class="instructions voffset5">
+	    <c:out value="${notebookDTO.instructions}" escapeXml="false"/>
+	</div>
+	
+	<c:if test="${empty notebookDTO.sessions}">
+		<lams:Alert type="info" id="no-session-summary" close="false">
+			<fmt:message key="message.monitoring.summary.no.session" />
+		</lams:Alert>
+	</c:if>
+	
 </div>
 
-<c:if test="${empty notebookDTO.sessions}">
-	<div align="center">
-		<b> <fmt:message key="message.monitoring.summary.no.session" /> </b>
-	</div>
+<c:if test="${isGroupedActivity}">
+	<div class="panel-group" id="accordionSessions" role="tablist" aria-multiselectable="true"> 
 </c:if>
 
-<div id="session-list">
-	<c:forEach var="session" items="${notebookDTO.sessions}">
+<c:forEach var="session" items="${notebookDTO.sessions}" varStatus="status">
+
+	<c:if test="${isGroupedActivity}">	
+	    <div class="panel panel-default" >
+        <div class="panel-heading" id="heading${session.key}">
+        	<span class="panel-title collapsable-icon-left">
+        	<a class="${status.first ? '' : 'collapsed'}" role="button" data-toggle="collapse" href="#collapse${session.key}" 
+					aria-expanded="${status.first ? 'false' : 'true'}" aria-controls="collapse${session.key}" >
+			<fmt:message key="message.session.name" />:	<c:out value="${session.value}" /></a>
+			</span>
+        </div>
+        
+        <div id="collapse${session.key}" class="panel-collapse collapse ${status.first ? 'in' : ''}"
+        	 role="tabpanel" aria-labelledby="heading${session.key}">
+	</c:if>
 	
-		<c:if test="${isGroupedActivity}">
-			<h1>
-				${session.value}
-			</h1>
-			<br>
-		</c:if>
-		
-		<table id="group${session.key}" class="scroll" cellpadding="0" cellspacing="0" ></table>
-		<div id="group${session.key}pager"></div> 
-		<br><br>
-		
-	</c:forEach>
-</div>
+	<table id="group${session.key}" class="scroll" cellpadding="0" cellspacing="0" ></table>
+	<div id="group${session.key}pager"></div>
+	
+	<c:if test="${isGroupedActivity}">
+		</div> <!-- end collapse area  -->
+		</div> <!-- end collapse panel  -->
+	</c:if>
+	${ !isGroupedActivity || ! status.last ? '<div class="voffset5">&nbsp;</div>' :  ''}
+</c:forEach>
+	
+<c:if test="${isGroupedActivity}">
+	</div> <!--  end panel group -->
+</c:if>
 
 <%@include file="advanceOptions.jsp"%>
 

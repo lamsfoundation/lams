@@ -21,8 +21,6 @@
  * ****************************************************************
  */
 
-
-
 package org.lamsfoundation.lams.tool.notebook.dto;
 
 import java.util.Date;
@@ -50,8 +48,6 @@ public class NotebookDTO {
     public Date submissionDeadline;
 
     public Set<NotebookSessionDTO> sessionDTOs = new TreeSet<NotebookSessionDTO>();
-
-    public Long currentTab;
 
     /* Constructors */
     public NotebookDTO() {
@@ -143,13 +139,5 @@ public class NotebookDTO {
      */
     public void setSubmissionDeadline(Date submissionDeadline) {
 	this.submissionDeadline = submissionDeadline;
-    }
-
-    public Long getCurrentTab() {
-	return currentTab;
-    }
-
-    public void setCurrentTab(Long currentTab) {
-	this.currentTab = currentTab;
     }
 }

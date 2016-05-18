@@ -1,43 +1,40 @@
 <%@ include file="/common/taglibs.jsp"%>
-
 <c:set var="dto" value="${notebookDTO}" />
 
 <c:if test="${dto.contentInUse}">
-	<p class="warning">
+	<lams:Alert type="warn" id="no-edit" close="false">
 		<fmt:message key="message.alertContentEdit" />
-	</p>
+	</lams:Alert>
 </c:if>
 
-<table cellspacing="0">
-	<tbody>
-		<tr>
-			<td class="field-name" width="30%">
-				<fmt:message key="label.authoring.basic.title" />
-			</td>
-			<td>
-				<c:out value="${dto.title}" escapeXml="true" />
-			</td>
-		</tr>
-		<tr>
-			<td class="field-name" width="30%">
-				<fmt:message key="label.authoring.basic.instructions" />
-			</td>
-			<td>
-				<c:out value="${dto.instructions}" escapeXml="false" />
-			</td>
-		</tr>
-	</tbody>
+
+<table class="table table-condensed">
+	<tr>
+		<td class="field-name" width="10%" valign="top">
+			<fmt:message key="label.authoring.basic.title" />
+		</td>
+		<td>
+			<c:out value="${dto.title}" escapeXml="true" />
+		</td>
+	</tr>
+
+	<tr>
+		<td class="field-name" width="10%" valign="top" NOWRAP>
+			<fmt:message key="label.authoring.basic.instructions" />
+		</td>
+		<td>
+			<c:out value="${dto.instructions}" escapeXml="false" />
+		</td>
+	</tr>
 </table>
 
-<p class="align-right">
+<c:if test='${!dto.contentInUse}'>
 	<c:url value="/authoring.do" var="authoringUrl">
 		<c:param name="toolContentID" value="${dto.toolContentId}" />
 		<c:param name="mode" value="teacher" />
 		<c:param name="contentFolderID" value="${contentFolderID}" />
 	</c:url>
-	<html:link href="${authoringUrl}" styleClass="button" target="_blank">
+	<html:link href="javascript:;" onclick="launchPopup('${authoringUrl}','definelater')" styleClass="btn btn-default">
 		<fmt:message key="button.editActivity" />
 	</html:link>
-</p>
-
-
+</c:if>

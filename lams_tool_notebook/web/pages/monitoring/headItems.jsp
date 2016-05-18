@@ -1,3 +1,20 @@
-<%@ taglib uri="tags-lams" prefix="lams"%>
+<%@ include file="/common/taglibs.jsp"%>
+<c:set scope="request" var="lams"><lams:LAMSURL/></c:set>
+<c:set scope="request" var="tool"><lams:WebAppURL/></c:set>
 
-<script type="text/javascript" src="<lams:WebAppURL />includes/javascript/monitoring.js"></script>
+<lams:css/>
+
+<script type="text/javascript" src="${lams}includes/javascript/common.js"></script>
+<script type="text/javascript" src="${lams}includes/javascript/jquery.js"></script>
+<script type="text/javascript" src="${lams}includes/javascript/jquery-ui.js"></script>
+<script type="text/javascript" src="${lams}includes/javascript/jquery-ui.timepicker.js"></script>
+<script type="text/javascript" src="${lams}includes/javascript/jquery.blockUI.js"></script>
+
+<script type="text/javascript" src="${lams}includes/javascript/jquery.jqGrid.locale-en.js"></script>
+<script type="text/javascript" src="${lams}includes/javascript/jquery.jqGrid.js"></script>
+<script type="text/javascript" src="${tool}includes/javascript/jinplace-1.0.1.js"></script>
+
+<script type="text/javascript" src="${lams}includes/javascript/bootstrap.min.js"></script>
+<script type="text/javascript" src="${lams}includes/javascript/bootstrap.tabcontroller.js"></script>
+
+<script type="text/javascript" src="${tool}includes/javascript/monitoring.js"></script>
