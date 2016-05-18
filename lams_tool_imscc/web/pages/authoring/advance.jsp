@@ -1,35 +1,28 @@
 <%@ include file="/common/taglibs.jsp"%>
-<c:set var="formBean"
-	value="<%=request.getAttribute(org.apache.struts.taglib.html.Constants.BEAN_KEY)%>" />
+<c:set var="formBean" value="<%=request.getAttribute(org.apache.struts.taglib.html.Constants.BEAN_KEY)%>" />
 
 <!-- Advance Tab Content -->
 
-<p class="small-space-top">
-	<html:checkbox property="commonCartridge.lockWhenFinished"
-		styleClass="noBorder" styleId="lockWhenFinished">
-	</html:checkbox>
-
-	<label for="lockWhenFinished">
+<div class="checkbox">
+	<label for="lock-when-finished">
+		<html:checkbox property="commonCartridge.lockWhenFinished" styleId="lock-when-finished"/>
 		<fmt:message key="label.authoring.advance.lock.on.finished" />
 	</label>
-</p>
+</div>
 
-<p>
-	<html:checkbox property="commonCartridge.runAuto" styleClass="noBorder" styleId="runAuto">
-	</html:checkbox>
-	<label for="runAuto">
+<div class="checkbox">
+	<label for="run-auto">
+		<html:checkbox property="commonCartridge.runAuto" styleId="run-auto"/>
 		<fmt:message key="label.authoring.advance.run.content.auto" />
 	</label>
-</p>
+</div>
 
-<p>
+<div class="select">
 	<html:select property="commonCartridge.miniViewCommonCartridgeNumber"
-		styleId="viewNumList" style="width:50px">
-		<c:forEach begin="1" end="${fn:length(commonCartridgeList)}"
-			varStatus="status">
+			styleId="viewNumList" styleClass="form-control form-control-inline roffset5">
+		<c:forEach begin="1" end="${fn:length(commonCartridgeList)}" varStatus="status">
 			<c:choose>
-				<c:when
-					test="${formBean.commonCartridge.miniViewCommonCartridgeNumber == status.index}">
+				<c:when test="${formBean.commonCartridge.miniViewCommonCartridgeNumber == status.index}">
 					<option value="${status.index}" selected="true">
 						${status.index}
 					</option>
@@ -43,37 +36,35 @@
 		</c:forEach>
 	</html:select>
 
+	<label for="viewNumList">
 	<fmt:message key="label.authoring.advance.mini.number.resources.view" />
-</p>
+	</label>
+</div>
 
-<p>
-	<html:checkbox property="commonCartridge.reflectOnActivity"
-		styleClass="noBorder" styleId="reflectOn">
-	</html:checkbox>
-	<label for="reflectOn">
+<div class="checkbox">
+	<label for="reflect-on-activity">
+		<html:checkbox property="commonCartridge.reflectOnActivity" styleId="reflect-on-activity"/>
 		<fmt:message key="label.authoring.advanced.reflectOnActivity" />
 	</label>
-</p>
+</div>
 
-<p>
-	<html:textarea property="commonCartridge.reflectInstructions"
-		styleId="reflectInstructions" cols="30" rows="3" />
-</p>
+<div class="form-group">
+	<html:textarea property="commonCartridge.reflectInstructions" rows="3" styleId="reflect-instructions" styleClass="form-control"/>
+</div>
+
 <script type="text/javascript">
-<!--
-//automatically turn on refect option if there are text input in refect instruction area
-	var ra = document.getElementById("reflectInstructions");
-	var rao = document.getElementById("reflectOn");
-	function turnOnRefect(){
-		if(isEmpty(ra.value)){
+	//automatically turn on refect option if there are text input in refect instruction area
+	var ra = document.getElementById("reflect-instructions");
+	var rao = document.getElementById("reflect-on-activity");
+	function turnOnRefect() {
+		if (isEmpty(ra.value)) {
 		//turn off	
 			rao.checked = false;
-		}else{
+		} else {
 		//turn on
 			rao.checked = true;		
 		}
 	}
 
 	ra.onkeyup=turnOnRefect;
-//-->
 </script>

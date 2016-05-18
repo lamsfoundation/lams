@@ -1,112 +1,108 @@
 <!DOCTYPE html>
-		
-
 <%@ include file="/common/taglibs.jsp"%>
-<lams:html>
-	<lams:head>
-		<%@ include file="/common/header.jsp"%>
-		<lams:css style="main" />
-		
-		<script type="text/javascript" src="<html:rewrite page='/includes/javascript/commonCartridgeItem.js'/>"></script>
-		<script type="text/javascript" src="${lams}includes/javascript/jquery.js"></script>
-		<script type="text/javascript" src="${lams}includes/javascript/jquery.form.js"></script>
-		<script type="text/javascript">
-    		function formSubmit(){
-    			$('#commonCartridgeItemForm').ajaxSubmit({
-    				target: $("#commonCartridgeListArea", self.parent.document),
-    				success: function() {
-    					self.parent.refreshThickbox()
-    					self.parent.tb_remove();
-    				}
-    			});
-    		}
-		</script>
-	</lams:head>
-	
-	<body class="stripes" onload="parent.resizeIframe();">
-	<div id="content" style="width: 93%; ">	
 
-		<!-- Basic Info Form-->
-		<%@ include file="/common/messages.jsp"%>
-		<html:form action="/authoring/saveOrUpdateItem" method="post" styleId="commonCartridgeItemForm">
-			<c:set var="formBean" value="<%=request.getAttribute(org.apache.struts.taglib.html.Constants.BEAN_KEY)%>" />
+<lams:html>
+<lams:head>
+	<%@ include file="/common/header.jsp"%>
+		
+	<script type="text/javascript" src="<html:rewrite page='/includes/javascript/commonCartridgeItem.js'/>"></script>
+	<script type="text/javascript" src="${lams}includes/javascript/jquery.form.js"></script>
+	<script type="text/javascript">
+   		function formSubmit(){
+   			$('#commonCartridgeItemForm').ajaxSubmit({
+   				target: $("#commonCartridgeListArea", self.parent.document),
+   				success: function() {
+   					self.parent.refreshThickbox()
+   					self.parent.tb_remove();
+   				}
+   			});
+   		}
+	</script>
+</lams:head>
+	
+<body class="stripes" onload="parent.resizeIframe();">
+	<html:form action="/authoring/saveOrUpdateItem" method="post" styleId="commonCartridgeItemForm">
+		<c:set var="formBean" value="<%= request.getAttribute(org.apache.struts.taglib.html.Constants.BEAN_KEY) %>" />
+	
+		<c:set var="title"><fmt:message key="label.authoring.basic.add.basiclti.tool" /></c:set>
+		<lams:Page title="${title}" type="learner">
+
+			<%@ include file="/common/messages.jsp"%>
+			
 			<html:hidden property="sessionMapID" />
 			<input type="hidden" name="itemType" id="itemType" value="1" />
 			<html:hidden property="itemIndex" />
-
-			<h2 class="no-space-left">
-				<fmt:message key="label.authoring.basic.add.basiclti.tool" />
-			</h2>
-
-			<div class="field-name">
-				<fmt:message key="label.authoring.basic.resource.title.input" />
+				
+			<div class="form-group">
+			    <label for="title">
+			    	<fmt:message key="label.authoring.basic.resource.title.input"/>
+			    </label>
+			    <html:text property="title" styleClass="form-control" styleId="title" tabindex="1"/>
 			</div>
-
-			<html:text property="title" size="55" />
-
-			<%--  Remove description in as LDEV-617
-							<tr>
-								<td>
-									<fmt:message key="label.authoring.basic.resource.description.input" />
-								</td>
-								<td>
-									<lams:STRUTS-textarea rows="5" cols="55" property="description" />
-								</td>
-							</tr>
-						 --%>
-
-			<div class="field-name space-top">
-				<fmt:message key="label.authoring.basic.bascilti.url" />
+		
+			<div class="form-group">
+			    <label for="url">
+			    	<fmt:message key="label.authoring.basic.bascilti.url" />
+			    </label>
+			    <html:text property="url" styleClass="form-control" styleId="url" tabindex="1"/>
 			</div>
-			<html:text property="url" size="55" />
-			
-			<div class="field-name space-top">
-				<fmt:message key="label.authoring.basic.bascilti.key" />
+					
+			<div class="form-group">
+			    <label for="key">
+			    	<fmt:message key="label.authoring.basic.bascilti.key" />
+			    </label>
+			    <html:text property="key" styleClass="form-control" styleId="key" tabindex="1"/>
 			</div>
-			<html:text property="key" size="55" />
-			
-			<div class="field-name space-top">
-				<fmt:message key="label.authoring.basic.bascilti.secret" />
+					
+			<div class="form-group">
+			    <label for="secret">
+			    	<fmt:message key="label.authoring.basic.bascilti.secret" />
+			    </label>
+			    <html:text property="secret" styleClass="form-control" styleId="secret" tabindex="1"/>
 			</div>
-			<html:text property="secret" size="55" />
-			
-			<div class="field-name space-top">
-				<fmt:message key="label.authoring.basic.bascilti.button.text" />
+					
+			<div class="form-group">
+			    <label for="buttonText">
+			    	<fmt:message key="label.authoring.basic.bascilti.button.text" />
+			    </label>
+			    <html:text property="buttonText" styleClass="form-control" styleId="buttonText" tabindex="1"/>
 			</div>
-			<html:text property="buttonText" size="55" />
-
-			<div class="space-top">
-				<html:checkbox property="openUrlNewWindow" styleId="openUrlNewWindow" styleClass="noBorder"/>
+		
+			<div class="checkbox">
 				<label for="openUrlNewWindow">
+					<html:checkbox property="openUrlNewWindow" styleId="openUrlNewWindow"/>
 					<fmt:message key="open.in.new.window" />
 				</label>
 			</div>
-			
-			<div class="field-name space-top">
-				<fmt:message key="label.authoring.basic.bascilti.iframe.height" />
+					
+			<div class="form-group">
+			    <label for="frameHeight">
+			    	<fmt:message key="label.authoring.basic.bascilti.iframe.height" />
+			    </label>
+			    <html:text property="frameHeight" styleClass="form-control" styleId="frameHeight" tabindex="1"/>
 			</div>
-			<html:text property="frameHeight" size="55" />
-			
+					
 			<c:if test="${not empty formBean.customStr}">
-				<div class="field-name space-top">
-					<fmt:message key="label.authoring.basic.bascilti.custom.parameters" />
-				</div>
-				<lams:STRUTS-textarea rows="5" cols="55" property="customStr"/>
+				<div class="form-group">
+				    <label for="customStr">
+				    	<fmt:message key="label.authoring.basic.bascilti.custom.parameters" />
+				    </label>
+				    <lams:STRUTS-textarea rows="5" property="customStr" styleClass="form-control" styleId="customStr" tabindex="1"/>
+				</div>						
 			</c:if>
 
-		</html:form>
+			<div class="voffset10 pull-right">
+				<a href="#nogo" onclick="javascript:formSubmit();" class="btn btn-sm btn-default button-add-item">
+					<fmt:message key="label.authoring.basic.add.url" /> 
+				</a>
+				<a href="#nogo" onclick="javascript:self.parent.tb_remove();" class="btn btn-sm btn-default loffset5">
+					<fmt:message key="label.cancel" /> 
+				</a>
+			</div>
+					
+		</lams:Page>
 
-		<br />
-		<lams:ImgButtonWrapper>
-			<a href="javascript:;" onclick="self.parent.tb_remove();" class="button space-left right-buttons space-right ">
-				<fmt:message key="label.cancel" /> 
-			</a>		
-			<a href="#" onclick="formSubmit()" class="button-add-item right-buttons space-left">
-				<fmt:message key="label.authoring.basic.add.url" />
-			</a>
-		</lams:ImgButtonWrapper>
-		
-		
-	</div>
-	</body>
+	</html:form>
+
+</body>
 </lams:html>

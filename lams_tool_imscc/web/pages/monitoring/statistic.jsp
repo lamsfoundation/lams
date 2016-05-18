@@ -2,40 +2,42 @@
 <c:set var="sessionMap" value="${sessionScope[sessionMapID]}"/>
 <c:set var="summaryList" value="${sessionMap.summaryList}"/>
 
+<c:if test="${empty summaryList}">
+	<lams:Alert type="info" id="no-session-summary" close="false">
+		<fmt:message key="message.monitoring.summary.no.session" />
+	</lams:Alert>
+</c:if>
 
-<table cellspacing="3" class="alternative-color">
-	<c:if test="${empty summaryList}">
-		<div align="center">
-			<b> <fmt:message key="message.monitoring.summary.no.session" /> </b>
+<c:forEach var="group" items="${summaryList}" varStatus="firstGroup">
+
+	<c:if test="${sessionMap.isGroupedActivity}">
+		<div class="panel panel-default" >
+			<div class="panel-heading">
+				<span class="panel-title">
+					<fmt:message key="monitoring.label.group" /> ${group[0].sessionName}
+				</span>
+			</div>
 		</div>
 	</c:if>
-	<c:forEach var="group" items="${summaryList}" varStatus="firstGroup">
-		<c:set var="groupSize" value="${fn:length(group)}" />
+	
+	<div class="panel-body">
+	<table class="table table-condensed table-striped">
+		<tr>
+			<th width="20%" align="center">
+				<fmt:message key="monitoring.label.type" />
+			</th>
+			<th width="35%">
+				<fmt:message key="monitoring.label.title" />
+			</th>
+			<th width="20%" align="center">
+				<fmt:message key="monitoring.label.number.learners" />
+			</th>
+		</tr>
+		
 		<c:forEach var="item" items="${group}" varStatus="status">
-			<%-- display group name on first row--%>
-			<c:if test="${status.index == 0}">
-				<tr>
-					<td colspan="4">
-						<B><fmt:message key="monitoring.label.group" /> ${item.sessionName}</B> <SPAN style="font-size: 12px;"> <c:if test="${firstGroup.index==0}">
-								<fmt:message key="monitoring.summary.note" />
-							</c:if> </SPAN>
-					</td>
-				</tr>
-				<tr>
-					<th width="20%" align="center">
-						<fmt:message key="monitoring.label.type" />
-					</th>
-					<th width="35%">
-						<fmt:message key="monitoring.label.title" />
-					</th>
-					<th width="20%" align="center">
-						<fmt:message key="monitoring.label.number.learners" />
-					</th>
-				</tr>
-			</c:if>
 			<c:if test="${item.itemUid == -1}">
 				<tr>
-					<td colspan="4">
+					<td colspan="3">
 						<div align="left">
 							<b> <fmt:message key="message.monitoring.summary.no.resource.for.group" /> </b>
 						</div>
@@ -69,15 +71,18 @@
 								<c:set var="listUrl">
 									<c:url value='/monitoring/listuser.do?toolSessionID=${item.sessionId}&itemUid=${item.itemUid}' />
 								</c:set>
-								<a href="#" onclick="launchPopup('${listUrl}','listuser')"> ${item.viewNumber}<a>
+								<a href="#" onclick="launchPopup('${listUrl}','listuser')"> 
+									${item.viewNumber}
+								</a>
 							</c:when>
 							<c:otherwise>
-											0
-										</c:otherwise>
+								0
+							</c:otherwise>
 						</c:choose>
 					</td>
 				</tr>
 			</c:if>
 		</c:forEach>
-	</c:forEach>
-</table>
+	</table>
+	</div>
+</c:forEach>
