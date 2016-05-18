@@ -36,9 +36,6 @@ import org.apache.log4j.Logger;
  * CommonCartridge
  *
  * @author Andrey Balan
- *
- *
- *
  */
 public class CommonCartridge implements Cloneable {
 

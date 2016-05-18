@@ -30,9 +30,6 @@ import java.util.Date;
  * CommonCartridge
  * 
  * @author Andrey Balan
- *
- *
- *
  */
 public class CommonCartridgeItemVisitLog {
 

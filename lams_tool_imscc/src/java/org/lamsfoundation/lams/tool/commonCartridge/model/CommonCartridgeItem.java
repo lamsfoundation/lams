@@ -34,9 +34,6 @@ import org.apache.log4j.Logger;
  * CommonCartridge
  *
  * @author Andrey Balan
- *
- *
- *
  */
 public class CommonCartridgeItem implements Cloneable {
     private static final Logger log = Logger.getLogger(CommonCartridgeItem.class);

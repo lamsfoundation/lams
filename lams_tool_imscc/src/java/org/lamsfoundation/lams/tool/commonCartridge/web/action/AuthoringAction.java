@@ -119,7 +119,7 @@ public class AuthoringAction extends Action {
 	}
 	// ----------------------- Add commonCartridge item function ---------------------------
 	if (param.equals("newItemInit")) {
-	    return newItemlInit(mapping, form, request, response);
+	    return newItemInit(mapping, form, request, response);
 	}
 	if (param.equals("editItemInit")) {
 	    return editItemInit(mapping, form, request, response);
@@ -218,7 +218,7 @@ public class AuthoringAction extends Action {
      * @param response
      * @return
      */
-    private ActionForward newItemlInit(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+    private ActionForward newItemInit(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) {
 	String sessionMapID = WebUtil.readStrParam(request, CommonCartridgeConstants.ATTR_SESSION_MAP_ID);
 	((CommonCartridgeItemForm) form).setSessionMapID(sessionMapID);

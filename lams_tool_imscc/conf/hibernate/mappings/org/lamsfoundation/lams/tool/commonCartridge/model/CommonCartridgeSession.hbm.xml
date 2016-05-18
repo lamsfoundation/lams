@@ -77,26 +77,6 @@
             length="250"
         />
 
-        <set
-            name="commonCartridgeItems"
-            lazy="true"
-            inverse="false"
-            cascade="all"
-            sort="unsorted"
-            order-by="create_date desc"
-        >
-
-            <key
-                column="session_uid"
-            >
-            </key>
-
-            <one-to-many
-                  class="org.lamsfoundation.lams.tool.commonCartridge.model.CommonCartridgeItem"
-            />
-
-        </set>
-
         <!--
             To add non XDoclet property mappings, create a file named
                 hibernate-properties-CommonCartridgeSession.xml
