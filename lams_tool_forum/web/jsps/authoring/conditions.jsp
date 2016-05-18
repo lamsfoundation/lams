@@ -1,100 +1,48 @@
 <%@ include file="/common/taglibs.jsp"%>
-<c:set var="formBean"
-	value="<%=request.getAttribute(org.apache.struts.taglib.html.Constants.BEAN_KEY)%>" />
+<c:set var="formBean" value="<%=request.getAttribute(org.apache.struts.taglib.html.Constants.BEAN_KEY)%>" />
 <script type="text/javascript">
-<!-- Common Javascript functions for LAMS -->
-
-	/**
-	 * Launches the popup window for the instruction files
-	 */
 	function showConditionMessage(url) {
 		$("#conditionInputArea").load(url, function() {
-			var area=document.getElementById("conditionInputArea");
-			if(area != null){
-				area.style.width="100%";
-				area.style.height="100%";
-				area.style.display="block";
-			}
-			var elem = document.getElementById("saveCancelButtons");
-			if (elem != null) {
-				elem.style.display="none";
-			}
-			location.hash = "conditionInputArea";
+			$(this).show();
+			$("#saveCancelButtons").hide();
 		});
 	}
 	function hideConditionMessage(){
-		var area=document.getElementById("conditionInputArea");
-		if(area != null){
-			area.style.width="0px";
-			area.style.height="0px";
-			area.style.display="none";
-		}
-		var elem = document.getElementById("saveCancelButtons");
-		if (elem != null) {
-			elem.style.display="block";
-		}
+		$("#conditionInputArea").hide();
+		$("#saveCancelButtons").show();
 	}
-
+	
 	function editCondition(orderId,sessionMapID){
-		 var reqIDVar = new Date();
-		var url = "<c:url value="/authoring/editCondition.do?orderId="/>" + orderId +"&sessionMapID="+sessionMapID;;
+		var url = "<c:url value='/authoring/editCondition.do?orderId='/>"
+			  + orderId + "&sessionMapID=" + sessionMapID;
 		showConditionMessage(url);
 	}
-	//The panel of taskList list panel
-	var conditionListTargetDiv = "conditionsArea";
-	function deleteCondition(orderId,sessionMapID){
-		var url = "<c:url value="/authoring/removeCondition.do"/>";
-	    var reqIDVar = new Date();
-		var param = "orderId=" + orderId +"&sessionMapID="+sessionMapID;
-		$.ajax({
-            type: 'get', 
-            url: url,
-            data: param,
-            success: function(data) {
-            	$("#"+conditionListTargetDiv).html(data);
-            }
-        });
+	
+	function deleteCondition(orderId, sessionMapID){
+		$("#conditionsArea").load("<c:url value='/authoring/removeCondition.do'/>",{
+			'orderId' : orderId,
+			'sessionMapID' : sessionMapID
+		});
 	}
 	
 	function upCondition(orderId,sessionMapID){
-		var url = "<c:url value="/authoring/upCondition.do"/>";
-	    var reqIDVar = new Date();
-		var param = "orderId=" + orderId + "&sessionMapID="+sessionMapID;;
-		$.ajax({
-            type: 'get', 
-            url: url,
-            data: param,
-            success: function(data) {
-            	$("#"+conditionListTargetDiv).html(data);
-            }
-        });
+		$("#conditionsArea").load("<c:url value='/authoring/upCondition.do'/>",{
+			'orderId' : orderId,
+			'sessionMapID' : sessionMapID
+		});
 	}
 	function downCondition(orderId,sessionMapID){
-		var url = "<c:url value="/authoring/downCondition.do"/>";
-	    var reqIDVar = new Date();
-		var param = "orderId=" + orderId + "&sessionMapID="+sessionMapID;;
-		$.ajax({
-            type: 'get', 
-            url: url,
-            data: param,
-            success: function(data) {
-            	$("#"+conditionListTargetDiv).html(data);
-            }
-        });
+		$("#conditionsArea").load("<c:url value='/authoring/downCondition.do'/>",{
+			'orderId' : orderId,
+			'sessionMapID' : sessionMapID
+		});
 	}
 	
 	//Packs additional elements and submits the question form
 	function submitCondition(){
-	
-	    $.ajax({ // create an AJAX call...
-           	type: $("#forumConditionForm").attr('method'),
-			url: $("#forumConditionForm").attr('action'),
-			data: $("#forumConditionForm").serialize(), 
-			success: function(data) {
-               $('#forumConditionForm').html(data);
-			}
-	    });
-	}   
+		var form = $('#forumConditionForm');
+		$('#conditionInputArea').load(form.attr('action'), form.serialize());
+	} 
 
 </script>
 
