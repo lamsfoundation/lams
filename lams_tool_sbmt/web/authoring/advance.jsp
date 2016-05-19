@@ -1,92 +1,72 @@
 <%@include file="/common/taglibs.jsp"%>
 
-<!-- Advance Tab Content -->
 
-<p class="small-space-top">
-	<html:checkbox property="lockOnFinished" styleClass="noBorder" styleId="lockOnFinished">
-	</html:checkbox>
+<!-- ========== Advanced Tab ========== -->
+
+<script type="text/javascript">
+	$(document).ready(function(){
+		$('#limitUpload').change(function(){
+			var enabled = $(this).is(':checked');
+			$('#limitUploadNumber').prop('disabled', !enabled);
+		}).change();
+		
+		$('#reflectInstructions').keyup(function(){
+			var checked = $(this).val() != null && $(this).val().trim() != '';
+			$('#reflectOnActivity').prop('checked', checked)
+		});
+	});
+</script>
+
+<div class="checkbox">
 	<label for="lockOnFinished">
+		<html:checkbox property="lockOnFinished" styleId="lockOnFinished" />
 		<fmt:message key="label.authoring.advance.lock.on.finished" />
 	</label>
-</p>
+</div>
 
-<p>
-	<html:checkbox property="limitUpload" styleId="limitUpload"
-		styleClass="noBorder" onclick="limitUploadChange()">
-	</html:checkbox>
+<div class="checkbox">
 	<label for="limitUpload">
+		<html:checkbox property="limitUpload" styleId="limitUpload" />
 		<fmt:message key="label.limit.number.upload" />
 	</label>
+</div>
 
-	<html:select property="limitUploadNumber" styleId="limitUploadNumber">
-		<html:option value="1">1</html:option>
-		<html:option value="2">2</html:option>
-		<html:option value="3">3</html:option>
-		<html:option value="4">4</html:option>
-		<html:option value="5">5</html:option>
-	</html:select>
-</p>
+<html:select property="limitUploadNumber" styleId="limitUploadNumber" styleClass="roffset5 form-control">
+	<html:option value="1">1</html:option>
+	<html:option value="2">2</html:option>
+	<html:option value="3">3</html:option>
+	<html:option value="4">4</html:option>
+	<html:option value="5">5</html:option>
+</html:select>
 
-<p>
-	<html:checkbox property="notifyLearnersOnMarkRelease" styleId="notifyLearnersOnMarkRelease"
-		styleClass="noBorder">
-	</html:checkbox>
+<div class="checkbox">
 	<label for="notifyLearnersOnMarkRelease">
+		<html:checkbox property="notifyLearnersOnMarkRelease" styleId="notifyLearnersOnMarkRelease" />
 		<fmt:message key="label.authoring.advanced.notify.mark.release" />
 	</label>
-</p>
+</div>
 
-<p>
-	<html:checkbox property="notifyTeachersOnFileSubmit" styleId="notifyTeachersOnFileSubmit"
-		styleClass="noBorder">
-	</html:checkbox>
+<div class="checkbox">
 	<label for="notifyTeachersOnFileSubmit">
+		<html:checkbox property="notifyTeachersOnFileSubmit" styleId="notifyTeachersOnFileSubmit" />
 		<fmt:message key="label.authoring.advanced.notify.onfilesubmit" />
 	</label>
-</p>
-<p>
-	<html:checkbox property="reflectOnActivity" styleClass="noBorder"
-		styleId="reflectOn">
-	</html:checkbox>
-	<label for="reflectOn">
+</div>
+
+<div class="checkbox">
+	<label for="notifyLearnersOnMarkRelease">
+		<html:checkbox property="notifyLearnersOnMarkRelease" styleId="notifyLearnersOnMarkRelease" />
+		<fmt:message key="label.authoring.advanced.notify.mark.release" />
+	</label>
+</div>
+
+<div class="checkbox">
+	<label for="reflectOnActivity">
+		<html:checkbox property="reflectOnActivity" styleId="reflectOnActivity" />
 		<fmt:message key="label.authoring.advanced.reflectOnActivity" />
 	</label>
-</p>
+</div>
 
-<p>
-	<html:textarea property="reflectInstructions"
-		styleId="reflectInstructions" cols="50" rows="4" />
-
-</p>
-<script type="text/javascript">
-	function limitUploadChange(){
-		var lu = document.getElementById("limitUpload");
-		var lun = document.getElementById("limitUploadNumber");
-		if(lu.checked){
-			lun.disabled = false;
-		}else{
-			lun.disabled = true;
-		}
-	}
-	//initial set
-	limitUploadChange();
-</script>
-
-<script type="text/javascript">
-<!--
-//automatically turn on refect option if there are text input in refect instruction area
-	var ra = document.getElementById("reflectInstructions");
-	var rao = document.getElementById("reflectOn");
-	function turnOnRefect(){
-		if(isEmpty(ra.value)){
-		//turn off	
-			rao.checked = false;
-		}else{
-		//turn on
-			rao.checked = true;		
-		}
-	}
-
-	ra.onkeyup=turnOnRefect;
-//-->
-</script>
+<div class="form-group">
+	<html:textarea property="reflectInstructions" styleId="reflectInstructions" styleClass="form-control" cols="50" rows="4" />
+</div>

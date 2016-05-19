@@ -56,12 +56,6 @@ import org.lamsfoundation.lams.web.util.SessionMap;
 /**
  * @author Manpreet Minhas
  * @author Steve Ni
- *
- *
- *
- *
- *
- *
  */
 public class AuthoringAction extends LamsDispatchAction {
     private Logger log = Logger.getLogger(AuthoringAction.class);
@@ -95,6 +89,7 @@ public class AuthoringAction extends LamsDispatchAction {
 
 	SessionMap sessionMap = new SessionMap();
 	request.getSession().setAttribute(sessionMap.getSessionID(), sessionMap);
+	sessionMap.put(AttributeNames.PARAM_MODE, mode);
 
 	Long contentID = new Long(WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_CONTENT_ID));
 	String contentFolderID = WebUtil.readStrParam(request, AttributeNames.PARAM_CONTENT_FOLDER_ID);
@@ -120,9 +115,8 @@ public class AuthoringAction extends LamsDispatchAction {
 	authForm.initContentValue(persistContent);
 	// session map
 	authForm.setSessionMapID(sessionMap.getSessionID());
-	// current tab
-	authForm.setCurrentTab(request.getParameter("currentTab"));
 	authForm.setContentFolderID(contentFolderID);
+	
 
 	return mapping.findForward("success");
     }
