@@ -191,16 +191,6 @@
       />
     </action>
 
-   <!-- ========== Action Mapping Definitions ============================== -->
-		<action path="/definelater" type="org.lamsfoundation.lams.tool.sbmt.web.AuthoringAction" 
-				name="SbmtAuthoringForm" 
-				scope="request" 
-				input="/authoring/definelater.jsp"
-				parameter="dispatch" 
-				validate="false">
-			<forward name="success" path="/authoring/definelater.jsp"/>
-			<forward name="forbidden" path="/authoring/definelaterforbid.jsp"/>
-		</action>
 		<!--  ========= Reflection =============== -->
 		<action path="/learning/newReflection"
 			type="org.lamsfoundation.lams.tool.sbmt.web.ReflectAction"
