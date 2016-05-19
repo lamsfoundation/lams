@@ -65,7 +65,6 @@
 		<c:forEach var="sessionEntry" items="${notebookDTO.sessions}">
 			<c:set var="sessionId" value ="${sessionEntry.key}"/>
 			<c:set var="sessionName" value ="${sessionEntry.value}"/>
-			<c:set var="gridCaption"><fmt:message key='label.notebook.entries' /></c:set>
 			
 			jQuery("#group${sessionId}").jqGrid({
 			
@@ -151,7 +150,8 @@
 				rowList:[10,20,30,40,50,100],
 				
 				height: 'auto',
-				width: 685,
+				autowidth: true,
+				shrinkToFit: false,
 				
 			   	colNames:['#',
 						'userUid',
@@ -172,7 +172,6 @@
 			   	],
 			   	
 			   	multiselect: false,
-			   	caption: " ${gridCaption}"
 			}).jqGrid('filterToolbar',{searchOnEnter: false});
 		</c:forEach>
 		
@@ -189,6 +188,7 @@
 		    }
 		});
 		
+		setTimeout(function(){ window.dispatchEvent(new Event('resize')); }, 300);
 	});
 
 </script>
