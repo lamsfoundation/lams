@@ -1,11 +1,13 @@
 <%@ include file="/common/taglibs.jsp"%>
 
-<div id="content">
-<div class="info"><fmt:message key="${messageKey}" /></div>
+<div class="panel">
+	<lams:Alert id="errorMessages" type="danger" close="false">
+		<fmt:message key="${messageKey}" />
+	</lams:Alert>
 
-<br>
-
-<a href="#" class="button" onclick="window.close();"
-	style="float: right"> <fmt:message key="button.close" /> </a> <br>
+	<p>
+		<a href="#" class="button" onclick="window.close();" style="float: right"> <fmt:message key="button.close" />
+		</a>
+	</p>
 </div>
 
