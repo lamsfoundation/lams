@@ -5,7 +5,7 @@
 <lams:html>
 	<lams:head>
 		<%@ include file="/common/header.jsp"%>
-		<lams:css style="main"/>
+		<lams:css/>
 
 		<script type="text/javascript">
 		   <%-- user for  rsrcresourceitem.js --%>
@@ -17,51 +17,49 @@
 	</lams:head>
 	<body>
 
-		<!-- Basic Info Form-->
-
-		<%@ include file="/common/messages.jsp"%>
-		<html:form action="/authoring/saveOrUpdateItem" method="post" styleId="resourceItemForm" enctype="multipart/form-data">
-			<input type="hidden" name="instructionList" id="instructionList" />
-			<html:hidden property="sessionMapID" />
-			<input type="hidden" name="itemType" id="itemType" value="2" />
-			<html:hidden property="itemIndex" />
-
-			<h2 class="no-space-left">
+		<div class="panel panel-default add-file">
+			<div class="panel-heading panel-title">
 				<fmt:message key="label.authoring.basic.add.file" />
-			</h2>
-
-			<div class="field-name">
-				<fmt:message key="label.authoring.basic.resource.title.input" />
-			</div>
-
-			<html:text property="title" size="55" tabindex="1" />
-
-			<div class="field-name space-top">
-				<fmt:message key="label.authoring.basic.resource.file.input" />
-			</div>
-			<c:set var="itemAttachment" value="<%=request.getAttribute(org.apache.struts.taglib.html.Constants.BEAN_KEY)%>" />
-			<div id="itemAttachmentArea">
-				<%@ include file="/pages/authoring/parts/itemattachment.jsp"%>
 			</div>
 			
-			<div class="space-top">
-				<html:checkbox property="openUrlNewWindow" styleId="open-file-in-new-window" styleClass="noBorder" />
-				<label for="open-file-in-new-window">
-					<fmt:message key="open.file.in.new.window" />
-				</label>
+			<div class="panel-body">
+
+			<%@ include file="/common/messages.jsp"%>
+
+			<html:form action="/authoring/saveOrUpdateItem" method="post" styleId="resourceItemForm" enctype="multipart/form-data">
+				<input type="hidden" name="instructionList" id="instructionList" />
+				<html:hidden property="sessionMapID" />
+				<input type="hidden" name="itemType" id="itemType" value="2" />
+				<html:hidden property="itemIndex" />
+	
+				<div class="form-group">
+				   	<label for="title"><fmt:message key="label.authoring.basic.resource.title.input" /></label>
+					<html:text property="title" size="55" styleClass="form-control form-control-inline" />
+			  	</div>	
+			  
+
+				<div class="form-group">
+					<label for="file"><fmt:message key="label.authoring.basic.resource.file.input" /></label>
+					<c:set var="itemAttachment" value="<%=request.getAttribute(org.apache.struts.taglib.html.Constants.BEAN_KEY)%>" />
+					<span id="itemAttachmentArea">
+					<%@ include file="/pages/authoring/parts/itemattachment.jsp"%>
+					</span>
+					<i class="fa fa-spinner" style="display:none" id="itemAttachmentArea_Busy"></i>
+				</div>
+	
+			</html:form>
+	
+			<!-- Instructions -->
+			<%@ include file="instructions.jsp"%>
+			
+			<div class="voffset5">
+				<a href="#" onclick="submitResourceItem()" class="btn btn-default btn-sm">
+					<i class="fa fa-plus"></i>&nbsp;<fmt:message key="label.authoring.basic.add.file" /> </a>
+				<a href="javascript:;" onclick="hideResourceItem()" class="btn btn-default btn-sm">
+					<fmt:message key="label.cancel" /> </a>
 			</div>
-
-		</html:form>
-
-		<!-- Instructions -->
-		<%@ include file="instructions.jsp"%>
-		
-		<lams:ImgButtonWrapper>
-			<a href="#" onclick="submitResourceItem()" class="button-add-item"><fmt:message
-					key="label.authoring.basic.add.file" /> </a>
-			<a href="javascript:;" onclick="cancelResourceItem()" class="button space-left"><fmt:message
-					key="label.cancel" /> </a>
-		</lams:ImgButtonWrapper>
-		<br />
+						
+			</div>
+		</div>
 	</body>
 </lams:html>

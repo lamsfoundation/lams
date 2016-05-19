@@ -1,10 +1,12 @@
 	function showBusy(targetDiv){
-		if($(targetDiv+"_Busy") != null){
+		var div = document.getElementById(targetDiv+"_Busy");
+		if(div != null){
 			document.getElementById(targetDiv+"_Busy").style.display = '';
 		}
 	}
 	function hideBusy(targetDiv){
-		if($(targetDiv+"_Busy") != null){
+		var div = document.getElementById(targetDiv+"_Busy");
+		if(div != null){
 			document.getElementById(targetDiv+"_Busy").style.display = 'none';
 		}				
 	}

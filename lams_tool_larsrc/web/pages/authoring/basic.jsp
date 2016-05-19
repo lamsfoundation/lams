@@ -4,35 +4,17 @@
 
 <c:set var="formBean" value="<%=request.getAttribute(org.apache.struts.taglib.html.Constants.BEAN_KEY)%>" />
 <script lang="javascript">
-<!-- Common Javascript functions for LAMS -->
 
-	/**
-	 * Launches the popup window for the instruction files
-	 */
-	function showMessage(url) {
-		var area=document.getElementById("reourceInputArea");
-		if(area != null){
-			area.style.width="90%";
-			area.src=url;
-			area.style.display="block";
-		}
-		var elem = document.getElementById("saveCancelButtons");
-		if (elem != null) {
-			elem.style.display="none";
-		}
-		location.hash = "reourceInputArea";
+
+	function showResourceItem(url) {
+		$("#resourceInputArea").load(url, function() {
+			$(this).show();
+			$("#saveCancelButtons").hide();
+		});
 	}
-	function hideMessage(){
-		var area=document.getElementById("reourceInputArea");
-		if(area != null){
-			area.style.width="0px";
-			area.style.height="0px";
-			area.style.display="none";
-		}
-		var elem = document.getElementById("saveCancelButtons");
-		if (elem != null) {
-			elem.style.display="block";
-		}
+	function hideResourceItem(){
+		$("#resourceInputArea").hide();
+		$("#saveCancelButtons").show();
 	}
 
 	function previewItem(type,idx,sessionMapID){
@@ -43,9 +25,9 @@
 	}
 	
 	function editItem(idx,sessionMapID){
-		 var reqIDVar = new Date();
+		var reqIDVar = new Date();
 		var url = "<c:url value="/authoring/editItemInit.do?itemIndex="/>" + idx +"&reqID="+reqIDVar.getTime()+"&sessionMapID="+sessionMapID;;
-		showMessage(url);
+		showResourceItem(url);
 	}
 	//The panel of resource list panel
 	var resourceListTargetDiv = "resourceListArea";
@@ -94,54 +76,31 @@
 	}
 
 </script>
-<!-- Basic Tab Content -->
-<table>
-	<tr>
-		<td colspan="2">
-			<div class="field-name">
-				<fmt:message key="label.authoring.basic.title"></fmt:message>
-			</div>
-			<html:text property="resource.title" style="width: 99%;"></html:text>
-		</td>
-	</tr>
-	<tr>
-		<td colspan="2">
-			<div class="field-name">
-				<fmt:message key="label.authoring.basic.instruction"></fmt:message>
-			</div>
-			<lams:CKEditor id="resource.instructions"
-				value="${formBean.resource.instructions}"
-				contentFolderID="${formBean.contentFolderID}"></lams:CKEditor>
-		</td>
-	</tr>
 
-</table>
+<!-- Basic Tab Content -->
+<div class="form-group">
+    <label for="forum.title"><fmt:message key="label.authoring.basic.title"/></label>
+    <html:text property="resource.title" styleClass="form-control"></html:text>
+</div>
+<div class="form-group">
+    <label for="resource.instructions"><fmt:message key="label.authoring.basic.instruction" /></label>
+    <lams:CKEditor id="resource.instructions" value="${formBean.resource.instructions}" contentFolderID="${formBean.contentFolderID}"></lams:CKEditor>
+</div>
 
 <div id="resourceListArea">
 	<c:set var="sessionMapID" value="${formBean.sessionMapID}" />
-	<%@ include file="/pages/authoring/parts/itemlist.jsp"%>
+ 	<%@ include file="/pages/authoring/parts/itemlist.jsp"%>
 </div>
 
-<p align="center">
-			<a
-				href="javascript:showMessage('<html:rewrite page="/authoring/newItemInit.do?sessionMapID=${formBean.sessionMapID}&itemType=1"/>');">
-				<fmt:message key="label.authoring.basic.add.url" /></a> 
-				 <a
-				href="javascript:showMessage('<html:rewrite page="/authoring/newItemInit.do?sessionMapID=${formBean.sessionMapID}&itemType=2"/>');"  class="space-left">
-				<fmt:message key="label.authoring.basic.add.file" /></a>
-				 <a
-				href="javascript:showMessage('<html:rewrite page="/authoring/newItemInit.do?sessionMapID=${formBean.sessionMapID}&itemType=3"/>');" class="space-left">
-				<fmt:message key="label.authoring.basic.add.website" /></a>
-				<a
-				href="javascript:showMessage('<html:rewrite page="/authoring/newItemInit.do?sessionMapID=${formBean.sessionMapID}&itemType=4"/>');" class="space-left">
-				<fmt:message key="label.authoring.basic.add.learning.object" /> </a>
-</p>
+<div class="form-inline">
+	<a href="javascript:showResourceItem('<html:rewrite page="/authoring/newItemInit.do?sessionMapID=${formBean.sessionMapID}&itemType=1"/>');" class="btn btn-default btn-sm">
+		<i class="fa fa-plus"></i>&nbsp;<fmt:message key="label.authoring.basic.add.url" /></a> 
+	<a href="javascript:showResourceItem('<html:rewrite page="/authoring/newItemInit.do?sessionMapID=${formBean.sessionMapID}&itemType=2"/>');"  class="btn btn-default btn-sm loffset5">
+		<i class="fa fa-plus"></i>&nbsp;<fmt:message key="label.authoring.basic.add.file" /></a>
+	<a href="javascript:showResourceItem('<html:rewrite page="/authoring/newItemInit.do?sessionMapID=${formBean.sessionMapID}&itemType=3"/>');" class="btn btn-default btn-sm loffset5">
+		<i class="fa fa-plus"></i>&nbsp;<fmt:message key="label.authoring.basic.add.website" /></a>
+	<a href="javascript:showResourceItem('<html:rewrite page="/authoring/newItemInit.do?sessionMapID=${formBean.sessionMapID}&itemType=4"/>');" class="btn btn-default btn-sm loffset5">
+		<i class="fa fa-plus"></i>&nbsp;<fmt:message key="label.authoring.basic.add.learning.object" /> </a>
+</div>
 
-<p>
-	<iframe
-		onload="javascript:this.style.height=this.contentWindow.document.body.scrollHeight+'px'"
-		id="reourceInputArea" name="reourceInputArea"
-		style="width:0px;height:0px;border:0px;display:none" frameborder="no"
-		scrolling="no">
-	</iframe>
-</p>
+<div id="resourceInputArea" name="resourceInputArea" class="voffset10"></div>

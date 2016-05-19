@@ -72,30 +72,28 @@
  
 </lams:head>
 <body class="stripes" onLoad="init()">
-<div id="page">
-		<h1>
-			<fmt:message key="label.authoring.heading" />
-		</h1>
-<div id="header">
-		<lams:Tabs useKey="true" control="true">
+
+	<html:form action="authoring/update" method="post" styleId="authoringForm" enctype="multipart/form-data">
+	<c:set var="formBean" value="<%= request.getAttribute(org.apache.struts.taglib.html.Constants.BEAN_KEY) %>" />
+	<html:hidden property="resource.contentId" />
+	<html:hidden property="sessionMapID" />
+	<html:hidden property="contentFolderID" />
+	<html:hidden property="currentTab" styleId="currentTab" />
+
+
+	<c:set var="title"><fmt:message key="activity.title" /></c:set>
+	<lams:Page title="${title}" type="navbar">
+	
+		<lams:Tabs control="true" title="${title}" helpToolSignature="<%= ResourceConstants.TOOL_SIGNATURE %>" helpModule="authoring">
 			<lams:Tab id="1" key="label.authoring.heading.basic" />
 			<lams:Tab id="2" key="label.authoring.heading.advance" />
-		</lams:Tabs></div>
-		<!-- start tabs -->
-<div id="content">
-		<!-- end tab buttons -->
-		
+		</lams:Tabs>    
+
+	<lams:TabBodyArea>
 		<%@ include file="/common/messages.jsp"%>
-
-		<html:form action="authoring/update" method="post" styleId="authoringForm" enctype="multipart/form-data">
-		<c:set var="formBean" value="<%= request.getAttribute(org.apache.struts.taglib.html.Constants.BEAN_KEY) %>" />
-		<html:hidden property="resource.contentId" />
-		<html:hidden property="sessionMapID" />
-		<html:hidden property="contentFolderID" />
-		<html:hidden property="currentTab" styleId="currentTab" />
-
-		<lams:help toolSignature="<%= ResourceConstants.TOOL_SIGNATURE %>" module="authoring"/>
-
+	   
+	    <!--  Set up tabs  -->
+	    <lams:TabBodys>
 			<!-- tab content 1 (Basic) -->
 			<lams:TabBody id="1" titleKey="label.authoring.heading.basic.desc" page="basic.jsp" />
 			<!-- end of content (Basic) -->
@@ -103,26 +101,26 @@
 			<!-- tab content 2 (Advanced) -->
 			<lams:TabBody id="2" titleKey="label.authoring.heading.advance.desc" page="advance.jsp" />
 			<!-- end of content (Advanced) -->
+		</lams:TabBodys>
+			
+		<!-- Button Row -->
+		<%--  Default value 
+			cancelButtonLabelKey="label.authoring.cancel.button"
+			saveButtonLabelKey="label.authoring.save.button"
+			cancelConfirmMsgKey="authoring.msg.cancel.save"
+			accessMode="author"
+		--%>
+		<lams:AuthoringButton formID="authoringForm" clearSessionActionUrl="/clearsession.do" 
+			toolSignature="<%=ResourceConstants.TOOL_SIGNATURE%>" toolContentID="${formBean.resource.contentId}" 
+			 customiseSessionID="${formBean.sessionMapID}"
+			 contentFolderID="${formBean.contentFolderID}" />
+	</lams:TabBodyArea>
 
+	<div id="footer"></div>
 
-			<!-- Button Row -->
-			<%--  Default value 
-				cancelButtonLabelKey="label.authoring.cancel.button"
-				saveButtonLabelKey="label.authoring.save.button"
-				cancelConfirmMsgKey="authoring.msg.cancel.save"
-				accessMode="author"
-			--%>
-			<lams:AuthoringButton formID="authoringForm" clearSessionActionUrl="/clearsession.do" 
-				toolSignature="<%=ResourceConstants.TOOL_SIGNATURE%>" toolContentID="${formBean.resource.contentId}" 
-				 customiseSessionID="${formBean.sessionMapID}"
-				 contentFolderID="${formBean.contentFolderID}" />
+	</lams:Page>
+		
 	</html:form>
-
-</div>
-
-<div id="footer"></div>
-<!-- end page div -->
-</div>
 
 <script type="text/javascript">
 	changeViewNum(${formBean.resource.miniViewResourceNumber});

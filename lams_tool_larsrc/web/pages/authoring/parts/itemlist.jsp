@@ -1,19 +1,14 @@
 <%@ include file="/common/taglibs.jsp"%>
-<c:set var="ctxPath" value="${pageContext.request.contextPath}"
-	scope="request" />
-
-<c:set var="tool">
-	<lams:WebAppURL />
-</c:set>
 
 <div id="itemList">
-	<h2 class="spacer-left">
-		<fmt:message key="label.authoring.basic.resource.list.title" />
-		<img src="${ctxPath}/includes/images/indicator.gif"
-			style="display:none" id="resourceListArea_Busy" />
-	</h2>
-	
-	<table class="alternative-color" id="itemTable" cellspacing="0">
+
+<div class="panel panel-default voffset5">
+	<div class="panel-heading panel-title">
+		<fmt:message key="label.authoring.basic.resource.list.title" /> 
+		<i class="fa fa-spinner" style="display: none" id="resourceListArea_Busy"></i>
+	</div>
+
+	<table class="table table-striped table-condensed" id="itemTable">
 		<c:set var="sessionMap" value="${sessionScope[sessionMapID]}" />
 		<c:set var="listSize" value="${fn:length(sessionMap.resourceList)}" />
 		<c:forEach var="resource" items="${sessionMap.resourceList}"
@@ -31,49 +26,6 @@
 							onclick="previewItem(1,${status.index},'${sessionMapID}')"> <fmt:message
 								key="label.authoring.basic.resource.verify.url" /> </a>
 					</td>
-					<td width="10%">
-						<%-- Don't display down icon if last line --%>
-						<c:choose>
-							<c:when test="${0 != status.index}">
-								<img src="<html:rewrite page='/includes/images/uparrow.gif'/>"
-									border="0" title="<fmt:message key="label.up"/>"
-									onclick="switchItem(${status.index}, ${status.index - 1}, '${sessionMapID}')">
-							</c:when>
-							<c:otherwise>
-								<img
-									src="<html:rewrite page='/includes/images/uparrow_disabled.gif'/>"
-									border="0" title="<fmt:message key="label.up"/>">
-							</c:otherwise>
-						</c:choose>
-
-						<c:choose>
-							<c:when test="${listSize != status.count}">
-								<img src="<html:rewrite page='/includes/images/downarrow.gif'/>"
-									border="0" title="<fmt:message key="label.down"/>"
-									onclick="switchItem(${status.index}, ${status.index + 1}, '${sessionMapID}')">
-							</c:when>
-
-							<c:otherwise>
-								<img
-									src="<html:rewrite page='/includes/images/downarrow_disabled.gif'/>"
-									border="0" title="<fmt:message key="label.down"/>">
-							</c:otherwise>
-
-						</c:choose>
-
-						<%-- Don't display down icon if last line --%>
-					</td>
-					<td width="5%">
-						<img src="${tool}includes/images/edit.gif"
-							title="<fmt:message key="label.authoring.basic.resource.edit" />"
-							onclick="editItem(${status.index},'${sessionMapID}')" />
-
-					</td>
-					<td width="5%">
-						<img src="${tool}includes/images/cross.gif"
-							title="<fmt:message key="label.authoring.basic.resource.delete" />"
-							onclick="deleteItem(${status.index},'${sessionMapID}')" />
-					</td>
 				</c:if>
 
 				<c:if test="${resource.type == 2}">
@@ -86,49 +38,6 @@
 						<a href="#"
 							onclick="previewItem(2,${status.index},'${sessionMapID}')"> <fmt:message
 								key="label.authoring.basic.resource.preview" /> </a>
-					</td>
-					<td width="10%">
-						<%-- Don't display down icon if last line --%>
-						<c:choose>
-							<c:when test="${0 != status.index}">
-								<img src="<html:rewrite page='/includes/images/uparrow.gif'/>"
-									border="0" title="<fmt:message key="label.up"/>"
-									onclick="switchItem(${status.index}, ${status.index - 1}, '${sessionMapID}')">
-							</c:when>
-							<c:otherwise>
-								<img
-									src="<html:rewrite page='/includes/images/uparrow_disabled.gif'/>"
-									border="0" title="<fmt:message key="label.up"/>">
-							</c:otherwise>
-						</c:choose>
-
-						<c:choose>
-							<c:when test="${listSize != status.count}">
-								<img src="<html:rewrite page='/includes/images/downarrow.gif'/>"
-									border="0" title="<fmt:message key="label.down"/>"
-									onclick="switchItem(${status.index}, ${status.index + 1}, '${sessionMapID}')">
-							</c:when>
-
-							<c:otherwise>
-								<img
-									src="<html:rewrite page='/includes/images/downarrow_disabled.gif'/>"
-									border="0" title="<fmt:message key="label.down"/>">
-							</c:otherwise>
-
-						</c:choose>
-
-						<%-- Don't display down icon if last line --%>
-					</td>
-					<td>
-						<img src="${tool}includes/images/edit.gif"
-							title="<fmt:message key="label.authoring.basic.resource.edit" />"
-							onclick="editItem(${status.index},'${sessionMapID}')" />
-
-					</td>
-					<td>
-						<img src="${tool}includes/images/cross.gif"
-							title="<fmt:message key="label.authoring.basic.resource.delete" />"
-							onclick="deleteItem(${status.index},'${sessionMapID}')" />
 					</td>
 				</c:if>
 
@@ -143,48 +52,6 @@
 							onclick="previewItem(3,${status.index},'${sessionMapID}')"> <fmt:message
 								key="label.authoring.basic.resource.preview" /> </a>
 					</td>
-					<td width="10%">
-						<%-- Don't display down icon if last line --%>
-						<c:choose>
-							<c:when test="${0 != status.index}">
-								<img src="<html:rewrite page='/includes/images/uparrow.gif'/>"
-									border="0" title="<fmt:message key="label.up"/>"
-									onclick="switchItem(${status.index}, ${status.index - 1}, '${sessionMapID}')">
-							</c:when>
-							<c:otherwise>
-								<img
-									src="<html:rewrite page='/includes/images/uparrow_disabled.gif'/>"
-									border="0" title="<fmt:message key="label.up"/>">
-							</c:otherwise>
-						</c:choose>
-
-						<c:choose>
-							<c:when test="${listSize != status.count}">
-								<img src="<html:rewrite page='/includes/images/downarrow.gif'/>"
-									border="0" title="<fmt:message key="label.down"/>"
-									onclick="switchItem(${status.index}, ${status.index + 1}, '${sessionMapID}')">
-							</c:when>
-
-							<c:otherwise>
-								<img
-									src="<html:rewrite page='/includes/images/downarrow_disabled.gif'/>"
-									border="0" title="<fmt:message key="label.down"/>">
-							</c:otherwise>
-
-						</c:choose>
-
-						<%-- Don't display down icon if last line --%>
-					</td>
-					<td>
-						<img src="${tool}includes/images/edit.gif"
-							title="<fmt:message key="label.authoring.basic.resource.edit" />"
-							onclick="editItem(${status.index},'${sessionMapID}')" />
-					</td>
-					<td>
-						<img src="${tool}includes/images/cross.gif"
-							title="<fmt:message key="label.authoring.basic.resource.delete" />"
-							onclick="deleteItem(${status.index},'${sessionMapID}')" />
-					</td>
 				</c:if>
 
 				<c:if test="${resource.type == 4}">
@@ -198,69 +65,32 @@
 							onclick="previewItem(4,${status.index},'${sessionMapID}')"> <fmt:message
 								key="label.authoring.basic.resource.preview" /> </a>
 					</td>
-					<td width="10%">
-						<%-- Don't display down icon if last line --%>
-						<c:choose>
-							<c:when test="${0 != status.index}">
-								<img src="<html:rewrite page='/includes/images/uparrow.gif'/>"
-									border="0" title="<fmt:message key="label.up"/>"
-									onclick="switchItem(${status.index}, ${status.index - 1}, '${sessionMapID}')">
-							</c:when>
-							<c:otherwise>
-								<img
-									src="<html:rewrite page='/includes/images/uparrow_disabled.gif'/>"
-									border="0" title="<fmt:message key="label.up"/>">
-							</c:otherwise>
-						</c:choose>
-
-						<c:choose>
-							<c:when test="${listSize != status.count}">
-								<img src="<html:rewrite page='/includes/images/downarrow.gif'/>"
-									border="0" title="<fmt:message key="label.down"/>"
-									onclick="switchItem(${status.index}, ${status.index + 1}, '${sessionMapID}')">
-							</c:when>
-
-							<c:otherwise>
-								<img
-									src="<html:rewrite page='/includes/images/downarrow_disabled.gif'/>"
-									border="0" title="<fmt:message key="label.down"/>">
-							</c:otherwise>
-
-						</c:choose>
-
-						<%-- Don't display down icon if last line --%>
-					</td>
-					<td>
-						<img src="${tool}includes/images/edit.gif"
-							title="<fmt:message key="label.authoring.basic.resource.edit" />"
-							onclick="editItem(${status.index},'${sessionMapID}')" />
-					</td>
-					<td>
-						<img src="${tool}includes/images/cross.gif"
-							title="<fmt:message key="label.authoring.basic.resource.delete" />"
-							onclick="deleteItem(${status.index},'${sessionMapID}')" />
-					</td>
 				</c:if>
+				
+					<td class="arrows" style="width:5%">
+						<!-- Don't display up icon if first line -->
+						<c:if test="${not status.first}">
+		 					<lams:Arrow state="up" title="<fmt:message key='label.up'/>" onclick="switchItem(${status.index}, ${status.index - 1}, '${sessionMapID}')"/>
+		 				</c:if>
+						<!-- Don't display down icon if last line -->
+						<c:if test="${not status.last}">
+							<lams:Arrow state="down" title="<fmt:message key='label.down'/>" onclick="switchItem(${status.index}, ${status.index + 1}, '${sessionMapID}')"/>
+		 				</c:if>
+					</td>
+					<td align="center" style="width:5%"><i class="fa fa-pencil"	title="<fmt:message key="label.edit" />" id="edit${status.index}"
+						onclick="editItem(${status.index},'${sessionMapID}')"></i></td>
+					<td  align="center" style="width:5%"><i class="fa fa-times"	title="<fmt:message key="label.delete" />" id="delete${status.index}" 
+						onclick="deleteItem(${status.index},'${sessionMapID}')"></i></td>
+				
 			</tr>
 		</c:forEach>
 	</table>
 </div>
+</div>
 
-<%-- This script will works when a new resoruce item submit in order to refresh "Resource List" panel. --%>
+<%-- This script will works when a new resource item submit in order to refresh "Resource List" panel. --%>
 <script lang="javascript">
-	var win = null;
-	try {
-		if (window.parent && window.parent.hideMessage) {
-			win = window.parent;
-		} else if (window.top && window.top.hideMessage) {
-			win = window.top;
-		}
-	} catch(err) {
-		// mute cross-domain iframe access errors
-	}
-	if (win) {
-		win.hideMessage();
-		var obj = win.document.getElementById('resourceListArea');
-		obj.innerHTML= document.getElementById("itemList").innerHTML;
-	}
+	hideResourceItem();
+	var obj = document.getElementById('resourceListArea');
+	obj.innerHTML= document.getElementById("itemList").innerHTML;
 </script>
