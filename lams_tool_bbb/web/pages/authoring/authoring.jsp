@@ -12,7 +12,7 @@
 	</c:if>
 
 		<c:set var="title">
-			<fmt:message key="activity.title" />: ${sessionMap.mode}
+			<fmt:message key="activity.title" />
 		</c:set>
 
 		<!--  TITLE KEY PAGE GOES HERE -->
