@@ -6,7 +6,6 @@
 	<c:set var="sessionMap" value="${sessionScope[formBean.sessionMapID]}" />
 	<c:set var="title"><fmt:message key="activity.title" /></c:set>
 	
-	<html:hidden property="currentTab" styleId="currentTab" />
 	<html:hidden property="dispatch" value="updateContent" />
 	<html:hidden property="sessionMapID" />
 	
@@ -14,8 +13,10 @@
 
 	<lams:Tabs control="true" title="${title}" helpToolSignature="<%= NotebookConstants.TOOL_SIGNATURE %>" helpModule="authoring">
 		<lams:Tab id="1" key="button.basic" />
-		<lams:Tab id="2" key="button.advanced" />
-		<lams:Tab id="3" key="button.conditions" />
+		<c:if test="${sessionMap.mode == 'author'}">
+			<lams:Tab id="2" key="button.advanced" />
+			<lams:Tab id="3" key="button.conditions" />
+		</c:if>
 	</lams:Tabs>  
 	
 	<lams:TabBodyArea>
@@ -24,8 +25,10 @@
 	    <!--  Set up tabs  -->
 	     <lams:TabBodys>
 			<lams:TabBody id="1" titleKey="button.basic" page="basic.jsp" />
-			<lams:TabBody id="2" titleKey="button.advanced" page="advanced.jsp" />
-			<lams:TabBody id="3" titleKey="button.conditions" page="conditions.jsp" />
+			<c:if test="${sessionMap.mode == 'author'}">
+				<lams:TabBody id="2" titleKey="button.advanced" page="advanced.jsp" />
+				<lams:TabBody id="3" titleKey="button.conditions" page="conditions.jsp" />
+			</c:if>
 	    </lams:TabBodys>
 
 
@@ -34,6 +37,8 @@
 			toolSignature="<%=NotebookConstants.TOOL_SIGNATURE%>"
 			cancelButtonLabelKey="button.cancel"
 			saveButtonLabelKey="button.save"
+			accessMode="${sessionMap.mode}"
+			defineLater="${sessionMap.mode == 'teacher'}"
 			toolContentID="${sessionMap.toolContentID}"
 			customiseSessionID="${sessionMap.sessionID}" 
 			contentFolderID="${sessionMap.contentFolderID}" />
