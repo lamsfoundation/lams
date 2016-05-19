@@ -1,21 +1,12 @@
 <%@ include file="/common/taglibs.jsp"%>
-<script type="text/javascript"
-	src="<lams:LAMSURL/>/includes/javascript/monitorToolSummaryAdvanced.js"></script>
 
 <c:set var="dto" value="${contentDTO}" />
 
-<h1>
-	<img src="<lams:LAMSURL/>/images/tree_closed.gif" id="treeIcon"
-		onclick="javascript:toggleAdvancedOptionsVisibility(document.getElementById('advancedDiv'), document.getElementById('treeIcon'), '<lams:LAMSURL/>');" />
+<div class="panel">
 
-	<a
-		href="javascript:toggleAdvancedOptionsVisibility(document.getElementById('advancedDiv'), document.getElementById('treeIcon'),'<lams:LAMSURL/>');">
-		<fmt:message key="monitor.summary.th.advancedSettings" /> </a>
-</h1>
-<br />
-
-<div class="monitoring-advanced" id="advancedDiv" style="display: none">
-	<table class="alternative-color">
+<c:set var="adTitle"><fmt:message key="monitor.summary.th.advancedSettings" /></c:set>
+<lams:AdvancedAccordian title="${adTitle}">
+	<table class="table table-striped table-condensed">
 
 		<tr>
 			<td>
@@ -35,26 +26,22 @@
 		</tr>
 
 	</table>
-</div>
+</lams:AdvancedAccordian>
+
 
 
 	<c:forEach var="session" items="${dto.sessionDTOs}">
 	
-		<h1>
-			${session.sessionName}
-		</h1>
+		<h4>
+			<c:out value="${session.sessionName}" escapeXml="true"/>
+		</h4>
 	
-		<h2>
-			<fmt:message key="monitor.summary.bbbSettings" />
-		</h2>
-	
-		
 		<html:form action="monitoring"  target="bbbMonitor${session.sessionID}" onsubmit="window.open('', 'bbbMonitor${session.sessionID}', 'resizable=yes,scrollbars=yes')"> 
 			<html:hidden property="dispatch" value="startMeeting" />
 			<html:hidden property="toolSessionID" value="${session.sessionID}" />
 						
 			<p>
-				<html:submit styleClass="button">
+				<html:submit styleClass="btn btn-primary loffset5 voffset10">
 				<fmt:message key="label.monitoring.startConference" />
 				</html:submit>
 			</p>
@@ -67,7 +54,8 @@
 		</p>
 		
 		<c:if test="${contentDTO.reflectOnActivity}">
-			<table cellspacing="0" class="alternative-color">
+			<div class="table-responsive">
+			<table class="table table-striped">
 		
 				<tr>
 					<th style="width: 30%;">
@@ -101,6 +89,7 @@
 					</tr>
 				</c:forEach>
 			</table>
+			</div>
 		</c:if>
 		
 		

@@ -1,20 +1,16 @@
 <%@ include file="/common/taglibs.jsp"%>
 
-<div id="header"></div>
-
-<div id="content">
-
-	<h1>
-		<fmt:message key="heading.notebookEntry" />
-	</h1>
-
-	<h2>
+<c:set var="title">
+	<fmt:message key="heading.notebookEntry" />
+</c:set>
+<lams:Page title="${title}" type="learner">
+	<h4>
 		<c:out value="${userDTO.firstName} ${userDTO.lastName}" escapeXml="true"/>
-	</h2>
+	</h4>
 
-	<table>
+	<table class="table table-striped table-condensed">
 		<tr>
-			<td class="field-name" style="width: 20%;">
+			<td>
 				<fmt:message key="label.created" />
 			</td>
 			<td>
@@ -23,7 +19,7 @@
 			</td>
 		</tr>
 		<tr>
-			<td class="field-name" style="width: 20%;">
+			<td>
 				<fmt:message key="label.lastModified" />
 			</td>
 			<td>
@@ -32,7 +28,7 @@
 		</tr>
 
 		<tr>
-			<td class="field-name" style="width: 20%;">
+			<td>
 				<fmt:message key="label.notebookEntry" />
 			</td>
 			<td>
@@ -41,9 +37,8 @@
 		</tr>
 	</table>
 
-	<html:link href="monitoring.do?"></html:link>
+	 <a href="javascript:history.back();" class="btn btn-sm btn-primary">
+	 	<fmt:message key="button.close"/>
+	 </a>
 
-</div>
-
-<div id="footer">
-</div>
+</lams:Page>
