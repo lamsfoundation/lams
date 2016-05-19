@@ -8,14 +8,12 @@
 	<%@ include file="/common/header.jsp"%>
 </lams:head>
 <body class="stripes">
-	<div id="content">
-	<div align="center">
-		<h1>
-			<fmt:message key="label.authoring.heading" />
-		</h1>
 
-		<B><fmt:message key="message.monitoring.edit.activity.not.editable" /></B>
-	</div>
-	</div>
+	<c:set var="title"><fmt:message key="activity.title" /></c:set>
+	<lams:Page title="${title}" type="learner">
+		<lams:Alert id="errorMessages" type="danger" close="false">
+			<fmt:message key="message.monitoring.edit.activity.not.editable" />
+		</lams:Alert>
+	</lams:Page>
 </body>
 </html:html>

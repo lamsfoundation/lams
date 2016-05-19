@@ -1,83 +1,46 @@
 <%@ include file="/common/taglibs.jsp"%>
-<c:set var="ctxPath" value="${pageContext.request.contextPath}" scope="request" />
 <c:set var="listSize" value="${fn:length(instructionList)}" />
 
 <div id="instructionArea">
+	<script></script> <!--  Do not remove empty scripts. They are stopping the form tags from being stripped by the AddInstruction call. http://forum.jquery.com/topic/is-jquery-stripping-form-tags -->
 	<form id="instructionForm">
-		<input type="hidden" name="instructionCount" id="instructionCount" value="${listSize}">
+		<input type="hidden" name="instructionCount" id="instructionCount" value="${listSize}" class="form-control"/>
 
-		<div class="field-name space-top">
-			<fmt:message key="label.authoring.basic.resource.instructions" />
-		</div>
+		<label><fmt:message key="label.authoring.basic.resource.instructions" /></label>
 
-		<img src="${ctxPath}/includes/images/indicator.gif" style="display:none" id="instructionArea_Busy" />
+		<i class="fa fa-spinner" style="display: none" id="instructionArea_Busy"></i>
 
-		<table>
+		<table class="table table-condensed table-no-border">
 			<c:forEach var="item" items="${instructionList}" varStatus="status">
 				<tr id="instructionItem${status.index}">
 					<td width="10px">
 						${status.index+1}
 					</td>
 					<td>
-						<lams:STRUTS-textarea property="instructionItemDesc${status.index}" 
+						<lams:STRUTS-textarea property="instructionItemDesc${status.index}" styleClass="form-control"
 							styleId="instructionItemDesc${status.index}" rows="3" cols="82" value="${item}" />
 					</td>
 
-					<td style="width: 20px; vertical-align: middle;">
-						<%-- Don't display down icon if last line --%>
-						<c:choose>
-							<c:when test="${0 != status.index}">
-								<img src="<html:rewrite page='/includes/images/uparrow.gif'/>"
-									border="0" title="<fmt:message key="label.up"/>"
-									onclick="upItem('${status.index}')">
-							</c:when>
-							<c:otherwise>
-								<img src="<html:rewrite page='/includes/images/uparrow_disabled.gif'/>"
-									border="0" title="<fmt:message key="label.up"/>">
-							</c:otherwise>
-						</c:choose>
-
-						<c:choose>
-							<c:when test="${listSize != status.count}">
-								<img src="<html:rewrite page='/includes/images/downarrow.gif'/>"
-									border="0" title="<fmt:message key="label.down"/>"
-									onclick="downItem('${status.index}','${listSize}')">
-							</c:when>
-
-							<c:otherwise>
-								<img src="<html:rewrite page='/includes/images/downarrow_disabled.gif'/>"
-									border="0" title="<fmt:message key="label.down"/>">
-							</c:otherwise>
-
-						</c:choose>
-
-						<%-- Don't display down icon if last line --%>
+					<td class="arrows" style="width:5%">
+						<!-- Don't display up icon if first line -->
+						<c:if test="${not status.first}">
+		 					<lams:Arrow state="up" title="<fmt:message key='label.up'/>" onclick="upItem('${status.index}')"/>
+		 				</c:if>
+						<!-- Don't display down icon if last line -->
+						<c:if test="${not status.last}">
+							<lams:Arrow state="down" title="<fmt:message key='label.down'/>" onclick="downItem('${status.index}','${listSize}')"/>
+		 				</c:if>
 					</td>
-					<td style="width: 20px; vertical-align: middle;">
-						<img src="<html:rewrite page='/includes/images/cross.gif'/>"
-							border="0" title="<fmt:message key="label.delete"/>"
-							onclick="removeInstruction('${status.index}')">
+					<td  align="center" style="width:5%"><i class="fa fa-times"	title="<fmt:message key="label.delete" />"  
+						onclick="removeInstruction('${status.index}')"></i>
 					</td>
 				</tr>
 			</c:forEach>
 		</table>
 
-		<a href="#nogo" onclick="javascript:addInstruction();" class="button-add-item float-right">
-			<fmt:message key="label.authoring.basic.resource.add.instruction" /> 
+		<a href="#nogo" onclick="javascript:addInstruction();" class="btn btn-default btn-sm">
+			<i class="fa fa-plus"></i>&nbsp;<fmt:message key="label.authoring.basic.resource.add.instruction" /> 
 		</a>
 
 	</form>
 </div>
-<br>
-
-<%-- This script will adjust resource item input area height according to the new instruction item amount. --%>
-<script type="text/javascript">
-	var obj = window.document.getElementById('reourceInputArea');
-	if (!obj && window.parent) {
-		 obj = window.parent.document.getElementById('reourceInputArea');
-	}  
-	if (!obj) {
-		obj = window.top.document.getElementById('reourceInputArea');
-	}
-	obj.style.height=obj.contentWindow.document.body.scrollHeight+'px';
-</script>

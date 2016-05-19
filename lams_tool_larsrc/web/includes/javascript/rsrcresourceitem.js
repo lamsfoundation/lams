@@ -4,7 +4,7 @@
 	var instructionTargetDiv = "instructionArea";
     var itemAttachmentTargetDiv = "itemAttachmentArea";
     var singleInstructionHeight = 74;
-    
+	
 	function removeInstruction(idx){
 		//prepare lams_textarea value to Ajax submit
 		$('textarea').trigger('change');
@@ -27,7 +27,8 @@
 			removeItemAttachmentUrl,
 			{
 				reqID: new Date()
-			}
+			},
+			removeItemAttachmentComplete
 		);	    
 	}
 	
@@ -42,24 +43,13 @@
 	    	addInstructionUrl, 
 	    	param, 
 	    	function(xml) {
-	    		addInstructionComplete();
-	    		document.getElementById("instructionArea").innerHTML = xml;
+               $('#instructionArea').html(xml);
 	    	}
 	    );
 	    
 	    return false;
 	}
 	
-	function adjustInstructionsDisplayAreaHeight(adjustAmount){
-		var obj = window.document.getElementById('reourceInputArea');
-		if (!obj && window.parent) {
-			 obj = window.parent.document.getElementById('reourceInputArea');
-		}  
-		if (!obj) {
-			obj = window.top.document.getElementById('reourceInputArea');
-		}
-		obj.style.height=obj.contentWindow.document.body.scrollHeight+adjustAmount+'px';
-	}
 	function upItem(itemIdx){
 		//prepare lams_textarea value to Ajax submit
 		$('textarea').trigger('change');
@@ -90,7 +80,6 @@
 	}
 	function removeInstructionComplete(){
 		hideBusy(instructionTargetDiv);
-		adjustInstructionsDisplayAreaHeight(-singleInstructionHeight);
 	}
 	function removeItemAttachmentLoading(){
 		showBusy(itemAttachmentTargetDiv);
@@ -103,26 +92,25 @@
 	}
 	function addInstructionComplete(){
 		hideBusy(instructionTargetDiv);
-		adjustInstructionsDisplayAreaHeight(singleInstructionHeight);
 	}
 	
 	function submitResourceItem(){
-		//prepare lams_textarea value to Ajax submit
+		//prepare lams_textarea value to Ajax submit and add instructions to form
 		$('textarea').trigger('change');
-		
 		document.getElementById("instructionList").value = $("#instructionForm").serialize();
-		$("#resourceItemForm").submit();
+		var formData = new FormData(document.getElementById("resourceItemForm"));
+
 		// after submit, it direct to itemlist.jsp, 
-		// then refresh "basic tab" resourcelist and close this window.
-	}
-	function cancelResourceItem(){ 
-		var win = null;
-		if (window.hideMessage) { 
-			win = window;
-		} else if (window.parent && window.parent.hideMessage) {
-			win = window.parent;
-		} else {
-			win = window.top;
-		}
-		win.hideMessage();
+		// then refresh "basic tab" resource list and close this window.
+	    $.ajax({ // create an AJAX call...
+			data: formData, 
+	        processData: false, // tell jQuery not to process the data
+	        contentType: false, // tell jQuery not to set contentType
+           	type: $("#resourceItemForm").attr('method'),
+			url: $("#resourceItemForm").attr('action'),
+			success: function(data) {
+               $('#resourceInputArea').html(data);
+			}
+	    });
+	    
 	}
