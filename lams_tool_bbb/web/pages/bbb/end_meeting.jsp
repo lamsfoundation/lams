@@ -1,12 +1,16 @@
 <%@ include file="/common/taglibs.jsp"%>
 
-<div id="content">
 
-<div class="info"><fmt:message key="message.endMeeting" /></div>
+<c:set var="title" scope="request">
+	<fmt:message key="message.endMeeting" />
+</c:set>
 
-<br>
+<lams:Page type="learner" title="${title}">
+	<h4><fmt:message key="message.endMeeting" /></h4>
+
+
 
 <a href="#" class="button" onclick="window.close();"
 	style="float: right"> <fmt:message key="button.close" /> </a> <br>
 
-</div>
+</lams:Page>
