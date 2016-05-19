@@ -12,6 +12,7 @@
 	<html:hidden property="mode" value="teacher" />
 	<html:hidden property="contentFolderID" />
 	
+<c:set var="title"><fmt:message key="activity.title" /></c:set>
 <lams:Page title="${title}" type="navbar">
 	
 	<lams:Tabs control="true" title="${title}" helpToolSignature="<%= ForumConstants.TOOL_SIGNATURE %>" helpModule="authoring">
