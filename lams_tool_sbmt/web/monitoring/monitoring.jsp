@@ -1,39 +1,42 @@
 <!DOCTYPE html>
 
 <%@include file="/common/taglibs.jsp"%>
-
 <%@ page import="org.lamsfoundation.lams.tool.sbmt.util.SbmtConstants"%>
+<c:set var="tool">
+	<lams:WebAppURL />
+</c:set>
+<c:set var="lams">
+	<lams:LAMSURL />
+</c:set>
 
 <lams:html>
 <lams:head>
 	<title><fmt:message key="activity.title" /></title>
-	<lams:headItems />
+	<lams:css/>
+	<link type="text/css" href="${lams}/css/jquery-ui-smoothness-theme.css" rel="stylesheet">
+	<link type="text/css" href="${lams}/css/jquery-ui.timepicker.css" rel="stylesheet">
+	<link type="text/css" href="${lams}/css/jquery.tablesorter.theme.bootstrap.css" rel="stylesheet">
+	<link type="text/css" href="${lams}/css/jquery.tablesorter.pager.css" rel="stylesheet">
+
+	<script type="text/javascript" src="${lams}includes/javascript/common.js"></script>
+	<script type="text/javascript" src="${lams}includes/javascript/jquery.js"></script>
+	<script type="text/javascript" src="${lams}includes/javascript/jquery-ui.js"></script>
+	<script type="text/javascript" src="${lams}includes/javascript/jquery-ui.timepicker.js"></script>
+	<script type="text/javascript" src="${lams}includes/javascript/jquery.blockUI.js"></script>
+	<script type="text/javascript" src="${lams}includes/javascript/jquery.tablesorter.js"></script>
+	<script type="text/javascript" src="${lams}includes/javascript/jquery.tablesorter-widgets.js"></script>
+	<script type="text/javascript" src="${lams}includes/javascript/jquery.tablesorter-pager.js"></script>
+	<script type="text/javascript" src="${lams}includes/javascript/bootstrap.min.js"></script>
+	<script type="text/javascript" src="${lams}includes/javascript/bootstrap.tabcontroller.js"></script>
+
 	<script type="text/javascript">
-		 function init(){
-            var tag = document.getElementById("currentTab");
-	    	if(tag.value != "")
-	    		selectTab(tag.value);
-            else
-                selectTab(1); //select the default tab;
-        }   
-        
 		function doSelectTab(tabId) {
-        	// start optional tab controller stuff
-        	var tag = document.getElementById("currentTab");
-	    	tag.value = tabId;
+	    	if (tabId == 3){
+				doStatistic();
+	    	}
     		selectTab(tabId);
-	    		
-	    	//for statistic page change:
-	    	if(tabId == 3)
-	    		doStatistic();	  
         } 
-        
-        
-        function doSubmit(method) {
-        	document.SbmtMonitoringForm.method.value=method;
-        	document.SbmtMonitoringForm.submit();
-        }
-        
+		
 		function doStatistic(){
 			var url = "<c:url value="/monitoring.do"/>";
 			
@@ -50,45 +53,31 @@
 				}
 			);
 		}
-		
 	</script>
 </lams:head>
 
-<body class="stripes" onLoad="init()">
-	<div id="page">
-		<h1>
-			<fmt:message key="label.monitoring.heading" />
-		</h1>
-		<div id="header">
-			<lams:Tabs control="true">
-				<lams:Tab id="1" key="label.monitoring.heading.userlist" />
-				<lams:Tab id="2" key="label.monitoring.heading.edit.activity" />
-				<lams:Tab id="3" key="label.monitoring.heading.stats" />
-			</lams:Tabs>
-		</div>
+<body class="stripes">
 
-		<div id="content">
-			<html:form action="monitoring" method="post" styleId="monitoringForm">
-				<html:hidden property="method" />
-				<html:hidden property="currentTab" styleId="currentTab" />
-				<html:errors />
+<c:set var="title"><fmt:message key="activity.title" /></c:set>
+<lams:Page title="${title}" type="navbar">
 
-				<lams:help toolSignature="<%= SbmtConstants.TOOL_SIGNATURE %>" module="monitoring"/>
+	<lams:Tabs title="${title}" control="true" helpToolSignature="<%= SbmtConstants.TOOL_SIGNATURE %>" helpModule="monitoring">
+		<lams:Tab id="1" key="label.monitoring.heading.userlist" />
+		<lams:Tab id="2" key="label.monitoring.heading.edit.activity" />
+		<lams:Tab id="3" key="label.monitoring.heading.stats" />
+	</lams:Tabs>
 
-				<!-- tab content 1 (Summary) -->
-				<lams:TabBody id="1" titleKey="label.monitoring.heading.userlist.desc" page="parts/summary.jsp" />
-				<!-- end of content (Summary) -->
 
-				<!-- tab content 2 (Edit Activity) -->
-				<lams:TabBody id="2" titleKey="label.monitoring.heading.edit.activity.desc" page="parts/activity.jsp" />
-				<!-- end of content (Edit Activity) -->
+	<lams:TabBodyArea>
+		<lams:TabBodys>
+			<lams:TabBody id="1" titleKey="label.monitoring.heading.userlist.desc" page="parts/summary.jsp" />
+			<lams:TabBody id="2" titleKey="label.monitoring.heading.edit.activity.desc" page="parts/activity.jsp" />
+			<lams:TabBody id="3" titleKey="label.monitoring.heading.stats.desc" page="parts/statistic.jsp" />
+		</lams:TabBodys>
+	</lams:TabBodyArea>
+		
+	<div id="footer"></div>
 
-				<!-- tab content 3 (Stats) -->
-				<lams:TabBody id="3" titleKey="label.monitoring.heading.stats.desc" page="parts/statistic.jsp" />
-				<!-- end of content (Stats) -->
-			</html:form>
-		</div>
-		<div id="footer"></div>
-	</div>
+</lams:Page>
 </body>
 </lams:html>

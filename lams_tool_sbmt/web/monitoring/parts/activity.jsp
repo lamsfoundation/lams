@@ -1,43 +1,41 @@
 <%@ include file="/common/taglibs.jsp"%>
 
-<input type="hidden" name="toolContentID" value="<c:out value='${authoring.contentID}'/>" />
+<html:errors />
 
-<c:if test="${isPageEditable}">
-	<p class="warning">
+<c:if test="${!isPageEditable}">
+	<lams:Alert type="warn" id="no-edit" close="false">
 		<fmt:message key="message.alertContentEdit" />
-	</p>
+	</lams:Alert>
 </c:if>
 
-<table cellpadding="0">
+
+<table class="table table-condensed">
 	<tr>
-		<td class="field-name" width="10%" nowrap>
+		<td class="field-name" width="10%" valign="top">
 			<fmt:message key="label.authoring.basic.title" />
-			:
 		</td>
 		<td>
 			<c:out value="${authoring.title}" escapeXml="true" />
 		</td>
 	</tr>
-	<!-- Instructions Row -->
+
 	<tr>
-		<td class="field-name" width="10%" nowrap valign="top">
+		<td class="field-name" width="10%" valign="top" NOWRAP>
 			<fmt:message key="label.authoring.basic.instruction" />
-			:
 		</td>
 		<td>
 			<c:out value="${authoring.instruction}" escapeXml="false" />
 		</td>
 	</tr>
-	<tr>
-		<td colspan="2">
-			<c:url value="/definelater.do" var="authoringUrl">
-				<c:param name="mode" value="teacher" />
-				<c:param name="toolContentID" value="${authoring.contentID}" />
-				<c:param name="contentFolderID" value="${contentFolderID}" />
-			</c:url>
-			<html:link href="javascript:;" onclick="launchPopup('${authoringUrl}','definelater')" styleClass="button">
-					<fmt:message key="label.monitoring.edit.activity.edit" />
-			</html:link>
-		</td>
-	</tr>
 </table>
+
+<c:if test='${isPageEditable}'>
+	<c:url value="/authoring.do" var="authoringUrl">
+		<c:param name="mode" value="teacher" />
+		<c:param name="contentFolderID" value="${contentFolderID}" />
+		<c:param name="toolContentID" value="${toolContentID}" />
+	</c:url>
+	<html:link href="javascript:;" onclick="launchPopup('${authoringUrl}','definelater')" styleClass="btn btn-default">
+		<fmt:message key="label.monitoring.edit.activity.edit" />
+	</html:link>
+</c:if>

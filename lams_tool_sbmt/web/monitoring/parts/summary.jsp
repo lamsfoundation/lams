@@ -8,15 +8,6 @@
 	<lams:LAMSURL />
 </c:set>
 
-<link type="text/css" href="${lams}/css/jquery-ui-smoothness-theme.css" rel="stylesheet">
-<link type="text/css" href="${lams}/css/jquery-ui.timepicker.css" rel="stylesheet">
-<link type="text/css" href="${lams}/css/jquery.tablesorter.theme-blue.css" rel="stylesheet">
-<link type="text/css" href="${lams}/css/jquery.tablesorter.pager.css" rel="stylesheet">
-
-<script type="text/javascript" src="${lams}includes/javascript/jquery.js"></script>
-<script type="text/javascript" src="${lams}includes/javascript/jquery-ui.js"></script>
-<script type="text/javascript" src="${lams}includes/javascript/jquery-ui.timepicker.js"></script>
-<script type="text/javascript" src="${lams}includes/javascript/jquery.blockUI.js"></script>	
 <script type="text/javascript">
 	// pass settings to monitorToolSummaryAdvanced.js
 	var submissionDeadlineSettings = {
@@ -31,9 +22,6 @@
 </script>
 <script type="text/javascript" src="${lams}/includes/javascript/monitorToolSummaryAdvanced.js" ></script>
 
-<script type="text/javascript" src="${lams}includes/javascript/jquery.tablesorter.js"></script>
-<script type="text/javascript" src="${lams}includes/javascript/jquery.tablesorter-widgets.js"></script>
-<script type="text/javascript" src="${lams}includes/javascript/jquery.tablesorter-pager.js"></script>
 <script type="text/javascript">
 	$(document).ready(function(){
 	    
@@ -117,11 +105,9 @@
 			})
 		});
   	})
-</script>
 
-
-<script type="text/javascript">
-	function launchPopup(url, title) {
+  	
+  	function launchPopup(url, title) {
 		var wd = null;
 		if (wd && wd.open && !wd.closed) {
 			wd.close();
@@ -158,120 +144,85 @@
 			}
 		);
 	}
-
-	function downloadMarks(sessionId) {
-		var url = "<c:url value="/monitoring.do"/>";
-		var reqIDVar = new Date();
-		var param = "?method=downloadMarks&toolSessionID=" + sessionId
-				+ "&reqID=" + reqIDVar.getTime();
-		url = url + param;
-		location.href = url;
-	}
 </script>
 
-<h1>
-	<c:out value="${authoring.title}" escapeXml="true" />
-</h1>
-<div class="instructions space-top">
-	<c:out value="${authoring.instruction}" escapeXml="false" />
+<div class="panel">
+	<h4>
+	    <c:out value="${authoring.title}" escapeXml="true"/>
+	</h4>
+	<div class="instructions voffset5">
+	    <c:out value="${authoring.instruction}" escapeXml="false"/>
+	</div>
+	
+	<c:if test="${empty sessions}">
+		<lams:Alert type="info" id="no-session-summary" close="false">
+			<fmt:message key="label.no.user.available" />
+		</lams:Alert>
+	</c:if>
+	
+	<!--For release marks feature-->
+	<img src="${tool}/images/indicator.gif" style="display:none" id="messageArea_Busy" />
+	<div id="messageArea"></div>
+
 </div>
 
-<table cellpadding="0">
-<tr><td>
-	<img src="${tool}/images/indicator.gif" style="display:none" id="messageArea_Busy" />
-	<span id="messageArea"></span>
-</td></tr>
-</table>
-<c:if test="${empty sessions}">
-	<fmt:message key="label.no.user.available" />
-</c:if>
 
-<c:forEach var="sessionDto" items="${sessions}">
 
-		<c:if test="${isGroupedActivity}">
-			<h1>
-				<fmt:message key="label.session.name" />: 
-				<c:out value="${sessionDto.sessionName}" />
-			</h1>
-		</c:if>
-		<br/>
+<c:forEach var="sessionDto" items="${sessions}" varStatus="status">
 		
-		<div class="tablesorter-holder">
-		<table class="tablesorter" data-session-id="${sessionDto.sessionID}">
-			<thead>
-				<tr>
-					<th>
-						<fmt:message key="monitoring.user.fullname"/>
-					</th>
-					<th  width="15%" align="center">
-						<fmt:message key="monitoring.user.submittedFiles"/>
-					</th>
-					<th width="15%" align="center">
-						<fmt:message key="monitoring.marked.question"/>
-					</th>
-					<c:if test="${reflectOn}">			
-						<th align="center">
-							<fmt:message key="monitoring.user.reflection"/>
-						</th>
-					</c:if>
-				</tr>
-			</thead>
-			<tbody>
-			</tbody>
-		</table>
-		
-		<!-- pager -->
-		<div class="pager">
-			<form>
-				<img class="tablesorter-first"/>
-				<img class="tablesorter-prev"/>
-				<span class="pagedisplay"></span> <!-- this can be any element, including an input -->
-				<img class="tablesorter-next"/>
-				<img class="tablesorter-last"/>
-				<select class="pagesize">
-					<option selected="selected" value="10">10</option>
-					<option value="20">20</option>
-					<option value="30">30</option>
-					<option value="40">40</option>
-					<option value="50">50</option>
-					<option value="100">100</option>
-				</select>
-			</form>
-		</div>
-		</div>
-		
-		<table>
-		  <tr>
-			<td align="center"><html:link href="javascript:viewAllMarks(${sessionDto.sessionID});"
-				property="viewAllMarks" styleClass="button">
-				<fmt:message key="label.monitoring.viewAllMarks.button" />
-			</html:link></td>
-			<td align="center"><html:link href="javascript:releaseMarks(${sessionDto.sessionID});"
-				property="releaseMarks" styleClass="button">
-				<fmt:message key="label.monitoring.releaseMarks.button" />
-			</html:link></td>
-			<td align="center" style="border-bottom: 12px;border-bottom-color: gray;"><html:link href="javascript:downloadMarks(${sessionDto.sessionID});"
-				property="downloadMarks" styleClass="button">
+	<c:if test="${isGroupedActivity}">	
+	    <div class="panel panel-default" >
+        <div class="panel-heading" id="heading${sessionDto.sessionID}">
+        	<span class="panel-title collapsable-icon-left">
+        	<a class="${status.first ? '' : 'collapsed'}" role="button" data-toggle="collapse" href="#collapse${sessionDto.sessionID}" 
+					aria-expanded="${status.first ? 'false' : 'true'}" aria-controls="collapse${sessionDto.sessionID}" >
+			<fmt:message key="message.session.name" />:	<c:out value="${sessionDto.sessionName}" /></a>
+			</span>
+        </div>
+        
+        <div id="collapse${sessionDto.sessionID}" class="panel-collapse collapse ${status.first ? 'in' : ''}" role="tabpanel" aria-labelledby="heading${sessionDto.sessionID}">
+	</c:if>
+	
+	<lams:TSTable numColumns="${reflectOn ? 4 : 3}" dataId="data-session-id='${sessionDto.sessionID}'">
+			<th><fmt:message key="monitoring.user.fullname"/></th>
+			<th width="15%" align="center"><fmt:message key="monitoring.user.submittedFiles"/></th>
+			<th width="10%" align="center"><fmt:message key="monitoring.marked.question"/></th>
+			<c:if test="${reflectOn}">
+				<th align="center" class="sorter-false"><fmt:message key="monitoring.user.reflection"/></th>
+			</c:if>
+	</lams:TSTable>
+	
+	<P style="display: inline"> 
+		<html:button property="viewAllMarks" onclick="javascript:viewAllMarks(${sessionDto.sessionID})"
+					 styleClass="btn btn-default loffset5 voffset10" >
+			<fmt:message key="label.monitoring.viewAllMarks.button" />
+		</html:button>
+		<html:button property="releaseMarks" onclick="releaseMarks(${sessionDto.sessionID})"
+					 styleClass="btn btn-default loffset5 voffset10" >
+			<fmt:message key="label.monitoring.releaseMarks.button" />
+		</html:button>
+		<html:form action="/monitoring" style="display:inline">
+			<html:hidden property="method" value="downloadMarks" />
+			<html:hidden property="toolSessionID" value="${sessionDto.sessionID}" />
+			<html:submit property="downloadMarks" styleClass="btn btn-default loffset5 voffset10" >
 				<fmt:message key="label.monitoring.downloadMarks.button" />
-			</html:link></td>
-		</tr>
-	</table>
-	<br/>
+			</html:submit>
+		</html:form>
+	</P>
+		
+	<c:if test="${isGroupedActivity}">
+		</div> <!-- end collapse area  -->
+		</div> <!-- end collapse panel  -->
+	</c:if>
+	${ !isGroupedActivity || ! status.last ? '<div class="voffset5">&nbsp;</div>' :  ''}
+		
 </c:forEach>
 
-<br/>
 
-<h1 style="padding-bottom: 10px;">
-	<img src="<lams:LAMSURL/>/images/tree_closed.gif" id="treeIcon" onclick="javascript:toggleAdvancedOptionsVisibility(document.getElementById('advancedDiv'), document.getElementById('treeIcon'), '<lams:LAMSURL/>');" />
-
-	<a href="javascript:toggleAdvancedOptionsVisibility(document.getElementById('advancedDiv'), document.getElementById('treeIcon'),'<lams:LAMSURL/>');" >
-		<fmt:message key="monitor.summary.th.advancedSettings" />
-	</a>
-</h1>
-
-<div class="monitoring-advanced" id="advancedDiv" style="display:none">
-<table class="alternative-color">
-
+<c:set var="adTitle"><fmt:message key="monitor.summary.th.advancedSettings" /></c:set>
+<lams:AdvancedAccordian title="${adTitle}">
+             
+<table class="table table-striped table-condensed">
 	<tr>
 		<td>
 			<fmt:message key="label.authoring.advance.lock.on.finished" />
@@ -288,7 +239,7 @@
 			</c:choose>	
 		</td>
 	</tr>
-	
+		
 	<tr>
 		<td>
 			<fmt:message key="label.limit.number.upload" />
@@ -322,6 +273,7 @@
 			</c:choose>	
 		</td>
 	</tr>
+	
 	<tr>
 		<td>
 			<fmt:message key="label.authoring.advanced.notify.onfilesubmit" />
@@ -338,6 +290,7 @@
 			</c:choose>	
 		</td>
 	</tr>
+	
 	<tr>
 		<td>
 			<fmt:message key="monitor.summary.td.addNotebook" />
@@ -365,9 +318,9 @@
 					<lams:out value="${authoring.reflectInstructions}" escapeHtml="true"/>	
 				</td>
 			</tr>
-		</c:when>
+	</c:when>
 	</c:choose>
 </table>
-</div>
+</lams:AdvancedAccordian>		
 
 <%@include file="daterestriction.jsp"%>

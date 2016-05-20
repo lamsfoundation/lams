@@ -79,17 +79,6 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
 
 /**
  * @author Manpreet Minhas
- *
- *
- *
- *
- *
- *
- *
- *
- *
- *
- *
  */
 public class MonitoringAction extends LamsDispatchAction {
 
@@ -144,7 +133,7 @@ public class MonitoringAction extends LamsDispatchAction {
 
 	AuthoringDTO authorDto = new AuthoringDTO(persistContent);
 	request.setAttribute(SbmtConstants.AUTHORING_DTO, authorDto);
-	request.setAttribute(SbmtConstants.PAGE_EDITABLE, persistContent.isContentInUse());
+	request.setAttribute(SbmtConstants.PAGE_EDITABLE, !persistContent.isContentInUse());
 	request.setAttribute(SbmtConstants.ATTR_IS_GROUPED_ACTIVITY, submitFilesService.isGroupedActivity(contentID));
 	request.setAttribute(SbmtConstants.ATTR_REFLECTION_ON, persistContent.isReflectOnActivity());
 
@@ -529,33 +518,5 @@ public class MonitoringAction extends LamsDispatchAction {
 
 	// request.setAttribute(AttributeNames.PARAM_TOOL_SESSION_ID,sessionID);
 	request.setAttribute("sessions", sessions);
-    }
-
-    public ActionForward viewReflection(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) {
-	Long userUid = WebUtil.readLongParam(request, SbmtConstants.ATTR_USER_UID);
-	Long sessionID = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_SESSION_ID);
-
-	submitFilesService = getSubmitFilesService();
-	SubmitUser userDto = submitFilesService.getUserByUid(userUid);
-
-	submitFilesService = getSubmitFilesService();
-	NotebookEntry notebookEntry = submitFilesService.getEntry(sessionID, CoreNotebookConstants.NOTEBOOK_TOOL,
-		SbmtConstants.TOOL_SIGNATURE, userDto.getUserID());
-
-	SubmitFilesSession session = submitFilesService.getSessionById(sessionID);
-
-	SubmitUserDTO userDTO = new SubmitUserDTO(userDto);
-	if (notebookEntry == null) {
-	    userDTO.setFinishReflection(false);
-	    userDTO.setReflect(null);
-	} else {
-	    userDTO.setFinishReflection(true);
-	    userDTO.setReflect(notebookEntry.getEntry());
-	}
-	userDTO.setReflectInstrctions(session.getContent().getReflectInstructions());
-
-	request.setAttribute("userDTO", userDTO);
-	return mapping.findForward("viewReflect");
     }
 }
