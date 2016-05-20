@@ -2,8 +2,6 @@
 
 <c:set var="dto" value="${contentDTO}" />
 
-<div class="panel">
-
 <c:set var="adTitle"><fmt:message key="monitor.summary.th.advancedSettings" /></c:set>
 <lams:AdvancedAccordian title="${adTitle}">
 	<table class="table table-striped table-condensed">
