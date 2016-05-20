@@ -1,8 +1,9 @@
 <!DOCTYPE html>
         
+<%@ include file="/common/taglibs.jsp"%>
+
 <c:set var="title"><fmt:message key="activity.title" /></c:set>
 
-<%@ include file="/common/taglibs.jsp"%>
 <%@ page import="java.util.HashSet"%>
 <%@ page import="org.lamsfoundation.lams.tool.rsrc.ResourceConstants"%>
 <%@ page import="java.util.Set"%>
@@ -49,7 +50,7 @@
 	<lams:Page title="${title}" type="navbar">
 
 		<lams:Tabs control="true" title="${title}" helpToolSignature="<%= ResourceConstants.TOOL_SIGNATURE %>" helpModule="authoring">
-			<lams:Tab id="1" key="authoring.tab.basic" />
+			<lams:Tab id="1" key="label.authoring.heading.basic" />
 		</lams:Tabs>    
 	
 		<lams:TabBodyArea>
@@ -57,7 +58,7 @@
 		   
 		    <!--  Set up tabs  -->
 		     <lams:TabBodys>
-				<lams:TabBody id="1" titleKey="authoring.tab.basic" page="basic.jsp" />
+				<lams:TabBody id="1" titleKey="label.authoring.heading.basic.desc" page="basic.jsp" />
 		    </lams:TabBodys>
 	
 			<!-- Button Row -->
