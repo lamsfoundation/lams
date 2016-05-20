@@ -184,11 +184,6 @@
         path="/monitoring/parts/statisticpart.jsp"
         redirect="false"
       />
-      <forward
-        name="viewReflect"
-        path="/monitoring/notebook.jsp"
-        redirect="false"
-      />
     </action>
 
 		<!--  ========= Reflection =============== -->
