@@ -3,17 +3,21 @@
 <c:set var="sessionMap" value="${sessionScope[sessionMapID]}"/>
 <c:set var="summaryList" value="${sessionMap.summaryList}"/>
 
-<link type="text/css" href="${lams}css/jquery-ui-redmond-theme.css" rel="stylesheet">
+<link type="text/css" href="${lams}css/jquery-ui-smoothness-theme.css" rel="stylesheet">
 <link type="text/css" href="${lams}css/jquery.jqGrid.css" rel="stylesheet" />
 <style media="screen,projection" type="text/css">
-	#user-dropdown-div {padding-left: 30px; margin-top: -5px; margin-bottom: 50px;}
-	.bottom-buttons {margin: 20px 20px 0px; padding-bottom: 20px;}
-	.section-header {padding-left: 20px; margin-bottom: 15px; margin-top: 60px;}
-	.ui-jqgrid tr.jqgrow td {
-	    white-space: normal !important;
-	    height:auto;
-	    vertical-align:text-top;
-	    padding-top:2px;
+	 .ui-jqgrid {
+		border-left-style: none !important;
+		border-right-style: none !important;
+		border-bottom-style: none !important;
+	}
+	
+	.ui-jqgrid tr {
+		border-left-style: none !important;
+	}
+	
+	.ui-jqgrid td {
+		border-style: none !important;
 	}
 </style>
 
@@ -48,7 +52,7 @@
 			   		{name:'viewNumber', index:'viewNumber', width:100, align:"center", sorttype:"int"},
 			   		{name:'actions', index:'actions', width:120, align:"center"}		
 			   	],
-			   	caption: "${groupSummary.sessionName}",
+			   	// caption: "${groupSummary.sessionName}",
 				subGrid: true,
 				subGridRowExpanded: function(subgrid_id, row_id) {
 					var subgridTableId = subgrid_id+"_t";
@@ -145,6 +149,7 @@
 		    	});
 		    }
 		});
+		setTimeout(function(){ window.dispatchEvent(new Event('resize')); }, 300);
 		
 	});
 	
@@ -175,35 +180,59 @@
 
 </script>
 
-<h1>
-	<c:out value="${sessionMap.resource.title}" escapeXml="true"/>
-</h1>
-
-<div class="instructions">
-	<c:out value="${sessionMap.resource.instructions}" escapeXml="false"/>
-</div>
-
-<br/>
-
-<c:if test="${empty summaryList}">
-	<div align="center">
-		<b> <fmt:message key="message.monitoring.summary.no.session" /> </b>
+<div class="panel">
+	<h4>
+	    <c:out value="${sessionMap.resource.title}" escapeXml="true"/>
+	</h4>
+	<div class="instructions voffset5">
+	    <c:out value="${sessionMap.resource.instructions}" escapeXml="false"/>
 	</div>
-</c:if>
-
-<c:forEach var="groupSummary" items="${summaryList}">
 	
-	<c:if test="${sessionMap.isGroupedActivity}">
-		<h1>
-			<fmt:message key="monitoring.label.group" /> ${groupSummary.sessionName}
-		</h1>
-		<br>
+	<c:if test="${empty summaryList}">
+		<lams:Alert type="info" id="no-session-summary" close="false">
+			 <fmt:message key="message.monitoring.summary.no.session" />
+		</lams:Alert>
 	</c:if>
 	
-	<table id="group${groupSummary.sessionId}" class="scroll" cellpadding="0" cellspacing="0"></table>
-	<br>
-		
+	<!--For release marks feature-->
+	<i class="fa fa-spinner" style="display:none" id="message-area-busy"></i>
+	<div id="message-area"></div>
+
+</div>
+
+
+<c:if test="${sessionMap.isGroupedActivity}">
+<div class="panel-group" id="accordionSessions" role="tablist" aria-multiselectable="true"> 
+</c:if>
+
+<c:forEach var="groupSummary" items="${summaryList}" varStatus="status">
+	
+	<c:if test="${sessionMap.isGroupedActivity}">	
+	    <div class="panel panel-default" >
+        <div class="panel-heading" id="heading${groupSummary.sessionId}">
+        	<span class="panel-title collapsable-icon-left">
+        	<a class="collapsed" role="button" data-toggle="collapse" href="#collapse${groupSummary.sessionId}" 
+					aria-expanded="false" aria-controls="collapse${groupSummary.sessionId}" >
+			<fmt:message key="monitoring.label.group" />&nbsp;${groupSummary.sessionName}</a>
+			</span>
+        </div>
+        
+        <div id="collapse${groupSummary.sessionId}" class="panel-collapse collapse in" role="tabpanel" aria-labelledby="heading${groupSummary.sessionId}">
+	</c:if>
+
+		<table id="group${groupSummary.sessionId}" class="scroll" cellpadding="0" cellspacing="0"></table>
+	
+	<c:if test="${sessionMap.isGroupedActivity}">
+		</div> <!-- end collapse area  -->
+		</div> <!-- end collapse panel  -->
+	</c:if>
+	${ !sessionMap.isGroupedActivity || ! status.last ? '<div class="voffset5">&nbsp;</div>' :  ''}
+	
 </c:forEach>
+
+<c:if test="${sessionMap.isGroupedActivity}">
+</div> <!--  end accordianSessions --> 
+</c:if>
 	
 <c:if test="${sessionMap.resource.reflectOnActivity}">
 	<%@ include file="reflections.jsp"%>

@@ -7,16 +7,6 @@
 <lams:html>
 	<lams:head>
 		<%@ include file="/common/tabbedheader.jsp" %>
-		<style media="screen,projection" type="text/css">
-			#tabbody1 {
-				margin-left: 15px;
-			}
-			
-			table.forms {
-				margin-left: 15px;
-			}
-		</style>
-		 
 		<script>
 			var initialTabId = "${initialTabId}";
 	
@@ -40,26 +30,27 @@
 		</script>		 
 	</lams:head>
 	<body class="stripes" onLoad="init()">
-	<div id="page">
-		<h1>
-			<fmt:message key="label.monitoring.heading" />
-		</h1>
-	<div id="header">
-		<lams:Tabs>
+
+	<c:set var="title"><fmt:message key="activity.title" /></c:set>
+	<lams:Page title="${title}" type="navbar">
+	
+		<lams:Tabs title="${title}" control="true" helpToolSignature="<%= ResourceConstants.TOOL_SIGNATURE %>" helpModule="monitoring">
 			<lams:Tab id="1" key="monitoring.tab.summary" />
 			<lams:Tab id="2" key="monitoring.tab.edit.activity" />			
 			<lams:Tab id="3" key="monitoring.tab.statistics" />
 		</lams:Tabs>
-	</div>
-	<div id="content">
-			<lams:help toolSignature="<%= ResourceConstants.TOOL_SIGNATURE %>" module="monitoring"/>
-	
+		
+		<lams:TabBodyArea>
+		<lams:TabBodys>
 			<lams:TabBody id="1" titleKey="monitoring.tab.summary" page="summary.jsp" />
 			<lams:TabBody id="2" titleKey="monitoring.tab.edit.activity" page="editactivity.jsp" />			
 			<lams:TabBody id="3" titleKey="monitoring.tab.statistics" page="statistic.jsp" />
-	</div>
-	<div id="footer"></div>
-	
-	</div>
+		</lams:TabBodys>
+		</lams:TabBodyArea>
+		
+		<div id="footer" />
+		
+	</lams:Page>
+
 	</body>
 </lams:html>
