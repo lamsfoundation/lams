@@ -143,11 +143,11 @@
 	<lams:Page type="learner" title="${resource.title}">
 	
 		<!--  Warnings -->
-		<c:if test="${sessionMap.lockOnFinish and mode != 'teacher'}">
+		<c:if test="${sessionMap.lockOnFinish and mode != 'teacher' and (resource.allowAddFiles or resource.allowAddUrls) }">
 			<lams:Alert type="danger" id="warn-lock" close="false">
 				<c:choose>
 					<c:when test="${sessionMap.userFinished}">
-						<fmt:message key="message.activityLocked" />
+						<fmt:message key="message.activityLocked" /> 
 					</c:when>
 					<c:otherwise>
 						<fmt:message key="message.warnLockOnFinish" />
@@ -160,7 +160,7 @@
 
 		<!--  Instructions -->
 		<div class="panel">
-			<c:out value="${resource.instructions}" escapeXml="false"/>
+			<c:out value="${resource.instructions}" escapeXml="false"/> ${resource.allowAddFiles} ${resource.allowAddUrls } 
 		</div>
 
 		<!-- Resources to View -->
