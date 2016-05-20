@@ -4,7 +4,6 @@
 <c:set var="ctxPath" value="${pageContext.request.contextPath}" scope="request"/>
 
  	<!-- ********************  CSS ********************** -->
-	<link href="<html:rewrite page='/includes/css/rsrc.css'/>" rel="stylesheet" type="text/css">
 	<lams:css />
 
 
@@ -12,10 +11,7 @@
 	<script type="text/javascript" src="${lams}includes/javascript/common.js"></script>
 	<script type="text/javascript" src="${lams}includes/javascript/jquery.js"></script>
 	<script type="text/javascript" src="<html:rewrite page='/includes/javascript/rsrccommon.js'/>"></script>
-<%-- <script type="text/javascript" src="${lams}includes/javascript/jquery.tablesorter.js"></script> 
-<script type="text/javascript" src="${lams}includes/javascript/jquery.tablesorter-widgets.js"></script> 
-<script type="text/javascript" src="${lams}includes/javascript/jquery.tablesorter-pager.js"></script> 
- --%>	<script type="text/javascript" src="${lams}includes/javascript/bootstrap.min.js"></script>
+	<script type="text/javascript" src="${lams}includes/javascript/bootstrap.min.js"></script>
 	<script type="text/javascript" src="${lams}includes/javascript/bootstrap.tabcontroller.js"></script>
 
 	

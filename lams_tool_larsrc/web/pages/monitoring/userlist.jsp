@@ -8,41 +8,52 @@
 	<c:set var="ctxPath" value="${pageContext.request.contextPath}" scope="request"/>
 
  	<!-- ********************  CSS ********************** -->
-	<link href="<html:rewrite page='/includes/css/rsrc.css'/>" rel="stylesheet" type="text/css">
 	<lams:css/>
-
+	<link rel="stylesheet" href="${lams}css/jquery.tablesorter.theme.bootstrap.css">
+	<link type="stylesheet" href="${lams}css/jquery.tablesorter.pager.css">
 
  	<!-- ********************  javascript ********************** -->
 	<script type="text/javascript" src="${lams}includes/javascript/common.js"></script>
 	<script language="JavaScript" type="text/javascript" src="<lams:LAMSURL/>/includes/javascript/jquery.js"></script>
 	<script type="text/javascript" src="<html:rewrite page='/includes/javascript/rsrccommon.js'/>"></script>
-	<script type="text/javascript" src="${lams}includes/javascript/tabcontroller.js"></script>    
+	<script type="text/javascript" src="${lams}includes/javascript/jquery.tablesorter.js"></script> 
+	<script type="text/javascript" src="${lams}includes/javascript/jquery.tablesorter-widgets.js"></script> 
+	<script type="text/javascript" src="${lams}includes/javascript/jquery.tablesorter-pager.js"></script> 
+	<script type="text/javascript" src="${lams}includes/javascript/bootstrap.min.js"></script>
 	    
-	<script language="JavaScript" type="text/javascript" src="<lams:LAMSURL/>/includes/javascript/jquery.tablesorter.pack.js"></script>
-	<script language="JavaScript" type="text/javascript" src="<lams:LAMSURL/>/includes/javascript/jquery.tablesorter.pager.js"></script>
+<%-- 	<script language="JavaScript" type="text/javascript" src="<lams:LAMSURL/>/includes/javascript/jquery.tablesorter.pack.js"></script> --%>
 	<script language="JavaScript" type="text/javascript">
-		<!--
 		jQuery(document).ready(function() {
-			jQuery("table.tablesorter-admin").tablesorter({widthFixed:true});
+			jQuery("table.tablesorter").tablesorter({
+				theme : "bootstrap",
+				widthFixed:true,
+			    headerTemplate : '{content} {icon}', 
+			    widgets : [ "uitheme"]
+			})
+			.tablesorterPager({
+				savePages: false,
+	            container: $(this).find(".ts-pager"),
+			    output: '{startRow} - {endRow} / {filteredRows} ({totalRows})',
+	            cssPageDisplay: '.pagedisplay',
+	            cssPageSize: '.pagesize',
+	            cssDisabled: 'disabled'
+			 });
+			
 			//sort table only in case there is a data inside (it's a tablesorter bug)
-			if (jQuery("table.tablesorter-admin tbody tr").length > 0) {
-				jQuery("table.tablesorter-admin").tablesorterPager({container: jQuery("#pager")});
+			if (jQuery("table.tablesorter tbody tr").length > 0) {
+				jQuery("table.tablesorter").tablesorterPager({container: jQuery("#pager")});
 			}
 		});
-		//-->
 	</script>
 </lams:head>
 <body class="stripes">
 
 <div id="content">
 		
-	<h1>
-		<fmt:message key="label.monitoring.heading.access"/>
-	</h1>
+	<c:set var="title"><fmt:message key="label.monitoring.heading.access"/></c:set>
+	<lams:Page type="learner" title="${title}">
 	
-	<br/>
-		
-	<table border="0" cellspacing="3" width="98%" class="tablesorter-admin">
+	<table class="tablesorter">
 		<thead>
 			<tr>
 				<th>
@@ -60,13 +71,6 @@
 			</tr>
 		</thead>
 		<tbody>
-			<script language="JavaScript" type="text/javascript">
-				<!--
-				if (jQuery.browser.msie) {
-					document.write('<tr><td/><td/><td/><td/><td/></tr>');
-				}
-				//-->
-			</script>
 			<c:forEach var="user" items="${userList}">
 				<tr>
 					<td>
@@ -84,33 +88,33 @@
 				</tr>
 			</c:forEach>
 		</tbody>
+		<tfoot>
+			<tr>
+		    	<th colspan="4" class="ts-pager form-horizontal">
+		        <button type="button" class="btn btn-xs first"><i class="fa fa-step-backward"></i></button>
+		        <button type="button" class="btn btn-xs prev"><i class="fa fa-backward"></i></button>
+		        <span class="pagedisplay"></span> <!-- this can be any element, including an input -->
+		        <button type="button" class="btn btn-xs next"><i class="fa fa-forward"></i></button>
+		        <button type="button" class="btn btn-xs last"><i class="fa fa-step-forward"></i></button>
+		        <select class="pagesize" title="Select page size">
+		      		<option selected="selected" value="10">10</option>
+		      		<option value="20">20</option>
+		      		<option value="30">30</option>
+		      		<option value="40">40</option>
+		      		<option value="50">50</option>
+		      		<option value="100">100</option>
+		        </select>
+		      </th>
+		    </tr>
+		</tfoot>
 	</table>
 	
-	<br/>
-
-	<div id="pager" class="pager">
-		<form onsubmit="return false;">
-			<img src="<lams:LAMSURL/>/images/first.png" class="first"/>
-			<img src="<lams:LAMSURL/>/images/prev.png" class="prev">
-			<input type="text" class="pagedisplay"/>
-			<img src="<lams:LAMSURL/>/images/next.png" class="next">
-			<img src="<lams:LAMSURL/>/images/last.png" class="last">
-			<select class="pagesize">
-				<option selected="selected"  value="10">10&nbsp;&nbsp;</option>
-				<option value="20">20</option>
-				<option value="30">30</option>
-				<option value="40">40</option>
-				<option value="50">50</option>
-				<option value="100">100</option>
-			</select>
-		</form>
-	</div>
-	
 	<div class="align-right small-space-top">
-		<a href="javaqscript:;" onclick="window.close()" class="button">Close</a>
+		<a href="javaqscript:;" onclick="window.close()" class="btn btn-default">Close</a>
 	</div>
-</div>
 
-<div id="footer"></div>
+	<div id="footer"></div>
+
+	</lams:Page>
 </body>
 </lams:html>
