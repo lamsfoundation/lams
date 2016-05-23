@@ -44,10 +44,10 @@ public class UserRoleServlet extends HttpServlet {
 	String username = request.getParameter(CentralConstants.PARAM_USERNAME);
 
 	try {
-	    ExtServerOrgMap serverMap = UserRoleServlet.integrationService.getExtServerOrgMap(serverId);
-	    Authenticator.authenticate(serverMap, datetime, username, hashValue);
-	    ExtUserUseridMap userMap = UserRoleServlet.integrationService.getExtUserUseridMap(serverMap, username);
 	    String method = request.getParameter(CentralConstants.PARAM_METHOD);
+	    ExtServerOrgMap serverMap = UserRoleServlet.integrationService.getExtServerOrgMap(serverId);
+	    Authenticator.authenticate(serverMap, datetime, username, method, hashValue);
+	    ExtUserUseridMap userMap = UserRoleServlet.integrationService.getExtUserUseridMap(serverMap, username);
 	    String role = request.getParameter(AttributeNames.PARAM_ROLE);
 	    if ("grant".equalsIgnoreCase(method)) {
 		grant(userMap.getUser(), role);
