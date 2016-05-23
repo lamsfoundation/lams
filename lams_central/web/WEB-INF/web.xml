@@ -382,6 +382,13 @@
 		</servlet-class>
 	</servlet>
 	
+	<servlet>
+		<servlet-name>OrganisationGroupServlet</servlet-name>
+		<servlet-class>
+			org.lamsfoundation.lams.webservice.xml.OrganisationGroupServlet
+		</servlet-class>
+	</servlet>
+	
 	
 	<servlet-mapping>
 		<servlet-name>LearningDesignRestServlet</servlet-name>
@@ -496,6 +503,11 @@
 		<servlet-name>UserRoleServlet</servlet-name>
 		<url-pattern>/services/UserRoleManager</url-pattern>
 	</servlet-mapping>
+	<servlet-mapping>
+		<servlet-name>OrganisationGroupServlet</servlet-name>
+		<url-pattern>/services/xml/CourseGroupManager</url-pattern>
+	</servlet-mapping>
+	
 	
 	<mime-mapping>
 		<extension>csv</extension>
@@ -635,6 +647,7 @@
 			<url-pattern>/services/Register/*</url-pattern>
 			<url-pattern>/services/xml/NotificationManager</url-pattern>
 			<url-pattern>/services/UserRoleManager</url-pattern>
+			<url-pattern>/services/xml/CourseGroupManager</url-pattern>
 			<url-pattern>/ForgotPasswordRequest</url-pattern>
 			<url-pattern>/forgotPassword.jsp</url-pattern>
 			<url-pattern>/forgotPasswordChange.jsp</url-pattern>
