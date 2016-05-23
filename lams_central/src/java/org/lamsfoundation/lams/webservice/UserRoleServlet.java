@@ -14,6 +14,7 @@ import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.integration.ExtServerOrgMap;
 import org.lamsfoundation.lams.integration.ExtUserUseridMap;
 import org.lamsfoundation.lams.integration.service.IntegrationService;
+import org.lamsfoundation.lams.security.ISecurityService;
 import org.lamsfoundation.lams.usermanagement.Organisation;
 import org.lamsfoundation.lams.usermanagement.Role;
 import org.lamsfoundation.lams.usermanagement.User;
@@ -35,6 +36,7 @@ public class UserRoleServlet extends HttpServlet {
 
     private static IntegrationService integrationService = null;
     private static IUserManagementService userManagementService = null;
+    private static ISecurityService securityService = null;
 
     @Override
     public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
@@ -47,20 +49,29 @@ public class UserRoleServlet extends HttpServlet {
 	String role = request.getParameter(AttributeNames.PARAM_ROLE);
 
 	try {
-
 	    ExtServerOrgMap serverMap = UserRoleServlet.integrationService.getExtServerOrgMap(serverId);
 	    String plaintext = datetime.toLowerCase().trim() + username.toLowerCase().trim()
 		    + targetUsername.toLowerCase().trim() + method.toLowerCase().trim() + role.toLowerCase().trim()
 		    + serverMap.getServerid().toLowerCase().trim() + serverMap.getServerkey().toLowerCase().trim();
 	    if (!hashValue.equals(HashUtil.sha1(plaintext))) {
-		log.error("Authentication failed while trying to set role for user: " + targetUsername);
+		log.error("Hash check failed while trying to set role for user: " + targetUsername);
 		response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Authentication failed, invalid hash");
+		return;
 	    }
-	    ExtUserUseridMap userMap = UserRoleServlet.integrationService.getExtUserUseridMap(serverMap, username);
+	    ExtUserUseridMap sysadminUserMap = UserRoleServlet.integrationService.getExtUserUseridMap(serverMap,
+		    username);
+	    if (!securityService.isSysadmin(sysadminUserMap.getUser().getUserId(), "set user role", false)) {
+		log.error("Sysadmin role check failed while trying to set role for user: " + targetUsername);
+		response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Authentication failed, user is not sysadmin");
+		return;
+	    }
+	    ExtUserUseridMap userMap = UserRoleServlet.integrationService.getExtUserUseridMap(serverMap,
+		    targetUsername);
+	    User targetUser = userMap.getUser();
 	    if ("grant".equalsIgnoreCase(method)) {
-		grant(userMap.getUser(), role);
+		grant(targetUser, role);
 	    } else if ("revoke".equalsIgnoreCase(method)) {
-		revoke(userMap.getUser(), role);
+		revoke(targetUser, role);
 	    } else {
 		log.error("Unknown method: " + method);
 		response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Unknown method: " + method);
@@ -85,6 +96,8 @@ public class UserRoleServlet extends HttpServlet {
 		.getRequiredWebApplicationContext(getServletContext()).getBean("integrationService");
 	UserRoleServlet.userManagementService = (IUserManagementService) WebApplicationContextUtils
 		.getRequiredWebApplicationContext(getServletContext()).getBean("userManagementService");
+	UserRoleServlet.securityService = (ISecurityService) WebApplicationContextUtils
+		.getRequiredWebApplicationContext(getServletContext()).getBean("securityService");
     }
 
     /**
