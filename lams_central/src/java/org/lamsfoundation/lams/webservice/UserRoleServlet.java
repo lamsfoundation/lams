@@ -13,13 +13,13 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.integration.ExtServerOrgMap;
 import org.lamsfoundation.lams.integration.ExtUserUseridMap;
-import org.lamsfoundation.lams.integration.security.Authenticator;
 import org.lamsfoundation.lams.integration.service.IntegrationService;
 import org.lamsfoundation.lams.usermanagement.Organisation;
 import org.lamsfoundation.lams.usermanagement.Role;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
 import org.lamsfoundation.lams.util.CentralConstants;
+import org.lamsfoundation.lams.util.HashUtil;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 
@@ -42,13 +42,21 @@ public class UserRoleServlet extends HttpServlet {
 	String datetime = request.getParameter(CentralConstants.PARAM_DATE_TIME);
 	String hashValue = request.getParameter(CentralConstants.PARAM_HASH_VALUE);
 	String username = request.getParameter(CentralConstants.PARAM_USERNAME);
+	String method = request.getParameter(CentralConstants.PARAM_METHOD);
+	String targetUsername = request.getParameter("targetUsername");
+	String role = request.getParameter(AttributeNames.PARAM_ROLE);
 
 	try {
-	    String method = request.getParameter(CentralConstants.PARAM_METHOD);
+
 	    ExtServerOrgMap serverMap = UserRoleServlet.integrationService.getExtServerOrgMap(serverId);
-	    Authenticator.authenticate(serverMap, datetime, username, method, hashValue);
+	    String plaintext = datetime.toLowerCase().trim() + username.toLowerCase().trim()
+		    + targetUsername.toLowerCase().trim() + method.toLowerCase().trim() + role.toLowerCase().trim()
+		    + serverMap.getServerid().toLowerCase().trim() + serverMap.getServerkey().toLowerCase().trim();
+	    if (!hashValue.equals(HashUtil.sha1(plaintext))) {
+		log.error("Authentication failed while trying to set role for user: " + targetUsername);
+		response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Authentication failed, invalid hash");
+	    }
 	    ExtUserUseridMap userMap = UserRoleServlet.integrationService.getExtUserUseridMap(serverMap, username);
-	    String role = request.getParameter(AttributeNames.PARAM_ROLE);
 	    if ("grant".equalsIgnoreCase(method)) {
 		grant(userMap.getUser(), role);
 	    } else if ("revoke".equalsIgnoreCase(method)) {
