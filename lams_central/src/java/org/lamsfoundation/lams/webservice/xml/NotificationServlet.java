@@ -75,7 +75,7 @@ public class NotificationServlet extends HttpServlet {
 		getNotifications(userMap.getUser().getUserId(), request, response);
 	    }
 	} catch (Exception e) {
-	    NotificationServlet.log.error("Error while getting notifications");
+	    NotificationServlet.log.error("Error while getting notifications", e);
 	}
     }
 
