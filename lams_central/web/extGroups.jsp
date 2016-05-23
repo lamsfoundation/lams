@@ -2,6 +2,10 @@
 <%@ taglib uri="tags-lams" prefix="lams"%>
 <%@ taglib uri="tags-fmt" prefix="fmt"%>
 <%@ taglib uri="tags-core" prefix="c"%>
+	
+<c:if test="${lessonID == null}">
+	<c:set var="lessonID"  value="${param.lessonID}"/>
+</c:if>
 
 <!DOCTYPE HTML>
 <lams:html>
@@ -19,8 +23,9 @@
 	<fmt:message key="index.course.groups.title" />
 </div>
 
-<form id="ext-groups-form" action="<lams:LAMSURL/>OrganisationGroup.do?method=selectExtGroups" method="POST">
-	<input name="lessonId" value="${param.lessonID}" type="hidden"/>
+<form id="ext-groups-form" action="<lams:LAMSURL/>OrganisationGroup.do?method=viewGroups" method="POST">
+	<input name="lessonID" value="${lessonID}" type="hidden"/>
+	<input name="activityID" value="${param.activityID}" type="hidden"/>
 
 	<c:forEach var="group" items="${extGroups}">
 		<div class="groupingContainer">
