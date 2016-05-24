@@ -1,8 +1,7 @@
 <%@ include file="/common/taglibs.jsp"%>
 <c:set var="lams"><lams:LAMSURL /></c:set>
-<c:set var="isShrinkToFit" value="${(145 + fn:length(assessment.questions)*80) < 630}"/>
 
-<link type="text/css" href="${lams}css/jquery-ui-redmond-theme.css" rel="stylesheet">
+<link type="text/css" href="${lams}css/jquery-ui-smoothness-theme.css" rel="stylesheet">
 <link type="text/css" href="${lams}/css/jquery-ui.timepicker.css" rel="stylesheet">
 <link href="${lams}css/jquery.jqGrid.css" rel="stylesheet" type="text/css"/>
 <style media="screen,projection" type="text/css">
@@ -26,13 +25,7 @@
 		messageRestrictionRemoved: '<fmt:message key="monitor.summary.date.restriction.removed" />'
 	};	
 </script>
-<script type="text/javascript" src="${lams}includes/javascript/jquery.js"></script>
-<script type="text/javascript" src="${lams}includes/javascript/jquery-ui.js"></script>
-<script type="text/javascript" src="${lams}includes/javascript/jquery-ui.timepicker.js"></script>
-<script type="text/javascript" src="${lams}includes/javascript/jquery.blockUI.js"></script>
 <script type="text/javascript" src="${lams}/includes/javascript/monitorToolSummaryAdvanced.js" ></script>
-<script type="text/javascript" src="${lams}includes/javascript/jquery.jqGrid.locale-en.js"></script>
-<script type="text/javascript" src="${lams}includes/javascript/jquery.jqGrid.js"></script>
 <script type="text/javascript">
 	$(document).ready(function(){
 		<c:forEach var="sessionDto" items="${sessionDtos}" varStatus="status">
@@ -41,13 +34,13 @@
 				datatype: "json",
 				url: "<c:url value='/monitoring.do'/>?dispatch=getPagedUsers&toolSessionID=${sessionDto.sessionId}",
 				height: 'auto',
-				width: 630,
-				shrinkToFit: ${isShrinkToFit},
+				autowidth: true,
+				shrinkToFit: true,
 				pager: 'pager-${sessionDto.sessionId}',
 				rowList:[10,20,30,40,50,100],
 				rowNum:10,
 				viewrecords:true,
-			   	caption: "${sessionDto.sessionName}",
+			   	/* caption: "${sessionDto.sessionName}", */
 			   	colNames:[
 						'userUid',
 						"<fmt:message key="label.monitoring.summary.user.name" />",
@@ -90,7 +83,7 @@
 				//hiddengrid:true,
 				height: 110,
 				autowidth: true,
-				shrinkToFit: false,
+				shrinkToFit: true,
 				caption: "<fmt:message key="label.monitoring.summary.learner.summary" />",
 			   	colNames:['#',
 						'userAttemptUid',
@@ -167,52 +160,66 @@
 
 </script>
 
-<h1>
-	<c:out value="${mcGeneralMonitoringDTO.activityTitle}" escapeXml="true"/>
-</h1>
+<div class="panel">
+	<h4>
+	    <c:out value="${mcGeneralMonitoringDTO.activityTitle}" escapeXml="true"/>
+	</h4>
+	<div class="instructions voffset5">
+	    <c:out value="${mcGeneralMonitoringDTO.activityInstructions}" escapeXml="false"/>
+	</div>
+	
+	<c:if test="${useSelectLeaderToolOuput}">
+		<lams:Alert type="info" id="use-leader" close="false">
+			<fmt:message key="label.info.use.select.leader.outputs" />
+		</lams:Alert>
+	</c:if>
+	
+	<c:if test="${(mcGeneralMonitoringDTO.userExceptionNoToolSessions == 'true')}">
+		<lams:Alert type="info" id="no-session-summary" close="false">
+			<fmt:message key="error.noLearnerActivity"/>
+		</lams:Alert>
+	</c:if>
+	
+	<!--For release marks feature-->
+	<i class="fa fa-spinner" style="display:none" id="message-area-busy"></i>
+	<div id="message-area"></div>
 
-<div class="instructions space-top">
-	<c:out value="${mcGeneralMonitoringDTO.activityInstructions}" escapeXml="false"/>
 </div>
+
 <%@ include file="parts/advanceQuestions.jsp"%>
 
-<c:if test="${useSelectLeaderToolOuput}">
-	<div class="info space-top">
-		<fmt:message key="label.info.use.select.leader.outputs" />
-	</div>
-	<br>
-</c:if>
 
-<c:if test="${(mcGeneralMonitoringDTO.userExceptionNoToolSessions == 'true')}"> 	
-	<c:if test="${notebookEntriesExist != 'true' }"> 			
-		<table align="center">
-			<tr> 
-				<td NOWRAP valign=top align=center> 
-					<b>  <fmt:message key="error.noLearnerActivity"/> </b>
-				</td> 
-			<tr>
-		</table>
-	</c:if>
-</c:if>
-			
 <c:if test="${mcGeneralMonitoringDTO.userExceptionNoToolSessions != 'true'}">
-	<br/>
-	<h2 style="font-size: 15px; margin-left: 30px;">    
+	<html:link href="#" onclick="javascript:submitMonitoringMethod('downloadMarks');" styleClass="btn btn-default btn-xs pull-right">
+		<fmt:message key="label.monitoring.downloadMarks.button" />
+	</html:link>
+
+	<h4>    
 		<fmt:message key="label.studentMarks"/>
-	</h2>
+	</h4>
 
 	<div id="masterDetailArea">
 		<%@ include file="masterDetailLoadUp.jsp"%>
 	</div>
-		
+
+	<c:if test="${isGroupedActivity}">
+	<div class="panel-group" id="accordionSessions" role="tablist" aria-multiselectable="true"> 
+	</c:if>
+	
 	<c:forEach var="sessionDto" items="${sessionDtos}" varStatus="status">
-			
-		<div style="padding-left: 30px; <c:if test='${! status.last}'>padding-bottom: 30px;</c:if><c:if test='${ status.last}'>padding-bottom: 15px;</c:if> ">
-			<c:if test="${isGroupedActivity}">
-				<div style="padding-bottom: 5px; font-size: small;">
-					<B><fmt:message key="group.label" /></B> ${sessionDto.sessionName}
-				</div>
-			</c:if>
+
+		<c:if test="${isGroupedActivity}">
+			<div class="panel panel-default" >
+	        <div class="panel-heading" id="heading${sessionDto.sessionId}">
+    	    	<span class="panel-title collapsable-icon-left">
+        		<a role="button" data-toggle="collapse" href="#collapse${sessionDto.sessionId}" 
+					aria-expanded="false" aria-controls="collapse${sessionDto.sessionId}" >
+				<fmt:message key="group.label" />&nbsp;${sessionDto.sessionName}</a>
+				</span>
+        	</div>
+        
+	        <div id="collapse${sessionDto.sessionId}" class="panel-collapse collapse in" role="tabpanel" aria-labelledby="heading${sessionDto.sessionId}">
+		</c:if>
 					
 			<table id="group${sessionDto.sessionId}" class="scroll" cellpadding="0" cellspacing="0"></table>
 			<div id="pager-${sessionDto.sessionId}" class="scroll"></div>
@@ -220,16 +227,21 @@
 			<div style="margin-top: 10px; width:99%;">
 				<table id="userSummary${sessionDto.sessionId}" class="scroll" cellpadding="0" cellspacing="0"></table>
 			</div>
-		</div>
-				
+			
+		<c:if test="${isGroupedActivity}">
+			</div> <!-- end collapse area  -->
+			</div> <!-- end collapse panel  -->
+		</c:if>
+		${ !isGroupedActivity || ! status.last ? '<div class="voffset5">&nbsp;</div>' :  ''}
+		
 	</c:forEach>
+
+	<c:if test="${isGroupedActivity}">
+	</div>
+	</c:if>
 
 	<jsp:include page="/monitoring/Reflections.jsp" />
 				
-	<html:link href="#" onclick="javascript:submitMonitoringMethod('downloadMarks');" styleClass="button float-right">
-		<fmt:message key="label.monitoring.downloadMarks.button" />
-	</html:link>
-	<br><br>			
 </c:if>
 
 <c:if test="${noSessionsNotebookEntriesExist == 'true'}"> 							

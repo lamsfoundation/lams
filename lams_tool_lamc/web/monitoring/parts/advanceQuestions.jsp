@@ -1,51 +1,49 @@
-<h1>
-	<img src="<lams:LAMSURL/>/images/tree_closed.gif" id="treeIcon3" onclick="javascript:toggleAdvancedOptionsVisibility(document.getElementById('advanced-questions'), document.getElementById('treeIcon3'), '<lams:LAMSURL/>');" />
+ <div class="panel panel-default" >
+	<div class="panel-heading" id="heading-advanced-questions">
+		<span class="panel-title collapsable-icon-left">
+			<a class=collapsed role="button" data-toggle="collapse" href="#advanced-questions" 
+				aria-expanded="true" aria-controls="advanced-questions" >
+			<fmt:message key="label.Questions" /></a>
+		</span>
+     </div>
+     <div id="advanced-questions" class="panel-collapse collapse" role="tabpanel" aria-labelledby="heading-advanced-questions">
 
-	<a href="javascript:toggleAdvancedOptionsVisibility(document.getElementById('advanced-questions'), document.getElementById('treeIcon3'),'<lams:LAMSURL/>');" >
-		<fmt:message key="label.Questions" />
-	</a>
-</h1>
+		<c:if test="${mcGeneralMonitoringDTO.userExceptionNoToolSessions != 'true'}">
+			<table class="table table-condensed table-striped">
+				<c:forEach var="question" items="${content.mcQueContents}" varStatus="i">
+	
+					<tr>			
+						<td><b>  <fmt:message key="label.question.only"/>&nbsp;${i.index + 1}:</b> (<fmt:message key="label.mark"/>&nbsp;<c:out value="${question.mark}"/>)<br/>
+							<c:out value="${question.question}" escapeXml="false"/>						
+						</td>
+					</tr>
+							
+					<tr>					
+						<td>  <b> <fmt:message key="label.mc.options.col"/>  </b> 
+							<table class="table table-condensed" style="margin-bottom:0px">
+								<c:forEach var="option" items="${question.mcOptionsContents}">
+									<tr>			
+										<td>
+											<c:if test="${option.correctOption}"> 		
+												(<fmt:message key="label.correct"/>)
+											</c:if>	
+											<c:out value="${option.mcQueOptionText}" escapeXml="false"/> 
+										</td>	
+									</tr>
+								</c:forEach>		  	
+							</table>
+						</td>  
+					</tr>			
+	
+				</c:forEach>		  	
+	
+			  	<tr>
+			  	 	<td class="text-left"> <b> 
+			  	 		<fmt:message key="label.passingMark"/>: </b> <c:out value="${passMark}"/> 
+			  	 	</td>
+			  	</tr>
+			</table>
+		</c:if>
 
-<div class="monitoring-advanced" id="advanced-questions" style="display:none">
-
-	<c:if test="${mcGeneralMonitoringDTO.userExceptionNoToolSessions != 'true'}">
-		<table class="forms">
-			<c:forEach var="question" items="${content.mcQueContents}" varStatus="i">
-
-				<tr>			
-					<td NOWRAP valign=top class="align-left"><b>  <fmt:message key="label.question.only"/> ${i.index + 1}:</b>
-						<c:out value="${question.question}" escapeXml="false"/> &nbsp (<fmt:message key="label.mark"/> <c:out value="${question.mark}"/> )
-					</td>
-				</tr>
-						
-				<tr>					
-					<td NOWRAP valign=top class="align-left">  <b> <fmt:message key="label.mc.options.col"/>  </b> 
-						<table class="align-left">
-							<c:forEach var="option" items="${question.mcOptionsContents}">
-								<tr>			
-									<td NOWRAP valign=top class="align-left">
-										&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp
-										<c:out value="${option.mcQueOptionText}" escapeXml="false"/> 
-												
-										<c:if test="${option.correctOption}"> 		
-											&nbsp (<fmt:message key="label.correct"/>)
-										</c:if>																		
-									</td>	
-								</tr>
-							</c:forEach>		  	
-						</table>
-					</td>  
-				</tr>			
-
-			</c:forEach>		  	
-
-		  	<tr>
-		  	 	<td NOWRAP valign=top class="align-left"> <b> 
-		  	 		<fmt:message key="label.passingMark"/>: </b> <c:out value="${passMark}"/> 
-		  	 	</td>
-		  	</tr>
-		</table>
-	</c:if>
-
-</div>
-		
+	</div>
+</div>		

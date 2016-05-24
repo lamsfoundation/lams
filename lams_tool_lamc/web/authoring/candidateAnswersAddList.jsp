@@ -7,7 +7,6 @@
 				${candidateIndex}
 			</c:when>
 			<c:otherwise>
-				<c:set var="formBean" value="<%=request.getAttribute(org.apache.struts.taglib.html.Constants.BEAN_KEY)%>" />
 				${formBean.candidateIndex}
 			</c:otherwise>
 		</c:choose>
@@ -15,53 +14,47 @@
 	
 	<input type="hidden" name="candidateIndex" value="${candidateIndex}"/>
 	
-	<div class="field-name space-top">
-		<fmt:message key="label.answers"></fmt:message>
-	</div>
-	
 	<%@ include file="/common/messages.jsp"%>
 
-	<table id="caTable">
+	<table id="caTable" class="table table-condensed table-no-border">
 	
 		<c:set var="caCount" scope="request" value="${fn:length(newQuestionDTO.listCandidateAnswersDTO)}"/>
 		<c:set var="listCandidateAnswersDTO" scope="request" value="${newQuestionDTO.listCandidateAnswersDTO}"/>	
 		<c:set var="caIndex" scope="request" value="0"/>
 
 		<tr>
-			<td width="10px">
-			</td>
-	
-			<td>
-			</td>
-	
-			<td width="60px" class="align-center">
+			<th colspan="2">
+				<fmt:message key="label.answers"></fmt:message>
+			</th>
+			
+			<th class="text-center">
 				<fmt:message key="label.isCorrect" />
-			</td>
+			</th>
 	
-			<td width="40px">
-			</td>
+			<th>
+			</th>
 	
-			<td width="20px">
-			</td>
+			<th>
+			</th>
 		</tr>
 		    
 	 	<c:forEach items="${listCandidateAnswersDTO}" var="currentCandidateDTO" varStatus="status">
 		   		<c:set var="caIndex" scope="request" value="${caIndex +1}"/>
 		   	
 				<tr>
-					<td>
+					<td width="10px">
 						<input type="hidden" name="caUid${caIndex}" value="${currentCandidateDTO.uid}">
 						<c:out value="${caIndex}" />  
 					</td>		
 				
-					<td>
+					<td width="90%">
 						<lams:CKEditor id="ca${caIndex}" 
 							value="${currentCandidateDTO.candidateAnswer}"
 							contentFolderID="${mcGeneralAuthoringDTO.contentFolderID}">
 						</lams:CKEditor>
 					</td>		
 					
-					<td class="align-center">
+					<td width="60px" class="text-center">
 						<c:forEach var="correctEntry" items="${mcGeneralAuthoringDTO.correctMap}">
 							<c:set var="SELECTED_ANSWER" scope="request" value="" />
 							<c:set var="ISCORRECT" scope="request" value="Incorrect" />
@@ -71,47 +64,29 @@
 								<c:set var="ISCORRECT" scope="request" value="Correct" />
 							</c:if>
 	
-							<input type="radio" name="correct" value="<c:out value="${caIndex}"/>" <c:out value="${SELECTED_ANSWER}"/> >  
+							<input type="radio" name="correct" class="form-control" value="<c:out value="${caIndex}"/>" ${SELECTED_ANSWER} >  
 	
 						</c:forEach>
 					</td>		
 					
-					<td>
+					<td width="5%">
 				 		<c:if test="${caCount != 1}"> 		
 				 		
-							<c:if test="${caIndex == 1}">
-								<img src="<c:out value="${tool}"/>images/down.gif" border="0"
-									title="<fmt:message key='label.tip.moveCandidateDown'/>"
-									onclick="javascript:submitModifyAddedCandidate('<c:out value="${caIndex}"/>', 'moveAddedCandidateDown');">
-								<img src="<c:out value="${tool}"/>images/up_disabled.gif"
-									border="0">
+							<c:if test="${caIndex != 1}">
+								<lams:Arrow state="up" title="<fmt:message key='label.tip.moveCandidateUp'/>" 
+									onclick="javascript:submitModifyAddedCandidate('${caIndex}', 'moveAddedCandidateUp');"/>
 							</c:if>
-	
-							<c:if test="${caIndex == caCount}">
-								<img src="<c:out value="${tool}"/>images/down_disabled.gif"
-									border="0">
-								<img src="<c:out value="${tool}"/>images/up.gif" border="0"
-									title="<fmt:message key='label.tip.moveCandidateUp'/>"
-									onclick="javascript:submitModifyAddedCandidate('<c:out value="${caIndex}"/>', 'moveAddedCandidateUp');">
+
+							<c:if test="${caIndex != caCount}">
+								<lams:Arrow state="down" title="<fmt:message key='label.tip.moveCandidateDown'/>" 
+									onclick="javascript:submitModifyAddedCandidate('${caIndex}', 'moveAddedCandidateDown');"/>
 							</c:if>
-	
-							<c:if test="${(caIndex != 1)  && (caIndex != caCount)}">
-								<img src="<c:out value="${tool}"/>images/down.gif" border="0"
-									title="<fmt:message key='label.tip.moveCandidateDown'/>"
-									onclick="javascript:submitModifyAddedCandidate('<c:out value="${caIndex}"/>', 'moveAddedCandidateDown');">
-	
-								<img src="<c:out value="${tool}"/>images/up.gif" border="0"
-									title="<fmt:message key='label.tip.moveCandidateUp'/>"
-									onclick="javascript:submitModifyAddedCandidate('<c:out value="${caIndex}"/>', 'moveAddedCandidateUp');">
-							</c:if>							
 						
 						</c:if> 			
 					</td>
-					
-					<td>				
-						<img src="<c:out value="${tool}"/>images/delete.gif" border="0"
-							title="<fmt:message key='label.tip.removeCandidate'/>"
-							onclick="removeAddedCandidate(${caIndex});">
+
+					<td  class="text-center"  width="5%"><i class="fa fa-times"	title="<fmt:message key='label.tip.removeCandidate'/>" 
+						onclick="removeAddedCandidate(${caIndex});"></i>
 					</td>
 			
 				</tr>

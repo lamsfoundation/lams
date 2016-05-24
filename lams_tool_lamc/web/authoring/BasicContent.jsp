@@ -38,8 +38,8 @@
 		    	height = document.documentElement.clientHeight;
 		    	// alert("using clientHeight");
 		    }
-			// alert("doc height "+height);
-		    height -= document.getElementById('TB_iframeContent').offsetTop + 60;
+		 	// alert("doc height "+height);
+		    height -= document.getElementById('TB_iframeContent').offsetTop + 260;
 		    document.getElementById('TB_iframeContent').style.height = height +"px";
 	
 			TB_HEIGHT = height + 28;
@@ -70,46 +70,35 @@
     	frame.src = '<html:rewrite page="/authoring.do?dispatch=exportQTI&httpSessionID=${mcGeneralAuthoringDTO.httpSessionID}" />'
     			+ '&title=' + title;
     }
-
+ 
 </script>
 
 <html:hidden property="questionIndex" />
-<table cellpadding="0">
-	<tr>
-		<td colspan="2">
-			<div class="field-name">
-				<fmt:message key="label.authoring.title.col"></fmt:message>
-			</div>
-			<html:text property="title" style="width: 99%;"></html:text>
-		</td>
-	</tr>
 
-	<tr>
-		<td colspan="2">
-			<div class="field-name">
-				<fmt:message key="label.authoring.instructions.col"></fmt:message>
-			</div>
-			<lams:CKEditor id="instructions"
-				value="${mcGeneralAuthoringDTO.activityInstructions}"
-				contentFolderID="${mcGeneralAuthoringDTO.contentFolderID}"></lams:CKEditor>
-		</td>
-	</tr>
-</table>
+<div class="form-group">
+    <label for="title"><fmt:message key="label.authoring.title.col"/></label>
+    <html:text property="title" styleClass="form-control"></html:text>
+</div>
+<div class="form-group">
+    <label for="instructions"><fmt:message key="label.authoring.instructions.col" /></label>
+    <lams:CKEditor id="instructions" value="${mcGeneralAuthoringDTO.activityInstructions}" contentFolderID="${mcGeneralAuthoringDTO.contentFolderID}"></lams:CKEditor>
+</div>
+
 
 <div id="resourceListArea">
 	<%@ include file="/authoring/itemlist.jsp"%>
 </div>
-
+  
 <p>
-	<a href="<html:rewrite page="/authoring.do"/>?dispatch=newQuestionBox&contentFolderID=${mcGeneralAuthoringDTO.contentFolderID}&httpSessionID=${mcGeneralAuthoringDTO.httpSessionID}&toolContentID=${mcGeneralAuthoringDTO.toolContentID}&sln=${mcGeneralAuthoringDTO.sln}&showMarks=${mcGeneralAuthoringDTO.showMarks}&randomize=${mcGeneralAuthoringDTO.randomize}&questionsSequenced=${mcGeneralAuthoringDTO.questionsSequenced}&retries=${mcGeneralAuthoringDTO.retries}&KeepThis=true&TB_iframe=true&height=640&width=950&modal=true"
-		class="button-add-item thickbox"> 
-		<fmt:message key="label.save.question" /> 
+	<a href="<html:rewrite page="/authoring.do"/>?dispatch=newQuestionBox&contentFolderID=${mcGeneralAuthoringDTO.contentFolderID}&httpSessionID=${mcGeneralAuthoringDTO.httpSessionID}&toolContentID=${mcGeneralAuthoringDTO.toolContentID}&sln=${mcGeneralAuthoringDTO.sln}&showMarks=${mcGeneralAuthoringDTO.showMarks}&randomize=${mcGeneralAuthoringDTO.randomize}&questionsSequenced=${mcGeneralAuthoringDTO.questionsSequenced}&retries=${mcGeneralAuthoringDTO.retries}&KeepThis=true&TB_iframe=true&height=540&width=950&modal=true"
+		class="btn btn-default btn-sm thickbox"> 
+		<i class="fa fa-plus"></i>&nbsp;<fmt:message key="label.save.question" /> 
 	</a>
 	
-	<a href="#" onClick="javascript:importQTI()" style="margin-left: 40px">
+	<a href="#" onClick="javascript:importQTI()" class="btn btn-default btn-sm">
 		<fmt:message key="label.authoring.import.qti" />
 	</a>
-	<a href="#" onClick="javascript:exportQTI()" style="margin-left: 40px">
+	<a href="#" onClick="javascript:exportQTI()" class="btn btn-default btn-sm">
 		<fmt:message key="label.authoring.export.qti" />
 	</a>
 </p>

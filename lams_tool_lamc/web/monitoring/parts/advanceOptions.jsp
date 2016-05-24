@@ -1,15 +1,7 @@
-<h1 style="padding-bottom: 10px;">
-	<img src="<lams:LAMSURL/>/images/tree_closed.gif" id="treeIcon" onclick="javascript:toggleAdvancedOptionsVisibility(document.getElementById('advancedDiv'), document.getElementById('treeIcon'), '<lams:LAMSURL/>');" />
-
-	<a href="javascript:toggleAdvancedOptionsVisibility(document.getElementById('advancedDiv'), document.getElementById('treeIcon'),'<lams:LAMSURL/>');" >
-		<fmt:message key="monitor.summary.th.advancedSettings" />
-	</a>
-</h1>
-<br />
-
-<div class="monitoring-advanced" id="advancedDiv" style="display:none">
-<table class="alternative-color">
-
+<c:set var="adTitle"><fmt:message key="monitor.summary.th.advancedSettings" /></c:set>
+<lams:AdvancedAccordian title="${adTitle}">
+             
+<table class="table table-striped table-condensed">
 	<tr>
 		<td>
 			<fmt:message key="label.use.select.leader.tool.output" />
@@ -163,25 +155,23 @@
 			</tr>
 		</c:when>
 	</c:choose>
+
+	<tr>
+		<td colspan="2">
+		<c:choose>
+			<c:when test="${mcGeneralMonitoringDTO.displayAnswers == 'true'}">
+				<fmt:message key="label.monitoring.yesDisplayAnswers"/>
+			</c:when>
+			<c:when test="${mcGeneralMonitoringDTO.displayAnswers == 'false'}">
+				<fmt:message key="label.monitoring.noDisplayAnswers1"/><br/>
+				<quote>
+					<fmt:message key="label.monitoring.noDisplayAnswers2"/>
+					<input onclick="javascript:submitChangeDisplayAnswers(this.value, 'displayAnswers');" name="displayAnswers" class="btn btn-default btn-xs" value="<fmt:message key='button.monitoring.noDisplayAnswers'/>" type="button">	
+				</quote>
+			</c:when>
+		</c:choose>
+		</td>
+	</tr>
 </table>
 
-<c:choose>
-	<c:when test="${mcGeneralMonitoringDTO.displayAnswers == 'true'}">
-		<p>
-			<fmt:message key="label.monitoring.yesDisplayAnswers"/>
-		</p>
-	</c:when>
-	<c:when test="${mcGeneralMonitoringDTO.displayAnswers == 'false'}">
-		<p>
-			<fmt:message key="label.monitoring.noDisplayAnswers1"/>
-			<br>
-			
-			<quote>
-				<fmt:message key="label.monitoring.noDisplayAnswers2"/>
-				<input onclick="javascript:submitChangeDisplayAnswers(this.value, 'displayAnswers');" class="button" name="displayAnswers" class="button" value="<fmt:message key='button.monitoring.noDisplayAnswers'/>" type="button">	
-			</quote>
-		</p>
-	</c:when>
-</c:choose>
-
-</div>
+</lams:AdvancedAccordian>
