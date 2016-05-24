@@ -52,6 +52,7 @@ import org.apache.tomcat.util.json.JSONObject;
 import org.lamsfoundation.lams.contentrepository.InvalidParameterException;
 import org.lamsfoundation.lams.integration.dto.ExtGroupDTO;
 import org.lamsfoundation.lams.integration.service.IIntegrationService;
+import org.lamsfoundation.lams.learning.service.ICoreLearnerService;
 import org.lamsfoundation.lams.learningdesign.Activity;
 import org.lamsfoundation.lams.learningdesign.Group;
 import org.lamsfoundation.lams.learningdesign.GroupComparator;
@@ -65,6 +66,7 @@ import org.lamsfoundation.lams.usermanagement.OrganisationGroup;
 import org.lamsfoundation.lams.usermanagement.OrganisationGrouping;
 import org.lamsfoundation.lams.usermanagement.Role;
 import org.lamsfoundation.lams.usermanagement.User;
+import org.lamsfoundation.lams.usermanagement.dto.OrganisationGroupingDTO;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
 import org.lamsfoundation.lams.util.AlphanumComparator;
@@ -81,70 +83,11 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
  *
  */
 public class OrganisationGroupAction extends DispatchAction {
-    /**
-     * Class for displaying data on groupings page.
-     */
-    public class OrganisationGroupingDTO implements Comparable<OrganisationGroupingDTO> {
-	private Long groupingId;
-	private String name;
-	private Integer groupCount;
-
-	public OrganisationGroupingDTO(OrganisationGrouping grouping) {
-	    this.groupingId = grouping.getGroupingId();
-	    this.name = grouping.getName();
-	    this.groupCount = grouping.getGroups().size();
-	}
-
-	public Long getGroupingId() {
-	    return groupingId;
-	}
-
-	public void setGroupingId(Long groupingId) {
-	    this.groupingId = groupingId;
-	}
-
-	public String getName() {
-	    return name;
-	}
-
-	public void setName(String name) {
-	    this.name = name;
-	}
-
-	public Integer getGroupCount() {
-	    return groupCount;
-	}
-
-	public void setGroupCount(Integer groupCount) {
-	    this.groupCount = groupCount;
-	}
-
-	@Override
-	public int compareTo(OrganisationGroupingDTO o) {
-	    if (o == null) {
-		return 1;
-	    }
-	    if (this.name == null) {
-		return o.name == null ? 0 : 1;
-	    }
-	    return this.name.compareTo(o.name);
-	}
-    }
-
-    private static final Comparator<OrganisationGroup> ORG_GROUP_COMPARATOR = new Comparator<OrganisationGroup>() {
-	@Override
-	public int compare(OrganisationGroup o1, OrganisationGroup o2) {
-	    String grp1Name = o1 != null ? o1.getName() : "";
-	    String grp2Name = o2 != null ? o2.getName() : "";
-
-	    AlphanumComparator comparator = new AlphanumComparator();
-	    return comparator.compare(grp1Name, grp2Name);
-	}
-    };
 
     private static Logger log = Logger.getLogger(OrganisationGroupAction.class);
 
     private static IUserManagementService userManagementService;
+    private static ICoreLearnerService learnerService;
     private static ILessonService lessonService;
     private static ISecurityService securityService;
     private static IIntegrationService integrationService;
@@ -155,12 +98,20 @@ public class OrganisationGroupAction extends DispatchAction {
 
     /**
      * Shows course grouping list or redirects to groups if a grouping was already chosen.
-     *
+     * 
      * @throws Exception
      */
     @SuppressWarnings("unchecked")
     public ActionForward viewGroupings(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) throws Exception {
+	Long activityID = WebUtil.readLongParam(request, AttributeNames.PARAM_ACTIVITY_ID, true);
+	boolean lessonGroupsExist = getLessonGrouping(request, activityID, false) != null;
+	if (lessonGroupsExist) {
+	    // this is lesson mode and user have already chosen a grouping before, so show it
+	    return viewGroups(mapping, form, request, response);
+	}
+
+	Integer userId = getUserDTO().getUserID();
 	Integer organisationId = WebUtil.readIntParam(request, AttributeNames.PARAM_ORGANISATION_ID, true);
 	Long lessonId = WebUtil.readLongParam(request, AttributeNames.PARAM_LESSON_ID, true);
 	if (organisationId == null) {
@@ -169,21 +120,12 @@ public class OrganisationGroupAction extends DispatchAction {
 		    .getOrganisationId();
 	}
 
-	Integer userId = getUserDTO().getUserID();
 	// check if user is allowed to view and edit groupings
 	if (!getSecurityService().hasOrgRole(organisationId, userId,
 		new String[] { Role.GROUP_ADMIN, Role.GROUP_MANAGER, Role.MONITOR, Role.AUTHOR },
 		"view organisation groupings", false)) {
 	    response.sendError(HttpServletResponse.SC_FORBIDDEN, "User is not a participant in the organisation");
 	    return null;
-	}
-
-	Long activityID = WebUtil.readLongParam(request, AttributeNames.PARAM_ACTIVITY_ID, true);
-
-	boolean lessonGroupsExist = getLessonGrouping(request, activityID, false) != null;
-	if (lessonGroupsExist) {
-	    // this is lesson mode and user have already chosen a grouping before, so show it
-	    return viewGroups(mapping, form, request, response);
 	}
 
 	if (OrganisationGroupAction.log.isDebugEnabled()) {
@@ -193,20 +135,29 @@ public class OrganisationGroupAction extends DispatchAction {
 	request.setAttribute(AttributeNames.PARAM_ORGANISATION_ID, organisationId);
 
 	// if this is a chosen group and lesson is created using integrations - show groups received from LMS instead of actual LAMS ones
-	if ((lessonId != null) && getIntegrationService().isIntegratedServerGroupFetchingAvailable(lessonId)) {
+	if (getIntegrationService().isIntegratedServerGroupFetchingAvailable(lessonId)) {
+	    
+	    if (lessonId == null) {
+		//it's when a learner clicks back button on groups page
+		Activity activity = getLearnerService().getActivity(activityID);
+		lessonId = getLearnerService().getLessonByActivity(activity).getLessonId();
+		request.setAttribute("lessonID", lessonId);
+	    }
+	    
 	    List<ExtGroupDTO> extGroups = getIntegrationService().getExtGroups(lessonId, null);
 	    request.setAttribute("extGroups", extGroups);
 	    // TODO ? show only with user number >0
 	    return mapping.findForward(OrganisationGroupAction.MAPPING_VIEW_EXT_GROUPS);
-	} else {
-	    boolean canEdit = getUserManagementService().isUserInRole(userId, organisationId, Role.GROUP_ADMIN)
-		    || getUserManagementService().isUserInRole(userId, organisationId, Role.GROUP_MANAGER);
-	    canEdit |= activityID != null;
-	    request.setAttribute("canEdit", canEdit);
 
+	} else {
+
+	    boolean isGroupSuperuser = getUserManagementService().isUserInRole(userId, organisationId, Role.GROUP_ADMIN)
+		    || getUserManagementService().isUserInRole(userId, organisationId, Role.GROUP_MANAGER);
+	    request.setAttribute("canEdit", isGroupSuperuser || (activityID != null));
+
+	    Set<OrganisationGroupingDTO> orgGroupingDTOs = new TreeSet<OrganisationGroupingDTO>();
 	    List<OrganisationGrouping> orgGroupings = getUserManagementService()
 		    .findByProperty(OrganisationGrouping.class, "organisationId", organisationId);
-	    Set<OrganisationGroupingDTO> orgGroupingDTOs = new TreeSet<OrganisationGroupingDTO>();
 	    for (OrganisationGrouping orgGrouping : orgGroupings) {
 		orgGroupingDTOs.add(new OrganisationGroupingDTO(orgGrouping));
 	    }
@@ -219,7 +170,7 @@ public class OrganisationGroupAction extends DispatchAction {
 
     /**
      * View groups of the given grouping.
-     *
+     * 
      * @throws Exception
      */
     @SuppressWarnings("unchecked")
@@ -270,7 +221,7 @@ public class OrganisationGroupAction extends DispatchAction {
 
 	//selected groups from integrated server
 	String[] extGroupIds = request.getParameterValues("extGroupIds");
-	boolean isExternalGroupsSelected = (extGroupIds != null) && (extGroupIds.length > 0);
+	boolean isExternalGroupsSelected = extGroupIds != null && extGroupIds.length > 0;
 
 	// check if any groups already exist in this grouping
 	Grouping lessonGrouping = getLessonGrouping(request, activityId, true);
@@ -474,7 +425,7 @@ public class OrganisationGroupAction extends DispatchAction {
 
     /**
      * Deletes course grouping with the given ID.
-     *
+     * 
      * @throws Exception
      */
     public ActionForward removeGrouping(ActionMapping mapping, ActionForm form, HttpServletRequest request,
@@ -534,12 +485,24 @@ public class OrganisationGroupAction extends DispatchAction {
      */
     private JSONArray getOrgGroupsDetails(Set<OrganisationGroup> groups, Collection<User> learners)
 	    throws JSONException {
+
+	final Comparator<OrganisationGroup> ORG_GROUP_COMPARATOR = new Comparator<OrganisationGroup>() {
+	    @Override
+	    public int compare(OrganisationGroup o1, OrganisationGroup o2) {
+		String grp1Name = o1 != null ? o1.getName() : "";
+		String grp2Name = o2 != null ? o2.getName() : "";
+
+		AlphanumComparator comparator = new AlphanumComparator();
+		return comparator.compare(grp1Name, grp2Name);
+	    }
+	};
+	
 	// serialize database group objects into JSON
 	JSONArray groupsJSON = new JSONArray();
 	if (groups != null) {
 	    // sort groups by their name
 	    List<OrganisationGroup> groupList = new LinkedList<OrganisationGroup>(groups);
-	    Collections.sort(groupList, OrganisationGroupAction.ORG_GROUP_COMPARATOR);
+	    Collections.sort(groupList, ORG_GROUP_COMPARATOR);
 
 	    for (OrganisationGroup group : groupList) {
 		JSONObject groupJSON = new JSONObject();
@@ -619,6 +582,16 @@ public class OrganisationGroupAction extends DispatchAction {
 		    .getBean("userManagementService");
 	}
 	return OrganisationGroupAction.userManagementService;
+    }
+    
+    private ICoreLearnerService getLearnerService() {
+	if (OrganisationGroupAction.learnerService == null) {
+	    WebApplicationContext ctx = WebApplicationContextUtils
+		    .getRequiredWebApplicationContext(getServlet().getServletContext());
+	    OrganisationGroupAction.learnerService = (ICoreLearnerService) ctx
+		    .getBean("learnerService");
+	}
+	return OrganisationGroupAction.learnerService;
     }
 
     private ILessonService getLessonService() {
