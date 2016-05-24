@@ -5,9 +5,7 @@
 <lams:html>
 	<lams:head>
 		<%@ include file="/common/header.jsp"%>
-		<link href="<html:rewrite page='/includes/css/addItem.css'/>" rel="stylesheet" type="text/css">
 
-		<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery.js"></script>
 		<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery.form.js"></script>
 
 		<script language="JavaScript" type="text/JavaScript">
@@ -149,77 +147,72 @@
 		</script>
 	</lams:head>
 
-	<body class="stripes" onload="parent.resizeIframe();">
-		<div id="content" >
-		<html:form action="/authoring?validate=false" styleId="newQuestionForm" enctype="multipart/form-data" method="POST">
+<body class="stripes" onload="parent.resizeIframe();">
 
-			<html:hidden property="dispatch" value="saveSingleQuestion" />
-			<html:hidden property="currentField"/>
-			<html:hidden property="toolContentID" />
-			<html:hidden property="currentTab" styleId="currentTab" />
-			<html:hidden property="httpSessionID" />
-			<html:hidden property="contentFolderID" />
-			<html:hidden property="editableQuestionIndex" />
-			<html:hidden property="editQuestionBoxRequest" value="true" />
-			<html:hidden property="totalMarks" />
+	<html:form action="/authoring?validate=false" styleId="newQuestionForm" enctype="multipart/form-data" method="POST">
 
-			<div class="field-name space-top">
-				<fmt:message key="label.edit.question"></fmt:message>
+		<html:hidden property="dispatch" value="saveSingleQuestion" />
+		<html:hidden property="currentField"/>
+		<html:hidden property="toolContentID" />
+		<html:hidden property="currentTab" styleId="currentTab" />
+		<html:hidden property="httpSessionID" />
+		<html:hidden property="contentFolderID" />
+		<html:hidden property="editableQuestionIndex" />
+		<html:hidden property="editQuestionBoxRequest" value="true" />
+		<html:hidden property="totalMarks" />
+
+		<c:set var="formBean" value="<%=request.getAttribute(org.apache.struts.taglib.html.Constants.BEAN_KEY)%>" />
+
+		<c:set var="title"><fmt:message key="label.edit.question"/></c:set>
+		<lams:Page title="${title}" type="learner">
+
+			<div class="form-group">
+				<lams:CKEditor id="newQuestion"
+					value="${mcGeneralAuthoringDTO.editableQuestionText}"
+					contentFolderID="${mcGeneralAuthoringDTO.contentFolderID}">
+				</lams:CKEditor>
 			</div>
-
-			<lams:CKEditor id="newQuestion"
-				value="${mcGeneralAuthoringDTO.editableQuestionText}"
-				contentFolderID="${mcGeneralAuthoringDTO.contentFolderID}"
-                width="100%">
-			</lams:CKEditor>
 
 			<%@ include file="/authoring/candidateAnswersList.jsp"%>
 
-			<div class="space-bottom small-space-top">
-				<div class="right-buttons">
-					<html:button property="newCandidate" onclick="javascript:submitMethod('newCandidateBox');"
-						styleClass="button">
-						<fmt:message key="label.add.candidates" />
-					</html:button>
-				</div>
-
-				<div id="questions-worth">
-					<fmt:message key="label.questions.worth"></fmt:message>
-					<select name="mark">
-						<c:forEach var="markEntry"
-							items="${mcGeneralAuthoringDTO.marksMap}">
-							<c:set var="SELECTED_MARK" scope="request" value="" />
-							<c:if test="${markEntry.value == mcGeneralAuthoringDTO.markValue}">
-								<c:set var="SELECTED_MARK" scope="request" value="SELECTED" />
-							</c:if>
-	
-							<option value="<c:out value="${markEntry.value}"/>"
-								<c:out value="${SELECTED_MARK}"/>>
-								<c:out value="${markEntry.value}" />
-							</option>
+			<div class="form-group">
+				<html:button property="newAddedCandidate" onclick="javascript:submitMethod('newAddedCandidateBox');" styleClass="btn btn-default btn-sm">
+					<fmt:message key="label.add.candidates" />
+				</html:button>
+			</div>
+			
+			<div id="questions-worth" class="form-group">
+				<fmt:message key="label.questions.worth"/>&nbsp;
+				<select name="mark" class="control-sm">
+					<c:forEach var="markEntry"
+						items="${mcGeneralAuthoringDTO.marksMap}">
+						<c:set var="SELECTED_MARK" value="" />
+						<c:if test="${markEntry.value == mcGeneralAuthoringDTO.markValue}">
+							<c:set var="SELECTED_MARK" value="SELECTED" />
+						</c:if>
+		
+						<option value="<c:out value="${markEntry.value}"/>"	${SELECTED_MARK}>
+							<c:out value="${markEntry.value}" />
+						</option>
 						</c:forEach>
-					</select>
-					<fmt:message key="label.marks"></fmt:message>
-				</div>
+				</select>
+				&nbsp;<fmt:message key="label.marks"></fmt:message>
 			</div>
-
-			<div class="field-name">
-				<fmt:message key="label.feedback"></fmt:message>
-			</div>
-			<html:textarea property="feedback" rows="3" cols="70"></html:textarea>
 
 			<lams:ImgButtonWrapper>
 				<a href="#" onclick="addItem();"
-					onmousedown="self.focus();" class="button-add-item"> 
-					<fmt:message key="label.add.new.question" />
+					onmousedown="self.focus();" class="btn btn-default btn-sm"> 
+					<i class="fa fa-plus"></i>&nbsp;<fmt:message key="label.add.new.question" />
 				</a>
 	
-				<a href="#" onclick="javascript:self.parent.tb_remove();" onmousedown="self.focus();" class="button space-left"> 
+				<a href="#" onclick="javascript:self.parent.tb_remove();" onmousedown="self.focus();" class="btn btn-default btn-sm"> 
 					<fmt:message key="label.cancel" />
 				</a>
 			</lams:ImgButtonWrapper>
 
-		</html:form>
-		</div>
-	</body>
+		</lams:Page>
+
+	</html:form>
+		
+</body>
 </lams:html>

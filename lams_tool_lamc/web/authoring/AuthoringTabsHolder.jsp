@@ -7,24 +7,12 @@
 <%@ page import="java.util.Set" %>
 <%@ page import="org.lamsfoundation.lams.tool.mc.McAppConstants"%>
 
-    <% 
-		Set tabs = new LinkedHashSet();
-		tabs.add("label.basic");
-		tabs.add("label.advanced");
-		pageContext.setAttribute("tabs", tabs);
-	%>
-
 <lams:html>		
 	<lams:head>
 	<title><fmt:message key="activity.title" /></title>
 	
-	<link href="<lams:LAMSURL/>css/thickbox.css" rel="stylesheet" type="text/css" media="screen">
-
 	<%@ include file="/common/header.jsp"%>
-	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery.js"></script>
-	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/thickbox.js"></script>
-	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery.form.js"></script>
-	
+ 	
  	<!-- ******************** FCK Editor related javascript & HTML ********************** -->
 	<script language="JavaScript" type="text/JavaScript">
 
@@ -86,42 +74,43 @@
 </lams:head>
 <body onLoad="init();" class="stripes">
 
-<div id="page">
-	<h1>  <fmt:message key="label.authoring.mc"/> </h1>
+	<html:form  action="/authoring?validate=false" styleId="authoringForm" enctype="multipart/form-data" method="POST" target="_self">
+		<html:hidden property="dispatch" value="submitAllContent"/>
+		<html:hidden property="toolContentID"/>
+		<html:hidden property="currentTab" styleId="currentTab" />
+		<html:hidden property="httpSessionID"/>						
+		<html:hidden property="contentFolderID"/>												
+		<html:hidden property="totalMarks"/>
+		<input type="hidden" name="mode" value="${mode}">
+		<c:set var="formBean" value="<%= request.getAttribute(org.apache.struts.taglib.html.Constants.BEAN_KEY) %>" />
+			
+	<c:set var="title"><fmt:message key="activity.title" /></c:set>
+	<lams:Page title="${title}" type="navbar">
+
+		 <lams:Tabs control="true" title="${title}" helpToolSignature="<%= McAppConstants.MY_SIGNATURE %>" helpModule="authoring">
+                    <lams:Tab id="1" key="label.basic" />
+                    <lams:Tab id="2" key="label.advanced" />
+            </lams:Tabs>   
+			
+			<lams:TabBodyArea>
+				<%@ include file="/common/messages.jsp"%>
+              
+                <!--  Set up tabs  -->
+                <lams:TabBodys>
+					<lams:TabBody id="1" titleKey="label.basic" page="BasicContent.jsp"/>
+ 					<lams:TabBody id="2" titleKey="label.advanced" page="AdvancedContent.jsp" />
+                </lams:TabBodys>
+
+				<lams:AuthoringButton formID="authoringForm" clearSessionActionUrl="/clearsession.do" toolSignature="lamc11" 
+					cancelButtonLabelKey="label.cancel" saveButtonLabelKey="label.save" toolContentID="${formBean.toolContentID}" 
+					contentFolderID="${formBean.contentFolderID}" accessMode="${mode}" defineLater="${mode=='teacher'}"/>
+			</lams:TabBodyArea>
+					
+		<div id="footer"></div>
+
+	</lams:Page>
 	
-	<div id="header">		
-		<lams:Tabs collection="${tabs}" useKey="true" control="true" />					
-	</div>
-
-	<div id="content">	
-		<html:form  action="/authoring?validate=false" styleId="authoringForm" enctype="multipart/form-data" method="POST" target="_self">
-			<html:hidden property="dispatch" value="submitAllContent"/>
-			<html:hidden property="toolContentID"/>
-			<html:hidden property="currentTab" styleId="currentTab" />
-			<html:hidden property="httpSessionID"/>						
-			<html:hidden property="contentFolderID"/>												
-			<html:hidden property="totalMarks"/>
-			<input type="hidden" name="mode" value="${mode}">
-			
-			<%@ include file="/common/messages.jsp"%>
-			   
-			<lams:help toolSignature="<%= McAppConstants.MY_SIGNATURE %>" module="authoring"/>
-				
-			<lams:TabBody id="1" titleKey="label.basic" page="BasicContent.jsp"/>
-			<lams:TabBody id="2" titleKey="label.advanced" page="AdvancedContent.jsp" />
-
-			<c:set var="formBean" value="<%= request.getAttribute(org.apache.struts.taglib.html.Constants.BEAN_KEY) %>" />
-			
-			<lams:AuthoringButton formID="authoringForm" clearSessionActionUrl="/clearsession.do" toolSignature="lamc11" 
-				cancelButtonLabelKey="label.cancel" saveButtonLabelKey="label.save" toolContentID="${formBean.toolContentID}" 
-				contentFolderID="${formBean.contentFolderID}" accessMode="${mode}" defineLater="${mode=='teacher'}"/>
-		
-		</html:form>
-	</div>
-
-	<div id="footer"></div>
-
-</div>
-
+	</html:form>
+	
 </body>
 </lams:html>

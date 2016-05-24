@@ -1,75 +1,63 @@
 <%@ include file="/common/taglibs.jsp"%>
 
-<p>
-	<html:checkbox property="useSelectLeaderToolOuput" value="1" styleId="useSelectLeaderToolOuput" onclick="clickSelectLeaderToolOuputHandler();"
-		styleClass="noBorder">
-	</html:checkbox>
+<div class="checkbox">
 	<label for="useSelectLeaderToolOuput">
-		<fmt:message key="label.use.select.leader.tool.output" />
+	<html:checkbox property="useSelectLeaderToolOuput" value="1" styleId="useSelectLeaderToolOuput" onclick="clickSelectLeaderToolOuputHandler();"/>
+	<fmt:message key="label.use.select.leader.tool.output" />
 	</label>
-</p>
+</div>
 
 
-<p class="small-space-top">
-	<html:checkbox property="prefixAnswersWithLetters" value="1" styleId="prefixAnswersWithLetters"
-		styleClass="noBorder">
-	</html:checkbox>
+<div class="checkbox">
 	<label for="prefixAnswersWithLetters">
-		<fmt:message key="label.prefix.sequential.letters.for.each.answer" />
+	<html:checkbox property="prefixAnswersWithLetters" value="1" styleId="prefixAnswersWithLetters"/>
+	<fmt:message key="label.prefix.sequential.letters.for.each.answer" />
 	</label>
-</p>
+</div>
 
 
-<p class="small-space-top">
-	<html:checkbox property="questionsSequenced" value="1" styleId="questionsSequenced"
-		styleClass="noBorder">
-	</html:checkbox>
+<div class="checkbox">
 	<label for="questionsSequenced">
-		<fmt:message key="radiobox.onepq" />
+	<html:checkbox property="questionsSequenced" value="1" styleId="questionsSequenced"/>
+	<fmt:message key="radiobox.onepq" />
 	</label>
-</p>
+</div>
 
 
-<p class="small-space-top">
-	<html:checkbox property="showMarks" value="1" styleId="showMarks"
-		styleClass="noBorder">
-	</html:checkbox>
+<div class="checkbox">
 	<label for="showMarks">
-		<fmt:message key="label.showMarks" />
+	<html:checkbox property="showMarks" value="1" styleId="showMarks"/>
+	<fmt:message key="label.showMarks" />
 	</label>
-</p>
+</div>
 
 
-<p class="small-space-top">
-	<html:checkbox property="randomize" value="1" styleId="randomize"
-		styleClass="noBorder">
-	</html:checkbox>
+<div class="checkbox">
 	<label for="randomize">
-		<fmt:message key="label.randomize" />
+	<html:checkbox property="randomize" value="1" styleId="randomize"/>
+	<fmt:message key="label.randomize" />
 	</label>
-</p>
+</div>
 
-<p class="small-space-top">
-	<html:checkbox property="displayAnswers" value="1" styleId="displayAnswers"
-		styleClass="noBorder">
-	</html:checkbox>
+<div class="checkbox">
 	<label for="displayAnswers">
-		<fmt:message key="label.displayAnswers" />
+	<html:checkbox property="displayAnswers" value="1" styleId="displayAnswers"/>
+	<fmt:message key="label.displayAnswers" />
 	</label>
-</p>
+</div>
 
 
-<p>
-	<html:checkbox property="retries" value="1" styleId="retries"
-		onclick="javascript:updatePass(this); submitMethod('updateMarksList');" styleClass="noBorder">
-	</html:checkbox>
+<div class="checkbox">
 	<label for="retries">
-		<fmt:message key="radiobox.retries" />		
+	<html:checkbox property="retries" value="1" styleId="retries"
+		onclick="javascript:updatePass(this); submitMethod('updateMarksList');"/>
+	<fmt:message key="radiobox.retries" />		
 	</label>
-</p>
+</div>
 
-<p>
-	<select name="passmark">
+<div class="form-inline loffset20">
+	<div class="form-group">
+	<select name="passmark"  class="form-control input-sm">
 		<c:forEach var="passmarkEntry"
 			items="${mcGeneralAuthoringDTO.passMarksMap}">
 			<c:set var="SELECTED_PASS" scope="request" value="" />
@@ -85,19 +73,18 @@
 		</c:forEach>
 	</select>
 	<fmt:message key="radiobox.passmark" />
+	</div>
+</div>
 
-</p>
-
-<p>
-	<html:checkbox property="reflect" value="1" styleClass="noBorder" styleId="reflect">
-	</html:checkbox>
+<div class="checkbox">
 	<label for="reflect">
-		<fmt:message key="label.reflect" />
+	<html:checkbox property="reflect" value="1" styleClass="noBorder" styleId="reflect"/>
+	<fmt:message key="label.reflect" />
 	</label>
-</p>
-<p>
-	<html:textarea cols="30" rows="3" property="reflectionSubject" styleId="reflectInstructions"></html:textarea>
-</p>
+</div>
+<div class="form-group">
+<html:textarea property="reflectionSubject" styleId="reflectInstructions"  styleClass="form-control" rows="3"/>
+</div>
 
 <script type="text/javascript">
 <!--

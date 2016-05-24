@@ -7,24 +7,12 @@
 <%@ page import="java.util.Set" %>
 <%@ page import="org.lamsfoundation.lams.tool.mc.McAppConstants"%>
 
-    <% 
-		Set tabs = new LinkedHashSet();
-		tabs.add("label.summary");
-		tabs.add("label.editActivity");
-		tabs.add("label.stats");
-		pageContext.setAttribute("tabs", tabs);
-	%>
-
 <lams:html>
 <lams:head>
 
 	<title><fmt:message key="label.monitoring"/></title>
 	
-	<link href="<lams:LAMSURL/>css/thickbox.css" rel="stylesheet" type="text/css" media="screen">
-
-	<%@ include file="/common/header.jsp"%>
-	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery.js"></script>
-	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/thickbox.js"></script>
+	<%@ include file="/common/monitoringheader.jsp"%>
 	<script type="text/javascript">
 	
         function init(){
@@ -72,33 +60,36 @@
 </lams:head>
 <body onLoad="init();" class="stripes">
 
-	<div id="page">
-		<h1> <fmt:message key="label.monitoring"/> </h1>
+<c:set var="title"><fmt:message key="activity.title" /></c:set>
+<lams:Page title="${title}" type="navbar">
 
-		<div id="header">
-			<lams:Tabs collection="${tabs}" useKey="true" control="true"/>
-		</div>	
+	<lams:Tabs title="${title}" control="true" helpToolSignature="<%= McAppConstants.MY_SIGNATURE %>" helpModule="monitoring">
+		<lams:Tab id="1" key="label.summary" />
+		<lams:Tab id="2" key="label.editActivity" />
+		<lams:Tab id="3" key="label.stats" />
+	</lams:Tabs>
+
+    <html:form  action="/monitoring?validate=false" enctype="multipart/form-data" method="POST" target="_self" styleId="monitoringForm">		
+		<html:hidden property="dispatch"/>
+		<html:hidden property="toolContentID"/>
+		<html:hidden property="httpSessionID"/>
+		<html:hidden property="currentTab" styleId="currentTab" />
+		<html:hidden property="contentFolderID"/>
+		<html:hidden property="responseId"/>
 	
-		<div id="content">						
-		    <html:form  action="/monitoring?validate=false" enctype="multipart/form-data" method="POST" target="_self" styleId="monitoringForm">		
-				<html:hidden property="dispatch"/>
-				<html:hidden property="toolContentID"/>
-				<html:hidden property="httpSessionID"/>
-				<html:hidden property="currentTab" styleId="currentTab" />
-				<html:hidden property="contentFolderID"/>
-				<html:hidden property="responseId"/>
-			
-				<lams:help toolSignature="<%= McAppConstants.MY_SIGNATURE %>" module="monitoring"/>
-			
+		<lams:TabBodyArea>
+			<lams:TabBodys>
 				<lams:TabBody id="1" titleKey="label.summary" page="SummaryContent.jsp"/>
 				<lams:TabBody id="2" titleKey="label.editActivity" page="Edit.jsp" />
 				<lams:TabBody id="3" titleKey="label.stats" page="Stats.jsp" />
-			</html:form>
-		</div>	
-	
-		<div id="footer"></div>
+			</lams:TabBodys>
+		</lams:TabBodyArea>
 
-	</div>
+	</html:form>
 	
+	<div id="footer" />
+	
+</lams:Page>
+
 </body>
 </lams:html>
