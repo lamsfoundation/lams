@@ -109,113 +109,106 @@
 			</c:when>
 
 			<c:otherwise>
-				<!-- Start uploaded files -->
-				<div class="row no-gutter">
-					<div class="col-xs-12">
-						<div class="panel panel-success">
-							<div class="panel-heading panel-title">
-								<fmt:message key="monitoring.user.submittedFiles" />
-								<small>[<c:out value="${fn:length(learner.filesUploaded)}" />]
-								</small>
-							</div>
-							<div class="panel-body">
-								<!-- iteration files uploaded -->
-								<c:set var="counter" value="0" scope="page" />
-								<div class="row no-gutter">
-									<c:forEach var="file" items="${learner.filesUploaded}">
+			
+			<table class="table table-condensed">
+				<tr>
+					<th class="active">
+						<fmt:message key="monitoring.user.submittedFiles" />
+					</th>
+					<th colspan="2" class="active">
+						<c:out value="${fn:length(learner.filesUploaded)}" />
+					</th>
+				<tr>
+				<c:forEach var="file" items="${learner.filesUploaded}" varStatus="status">
+					<tr class="active">
+						<!--First Row displaying the name of the File -->
+						<td colspan="${file.currentLearner ? 2 : 3}">
+							<c:out value="${status.count}" />) <c:out value="${file.filePath}" />
+							<c:if test="${file.currentLearner}">
+								<c:set var="downloadURL">
+									<c:url value="/download?uuid=${file.uuID}&versionID=${file.versionID}&preferDownload=true" />
+								</c:set>
+								</td>
+								<td>
+									<html:link href="${downloadURL}" styleClass="btn btn-default">
+										<fmt:message key="label.download" />
+									</html:link>
+								</td>
+							</c:if>
+						</td>
+					</tr>
+					<tr>
+						<!--Second Row displaying the description of the File -->
+						<td><fmt:message key="label.learner.fileDescription" /></td>
+						<td colspan="2"><lams:out value="${file.fileDescription}" escapeHtml="true" /></td>
+					</tr>
 
-										<div class="col-xs-12 col-sm-6 col-md-6 col-lg-4">
-											<div class="table-responsive">
-												<table class="table table-condensed">
-													<tbody>
-														<c:set var="counter" value="${counter + 1}" scope="page" />
-														<tr class="bg-success">
-															<!--First Row displaying the name of the File -->
-															<td colspan="2"><strong> <c:out value="${counter}" />) <c:out value="${file.filePath}" />
-																	<c:if test="${file.currentLearner}">
-																		<c:set var="downloadURL">
-																			<c:url value="/download?uuid=${file.uuID}&versionID=${file.versionID}&preferDownload=true" />
-																		</c:set>
-																		<a class="btn btn-default btn-xs pull-right" title="<fmt:message key='label.download'/>"
-																			href="${downloadURL}"><i class="fa fa-download"></i> </a>
-																	</c:if>
-															</strong></td>
-														</tr>
-														<tr>
-															<!--Second Row displaying the description of the File -->
-															<td class="text-nowrap"><fmt:message key="label.learner.fileDescription" /></td>
-															<td><lams:out value="${file.fileDescription}" escapeHtml="true" /></td>
-														</tr>
+					<tr>
+						<!--Third row displaying the date of submission of the File -->
+						<td><fmt:message key="label.learner.time" /></td>
+						<td colspan="2">
+							<time class="timeago" datetime="${file.dateOfSubmission}">
+								<lams:Date value='${file.dateOfSubmission}' />
+							</time>
+						</td>
+					</tr>
 
-														<tr>
-															<!--Third row displaying the date of submission of the File -->
-															<td class="text-nowrap"><fmt:message key="label.learner.time" /></td>
-															<td><time class="timeago" datetime="${file.dateOfSubmission}">
-																	<lams:Date value='${file.dateOfSubmission}' />
-																</time></td>
-														</tr>
+					<tr>
+						<!--Fourth row displaying the comments -->
+						<td><fmt:message key="label.learner.comments" /></td>
+						<td colspan="2">
+							<c:choose>
+								<c:when test="${empty file.comments}">
+									<fmt:message key="label.learner.notAvailable" />
+								</c:when>
+								<c:otherwise>
+									<c:out value="${file.comments}" escapeXml="false" />
+								</c:otherwise>
+							</c:choose>
+						</td>
+					</tr>
 
-														<tr>
-															<!--Fourth row displaying the comments -->
-															<td class="text-nowrap"><fmt:message key="label.learner.comments" /></td>
-															<td><c:choose>
-																	<c:when test="${empty file.comments}">
-																		<fmt:message key="label.learner.notAvailable" />
-																	</c:when>
-																	<c:otherwise>
-																		<c:out value="${file.comments}" escapeXml="false" />
-																	</c:otherwise>
-																</c:choose></td>
-														</tr>
+					<tr>
+						<!--Fifth row displaying the marks-->
+						<td><fmt:message key="label.learner.marks" /></td>
+						<td>
+							<c:choose>
+								<c:when test="${empty file.marks}">
+									<fmt:message key="label.learner.notAvailable" />
+								</c:when>
+								<c:otherwise>
+									<c:out value="${file.marks}" escapeXml="true" />
+								</c:otherwise>
+							</c:choose>
+						</td>
+					</tr>
+					<tr style="margin-bottom: 5px; border-bottom: 5px solid #ddd">
+						<!--Sixth row displaying the marked file-->
+						<td><fmt:message key="label.monitor.mark.markedFile" /></td>
+						<c:choose>
+							<c:when test="${empty file.markFileUUID}">
+								<td colspan="2">
+									<fmt:message key="label.learner.notAvailable" />
+								</td>
+							</c:when>
+							<c:otherwise>
+								<td>
+									<c:out value="${file.markFileName}" />
+								</td>
+								<td>
+									<c:set var="markFileDownloadURL">
+										<c:url value="/download?uuid=${file.markFileUUID}&versionID=${file.markFileVersionID}&preferDownload=true" />
+									</c:set>
+									<html:link href="${markFileDownloadURL}" styleClass="btn btn-default">
+										<fmt:message key="label.download" />
+									</html:link>
+								</td>
+							</c:otherwise>
+						</c:choose>
+					</tr>
+				</c:forEach>
+			</table>
 
-														<tr>
-															<!--Fifth row displaying the marks-->
-															<td class="text-nowrap"><fmt:message key="label.learner.marks" /></td>
-															<td><c:choose>
-																	<c:when test="${empty file.marks}">
-																		<fmt:message key="label.learner.notAvailable" />
-																	</c:when>
-																	<c:otherwise>
-																		<c:out value="${file.marks}" escapeXml="true" />
-																	</c:otherwise>
-																</c:choose></td>
-														</tr>
-														<tr style="margin-bottom: 5px; border-bottom: 5px solid #ddd">
-															<!--Sixth row displaying the marked file-->
-															<td class="text-nowrap"><fmt:message key="label.monitor.mark.markedFile" /></td>
-															<td><c:choose>
-																	<c:when test="${empty file.markFileUUID}">
-																		<fmt:message key="label.learner.notAvailable" />
-																	</c:when>
-																	<c:otherwise>
-																		<c:out value="${file.markFileName}" />
-																		<c:set var="markFileDownloadURL">
-																			<c:url
-																				value="/download?uuid=${file.markFileUUID}&versionID=${file.markFileVersionID}&preferDownload=true" />
-																		</c:set>
-																		<a href="${markFileDownloadURL}"><fmt:message key="label.download" /> </a>
-
-																	</c:otherwise>
-																</c:choose></td>
-														</tr>
-
-													</tbody>
-												</table>
-											</div>
-											<!-- end table responsive -->
-										</div>
-									</c:forEach>
-									<!-- End iteration files uploaded -->
-								</div>
-								<!-- end row no-gutter -->
-
-
-							</div>
-							<!-- end panel-body -->
-						</div>
-					</div>
-				</div>
-				<!-- End row -->
 			</c:otherwise>
 		</c:choose>
 
