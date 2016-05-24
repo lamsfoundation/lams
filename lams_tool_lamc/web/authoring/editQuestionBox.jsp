@@ -176,7 +176,7 @@
 			<%@ include file="/authoring/candidateAnswersList.jsp"%>
 
 			<div class="form-group">
-				<html:button property="newAddedCandidate" onclick="javascript:submitMethod('newAddedCandidateBox');" styleClass="btn btn-default btn-sm">
+				<html:button property="newCandidate" onclick="javascript:submitMethod('newCandidateBox');" styleClass="btn btn-default btn-sm">
 					<fmt:message key="label.add.candidates" />
 				</html:button>
 			</div>
