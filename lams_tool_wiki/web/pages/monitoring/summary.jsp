@@ -28,19 +28,24 @@
 </script>
 
 <c:set var="dto" value="${wikiDTO}" />
+ 
+<div class="panel">
+	<h4>
+	    <c:out value="${dto.title}" escapeXml="true"/>
+	</h4>
+ 	<div class="instructions voffset5">
+		<c:out value="${dto.instructions}" escapeXml="false" />
+	</div>
 
-<h1>
-	<c:out value="${dto.title}" escapeXml="true" />
-</h1>
-
-<div class="instructions space-top">
-	<c:out value="${dto.instructions}" escapeXml="false" />
+	<c:if test="${empty dto.sessionDTOs}">
+		<lams:Alert type="info" id="no-session-summary" close="false">
+			<fmt:message key="monitor.nosessions"></fmt:message> 
+		</lams:Alert>
+	</c:if> 
 </div>
-<br/>
 
-<c:choose>
-	<c:when test="${not empty dto.sessionDTOs}">
-		<table class="alternative-color">
+<c:if test="${not empty dto.sessionDTOs}">
+		<table class="table table-striped">
 			<tr>
 				<th>
 					<fmt:message key="monitor.th.sessions"></fmt:message>
@@ -60,25 +65,12 @@
 			</tr>
 			</c:forEach>
 		</table>
+</c:if>
 
-	</c:when>
-	<c:otherwise>
-		<fmt:message key="monitor.nosessions"></fmt:message> 
-	</c:otherwise>
-</c:choose>
-
-
-<h1>
-	<img src="<lams:LAMSURL/>/images/tree_closed.gif" id="treeIcon" onclick="javascript:toggleAdvancedOptionsVisibility(document.getElementById('advancedDiv'), document.getElementById('treeIcon'), '<lams:LAMSURL/>');" />
-
-	<a href="javascript:toggleAdvancedOptionsVisibility(document.getElementById('advancedDiv'), document.getElementById('treeIcon'),'<lams:LAMSURL/>');" >
-		<fmt:message key="monitor.summary.th.advancedSettings" />
-	</a>
-</h1>
-<br />
-
-<div class="monitoring-advanced" id="advancedDiv" style="display:none">
-<table class="alternative-color">
+<c:set var="adTitle"><fmt:message key="monitor.summary.th.advancedSettings" /></c:set>
+<lams:AdvancedAccordian title="${adTitle}">
+             
+<table class="table table-striped table-condensed">
 
 	<tr>
 		<td>
@@ -201,7 +193,7 @@
 		</td>
 		
 		<td>
-			<fmt:message key="advanced.editingLimits.minimum" /> 
+			<fmt:message key="advanced.editingLimits.minimum" />&nbsp; 
 			<c:choose>
 				<c:when test="${dto.minimumEdits == 0}">
 					<fmt:message key="advanced.editingLimits.nominimum" />
@@ -213,7 +205,7 @@
 			
 			<br />
 			
-			<fmt:message key="advanced.editingLimits.maximum" /> 
+			<fmt:message key="advanced.editingLimits.maximum" /> &nbsp;
 			<c:choose>
 				<c:when test="${dto.maximumEdits == 0}">
 					<fmt:message key="advanced.editingLimits.nomaximum" />
@@ -226,4 +218,4 @@
 	</tr>
 	
 </table>
-</div>
+</lams:AdvancedAccordian> 

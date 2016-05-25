@@ -1,6 +1,5 @@
 <%@ include file="/common/taglibs.jsp"%>
   <%@ page import="org.lamsfoundation.lams.tool.wiki.util.WikiConstants"%>
-    <link href="includes/css/wiki_style.css" rel="stylesheet" type="text/css">
     <script language="JavaScript" type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery.js"></script>
     <script language="JavaScript" type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery-ui.js"></script>
     <script language="JavaScript" type="text/javascript" src="includes/javascript/validation.js"></script>
@@ -50,8 +49,8 @@
       <div class="container" id="content">
         <div class="row no-gutter">
           <div class="col-xs-12">
-            <div class="panel panel-default panel-learner-title">
-              <div class="panel-heading">
+            <div class="panel panel-default">
+              <div class="panel-heading panel-learner-title">
                 <c:if test="${currentWikiPage.title != mainWikiPage.title}">
                   <a class="panel-title panel-learner-title pull-left" href="javascript:changeWikiPage('${fn:escapeXml(mainWikiPage.javaScriptTitle)}')"> ${fn:escapeXml(mainWikiPage.title)}</a>&nbsp;/&nbsp;
                 </c:if> 
@@ -113,6 +112,7 @@
                 </div> <!-- end wiki top menu -->               
               </div>
               <div class="panel-body">
+              
                 <!--
 <div style="float: right; margin-left: 10px; position:relative; padding-top: 4px" class="help">
 <lams:help toolSignature="<%=WikiConstants.TOOL_SIGNATURE%>" module="learning" />
@@ -252,7 +252,7 @@
                   <div class="panel-body">
                     <c:choose>
                       <c:when test="${not empty wikiPageContentHistory}">
-                        <table class="table table-stripped table-condensed">
+                        <table class="table table-striped table-condensed">
                           <tr>
                             <th>
                               <fmt:message key="label.wiki.history.version"></fmt:message>
@@ -322,7 +322,7 @@
                     </h4>
                   </div>
                   <div class="panel-body">
-                    <table class="table table-stripped table-condensed">
+                    <table class="table table-striped table-condensed">
                       <tr>
                         <td>
                           <div class="field-name">
