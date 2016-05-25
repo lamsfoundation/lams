@@ -345,6 +345,8 @@ public class IntegrationService implements IIntegrationService {
 		(OrganisationState) service.findById(OrganisationState.class, OrganisationState.ACTIVE));
 	org.setLocale(LanguageUtil.getSupportedLocale(langIsoCode, countryIsoCode));
 
+	org.setEnableCourseNotifications(true);
+	
 	// determine whether org will be a group or subgroup
 	Organisation parent = (Organisation) service.findById(Organisation.class, Integer.valueOf(parentOrgId));
 	if (parent != null) {
