@@ -8,20 +8,16 @@
 		
 		<lams:headItems />
 		
-		<link href="<lams:WebAppURL />/includes/css/wiki_style.css" rel="stylesheet" type="text/css">
 	</lams:head>
 	
-	<div id="page">
 	<body class="stripes">
-		<div id="content" style="margin-right:75px;">	
-			<h1>
-				${currentWikiPage.title}
-			</h1>
+	
+		<lams:Page title="${currentWikiPage.title}" type="learner">
 			
-			<h3>
-				<fmt:message key="label.wiki.history.version"></fmt:message>: ${currentWikiPage.currentWikiContentDTO.version}<br />
-				<fmt:message key="label.wiki.history.date"></fmt:message>: <lams:Date value="${currentWikiPage.currentWikiContentDTO.editDate}"/><br />
-				<fmt:message key="label.wiki.history.editor"></fmt:message>: 
+			<div>
+				<strong><fmt:message key="label.wiki.history.version"></fmt:message>:</strong> ${currentWikiPage.currentWikiContentDTO.version}<br />
+				<strong><fmt:message key="label.wiki.history.date"></fmt:message>:</strong> <lams:Date value="${currentWikiPage.currentWikiContentDTO.editDate}"/><br />
+				<strong><fmt:message key="label.wiki.history.editor"></fmt:message>:</strong> 
 				<c:choose>
 					<c:when test="${currentWikiPage.currentWikiContentDTO.editorDTO != null}">
 						${currentWikiPage.currentWikiContentDTO.editorDTO.firstName} ${currentWikiPage.currentWikiContentDTO.editorDTO.firstName}
@@ -30,20 +26,18 @@
 						<fmt:message key="label.wiki.history.editor.author"></fmt:message>
 					</c:otherwise>
 				</c:choose>
-			</h3>
-			
-			<br />	
-			<div id="viewBody">
-				${currentWikiPage.currentWikiContentDTO.body}
 			</div>
 			
-			<p id="saveCancelButtons" >
-				<a href="javascript:window.close()" class="button right-buttons space-left"><fmt:message key="button.close" /></a>
-			</p>
-		</div>
+			<div id="viewBody">
+				<strong><fmt:message key="label.wiki.body"></fmt:message>:</strong> ${currentWikiPage.currentWikiContentDTO.body}
+			</div>
+			
+			<div id="saveCancelButtons" class="voffset10"> 
+				<a href="javascript:window.close()" class="btn btn-default"><fmt:message key="button.close" /></a>
+			</div>
 		
-		<div id="footer">
-		</div>
-	</div>
+		<div id="footer"></div>
+		</lams:Page>
+		
 	</body>
 </lams:html>

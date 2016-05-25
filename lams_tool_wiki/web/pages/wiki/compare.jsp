@@ -7,19 +7,15 @@
 		
 		<lams:headItems />
 		
-		<link href="<lams:WebAppURL />/includes/css/wiki_style.css" rel="stylesheet" type="text/css">
 	</lams:head>
 	
-	<div id="page">
 	<body class="stripes">
-		<div id="content" style="margin-right:75px;">
-			<h1>
-				${compareTitle} 
-			</h1>
-			
-			<h3>
+	
+		<lams:Page title="${compareTitle}" type="learner">
+		
+			<h4>
 				<fmt:message key="label.wiki.compare"><fmt:param>${compareVersions}</fmt:param></fmt:message>
-			</h3>
+			</h4>
 			
 			<span style='background-color:#99FFCC'>&nbsp;&nbsp;&nbsp;&nbsp;</span>
 			&nbsp;&nbsp;&nbsp;&nbsp;<fmt:message key="label.wiki.compare.added.line" />
@@ -32,13 +28,12 @@
 				${compareString}
 			</div>
 			
-			<br />
-			<p id="saveCancelButtons" >
-				<a href="javascript:window.close()" class="button right-buttons space-left"><fmt:message key="button.close" /></a>
-			</p>
-		</div>
-		<div id="footer">
-		</div>
+			<div id="saveCancelButtons" class="voffset10"> 
+				<a href="javascript:window.close()" class="btn btn-default"><fmt:message key="button.close" /></a>
+			</div>
+
+		<div id="footer"></div>
+		</lams:Page>
+		
 	</body>
-	</div>
 </lams:html>

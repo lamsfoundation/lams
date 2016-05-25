@@ -2,49 +2,53 @@
 
 <!-- ========== Advanced Tab ========== -->
 
-<p class="small-space-top"><html:checkbox property="lockOnFinished"
-	value="1" styleClass="noBorder" styleId="lockOnFinished"></html:checkbox>
-<label for="lockOnFinished"> <fmt:message
-	key="advanced.lockOnFinished" /> </label></p>
+<div class="checkbox">
+	<label for="lockOnFinished">
+	<html:checkbox property="lockOnFinished" value="1" styleId="lockOnFinished"></html:checkbox>
+	<fmt:message key="advanced.lockOnFinished" /></label>
+</div>
 
-<p class="small-space-top"><html:checkbox
-	property="allowLearnerCreatePages" value="1" styleClass="noBorder"
-	styleId="allowLearnerCreatePages"></html:checkbox> <label
-	for="allowLearnerCreatePages"> <fmt:message
-	key="advanced.allowLearnerCreatePages" /> </label></p>
+<div class="checkbox">
+	<label for="allowLearnerCreatePages"> 
+	<html:checkbox	property="allowLearnerCreatePages" value="1" styleId="allowLearnerCreatePages"></html:checkbox> 
+	<fmt:message key="advanced.allowLearnerCreatePages" /></label>
+</div>
 
-<p class="small-space-top"><html:checkbox
-	property="allowLearnerInsertLinks" value="1" styleClass="noBorder"
-	styleId="allowLearnerInsertLinks"></html:checkbox> <label
-	for="allowLearnerInsertLinks"> <fmt:message
-	key="advanced.allowLearnerInsertLinks" /> </label></p>
+<div class="checkbox">
+	<label	for="allowLearnerInsertLinks">
+	<html:checkbox property="allowLearnerInsertLinks" value="1" styleId="allowLearnerInsertLinks"></html:checkbox>  
+	<fmt:message key="advanced.allowLearnerInsertLinks" /></label>
+</div>
 
-<p class="small-space-top"><html:checkbox
-	property="allowLearnerAttachImages" value="1" styleClass="noBorder"
-	styleId="allowLearnerAttachImages"></html:checkbox> <label
-	for="allowLearnerAttachImages"> <fmt:message
-	key="advanced.allowLearnerAttachImages" /> </label></p>
+<div class="checkbox">
+	<label for="allowLearnerAttachImages"> 
+	<html:checkbox	property="allowLearnerAttachImages" value="1" styleId="allowLearnerAttachImages"></html:checkbox> 
+	<fmt:message key="advanced.allowLearnerAttachImages" /> </label>
+</div>
 	
-<p class="small-space-top"><html:checkbox
-	property="notifyUpdates" value="1" styleClass="noBorder"
-	styleId="notifyUpdates"></html:checkbox> <label
-	for="notifyUpdates"> <fmt:message
-	key="advanced.notifyChange" /> </label></p>
+<div class="checkbox">
+	<label	for="notifyUpdates">
+	<html:checkbox property="notifyUpdates" value="1" styleId="notifyUpdates"></html:checkbox>
+	<fmt:message key="advanced.notifyChange" /> </label>
+</div>
 
-<p><html:checkbox property="reflectOnActivity" value="1"
-	styleClass="noBorder" styleId="reflectOnActivity"></html:checkbox> <label
-	for="reflectOnActivity"> <fmt:message
-	key="advanced.reflectOnActivity" /> </label></p>
-<p><html:textarea property="reflectInstructions" cols="30" rows="3"
-	styleId="reflectInstructions" /></p>
+<div class="checkbox">
+	<label for="reflectOnActivity">
+	<html:checkbox property="reflectOnActivity" value="1"
+	styleId="reflectOnActivity"></html:checkbox>
+	<fmt:message key="advanced.reflectOnActivity" /> </label>
+</div>
+<div class="form-group">
+	<html:textarea property="reflectInstructions" rows="3" styleClass="form-control" styleId="reflectInstructions" />
+</div>
 
 
-<h2><fmt:message key="advanced.editingLimits" /></h2>
+<h4><fmt:message key="advanced.editingLimits" /></h4>
 
-<p><fmt:message key="advanced.editingLimits.prompt" /></p>
+<div><fmt:message key="advanced.editingLimits.prompt" /></div>
 
-<p><fmt:message key="advanced.editingLimits.minimum" /> <html:select
-	property="minimumEdits" styleId="minimumEdits">
+<div><fmt:message key="advanced.editingLimits.minimum" />&nbsp;<html:select
+	property="minimumEdits" styleId="minimumEdits" styleClass="form-control form-control-inline input-sm">
 	<html:option value="0">
 		<fmt:message key="advanced.editingLimits.nominimum" />
 	</html:option>
@@ -58,8 +62,8 @@
 	<html:option value="8">8</html:option>
 	<html:option value="9">9</html:option>
 	<html:option value="10">10</html:option>
-</html:select> <fmt:message key="advanced.editingLimits.maximum" /> <html:select
-	property="maximumEdits" styleId="maximumEdits">
+</html:select>&nbsp;<fmt:message key="advanced.editingLimits.maximum" />&nbsp;<html:select
+	property="maximumEdits" styleId="maximumEdits" styleClass="form-control form-control-inline input-sm">
 	<html:option value="0">
 		<fmt:message key="advanced.editingLimits.nomaximum" />
 	</html:option>
@@ -73,7 +77,7 @@
 	<html:option value="8">8</html:option>
 	<html:option value="9">9</html:option>
 	<html:option value="10">10</html:option>
-</html:select></p>
+</html:select></div>
 
 
 <script type="text/javascript">

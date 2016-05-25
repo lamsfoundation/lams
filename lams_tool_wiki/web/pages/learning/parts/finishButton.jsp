@@ -18,8 +18,8 @@
       <html:hidden property="dispatch" value="openNotebook" />
       <html:hidden property="mode" value="${mode}" />	
       <html:hidden property="toolSessionID" styleId="toolSessionID"/>
-      <div class="panel panel-default">
-        <div class="panel heading">
+      <div class="panel panel-default voffset10">
+        <div class="panel-heading">
           <h4 class="panel-title">
             <lams:out value="${wikiDTO.reflectInstructions}" escapeHtml="true"/>
           </h4>

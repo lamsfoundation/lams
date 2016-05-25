@@ -11,13 +11,8 @@
 	<title>
 		<fmt:message key="activity.title" />
 	</title>
-	
-	
-	
-	
+
 	<lams:headItems />
 	<tiles:insert attribute="headItems" />
 	
-	
-	<link href="${tool}/includes/css/wiki_style.css" rel="stylesheet" type="text/css">
 </lams:head>

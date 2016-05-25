@@ -2,79 +2,66 @@
 
 <script language="JavaScript" type="text/javascript" src="includes/javascript/validation.js"></script>
 
-
-
 <c:set var="formBean" value="<%=request.getAttribute(org.apache.struts.taglib.html.Constants.BEAN_KEY)%>" />
 
 <!-- ========== Basic Tab ========== -->
 
-<div id="wikimenu" style="margin-right:75px;">
-
-	<div id="breadcrumb" style="float: left; width: 50%;">
+<div id="wikimenu" class="panel panel-default">
+  <div class="panel-heading  panel-learner-title">
 		<c:if test="${currentWikiPage.title != mainWikiPage.title}">
 			<a href='javascript:changeWikiPage("${fn:escapeXml(mainWikiPage.javaScriptTitle)}")'>${fn:escapeXml(mainWikiPage.title)}</a> :
 		</c:if> 
 		<a href='javascript:changeWikiPage("${fn:escapeXml(currentWikiPage.javaScriptTitle)}")'>${fn:escapeXml(mainWikiPage.title)}</a>
-	</div>
-	
-	<div id="buttons" style="float: right; width: 50%; text-align:right; " >
-		<a href="javascript:changeDiv('view');" title="<fmt:message key="label.wiki.view.toolTip"></fmt:message>">
-			<fmt:message key="label.wiki.view"></fmt:message>
+
+    <!-- begin wiki menu-->
+    <div class="btn-group pull-right">
+
+		<a href="javascript:changeDiv('view');" title="<fmt:message key="label.wiki.view.toolTip"></fmt:message>" type="button" class="btn btn-xs btn-default">
+			<i class="fa fa-xm fa-play"></i> <fmt:message key="label.wiki.view"></fmt:message>
 		</a> 
-		&nbsp;
 		<c:if test="${not currentWikiPage.deleted}">
-			<a href="javascript:changeDiv('edit');" title="<fmt:message key="label.wiki.edit.toolTip"></fmt:message>">
-				<fmt:message key="label.wiki.edit"></fmt:message>
+			<a href="javascript:changeDiv('edit');" title="<fmt:message key="label.wiki.edit.toolTip"></fmt:message>" type="button" class="btn btn-xs btn-default">
+			<i class="fa fa-xm fa-pencil"></i> <fmt:message key="label.wiki.edit"></fmt:message>
 			</a> 
-			&nbsp;
 		</c:if>
-		<a href="javascript:cancelAdd();changeDiv('add');" title="<fmt:message key="label.wiki.add.toolTip"></fmt:message>">
-			<fmt:message key="label.wiki.add"></fmt:message>
+		<a href="javascript:cancelAdd();changeDiv('add');" title="<fmt:message key="label.wiki.add.toolTip"></fmt:message>" type="button" class="btn btn-xs btn-default">
+			<i class="fa fa-xm fa-plus"></i> <fmt:message key="label.wiki.add"></fmt:message>
 		</a> 
-		&nbsp;
-		<a href="javascript:changeDiv('history');" title="<fmt:message key="label.wiki.history.toolTip"></fmt:message>">
-			<fmt:message key="label.wiki.history"></fmt:message>
+		<a href="javascript:changeDiv('history');" title="<fmt:message key="label.wiki.history.toolTip"></fmt:message>" type="button" class="btn btn-xs btn-default">
+			<i class="fa fa-xm fa-history"></i> <fmt:message key="label.wiki.history"></fmt:message>
 		</a>
 		<c:if test="${currentWikiPage.title != mainWikiPage.title and not currentWikiPage.deleted}">
-			&nbsp;
 			<c:choose>
 				<c:when test="${defineLater eq 'yes'}">
 					<a href="javascript:doRemove('<fmt:message key="label.wiki.remove.mark.confirm"></fmt:message>')"
-					   title="<fmt:message key="label.wiki.remove.mark.toolTip"></fmt:message>">
-
+					   title="<fmt:message key="label.wiki.remove.mark.toolTip"></fmt:message>" type="button" class="btn btn-xs btn-default">
+					</a>
 				</c:when>
 				<c:otherwise>
 					<a href="javascript:doRemove('<fmt:message key="label.wiki.remove.confirm"></fmt:message>')"
-					   title="<fmt:message key="label.wiki.remove.toolTip"></fmt:message>">
+					   title="<fmt:message key="label.wiki.remove.toolTip"></fmt:message>" type="button" class="btn btn-xs btn-default">
 				</c:otherwise>
 			</c:choose>
-						<fmt:message key="label.wiki.remove"></fmt:message>
+					<i class="fa fa-xm fa-trash"></i> <fmt:message key="label.wiki.remove"></fmt:message>
 					</a>
 		</c:if>
 		<c:if test="${currentWikiPage.deleted}">
-			&nbsp;
 			<a href="javascript:submitWiki('restorePage')"
 				title="<fmt:message key="label.wiki.restore.toolTip"></fmt:message>"
 			>
-				<fmt:message key="label.wiki.restore"></fmt:message>
+				<i class="fa fa-xm fa-backward"></i> <fmt:message key="label.wiki.restore"></fmt:message>
 			</a>	
 		</c:if>
-	</div>
-</div>
+	</div> <!-- end wiki menu -->
+	</div> <!--  end panel-heading -->
+</div> <!--  end panel for overall heading & buttons -->
 
-<br />
-<br />
-<hr />
-<br />
-
-<div id="view" style="margin-right:75px;">
-	<h1>
-		<c:out value="${currentWikiPage.title}" escapeXml="true"/>
-	</h1>
-	
-	<br />
-	
-	<i> 
+<div class="panel panel-default" id="view">
+   <div class="panel-heading">
+     <h4 class="panel-title"><c:out value="${currentWikiPage.title}" escapeXml="true"/></h4>
+     <!-- Last edited -->
+     <div class="voffset5" style="font-size: 12px">
+     	<!-- Last edited -->
 		<fmt:message key="label.wiki.last.edit">
 			<fmt:param>
 				<c:choose>
@@ -86,31 +73,27 @@
 					</c:otherwise>
 				</c:choose>
 			</fmt:param>
-			<fmt:param>
-				<lams:Date value="${currentWikiPage.currentWikiContentDTO.editDate}" />
-			</fmt:param>
+            <fmt:param>
+               <time class="timeago" datetime="<fmt:formatDate value='${currentWikiPage.currentWikiContentDTO.editDate}' pattern="yyyy-MM-dd'T'HH:mm:ss.S'Z'"/>"><lams:Date value="${currentWikiPage.currentWikiContentDTO.editDate}" /></time>
+             </fmt:param>
 		</fmt:message> 
-	</i> 
-	
-	<br />
-	<br />
-	
-	<div id="viewBody">
-		<c:out value="${currentWikiPage.currentWikiContentDTO.body}" escapeXml="false"/>
+		</div> <!-- End last edited -->
 	</div>
+    <div class="panel-body" id="viewBody">
+		<c:out value="${currentWikiPage.currentWikiContentDTO.body}" escapeXml="false"/>
+    </div>
 </div>
 
-<div id="history" style="display: none;">
-
-	<h1>
-	<fmt:message key="label.wiki.history" /> - <c:out value="${currentWikiPage.title}" />
-	</h1>
-	
-	<br />
-	
+<div class="panel panel-default" id="history" style="display: none">
+  <div class="panel-heading">
+    <h4 class="panel-title">
+      <fmt:message key="label.wiki.history" /> - <c:out value="${currentWikiPage.title}" />
+    </h4>
+  </div>
+  <div class="panel-body">
 	<c:choose>
 		<c:when test="${not empty wikiPageContentHistory}">
-			<table class="alternative-color">
+			<table class="table table-striped table-condensed">
 				<tr>
 					<th>
 						<fmt:message key="label.wiki.history.version"></fmt:message>
@@ -168,99 +151,80 @@
 		</c:otherwise>
 	</c:choose>
 </div>
+</div>
 
-
-<div id="edit" style="display: none;">
-	<h1>
-		<fmt:message key="label.wiki.edit"></fmt:message> - <c:out value="${currentWikiPage.title}" escapeXml="true"/>
-	</h1>
-	
-	<table cellpadding="0">
-		<tr>
-			<td>
-				<div class="field-name"><fmt:message key="label.authoring.basic.title"></fmt:message></div>
-				<html:text property="title" styleId="title" style="width: 99%;" value="${currentWikiPage.title}"></html:text><span style="display: none;'" class="title error"><fmt:message key="error.title.invalid.characters"/>
-			</td>
-		</tr>
-		<tr>
-			<td>
-				<div class="field-name">
-					<fmt:message key="label.wiki.body"></fmt:message>
-				</div>
-				<lams:CKEditor id="wikiBody"
-					value="${currentWikiPage.currentWikiContentDTO.body}"
-					contentFolderID="${sessionMap.contentFolderID}"
-					toolbarSet="CustomWiki" height="400px">
-				</lams:CKEditor>
-			</td>
-		</tr>
-		<tr>
-			<td>
-				<html:checkbox property="isEditable" value="1" styleClass="noBorder" styleId="isEditable"></html:checkbox>
-				&nbsp;
+<div class="panel panel-default" id="edit" style="display: none">
+	<div class="panel-heading">
+		<h4 clas="panel-title">
+			<fmt:message key="label.wiki.edit"></fmt:message> -  <c:out value="${currentWikiPage.title}" escapeXml="true"/>
+		</h4>
+	</div>
+	<div class="panel-body">
+	  	<div class="form-group">
+	  		<label for="title"><fmt:message key="label.authoring.basic.title"></fmt:message></label>
+			<html:text property="title" styleId="title" style="width: 99%;" value="${currentWikiPage.title}" styleClass="form-control"></html:text>
+			<span style="display: none;'" class="title error"><fmt:message key="error.title.invalid.characters"/>
+		</div>
+	  	<div class="form-group">
+			<label for="wikiBody"><fmt:message key="label.wiki.body"></fmt:message></label>
+			<lams:CKEditor id="wikiBody"
+				value="${currentWikiPage.currentWikiContentDTO.body}"
+				contentFolderID="${sessionMap.contentFolderID}"
+				toolbarSet="CustomWiki" height="400px">
+			</lams:CKEditor>
+		</div>
+		<div class="checkbox">
+			<label for="isEditable">
+				<html:checkbox property="isEditable" value="1" styleId="isEditable"></html:checkbox>
 				<fmt:message key="label.authoring.basic.wikipagevisible"></fmt:message>
-			</td>
-		</tr>
-		<tr>
-			<td align="right">
-				<a href="javascript:doEditOrAdd('editPage');" class="button"><fmt:message key="label.wiki.savechanges"></fmt:message></a>
-				<a href="javascript:changeDiv('view');" class="button"><fmt:message key="button.cancel"></fmt:message></a>
-			</td>
-		</tr>
-	</table>
+			</label>
+		</div>
+		<div class="pull-right">
+			<a href="javascript:doEditOrAdd('editPage');" class="btn btn-primary"><fmt:message key="label.wiki.savechanges"></fmt:message></a>
+			<a href="javascript:changeDiv('view');" class="btn btn-default"><fmt:message key="button.cancel"></fmt:message></a>
+		</div>
+	</div>
 </div>
 
-<div id="add" style="display: none;">
-
-	<h1>
-		<fmt:message key="label.wiki.add"></fmt:message>
-	</h1>
-	<table cellpadding="0">
-		<tr>
-			<td>
-				<div class="field-name">
-					<fmt:message key="label.authoring.basic.title"></fmt:message>
-				</div>
-				<html:text property="newPageTitle" styleId="newPageTitle" style="width: 99%;" value=""></html:text><span style="display: none;'" class="newPageTitle error"><fmt:message key="error.title.invalid.characters"/>
-			</td>
-		</tr>
-		<tr>
-			<td>
-				<div class="field-name">
-					<fmt:message key="label.wiki.body"></fmt:message>
-				</div>
-				<lams:CKEditor id="newPageWikiBody" value="" height="400px"
-					contentFolderID="${sessionMap.contentFolderID}"
-					toolbarSet="CustomWiki">
-				</lams:CKEditor>
-			</td>
-		</tr>
-		<tr>
-			<td>
-				<html:checkbox property="newPageIsEditable" styleClass="noBorder" value="1" styleId="newPageIsEditable"></html:checkbox>
-				&nbsp;
+<div class="panel panel-default" id="add" style="display: none">
+  <div class="panel-heading">
+    <h4 clas="panel-title">
+      <fmt:message key="label.wiki.add"></fmt:message>
+    </h4>
+  </div>
+  <div class="panel-body">
+  	  	<div class="form-group">
+	  		<label for="newPageTitle"><fmt:message key="label.authoring.basic.title"></fmt:message></label>
+			<html:text property="newPageTitle" styleId="newPageTitle" style="width: 99%;" value="" styleClass="form-control"></html:text>
+			<span style="display: none;'" class="newPageTitle error"><fmt:message key="error.title.invalid.characters"/>
+		</div>
+	  	<div class="form-group">
+			<label for=newPageWikiBody><fmt:message key="label.wiki.body"></fmt:message></label>
+			<lams:CKEditor id="newPageWikiBody" value="" height="400px"
+				contentFolderID="${sessionMap.contentFolderID}"
+				toolbarSet="CustomWiki">
+			</lams:CKEditor>
+		</div>
+		<div class="checkbox">
+			<label for=newPageIsEditable>
+				<html:checkbox property="newPageIsEditable" value="1" styleId="newPageIsEditable"></html:checkbox>
 				<fmt:message key="label.authoring.basic.wikipagevisible"></fmt:message>
-			</td>
-		</tr>
-		<tr>
-			<td align="right">
-				<a href="javascript:doEditOrAdd('addPage');" class="button"><fmt:message key="label.wiki.savechanges"></fmt:message></a>
-				<a href="javascript:cancelAdd();changeDiv('view');" class="button"><fmt:message key="button.cancel"></fmt:message></a>
-			</td>
-		</tr>
-	</table>
+			</label>
+		</div>
+		<div class="pull-right">
+			<a href="javascript:doEditOrAdd('addPage');" class="btn btn-primary"><fmt:message key="label.wiki.savechanges"></fmt:message></a>
+			<a href="javascript:cancelAdd();changeDiv('view');" class="btn btn-default"><fmt:message key="button.cancel"></fmt:message></a>
+		</div>
+  </div>
 </div>
 
-<br />
-<hr />
-<br />
-
-<div class="field-name">
-	<fmt:message key="label.wiki.pages"></fmt:message>
-</div>
+<!-- Wiki pages folders -->
+<h4>
+  <fmt:message key="label.wiki.pages"></fmt:message>
+</h4>
 
 <img src="<lams:WebAppURL />/images/tree_closed.gif" id="wikiListImage" 
-	onclick="javascript:toggleWikiList('<lams:WebAppURL />')" />
+     onclick="javascript:toggleWikiList('<lams:WebAppURL />')" />
 &nbsp;
 <a href="javascript:changeWikiPage('${fn:escapeXml(mainWikiPage.javaScriptTitle)}')">${fn:escapeXml(mainWikiPage.title)}</a>
 <div id="wikiList" style="display:none;">
@@ -271,7 +235,8 @@
 			<br />
 		</c:if> 
 	</c:forEach>
-</div>
+</div>                
+<!-- end wiki pages folders -->
 
 <script type="text/javascript">
 <!--
