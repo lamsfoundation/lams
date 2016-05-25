@@ -30,6 +30,9 @@ function closeEditPane() {
 
 <c:set var="session" value="${requestScope.sessionDTO}" />
 
+<c:set var="title"><fmt:message key="pageTitle.monitoring.chatHistory"/></c:set>
+<lams:Page title="${title}" type="learner">
+
 <c:choose>
 	<c:when test="${empty session.messageDTOs}">
 		<fmt:message key="message.noChatMessages" />
@@ -37,18 +40,22 @@ function closeEditPane() {
 	<c:otherwise>
 		<div class="space-left space-right">
 			<c:forEach var="message" items="${session.messageDTOs}">
-				<c:set var="hiddenStyle" value="" />
-				<c:if test="${message.hidden}">
-					<c:set var="hiddenStyle" value="color: graytext" />
-				</c:if>
+				<c:choose>
+				<c:when test="${message.hidden}">
+					<c:set var="hiddenStyle" value="color: graytext; text-decoration:line-through" />
+				</c:when>
+				<c:otherwise>
+					<c:set var="hiddenStyle" value="" />
+				</c:otherwise>
+				</c:choose>
 
 				<div class="message"
 					onclick="javascript:toggleEditPane('u${message.uid}')" style="">
 					<div class="messageFrom">
 						${message.from}
 					</div>
-					<lams:out escapeHtml="true" value="${message.body}"></lams:out>
-					<img src="images/edit.gif" alt="edit" />
+					<span style="${hiddenStyle}"><lams:out escapeHtml="true" value="${message.body}"></lams:out></span>
+					<i class="fa fa-pencil"	title="<fmt:message key='button.edit'/>"></i>
 				</div>
 
 				<div id="u${message.uid}" class="edit-pane">
@@ -60,11 +67,11 @@ function closeEditPane() {
 						<c:choose>
 							<c:when test="${message.hidden}">
 								<input id="cb${message.uid}" name="messageHidden"
-									type="checkbox" checked="checked" class="noBorder" />
+									type="checkbox" checked="checked"/>
 							</c:when>
 							<c:otherwise>
 								<input id="cb${message.uid}" name="messageHidden"
-									type="checkbox" class="noBorder" />
+									type="checkbox"/>
 							</c:otherwise>
 						</c:choose>
 
@@ -76,14 +83,13 @@ function closeEditPane() {
 						<html:textarea property="messageBody" value="${message.body}"
 							style="width:95%" rows="3" />
 						<br />
-						<br />
 
-						<html:submit styleClass="button">
+						<html:submit styleClass="btn btn-primary btn-sm">
 							<fmt:message>button.save</fmt:message>
-						</html:submit>
+						</html:submit>&nbsp;
 						<html:button property="dispatch"
 							onclick="javascript:toggleEditPane('u${message.uid}')"
-							styleClass="button">
+							styleClass="btn btn-default btn-sm">
 							<fmt:message>button.cancel</fmt:message>
 						</html:button>
 					</html:form>
@@ -94,3 +100,4 @@ function closeEditPane() {
 		</div>
 	</c:otherwise>
 </c:choose>
+</lams:Page>

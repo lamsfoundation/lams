@@ -1,5 +1,8 @@
 <%@ include file="/common/taglibs.jsp"%>
 
+<c:set var="title"><fmt:message key="heading.reflection"/></c:set>
+<lams:Page title="${title}" type="learner">
+
 <table>
 	<tr>
 		<td>
@@ -17,3 +20,4 @@
 	</tr>
 </table>
 
+</lams:Page>
