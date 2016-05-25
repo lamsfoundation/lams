@@ -85,7 +85,7 @@
 
 	    <forward
 			name="editQuestionBox"
-			path="/authoring/editQuestionBox.jsp"
+			path="/authoring/newQuestionBox.jsp"
 			redirect="false"
 	    />
 
