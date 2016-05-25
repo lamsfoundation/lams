@@ -1,32 +1,27 @@
 <!DOCTYPE html>
         
-
 <%@ include file="/common/taglibs.jsp"%>
-
-<%@ page import="java.util.LinkedHashSet" %>
-<%@ page import="java.util.Set" %>
 <%@ page import="org.lamsfoundation.lams.tool.qa.QaAppConstants"%>
-
-    <% 
-		Set tabs = new LinkedHashSet();
-		tabs.add("label.basic");
-		tabs.add("label.advanced");
-		tabs.add("label.conditions");
-		pageContext.setAttribute("tabs", tabs);
-	%>
+<c:set var="lams">
+	<lams:LAMSURL />
+</c:set>
+<c:set var="tool">
+	<lams:WebAppURL />
+</c:set>
 
 <lams:html>		
 	<lams:head>
 	<title><fmt:message key="activity.title" /></title>
-
-	<%@ include file="/common/tabbedheader.jsp"%>
-	<link href="${lams}css/jquery-ui-redmond-theme.css" rel="stylesheet" type="text/css" >
+	<lams:css/>
+	<link type="text/css" href="${lams}/css/jquery-ui-smoothness-theme.css" rel="stylesheet">
+	
+	<script type="text/javascript" src="${lams}includes/javascript/common.js"></script>
 	<script type="text/javascript" src="${lams}includes/javascript/jquery.js"></script>
 	<script type="text/javascript" src="${lams}includes/javascript/jquery-ui.js"></script>
+	<script type="text/javascript" src="${lams}includes/javascript/bootstrap.min.js"></script>
+	<script type="text/javascript" src="${lams}includes/javascript/bootstrap.tabcontroller.js"></script>
 	
- 	<!-- ******************** FCK Editor related javascript & HTML ********************** -->
-	<script language="JavaScript" type="text/JavaScript">
-
+	<script type="text/JavaScript">
 		function submitMethod(actionMethod) {
 			document.QaAuthoringForm.dispatch.value=actionMethod; 
 			document.QaAuthoringForm.submit();
@@ -37,69 +32,64 @@
 			submitMethod(actionMethod);
 		}
         
-        function init() {
-	         var tag = document.getElementById("currentTab");
-		    if(tag.value != "")
-		    	selectTab(tag.value);
-	        else
-	            selectTab(1); //select the default tab;
-        }
-        
         function doSelectTab(tabId) {
-        	// start optional tab controller stuff
-        	var tag = document.getElementById("currentTab");
-	    	tag.value = tabId;
-	    	// end optional tab controller stuff
 	    	selectTab(tabId);
         } 
-        
-        function doSubmit(method) {
-        	document.QaAuthoringForm.dispatch.value=method;
-        	document.QaAuthoringForm.submit();
-        }
-
 	</script>
 </lams:head>
 
-<body class="stripes" onLoad="init();">
-
-<div id="page">
-	<h1>  <fmt:message key="label.authoring.qa"/> </h1>
+<body class="stripes">
+<html:form action="/authoring?validate=false" styleId="authoringForm" method="POST" enctype="multipart/form-data">
+	<c:set var="formBean" value="<%=request.getAttribute(org.apache.struts.taglib.html.Constants.BEAN_KEY)%>" />
+	<c:set var="sessionMap" value="${sessionScope[formBean.httpSessionID]}" />
+	<c:set var="title"><fmt:message key="activity.title" /></c:set>
 	
-	<div id="header">			
-		<lams:Tabs collection="${tabs}" useKey="true" control="true" />						
-	</div>
+	<html:hidden property="mode" value="${mode}" />
+	<html:hidden property="dispatch" value="submitAllContent" />
+	<html:hidden property="toolContentID" />
+	<html:hidden property="contentFolderID" />
+	<html:hidden property="httpSessionID"/>		
+	
+<lams:Page title="${title}" type="navbar">
+	<lams:Tabs control="true" title="${title}" helpToolSignature="<%= QaAppConstants.MY_SIGNATURE %>" helpModule="authoring">
+		<lams:Tab id="1" key="label.basic" />
+		<c:if test="${mode == 'author'}">
+			<lams:Tab id="2" key="label.advanced" />
+			<lams:Tab id="3" key="label.conditions" />
+		</c:if>
+	</lams:Tabs>
 
-	<div id="content">	
-		<html:form  action="/authoring?validate=false" styleId="authoringForm" enctype="multipart/form-data" method="POST" target="_self">
-			<c:set var="formBean" value="<%= request.getAttribute(org.apache.struts.taglib.html.Constants.BEAN_KEY) %>" />
-			<c:set var="sessionMap" value="${sessionScope[formBean.httpSessionID]}" scope="request"/>
-			
-			<html:hidden property="dispatch" value="submitAllContent"/>
-			<html:hidden property="toolContentID"/>
-			<html:hidden property="currentTab" styleId="currentTab" />
-			<html:hidden property="httpSessionID"/>									
-			<html:hidden property="contentFolderID"/>
-			<input type="hidden" name="mode" value="${mode}">											
-			
-			<%@ include file="/common/messages.jsp"%>
-			
-			<lams:help toolSignature="<%= QaAppConstants.MY_SIGNATURE %>" module="authoring"/>	
+	<lams:TabBodyArea>
+		<logic:messagesPresent>
+			<lams:Alert id="errors" type="danger" close="true">
+			        <html:messages id="error">
+			            <c:out value="${error}" escapeXml="false"/><br/>
+			        </html:messages>
+			</lams:Alert>
+		</logic:messagesPresent>
+		
+		<lams:TabBodys>
 			<lams:TabBody id="1" titleKey="label.basic" page="BasicContent.jsp"/>
-			      
-			<lams:TabBody id="2" titleKey="label.advanced" page="AdvancedContent.jsp" />
-
-			<lams:TabBody id="3" titleKey="label.conditions" page="conditions.jsp" />
-			
-			<lams:AuthoringButton formID="authoringForm" clearSessionActionUrl="/clearsession.do" toolSignature="laqa11" 
-				cancelButtonLabelKey="label.cancel" saveButtonLabelKey="label.save" toolContentID="${formBean.toolContentID}" 
-				contentFolderID="${formBean.contentFolderID}" accessMode="${mode}" defineLater="${mode=='teacher'}"/>		
-		</html:form>		
-	</div>
-
+			<c:if test="${mode == 'author'}">
+				<lams:TabBody id="2" titleKey="label.advanced" page="AdvancedContent.jsp" />
+				<lams:TabBody id="3" titleKey="label.conditions" page="conditions.jsp" />
+			</c:if>
+	    </lams:TabBodys>
+	    
+		<lams:AuthoringButton formID="authoringForm"
+			clearSessionActionUrl="/clearsession.do"
+			toolSignature="<%=QaAppConstants.MY_SIGNATURE%>"
+			accessMode="${mode}"
+			defineLater="${mode == 'teacher'}"
+			cancelButtonLabelKey="label.cancel"
+			saveButtonLabelKey="label.save"
+			toolContentID="${formBean.toolContentID}"
+			contentFolderID="${formBean.contentFolderID}" />
+	</lams:TabBodyArea>
+	
 	<div id="footer"></div>
-
-</div>
-
+	
+</lams:Page>
+</html:form>
 </body>
 </lams:html>
