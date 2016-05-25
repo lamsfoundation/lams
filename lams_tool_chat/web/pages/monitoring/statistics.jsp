@@ -1,15 +1,22 @@
 <%@ include file="/common/taglibs.jsp"%>
 
 <c:set var="dto" value="${requestScope.monitoringDTO}" />
-<c:forEach var="session" items="${dto.sessionDTOs}">
-	<table cellspacing="0">
-		<tbody>
-			<tr>
-				<td colspan="2">
-					<h2>${session.sessionName}</h2>
-				</td>
-			</tr>
 
+
+<c:forEach var="session" items="${dto.sessionDTOs}">
+
+	<c:if test="${isGroupedActivity}">	
+	    <div class="panel panel-default" >
+        <div class="panel-heading" id="heading${session.sessionID}">
+			<span class="panel-title">
+				<c:out value="${session.sessionName}" />
+			</span>
+        </div>
+        <div class="panel-body">
+	</c:if>
+
+	<table class="table table-condensed table-no-border">
+		<tbody>
 			<tr>
 				<td class="field-name" style="width: 30%;">
 					<fmt:message>heading.totalLearners</fmt:message>
@@ -49,5 +56,9 @@
 			</c:forEach>
 		</tbody>
 	</table>
-	<hr/>
+	
+	<c:if test="${isGroupedActivity}">	
+		</div>
+	</c:if>
+	
 </c:forEach>

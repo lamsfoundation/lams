@@ -22,38 +22,18 @@
  */
 
 /**
- * TabName Tag
- *	Author: Mitchell Seaton
- *	Description: Shortens name that are too long to fit inside a tab
+ * TabBodyArea.tag
+ *	Author: Fiona Malikoff
+ *	Description: Creates the panel body area for a nav bar screen
+ * Wiki: 
  */
 
-		%>
-<%@ tag body-content="scriptless" %>
-
-<%@ attribute name="url" required="true" rtexprvalue="true"%>
-<%@ attribute name="highlight" required="false" rtexprvalue="true" %>
-
+%>
 <%@ taglib uri="tags-core" prefix="c"%>
-<%@ taglib uri="tags-function" prefix="fn"%>
+<%@ taglib uri="tags-bean" prefix="bean"%>
 
-<c:set var="limit">12</c:set>
-<c:set var="fullname"><jsp:doBody/></c:set>
-<c:set var="titleValue" value=""/>
+<div class="panel-body panel-monitor-body">
+	 <jsp:doBody />
+</div>
 
-<c:choose>
-	<c:when test="${fn:length(fullname) > limit}">
-			<c:set var="titleValue" value="${fullname}"/>
-			<c:set var="tabname" value="${fn:substring(fullname, 0, limit-2)}..."/>
-	</c:when>
-	<c:otherwise>
-		<c:set var="tabname" value="${fullname}"/>
-	</c:otherwise>
-</c:choose>
-
-<c:if test="${highlight eq true}">
-	<c:set var="classVar" value="tab-link-highlight" />
-</c:if>
-
-<a class="tab-middle-link ${classVar}" href="<c:out value='${url}' />" title="<c:out value='${titleValue}'/>" style="border:0;">
-	<c:out value="${tabname}" escapeXml="false"/>	
-</a>
+</div> <!--  close tab opened in TabHeader -->

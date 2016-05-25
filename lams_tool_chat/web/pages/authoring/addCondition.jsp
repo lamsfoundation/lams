@@ -13,21 +13,20 @@
 		</title>
 		<link href="${tool}includes/css/chat.css" rel="stylesheet" type="text/css">
 		<lams:headItems />
-		<lams:css style="main" />
-		
-		<script type="text/javascript"> 
-			function callHideConditionMessage() {
-				if (window.hideConditionMessage) {
-					window.hideConditionMessage();
-				} else if (window.parent && window.parent.hideConditionMessage) {
-					window.parent.hideConditionMessage();
-				} else if (window.top && window.top.hideConditionMessage) {
-					window.top.hideConditionMessage();
-				}
-			}
-		</script>
+		<lams:css/>
 	</lams:head>
-	<body class="tabpart">
+	
+	<body>
+	
+	<div class="panel panel-default">
+	<div class="panel-heading">
+		<div class="panel-title">
+			<fmt:message key="label.authoring.conditions.add.condition" />
+		</div>
+	</div>
+
+	<div class="panel-body">
+	
 		<!-- Basic Info Form-->
 		<%@ include file="/common/messages.jsp"%>
 		<html:form action="/authoring/saveOrUpdateCondition" method="post" styleId="chatConditionForm" focus="displayName" >
@@ -36,21 +35,23 @@
 				<fmt:message key="label.authoring.conditions.add.condition" />
 			</h2>
 
-			<div class="field-name">
-            	<fmt:message key="label.authoring.conditions.condition.name" />
-			</div>
-			<div class="small-space-bottom">
-         		<html:text property="displayName" size="51"/>
+			<div class="form-group">
+            	<label for="displayName"><fmt:message key="label.authoring.conditions.condition.name" /></label>
+         		<html:text property="displayName" size="51" styleClass="form-control" />
 			</div>
 			<%-- Text search form fields are being included --%>
 			<lams:TextSearch wrapInFormTag="false" sessionMapID="${sessionMapID}"  />
 		</html:form>
 
-		<lams:ImgButtonWrapper>
-			<a href="javascript:;" onclick="javascript:chatConditionForm.submit();" class="button-add-item"><fmt:message
-					key="button.save" /> </a>
-			<a href="javascript:;" onclick="javascript:callHideConditionMessage()"
-				class="button space-left"><fmt:message key="label.cancel" /> </a>
-		</lams:ImgButtonWrapper>
+		<div class="voffset5">
+			<a href="javascript:;" onclick="submitCondition();" class="btn btn-default btn-xs">
+				<fmt:message key="label.save" /></a>
+			<a href="javascript:;" onclick="hideConditionMessage()" class="btn btn-default btn-xs">
+				<fmt:message key="label.cancel" /> </a>
+		</div>
+
+	</div>
+</div>
+
 	</body>
 </lams:html>

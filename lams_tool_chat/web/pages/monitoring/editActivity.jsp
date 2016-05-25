@@ -3,12 +3,12 @@
 <c:set var="dto" value="${requestScope.monitoringDTO}" />
 
 <c:if test="${dto.contentInUse}">
-	<p class="warning">
+	<lams:Alert type="warn" id="no-edit" close="false">
 		<fmt:message key="message.alertContentEdit" />
-	</p>
+	</lams:Alert>
 </c:if>
 
-<table cellspacing="0">
+<table class="table table-condensed">
 	<tbody>
 		<tr>
 			<td class="field-name" style="width: 10%;" nowrap>
@@ -34,8 +34,7 @@
 	<c:param name="mode" value="teacher" />
 	<c:param name="contentFolderID" value="${contentFolderID}"></c:param>
 </c:url>
-<html:link href="${fn:escapeXml(authoringUrl)}"
-	styleClass="button right-buttons" target="_blank">
+<a href="#" onClick="javascript:launchPopup('${authoringUrl}')" class="btn btn-default">
 	<fmt:message key="button.editActivity" />
-</html:link>
+</a>
 

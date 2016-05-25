@@ -1,27 +1,23 @@
 <%@ include file="/common/taglibs.jsp"%>
 
 <!-- ========== Advanced Tab ========== -->
-<p class="small-space-top">
-	<html:checkbox property="lockOnFinished" value="1"
-		styleClass="noBorder" styleId="lockOnFinished">
-	</html:checkbox>
-
+<div class="checkbox">
 	<label for="lockOnFinished">
-		<fmt:message key="advanced.lockOnFinished" />
+	<html:checkbox property="lockOnFinished" value="1"	styleId="lockOnFinished">	</html:checkbox>
+	<fmt:message key="advanced.lockOnFinished" />
 	</label>
-</p>
+</div>
 
-<p>
-	<html:checkbox property="reflectOnActivity" value="1"
-		styleClass="noBorder" styleId="reflectOnActivity"></html:checkbox>
-
+<div class="checkbox">
 	<label for="reflectOnActivity">
-		<fmt:message key="advanced.reflectOnActivity" />
+	<html:checkbox property="reflectOnActivity" value="1" styleId="reflectOnActivity"></html:checkbox>
+	<fmt:message key="advanced.reflectOnActivity" />
 	</label>
-</p>
-<p>
-	<html:textarea property="reflectInstructions" cols="30" rows="3" styleId="reflectInstructions"/>
-</p>
+</div>
+
+<div class="form-group">
+	<html:textarea property="reflectInstructions" rows="3" styleId="reflectInstructions" styleClass="form-control"/>
+</div>
 <script type="text/javascript">
 <!--
 //automatically turn on refect option if there are text input in refect instruction area
@@ -40,15 +36,13 @@
 	ra.onkeyup=turnOnRefect;
 //-->
 </script>
-<p>
-	<html:checkbox property="filteringEnabled" value="1"
-		styleClass="noBorder" styleId="filteringEnabled"></html:checkbox>
-
+<div class="checkbox">
 	<label for="filteringEnabled">
-		<fmt:message key="advanced.filteringEnabled" />
+	<html:checkbox property="filteringEnabled" value="1" styleId="filteringEnabled"></html:checkbox>
+	<fmt:message key="advanced.filteringEnabled" />
 	</label>
-</p>
-<p>
-	<html:textarea property="filterKeywords" cols="30" rows="3" />
-</p>
+</div>
+<div class="form-group">
+	<html:textarea property="filterKeywords" rows="3" styleClass="form-control"/>
+</div>
 

@@ -11,54 +11,53 @@
 		<c:set var="defineLater" value="yes" />
 	</c:if>
 
-	<div id="header">
-		<lams:Tabs control="true">
+	<html:hidden property="currentTab" styleId="currentTab" />
+	<html:hidden property="dispatch" value="updateContent" />
+	<html:hidden property="sessionMapID" />
+
+	<c:set var="title"><fmt:message key="activity.title" /></c:set>
+	<lams:Page title="${title}" type="navbar">
+
+		<lams:Tabs control="true" title="${title}" helpToolSignature="<%= ChatConstants.TOOL_SIGNATURE %>" helpModule="authoring">
 			<lams:Tab id="1" key="button.basic" />
 			<c:if test="${sessionMap.mode == 'author'}">
 				<lams:Tab id="2" key="button.advanced" />
 				<lams:Tab id="3" key="button.conditions" />
 			</c:if>
 		</lams:Tabs>
-	</div>
-	<!--closes header-->
 
-	<div id="content">
-
-		<div>
-			<html:hidden property="currentTab" styleId="currentTab" />
-			<html:hidden property="dispatch" value="updateContent" />
-			<html:hidden property="sessionMapID" />
-		</div>
-
-		<div id="message" style="text-align: center;">
-			<logic:messagesPresent>
-				<p class="warning">
-				        <html:messages id="error">
-				            <c:out value="${error}" escapeXml="false"/><br/>
-				        </html:messages>
-				</p>
-			</logic:messagesPresent>
-		</div>
+		<lams:TabBodyArea>
 		
-		<lams:help toolSignature="<%=ChatConstants.TOOL_SIGNATURE%>"
-			module="authoring" />
+			<div id="message" style="text-align: center;">
+				<logic:messagesPresent>
+					 <lams:Alert id="errorMessages" type="danger" close="false">
+			            <c:out value="${error}" escapeXml="false"/><br/>
+			         </lams:Alert>
+				</logic:messagesPresent>
+			</div>
+		
+			<%-- Page tabs --%>
+			<lams:TabBodys>
+				<lams:TabBody id="1" titleKey="button.basic" page="basic.jsp" />
+				<c:if test="${sessionMap.mode == 'author'}">
+					<lams:TabBody id="2" titleKey="button.advanced" page="advanced.jsp" />
+					<lams:TabBody id="3" titleKey="button.conditions" page="conditions.jsp" />
+				</c:if>
+			</lams:TabBodys>
+			
+			<lams:AuthoringButton formID="authoringForm"
+				clearSessionActionUrl="/clearsession.do" toolSignature="lachat11"
+				cancelButtonLabelKey="button.cancel" saveButtonLabelKey="button.save"
+				toolContentID="${sessionMap.toolContentID}"
+				accessMode="${sessionMap.mode}" defineLater="${defineLater}"
+				customiseSessionID="${sessionMap.sessionID}"
+				contentFolderID="${sessionMap.contentFolderID}" />
+				
+		</lams:TabBodyArea>
 
-		<%-- Page tabs --%>
-		<lams:TabBody id="1" titleKey="button.basic" page="basic.jsp" />
-		<c:if test="${sessionMap.mode == 'author'}">
-			<lams:TabBody id="2" titleKey="button.advanced" page="advanced.jsp" />
-			<lams:TabBody id="3" titleKey="button.conditions" page="conditions.jsp" />
-		</c:if>
+		<div id="footer"></div>
 
-		<lams:AuthoringButton formID="authoringForm"
-			clearSessionActionUrl="/clearsession.do" toolSignature="lachat11"
-			cancelButtonLabelKey="button.cancel" saveButtonLabelKey="button.save"
-			toolContentID="${sessionMap.toolContentID}"
-			accessMode="${sessionMap.mode}" defineLater="${defineLater}"
-			customiseSessionID="${sessionMap.sessionID}"
-			contentFolderID="${sessionMap.contentFolderID}" />
-	</div>
-	<!--closes content-->
+	</lams:Page>
+
 </html:form>
 
-<div id="footer"></div>
