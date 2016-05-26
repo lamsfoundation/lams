@@ -7,22 +7,13 @@
 <%@ page import="java.util.Set" %>
 <%@ page import="org.lamsfoundation.lams.tool.vote.VoteAppConstants"%>
 
-    <% 
-		Set tabs = new LinkedHashSet();
-		tabs.add("label.basic");
-		tabs.add("label.advanced");
-		pageContext.setAttribute("tabs", tabs);
-	%>
-
 	<lams:html>
 	<lams:head>
-	<title> <fmt:message key="activity.title"/>  </title>
-
-	<%@ include file="/common/tabbedheader.jsp"%>
-	<script type="text/javascript" src="${lams}includes/javascript/prototype.js"></script>
+		<title> <fmt:message key="activity.title"/>  </title>
+		<lams:headItems/>
 
 	<script type="text/javascript">
-		var noneDataFlowSelectedPreviously = null;
+ 		var noneDataFlowSelectedPreviously = null;
 		
         function init(){
 	    	var tag = document.getElementById("currentTab");
@@ -111,21 +102,13 @@
 			document.VoteAuthoringForm.uuid.value=uuid; 
 			submitMethod(actionMethod);
 		}
-
+ 
 	</script>
 	
 </lams:head>
-<body class="stripes" onLoad="init();">
+<body class="stripes" ><!-- onLoad="init();" -->
 
-<div id="page">
-	<h1> <fmt:message key="label.authoring.vote"/> </h1>
-	
-	<div id="header">			
-		<lams:Tabs collection="${tabs}" useKey="true" control="true"/>								
-	</div>
-	
-	<div id="content">	
-		<html:form  styleId="authoringForm" action="/authoring?validate=false" enctype="multipart/form-data" method="POST" target="_self">
+	<html:form  styleId="authoringForm" action="/authoring?validate=false" enctype="multipart/form-data" method="POST" target="_self">
 		<c:set var="formBean" value="<%= request.getAttribute(org.apache.struts.taglib.html.Constants.BEAN_KEY) %>" />
 		<html:hidden property="dispatch" value="submitAllContent"/>
 		<html:hidden property="toolContentID"/>
@@ -133,29 +116,40 @@
 		<html:hidden property="httpSessionID"/>									
 		<html:hidden property="contentFolderID"/>
 		<input type="hidden" name="mode" value="${mode}">
-		
-		<%@ include file="/common/messages.jsp"%>
-		
-		<lams:help toolSignature="<%= VoteAppConstants.MY_SIGNATURE %>" module="authoring"/>
-					
-			<lams:TabBody id="1" titleKey="label.basic" page="BasicContent.jsp"/>
-			      
-			<lams:TabBody id="2" titleKey="label.advanced" page="AdvancedContent.jsp" />
 
-			<lams:AuthoringButton formID="authoringForm" clearSessionActionUrl="/clearsession.do" toolSignature="lavote11" 
+
+		<c:set var="title"><fmt:message key="activity.title" /></c:set>
+		<lams:Page title="${title}" type="navbar">
+		
+			 <lams:Tabs control="true" title="${title}" helpToolSignature="<%= VoteAppConstants.MY_SIGNATURE %>" helpModule="authoring">
+                  <lams:Tab id="1" key="label.basic" />
+                  <lams:Tab id="2" key="label.advanced" />
+	         </lams:Tabs>   
+
+			<lams:TabBodyArea>
+				<%@ include file="/common/messages.jsp"%>
+              
+                <!--  Set up tabs  -->
+                 <lams:TabBodys>
+    				<lams:TabBody id="1" titleKey="label.basic" page="BasicContent.jsp"/>
+					<lams:TabBody id="2" titleKey="label.advanced" page="AdvancedContent.jsp" />
+                </lams:TabBodys>
+  	
+  				<lams:AuthoringButton formID="authoringForm" clearSessionActionUrl="/clearsession.do" toolSignature="lavote11" 
 				cancelButtonLabelKey="label.cancel" saveButtonLabelKey="label.save" toolContentID="${formBean.toolContentID}" 
 				contentFolderID="${formBean.contentFolderID}" accessMode="${mode}" defineLater="${mode=='teacher'}"/>
+			</lams:TabBodyArea>
 			
-		</html:form>
-	</div>
+			<div id="footer"></div>
 
-	<div id="footer"></div>
-	</div>
+		</lams:Page>
+
+	</html:form>
 
 	<script type="text/javascript">
 		<c:if test="${ not empty formBean.maxNominationCount }"> 			
 			changeMinMaxVotes(${formBean.maxNominationCount}, ${formBean.minNominationCount});
-		</c:if>
+		</c:if> 
 	</script>
 
 </body>

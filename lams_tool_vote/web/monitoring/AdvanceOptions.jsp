@@ -1,14 +1,7 @@
-<h1 style="padding-bottom: 10px;">
-	<img src="<lams:LAMSURL/>/images/tree_closed.gif" id="treeIcon" onclick="javascript:toggleAdvancedOptionsVisibility(document.getElementById('advancedDiv'), document.getElementById('treeIcon'), '<lams:LAMSURL/>');" />
-
-	<a href="javascript:toggleAdvancedOptionsVisibility(document.getElementById('advancedDiv'), document.getElementById('treeIcon'),'<lams:LAMSURL/>');" >
-		<fmt:message key="monitor.summary.th.advancedSettings" />
-	</a>
-</h1>
-<br />
-
-<div class="monitoring-advanced" id="advancedDiv" style="display:none">
-<table class="alternative-color">
+<c:set var="adTitle"><fmt:message key="monitor.summary.th.advancedSettings" /></c:set>
+<lams:AdvancedAccordian title="${adTitle}">
+             
+<table class="table table-striped table-condensed">
 
 	<tr>
 		<td>
@@ -122,4 +115,5 @@
 		</c:when>
 	</c:choose>
 </table>
-</div>
+
+</lams:AdvancedAccordian>

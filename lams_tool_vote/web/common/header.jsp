@@ -7,12 +7,9 @@
 </c:set>
 <c:set var="ctxPath" value="${pageContext.request.contextPath}" scope="request" />
 
-<lams:css />
+<lams:css/>
 
 <!-- ********************  javascript ********************** -->
 <script type="text/javascript" src="${lams}includes/javascript/common.js"></script>
-<script type="text/javascript" src="${lams}includes/javascript/tabcontroller.js"></script>
-<script type="text/javascript" src="${lams}includes/javascript/jquery.js"></script>
-<script type="text/javascript" src="${lams}includes/javascript/bootstrap.min.js"></script>
 
 

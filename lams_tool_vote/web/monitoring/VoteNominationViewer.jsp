@@ -13,10 +13,11 @@
 			$(document).ready(function(){
 	    
 			$(".tablesorter").tablesorter({
-				theme: 'blue',
+				theme: 'bootstrap',
 			    sortInitialOrder: 'desc',
 	            sortList: [[0]],
-	            widgets: [ "resizable", "filter" ],
+	            headerTemplate : '{content} {icon}',
+	            widgets: [ "uitheme", "resizable", "filter" ],
 	            headers: { 1: { filter: false} }, 
 	            widgetOptions: {
 	            	resizable: true,
@@ -30,6 +31,11 @@
 		$(".tablesorter").each(function() {
 			$(this).tablesorterPager({
 				savePages: false,
+	            container: $(this).find(".ts-pager"),
+	            output: '{startRow} to {endRow} ({totalRows})',
+	            cssPageDisplay: '.pagedisplay',
+	            cssPageSize: '.pagesize',
+	            cssDisabled: 'disabled',
 				ajaxUrl : "<lams:WebAppURL/>monitoring.do?dispatch=getVoteNominationsJSON&page={page}&size={size}&{sortList:column}&{filterList:fcol}&questionUid=${questionUid}&sessionUid=" + $(this).attr('data-session-id'),
 				ajaxProcessing: function (data, table) {
 					if (data && data.hasOwnProperty('rows')) {
@@ -56,63 +62,24 @@
 						return json;
 			            
 			    	}
-				},					
-			    container: $(this).next(".pager"),
-			    output: '{startRow} to {endRow} ({totalRows})',
-			    // css class names of pager arrows
-			    cssNext: '.tablesorter-next', // next page arrow
-				cssPrev: '.tablesorter-prev', // previous page arrow
-				cssFirst: '.tablesorter-first', // go to first page arrow
-				cssLast: '.tablesorter-last', // go to last page arrow
-				cssGoto: '.gotoPage', // select dropdown to allow choosing a page
-				cssPageDisplay: '.pagedisplay', // location of where the "output" is displayed
-				cssPageSize: '.pagesize', // page size selector - select dropdown that sets the "size" option
-				// class added to arrows when at the extremes (i.e. prev/first arrows are "disabled" when on the first page)
-				cssDisabled: 'disabled' // Note there is no period "." in front of this class name
+				}				
 			})
 		});
   	})
 </script>	
 	</lams:head>
 <body class="stripes">
-
-	<div id="content">
-	
-		<h2><fmt:message key="label.learnersVoted"/>: <c:out value="${nominationText}" escapeXml="true"/></h2>
-
-		<div class="tablesorter-holder">
-		<table class="tablesorter" data-session-id="${sessionUid}">
-			<thead>
-				<tr>
-			       <th><fmt:message key="label.user"/></td>
-			       <th><fmt:message key="label.attemptTime"/></td>
-				</tr>
-			</thead>
-			<tbody>
-			</tbody>
-		</table>
+	<c:set var="title"><fmt:message key="label.learnersVoted"/></c:set>
+	<lams:Page type="learner" title="${title}">
 		
-		<!-- pager -->
-		<div class="pager">
-			<form>
-				<img class="tablesorter-first"/>
-				<img class="tablesorter-prev"/>
-				<span class="pagedisplay"></span> <!-- this can be any element, including an input -->
-				<img class="tablesorter-next"/>
-				<img class="tablesorter-last"/>
-				<select class="pagesize">
-					<option selected="selected" value="10">10</option>
-					<option value="20">20</option>
-					<option value="30">30</option>
-					<option value="40">40</option>
-					<option value="50">50</option>
-					<option value="100">100</option>
-				</select>
-			</form>
-		</div>
-		</div>
+		<h4><fmt:message key="label.learnersVoted"/>: ${nominationText}</h4>
+
+		<lams:TSTable numColumns="2" dataId="data-session-id='${sessionUid}'">
+	       <th><fmt:message key="label.user"/></td>
+	       <th><fmt:message key="label.attemptTime"/></td>
+	     </lams:TSTable>
 		
-	</div>
 	<div id="footer"></div>
+	</lams:Page>
 </body>
 </lams:html>

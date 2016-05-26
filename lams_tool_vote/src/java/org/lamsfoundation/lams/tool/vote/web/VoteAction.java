@@ -493,7 +493,7 @@ public class VoteAction extends LamsDispatchAction implements VoteAppConstants {
 
 	request.getSession().setAttribute(httpSessionID, sessionMap);
 
-	return mapping.findForward(VoteAppConstants.LOAD_QUESTIONS);
+	return mapping.findForward(VoteAppConstants.LOAD_NOMINATIONS);
     }
 
     /**
@@ -608,7 +608,7 @@ public class VoteAction extends LamsDispatchAction implements VoteAppConstants {
 
 	request.getSession().setAttribute(httpSessionID, sessionMap);
 
-	return mapping.findForward(VoteAppConstants.LOAD_QUESTIONS);
+	return mapping.findForward(VoteAppConstants.LOAD_NOMINATIONS);
     }
 
     /**

@@ -2,22 +2,17 @@
 <lams:html>
 	<lams:head>
 		<%@ include file="/common/header.jsp"%>
-		<lams:css style="main" />
-		
-		<script type="text/javascript">			
-			$(function() {
-				//change size of an iframe on ckeditor's autogrow 
-				CKEDITOR.instances.newNomination.on("instanceReady", function(e) {
-				    e.editor.on('resize', function(reEvent){
-				    	var iframe = window.parent.document.getElementById("messageArea");
-				    	iframe.style.height = eval(iframe.contentWindow.document.body.scrollHeight) + 'px';
-				    });
-				});
-			});
-		</script>
+		<script type="text/javascript" src="${tool}includes/javascript/authoring.js"></script>
 	</lams:head>
 
 	<body>
+
+		<div class="panel panel-default add-file">
+		<div class="panel-heading panel-title">
+			<fmt:message key="label.edit.nomination"></fmt:message>
+		</div>
+		
+		<div class="panel-body">
 
 		<html:form action="/authoring?validate=false" styleId="newNominationForm" enctype="multipart/form-data" method="POST">
 
@@ -29,27 +24,23 @@
 			<html:hidden property="editableNominationIndex" />
 			<html:hidden property="editNominationBoxRequest" value="true" />
 
-			<div class="field-name">
-				<fmt:message key="label.edit.nomination"></fmt:message>
+			<div class="form-group">
+				<lams:CKEditor id="newNomination"
+					value="${voteGeneralAuthoringDTO.editableNominationText}"   
+					contentFolderID="${voteGeneralAuthoringDTO.contentFolderID}">
+				</lams:CKEditor>
 			</div>
-
-			<lams:CKEditor id="newNomination"
-				value="${voteGeneralAuthoringDTO.editableNominationText}"   
-                height="370px" width="99%"
-				contentFolderID="${voteGeneralAuthoringDTO.contentFolderID}"
-				resizeParentFrameName="messageArea">
-			</lams:CKEditor>
 			
-			<lams:ImgButtonWrapper>
-				<a href="#" onclick="getElementById('newNominationForm').submit();"
-					class="button-add-item"> <fmt:message
-						key="label.save.nomination" /> </a>
-
-				<a href="#" onclick="javascript:window.parent.hideMessage()"
-					class="button space-left"> <fmt:message key="label.cancel" /> </a>
-			</lams:ImgButtonWrapper>
-			
+			<div class="voffset5">
+				<a href="#" onclick="javascript:submitNomination()" class="btn btn-default btn-sm">
+					<i class="fa fa-plus"></i>&nbsp; <fmt:message key="label.save.nomination" /> </a>
+				<a href="#" onclick="javascript:hideMessage()"
+				class="btn btn-default btn-sm"> <fmt:message key="label.cancel" /></a>
+			</div>
+					
 		</html:form>
+		</div>
+		</div>
 
 	</body>
 </lams:html>

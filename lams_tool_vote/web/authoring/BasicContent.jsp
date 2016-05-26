@@ -9,33 +9,16 @@
 
 <script type="text/javascript">
 <!-- Common Javascript functions for LAMS -->
-	/**
-	 * Launches the popup window for the instruction files
-	 */
-	function showMessage(url) {
-		var area=document.getElementById("messageArea");
-		if(area != null){
-			area.style.width="100%";
-			area.src=url;
-			area.style.display="block";
-		}
-		var elem = document.getElementById("saveCancelButtons");
-		if (elem != null) {
-			elem.style.display="none";
-		}
-		location.hash = "messageArea";		
+
+ 	function showMessage(url) {
+		$("#messageArea").load(url, function() {
+			$(this).show();
+			$("#saveCancelButtons").hide();
+		});
 	}
 	function hideMessage(){
-		var area=document.getElementById("messageArea");
-		if(area != null){
-			area.style.width="0px";
-			area.style.height="0px";
-			area.style.display="none";
-		}
-		var elem = document.getElementById("saveCancelButtons");
-		if (elem != null) {
-			elem.style.display="block";
-		}
+		$("#messageArea").hide();
+		$("#saveCancelButtons").show();
 	}
 
 	function removeNomination(questionIndex){
@@ -61,40 +44,21 @@
 			}
 			noneDataFlowSelectedPreviously = document.getElementById("dataFlowNoneOption").selected;
 		}
-	}
-
-	function resizeOnMessageFrameLoad(){
-		var messageAreaFrame = document.getElementById("messageArea");
-		messageAreaFrame.style.height=messageAreaFrame.contentWindow.document.body.scrollHeight+'px';
-	}
+	} 
 
 </script>
 
 <html:hidden property="questionIndex" />
 
-<table cellpadding="0">
-
-	<tr>
-		<td colspan="2">
-			<div class="field-name">
-				<fmt:message key="label.authoring.title.col"></fmt:message>
-			</div>
-			<html:text property="title" style="width: 100%;"></html:text>
-		</td>
-	</tr>
-
-
-	<tr>
-		<td colspan="2">
-			<div class="field-name">
-				<fmt:message key="label.authoring.instructions.col"></fmt:message>
-			</div>
-			<lams:CKEditor id="instructions"
-				value="${voteGeneralAuthoringDTO.activityInstructions}"
-				contentFolderID="${voteGeneralAuthoringDTO.contentFolderID}"></lams:CKEditor>
-		</td>
-	</tr>
-</table>
+<div class="form-group">
+    <label for="title"><fmt:message key="label.authoring.title.col"/></label>
+    <html:text property="title" styleClass="form-control"></html:text>
+</div>
+<div class="form-group">
+    <label for="instructions"><fmt:message key="label.authoring.instructions.col" /></label>
+	<lams:CKEditor id="instructions" value="${voteGeneralAuthoringDTO.activityInstructions}"
+		contentFolderID="${voteGeneralAuthoringDTO.contentFolderID}"></lams:CKEditor>
+</div>
 
 <div id="resourceListArea">
 	<%@ include file="/authoring/itemlist.jsp"%>
@@ -102,7 +66,7 @@
 
 <p>
 	<a href="javascript:showMessage('<html:rewrite page="/authoring.do?dispatch=newNominationBox&contentFolderID=${voteGeneralAuthoringDTO.contentFolderID}&httpSessionID=${voteGeneralAuthoringDTO.httpSessionID}&toolContentID=${voteGeneralAuthoringDTO.toolContentID}&lockOnFinish=${voteGeneralAuthoringDTO.lockOnFinish}&allowText=${voteGeneralAuthoringDTO.allowText}&maxNominationCount=${voteGeneralAuthoringDTO.maxNominationCount}&minNominationCount=${voteGeneralAuthoringDTO.minNominationCount}&reflect=${voteGeneralAuthoringDTO.reflect}"/>');"
-			class="button-add-item"> 
+			class="btn btn-default btn-sm"><i class="fa fa-plus"></i>&nbsp;
 		<fmt:message key="label.add.new.nomination" /> 
 	</a>
 	
@@ -117,11 +81,4 @@
 	</c:if>
 </p>
 
-<p>
-	<iframe
-		onload="javascript:resizeOnMessageFrameLoad()"
-		id="messageArea" name="messageArea"
-		style="width:0px;height:0px;border:0px;display:none" frameborder="no"
-		scrolling="no">
-	</iframe>
-</p>
+<div id="messageArea" name="messageArea" class="voffset10"></div>

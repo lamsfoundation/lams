@@ -6,21 +6,11 @@
 <%@ page import="java.util.Set" %>
 <%@ page import="org.lamsfoundation.lams.tool.vote.VoteAppConstants"%>
 
-    <% 
-		Set tabs = new LinkedHashSet();
-		tabs.add("label.summary");
-		tabs.add("label.editActivity");
-		tabs.add("label.stats");
-		pageContext.setAttribute("tabs", tabs);
-	%>
-
-	<lams:html>
+<lams:html>
 	<lams:head>
-
+	
 	<title> <fmt:message key="label.monitoring"/> </title>
-
-	<%@ include file="/common/tabbedheader.jsp"%>
-	<script type="text/javascript" src="${lams}includes/javascript/jquery.js"></script>
+	<%@ include file="/common/monitorheader.jsp"%>
 
 	<script type="text/javascript">
 	
@@ -107,15 +97,7 @@
 </lams:head>
 <body class="stripes" onLoad="init();">
 
-	<div id="page">
-			<h1> <fmt:message key="label.monitoring"/> </h1>
-
-	<div id="header">
-		<lams:Tabs collection="${tabs}" useKey="true" control="true"/>
-	</div>	
-
-	<div id="content">						
-	    <html:form  action="/monitoring?validate=false" enctype="multipart/form-data" method="POST" target="_self">		
+    <html:form  action="/monitoring?validate=false" enctype="multipart/form-data" method="POST" target="_self">		
 		<html:hidden property="dispatch"/>
 		<html:hidden property="toolContentID"/>
 		<html:hidden property="httpSessionID"/>		
@@ -123,18 +105,29 @@
 		<html:hidden property="contentFolderID"/>
 		<html:hidden property="responseId"/>	 
 		<html:hidden property="currentUid"/>
-		
-		<lams:help toolSignature="<%= VoteAppConstants.MY_SIGNATURE %>" module="monitoring"/>
-		
-			<lams:TabBody id="1" titleKey="label.summary" page="SummaryContent.jsp"/>
-			<lams:TabBody id="2" titleKey="label.editActivity" page="Edit.jsp" />
+
+        <c:set var="title"><fmt:message key="activity.title" /></c:set>
+        <lams:Page title="${title}" type="navbar">
+
+         <lams:Tabs control="true" title="${title}" helpToolSignature="<%= VoteAppConstants.MY_SIGNATURE %>" helpModule="monitoring">
+            <lams:Tab id="1" key="label.summary" />
+            <lams:Tab id="2" key="label.editActivity" />
+            <lams:Tab id="3" key="label.stats" />
+         </lams:Tabs>
+   
+        <lams:TabBodyArea>
+        <lams:TabBodys>
+            <lams:TabBody id="1" titleKey="label.summary" page="SummaryContent.jsp"/>
+	 		<lams:TabBody id="2" titleKey="label.editActivity" page="Edit.jsp" />
 			<lams:TabBody id="3" titleKey="label.stats" page="Stats.jsp" />
-		</html:form>
-	</div>	
-
-	<div id="footer"></div>
-
-	</div>
+        </lams:TabBodys>
+        </lams:TabBodyArea>
+       
+        <div id="footer"></div>
+       
+        </lams:Page>
+            		
+	</html:form>
 	
 </body>
 </lams:html>
