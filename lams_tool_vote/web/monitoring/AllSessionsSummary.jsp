@@ -3,14 +3,10 @@
 <c:set scope="request" var="lams"><lams:LAMSURL/></c:set>
 <c:set scope="request" var="tool"><lams:WebAppURL/></c:set>
 
-<c:if test="${empty sessionDTOs}">
-	<h3><fmt:message key="error.noLearnerActivity"/></h3>
-</c:if>
+<div class="panel-group" id="accordionSessions" role="tablist" aria-multiselectable="false"> 
 
-<c:forEach var="sessionDto" items="${sessionDTOs}">
+<c:forEach var="sessionDto" items="${sessionDTOs}" varStatus="status">
 	<c:set var="sessionUid" value="${sessionDto.sessionUid}"/>
-	
-	<div class="space-bottom-top">
 	
 	<c:if test="${reflect && sessionUid ne 0}">			
 		<c:set var="viewReflectionsURL">
@@ -18,14 +14,39 @@
 		</c:set>
 	</c:if>
 
-	<c:if test="${isGroupedActivity}">
-		<h1>
-			<c:out value="${sessionDto.sessionName}"/>
-		</h1>
-		<br>
-	</c:if>
-						
-	<table cellspacing="0" class="alternative-color">							
+	<c:set var="buttonbar">
+		<div class="pull-right">
+			<c:if test="${not empty viewReflectionsURL}">
+				<html:link href="javascript:launchPopup('${viewReflectionsURL}')" styleClass="btn btn-default btn-sm">
+					<fmt:message key="label.notebook.entries" />
+				</html:link>
+			</c:if>			
+			&nbsp;
+			<c:set var="chartURL" value="${tool}chartGenerator.do?currentSessionId=${sessionDto.toolSessionId}&toolContentID=${toolContentID}" />
+			<img src='<c:out value="${tool}"/>images/piechart.gif' 
+				title="<fmt:message key='label.tip.displayPieChart'/>"
+				style="cursor: pointer;" height="30" border="0"
+				onclick="javascript:drawChart('pie', 'chartDiv${sessionDto.toolSessionId}', '${chartURL}')">
+			&nbsp;
+			<img src='<c:out value="${tool}"/>images/columnchart.gif'
+				title="<fmt:message key='label.tip.displayBarChart'/>" 
+				style="cursor: pointer;" height="30" border="0"
+				onclick="javascript:drawChart('bar', 'chartDiv${sessionDto.toolSessionId}', '${chartURL}')">
+		</div>
+	</c:set>						
+		
+	<div class="panel panel-default" >
+       <div class="panel-heading " id="heading${sessionUid}">
+  	    	<span class="panel-title  collapsable-icon-left">
+  	    	<a class="${status.first ? '' : 'collapsed'}" role="button" data-toggle="collapse" href="#collapse${sessionUid}" 
+				aria-expanded="${status.first ? 'false' : 'true'}" aria-controls="collapse${sessionUid}" >
+		<c:out value="${sessionDto.sessionName}"/></a>
+		</span>  ${buttonbar}
+       </div>
+       
+       <div id="collapse${sessionUid}" class="panel-collapse collapse ${status.first ? 'in' : ''}" role="tabpanel" aria-labelledby="heading${sessionUid}">
+
+	<table class="table table-condensed table-striped">							
 
 		<tr>
 			<th><fmt:message key="label.nomination"/></th>
@@ -36,7 +57,8 @@
 			<c:set var="questionUid" scope="request" value="${currentNomination.questionUid}"/>
 			<tr>
 				<td  valign=top class="align-left">
-					<c:out value="${currentNomination.nomination}" escapeXml="true"/>
+					<!-- Cannot escape as it was entered in a CKeditor -->
+					${currentNomination.nomination}
 				</td>
 						
 				<td  valign=top class="align-left">				  	 		
@@ -46,7 +68,7 @@
 					<a href="javascript:launchInstructionsPopup('<c:out value='${viewVotesURL}' escapeXml='false'/>')">
 						<c:out value="${currentNomination.numberOfVotes}"/>  
 					</a>
-					&nbsp(<fmt:formatNumber type="number" maxFractionDigits="2" value="${currentNomination.percentageOfVotes}" /><fmt:message key="label.percent"/>) 
+					&nbsp;(<fmt:formatNumber type="number" maxFractionDigits="2" value="${currentNomination.percentageOfVotes}" /><fmt:message key="label.percent"/>) 
 				</td>			
 			</tr>	
 		</c:forEach>	
@@ -70,31 +92,13 @@
 		</c:if>
 	</table>
 
-	<p class="float-right " style="margin-right: 8%;">
-
-		<c:set var="chartURL" value="${tool}chartGenerator.do?currentSessionId=${sessionDto.toolSessionId}&toolContentID=${toolContentID}" />
-		<img src='<c:out value="${tool}"/>images/piechart.gif' width="30"
-			title="<fmt:message key='label.tip.displayPieChart'/>"
-			style="cursor: pointer; height: 30px; border: none"
-			onclick="javascript:drawChart('pie', 'chartDiv${sessionDto.toolSessionId}', '${chartURL}')">
-
-		<img src='<c:out value="${tool}"/>images/columnchart.gif' width="30"
-			title="<fmt:message key='label.tip.displayBarChart'/>" 
-			style="cursor: pointer;" height="30" border="0"
-			onclick="javascript:drawChart('bar', 'chartDiv${sessionDto.toolSessionId}', '${chartURL}')">
-	
-	<p class="float-right">
-		<c:if test="${not empty viewReflectionsURL}">
-			<html:link href="javascript:launchPopup('${viewReflectionsURL}')" styleClass="button">
-				<fmt:message key="label.notebook.entries" />
-			</html:link>
-		</c:if>			
-	</p>
-						
-	<p id="chartDiv${sessionDto.toolSessionId}" style="height: 220px; display: none;" class="space-bottom"></p>
-
-
-	</div>
+ 	<p id="chartDiv${sessionDto.toolSessionId}" style="height: 220px; display: none;"></p>
+ 
+	</div> <!-- end collapse area  -->
+	</div> <!-- end collapse panel  -->
+ 	${ ! status.last ? '<div class="voffset5">&nbsp;</div>' :  ''}
 	
 </c:forEach>				
+
+</div> <!--  end panel group -->
 

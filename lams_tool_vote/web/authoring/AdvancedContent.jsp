@@ -7,47 +7,43 @@
 	<lams:WebAppURL />
 </c:set>
 
-<p>
-	<html:checkbox property="useSelectLeaderToolOuput" value="1" styleId="useSelectLeaderToolOuput" styleClass="noBorder">
-	</html:checkbox>
+<div class="checkbox">
 	<label for="useSelectLeaderToolOuput">
-		<fmt:message key="label.use.select.leader.tool.output" />
-	</label>
-</p>
-
-<p>
-	<html:checkbox property="lockOnFinish" value="1" styleClass="noBorder" styleId="lockOnFinish">
+	<html:checkbox property="useSelectLeaderToolOuput" value="1" styleId="useSelectLeaderToolOuput">
 	</html:checkbox>
+	<fmt:message key="label.use.select.leader.tool.output" />
+	</label>
+</div>
+
+<div class="checkbox">
 	<label for="lockOnFinish">
-		<fmt:message key="label.vote.lockedOnFinish" />
-	</label>
-</p>
-
-<p>
-	<html:checkbox property="allowText" value="1" styleClass="noBorder" styleId="allowText" onchange="changeMinMaxVotes(-1, -1);">
+	<html:checkbox property="lockOnFinish" value="1" styleId="lockOnFinish">
 	</html:checkbox>
-	<label for="allowText">
-		<fmt:message key="label.allowText" />
+	<fmt:message key="label.vote.lockedOnFinish" />
 	</label>
-</p>
+</div>
 
-<p>
-	<fmt:message key="label.maxNomCount" />&nbsp;
-	<html:select property="maxNominationCount" styleId="maxNominationCount">
-	</html:select>	
-</p>
+<div class="checkbox">
+	<label for="allowText">
+	<html:checkbox property="allowText" value="1" styleId="allowText" onchange="changeMinMaxVotes(-1, -1);">
+	</html:checkbox>
+	<fmt:message key="label.allowText" />
+	</label>
+</div>
 
-<p>
-	<fmt:message key="label.minNomCount" />&nbsp;&nbsp;
-	<html:select property="minNominationCount" styleId="minNominationCount">
-	</html:select>	
-</p>
+<div class="form-group">
+	<html:select property="maxNominationCount" styleId="maxNominationCount" styleClass="form-control form-control-inline input-sm">
+	</html:select>&nbsp;<fmt:message key="label.maxNomCount" />
+</div>
+
+<div class="form-group">
+	<html:select property="minNominationCount" styleId="minNominationCount" styleClass="form-control form-control-inline input-sm">
+	</html:select>&nbsp;<fmt:message key="label.minNomCount" />
+</div>
 
 <c:if test="${not empty voteGeneralAuthoringDTO.dataFlowObjectNames}">
-	<p>
-		<label for="maxInputs">
-		<fmt:message key="label.advanced.data.flow.limit" /></label>
-		<html:select property="maxInputs" styleId="maxInputs">
+	<div class="form-group">
+		<html:select property="maxInputs" styleId="maxInputs"  styleClass="form-control input-sm">
 			<html:option value="0" styleId="dataFlowLimitNoneOption">
 				<fmt:message key="label.advanced.data.flow.limit.none" />
 			</html:option>
@@ -55,27 +51,29 @@
 				<html:option value="${index}">${index}</html:option>
 			</c:forEach>
 		</html:select>
-	</p>
+		<label for="maxInputs">
+		<fmt:message key="label.advanced.data.flow.limit" /></label>
+	</div>
 </c:if>
 
-<p>
-	<html:checkbox property="showResults" value="1" styleClass="noBorder" styleId="showResults">
-	</html:checkbox>
+<div class="checkbox">
 	<label for="showResults">
-		<fmt:message key="label.show.results" />
-	</label>
-</p>
-
-<p>
-	<html:checkbox property="reflect" value="1" styleClass="noBorder" styleId="reflect">
+	<html:checkbox property="showResults" value="1" styleId="showResults">
 	</html:checkbox>
-	<label for="reflect">
-		<fmt:message key="label.reflect" />
+	<fmt:message key="label.show.results" />
 	</label>
-</p>
-<p>
-	<html:textarea cols="30" rows="3" property="reflectionSubject" styleId="reflectInstructions"></html:textarea>
-</p>
+</div>
+
+<div class="checkbox">
+	<label for="reflect">
+	<html:checkbox property="reflect" value="1" styleId="reflect">
+	</html:checkbox>
+	<fmt:message key="label.reflect" />
+	</label>
+</div>
+<div class="form-group">
+	<html:textarea rows="3" property="reflectionSubject" styleId="reflectInstructions" styleClass="form-control"></html:textarea> 
+</div>
 
 <script type="text/javascript">
 <!--

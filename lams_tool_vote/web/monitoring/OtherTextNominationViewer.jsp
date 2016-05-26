@@ -43,10 +43,11 @@
 			$(document).ready(function(){
 	    
 			$(".tablesorter").tablesorter({
-				theme: 'blue',
+				theme: 'bootstrap',
 			    sortInitialOrder: 'desc',
 	            sortList: [[0]],
-	            widgets: [ "resizable", "filter" ],
+	            headerTemplate : '{content} {icon}',
+	            widgets: [ "uitheme", "resizable", "filter" ],
 	            headers: { 2: { filter: false}, 3: { filter: false} }, 
 	            widgetOptions: {
 	            	resizable: true,
@@ -60,7 +61,12 @@
 		$(".tablesorter").each(function() {
 			$(this).tablesorterPager({
 				savePages: false,
-				<c:choose>
+	            container: $(this).find(".ts-pager"),
+	            output: '{startRow} to {endRow} ({totalRows})',
+	            cssPageDisplay: '.pagedisplay',
+	            cssPageSize: '.pagesize',
+	            cssDisabled: 'disabled',
+	            <c:choose>
 				<c:when test="${not empty param.sessionUid}">
 				ajaxUrl : "<lams:WebAppURL/>monitoring.do?dispatch=getOpenTextNominationsJSON&page={page}&size={size}&{sortList:column}&{filterList:fcol}&sessionUid=${param.sessionUid}&toolContentUID=${param.toolContentUID}",
 				</c:when><c:otherwise>
@@ -105,19 +111,7 @@
 						json.rows = $(rows);
 						return json;
 			    	}
-				},					
-			    container: $(this).next(".pager"),
-			    output: '{startRow} to {endRow} ({totalRows})',
-			    // css class names of pager arrows
-			    cssNext: '.tablesorter-next', // next page arrow
-				cssPrev: '.tablesorter-prev', // previous page arrow
-				cssFirst: '.tablesorter-first', // go to first page arrow
-				cssLast: '.tablesorter-last', // go to last page arrow
-				cssGoto: '.gotoPage', // select dropdown to allow choosing a page
-				cssPageDisplay: '.pagedisplay', // location of where the "output" is displayed
-				cssPageSize: '.pagesize', // page size selector - select dropdown that sets the "size" option
-				// class added to arrows when at the extremes (i.e. prev/first arrows are "disabled" when on the first page)
-				cssDisabled: 'disabled' // Note there is no period "." in front of this class name
+				}					
 			})
 		});
   	})
@@ -125,52 +119,26 @@
 	</lams:head>
 <body class="stripes">
 
-	<div id="content">
-	
-		<h2><fmt:message key="label.learnersVoted"/>: <fmt:message key="label.openVotes"/></h2>
-		    
-   		<div class="tablesorter-holder">
-   		
-   		<c:choose>
+	<c:set var="title"><fmt:message key="label.openVotes"/></c:set>
+	<lams:Page type="learner" title="${title}">
+		
+		<c:choose>
 		<c:when test="${not empty param.sessionUid}">
-		<table id="entryTable" class="tablesorter" data-session-id="${param.sessionUid}">
+			<c:set var="dsi">data-session-id='${param.sessionUid}'</c:set>
 		</c:when><c:otherwise>
-		<table id="entryTable" class="tablesorter" data-session-id="${param.toolContentUID}">
+			<c:set var="dsi">data-session-id='${param.toolContentUID}'</c:set>
 		</c:otherwise>
 		</c:choose>
-			<thead>
-				<tr>
-					<th><fmt:message key="label.vote"/></th>
-					<th> <fmt:message key="label.user"/></th>
-					<th> <fmt:message key="label.attemptTime"/></th>
-					<th style="width: 70px;"> <fmt:message key="label.visible"/></th>								  						 
-				</tr>
-			</thead>
-			<tbody>
-			</tbody>
-		</table>
+	
+		<lams:TSTable numColumns="4" dataId="${dsi}">
+			<th><fmt:message key="label.vote"/></th>
+			<th> <fmt:message key="label.user"/></th>
+			<th> <fmt:message key="label.attemptTime"/></th>
+			<th style="width: 70px;"> <fmt:message key="label.visible"/></th>								  						 
+	     </lams:TSTable>
 		
-		<!-- pager -->
-		<div class="pager">
-			<form>
-				<img class="tablesorter-first"/>
-				<img class="tablesorter-prev"/>
-				<span class="pagedisplay"></span> <!-- this can be any element, including an input -->
-				<img class="tablesorter-next"/>
-				<img class="tablesorter-last"/>
-				<select class="pagesize">
-					<option selected="selected" value="10">10</option>
-					<option value="20">20</option>
-					<option value="30">30</option>
-					<option value="40">40</option>
-					<option value="50">50</option>
-					<option value="100">100</option>
-				</select>
-			</form>
-		</div>
-		</div>
-		
-	</div>
 	<div id="footer"></div>
+	</lams:Page>
+
 </body>
 </lams:html>

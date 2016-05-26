@@ -93,6 +93,12 @@
 	        path="/authoring/AuthoringMaincontent.jsp"
 		    redirect="false"
 	      />
+
+	      <forward
+	        name="loadNominations"
+	        path="/authoring/itemlist.jsp"
+		    redirect="false"
+	      />
 	    
 	      <forward
 	        name="starter"
