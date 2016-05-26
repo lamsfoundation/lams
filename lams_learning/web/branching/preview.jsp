@@ -51,11 +51,8 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 	//-->
 </script>
 
-<div id="content">
-
-	<h1>
-		<c:out value="${BranchingForm.map.title}" />
-	</h1>
+<c:set var="title"><c:out value="${BranchingForm.map.title}" /></c:set>
+<lams:Page type="learner" title="${title}">
 
 	<p>
 		<em><fmt:message key="label.branching.preview.message" /> </em>
@@ -67,14 +64,14 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 			action="/branching.do?method=forceBranching&amp;type=${BranchingForm.map.type}&amp;activityID=${BranchingForm.map.activityID}&amp;progressID=${BranchingForm.map.progressID}"
 			target="_self" onsubmit="return validate();">
 
-			<table class="alternative-color" cellspacing="0">
+			<table class="table table-condensed table-striped">
 				<c:forEach items="${BranchingForm.map.activityURLs}"
 					var="activityURL" varStatus="loop">
 					<tr>
 						<td width="2%">
 							<c:choose>
 								<c:when test="${activityURL.complete}">
-									<img src="<lams:LAMSURL/>/images/tick.gif" />
+									<i class="fa fa-check"></i>
 								</c:when>
 								<c:when test="${activityURL.defaultURL}">
 									<input type="radio" name="branchID"
@@ -125,11 +122,9 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 			</table>
 
 			<c:if test="${BranchingForm.map.showNextButton}">
-				<div class="align-right small-space-bottom">
-					<html:submit styleClass="button">
-						<fmt:message key="label.activity.options.choose" />
-					</html:submit>
-				</div>
+				<html:submit styleClass="btn btn-default pull-left">
+					<fmt:message key="label.activity.options.choose" />
+				</html:submit>
 			</c:if>
 
 		</html:form>
@@ -144,18 +139,15 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 			<input type="hidden" name="progressID"
 				value="<c:out value='${BranchingForm.map.progressID}' />">
 
-			<div class="align-right space-bottom-top">
-			        <html:link href="javascript:;" styleClass="button" styleId="finishButton" onclick="submitForm('finish')">
-					<span class="nextActivity"><fmt:message key="label.finish.button" /></span>
-				</html:link>
-			</div>
+	        <html:link href="javascript:;" styleClass="btn btn-default pull-right" styleId="finishButton" onclick="submitForm('finish')">
+				<span class="nextActivity"><fmt:message key="label.finish.button" /></span>
+			</html:link>
 
 		</html:form>
 	</c:if>
 
-</div>
 <!--closes content-->
 
 <div id="footer"></div>
 
-
+</lams:Page>

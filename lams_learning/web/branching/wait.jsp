@@ -30,24 +30,15 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 
 	<html:form action="${formAction}" target="_self">
 
-
-		<div id="content">
-		
-			<h1><c:out value="${BranchingForm.map.title}"/></h1>
-			
-			<p>&nbsp;</p>
+		<c:set var="title"><c:out value="${BranchingForm.map.title}" /></c:set>
+		<lams:Page type="learner" title="${title}">
 
 			<p><fmt:message key="label.branching.wait.message"/></p>
-
 			<p><fmt:message key="label.branching.refresh.message"/></p>
 
-			<table><tr><td><div class="right-buttons">
-					<html:submit styleClass="button"><fmt:message key="label.next.button"/></html:submit>
-			</div></td></tr></table>
+			<html:submit styleClass="btn btn-default pull-right"><fmt:message key="label.next.button"/></html:submit>
 
-		</div>  <!--closes content-->
-
-		<div id="footer">
-		</div><!--closes footer-->
+			<div id="footer"></div>
+		</lams:Page>
 
 	</html:form>
