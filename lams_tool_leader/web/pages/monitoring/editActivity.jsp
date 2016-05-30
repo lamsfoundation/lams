@@ -3,12 +3,12 @@
 <c:set var="dto" value="${leaderselectionDTO}" />
 
 <c:if test="${dto.contentInUse}">
-	<p class="warning">
+	<lams:Alert type="info" id="content-in-use" close="false">
 		<fmt:message key="message.alertContentEdit" />
-	</p>
+	</lams:Alert>
 </c:if>
 
-<table cellspacing="0">
+<table class="table table-condensed">
 	<tbody>
 		<tr>
 			<td class="field-name" width="10%" nowrap>
@@ -35,7 +35,7 @@
 		<c:param name="mode" value="teacher" />
 		<c:param name="contentFolderID" value="${contentFolderID}" />
 	</c:url>
-	<html:link href="${authoringUrl}" styleClass="button" target="_blank">
+	<html:link href="${authoringUrl}" styleClass="btn btn-default" target="_blank">
 		<fmt:message key="button.editActivity" />
 	</html:link>
 </p>

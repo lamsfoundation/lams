@@ -15,6 +15,8 @@
 <script type="text/javascript" src="${lams}includes/javascript/jquery.js"></script>
 <script type="text/javascript" src="${lams}includes/javascript/jquery-ui.js"></script>
 <script type="text/javascript" src="${lams}includes/javascript/thickbox.js"></script>
+<script type="text/javascript" src="${lams}includes/javascript/bootstrap.min.js"></script>
+<script type="text/javascript" src="${lams}includes/javascript/bootstrap.tabcontroller.js"></script>
 <script type="text/javascript" src="${tool}includes/javascript/monitoring.js"></script>
 <script type="text/javascript">
 	function resizeIframe() {
@@ -33,3 +35,4 @@
 	};
 	window.onresize = resizeIframe;
 </script>
+
