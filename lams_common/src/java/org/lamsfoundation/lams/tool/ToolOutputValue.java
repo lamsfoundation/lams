@@ -20,7 +20,6 @@
  * ****************************************************************
  */
 
-
 package org.lamsfoundation.lams.tool;
 
 /**
@@ -33,7 +32,7 @@ public class ToolOutputValue {
 
     /**
      * Create a ToolOutputValue based on a Boolean. This will create a value of type OUTPUT_BOOLEAN
-     * 
+     *
      * @param val
      *            mandatory
      */
@@ -44,7 +43,7 @@ public class ToolOutputValue {
 
     /**
      * Create a ToolOutputValue based on a Long. This will create a value of type OUTPUT_LONG.
-     * 
+     *
      * @param val
      *            mandatory
      */
@@ -55,7 +54,7 @@ public class ToolOutputValue {
 
     /**
      * Create a ToolOutputValue based on a Integer. This will create a value of type OUTPUT_LONG.
-     * 
+     *
      * @param val
      *            mandatory
      */
@@ -66,7 +65,7 @@ public class ToolOutputValue {
 
     /**
      * Create a ToolOutputValue based on a Double. This will create a value of type OUTPUT_DOUBLE.
-     * 
+     *
      * @param val
      *            mandatory
      */
@@ -77,7 +76,7 @@ public class ToolOutputValue {
 
     /**
      * Create a ToolOutputValue based on a Integer. This will create a value of type OUTPUT_DOUBLE.
-     * 
+     *
      * @param val
      *            mandatory
      */
@@ -88,7 +87,7 @@ public class ToolOutputValue {
 
     /**
      * Create a ToolOutputValue based on a String. This will create a value of type OUTPUT_STRING.
-     * 
+     *
      * @param val
      *            mandatory
      */
@@ -99,7 +98,7 @@ public class ToolOutputValue {
 
     /**
      * Create a ToolOutputValue based on a String. It tries to convert it to the type defined by the type.
-     * 
+     *
      * @throws ToolOutputFormatException
      *             If unable to convert the value to the requested type.
      * @param val
@@ -135,7 +134,7 @@ public class ToolOutputValue {
      * Create a Complex ToolOutputValue based on an Object. This will create a value of type OUTPUT_COMPLEX. The
      * junk parameter is to ensure this method isn't "accidently" in place of one of the other constructors. ie to stop
      * accidental bugs!
-     * 
+     *
      * @param val
      *            mandatory
      * @param junk
@@ -164,12 +163,33 @@ public class ToolOutputValue {
 
     /**
      * Returns a string representation of the value. Available for any type of output.
-     * 
+     *
      * @throws ToolOutputFormatException
      *             If unable to convert the value to a string.
      */
     public String getString() throws ToolOutputFormatException {
-	return OutputType.OUTPUT_STRING.equals(type) ? (String) value : value.toString();
+	switch (type) {
+	    case OUTPUT_STRING:
+		return (String) value;
+	    case OUTPUT_COMPLEX:
+		if (value instanceof Object[]) {
+		    Object[] array = (Object[]) value;
+		    StringBuilder result = new StringBuilder("[");
+		    for (Object valuePart : array) {
+			result.append(valuePart.toString()).append(",");
+		    }
+		    if (array.length > 0) {
+			result.replace(result.length() - 1, result.length(), "]");
+		    } else {
+			result.append("]");
+		    }
+
+		    return result.toString();
+		}
+		return value.toString();
+	    default:
+		return value.toString();
+	}
     }
 
     /**
