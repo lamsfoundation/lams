@@ -67,6 +67,7 @@ public class NotebookOutputFactory extends OutputFactory {
 		    notebookEntryDefinition.setShowConditionNameOnly(true);
 		    definitionMap.put(NotebookConstants.USER_ENTRY_DEFINITION_NAME, notebookEntryDefinition);
 		}
+		break;
 	    case ToolOutputDefinition.DATA_OUTPUT_DEFINITION_TYPE_DATA_FLOW:
 		ToolOutputDefinition allUsersEntriesDefinition = buildComplexOutputDefinition(
 			NotebookConstants.ALL_USERS_ENTRIES_DEFINITION_NAME, stringArrayClass);
