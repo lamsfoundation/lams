@@ -26,4 +26,8 @@
   <resources>
     <resource-root path="commons-httpclient-3.1.jar"/>
   </resources>
+  <dependencies>
+    <module name="org.apache.commons.logging"/>
+    <module name="org.apache.commons.codec"/>
+  </dependencies>
 </module>

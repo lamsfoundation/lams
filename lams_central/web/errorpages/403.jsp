@@ -23,7 +23,7 @@
 	<lams:Page type="admin" title="${title}"></lams:Page>
 
 
-	<lams:Alert id="403" class="danger" close="false"></
+	<lams:Alert id="403" class="type" close="false"></
 				<fmt:message key="403.message" />
 	</lams:Alert>
 	
