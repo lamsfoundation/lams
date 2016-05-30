@@ -24,6 +24,7 @@
 	<%@ taglib uri="tags-logic" prefix="logic" %>
 	<%@ taglib uri="tags-core" prefix="c" %>		
 	<%@ taglib uri="tags-fmt" prefix="fmt" %>
+	<%@ taglib uri="tags-lams" prefix="lams" %>
 	<script type="text/javascript">
 		function onSubmitForm(){
 			var select = document.getElementById(document.pressed);
@@ -36,8 +37,9 @@
 			}
 		}
 	</script>
-	<div id="content">
-		<h1><fmt:message key="label.condition.gate.title"/></h1>
+
+	<c:set var="title"><fmt:message key="label.condition.gate.title"/></c:set>
+	<lams:Page title="${title}" type="monitoring">
 		
 		<%@ include file="gateInfo.jsp" %>
 		<c:if test="${not GateForm.map.gate.gateOpen}" >
@@ -94,4 +96,5 @@
 			</table>
 			</html:form>
 		</c:if>
-	</div>  <!--closes content-->
+
+	</lams:Page>

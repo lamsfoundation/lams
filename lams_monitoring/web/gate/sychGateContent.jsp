@@ -24,14 +24,13 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 <%@ taglib uri="tags-logic" prefix="logic" %>
 <%@ taglib uri="tags-core" prefix="c" %>		
 <%@ taglib uri="tags-fmt" prefix="fmt" %>
+<%@ taglib uri="tags-lams" prefix="lams" %>
 
-	<div id="content">
-
-		<h1><fmt:message key="label.synch.gate.title"/></h1>
+	<c:set var="title"><fmt:message key="label.synch.gate.title"/></c:set>
+	<lams:Page title="${title}" type="monitoring">
 
 		<%@ include file="gateInfo.jsp" %>
 		<%@ include file="gateStatus.jsp" %>
 
-	</div>  <!--closes content-->
-
+	</lams:Page>
 

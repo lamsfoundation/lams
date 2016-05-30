@@ -26,9 +26,8 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 <%@ taglib uri="tags-fmt" prefix="fmt" %>
 <%@ taglib uri="tags-lams" prefix="lams" %>
 
-	<div id="content">
-
-		<h1><fmt:message key="label.schedule.gate.title"/></h1>
+	<c:set var="title"><fmt:message key="label.schedule.gate.title"/></c:set>
+	<lams:Page title="${title}" type="monitoring">
 
 		<%@ include file="gateInfo.jsp" %>
 		<c:choose>
@@ -48,5 +47,4 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 
 		<%@ include file="gateStatus.jsp" %>
 
-	</div>  <!--closes content-->
-
+	</lams:Page>
