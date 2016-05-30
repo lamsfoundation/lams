@@ -40,19 +40,14 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 </lams:head>
 
 <body class="stripes">
-<div id="content">
-	<h1>
-		<c:out value="${title}"/>
-	</h1>
+
+	<lams:Page title="${title}" type="monitoring">
 	
 	<c:if test="${not empty description}">
 		<p><c:out value="${description}"/></p>
 	</c:if>
-	
 
-	<p>
-		<strong><fmt:message key="label.grouping.general.instructions.heading"/></strong>
-	</p>
+	<h4><fmt:message key="label.grouping.general.instructions.heading"/></h4>
 	
 	<c:if test="${not usedForBranching}">
 		<p>
@@ -69,6 +64,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 	</c:if>
 	
 	<iframe src="<lams:LAMSURL/>OrganisationGroup.do?method=viewGroupings&lessonID=${param.lessonID}&activityID=${param.activityID}"></iframe>
-</div>
+
+	</lams:Page>
 </body>
 </lams:html>
