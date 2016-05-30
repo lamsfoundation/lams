@@ -9,10 +9,7 @@
 <lams:html>
 	<lams:head>
 		<lams:css />
-		<link type="text/css" href="${lams}css/jquery-ui-redmond-theme.css" rel="stylesheet">
-		<style media="screen,projection" type="text/css">
-			.refresh-button {float:right; margin-right:12px; padding-top:5px;}
-		</style>	
+		<link type="text/css" href="${lams}css/jquery-ui-smoothness-theme.css" rel="stylesheet">
 		
 		<script type="text/javascript" src="${lams}includes/javascript/jquery.js"></script>
 		<script type="text/javascript" src="${lams}includes/javascript/jquery.form.js"></script>
@@ -34,14 +31,11 @@
 	</lams:head>
 	
 	<body class="stripes" onload="parent.resizeIframe();">
-		<div id="content" >
-		
-			<h1>
-				<fmt:message key="label.plese.select.leaders" />
-			</h1>
-			<br/>
+
+	<c:set var="title"><fmt:message key="label.plese.select.leaders" /></c:set>
+	<lams:Page type="learner" title="${title}">
 			
-			<form action="<c:url value='/monitoring.do'/>?dispatch=saveLeaders&sessionMapID=${sessionMapID}" id="leaders">
+		<form action="<c:url value='/monitoring.do'/>?dispatch=saveLeaders&sessionMapID=${sessionMapID}" id="leaders">
 				<c:forEach var="session" items="${sessionMap.leaderselectionDT0.sessionDTOs}" varStatus="status">
 					<h1></h1>
 					<div style="padding-left: 30px; <c:if test='${! status.last}'>padding-bottom: 30px;</c:if><c:if test='${ status.last}'>padding-bottom: 15px;</c:if> ">
@@ -61,21 +55,20 @@
 				</c:forEach>
 			</form>
 
-			<lams:ImgButtonWrapper>
-				<a href="#" onclick="closeThickboxPage();" class="button refresh-button">
+			<div class="pull-right">
+				<a href="#" onclick="closeThickboxPage();" class="btn btn-default">
 					<fmt:message key="button.cancel" /> 
 				</a>
-				<a href="#" onclick="save();" class="button refresh-button">
+				<a href="#" onclick="save();" class="btn btn-primary">
 					<fmt:message key="button.save" /> 
 				</a>
-			</lams:ImgButtonWrapper>
+			</div>
 
 		</div>
 		<!--closes content-->
 	
-		<div id="footer">
-		</div>
-		<!--closes footer-->		
-		
+		<div id="footer"></div>
+
+	</lams:Page>		
 	</body>
 </lams:html>
