@@ -2,7 +2,13 @@
 
 <c:set var="dto" value="${requestScope.monitoringDTO}" />
 
-<table cellspacing="0">
+<c:if test="${dto.contentInUse}">
+	<lams:Alert type="info" id="content-in-use" close="false">
+		<fmt:message key="message.contentInUseSet" /> 
+	</lams:Alert>
+</c:if>	
+
+<table class="table table-condensed">
 	<tbody>
 		<tr>
 			<td class="field-name" style="width: 30%;">
@@ -23,22 +29,15 @@
 	</tbody>
 </table>
 
-<c:choose>
-	<c:when test="${not dto.contentInUse}">
-		<c:url value="/authoring.do" var="authoringUrl">
-			<c:param name="toolContentID" value="${dto.toolContentID}" />
-			<c:param name="mode" value="teacher" />
-			<c:param name="contentFolderID" value="${contentFolderID}"></c:param>
-		</c:url>
-		<html:link href="${fn:escapeXml(authoringUrl)}"
-			styleClass="button right-buttons" target="_blank">
-			<fmt:message key="button.editActivity" />
-		</html:link>
-	</c:when>
-	<c:otherwise>
-		<div class="warning">
-			<fmt:message key="message.contentInUseSet" /> 
-		</div>
-	</c:otherwise>
-</c:choose>
+<c:if test="${not dto.contentInUse}">
+	<c:url value="/authoring.do" var="authoringUrl">
+		<c:param name="toolContentID" value="${dto.toolContentID}" />
+		<c:param name="mode" value="teacher" />
+		<c:param name="contentFolderID" value="${contentFolderID}"></c:param>
+	</c:url>
+	<html:link href="${fn:escapeXml(authoringUrl)}"
+		styleClass="btn btn-default" target="_blank">
+		<fmt:message key="button.editActivity" />
+	</html:link>
+</c:if>
 

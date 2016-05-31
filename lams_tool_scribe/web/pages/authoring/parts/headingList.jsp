@@ -2,12 +2,11 @@
 
 <c:set var="sessionMap" value="${sessionScope[sessionMapID]}" />
 
-<table class="alternative-color" cellspacing="0">
+<table class="table table-condensed table-striped" >
 	<c:if test="${empty sessionMap.headings}">
 		<tr>
 			<td>
 				<fmt:message key="message.noHeadings" />
-				<%--	TODO should we ever reach this state ??--%>
 			<td>
 		</tr>
 	</c:if>
@@ -21,62 +20,44 @@
 				</div>
 			</td>
 
-			<td width="10%">
-				<c:choose>
-					<c:when test="${index ne 0}">
-						<c:set var="moveUpURL">
-							<html:rewrite
-								page="/authoring.do?dispatch=moveHeading&amp;sessionMapID=${sessionMapID}&amp;headingIndex=${index}&amp;direction=up" />
-						</c:set>
-						<img src="${tool}images/up.gif"
-							title="<fmt:message key="link.moveUp"/>"
-							onclick="showMessage('${moveUpURL}')"></img>
-					</c:when>
-					<c:otherwise>
-						<img src="${tool}images/up_disabled.gif"
-							title="<fmt:message key="link.moveUp"/>"></img>
-					</c:otherwise>
-				</c:choose>
+ 			<td class="arrows" style="width:5%">
+				<c:if test="${index ne 0}">
+					<c:set var="moveUpURL">
+						<html:rewrite
+							page="/authoring.do?dispatch=moveHeading&amp;sessionMapID=${sessionMapID}&amp;headingIndex=${index}&amp;direction=up" />
+					</c:set>
+					<lams:Arrow state="up" title="<fmt:message key='link.moveUp'/>" 
+	 						onclick="runUrl('${moveUpURL}')"/>
+				</c:if>
 
-				<c:choose>
-					<c:when test="${index ne fn:length(sessionMap.headings)-1}">
-						<c:set var="moveDownURL">
-							<html:rewrite
-								page="/authoring.do?dispatch=moveHeading&amp;sessionMapID=${sessionMapID}&amp;headingIndex=${index}&amp;direction=down" />
-						</c:set>
-						<img src="${tool}images/down.gif"
-							title="<fmt:message key="link.moveDown"/>"
-							onclick="showMessage('${moveDownURL}')"></img>
-					</c:when>
-					<c:otherwise>
-						<img src="${tool}images/down_disabled.gif"
-							title="<fmt:message key="link.moveDown"/>"></img>
-					</c:otherwise>
-				</c:choose>
+				<c:if test="${index ne fn:length(sessionMap.headings)-1}">
+					<c:set var="moveDownURL">
+						<html:rewrite
+							page="/authoring.do?dispatch=moveHeading&amp;sessionMapID=${sessionMapID}&amp;headingIndex=${index}&amp;direction=down" />
+					</c:set>
+					<lams:Arrow state="down" title="<fmt:message key='link.moveDown'/>"  
+								onclick="runUrl('${moveDownURL}')"/>
+				</c:if>
 			</td>
 
-			<td>
+			<td class="text-center" style="width:3%">
 				<c:set var="editURL">
 					<html:rewrite
 						page="/authoring.do?dispatch=loadHeadingForm&amp;sessionMapID=${sessionMapID}&amp;headingIndex=${index}" />
 				</c:set>
-				<img src="${tool}images/edit.gif"
-					title="<fmt:message key="link.edit"/>"
-					onclick="showMessage('${editURL}')"></img>
+				<i class="fa fa-pencil" title="<fmt:message key='link.edit'/>" onclick="showMessage('${editURL}')"></i>
 			</td>
 
-			<td>
+			<td class="text-center"  style="width:3%">
 				<c:set var="deleteURL">
 					<html:rewrite
 						page="/authoring.do?dispatch=deleteHeading&amp;sessionMapID=${sessionMapID}&amp;headingIndex=${index}" />
 				</c:set>
-				<img src="${tool}images/delete.gif"
-					title="<fmt:message key="link.delete"/>"
-					onclick="showMessage('${deleteURL}')"></img>
-
-				<c:set var="index" value="${index + 1}" />
-			</td>
+				<i class="fa fa-times"	title="<fmt:message key="link.delete"/>" onclick="runUrl('${deleteURL}')"></img>
+			</td> 
 		</tr>
+		
+		<c:set var="index" value="${index + 1}" />
 	</c:forEach>
 
 </table>

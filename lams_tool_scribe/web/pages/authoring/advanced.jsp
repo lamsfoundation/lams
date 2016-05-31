@@ -2,45 +2,41 @@
 
 <!-- ========== Advanced Tab ========== -->
 
-<p class="small-space-top">
-	<html:checkbox property="showAggregatedReports" value="1"
-		styleClass="noBorder" styleId="showAggregatedReports"></html:checkbox>
-
+<div class="checkbox">
 	<label for="showAggregatedReports">
-		<fmt:message key="advanced.showAggregatedReports" />
+	<html:checkbox property="showAggregatedReports" value="1" styleId="showAggregatedReports"></html:checkbox>
+	<fmt:message key="advanced.showAggregatedReports" />
 	</label>
-</p>
+</div>
 
-<p class="small-space-top">
-	<html:checkbox property="reflectOnActivity" value="1"
-		styleClass="noBorder" styleId="reflectOnActivity"></html:checkbox>
-
+<div class="checkbox">
 	<label for="reflectOnActivity">
-		<fmt:message key="advanced.reflectOnActivity" />
+	<html:checkbox property="reflectOnActivity" value="1" styleId="reflectOnActivity"></html:checkbox>
+	<fmt:message key="advanced.reflectOnActivity" />
 	</label>
 </p>
 <p>
-	<html:textarea property="reflectInstructions" cols="30" rows="3" styleId="reflectInstructions"/>
+	<html:textarea property="reflectInstructions" rows="3" styleId="reflectInstructions" styleClass="form-control"/>
 </p>
 
-<h2>
+<h4>
 	<fmt:message key="advanced.selectScribe" />
-</h2>
+</h4>
 
-<p>
-	<html:radio property="autoSelectScribe" value="true" styleId="autoSelectScribe1" styleClass="noBorder">
+<div class="form-group">
+	<html:radio property="autoSelectScribe" value="true" styleId="autoSelectScribe1">
 	</html:radio>
 	<label for="autoSelectScribe1">
 		<fmt:message key="advanced.firstLearner" />
 	</label>
-</p>
-<p>
-	<html:radio property="autoSelectScribe" value="false" styleId="autoSelectScribe2" styleClass="noBorder">
+</div>
+<div class="form-group">
+	<html:radio property="autoSelectScribe" value="false" styleId="autoSelectScribe2">
 	</html:radio>
 	<label for="autoSelectScribe2">
 		<fmt:message key="advanced.selectInMonitor" />
 	</label>
-</p>
+</div>
 
 <script type="text/javascript">
 <!--
