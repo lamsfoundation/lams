@@ -162,16 +162,6 @@ public class Configuration implements InitializingBean {
 	return Configuration.configurationDAO.getAllItems();
     }
 
-    // update jvm system property
-    private static void setSystemProperty(String key, String value) {
-	if (StringUtils.isBlank(key)) {
-	    // use default
-	    System.clearProperty(key);
-	} else {
-	    System.setProperty(key, value);
-	}
-    }
-
     @Override
     public void afterPropertiesSet() {
 	if (Configuration.items != null) {
@@ -188,11 +178,13 @@ public class Configuration implements InitializingBean {
 	if ((refreshCacheInterval != null) && (refreshCacheInterval > 0)) {
 	    JobDetail jobDetail = JobBuilder.newJob(ConfigurationRefreshCacheJob.class)
 		    .withIdentity("configurationCacheRefresh").build();
-	    Trigger trigger = TriggerBuilder.newTrigger().withIdentity("configurationCacheRefreshTrigger")
-		    .withSchedule(SimpleScheduleBuilder.repeatMinutelyForever(refreshCacheInterval)).build();
-
 	    try {
-		Configuration.scheduler.scheduleJob(jobDetail, trigger);
+		if (scheduler.checkExists(jobDetail.getKey())) {
+		    return;
+		}
+		Trigger trigger = TriggerBuilder.newTrigger().withIdentity("configurationCacheRefreshTrigger")
+			.withSchedule(SimpleScheduleBuilder.repeatMinutelyForever(refreshCacheInterval)).build();
+		scheduler.scheduleJob(jobDetail, trigger);
 	    } catch (SchedulerException e) {
 		Configuration.log.error(
 			"Error while scheduling Configuration cache refresh. The cache will NOT be periodically updated.",
