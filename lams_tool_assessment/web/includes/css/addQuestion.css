@@ -1,28 +1,26 @@
+div.error {
+	display:none;
+}
 label.error { 
-	color: red; font-weight: bold; font-style: italic; margin-left: 0px;
+	color: red; 
+	font-weight: bold; 
+	margin-left: 0px;
 	display: inline-block;
 }
 em { 
-	font-weight: bold; padding-right: 1em; vertical-align: top; 
+	font-weight: bold; 
+	padding-right: 1em; 
+	vertical-align: top; 
 }
 #content {
-	width: 91%; margin-bottom: 10px;
+	width: 91%; 
+	margin-bottom: 10px;
 }
 table.alternative-color td {
 	padding-left: 0;
 }
-input[type=text].shortInputText {
+.short-input-text {
 	width:10%;
-}
-input[type=text] {
-	width:98%;
-}
-textarea {
-	width:98%;
-}
-
-.word-limit-label {
-	margin-right: 7px;
 }
 
 #max-words-limit-checkbox, #min-words-limit-checkbox {
@@ -31,6 +29,7 @@ textarea {
 
 .fake-validation-input {
 	visibility: hidden;
-	height: 0px;
-	padding: 0 !important;
+	height: 0;
+	width: 0;
+	float: right !important;
 }

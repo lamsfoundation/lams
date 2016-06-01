@@ -176,27 +176,21 @@
 </script>
 
 <!-- Basic Tab Content -->
-<table>
-	<tr>
-		<td colspan="2">
-			<div class="field-name">
-				<fmt:message key="label.authoring.basic.title"></fmt:message>
-			</div>
-			<html:text property="assessment.title" style="width: 99%;"></html:text>
-		</td>
-	</tr>
-	<tr>
-		<td colspan="2">
-			<div class="field-name">
-				<fmt:message key="label.authoring.basic.instruction"></fmt:message>
-			</div>
-			<lams:CKEditor id="assessment.instructions" value="${formBean.assessment.instructions}"
-				contentFolderID="${formBean.contentFolderID}">
-			</lams:CKEditor>
-		</td>
-	</tr>
+<div class="form-group">
+    <label for="assessment.title">
+    	<fmt:message key="label.authoring.basic.title"/>
+    </label>
+    <html:text property="assessment.title" styleClass="form-control"/>
+</div>
 
-</table>
+<div class="form-group">
+    <label for="assessment.instructions">
+    	<fmt:message key="label.authoring.basic.instruction"/>
+    </label>
+	<lams:CKEditor id="assessment.instructions" value="${formBean.assessment.instructions}"
+			contentFolderID="${formBean.contentFolderID}" height="400">
+	</lams:CKEditor>
+</div>
 
 <div id="questionListArea">
 	<c:set var="sessionMapID" value="${formBean.sessionMapID}" />
@@ -204,8 +198,8 @@
 </div>
 
 <!-- Dropdown menu for choosing a question type -->
-<p>
-	<select id="questionType" style="float: left">
+<div class="form-inline form-group">
+	<select id="questionType" class="form-control input-sm">
 		<option selected="selected"><fmt:message key="label.authoring.basic.type.multiple.choice" /></option>
 		<option><fmt:message key="label.authoring.basic.type.matching.pairs" /></option>
 		<option><fmt:message key="label.authoring.basic.type.short.answer" /></option>
@@ -216,30 +210,31 @@
 		<option><fmt:message key="label.authoring.basic.type.mark.hedging" /></option>
 	</select>
 	
-	<a onclick="createNewQuestionInitHref();return false;" href="" class="button-add-item space-left thickbox" id="newQuestionInitHref">  
+	<a onclick="createNewQuestionInitHref();return false;" href="" class="btn btn-default btn-sm button-add-item thickbox" id="newQuestionInitHref">  
 		<fmt:message key="label.authoring.basic.add.question.to.pool" />
 	</a>
 	
 	<c:set var="importInitUrl" >
 		<c:url value='/authoring/importInit.do'/>?sessionMapID=${sessionMapID}&KeepThis=true&TB_iframe=true&height=240&width=650
 	</c:set>
-	<a href="${importInitUrl}" class="button space-right thickbox" id="importButton" style="float: right;">  
+	<a href="${importInitUrl}" class="btn btn-default btn-xs pull-right loffset5 thickbox" id="importButton">  
 		<fmt:message key="label.authoring.basic.import.questions" />
 	</a>
 	
-	<a onclick="javascript:exportQuestions();" class="button space-right" id="exportButton" style="float: right;">  
+	<a onclick="javascript:exportQuestions();" class="btn btn-default btn-xs pull-right" id="exportButton">  
 		<fmt:message key="label.authoring.basic.export.questions" />
 	</a>
 	
-	<a href="#" onClick="javascript:exportQTI()" style="float: right; margin-right: 50px">
-		<fmt:message key="label.authoring.basic.export.qti" />
-	</a>
-	
-	<a href="#" onClick="javascript:importQTI()" style="float: right; margin-right: 30px">
+	<br>
+	<a href="#nogo" onClick="javascript:importQTI()" class="btn btn-default btn-xs pull-right loffset5">
 		<fmt:message key="label.authoring.basic.import.qti" /> 
 	</a>
-</p>
-<br>
+	<a href="#nogo" onClick="javascript:exportQTI()" class="btn btn-default btn-xs pull-right">
+		<fmt:message key="label.authoring.basic.export.qti" />
+	</a>
+
+</div>
+<br><br>
 
 <!-- For exporting QTI packages -->
 <iframe id="downloadFileDummyIframe" style="display: none;"></iframe>

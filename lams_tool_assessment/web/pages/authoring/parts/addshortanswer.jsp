@@ -1,13 +1,11 @@
 <!DOCTYPE html>
-
 <%@ include file="/common/taglibs.jsp"%>
+<c:set var="questionType" value="3"	scope="request" />
+
 <lams:html>
 	<lams:head>
 		<%@ include file="/common/header.jsp"%>
 		<link href="<html:rewrite page='/includes/css/addQuestion.css'/>" rel="stylesheet" type="text/css">
-		
-		<c:set var="ctxPath" value="${pageContext.request.contextPath}"	scope="request" />
-		<c:set var="questionType" value="3"	scope="request" />
 
 		<script type="text/javascript">
 			var questionType = ${questionType};
@@ -17,7 +15,6 @@
     	    var downOptionUrl = "<c:url value='/authoring/downOption.do'/>";
 		</script>
 		<script type="text/javascript" src="<html:rewrite page='/includes/javascript/assessmentoption.js'/>"></script>
-		<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery.js"></script>
 		<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery.validate.js"></script>
 		<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery.form.js"></script>
   	    <script>
@@ -76,6 +73,7 @@
 		    		      }
 		    		},
 		    		debug: true,
+		    		errorClass: "alert alert-danger",
      			    submitHandler: function(form) {
      			    	prepareOptionEditorsForAjaxSubmit();     			    
 		    			$("#optionList").val($("#optionForm").serialize(true));
@@ -98,15 +96,21 @@
     		}    
   		</script>
 		
-	</lams:head>
+</lams:head>
 	
-	<body class="stripes" onload="parent.resizeIframe();">
-		<div id="content" >	
+<body onload="parent.resizeIframe();">
+	<div class="panel panel-default add-file">
+		<div class="panel-heading panel-title">
+			<fmt:message key="label.authoring.basic.type.short.answer" />
+		</div>
+
+		<div class="panel-body">
 			<%@ include file="/common/messages.jsp"%>
-		    <div class="error" style="display:none;">
-		      	<img src="${ctxPath}/includes/images/warning.gif" alt="Warning!" width="24" height="24" style="float:left; margin: -5px 10px 0px 0px; " />
-		      	<span></span>.<br clear="all"/>
-		    </div>			
+		    <div class="error">
+		    	<lams:Alert id="errorMessages" type="danger" close="false" >
+					<span></span>
+				</lams:Alert>	
+		    </div>
 			
 			<html:form action="/authoring/saveOrUpdateQuestion" method="post" styleId="assessmentQuestionForm">
 				<c:set var="formBean" value="<%=request.getAttribute(org.apache.struts.taglib.html.Constants.BEAN_KEY)%>" />
@@ -114,70 +118,72 @@
 				<input type="hidden" name="questionType" id="questionType" value="${questionType}" />
 				<input type="hidden" name="optionList" id="optionList" />
 				<html:hidden property="questionIndex" />
-				<html:hidden property="contentFolderID" styleId="contentFolderID"/>				
-	
-				<h2 class="no-space-left">
-					<fmt:message key="label.authoring.basic.type.short.answer" />
-				</h2>
-	
-				<div class="field-name space-top">
-					<fmt:message key="label.authoring.basic.question.name" />
-					<img title="Required field" alt="Required field" src="${ctxPath}/includes/images/req.gif" />
-				</div>
-				<html:text property="title"/>
-	
-				<div class="field-name space-top">
-					<fmt:message key="label.authoring.basic.question.text" />
-				</div>
-				<lams:CKEditor id="question" value="${formBean.question}"
-					contentFolderID="${formBean.contentFolderID}">
-				</lams:CKEditor>
+				<html:hidden property="contentFolderID" styleId="contentFolderID"/>
 				
-				<div class="field-name space-top">
-					<fmt:message key="label.authoring.basic.default.question.grade" />
-					<img title="Required field" alt="Required field" src="${ctxPath}/includes/images/req.gif" />
+				<div class="form-group">
+				    <label for="title">
+				    	<fmt:message key="label.authoring.basic.question.name"/>
+				    	<img src="${ctxPath}/includes/images/req.gif" title="Required field" alt="Required field"/>
+				    </label>
+				    <html:text property="title" styleId="title" styleClass="form-control" tabindex="1"/>
 				</div>
-				<html:text property="defaultGrade" styleClass="shortInputText"/>
-					
-				<div class="field-name space-top">
-					<fmt:message key="label.authoring.basic.penalty.factor" />
-					<img title="Required field" alt="Required field" src="${ctxPath}/includes/images/req.gif" />
+			
+				<div class="form-group">
+					<label for="question">
+						<fmt:message key="label.authoring.basic.question.text" />
+					</label>
+		            	
+					<lams:CKEditor id="question" value="${formBean.question}" contentFolderID="${formBean.contentFolderID}" />
 				</div>
-				<html:text property="penaltyFactor" styleClass="shortInputText"/>
 				
-				<div class="field-name space-top" >
-					<html:checkbox property="answerRequired" styleId="answer-required"/>
+				<div class="form-group">
+				    <label for="defaultGrade">
+				    	<fmt:message key="label.authoring.basic.default.question.grade" />
+				    	<img src="${ctxPath}/includes/images/req.gif" title="Required field" alt="Required field"/>
+				    </label>
+				    <html:text property="defaultGrade" styleClass="form-control short-input-text input-sm"/>
+				</div>
+				
+				<div class="form-group">
+				    <label for="penaltyFactor">
+				    	<fmt:message key="label.authoring.basic.penalty.factor" />
+						<img src="${ctxPath}/includes/images/req.gif" title="Required field" alt="Required field"/>
+				    </label>
+				    <html:text property="penaltyFactor" styleClass="form-control short-input-text input-sm"/>
+				</div>
+				
+				<div class="checkbox">
 					<label for="answer-required">
+						<html:checkbox property="answerRequired" styleId="answer-required"/>
 						<fmt:message key="label.authoring.answer.required" />
 					</label>
 				</div>
 				
-				<div class="field-name space-top">
+				<div class="form-group">
 					<img src="<lams:LAMSURL/>/images/tree_closed.gif" onclick="javascript:toggleVisibility('general-feedback');" />
 
 					<a href="javascript:toggleVisibility('general-feedback');" >
 						<fmt:message key="label.authoring.basic.general.feedback" />
 					</a>
+					
+					<div id="general-feedback" class="initially-hidden">
+						<lams:CKEditor id="generalFeedback" value="${formBean.generalFeedback}" contentFolderID="${formBean.contentFolderID}"/>
+					</div>
 				</div>
-				<div id="general-feedback" class="hidden">
-					<lams:CKEditor id="generalFeedback" value="${formBean.generalFeedback}"
-						contentFolderID="${formBean.contentFolderID}">
-					</lams:CKEditor>
-				</div>
-	
-				<div class="field-name space-top">
-					<fmt:message key="label.authoring.short.answer.case.sensitivity" />
-				</div>
-				<html:select property="caseSensitive">
-					<html:option value="false"><fmt:message key="label.authoring.short.answer.no.case.unimportant" /></html:option>
-					<html:option value="true"><fmt:message key="label.authoring.short.answer.yes.case.must.match" /></html:option>
-				</html:select>
 				
-				<br><br>
+				<div class="form-inline form-group">
+					<label for="caseSensitive">
+						<fmt:message key="label.authoring.short.answer.case.sensitivity" />
+					</label>
+					<html:select property="caseSensitive" styleClass="form-control input-sm">
+						<html:option value="false"><fmt:message key="label.authoring.short.answer.no.case.unimportant" /></html:option>
+						<html:option value="true"><fmt:message key="label.authoring.short.answer.yes.case.must.match" /></html:option>
+					</html:select>
+				</div>
 				
-				<div class="field-name space-top">
+				<h5 class="voffset20">
 					<fmt:message key="label.authoring.short.answer.answers" />
-				</div>
+				</h5>
 				<input type="text" name="hasOptionFilled" id="hasOptionFilled" class="fake-validation-input">
 				<input type="text" name="hasOneHundredGrade" id="hasOneHundredGrade" class="fake-validation-input">
 			</html:form>
@@ -185,20 +191,20 @@
 			<!-- Options -->
 			<form id="optionForm" name="optionForm">
 				<%@ include file="optionlist.jsp"%>
-				<a href="javascript:;" onclick="addOption();" class="button-add-item right-buttons" style="margin-right: 40px; margin-top:0px">
-					<fmt:message key="label.authoring.short.answer.add.answer" /> 
+				
+				<a href="#nogo" onclick="javascript:addOption();" class="btn btn-xs btn-default button-add-item pull-right">
+					<fmt:message key="label.authoring.short.answer.add.answer" />  
 				</a>
 			</form>
-			
-			<br><br><br>
-			<lams:ImgButtonWrapper>
-				<a href="#" onclick="$('#assessmentQuestionForm').submit();" onmousedown="self.focus();" class="button-add-item">
-					<fmt:message key="label.authoring.short.answer.add.short.answer" /> 
+
+			<div class="voffset10 pull-right clear-both">
+				<a href="#nogo" onclick="javascript:$('#assessmentQuestionForm').submit();" class="btn btn-sm btn-default button-add-item">
+					<fmt:message key="label.authoring.short.answer.add.short.answer" />
 				</a>
-				<a href="#" onclick="self.parent.tb_remove();" onmousedown="self.focus();" class="button space-left">
-					<fmt:message key="label.cancel" /> 
+				<a href="#nogo" onclick="javascript:self.parent.tb_remove();" class="btn btn-sm btn-default loffset5">
+					<fmt:message key="label.cancel" />
 				</a>
-			</lams:ImgButtonWrapper>
+			</div>			
 
 		</div>
 		<!--closes content-->
@@ -206,6 +212,6 @@
 		<div id="footer">
 		</div>
 		<!--closes footer-->		
-		
-	</body>
+	</div>	
+</body>
 </lams:html>

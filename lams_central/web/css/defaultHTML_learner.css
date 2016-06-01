@@ -40,6 +40,9 @@ LAMS Learner Style
 .voffset10 {
   margin-top: 10px;
 }
+.voffset20 {
+  margin-top: 20px;
+}
 .roffset2 {
   margin-right: 2px;
 }
@@ -60,6 +63,9 @@ LAMS Learner Style
 }
 .loffset20 {
   margin-left: 20px;
+}
+.clear-both {
+	clear: both;
 }
 /* Comments/Forum classes */
 .msg .panel-heading {

@@ -26,67 +26,43 @@
 		});
 	});		
 </script>
-		
-<h2>
-	<fmt:message key="label.number.learners.per.session" />
-</h2>
 
-<table cellspacing="3" style="width: 400px; padding-left: 30px;">
-
-	<c:choose>
-		<c:when test="${empty sessionDtos}">
-			<div align="center">
-				<b> <fmt:message key="message.monitoring.summary.no.session" /> </b>
-			</div>
-		</c:when>
+<c:choose>
+	<c:when test="${empty sessionDtos}">
+		<lams:Alert type="warn" id="no-edit" close="false">
+			<fmt:message key="message.monitoring.summary.no.session" />
+		</lams:Alert>
+	</c:when>
 		
-		<c:otherwise>
+	<c:otherwise>
+	
+		<h5>
+			<fmt:message key="label.number.learners.per.session" />
+		</h5>
+	
+		<table class="table table-condensed table-striped">
 			<tr>
-				<th width="150px;" style="padding-left: 0px;">
+				<th width="150px;">
 					<fmt:message key="label.monitoring.summary.user.name" />
 				</th>
-				<th width="80px;" style="padding-left: 0px;">
+				<th width="80px;">
 					<fmt:message key="label.monitoring.summary.total" />
-				</th>					
-			</tr>	
-		</c:otherwise>
-	
-	</c:choose>
-	
-	<c:forEach var="sessionDto" items="${sessionDtos}" varStatus="firstGroup">
-		<tr>				
-			<td>
-				<fmt:message key="monitoring.label.group" /> ${sessionDto.sessionName}
-			</td>
-			<td>
-				${sessionDto.numberLearners}
-			</td>
-		</tr>
-	</c:forEach>
-</table>
-
-<h1>
-	<img src="<lams:LAMSURL/>/images/tree_closed.gif" id="tree-icon" onclick="javascript:toggleAdvancedOptionsVisibility(document.getElementById('tool-output'), document.getElementById('tree-icon'), '<lams:LAMSURL/>');" />
-
-	<a href="javascript:toggleAdvancedOptionsVisibility(document.getElementById('tool-output'), document.getElementById('tree-icon'),'<lams:LAMSURL/>');" >
-		<fmt:message key="label.tool.output" />
-	</a>
-</h1>
-<br />
-
-<div class="monitoring-advanced" id="tool-output" style="display:none">
-	<select name="activityEvaluation" id="activity-evaluation" autocomplete="off">
-		<option value="dummy"></option>
+				</th>		
+			</tr>
 		
-		<c:forEach var="toolOutputDefinition" items="${sessionMap.toolOutputDefinitions}" varStatus="firstGroup">
-		
-			<option value="${toolOutputDefinition}"
-				<c:if test="${toolOutputDefinition == sessionMap.activityEvaluation}">selected="selected"</c:if>
-			>
-				<fmt:message key="output.desc.${toolOutputDefinition}" />
-			</option>
-			
-		</c:forEach>
-	</select>
-</div>
+			<c:forEach var="sessionDto" items="${sessionDtos}" varStatus="firstGroup">
+				<tr>				
+					<td>
+						<fmt:message key="monitoring.label.group" />&nbsp;${sessionDto.sessionName}
+					</td>
+					<td>
+						${sessionDto.numberLearners}
+					</td>
+				</tr>
+			</c:forEach>
+		</table>
+	
+	</c:otherwise>
+</c:choose>
 
+<%@ include file="parts/toolOutput.jsp"%>

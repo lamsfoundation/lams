@@ -1,6 +1,6 @@
 <!DOCTYPE html>
-
 <%@ include file="/common/taglibs.jsp" %>
+
 <html>
 	<body class="stripes">
 		<html:form action="/authoring/init.do?mode=${mode}" method="post" styleId="startForm">

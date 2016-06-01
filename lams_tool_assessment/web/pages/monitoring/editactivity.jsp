@@ -2,7 +2,7 @@
 <c:set var="sessionMap" value="${sessionScope[sessionMapID]}"/>
 <c:set var="assessment" value="${sessionMap.assessment}"/>
 
-<table cellpadding="0">
+<table class="table table-condensed">
 	<tr>
 		<td width="10%">
 			<fmt:message key="label.authoring.basic.title" />:
@@ -27,7 +27,7 @@
 				<c:param name="toolContentID" value="${sessionMap.toolContentID}" />
 				<c:param name="contentFolderID" value="${sessionMap.contentFolderID}" />
 			</c:url>
-			<html:link href="javascript:;" onclick="launchPopup('${authoringUrl}','definelater')" styleClass="button">
+			<html:link href="#nogo" onclick="javascript:launchPopup('${authoringUrl}','definelater')" styleClass="btn btn-default pull-right">
 				<fmt:message key="label.monitoring.edit.activity.edit" />
 			</html:link>
 		</td>

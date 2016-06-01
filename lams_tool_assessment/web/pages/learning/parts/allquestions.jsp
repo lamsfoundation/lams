@@ -5,7 +5,7 @@
 				<input type="hidden" name="questionUid${status.index}" id="questionUid${status.index}" value="${question.uid}" />						
 							
 				<div class="panel panel-default" id="question-area-${status.index}">
-					<div class="field-name panel-heading">
+					<div class="panel-heading">
 						<c:if test="${assessment.numbered}">
 							<span class="question-numbers">
 								${status.index + sessionMap.questionNumberingOffset}.

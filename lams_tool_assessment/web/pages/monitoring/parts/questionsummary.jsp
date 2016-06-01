@@ -1,5 +1,4 @@
 <!DOCTYPE html>
-
 <%@ include file="/common/taglibs.jsp"%>
 
 <lams:html>
@@ -10,8 +9,8 @@
 		<c:set var="assessment" value="${sessionMap.assessment}"/>
 		<c:set var="sessionDtos" value="${sessionMap.sessionDtos}"/>
 		
-		<link type="text/css" href="<lams:LAMSURL />css/jquery-ui-redmond-theme.css" rel="stylesheet">
-		<link type="text/css" href="<lams:LAMSURL />css/jquery.jqGrid.css" rel="stylesheet" />
+		<link type="text/css" href="${lams}css/jquery-ui-smoothness-theme.css" rel="stylesheet">
+		<link type="text/css" href="${lams}css/jquery.jqGrid.css" rel="stylesheet" />
 		<style media="screen,projection" type="text/css">
 			.ui-jqgrid tr.jqgrow td {
 			    white-space: normal !important;
@@ -21,9 +20,8 @@
 			}
 		</style>
 		
-		<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery.js"></script>
-		<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery.jqGrid.locale-en.js"></script>
-	 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery.jqGrid.js"></script>
+		<script type="text/javascript" src="${lams}includes/javascript/jquery.jqGrid.locale-en.js"></script>
+	 	<script type="text/javascript" src="${lams}includes/javascript/jquery.jqGrid.js"></script>
   	    <script>
   	    	var isEdited = false;
   	    	var previousCellValue = "";
@@ -118,6 +116,7 @@
 	  		            });
 	  		        }
 	  			});
+	  			setTimeout(function(){ window.dispatchEvent(new Event('resize')); }, 300);
 	  		});  	    	
 	  		
     		function refreshSummaryPage()  { 
@@ -128,22 +127,23 @@
         		}
     		}
   		</script>
-		
-		
 	</lams:head>
 	
-	<body class="stripes" onload="parent.resizeIframe();">
-		<div id="content" >
-		
-			<h1>
+<body class="stripes" onload="parent.resizeIframe();">
+
+	<div class="panel panel-default">
+		<div class="panel-heading">
+			<div class="panel-title">
 				<fmt:message key="label.monitoring.question.summary.history.responses" />
-			</h1>
-			<br><br>		
+			</div>
+		</div>
+			
+		<div class="panel-body">
 			<%@ include file="/common/messages.jsp"%>
 			
-			<table class="forum">
+			<table class="table table-condensed table-striped">
 				<tr>
-					<th style="width: 180px; border-left: none; padding-top:0px; " >
+					<th style="width: 180px;" >
 						<fmt:message key="label.monitoring.question.summary.title" />
 					</th>
 					<td >
@@ -152,7 +152,7 @@
 				</tr>
 				
 				<tr>
-					<th style="width: 180px;" >
+					<th>
 						<fmt:message key="label.monitoring.question.summary.question" />
 					</th>
 					<td>
@@ -162,7 +162,7 @@
 				
 				<c:if test="${questionSummary.question.type == 1}">
 					<tr>
-						<th style="width: 180px;" >
+						<th>
 							<fmt:message key="label.incorrect.answer.nullifies.mark" />
 						</th>
 						<td>
@@ -172,7 +172,7 @@
 				</c:if>
 					
 				<tr>
-					<th style="width: 180px;" >
+					<th>
 						<fmt:message key="label.monitoring.question.summary.default.mark" />
 					</th>
 					<td>
@@ -181,7 +181,7 @@
 				</tr>
 					
 				<tr>
-					<th style="width: 180px;" >
+					<th>
 						<fmt:message key="label.monitoring.question.summary.penalty" />
 					</th>
 					<td>
@@ -189,24 +189,17 @@
 					</td>
 				</tr>			
 			</table>
-			<br><br>
 			
 			<c:forEach var="sessionDto" items="${sessionDtos}" varStatus="status">
-				<div style="padding-left: 0px; padding-bottom: 30px; width:99%;">
-					<div style="font-size: small; padding-bottom: 5px;">
-						<fmt:message key="label.monitoring.question.summary.group" /> ${sessionDto.sessionName}
-					</div>
-					
-					<table id="session${sessionDto.sessionId}" class="scroll" cellpadding="0" cellspacing="0" ></table>
-					<div id="pager${sessionDto.sessionId}" class="scroll"></div>
+				<div class="voffset20">
+					<table id="session${sessionDto.sessionId}"></table>
+					<div id="pager${sessionDto.sessionId}"></div>
 				</div>	
 			</c:forEach>
-
-			<lams:ImgButtonWrapper>
-				<a href="#" onclick="refreshSummaryPage();" class="button space-left" style="float:right; margin-right:10px; padding-top:5px;">
-					<fmt:message key="label.monitoring.question.summary.ok" /> 
-				</a>
-			</lams:ImgButtonWrapper>
+			
+			<a href="#nogo" onclick="refreshSummaryPage();" class="btn btn-default btn-sm button-add-item voffset10 pull-right">
+				<fmt:message key="label.monitoring.question.summary.ok" /> 
+			</a>
 
 		</div>
 		<!--closes content-->
@@ -214,6 +207,6 @@
 		<div id="footer">
 		</div>
 		<!--closes footer-->		
-		
-	</body>
+	</div>
+</body>
 </lams:html>
