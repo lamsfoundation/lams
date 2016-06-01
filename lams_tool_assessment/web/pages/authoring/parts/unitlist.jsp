@@ -3,43 +3,41 @@
 	<input type="hidden" name="unitCount" id="unitCount" value="${fn:length(unitList)}">
 	<input type="hidden" name="questionType" id="questionType" value="${questionType}" />
 	
-	<table class="alternative-color" cellspacing="0">
+	<table class="table">
 		<c:forEach var="unit" items="${unitList}" varStatus="status">
 			<tr>
-				<td width="3px" style="vertical-align:middle;">
+				<td width="10px" style="vertical-align:middle;">
 					${status.index+1}
-				</td>			
+				</td>
 				<td>
-					<table>
+					<table class="table-row-spacing">
 						<tr>
-							<td style="padding-left:0px; border-bottom:0px; vertical-align:middle; background:none;" width="50 px">
-								<span class="field-name">
-									<fmt:message key="label.authoring.basic.unit.unit"></fmt:message>
-								</span>
+							<td width="80px">
+								<fmt:message key="label.authoring.basic.unit.unit"/>
 							</td>
-							<td style="padding-left:0px; border-bottom:0px; background:none;">	
-								<input type="hidden" name="unitSequenceId${status.index}" id="unitSequenceId${status.index}" value="${unit.sequenceId}">									
-								<input type="text" name="unitUnit${status.index}"
-									id="unitUnit${status.index}" value="${unit.unit}">
+							<td>	
+								<input type="hidden" name="unitSequenceId${status.index}" value="${unit.sequenceId}" 
+										id="unitSequenceId${status.index}">						
+								<input type="text" name="unitUnit${status.index}" value="${unit.unit}"
+										id="unitUnit${status.index}" class="number form-control input-sm">
 							</td>									
 						</tr>
 						<tr>
-							<td style="padding-left:0px; border-bottom:0px; vertical-align:middle; background:none;">
-								<span class="field-name">
-									<fmt:message key="label.authoring.basic.unit.multiplier"></fmt:message>
-								</span>
+							<td>
+								<fmt:message key="label.authoring.basic.unit.multiplier"/>
 							</td>
-							<td style="padding-left:0px; border-bottom:0px; background:none;">	
-							<c:choose>
-								<c:when test="${status.index == 0}">
-									<input type="hidden" name="unitMultiplier0" id="unitMultiplier0" value="${unit.multiplier}">
-									${unit.multiplier}
-								</c:when>
-								<c:otherwise>
-									<input type="text" name="unitMultiplier${status.index}"
-										id="unitMultiplier${status.index}" value="${unit.multiplier}" class="number shortInputText" title="<fmt:message key='label.authoring.choice.enter.float'/>">
-								</c:otherwise>
-							</c:choose>							
+							<td>	
+								<c:choose>
+									<c:when test="${status.index == 0}">
+										<input type="hidden" name="unitMultiplier0" id="unitMultiplier0" value="${unit.multiplier}">
+										${unit.multiplier}
+									</c:when>
+									<c:otherwise>
+										<input type="text" name="unitMultiplier${status.index}" value="${unit.multiplier}"
+												id="unitMultiplier${status.index}" class="number form-control short-input-text input-sm" 
+												title="<fmt:message key='label.authoring.choice.enter.float'/>">
+									</c:otherwise>
+								</c:choose>							
 							</td>									
 						</tr>	
 					</table>

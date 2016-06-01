@@ -9,7 +9,6 @@
 		<c:forEach var="sessionDto" items="${sessionDtos}" varStatus="status">
 		
 			jQuery("#list${sessionDto.sessionId}").jqGrid({
-			   	caption: "${sessionDto.sessionName}",
 			   	multiselect: false,
 				datatype: "json",
 				url: "<c:url value="/monitoring/getUsers.do"/>?sessionMapID=${sessionMapID}&sessionId=${sessionDto.sessionId}",
@@ -133,12 +132,13 @@
 		
 		//jqgrid autowidth (http://stackoverflow.com/a/1610197)
 		$(window).bind('resize', function() {
-			jQuery(".ui-jqgrid-btable:visible").each(function(index) {
-		    	var gridId = $(this).attr('id');
-		    	var gridParentWidth = jQuery('#gbox_' + gridId).parent().width();
-	        	jQuery('#' + gridId).setGridWidth(gridParentWidth, true);
-		    });
-		}).trigger('resize');
+			resizeJqgrid(jQuery(".ui-jqgrid-btable:visible"));
+		});
+
+		//resize jqGrid on openning of bootstrap collapsible
+		$('div[id^="collapse"]').on('shown.bs.collapse', function () {
+			resizeJqgrid(jQuery(".ui-jqgrid-btable:visible", this));
+		})
 
 		$("#questionUid").change(function() {
 			var questionUid = $("#questionUid").val();
@@ -148,10 +148,18 @@
 				$("#questionSummaryHref").attr("href", questionSummaryHref);	
 				$("#questionSummaryHref").click(); 		 
 			}
-	    }); 
+	    });
 	});
+
+	function resizeJqgrid(jqgrids) {
+		jqgrids.each(function(index) {
+			var gridId = $(this).attr('id');
+	    	var gridParentWidth = jQuery('#gbox_' + gridId).parent().width();
+	    	jQuery('#' + gridId).setGridWidth(gridParentWidth, true);
+	    });
+	};
 	
-	function exportSummary(){   
+	function exportSummary() {
 		var url = "<c:url value='/monitoring/exportSummary.do'/>";
 	    var reqIDVar = new Date();
 		var param = "?sessionMapID=${sessionMapID}&reqID="+reqIDVar.getTime();
@@ -183,92 +191,97 @@
 		}
 	};
 	window.onresize = resizeIframe;
-	
-	// pass settings to monitorToolSummaryAdvanced.js
-	var submissionDeadlineSettings = {
-		lams: '<lams:LAMSURL />',
-		submissionDeadline: '${submissionDeadline}',
-		setSubmissionDeadlineUrl: '<c:url value="/monitoring/setSubmissionDeadline.do"/>',
-		toolContentID: '${param.toolContentID}',
-		messageNotification: '<fmt:message key="monitor.summary.notification" />',
-		messageRestrictionSet: '<fmt:message key="monitor.summary.date.restriction.set" />',
-		messageRestrictionRemoved: '<fmt:message key="monitor.summary.date.restriction.removed" />'
-	};
 </script>
 
-<script type="text/javascript" src="<lams:LAMSURL/>/includes/javascript/monitorToolSummaryAdvanced.js" ></script>
-
-<h1><c:out value="${assessment.title}" escapeXml="true"/></h1>
-
-<div class="instructions space-top">
-	<c:out value="${assessment.instructions}" escapeXml="false"/>
+<div class="panel">
+	<h4>
+	  <c:out value="${assessment.title}" escapeXml="true"/>
+	</h4>
+	
+	<div class="instructions voffset5">
+	  <c:out value="${assessment.instructions}" escapeXml="false"/>
+	</div>
+	
+	<c:if test="${empty sessionDtos}">
+		<lams:Alert type="info" id="no-session-summary" close="false">
+			<fmt:message key="message.monitoring.summary.no.session" />
+		</lams:Alert>
+	</c:if>
 </div>
 
-
-<c:choose>
-	<c:when test="${empty sessionDtos}">
-		<div align="center">
-			<b> <fmt:message key="message.monitoring.summary.no.session" /> </b>
-		</div>	
-	</c:when>
-	<c:otherwise>
+<c:if test="${not empty sessionDtos}">
 	
-		<div style="padding-left: 20px; margin-bottom: 10px; margin-top: 15px;">
-			<H1><fmt:message key="label.monitoring.summary.summary" /></H1>
-		</div>	
+	<h5><fmt:message key="label.monitoring.summary.summary" /></h5>
 	
-		<div style="padding-left: 30px; font-size: small; margin-bottom: 20px; font-style: italic;">
-			<fmt:message key="label.monitoring.summary.double.click" />
-		</div>
+	<div class="comments">
+		<fmt:message key="label.monitoring.summary.double.click" />
+	</div>
 			
-		<div id="masterDetailArea">
-			<%@ include file="parts/masterDetailLoadUp.jsp"%>
-		</div>
-		<a onclick="" href="return false;" class="thickbox" id="userSummaryHref" style="display: none;"></a>	
+	<div id="masterDetailArea" class="voffset10">
+		<%@ include file="parts/masterDetailLoadUp.jsp"%>
+	</div>
+	<a onclick="" href="return false;" class="thickbox initially-hidden" id="userSummaryHref"></a>
 	
-		<c:forEach var="sessionDto" items="${sessionDtos}" varStatus="status">
-			<div class="session-container" 
-				 	style="<c:if test='${!status.last}'>padding-bottom: 30px;</c:if><c:if test='${status.last}'>padding-bottom: 15px;</c:if> ">
-				<c:if test="${sessionMap.isGroupedActivity}">
-					<div class="session-header">
-						<B><fmt:message key="monitoring.label.group" /></B> ${sessionDto.sessionName}
-					</div>
-				</c:if>
+	<c:if test="${sessionMap.isGroupedActivity}">
+		<div class="panel-group" id="accordionSessions" role="tablist" aria-multiselectable="true"> 
+	</c:if>
+	
+	<c:forEach var="sessionDto" items="${sessionDtos}" varStatus="status">
+	
+		<c:if test="${sessionMap.isGroupedActivity}">	
+		    <div class="panel panel-default" >
+		        <div class="panel-heading" id="heading${sessionDto.sessionId}">
+		        	<span class="panel-title collapsable-icon-left">
+		        		<a class="${status.first ? '' : 'collapsed'}" role="button" data-toggle="collapse" href="#collapse${sessionDto.sessionId}" 
+								aria-expanded="${status.first ? 'false' : 'true'}" aria-controls="collapse${sessionDto.sessionId}" >
+							<fmt:message key="monitoring.label.group" />:	<c:out value="${sessionDto.sessionName}" />
+						</a>
+					</span>
+		        </div>
+	        
+	        <div id="collapse${sessionDto.sessionId}" class="panel-collapse collapse ${status.first ? 'in' : ''}" 
+	        		role="tabpanel" aria-labelledby="heading${sessionSummary.sessionId}">
+		</c:if>
 				
-				<table id="list${sessionDto.sessionId}" class="scroll" cellpadding="0" cellspacing="0"></table>
-				<table id="userSummary${sessionDto.sessionId}" class="scroll" cellpadding="0" cellspacing="0"></table>
-				<div id="listPager${sessionDto.sessionId}" class="scroll"></div>
-				
-			</div>
-		</c:forEach>	
-		
-		<html:link href="javascript:exportSummary();" property="exportExcel" styleClass="button space-right float-right">
-			<fmt:message key="label.monitoring.summary.export.summary" />
-		</html:link>
-		
-		<div style="padding-left: 20px; margin-bottom: 15px; margin-top: 30px;">
-			<H1><fmt:message key="label.monitoring.summary.report.by.question" /></H1>
-		</div>
-		
-		<!-- Dropdown menu for choosing a question type -->
-		
-		<div style="padding-left: 30px; margin-top: 10px; margin-bottom: 25px;">	
-			<div style="margin-bottom: 6px; font-size: small; font-style: italic;">
-				<fmt:message key="label.monitoring.summary.results.question" />
-			</div>
+		<table id="list${sessionDto.sessionId}"></table>
+		<div class="voffset10"></div>
+		<table id="userSummary${sessionDto.sessionId}"></table>
+		<div id="listPager${sessionDto.sessionId}"></div>
 
-			<select id="questionUid" style="float: left">
-				<option selected="selected" value="-1"><fmt:message key="label.monitoring.summary.choose" /></option>
-    			<c:forEach var="question" items="${sessionMap.questionList}">
-					<option value="${question.uid}"><c:out value="${question.title}" escapeXml="true"/></option>
-			   	</c:forEach>
-			</select>
-			
-			<a onclick="" href="return false;" class="thickbox" id="questionSummaryHref" style="display: none;"></a>
-		</div>
+		<c:if test="${sessionMap.isGroupedActivity}">
+			</div> <!-- end collapse area  -->
+			</div> <!-- end collapse panel  -->
+		</c:if>
+		${ !sessionMap.isGroupedActivity || ! status.last ? '<div class="voffset5">&nbsp;</div>' :  ''}
+
+	</c:forEach>
+		
+	<c:if test="${sessionMap.isGroupedActivity}">
+		</div> <!--  end panel group -->
+	</c:if>
+		
+	<html:link href="javascript:exportSummary();" property="exportExcel" styleClass="btn btn-default btn-xs pull-right">
+		<fmt:message key="label.monitoring.summary.export.summary" />
+	</html:link>
+		
+	<!-- Dropdown menu for choosing a question type -->	
+	<h5><fmt:message key="label.monitoring.summary.report.by.question" /></h5>
 	
-	</c:otherwise>
-</c:choose>
+	<div class="comments">
+		<fmt:message key="label.monitoring.summary.results.question" />
+	</div>
+
+	<div class="form-inline form-group voffset5">
+		<select id="questionUid" class="form-control input-sm">
+			<option selected="selected" value="-1"><fmt:message key="label.monitoring.summary.choose" /></option>
+    		<c:forEach var="question" items="${sessionMap.questionList}">
+				<option value="${question.uid}"><c:out value="${question.title}" escapeXml="true"/></option>
+		   	</c:forEach>
+		</select>
+			
+		<a onclick="" href="return false;" class="thickbox initially-hidden" id="questionSummaryHref"></a>
+	</div>
+</c:if>
 
 <br/>
 

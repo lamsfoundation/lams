@@ -1,23 +1,27 @@
 <%@ include file="/common/taglibs.jsp"%>
 
-<br>
-<table class="alternative-color" id="reflections">
-						
-	<tr>
-		<th>
-			<fmt:message key="label.export.reflection"/>
-		</th>
-	</tr>
+<div class="panel-group" id="reflections" role="tablist" aria-multiselectable="true"> 
+    <div class="panel panel-default" >
+        <div class="panel-heading collapsable-icon-left" id="headingReflection">
+        	<span class="panel-title">
+		    	<a class="collapsed" role="button" data-toggle="collapse" href="#collapseReflection" aria-expanded="false" aria-controls="collapseReflection" >
+	          		<fmt:message key="label.export.reflection"/>
+	        	</a>
+      		</span>
+        </div>
 
-	<c:forEach var="reflectDTO" items="${sessionMap.reflectList}">
-		<tr>
-			<td valign=top class="align-left">
-				<b><c:out value="${reflectDTO.fullName}" escapeXml="true"/> - <lams:Date value="${reflectDTO.date}"/></b>
-				<br>
-				<lams:out value="${reflectDTO.reflect}" escapeHtml="true"/>
-
-			</td>
-		</tr>
-	</c:forEach>
-
-</table>
+        <div id="collapseReflection" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingReflection">
+			<table class="table table-striped table-condensed">
+				<c:forEach var="reflectDTO" items="${sessionMap.reflectList}">
+					<tr>
+						<td>
+							<strong><c:out value="${reflectDTO.fullName}" escapeXml="true"/></strong> - <lams:Date value="${reflectDTO.date}"/>
+							<br>
+							<lams:out value="${reflectDTO.reflect}" escapeHtml="true" />
+						</td>
+					</tr>
+				</c:forEach>
+			</table>
+		</div>
+	</div>
+</div>

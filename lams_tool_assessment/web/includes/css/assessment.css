@@ -1,17 +1,3 @@
-.field-name input[type=checkbox] {
-	vertical-align: bottom;
-	margin-right: 4px;
-	border: none;
-}
-
-.field-name a {
-	color: #0087e5;
-}
-
-.field-name img {
-	margin-left: -4px;
-}
-
 #overall-feedback {
 	margin-left: 23px; 
 	margin-top: 10px;
@@ -64,7 +50,7 @@ table.forum.question-summary-table tr:last-child td{
 	width:100%;
 }
 
-div.error, div.message {
+div.message {
     background-color: #FFE4C4;
     border: 1px solid #000;
     color: #000000;
@@ -74,11 +60,6 @@ div.error, div.message {
     padding: 8px;
     text-align: left;
     vertical-align: bottom;
-}
-
-/* use a different color for the errors */
-div.error {
-	border: 2px solid red;
 }
 
 img.validationWarning, div.errors img.icon, div.messages img.icon {
@@ -153,7 +134,7 @@ div.growlUI h1, div.growlUI h2 {
 	color: red;
 }
 
-#warning-answers-required, #warning-words-limit, #warning-mark-hedging-wrong-total, .hidden {
+#warning-answers-required, #warning-words-limit, #warning-mark-hedging-wrong-total, .initially-hidden {
 	display: none;
 }
 
@@ -166,4 +147,13 @@ div.growlUI h1, div.growlUI h2 {
 
 .button-disabled {
 	opacity:.2;
+}
+
+table.table-row-spacing {
+	width:100%; 
+	border-spacing: 4px; 
+	border-collapse: separate;
+}
+.comments {
+	font-size: small; font-style: italic; margin-top: -8px;
 }
