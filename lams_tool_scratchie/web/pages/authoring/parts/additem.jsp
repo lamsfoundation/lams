@@ -5,17 +5,11 @@
 <lams:html>
 	<lams:head>
 		<%@ include file="/common/header.jsp"%>
-		<style media="screen,projection" type="text/css">
-			label { width: 10em; float: left; }
+		<link href="<lams:WebAppURL/>css/scratchie.css" rel="stylesheet" type="text/css" media="screen">
+ 		<style media="screen,projection" type="text/css">
 			label.error { float: none; color: red; vertical-align: top; font-weight: bold; font-style: italic;}
-			em { font-weight: bold; padding-right: 1em; vertical-align: top; }
-			#content {width: 91%; margin-bottom: 10px;}
-			table.alternative-color td {padding-left: 0;}
-			input[type=text].shortInputText {width:10%;}
-			input[type=text] {width:98%;}
-			textarea {width:98%;}
 		</style>
-		
+ 		
 		<c:set var="ctxPath" value="${pageContext.request.contextPath}"	scope="request" />
 
 		<script language="JavaScript" type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery.js"></script>
@@ -213,12 +207,20 @@
 	</lams:head>
 	
 	<body class="stripes" onload="parent.resizeIframe();">
-		<div id="content" >	
+	
+	<div class="row no-gutter">
+		<div class="col-xs-12">
+			<div class="container" id="content">
+			
+			<div class="panel panel-default panel-learner-page">
+				<div class="panel-heading">
+					<div class="panel-title panel-learner-title">
+						<fmt:message key="label.edit.question" />
+					</div>
+				</div>
+			<div class="panel-body panel-${type}-body">
+	
 			<%@ include file="/common/messages.jsp"%>
-		    <div class="error" style="display:none;">
-		      	<img src="${ctxPath}/includes/images/warning.gif" alt="Warning!" width="24" height="24" style="float:left; margin: -5px 10px 0px 0px; " />
-		      	<span></span>.<br clear="all"/>
-		    </div>			
 			
 			<html:form action="/authoring/saveItem" method="post" styleId="scratchieItemForm">
 				<c:set var="formBean" value="<%=request.getAttribute(org.apache.struts.taglib.html.Constants.BEAN_KEY)%>" />
@@ -227,59 +229,49 @@
 				<html:hidden property="itemIndex" />
 				<html:hidden property="contentFolderID" styleId="contentFolderID"/>
 	
-				<h2 class="no-space-left">
-					<fmt:message key="label.edit.question" />
-				</h2>
-	
-				<div class="field-name space-top">
-					<fmt:message key="label.authoring.basic.question.name" />
-					<img title="Required field" alt="Required field" src="${ctxPath}/includes/images/req.gif" />
+				<div class="form-group">
+					<label for="title"><fmt:message key="label.authoring.basic.question.name" /></label>
+					<html:text property="title" styleClass="form-control"/>
 				</div>
-				<html:text property="title" />
-	
-				<div class="field-name space-top">
-					<fmt:message key="label.authoring.basic.question.text" />
+
+				<div class="form-group">
+					<label for="description"><fmt:message key="label.authoring.basic.question.text" /></label>
+					<lams:CKEditor id="description" value="${formBean.description}" contentFolderID="${formBean.contentFolderID}"></lams:CKEditor>
 				</div>
-				<lams:CKEditor id="description" value="${formBean.description}" contentFolderID="${formBean.contentFolderID}" >
-				</lams:CKEditor>
-				<br><br>
-				
-				<input type="text" name="hasAnswerFilled" id="hasAnswerFilled" class="fake-validation-input">
-				
-				<div class="field-name space-top">
-					<fmt:message key="label.authoring.scratchie.answers" />
-				</div>
+
 				<label for="hasAnswerFilled" class="error" style="display: none;"></label>
-				
-				<input type="text" name="hasFilledCorrectAnswer" id="hasFilledCorrectAnswer" class="fake-validation-input">
+				<input type="text" name="hasAnswerFilled" id="hasAnswerFilled" class="fake-validation-input" >
 				<label for="hasFilledCorrectAnswer" class="error" style="display: none;"></label>
-				
+				<input type="text" name="hasFilledCorrectAnswer" id="hasFilledCorrectAnswer" class="fake-validation-input">
+
+				<div class="form-group"><fmt:message key="label.authoring.scratchie.answers" /></div>
+			
 			</html:form>
 			
 			<!-- Answers -->
 			<form id="answerForm" name="answerForm">
-				<%@ include file="answerlist.jsp"%>
-				<a href="javascript:;" onclick="addAnswer();" class="button-add-item right-buttons" style="margin-right: 40px; margin-top:0px">
-					<fmt:message key="label.authoring.add.blank.answer" /> 
+ 				<%@ include file="answerlist.jsp"%>
+ 				<a href="javascript:;" onclick="addAnswer();" class="btn btn-default btn-sm" style="margin-right: 40px; margin-top:0px">
+					<i class="fa fa-plus"></i>&nbsp;<fmt:message key="label.authoring.add.blank.answer" /> 
 				</a>
 			</form>
-			<br><br>
-			
-			<lams:ImgButtonWrapper>
-				<a href="#" onclick="$('#scratchieItemForm').submit();" onmousedown="self.focus();" class="button-add-item">
-					<fmt:message key="label.authoring.save.button" /> 
-				</a>
-				<a href="#" onclick="self.parent.tb_remove();" onmousedown="self.focus();" class="button space-left">
+			<div class="pull-right">
+				<a href="#" onclick="self.parent.tb_remove();" onmousedown="self.focus();" class="btn btn-default btn-sm">
 					<fmt:message key="label.authoring.cancel.button" /> 
 				</a>
-			</lams:ImgButtonWrapper>
+				<a href="#" onclick="$('#scratchieItemForm').submit();" onmousedown="self.focus();" class="btn btn-primary btn-sm">
+					<fmt:message key="label.authoring.save.button" /> 
+				</a>
+			</div>
+			
+			<div id="footer"></div>
 
+			</div>
+			</div>
+
+			</div>
 		</div>
-		<!--closes content-->
-	
-		<div id="footer">
-		</div>
-		<!--closes footer-->		
-		
+	</div>
+					
 	</body>
 </lams:html>

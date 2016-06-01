@@ -62,8 +62,8 @@
 		    	height = document.documentElement.clientHeight;
 		    	// alert("using clientHeight");
 		    }
-			// alert("doc height "+height);
-		    height -= document.getElementById('TB_iframeContent').offsetTop + 60;
+		 	// alert("doc height "+height);
+		    height -= document.getElementById('TB_iframeContent').offsetTop + 260;
 		    document.getElementById('TB_iframeContent').style.height = height +"px";
 	
 			TB_HEIGHT = height + 28;
@@ -108,45 +108,39 @@
     			+ '&title=' + title;
     }
 </script>
+
 <!-- Basic Tab Content -->
-<table class="space-bottom">
-	<tr>
-		<td>
-			<div class="field-name">
-				<fmt:message key="label.authoring.basic.title"/>
-			</div>
-			<html:text property="scratchie.title" style="width: 99%;"/>
-		</td>
-	</tr>
-	<tr>
-		<td>
-			<div class="field-name">
-				<fmt:message key="label.authoring.basic.instruction"/>
-			</div>
-			<lams:CKEditor id="scratchie.instructions" value="${formBean.scratchie.instructions}" contentFolderID="${formBean.contentFolderID}"/>
-		</td>
-	</tr>
+<div class="form-group">
+    <label for="scratchie.title"><fmt:message key="label.authoring.basic.title"/></label>
+    <html:text property="scratchie.title" styleClass="form-control"></html:text>
+</div>
+<div class="form-group">
+    <label for="scratchie.instructions"><fmt:message key="label.authoring.basic.instruction" /></label>
+    <lams:CKEditor id="scratchie.instructions" value="${formBean.scratchie.instructions}" contentFolderID="${formBean.contentFolderID}"></lams:CKEditor>
+</div>
 
-
-</table>
-
+<%-- <div id="resourceListArea">
+	<c:set var="sessionMapID" value="${formBean.sessionMapID}" />
+ 	<%@ include file="/pages/authoring/parts/itemlist.jsp"%>
+</div>
+ --%>
 <!-- Items -->
 <div>
 	<div  id="itemArea">
 		<%@ include file="parts/itemlist.jsp"%>
 	</div>
 	
-	<div  style="margin: 0 40px 80px;">
+	<div>
 		<c:set var="addItemUrl" >
 			<c:url value='/authoring/addItem.do'/>?sessionMapID=${sessionMapID}&KeepThis=true&TB_iframe=true&height=540&width=850&modal=true
 		</c:set>
-		<a href="${addItemUrl}" class="button-add-item right-buttons thickbox">
-			<fmt:message key="label.authoring.basic.add.another.scratchie" /> 
+		<a href="${addItemUrl}" class="btn btn-default btn-sm thickbox">
+			<i class="fa fa-plus"></i>&nbsp;<fmt:message key="label.authoring.basic.add.another.scratchie" /> 
 		</a>
-		<a href="#" onClick="javascript:importQTI()" style="margin-right: 30px">
+		<a href="#" onClick="javascript:importQTI()" class="btn btn-default btn-sm loffset5">
 			<fmt:message key="label.authoring.import.qti" /> 
 		</a>
-		<a href="#" onClick="javascript:exportQTI()">
+		<a href="#" onClick="javascript:exportQTI()" class="btn btn-default btn-sm loffset5">
 			<fmt:message key="label.authoring.export.qti" />
 		</a>
 	</div>

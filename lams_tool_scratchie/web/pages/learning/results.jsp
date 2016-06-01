@@ -19,7 +19,7 @@
 	<title><fmt:message key="label.learning.title" /></title>
 	<%@ include file="/common/header.jsp"%>
 	
-	<link type="text/css" href="${lams}css/jquery-ui-redmond-theme.css" rel="stylesheet">
+	<link type="text/css" href="${lams}css/jquery-ui-smoothness-theme.css" rel="stylesheet">
 	<link type="text/css" href="${lams}css/jquery.jqGrid.css" rel="stylesheet" />
 	<link rel="stylesheet" href="<lams:LAMSURL />/includes/font-awesome/css/font-awesome.min.css">
 	<style media="screen,projection" type="text/css">
