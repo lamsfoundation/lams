@@ -5,19 +5,24 @@
 <c:set var="scratchie" value="${sessionMap.scratchie}"/>
 
 <style media="screen,projection" type="text/css">
-	#user-dropdown-div {padding-left: 30px; margin-top: -5px; margin-bottom: 50px;}
-	.bottom-buttons {margin: 20px 20px 0px; padding-bottom: 20px;}
-	.section-header {padding-left: 20px; margin-bottom: 15px; margin-top: 60px;}
+	 .ui-jqgrid {
+		border-left-style: none !important;
+		border-right-style: none !important;
+		border-bottom-style: none !important;
+	}
+	
+	.ui-jqgrid tr {
+		border-left-style: none !important;
+	}
+	
+	.ui-jqgrid td {
+		border-style: none !important;
+	}
 	.ui-jqgrid tr.jqgrow td {
 	    white-space: normal !important;
 	    height:auto;
 	    vertical-align:text-top;
 	    padding-top:2px;
-	}
-	.burning-question-dto {
-		padding-left: 30px; 
-		padding-bottom: 5px; 
-		width:96%;
 	}
 </style>
 
@@ -55,7 +60,7 @@
 			   		{name:'totalAttempts', index:'totalAttempts', width:100, align:"right", sorttype:"int"},
 			   		{name:'mark', index:'mark', width:100, align:"right", sorttype:"int", editable:true, editoptions: {size:4, maxlength: 4}}		
 			   	],
-			   	caption: "${summary.sessionName}",
+			   	// caption: "${summary.sessionName}",
 				cellurl: '<c:url value="/monitoring/saveUserMark.do"/>',
   				cellEdit: true,
   				afterEditCell: function (rowid,name,val,iRow,iCol){
@@ -110,11 +115,11 @@
 				],
 			   	colModel:[
 			   		{name:'id', index:'id', width:0, sorttype:"int", hidden: true},
-			   		{name:'groupName', index:'groupName', width:200},
-			   		{name:'feedback', index:'feedback', width:530},
-			   		{name:'count', index:'count', width:40}
+			   		{name:'groupName', index:'groupName', width:150},
+			   		{name:'feedback', index:'feedback', width:520},
+			   		{name:'count', index:'count', width:70}
 			   	],
-			   	caption: "${scratchieItem.title}"
+			   	// caption: "${scratchieItem.title}"
 			});
 			
 			<c:forEach var="burningQuestionDto" items="${burningQuestionItemDto.burningQuestionDtos}" varStatus="i">
@@ -145,7 +150,7 @@
 		   		{name:'groupName', index:'groupName', width:200},
 		   		{name:'feedback', index:'feedback', width:570}
 		   	],
-		   	caption: "<fmt:message key='label.learners.feedback' />"
+		   	//caption: "<fmt:message key='label.learners.feedback' />"
 		});
 	    <c:forEach var="reflectDTO" items="${sessionMap.reflections}" varStatus="i">
 	    	jQuery("#reflections").addRowData(${i.index + 1}, {
@@ -166,6 +171,7 @@
 		    	});
 		    }
 		});
+		setTimeout(function(){ window.dispatchEvent(new Event('resize')); }, 300);
 
 		$("#item-uid").change(function() {
 			var itemUid = $(this).val();
@@ -240,121 +246,128 @@
 
 </script>
 <script type="text/javascript" src="<lams:LAMSURL/>/includes/javascript/monitorToolSummaryAdvanced.js" ></script>
-<h1><c:out value="${scratchie.title}" escapeXml="true"/></h1>
 
-<div class"instructions space-top space-bottom">
-	<c:out value="${scratchie.instructions }" escapeXml="false" />
-</div>
+	<html:link href="javascript:exportExcel();" styleClass="btn btn-default pull-right">
+		<fmt:message key="label.export.excel" />
+	</html:link>
 
-<c:choose>
-	<c:when test="${empty summaryList}">
-		<div align="center">
-			<b> <fmt:message key="message.monitoring.summary.no.session" /> </b>
-		</div>	
-	</c:when>
-	
-	<c:otherwise>
-	
-		<div style="padding-left: 20px; margin-bottom: 10px; margin-top: 15px;">
-			<H1><fmt:message key="label.monitoring.summary.summary" /></H1>
-		</div>	
-	
-		<div style="padding-left: 30px; font-size: small; margin-bottom: 20px; font-style: italic;">
-			<fmt:message key="label.monitoring.summary.select.student" />
+	<div class="panel">
+		<h4>
+		    <c:out value="${scratchie.title}" escapeXml="true"/>
+		</h4>
+		<div class="instructions voffset5">
+		    <c:out value="${scratchie.instructions}" escapeXml="false"/>
 		</div>
-	
-		<c:forEach var="summary" items="${summaryList}" varStatus="status">
-			<div style="width:96%; padding-left: 30px; <c:if test='${! status.last}'>padding-bottom: 30px;</c:if><c:if test='${ status.last}'>padding-bottom: 15px;</c:if> ">
-				<c:if test="${sessionMap.isGroupedActivity}">
-					<div style="padding-bottom: 5px; font-size: small;">
-						<B><fmt:message key="monitoring.label.group" /></B> ${summary.sessionName}
-					</div>
-				</c:if>
-				
-				<table id="list${summary.sessionId}" class="scroll" cellpadding="0" cellspacing="0"></table>
-			</div>
-		</c:forEach>
 		
+		<c:if test="${empty summaryList}">
+			<lams:Alert type="info" id="no-session-summary" close="false">
+				 <fmt:message key="message.monitoring.summary.no.session" />
+			</lams:Alert>
+		</c:if>
+	
+	</div>
+
+	<div class="form-group">
 		<!-- Dropdown menu for choosing scratchie item -->
-		
-		<div style="padding-left: 20px; margin-bottom: 15px; margin-top: 30px;">
-			<H1><fmt:message key="label.monitoring.summary.report.by.scratchie" /></H1>
-		</div>
-		
-		<div style="padding-left: 30px; margin-top: -5px; margin-bottom: 25px;">
-			<select id="item-uid" style="float: left">
-				<option selected="selected" value="-1"><fmt:message key="label.monitoring.summary.choose" /></option>
-    			<c:forEach var="item" items="${scratchie.scratchieItems}">
-					<option value="${item.uid}"><c:out value="${item.title}" escapeXml="true"/></option>
-			   	</c:forEach>
-			</select>
-			
-			<a href="#nogo" class="thickbox" id="item-summary-href" style="display: none;"></a>
-		</div>
-		
+		<label for="item-uid"><h4><fmt:message key="label.monitoring.summary.report.by.scratchie" /></h4></label>
+		<select id="item-uid" class="form-control">
+			<option selected="selected" value="-1"><fmt:message key="label.monitoring.summary.choose" /></option>
+   			<c:forEach var="item" items="${scratchie.scratchieItems}">
+				<option value="${item.uid}"><c:out value="${item.title}" escapeXml="true"/></option>
+		   	</c:forEach>
+		</select>
+		<a href="#nogo" class="thickbox" id="item-summary-href" style="display: none;"></a>
+	</div>
+	<div class="form-group">
 		<!-- Dropdown menu for choosing user -->
-		
-		<div class="section-header">
-			<H1><fmt:message key="label.monitoring.summary.report.by.user" /></H1>
-		</div>
-		
-		<div id="user-dropdown-div">
+		<label for="userid-dropdown"><h4><fmt:message key="label.monitoring.summary.report.by.user" /></h4></label>
+		<select id="userid-dropdown" class="form-control">
+			<option selected="selected" value="-1"><fmt:message key="label.monitoring.summary.choose" /></option>
+   			<c:forEach var="learner" items="${sessionMap.learners}">
+				<option value="${learner.userId}" alt="${learner.session.sessionId}"><c:out value="${learner.firstName} ${learner.lastName} (${learner.session.sessionName})" escapeXml="true"/></option>
+		   	</c:forEach>
+		</select>
+	</div>
 
-			<select id="userid-dropdown" class="float-left">
-				<option selected="selected" value="-1"><fmt:message key="label.monitoring.summary.choose" /></option>
-    			<c:forEach var="learner" items="${sessionMap.learners}">
-					<option value="${learner.userId}" alt="${learner.session.sessionId}"><c:out value="${learner.firstName} ${learner.lastName} (${learner.session.sessionName})" escapeXml="true"/></option>
-			   	</c:forEach>
-			</select>
-		</div>
-		
-		<!-- Display burningQuestionItemDtos -->
-		<c:if test="${scratchie.burningQuestionsEnabled}">
-		
-			<div class="section-header">
-				<H1>
-					<fmt:message key="label.burning.questions" />
-				</H1>
-			</div>
-			
-			<c:forEach var="burningQuestionItemDto" items="${sessionMap.burningQuestionItemDtos}" varStatus="i">
-				<div class="burning-question-dto">
-					<table id="burningQuestions${burningQuestionItemDto.scratchieItem.uid}" class="scroll" cellpadding="0" cellspacing="0"></table>
-				</div>
-			</c:forEach>
+	<c:set var="summaryTitle"><fmt:message key="label.monitoring.summary.summary" /></c:set>
+	<c:if test="${sessionMap.isGroupedActivity}">
+		<H4>${summaryTitle}</H4>
+	</c:if>
+	
+	<fmt:message key="label.monitoring.summary.select.student" />
+
+	<c:forEach var="summary" items="${summaryList}" varStatus="status">
+
+		<c:if test="${sessionMap.isGroupedActivity}">
+			<c:set var="summaryTitle"><fmt:message key="monitoring.label.group" /></B> ${summary.sessionName}</c:set>
 		</c:if>
 		
-		<!-- Display reflection entries -->
-		<c:if test="${sessionMap.reflectOn}">
+	    <div class="panel panel-default" >
+        <div class="panel-heading" id="heading${summary.sessionId}">
+        	<span class="panel-title collapsable-icon-left">
+        	<a role="button" data-toggle="collapse" href="#collapse${summary.sessionId}" 
+					aria-expanded="false" aria-controls="collapse${summary.sessionId}" >
+				${summaryTitle}</a>
+			</span>
+        </div>
+        
+        <div id="collapse${summary.sessionId}" class="panel-collapse collapse in" role="tabpanel" aria-labelledby="heading${summary.sessionId}">
+
+		<table id="list${summary.sessionId}" class="scroll" cellpadding="0" cellspacing="0"></table>
 		
-			<div class="section-header" style="margin-top: 30px;">
-				<H1>
-					<fmt:message key="label.learners.feedback" />
-					
-					<select id="reflection-group-selector" class="space-left">
+		</div> <!-- end collapse area  -->
+		</div> <!-- end collapse panel  -->
+	
+	</c:forEach>
+
+	<!-- Display burningQuestionItemDtos -->
+	<c:if test="${scratchie.burningQuestionsEnabled}">
+		<div class="panel-group" id="accordionBurning" role="tablist" aria-multiselectable="true"> 
+		    <div class="panel panel-default" >
+		        <div class="panel-heading collapsable-icon-left" id="headingBurning">
+		        	<span class="panel-title">
+			    	<a role="button" data-toggle="collapse" href="#collapseBurning" aria-expanded="false" aria-controls="collapseBurning" >
+		          	<fmt:message key="label.burning.questions" />
+		        	</a>
+		      		</span>
+		        </div>
+		
+		        <div id="collapseBurning" class="panel-collapse collapse in" role="tabpanel" aria-labelledby="headingBurning">
+					<c:forEach var="burningQuestionItemDto" items="${sessionMap.burningQuestionItemDtos}" varStatus="i">
+						<div class="voffset5"><strong>${burningQuestionItemDto.scratchieItem.title}</strong></div>
+						<table id="burningQuestions${burningQuestionItemDto.scratchieItem.uid}" class="scroll" cellpadding="0" cellspacing="0"></table>
+					</c:forEach>
+				</div>
+			</div>
+		</div>
+	</c:if>
+	
+	<!-- Display reflection entries -->
+	<c:if test="${sessionMap.reflectOn}">
+
+		<div class="panel-group" id="accordionReflections" role="tablist" aria-multiselectable="true"> 
+		    <div class="panel panel-default" >
+		        <div class="panel-heading collapsable-icon-left" id="headingReflections">
+		        	<span class="panel-title">
+			    	<a role="button" data-toggle="collapse" href="#collapseReflections" aria-expanded="false" aria-controls="collapseReflections" >
+		          	<fmt:message key="label.learners.feedback" />
+		        	</a>
+		        	<select id="reflection-group-selector" class="input-sm pull-right">
 						<option selected="selected" value=""><fmt:message key="label.all" /></option>
 		    			<c:forEach var="reflectDTO" items="${sessionMap.reflections}">
 							<option value="${reflectDTO.groupName}">${reflectDTO.groupName}</option>
 					   	</c:forEach>
 					</select>
-				</H1>
-			</div>
-			
-			<div style="padding-left: 30px; width:96%;">
-				<table id="reflections" class="scroll" cellpadding="0" cellspacing="0"></table>
-			</div>
-		</c:if>
+		      		</span>
+		        </div>
 		
-		<div class="bottom-buttons">
-			<html:link href="javascript:exportExcel();" styleClass="button float-right space-left">
-				<fmt:message key="label.export.excel" />
-			</html:link>
+		        <div id="collapseReflections" class="panel-collapse collapse in" role="tabpanel" aria-labelledby="headingReflections">
+					<table id="reflections" class="scroll" cellpadding="0" cellspacing="0"></table>
+				</div>
+			</div>
 		</div>
+	</c:if>
 	
-	</c:otherwise>
-</c:choose>
-
-
 <%@ include file="parts/advanceOptions.jsp"%>
 
 <%@ include file="parts/dateRestriction.jsp"%>

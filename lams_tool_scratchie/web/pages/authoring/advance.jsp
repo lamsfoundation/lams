@@ -6,31 +6,31 @@
 <!-- Advance Tab Content -->
 
 <c:if test="${sessionMap.isEnabledExtraPointOption}">
-	<p>
-		<html:checkbox property="scratchie.extraPoint" styleClass="noBorder" styleId="extraPoint"/>
+	<div class="checkbox">
 		<label for="extraPoint">
-			<fmt:message key="label.authoring.advanced.give.extra.point" />
+		<html:checkbox property="scratchie.extraPoint" styleId="extraPoint"/>
+		<fmt:message key="label.authoring.advanced.give.extra.point" />
 		</label>
-	</p>
+	</div>
 </c:if>
 
-<p>
-	<html:checkbox property="scratchie.burningQuestionsEnabled" styleClass="noBorder" styleId="burningQuestionsEnabled"/>
+<div class="checkbox">
 	<label for="burningQuestionsEnabled">
-		<fmt:message key="label.authoring.advanced.burning.questions" />
+	<html:checkbox property="scratchie.burningQuestionsEnabled" styleId="burningQuestionsEnabled"/>
+	<fmt:message key="label.authoring.advanced.burning.questions" />
 	</label>
-</p>
+</div>
 
-<p>
-	<html:checkbox property="scratchie.reflectOnActivity" styleClass="noBorder" styleId="reflectOn"/>
+<div class="checkbox">
 	<label for="reflectOn">
-		<fmt:message key="label.authoring.advanced.reflectOnActivity" />
+	<html:checkbox property="scratchie.reflectOnActivity" styleId="reflectOn"/>
+	<fmt:message key="label.authoring.advanced.reflectOnActivity" />
 	</label>
-</p>
+</div>
 
-<p>
-	<html:textarea property="scratchie.reflectInstructions" styleId="reflectInstructions" cols="30" rows="3" />
-</p>
+<div class="form-group">
+	<html:textarea property="scratchie.reflectInstructions"  styleClass="form-control" styleId="reflectInstructions" rows="3" />
+</div>
 <script type="text/javascript">
 <!--
 //automatically turn on refect option if there are text input in refect instruction area

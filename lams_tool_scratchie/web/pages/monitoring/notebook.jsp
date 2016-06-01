@@ -8,41 +8,27 @@
 	<%@ include file="/common/header.jsp"%>
 </lams:head>
 <body class="stripes">
-		
-			<div id="content">
-				<h1>
-					<fmt:message key="page.title.monitoring.view.reflection"/>
-				</h1>
-				${userDTO.fullName}<BR><BR>
-				<table class="alternative-color" cellspacing="0">
-					<tr>
-						<th class="first">
-							<lams:out value="${userDTO.reflectInstrctions}"/>
-						</th>
-					</tr>
-					<tr>
-						<td>
-							<c:choose>
-								<c:when test="${userDTO.finishReflection}">
-									<lams:out value="${userDTO.reflect}"/>
-								</c:when>
-								<c:otherwise>
-									<fmt:message key="message.no.reflection.available" />
-								</c:otherwise>
-							</c:choose>
-						</td>
-					</tr>
-				</table>
-				<table cellpadding="0">
-					<tr>
-						<td>
-							<a href="javascript:window.close();" class="button"><fmt:message key="button.close"/></a>
-						</td>
-					</tr>
-				</table>
-			</div>
-		<div id="footer">
-		</div>
-		<!--closes footer-->
+
+	<c:set var="title"><fmt:message key="page.title.monitoring.view.reflection"/></c:set>
+	<lams:Page type="learner" title="${title}">
+
+		<h4>${userDTO.fullName}</h4>
+
+		<p><lams:out value="${userDTO.reflectInstrctions}"/></p>
+
+		<c:choose>
+			<c:when test="${userDTO.finishReflection}">
+				<p><lams:out value="${userDTO.reflect}"/></p>
+			</c:when>
+			<c:otherwise>
+				<p><fmt:message key="message.no.reflection.available" /></p>
+			</c:otherwise>
+		</c:choose>
+
+		<a href="javascript:window.close();" class="btn btn-default"><fmt:message key="button.close"/></a>
+
+		<div id="footer"></div>
+	</lams:Page>
+
 </body>
 </lams:html>

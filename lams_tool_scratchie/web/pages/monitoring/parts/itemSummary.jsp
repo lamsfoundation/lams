@@ -6,12 +6,26 @@
 <c:set var="lams"><lams:LAMSURL /></c:set>
 <c:set var="sessionMap" value="${sessionScope[sessionMapID]}"/>
 <c:set var="scratchie" value="${sessionMap.scratchie}"/>
-
+<style media="screen,projection" type="text/css">
+	 .ui-jqgrid {
+		border-left-style: none !important;
+		border-right-style: none !important;
+		border-bottom-style: none !important;
+	}
+	
+	.ui-jqgrid tr {
+		border-left-style: none !important;
+	}
+	
+	.ui-jqgrid td {
+		border-style: none !important;
+	}
+</style>
 <lams:html>
 	<lams:head>
 		<%@ include file="/common/header.jsp"%>
 		
-		<link type="text/css" href="${lams}css/jquery-ui-redmond-theme.css" rel="stylesheet">
+		<link type="text/css" href="${lams}css/jquery-ui-smoothness-theme.css" rel="stylesheet">
 		<link type="text/css" href="${lams}css/jquery.jqGrid.css" rel="stylesheet" />
 		
 		<script type="text/javascript" src="${lams}includes/javascript/jquery.js"></script>
@@ -26,7 +40,7 @@
 	  					datatype: "local",
 	  					rowNum: 10000,
 	  					height: 'auto',
-	  					width: 500,
+	  					width: 629,
 	  					shrinkToFit: true,
 	  					
 	  				   	colNames:["<fmt:message key="label.monitoring.summary.answer" />"
@@ -43,7 +57,7 @@
 	  				   	],
 	  				   	
 	  				   	multiselect: false,
-	  				   	caption: "<fmt:message key="label.monitoring.item.summary.group" /> ${summary.sessionName}"
+	  				   	//caption: "<fmt:message key="label.monitoring.item.summary.group" /> ${summary.sessionName}"
 	  				});
 	  				
 	  	   	        <c:forEach var="answer" items="${summary.answers}" varStatus="i">
@@ -68,39 +82,38 @@
 	</lams:head>
 	
 	<body class="stripes" onload="parent.resizeIframe();">
-		<div id="content" >
-		
-			<h1>
-				<fmt:message key="label.monitoring.summary.report.for" >
+	
+		<c:set var="title"><fmt:message key="label.monitoring.summary.report.for" >
 					<fmt:param>${fn:escapeXml(item.title)}</fmt:param>
 				</fmt:message>
-			</h1>
+		</c:set>
+
+		<lams:Page type="learning" title="${title}">
+		
 			<h3>
 				<c:out value="${item.description}" escapeXml="false"/>
 			</h3>	
 			<%@ include file="/common/messages.jsp"%>
-			<br/>
-			<br/>
 			
 			<c:forEach var="summary" items="${summaryList}" varStatus="status">
-				<div style="padding-left: 0px; padding-bottom: 30px;">
-					<table id="session${summary.sessionId}" class="scroll" cellpadding="0" cellspacing="0" ></table>
-				</div>	
+
+				<div class="panel panel-default" >
+	        	<div class="panel-heading">
+				<span class="panel-title">
+					<fmt:message key="label.monitoring.item.summary.group" />&nbsp;${summary.sessionName}
+				</span>
+				</div>
+				<table id="session${summary.sessionId}" class="scroll" cellpadding="0" cellspacing="0" ></table>
+				</div>
 			</c:forEach>	
 
-
-			<lams:ImgButtonWrapper>
-				<a href="#" onclick="refreshSummaryPage();" class="button space-left" style="float:right; margin-right:40px; padding-top:5px;">
-					<fmt:message key="button.close" /> 
-				</a>
-			</lams:ImgButtonWrapper>
-
-		</div>
-		<!--closes content-->
+			<a href="#" onclick="refreshSummaryPage();" class="btn btn-default">
+				<fmt:message key="button.close" /> 
+			</a>
 	
-		<div id="footer">
-		</div>
-		<!--closes footer-->		
-		
+		<div id="footer"></div>
+
+		</lams:Page>
+				
 	</body>
 </lams:html>

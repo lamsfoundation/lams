@@ -5,37 +5,44 @@
 
 
 	<c:if test="${empty summaryList}">
-		<div align="center">
-			<b> <fmt:message key="message.monitoring.summary.no.session" /> </b>
-		</div>
+		<lams:Alert type="info" id="no-session-summary" close="false">
+			<fmt:message key="message.monitoring.summary.no.session" />
+		</lams:Alert>
 	</c:if>
 	
 	<c:forEach var="summary" items="${summaryList}" varStatus="firstGroup">
 
-	<h2><fmt:message key="monitoring.label.group" /> ${summary.sessionName}</h2> 
+		<c:if test="${sessionMap.isGroupedActivity}">	
+		    <div class="panel panel-default" >
+	        <div class="panel-heading" id="heading${summary.sessionId}">
+				<span class="panel-title">
+					<fmt:message key="monitoring.label.group" /> ${summary.sessionName}
+				</span>
+	        </div>
+		</c:if>
 
-	<table cellspacing="3" style="width: 400px; padding-left: 30px;" class="alternative-color">
+		<table class="table table-striped table-condensed">
 		<tr>
-			<th width="20px;" style="text-align: center; padding-left: 0px;">
+			<th class="text-center" width="20px;">
 				#
 			</th>				
-			<th width="150px;" style="padding-left: 0px;">
+			<th width="150px;">
 				<fmt:message key="label.monitoring.summary.user.name" />
 			</th>
-			<th width="80px;" style="padding-left: 0px; text-align: center;'">
+			<th class="text-center" width="80px;" >
 				<fmt:message key="label.monitoring.summary.mark" />
 			</th>					
 		</tr>	
 	
 		<c:forEach var="user" items="${summary.users}" varStatus="status">
 			<tr>
-				<td>
+				<td class="text-center" >
 					${status.index + 1}
 				</td>				
 				<td>
 					<c:out value="${user.firstName} ${user.lastName}" escapeXml="true"/>
 				</td>
-				<td align="center">
+				<td class="text-center" >
 					<c:choose>
 						<c:when test='${summary.totalAttempts == 0}'>-</c:when> 
 						<c:otherwise>${summary.mark}</c:otherwise>
@@ -43,6 +50,11 @@
 				</td>
 			</tr>
 		</c:forEach>
+		</table>
+		
+		<c:if test="${sessionMap.isGroupedActivity}">	
+			</div>
+		</c:if>
+	
 	</c:forEach>
-</table>
 
