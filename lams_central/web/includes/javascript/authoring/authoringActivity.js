@@ -612,12 +612,16 @@ ActivityDraw = {
 							'fill'   : layout.colors.activity[layout.toolMetadata[this.learningLibraryID].activityCategoryID]
 						 }),
 			// check for icon in the library
-			icon =  paper.image(ActivityIcons[this.learningLibraryID], x + 47, y + 3, 30, 30),
+			imageData = ActivityIcons[this.learningLibraryID],
+			icon = imageData ? paper.image(imageData, x + 47, y + 3, 30, 30) : null,
 			label = paper.text(x + 62, y + 43, ActivityLib.shortenActivityTitle(this.title))
 			 			 .attr(layout.defaultTextAttributes)
 			 			 .attr('fill', layout.colors.activityText);
 		
-		this.items = paper.g(shape, icon, label);
+		this.items = paper.g(shape, label);
+		if (icon) {
+			this.items.add(icon);
+		}
 		if (this.readOnly && !isReadOnlyMode) {
 			this.items.attr('filter', layout.conf.readOnlyFilter);
 		}

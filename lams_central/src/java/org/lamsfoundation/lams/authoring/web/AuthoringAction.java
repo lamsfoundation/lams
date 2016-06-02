@@ -118,7 +118,7 @@ public class AuthoringAction extends LamsDispatchAction {
 	    HttpServletResponse response) throws IOException, JSONException {
 	request.setAttribute(AttributeNames.PARAM_CONTENT_FOLDER_ID, FileUtil.generateUniqueContentFolderID());
 
-	request.setAttribute("tools", getLearningDesignService().getToolDTOs(true, request.getRemoteUser()));
+	request.setAttribute("tools", getLearningDesignService().getToolDTOs(true, true, request.getRemoteUser()));
 	// build list of existing learning library groups
 	List<LearningLibraryGroup> groups = getLearningDesignService().getLearningLibraryGroups();
 	JSONArray groupsJSON = new JSONArray();
@@ -145,7 +145,7 @@ public class AuthoringAction extends LamsDispatchAction {
 
     public ActionForward generateSVG(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) throws IOException {
-	request.setAttribute("tools", getLearningDesignService().getToolDTOs(true, request.getRemoteUser()));
+	request.setAttribute("tools", getLearningDesignService().getToolDTOs(true, true, request.getRemoteUser()));
 
 	return mapping.findForward("svgGenerator");
     }
@@ -325,7 +325,7 @@ public class AuthoringAction extends LamsDispatchAction {
 	    Long learningDesignID = learningDesign.getLearningDesignId();
 	    if (learningDesignID != null) {
 		responseJSON.put("learningDesignID", learningDesignID);
-		
+
 		Gson gson = new GsonBuilder().create();
 		Vector<ValidationErrorDTO> validationDTOs = getAuthoringService()
 			.validateLearningDesign(learningDesignID);

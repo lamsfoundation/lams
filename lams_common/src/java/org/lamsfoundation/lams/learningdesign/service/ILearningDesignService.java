@@ -97,5 +97,6 @@ public interface ILearningDesignService {
      */
     public void setValid(Long learningLibraryId, boolean valid);
 
-    public List<ToolDTO> getToolDTOs(boolean includeParallel, String userName) throws IOException;
+    public List<ToolDTO> getToolDTOs(boolean includeParallel, boolean includeInvalid, String userName)
+	    throws IOException;
 }

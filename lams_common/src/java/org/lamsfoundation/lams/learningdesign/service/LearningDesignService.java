@@ -248,15 +248,16 @@ public class LearningDesignService implements ILearningDesignService {
      */
     @Override
     @SuppressWarnings("unchecked")
-    public List<ToolDTO> getToolDTOs(boolean includeParallel, String userName) throws IOException {
+    public List<ToolDTO> getToolDTOs(boolean includeParallel, boolean includeInvalid, String userName)
+	    throws IOException {
 	User user = (User) learningLibraryDAO.findByProperty(User.class, "login", userName).get(0);
 	String languageCode = user.getLocale().getLanguageIsoCode();
-	ArrayList<LearningLibraryDTO> learningLibraries = getAllLearningLibraryDetails(languageCode);
+	ArrayList<LearningLibraryDTO> learningLibraries = getAllLearningLibraryDetails(false, languageCode);
 	List<ToolDTO> tools = new ArrayList<ToolDTO>();
 	for (LearningLibraryDTO learningLibrary : learningLibraries) {
 	    // skip invalid tools
 	    boolean isParallel = learningLibrary.getTemplateActivities().size() > 1;
-	    if (learningLibrary.getValidFlag() && (includeParallel || !isParallel)) {
+	    if ((includeInvalid || learningLibrary.getValidFlag()) && (includeParallel || !isParallel)) {
 		List<LibraryActivityDTO> libraryActivityDTOs = learningLibrary.getTemplateActivities();
 		LibraryActivityDTO libraryActivityDTO = libraryActivityDTOs.get(0);
 		ToolDTO toolDTO = new ToolDTO();
@@ -278,6 +279,7 @@ public class LearningDesignService implements ILearningDesignService {
 			isParallel ? learningLibrary.getTitle() : libraryActivityDTO.getActivityTitle());
 		toolDTO.setActivityCategoryID(
 			isParallel ? Activity.CATEGORY_SPLIT : libraryActivityDTO.getActivityCategoryID());
+		toolDTO.setValid(learningLibrary.getValidFlag());
 
 		if (libraryActivityDTO.getToolID() == null) {
 		    toolDTO.setIconPath(libraryActivityDTO.getLibraryActivityUIImage());
