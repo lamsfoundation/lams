@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!DOCTYPE struts-config PUBLIC "-//Apache Software Foundation//DTD Struts Configuration 1.2//EN" "http://jakarta.apache.org/struts/dtds/struts-config_1_2.dtd">
+
+<struts-config>
+	<global-exceptions>
+		<exception
+			handler="org.lamsfoundation.lams.web.util.CustomStrutsExceptionHandler"
+			key="error.system" path="/error.jsp" scope="request" type="java.lang.Exception" />
+	</global-exceptions>
+
+	<action-mappings>
+		<action path="/authoring/start"
+			type="org.eucm.lams.tool.eadventure.web.action.AuthoringAction" />
+
+		<action path="/authoring/initPedagogicalPlannerForm"
+			type="org.eucm.lams.tool.eadventure.web.action.AuthoringAction" />
+
+		<action path="/learning/start"
+			type="org.eucm.lams.tool.eadventure.web.action.LearningAction" />
+
+		<action path="/monitoring/summary"
+			type="org.eucm.lams.tool.eadventure.web.action.MonitoringAction" />
+	</action-mappings>
+</struts-config>

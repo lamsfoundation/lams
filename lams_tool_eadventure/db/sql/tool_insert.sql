@@ -1,7 +1,3 @@
-# Connection: ROOT LOCAL
-# Host: localhost
-# Saved: 2005-04-07 10:42:43
-# 
 INSERT INTO lams_tool
 (
 tool_signature,
@@ -46,9 +42,9 @@ NULL,
 'tool/eueadv10/learning/start.do?mode=teacher',
 'tool/eueadv10/authoring/start.do',
 'tool/eueadv10/monitoring/summary.do',
-'tool/eueadv10/definelater.do',
+NULL,
 'tool/eueadv10/authoring/initPedagogicalPlannerForm.do',
-'http://wiki.lamsfoundation.org/display/lamsdocs/eueadv10',
+NULL,
 'org.eucm.lams.tool.eadventure.ApplicationResources',
 NOW(),
 NOW(),

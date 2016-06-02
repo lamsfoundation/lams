@@ -20,7 +20,6 @@
  * ****************************************************************
  */
 
-
 package org.lamsfoundation.lams.web;
 
 import java.sql.SQLException;
@@ -116,7 +115,8 @@ public class DisplayGroupAction extends Action {
 	    if (org.getEnableSingleActivityLessons()
 		    && (roles.contains(Role.ROLE_GROUP_MANAGER) || roles.contains(Role.ROLE_MONITOR))) {
 		// if single activity lessons are enabled, put sorted list of tools
-		request.setAttribute("tools", getLearningDesignService().getToolDTOs(false, request.getRemoteUser()));
+		request.setAttribute("tools",
+			getLearningDesignService().getToolDTOs(false, false, request.getRemoteUser()));
 	    }
 	}
 

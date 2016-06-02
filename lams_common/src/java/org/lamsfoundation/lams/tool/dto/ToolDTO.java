@@ -33,6 +33,7 @@ public class ToolDTO {
     private Boolean supportsOutputs;
     private Integer activityCategoryID;
     private Long[] childToolIds;
+    private Boolean valid;
 
     public ToolDTO() {
     }
@@ -109,4 +110,11 @@ public class ToolDTO {
 	this.childToolIds = childLearningLibraryIds;
     }
 
+    public Boolean getValid() {
+        return valid;
+    }
+
+    public void setValid(Boolean valid) {
+        this.valid = valid;
+    }
 }

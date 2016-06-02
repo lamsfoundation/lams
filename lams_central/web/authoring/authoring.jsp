@@ -416,7 +416,12 @@
 							 	${childId},
 							 </c:forEach>
 							 "
-							 class="template">
+							 class="template"
+							 <%-- Hide invalid tools --%>
+							 <c:if test="${not tool.valid}">
+							 	style="display: none"
+							 </c:if>
+							 >
 							<div><c:out value="${tool.toolDisplayName}" /></div>
 						</div>
 					</c:forEach>
