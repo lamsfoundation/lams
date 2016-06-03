@@ -7,81 +7,52 @@
 </c:set>
 
 <div id="itemList">
-	<h2 class="spacer-left">
+	<h4>
 		<fmt:message key="label.authoring.basic.task.list.title" />
-		<img src="${ctxPath}/includes/images/indicator.gif"
-			style="display:none" id="taskListListArea_Busy" />
-	</h2>
+		<i class="fa fa-spinner" style="display: none" id="taskListListArea_Busy"></i>
+	</h4>
 	
-	<table class="alternative-color" id="itemTable" cellspacing="0">
+	<table class="table table-condensed table-striped" id="itemTable">
 		<c:set var="sessionMap" value="${sessionScope[sessionMapID]}" />
 
 		<c:forEach var="taskList" items="${sessionMap.taskListList}"
 			varStatus="status">
 			<tr>
-				<td width="4%" class="field-name align-right">
+				<td width="5%" class="field-name align-right">
 					<fmt:message key="label.authoring.basic.resource.task" />
 				</td>
-                                <td>
+                 <td>
 					<c:out value="${taskList.title}" escapeXml="true"/>
 				</td>
 
-				<td width="40px" align="center">
+				<td class="arrows" style="width:5%">
 					<c:if test="${not status.first}">
-						<img src="<html:rewrite page='/includes/images/uparrow.gif'/>"
-							border="0" title="<fmt:message key="label.authoring.up"/>"
-							onclick="upQuestion(${status.index},'${sessionMapID}')">
-						<c:if test="${status.last}">
-							<img
-								src="<html:rewrite page='/includes/images/downarrow_disabled.gif'/>"
-								border="0" title="<fmt:message key="label.authoring.down"/>">
-						</c:if>
+						<c:set var="title"><fmt:message key='label.authoring.up'/></c:set>
+						<lams:Arrow state="up" title="${title}" onclick="upQuestion(${status.index},'${sessionMapID}')"/>
 					</c:if>
-
 					<c:if test="${not status.last}">
-						<c:if test="${status.first}">
-							<img
-								src="<html:rewrite page='/includes/images/uparrow_disabled.gif'/>"
-								border="0" title="<fmt:message key="label.authoring.up"/>">
-						</c:if>
-
-						<img src="<html:rewrite page='/includes/images/downarrow.gif'/>"
-							border="0" title="<fmt:message key="label.authoring.down"/>"
-							onclick="downQuestion(${status.index},'${sessionMapID}')">
+						<c:set var="title"><fmt:message key='label.authoring.down'/></c:set>
+						<lams:Arrow state="down" title="<fmt:message key='label.authoring.down'/>" onclick="downQuestion(${status.index},'${sessionMapID}')"/>
 					</c:if>
 				</td>
 				
-				<td width="20px">
-					<img src="${tool}includes/images/edit.gif"
-						title="<fmt:message key="label.authoring.basic.resource.edit" />"
-						onclick="editItem(${status.index},'${sessionMapID}')" />
+				<td align="center" style="width:5%">
+					<i class="fa fa-pencil"	title="<fmt:message key="label.authoring.basic.resource.edit" />"
+						onclick="editItem(${status.index},'${sessionMapID}')"></i>
                 </td>
                 
-				<td width="20px">
-					<img src="${tool}includes/images/cross.gif"
-						title="<fmt:message key="label.authoring.basic.resource.delete" />"
-						onclick="deleteItem(${status.index},'${sessionMapID}')" />
+				<td  align="center" style="width:5%">
+					<i class="fa fa-times"	title="<fmt:message key="label.authoring.basic.resource.delete" />"
+						onclick="deleteItem(${status.index},'${sessionMapID}')"></i>
 				</td>
 			</tr>
 		</c:forEach>
 	</table>
 </div>
 
-<%-- This script will works when a new resoruce item submit in order to refresh "TaskList List" panel. --%>
+<%-- This script will works when a new item is submitted in order to refresh "TaskList List" panel. --%>
 <script lang="javascript">
-	var win = null;
-	try {
-		if (window.parent && window.parent.hideMessage) {
-			win = window.parent;
-		} else if (window.top && window.top.hideMessage) {
-			win = window.top;
-		}
-	} catch(err) {
-		// mute cross-domain iframe access errors
-	}
-	if (win) {
-		win.hideMessage();
-		var obj = win.document.getElementById('taskListListArea');
-		obj.innerHTML= document.getElementById("itemList").innerHTML;
-	}
+	hideMessage();
+	var obj = document.getElementById('taskListListArea');
+	obj.innerHTML= document.getElementById("itemList").innerHTML;
 </script>

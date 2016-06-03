@@ -50,10 +50,12 @@
 					</span>
 				</html:link>
 			</div>
+
+			<div id="footer"></div>
+			<!--closes footer-->
+		</lams:Page>
+			
 	</html:form>
 
-	<div id="footer"></div>
-	<!--closes footer-->
-	</lams:Page>
 </body>
 </lams:html>

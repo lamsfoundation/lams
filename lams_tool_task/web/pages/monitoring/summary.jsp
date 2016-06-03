@@ -5,40 +5,6 @@
 <c:set scope="request" var="lams"><lams:LAMSURL/></c:set>
 <c:set scope="request" var="tool"><lams:WebAppURL/></c:set>
 
-<link type="text/css" href="${lams}css/jquery-ui-redmond-theme.css" rel="stylesheet">
-<link type="text/css" href="${lams}/css/jquery-ui.timepicker.css" rel="stylesheet">
-<link type="text/css" href="${lams}css/jquery.jqGrid.css" rel="stylesheet"/>
-<style media="screen,projection" type="text/css">
-	.ui-jqgrid tr.jqgrow td {
-	    white-space: normal !important;
-	    height:auto;
-	    vertical-align:text-top;
-	    padding-top:2px;
-	}
-	.ui-jqgrid .ui-jqgrid-bdiv {
-		overflow: auto;
-	}
-</style>
-
-<script type="text/javascript">
-	//pass settings to monitorToolSummaryAdvanced.js
-	var submissionDeadlineSettings = {
-		lams: '${lams}',
-		submissionDeadline: '${sessionMap.submissionDeadline}',
-		setSubmissionDeadlineUrl: '<c:url value="/monitoring/setSubmissionDeadline.do"/>',
-		toolContentID: '${toolContentID}',
-		messageNotification: '<fmt:message key="monitor.summary.notification" />',
-		messageRestrictionSet: '<fmt:message key="monitor.summary.date.restriction.set" />',
-		messageRestrictionRemoved: '<fmt:message key="monitor.summary.date.restriction.removed" />'
-	};
-</script>
-<script type="text/javascript" src="${lams}includes/javascript/jquery.js"></script>
-<script type="text/javascript" src="${lams}includes/javascript/jquery-ui.js"></script>
-<script type="text/javascript" src="${lams}includes/javascript/jquery-ui.timepicker.js"></script>
-<script type="text/javascript" src="${lams}includes/javascript/jquery.blockUI.js"></script>
-<script type="text/javascript" src="${lams}/includes/javascript/monitorToolSummaryAdvanced.js" ></script>
-<script type="text/javascript" src="${lams}includes/javascript/jquery.jqGrid.locale-en.js"></script>
-<script type="text/javascript" src="${lams}includes/javascript/jquery.jqGrid.js"></script>
 <script type="text/javascript">
 	$(document).ready(function(){
 		<c:forEach var="sessionDto" items="${sessionDtos}">
@@ -46,14 +12,14 @@
 			jQuery("#group${sessionDto.sessionId}").jqGrid({
 				datatype: "json",
 				url: "<c:url value='/monitoring/getPagedUsers.do'/>?sessionMapID=${sessionMapID}&toolSessionID=${sessionDto.sessionId}",
-				height: 'auto',
-				shrinkToFit: ${(200 + ((sessionMap.monitorVerificationRequired? 1 : 0)*130) + fn:length(sessionDto.taskListItems)*100) < 800},
-				width: '800',
+				height: '100%',
+				autowidth: true,
+				shrinkToFit: false,
 				pager: 'pager-${sessionDto.sessionId}',
 				rowList:[10,20,30,40,50,100],
 				rowNum:10,
 				viewrecords:true,
-			   	caption: "${sessionDto.sessionName}",
+//			   	caption: "${sessionDto.sessionName}",
 			   	colNames:[
 						'userUid'
 						,"<fmt:message key="label.monitoring.summary.user" />"
@@ -86,20 +52,24 @@
 	        			
 		</c:forEach>
 
-		//jqgrid autowidth
-		function resizeFunc(){
-			var grid;
-		    if (grid = jQuery(".ui-jqgrid-btable:visible")) {
-		    	grid.each(function(index) {
-			        var gridId = $(this).attr('id');
-			        
-				    var gridParentWidth = jQuery('#gbox_' + gridId).parent().width();
-				    jQuery('#' + gridId).setGridWidth(gridParentWidth, false);
-		        });
-		    }
-		}
-		resizeFunc();
-		$(window).bind('resize', resizeFunc);
+		//jqgrid autowidth (http://stackoverflow.com/a/1610197)
+		$(window).bind('resize', function() {
+			resizeJqgrid(jQuery(".ui-jqgrid-btable:visible"));
+		});
+
+		//resize jqGrid on openning of bootstrap collapsible
+		$('div[id^="collapse"]').on('shown.bs.collapse', function () {
+			resizeJqgrid(jQuery(".ui-jqgrid-btable:visible", this));
+		})
+
+		function resizeJqgrid(jqgrids) {
+			jqgrids.each(function(index) {
+				var gridId = $(this).attr('id');
+		    	var gridParentWidth = jQuery('#gbox_' + gridId).parent().width();
+		    	jQuery('#' + gridId).setGridWidth(gridParentWidth, true);
+		    });
+		};
+		setTimeout(function(){ window.dispatchEvent(new Event('resize')); }, 300);
 	});
 
 	function summaryTask(itemUid){
@@ -114,7 +84,7 @@
 			url: '<c:url value="/monitoring/setVerifiedByMonitor.do"/>',
 			data: { userUid: userUid },
 			success: function(response) {
-				$("#verif-"+response).html('<img src="<html:rewrite page='/includes/images/tick.gif'/>" >');
+				$("#verif-"+response).html('<i class="fa fa-check"></i>');
 			}
 		});
 		
@@ -122,35 +92,58 @@
 	}
 
 </script>
-
-<h1>
-	<c:out value="${taskList.title}" escapeXml="true"/>
-</h1>
-<div class="instructions space-top space-bottom">
-	<c:out value="${taskList.instructions}" escapeXml="false"/>
+<div class="panel">
+	<h4>
+	    <c:out value="${taskList.title}" escapeXml="true"/>
+	</h4>
+	<div class="instructions voffset5">
+	    <c:out value="${taskList.instructions}" escapeXml="false"/>
+	</div>
+	
+	<c:if test="${empty sessionDtos}">
+		<lams:Alert type="info" id="no-session-summary" close="false">
+			 <fmt:message key="message.monitoring.summary.no.session" />
+		</lams:Alert>
+	</c:if>
+	
 </div>
 
+
 <%-- Summary list  --%>
-<c:if test="${empty sessionDtos}">
-	<div align="center">
-		<b> <fmt:message key="message.monitoring.summary.no.session" /> </b>
-	</div>
+<c:if test="${sessionMap.isGroupedActivity}">
+<div class="panel-group" id="accordionSessions" role="tablist" aria-multiselectable="true"> 
 </c:if>
+
 
 <c:forEach var="sessionDto" items="${sessionDtos}" varStatus="status">
 			
-	<div style="padding-left: 30px; <c:if test='${! status.last}'>padding-bottom: 30px;</c:if><c:if test='${ status.last}'>padding-bottom: 15px;</c:if> ">
-		<c:if test="${sessionMap.isGroupedActivity}">
-			<div style="padding-bottom: 5px; font-size: small;">
-				<B><fmt:message key="monitoring.label.group" /></B> ${sessionDto.sessionName}
-			</div>
-		</c:if>
-		
+	<c:if test="${sessionMap.isGroupedActivity}">	
+	    <div class="panel panel-default" >
+	       <div class="panel-heading" id="heading${sessionDto.sessionId}">
+	       	<span class="panel-title collapsable-icon-left">
+	       	<a class="${status.first ? '' : 'collapsed'}" role="button" data-toggle="collapse" href="#collapse${sessionDto.sessionId}" 
+					aria-expanded="${status.first ? 'false' : 'true'}" aria-controls="collapse${sessionDto.sessionId}" >
+			<fmt:message key="monitoring.label.group" />&nbsp;${sessionDto.sessionName}</a>
+			</span>
+	       </div>
+	       
+	       <div id="collapse${sessionDto.sessionId}" class="panel-collapse collapse ${status.first ? 'in' : ''}" role="tabpanel" aria-labelledby="heading${sessionDto.sessionId}">
+	</c:if>
+			
 		<table id="group${sessionDto.sessionId}"></table>
 		<div id="pager-${sessionDto.sessionId}"></div>
-	</div>
-				
+
+	<c:if test="${sessionMap.isGroupedActivity}">
+		</div> <!-- end collapse area  -->
+		</div> <!-- end collapse panel  -->
+	</c:if>
+	${ !sessionMap.isGroupedActivity || ! status.last ? '<div class="voffset5">&nbsp;</div>' :  ''}
+	
 </c:forEach>
+
+<c:if test="${sessionMap.isGroupedActivity}">
+</div> <!--  end accordianSessions --> 
+</c:if>
 				
 <br/>
 <c:if test="${taskList.reflectOnActivity && not empty sessionMap.reflectList}">

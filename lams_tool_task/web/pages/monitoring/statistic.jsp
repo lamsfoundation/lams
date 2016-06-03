@@ -3,17 +3,23 @@
 <c:set var="sessionDtos" value="${sessionMap.sessionDtos}"/>
 
 <c:if test="${empty sessionDtos}">
-	<div align="center">
+	<lams:Alert type="info" id="no-session-summary" close="false">
 		<b> <fmt:message key="message.monitoring.summary.no.session" /> </b>
-	</div>
+	</lams:Alert>
 </c:if>
 
-<c:out value="${sessionMap.isGroupedActivity}"/>
 <c:forEach var="sessionDto" items="${sessionDtos}">
-	<%-- display group name on first row--%>
-	<h1><fmt:message key="monitoring.label.group" /> ${sessionDto.sessionName}	</h1>	
-		
-	<table cellspacing="3" class="alternative-color small-space-top">
+
+	<c:if test="${sessionMap.isGroupedActivity}">	
+	   <div class="panel panel-default" >
+	      <div class="panel-heading">
+			<span class="panel-title">
+				<fmt:message key="monitoring.label.group" />&nbsp;${sessionDto.sessionName}
+			</span>
+	      </div>
+	</c:if>
+
+	<table class="table table-condensed table-striped">
 		<tr>
 			<th width="45%">
 				<fmt:message key="monitoring.label.title" />
@@ -21,7 +27,7 @@
 			<th width="35%">
 				<fmt:message key="monitoring.label.suggest" />
 			</th>
-			<th width="20%" align="center">
+			<th width="20%" class="text-center">
 				<fmt:message key="monitoring.label.number.learners" />
 			</th>
 		</tr>
@@ -30,10 +36,8 @@
 	
 			<c:if test="${item.uid == -1}">
 				<tr>
-					<td colspan="3">
-						<div align="left">
-							<b> <fmt:message key="message.monitoring.summary.no.resource.for.group" /> </b>
-						</div>
+					<td colspan="3" class="text-center">
+						<b> <fmt:message key="message.monitoring.summary.no.resource.for.group" /> </b>
 					</td>
 				</tr>
 			</c:if>
@@ -45,12 +49,16 @@
 					<td>
 						<c:out value="${item.createBy.loginName}" escapeXml="true"/>
 					</td>
-					<td align="center">
+					<td class="text-center">
 						${sessionDto.visitNumbers[status.index]}
 					</td>
 				</tr>
 			</c:if>
 		</c:forEach>
-	
 	</table>	
+	
+	<c:if test="${sessionMap.isGroupedActivity}">	
+		</div>
+	</c:if>
+
 </c:forEach>

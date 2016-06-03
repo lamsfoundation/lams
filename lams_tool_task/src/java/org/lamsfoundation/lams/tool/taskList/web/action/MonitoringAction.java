@@ -237,8 +237,8 @@ public class MonitoringAction extends Action {
 	    Set<Long> completedTaskUids = userDto.getCompletedTaskUids();
 	    for (TaskListItem item : items) {
 		String completionImage = completedTaskUids.contains(item.getUid())
-			? "<img src='" + TOOL_URL + "/includes/images/completeitem.gif' border='0'>"
-			: "<img src='" + TOOL_URL + "/includes/images/dash.gif' border='0'>";
+			? "<i class=\"fa fa-check\"></i>"
+			: "<i class=\"fa fa-minus\"></i>";
 		userData.put(completionImage);
 	    }
 
@@ -246,7 +246,7 @@ public class MonitoringAction extends Action {
 		String label = StringEscapeUtils.escapeHtml(service.getMessage("label.confirm"));
 
 		String verificationStatus = userDto.isVerifiedByMonitor()
-			? "<img src='" + TOOL_URL + "/includes/images/tick.gif' border='0'>"
+			? "<i class=\"fa fa-check\"></i>"
 			: "<a id='verif-" + userDto.getUserId()
 				+ "' href='javascript:;' onclick='return setVerifiedByMonitor(this, "
 				+ userDto.getUserId() + ");'>" + label + "</a>";
@@ -321,8 +321,8 @@ public class MonitoringAction extends Action {
 	    userData.put(fullName);
 
 	    String completionImage = userDto.isCompleted()
-		    ? "<img src='" + TOOL_URL + "/includes/images/completeitem.gif' border='0'>"
-		    : "<img src='" + TOOL_URL + "/includes/images/dash.gif' border='0'>";
+		    ? "<i class=\"fa fa-check\"></i>"
+		    : "<i class=\"fa fa-minus\"></i>";
 	    userData.put(completionImage);
 
 	    String accessDate = (userDto.getAccessDate() == null) ? ""

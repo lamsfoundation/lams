@@ -8,11 +8,8 @@
 <lams:html>
 <lams:head>
 	<title><fmt:message key="label.learning.title" /></title>
-	<%@ include file="/common/header.jsp"%>
+	<%@ include file="/common/monitorheader.jsp"%>
 		
-	<link type="text/css" href="${lams}css/jquery-ui-redmond-theme.css" rel="stylesheet">
-	<link type="text/css" href="${lams}/css/jquery-ui.timepicker.css" rel="stylesheet">
-	<link type="text/css" href="${lams}css/jquery.jqGrid.css" rel="stylesheet"/>
 	<style media="screen,projection" type="text/css">
 		.ui-jqgrid tr.jqgrow td {
 		    white-space: normal !important;
@@ -22,10 +19,6 @@
 		}
 	</style>
 		
-	<script type="text/javascript" src="${lams}includes/javascript/jquery.js"></script>
-	<script type="text/javascript" src="${lams}includes/javascript/jquery-ui.js"></script>
-	<script type="text/javascript" src="${lams}includes/javascript/jquery.jqGrid.locale-en.js"></script>
-	<script type="text/javascript" src="${lams}includes/javascript/jquery.jqGrid.js"></script>
 	<script type="text/javascript">
 		$(document).ready(function(){
 			<c:forEach var="sessionDto" items="${sessionDtos}">

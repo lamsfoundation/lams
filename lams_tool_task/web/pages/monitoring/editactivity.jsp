@@ -3,12 +3,12 @@
 <c:set var="taskList" value="${sessionMap.taskList}"/>
 
 <c:if test="${sessionMap.isPageEditable}">
-	<p class="warning">
+	<lams:Alert type="info" id="no-session-summary" close="false">
 		<fmt:message key="message.alertContentEdit" />
-	</p>
+	</lams:Alert>
 </c:if>
 
-<table cellpadding="0">
+<table class="table table-condensed table-no-border">
 	<tr>
 		<td width="15%" nowrap>
 			<fmt:message key="label.authoring.basic.title" />
@@ -28,16 +28,12 @@
 			<c:out value="${taskList.instructions}" escapeXml="false" />
 		</td>
 	</tr>
-
-	<tr>
-		<td colspan="2">
-			<c:url  var="authoringUrl" value="/definelater.do">
-				<c:param name="toolContentID" value="${sessionMap.toolContentID}" />
-				<c:param name="contentFolderID" value="${sessionMap.contentFolderID}" />
-			</c:url>
-			<html:link href="javascript:;" onclick="launchPopup('${authoringUrl}','definelater')" styleClass="button">
-				<fmt:message key="label.monitoring.edit.activity.edit" />
-			</html:link>
-		</td>
-	</tr>
 </table>
+
+<c:url  var="authoringUrl" value="/definelater.do">
+	<c:param name="toolContentID" value="${sessionMap.toolContentID}" />
+	<c:param name="contentFolderID" value="${sessionMap.contentFolderID}" />
+</c:url>
+<html:link href="javascript:;" onclick="launchPopup('${authoringUrl}','definelater')" styleClass="btn btn-default">
+	<fmt:message key="label.monitoring.edit.activity.edit" />
+</html:link>
