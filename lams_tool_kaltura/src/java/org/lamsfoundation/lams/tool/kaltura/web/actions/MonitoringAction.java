@@ -58,13 +58,6 @@ import org.lamsfoundation.lams.web.util.AttributeNames;
 
 /**
  * @author Andrey Balan
- *
- *
- *
- *
- *
- *
- *
  */
 public class MonitoringAction extends LamsDispatchAction {
 
@@ -127,19 +120,6 @@ public class MonitoringAction extends LamsDispatchAction {
 	redirect.addParameter(AttributeNames.PARAM_TOOL_SESSION_ID, toolSessionID);
 	redirect.addParameter(AttributeNames.PARAM_USER_ID, user.getUserID());
 	return redirect;
-    }
-
-    public ActionForward showNotebookEntry(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) {
-
-	setupService();
-
-	Long uid = new Long(WebUtil.readLongParam(request, "userUID"));
-	KalturaUser user = kalturaService.getUserByUid(uid);
-	KalturaUserDTO userDTO = new KalturaUserDTO(user);
-	request.setAttribute("userDTO", userDTO);
-
-	return mapping.findForward("kalturaDisplay");
     }
 
     /**

@@ -98,11 +98,6 @@
 		<put name="header" value="tiles:/header:monitoring/main" type="definition" />
 		<put name="body" value="/pages/monitoring/monitoring.jsp" />
 	</definition>
-	
-	<definition name="tiles:/monitoring/kalturaDisplay" path="/pages/monitoring/kalturaDisplay.jsp">
-		<put name="header" value="tiles:/header:monitoring/main" type="definition" />
-		<put name="pageTitleKey" value="pageTitle.monitoring" />
-	</definition>
 
 	<definition name="tiles:/header:monitoring/main" extends="tiles:/header:default">
 		<put name="headItems" value="/pages/monitoring/headItems.jsp" />

@@ -2,12 +2,11 @@
 <c:set scope="request" var="lams"><lams:LAMSURL/></c:set>
 <c:set scope="request" var="tool"><lams:WebAppURL/></c:set>
 
-<link rel="stylesheet" href="${lams}/css/thickbox.css" type="text/css" media="screen">
+<link type="text/css" href="${lams}/css/thickbox.css" rel="stylesheet">
 <link type="text/css" href="${lams}/css/jquery-ui-smoothness-theme.css" rel="stylesheet">
 <link type="text/css" href="${lams}/css/jquery-ui.timepicker.css" rel="stylesheet">
 
 <script type="text/javascript">
-<!--
 	//pass settings to monitorToolSummaryAdvanced.js
 	var submissionDeadlineSettings = {
 		lams: '${lams}',
@@ -18,59 +17,61 @@
 		messageRestrictionSet: '<fmt:message key="monitor.summary.date.restriction.set" />',
 		messageRestrictionRemoved: '<fmt:message key="monitor.summary.date.restriction.removed" />'
 	};
-//-->	
 </script>
-<script type="text/javascript" src="${lams}includes/javascript/jquery.js"></script>
 <script type="text/javascript" src="${lams}includes/javascript/jquery-ui.js"></script>
 <script type="text/javascript" src="${lams}includes/javascript/jquery-ui.timepicker.js"></script>
 <script type="text/javascript" src="${lams}includes/javascript/jquery.blockUI.js"></script>
 <script type="text/javascript" src="${lams}/includes/javascript/thickbox.js"></script>
 <script type="text/javascript" src="${lams}/includes/javascript/monitorToolSummaryAdvanced.js" ></script>
 <script type="text/javascript">
-<!--
 	var evalcomixWindow = null;
-	
 	function openEvalcomixWindow(url) {
     	evalcomixWindow=window.open(url,'evalcomixWindow','width=800,height=600,scrollbars=yes,resizable=yes');
 		if (window.focus) {evalcomixWindow.focus()}
 	}
-//-->
 </script>
 
-<c:choose>
-	<c:when test="${empty sessionDTOs}">
-		<div align="center">
-			<b> <fmt:message key="label.monitoring.summary.no.session" /> </b>
-		</div>	
-	</c:when>
+<div class="panel">
+	<h4>
+	  <c:out value="${kaltura.title}" escapeXml="true"/>
+	</h4>
 	
-	<c:otherwise>
+	<div class="instructions voffset5">
+	  <c:out value="${kaltura.instructions}" escapeXml="false"/>
+	</div>
 	
-		<table class="space-left space-top">
+	<c:if test="${empty sessionDTOs}">
+		<lams:Alert type="info" id="no-session-summary" close="false">
+			<fmt:message key="label.monitoring.summary.no.session" />
+		</lams:Alert>
+	</c:if>
+</div>
+
+<c:if test="${!empty sessionDTOs}">
+
+	<c:if test="${isGroupedActivity}">	
+		<h5>
+			<fmt:message key="label.select.group.name" />
+		</h5>
+	</c:if>
+	
+	<table class="<c:if test="${isGroupedActivity}">table</c:if> voffset10">
+		<c:forEach var="session" items="${sessionDTOs}">
 			<tr>
-				<th class="field-name">
-					<fmt:message key="label.select.group.name" />
-				</th>
-			</tr>
-		
-			<c:forEach var="session" items="${sessionDTOs}">
-				<tr>
-					<td>
-					<a href="<c:url value="/monitoring.do"/>?dispatch=showGroupLearning&toolSessionID=${session.sessionID}&keepThis=true&TB_iframe=true&height=630&width=800" class="button thickbox" title="<fmt:message key='heading.notebookEntry' />">
+				<td>
+					<a href="<c:url value="/monitoring.do"/>?dispatch=showGroupLearning&toolSessionID=${session.sessionID}&TB_iframe=true&height=630&width=800" class="btn btn-default btn-sm thickbox" title="<fmt:message key='heading.notebookEntry' />">
 						${session.sessionName}
 					</a>
-					</td>
-				</tr>
-			</c:forEach>
-		</table>	
+				</td>
+			</tr>
+		</c:forEach>
+	</table>
+	<br/>
 	
-	</c:otherwise>
-</c:choose>
+</c:if>
 
 <%@include file="reflections.jsp"%>
 
 <%@include file="advanceOptions.jsp"%>
 
 <%@include file="daterestriction.jsp"%>
-
-
