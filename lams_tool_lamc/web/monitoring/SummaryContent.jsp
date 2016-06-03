@@ -4,15 +4,22 @@
 <link type="text/css" href="${lams}css/jquery-ui-smoothness-theme.css" rel="stylesheet">
 <link type="text/css" href="${lams}/css/jquery-ui.timepicker.css" rel="stylesheet">
 <link href="${lams}css/jquery.jqGrid.css" rel="stylesheet" type="text/css"/>
+
 <style media="screen,projection" type="text/css">
-	.ui-jqgrid tr.jqgrow td {
-	    white-space: normal !important;
-	    height:auto;
-	    vertical-align:text-top;
-	    padding-top:2px;
+	 .ui-jqgrid {
+		border-left-style: none !important;
+		border-right-style: none !important;
+		border-bottom-style: none !important;
+	}
+	
+	.ui-jqgrid tr {
+		border-left-style: none !important;
+	}
+	
+	.ui-jqgrid td {
+		border-style: none !important;
 	}
 </style>
-
 <script type="text/javascript"> 
 	//pass settings to monitorToolSummaryAdvanced.js
 	var submissionDeadlineSettings = {
@@ -139,23 +146,26 @@
   				}
 			});
 			
-		</c:forEach>
+		</c:forEach>	
 		
-		//jqgrid autowidth (http://stackoverflow.com/a/1610197)
-		$(window).bind('resize', function() {
-			var grid;
-		    if (grid = jQuery(".ui-jqgrid-btable:visible")) {
-		    	grid.each(function(index) {
-			        var gridId = $(this).attr('id');
-			        
-			        //resize only user summary grids
-			        if (gridId.match("^userSummary")) {
-				        var gridParentWidth = jQuery('#gbox_' + gridId).parent().width();
-				        jQuery('#' + gridId).setGridWidth(gridParentWidth, true);			        	
-			        }
-		        });
-		    }
-		});
+        //jqgrid autowidth (http://stackoverflow.com/a/1610197)
+        $(window).bind('resize', function() {
+            resizeJqgrid(jQuery(".ui-jqgrid-btable:visible"));
+        });
+
+        //resize jqGrid on openning of bootstrap collapsible
+        $('div[id^="collapse"]').on('shown.bs.collapse', function () {
+            resizeJqgrid(jQuery(".ui-jqgrid-btable:visible", this));
+        })
+
+        function resizeJqgrid(jqgrids) {
+            jqgrids.each(function(index) {
+                var gridId = $(this).attr('id');
+                var gridParentWidth = jQuery('#gbox_' + gridId).parent().width();
+                jQuery('#' + gridId).setGridWidth(gridParentWidth, true);
+            });
+        };
+        setTimeout(function(){ window.dispatchEvent(new Event('resize')); }, 300);
 	});
 
 </script>
@@ -212,13 +222,13 @@
 			<div class="panel panel-default" >
 	        <div class="panel-heading" id="heading${sessionDto.sessionId}">
     	    	<span class="panel-title collapsable-icon-left">
-        		<a role="button" data-toggle="collapse" href="#collapse${sessionDto.sessionId}" 
-					aria-expanded="false" aria-controls="collapse${sessionDto.sessionId}" >
+        		<a class="${status.first ? '' : 'collapsed'}" role="button" data-toggle="collapse" href="#collapse${sessionDto.sessionId}" 
+					aria-expanded="${status.first ? 'false' : 'true'}" aria-controls="collapse${sessionDto.sessionId}" >
 				<fmt:message key="group.label" />&nbsp;${sessionDto.sessionName}</a>
 				</span>
         	</div>
         
-	        <div id="collapse${sessionDto.sessionId}" class="panel-collapse collapse in" role="tabpanel" aria-labelledby="heading${sessionDto.sessionId}">
+	        <div id="collapse${sessionDto.sessionId}" class="panel-collapse collapse ${status.first ? 'in' : ''}" role="tabpanel" aria-labelledby="heading${sessionDto.sessionId}">
 		</c:if>
 					
 			<table id="group${sessionDto.sessionId}" class="scroll" cellpadding="0" cellspacing="0"></table>
