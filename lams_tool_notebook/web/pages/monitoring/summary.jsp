@@ -6,46 +6,18 @@
 <link type="text/css" href="${lams}/css/jquery-ui.timepicker.css" rel="stylesheet">
 <link type="text/css" href="${lams}css/jquery.jqGrid.css" rel="stylesheet"/>
 <style media="screen,projection" type="text/css">
-    .ui-jqgrid tr.jqgrow td, .ui-jqgrid .user-entry, .ui-search-input {
-        word-wrap: break-word; /* IE 5.5+ and CSS3 */
-        white-space: pre-wrap; /* CSS3 */
-        white-space: -moz-pre-wrap; /* Mozilla, since 1999 */
-        white-space: -pre-wrap; /* Opera 4-6 */
-        white-space: -o-pre-wrap; /* Opera 7 */
-        overflow: hidden;
-        height: auto;
-        vertical-align: middle;
-        padding-top: 2px;
-        padding-bottom: 2px
-    }
-	
-	#session-list {
-		padding: 15px 20px 10px;
+	 .ui-jqgrid {
+		border-left-style: none !important;
+		border-right-style: none !important;
+		border-bottom-style: none !important;
 	}
 	
-	#session-list > h1 {
-		margin-left: -10px;
+	.ui-jqgrid tr {
+		border-left-style: none !important;
 	}
 	
-	.comment-area {
-		background-color: whitesmoke;
-	}
-	
-	.comment-area input.jip-ok-button {
-		margin: 7px 7px 5px 20px;
-	}
-	
-	.comment-area input.jip-cancel-button {
-		margin-right: 5px;
-	}
-	
-	.comment-area #notify-learner {
-		margin-right: 5px;
-		vertical-align: middle;
-	}
-	
-	.jip-button {
-		padding: 4px;
+	.ui-jqgrid td {
+		border-style: none !important;
 	}
 </style>
 
@@ -175,20 +147,25 @@
 			}).jqGrid('filterToolbar',{searchOnEnter: false});
 		</c:forEach>
 		
-		//jqgrid autowidth (http://stackoverflow.com/a/1610197)
-		$(window).bind('resize', function() {
-			var grid;
-		    if (grid = jQuery(".ui-jqgrid-btable:visible")) {
-		    	grid.each(function(index) {
-			       var gridId = $(this).attr('id');
-			        
-				   var gridParentWidth = jQuery('#gbox_' + gridId).parent().width();
-				   jQuery('#' + gridId).setGridWidth(gridParentWidth, true);
-		        });
-		    }
-		});
 		
-		setTimeout(function(){ window.dispatchEvent(new Event('resize')); }, 300);
+        //jqgrid autowidth (http://stackoverflow.com/a/1610197)
+        $(window).bind('resize', function() {
+            resizeJqgrid(jQuery(".ui-jqgrid-btable:visible"));
+        });
+
+        //resize jqGrid on openning of bootstrap collapsible
+        $('div[id^="collapse"]').on('shown.bs.collapse', function () {
+            resizeJqgrid(jQuery(".ui-jqgrid-btable:visible", this));
+        })
+
+        function resizeJqgrid(jqgrids) {
+            jqgrids.each(function(index) {
+                var gridId = $(this).attr('id');
+                var gridParentWidth = jQuery('#gbox_' + gridId).parent().width();
+                jQuery('#' + gridId).setGridWidth(gridParentWidth, true);
+            });
+        };
+        setTimeout(function(){ window.dispatchEvent(new Event('resize')); }, 300);
 	});
 
 </script>
