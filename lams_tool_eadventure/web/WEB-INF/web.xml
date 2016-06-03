@@ -50,7 +50,6 @@
 			<param-name>detail</param-name>
 			<param-value>1</param-value>
 		</init-param>
-		<load-on-startup>2</load-on-startup>
 	</servlet>
 
 	<servlet-mapping>
