@@ -21,6 +21,23 @@
 		</script>
 	
 		<%@ include file="/common/monitorheader.jsp" %>
+		
+		<style media="screen,projection" type="text/css">
+			 .ui-jqgrid {
+				border-left-style: none !important;
+				border-right-style: none !important;
+				border-bottom-style: none !important;
+			}
+			
+			.ui-jqgrid tr {
+				border-left-style: none !important;
+			}
+			
+			.ui-jqgrid td {
+				border-style: none !important;
+			}
+		</style>
+		
 		<script>
 
 	        function init(){
