@@ -1,5 +1,3 @@
--- CVS ID: $Id$
- 
 INSERT INTO lams_learning_activity
 (
 activity_ui_id
