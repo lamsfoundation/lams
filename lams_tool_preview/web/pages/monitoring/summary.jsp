@@ -7,28 +7,23 @@
 <link type="text/css" href="${lams}css/jquery.jqGrid.css" rel="stylesheet" />
 <link type="text/css" href="${lams}css/jquery.jRating.css" rel="stylesheet"/>
 <link rel="stylesheet" href="<html:rewrite page='/includes/css/learning.css'/>">
-<!-- <style media="screen,projection" type="text/css">
-	#user-dropdown-div {padding-left: 30px; margin-top: -5px; margin-bottom: 50px;}
-	.ui-jqgrid tr.jqgrow td {
-	    white-space: normal !important;
-	    height:auto;
-	    vertical-align:text-top;
-	    padding-top:2px;
+
+<style media="screen,projection" type="text/css">
+	 .ui-jqgrid {
+		border-left-style: none !important;
+		border-right-style: none !important;
+		border-bottom-style: none !important;
 	}
 	
-	.subgrid-data .ui-jqgrid-hdiv {
-		display:none !important;
+	.ui-jqgrid tr {
+		border-left-style: none !important;
 	}
 	
- 	.subgrid-data td[colspan]:not([colspan="1"]) {
-		background: #F0F0F0;
-	} 
-	
-	.ui-jqgrid tr.jqgrow td {
-		vertical-align: top;
+	.ui-jqgrid td {
+		border-style: none !important;
 	}
 </style>
- -->
+
 <script type="text/javascript">
 	//var for jquery.jRating.js
 	var pathToImageFolder = "${lams}images/css/";
@@ -128,20 +123,26 @@
 			
 		</c:forEach>
         
-		//jqgrid autowidth (http://stackoverflow.com/a/1610197)
-		$(window).bind('resize', function() {
-			var grid;
-		    if (grid = jQuery(".ui-jqgrid-btable")) {
-		    	grid.each(function(index) {
-		        	var gridId = $(this).attr('id');
-		        	var gridParentWidth = jQuery('#gbox_' + gridId).parent().width();
-		        	jQuery('#' + gridId).setGridWidth(gridParentWidth, true);
-		    	});
-		    }
-		}).trigger('resize');
-		setTimeout(function(){ window.dispatchEvent(new Event('resize')); }, 300);
 		
-		
+        //jqgrid autowidth (http://stackoverflow.com/a/1610197)
+        $(window).bind('resize', function() {
+            resizeJqgrid(jQuery(".ui-jqgrid-btable:visible"));
+        });
+
+        //resize jqGrid on openning of bootstrap collapsible
+        $('div[id^="collapse"]').on('shown.bs.collapse', function () {
+            resizeJqgrid(jQuery(".ui-jqgrid-btable:visible", this));
+        })
+
+        function resizeJqgrid(jqgrids) {
+            jqgrids.each(function(index) {
+                var gridId = $(this).attr('id');
+                var gridParentWidth = jQuery('#gbox_' + gridId).parent().width();
+                jQuery('#' + gridId).setGridWidth(gridParentWidth, true);
+            });
+        };
+        setTimeout(function(){ window.dispatchEvent(new Event('resize')); }, 300);
+        
 	});
 
 </script>
@@ -172,13 +173,13 @@
 	    <div class="panel panel-default" >
         <div class="panel-heading" id="heading${groupSummary.sessionId}">
         	<span class="panel-title collapsable-icon-left">
-        	<a role="button" data-toggle="collapse" href="#collapse${groupSummary.sessionId}" 
-					aria-expanded="true" aria-controls="collapse${groupSummary.sessionId}">
+        	<a class="${status.first ? '' : 'collapsed'}" role="button" data-toggle="collapse" href="#collapse${groupSummary.sessionId}" 
+					aria-expanded="${status.first ? 'false' : 'true'}" aria-controls="collapse${groupSummary.sessionId}">
 			<fmt:message key="monitoring.label.group" />: ${groupSummary.sessionName}</a>
 			</span>
         </div>
         
-        <div id="collapse${groupSummary.sessionId}" class="panel-collapse collapse in" role="tabpanel" aria-labelledby="heading${groupSummary.sessionId}">
+        <div id="collapse${groupSummary.sessionId}" class="panel-collapse collapse ${status.first ? 'in' : ''}" role="tabpanel" aria-labelledby="heading${groupSummary.sessionId}">
 	</c:if>
 	
 	<table id="group${groupSummary.sessionId}" class="scroll" cellpadding="0" cellspacing="0"></table>
