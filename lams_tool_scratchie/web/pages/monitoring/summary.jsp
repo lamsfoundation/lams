@@ -18,12 +18,6 @@
 	.ui-jqgrid td {
 		border-style: none !important;
 	}
-	.ui-jqgrid tr.jqgrow td {
-	    white-space: normal !important;
-	    height:auto;
-	    vertical-align:text-top;
-	    padding-top:2px;
-	}
 </style>
 
 <script type="text/javascript">
@@ -160,18 +154,25 @@
 	   	   	});
         </c:forEach>
         
-		//jqgrid autowidth (http://stackoverflow.com/a/1610197)
-		$(window).bind('resize', function() {
-			var grid;
-		    if (grid = jQuery(".ui-jqgrid-btable:visible")) {
-		    	grid.each(function(index) {
-		        	var gridId = $(this).attr('id');
-		        	var gridParentWidth = jQuery('#gbox_' + gridId).parent().width();
-		        	jQuery('#' + gridId).setGridWidth(gridParentWidth, true);
-		    	});
-		    }
-		});
-		setTimeout(function(){ window.dispatchEvent(new Event('resize')); }, 300);
+		
+        //jqgrid autowidth (http://stackoverflow.com/a/1610197)
+        $(window).bind('resize', function() {
+            resizeJqgrid(jQuery(".ui-jqgrid-btable:visible"));
+        });
+
+        //resize jqGrid on openning of bootstrap collapsible
+        $('div[id^="collapse"]').on('shown.bs.collapse', function () {
+            resizeJqgrid(jQuery(".ui-jqgrid-btable:visible", this));
+        })
+
+        function resizeJqgrid(jqgrids) {
+            jqgrids.each(function(index) {
+                var gridId = $(this).attr('id');
+                var gridParentWidth = jQuery('#gbox_' + gridId).parent().width();
+                jQuery('#' + gridId).setGridWidth(gridParentWidth, true);
+            });
+        };
+        setTimeout(function(){ window.dispatchEvent(new Event('resize')); }, 300);
 
 		$("#item-uid").change(function() {
 			var itemUid = $(this).val();
@@ -305,13 +306,13 @@
 	    <div class="panel panel-default" >
         <div class="panel-heading" id="heading${summary.sessionId}">
         	<span class="panel-title collapsable-icon-left">
-        	<a role="button" data-toggle="collapse" href="#collapse${summary.sessionId}" 
-					aria-expanded="false" aria-controls="collapse${summary.sessionId}" >
+        	<a class="${status.first ? '' : 'collapsed'}" role="button" data-toggle="collapse" href="#collapse${summary.sessionId}" 
+					aria-expanded="${status.first ? 'false' : 'true'}" aria-controls="collapse${summary.sessionId}" >
 				${summaryTitle}</a>
 			</span>
         </div>
         
-        <div id="collapse${summary.sessionId}" class="panel-collapse collapse in" role="tabpanel" aria-labelledby="heading${summary.sessionId}">
+        <div id="collapse${summary.sessionId}" class="panel-collapse collapse ${status.first ? 'in' : ''}" role="tabpanel" aria-labelledby="heading${summary.sessionId}">
 
 		<table id="list${summary.sessionId}" class="scroll" cellpadding="0" cellspacing="0"></table>
 		
