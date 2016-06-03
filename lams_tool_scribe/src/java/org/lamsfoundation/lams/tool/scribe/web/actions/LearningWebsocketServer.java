@@ -294,14 +294,21 @@ public class LearningWebsocketServer {
      * The scribe or a Monitor has force completed the activity. Browsers will refresh and display report summary.
      */
     static void sendCloseRequest(Long toolSessionId) throws JSONException, IOException {
+	Set<Session> sessionWebsockets = LearningWebsocketServer.websockets.get(toolSessionId);
+	if (sessionWebsockets == null) {
+	    return;
+	}
+	// make a copy of the websocket collection so it does not get blocked while sending messages
+	sessionWebsockets = new HashSet<Session>(sessionWebsockets);
+
 	JSONObject responseJSON = new JSONObject();
 	responseJSON.put("close", true);
 	String response = responseJSON.toString();
 
-	// make a copy of the websocket collection so it does not get blocked while sending messages
-	Set<Session> sessionWebsockets = new HashSet<Session>(LearningWebsocketServer.websockets.get(toolSessionId));
 	for (Session websocket : sessionWebsockets) {
-	    websocket.getBasicRemote().sendText(response);
+	    if (websocket.isOpen()) {
+		websocket.getBasicRemote().sendText(response);
+	    }
 	}
     }
 
