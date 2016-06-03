@@ -34,7 +34,6 @@
 	var USER_ID  = 'ANONYMOUS';
 		
 	$(document).ready(function(){
-		
 		initialize();
 	});
 	
@@ -224,52 +223,32 @@
 </script>
 
 <!-- ========== Basic Tab ========== -->
-<table cellpadding="0">
-	<tr>
-		<td>
-			<div class="field-name">
-				<fmt:message key="label.authoring.basic.title"/>
-			</div>
-					
-			<html:text property="title" style="width: 99%;"/>
-		</td>
-	</tr>
-	
-	<tr>
-		<td>
-			<div class="field-name">
-				<fmt:message key="label.authoring.basic.instructions"/>
-			</div>
-					
-			<lams:CKEditor id="instructions" value="${formBean.instructions}" contentFolderID="${sessionMap.contentFolderID}"/>
-		</td>
-	</tr>
-	
-	<tr>
-		<td>
-			<div class="field-name">
-				<fmt:message key="label.authoring.basic.video"/>
-			</div>
-			<center>
-			<div id="kcwHolder">		
-				<div id="kcw"></div>
-			</div>
-			</center>
-				
-			<div id="kcwOpener" style="display: none;">
-				<a href="#nogo" onclick="javascript: return displayKCW();">
-					<fmt:message key="label.upload.more.video"/>
-				</a>
-			</div>
-		</td>
-	</tr>
-	
-	<tr>
-		<td>
-			<div id="itemListArea">
-				<%@ include file="/pages/authoring/itemlist.jsp"%>
-			</div>
-		</td>
-	</tr>
+<div class="form-group">
+    <label for="title">
+    	<fmt:message key="label.authoring.basic.title"/>
+    </label>
+    <html:text property="title" styleClass="form-control"/>
+</div>
 
-</table>
+<div class="form-group">
+    <label for="instructions">
+    	<fmt:message key="label.authoring.basic.instructions"/>
+    </label>
+	<lams:CKEditor id="instructions" value="${formBean.instructions}"
+			contentFolderID="${sessionMap.contentFolderID}" height="400"/>
+</div>
+
+<div id="kcwHolder" style="text-align:center;">
+
+	<div id="kcw"></div>
+</div>
+				
+<div id="kcwOpener" style="display: none;">
+	<a href="#nogo" onclick="javascript: return displayKCW();" class="btn btn-xs btn-default pull-right voffset10">
+		<fmt:message key="label.upload.more.video"/>
+	</a>
+</div>
+	
+<div id="itemListArea">
+	<%@ include file="/pages/authoring/itemlist.jsp"%>
+</div>

@@ -8,5 +8,4 @@
 <link href="${lams}css/thickbox.css" rel="stylesheet" type="text/css" media="screen">
 
 <script type="text/javascript" src="${tool}includes/javascript/authoring.js"></script>
-<script type="text/javascript" src="${lams}includes/javascript/jquery.js"></script>
 <script type="text/javascript" src="${lams}includes/javascript/thickbox.js"></script>

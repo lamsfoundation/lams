@@ -65,13 +65,12 @@
 				</object>
 			</div>
 			
-			<lams:ImgButtonWrapper>
+			<div>
 				<a href="#" onclick="self.parent.tb_remove();" onmousedown="self.focus();" class="btn btn-sm btn-primary pull-right voffset10">
 					<fmt:message key="label.close" /> 
 				</a>
-			</lams:ImgButtonWrapper>
+			</div>
 			
-		</lams:Page>
-		
+		</lams:Page>	
 	</body>
 </lams:html>

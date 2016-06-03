@@ -6,16 +6,21 @@
 	<lams:css style="core" />
 	
 	<script type="text/javascript">
-	function prepareFormData(){
+	function prepareFormData() {
 		//CKeditor content is not submitted when sending by jQuery; we need to do this
 		var content = CKEDITOR.instances.instructions.getData();
 		document.getElementById("instructions").value=content;
 	}
 	</script>
 </lams:head>
+
 <body style="width: 550px">
 	<%@ include file="/common/messages.jsp"%>
-	<h4 class="space-left" style="float:left"><fmt:message key="label.authoring.basic.instructions" /></h4>
+	
+	<h4 class="space-left" style="float:left">
+		<fmt:message key="label.authoring.basic.instructions" />
+	</h4>
+	
 	<html:form action="/pedagogicalPlanner.do?dispatch=saveOrUpdatePedagogicalPlannerForm" styleId="pedagogicalPlannerForm" method="post">
 		<html:hidden property="toolContentID" styleId="toolContentID" />
 		<html:hidden property="valid" styleId="valid" />

@@ -2,54 +2,55 @@
 <c:set var="formBean" value="<%=request.getAttribute(org.apache.struts.taglib.html.Constants.BEAN_KEY)%>" />
 
 <script lang="javascript">
-	$(document).ready(function(){
+	$(document).ready(function() {
 		$("#allowContributeVideos").click(function() {
 			if ($('#allowContributeVideos').is(':checked')) {
 				$("#allowSeeingOtherUsersRecordings").prop("disabled", false);
-				$("#learnerContributionLimit").prop("disabled", false);
+				$("#learner-contribution-limit").prop("disabled", false);
 			} else {
 				$("#allowSeeingOtherUsersRecordings").prop("disabled", true);
 				$("#allowSeeingOtherUsersRecordings").prop("checked", false);
-				$("#learnerContributionLimit").prop("disabled", true);
-				$("#learnerContributionLimit").prop("value", -1);
+				$("#learner-contribution-limit").prop("disabled", true);
+				$("#learner-contribution-limit").prop("value", -1);
 			}
 		});
 		
 		<c:if test="${!formBean.allowContributeVideos}">
 			$("#allowSeeingOtherUsersRecordings").prop("disabled", true);
-			$("#learnerContributionLimit").prop("disabled", true);
+			$("#learner-contribution-limit").prop("disabled", true);
 		</c:if>
+
+		$('#reflect-instructions').keyup(function(){
+			$('#reflect-on-activity').prop('checked', !isEmpty($(this).val()));
+		});
 	});
 </script>
 
 <!-- ========== Advanced Tab ========== -->
 
-<p class="small-space-top">
-	<html:checkbox property="lockOnFinished" value="1" styleClass="noBorder" styleId="lockOnFinished"/>
-	<label for="lockOnFinished">
+<div class="checkbox">
+	<label for="lock-on-finished">
+		<html:checkbox property="lockOnFinished" styleId="lock-on-finished"/>
 		<fmt:message key="advanced.lockOnFinished" />
 	</label>
-</p>
+</div>
 
-<p class="small-space-top">
-	<html:checkbox property="allowContributeVideos" value="1" styleClass="noBorder" styleId="allowContributeVideos"/>
+<div class="checkbox">
 	<label for="allowContributeVideos">
+		<html:checkbox property="allowContributeVideos" styleId="allowContributeVideos"/>
 		<fmt:message key="advanced.allowContributeVideos" />
 	</label>
-</p>
+</div>
 
-<p>
-	<html:checkbox property="allowSeeingOtherUsersRecordings" value="1" styleClass="noBorder" styleId="allowSeeingOtherUsersRecordings" />
+<div class="checkbox loffset20">
 	<label for="allowSeeingOtherUsersRecordings">
+		<html:checkbox property="allowSeeingOtherUsersRecordings" styleId="allowSeeingOtherUsersRecordings"/>
 		<fmt:message key="advanced.allowSeeingOtherUsersRecordings" />
 	</label>
-</p>
+</div>
 
-<p>
-	<label for="learnerContributionLimit">
-		<fmt:message key="advanced.learnerContributionLimit" />
-	</label>
-	<html:select property="learnerContributionLimit" styleId="learnerContributionLimit">
+<div class="form-inline form-group loffset20">
+	<html:select property="learnerContributionLimit" styleId="learner-contribution-limit" styleClass="form-control input-sm">
 		<html:option value="-1"><fmt:message key="advanced.unlimited" /></html:option>
 		<html:option value="1">1</html:option>
 		<html:option value="2">2</html:option>
@@ -62,47 +63,32 @@
 		<html:option value="9">9</html:option>
 		<html:option value="10">10</html:option>
 	</html:select>
-</p>
+	<label for="learner-contribution-limit">
+		&nbsp;<fmt:message key="advanced.learnerContributionLimit" />
+	</label>
+</div>
 
-<p>
-	<html:checkbox property="allowComments" value="1" styleClass="noBorder" styleId="allowComments"/>
-	<label for="allowComments">
+<div class="checkbox">
+	<label for="allow-comments">
+		<html:checkbox property="allowComments" styleId="allow-comments"/>
 		<fmt:message key="advanced.allowComments" />
 	</label>
-</p>
+</div>
 
-<p>
-	<html:checkbox property="allowRatings" value="1" styleClass="noBorder" styleId="allowRatings"/>
-	<label for="allowRatings">
+<div class="checkbox">
+	<label for="allow-ratings">
+		<html:checkbox property="allowRatings" styleId="allow-ratings"/>
 		<fmt:message key="advanced.allowRatings" />
 	</label>
-</p>
+</div>
 
-<p>
-	<html:checkbox property="reflectOnActivity" styleClass="noBorder" styleId="reflectOnActivity"/>
-	<label for="reflectOnActivity">
+<div class="checkbox">
+	<label for="reflect-on-activity">
+		<html:checkbox property="reflectOnActivity" styleId="reflect-on-activity" />
 		<fmt:message key="advanced.reflectOnActivity" />
 	</label>
-</p>
+</div>
 
-<p>
-	<html:textarea property="reflectInstructions" styleId="reflectInstructions" cols="30" rows="3" />
-</p>
-<script type="text/javascript">
-	<!--
-	//automatically turn on refect option if there are text input in refect instruction area
-		var ra = document.getElementById("reflectInstructions");
-		var rao = document.getElementById("reflectOnActivity");
-		function turnOnRefect(){
-			if(isEmpty(ra.value)){
-			//turn off	
-				rao.checked = false;
-			}else{
-			//turn on
-				rao.checked = true;		
-			}
-		}
-	
-		ra.onkeyup=turnOnRefect;
-	//-->
-</script>
+<div class="form-group">
+	<html:textarea property="reflectInstructions" styleId="reflect-instructions" styleClass="form-control" rows="3"	/>
+</div>
