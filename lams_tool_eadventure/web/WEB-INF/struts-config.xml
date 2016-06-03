@@ -3,12 +3,6 @@
 <!DOCTYPE struts-config PUBLIC "-//Apache Software Foundation//DTD Struts Configuration 1.2//EN" "http://jakarta.apache.org/struts/dtds/struts-config_1_2.dtd">
 
 <struts-config>
-	<global-exceptions>
-		<exception
-			handler="org.lamsfoundation.lams.web.util.CustomStrutsExceptionHandler"
-			key="error.system" path="/error.jsp" scope="request" type="java.lang.Exception" />
-	</global-exceptions>
-
 	<action-mappings>
 		<action path="/authoring/start"
 			type="org.eucm.lams.tool.eadventure.web.action.AuthoringAction" />
