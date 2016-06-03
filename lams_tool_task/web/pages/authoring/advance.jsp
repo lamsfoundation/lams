@@ -3,25 +3,25 @@
 
 <!-- Advance Tab Content -->
 
-<p class="small-space-top">
-	<html:checkbox property="taskList.lockWhenFinished"	styleClass="noBorder" styleId="lockWhenFinished" />
+<div class="checkbox">
 	<label for="lockWhenFinished">
-		<fmt:message key="label.authoring.advance.lock.on.finished" />
+	<html:checkbox property="taskList.lockWhenFinished"	styleId="lockWhenFinished" />
+	<fmt:message key="label.authoring.advance.lock.on.finished" />
 	</label>
-</p>
+</div>
 
-<p>
-	<html:checkbox property="taskList.sequentialOrder" styleClass="noBorder" styleId="sequentialOrder"/>
+<div class="checkbox">
 	<label for="sequentialOrder">
-		<fmt:message key="label.authoring.advance.run.content.sequentialOrder" />
+	<html:checkbox property="taskList.sequentialOrder" styleId="sequentialOrder"/>
+	<fmt:message key="label.authoring.advance.run.content.sequentialOrder" />
 	</label>
-</p>
+</div>
 
-<p>
+<div class="form-group">
 	<c:set var="sessionMapID" value="${param.sessionMapID}" />
 	<c:set var="sessionMap" value="${sessionScope[sessionMapID]}" />
 
-	<html:select property="taskList.minimumNumberTasks"	styleId="minimumNumberTasks" style="width:50px">
+	<html:select property="taskList.minimumNumberTasks"	styleId="minimumNumberTasks" styleClass="form-control form-control-inline input-sm">
 <!-- 		<c:forEach begin="1" end="${fn:length(sessionMap.taskListList)}" varStatus="status">
 			<c:choose>
 				<c:when	test="${formBean.taskList.minimumNumberTasks == status.index}">
@@ -42,32 +42,32 @@
 	<label for="minimumNumberTasks">
 		<fmt:message key="label.authoring.advance.minimum.number.tasks" />
 	</label>
-</p>
+</div>
 
-<p>
-	<html:checkbox property="taskList.allowContributeTasks" styleClass="noBorder" styleId="allowContributeTasks" />
+<div class="checkbox">
 	<label for="allowContributeTasks">
-		<fmt:message key="label.authoring.advance.allow.contribute.tasks" />
+	<html:checkbox property="taskList.allowContributeTasks" styleId="allowContributeTasks" />
+	<fmt:message key="label.authoring.advance.allow.contribute.tasks" />
 	</label>
-</p>
+</div>
 
-<p>
-	<html:checkbox property="taskList.monitorVerificationRequired" styleClass="noBorder" styleId="monitorVerificationRequired" />
+<div class="checkbox">
 	<label for="monitorVerificationRequired">
-		<fmt:message key="label.authoring.advance.monitor.verification.required" />
+	<html:checkbox property="taskList.monitorVerificationRequired" styleId="monitorVerificationRequired" />
+	<fmt:message key="label.authoring.advance.monitor.verification.required" />
 	</label>
-</p>
+</div>
 
-<p>
-	<html:checkbox property="taskList.reflectOnActivity" styleClass="noBorder" styleId="reflectOn" />
+<div class="checkbox">
 	<label for="reflectOn">
-		<fmt:message key="label.authoring.advanced.reflectOnActivity" />
+	<html:checkbox property="taskList.reflectOnActivity" styleId="reflectOn" />
+	<fmt:message key="label.authoring.advanced.reflectOnActivity" />
 	</label>
-</p>
+</div>
 
-<p>
-	<html:textarea property="taskList.reflectInstructions"	styleId="reflectInstructions" cols="30" rows="3" />
-</p>
+<div class="form-group">
+	<html:textarea property="taskList.reflectInstructions"	styleId="reflectInstructions" styleClass="form-control" rows="3" />
+</div>
 
 <script type="text/javascript">
 <!--

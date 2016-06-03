@@ -4,98 +4,48 @@
 <script lang="javascript">
 <!-- Common Javascript functions for LAMS -->
 
-	/**
-	 * Launches the popup window for the instruction files
-	 */
-	function showConditionMessage(url) {
-		var area=document.getElementById("conditionInputArea");
-		if(area != null){
-			area.style.width="650px";
-			area.style.height="100%";
-			area.src=url;
-			area.style.display="block";
-		}
-		var elem = document.getElementById("saveCancelButtons");
-		if (elem != null) {
-			elem.style.display="none";
-		}
-		location.hash = "conditionInputArea";
-	}
-	function hideConditionMessage(){
-		var area=document.getElementById("conditionInputArea");
-		if(area != null){
-			area.style.width="0px";
-			area.style.height="0px";
-			area.style.display="none";
-		}
-		var elem = document.getElementById("saveCancelButtons");
-		if (elem != null) {
-			elem.style.display="block";
-		}
-	}
+function showConditionMessage(url) {
+	$("#conditionInputArea").load(url, function() {
+		$(this).show();
+		$("#saveCancelButtons").hide();
+	});
+}
+function hideConditionMessage(){
+	$("#conditionInputArea").hide();
+	$("#saveCancelButtons").show();
+}
 
-	function editCondition(sequenceId,sessionMapID){
-		 var reqIDVar = new Date();
-		var url = "<c:url value="/authoring/editCondition.do?sequenceId="/>" + sequenceId +"&sessionMapID="+sessionMapID;;
-		showConditionMessage(url);
-	}
-	//The panel of taskList list panel
-	var conditionListTargetDiv = "conditionsArea";
-	function deleteCondition(sequenceId,sessionMapID){
-		var url = "<c:url value="/authoring/removeCondition.do"/>";
-	    var reqIDVar = new Date();
-		var param = "sequenceId=" + sequenceId +"&sessionMapID="+sessionMapID;;
-		deleteConditionLoading();
-	    var myAjax = new Ajax.Updater(
-		    	conditionListTargetDiv,
-		    	url,
-		    	{
-		    		method:'get',
-		    		parameters:param,
-		    		onComplete:deleteConditionComplete,
-		    		evalScripts:true
-		    	}
-	    );
-	}
-	function deleteConditionLoading(){
-		showBusy(conditionListTargetDiv);
-	}
-	function deleteConditionComplete(){
-		hideBusy(conditionListTargetDiv);
-	}
-	
-	function upCondition(sequenceId,sessionMapID){
-		var url = "<c:url value="/authoring/upCondition.do"/>";
-	    var reqIDVar = new Date();
-		var param = "sequenceId=" + sequenceId + "&sessionMapID="+sessionMapID;;
-		deleteConditionLoading();
-	    var myAjax = new Ajax.Updater(
-		    	conditionListTargetDiv,
-		    	url,
-		    	{
-		    		method:'get',
-		    		parameters:param,
-		    		onComplete:deleteConditionComplete,
-		    		evalScripts:true
-		    	}
-	    );
-	}
-	function downCondition(sequenceId,sessionMapID){
-		var url = "<c:url value="/authoring/downCondition.do"/>";
-	    var reqIDVar = new Date();
-		var param = "sequenceId=" + sequenceId + "&sessionMapID="+sessionMapID;;
-		deleteConditionLoading();
-	    var myAjax = new Ajax.Updater(
-		    	conditionListTargetDiv,
-		    	url,
-		    	{
-		    		method:'get',
-		    		parameters:param,
-		    		onComplete:deleteConditionComplete,
-		    		evalScripts:true
-		    	}
-	    );
-	}
+function editCondition(sequenceId,sessionMapID){
+	var url = "<c:url value="/authoring/editCondition.do?sequenceId="/>" + sequenceId +"&sessionMapID="+sessionMapID;
+	showConditionMessage(url);
+}
+
+function deleteCondition(sequenceId, sessionMapID){
+	var param = "sequenceId=" + sequenceId +"&sessionMapID="+sessionMapID;
+	var url = "<c:url value="/authoring/removeCondition.do"/>?"+param;
+	$("#conditionsArea").load(url);
+}
+
+function upCondition(sequenceId,sessionMapID){
+	var param = "sequenceId=" + sequenceId + "&sessionMapID="+sessionMapID;;
+	var url = "<c:url value="/authoring/upCondition.do"/>?"+param;
+	alert(url);
+	$("#conditionListTargetDiv").load(url,function() {
+		alert("loaded");
+	});
+}
+function downCondition(sequenceId,sessionMapID){
+	var param = "sequenceId=" + sequenceId + "&sessionMapID="+sessionMapID;
+	var url = "<c:url value="/authoring/downCondition.do"/>?"+param;
+	$("#conditionListTargetDiv").load(url);
+}
+
+//Packs additional elements and submits the question form
+function submitCondition(){
+	refreshCKEditors();
+	var form = $('#taskListConditionForm');
+	$('#conditionInputArea').load(form.attr('action'), form.serialize());
+} 
 
 </script>
 
@@ -106,17 +56,9 @@
 	<%@ include file="/pages/authoring/parts/conditionlist.jsp"%>
 </div>
 
-<p class="small-space-bottom">
-	<a href="javascript:showConditionMessage('<html:rewrite page="/authoring/newConditionInit.do?sessionMapID=${formBean.sessionMapID}"/>');" class="button-add-item">
-	<fmt:message key="label.authoring.conditions.add.condition" /></a> 
-</p>
+ <div class="form-inline">
+	<a href="javascript:showConditionMessage('<html:rewrite page="/authoring/newConditionInit.do?sessionMapID=${formBean.sessionMapID}"/>');"
+		 class="btn btn-default btn-sm"><i class="fa fa-plus"></i>&nbsp;<fmt:message key="label.authoring.conditions.add.condition" /></a> 
+</div>
 
-
-<p>
-	<iframe
-		onload="javascript:this.style.height=this.contentWindow.document.body.scrollHeight+'px'"
-		id="conditionInputArea" name="conditionInputArea"
-		style="width:0px;height:0px;border:0px;display:none" frameborder="no"
-		scrolling="no">
-	</iframe>
-</p>
+<div id="conditionInputArea" name="conditionInputArea" class="voffset10"></div>

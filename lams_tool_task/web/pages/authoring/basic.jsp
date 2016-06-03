@@ -8,29 +8,14 @@
 	 * Launches the popup window for the instruction files
 	 */
 	function showMessage(url) {
-		var area=document.getElementById("resourceInputArea");
-		if(area != null){
-			area.style.width="100%";
-			area.src=url;
-			area.style.display="block";
-		}
-		var elem = document.getElementById("saveCancelButtons");
-		if (elem != null) {
-			elem.style.display="none";
-		}
-		location.hash = "resourceInputArea";
+		$("#resourceInputArea").load(url, function() {
+			$(this).show();
+			$("#saveCancelButtons").hide();
+		});
 	}
 	function hideMessage(){
-		var area=document.getElementById("resourceInputArea");
-		if(area != null){
-			area.style.width="0px";
-			area.style.height="0px";
-			area.style.display="none";
-		}
-		var elem = document.getElementById("saveCancelButtons");
-		if (elem != null) {
-			elem.style.display="block";
-		}
+		$("#resourceInputArea").hide();
+		$("#saveCancelButtons").show();
 	}
 
 	function editItem(idx, sessionMapID){
@@ -49,20 +34,14 @@
  		}
 		
 		if (deletionConfirmed) {
-			var url = "<c:url value="/authoring/removeItem.do"/>";
 		    var reqIDVar = new Date();
-			var param = "itemIndex=" + idx +"&reqID="+reqIDVar.getTime()+"&sessionMapID="+sessionMapID;;
+			var param = "itemIndex=" + idx +"&reqID="+reqIDVar.getTime()+"&sessionMapID="+sessionMapID;
+			var url = "<c:url value="/authoring/removeItem.do"/>?"+param;
 			deleteItemLoading();
-		    var myAjax = new Ajax.Updater(
-			    	taskListListTargetDiv,
-			    	url,
-			    	{
-			    		method:'get',
-			    		parameters:param,
-			    		onComplete:deleteItemComplete,
-			    		evalScripts:true
-			    	}
-		    );
+			$('#taskListListArea').load(url, function() {
+				debugger;
+	    		deleteItemComplete();
+			});
  		}
 		
 	}
@@ -74,82 +53,53 @@
 	}
 	
 	function upQuestion(idx, sessionMapID){
-		var url = "<c:url value="/authoring/upItem.do"/>";
 	    var reqIDVar = new Date();
-		var param = "itemIndex=" + idx +"&reqID="+reqIDVar.getTime()+"&sessionMapID="+sessionMapID;;
+		var param = "itemIndex=" + idx +"&reqID="+reqIDVar.getTime()+"&sessionMapID="+sessionMapID;
+		var url = "<c:url value="/authoring/upItem.do"/>?"+param;
 		deleteItemLoading();
-	    var myAjax = new Ajax.Updater(
-		    	taskListListTargetDiv,
-		    	url,
-		    	{
-		    		method:'get',
-		    		parameters:param,
-		    		onComplete:deleteItemComplete,
-		    		evalScripts:true
-		    	}
-	    );
+		$('#taskListListArea').load(url, function() {
+			debugger;
+			deleteItemComplete();
+		});
 	}
 	function downQuestion(idx, sessionMapID){
-		var url = "<c:url value="/authoring/downItem.do"/>";
 	    var reqIDVar = new Date();
 		var param = "itemIndex=" + idx +"&reqID="+reqIDVar.getTime()+"&sessionMapID="+sessionMapID;;
+		var url = "<c:url value="/authoring/downItem.do"/>?"+param;
 		deleteItemLoading();
-	    var myAjax = new Ajax.Updater(
-		    	taskListListTargetDiv,
-		    	url,
-		    	{
-		    		method:'get',
-		    		parameters:param,
-		    		onComplete:deleteItemComplete,
-		    		evalScripts:true
-		    	}
-	    );
+		$('#taskListListArea').load(url, function() {
+			debugger;
+			deleteItemComplete();
+		});
 	}
-	function resizeOnMessageFrameLoad(){
-		var messageAreaFrame = document.getElementById("resourceInputArea");
-		messageAreaFrame.style.height=messageAreaFrame.contentWindow.document.body.scrollHeight+'px';
-	}
+	
+	//Packs additional elements and submits the question form
+	function submitTask(){
+		debugger;
+		refreshCKEditors();
+		var form = $('#taskListItemForm');
+		$('#taskListListArea').load(form.attr('action'), form.serialize());
+	} 
+	
 </script>
 
 <!-- Basic Tab Content -->
-<table>
-	<tr>
-		<td colspan="2">
-			<div class="field-name">
-				<fmt:message key="label.authoring.basic.title"></fmt:message>
-			</div>
-			<html:text property="taskList.title" style="width: 99%;"></html:text>
-		</td>
-	</tr>
-	<tr>
-		<td colspan="2">
-			<div class="field-name">
-				<fmt:message key="label.authoring.basic.description"></fmt:message>
-			</div>
-			<lams:CKEditor id="taskList.instructions"
-				value="${formBean.taskList.instructions}"
-				contentFolderID="${formBean.contentFolderID}"></lams:CKEditor>
-		</td>
-	</tr>
-
-</table>
+<div class="form-group">
+    <label for="taskList"><fmt:message key="label.authoring.basic.title"/></label>
+    <html:text property="taskList.title" styleClass="form-control"></html:text>
+</div>
+<div class="form-group">
+    <label for="taskList"><fmt:message key="label.authoring.basic.description" /></label>
+    <lams:CKEditor id="taskList.instructions" value="${formBean.taskList.instructions}" contentFolderID="${formBean.contentFolderID}"></lams:CKEditor>
+</div>
 
 <div id="taskListListArea">
 	<c:set var="sessionMapID" value="${formBean.sessionMapID}" />
 	<%@ include file="/pages/authoring/parts/itemlist.jsp"%>
 </div>
 
-<p class="small-space-bottom">
-	<a href="javascript:showMessage('<html:rewrite page="/authoring/newItemInit.do?sessionMapID=${formBean.sessionMapID}"/>');" class="button-add-item">
-	<fmt:message key="label.authoring.basic.add.task" /></a> 
-</p>
+<a href="javascript:showMessage('<html:rewrite page="/authoring/newItemInit.do?sessionMapID=${formBean.sessionMapID}"/>');" class="btn btn-default btn-sm">
+		<i class="fa fa-plus"></i>&nbsp;<fmt:message key="label.authoring.basic.add.task" /></a> 
 
+<div id="resourceInputArea" name="resourceInputArea" class="voffset10"></div>
 
-<p>
-	<iframe
-		onload="javascript:resizeOnMessageFrameLoad();"
-		id="resourceInputArea" name="resourceInputArea"
-		style="width:0px;height:0px;border:0px;display:none" frameborder="no"
-		scrolling="no">
-	</iframe>
-</p>
