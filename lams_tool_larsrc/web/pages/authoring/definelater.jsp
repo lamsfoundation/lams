@@ -6,12 +6,7 @@
 
 <%@ page import="java.util.HashSet"%>
 <%@ page import="org.lamsfoundation.lams.tool.rsrc.ResourceConstants"%>
-<%@ page import="java.util.Set"%>
-<%Set tabs = new HashSet();
-			tabs.add("label.authoring.heading.basic");
-			pageContext.setAttribute("tabs", tabs);
 
-			%>
 <lams:html>
 <lams:head>
 	<title><fmt:message key="label.author.title" /></title>
@@ -47,30 +42,32 @@
 		<html:hidden property="contentFolderID" />
 		<html:hidden property="sessionMapID" />
 		
-	<lams:Page title="${title}" type="navbar">
-
-		<lams:Tabs control="true" title="${title}" helpToolSignature="<%= ResourceConstants.TOOL_SIGNATURE %>" helpModule="authoring">
-			<lams:Tab id="1" key="label.authoring.heading.basic" />
-		</lams:Tabs>    
+		<lams:Page title="${title}" type="navbar">
+		
+			<lams:Tabs control="true" title="${title}" helpToolSignature="<%= ResourceConstants.TOOL_SIGNATURE %>" helpModule="authoring">
+				<lams:Tab id="1" key="label.authoring.heading.basic" />
+			</lams:Tabs>    
 	
-		<lams:TabBodyArea>
+			<lams:TabBodyArea>
 			<%@ include file="/common/messages.jsp"%>
 		   
-		    <!--  Set up tabs  -->
-		     <lams:TabBodys>
-				<lams:TabBody id="1" titleKey="label.authoring.heading.basic.desc" page="basic.jsp" />
-		    </lams:TabBodys>
+			    <!--  Set up tabs  -->
+			    <lams:TabBodys>
+					<!-- tab content 1 (Basic) -->
+					<lams:TabBody id="1" titleKey="label.authoring.heading.basic.desc" page="basic.jsp" />
+					<!-- end of content (Basic) -->
+				</lams:TabBodys>
 	
-			<!-- Button Row -->
-			<lams:AuthoringButton formID="authoringForm" clearSessionActionUrl="/clearsession.do" toolSignature="<%=ResourceConstants.TOOL_SIGNATURE%>" 
-				toolContentID="${formBean.resource.contentId}"  accessMode="teacher" defineLater="yes"  
-				customiseSessionID="${formBean.sessionMapID}" contentFolderID="${formBean.contentFolderID}"/>
+				<!-- Button Row -->
+				<lams:AuthoringButton formID="authoringForm" clearSessionActionUrl="/clearsession.do" toolSignature="<%=ResourceConstants.TOOL_SIGNATURE%>" 
+					toolContentID="${formBean.resource.contentId}"  accessMode="teacher" defineLater="yes"  
+					customiseSessionID="${formBean.sessionMapID}" contentFolderID="${formBean.contentFolderID}"/>
 
-		</lams:TabBodyArea>
+			</lams:TabBodyArea>
 
-		<div id="footer"></div>
+			<div id="footer"></div>
 
-	</lams:Page>
+		</lams:Page>
 
 	</html:form>
 </body>
