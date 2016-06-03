@@ -23,19 +23,15 @@
         }     
         
         function doSelectTab(tabId) {
-        	// start optional tab controller stuff
         	var tag = document.getElementById("currentTab");
 	    	tag.value = tabId;
-	    	// end optional tab controller stuff
-	    	
-	    	//if we're leaving Condition tab its addCondition area should be closed
-	    	if (tabId != 3)	window.parent.hideConditionMessage();
 	    	
 	    	selectTab(tabId);
 	    	
 	    	//for advanceTab
-	    	if(tabId == 2)
+	    	if(tabId == 2) {
 	    		changeMinTasks(-1);
+	    	}
         }
         
         function changeMinTasks(initVal){
