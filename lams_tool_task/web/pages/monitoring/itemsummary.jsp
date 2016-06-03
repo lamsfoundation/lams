@@ -9,13 +9,20 @@
 <lams:head>
 	<title><fmt:message key="label.learning.title" /></title>
 	<%@ include file="/common/monitorheader.jsp"%>
-		
+
 	<style media="screen,projection" type="text/css">
-		.ui-jqgrid tr.jqgrow td {
-		    white-space: normal !important;
-		    height:auto;
-		    vertical-align:text-top;
-		    padding-top:2px;
+		 .ui-jqgrid {
+			border-left-style: none !important;
+			border-right-style: none !important;
+			border-bottom-style: none !important;
+		}
+		
+		.ui-jqgrid tr {
+			border-left-style: none !important;
+		}
+		
+		.ui-jqgrid td {
+			border-style: none !important;
 		}
 	</style>
 		
@@ -62,18 +69,25 @@
 	 	 		.navGrid("#pager-${sessionDto.sessionId}", {edit:false,add:false,del:false,search:false});
 			</c:forEach>
 		
-			//jqgrid autowidth
+			//jqgrid autowidth (http://stackoverflow.com/a/1610197)
 			$(window).bind('resize', function() {
-				var grid;
-			    if (grid = jQuery(".ui-jqgrid-btable:visible")) {
-			    	grid.each(function(index) {
-				        var gridId = $(this).attr('id');
-				        
-					    var gridParentWidth = jQuery('#gbox_' + gridId).parent().width();
-					    jQuery('#' + gridId).setGridWidth(gridParentWidth, false);
-			        });
-			    }
+				resizeJqgrid(jQuery(".ui-jqgrid-btable:visible"));
 			});
+
+			//resize jqGrid on openning of bootstrap collapsible
+			$('div[id^="collapse"]').on('shown.bs.collapse', function () {
+				resizeJqgrid(jQuery(".ui-jqgrid-btable:visible", this));
+			})
+
+			function resizeJqgrid(jqgrids) {
+				jqgrids.each(function(index) {
+					var gridId = $(this).attr('id');
+			    	var gridParentWidth = jQuery('#gbox_' + gridId).parent().width();
+			    	jQuery('#' + gridId).setGridWidth(gridParentWidth, true);
+			    });
+			};
+			setTimeout(function(){ window.dispatchEvent(new Event('resize')); }, 300);
+			
 		});
 		
 	</script>
