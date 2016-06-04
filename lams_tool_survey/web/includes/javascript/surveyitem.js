@@ -1,44 +1,27 @@
 	/*
-	 This is Survey Item instrcution area.
+	 This is Survey Item instruction area.
 	 */
-    var instructionTargetDiv = "instructionArea";
 // Please set these 2 variables in JSP file for using tag reason:
 //    var removeInstructionUrl = "<c:url value='/authoring/removeInstruction.do'/>";
 //    var addInstructionUrl = "<c:url value='/authoring/newInstruction.do'/>";
 	function removeInstruction(idx){
-		//var id = "instructionItem" + idx;
-		//Element.remove(id);
- 		var url= removeInstructionUrl;
 	    var reqIDVar = new Date();
-	    var param = Form.serialize("instructionForm")+"&removeIdx="+idx+"&reqID="+reqIDVar.getTime();
-	    removeInstructionLoading();
-	    var myAjax = new Ajax.Updater(
-		    	instructionTargetDiv,
-		    	url,
-		    	{
-		    		method:'post',
-		    		parameters:param,
-		    		onComplete:removeInstructionComplete,
-		    		evalScripts:true
-		    	}
-	    );
+	    var param = $("#instructionForm").serialize()+"&removeIdx="+idx+"&reqID="+reqIDVar.getTime();
+ 		var url= removeInstructionUrl+"?"+param;
+	    showInstructionBusy();
+	    $('#instructionArea').load(url,function(data) {
+	    	hideInstructionBusy();
+	    });
 	}
 	
 	function addInstruction(){
-		var url= addInstructionUrl;
 	    var reqIDVar = new Date();
-	    var param = Form.serialize("instructionForm")+"&reqID="+reqIDVar.getTime();
-		addInstructionLoading();
-	    var myAjax = new Ajax.Updater(
-		    	instructionTargetDiv,
-		    	url,
-		    	{
-		    		method:'post',
-		    		parameters:param,
-		    		onComplete:addInstructionComplete,
-		    		evalScripts:true
-		    	}
-	    );
+	    var param = $("#instructionForm").serialize()+"&reqID="+reqIDVar.getTime();
+		var url= addInstructionUrl+"?"+param;
+	    showInstructionBusy();
+	    $('#instructionArea').load(url,function() {
+	    	hideInstructionBusy();
+	    });
 	}
 	function upItem(itemIdx){
 		if(itemIdx == 0)
@@ -55,50 +38,41 @@
 		switchValue(currId,repId);
 	}
 	function switchValue(currId,repId){
-		var temp = $(repId).value;
-		$(repId).value =  $(currId).value;
-		$(currId).value= temp;
+		var current = document.getElementById(currId);
+		var rep = document.getElementById(repId);
+		var temp = rep.value;
+		rep.value = current.value;
+		current.value= temp;
 	}
-	function removeInstructionLoading(){
-		showBusy(instructionTargetDiv);
+	function showInstructionBusy(){
+		$('#instructionAreaBusy').show();
 	}
-	function removeInstructionComplete(){
-		hideBusy(instructionTargetDiv);
-		
-	}
-	
-	function addInstructionLoading(){
-		showBusy(instructionTargetDiv);
-	}
-	function addInstructionComplete(){
-		hideBusy(instructionTargetDiv);
-		
-	}
-	function showBusy(targetDiv){
-		if($(targetDiv+"_Busy") != null){
-			Element.show(targetDiv+"_Busy");
-		}
-	}
-	function hideBusy(targetDiv){
-		if($(targetDiv+"_Busy") != null){
-			Element.hide(targetDiv+"_Busy");
-		}				
+	function hideInstructionBusy(){
+		$('#instructionAreaBusy').hide();
 	}
 	
+	function refreshCKEditors() {
+		// make sure all the ckeditors are refreshed, not just the validated ones
+		for (var i in CKEDITOR.instances) {
+       		CKEDITOR.instances[i].updateElement();
+   		}
+	}
+
 	function submitSurveyItem(){
-		if($("instructionList") != null)
-			$("instructionList").value = Form.serialize("instructionForm");
-		$("surveyItemForm").submit();
+		refreshCKEditors();
+		if (document.getElementById("instructionForm")) {
+			document.getElementById("instructionList").value = $("#instructionForm").serialize();
+		}
+		$.ajax({
+			data: $("#surveyItemForm").serialize(),
+	       	type: $("#surveyItemForm").attr('method'),
+			url: $("#surveyItemForm").attr('action'),
+			success: function(data) {
+	           $('#questionInputArea').html(data);
+			}
+		});
 	}
 	
 	function cancelSurveyItem(){
-		var win = null;
-		if (window.hideMessage) { 
-			win = window;
-		} else if (window.parent && window.parent.hideMessage) {
-			win = window.parent;
-		} else {
-			win = window.top;
-		}
-		win.hideMessage();
+		hideMessage();
 	}

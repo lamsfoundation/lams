@@ -3,44 +3,44 @@
 
 <!-- Advance Tab Content -->
 
-<p class="small-space-top">
-	<html:checkbox property="survey.lockWhenFinished" styleClass="noBorder" styleId="lockWhenFinished"/>
+<div class="checkbox">
 	<label for="lockWhenFinished">
+	<html:checkbox property="survey.lockWhenFinished" styleId="lockWhenFinished"/>
 		<fmt:message key="label.authoring.advance.lock.on.finished" />
 	</label>
-</p>
+</div>
 
-<p>
-	<html:checkbox property="survey.showOnePage" styleClass="noBorder" styleId="showOnePage"/>
+<div class="checkbox">
 	<label for="showOnePage">
+	<html:checkbox property="survey.showOnePage" styleId="showOnePage"/>
 		<fmt:message key="label.authoring.advance.show.on.one.page" />
 	</label>
-</p>
+</div>
 
-<p>
-	<html:checkbox property="survey.showOtherUsersAnswers" styleClass="noBorder" styleId="showOtherUsersAnswers"/>
+<div class="checkbox">
 	<label for="showOtherUsersAnswers">
+	<html:checkbox property="survey.showOtherUsersAnswers" styleId="showOtherUsersAnswers"/>
 		<fmt:message key="label.show.answers.from.other.users" />
 	</label>
-</p>
+</div>
 
-<p>
-	<html:checkbox property="survey.notifyTeachersOnAnswerSumbit" styleClass="noBorder" styleId="notifyTeachersOnAnswerSumbit"/>
+<div class="checkbox">
 	<label for="notifyTeachersOnAnswerSumbit">
+	<html:checkbox property="survey.notifyTeachersOnAnswerSumbit" styleId="notifyTeachersOnAnswerSumbit"/>
 		<fmt:message key="label.authoring.advanced.notify.onanswersubmit" />
 	</label>
-</p>
+</div>
 
-<p>
-	<html:checkbox property="survey.reflectOnActivity" styleClass="noBorder" styleId="reflectOn"/>
+<div class="checkbox">
 	<label for="reflectOn">
+	<html:checkbox property="survey.reflectOnActivity" styleId="reflectOn"/>
 		<fmt:message key="label.authoring.advanced.reflectOnActivity" />
 	</label>
-</p>
+</div>
 
-<p>
-	<html:textarea property="survey.reflectInstructions" styleId="reflectInstructions" cols="30" rows="3" />
-</p>
+<div class="form-group">
+	<html:textarea property="survey.reflectInstructions" styleId="reflectInstructions" rows="3" styleClass="form-control"/>
+</div>
 
 <script type="text/javascript">
 <!--

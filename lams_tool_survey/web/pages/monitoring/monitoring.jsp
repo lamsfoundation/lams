@@ -1,12 +1,43 @@
 <!DOCTYPE html>
-        
-
 <%@ include file="/common/taglibs.jsp"%>
 <%@ page import="org.lamsfoundation.lams.tool.survey.SurveyConstants"%>
 
+<c:set var="lams"><lams:LAMSURL/></c:set>
+
 <lams:html>
 	<lams:head>
-		 <%@ include file="/common/tabbedheader.jsp" %>
+
+	<lams:css/>
+	
+	<script type="text/javascript" src="${lams}includes/javascript/common.js"></script>
+	<script type="text/javascript" src="${lams}includes/javascript/jquery.js"></script>
+	<script type="text/javascript" src="${lams}includes/javascript/jquery-ui.js"></script>
+	<script type="text/javascript" src="${lams}includes/javascript/jquery-ui.timepicker.js"></script>
+	<script type="text/javascript" src="${lams}includes/javascript/jquery.blockUI.js"></script>
+	<script type="text/javascript" src="${lams}includes/javascript/d3.js"></script>
+	<script type="text/javascript" src="${lams}includes/javascript/chart.js"></script>
+	<script type="text/javascript" src="${lams}includes/javascript/bootstrap.min.js"></script>
+	<script type="text/javascript" src="${lams}includes/javascript/bootstrap.tabcontroller.js"></script>
+	
+	<script type="text/javascript">
+	//pass settings to monitorToolSummaryAdvanced.js
+	<c:set var="sessionMap" value="${sessionScope[sessionMapID]}"/>
+	var submissionDeadlineSettings = {
+		lams: '${lams}',
+		submissionDeadline: '${sessionMap.submissionDeadline}',
+		setSubmissionDeadlineUrl: '<c:url value="/monitoring/setSubmissionDeadline.do"/>',
+		toolContentID: '${param.toolContentID}',
+		messageNotification: '<fmt:message key="monitor.summary.notification" />',
+		messageRestrictionSet: '<fmt:message key="monitor.summary.date.restriction.set" />',
+		messageRestrictionRemoved: '<fmt:message key="monitor.summary.date.restriction.removed" />'
+	};	
+	</script>
+	<script type="text/javascript" src="${lams}/includes/javascript/monitorToolSummaryAdvanced.js" ></script>
+
+	<link type="text/css" href="${lams}/css/jquery-ui-smoothness-theme.css" rel="stylesheet">
+	<link type="text/css" href="${lams}/css/jquery-ui.timepicker.css" rel="stylesheet"> 
+	<link type="text/css" href="${lams}/css/chart.css" rel="stylesheet" />
+		
 	 <script>
 			var initialTabId = "${initialTabId}";
 	 
@@ -30,26 +61,27 @@
 	    </script>		 
 	</lams:head>
 	<body class="stripes" onLoad="init()">
-	<div id="page">
-		<h1>
-			<fmt:message key="label.monitoring.heading" />
-		</h1>
-	<div id="header">
-		<lams:Tabs>
+	
+	<c:set var="title"><fmt:message key="activity.title" /></c:set>
+	<lams:Page title="${title}" type="navbar">
+	
+		<lams:Tabs title="${title}" control="true" helpToolSignature="<%= SurveyConstants.TOOL_SIGNATURE %>" helpModule="monitoring">
 			<lams:Tab id="1" key="monitoring.tab.summary" />
 			<lams:Tab id="2" key="monitoring.tab.edit.activity" />			
 			<lams:Tab id="3" key="monitoring.tab.statistics" />
 		</lams:Tabs>
-	</div>
-	<div id="content">
-			<lams:help toolSignature="<%= SurveyConstants.TOOL_SIGNATURE %>" module="monitoring"/>
-	
+		
+		<lams:TabBodyArea>
+		<lams:TabBodys>
 			<lams:TabBody id="1" titleKey="monitoring.tab.summary" page="summary.jsp" />
 			<lams:TabBody id="2" titleKey="monitoring.tab.edit.activity" page="editactivity.jsp" />			
 			<lams:TabBody id="3" titleKey="monitoring.tab.statistics" page="statistic.jsp" />
-	</div>
-	<div id="footer"></div>
-	
-	</div>
+		</lams:TabBodys>
+		</lams:TabBodyArea>
+		
+		<div id="footer" />
+		
+	</lams:Page>
+
 	</body>
 </lams:html>

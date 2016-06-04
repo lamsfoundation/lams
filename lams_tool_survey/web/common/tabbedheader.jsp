@@ -3,13 +3,4 @@
 <c:set var="tool"><lams:WebAppURL/></c:set>
 <c:set var="ctxPath" value="${pageContext.request.contextPath}" scope="request"/>
 
- 	<!-- ********************  CSS ********************** -->
-	<lams:css style="main"/>
-
-
- 	<!-- ********************  javascript ********************** -->
-	<script type="text/javascript" src="${lams}includes/javascript/common.js"></script>
-	<script type="text/javascript" src="${lams}includes/javascript/prototype.js"></script>
-	<script type="text/javascript" src="${lams}includes/javascript/tabcontroller.js"></script>    
-
-	
+<lams:headItems/>
