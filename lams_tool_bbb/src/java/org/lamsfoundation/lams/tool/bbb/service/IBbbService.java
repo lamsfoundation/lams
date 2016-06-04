@@ -63,6 +63,12 @@ public interface IBbbService {
     public Bbb getBbbByContentId(Long toolContentID);
 
     /**
+     * @param toolContentID
+     * @return
+     */
+    public boolean isGroupedActivity(long toolContentID);
+
+    /**
      * @param bbb
      */
     public void saveOrUpdateBbb(Bbb bbb);

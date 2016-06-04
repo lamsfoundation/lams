@@ -48,12 +48,15 @@ public class ContentDTO {
     boolean defineLater;
 
     boolean contentInUse;
-
+    
     boolean lockOnFinish;
 
     Set<SessionDTO> sessionDTOs = new TreeSet<SessionDTO>();
 
     Long currentTab;
+
+    boolean isGroupedActivity; // set manually in MonitoringAction
+
 
     /* Constructors */
     public ContentDTO() {
@@ -71,6 +74,8 @@ public class ContentDTO {
 	for (BbbSession bbbSession : bbb.getBbbSessions()) {
 	    sessionDTOs.add(new SessionDTO(bbbSession));
 	}
+	
+	isGroupedActivity = false;
     }
 
     /* Getters / Setters */
@@ -144,6 +149,14 @@ public class ContentDTO {
 
     public void setCurrentTab(Long currentTab) {
 	this.currentTab = currentTab;
+    }
+
+    public boolean isGroupedActivity() {
+        return isGroupedActivity;
+    }
+
+    public void setGroupedActivity(boolean isGroupedActivity) {
+        this.isGroupedActivity = isGroupedActivity;
     }
 
 }
