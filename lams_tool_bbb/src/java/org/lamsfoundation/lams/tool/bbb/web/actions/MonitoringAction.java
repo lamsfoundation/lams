@@ -96,8 +96,12 @@ public class MonitoringAction extends DispatchAction {
 	Long currentTab = WebUtil.readLongParam(request, AttributeNames.PARAM_CURRENT_TAB, true);
 	contentDT0.setCurrentTab(currentTab);
 
+	contentDT0.setGroupedActivity(bbbService.isGroupedActivity(toolContentID));
+
 	request.setAttribute(Constants.ATTR_CONTENT_DTO, contentDT0);
 	request.setAttribute(Constants.ATTR_CONTENT_FOLDER_ID, contentFolderID);
+
+
 	return mapping.findForward("success");
     }
 

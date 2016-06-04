@@ -434,6 +434,12 @@ public class BbbService implements ToolSessionManager, ToolContentManager, IBbbS
     }
 
     @Override
+    public boolean isGroupedActivity(long toolContentID) {
+	return toolService.isGroupedActivity(toolContentID);
+    }
+
+
+    @Override
     @SuppressWarnings("unchecked")
     public BbbSession getSessionBySessionId(Long toolSessionId) {
 	List<BbbSession> list = bbbSessionDAO.findByProperty(BbbSession.class, "sessionId", toolSessionId);
