@@ -2,59 +2,42 @@
 		
 <%@ include file="/common/taglibs.jsp"%>
 
-<lams:html>
-	<lams:head>
-		<%@ include file="/common/header.jsp"%>
-		<script type="text/javascript" src="${lams}includes/javascript/prototype.js"></script>
-		<lams:css style="main" />
-		<script type="text/javascript"> 
-			function callHideConditionMessage() {
-				try {
-					if (window.parent && window.parent.hideConditionMessage) {
-						window.parent.hideConditionMessage();
-					} else if (window.top && window.top.hideConditionMessage) {
-						window.top.hideConditionMessage();
-					}
-				} catch(err) {
-					// mute cross-domain iframe access errors
-				}
-			}
-		</script>
-	</lams:head>
-	<body class="tabpart">
-		<!-- Basic Info Form-->
-		<%@ include file="/common/messages.jsp"%>
-		<html:form action="/authoring/saveOrUpdateCondition" method="post" styleId="surveyConditionForm" focus="displayName" >
-			<html:hidden property="orderId" />
-			<h2 class="no-space-left">
-				<fmt:message key="label.authoring.conditions.add.condition" />
-			</h2>
+<div class="panel panel-default">
+<div class="panel-heading">
+	<div class="panel-title"><fmt:message key="label.authoring.conditions.add.condition" /></div>
+</div>
 
-			<div class="field-name">
-            	<fmt:message key="label.authoring.conditions.condition.name" />
-			</div>
+<div class="panel-body">	
 
-			<div class="small-space-bottom">
-         		<html:text property="displayName" size="51"/>
-			</div>
-			<%-- Text search form fields are being included --%>
-			<lams:TextSearch wrapInFormTag="false" sessionMapID="${sessionMapID}"  />
-			<h4 class="no-space-left"><fmt:message key="textsearch.questions" /></h4>
-			<logic:iterate name="surveyConditionForm" id="itemE" property="possibleItems">
-			  	<html:multibox property="selectedItems">
-			    	<bean:write name="itemE" property="value" />
-			  	</html:multibox>
-			    <bean:write name="itemE" property="label" />
-			    <br />
-			</logic:iterate>
+	<%@ include file="/common/messages.jsp"%>
+	<html:form action="/authoring/saveOrUpdateCondition" method="post" styleId="surveyConditionForm" focus="displayName" >
+		<html:hidden property="orderId" />
+		
+		<div class="form-group">
+		    <label for="displayName"><fmt:message key="label.authoring.conditions.condition.name" /></label>
+       		<html:text property="displayName" size="51"  styleClass="form-control"/>
+		</div>
 
-		</html:form>
+		<%-- Text search form fields are being included --%>
+		<lams:TextSearch wrapInFormTag="false" sessionMapID="${sessionMapID}"  />
+		<h4><fmt:message key="textsearch.questions" /></h4>
+		<logic:iterate name="surveyConditionForm" id="itemE" property="possibleItems">
+			<div class="checkbox">
+			<label>
+		  	<html:multibox property="selectedItems">
+		    	<bean:write name="itemE" property="value" />
+		  	</html:multibox>
+		    <bean:write name="itemE" property="label" />
+		    </label>
+		    </div>
+		</logic:iterate>
+	
+	</html:form>
 
-		<lams:ImgButtonWrapper>
-			<a href="javascript:;" onclick="javascript:surveyConditionForm.submit();" class="button-add-item"><fmt:message
-					key="label.save" /> </a>
-			<a href="javascript:;" onclick="javascript:callHideConditionMessage()"
-				class="button space-left"><fmt:message key="label.cancel" /> </a>
-		</lams:ImgButtonWrapper>
-	</body>
-</lams:html>
+	<div class="voffset5">
+		<a href="#" onclick="submitCondition();" class="btn btn-default btn-xs"><fmt:message key="label.save" /> </a>
+		<a href="#" onclick="hideConditionMessage();" class="btn btn-default btn-xs"><fmt:message key="button.cancel" /> </a>
+	</div>
+
+</div>
+</div>

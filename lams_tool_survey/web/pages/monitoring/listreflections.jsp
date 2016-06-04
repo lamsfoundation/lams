@@ -7,7 +7,7 @@
 <lams:html>
 <lams:head>
 	    <%@ include file="/common/header.jsp" %>
-	    <link type="text/css" href="${lams}css/jquery.tablesorter.theme-blue.css" rel="stylesheet">
+	    <link type="text/css" href="${lams}css/jquery.tablesorter.theme.bootstrap.css" rel="stylesheet">
 		<link type="text/css" href="${lams}css/jquery.tablesorter.pager.css" rel="stylesheet">
 
 		<script type="text/javascript" src="${lams}includes/javascript/jquery.js"></script>
@@ -20,10 +20,11 @@
 	$(document).ready(function(){
 	    
 		$(".tablesorter").tablesorter({
-			theme: 'blue',
+			theme: 'bootstrap',
+			headerTemplate : '{content} {icon}',
 		    sortInitialOrder: 'desc',
             sortList: [[0]],
-            widgets: [ "resizable", "filter" ],
+            widgets: [ "uitheme", "resizable", "filter" ],
             headers: { 1: { sorter: false, filter: false} }, 
             widgetOptions: {
             	resizable: true,
@@ -37,6 +38,11 @@
 		$(".tablesorter").each(function() {
 			$(this).tablesorterPager({
 				savePages: false,
+                container: $(this).find(".ts-pager"),
+                output: '{startRow} to {endRow} ({totalRows})',
+                cssPageDisplay: '.pagedisplay',
+                cssPageSize: '.pagesize',
+                cssDisabled: 'disabled',
 				ajaxUrl : "<c:url value='/monitoring/getReflectionsJSON.do'/>?page={page}&size={size}&{sortList:column}&{filterList:fcol}&toolSessionID=" + $(this).attr('data-session-id'),
 				ajaxProcessing: function (data, table) {
 					if (data && data.hasOwnProperty('rows')) {
@@ -67,59 +73,25 @@
 						return json;
 			            
 			    	}
-				},					
-			    container: $(this).next(".pager"),
-			    output: '{startRow} to {endRow} ({totalRows})',
-			    // css class names of pager arrows
-			    cssNext: '.tablesorter-next', // next page arrow
-				cssPrev: '.tablesorter-prev', // previous page arrow
-				cssFirst: '.tablesorter-first', // go to first page arrow
-				cssLast: '.tablesorter-last', // go to last page arrow
-				cssGoto: '.gotoPage', // select dropdown to allow choosing a page
-				cssPageDisplay: '.pagedisplay', // location of where the "output" is displayed
-				cssPageSize: '.pagesize', // page size selector - select dropdown that sets the "size" option
-				// class added to arrows when at the extremes (i.e. prev/first arrows are "disabled" when on the first page)
-				cssDisabled: 'disabled' // Note there is no period "." in front of this class name
+				}
 			})
 		});
   	})
 </script>
 <body class="stripes">
-	<div id="content">
-		<h1><fmt:message key="title.reflection"/></h1>
 
-		<div class="tablesorter-holder">
-		<table class="tablesorter" data-session-id="${param.toolSessionID}">
-			<thead>
-				<tr>
-					<th><fmt:message key="monitoring.user.fullname"/></th>
-					<th><fmt:message key="monitoring.user.reflection"/></th>
-				</tr>
-			</thead>
-			<tbody>
-			</tbody>
-		</table>
-		
-		<!-- pager -->
-		<div class="pager">
-			<form>
-				<img class="tablesorter-first"/>
-				<img class="tablesorter-prev"/>
-				<span class="pagedisplay"></span> <!-- this can be any element, including an input -->
-				<img class="tablesorter-next"/>
-				<img class="tablesorter-last"/>
-				<select class="pagesize">
-					<option selected="selected" value="10">10</option>
-					<option value="20">20</option>
-					<option value="30">30</option>
-					<option value="40">40</option>
-					<option value="50">50</option>
-					<option value="100">100</option>
-				</select>
-			</form>
-		</div>
-		</div>
+	<c:set var="title"><fmt:message key="title.reflection"/></c:set>
+	<lams:Page type="learner" title="${title}">
+
+		<lams:TSTable numColumns="2" dataId='data-session-id="${param.toolSessionID}"'> 
+			<th><fmt:message key="monitoring.user.fullname"/></th>
+			<th><fmt:message key="monitoring.user.reflection"/></th>
+		</lams:TSTable>
 				
-	</div>
+		<a href="javascript:window.close();" class="btn btn-default btn-sm">
+		<fmt:message key="button.close"/>
+		</a>
+
+	</lams:Page>
 </body>
 </lams:html>

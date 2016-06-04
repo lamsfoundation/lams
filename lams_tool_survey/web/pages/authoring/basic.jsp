@@ -9,32 +9,15 @@
 	 * Launches the popup window for the instruction files
 	 */
 	function showMessage(url) {
-		var area=document.getElementById("questionInputArea");
-		if(area != null){
-			area.style.width="100%";
-			area.src=url;
-			area.style.display="block";
-		}
-		var elem = document.getElementById("saveCancelButtons");
-		if (elem != null) {
-			elem.style.display="none";
-		}
-		
-		location.hash = "questionInputArea";
+		$("#questionInputArea").load(url, function() {
+			$(this).show();
+			$("#saveCancelButtons").hide();
+		});
 	}
 	function hideMessage(){
-		var area=document.getElementById("questionInputArea");
-		if(area != null){
-			area.style.width="0px";
-			area.style.height="0px";
-			area.style.display="none";
-		}
-		var elem = document.getElementById("saveCancelButtons");
-		if (elem != null) {
-			elem.style.display="block";
-		}
+		$("#questionInputArea").hide();
+		$("#saveCancelButtons").show();
 	}
-
 	
 	function editItem(idx,itemType,sessionMapID,contentFolderID){
 		var reqIDVar = new Date();
@@ -49,123 +32,56 @@
 	}
 	
 	//The panel of survey list panel
-	var surveyListTargetDiv = "surveyListArea";
 	function deleteItem(idx,sessionMapID){
-		var url = "<c:url value="/authoring/removeItem.do"/>";
 	    var reqIDVar = new Date();
 		var param = "itemIndex=" + idx +"&reqID="+reqIDVar.getTime()+"&sessionMapID="+sessionMapID;;
+		var url = "<c:url value="/authoring/removeItem.do"/>?"+param;
 		deleteItemLoading();
-	    var myAjax = new Ajax.Updater(
-		    	surveyListTargetDiv,
-		    	url,
-		    	{
-		    		method:'get',
-		    		parameters:param,
-		    		onComplete:deleteItemComplete,
-		    		evalScripts:true
-		    	}
-	    );
+		$("#surveyListArea").load(url,deleteItemComplete);
 	}
+	
 	function upQuestion(idx,sessionMapID){
-		var url = "<c:url value="/authoring/upItem.do"/>";
 	    var reqIDVar = new Date();
 		var param = "itemIndex=" + idx +"&reqID="+reqIDVar.getTime()+"&sessionMapID="+sessionMapID;;
+		var url = "<c:url value="/authoring/upItem.do"/>?"+param;
 		deleteItemLoading();
-	    var myAjax = new Ajax.Updater(
-		    	surveyListTargetDiv,
-		    	url,
-		    	{
-		    		method:'get',
-		    		parameters:param,
-		    		onComplete:deleteItemComplete,
-		    		evalScripts:true
-		    	}
-	    );
+		$("#surveyListArea").load(url, deleteItemComplete);
 	}
 	function downQuestion(idx,sessionMapID){
-		var url = "<c:url value="/authoring/downItem.do"/>";
 	    var reqIDVar = new Date();
 		var param = "itemIndex=" + idx +"&reqID="+reqIDVar.getTime()+"&sessionMapID="+sessionMapID;;
+		var url = "<c:url value="/authoring/downItem.do"/>?"+param;
 		deleteItemLoading();
-	    var myAjax = new Ajax.Updater(
-		    	surveyListTargetDiv,
-		    	url,
-		    	{
-		    		method:'get',
-		    		parameters:param,
-		    		onComplete:deleteItemComplete,
-		    		evalScripts:true
-		    	}
-	    );
+		$("#surveyListArea").load(url,deleteItemComplete);
 	}
 	function deleteItemLoading(){
-		showBusy(surveyListTargetDiv);
+		$("#resourceListArea_Busy").show();
 	}
 	function deleteItemComplete(){
-		hideBusy(surveyListTargetDiv);
+		$("#resourceListArea_Busy").hide();
 	}
-
-	function showBusy(targetDiv){
-		if($(targetDiv+"_Busy") != null){
-			Element.show(targetDiv+"_Busy");
-		}
-	}
-	function hideBusy(targetDiv){
-		if($(targetDiv+"_Busy") != null){
-			Element.hide(targetDiv+"_Busy");
-		}				
-	}
-
-	function resizeOnMessageFrameLoad(){
-		var messageAreaFrame = document.getElementById("questionInputArea");
-		messageAreaFrame.style.height=messageAreaFrame.contentWindow.document.body.scrollHeight+'px';
-	}
-
 </script>
-<!-- Basic Tab Content -->
-<table>
-	<tr>
-		<td colspan="2">
-			<div class="field-name">
-				<fmt:message key="label.authoring.basic.title"></fmt:message>
-			</div>
-			<html:text property="survey.title" style="width: 99%;"></html:text>
-		</td>
-	</tr>
-	<tr>
-		<td colspan="2">
-			<div class="field-name">
-				<fmt:message key="label.authoring.basic.instruction"></fmt:message>
-			</div>
-			<lams:CKEditor id="survey.instructions"
-				value="${formBean.survey.instructions}"
-				contentFolderID="${formBean.contentFolderID}"></lams:CKEditor>
-		</td>
-	</tr>
 
-</table>
+<!-- Basic Tab Content -->
+<div class="form-group">
+    <label for="survey.title"><fmt:message key="label.authoring.basic.title"/></label>
+    <html:text property="survey.title" styleClass="form-control"></html:text>
+</div>
+<div class="form-group">
+    <label for="survey.instructions"><fmt:message key="label.authoring.basic.instruction" /></label>
+    <lams:CKEditor id="survey.instructions" value="${formBean.survey.instructions}" contentFolderID="${formBean.contentFolderID}"></lams:CKEditor>
+</div>
+
 <div id="surveyListArea">
 	<c:set var="sessionMapID" value="${formBean.sessionMapID}" />
 	<%@ include file="/pages/authoring/parts/itemlist.jsp"%>
 </div>
 
-<p align="center">
-	<a
-		href="javascript:showMessage('<html:rewrite page="/authoring/newItemInit.do?itemType=1&contentFolderID=${formBean.contentFolderID}&sessionMapID=${formBean.sessionMapID}"/>');">
-		<fmt:message key="label.authoring.basic.add.survey.question" /> </a>
+<a href="javascript:showMessage('<html:rewrite page="/authoring/newItemInit.do?itemType=1&contentFolderID=${formBean.contentFolderID}&sessionMapID=${formBean.sessionMapID}"/>');"
+	class="btn btn-default">
+	<i class="fa fa-plus"></i>&nbsp; <fmt:message key="label.authoring.basic.add.survey.question"/> </a>
 
-	<a
-		href="javascript:showMessage('<html:rewrite page="/authoring/newItemInit.do?itemType=3&contentFolderID=${formBean.contentFolderID}&sessionMapID=${formBean.sessionMapID}"/>');"
-		class="space-left"> <fmt:message
-			key="label.authoring.basic.add.survey.open.question" /> </a>
-</p>
+<a href="javascript:showMessage('<html:rewrite page="/authoring/newItemInit.do?itemType=3&contentFolderID=${formBean.contentFolderID}&sessionMapID=${formBean.sessionMapID}"/>');"
+	class="btn btn-default"> <i class="fa fa-plus"></i>&nbsp; <fmt:message key="label.authoring.basic.add.survey.open.question" /> </a>
 
-<p>
-	<iframe
-		onload="javascript:resizeOnMessageFrameLoad();"
-		id="questionInputArea" name="questionInputArea"
-		style="width:0px;height:0px;border:0px;display:none" frameborder="no"
-		scrolling="no">
-	</iframe>
-</p>
-
+<div id="questionInputArea" name="questionInputArea" class="voffset10"></div>

@@ -8,29 +8,6 @@
  		<lams:LAMSURL />
 </c:set>
 
-<link type="text/css" href="${lams}/css/jquery-ui-smoothness-theme.css" rel="stylesheet">
-<link type="text/css" href="${lams}/css/jquery-ui.timepicker.css" rel="stylesheet"> 
-<link type="text/css" href="${lams}/css/chart.css" rel="stylesheet" />
-
-<script type="text/javascript">
-	//pass settings to monitorToolSummaryAdvanced.js
-	var submissionDeadlineSettings = {
-		lams: '${lams}',
-		submissionDeadline: '${sessionMap.submissionDeadline}',
-		setSubmissionDeadlineUrl: '<c:url value="/monitoring/setSubmissionDeadline.do"/>',
-		toolContentID: '${param.toolContentID}',
-		messageNotification: '<fmt:message key="monitor.summary.notification" />',
-		messageRestrictionSet: '<fmt:message key="monitor.summary.date.restriction.set" />',
-		messageRestrictionRemoved: '<fmt:message key="monitor.summary.date.restriction.removed" />'
-	};	
-</script>
-<script type="text/javascript" src="${lams}includes/javascript/jquery.js"></script>
-<script type="text/javascript" src="${lams}includes/javascript/jquery-ui.js"></script>
-<script type="text/javascript" src="${lams}includes/javascript/jquery-ui.timepicker.js"></script>
-<script type="text/javascript" src="${lams}includes/javascript/jquery.blockUI.js"></script>
-<script type="text/javascript" src="${lams}includes/javascript/d3.js"></script>
-<script type="text/javascript" src="${lams}includes/javascript/chart.js"></script>
-<script type="text/javascript" src="${lams}/includes/javascript/monitorToolSummaryAdvanced.js" ></script>
 <script type="text/javascript">
 	function exportSurvey(sessionId){
 		var url = "<c:url value="/monitoring/exportSurvey.do"/>";
@@ -41,48 +18,70 @@
 	}
 </script>
 
-<h1>
-	<c:out value="${survey.title}" escapeXml="true" />
-</h1>
-<div class="instructions small-space-top">
-	<c:out value="${survey.instructions}" escapeXml="false"/>
-</div>
-<br/>
-
-<c:if test="${empty summaryList}">
-	<div align="center">
-		<b> <fmt:message key="message.monitoring.summary.no.session" /> </b>
+<div class="panel">
+	<h4>
+	    <c:out value="${survey.title}" escapeXml="true"/>
+	</h4>
+	<div class="instructions voffset5">
+	    <c:out value="${survey.instructions}" escapeXml="false"/>
 	</div>
+	
+	<c:if test="${empty summaryList}">
+		<lams:Alert type="info" id="no-session-summary" close="false">
+			<fmt:message key="message.monitoring.summary.no.session" />
+		</lams:Alert>
+	</c:if>
+	
+
+</div>
+
+<c:set var="sessionButtonSize">btn-sm</c:set>
+<c:if test="${sessionMap.isGroupedActivity}">
+<div class="panel-group" id="accordionSessions" role="tablist" aria-multiselectable="true"> 
+<c:set var="sessionButtonSize">btn-xs</c:set>
 </c:if>
 
-	<c:forEach var="group" items="${summaryList}" varStatus="firstGroup">
+	<c:forEach var="group" items="${summaryList}" varStatus="status">
 		<c:set var="surveySession"  value="${group.key}"/>
 		<c:set var="questions"  value="${group.value}"/>
+
+		<c:set var="sessionButtons">
+			<c:if test="${sessionMap.survey.reflectOnActivity}">
+				<c:set var="listReflections"><c:url value="/pages/monitoring/listreflections.jsp?toolSessionID=${surveySession.sessionId}"/></c:set>
+				<html:link href="javascript:launchPopup('${listReflections}')" styleClass="btn btn-default ${sessionButtonSize}">
+					<fmt:message key="page.title.monitoring.view.reflection" />
+				</html:link>
+			</c:if>	
+			<html:link href="javascript:exportSurvey(${surveySession.sessionId});" property="exportExcel" styleClass="btn btn-default ${sessionButtonSize} loffset5">
+				<fmt:message key="label.monitoring.button.export.excel" />
+			</html:link>
+		</c:set>
+
+		<c:choose>
+		<c:when test="${sessionMap.isGroupedActivity}">	
+		    <div class="panel panel-default" >
+	        <div class="panel-heading" id="heading${surveySession.sessionId}">
+	        	<span class="panel-title collapsable-icon-left">
+	        	<a class="${status.first ? '' : 'collapsed'}" role="button" data-toggle="collapse" href="#collapse${surveySession.sessionId}" 
+						aria-expanded="${status.first ? 'false' : 'true'}" aria-controls="collapse${surveySession.sessionId}" >
+				<fmt:message key="monitoring.label.group" />&nbsp;${surveySession.sessionName}</a>
+				</span>
+				<span class="pull-right btn-group">${sessionButtons}</span>
+	        </div>
+	        
+	        <div id="collapse${surveySession.sessionId}" class="panel-collapse collapse ${status.first ? 'in' : ''}" role="tabpanel" aria-labelledby="heading${surveySession.sessionId}">
+		</c:when>
+		<c:otherwise>
+			<div>${sessionButtons}</div>
+		</c:otherwise>
+		</c:choose>
 		
 		<c:if test="${empty questions}">
-			<table cellpadding="0"  class="alternative-color">
-				<tr>
-					<td colspan="2">
-						<div align="left">
-							<b> <fmt:message key="message.monitoring.summary.no.survey.for.group" /> </b>
-						</div>
-					</td>
-				</tr>
-			</table>
+			<b> <fmt:message key="message.monitoring.summary.no.survey.for.group" /> </b>
 		</c:if>
+		
 		<c:forEach var="question" items="${questions}" varStatus="queStatus">
-			<%-- display group name on first row--%>
-			<c:if test="${queStatus.first}">
-				<table cellpadding="0"  class="alternative-color">
-					<c:if test="${sessionMap.isGroupedActivity}">
-						<tr>
-							<td colspan="2">
-								<B><fmt:message key="monitoring.label.group" /> ${surveySession.sessionName}</B> 
-							</td>
-						</tr>
-					</c:if>
-					<%-- End group title display --%>
-			</c:if>
+			<table class="table table-condensed table-no-border">
 			<tr>
 				<th class="first" colspan="2">
 					<a href="javascript:;" onclick="launchPopup('<c:url value="/monitoring/listAnswers.do?"/>toolSessionID=${surveySession.sessionId}&questionUid=${question.uid}')">
@@ -143,7 +142,7 @@
 			</c:if>
 			<c:if test="${question.type == 3}">
 				<tr>
-					<td><fmt:message key="label.open.response"/></td>
+					<td width="30%"><fmt:message key="label.open.response"/></td>
 					<td>
 						${question.openResponseCount} 
 					</td>
@@ -153,24 +152,18 @@
 				</table>
 			</c:if>
 		</c:forEach>
-			<table>		
-					<tr>
-						<td >
-							<c:if test="${sessionMap.survey.reflectOnActivity}">
-								<c:set var="listReflections"><c:url value="/pages/monitoring/listreflections.jsp?toolSessionID=${surveySession.sessionId}"/></c:set>
-								<html:link href="javascript:launchPopup('${listReflections}')" styleClass="button">
-									<fmt:message key="page.title.monitoring.view.reflection" />
-								</html:link>
-							</c:if>	
-							<html:link href="javascript:exportSurvey(${surveySession.sessionId});" property="exportExcel" styleClass="button">
-									<fmt:message key="label.monitoring.button.export.excel" />
-							</html:link>
-						</td>
-					</tr>		
-			</table>
+
+	<c:if test="${sessionMap.isGroupedActivity}">
+		</div> <!-- end collapse area  -->
+		</div> <!-- end collapse panel  -->
+	</c:if>
+	${ !sessionMap.isGroupedActivity || ! status.last ? '<div class="voffset5">&nbsp;</div>' :  ''}
+			
 	</c:forEach>
 	
-<br />	
+<c:if test="${sessionMap.isGroupedActivity}">
+</div> 
+</c:if>
 	
 <%@include file="advanceoptions.jsp"%>
 

@@ -7,7 +7,7 @@
 <lams:html>
 <lams:head>
 	    <%@ include file="/common/header.jsp" %>
-	    <link type="text/css" href="${lams}css/jquery.tablesorter.theme-blue.css" rel="stylesheet">
+	    <link type="text/css" href="${lams}css/jquery.tablesorter.theme.bootstrap.css" rel="stylesheet">
 		<link type="text/css" href="${lams}css/jquery.tablesorter.pager.css" rel="stylesheet">
 
 		<script type="text/javascript" src="${lams}includes/javascript/jquery.js"></script>
@@ -43,10 +43,11 @@
 	$(document).ready(function(){
 	    
 		$(".tablesorter").tablesorter({
-			theme: 'blue',
+			theme: 'bootstrap',
+			headerTemplate : '{content} {icon}',
 		    sortInitialOrder: 'desc',
             sortList: [[0]],
-            widgets: [ "resizable", "filter" ],
+            widgets: [ "uitheme", "resizable", "filter" ],
             headers: { ${filterString} }, 
             widgetOptions: {
             	resizable: true,
@@ -60,7 +61,11 @@
 		$(".tablesorter").each(function() {
 			$(this).tablesorterPager({
 				savePages: false,
-				ajaxUrl : "<c:url value='/monitoring/getAnswersJSON.do'/>?page={page}&size={size}&{sortList:column}&{filterList:fcol}&questionUid=${question.uid}&toolSessionID=" + $(this).attr('data-session-id'),
+                container: $(this).find(".ts-pager"),
+                output: '{startRow} to {endRow} ({totalRows})',
+                cssPageDisplay: '.pagedisplay',
+                cssPageSize: '.pagesize',
+                cssDisabled: 'disabled',				ajaxUrl : "<c:url value='/monitoring/getAnswersJSON.do'/>?page={page}&size={size}&{sortList:column}&{filterList:fcol}&questionUid=${question.uid}&toolSessionID=" + $(this).attr('data-session-id'),
 				ajaxProcessing: function (data, table) {
 					if (data && data.hasOwnProperty('rows')) {
 			    		var rows = [],
@@ -101,40 +106,28 @@
 						return json;
 			            
 			    	}
-				},					
-			    container: $(this).next(".pager"),
-			    output: '{startRow} to {endRow} ({totalRows})',
-			    // css class names of pager arrows
-			    cssNext: '.tablesorter-next', // next page arrow
-				cssPrev: '.tablesorter-prev', // previous page arrow
-				cssFirst: '.tablesorter-first', // go to first page arrow
-				cssLast: '.tablesorter-last', // go to last page arrow
-				cssGoto: '.gotoPage', // select dropdown to allow choosing a page
-				cssPageDisplay: '.pagedisplay', // location of where the "output" is displayed
-				cssPageSize: '.pagesize', // page size selector - select dropdown that sets the "size" option
-				// class added to arrows when at the extremes (i.e. prev/first arrows are "disabled" when on the first page)
-				cssDisabled: 'disabled' // Note there is no period "." in front of this class name
+				}
 			})
 		});
   	})
 </script>
 </lams:head>
 <body class="stripes">
-		<div id="content">
-		<h1>
-			<fmt:message key="title.chart.report"/>
-		</h1>
 
-		<h2><fmt:message key="label.question"/></h2>
+	<c:set var="title"><fmt:message key="title.chart.report"/></c:set>
+	<c:set var="optionShortHeader"><%= SurveyConstants.OPTION_SHORT_HEADER %></c:set>
+	<lams:Page type="learner" title="${title}">
 
-		<table  class="tablesorter-blue" cellspacing="0">
+		<h4><fmt:message key="label.question"/></h4>
+
+		<table  class="table table-condensed table-striped table-bordered">
 		<tr>
 			<th colspan="2" class="first"><c:out value="${question.description}" escapeXml="false"/></th>
 		</tr>
 		<c:forEach var="option" items="${question.options}" varStatus="optStatus">
 			<tr>
-				<td  width="100px">
-					<%= SurveyConstants.OPTION_SHORT_HEADER %>${optStatus.count}
+				<td width="30%">
+					${optionShortHeader}${optStatus.count}
 				</td>
 				<td>
 					<c:out value="${option.description}" escapeXml="true"/>
@@ -143,15 +136,14 @@
 		</c:forEach>
 		<c:if test="${question.appendText ||question.type == 3}">
 			<tr>
-				<td  width="100px">
+				<td colspan="2">
 					<fmt:message key="label.open.response"/>
 				</td>
-				<td>&nbsp;</td>
 			</tr>
 		</c:if>
 		</table>
 
-		<h2><fmt:message key="label.answer"/></h2>
+		<h4><fmt:message key="label.answer"/></h4>
 
 		<c:choose>
 			<c:when test="${!(question.appendText || question.type==3)}">
@@ -161,50 +153,32 @@
 				<c:set var="nameWidth"></c:set>
 			</c:otherwise>
 		</c:choose>
+	
+		<c:set var="numColumns" value="${fn:length(question.options)+1}"/>
+		<c:if test="${question.appendText || question.type == 3}">
+			<c:set var="numColumns" value="${numColumns+1}"/>
+		</c:if>
 
-		<div class="tablesorter-holder">
-		<table class="tablesorter" data-session-id="${toolSessionID}">
-			<thead>
-				<tr>
- 					<th align="left" ${nameWidth}>
-						<fmt:message key="label.learner"/>
-					</th>
-					<c:forEach var="option" items="${question.options}" varStatus="optStatus">
-					<th>
-						<%= SurveyConstants.OPTION_SHORT_HEADER %>${optStatus.count}
-					</th>
-					</c:forEach>
-					<c:if test="${question.appendText || question.type == 3}">
-					<th>
-						<fmt:message key="label.open.response"/>
-					</th>
-					</c:if>
-				</tr>
-			</thead>
-			<tbody>
-			</tbody>
-		</table>
-		
-		<!-- pager -->
-		<div class="pager">
-			<form>
-				<img class="tablesorter-first"/>
-				<img class="tablesorter-prev"/>
-				<span class="pagedisplay"></span> <!-- this can be any element, including an input -->
-				<img class="tablesorter-next"/>
-				<img class="tablesorter-last"/>
-				<select class="pagesize">
-					<option selected="selected" value="10">10</option>
-					<option value="20">20</option>
-					<option value="30">30</option>
-					<option value="40">40</option>
-					<option value="50">50</option>
-					<option value="100">100</option>
-				</select>
-			</form>
-		</div>
-		</div>
-		
-	</div>
+		<lams:TSTable numColumns="${numColumns}" dataId='data-session-id="${toolSessionID}"'> 
+			<th align="left" ${nameWidth}>
+				<fmt:message key="label.learner"/>
+			</th>
+			<c:forEach var="option" items="${question.options}" varStatus="optStatus">
+			<th>
+				${optionShortHeader}${optStatus.count}
+			</th>
+			</c:forEach>
+			<c:if test="${question.appendText || question.type == 3}">
+			<th>
+				<fmt:message key="label.open.response"/>
+			</th>
+			</c:if>
+		</lams:TSTable>
+
+		<a href="javascript:window.close();" class="btn btn-default btn-sm">
+		<fmt:message key="button.close"/>
+		</a>
+
+	</lams:Page>
 </body>
 </lams:html>

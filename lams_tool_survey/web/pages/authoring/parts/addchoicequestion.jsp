@@ -1,91 +1,80 @@
-<!DOCTYPE html>
-		
-
 <%@ include file="/common/taglibs.jsp"%>
 
-<lams:html>
-	<lams:head>
-		<%@ include file="/common/header.jsp"%>
-		<lams:css style="main" />
-		
-		<script type="text/javascript" src="${lams}includes/javascript/prototype.js"></script>
-		<%-- used for  surveyitem.js --%>
-		<script type="text/javascript">
-		   var removeInstructionUrl = "<c:url value='/authoring/removeInstruction.do'/>";
-	       var addInstructionUrl = "<c:url value='/authoring/newInstruction.do'/>";
-		</script>
-		<script type="text/javascript"
-			src="<html:rewrite page='/includes/javascript/surveyitem.js'/>"></script>
-	</lams:head>
-	<body>
+	<%-- used for  surveyitem.js --%>
+	<script type="text/javascript">
+	   var removeInstructionUrl = "<c:url value='/authoring/removeInstruction.do'/>";
+       var addInstructionUrl = "<c:url value='/authoring/newInstruction.do'/>";
+	</script>
+	<script type="text/javascript"
+		src="<html:rewrite page='/includes/javascript/surveyitem.js'/>"></script>
+
 		<!-- Basic Info Form-->
-
-		<%@ include file="/common/messages.jsp"%>
-		<html:form action="/authoring/saveOrUpdateItem" method="post"
-			styleId="surveyItemForm">
-			<c:set var="formBean" value="<%=request.getAttribute(org.apache.struts.taglib.html.Constants.BEAN_KEY)%>" />
-			<%-- This field is not belong STRUTS form --%>
-			<input type="hidden" name="instructionList" id="instructionList" />
-			<html:hidden property="sessionMapID" />
-			<html:hidden property="itemIndex" />
-			<html:hidden property="contentFolderID" />
-			<%-- This value should be 1 or 2 --%>
-			<html:hidden property="itemType" value="1" />
-
-			<h2 class="no-space-left">
+		<div class="panel panel-default add-file">
+			<div class="panel-heading panel-title">
 				<fmt:message key="label.authoring.basic.add.survey.question" />
-			</h2>
-
-			<div class="field-name">
-				<fmt:message key="label.question" />
 			</div>
+			<div class="panel-body">
 
-			<lams:CKEditor id="question.description" value="${formBean.question.description}"
-				contentFolderID="${formBean.contentFolderID}" width="99%"
-				resizeParentFrameName="questionInputArea">	
-			</lams:CKEditor>
+			<%@ include file="/common/messages.jsp"%>
+	
+			<html:form action="/authoring/saveOrUpdateItem" method="post"
+				styleId="surveyItemForm">
+				<c:set var="formBean" value="<%=request.getAttribute(org.apache.struts.taglib.html.Constants.BEAN_KEY)%>" />
+				<%-- This field is not belong STRUTS form --%>
+				<input type="hidden" name="instructionList" id="instructionList" />
+				<html:hidden property="sessionMapID" />
+				<html:hidden property="itemIndex" />
+				<html:hidden property="contentFolderID" />
+				<%-- This value should be 1 or 2 --%>
+				<html:hidden property="itemType" value="1" />
 
-			<div class="space-top">
-				<html:checkbox property="question.optional" styleClass="noBorder"
-					styleId="questionOptional">
-				</html:checkbox>
+				<div class="form-group">
+					<label for="question.description"><fmt:message key="label.question" /></label>
+					<lams:CKEditor id="question.description" value="${formBean.question.description}"
+						contentFolderID="${formBean.contentFolderID}">	
+					</lams:CKEditor>
+				</div>
 
-				<label for="questionOptional">
+				<div class="checkbox">
+					<label for="questionOptional">
+					<html:checkbox property="question.optional" styleId="questionOptional">
+					</html:checkbox>
 					<fmt:message key="label.authoring.basic.question.optional" />
-				</label>
-			</div>
+					</label>
+				</div>
 
-			<div class="space-top">
-				<a href="javascript:;" onclick="addInstruction()" class="button"><fmt:message
-						key="label.authoring.basic.add.option" /> </a>
-				<img src="${ctxPath}/includes/images/indicator.gif"
-					style="display:none" id="instructionArea_Busy" />
+				<div class="voffset5 form-inline">
+					<a href="javascript:;" onclick="addInstruction()" class="btn btn-default btn-sm">
+						<fmt:message key="label.authoring.basic.add.option" /> </a>
+					<i class="fa fa-spinner" style="display: none" id="instructionArea_Busy" />
 
-				<span class="space-left"> <html:checkbox
-						property="question.allowMultipleAnswer"
-						styleId="questionAllowMultipleAnswer" styleClass="noBorder">
-					</html:checkbox> <label for="questionAllowMultipleAnswer">
-						<fmt:message
-							key="label.authoring.basic.question.allow.muli.answer" />
-					</label> <html:checkbox property="question.appendText"
-						styleClass="noBorder" styleId="questionAppendText">
-					</html:checkbox> <label for="questionAppendText">
+					<div class="checkbox loffset5"> 
+						<label for="question.allowMultipleAnswer">
+						<html:checkbox	property="question.allowMultipleAnswer" styleId="questionAllowMultipleAnswer">
+						</html:checkbox> 
+						<fmt:message key="label.authoring.basic.question.allow.muli.answer" />
+						</label> 
+					</div>
+					
+					<div class="checkbox loffset5"> 
+						<label for="question.appendText">
+						<html:checkbox property="question.appendText" styleId="questionAppendText">
+						</html:checkbox> 
 						<fmt:message key="label.authoring.basic.question.append.text" />
-					</label> </span>
-			</div>
+						</label>
+					</div>
+				</div>
 
-		</html:form>
+			</html:form>
 		<!-- Instructions -->
 
 		<%@ include file="instructions.jsp"%>
 
-		<lams:ImgButtonWrapper>
-			<a href="#" onclick="submitSurveyItem()" class="button-add-item">
-				<fmt:message key="label.authoring.basic.add.question" /> </a>
+		<a href="#" onclick="submitSurveyItem()" class="btn btn-default btn-sm">
+			<i class="fa fa-plus"></i>&nbsp; <fmt:message key="label.authoring.basic.add.question" /> </a>
 
-			<a href="javascript:;" onclick="cancelSurveyItem()"
-				class="button space-left"> <fmt:message key="label.cancel" /> </a>
-		</lams:ImgButtonWrapper>
+		<a href="javascript:;" onclick="cancelSurveyItem()"
+			class="btn btn-default btn-sm"> <fmt:message key="label.cancel" /> </a>
 
-	</body>
-</lams:html>
+		</div>
+	</div>
