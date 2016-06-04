@@ -1,5 +1,3 @@
--- CVS ID: $Id$
- 
 INSERT INTO lams_tool
 (
 tool_signature,

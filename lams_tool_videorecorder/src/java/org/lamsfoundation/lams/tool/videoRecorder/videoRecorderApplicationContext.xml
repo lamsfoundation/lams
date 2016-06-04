@@ -1,97 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <beans xmlns="http://www.springframework.org/schema/beans"
-       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-       xsi:schemaLocation="http://www.springframework.org/schema/beans
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
            				   http://www.springframework.org/schema/beans/spring-beans-4.0.xsd">
 
-	<!-- ========================= GENERAL DEFINITIONS ========================= -->
-
-	<!-- ========================= RESOURCE DEFINITIONS ========================= -->
-	<bean id="videoRecorderMessageService" class="org.lamsfoundation.lams.util.MessageService">
-		<property name="messageSource">
-			<bean id="messageSource" class="org.springframework.context.support.ResourceBundleMessageSource">
-				<property name="basename"><value>org.lamsfoundation.lams.tool.videoRecorder.ApplicationResources</value></property>
-			</bean>
-		</property>										
-	</bean>
-
-	<!-- ========================= BUSINESS OBJECT DEFINITIONS ======================== -->
-	<bean id="videoRecorderOutputFactory" class="org.lamsfoundation.lams.tool.videoRecorder.service.VideoRecorderOutputFactory">  
-    	<property name="toolMessageService"><ref bean="videoRecorderMessageService"/></property>  
-	</bean> 
-	<bean id="videoRecorderService" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
-		<property name="transactionManager"><ref bean="transactionManager"/></property>
-		<property name="preInterceptors">
-			<list>
-				<ref bean="transactionRetryInterceptor" />			
-			</list>
-		</property>
-		<property name ="target">
-			<bean class="org.lamsfoundation.lams.tool.videoRecorder.service.VideoRecorderService">
-				<property name="videoRecorderSessionDAO"><ref bean="videoRecorderSessionDAO"/></property>
-				<property name="videoRecorderUserDAO"><ref bean="videoRecorderUserDAO"/></property>
-				<property name="videoRecorderDAO"><ref bean="videoRecorderDAO"/></property>
-				<property name="videoRecorderRecordingDAO"><ref bean="videoRecorderRecordingDAO"/></property>
-				<property name="videoRecorderRatingDAO"><ref bean="videoRecorderRatingDAO"/></property>
-				<property name="videoRecorderCommentDAO"><ref bean="videoRecorderCommentDAO"/></property>
-				<property name="toolService"><ref bean="lamsToolService"/></property>
-				<property name="learnerService"><ref bean="learnerService"/></property>	
- 				<property name="videoRecorderToolContentHandler"><ref bean="videoRecorderToolContentHandler"/></property>
-		   		<property name="exportContentService"><ref bean="exportToolContentService"/></property> 				
-		   		<property name="coreNotebookService"><ref bean="coreNotebookService"/></property>
-		   		<property name="videoRecorderOutputFactory"><ref bean="videoRecorderOutputFactory"/></property>
-		   		<property name="messageService"><ref bean="videoRecorderMessageService"/></property> 
-			</bean>
-		</property>
-		<property name="transactionAttributes">
-			<props>
-				<prop key="create*">PROPAGATION_REQUIRED</prop>
-				<prop key="copy*">PROPAGATION_REQUIRED</prop>
-				<prop key="update*">PROPAGATION_REQUIRED</prop>
-				<prop key="get*">PROPAGATION_REQUIRED</prop>
-				<prop key="save*">PROPAGATION_REQUIRED</prop>
-				<prop key="retrieve*">PROPAGATION_REQUIRED</prop>
-				<prop key="remove*">PROPAGATION_REQUIRED</prop>
-				<prop key="add*">PROPAGATION_REQUIRED</prop>
-                <prop key="resetDefineLater">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
-				<prop key="leaveToolSession">PROPAGATION_REQUIRED</prop>
-                <prop key="exportToolSession">PROPAGATION_REQUIRED</prop>
-				<prop key="importToolContent">PROPAGATION_REQUIRED</prop>
-				<prop key="exportToolContent">PROPAGATION_REQUIRED</prop>
-				<prop key="import102ToolContent">PROPAGATION_REQUIRED</prop>
-				<prop key="setReflectiveData">PROPAGATION_REQUIRED</prop>				
-			</props>
-		</property>
-	</bean>
-	
-	<!--  DAO classes -->
-	<bean id="videoRecorderDAO" class="org.lamsfoundation.lams.tool.videoRecorder.dao.hibernate.VideoRecorderDAO">
-		<property name="sessionFactory"><ref bean="coreSessionFactory"/></property>
-	</bean>  
-
-	<bean id="videoRecorderSessionDAO" class="org.lamsfoundation.lams.tool.videoRecorder.dao.hibernate.VideoRecorderSessionDAO">
-		<property name="sessionFactory"><ref bean="coreSessionFactory"/></property>
-	</bean>
-	
-	<bean id="videoRecorderUserDAO" class="org.lamsfoundation.lams.tool.videoRecorder.dao.hibernate.VideoRecorderUserDAO">
-		<property name="sessionFactory"><ref bean="coreSessionFactory"/></property>
-	</bean>
-
-	<bean id="videoRecorderRecordingDAO" class="org.lamsfoundation.lams.tool.videoRecorder.dao.hibernate.VideoRecorderRecordingDAO">
-		<property name="sessionFactory"><ref bean="coreSessionFactory"/></property>
-	</bean>
-
-	<bean id="videoRecorderRatingDAO" class="org.lamsfoundation.lams.tool.videoRecorder.dao.hibernate.VideoRecorderRatingDAO">
-		<property name="sessionFactory"><ref bean="coreSessionFactory"/></property>
-	</bean>
-
-	<bean id="videoRecorderCommentDAO" class="org.lamsfoundation.lams.tool.videoRecorder.dao.hibernate.VideoRecorderCommentDAO">
-		<property name="sessionFactory"><ref bean="coreSessionFactory"/></property>
-	</bean>
-	
- 	<bean id="videoRecorderToolContentHandler" class="org.lamsfoundation.lams.tool.videoRecorder.util.VideoRecorderToolContentHandler">
- 		<property name="repositoryService"><ref bean="repositoryService"/></property>
-	</bean>  
-
+	<bean id="videoRecorderService"
+		class="org.lamsfoundation.lams.tool.videoRecorder.service.VideoRecorderService" />
 </beans>
