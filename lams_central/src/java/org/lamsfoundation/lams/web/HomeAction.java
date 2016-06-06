@@ -76,18 +76,8 @@ import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 
 /**
- * this is an action where all lams client environments launch. initial configuration of the individual environment
+ * This is an action where all lams client environments launch. initial configuration of the individual environment
  * setting is done here.
- *
- *
- *
- *
- *
- *
- *
- *
- *
- *
  */
 public class HomeAction extends DispatchAction {
 

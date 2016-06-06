@@ -188,11 +188,6 @@
         redirect="false"
       />
       <forward
-        name="displayProgress"
-        path="/mobile/progress.jsp"
-        redirect="false"
-      />
-      <forward
         name="message"
         path=".message"
         redirect="false"

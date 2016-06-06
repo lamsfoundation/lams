@@ -73,13 +73,6 @@ import org.lamsfoundation.lams.web.util.AttributeNames;
  * @author Jacky Fang
  * @since 3/03/2005
  * @version 1.1
- *
- *
- *
- *
- *
- *
- *
  */
 public class LearnerAction extends LamsDispatchAction {
     // ---------------------------------------------------------------------
@@ -225,37 +218,6 @@ public class LearnerAction extends LamsDispatchAction {
 	response.getWriter().print(responseJSON.toString());
 
 	return null;
-    }
-
-    /**
-     * Gets the same url as getLearnerActivityURL() but forwards directly to the url.
-     *
-     * @param mapping
-     *            An ActionMapping class that will be used by the Action class to tell the ActionServlet where to send
-     *            the end-user.
-     * @param form
-     *            The ActionForm class that will contain any data submitted by the end-user via a form.
-     * @param request
-     *            A standard Servlet HttpServletRequest class.
-     * @param response
-     *            A standard Servlet HttpServletResponse class.
-     * @return An ActionForward class that will be returned to the ActionServlet indicating where the user is to go
-     *         next.
-     * @throws IOException
-     * @throws ServletException
-     */
-    public ActionForward displayProgress(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws IOException, ServletException {
-	Integer learnerId = LearningWebUtil.getUserId();
-	Long lessonId = WebUtil.readLongParam(request, AttributeNames.PARAM_LESSON_ID);
-
-	ICoreLearnerService learnerService = LearnerServiceProxy.getLearnerService(getServlet().getServletContext());
-	Object[] ret = learnerService.getStructuredActivityURLs(learnerId, lessonId);
-	;
-	request.setAttribute("progressList", ret[0]);
-	request.setAttribute("currentActivityID", ret[1]);
-
-	return mapping.findForward("displayProgress");
     }
 
     public ActionForward getPresenceChatActiveUserCount(ActionMapping mapping, ActionForm form,
