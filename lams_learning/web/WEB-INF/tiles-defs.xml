@@ -32,12 +32,6 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 		<put name="body" value=""/>
 		<put name="includeBodyTag" value="true"/>
 	</definition>
-	
-	<definition name=".supportMobileVersionLayout" path="/layout/supportMobileVersionLayout.jsp">
-		<put name="pageTitleKey" value="learner.title"/>
-		<put name="body" value=""/>
-		<put name="includeBodyTag" value="true"/>
-	</definition>
 
 	<!-- Standard layout for a gate page. -->
 	<definition name=".gateLayout" path="/layout/gateLayout.jsp">
@@ -83,9 +77,8 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 	<definition name=".parallelWait" extends=".layout">
 		<put name="body" value="/partialCompleted.jsp"/>
 	</definition>
-	<definition name=".lessonComplete" extends=".supportMobileVersionLayout">
+	<definition name=".lessonComplete" extends=".layout">
 		<put name="body" value="/lessonComplete.jsp"/>
-		<put name="bodyMobile" value="/mobile/lessonComplete.jsp"/>
 	</definition>
 	<definition name=".welcome" extends=".layout">
 		<put name="body" value="/welcome.jsp"/>
