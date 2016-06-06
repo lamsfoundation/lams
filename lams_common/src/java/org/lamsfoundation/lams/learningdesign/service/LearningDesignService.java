@@ -231,7 +231,7 @@ public class LearningDesignService implements ILearningDesignService {
 		    .getActivitiesByLibraryID(learningLibrary.getLearningLibraryId());
 
 	    if ((templateActivities != null) & (templateActivities.size() == 0)) {
-		log.error("Learning Library with ID " + learningLibrary.getLearningLibraryId() + "\""
+		log.error("Learning Library with ID " + learningLibrary.getLearningLibraryId() + " \""
 			+ learningLibrary.getTitle() + "\" does not have a template activity");
 	    }
 	    // convert library to DTO format
@@ -258,7 +258,7 @@ public class LearningDesignService implements ILearningDesignService {
 	    // skip invalid tools
 	    List<LibraryActivityDTO> libraryActivityDTOs = learningLibrary.getTemplateActivities();
 	    if (libraryActivityDTOs.isEmpty()) {
-		log.error("Learning Library with ID " + learningLibrary.getLearningLibraryID() + "\""
+		log.error("Learning Library with ID " + learningLibrary.getLearningLibraryID() + " \""
 			+ learningLibrary.getTitle() + "\" does not have a template activity");
 		continue;
 	    }
