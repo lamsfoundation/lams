@@ -231,8 +231,8 @@ public class LearningDesignService implements ILearningDesignService {
 		    .getActivitiesByLibraryID(learningLibrary.getLearningLibraryId());
 
 	    if ((templateActivities != null) & (templateActivities.size() == 0)) {
-		log.error("Learning Library with ID " + learningLibrary.getLearningLibraryId()
-			+ " does not have a template activity");
+		log.error("Learning Library with ID " + learningLibrary.getLearningLibraryId() + "\""
+			+ learningLibrary.getTitle() + "\" does not have a template activity");
 	    }
 	    // convert library to DTO format
 
@@ -256,9 +256,14 @@ public class LearningDesignService implements ILearningDesignService {
 	List<ToolDTO> tools = new ArrayList<ToolDTO>();
 	for (LearningLibraryDTO learningLibrary : learningLibraries) {
 	    // skip invalid tools
-	    boolean isParallel = learningLibrary.getTemplateActivities().size() > 1;
+	    List<LibraryActivityDTO> libraryActivityDTOs = learningLibrary.getTemplateActivities();
+	    if (libraryActivityDTOs.isEmpty()) {
+		log.error("Learning Library with ID " + learningLibrary.getLearningLibraryID() + "\""
+			+ learningLibrary.getTitle() + "\" does not have a template activity");
+		continue;
+	    }
+	    boolean isParallel = libraryActivityDTOs.size() > 1;
 	    if ((includeInvalid || learningLibrary.getValidFlag()) && (includeParallel || !isParallel)) {
-		List<LibraryActivityDTO> libraryActivityDTOs = learningLibrary.getTemplateActivities();
 		LibraryActivityDTO libraryActivityDTO = libraryActivityDTOs.get(0);
 		ToolDTO toolDTO = new ToolDTO();
 		if (isParallel) {
