@@ -21,7 +21,6 @@
  * ****************************************************************
  */
 
-
 package org.lamsfoundation.lams.learning.web.action;
 
 import java.io.IOException;
@@ -44,6 +43,7 @@ import org.lamsfoundation.lams.learning.service.LearnerServiceProxy;
 import org.lamsfoundation.lams.learning.web.bean.ActivityURL;
 import org.lamsfoundation.lams.learning.web.util.ActivityMapping;
 import org.lamsfoundation.lams.learning.web.util.LearningWebUtil;
+import org.lamsfoundation.lams.learningdesign.Activity;
 import org.lamsfoundation.lams.lesson.LearnerProgress;
 import org.lamsfoundation.lams.lesson.Lesson;
 import org.lamsfoundation.lams.usermanagement.User;
@@ -227,6 +227,46 @@ public class LearnerAction extends LamsDispatchAction {
 	response.setContentType("text/plain;charset=utf-8");
 	response.getWriter().print(count);
 	return null;
+    }
+
+    /**
+     * Forces a move to a destination Activity in the learning sequence, redirecting to the new page rather.
+     */
+    public ActionForward forceMoveRedirect(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+	    HttpServletResponse response) throws IOException, ServletException {
+	ICoreLearnerService learnerService = LearnerServiceProxy.getLearnerService(getServlet().getServletContext());
+
+	Long fromActivityId = WebUtil.readLongParam(request, AttributeNames.PARAM_CURRENT_ACTIVITY_ID, true);
+	Long toActivityId = WebUtil.readLongParam(request, AttributeNames.PARAM_DEST_ACTIVITY_ID, true);
+
+	Activity fromActivity = null;
+	Activity toActivity = null;
+
+	if (fromActivityId != null) {
+	    fromActivity = learnerService.getActivity(fromActivityId);
+	}
+
+	if (toActivityId != null) {
+	    toActivity = learnerService.getActivity(toActivityId);
+	}
+
+	Integer learnerId = LearningWebUtil.getUserId();
+	Long lessonId = WebUtil.readLongParam(request, AttributeNames.PARAM_LESSON_ID);
+	learnerService.moveToActivity(learnerId, lessonId, fromActivity, toActivity);
+
+	if (LearnerAction.log.isDebugEnabled()) {
+	    LearnerAction.log.debug("Force move for learner " + learnerId + " lesson " + lessonId + ". ");
+	}
+
+	String url = null;
+	ActivityMapping activityMapping = LearnerServiceProxy.getActivityMapping(this.getServlet().getServletContext());
+	if (!toActivity.isFloating()) {
+	    url = "/learning" + activityMapping.getDisplayActivityAction(lessonId);
+	} else {
+	    url = activityMapping.getActivityURL(toActivity);
+	}
+
+	return redirectToURL(mapping, response, url);
     }
 
     /**
