@@ -756,7 +756,12 @@ function updateSequenceTab() {
 		sequenceCanvas.html(originalSequenceCanvas);
 	} else {
 		sequenceCanvasFirstFetch = true;
-		loadLearningDesignSVG();
+		var exit = loadLearningDesignSVG();
+		if (exit) {
+			// when SVG gets re-created, this update method will be run again
+			sequenceRefreshInProgress = false;
+			return;
+		}
 	}
 	
 	// clear all completed learner icons except the door
@@ -859,6 +864,7 @@ function updateSequenceTab() {
 }
 
 function loadLearningDesignSVG() {
+	var exit = false;
 	// fetch SVG just once, since it is immutable
 	$.ajax({
 		dataType : 'text',
@@ -882,6 +888,7 @@ function loadLearningDesignSVG() {
 			resizeSequenceCanvas(width, height);
 		},
 		error : function(error) {
+			exit = true;
 			// the LD SVG is missing, try to re-generate it; if it is an another error, fail
 			if (error.status != 404) {
 				return;
@@ -893,12 +900,15 @@ function loadLearningDesignSVG() {
 					win = frame[0].contentWindow || frame[0].contentDocument;
 				win.GeneralLib.saveLearningDesignImage();
 				frame.remove();
-				// load the image again
-				loadLearningDesignSVG();
+				
+				// run the whole fetch again
+				updateSequenceTab();
 			}).attr('src', LAMS_URL 
 						   + 'authoring/author.do?method=generateSVG&selectable=false&learningDesignID=' + ldId);
 		}
 	});
+	
+	return exit;
 }
 
 
@@ -2099,11 +2109,11 @@ function appendXMLElement(tagName, attributesObject, content, target) {
 function dblTap(elem, dblClickFunction) {
  	 // double tap detection on mobile devices; it works also for mouse clicks
  	 elem.tap(function(event){
+ 		 var currentTime = new Date().getTime();
  	 	  // is the second click on the same element as the first one?
  		  if (event.currentTarget == lastTapTarget) {
  		  	  // was the second click quick enough after the first one?
-		  var currentTime = new Date().getTime(),
-			  	  tapLength = currentTime - lastTapTime;
+			  var tapLength = currentTime - lastTapTime;
 		  if (tapLength < tapTimeout && tapLength > 0) {
 			  event.preventDefault();
 			  dblClickFunction(event);
