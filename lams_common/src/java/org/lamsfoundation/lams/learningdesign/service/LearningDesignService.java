@@ -35,6 +35,7 @@ import java.util.Vector;
 
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.learningdesign.Activity;
+import org.lamsfoundation.lams.learningdesign.ComplexActivity;
 import org.lamsfoundation.lams.learningdesign.LearningDesign;
 import org.lamsfoundation.lams.learningdesign.LearningLibrary;
 import org.lamsfoundation.lams.learningdesign.LearningLibraryGroup;
@@ -236,11 +237,37 @@ public class LearningDesignService implements ILearningDesignService {
 	    }
 	    // convert library to DTO format
 
-	    LearningLibraryDTO libraryDTO = learningLibrary.getLearningLibraryDTO(templateActivities, languageCode);
+	    LearningLibraryDTO libraryDTO = new LearningLibraryDTO(learningLibrary);
+	    libraryDTO.setTemplateActivities(populateActivities(templateActivities.iterator(), languageCode));
+
 	    internationaliseActivities(libraryDTO.getTemplateActivities());
 	    libraries.add(libraryDTO);
 	}
 	return libraries;
+    }
+
+    private Vector populateActivities(Iterator iterator, String languageCode) {
+	Vector activities = new Vector();
+	Vector childActivities = null;
+	while (iterator.hasNext()) {
+	    Activity object = (Activity) iterator.next();
+
+	    if (object.isComplexActivity()) { //parallel, sequence or options activity
+		object = activityDAO.getActivityByActivityId(object.getActivityId());
+		ComplexActivity complexActivity = (ComplexActivity) object;
+		Iterator childIterator = complexActivity.getActivities().iterator();
+		childActivities = new Vector();
+		while (childIterator.hasNext()) {
+		    Activity activity = (Activity) childIterator.next();
+		    childActivities.add(activity.getLibraryActivityDTO(languageCode));
+		}
+		activities.add(complexActivity.getLibraryActivityDTO(languageCode));
+		activities.addAll(childActivities);
+	    } else {
+		activities.add(object.getLibraryActivityDTO(languageCode));
+	    }
+	}
+	return activities;
     }
 
     /**

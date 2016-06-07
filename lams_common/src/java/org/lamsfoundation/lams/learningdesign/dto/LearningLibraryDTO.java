@@ -24,12 +24,8 @@
 package org.lamsfoundation.lams.learningdesign.dto;
 
 import java.util.Date;
-import java.util.Iterator;
-import java.util.List;
 import java.util.Vector;
 
-import org.lamsfoundation.lams.learningdesign.Activity;
-import org.lamsfoundation.lams.learningdesign.ComplexActivity;
 import org.lamsfoundation.lams.learningdesign.LearningLibrary;
 
 /**
@@ -53,32 +49,13 @@ public class LearningLibraryDTO extends BaseDTO {
 
     }
 
-    public LearningLibraryDTO(Long learningLibraryID, String description, String title, Boolean validFlag,
-	    Date createDateTime, Vector templateActivities) {
-	this.learningLibraryID = learningLibraryID;
-	this.description = description;
-	this.title = title;
-	this.validFlag = validFlag;
-	this.createDateTime = createDateTime;
-	this.templateActivities = templateActivities;
-    }
-
-    public LearningLibraryDTO(LearningLibrary learningLibrary, String languageCode) {
+    public LearningLibraryDTO(LearningLibrary learningLibrary) {
 	this.learningLibraryID = learningLibrary.getLearningLibraryId();
 	this.description = learningLibrary.getDescription();
 	this.title = learningLibrary.getTitle();
 	this.validFlag = learningLibrary.getValidLibrary();
 	this.createDateTime = learningLibrary.getCreateDateTime();
-	this.templateActivities = populateActivities(learningLibrary.getActivities().iterator(), languageCode);
-    }
-
-    public LearningLibraryDTO(LearningLibrary learningLibrary, List templateActivity, String languageCode) {
-	this.learningLibraryID = learningLibrary.getLearningLibraryId();
-	this.description = learningLibrary.getDescription();
-	this.title = learningLibrary.getTitle();
-	this.validFlag = learningLibrary.getValidLibrary();
-	this.createDateTime = learningLibrary.getCreateDateTime();
-	this.templateActivities = populateActivities(templateActivity.iterator(), languageCode);
+	// this.templateActivities = populateActivities(templateActivity.iterator(), languageCode);
     }
 
     /**
@@ -116,38 +93,8 @@ public class LearningLibraryDTO extends BaseDTO {
 	return templateActivities;
     }
 
-    /*
-     * public Vector populateActivities(Iterator iterator){
-     * Vector activities = new Vector();
-     * while(iterator.hasNext()){
-     * Activity activity = (Activity)iterator.next();
-     * activities.add(activity.getLibraryActivityDTO());
-     * }
-     * return activities;
-     * }
-     */
-
-    public Vector populateActivities(Iterator iterator, String languageCode) {
-	Vector activities = new Vector();
-	Vector childActivities = null;
-	while (iterator.hasNext()) {
-	    Activity object = (Activity) iterator.next();
-
-	    if (object.isComplexActivity()) { //parallel, sequence or options activity
-		ComplexActivity complexActivity = (ComplexActivity) object;
-		Iterator childIterator = complexActivity.getActivities().iterator();
-		childActivities = new Vector();
-		while (childIterator.hasNext()) {
-		    Activity activity = (Activity) childIterator.next();
-		    childActivities.add(activity.getLibraryActivityDTO(languageCode));
-		}
-		activities.add(complexActivity.getLibraryActivityDTO(languageCode));
-		activities.addAll(childActivities);
-	    } else {
-		activities.add(object.getLibraryActivityDTO(languageCode));
-	    }
-	}
-	return activities;
+    public void setTemplateActivities(Vector templateActivities) {
+	this.templateActivities = templateActivities;
     }
 
     public Date getCreateDateTime() {
@@ -157,5 +104,4 @@ public class LearningLibraryDTO extends BaseDTO {
     public void setCreateDateTime(Date createDateTime) {
 	this.createDateTime = createDateTime;
     }
-
 }
