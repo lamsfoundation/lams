@@ -102,6 +102,10 @@
 			<props>
 				<prop key="validateLearningDesign">PROPAGATION_REQUIRED</prop>
 				<prop key="setValid">PROPAGATION_REQUIRED</prop>
+				<prop key="getAllLearningLibraryDetails">PROPAGATION_REQUIRED</prop>
+				<prop key="getToolDTOs">PROPAGATION_REQUIRED</prop>
+				<prop key="getLearning*">PROPAGATION_REQUIRED</prop>
+				<prop key="save*">PROPAGATION_REQUIRED</prop>
 			</props>
 		</property>
 	</bean>

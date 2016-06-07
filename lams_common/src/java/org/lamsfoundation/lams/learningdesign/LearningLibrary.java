@@ -148,9 +148,4 @@ public class LearningLibrary implements Serializable {
     public void setValidLibrary(Boolean validLibrary) {
 	this.validLibrary = validLibrary;
     }
-
-    public LearningLibraryDTO getLearningLibraryDTO(List templateActivities, String languageCode) {
-	return new LearningLibraryDTO(this, templateActivities, languageCode);
-    }
-
 }
