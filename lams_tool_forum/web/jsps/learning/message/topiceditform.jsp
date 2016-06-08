@@ -33,8 +33,9 @@
 		<html:button property="goback" styleId="cancelButton" onclick="javascript:cancelEdit();"	styleClass="button">
 			<fmt:message key="button.cancel" />
 		</html:button>
-		<html:submit styleClass="button" styleId="submitButton">
+		<html:button property="submit" styleClass="button" styleId="submitButton" 
+			onclick="javascript:submitEdit();">
 			<fmt:message key="button.submit" />
-		</html:submit>
+		</html:button>
 	</div>
 </div>

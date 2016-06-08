@@ -19,7 +19,7 @@
 	<div class="field-name title-space-top">
 		<fmt:message key="message.label.attachment" />
 	</div>
-	<html:file tabindex="3" property="attachmentFile" />
+	<html:file tabindex="3" property="attachmentFile" styleId="attachmentFile"/>
 
 	<div style="font-style: italic; margin-top: 10px">
 		<fmt:message key="label.upload.info">
@@ -36,8 +36,9 @@
 			styleClass="button">
 			<fmt:message key="button.cancel" />
 		</html:button>
-		<html:submit styleClass="button" styleId="submitButton" >
+		<html:button property="submit" styleClass="button" styleId="submitButton" 
+			onclick="javascript:submitReply();">
 			<fmt:message key="button.submit" />
-		</html:submit>
+		</html:button>
 	</div>
 </div>
