@@ -1066,8 +1066,10 @@ GeneralLib = {
 		var column = 0,
 			// for special cases when row needs to shifted more
 			forceRowY = null,
+			paperWidth = paper.attr('width'),
 			// check how many columns current paper can hold
-			maxColumns = Math.floor((paper.attr('width') - layout.conf.arrangeHorizontalPadding)
+			maxColumns = Math.floor(((paperWidth < 300 && paperMinWidth ? paperMinWidth : paperWidth) 
+									    - layout.conf.arrangeHorizontalPadding)
 					                 / layout.conf.arrangeHorizontalSpace),
 			// the initial max length of subsequences is limited by paper space
 			subsequenceMaxLength = maxColumns,
