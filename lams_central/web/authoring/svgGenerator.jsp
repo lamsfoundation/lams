@@ -46,6 +46,7 @@
 				DEFAULT_ANNOTATION_LABEL_TITLE : '<c:out value="${DEFAULT_ANNOTATION_LABEL_TITLE_VAR}" />'
 			},
 			
+			paperMinWidth = 1000,
 			isReadOnlyMode = true,
 			activitiesOnlySelectable = ${param.selectable eq 'true'},
 			initLearningDesignID = '${param.learningDesignID}';
