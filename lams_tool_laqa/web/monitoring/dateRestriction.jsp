@@ -39,54 +39,40 @@
 
 </script>
 
-<h1>
-	<img src="<lams:LAMSURL/>/images/tree_closed.gif" id="restrictUsageTreeIcon" onclick="javascript:toggleAdvancedOptionsVisibility(document.getElementById('restrictUsageDiv'), document.getElementById('restrictUsageTreeIcon'), '<lams:LAMSURL/>');" />
+<c:set var="ddTitle"><fmt:message key="monitor.summary.date.restriction" /></c:set>
+<lams:RestrictedUsageAccordian title="${ddTitle}">
 
-	<a href="javascript:toggleAdvancedOptionsVisibility(document.getElementById('restrictUsageDiv'), document.getElementById('restrictUsageTreeIcon'),'<lams:LAMSURL/>');" >
-		<fmt:message key="monitor.summary.date.restriction" />
-	</a>
-</h1>
-<br />
-
-<div class="monitoring-advanced" id="restrictUsageDiv" style="display:none; ">
-
-	<div>
-		<fmt:message key="monitor.summary.when.date.restriction.is.set" />
-	</div>
+	<p><fmt:message key="monitor.summary.when.date.restriction.is.set" /></p>
 		
 	<div id="datetimeDiv" <c:if test='${not empty submissionDeadline}'> style="display: none;" </c:if>>
-		<span>
-			<fmt:message key="monitor.summary.after.date" />
-		</span>
-		
-		<input type="text" name="datetime" id="datetime" value=""/>
-				
-		<html:link	href="javascript:storeShowOtherAnswersAfterDeadline(); setSubmissionDeadline();" styleClass="button">
+		<div class="form-group">
+		<label for="datetime"><fmt:message key="monitor.summary.after.date" />&nbsp;
+		<input type="text" name="datetime" id="datetime" value="" class="form-control form-control-inline"/>
+		</label>							
+		<html:link	href="javascript:storeShowOtherAnswersAfterDeadline(); setSubmissionDeadline();" styleClass="btn btn-default">
 			<fmt:message key="monitor.summary.set.restriction" />
 		</html:link>
+		</div>
 	</div>
 
 	<div id="dateInfoDiv" <c:if test='${empty submissionDeadline}'> style="display: none;" </c:if>>
-		<span>
-			<fmt:message key="monitor.summary.after.date" />
-		</span>
-		
+		<label><fmt:message key="monitor.summary.after.date" /></span>
 		<span id="dateInfo">
 		</span>
-				
-		<html:link	href="javascript:$('#show-other-answers-after-deadline').prop('checked', false); removeSubmissionDeadline();" styleClass="button">
+		</label>
+		<html:link	href="javascript:$('#show-other-answers-after-deadline').prop('checked', false); removeSubmissionDeadline();" styleClass="btn btn-default">
 			<fmt:message key="monitor.summary.unset.restriction" />
 		</html:link>
 	</div>
 	
-	<div class="small-space-top">
-		<input type="checkbox" name="showOtherAnswersAfterDeadline" value="1" id="show-other-answers-after-deadline" class="noBorder"
-			<c:if test="${empty submissionDeadline}">disabled="disabled"</c:if>
-			<c:if test="${content.showOtherAnswersAfterDeadline}">checked="checked"</c:if>
-		/>
+	<div class="checkbox">
 		<label for="show-other-answers-after-deadline">
+			<input type="checkbox" name="showOtherAnswersAfterDeadline" id="show-other-answers-after-deadline" value="1" 
+				<c:if test="${empty submissionDeadline}">disabled="disabled"</c:if>
+				<c:if test="${content.showOtherAnswersAfterDeadline}">checked="checked"</c:if>
+			></input>
 			<fmt:message key="label.allow.review.other.responses" />
 		</label>
 	</div>
-
-</div>
+	
+</lams:RestrictedUsageAccordian>

@@ -1,21 +1,22 @@
 <%@ include file="/common/taglibs.jsp"%>
 
-<table class="alternative-color">
-	<tr> 
-		<td class="field-name">
-			<b> <fmt:message key="count.total.user" /> </b>
+<table class="table table-condensed table-no-border">
+	<tr>
+		<td class="field-name" width="30%">
+			<fmt:message key="count.total.user" />
 		</td>
-		<td align="right">
-			<c:out value="${qaStatsDTO.countAllUsers}"/>
-		</td> 
+		<td>
+			<c:out value="${qaStatsDTO.countAllUsers}" />
+		</td>
+		
 	</tr>
-						
-	<tr> 
-		<td class="field-name">
-			<b>  <fmt:message key="count.finished.session" /> </b>
+	<tr>
+		<td class="field-name" width="30%">
+			<fmt:message key="count.finished.session" />
 		</td>
-		<td align="right">
-			<c:out value="${qaStatsDTO.countSessionComplete}"/>
-		</td> 
+		
+		<td>
+			<c:out value="${qaStatsDTO.countSessionComplete}" />
+		</td>
 	</tr>
 </table>

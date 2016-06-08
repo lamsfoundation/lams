@@ -1,57 +1,32 @@
 <!DOCTYPE html>
 
 <%@ include file="/common/taglibs.jsp"%>
-
-<%@ page import="java.util.LinkedHashSet" %>
-<%@ page import="java.util.Set" %>
 <%@ page import="org.lamsfoundation.lams.tool.qa.QaAppConstants"%>
 
 <c:set var="sessionMap" value="${sessionScope[generalLearnerFlowDTO.httpSessionID]}" />
 <c:set var="qaContent" value="${content}" />
+<c:set var="lams">
+	<lams:LAMSURL />
+</c:set>
+<c:set var="tool">
+	<lams:WebAppURL />
+</c:set>
 
-    <% 
-		Set tabs = new LinkedHashSet();
-		tabs.add("label.summary");
-		tabs.add("label.editActivity");
-		tabs.add("label.stats");
-		pageContext.setAttribute("tabs", tabs);
-	%>
-
-	<lams:html>
+<lams:html>
 	<lams:head>
 	<title><fmt:message key="activity.title" /></title>
-	<c:set var="lams">
-		<lams:LAMSURL />
-	</c:set>
-	<c:set var="tool">
-		<lams:WebAppURL />
-	</c:set>
-	<c:set var="ctxPath" value="${pageContext.request.contextPath}" scope="request" />
-		
-	<lams:css  style="main"/>
 
-	<link type="text/css" href="${lams}/css/jquery-ui-smoothness-theme.css" rel="stylesheet">
-	<link type="text/css" href="${lams}/css/jquery-ui.timepicker.css" rel="stylesheet">
+	<lams:css />
+	<link type="text/css" href="${lams}css/jquery-ui-smoothness-theme.css" rel="stylesheet">
+	<link type="text/css" href="${lams}css/jquery-ui.timepicker.css" rel="stylesheet">
 	<link type="text/css" href="${lams}css/jquery.jRating.css" rel="stylesheet"/>
-	<link rel="stylesheet" href="${lams}css/jquery.tablesorter.theme-blue.css">
-	<link rel="stylesheet" href="${lams}css/jquery.tablesorter.pager.css">
-	<link rel="stylesheet" href="<html:rewrite page='/includes/qalearning.css'/>">
+	<link rel="stylesheet" type="text/css" href="${lams}css/jquery.tablesorter.theme.bootstrap.css">
+	<link rel="stylesheet" type="text/css" href="${lams}css/jquery.tablesorter.pager.css"> 
+	<link type="text/css" rel="stylesheet" href="<html:rewrite page='/includes/qalearning.css'/>">
+	
 	<style media="screen,projection" type="text/css">
-		.tablesorter-blue {
-			margin: 5px 0 5px;
-		}
-		.question-title {
-			font-weight: bold;
-		}
-		.tablesorter-container {
-			width: 94%;
-			margin: 20px 20px 0;
-		}
 		.rating-stars-div {
 			padding-top: 12px;
-		}
-		.instructions {
-			padding-left: 20px;
 		}
 		#reflections {
 			padding: 70px 0 0px;
@@ -70,27 +45,11 @@
 			border-bottom: none !important;
 		}
 		
-		.tablesorter tbody > tr:nth-child(odd) > td, .tablesorter tbody > tr:nth-child(odd) > th {
-		    background-color: #EBF2FA;
-		}
-		.tablesorter tbody > tr:nth-child(odd):hover > td, .tablesorter tbody > tr:nth-child(odd):hover > th {
-		    background-color: #bfbfbf;
-		}
 		tr:nth-child(odd):hover .jStar {background-image: url(${lams}images/css/jquery.jRating-stars-grey.png)!important;}
 		tr:nth-child(even):hover .jStar {background-image: url(${lams}images/css/jquery.jRating-stars-light-grey.png)!important;}
 		tr:nth-child(odd) .jStar {background-image: url(${lams}images/css/jquery.jRating-stars-light-blue.png)!important;}
-		
-		h4 {
-			color:#0087e5; 
-			font-size:11px;
-			margin-top:10px;
-			margin-bottom:10px;
-			padding:0;
-		}
-		
 	</style>
 	
-	<!-- ********************  javascript ********************** -->
 	<script type="text/javascript"> 
 		//pass settings to monitorToolSummaryAdvanced.js
 		var submissionDeadlineSettings = {
@@ -118,23 +77,23 @@
 		COMMENT_TEXTAREA_TIP_LABEL = '<fmt:message key="label.comment.textarea.tip"/>',
 		WARN_COMMENTS_IS_BLANK_LABEL = '<fmt:message key="${warnCommentIsBlankLabel}"/>',
 		WARN_MIN_NUMBER_WORDS_LABEL = '<fmt:message key="${warnMinNumberWordsLabel}"><fmt:param value="${itemRatingDto.commentsMinWordsLimit}"/></fmt:message>';
-
 	</script>
 	<script type="text/javascript" src="${lams}includes/javascript/common.js"></script>
-	<script type="text/javascript" src="${lams}includes/javascript/tabcontroller.js"></script>
 	<script type="text/javascript" src="${lams}includes/javascript/jquery.js"></script>
 	<script type="text/javascript" src="${lams}includes/javascript/jquery-ui.js"></script>
 	<script type="text/javascript" src="${lams}includes/javascript/jquery-ui.timepicker.js"></script>
 	<script type="text/javascript" src="${lams}includes/javascript/jquery.blockUI.js"></script>
-	<script type="text/javascript" src="${lams}includes/javascript/monitorToolSummaryAdvanced.js" ></script>
 	<script type="text/javascript" src="${lams}includes/javascript/jquery.jRating.js"></script>
 	<script type="text/javascript" src="${lams}includes/javascript/jquery.tablesorter.js"></script>
 	<script type="text/javascript" src="${lams}includes/javascript/jquery.tablesorter-pager.js"></script>
 	<script type="text/javascript" src="${lams}includes/javascript/jquery.tablesorter-widgets.js"></script> 
 	<script type="text/javascript" src="${lams}includes/javascript/rating.js"></script> 
-
+	<script type="text/javascript" src="${lams}includes/javascript/monitorToolSummaryAdvanced.js" ></script>
+	<script type="text/javascript" src="${lams}includes/javascript/bootstrap.min.js"></script>
+	<script type="text/javascript" src="${lams}includes/javascript/bootstrap.tabcontroller.js"></script>
+	
  	<!-- ******************** FCK Editor related javascript & HTML ********************** -->
-	<script language="JavaScript" type="text/JavaScript">
+	<script type="text/javascript">
 	
 		var POSTED_BY_LABEL = '<fmt:message key="label.posted.by"><fmt:param>{0}</fmt:param><fmt:param>{1}</fmt:param></fmt:message>';
 	
@@ -391,58 +350,41 @@
 			submitMethod(actionMethod);
 		}
 
-        function init(){
-            var tag = document.getElementById("currentTab");
-	    	if(tag.value != "")
-	    		selectTab(tag.value);
-            else
-                selectTab(1); //select the default tab;
-        }     
         
         function doSelectTab(tabId) {
-        	// start optional tab controller stuff
-        	var tag = document.getElementById("currentTab");
-	    	tag.value = tabId;
-	    	// end optional tab controller stuff
 	    	selectTab(tabId);
         } 
-        
-        function doSubmit(method) {
-        	document.QaMonitoringForm.dispatch.value=method;
-        	document.QaMonitoringForm.submit();
-        }
-	
 	</script>
 	
 </lams:head>
-<body class="stripes" onLoad="init();">
+<body class="stripes">
 
-<div id="page">
-	<h1> 
-		<fmt:message key="label.monitoring"/> 
-	</h1>
-
-	<div id="header">
-		<lams:Tabs collection="${tabs}" useKey="true" control="true"/>	
-	</div>	
+<html:form action="/monitoring?validate=false" method="POST" enctype="multipart/form-data" >
+	<c:set var="title"><fmt:message key="activity.title" /></c:set>
 	
-	<div id="content">		
-	    <html:form  action="/monitoring?validate=false" enctype="multipart/form-data" method="POST" target="_self">		
-		<html:hidden property="dispatch"/>
-		<html:hidden property="currentUid"/>
-		<html:hidden property="toolContentID"/>
-		<html:hidden property="currentTab" styleId="currentTab" />
-		<html:hidden property="httpSessionID"/>					
-		<html:hidden property="contentFolderID"/>						
+	<html:hidden property="dispatch"/>
+	<html:hidden property="currentUid"/>
+	<html:hidden property="toolContentID"/>
+	<html:hidden property="httpSessionID"/>					
+	<html:hidden property="contentFolderID"/>	
+	
+<lams:Page title="${title}" type="navbar">
+
+	<lams:Tabs title="${title}" control="true" helpToolSignature="<%= QaAppConstants.MY_SIGNATURE %>" helpModule="monitoring">
+		<lams:Tab id="1" key="label.summary" />
+		<lams:Tab id="2" key="label.editActivity" />
+		<lams:Tab id="3" key="label.stats" />
+	</lams:Tabs>
+
+
+	<lams:TabBodyArea>
+		<lams:TabBodys>
+			<lams:TabBody id="1" titleKey="label.summary" page="SummaryContent.jsp" />
+			<lams:TabBody id="2" titleKey="label.editActivity" page="Edit.jsp" />
+			<lams:TabBody id="3" titleKey="label.stats" page="Stats.jsp" />
+		</lams:TabBodys>
+	</lams:TabBodyArea>
 		
-		<lams:help toolSignature="<%= QaAppConstants.MY_SIGNATURE %>" module="monitoring"/>
-
-		<lams:TabBody id="1" titleKey="label.summary" page="SummaryContent.jsp"/>
-		<lams:TabBody id="2" titleKey="label.editActivity" page="Edit.jsp" />
-		<lams:TabBody id="3" titleKey="label.stats" page="Stats.jsp" />
-		</html:form>
-	</div>
-	
 	<div id="footer"></div>
 	
 	<div id="edit-response-dialog" title="<fmt:message key='label.modify.users.response' />" class="dialog">
@@ -459,8 +401,7 @@
 			</c:otherwise>
 		</c:choose>
 	</div>
-
-	</div>
-	
+</lams:Page>
+</html:form>
 </body>
 </lams:html>

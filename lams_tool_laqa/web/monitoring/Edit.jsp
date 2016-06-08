@@ -1,37 +1,32 @@
 <%@ include file="/common/taglibs.jsp"%>
 
-<c:set var="ctxPath" value="${pageContext.request.contextPath}" scope="request"/>
 <c:set var="formBean" value="<%= request.getAttribute(org.apache.struts.taglib.html.Constants.BEAN_KEY) %>" />
 
-<table>
+<table class="table table-condensed">
 	<tr>
-		<td width="10%" nowrap valign="top" class="field-name">
-			<fmt:message key="label.authoring.title"/>:
+		<td class="field-name" width="10%" valign="top">
+			<fmt:message key="label.authoring.title" />
 		</td>
 		<td>
-			<c:out value="${content.title}" escapeXml="true"/>
+			<c:out value="${content.title}" escapeXml="true" />
 		</td>
 	</tr>
+
 	<tr>
-		<td width="10%" nowrap valign="top" class="field-name">
-			<fmt:message key="label.authoring.instructions"/>:
+		<td class="field-name" width="10%" valign="top" NOWRAP>
+			<fmt:message key="label.authoring.instructions" />
 		</td>
 		<td>
-			<c:out value="${content.instructions}" escapeXml="false"/>
+			<c:out value="${content.instructions}" escapeXml="false" />
 		</td>
 	</tr>
-	
-	<tr>
-		<td colspan=2 class="align-right">
-			<c:url  var="authoringUrl" value="/authoringStarter.do">
-				<c:param name="toolContentID" value="${formBean.toolContentID}" />
-				<c:param name="contentFolderID" value="${formBean.contentFolderID}" />
-				<c:param name="mode" value="teacher" />
-			</c:url>
-			<html:link href="javascript:;" onclick="launchPopup('${authoringUrl}','definelater')" styleClass="button">
-				<fmt:message key="label.edit"/>
-			</html:link>
-		</td>
-	</tr>		 
-</table>																								
-		
+</table>
+
+<c:url value="/authoringStarter.do" var="authoringUrl">
+	<c:param name="mode" value="teacher" />
+	<c:param name="toolContentID" value="${formBean.toolContentID}" />
+	<c:param name="contentFolderID" value="${formBean.contentFolderID}" />
+</c:url>
+<html:link href="javascript:;" onclick="launchPopup('${authoringUrl}','definelater')" styleClass="btn btn-default">
+	<fmt:message key="label.edit" />
+</html:link>
