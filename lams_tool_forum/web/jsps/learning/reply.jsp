@@ -16,7 +16,7 @@
 	});
 	
 
-	$('#replyForm').submit(function() { // catch the form's submit event
+	function submitReply(){
 
 		disableSubmitButton();
 		if ( validateForm() ) {
@@ -25,66 +25,87 @@
 				for ( instance in CKEDITOR.instances )
     				CKEDITOR.instances[instance].updateElement();
     		}
-    		
-			var formData = new FormData(this);
 			
-		    $.ajax({ // create an AJAX call...
-		        data: formData, 
-		        processData: false, // tell jQuery not to process the data
-		        contentType: false, // tell jQuery not to set contentType
-		        type: $(this).attr('method'), // GET or POST
-		        url: $(this).attr('action'), // the file to call
-		        success: function (response) {
-        			var threadDiv = document.getElementById('thread'+response.threadUid);
-        			var threadUid = response.threadUid;
-        			var messageUid = response.messageUid;
-        			var rootUid = response.rootUid;
-					
-        			if ( rootUid ) {
-	        			if ( ! threadDiv) {
-    	    				// must have replied to the top level, so show the posting at the top.
-							var threadDiv = document.getElementById('reply');
-							threadDiv.id = 'thread'+messageUid;
-        				} else {
-        					// make sure the old reply form is gone, so if something goes wrong 
-        					// the user won't try to submit it again
-							$('#reply').remove();
-						}
-        			
-	        			if ( ! threadDiv) {
-	        				alert('<fmt:message key="error.cannot.redisplay.please.refresh"/>');
-        				} else {
-	        				var loadString = '<html:rewrite page="/learning/viewTopicThread.do?topicID="/>' + rootUid + "&sessionMapID=" + response.sessionMapID + "&threadUid=" + threadUid+"&messageUid="+messageUid;
-							$(threadDiv).load(loadString, function() {
-								// expand up to the reply - in case it is buried down in a lot of replies
-								// don't need to do this if we have started a new thread.
-								if ( threadUid != messageUid ) {
-									$('#tree' + threadUid).treetable("reveal",messageUid);
-									$('#msg'+messageUid).focus();
-								}
-								setupJRating("<c:url value='/learning/rateMessage.do'/>?toolSessionID=${sessionMap.toolSessionID}&sessionMapID=${sessionMapID}");
-								highlightMessage();
-							});
-						}
+			var replyForm = $("#replyForm");
+ 			if(typeof FormData == "undefined"){
 
-    		     		if ( response.noMorePosts ) {
-	        				$('.replybutton').hide();
-	        			}
-		    		
-						 
-		    		} else {
-		    			// No new id? Validation failed! 
-						$('#reply').html(response);
-		    		}
-		    	}
-		    });
+ 				if ( $("#attachmentFile").val() ) {
+					alert("Your browser is missing the required FormData component. Files cannot be uploaded.");
+ 				}
+
+				$.ajax({ // create an AJAX call...
+			        data: replyForm.serialize(), 
+			        type: replyForm.attr('method'), // GET or POST
+			        url: replyForm.attr('action'), // the file to call
+			        success: function(response) {
+			        	submitSuccess(response);
+			        }
+			    });
+
+			} else {
+
+			    $.ajax({ // create an AJAX call...
+			        data:  new FormData(replyForm[0]),
+			        processData: false,
+			   		contentType: false,
+			        type: replyForm.attr('method'), // GET or POST
+			        url: replyForm.attr('action'), // the file to call
+			        success: function(response) {
+			        	submitSuccess(response);
+			        }
+			    });
+			}
+			
 		} // end validateForm()
 		else {
 			enableSubmitButton();
 		}
 		return false;
-	});
+	}
 
+	function submitSuccess(response) {
+		var threadDiv = document.getElementById('thread'+response.threadUid);
+		var threadUid = response.threadUid;
+		var messageUid = response.messageUid;
+		var rootUid = response.rootUid;
+		
+		if ( rootUid ) {
+			if ( ! threadDiv) {
+				// must have replied to the top level, so show the posting at the top.
+				var threadDiv = document.getElementById('reply');
+				threadDiv.id = 'thread'+messageUid;
+			} else {
+				// make sure the old reply form is gone, so if something goes wrong 
+				// the user won't try to submit it again
+				$('#reply').remove();
+			}
+		
+			if ( ! threadDiv) {
+				alert('<fmt:message key="error.cannot.redisplay.please.refresh"/>');
+			} else {
+				var loadString = '<html:rewrite page="/learning/viewTopicThread.do?topicID="/>' + rootUid + "&sessionMapID=" + response.sessionMapID + "&threadUid=" + threadUid+"&messageUid="+messageUid;
+				$(threadDiv).load(loadString, function() {
+					// expand up to the reply - in case it is buried down in a lot of replies
+					// don't need to do this if we have started a new thread.
+					if ( threadUid != messageUid ) {
+						$('#tree' + threadUid).treetable("reveal",messageUid);
+						$('#msg'+messageUid).focus();
+					}
+					setupJRating("<c:url value='/learning/rateMessage.do'/>?toolSessionID=${sessionMap.toolSessionID}&sessionMapID=${sessionMapID}");
+					highlightMessage();
+				});
+			}
+
+     		if ( response.noMorePosts ) {
+				$('.replybutton').hide();
+			}
+		
+		} else {
+			// No new id? Validation failed! 
+			$('#reply').html(response);
+		} 
+	}
+	
 	function cancelReply() {
 		$('#reply').remove();
 	}

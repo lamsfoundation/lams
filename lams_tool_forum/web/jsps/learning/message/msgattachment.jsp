@@ -26,5 +26,5 @@
 </c:if>
 
 <c:if test="${not topic.hasAttachment && allowUpload}">
-	<input type="file" name="attachmentFile" size="55"  /> 
+	<input type="file" name="attachmentFile" id="attachmentFile" size="55"  /> 
 </c:if>
