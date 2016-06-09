@@ -44,7 +44,6 @@ import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.util.CentralConstants;
 import org.lamsfoundation.lams.util.WebUtil;
-import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 
@@ -153,9 +152,6 @@ public class LoginRequestServlet extends HttpServlet {
 		response.sendRedirect(response.encodeRedirectURL(url));
 		return;
 	    }
-	    
-	    // invalidate the existing session, if any
-	    SessionManager.removeSession(login, true);
 
 	    // check if there is a redirect URL parameter already
 	    String redirectURL = WebUtil.getBaseServerURL() + LoginRequestDispatcher.getRequestURL(request);
