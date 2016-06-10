@@ -415,12 +415,30 @@
 	</bean>	
 	
 	<!--  Configuration service -->
-	<bean id="configurationService" class="org.lamsfoundation.lams.util.Configuration">
-		<property name="configurationDAO"><ref bean="configurationDAO" /></property>
-		<property name="registrationDAO"><ref bean="registrationDAO" /></property>
-		<property name="messageService"><ref bean="commonMessageService" /></property>
-		<property name="scheduler"><ref bean="scheduler" /></property>
+	<bean id="configurationService"  class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
+		<property name ="transactionManager"><ref bean ="transactionManager"/></property>
+		<property name="preInterceptors">
+			<list>
+				<ref bean="transactionRetryInterceptor" />			
+			</list>
+		</property>
+		<property name ="target">
+			<bean class="org.lamsfoundation.lams.util.Configuration">
+				<property name="configurationDAO"><ref bean="configurationDAO" /></property>
+				<property name="registrationDAO"><ref bean="registrationDAO" /></property>
+				<property name="messageService"><ref bean="commonMessageService" /></property>
+				<property name="scheduler"><ref bean="scheduler" /></property>
+			</bean>
+		</property>
+		<property name="proxyTargetClass"><value>true</value></property> 
+		<property name="transactionAttributes">
+			<props>
+				<prop key="save*">PROPAGATION_REQUIRED</prop>
+				<prop key="persist*">PROPAGATION_REQUIRED</prop>
+			</props>
+		</property>
 	</bean>
+
 	
 	<!-- auditing service -->
 	<bean id="auditService" class="org.lamsfoundation.lams.util.audit.AuditService" >
