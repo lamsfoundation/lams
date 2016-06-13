@@ -27,6 +27,7 @@ package org.lamsfoundation.lams.tool.pixlr.service;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.Hashtable;
 import java.util.List;
@@ -159,6 +160,11 @@ public class PixlrService
     @Override
     public ToolOutput getToolOutput(String name, Long toolSessionId, Long learnerId) {
 	return getPixlrOutputFactory().getToolOutput(name, this, toolSessionId, learnerId);
+    }
+
+    @Override
+    public List<ToolOutput> getToolOutputs(String name, Long toolContentId) {
+	return new ArrayList<ToolOutput>();
     }
 
     @Override

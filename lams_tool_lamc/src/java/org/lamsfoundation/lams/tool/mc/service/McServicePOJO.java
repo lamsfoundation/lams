@@ -1614,6 +1614,11 @@ public class McServicePOJO implements IMcService, ToolContentManager, ToolSessio
     }
 
     @Override
+    public List<ToolOutput> getToolOutputs(String name, Long toolContentId) {
+	return new ArrayList<ToolOutput>();
+    }
+
+    @Override
     public void forceCompleteUser(Long toolSessionId, User user) {
 	Long userId = user.getUserId().longValue();
 
@@ -1665,6 +1670,16 @@ public class McServicePOJO implements IMcService, ToolContentManager, ToolSessio
     @Override
     public boolean isGroupedActivity(long toolContentID) {
 	return toolService.isGroupedActivity(toolContentID);
+    }
+
+    @Override
+    public String getActivityEvaluation(Long toolContentId) {
+	return toolService.getActivityEvaluation(toolContentId);
+    }
+
+    @Override
+    public void setActivityEvaluation(Long toolContentId, String toolOutputDefinition) {
+	toolService.setActivityEvaluation(toolContentId, toolOutputDefinition);
     }
 
     /**

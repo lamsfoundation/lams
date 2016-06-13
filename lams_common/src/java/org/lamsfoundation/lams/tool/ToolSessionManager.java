@@ -143,6 +143,18 @@ public interface ToolSessionManager {
      * Note: the learnerId may not be the userId of the current user as the current user may be a staff member.
      */
     ToolOutput getToolOutput(String name, Long toolSessionId, Long learnerId);
+    
+    /**
+     * Returns outputs for all learners that left responses required for this output. Returns nothing for the learners
+     * that haven't started the activity or haven't provided required results. Method is useful when tool should provide
+     * results for all users at once rather than on one-by-one basis.
+     * 
+     * @param name
+     *            tool output name
+     * @param toolContentId
+     * @return
+     */
+    List<ToolOutput> getToolOutputs(String name, Long toolContentId);
 
     /**
      * Notifies tool that the user is force completed. Currently it's been utilized only by leader aware tools, which

@@ -24,6 +24,7 @@
 
 package org.lamsfoundation.lams.tool.noticeboard.service;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.Hashtable;
 import java.util.Iterator;
@@ -529,6 +530,11 @@ public class NoticeboardServicePOJO implements INoticeboardService, ToolContentM
     @Override
     public ToolOutput getToolOutput(String name, Long toolSessionId, Long learnerId) {
 	return null;
+    }
+
+    @Override
+    public List<ToolOutput> getToolOutputs(String name, Long toolContentId) {
+	return new ArrayList<ToolOutput>();
     }
 
     @Override

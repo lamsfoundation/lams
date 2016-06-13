@@ -1559,6 +1559,11 @@ public class VoteServicePOJO implements IVoteService, ToolContentManager, ToolSe
     }
 
     @Override
+    public List<ToolOutput> getToolOutputs(String name, Long toolContentId) {
+	return new ArrayList<ToolOutput>();
+    }
+
+    @Override
     public void forceCompleteUser(Long toolSessionId, User user) {
 	Long userId = user.getUserId().longValue();
 
