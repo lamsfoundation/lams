@@ -66,6 +66,7 @@ import org.lamsfoundation.lams.lesson.CompletedActivityProgress;
 import org.lamsfoundation.lams.lesson.LearnerProgress;
 import org.lamsfoundation.lams.lesson.Lesson;
 import org.lamsfoundation.lams.lesson.dao.ILearnerProgressDAO;
+import org.lamsfoundation.lams.lesson.dao.ILessonDAO;
 import org.lamsfoundation.lams.lesson.service.ILessonService;
 import org.lamsfoundation.lams.tool.ToolOutput;
 import org.lamsfoundation.lams.tool.ToolOutputValue;
@@ -105,6 +106,7 @@ public class GradebookService implements IGradebookService {
     private ILamsCoreToolService toolService;
     private IGradebookDAO gradebookDAO;
     private ILearnerProgressDAO learnerProgressDAO;
+    private ILessonDAO lessonDAO;
     private ILessonService lessonService;
     private IUserManagementService userService;
     private IBaseDAO baseDAO;
@@ -438,6 +440,53 @@ public class GradebookService implements IGradebookService {
 	    auditService.log(monitorUser, GradebookConstants.MODULE_NAME, message);
 	}
     }
+    
+    @Override
+    public void updateUserMarksForActivity(Activity activity) {
+	Long activityId = activity.getActivityId();
+	Lesson lesson = lessonDAO.getLessonForActivity(activityId);
+
+	if ((lesson == null) || (activity == null) || !(activity instanceof ToolActivity)
+		|| (((ToolActivity) activity).getActivityEvaluations() == null)
+		|| ((ToolActivity) activity).getActivityEvaluations().isEmpty()) {
+	    return;
+	}
+	ToolActivity toolActivity = (ToolActivity) activity;
+
+	// Getting the first activity evaluation
+	ActivityEvaluation eval = toolActivity.getActivityEvaluations().iterator().next();
+	String toolOutputDefinition = eval.getToolOutputDefinition();
+	
+	Map<Integer, GradebookUserActivity> userToGradebookUserActivityMap = getUserToGradebookUserActivityMap(activity,
+		null);
+	Map<Integer, GradebookUserLesson> userToGradebookUserLessonMap = getUserToGradebookUserLessonMap(lesson, null);
+	List<ToolOutput> toolOutputs = toolService.getOutputsFromTool(toolOutputDefinition, toolActivity);
+
+	//update for all users in activity
+	List<User> users = learnerProgressDAO.getLearnersCompletedActivity(activity);
+	for (User user : users) {
+	    //find according toolOutput
+	    ToolOutput toolOutput = null;
+	    for (ToolOutput toolOutputIter : toolOutputs) {
+		if (toolOutputIter.getUserId().equals(user.getUserId())) {
+		    toolOutput = toolOutputIter;
+		}
+	    }
+
+	    //in case of toolOutput == null (which means no results in the tool but user nonetheless has finished activity), assign 0 as a result
+	    Double outputDouble = (toolOutput == null || toolOutput.getValue() == null) ? null
+		    : toolOutput.getValue().getDouble();
+
+	    GradebookUserActivity gradebookUserActivity = userToGradebookUserActivityMap.get(user.getUserId());
+	    GradebookUserLesson gradebookUserLesson = userToGradebookUserLessonMap.get(user.getUserId());
+
+	    // Only set the mark if it hasnt previously been set by a teacher
+	    if ((gradebookUserActivity == null) || !gradebookUserActivity.getMarkedInGradebook()) {
+		updateUserActivityGradebookMark(lesson, user, toolActivity, outputDouble, false, false,
+			gradebookUserActivity, gradebookUserLesson);
+	    }
+	}
+   }
 
     @Override
     public void updateUserActivityGradebookMark(Lesson lesson, Activity activity, User learner) {
@@ -482,17 +531,32 @@ public class GradebookService implements IGradebookService {
     @Override
     public void updateUserActivityGradebookMark(Lesson lesson, User learner, Activity activity, Double mark,
 	    Boolean markedInGradebook, boolean isAuditLogRequired) {
+
+	GradebookUserActivity gradebookUserActivity = gradebookDAO
+		.getGradebookUserDataForActivity(activity.getActivityId(), learner.getUserId());
+
+	GradebookUserLesson gradebookUserLesson = gradebookDAO.getGradebookUserDataForLesson(lesson.getLessonId(),
+		learner.getUserId());
+
+	updateUserActivityGradebookMark(lesson, learner, activity, mark, markedInGradebook, isAuditLogRequired,
+		gradebookUserActivity, gradebookUserLesson);
+    }
+    
+    /**
+     * It's the same method as above, it only also accepts gradebookUserActivity and gradebookUserLesson as parameters.
+     */
+    private void updateUserActivityGradebookMark(Lesson lesson, User learner, Activity activity, Double mark,
+	    Boolean markedInGradebook, boolean isAuditLogRequired, GradebookUserActivity gradebookUserActivity,
+	    GradebookUserLesson gradebookUserLesson) {
 	if ((lesson != null) && (activity != null) && (learner != null) && activity.isToolActivity()) {
 
 	    // First, update the mark for the activity
-	    GradebookUserActivity gradebookUserActivity = gradebookDAO
-		    .getGradebookUserDataForActivity(activity.getActivityId(), learner.getUserId());
-
 	    if (gradebookUserActivity == null) {
 		gradebookUserActivity = new GradebookUserActivity((ToolActivity) activity, learner);
 	    }
 	    String oldMark = (gradebookUserActivity.getMark() == null) ? "-"
 		    : gradebookUserActivity.getMark().toString();
+	    Double oldActivityMark = gradebookUserActivity.getMark();
 
 	    gradebookUserActivity.setMark(mark);
 	    gradebookUserActivity.setUpdateDate(new Date());
@@ -500,8 +564,6 @@ public class GradebookService implements IGradebookService {
 	    gradebookDAO.insertOrUpdate(gradebookUserActivity);
 
 	    // Now update the lesson mark
-	    GradebookUserLesson gradebookUserLesson = gradebookDAO.getGradebookUserDataForLesson(lesson.getLessonId(),
-		    learner.getUserId());
 
 	    if (gradebookUserLesson == null) {
 		gradebookUserLesson = new GradebookUserLesson();
@@ -509,14 +571,15 @@ public class GradebookService implements IGradebookService {
 		gradebookUserLesson.setLesson(lesson);
 	    }
 
-	    aggregateTotalMarkForLesson(gradebookUserLesson);
+	    aggregateTotalMarkForLesson(gradebookUserLesson, mark, oldActivityMark);
 
 	    // audit log changed gradebook mark
 	    if (isAuditLogRequired) {
 		UserDTO monitorUser = (UserDTO) SessionManager.getSession().getAttribute(AttributeNames.USER);
+		String markStr = mark == null ? "" : mark.toString();
 		String[] args = new String[] { learner.getLogin() + "(" + learner.getUserId() + ")",
 			activity.getActivityId().toString(), lesson.getLessonId().toString(), oldMark.toString(),
-			mark.toString() };
+			markStr };
 		String message = messageService.getMessage("audit.activity.change.mark", args);
 		auditService.log(monitorUser, GradebookConstants.MODULE_NAME, message);
 	    }
@@ -1354,9 +1417,17 @@ public class GradebookService implements IGradebookService {
      *
      * @param gradebookUserLesson
      */
-    private void aggregateTotalMarkForLesson(GradebookUserLesson gradebookUserLesson) {
-	Double totalMark = gradebookDAO.getGradebookUserActivityMarkSum(gradebookUserLesson.getLesson().getLessonId(),
-		gradebookUserLesson.getLearner().getUserId());
+    private void aggregateTotalMarkForLesson(GradebookUserLesson gradebookUserLesson, Double newActivityMark, Double oldActivityMark) {
+	newActivityMark = newActivityMark == null ? 0 : newActivityMark;
+	
+	Double totalMark;
+	if (oldActivityMark == null || gradebookUserLesson.getMark() == null) {
+	    totalMark = gradebookDAO.getGradebookUserActivityMarkSum(gradebookUserLesson.getLesson().getLessonId(),
+			gradebookUserLesson.getLearner().getUserId());
+	} else {
+	    totalMark = gradebookUserLesson.getMark() - oldActivityMark + newActivityMark;
+	}
+	
 	gradebookUserLesson.setMark(totalMark);
 	gradebookDAO.insertOrUpdate(gradebookUserLesson);
     }
@@ -1682,6 +1753,10 @@ public class GradebookService implements IGradebookService {
 
     public void setLearnerProgressDAO(ILearnerProgressDAO learnerProgressDAO) {
 	this.learnerProgressDAO = learnerProgressDAO;
+    }
+
+    public void setLessonDAO(ILessonDAO lessonDAO) {
+	this.lessonDAO = lessonDAO;
     }
 
     public ILessonService getLessonService() {

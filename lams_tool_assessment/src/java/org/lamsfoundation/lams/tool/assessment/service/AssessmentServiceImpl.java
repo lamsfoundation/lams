@@ -740,20 +740,40 @@ public class AssessmentServiceImpl implements IAssessmentService, ToolContentMan
     public Float getLastTotalScoreByUser(Long assessmentUid, Long userId) {
 	return assessmentResultDao.getLastTotalScoreByUser(assessmentUid, userId);
     }
+    
+    @Override
+    public List<AssessmentUserDTO> getLastTotalScoresByContentId(Long toolContentId) {
+	return assessmentResultDao.getLastTotalScoresByContentId(toolContentId);
+    }
 
     @Override
     public Float getBestTotalScoreByUser(Long sessionId, Long userId) {
 	return assessmentResultDao.getBestTotalScoreByUser(sessionId, userId);
+    }
+    
+    @Override
+    public List<AssessmentUserDTO> getBestTotalScoresByContentId(Long toolContentId) {
+	return assessmentResultDao.getBestTotalScoresByContentId(toolContentId);
     }
 
     @Override
     public Float getFirstTotalScoreByUser(Long sessionId, Long userId) {
 	return assessmentResultDao.getFirstTotalScoreByUser(sessionId, userId);
     }
+    
+    @Override
+    public List<AssessmentUserDTO> getFirstTotalScoresByContentId(Long toolContentId) {
+	return assessmentResultDao.getFirstTotalScoresByContentId(toolContentId);
+    }
 
     @Override
     public Float getAvergeTotalScoreByUser(Long sessionId, Long userId) {
 	return assessmentResultDao.getAvergeTotalScoreByUser(sessionId, userId);
+    }
+    
+    @Override
+    public List<AssessmentUserDTO> getAverageTotalScoresByContentId(Long toolContentId) {
+	return assessmentResultDao.getAverageTotalScoresByContentId(toolContentId);
     }
 
     @Override
@@ -1925,8 +1945,10 @@ public class AssessmentServiceImpl implements IAssessmentService, ToolContentMan
 			    // propagade total mark to Gradebook
 			    gradebookService.updateActivityMark(mark, null, user.getUserId().intValue(), toolSessionId,
 				    false);
+			    System.out.println("aaa USER" + user.getUserId());
 			}
 		    }
+		    System.out.println("aaa" + toolSessionId);
 
 		}
 	    }
@@ -2279,6 +2301,16 @@ public class AssessmentServiceImpl implements IAssessmentService, ToolContentMan
     @Override
     public ToolOutput getToolOutput(String name, Long toolSessionId, Long learnerId) {
 	return assessmentOutputFactory.getToolOutput(name, this, toolSessionId, learnerId);
+    }
+    
+    /**
+     * Get the tool output for the given tool output name.
+     *
+     * @see org.lamsfoundation.lams.tool.ToolSessionManager#getToolOutput(java.lang.String, java.lang.Long)
+     */
+    @Override
+    public List<ToolOutput> getToolOutputs(String name, Long toolContentId) {
+	return assessmentOutputFactory.getToolOutputs(name, this, toolContentId);
     }
 
     @Override

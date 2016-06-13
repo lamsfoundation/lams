@@ -227,6 +227,8 @@ public interface IAssessmentService {
      * @return
      */
     Float getLastTotalScoreByUser(Long assessmentUid, Long userId);
+    
+    List<AssessmentUserDTO> getLastTotalScoresByContentId(Long toolContentId);
 
     /**
      * Return the best *finished* result grade.
@@ -236,6 +238,8 @@ public interface IAssessmentService {
      * @return
      */
     Float getBestTotalScoreByUser(Long sessionId, Long userId);
+    
+    List<AssessmentUserDTO> getBestTotalScoresByContentId(Long toolContentId);
 
     /**
      * Return the first *finished* result grade.
@@ -245,6 +249,8 @@ public interface IAssessmentService {
      * @return
      */
     Float getFirstTotalScoreByUser(Long sessionId, Long userId);
+    
+    List<AssessmentUserDTO> getFirstTotalScoresByContentId(Long toolContentId);
 
     /**
      * Return the average score of all *finished* result scores.
@@ -254,6 +260,8 @@ public interface IAssessmentService {
      * @return
      */
     Float getAvergeTotalScoreByUser(Long sessionId, Long userId);
+    
+    List<AssessmentUserDTO> getAverageTotalScoresByContentId(Long toolContentId);
 
     /**
      * Return the latest *finished* result grade.
