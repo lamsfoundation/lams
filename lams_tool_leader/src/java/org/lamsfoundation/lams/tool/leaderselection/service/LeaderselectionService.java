@@ -24,6 +24,7 @@
 
 package org.lamsfoundation.lams.tool.leaderselection.service;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.Hashtable;
 import java.util.List;
@@ -154,6 +155,11 @@ public class LeaderselectionService implements ToolSessionManager, ToolContentMa
     @Override
     public ToolOutput getToolOutput(String name, Long toolSessionId, Long learnerId) {
 	return getLeaderselectionOutputFactory().getToolOutput(name, this, toolSessionId, learnerId);
+    }
+
+    @Override
+    public List<ToolOutput> getToolOutputs(String name, Long toolContentId) {
+	return new ArrayList<ToolOutput>();
     }
 
     @Override

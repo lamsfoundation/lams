@@ -32,6 +32,11 @@ public class ToolOutput {
     private String name;
     private String description;
     private ToolOutputValue value;
+    
+    /**
+     * User Id. Used when tool returns multiple tool outputs for different users.
+     */
+    private Integer userId;
 
     /**
      * Create a ToolOutput based on a Boolean. This will create a value of type OUTPUT_BOOLEAN
@@ -189,5 +194,13 @@ public class ToolOutput {
 
     public void setValue(ToolOutputValue value) {
 	this.value = value;
+    }
+    
+    public Integer getUserId() {
+	return userId;
+    }
+
+    public void setUserId(Integer userId) {
+	this.userId = userId;
     }
 }

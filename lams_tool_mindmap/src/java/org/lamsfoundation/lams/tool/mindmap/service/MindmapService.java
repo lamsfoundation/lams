@@ -159,6 +159,11 @@ public class MindmapService implements ToolSessionManager, ToolContentManager, I
     }
 
     @Override
+    public List<ToolOutput> getToolOutputs(String name, Long toolContentId) {
+	return new ArrayList<ToolOutput>();
+    }
+
+    @Override
     public void forceCompleteUser(Long toolSessionId, User user) {
 	// no actions required
     }

@@ -24,6 +24,7 @@
 
 package org.lamsfoundation.lams.tool.wookie.service;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.Hashtable;
 import java.util.List;
@@ -193,6 +194,11 @@ public class WookieService
     @Override
     public ToolOutput getToolOutput(String name, Long toolSessionId, Long learnerId) {
 	return getWookieOutputFactory().getToolOutput(name, this, toolSessionId, learnerId);
+    }
+
+    @Override
+    public List<ToolOutput> getToolOutputs(String name, Long toolContentId) {
+	return new ArrayList<ToolOutput>();
     }
 
     @Override

@@ -212,6 +212,18 @@ public interface ILamsCoreToolService {
      * @throws ToolException
      */
     ToolOutput getOutputFromTool(String conditionName, ToolSession toolSession, Integer learnerId) throws ToolException;
+    
+    /**
+     * Returns tool outputs for the entire activity. Note, some tools don't support this functionality and will always
+     * return empty list.
+     * 
+     * @param conditionName
+     * @param toolActivity
+     * @return
+     * @throws ToolException
+     */
+    List<ToolOutput> getOutputsFromTool(String conditionName, ToolActivity toolActivity)
+	    throws ToolException;
 
     /**
      * Ask a tool for a set of ToolOutputs, based on the given toolSessionId.

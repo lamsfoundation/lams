@@ -40,7 +40,7 @@
 			<attribute name="javadoc_location" value="http://www.jboss.org/file-access/default/members/jbossweb/freezone/docs/latest/api/"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry kind="lib" path="/lams_build/lib/lams/lams-gradebook.jar"/>
+	<classpathentry kind="lib" path="/lams_build/lib/lams/lams-gradebook.jar" sourcepath="/lams_gradebook"/>
 	<classpathentry kind="output" path="bin"/>
 	<referencedentry kind="lib" path="/lams_build/lib/lams/lams.jar" sourcepath=""/>
 </classpath>

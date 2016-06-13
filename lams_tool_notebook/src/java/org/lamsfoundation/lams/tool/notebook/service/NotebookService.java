@@ -24,6 +24,7 @@
 
 package org.lamsfoundation.lams.tool.notebook.service;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 import java.util.Hashtable;
@@ -162,6 +163,11 @@ public class NotebookService implements ToolSessionManager, ToolContentManager, 
     @Override
     public ToolOutput getToolOutput(String name, Long toolSessionId, Long learnerId) {
 	return getNotebookOutputFactory().getToolOutput(name, this, toolSessionId, learnerId);
+    }
+
+    @Override
+    public List<ToolOutput> getToolOutputs(String name, Long toolContentId) {
+	return new ArrayList<ToolOutput>();
     }
 
     @Override
