@@ -23,8 +23,10 @@
 
 package org.lamsfoundation.lams.tool.mc.service;
 
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 import java.util.SortedMap;
 import java.util.TreeMap;
 
@@ -32,6 +34,7 @@ import org.lamsfoundation.lams.tool.OutputFactory;
 import org.lamsfoundation.lams.tool.ToolOutput;
 import org.lamsfoundation.lams.tool.ToolOutputDefinition;
 import org.lamsfoundation.lams.tool.mc.McAppConstants;
+import org.lamsfoundation.lams.tool.mc.dto.ToolOutputDTO;
 import org.lamsfoundation.lams.tool.mc.pojos.McContent;
 import org.lamsfoundation.lams.tool.mc.pojos.McOptsContent;
 import org.lamsfoundation.lams.tool.mc.pojos.McQueContent;
@@ -103,6 +106,53 @@ public class MCOutputFactory extends OutputFactory {
 			return getLearnerAllCorrect(mcService, queUser);
 		    }
 		}
+	    }
+	}
+	return null;
+    }
+    
+    public List<ToolOutput> getToolOutputs(String name, IMcService assessmentService, Long toolContentId) {
+	if ((name != null) && (toolContentId != null)) {
+
+	    if (name.equals(McAppConstants.OUTPUT_NAME_LEARNER_MARK)) {
+		List<ToolOutputDTO> toolOutputDtos = assessmentService.getLearnerMarksByContentId(toolContentId);
+		
+		//convert toolOutputDtos to toolOutputs
+		List<ToolOutput> toolOutputs = new ArrayList<ToolOutput>();
+		for (ToolOutputDTO toolOutputDto : toolOutputDtos) {
+		    float totalMark = toolOutputDto.getMark() == null ? 0 : toolOutputDto.getMark().floatValue();
+		    
+		    ToolOutput toolOutput = new ToolOutput(McAppConstants.OUTPUT_NAME_LEARNER_MARK,
+			    getI18NText(McAppConstants.OUTPUT_NAME_LEARNER_MARK, true), totalMark);
+		    toolOutput.setUserId(toolOutputDto.getUserId().intValue());
+		    toolOutputs.add(toolOutput);
+		}
+
+		return toolOutputs;
+		
+	    } else if (name.equals(McAppConstants.OUTPUT_NAME_LEARNER_ALL_CORRECT)) {
+		List<ToolOutputDTO> toolOutputDtos = assessmentService.getLearnerMarksByContentId(toolContentId);
+		
+		//calculate max possible total mark
+		int maxMark = 0;
+		McContent mcContent = assessmentService.getMcContent(toolContentId);
+		for (McQueContent question : (Set<McQueContent>)mcContent.getMcQueContents()) {
+		    maxMark += question.getMark();
+		}
+		
+		//convert toolOutputDtos to toolOutputs
+		List<ToolOutput> toolOutputs = new ArrayList<ToolOutput>();
+		for (ToolOutputDTO toolOutputDto : toolOutputDtos) {
+		    float totalMark = toolOutputDto.getMark() == null ? 0 : toolOutputDto.getMark().floatValue();
+		    boolean isAllQuestionAnswersCorrect = totalMark == maxMark;
+		    
+		    ToolOutput toolOutput = new ToolOutput(McAppConstants.OUTPUT_NAME_LEARNER_ALL_CORRECT,
+			    getI18NText(McAppConstants.OUTPUT_NAME_LEARNER_ALL_CORRECT, true), isAllQuestionAnswersCorrect);
+		    toolOutput.setUserId(toolOutputDto.getUserId().intValue());
+		    toolOutputs.add(toolOutput);
+		}
+
+		return toolOutputs;
 	    }
 	}
 	return null;

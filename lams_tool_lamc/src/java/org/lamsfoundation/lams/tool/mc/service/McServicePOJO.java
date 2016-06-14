@@ -96,6 +96,7 @@ import org.lamsfoundation.lams.tool.mc.dao.IMcQueContentDAO;
 import org.lamsfoundation.lams.tool.mc.dao.IMcSessionDAO;
 import org.lamsfoundation.lams.tool.mc.dao.IMcUserDAO;
 import org.lamsfoundation.lams.tool.mc.dao.IMcUsrAttemptDAO;
+import org.lamsfoundation.lams.tool.mc.dto.ToolOutputDTO;
 import org.lamsfoundation.lams.tool.mc.pojos.McContent;
 import org.lamsfoundation.lams.tool.mc.pojos.McOptsContent;
 import org.lamsfoundation.lams.tool.mc.pojos.McQueContent;
@@ -678,6 +679,11 @@ public class McServicePOJO implements IMcService, ToolContentManager, ToolSessio
 			    + e.getMessage(),
 		    e);
 	}
+    }
+    
+    @Override
+    public List<ToolOutputDTO> getLearnerMarksByContentId(Long toolContentId) {
+	return mcUsrAttemptDAO.getLearnerMarksByContentId(toolContentId);
     }
 
     @Override
@@ -1615,7 +1621,7 @@ public class McServicePOJO implements IMcService, ToolContentManager, ToolSessio
 
     @Override
     public List<ToolOutput> getToolOutputs(String name, Long toolContentId) {
-	return new ArrayList<ToolOutput>();
+	return mcOutputFactory.getToolOutputs(name, this, toolContentId);
     }
 
     @Override

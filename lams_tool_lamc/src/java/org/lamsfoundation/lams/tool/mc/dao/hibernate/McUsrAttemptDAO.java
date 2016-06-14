@@ -22,10 +22,13 @@
 
 package org.lamsfoundation.lams.tool.mc.dao.hibernate;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.hibernate.FlushMode;
 import org.lamsfoundation.lams.tool.mc.dao.IMcUsrAttemptDAO;
+import org.lamsfoundation.lams.tool.mc.dto.ToolOutputDTO;
+import org.lamsfoundation.lams.tool.mc.pojos.McQueUsr;
 import org.lamsfoundation.lams.tool.mc.pojos.McUsrAttempt;
 import org.springframework.orm.hibernate3.support.HibernateDaoSupport;
 
@@ -127,6 +130,33 @@ public class McUsrAttemptDAO extends HibernateDaoSupport implements IMcUsrAttemp
 	    return 0;
 	}
 	return ((Number) list.get(0)).intValue();
+    }
+    
+    @Override
+    public List<ToolOutputDTO> getLearnerMarksByContentId(Long toolContentId) {
+	
+	final String FIND_MARKS_FOR_CONTENT_ID = "SELECT user.queUsrId, user.lastAttemptTotalMark FROM "
+		+ McQueUsr.class.getName()
+		+ " user WHERE user.mcSession.mcContent.mcContentId = ? AND user.responseFinalised = true";
+
+	List<Object[]> list = getHibernateTemplate().find(FIND_MARKS_FOR_CONTENT_ID, new Object[] { toolContentId });
+	
+	List<ToolOutputDTO> toolOutputDtos = new ArrayList<ToolOutputDTO>();
+	if (list != null && list.size() > 0) {
+	    for (Object[] element : list) {
+
+		Long userId = ((Number) element[0]).longValue();
+		Integer grade = (Integer) element[1];
+
+		ToolOutputDTO toolOutputDto = new ToolOutputDTO();
+		toolOutputDto.setUserId(userId.intValue());
+		toolOutputDto.setMark(grade);
+		toolOutputDtos.add(toolOutputDto);
+	    }
+
+	}
+
+	return toolOutputDtos;
     }
 
 }

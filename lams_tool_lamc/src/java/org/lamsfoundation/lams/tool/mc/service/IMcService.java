@@ -38,6 +38,7 @@ import org.lamsfoundation.lams.tool.mc.McQuestionDTO;
 import org.lamsfoundation.lams.tool.mc.McSessionMarkDTO;
 import org.lamsfoundation.lams.tool.mc.McUserMarkDTO;
 import org.lamsfoundation.lams.tool.mc.ReflectionDTO;
+import org.lamsfoundation.lams.tool.mc.dto.ToolOutputDTO;
 import org.lamsfoundation.lams.tool.mc.pojos.McContent;
 import org.lamsfoundation.lams.tool.mc.pojos.McOptsContent;
 import org.lamsfoundation.lams.tool.mc.pojos.McQueContent;
@@ -131,6 +132,8 @@ public interface IMcService {
     void updateMcOptionsContent(McOptsContent mcOptsContent) throws McApplicationException;
 
     McUsrAttempt getUserAttemptByQuestion(Long queUsrUid, Long mcQueContentId) throws McApplicationException;
+    
+    List<ToolOutputDTO> getLearnerMarksByContentId(Long toolContentId);
 
     void copyToolContent(Long fromContentId, Long toContentId) throws ToolException;
 
