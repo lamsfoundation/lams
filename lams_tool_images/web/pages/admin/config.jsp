@@ -10,33 +10,29 @@
 	</lams:head>
 	
 	<body class="stripes">
-		<div id="content">
 
-			<h1>
-				<fmt:message key="admin.page.title" />
-			</h1>
-			
-			<a href="<lams:LAMSURL/>/admin/sysadminstart.do"><fmt:message key="admin.return" /></a>
-
-			<p>
+		<c:set var="title"><fmt:message key="admin.page.title" /></c:set>
+		<lams:Page type="admin" title="${title}">
+		
+			<a href="<lams:LAMSURL/>/admin/sysadminstart.do" class="btn btn-default"><fmt:message key="admin.return" /></a>
 
 			<%@ include file="/common/messages.jsp"%>
 		
 			<c:if test="${savedSuccess}">
-				<p class="info">
+				<lams:Alert type="info" id="admin-success" close="false">
 					<fmt:message key="admin.success" />
-				<p>
+				</lams:Alert>
 			</c:if>
 			
 			<html:form action="/laimag10admin/saveContent" styleId="imageGalleryAdminForm" method="post" enctype="multipart/form-data">
-				<table class="alternative-color">
+				<table class="table table-no-border voffset5">
 					<tr>
 						<td width="30%">
 							<fmt:message key="admin.maximum.dimensions.medium.image" />
 						</td>
 						
 						<td width="70%">
-							<html:text property="mediumImageDimensions" size="50" maxlength="255">
+							<html:text property="mediumImageDimensions" styleClass="form-control" size="50" maxlength="255">
 						</html:text></td>
 					</tr>
 					
@@ -46,18 +42,17 @@
 						</td>
 						
 						<td width="70%">
-							<html:text property="thumbnailImageDimensions" size="50" maxlength="255">
+							<html:text property="thumbnailImageDimensions" styleClass="form-control" size="50" maxlength="255">
 						</html:text></td>
 					</tr>					
 				</table>
-				<html:submit><fmt:message key="admin.button.save" /></html:submit>
+				<html:submit styleClass="btn btn-primary pull-right"><fmt:message key="admin.button.save" /></html:submit>
 			</html:form>
 			
-		</div>
-		<!--closes content-->
-
 		<div id="footer">
 		</div>
 		<!--closes footer-->
+		
+		</lams:Page>
 	</body>
 </head>

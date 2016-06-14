@@ -14,6 +14,8 @@
 		<c:set var="title"><fmt:message key="pageTitle.admin" /></c:set>
 		<lams:Page type="admin" title="${title}">
 
+			<a href="<lams:LAMSURL/>/admin/sysadminstart.do" class="btn btn-default"><fmt:message key="admin.return" /></a>
+
 			<c:choose>
 			<c:when test="${error}">
 				<lams:Alert type="warn" id="no-edit" close="false">
@@ -31,14 +33,12 @@
 				
 				<html:hidden property="dispatch" value="saveContent" />
 				
-				<div class="form-group">
+				<div class="form-group voffset5">
 					<label for="gmapKey"><fmt:message key="admin.gmapKey" /></label>
 					<html:text property="gmapKey" size="50" maxlength="255" styleClass="form-control form-control-inline"></html:text>
 				</div>
 			
-				<a href="<lams:LAMSURL/>/admin/sysadminstart.do" class="btn btn-default"><fmt:message key="admin.return" /></a>
-				
-				<html:submit styleClass="btn btn-default btn-primary pull-right"><fmt:message key="button.save"/></html:submit>
+				<html:submit styleClass="btn btn-primary pull-right"><fmt:message key="button.save"/></html:submit>
 			
 			</html:form>
 			
