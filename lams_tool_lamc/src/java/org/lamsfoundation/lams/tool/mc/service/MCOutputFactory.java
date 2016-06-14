@@ -31,6 +31,7 @@ import java.util.TreeMap;
 import org.lamsfoundation.lams.tool.OutputFactory;
 import org.lamsfoundation.lams.tool.ToolOutput;
 import org.lamsfoundation.lams.tool.ToolOutputDefinition;
+import org.lamsfoundation.lams.tool.mc.McAppConstants;
 import org.lamsfoundation.lams.tool.mc.pojos.McContent;
 import org.lamsfoundation.lams.tool.mc.pojos.McOptsContent;
 import org.lamsfoundation.lams.tool.mc.pojos.McQueContent;
@@ -40,9 +41,6 @@ import org.lamsfoundation.lams.tool.mc.pojos.McUsrAttempt;
 
 public class MCOutputFactory extends OutputFactory {
 
-    protected static final String OUTPUT_NAME_LEARNER_MARK = "learner.mark";
-    protected static final String OUTPUT_NAME_LEARNER_ALL_CORRECT = "learner.all.correct";
-
     /**
      * @see org.lamsfoundation.lams.tool.OutputDefinitionFactory#getToolOutputDefinitions(java.lang.Object)
      */
@@ -51,15 +49,15 @@ public class MCOutputFactory extends OutputFactory {
 	    int definitionType) {
 
 	TreeMap<String, ToolOutputDefinition> definitionMap = new TreeMap<String, ToolOutputDefinition>();
-	ToolOutputDefinition definition = buildBooleanOutputDefinition(OUTPUT_NAME_LEARNER_ALL_CORRECT);
-	definitionMap.put(OUTPUT_NAME_LEARNER_ALL_CORRECT, definition);
+	ToolOutputDefinition definition = buildBooleanOutputDefinition(McAppConstants.OUTPUT_NAME_LEARNER_ALL_CORRECT);
+	definitionMap.put(McAppConstants.OUTPUT_NAME_LEARNER_ALL_CORRECT, definition);
 
 	if (toolContentObject != null) {
 	    McContent content = (McContent) toolContentObject;
 
-	    definition = buildRangeDefinition(OUTPUT_NAME_LEARNER_MARK, new Long(0),
+	    definition = buildRangeDefinition(McAppConstants.OUTPUT_NAME_LEARNER_MARK, new Long(0),
 		    new Long(content.getTotalMarksPossible().longValue()), true);
-	    definitionMap.put(OUTPUT_NAME_LEARNER_MARK, definition);
+	    definitionMap.put(McAppConstants.OUTPUT_NAME_LEARNER_MARK, definition);
 	} else {
 	    log.error(
 		    "Unable to build content based output definitions for Multiple Choice as no tool content object supplied. Only including the definitions that do not need any content.");
@@ -79,11 +77,12 @@ public class MCOutputFactory extends OutputFactory {
 	    McQueUsr queUser = mcService.getMcUserBySession(learnerId, session.getUid());
 	    if (queUser != null) {
 
-		if (names == null || names.contains(OUTPUT_NAME_LEARNER_MARK)) {
-		    output.put(OUTPUT_NAME_LEARNER_MARK, getLearnerMark(queUser));
+		if (names == null || names.contains(McAppConstants.OUTPUT_NAME_LEARNER_MARK)) {
+		    output.put(McAppConstants.OUTPUT_NAME_LEARNER_MARK, getLearnerMark(queUser));
 		}
-		if (names == null || names.contains(OUTPUT_NAME_LEARNER_ALL_CORRECT)) {
-		    output.put(OUTPUT_NAME_LEARNER_ALL_CORRECT, getLearnerAllCorrect(mcService, queUser));
+		if (names == null || names.contains(McAppConstants.OUTPUT_NAME_LEARNER_ALL_CORRECT)) {
+		    output.put(McAppConstants.OUTPUT_NAME_LEARNER_ALL_CORRECT,
+			    getLearnerAllCorrect(mcService, queUser));
 		}
 	    }
 	}
@@ -98,9 +97,9 @@ public class MCOutputFactory extends OutputFactory {
 		McQueUsr queUser = mcService.getMcUserBySession(learnerId, session.getUid());
 
 		if (queUser != null) {
-		    if (name.equals(OUTPUT_NAME_LEARNER_MARK)) {
+		    if (name.equals(McAppConstants.OUTPUT_NAME_LEARNER_MARK)) {
 			return getLearnerMark(queUser);
-		    } else if (name.equals(OUTPUT_NAME_LEARNER_ALL_CORRECT)) {
+		    } else if (name.equals(McAppConstants.OUTPUT_NAME_LEARNER_ALL_CORRECT)) {
 			return getLearnerAllCorrect(mcService, queUser);
 		    }
 		}
@@ -120,8 +119,8 @@ public class MCOutputFactory extends OutputFactory {
 	} else {
 	    mark = new Long(0);
 	}
-	return new ToolOutput(MCOutputFactory.OUTPUT_NAME_LEARNER_MARK,
-		getI18NText(MCOutputFactory.OUTPUT_NAME_LEARNER_MARK, true), mark);
+	return new ToolOutput(McAppConstants.OUTPUT_NAME_LEARNER_MARK,
+		getI18NText(McAppConstants.OUTPUT_NAME_LEARNER_MARK, true), mark);
     }
 
     /**
@@ -130,8 +129,8 @@ public class MCOutputFactory extends OutputFactory {
      */
     private ToolOutput getLearnerAllCorrect(IMcService mcService, McQueUsr queUser) {
 	boolean allCorrect = allQuestionsCorrect(mcService, queUser);
-	return new ToolOutput(MCOutputFactory.OUTPUT_NAME_LEARNER_ALL_CORRECT,
-		getI18NText(MCOutputFactory.OUTPUT_NAME_LEARNER_ALL_CORRECT, true), allCorrect);
+	return new ToolOutput(McAppConstants.OUTPUT_NAME_LEARNER_ALL_CORRECT,
+		getI18NText(McAppConstants.OUTPUT_NAME_LEARNER_ALL_CORRECT, true), allCorrect);
     }
 
     // written to cope with more than one correct option for each question but only tested with
