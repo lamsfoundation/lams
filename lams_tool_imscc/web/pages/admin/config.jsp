@@ -10,33 +10,29 @@
 	</lams:head>
 	
 	<body class="stripes">
-		<div id="content">
 
-			<h1>
-				<fmt:message key="admin.page.title" />
-			</h1>
+		<c:set var="title"><fmt:message key="admin.page.title" /></c:set>
+		<lams:Page type="admin" title="${title}">
 			
-			<a href="<lams:LAMSURL/>/admin/sysadminstart.do"><fmt:message key="admin.return" /></a>
-
-			<p>
+			<a href="<lams:LAMSURL/>/admin/sysadminstart.do" class="btn btn-default"><fmt:message key="admin.return" /></a>
 
 			<%@ include file="/common/messages.jsp"%>
 		
 			<c:if test="${savedSuccess}">
-				<p class="info">
+				<lams:Alert type="info" id="admin-success" close="false">
 					<fmt:message key="admin.success" />
-				<p>
+				</lams:Alert>
 			</c:if>
 			
 			<html:form action="/laimsc11admin/saveContent" styleId="commonCartridgeAdminForm" method="post" enctype="multipart/form-data">
-				<table class="alternative-color">
+				<table class="table table-no-border voffset5">
 					<tr>
 						<td width="30%">
 							<fmt:message key="admin.expose.user.name" />
 						</td>
 						
 						<td width="70%">
-							<html:checkbox property="allowExposeUserName" />
+							<html:checkbox property="allowExposeUserName"/>
 						</td>
 					</tr>
 					
@@ -46,18 +42,17 @@
 						</td>
 						
 						<td width="70%">
-							<html:checkbox property="allowExposeUserEmail" />
+							<html:checkbox property="allowExposeUserEmail"/>
 						</td>
 					</tr>					
 				</table>
-				<html:submit><fmt:message key="admin.button.save" /></html:submit>
+				<html:submit styleClass="btn btn-primary pull-right"><fmt:message key="admin.button.save" /></html:submit>
 			</html:form>
 			
-		</div>
-		<!--closes content-->
-
 		<div id="footer">
 		</div>
 		<!--closes footer-->
+		
+		</lams:Page>
 	</body>
 </head>
