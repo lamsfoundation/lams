@@ -4,39 +4,42 @@
 	<lams:LAMSURL />
 </c:set>
 
-<div id="content">
+<c:set var="title"><fmt:message key="admin.title" /></c:set>
+<lams:Page type="admin" title="${title}">
 
-<h1><fmt:message key="admin.title" /></h1>
+	<logic:messagesPresent>
+		<lams:Alert type="danger" id="form-error" close="false">
+		<html:messages id="error">
+			<c:out value="${error}" escapeXml="false" />
+			<br />
+		</html:messages>
+		</lams:Alert>
+	</logic:messagesPresent> 
+	
+	<html:form action="/admin/save">
 
-<logic:messagesPresent>
-	<p class="warning"><html:messages id="error">
-		<c:out value="${error}" escapeXml="false" />
-		<br />
-	</html:messages></p>
-</logic:messagesPresent> <html:form action="/admin/save">
+		<lams:Alert type="warn" id="form-warn" close="false">
+			<fmt:message key="config.securitySalt.notice" />
+			<p>
+			<fmt:message key="config.securitySalt.notice2" />
+			</p>
+		</lams:Alert>
+	
+		<table class="table table-no-border">
+			<tr>
+				<td width="25%"><fmt:message key="config.serverURL" /></td>
+				<td><html:text property="serverURL" size="50" styleClass="form-control"/></td>
+			</tr>
+			<tr>
+				<td><fmt:message key="config.securitySalt"/></td>
+				<td><html:text property="securitySalt" size="50"  styleClass="form-control"/></td>
+			</tr>	
+		</table>
+	
+		<div class="pull-right">
+			<html:cancel styleClass="btn btn-default"><fmt:message key="label.cancel" /></html:cancel>
+			<html:submit styleClass="btn btn-primary loffset5"><fmt:message key="label.save" /></html:submit> 
+		</div>
 
-<div class="warning">
-	<fmt:message key="config.securitySalt.notice" />
-	<p>
-	<fmt:message key="config.securitySalt.notice2" />
-	</p>
-</div>
-
-	<table>
-		<tr>
-			<td><fmt:message key="config.serverURL" /></td>
-			<td><html:text property="serverURL" size="50"/></td>
-		</tr>
-		<tr>
-			<td><fmt:message key="config.securitySalt"/></td>
-			<td><html:text property="securitySalt" size="50" /></td>
-		</tr>	
-	</table>
-
-	<div class="align-right"><html:submit styleClass="button">
-		<fmt:message key="label.save" />
-	</html:submit> <html:cancel styleClass="button">
-		<fmt:message key="label.cancel" />
-	</html:cancel></div>
-</html:form></div>
-
+	</html:form>
+</lams:Page>
