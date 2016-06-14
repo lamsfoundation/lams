@@ -13,12 +13,14 @@
 		<c:set var="title"><fmt:message key="admin.page.title" /></c:set>
 		<lams:Page type="admin" title="${title}">
 			
+			<a href="<lams:LAMSURL/>/admin/sysadminstart.do" class="btn btn-default"><fmt:message key="admin.return" /></a>
+			
 			<%@ include file="/common/messages.jsp"%>
 		
 			<c:if test="${savedSuccess}">
-				<p class="info">
+				<lams:Alert type="info" id="admin-success" close="false">
 					<fmt:message key="admin.success" />
-				<p>
+				</lams:Alert>
 			</c:if>
 			
 			<html:form action="/admin/saveContent" styleId="scratchieAdminForm" method="post" enctype="multipart/form-data">
@@ -32,7 +34,6 @@
 					<html:text property="presetMarks" size="50" maxlength="255" styleClass="form-control form-control-inline">
 					</html:text>
 				</div>
-				<a href="<lams:LAMSURL/>/admin/sysadminstart.do" class="btn btn-default"><fmt:message key="admin.return" /></a>
 				<html:submit styleClass="btn btn-primary  pull-right"><fmt:message key="admin.button.save" /></html:submit>
 			</html:form>
 			
