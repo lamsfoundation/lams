@@ -261,6 +261,32 @@ public class McMonitoringAction extends LamsDispatchAction implements McAppConst
     }
 
     /**
+     * Set tool's activityEvaluation
+     *
+     * @param mapping
+     * @param form
+     * @param request
+     * @param response
+     * @return
+     * @throws JSONException
+     * @throws IOException
+     */
+    public ActionForward setActivityEvaluation(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+	    HttpServletResponse response) throws JSONException, IOException {
+	IMcService service = McServiceProxy.getMcService(getServlet().getServletContext());
+
+	Long contentID = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_CONTENT_ID);
+	String activityEvaluation = WebUtil.readStrParam(request, McAppConstants.ATTR_ACTIVITY_EVALUATION);
+	service.setActivityEvaluation(contentID, activityEvaluation);
+
+	JSONObject responseJSON = new JSONObject();
+	responseJSON.put("success", "true");
+	response.setContentType("application/json;charset=utf-8");
+	response.getWriter().print(new String(responseJSON.toString()));
+	return null;
+    }
+
+    /**
      * Populate user jqgrid table on summary page.
      */
     public ActionForward userMasterDetail(ActionMapping mapping, ActionForm form, HttpServletRequest request,

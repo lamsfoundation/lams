@@ -38,6 +38,7 @@ import org.lamsfoundation.lams.tool.mc.McQuestionDTO;
 import org.lamsfoundation.lams.tool.mc.McSessionMarkDTO;
 import org.lamsfoundation.lams.tool.mc.McUserMarkDTO;
 import org.lamsfoundation.lams.tool.mc.ReflectionDTO;
+import org.lamsfoundation.lams.tool.mc.dto.ToolOutputDTO;
 import org.lamsfoundation.lams.tool.mc.pojos.McContent;
 import org.lamsfoundation.lams.tool.mc.pojos.McOptsContent;
 import org.lamsfoundation.lams.tool.mc.pojos.McQueContent;
@@ -131,6 +132,8 @@ public interface IMcService {
     void updateMcOptionsContent(McOptsContent mcOptsContent) throws McApplicationException;
 
     McUsrAttempt getUserAttemptByQuestion(Long queUsrUid, Long mcQueContentId) throws McApplicationException;
+    
+    List<ToolOutputDTO> getLearnerMarksByContentId(Long toolContentId);
 
     void copyToolContent(Long fromContentId, Long toContentId) throws ToolException;
 
@@ -171,6 +174,18 @@ public interface IMcService {
      * @return
      */
     boolean isGroupedActivity(long toolContentID);
+
+    /**
+     * Get the definitions for possible output for an activity, based on the toolContentId. These may be definitions
+     * that are always available for the tool (e.g. number of marks for Multiple Choice) or a custom definition created
+     * for a particular activity such as the answer to the third question contains the word Koala and hence the need for
+     * the toolContentId
+     * 
+     * @return SortedMap of ToolOutputDefinitions with the key being the name of each definition
+     */
+    String getActivityEvaluation(Long toolContentId);
+    
+    void setActivityEvaluation(Long toolContentId, String toolOutputDefinition);
 
     /**
      * @param mcContent
