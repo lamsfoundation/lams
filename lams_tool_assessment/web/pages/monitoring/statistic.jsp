@@ -21,6 +21,9 @@
 					if (json.success == "true") {
 						alert("<fmt:message key='label.tool.output.has.been.changed'/>");
 					}
+				},
+				error: function (xhr, ajaxOptions, thrownError) {
+					alert("<fmt:message key='label.operation.failed'/>");
 				}
 			});
 		});

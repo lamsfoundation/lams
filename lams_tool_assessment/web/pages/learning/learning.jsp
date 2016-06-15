@@ -656,7 +656,7 @@
 					<c:otherwise>
 						<c:if test="${isResubmitAllowed && hasEditRight}">
 							<html:link href="javascript:;" property="resubmit" onclick="return resubmit()" 
-									styleClass="btn btn-primary">
+									styleClass="btn btn-default">
 								<fmt:message key="label.learning.resubmit" />
 							</html:link>
 						</c:if>	

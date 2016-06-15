@@ -20,14 +20,15 @@
  * ****************************************************************
  */
 
-
 package org.lamsfoundation.lams.tool.assessment.dao.hibernate;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.hibernate.Query;
 import org.lamsfoundation.lams.dao.hibernate.LAMSBaseDAO;
 import org.lamsfoundation.lams.tool.assessment.dao.AssessmentResultDAO;
+import org.lamsfoundation.lams.tool.assessment.dto.AssessmentUserDTO;
 import org.lamsfoundation.lams.tool.assessment.model.AssessmentResult;
 import org.springframework.stereotype.Repository;
 
@@ -59,13 +60,20 @@ public class AssessmentResultDAOHibernate extends LAMSBaseDAO implements Assessm
 	    + AssessmentResult.class.getName()
 	    + " AS r WHERE r.user.userId=? AND r.assessment.uid=? AND (r.finishDate != null)";
 
-    private static final String FIND_LAST_ASSESSMENT_RESULT_GRADE = "select r.grade FROM "
-	    + AssessmentResult.class.getName()
+    private static final String LAST_ASSESSMENT_RESULT_GRADE = "select r.grade FROM " + AssessmentResult.class.getName()
 	    + " AS r WHERE r.user.userId=? AND r.assessment.uid=? AND (r.finishDate != null) AND r.latest=1";
+
+    private static final String LAST_ASSESSMENT_RESULT_GRADES_BY_CONTENT_ID = "select r.user.userId, r.grade FROM "
+	    + AssessmentResult.class.getName()
+	    + " AS r WHERE r.assessment.contentId=? AND (r.finishDate != null) AND r.latest=1";
 
     private static final String BEST_SCORE_BY_SESSION_AND_USER = "SELECT MAX(r.grade) FROM "
 	    + AssessmentResult.class.getName()
-	    + " AS r WHERE r.user.userId = ? AND r.sessionId=? AND (r.finishDate != null) ORDER BY r.startDate ASC";
+	    + " AS r WHERE r.user.userId = ? AND r.sessionId=? AND (r.finishDate != null)";
+
+    private static final String BEST_SCORES_BY_CONTENT_ID = "SELECT r.user.userId, MAX(r.grade) FROM "
+	    + AssessmentResult.class.getName()
+	    + " AS r WHERE r.assessment.contentId=? AND (r.finishDate != null) GROUP BY r.user.userId";
 
     private static final String FIRST_SCORE_BY_SESSION_AND_USER = "SELECT r.grade FROM "
 	    + AssessmentResult.class.getName()
@@ -73,7 +81,11 @@ public class AssessmentResultDAOHibernate extends LAMSBaseDAO implements Assessm
 
     private static final String AVERAGE_SCORE_BY_SESSION_AND_USER = "SELECT AVG(r.grade) FROM "
 	    + AssessmentResult.class.getName()
-	    + " AS r WHERE r.user.userId = ? AND r.sessionId=? AND (r.finishDate != null) ORDER BY r.startDate ASC";
+	    + " AS r WHERE r.user.userId = ? AND r.sessionId=? AND (r.finishDate != null)";
+
+    private static final String AVERAGE_SCORES_BY_CONTENT_ID = "SELECT r.user.userId, AVG(r.grade) FROM "
+	    + AssessmentResult.class.getName()
+	    + " AS r WHERE r.assessment.contentId=? AND (r.finishDate != null) GROUP BY r.user.userId";
 
     private static final String FIND_LAST_ASSESSMENT_RESULT_TIME_TAKEN = "select UNIX_TIMESTAMP(r.finishDate) - UNIX_TIMESTAMP(r.startDate) FROM "
 	    + AssessmentResult.class.getName()
@@ -84,25 +96,24 @@ public class AssessmentResultDAOHibernate extends LAMSBaseDAO implements Assessm
     @Override
     @SuppressWarnings("unchecked")
     public List<AssessmentResult> getAssessmentResults(Long assessmentUid, Long userId) {
-	return (List<AssessmentResult>) doFind(AssessmentResultDAOHibernate.FIND_BY_ASSESSMENT_AND_USER_AND_FINISHED,
+	return (List<AssessmentResult>) doFind(FIND_BY_ASSESSMENT_AND_USER_AND_FINISHED,
 		new Object[] { userId, assessmentUid });
     }
 
     @Override
     public List<AssessmentResult> getFinishedAssessmentResultsByUser(Long sessionId, Long userId) {
-	return (List<AssessmentResult>) doFind(AssessmentResultDAOHibernate.FIND_BY_SESSION_AND_USER_AND_FINISHED,
+	return (List<AssessmentResult>) doFind(FIND_BY_SESSION_AND_USER_AND_FINISHED,
 		new Object[] { userId, sessionId });
     }
 
     @Override
     public List<AssessmentResult> getAssessmentResultsBySession(Long sessionId, Long userId) {
-	return (List<AssessmentResult>) doFind(AssessmentResultDAOHibernate.FIND_BY_SESSION_AND_USER,
-		new Object[] { userId, sessionId });
+	return (List<AssessmentResult>) doFind(FIND_BY_SESSION_AND_USER, new Object[] { userId, sessionId });
     }
 
     @Override
     public AssessmentResult getLastAssessmentResult(Long assessmentUid, Long userId) {
-	Query q = getSession().createQuery(AssessmentResultDAOHibernate.FIND_LAST_BY_ASSESSMENT_AND_USER);
+	Query q = getSession().createQuery(FIND_LAST_BY_ASSESSMENT_AND_USER);
 	q.setParameter(0, userId);
 	q.setParameter(1, assessmentUid);
 	return (AssessmentResult) q.uniqueResult();
@@ -111,7 +122,7 @@ public class AssessmentResultDAOHibernate extends LAMSBaseDAO implements Assessm
     @Override
     public AssessmentResult getLastFinishedAssessmentResult(Long assessmentUid, Long userId) {
 
-	Query q = getSession().createQuery(AssessmentResultDAOHibernate.FIND_LAST_FINISHED_BY_ASSESSMENT_AND_USER);
+	Query q = getSession().createQuery(FIND_LAST_FINISHED_BY_ASSESSMENT_AND_USER);
 	q.setParameter(0, userId);
 	q.setParameter(1, assessmentUid);
 	return (AssessmentResult) q.uniqueResult();
@@ -120,23 +131,36 @@ public class AssessmentResultDAOHibernate extends LAMSBaseDAO implements Assessm
     @Override
     public Float getLastTotalScoreByUser(Long assessmentUid, Long userId) {
 
-	Query q = getSession().createQuery(AssessmentResultDAOHibernate.FIND_LAST_ASSESSMENT_RESULT_GRADE);
+	Query q = getSession().createQuery(LAST_ASSESSMENT_RESULT_GRADE);
 	q.setParameter(0, userId);
 	q.setParameter(1, assessmentUid);
 	return ((Float) q.uniqueResult());
     }
 
     @Override
+    public List<AssessmentUserDTO> getLastTotalScoresByContentId(Long toolContentId) {
+	List<Object[]> list = (List<Object[]>) doFind(LAST_ASSESSMENT_RESULT_GRADES_BY_CONTENT_ID,
+		new Object[] { toolContentId });
+	return convertResultsToAssessmentUserDTOList(list);
+    }
+
+    @Override
     public Float getBestTotalScoreByUser(Long sessionId, Long userId) {
-	Query q = getSession().createQuery(AssessmentResultDAOHibernate.BEST_SCORE_BY_SESSION_AND_USER);
+	Query q = getSession().createQuery(BEST_SCORE_BY_SESSION_AND_USER);
 	q.setParameter(0, userId);
 	q.setParameter(1, sessionId);
 	return ((Float) q.uniqueResult());
     }
 
     @Override
+    public List<AssessmentUserDTO> getBestTotalScoresByContentId(Long toolContentId) {
+	List<Object[]> list = (List<Object[]>) doFind(BEST_SCORES_BY_CONTENT_ID, new Object[] { toolContentId });
+	return convertResultsToAssessmentUserDTOList(list);
+    }
+
+    @Override
     public Float getFirstTotalScoreByUser(Long sessionId, Long userId) {
-	Query q = getSession().createQuery(AssessmentResultDAOHibernate.FIRST_SCORE_BY_SESSION_AND_USER);
+	Query q = getSession().createQuery(FIRST_SCORE_BY_SESSION_AND_USER);
 	q.setParameter(0, userId);
 	q.setParameter(1, sessionId);
 	q.setMaxResults(1);
@@ -144,12 +168,29 @@ public class AssessmentResultDAOHibernate extends LAMSBaseDAO implements Assessm
     }
 
     @Override
+    public List<AssessmentUserDTO> getFirstTotalScoresByContentId(Long toolContentId) {
+	final String FIRST_SCORES_BY_CONTENT_ID = "SELECT res.user.userId, res.grade FROM " + AssessmentResult.class.getName()
+		+ " AS res WHERE res.startDate = ( SELECT MIN(resMax.startDate) FROM "
+		+ AssessmentResult.class.getName()
+		+ " AS resMax WHERE resMax.user.userId = res.user.userId AND resMax.assessment.contentId=? AND (resMax.finishDate != null) )";
+
+	List<Object[]> list = (List<Object[]>) doFind(FIRST_SCORES_BY_CONTENT_ID, new Object[] { toolContentId });
+	return convertResultsToAssessmentUserDTOList(list);
+    }
+
+    @Override
     public Float getAvergeTotalScoreByUser(Long sessionId, Long userId) {
-	Query q = getSession().createQuery(AssessmentResultDAOHibernate.AVERAGE_SCORE_BY_SESSION_AND_USER);
+	Query q = getSession().createQuery(AVERAGE_SCORE_BY_SESSION_AND_USER);
 	q.setParameter(0, userId);
 	q.setParameter(1, sessionId);
 	Object result = q.uniqueResult();
 	return result == null ? null : ((Double) result).floatValue();
+    }
+
+    @Override
+    public List<AssessmentUserDTO> getAverageTotalScoresByContentId(Long toolContentId) {
+	List<Object[]> list = (List<Object[]>) doFind(AVERAGE_SCORES_BY_CONTENT_ID, new Object[] { toolContentId });
+	return convertResultsToAssessmentUserDTOList(list);
     }
 
     @Override
@@ -165,7 +206,7 @@ public class AssessmentResultDAOHibernate extends LAMSBaseDAO implements Assessm
 
     @Override
     public AssessmentResult getLastFinishedAssessmentResultByUser(Long sessionId, Long userId) {
-	Query q = getSession().createQuery(AssessmentResultDAOHibernate.FIND_LAST_FINISHED_BY_SESSION_AND_USER);
+	Query q = getSession().createQuery(FIND_LAST_FINISHED_BY_SESSION_AND_USER);
 	q.setParameter(0, userId);
 	q.setParameter(1, sessionId);
 	return (AssessmentResult) q.uniqueResult();
@@ -173,14 +214,12 @@ public class AssessmentResultDAOHibernate extends LAMSBaseDAO implements Assessm
 
     @Override
     public List<AssessmentResult> getLastFinishedAssessmentResults(Long contentId) {
-	return (List<AssessmentResult>) doFind(AssessmentResultDAOHibernate.FIND_LAST_FINISHED_RESULTS_BY_CONTENT_ID,
-		new Object[] { contentId });
+	return (List<AssessmentResult>) doFind(FIND_LAST_FINISHED_RESULTS_BY_CONTENT_ID, new Object[] { contentId });
     }
 
     @Override
     public int getAssessmentResultCount(Long assessmentUid, Long userId) {
-	List list = doFind(AssessmentResultDAOHibernate.FIND_ASSESSMENT_RESULT_COUNT_BY_ASSESSMENT_AND_USER,
-		new Object[] { userId, assessmentUid });
+	List list = doFind(FIND_ASSESSMENT_RESULT_COUNT_BY_ASSESSMENT_AND_USER, new Object[] { userId, assessmentUid });
 	if ((list == null) || (list.size() == 0)) {
 	    return 0;
 	} else {
@@ -190,11 +229,35 @@ public class AssessmentResultDAOHibernate extends LAMSBaseDAO implements Assessm
 
     @Override
     public AssessmentResult getAssessmentResultByUid(Long assessmentResultUid) {
-	List list = doFind(AssessmentResultDAOHibernate.FIND_BY_UID, new Object[] { assessmentResultUid });
+	List list = doFind(FIND_BY_UID, new Object[] { assessmentResultUid });
 	if ((list == null) || (list.size() == 0)) {
 	    return null;
 	}
 	return (AssessmentResult) list.get(0);
     }
 
+    private List<AssessmentUserDTO> convertResultsToAssessmentUserDTOList(List<Object[]> list) {
+
+	List<AssessmentUserDTO> lastTotalScores = new ArrayList<AssessmentUserDTO>();
+	if (list != null && list.size() > 0) {
+	    for (Object[] element : list) {
+
+		Long userId = ((Number) element[0]).longValue();
+		float grade;
+		try {
+		    grade = ((Double) element[1]).floatValue();
+		} catch (ClassCastException e) {
+		    grade = (Float) element[1];
+		}
+
+		AssessmentUserDTO userDto = new AssessmentUserDTO();
+		userDto.setUserId(userId);
+		userDto.setGrade(grade);
+		lastTotalScores.add(userDto);
+	    }
+
+	}
+
+	return lastTotalScores;
+    }
 }

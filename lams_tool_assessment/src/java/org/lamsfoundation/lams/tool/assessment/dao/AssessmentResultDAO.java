@@ -25,6 +25,7 @@ package org.lamsfoundation.lams.tool.assessment.dao;
 
 import java.util.List;
 
+import org.lamsfoundation.lams.tool.assessment.dto.AssessmentUserDTO;
 import org.lamsfoundation.lams.tool.assessment.model.AssessmentResult;
 
 public interface AssessmentResultDAO extends DAO {
@@ -41,11 +42,19 @@ public interface AssessmentResultDAO extends DAO {
 
     Float getLastTotalScoreByUser(Long assessmentUid, Long userId);
 
+    List<AssessmentUserDTO> getLastTotalScoresByContentId(Long assessmentUid);
+
     Float getBestTotalScoreByUser(Long sessionId, Long userId);
+    
+    List<AssessmentUserDTO> getBestTotalScoresByContentId(Long assessmentUid);
 
     Float getFirstTotalScoreByUser(Long sessionId, Long userId);
+    
+    List<AssessmentUserDTO> getFirstTotalScoresByContentId(Long assessmentUid);
 
     Float getAvergeTotalScoreByUser(Long sessionId, Long userId);
+    
+    List<AssessmentUserDTO> getAverageTotalScoresByContentId(Long assessmentUid);
 
     Integer getLastFinishedAssessmentResultTimeTaken(Long assessmentUid, Long userId);
 
