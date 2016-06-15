@@ -271,6 +271,12 @@ public interface McAppConstants {
     public static final String MODE = "mode";
     public static final String LEARNING_MODE = "learningMode";
     public static final String REFLECT = "reflect";
+    
+  //output definitions
+    public static final String ATTR_ACTIVITY_EVALUATION = "activityEvaluation";
+    public static final String ATTR_TOOL_OUTPUT_DEFINITIONS = "toolOutputDefinitions";
+    public static final String OUTPUT_NAME_LEARNER_MARK = "learner.mark";
+    public static final String OUTPUT_NAME_LEARNER_ALL_CORRECT = "learner.all.correct";
 
     /*
      * exception constants

@@ -93,6 +93,7 @@ import org.lamsfoundation.lams.tool.mc.dao.IMcQueContentDAO;
 import org.lamsfoundation.lams.tool.mc.dao.IMcSessionDAO;
 import org.lamsfoundation.lams.tool.mc.dao.IMcUserDAO;
 import org.lamsfoundation.lams.tool.mc.dao.IMcUsrAttemptDAO;
+import org.lamsfoundation.lams.tool.mc.dto.ToolOutputDTO;
 import org.lamsfoundation.lams.tool.mc.pojos.McContent;
 import org.lamsfoundation.lams.tool.mc.pojos.McOptsContent;
 import org.lamsfoundation.lams.tool.mc.pojos.McQueContent;
@@ -672,6 +673,11 @@ public class McServicePOJO
 			    + e.getMessage(),
 		    e);
 	}
+    }
+    
+    @Override
+    public List<ToolOutputDTO> getLearnerMarksByContentId(Long toolContentId) {
+	return mcUsrAttemptDAO.getLearnerMarksByContentId(toolContentId);
     }
 
     @Override
@@ -1618,6 +1624,11 @@ public class McServicePOJO
     public ToolOutput getToolOutput(String name, Long toolSessionId, Long learnerId) {
 	return mcOutputFactory.getToolOutput(name, this, toolSessionId, learnerId);
     }
+    
+    @Override
+    public List<ToolOutput> getToolOutputs(String name, Long toolContentId) {
+	return mcOutputFactory.getToolOutputs(name, this, toolContentId);
+    }
 
     @Override
     public void forceCompleteUser(Long toolSessionId, User user) {
@@ -1671,6 +1682,16 @@ public class McServicePOJO
     @Override
     public boolean isGroupedActivity(long toolContentID) {
 	return toolService.isGroupedActivity(toolContentID);
+    }
+
+    @Override
+    public String getActivityEvaluation(Long toolContentId) {
+	return toolService.getActivityEvaluation(toolContentId);
+    }
+
+    @Override
+    public void setActivityEvaluation(Long toolContentId, String toolOutputDefinition) {
+	toolService.setActivityEvaluation(toolContentId, toolOutputDefinition);
     }
 
     /**

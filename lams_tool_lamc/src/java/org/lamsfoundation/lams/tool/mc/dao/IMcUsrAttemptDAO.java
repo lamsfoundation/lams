@@ -24,6 +24,7 @@ package org.lamsfoundation.lams.tool.mc.dao;
 
 import java.util.List;
 
+import org.lamsfoundation.lams.tool.mc.dto.ToolOutputDTO;
 import org.lamsfoundation.lams.tool.mc.pojos.McUsrAttempt;
 
 /**
@@ -101,5 +102,13 @@ public interface IMcUsrAttemptDAO {
     int getUserTotalMark(final Long userUid);
 
     McUsrAttempt getUserAttemptByUid(Long uid);
+    
+    /**
+     * Returns all existing total marks for users belonging to tool content.
+     * 
+     * @param toolContentId
+     * @return
+     */
+    List<ToolOutputDTO> getLearnerMarksByContentId(Long toolContentId);
 
 }
