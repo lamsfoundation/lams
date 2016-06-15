@@ -75,8 +75,6 @@ public class LamsToolService implements ILamsToolService {
     private static final String LEADER_SELECTION_TOOL_OUTPUT_NAME_LEADER_USERID = "leader.user.id";
 
     private IActivityDAO activityDAO;
-    private ILessonDAO lessonDAO;
-    private ILearnerProgressDAO learnerProgressDAO;
     private IToolDAO toolDAO;
     private IToolSessionDAO toolSessionDAO;
     private IToolContentDAO toolContentDAO;
@@ -187,7 +185,7 @@ public class LamsToolService implements ILamsToolService {
 
 	// Get the first (only) ActivityEvaluation if it exists
 	ActivityEvaluation activityEvaluation;
-	boolean isToolOutputDefinitionChanged = false;
+	boolean isToolOutputDefinitionChanged = true;
 	if (activityEvaluations.isEmpty()) {
 	    activityEvaluation = new ActivityEvaluation();
 	    activityEvaluation.setActivity(toolActivity);
@@ -210,13 +208,7 @@ public class LamsToolService implements ILamsToolService {
 
 	//update gradebook marks if required
 	if (isToolOutputDefinitionChanged) {
-	    Lesson lesson = lessonDAO.getLessonForActivity(toolActivity.getActivityId());
-	    List<User> users = learnerProgressDAO.getLearnersCompletedActivity(toolActivity);
-
-	    //update for all users in activity
-	    for (User user : users) {
-		gradebookService.updateUserActivityGradebookMark(lesson, toolActivity, user);
-	    }
+	    gradebookService.updateUserMarksForActivity(toolActivity);
 	}
 
     }
@@ -336,14 +328,6 @@ public class LamsToolService implements ILamsToolService {
 
     public void setActivityDAO(IActivityDAO activityDAO) {
 	this.activityDAO = activityDAO;
-    }
-
-    public void setLearnerProgressDAO(ILearnerProgressDAO learnerProgressDAO) {
-	this.learnerProgressDAO = learnerProgressDAO;
-    }
-
-    public void setLessonDAO(ILessonDAO lessonDAO) {
-	this.lessonDAO = lessonDAO;
     }
 
     public void setToolSessionDAO(IToolSessionDAO toolSessionDAO) {

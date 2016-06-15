@@ -692,6 +692,11 @@ public class PeerreviewServiceImpl
     public ToolOutput getToolOutput(String name, Long toolSessionId, Long learnerId) {
 	return null;
     }
+    
+    @Override
+    public List<ToolOutput> getToolOutputs(String name, Long toolContentId) {
+	return new ArrayList<ToolOutput>();
+    }
 
     @Override
     public void forceCompleteUser(Long toolSessionId, User user) {

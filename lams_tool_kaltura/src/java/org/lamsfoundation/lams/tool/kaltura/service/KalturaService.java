@@ -25,6 +25,7 @@
 package org.lamsfoundation.lams.tool.kaltura.service;
 
 import java.sql.Timestamp;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -169,6 +170,11 @@ public class KalturaService implements ToolSessionManager, ToolContentManager, I
     @Override
     public ToolOutput getToolOutput(String name, Long toolSessionId, Long learnerId) {
 	return getKalturaOutputFactory().getToolOutput(name, this, toolSessionId, learnerId);
+    }
+    
+    @Override
+    public List<ToolOutput> getToolOutputs(String name, Long toolContentId) {
+	return new ArrayList<ToolOutput>();
     }
 
     @Override

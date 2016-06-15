@@ -24,6 +24,7 @@
 
 package org.lamsfoundation.lams.tool.videoRecorder.service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.SortedMap;
 
@@ -122,6 +123,11 @@ public class VideoRecorderService implements ToolSessionManager, ToolContentMana
     @Override
     public ToolOutput getToolOutput(String name, Long toolSessionId, Long learnerId) {
 	return null;
+    }
+    
+    @Override
+    public List<ToolOutput> getToolOutputs(String name, Long toolContentId) {
+	return new ArrayList<ToolOutput>();
     }
 
     @Override
