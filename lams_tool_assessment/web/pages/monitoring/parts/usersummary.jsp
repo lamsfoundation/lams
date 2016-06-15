@@ -221,7 +221,7 @@
 				</div>
 			</c:forEach>
 
-			<a href="#nogo" onclick="refreshSummaryPage();" class="btn btn-default btn-sm button-add-item voffset20 pull-right">
+			<a href="#nogo" onclick="refreshSummaryPage();" class="btn btn-default btn-sm voffset20 pull-right">
 				<fmt:message key="label.monitoring.user.summary.ok" /> 
 			</a>
 
