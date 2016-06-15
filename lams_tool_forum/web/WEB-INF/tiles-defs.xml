@@ -67,15 +67,12 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 	<!-- MAIN PAGE for learner -->	
 	<definition name="tiles:/learning/forum/viewForum" extends="tiles:learner:layout">
     	<put name="body" value="/jsps/learning/viewforum.jsp"/>
-    	<put name="bodyMobile" value="/jsps/learning/mobile/viewforum.jsp"/>
 	</definition>
 	<definition name="tiles:/learning/forum/submissionDeadline" extends="tiles:learner:layout">
     	<put name="body" value="/jsps/learning/submissionDeadline.jsp"/>
-    	<put name="bodyMobile" value="/jsps/learning/mobile/submissionDeadline.jsp"/>
 	</definition>
 	<definition name="tiles:/learning/forum/defineLater" extends="tiles:learner:layout">
     	<put name="body" value="/jsps/learning/definelater.jsp"/>
-    	<put name="bodyMobile" value="/jsps/learning/mobile/definelater.jsp"/>
 	</definition>
 	
 	<definition name="tiles:/learning/forum/viewTopic" path="/jsps/learning/viewtopic.jsp" />
@@ -85,24 +82,20 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
     <definition name="tiles:/learning/forum/newTopic" extends="tiles:learner:layout">
     	<put name="pageTitleKey" value="title.message.add"/>
     	<put name="body" value="/jsps/learning/create.jsp"/>
-    	<put name="bodyMobile" value="/jsps/learning/mobile/create.jsp"/>
 	</definition>
 
     <definition name="tiles:/learning/forum/replyTopic" extends="tiles:learner:layout">
           <put name="pageTitleKey" value="title.message.reply"/>
           <put name="body" value="/jsps/learning/reply.jsp"/>
-          <put name="bodyMobile" value="/jsps/learning/mobile/reply.jsp"/>
     </definition>
     
     <definition name="tiles:/learning/forum/editTopic" extends="tiles:learner:layout">
     	<put name="pageTitleKey" value="title.message.edit"/>
     	<put name="body" value="/jsps/learning/edit.jsp"/>
-    	<put name="bodyMobile" value="/jsps/learning/mobile/edit.jsp"/>
 	</definition>
     <definition name="tiles:/learning/reflection" extends="tiles:learner:layout">
     	<put name="pageTitleKey" value="title.reflection"/>
     	<put name="body" value="/jsps/learning/notebook.jsp"/>
-    	<put name="bodyMobile" value="/jsps/learning/mobile/notebook.jsp"/>
 	</definition>
 	<!-- E: Learning -->
 	
