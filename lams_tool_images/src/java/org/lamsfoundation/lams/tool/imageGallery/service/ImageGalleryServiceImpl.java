@@ -1039,6 +1039,11 @@ public class ImageGalleryServiceImpl implements IImageGalleryService, ToolConten
     public ToolOutput getToolOutput(String name, Long toolSessionId, Long learnerId) {
 	return imageGalleryOutputFactory.getToolOutput(name, this, toolSessionId, learnerId);
     }
+    
+    @Override
+    public List<ToolOutput> getToolOutputs(String name, Long toolContentId) {
+	return new ArrayList<ToolOutput>();
+    }
 
     @Override
     public void forceCompleteUser(Long toolSessionId, User user) {

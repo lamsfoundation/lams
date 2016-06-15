@@ -486,6 +486,39 @@ public class LamsCoreToolService implements ILamsCoreToolService, ApplicationCon
 	    throw new ToolException(message, e);
 	}
     }
+    
+    @Override
+    public List<ToolOutput> getOutputsFromTool(String conditionName, ToolActivity toolActivity)
+	    throws ToolException {
+
+	if (toolActivity == null) {
+	    String error = "The toolActivity is null. Unable to get tool outputs";
+	    LamsCoreToolService.log.error(error);
+	    throw new DataMissingException(error);
+	}
+
+	Tool tool = toolActivity.getTool();
+	if (tool == null) {
+	    String error = "The tool for toolActivity " + toolActivity.getActivityId() + " is missing.";
+	    LamsCoreToolService.log.error(error);
+	    throw new DataMissingException(error);
+	}
+
+	try {
+	    ToolSessionManager sessionManager = (ToolSessionManager) findToolService(tool);
+	    return sessionManager.getToolOutputs(conditionName, toolActivity.getToolContentId());
+	} catch (NoSuchBeanDefinitionException e) {
+	    String message = "A tool which is defined in the database appears to missing from the classpath. Unable to grt the tol output. toolActivity "
+		    + toolActivity.getActivityId();
+	    LamsCoreToolService.log.error(message, e);
+	    throw new ToolException(message, e);
+	} catch (java.lang.AbstractMethodError e) {
+	    String message = "Tool " + tool.getToolDisplayName()
+		    + " doesn't support the getToolOutput(name, toolSessionId, learnerId) method so no output definitions can be accessed.";
+	    LamsCoreToolService.log.error(message, e);
+	    throw new ToolException(message, e);
+	}
+    }
 
     @Override
     public void forceCompleteActivity(ToolSession toolSession, User learner) throws ToolException {

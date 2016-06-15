@@ -24,6 +24,7 @@
 
 package org.lamsfoundation.lams.tool.wookie.service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.SortedMap;
 
@@ -123,6 +124,11 @@ public class WookieService implements ToolSessionManager, ToolContentManager {
     @Override
     public ToolOutput getToolOutput(String name, Long toolSessionId, Long learnerId) {
 	return null;
+    }
+    
+    @Override
+    public List<ToolOutput> getToolOutputs(String name, Long toolContentId) {
+	return new ArrayList<ToolOutput>();
     }
 
     @Override

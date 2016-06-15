@@ -117,6 +117,13 @@ public interface IGradebookService {
 	    String sortOrder, String searchString);
 
     int getCountUsersByOrganisation(Integer orgId, String searchString);
+    
+    /**
+     * Updates all user marks in specified activity. It recalculates all UserActivityGradebooks and UserLessonGradebooks.
+     * 
+     * @param activity
+     */
+    void updateUserMarksForActivity(Activity activity);
 
     /**
      * Updates a user's lesson mark, this will make it desynchronised with the aggregated marks from the activities

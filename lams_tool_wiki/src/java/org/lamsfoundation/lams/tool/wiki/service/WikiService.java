@@ -24,6 +24,7 @@
 
 package org.lamsfoundation.lams.tool.wiki.service;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.HashSet;
@@ -216,6 +217,11 @@ public class WikiService implements ToolSessionManager, ToolContentManager, IWik
 	    return null;
 	}
 	return wikiOutputFactory.getToolOutput(name, this, toolSessionId, learnerId);
+    }
+    
+    @Override
+    public List<ToolOutput> getToolOutputs(String name, Long toolContentId) {
+	return new ArrayList<ToolOutput>();
     }
 
     @Override

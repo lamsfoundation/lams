@@ -24,6 +24,7 @@
 
 package org.lamsfoundation.lams.tool.scribe.service;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -152,6 +153,11 @@ public class ScribeService implements ToolSessionManager, ToolContentManager, To
     @Override
     public ToolOutput getToolOutput(String name, Long toolSessionId, Long learnerId) {
 	return null;
+    }
+    
+    @Override
+    public List<ToolOutput> getToolOutputs(String name, Long toolContentId) {
+	return new ArrayList<ToolOutput>();
     }
 
     @Override
