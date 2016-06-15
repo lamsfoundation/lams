@@ -434,8 +434,12 @@ public class UserManagementService implements IUserManagementService {
 	    }
 	} else {
 	    // update workspace/folder names
-	    organisation.getNormalFolder().setName(organisation.getName());
-	    organisation.getRunSequencesFolder().setName(getRunSequencesFolderName(organisation.getName()));
+	    WorkspaceFolder folder = organisation.getNormalFolder();
+	    if ( folder != null )
+		folder.setName(organisation.getName());
+	    folder = organisation.getRunSequencesFolder();
+	    if ( folder != null )
+		folder.setName(getRunSequencesFolderName(organisation.getName()));
 	}
 
 	return organisation;
