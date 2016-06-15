@@ -84,7 +84,6 @@
     <lams:CKEditor id="instructions" value="${mcGeneralAuthoringDTO.activityInstructions}" contentFolderID="${mcGeneralAuthoringDTO.contentFolderID}"></lams:CKEditor>
 </div>
 
-
 <div id="resourceListArea">
 	<%@ include file="/authoring/itemlist.jsp"%>
 </div>

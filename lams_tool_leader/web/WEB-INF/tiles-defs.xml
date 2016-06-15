@@ -65,12 +65,10 @@
 	<!-- Begin: Learning -->
 	<definition name="tiles:/learning/main" extends="tiles:/layout:learning">
 		<put name="body" value="/pages/learning/leaderselection.jsp" />
-		<put name="bodyMobile" value="/pages/learning/mobile/leaderselection.jsp"/>
 	</definition>
 	
 	<definition name="tiles:/learning/defineLater" extends="tiles:/layout:learning">
 		<put name="body" value="/pages/learning/defineLater.jsp" />
-		<put name="bodyMobile" value="/pages/learning/mobile/defineLater.jsp"/>
 	</definition>
 	<!-- End: Learning -->
 
