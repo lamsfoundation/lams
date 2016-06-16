@@ -151,7 +151,7 @@ public class ThemeManagementAction extends LamsDispatchAction {
 	theme.setName(form.getName());
 	theme.setDescription(form.getDescription());
 	theme.setImageDirectory(form.getImageDirectory());
-	theme.setType(Integer.parseInt(form.getType()));
+	// theme.setType(Integer.parseInt(form.getType())); no longer in form see LDEV-3674
 	return theme;
     }
 

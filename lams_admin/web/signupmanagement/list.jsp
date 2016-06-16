@@ -1,17 +1,15 @@
 <%@ page import="org.lamsfoundation.lams.signup.model.SignupOrganisation" %>
 <%@ include file="/taglibs.jsp"%>
 
-<h4><a href="sysadminstart.do"><fmt:message key="sysadmin.maintain" /></a></h4>
-
-<lams:help style="no-tabs" page="<%= SignupOrganisation.SIGNUP_HELP_PAGE %>"/>
-
-<h1><fmt:message key="admin.list.signup.pages"/></h1>
+<p><a href="<lams:LAMSURL/>/admin/sysadminstart.do" class="btn btn-default"><fmt:message key="sysadmin.maintain" /></a></p>
 
 <c:if test="${not empty error}">
-	<p class="warning"><c:out value="${error}" /></p>
+	<lams:Alert type="warn" id="errorMessage" close="false">	
+		<c:out value="${error}" />
+	</lams:Alert>
 </c:if>
 
-<table border="0" cellspacing="1" cellpadding="1" class="alternative-color">
+<table class="table table-striped table-condensed" >
 	<tr>
 		<th><fmt:message key="admin.group" /></th>
 		<th><fmt:message key="admin.group.code" /></th>
@@ -54,6 +52,4 @@
 	</c:forEach>
 </table>
 
-<p>
-	<html:link styleClass="button" page="/signupManagement.do?method=add"><fmt:message key="admin.add.new.signup.page"/></html:link>
-</p>
+<html:link styleClass="btn btn-primary pull-right" page="/signupManagement.do?method=add"><fmt:message key="admin.add.new.signup.page"/></html:link>

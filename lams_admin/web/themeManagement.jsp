@@ -2,7 +2,7 @@
 
 
 <script type="text/javascript">
-	function editTheme(name, description, imageDirectory, id, currentDefaultTheme, type) {
+	function editTheme(name, description, imageDirectory, id, currentDefaultTheme) {
 		document.getElementById("name").value = name;
 		document.getElementById("description").value = description;
 		document.getElementById("imageDirectory").value = imageDirectory;
@@ -13,8 +13,6 @@
 		if(currentDefaultTheme == "true") {
 			document.getElementById("currentDefaultTheme").checked = true;
 		}
-		document.getElementById("type").options[type -1].selected = true;
-		
 		document.getElementById("cancelEdit").style.display="block";
 		document.getElementById("normalSave").style.display="none";
 	}
@@ -27,15 +25,13 @@
 		document.getElementById("currentDefaultTheme").checked = false;
 		document.getElementById("cancelEdit").style.display="none";
 		document.getElementById("normalSave").style.display="block";
-		document.getElementById("type").options[0].selected = true;
 	}
 
-	function removeTheme(id, name, type) {
+	function removeTheme(id, name) {
 		var answer = confirm("<fmt:message key="admin.themes.deleteConfirm" />")
 		if (answer) {
 			document.getElementById("name").value = name;
 			document.getElementById("id").value = id;
-			document.getElementById("type").options[type -1].selected = true;
 			document.getElementById("method").value = "removeTheme";
 			submitForm();
 		}
@@ -60,7 +56,6 @@
 				alert("<fmt:message key="admin.themes.nameAlreadyExists" />");
 				return;
 			}
-
 		</c:forEach>
 		submitForm();
 	}
@@ -70,14 +65,10 @@
 	}
 </script>
 
-<h4 class="align-left">
-		<a href="sysadminstart.do"><fmt:message key="sysadmin.maintain" /></a>
-</h4>
-
-<h1><fmt:message key="admin.themes.title" /></h1>
+<p><a href="<lams:LAMSURL/>/admin/sysadminstart.do" class="btn btn-default"><fmt:message key="sysadmin.maintain" /></a></p>
 
 
-<table class="alternative-color">
+<table class="table table-striped table-condensed" >
 	<tr>
 		<th>
 			<fmt:message key="admin.themes.theme" />
@@ -92,7 +83,6 @@
 			<fmt:message key="admin.themes.defaultTheme" />
 		</th>
 		<th>
-			<fmt:message key="admin.themes.type" />
 		</th>
 		<th>
 		</th>
@@ -110,24 +100,24 @@
 			</td>
 			<td align="center">
 				<c:if test="${theme.currentDefaultTheme}">
-					<img src="<lams:LAMSURL/>/images/tick.png" >
+					<i class="fa fa-check"></i>
 				</c:if>
 			</td>
 			<td align="center">
 
 				<c:choose>
 					<c:when test="${not theme.notEditable}">
-						<img src="<lams:LAMSURL/>/images/edit.gif" 
+						<i class="fa fa-pencil" 
 							title="<fmt:message key="admin.themes.edit" />"
-							onclick="editTheme('${theme.name}', '${theme.description}', '${theme.imageDirectory}', '${theme.themeId}', '${theme.currentDefaultTheme}', '${theme.type}')"
-						>
-						<img src="<lams:LAMSURL/>/images/cross.gif" 
+							onclick="editTheme('${theme.name}', '${theme.description}', '${theme.imageDirectory}', '${theme.themeId}', '${theme.currentDefaultTheme}')"
+						></i>
+						<i class="fa fa-times" 
 							title="<fmt:message key="admin.themes.remove" />"
-							onclick="removeTheme('${theme.themeId}', '${theme.name}', '${theme.type}')"
-						>
+							onclick="removeTheme('${theme.themeId}', '${theme.name}')"
+						></i>
 					</c:when>
 					<c:otherwise>
-						<a href="javascript:setAsDefault('${theme.name}')" class="button" title="<fmt:message key="admin.themes.makeThemeDefault"/>">
+						<a href="javascript:setAsDefault('${theme.name}')" class="btn btn-default btn-sm" title="<fmt:message key="admin.themes.makeThemeDefault"/>">
 							<fmt:message key="admin.themes.makeDefault" />
 						</a>
 					</c:otherwise>
@@ -137,15 +127,18 @@
 	</c:forEach>
 </table>
 
-<h3>
-	<fmt:message key="admin.themes.addNew" />
-</h3>
-<br />
-<html:form action="/themeManagement" method="post" styleId="themeForm">	
+<div class="panel panel-default">
+	<div class="panel-heading">
+		<div class="panel-title"><fmt:message key="admin.themes.addNew" /></div>
+	</div>
+	
+	<div class="panel-body">
+	<html:form action="/themeManagement" method="post" styleId="themeForm">	
 	<html:hidden property="method" styleId="method" value="addOrEditTheme"/>
 	<html:hidden property="id" styleId="id" />
 	
-	<table>
+	
+	<table class="table table-no-border" >
 		<tr>
 			<td>
 				* <fmt:message key="admin.themes.name" />:
@@ -180,14 +173,17 @@
 		</tr>
 	</table>
 	
-	<br />
-	
+	<div class="pull-right">
 	<div id="normalSave">
-		<a href="javascript:checkAndSubmit()" class="button"><fmt:message key="admin.save" /></a>
+		<a href="javascript:checkAndSubmit()" class="btn btn-default"><fmt:message key="admin.save" /></a>
 	</div>
 	<div id="cancelEdit" style="display:none;">
-		<a href="javascript:submitForm()" class="button"><fmt:message key="admin.save" /></a> &nbsp;
-		<a href="javascript:cancelEdit()" class="button"><fmt:message key="admin.cancel" /></a>
+		<a href="javascript:cancelEdit()" class="btn btn-default"><fmt:message key="admin.cancel" /></a>
+		<a href="javascript:submitForm()" class="btn btn-default loffset5"><fmt:message key="admin.save" /></a>
 	</div>
-</html:form>
+	</div>
+	</html:form>
+	
+</div>
+</div>
 

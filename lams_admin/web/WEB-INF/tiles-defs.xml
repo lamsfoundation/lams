@@ -25,6 +25,7 @@
 
 	<definition name=".ldap" path="/template.jsp">
 		<put name="title" value="sysadmin.ldap.configuration"/>
+		<put name="help" value="LDAP+Configuration"/>
 		<put name="content" value=".ldap-items" />	
 	</definition>
 	
@@ -34,6 +35,7 @@
 	
 	<definition name=".importGroups" path="/template.jsp">
 		<put name="title" value="sysadmin.import.groups.title"/>
+		<put name="help" value="Import+Groups"/>
 		<put name="content" value="import/importGroups.jsp" />	
 	</definition>
 
@@ -58,7 +60,7 @@
 	</definition>
 
 	<definition name=".toolcontentlist" path="/template.jsp">
-		<put name="title" value="sysadmin.edit.default.tool.content"/>
+		<put name="title" value="sysadmin.tool.management"/>
 		<put name="content" value="toolcontent/toolcontentlist.jsp" />	
 	</definition>
 
@@ -69,11 +71,13 @@
 
 	<definition name=".importexcel" path="/template.jsp">
 		<put name="title" value="admin.user.management"/>
+		<put name="help" value="Import+Users"/>
 		<put name="content" value="import/importexcel.jsp" />	
 	</definition>
 
 	<definition name=".disabledlist" path="/template.jsp">
 		<put name="title" value="admin.user.management"/>
+		<put name="subtitle" value="admin.list.disabled.users"/>
 		<put name="content" value="disabledusers.jsp" />	
 	</definition>
 
@@ -84,16 +88,19 @@
 
 	<definition name=".usersearchlist" path="/template.jsp">
 		<put name="title" value="admin.user.management"/>
+		<put name="subtitle" value="admin.user.find"/>	
 		<put name="content" value="usersearchlist.jsp" />	
 	</definition>
 	
 	<definition name=".userorgrole" path="/template.jsp">
 		<put name="title" value="admin.user.management"/>
+		<put name="subtitle" value="admin.user.assign.roles"/>
 		<put name="content" value="userorgrole.jsp" />	
 	</definition>
 	
 	<definition name=".userorg" path="/template.jsp">
 		<put name="title" value="admin.user.management"/>
+		<put name="subtitle" value="admin.user.add"/> 
 		<put name="content" value="userorg.jsp" />	
 	</definition>
 	
@@ -104,16 +111,18 @@
 	
 	<definition name=".user" path="/template.jsp">
 		<put name="title" value="admin.user.entry"/>
+		<put name="subtitle" value="admin.user.edit"/>
 		<put name="content" value="user.jsp" />	
 	</definition>
 	
 	<definition name=".userrole" path="/template.jsp">
 		<put name="title" value="admin.user.entry"/>
+		<put name="subtitle" value="admin.user.assign.roles"/>
 		<put name="content" value="userrole.jsp" />	
 	</definition>
 	
 	<definition name=".orglist" path="/template.jsp">
-		<put name="title" value="admin.organisation.management"/>
+		<put name="title" value="admin.course.manage" />
 		<put name="content" value="organisation/list.jsp" />	
 	</definition>
 
@@ -163,11 +172,13 @@
 
 	<definition name=".servermaintain" path="/template.jsp">
 		<put name="title" value="sysadmin.maintain.server.edit"/>
+		<put name="help" value="Integrations"/>
 		<put name="content" value="servermaintain.jsp" />	
 	</definition>
 	
 	<definition name=".editconfig" path="/template.jsp">
 		<put name="title" value="sysadmin.config.settings.edit"/>
+		<put name="help" value="LAMS+Configuration"/>
 		<put name="content" value=".editconfig-items"/>
 	</definition>
 	
@@ -192,6 +203,7 @@
 	
 	<definition name=".timezoneManagement" path="/template.jsp">
 		<put name="title" value="admin.timezone.title"/>
+		<put name="help" value="LAMS+Configuration"/>
 		<put name="content" value="timezoneManagement.jsp"/>
 	</definition>	
 	
@@ -202,11 +214,13 @@
 	
 	<definition name=".addSignupPage" path="/template.jsp">
 		<put name="title" value="admin.signup.title" />
+		<put name="subtitle" value="admin.add.edit.signup.page" />
 		<put name="content" value="signupmanagement/add.jsp" />
 	</definition>
 
 	<definition name=".signupPageList" path="/template.jsp">
 		<put name="title" value="admin.signup.title" />
+		<put name="help" value="LAMS+Signup"/>
 		<put name="content" value="signupmanagement/list.jsp" />
 	</definition>
 	

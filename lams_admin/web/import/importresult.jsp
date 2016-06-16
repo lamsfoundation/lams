@@ -1,7 +1,6 @@
 <%@ include file="/taglibs.jsp"%>
 
-<h4><a href="sysadminstart.do"><fmt:message key="sysadmin.maintain" /></a></h4>
-<h1><fmt:message key="admin.user.import" /></h1>
+<p><a href="<lams:LAMSURL/>/admin/sysadminstart.do" class="btn btn-default"><fmt:message key="sysadmin.maintain" /></a></p>
 
 <p><c:out value="${successful}" /></p>
 <p>
@@ -13,11 +12,4 @@
 		</logic:iterate>
 	</logic:notEmpty>
 </logic:iterate>
-</p>
-
-<p>&nbsp;</p>
-
-<p>
-	<input type="submit" class="button" value="Ok"
-		onclick="javascript:document.location='sysadminstart.do';" />
 </p>

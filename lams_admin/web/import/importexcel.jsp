@@ -7,9 +7,7 @@
 	}
 </script>
 
-<h4><a href="sysadminstart.do"><fmt:message key="sysadmin.maintain" /></a></h4>
-<lams:help style="no-tabs" page="<%= IImportService.IMPORT_HELP_PAGE %>"/>
-<h1><fmt:message key="admin.user.import" /></h1>
+<p><a href="<lams:LAMSURL/>/admin/sysadminstart.do" class="btn btn-default"><fmt:message key="sysadmin.maintain" /></a></p>
 
 <p><fmt:message key="msg.import.intro"/></p>
 <p>
@@ -35,12 +33,12 @@
 <table>
 	<tr>
 		<td align="right"><fmt:message key="label.excel.spreadsheet" />:&nbsp;</td>
-		<td><html:file property="file" /></td>
+		<td><html:file property="file" styleClass="form-control"/></td>
 	</tr>
 </table>
-<p align="center">
-<html:submit styleId="importButton" styleClass="button"><fmt:message key="label.import"/></html:submit> &nbsp; 	
-<html:cancel styleId="cancelButton" styleClass="button"><fmt:message key="admin.cancel"/></html:cancel>
-</p>
+<div class="pull-right">
+<html:cancel styleId="cancelButton" styleClass="btn btn-default"><fmt:message key="admin.cancel"/></html:cancel>
+<html:submit styleId="importButton" styleClass="btn btn-primary loffset5"><fmt:message key="label.import"/></html:submit> &nbsp; 	
+</div>
 
 </html:form>

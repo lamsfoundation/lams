@@ -13,10 +13,6 @@
 		height:250px; 
 		overflow-y:auto;
 	}
-	.floatRight {
-		float:right;
-		margin-top:5px;
-	}
 </style>
 
 <script type="text/javascript" src="<lams:LAMSURL/>/includes/javascript/jquery.js"></script>
@@ -135,30 +131,32 @@
 	}
 </script>
 
-<h4 class="align-left">
-	<a href="orgmanage.do?org=1"><fmt:message key="admin.course.manage" /></a>
+<p>
+	<a href="orgmanage.do?org=1" class="btn btn-default"><fmt:message key="admin.course.manage" /></a>
     <logic:notEmpty name="pOrgId">
-        : <a href="orgmanage.do?org=<bean:write name="pOrgId" />"><bean:write name="pOrgName"/></a>
+        : <a href="orgmanage.do?org=<bean:write name="pOrgId" />" class="btn btn-default"><bean:write name="pOrgName"/></a>
     </logic:notEmpty>
     <logic:notEqual name="UserOrgForm" property="orgId" value="1">
-		: <a href="<logic:equal name="orgType" value="3">user</logic:equal><logic:notEqual name="orgType" value="3">org</logic:notEqual>manage.do?org=<bean:write name="UserOrgForm" property="orgId" />">
+		: <a href="<logic:equal name="orgType" value="3">user</logic:equal><logic:notEqual name="orgType" value="3">org</logic:notEqual>manage.do?org=<bean:write name="UserOrgForm" property="orgId" />" class="btn btn-default">
 		<bean:write name="UserOrgForm" property="orgName"/></a>
 	</logic:notEqual>
 	<logic:equal name="UserOrgForm" property="orgId" value="1">
-		: <a href="usermanage.do?org=<bean:write name="UserOrgForm" property="orgId" />"><fmt:message key="admin.global.roles.manage" /></a>
+		: <a href="usermanage.do?org=<bean:write name="UserOrgForm" property="orgId" />" class="btn btn-default"><fmt:message key="admin.global.roles.manage" /></a>
 	</logic:equal>
-</h4>
+</p>
 
-<h1><fmt:message key="admin.user.add"/></h1>
+<h4><fmt:message key="admin.user.add"/></h4>
 
 <div align="center"><html-el:errors/></div>
 
 <logic:equal name="orgType" value="2">
-	<p><fmt:message key="msg.remove.from.subgroups"/></p>
+	<lams:Alert id="subgroup-warning" type="info" close="false">
+		<fmt:message key="msg.remove.from.subgroups"/>
+	</lams:Alert>
 </logic:equal>
 
 <h3><fmt:message key="heading.users"/></h3>
-<div class="floatRight"><span id="totalUsers"><c:out value="${numExistUsers}"/></span></div>
+<div class="pull-right"><span id="totalUsers"><c:out value="${numExistUsers}"/></span></div>
 <p>
 	 <fmt:message key="msg.click.remove.user"/>
 </p>
@@ -169,11 +167,11 @@
 
 <p>&nbsp;</p>
 
-<h3><fmt:message key="heading.potential.users"/></h3>
+<h4><fmt:message key="heading.potential.users"/></h4>
 <p>
 	<fmt:message key="msg.click.add.user"/>
 </p>
-<div class="floatRight"><span id="potentialUsers"><c:out value="${numPotentialUsers}"/></span></div>
+<div class="pull-right"><span id="potentialUsers"><c:out value="${numPotentialUsers}"/></span></div>
 <form onsubmit="return loadSearchResults(0);">
 	<p>
 		<fmt:message key="admin.search"/>: <input id="term" type="text"/> or <a onclick="loadSearchResults(1);"><fmt:message key="msg.show.all.potential.users"/></a>
@@ -186,12 +184,10 @@
 
 <p>&nbsp;</p>
 
-<div id="form" class="floatRight">
+<div id="form" class="pull-right">
 	<html:form action="userorgsave.do" method="post">
 		<html:hidden property="orgId" />
-		<html:cancel styleId="cancelButton" styleClass="button"><fmt:message key="admin.cancel"/></html:cancel>
-		<html:submit styleId="nextButton" styleClass="button" onclick="return populateForm();"><fmt:message key="label.next"/></html:submit>
+		<html:cancel styleId="cancelButton" styleClass="btn btn-default"><fmt:message key="admin.cancel"/></html:cancel>
+		<html:submit styleId="nextButton" styleClass="btn btn-primary loffset5" onclick="return populateForm();"><fmt:message key="label.next"/></html:submit>
 	</html:form>
 </div>
-
-<p>&nbsp;</p>

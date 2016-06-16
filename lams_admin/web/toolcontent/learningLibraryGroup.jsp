@@ -5,8 +5,8 @@
 <!DOCTYPE html>
 <lams:html>
 <lams:head>
-	<lams:css style="main" />
-	<link rel="stylesheet" href="<lams:LAMSURL/>css/jquery-ui-redmond-theme.css" type="text/css" media="screen" />
+	<lams:css/>
+	<link rel="stylesheet" href="<lams:LAMSURL/>css/jquery-ui-smoothness-theme.css" type="text/css" media="screen" />
 	<link rel="stylesheet" href="css/learningLibraryGroup.css" type="text/css" media="screen" />
 
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery.js"></script>
@@ -21,13 +21,13 @@
 			decoderDiv = $('<div />'),
 			LABELS = {
 					<fmt:message key="tool.groups.group.default.name" var="GROUP_DEFAULT_NAME_VAR"/>
-					GROUP_DEFAULT_NAME : '<c:out value="${GROUP_DEFAULT_NAME_VAR}" />',
+					GROUP_DEFAULT_NAME : '${GROUP_DEFAULT_NAME_VAR}',
 					<fmt:message key="tool.groups.remove.confirm" var="GROUP_REMOVE_CONFIRM_VAR"/>
-					GROUP_REMOVE_CONFIRM : decoderDiv.html('<c:out value="${GROUP_REMOVE_CONFIRM_VAR}" />').text(),
+					GROUP_REMOVE_CONFIRM : decoderDiv.html('${GROUP_REMOVE_CONFIRM_VAR}').text(),
 					<fmt:message key="tool.groups.group.name.error" var="GROUP_NAME_VALIDATION_ERROR_VAR"/>
-					GROUP_NAME_VALIDATION_ERROR : decoderDiv.html('<c:out value="${GROUP_NAME_VALIDATION_ERROR_VAR}" />').text(),
+					GROUP_NAME_VALIDATION_ERROR : decoderDiv.html('${GROUP_NAME_VALIDATION_ERROR_VAR}').text(),
 					<fmt:message key="tool.groups.save.error" var="SAVE_ERROR_VAR"/>
-					SAVE_ERROR : decoderDiv.html('<c:out value="${SAVE_ERROR_VAR}" />').text()
+					SAVE_ERROR : decoderDiv.html('${SAVE_ERROR_VAR}').text()
 			};
 	</script>
 </lams:head>
@@ -53,8 +53,8 @@
 <!-- A template which gets cloned when a group is added -->
 <div id="groupTemplate" class="groupContainer">
 	<div class="learningLibraryContainerTitle">
-		<img class="removeGroupButton" src="<lams:LAMSURL/>images/css/delete.png"
-			 title="<fmt:message key='tool.groups.remove.group.button.tooltip' />" />
+		<i class="removeGroupButton fa fa-times" src="<lams:LAMSURL/>images/css/delete.png"
+			 title="<fmt:message key='tool.groups.remove.group.button.tooltip' />"></i>
 		<input type="text" />
 	</div>
 	<div class="learningLibraryContainer"></div>

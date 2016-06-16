@@ -24,7 +24,7 @@
 <div id="page">
 	<div id="content">
 		<h2>
-			<a href="<lams:LAMSURL/>/admin/sysadminstart.do"><fmt:message key="sysadmin.maintain" /></a>
+			<p><a href="<lams:LAMSURL/>/admin/sysadminstart.do" class="btn btn-default"><fmt:message key="sysadmin.maintain" /></a></p>
 			: <fmt:message key="admin.user.import" />
 		</h2>
 
