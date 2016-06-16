@@ -1,9 +1,8 @@
 <%@ include file="/taglibs.jsp"%>
 
-<h4><a href="sysadminstart.do"><fmt:message key="sysadmin.maintain" /></a></h4>
-<h1><fmt:message key="admin.list.disabled.users"/></h1>
+<p><a href="<lams:LAMSURL/>/admin/sysadminstart.do" class="btn btn-default"><fmt:message key="sysadmin.maintain" /></a></p>
 
-<table class="alternative-color" width=100% cellspacing="0">
+<table class="table table-striped table-condensed">
 <tr>
 	<th></th>
 	<th><fmt:message key="admin.user.login"/></th>
@@ -30,7 +29,7 @@
 			<bean:write name="user" property="lastName" />
 		</td>
 		<td>
-			<a href="user.do?method=enable&userId=<bean:write name='user' property='userId' />"><fmt:message key="admin.enable"/></a>
+			<a href="user.do?method=enable&userId=<bean:write name='user' property='userId' />" class="btn btn-default btn-sm"><fmt:message key="admin.enable"/></a>
 		</td>		
 	</tr>
 </logic:iterate>

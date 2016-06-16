@@ -1,14 +1,12 @@
 <%@ include file="/taglibs.jsp"%>
 
-<h4><a href="sysadminstart.do"><fmt:message key="sysadmin.maintain" /></a>
-</h4>
-<h1><fmt:message key="sysadmin.maintain.loginpage"/></h1>
+<p><a href="<lams:LAMSURL/>/admin/sysadminstart.do" class="btn btn-default"><fmt:message key="sysadmin.maintain" /></a></p>
 
 <html:errors />
-<br />
+
 <html:form action="/loginsave.do?method=save" enctype="multipart/form-data" method="post">
 <p><fmt:message key="sysadmin.login.logo"/></p>
-<p><html:file property="logo" size="40" styleClass="button" /></p>
+<p><html:file property="logo" size="40" styleClass="form-control" /></p>
 <br />
 <c:set var="language"><lams:user property="localeLanguage"/></c:set>
 <p><fmt:message key="sysadmin.login.text"/></p>
@@ -17,12 +15,12 @@
 
 <c:set var="existingContent"><bean:write name='LoginMaintainForm' property='news' filter='false' /></c:set>
 
-<lams:CKEditor id="news" value="${existingContent}"	contentFolderID="../public" width="95%" height="600px"></lams:CKEditor>
+<lams:CKEditor id="news" value="${existingContent}"	contentFolderID="../public" height="600px"></lams:CKEditor>
 
 </div>
-<br />
-<p align="center">
-	<html:cancel styleId="cancelButton" styleClass="button"><fmt:message key="admin.cancel" /></html:cancel>
-	<html:submit styleId="saveButton" styleClass="button"><fmt:message key="admin.save" /></html:submit>
-</p>
+
+<div class="pull-right voffset5">
+	<html:cancel styleId="cancelButton" styleClass="btn btn-default"><fmt:message key="admin.cancel" /></html:cancel>
+	<html:submit styleId="saveButton" styleClass="btn btn-primary loffset5"><fmt:message key="admin.save" /></html:submit>
+</div>
 </html:form>
