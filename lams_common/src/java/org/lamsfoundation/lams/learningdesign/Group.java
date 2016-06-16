@@ -35,7 +35,7 @@ import org.lamsfoundation.lams.learningdesign.dto.GroupDTO;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.util.Nullable;
 
-public class Group implements Serializable, Nullable, Comparable {
+public class Group implements Serializable, Nullable, Comparable<Group> {
 
     public final static int STAFF_GROUP_ORDER_ID = 1;
     public final static String NAME_OF_STAFF_GROUP = "Staff Group";
@@ -263,11 +263,10 @@ public class Group implements Serializable, Nullable, Comparable {
      * @see java.lang.Comparable#compareTo(java.lang.Object)
      */
     @Override
-    public int compareTo(Object o) {
-	Group castOther = (Group) o;
-	return new CompareToBuilder().append(this.getOrderId(), castOther.getOrderId())
-		.append(this.getGroupId(), castOther.getGroupId()).append(this.getGroupName(), castOther.getGroupName())
-		.append(this.getGroupUIID(), castOther.getGroupUIID()).toComparison();
+    public int compareTo(Group group) {
+	return new CompareToBuilder().append(this.getOrderId(), group.getOrderId())
+		.append(this.getGroupId(), group.getGroupId()).append(this.getGroupName(), group.getGroupName())
+		.append(this.getGroupUIID(), group.getGroupUIID()).toComparison();
     }
 
     // ---------------------------------------------------------------------

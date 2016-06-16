@@ -26,6 +26,7 @@ package org.lamsfoundation.lams.usermanagement;
 import java.io.Serializable;
 import java.util.Set;
 
+import org.apache.commons.lang.builder.CompareToBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 
 /**
@@ -33,7 +34,7 @@ import org.apache.commons.lang.builder.HashCodeBuilder;
  *
  * @hibernate.class table="lams_organisation_group"
  */
-public class OrganisationGroup implements Serializable {
+public class OrganisationGroup implements Serializable, Comparable<OrganisationGroup> {
 
     /** identifier field */
     private Long groupId;
@@ -126,5 +127,11 @@ public class OrganisationGroup implements Serializable {
 	    return false;
 	}
 	return true;
+    }
+
+    @Override
+    public int compareTo(OrganisationGroup group) {
+	return new CompareToBuilder().append(this.getGroupId(), group.getGroupId())
+		.append(this.getName(), group.getName()).toComparison();
     }
 }
