@@ -31,33 +31,28 @@
 <html:form action="/register" method="post" styleId="RegisterForm">
 	<html:hidden property="method" value="register" />
 	
-	<h4 class="align-left">
-		<a href="sysadminstart.do"><fmt:message key="sysadmin.maintain" /></a>
-	</h4>
-	<h1><fmt:message key="sysadmin.register.server" /></h1>
-	<br />
-	
+	<p><a href="<lams:LAMSURL/>/admin/sysadminstart.do" class="btn btn-default"><fmt:message key="sysadmin.maintain" /></a></p>
+
 	<c:choose>
 		<c:when test="${not empty errorKey}">
-			<p class="warning">
+			<lams:Alert type="warn" id="errorKey" close="false">				
 				<fmt:message key="${errorKey}"/>
-			</p>
+			</lams:Alert>
 		</c:when>
-		<c:otherwise>
-			<c:if test="${not empty successKey}">
-				<p class="info">
-					<fmt:message key="${successKey}"/>
-				</p>
-			</c:if>
-		</c:otherwise>
+		<c:when test="${not empty successKey}">
+			<lams:Alert type="info" id="successKey" close="false">				
+				<fmt:message key="${successKey}"/>
+			</lams:Alert>
+		</c:when>
 	</c:choose>
 
-	<table class="alternative-color" width=100% cellspacing="0">
+	<div class="panel panel-default">
+		<div class="panel-heading">
+			<div class="panel-title"><fmt:message key="admin.register.heading.title"/></div>
+		</div>
+		<table class="table table-striped table-condensed" >
 			<tr>
-				<th colspan="2"><fmt:message key="admin.register.heading.title"/></th>
-			</tr>
-			<tr>
-				<td>
+				<td width="40%">
 					<fmt:message key="admin.register.enableLamsCommunity"/>
 				</td>
 				<td>
@@ -69,7 +64,7 @@
 					<fmt:message key="admin.register.sitename"/>
 				</td>
 				<td>
-					<html:text property="siteName" size="40"/>
+					<html:text property="siteName" size="40" styleClass="form-control"/>
 				</td>
 			</tr>
 			<tr>
@@ -77,14 +72,14 @@
 					<fmt:message key="admin.register.orgname"/>
 				</td>
 				<td>
-					<html:text property="organisation" size="40" />
+					<html:text property="organisation" size="40"  styleClass="form-control" />
 				</td>
 			<tr>
 				<td>
 					<fmt:message key="admin.user.name"/>
 				</td>
 				<td>
-					<html:text property="name" size="40" />
+					<html:text property="name" size="40"  styleClass="form-control"/>
 					
 				</td>
 			</tr>
@@ -93,7 +88,7 @@
 					<fmt:message key="admin.user.email"/>
 				</td>
 				<td>
-					<html:text property="email" size="40" />
+					<html:text property="email" size="40"  styleClass="form-control"/>
 				</td>
 			</tr>
 			<tr>
@@ -102,7 +97,7 @@
 				</td>
 				<td>
 					
-					<html:select property="serverCountry">
+					<html:select property="serverCountry"  styleClass="form-control">
 						<html:option value="AF">Afghanistan</html:option>
 						<html:option value="AX">Aland Islands</html:option>
 						<html:option value="AL">Albania</html:option>
@@ -342,13 +337,16 @@
 					<html:checkbox property="publicDirectory" />
 				</td>
 			</tr>
+		</table>
+		</div>
+		
+		<div class="panel panel-default">
+		<div class="panel-heading">
+			<div class="panel-title"><fmt:message key="admin.register.server.config.title"/></div>
+		</div>
+		<table class="table table-striped table-condensed" >
 			<tr>
-				<th colspan="2">
-					<fmt:message key="admin.register.server.config.title"/>
-				</th>
-			</tr>
-			<tr>
-				<td>
+				<td width="40%">
 					<fmt:message key="admin.register.server.config.url"/>
 				</td>
 				<td>
@@ -387,13 +385,16 @@
 					${registerDTO.serverLanguageDate}
 				</td>
 			</tr>
+		</table>
+		</div>
+		
+		<div class="panel panel-default">
+		<div class="panel-heading">
+			<div class="panel-title"><fmt:message key="admin.register.server.stats.title"/></div>
+		</div>
+		<table class="table table-striped table-condensed" >
 			<tr>
-				<th colspan="2">
-					<fmt:message key="admin.register.server.stats.title"/>
-				</th>
-			</tr>
-			<tr>
-				<td>
+				<td width="40%">
 					<fmt:message key="admin.course"/>
 				</td>
 				<td>
@@ -466,10 +467,10 @@
 			</tr>
 	</table>
 	
-	<p align="center">
-		<input class="button" type="submit" value="<fmt:message key="admin.register" />"/>
-		<html:reset styleClass="button"><fmt:message key="admin.reset" /></html:reset>
-        <input class="button" type="button" value="<fmt:message key="admin.cancel" />" onClick="javascript:window.location.href='<lams:LAMSURL/>/admin/sysadminstart.do'"/>
-	</p>
+	<div class="pull-right voffset5">
+        <input class="btn btn-default" type="button" value="<fmt:message key="admin.cancel" />" onClick="javascript:window.location.href='<lams:LAMSURL/>/admin/sysadminstart.do'"/>
+		<html:reset styleClass="btn btn-default"><fmt:message key="admin.reset" /></html:reset>
+		<input class="btn btn-primary loffset5" type="submit" value="<fmt:message key="admin.register" />"/>
+	</div>
 </html:form>
 

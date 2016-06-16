@@ -1,74 +1,73 @@
 <%@ include file="/taglibs.jsp"%>
+<c:set var="lams"><lams:LAMSURL /></c:set>
 
-<link type="text/css" href="<lams:LAMSURL/>css/jquery-ui-smoothness-theme.css" rel="stylesheet">
+<link type="text/css" href="${lams}css/jquery-ui-smoothness-theme.css" rel="stylesheet">
+<link type="text/css" href="${lams}css/jquery.tablesorter.theme.bootstrap.css" rel="stylesheet">
+<link type="text/css" href="${lams}css/jquery.tablesorter.pager.css"  rel="stylesheet">
 
-<style type="text/css">
-	.clone-box {
-		border: 1px solid grey; padding: 10px; margin-top: 10px;
-	}
-	.padding-bottom {
-		padding-bottom: 20px;
-	}
-</style>
 
-<script language="JavaScript" type="text/javascript" src="<lams:LAMSURL/>/includes/javascript/jquery.js"></script>
-<script language="JavaScript" type="text/javascript" src="<lams:LAMSURL/>/includes/javascript/jquery-ui.js"></script>
-<script language="JavaScript" type="text/javascript" src="<lams:LAMSURL/>/includes/javascript/jquery.tablesorter.pack.js"></script>
-<script language="JavaScript" type="text/javascript" src="<lams:LAMSURL/>/includes/javascript/jquery.tablesorter.pager.js"></script>
+<script language="JavaScript" type="text/javascript" src="${lams}includes/javascript/jquery.js"></script>
+<script language="JavaScript" type="text/javascript" src="${lams}includes/javascript/jquery-ui.js"></script>
+<script language="JavaScript" type="text/javascript" src="${lams}includes/javascript/jquery.tablesorter.js"></script>
+<script language="JavaScript" type="text/javascript" src="${lams}includes/javascript/jquery.tablesorter-widgets.js"></script>
+<script language="JavaScript" type="text/javascript" src="${lams}includes/javascript/jquery.tablesorter-pager.js"></script>
+
+<%-- <script language="JavaScript" type="text/javascript" src="${lams}includes/javascript/jquery.tablesorter.pack.js"></script>
+ --%>
 <script language="JavaScript" type="text/javascript">
 	<!--
 	var staffLoaded, learnersLoaded = false;
 	var lessonsLoaded = {};
 
-	jQuery(document).ready(function() {
-		jQuery("#sourceGroupId").change(function() {
-			loadSubgroups(jQuery("#sourceGroupId").val());
+	$(document).ready(function() {
+		$("#sourceGroupId").change(function() {
+			loadSubgroups($("#sourceGroupId").val());
 		});
-		jQuery("#sourceGroupId").load("<lams:LAMSURL/>/admin/clone.do", { method: "getGroups" }, function() {
-			loadSubgroups(jQuery("#sourceGroupId").val());
+		$("#sourceGroupId").load("<lams:LAMSURL/>/admin/clone.do", { method: "getGroups" }, function() {
+			loadSubgroups($("#sourceGroupId").val());
 		});
-		jQuery("a.lessonNameLink").live("click", function() {
-			lessonDialog(jQuery(this).attr("id"));
+		$("a.lessonNameLink").on("click", function() {
+			lessonDialog($(this).attr("id"));
 		});
 	});
 
 	function loadSubgroups(groupId) {
-		jQuery("#sourceSubgroupId").load("<lams:LAMSURL/>/admin/clone.do", { method: "getSubgroups", groupId: groupId });
+		$("#sourceSubgroupId").load("<lams:LAMSURL/>/admin/clone.do", { method: "getSubgroups", groupId: groupId });
 	}
 
 	function chosenGroup() {
-		if (jQuery("#sourceSubgroupId").val() != '') {
-			return jQuery("#sourceSubgroupId").val();
+		if ($("#sourceSubgroupId").val() != '') {
+			return $("#sourceSubgroupId").val();
 		} else {
-			return jQuery("#sourceGroupId").val();
+			return $("#sourceGroupId").val();
 		}
 	}
 
 	function loadGroupAttributes(sourceGroupId) {
-		jQuery("#cloneOptionsDiv").show();
-		jQuery("#availableLessons").load("<lams:LAMSURL/>/admin/clone.do", { method: "availableLessons", sourceGroupId: sourceGroupId });
+		$("#cloneOptionsDiv").show();
+		$("#availableLessons").load("<lams:LAMSURL/>/admin/clone.do", { method: "availableLessons", sourceGroupId: sourceGroupId });
 	}
 
 	function lessonDialog(lessonId) {
 		if (lessonsLoaded[lessonId] == null || !lessonsLoaded[lessonId]) {
-			jQuery("#lessonDialog-"+lessonId).dialog({
+			$("#lessonDialog-"+lessonId).dialog({
 				autoOpen: false,
 				modal: true
 			});
 			lessonsLoaded[lessonId] = true;
 		}
-		jQuery("#lessonDialog-"+lessonId).dialog("open");
+		$("#lessonDialog-"+lessonId).dialog("open");
 		return false;
 	}
 
 	function initUserDialog(selector) {
-		jQuery(selector).dialog({
+		$(selector).dialog({
 			autoOpen: false,
 			modal: true, 
-			width: 500, 
+			width: 680, 
 			buttons: { 
 				"<fmt:message key='label.ok' />": function() {
-					jQuery(this).dialog("close");
+					$(this).dialog("close");
 				} 
 			} 
 		});
@@ -76,21 +75,21 @@
 
 	function staffDialog() {
 		if (!staffLoaded) {
-			jQuery("#staffDialog").load("<lams:LAMSURL/>/admin/clone.do", { method: "selectStaff", groupId: <c:out value="${org.organisationId}" /> });
+			$("#staffDialog").load("<lams:LAMSURL/>/admin/clone.do", { method: "selectStaff", groupId: <c:out value="${org.organisationId}" /> });
 			initUserDialog("#staffDialog");
 			staffLoaded = true;
 		}
-		jQuery("#staffDialog").dialog("open");
+		$("#staffDialog").dialog("open");
 		return false;
 	}
 
 	function learnerDialog() {
 		if (!learnersLoaded) {
-			jQuery("#learnerDialog").load("<lams:LAMSURL/>/admin/clone.do", { method: "selectLearners", groupId: <c:out value="${org.organisationId}" /> });
+			$("#learnerDialog").load("<lams:LAMSURL/>/admin/clone.do", { method: "selectLearners", groupId: <c:out value="${org.organisationId}" /> });
 			initUserDialog("#learnerDialog");
 			learnersLoaded = true;
 		}
-		jQuery("#learnerDialog").dialog("open");
+		$("#learnerDialog").dialog("open");
 		return false;
 	}
 
@@ -98,20 +97,20 @@
 		var lessons = [];
 		var staff = [];
 		var learners = [];
-		jQuery("input[name=lessons]:checked").each(function() {
-			lessons.push(jQuery(this).val());
+		$("input[name=lessons]:checked").each(function() {
+			lessons.push($(this).val());
 		});
-		jQuery("input[name=staff]:checked").each(function() {
-			staff.push(jQuery(this).val());
+		$("input[name=staff]:checked").each(function() {
+			staff.push($(this).val());
 		});
-		jQuery("input[name=learners]:checked").each(function() {
-			learners.push(jQuery(this).val());
+		$("input[name=learners]:checked").each(function() {
+			learners.push($(this).val());
 		});
-		jQuery("input[name=lessons]").val(lessons.join(","));
-		jQuery("input[name=staff]").val(staff.join(","));
-		jQuery("input[name=learners]").val(learners.join(","));
-		jQuery("input[name=addAllStaff]").val(jQuery("#addAllStaff").is(":checked"));
-		jQuery("input[name=addAllLearners]").val(jQuery("#addAllLearners").is(":checked"));
+		$("input[name=lessons]").val(lessons.join(","));
+		$("input[name=staff]").val(staff.join(","));
+		$("input[name=learners]").val(learners.join(","));
+		$("input[name=addAllStaff]").val($("#addAllStaff").is(":checked"));
+		$("input[name=addAllLearners]").val($("#addAllLearners").is(":checked"));
 		return true;
 	}
 	//-->
@@ -119,33 +118,48 @@
 
 <tiles:insert attribute="breadcrumbs" />
 
-<h1><fmt:message key="title.clone.lessons.for"><fmt:param value="${org.name}" /></fmt:message></h1>
+<h4><fmt:message key="title.clone.lessons.for"><fmt:param value="${org.name}" /></fmt:message></h4>
 
 <c:if test="${not empty errors}">
-	<p class="warning">
+	<lams:Alert type="danger" id="errorKey" close="false">			
 		<c:forEach items="${errors}" var="error">
 			<c:out value="${error}" />
 		</c:forEach>
-	</p>
+	</lams:Alert>
 </c:if>
 
-<h2><fmt:message key="title.choose.group" /></h2>
-<div class="clone-box">
-	<p>
-		<fmt:message key="admin.course" />:
-		<select id="sourceGroupId">
-			<option value="">...</option>
-		</select>
-	</p>
-	<p class="padding-bottom">
-		<fmt:message key="admin.class" />:
-		<select id="sourceSubgroupId">
-		</select>
-	</p>
-	<p>
-		<input type="submit" class="button" value="<fmt:message key="label.choose" />" onclick="javascript:loadGroupAttributes(chosenGroup());">
-	</p>
+<div class="panel panel-default voffset5" >
+	<div class="panel-heading">
+		<span class="panel-title">
+			<fmt:message key="title.choose.group" />
+		</span>
+	</div>
+	<div class="panel-body">
+		<div class="form-group">
+			<fmt:message key="admin.course" />:
+			<select id="sourceGroupId" class="form-control">
+				<option value="">...</option>
+			</select>
+		</div>
+		<div class="form-group">
+			<fmt:message key="admin.class" />:
+			<select id="sourceSubgroupId" class="form-control">
+			</select>
+		</div>
+		<div class="form-group">
+			<input type="submit" class="btn btn-default" value="<fmt:message key="label.choose" />" onclick="javascript:loadGroupAttributes(chosenGroup());">
+		</div>
+	</div>
 </div>
+
+<div id="staffDialog" title="<fmt:message key="label.configure.staff" />" style="display:none;">
+
+</div>
+
+<div id="learnerDialog" title="<fmt:message key="label.configure.learners" />" style="display:none;">
+
+</div>
+
 
 <form name="cloneForm" id="cloneForm" action="<lams:LAMSURL/>/admin/clone.do" method="post">
 	<input type="hidden" name="method" value="clone">
@@ -155,41 +169,45 @@
 	<input type="hidden" name="learners">
 
 	<div style="display:none;" id="cloneOptionsDiv">
-		<h2><fmt:message key="title.select.lessons" /></h2>
-		<p class="clone-box" id="availableLessons"></p>
-		
-		<h2><fmt:message key="title.select.staff" /></h2>
-		<div class="clone-box">
-			<p class="padding-bottom">
-				<input type="checkbox" id="addAllStaff" name="addAllStaff" checked="checked"> <fmt:message key="message.add.all.monitors" />
-			</p>
-			<p>
-				<a onclick="staffDialog();"><fmt:message key="label.configure.staff" /></a>
-			</p>
+	
+		<div class="panel panel-default voffset5" >
+		<div class="panel-heading">
+			<span class="panel-title">
+				<fmt:message key="title.select.lessons" />
+			</span>
+		</div>
+		<div class="panel-body">
+			<p id="availableLessons"></p>
+		</div>
+		</div>
+	
+		<div class="panel panel-default voffset5" >
+		<div class="panel-heading">
+			<span class="panel-title">
+				<fmt:message key="title.select.staff" />
+			</span>
+		</div>
+		<div class="panel-body">
+			<input type="checkbox" id="addAllStaff" name="addAllStaff" checked="checked"> <fmt:message key="message.add.all.monitors" />
+			<a onclick="staffDialog();" class="btn btn-default pull-right"><fmt:message key="label.configure.staff" /></a>
+		</div>
 		</div>
 		
-		<h2><fmt:message key="title.select.learners" /></h2>
-		<div class="clone-box">
-			<p class="padding-bottom">
-				<input type="checkbox" id="addAllLearners" name="addAllLearners" checked="checked"> <fmt:message key="message.add.all.learners" />
-			</p>
-			<p>
-				<a onclick="learnerDialog();"><fmt:message key="label.configure.learners" /></a>
-			</p>
+		<div class="panel panel-default voffset5" >
+		<div class="panel-heading">
+			<span class="panel-title">
+				<fmt:message key="title.select.learners" />
+			</span>
 		</div>
-		
-		<p style="float:right;">
-			<input type="submit" class="button" onclick="return clone();" value="<fmt:message key="label.clone" />">
-		</p>
-		<p class="padding-bottom"></p>
-	</div>
-	
-	<div id="staffDialog" title="<fmt:message key="label.configure.staff" />" style="display:none;">
-	
-	</div>
-	
-	<div id="learnerDialog" title="<fmt:message key="label.configure.learners" />" style="display:none;">
-	
-	</div>
+		<div class="panel-body">
+			<input type="checkbox" id="addAllLearners" name="addAllLearners" checked="checked"> <fmt:message key="message.add.all.learners" />
+			<a onclick="learnerDialog();" class="btn btn-default pull-right"><fmt:message key="label.configure.learners" /></a>
+		</div>
+		</div>
 
+		<div class="pull-right">
+			<input type="submit" class="btn btn-primary" onclick="return clone();" value="<fmt:message key="label.clone" />">
+		</div>
+	</div>
+	
 </form>

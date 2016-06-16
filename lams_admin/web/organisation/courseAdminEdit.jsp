@@ -10,35 +10,35 @@
 <logic:equal name="OrganisationForm" property="courseAdminCanChangeStatusOfCourse" value="false">
 	<html:hidden property="stateId" />
 </logic:equal>
-<h4>
-	<a href="orgmanage.do?org=1"><fmt:message key="admin.course.manage" /></a> : 
-	<a href="orgmanage.do?org=<bean:write name="OrganisationForm" property="orgId" />">
+<p>
+	<a href="orgmanage.do?org=1" class="btn btn-default"><fmt:message key="admin.course.manage" /></a> : 
+	<a href="orgmanage.do?org=<bean:write name="OrganisationForm" property="orgId" />" class="btn btn-default">
 		<bean:write name="OrganisationForm" property="name"/>
 	</a>
-</h4>
+</p>
 
 <h1>
 	<fmt:message key="admin.edit"/> <bean:write name="OrganisationForm" property="name"/>
 </h1>
 
 <div align="center"><html-el:errors/></div>
-<table>
+<table  class="table table-no-border">
 	<tr>
 		<td><fmt:message key="admin.organisation.name"/>:</td>
-		<td><html-el:text property="name" size="40" /> *</td>
+		<td><html-el:text property="name" size="40" styleClass="form-control"/> *</td>
 	</tr>
 	<tr>
 	<td><fmt:message key="admin.organisation.code"/>:</td>
-		<td><html-el:text property="code" size="20" /></td>
+		<td><html-el:text property="code" size="20"  styleClass="form-control"/></td>
 	</tr>
 	<tr>
 		<td><fmt:message key="admin.organisation.description"/>:</td>
-		<td><html-el:textarea property="description" cols="50" rows="3" /></td>
+		<td><html-el:textarea property="description" cols="50" rows="3"  styleClass="form-control"/></td>
 	</tr>
 	<tr>
 		<td><fmt:message key="admin.organisation.locale"/>:</td>
 		<td>
-			<html-el:select property="localeId">
+			<html-el:select property="localeId"  styleClass="form-control">
 				<c:forEach items="${locales}" var="locale">
 					<html-el:option value="${locale.localeId}">
 						<c:out value="${locale.description}" />
@@ -51,7 +51,7 @@
 	<tr>
 		<td><fmt:message key="admin.organisation.status"/>:</td>
 		<td>
-			<html-el:select property="stateId">
+			<html-el:select property="stateId"  styleClass="form-control">
 				<c:forEach items="${status}" var="state">
 					<html-el:option value="${state.organisationStateId}"><fmt:message key="organisation.state.${state.description}"/></html-el:option>
 				</c:forEach>
@@ -71,12 +71,13 @@
 	<tr>
 		<td colspan="2">&nbsp;</td>
 	</tr>
-	<tr>
-		<td colspan=2 class="align-right">
-			<html-el:submit styleClass="button"><fmt:message key="admin.save"/></html-el:submit>
-			<html-el:reset styleClass="button"><fmt:message key="admin.reset"/></html-el:reset>
-			<html-el:cancel styleClass="button"><fmt:message key="admin.cancel"/></html-el:cancel>
-		</td>
-	</tr>
 </table>
+
+<div class="pull-right">
+	<html-el:cancel styleClass="btn btn-default"><fmt:message key="admin.cancel"/></html-el:cancel>
+	<html-el:reset styleClass="btn btn-default loffset5"><fmt:message key="admin.reset"/></html-el:reset>
+	<html-el:submit styleClass="btn btn-primary loffset5"><fmt:message key="admin.save"/></html-el:submit>
+</div>
+
 </html-el:form>
+		

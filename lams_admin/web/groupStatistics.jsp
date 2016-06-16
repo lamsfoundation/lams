@@ -1,11 +1,11 @@
 <%@ include file="/taglibs.jsp"%>
 
-<h3>${groupStatisticsDTO.name}</h3>
+<h4>${groupStatisticsDTO.name}</h4>
 
-<table class="alternative-color">
+<table class="table table-striped table-condensed" >
 	<tr>
 		<td><fmt:message key="admin.statistics.totalUsers" /></td>
-		<td>${groupStatisticsDTO.totalUsers}</td>
+		<td width="150px">${groupStatisticsDTO.totalUsers}</td>
 	</tr>
 	<tr>
 		<td><fmt:message key="admin.statistics.lessons" /></td>
@@ -26,15 +26,15 @@
 </table>
 
 <c:if test="${not empty  groupStatisticsDTO.subGroups}">
-	<div style="margin-left: 50px"><c:forEach
+	<div style="margin-left: 4%"><c:forEach
 		var="subGroupStatisticsDTO" items="${groupStatisticsDTO.subGroups}">
 
-		<h3>${subGroupStatisticsDTO.name}</h3>
+		<h4>${subGroupStatisticsDTO.name}</h4>
 
-		<table class="alternative-color">
+		<table class="table table-striped table-condensed" >
 			<tr>
 				<td><fmt:message key="admin.statistics.totalUsers" /></td>
-				<td>${subGroupStatisticsDTO.totalUsers}</td>
+				<td width="150px">${subGroupStatisticsDTO.totalUsers}</td>
 			</tr>
 			<tr>
 				<td><fmt:message key="admin.statistics.lessons" /></td>

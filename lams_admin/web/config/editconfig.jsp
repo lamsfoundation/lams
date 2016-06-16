@@ -2,37 +2,28 @@
 <%@ page import="org.lamsfoundation.lams.config.ConfigurationItem"%>
 <%@ include file="/taglibs.jsp"%>
 
-<h4>
-	<a href="sysadminstart.do"><fmt:message key="sysadmin.maintain" /></a>
-</h4>
-<lams:help style="no-tabs"
-	page="<%=Configuration.CONFIGURATION_HELP_PAGE%>" />
-<h1>
-	<fmt:message key="sysadmin.config.settings.edit" />
-</h1>
+<p><a href="<lams:LAMSURL/>/admin/sysadminstart.do" class="btn btn-default"><fmt:message key="sysadmin.maintain" /></a></p>
 
-<div align="center">
-	<c:if test="${not empty error}">
-		<p class='warning'>
+<c:if test="${not empty error}">
+	<lams:Alert type="danger" id="error-messages" close="false">
 			<c:out value="${error}" />
-		</p>
-	</c:if>
-</div>
+	</lams:Alert>
+</c:if>
 
 <html:form action="/config" method="post">
 	<html:hidden property="method" value="save" />
 
 	<tiles:insert attribute="items" />
 
-	<p align="center">
-		<html:submit styleId="saveButton" styleClass="button">
-			<fmt:message key="admin.save" />
-		</html:submit>
-		<html:reset styleClass="button">
-			<fmt:message key="admin.reset" />
-		</html:reset>
-		<html:cancel styleClass="button">
+	<div class="pull-right">
+		<html:cancel styleClass="btn btn-default">
 			<fmt:message key="admin.cancel" />
 		</html:cancel>
-	</p>
+		<html:reset styleClass="btn btn-default loffset5">
+			<fmt:message key="admin.reset" />
+		</html:reset>
+		<html:submit styleId="saveButton" styleClass="btn btn-primary loffset5">
+			<fmt:message key="admin.save" />
+		</html:submit>
+	</div>
 </html:form>

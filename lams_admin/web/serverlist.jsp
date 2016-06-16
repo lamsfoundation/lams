@@ -1,10 +1,8 @@
 <%@ include file="/taglibs.jsp"%>
 
-<h4><a href="sysadminstart.do"><fmt:message key="sysadmin.maintain" /></a></h4>
-<h1><fmt:message key="sysadmin.maintain.external.servers" /></h1>
+<p><a href="<lams:LAMSURL/>/admin/sysadminstart.do" class="btn btn-default"><fmt:message key="sysadmin.maintain" /></a></p>
 
-<p class="align-right"><input class="button" name="addnewserver" type="button" value="<fmt:message key='sysadmin.server.add' />" onClick="javascript:document.location='servermaintain.do?method=edit'" /></p>
-<table class=alternative-color width=100%>
+<table class="table table-striped">
 	<tr>
 		<th><fmt:message key="sysadmin.serverid" /></th>
 		<th><fmt:message key="sysadmin.serverkey" /></th>
@@ -50,4 +48,7 @@
 	</tr>
 	</c:forEach>
 </table>
-<p>${fn:length(servers)} <fmt:message key="sysadmin.integrated.servers" /></p>
+<p>${fn:length(servers)}&nbsp;<fmt:message key="sysadmin.integrated.servers" /></p>
+
+<input class="btn btn-default pull-right" name="addnewserver" type="button" value="<fmt:message key='sysadmin.server.add' />" onClick="javascript:document.location='servermaintain.do?method=edit'" />
+
