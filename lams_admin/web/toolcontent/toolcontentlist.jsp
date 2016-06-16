@@ -35,27 +35,31 @@
 </script>
 
 
-<h4><a href="sysadminstart.do"><fmt:message key="sysadmin.maintain" /></a></h4>
+<p><a href="<lams:LAMSURL/>/admin/sysadminstart.do" class="btn btn-default"><fmt:message key="sysadmin.maintain" /></a></p>
+
 <h1><fmt:message key="sysadmin.tool.management" /></h1>
 
-<p>
-	<fmt:message key="msg.edit.tool.content.1" />
-	&nbsp;&nbsp;
-	<fmt:message key="msg.edit.tool.content.2" />
-</p>
-<p>
-	<fmt:message key="msg.edit.tool.content.3" />
-</p>
-
-<a href="javascript:openToolGroups()" class="button" style="float:right; margin: 10px 0"
-   title="<fmt:message key='tool.groups.open.button.tooltip' />"><fmt:message key="tool.groups.open.button" /></a>
-<div id="toolGroupsDialog" style="display: none">
-	<a class="customDialogButton" href="javascript:saveToolGroups()" style="right: 50px;">
-		<fmt:message key="admin.save" />
-	</a>
-	<iframe id="toolGroupsFrame" style="border: none; width: 100%; height: 100%"></iframe>
-</div>
-
+<div class="panel">
+	<p>
+		<fmt:message key="msg.edit.tool.content.1" />
+		&nbsp;
+		<fmt:message key="msg.edit.tool.content.2" />
+	</p>
+	<p>
+		<fmt:message key="msg.edit.tool.content.3" />
+	</p>
+	
+	<a href="javascript:openToolGroups()" class="btn btn-default pull-right" 
+	   title="<fmt:message key='tool.groups.open.button.tooltip' />"><fmt:message key="tool.groups.open.button" /></a>
+	<div id="toolGroupsDialog" style="display: none">
+		<a class="customDialogButton" href="javascript:saveToolGroups()" style="right: 50px;">
+			<fmt:message key="admin.save" />
+		</a>
+		<iframe id="toolGroupsFrame" style="border: none; width: 100%; height: 100%"></iframe>
+	</div>
+	
+	<p>${fn:length(toolLibrary)}&nbsp;<fmt:message key="sysadmin.library.totals" /></p>
+</div>	
 
 <c:set var="displayToolManagement" value="false" />
 <logic:iterate id="dto" name="toolLibrary">
@@ -64,8 +68,7 @@
 	</c:if>
 </logic:iterate>
 
-<p>
-<table class="alternative-color" width="100%">
+<table class="table table-striped table-condensed voffset10">
 	<tr>
 		<th><fmt:message key="label.tool" /></th>
 		<th><fmt:message key="sysadmin.library.activity.description" /></th>
@@ -111,4 +114,3 @@
 	</logic:iterate>
 </table>
 </p>
-<p>${fn:length(toolLibrary)} <fmt:message key="sysadmin.library.totals" /></p>

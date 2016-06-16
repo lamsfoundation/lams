@@ -7,7 +7,7 @@
 	<link rel="icon" href="<lams:LAMSURL/>favicon.ico" type="image/x-icon" />
 	<link rel="shortcut icon" href="<lams:LAMSURL/>favicon.ico" type="image/x-icon" />
 	
-	<lams:css style="main" />
+	<lams:css />
 	<style media="screen,projection" type="text/css">
 		html {
 			margin: 1;
@@ -32,12 +32,12 @@
 
 <body>
 
-<h1 style="padding: 20px 10px 0px;"><fmt:message key="admin.servertimezone.select.server.timezone" /></h1>
+<h4 class="loffset10"><fmt:message key="admin.servertimezone.select.server.timezone" /></h4>
 	<div style="padding: 13px 20px 20px;">
 
 		<html:select styleId="timeZoneId" property="timeZoneId" value="${serverTimezone}" style="margin-bottom:40px;">
 			<logic:iterate name="timezoneDtos" id="timezoneDto">
-				<html:option value="${timezoneDto.timeZoneId}">
+				<html:option value="${timezoneDto.timeZoneId}" styleClass="form-control">
 					${timezoneDto.timeZoneId}
 					&nbsp;&nbsp;-&nbsp;&nbsp;
 					<fmt:message key="admin.servertimezone.raw.offset" ><fmt:param><fmt:formatDate value="${timezoneDto.rawOffset}" pattern="H:mm" timeZone="GMT" /></fmt:param></fmt:message>
@@ -49,14 +49,14 @@
 			</logic:iterate>
 		</html:select>
 		
-		<lams:ImgButtonWrapper>
-			<a href="#" onclick="self.parent.tb_remove();" class="button right-buttons space-left">
+		<div class="pull-right">
+			<a href="#" onclick="self.parent.tb_remove();" class="btn btn-default btn-sm">
 				<fmt:message key="admin.cancel" /> 
 			</a>
-			<a href="#" onclick="changeServerTimezone();" class="button right-buttons">
+			<a href="#" onclick="changeServerTimezone();" class="btn btn-primary btn-sm">
 				<fmt:message key="admin.servertimezone.select" /> 
 			</a>
-		</lams:ImgButtonWrapper>
+		</div>
 	</div>
 	
 </body>

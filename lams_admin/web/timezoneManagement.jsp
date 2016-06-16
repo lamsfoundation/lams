@@ -4,24 +4,25 @@
 <script type="text/javascript" src="<lams:LAMSURL/>/includes/javascript/jquery.js"></script>
 <script type="text/javascript" src="<lams:LAMSURL/>/includes/javascript/thickbox.js"></script>
 
-<h4><a href="sysadminstart.do"><fmt:message key="sysadmin.maintain" /></a></h4>
-<lams:help style="no-tabs" page="<%= Timezone.TIMEZONE_HELP_PAGE %>"/>
-<h1><fmt:message key="admin.timezone.available.timezones" /></h1>
-<fmt:message key="admin.timezone.select.timezones.you.want.users.choose" />
+<p><a href="<lams:LAMSURL/>/admin/sysadminstart.do" class="btn btn-default"><fmt:message key="sysadmin.maintain" /></a></p>
+<fmt:message key="admin.timezone.select.timezones.you.want.users.choose" >
+<fmt:param>
 	<a class="thickbox" href="timezonemanagement.do?method=serverTimezoneManagement&KeepThis=true&TB_iframe=true&height=188&width=820" title="<fmt:message key='admin.servertimezone.server.timezone.management'/>">
 		${serverTimezone}
 	</a>
+</fmt:param>
+</fmt:message>
 
-<div align="center">
-	<c:if test="${not empty error}">
-		<p class='warning'><c:out value="${error}"/></p>
-	</c:if>
-</div>
+<c:if test="${not empty error}">
+	<lams:Alert type="danger" id="errorKey" close="false">				
+		<c:out value="${error}"/></p>
+	</lams:Alert>
+</c:if>
 
 <html:form action="/timezonemanagement" method="post">
 	<html:hidden property="method" value="save"/>
 	
-	<table class="alternative-color" width=100% cellspacing="0" style="padding-top:20px;">
+	<table class="table table-striped table-condensed">
 		<tr>
 			<th width="8%"><fmt:message key="admin.timezone.select" /></th>
 			<th width="22%"><fmt:message key="admin.timezone.time.zone.id" /></th>
@@ -55,8 +56,8 @@
 		
 	</table>
 	
-	<p align="right" class="small-space-top" style="margin-right: 10px">
-		<html:submit styleClass="button" style="margin-right: 15px"><fmt:message key="admin.save" /></html:submit>
-		<html:cancel styleClass="button"><fmt:message key="admin.cancel" /></html:cancel>
+	<div class="pull-right">
+		<html:cancel styleClass="btn btn-default"><fmt:message key="admin.cancel" /></html:cancel>
+		<html:submit styleClass="btn btn-primary loffset5"><fmt:message key="admin.save" /></html:submit>
 	</p>
 </html:form>

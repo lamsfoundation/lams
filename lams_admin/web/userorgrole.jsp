@@ -8,17 +8,16 @@ function toggleCheckboxes(roleIndex, object){
 }
 </script>
 
-<h4>
-	<a href="orgmanage.do?org=1"><fmt:message key="admin.course.manage" /></a>
+<p><a href="orgmanage.do?org=1" class="btn btn-default"><fmt:message key="admin.course.manage" /></a>
     <logic:notEmpty name="pOrgId">
-        : <a href="orgmanage.do?org=<bean:write name="pOrgId" />"><bean:write name="pOrgName"/></a>
+        : <a href="orgmanage.do?org=<bean:write name="pOrgId" />" class="btn btn-default"><bean:write name="pOrgName"/></a>
     </logic:notEmpty>
     <logic:notEqual name="UserOrgRoleForm" property="orgId" value="1">
-		: <a href="<logic:equal name="orgType" value="3">user</logic:equal><logic:notEqual name="orgType" value="3">org</logic:notEqual>manage.do?org=<bean:write name="UserOrgRoleForm" property="orgId" />">
+		: <a href="<logic:equal name="orgType" value="3">user</logic:equal><logic:notEqual name="orgType" value="3">org</logic:notEqual>manage.do?org=<bean:write name="UserOrgRoleForm" property="orgId" />" class="btn btn-default">
 		<bean:write name="orgName"/></a>
 	</logic:notEqual>
 	<logic:equal name="UserOrgRoleForm" property="orgId" value="1">
-		: <a href="usermanage.do?org=<bean:write name="UserOrgRoleForm" property="orgId" />"><fmt:message key="admin.global.roles.manage" /></a>
+		: <a href="usermanage.do?org=<bean:write name="UserOrgRoleForm" property="orgId" />" class="btn btn-default"><fmt:message key="admin.global.roles.manage" /></a>
 	</logic:equal>
 </h4>
 
@@ -29,14 +28,14 @@ function toggleCheckboxes(roleIndex, object){
 <html-el:form action="/userorgrolesave.do" method="post">
 <html-el:hidden property="orgId" />
 
-<table class="alternative-color" width=100% cellspacing="0">
+<table class="table table-condensed table-no-border">
 <tr>
 	<th><fmt:message key="admin.user.login"/></th>
 	<logic:iterate id="role" name="roles" indexId="roleIndex">
 		<th><input type="checkbox" 
 					name="<c:out value="${roleIndex}" />" 
 					onclick="toggleCheckboxes(<c:out value="${roleIndex}" />, this);" 
-					onkeyup="toggleCheckboxes(<c:out value="${roleIndex}" />, this);" />
+					onkeyup="toggleCheckboxes(<c:out value="${roleIndex}" />, this);" />&nbsp;
 			<fmt:message>role.<lams:role role="${role.name}" /></fmt:message></th>
 	</logic:iterate>
 </tr>
@@ -52,15 +51,13 @@ function toggleCheckboxes(roleIndex, object){
 		</logic:iterate>
 	</tr>
 </logic:iterate>
-<tr>
-	<td></td>
-	<td colspan=<c:out value="${numroles}" /> class="align-right">
-		<html-el:cancel styleId="cancelButton" styleClass="button"><fmt:message key="admin.cancel"/></html-el:cancel>
-		<html-el:submit styleId="saveButton"   styleClass="button"><fmt:message key="admin.save"/></html-el:submit>
-	</td>
-</tr>
 </table>
 <c:if test="${parentFlag}">
 <p><fmt:message key="msg.user.add.to.parent.group" /></p>
 </c:if>
+
+<div class="pull-right">
+	<html-el:cancel styleId="cancelButton" styleClass="btn btn-default"><fmt:message key="admin.cancel"/></html-el:cancel>
+	<html-el:submit styleId="saveButton"   styleClass="btn btn-primary loffset5"><fmt:message key="admin.save"/></html-el:submit>
+</div>
 </html-el:form>

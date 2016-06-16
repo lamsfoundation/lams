@@ -11,19 +11,17 @@ function loading(){
 }
 </script>
 
-<h4><a href="sysadminstart.do"><fmt:message key="sysadmin.maintain" /></a></h4>
-<lams:help style="no-tabs" page="<%= IImportService.IMPORT_GROUPS_HELP_PAGE %>"/>
-<h1><fmt:message key="sysadmin.import.groups.title" /></h1>
+<p><a href="<lams:LAMSURL/>/admin/sysadminstart.do" class="btn btn-default"><fmt:message key="sysadmin.maintain" /></a></p>
 
 <div id="loading" style="display:none">
-	<h3><fmt:message key="msg.please.wait"/></h3>
+	<h4><fmt:message key="msg.please.wait"/></h4>
 	<p align="center"><img src="<lams:LAMSURL/>/images/loading.gif" alt="loading..." /></p>
 </div>
 
 <div id="main-page">
 
 <logic:notEmpty name="results">
-	<h3><fmt:message key="heading.import.results"/></h3>
+	<h4><fmt:message key="heading.import.results"/></h4>
 	<table cellspacing="5" cellpadding="5">
 		<tr><th width="115" align="right"><fmt:message key="table.heading.organisation.id"/></th><th><fmt:message key="admin.organisation.name"/></th></tr>
 		<%
@@ -33,10 +31,10 @@ function loading(){
 				List rowResult = (List)results.get(i);
 				if (rowResult != null && rowResult.size() >= 4) {
 					if (rowResult.get(3).equals(OrganisationType.COURSE_TYPE.toString())) {
-						out.print("<th align=\"right\">"+rowResult.get(0)+"</th>");
+						out.print("<th>"+rowResult.get(0)+"</th>");
 						out.print("<th>"+rowResult.get(1)+"</th>");
 					} else if (rowResult.get(3).equals(OrganisationType.CLASS_TYPE.toString())) {
-						out.print("<td align=\"right\">"+rowResult.get(0)+"</td>");
+						out.print("<td>"+rowResult.get(0)+"</td>");
 						out.print("<td>"+rowResult.get(1)+"</td>");
 					}
 				} else { // it's an error message
@@ -50,7 +48,6 @@ function loading(){
 			}
 		%>
 	</table>
-	<p>&nbsp;</p>
 	<hr />
 </logic:notEmpty>
 
@@ -77,13 +74,13 @@ function loading(){
 <table>
 	<tr>
 		<td align="right"><fmt:message key="label.excel.spreadsheet" />:&nbsp;</td>
-		<td><html:file property="file" /></td>
+		<td><html:file property="file" styleClass="form-control"/></td>
 	</tr>
 </table>
-<p align="center">
-<html:submit styleId="importButton" styleClass="button"><fmt:message key="label.import"/></html:submit> &nbsp; 	
-<html:cancel styleId="cancelButton" styleClass="button"><fmt:message key="admin.cancel"/></html:cancel>
-</p>
+<div class="pull-right">
+<html:cancel styleId="cancelButton" styleClass="btn btn-default"><fmt:message key="admin.cancel"/></html:cancel>
+<html:submit styleId="importButton" styleClass="btn btn-primary loffset5"><fmt:message key="label.import"/></html:submit> &nbsp; 	
+</div>
 
 </html:form>
 

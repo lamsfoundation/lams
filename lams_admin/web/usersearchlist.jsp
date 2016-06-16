@@ -4,7 +4,7 @@
 <c:set var="useInternalSMTPServer"><lams:Configuration key="InternalSMTPServer"/></c:set>
 <c:set var="smtpServer"><lams:Configuration key="SMTPServer"/></c:set>
 
-<link type="text/css" href="${lams}css/jquery.tablesorter.theme-blue.css" rel="stylesheet">
+<link rel="stylesheet" href="${lams}css/jquery.tablesorter.theme.bootstrap.css">
 <link type="text/css" href="${lams}css/jquery.tablesorter.pager.css" rel="stylesheet">
 <style>
 	#tablesorter thead .disabled {
@@ -18,10 +18,10 @@
 <script type="text/javascript" src="${lams}includes/javascript/jquery.tablesorter-widgets.js"></script>
 <script type="text/javascript">
   	$(document).ready(function(){
-	    
-  		var $table = $("#tablesorter").tablesorter({
-			theme: 'blue',
-			widgets: ["zebra", "filter"],
+  		var $table = $(".tablesorter").tablesorter({
+  			theme: 'bootstrap',
+  			headerTemplate : '{content} {icon}',
+			widgets: ["uitheme", "zebra", "filter"],
 		    widgetOptions : {
 		    	filter_external : '.search',
 		        // include column filters
@@ -36,11 +36,17 @@
             sortList: [[1]] 
 		});
 		
-		$("#tablesorter").each(function() {
+		$(".tablesorter").each(function() {
 			$(this).tablesorterPager({
 				savePages: false,
-				ajaxUrl : "<c:url value='/usersearch.do'/>?dispatch=getPagedUsers&page={page}&size={size}&{sortList:column}&{filterList:fcol}",
+                container: $(this).find(".ts-pager"),
+                output: '{startRow} to {endRow} ({totalRows})',
+                cssPageDisplay: '.pagedisplay',
+                cssPageSize: '.pagesize',
+                cssDisabled: 'disabled',
+                ajaxUrl : "<c:url value='/usersearch.do'/>?dispatch=getPagedUsers&page={page}&size={size}&{sortList:column}&{filterList:fcol}",
 				ajaxProcessing: function (data, table) {
+
 			    	if (data && data.hasOwnProperty('rows')) {
 			    		var rows = [],
 			            json = {};
@@ -100,20 +106,8 @@
 						return json;
 			            
 			    	}
-				},
-			    container: $(this).next("#pager"),
-			    output: '{startRow} to {endRow} ({totalRows})',// possible variables: {page}, {totalPages}, {filteredPages}, {startRow}, {endRow}, {filteredRows} and {totalRows}
-			    // css class names of pager arrows
-			    cssNext: '.tablesorter-next', // next page arrow
-				cssPrev: '.tablesorter-prev', // previous page arrow
-				cssFirst: '.tablesorter-first', // go to first page arrow
-				cssLast: '.tablesorter-last', // go to last page arrow
-				cssGoto: '.gotoPage', // select dropdown to allow choosing a page
-				cssPageDisplay: '.pagedisplay', // location of where the "output" is displayed
-				cssPageSize: '.pagesize', // page size selector - select dropdown that sets the "size" option
-				// class added to arrows when at the extremes (i.e. prev/first arrows are "disabled" when on the first page)
-				cssDisabled: 'disabled' // Note there is no period "." in front of this class name
-			})
+				}
+            })
 		});
 		
 		// make demo search buttons work
@@ -129,66 +123,34 @@
   	})
 </script>
 
-<h4>
-	<a href="orgmanage.do?org=1">
-		<fmt:message key="admin.course.manage" />
-	</a>
-</h4>
-<h1>
-	<fmt:message key="admin.user.find"/>
-</h1>
+<p><a href="orgmanage.do?org=1" class="btn btn-default"><fmt:message key="admin.course.manage" /></a>
+<a href="<lams:LAMSURL/>/admin/sysadminstart.do" class="btn btn-default loffset5"><fmt:message key="sysadmin.maintain" /></a></p>
 
-<p align="right">
-	<input class="button" type="button" value="<fmt:message key="admin.user.create"/>" onclick=javascript:document.location='user.do?method=edit' />
+<p><input class="btn btn-default" type="button" value="<fmt:message key="admin.user.create"/>" onclick=javascript:document.location='user.do?method=edit' />
+
+<span class="pull-right">
+	<fmt:message key="admin.search" />:&nbsp;<input class="search form-control form-control-inline" type="search" data-column="1">
+</span>
 </p>
 
-<p align="right">
-	<fmt:message key="admin.search" />:&nbsp;<input class="search" type="search" data-column="1">
-</p>
-
-<table id="tablesorter">
-	<thead>
-		<tr>
-			<th width="3%" clas="{sorter: 'digit'}">
-				<fmt:message key="admin.user.userid"/>
-			</th>
-			<th width="15%" align="center">
-				<fmt:message key="admin.user.login"/>
-			</th>
-			<th width="15%" align="center">
-				<fmt:message key="admin.user.first_name"/>
-			</th>
-			<th width="15%" align="center">
-				<fmt:message key="admin.user.last_name"/>
-			</th>
-			<th width="15%" align="center">
-				<fmt:message key="admin.user.email"/>
-			</th>
-			<th width="20%" align="center">
-				<fmt:message key="admin.user.actions"/>
-			</th>
-		</tr>
-	</thead>
-			
-	<tbody>
-	</tbody>
-</table>
+<lams:TSTable numColumns="6"> 
+	<th width="3%" clas="{sorter: 'digit'}">
+		<fmt:message key="admin.user.userid"/>
+	</th>
+	<th width="15%" align="center">
+		<fmt:message key="admin.user.login"/>
+	</th>
+	<th width="15%" align="center">
+		<fmt:message key="admin.user.first_name"/>
+	</th>
+	<th width="15%" align="center">
+		<fmt:message key="admin.user.last_name"/>
+	</th>
+	<th width="15%" align="center">
+		<fmt:message key="admin.user.email"/>
+	</th>
+	<th width="20%" align="center">
+		<fmt:message key="admin.user.actions"/>
+	</th>
+</lams:TSTable>			
 		
-<!-- pager -->
-<div id="pager">
-	<form>
-		<img class="tablesorter-first"/>
-		<img class="tablesorter-prev"/>
-		<span class="pagedisplay"></span>
-		<img class="tablesorter-next"/>
-		<img class="tablesorter-last"/>
-		<select class="pagesize">
-			<option selected="selected" value="10">10</option>
-			<option value="20">20</option>
-			<option value="30">30</option>
-			<option value="40">40</option>
-			<option value="50">50</option>
-			<option value="100">100</option>
-		</select>
-	</form>
-</div>
