@@ -1149,7 +1149,7 @@ public class MonitoringAction extends LamsDispatchAction {
 	boolean flaFormat = false;
 	for (Activity activity : (Set<Activity>) learningDesign.getActivities()) {
 	    if ((activity.isBranchingActivity() || activity.isOptionsWithSequencesActivity())
-		    && (((ComplexActivity) activity).getXcoord() == null)) {
+		    && (activity.getXcoord() == null)) {
 		// if a single activity is in FLA format, all of them are
 		flaFormat = true;
 		break;
@@ -1240,15 +1240,14 @@ public class MonitoringAction extends LamsDispatchAction {
 	    activityJSON.put("type", activity.getActivityTypeId());
 
 	    Activity parentActivity = activity.getParentActivity();
-	    if (activity.isBranchingActivity() && (((BranchingActivity) activity).getXcoord() == null)) {
+	    if (activity.isBranchingActivity() && (activity.getXcoord() == null)) {
 		// old branching is just a rectangle like Tool
 		// new branching has start and finish points, it's exploded
 		activityJSON.put("x",
 			MonitoringAction.getActivityCoordinate(((BranchingActivity) activity).getStartXcoord()));
 		activityJSON.put("y",
 			MonitoringAction.getActivityCoordinate(((BranchingActivity) activity).getStartYcoord()));
-	    } else if (activity.isOptionsWithSequencesActivity()
-		    && (((OptionsWithSequencesActivity) activity).getXcoord() == null)) {
+	    } else if (activity.isOptionsWithSequencesActivity() && (activity.getXcoord() == null)) {
 		// old optional sequences is just a long rectangle
 		// new optional sequences has start and finish points, it's exploded
 		activityJSON.put("x", MonitoringAction
