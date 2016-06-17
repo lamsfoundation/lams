@@ -20,7 +20,6 @@
  * ****************************************************************
  */
 
-
 package org.lamsfoundation.lams.web;
 
 import java.io.IOException;
@@ -33,6 +32,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.SortedSet;
 import java.util.TreeMap;
 import java.util.TreeSet;
 
@@ -76,12 +76,6 @@ import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 
-/**
- *
- *
- *
- *
- */
 public class OrganisationGroupAction extends DispatchAction {
 
     private static Logger log = Logger.getLogger(OrganisationGroupAction.class);
@@ -98,7 +92,7 @@ public class OrganisationGroupAction extends DispatchAction {
 
     /**
      * Shows course grouping list or redirects to groups if a grouping was already chosen.
-     * 
+     *
      * @throws Exception
      */
     @SuppressWarnings("unchecked")
@@ -136,41 +130,39 @@ public class OrganisationGroupAction extends DispatchAction {
 
 	// if this is a chosen group and lesson is created using integrations - show groups received from LMS instead of actual LAMS ones
 	if (getIntegrationService().isIntegratedServerGroupFetchingAvailable(lessonId)) {
-	    
+
 	    if (lessonId == null) {
 		//it's when a learner clicks back button on groups page
 		Activity activity = getLearnerService().getActivity(activityID);
 		lessonId = getLearnerService().getLessonByActivity(activity).getLessonId();
 		request.setAttribute("lessonID", lessonId);
 	    }
-	    
+
 	    List<ExtGroupDTO> extGroups = getIntegrationService().getExtGroups(lessonId, null);
 	    request.setAttribute("extGroups", extGroups);
 	    // TODO ? show only with user number >0
 	    return mapping.findForward(OrganisationGroupAction.MAPPING_VIEW_EXT_GROUPS);
 
-	} else {
-
-	    boolean isGroupSuperuser = getUserManagementService().isUserInRole(userId, organisationId, Role.GROUP_ADMIN)
-		    || getUserManagementService().isUserInRole(userId, organisationId, Role.GROUP_MANAGER);
-	    request.setAttribute("canEdit", isGroupSuperuser || (activityID != null));
-
-	    Set<OrganisationGroupingDTO> orgGroupingDTOs = new TreeSet<OrganisationGroupingDTO>();
-	    List<OrganisationGrouping> orgGroupings = getUserManagementService()
-		    .findByProperty(OrganisationGrouping.class, "organisationId", organisationId);
-	    for (OrganisationGrouping orgGrouping : orgGroupings) {
-		orgGroupingDTOs.add(new OrganisationGroupingDTO(orgGrouping));
-	    }
-	    request.setAttribute("groupings", orgGroupingDTOs);
-
-	    return mapping.findForward(OrganisationGroupAction.MAPPING_VIEW_GROUPINGS);
 	}
 
+	boolean isGroupSuperuser = getUserManagementService().isUserInRole(userId, organisationId, Role.GROUP_ADMIN)
+		|| getUserManagementService().isUserInRole(userId, organisationId, Role.GROUP_MANAGER);
+	request.setAttribute("canEdit", isGroupSuperuser || (activityID != null));
+
+	Set<OrganisationGroupingDTO> orgGroupingDTOs = new TreeSet<OrganisationGroupingDTO>();
+	List<OrganisationGrouping> orgGroupings = getUserManagementService().findByProperty(OrganisationGrouping.class,
+		"organisationId", organisationId);
+	for (OrganisationGrouping orgGrouping : orgGroupings) {
+	    orgGroupingDTOs.add(new OrganisationGroupingDTO(orgGrouping));
+	}
+	request.setAttribute("groupings", orgGroupingDTOs);
+
+	return mapping.findForward(OrganisationGroupAction.MAPPING_VIEW_GROUPINGS);
     }
 
     /**
      * View groups of the given grouping.
-     * 
+     *
      * @throws Exception
      */
     @SuppressWarnings("unchecked")
@@ -425,7 +417,7 @@ public class OrganisationGroupAction extends DispatchAction {
 
     /**
      * Deletes course grouping with the given ID.
-     * 
+     *
      * @throws Exception
      */
     public ActionForward removeGrouping(ActionMapping mapping, ActionForm form, HttpServletRequest request,
@@ -447,6 +439,70 @@ public class OrganisationGroupAction extends DispatchAction {
 	getUserManagementService().deleteById(OrganisationGrouping.class, groupingId);
 
 	return viewGroupings(mapping, form, request, response);
+    }
+
+    /**
+     * Fetches course and branching so they can get matched by user.
+     */
+    @SuppressWarnings("unchecked")
+    public ActionForward getGroupsForMapping(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+	    HttpServletResponse response) throws IOException, JSONException {
+	Long orgGroupingId = WebUtil.readLongParam(request, "groupingId");
+	Long activityID = WebUtil.readLongParam(request, AttributeNames.PARAM_ACTIVITY_ID);
+
+	OrganisationGrouping orgGrouping = (OrganisationGrouping) getUserManagementService()
+		.findById(OrganisationGrouping.class, orgGroupingId);
+	JSONArray groupsJSON = new JSONArray();
+	SortedSet<OrganisationGroup> orgGroups = new TreeSet<OrganisationGroup>(orgGrouping.getGroups());
+	for (OrganisationGroup group : orgGroups) {
+	    JSONObject groupJSON = new JSONObject();
+	    groupJSON.put("id", group.getGroupId());
+	    groupJSON.put("name", group.getName());
+	    groupsJSON.put(groupJSON);
+	}
+
+	GroupingActivity branchingGrouping = (GroupingActivity) getUserManagementService().findById(Activity.class,
+		activityID);
+	JSONArray branchesJSON = new JSONArray();
+	Grouping grouping = branchingGrouping.getCreateGrouping();
+	SortedSet<Group> groups = new TreeSet<Group>(grouping.getGroups());
+	for (Group group : groups) {
+	    JSONObject groupJSON = new JSONObject();
+	    groupJSON.put("id", group.getGroupId());
+	    groupJSON.put("name", group.getGroupName());
+	    branchesJSON.put(groupJSON);
+	}
+
+	JSONObject responseJSON = new JSONObject();
+	responseJSON.put("branches", branchesJSON);
+	responseJSON.put("groups", groupsJSON);
+
+	response.setContentType("application/json;charset=utf-8");
+	response.getWriter().write(responseJSON.toString());
+	return null;
+    }
+
+    /**
+     * Stores course groups to branching groups mapping.
+     */
+    public ActionForward saveGroupMappings(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+	    HttpServletResponse response) throws IOException, JSONException {
+	JSONArray groupMapping = new JSONArray(request.getParameter("mapping"));
+	for (int index = 0; index < groupMapping.length(); index++) {
+	    JSONObject entry = groupMapping.getJSONObject(index);
+	    Long orgGroupID = entry.getLong("groupID");
+	    Long branchingGroupID = entry.getLong("branchID");
+	    OrganisationGroup orgGroup = (OrganisationGroup) getUserManagementService()
+		    .findById(OrganisationGroup.class, orgGroupID);
+	    Group branchingGroup = (Group) getUserManagementService().findById(Group.class, branchingGroupID);
+	    // put all users from course group to mapped branching group
+	    branchingGroup.getUsers().addAll(orgGroup.getUsers());
+	    getUserManagementService().save(branchingGroup);
+	}
+	response.setContentType("text/plain;charset=utf-8");
+	// Javascript waits for this response
+	response.getWriter().write("OK");
+	return null;
     }
 
     /**
@@ -496,7 +552,7 @@ public class OrganisationGroupAction extends DispatchAction {
 		return comparator.compare(grp1Name, grp2Name);
 	    }
 	};
-	
+
 	// serialize database group objects into JSON
 	JSONArray groupsJSON = new JSONArray();
 	if (groups != null) {
@@ -542,8 +598,7 @@ public class OrganisationGroupAction extends DispatchAction {
 		request.setAttribute(GroupingAJAXAction.PARAM_USED_FOR_BRANCHING, isUsedForBranching);
 
 		// check if it is immutable (for branching) or default groups are allowed
-		return !groups.isEmpty() && (isUsedForBranching || allowDefault || !isDefaultChosenGrouping(grouping))
-			? grouping : null;
+		return !groups.isEmpty() && (allowDefault || !isDefaultChosenGrouping(grouping)) ? grouping : null;
 	    }
 	}
 
@@ -551,7 +606,7 @@ public class OrganisationGroupAction extends DispatchAction {
     }
 
     /**
-     * Check if the give groups are default for chosen grouping. There is actually no good way to detect this, but even
+     * Check if the given groups are default for chosen grouping. There is actually no good way to detect this, but even
      * if a custom grouping is mistaken for the default one, it should bring little harm.
      */
     @SuppressWarnings("unchecked")
@@ -583,13 +638,12 @@ public class OrganisationGroupAction extends DispatchAction {
 	}
 	return OrganisationGroupAction.userManagementService;
     }
-    
+
     private ICoreLearnerService getLearnerService() {
 	if (OrganisationGroupAction.learnerService == null) {
 	    WebApplicationContext ctx = WebApplicationContextUtils
 		    .getRequiredWebApplicationContext(getServlet().getServletContext());
-	    OrganisationGroupAction.learnerService = (ICoreLearnerService) ctx
-		    .getBean("learnerService");
+	    OrganisationGroupAction.learnerService = (ICoreLearnerService) ctx.getBean("learnerService");
 	}
 	return OrganisationGroupAction.learnerService;
     }
