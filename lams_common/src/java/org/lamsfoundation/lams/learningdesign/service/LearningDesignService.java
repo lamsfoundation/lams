@@ -306,9 +306,8 @@ public class LearningDesignService implements ILearningDesignService {
 
     @Override
     public String createBranchingSVG(Long branchingActivityId, int imageFormat) throws IOException {
-	BranchingActivity branchingActivity = (BranchingActivity) activityDAO
-		.getActivityByActivityId(branchingActivityId);
-	Long learningDesignId = branchingActivity.getLearningDesign().getLearningDesignId();
+	Activity activity = activityDAO.getActivityByActivityId(branchingActivityId);
+	Long learningDesignId = activity.getLearningDesign().getLearningDesignId();
 	return createDesignSVG(learningDesignId, branchingActivityId, imageFormat);
     }
 
