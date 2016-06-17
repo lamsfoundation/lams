@@ -11,7 +11,7 @@ function removeGrouping(groupingId) {
 	}
 }
 
-function showGroups(groupingId, force) {
+function viewGroups(groupingId, force) {
 	var url = LAMS_URL + 'OrganisationGroup.do?method=viewGroups&organisationID='
 		+ organisationId;
 	if (lessonId) {
@@ -92,7 +92,7 @@ function openGroupMappingDialog(groupingId) {
 											// LAMS can reply 200 even if there is an error, so we need OK response
 											if (response == 'OK') {
 												// go straight to branching groups for final check
-												showGroups(groupingId, true);
+												viewGroups(groupingId, true);
 											}
 										}
 				            		});
