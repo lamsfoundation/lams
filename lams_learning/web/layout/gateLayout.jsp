@@ -29,7 +29,11 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 <lams:html xhtml="true">
 
 <lams:head>
-	<title><c:out value="${GateForm.map.gate.title}" /></title>
+
+	<c:set var="title"><tiles:getAsString name="pageTitleKey"/></c:set>
+	<c:set var="title"><fmt:message key="${title}"/></c:set>
+	
+	<title><c:out value="${title}" /></title>
 	<lams:css />
 	<META HTTP-EQUIV="Refresh"
 		CONTENT="60;URL=<lams:WebAppURL/>/gate.do?method=knockGate&activityID=${GateForm.map.activityID}&lessonID=${GateForm.map.lessonID }">
@@ -42,11 +46,10 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 <body class="stripes">
 
 
-	<lams:Page type="learner" title="${GateForm.map.gate.title}">
+	<lams:Page type="learner" title="${title}">
 
 		<tiles:insert attribute="body" />
 		<%@ include file="../gate/gateNext.jsp"%>
-
 
 	</lams:Page>
 </body>
