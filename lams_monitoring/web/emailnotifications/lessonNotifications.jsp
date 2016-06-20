@@ -14,8 +14,8 @@
 	<link rel="shortcut icon" href="<lams:LAMSURL/>/favicon.ico" type="image/x-icon" />
 	<title><fmt:message key="${fn:escapeXml(title)}"/></title>
 	
-	<lams:css style="learner"/>
-	<link type="text/css" href="<lams:LAMSURL/>css/jquery-ui-redmond-theme.css" rel="stylesheet">
+	<lams:css/>
+	<link type="text/css" href="<lams:LAMSURL/>css/jquery-ui-smoothness-theme.css" rel="stylesheet">
 	<link rel="stylesheet" type="text/css" href="<lams:LAMSURL/>/css/jquery.jqGrid.css" />
 	
 	<style media="screen,projection" type="text/css">
@@ -25,11 +25,10 @@
 		#additionalParameters {min-height: 50px;}
 		#activityDiv, #daysToDeadlineDiv {display: none;}
 		#pager3_right table{float:right !important; }
-		#datePickerDiv {margin: 10px 0 50px;}
+		#datePickerDiv {margin: 10px 0 10px;}
 		
 		/* Accordion */
 		.ui-state-active a, .ui-state-active a:link, .ui-state-active a:visited, .ui-state-active a:hover  {
-		    color: #47bc23 !important;
 		    background-image: none;
 		    background-color: transparent ;
 		}
@@ -37,8 +36,7 @@
 		.ui-jqgrid-hbox {padding-left: 0;}
 		#accordion {width: 325px;}
 		#accordion h3 a {border-bottom: 0;}
-		#accordion p {text-align: center; padding-bottom: 0px; margin-bottom: 0xp;}
-		#listEmailsHref {border-bottom: 1px dotted #47BC23;color: #47BC23;text-decoration: none;}
+		#accordion p {text-align: center; padding-bottom: 0px; margin-bottom: 0xp; font-size:12px;}
 	</style>	
 	
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery.js"></script>
@@ -89,7 +87,7 @@
     				// once it is loaded, it needs to be adjusted
     				$('div.ui-accordion-content').css('height', '100%');
     			},
-    			change: function(event, ui) {
+    			activate: function(event, ui) {
     				if ($('#accordion').accordion('option', 'active') == 0) {
     					$("#emailButton").attr('value', '<fmt:message key="email.notifications.send"/>');
     				} else {
@@ -188,19 +186,18 @@
 </lams:head>
     
 <body class="stripes">
-<div id="page">
-	<div id="content">
 
-		<h2><fmt:message key="email.notifications.notify.sudents.that"/></h2>
+	<lams:Page title="${title}" type="admin">
+		<h4><fmt:message key="email.notifications.notify.sudents.that"/></h4>
 		
 		<form action="<c:url value="/emailNotifications.do"/>?method=emailUsers" method="post" id="emailNotificationsForm" >	
 		
 		<div id="emailTextareaDiv">
 			<c:set var="emailBody"><fmt:message key="email.notifications.lesson.email.body.header"/><br/><br/><fmt:message key="email.notifications.lesson.email.body.msg"/><br/><br/><br/><fmt:message key="email.notifications.lesson.email.body.footer" ><fmt:param>${lesson.lessonName}</fmt:param><fmt:param><lams:LAMSURL/>home.do?method=learner&lessonID=${lesson.lessonId}</fmt:param></fmt:message>
 			</c:set>
-			<textarea rows="8" name="emailBody" id="emailBody" cols="43" >${fn:replace(emailBody, '<br/>', newLineChar)}</textarea>
+			<textarea rows="8" name="emailBody" id="emailBody" cols="43"  class="form-control form-control-inline">${fn:replace(emailBody, '<br/>', newLineChar)}</textarea>
 			<br/><br/>
-			<input class="button" type="button" id="emailButton" value="<fmt:message key="email.notifications.send"/>" />
+			<input class="btn btn-primary btn-sm" type="button" id="emailButton" value="<fmt:message key="email.notifications.send"/>" />
 		</div>		
 		
 		<!-- Dropdown menu for choosing a user search type -->
@@ -234,14 +231,13 @@
 				</h3>
 				
 				<input name="daysToDeadline" type="text" id="daysToDeadline" value="3" size="3"/> 	
-				<input class="button space-left small-space-bottom" type="button" value="<fmt:message key="button.ok"/>" onclick="getUsers();" />			
+				<input class="btn btn-default btn-sm" type="button" value="<fmt:message key="button.ok"/>" onclick="getUsers();" />			
 			</div>
 		</div>
 		
 		<%@ include file="additionalSettings.jsp"%>
 		
 		</form>
-	</div>
-</div>
+	</lams:Page>
 </body>
 </lams:html>

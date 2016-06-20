@@ -11,45 +11,39 @@
 <!DOCTYPE html>
 <lams:html>
 <lams:head>
-	<link rel="icon" href="<lams:LAMSURL/>favicon.ico" type="image/x-icon" />
-	<link rel="shortcut icon" href="<lams:LAMSURL/>favicon.ico" type="image/x-icon" />
 	<c:if test="${not empty param.sessionMapID}">
 		<c:set var="sessionMapID" value="${param.sessionMapID}" />
 	</c:if>	
 	
-	<lams:css style="main" />	
-	<link type="text/css" href="<lams:LAMSURL/>/css/jquery-ui-redmond-theme.css" rel="stylesheet" />	
-	<style media="screen,projection" type="text/css">
-		html {margin: 0;overflow:auto;background: none;}
-		body {background: none;	min-height: 100%;width: 100%;}	
-	</style>
+	<lams:css/>	
+	<link type="text/css" href="<lams:LAMSURL/>/css/jquery-ui-smoothness-theme.css" rel="stylesheet" />
 </lams:head>
 
 <body>
-	<h2 style="padding: 20px 25px 0;">
+	<h4>
 		<fmt:message key="email.notifications.scheduled.messages.list"/>
-	</h2>
+	</h4>
 
-	<table style="padding: 10px 30px;">
+	<table class="table table-condensed table-striped">
 		<thead>
-			<tr class="ui-widget-header">
-				<td style="text-align: left; width: 20%;">
+			<tr>
+				<td class="text-left">
 					<fmt:message key="email.notifications.scheduled.messages.list.scheduled.date"/>		
 				</td>
-				<td style="text-align: left; width: 30%;">
+				<td  class="text-left">
 					Notify students that	
 				</td>
-				<td style="text-align: left;">
+				<td  class="text-left">
 					<fmt:message key="email.notifications.scheduled.messages.list.email.body"/>		
 				</td>
 			</tr>
 		</thead>
 		<c:forEach var="emailJob" items="${scheduleList}">
 			<tr>
-				<td style="border-bottom: 1px solid #efefef;">
+				<td style="vertical-align: top;">
 					<fmt:formatDate value="${emailJob.triggerDate}" type="date" />
 				</td>
-				<td style="border-bottom: 1px solid #efefef;">
+				<td  style="vertical-align: top;">
 					<c:choose>
 						<c:when test="${emailJob.searchType == 0}"><fmt:message key="email.notifications.user.search.property.0" /></c:when>
 						<c:when test="${emailJob.searchType == 1}"><fmt:message key="email.notifications.user.search.property.1" /></c:when>
@@ -64,7 +58,7 @@
 						<c:when test="${emailJob.searchType == 10}"><fmt:message key="email.notifications.user.search.property.10" /></c:when>
 					</c:choose>
 				</td>
-				<td style="border-bottom: 1px solid #efefef;">
+				<td  style="vertical-align: top;">
 					${emailJob.emailBody}
 				</td>
 			</tr>
@@ -79,7 +73,7 @@
 			<c:set var="returnUrlParams">?method=getCourseView&organisationID=${organisationID}</c:set>
 		</c:otherwise>
 	</c:choose>
-	<a href="<c:url value='/emailNotifications.do'/>${returnUrlParams}" style="margin: 30px 50px; float: right;">
+	<a href="<c:url value='/emailNotifications.do'/>${returnUrlParams}" class="btn btn-primary pull-right">
 		<fmt:message key="email.notifications.scheduled.messages.list.back" />
 	</a>
 

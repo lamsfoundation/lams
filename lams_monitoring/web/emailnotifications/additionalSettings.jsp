@@ -6,21 +6,21 @@
 <%@ taglib uri="tags-function" prefix="fn"%>
 
 <div id="accordion">
-	<h3 id="nowHeader">
+	<h4 id="nowHeader">
 		<a href="#"><fmt:message key="email.notifications.table.now" /></a>
-	</h3>
+	</h4>
 	<div id="nowDiv">
 		<table id="list3"></table>
 		<div id="pager3"></div>
 	</div>
 			
-	<h3 id="scheduleHeader">
+	<h4 id="scheduleHeader">
 		<a href="#"><fmt:message key="email.notifications.table.schedule" /></a>
-	</h3>
+	</h4>
 	<div>
-		<div>
+		<p class="body">
 			<fmt:message key="email.notifications.schedule.description" />
-		</div>
+		</p>
 	
 		<div id="datePickerDiv">
 			<span>
@@ -38,7 +38,7 @@
 				<c:set var="additionalParams">organisationID=${org.organisationId}</c:set>
 			</c:otherwise>
 		</c:choose>
-		<a href="<c:url value='/emailNotifications.do'/>?method=showScheduledEmails&${additionalParams}" id="listEmailsHref">
+		<a href="<c:url value='/emailNotifications.do'/>?method=showScheduledEmails&${additionalParams}" id="listEmailsHref" class="btn btn-default btn-sm">
 			<fmt:message key="email.notifications.scheduled.messages.list" />
 		</a>				
 	</div>
