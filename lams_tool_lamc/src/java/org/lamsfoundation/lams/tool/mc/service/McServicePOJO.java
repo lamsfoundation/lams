@@ -137,8 +137,6 @@ public class McServicePOJO
 
     private IAuditService auditService;
     private IUserManagementService userManagementService;
-    private ILessonService lessonService;
-    private IActivityDAO activityDAO;
     private ILearnerService learnerService;
     private ILamsToolService toolService;
     private IToolContentHandler mcToolContentHandler = null;
@@ -939,94 +937,6 @@ public class McServicePOJO
     }
 
     @Override
-    public void recalculateMarkForLesson(UserDTO requestUserDTO, Long lessonId) {
-
-	User requestUser = userManagementService.getUserByLogin(requestUserDTO.getLogin());
-	Lesson lesson = lessonService.getLesson(lessonId);
-	Organisation organisation = lesson.getOrganisation();
-
-	// skip doing anything if the user doesn't have permission
-	Integer organisationToCheckPermission = (organisation.getOrganisationType().getOrganisationTypeId()
-		.equals(OrganisationType.COURSE_TYPE)) ? organisation.getOrganisationId()
-			: organisation.getParentOrganisation().getOrganisationId();
-	boolean isGroupManager = userManagementService.isUserInRole(requestUser.getUserId(),
-		organisationToCheckPermission, Role.GROUP_MANAGER);
-	if (!(lesson.getLessonClass().isStaffMember(requestUser) || isGroupManager)) {
-	    return;
-	}
-
-	// get all lesson activities
-	Set<Activity> lessonActivities = new TreeSet<Activity>();
-	/*
-	 * Hibernate CGLIB is failing to load the first activity in the sequence as a ToolActivity for some mysterious
-	 * reason Causes a ClassCastException when you try to cast it, even if it is a ToolActivity.
-	 *
-	 * THIS IS A HACK to retrieve the first tool activity manually so it can be cast as a ToolActivity - if it is
-	 * one
-	 */
-	Activity firstActivity = activityDAO
-		.getActivityByActivityId(lesson.getLearningDesign().getFirstActivity().getActivityId());
-	lessonActivities.add(firstActivity);
-	lessonActivities.addAll(lesson.getLearningDesign().getActivities());
-
-	// iterate through all assessment activities in the lesson
-	for (Activity activity : lessonActivities) {
-
-	    // check if it's assessment activity
-	    if ((activity instanceof ToolActivity)
-		    && ((ToolActivity) activity).getTool().getToolSignature().equals(McAppConstants.MY_SIGNATURE)) {
-		ToolActivity mcqActivity = (ToolActivity) activity;
-
-		for (ToolSession toolSession : (Set<ToolSession>) mcqActivity.getToolSessions()) {
-		    Long toolSessionId = toolSession.getToolSessionId();
-		    McSession mcSession = getMcSessionById(toolSessionId);
-		    McContent mcContent = mcSession.getMcContent();
-
-		    if (mcContent.isUseSelectLeaderToolOuput()) {
-
-			McQueUsr leader = mcSession.getGroupLeader();
-			//if there is no leader yet or leader hasn't submitted any attempts - no point in updating gradebook marks
-			if (leader == null || (leader.getNumberOfAttempts() == 0)) {
-			    continue;
-			}
-
-			final Double leaderMark = new Double(leader.getLastAttemptTotalMark());
-
-			// update marks for all learners in a group
-			Set<McQueUsr> users = mcSession.getMcQueUsers();
-			for (McQueUsr user : users) {
-			    copyAnswersFromLeader(user, leader);
-
-			    // propagade total mark to Gradebook
-			    gradebookService.updateActivityMark(leaderMark, null, user.getQueUsrId().intValue(),
-				    toolSessionId, false);
-			}
-		    } else {
-
-			// update marks for all learners in a group
-			Set<McQueUsr> users = mcSession.getMcQueUsers();
-			for (McQueUsr user : users) {
-
-			    // if leader hasn't submitted any attempts - no point in updating gradebook marks
-			    if (user.getNumberOfAttempts() == 0) {
-				continue;
-			    }
-
-			    final Double userMark = new Double(user.getLastAttemptTotalMark());
-
-			    // propagade total mark to Gradebook
-			    gradebookService.updateActivityMark(userMark, null, user.getQueUsrId().intValue(),
-				    toolSessionId, false);
-			}
-		    }
-
-		}
-	    }
-	}
-
-    }
-
-    @Override
     public byte[] prepareSessionDataSpreadsheet(McContent mcContent) throws IOException {
 
 	Set<McQueContent> questions = mcContent.getMcQueContents();
@@ -1744,14 +1654,6 @@ public class McServicePOJO
 
     public void setUserManagementService(IUserManagementService userManagementService) {
 	this.userManagementService = userManagementService;
-    }
-
-    public void setLessonService(ILessonService lessonService) {
-	this.lessonService = lessonService;
-    }
-
-    public void setActivityDAO(IActivityDAO activityDAO) {
-	this.activityDAO = activityDAO;
     }
 
     public void setToolService(ILamsToolService toolService) {
