@@ -72,12 +72,6 @@
 		<url-pattern>/*</url-pattern>
 	</filter-mapping>
 	
-
-	<servlet>
-		<servlet-name>populateMarks</servlet-name>
-		<servlet-class>org.lamsfoundation.lams.tool.assessment.web.servlet.PopulateMarksServlet</servlet-class>
-	</servlet>
-
 	<servlet>
 		<servlet-name>action</servlet-name>
 		<servlet-class>org.apache.struts.action.ActionServlet</servlet-class>
@@ -140,11 +134,6 @@
 	<servlet-mapping>
 		<servlet-name>download</servlet-name>
 		<url-pattern>/download/*</url-pattern>
-	</servlet-mapping>
-
-	<servlet-mapping>
-		<servlet-name>populateMarks</servlet-name>
-		<url-pattern>/populateMarks</url-pattern>
 	</servlet-mapping>
 
 	<jsp-config>

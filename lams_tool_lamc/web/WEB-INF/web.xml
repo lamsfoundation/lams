@@ -98,12 +98,6 @@
 		</init-param>
 		<load-on-startup>3</load-on-startup>
 	</servlet>
-	
-	<servlet>
-		<servlet-name>populateMarks</servlet-name>
-		<servlet-class>org.lamsfoundation.lams.tool.mc.web.PopulateMarksServlet</servlet-class>
-	</servlet>
-
 
 	<!-- FCKEditor Connector Configuration -->
 	<servlet>
@@ -128,11 +122,6 @@
 	<servlet-mapping>
 		<servlet-name>download</servlet-name>
 		<url-pattern>/download/*</url-pattern>
-	</servlet-mapping>
-  	
-  	<servlet-mapping>
-		<servlet-name>populateMarks</servlet-name>
-		<url-pattern>/populateMarks</url-pattern>
 	</servlet-mapping>
 
 	<servlet-mapping>
