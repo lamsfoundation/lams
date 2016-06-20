@@ -906,7 +906,7 @@ function updateSequenceTab() {
 			$.each(response.activities, function(activityIndex, activity){
 				addActivityIconsHandlers(activity);
 				
-				var isBranching = [10,11,12,13].indexOf(activity.type) > -1;
+				var isBranching = [10,11,12].indexOf(activity.type) > -1;
 				if (activity.url || (isBranching && !flaFormat)) {
 					var activityGroup = $('g[id="' + activity.id + '"]'),
 						dblClickFunction = 
@@ -2198,11 +2198,11 @@ function appendXMLElement(tagName, attributesObject, content, target) {
 function dblTap(elem, dblClickFunction) {
  	 // double tap detection on mobile devices; it works also for mouse clicks
  	 elem.tap(function(event){
+ 		 var currentTime = new Date().getTime();
  	 	  // is the second click on the same element as the first one?
  		  if (event.currentTarget == lastTapTarget) {
  		  	  // was the second click quick enough after the first one?
-			  var currentTime = new Date().getTime(),
-			  	  tapLength = currentTime - lastTapTime;
+			  var tapLength = currentTime - lastTapTime;
 			  if (tapLength < tapTimeout && tapLength > 0) {
 				  event.preventDefault();
 				  dblClickFunction(event);
