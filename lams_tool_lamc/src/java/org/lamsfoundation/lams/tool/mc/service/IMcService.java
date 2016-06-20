@@ -221,15 +221,6 @@ public interface IMcService {
 	    List<McQuestionDTO> deletedQuestions);
 
     /**
-     * Recalculate mark for leader and sets it to all members of a group. Authentication check: user must be either
-     * lesson stuff or group manager.
-     *
-     * @param requestUserDTO
-     * @param lessonId
-     */
-    void recalculateMarkForLesson(UserDTO requestUserDTO, Long lessonId);
-
-    /**
      *
      * returns reflection data for all sessions
      *

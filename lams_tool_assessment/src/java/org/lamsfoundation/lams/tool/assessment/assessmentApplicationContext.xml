@@ -105,20 +105,10 @@
 		</property>   
 		<property name="eventNotificationService">
 			<ref bean="eventNotificationService"/>
-		</property>   
-		<property name="lessonService">
-   			<ref bean="lessonService"/>
-   		</property>
+		</property>
    		<property name="assessmentOutputFactory">
    			<ref bean="assessmentOutputFactory"/>
    		</property>
-		<property name="activityDAO">
-			<ref bean="activityDAO"/>
-		</property>
-		<property name="userService">
-			<ref bean="userManagementService"/>
-		</property>
-				
     </bean>
 
     <bean id="laasseAssessmentService" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
