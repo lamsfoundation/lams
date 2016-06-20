@@ -436,14 +436,5 @@ public interface IAssessmentService {
 	    Set<QuestionReference> oldReferences, Set<QuestionReference> newReferences,
 	    List<QuestionReference> deletedReferences);
 
-    /**
-     * Recalculate mark for leader and sets it to all members of a group. Authentication check: user must be either
-     * lesson stuff or group manager.
-     *
-     * @param requestUserDTO
-     * @param lessonId
-     */
-    void recalculateMarkForLesson(UserDTO requestUserDTO, Long lessonId);
-
     void releaseQuestionsAndReferencesFromCache(Assessment assessment);
 }

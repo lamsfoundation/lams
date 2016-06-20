@@ -156,12 +156,6 @@ public class AssessmentServiceImpl implements IAssessmentService, ToolContentMan
 
     private IEventNotificationService eventNotificationService;
 
-    private ILessonService lessonService;
-
-    private IActivityDAO activityDAO;
-
-    private IUserManagementService userService;
-
     // *******************************************************************************
     // Service method
     // *******************************************************************************
@@ -1864,99 +1858,6 @@ public class AssessmentServiceImpl implements IAssessmentService, ToolContentMan
     }
 
     @Override
-    public void recalculateMarkForLesson(UserDTO requestUserDTO, Long lessonId) {
-
-	User requestUser = userService.getUserByLogin(requestUserDTO.getLogin());
-	Lesson lesson = lessonService.getLesson(lessonId);
-	Organisation organisation = lesson.getOrganisation();
-
-	// skip doing anything if the user doesn't have permission
-	Integer organisationToCheckPermission = (organisation.getOrganisationType().getOrganisationTypeId()
-		.equals(OrganisationType.COURSE_TYPE)) ? organisation.getOrganisationId()
-			: organisation.getParentOrganisation().getOrganisationId();
-	boolean isGroupManager = userService.isUserInRole(requestUser.getUserId(), organisationToCheckPermission,
-		Role.GROUP_MANAGER);
-	if (!(lesson.getLessonClass().isStaffMember(requestUser) || isGroupManager)) {
-	    return;
-	}
-
-	// get all lesson activities
-	Set<Activity> lessonActivities = new TreeSet<Activity>();
-	/*
-	 * Hibernate CGLIB is failing to load the first activity in the sequence as a ToolActivity for some mysterious
-	 * reason Causes a ClassCastException when you try to cast it, even if it is a ToolActivity.
-	 *
-	 * THIS IS A HACK to retrieve the first tool activity manually so it can be cast as a ToolActivity - if it is
-	 * one
-	 */
-	Activity firstActivity = activityDAO
-		.getActivityByActivityId(lesson.getLearningDesign().getFirstActivity().getActivityId());
-	lessonActivities.add(firstActivity);
-	lessonActivities.addAll(lesson.getLearningDesign().getActivities());
-
-	// iterate through all assessment activities in the lesson
-	for (Activity activity : lessonActivities) {
-
-	    // check if it's assessment activity
-	    if ((activity instanceof ToolActivity) && ((ToolActivity) activity).getTool().getToolSignature()
-		    .equals(AssessmentConstants.TOOL_SIGNATURE)) {
-		ToolActivity assessmentActivity = (ToolActivity) activity;
-
-		for (ToolSession toolSession : (Set<ToolSession>) assessmentActivity.getToolSessions()) {
-		    Long toolSessionId = toolSession.getToolSessionId();
-		    AssessmentSession assessmentSession = getAssessmentSessionBySessionId(toolSessionId);
-		    Assessment assessment = assessmentSession.getAssessment();
-
-		    if (assessment.isUseSelectLeaderToolOuput()) {
-
-			AssessmentUser leader = assessmentSession.getGroupLeader();
-			if (leader == null) {
-			    continue;
-			}
-
-			AssessmentResult leaderLastResult = getLastFinishedAssessmentResult(assessment.getUid(),
-				leader.getUserId());
-			if (leaderLastResult == null) {
-			    continue;
-			}
-			Double mark = new Double(leaderLastResult.getGrade());
-
-			// update marks for all learners in a group
-			List<AssessmentUser> users = getUsersBySession(toolSessionId);
-			for (AssessmentUser user : users) {
-			    copyAnswersFromLeader(user, leader);
-
-			    // propagade total mark to Gradebook
-			    gradebookService.updateActivityMark(mark, null, user.getUserId().intValue(), toolSessionId,
-				    false);
-			}
-		    } else {
-
-			// update marks for all learners in a group
-			List<AssessmentUser> users = getUsersBySession(toolSessionId);
-			for (AssessmentUser user : users) {
-			    AssessmentResult userLastResult = getLastFinishedAssessmentResult(assessment.getUid(),
-				    user.getUserId());
-			    if (userLastResult == null) {
-				continue;
-			    }
-			    Double mark = new Double(userLastResult.getGrade());
-
-			    // propagade total mark to Gradebook
-			    gradebookService.updateActivityMark(mark, null, user.getUserId().intValue(), toolSessionId,
-				    false);
-			    System.out.println("aaa USER" + user.getUserId());
-			}
-		    }
-		    System.out.println("aaa" + toolSessionId);
-
-		}
-	    }
-	}
-
-    }
-
-    @Override
     public String getMessage(String key) {
 	return messageService.getMessage(key);
     }
@@ -2420,10 +2321,6 @@ public class AssessmentServiceImpl implements IAssessmentService, ToolContentMan
 	this.assessmentOutputFactory = assessmentOutputFactory;
     }
 
-    public void setLessonService(ILessonService lessonService) {
-	this.lessonService = lessonService;
-    }
-
     @Override
     public Class[] getSupportedToolOutputDefinitionClasses(int definitionType) {
 	return getAssessmentOutputFactory().getSupportedDefinitionClasses(definitionType);
@@ -2432,14 +2329,6 @@ public class AssessmentServiceImpl implements IAssessmentService, ToolContentMan
     @Override
     public String getToolContentTitle(Long toolContentId) {
 	return getAssessmentByContentId(toolContentId).getTitle();
-    }
-
-    public void setActivityDAO(IActivityDAO activityDAO) {
-	this.activityDAO = activityDAO;
-    }
-
-    public void setUserService(IUserManagementService userService) {
-	this.userService = userService;
     }
 
     // ****************** REST methods *************************

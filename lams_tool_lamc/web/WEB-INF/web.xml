@@ -123,13 +123,8 @@
 		<servlet-name>exportPortfolio</servlet-name>
 		<servlet-class>org.lamsfoundation.lams.tool.mc.web.ExportServlet</servlet-class>
 	</servlet>
-	
-	<servlet>
-		<servlet-name>populateMarks</servlet-name>
-		<servlet-class>org.lamsfoundation.lams.tool.mc.web.PopulateMarksServlet</servlet-class>
-	</servlet>
 
-<!--  FCKEditor Connector Configuration -->
+	<!--  CKEditor Connector Configuration -->
 	<servlet>
 		<servlet-name>Connector</servlet-name>
 		<servlet-class>net.fckeditor.connector.ConnectorServlet</servlet-class>
@@ -158,11 +153,6 @@
 		<servlet-name>exportPortfolio</servlet-name>
 		<url-pattern>/exportPortfolio/*</url-pattern>
   	</servlet-mapping>
-  	
-  	<servlet-mapping>
-		<servlet-name>populateMarks</servlet-name>
-		<url-pattern>/populateMarks</url-pattern>
-	</servlet-mapping>
 
 	<servlet-mapping>
 	    <servlet-name>Connector</servlet-name>
