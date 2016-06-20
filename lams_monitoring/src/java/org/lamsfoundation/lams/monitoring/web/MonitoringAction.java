@@ -21,7 +21,6 @@
  * ****************************************************************
  */
 
-
 package org.lamsfoundation.lams.monitoring.web;
 
 import java.io.IOException;
@@ -1184,6 +1183,9 @@ public class MonitoringAction extends LamsDispatchAction {
 		    || parentParentActivity.getActivityId().equals(branchingActivityId))) {
 		activities.add(activity);
 	    } else {
+		if (parentParentActivity.isOptionsWithSequencesActivity()) {
+		    activities.add(activity);
+		}
 		// branching and options with sequences in Flash format have hidden activities
 		// map the children to their parent for further processing
 		Set<Activity> children = parentToChildren.get(parentParentActivity.getActivityId());
@@ -1240,14 +1242,14 @@ public class MonitoringAction extends LamsDispatchAction {
 	    activityJSON.put("type", activity.getActivityTypeId());
 
 	    Activity parentActivity = activity.getParentActivity();
-	    if (activity.isBranchingActivity() && (activity.getXcoord() == null)) {
+	    if (activity.isBranchingActivity() && flaFormat) {
 		// old branching is just a rectangle like Tool
 		// new branching has start and finish points, it's exploded
 		activityJSON.put("x",
 			MonitoringAction.getActivityCoordinate(((BranchingActivity) activity).getStartXcoord()));
 		activityJSON.put("y",
 			MonitoringAction.getActivityCoordinate(((BranchingActivity) activity).getStartYcoord()));
-	    } else if (activity.isOptionsWithSequencesActivity() && (activity.getXcoord() == null)) {
+	    } else if (activity.isOptionsWithSequencesActivity() && flaFormat) {
 		// old optional sequences is just a long rectangle
 		// new optional sequences has start and finish points, it's exploded
 		activityJSON.put("x", MonitoringAction
@@ -1255,6 +1257,8 @@ public class MonitoringAction extends LamsDispatchAction {
 		activityJSON.put("y", MonitoringAction
 			.getActivityCoordinate(((OptionsWithSequencesActivity) activity).getStartYcoord()));
 	    } else if ((parentActivity != null) && (parentActivity.isOptionsActivity()
+		    || (parentActivity.isSequenceActivity()
+			    && parentActivity.getParentActivity().isOptionsWithSequencesActivity())
 		    || parentActivity.isParallelActivity() || parentActivity.isFloatingActivity())) {
 		// Optional Activity children had coordinates relative to parent
 		activityJSON.put("x", MonitoringAction.getActivityCoordinate(parentActivity.getXcoord())
