@@ -47,9 +47,11 @@ public class LearnerProgressDAO extends LAMSBaseDAO implements ILearnerProgressD
 
     protected Logger log = Logger.getLogger(LearnerProgressDAO.class);
 
-    private final static String LOAD_PROGRESS_BY_LEARNER = "from LearnerProgress p where p.user.id = :learnerId and p.lesson.id = :lessonId";
+    private final static String LOAD_PROGRESS_BY_LEARNER = "from LearnerProgress p where p.user.id = :learnerId "
+	    + "and p.lesson.id = :lessonId";
 
-    private final static String LOAD_PROGRESS_REFFERING_TO_ACTIVITY = "from LearnerProgress p where p.previousActivity = :activity or p.currentActivity = :activity or p.nextActivity = :activity ";
+    private final static String LOAD_PROGRESS_REFFERING_TO_ACTIVITY = "from LearnerProgress p "
+	    + "where p.previousActivity = :activity or p.currentActivity = :activity or p.nextActivity = :activity ";
 
     private final static String LOAD_COMPLETED_PROGRESS_BY_LESSON = "FROM LearnerProgress p WHERE p.lessonComplete > 0 "
 	    + "AND p.lesson.id = :lessonId ORDER BY p.user.firstName <ORDER>, p.user.lastName <ORDER>, p.user.login <ORDER>";
@@ -75,7 +77,8 @@ public class LearnerProgressDAO extends LAMSBaseDAO implements ILearnerProgressD
 	    + " index(compAct) = act";
 
     private final static String COUNT_CURRENT_ACTIVITY = "select prog.currentActivity.activityId, count(prog) "
-	    + "from LearnerProgress prog WHERE prog.currentActivity.activityId IN (:activityIds) GROUP BY prog.currentActivity.activityId";
+	    + "from LearnerProgress prog WHERE prog.currentActivity.activityId IN (:activityIds) "
+	    + "GROUP BY prog.currentActivity.activityId";
 
     private final static String LOAD_PROGRESS_BY_LESSON = "from LearnerProgress p "
 	    + " where p.lesson.id = :lessonId order by p.user.lastName, p.user.firstName, p.user.userId";
@@ -109,6 +112,9 @@ public class LearnerProgressDAO extends LAMSBaseDAO implements ILearnerProgressD
 	    + "WHERE lesson.lesson_id = :lessonId AND g.group_name NOT LIKE '%Staff%'";
     private final static String LOAD_LEARNERS_BY_MOST_PROGRESS_ORDER_CLAUSE = " GROUP BY u.user_id "
 	    + "ORDER BY prog.lesson_completed_flag DESC, comp_count DESC, u.first_name ASC, u.last_name ASC, u.login ASC";
+
+    private final static String FIND_PROGRESS_ARCHIVE_MAX_ATTEMPT = "SELECT MAX(p.attemptId) FROM LearnerProgressArchive p "
+	    + "WHERE p.user.id = :learnerId AND p.lesson.id = :lessonId";
 
     @Override
     public LearnerProgress getLearnerProgress(Long learnerProgressId) {
@@ -337,5 +343,12 @@ public class LearnerProgressDAO extends LAMSBaseDAO implements ILearnerProgressD
 	    }
 	}
 	return result;
+    }
+
+    @Override
+    public Integer getLearnerProgressArchiveMaxAttemptID(Integer userId, Long lessonId) {
+	Object value = getSession().createQuery(LearnerProgressDAO.FIND_PROGRESS_ARCHIVE_MAX_ATTEMPT)
+		.setInteger("learnerId", userId).setLong("lessonId", lessonId).uniqueResult();
+	return value == null ? null : ((Number) value).intValue();
     }
 }

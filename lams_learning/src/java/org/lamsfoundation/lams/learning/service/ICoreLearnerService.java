@@ -91,6 +91,11 @@ public interface ICoreLearnerService extends ILearnerService {
      *             in case of problems.
      */
     LearnerProgress getProgress(Integer learnerId, Long lessonId);
+    
+    /**
+     * Get the last attempt ID for the given learner and lesson.
+     */
+    Integer getProgressArchiveMaxAttemptID(Integer userId, Long lessonId);
 
     /**
      * Returns the current progress data, in the DTO format required by the jsp progress screen, of the User.

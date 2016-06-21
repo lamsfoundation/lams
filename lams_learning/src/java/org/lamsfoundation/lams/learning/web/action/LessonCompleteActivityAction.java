@@ -84,6 +84,7 @@ public class LessonCompleteActivityAction extends ActivityAction {
 	if (lessonFinishCallbackUrl != null) {
 	    request.setAttribute("lessonFinishUrl", lessonFinishCallbackUrl);
 	}
+	request.setAttribute("lessonID", learnerProgress.getLesson().getLessonId());
 
 	return mapping.findForward("lessonComplete");
     }
