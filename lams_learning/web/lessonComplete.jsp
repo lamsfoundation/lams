@@ -54,6 +54,11 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 		</fmt:message>
 	</p>
 	
+	<p>
+		<fmt:message key="message.lesson.restart" />
+		<a class="button" href="<lams:WebAppURL/>learner.do?method=restartLesson&lessonID=${lessonID}"><fmt:message key="message.lesson.restart.button" /></a>
+	</p>
+	
 	<c:if test="${not empty releasedLessons}">
 		<p>
 			<fmt:message key="message.released.lessons">
@@ -71,7 +76,6 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 			</a>	
 		</p>
 	</c:if>
-	
 </div>
 <!--closes content-->
 

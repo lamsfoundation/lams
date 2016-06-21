@@ -21,7 +21,6 @@
  * ****************************************************************
  */
 
-
 package org.lamsfoundation.lams.learning.web.action;
 
 import java.io.UnsupportedEncodingException;
@@ -86,7 +85,9 @@ public class LessonCompleteActivityAction extends ActivityAction {
 		learnerProgress.getLesson());
 	if (lessonFinishCallbackUrl != null) {
 	    request.setAttribute("lessonFinishUrl", lessonFinishCallbackUrl);
+
 	}
+	request.setAttribute("lessonID", learnerProgress.getLesson().getLessonId());
 
 	return mapping.findForward("lessonComplete");
     }

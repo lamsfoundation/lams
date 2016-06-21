@@ -21,12 +21,15 @@
  * ****************************************************************
  */
 
-
 package org.lamsfoundation.lams.learning.web.action;
 
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -46,11 +49,16 @@ import org.lamsfoundation.lams.learning.web.util.ActivityMapping;
 import org.lamsfoundation.lams.learning.web.util.LearningWebUtil;
 import org.lamsfoundation.lams.learningdesign.Activity;
 import org.lamsfoundation.lams.learningdesign.dto.ProgressActivityDTO;
+import org.lamsfoundation.lams.lesson.CompletedActivityProgress;
+import org.lamsfoundation.lams.lesson.CompletedActivityProgressArchive;
 import org.lamsfoundation.lams.lesson.LearnerProgress;
+import org.lamsfoundation.lams.lesson.LearnerProgressArchive;
 import org.lamsfoundation.lams.lesson.Lesson;
 import org.lamsfoundation.lams.lesson.dto.LessonDTO;
+import org.lamsfoundation.lams.monitoring.service.IMonitoringService;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
+import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
 import org.lamsfoundation.lams.util.Configuration;
 import org.lamsfoundation.lams.util.ConfigurationKeys;
 import org.lamsfoundation.lams.util.WebUtil;
@@ -274,6 +282,53 @@ public class LearnerAction extends LamsDispatchAction {
 	// we hand over the control to flash.
 	response.getWriter().print(wddxPacket);
 	return null;
+    }
+
+    /**
+     * Archives current learner progress and moves a learner back to the start of lesson.
+     */
+    public ActionForward restartLesson(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+	    HttpServletResponse response) throws IOException, ServletException {
+	// fetch necessary parameters
+	long lessonID = WebUtil.readLongParam(request, AttributeNames.PARAM_LESSON_ID);
+	ICoreLearnerService learnerService = LearnerServiceProxy.getLearnerService(getServlet().getServletContext());
+	User user = LearningWebUtil.getUser(learnerService);
+	Integer userID = user.getUserId();
+
+	// find number of previous attempts
+	Integer attemptID = learnerService.getProgressArchiveMaxAttemptID(userID, lessonID);
+	if (attemptID == null) {
+	    attemptID = 0;
+	}
+	attemptID++;
+
+	// make a copy of attempted and completed activities
+	LearnerProgress learnerProgress = learnerService.getProgress(userID, lessonID);
+	Map<Activity, Date> attemptedActivities = new HashMap<Activity, Date>(learnerProgress.getAttemptedActivities());
+	Map<Activity, CompletedActivityProgressArchive> completedActivities = new HashMap<Activity, CompletedActivityProgressArchive>();
+	for (Entry<Activity, CompletedActivityProgress> entry : learnerProgress.getCompletedActivities().entrySet()) {
+	    CompletedActivityProgressArchive activityArchive = new CompletedActivityProgressArchive(learnerProgress,
+		    entry.getKey(), entry.getValue().getStartDate(), entry.getValue().getFinishDate());
+	    completedActivities.put(entry.getKey(), activityArchive);
+	}
+
+	// save the historic attempt
+	LearnerProgressArchive learnerProgressArchive = new LearnerProgressArchive(user, learnerProgress.getLesson(),
+		attemptID, attemptedActivities, completedActivities, learnerProgress.getCurrentActivity(),
+		learnerProgress.getLessonComplete(), learnerProgress.getStartDate(), learnerProgress.getFinishDate());
+
+	// move learner to the beginning of lesson the same way Monitor can
+	IMonitoringService monitoringService = LearnerServiceProxy
+		.getMonitoringService(getServlet().getServletContext());
+	monitoringService.forceCompleteActivitiesByUser(userID, userID, lessonID,
+		learnerProgress.getLesson().getLearningDesign().getFirstActivity().getActivityId(), true);
+
+	IUserManagementService userManagementService = LearnerServiceProxy
+		.getUserManagementService(getServlet().getServletContext());
+	userManagementService.save(learnerProgressArchive);
+
+	// display Learner interface with updated data
+	return joinLesson(mapping, form, request, response);
     }
 
     /**
