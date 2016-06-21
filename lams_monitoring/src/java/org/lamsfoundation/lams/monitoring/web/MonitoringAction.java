@@ -1078,16 +1078,12 @@ public class MonitoringAction extends LamsDispatchAction {
 	    activityJSON.put("type", activity.getActivityTypeId());
 
 	    Activity parentActivity = activity.getParentActivity();
-	    if (activity.isBranchingActivity() && (activity.getXcoord() == null)) {
-		// old branching is just a rectangle like Tool
-		// new branching has start and finish points, it's exploded
+	    if (activity.isBranchingActivity()) {
 		activityJSON.put("x",
 			MonitoringAction.getActivityCoordinate(((BranchingActivity) activity).getStartXcoord()));
 		activityJSON.put("y",
 			MonitoringAction.getActivityCoordinate(((BranchingActivity) activity).getStartYcoord()));
-	    } else if (activity.isOptionsWithSequencesActivity() && (activity.getXcoord() == null)) {
-		// old optional sequences is just a long rectangle
-		// new optional sequences has start and finish points, it's exploded
+	    } else if (activity.isOptionsWithSequencesActivity()) {
 		activityJSON.put("x", MonitoringAction
 			.getActivityCoordinate(((OptionsWithSequencesActivity) activity).getStartXcoord()));
 		activityJSON.put("y", MonitoringAction
