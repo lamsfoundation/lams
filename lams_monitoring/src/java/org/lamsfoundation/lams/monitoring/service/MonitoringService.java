@@ -989,7 +989,11 @@ public class MonitoringService implements IMonitoringService {
     @Override
     public String forceCompleteActivitiesByUser(Integer learnerId, Integer requesterId, long lessonId, Long activityId,
 	    boolean removeLearnerContent) {
-	securityService.isLessonMonitor(lessonId, requesterId, "force complete", true);
+	if (requesterId.equals(learnerId)) {
+	    securityService.isLessonLearner(lessonId, requesterId, "force complete", true);
+	} else {
+	    securityService.isLessonMonitor(lessonId, requesterId, "force complete", true);
+	}
 	Lesson lesson = lessonDAO.getLesson(new Long(lessonId));
 	User learner = (User) baseDAO.find(User.class, learnerId);
 

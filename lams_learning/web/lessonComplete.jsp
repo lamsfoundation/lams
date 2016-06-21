@@ -56,6 +56,13 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 		</fmt:message>
 	</div>
 	
+	<div class="voffset10">
+		<fmt:message key="message.lesson.restart" />
+		<a class="btn btn-default loffset20" href="<lams:WebAppURL/>learner.do?method=restartLesson&lessonID=${lessonID}">
+			<fmt:message key="message.lesson.restart.button" />
+		</a>
+	</div>
+	
 	<c:if test="${not empty releasedLessons}">
 		<div class="voffset10">
 			<fmt:message key="message.released.lessons">

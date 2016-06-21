@@ -383,6 +383,11 @@ public class LearnerService implements ICoreLearnerService {
     public LearnerProgress getProgressById(Long progressId) {
 	return learnerProgressDAO.getLearnerProgress(progressId);
     }
+    
+    @Override
+    public Integer getProgressArchiveMaxAttemptID(Integer userId, Long lessonId) {
+	return learnerProgressDAO.getLearnerProgressArchiveMaxAttemptID(userId, lessonId);
+    }
 
     /**
      * @see org.lamsfoundation.lams.learning.service.ICoreLearnerService#getStructuredProgressDTOs(java.lang.Long,
