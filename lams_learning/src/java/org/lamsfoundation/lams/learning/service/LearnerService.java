@@ -21,7 +21,6 @@
  * ****************************************************************
  */
 
-
 package org.lamsfoundation.lams.learning.service;
 
 import java.sql.Timestamp;
@@ -410,6 +409,11 @@ public class LearnerService implements ICoreLearnerService {
     public LearnerProgress getProgressById(Long progressId) {
 	return learnerProgressDAO.getLearnerProgress(progressId);
     }
+    
+    @Override
+    public Integer getProgressArchiveMaxAttemptID(Integer userId, Long lessonId) {
+	return learnerProgressDAO.getLearnerProgressArchiveMaxAttemptID(userId, lessonId);
+    }
 
     /**
      * @see org.lamsfoundation.lams.learning.service.ICoreLearnerService#getProgressDTOByLessonId(java.lang.Long,
@@ -418,11 +422,7 @@ public class LearnerService implements ICoreLearnerService {
     @Override
     public LearnerProgressDTO getProgressDTOByLessonId(Long lessonId, Integer learnerId) {
 	LearnerProgress progress = learnerProgressDAO.getLearnerProgressByLearner(learnerId, lessonId);
-	if (progress != null) {
-	    return progress.getLearnerProgressData();
-	} else {
-	    return null;
-	}
+	return progress == null ? null : progress.getLearnerProgressData();
     }
 
     /**

@@ -21,7 +21,6 @@
  * ****************************************************************
  */
 
-
 package org.lamsfoundation.lams.learning.service;
 
 import java.util.Set;
@@ -51,21 +50,21 @@ import org.lamsfoundation.lams.util.MessageService;
 public interface ICoreLearnerService extends ILearnerService {
 
     /** Get the I18N service. Used by actions for internationalising errors that go back to Flash */
-    public MessageService getMessageService();
+    MessageService getMessageService();
 
     /** Get the user service. Used when the action needs the real user object, not just the userId */
-    public IUserManagementService getUserManagementService();
+    IUserManagementService getUserManagementService();
 
     /**
      * Gets the lesson object for the given key.
      *
      */
-    public Lesson getLesson(Long lessonID);
+    Lesson getLesson(Long lessonID);
 
     /**
      * Get the lesson data for a particular lesson. In a DTO format suitable for sending to the client.
      */
-    public LessonDTO getLessonData(Long lessonId);
+    LessonDTO getLessonData(Long lessonId);
 
     /**
      * Joins a User to a a new lesson as a learner
@@ -77,7 +76,7 @@ public interface ICoreLearnerService extends ILearnerService {
      * @throws LearnerServiceException
      *             in case of problems.
      */
-    public LearnerProgress joinLesson(Integer learnerId, Long lessonID);
+    LearnerProgress joinLesson(Integer learnerId, Long lessonID);
 
     /**
      * This method navigate through all the tool activities for the given activity. For each tool activity, we look up
@@ -88,7 +87,7 @@ public interface ICoreLearnerService extends ILearnerService {
      *            the learner progress we are processing.
      * @throws LamsToolServiceException
      */
-    public void createToolSessionsIfNecessary(Activity activity, LearnerProgress learnerProgress);
+    void createToolSessionsIfNecessary(Activity activity, LearnerProgress learnerProgress);
 
     /**
      * Returns the current progress data of the User.
@@ -101,7 +100,12 @@ public interface ICoreLearnerService extends ILearnerService {
      * @throws LearnerServiceException
      *             in case of problems.
      */
-    public LearnerProgress getProgress(Integer learnerId, Long lessonId);
+    LearnerProgress getProgress(Integer learnerId, Long lessonId);
+
+    /**
+     * Get the last attempt ID for the given learner and lesson.
+     */
+    Integer getProgressArchiveMaxAttemptID(Integer userId, Long lessonId);
 
     /**
      * Returns the current progress data, in the DTO format required by the jsp progress screen, of the User.
@@ -114,7 +118,7 @@ public interface ICoreLearnerService extends ILearnerService {
      * @throws LearnerServiceException
      *             in case of problems.
      */
-    public Object[] getStructuredActivityURLs(Integer learnerId, Long lessonId);
+    Object[] getStructuredActivityURLs(Integer learnerId, Long lessonId);
 
     /**
      * Return the current progress data against progress id.
@@ -122,7 +126,7 @@ public interface ICoreLearnerService extends ILearnerService {
      * @param progressId
      * @return
      */
-    public LearnerProgress getProgressById(Long progressId);
+    LearnerProgress getProgressById(Long progressId);
 
     /**
      * Return the current progress data for a user for a lesson Returns a DTO suitable to send to Flash.
@@ -133,7 +137,7 @@ public interface ICoreLearnerService extends ILearnerService {
      *            id
      * @return
      */
-    public LearnerProgressDTO getProgressDTOByLessonId(Long lessonId, Integer learnerId);
+    LearnerProgressDTO getProgressDTOByLessonId(Long lessonId, Integer learnerId);
 
     /**
      * Marks an activity as attempted. Called when a user selects an OptionsActivity.
@@ -149,8 +153,7 @@ public interface ICoreLearnerService extends ILearnerService {
      *            for branching and optional sequences for skipped sequences (e.g. force completed branching)
      * @return LearnerProgress
      */
-    public LearnerProgress chooseActivity(Integer learnerId, Long lessonId, Activity activity,
-	    Boolean clearCompletedFlag);
+    LearnerProgress chooseActivity(Integer learnerId, Long lessonId, Activity activity, Boolean clearCompletedFlag);
 
     /**
      * Calculates learner progress and returns the data required to be displayed to the learner (including URL(s)). This
@@ -164,7 +167,7 @@ public interface ICoreLearnerService extends ILearnerService {
      * @throws LearnerServiceException
      *             in case of problems.
      */
-    public LearnerProgress calculateProgress(Activity completedActivity, Integer learnerId,
+    LearnerProgress calculateProgress(Activity completedActivity, Integer learnerId,
 	    LearnerProgress currentLearnerProgress);
 
     /**
@@ -180,7 +183,7 @@ public interface ICoreLearnerService extends ILearnerService {
      *            lesson id
      * @return the updated learner progress
      */
-    public LearnerProgress completeActivity(Integer learnerId, Activity activity, LearnerProgress progress);
+    LearnerProgress completeActivity(Integer learnerId, Activity activity, LearnerProgress progress);
 
     /**
      * If specified activity is set to produce ToolOutput, calculates and stores mark to gradebook.
@@ -204,7 +207,7 @@ public interface ICoreLearnerService extends ILearnerService {
      *            lesson id
      * @return the updated learner progress
      */
-    public LearnerProgress completeActivity(Integer learnerId, Activity activity, Long lessonId);
+    LearnerProgress completeActivity(Integer learnerId, Activity activity, Long lessonId);
 
     /**
      * Retrieve all lessons that has been started, suspended or finished. All finished but archived lesson should not be
@@ -214,7 +217,7 @@ public interface ICoreLearnerService extends ILearnerService {
      *            the user who intend to start a lesson
      * @return a list of active lessons.
      */
-    public LessonDTO[] getActiveLessonsFor(Integer learnerId);
+    LessonDTO[] getActiveLessonsFor(Integer learnerId);
 
     /**
      * Mark the learner progress as restarting to indicate the current learner has exit the lesson. Doesn't use the
@@ -223,7 +226,7 @@ public interface ICoreLearnerService extends ILearnerService {
      * @param userId
      * @param lessonId
      */
-    public void exitLesson(Integer learnerId, Long lessonId);
+    void exitLesson(Integer learnerId, Long lessonId);
 
     /**
      * Returns an activity according to the activity id.
@@ -232,7 +235,7 @@ public interface ICoreLearnerService extends ILearnerService {
      *            the activity id.
      * @return the activity requested.
      */
-    public Activity getActivity(Long activityId);
+    Activity getActivity(Long activityId);
 
     /**
      * Perform grouping for the learners who have started the lesson, based on the grouping activity.
@@ -248,7 +251,7 @@ public interface ICoreLearnerService extends ILearnerService {
      *            of the grouping type
      * @return true if grouping done, false if waiting for grouping to occur
      */
-    public boolean performGrouping(Long lessonId, Long groupingActivityId, Integer learnerId, boolean forceGrouping);
+    boolean performGrouping(Long lessonId, Long groupingActivityId, Integer learnerId, boolean forceGrouping);
 
     /**
      * Perform grouping for the learner, depending on his/hers choice.
@@ -264,7 +267,7 @@ public interface ICoreLearnerService extends ILearnerService {
      * @return true if the learner was successfully added to the group; false if the group was empty
      * @throws LearnerServiceException
      */
-    public boolean learnerChooseGroup(Long lessonId, Long groupingActivityId, Long groupId, Integer learnerId)
+    boolean learnerChooseGroup(Long lessonId, Long groupingActivityId, Long groupId, Integer learnerId)
 	    throws LearnerServiceException;
 
     /**
@@ -277,9 +280,9 @@ public interface ICoreLearnerService extends ILearnerService {
      * @return the maximum number of learners per group;<code>null</code> if the requirement for equal number of
      *         learners in groups was not set
      */
-    public Integer calculateMaxNumberOfLearnersPerGroup(Long lessonId, Grouping grouping);
+    Integer calculateMaxNumberOfLearnersPerGroup(Long lessonId, Grouping grouping);
 
-    public Grouping getGrouping(Long groupingId);
+    Grouping getGrouping(Long groupingId);
 
     /**
      * Check up the gate status to go through the gate. This also updates the gate. This method should be used when we
@@ -293,7 +296,7 @@ public interface ICoreLearnerService extends ILearnerService {
      *            if forceGate==true and the lesson is a preview lesson then the gate is opened straight away.
      * @return Updated gate details
      */
-    public GateActivityDTO knockGate(Long gateActivityId, User knocker, boolean forceGate);
+    GateActivityDTO knockGate(Long gateActivityId, User knocker, boolean forceGate);
 
     /**
      * Check up the gate status to go through the gate. This also updates the gate. This method should be used when we
@@ -309,9 +312,9 @@ public interface ICoreLearnerService extends ILearnerService {
      *            if forceGate==true and the lesson is a preview lesson then the gate is opened straight away.
      * @return Updated gate details
      */
-    public GateActivityDTO knockGate(GateActivity gateActivity, User knocker, boolean forceGate);
+    GateActivityDTO knockGate(GateActivity gateActivity, User knocker, boolean forceGate);
 
-    public Set<Group> getGroupsForGate(GateActivity gate);
+    Set<Group> getGroupsForGate(GateActivity gate);
 
     /**
      * Get the learner url for a particular activity.
@@ -319,13 +322,13 @@ public interface ICoreLearnerService extends ILearnerService {
      * @param learnerId
      * @param activityId
      */
-    public String getLearnerActivityURL(Integer learnerId, Long activityId);
+    String getLearnerActivityURL(Integer learnerId, Long activityId);
 
     /**
      * Get the lesson for this activity. If the activity is not part of a lesson (ie is from an authoring design then it
      * will return null.
      */
-    public Lesson getLessonByActivity(Activity activity);
+    Lesson getLessonByActivity(Activity activity);
 
     /**
      *
@@ -339,7 +342,7 @@ public interface ICoreLearnerService extends ILearnerService {
      *            Activity moving to (being run)
      * @return updated Learner Progress
      */
-    public LearnerProgress moveToActivity(Integer learnerId, Long lessonId, Activity fromActivity, Activity toActivity);
+    LearnerProgress moveToActivity(Integer learnerId, Long lessonId, Activity fromActivity, Activity toActivity);
 
     /**
      * Work out which branch to which a user should go. If the current lesson is a preview lesson, it will force the
@@ -353,7 +356,7 @@ public interface ICoreLearnerService extends ILearnerService {
      *            the learner who triggers the grouping.
      * @throws LearnerServiceException
      */
-    public SequenceActivity determineBranch(Lesson lesson, BranchingActivity branchingActivity, Integer learnerId)
+    SequenceActivity determineBranch(Lesson lesson, BranchingActivity branchingActivity, Integer learnerId)
 	    throws LearnerServiceException;
 
     /**
@@ -368,6 +371,6 @@ public interface ICoreLearnerService extends ILearnerService {
      * @return branchId of the desired branch
      * @throws LearnerServiceException
      */
-    public SequenceActivity selectBranch(Lesson lesson, BranchingActivity branchingActivity, Integer learnerId,
-	    Long branchId) throws LearnerServiceException;
+    SequenceActivity selectBranch(Lesson lesson, BranchingActivity branchingActivity, Integer learnerId, Long branchId)
+	    throws LearnerServiceException;
 }

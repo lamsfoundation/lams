@@ -21,7 +21,6 @@
  * ****************************************************************
  */
 
-
 package org.lamsfoundation.lams.learning.web.action;
 
 import java.io.IOException;
@@ -80,7 +79,7 @@ public class CompleteActivityAction extends ActivityAction {
 	// otherwise we may be using an old version of a lesson while a teacher is starting a
 	// live edit, and then the lock flag can't be checked correctly.
 	LearnerProgress progress = learnerService
-		.getProgressById(WebUtil.readLongParam(request, LearningWebUtil.PARAM_PROGRESS_ID, true));
+		.getProgressById(WebUtil.readLongParam(request, LearningWebUtil.PARAM_PROGRESS_ID));
 
 	// if user has already completed the lesson - we need to let integrations servers know to come and pick up
 	// updated marks (as it won't happen at lessoncomplete.jsp page)
@@ -90,6 +89,7 @@ public class CompleteActivityAction extends ActivityAction {
 	    if (lessonFinishCallbackUrl != null) {
 		request.setAttribute("lessonFinishUrl", lessonFinishCallbackUrl);
 	    }
+	    request.setAttribute("lessonID", progress.getLesson().getLessonId());
 	}
 
 	ActionForward forward = null;
