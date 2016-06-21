@@ -108,7 +108,7 @@
 </c:forEach>
 
 <c:if test="${canEdit}">
-	<div id="addGroupingButton" class="ui-button" onClick="javascript:showGroups()">
+		<div id="addGroupingButton" class="ui-button" onClick="javascript:viewGroups()">
 		<fmt:message key='label.course.groups.grouping.create' />
 	</div>
 </c:if>
