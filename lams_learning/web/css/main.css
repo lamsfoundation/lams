@@ -64,7 +64,6 @@ div#progressBarDiv {
 }
 
 .separatorRow {
-	height: 15px;
 	background-color: rgb(197,212,251);
 	border-top: 4px solid #DDDDDD;
 	border-bottom: 4px solid #DDDDDD;
