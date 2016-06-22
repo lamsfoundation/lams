@@ -1079,10 +1079,11 @@ public class MonitoringAction extends LamsDispatchAction {
 
 	    Activity parentActivity = activity.getParentActivity();
 	    if (activity.isBranchingActivity()) {
+		BranchingActivity ba = (BranchingActivity) monitoringService.getActivityById(activity.getActivityId());
 		activityJSON.put("x",
-			MonitoringAction.getActivityCoordinate(((BranchingActivity) activity).getStartXcoord()));
+			MonitoringAction.getActivityCoordinate(ba.getStartXcoord()));
 		activityJSON.put("y",
-			MonitoringAction.getActivityCoordinate(((BranchingActivity) activity).getStartYcoord()));
+			MonitoringAction.getActivityCoordinate(ba.getStartYcoord()));
 	    } else if (activity.isOptionsWithSequencesActivity()) {
 		activityJSON.put("x", MonitoringAction
 			.getActivityCoordinate(((OptionsWithSequencesActivity) activity).getStartXcoord()));
