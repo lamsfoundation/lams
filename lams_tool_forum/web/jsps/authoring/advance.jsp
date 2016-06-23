@@ -2,58 +2,11 @@
 
 <!--   Advance Tab Content    -->
 
-<div class="checkbox">
-<label for="lockWhenFinished"><html:checkbox property="forum.lockWhenFinished" styleId="lockWhenFinished" />
-<fmt:message key="label.authoring.advance.lock.on.finished" /></label>
-</div>
+<lams:SimplePanel titleKey="label.posting.options" titleHelpURL="http://www.smh.com.au/">
 
 <div class="checkbox">
-<label for="allowEdit"><html:checkbox property="forum.allowEdit" styleId="allowEdit" />
-<fmt:message key="label.authoring.advance.allow.edit" /></label>
-</div>
-
-<div class="checkbox">
-<label for="allowRateMessages"><html:checkbox property="forum.allowRateMessages" styleId="allowRateMessages"  onclick="checkRating()"/>
-<fmt:message key="label.authoring.advance.allow.rate.postings" /></label>
-</div>
-
-<div class="form-inline loffset20">
-	<div class="form-group">
-	<label for="minimumRate"><fmt:message key="label.authoring.advance.minimum.reply" /></label>
-	<html:select property="forum.minimumRate" styleId="minimumRate"  onmouseup="validateRatings(true);" styleClass="form-control input-sm">
-		<html:option value="0">
-			<fmt:message key="label.authoring.advance.no.minimum" />
-		</html:option>
-		<html:option value="1">1</html:option>
-		<html:option value="2">2</html:option>
-		<html:option value="3">3</html:option>
-		<html:option value="4">4</html:option>
-		<html:option value="5">5</html:option>
-		<html:option value="6">6</html:option>
-		<html:option value="7">7</html:option>
-		<html:option value="8">8</html:option>
-		<html:option value="9">9</html:option>
-		<html:option value="10">10</html:option>
-	</html:select>
-	</div>
-	<div class="form-group">
-	<label for="maximumRate"><fmt:message key="label.authoring.advance.maximum.reply" /></label>
-	<html:select property="forum.maximumRate" styleId="maximumRate"   onmouseup="validateRatings(false);"  styleClass="form-control input-sm">
-		<html:option value="0">
-			<fmt:message key="label.authoring.advance.no.maximum" />
-		</html:option>
-		<html:option value="1">1</html:option>
-		<html:option value="2">2</html:option>
-		<html:option value="3">3</html:option>
-		<html:option value="4">4</html:option>
-		<html:option value="5">5</html:option>
-		<html:option value="6">6</html:option>
-		<html:option value="7">7</html:option>
-		<html:option value="8">8</html:option>
-		<html:option value="9">9</html:option>
-		<html:option value="10">10</html:option>
-	</html:select>
-	</div>
+<label for="rich-editor"><html:checkbox property="forum.allowRichEditor" styleId="rich-editor"/>
+<fmt:message key="label.authoring.advance.use.richeditor" /></label>
 </div>
 
 <div class="checkbox">
@@ -62,8 +15,8 @@
 </div>
 
 <div class="checkbox">
-<label for="rich-editor"><html:checkbox property="forum.allowRichEditor" styleId="rich-editor"/>
-<fmt:message key="label.authoring.advance.use.richeditor" /></label>
+<label for="allowEdit"><html:checkbox property="forum.allowEdit" styleId="allowEdit" />
+<fmt:message key="label.authoring.advance.allow.edit" /></label>
 </div>
 
 <div class="checkbox">
@@ -79,6 +32,115 @@
 <html:text property="forum.maxCharacters" styleId="max-characters"  styleClass="form-control form-control-inline input-sm"/>
 </div>
 
+<div class="panel panel-default">
+<div class="panel-body panel-body-sm">
+
+<div class="checkbox">
+<label for="allowRateMessages"><html:checkbox property="forum.allowRateMessages" styleId="allowRateMessages"  onclick="checkRating()"/>
+<fmt:message key="label.authoring.advance.allow.rate.postings" /></label>
+</div>
+
+	<div class="form-inline loffset20">
+		<div class="form-group">
+		<label for="minimumRate"><fmt:message key="label.authoring.advance.minimum.reply" /></label>
+		<html:select property="forum.minimumRate" styleId="minimumRate"  onmouseup="validateRatings(true);" styleClass="form-control input-sm">
+			<html:option value="0">
+				<fmt:message key="label.authoring.advance.no.minimum" />
+			</html:option>
+			<html:option value="1">1</html:option>
+			<html:option value="2">2</html:option>
+			<html:option value="3">3</html:option>
+			<html:option value="4">4</html:option>
+			<html:option value="5">5</html:option>
+			<html:option value="6">6</html:option>
+			<html:option value="7">7</html:option>
+			<html:option value="8">8</html:option>
+			<html:option value="9">9</html:option>
+			<html:option value="10">10</html:option>
+		</html:select>
+		</div>
+		<div class="form-group">
+		<label for="maximumRate"><fmt:message key="label.authoring.advance.maximum.reply" /></label>
+		<html:select property="forum.maximumRate" styleId="maximumRate"   onmouseup="validateRatings(false);"  styleClass="form-control input-sm">
+			<html:option value="0">
+				<fmt:message key="label.authoring.advance.no.maximum" />
+			</html:option>
+			<html:option value="1">1</html:option>
+			<html:option value="2">2</html:option>
+			<html:option value="3">3</html:option>
+			<html:option value="4">4</html:option>
+			<html:option value="5">5</html:option>
+			<html:option value="6">6</html:option>
+			<html:option value="7">7</html:option>
+			<html:option value="8">8</html:option>
+			<html:option value="9">9</html:option>
+			<html:option value="10">10</html:option>
+		</html:select>
+		</div>
+	</div>
+</div>
+</div>
+
+<div class="panel panel-default">
+<div class="panel-body panel-body-sm">
+	<fmt:message key="message.posting.limiting" />
+	<div class="radio">
+	<label for="allowNewTopic1">
+	<html:radio property="forum.allowNewTopic" value="true"	onclick="allowNewTopic()" styleId="allowNewTopic1"/>
+	<fmt:message key="label.authoring.advance.allow.new.topics" />
+	</label>
+	</div>
+	
+	<div class="radio">
+	<label for="allowNewTopic2">
+	<html:radio property="forum.allowNewTopic" value="false" onclick="allowNewTopic()" styleId="allowNewTopic2"/>
+	<fmt:message key="label.authoring.advance.number.reply" />
+	</label>
+	</div>
+	
+	<div class="form-inline loffset20">
+		<div class="form-group">
+		<label for="minimumReply"><fmt:message key="label.authoring.advance.minimum.reply" /></label>
+		<html:select property="forum.minimumReply" styleId="minimumReply" styleClass="form-control input-sm">
+			<html:option value="0">
+				<fmt:message key="label.authoring.advance.no.minimum" />
+			</html:option>
+			<html:option value="1">1</html:option>
+			<html:option value="2">2</html:option>
+			<html:option value="3">3</html:option>
+			<html:option value="4">4</html:option>
+			<html:option value="5">5</html:option>
+			<html:option value="6">6</html:option>
+			<html:option value="7">7</html:option>
+			<html:option value="8">8</html:option>
+			<html:option value="9">9</html:option>
+			<html:option value="10">10</html:option>
+		</html:select>
+		</div>
+		<div class="form-group">
+		<label for="maximumReply"><fmt:message key="label.authoring.advance.maximum.reply" /></label>
+		<html:select property="forum.maximumReply" styleId="maximumReply" styleClass="form-control input-sm">
+			<html:option value="0">
+				<fmt:message key="label.authoring.advance.no.maximum" />
+			</html:option>
+			<html:option value="1">1</html:option>
+			<html:option value="2">2</html:option>
+			<html:option value="3">3</html:option>
+			<html:option value="4">4</html:option>
+			<html:option value="5">5</html:option>
+			<html:option value="6">6</html:option>
+			<html:option value="7">7</html:option>
+			<html:option value="8">8</html:option>
+			<html:option value="9">9</html:option>
+			<html:option value="10">10</html:option>
+		</html:select>
+		</div>
+	</div>
+</div>
+</div>
+</lams:SimplePanel>
+
+<lams:SimplePanel titleKey="label.notifications">
 <div class="form-group">
 <label><fmt:message key="label.authoring.advanced.send.emails.to" /></label>
 <div class="form-inline">
@@ -96,6 +158,13 @@
 <div class="checkbox">
 <label for="notifyLearnersOnMarkRelease"><html:checkbox property="forum.notifyLearnersOnMarkRelease" styleId="notifyLearnersOnMarkRelease"/>
 <fmt:message key="label.authoring.advanced.notify.mark.release" /></label>
+</div>
+</lams:SimplePanel>
+
+<lams:SimplePanel titleKey="label.activity.completion">
+<div class="checkbox">
+<label for="lockWhenFinished"><html:checkbox property="forum.lockWhenFinished" styleId="lockWhenFinished" />
+<fmt:message key="label.authoring.advance.lock.on.finished" /></label>
 </div>
 
 <div class="checkbox">
@@ -124,63 +193,7 @@
 	ra.onkeyup = turnOnRefect;
 </script>
 
-<h4>
-	<fmt:message key="message.posting.limiting" />
-</h4>
-
-<div class="radio">
-<label for="allowNewTopic1">
-<html:radio property="forum.allowNewTopic" value="true"	onclick="allowNewTopic()" styleId="allowNewTopic1"/>
-<fmt:message key="label.authoring.advance.allow.new.topics" />
-</label>
-</div>
-
-<div class="radio">
-<label for="allowNewTopic2">
-<html:radio property="forum.allowNewTopic" value="false" onclick="allowNewTopic()" styleId="allowNewTopic2"/>
-<fmt:message key="label.authoring.advance.number.reply" />
-</label>
-</div>
-
-<div class="form-inline loffset20">
-	<div class="form-group">
-	<label for="minimumReply"><fmt:message key="label.authoring.advance.minimum.reply" /></label>
-	<html:select property="forum.minimumReply" styleId="minimumReply" styleClass="form-control input-sm">
-		<html:option value="0">
-			<fmt:message key="label.authoring.advance.no.minimum" />
-		</html:option>
-		<html:option value="1">1</html:option>
-		<html:option value="2">2</html:option>
-		<html:option value="3">3</html:option>
-		<html:option value="4">4</html:option>
-		<html:option value="5">5</html:option>
-		<html:option value="6">6</html:option>
-		<html:option value="7">7</html:option>
-		<html:option value="8">8</html:option>
-		<html:option value="9">9</html:option>
-		<html:option value="10">10</html:option>
-	</html:select>
-	</div>
-	<div class="form-group">
-	<label for="maximumReply"><fmt:message key="label.authoring.advance.maximum.reply" /></label>
-	<fmt:message key="label.authoring.advance.maximum.reply" />
-	<html:select property="forum.maximumReply" styleId="maximumReply" styleClass="form-control input-sm">
-		<html:option value="0">
-			<fmt:message key="label.authoring.advance.no.maximum" />
-		</html:option>
-		<html:option value="1">1</html:option>
-		<html:option value="2">2</html:option>
-		<html:option value="3">3</html:option>
-		<html:option value="4">4</html:option>
-		<html:option value="5">5</html:option>
-		<html:option value="6">6</html:option>
-		<html:option value="7">7</html:option>
-		<html:option value="8">8</html:option>
-		<html:option value="9">9</html:option>
-		<html:option value="10">10</html:option>
-	</html:select>
-	</div>
-</div>
+</lams:SimplePanel>
 
 <script type="text/javascript">
 
