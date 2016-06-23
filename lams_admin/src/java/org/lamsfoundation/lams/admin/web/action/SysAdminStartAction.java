@@ -24,7 +24,6 @@
 package org.lamsfoundation.lams.admin.web.action;
 
 import java.util.ArrayList;
-
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -32,6 +31,7 @@ import org.apache.struts.action.Action;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
+import org.lamsfoundation.lams.admin.AdminConstants;
 import org.lamsfoundation.lams.admin.service.AdminServiceProxy;
 import org.lamsfoundation.lams.admin.web.dto.LinkBean;
 import org.lamsfoundation.lams.usermanagement.Role;
@@ -46,36 +46,48 @@ import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
 public class SysAdminStartAction extends Action {
 
     private static IUserManagementService service;
-
+    
     @Override
     public ActionForward execute(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) throws Exception {
 
 	service = AdminServiceProxy.getService(getServlet().getServletContext());
 
-	ArrayList<LinkBean> links = new ArrayList<LinkBean>();
+	ArrayList<Object[]> groupedLinks = new ArrayList<Object[]>();
+
 	if (request.isUserInRole(Role.SYSADMIN)) {
-	    links.add(new LinkBean("cleanup.do", "sysadmin.batch.temp.file.delete"));
+	    ArrayList<LinkBean> links = new ArrayList<LinkBean>();
 	    links.add(new LinkBean("config.do", "sysadmin.config.settings.edit"));
+	    links.add(new LinkBean("timezonemanagement.do", "admin.timezone.title"));
+	    links.add(new LinkBean("loginmaintain.do", "sysadmin.maintain.loginpage"));
+	    links.add(new LinkBean("signupManagement.do", "admin.signup.title"));
+	    links.add(new LinkBean("serverlist.do", "sysadmin.maintain.external.servers"));
+	    links.add(new LinkBean("register.do", "sysadmin.register.server"));
 	    links.add(new LinkBean("toolcontentlist.do", "sysadmin.tool.management"));
+	    links.add(new LinkBean("themeManagement.do", "admin.themes.title"));
+	    groupedLinks.add(new Object[]{AdminConstants.START_CONFIG_LINKS,links});
+
+	    links = new ArrayList<LinkBean>();
+	    links.add(new LinkBean("cleanup.do", "sysadmin.batch.temp.file.delete"));
+	    links.add(new LinkBean("statistics.do", "admin.statistics.title"));
+	    groupedLinks.add(new Object[]{AdminConstants.START_MONITOR_LINKS,links});
+	    
+	    links = new ArrayList<LinkBean>();
 	    links.add(new LinkBean("usersearch.do", "admin.user.find"));
 	    links.add(new LinkBean("importgroups.do", "sysadmin.import.groups.title"));
 	    links.add(new LinkBean("importexcel.do", "admin.user.import"));
-	    links.add(new LinkBean("ldap.do", "sysadmin.ldap.configuration"));
 	    links.add(new LinkBean("disabledmanage.do", "admin.list.disabled.users"));
-	    links.add(new LinkBean("loginmaintain.do", "sysadmin.maintain.loginpage"));
-	    links.add(new LinkBean("serverlist.do", "sysadmin.maintain.external.servers"));
-	    links.add(new LinkBean("register.do", "sysadmin.register.server"));
-	    links.add(new LinkBean("statistics.do", "admin.statistics.title"));
-	    links.add(new LinkBean("signupManagement.do", "admin.signup.title"));
-	    links.add(new LinkBean("themeManagement.do", "admin.themes.title"));
-	    links.add(new LinkBean("timezonemanagement.do", "admin.timezone.title"));
+	    links.add(new LinkBean("ldap.do", "sysadmin.ldap.configuration"));
+	    groupedLinks.add(new Object[]{AdminConstants.START_COURSE_LINKS,links});
+
 	} else if (service.isUserGlobalGroupAdmin()) {
-	    LinkBean linkBean = new LinkBean("usersearch.do", "admin.user.find");
-	    links.add(linkBean);
+	    ArrayList<LinkBean> links = new ArrayList<LinkBean>();
+	    links.add(new LinkBean("usersearch.do", "admin.user.find"));
 	    links.add(new LinkBean("importgroups.do", "sysadmin.import.groups.title"));
 	    links.add(new LinkBean("importexcel.do", "admin.user.import"));
 	    links.add(new LinkBean("disabledmanage.do", "admin.list.disabled.users"));
+	    groupedLinks.add(new Object[]{AdminConstants.START_COURSE_LINKS,links});
+
 	} else {
 	    request.setAttribute("errorName", "SysAdminStartAction");
 	    request.setAttribute("errorMessage", AdminServiceProxy.getMessageService(getServlet().getServletContext())
@@ -83,7 +95,7 @@ public class SysAdminStartAction extends Action {
 	    return mapping.findForward("error");
 	}
 
-	request.setAttribute("links", links);
+	request.setAttribute("groupedLinks", groupedLinks);
 	return mapping.findForward("sysadmin");
     }
 
