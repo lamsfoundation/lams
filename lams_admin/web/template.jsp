@@ -3,8 +3,8 @@
 <!DOCTYPE html>
 <lams:html>
 <lams:head>
-	<c:set var="title" scope="session"><tiles:getAsString name="title"/></c:set>
-	<c:set var="title" scope="session"><fmt:message key="${title}"/></c:set>
+	<c:set var="title"><tiles:getAsString name="title"/></c:set>
+	<c:set var="title"><fmt:message key="${title}"/></c:set>
 	<title>${title}</title>
 
 	<lams:css/>
@@ -15,9 +15,9 @@
 </lams:head>
     
 <body class="stripes">
-	<c:set var="subtitle" scope="session"><tiles:getAsString name="subtitle" ignore="true"/></c:set>	
+	<c:set var="subtitle"><tiles:getAsString name="subtitle" ignore="true"/></c:set>	
 	<c:if test="${not empty subtitle}">
-		<c:set var="title" scope="session">${title}: <fmt:message key="${subtitle}"/></c:set>
+		<c:set var="title">${title}: <fmt:message key="${subtitle}"/></c:set>
 	</c:if>
 	
 	<c:set var="help"><tiles:getAsString name='help'  ignore="true"/></c:set>
