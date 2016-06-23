@@ -2,7 +2,7 @@
 
 <!--   Advance Tab Content    -->
 
-<lams:SimplePanel titleKey="label.posting.options" titleHelpURL="http://www.smh.com.au/">
+<lams:SimplePanel titleKey="label.posting.options" titleHelpURL="https://wiki.lamsfoundation.org/display/lamsdocs/Home">
 
 <div class="checkbox">
 <label for="rich-editor"><html:checkbox property="forum.allowRichEditor" styleId="rich-editor"/>
