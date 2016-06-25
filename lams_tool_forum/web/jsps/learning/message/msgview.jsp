@@ -31,8 +31,8 @@
 <div class="panel panel-default ${highlightClass} msg" id="msg${msgDto.message.uid}">
 	<div class="panel-heading">
 		<h4 class="panel-title">
-			<span style="float: right"> <i class="fa fa-xs fa-user"></i> <c:if
-					test='${(sessionMap.mode == "teacher") || (not hidden)}'>
+			<span style="float: right"> <i class="fa fa-xs fa-user"></i> 
+			  <c:if test='${(sessionMap.mode == "teacher") || (not hidden)}'>
 					<c:set var="author" value="${msgDto.author}" />
 					<c:if test="${empty author}">
 						<c:set var="author">
@@ -41,7 +41,7 @@
 					</c:if>
 					<span id="author"><c:out value="${author}" escapeXml="true" /></span>						
 				-
-				<time class="timeago" datetime="<fmt:formatDate value='${msgDto.message.updated}' pattern="yyyy-MM-dd'T'HH:mm:ss.S'Z'"/>"><lams:Date value="${msgDto.message.updated}" /></time>
+				<lams:Date value="${msgDto.message.updated}" timeago="true"/>
 				</c:if>
 			</span>
 			<c:choose>

@@ -44,7 +44,7 @@
 			</c:choose>            
 
             <span class="${colourClass}"><strong><c:out value="${author}" escapeXml="true"/></strong> - 
-            <time class="timeago" datetime="<fmt:formatDate value='${commentDto.comment.updated}' pattern="yyyy-MM-dd'T'HH:mm:ss.S'Z'"/>"><lams:Date value='${commentDto.comment.updated}' /></time>
+            <lams:Date value="${commentDto.comment.updated}" timeago="true"/>
             <c:if test='${commentDto.comment.created != commentDto.comment.updated}'>
               | <small>(<fmt:message key="label.edited"/>)</small>
             </c:if>  

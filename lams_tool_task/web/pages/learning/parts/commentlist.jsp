@@ -26,11 +26,7 @@
 							<c:out value="${author}" escapeXml="true" />
 						</div>
 						-
-						<time class="timeago"
-							datetime="<fmt:formatDate value='${comment.createDate}' pattern="yyyy-MM-dd'T'HH:mm:ss.S'Z'"/>">
-							<lams:Date value="${comment.createDate}" />
-						</time>
-
+						<lams:Date value="${comment.createDate}" timeago="true"/>
 					</div>
 					<div class="panel-body-sm">
 						<c:out value="${comment.comment}" escapeXml="false" />

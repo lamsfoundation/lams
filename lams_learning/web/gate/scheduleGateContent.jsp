@@ -31,7 +31,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 </div>
 
 <lams:Alert type="info" close="false" id="whenOpens">
-<fmt:message key="label.schedule.gate.open.remaining" />&nbsp;<strong><time class="timeago" datetime="<fmt:formatDate value='${GateForm.map.startingTime}' pattern="yyyy-MM-dd'T'HH:mm:ss.S"/>"></time></strong>
+<fmt:message key="label.schedule.gate.open.remaining" />&nbsp;<strong><lams:Date value="${GateForm.map.startingTime}" timeago="true"/></strong>
 </lams:Alert>
 
 <c:choose>
