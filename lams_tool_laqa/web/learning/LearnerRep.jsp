@@ -343,10 +343,7 @@
 												<c:out value="${userResponse.qaQueUser.fullname}" />
 											</div>
 											-
-											<time class="timeago"
-												datetime="<fmt:formatDate value='${userResponse.attemptTime}' pattern="yyyy-MM-dd'T'HH:mm:ss.S'Z'"/>">
-												<lams:Date value="${userResponse.attemptTime}" />
-											</time>
+											<lams:Date value="${userResponse.attemptTime}" timeago="true"/>
 										</div>
 										<div class="sbox-body">
 											<c:out value="${userResponse.answer}" escapeXml="false" />

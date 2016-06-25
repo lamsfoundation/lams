@@ -126,15 +126,8 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 										</c:choose>
 									</html:link></td>
 								<td>&nbsp;</td>
-								<td><c:set var="createDateTimeago">
-										<fmt:formatDate value='${entry.createDate}' pattern="yyyy-MM-dd'T'HH:mm:ss.S" />
-									</c:set>
-									<time class="timeago" datetime="${createDateTimeago}" title="<lams:Date value='${entry.createDate}'/>"></time></td>
-								<td>
-									 <c:set var="lastModifiedTimeago">
-										<fmt:formatDate value='${entry.lastModified}' pattern="yyyy-MM-dd'T'HH:mm:ss.S" />
-									</c:set>
-									<time class="timeago" datetime="${lastModifiedTimeago}" title="<lams:Date value='${entry.lastModified}'/>"></time></td>
+								<td><lams:Date value="${entry.createDate}" timeago="true"/></td>
+								<td><lams:Date value="${entry.lastModified}" timeago="true"/></td>
 							</tr>
 							</c:forEach>
 

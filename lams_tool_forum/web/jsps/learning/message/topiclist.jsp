@@ -62,10 +62,7 @@
 							<td align="center"><c:out value="${topic.message.replyNumber}" /></td>
 
 							<td align="center"><c:out value="${topic.newPostingsNum}" /></td>
-							<td><time class="timeago"
-									datetime="<fmt:formatDate value='${topic.message.lastReplyDate}' pattern="yyyy-MM-dd'T'HH:mm:ss.S'Z'"/>">
-									<lams:Date value="${topic.message.lastReplyDate}" />
-								</time></td>
+							<td><lams:Date value="${topic.message.lastReplyDate}" timeago="true"/></td>
 							<c:if test="${not sessionMap.allowNewTopics and sessionMap.minimumReply ne 0}">
 								<td>${topic.numOfPosts}/${sessionMap.minimumReply}</td>
 							</c:if>
