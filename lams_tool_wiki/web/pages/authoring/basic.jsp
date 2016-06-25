@@ -74,7 +74,7 @@
 				</c:choose>
 			</fmt:param>
             <fmt:param>
-               <time class="timeago" datetime="<fmt:formatDate value='${currentWikiPage.currentWikiContentDTO.editDate}' pattern="yyyy-MM-dd'T'HH:mm:ss.S'Z'"/>"><lams:Date value="${currentWikiPage.currentWikiContentDTO.editDate}" /></time>
+	            <lams:Date value="${currentWikiPage.currentWikiContentDTO.editDate}" timeago="true"/>
              </fmt:param>
 		</fmt:message> 
 		</div> <!-- End last edited -->
