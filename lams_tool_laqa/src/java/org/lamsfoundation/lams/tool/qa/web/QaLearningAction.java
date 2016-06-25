@@ -1118,7 +1118,6 @@ public class QaLearningAction extends LamsDispatchAction implements QaAppConstan
 	    // as trying to convert dates runs into tz issues - any Date object created is still
 	    // in the server time zone.
 	    Date attemptTime = response.getAttemptTime();
-	    ;
 	    responseRow.put("attemptTime", DateUtil.convertToStringForJSON(attemptTime, request.getLocale()));
 	    responseRow.put("timeAgo", dateFormatterTimeAgo.format(attemptTime)); 
 
