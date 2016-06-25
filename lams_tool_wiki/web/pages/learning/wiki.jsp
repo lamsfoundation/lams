@@ -3,12 +3,17 @@
     <script language="JavaScript" type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery.js"></script>
     <script language="JavaScript" type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery-ui.js"></script>
     <script language="JavaScript" type="text/javascript" src="includes/javascript/validation.js"></script>
+    <script type="text/javascript" src="<lams:LAMSURL />/includes/javascript/jquery.timeago.js"></script>
 
     <script type="text/javascript">
       <!--
         var mode = "${mode}";
       var formName = "learningForm"
 
+   	  $(document).ready(function() {
+  			$("time.timeago").timeago();
+ 		});
+      
       function disableFinishButton() {
         document.getElementById("finishButton").disabled = true;
       }
@@ -201,7 +206,7 @@
                               </c:choose>
                             </fmt:param>
                             <fmt:param>
-                              <time class="timeago" datetime="<fmt:formatDate value='${currentWikiPage.currentWikiContentDTO.editDate}' pattern="yyyy-MM-dd'T'HH:mm:ss.S'Z'"/>"><lams:Date value="${currentWikiPage.currentWikiContentDTO.editDate}" /></time>
+                              <lams:Date value="${currentWikiPage.currentWikiContentDTO.editDate}" timeago="true"/>
                             </fmt:param>
                           </fmt:message> 
                         </div> <!-- End last edited -->

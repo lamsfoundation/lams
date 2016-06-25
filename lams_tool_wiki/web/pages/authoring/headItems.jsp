@@ -11,4 +11,10 @@
 <script type="text/javascript" src="${tool}includes/javascript/wikiCommon.js"></script>
 <script type="text/javascript" src="${lams}includes/javascript/jquery.js"></script>
 <script type="text/javascript" src="${lams}includes/javascript/jquery-ui.js"></script>
+<script type="text/javascript" src="${lams}/includes/javascript/jquery.timeago.js"></script>
 <script type="text/javascript" src="${lams}includes/javascript/bootstrap.min.js"></script>
+
+<script type="text/javascript">
+	$(document).ready(function() {$("time.timeago").timeago();});
+</script>
+
