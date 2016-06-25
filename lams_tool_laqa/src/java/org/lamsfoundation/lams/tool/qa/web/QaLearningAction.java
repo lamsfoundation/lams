@@ -1097,8 +1097,10 @@ public class QaLearningAction extends LamsDispatchAction implements QaAppConstan
 	}
 
 	DateFormat dateFormatter = new SimpleDateFormat(DateUtil.PRETTY_FORMAT);
+	dateFormatter.setTimeZone(userTimeZone);
 	// setting date format to ISO8601 for jquery.timeago
 	DateFormat dateFormatterTimeAgo = new SimpleDateFormat(DateUtil.ISO8601_FORMAT);
+	dateFormatterTimeAgo.setTimeZone(TimeZone.getTimeZone("GMT"));
 	for (QaUsrResp response : responses) {
 	    QaQueUsr user = response.getQaQueUser();
 
@@ -1114,11 +1116,12 @@ public class QaLearningAction extends LamsDispatchAction implements QaAppConstan
 	    responseRow.put("userName", StringEscapeUtils.escapeCsv(user.getFullname()));
 	    responseRow.put("visible", new Boolean(response.isVisible()).toString());
 
-	    // format attemptTime
+	    // format attemptTime - got straight from server time to other timezones in formatter
+	    // as trying to convert dates runs into tz issues - any Date object created is still
+	    // in the server time zone.
 	    Date attemptTime = response.getAttemptTime();
-	    attemptTime = DateUtil.convertToTimeZoneFromDefault(userTimeZone, attemptTime);
 	    responseRow.put("attemptTime", dateFormatter.format(attemptTime));
-	    responseRow.put("timeAgo", dateFormatterTimeAgo.format(attemptTime));
+	    responseRow.put("timeAgo", dateFormatterTimeAgo.format(attemptTime)); 
 
 	    if (isAllowRateAnswers) {
 

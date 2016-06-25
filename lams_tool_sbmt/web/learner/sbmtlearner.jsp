@@ -147,9 +147,7 @@
 						<!--Third row displaying the date of submission of the File -->
 						<td><fmt:message key="label.learner.time" /></td>
 						<td colspan="2">
-							<time class="timeago" datetime="${file.dateOfSubmission}">
-								<lams:Date value='${file.dateOfSubmission}' />
-							</time>
+							<lams:Date value="${file.dateOfSubmission}" timeago="true"/>
 						</td>
 					</tr>
 
