@@ -2,7 +2,7 @@
 
 <!--   Advance Tab Content    -->
 
-<lams:SimplePanel titleKey="label.posting.options" titleHelpURL="https://wiki.lamsfoundation.org/display/lamsdocs/Home">
+<lams:SimplePanel titleKey="label.posting.options">
 
 <div class="checkbox">
 <label for="rich-editor"><html:checkbox property="forum.allowRichEditor" styleId="rich-editor"/>
@@ -43,7 +43,7 @@
 	<div class="form-inline loffset20">
 		<div class="form-group">
 		<label for="minimumRate"><fmt:message key="label.authoring.advance.minimum.reply" /></label>
-		<html:select property="forum.minimumRate" styleId="minimumRate"  onmouseup="validateRatings(true);" styleClass="form-control input-sm">
+		<html:select property="forum.minimumRate" styleId="minimumRate"  onchange="validateRatings(true);" styleClass="form-control input-sm">
 			<html:option value="0">
 				<fmt:message key="label.authoring.advance.no.minimum" />
 			</html:option>
@@ -61,7 +61,7 @@
 		</div>
 		<div class="form-group">
 		<label for="maximumRate"><fmt:message key="label.authoring.advance.maximum.reply" /></label>
-		<html:select property="forum.maximumRate" styleId="maximumRate"   onmouseup="validateRatings(false);"  styleClass="form-control input-sm">
+		<html:select property="forum.maximumRate" styleId="maximumRate"   onchange="validateRatings(false);"  styleClass="form-control input-sm">
 			<html:option value="0">
 				<fmt:message key="label.authoring.advance.no.maximum" />
 			</html:option>
