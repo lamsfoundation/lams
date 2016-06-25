@@ -15,6 +15,7 @@ table.treetable tr span.indenter a {
   outline: none; /* Expander shows outline after upgrading to 3.0 (#141) */
   border-bottom: none; /* Hide the dotted line underneath */
   width: 250px;
+  font-size: x-small;
 }
 
 table.treetable tr.collapsed.selected span.indenter a {
