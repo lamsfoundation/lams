@@ -1096,8 +1096,6 @@ public class QaLearningAction extends LamsDispatchAction implements QaAppConstan
 	    responcedata.put(AttributeNames.ATTR_COUNT_RATED_ITEMS, countRatedQuestions);
 	}
 
-	DateFormat dateFormatter = new SimpleDateFormat(DateUtil.PRETTY_FORMAT);
-	dateFormatter.setTimeZone(userTimeZone);
 	// setting date format to ISO8601 for jquery.timeago
 	DateFormat dateFormatterTimeAgo = new SimpleDateFormat(DateUtil.ISO8601_FORMAT);
 	dateFormatterTimeAgo.setTimeZone(TimeZone.getTimeZone("GMT"));
@@ -1120,7 +1118,8 @@ public class QaLearningAction extends LamsDispatchAction implements QaAppConstan
 	    // as trying to convert dates runs into tz issues - any Date object created is still
 	    // in the server time zone.
 	    Date attemptTime = response.getAttemptTime();
-	    responseRow.put("attemptTime", dateFormatter.format(attemptTime));
+	    ;
+	    responseRow.put("attemptTime", DateUtil.convertToStringForJSON(attemptTime, request.getLocale()));
 	    responseRow.put("timeAgo", dateFormatterTimeAgo.format(attemptTime)); 
 
 	    if (isAllowRateAnswers) {
@@ -1166,7 +1165,7 @@ public class QaLearningAction extends LamsDispatchAction implements QaAppConstan
 			    // format attemptTime
 			    Date postedDate = commentDto.getPostedDate();
 			    postedDate = DateUtil.convertToTimeZoneFromDefault(userTimeZone, postedDate);
-			    comment.put("postedDate", dateFormatter.format(postedDate));
+			    comment.put("postedDate", DateUtil.convertToStringForJSON(postedDate, request.getLocale()));
 
 			    comment.put("userFullName", StringEscapeUtils.escapeCsv(commentDto.getUserFullName()));
 			}
