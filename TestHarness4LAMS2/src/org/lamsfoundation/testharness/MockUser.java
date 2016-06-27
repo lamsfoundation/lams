@@ -24,12 +24,9 @@ package org.lamsfoundation.testharness;
 
 import java.io.File;
 import java.io.IOException;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.apache.commons.codec.binary.Hex;
 import org.apache.log4j.Logger;
 import org.xml.sax.SAXException;
 
@@ -49,10 +46,10 @@ public class MockUser {
 	    " is in a daze ", " will have a cup of coffee for ", " is away for toilet " };
 
     private static final String LOGIN_PAGE_FLAG = "j_security_check";
-    private static final String INDEX_PAGE_FLAG = "images/loading.gif";
+    private static final String INDEX_PAGE_FLAG = "Index page flag";
 
     private static final String USERNAME = "j_username";
-    private static final String PASSWORD = "j_password";;
+    private static final String PASSWORD = "j_password";
 
     protected AbstractTest test;
     protected String userId;
@@ -67,11 +64,6 @@ public class MockUser {
 	this.role = role;
 	this.password = password;
 	this.userId = userId;
-    }
-
-    private static String sha1(String plaintext) throws NoSuchAlgorithmException {
-	MessageDigest md = MessageDigest.getInstance("SHA1");
-	return new String(Hex.encodeHex(md.digest(plaintext.getBytes())));
     }
 
     protected static boolean checkPageContains(WebResponse resp, String flag) throws IOException {

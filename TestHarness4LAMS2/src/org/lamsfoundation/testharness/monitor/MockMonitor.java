@@ -102,11 +102,11 @@ public class MockMonitor extends MockUser implements Runnable {
 		throw new TestHarnessException(
 			"User id is missing. If you have set UserCreated (admin properties) to true, then you must set UserId in the monitor properties.");
 	    }
-	    MockMonitor.log.debug("initLessonURL " + initLessonURL + " ldId " + ldId + " orgId " + organisationID
-		    + " userId " + userId + " name " + name);
+
 	    String url = initLessonURL.replace(MockMonitor.LDID_PATTERN, ldId)
 		    .replace(MockMonitor.ORGANISATION_ID_PATTERN, organisationID)
 		    .replace(MockMonitor.USER_ID_PATTERN, userId).replace(MockMonitor.LESSON_NAME_PATTERN, name);
+	    MockMonitor.log.debug("initLessonURL:  " + url);
 	    WebResponse resp = (WebResponse) new Call(wc, test, username + " inits lesson", url).execute();
 
 	    String idAsString = resp.getText().trim();

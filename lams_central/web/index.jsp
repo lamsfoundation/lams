@@ -13,6 +13,7 @@
 </lams:head>
 
 <body class="stripes">
+	<!-- Index page flag - do not remove, TestHarness looks for it -->
 
 	<lams:Page type="admin">
 
