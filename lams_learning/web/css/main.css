@@ -51,6 +51,10 @@ td#exitButtonCell {
 	width: 50px;
 }
 
+td#restartButtonCell {
+	padding: 1px 2px 0px 0px;
+}
+
 div#lessonTitleRow {
 	overflow: hidden;
 	text-overflow:ellipsis;

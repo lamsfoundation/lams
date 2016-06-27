@@ -140,7 +140,8 @@ public class LessonManagerServlet extends HttpServlet {
 	boolean presenceEnable = WebUtil.readBooleanParam(request, CentralConstants.PARAM_LEARNER_PRESENCE_ENABLE,
 		false);
 	boolean imEnable = WebUtil.readBooleanParam(request, CentralConstants.PARAM_LEARNER_IM_ENABLE, false);
-	boolean enableNotifications = WebUtil.readBooleanParam(request, CentralConstants.PARAM_ENABLE_NOTIFICATIONS, false);
+	boolean enableNotifications = WebUtil.readBooleanParam(request, CentralConstants.PARAM_ENABLE_NOTIFICATIONS,
+		false);
 
 	Long ldId = null;
 	Long lsId = null;
@@ -341,7 +342,7 @@ public class LessonManagerServlet extends HttpServlet {
 	    // 1. init lesson
 	    Lesson lesson = LessonManagerServlet.monitoringService.initializeLesson(title, desc, ldId,
 		    organisation.getOrganisationId(), user.getUserId(), customCSV, false, false, presenceEnable,
-		    imEnable, true, enableNotifications, false, null, null);
+		    imEnable, true, enableNotifications, false, false, null, null);
 	    // 2. create lessonClass for lesson
 	    createLessonClass(lesson, organisation, user);
 	    // 3. start lesson
@@ -368,7 +369,7 @@ public class LessonManagerServlet extends HttpServlet {
 	    // 1. init lesson
 	    Lesson lesson = LessonManagerServlet.monitoringService.initializeLesson(title, desc, ldId,
 		    orgMap.getOrganisation().getOrganisationId(), userMap.getUser().getUserId(), customCSV, false,
-		    false, presenceEnable, imEnable, true, enableNotifications, false, null, null);
+		    false, presenceEnable, imEnable, true, enableNotifications, false, false, null, null);
 	    // 2. create lessonClass for lesson
 	    createLessonClass(lesson, orgMap.getOrganisation(), userMap.getUser());
 	    // 3. schedule lesson

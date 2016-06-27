@@ -21,7 +21,6 @@
  * ****************************************************************
  */
 
-
 package org.lamsfoundation.lams.monitoring.web;
 
 import java.io.IOException;
@@ -98,11 +97,9 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
 /**
- * <p>
  * The action servlet that provide all the monitoring functionalities. It interact with the teacher via JSP monitoring
  * interface.
- * </p>
- *
+ * 
  * @author Jacky Fang
  */
 public class MonitoringAction extends LamsDispatchAction {
@@ -141,13 +138,13 @@ public class MonitoringAction extends LamsDispatchAction {
 
     private ActionForward redirectToURL(ActionMapping mapping, HttpServletResponse response, String url)
 	    throws IOException {
-	if (url != null) {
-	    String fullURL = WebUtil.convertToFullURL(url);
-	    response.sendRedirect(response.encodeRedirectURL(fullURL));
-	    return null;
-	} else {
+	if (url == null) {
 	    return mapping.findForward(MonitoringAction.NOT_SUPPORTED_SCREEN);
 	}
+
+	String fullURL = WebUtil.convertToFullURL(url);
+	response.sendRedirect(response.encodeRedirectURL(fullURL));
+	return null;
     }
 
     /**
@@ -174,7 +171,8 @@ public class MonitoringAction extends LamsDispatchAction {
 	Boolean learnerPresenceAvailable = WebUtil.readBooleanParam(request, "learnerPresenceAvailable", false);
 	Boolean learnerImAvailable = WebUtil.readBooleanParam(request, "learnerImAvailable", false);
 	Boolean liveEditEnabled = WebUtil.readBooleanParam(request, "liveEditEnabled", false);
-	Boolean learnerRestart = WebUtil.readBooleanParam(request, "learnerRestart", false);
+	Boolean forceRestart = WebUtil.readBooleanParam(request, "forceRestart", false);
+	Boolean allowRestart = WebUtil.readBooleanParam(request, "allowRestart", false);
 
 	Lesson newLesson = null;
 	if ((copyType != null) && copyType.equals(LearningDesign.COPY_TYPE_PREVIEW)) {
@@ -184,7 +182,7 @@ public class MonitoringAction extends LamsDispatchAction {
 	    try {
 		newLesson = getMonitoringService().initializeLesson(title, desc, ldId, organisationId, getUserId(),
 			customCSV, false, false, learnerPresenceAvailable, learnerImAvailable, liveEditEnabled, false,
-			learnerRestart, null, null);
+			forceRestart, allowRestart, null, null);
 	    } catch (SecurityException e) {
 		response.sendError(HttpServletResponse.SC_FORBIDDEN, "User is not a monitor in the organisation");
 		return null;
@@ -281,7 +279,8 @@ public class MonitoringAction extends LamsDispatchAction {
 	Date schedulingDatetime = schedulingEnable
 		? MonitoringAction.LESSON_SCHEDULING_DATETIME_FORMAT.parse(request.getParameter("schedulingDatetime"))
 		: null;
-	boolean learnerRestart = WebUtil.readBooleanParam(request, "learnerRestart", false);
+	boolean forceRestart = WebUtil.readBooleanParam(request, "forceRestart", false);
+	boolean allowRestart = WebUtil.readBooleanParam(request, "allowRestart", false);
 
 	boolean precedingLessonEnable = WebUtil.readBooleanParam(request, "precedingLessonEnable", false);
 	Long precedingLessonId = precedingLessonEnable ? WebUtil.readLongParam(request, "precedingLessonId", true)
@@ -342,7 +341,7 @@ public class MonitoringAction extends LamsDispatchAction {
 	    try {
 		lesson = getMonitoringService().initializeLesson(lessonInstanceName, introDescription, ldId,
 			organisationId, userId, null, introEnable, introImage, presenceEnable, imEnable, enableLiveEdit,
-			notificationsEnable, learnerRestart, timeLimitIndividual, precedingLessonId);
+			notificationsEnable, forceRestart, allowRestart, timeLimitIndividual, precedingLessonId);
 
 		getMonitoringService().createLessonClassForLesson(lesson.getLessonId(), organisation,
 			learnerGroupInstanceName, lessonInstanceLearners, staffGroupInstanceName, staff, userId);
@@ -1080,10 +1079,8 @@ public class MonitoringAction extends LamsDispatchAction {
 	    Activity parentActivity = activity.getParentActivity();
 	    if (activity.isBranchingActivity()) {
 		BranchingActivity ba = (BranchingActivity) monitoringService.getActivityById(activity.getActivityId());
-		activityJSON.put("x",
-			MonitoringAction.getActivityCoordinate(ba.getStartXcoord()));
-		activityJSON.put("y",
-			MonitoringAction.getActivityCoordinate(ba.getStartYcoord()));
+		activityJSON.put("x", MonitoringAction.getActivityCoordinate(ba.getStartXcoord()));
+		activityJSON.put("y", MonitoringAction.getActivityCoordinate(ba.getStartYcoord()));
 	    } else if (activity.isOptionsWithSequencesActivity()) {
 		activityJSON.put("x", MonitoringAction
 			.getActivityCoordinate(((OptionsWithSequencesActivity) activity).getStartXcoord()));

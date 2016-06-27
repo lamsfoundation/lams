@@ -177,7 +177,7 @@ public class HomeAction extends DispatchAction {
 		return mapping.findForward("lessonIntro");
 	    }
 
-	    if (lesson.getLearnerRestart()) {
+	    if (lesson.getForceLearnerRestart()) {
 		// start the lesson from the beginning each time
 		getLessonService().removeLearnerProgress(lessonId, user.getUserID());
 	    }
@@ -187,6 +187,7 @@ public class HomeAction extends DispatchAction {
 	    }
 
 	    req.setAttribute(AttributeNames.PARAM_LESSON_ID, String.valueOf(lessonId));
+	    req.setAttribute("allowRestart", lesson.getAllowLearnerRestart());
 	    req.setAttribute(AttributeNames.PARAM_PRESENCE_ENABLED,
 		    String.valueOf(lesson.getLearnerPresenceAvailable()));
 	    req.setAttribute(AttributeNames.PARAM_PRESENCE_IM_ENABLED, String.valueOf(lesson.getLearnerImAvailable()));
