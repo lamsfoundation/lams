@@ -198,7 +198,7 @@ public class HomeAction extends DispatchAction {
 		return mapping.findForward("lessonIntro");
 	    }
 
-	    if (lesson.getLearnerRestart()) {
+	    if (lesson.getForceLearnerRestart()) {
 		// start the lesson from the beginning each time
 		getLessonService().removeLearnerProgress(lessonId, user.getUserID());
 	    }
@@ -217,6 +217,7 @@ public class HomeAction extends DispatchAction {
 
 	    req.setAttribute(AttributeNames.PARAM_LESSON_ID, String.valueOf(lessonId));
 	    req.setAttribute(AttributeNames.PARAM_EXPORT_PORTFOLIO_ENABLED, String.valueOf(isPortfolioEnabled));
+	    req.setAttribute("allowRestart", lesson.getAllowLearnerRestart());
 	    req.setAttribute(AttributeNames.PARAM_PRESENCE_ENABLED,
 		    String.valueOf(lesson.getLearnerPresenceAvailable()));
 	    req.setAttribute(AttributeNames.PARAM_PRESENCE_IM_ENABLED, String.valueOf(lesson.getLearnerImAvailable()));
@@ -453,15 +454,14 @@ public class HomeAction extends DispatchAction {
 	    url += URLEncoder.encode(Configuration.get(ConfigurationKeys.SERVER_URL), "UTF8");
 	    res.sendRedirect(url);
 	    return null;
-
-	} else {
-	    req.getSession().invalidate();
-
-	    // clear system shared session.
-	    SessionManager.getSession().invalidate();
-
-	    return mapping.findForward("index");
 	}
+	
+	req.getSession().invalidate();
+
+	// clear system shared session.
+	SessionManager.getSession().invalidate();
+
+	return mapping.findForward("index");
     }
 
     private ActionForward displayMessage(ActionMapping mapping, HttpServletRequest req, String messageKey) {

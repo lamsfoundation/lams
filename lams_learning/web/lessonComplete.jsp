@@ -29,6 +29,14 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 
 <c:set var="displayPrintButton"><lams:Configuration key="DisplayPrintButton"/></c:set>
 
+<script type="text/javascript">
+	function restartLesson(){
+		if (confirm('<fmt:message key="message.learner.progress.restart.confirm"/>')) {
+			window.location.href = "<lams:WebAppURL/>learner.do?method=restartLesson&lessonID=${lessonID}";
+		}
+	}
+</script>
+
 <div id="content">
 	<c:set var="displayName">
 		<lams:user property="firstName"/> <lams:user property="lastName"/>
@@ -54,10 +62,13 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 		</fmt:message>
 	</p>
 	
-	<p>
-		<fmt:message key="message.lesson.restart" />
-		<a class="button" href="<lams:WebAppURL/>learner.do?method=restartLesson&lessonID=${lessonID}"><fmt:message key="message.lesson.restart.button" /></a>
-	</p>
+	<%-- lessonID is set in CompleteActivityAction and LessonCompleteActivityAction only if lesson.allowLearnerRestart is on --%>
+	<c:if test="${not empty lessonID}">
+		<p>
+			<fmt:message key="message.lesson.restart" />
+			<a class="button" href="#" onClick="javascript:restartLesson()"><fmt:message key="message.lesson.restart.button" /></a>
+		</p>
+	</c:if>
 	
 	<c:if test="${not empty releasedLessons}">
 		<p>

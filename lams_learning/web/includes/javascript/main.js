@@ -7,6 +7,12 @@ function exportPortfolio(){
 			"no");
 }
 
+function restartLesson(){
+	if (confirm(LABELS.CONFIRM_RESTART)) {
+		$('#contentFrame').attr('src',APP_URL + 'learner.do?method=restartLesson&lessonID=' + lessonId);
+	}
+}
+
 function viewNotebookEntries(){
 	openPopUp(APP_URL + "notebook.do?method=viewAll&lessonID=" + lessonId,
 			"Notebook",

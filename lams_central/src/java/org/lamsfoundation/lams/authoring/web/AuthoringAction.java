@@ -205,7 +205,6 @@ public class AuthoringAction extends LamsDispatchAction {
     public ActionForward getToolOutputDefinitionsJSON(ActionMapping mapping, ActionForm form,
 	    HttpServletRequest request, HttpServletResponse response)
 	    throws ServletException, IOException, JSONException {
-	String wddxPacket;
 	IAuthoringService authoringService = getAuthoringService();
 	Long toolContentID = WebUtil.readLongParam(request, "toolContentID");
 	Integer definitionType = ToolOutputDefinition.DATA_OUTPUT_DEFINITION_TYPE_CONDITION;
@@ -479,7 +478,7 @@ public class AuthoringAction extends LamsDispatchAction {
 	if (learningDesignID != null) {
 	    User user = (User) getUserManagementService().findById(User.class, userID);
 	    Lesson lesson = getMonitoringService().initializeLessonWithoutLDcopy(title, "", learningDesignID, user,
-		    null, false, false, true, false, false, true, true, false, null, null);
+		    null, false, false, true, false, false, true, true, false, false, null, null);
 	    Organisation organisation = getMonitoringService().getOrganisation(organisationID);
 
 	    List<User> staffList = new LinkedList<User>();

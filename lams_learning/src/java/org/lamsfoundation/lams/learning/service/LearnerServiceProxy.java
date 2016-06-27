@@ -26,7 +26,7 @@ package org.lamsfoundation.lams.learning.service;
 import javax.servlet.ServletContext;
 
 import org.lamsfoundation.lams.learning.web.util.ActivityMapping;
-import org.lamsfoundation.lams.monitoring.service.IMonitoringService;
+import org.lamsfoundation.lams.lesson.service.ILessonService;
 import org.lamsfoundation.lams.tool.service.ILamsToolService;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
 import org.springframework.web.context.WebApplicationContext;
@@ -81,8 +81,8 @@ public class LearnerServiceProxy {
 	return (ILamsToolService) LearnerServiceProxy.getDomainService(serlvetContext, "lamsToolService");
     }
 
-    public static final IMonitoringService getMonitoringService(ServletContext servletContext) {
-	return (IMonitoringService) LearnerServiceProxy.getDomainService(servletContext, "monitoringService");
+    public static final ILessonService getLessonService(ServletContext servletContext) {
+	return (ILessonService) LearnerServiceProxy.getDomainService(servletContext, "lessonService");
     }
 
     /**

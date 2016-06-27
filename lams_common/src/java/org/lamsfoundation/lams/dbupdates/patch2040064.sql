@@ -1,6 +1,9 @@
 -- Turn off autocommit, so nothing is committed if there is an error
 SET AUTOCOMMIT = 0;
 
+-- LDEV-3839: Lesson restart
+
+-- Tables for archiving learner progress
 CREATE TABLE lams_learner_progress_archive (
   learner_progress_id bigint(20) NOT NULL AUTO_INCREMENT,
   user_id bigint(20) NOT NULL,
@@ -44,6 +47,11 @@ CREATE TABLE lams_progress_completed_archive (
   CONSTRAINT FK_lams_progress_completed_archive_2 FOREIGN KEY (activity_id)
   	REFERENCES lams_learning_activity (activity_id) ON UPDATE CASCADE ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- make restart an option
+ALTER TABLE lams_lesson CHANGE COLUMN learner_restart force_restart tinyint(1) DEFAULT '0',
+						ADD COLUMN allow_restart tinyint(1) DEFAULT '0';
+
 
 COMMIT;
 SET AUTOCOMMIT = 1;

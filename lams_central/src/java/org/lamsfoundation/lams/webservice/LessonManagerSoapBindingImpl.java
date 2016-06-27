@@ -85,7 +85,7 @@ public class LessonManagerSoapBindingImpl implements LessonManager {
 	    // 1. init lesson
 	    Lesson lesson = LessonManagerSoapBindingImpl.monitoringService.initializeLesson(title, desc, ldId,
 		    orgMap.getOrganisation().getOrganisationId(), userMap.getUser().getUserId(), customCSV, false,
-		    false, true, false, false, false, false, false, null, null);
+		    false, true, false, false, false, false, false, false, null, null);
 	    // 2. create lessonClass for lesson
 	    createLessonClass(lesson, orgMap.getOrganisation(), userMap.getUser());
 	    // 3. start lesson
@@ -111,7 +111,7 @@ public class LessonManagerSoapBindingImpl implements LessonManager {
 	    // 1. init lesson
 	    Lesson lesson = LessonManagerSoapBindingImpl.monitoringService.initializeLesson(title, desc, ldId,
 		    orgMap.getOrganisation().getOrganisationId(), userMap.getUser().getUserId(), customCSV, false,
-		    false, true, false, false, false, false, false, null, null);
+		    false, true, false, false, false, false, false, false, null, null);
 	    // 2. create lessonClass for lesson
 	    createLessonClass(lesson, orgMap.getOrganisation(), userMap.getUser());
 	    // 3. schedule lesson

@@ -75,7 +75,6 @@ import org.lamsfoundation.lams.monitoring.dto.ContributeActivityDTO;
 import org.lamsfoundation.lams.monitoring.service.IMonitoringService;
 import org.lamsfoundation.lams.monitoring.service.MonitoringServiceProxy;
 import org.lamsfoundation.lams.security.ISecurityService;
-import org.lamsfoundation.lams.timezone.service.ITimezoneService;
 import org.lamsfoundation.lams.tool.exception.LamsToolServiceException;
 import org.lamsfoundation.lams.usermanagement.Organisation;
 import org.lamsfoundation.lams.usermanagement.Role;
@@ -141,8 +140,6 @@ public class MonitoringAction extends LamsDispatchAction {
 
     private static IAuditService auditService;
 
-    private static ITimezoneService timezoneService;
-
     private static ILessonService lessonService;
 
     private static ISecurityService securityService;
@@ -166,33 +163,24 @@ public class MonitoringAction extends LamsDispatchAction {
 	    return new FlashMessage(methodKey,
 		    getMonitoringService().getMessageService().getMessage("error.user.noprivilege"),
 		    FlashMessage.ERROR);
-	} else {
-	    String[] msg = new String[1];
-	    msg[0] = e.getMessage();
-	    return new FlashMessage(methodKey,
-		    getMonitoringService().getMessageService().getMessage("error.system.error", msg),
-		    FlashMessage.CRITICAL_ERROR);
 	}
-    }
+	String[] msg = new String[1];
+	msg[0] = e.getMessage();
+	return new FlashMessage(methodKey,
+		getMonitoringService().getMessageService().getMessage("error.system.error", msg),
+		FlashMessage.CRITICAL_ERROR);
 
-    private FlashMessage handleCriticalError(String methodKey, String messageKey) {
-	String message = getMonitoringService().getMessageService().getMessage(messageKey);
-	LamsDispatchAction.log.error("Error occured " + methodKey + " error ");
-	MonitoringAction.auditService = getAuditService();
-	MonitoringAction.auditService.log(MonitoringAction.class.getName() + ":" + methodKey, message);
-
-	return new FlashMessage(methodKey, message, FlashMessage.CRITICAL_ERROR);
     }
 
     private ActionForward redirectToURL(ActionMapping mapping, HttpServletResponse response, String url)
 	    throws IOException {
-	if (url != null) {
-	    String fullURL = WebUtil.convertToFullURL(url);
-	    response.sendRedirect(response.encodeRedirectURL(fullURL));
-	    return null;
-	} else {
+	if (url == null) {
 	    return mapping.findForward(MonitoringAction.NOT_SUPPORTED_SCREEN);
 	}
+
+	String fullURL = WebUtil.convertToFullURL(url);
+	response.sendRedirect(response.encodeRedirectURL(fullURL));
+	return null;
     }
 
     /**
@@ -220,7 +208,8 @@ public class MonitoringAction extends LamsDispatchAction {
 	Boolean learnerPresenceAvailable = WebUtil.readBooleanParam(request, "learnerPresenceAvailable", false);
 	Boolean learnerImAvailable = WebUtil.readBooleanParam(request, "learnerImAvailable", false);
 	Boolean liveEditEnabled = WebUtil.readBooleanParam(request, "liveEditEnabled", false);
-	Boolean learnerRestart = WebUtil.readBooleanParam(request, "learnerRestart", false);
+	Boolean forceRestart = WebUtil.readBooleanParam(request, "forceRestart", false);
+	Boolean allowRestart = WebUtil.readBooleanParam(request, "allowRestart", false);
 
 	Lesson newLesson = null;
 	if ((copyType != null) && copyType.equals(LearningDesign.COPY_TYPE_PREVIEW)) {
@@ -230,7 +219,7 @@ public class MonitoringAction extends LamsDispatchAction {
 	    try {
 		newLesson = getMonitoringService().initializeLesson(title, desc, ldId, organisationId, getUserId(),
 			customCSV, false, false, learnerExportAvailable, learnerPresenceAvailable, learnerImAvailable,
-			liveEditEnabled, false, learnerRestart, null, null);
+			liveEditEnabled, false, forceRestart, allowRestart, null, null);
 	    } catch (SecurityException e) {
 		response.sendError(HttpServletResponse.SC_FORBIDDEN, "User is not a monitor in the organisation");
 		return null;
@@ -328,7 +317,8 @@ public class MonitoringAction extends LamsDispatchAction {
 	Date schedulingDatetime = schedulingEnable
 		? MonitoringAction.LESSON_SCHEDULING_DATETIME_FORMAT.parse(request.getParameter("schedulingDatetime"))
 		: null;
-	boolean learnerRestart = WebUtil.readBooleanParam(request, "learnerRestart", false);
+	boolean forceRestart = WebUtil.readBooleanParam(request, "forceRestart", false);
+	boolean allowRestart = WebUtil.readBooleanParam(request, "allowRestart", false);
 
 	boolean precedingLessonEnable = WebUtil.readBooleanParam(request, "precedingLessonEnable", false);
 	Long precedingLessonId = precedingLessonEnable ? WebUtil.readLongParam(request, "precedingLessonId", true)
@@ -389,7 +379,7 @@ public class MonitoringAction extends LamsDispatchAction {
 	    try {
 		lesson = getMonitoringService().initializeLesson(lessonInstanceName, introDescription, ldId,
 			organisationId, userId, null, introEnable, introImage, portfolioEnable, presenceEnable,
-			imEnable, enableLiveEdit, notificationsEnable, learnerRestart, timeLimitIndividual,
+			imEnable, enableLiveEdit, notificationsEnable, forceRestart, allowRestart, timeLimitIndividual,
 			precedingLessonId);
 
 		getMonitoringService().createLessonClassForLesson(lesson.getLessonId(), organisation,
@@ -1246,10 +1236,8 @@ public class MonitoringAction extends LamsDispatchAction {
 		// old branching is just a rectangle like Tool
 		// new branching has start and finish points, it's exploded
 		BranchingActivity ba = (BranchingActivity) monitoringService.getActivityById(activity.getActivityId());
-		activityJSON.put("x",
-			MonitoringAction.getActivityCoordinate(ba.getStartXcoord()));
-		activityJSON.put("y",
-			MonitoringAction.getActivityCoordinate(ba.getStartYcoord()));
+		activityJSON.put("x", MonitoringAction.getActivityCoordinate(ba.getStartXcoord()));
+		activityJSON.put("y", MonitoringAction.getActivityCoordinate(ba.getStartYcoord()));
 	    } else if (activity.isOptionsWithSequencesActivity() && flaFormat) {
 		// old optional sequences is just a long rectangle
 		// new optional sequences has start and finish points, it's exploded
@@ -1478,20 +1466,6 @@ public class MonitoringAction extends LamsDispatchAction {
 	return MonitoringAction.auditService;
     }
 
-    /**
-     * Get TimezoneService bean.
-     *
-     * @return
-     */
-    private ITimezoneService getTimezoneService() {
-	if (MonitoringAction.timezoneService == null) {
-	    WebApplicationContext ctx = WebApplicationContextUtils
-		    .getRequiredWebApplicationContext(getServlet().getServletContext());
-	    MonitoringAction.timezoneService = (ITimezoneService) ctx.getBean("timezoneService");
-	}
-	return MonitoringAction.timezoneService;
-    }
-
     private ILessonService getLessonService() {
 	if (MonitoringAction.lessonService == null) {
 	    WebApplicationContext ctx = WebApplicationContextUtils
@@ -1616,8 +1590,6 @@ public class MonitoringAction extends LamsDispatchAction {
      * Creates a list of users out of string with comma-delimited user IDs.
      */
     private List<User> parseUserList(HttpServletRequest request, String paramName, Collection<User> users) {
-	IUserManagementService userManagementService = MonitoringServiceProxy
-		.getUserManagementService(getServlet().getServletContext());
 	String userIdList = request.getParameter(paramName);
 	String[] userIdArray = userIdList.split(",");
 	List<User> result = new ArrayList<User>(userIdArray.length);
