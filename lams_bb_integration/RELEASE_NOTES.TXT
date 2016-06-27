@@ -121,3 +121,4 @@ Now reverted back to previous behaviour with lesson loading in the same tab.
 ====================
 * LDEV-3399: Support Course Copy feature in Blackboard
 * LDEV-3704: Ability to modify BB lessons' URL host name
+* LDEV-3881: Increase popup size (to 1280x720)
