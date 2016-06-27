@@ -29,6 +29,14 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 
 <c:set var="displayPrintButton"><lams:Configuration key="DisplayPrintButton"/></c:set>
 
+<script type="text/javascript">
+	function restartLesson(){
+		if (confirm('<fmt:message key="message.learner.progress.restart.confirm"/>')) {
+			window.location.href = "<lams:WebAppURL/>learner.do?method=restartLesson&lessonID=${lessonID}";
+		}
+	}
+</script>
+
 <lams:Page type="admin">
 	<c:set var="lastName">
 		<lams:user property="lastName"/> 
@@ -58,7 +66,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 	
 	<div class="voffset10">
 		<fmt:message key="message.lesson.restart" />
-		<a class="btn btn-default loffset20" href="<lams:WebAppURL/>learner.do?method=restartLesson&lessonID=${lessonID}">
+		<a class="btn btn-default loffset20" href="#" onClick="javascript:restartLesson()">
 			<fmt:message key="message.lesson.restart.button" />
 		</a>
 	</div>

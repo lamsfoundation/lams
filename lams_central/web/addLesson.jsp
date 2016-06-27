@@ -190,7 +190,8 @@
 			
 			<div class="fieldSectionTitle"><fmt:message key="label.tab.advanced.section.advanced" /></div>
 			<input id="startMonitorField" name="startMonitor" value="true" type="checkbox"><fmt:message key="label.tab.advanced.field.monitor" /></input><br />
-				<input name="learnerRestart" value="true" type="checkbox"><fmt:message key="label.tab.advanced.field.restart" /></input><br />
+			<input name="forceRestart" value="true" type="checkbox"><fmt:message key="label.tab.advanced.field.force.restart" /></input><br />
+			<input name="allowRestart" value="true" type="checkbox"><fmt:message key="label.tab.advanced.field.allow.restart" /></input><br />
 			<input name="liveEditEnable" value="true" type="checkbox" checked="checked"><fmt:message key="label.tab.advanced.field.liveedit" /></input><br />
 			<input name="notificationsEnable" value="true" type="checkbox" checked="checked"><fmt:message key="label.tab.advanced.field.notification" /></input><br />
 			<input id="presenceEnableField" name="presenceEnable" value="true" type="checkbox"><fmt:message key="label.tab.advanced.field.presence" /></input><br />

@@ -282,7 +282,7 @@ public class AuthoringAction extends LamsDispatchAction {
 	if (learningDesignID != null) {
 	    User user = (User) getUserManagementService().findById(User.class, userID);
 	    Lesson lesson = getMonitoringService().initializeLessonWithoutLDcopy(title, "", learningDesignID, user,
-		    null, false, false, false, false, true, true, false, null, null);
+		    null, false, false, false, false, true, true, false, false, null, null);
 	    Organisation organisation = getMonitoringService().getOrganisation(organisationID);
 
 	    List<User> staffList = new LinkedList<User>();

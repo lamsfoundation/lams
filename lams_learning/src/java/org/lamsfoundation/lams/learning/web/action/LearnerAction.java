@@ -53,7 +53,7 @@ import org.lamsfoundation.lams.lesson.CompletedActivityProgressArchive;
 import org.lamsfoundation.lams.lesson.LearnerProgress;
 import org.lamsfoundation.lams.lesson.LearnerProgressArchive;
 import org.lamsfoundation.lams.lesson.Lesson;
-import org.lamsfoundation.lams.monitoring.service.IMonitoringService;
+import org.lamsfoundation.lams.lesson.service.ILessonService;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
@@ -213,11 +213,9 @@ public class LearnerAction extends LamsDispatchAction {
 		attemptID, attemptedActivities, completedActivities, learnerProgress.getCurrentActivity(),
 		learnerProgress.getLessonComplete(), learnerProgress.getStartDate(), learnerProgress.getFinishDate());
 
-	// move learner to the beginning of lesson the same way Monitor can
-	IMonitoringService monitoringService = LearnerServiceProxy
-		.getMonitoringService(getServlet().getServletContext());
-	monitoringService.forceCompleteActivitiesByUser(userID, userID, lessonID,
-		learnerProgress.getLesson().getLearningDesign().getFirstActivity().getActivityId(), true);
+	// remove learner progress
+	ILessonService lessonService = LearnerServiceProxy.getLessonService(getServlet().getServletContext());
+	lessonService.removeLearnerProgress(lessonID, userID);
 
 	IUserManagementService userManagementService = LearnerServiceProxy
 		.getUserManagementService(getServlet().getServletContext());

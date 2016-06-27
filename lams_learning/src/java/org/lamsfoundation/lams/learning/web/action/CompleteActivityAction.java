@@ -89,7 +89,9 @@ public class CompleteActivityAction extends ActivityAction {
 	    if (lessonFinishCallbackUrl != null) {
 		request.setAttribute("lessonFinishUrl", lessonFinishCallbackUrl);
 	    }
+	    if (progress.getLesson().getAllowLearnerRestart()) {
 	    request.setAttribute("lessonID", progress.getLesson().getLessonId());
+	}
 	}
 
 	ActionForward forward = null;

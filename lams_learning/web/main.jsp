@@ -35,7 +35,9 @@
 				<fmt:message key="label.learner.progress.activity.tostart.tooltip" var="TOSTART_ACTIVITY_VAR"/>
 				TOSTART_ACTIVITY : '<c:out value="${TOSTART_ACTIVITY_VAR}" />',
 				<fmt:message key="label.learner.progress.activity.support.tooltip" var="SUPPORT_ACTIVITY_VAR"/>
-				SUPPORT_ACTIVITY : '<c:out value="${SUPPORT_ACTIVITY_VAR}" />'
+				SUPPORT_ACTIVITY : '<c:out value="${SUPPORT_ACTIVITY_VAR}" />',
+				<fmt:message key="message.learner.progress.restart.confirm" var="CONFIRM_RESTART_VAR"/>
+				CONFIRM_RESTART : '<c:out value="${CONFIRM_RESTART_VAR}" />'
 			},
 			
 			parentURL = "${notifyCloseURL}",
@@ -97,11 +99,20 @@
 	<div id="controlFrame" class="ui-layout-west">
 		<table id="logoTable" class="progressStaticHeight" cellspacing="0">
 			<tr>
-				<td>
+				<td rowspan="2">
 					<img id="logoImage" src="<lams:LAMSURL />images/css/lams_logo.gif" />
 				</td>
 				<td id="exitButtonCell">
-					<input name="exitButton" onClick="javascript:closeWindow()" type="button" class="button progressButton" value='<fmt:message key="button.exit" />' />
+					<input name="exitButton" onClick="javascript:closeWindow()" type="button" class="button progressButton"
+						   value='<fmt:message key="button.exit" />' />
+				</td>
+			</tr>
+			<tr>
+				<td id="restartButtonCell">
+					<c:if test="${allowRestart}">
+						<input onClick="javascript:restartLesson()" type="button" class="button progressButton"
+							   value='<fmt:message key="message.lesson.restart.button" />' />
+					</c:if>
 				</td>
 			</tr>
 		</table>

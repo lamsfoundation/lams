@@ -21,7 +21,6 @@
  * ****************************************************************
  */
 
-
 package org.lamsfoundation.lams.monitoring.service;
 
 import java.io.IOException;
@@ -347,8 +346,8 @@ public class MonitoringService implements IMonitoringService {
     public Lesson initializeLesson(String lessonName, String lessonDescription, long learningDesignId,
 	    Integer organisationId, Integer userID, String customCSV, Boolean enableLessonIntro,
 	    Boolean displayDesignImage, Boolean learnerPresenceAvailable, Boolean learnerImAvailable,
-	    Boolean liveEditEnabled, Boolean enableLessonNotifications, Boolean learnerRestart,
-	    Integer scheduledNumberDaysToLessonFinish, Long precedingLessonId) {
+	    Boolean liveEditEnabled, Boolean enableLessonNotifications, Boolean forceLearnerRestart,
+	    Boolean allowLearnerRestart, Integer scheduledNumberDaysToLessonFinish, Long precedingLessonId) {
 
 	securityService.isGroupMonitor(organisationId, userID, "intializeLesson", true);
 
@@ -364,21 +363,21 @@ public class MonitoringService implements IMonitoringService {
 	Organisation org = (Organisation) baseDAO.find(Organisation.class, organisationId);
 	WorkspaceFolder runSeqFolder = null;
 	int MAX_DEEP_LEVEL_FOLDER = 50;
-	    for (int idx = 0; idx < MAX_DEEP_LEVEL_FOLDER; idx++) {
-		if ((org == null) || (runSeqFolder != null)) {
-		    break;
-		}
-	    runSeqFolder = org.getRunSequencesFolder();
-		if (runSeqFolder == null) {
-		    org = org.getParentOrganisation();
-		}
+	for (int idx = 0; idx < MAX_DEEP_LEVEL_FOLDER; idx++) {
+	    if ((org == null) || (runSeqFolder != null)) {
+		break;
 	    }
+	    runSeqFolder = org.getRunSequencesFolder();
+	    if (runSeqFolder == null) {
+		org = org.getParentOrganisation();
+	    }
+	}
 
 	User user = userID != null ? (User) baseDAO.find(User.class, userID) : null;
 	Lesson initializedLesson = initializeLesson(lessonName, lessonDescription, originalLearningDesign, user,
 		runSeqFolder, LearningDesign.COPY_TYPE_LESSON, customCSV, enableLessonIntro, displayDesignImage,
 		learnerPresenceAvailable, learnerImAvailable, liveEditEnabled, enableLessonNotifications,
-		learnerRestart, scheduledNumberDaysToLessonFinish, precedingLesson);
+		forceLearnerRestart, allowLearnerRestart, scheduledNumberDaysToLessonFinish, precedingLesson);
 
 	Long initializedLearningDesignId = initializedLesson.getLearningDesign().getLearningDesignId();
 	logEventService.logEvent(LogEvent.TYPE_TEACHER_LESSON_CREATE, userID, initializedLearningDesignId,
@@ -400,15 +399,15 @@ public class MonitoringService implements IMonitoringService {
 
 	return initializeLesson(lessonName, lessonDescription, originalLearningDesign, user, null,
 		LearningDesign.COPY_TYPE_PREVIEW, customCSV, false, false, learnerPresenceAvailable, learnerImAvailable,
-		liveEditEnabled, true, false, null, null);
+		liveEditEnabled, true, false, false, null, null);
     }
 
     @Override
     public Lesson initializeLessonWithoutLDcopy(String lessonName, String lessonDescription, long learningDesignID,
 	    User user, String customCSV, Boolean enableLessonIntro, Boolean displayDesignImage,
 	    Boolean learnerPresenceAvailable, Boolean learnerImAvailable, Boolean liveEditEnabled,
-	    Boolean enableLessonNotifications, Boolean learnerRestart, Integer scheduledNumberDaysToLessonFinish,
-	    Lesson precedingLesson) {
+	    Boolean enableLessonNotifications, Boolean forceLearnerRestart, Boolean allowLearnerRestart,
+	    Integer scheduledNumberDaysToLessonFinish, Lesson precedingLesson) {
 	LearningDesign learningDesign = authoringService.getLearningDesign(learningDesignID);
 	if (learningDesign == null) {
 	    throw new MonitoringServiceException(
@@ -416,7 +415,8 @@ public class MonitoringService implements IMonitoringService {
 	}
 	Lesson lesson = createNewLesson(lessonName, lessonDescription, user, learningDesign, enableLessonIntro,
 		displayDesignImage, learnerPresenceAvailable, learnerImAvailable, liveEditEnabled,
-		enableLessonNotifications, learnerRestart, scheduledNumberDaysToLessonFinish, precedingLesson);
+		enableLessonNotifications, forceLearnerRestart, allowLearnerRestart, scheduledNumberDaysToLessonFinish,
+		precedingLesson);
 	writeAuditLog(MonitoringService.AUDIT_LESSON_CREATED_KEY,
 		new Object[] { lessonName, learningDesign.getTitle() });
 	return lesson;
@@ -425,8 +425,8 @@ public class MonitoringService implements IMonitoringService {
     private Lesson initializeLesson(String lessonName, String lessonDescription, LearningDesign originalLearningDesign,
 	    User user, WorkspaceFolder workspaceFolder, int copyType, String customCSV, Boolean enableLessonIntro,
 	    Boolean displayDesignImage, Boolean learnerPresenceAvailable, Boolean learnerImAvailable,
-	    Boolean liveEditEnabled, Boolean enableLessonNotifications, Boolean learnerRestart,
-	    Integer scheduledNumberDaysToLessonFinish, Lesson precedingLesson) {
+	    Boolean liveEditEnabled, Boolean enableLessonNotifications, Boolean forceLearnerRestart,
+	    Boolean allowLearnerRestart, Integer scheduledNumberDaysToLessonFinish, Lesson precedingLesson) {
 	// copy the current learning design
 	LearningDesign copiedLearningDesign = authoringService.copyLearningDesign(originalLearningDesign,
 		new Integer(copyType), user, workspaceFolder, true, null, customCSV);
@@ -442,7 +442,8 @@ public class MonitoringService implements IMonitoringService {
 
 	Lesson lesson = createNewLesson(title, lessonDescription, user, copiedLearningDesign, enableLessonIntro,
 		displayDesignImage, learnerPresenceAvailable, learnerImAvailable, liveEditEnabled,
-		enableLessonNotifications, learnerRestart, scheduledNumberDaysToLessonFinish, precedingLesson);
+		enableLessonNotifications, forceLearnerRestart, allowLearnerRestart, scheduledNumberDaysToLessonFinish,
+		precedingLesson);
 	writeAuditLog(MonitoringService.AUDIT_LESSON_CREATED_KEY,
 		new Object[] { lessonName, copiedLearningDesign.getTitle() });
 	return lesson;
@@ -1737,11 +1738,11 @@ public class MonitoringService implements IMonitoringService {
     private Lesson createNewLesson(String lessonName, String lessonDescription, User user,
 	    LearningDesign copiedLearningDesign, Boolean enableLessonIntro, Boolean displayDesignImage,
 	    Boolean learnerPresenceAvailable, Boolean learnerImAvailable, Boolean liveEditEnabled,
-	    Boolean enableLessonNotifications, Boolean learnerRestart, Integer scheduledNumberDaysToLessonFinish,
-	    Lesson precedingLesson) {
+	    Boolean enableLessonNotifications, Boolean forceLearnerRestart, Boolean allowLearnerRestart,
+	    Integer scheduledNumberDaysToLessonFinish, Lesson precedingLesson) {
 	Lesson newLesson = Lesson.createNewLessonWithoutClass(lessonName, lessonDescription, user, copiedLearningDesign,
 		enableLessonIntro, displayDesignImage, learnerPresenceAvailable, learnerImAvailable, liveEditEnabled,
-		enableLessonNotifications, learnerRestart, scheduledNumberDaysToLessonFinish);
+		enableLessonNotifications, forceLearnerRestart, allowLearnerRestart, scheduledNumberDaysToLessonFinish);
 	if (precedingLesson != null) {
 	    HashSet precedingLessons = new HashSet();
 	    precedingLessons.add(precedingLesson);
@@ -2225,7 +2226,7 @@ public class MonitoringService implements IMonitoringService {
 					lesson.isEnableLessonIntro(), lesson.isDisplayDesignImage(),
 					lesson.getLearnerPresenceAvailable(), lesson.getLearnerImAvailable(),
 					lesson.getLiveEditEnabled(), lesson.getEnableLessonNotifications(),
-					lesson.getLearnerRestart(), null, null);
+					lesson.getForceLearnerRestart(), lesson.getAllowLearnerRestart(), null, null);
 
 				// save LessonClasses
 				newLesson = this.createLessonClassForLesson(newLesson.getLessonId(), group,
