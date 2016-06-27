@@ -21,7 +21,6 @@
  * ****************************************************************
  */
 
-
 package org.lamsfoundation.lams.monitoring.service;
 
 import java.io.IOException;
@@ -62,8 +61,8 @@ public interface IMonitoringService {
     Lesson initializeLessonWithoutLDcopy(String lessonName, String lessonDescription, long learningDesignID, User user,
 	    String customCSV, Boolean enableLessonIntro, Boolean displayDesignImage, Boolean learnerExportAvailable,
 	    Boolean learnerPresenceAvailable, Boolean learnerImAvailable, Boolean liveEditEnabled,
-	    Boolean enableLessonNotifications, Boolean learnerRestart, Integer scheduledNumberDaysToLessonFinish,
-	    Lesson precedingLesson);
+	    Boolean enableLessonNotifications, Boolean forceLearnerRestart, Boolean allowLearnerRestart,
+	    Integer scheduledNumberDaysToLessonFinish, Lesson precedingLesson);
 
     /**
      * <p>
@@ -111,8 +110,8 @@ public interface IMonitoringService {
     Lesson initializeLesson(String lessonName, String lessonDescription, long learningDesignId, Integer organisationId,
 	    Integer userID, String customCSV, Boolean enableLessonIntro, Boolean displayDesignImage,
 	    Boolean learnerExportAvailable, Boolean learnerPresenceAvailable, Boolean learnerImAvailable,
-	    Boolean liveEditEnabled, Boolean enableNotifications, Boolean learnerRestart,
-	    Integer numberDaysToLessonFinish, Long precedingLessonId);
+	    Boolean liveEditEnabled, Boolean enableNotifications, Boolean forceLearnerRestart,
+	    Boolean allowLearnerRestart, Integer numberDaysToLessonFinish, Long precedingLessonId);
 
     /**
      * Initialize a new lesson so as to start the learning process for a normal or preview learning session. It needs to

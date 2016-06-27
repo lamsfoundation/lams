@@ -20,7 +20,6 @@
  * ****************************************************************
  */
 
-
 package org.lamsfoundation.lams.webservice.xml;
 
 import java.io.IOException;
@@ -264,7 +263,8 @@ public class LessonJoinServlet extends HttpServlet {
 	Boolean learnerImAvailable;
 	Boolean liveEditEnabled;
 	Boolean enableNotifications;
-	Boolean learnerRestart;
+	Boolean forceLearnerRestart;
+	Boolean allowLearnerRestart;
 	Integer ownerUserId;
 	Organisation org = (Organisation) LessonJoinServlet.userService.findById(Organisation.class, orgId);
 	String learnerGroupName;
@@ -285,7 +285,8 @@ public class LessonJoinServlet extends HttpServlet {
 	    learnerImAvailable = l.getLearnerImAvailable();
 	    liveEditEnabled = l.getLiveEditEnabled();
 	    enableNotifications = l.getEnableLessonNotifications();
-	    learnerRestart = l.getLearnerRestart();
+	    forceLearnerRestart = l.getForceLearnerRestart();
+	    allowLearnerRestart = l.getAllowLearnerRestart();
 	    ownerUserId = l.getUser().getUserId();
 	    learnerGroupName = l.getLessonClass().getLearnersGroup().getGroupName();
 	    staffGroupName = l.getLessonClass().getStaffGroup().getGroupName();
@@ -302,7 +303,8 @@ public class LessonJoinServlet extends HttpServlet {
 	    learnerImAvailable = false;
 	    liveEditEnabled = false;
 	    enableNotifications = false;
-	    learnerRestart = false;
+	    forceLearnerRestart = false;
+	    allowLearnerRestart = false;
 	    ownerUserId = ld.getUser().getUserId();
 	    learnerGroupName = org.getName() + " Learners";
 	    staffGroupName = org.getName() + " Staff";
@@ -312,8 +314,8 @@ public class LessonJoinServlet extends HttpServlet {
 	}
 	Lesson lesson = LessonJoinServlet.monitoringService.initializeLesson(lessonName, lessonDescription, ldId, orgId,
 		ownerUserId, null, enableLessonIntro, displayDesignImage, learnerExportAvailable,
-		learnerPresenceAvailable, learnerImAvailable, liveEditEnabled, enableNotifications, learnerRestart,
-		null, null);
+		learnerPresenceAvailable, learnerImAvailable, liveEditEnabled, enableNotifications, forceLearnerRestart,
+		allowLearnerRestart, null, null);
 	LessonJoinServlet.monitoringService.createLessonClassForLesson(lesson.getLessonId().longValue(), org,
 		learnerGroupName, learnerList, staffGroupName, staffList, ownerUserId);
 	LessonJoinServlet.monitoringService.startLesson(lesson.getLessonId().longValue(), ownerUserId);

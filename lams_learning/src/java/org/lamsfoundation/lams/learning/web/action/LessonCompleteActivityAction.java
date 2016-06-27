@@ -87,7 +87,9 @@ public class LessonCompleteActivityAction extends ActivityAction {
 	    request.setAttribute("lessonFinishUrl", lessonFinishCallbackUrl);
 
 	}
-	request.setAttribute("lessonID", learnerProgress.getLesson().getLessonId());
+	if (learnerProgress.getLesson().getAllowLearnerRestart()) {
+	    request.setAttribute("lessonID", learnerProgress.getLesson().getLessonId());
+	}
 
 	return mapping.findForward("lessonComplete");
     }

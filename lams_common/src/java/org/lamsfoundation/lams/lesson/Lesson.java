@@ -161,8 +161,15 @@ public class Lesson implements Serializable {
 
     /**
      * Should Learner start the lesson from the beginning each time he enters it.
+     * Content is not removed, LessonProgress is deleted, not archived.
      */
-    private Boolean learnerRestart;
+    private Boolean forceLearnerRestart;
+
+    /**
+     * Should Learners be allowed to restart the lesson after finishing it.
+     * Content is not removed, LessonProgress is archived and then deleted.
+     */
+    private Boolean allowLearnerRestart;
 
     /**
      * For lesson conditional release
@@ -185,11 +192,12 @@ public class Lesson implements Serializable {
 	    Integer previousLessonStateId, LearningDesign learningDesign, Set learnerProgresses,
 	    Boolean enableLessonIntro, Boolean displayDesignImage, Boolean learnerExportAvailable,
 	    Boolean learnerPresenceAvailable, Boolean learnerImAvailable, Boolean liveEditEnabled,
-	    Boolean enableLessonNotifications, Boolean learnerRestart, Integer scheduledNumberDaysTolessonFinish) {
+	    Boolean enableLessonNotifications, Boolean forceLearnerRestart, Boolean allowLearnerRestart,
+	    Integer scheduledNumberDaysTolessonFinish) {
 	this(null, name, description, createDateTime, null, null, user, lessonStateId, previousLessonStateId,
 		enableLessonIntro, displayDesignImage, learnerExportAvailable, false, learningDesign, null, null,
 		learnerProgresses, learnerPresenceAvailable, learnerImAvailable, liveEditEnabled,
-		enableLessonNotifications, learnerRestart, scheduledNumberDaysTolessonFinish);
+		enableLessonNotifications, forceLearnerRestart, allowLearnerRestart, scheduledNumberDaysTolessonFinish);
     }
 
     /** full constructor */
@@ -198,8 +206,8 @@ public class Lesson implements Serializable {
 	    Boolean enableLessonIntro, Boolean displayDesignImage, Boolean learnerExportAvailable,
 	    Boolean lockedForEdit, LearningDesign learningDesign, LessonClass lessonClass, Organisation organisation,
 	    Set learnerProgresses, Boolean learnerPresenceAvailable, Boolean learnerImAvailable,
-	    Boolean liveEditEnabled, Boolean enableLessonNotifications, Boolean learnerRestart,
-	    Integer scheduledNumberDaysToLessonFinish) {
+	    Boolean liveEditEnabled, Boolean enableLessonNotifications, Boolean forceLearnerRestart,
+	    Boolean allowLearnerRestart, Integer scheduledNumberDaysToLessonFinish) {
 	this.lessonId = lessonId;
 	this.lessonName = name;
 	this.lessonDescription = description;
@@ -221,7 +229,8 @@ public class Lesson implements Serializable {
 	this.learnerProgresses = learnerProgresses;
 	this.liveEditEnabled = liveEditEnabled;
 	this.enableLessonNotifications = enableLessonNotifications;
-	this.learnerRestart = learnerRestart;
+	this.forceLearnerRestart = forceLearnerRestart;
+	this.allowLearnerRestart = allowLearnerRestart;
 	this.gradebookUserLessons = new HashSet<GradebookUserLesson>();
 	this.marksReleased = false;
 	this.scheduledNumberDaysToLessonFinish = scheduledNumberDaysToLessonFinish;
@@ -242,11 +251,12 @@ public class Lesson implements Serializable {
     public static Lesson createNewLessonWithoutClass(String lessonName, String lessonDescription, User user,
 	    LearningDesign ld, Boolean enableLessonIntro, Boolean displayDesignImage, Boolean learnerExportAvailable,
 	    Boolean learnerPresenceAvailable, Boolean learnerImAvailable, Boolean liveEditEnabled,
-	    Boolean enableLessonNotifications, Boolean learnerRestart, Integer scheduledNumberDaysToLessonFinish) {
+	    Boolean enableLessonNotifications, Boolean forceLearnerRestart, Boolean allowLearnerRestart,
+	    Integer scheduledNumberDaysToLessonFinish) {
 	return new Lesson(lessonName, lessonDescription, new Date(System.currentTimeMillis()), user, Lesson.CREATED,
 		null, ld, new HashSet(), enableLessonIntro, displayDesignImage, learnerExportAvailable,
 		learnerPresenceAvailable, learnerImAvailable, liveEditEnabled, enableLessonNotifications,
-		learnerRestart, scheduledNumberDaysToLessonFinish);
+		forceLearnerRestart, allowLearnerRestart, scheduledNumberDaysToLessonFinish);
     }
 
     // ---------------------------------------------------------------------
@@ -591,12 +601,20 @@ public class Lesson implements Serializable {
 	this.marksReleased = marksReleased;
     }
 
-    public Boolean getLearnerRestart() {
-	return learnerRestart;
+    public Boolean getForceLearnerRestart() {
+	return forceLearnerRestart;
     }
 
-    public void setLearnerRestart(Boolean learnerRestart) {
-	this.learnerRestart = learnerRestart;
+    public void setForceLearnerRestart(Boolean forceLearnerRestart) {
+	this.forceLearnerRestart = forceLearnerRestart;
+    }
+
+    public Boolean getAllowLearnerRestart() {
+	return allowLearnerRestart;
+    }
+
+    public void setAllowLearnerRestart(Boolean allowLearnerRestart) {
+	this.allowLearnerRestart = allowLearnerRestart;
     }
 
     public Set<Lesson> getPrecedingLessons() {

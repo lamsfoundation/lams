@@ -51,8 +51,12 @@ td#exitButtonCell {
 	width: 50px;
 }
 
-td#exportButtonCell {
+td#exportButtonCell{
 	padding: 3px 2px 5px 0px;
+}
+
+td#restartButtonCell {
+	padding: 1px 2px 0px 0px;
 }
 
 div#lessonTitleRow {
