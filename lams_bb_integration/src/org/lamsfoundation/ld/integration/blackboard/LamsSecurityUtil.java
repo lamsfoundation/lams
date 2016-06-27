@@ -516,7 +516,8 @@ public class LamsSecurityUtil {
 		    + URLEncoder.encode(username, "utf8") + "&hashValue=" + hash + course
 		    + "&ldId=" + new Long(ldId).toString() + "&country="
 		    + country + "&lang=" + lang + "&method=" + method + "&title="
-		    + URLEncoder.encode(title, "utf8").trim() + "&desc=" + URLEncoder.encode(desc, "utf8").trim();
+		    + URLEncoder.encode(title, "utf8").trim() + "&desc=" + URLEncoder.encode(desc, "utf8").trim()
+		    + "&enableNotifications=true";
 
 	    logger.info("LAMS START LESSON Req: " + serviceURL);
 
