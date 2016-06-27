@@ -53,9 +53,9 @@ public class MockAuthor extends MockUser {
 
     private static final String IMPORT_FORM_FLAG = "UPLOAD_FILE";
     private static final String UPLOAD_FILE_PARAM = "UPLOAD_FILE";
-    private static final String IMPORT_SUCCESS_FLAG = "movie";
+    private static final String IMPORT_SUCCESS_FLAG = "Flashless Authoring is";
     private static final String LD_START_TAG = "learningDesignID=";
-    private static final char LD_END_TAG = '&';
+    private static final char LD_END_TAG = ' ';
 
     /**
      * MockAuthor Constructor
