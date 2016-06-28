@@ -72,7 +72,8 @@ public class MockLearner extends MockUser implements Runnable {
 
     private static final String FORUM_FINISH_SUBSTRING = "lafrum11/learning/finish.do";
     private static final String FORUM_VIEW_TOPIC_SUBSTRING = "lafrum11/learning/viewTopic.do";
-    private static final String FORUM_REPLY_SUBSTRING = "lafrum11/learning/newReplyTopic.do";
+    private static final Pattern FORUM_REPLY_SUBSTRING = Pattern
+	    .compile("'(/lams/tool/lafrum11/learning/newReplyTopic\\.do.*)'");
     private static final String FORUM_VIEW_FORUM_SUBSTRING = "lafrum11/learning/viewForum.do";
 
     private static final String LEADER_FINISH_SUBSTRING = "/lams/tool/lalead11/learning.do";
@@ -86,13 +87,10 @@ public class MockLearner extends MockUser implements Runnable {
     private static final String SCRATCHIE_REFLECTION_SUBSTRING = "newReflection";
     private static final String SCRATCHIE_LEARNING_SUBSTRING = "/lams/tool/lascrt11/pages/learning/learning.jsp";
     private static final Pattern SCRATCHIE_SCRATCH_PATTERN = Pattern.compile("scratchItem\\((\\d+), (\\d+)\\)");
-    private static final String SCRATCHIE_REFLECTION_AVAILABLE = "return continueReflect()";
     private static final String SCRATCHIE_IS_LEADER_SUBSTRING = "isUserLeader=true";
 
     private static final String CHAT_FINISH_SUBSTRING = "/lams/tool/lachat11/learning.do";
     private static final int CHAT_REPLIES = 3;
-
-    private static final String VOTE_FINISH_SUBSTRING = "/lams/tool/lavote11/learning.do";
 
     private static final String KNOCK_GATE_SUBSTRING = "/lams/learning/gate.do?method=knockGate";
 
@@ -557,13 +555,17 @@ public class MockLearner extends MockUser implements Runnable {
 
     private WebResponse handleToolForumReply(String url) throws SAXException, IOException {
 	WebResponse resp = (WebResponse) new Call(wc, test, username + " views Forum topic", url).execute();
-	String replyURL = MockLearner.findURLInAHREF(resp, MockLearner.FORUM_REPLY_SUBSTRING);
-	if (replyURL == null) {
+	// store link for later
+	String returnToForumURL = MockLearner.findURLInLocationHref(resp, MockLearner.FORUM_VIEW_FORUM_SUBSTRING);
+
+	Matcher matcher = FORUM_REPLY_SUBSTRING.matcher(resp.getText());
+	if (matcher.find()) {
+	    resp = (WebResponse) new Call(wc, test, username + " replies to Forum topic", matcher.group(1)).execute();
+	} else {
 	    MockLearner.log.debug(resp.getText());
 	    throw new TestHarnessException("No reply URL found - unable to do reply. ");
 	}
 
-	resp = (WebResponse) new Call(wc, test, username + " replies to Forum topic", replyURL).execute();
 	WebForm[] forms = resp.getForms();
 	if ((forms == null) || (forms.length == 0)) {
 	    MockLearner.log.debug(resp.getText());
@@ -576,8 +578,7 @@ public class MockLearner extends MockUser implements Runnable {
 
 	resp = handlePageWithForms(resp);
 
-	// now we are back on the topic page, so go back to the main forum page.
-	String returnToForumURL = MockLearner.findURLInAHREF(resp, MockLearner.FORUM_VIEW_FORUM_SUBSTRING);
+	// go back to the main forum page.
 	if (returnToForumURL == null) {
 	    MockLearner.log.debug(resp.getText());
 	    throw new TestHarnessException("No button back to forum page found - stuck while doing reply");
@@ -692,7 +693,6 @@ public class MockLearner extends MockUser implements Runnable {
 		} catch (InterruptedException e) {
 		    MockLearner.log.error("Interrupted waiting between question list refresh in scratchie");
 		}
-		String url = resp.getURL().toString() + "&reqId=" + System.currentTimeMillis();
 		WebResponse questionRefreshResp = (WebResponse) new Call(wc, test,
 			username + " refreshes Scratchie question list", refreshQuestionsURL).execute();
 		asText = questionRefreshResp.getText();
@@ -828,16 +828,16 @@ public class MockLearner extends MockUser implements Runnable {
 	return form;
     }
 
-    private WebForm handleToolVote(WebForm form, String action) throws IOException, SAXException {
-	// add one random page...
-	form.setAttribute("action", action + "?dispatch=addPage");
-	WebResponse nextResp = (WebResponse) new Call(wc, test, username + " adds Wiki page", fillFormArbitrarily(form))
-		.execute();
-	form = nextResp.getForms()[1];
-	// ...and mark the activity to be finished
-	form.setAttribute("action", action + "?dispatch=finishActivity");
-	return form;
-    }
+//    private WebForm handleToolVote(WebForm form, String action) throws IOException, SAXException {
+//	// add one random page...
+//	form.setAttribute("action", action + "?dispatch=addPage");
+//	WebResponse nextResp = (WebResponse) new Call(wc, test, username + " adds Wiki page", fillFormArbitrarily(form))
+//		.execute();
+//	form = nextResp.getForms()[1];
+//	// ...and mark the activity to be finished
+//	form.setAttribute("action", action + "?dispatch=finishActivity");
+//	return form;
+//    }
 
     private WebResponse handleToolPeerReview(WebResponse resp, String asText) throws SAXException, IOException {
 	WebResponse replyResponse = null;
