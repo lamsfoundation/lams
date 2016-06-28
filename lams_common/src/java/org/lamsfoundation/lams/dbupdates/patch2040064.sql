@@ -21,7 +21,7 @@ CREATE TABLE lams_learner_progress_archive (
   	REFERENCES lams_lesson (lesson_id) ON UPDATE CASCADE ON DELETE CASCADE,
   CONSTRAINT FK_lams_learner_progress_archive_3 FOREIGN KEY (current_activity_id)
   	REFERENCES lams_learning_activity (activity_id) ON UPDATE CASCADE ON DELETE SET NULL
-) ENGINE=InnoDB DEFAULT CHARSET utf8mb4;
+) ENGINE=InnoDB;
 
 
 CREATE TABLE lams_progress_attempted_archive (
@@ -33,7 +33,7 @@ CREATE TABLE lams_progress_attempted_archive (
   	REFERENCES lams_learner_progress_archive (learner_progress_id) ON UPDATE CASCADE ON DELETE CASCADE,
   CONSTRAINT FK_lams_progress_current_archive_2 FOREIGN KEY (activity_id)
   	REFERENCES lams_learning_activity (activity_id) ON UPDATE CASCADE ON DELETE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET utf8mb4;
+) ENGINE=InnoDB;
 
 
 CREATE TABLE lams_progress_completed_archive (
@@ -46,7 +46,7 @@ CREATE TABLE lams_progress_completed_archive (
   	REFERENCES lams_learner_progress_archive (learner_progress_id) ON UPDATE CASCADE ON DELETE CASCADE,
   CONSTRAINT FK_lams_progress_completed_archive_2 FOREIGN KEY (activity_id)
   	REFERENCES lams_learning_activity (activity_id) ON UPDATE CASCADE ON DELETE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB;
 
 -- make restart an option
 ALTER TABLE lams_lesson CHANGE COLUMN learner_restart force_restart tinyint(1) DEFAULT '0',
