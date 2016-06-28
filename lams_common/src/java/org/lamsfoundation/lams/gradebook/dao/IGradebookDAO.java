@@ -53,7 +53,7 @@ public interface IGradebookDAO extends IBaseDAO {
      */
     List<GradebookUserActivity> getGradebookUserActivitiesForActivity(Long activityID, List<Integer> userIds);
 
-    Double getAverageMarkForLesson(Long lessonID);
+    Double getMedianMarkForLesson(Long lessonID);
 
     long getAverageDurationLesson(Long lessonID);
 

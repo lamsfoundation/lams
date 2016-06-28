@@ -492,7 +492,7 @@ public class GradebookAction extends LamsDispatchAction {
     }
 
     /**
-     * Gets the average mark for lesson and writes the result in the response
+     * Gets the median mark for lesson and writes the result in the response
      *
      * @param mapping
      * @param form
@@ -501,7 +501,7 @@ public class GradebookAction extends LamsDispatchAction {
      * @return
      * @throws Exception
      */
-    public ActionForward getLessonMarkAverage(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+    public ActionForward getMedianMarkForLesson(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) throws Exception {
 	Long lessonID = WebUtil.readLongParam(request, AttributeNames.PARAM_LESSON_ID);
 	if (!getSecurityService().isLessonMonitor(lessonID, getUser().getUserID(), "get lesson mark average", false)) {
@@ -509,12 +509,11 @@ public class GradebookAction extends LamsDispatchAction {
 	    return null;
 	}
 
-	Lesson lesson = getLessonService().getLesson(lessonID);
-	Double averageMark = getGradebookService().getAverageMarkForLesson(lessonID);
+	Double medianMark = getGradebookService().getMedianMarkForLesson(lessonID);
 
-	if (averageMark != null) {
+	if (medianMark != null) {
 	    writeResponse(response, LamsDispatchAction.CONTENT_TYPE_TEXT_PLAIN, LamsDispatchAction.ENCODING_UTF8,
-		    GradebookUtil.niceFormatting(averageMark));
+		    GradebookUtil.niceFormatting(medianMark));
 	} else {
 	    writeResponse(response, LamsDispatchAction.CONTENT_TYPE_TEXT_PLAIN, LamsDispatchAction.ENCODING_UTF8,
 		    GradebookConstants.CELL_EMPTY);

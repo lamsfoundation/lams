@@ -111,7 +111,7 @@
 					     	// update the lesson average mark
 					     	if (cellname == "mark") {
 					     		// Update the average activity mark
-						     	$.get("<lams:LAMSURL/>/gradebook/gradebook.do", {dispatch:"getLessonMarkAverage", lessonID:lessonID}, function(xml) {
+						     	$.get("<lams:LAMSURL/>/gradebook/gradebook.do", {dispatch:"getMedianMarkForLesson", lessonID:lessonID}, function(xml) {
 							    	if (xml!=null) {
 							    		jQuery("#organisationGrid").setCell(row_id, "avgMark", xml, "", "");
 							    	} 

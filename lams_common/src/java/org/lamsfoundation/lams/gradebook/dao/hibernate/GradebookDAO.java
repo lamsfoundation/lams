@@ -52,9 +52,6 @@ public class GradebookDAO extends BaseDAO implements IGradebookDAO {
     private static final String GET_GRADEBOOK_USER_ACTIVITIES_FOR_ACTIVITY = "FROM GradebookUserActivity gact where "
 	    + "gact.activity.activityId=:activityID";
 
-    private static final String GET_AVERAGE_MARK_FOR_LESSON = "SELECT AVG(gles.mark) FROM GradebookUserLesson gles WHERE "
-	    + "gles.lesson.lessonId=:lessonID";
-
     private static final String GET_AVERAGE_COMPLETION_TIME = "select prog.finishDate, prog.startDate FROM LearnerProgress prog where "
 	    + "prog.lesson.lessonId=:lessonID";
 
@@ -149,8 +146,27 @@ public class GradebookDAO extends BaseDAO implements IGradebookDAO {
 
     @Override
     @SuppressWarnings("unchecked")
-    public Double getAverageMarkForLesson(Long lessonID) {
-	List result = getSession().createQuery(GET_AVERAGE_MARK_FOR_LESSON).setLong("lessonID", lessonID.longValue())
+    public Double getMedianMarkForLesson(Long lessonID) {
+	
+	// Hacking SQL and using /*'*/:=/*'*/ instead of := which brakes HQL (https://hibernate.onjira.com/browse/HHH-2697)
+	// After moving to Hibernate higher than 4.1.3, it can be replaced by \\:=
+	final String GET_MEDIAN_MARK_FOR_LESSON = "SELECT avg(t1.mark) as medianVal FROM ("
+		+ " SELECT @rownum/*'*/:=/*'*/@rownum+1 as `rowNumber`, gles.mark"
+		+ "  FROM lams_gradebook_user_lesson gles,  (SELECT @rownum/*'*/:=/*'*/0) r"
+		+ "  WHERE 1"
+		+ "  AND gles.lesson_id=:lessonID"
+		+ "  ORDER BY gles.mark"
+		+ " ) as t1, "
+		+ " ("
+		+ "  SELECT count(*) as totalRows"
+		+ "  FROM lams_gradebook_user_lesson gles"
+		+ "  WHERE 1"
+		+ "  AND gles.lesson_id=:lessonID"
+		+ " ) as t2"
+		+ " WHERE 1"
+		+ " AND t1.rowNumber in ( floor((totalRows+1)/2), floor((totalRows+2)/2) )";
+	
+	List result = getSession().createSQLQuery(GET_MEDIAN_MARK_FOR_LESSON).setLong("lessonID", lessonID.longValue())
 		.list();
 
 	if (result != null) {
