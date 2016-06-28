@@ -35,8 +35,8 @@ public class GBAverageMarkComparator implements Comparator {
 
 	if (gradebookGridRow instanceof GradebookGridRowDTO && anotherGradebookGridRow instanceof GradebookGridRowDTO) {
 
-	    Double mark1 = ((GradebookGridRowDTO) gradebookGridRow).getAverageMark();
-	    Double mark2 = ((GradebookGridRowDTO) anotherGradebookGridRow).getAverageMark();
+	    Double mark1 = ((GradebookGridRowDTO) gradebookGridRow).getMedianMark();
+	    Double mark2 = ((GradebookGridRowDTO) anotherGradebookGridRow).getMedianMark();
 
 	    mark1 = (mark1 == null) ? 0.0 : mark1;
 	    mark2 = (mark2 == null) ? 0.0 : mark2;

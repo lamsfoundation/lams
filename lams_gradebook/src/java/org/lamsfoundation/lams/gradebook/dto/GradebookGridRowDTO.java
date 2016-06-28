@@ -56,7 +56,7 @@ public abstract class GradebookGridRowDTO {
     protected Double mark;
 
     // Average mark for the corresponding task
-    protected Double averageMark;
+    protected Double medianMark;
 
     // Number of marks available where applicable
     protected Long marksAvailable;
@@ -138,8 +138,8 @@ public abstract class GradebookGridRowDTO {
     }
 
     protected String averageMarkToString() {
-	if (averageMark != null) {
-	    String avgStr = new DecimalFormat("##0.00").format(averageMark);
+	if (medianMark != null) {
+	    String avgStr = new DecimalFormat("##0.00").format(medianMark);
 	    if (marksAvailable != null) {
 		return avgStr + "/" + marksAvailable.toString();
 	    } else {
@@ -210,12 +210,12 @@ public abstract class GradebookGridRowDTO {
 	this.averageTimeTaken = averageTimeTaken;
     }
 
-    public Double getAverageMark() {
-	return averageMark;
+    public Double getMedianMark() {
+	return medianMark;
     }
 
-    public void setAverageMark(Double averageMark) {
-	this.averageMark = averageMark;
+    public void setMedianMark(Double medianMark) {
+	this.medianMark = medianMark;
     }
 
     public Long getMarksAvailable() {
