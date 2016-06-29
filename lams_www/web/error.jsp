@@ -2,11 +2,17 @@
 <%@ taglib uri="tags-lams" prefix="lams"%>
 <%@ taglib uri="tags-core" prefix="c"%>
 <%@ taglib uri="tags-fmt" prefix="fmt"%>
+
+<!DOCTYPE html>
+<lams:html>
+
 <c:set var="lams">
 	<lams:LAMSURL />
 </c:set>
 
 <%-- Catch JSP Servlet Exception --%>
+<%-- The javascript method checkForErrorScreen in error.js is coded to match this page exactly.
+---- If you change this page, please change the javascript. --%>
 <%
 if (exception != null) {
 %>
@@ -48,6 +54,7 @@ if (exception != null) {
 <%
 }
 %>
+<body>
 <form action="${lams}errorpages/error.jsp" method="post" id="errorForm">
 	<input type="hidden" name="errorName" value="<c:out value='${errorName}' />"/>
 	<input type="hidden" name="errorMessage" value="<c:out value='${errorMessage}' />"/>
@@ -61,3 +68,5 @@ if(window.top != null)
 document.getElementById("errorForm").submit();
 
 </script>
+</body>
+</lams:html>

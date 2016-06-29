@@ -52,6 +52,40 @@
 		<location>/404.jsp</location>
 	</error-page>
 
+	<jsp-config>
+		<!-- ======================================================== -->
+		<!-- JSTL 1.2 Tag Library -->
+		<!-- ======================================================== -->
+		<taglib>
+			<taglib-uri>tags-fmt</taglib-uri>
+			<taglib-location>/WEB-INF/tlds/jstl/fmt.tld</taglib-location>
+		</taglib>
+		<taglib>
+			<taglib-uri>tags-core</taglib-uri>
+			<taglib-location>/WEB-INF/tlds/jstl/c.tld</taglib-location>
+		</taglib>
+		<taglib>
+			<taglib-uri>tags-function</taglib-uri>
+			<taglib-location>/WEB-INF/tlds/jstl/fn.tld</taglib-location>
+		</taglib>
+		<taglib>
+			<taglib-uri>tags-xml</taglib-uri>
+			<taglib-location>/WEB-INF/tlds/jstl/x.tld</taglib-location>
+		</taglib>
+		<!-- ======================================================== -->
+		<!-- Customized Tag Library -->
+		<!-- ======================================================== -->
+		<taglib>
+			<taglib-uri>tags-lams</taglib-uri>
+			<taglib-location>/WEB-INF/tlds/lams/lams.tld</taglib-location>
+		</taglib>
+
+	</jsp-config>
+
+		<!-- ======================================================== -->
+		<!-- Struts Tag Library Descriptors -->
+		<!-- ======================================================== -->
+
 	<!-- Security Constraint -->
 	<security-constraint>
 		<web-resource-collection>
