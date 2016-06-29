@@ -21,12 +21,14 @@
  * ****************************************************************
  */
 
-
 package org.lamsfoundation.lams.monitoring.web;
 
 import java.io.IOException;
+import java.util.Comparator;
 import java.util.Iterator;
 import java.util.Set;
+import java.util.SortedSet;
+import java.util.TreeSet;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -38,14 +40,17 @@ import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.apache.tomcat.util.json.JSONException;
 import org.apache.tomcat.util.json.JSONObject;
+import org.lamsfoundation.lams.learning.web.action.GroupingAction;
 import org.lamsfoundation.lams.learningdesign.Activity;
 import org.lamsfoundation.lams.learningdesign.Group;
+import org.lamsfoundation.lams.learningdesign.GroupComparator;
 import org.lamsfoundation.lams.learningdesign.Grouping;
 import org.lamsfoundation.lams.learningdesign.GroupingActivity;
 import org.lamsfoundation.lams.lesson.service.LessonServiceException;
 import org.lamsfoundation.lams.monitoring.service.IMonitoringService;
 import org.lamsfoundation.lams.monitoring.service.MonitoringServiceProxy;
 import org.lamsfoundation.lams.usermanagement.User;
+import org.lamsfoundation.lams.usermanagement.util.FirstNameAlphabeticComparator;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.action.LamsDispatchAction;
 import org.lamsfoundation.lams.web.util.AttributeNames;
@@ -58,19 +63,13 @@ import org.lamsfoundation.lams.web.util.AttributeNames;
  * </UL>
  *
  * @author Fiona Malikoff
- *
- *
- *
- *
- *
- *
- *
  */
 public class GroupingAJAXAction extends LamsDispatchAction {
 
     // ---------------------------------------------------------------------
 
     private static final String CHOSEN_GROUPING_SCREEN = "chosenGrouping";
+    private static final String VIEW_GROUPS_SCREEN = "viewGroups";
     private static final String PARAM_ACTIVITY_TITLE = "title";
     private static final String PARAM_ACTIVITY_DESCRIPTION = "description";
     public static final String PARAM_MAX_NUM_GROUPS = "maxNumberOfGroups";
@@ -130,9 +129,22 @@ public class GroupingAJAXAction extends LamsDispatchAction {
 	    request.setAttribute(GroupingAJAXAction.PARAM_VIEW_MODE, Boolean.FALSE);
 
 	    return mapping.findForward(GroupingAJAXAction.CHOSEN_GROUPING_SCREEN);
-
 	}
-	return null;
+
+	SortedSet<Group> groups = new TreeSet<Group>(new GroupComparator());
+	groups.addAll(grouping.getGroups());
+
+	// sort users with first, then last name, then login
+	Comparator<User> userComparator = new FirstNameAlphabeticComparator();
+	for (Group group : groups) {
+	    Set<User> sortedUsers = new TreeSet<User>(userComparator);
+	    sortedUsers.addAll(group.getUsers());
+	    group.setUsers(sortedUsers);
+	}
+
+	request.setAttribute(GroupingAction.GROUPS, groups);
+	// go to a view only screen for random grouping
+	return mapping.findForward(GroupingAJAXAction.VIEW_GROUPS_SCREEN);
     }
 
     /**
