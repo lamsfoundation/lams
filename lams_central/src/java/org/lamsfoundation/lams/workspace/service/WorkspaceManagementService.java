@@ -425,9 +425,8 @@ public class WorkspaceManagementService implements IWorkspaceManagementService {
 		// designType=someting: get only "something" templateLDs
 		if (designType == null
 			? folderContent.getDesignType().equals(WorkspaceManagementService.DEFAULT_DESIGN_TYPE)
-			: (designType.equals(WorkspaceManagementService.ALL_DESIGN_TYPES) && !folderContent
-				.getDesignType().equals(WorkspaceManagementService.DEFAULT_DESIGN_TYPE))
-				|| designType.equals(folderContent.getDesignType())) {
+			: (designType.equals(WorkspaceManagementService.ALL_DESIGN_TYPES)
+				|| designType.equals(folderContent.getDesignType()))) {
 		    JSONObject learningDesignJSON = new JSONObject();
 		    learningDesignJSON.put("name", folderContent.getName());
 		    learningDesignJSON.put("learningDesignId", folderContent.getResourceID());
@@ -702,11 +701,11 @@ public class WorkspaceManagementService implements IWorkspaceManagementService {
 		baseDAO.insert(workspaceFolder);
 		return workspaceFolder;
 	    }
-		throw new UserException(messageService.getMessage("no.such.user", new Object[] { userID }));
-	    }
-	    throw new WorkspaceFolderException(
-		    messageService.getMessage("no.such.workspace", new Object[] { parentFolderID }));
+	    throw new UserException(messageService.getMessage("no.such.user", new Object[] { userID }));
 	}
+	throw new WorkspaceFolderException(
+		messageService.getMessage("no.such.workspace", new Object[] { parentFolderID }));
+    }
 
     private boolean ifNameExists(WorkspaceFolder targetFolder, String folderName) {
 	List folders = baseDAO.findByProperty(WorkspaceFolder.class, "parentWorkspaceFolder.workspaceFolderId",
@@ -838,20 +837,20 @@ public class WorkspaceManagementService implements IWorkspaceManagementService {
 			    // Only courses have folders - classes don't!
 			    WorkspaceFolder orgFolder = org.getNormalFolder();
 
-				if (orgFolder != null) {
-				    // Check if the user has write access, which is available
-				    // only if the user has an AUTHOR, TEACHER or STAFF role. If
-				    // user has access add that folder to the list.
-				    Set roles = member.getUserOrganisationRoles();
-				    if (hasWriteAccess(roles)) {
-					Integer permission = getPermissions(orgFolder, user);
-					if (!permission.equals(WorkspaceFolder.NO_ACCESS)) {
-					    folders.add(new FolderContentDTO(orgFolder, permission, user));
-					}
+			    if (orgFolder != null) {
+				// Check if the user has write access, which is available
+				// only if the user has an AUTHOR, TEACHER or STAFF role. If
+				// user has access add that folder to the list.
+				Set roles = member.getUserOrganisationRoles();
+				if (hasWriteAccess(roles)) {
+				    Integer permission = getPermissions(orgFolder, user);
+				    if (!permission.equals(WorkspaceFolder.NO_ACCESS)) {
+					folders.add(new FolderContentDTO(orgFolder, permission, user));
 				    }
 				}
 			    }
 			}
+		    }
 
 		}
 	    } else {
@@ -884,9 +883,9 @@ public class WorkspaceManagementService implements IWorkspaceManagementService {
 	    if (workspaceFolder != null) {
 		Integer permissions = getPermissions(workspaceFolder, user);
 		return new FolderContentDTO(workspaceFolder, permissions, user);
-		}
+	    }
 	    log.warn("getUserWorkspaceFolder: User " + userID + " does not have a root folder. Returning no folders.");
-	    } else {
+	} else {
 	    log.warn("getUserWorkspaceFolder: User " + userID + " does not exist. Returning no folders.");
 	}
 
