@@ -28,14 +28,14 @@ import java.util.Comparator;
 import org.lamsfoundation.lams.gradebook.dto.GradebookGridRowDTO;
 
 @SuppressWarnings("unchecked")
-public class GBAverageTimeTakenComparator implements Comparator {
+public class GBMedianTimeTakenComparator implements Comparator {
     @Override
     public int compare(Object gradebookGridRow, Object anotherGradebookGridRow) {
 
 	if (gradebookGridRow instanceof GradebookGridRowDTO && anotherGradebookGridRow instanceof GradebookGridRowDTO) {
 
-	    Long timeTaken1 = ((GradebookGridRowDTO) gradebookGridRow).getAverageTimeTaken();
-	    Long timeTaken2 = ((GradebookGridRowDTO) anotherGradebookGridRow).getAverageTimeTaken();
+	    Long timeTaken1 = ((GradebookGridRowDTO) gradebookGridRow).getMedianTimeTaken();
+	    Long timeTaken2 = ((GradebookGridRowDTO) anotherGradebookGridRow).getMedianTimeTaken();
 
 	    timeTaken1 = (timeTaken1 == null) ? 0 : timeTaken1;
 	    timeTaken2 = (timeTaken2 == null) ? 0 : timeTaken2;

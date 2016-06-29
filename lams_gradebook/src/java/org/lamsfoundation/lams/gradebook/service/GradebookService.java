@@ -156,7 +156,7 @@ public class GradebookService implements IGradebookService {
 
 	    // Setting averages
 	    activityDTO.setAverageMark(gradebookDAO.getAverageMarkForActivity(activity.getActivityId()));
-	    activityDTO.setAverageTimeTaken(gradebookDAO.getAverageDurationForActivity(activity.getActivityId()));
+	    activityDTO.setMedianTimeTaken(gradebookDAO.getMedianTimeTakenForActivity(activity.getActivityId()));
 
 	    // Get the tool outputs for this user if there are any
 	    ToolSession toolSession = toolService.getToolSessionByLearner(learner, activity);
@@ -670,7 +670,7 @@ public class GradebookService implements IGradebookService {
 		    } else if (view == GBGridView.MON_COURSE) {
 
 			// Setting the averages for monitor view
-			lessonRow.setAverageTimeTaken(gradebookDAO.getAverageDurationLesson(lesson.getLessonId()));
+			lessonRow.setMedianTimeTaken(gradebookDAO.getMedianTimeTakenLesson(lesson.getLessonId()));
 			lessonRow.setAverageMark(gradebookDAO.getAverageMarkForLesson(lesson.getLessonId()));
 
 			// Set the gradebook monitor url
@@ -682,7 +682,7 @@ public class GradebookService implements IGradebookService {
 			GradebookUserLesson gbLesson = gradebookDAO.getGradebookUserDataForLesson(lesson.getLessonId(),
 				userId);
 
-			lessonRow.setAverageTimeTaken(gradebookDAO.getAverageDurationLesson(lesson.getLessonId()));
+			lessonRow.setMedianTimeTaken(gradebookDAO.getMedianTimeTakenLesson(lesson.getLessonId()));
 			lessonRow.setAverageMark(gradebookDAO.getAverageMarkForLesson(lesson.getLessonId()));
 
 			if (gbLesson != null) {
@@ -779,11 +779,10 @@ public class GradebookService implements IGradebookService {
 	lessonAverageMark[1] = new ExcelCell(getAverageMarkForLesson(lesson.getLessonId()), false);
 	rowList.add(lessonAverageMark);
 
-	ExcelCell[] lessonAverageTimeTaken = new ExcelCell[2];
-	lessonAverageTimeTaken[0] = new ExcelCell(getMessage("gradebook.export.average.lesson.time.taken"), true);
-	lessonAverageTimeTaken[1] = new ExcelCell(gradebookDAO.getAverageDurationLesson(lesson.getLessonId()) / 1000,
-		false);
-	rowList.add(lessonAverageTimeTaken);
+	ExcelCell[] lessonMedianTimeTaken = new ExcelCell[2];
+	lessonMedianTimeTaken[0] = new ExcelCell(getMessage("gradebook.export.average.lesson.time.taken"), true);
+	lessonMedianTimeTaken[1] = new ExcelCell(gradebookDAO.getMedianTimeTakenLesson(lesson.getLessonId()) / 1000, false);
+	rowList.add(lessonMedianTimeTaken);
 	rowList.add(GradebookService.EMPTY_ROW);
 
 	// Adding the activity average data to the summary
@@ -807,7 +806,7 @@ public class GradebookService implements IGradebookService {
 	    ExcelCell[] activityDataRow = new ExcelCell[4];
 	    activityDataRow[0] = new ExcelCell(activityRow.getRowName(), false);
 	    activityDataRow[1] = new ExcelCell(activityRow.getCompetences(), false);
-	    activityDataRow[2] = new ExcelCell(activityRow.getAverageTimeTakenSeconds(), false);
+	    activityDataRow[2] = new ExcelCell(activityRow.getMedianTimeTakenSeconds(), false);
 	    activityDataRow[3] = new ExcelCell(activityRow.getAverageMark(), false);
 	    rowList.add(activityDataRow);
 	}
@@ -1449,13 +1448,13 @@ public class GradebookService implements IGradebookService {
 	    // Setting averages for group
 	    activityDTO
 		    .setAverageMark(gradebookDAO.getAverageMarkForGroupedActivity(activity.getActivityId(), groupId));
-	    activityDTO.setAverageTimeTaken(
-		    gradebookDAO.getAverageDurationForGroupedActivity(activity.getActivityId(), groupId));
+	    activityDTO.setMedianTimeTaken(
+		    gradebookDAO.getMedianTimeTakenForGroupedActivity(activity.getActivityId(), groupId));
 
 	} else {
 	    // Setting averages for lesson
 	    activityDTO.setAverageMark(gradebookDAO.getAverageMarkForActivity(activity.getActivityId()));
-	    activityDTO.setAverageTimeTaken(gradebookDAO.getAverageDurationForActivity(activity.getActivityId()));
+	    activityDTO.setMedianTimeTaken(gradebookDAO.getMedianTimeTakenForActivity(activity.getActivityId()));
 	}
 
 	// Set the possible marks if applicable

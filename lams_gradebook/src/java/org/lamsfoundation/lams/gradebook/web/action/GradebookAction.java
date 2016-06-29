@@ -64,13 +64,7 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
 /**
  * @author lfoxton
  *
- *         Handles the general requests for content in gradebook
- *
- *
- *
- *
- *
- *
+ * Handles the general requests for content in gradebook
  */
 public class GradebookAction extends LamsDispatchAction {
 
@@ -501,7 +495,7 @@ public class GradebookAction extends LamsDispatchAction {
      * @return
      * @throws Exception
      */
-    public ActionForward getLessonMarkAverage(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+    public ActionForward getAverageMarkForLesson(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) throws Exception {
 	Long lessonID = WebUtil.readLongParam(request, AttributeNames.PARAM_LESSON_ID);
 	if (!getSecurityService().isLessonMonitor(lessonID, getUser().getUserID(), "get lesson mark average", false)) {

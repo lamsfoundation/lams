@@ -49,13 +49,6 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
  *         Handles the learner interfaces for gradebook
  *
  *         This is where marking for an activity/lesson takes place
- *
- *
- *
- *
- *
- *
- *
  */
 public class GradebookLearningAction extends LamsDispatchAction {
 
