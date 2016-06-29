@@ -122,7 +122,7 @@
     	window.close();
     }  				
 </script>	
-<div id="saveCancelButtons voffset5" >
+<div id="saveCancelButtons" >
 		<html:link href="javascript:doSubmit_Form_Only();" property="submit" styleClass="btn btn-primary pull-right">
 			<span class="okIcon"><fmt:message key="${saveButtonLabelKey}" /></span>
 		</html:link>
