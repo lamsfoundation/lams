@@ -32,9 +32,7 @@
 <html:text property="forum.maxCharacters" styleId="max-characters"  styleClass="form-control form-control-inline input-sm"/>
 </div>
 
-<div class="panel panel-default">
-<div class="panel-body panel-body-sm">
-
+<lams:SimplePanel panelBodyClass="panel-body-sm">
 <div class="checkbox">
 <label for="allowRateMessages"><html:checkbox property="forum.allowRateMessages" styleId="allowRateMessages"  onclick="checkRating()"/>
 <fmt:message key="label.authoring.advance.allow.rate.postings" /></label>
@@ -78,11 +76,9 @@
 		</html:select>
 		</div>
 	</div>
-</div>
-</div>
+</lams:SimplePanel>
 
-<div class="panel panel-default">
-<div class="panel-body panel-body-sm">
+<lams:SimplePanel panelBodyClass="panel-body-sm">
 	<fmt:message key="message.posting.limiting" />
 	<div class="radio">
 	<label for="allowNewTopic1">
@@ -136,8 +132,7 @@
 		</html:select>
 		</div>
 	</div>
-</div>
-</div>
+</lams:SimplePanel>
 </lams:SimplePanel>
 
 <lams:SimplePanel titleKey="label.notifications">
