@@ -3,12 +3,7 @@
 
 <!-- Advance Tab Content -->
 
-<div class="checkbox">
-	<label for="lock-when-finished">
-		<html:checkbox property="commonCartridge.lockWhenFinished" styleId="lock-when-finished"/>
-		<fmt:message key="label.authoring.advance.lock.on.finished" />
-	</label>
-</div>
+<lams:SimplePanel titleKey="label.resource.options">
 
 <div class="checkbox">
 	<label for="run-auto">
@@ -41,6 +36,17 @@
 	</label>
 </div>
 
+</lams:SimplePanel>
+
+<lams:SimplePanel titleKey="label.activity.completion">
+
+<div class="checkbox">
+	<label for="lock-when-finished">
+		<html:checkbox property="commonCartridge.lockWhenFinished" styleId="lock-when-finished"/>
+		<fmt:message key="label.authoring.advance.lock.on.finished" />
+	</label>
+</div>
+
 <div class="checkbox">
 	<label for="reflect-on-activity">
 		<html:checkbox property="commonCartridge.reflectOnActivity" styleId="reflect-on-activity"/>
@@ -51,6 +57,8 @@
 <div class="form-group">
 	<html:textarea property="commonCartridge.reflectInstructions" rows="3" styleId="reflect-instructions" styleClass="form-control"/>
 </div>
+
+</lams:SimplePanel>
 
 <script type="text/javascript">
 	//automatically turn on refect option if there are text input in refect instruction area
