@@ -3,14 +3,8 @@
 <!-- ========== Advanced Tab ========== -->
 
 
-<h4><fmt:message key="advanced.editingOptions" /></h4>
+<lams:SimplePanel titleKey="advanced.editingOptions">
 
-	<div class="checkbox">
-		<label for="lockOnFinished">
-		<html:checkbox property="lockOnFinished" value="1" styleId="lockOnFinished"></html:checkbox>
-		<fmt:message key="advanced.lockOnFinished" /></label>
-	</div>
-	
 	<div class="checkbox">
 		<label for="allowEditMarkers">
 		<html:checkbox property="allowEditMarkers" value="1" styleId="allowEditMarkers"></html:checkbox>
@@ -22,9 +16,9 @@
 		<html:checkbox property="allowShowAllMarkers" value="1" styleId="allowShowAllMarkers"></html:checkbox>
 		<fmt:message key="advanced.allowShowAllMarkers" /></label>
 	</div>
+</lams:SimplePanel>
 
-<h4><fmt:message key="advanced.limitMarkers" /></h4>
-
+<lams:SimplePanel titleKey="advanced.limitMarkers">
 	<div class="checkbox">
 		<label for="limitMarkers">
 		<html:checkbox property="limitMarkers" value="1" onclick="javascript:toggleMaxMarkerMenu()" styleId="limitMarkers"></html:checkbox>
@@ -66,7 +60,9 @@
 	//-->
 	</script>
 
-<h4><fmt:message key="advanced.mapOptions" /></h4>
+</lams:SimplePanel>
+
+<lams:SimplePanel titleKey="advanced.mapOptions">
 
 	<div class="checkbox">
 		<label for="allowZoom">
@@ -91,6 +87,14 @@
 		<html:checkbox property="allowTerrain" value="1" styleId="allowTerrain"></html:checkbox>
 		<fmt:message key="advanced.allowTerrain" /></label>
 	</div>
+</lams:SimplePanel>
+
+<lams:SimplePanel titleKey="label.activity.completion">	
+	<div class="checkbox">
+		<label for="lockOnFinished">
+		<html:checkbox property="lockOnFinished" value="1" styleId="lockOnFinished"></html:checkbox>
+		<fmt:message key="advanced.lockOnFinished" /></label>
+	</div>
 	
 	<div class="checkbox">
 		<label for="reflectOnActivity">
@@ -100,7 +104,8 @@
 	<div class="form-group">
 	<html:textarea property="reflectInstructions" rows="3" styleId="reflectInstructions"  styleClass="form-control"/>
 	</div>
-	
+</lams:SimplePanel>
+
 	<script type="text/javascript">
 	<!--
 	//automatically turn on refect option if there are text input in refect instruction area
