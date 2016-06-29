@@ -36,12 +36,7 @@
 
 <!-- Advance Tab Content -->
 
-<div class="checkbox">
-	<label for="lock-when-finished">
-		<html:checkbox property="imageGallery.lockWhenFinished" styleId="lock-when-finished"/>
-		<fmt:message key="label.authoring.advance.lock.on.finished" />
-	</label>
-</div>
+<lams:SimplePanel titleKey="label.image.options">
 
 <div class="checkbox">
 	<label for="allowShareImages">
@@ -98,6 +93,17 @@
 	
 </div>
 
+</lams:SimplePanel>
+
+<lams:SimplePanel titleKey="label.activity.completion">
+
+<div class="checkbox">
+	<label for="lock-when-finished">
+		<html:checkbox property="imageGallery.lockWhenFinished" styleId="lock-when-finished"/>
+		<fmt:message key="label.authoring.advance.lock.on.finished" />
+	</label>
+</div>
+
 <div class="checkbox">
 	<label for="reflect-on">
 		<html:checkbox property="imageGallery.reflectOnActivity" styleId="reflect-on"/>
@@ -108,6 +114,8 @@
 <div class="form-group">
 	<html:textarea property="imageGallery.reflectInstructions" cols="60" rows="3" styleId="reflect-instructions" styleClass="form-control"/>
 </div>
+
+</lams:SimplePanel>
 
 <script type="text/javascript">
 	//automatically turn on refect option if there are text input in refect instruction area
