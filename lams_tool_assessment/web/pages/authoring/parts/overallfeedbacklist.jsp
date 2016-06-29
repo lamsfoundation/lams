@@ -21,12 +21,8 @@
 <div id="overallFeedbackArea">
 	<form id="overallFeedbackForm">
 		<input type="hidden" name="overallFeedbackCount" id="overallFeedbackCount" value="${overallFeedbackListSize}">
-
-		<h5>
-			<fmt:message key="label.authoring.advance.overall.feedback" />
-			<img src="${ctxPath}/includes/images/indicator.gif"	style="display:none;" id="overallFeedbackArea_Busy" />			
-		</h5>
-
+		<img src="${ctxPath}/includes/images/indicator.gif"	style="display:none;" id="overallFeedbackArea_Busy" />			
+		
 		<table class="table table-condensed">
 			<tr>
 				<td style="text-align:right;">
@@ -90,7 +86,7 @@
 	if (!obj) {
 		obj = window.top.document.getElementById('advancedInputArea');
 	}
-	obj.style.height = eval(125 + ${overallFeedbackListSize}*90) + 'px';
+	obj.style.height = eval(75 + ${overallFeedbackListSize}*90) + 'px';
 </script>	
 	
 </body>
