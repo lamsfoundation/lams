@@ -52,23 +52,11 @@ public class GradebookDAO extends BaseDAO implements IGradebookDAO {
     private static final String GET_GRADEBOOK_USER_ACTIVITIES_FOR_ACTIVITY = "FROM GradebookUserActivity gact where "
 	    + "gact.activity.activityId=:activityID";
 
-    private static final String GET_AVERAGE_COMPLETION_TIME = "select prog.finishDate, prog.startDate FROM LearnerProgress prog where "
-	    + "prog.lesson.lessonId=:lessonID";
-
-    final String GET_AVERAGE_COMPLETION_TIME2 = "SELECT AVG(TIMEDIFF(progress.finishDate,progress.startDate)) "
-	    + "FROM LearnerProgress progress " + "WHERE progress.lesson.lessonId = :lessonId ";
-
-    private static final String GET_AVERAGE_COMPLETION_TIME_ACTIVITY = "select compProg.finishDate, compProg.startDate from CompletedActivityProgress compProg where "
-	    + "compProg.activity.activityId=:activityID";
-
     private static final String GET_AVERAGE_MARK_FOR_ACTIVTY = "select avg(gact.mark) from GradebookUserActivity gact where "
 	    + "gact.activity.activityId=:activityID";
 
     private static final String GET_AVERAGE_MARK_FOR_GROUPED_ACTIVTY = "select avg(gact.mark) from GradebookUserActivity gact, GroupUser gu, Group grp where "
 	    + "gact.activity.activityId=:activityID and grp.groupId=:groupID and gu.user=gact.learner and gu.group=grp";
-
-    private static final String GET_AVERAGE_COMPLETION_TIME_GROUPED_ACTIVITY = "select compProg.finishDate, compProg.startDate from CompletedActivityProgress compProg, Group grp, GroupUser gu where "
-	    + "compProg.activity.activityId=:activityID and grp.groupId=:groupID and gu.user=compProg.learnerProgress.user and gu.group=grp";
 
     @Override
     @SuppressWarnings("unchecked")
@@ -146,28 +134,12 @@ public class GradebookDAO extends BaseDAO implements IGradebookDAO {
 
     @Override
     @SuppressWarnings("unchecked")
-    public Double getMedianMarkForLesson(Long lessonID) {
+    public Double getAverageMarkForLesson(Long lessonID) {
 	
-	// Hacking SQL and using /*'*/:=/*'*/ instead of := which brakes HQL (https://hibernate.onjira.com/browse/HHH-2697)
-	// After moving to Hibernate higher than 4.1.3, it can be replaced by \\:=
-	final String GET_MEDIAN_MARK_FOR_LESSON = "SELECT avg(t1.mark) as medianVal FROM ("
-		+ " SELECT @rownum/*'*/:=/*'*/@rownum+1 as `rowNumber`, gles.mark"
-		+ "  FROM lams_gradebook_user_lesson gles,  (SELECT @rownum/*'*/:=/*'*/0) r"
-		+ "  WHERE 1"
-		+ "  AND gles.lesson_id=:lessonID"
-		+ "  ORDER BY gles.mark"
-		+ " ) as t1, "
-		+ " ("
-		+ "  SELECT count(*) as totalRows"
-		+ "  FROM lams_gradebook_user_lesson gles"
-		+ "  WHERE 1"
-		+ "  AND gles.lesson_id=:lessonID"
-		+ " ) as t2"
-		+ " WHERE 1"
-		+ " AND t1.rowNumber in ( floor((totalRows+1)/2), floor((totalRows+2)/2) )";
+	final String GET_AVERAGE_MARK_FOR_LESSON = "SELECT AVG(gles.mark) FROM GradebookUserLesson gles WHERE "
+		+ "gles.lesson.lessonId=:lessonID";
 	
-	List result = getSession().createSQLQuery(GET_MEDIAN_MARK_FOR_LESSON).setLong("lessonID", lessonID.longValue())
-		.list();
+	List result = getSession().createQuery(GET_AVERAGE_MARK_FOR_LESSON).setLong("lessonID", lessonID.longValue()).list();
 
 	if (result != null) {
 	    if (result.size() > 0) {
@@ -180,51 +152,61 @@ public class GradebookDAO extends BaseDAO implements IGradebookDAO {
 
     @Override
     @SuppressWarnings("unchecked")
-    public long getAverageDurationLesson(Long lessonID) {
+    public long getMedianTimeTakenLesson(Long lessonID) {
+	
+	// Hacking SQL and using /*'*/:=/*'*/ instead of := which brakes HQL (https://hibernate.onjira.com/browse/HHH-2697)
+	// After moving to Hibernate higher than 4.1.3, it can be replaced by \\:=
+	final String GET_MEDIAN_TIME_TAKEN_FOR_LESSON = "SELECT AVG(t1.timeTaken) AS medianVal FROM ("
+		+ " SELECT @rownum/*'*/:=/*'*/@rownum+1 AS `rowNumber`, TIME_TO_SEC(TIMEDIFF(progress.finish_date_time, progress.start_date_time)) AS timeTaken"
+		+ "  FROM lams_learner_progress progress,  (SELECT @rownum/*'*/:=/*'*/0) r"
+		+ "  WHERE progress.lesson_id=:lessonID AND TIMEDIFF(progress.finish_date_time, progress.start_date_time) IS NOT NULL"
+		+ "  ORDER BY TIMEDIFF(progress.finish_date_time, progress.start_date_time)"
+		+ " ) AS t1, "
+		+ " ("
+		+ "  SELECT count(*) AS totalRows"
+		+ "  FROM lams_learner_progress progress"
+		+ "  WHERE progress.lesson_id=:lessonID AND TIMEDIFF(progress.finish_date_time, progress.start_date_time) IS NOT NULL"
+		+ " ) AS t2"
+		+ " WHERE t1.rowNumber in ( floor((totalRows+1)/2), floor((totalRows+2)/2) )";
 
-	final String GET_AVERAGE_COMPLETION_TIME2 = "SELECT AVG(TIMEDIFF(progress.finishDate,progress.startDate)) "
-		+ "FROM LearnerProgress progress " + "WHERE progress.lesson.lessonId = :lessonId ";
-
-	List result = getSession().createQuery(GET_AVERAGE_COMPLETION_TIME2).setLong("lessonId", lessonID).list();
+	List result = getSession().createSQLQuery(GET_MEDIAN_TIME_TAKEN_FOR_LESSON).setLong("lessonID", lessonID).list();
 
 	if (result == null || result.size() == 0 || result.get(0) == null) {
 	    return 0;
 	} else {
-	    return ((Number) result.get(0)).intValue();
+	    //converting into milliseconds
+	    return ((Number) result.get(0)).intValue() * 1000;
 	}
     }
 
     @Override
     @SuppressWarnings("unchecked")
-    public long getAverageDurationForActivity(Long activityID) {
-	List<Object[]> result = getSession().createQuery(GET_AVERAGE_COMPLETION_TIME_ACTIVITY)
+    public long getMedianTimeTakenForActivity(Long activityID) {
+	
+	// Hacking SQL and using /*'*/:=/*'*/ instead of := which brakes HQL (https://hibernate.onjira.com/browse/HHH-2697)
+	// After moving to Hibernate higher than 4.1.3, it can be replaced by \\:=
+	final String GET_MEDIAN_TIME_TAKEN_FOR_ACTIVITY = "SELECT AVG(t1.timeTaken) AS medianVal FROM ("
+		+ " SELECT @rownum/*'*/:=/*'*/@rownum+1 AS `rowNumber`, TIME_TO_SEC(TIMEDIFF(progress.completed_date_time, progress.start_date_time)) AS timeTaken"
+		+ "  FROM lams_progress_completed progress,  (SELECT @rownum/*'*/:=/*'*/0) r"
+		+ "  WHERE progress.activity_id=:activityID AND TIMEDIFF(progress.completed_date_time, progress.start_date_time) IS NOT NULL"
+		+ "  ORDER BY TIMEDIFF(progress.completed_date_time, progress.start_date_time)"
+		+ " ) AS t1, "
+		+ " ("
+		+ "  SELECT count(*) AS totalRows"
+		+ "  FROM lams_progress_completed progress"
+		+ "  WHERE progress.activity_id=:activityID AND TIMEDIFF(progress.completed_date_time, progress.start_date_time) IS NOT NULL"
+		+ " ) AS t2"
+		+ " WHERE t1.rowNumber in ( floor((totalRows+1)/2), floor((totalRows+2)/2) )";
+
+	List result = getSession().createSQLQuery(GET_MEDIAN_TIME_TAKEN_FOR_ACTIVITY)
 		.setLong("activityID", activityID.longValue()).list();
-
-	if (result != null) {
-	    if (result.size() > 0) {
-
-		long sum = 0;
-		long count = 0;
-		for (Object[] dateObjs : result) {
-		    if (dateObjs != null && dateObjs.length == 2) {
-			Date finishDate = (Date) dateObjs[0];
-			Date startDate = (Date) dateObjs[1];
-
-			if (startDate != null && finishDate != null) {
-
-			    sum += finishDate.getTime() - startDate.getTime();
-			    count++;
-			}
-		    }
-		}
-
-		if (count > 0) {
-		    return sum / count;
-		}
-	    }
-
+	
+	if (result == null || result.size() == 0 || result.get(0) == null) {
+	    return 0;
+	} else {
+	    //converting into milliseconds
+	    return ((Number) result.get(0)).intValue() * 1000;
 	}
-	return 0;
     }
 
     @Override
@@ -260,35 +242,34 @@ public class GradebookDAO extends BaseDAO implements IGradebookDAO {
 
     @Override
     @SuppressWarnings("unchecked")
-    public long getAverageDurationForGroupedActivity(Long activityID, Long groupID) {
-	List<Object[]> result = getSession().createQuery(GET_AVERAGE_COMPLETION_TIME_GROUPED_ACTIVITY)
+    public long getMedianTimeTakenForGroupedActivity(Long activityID, Long groupID) {
+	
+	// Hacking SQL and using /*'*/:=/*'*/ instead of := which brakes HQL (https://hibernate.onjira.com/browse/HHH-2697)
+	// After moving to Hibernate higher than 4.1.3, it can be replaced by \\:=
+	final String GET_MEDIAN_TIME_TAKEN_FOR_GROUPED_ACTIVITY = "SELECT AVG(t1.timeTaken) AS medianVal FROM ("
+		+ " SELECT @rownum/*'*/:=/*'*/@rownum+1 AS `rowNumber`, TIME_TO_SEC(TIMEDIFF(compProgress.completed_date_time, compProgress.start_date_time)) AS timeTaken"
+		+ "  FROM lams_progress_completed compProgress,  (SELECT @rownum/*'*/:=/*'*/0) r, lams_learner_progress progr, lams_user_group ug "
+		+ "  WHERE compProgress.activity_id=:activityID AND TIMEDIFF(compProgress.completed_date_time, compProgress.start_date_time) IS NOT NULL"
+		+ "  AND ug.group_id=:groupID AND compProgress.learner_progress_id = progr.learner_progress_id AND progr.user_id=ug.user_id "
+		+ "  ORDER BY TIMEDIFF(compProgress.completed_date_time, compProgress.start_date_time)"
+		+ " ) AS t1, "
+		+ " ("
+		+ "  SELECT count(*) AS totalRows"
+		+ "  FROM lams_progress_completed compProgress, lams_learner_progress progr, lams_user_group ug"
+		+ "  WHERE compProgress.activity_id=:activityID AND TIMEDIFF(compProgress.completed_date_time, compProgress.start_date_time) IS NOT NULL"
+		+ "  AND ug.group_id=:groupID AND compProgress.learner_progress_id = progr.learner_progress_id AND progr.user_id=ug.user_id"
+		+ " ) AS t2"
+		+ " WHERE t1.rowNumber in ( floor((totalRows+1)/2), floor((totalRows+2)/2) )";
+
+	List result = getSession().createSQLQuery(GET_MEDIAN_TIME_TAKEN_FOR_GROUPED_ACTIVITY)
 		.setLong("activityID", activityID.longValue()).setLong("groupID", groupID.longValue()).list();
 
-	if (result != null) {
-	    if (result.size() > 0) {
-
-		long sum = 0;
-		long count = 0;
-		for (Object[] dateObjs : result) {
-		    if (dateObjs != null && dateObjs.length == 2) {
-			Date finishDate = (Date) dateObjs[0];
-			Date startDate = (Date) dateObjs[1];
-
-			if (startDate != null && finishDate != null) {
-
-			    sum += finishDate.getTime() - startDate.getTime();
-			    count++;
-			}
-		    }
-		}
-
-		if (count > 0) {
-		    return sum / count;
-		}
-	    }
-
+	if (result == null || result.size() == 0 || result.get(0) == null) {
+	    return 0;
+	} else {
+	    //converting into milliseconds
+	    return ((Number) result.get(0)).intValue() * 1000;
 	}
-	return 0;
     }
 
     @Override
