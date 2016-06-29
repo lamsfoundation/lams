@@ -17,28 +17,24 @@
 	});
 </script>
 
-<div class="checkbox">
-	<label for="lockOnFinished">
-		<html:checkbox property="lockOnFinished" styleId="lockOnFinished" />
-		<fmt:message key="label.authoring.advance.lock.on.finished" />
-	</label>
-</div>
-
+<lams:SimplePanel titleKey="label.file.options">
 <div class="checkbox">
 	<label for="limitUpload">
 		<html:checkbox property="limitUpload" styleId="limitUpload" />
 		<fmt:message key="label.limit.number.upload" />
 	</label>
+
+	<html:select property="limitUploadNumber" styleId="limitUploadNumber" styleClass="loffset5 form-control form-control-inline">
+		<html:option value="1">1</html:option>
+		<html:option value="2">2</html:option>
+		<html:option value="3">3</html:option>
+		<html:option value="4">4</html:option>
+		<html:option value="5">5</html:option>
+	</html:select>
 </div>
+</lams:SimplePanel>
 
-<html:select property="limitUploadNumber" styleId="limitUploadNumber" styleClass="roffset5 form-control">
-	<html:option value="1">1</html:option>
-	<html:option value="2">2</html:option>
-	<html:option value="3">3</html:option>
-	<html:option value="4">4</html:option>
-	<html:option value="5">5</html:option>
-</html:select>
-
+<lams:SimplePanel titleKey="label.notifications">
 <div class="checkbox">
 	<label for="notifyLearnersOnMarkRelease">
 		<html:checkbox property="notifyLearnersOnMarkRelease" styleId="notifyLearnersOnMarkRelease" />
@@ -60,6 +56,16 @@
 	</label>
 </div>
 
+</lams:SimplePanel>
+
+<lams:SimplePanel titleKey="label.activity.completion">
+<div class="checkbox">
+	<label for="lockOnFinished">
+		<html:checkbox property="lockOnFinished" styleId="lockOnFinished" />
+		<fmt:message key="label.authoring.advance.lock.on.finished" />
+	</label>
+</div>
+
 <div class="checkbox">
 	<label for="reflectOnActivity">
 		<html:checkbox property="reflectOnActivity" styleId="reflectOnActivity" />
@@ -70,3 +76,5 @@
 <div class="form-group">
 	<html:textarea property="reflectInstructions" styleId="reflectInstructions" styleClass="form-control" cols="50" rows="4" />
 </div>
+</lams:SimplePanel>
+
