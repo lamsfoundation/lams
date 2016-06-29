@@ -64,7 +64,7 @@ public class GBLessonGridRowDTO extends GradebookGridRowDTO {
 	    }
 	    ret.add(subGroup);
 	    ret.add(startDate);
-	    ret.add((averageTimeTaken != null && averageTimeTaken != 0) ? convertTimeToString(averageTimeTaken)
+	    ret.add((medianTimeTaken != null && medianTimeTaken != 0) ? convertTimeToString(medianTimeTaken)
 		    : CELL_EMPTY);
 	    ret.add((averageMark != null) ? GradebookUtil.niceFormatting(averageMark) : CELL_EMPTY);
 
@@ -80,8 +80,8 @@ public class GBLessonGridRowDTO extends GradebookGridRowDTO {
 	    ret.add(feedback);
 	    ret.add((startDate != null) ? startDate : CELL_EMPTY);
 	    ret.add((finishDate != null) ? finishDate : CELL_EMPTY);
-	    ret.add((averageTimeTaken != null && averageTimeTaken != 0)
-		    ? toItalic(convertTimeToString(averageTimeTaken)) : CELL_EMPTY);
+	    ret.add((medianTimeTaken != null && medianTimeTaken != 0)
+		    ? toItalic(convertTimeToString(medianTimeTaken)) : CELL_EMPTY);
 	    ret.add((timeTaken != null) ? convertTimeToString(timeTaken) : CELL_EMPTY);
 	    ret.add((averageMark != null) ? toItalic(GradebookUtil.niceFormatting(averageMark)) : CELL_EMPTY);
 	    ret.add((mark != null) ? GradebookUtil.niceFormatting(mark) : CELL_EMPTY);

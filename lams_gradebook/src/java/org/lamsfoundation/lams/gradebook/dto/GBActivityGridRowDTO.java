@@ -118,7 +118,7 @@ public class GBActivityGridRowDTO extends GradebookGridRowDTO {
 		ret.add(rowName);
 	    }
 
-	    ret.add((averageTimeTaken != null) ? convertTimeToString(averageTimeTaken) : CELL_EMPTY);
+	    ret.add((medianTimeTaken != null) ? convertTimeToString(medianTimeTaken) : CELL_EMPTY);
 	    ret.add(competences);
 	    ret.add(averageMark != null ? GradebookUtil.niceFormatting(averageMark) : CELL_EMPTY);
 
@@ -126,7 +126,7 @@ public class GBActivityGridRowDTO extends GradebookGridRowDTO {
 	    ret.add(rowName);
 	    ret.add(status);
 	    ret.add(feedback);
-	    ret.add((averageTimeTaken != null) ? convertTimeToString(averageTimeTaken) : CELL_EMPTY);
+	    ret.add((medianTimeTaken != null) ? convertTimeToString(medianTimeTaken) : CELL_EMPTY);
 	    ret.add((timeTaken != null) ? convertTimeToString(timeTaken) : CELL_EMPTY);
 	    ret.add(averageMark != null ? GradebookUtil.niceFormatting(averageMark) : CELL_EMPTY);
 	    ret.add(mark != null ? GradebookUtil.niceFormatting(mark) : CELL_EMPTY);

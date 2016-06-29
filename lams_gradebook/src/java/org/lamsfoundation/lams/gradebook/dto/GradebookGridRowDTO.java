@@ -50,7 +50,7 @@ public abstract class GradebookGridRowDTO {
     protected Long timeTaken;
 
     // Another unit of time that represents average time taken for a corresponding task
-    protected Long averageTimeTaken;
+    protected Long medianTimeTaken;
 
     // The mark for the corresponding gradebook grid row task
     protected Double mark;
@@ -194,20 +194,20 @@ public abstract class GradebookGridRowDTO {
 	this.rowName = rowName;
     }
 
-    public Long getAverageTimeTaken() {
-	return averageTimeTaken;
+    public Long getMedianTimeTaken() {
+	return medianTimeTaken;
     }
 
-    public Long getAverageTimeTakenSeconds() {
-	if (averageTimeTaken != null) {
-	    return averageTimeTaken / 1000;
+    public Long getMedianTimeTakenSeconds() {
+	if (medianTimeTaken != null) {
+	    return medianTimeTaken / 1000;
 	} else {
 	    return null;
 	}
     }
 
-    public void setAverageTimeTaken(Long averageTimeTaken) {
-	this.averageTimeTaken = averageTimeTaken;
+    public void setMedianTimeTaken(Long medianTimeTaken) {
+	this.medianTimeTaken = medianTimeTaken;
     }
 
     public Double getAverageMark() {
