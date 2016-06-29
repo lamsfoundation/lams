@@ -40,21 +40,23 @@
 </script>
 
 <!-- Advance Tab Content -->
+
+<lams:SimplePanel titleKey="label.select.leader">
 <div class="checkbox">
 	<label for="useSelectLeaderToolOuput">
 		<html:checkbox property="assessment.useSelectLeaderToolOuput" value="1" styleId="useSelectLeaderToolOuput"/>
 		<fmt:message key="label.use.select.leader.tool.output" />
 	</label>
 </div>
+</lams:SimplePanel>
 
-<div class="form-inline form-group">
-	<html:text property="assessment.timeLimit" size="3" styleId="timeLimit" styleClass="form-control input-sm"/>
-	<label for="timeLimit">
-		&nbsp;<fmt:message key="label.authoring.advance.time.limit" />
-	</label>
-</div>
+<lams:SimplePanel titleKey="label.question.options">
 
-<div class="form-inline form-group">
+<lams:SimplePanel panelBodyClass="panel-body-sm">
+
+<div class="form-inline">
+	<label for="assessment.questionsPerPage">
+		<fmt:message key="label.authoring.advance.questions.per.page" />&nbsp;
 	<html:select property="assessment.questionsPerPage" styleClass="form-control input-sm">
 		<html:option value="0"><fmt:message key="label.authoring.advance.all.in.one.page" /></html:option>
 		<html:option value="10">10</html:option>
@@ -68,8 +70,6 @@
 		<html:option value="2">2</html:option>
 		<html:option value="1">1</html:option>
 	</html:select>
-	<label for="assessment.questionsPerPage">
-		&nbsp;<fmt:message key="label.authoring.advance.questions.per.page" />
 	</label>
 </div>
 
@@ -84,6 +84,16 @@
 	<label for="questions-numbering">
 		<html:checkbox property="assessment.numbered" styleId="questions-numbering"/>
 		<fmt:message key="label.authoring.advance.numbered.questions" />
+	</label>
+</div>
+
+</lams:SimplePanel>
+
+<lams:SimplePanel panelBodyClass="panel-body-sm">
+
+<div class="form-inline">
+	<label for="timeLimit"><fmt:message key="label.authoring.advance.time.limit" />&nbsp;
+	<html:text property="assessment.timeLimit" size="3" styleId="timeLimit" styleClass="form-control input-sm"/>
 	</label>
 </div>
 
@@ -121,6 +131,10 @@
 	</div>
 	
 </div>
+
+</lams:SimplePanel>
+
+<lams:SimplePanel panelBodyClass="panel-body-sm">
 
 <div class="checkbox">
 	<label for="display-summary">
@@ -174,13 +188,29 @@
 		<fmt:message key="label.authoring.advance.allow.students.grades" />
 	</label>
 </div>
+</lams:SimplePanel>
 
+</lams:SimplePanel>
+
+<lams:SimplePanel titleKey="label.notifications">
 <div class="checkbox">
 	<label for="notifyTeachersOnAttemptCompletion">
 		<html:checkbox property="assessment.notifyTeachersOnAttemptCompletion" styleId="notifyTeachersOnAttemptCompletion"/>
 		<fmt:message key="label.authoring.advanced.notify.on.attempt.completion" />
 	</label>
 </div>
+</lams:SimplePanel>
+
+<!-- Overall feedback -->
+<lams:SimplePanel titleKey="label.authoring.advance.overall.feedback">
+
+<input type="hidden" name="overallFeedbackList" id="overallFeedbackList" />
+<iframe id="advancedInputArea" name="advancedInputArea" style="width:650px;height:100%;border:0px;display:block;" 
+		frameborder="no" scrolling="no" src="<c:url value='/authoring/initOverallFeedback.do'/>?sessionMapID=${formBean.sessionMapID}">
+</iframe>
+</lams:SimplePanel>
+
+<lams:SimplePanel titleKey="label.activity.completion">
 
 <div class="checkbox">
 	<label for="reflectOnActivity">
@@ -192,14 +222,7 @@
 <div class="form-group">
 	<html:textarea property="assessment.reflectInstructions" rows="3" styleId="reflectInstructions" styleClass="form-control"/>
 </div>
-
-<!-- Overall feedback -->
-<input type="hidden" name="overallFeedbackList" id="overallFeedbackList" />
-<p>
-	<iframe id="advancedInputArea" name="advancedInputArea" style="width:650px;height:100%;border:0px;display:block;" 
-			frameborder="no" scrolling="no" src="<c:url value='/authoring/initOverallFeedback.do'/>?sessionMapID=${formBean.sessionMapID}">
-	</iframe>
-</p>
+</lams:SimplePanel>
 
 <script type="text/javascript">
 	//automatically turn on refect option if there are text input in refect instruction area
@@ -217,3 +240,4 @@
 	
 	ra.onkeyup=turnOnRefect;
 </script>
+
