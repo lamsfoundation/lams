@@ -494,9 +494,8 @@ public class WorkspaceManagementService implements IWorkspaceManagementService {
 		// designType=someting: get only "something" templateLDs
 		if (designType == null
 			? folderContent.getDesignType().equals(WorkspaceManagementService.DEFAULT_DESIGN_TYPE)
-			: (designType.equals(WorkspaceManagementService.ALL_DESIGN_TYPES) && !folderContent
-				.getDesignType().equals(WorkspaceManagementService.DEFAULT_DESIGN_TYPE))
-				|| designType.equals(folderContent.getDesignType())) {
+			: (designType.equals(WorkspaceManagementService.ALL_DESIGN_TYPES)
+				|| designType.equals(folderContent.getDesignType()))) {
 		    JSONObject learningDesignJSON = new JSONObject();
 		    learningDesignJSON.put("name", folderContent.getName());
 		    learningDesignJSON.put("learningDesignId", folderContent.getResourceID());
