@@ -33,7 +33,7 @@
 			<html:form action="/learning/submitReflection" method="post" onsubmit="disableFinishButton();" styleId="messageForm">
 				<html:hidden property="userID" />
 				<html:hidden property="sessionMapID" />
-				<html:textarea property="entryText" styleClass="form-control" styleId="focused" />
+				<html:textarea property="entryText" styleClass="form-control" styleId="focused" rows="5" />
 
 
 				<html:link href="#nogo" styleClass="btn btn-primary voffset10 pull-right na" styleId="finishButton"
