@@ -24,18 +24,18 @@
 	<c:set var="likeDislikeLabelKey" value="advanced.comments.like.and.dislike" />
 </c:if>
 
-<p class="voffset5">
+<div class="checkbox">
+	<label>
 	<html:checkbox property="${allowCommentsVariableName}" value="1"
-		styleClass="noBorder" styleId="${allowCommentsVariableName}">
-		&nbsp;<fmt:message key="${allowCommentLabelKey}" />
+		styleId="${allowCommentsVariableName}">
 	</html:checkbox>
-</p>
-	<div style="padding-left: 20px" id="likedislike">
-	<p>
+	<fmt:message key="${allowCommentLabelKey}"/>
+	</label>
+</div>
+<div class="loffset20" id="likedislike">
 		<html:radio property="${likeDislikeVariableName}" value="false" />&nbsp;<fmt:message key="${likeOnlyCommentLabelKey}" /> &nbsp;
 		<html:radio property="${likeDislikeVariableName}" value="true" />&nbsp;<fmt:message key="${likeDislikeLabelKey}" /> 
-	</p>
-	</div>
+</div>
 
 <script>
 jQuery( document ).ready(function( $ ) {
