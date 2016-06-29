@@ -161,6 +161,11 @@
       validate="false"
     >
       <forward
+        name="viewGroups"
+        path=".viewGroups"
+        redirect="false"
+      />
+      <forward
         name="chosenGrouping"
         path="/grouping/chosenGrouping.jsp"
         redirect="false"
