@@ -55,7 +55,7 @@
 			      {name:'feedback',index:'feedback', sortable:false, editable:false, search:false, width:200},
 			      {name:'startDate',index:'startDate', sortable:false, editable:false, hidden:true, search:false},
 			      {name:'finishDate',index:'finishDate', sortable:false, editable:false, hidden:true, search:false},
-			      {name:'averageTimeTaken',index:'averageTimeTaken', sortable:true, hidden:true, editable:false, search:false, width:80, align:"center"},
+			      {name:'medianTimeTaken',index:'medianTimeTaken', sortable:true, hidden:true, editable:false, search:false, width:80, align:"center"},
 			      {name:'timeTaken',index:'timeTaken', sortable:true, editable:false, hidden:true, search:false, width:80, align:"center"},
 			      {name:'averageMark',index:'averageMark', sortable:true, editable:false, search:false, width:50, align:"center"},
 			      {name:'mark',index:'mark', sortable:true, editable:false, search:false, width:50, align:"center"}
@@ -93,7 +93,7 @@
 								{name:'rowName', index:'rowName', sortable:false, editable: false, width:100},
 								{name:'status', index:'status', sortable:false, editable:false, width:50, align:"center"},
 								{name:'feedback', index:'feedback', sortable:false, editable: false, hidden:true},
-								{name:'averageTimeTaken',index:'averageTimeTaken', sortable:true, hidden:true, editable:false, search:false, width:80, align:"center"},
+								{name:'medianTimeTaken',index:'medianTimeTaken', sortable:true, hidden:true, editable:false, search:false, width:80, align:"center"},
 			      				{name:'timeTaken',index:'timeTaken', sortable:true, editable:false, hidden:true, search:false, width:80, align:"center"},
 			      				{name:'averageMark',index:'averageMark', sortable:true, editable:false, search:false, width:50, align:"center"},
 								{name:'mark', width:100, index:'mark', sortable:true, editable: false, width:50, align:"center"}

@@ -111,7 +111,7 @@
 					     	// update the lesson average mark
 					     	if (cellname == "mark") {
 					     		// Update the average activity mark
-						     	$.get("<lams:LAMSURL/>/gradebook/gradebook.do", {dispatch:"getMedianMarkForLesson", lessonID:lessonID}, function(xml) {
+						     	$.get("<lams:LAMSURL/>/gradebook/gradebook.do", {dispatch:"getAverageMarkForLesson", lessonID:lessonID}, function(xml) {
 							    	if (xml!=null) {
 							    		jQuery("#organisationGrid").setCell(row_id, "avgMark", xml, "", "");
 							    	} 
@@ -229,7 +229,7 @@
 								{name:'feedback',  index:'feedback', sortable:false, editable: true, edittype:'textarea', editoptions:{rows:'4',cols:'20'}, width:150},
 								{name:'startDate',index:'startDate', sortable:false, editable:false, hidden:true, search:false},
 								{name:'finishDate',index:'finishDate', sortable:false, editable:false, hidden:true, search:false},
-								{name:'averageTimeTaken',index:'averageTimeTaken', sortable:true, hidden:true, editable:false, search:false, width:80, align:"center"},
+								{name:'medianTimeTaken',index:'medianTimeTaken', sortable:true, hidden:true, editable:false, search:false, width:80, align:"center"},
 								{name:'timeTaken',index:'timeTaken', sortable:true, editable:false, hidden:true, search:false, width:80, align:"center"},
 								{name:'averageMark',index:'averageMark', sortable:true, editable:false, hidden:true, search:false, width:50, align:"center"},
 								{name:'mark',index:'mark', sortable:true, editable:true, editrules:{number:true}, search:false, width:60, align:"center"}

@@ -50,13 +50,13 @@ public abstract class GradebookGridRowDTO {
     protected Long timeTaken;
 
     // Another unit of time that represents average time taken for a corresponding task
-    protected Long averageTimeTaken;
+    protected Long medianTimeTaken;
 
     // The mark for the corresponding gradebook grid row task
     protected Double mark;
 
     // Average mark for the corresponding task
-    protected Double medianMark;
+    protected Double averageMark;
 
     // Number of marks available where applicable
     protected Long marksAvailable;
@@ -138,8 +138,8 @@ public abstract class GradebookGridRowDTO {
     }
 
     protected String averageMarkToString() {
-	if (medianMark != null) {
-	    String avgStr = new DecimalFormat("##0.00").format(medianMark);
+	if (averageMark != null) {
+	    String avgStr = new DecimalFormat("##0.00").format(averageMark);
 	    if (marksAvailable != null) {
 		return avgStr + "/" + marksAvailable.toString();
 	    } else {
@@ -194,28 +194,28 @@ public abstract class GradebookGridRowDTO {
 	this.rowName = rowName;
     }
 
-    public Long getAverageTimeTaken() {
-	return averageTimeTaken;
+    public Long getMedianTimeTaken() {
+	return medianTimeTaken;
     }
 
-    public Long getAverageTimeTakenSeconds() {
-	if (averageTimeTaken != null) {
-	    return averageTimeTaken / 1000;
+    public Long getMedianTimeTakenSeconds() {
+	if (medianTimeTaken != null) {
+	    return medianTimeTaken / 1000;
 	} else {
 	    return null;
 	}
     }
 
-    public void setAverageTimeTaken(Long averageTimeTaken) {
-	this.averageTimeTaken = averageTimeTaken;
+    public void setMedianTimeTaken(Long medianTimeTaken) {
+	this.medianTimeTaken = medianTimeTaken;
     }
 
-    public Double getMedianMark() {
-	return medianMark;
+    public Double getAverageMark() {
+	return averageMark;
     }
 
-    public void setMedianMark(Double medianMark) {
-	this.medianMark = medianMark;
+    public void setAverageMark(Double averageMark) {
+	this.averageMark = averageMark;
     }
 
     public Long getMarksAvailable() {

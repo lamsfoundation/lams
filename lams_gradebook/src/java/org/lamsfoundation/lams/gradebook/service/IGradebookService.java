@@ -240,7 +240,7 @@ public interface IGradebookService {
      * @param lessonID
      * @return
      */
-    Double getMedianMarkForLesson(Long lessonID);
+    Double getAverageMarkForLesson(Long lessonID);
 
     /**
      * Method for updating an activity mark that tools can call
