@@ -258,6 +258,7 @@ INSERT INTO lams_user_organisation_role (user_organisation_role_id, user_organis
 
 -- test, lamskh01 and mmm are authors, staff and learners in MATH111
 -- test1, test2, test3 and test4 are authors, staff and learners in MATH111
+-- test4 is group manager, mmm is group admin in MATH111
 INSERT INTO lams_user_organisation_role (user_organisation_role_id, user_organisation_id, role_id) VALUES (37, 22, 2);
 INSERT INTO lams_user_organisation_role (user_organisation_role_id, user_organisation_id, role_id) VALUES (38, 16, 3);
 INSERT INTO lams_user_organisation_role (user_organisation_role_id, user_organisation_id, role_id) VALUES (39, 17, 3);
