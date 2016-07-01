@@ -5,32 +5,37 @@
 
 <!-- Advance Tab Content -->
 
-<c:if test="${sessionMap.isEnabledExtraPointOption}">
+<lams:SimplePanel titleKey="label.scratchie.options">
+	<c:if test="${sessionMap.isEnabledExtraPointOption}">
+		<div class="checkbox">
+			<label for="extraPoint">
+			<html:checkbox property="scratchie.extraPoint" styleId="extraPoint"/>
+			<fmt:message key="label.authoring.advanced.give.extra.point" />
+			</label>
+		</div>
+	</c:if>
+	
 	<div class="checkbox">
-		<label for="extraPoint">
-		<html:checkbox property="scratchie.extraPoint" styleId="extraPoint"/>
-		<fmt:message key="label.authoring.advanced.give.extra.point" />
+		<label for="burningQuestionsEnabled">
+		<html:checkbox property="scratchie.burningQuestionsEnabled" styleId="burningQuestionsEnabled"/>
+		<fmt:message key="label.authoring.advanced.burning.questions" />
 		</label>
 	</div>
-</c:if>
+</lams:SimplePanel>
 
-<div class="checkbox">
-	<label for="burningQuestionsEnabled">
-	<html:checkbox property="scratchie.burningQuestionsEnabled" styleId="burningQuestionsEnabled"/>
-	<fmt:message key="label.authoring.advanced.burning.questions" />
-	</label>
-</div>
+<lams:SimplePanel titleKey="label.activity.completion">
+	<div class="checkbox">
+		<label for="reflectOn">
+		<html:checkbox property="scratchie.reflectOnActivity" styleId="reflectOn"/>
+		<fmt:message key="label.authoring.advanced.reflectOnActivity" />
+		</label>
+	</div>
+	
+	<div class="form-group">
+		<html:textarea property="scratchie.reflectInstructions"  styleClass="form-control" styleId="reflectInstructions" rows="3" />
+	</div>
+</lams:SimplePanel>
 
-<div class="checkbox">
-	<label for="reflectOn">
-	<html:checkbox property="scratchie.reflectOnActivity" styleId="reflectOn"/>
-	<fmt:message key="label.authoring.advanced.reflectOnActivity" />
-	</label>
-</div>
-
-<div class="form-group">
-	<html:textarea property="scratchie.reflectInstructions"  styleClass="form-control" styleId="reflectInstructions" rows="3" />
-</div>
 <script type="text/javascript">
 <!--
 //automatically turn on refect option if there are text input in refect instruction area
