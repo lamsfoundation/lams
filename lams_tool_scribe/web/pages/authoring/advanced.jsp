@@ -2,41 +2,42 @@
 
 <!-- ========== Advanced Tab ========== -->
 
-<div class="checkbox">
-	<label for="showAggregatedReports">
-	<html:checkbox property="showAggregatedReports" value="1" styleId="showAggregatedReports"></html:checkbox>
-	<fmt:message key="advanced.showAggregatedReports" />
-	</label>
-</div>
+<lams:SimplePanel titleKey="label.scribe.options">
 
-<div class="checkbox">
-	<label for="reflectOnActivity">
-	<html:checkbox property="reflectOnActivity" value="1" styleId="reflectOnActivity"></html:checkbox>
-	<fmt:message key="advanced.reflectOnActivity" />
-	</label>
-</p>
-<p>
-	<html:textarea property="reflectInstructions" rows="3" styleId="reflectInstructions" styleClass="form-control"/>
-</p>
+	<strong></b><fmt:message key="advanced.selectScribe" /></strong>
+	
+	<div class="radio">
+		<label for="autoSelectScribe1">
+			<html:radio property="autoSelectScribe" value="true" styleId="autoSelectScribe1"/>
+			<fmt:message key="advanced.firstLearner" />
+		</label>
+	</div>
+	<div class="radio">
+		<label for="autoSelectScribe2">
+			<html:radio property="autoSelectScribe" value="false" styleId="autoSelectScribe2"/>
+			<fmt:message key="advanced.selectInMonitor" />
+		</label>
+	</div>
+	
+	<div class="checkbox voffset20">
+		<label for="showAggregatedReports">
+		<html:checkbox property="showAggregatedReports" value="1" styleId="showAggregatedReports"></html:checkbox>
+		<fmt:message key="advanced.showAggregatedReports" />
+		</label>
+	</div>
+</lams:SimplePanel>
 
-<h4>
-	<fmt:message key="advanced.selectScribe" />
-</h4>
-
-<div class="form-group">
-	<html:radio property="autoSelectScribe" value="true" styleId="autoSelectScribe1">
-	</html:radio>
-	<label for="autoSelectScribe1">
-		<fmt:message key="advanced.firstLearner" />
-	</label>
-</div>
-<div class="form-group">
-	<html:radio property="autoSelectScribe" value="false" styleId="autoSelectScribe2">
-	</html:radio>
-	<label for="autoSelectScribe2">
-		<fmt:message key="advanced.selectInMonitor" />
-	</label>
-</div>
+<lams:SimplePanel titleKey="label.activity.completion">
+	<div class="checkbox">
+		<label for="reflectOnActivity">
+		<html:checkbox property="reflectOnActivity" value="1" styleId="reflectOnActivity"></html:checkbox>
+		<fmt:message key="advanced.reflectOnActivity" />
+		</label>
+	</div>
+	<div class="form-group">
+		<html:textarea property="reflectInstructions" rows="3" styleId="reflectInstructions" styleClass="form-control"/>
+	</div>
+</lams:SimplePanel>
 
 <script type="text/javascript">
 <!--
