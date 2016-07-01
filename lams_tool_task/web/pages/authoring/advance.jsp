@@ -3,71 +3,79 @@
 
 <!-- Advance Tab Content -->
 
-<div class="checkbox">
-	<label for="lockWhenFinished">
-	<html:checkbox property="taskList.lockWhenFinished"	styleId="lockWhenFinished" />
-	<fmt:message key="label.authoring.advance.lock.on.finished" />
-	</label>
-</div>
+<lams:SimplePanel titleKey="label.task.options">
+	
+	<div class="checkbox">
+		<label for="sequentialOrder">
+		<html:checkbox property="taskList.sequentialOrder" styleId="sequentialOrder"/>
+		<fmt:message key="label.authoring.advance.run.content.sequentialOrder" />
+		</label>
+	</div>
+	
+	<div class="form-group">
+		<c:set var="sessionMapID" value="${param.sessionMapID}" />
+		<c:set var="sessionMap" value="${sessionScope[sessionMapID]}" />
+	
+		<html:select property="taskList.minimumNumberTasks"	styleId="minimumNumberTasks" styleClass="form-control form-control-inline input-sm">
+	<!-- 		<c:forEach begin="1" end="${fn:length(sessionMap.taskListList)}" varStatus="status">
+				<c:choose>
+					<c:when	test="${formBean.taskList.minimumNumberTasks == status.index}">
+						<option value="${status.index}" selected="true">
+							${status.index}
+						</option>
+					</c:when>
+					<c:otherwise>
+						<option value="${status.index}">
+							${status.index}
+						</option>
+					</c:otherwise>
+				</c:choose>
+			</c:forEach>
+	 -->		
+		</html:select>
+	
+		<label for="minimumNumberTasks">
+			<fmt:message key="label.authoring.advance.minimum.number.tasks" />
+		</label>
+	</div>
+	
+	<div class="checkbox">
+		<label for="allowContributeTasks">
+		<html:checkbox property="taskList.allowContributeTasks" styleId="allowContributeTasks" />
+		<fmt:message key="label.authoring.advance.allow.contribute.tasks" />
+		</label>
+	</div>
+		
+	<div class="checkbox">
+		<label for="monitorVerificationRequired">
+		<html:checkbox property="taskList.monitorVerificationRequired" styleId="monitorVerificationRequired" />
+		<fmt:message key="label.authoring.advance.monitor.verification.required" />
+		</label>
+	</div>
 
-<div class="checkbox">
-	<label for="sequentialOrder">
-	<html:checkbox property="taskList.sequentialOrder" styleId="sequentialOrder"/>
-	<fmt:message key="label.authoring.advance.run.content.sequentialOrder" />
-	</label>
-</div>
+</lams:SimplePanel>
+	
+<lams:SimplePanel titleKey="label.activity.completion">
 
-<div class="form-group">
-	<c:set var="sessionMapID" value="${param.sessionMapID}" />
-	<c:set var="sessionMap" value="${sessionScope[sessionMapID]}" />
+	<div class="checkbox">
+		<label for="lockWhenFinished">
+		<html:checkbox property="taskList.lockWhenFinished"	styleId="lockWhenFinished" />
+		<fmt:message key="label.authoring.advance.lock.on.finished" />
+		</label>
+	</div>
 
-	<html:select property="taskList.minimumNumberTasks"	styleId="minimumNumberTasks" styleClass="form-control form-control-inline input-sm">
-<!-- 		<c:forEach begin="1" end="${fn:length(sessionMap.taskListList)}" varStatus="status">
-			<c:choose>
-				<c:when	test="${formBean.taskList.minimumNumberTasks == status.index}">
-					<option value="${status.index}" selected="true">
-						${status.index}
-					</option>
-				</c:when>
-				<c:otherwise>
-					<option value="${status.index}">
-						${status.index}
-					</option>
-				</c:otherwise>
-			</c:choose>
-		</c:forEach>
- -->		
-	</html:select>
+	<div class="checkbox">
+		<label for="reflectOn">
+		<html:checkbox property="taskList.reflectOnActivity" styleId="reflectOn" />
+		<fmt:message key="label.authoring.advanced.reflectOnActivity" />
+		</label>
+	</div>
+	
+	<div class="form-group">
+		<html:textarea property="taskList.reflectInstructions"	styleId="reflectInstructions" styleClass="form-control" rows="3" />
+	</div>
 
-	<label for="minimumNumberTasks">
-		<fmt:message key="label.authoring.advance.minimum.number.tasks" />
-	</label>
-</div>
-
-<div class="checkbox">
-	<label for="allowContributeTasks">
-	<html:checkbox property="taskList.allowContributeTasks" styleId="allowContributeTasks" />
-	<fmt:message key="label.authoring.advance.allow.contribute.tasks" />
-	</label>
-</div>
-
-<div class="checkbox">
-	<label for="monitorVerificationRequired">
-	<html:checkbox property="taskList.monitorVerificationRequired" styleId="monitorVerificationRequired" />
-	<fmt:message key="label.authoring.advance.monitor.verification.required" />
-	</label>
-</div>
-
-<div class="checkbox">
-	<label for="reflectOn">
-	<html:checkbox property="taskList.reflectOnActivity" styleId="reflectOn" />
-	<fmt:message key="label.authoring.advanced.reflectOnActivity" />
-	</label>
-</div>
-
-<div class="form-group">
-	<html:textarea property="taskList.reflectInstructions"	styleId="reflectInstructions" styleClass="form-control" rows="3" />
-</div>
+</lams:SimplePanel>
 
 <script type="text/javascript">
 <!--
