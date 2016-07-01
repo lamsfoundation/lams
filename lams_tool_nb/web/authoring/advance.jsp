@@ -4,6 +4,8 @@
 
 <lams:CommentsAuthor/>
 
+<lams:SimplePanel titleKey="label.activity.completion">
+
 <div class="checkbox">
 	<label for="reflectOnActivity">
     <html:checkbox property="reflectOnActivity" value="1"
@@ -14,6 +16,7 @@
 <div class="form-group">
 	<html:textarea property="reflectInstructions" cols="60" rows="3"  styleId="reflectInstructions" styleClass="form-control"/>
 </div>
+</lams:SimplePanel>
 
 <script type="text/javascript">
 <!--
