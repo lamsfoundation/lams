@@ -1,8 +1,11 @@
 <%@ include file="/common/taglibs.jsp"%>
 
+<c:set var="formBean" value="<%=request.getAttribute(org.apache.struts.taglib.html.Constants.BEAN_KEY)%>" />
+
 <script type="text/javascript">
 	
 	$(document).ready(function() {
+		
 		$("#useSelectLeaderToolOuput").click(function() {
 			if (document.QaAuthoringForm.useSelectLeaderToolOuput.checked) {
 				//uncheck checkboxes
@@ -46,85 +49,95 @@
 	});
 </script>
 
-<div class="checkbox">
-	<label for="useSelectLeaderToolOuput">
-		<html:checkbox property="useSelectLeaderToolOuput" styleId="useSelectLeaderToolOuput" value="1" />
-		<fmt:message key="label.use.select.leader.tool.output" />
-	</label>
-</div>
-
-<div class="checkbox">
-	<label for="showOtherAnswers">
-		<html:checkbox property="showOtherAnswers" styleId="showOtherAnswers" value="1" disabled="${formBean.useSelectLeaderToolOuput}"/>
-		<fmt:message key="label.learner.answer" />
-	</label>
-</div>
-
-
-
-<div class="loffset20" id="show-other-answers-options">
+<lams:SimplePanel titleKey="label.select.leader">
 	<div class="checkbox">
-		<label for="usernameVisible">
-			<html:checkbox property="usernameVisible" styleId="usernameVisible" value="1" />
-			<fmt:message key="label.show.names" />
+		<label for="useSelectLeaderToolOuput">
+			<html:checkbox property="useSelectLeaderToolOuput" styleId="useSelectLeaderToolOuput" value="1" />
+			<fmt:message key="label.use.select.leader.tool.output" />
+		</label>
+	</div>
+</lams:SimplePanel>
+
+<lams:SimplePanel titleKey="label.question.options">
+
+	<div class="checkbox">
+		<label for="questionsSequenced">
+			<html:checkbox property="questionsSequenced" styleId="questionsSequenced" value="1" />
+			<fmt:message key="radiobox.questionsSequenced" />
 		</label>
 	</div>
 	
 	<div class="checkbox">
-		<label for="allowRateAnswers">
-			<html:checkbox property="allowRateAnswers" styleId="allowRateAnswers" value="1" />
-			<fmt:message key="label.authoring.allow.rate.answers" />
+		<label for="allowRichEditor">
+			<html:checkbox property="allowRichEditor" styleId="allowRichEditor" value="1" />
+			<fmt:message key="label.allowRichEditor" />
+		</label>
+	</div>
+	
+	<div class="checkbox">
+		<label for="noReeditAllowed">
+			<html:checkbox property="noReeditAllowed" styleId="noReeditAllowed" value="1" />
+			<fmt:message key="label.no.reedit.allowed" />
 		</label>
 	</div>
 
-	<div class="loffset20">
-		<lams:AuthoringRatingCriteria criterias="${sessionMap.ratingCriterias}" hasRatingLimits="true"
-			upLabel="label.authoring.up" downLabel="label.authoring.down" />
+	<div class="checkbox">
+		<label for="showOtherAnswers">
+			<html:checkbox property="showOtherAnswers" styleId="showOtherAnswers" value="1" disabled="${formBean.useSelectLeaderToolOuput}"/>
+			<fmt:message key="label.learner.answer" />
+		</label>
 	</div>
-</div>
 
-<div class="checkbox">
-	<label for="notifyTeachersOnResponseSubmit">
-		<html:checkbox property="notifyTeachersOnResponseSubmit" styleId="notifyTeachersOnResponseSubmit" value="1" />
-		<fmt:message key="label.notify.teachers.on.response.submit" />
-	</label>
-</div>
+	<div class="loffset20" id="show-other-answers-options">
+		<div class="checkbox">
+			<label for="usernameVisible">
+				<html:checkbox property="usernameVisible" styleId="usernameVisible" value="1" />
+				<fmt:message key="label.show.names" />
+			</label>
+		</div>
+		
+		<div class="checkbox">
+			<label for="allowRateAnswers">
+				<html:checkbox property="allowRateAnswers" styleId="allowRateAnswers" value="1" />
+				<fmt:message key="label.authoring.allow.rate.answers" />
+			</label>
+		</div>
+	
+		<div class="loffset20">
+			<lams:AuthoringRatingCriteria criterias="${sessionMap.ratingCriterias}" hasRatingLimits="true"
+				upLabel="label.authoring.up" downLabel="label.authoring.down" />
+		</div>
+	</div>
+	
+</lams:SimplePanel>
+	
+<lams:SimplePanel titleKey="label.notifications">
 
-<div class="checkbox">
-	<label for="reflect">
-		<html:checkbox property="reflect" styleId="reflect" value="1" />
-		<fmt:message key="label.reflect" />
-	</label>
-</div>
+	<div class="checkbox">
+		<label for="notifyTeachersOnResponseSubmit">
+			<html:checkbox property="notifyTeachersOnResponseSubmit" styleId="notifyTeachersOnResponseSubmit" value="1" />
+			<fmt:message key="label.notify.teachers.on.response.submit" />
+		</label>
+	</div>
+	
+</lams:SimplePanel>
 
-<div class="form-group">
-	<html:textarea property="reflectionSubject" styleId="reflectionSubject" styleClass="form-control" cols="30" rows="3"	/>
-</div>
+<lams:SimplePanel titleKey="label.activity.completion">
+	<div class="checkbox">
+		<label for="lockWhenFinished">
+			<html:checkbox property="lockWhenFinished" styleId="lockWhenFinished" value="1" disabled="${formBean.noReeditAllowed == 1}"/>
+			<fmt:message key="label.lockWhenFinished" />
+		</label>
+	</div>
 
-<div class="checkbox">
-	<label for="questionsSequenced">
-		<html:checkbox property="questionsSequenced" styleId="questionsSequenced" value="1" />
-		<fmt:message key="radiobox.questionsSequenced" />
-	</label>
-</div>
-
-<div class="checkbox">
-	<label for="noReeditAllowed">
-		<html:checkbox property="noReeditAllowed" styleId="noReeditAllowed" value="1" />
-		<fmt:message key="label.no.reedit.allowed" />
-	</label>
-</div>
-
-<div class="checkbox">
-	<label for="lockWhenFinished">
-		<html:checkbox property="lockWhenFinished" styleId="lockWhenFinished" value="1" disabled="${formBean.noReeditAllowed == 1}"/>
-		<fmt:message key="label.lockWhenFinished" />
-	</label>
-</div>
-
-<div class="checkbox">
-	<label for="allowRichEditor">
-		<html:checkbox property="allowRichEditor" styleId="allowRichEditor" value="1" />
-		<fmt:message key="label.allowRichEditor" />
-	</label>
-</div>
+	<div class="checkbox">
+		<label for="reflect">
+			<html:checkbox property="reflect" styleId="reflect" value="1" />
+			<fmt:message key="label.reflect" />
+		</label>
+	</div>
+	
+	<div class="form-group">
+		<html:textarea property="reflectionSubject" styleId="reflectionSubject" styleClass="form-control" cols="30" rows="3"	/>
+	</div>
+</lams:SimplePanel>

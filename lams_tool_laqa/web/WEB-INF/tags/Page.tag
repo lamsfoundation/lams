@@ -24,7 +24,7 @@
 						<div class="panel-title panel-${type}-title">
 							<c:out value="${title}" escapeXml="true" />
 							<c:if test="${not empty titleHelpURL}">
-								<a style="float: right" href="${titleHelpURL}" target="_new"><span class="help" style="margin: 0px"></span></a>
+								<span class="pull-right">${titleHelpURL}</span>
 							</c:if>
 						</div>
 						<c:if test="${not empty headingContent}">
