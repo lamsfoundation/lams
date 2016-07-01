@@ -2,20 +2,24 @@
 
 <!-- ========== Advanced Tab ========== -->
 
-<div class="checkbox">
-	<label for="lockOnFinished"><html:checkbox property="lockOnFinished" value="1" styleClass="noBorder"
-			styleId="lockOnFinished"></html:checkbox> <fmt:message key="advanced.lockOnFinished" /> </label>
-</div>
+<lams:SimplePanel titleKey="label.activity.completion">
 
-<div class="checkbox voffset10">
-	<label for="reflectOnActivity"> <html:checkbox property="reflectOnActivity" value="1" styleClass="noBorder"
-			styleId="reflectOnActivity"></html:checkbox> <fmt:message key="advanced.reflectOnActivity" />
-	</label>
-</div>
+	<div class="checkbox">
+		<label for="lockOnFinished"><html:checkbox property="lockOnFinished" value="1" styleClass="noBorder"
+				styleId="lockOnFinished"></html:checkbox> <fmt:message key="advanced.lockOnFinished" /> </label>
+	</div>
+	
+	<div class="checkbox voffset10">
+		<label for="reflectOnActivity"> <html:checkbox property="reflectOnActivity" value="1" styleClass="noBorder"
+				styleId="reflectOnActivity"></html:checkbox> <fmt:message key="advanced.reflectOnActivity" />
+		</label>
+	</div>
+	
+	<div class="form-group">
+		<html:textarea property="reflectInstructions" styleId="reflectInstructions" styleClass="form-control" rows="3"/>
+	</div>
 
-<div class="form-group">
-	<html:textarea property="reflectInstructions" styleId="reflectInstructions" styleClass="form-control" rows="3"/>
-</div>
+</lams:SimplePanel>
 
 <script type="text/javascript">
 <!--
