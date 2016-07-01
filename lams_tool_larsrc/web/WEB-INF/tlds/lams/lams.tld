@@ -471,6 +471,10 @@
    		<name>RestrictedUsageAccordian</name>
    		<path>/WEB-INF/tags/RestrictedUsageAccordian.tag</path>
    	</tag-file>
+  	<tag-file>
+	    <name>SimplePanel</name>
+		<path>/WEB-INF/tags/SimplePanel.tag</path>
+   	</tag-file>
    	<tag-file>
 	    <name>ImgButtonWrapper</name>
 		<path>/WEB-INF/tags/ImgButtonWrapper.tag</path>
