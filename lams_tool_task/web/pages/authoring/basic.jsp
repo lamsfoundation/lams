@@ -39,7 +39,6 @@
 			var url = "<c:url value="/authoring/removeItem.do"/>?"+param;
 			deleteItemLoading();
 			$('#taskListListArea').load(url, function() {
-				debugger;
 	    		deleteItemComplete();
 			});
  		}
@@ -58,7 +57,6 @@
 		var url = "<c:url value="/authoring/upItem.do"/>?"+param;
 		deleteItemLoading();
 		$('#taskListListArea').load(url, function() {
-			debugger;
 			deleteItemComplete();
 		});
 	}
@@ -68,14 +66,12 @@
 		var url = "<c:url value="/authoring/downItem.do"/>?"+param;
 		deleteItemLoading();
 		$('#taskListListArea').load(url, function() {
-			debugger;
 			deleteItemComplete();
 		});
 	}
 	
 	//Packs additional elements and submits the question form
 	function submitTask(){
-		debugger;
 		refreshCKEditors();
 		var form = $('#taskListItemForm');
 		$('#taskListListArea').load(form.attr('action'), form.serialize());

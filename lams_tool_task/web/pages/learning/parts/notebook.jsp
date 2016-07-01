@@ -34,7 +34,7 @@
 				<lams:out value="${sessionMap.reflectInstructions}" escapeHtml="true" />
 			</p>
 
-			<html:textarea cols="60" styleId="notebookEntry" property="entryText" styleClass="form-control" />
+			<html:textarea cols="60" styleId="notebookEntry" property="entryText" styleClass="form-control" rows="5" />
 
 			<div class="voffset10">
 				<html:link href="#nogo" styleClass="btn btn-primary pull-right na" styleId="finishButton"
