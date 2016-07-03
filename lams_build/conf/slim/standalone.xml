@@ -457,6 +457,9 @@
 	                    <filter-ref name="server-header"/>
 	                    <filter-ref name="x-powered-by-header"/>
                  	-->
+                         <!-- Enable if running https see (LDEV-3888)
+                            <filter-ref name="hsts"/>
+                            -->
                  	<access-log pattern="combined" />
                 </host>
             </server>
@@ -468,6 +471,7 @@
                 <file name="welcome-content" path="${jboss.home.dir}/welcome-content"/>
             </handlers>
             <filters>
+                <response-header name="hsts" header-name="Strict-Transport-Security" header-value="max-age=3600"/>
                 <response-header name="server-header" header-name="Server" header-value="WildFly/8"/>
                 <response-header name="x-powered-by-header" header-name="X-Powered-By" header-value="Undertow/1"/>
             </filters>
