@@ -21,7 +21,6 @@
  * ****************************************************************
  */
 
-
 package org.lamsfoundation.lams.contentrepository.service;
 
 import java.io.IOException;
@@ -31,6 +30,7 @@ import java.util.SortedMap;
 import java.util.SortedSet;
 
 import org.lamsfoundation.lams.contentrepository.AccessDeniedException;
+import org.lamsfoundation.lams.contentrepository.CrWorkspace;
 import org.lamsfoundation.lams.contentrepository.FileException;
 import org.lamsfoundation.lams.contentrepository.ICredentials;
 import org.lamsfoundation.lams.contentrepository.ITicket;
@@ -73,7 +73,7 @@ public interface IRepositoryService {
      * workspace. If login fails, a LoginException is thrown and
      * no valid ticket is generated. The credentials object in the ticket
      * does not contain the password.
-     * 
+     *
      * It does not clear the password in the input credentials object.
      *
      * @param credentials
@@ -95,7 +95,7 @@ public interface IRepositoryService {
      * Create a new workspace, with the tool identified in the creditials
      * as the owner.
      * It does not clear the password in the credentials
-     * 
+     *
      * @param credentials
      *            this user/password must already exist in the repository. Password will be checked.
      * @param workspaceName
@@ -106,19 +106,19 @@ public interface IRepositoryService {
      * @throws RepositoryCheckedException
      *             if parameters are missing.
      */
-    public void addWorkspace(ICredentials credentials, String workspaceName)
+    public CrWorkspace addWorkspace(ICredentials credentials, String workspaceName)
 	    throws LoginException, AccessDeniedException, ItemExistsException, RepositoryCheckedException;
 
     /**
      * Create a new repository "user" - usually a tool.
-     * 
+     *
      * The password must be at least 6 chars.
-     * 
+     *
      * This method will not wipe out the password in the newCredential object.
-     * 
+     *
      * At this stage it is publically accessable - may need to move
      * it to a private management tool if considered to insecure.
-     * 
+     *
      * @param newCredential
      *            this user/password will be added to the repository
      * @throws RepositoryCheckedException
@@ -131,9 +131,9 @@ public interface IRepositoryService {
 
     /**
      * Update a credential. Name cannot change, so really only the password changes
-     * 
+     *
      * The password must be at least 6 chars.
-     * 
+     *
      * @param oldCredential
      *            the current user/password
      * @param newCredential
@@ -150,7 +150,7 @@ public interface IRepositoryService {
      * Add a new file to the repository. This will create
      * a completely new entry (node) in the repository, starting
      * with version 1.
-     * 
+     *
      * @param ticket
      *            ticket issued on login. Identifies tool and workspace - mandatory
      * @param istream
@@ -175,11 +175,11 @@ public interface IRepositoryService {
     /**
      * Add a new package of files to the repository. If startFile
      * is not supplied, then it is assumed to be index.html.
-     * 
+     *
      * The directory separator character in the paths of the files in the package
      * will be converted to "/" so that a web style path can be used to
      * access the file.
-     * 
+     *
      * @param ticket
      *            ticket issued on login. Identifies tool and workspace - mandatory
      * @param dirPath
@@ -204,7 +204,7 @@ public interface IRepositoryService {
     /**
      * Update an existing file in the repository. This will create
      * a new version of this file.
-     * 
+     *
      * @param ticket
      *            ticket issued on login. Identifies tool and workspace - mandatory
      * @param uuid
@@ -233,11 +233,11 @@ public interface IRepositoryService {
     /**
      * Add a new package of files to the repository. If startFile
      * is not supplied, then it is assumed to be index.html.
-     * 
+     *
      * The directory separator character in the paths of the files in the package
      * will be converted to "/" so that a web style path can be used to
      * access the file.
-     * 
+     *
      * @param ticket
      *            ticket issued on login. Identifies tool and workspace - mandatory
      * @param uuid
@@ -298,7 +298,7 @@ public interface IRepositoryService {
      * then it uses the latest version of the node as the basis for the new node.
      * <p>
      * This method works for both file nodes and package nodes.
-     * 
+     *
      * @param ticket
      *            ticket issued on login. Identifies tool and workspace - mandatory
      * @param uuid
@@ -317,7 +317,7 @@ public interface IRepositoryService {
     /**
      * Get an item from the repository based on the UUID. This
      * may be either a file or package node.
-     * 
+     *
      * @param ticket
      *            ticket issued on login. Identifies tool and workspace - mandatory
      * @param uuid
@@ -334,12 +334,12 @@ public interface IRepositoryService {
      * path. Only used to get the content from a package. The
      * UUID is the id of the package, and relPath is the relative
      * path within the package.
-     * 
+     *
      * If the item is a package and relPath is null, return the package node.
-     * 
+     *
      * The relPath must be specified in web format ie use a separator
      * of "/" not "\".
-     * 
+     *
      * @param ticket
      *            ticket issued on login. Identifies tool and workspace - mandatory
      * @param uuid
@@ -366,7 +366,7 @@ public interface IRepositoryService {
     /**
      * Return a list of all the nodes for a package. The first in the list
      * is the package node. The others are in arbitrary order.
-     * 
+     *
      * @param ticket
      * @param uuid
      *            uuid of the package node
@@ -384,7 +384,7 @@ public interface IRepositoryService {
      * Get the history for a node. Quite intensive operation the
      * first time it is run on a node as it has to build all the
      * data structures.
-     * 
+     *
      * @param ticket
      *            ticket issued on login. Identifies tool and workspace - mandatory
      * @return SortedSet of IVersionDetail objects, ordered by version
@@ -444,7 +444,7 @@ public interface IRepositoryService {
     /**
      * Finish using this ticket. No more updates may be used with this ticket
      * after logout(). Allows any resources to be freed.
-     * 
+     *
      * @param ticket
      *            ticket issued on login. Identifies tool and workspace - mandatory
      */
@@ -457,7 +457,7 @@ public interface IRepositoryService {
      * Warning: Once a workspace gets a lot of nodes, this will be
      * a very very expensive call!!!!!
      * </p>
-     * 
+     *
      * @param ticket
      *            ticket issued on login. Identifies tool and workspace - mandatory
      * @return SortedMap key Long uuid, value IVersionDetail version history
@@ -481,4 +481,8 @@ public interface IRepositoryService {
      */
     public void saveFile(ITicket ticket, Long uuid, Long versionId, String toFileName)
 	    throws RepositoryCheckedException, AccessDeniedException, ItemNotFoundException, IOException;
+
+    public boolean workspaceExists(ICredentials credentials, Long workspaceId);
+
+    public boolean workspaceExists(ICredentials credentials, String workspaceName);
 }
