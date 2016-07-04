@@ -935,8 +935,11 @@ public class QaServicePOJO implements IQaService, ToolContentManager, ToolSessio
 	    // reset it to new toolContentID
 	    toolContentObj.setQaContentId(toolContentID);
 	    toolContentObj.setCreatedBy(newUserUid);
-	    for (LearnerItemRatingCriteria criteria : toolContentObj.getRatingCriterias()) {
-		criteria.setToolContentId(toolContentID);
+	    Set<LearnerItemRatingCriteria> criterias = toolContentObj.getRatingCriterias();
+	    if (criterias != null) {
+		for (LearnerItemRatingCriteria criteria : toolContentObj.getRatingCriterias()) {
+		    criteria.setToolContentId(toolContentID);
+		}
 	    }
 
 	    // set back the tool content
