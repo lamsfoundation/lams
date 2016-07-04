@@ -133,25 +133,11 @@ public class SimpleRepository implements IRepositoryAdmin {
 			"Cannot get user details for content repository. User may not be logged in.");
 	    }
 	    return user.getUserID();
-	} else {
+	}
 	    throw new AccessDeniedException(
 		    "Cannot get user details for content repository. No session found - user not logged in or the webservice call has not set up the session details.");
-	}
-    }
 
-    /**
-     * @param workspaceName
-     * @return
-     * @throws WorkspaceNotFoundException
-     */
-    private CrWorkspace getWorkspace(String workspaceName) throws WorkspaceNotFoundException {
-	// call workspace dao to get the workspace
-	CrWorkspace workspace = workspaceDAO.findByName(workspaceName);
-	if (workspace == null) {
-	    throw new WorkspaceNotFoundException("Workspace " + workspaceName + " does not exist.");
 	}
-	return workspace;
-    }
 
     /**
      * @param workspaceId
@@ -173,6 +159,7 @@ public class SimpleRepository implements IRepositoryAdmin {
      * @see org.lamsfoundation.lams.contentrepository.IRepository#login(org.lamsfoundation.lams.contentrepository.
      * ICredentials, java.lang.String)
      */
+    @SuppressWarnings("unchecked")
     @Override
     public ITicket login(ICredentials credentials, String workspaceName)
 	    throws AccessDeniedException, LoginException, WorkspaceNotFoundException {
@@ -182,9 +169,15 @@ public class SimpleRepository implements IRepositoryAdmin {
 		    "Workspace or Credential DAO object missing. Unable to process login.");
 	}
 
-	CrWorkspace workspace = getWorkspace(workspaceName);
-
-	if (!credentialDAO.checkCredential(credentials, workspace)) {
+	CrWorkspace workspace = workspaceDAO.findByName(workspaceName);
+	if (workspace == null) {
+	    try {
+		createCredentials(credentials);
+		workspace = addWorkspace(credentials, workspaceName);
+	    } catch (Exception e) {
+		throw new RepositoryRuntimeException("Error while creating workspace \"" + workspaceName + "\"", e);
+	    }
+	} else if (!credentialDAO.checkCredential(credentials, workspace)) {
 	    throw new LoginException("Login failed. Password incorrect or not authorised to access this workspace.");
 	}
 
@@ -210,7 +203,7 @@ public class SimpleRepository implements IRepositoryAdmin {
      *             if parameters are missing.
      */
     @Override
-    public void addWorkspace(ICredentials credentials, String workspaceName)
+    public CrWorkspace addWorkspace(ICredentials credentials, String workspaceName)
 	    throws AccessDeniedException, LoginException, ItemExistsException, RepositoryCheckedException {
 
 	// call workspace dao to check the login and get the workspace
@@ -234,6 +227,7 @@ public class SimpleRepository implements IRepositoryAdmin {
 	crWorkspace.setName(workspaceName);
 	workspaceDAO.insert(crWorkspace);
 	assignCredentials(credentials, crWorkspace);
+	return crWorkspace;
     }
 
     /**
@@ -346,7 +340,7 @@ public class SimpleRepository implements IRepositoryAdmin {
 	}
 
 	// call workspace dao to get the workspace
-	CrWorkspace workspace = getWorkspace(workspaceName);
+	CrWorkspace workspace = workspaceDAO.findByName(workspaceName);
 	if (workspace == null) {
 	    throw new WorkspaceNotFoundException("Workspace " + workspaceName + " does not exist.");
 	}
@@ -854,6 +848,14 @@ public class SimpleRepository implements IRepositoryAdmin {
 	List problemPaths = nodeVersion.deleteVersion();
 	return problemPaths != null ? (String[]) problemPaths.toArray(new String[problemPaths.size()]) : new String[0];
 
+    }
+
+    public boolean workspaceExists(ICredentials credentials, Long workspaceId) {
+	return workspaceDAO.find(CrWorkspace.class, workspaceId) != null;
+    }
+
+    public boolean workspaceExists(ICredentials credentials, String workspaceName) {
+	return workspaceDAO.findByName(workspaceName) != null;
     }
 
     /* ********** setters and getters for DAOs *******************/

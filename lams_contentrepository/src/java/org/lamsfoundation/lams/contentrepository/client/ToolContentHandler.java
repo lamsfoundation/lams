@@ -35,11 +35,9 @@ import org.lamsfoundation.lams.contentrepository.ICredentials;
 import org.lamsfoundation.lams.contentrepository.ITicket;
 import org.lamsfoundation.lams.contentrepository.IVersionedNode;
 import org.lamsfoundation.lams.contentrepository.InvalidParameterException;
-import org.lamsfoundation.lams.contentrepository.ItemExistsException;
 import org.lamsfoundation.lams.contentrepository.ItemNotFoundException;
 import org.lamsfoundation.lams.contentrepository.NodeKey;
 import org.lamsfoundation.lams.contentrepository.RepositoryCheckedException;
-import org.lamsfoundation.lams.contentrepository.WorkspaceNotFoundException;
 import org.lamsfoundation.lams.contentrepository.service.IRepositoryService;
 import org.lamsfoundation.lams.contentrepository.service.SimpleCredentials;
 
@@ -137,38 +135,20 @@ public abstract class ToolContentHandler implements IToolContentHandler {
     @Override
     public abstract char[] getRepositoryId();
 
-    private void configureContentRepository() throws RepositoryCheckedException {
-	ICredentials cred = new SimpleCredentials(getRepositoryUser(), getRepositoryId());
-	try {
-	    getRepositoryService().createCredentials(cred);
-	    getRepositoryService().addWorkspace(cred, getRepositoryWorkspaceName());
-	} catch (ItemExistsException ie) {
-	    log.warn("Tried to configure repository but it " + " appears to be already configured." + "Workspace name "
-		    + getRepositoryWorkspaceName() + ". Exception thrown by repository being ignored. ", ie);
-	} catch (RepositoryCheckedException e) {
-	    log.error("Error occured while trying to configure repository." + "Workspace name "
-		    + getRepositoryWorkspaceName() + " Unable to recover from error: " + e.getMessage(), e);
-	    throw e;
-	}
-    }
-
     @Override
     public ITicket getTicket(boolean forceLogin) throws RepositoryCheckedException {
-	if (ticket == null || forceLogin) {
-	    ICredentials cred = new SimpleCredentials(getRepositoryUser(), getRepositoryId());
-	    try {
-		try {
-		    ticket = getRepositoryService().login(cred, getRepositoryWorkspaceName());
-		} catch (WorkspaceNotFoundException e) {
-		    log.error("Content Repository workspace " + getRepositoryWorkspaceName()
-			    + " not configured. Attempting to configure now.");
-		    configureContentRepository();
-		    ticket = getRepositoryService().login(cred, getRepositoryWorkspaceName());
+	ICredentials cred = null;
+	boolean doLogin = ticket == null || forceLogin;
+	if (!doLogin) {
+	    // make sure workspace exists - sometimes it does not get created when creating a ticket
+	    cred = new SimpleCredentials(getRepositoryUser(), getRepositoryId());
+	    doLogin = !getRepositoryService().workspaceExists(cred, getRepositoryWorkspaceName());
 		}
-	    } catch (RepositoryCheckedException e) {
-		log.error("Unable to get ticket for workspace " + getRepositoryWorkspaceName(), e);
-		throw e;
+	if (doLogin) {
+	    if (cred == null) {
+		cred = new SimpleCredentials(getRepositoryUser(), getRepositoryId());
 	    }
+	    ticket = getRepositoryService().login(cred, getRepositoryWorkspaceName());
 	}
 	return ticket;
     }
@@ -179,7 +159,7 @@ public abstract class ToolContentHandler implements IToolContentHandler {
 	NodeKey nodeKey = null;
 	try {
 	    try {
-		nodeKey = getRepositoryService().addFileItem(getTicket(true), stream, fileName, mimeType, null);
+		nodeKey = getRepositoryService().addFileItem(getTicket(false), stream, fileName, mimeType, null);
 	    } catch (AccessDeniedException e) {
 		log.warn("Unable to access repository to add file " + fileName + "AccessDeniedException: "
 			+ e.getMessage() + " Retrying login.");

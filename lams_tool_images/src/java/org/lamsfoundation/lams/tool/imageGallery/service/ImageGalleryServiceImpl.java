@@ -722,8 +722,11 @@ public class ImageGalleryServiceImpl implements IImageGalleryService, ToolConten
 	}
 
 	// don't export following fields
-	for (LearnerItemRatingCriteria criteria : toolContentObj.getRatingCriterias()) {
+	Set<LearnerItemRatingCriteria> criterias = toolContentObj.getRatingCriterias();
+	if (criterias != null) {
+	    for (LearnerItemRatingCriteria criteria : criterias) {
 	    criteria.setToolContentId(null);
+	}
 	}
 
 	// set ImageGalleryToolContentHandler as null to avoid copy file node in repository again.
