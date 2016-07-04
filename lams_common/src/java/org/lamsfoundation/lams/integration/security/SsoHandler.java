@@ -55,6 +55,9 @@ public class SsoHandler implements ServletExtension {
 
     protected static final String SESSION_KEY = "io.undertow.servlet.form.auth.redirect.location";
 
+    // if this attribute is set in session, credential cache will not be cleared on session destro in SessionListener
+    public static final String NO_FLUSH_FLAG = "noFlush";
+
     @Override
     public void handleDeployment(final DeploymentInfo deploymentInfo, final ServletContext servletContext) {
 	// expose servlet context so other classes can use it
@@ -104,8 +107,15 @@ public class SsoHandler implements ServletExtension {
 
 		if (!StringUtils.isBlank(login) && login.equals(request.getRemoteUser())) {
 		    session.setAttribute(AttributeNames.USER, userDTO);
-		    // remove an existing session for the given user
-		    SessionManager.removeSession(login, true);
+
+		    HttpSession existingSession = SessionManager.getSessionForLogin(login);
+		    if (existingSession != null) {
+			// tell SessionListener not to flush credential cache on session destroy,
+			// otherwise this authentication processs fails
+			existingSession.setAttribute(NO_FLUSH_FLAG, true);
+			// remove an existing session for the given user
+			SessionManager.removeSession(login, true);
+		    }
 		    // register current session as the only one for the given user
 		    SessionManager.addSession(login, session);
 		}
