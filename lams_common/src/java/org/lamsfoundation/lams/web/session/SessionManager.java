@@ -121,6 +121,13 @@ public class SessionManager {
     }
 
     /**
+     * Get system session by given login.
+     */
+    public static HttpSession getSessionForLogin(String login) {
+	return SessionManager.loginMapping.get(login);
+    }
+
+    /**
      * Returns number of sessions stored in the container.
      */
     public static int getSessionCount() {
