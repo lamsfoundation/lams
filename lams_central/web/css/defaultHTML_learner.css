@@ -351,8 +351,7 @@ a.button-add-item:before {
 }
 
 .rating-criteria-tag {
-	width: 70%;
-	padding-left: 20px;
+	width: 100%;
 }
 .rating-criteria-tag input[type="text"] {
 	width: 100%;
