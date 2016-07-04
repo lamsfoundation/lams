@@ -1,12 +1,14 @@
 <%@ taglib uri="tags-fmt" prefix="fmt" %>
+<%@ taglib uri="tags-core" prefix="c" %>
+<%@ taglib uri="tags-lams" prefix="lams" %>
 
-<table width="90%" border="0" cellspacing="0" cellpadding="0" bgcolor="#FFFFFF">
-	<tr> 
-		<td> 
-			<div align="center" class="heading">
-				<p><fmt:message key="${messageKey}"/>
-				</p>
-			</div>
-		</td>
-	</tr>
-</table>
+
+<c:set var="title"><fmt:message key="error.title"/></c:set>
+
+<lams:Page type="admin" title="${title}">
+
+	<span class="text-center">
+		 ${messageKey}
+	</span>
+
+</lams:Page>
