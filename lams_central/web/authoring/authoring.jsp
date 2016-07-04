@@ -438,9 +438,7 @@
 					<div id="ldDescriptionDetails">
 						<div class="ldDescriptionLabel"><fmt:message key="authoring.fla.page.ld.description" /></div>
 						<div id="ldDescriptionEditorContainer">
-							<lams:CKEditor id="ldDescriptionFieldDescription" value=""
-								   height="300px"
-								   contentFolderID="${contentFolderID}"/>
+							 <lams:CKEditor id="ldDescriptionFieldDescription" value="" contentFolderID="${contentFolderID}"></lams:CKEditor>
 						</div>
 						
 						<div class="ldDescriptionLabel"><fmt:message key="authoring.fla.page.ld.license" /></div>
