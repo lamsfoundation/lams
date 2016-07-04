@@ -103,10 +103,8 @@
 			</label>
 		</div>
 	
-		<div class="loffset20">
-			<lams:AuthoringRatingCriteria criterias="${sessionMap.ratingCriterias}" hasRatingLimits="true"
-				upLabel="label.authoring.up" downLabel="label.authoring.down" />
-		</div>
+		<lams:AuthoringRatingCriteria criterias="${sessionMap.ratingCriterias}" hasRatingLimits="true"
+			upLabel="label.authoring.up" downLabel="label.authoring.down" />
 	</div>
 	
 </lams:SimplePanel>
