@@ -791,8 +791,11 @@ public class ImageGalleryServiceImpl
 	}
 
 	// don't export following fields
-	for (LearnerItemRatingCriteria criteria : toolContentObj.getRatingCriterias()) {
-	    criteria.setToolContentId(null);
+	Set<LearnerItemRatingCriteria> criterias = toolContentObj.getRatingCriterias();
+	if (criterias != null) {
+	    for (LearnerItemRatingCriteria criteria : criterias) {
+		criteria.setToolContentId(null);
+	    }
 	}
 
 	// set ImageGalleryToolContentHandler as null to avoid copy file node in repository again.
@@ -857,8 +860,11 @@ public class ImageGalleryServiceImpl
 
 	    // reset it to new toolContentId
 	    toolContentObj.setContentId(toolContentId);
-	    for (LearnerItemRatingCriteria criteria : toolContentObj.getRatingCriterias()) {
-		criteria.setToolContentId(toolContentId);
+	    Set<LearnerItemRatingCriteria> criterias = toolContentObj.getRatingCriterias();
+	    if (criterias != null) {
+		for (LearnerItemRatingCriteria criteria : criterias) {
+		    criteria.setToolContentId(toolContentId);
+		}
 	    }
 	    ImageGalleryUser user = imageGalleryUserDao.getUserByUserIDAndContentID(new Long(newUserUid.longValue()),
 		    toolContentId);

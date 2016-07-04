@@ -21,7 +21,6 @@
  * ****************************************************************
  */
 
-
 package org.lamsfoundation.lams.contentrepository.client;
 
 import java.io.IOException;
@@ -35,11 +34,9 @@ import org.lamsfoundation.lams.contentrepository.ICredentials;
 import org.lamsfoundation.lams.contentrepository.ITicket;
 import org.lamsfoundation.lams.contentrepository.IVersionedNode;
 import org.lamsfoundation.lams.contentrepository.InvalidParameterException;
-import org.lamsfoundation.lams.contentrepository.ItemExistsException;
 import org.lamsfoundation.lams.contentrepository.ItemNotFoundException;
 import org.lamsfoundation.lams.contentrepository.NodeKey;
 import org.lamsfoundation.lams.contentrepository.RepositoryCheckedException;
-import org.lamsfoundation.lams.contentrepository.WorkspaceNotFoundException;
 import org.lamsfoundation.lams.contentrepository.service.IRepositoryService;
 import org.lamsfoundation.lams.contentrepository.service.SimpleCredentials;
 
@@ -68,7 +65,7 @@ import org.lamsfoundation.lams.contentrepository.service.SimpleCredentials;
  * Content Repository's applicationContext.xml. The name must be unique to this project.
  * </UL>
  * For example:
- * 
+ *
  * <pre>
  * 	&lt;bean id="blahToolContentHandler" class="your class name here"&gt;
  * 		&lt;property name="repositoryService"&gt; &lt;ref bean="repositoryService"/&lt;/property&gt;
@@ -88,7 +85,7 @@ import org.lamsfoundation.lams.contentrepository.service.SimpleCredentials;
  * <LI>IVersionedNode getFileNode(Long uuid)<BR>
  * Gets the file node from the repository. To get the file stream, do getFileNode().getFile()
  * For example:<BR>
- * 
+ *
  * <pre>
  * NodeKey nodeKey = handler.uploadFile(istream, fileName, fileMimeType);<BR>
  * Long uuid = nodeKey.getUuid();<BR>
@@ -137,38 +134,20 @@ public abstract class ToolContentHandler implements IToolContentHandler {
     @Override
     public abstract char[] getRepositoryId();
 
-    private void configureContentRepository() throws RepositoryCheckedException {
-	ICredentials cred = new SimpleCredentials(getRepositoryUser(), getRepositoryId());
-	try {
-	    getRepositoryService().createCredentials(cred);
-	    getRepositoryService().addWorkspace(cred, getRepositoryWorkspaceName());
-	} catch (ItemExistsException ie) {
-	    log.warn("Tried to configure repository but it " + " appears to be already configured." + "Workspace name "
-		    + getRepositoryWorkspaceName() + ". Exception thrown by repository being ignored. ", ie);
-	} catch (RepositoryCheckedException e) {
-	    log.error("Error occured while trying to configure repository." + "Workspace name "
-		    + getRepositoryWorkspaceName() + " Unable to recover from error: " + e.getMessage(), e);
-	    throw e;
-	}
-    }
-
     @Override
     public ITicket getTicket(boolean forceLogin) throws RepositoryCheckedException {
-	if (ticket == null || forceLogin) {
-	    ICredentials cred = new SimpleCredentials(getRepositoryUser(), getRepositoryId());
-	    try {
-		try {
-		    ticket = getRepositoryService().login(cred, getRepositoryWorkspaceName());
-		} catch (WorkspaceNotFoundException e) {
-		    log.error("Content Repository workspace " + getRepositoryWorkspaceName()
-			    + " not configured. Attempting to configure now.");
-		    configureContentRepository();
-		    ticket = getRepositoryService().login(cred, getRepositoryWorkspaceName());
-		}
-	    } catch (RepositoryCheckedException e) {
-		log.error("Unable to get ticket for workspace " + getRepositoryWorkspaceName(), e);
-		throw e;
+	ICredentials cred = null;
+	boolean doLogin = ticket == null || forceLogin;
+	if (!doLogin) {
+	    // make sure workspace exists - sometimes it does not get created when creating a ticket
+	    cred = new SimpleCredentials(getRepositoryUser(), getRepositoryId());
+	    doLogin = !getRepositoryService().workspaceExists(cred, getRepositoryWorkspaceName());
+	}
+	if (doLogin) {
+	    if (cred == null) {
+		cred = new SimpleCredentials(getRepositoryUser(), getRepositoryId());
 	    }
+	    ticket = getRepositoryService().login(cred, getRepositoryWorkspaceName());
 	}
 	return ticket;
     }
@@ -208,7 +187,7 @@ public abstract class ToolContentHandler implements IToolContentHandler {
 
     /**
      * Save a directory of files in the content repository.
-     * 
+     *
      * @param ticket
      *            ticket issued on login. Identifies tool and workspace - mandatory
      * @param dirPath
@@ -385,7 +364,7 @@ public abstract class ToolContentHandler implements IToolContentHandler {
  * out.flush();
  * return file;
  * }
- * 
+ *
  * protected byte[] getBytes(File file) throws FileNotFoundException, Exception {
  * byte[] byteArray = new byte[(int) file.length()];
  * FileInputStream stream = new FileInputStream(file);
