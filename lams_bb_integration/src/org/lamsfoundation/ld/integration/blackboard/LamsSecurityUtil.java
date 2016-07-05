@@ -41,6 +41,7 @@ import java.util.Properties;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
 
 import org.apache.commons.codec.binary.Hex;
 import org.apache.commons.io.IOUtils;
@@ -48,6 +49,7 @@ import org.apache.log4j.Logger;
 import org.lamsfoundation.ld.integration.dto.LearnerProgressDTO;
 import org.w3c.dom.Document;
 import org.w3c.dom.NamedNodeMap;
+import org.xml.sax.SAXException;
 
 import blackboard.base.BbList;
 import blackboard.data.course.CourseMembership;
@@ -60,6 +62,7 @@ import blackboard.persist.course.CourseMembershipDbLoader;
 import blackboard.persist.user.UserDbLoader;
 import blackboard.platform.BbServiceManager;
 import blackboard.platform.context.Context;
+import blackboard.platform.cx.component.CopyControl;
 import blackboard.portal.data.ExtraInfo;
 import blackboard.portal.data.PortalExtraInfo;
 import blackboard.portal.servlet.PortalUtil;
@@ -599,8 +602,7 @@ public class LamsSecurityUtil {
 			    + country + "&lang=" + lang + "&lsId=" + lsId + "&method=" + method;
 
 	    logger.info("LAMS clone lesson request: " + serviceURL);
-
-	    // InputStream is = url.openConnection().getInputStream();
+	    
 	    InputStream is = LamsSecurityUtil.callLamsServerPost(serviceURL);
 	    // parse xml response
 	    DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
@@ -632,8 +634,14 @@ public class LamsSecurityUtil {
 		    "LAMS Server timeout, did not get a response from the LAMS server. Please contact your systems administrator",
 		    e);
 	} catch (IOException e) {
-		    throw new RuntimeException("Unable to clone LAMS lesson. " + e.getMessage()
-			    + " Please contact your system administrator.", e);
+	    throw new RuntimeException(
+		    "Unable to clone LAMS lesson. " + e.getMessage() + " Please contact your system administrator.", e);
+	} catch (ParserConfigurationException e) {
+	    throw new RuntimeException(
+		    "Unable to clone LAMS lesson. " + e.getMessage() + " Can't instantiate DocumentBuilder.", e);
+	} catch (SAXException e) {
+	    throw new RuntimeException(
+		    "Unable to clone LAMS lesson. " + e.getMessage() + " Can't parse LAMS results.", e);
 	} catch (Exception e) {
 	    throw new RuntimeException("Unable to clone LAMS lesson. Please contact your system administrator.", e);
 	}

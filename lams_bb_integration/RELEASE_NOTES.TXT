@@ -123,3 +123,7 @@ Now reverted back to previous behaviour with lesson loading in the same tab.
 * LDEV-3704: Ability to modify BB lessons' URL host name
 * LDEV-3881: Increase popup size (to 1280x720)
 * LDEV-3880: Notification ON by default with Blackboard integration
+
+1.2.19 Release Fixes
+====================
+* LDEV-3399: Course Copy feature. Remove auxiliary building block and introduce special button to update LAMS links with new lesson ids.
