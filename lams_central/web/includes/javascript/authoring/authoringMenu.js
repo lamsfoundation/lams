@@ -173,6 +173,7 @@ var MenuLib = {
 			
 			if (branchingActivity) {
 				// converge point was just place, end of function
+				layout.addBranchingStart = null;
 				HandlerLib.resetCanvasMode(true);
 				
 				dialog.text('').dialog('close');
