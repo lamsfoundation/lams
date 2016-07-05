@@ -157,6 +157,8 @@ var MenuLib = {
 		var dialog = layout.infoDialog.text(LABELS.BRANCHING_START_PLACE_PROMPT);
 		dialog.dialog('open');
 		
+		layout.addBranchingStart = true;
+		
 		var branchingActivity = null;
 		canvas.css('cursor', 'pointer').click(function(event){
 			// pageX and pageY tell event coordinates relative to the whole page
@@ -179,6 +181,7 @@ var MenuLib = {
 			} else {
 				// extract main branchingActivity structure from created start point
 				branchingActivity = branchingEdge.branchingActivity;
+				layout.addBranchingStart = branchingEdge;
 				dialog.text(LABELS.BRANCHING_END_PLACE_PROMPT);
 			}
 		});

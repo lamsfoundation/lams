@@ -47,6 +47,8 @@ var paper = null,
 		'liveEdit'   : false,
 		// should the sequence be saved before exiting?
 		'modified'   : false,
+		// was start point of a new branching placed?
+		'addBranchingStart' : null,
 		// list of all dialogs, so they can be easily closed all at once 
 		'dialogs' : [],
 		// icons for special activities
