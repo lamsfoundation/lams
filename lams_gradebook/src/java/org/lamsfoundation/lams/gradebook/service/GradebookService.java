@@ -768,6 +768,8 @@ public class GradebookService implements IGradebookService {
 
 	LinkedHashMap<String, ExcelCell[][]> dataToExport = new LinkedHashMap<String, ExcelCell[][]>();
 
+	SimpleDateFormat cellDateFormat = new SimpleDateFormat(FileUtil.EXPORT_TO_SPREADSHEET_TITLE_DATE_FORMAT);
+
 	// -------------------- process summary excel page --------------------------------
 
 	// The entire data list
@@ -852,27 +854,39 @@ public class GradebookService implements IGradebookService {
 
 	for (Activity activity : activityToUserDTOMap.keySet()) {
 
-	    ExcelCell[] activityTitleRow = new ExcelCell[5];
+	    ExcelCell[] activityTitleRow = new ExcelCell[7];
 	    activityTitleRow[0] = new ExcelCell(activity.getTitle(), true);
 	    rowList1.add(activityTitleRow);
-	    ExcelCell[] titleRow = new ExcelCell[5];
-	    titleRow[0] = new ExcelCell(getMessage("gradebook.export.last.name"), true);
-	    titleRow[1] = new ExcelCell(getMessage("gradebook.export.first.name"), true);
-	    titleRow[2] = new ExcelCell(getMessage("gradebook.export.login"), true);
-	    titleRow[3] = new ExcelCell(getMessage("gradebook.export.time.taken.seconds"), true);
-	    titleRow[4] = new ExcelCell(getMessage("gradebook.columntitle.mark"), true);
+	    
+	    int count = 0;
+	    ExcelCell[] titleRow = new ExcelCell[7];
+	    titleRow[count++] = new ExcelCell(getMessage("gradebook.export.last.name"), true);
+	    titleRow[count++] = new ExcelCell(getMessage("gradebook.export.first.name"), true);
+	    titleRow[count++] = new ExcelCell(getMessage("gradebook.export.login"), true);
+	    titleRow[count++] = new ExcelCell(getMessage("gradebook.columntitle.startDate"), true);
+	    titleRow[count++] = new ExcelCell(getMessage("gradebook.columntitle.completeDate"), true);
+	    titleRow[count++] = new ExcelCell(getMessage("gradebook.export.time.taken.seconds"), true);
+	    titleRow[count++] = new ExcelCell(getMessage("gradebook.columntitle.mark"), true);
 	    rowList1.add(titleRow);
 
 	    // Get the rest of the data
 	    List<GBUserGridRowDTO> userDtos = activityToUserDTOMap.get(activity);
 	    for (GBUserGridRowDTO userDto : userDtos) {
-		ExcelCell[] userDataRow = new ExcelCell[5];
 
-		userDataRow[0] = new ExcelCell(userDto.getLastName(), false);
-		userDataRow[1] = new ExcelCell(userDto.getFirstName(), false);
-		userDataRow[2] = new ExcelCell(userDto.getLogin(), false);
-		userDataRow[3] = new ExcelCell(userDto.getTimeTakenSeconds(), false);
-		userDataRow[4] = new ExcelCell(userDto.getMark(), false);
+		String startDate = (userDto.getStartDate() == null) ? ""
+			: cellDateFormat.format(userDto.getStartDate());
+		String finishDate = (userDto.getFinishDate() == null) ? ""
+			: cellDateFormat.format(userDto.getFinishDate());
+
+		count = 0;
+		ExcelCell[] userDataRow = new ExcelCell[7];
+		userDataRow[count++] = new ExcelCell(userDto.getLastName(), false);
+		userDataRow[count++] = new ExcelCell(userDto.getFirstName(), false);
+		userDataRow[count++] = new ExcelCell(userDto.getLogin(), false);
+		userDataRow[count++] = new ExcelCell(startDate, false);
+		userDataRow[count++] = new ExcelCell(finishDate, false);
+		userDataRow[count++] = new ExcelCell(userDto.getTimeTakenSeconds(), false);
+		userDataRow[count++] = new ExcelCell(userDto.getMark(), false);
 		rowList1.add(userDataRow);
 	    }
 
@@ -888,8 +902,6 @@ public class GradebookService implements IGradebookService {
 	if (lesson.getAllLearners() != null) {
 	    learners.addAll(lesson.getAllLearners());
 	}
-
-	SimpleDateFormat cellDateFormat = new SimpleDateFormat(FileUtil.EXPORT_TO_SPREADSHEET_TITLE_DATE_FORMAT);
 
 	rowList = new LinkedList<ExcelCell[]>();
 	for (User learner : learners) {
