@@ -45,6 +45,8 @@ var paper = null,
 		'drawMode'   : false,
 		// should the sequence be saved before exiting?
 		'modified'   : false,
+		// was start point of a new branching placed?
+		'addBranchingStart' : null,
 		// list of all dialogs, so they can be easily closed all at once 
 		'dialogs' : [],
 		// stores precached tool images so they can be used in exported SVG
