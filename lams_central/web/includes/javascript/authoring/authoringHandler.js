@@ -221,6 +221,17 @@ var HandlerLib = {
 		      .off('mousedown')
 		      .off('mouseup')
 		      .off('mousemove');
+		
+		// if the user started adding a branching and did not finish it
+		if (layout.addBranchingStart){			
+			layout.infoDialog.text('').dialog('close');
+			
+			if (layout.addBranchingStart instanceof ActivityDefs.BranchingEdgeActivity) {
+				layout.activities.splice(layout.activities.indexOf(layout.addBranchingStart), 1);
+				layout.addBranchingStart.items.remove();
+			}
+			layout.addBranchingStart = null;
+		}
 
 		if (init) {
 			 // if clicked anywhere, activity selection is gone
