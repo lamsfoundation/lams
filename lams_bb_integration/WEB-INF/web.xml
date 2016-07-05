@@ -22,6 +22,10 @@
     <servlet-class>org.lamsfoundation.ld.integration.blackboard.LamsLearningDesignDeleteServlet</servlet-class>
   </servlet>
   <servlet>
+    <servlet-name>CloneLessonsServlet</servlet-name>
+    <servlet-class>org.lamsfoundation.ld.integration.blackboard.CloneLessonsServlet</servlet-class>
+  </servlet>  
+  <servlet>
     <servlet-name>GradebookServlet</servlet-name>
     <servlet-class>org.lamsfoundation.ld.integration.blackboard.GradebookServlet</servlet-class>
   </servlet>
@@ -54,6 +58,10 @@
     <servlet-name>UserDataServlet</servlet-name>
     <url-pattern>/UserData</url-pattern>
   </servlet-mapping>
+  <servlet-mapping>
+    <servlet-name>CloneLessonsServlet</servlet-name>
+    <url-pattern>/CloneLessons</url-pattern>
+  </servlet-mapping>   
   <servlet-mapping>
     <servlet-name>GroupDataServlet</servlet-name>
     <url-pattern>/GroupData</url-pattern>

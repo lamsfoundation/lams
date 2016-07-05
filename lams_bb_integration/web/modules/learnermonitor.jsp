@@ -78,8 +78,8 @@
 	
     // Get Course ID and Session User ID
     BbPersistenceManager bbPm = BbServiceManager.getPersistenceService().getDbPersistenceManager();
-    String course_idstr = request.getParameter("course_id");    
-    Id course_id = bbPm.generateId(Course.DATA_TYPE, course_idstr);
+    String courseIdParam = request.getParameter("course_id");    
+    Id course_id = bbPm.generateId(Course.DATA_TYPE, courseIdParam);
     User sessionUser = ctx.getUser();
     Id sessionUserId = sessionUser.getId();
 
@@ -87,7 +87,7 @@
     CourseMembership courseMembership = null;
     CourseMembership.Role courseRole = null;
     boolean isActive = false;
-    
+
     CourseMembershipDbLoader sessionCourseMembershipLoader = (CourseMembershipDbLoader) bbPm.getLoader(CourseMembershipDbLoader.TYPE);
     try {
         courseMembership = sessionCourseMembershipLoader.loadByCourseAndUserId(course_id, sessionUserId);
@@ -104,7 +104,7 @@
     // Is the User an Instructor of Teaching Assistant
     boolean instructorstr=false;
     if (CourseMembership.Role.INSTRUCTOR.equals(courseRole) || CourseMembership.Role.TEACHING_ASSISTANT.equals(courseRole)
-	    	|| CourseMembership.Role.COURSE_BUILDER.equals(courseRole)) {
+    	|| CourseMembership.Role.COURSE_BUILDER.equals(courseRole)) {
         instructorstr=true;
         
     } else if (!CourseMembership.Role.STUDENT.equals(courseRole)) {
@@ -118,18 +118,18 @@
     }
     
     //Get lessson's title and description
-    String contentIdStr = request.getParameter("content_id");
     String title = "";
     String description = "";
     String strLineitemId = null;
     String position = "unknown";
     //contentId is available in versions after 1.2.3
-    if (contentIdStr != null) {
+    String contentIdParam = request.getParameter("content_id");
+    if (contentIdParam != null) {
     	
         Container bbContainer = bbPm.getContainer();
-        Id contentId = new PkId( bbContainer, CourseDocument.DATA_TYPE, request.getParameter("content_id") );
-        ContentDbLoader courseDocumentLoader = (ContentDbLoader) bbPm.getLoader( ContentDbLoader.TYPE );
-        Content courseDoc = (Content)courseDocumentLoader.loadById( contentId );
+        Id contentId = new PkId(bbContainer, CourseDocument.DATA_TYPE, contentIdParam);
+        ContentDbLoader courseDocumentLoader = (ContentDbLoader) bbPm.getLoader(ContentDbLoader.TYPE);
+        Content courseDoc = (Content) courseDocumentLoader.loadById(contentId);
         title = courseDoc.getTitle();
         description = courseDoc.getBody().getFormattedText();
         position = String.valueOf(courseDoc.getPosition());
@@ -137,53 +137,55 @@
         //get lineitemid from the storage (bbContentId -> lineitemid)
 	    PortalExtraInfo pei = PortalUtil.loadPortalExtraInfo(null, null, "LamsLineitemStorage");
 	    ExtraInfo ei = pei.getExtraInfo();
-	    strLineitemId = ei.getValue(contentIdStr);
+	    strLineitemId = ei.getValue(contentIdParam);
 	    
     } else {
-    
+
     	title = (request.getParameter("title") != null) ? request.getParameter("title") : "LAMS Options";
     	description = request.getParameter("description");
         strLineitemId = request.getParameter("lineitemid");
     }
 
     //display learning design image
-    String strIsDisplayDesignImage = request.getParameter("isDisplayDesignImage");
-    boolean isDisplayDesignImage = "true".equals(strIsDisplayDesignImage)?true:false;
-    String learningDesignImageUrl = "";
-    if (isDisplayDesignImage) {
-		String strLearningDesignId = request.getParameter("ldid").trim();
-	    long learningDesignId = Long.parseLong(strLearningDesignId);
-	    
-	    learningDesignImageUrl = LamsSecurityUtil.generateRequestLearningDesignImage(ctx, false) + "&ldId=" + learningDesignId;
-    }
-    
-    //check whether user has score for this lesson
-    Score current_score = null;
-	if (strLineitemId != null) { // there won't be "lineitemid" parameter in case lesson had been created in LAMS building block version prior to 1.2 
-	    
-	    //check if it was created in old versions (e.g. 1.2.1) where lineitemId parameter had the following format "PkId(key=_XXXX_1, %20dataType=blackboard.data.gradebook.impl.OutcomeDefinition, %20container=blackboard.persist.DatabaseContainer@xxxx)"
-	    //in which case transform it to the more regular one
-		if (strLineitemId.contains("key=")) {
-			int pos1 = strLineitemId.indexOf("key=") + 4;
-			int pos2 = strLineitemId.indexOf(",", pos1);
+ 	String strIsDisplayDesignImage = request.getParameter("isDisplayDesignImage");
+ 	boolean isDisplayDesignImage = "true".equals(strIsDisplayDesignImage) ? true : false;
+ 	String learningDesignImageUrl = "";
+ 	if (isDisplayDesignImage) {
+ 	    String strLearningDesignId = request.getParameter("ldid").trim();
+ 	    long learningDesignId = Long.parseLong(strLearningDesignId);
 
-			if (pos1 != -1 && pos2 != -1 && pos1 <= pos2 && pos2 <= strLineitemId.length()) {
-			    strLineitemId = strLineitemId.substring(pos1, pos2);
-			}
-		}
-	    
+ 	    learningDesignImageUrl = LamsSecurityUtil.generateRequestLearningDesignImage(ctx, false) + "&ldId="
+ 		    + learningDesignId;
+ 	}
+
+ 	//check whether user has score for this lesson
+ 	Score current_score = null;
+ 	if (strLineitemId != null) { // there won't be "lineitemid" parameter in case lesson had been created in LAMS building block version prior to 1.2 
+
+ 	    //check if it was created in old versions (e.g. 1.2.1) where lineitemId parameter had the following format "PkId(key=_XXXX_1, %20dataType=blackboard.data.gradebook.impl.OutcomeDefinition, %20container=blackboard.persist.DatabaseContainer@xxxx)"
+ 	    //in which case transform it to the more regular one
+ 		if (strLineitemId.contains("key=")) {
+ 			int pos1 = strLineitemId.indexOf("key=") + 4;
+	 		int pos2 = strLineitemId.indexOf(",", pos1);
+
+ 			if (pos1 != -1 && pos2 != -1 && pos1 <= pos2 && pos2 <= strLineitemId.length()) {
+ 			    strLineitemId = strLineitemId.substring(pos1, pos2);
+	 		}
+ 		}
+
 	    Id lineitemId = bbPm.generateId(Lineitem.LINEITEM_DATA_TYPE, strLineitemId.trim());
 	    ScoreDbLoader scoreLoader = (ScoreDbLoader) bbPm.getLoader(ScoreDbLoader.TYPE);
-		try {
-		    current_score = scoreLoader.loadByCourseMembershipIdAndLineitemId(courseMembership.getId(), lineitemId);
-		} catch (KeyNotFoundException c) {
-		    //no score availalbe
-		}
+	    try {
+ 			current_score = scoreLoader.loadByCourseMembershipIdAndLineitemId(courseMembership.getId(),
+ 				lineitemId);
+	    } catch (KeyNotFoundException c) {
+ 			//no score availalbe
+	    }
 	}
     boolean isScoreAvailable = (current_score != null);
     
 	String strLessonId = request.getParameter("lsid").trim();
-	long lessonId = Long.parseLong(strLessonId);    
+	long lessonId = Long.parseLong(strLessonId);
 	LearnerProgressDTO learnerProgressDto = LamsSecurityUtil.getLearnerProgress(ctx, lessonId);
 %>
 
