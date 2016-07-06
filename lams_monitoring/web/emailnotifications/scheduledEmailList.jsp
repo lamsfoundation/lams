@@ -41,7 +41,7 @@
 		<c:forEach var="emailJob" items="${scheduleList}">
 			<tr>
 				<td style="vertical-align: top;">
-					<fmt:formatDate value="${emailJob.triggerDate}" type="date" />
+					<lams:Date value="${emailJob.triggerDate}"/>
 				</td>
 				<td  style="vertical-align: top;">
 					<c:choose>
