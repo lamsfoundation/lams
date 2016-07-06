@@ -1103,15 +1103,21 @@ public class QaLearningAction extends LamsDispatchAction implements QaAppConstan
 	    //JSONArray cell=new JSONArray();
 	    //cell.put(StringEscapeUtils.escapeHtml(user.getFirstName()) + " " + StringEscapeUtils.escapeHtml(user.getLastName()) + " [" + StringEscapeUtils.escapeHtml(user.getLogin()) + "]");
 
+	    /*  LDEV-3891: This code has been commented out, as the escapeCsv puts double quotes in the string, which goes through to the 
+	     * client and wrecks img src entries. It appears the browser cannot process the string with all the double quotes. 
+	     * This is the second time it is being fixed - the escapeCsv was removed in LDEV-3448 and then added back in 
+	     * when Peer Review was added (LDEV-3480). If escapeCsv needs to be added in again, make sure it does not break 
+	     * learner added images being seen in monitoring.
 	    //remove leading and trailing quotes
 	    String answer = StringEscapeUtils.escapeCsv(response.getAnswer());
 	    if (isAllowRichEditor && answer.startsWith("\"") && answer.length() >= 3) {
 		answer = answer.substring(1, answer.length() - 1);
 	    }
+	     */
 
 	    JSONObject responseRow = new JSONObject();
 	    responseRow.put("responseUid", response.getResponseId().toString());
-	    responseRow.put("answer", answer);
+	    responseRow.put("answer", response.getAnswer());
 	    responseRow.put("userName", StringEscapeUtils.escapeCsv(user.getFullname()));
 	    responseRow.put("visible", new Boolean(response.isVisible()).toString());
 
