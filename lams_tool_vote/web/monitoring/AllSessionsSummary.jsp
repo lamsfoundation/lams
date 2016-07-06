@@ -36,7 +36,7 @@
 			<c:set var="questionUid" scope="request" value="${currentNomination.questionUid}"/>
 			<tr>
 				<td  valign=top class="align-left">
-					<c:out value="${currentNomination.nomination}" escapeXml="true"/>
+					<c:out value="${currentNomination.nomination}" escapeXml="false"/>
 				</td>
 						
 				<td  valign=top class="align-left">				  	 		
