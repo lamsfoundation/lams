@@ -17,8 +17,8 @@
 	<lams:css/>
 	<link type="text/css" href="<lams:LAMSURL/>css/jquery-ui-smoothness-theme.css" rel="stylesheet">
 	<link rel="stylesheet" type="text/css" href="<lams:LAMSURL/>/css/jquery.jqGrid.css" />
-	
-	<style media="screen,projection" type="text/css">
+	<link type="text/css" href="<lams:LAMSURL/>css/jquery-ui.timepicker.css" rel="stylesheet">
+	<style type="text/css">
 		div#content {min-height: 250px; }
 		#emailTextareaDiv {float: right;}
 		#emailButton {text-align: right; float: right;}
@@ -42,10 +42,11 @@
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery.js"></script>
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/monitorToolSummaryAdvanced.js "></script>
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery-ui.js"></script>
-	<script language="JavaScript" type="text/javascript" src="<lams:LAMSURL/>/includes/javascript/jquery.jqGrid.locale-en.js"></script>
-	<script language="JavaScript" type="text/javascript" src="<lams:LAMSURL/>/includes/javascript/jquery.jqGrid.js"></script>
-	<script language="JavaScript" type="text/javascript" src="<lams:LAMSURL/>/includes/javascript/jquery.jstepper.min.js"></script>
-	<script language="JavaScript" type="text/javascript">
+	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery-ui.timepicker.js"></script>
+	<script type="text/javascript" src="<lams:LAMSURL/>/includes/javascript/jquery.jqGrid.locale-en.js"></script>
+	<script type="text/javascript" src="<lams:LAMSURL/>/includes/javascript/jquery.jqGrid.js"></script>
+	<script type="text/javascript" src="<lams:LAMSURL/>/includes/javascript/jquery.jstepper.min.js"></script>
+	<script type="text/javascript">
 		jQuery(document).ready(function() {
 			
 			//initialize user list 
@@ -74,11 +75,8 @@
 			//initialize jStepper for additional parameters
 			$("#daysToDeadline").jStepper({minValue:0, maxValue:999, defaultValue:3, allowDecimals:false});
 			
-    		//initialize datePicker
-    		$( "#datePicker" ).datepicker({ 
-    			dateFormat: 'dd/mm/yy',
-    			minDate: 1
-    		});
+    		//initialize datetimepicker
+    		$("#datePicker").datetimepicker();
     		
     		//initialize accordion
     		$( "#accordion" ).accordion({
@@ -109,16 +107,16 @@
     			} else if (isInstantEmailing && !ids.length) {
     				return;
     				
-    			} else { //in case of scheduling
-    				var scheduleDate = $("#datePicker").datepicker( "getDate" );
+    			//in case of scheduling
+    			} else {
+    				//get the timestamp in milliseconds since midnight Jan 1, 1970
+    				var scheduleDate = $("#datePicker").datetimepicker('getDate');
     				if (scheduleDate == null) {
     					return;
-    				} else {
-    					scheduleDate = scheduleDate.getTime();
     				}
         			       			
     				var searchType = document.getElementById("searchType").value;
-    				params = "&searchType=" + searchType + "&scheduleDate=" + scheduleDate + getSearchParams(); 
+    				params = "&searchType=" + searchType + "&scheduleDate=" + scheduleDate.getTime() + getSearchParams();
     			}
     			
     			var emailBody = encodeURIComponent(document.getElementById("emailBody").value);
