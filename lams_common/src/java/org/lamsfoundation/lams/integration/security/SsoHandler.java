@@ -98,11 +98,11 @@ public class SsoHandler implements ServletExtension {
 			userDTO = user.getUserDTO();
 		    }
 		}
-		
+
 		// prevent session fixation attack
 		// This will become obsolete on Undertow upgrade to version 1.1.10+
 		request.changeSessionId();
-		
+
 		// store session so UniversalLoginModule can access it
 		SessionManager.startSession(request);
 
@@ -134,6 +134,19 @@ public class SsoHandler implements ServletExtension {
      * ServletFormAuthenticationMechanism method.
      */
     protected static void handleRedirectBack(ServletRequestContext context, String redirectURL) {
+	/*
+	 * Prevent HTTP Response Splitting attack by sanitizing redirectURL.
+	 * The attack was possible by changing action of login form to, for example,
+	 * "j_security_check?redirectURL=%0d%0aAppScanHeader:%20AppScanValue%2f1%2e2%2d3%0d%0aSecondAppScanHeader:%20whatever"
+	 * Putting it in redirectURL form field or using another GET parameter ("something", "j_username") did not work.
+	 * The result was a split HTTP response with AppScanHeader and SecondAppScanHeader set, resultint in a security
+	 * threat.
+	 */
+	if (redirectURL.contains("\n") || redirectURL.contains("\r")) {
+	    throw new SecurityException(
+		    "redirectURL contains forbidden characters: \\n or \\r. Possible HTTP Response Splitting attack.");
+	}
+
 	HttpSessionImpl httpSession = context.getCurrentServletContext().getSession(context.getExchange(), true);
 	if (httpSession != null) {
 	    Session session;
