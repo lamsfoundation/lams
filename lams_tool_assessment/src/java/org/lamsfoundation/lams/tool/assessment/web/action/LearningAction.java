@@ -1000,7 +1000,8 @@ public class LearningAction extends Action {
 
 	//calculate whether user has failed this attempt
 	int passingMark = assessment.getPassingMark();
-	boolean isUserFailed = ((passingMark != 0) && (passingMark > result.getGrade()));
+	double gradeRoundedTo2DecimalPlaces = Math.round(result.getGrade() * 100.0) / 100.0;
+	boolean isUserFailed = ((passingMark != 0) && (passingMark > gradeRoundedTo2DecimalPlaces));
 	sessionMap.put(AssessmentConstants.ATTR_IS_USER_FAILED, isUserFailed);
 
 	sessionMap.put(AssessmentConstants.ATTR_ASSESSMENT_RESULT, result);
