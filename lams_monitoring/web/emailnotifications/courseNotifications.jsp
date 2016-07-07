@@ -76,13 +76,11 @@
 			//initialize datetimepicker
     		$("#datePicker").datetimepicker();
 
-			debugger;
     		//initialize accordion
     		$( "#accordion" ).accordion({
     			create: function(event, ui) {
     				// accordion probably sets its height based on empty grid
     				// once it is loaded, it needs to be adjusted
-    				debugger;
     				$('div.ui-accordion-content').css('height', '100%');
     			},
     			activate: function(event, ui) {
@@ -121,7 +119,6 @@
 			
     		$('#emailButton').click(function() {
     			
-    			debugger;
     			var isInstantEmailing = ($('#accordion').accordion('option', 'active') == 0);
     			var ids = jQuery("#list3").getGridParam('selarrrow');
     			var params = "";
