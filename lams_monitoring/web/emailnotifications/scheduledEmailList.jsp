@@ -23,12 +23,51 @@
 		html {margin: 0;overflow:auto;background: none;}
 		body {background: none;	min-height: 100%;width: 100%;}	
 	</style>
+	
+	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery.js"></script>
+	<script type="text/javascript">
+	var deleteConfirmationMessage1 = '<fmt:message key="email.notification.delete.alert1"><fmt:param>%replace%</fmt:param></fmt:message>';
+	var deleteConfirmationMessage2 = '<fmt:message key="email.notification.delete.alert2"/>';
+	
+	function deleteNotification(triggerName, scheduledate, deleteUrlParams) {
+		var msg = deleteConfirmationMessage1;
+		msg = msg.replace('%replace%', scheduledate);
+		if (confirm(msg+'\n\n'+deleteConfirmationMessage2)) {
+ 			$.ajax({
+				async : false,
+				url : '<c:url value="/emailNotifications.do"/>',
+ 				data : deleteUrlParams+'&triggerName=' + triggerName,
+ 				type : "POST",
+				success : function(json) {
+ 					if (json.deleteNotification == 'true') {
+						window.location.reload();
+					} else {
+						alert(json.deleteNotification);
+					}
+				}
+			});
+ 		}
+	}
+	
+	</script>
+	
 </lams:head>
 
 <body>
 	<h2 style="padding: 20px 25px 0;">
 		<fmt:message key="email.notifications.scheduled.messages.list"/>
 	</h2>
+
+	<c:choose>
+		<c:when test="${lessonID != null}">
+			<c:set var="returnUrlParams">?method=getLessonView&lessonID=${lessonID}</c:set>
+			<c:set var="deleteUrlParams">method=deleteNotification&lessonID=${lessonID}</c:set>
+		</c:when>
+		<c:otherwise>
+			<c:set var="returnUrlParams">?method=getCourseView&organisationID=${organisationID}</c:set>
+			<c:set var="deleteUrlParams">method=deleteNotification&organisationID=${organisationID}</c:set>
+		</c:otherwise>
+	</c:choose>
 
 	<table style="padding: 10px 30px;">
 		<thead>
@@ -47,7 +86,12 @@
 		<c:forEach var="emailJob" items="${scheduleList}">
 			<tr>
 				<td style="border-bottom: 1px solid #efefef;">
-					<lams:Date value="${emailJob.triggerDate}"/>
+					<c:set var="tDate"><lams:Date value="${emailJob.triggerDate}"/></c:set>
+					${tDate}<BR/>
+					
+					<a href="#" onclick="javascript:deleteNotification('${emailJob.triggerName}', '${tDate}', '${deleteUrlParams}');">
+						<fmt:message key="email.notifications.delete" />
+					</a>
 				</td>
 				<td style="border-bottom: 1px solid #efefef;">
 					<c:choose>
@@ -71,14 +115,6 @@
 		</c:forEach>
 	</table>
 	
-	<c:choose>
-		<c:when test="${lessonID != null}">
-			<c:set var="returnUrlParams">?method=getLessonView&lessonID=${lessonID}</c:set>
-		</c:when>
-		<c:otherwise>
-			<c:set var="returnUrlParams">?method=getCourseView&organisationID=${organisationID}</c:set>
-		</c:otherwise>
-	</c:choose>
 	<a href="<c:url value='/emailNotifications.do'/>${returnUrlParams}" style="margin: 30px 50px; float: right;">
 		<fmt:message key="email.notifications.scheduled.messages.list.back" />
 	</a>
