@@ -69,6 +69,7 @@ import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.quartz.JobBuilder;
 import org.quartz.JobDataMap;
 import org.quartz.JobDetail;
+import org.quartz.JobKey;
 import org.quartz.Scheduler;
 import org.quartz.SchedulerException;
 import org.quartz.Trigger;
@@ -232,6 +233,7 @@ public class EmailNotificationsAction extends LamsDispatchAction {
 		String emailBody = WebUtil.convertNewlines((String) jobDataMap.get("emailBody"));
 		int searchType = (Integer) jobDataMap.get("searchType");
 		EmailScheduleMessageJobDTO emailScheduleJobDTO = new EmailScheduleMessageJobDTO();
+		emailScheduleJobDTO.setTriggerName(triggerName);
 		emailScheduleJobDTO.setTriggerDate(triggerDate);
 		emailScheduleJobDTO.setEmailBody(emailBody);
 		emailScheduleJobDTO.setSearchType(searchType);
@@ -244,6 +246,76 @@ public class EmailNotificationsAction extends LamsDispatchAction {
 	request.setAttribute(AttributeNames.PARAM_ORGANISATION_ID, organisationId);
 
 	return mapping.findForward("scheduledEmailList");
+    }
+
+    /**
+     * Delete a scheduled emails.
+     * @throws JSONException 
+     */
+    public ActionForward deleteNotification(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+	    HttpServletResponse response) throws IOException, ServletException, SchedulerException, JSONException {
+	
+	String inputTriggerName = WebUtil.readStrParam(request, "triggerName");
+	Long lessonId = WebUtil.readLongParam(request, AttributeNames.PARAM_LESSON_ID, true);
+	Integer userId = getUser().getUserID();
+	boolean isLessonNotifications = (lessonId != null);
+	Integer organisationId = WebUtil.readIntParam(request, AttributeNames.PARAM_ORGANISATION_ID, true);
+
+	IMonitoringService monitoringService = MonitoringServiceProxy.getMonitoringService(getServlet()
+		.getServletContext());
+	getUserManagementService();
+	Scheduler scheduler = getScheduler();
+
+	JSONObject jsonObject = new JSONObject();
+	String error = null;
+
+	try {
+	    // if this method throws an Exception, there will be no deleteNotification=true in the JSON reply
+	    if (isLessonNotifications) {
+		if (!getSecurityService().isLessonMonitor(lessonId, userId,
+			"show scheduled lesson email notifications", false)) {
+		    error = "Unable to delete notification: the user is not a monitor in the lesson";
+		}
+	    } else {
+		if (!getSecurityService().isGroupMonitor(organisationId, userId,
+			"show scheduled course course email notifications", false)) {
+		    error = "Unable to delete notification: the user is not a monitor in the organisation";
+		}
+	    }
+
+	    if ( error == null ) {
+		Set<TriggerKey> triggerKeys = scheduler.getTriggerKeys(GroupMatcher
+			.triggerGroupEquals(Scheduler.DEFAULT_GROUP));
+		for (TriggerKey triggerKey : triggerKeys) {
+		    String triggerName = triggerKey.getName();
+		    if (triggerName.equals(inputTriggerName)) {
+			Trigger trigger = scheduler.getTrigger(triggerKey);
+
+			JobKey jobKey = trigger.getJobKey();
+
+			JobDetail jobDetail = scheduler.getJobDetail(trigger.getJobKey());
+			JobDataMap jobDataMap = jobDetail.getJobDataMap();
+			getAuditService().log(MonitoringConstants.MONITORING_MODULE_NAME,
+				"Deleting unsent scheduled notification " + jobKey + " " + jobDataMap.getString("emailBody"));
+
+			scheduler.deleteJob(jobKey);
+
+		    }
+		}
+
+	    }
+	    
+	} catch (Exception e) {
+	    String[] msg = new String[1];
+	    msg[0] = e.getMessage();
+	    error = monitoringService.getMessageService().getMessage("error.system.error", msg);
+	}
+
+	jsonObject.put("deleteNotification", error == null ? "true" : error);
+	response.setContentType("application/json;charset=utf-8");
+	response.getWriter().print(jsonObject);
+	return null;
+
     }
 
     /**
