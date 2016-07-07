@@ -31,6 +31,7 @@ import org.apache.commons.lang.builder.ToStringBuilder;
 
 public class EmailScheduleMessageJobDTO implements Serializable, Comparable {
 
+    private String triggerName;
     private Date triggerDate;
     private String emailBody;
     private int searchType;
@@ -59,9 +60,17 @@ public class EmailScheduleMessageJobDTO implements Serializable, Comparable {
 	this.searchType = searchType;
     }
 
+    public String getTriggerName() {
+        return triggerName;
+    }
+
+    public void setTriggerName(String triggerName) {
+        this.triggerName = triggerName;
+    }
+
     @Override
     public String toString() {
-	return new ToStringBuilder(this).append("emailBody", emailBody).append("triggerDate", triggerDate)
+	return new ToStringBuilder(this).append("triggerName", triggerName).append("emailBody", emailBody).append("triggerDate", triggerDate)
 		.append("searchType", searchType).toString();
     }
 
@@ -69,7 +78,7 @@ public class EmailScheduleMessageJobDTO implements Serializable, Comparable {
     public int compareTo(Object other) {
 	EmailScheduleMessageJobDTO otherDto = (EmailScheduleMessageJobDTO) other;
 	return new CompareToBuilder().append(triggerDate, otherDto.triggerDate).append(emailBody, otherDto.emailBody)
-		.append(searchType, otherDto.searchType).toComparison();
+		.append(searchType, otherDto.searchType).append("triggerName", triggerName).toComparison();
     }
 
 }
