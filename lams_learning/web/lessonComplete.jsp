@@ -64,12 +64,15 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 		</fmt:message>
 	</div>
 	
-	<div class="voffset10">
-		<fmt:message key="message.lesson.restart" />
-		<a class="btn btn-default loffset20" href="#" onClick="javascript:restartLesson()">
-			<fmt:message key="message.lesson.restart.button" />
-		</a>
-	</div>
+	<%-- lessonID is set in CompleteActivityAction and LessonCompleteActivityAction only if lesson.allowLearnerRestart is on --%>
+	<c:if test="${not empty lessonID}">
+		<div class="voffset10">
+			<fmt:message key="message.lesson.restart" />
+			<a class="btn btn-default loffset20" href="#" onClick="javascript:restartLesson()">
+				<fmt:message key="message.lesson.restart.button" />
+			</a>
+		</div>
+	</c:if>
 	
 	<c:if test="${not empty releasedLessons}">
 		<div class="voffset10">
