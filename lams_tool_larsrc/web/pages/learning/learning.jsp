@@ -160,7 +160,7 @@
 
 		<!--  Instructions -->
 		<div class="panel">
-			<c:out value="${resource.instructions}" escapeXml="false"/> ${resource.allowAddFiles} ${resource.allowAddUrls } 
+			<c:out value="${resource.instructions}" escapeXml="false"/>
 		</div>
 
 		<!-- Resources to View -->
