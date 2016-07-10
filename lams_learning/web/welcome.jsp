@@ -29,7 +29,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 
 <script language="JavaScript" type="text/JavaScript">
 <!--
-	parent.frames['contentFrame'].location.href = "learner.do?method=joinLesson&lessonID=<c:out value='${lessonID}' escapeXml='false' />";
+	parent.frames['contentFrame'].location.href = "learner.do?method=joinLesson&lessonID=<c:out value='${lessonID}' escapeXml='true' />";
 //-->
 </script>
 
