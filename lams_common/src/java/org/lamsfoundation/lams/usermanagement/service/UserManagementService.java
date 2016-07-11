@@ -115,15 +115,11 @@ public class UserManagementService implements IUserManagementService {
 
     @Override
     public void save(Object object) {
-	try {
-	    if (object instanceof User) {
-		User user = (User) object;
-		object = saveUser(user);
-	    }
-	    baseDAO.insertOrUpdate(object);
-	} catch (Exception e) {
-	    log.debug(e);
+	if (object instanceof User) {
+	    User user = (User) object;
+	    object = saveUser(user);
 	}
+	baseDAO.insertOrUpdate(object);
     }
 
     protected User saveUser(User user) {
