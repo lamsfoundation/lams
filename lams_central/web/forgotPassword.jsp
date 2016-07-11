@@ -1,4 +1,5 @@
-<%@ page language="java" pageEncoding="UTF-8" contentType="text/html;charset=utf-8"%>
+<%@ page language="java" pageEncoding="UTF-8"
+	contentType="text/html;charset=utf-8"%>
 <%@page import="org.apache.struts.action.ActionMessages"%>
 <%@ page import="org.lamsfoundation.lams.util.Configuration"%>
 <%@ page import="org.lamsfoundation.lams.util.ConfigurationKeys"%>
@@ -17,9 +18,9 @@
 	<lams:css />
 	<title><fmt:message key="title.forgot.password" /></title>
 	<link rel="icon" href="<lams:LAMSURL/>/favicon.ico" type="image/x-icon" />
-	<link rel="shortcut icon" href="<lams:LAMSURL/>/favicon.ico" type="image/x-icon" />
-	<script language="javascript" type="text/javascript">
-	<!--
+	<link rel="shortcut icon" href="<lams:LAMSURL/>/favicon.ico"
+		type="image/x-icon" />
+	<script type="text/javascript">
 		function toHome() {
 			window.location = "<lams:LAMSURL/>index.do";
 		};
@@ -75,7 +76,6 @@
 			} else
 				return true;
 		}
-	//-->
 	</script>
 </lams:head>
 
@@ -86,7 +86,8 @@
 <body class="stripes" onload="radioSelected();">
 
 	<lams:Page type="admin" title="${title}">
-		<form action="<lams:LAMSURL/>/ForgotPasswordRequest" method="get" name="forgotForm">
+		<form action="<lams:LAMSURL/>/ForgotPasswordRequest" method="post"
+			name="forgotForm">
 			<input type="hidden" name="method" id="method" value="requestEmail" />
 
 			<h4 class="no-tabs-below">
@@ -106,30 +107,39 @@
 					<div class="panel-body">
 
 						<div class="form-group">
-							<input type="radio" id="loginCheck" name="selectType" value="radioUsername" onclick="radioSelected();" checked>
-							<label for="loginCheck"><fmt:message key="label.forgot.password.username" /></label>
+							<input type="radio" id="loginCheck" name="selectType"
+								value="radioUsername" onclick="radioSelected();" checked>
+							<label for="loginCheck"><fmt:message
+									key="label.forgot.password.username" /></label>
 						</div>
 						<div class="form-group">
-							<input type="text" name="login" id="login" class="form-control" maxlength="50" tabindex="1"
+							<input type="text" name="login" id="login" class="form-control"
+								maxlength="50" tabindex="1"
 								onKeyPress="return submitenter(this,event)" />
 						</div>
 
 						<hr class="msg-hr" />
 
 						<div class="form-group">
-							<input type="radio" id="emailCheck" name="selectType" value="radioEmail" onclick="radioSelected();"> <label
-								for="emailCheck"><fmt:message key="label.forgot.password.email" /></label>
+							<input type="radio" id="emailCheck" name="selectType"
+								value="radioEmail" onclick="radioSelected();"> <label
+								for="emailCheck"><fmt:message
+									key="label.forgot.password.email" /></label>
 						</div>
 						<div class="form-group">
-							<input type="text" name="email" id="email" class="form-control" maxlength="50" tabindex="1"
+							<input type="text" name="email" id="email" class="form-control"
+								maxlength="50" tabindex="1"
 								onKeyPress="return submitenter(this,event)" />
 						</div>
 
 						<div class="form-group">
-							<html:button property="cancel" styleClass="btn btn-default roffset10" onclick="javascript:toHome();">
+							<html:button property="cancel"
+								styleClass="btn btn-default roffset10"
+								onclick="javascript:toHome();">
 								<fmt:message key="button.cancel" />
 							</html:button>
-							<html:button property="ok" styleClass="btn btn-primary" onclick="javascript:validateForm();">
+							<html:button property="ok" styleClass="btn btn-primary"
+								onclick="javascript:validateForm();">
 								<fmt:message key="label.ok" />
 							</html:button>
 						</div>
