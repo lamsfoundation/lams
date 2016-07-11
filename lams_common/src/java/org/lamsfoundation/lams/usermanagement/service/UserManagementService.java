@@ -110,15 +110,11 @@ public class UserManagementService implements IUserManagementService {
 
     @Override
     public void save(Object object) {
-	try {
-	    if (object instanceof User) {
-		User user = (User) object;
-		object = saveUser(user);
-	    }
-	    baseDAO.insertOrUpdate(object);
-	} catch (Exception e) {
-	    log.debug(e);
+	if (object instanceof User) {
+	    User user = (User) object;
+	    object = saveUser(user);
 	}
+	baseDAO.insertOrUpdate(object);
     }
 
     protected User saveUser(User user) {
@@ -435,10 +431,10 @@ public class UserManagementService implements IUserManagementService {
 	} else {
 	    // update workspace/folder names
 	    WorkspaceFolder folder = organisation.getNormalFolder();
-	    if ( folder != null )
+	    if (folder != null)
 		folder.setName(organisation.getName());
 	    folder = organisation.getRunSequencesFolder();
-	    if ( folder != null )
+	    if (folder != null)
 		folder.setName(getRunSequencesFolderName(organisation.getName()));
 	}
 
@@ -454,7 +450,7 @@ public class UserManagementService implements IUserManagementService {
 	folder = organisation.getRunSequencesFolder();
 	folder.setName(getRunSequencesFolderName(organisation.getName()));
 	baseDAO.update(folder);
-		}
+    }
 
     private String getRunSequencesFolderName(String workspaceName) {
 	// get i18n'd message according to server locale
