@@ -122,12 +122,13 @@ public class QaUsrRespDAO extends HibernateDaoSupport implements IQaUsrRespDAO {
 
     private static final String LOAD_ATTEMPT_FOR_SESSION_AND_QUESTION_LIMIT_WITH_NAME_SEARCH1 = "from qaUsrResp in class QaUsrResp "
 	    + " WHERE qaUsrResp.answer IS NOT NULL AND qaUsrResp.qaQueUser.qaSession.qaSessionId=:qaSessionId AND qaUsrResp.qaQuestion.uid=:questionId AND qaUsrResp.qaQueUser.queUsrId!=:excludeUserId ";
-    private static final String LOAD_ATTEMPT_FOR_SESSION_AND_QUESTION_LIMIT_WITH_NAME_SEARCH2 = " order by ";
+    private static final String LOAD_ATTEMPT_FOR_SESSION_AND_QUESTION_LIMIT_WITH_NAME_SEARCH2 = " AND qaUsrResp.qaQueUser.qaSession.groupLeader.queUsrId=qaUsrResp.qaQueUser.queUsrId ";
+    private static final String LOAD_ATTEMPT_FOR_SESSION_AND_QUESTION_LIMIT_WITH_NAME_SEARCH3 = " order by ";
 
     @SuppressWarnings("unchecked")
     @Override
     public List<QaUsrResp> getResponsesForTablesorter(final Long toolContentId, final Long qaSessionId,
-	    final Long questionId, final Long excludeUserId, int page, int size, int sorting, String searchString) {
+	    final Long questionId, final Long excludeUserId, boolean isOnlyLeadersIncluded, int page, int size, int sorting, String searchString) {
 	String sortingOrder;
 	boolean useAverageRatingSort = false;
 	switch (sorting) {
@@ -176,7 +177,8 @@ public class QaUsrRespDAO extends HibernateDaoSupport implements IQaUsrRespDAO {
 	    String filteredSearchString = buildNameSearch(searchString, "qaUsrResp.qaQueUser");
 	    String queryText = LOAD_ATTEMPT_FOR_SESSION_AND_QUESTION_LIMIT_WITH_NAME_SEARCH1
 		    + (filteredSearchString != null ? filteredSearchString : "")
-		    + LOAD_ATTEMPT_FOR_SESSION_AND_QUESTION_LIMIT_WITH_NAME_SEARCH2 + sortingOrder;
+		    + (isOnlyLeadersIncluded ? LOAD_ATTEMPT_FOR_SESSION_AND_QUESTION_LIMIT_WITH_NAME_SEARCH2 : "")
+		    + LOAD_ATTEMPT_FOR_SESSION_AND_QUESTION_LIMIT_WITH_NAME_SEARCH3 + sortingOrder;
 
 	    query = getSession().createQuery(queryText);
 	}
@@ -212,13 +214,14 @@ public class QaUsrRespDAO extends HibernateDaoSupport implements IQaUsrRespDAO {
     private static final String GET_COUNT_RESPONSES_FOR_SESSION_AND_QUESTION_WITH_NAME_SEARCH = "SELECT COUNT(*) FROM "
 	    + QaUsrResp.class.getName()
 	    + " AS r WHERE r.answer IS NOT NULL AND r.qaQueUser.qaSession.qaSessionId=? AND r.qaQuestion.uid=? AND r.qaQueUser.queUsrId!=?";
-
+    private static final String GET_COUNT_RESPONSES_FOR_SESSION_AND_QUESTION_WITH_NAME_SEARCH2 = " AND r.qaQueUser.qaSession.groupLeader.queUsrId=r.qaQueUser.queUsrId ";
     @Override
     public int getCountResponsesBySessionAndQuestion(final Long qaSessionId, final Long questionId,
-	    final Long excludeUserId, String searchString) {
+	    final Long excludeUserId, boolean isOnlyLeadersIncluded, String searchString) {
 
 	String filteredSearchString = buildNameSearch(searchString, "r.qaQueUser");
-	String queryText = GET_COUNT_RESPONSES_FOR_SESSION_AND_QUESTION_WITH_NAME_SEARCH;
+	String queryText = GET_COUNT_RESPONSES_FOR_SESSION_AND_QUESTION_WITH_NAME_SEARCH
+		+ (isOnlyLeadersIncluded ? GET_COUNT_RESPONSES_FOR_SESSION_AND_QUESTION_WITH_NAME_SEARCH2 : "");
 	if (filteredSearchString != null) {
 	    queryText += filteredSearchString;
 	}
