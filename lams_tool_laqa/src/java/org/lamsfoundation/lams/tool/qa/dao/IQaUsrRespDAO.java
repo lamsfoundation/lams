@@ -49,8 +49,8 @@ public interface IQaUsrRespDAO {
     List<QaUsrResp> getResponseBySessionAndQuestion(final Long qaSessionId, final Long questionId);
 
     List<QaUsrResp> getResponsesForTablesorter(final Long toolContentId, final Long qaSessionId, final Long questionId,
-	    final Long userId, int page, int size, int sorting, String searchString);
+	    final Long excludeUserId, boolean isOnlyLeadersIncluded, int page, int size, int sorting, String searchString);
 
     int getCountResponsesBySessionAndQuestion(final Long qaSessionId, final Long questionId, final Long excludeUserId,
-	    String searchString);
+	    boolean isOnlyLeadersIncluded, String searchString);
 }
