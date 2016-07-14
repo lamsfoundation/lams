@@ -8,6 +8,7 @@
 <%@ taglib uri="tags-logic" prefix="logic"%>
 <%@ taglib uri="tags-fmt" prefix="fmt"%>
 <%@ taglib uri="tags-lams" prefix="lams"%>
+<%@ taglib uri="tags-core" prefix="c"%>
 
 <!DOCTYPE html>
 <lams:html>
@@ -81,7 +82,7 @@
 			<div class="form-group">
 				<label for="confirmNewPassword"><fmt:message
 						key="label.password.confirm.new.password" /></label> <input
-					type="password" id="confirmNewPassword" name="confirmNewPassword"
+					type="password" id="confirmNewPassword" class="form-control" name="confirmNewPassword"
 					maxlength="50" onKeyPress="return submitenter(this,event)" />
 			</div>
 			<div class="form-group">
