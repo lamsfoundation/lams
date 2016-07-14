@@ -295,15 +295,17 @@ public class QaServicePOJO
 
     @Override
     public List<QaUsrResp> getResponsesForTablesorter(final Long toolContentId, final Long qaSessionId,
-	    final Long questionId, final Long excludeUserId, int page, int size, int sorting, String searchString) {
-	return qaUsrRespDAO.getResponsesForTablesorter(toolContentId, qaSessionId, questionId, excludeUserId, page,
-		size, sorting, searchString);
+	    final Long questionId, final Long excludeUserId, boolean isOnlyLeadersIncluded, int page, int size,
+	    int sorting, String searchString) {
+	return qaUsrRespDAO.getResponsesForTablesorter(toolContentId, qaSessionId, questionId, excludeUserId,
+		isOnlyLeadersIncluded, page, size, sorting, searchString);
     }
 
     @Override
     public int getCountResponsesBySessionAndQuestion(final Long qaSessionId, final Long questionId,
-	    final Long excludeUserId, String searchString) {
-	return qaUsrRespDAO.getCountResponsesBySessionAndQuestion(qaSessionId, questionId, excludeUserId, searchString);
+	    final Long excludeUserId, boolean isOnlyLeadersIncluded, String searchString) {
+	return qaUsrRespDAO.getCountResponsesBySessionAndQuestion(qaSessionId, questionId, excludeUserId,
+		isOnlyLeadersIncluded, searchString);
     }
 
     @Override
