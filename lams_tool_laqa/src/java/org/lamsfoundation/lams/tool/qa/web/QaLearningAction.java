@@ -1037,6 +1037,7 @@ public class QaLearningAction extends LamsDispatchAction implements QaAppConstan
 
 	boolean isAllowRateAnswers = WebUtil.readBooleanParam(request, "isAllowRateAnswers");
 	boolean isAllowRichEditor = WebUtil.readBooleanParam(request, "isAllowRichEditor");
+	boolean isOnlyLeadersIncluded = WebUtil.readBooleanParam(request, "isOnlyLeadersIncluded", false);
 	Long qaContentId = WebUtil.readLongParam(request, "qaContentId");
 
 	Long questionUid = WebUtil.readLongParam(request, "questionUid");
@@ -1067,13 +1068,13 @@ public class QaLearningAction extends LamsDispatchAction implements QaAppConstan
 	}
 
 	List<QaUsrResp> responses = QaLearningAction.qaService.getResponsesForTablesorter(qaContentId, qaSessionId,
-		questionUid, userId, page, size, sorting, searchString);
+		questionUid, userId, isOnlyLeadersIncluded, page, size, sorting, searchString);
 
 	JSONObject responcedata = new JSONObject();
 	JSONArray rows = new JSONArray();
 
 	responcedata.put("total_rows", QaLearningAction.qaService.getCountResponsesBySessionAndQuestion(qaSessionId,
-		questionUid, userId, searchString));
+		questionUid, userId, isOnlyLeadersIncluded, searchString));
 
 	// handle rating criterias - even though we may have searched on ratings earlier we can't use the average ratings
 	// calculated as they may have been averages over more than one criteria.
