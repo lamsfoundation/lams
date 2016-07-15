@@ -51,8 +51,8 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 					<div class="panel-heading">
 						<div id="headerFrame"></div>
 					</div>
-					<div class="panel-body">
-						<iframe src="<c:url value='${resourceItemReviewUrl}'/>" id="resourceFrame" style="border:0px;width:100%;height:350px;" onload="setIframeHeight()"></iframe>
+					<div class="panel-body" style="height:100vh;">
+						<iframe src="<c:url value='${resourceItemReviewUrl}'/>" id="resourceFrame" style="border:0px;width:100%;height:100%;" onload="setIframeHeight()"></iframe>
  					</div>
 				</div>
 			</div>
