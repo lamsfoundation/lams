@@ -47,7 +47,12 @@
 	<%-- Monitor Button --%>
 	<div id="buttons">
 		<button id="clone-lessons-button" onclick="javascript:cloneLessons(); return false;">
-			Update LAMS links
+			Update LAMS links after course copy
+		</button>
+		<br>
+		
+		<button id="import-lessons-button" onclick="javascript:importLessons(); return false;">
+			Update LAMS links after course import
 		</button>
 	</div>
 	
@@ -61,22 +66,7 @@
 	    // Open the LAMS Seuence Monitor Window
 	    function cloneLessons() {
 	    	//block #buttons
-	    	$j('#buttons').block({
-	    		message: '<h1 style="color:#fff";>Please, wait. Lessons are getting copied now.</h1>',
-	    		baseZ: 1000000,
-	    		fadeIn:  0,
-	    		css: {
-	    			border: 'none',
-	    		    padding: $j('#buttons').height() + 'px', 
-	    		    backgroundColor: '#000', 
-	    		    '-webkit-border-radius': '10px', 
-	    		    '-moz-border-radius': '10px', 
-	    		    opacity: .98 
-	    		},
-	    		overlayCSS: {
-	    			opacity: 0
-	    		}
-	    	});
+		    blockButtons();
 	    	
 	        $j.ajax({
 	        	async: true,
@@ -97,6 +87,49 @@
 	        
 	        return false;
 	    }
+
+	    function importLessons() {
+	    	//block #buttons
+		    blockButtons();
+	    	
+	        $j.ajax({
+	        	async: true,
+	            url: '../ImportLessons',
+	            data : 'courseId=<%=ctx.getCourse().getCourseId()%>',
+	            type: 'post',
+	            success: function (response) {
+	            	$j("#buttons").unblock();
+	            	alert(response);
+	            },
+	            error: function (request, status, error) {
+	            	$j("#buttons").unblock();
+	                alert(error);
+	            }
+	       	});
+	        
+	        return false;		    
+		}
+
+	    //auxiliary method to block #buttons element
+		function blockButtons(){
+
+	    	$j('#buttons').block({
+	    		message: '<h1 style="color:#fff";>Please, wait. Lessons are getting copied now.</h1>',
+	    		baseZ: 1000000,
+	    		fadeIn:  0,
+	    		css: {
+	    			border: 'none',
+	    		    padding: $j('#buttons').height() + 'px', 
+	    		    backgroundColor: '#000', 
+	    		    '-webkit-border-radius': '10px', 
+	    		    '-moz-border-radius': '10px', 
+	    		    opacity: .98 
+	    		},
+	    		overlayCSS: {
+	    			opacity: 0
+	    		}
+	    	});
+		}
 
 	</script>
 </bbNG:jsBlock>

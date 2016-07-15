@@ -47,6 +47,7 @@ import org.apache.commons.codec.binary.Hex;
 import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
 import org.lamsfoundation.ld.integration.dto.LearnerProgressDTO;
+import org.lamsfoundation.ld.util.LamsServerException;
 import org.w3c.dom.Document;
 import org.w3c.dom.NamedNodeMap;
 import org.xml.sax.SAXException;
@@ -76,6 +77,7 @@ public class LamsSecurityUtil {
 
     private static Logger logger = Logger.getLogger(LamsSecurityUtil.class);
     private static final String DUMMY_COURSE = "Previews"; 
+    private static final String EXPORT_FOLDER_LAMS_SERVER = "/tmp/lams/";
     
     /**
      * Generates login requests to LAMS for author, monitor and learner, using the alternative URL.
@@ -524,23 +526,14 @@ public class LamsSecurityUtil {
 
 	    logger.info("LAMS START LESSON Req: " + serviceURL);
 
-	    // InputStream is = url.openConnection().getInputStream();
+	    // parse xml response and get the lesson id
 	    InputStream is = LamsSecurityUtil.callLamsServerPost(serviceURL);
-
-	    // parse xml response
 	    DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
 	    DocumentBuilder db = dbf.newDocumentBuilder();
 	    Document document = db.parse(is);
-
-	    // get the lesson id from the response
-
-	    /*
-	     * The getTextContext is not a java 1.4 method, so Blackboard 7.1 comes up with errors using getNodeValue()
-	     * instead
-	     */
-	    // return Long.parseLong(document.getElementsByTagName("Lesson").item(0).getAttributes().getNamedItem("lessonId").getTextContent());
 	    return Long.parseLong(document.getElementsByTagName("Lesson").item(0).getAttributes()
 		    .getNamedItem("lessonId").getNodeValue());
+	    
 	} catch (MalformedURLException e) {
 	    throw new RuntimeException("Unable to start LAMS lesson, bad URL: '" + serverAddr
 		    + "', please check lams.properties", e);
@@ -593,7 +586,6 @@ public class LamsSecurityUtil {
 	try {
 	    String method = "clone";
 	    String timestamp = new Long(System.currentTimeMillis()).toString();
-//	    String username = "not_available";//signifier for skipping security check as we can't get the current user requested cloning
 	    String hash = generateAuthenticationHash(timestamp, username, serverId);
 	    String serviceURL = serverAddr + "/services/xml/LessonManager?" + "serverId="
 		    + URLEncoder.encode(serverId, "utf8") + "&datetime=" + timestamp + "&username="
@@ -603,21 +595,14 @@ public class LamsSecurityUtil {
 
 	    logger.info("LAMS clone lesson request: " + serviceURL);
 	    
+	   // parse xml response and get the lesson id 
 	    InputStream is = LamsSecurityUtil.callLamsServerPost(serviceURL);
-	    // parse xml response
 	    DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
 	    DocumentBuilder db = dbf.newDocumentBuilder();
 	    Document document = db.parse(is);
-
-	    // get the lesson id from the response
-
-	    /*
-	     * The getTextContext is not a java 1.4 method, so Blackboard 7.1 comes up with errors using getNodeValue()
-	     * instead
-	     */
-	    // return Long.parseLong(document.getElementsByTagName("Lesson").item(0).getAttributes().getNamedItem("lessonId").getTextContent());
 	    return Long.parseLong(document.getElementsByTagName("Lesson").item(0).getAttributes()
 		    .getNamedItem("lessonId").getNodeValue());
+	    
 	} catch (MalformedURLException e) {
 	    throw new RuntimeException("Unable to clone LAMS lesson, bad URL: '" + serverAddr
 		    + "', please check lams.properties", e);
@@ -644,6 +629,93 @@ public class LamsSecurityUtil {
 		    "Unable to clone LAMS lesson. " + e.getMessage() + " Can't parse LAMS results.", e);
 	} catch (Exception e) {
 	    throw new RuntimeException("Unable to clone LAMS lesson. Please contact your system administrator.", e);
+	}
+
+    }
+    
+    /**
+     * Import learning design in LAMS from its temp folder. Then starting a lesson using this learning design.
+     * 
+     * @param courseId
+     * 		  courseId as a request parameter
+     * @param ldId
+     *            the learning design id for which you wish to start a lesson
+     *            
+     * @return lesson id of a cloned lesson
+     * @throws LamsServerException 
+     */
+    public static Long importLearningDesign(User teacher, String courseId, String lsId, String ldId) throws LamsServerException {
+
+	String serverId = getServerID();
+	String serverAddr = getServerAddress();
+	String serverKey = getServerKey();
+	String username = teacher.getUserName();
+	String locale = teacher.getLocale();
+	String country = getCountry(locale);
+	String lang = getLanguage(locale);
+	
+	if (courseId == null || serverId == null || serverAddr == null || serverKey == null) {
+	    logger.info("Unable to import lesson, one or more lams configuration properties or the course id is null");
+	    throw new RuntimeException("Unable to import lesson, one or more lams configuration properties or the course id is null. courseId="+courseId);
+	}
+
+        //import a learning design
+	String filePath = EXPORT_FOLDER_LAMS_SERVER + lsId + "_" + ldId + ".zip";
+	
+	try {
+	    String filePathParam =  URLEncoder.encode(filePath, "UTF-8");
+	    String timestamp = new Long(System.currentTimeMillis()).toString();
+	    String hash = generateAuthenticationHash(timestamp, username, serverId);
+	    String serviceURL = serverAddr + "/services/xml/LessonManager?" + "serverId="
+		    + URLEncoder.encode(serverId, "utf8") + "&datetime=" + timestamp + "&username="
+		    + URLEncoder.encode(username, "utf8") + "&hashValue=" + hash + "&courseId="
+		    + URLEncoder.encode(courseId, "UTF8") + "&country="
+			    + country + "&lang=" + lang + "&method=import&customCSV=&filePath=" + filePathParam;
+
+	    logger.info("LAMS import lesson request: " + serviceURL);
+
+	    // parse xml response and get the ldid
+	    InputStream is = LamsSecurityUtil.callLamsServerPost(serviceURL);
+	    DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+	    DocumentBuilder db = dbf.newDocumentBuilder();
+	    Document document = db.parse(is);
+	    return Long.parseLong(document.getElementsByTagName("Lesson").item(0).getAttributes()
+		    .getNamedItem("ldId").getNodeValue());    
+	    
+	} catch (MalformedURLException e) {
+	    throw new LamsServerException("Unable to import LAMS lesson, bad URL: '" + serverAddr
+		    + "', please check lams.properties. Tried to import file " + filePath, e);
+	} catch (IllegalStateException e) {
+	    throw new LamsServerException(
+		    "LAMS Server timeout, did not get a response from the LAMS server. Please contact your systems administrator. Tried to import file "
+			    + filePath,
+		    e);
+	} catch (RemoteException e) {
+	    throw new LamsServerException(
+		    "Unable to import LAMS lesson, RMI Remote Exception. Tried to import file " + filePath, e);
+	} catch (UnsupportedEncodingException e) {
+	    throw new LamsServerException(
+		    "Unable to import LAMS lesson, Unsupported Encoding Exception. Tried to import file " + filePath,
+		    e);
+	} catch (ConnectException e) {
+	    throw new LamsServerException(
+		    "LAMS Server timeout, did not get a response from the LAMS server. Please contact your systems administrator. Tried to import file "
+			    + filePath,
+		    e);
+	} catch (IOException e) {
+	    throw new LamsServerException("Unable to import LAMS lesson. " + e.getMessage()
+		    + " Please contact your system administrator. Tried to import file " + filePath, e);
+	} catch (ParserConfigurationException e) {
+	    throw new LamsServerException("Unable to import LAMS lesson. " + e.getMessage()
+		    + " Can't instantiate DocumentBuilder. Tried to import file " + filePath, e);
+	} catch (SAXException e) {
+	    throw new LamsServerException("Unable to import LAMS lesson. " + e.getMessage()
+		    + " Can't parse LAMS results. Tried to import file " + filePath, e);
+	} catch (Exception e) {
+	    throw new LamsServerException(
+		    "Unable to import LAMS lesson. Please contact your system administrator. Tried to import file "
+			    + filePath,
+		    e);
 	}
 
     }
