@@ -192,8 +192,12 @@ GeneralInitLib = {
 			allGroup.data('templates', allTemplates);
 			
 			$.each(learningLibraryGroups, function(){
-				var templates = allTemplates.clone().appendTo(templateContainerCell),
-					learningLibraries = this.learningLibraries;
+				var learningLibraries = this.learningLibraries;
+				if (!learningLibraries) {
+					return true;
+				}
+				
+				var templates = allTemplates.clone().appendTo(templateContainerCell);
 				// cloned everything, now remove ones that are not in the list
 				$('.template', templates).each(function(){
 					var learningLibraryId = $(this).attr('learningLibraryId'),
