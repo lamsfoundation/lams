@@ -190,6 +190,7 @@ public class LessonManagerServlet extends HttpServlet {
 		element.setAttribute(CentralConstants.ATTR_LESSON_ID, lessonId.toString());
 
 	    } else if (method.equals(CentralConstants.METHOD_CLONE)) {
+		
 		lsId = new Long(lsIdStr);
 		Long lessonId = cloneLesson(serverId, datetime, hashValue, username, lsId, courseId, country, lang);
 
@@ -738,6 +739,8 @@ public class LessonManagerServlet extends HttpServlet {
     @SuppressWarnings("unchecked")
     private Long importLearningDesign(HttpServletRequest request, HttpServletResponse response, String filePath,
 	    String username, String serverId, String customCSV) throws RemoteException {
+
+	log.info("Starting import of learning design from the following path: " + filePath + ". ");
 
 	List<String> ldErrorMsgs = new ArrayList<String>();
 	List<String> toolsErrorMsgs = new ArrayList<String>();
