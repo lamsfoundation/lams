@@ -24,7 +24,11 @@
   <servlet>
     <servlet-name>CloneLessonsServlet</servlet-name>
     <servlet-class>org.lamsfoundation.ld.integration.blackboard.CloneLessonsServlet</servlet-class>
-  </servlet>  
+  </servlet>
+  <servlet>
+    <servlet-name>ImportLessonsServlet</servlet-name>
+    <servlet-class>org.lamsfoundation.ld.integration.blackboard.ImportLessonsServlet</servlet-class>
+  </servlet> 
   <servlet>
     <servlet-name>GradebookServlet</servlet-name>
     <servlet-class>org.lamsfoundation.ld.integration.blackboard.GradebookServlet</servlet-class>
@@ -61,7 +65,11 @@
   <servlet-mapping>
     <servlet-name>CloneLessonsServlet</servlet-name>
     <url-pattern>/CloneLessons</url-pattern>
-  </servlet-mapping>   
+  </servlet-mapping> 
+  <servlet-mapping>
+    <servlet-name>ImportLessonsServlet</servlet-name>
+    <url-pattern>/ImportLessons</url-pattern>
+  </servlet-mapping>  
   <servlet-mapping>
     <servlet-name>GroupDataServlet</servlet-name>
     <url-pattern>/GroupData</url-pattern>
