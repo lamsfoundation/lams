@@ -137,7 +137,7 @@ public class AssessmentUserDAOHibernate extends BaseDAOHibernate implements Asse
     public List<AssessmentUserDTO> getPagedUsersBySessionAndQuestion(Long sessionId, Long questionUid, int page,
 	    int size, String sortBy, String sortOrder, String searchString) {
 
-	String LOAD_USERS_ORDERED_BY_NAME = "SELECT DISTINCT question_result.uid, user.last_name, user.first_name, user.login_name question_result.mark"
+	String LOAD_USERS_ORDERED_BY_NAME = "SELECT DISTINCT question_result.uid, user.last_name, user.first_name, user.login_name, question_result.mark"
 		+ " FROM tl_laasse10_user user" + " INNER JOIN tl_laasse10_session session"
 		+ " ON user.session_uid=session.uid" +
 
