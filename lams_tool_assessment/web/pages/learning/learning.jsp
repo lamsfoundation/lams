@@ -582,9 +582,9 @@
 		</lams:Alert>
 		
 		<div id="timelimit-start-dialog"> 
-	        <h1>
+	        <h4>
 	        	<fmt:message key='label.learning.blockui.are.you.ready' />
-	        </h1>
+	        </h4>
 	        <html:button property="ok" styleId="timelimit-start-ok" styleClass="button">
 				OK
 			</html:button>
