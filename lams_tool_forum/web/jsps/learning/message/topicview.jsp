@@ -81,6 +81,7 @@
 				<script> 
 				$("#${messageTablename}").treetable({${tableCommand}});
 				</script>
+				</div>
 				 <!--  end thread ${messageTablename} -->	
 			</c:if>
 			<c:set var="messageTablename" value="tree${msgDto.message.uid}" />
