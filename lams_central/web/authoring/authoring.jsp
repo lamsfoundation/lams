@@ -478,7 +478,7 @@
 				</td>
 				<td id="ldStoreDialogCanvasCell" rowspan="2">
 					<div id="ldStoreDialogCanvasDiv">
-			    		<div id="ldScreenshotAuthor" class="ldChoiceDependentCanvasElement" />
+			    		<div id="ldScreenshotAuthor" class="ldChoiceDependentCanvasElement"></div>
 		    			<img id="ldScreenshotLoading" class="ldChoiceDependentCanvasElement"
 		    			     src="<lams:LAMSURL/>images/ajax-loader-big.gif" />
 		    			<iframe id="ldStoreDialogImportPartFrame"></iframe>
