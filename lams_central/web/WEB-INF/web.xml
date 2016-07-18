@@ -313,6 +313,13 @@
 	</servlet>
 
 	<servlet>
+		<servlet-name>LearningDesignSVG</servlet-name>
+		<servlet-class>
+			org.lamsfoundation.lams.webservice.LearningDesignSVGServlet
+		</servlet-class>
+	</servlet>
+
+	<servlet>
 		<servlet-name>LessonManager</servlet-name>
 		<servlet-class>
 			org.lamsfoundation.lams.webservice.xml.LessonManagerServlet
@@ -419,6 +426,11 @@
 	<servlet-mapping>
 		<servlet-name>LearningDesignRepository</servlet-name>
 		<url-pattern>/services/xml/LearningDesignRepository/*</url-pattern>
+	</servlet-mapping>
+
+	<servlet-mapping>
+		<servlet-name>LearningDesignSVG</servlet-name>
+		<url-pattern>/services/LearningDesignSVG/*</url-pattern>
 	</servlet-mapping>
 
 	<servlet-mapping>
@@ -640,6 +652,7 @@
 			<url-pattern>/LoginRequest</url-pattern>
 			<url-pattern>/services/xml/LessonManager/*</url-pattern>
 			<url-pattern>/services/xml/LearningDesignRepository/*</url-pattern>
+			<url-pattern>/services/LearningDesignSVG/*</url-pattern>
 			<url-pattern>/services/Gradebook</url-pattern>
 			<url-pattern>/services/xml/LessonJoin/*</url-pattern>
 			<url-pattern>/services/CourseGroupManager</url-pattern>
