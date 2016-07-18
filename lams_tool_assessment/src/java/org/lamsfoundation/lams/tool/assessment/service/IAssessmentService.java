@@ -321,6 +321,14 @@ public interface IAssessmentService {
      * @return
      */
     String finishToolSession(Long toolSessionId, Long userId) throws AssessmentApplicationException;
+    
+    /**
+     * Set userFinished to false
+     * 
+     * @param toolSessionId
+     * @param userId
+     */
+    void unsetSessionFinished(Long toolSessionId, Long userId);
 
     /**
      * Returns sessionDtos containing only session ids and session names.

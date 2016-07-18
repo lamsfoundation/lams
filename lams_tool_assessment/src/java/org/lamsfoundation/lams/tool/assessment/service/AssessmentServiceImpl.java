@@ -868,6 +868,13 @@ public class AssessmentServiceImpl implements IAssessmentService, ToolContentMan
 	}
 	return nextUrl;
     }
+    
+    @Override
+    public void unsetSessionFinished(Long toolSessionId, Long userId) {
+	AssessmentUser user = assessmentUserDao.getUserByUserIDAndSessionID(userId, toolSessionId);
+	user.setSessionFinished(false);
+	assessmentUserDao.saveObject(user);
+    }   
 
     @Override
     public List<SessionDTO> getSessionDtos(Long contentId) {

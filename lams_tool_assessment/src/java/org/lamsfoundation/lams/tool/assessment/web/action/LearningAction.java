@@ -553,6 +553,7 @@ public class LearningAction extends Action {
 	Assessment assessment = (Assessment) sessionMap.get(AssessmentConstants.ATTR_ASSESSMENT);
 	Long toolSessionId = (Long) sessionMap.get(AssessmentConstants.ATTR_TOOL_SESSION_ID);
 	AssessmentUser assessmentUser = (AssessmentUser) sessionMap.get(AssessmentConstants.ATTR_USER);
+	service.unsetSessionFinished(toolSessionId, assessmentUser.getUserId());
 
 	//set attempt started: create a new one + mark previous as not being the latest any longer
 	List<Set<AssessmentQuestion>> pagedQuestions = (List<Set<AssessmentQuestion>>) sessionMap
