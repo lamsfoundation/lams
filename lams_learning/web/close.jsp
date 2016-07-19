@@ -21,6 +21,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 
 <%@ taglib uri="tags-fmt" prefix="fmt" %>
 <%@ taglib uri="tags-core" prefix="c" %>
+<%@ taglib uri="tags-lams" prefix="lams" %>
 
  <script language="JavaScript" type="text/Javascript">
     function doCloseRedirect() {
