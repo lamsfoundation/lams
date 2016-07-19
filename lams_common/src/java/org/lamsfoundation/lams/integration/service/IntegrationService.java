@@ -740,7 +740,18 @@ public class IntegrationService implements IIntegrationService {
 
 	return extGroups;
     }
-
+    
+    @Override
+    @SuppressWarnings("unchecked")
+    public ExtCourseClassMap getExtCourseClassMap(Integer sid, Long lessonId) {
+	Lesson lesson = lessonService.getLesson(lessonId);
+	Map<String, Object> properties = new HashMap<String, Object>();
+	properties.put("extServerOrgMap.sid", sid);
+	properties.put("organisation.organisationId", lesson.getOrganisation().getOrganisationId());
+	List<ExtCourseClassMap> list = service.findByProperties(ExtCourseClassMap.class, properties);
+	return list == null || list.isEmpty() ? null : list.get(0);
+    }
+    
     private ExtServerLessonMap getExtServerLessonMap(Long lessonId) {
 	List list = service.findByProperty(ExtServerLessonMap.class, "lessonId", lessonId);
 	if ((list == null) || (list.size() == 0)) {
