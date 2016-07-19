@@ -39,6 +39,7 @@ import javax.sql.DataSource;
 
 import org.apache.catalina.authenticator.Constants;
 import org.apache.log4j.Logger;
+import org.lamsfoundation.lams.integration.ExtCourseClassMap;
 import org.lamsfoundation.lams.integration.ExtServerOrgMap;
 import org.lamsfoundation.lams.integration.ExtUserUseridMap;
 import org.lamsfoundation.lams.integration.UserInfoFetchException;
@@ -122,33 +123,40 @@ public class LoginRequestServlet extends HttpServlet {
 	    }
 	}
 
-	ExtServerOrgMap serverMap = getService().getExtServerOrgMap(serverId);
+	ExtServerOrgMap serverMap = getIntegrationService().getExtServerOrgMap(serverId);
 	boolean prefix = (usePrefix == null) ? true : Boolean.parseBoolean(usePrefix);
 	try {
 	    ExtUserUseridMap userMap = null;
 	    if ((firstName == null) && (lastName == null)) {
-		userMap = getService().getExtUserUseridMap(serverMap, extUsername, prefix);
+		userMap = getIntegrationService().getExtUserUseridMap(serverMap, extUsername, prefix);
 	    } else {
-		userMap = getService().getImplicitExtUserUseridMap(serverMap, extUsername, firstName, lastName,
-			langIsoCode, countryIsoCode, email, prefix, isUpdateUserDetails);
+		userMap = getIntegrationService().getImplicitExtUserUseridMap(serverMap, extUsername, firstName,
+			lastName, langIsoCode, countryIsoCode, email, prefix, isUpdateUserDetails);
 	    }
 
 	    // in case of request for learner with strict authentication check cache should also contain lsid
-	    String lsId = null;
-	    if (LoginRequestDispatcher.METHOD_LEARNER_STRICT_AUTHENTICATION.equals(method)) {
-
-		lsId = request.getParameter(LoginRequestDispatcher.PARAM_LESSON_ID);
-		if (lsId == null) {
-		    response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Login Failed - lsId parameter missing");
-		    return;
-		}
+	    String lsId = request.getParameter(LoginRequestDispatcher.PARAM_LESSON_ID);
+	    if (LoginRequestDispatcher.METHOD_LEARNER_STRICT_AUTHENTICATION.equals(method) && lsId == null) {
+		response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Login Failed - lsId parameter missing");
+		return;
 	    }
 	    Authenticator.authenticateLoginRequest(serverMap, timestamp, extUsername, method, lsId, hash);
 
+	    if (extCourseId == null && lsId != null) {
+		// derive course ID from lesson ID
+		ExtCourseClassMap classMap = integrationService.getExtCourseClassMap(serverMap.getSid(),
+			Long.parseLong(lsId));
+		if (classMap == null) {
+		    log.warn("Lesson " + lsId + " is not mapped to any course for server " + serverMap.getServername());
+		} else {
+		    extCourseId = classMap.getCourseid();
+		}
+	    }
+
 	    if (extCourseId != null) {
 		// check if organisation, ExtCourseClassMap and user roles exist and up-to-date, and if not update them
-		getService().getExtCourseClassMap(serverMap, userMap, extCourseId, countryIsoCode, langIsoCode,
-			courseName, method, prefix);
+		getIntegrationService().getExtCourseClassMap(serverMap, userMap, extCourseId, countryIsoCode,
+			langIsoCode, courseName, method, prefix);
 	    }
 
 	    User user = userMap.getUser();
@@ -274,7 +282,7 @@ public class LoginRequestServlet extends HttpServlet {
 	return hses;
     }
 
-    private IntegrationService getService() {
+    private IntegrationService getIntegrationService() {
 	if (LoginRequestServlet.integrationService == null) {
 	    LoginRequestServlet.integrationService = (IntegrationService) WebApplicationContextUtils
 		    .getRequiredWebApplicationContext(getServletContext()).getBean("integrationService");

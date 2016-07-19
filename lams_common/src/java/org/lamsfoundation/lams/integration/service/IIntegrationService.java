@@ -27,6 +27,7 @@ import java.io.UnsupportedEncodingException;
 import java.util.List;
 
 import org.lamsfoundation.lams.integration.ExtCourseClassMap;
+import org.lamsfoundation.lams.integration.ExtServerLessonMap;
 import org.lamsfoundation.lams.integration.ExtServerOrgMap;
 import org.lamsfoundation.lams.integration.ExtServerToolAdapterMap;
 import org.lamsfoundation.lams.integration.ExtUserUseridMap;
@@ -164,4 +165,6 @@ public interface IIntegrationService {
     boolean isIntegratedServerGroupFetchingAvailable(Long lessonId);
 
     List<ExtGroupDTO> getExtGroups(Long lessonId, String[] extGroupIds) throws Exception;
+
+    ExtCourseClassMap getExtCourseClassMap(Integer sid, Long lessonId);
 }
