@@ -7,8 +7,6 @@
 <%@ taglib uri="tags-html" prefix="html" %>
 <%@ taglib uri="tags-function" prefix="fn"%>
 <c:set var="lams" ><lams:LAMSURL/></c:set>
-<c:set var="pngImageSrc" value="${lams}www/secure/learning-design-images/${learningDesignID}.png" />
-<c:set var="svgImageSrc" value="${lams}www/secure/learning-design-images/${learningDesignID}.svg" />
 
 <lams:html>
 <lams:head>
@@ -19,16 +17,8 @@
 	
 	<lams:css/>
 	<link rel="stylesheet" href="css/thickbox.css" type="text/css" media="screen">
-	<script language="JavaScript" type="text/javascript" src="includes/javascript/css.browser.selector.js"></script>	
 	<style media="screen,projection" type="text/css">
-		div.svg-object { display: none }
-		.ie div.svg-object { display: inline }
-		.ie img.svg { display: none }
-		.gecko div.svg-object { display: inline }
-		.gecko img.svg { display: none }
-		
 		#sequence-preview {padding: 10px; text-align: center;}
-		
 		#TB_iframeContent {width: 820px !important}
 	</style>	
 	
@@ -43,12 +33,7 @@
 	
 		<c:if test="${displayDesignImage}">
 			<div id="sequence-preview">
-				<img src="${pngImageSrc}" alt="Sequence Preview" class="svg" />
-				<div class="svg-object">
-					<object data="${svgImageSrc}" type="image/svg+xml">
-			 			<img src="${pngImageSrc}" alt="Sequence Preview"/>
-					</object>
-				</div>
+				<img src="<lams:LAMSURL/>home.do?method=getLearningDesignThumbnail&ldId=${learningDesignID}" alt="Sequence Preview" />
 			</div>
 		</c:if>
 			

@@ -20,7 +20,6 @@
  * ****************************************************************
  */
 
-
 package org.lamsfoundation.lams.web.action;
 
 import java.io.IOException;
@@ -34,7 +33,6 @@ import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.apache.struts.actions.DispatchAction;
 import org.lamsfoundation.lams.lesson.Lesson;
-import org.lamsfoundation.lams.lesson.dao.ILessonDAO;
 import org.lamsfoundation.lams.lesson.service.ILessonService;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.util.AttributeNames;
@@ -43,16 +41,10 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
 
 /**
  * Edit lesson intro page.
- *
- *
- *
- *
  */
 public class EditLessonIntroAction extends DispatchAction {
 
     private static ILessonService lessonService;
-
-    private static ILessonDAO lessonDAO;
 
     /**
      * Edit lesson intro page.
@@ -85,7 +77,7 @@ public class EditLessonIntroAction extends DispatchAction {
 	lesson.setLessonName(lessonName);
 	lesson.setLessonDescription(lessonDescription);
 	lesson.setDisplayDesignImage(displayDesignImage);
-	getLessonDAO().saveLesson(lesson);
+	getLessonService().saveLesson(lesson);
 
 	return null;
     }
@@ -97,14 +89,5 @@ public class EditLessonIntroAction extends DispatchAction {
 	    lessonService = (ILessonService) ctx.getBean("lessonService");
 	}
 	return lessonService;
-    }
-
-    private ILessonDAO getLessonDAO() {
-	if (lessonDAO == null) {
-	    WebApplicationContext ctx = WebApplicationContextUtils
-		    .getRequiredWebApplicationContext(getServlet().getServletContext());
-	    lessonDAO = (ILessonDAO) ctx.getBean("lessonDAO");
-	}
-	return lessonDAO;
     }
 }
