@@ -28,24 +28,17 @@
 		.gecko img.svg { display: none }
 		
 		#sequence-preview {padding: 10px; text-align: center;}
+		
+		#TB_iframeContent {width: 820px !important}
 	</style>	
 	
 </lams:head>
 
 <body class="stripes">
 	
-	<div id="content">
+	<c:set var="title"><c:out value="${lesson.lessonName}" escapeXml="true"/></c:set>
+	<lams:Page type="learner" title="${title}">
 		
-		<c:if test="${isMonitor}">
-			 <div class="float-right small-space-top">
-			 	<a class="thickbox button" href="editLessonIntro.do?method=edit&lessonID=${lesson.lessonId}&KeepThis=true&TB_iframe=true&height=600&width=850" title="<fmt:message key='label.edit'/>">
-					<fmt:message key="label.edit"/>
-				</a>
-			</div>
-		</c:if>
-	
-		<h1><c:out value="${lesson.lessonName}" escapeXml="true"/></h1>
-	
 		<p><c:out value="${lesson.lessonDescription}" escapeXml="false"/></p>	
 	
 		<c:if test="${displayDesignImage}">
@@ -59,15 +52,24 @@
 			</div>
 		</c:if>
 			
-		<div class="space-bottom-top align-right">
-			<html:link href="${lams}home.do?method=learner&lessonID=${lesson.lessonId}&isLessonIntroWatched=true" styleClass="button">
+		<div class="voffset10 pull-right">
+
+			<c:if test="${isMonitor}">
+				 <div class="btn btn-default">
+				 	<a class="thickbox" href="editLessonIntro.do?method=edit&lessonID=${lesson.lessonId}&KeepThis=true&TB_iframe=true&height=600&width=800" title="<fmt:message key='label.edit'/>">
+						<fmt:message key="label.edit"/>
+					</a>
+				</div>
+			</c:if>
+
+			<html:link href="${lams}home.do?method=learner&lessonID=${lesson.lessonId}&isLessonIntroWatched=true" styleClass="btn btn-primary na">
 				<span class="nextActivity"><fmt:message key="label.start.lesson" /></span>
 			</html:link>
 		</div>
-
-	</div>
-	   
-	<div id="footer"></div>
+	
+		<div id="footer"></div>
+	
+	</lams:Page>
 
 </BODY>
 	
