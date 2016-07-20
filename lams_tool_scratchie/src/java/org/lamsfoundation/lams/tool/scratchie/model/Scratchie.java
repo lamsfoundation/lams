@@ -72,6 +72,8 @@ public class Scratchie implements Cloneable {
 
     private boolean burningQuestionsEnabled;
 
+    private int timeLimit;
+
     private boolean reflectOnActivity;
 
     private String reflectInstructions;
@@ -344,4 +346,21 @@ public class Scratchie implements Cloneable {
     public void setBurningQuestionsEnabled(boolean burningQuestionsEnabled) {
 	this.burningQuestionsEnabled = burningQuestionsEnabled;
     }
+    
+    /**
+     * @hibernate.property column="time_limit"
+     * @return Returns the time limitation, that students have to complete an attempt.
+     */
+    public int getTimeLimit() {
+	return timeLimit;
+    }
+
+    /**
+     * @param timeLimit
+     *            the time limitation, that students have to complete an attempt.
+     */
+    public void setTimeLimit(int timeLimit) {
+	this.timeLimit = timeLimit;
+    }
+
 }

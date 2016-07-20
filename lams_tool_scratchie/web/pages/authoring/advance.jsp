@@ -22,6 +22,13 @@
 </p>
 
 <p>
+	<label for="time-limit">
+		<fmt:message key="label.time.limit" />&nbsp;
+		<html:text property="scratchie.timeLimit" size="3" styleId="time-limit"/>
+	</label>
+</p>
+
+<p>
 	<html:checkbox property="scratchie.reflectOnActivity" styleClass="noBorder" styleId="reflectOn"/>
 	<label for="reflectOn">
 		<fmt:message key="label.authoring.advanced.reflectOnActivity" />
