@@ -38,25 +38,23 @@
 
 <body class="stripes">
 	
-	<div id="content">
-	
+	<lams:Page type="admin">		
 		<form action="editLessonIntro.do?method=save" method="post" id="lessonForm">
-		
 			<input type="hidden" name="lessonID" value="${lesson.lessonId}"/>
 	
-			<div class="field-name">
-				<fmt:message key="label.lesson.name"></fmt:message>
+			<div class="field-group">
+				<label for="lessonName"><fmt:message key="label.lesson.name"></fmt:message></label>
+				<input type="text" name="lessonName" value="<c:out value='${lesson.lessonName}' />" class="form-control" style="width: 99%;" />
 			</div>
-			<input type="text" name="lessonName" value="<c:out value='${lesson.lessonName}' />" style="width: 99%;" />
 			
-			<div class="field-name space-top">
-				<fmt:message key="label.instructions"></fmt:message>
+			<div class="field-group">
+				<label for="lessonDescription"><fmt:message key="label.instructions"></fmt:message></label>
+				<lams:CKEditor id="lessonDescription" value="${lesson.lessonDescription}"
+					contentFolderID="${contentFolderID}">
+				</lams:CKEditor>
 			</div>
-			<lams:CKEditor id="lessonDescription" value="${lesson.lessonDescription}"
-				contentFolderID="${contentFolderID}">
-			</lams:CKEditor>
 		
-			<div class="space-top">
+			<div class="voffset10">
 				<input type="checkbox" name="displayDesignImage" <c:if test="${displayDesignImage}">checked="checked"</c:if> class="noBorder" value="true"/>
 				<fmt:message key="label.display.lesson.design"></fmt:message>
 			</div>
@@ -64,11 +62,11 @@
 			<br /><br /><br />        
 			
 			<lams:ImgButtonWrapper>
-				<div class="float-right">
-					<a href="#nogo" onclick="$('#lessonForm').submit();" onmousedown="self.focus();" class="button">
+				<div class="pull-right">
+					<a href="#nogo" onclick="$('#lessonForm').submit();" onmousedown="self.focus();" class="btn btn-primary">
 						<fmt:message key="button.save" /> 
 					</a>
-					<a href="#nogo" onclick="self.parent.tb_remove();" onmousedown="self.focus();" class="button space-left">
+					<a href="#nogo" onclick="self.parent.tb_remove();" onmousedown="self.focus();" class="btn btn-default loffset5">
 						<fmt:message key="label.cancel" /> 
 					</a>
 				</div>
@@ -76,10 +74,8 @@
 		
 		</form>
 			
-	</div>
-	   
-	<div id="footer"></div>
-
+		<div id="footer"></div>
+	</lams:Page>
 </BODY>
 	
 </lams:html>

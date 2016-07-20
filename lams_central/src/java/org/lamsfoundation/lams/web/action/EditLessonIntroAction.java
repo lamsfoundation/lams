@@ -79,7 +79,7 @@ public class EditLessonIntroAction extends DispatchAction {
 	Lesson lesson = getLessonService().getLesson(lessonId);
 	String lessonName = WebUtil.readStrParam(req, "lessonName");
 	String lessonDescription = WebUtil.readStrParam(req, "lessonDescription");
-	boolean displayDesignImage = WebUtil.readBooleanParam(req, "displayDesignImage");
+	boolean displayDesignImage = WebUtil.readBooleanParam(req, "displayDesignImage", false);
 
 	//sore lesson in DB
 	lesson.setLessonName(lessonName);
