@@ -21,7 +21,6 @@
  * ****************************************************************
  */
 
-
 package org.lamsfoundation.lams.lesson.service;
 
 import java.util.ArrayList;
@@ -686,5 +685,9 @@ public class LessonService implements ILessonService {
 	    }
 	}
 	return releasedSucceedingLessons;
+    }
+
+    public void saveLesson(Lesson lesson) {
+	lessonDAO.saveLesson(lesson);
     }
 }
