@@ -83,9 +83,10 @@ public class AdminTest extends AbstractTest {
     protected void startTest() {
 	MockAdmin admin = (MockAdmin) users[0];
 	admin.login();
-	if (courseId == null) {
+	boolean courseIdSet = courseId != null;
+	if (!courseIdSet) {
 	    setCourseId(admin.createCourse(createCourseURL, courseName));
 	}
-	admin.createUsers(createUserURL, addRolesURL, courseId, storedUsersFileName);
+	admin.createUsers(createUserURL, addRolesURL, courseId, courseIdSet, storedUsersFileName);
     }
 }

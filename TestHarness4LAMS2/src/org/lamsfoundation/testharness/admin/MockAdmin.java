@@ -119,7 +119,8 @@ public class MockAdmin extends MockUser {
 	}
     }
 
-    public void createUsers(String createUserURL, String addRolesURL, String courseId, String storedUsersFileName) {
+    public void createUsers(String createUserURL, String addRolesURL, String courseId, boolean courseIdSet,
+	    String storedUsersFileName) {
 	try {
 	    String url = createUserURL.replace(MockAdmin.COURSE_ID_PATTERN, courseId.toString());
 	    List<MockUser> mockUsers = new ArrayList<MockUser>();
@@ -131,11 +132,10 @@ public class MockAdmin extends MockUser {
 	    Collections.addAll(mockUsers, learnerTest.getUsers());
 
 	    for (MockUser mockUser : mockUsers) {
-		delay();
-
-		String name = mockUser.getUsername();
 		WebResponse resp = null;
-		if (mockUser.getUserId() == null) {
+		String name = mockUser.getUsername();
+		boolean userExists = mockUser.getUserId() != null;
+		if (!userExists) {
 		    // create the user
 		    MockAdmin.log.info(username + " creating user " + name);
 		    resp = (WebResponse) new Call(wc, test, username + " creating user " + name, url).execute();
@@ -187,42 +187,48 @@ public class MockAdmin extends MockUser {
 		    MockAdmin.log.debug("User " + name + " already exists, skipping creation");
 		}
 
-		StringBuilder bodyBuilder = new StringBuilder();
-		bodyBuilder.append("orgId=").append(courseId).append("&userId=").append(mockUser.getUserId())
-			.append("&roles=").append(mockUser.getRole());
-		InputStream is = new ByteArrayInputStream(bodyBuilder.toString().getBytes("UTF-8"));
+		if (!userExists || !courseIdSet) {
+		    StringBuilder bodyBuilder = new StringBuilder();
+		    bodyBuilder.append("orgId=").append(courseId).append("&userId=").append(mockUser.getUserId())
+			    .append("&roles=").append(mockUser.getRole());
+		    InputStream is = new ByteArrayInputStream(bodyBuilder.toString().getBytes("UTF-8"));
 
-		MockAdmin.log.info(username + " adding roles to user " + name);
-		resp = (WebResponse) new Call(wc, test, username + " submit user roles form", addRolesURL, is)
-			.execute();
-		WebTable[] tables = resp.getTables();
-		if ((tables == null) || (tables.length < 2)) {
-		    MockAdmin.log.debug(resp.getText());
-		    throw new TestHarnessException(
-			    username + " failed to get an user table after submitting user role form");
-		}
-
-		WebTable table = tables[1];
-		String idAsString = null;
-		for (int j = table.getRowCount() - 1; j >= 0; j--) {
-		    MockAdmin.log.debug("1:" + table.getCellAsText(j, 0));
-		    MockAdmin.log.debug("4:" + table.getCellAsText(j, 4));
-		    if (table.getCellAsText(j, 0).indexOf(name) != -1) {
-			TableCell cell = table.getTableCell(j, 4);
-			WebLink link = cell.getLinks()[0];
-			String cellText = link.getAttribute("href");
-			int startIndex = cellText.indexOf(MockAdmin.USER_ID_START_FLAG);
-			int endIndex = cellText.indexOf(MockAdmin.USER_ID_END_FLAG, startIndex);
-			idAsString = cellText.substring(startIndex + MockAdmin.USER_ID_START_FLAG.length(), endIndex);
-			break;
+		    MockAdmin.log.info(username + " adding roles to user " + name);
+		    resp = (WebResponse) new Call(wc, test, username + " submit user roles form", addRolesURL, is)
+			    .execute();
+		    WebTable[] tables = resp.getTables();
+		    if ((tables == null) || (tables.length < 2)) {
+			MockAdmin.log.debug(resp.getText());
+			throw new TestHarnessException(
+				username + " failed to get an user table after submitting user role form");
 		    }
+
+		    WebTable table = tables[1];
+		    String idAsString = null;
+		    for (int j = table.getRowCount() - 1; j >= 0; j--) {
+			MockAdmin.log.debug("1:" + table.getCellAsText(j, 0));
+			MockAdmin.log.debug("4:" + table.getCellAsText(j, 4));
+			if (table.getCellAsText(j, 0).indexOf(name) != -1) {
+			    TableCell cell = table.getTableCell(j, 4);
+			    WebLink link = cell.getLinks()[0];
+			    String cellText = link.getAttribute("href");
+			    int startIndex = cellText.indexOf(MockAdmin.USER_ID_START_FLAG);
+			    int endIndex = cellText.indexOf(MockAdmin.USER_ID_END_FLAG, startIndex);
+			    idAsString = cellText.substring(startIndex + MockAdmin.USER_ID_START_FLAG.length(),
+				    endIndex);
+			    break;
+			}
+		    }
+
+		    if (idAsString == null) {
+			MockAdmin.log.debug(resp.getText());
+			throw new TestHarnessException("Failed to set roles for user " + name);
+		    }
+
+		    delay();
+		} else {
+		    MockAdmin.log.debug("User " + name + " already has roles assigned to course " + courseId);
 		}
-		if (idAsString == null) {
-		    MockAdmin.log.debug(resp.getText());
-		    throw new TestHarnessException("Failed to get the user id for " + name);
-		}
-		MockAdmin.log.info(username + " created user " + name + " and the id is " + idAsString);
-		mockUser.setUserId(idAsString);
 	    }
 
 	    TestManager.storeUsers(storedUsersFileName, mockUsers);
