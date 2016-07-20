@@ -24,7 +24,6 @@
 		}
 	});
 	
-	
 	//init the connection with server using server URL but with different protocol
 	var websocket = new WebSocket('<lams:WebAppURL />'.replace('http', 'ws') 
 					+ 'learningWebsocket?toolSessionID=' + ${toolSessionID});
@@ -126,19 +125,22 @@
 	<div class="voffset10 pull-right">
 		<c:choose>
 			<c:when test="${isUserLeader && sessionMap.isBurningQuestionsEnabled}">
-				<html:button property="finishButton" styleId="finishButton" onclick="return finish('showBurningQuestions')"
+				<input type="hidden" name="method" id="method" value="showBurningQuestions">
+				<html:button property="finishButton" styleId="finishButton" onclick="return finish(false);"
 					styleClass="btn btn-sm btn-default">
 					<fmt:message key="label.continue.burning.questions" />
 				</html:button>
 			</c:when>
 			<c:when test="${isUserLeader && sessionMap.reflectOn}">
-				<html:button property="finishButton" styleId="finishButton" onclick="return finish('newReflection')"
+				<input type="hidden" name="method" id="method" value="newReflection">
+				<html:button property="finishButton" styleId="finishButton" onclick="return finish(false);"
 					styleClass="btn btn-default">
 					<fmt:message key="label.continue" />
 				</html:button>
 			</c:when>
 			<c:otherwise>
-				<html:button property="finishButton" styleId="finishButton" onclick="return finish('showResults')"
+				<input type="hidden" name="method" id="method" value="showResults">
+				<html:button property="finishButton" styleId="finishButton" onclick="return finish(false);"
 					styleClass="btn btn-default">
 					<fmt:message key="label.submit" />
 				</html:button>

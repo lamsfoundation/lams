@@ -36,9 +36,6 @@ import org.apache.log4j.Logger;
  * Scratchie
  *
  * @author Andrey Balan
- *
- *
- *
  */
 public class Scratchie implements Cloneable {
 
@@ -71,6 +68,8 @@ public class Scratchie implements Cloneable {
     private boolean extraPoint;
 
     private boolean burningQuestionsEnabled;
+    
+    private int timeLimit;
 
     private boolean reflectOnActivity;
 
@@ -343,5 +342,20 @@ public class Scratchie implements Cloneable {
 
     public void setBurningQuestionsEnabled(boolean burningQuestionsEnabled) {
 	this.burningQuestionsEnabled = burningQuestionsEnabled;
+    }
+    
+    /**
+     * @return Returns the time limitation, that students have to complete an attempt.
+     */
+    public int getTimeLimit() {
+	return timeLimit;
+    }
+
+    /**
+     * @param timeLimit
+     *            the time limitation, that students have to complete an attempt.
+     */
+    public void setTimeLimit(int timeLimit) {
+	this.timeLimit = timeLimit;
     }
 }

@@ -9,25 +9,32 @@
 	<c:if test="${sessionMap.isEnabledExtraPointOption}">
 		<div class="checkbox">
 			<label for="extraPoint">
-			<html:checkbox property="scratchie.extraPoint" styleId="extraPoint"/>
-			<fmt:message key="label.authoring.advanced.give.extra.point" />
+				<html:checkbox property="scratchie.extraPoint" styleId="extraPoint"/>
+				<fmt:message key="label.authoring.advanced.give.extra.point" />
 			</label>
 		</div>
 	</c:if>
 	
 	<div class="checkbox">
 		<label for="burningQuestionsEnabled">
-		<html:checkbox property="scratchie.burningQuestionsEnabled" styleId="burningQuestionsEnabled"/>
-		<fmt:message key="label.authoring.advanced.burning.questions" />
+			<html:checkbox property="scratchie.burningQuestionsEnabled" styleId="burningQuestionsEnabled"/>
+			<fmt:message key="label.authoring.advanced.burning.questions" />
+		</label>
+	</div>
+	
+	<div class="form-inline">
+		<label for="time-limit">
+			<fmt:message key="label.time.limit" />&nbsp;
+			<html:text property="scratchie.timeLimit" size="3" styleId="time-limit" styleClass="form-control input-sm"/>
 		</label>
 	</div>
 </lams:SimplePanel>
 
 <lams:SimplePanel titleKey="label.activity.completion">
 	<div class="checkbox">
-		<label for="reflectOn">
-		<html:checkbox property="scratchie.reflectOnActivity" styleId="reflectOn"/>
-		<fmt:message key="label.authoring.advanced.reflectOnActivity" />
+		<label for="reflect-on">
+			<html:checkbox property="scratchie.reflectOnActivity" styleId="reflect-on"/>
+			<fmt:message key="label.authoring.advanced.reflectOnActivity" />
 		</label>
 	</div>
 	
