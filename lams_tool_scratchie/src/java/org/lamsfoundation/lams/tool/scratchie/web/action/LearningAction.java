@@ -337,50 +337,6 @@ public class LearningAction extends Action {
     }
 
     /**
-     * Return whether leader still needs submit notebook.
-     */
-    private ActionForward checkLeaderSubmittedNotebook(ActionMapping mapping, ActionForm form,
-	    HttpServletRequest request, HttpServletResponse response) throws JSONException, IOException {
-	initializeScratchieService();
-
-	// get back SessionMap
-	String sessionMapID = request.getParameter(ScratchieConstants.ATTR_SESSION_MAP_ID);
-	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
-		.getAttribute(sessionMapID);
-	boolean isReflectOnActivity = (Boolean) sessionMap.get(ScratchieConstants.ATTR_REFLECTION_ON);
-	boolean isBurningQuestionsEnabled = (Boolean) sessionMap
-		.get(ScratchieConstants.ATTR_IS_BURNING_QUESTIONS_ENABLED);
-	Long toolSessionId = (Long) sessionMap.get(AttributeNames.PARAM_TOOL_SESSION_ID);
-
-	ScratchieSession toolSession = LearningAction.service.getScratchieSessionBySessionId(toolSessionId);
-	ScratchieUser groupLeader = toolSession.getGroupLeader();
-
-	// get notebook entry
-	NotebookEntry notebookEntry = null;
-	if (isReflectOnActivity && (groupLeader != null)) {
-	    notebookEntry = LearningAction.service.getEntry(toolSessionId, CoreNotebookConstants.NOTEBOOK_TOOL,
-		    ScratchieConstants.TOOL_SIGNATURE, groupLeader.getUserId().intValue());
-	}
-	boolean isWaitingForLeaderToSubmitNotebook = isReflectOnActivity && (notebookEntry == null);
-
-	// make non leaders also wait for burning questions submit
-	List<ScratchieBurningQuestion> burningQuestions = null;
-	if (isBurningQuestionsEnabled) {
-	    burningQuestions = LearningAction.service.getBurningQuestionsBySession(toolSessionId);
-	}
-	isWaitingForLeaderToSubmitNotebook |= isBurningQuestionsEnabled
-		&& ((burningQuestions == null) || burningQuestions.isEmpty()) && !toolSession.isSessionFinished();
-
-	JSONObject JSONObject = new JSONObject();
-	JSONObject.put(ScratchieConstants.ATTR_IS_WAITING_FOR_LEADER_TO_SUBMIT_NOTEBOOK,
-		isWaitingForLeaderToSubmitNotebook);
-	response.setContentType("application/x-json;charset=utf-8");
-	response.getWriter().print(JSONObject);
-
-	return null;
-    }
-
-    /**
      * Record in DB that leader has scratched specified answer. And return whether scratchie answer is correct or not
      *
      * @throws ScratchieApplicationException
