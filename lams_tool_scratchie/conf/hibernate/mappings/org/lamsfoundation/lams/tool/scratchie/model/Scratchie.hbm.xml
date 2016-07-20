@@ -134,6 +134,14 @@
             insert="true"
             column="burning_questions_enabled"
         />
+        
+        <property
+            name="timeLimit"
+            type="int"
+            update="true"
+            insert="true"
+            column="time_limit"
+        />
 
         <!--
             To add non XDoclet property mappings, create a file named

@@ -34,7 +34,17 @@
 				<c:otherwise>
 					<fmt:message key="label.off" />
 				</c:otherwise>
-			</c:choose>	
+			</c:choose>
+		</td>
+	</tr>
+	
+	<tr>
+		<td>
+			<fmt:message key="label.time.limit" />
+		</td>
+			
+		<td>
+			<c:out value="${sessionMap.scratchie.timeLimit}" escapeXml="true"/>
 		</td>
 	</tr>
 	

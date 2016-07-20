@@ -1,6 +1,9 @@
 <!DOCTYPE html>
 
 <%@ include file="/common/taglibs.jsp"%>
+<c:set var="lams">
+	<lams:LAMSURL />
+</c:set>
 <%-- param has higher level for request attribute --%>
 <c:if test="${not empty param.sessionMapID}">
 	<c:set var="sessionMapID" value="${param.sessionMapID}" />
@@ -10,32 +13,21 @@
 <c:set var="mode" value="${sessionMap.mode}" />
 <c:set var="toolSessionID" value="${sessionMap.toolSessionID}" />
 <c:set var="scratchie" value="${sessionMap.scratchie}" />
-<c:set var="isUserLeader" value="${sessionMap.isUserLeader}" />
+<c:set var="isUserLeader" value="${sessionMap.isUserLeader}" />	
 
 <lams:html>
 <lams:head>
 	<title><fmt:message key="label.learning.title" /></title>
 	<%@ include file="/common/header.jsp"%>
-	<style type="text/css">
-#scratches {
-	margin: 40px 0px;
-	border-spacing: 0;
-}
+	<link rel="stylesheet" type="text/css" href="${lams}css/jquery.countdown.css" />
+	<link rel="stylesheet" type="text/css" href="${lams}css/jquery.jgrowl.css" />
+	<link rel="stylesheet" type="text/css" href="includes/css/scratchie-learning.css" />
 
-#scratches tr td {
-	padding: 12px 15px;
-}
-
-#scratches a, #scratches a:hover {
-	border-bottom: none;
-}
-
-.scartchie-image {
-	border: 0;
-}
-</style>
-
-	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery-ui.js"></script>
+	<script type="text/javascript" src="${lams}includes/javascript/jquery-ui.js"></script>
+	<script type="text/javascript" src="${lams}includes/javascript/jquery.plugin.js"></script>
+	<script type="text/javascript" src="${lams}includes/javascript/jquery.countdown.js"></script>
+	<script type="text/javascript" src="${lams}includes/javascript/jquery.blockUI.js"></script>
+	<script type="text/javascript" src="${lams}includes/javascript/jquery.jgrowl.js"></script>	
 	<script type="text/javascript">
 		function scratchImage(itemUid, answerUid, isCorrect) {
 			// first show animation, then put static image
@@ -76,19 +68,79 @@
 	       	});
 		}
 
-		function finish(method){
-			var numberOfAvailableScratches = $("[id^=imageLink-][onclick]").length,
-				finishConfirmed = (numberOfAvailableScratches > 0) ? confirm("<fmt:message key="label.one.or.more.questions.not.completed"></fmt:message>") : true;
+		//time limit feature
+		<c:if test="${not sessionMap.userFinished && scratchie.timeLimit > 0 && (mode != 'teacher')}">
+			$(document).ready(function(){
+				//show confirmation dialog
+				$.blockUI({ 
+					message: $('#timelimit-start-dialog'), 
+					css: { width: '325px', height: '120px'}, 
+					overlayCSS: { opacity: '.98'} 
+				});
+					
+				//once OK button pressed start countdown
+			    $('#timelimit-start-ok').click(function() {
+			       	$.unblockUI();
+			       	displayCountdown();
+			    });
+			});
 			
-			if (finishConfirmed) {
-				document.getElementById("finishButton").disabled = true;
-				document.location.href ='<c:url value="/learning/' + method + '.do?sessionMapID=${sessionMapID}"/>';
+			function displayCountdown(){
+				var countdown = '<div id="countdown"></div>' 
+				$.blockUI({
+					message: countdown, 
+					showOverlay: false,
+					focusInput: false,
+					css: { 
+						top: '40px',
+						left: '',
+						right: '0%',
+				        opacity: '.8', 
+				        width: '230px',
+				        cursor: 'default',
+				        border: 'none'
+			        }   
+				});
 				
-				return false;
+				$('#countdown').countdown({
+					until: '+${scratchie.timeLimit * 60}S',  
+					format: 'hMS',
+					compact: true,
+					onTick: function(periods) {
+						//check for 30 seconds
+						if ((periods[4] == 0) && (periods[5] == 0) && (periods[6] <= 30)) {
+							$('#countdown').css('color', '#FF3333');
+						}					
+					},
+					onExpiry: function(periods) {
+				        $.blockUI({ message: '<h1 id="timelimit-expired"><img src="<html:rewrite page='/includes/images/indicator.gif'/>" border="0" > <fmt:message key="label.time.is.over" /></h1>' }); 
+				        
+				        setTimeout(function() { 
+				        	finish(true);
+				        }, 4000); 
+					},
+					description: "<div id='countdown-label'><fmt:message key='label.countdown.time.left' /></div>"
+				});
 			}
+		</c:if>
+
+		function finish(isTimelimitExpired) {
+			var method = $("#method").val();
+			
+			var proceed = true;
+			//ask for leave confirmation only if time limit is not expired
+			if (!isTimelimitExpired) {
+				var numberOfAvailableScratches = $("[id^=imageLink-][onclick]").length;
+				proceed = (numberOfAvailableScratches > 0) ? confirm("<fmt:message key="label.one.or.more.questions.not.completed"></fmt:message>") : true;	
+			}
+			
+			if (proceed) {
+				document.getElementById("finishButton").disabled = true;
+				document.location.href ='<c:url value="/learning/' + method + '.do?sessionMapID=${sessionMapID}"/>';	
+			}
+			
+			return false;
 		}
-		
-		
     </script>
 </lams:head>
 <body class="stripes">
@@ -116,13 +168,23 @@
 				</fmt:message>
 			</lams:Alert>
 		</c:if>
+		
+		<c:if test="${mode != 'teacher'}">
+			<div id="timelimit-start-dialog"> 
+		        <h4>
+		        	<fmt:message key='label.are.you.ready' />
+		        </h4>
+		        <html:button property="ok" styleId="timelimit-start-ok" styleClass="button">
+					<fmt:message key='label.ok' />
+				</html:button>
+			</div>
+		</c:if>
 
 		<%@ include file="/common/messages.jsp"%>
 
 		<div id="questionListArea">
 			<%@ include file="questionlist.jsp"%>
 		</div>
-
 
 		<div id="footer"></div>
 		<!--closes footer-->
