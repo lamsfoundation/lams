@@ -916,6 +916,7 @@ public class MockLearner extends MockUser implements Runnable {
 		    resp = handleActivity(resp);
 		    nextURL = MockLearner.parseOutNextURL(resp);
 		} else {
+		    new Call(wc, test, username + " logs out", "/lams/home.do?method=logout").execute();
 		    lessonFinished = true;
 		}
 	    } else {
