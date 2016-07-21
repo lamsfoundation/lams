@@ -231,6 +231,8 @@ public class MockAdmin extends MockUser {
 		}
 	    }
 
+	    new Call(wc, test, username + " logs out", "/lams/home.do?method=logout").execute();
+
 	    TestManager.storeUsers(storedUsersFileName, mockUsers);
 	} catch (IOException e) {
 	    throw new RuntimeException(e);

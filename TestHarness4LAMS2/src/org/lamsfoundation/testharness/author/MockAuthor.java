@@ -90,6 +90,7 @@ public class MockAuthor extends MockUser {
 	    String idAsString = text.substring(startIndex + MockAuthor.LD_START_TAG.length(), endIndex);
 	    MockAuthor.log
 		    .info(username + " imported learning design " + file.getName() + " and the id is " + idAsString);
+	    new Call(wc, test, username + " logs out", "/lams/home.do?method=logout").execute();
 	    return idAsString;
 	} catch (IOException e) {
 	    throw new RuntimeException(e);
