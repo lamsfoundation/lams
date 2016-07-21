@@ -128,6 +128,7 @@ public class MockMonitor extends MockUser implements Runnable {
 		MockMonitor.log.debug(username + " is refreshing all learners progress");
 		getAllLearnersProgress(monitorTest.getGetAllLearnersProgressURL(), monitorTest.getLsId());
 	    }
+	    new Call(wc, test, username + " logs out", "/lams/home.do?method=logout").execute();
 	    MockMonitor.log.info(username + " stopped monitoring");
 	    stopSignal.countDown();
 	} catch (Exception e) {
