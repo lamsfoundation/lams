@@ -16,7 +16,7 @@
 			
 			<div>
 				<strong><fmt:message key="label.wiki.history.version"></fmt:message>:</strong> ${currentWikiPage.currentWikiContentDTO.version}<br />
-				<strong><fmt:message key="label.wiki.history.date"></fmt:message>:</strong> <lams:Date value="${currentWikiPage.currentWikiContentDTO.editDate}"/><br />
+				<strong><fmt:message key="label.wiki.history.date"></fmt:message>:</strong> <lams:Date value="${currentWikiPage.currentWikiContentDTO.editDate}" timeago="true"/><br />
 				<strong><fmt:message key="label.wiki.history.editor"></fmt:message>:</strong> 
 				<c:choose>
 					<c:when test="${currentWikiPage.currentWikiContentDTO.editorDTO != null}">
