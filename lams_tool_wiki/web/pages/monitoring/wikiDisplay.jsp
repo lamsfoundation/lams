@@ -118,7 +118,7 @@
 									${wikiContentPageVersion.version}
 								</td>
 								<td>
-									<lams:Date value="${wikiContentPageVersion.editDate}" />
+									<lams:Date value="${wikiContentPageVersion.editDate}" timeago="true"/>
 								</td>
 								<td>
 									<c:choose>
