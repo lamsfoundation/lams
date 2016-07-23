@@ -196,7 +196,7 @@ public String getChild(Content f, ContentDbLoader cLoader) {
 	    function syncMarks() {
 	    	$j("#sync-button-but").hide();
 	    	
-	    	//var monitorWin2 = window.open('../GradebookSync?lsId='  + sequenceId,'mWindow','width=1024,height=768,resizable');
+	    	//var monitorWin2 = window.open('../GradebookSync?lsId='  + sequenceId,'mWindow','width=1280,height=720,resizable');
 	       // monitorWin2.focus();
 	       // return;
 	    	
@@ -246,7 +246,7 @@ public String getChild(Content f, ContentDbLoader cLoader) {
                 
             } else{
                 try {
-                    monitorWin = window.open(monitorURL,'mWindow','width=1024,height=768,resizable');
+                    monitorWin = window.open(monitorURL,'mWindow','width=1280,height=720,resizable');
                     monitorWin.focus();
                 }catch(e){
                     // popups blocked by a 3rd party
