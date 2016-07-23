@@ -289,16 +289,16 @@
 				
                 document.getElementsByName("sequence_id")[0].value = obj;
 
-                if (obj!=0) {
+                if ((typeof obj === "undefined") || (obj==0)) {
+                	isSelected = false;
+            		document.getElementById('previewbutton').style.visibility='hidden';
+            		
+                } else {
 	            	if (document.getElementsByName("title")[0].value == '') {
 	            	    document.getElementsByName("title")[0].value = name;
 	            	}
 	            	isSelected = true;
 	            	document.getElementById('previewbutton').style.visibility='visible';
-	            	
-                } else {
-                	isSelected = false;
-            		document.getElementById('previewbutton').style.visibility='hidden';
                 }
             }
             
