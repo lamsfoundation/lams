@@ -16,17 +16,17 @@
 	<title><fmt:message key="activity.title" /></title>
 	<lams:css />
 	<style media="screen,projection" type="text/css">
-div.growlUI {
-	background: url(check48.png) no-repeat 10px 10px
-}
-
-div.growlUI h1, div.growlUI h2 {
-	color: white;
-	padding: 5px 5px 5px 0px;
-	text-align: center;
-	font-size: 20px;
-}
-</style>
+		div.growlUI {
+			background: url(check48.png) no-repeat 10px 10px
+		}
+		
+		div.growlUI h1, div.growlUI h2 {
+			color: white;
+			padding: 5px 5px 5px 0px;
+			text-align: center;
+			font-size: 20px;
+		}
+	</style>
 
 	<script type="text/javascript" src="${lams}includes/javascript/common.js"></script>
 	<script type="text/javascript" src="${lams}includes/javascript/jquery.js"></script>
@@ -34,9 +34,7 @@ div.growlUI h1, div.growlUI h2 {
 	<script type="text/javascript" src="${lams}includes/javascript/jquery.blockUI.js"></script>
 	<script type="text/javascript" src="${lams}includes/javascript/jquery.timeago.js"></script>
 	<script type="text/javascript" src="${lams}includes/javascript/bootstrap.min.js"></script>
-
-
-	<script language="JavaScript" type="text/JavaScript">
+	<script type="text/JavaScript">
 
 		var minWordsLimitLabel = '<fmt:message key="label.minimum.number.words" ><fmt:param>{0}</fmt:param></fmt:message>';
 	
@@ -63,7 +61,7 @@ div.growlUI h1, div.growlUI h2 {
 						value =  $("#answer"+ questionId).val();
 					}
 					
-					var numberEnteredWords = getNumberOfWords(value); 
+					var numberEnteredWords = getNumberOfWords(value, isCkeditor); 
 					
 					var minWordsLimit = $(this).data("min-words-limit");
 					if (numberEnteredWords < minWordsLimit) {
@@ -145,6 +143,56 @@ div.growlUI h1, div.growlUI h2 {
 		       	}, interval
 		   );
 		}
+
+		//min words counter
+		$(document).ready(function() {
+			
+			//character count fuction in case ckeditor is OFF
+			function counter(event) {
+				var questionId = event.data.questionId;
+				var minWordsLimit = event.data.minWordsLimit;
+				var value = $("#answer"+ questionId).val();
+				
+				var numberEnteredWords = getNumberOfWords(value, false);
+				var numberRequiredWords = (minWordsLimit > numberEnteredWords) ? minWordsLimit - numberEnteredWords : 0;
+				$('#words-required-' + questionId).html(numberRequiredWords);
+			};
+
+			//character count fuction in case ckeditor is ON
+			function ckeditorCounter(event) {
+				var questionId = event.listenerData.questionId;
+				var minWordsLimit = event.listenerData.minWordsLimit;
+				var value = event.editor.getData();
+				
+				var numberEnteredWords = getNumberOfWords(value, true);
+				var numberRequiredWords = (minWordsLimit > numberEnteredWords) ? minWordsLimit - numberEnteredWords : 0;
+				$('#words-required-' + questionId).html(numberRequiredWords);
+			};
+
+			//check for min words limit 
+			jQuery(".min-words-limit-enabled").each(function() {
+
+				var isCkeditor = $(this).data("is-ckeditor");
+				var questionId = (${generalLearnerFlowDTO.questionListingMode == 'questionListingModeSequential'}) ? "" : $(this).data("sequence-id");
+				var minWordsLimit = $(this).data("min-words-limit");
+				
+				//assign function
+				if (isCkeditor) {
+					var ckeditor = CKEDITOR.instances["answer" + questionId];
+					
+				    ckeditor.on('change', ckeditorCounter, null, {questionId: questionId, minWordsLimit: minWordsLimit} );
+					//count characters initially
+				    ckeditor.on('instanceReady', ckeditorCounter, null, {questionId: questionId, minWordsLimit: minWordsLimit});
+				      
+				} else {
+					$("#answer" + questionId)
+						.on('change keydown keypress keyup paste', {questionId: questionId, minWordsLimit: minWordsLimit}, counter)
+						.trigger( "change", {questionId: questionId, minWordsLimit: minWordsLimit} );
+				}
+				
+			});
+
+		});
 		
 	</script>
 </lams:head>
