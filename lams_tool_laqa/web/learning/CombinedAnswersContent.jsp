@@ -25,19 +25,20 @@
 							<div class="panel"><c:out value="${questionEntry.value.question}" escapeXml="false" /></div>
 						
 							<div class="answer-req">
-							<fmt:message key="label.learning.yourAnswer" /> 
-							<c:if
-									test="${questionEntry.value.required}">
-									<small><mark>
+								<fmt:message key="label.learning.yourAnswer" /> 
+								<c:if test="${questionEntry.value.required}">
+									<small>
+										<mark>
 											<fmt:message key="label.required" />
-										</mark></small>
-								</c:if> <c:if test="${questionEntry.value.minWordsLimit != 0}">
-									<br/><small><em>- <fmt:message key="label.minimum.number.words">
-											<fmt:param>&nbsp;${questionEntry.value.minWordsLimit}</fmt:param>
-										</fmt:message>
-									</em></small>
+										</mark>
+									</small>
+								</c:if> 
+								
+								<c:if test="${questionEntry.value.minWordsLimit != 0}">
+									<br/>
+									<fmt:message key="label.words.required" />: <span id="words-required-${questionEntry.key}"></span>
 								</c:if>
-								</div>
+							</div>
 
 							<c:choose>
 								<c:when test="${hasEditRight}">

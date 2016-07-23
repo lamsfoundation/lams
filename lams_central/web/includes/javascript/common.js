@@ -119,16 +119,4 @@ function getNumberOfWords(value, isRemoveHtmlTags) {
 	var wordCount = value ? (value.replace(/['";:,.?\-!]+/g, '').match(/\S+/g) || []).length : 0;
 	return wordCount;
 }
-    
-function getNumberOfWords(value, isRemoveHtmlTags) {
-    	
-	//HTML tags stripping 
-	if (isRemoveHtmlTags) {
-		value = value.replace(/&nbsp;/g, '').replace(/<\/?[a-z][^>]*>/gi, '');
-	}
-	value = value.trim();
-    	
-	var wordCount = value ? (value.replace(/['";:,.?\-!]+/g, '').match(/\S+/g) || []).length : 0;
-	return wordCount;
-}
 	

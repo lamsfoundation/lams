@@ -26,16 +26,15 @@
 						<div class="answer-req">
 							<fmt:message key="label.learning.yourAnswer" />
 							<c:if test="${questionEntry.value.required}">
-								<small><mark>
+								<small>
+									<mark>
 										<fmt:message key="label.required" />
-									</mark></small>
+									</mark>
+								</small>
 							</c:if>
 							<c:if test="${questionEntry.value.minWordsLimit != 0}">
 								<br />
-								<small><em>- <fmt:message key="label.minimum.number.words">
-											<fmt:param>&nbsp;${questionEntry.value.minWordsLimit}</fmt:param>
-										</fmt:message>
-								</em></small>
+								<fmt:message key="label.words.required" />: <span id="words-required-"></span>
 							</c:if>
 						</div>
 
