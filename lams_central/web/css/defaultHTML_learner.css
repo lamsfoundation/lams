@@ -7,6 +7,7 @@ LAMS Learner Style
 /* Imports */
 @import url('/lams/includes/font-awesome/css/font-awesome.min.css');
 @import url('/lams/css/bootstrap.min.css');
+@import url('/lams/css/inlineeditor.css');
 @media (max-width: 500px) {
   .h1,
   .h2,
@@ -273,40 +274,6 @@ nav.navbar-heading {
 	cursor: pointer;
 }
 
-/** CKEditor Inline */
-.cke_textarea_inline {
-  /* From bootstrap form-control */
-  display: block;
-  width: 100%;
-  padding: 6px 12px;
-  font-size: 14px;
-  line-height: 1.42857143;
-  color: #555;
-  background-color: #fff;
-  background-image: none;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-  -webkit-box-shadow: inset 0 1px 1px rgba(0, 0, 0, .075);
-          box-shadow: inset 0 1px 1px rgba(0, 0, 0, .075);
-  -webkit-transition: border-color ease-in-out .15s, -webkit-box-shadow ease-in-out .15s;
-       -o-transition: border-color ease-in-out .15s, box-shadow ease-in-out .15s;
-          transition: border-color ease-in-out .15s, box-shadow ease-in-out .15s;	border: 1px solid #c1c1c1;
-  /* LAMS */
-   min-height: 100px;
-  -webkit-appearance: textfield;
-}
-
-.cke_textarea_inline:focus{
-  /* From bootstrap form-control */
-  border-color: #66afe9;
-  outline: 0;
-  -webkit-box-shadow: inset 0 1px 1px rgba(0,0,0,.075), 0 0 8px rgba(102, 175, 233, .6);
-          box-shadow: inset 0 1px 1px rgba(0,0,0,.075), 0 0 8px rgba(102, 175, 233, .6);
-}
-
-.cke_reset_all {
-	width: 70% !important;
-}
 
 /** Authoring */
 /*layout of adding a topic button */
