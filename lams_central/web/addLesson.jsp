@@ -180,8 +180,7 @@
 				<div id="introDescriptionLabelDiv">
 				 <fmt:message key="label.tab.advanced.intro.description" />
 				</div>
-				<lams:CKEditor id="introDescription" toolbarSet="LessonDescription" 
-				               height="150px" value="">
+				<lams:CKEditor id="introDescription" toolbarSet="LessonDescription" value="">
 				</lams:CKEditor>
 				<input id="introImageField" name="introImage" value="true" type="checkbox">
 					  <fmt:message key="label.tab.advanced.intro.image" />
