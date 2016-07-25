@@ -17,7 +17,7 @@ $(document).ready(function() {
 		MenuLib.init();
 	}
 	
-	GeneralLib.newLearningDesign(true, true);
+	GeneralLib.newLearningDesign(true);
 	if (!isReadOnlyMode) {
 		layout.ld.contentFolderID = initContentFolderID;
 	}
@@ -1379,7 +1379,7 @@ GeneralLib = {
 	/**
 	 * Removes existing activities and prepares canvas for a new sequence.
 	 */
-	newLearningDesign : function(force, soft){
+	newLearningDesign : function(force){
 		// force means that user should not be asked for confirmation.
 		if (!force && (layout.activities.length > 0
 					  || layout.regions.length > 0
@@ -1391,8 +1391,7 @@ GeneralLib = {
 		
 		$('#ldDescriptionDetails').slideUp();
 		
-		// soft means that data is manually reset, instead of simply reloading the page.
-		if (soft) {
+		if (force) {
 			layout.ld = {
 				'maxUIID' : 0,
 				'designType' : null
@@ -1401,19 +1400,6 @@ GeneralLib = {
 			layout.regions = [];
 			layout.labels = [];
 			layout.floatingActivity = null;
-			
-			if (!isReadOnlyMode) {
-				$('#ldDescriptionFieldTitle').text('Untitled');
-				var editor = CKEDITOR.instances['ldDescriptionFieldDescription'];
-				editor.once('dataReady', function(){
-					// do nothing
-					// this listener is just for saveLearningDesign() to detect that data was already cleared
-				});
-				editor.setData(null);
-				$('#ldDescriptionLicenseSelect').val(0);
-				$('#ldDescriptionLicenseText').text('');
-				GeneralLib.setModified(true);
-			}
 			
 			if (paper) {
 				paper.clear();
@@ -1464,7 +1450,7 @@ GeneralLib = {
 				var ld = response.ld;
 				
 				// remove existing activities
-				GeneralLib.newLearningDesign(true, true);
+				GeneralLib.newLearningDesign(true);
 				layout.ld = {
 					'learningDesignID' : ld.learningDesignID,
 					'folderID'		   : ld.workspaceFolderID,
@@ -1476,21 +1462,9 @@ GeneralLib = {
 				
 				if (!isReadOnlyMode) {
 					$('#ldDescriptionFieldTitle').html(GeneralLib.escapeHtml(ld.title));
-					var editor = CKEDITOR.instances['ldDescriptionFieldDescription'];
-					if (editor.hasListeners('dataReady')) {
-						// data was not cleared yet by newLearningDesign, so queue the current change
-						editor.once('dataReady', function(eventInfo){
-							editor.setData(ld.description);
-						});
-					} else {
-						// data was already cleared, so just set the description
-						editor.setData(ld.description);
-					}
-					
-					if (ld.licenseID) {
-						$('#ldDescriptionLicenseSelect').val(ld.licenseID || 0).change();
-						$('#ldDescriptionLicenseText').text(ld.licenseText);
-					}
+					CKEDITOR.instances['ldDescriptionFieldDescription'].setData(ld.description);
+					$('#ldDescriptionLicenseSelect').val(ld.licenseID || 0).change();
+					$('#ldDescriptionLicenseText').text(ld.licenseText || null);
 				}
 				
 				var arrangeNeeded = false,
