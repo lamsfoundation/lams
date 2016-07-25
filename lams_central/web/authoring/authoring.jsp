@@ -296,7 +296,7 @@
 	</div>
 	
 	<div id="toolbar" class="ui-corner-all">
-		<div id="newButton" class="ui-button" onClick="javascript:GeneralLib.newLearningDesign(false, false)">
+		<div id="newButton" class="ui-button" onClick="javascript:GeneralLib.newLearningDesign(false)">
 			<fmt:message key="authoring.fla.page.menu.new" />
 		</div>
 		<div>
