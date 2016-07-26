@@ -63,6 +63,7 @@ public interface NotebookConstants {
     public static final String PARAM_ENTRY = "entry";
     public static final String PARAM_NAME = "userName";
     public static final String PARAM_MODIFIED_DATE = "lastEdited";
+    public static final String PARAM_MODIFIED_DATE_TIMEAGO = "lastEditedTimeago";
     public static final String PARAM_COMMENT = "comment";
     public static final String PARAM_COMMENT_SORT = "commentsort"; // used to trigger sorting on comments
 
