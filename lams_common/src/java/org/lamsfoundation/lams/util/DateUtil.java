@@ -53,7 +53,16 @@ public class DateUtil {
     public static final String SCHEDULE_LESSON_FORMAT = "dd/M/yyyy h:mm a";
     public static final String ISO8601_FORMAT = "yyyy-MM-dd'T'HH:mmZ";
     public static final String PRETTY_FORMAT = "d MMMM yyyy h:mm:ss a";
-
+    private static DateFormat dateFormatterTimeAgo; // access via getTimeagoDateFormatter()
+    
+    private static DateFormat getTimeagoDateFormatter() {
+	if (dateFormatterTimeAgo == null) {
+	    dateFormatterTimeAgo = new SimpleDateFormat(DateUtil.ISO8601_FORMAT);
+	    dateFormatterTimeAgo.setTimeZone(TimeZone.getTimeZone("GMT"));
+	}
+	return dateFormatterTimeAgo;
+    }
+    
     /**
      * Convert your local time to Universal Time Coordinator. TODO conversion is not working properly. The returned Date
      * object still contain server local timezone rather than GMT time zone.
@@ -257,6 +266,14 @@ public class DateUtil {
 	}
 
 	return df.format(value);
+    }
+
+    /**
+     * Convert a date to the ISO08601 format needed for Timeago. Used to return dates through JSON.
+     */
+    public static String convertToStringForTimeagoJSON(Date value) {
+	return getTimeagoDateFormatter().format(value);
+	
     }
 
 }
