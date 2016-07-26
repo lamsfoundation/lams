@@ -55,6 +55,8 @@ public class DateUtil {
     public static final String ISO8601_FORMAT = "yyyy-MM-dd'T'HH:mmZ";
     public static final String PRETTY_FORMAT = "d MMMM yyyy h:mm:ss a";
     
+    private static final FastDateFormat dateFormatterTimeAgo = FastDateFormat.getInstance(DateUtil.ISO8601_FORMAT, TimeZone.getTimeZone("GMT"), null);
+
     /**
      * Convert your local time to Universal Time Coordinator. TODO conversion is not working properly. The returned Date
      * object still contain server local timezone rather than GMT time zone.
@@ -264,7 +266,6 @@ public class DateUtil {
      * Convert a date to the ISO08601 format needed for Timeago. Used to return dates through JSON.
      */
     public static String convertToStringForTimeagoJSON(Date value) {
-	FastDateFormat dateFormatterTimeAgo = FastDateFormat.getInstance(DateUtil.ISO8601_FORMAT, TimeZone.getTimeZone("GMT"), null);
 	return dateFormatterTimeAgo.format(value);
 	
     }
