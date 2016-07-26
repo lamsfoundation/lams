@@ -93,7 +93,11 @@
 							rows += '</td>';
 
 							rows += '<td>';
+							rows += '<time class="timeago" title="';
 							rows += userData["attemptTime"];
+							rows += '" datetime="';
+							rows += userData["attemptTimeTimeago"];
+							rows += '"></time>';
 							rows += '</td>';
 
 							rows += '<td><span id="link'+userData["userEntryUid"]+'">';
@@ -112,6 +116,10 @@
 						return json;
 			    	}
 				}					
+			})
+			// bind to pager events
+			.bind('pagerInitialized pagerComplete', function(event, options){
+				$("time.timeago").timeago();
 			})
 		});
   	})

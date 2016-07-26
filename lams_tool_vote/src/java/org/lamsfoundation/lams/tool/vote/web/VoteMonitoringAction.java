@@ -175,6 +175,8 @@ public class VoteMonitoringAction extends LamsDispatchAction implements VoteAppC
 	    responseRow.put(VoteAppConstants.ATTR_USER_NAME, StringEscapeUtils.escapeHtml((String) userAndAnswers[1]));
 	    responseRow.put(VoteAppConstants.ATTR_ATTEMPT_TIME,
 		    DateUtil.convertToStringForJSON((Date) userAndAnswers[2], request.getLocale()));
+	    responseRow.put(VoteAppConstants.ATTR_ATTEMPT_TIME_TIMEAGO,
+		    DateUtil.convertToStringForTimeagoJSON((Date) userAndAnswers[2]));
 	    rows.put(responseRow);
 	}
 	responsedata.put("rows", rows);
@@ -289,6 +291,8 @@ public class VoteMonitoringAction extends LamsDispatchAction implements VoteAppC
 	    responseRow.put("userEntry", StringEscapeUtils.escapeHtml(userAndAttempt.getUserEntry()));
 	    responseRow.put(VoteAppConstants.ATTR_ATTEMPT_TIME,
 		    DateUtil.convertToStringForJSON(userAndAttempt.getAttemptTime(), request.getLocale()));
+	    responseRow.put(VoteAppConstants.ATTR_ATTEMPT_TIME_TIMEAGO,
+		    DateUtil.convertToStringForTimeagoJSON(userAndAttempt.getAttemptTime()));
 	    responseRow.put("visible", userAndAttempt.isVisible());
 
 	    rows.put(responseRow);

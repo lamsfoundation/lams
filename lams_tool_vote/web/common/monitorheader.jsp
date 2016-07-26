@@ -23,6 +23,7 @@
 <script type="text/javascript" src="${lams}includes/javascript/chart.js"></script>
 <script type="text/javascript" src="${lams}includes/javascript/bootstrap.min.js"></script>
 <script type="text/javascript" src="${lams}includes/javascript/bootstrap.tabcontroller.js"></script>
+<script type="text/javascript" src="${lams}includes/javascript/jquery.timeago.js"></script>
 
 <link rel="stylesheet" href="${lams}css/jquery.tablesorter.theme.bootstrap.css">
 <link type="text/css" href="${lams}css/jquery.tablesorter.pager.css" rel="stylesheet">

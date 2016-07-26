@@ -249,6 +249,7 @@ public interface VoteAppConstants {
     public static final String ATTR_SESSION_UID = "sessionUid"; // not the tool session id supplied by the core
     public static final String ATTR_USER_NAME = "userName";
     public static final String ATTR_ATTEMPT_TIME = "attemptTime";
+    public static final String ATTR_ATTEMPT_TIME_TIMEAGO = "attemptTimeTimeago";
 
     /*
      * exception constants
