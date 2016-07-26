@@ -55,22 +55,20 @@
 			<div class="panel-heading">
 				<c:out value="${question.question}" escapeXml="false"/>
 			</div>
-			<div class="loffset5">
-				<lams:TSTable numColumns="${content.allowRateAnswers ? (isCommentsEnabled ? 3 : 2) : (isCommentsEnabled ? 2 : 1)}"
-							  dataId="data-session-id='${groupDto.sessionId}' data-question-uid='${question.uid}'">
-						<th title="<fmt:message key='label.sort.by.answer'/>"><fmt:message key="label.learning.answer"/></th>
-						<c:if test="${content.allowRateAnswers}">
-							<th title="<fmt:message key='label.sort.by.rating'/>" width="130px">
-								<fmt:message key="label.learning.rating" />
-							</th>
-						</c:if>
-						<c:if test="${isCommentsEnabled}">
-							<th>
-								<fmt:message key="label.comment" />
-							</th>
-						</c:if>
-				</lams:TSTable>
-			</div>
+			<lams:TSTable numColumns="${content.allowRateAnswers ? (isCommentsEnabled ? 3 : 2) : (isCommentsEnabled ? 2 : 1)}"
+						  dataId="data-session-id='${groupDto.sessionId}' data-question-uid='${question.uid}'">
+					<th title="<fmt:message key='label.sort.by.answer'/>"><fmt:message key="label.learning.answer"/></th>
+					<c:if test="${content.allowRateAnswers}">
+						<th title="<fmt:message key='label.sort.by.rating'/>" width="130px">
+							<fmt:message key="label.learning.rating" />
+						</th>
+					</c:if>
+					<c:if test="${isCommentsEnabled}">
+						<th>
+							<fmt:message key="label.comment" />
+						</th>
+					</c:if>
+			</lams:TSTable>
 		</div>
 	</c:forEach>
 	

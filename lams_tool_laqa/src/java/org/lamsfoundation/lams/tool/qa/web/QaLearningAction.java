@@ -1097,9 +1097,6 @@ public class QaLearningAction extends LamsDispatchAction implements QaAppConstan
 	    responcedata.put(AttributeNames.ATTR_COUNT_RATED_ITEMS, countRatedQuestions);
 	}
 
-	// setting date format to ISO8601 for jquery.timeago
-	DateFormat dateFormatterTimeAgo = new SimpleDateFormat(DateUtil.ISO8601_FORMAT);
-	dateFormatterTimeAgo.setTimeZone(TimeZone.getTimeZone("GMT"));
 	for (QaUsrResp response : responses) {
 	    QaQueUsr user = response.getQaQueUser();
 
@@ -1126,7 +1123,7 @@ public class QaLearningAction extends LamsDispatchAction implements QaAppConstan
 	    // in the server time zone.
 	    Date attemptTime = response.getAttemptTime();
 	    responseRow.put("attemptTime", DateUtil.convertToStringForJSON(attemptTime, request.getLocale()));
-	    responseRow.put("timeAgo", dateFormatterTimeAgo.format(attemptTime)); 
+	    responseRow.put("timeAgo", DateUtil.convertToStringForTimeagoJSON(attemptTime)); 
 
 	    if (isAllowRateAnswers) {
 
