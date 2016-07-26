@@ -72,11 +72,18 @@
 						} else {
 							jQuery("#group${sessionId}").setCell(rowId, 'commentsort','<fmt:message key="label.no" />');
 						}
+ 	                	var lastEdited = jQuery("#group${sessionId}").getCell(rowId, 'lastEdited');
+ 	                	var lastEditedTimeagoFormat = jQuery("#group${sessionId}").getCell(rowId, 'lastEditedTimeago');
+ 	                	if ( lastEditedTimeagoFormat && lastEditedTimeagoFormat.length > 0) {
+ 	                		jQuery("#group${sessionId}").setCell(rowId, 'lastEditedTimeagoOutput', 
+ 	                				'<time class="timeago" title="'+lastEdited+'" datetime="'+lastEditedTimeagoFormat+'"></time>'); 
+ 	                	}
  	                	var entry = jQuery("#group${sessionId}").getCell(rowId, 'entry');
  	                	if (entry && entry.length > 0) {
  	                		$("#group${sessionId}").expandSubGridRow(rowId);
  	                	}
  	                });
+ 	               $("time.timeago").timeago();
  	            },
  				subGridRowExpanded: function(subgridDivId, rowId) {
  					var subgrid = jQuery("#"+subgridDivId);
@@ -129,6 +136,8 @@
 						'userUid',
 						"<fmt:message key="label.user.name" />",
 					    "<fmt:message key="label.lastModified" />",
+					    "<fmt:message key="label.lastModified" />",
+					    "<fmt:message key="label.lastModified" />",
 					    'entry',
 					    "<fmt:message key="label.comment" />",  // comment summary for sorting
 					    'actualComment'],
@@ -137,7 +146,9 @@
 			   		{name:'id',index:'id', width:10, hidden: true, search: false},
 			   		{name:'userUid',index:'userUid', width:0, hidden: true, search: false},
 			   		{name:'userName',index:'userName', width:200},
-			   		{name:'lastEdited',index:'lastEdited', width:120, search: false},		
+			   		{name:'lastEdited',index:'lastEdited', hidden: true, width:0, search: false},		
+			   		{name:'lastEditedTimeago',index:'lastEditedTimeago', hidden: true, width:0,  search: false},		
+			   		{name:'lastEditedTimeagoOutput',index:'lastEditedTimeagoOutput', width:120, search: false},		
 			   		{name:'entry',index:'entry', hidden: true, width:0, search: false},	
 			   		{name:'commentsort',index:'commentsort', width:40, search: false },
 			   		{name:'comment',index:'comment', hidden: true, width:0, search: false}		
@@ -166,6 +177,7 @@
             });
         };
         setTimeout(function(){ window.dispatchEvent(new Event('resize')); }, 300);
+
 	});
 
 </script>
