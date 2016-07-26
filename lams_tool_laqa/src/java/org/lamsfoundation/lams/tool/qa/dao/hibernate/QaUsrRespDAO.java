@@ -107,8 +107,8 @@ public class QaUsrRespDAO extends LAMSBaseDAO implements IQaUsrRespDAO {
     }
 
     private static final String SQL_LOAD_ATTEMPT_FOR_SESSION_AND_QUESTION_LIMIT_WITH_NAME_SEARCH_AVG_RATING1 = "SELECT resp.*, AVG(rating.rating) avg_rating"
-	    + " FROM tl_laqa11_usr_resp resp WHERE resp.answer IS NOT NULL" + " JOIN tl_laqa11_que_usr usr"
-	    + " ON resp.qa_que_content_id = :questionId AND resp.que_usr_id = usr.uid "
+	    + " FROM tl_laqa11_usr_resp resp" + " JOIN tl_laqa11_que_usr usr"
+	    + " ON resp.answer IS NOT NULL AND resp.qa_que_content_id = :questionId AND resp.que_usr_id = usr.uid "
 	    + " AND usr.que_usr_id!=:excludeUserId " + " JOIN tl_laqa11_session sess "
 	    + " ON usr.qa_session_id = sess.uid AND sess.qa_session_id = :qaSessionId ";
 

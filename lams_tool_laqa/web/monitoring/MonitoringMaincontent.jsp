@@ -91,6 +91,8 @@
 	<script type="text/javascript" src="${lams}includes/javascript/monitorToolSummaryAdvanced.js" ></script>
 	<script type="text/javascript" src="${lams}includes/javascript/bootstrap.min.js"></script>
 	<script type="text/javascript" src="${lams}includes/javascript/bootstrap.tabcontroller.js"></script>
+	<script type="text/javascript" src="${lams}includes/javascript/jquery.timeago.js"></script>
+	
 	
  	<!-- ******************** FCK Editor related javascript & HTML ********************** -->
 	<script type="text/javascript">
@@ -100,15 +102,17 @@
 	  	$(document).ready(function(){
 		    
 			$(".tablesorter").tablesorter({
-				theme: 'blue',
+				theme: 'bootstrap',
 			    widthFixed: true,
-				widgets: ["zebra", "filter"],
+				widgets: ["uitheme", "zebra", "filter"],
+				headerTemplate : '{content} {icon}',
 				headers: { 1: { filter: false }, 2: { filter: false, sorter: false } },
 			    widgetOptions : {
 			        // include column filters
 			        filter_columnFilters: true,
 		    	    filter_placeholder: { search : '<fmt:message key="label.search"/>' },
 		    	    filter_searchDelay: 700
+		    	    
 		      	}
 			});
 			
@@ -140,7 +144,11 @@
 									rows += 	'<span class="field-name">';
 									rows += 		userData["userName"];
 									rows += 	'</span> ';
-									rows += 	userData["attemptTime"];
+									rows += 	'(<time class="timeago" title="';
+									rows += 	userData["attemptTime"]
+									rows += 	'" datetime="';
+									rows += 	userData["timeAgo"];
+									rows += 	'"></time>)';
 									rows += '</div>';
 								
 								rows += 	'<div class="user-answer">';
@@ -236,6 +244,7 @@
 				
 				// bind to pager events
 				.bind('pagerInitialized pagerComplete', function(event, options){
+					$("time.timeago").timeago();
 					initializeJRating();
 				})
 			});
