@@ -1048,9 +1048,9 @@ public class LearningAction extends Action {
 			question.setPenalty(questionResult.getPenalty());
 
 			for (AssessmentQuestionOption option : question.getOptions()) {
+			    
 			    for (AssessmentOptionAnswer optionAnswer : questionResult.getOptionAnswers()) {
 				if (option.getUid().equals(optionAnswer.getOptionUid())) {
-
 				    option.setAnswerBoolean(optionAnswer.getAnswerBoolean());
 				    option.setAnswerInt(optionAnswer.getAnswerInt());
 				    break;
@@ -1060,10 +1060,21 @@ public class LearningAction extends Action {
 
 			//sort ordering type of question in order to show how learner has sorted them
 			if (question.getType() == AssessmentConstants.QUESTION_TYPE_ORDERING) {
-			    TreeSet<AssessmentQuestionOption> orderedSet = new TreeSet<AssessmentQuestionOption>(
-				    new AnswerIntComparator());
-			    orderedSet.addAll(question.getOptions());
-			    question.setOptions(orderedSet);
+			    
+			    //don't sort ordering type of questions that haven't been submitted to not break their shuffled order
+			    boolean isOptionAnswersNeverSubmitted = true;
+			    for (AssessmentQuestionOption option : question.getOptions()) {
+				if (option.getAnswerInt() != 0) {
+				    isOptionAnswersNeverSubmitted = false;
+				}
+			    }
+
+			    if (!isOptionAnswersNeverSubmitted) {
+				TreeSet<AssessmentQuestionOption> orderedSet = new TreeSet<AssessmentQuestionOption>(
+					new AnswerIntComparator());
+				orderedSet.addAll(question.getOptions());
+				question.setOptions(orderedSet);
+			    }
 			}
 
 			break;
