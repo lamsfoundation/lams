@@ -102,6 +102,8 @@ public class LoginRequestDispatcher {
     private static final String URL_LEARNER = "/home.do?method=learner&lessonID=";
 
     private static final String URL_MONITOR = "/home.do?method=monitorLesson&lessonID=";
+    
+    private static final String URL_REDIRECT = "/home.do?method=redirect";
 
     private static final String URL_GRADEBOOK = "/services/Gradebook?";
 
@@ -118,18 +120,19 @@ public class LoginRequestDispatcher {
      *
      * @param request
      * @return
+     * @throws UnsupportedEncodingException 
      */
 
-    public static String getRequestURL(HttpServletRequest request) throws ServletException {
+    public static String getRequestURL(HttpServletRequest request) throws ServletException, UnsupportedEncodingException {
 
 	// get the location from an explicit parameter if it exists
-	String redirect = request.getParameter("redirectURL");
-	if (redirect != null) {
+	String redirectUrlParam = request.getParameter("redirectURL");
+	if (redirectUrlParam != null) {
 	    // for NTU Blackboard's based templates, force to https to co-exist with Blackboard
-	    if (redirect.indexOf("ldtemplate") >= 0) {
-		return "https://" + request.getServerName() + request.getContextPath() + "/" + redirect;
+	    if (redirectUrlParam.indexOf("ldtemplate") >= 0) {
+		return "https://" + request.getServerName() + request.getContextPath() + "/" + redirectUrlParam;
 	    } else {
-		return request.getContextPath() + "/" + redirect;
+		return request.getContextPath() + URL_REDIRECT + "&redirectURL=" + URLEncoder.encode(redirectUrlParam, "UTF8");
 	    }
 	}
 
