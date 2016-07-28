@@ -2201,59 +2201,73 @@ public class MonitoringService implements IMonitoringService {
     public int cloneLessons(String[] lessonIds, Boolean addAllStaff, Boolean addAllLearners, String[] staffIds,
 	    String[] learnerIds, Organisation group) throws MonitoringServiceException {
 	int result = 0;
-	for (String l : lessonIds) {
-	    Lesson lesson = lessonService.getLesson(Long.valueOf(l));
-	    if (lesson != null) {
-		HttpSession ss = SessionManager.getSession();
-		if (ss != null) {
-		    UserDTO userDto = (UserDTO) ss.getAttribute(AttributeNames.USER);
-		    if (userDto != null) {
-			if ((!addAllStaff && (staffIds.length > 0)) || addAllStaff) {
-			    // create staff LessonClass
-			    String staffGroupName = group.getName() + " staff";
-			    List<User> staffUsers = createStaffGroup(group.getOrganisationId(), addAllStaff, staffIds);
+	HttpSession ss = SessionManager.getSession();
+	if (ss != null) {
+	    UserDTO userDto = (UserDTO) ss.getAttribute(AttributeNames.USER);
+	    if (userDto != null) {
+		Integer creatorId = userDto.getUserID();
 
-			    if ((!addAllLearners && (learnerIds.length > 0)) || addAllLearners) {
-				// create learner LessonClass for lesson
-				String learnerGroupName = group.getName() + " learners";
-				List<User> learnerUsers = createLearnerGroup(group.getOrganisationId(), addAllLearners,
-					learnerIds);
+		for (String lessonIdStr : lessonIds) {
+		    Long lessonId = Long.parseLong(lessonIdStr);
 
-				// init Lesson with user as creator
-				Lesson newLesson = this.initializeLesson(lesson.getLessonName(),
-					lesson.getLessonDescription(), lesson.getLearningDesign().getLearningDesignId(),
-					group.getOrganisationId(), userDto.getUserID(), null,
-					lesson.isEnableLessonIntro(), lesson.isDisplayDesignImage(),
-					lesson.getLearnerPresenceAvailable(), lesson.getLearnerImAvailable(),
-					lesson.getLiveEditEnabled(), lesson.getEnableLessonNotifications(),
-					lesson.getForceLearnerRestart(), lesson.getAllowLearnerRestart(), null, null);
-
-				// save LessonClasses
-				newLesson = this.createLessonClassForLesson(newLesson.getLessonId(), group,
-					learnerGroupName, learnerUsers, staffGroupName, staffUsers,
-					userDto.getUserID());
-
-				// start Lessons
-				// TODO user-specified creator; must be someone in staff group
-				this.startLesson(newLesson.getLessonId(), staffUsers.get(0).getUserId());
-
-				result++;
-			    } else {
-				throw new MonitoringServiceException(
-					"No learners specified, can't create any Lessons.");
-			    }
-			} else {
-			    throw new MonitoringServiceException("No staff specified, can't create any Lessons.");
-			}
-		    } else {
-			throw new MonitoringServiceException("No UserDTO in session, can't create any Lessons.");
-		    }
+		    cloneLesson(lessonId, creatorId, addAllStaff, addAllLearners, staffIds, learnerIds, group);
+		    result++;
 		}
 	    } else {
-		throw new MonitoringServiceException("Couldn't find Lesson based on id=" + l);
+		throw new MonitoringServiceException("No UserDTO in session, can't create any Lessons.");
 	    }
 	}
+
 	return result;
+    }
+
+    @Override
+    public Long cloneLesson(Long lessonId, Integer creatorId, Boolean addAllStaff, Boolean addAllLearners,
+	    String[] staffIds, String[] learnerIds, Organisation group) throws MonitoringServiceException {
+	Lesson newLesson = null;
+
+	securityService.isGroupMonitor(group.getOrganisationId(), creatorId, "cloneLesson", true);
+
+	Lesson lesson = lessonService.getLesson(lessonId);
+	if (lesson != null) {
+
+	    if ((!addAllStaff && (staffIds.length > 0)) || addAllStaff) {
+		// create staff LessonClass
+		String staffGroupName = group.getName() + " Staff";
+		List<User> staffUsers = createStaffGroup(group.getOrganisationId(), addAllStaff, staffIds);
+
+		if ((!addAllLearners && (learnerIds.length > 0)) || addAllLearners) {
+		    // create learner LessonClass for lesson
+		    String learnerGroupName = group.getName() + " Learners";
+		    List<User> learnerUsers = createLearnerGroup(group.getOrganisationId(), addAllLearners, learnerIds);
+
+		    // init Lesson with user as creator
+		    newLesson = this.initializeLesson(lesson.getLessonName(), lesson.getLessonDescription(),
+			    lesson.getLearningDesign().getLearningDesignId(), group.getOrganisationId(), creatorId,
+			    null, lesson.isEnableLessonIntro(), lesson.isDisplayDesignImage(),
+			    lesson.getLearnerPresenceAvailable(), lesson.getLearnerImAvailable(),
+			    lesson.getLiveEditEnabled(), lesson.getEnableLessonNotifications(),
+			    lesson.getForceLearnerRestart(), lesson.getAllowLearnerRestart(), null, null);
+
+		    // save LessonClasses
+		    newLesson = this.createLessonClassForLesson(newLesson.getLessonId(), group, learnerGroupName,
+			    learnerUsers, staffGroupName, staffUsers, creatorId);
+
+		    // start Lessons
+		    // TODO user-specified creator; must be someone in staff group
+		    this.startLesson(newLesson.getLessonId(), staffUsers.get(0).getUserId());
+
+		} else {
+		    throw new MonitoringServiceException("No learners specified, can't create any Lessons.");
+		}
+	    } else {
+		throw new MonitoringServiceException("No staff specified, can't create any Lessons.");
+	    }
+	} else {
+	    throw new MonitoringServiceException("Couldn't find Lesson based on id=" + lessonId);
+	}
+
+	return newLesson.getLessonId();
     }
 
     /*

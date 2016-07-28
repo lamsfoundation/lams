@@ -81,6 +81,8 @@ public class CentralConstants {
 
     public static final String METHOD_SCHEDULE = "schedule";
 
+    public static final String METHOD_CLONE = "clone";
+
     public static final String METHOD_DELETE = "delete";
 
     public static final String METHOD_STUDENT_PROGRESS = "studentProgress";
