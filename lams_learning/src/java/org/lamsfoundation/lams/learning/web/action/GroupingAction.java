@@ -147,6 +147,7 @@ public class GroupingAction extends LamsDispatchAction {
 	groupForm.set("previewLesson", learnerProgress.getLesson().isPreviewLesson());
 	groupForm.set("title", activity.getTitle());
 
+	request.setAttribute(AttributeNames.PARAM_LESSON_ID, lessonId);
 	if (groupingDone) {
 	    request.setAttribute(GroupingAction.FINISHED_BUTTON, Boolean.TRUE);
 	    return mapping.findForward(GroupingAction.VIEW_GROUP);

@@ -42,7 +42,8 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 	<c:set var="lams">
 		<lams:LAMSURL />
 	</c:set>
-		
+
+	<script type="text/javascript" src="${lams}includes/javascript/jquery.js"></script>
 	<script type="text/javascript"
 		src="${lams}includes/javascript/common.js"></script>
 </lams:head>
