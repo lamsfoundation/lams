@@ -43,3 +43,8 @@ div.highlight {
 	border:2px solid #cacdd1; 
 }
  
+#clearfix:after { 
+    content: " "; 
+    display: block;
+    clear: both;
+} 
