@@ -9,6 +9,8 @@
 	<lams:css />
 	<title><fmt:message key="activity.title" /></title>
 
+	<script type="text/javascript" src="<lams:LAMSURL />javascript/jquery.js"></script>
+
 	<script language="JavaScript" type="text/JavaScript">
 		function submitLearningMethod(actionMethod) {
 			if (actionMethod == 'endLearning') {
