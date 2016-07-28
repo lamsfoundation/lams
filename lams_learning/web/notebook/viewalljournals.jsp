@@ -28,7 +28,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 </c:set>
 
 <fmt:setBundle basename="org.lamsfoundation.lams.learning.ApplicationResources" />
-<lams:Page type="learner" title="${title}">
+<lams:Page type="learner" title="${title}" hideProgressBar="true">
 
 	<h2>
 		<fmt:message key="mynotes.view.all.button" />

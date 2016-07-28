@@ -21,7 +21,6 @@
  * ****************************************************************
  */
 
-
 package org.lamsfoundation.lams.learning.service;
 
 import javax.servlet.ServletContext;
@@ -30,6 +29,7 @@ import org.lamsfoundation.lams.learning.web.util.ActivityMapping;
 import org.lamsfoundation.lams.lesson.service.ILessonService;
 import org.lamsfoundation.lams.tool.service.ILamsToolService;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
+import org.lamsfoundation.lams.util.MessageService;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 
@@ -48,7 +48,7 @@ public class LearnerServiceProxy {
     /**
      * Return the learner domain service object. It will delegate to the Spring
      * helper method to retrieve the proper bean from Spring bean factory.
-     * 
+     *
      * @param servletContext
      *            the servletContext for current application
      * @return learner service object.
@@ -61,7 +61,7 @@ public class LearnerServiceProxy {
      * Return the user management domain service object. It will delegate to
      * the Spring helper method to retrieve the proper bean from Spring bean
      * factory
-     * 
+     *
      * @param servletContext
      *            the servletContext for current application
      * @return user management service object
@@ -73,7 +73,7 @@ public class LearnerServiceProxy {
     /**
      * Return the lams tool domain service object. It will delegate to the
      * Spring helper method to retrieve the proper bean from Spring bean factory.
-     * 
+     *
      * @param serlvetContext
      *            the servletContext for current application
      * @return tool service object
@@ -86,9 +86,17 @@ public class LearnerServiceProxy {
 	return (ILessonService) LearnerServiceProxy.getDomainService(servletContext, "lessonService");
     }
 
+    public static final MessageService getMessageService(ServletContext servletContext) {
+	return (MessageService) LearnerServiceProxy.getDomainService(servletContext, "learningMessageService");
+    }
+
+    public static final MessageService getMonitoringMessageService(ServletContext servletContext) {
+	return (MessageService) LearnerServiceProxy.getDomainService(servletContext, "monitoringMessageService");
+    }
+
     /**
      * Return the activity mapping service object.
-     * 
+     *
      * @param serlvetContext
      *            the servletContext for current application
      * @return the activity mapping service object.
@@ -99,7 +107,7 @@ public class LearnerServiceProxy {
 
     /**
      * Retrieve the proper Spring bean from bean factory.
-     * 
+     *
      * @param servletContext
      *            the servletContext for current application
      * @return the Spring service bean.

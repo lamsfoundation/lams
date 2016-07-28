@@ -11,10 +11,24 @@
 	-->
 
 	<!-- ========================= GENERAL DEFINITIONS ========================= -->
-	<bean id="learningMessageSource" class="org.springframework.context.support.ResourceBundleMessageSource">
+	<bean id="monitoringMessageSource" class="org.springframework.context.support.ResourceBundleMessageSource">
 		<property name="basename">
 			<value>org.lamsfoundation.lams.monitoring.ApplicationResources</value>
 		</property>
+	</bean>
+	
+	<bean id="monitoringMessageService" class="org.lamsfoundation.lams.util.MessageService" >
+		<property name="messageSource" ref="monitoringMessageSource" />								
+	</bean>
+
+	<bean id="learningMessageSource" class="org.springframework.context.support.ResourceBundleMessageSource">
+		<property name="basename">
+			<value>org.lamsfoundation.lams.learning.ApplicationResources</value>
+		</property>
+	</bean>
+	
+	<bean id="learningMessageService" class="org.lamsfoundation.lams.util.MessageService" >
+		<property name="messageSource" ref="learningMessageSource" />								
 	</bean>
 	
 	<!-- ========================= BUSINESS OBJECT DEFINITIONS ======================== -->

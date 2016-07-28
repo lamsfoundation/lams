@@ -10,7 +10,7 @@
 
 	<context-param>
 		<param-name>messageSource</param-name>
-		<param-value>learningMessageSource</param-value>
+		<param-value>monitoringMessageSource</param-value>
 	</context-param>
 
 	<context-param>

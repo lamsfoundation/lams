@@ -44,7 +44,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 </c:set>
 
 
-<lams:Page type="learner" title="${title}">
+<lams:Page type="learner" title="${title}"  hideProgressBar="true">
 	<html:form action="/notebook.do?method=processNewEntry" styleId="notebookForm" method="post">
 
 		<html:hidden property="signature" />

@@ -54,11 +54,13 @@ import org.lamsfoundation.lams.lesson.LearnerProgress;
 import org.lamsfoundation.lams.lesson.LearnerProgressArchive;
 import org.lamsfoundation.lams.lesson.Lesson;
 import org.lamsfoundation.lams.lesson.service.ILessonService;
+import org.lamsfoundation.lams.tool.ToolSession;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
 import org.lamsfoundation.lams.util.Configuration;
 import org.lamsfoundation.lams.util.ConfigurationKeys;
+import org.lamsfoundation.lams.util.MessageService;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.action.LamsDispatchAction;
 import org.lamsfoundation.lams.web.session.SessionManager;
@@ -89,6 +91,18 @@ public class LearnerAction extends LamsDispatchAction {
     // ---------------------------------------------------------------------
     private static Logger log = Logger.getLogger(LearnerAction.class);
 
+    private static JSONObject progressBarMessages = null;
+
+    private static final String[] MONITOR_MESSAGE_KEYS = new String[] {
+	    "label.learner.progress.activity.current.tooltip", "label.learner.progress.activity.completed.tooltip",
+	    "label.learner.progress.activity.attempted.tooltip", "label.learner.progress.activity.tostart.tooltip",
+	    "label.learner.progress.activity.support.tooltip"};
+
+    private static final String[] LEARNER_MESSAGE_KEYS = new String[] {
+	    "message.learner.progress.restart.confirm", "message.lesson.restart.button",
+	    "label.learner.progress.notebook", "button.exit"};
+
+    
     // ---------------------------------------------------------------------
     // Class level constants - Struts forward
     // ---------------------------------------------------------------------
@@ -244,7 +258,18 @@ public class LearnerAction extends LamsDispatchAction {
 	    monitorId = userId;
 	}
 
-	Long lessonId = WebUtil.readLongParam(request, AttributeNames.PARAM_LESSON_ID);
+	JSONObject responseJSON = new JSONObject();
+	Long lessonId = WebUtil.readLongParam(request, AttributeNames.PARAM_LESSON_ID, true);
+	if (lessonId == null) {
+	    // depending on when this is called, there may only be a toolSessionId known, not the lessonId.
+	    Long toolSessionId = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_SESSION_ID);
+	    ToolSession toolSession = LearnerServiceProxy.getLamsToolService(getServlet().getServletContext())
+		    .getToolSession(toolSessionId);
+	    lessonId = toolSession.getLesson().getLessonId();
+	}
+
+	responseJSON.put("messages", getProgressBarMessages());
+	
 	ICoreLearnerService learnerService = LearnerServiceProxy.getLearnerService(getServlet().getServletContext());
 	Object[] ret = learnerService.getStructuredActivityURLs(learnerId, lessonId);
 	if (ret == null) {
@@ -252,7 +277,6 @@ public class LearnerAction extends LamsDispatchAction {
 	    return null;
 	}
 
-	JSONObject responseJSON = new JSONObject();
 	responseJSON.put("currentActivityId", ret[1]);
 	responseJSON.put("isPreview", ret[2]);
 	for (ActivityURL activity : (List<ActivityURL>) ret[0]) {
@@ -373,5 +397,54 @@ public class LearnerAction extends LamsDispatchAction {
 	}
 
 	return activityJSON;
+    }
+
+    private JSONObject getProgressBarMessages() throws JSONException {
+	if (progressBarMessages == null) {
+	    progressBarMessages = new JSONObject();
+	    MessageService messageService = LearnerServiceProxy.getMonitoringMessageService(getServlet().getServletContext());
+	    for (String key : MONITOR_MESSAGE_KEYS) {
+		String value = messageService.getMessage(key);
+		progressBarMessages.put(key, value);
+	    }
+	    messageService = LearnerServiceProxy.getMessageService(getServlet().getServletContext());
+	    for (String key : LEARNER_MESSAGE_KEYS) {
+		String value = messageService.getMessage(key);
+		progressBarMessages.put(key, value);
+	    }
+	}
+	return progressBarMessages;
+    }
+    
+    /**
+     * Gets the lesson details based on lesson id or the current tool session
+     */
+    public ActionForward getLessonDetails(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+	    HttpServletResponse response) throws JSONException, IOException {
+
+	JSONObject responseJSON = new JSONObject();
+	Lesson lesson = null;
+	
+	Long lessonID = WebUtil.readLongParam(request, AttributeNames.PARAM_LESSON_ID, true);
+	if ( lessonID != null ) {
+	    lesson = LearnerServiceProxy.getLearnerService(getServlet().getServletContext()).getLesson(lessonID);
+
+	} else {
+	    Long toolSessionId = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_SESSION_ID);
+	    ToolSession toolSession = LearnerServiceProxy.getLamsToolService(getServlet().getServletContext())
+		    .getToolSession(toolSessionId);
+	    lesson = toolSession.getLesson();
+	}
+
+	responseJSON.put(AttributeNames.PARAM_LESSON_ID, lesson.getLessonId());
+	responseJSON.put(AttributeNames.PARAM_TITLE, lesson.getLessonName());
+	responseJSON.put("allowRestart", lesson.getAllowLearnerRestart());
+	responseJSON.put(AttributeNames.PARAM_PRESENCE_ENABLED, lesson.getLearnerPresenceAvailable());
+	responseJSON.put(AttributeNames.PARAM_PRESENCE_IM_ENABLED, lesson.getLearnerImAvailable());
+
+	response.setContentType("application/json;charset=utf-8");
+	response.getWriter().print(responseJSON.toString());
+
+	return null;
     }
 }

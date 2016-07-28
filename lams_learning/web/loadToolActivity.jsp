@@ -30,6 +30,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 	<lams:WebAppURL />
 </c:set>
 <link href="${learnerAppUrl}css/nprogress.css" rel="stylesheet" type="text/css" />
+<script type="text/javascript" src="<lams:LAMSURL />includes/javascript/jquery.js"></script>
 <script type="text/javascript" src="${learnerAppUrl}includes/javascript/nprogress.js"></script>
 
 
@@ -65,7 +66,9 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 	</script>
 
 	<script language="JavaScript" type="text/JavaScript">
-		window.onload = redirectPage;
+		$(document).ready(function(){
+			redirectPage();
+		});
 	</script>
 
 	<lams:Page type="admin">

@@ -4,7 +4,7 @@
 
 #presenceChat {
 	position: absolute;
-	width: 600px;
+	width: 640px;
 	height: 300px;
 	right: 18px;
 	z-index: 10;
@@ -88,10 +88,8 @@
 }
 
 .messageInput {
-	float: left;
-	width: 85%;
+	width: 80%;
 }
 	
 .sendButton {
-	float: left;
 }

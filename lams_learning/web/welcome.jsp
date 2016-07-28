@@ -22,14 +22,16 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 <%@ taglib uri="tags-bean" prefix="bean"%>
 <%@ taglib uri="tags-fmt" prefix="fmt"%>
 <%@ taglib uri="tags-core" prefix="c"%>
+<%@ taglib uri="tags-lams" prefix="lams" %>
 
 <c:if test="${empty lessonID}">
 	<bean:parameter id="lessonID" name="lessonID" />
 </c:if>
-
+<script type="text/javascript" src="<lams:LAMSURL />includes/javascript/jquery.js"></script>
 <script language="JavaScript" type="text/JavaScript">
 <!--
-	parent.frames['contentFrame'].location.href = "learner.do?method=joinLesson&lessonID=<c:out value='${lessonID}' escapeXml='true' />";
+	var contentURL = '<lams:WebAppURL />learner.do?method=joinLesson&lessonID=<c:out value='${lessonID}' escapeXml='true' />';
+	window.location.href = contentURL;
 //-->
 </script>
 

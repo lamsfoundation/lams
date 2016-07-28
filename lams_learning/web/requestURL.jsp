@@ -32,13 +32,12 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 		
 		<script type="text/javascript">
 			function doRedirect() {
-				var contentFrame = parent.frames['contentFrame'];
-				if (contentFrame == null) {
-					// This means we are in a parallel activity.
-					// We need to move two levels up to reach 'contentFrame'
-					contentFrame = parent.parent.frames['contentFrame'];
-				}	
-				contentFrame.location.href = decodeURIComponent("<c:out value='${url}' escapeXml='false' />");
+				var myParent = parent;
+				var url = decodeURIComponent("<c:out value='${url}' escapeXml='false' />");
+				if ( myParent )
+					myParent.location.href = url;
+				else 
+					window.location.href = url;
 			}
 			window.onload = doRedirect;
 		</script>

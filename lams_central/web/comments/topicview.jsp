@@ -162,7 +162,7 @@
 			</div>
 		</c:if>
 		<c:set var="messageTablename" value="tree${commentDto.comment.uid}"/>
-		<div id="thread${commentDto.comment.uid}" class="col-xs-12 voffset10">
+		<div id="thread${commentDto.comment.uid}" class="clearfix">
 		<c:set var="isSticky" value="${commentDto.comment.sticky}"/>
 		<table id="${messageTablename}" class="col-xs-12">
 		<tr data-tt-id="${commentDto.comment.uid}"><td>	
