@@ -256,8 +256,7 @@ public class AssessmentEscapeUtils {
 		case AssessmentConstants.QUESTION_TYPE_TRUE_FALSE:
 		    return questionResult.getAnswerBoolean();
 		case AssessmentConstants.QUESTION_TYPE_MARK_HEDGING:
-		    return AssessmentEscapeUtils.getOptionResponse(questionResult,
-			    AssessmentConstants.QUESTION_TYPE_MARK_HEDGING);
+		    //taken care beforehand
 		default:
 		    return null;
 	    }
@@ -322,17 +321,7 @@ public class AssessmentEscapeUtils {
 		}
 
 	    } else if (type == AssessmentConstants.QUESTION_TYPE_MARK_HEDGING) {
-
-		for (AssessmentQuestionOption option : options) {
-		    sb.append("[" + option.getOptionString() + ", ");
-
-		    for (AssessmentOptionAnswer optionAnswer : optionAnswers) {
-			if (option.getUid().equals(optionAnswer.getOptionUid())) {
-			    sb.append(optionAnswer.getAnswerInt() + "] ");
-			}
-		    }
-
-		}
+		//taken care beforehand
 	    }
 
 	}
