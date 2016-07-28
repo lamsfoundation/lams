@@ -38,7 +38,16 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 	<fmt:message key="mynotes.title" />
 </c:set>
 
-<lams:Page type="learner" title="${title}">
+<lams:Page type="learner" title="${title}" hideProgressBar="true">
+	<c:set var="addnote">
+		<html:rewrite page="/notebook/add.do?lessonID=" />
+		<c:out value="${lessonID}" />
+	</c:set>
+	<div class="pull-right">
+		<a href="${addnote}" class="btn btn-default pull-right" id="addNewBtn"><fmt:message
+				key="mynotes.add.new.current.lesson.button" /></a>
+	</div>
+	
 	<div class="lead">
 		<fmt:message key="mynotes.view.all.button" />
 	</div>

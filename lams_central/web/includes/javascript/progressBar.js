@@ -1,8 +1,10 @@
 ﻿	//------- GLOBAL VARIABLES ----------
 	//IMPORTANT: set following variables on the page which imports this JS file
-var isHorizontalBar = isHorizontalBar || false,
+var lessonId = lessonId || null,
+	toolSessionId = toolSessionId || null,
+	progressPanelEnabled = progressPanelEnabled || false,
+	isHorizontalBar = isHorizontalBar || false,
 	hasContentFrame = hasContentFrame || true,
-	isTouchInterface = isTouchInterface || false,
 	hasDialog = hasDialog || false,
 	presenceEnabled = presenceEnabled || false,
 	REVIEW_ACTIVITY_TITLE = REVIEW_ACTIVITY_TITLE || 'Review activity',
@@ -109,49 +111,6 @@ function loadFrame(activity) {
 	}
 }
 
-// adjusts elements after window resize
-function resizeElements() {
-	var width = $('#controlFrame').is(":visible")? $(window).width() - 160 : $(window).width();
-	var height = $(window).height();
-
-	if (hasContentFrame) {
-		// resize main content frame, if it is present
-		var position = (isTouchInterface) ? 'static' : 'fixed';
-		$('#contentFrame').css({
-			'width' : width + "px",
-			'height' : height + "px",
-			'position' : position
-		});
-	}
-
-	// do the real resizing; applicable only for Learner page
-	if (!isHorizontalBar && progressPanelEnabled) {
-		if (hasContentFrame && !controlFramePadding) {
-			// calculate only once in the beginning
-			// there will be miscalculations when trying to repeat this
-			// in the middle of resizing
-			controlFramePadding = $('#controlFrame').outerHeight(true)
-					- $('#controlFrame').height();
-		}
-
-		// calculate immutable chunks and what is left goes for progress bar
-		var progressBarHeight = height - controlFramePadding;
-		$('.progressStaticHeight').each(function() {
-			var elem = $(this);
-			// are notebook and/or support activities hidden?
-			if (elem.is(':visible')) {
-				progressBarHeight -= elem.outerHeight(true);
-			}
-		});
-
-		$('#progressBarDiv').height(progressBarHeight);
-	}
-
-	if (presenceEnabled) {
-		// resize chat frame only if it exists
-		resizeChat();
-	}
-}
 
 // double click triggers also single click event, this method helps
 function handleClicks(elem, click, dblClick) {
@@ -1045,6 +1004,7 @@ function fillProgressBar(barId) {
 		data : {
 			'method'   : 'getLearnerProgress',
 			'lessonID' : lessonId,
+			'toolSessionID' : toolSessionId,
 			'userID'   : bar.userId
 		},
 		cache : false,
@@ -1066,6 +1026,20 @@ function fillProgressBar(barId) {
 			// if nothing changed, don't do any calculations
 			if (bar.currentActivityId && (result.currentActivityId == bar.currentActivityId)) {
 				return;
+			}
+			
+			if (typeof LABELS == "undefined" && result.messages) {
+				LABELS = {
+					CURRENT_ACTIVITY : result.messages["label.learner.progress.activity.current.tooltip"],
+					COMPLETED_ACTIVITY : result.messages["label.learner.progress.activity.completed.tooltip"],
+					ATTEMPTED_ACTIVITY : result.messages["label.learner.progress.activity.attempted.tooltip"],
+					TOSTART_ACTIVITY : result.messages["label.learner.progress.activity.tostart.tooltip"],
+					SUPPORT_ACTIVITY : result.messages["label.learner.progress.activity.support.tooltip"],
+					CONFIRM_RESTART : result.messages["message.learner.progress.restart.confirm"],
+					RESTART: result.messages["message.lesson.restart.button"],
+					NOTEBOOK: result.messages["label.learner.progress.notebook"],
+					EXIT : result.messages["button.exit"]
+				};
 			}
 			
 			bar.currentActivityId = result.currentActivityId;
@@ -1194,13 +1168,18 @@ function fillProgressBar(barId) {
 				});
 			}
 
-			resizeElements();
 			// scroll to the current activity
 			if (!isHorizontalBar) {
 				$('#' + bar.containerId).scrollTop(
 							Math.max((currentActivityIndex - 1) * 60,0)
 						);
 			}
+			
+			//callback function
+	 	    if (typeof onProgressBarLoaded === "function") { 
+		        // safe to use the function
+	 	    	onProgressBarLoaded();
+		    }
 		}
 	});
 

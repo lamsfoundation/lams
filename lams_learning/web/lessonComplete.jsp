@@ -27,6 +27,8 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 <%@ taglib uri="tags-fmt" prefix="fmt"%>
 <%@ taglib uri="tags-lams" prefix="lams"%>
 
+<script type="text/javascript" src="<lams:LAMSURL />includes/javascript/jquery.js"></script>
+
 <c:set var="displayPrintButton"><lams:Configuration key="DisplayPrintButton"/></c:set>
 
 <script type="text/javascript">
@@ -37,7 +39,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 	}
 </script>
 
-<lams:Page type="admin">
+<lams:Page type="learner">
 	<c:set var="lastName">
 		<lams:user property="lastName"/> 
 	</c:set>
@@ -64,8 +66,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 		</fmt:message>
 	</div>
 	
-	<%-- lessonID is set in CompleteActivityAction and LessonCompleteActivityAction only if lesson.allowLearnerRestart is on --%>
-	<c:if test="${not empty lessonID}">
+	<c:if test="${learnerprogress.lesson.allowLearnerRestart}">
 		<div class="voffset10">
 			<fmt:message key="message.lesson.restart" />
 			<a class="btn btn-default loffset20" href="#" onClick="javascript:restartLesson()">

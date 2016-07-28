@@ -186,24 +186,13 @@ public class HomeAction extends DispatchAction {
 		req.setAttribute(AttributeNames.PARAM_MODE, mode);
 	    }
 
-	    req.setAttribute(AttributeNames.PARAM_LESSON_ID, String.valueOf(lessonId));
-	    req.setAttribute("allowRestart", lesson.getAllowLearnerRestart());
-	    req.setAttribute(AttributeNames.PARAM_PRESENCE_ENABLED,
-		    String.valueOf(lesson.getLearnerPresenceAvailable()));
-	    req.setAttribute(AttributeNames.PARAM_PRESENCE_IM_ENABLED, String.valueOf(lesson.getLearnerImAvailable()));
-	    req.setAttribute(AttributeNames.PARAM_TITLE, lesson.getLessonName());
-
-	    /* Date Format for Chat room append */
-	    DateFormat sfm = new SimpleDateFormat("yyyyMMdd_HHmmss");
-	    req.setAttribute(AttributeNames.PARAM_CREATE_DATE_TIME, sfm.format(lesson.getCreateDateTime()));
-
-	    // forward to /lams/learning/main.jsp
+	    // forward to the next (possibly first) activity.
 	    String serverURLContextPath = Configuration.get(ConfigurationKeys.SERVER_URL_CONTEXT_PATH);
 	    serverURLContextPath = serverURLContextPath.startsWith("/") ? serverURLContextPath
 		    : "/" + serverURLContextPath;
 	    serverURLContextPath += serverURLContextPath.endsWith("/") ? "" : "/";
 	    getServlet().getServletContext().getContext(serverURLContextPath + "learning")
-		    .getRequestDispatcher("/main.jsp").forward(req, res);
+		    .getRequestDispatcher("/content.do?lessonID="+lessonId).forward(req, res);
 	    return null;
 
 	} catch (Exception e) {

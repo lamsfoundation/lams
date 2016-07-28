@@ -52,7 +52,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 	</c:choose>
 </c:set>
 
-<lams:Page type="learner" title="${title}">
+<lams:Page type="learner" title="${title}"  hideProgressBar="true">
 
 	<html:form action="/notebook.do?method=updateEntry" styleId="notebookForm" method="post">
 		<html:hidden property="uid" value="${entry.uid}" />

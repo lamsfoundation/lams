@@ -1,6 +1,9 @@
 $(document).ready(function (){
 	presenceChat = $("#presenceChat");
 	rosterDiv = $("#presenceUserListings");
+	$( window ).resize(function() {
+		resizeChat();
+	});
 
 	// if presence IM is enabled
 	if (presenceEnabled) {
@@ -174,6 +177,7 @@ function generateMessageHTML(nick, message, date) {
 }
 
 function resizeChat() {
+	
 	// refresh the window height
 	windowHeight = $(window).height() - 30;
 
@@ -181,14 +185,16 @@ function resizeChat() {
 	if (presenceShown) {
 		// set presence chat to maximized height
 		presenceChat.css({
-			'top' : windowHeight - 270 + "px"
+			'top' : windowHeight - 300 + "px",
+			'position' : 'absolute'
 		});
 	}
 	// otherwise
 	else {
 		// set presence chat to minimized height
 		presenceChat.css({
-			'top' : windowHeight + "px"
+			'top' : windowHeight + "px",
+			'position' : 'fixed'
 		});
 	}
 }	
@@ -266,7 +272,6 @@ function sendMessage(receiver) {
 	messageInput.val('');
 	messageInput.focus();
 	
-	
 	var data = {
 		 'type'     : 'message',
 		 'lessonID' : lessonId,
@@ -293,7 +298,7 @@ function handlePresenceClick() {
 		presenceShown = false;
 	} else {
 		presenceChat.animate({
-			top : windowHeight - 270 + "px"
+			top : windowHeight - 300 + "px"
 		}, 1000);
 		presenceShown = true;
 	}
