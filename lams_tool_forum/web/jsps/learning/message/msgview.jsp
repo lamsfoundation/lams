@@ -53,7 +53,7 @@
 				</c:otherwise>
 			</c:choose>
 		</h4>
-	</div>
+	</div> <!--  end of panel-heading -->
 
 	<div class="panel-body" id="pb-msg${msgDto.message.uid}">
 		<span> <c:if test='${(not hidden) || (hidden && sessionMap.mode == "teacher")}'>
@@ -169,11 +169,11 @@
 </div> <!--  end panel -->
 
 <%-- Close the 2 divs from the choose --%> 
-</div>
-</div>
+</div> <!--  end div outermsg -->
+</div> <!--  end div no gutter -->
 
 <script type="text/javascript">
 		jQuery(document).ready(function() {
 			jQuery("time.timeago").timeago();
 		});
-	</script>
+</script>

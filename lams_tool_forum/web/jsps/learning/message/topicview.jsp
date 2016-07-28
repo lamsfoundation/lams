@@ -78,15 +78,12 @@
 			<%-- same test & command appears at bottom of script --%>
 			<c:if test='${messageTablename != ""}'>
 				</table>
-				<script> 
-				$("#${messageTablename}").treetable({${tableCommand}});
-				</script>
 				</div>
 				 <!--  end thread ${messageTablename} -->	
 			</c:if>
 			<c:set var="messageTablename" value="tree${msgDto.message.uid}" />
 				<!--  start thread  -->
-				<div id="thread${msgDto.message.uid}">
+				<div id="thread${msgDto.message.uid}" class="clearfix">
 				<table id="${messageTablename}" class="col-xs-12">
 					<tr data-tt-id="${msgDto.message.uid}"><td>
 			</c:when>
@@ -110,9 +107,6 @@
 	
 	<c:if test='${messageTablename != ""}'>	
 		</table>
-		<script>
-			$("#${messageTablename}").treetable({${tableCommand}});
-		</script>
 		</div>
 	</c:if>
 
