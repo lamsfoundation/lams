@@ -37,7 +37,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 <lams:Page type="learner" title="${title}">
 
 	<html:form
-		action="/grouping.do?method=completeActivity&userId=${user.userID}&lessonId=${lesson.lessonId}&activityID=${activityID}"
+		action="/grouping.do?method=completeActivity&userId=${user.userID}&lessonId=${lessonID}&activityID=${activityID}"
 		target="_self" styleId="messageForm">
 
 		<c:set var="userId" value="${user.userID}" />

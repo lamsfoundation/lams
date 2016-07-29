@@ -66,7 +66,7 @@
 				<c:set var="toolForm" value="<%=request.getAttribute(org.apache.struts.taglib.html.Constants.BEAN_KEY)%>" />
 				<c:set var="toolSessionId" value="${toolForm.toolSessionID}" />
 			</c:if>
-			<c:if test="${empty toolSessionId}">
+ 			<c:if test="${empty toolSessionId}">
 				<c:if test="${empty sessionMapID}">
 					<c:set var="sessionMapID" value="${param.sessionMapID}"/>
 				</c:if>
@@ -204,7 +204,10 @@
 						<li><a href="#" onClick="javascript:closeWindow()" ><span id="exitlabel">Exit</span><i class="pull-right fa fa-times"></i></a></li>
 						<li><a href="#" onClick="javascript:viewNotebookEntries(); return false;" ><span id="notebooklabel">Notebook</span><i class="pull-right fa fa-book"></i></a></li>
 						<li id="restartitem" style="display:none"><a href="#" onClick="javascript:restartLesson()"><span id="restartlabel">RestartX</span><i class="pull-right fa fa-recycle"></i></a></li>
-						<li><a href="#" class="slidesidemenu" onClick="javascript:toggleSlideMenu()">
+						<li><a href="#" class="slidesidemenu" onClick="javascript:toggleSlideMenu(); return false;">
+							<i class="pull-right fa fa-wrench"></i></a>
+							<div id="supportPart" class="progressBarContainer"></div>
+						<li><a href="#" class="slidesidemenu" onClick="javascript:toggleSlideMenu(); return false;">
 							<i class="pull-right fa fa-map"></i></a>
 							<div id="progressBarDiv" class="progressBarContainer"></div></li>
 					</ul>
