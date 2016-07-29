@@ -144,7 +144,6 @@
 						}
 					}
 				} else { // test for popup window
-					debugger;
 					showControlBar =  ( window.name.match("LearnerActivity") == null );
 				}
 

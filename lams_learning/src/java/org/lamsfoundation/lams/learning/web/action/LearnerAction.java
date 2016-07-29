@@ -100,7 +100,8 @@ public class LearnerAction extends LamsDispatchAction {
 
     private static final String[] LEARNER_MESSAGE_KEYS = new String[] {
 	    "message.learner.progress.restart.confirm", "message.lesson.restart.button",
-	    "label.learner.progress.notebook", "button.exit"};
+	    "label.learner.progress.notebook", "button.exit",
+	    "label.learner.progress.support", "label.my.progress"};
 
     
     // ---------------------------------------------------------------------
