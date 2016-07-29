@@ -201,8 +201,8 @@
 						<li><a href="#" class="hidden-xs visible-sm visible-md visible-lg slidesidemenu" onClick="javascript:toggleSlideMenu()">
 							<i class="pull-right fa fa-bars" style="color:#337ab7"></i>
 							<p class="lessonName"><%=request.getAttribute(org.apache.struts.taglib.html.Constants.BEAN_KEY)%></p></a></li>
-						<li><a href="#" onClick="javascript:closeWindow()" ><span id="exitlabel">ExitX</span><i class="pull-right fa fa-times"></i></a></li>
-						<li><a href="#" onClick="javascript:viewNotebookEntries()" ><span id="notebooklabel">NotebookX</span><i class="pull-right fa fa-book"></i></a></li>
+						<li><a href="#" onClick="javascript:closeWindow()" ><span id="exitlabel">Exit</span><i class="pull-right fa fa-times"></i></a></li>
+						<li><a href="#" onClick="javascript:viewNotebookEntries(); return false;" ><span id="notebooklabel">Notebook</span><i class="pull-right fa fa-book"></i></a></li>
 						<li id="restartitem" style="display:none"><a href="#" onClick="javascript:restartLesson()"><span id="restartlabel">RestartX</span><i class="pull-right fa fa-recycle"></i></a></li>
 						<li><a href="#" class="slidesidemenu" onClick="javascript:toggleSlideMenu()">
 							<i class="pull-right fa fa-map"></i></a>
