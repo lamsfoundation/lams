@@ -1038,7 +1038,9 @@ function fillProgressBar(barId) {
 					CONFIRM_RESTART : result.messages["message.learner.progress.restart.confirm"],
 					RESTART: result.messages["message.lesson.restart.button"],
 					NOTEBOOK: result.messages["label.learner.progress.notebook"],
-					EXIT : result.messages["button.exit"]
+					EXIT : result.messages["button.exit"],
+					SUPPORT_ACTIVITIES : result.messages["label.learner.progress.support"],
+					PROGRESS_BAR: result.messages["label.my.progress"]
 				};
 			}
 			
@@ -1140,14 +1142,11 @@ function fillProgressBar(barId) {
 			}
 
 			// draw support activities if they exist
-			var supportSeparatorRow = $('#supportSeparatorRow');
-			if (result.support && supportSeparatorRow.length > 0 && !supportSeparatorRow.is(':visible')) {
-				supportSeparatorRow.show();
-
-
+			if (result.support) {
+				var svgheight = 17 + 33 * result.support.length;
 				// separate paper for Support Activities frame
 				var supportPaper = Snap();
-				$('#supportPart').height(17 + 33 * result.support.length)
+				$('#supportPart').height(svgheight+5)
 								 .append(supportPaper.node)
 								 .show();
 				$.each(result.support, function(activityIndex,
@@ -1165,7 +1164,11 @@ function fillProgressBar(barId) {
 					ActivityUtils.addEffects(activity);
 					supportPaper.text(90, 24 + 33 * activityIndex,
 							activity.name).attr(DEFAULT_TEXT_ATTRIBUTES);
+					supportPaper.attr(
+							{'height' : svgheight}
+					)
 				});
+				$("#supportitem").show();
 			}
 
 			// scroll to the current activity
