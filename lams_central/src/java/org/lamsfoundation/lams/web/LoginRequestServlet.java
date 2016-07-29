@@ -115,7 +115,7 @@ public class LoginRequestServlet extends HttpServlet {
 
 	// LDEV-2196 preserve character encoding if necessary
 	if (request.getCharacterEncoding() == null) {
-	    LoginRequestServlet.log.debug(
+	    log.debug(
 		    "request.getCharacterEncoding is empty, parsing username and courseName as 8859_1 to UTF-8...");
 	    extUsername = new String(extUsername.getBytes("8859_1"), "UTF-8");
 	    if (courseName != null) {
@@ -136,7 +136,8 @@ public class LoginRequestServlet extends HttpServlet {
 
 	    // in case of request for learner with strict authentication check cache should also contain lsid
 	    String lsId = request.getParameter(LoginRequestDispatcher.PARAM_LESSON_ID);
-	    if (LoginRequestDispatcher.METHOD_LEARNER_STRICT_AUTHENTICATION.equals(method) && lsId == null) {
+	    if ((LoginRequestDispatcher.METHOD_LEARNER_STRICT_AUTHENTICATION.equals(method)
+		    || LoginRequestDispatcher.METHOD_MONITOR.equals(method)) && lsId == null) {
 		response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Login Failed - lsId parameter missing");
 		return;
 	    }
@@ -158,6 +159,12 @@ public class LoginRequestServlet extends HttpServlet {
 		getIntegrationService().getExtCourseClassMap(serverMap, userMap, extCourseId, countryIsoCode,
 			langIsoCode, courseName, method, prefix);
 	    }
+	    
+	    //in case of method=monitor is requested, check whether the user is lesson's monitor. And if not - add him
+	    if (LoginRequestDispatcher.METHOD_MONITOR.equals(method)) {
+		getIntegrationService().getLessonService().addStaffMember(Long.parseLong(lsId),
+			userMap.getUser().getUserId());
+	    }
 
 	    User user = userMap.getUser();
 	    String login = user.getLogin();
@@ -176,7 +183,7 @@ public class LoginRequestServlet extends HttpServlet {
 		hses = recreateSession(request, response);
 	    }
 
-	    LoginRequestServlet.log.debug("Session Id - " + hses.getId());
+	    log.debug("Session Id - " + hses.getId());
 	    // connect to DB and get password here
 	    String pass = getUserPassword(userMap.getUser().getLogin());
 	    // should post the parameters back so it's little more secure,
@@ -193,24 +200,24 @@ public class LoginRequestServlet extends HttpServlet {
 		response.sendRedirect("j_security_check?j_username=" + login + "&j_password=" + pass);
 	    }
 	} catch (AuthenticationException e) {
-	    LoginRequestServlet.log.error("Authentication error: ", e);
+	    log.error("Authentication error: ", e);
 	    response.sendError(HttpServletResponse.SC_UNAUTHORIZED,
 		    "Login Failed - authentication error. " + e.getMessage());
 	} catch (UserInfoFetchException e) {
-	    LoginRequestServlet.log.error("User fetch info error: ", e);
+	    log.error("User fetch info error: ", e);
 	    response.sendError(HttpServletResponse.SC_BAD_GATEWAY,
 		    "Login Failed - failed to fetch user info from the third party server");
 	} catch (UserInfoValidationException e) {
-	    LoginRequestServlet.log.error("User validation error: ", e);
+	    log.error("User validation error: ", e);
 	    response.sendError(HttpServletResponse.SC_BAD_REQUEST, e.getMessage());
 	} catch (FailedLoginException e) {
-	    LoginRequestServlet.log.error("Login error: ", e);
+	    log.error("Login error: ", e);
 	    response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Login Failed - user was not found");
 	} catch (NamingException e) {
-	    LoginRequestServlet.log.error("Naming error: ", e);
+	    log.error("Naming error: ", e);
 	    response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e.getMessage());
 	} catch (SQLException e) {
-	    LoginRequestServlet.log.error("Database error: ", e);
+	    log.error("Database error: ", e);
 	    response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e.getMessage());
 	}
     }
@@ -238,12 +245,12 @@ public class LoginRequestServlet extends HttpServlet {
     private String getUserPassword(String username) throws FailedLoginException, NamingException, SQLException {
 	InitialContext ctx = new InitialContext();
 
-	DataSource ds = (DataSource) ctx.lookup(LoginRequestServlet.JNDI_DATASOURCE);
+	DataSource ds = (DataSource) ctx.lookup(JNDI_DATASOURCE);
 	Connection conn = null;
 	String password = null;
 	try {
 	    conn = ds.getConnection();
-	    PreparedStatement ps = conn.prepareStatement(LoginRequestServlet.PASSWORD_QUERY);
+	    PreparedStatement ps = conn.prepareStatement(PASSWORD_QUERY);
 	    ps.setString(1, username);
 	    ResultSet rs = ps.executeQuery();
 
@@ -283,10 +290,10 @@ public class LoginRequestServlet extends HttpServlet {
     }
 
     private IntegrationService getIntegrationService() {
-	if (LoginRequestServlet.integrationService == null) {
-	    LoginRequestServlet.integrationService = (IntegrationService) WebApplicationContextUtils
+	if (integrationService == null) {
+	    integrationService = (IntegrationService) WebApplicationContextUtils
 		    .getRequiredWebApplicationContext(getServletContext()).getBean("integrationService");
 	}
-	return LoginRequestServlet.integrationService;
+	return integrationService;
     }
 }
