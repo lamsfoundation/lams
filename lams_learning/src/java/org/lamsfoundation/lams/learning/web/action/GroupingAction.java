@@ -183,6 +183,11 @@ public class GroupingAction extends LamsDispatchAction {
      */
     public ActionForward viewGrouping(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) throws IOException, ServletException {
+	return viewGrouping(mapping, form, request, response, null);
+    }
+
+    public ActionForward viewGrouping(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+	    HttpServletResponse response, LearnerProgress learnerProgress) throws IOException, ServletException {
 	prepareGroupData(request);
 	request.setAttribute(GroupingAction.LOCAL_FILES, Boolean.FALSE);
 	ToolAccessMode mode = WebUtil.readToolAccessModeParam(request, AttributeNames.PARAM_MODE, true);
@@ -191,6 +196,14 @@ public class GroupingAction extends LamsDispatchAction {
 	long activityId = WebUtil.readLongParam(request, AttributeNames.PARAM_ACTIVITY_ID);
 	LearningWebUtil.putActivityPositionInRequest(activityId, request, getServlet().getServletContext());
 
+	// make sure the lesson id is always in the request for the progress bar.
+	if ( request.getAttribute(AttributeNames.PARAM_LESSON_ID) == null ) {
+	    if ( learnerProgress == null ) {
+		ICoreLearnerService learnerService = LearnerServiceProxy.getLearnerService(getServlet().getServletContext());
+		learnerProgress = LearningWebUtil.getLearnerProgress(request, learnerService);
+	    }
+	    request.setAttribute(AttributeNames.PARAM_LESSON_ID,  learnerProgress.getLesson().getLessonId());
+	}
 	return mapping.findForward(GroupingAction.SHOW_GROUP);
     }
 
@@ -271,7 +284,7 @@ public class GroupingAction extends LamsDispatchAction {
 	boolean learnerGroupped = learnerService.learnerChooseGroup(lessonId, activity.getActivityId(), groupId,
 		LearningWebUtil.getUserId());
 	if (learnerGroupped) {
-	    return viewGrouping(mapping, form, request, response);
+	    return viewGrouping(mapping, form, request, response, learnerProgress);
 	}
 	Long groupingId = ((GroupingActivity) activity).getCreateGrouping().getGroupingId();
 

@@ -46,6 +46,7 @@ import org.lamsfoundation.lams.learningdesign.SequenceActivity;
 import org.lamsfoundation.lams.lesson.LearnerProgress;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.action.LamsDispatchAction;
+import org.lamsfoundation.lams.web.util.AttributeNames;
 
 /**
  * Action class to display an OptionsActivity.
@@ -148,6 +149,8 @@ public class BranchingActivityAction extends LamsDispatchAction {
 		} else if (branchingActivity.isToolBranchingActivity()) {
 		    branchForm.set("type", BranchingActivity.TOOL_BASED_TYPE);
 		}
+		// lessonId needed for the progress bar
+		request.setAttribute(AttributeNames.PARAM_LESSON_ID, learnerProgress.getLesson().getLessonId());
 	    } else {
 		// forward to the sequence activity.
 		if (LamsDispatchAction.log.isDebugEnabled()) {

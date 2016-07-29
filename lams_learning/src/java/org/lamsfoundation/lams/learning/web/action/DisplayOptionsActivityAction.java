@@ -44,6 +44,7 @@ import org.lamsfoundation.lams.learningdesign.Activity;
 import org.lamsfoundation.lams.learningdesign.OptionsActivity;
 import org.lamsfoundation.lams.lesson.LearnerProgress;
 import org.lamsfoundation.lams.web.action.LamsAction;
+import org.lamsfoundation.lams.web.util.AttributeNames;
 
 /**
  * Action class to display an OptionsActivity.
@@ -115,6 +116,9 @@ public class DisplayOptionsActivityAction extends ActivityAction {
 
 	LearningWebUtil.putActivityPositionInRequest(form.getActivityID(), request, getServlet().getServletContext());
 
+	// lessonId needed for the progress bar
+	request.setAttribute(AttributeNames.PARAM_LESSON_ID, learnerProgress.getLesson().getLessonId());
+			
 	String forward = "displayOptions";
 	return mapping.findForward(forward);
     }
