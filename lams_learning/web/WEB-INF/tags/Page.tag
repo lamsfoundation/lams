@@ -38,9 +38,8 @@
 		<c:set var="mode" value="${sessionScope[sessionMapID].mode}" />
 	</c:if>
 
-	<%--  only have sidebar and presence in learner --%>
-	<c:choose>
-	<c:when test="${ not hideProgressBar && ( empty mode || mode == 'author' || mode == 'learner') }">
+	<%--  only have sidebar and presence in learner main window, not in popup windows --%>
+	<c:if test="${ not hideProgressBar && ( empty mode || mode == 'author' || mode == 'learner') }">
 	
 		<%-- Links placed in body instead of head. Ugly, but it works. --%>
 		<link rel="stylesheet" href="<lams:LAMSURL/>css/progressBar.css" type="text/css" />
@@ -123,6 +122,8 @@
 			function onProgressBarLoaded() {
 				$('#exitlabel').html(LABELS.EXIT);
 				$('#notebooklabel').html(LABELS.NOTEBOOK);
+				$('#supportlabel').html(LABELS.SUPPORT_ACTIVITIES);
+				$('#progresslabel').html(LABELS.PROGRESS_BAR);
 				if ( allowRestart ) {
 					$('#restartlabel').html(LABELS.RESTART);
 					restartLessonConfirmation = LABELS.CONFIRM_RESTART;
@@ -133,7 +134,7 @@
 			$(document).ready(function() {
 				var showControlBar = true;
 				var showIM = true;
-				if ( window.frameElement ) {
+				if ( window.frameElement ) { // parallel
 					var myId = window.frameElement.id;
 					if ( myId ) {
 						if ( myId == 'lamsDynamicFrame0' ) {
@@ -142,6 +143,8 @@
 							showControlBar = false;
 						}
 					}
+				} else { // test for popup window
+					showControlBar =  ( window.name.match("LearnerActivity") == null );
 				}
 
 				if ( lessonId != "" || toolSessionId != "" ) {
@@ -162,6 +165,7 @@
 								allowRestart = result.allowRestart;
 								$('.lessonName').html(result.title);
 								fillProgressBar('learnerMainBar');
+								$('#navcontent').addClass('navcontent');
 								$('#sidebar').show();
 							}
 							
@@ -203,26 +207,21 @@
 							<p class="lessonName"><%=request.getAttribute(org.apache.struts.taglib.html.Constants.BEAN_KEY)%></p></a></li>
 						<li><a href="#" onClick="javascript:closeWindow()" ><span id="exitlabel">Exit</span><i class="pull-right fa fa-times"></i></a></li>
 						<li><a href="#" onClick="javascript:viewNotebookEntries(); return false;" ><span id="notebooklabel">Notebook</span><i class="pull-right fa fa-book"></i></a></li>
-						<li id="restartitem" style="display:none"><a href="#" onClick="javascript:restartLesson()"><span id="restartlabel">RestartX</span><i class="pull-right fa fa-recycle"></i></a></li>
-						<li><a href="#" class="slidesidemenu" onClick="javascript:toggleSlideMenu(); return false;">
-							<i class="pull-right fa fa-wrench"></i></a>
+						<li id="restartitem" style="display:none"><a href="#" onClick="javascript:restartLesson()"><span id="restartlabel">Restart</span><i class="pull-right fa fa-recycle"></i></a></li>
+						<li id="supportitem" style="display:none"><a href="#" class="slidesidemenu" onClick="javascript:toggleSlideMenu(); return false;">
+							<span id="supportlabel">Support Activities</span><i class="pull-right fa fa-wrench"></i></a>
 							<div id="supportPart" class="progressBarContainer"></div>
 						<li><a href="#" class="slidesidemenu" onClick="javascript:toggleSlideMenu(); return false;">
-							<i class="pull-right fa fa-map"></i></a>
+							<span id="progresslabel">My Progress</span><i class="pull-right fa fa-map"></i></a>
 							<div id="progressBarDiv" class="progressBarContainer"></div></li>
 					</ul>
 				</div>
 			</div>
 		</nav>
 
-		<div class="content navcontent">
-	
-	</c:when> <%--  end of sidebar stuff - only used if in learner screen --%>
-	<c:otherwise>
-		<div class="content">
-	</c:otherwise>
-	</c:choose>
-	
+	</c:if> <%--  end of sidebar stuff - only used if in learner screen --%>
+
+		<div id="navcontent" class="content">
 			<div class="row no-gutter">
 			<div class="col-xs-12">
 			<div class="container">
