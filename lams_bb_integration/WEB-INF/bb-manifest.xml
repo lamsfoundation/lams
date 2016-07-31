@@ -82,6 +82,7 @@
 		<permission type="java.lang.RuntimePermission" name="getClassLoader" />
 		<permission type="java.lang.RuntimePermission" name="createClassLoader" />
 		<permission type="java.lang.RuntimePermission" name="accessDeclaredMembers" actions=""/>
+		<permission type="java.net.SocketPermission" name="*" actions="connect,resolve"/>
 		<permission type="java.util.PropertyPermission" name="java.protocol.handler.pkgs" actions="write"/>
 		
 		<permission type="persist" name="Outcome" actions="create,modify,delete"/>
