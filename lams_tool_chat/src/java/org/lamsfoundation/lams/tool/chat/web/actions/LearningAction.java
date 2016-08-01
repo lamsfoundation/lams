@@ -207,6 +207,7 @@ public class LearningAction extends LamsDispatchAction {
 	    lrnForm.setEntryText(notebookEntry.getEntry());
 	}
 
+	request.setAttribute(AttributeNames.PARAM_TOOL_SESSION_ID, chatUser.getChatSession().getSessionId());
 	LearningWebUtil.putActivityPositionInRequestByToolSessionId(chatUser.getChatSession().getSessionId(), request,
 		getServlet().getServletContext());
 
