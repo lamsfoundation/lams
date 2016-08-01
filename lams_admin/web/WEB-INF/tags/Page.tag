@@ -63,7 +63,9 @@
 			</c:if>
 			<c:if test="${empty toolSessionId}">
 				<c:set var="toolForm" value="<%=request.getAttribute(org.apache.struts.taglib.html.Constants.BEAN_KEY)%>" />
-				<c:set var="toolSessionId" value="${toolForm.toolSessionID}" />
+				<c:if test="${not empty toolForm}"> 
+				    <c:set var="toolSessionId"><c:catch var="exception">${toolForm.toolSessionID}</c:catch></c:set>
+				</c:if>
 			</c:if>
  			<c:if test="${empty toolSessionId}">
 				<c:if test="${empty sessionMapID}">
@@ -144,7 +146,6 @@
 						}
 					}
 				} else { // test for popup window
-					debugger;
 					showControlBar =  ( window.name.match("LearnerActivity") == null );
 				}
 
