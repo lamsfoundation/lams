@@ -18,6 +18,7 @@
 		
 		<lams:css/>
 		
+		<script type="text/javascript" src="<lams:LAMSURL />includes/javascript/jquery.js"></script>
 		<script type="text/javascript" src="${lams}includes/javascript/common.js"></script>
 		
 	</lams:head>
