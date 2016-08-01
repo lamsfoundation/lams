@@ -31,7 +31,7 @@ function closeEditPane() {
 <c:set var="session" value="${requestScope.sessionDTO}" />
 
 <c:set var="title"><fmt:message key="pageTitle.monitoring.chatHistory"/></c:set>
-<lams:Page title="${title}" type="learner">
+<lams:Page title="${title}" type="learner" hideProgressBar="true">
 
 <c:choose>
 	<c:when test="${empty session.messageDTOs}">
