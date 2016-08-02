@@ -90,7 +90,7 @@
 						<h2>
 							<fmt:message key="button.login" />
 						</h2>
-						<form action="j_security_check" method="POST" name="loginForm" id="loginForm">
+						<form action="/lams/j_security_check" method="POST" name="loginForm" id="loginForm">
 							<c:if test="${!empty param.failed}">
 								<div class="warning-login">
 									<fmt:message key="error.login" />
