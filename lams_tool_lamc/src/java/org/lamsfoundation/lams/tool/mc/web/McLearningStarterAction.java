@@ -254,6 +254,7 @@ public class McLearningStarterAction extends Action implements McAppConstants {
 	    redirect.addParameter(AttributeNames.PARAM_TOOL_SESSION_ID, toolSessionID);
 	    redirect.addParameter(MODE, mode);
 	    redirect.addParameter("httpSessionID", sessionMap.getSessionID());
+	    redirect.addParameter("userID", mcLearningForm.getUserID());
 	    return redirect;
 	}
 
