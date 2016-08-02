@@ -61,8 +61,8 @@
 	<html:hidden property="toolContentId" value="${toolContentIdParam}" />
 	<html:hidden property="toolSessionID" />
 	<html:hidden property="mindmapContent" styleId="mindmapContent" />
-	
-	<lams:Page type="learner" title="${mindmapDTO.title}">
+
+	<lams:Page type="learner" title="${mindmapDTO.title}" hideProgressBar="${isMonitor}">
 	
 		<%--Advanced settings and notices-----------------------------------%>
 		
