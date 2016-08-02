@@ -5,6 +5,7 @@
 	<html:base />
 	<lams:css />
 	<title><fmt:message key="activity.title" /></title>
+	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery.js"></script>
 	<script type="text/javascript">
 		function disableFinishButton() {
 			var elem = document.getElementById("finishButton");
@@ -21,6 +22,8 @@
 </lams:head>
 
 <body class="stripes">
+	<html:form action="/learning?method=displayMc&validate=false" method="POST" target="_self"
+		onsubmit="disableFinishButton();" styleId="Form1">
 
 	<lams:Page type="learner" title="${mcGeneralLearnerFlowDTO.activityTitle}">
 
@@ -143,8 +146,6 @@
 		</c:if>
 
 
-		<html:form action="/learning?method=displayMc&validate=false" method="POST" target="_self"
-			onsubmit="disableFinishButton();" styleId="Form1">
 			<html:hidden property="toolContentID" />
 			<html:hidden property="toolSessionID" />
 			<html:hidden property="httpSessionID" />
@@ -199,8 +200,10 @@
 
 			</c:if>
 
-		</html:form>
 	</lams:Page>
+	
+	</html:form>
+	
 </body>
 </lams:html>
 

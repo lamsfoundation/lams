@@ -8,6 +8,7 @@
 </lams:head>
 
 <c:set var="title" scope="request">
+	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery.js"></script>
 	<fmt:message key="activity.title" />
 </c:set>
 

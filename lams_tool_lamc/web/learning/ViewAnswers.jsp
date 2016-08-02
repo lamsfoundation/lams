@@ -11,6 +11,7 @@
 	<lams:css />
 
 	<title><fmt:message key="activity.title" /></title>
+	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery.js"></script>
 	<script type="text/javascript">
 		function disableFinishButton() {
 			var elem = document.getElementById("finishButton");
