@@ -82,7 +82,8 @@ public class MindmapRequestDAO extends LAMSBaseDAO implements IMindmapRequestDAO
 	q.setParameter(1, sessionId);
 	q.setMaxResults(1);
 	Object result = q.uniqueResult();
-	return result != null ? ((Number) result).longValue() : null;
+	// must return a valid number or calling code will throw a null ptr exception.
+	return result != null ? ((Number) result).longValue() : 0L; 
     }
 
     @Override
