@@ -30,9 +30,7 @@
 <%@ page import="blackboard.persist.PersistenceException" %>
 <%@ page import="blackboard.persist.gradebook.*" %>
 <%@ page import="blackboard.data.gradebook.*" %>
-<%@ page import="org.lamsfoundation.ld.util.*"%>
-<%@ page import="org.lamsfoundation.ld.integration.blackboard.LamsSecurityUtil"%>
-<%@ page import="org.lamsfoundation.ld.integration.blackboard.LamsPluginUtil"%>
+<%@ page import="org.lamsfoundation.ld.integration.util.*"%>
 <%@ page errorPage="/error.jsp"%>
 <%@ taglib uri="/bbNG" prefix="bbNG"%>
 

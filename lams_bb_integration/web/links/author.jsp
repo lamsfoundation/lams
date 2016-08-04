@@ -1,5 +1,5 @@
 <%@ page import="java.util.*, java.net.*,
-                 org.lamsfoundation.ld.integration.blackboard.*" errorPage="error.jsp" %>
+                 org.lamsfoundation.ld.integration.util.*" errorPage="error.jsp" %>
 <%@ taglib uri="/bbData" prefix="bbData"%>
 <%@ taglib uri="/bbNG" prefix="bbNG"%>
 <bbData:context id="ctx">

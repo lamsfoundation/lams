@@ -14,7 +14,7 @@
                 blackboard.platform.*,
                 blackboard.platform.plugin.*,
                 org.lamsfoundation.ld.integration.*,
-				org.lamsfoundation.ld.integration.blackboard.*" errorPage="error.jsp" %>
+				org.lamsfoundation.ld.integration.util.*" errorPage="error.jsp" %>
 <%@ taglib uri="/bbNG" prefix="bbNG"%>
 <%@ taglib uri="/bbData" prefix="bbData"%>
 <bbData:context id="ctx">

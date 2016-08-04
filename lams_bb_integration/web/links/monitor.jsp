@@ -13,6 +13,7 @@
                 blackboard.base.*,
                 blackboard.platform.*,
                 blackboard.platform.plugin.*,
+                blackboard.platform.persistence.*,
                 org.lamsfoundation.ld.integration.*,
 				org.lamsfoundation.ld.integration.blackboard.*" errorPage="error.jsp" %>
 <%@ taglib uri="/bbNG" prefix="bbNG"%>
@@ -113,7 +114,7 @@ public String getChild(Content f, ContentDbLoader cLoader) {
         return;
     }
 
-    BbPersistenceManager bbPm = BbServiceManager.getPersistenceService().getDbPersistenceManager();
+	BbPersistenceManager bbPm = PersistenceServiceFactory.getInstance().getDbPersistenceManager();
     Container bbContainer = bbPm.getContainer();
     
     ContentDbLoader cLoader = (ContentDbLoader) bbPm.getLoader( ContentDbLoader.TYPE );

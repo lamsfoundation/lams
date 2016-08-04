@@ -32,8 +32,8 @@
 <%@ page import="blackboard.platform.plugin.PlugInException"%>
 <%@ page import="blackboard.data.gradebook.Lineitem" %>
 <%@ page import="blackboard.persist.gradebook.LineitemDbPersister" %>
-<%@ page import="org.lamsfoundation.ld.integration.blackboard.LamsSecurityUtil"%>
-<%@ page import="org.lamsfoundation.ld.integration.blackboard.LamsPluginUtil"%>    
+<%@ page import="org.lamsfoundation.ld.integration.util.LamsSecurityUtil"%>
+<%@ page import="org.lamsfoundation.ld.integration.util.LamsPluginUtil"%>    
 <%@ page import="org.lamsfoundation.ld.integration.Constants" %> 
 <%@ page errorPage="/error.jsp"%>
 <%@ taglib uri="/bbNG" prefix="bbNG"%>
