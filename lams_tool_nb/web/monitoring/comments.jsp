@@ -21,7 +21,7 @@
 <body class="stripes">
 
 	<c:set var="title"><fmt:message key="activity.title" />: <fmt:message key="label.view.comments" /></c:set>
-	<lams:Page title="${title}" type="learner">
+	<lams:Page title="${title}" type="learner" hideProgressBar="true">
 
 	<lams:Comments toolSessionId="${requestScope.toolSessionID}" toolSignature="<%=NoticeboardConstants.TOOL_SIGNATURE%>" mode="teacher"/>
 	
