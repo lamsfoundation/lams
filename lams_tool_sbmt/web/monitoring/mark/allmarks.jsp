@@ -25,7 +25,7 @@
 
 <body class="stripes">
 <c:set var="title"><fmt:message key="label.monitoring.heading.marking" /></c:set>
-<lams:Page title="${title}" type="learner">
+<lams:Page title="${title}" type="monitor">
 
 	<table class="table table-condensed">
 		<c:forEach var="user" items="${reports}">
