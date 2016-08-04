@@ -33,7 +33,9 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.log4j.Logger;
-import org.lamsfoundation.ld.util.LamsServerException;
+import org.lamsfoundation.ld.integration.util.LamsSecurityUtil;
+import org.lamsfoundation.ld.integration.util.LamsServerException;
+import org.lamsfoundation.ld.integration.util.LineitemUtil;
 
 import blackboard.base.BbList;
 import blackboard.base.FormattedText;
@@ -170,14 +172,8 @@ public class ImportLessonsServlet extends HttpServlet {
 				// persist updated content
 				persister.persist(content);
 
-				// store internalContentId -> externalContentId. It's used for lineitem removal (delete.jsp)
-				PortalExtraInfo pei = PortalUtil.loadPortalExtraInfo(null, null, "LamsStorage");
-				ExtraInfo ei = pei.getExtraInfo();
-				ei.setValue(_content_id, Long.toString(newLessonId));
-				PortalUtil.savePortalExtraInfo(pei);
-
-				// Gradebook column will be copied automatically if appropriate option is selected on
-				// importing lesson page
+				//update lineitem details
+				LineitemUtil.updateLineitemLessonId(content, _course_id, newLessonId, ctx, teacher.getUserName());
 
 				logger.debug("Lesson (lessonId=" + urlLessonId
 					+ ") was successfully imported to the one (lessonId=" + newLessonId + ").");

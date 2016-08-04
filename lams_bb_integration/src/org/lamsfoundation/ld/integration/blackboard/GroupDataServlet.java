@@ -33,6 +33,8 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.log4j.Logger;
 import org.lamsfoundation.ld.integration.Constants;
+import org.lamsfoundation.ld.integration.util.LamsPluginUtil;
+import org.lamsfoundation.ld.integration.util.LamsSecurityUtil;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
@@ -48,6 +50,7 @@ import blackboard.persist.course.CourseDbLoader;
 import blackboard.persist.course.GroupDbLoader;
 import blackboard.persist.user.UserDbLoader;
 import blackboard.platform.BbServiceManager;
+import blackboard.platform.persistence.PersistenceServiceFactory;
 
 /**
  * Fetch groups of the specified course. Serves 2 different types of calls: 1-initial request for group names;
@@ -88,7 +91,7 @@ public class GroupDataServlet extends HttpServlet {
 	    }
 
 	    // get the persistence manager
-	    BbPersistenceManager bbPm = BbServiceManager.getPersistenceService().getDbPersistenceManager();
+	    BbPersistenceManager bbPm = PersistenceServiceFactory.getInstance().getDbPersistenceManager();
 	    CourseDbLoader cLoader = CourseDbLoader.Default.getInstance();
 	    GroupDbLoader groupLoader = (GroupDbLoader) bbPm.getLoader(GroupDbLoader.TYPE);
 	    UserDbLoader userDbLoader = (UserDbLoader) bbPm.getLoader(UserDbLoader.TYPE);

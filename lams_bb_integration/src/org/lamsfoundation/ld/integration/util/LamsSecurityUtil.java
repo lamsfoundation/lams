@@ -20,7 +20,7 @@
  * http://www.gnu.org/licenses/gpl.txt
  * ****************************************************************
  */
-package org.lamsfoundation.ld.integration.blackboard;
+package org.lamsfoundation.ld.integration.util;
 
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -47,7 +47,6 @@ import org.apache.commons.codec.binary.Hex;
 import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
 import org.lamsfoundation.ld.integration.dto.LearnerProgressDTO;
-import org.lamsfoundation.ld.util.LamsServerException;
 import org.w3c.dom.Document;
 import org.w3c.dom.NamedNodeMap;
 import org.xml.sax.SAXException;
@@ -64,6 +63,7 @@ import blackboard.persist.user.UserDbLoader;
 import blackboard.platform.BbServiceManager;
 import blackboard.platform.context.Context;
 import blackboard.platform.cx.component.CopyControl;
+import blackboard.platform.persistence.PersistenceServiceFactory;
 import blackboard.portal.data.ExtraInfo;
 import blackboard.portal.data.PortalExtraInfo;
 import blackboard.portal.servlet.PortalUtil;
@@ -205,14 +205,13 @@ public class LamsSecurityUtil {
      * @return a url pointing to the LAMS lesson, monitor, author session
      * @throws UnsupportedEncodingException 
      */
-    public static String generateRequestLearningDesignImage(Context ctx, boolean isSvgImage) throws UnsupportedEncodingException {
+    public static String generateRequestLearningDesignImage(String username, boolean isSvgImage) throws UnsupportedEncodingException {
 	String serverAddr = getServerAddress();
 	int svgFormat = (isSvgImage) ? 1 : 2;
 	
         //$request = "$CFG->lamslesson_serverurl/services/LearningDesignSVG?serverId=" . $CFG->lamslesson_serverid . "&datetime=" . $datetime_encoded . "&hashValue=" . 
         //$hashvalue . "&username=" . $username  . "&courseId=" . $courseid . "&courseName=" . urlencode($coursename) . "&mode=2&country=" . $country . "&lang=" . $lang . 
         //"&ldId=" . $ldid . "&svgFormat=" . $format;
-	String username = ctx.getUser().getUserName();
 	String url = serverAddr + "/services/LearningDesignSVG?" + generateAuthenticateParameters(username)
 		+ "&svgFormat=" + svgFormat;
 
@@ -755,7 +754,7 @@ public class LamsSecurityUtil {
 	    String monitorIds = "";
 	    final String DUMMY_VALUE = "-";
 
-	    BbPersistenceManager bbPm = BbServiceManager.getPersistenceService().getDbPersistenceManager();
+	    BbPersistenceManager bbPm = PersistenceServiceFactory.getInstance().getDbPersistenceManager();
 	    Id courseId = ctx.getCourse().getId();
 
 	    CourseMembershipDbLoader courseMemLoader = (CourseMembershipDbLoader) bbPm

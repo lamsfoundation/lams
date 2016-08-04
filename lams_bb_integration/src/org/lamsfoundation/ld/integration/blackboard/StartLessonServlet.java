@@ -30,7 +30,9 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.log4j.Logger;
-import org.lamsfoundation.ld.util.LineitemUtil;
+import org.lamsfoundation.ld.integration.util.LamsPluginUtil;
+import org.lamsfoundation.ld.integration.util.LamsSecurityUtil;
+import org.lamsfoundation.ld.integration.util.LineitemUtil;
 
 import blackboard.base.FormattedText;
 import blackboard.data.content.Content;
@@ -43,6 +45,7 @@ import blackboard.persist.content.ContentDbPersister;
 import blackboard.platform.BbServiceManager;
 import blackboard.platform.context.Context;
 import blackboard.platform.context.ContextManager;
+import blackboard.platform.persistence.PersistenceServiceFactory;
 import blackboard.platform.plugin.PlugInException;
 import blackboard.platform.plugin.PlugInUtil;
 import blackboard.portal.data.ExtraInfo;
@@ -52,7 +55,9 @@ import blackboard.portal.servlet.PortalUtil;
 /**
  * Starts a lesson, returning the BB Content Id in JSON. Based on start_lesson_proc but uses the username
  * parameter as a basis for identifying the user. 
- * Return a server error rather than throw an exception as this will be consumed by AJAX call or the like. 
+ * Return a server error rather than throw an exception as this will be consumed by AJAX call or the like.
+ * 
+ *  TODO create a common methods util class with start_lesson_proc.jsp
  */
 public class StartLessonServlet extends HttpServlet {
 
@@ -80,7 +85,7 @@ public class StartLessonServlet extends HttpServlet {
 	    CourseDocument bbContent = new blackboard.data.content.CourseDocument();
 
 	    // Retrieve the Db persistence manager from the persistence service
-	    BbPersistenceManager bbPm = BbServiceManager.getPersistenceService().getDbPersistenceManager();
+	    BbPersistenceManager bbPm = PersistenceServiceFactory.getInstance().getDbPersistenceManager();
 
 	    String courseIdStr = request.getParameter("course_id");
 	    String contentIdStr = request.getParameter("content_id");
@@ -187,7 +192,7 @@ public class StartLessonServlet extends HttpServlet {
         	    bbContent.setUrl(contentUrl);
         	    persister.persist(bbContent);
         
-        	    // store internalContentId -> externalContentId. It's used for lineitem removal (delete.jsp)
+        	    // store internalContentId -> externalContentId. It's used for GradebookServlet
         	    PortalExtraInfo pei = PortalUtil.loadPortalExtraInfo(null, null, "LamsStorage");
         	    ExtraInfo ei = pei.getExtraInfo();
         	    ei.setValue(bbContentId, lamsLessonId);
@@ -195,7 +200,8 @@ public class StartLessonServlet extends HttpServlet {
         
         	    // Create new Gradebook column for current lesson
         	    if (isGradecenter) {
-        		LineitemUtil.createLineitem(ctx, bbContent);
+        		String userName = ctx.getUser().getUserName();
+        		LineitemUtil.createLineitem(bbContent, ctx, userName);
         	    }
         
         	    String strReturnUrl = PlugInUtil.getEditableContentReturnURL(bbContent.getParentId(), courseId);

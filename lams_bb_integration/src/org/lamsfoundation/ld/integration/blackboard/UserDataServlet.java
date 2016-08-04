@@ -29,15 +29,18 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import org.apache.commons.codec.binary.Hex;
-import org.lamsfoundation.ld.util.CSVUtil;
 import org.lamsfoundation.ld.integration.Constants;
 import blackboard.persist.BbPersistenceManager;
 import blackboard.persist.user.UserDbLoader;
 import blackboard.platform.BbServiceManager;
 import blackboard.data.user.User;
 import blackboard.platform.context.ContextManager;
+import blackboard.platform.persistence.PersistenceServiceFactory;
+
 import org.apache.log4j.Logger;
-import org.lamsfoundation.ld.integration.blackboard.LamsSecurityUtil;
+import org.lamsfoundation.ld.integration.util.CSVUtil;
+import org.lamsfoundation.ld.integration.util.LamsPluginUtil;
+import org.lamsfoundation.ld.integration.util.LamsSecurityUtil;
 
 /**
  * @author <a href="mailto:anthony.xiao@lamsinternational.com">Anthony Xiao</a>
@@ -91,7 +94,7 @@ public class UserDataServlet extends HttpServlet {
 	    }
 
 	    // get the persistence manager
-	    BbPersistenceManager bbPm = BbServiceManager.getPersistenceService().getDbPersistenceManager();
+	    BbPersistenceManager bbPm = PersistenceServiceFactory.getInstance().getDbPersistenceManager();
 
 	    // get user list, but no role info since there are no course info
 	    UserDbLoader userLoader = (UserDbLoader) bbPm.getLoader(UserDbLoader.TYPE);

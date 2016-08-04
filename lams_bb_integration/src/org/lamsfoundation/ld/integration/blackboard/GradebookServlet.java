@@ -30,11 +30,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.net.URLEncoder;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
 import java.text.DecimalFormat;
-import java.util.List;
-import java.util.Set;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -44,41 +40,28 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
-import org.apache.commons.codec.binary.Hex;
 import org.apache.log4j.Logger;
 import org.lamsfoundation.ld.integration.Constants;
-import org.lamsfoundation.ld.util.LineitemUtil;
+import org.lamsfoundation.ld.integration.util.LamsPluginUtil;
+import org.lamsfoundation.ld.integration.util.LamsSecurityUtil;
+import org.lamsfoundation.ld.integration.util.LineitemUtil;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
-import blackboard.data.content.Content;
-import blackboard.data.content.CourseDocument;
-import blackboard.data.course.Course;
 import blackboard.data.course.CourseMembership;
 import blackboard.data.gradebook.Lineitem;
 import blackboard.data.gradebook.Score;
 import blackboard.data.user.User;
-import blackboard.persist.BbPersistenceManager;
-import blackboard.persist.Container;
 import blackboard.persist.Id;
 import blackboard.persist.KeyNotFoundException;
-import blackboard.persist.PkId;
-import blackboard.persist.content.ContentDbLoader;
-import blackboard.persist.course.CourseDbLoader;
 import blackboard.persist.course.CourseMembershipDbLoader;
-import blackboard.persist.gradebook.LineitemDbLoader;
-import blackboard.persist.gradebook.LineitemDbPersister;
 import blackboard.persist.gradebook.ScoreDbLoader;
 import blackboard.persist.gradebook.ScoreDbPersister;
 import blackboard.persist.user.UserDbLoader;
 import blackboard.platform.BbServiceManager;
-import blackboard.platform.context.Context;
 import blackboard.platform.context.ContextManager;
-import blackboard.portal.data.ExtraInfo;
-import blackboard.portal.data.PortalExtraInfo;
-import blackboard.portal.servlet.PortalUtil;
 
 /**
  * Deals with Blackboard Grade Center.
@@ -98,6 +81,10 @@ public class GradebookServlet extends HttpServlet {
 	try {
 	    // get Blackboard context
 	    ctxMgr = (ContextManager) BbServiceManager.lookupService(ContextManager.class);
+	    UserDbLoader userLoader = UserDbLoader.Default.getInstance();
+	    CourseMembershipDbLoader courseMembershipLoader = CourseMembershipDbLoader.Default.getInstance();
+	    ScoreDbLoader scoreLoader = ScoreDbLoader.Default.getInstance();
+	    ScoreDbPersister scorePersister = ScoreDbPersister.Default.getInstance();
 
 	    // get Parameter values
 	    String userName = request.getParameter(Constants.PARAM_USER_ID);
@@ -120,48 +107,13 @@ public class GradebookServlet extends HttpServlet {
 		response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "authentication failed");
 		return;
 	    }
-	    
-	    //check if isGradebookcenter
-	    PortalExtraInfo portalExtraInfo = PortalUtil.loadPortalExtraInfo(null, null, "LamsStorage");
-	    ExtraInfo extraInfo = portalExtraInfo.getExtraInfo();
-	    Set<String> bbContentIds = extraInfo.getKeys();
-	    String bbContentId = null;
-	    for (String bbContentIdIter : bbContentIds) {
-		String lamsLessonId = extraInfo.getValue(bbContentIdIter);
-		if (lamsLessonIdParam.equals(lamsLessonId)) {
-		    bbContentId = bbContentIdIter;
-		    break;
-		}
-	    }
-	    
-	    // exit method as it was created in version prior to 1.2.1 and thus don't have lineitem
-	    if (bbContentId == null) {
-		response.sendError(HttpServletResponse.SC_CONFLICT, "exit method as it was created in version prior to 1.2.1 and thus don't have lineitem");
-	    	return;
-	    }
-	    
-	    //check isGradecenter option is ON 
-            BbPersistenceManager bbPm = BbServiceManager.getPersistenceService().getDbPersistenceManager();
-            Container bbContainer = bbPm.getContainer();
-            Id contentId = new PkId( bbContainer, CourseDocument.DATA_TYPE, bbContentId );
-            ContentDbLoader contentDbLoader = (ContentDbLoader) bbPm.getLoader( ContentDbLoader.TYPE );
-            Content bbContent = (Content)contentDbLoader.loadById( contentId );
-            //check isGradecenter option is ON 
-            if (!bbContent.getIsDescribed()) {//(isDescribed field is used for storing isGradecenter parameter)
-        	response.sendError(HttpServletResponse.SC_BAD_REQUEST, "exit method as Gradecenter option is OFF");
-                return;
-            }
 
 	    // get user list, but no role info since there are no course info
-	    UserDbLoader userLoader = (UserDbLoader) bbPm.getLoader(UserDbLoader.TYPE);
 	    User user = userLoader.loadByUserName(userName);
-	    
 	    if (user == null) {
 		throw new ServletException("User not found with userName:" + userName);
 	    }
 	    Id userId = user.getId();
-	    //do not remove the following line: it's required to instantiate the object
-	    logger.info(bbContent.getTitle());
 
 	    String serviceURL = LamsSecurityUtil.getServerAddress() + "/services/xml/LessonManager?"
 		    + LamsSecurityUtil.generateAuthenticateParameters(userName) + "&courseId="
@@ -192,7 +144,6 @@ public class GradebookServlet extends HttpServlet {
 	    DocumentBuilder db = dbf.newDocumentBuilder();
 	    Document document = db.parse(is);
 	    
-	    
 	    NodeList activities = document.getDocumentElement().getFirstChild().getChildNodes();
 
 	    float maxResult = 0;
@@ -218,16 +169,15 @@ public class GradebookServlet extends HttpServlet {
 		
 	    }
             
-	    Lineitem lineitem = LineitemUtil.getLineitem(bbContentId, userId, lamsLessonIdParam);
+	    Lineitem lineitem = LineitemUtil.getLineitem(userId, lamsLessonIdParam);
+	    if (lineitem == null) {
+		throw new ServletException("Lineitem was not found for userId:" + userId + " and lamsLessonId:" + lamsLessonIdParam);
+	    }
 	    //do not remove the following line: it's required to instantiate the object
 	    logger.info("Record score for " +lineitem.getName() + " lesson. It now has "+ lineitem.getScores().size() + " scores.");
 
 	    // store new score
-	    CourseMembershipDbLoader memLoader = (CourseMembershipDbLoader) bbPm
-		    .getLoader(CourseMembershipDbLoader.TYPE);
-	    ScoreDbLoader scoreLoader = (ScoreDbLoader) bbPm.getLoader(ScoreDbLoader.TYPE);
-	    ScoreDbPersister scorePersister = (ScoreDbPersister) bbPm.getPersister(ScoreDbPersister.TYPE);
-	    CourseMembership courseMembership = memLoader.loadByCourseAndUserId(lineitem.getCourseId(), userId);
+	    CourseMembership courseMembership = courseMembershipLoader.loadByCourseAndUserId(lineitem.getCourseId(), userId);
 	    Score currentScore = null;
 	    try {
 		currentScore = scoreLoader.loadByCourseMembershipIdAndLineitemId(courseMembership.getId(), lineitem.getId());

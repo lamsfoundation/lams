@@ -32,6 +32,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.log4j.Logger;
+import org.lamsfoundation.ld.integration.util.LamsSecurityUtil;
+import org.lamsfoundation.ld.integration.util.LineitemUtil;
 
 import blackboard.base.BbList;
 import blackboard.data.content.Content;
@@ -46,6 +48,9 @@ import blackboard.persist.content.ContentDbPersister;
 import blackboard.persist.course.CourseDbLoader;
 import blackboard.persist.course.CourseMembershipDbLoader;
 import blackboard.persist.navigation.CourseTocDbLoader;
+import blackboard.platform.BbServiceManager;
+import blackboard.platform.context.Context;
+import blackboard.platform.context.ContextManager;
 import blackboard.portal.data.ExtraInfo;
 import blackboard.portal.data.PortalExtraInfo;
 import blackboard.portal.servlet.PortalUtil;
@@ -68,6 +73,10 @@ public class CloneLessonsServlet extends HttpServlet {
 
 	String newLessonIds = "";
 	try {
+	    // get Blackboard context
+	    ContextManager ctxMgr = (ContextManager) BbServiceManager.lookupService(ContextManager.class);
+	    Context ctx = ctxMgr.setContext(request);
+	    
 	    CourseDbLoader courseLoader = CourseDbLoader.Default.getInstance();
 	    Course course = courseLoader.loadByCourseId(courseIdParam);
 	    PkId courseId = (PkId) course.getId();
@@ -144,15 +153,9 @@ public class CloneLessonsServlet extends HttpServlet {
 
 				// persist updated content
 				persister.persist(content);
-
-				// store internalContentId -> externalContentId. It's used for lineitem removal (delete.jsp)
-				PortalExtraInfo pei = PortalUtil.loadPortalExtraInfo(null, null, "LamsStorage");
-				ExtraInfo ei = pei.getExtraInfo();
-				ei.setValue(_content_id, Long.toString(newLessonId));
-				PortalUtil.savePortalExtraInfo(pei);
-
-				// Gradebook column will be copied automatically if appropriate option is selected on
-				// cloning lesson page
+				
+				//update lineitem details
+				LineitemUtil.updateLineitemLessonId(content, _course_id, newLessonId, ctx, teacher.getUserName());
 
 				logger.debug("Lesson (lessonId=" + urlLessonId
 					+ ") was successfully cloned to the one (lessonId=" + newLessonId + ").");

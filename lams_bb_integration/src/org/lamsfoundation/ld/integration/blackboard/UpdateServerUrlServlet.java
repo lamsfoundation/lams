@@ -46,6 +46,7 @@ import blackboard.persist.content.ContentDbPersister;
 import blackboard.persist.navigation.CourseTocDbLoader;
 import blackboard.platform.BbServiceManager;
 import blackboard.platform.context.ContextManager;
+import blackboard.platform.persistence.PersistenceServiceFactory;
 import blackboard.platform.plugin.PlugInUtil;
 
 /**
@@ -80,7 +81,7 @@ public class UpdateServerUrlServlet extends HttpServlet {
 	    
 	    // get Blackboard context
 	    ctxMgr = (ContextManager) BbServiceManager.lookupService(ContextManager.class);
-	    BbPersistenceManager bbPm = BbServiceManager.getPersistenceService().getDbPersistenceManager();
+	    BbPersistenceManager bbPm = PersistenceServiceFactory.getInstance().getDbPersistenceManager();
 	    Container bbContainer = bbPm.getContainer();
 
 	    ContentDbLoader contentDbLoader = ContentDbLoader.Default.getInstance();
