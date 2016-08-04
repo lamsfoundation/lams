@@ -15,10 +15,11 @@
 <%@ page import="blackboard.db.*"%>
 <%@ page import="blackboard.base.*"%>
 <%@ page import="blackboard.platform.*"%>
+<%@ page import="blackboard.platform.persistence.*"%>
 <%@ page import="blackboard.platform.plugin.*"%>
 <%@ page import="blackboard.portal.servlet.*"%>
 <%@ page import="blackboard.portal.data.*"%>
-<%@ page import="org.lamsfoundation.ld.integration.blackboard.LamsSecurityUtil"%>
+<%@ page import="org.lamsfoundation.ld.integration.util.LamsSecurityUtil"%>
 <%@ page errorPage="/error.jsp"%>
 <%@ taglib uri="/bbNG" prefix="bbNG"%>
 <bbNG:genericPage title="Open Author" ctxId="ctx">
@@ -33,7 +34,7 @@
 	}
 
 	// Get Course ID and Session User ID
-	BbPersistenceManager bbPm = BbServiceManager.getPersistenceService().getDbPersistenceManager();
+	BbPersistenceManager bbPm = PersistenceServiceFactory.getInstance().getDbPersistenceManager();
 	String course_idstr = request.getParameter("course_id");    
 	Id course_id = bbPm.generateId(Course.DATA_TYPE, course_idstr);
 	User sessionUser = ctx.getUser();

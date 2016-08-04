@@ -12,7 +12,7 @@
 <%@ page import="blackboard.platform.BbServiceManager"%>
 <%@ page import="blackboard.platform.plugin.PlugInUtil"%>
 <%@ page import="blackboard.platform.plugin.PlugInException"%>
-<%@ page import="org.lamsfoundation.ld.integration.blackboard.LamsPluginUtil"%>
+<%@ page import="org.lamsfoundation.ld.integration.util.LamsPluginUtil"%>
 <%@ page errorPage="/error.jsp"%>
 <%@ taglib uri="/bbNG" prefix="bbNG"%>
 <bbNG:genericPage title="LAMS Configuration" ctxId="ctx">
@@ -66,7 +66,7 @@
 
     <%-- Receipt --%>
     <bbNG:receipt type="SUCCESS" 
-        iconUrl="/images/ci/icons/receiptsuccess_u.gif" 
+        iconUrl="/includes/images/ci/icons/receiptsuccess_u.gif" 
         title="LAMS Configuration" 
         recallUrl="/webapps/blackboard/admin/manage_plugins.jsp">
             <h4>Sample plugin configured</h4><p>

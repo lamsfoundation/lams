@@ -27,9 +27,10 @@
 <%@ page import="blackboard.base.*"%>
 <%@ page import="blackboard.platform.*"%>
 <%@ page import="blackboard.platform.plugin.*"%>
+<%@ page import="blackboard.platform.persistence.*"%>
 <%@ page import="blackboard.portal.servlet.*"%>
 <%@ page import="blackboard.portal.data.*"%>
-<%@ page import="org.lamsfoundation.ld.integration.blackboard.LamsSecurityUtil"%>
+<%@ page import="org.lamsfoundation.ld.integration.util.*"%>
 <%@ page import="org.lamsfoundation.ld.integration.dto.LearnerProgressDTO"%>
 <%@ page errorPage="/error.jsp"%>
 <%@ taglib uri="/bbNG" prefix="bbNG"%>
@@ -67,6 +68,8 @@
 	</bbNG:cssBlock>
  
 <%
+	BbPersistenceManager bbPm = PersistenceServiceFactory.getInstance().getDbPersistenceManager();
+	CourseMembershipDbLoader sessionCourseMembershipLoader = CourseMembershipDbLoader.Default.getInstance();
 
     // Authorise current user for Course Access (automatic redirect)
     try{
@@ -75,22 +78,21 @@
     } catch(PlugInException e) {
         throw new RuntimeException(e);
     }
+
+	String strLessonId = request.getParameter("lsid").trim();
+	String courseIdParam = request.getParameter("course_id");  
 	
-    // Get Course ID and Session User ID
-    BbPersistenceManager bbPm = BbServiceManager.getPersistenceService().getDbPersistenceManager();
-    String courseIdParam = request.getParameter("course_id");    
+    // Get Course ID and User ID
     Id course_id = bbPm.generateId(Course.DATA_TYPE, courseIdParam);
-    User sessionUser = ctx.getUser();
-    Id sessionUserId = sessionUser.getId();
+    Id userId = ctx.getUser().getId();
 
     // Get the membership data to determine the User's Role
     CourseMembership courseMembership = null;
     CourseMembership.Role courseRole = null;
     boolean isActive = false;
 
-    CourseMembershipDbLoader sessionCourseMembershipLoader = (CourseMembershipDbLoader) bbPm.getLoader(CourseMembershipDbLoader.TYPE);
     try {
-        courseMembership = sessionCourseMembershipLoader.loadByCourseAndUserId(course_id, sessionUserId);
+        courseMembership = sessionCourseMembershipLoader.loadByCourseAndUserId(course_id, userId);
         courseRole = courseMembership.getRole();        
         isActive = courseMembership.getIsAvailable();
     } catch (KeyNotFoundException e) {
@@ -134,10 +136,8 @@
         description = courseDoc.getBody().getFormattedText();
         position = String.valueOf(courseDoc.getPosition());
         
-        //get lineitemid from the storage (bbContentId -> lineitemid)
-	    PortalExtraInfo pei = PortalUtil.loadPortalExtraInfo(null, null, "LamsLineitemStorage");
-	    ExtraInfo ei = pei.getExtraInfo();
-	    strLineitemId = ei.getValue(contentIdParam);
+        //get lineitemid from the storage 
+	    Lineitem lineitem = LineitemUtil.getLineitem(contentIdParam, userId, strLessonId);
 	    
     } else {
 
@@ -154,7 +154,8 @@
  	    String strLearningDesignId = request.getParameter("ldid").trim();
  	    long learningDesignId = Long.parseLong(strLearningDesignId);
 
- 	    learningDesignImageUrl = LamsSecurityUtil.generateRequestLearningDesignImage(ctx, false) + "&ldId="
+ 	    String username = ctx.getUser().getUserName();
+ 	    learningDesignImageUrl = LamsSecurityUtil.generateRequestLearningDesignImage(username, false) + "&ldId="
  		    + learningDesignId;
  	}
 
@@ -183,8 +184,8 @@
 	    }
 	}
     boolean isScoreAvailable = (current_score != null);
-    
-	String strLessonId = request.getParameter("lsid").trim();
+
+    //prepare learnerProgressDto for displaying on jsp
 	long lessonId = Long.parseLong(strLessonId);
 	LearnerProgressDTO learnerProgressDto = LamsSecurityUtil.getLearnerProgress(ctx, lessonId);
 %>
