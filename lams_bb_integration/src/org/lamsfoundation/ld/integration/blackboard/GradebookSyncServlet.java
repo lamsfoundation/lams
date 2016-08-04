@@ -33,7 +33,6 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.text.DecimalFormat;
-import java.util.Set;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -45,35 +44,25 @@ import javax.xml.parsers.ParserConfigurationException;
 
 import org.apache.log4j.Logger;
 import org.lamsfoundation.ld.integration.Constants;
-import org.lamsfoundation.ld.util.LineitemUtil;
+import org.lamsfoundation.ld.integration.util.LamsBuildingBlockException;
+import org.lamsfoundation.ld.integration.util.LamsSecurityUtil;
+import org.lamsfoundation.ld.integration.util.LineitemUtil;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
 import blackboard.base.BbList;
-import blackboard.data.content.Content;
-import blackboard.data.content.CourseDocument;
-import blackboard.data.course.Course;
 import blackboard.data.course.CourseMembership;
 import blackboard.data.gradebook.Lineitem;
 import blackboard.data.gradebook.Score;
-import blackboard.persist.BbPersistenceManager;
-import blackboard.persist.Container;
 import blackboard.persist.Id;
-import blackboard.persist.PkId;
-import blackboard.persist.content.ContentDbLoader;
-import blackboard.persist.course.CourseDbLoader;
 import blackboard.persist.course.CourseMembershipDbLoader;
-import blackboard.persist.gradebook.LineitemDbLoader;
 import blackboard.persist.gradebook.ScoreDbLoader;
 import blackboard.persist.gradebook.ScoreDbPersister;
 import blackboard.platform.BbServiceManager;
 import blackboard.platform.context.Context;
 import blackboard.platform.context.ContextManager;
-import blackboard.portal.data.ExtraInfo;
-import blackboard.portal.data.PortalExtraInfo;
-import blackboard.portal.servlet.PortalUtil;
 import blackboard.util.StringUtil;
 
 /**
@@ -97,7 +86,9 @@ public class GradebookSyncServlet extends HttpServlet {
 	    // get Blackboard context
 	    ctxMgr = (ContextManager) BbServiceManager.lookupService(ContextManager.class);
 	    Context ctx = ctxMgr.setContext(request);
-	    BbPersistenceManager bbPm = BbServiceManager.getPersistenceService().getDbPersistenceManager();
+	    CourseMembershipDbLoader courseMemLoader = CourseMembershipDbLoader.Default.getInstance();
+	    ScoreDbLoader scoreLoader = ScoreDbLoader.Default.getInstance();
+	    ScoreDbPersister scorePersister = ScoreDbPersister.Default.getInstance();
 
 	    // get Parameter values
 	    String lamsLessonIdParam = request.getParameter(Constants.PARAM_LESSON_ID);
@@ -106,63 +97,9 @@ public class GradebookSyncServlet extends HttpServlet {
 		throw new RuntimeException("Requred parameters missing. lsid=" + lamsLessonIdParam);
 	    }
 
-	    // check if isGradebookcenter
-	    PortalExtraInfo portalExtraInfo = PortalUtil.loadPortalExtraInfo(null, null, "LamsStorage");
-	    ExtraInfo extraInfo = portalExtraInfo.getExtraInfo();
-	    Set<String> bbContentIds = extraInfo.getKeys();
-	    String bbContentId = null;
-	    for (String bbContentIdIter : bbContentIds) {
-		String lamsLessonId = extraInfo.getValue(bbContentIdIter);
-		if (lamsLessonIdParam.equals(lamsLessonId)) {
-		    bbContentId = bbContentIdIter;
-		    break;
-		}
-	    }
-	    
-	    // check whether the lesson was created by Chen Rui's BB and has gradebook feature on
-	    Lineitem lineitem = null;
-	    if (bbContentId == null) {
-		CourseDbLoader cLoader = CourseDbLoader.Default.getInstance();
-		LineitemDbLoader liLoader = LineitemDbLoader.Default.getInstance();
-		
-		BbList coursesBBList = cLoader.loadByUserId(ctx.getUserId());
-		Course[] courses = (Course[]) coursesBBList.toArray(new Course[0]);
-		boolean isChenRuiGradebookOn = false;
-		for (int i = 0; i < courses.length; i++) {
-		    BbList lineitemsBBList = liLoader.loadByCourseId(courses[i].getId());
-		    Lineitem[] lineitems = (Lineitem[]) lineitemsBBList.toArray(new Lineitem[0]);
-		    for (int j = 0; j < lineitems.length; j++) {
-			if (lineitems[j].getAssessmentId() != null
-				&& lineitems[j].getAssessmentId().equals(lamsLessonIdParam)) {
-			    lineitem = lineitems[j];
-			    isChenRuiGradebookOn = true;
-			    break;
-			}
-		    }
-		}
-		
-		//  was created in version prior to 1.2.1 OR possibly Chen Rui's BB gradecenter option is OFF
-		if (!isChenRuiGradebookOn) {
-		    response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-		    response.getWriter()
-			    .write("Can't syncronize lesson as it was created in version prior to 1.2.1 and thus don't have lineitem.");
-		    return;
-		}
-		
-            // check isGradecenter option is ON
-	    } else {
-		Container bbContainer = bbPm.getContainer();
-		Id contentId = new PkId(bbContainer, CourseDocument.DATA_TYPE, bbContentId);
-		ContentDbLoader contentDbLoader = (ContentDbLoader) bbPm.getLoader(ContentDbLoader.TYPE);
-		Content bbContent = (Content) contentDbLoader.loadById(contentId);
-		// check isGradecenter option is ON
-		if (!bbContent.getIsDescribed()) {// (isDescribed field is used for storing isGradecenter parameter)
-		    response.setStatus(HttpServletResponse.SC_ACCEPTED);
-		    response.getWriter().write("Can't syncronize lesson as it's gradecenter option is OFF.");
-		    return;
-		}
-
-		lineitem = LineitemUtil.getLineitem(bbContentId, ctx.getUserId(), lamsLessonIdParam);
+	    Lineitem lineitem = LineitemUtil.getLineitem(ctx.getUserId(), lamsLessonIdParam);
+	    if (lineitem == null) {
+		throw new ServletException("Lineitem was not found for userId:" + ctx.getUserId() + " and lamsLessonId:" + lamsLessonIdParam);
 	    }
 
 	    String username = ctx.getUser().getUserName();
@@ -181,18 +118,11 @@ public class GradebookSyncServlet extends HttpServlet {
 	    if (httpConn.getResponseCode() != HttpURLConnection.HTTP_OK) {
 		String errorMsg = "HTTP Response Code: " + httpConn.getResponseCode() + ", HTTP Response Message: "
 			+ httpConn.getResponseMessage();
-//		response.sendError(HttpServletResponse.SC_UNAUTHORIZED, errorMsg);
 		response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
 		response.getWriter().write(errorMsg);
 		return;
 	    }
-	    
-	    CourseMembershipDbLoader courseMemLoader = (CourseMembershipDbLoader) bbPm
-		    .getLoader(CourseMembershipDbLoader.TYPE);
-	    ScoreDbLoader scoreLoader = (ScoreDbLoader) bbPm.getLoader(ScoreDbLoader.TYPE);
-	    ScoreDbPersister scorePersister = (ScoreDbPersister) bbPm.getPersister(ScoreDbPersister.TYPE);
 
-	    // InputStream is = url.openConnection().getInputStream();
 	    InputStream is = conn.getInputStream();
 
 	    // parse xml response
@@ -261,6 +191,13 @@ public class GradebookSyncServlet extends HttpServlet {
 		}
 	    }
 
+	    
+	} catch (LamsBuildingBlockException e) {
+	    response.setContentType("text/html");
+	    PrintWriter out = response.getWriter();
+	    out.write("Exception was thrown: " + e.getMessage());
+	    return;
+	
 	} catch (MalformedURLException e) {
 	    throw new ServletException("Unable to get LAMS learning designs, bad URL: "
 		    + ", please check lams.properties", e);

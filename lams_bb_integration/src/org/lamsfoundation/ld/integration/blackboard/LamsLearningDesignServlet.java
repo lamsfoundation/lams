@@ -30,6 +30,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.lamsfoundation.ld.integration.Constants;
+import org.lamsfoundation.ld.integration.util.LamsSecurityUtil;
 
 import blackboard.base.InitializationException;
 import blackboard.platform.BbServiceException;

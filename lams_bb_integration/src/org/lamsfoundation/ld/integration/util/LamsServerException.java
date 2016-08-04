@@ -1,4 +1,4 @@
-package org.lamsfoundation.ld.util;
+package org.lamsfoundation.ld.integration.util;
 
 /**
  * Exception that originated at LAMS server.

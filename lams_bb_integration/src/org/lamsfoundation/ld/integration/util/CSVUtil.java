@@ -20,7 +20,7 @@
  * http://www.gnu.org/licenses/gpl.txt
  * ****************************************************************
  */
-package org.lamsfoundation.ld.util;
+package org.lamsfoundation.ld.integration.util;
 
 import java.text.ParseException;
 import java.util.ArrayList;
