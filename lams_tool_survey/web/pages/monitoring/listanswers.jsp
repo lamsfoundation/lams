@@ -116,7 +116,7 @@
 
 	<c:set var="title"><fmt:message key="title.chart.report"/></c:set>
 	<c:set var="optionShortHeader"><%= SurveyConstants.OPTION_SHORT_HEADER %></c:set>
-	<lams:Page type="learner" title="${title}">
+	<lams:Page type="monitor" title="${title}">
 
 		<h4><fmt:message key="label.question"/></h4>
 
