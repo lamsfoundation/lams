@@ -31,7 +31,7 @@
 
 <body class="stripes">
 <c:set var="title"><fmt:message key="label.monitoring.updateMarks.button" /></c:set>
-<lams:Page title="${title}" type="learner">
+<lams:Page title="${title}" type="monitor">
 
 	<table class="table table-condensed">
 		<c:forEach var="fileInfo" items="${report}" varStatus="status">
