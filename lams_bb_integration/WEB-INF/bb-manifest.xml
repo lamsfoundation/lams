@@ -30,8 +30,8 @@
                 <remove value="modules/delete.jsp"/>
             </http-actions>
             <icons>
-                <toolbar value="images/logo.gif" />
-                <listitem value="images/logo.gif" />
+                <toolbar value="includes/images/logo.gif" />
+                <listitem value="includes/images/logo.gif" />
             </icons>
         </content-handler>
     </content-handlers>
@@ -46,7 +46,7 @@
                     <url value="links/admin.jsp" />
                     <description value="Admin course lessons" />
                     <icons>
-                        <listitem value="images/logo.gif"/>
+                        <listitem value="includes/images/logo.gif"/>
                     </icons>
                 </link>
                 <link>
@@ -55,7 +55,7 @@
                     <url value="links/monitor.jsp" />
                     <description value="Monitor the learners' progress" />
                     <icons>
-                        <listitem value="images/logo.gif"/>
+                        <listitem value="includes/images/logo.gif"/>
                     </icons>
                 </link>
                 <link>
@@ -64,7 +64,7 @@
                     <url value="links/author.jsp" />
                     <description value="Author new or edit existing LAMS sequences" />
                     <icons>
-                        <listitem value="images/logo.gif"/>
+                        <listitem value="includes/images/logo.gif"/>
                     </icons>
                 </link>               
             </links>
