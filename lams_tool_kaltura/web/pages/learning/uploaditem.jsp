@@ -164,7 +164,7 @@
 		<fmt:message key="label.authoring.basic.video"/>
 	</c:set>
 	<body class="stripes">
-		<lams:Page type="learner" title="${title}">
+		<lams:Page type="learner" title="${title}" hideProgressBar="true">
 						
 			<div id="kcwHolder">	
 				<div id="kcw"></div>
