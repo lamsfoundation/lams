@@ -98,7 +98,7 @@
 <body class="stripes">
 
 	<c:set var="title"><fmt:message key="label.notebook.entries" /></c:set>
-	<lams:Page title="${title}" type="learner">
+	<lams:Page title="${title}" type="monitoring" >
 		<lams:TSTable numColumns="2" dataId="data-session-id='${param.toolSessionID}'">
 			<th><fmt:message key="label.user"/></th>
 			<th><fmt:message key="label.reflection" /></th>
