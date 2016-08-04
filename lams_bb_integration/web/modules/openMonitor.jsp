@@ -15,10 +15,11 @@
 <%@ page import="blackboard.db.*"%>
 <%@ page import="blackboard.base.*"%>
 <%@ page import="blackboard.platform.*"%>
+<%@ page import="blackboard.platform.persistence.*"%>
 <%@ page import="blackboard.platform.plugin.*"%>
 <%@ page import="blackboard.portal.servlet.*"%>
 <%@ page import="blackboard.portal.data.*"%>
-<%@ page import="org.lamsfoundation.ld.integration.blackboard.LamsSecurityUtil"%>
+<%@ page import="org.lamsfoundation.ld.integration.util.LamsSecurityUtil"%>
 <%@ page errorPage="/error.jsp"%>
 <%@ taglib uri="/bbNG" prefix="bbNG"%>
 <bbNG:genericPage title="Open Author" ctxId="ctx">

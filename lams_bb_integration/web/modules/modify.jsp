@@ -26,6 +26,7 @@
 <%@ page import="blackboard.db.*"%>
 <%@ page import="blackboard.base.*"%>
 <%@ page import="blackboard.platform.*"%>
+<%@ page import="blackboard.platform.persistence.*"%>
 <%@ page import="blackboard.platform.plugin.*"%>
 <%@ page errorPage="/error.jsp"%>  
 <%@ taglib uri="/bbNG" prefix="bbNG"%>
@@ -43,7 +44,7 @@
     }
 
  	// Get the Course Document (Lams Lesson)
-    BbPersistenceManager bbPm = BbServiceManager.getPersistenceService().getDbPersistenceManager();
+    BbPersistenceManager bbPm = PersistenceServiceFactory.getInstance().getDbPersistenceManager();
     Container bbContainer = bbPm.getContainer();
     Id contentId = new PkId( bbContainer, CourseDocument.DATA_TYPE, request.getParameter("content_id") );
     ContentDbLoader courseDocumentLoader = (ContentDbLoader) bbPm.getLoader( ContentDbLoader.TYPE );

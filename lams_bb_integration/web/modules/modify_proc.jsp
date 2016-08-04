@@ -27,8 +27,9 @@
 <%@ page import="blackboard.platform.persistence.*"%>
 <%@ page import="blackboard.platform.plugin.*"%>
 <%@ page import="blackboard.platform.plugin.*"%>
+<%@ page import="blackboard.platform.persistence.*"%>
 <%@ page import="blackboard.data.gradebook.*"%> 
-<%@ page import="org.lamsfoundation.ld.util.*"%>
+<%@ page import="org.lamsfoundation.ld.integration.util.*"%>
 <%@ page errorPage="/error.jsp"%>
 <%@ taglib uri="/bbNG" prefix="bbNG"%>
 <bbNG:genericPage title="Modify A LAMS Lesson" ctxId="ctx">
@@ -46,7 +47,7 @@
 	    String contentIdStr = request.getParameter("content_id");
 
         // Retrieve the Db persistence manager from the persistence service
-        BbPersistenceManager bbPm = BbServiceManager.getPersistenceService().getDbPersistenceManager();
+        BbPersistenceManager bbPm = PersistenceServiceFactory.getInstance().getDbPersistenceManager();
         Container bbContainer = bbPm.getContainer();
 
         // Internal Blackboard IDs for the course and parent content item
@@ -83,7 +84,9 @@
         
         //if teacher turned Gradecenter option ON (and it was OFF previously) - create lineitem
         if (!bbContent.getIsDescribed() && isGradecenter) {
-            LineitemUtil.createLineitem(ctx, bbContent);
+
+    		String username = ctx.getUser().getUserName();
+            LineitemUtil.createLineitem(bbContent, ctx, username);
             
         //if teacher turned Gradecenter option OFF (and it was ON previously) - remove lineitem
         } else if (bbContent.getIsDescribed() && !isGradecenter) {

@@ -12,7 +12,7 @@
 <%@ page import="blackboard.platform.BbServiceManager"%>
 <%@ page import="blackboard.platform.plugin.PlugInUtil"%>
 <%@ page import="blackboard.platform.plugin.PlugInException"%>
-<%@ page import="org.lamsfoundation.ld.integration.blackboard.LamsPluginUtil"%>
+<%@ page import="org.lamsfoundation.ld.integration.util.LamsPluginUtil"%>
 <%@ page errorPage="/error.jsp"%>
 <%@ taglib uri="/bbNG" prefix="bbNG"%>
 <bbNG:genericPage title="LAMS Configuration" ctxId="ctx">

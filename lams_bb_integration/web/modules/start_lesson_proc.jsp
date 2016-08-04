@@ -28,15 +28,14 @@
 <%@ page import="blackboard.persist.gradebook.ext.*"%>
 <%@ page import="blackboard.persist.gradebook.impl.*"%>
 <%@ page import="blackboard.platform.*"%>
+<%@ page import="blackboard.platform.persistence.*"%>
 <%@ page import="blackboard.platform.plugin.PlugInUtil"%>
 <%@ page import="blackboard.platform.plugin.PlugInException"%>
 <%@ page import="blackboard.platform.context.Context"%>
 <%@ page import="blackboard.data.gradebook.Lineitem" %>
 <%@ page import="blackboard.persist.gradebook.LineitemDbPersister" %>
-<%@ page import="org.lamsfoundation.ld.integration.blackboard.LamsSecurityUtil"%>
-<%@ page import="org.lamsfoundation.ld.integration.blackboard.LamsPluginUtil"%>
 <%@ page import="org.lamsfoundation.ld.integration.Constants" %>
-<%@ page import="org.lamsfoundation.ld.util.*"%>
+<%@ page import="org.lamsfoundation.ld.integration.util.*"%>
 <%@ page import="blackboard.portal.data.*" %>
 <%@ page import="blackboard.data.content.ExternalLink" %>
 <%@ page import="blackboard.portal.servlet.PortalUtil" %>
@@ -170,7 +169,7 @@
 		bbContent.setUrl(contentUrl);
 		persister.persist(bbContent);
 
-		//store internalContentId -> externalContentId. It's used for lineitem removal (delete.jsp)
+		//store internalContentId -> externalContentId. It's used for GradebookServlet
 		PortalExtraInfo pei = PortalUtil.loadPortalExtraInfo(null, null, "LamsStorage");
 		ExtraInfo ei = pei.getExtraInfo();
 		ei.setValue(bbContentId, lamsLessonId);
@@ -178,7 +177,8 @@
 		
 		//Create new Gradebook column for current lesson
 		if (isGradecenter) {
-		    LineitemUtil.createLineitem(ctx, bbContent);
+		    String userName = ctx.getUser().getUserName();
+		    LineitemUtil.createLineitem(bbContent, ctx, userName);
 		}
 		
         String strReturnUrl = PlugInUtil.getEditableContentReturnURL(bbContent.getParentId(), courseId);

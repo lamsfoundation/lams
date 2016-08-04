@@ -1,7 +1,7 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
 <%@ page import="blackboard.platform.plugin.PlugInUtil"%>
 <%@ page import="blackboard.platform.plugin.PlugInException"%>
-<%@ page import="org.lamsfoundation.ld.integration.blackboard.LamsSecurityUtil"%>
+<%@ page import="org.lamsfoundation.ld.integration.util.LamsSecurityUtil"%>
 <%@ page errorPage="/error.jsp"%>
 <%@ taglib uri="/bbNG" prefix="bbNG"%>
 <bbNG:genericPage title="Open Author" ctxId="ctx">
