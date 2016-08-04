@@ -12,7 +12,8 @@
 	<html:base />
 	<lams:css />
 	<title><fmt:message key="activity.title" /></title>
-
+	
+	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery.js"></script>
 	<script language="JavaScript" type="text/JavaScript">
 		function submitMethod(actionMethod) {
 			document.VoteLearningForm.dispatch.value = actionMethod;
@@ -24,8 +25,9 @@
 
 <body class="stripes">
 
-	<lams:Page type="learner" title="${voteGeneralLearnerFlowDTO.activityTitle}">
 		<html:form action="/learning?validate=false" enctype="multipart/form-data" method="POST" target="_self">
+
+		<lams:Page type="learner" title="${voteGeneralLearnerFlowDTO.activityTitle}">
 
 			<html:hidden property="dispatch" />
 			<html:hidden property="toolSessionID" />
@@ -44,8 +46,9 @@
 				<fmt:message key="button.endLearning" />
 			</html:link>
 
+		</lams:Page>
+
 		</html:form>
-	</lams:Page>
 
 	<script type="text/javascript">
 		window.onload = function() {

@@ -8,6 +8,7 @@
 
 	<lams:css />
 
+	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery.js"></script>
 	<script type="text/javascript">
 		function refresh() {
 			location.reload();
