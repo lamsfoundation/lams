@@ -81,7 +81,7 @@
 <body class="stripes">
 
 	<c:set var="title"><fmt:message key="title.reflection"/></c:set>
-	<lams:Page type="learner" title="${title}">
+	<lams:Page type="monitor" title="${title}">
 
 		<lams:TSTable numColumns="2" dataId='data-session-id="${param.toolSessionID}"'> 
 			<th><fmt:message key="monitoring.user.fullname"/></th>
