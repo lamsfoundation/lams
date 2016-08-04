@@ -15,6 +15,7 @@
 	<lams:css />
 	<title><fmt:message key="activity.title" /></title>
 
+	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery.js"></script>
 	<script language="JavaScript" type="text/JavaScript">
 		function submitMethod(actionMethod) {
 			if (actionMethod == 'learnerFinished') {
