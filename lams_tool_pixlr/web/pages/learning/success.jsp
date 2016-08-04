@@ -10,6 +10,7 @@
 
 	<lams:head>  
 		<lams:css/>
+		<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery.js"></script>
 	</lams:head>
 	
 	<body class="stripes">
@@ -23,7 +24,7 @@
 			</c:otherwise>
 		</c:choose>
 	
-		<lams:Page type="learner" title="${title}">
+		<lams:Page type="learner" title="${title}" hideProgressBar="true">
 			
 			<html:submit styleClass="btn btn-primary pull-right" onclick="javascript:window.close();">
 				<fmt:message key="button.close" />
