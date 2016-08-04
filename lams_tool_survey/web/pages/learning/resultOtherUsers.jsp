@@ -24,6 +24,12 @@
 table.alternative-color td:first-child {
 	width: 25%;
 }
+
+.chartDiv {
+	display: none;
+	height: 220px;
+	padding 0;
+}
 </style>
 
 	<script type="text/javascript" src="${lams}includes/javascript/jquery.js"></script>
@@ -262,7 +268,7 @@ table.alternative-color td:first-child {
 							</tr>
 						</c:forEach>
 						<tr>
-							<td id="chartDiv${queStatus.index}" colspan="2"></td>
+							<td id="chartDiv${queStatus.index}" colspan="2" class="chartDiv"></td>
 						</tr>
 						<c:if test="${question.appendText}">
 							<tr>
