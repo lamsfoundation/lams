@@ -8,7 +8,6 @@
 		<fmt:message key="label.learning.title" />
 	</title>
 	<%@ include file="/common/header.jsp"%>
-	<script type="text/javascript" src="${lams}includes/javascript/prototype.js"></script>
 
 	<%-- param has higher level for request attribute --%>
 	<c:if test="${not empty param.sessionMapID}">
@@ -41,9 +40,8 @@
 			var code = window.frames["externalSpreadsheet"].cellsToJS();
 			document.getElementById("spreadsheet.code").value = code;
 		
-		    var learningForm = $("learningForm");
-        	learningForm.action = "<c:url value='/learning/saveUserSpreadsheet.do?sessionMapID=${sessionMapID}&mode=${mode}&toolSessionID=${toolSessionID}&typeOfAction='/>" + typeOfAction;
-        	learningForm.submit();
+			$("#learningForm").attr('action', '<c:url value="/learning/saveUserSpreadsheet.do?sessionMapID=${sessionMapID}&mode=${mode}&toolSessionID=${toolSessionID}&typeOfAction="/>' + typeOfAction);
+		    $("#learningForm").submit();
 		}
 		
 	-->        
