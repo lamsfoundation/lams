@@ -20,7 +20,7 @@
  * http://www.gnu.org/licenses/gpl.txt
  * ****************************************************************
  */
-package org.lamsfoundation.ld.integration.blackboard;
+package org.lamsfoundation.ld.integration.util;
 
 import java.util.Properties;
 import java.io.File;

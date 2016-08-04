@@ -30,6 +30,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.lamsfoundation.ld.integration.Constants;
+import org.lamsfoundation.ld.integration.util.LamsSecurityUtil;
 
 import blackboard.base.InitializationException;
 import blackboard.platform.BbServiceException;
@@ -79,7 +80,8 @@ public class RenderDesignImageServlet extends HttpServlet {
 	    ctxMgr = (ContextManager) BbServiceManager.lookupService(ContextManager.class);
 	    ctx = ctxMgr.setContext(request);
 
-	    String learningDesignImageUrl = LamsSecurityUtil.generateRequestLearningDesignImage(ctx, false) + "&ldId=" + learningDesignId;
+	    String username = ctx.getUser().getUserName();
+	    String learningDesignImageUrl = LamsSecurityUtil.generateRequestLearningDesignImage(username, false) + "&ldId=" + learningDesignId;
 	    response.sendRedirect(learningDesignImageUrl);
 	    
 	} catch (InitializationException e) {
