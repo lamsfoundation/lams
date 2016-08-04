@@ -24,7 +24,8 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 	<%@ include file="/common/header.jsp"%>
 
 	<c:set var="initNavUrl"><c:url value="/pages/itemreview/initnav.jsp"/>?mode=${mode}&itemIndex=${itemIndex}&itemUid=${itemUid}&toolSessionID=${toolSessionID}&sessionMapID=${sessionMapID}</c:set>
-
+	<c:set var="sessionMap" value="${sessionScope[sessionMapID]}"/>
+	
 	<script type="text/javascript">
 		$(document).ready(function(){
 			$('#headerFrame').load('${initNavUrl}');
@@ -37,16 +38,16 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 	        var html = doc.documentElement;
 	        var height = Math.max( body.scrollHeight, body.offsetHeight, 
 	            html.clientHeight, html.scrollHeight, html.offsetHeight );
-		    rscFrame.style.height = height + 40 + "px";
+		    rscFrame.style.height = height + "px";
 		}
 	</script>
 </lams:head>
 
 <body class="stripes">
-
-	<div class="row no-gutter">
-		<div class="col-xs-12">
-			<div class="container" id="content">
+	<c:choose>
+	
+		<c:when test="${sessionMap.runAuto}">
+			<lams:Page title="" type="learner">
 				<div class="panel panel-default">
 					<div class="panel-heading">
 						<div id="headerFrame"></div>
@@ -55,10 +56,28 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 						<iframe src="<c:url value='${resourceItemReviewUrl}'/>" id="resourceFrame" style="border:0px;width:100%;height:100%;" onload="setIframeHeight()"></iframe>
  					</div>
 				</div>
+			</lams:Page>
+		</c:when>			
+
+		<c:otherwise>
+			<div class="row no-gutter">
+				<div class="col-xs-12">
+					<div class="container" id="content" >
+						<div class="panel panel-default">
+							<div class="panel-heading">
+								<div id="headerFrame"></div>
+							</div>
+							<div class="panel-body" style="height:100vh;">
+								<iframe src="<c:url value='${resourceItemReviewUrl}'/>" id="resourceFrame" style="border:0px;width:100%;height:100%;" onload="setIframeHeight()"></iframe>
+		 					</div>
+						</div>
+					</div>
+					<!-- End content container -->
+				</div>
 			</div>
-			<!-- End content container -->
-		</div>
-	</div>
+		</c:otherwise>
+
+	</c:choose>
 
 </body>	
 </lams:html>
