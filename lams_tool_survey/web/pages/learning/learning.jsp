@@ -6,16 +6,15 @@
 	<title><fmt:message key="label.learning.title" /></title>
 	<%@ include file="/common/header.jsp"%>
 
-	<script type="text/javascript" src="${lams}includes/javascript/prototype.js"></script>
 	<script type="text/javascript">
 		function previousQuestion(sessionMapID) {
-			$("surveyForm").action = '<c:url value="/learning/previousQuestion.do"/>';
-			$("surveyForm").submit();
+			$("#surveyForm").attr('action', '<c:url value="/learning/previousQuestion.do"/>');
+			$("#surveyForm").submit();
 		}
 
 		function nextQuestion(sessionMapID) {
-			$("surveyForm").action = '<c:url value="/learning/nextQuestion.do"/>';
-			$("surveyForm").submit();
+			$("#surveyForm").attr('action', '<c:url value="/learning/nextQuestion.do"/>');
+			$("#surveyForm").submit();
 		}
 
 		function singleChoice(choiceName) {
