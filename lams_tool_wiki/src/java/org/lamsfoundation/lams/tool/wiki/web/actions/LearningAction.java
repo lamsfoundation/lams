@@ -235,6 +235,8 @@ public class LearningAction extends WikiPageAction {
 	    HttpServletResponse response, Long currentWikiPageId) throws Exception {
 	LearningForm learnForm = (LearningForm) form;
 	learnForm.setCurrentWikiPageId(currentWikiPageId);
+	// put the tool session id in the attributes so that the progress bar can pick it up.
+	request.setAttribute(AttributeNames.PARAM_TOOL_SESSION_ID, learnForm.getToolSessionID());
 	return unspecified(mapping, learnForm, request, response);
     }
 

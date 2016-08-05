@@ -49,11 +49,11 @@
 
       -->
     </script>
+
+  <lams:Page type="learner" usePanel="false">
+     
     <html:form action="/learning" method="post"styleId="learningForm" enctype="multipart/form-data">
 
-      <div class="container" id="content">
-        <div class="row no-gutter">
-          <div class="col-xs-12">
             <div class="panel panel-default">
               <div class="panel-heading panel-learner-title">
                 <c:if test="${currentWikiPage.title != mainWikiPage.title}">
@@ -61,8 +61,6 @@
                 </c:if> 
                 <a class="panel-title panel-learner-title"  href="javascript:changeWikiPage('${fn:escapeXml(currentWikiPage.javaScriptTitle)}')">${fn:escapeXml(currentWikiPage.title)}</a>
 
-
-                <c:set var="lrnForm" value="<%=request.getAttribute(org.apache.struts.taglib.html.Constants.BEAN_KEY)%>" />
 
                 <!-- Set up edit and add flags -->
                 <c:set var="editableFlag" value="${currentWikiPage.editable and not maxEditsReached}" />
@@ -239,7 +237,7 @@
                 </div> <!-- end Wiki main content -->
 
                 <!-- Begin form -->
-                <html:hidden property="toolSessionID" />
+                <html:hidden property="toolSessionID" styleId = "toolSessionID"  />
                 <html:hidden property="mode" />
                 <input type="hidden" name="userID" value="${userDTO.userId}"/>
                 <html:hidden property="currentWikiPage" value="${currentWikiPage.uid}" styleId="currentWikiPage" />
@@ -432,10 +430,8 @@
 
             </div><!-- end panel body -->
           </div> <!-- end panel -->
-        </div>
-      </div> <!-- end row -->
-      </div> <!-- end content fluid -->
 
+	</lams:Page>
 
     <script type="text/javascript">
       <!--
@@ -530,7 +526,8 @@
 
       function refreshPage()
       {
-        var url = "<lams:WebAppURL/>/learning.do?mode=${mode}&toolSessionID=${lrnForm.toolSessionID}&currentWikiPageId=${currentWikiPage.uid}"
+    	var toolSessionID = $("#toolSessionID").val();
+        var url = "<lams:WebAppURL/>/learning.do?mode=${mode}&toolSessionID="+toolSessionID+"&currentWikiPageId=${currentWikiPage.uid}"
         window.location=url;
       }
 
