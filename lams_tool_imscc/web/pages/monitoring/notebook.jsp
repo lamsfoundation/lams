@@ -10,7 +10,7 @@
 <body class="stripes">
 
 	<c:set var="title"><fmt:message key="page.title.monitoring.view.reflection" /></c:set>
-	<lams:Page type="learner" title="${title}">
+	<lams:Page type="monitor" title="${title}">
 		
 		<c:out value="${userDTO.fullName}" escapeXml="true"/><BR><BR>
 		<table class="table">
