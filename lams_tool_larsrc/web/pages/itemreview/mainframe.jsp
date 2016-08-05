@@ -44,40 +44,17 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 </lams:head>
 
 <body class="stripes">
-	<c:choose>
-	
-		<c:when test="${sessionMap.runAuto}">
-			<lams:Page title="" type="learner">
-				<div class="panel panel-default">
-					<div class="panel-heading">
-						<div id="headerFrame"></div>
-					</div>
-					<div class="panel-body" style="height:100vh;">
-						<iframe src="<c:url value='${resourceItemReviewUrl}'/>" id="resourceFrame" style="border:0px;width:100%;height:100%;" onload="setIframeHeight()"></iframe>
- 					</div>
-				</div>
-			</lams:Page>
-		</c:when>			
 
-		<c:otherwise>
-			<div class="row no-gutter">
-				<div class="col-xs-12">
-					<div class="container" id="content" >
-						<div class="panel panel-default">
-							<div class="panel-heading">
-								<div id="headerFrame"></div>
-							</div>
-							<div class="panel-body" style="height:100vh;">
-								<iframe src="<c:url value='${resourceItemReviewUrl}'/>" id="resourceFrame" style="border:0px;width:100%;height:100%;" onload="setIframeHeight()"></iframe>
-		 					</div>
-						</div>
-					</div>
-					<!-- End content container -->
-				</div>
+	<lams:Page title="" type="learner" usePanel="false" hideProgressBar="${!sessionMap.runAuto}">
+		<div class="panel panel-default">
+			<div class="panel-heading">
+				<div id="headerFrame"></div>
 			</div>
-		</c:otherwise>
-
-	</c:choose>
+			<div class="panel-body" style="height:100vh;">
+				<iframe src="<c:url value='${resourceItemReviewUrl}'/>" id="resourceFrame" style="border:0px;width:100%;height:100%;" onload="setIframeHeight()"></iframe>
+				</div>
+		</div>
+	</lams:Page>
 
 </body>	
 </lams:html>
