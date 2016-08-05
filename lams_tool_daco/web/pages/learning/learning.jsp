@@ -43,7 +43,7 @@
 
 
 <body class="stripes" id="body" onLoad="init()">
-<lams:Page type="navbar" title="${daco.title}">
+<lams:Page type="learner" title="${daco.title}" usePanel="false">
 
 <%-- To switch between the vertical/horizontal view --%>
 <c:set var="ellipsisControl">
