@@ -8,9 +8,13 @@
 <%@ attribute name="title" required="false" rtexprvalue="true"%>
 <%@ attribute name="titleHelpURL" required="false" rtexprvalue="true"%>
 <%@ attribute name="headingContent" required="false" rtexprvalue="true"%>
+<%@ attribute name="usePanel" required="false" rtexprvalue="true"%>
 <%@ attribute name="hideProgressBar" required="false" rtexprvalue="true"%>
 
-			
+<c:if test="${empty usePanel}">				
+	<c:set var="usePanel">true</c:set>
+</c:if>
+
 <c:choose>
 
 	<c:when test='${type == "navbar"}'>
@@ -136,6 +140,7 @@
 					restartLessonConfirmation = LABELS.CONFIRM_RESTART;
 					$('#restartitem').show();
 				}
+				$('#sidebar').show();
 			}
 			
 			$(document).ready(function() {
@@ -173,7 +178,6 @@
 								$('.lessonName').html(result.title);
 								fillProgressBar('learnerMainBar');
 								$('#navcontent').addClass('navcontent');
-								$('#sidebar').show();
 							}
 							
 							var presenceEnabledPatch = result.presenceEnabledPatch;
@@ -232,6 +236,8 @@
 			<div class="row no-gutter">
 			<div class="col-xs-12">
 			<div class="container">
+				<c:choose>
+				<c:when test="${usePanel}">
 					<div class="panel panel-default panel-${type}-page">
 						<c:if test="${not empty title}">
 							<div class="panel-heading">
@@ -256,7 +262,11 @@
 					<c:if test="${ not hideProgressBar && ( empty mode || mode == 'author' || mode == 'learner') }">
 					<div id="presenceEnabledPatchDiv"></div>
 					</c:if>
-						
+				</c:when>
+				<c:otherwise>
+					<jsp:doBody />
+				</c:otherwise>
+				</c:choose>						
 			</div>
 				</div>
 			</div>
@@ -269,7 +279,9 @@
 		<div class="row no-gutter">
 		<div class="col-xs-12">
 		<div class="container" id="content">
-		
+
+		<c:choose>
+		<c:when test="${usePanel}">
 		<div class="panel panel-default panel-${type}-page">
 			<c:if test="${not empty title}">
 				<div class="panel-heading">
@@ -289,6 +301,13 @@
 				<jsp:doBody />
 			</div>
 		</div>
+		</c:when>
+
+		<c:otherwise>
+		<jsp:doBody />
+		</c:otherwise>
+		</c:choose>						
+		
 		</div>
 		</div>
 		</div>

@@ -348,6 +348,7 @@ a.button-add-item:before {
 	nav.sidebar{
 		  border-radius: 0px;
 		  box-shadow: 0 1px 1px rgba(8, 8, 8, 0.88);
+		  min-height:300px;
 	}
  
 	/*Center Brand*/
