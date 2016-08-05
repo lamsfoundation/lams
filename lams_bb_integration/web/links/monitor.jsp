@@ -197,10 +197,6 @@ public String getChild(Content f, ContentDbLoader cLoader) {
 	    function syncMarks() {
 	    	$j("#sync-button-but").hide();
 	    	
-	    	//var monitorWin2 = window.open('../GradebookSync?lsId='  + sequenceId,'mWindow','width=1280,height=720,resizable');
-	       // monitorWin2.focus();
-	       // return;
-	    	
 	        $j.ajax({
 	        	async: false,
 	            url: '../GradebookSync',
@@ -213,7 +209,7 @@ public String getChild(Content f, ContentDbLoader cLoader) {
 	            error: function (request, status, error) {
 	            	$j("#sync-button-but").show();
 	                //alert(request.responseText);
-	               // alert(request.status);
+	                //alert(request.status);
 	                alert(error);
 	            }
 	       	});
@@ -237,19 +233,19 @@ public String getChild(Content f, ContentDbLoader cLoader) {
         	
             var monitorURL = "<%= monitorURL %>&lsid=" + sequenceId;
             
-            if(monitorWin && !monitorWin.closed){
+            if (monitorWin && !monitorWin.closed) {
                 try {
                     monitorWin.focus();
-                }catch(e){
+                } catch(e) {
                     // popups blocked by a 3rd party
                     alert("Pop-up windows have been blocked by your browser.  Please allow pop-ups for this site and try again");
                 }
                 
-            } else{
+            } else {
                 try {
                     monitorWin = window.open(monitorURL,'mWindow','width=1280,height=720,resizable');
                     monitorWin.focus();
-                }catch(e){
+                } catch(e) {
                     // popups blocked by a 3rd party
                     alert("Pop-up windows have been blocked by your browser.  Please allow pop-ups for this site and try again");
                 }

@@ -129,3 +129,5 @@ Now reverted back to previous behaviour with lesson loading in the same tab.
 * LDEV-3399: Course Copy feature. Remove auxiliary building block and introduce special button to update LAMS links with new lesson ids.
 * LDEV-3897: Ability to fix LAMS lessons in imported courses
 * LDEV-3905: Fixed exception that was thrown on trying to start a lesson while folder selected
+* LDEV-3939: Grade center column now gets created on course copy/import; Refactoring of Java code; All util classes moved to org.lamsfoundation.ld.integration.util package
+* LDEV-3927: Fixed a FF bug: "Open Lesson" not open in firefox browser for the second time after closing the opened window

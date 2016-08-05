@@ -212,7 +212,6 @@
 
     <bbNG:jsBlock>
         <script language="JavaScript" type="text/javascript">
-        <!--
         	
             var authorWin = null;
         	var previewWin = null;
@@ -222,7 +221,7 @@
             function openAuthor() {
                 var authorUrl = 'openAuthor.jsp?course_id=<%=request.getParameter("course_id")%>&content_id=<%=request.getParameter("content_id")%>';
                 
-                if(authorWin && authorWin.open && !authorWin.closed){
+                if(authorWin && !authorWin.closed){
                     try {
                         authorWin.focus();
                     }catch(e){
@@ -251,24 +250,19 @@
             	
                 var previewUrl = "preview.jsp?course_id=<%=request.getParameter("course_id")%>&ldId=" + document.getElementsByName("sequence_id")[0].value + "&title=" + document.lesson_form.title.value;
                 
-                //lams_central
-            	//if (parentURL != "") {
-            		//window.parent.opener.location.href = parentURL;
-            	//}
-                
-                if(previewWin && !previewWin.closed){
+               if (previewWin && !previewWin.closed) {
                     try {
                         previewWin.focus();
-                    }catch(e){
+                    } catch(e) {
                         // popups blocked by a 3rd party
                         alert("Pop-up windows have been blocked by your browser.  Please allow pop-ups for this site and try again");
                     }
                     
-                } else{
+                } else {
                     try {
                         previewWin = window.open(previewUrl,'pWindow','width=1280,height=720,resizable');
                         previewWin.focus();
-                    }catch(e){
+                    } catch(e) {
                         // popups blocked by a 3rd party
                         alert("Pop-up windows have been blocked by your browser.  Please allow pop-ups for this site and try again");
                     }
@@ -340,9 +334,6 @@
 			} else if (window.attachEvent){
 				window.attachEvent("message", receiveMessage);
 			}
-            
-
-        //-->
         </script>
     </bbNG:jsBlock>
     

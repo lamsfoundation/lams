@@ -249,7 +249,6 @@
 
     <bbNG:jsBlock>
         <script language="JavaScript" type="text/javascript">
-        <!--
             var learnerWin = null;
             var monitorWin = null;
                 
@@ -261,7 +260,7 @@
             // Open the Lesson as a Learner
             function openLearner() {
             	var learnerUrl = 'openLearner.jsp?course_id=<%=request.getParameter("course_id")%>&content_id=<%=request.getParameter("content_id")%>&lsid=<%=request.getParameter("lsid")%>';
-                if(learnerWin && learnerWin.open && !learnerWin.closed){
+                if (learnerWin && !learnerWin.closed) {
                     try {
                         learnerWin.focus();
                     } catch(e) {
@@ -282,7 +281,7 @@
             // Open the Lesson Monitor                
             function openMonitor() {
             	var monitorUrl = 'openMonitor.jsp?course_id=<%=request.getParameter("course_id")%>&content_id=<%=request.getParameter("content_id")%>&lsid=<%=request.getParameter("lsid")%>';
-                if(monitorWin && monitorWin.open && !monitorWin.closed){
+                if(monitorWin && !monitorWin.closed) {
                     try {
                         monitorWin.focus();
                     } catch(e) {
@@ -301,7 +300,6 @@
                 }
             }
            
-        //-->
         </script>
     </bbNG:jsBlock>
         
