@@ -789,4 +789,8 @@ public class IntegrationService implements IIntegrationService {
     public void setLessonService(ILessonService lessonService) {
 	this.lessonService = lessonService;
     }
+    
+    public ILessonService getLessonService() {
+	return lessonService;
+    }
 }
