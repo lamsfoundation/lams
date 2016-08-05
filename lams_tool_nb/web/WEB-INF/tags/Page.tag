@@ -58,20 +58,25 @@
 			<c:if test="${empty toolSessionId}">
 				<c:set var="toolSessionId" value="${param.toolSessionId}" />
 			</c:if>
-			<c:if test="${empty toolSessionID}">
+			<c:if test="${empty toolSessionId}">
 				<c:set var="toolSessionId" value="${param.toolSessionID}" />
+			</c:if>
+ 			<c:if test="${empty toolSessionId}">
+				<c:if test="${empty sessionMapID}">
+					<c:set var="sessionMapID" value="${param.sessionMapID}"/>
+				</c:if>
+ 				<c:if test="${not empty sessionMapID}">
+					<c:set var="toolSessionId" value="${sessionScope[sessionMapID].toolSessionID}" />
+					<c:if test="${empty toolSessionId}">
+						<c:set var="toolSessionId" value="${sessionScope[sessionMapID].toolSessionId}" />
+					</c:if>
+				</c:if>
 			</c:if>
 			<c:if test="${empty toolSessionId}">
 				<c:set var="toolForm" value="<%=request.getAttribute(org.apache.struts.taglib.html.Constants.BEAN_KEY)%>" />
 				<c:if test="${not empty toolForm}"> 
 				    <c:set var="toolSessionId"><c:catch var="exception">${toolForm.toolSessionID}</c:catch></c:set>
 				</c:if>
-			</c:if>
- 			<c:if test="${empty toolSessionId}">
-				<c:if test="${empty sessionMapID}">
-					<c:set var="sessionMapID" value="${param.sessionMapID}"/>
-				</c:if>
-				<c:set var="toolSessionId" value="${sessionScope[sessionMapID].toolSessionID}" />
 			</c:if>
 		</c:if>
 		
@@ -206,12 +211,12 @@
 					<ul class="nav navbar-nav">
 						<li><a href="#" class="hidden-xs visible-sm visible-md visible-lg slidesidemenu" onClick="javascript:toggleSlideMenu()">
 							<i class="pull-right fa fa-bars" style="color:#337ab7"></i>
-							<p class="lessonName"><%=request.getAttribute(org.apache.struts.taglib.html.Constants.BEAN_KEY)%></p></a></li>
+							<p class="lessonName"></p></a></li>
 						<li><a href="#" onClick="javascript:closeWindow()" ><span id="exitlabel">Exit</span><i class="pull-right fa fa-times"></i></a></li>
 						<li><a href="#" onClick="javascript:viewNotebookEntries(); return false;" ><span id="notebooklabel">Notebook</span><i class="pull-right fa fa-book"></i></a></li>
 						<li id="restartitem" style="display:none"><a href="#" onClick="javascript:restartLesson()"><span id="restartlabel">Restart</span><i class="pull-right fa fa-recycle"></i></a></li>
 						<li id="supportitem" style="display:none"><a href="#" class="slidesidemenu" onClick="javascript:toggleSlideMenu(); return false;">
-							<span id="supportlabel">Support Activities</span><i class="pull-right fa fa-wrench"></i></a>
+							<span id="supportlabel">Support Activities</span><i class="pull-right fa fa-th-large"></i></a>
 							<div id="supportPart" class="progressBarContainer"></div>
 						<li><a href="#" class="slidesidemenu" onClick="javascript:toggleSlideMenu(); return false;">
 							<span id="progresslabel">My Progress</span><i class="pull-right fa fa-map"></i></a>
