@@ -92,20 +92,21 @@
 	</lams:head>
 	<body>
 
-		<div id="instructions" class="panel panel-default">	
-			<div class="panel-heading panel-title ">
-				<div class="row ">
-					<c:choose>
-						<c:when test="${reflectOn && runAuto}">
-							<input type="button" id="FinishInstruction" name="FinishInstruction"
-								onClick="javascript:continueReflect()" class="btn btn-primary pull-right roffset5" value="<fmt:message key='label.continue' />" />
-						</c:when>
-						<c:otherwise>
-							<input type="button" id="FinishInstruction" name="FinishInstruction" class="btn btn-primary pull-right roffset5" value="<fmt:message key='label.finish' />" />
-						</c:otherwise>
-					</c:choose>
-				</div>
+		<div class="container-fluid" id="instructions">
+		  <div class="row">
+			<div class="col-xs-12 ">
+				<c:choose>
+					<c:when test="${reflectOn && runAuto}">
+						<input type="button" id="FinishInstruction" name="FinishInstruction"
+							onClick="javascript:continueReflect()" class="btn btn-primary pull-right roffset5" value="<fmt:message key='label.continue' />" />
+					</c:when>
+					<c:otherwise>
+						<input type="button" id="FinishInstruction" name="FinishInstruction" class="btn btn-primary pull-right roffset5" value="<fmt:message key='label.finish' />" />
+					</c:otherwise>
+				</c:choose>
 			</div>
+		  </div>
 		</div>
+	
 	</body>
 </lams:html>
