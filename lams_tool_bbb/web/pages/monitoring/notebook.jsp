@@ -3,7 +3,7 @@
 <c:set var="title">
 	<fmt:message key="heading.notebookEntry" />
 </c:set>
-<lams:Page title="${title}" type="learner">
+<lams:Page title="${title}" type="monitor">
 	<h4>
 		<c:out value="${userDTO.firstName} ${userDTO.lastName}" escapeXml="true"/>
 	</h4>
