@@ -51,6 +51,7 @@ import org.lamsfoundation.lams.lesson.Lesson;
 import org.lamsfoundation.lams.lesson.dto.LearnerProgressDTO;
 import org.lamsfoundation.lams.lesson.service.ILessonService;
 import org.lamsfoundation.lams.monitoring.service.IMonitoringService;
+import org.lamsfoundation.lams.security.ISecurityService;
 import org.lamsfoundation.lams.tool.OutputType;
 import org.lamsfoundation.lams.tool.ToolOutput;
 import org.lamsfoundation.lams.tool.ToolOutputDefinition;
@@ -91,6 +92,8 @@ public class LessonManagerServlet extends HttpServlet {
 
     private static IUserManagementService userManagementService = null;
 
+    private static ISecurityService securityService = null;
+
     /**
      * The doGet method of the servlet. <br>
      *
@@ -126,6 +129,7 @@ public class LessonManagerServlet extends HttpServlet {
 	String method = request.getParameter(CentralConstants.PARAM_METHOD);
 	String filePath = request.getParameter(CentralConstants.PARAM_FILEPATH);
 	String outputsUser = request.getParameter("outputsUser");
+	String userIds = request.getParameter(CentralConstants.PARAM_USER_IDS);
 	String learnerIds = request.getParameter(CentralConstants.PARAM_LEARNER_IDS);
 	String monitorIds = request.getParameter(CentralConstants.PARAM_MONITOR_IDS);
 
@@ -192,13 +196,21 @@ public class LessonManagerServlet extends HttpServlet {
 		element.setAttribute(CentralConstants.ATTR_LESSON_ID, lessonId.toString());
 
 
-	    } else if (method.equals(CentralConstants.METHOD_DELETE)) {
+	    } else if (method.equals(CentralConstants.METHOD_DELETE)
+		    || method.equals(CentralConstants.METHOD_REMOVE_LESSON)) {
+		verifyPostRequestMethod(request);
+
 		lsId = new Long(lsIdStr);
-		Boolean deleted = deleteLesson(serverId, datetime, hashValue, username, lsId);
+		Boolean deleted = removeLesson(serverId, datetime, hashValue, username, lsId);
 
 		element = document.createElement(CentralConstants.ELEM_LESSON);
 		element.setAttribute(CentralConstants.ATTR_LESSON_ID, lsId.toString());
 		element.setAttribute(CentralConstants.ATTR_DELETED, deleted.toString());
+
+	    } else if (method.equals(CentralConstants.METHOD_REMOVE_ALL_LESSONS)) {
+		verifyPostRequestMethod(request);
+
+		element = removeAllLessons(document, serverId, datetime, hashValue, username, courseId);
 
 	    } else if (method.equals(CentralConstants.METHOD_STUDENT_PROGRESS)) {
 		lsId = new Long(lsIdStr);
@@ -336,7 +348,7 @@ public class LessonManagerServlet extends HttpServlet {
 	doGet(request, response);
     }
 
-    public Long startLesson(String serverId, String datetime, String hashValue, String username, long ldId,
+    private Long startLesson(String serverId, String datetime, String hashValue, String username, long ldId,
 	    String courseId, String title, String desc, String countryIsoCode, String langIsoCode, String customCSV,
 	    boolean presenceEnable, boolean imEnable, boolean enableNotifications) throws RemoteException {
 	try {
@@ -365,7 +377,7 @@ public class LessonManagerServlet extends HttpServlet {
 	}
     }
 
-    public Long scheduleLesson(String serverId, String datetime, String hashValue, String username, long ldId,
+    private Long scheduleLesson(String serverId, String datetime, String hashValue, String username, long ldId,
 	    String courseId, String title, String desc, String startDate, String countryIsoCode, String langIsoCode,
 	    String customCSV, boolean presenceEnable, boolean imEnable, boolean enableNotifications)
 	    throws RemoteException {
@@ -421,7 +433,7 @@ public class LessonManagerServlet extends HttpServlet {
     }
 
     @SuppressWarnings("unchecked")
-    public Element getAllStudentProgress(Document document, String serverId, String datetime, String hashValue,
+    private Element getAllStudentProgress(Document document, String serverId, String datetime, String hashValue,
 	    String username, long lsId, String courseID) throws RemoteException {
 	try {
 	    ExtServerOrgMap serverMap = LessonManagerServlet.integrationService.getExtServerOrgMap(serverId);
@@ -479,7 +491,7 @@ public class LessonManagerServlet extends HttpServlet {
 
     }
 
-    public Element getSingleStudentProgress(Document document, String serverId, String datetime, String hashValue,
+    private Element getSingleStudentProgress(Document document, String serverId, String datetime, String hashValue,
 	    String username, String firstName, String lastName, String language, String country, String email,
 	    long lsId, String courseID) throws RemoteException {
 	try {
@@ -553,7 +565,7 @@ public class LessonManagerServlet extends HttpServlet {
 
     }
 
-    public boolean deleteLesson(String serverId, String datetime, String hashValue, String username, long lsId)
+    private boolean removeLesson(String serverId, String datetime, String hashValue, String username, long lsId)
 	    throws RemoteException {
 	try {
 	    ExtServerOrgMap serverMap = LessonManagerServlet.integrationService.getExtServerOrgMap(serverId);
@@ -566,7 +578,49 @@ public class LessonManagerServlet extends HttpServlet {
 	}
     }
 
-    public Long startPreview(String serverId, String datetime, String hashValue, String username, Long ldId,
+    /**
+     * Deletes all users from the specified course.
+     */
+    private Element removeAllLessons(Document document, String serverId, String datetime, String hashValue,
+	    String username, String courseId) throws Exception {
+	// Create the root node of the xml document
+	Element lessonsElement = document.createElement("Lessons");
+
+	ExtServerOrgMap serverMap = LessonManagerServlet.integrationService.getExtServerOrgMap(serverId);
+	Authenticator.authenticate(serverMap, datetime, username, hashValue);
+
+	ExtUserUseridMap userMap = LessonManagerServlet.integrationService.getExtUserUseridMap(serverMap, username);
+
+	// find all lesons in organisation
+	ExtCourseClassMap orgMap = LessonManagerServlet.integrationService.getExtCourseClassMap(serverMap.getSid(),
+		courseId);
+	if (orgMap == null) {
+	    LessonManagerServlet.log.debug("No course exists for: " + courseId + ". Can't delete any lessons.");
+	    throw new Exception("Course with courseId: " + courseId + " could not be found");
+	}
+	Integer organisationId = orgMap.getOrganisation().getOrganisationId();
+	List<Lesson> lessons = LessonManagerServlet.lessonService.getLessonsByGroup(organisationId);
+
+	if (lessons != null) {
+	    for (Lesson lesson : lessons) {
+
+		Long lessonId = lesson.getLessonId();
+
+		// remove lesson
+		LessonManagerServlet.monitoringService.removeLesson(lessonId, userMap.getUser().getUserId());
+
+		// add lessonId to output xml document
+		Element lessonElement = document.createElement(CentralConstants.ELEM_LESSON);
+		lessonElement.setAttribute(CentralConstants.ATTR_LESSON_ID, "" + lessonId);
+		lessonElement.setAttribute(CentralConstants.ATTR_DELETED, "true");
+		lessonsElement.appendChild(lessonElement);
+	    }
+	}
+
+	return lessonsElement;
+    }
+
+    private Long startPreview(String serverId, String datetime, String hashValue, String username, Long ldId,
 	    String courseId, String title, String desc, String countryIsoCode, String langIsoCode, String customCSV,
 	    boolean presenceEnable, boolean imEnable) throws RemoteException {
 
@@ -595,7 +649,7 @@ public class LessonManagerServlet extends HttpServlet {
     }
 
     @SuppressWarnings("unchecked")
-    public Long importLearningDesign(HttpServletRequest request, HttpServletResponse response, String filePath,
+    private Long importLearningDesign(HttpServletRequest request, HttpServletResponse response, String filePath,
 	    String username, String serverId, String customCSV) throws RemoteException {
 
 	List<String> ldErrorMsgs = new ArrayList<String>();
@@ -683,6 +737,9 @@ public class LessonManagerServlet extends HttpServlet {
 
 	LessonManagerServlet.userManagementService = (IUserManagementService) WebApplicationContextUtils
 		.getRequiredWebApplicationContext(getServletContext()).getBean("userManagementService");
+
+	LessonManagerServlet.securityService = (ISecurityService) WebApplicationContextUtils
+		.getRequiredWebApplicationContext(getServletContext()).getBean("securityService");
     }
 
     private class AddUsersToLessonThread implements Runnable {
@@ -876,7 +933,7 @@ public class LessonManagerServlet extends HttpServlet {
      * @throws Exception
      */
     @SuppressWarnings("unchecked")
-    public Element getGradebookMarks(Document document, String serverId, String datetime, String hashValue,
+    private Element getGradebookMarks(Document document, String serverId, String datetime, String hashValue,
 	    String username, Long lessonIdParam, String courseId, String outputsUser) throws Exception {
 
 	ExtServerOrgMap serverMap = LessonManagerServlet.integrationService.getExtServerOrgMap(serverId);
@@ -1283,6 +1340,23 @@ public class LessonManagerServlet extends HttpServlet {
 	    return (Long) upperLimit;
 	}
 	return null;
+    }
+
+    /**
+     * Checks whether request method is POST, throws SecurityException if not.
+     *
+     * @param request
+     * @return
+     * @throws SecurityException
+     */
+    private boolean verifyPostRequestMethod(HttpServletRequest request) throws SecurityException {
+	boolean isPost = "POST".equals(request.getMethod());
+
+	if (!isPost) {
+	    throw new SecurityException("This API call allows only POST request method.");
+	}
+
+	return isPost;
     }
 
     /**
