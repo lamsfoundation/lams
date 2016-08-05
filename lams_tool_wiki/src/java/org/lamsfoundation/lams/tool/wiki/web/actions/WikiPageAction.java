@@ -205,7 +205,11 @@ public abstract class WikiPageAction extends LamsDispatchAction {
 	// Send revert notifications
 	if ((toolSessionID != null) && (user != null)) {
 	    notifyWikiChange(toolSessionID, "notify.pageEdited.subject", "notify.pageEdited.body", user, request);
+
+	    // put the tool session id in the attributes so that the progress bar can pick it up.
+	    request.setAttribute(AttributeNames.PARAM_TOOL_SESSION_ID, toolSessionID);
 	}
+
 
 	return unspecified(mapping, wikiForm, request, response);
     }
