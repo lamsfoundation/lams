@@ -411,6 +411,8 @@ a.button-add-item:before {
 	/*give sidebar 100% width;*/
 	nav.sidebar li {
 		width: 100%;
+		margin-top: 3px;
+		margin-bottom: 3px;
 	}
 
  	/* Move nav to full on mouse over*/
@@ -427,6 +429,9 @@ a.button-add-item:before {
 		opacity: 0;
 	}
 	
+	nav.sidebar .fa{
+		font-size: 18px;
+	}
 }
 
 /* .....NavBar: Fully showing nav bar..... */
