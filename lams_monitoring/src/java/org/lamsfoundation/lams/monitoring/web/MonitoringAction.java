@@ -40,6 +40,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 import java.util.TreeSet;
+import java.util.Vector;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -99,7 +100,7 @@ import com.google.gson.GsonBuilder;
 /**
  * The action servlet that provide all the monitoring functionalities. It interact with the teacher via JSP monitoring
  * interface.
- * 
+ *
  * @author Jacky Fang
  */
 public class MonitoringAction extends LamsDispatchAction {
@@ -382,6 +383,24 @@ public class MonitoringAction extends LamsDispatchAction {
 	    }
 	}
 
+	return null;
+    }
+
+    /**
+     * Adds all course learners to the given lesson.
+     */
+    @SuppressWarnings("unchecked")
+    public ActionForward addAllOrganisationLearnersToLesson(ActionMapping mapping, ActionForm form,
+	    HttpServletRequest request, HttpServletResponse response) throws IOException {
+	Long lessonId = WebUtil.readLongParam(request, AttributeNames.PARAM_LESSON_ID);
+	if (!getSecurityService().isLessonMonitor(lessonId, getUserId(), "get lesson learners", false)) {
+	    response.sendError(HttpServletResponse.SC_FORBIDDEN, "User is not a monitor in the lesson");
+	    return null;
+	}
+	Lesson lesson = getLessonService().getLesson(lessonId);
+	Vector<User> learners = getUserManagementService()
+		.getUsersFromOrganisationByRole(lesson.getOrganisation().getOrganisationId(), Role.LEARNER, true);
+	getLessonService().addLearners(lesson, learners);
 	return null;
     }
 
