@@ -424,4 +424,8 @@ public interface ILessonService {
     Set<Lesson> getReleasedSucceedingLessons(Long completedLessonId, Integer learnerId);
 
     void removeLearnerProgress(Long lessonId, Integer userId);
+
+    void addPrecedingLesson(Long lessonId, Long precedingLessonId);
+
+    void removePrecedingLesson(Long lessonId, Long precedingLessonId);
 }

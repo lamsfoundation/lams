@@ -21,7 +21,6 @@
  * ****************************************************************
  */
 
-
 package org.lamsfoundation.lams.lesson.service;
 
 import java.util.ArrayList;
@@ -698,5 +697,28 @@ public class LessonService implements ILessonService {
 	    }
 	}
 	return releasedSucceedingLessons;
+    }
+
+    @Override
+    public void addPrecedingLesson(Long lessonId, Long precedingLessonId) {
+	Lesson addedPrecedingLesson = getLesson(precedingLessonId);
+	if (addedPrecedingLesson == null) {
+	    throw new IllegalArgumentException("Preceding lesson with ID: " + lessonId + " does not exist.");
+	}
+	Lesson lesson = getLesson(lessonId);
+
+	lesson.getPrecedingLessons().add(addedPrecedingLesson);
+    }
+
+    @Override
+    public void removePrecedingLesson(Long lessonId, Long precedingLessonId) {
+	Lesson lesson = getLesson(lessonId);
+	Iterator<Lesson> precedingLessonIter = lesson.getPrecedingLessons().iterator();
+	while (precedingLessonIter.hasNext()) {
+	    if (precedingLessonIter.next().getLessonId().equals(precedingLessonId)) {
+		precedingLessonIter.remove();
+		break;
+	    }
+	}
     }
 }

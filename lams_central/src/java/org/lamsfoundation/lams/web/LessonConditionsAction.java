@@ -20,14 +20,12 @@
  * ****************************************************************
  */
 
-
 package org.lamsfoundation.lams.web;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
@@ -170,17 +168,10 @@ public class LessonConditionsAction extends DispatchAction {
 	    return null;
 	}
 
-	Long removedPrecedingLessonId = WebUtil.readLongParam(request, LessonConditionsAction.PARAM_PRECEDING_LESSON_ID,
+	Long precedingLessonId = WebUtil.readLongParam(request, LessonConditionsAction.PARAM_PRECEDING_LESSON_ID,
 		false);
 
-	Lesson lesson = getLessonService().getLesson(lessonId);
-	Iterator<Lesson> precedingLessonIter = lesson.getPrecedingLessons().iterator();
-	while (precedingLessonIter.hasNext()) {
-	    if (precedingLessonIter.next().getLessonId().equals(removedPrecedingLessonId)) {
-		precedingLessonIter.remove();
-		break;
-	    }
-	}
+	getLessonService().removePrecedingLesson(lessonId, precedingLessonId);
 
 	// after operation, display contents again
 	return getIndexLessonConditions(mapping, form, request, response);
@@ -201,16 +192,9 @@ public class LessonConditionsAction extends DispatchAction {
 	    return null;
 	}
 
-	Long addedPrecedingLessonId = WebUtil.readLongParam(request, LessonConditionsAction.PARAM_PRECEDING_LESSON_ID,
+	Long precedingLessonId = WebUtil.readLongParam(request, LessonConditionsAction.PARAM_PRECEDING_LESSON_ID,
 		false);
-	Lesson lesson = getLessonService().getLesson(lessonId);
-	Lesson addedPrecedingLesson = getLessonService().getLesson(addedPrecedingLessonId);
-	if (addedPrecedingLesson == null) {
-	    throw new IllegalArgumentException("Preceding lesson with ID: " + lessonId + " does not exist.");
-	}
-
-	lesson.getPrecedingLessons().add(addedPrecedingLesson);
-
+	getLessonService().addPrecedingLesson(lessonId, precedingLessonId);
 	// after operation, display contents again
 	return getIndexLessonConditions(mapping, form, request, response);
     }
@@ -220,7 +204,6 @@ public class LessonConditionsAction extends DispatchAction {
      *
      * @throws IOException
      */
-    @SuppressWarnings("unchecked")
     public ActionForward setDaysToLessonFinish(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) throws IOException {
 	Long lessonId = WebUtil.readLongParam(request, CentralConstants.PARAM_LESSON_ID, false);
