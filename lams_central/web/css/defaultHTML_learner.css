@@ -68,6 +68,11 @@ LAMS Learner Style
 .clear-both {
 	clear: both;
 }
+/* Eliminate the scrollbar on learner popup windows, monitoring windows */
+.no-margin{
+	margin-left: 0px;
+	margin-right: 0px;
+}
 /* Comments/Forum classes */
 .msg .panel-heading {
   padding: 3px;
@@ -324,7 +329,7 @@ a.button-add-item:before {
 	width: 100%;
 }
 #criterias-table {
-	margin-left: 0;
+	margin-left: 0px;
 }
 #criterias-table td {
 	vertical-align:middle;
@@ -339,11 +344,11 @@ a.button-add-item:before {
 	.navcontent{
 		position: absolute;
 		width: calc(100% - 40px); /*keeps 100% minus nav size*/
-		margin-left: 40px;
+		margin-left: 20px;
 		float: right;
 		min-height:100%;
 	}
-
+	
 	/* darker outline than usual */
 	nav.sidebar{
 		  border-radius: 0px;
@@ -433,6 +438,7 @@ a.button-add-item:before {
 	nav.sidebar .fa{
 		font-size: 18px;
 	}
+	
 }
 
 /* .....NavBar: Fully showing nav bar..... */
