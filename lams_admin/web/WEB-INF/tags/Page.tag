@@ -19,7 +19,7 @@
 
 	<c:when test='${type == "navbar"}'>
 	<%-- Combined tab and navigation bar used in authoring and monitoring --%>
-		<div class="row no-gutter">
+		<div class="row no-gutter no-margin">
 		<div class="col-xs-12">
 		<div class="container" id="content">
 		<jsp:doBody />
@@ -144,19 +144,21 @@
 			}
 			
 			$(document).ready(function() {
-				var showControlBar = true;
+				var showControlBar = 1; // 0/1/2 none/full/keep space
 				var showIM = true;
-				if ( window.frameElement ) { // parallel
+				if ( window.name.match("LearnerActivity") || window.parent.name.match("LearnerActivity")) { 
+					// popup window
+					showControlBar = 0;
+					showIM = false;
+				} else 	if ( window.frameElement ) { // parallel
 					var myId = window.frameElement.id;
 					if ( myId ) {
 						if ( myId == 'lamsDynamicFrame0' ) {
 							showIM = false;
-						} else if ( myId == 'lamsDynamicFrame1' ) {
-							showControlBar = false;
+						} else if ( myId == 'lamsDynamicFrame1') {
+							showControlBar = 2;
 						}
 					}
-				} else { // test for popup window
-					showControlBar =  ( window.name.match("LearnerActivity") == null );
 				}
 
 				if ( lessonId != "" || toolSessionId != "" ) {
@@ -173,10 +175,12 @@
 							
 							lessonId = result.lessonID;
 							
-							if ( showControlBar ) {
+							if ( showControlBar == 1  ) {
 								allowRestart = result.allowRestart;
 								$('.lessonName').html(result.title);
 								fillProgressBar('learnerMainBar');
+								$('#navcontent').addClass('navcontent');
+							} else if ( showControlBar == 2 ) {
 								$('#navcontent').addClass('navcontent');
 							}
 							
@@ -233,7 +237,7 @@
 	</c:if> <%--  end of sidebar stuff - only used if in learner screen --%>
 
 		<div id="navcontent" class="content">
-			<div class="row no-gutter">
+			<div class="row no-gutter no-margin">
 			<div class="col-xs-12">
 			<div class="container">
 				<c:choose>
@@ -276,7 +280,7 @@
 
 	<c:otherwise>
 	<!-- Standard Screens  --> 
-		<div class="row no-gutter">
+		<div class="row no-gutter no-margin">
 		<div class="col-xs-12">
 		<div class="container" id="content">
 
