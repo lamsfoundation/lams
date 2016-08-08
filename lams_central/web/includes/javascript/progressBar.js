@@ -2,7 +2,6 @@
 	//IMPORTANT: set following variables on the page which imports this JS file
 var lessonId = lessonId || null,
 	toolSessionId = toolSessionId || null,
-	progressPanelEnabled = progressPanelEnabled || false,
 	isHorizontalBar = isHorizontalBar || false,
 	hasContentFrame = hasContentFrame || true,
 	hasDialog = hasDialog || false,
@@ -96,7 +95,7 @@ function openActivity(url) {
 
 // loads a new activity to main content frame; alternative to opening in pop up
 function loadFrame(activity) {
-	$('#contentFrame').attr('src', activity.url);
+	window.location.href = activity.url;
 	
 	var displayedActivity = activity.bar.displayedActivity;
 	// do not glow current activity
