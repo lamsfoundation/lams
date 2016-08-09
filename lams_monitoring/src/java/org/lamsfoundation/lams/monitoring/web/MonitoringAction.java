@@ -41,6 +41,7 @@ import java.util.Map.Entry;
 import java.util.Set;
 import java.util.TreeMap;
 import java.util.TreeSet;
+import java.util.Vector;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -421,6 +422,24 @@ public class MonitoringAction extends LamsDispatchAction {
 	    }
 	}
 
+	return null;
+    }
+
+    /**
+     * Adds all course learners to the given lesson.
+     */
+    @SuppressWarnings("unchecked")
+    public ActionForward addAllOrganisationLearnersToLesson(ActionMapping mapping, ActionForm form,
+	    HttpServletRequest request, HttpServletResponse response) throws IOException {
+	Long lessonId = WebUtil.readLongParam(request, AttributeNames.PARAM_LESSON_ID);
+	if (!getSecurityService().isLessonMonitor(lessonId, getUserId(), "get lesson learners", false)) {
+	    response.sendError(HttpServletResponse.SC_FORBIDDEN, "User is not a monitor in the lesson");
+	    return null;
+	}
+	Lesson lesson = getLessonService().getLesson(lessonId);
+	Vector<User> learners = getUserManagementService().getUsersFromOrganisationByRole(
+		lesson.getOrganisation().getOrganisationId(), Role.LEARNER, false, true);
+	getLessonService().addLearners(lesson, learners);
 	return null;
     }
 
