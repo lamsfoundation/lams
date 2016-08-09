@@ -127,6 +127,7 @@
 			}
 
 			function hideSlideMenu() {	
+				hideProgressBars();
 				$("nav.sidebar").removeClass("expandmenu");
 			}
 			
