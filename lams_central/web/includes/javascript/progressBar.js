@@ -594,6 +594,13 @@ var ActivityUtils = {
 		});
 	},
 
+	// hide all Optional Activities instantly - used when the control bar shrinks
+	hideComplexContentInstantly : function() {
+		$('div.optionalActivity').each(function(index, contentDiv) {
+			$(contentDiv).hide();
+		});
+	},
+
 	// draw box with inner activities
 	showComplexContent : function(activity) {
 		if (activity.isComplex) {
@@ -611,9 +618,9 @@ var ActivityUtils = {
 				activity.optionalContent = $('<div />').attr('id',
 						containerName).addClass('optionalActivity').css({
 					// a little higher than activity, to cover it
-					'top'    : $(activity.shape.node).offset().top - 8,
+					'top'    : $(activity.shape.node).offset().top - $('#progressBarDiv').offset().top + 30,
 					'left'   : $(activity.shape.node).offset().left - 65, 
-					'height' : 27 * activity.childActivities.length - 1
+					'height' : 29 * activity.childActivities.length - 1
 				}).appendTo('#' + activity.bar.containerId);
 
 				var optionalContentTable = $('<table cellspacing="0" />')
@@ -990,6 +997,9 @@ function OptionalActivity(paper, name, status, url, childActivitiesData, isNeste
 	}
 }
 
+function hideProgressBars() {
+	ActivityUtils.hideComplexContentInstantly();
+}
 // refresh progress bar on first/next activity load
 function fillProgressBar(barId) {
 	var bar = bars[barId];
