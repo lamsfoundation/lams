@@ -93,7 +93,9 @@
 				
 				LAMS_URL = '<lams:LAMSURL/>',
 				APP_URL = LAMS_URL + 'learning/',
-						
+				
+				commandWebsocket = null,
+
 				bars = {
 					'learnerMainBar' : {
 						'containerId' : 'progressBarDiv'
@@ -196,9 +198,24 @@
 									} 
 								});
 							}
+
+							commandWebsocket = new WebSocket(APP_URL.replace('http', 'ws') + 'commandWebsocket?lessonID=' + lessonId);
+							//when the server pushes new commands
+							commandWebsocket.onmessage = function(e){
+								// read JSON object
+								var command = JSON.parse(e.data);
+								if (command.message) {
+									alert(command.message);
+								}
+								if (command.redirectURL) {
+									window.location.href = command.redirectURL;
+								}
+							};
 						}
 					});
 				}
+
+
 			});
 			
 		</script>
