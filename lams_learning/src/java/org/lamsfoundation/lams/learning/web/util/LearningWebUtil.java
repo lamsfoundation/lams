@@ -21,7 +21,6 @@
  * ****************************************************************
  */
 
-
 package org.lamsfoundation.lams.learning.web.util;
 
 import java.io.UnsupportedEncodingException;
@@ -222,7 +221,6 @@ public class LearningWebUtil {
 	if (currentActivity == null) {
 	    progress = learnerService.joinLesson(learnerId, lesson.getLessonId());
 	} else if (progress.getCompletedActivities().containsKey(currentActivity)) {
-
 	    // recalculate activity mark and pass it to gradebook
 	    learnerService.updateGradebookMark(currentActivity, progress);
 
@@ -231,7 +229,8 @@ public class LearningWebUtil {
 	    progress = learnerService.completeActivity(learnerId, currentActivity, progress);
 	}
 
-	if ((currentActivity != null) && currentActivity.isFloating()) {
+	if (currentActivity != null && (currentActivity.isFloating() || (currentActivity.getParentActivity() != null
+		&& progress.getCompletedActivities().containsKey(currentActivity.getParentActivity())))) {
 	    return actionMappings.getCloseForward(currentActivity, lesson.getLessonId());
 	}
 
