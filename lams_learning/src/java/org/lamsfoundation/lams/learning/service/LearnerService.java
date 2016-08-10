@@ -21,7 +21,6 @@
  * ****************************************************************
  */
 
-
 package org.lamsfoundation.lams.learning.service;
 
 import java.sql.Timestamp;
@@ -38,6 +37,7 @@ import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.gradebook.service.IGradebookService;
+import org.lamsfoundation.lams.learning.command.Command;
 import org.lamsfoundation.lams.learning.progress.ProgressBuilder;
 import org.lamsfoundation.lams.learning.progress.ProgressEngine;
 import org.lamsfoundation.lams.learning.progress.ProgressException;
@@ -383,7 +383,7 @@ public class LearnerService implements ICoreLearnerService {
     public LearnerProgress getProgressById(Long progressId) {
 	return learnerProgressDAO.getLearnerProgress(progressId);
     }
-    
+
     @Override
     public Integer getProgressArchiveMaxAttemptID(Integer userId, Long lessonId) {
 	return learnerProgressDAO.getLearnerProgressArchiveMaxAttemptID(userId, lessonId);
@@ -1395,6 +1395,19 @@ public class LearnerService implements ICoreLearnerService {
 	result.setFirst(isFirst);
 	result.setLast(isLast);
 	return result;
+    }
+
+    @Override
+    public void createCommandForLearner(Long lessonId, String userName, String jsonCommand) {
+	Command command = new Command(lessonId, userName, jsonCommand);
+	activityDAO.insert(command);
+    }
+
+    @Override
+    @SuppressWarnings("unchecked")
+    public List<Command> getCommandsForLesson(Long lessonId, Date laterThan) {
+	String query = "FROM Command WHERE lessonId=? AND createDate >= ?";
+	return activityDAO.find(query, new Object[] { lessonId, laterThan });
     }
 
     @Override

@@ -55,6 +55,7 @@ import org.apache.tomcat.util.json.JSONException;
 import org.apache.tomcat.util.json.JSONObject;
 import org.lamsfoundation.lams.authoring.ObjectExtractor;
 import org.lamsfoundation.lams.authoring.service.IAuthoringService;
+import org.lamsfoundation.lams.learning.service.ILearnerService;
 import org.lamsfoundation.lams.learningdesign.Activity;
 import org.lamsfoundation.lams.learningdesign.BranchingActivity;
 import org.lamsfoundation.lams.learningdesign.ChosenBranchingActivity;
@@ -130,6 +131,8 @@ public class MonitoringAction extends LamsDispatchAction {
     private static IMonitoringService monitoringService;
 
     private static IUserManagementService userManagementService;
+
+    private static ILearnerService learnerService;
 
     private Integer getUserId() {
 	HttpSession ss = SessionManager.getSession();
@@ -590,9 +593,10 @@ public class MonitoringAction extends LamsDispatchAction {
      * @return An ActionForward
      * @throws IOException
      * @throws ServletException
+     * @throws JSONException
      */
     public ActionForward forceComplete(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws IOException, ServletException {
+	    HttpServletResponse response) throws IOException, ServletException, JSONException {
 	getAuditService();
 	// get parameters
 	Long activityId = null;
@@ -630,6 +634,12 @@ public class MonitoringAction extends LamsDispatchAction {
 	Object[] args = new Object[] { learnerId, activityId, lessonId };
 	String auditMessage = getMonitoringService().getMessageService().getMessage(messageKey, args);
 	MonitoringAction.auditService.log(MonitoringConstants.MONITORING_MODULE_NAME, auditMessage + " " + message);
+
+	JSONObject jsonCommand = new JSONObject();
+	jsonCommand.put("message", "Teacher moved you to another activity.");
+	jsonCommand.put("redirectURL", "/lams/learning/learner.do?method=joinLesson&lessonID=" + lessonId);
+	User learner = (User) getUserManagementService().findById(User.class, learnerId);
+	getLearnerService().createCommandForLearner(lessonId, learner.getLogin(), jsonCommand.toString());
 
 	PrintWriter writer = response.getWriter();
 	writer.println(message);
@@ -1383,6 +1393,15 @@ public class MonitoringAction extends LamsDispatchAction {
 	    MonitoringAction.userManagementService = (IUserManagementService) ctx.getBean("userManagementService");
 	}
 	return MonitoringAction.userManagementService;
+    }
+
+    private ILearnerService getLearnerService() {
+	if (MonitoringAction.learnerService == null) {
+	    WebApplicationContext ctx = WebApplicationContextUtils
+		    .getRequiredWebApplicationContext(getServlet().getServletContext());
+	    MonitoringAction.learnerService = (ILearnerService) ctx.getBean("learnerService");
+	}
+	return MonitoringAction.learnerService;
     }
 
     /**
