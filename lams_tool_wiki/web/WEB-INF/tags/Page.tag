@@ -127,6 +127,7 @@
 			}
 
 			function hideSlideMenu() {	
+				hideProgressBars();
 				$("nav.sidebar").removeClass("expandmenu");
 			}
 			
@@ -217,7 +218,7 @@
 				<!-- Collect the nav links, forms, and other content for toggling -->
 				<div class="collapse navbar-collapse" id="bs-sidebar-navbar-collapse-1">
 					<ul class="nav navbar-nav">
-						<li><a href="#" class="hidden-xs visible-sm visible-md visible-lg slidesidemenu" onClick="javascript:toggleSlideMenu()">
+						<li><a href="#" class="hidden-xs visible-sm visible-md visible-lg slidesidemenu" onClick="javascript:toggleSlideMenu(); return false;">
 							<i class="pull-right fa fa-bars" style="color:#337ab7"></i>
 							<p class="lessonName"></p></a></li>
 						<li><a href="#" onClick="javascript:closeWindow()" ><span id="exitlabel">Exit</span><i class="pull-right fa fa-times"></i></a></li>
