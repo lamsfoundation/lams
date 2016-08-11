@@ -21,13 +21,13 @@
  * ****************************************************************
  */
 
-package org.lamsfoundation.lams.learning.command;
+package org.lamsfoundation.lams.learning.command.model;
 
 import java.io.Serializable;
 import java.util.Date;
 
 /**
- *
+ * Stores a command to be sent to a learner via websocket.
  */
 public class Command implements Serializable {
 

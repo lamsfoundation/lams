@@ -11,7 +11,10 @@ CREATE TABLE lams_learning_command (
 	user_name VARCHAR(191),
 	create_date DATETIME NOT NULL,
 	command_text TEXT,
-	PRIMARY KEY (uid)
+	PRIMARY KEY (uid),
+	INDEX idx_lesson_id (lesson_id),
+	INDEX idx_user_name (user_name),
+	INDEX idx_create_date (create_date)
 )ENGINE=InnoDB;
 
 COMMIT;

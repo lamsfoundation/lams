@@ -26,7 +26,7 @@ package org.lamsfoundation.lams.learning.service;
 import java.util.Date;
 import java.util.List;
 
-import org.lamsfoundation.lams.learning.command.Command;
+import org.lamsfoundation.lams.learning.command.model.Command;
 import org.lamsfoundation.lams.learning.web.bean.ActivityPositionDTO;
 import org.lamsfoundation.lams.tool.ToolOutput;
 

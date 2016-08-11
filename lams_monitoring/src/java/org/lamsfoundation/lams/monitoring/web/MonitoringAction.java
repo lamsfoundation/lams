@@ -134,6 +134,8 @@ public class MonitoringAction extends LamsDispatchAction {
 
     private static ILearnerService learnerService;
 
+    private static MessageService messageService;
+
     private Integer getUserId() {
 	HttpSession ss = SessionManager.getSession();
 	UserDTO user = (UserDTO) ss.getAttribute(AttributeNames.USER);
@@ -636,7 +638,7 @@ public class MonitoringAction extends LamsDispatchAction {
 	MonitoringAction.auditService.log(MonitoringConstants.MONITORING_MODULE_NAME, auditMessage + " " + message);
 
 	JSONObject jsonCommand = new JSONObject();
-	jsonCommand.put("message", "Teacher moved you to another activity.");
+	jsonCommand.put("message", getMessageService().getMessage("force.complete.learner.command.message"));
 	jsonCommand.put("redirectURL", "/lams/learning/learner.do?method=joinLesson&lessonID=" + lessonId);
 	User learner = (User) getUserManagementService().findById(User.class, learnerId);
 	getLearnerService().createCommandForLearner(lessonId, learner.getLogin(), jsonCommand.toString());
@@ -1402,6 +1404,15 @@ public class MonitoringAction extends LamsDispatchAction {
 	    MonitoringAction.learnerService = (ILearnerService) ctx.getBean("learnerService");
 	}
 	return MonitoringAction.learnerService;
+    }
+
+    private MessageService getMessageService() {
+	if (MonitoringAction.messageService == null) {
+	    WebApplicationContext ctx = WebApplicationContextUtils
+		    .getRequiredWebApplicationContext(getServlet().getServletContext());
+	    MonitoringAction.messageService = (MessageService) ctx.getBean("monitoringMessageService");
+	}
+	return MonitoringAction.messageService;
     }
 
     /**
