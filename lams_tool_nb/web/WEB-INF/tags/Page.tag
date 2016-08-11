@@ -93,7 +93,10 @@
 				
 				LAMS_URL = '<lams:LAMSURL/>',
 				APP_URL = LAMS_URL + 'learning/',
-						
+
+				// it gets initialised along with progress bar
+				commandWebsocket = null,
+
 				bars = {
 					'learnerMainBar' : {
 						'containerId' : 'progressBarDiv'
@@ -196,9 +199,25 @@
 									} 
 								});
 							}
+
+							// it is not an obvious place to init the websocket, but we need lesson ID
+							commandWebsocket = new WebSocket(APP_URL.replace('http', 'ws') + 'commandWebsocket?lessonID=' + lessonId);
+							// when the server pushes new commands
+							commandWebsocket.onmessage = function(e){
+								// read JSON object
+								var command = JSON.parse(e.data);
+								if (command.message) {
+									alert(command.message);
+								}
+								if (command.redirectURL) {
+									window.location.href = command.redirectURL;
+								}
+							};
 						}
 					});
 				}
+
+
 			});
 			
 		</script>

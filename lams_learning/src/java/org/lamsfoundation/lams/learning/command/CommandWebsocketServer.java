@@ -16,6 +16,7 @@ import javax.websocket.Session;
 import javax.websocket.server.ServerEndpoint;
 
 import org.apache.log4j.Logger;
+import org.lamsfoundation.lams.learning.command.model.Command;
 import org.lamsfoundation.lams.learning.service.ILearnerService;
 import org.lamsfoundation.lams.util.hibernate.HibernateSessionManager;
 import org.lamsfoundation.lams.web.session.SessionManager;
@@ -39,7 +40,7 @@ public class CommandWebsocketServer {
     private static class SendWorker extends Thread {
 	private boolean stopFlag = false;
 	// how ofter the thread runs
-	private static final long CHECK_INTERVAL = 2000;
+	private static final long CHECK_INTERVAL = 5000;
 	// mapping lessonId -> timestamp when the check was last performed, so the thread does not run too often
 	private final Map<Long, Long> lastSendTimes = new TreeMap<Long, Long>();
 
@@ -95,10 +96,13 @@ public class CommandWebsocketServer {
 	}
 
 	/**
-	 * Feeds opened websockets with messages.
+	 * Feeds opened websockets with commands.
 	 */
 	private void send(Long lessonId) throws IOException {
 	    Long lastSendTime = lastSendTimes.get(lessonId);
+	    if (lastSendTime == null) {
+		lastSendTime = System.currentTimeMillis() - CHECK_INTERVAL;
+	    }
 	    lastSendTimes.put(lessonId, System.currentTimeMillis());
 
 	    List<Command> commands = CommandWebsocketServer.getLearnerService().getCommandsForLesson(lessonId,

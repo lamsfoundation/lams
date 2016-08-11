@@ -37,7 +37,8 @@ import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.gradebook.service.IGradebookService;
-import org.lamsfoundation.lams.learning.command.Command;
+import org.lamsfoundation.lams.learning.command.dao.ICommandDAO;
+import org.lamsfoundation.lams.learning.command.model.Command;
 import org.lamsfoundation.lams.learning.progress.ProgressBuilder;
 import org.lamsfoundation.lams.learning.progress.ProgressEngine;
 import org.lamsfoundation.lams.learning.progress.ProgressException;
@@ -104,6 +105,7 @@ public class LearnerService implements ICoreLearnerService {
     private IGroupUserDAO groupUserDAO;
     private ProgressEngine progressEngine;
     private IDataFlowDAO dataFlowDAO;
+    private ICommandDAO commandDAO;
     private ILamsCoreToolService lamsCoreToolService;
     private ActivityMapping activityMapping;
     private IUserManagementService userManagementService;
@@ -1308,6 +1310,14 @@ public class LearnerService implements ICoreLearnerService {
 	this.dataFlowDAO = dataFlowDAO;
     }
 
+    public ICommandDAO getCommandDAO() {
+	return commandDAO;
+    }
+
+    public void setCommandDAO(ICommandDAO commandDAO) {
+	this.commandDAO = commandDAO;
+    }
+
     /**
      * Gets the concreted tool output (not the definition) from a tool. This method is called by target tool in order to
      * get data from source tool.
@@ -1400,14 +1410,12 @@ public class LearnerService implements ICoreLearnerService {
     @Override
     public void createCommandForLearner(Long lessonId, String userName, String jsonCommand) {
 	Command command = new Command(lessonId, userName, jsonCommand);
-	activityDAO.insert(command);
+	commandDAO.insert(command);
     }
 
     @Override
-    @SuppressWarnings("unchecked")
     public List<Command> getCommandsForLesson(Long lessonId, Date laterThan) {
-	String query = "FROM Command WHERE lessonId=? AND createDate >= ?";
-	return activityDAO.find(query, new Object[] { lessonId, laterThan });
+	return commandDAO.getNewCommands(lessonId, laterThan);
     }
 
     @Override
