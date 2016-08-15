@@ -5,9 +5,9 @@ SET FOREIGN_KEY_CHECKS=0;
 
 -- LDEV-3687 Unable to add marks due to foreign key on spreadsheet_mark table
 
-ALTER IGNORE TABLE `tl_lasprd10_spreadsheet_mark` DROP FOREIGN KEY `tl_lasprd10_spreadsheet_mark_ibfk_1`;
+ALTER TABLE `tl_lasprd10_spreadsheet_mark` DROP FOREIGN KEY `tl_lasprd10_spreadsheet_mark_ibfk_1`;
 
-ALTER IGNORE TABLE tl_lasprd10_user_modified_spreadsheet DROP FOREIGN KEY FK_tl_lasprd10_user_modified_spreadsheet_1;
+ALTER TABLE tl_lasprd10_user_modified_spreadsheet DROP FOREIGN KEY FK_tl_lasprd10_user_modified_spreadsheet_1;
 ALTER TABLE tl_lasprd10_user_modified_spreadsheet ADD CONSTRAINT FK_tl_lasprd10_user_modified_spreadsheet_1 FOREIGN KEY (`mark_id`)
 REFERENCES `tl_lasprd10_spreadsheet_mark` (`uid`) ON DELETE SET NULL ON UPDATE NO ACTION;
 
