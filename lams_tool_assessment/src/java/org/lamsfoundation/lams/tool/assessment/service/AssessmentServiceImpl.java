@@ -402,9 +402,31 @@ public class AssessmentServiceImpl
 
 	    // don't instantiate new attempt if the previous one wasn't finished and thus continue working with it
 	    if (lastResult.getFinishDate() == null) {
+		
+		//check all required questionResults exist, it can be missing in case of random question - create new one then
+		Set<AssessmentQuestionResult> questionResults = lastResult.getQuestionResults();
+		Set<AssessmentQuestionResult> updatedQuestionResults = new TreeSet(new AssessmentQuestionResultComparator());
+		for (Set<AssessmentQuestion> questionsForOnePage : pagedQuestions) {
+		    for (AssessmentQuestion question : questionsForOnePage) {
+
+			// get questionResult from DB instance of AssessmentResult
+			AssessmentQuestionResult questionResult = null;
+			for (AssessmentQuestionResult questionResultIter : questionResults) {
+			    if (question.getUid().equals(questionResultIter.getAssessmentQuestion().getUid())) {
+				questionResult = questionResultIter;
+			    }
+			}
+			if (questionResult == null) {
+			    questionResult = createQuestionResultObject(question);
+			}
+			updatedQuestionResults.add(questionResult);
+		    }
+		}
+		lastResult.setQuestionResults(updatedQuestionResults);
+		assessmentResultDao.saveObject(lastResult);	
 		return;
 
-		// mark previous attempt as being not the latest any longer
+	    // mark previous attempt as being not the latest any longer
 	    } else {
 		lastResult.setLatest(false);
 		assessmentResultDao.saveObject(lastResult);
@@ -422,21 +444,32 @@ public class AssessmentServiceImpl
 	Set<AssessmentQuestionResult> questionResults = result.getQuestionResults();
 	for (Set<AssessmentQuestion> questionsForOnePage : pagedQuestions) {
 	    for (AssessmentQuestion question : questionsForOnePage) {
-		AssessmentQuestionResult questionResult = new AssessmentQuestionResult();
-		questionResult.setAssessmentQuestion(question);
+		AssessmentQuestionResult questionResult = createQuestionResultObject(question);
 		questionResults.add(questionResult);
-
-		// create optionAnswer for each option
-		Set<AssessmentOptionAnswer> optionAnswers = questionResult.getOptionAnswers();
-		for (AssessmentQuestionOption option : question.getOptions()) {
-		    AssessmentOptionAnswer optionAnswer = new AssessmentOptionAnswer();
-		    optionAnswer.setOptionUid(option.getUid());
-		    optionAnswers.add(optionAnswer);
-		}
 	    }
 	}
 
 	assessmentResultDao.saveObject(result);
+    }
+    
+    /* Auiliary method for setAttemptStarted(). Simply init new AssessmentQuestionResult object and fills it in with values.
+     * @param question
+     * @param questionResults
+     * @return
+     */
+    private AssessmentQuestionResult createQuestionResultObject(AssessmentQuestion question) {
+	AssessmentQuestionResult questionResult = new AssessmentQuestionResult();
+	questionResult.setAssessmentQuestion(question);
+
+	// create optionAnswer for each option
+	Set<AssessmentOptionAnswer> optionAnswers = questionResult.getOptionAnswers();
+	for (AssessmentQuestionOption option : question.getOptions()) {
+	    AssessmentOptionAnswer optionAnswer = new AssessmentOptionAnswer();
+	    optionAnswer.setOptionUid(option.getUid());
+	    optionAnswers.add(optionAnswer);
+	}
+
+	return questionResult;
     }
 
     @Override
