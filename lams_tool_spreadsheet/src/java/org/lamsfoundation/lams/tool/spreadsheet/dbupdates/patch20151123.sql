@@ -4,7 +4,7 @@ SET FOREIGN_KEY_CHECKS=0;
 ----------------------Put all sql statements below here-------------------------
 
 --  LDEV-3612 Marks should accept decimal 
-ALTER IGNORE TABLE tl_lasprd10_spreadsheet_mark CHANGE COLUMN marks marks FLOAT NULL DEFAULT NULL;
+ALTER TABLE tl_lasprd10_spreadsheet_mark CHANGE COLUMN marks marks FLOAT NULL DEFAULT NULL;
 
 ----------------------Put all sql statements above here-------------------------
 
