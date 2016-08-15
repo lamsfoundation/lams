@@ -1090,8 +1090,30 @@ function addActivityIcons(activity) {
 			'style'		 : 'cursor : pointer'
 		}, activity.learnerCount, appendTarget);
 		appendXMLElement('title', null, groupTitle, element);
-	} 
-
+	
+		if (activity.learners) {
+			// draw single icons for the first few learners;
+			// don't do it for gate and optional activities
+			if ([3,4,5,7,13,14].indexOf(activity.type) == -1) {
+				$.each(activity.learners, function(learnerIndex, learner){
+					var learnerDisplayName = getLearnerDisplayName(learner);
+						element = appendXMLElement('image', {
+							'id'         : 'act' + activity.id + 'learner' + learner.id,
+							'x'          : coord.x + learnerIndex*15 + 1,
+							// a bit lower for Optional Activity
+							'y'          : coord.y,
+							'height'     : 16,
+							'width'      : 16,
+								'xlink:href' : LAMS_URL + 'images/icons/' 
+											   + (learner.id == sequenceSearchedLearner ? 'user_red.png' : 'user.png'),
+							'style'		 : 'cursor : pointer'
+						}, null, appendTarget);
+						appendXMLElement('title', null, learnerDisplayName, element);
+					});
+			}
+		}
+	}
+	
 	if (activity.requiresAttention) {
 		var element = appendXMLElement('image', {
 			'id'         : 'act' + activity.id + 'attention',
