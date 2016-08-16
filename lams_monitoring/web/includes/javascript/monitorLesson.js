@@ -1105,7 +1105,8 @@ function addActivityIcons(activity) {
 							'height'     : 16,
 							'width'      : 16,
 								'xlink:href' : LAMS_URL + 'images/icons/' 
-											   + (learner.id == sequenceSearchedLearner ? 'user_red.png' : 'user.png'),
+											   + (learner.id == sequenceSearchedLearner ? 'user_red.png'
+											      : (learner.leader ? 'user_online.png' : 'user.png')),
 							'style'		 : 'cursor : pointer'
 						}, null, appendTarget);
 						appendXMLElement('title', null, learnerDisplayName, element);

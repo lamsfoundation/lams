@@ -23,6 +23,7 @@
 package org.lamsfoundation.lams.tool.service;
 
 import java.io.IOException;
+import java.util.Set;
 
 import org.lamsfoundation.lams.tool.IToolVO;
 import org.lamsfoundation.lams.tool.Tool;
@@ -38,6 +39,8 @@ import org.lamsfoundation.lams.util.FileUtilException;
  * @author Ozgur Demirtas 24/06/2005
  */
 public interface ILamsToolService {
+    public static final String LEADER_SELECTION_TOOL_SIGNATURE = "lalead11";
+
     IToolVO getToolByID(Long toolId);
 
     IToolVO getToolBySignature(final String toolSignature);
@@ -99,6 +102,11 @@ public interface ILamsToolService {
      * @return
      */
     Long getLeaderUserId(Long toolSessionId, Integer learnerId);
+
+    /**
+     * Returns leaders' userIds for all tool sessions from the given Leader Selection Tool.
+     */
+    Set<Long> getLeaderUserId(Long leaderSelectionActivityId);
 
     /**
      * Get a count of all the users that would be returned by getUsersForActivity(Long toolSessionId);
