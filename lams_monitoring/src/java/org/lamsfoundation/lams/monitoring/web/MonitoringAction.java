@@ -65,6 +65,7 @@ import org.lamsfoundation.lams.learningdesign.Group;
 import org.lamsfoundation.lams.learningdesign.LearningDesign;
 import org.lamsfoundation.lams.learningdesign.OptionsWithSequencesActivity;
 import org.lamsfoundation.lams.learningdesign.SequenceActivity;
+import org.lamsfoundation.lams.learningdesign.ToolActivity;
 import org.lamsfoundation.lams.learningdesign.Transition;
 import org.lamsfoundation.lams.learningdesign.exception.LearningDesignException;
 import org.lamsfoundation.lams.lesson.LearnerProgress;
@@ -77,6 +78,7 @@ import org.lamsfoundation.lams.monitoring.service.IMonitoringService;
 import org.lamsfoundation.lams.monitoring.service.MonitoringServiceProxy;
 import org.lamsfoundation.lams.security.ISecurityService;
 import org.lamsfoundation.lams.tool.exception.LamsToolServiceException;
+import org.lamsfoundation.lams.tool.service.ILamsToolService;
 import org.lamsfoundation.lams.usermanagement.Organisation;
 import org.lamsfoundation.lams.usermanagement.Role;
 import org.lamsfoundation.lams.usermanagement.User;
@@ -133,6 +135,8 @@ public class MonitoringAction extends LamsDispatchAction {
     private static IUserManagementService userManagementService;
 
     private static ILearnerService learnerService;
+
+    private static ILamsToolService toolService;
 
     private static MessageService messageService;
 
@@ -1092,9 +1096,19 @@ public class MonitoringAction extends LamsDispatchAction {
 
 	// Fetch number of learners at each activity
 	ArrayList<Long> activityIds = new ArrayList<Long>();
+	Set<Long> leaders = new TreeSet<Long>();
 	for (Activity activity : activities) {
 	    activityIds.add(activity.getActivityId());
+	    // find leaders from Leader Selection Tool
+	    if (activity.isToolActivity()) {
+		ToolActivity toolActivity = (ToolActivity) activity;
+		if (ILamsToolService.LEADER_SELECTION_TOOL_SIGNATURE
+			.equals(toolActivity.getTool().getToolSignature())) {
+		    leaders.addAll(getToolService().getLeaderUserId(activity.getActivityId()));
+		}
+	    }
 	}
+
 	Map<Long, Integer> learnerCounts = getMonitoringService()
 		.getCountLearnersCurrentActivities(activityIds.toArray(new Long[activityIds.size()]));
 
@@ -1142,11 +1156,23 @@ public class MonitoringAction extends LamsDispatchAction {
 		List<User> latestLearners = getMonitoringService().getLearnersLatestByActivity(activity.getActivityId(),
 			MonitoringAction.LATEST_LEARNER_PROGRESS_ACTIVITY_DISPLAY_LIMIT, null);
 
+		// insert leaders as first of learners
+		for (Long leaderId : leaders) {
+		    for (User learner : latestLearners) {
+			if (learner.getUserId().equals(leaderId.intValue())) {
+			    latestLearners = MonitoringAction.insertHighlightedLearner(learner, latestLearners,
+				    MonitoringAction.LATEST_LEARNER_PROGRESS_ACTIVITY_DISPLAY_LIMIT);
+			    break;
+			}
+		    }
+		}
+
+		// insert the searched learner as the first one
 		if ((searchedLearnerProgress != null) && (searchedLearnerProgress.getCurrentActivity() != null)
 			&& activity.getActivityId()
 				.equals(searchedLearnerProgress.getCurrentActivity().getActivityId())) {
 		    // put the searched learner in front
-		    latestLearners = MonitoringAction.insertSearchedLearner(searchedLearnerProgress.getUser(),
+		    latestLearners = MonitoringAction.insertHighlightedLearner(searchedLearnerProgress.getUser(),
 			    latestLearners, MonitoringAction.LATEST_LEARNER_PROGRESS_ACTIVITY_DISPLAY_LIMIT);
 		}
 
@@ -1154,7 +1180,11 @@ public class MonitoringAction extends LamsDispatchAction {
 		if (!latestLearners.isEmpty()) {
 		    JSONArray learnersJSON = new JSONArray();
 		    for (User learner : latestLearners) {
-			learnersJSON.put(WebUtil.userToJSON(learner));
+			JSONObject userJSON = WebUtil.userToJSON(learner);
+			if (leaders.contains(learner.getUserId().longValue())) {
+			    userJSON.put("leader", true);
+			}
+			learnersJSON.put(userJSON);
 		    }
 
 		    activityJSON.put("learners", learnersJSON);
@@ -1179,7 +1209,7 @@ public class MonitoringAction extends LamsDispatchAction {
 
 	if ((searchedLearnerProgress != null) && searchedLearnerProgress.isComplete()) {
 	    // put the searched learner in front
-	    completedLearners = MonitoringAction.insertSearchedLearner(searchedLearnerProgress.getUser(),
+	    completedLearners = MonitoringAction.insertHighlightedLearner(searchedLearnerProgress.getUser(),
 		    completedLearners, MonitoringAction.LATEST_LEARNER_PROGRESS_LESSON_DISPLAY_LIMIT);
 	}
 	for (User learner : completedLearners) {
@@ -1415,6 +1445,15 @@ public class MonitoringAction extends LamsDispatchAction {
 	return MonitoringAction.messageService;
     }
 
+    private ILamsToolService getToolService() {
+	if (MonitoringAction.toolService == null) {
+	    WebApplicationContext ctx = WebApplicationContextUtils
+		    .getRequiredWebApplicationContext(getServlet().getServletContext());
+	    MonitoringAction.toolService = (ILamsToolService) ctx.getBean("lamsToolService");
+	}
+	return MonitoringAction.toolService;
+    }
+
     /**
      * Set whether or not the presence available button is available in learner. Expects parameters lessonID and
      * presenceAvailable.
@@ -1554,7 +1593,7 @@ public class MonitoringAction extends LamsDispatchAction {
     /**
      * Puts the searched learner in front of other learners in the list.
      */
-    private static List<User> insertSearchedLearner(User searchedLearner, List<User> latestLearners, int limit) {
+    private static List<User> insertHighlightedLearner(User searchedLearner, List<User> latestLearners, int limit) {
 	latestLearners.remove(searchedLearner);
 	LinkedList<User> updatedLatestLearners = new LinkedList<User>(latestLearners);
 	updatedLatestLearners.addFirst(searchedLearner);

@@ -29,6 +29,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.TreeSet;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
@@ -43,9 +44,6 @@ import org.lamsfoundation.lams.learningdesign.Transition;
 import org.lamsfoundation.lams.learningdesign.dao.IActivityDAO;
 import org.lamsfoundation.lams.lesson.CompletedActivityProgress;
 import org.lamsfoundation.lams.lesson.LearnerProgress;
-import org.lamsfoundation.lams.lesson.Lesson;
-import org.lamsfoundation.lams.lesson.dao.ILearnerProgressDAO;
-import org.lamsfoundation.lams.lesson.dao.ILessonDAO;
 import org.lamsfoundation.lams.lesson.service.ILessonService;
 import org.lamsfoundation.lams.tool.IToolVO;
 import org.lamsfoundation.lams.tool.Tool;
@@ -71,7 +69,6 @@ public class LamsToolService implements ILamsToolService {
     private static Logger log = Logger.getLogger(LamsToolService.class);
 
     // Leader selection tool Constants
-    private static final String LEADER_SELECTION_TOOL_SIGNATURE = "lalead11";
     private static final String LEADER_SELECTION_TOOL_OUTPUT_NAME_LEADER_USERID = "leader.user.id";
 
     private IActivityDAO activityDAO;
@@ -239,6 +236,25 @@ public class LamsToolService implements ILamsToolService {
 	}
 
 	return leaderUserId;
+    }
+
+    @Override
+    @SuppressWarnings("unchecked")
+    public Set<Long> getLeaderUserId(Long leaderSelectionActivityId) {
+	Activity activity = activityDAO.getActivityByActivityId(leaderSelectionActivityId);
+	List<ToolSession> toolSessions = toolSessionDAO.getToolSessionByActivity(activity);
+	Set<Long> result = new TreeSet<Long>();
+	for (ToolSession toolSession : toolSessions) {
+	    ToolOutput output = lamsCoreToolService.getOutputFromTool(LEADER_SELECTION_TOOL_OUTPUT_NAME_LEADER_USERID,
+		    toolSession, null);
+
+	    // check if tool produced output
+	    if ((output != null) && (output.getValue() != null)) {
+		result.add(output.getValue().getLong());
+	    }
+	}
+
+	return result;
     }
 
     /**
