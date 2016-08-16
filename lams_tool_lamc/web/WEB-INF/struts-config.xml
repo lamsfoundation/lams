@@ -265,12 +265,6 @@
 		    redirect="false"
 	     />
 
-	  	<forward
-		    name="viewAnswersRedirect"
-		    path="/learning.do?method=viewAnswers"
-		    redirect="true"
-	  	/>
-
 	     <forward
 	        name="preview"
 	        path="/learning/Preview.jsp"

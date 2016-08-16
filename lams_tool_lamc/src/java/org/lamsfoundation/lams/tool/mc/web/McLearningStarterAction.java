@@ -91,11 +91,6 @@ public class McLearningStarterAction extends Action implements McAppConstants {
 	mcLearningForm.setPassMarkApplicable(new Boolean(false).toString());
 	mcLearningForm.setUserOverPassMark(new Boolean(false).toString());
 
-	ActionForward validateParameters = validateParameters(request, mcLearningForm, mapping);
-	if (validateParameters != null) {
-	    return validateParameters;
-	}
-
 	SessionMap<String, Object> sessionMap = new SessionMap<String, Object>();
 	List<String> sequentialCheckedCa = new LinkedList<String>();
 	sessionMap.put(McAppConstants.QUESTION_AND_CANDIDATE_ANSWERS_KEY, sequentialCheckedCa);
@@ -109,9 +104,7 @@ public class McLearningStarterAction extends Action implements McAppConstants {
 	 * by now, we made sure that the passed tool session id exists in the db as a new record Make sure we can
 	 * retrieve it and the relavent content
 	 */
-
 	McSession mcSession = mcService.getMcSessionById(new Long(toolSessionID));
-
 	if (mcSession == null) {
 	    McUtils.cleanUpSessionAbsolute(request);
 	    return (mapping.findForward(McAppConstants.ERROR_LIST));
@@ -122,10 +115,11 @@ public class McLearningStarterAction extends Action implements McAppConstants {
 	 * tool session id points to a particular content. Many to one mapping.
 	 */
 	McContent mcContent = mcSession.getMcContent();
-
 	if (mcContent == null) {
 	    McUtils.cleanUpSessionAbsolute(request);
-	    persistError(request, "error.content.doesNotExist");
+	    ActionMessages errors = new ActionMessages();
+	    errors.add(Globals.ERROR_KEY, new ActionMessage("error.content.doesNotExist"));
+	    saveErrors(request, errors);
 	    return (mapping.findForward(McAppConstants.ERROR_LIST));
 	}
 
@@ -133,7 +127,6 @@ public class McLearningStarterAction extends Action implements McAppConstants {
 	 * The content we retrieved above must have been created before in Authoring time. And the passed tool session
 	 * id already refers to it.
 	 */
-
 	McLearnerStarterDTO mcLearnerStarterDTO = new McLearnerStarterDTO();
 	if (mcContent.isQuestionsSequenced()) {
 	    mcLearnerStarterDTO.setQuestionListingMode(McAppConstants.QUESTION_LISTING_MODE_SEQUENTIAL);
@@ -152,13 +145,13 @@ public class McLearningStarterAction extends Action implements McAppConstants {
 	} else {
 	    user = getCurrentUser(toolSessionID);
 	}
+	Long userID = user.getQueUsrId();
+	mcLearningForm.setUserID(userID);
 
 	/*
 	 * Is there a deadline set?
 	 */
-
 	Date submissionDeadline = mcContent.getSubmissionDeadline();
-
 	if (submissionDeadline != null) {
 
 	    HttpSession ss = SessionManager.getSession();
@@ -189,9 +182,8 @@ public class McLearningStarterAction extends Action implements McAppConstants {
 	// String reflectionSubject = McUtils.replaceNewLines(mcContent.getReflectionSubject());
 	mcGeneralLearnerFlowDTO.setReflectionSubject(mcContent.getReflectionSubject());
 
-	String userID = mcLearningForm.getUserID();
 	NotebookEntry notebookEntry = mcService.getEntry(new Long(toolSessionID), CoreNotebookConstants.NOTEBOOK_TOOL,
-		McAppConstants.MY_SIGNATURE, new Integer(userID));
+		McAppConstants.MY_SIGNATURE, userID.intValue());
 
 	if (notebookEntry != null) {
 	    // String notebookEntryPresentable = McUtils.replaceNewLines(notebookEntry.getEntry());
@@ -252,6 +244,7 @@ public class McLearningStarterAction extends Action implements McAppConstants {
 
 	    ActionRedirect redirect = new ActionRedirect(mapping.findForwardConfig("viewAnswersRedirect"));
 	    redirect.addParameter(AttributeNames.PARAM_TOOL_SESSION_ID, toolSessionID);
+	    redirect.addParameter("userID", userID);
 	    redirect.addParameter(MODE, mode);
 	    redirect.addParameter("httpSessionID", sessionMap.getSessionID());
 	    return redirect;
@@ -259,53 +252,6 @@ public class McLearningStarterAction extends Action implements McAppConstants {
 
 	request.setAttribute(McAppConstants.MC_LEARNER_STARTER_DTO, mcLearnerStarterDTO);
 	return (mapping.findForward(McAppConstants.LOAD_LEARNER));
-    }
-
-    protected ActionForward validateParameters(HttpServletRequest request, McLearningForm mcLearningForm,
-	    ActionMapping mapping) {
-	/*
-	 * obtain and setup the current user's data
-	 */
-
-	String userID = "";
-	HttpSession ss = SessionManager.getSession();
-
-	if (ss != null) {
-	    UserDTO user = (UserDTO) ss.getAttribute(AttributeNames.USER);
-	    if ((user != null) && (user.getUserID() != null)) {
-		userID = user.getUserID().toString();
-	    }
-	}
-
-	mcLearningForm.setUserID(userID);
-
-	/*
-	 * process incoming tool session id and later derive toolContentId from it.
-	 */
-	String strToolSessionId = request.getParameter(AttributeNames.PARAM_TOOL_SESSION_ID);
-	long toolSessionId = 0;
-	if ((strToolSessionId == null) || (strToolSessionId.length() == 0)) {
-	    McLearningStarterAction.logger.error("error.toolSessionId.required");
-	} else {
-	    try {
-		toolSessionId = new Long(strToolSessionId).longValue();
-	    } catch (NumberFormatException e) {
-		McLearningStarterAction.logger.error("error.sessionId.numberFormatException");
-	    }
-	}
-
-	/* mode can be learner, teacher or author */
-	String mode = request.getParameter(McAppConstants.MODE);
-
-	if ((mode == null) || (mode.length() == 0)) {
-	    McLearningStarterAction.logger.error("error.mode.required");
-	}
-
-	if ((!mode.equals("learner")) && (!mode.equals("teacher")) && (!mode.equals("author"))) {
-	    McLearningStarterAction.logger.error("error.mode.invalid");
-	}
-
-	return null;
     }
 
     private McQueUsr getCurrentUser(String toolSessionId) {
@@ -332,17 +278,5 @@ public class McLearningStarterAction extends Action implements McAppConstants {
 		    + new Long(toolSessionId) + " UserId=" + userId);
 	}
 	return qaUser;
-    }
-
-    /**
-     * persists error messages to request scope
-     *
-     * @param request
-     * @param message
-     */
-    public void persistError(HttpServletRequest request, String message) {
-	ActionMessages errors = new ActionMessages();
-	errors.add(Globals.ERROR_KEY, new ActionMessage(message));
-	saveErrors(request, errors);
     }
 }

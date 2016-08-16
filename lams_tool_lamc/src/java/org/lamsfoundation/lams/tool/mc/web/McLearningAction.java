@@ -321,11 +321,7 @@ public class McLearningAction extends LamsDispatchAction implements McAppConstan
 
 	//prohibit users from submitting answers after response is finalized but Resubmit button is not pressed (e.g. using 2 browsers)
 	if (user.isResponseFinalised()) {
-	    ActionRedirect redirect = new ActionRedirect(mapping.findForwardConfig("viewAnswersRedirect"));
-	    redirect.addParameter(AttributeNames.PARAM_TOOL_SESSION_ID, toolSessionID);
-	    redirect.addParameter(MODE, "learner");
-	    redirect.addParameter("httpSessionID", httpSessionID);
-	    return redirect;
+	    return viewAnswers(mapping, mcLearningForm, request, response);
 	}
 
 	// Have to work out in advance if passed so that we can store it against the attempts
@@ -397,11 +393,7 @@ public class McLearningAction extends LamsDispatchAction implements McAppConstan
 
 	//prohibit users from submitting answers after response is finalized but Resubmit button is not pressed (e.g. using 2 browsers)
 	if (user.isResponseFinalised()) {
-	    ActionRedirect redirect = new ActionRedirect(mapping.findForwardConfig("viewAnswersRedirect"));
-	    redirect.addParameter(AttributeNames.PARAM_TOOL_SESSION_ID, toolSessionID);
-	    redirect.addParameter(MODE, "learner");
-	    redirect.addParameter("httpSessionID", httpSessionID);
-	    return redirect;
+	    return viewAnswers(mapping, mcLearningForm, request, response);
 	}
 
 	//parse learner input
@@ -689,8 +681,6 @@ public class McLearningAction extends LamsDispatchAction implements McAppConstan
     }
 
     /**
-     * submitReflection(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse
-     * response)
      *
      * @param mapping
      * @param form
@@ -712,19 +702,18 @@ public class McLearningAction extends LamsDispatchAction implements McAppConstan
 	String toolSessionID = request.getParameter(AttributeNames.PARAM_TOOL_SESSION_ID);
 	mcLearningForm.setToolSessionID(toolSessionID);
 
-	String userID = request.getParameter("userID");
-	mcLearningForm.setUserID(userID);
+	Long userID = mcLearningForm.getUserID();
 
 	String reflectionEntry = request.getParameter(McAppConstants.ENTRY_TEXT);
 	NotebookEntry notebookEntry = mcService.getEntry(new Long(toolSessionID), CoreNotebookConstants.NOTEBOOK_TOOL,
-		McAppConstants.MY_SIGNATURE, new Integer(userID));
+		McAppConstants.MY_SIGNATURE, userID.intValue());
 
 	if (notebookEntry != null) {
 	    notebookEntry.setEntry(reflectionEntry);
 	    mcService.updateEntry(notebookEntry);
 	} else {
 	    mcService.createNotebookEntry(new Long(toolSessionID), CoreNotebookConstants.NOTEBOOK_TOOL,
-		    McAppConstants.MY_SIGNATURE, new Integer(userID), reflectionEntry);
+		    McAppConstants.MY_SIGNATURE, userID.intValue(), reflectionEntry);
 	}
 
 	return endLearning(mapping, form, request, response);
@@ -759,19 +748,11 @@ public class McLearningAction extends LamsDispatchAction implements McAppConstan
 	mcGeneralLearnerFlowDTO.setActivityTitle(mcContent.getTitle());
 	mcGeneralLearnerFlowDTO.setReflectionSubject(mcContent.getReflectionSubject());
 
-	String userID = "";
-	HttpSession ss = SessionManager.getSession();
-
-	if (ss != null) {
-	    UserDTO user = (UserDTO) ss.getAttribute(AttributeNames.USER);
-	    if (user != null && user.getUserID() != null) {
-		userID = user.getUserID().toString();
-	    }
-	}
+	Long userID = mcLearningForm.getUserID();
 
 	// attempt getting notebookEntry
 	NotebookEntry notebookEntry = mcService.getEntry(new Long(toolSessionID), CoreNotebookConstants.NOTEBOOK_TOOL,
-		McAppConstants.MY_SIGNATURE, new Integer(userID));
+		McAppConstants.MY_SIGNATURE, userID.intValue());
 
 	if (notebookEntry != null) {
 	    String notebookEntryPresentable = notebookEntry.getEntry();
@@ -805,10 +786,8 @@ public class McLearningAction extends LamsDispatchAction implements McAppConstan
 	McSession mcSession = mcService.getMcSessionById(new Long(toolSessionID));
 	McContent mcContent = mcSession.getMcContent();
 
-	HttpSession ss = SessionManager.getSession();
-	UserDTO userDto = (UserDTO) ss.getAttribute(AttributeNames.USER);
-	String userID = userDto.getUserID().toString();
-	McQueUsr user = mcService.getMcUserBySession(new Long(userID), mcSession.getUid());
+	Long userID = mcLearningForm.getUserID();
+	McQueUsr user = mcService.getMcUserBySession(userID, mcSession.getUid());
 
 	//prohibit users from autosaving answers after response is finalized but Resubmit button is not pressed (e.g. using 2 browsers)
 	if (user.isResponseFinalised()) {
