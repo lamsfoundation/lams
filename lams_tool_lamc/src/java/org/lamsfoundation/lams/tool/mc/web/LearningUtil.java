@@ -52,9 +52,6 @@ public class LearningUtil implements McAppConstants {
 	String httpSessionID = request.getParameter("httpSessionID");
 	mcLearningForm.setHttpSessionID(httpSessionID);
 
-	String userID = request.getParameter("userID");
-	mcLearningForm.setUserID(userID);
-
 	String passMarkApplicable = request.getParameter("passMarkApplicable");
 	mcLearningForm.setPassMarkApplicable(passMarkApplicable);
 
