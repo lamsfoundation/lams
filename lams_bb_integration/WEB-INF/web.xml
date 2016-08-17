@@ -30,6 +30,10 @@
     <servlet-class>org.lamsfoundation.ld.integration.blackboard.ImportLessonsServlet</servlet-class>
   </servlet> 
   <servlet>
+    <servlet-name>CorrectLineitemsServlet</servlet-name>
+    <servlet-class>org.lamsfoundation.ld.integration.blackboard.CorrectLineitemsServlet</servlet-class>
+  </servlet>
+  <servlet>
     <servlet-name>GradebookServlet</servlet-name>
     <servlet-class>org.lamsfoundation.ld.integration.blackboard.GradebookServlet</servlet-class>
   </servlet>
@@ -70,6 +74,10 @@
     <servlet-name>ImportLessonsServlet</servlet-name>
     <url-pattern>/ImportLessons</url-pattern>
   </servlet-mapping>  
+  <servlet-mapping>
+    <servlet-name>CorrectLineitemsServlet</servlet-name>
+    <url-pattern>/CorrectLineitems</url-pattern>
+  </servlet-mapping>
   <servlet-mapping>
     <servlet-name>GroupDataServlet</servlet-name>
     <url-pattern>/GroupData</url-pattern>

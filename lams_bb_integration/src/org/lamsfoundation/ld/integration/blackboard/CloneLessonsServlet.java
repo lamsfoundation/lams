@@ -32,13 +32,13 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.log4j.Logger;
+import org.lamsfoundation.ld.integration.util.BlackboardUtil;
 import org.lamsfoundation.ld.integration.util.LamsSecurityUtil;
 import org.lamsfoundation.ld.integration.util.LineitemUtil;
 
 import blackboard.base.BbList;
 import blackboard.data.content.Content;
 import blackboard.data.course.Course;
-import blackboard.data.course.CourseMembership;
 import blackboard.data.navigation.CourseToc;
 import blackboard.data.user.User;
 import blackboard.persist.Id;
@@ -46,14 +46,10 @@ import blackboard.persist.PkId;
 import blackboard.persist.content.ContentDbLoader;
 import blackboard.persist.content.ContentDbPersister;
 import blackboard.persist.course.CourseDbLoader;
-import blackboard.persist.course.CourseMembershipDbLoader;
 import blackboard.persist.navigation.CourseTocDbLoader;
 import blackboard.platform.BbServiceManager;
 import blackboard.platform.context.Context;
 import blackboard.platform.context.ContextManager;
-import blackboard.portal.data.ExtraInfo;
-import blackboard.portal.data.PortalExtraInfo;
-import blackboard.portal.servlet.PortalUtil;
 import blackboard.util.StringUtil;
 
 /**
@@ -82,25 +78,8 @@ public class CloneLessonsServlet extends HttpServlet {
 	    PkId courseId = (PkId) course.getId();
 	    String _course_id = "_" + courseId.getPk1() + "_" + courseId.getPk2();
 
-	    // find the main teacher
-	    CourseMembershipDbLoader courseMemLoader = CourseMembershipDbLoader.Default.getInstance();
-	    BbList<CourseMembership> monitorCourseMemberships = courseMemLoader.loadByCourseIdAndRole(courseId,
-		    CourseMembership.Role.INSTRUCTOR, null, true);
-	    if (monitorCourseMemberships.isEmpty()) {
-		BbList<CourseMembership> teachingAssistantCourseMemberships = courseMemLoader
-			.loadByCourseIdAndRole(courseId, CourseMembership.Role.TEACHING_ASSISTANT, null, true);
-		monitorCourseMemberships.addAll(teachingAssistantCourseMemberships);
-		if (monitorCourseMemberships.isEmpty()) {
-		    BbList<CourseMembership> courseBuilderCourseMemberships = courseMemLoader
-			    .loadByCourseIdAndRole(courseId, CourseMembership.Role.COURSE_BUILDER, null, true);
-		    monitorCourseMemberships.addAll(courseBuilderCourseMemberships);
-		}
-	    }
-	    // validate teacher existence
-	    if (monitorCourseMemberships.isEmpty()) {
-		throw new RuntimeException("There are no monitors in the course courseId=" + courseId);
-	    }
-	    User teacher = monitorCourseMemberships.get(0).getUser();
+	    // find a teacher that will be assigned as lesson's author on LAMS side
+	    User teacher = BlackboardUtil.getCourseTeacher(courseId);
 
 	    logger.debug("Starting clonning course lessons (courseId=" + courseId + ").");
 
