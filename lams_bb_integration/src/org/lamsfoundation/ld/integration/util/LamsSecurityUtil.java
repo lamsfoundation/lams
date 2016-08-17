@@ -22,7 +22,6 @@
  */
 package org.lamsfoundation.ld.integration.util;
 
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.StringWriter;
@@ -37,7 +36,6 @@ import java.rmi.RemoteException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.Date;
-import java.util.Properties;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -60,9 +58,7 @@ import blackboard.persist.KeyNotFoundException;
 import blackboard.persist.PersistenceException;
 import blackboard.persist.course.CourseMembershipDbLoader;
 import blackboard.persist.user.UserDbLoader;
-import blackboard.platform.BbServiceManager;
 import blackboard.platform.context.Context;
-import blackboard.platform.cx.component.CopyControl;
 import blackboard.platform.persistence.PersistenceServiceFactory;
 import blackboard.portal.data.ExtraInfo;
 import blackboard.portal.data.PortalExtraInfo;
@@ -78,24 +74,6 @@ public class LamsSecurityUtil {
     private static Logger logger = Logger.getLogger(LamsSecurityUtil.class);
     private static final String DUMMY_COURSE = "Previews"; 
     private static final String EXPORT_FOLDER_LAMS_SERVER = "/tmp/lams/";
-    
-    /**
-     * Generates login requests to LAMS for author, monitor and learner, using the alternative URL.
-     * 
-     * @param ctx
-     *            the blackboard contect, contains session data
-     * @param method
-     *            the mehtod to request of LAMS "author", "monitor", "learnerStrictAuth"
-     * @param lsid
-     *            lesson id. It is expected to be present in case of "monitor" and "learnerStrictAuth"
-     * @return a url pointing to the LAMS lesson, monitor, author session
-     * @throws IOException 
-     * @throws PersistenceException 
-     * @throws Exception
-     */
-    public static String generateRequestAltURL(Context ctx, String method, String lsid) throws PersistenceException, IOException {
-	return generateRequestURLForServer(ctx, method, lsid, getAltServerAddress());
-    }
 
     /**
      * Generates login requests to LAMS for author, monitor and learner
@@ -112,10 +90,7 @@ public class LamsSecurityUtil {
      * @throws Exception
      */
     public static String generateRequestURL(Context ctx, String method, String lsid) throws PersistenceException, IOException {
-	return generateRequestURLForServer(ctx, method, lsid, getServerAddress());
-    }
-	
-    private static String generateRequestURLForServer(Context ctx, String method, String lsid, String serverAddr) throws PersistenceException, IOException {
+	String serverAddr = getServerAddress();
 	String serverId = getServerID();
 	String reqSrc = getReqSrc();
 
@@ -268,7 +243,7 @@ public class LamsSecurityUtil {
 
 	User user = ctx.getUser();
 	if ( user == null )
-	    user = loadUserFromDB(ctx, usernameFromParam);
+	    user = loadUserFromDB(usernameFromParam);
 	
 	String username = user.getUserName();
 	String firstName = user.getGivenName();
@@ -352,18 +327,18 @@ public class LamsSecurityUtil {
 	return learningDesigns;
     }
 
-    private static User loadUserFromDB(Context ctx, String username) {
+    private static User loadUserFromDB(String username) {
 	User user = null;
 	try {
 	    final UserDbLoader userDbLoader = UserDbLoader.Default.getInstance();
 	    user = userDbLoader.loadByUserName(username);
 	} catch (KeyNotFoundException e) {
-	    throw new RuntimeException("No user details found in context or via username parameter. Unable access LAMS. "+e.getMessage()+" Username "+username+" Ctx "+ctx,e);
+	    throw new RuntimeException("No user details found in context or via username parameter. Unable access LAMS. "+e.getMessage()+" Username "+username,e);
 	} catch (PersistenceException e) {
-	    throw new RuntimeException("No user details found in context or via username parameter. Unable access LAMS. "+e.getMessage()+" Username "+username+" Ctx "+ctx,e);
+	    throw new RuntimeException("No user details found in context or via username parameter. Unable access LAMS. "+e.getMessage()+" Username "+username,e);
 	}
 	if ( user == null ) {
-	    throw new RuntimeException("No user details found in context or via username parameter. Unable access LAMS. Username "+username+" Ctx "+ctx);
+	    throw new RuntimeException("No user details found in context or via username parameter. Unable access LAMS. Username "+username);
 	}
 	return user;
     }
@@ -439,12 +414,15 @@ public class LamsSecurityUtil {
     private static String setupCourseId(Context ctx, String urlCourseId, boolean allowUserDummyCourse) {
 	// can we pull the alphanumeric course id from the context, rather than the on passed in from the URL? If neither exist, use the dummy Preview course.
 	String courseId = null;
-	if ( ctx.getCourse()!=null )
+	if (ctx.getCourse() != null) {
 	    courseId = ctx.getCourse().getCourseId();
-	if ( courseId == null && urlCourseId != null && urlCourseId.length() > 0)
+	}
+	if (courseId == null && urlCourseId != null && urlCourseId.length() > 0) {
 	    courseId = urlCourseId;
-	if ( courseId == null && allowUserDummyCourse )
+	}
+	if (courseId == null && allowUserDummyCourse) {
 	    courseId = DUMMY_COURSE;
+	}
 	return courseId;
     }
     /**
@@ -492,7 +470,7 @@ public class LamsSecurityUtil {
 	
 	User user = ctx.getUser();
 	if ( user == null ) 
-	    user = loadUserFromDB(ctx, usernameFromParam);
+	    user = loadUserFromDB(usernameFromParam);
 
 	String username = user.getUserName();
 	String locale = user.getLocale();
@@ -1069,40 +1047,6 @@ public class LamsSecurityUtil {
 	
 	return "" + lamsServerTime;
     }
-    
-    /**
-     * Gets the app.version property value from
-     * the ./main.properties file of the base folder
-     *
-     * @return app.version string
-     * @throws IOException
-     */
-    public static String getAppVersion() throws IOException{
-
-        String versionString = null;
-
-        //to load application's properties, we use this class
-        Properties mainProperties = new Properties();
-
-        FileInputStream file;
-
-        //the base folder is ./, the root of the main.properties file  
-        String path = "./main.properties";
-
-        //load the file handle for main.properties
-        file = new FileInputStream(path);
-
-        //load all the properties from this file
-        mainProperties.load(file);
-
-        //we have loaded the properties, so close the file handle
-        file.close();
-
-        //retrieve the property we are intrested, the app.version
-        versionString = mainProperties.getProperty("app.version");
-
-        return versionString;
-    }
 
     /**
      * @return gets server address from the lams.properties file
@@ -1114,7 +1058,7 @@ public class LamsSecurityUtil {
     /**
      * @return gets alternative server address from the lams.properties file
      */
-    public static String getAltServerAddress() {
+    private static String getAltServerAddress() {
 	return LamsPluginUtil.getProperties().getProperty(LamsPluginUtil.PROP_ALT_LAMS_URL);
     }
 
@@ -1129,14 +1073,14 @@ public class LamsSecurityUtil {
     /**
      * @return gets server key from the lams.properties file
      */
-    public static String getServerKey() {
+    private static String getServerKey() {
 	return LamsPluginUtil.getProperties().getProperty(LamsPluginUtil.PROP_LAMS_SECRET_KEY);
     }
 
     /**
      * @return gets request source from the lams.properties file
      */
-    public static String getReqSrc() {
+    private static String getReqSrc() {
 	return LamsPluginUtil.getProperties().getProperty(LamsPluginUtil.PROP_REQ_SRC);
     }
     
@@ -1144,7 +1088,7 @@ public class LamsSecurityUtil {
      * 
      * @return the LAMS server time refresh interval from lams.properties
      */
-    public static long getLamsServerTimeRefreshInterval() {
+    private static long getLamsServerTimeRefreshInterval() {
 	//set default value
 	long lamsServerTimeRefreshInterval = 24;
 	
@@ -1160,7 +1104,7 @@ public class LamsSecurityUtil {
     }
 
     // generate authentication hash code to validate parameters
-    public static String generateAuthenticationHash(String datetime, String login, String serverId) {
+    private static String generateAuthenticationHash(String datetime, String login, String serverId) {
 	String secretkey = getServerKey();
 
 	String plaintext = datetime.toLowerCase().trim() + login.toLowerCase().trim() + serverId.toLowerCase().trim()
