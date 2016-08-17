@@ -54,6 +54,11 @@
 		<button id="import-lessons-button" onclick="javascript:importLessons(); return false;">
 			Update LAMS links after course import
 		</button>
+		<br>
+		
+		<button id="import-lessons-button" onclick="javascript:correctLineitems(); return false;">
+			Correct Grade center columns
+		</button>
 	</div>
 	
 	<div id="treeDiv"></div>
@@ -66,7 +71,7 @@
 	    // Open the LAMS Seuence Monitor Window
 	    function cloneLessons() {
 	    	//block #buttons
-		    blockButtons();
+		    blockButtons('<h1 style="color:#fff";>Please, wait. Lessons are getting copied now.</h1>');
 	    	
 	        $j.ajax({
 	        	async: true,
@@ -90,7 +95,7 @@
 
 	    function importLessons() {
 	    	//block #buttons
-		    blockButtons();
+		    blockButtons('<h1 style="color:#fff";>Please, wait. Lessons are getting copied now.</h1>');
 	    	
 	        $j.ajax({
 	        	async: true,
@@ -110,11 +115,33 @@
 	        return false;		    
 		}
 
+	    function correctLineitems() {
+	    	//block #buttons
+		    blockButtons('<h1 style="color:#fff";>Please wait while Grade center columns are getting fixed.</h1>');
+	    	
+	        $j.ajax({
+	        	async: true,
+	            url: '../CorrectLineitems',
+	            data : 'courseId=<%=ctx.getCourse().getCourseId()%>',
+	            type: 'post',
+	            success: function (response) {
+	            	$j("#buttons").unblock();
+	            	alert(response);
+	            },
+	            error: function (request, status, error) {
+	            	$j("#buttons").unblock();
+	                alert(error);
+	            }
+	       	});
+	        
+	        return false;		    
+		}
+
 	    //auxiliary method to block #buttons element
-		function blockButtons(){
+		function blockButtons(message){
 
 	    	$j('#buttons').block({
-	    		message: '<h1 style="color:#fff";>Please, wait. Lessons are getting copied now.</h1>',
+	    		message: message,
 	    		baseZ: 1000000,
 	    		fadeIn:  0,
 	    		css: {

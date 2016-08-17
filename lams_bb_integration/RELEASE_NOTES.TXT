@@ -131,3 +131,5 @@ Now reverted back to previous behaviour with lesson loading in the same tab.
 * LDEV-3905: Fixed exception that was thrown on trying to start a lesson while folder selected
 * LDEV-3939: Grade center column now gets created on course copy/import; Refactoring of Java code; All util classes moved to org.lamsfoundation.ld.integration.util package
 * LDEV-3927: Fixed a FF bug: "Open Lesson" not open in firefox browser for the second time after closing the opened window
+* LDEV-3510: Remove previously added line that made LAMS Lessons always appear at top of content list
+* LDEV-3958: Add a button to admin page that can fix grade center columns

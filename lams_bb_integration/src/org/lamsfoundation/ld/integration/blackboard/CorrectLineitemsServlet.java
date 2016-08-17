@@ -25,7 +25,6 @@ package org.lamsfoundation.ld.integration.blackboard;
 
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.net.URLEncoder;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -35,12 +34,9 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.log4j.Logger;
 import org.lamsfoundation.ld.integration.util.BlackboardUtil;
 import org.lamsfoundation.ld.integration.util.LamsSecurityUtil;
-import org.lamsfoundation.ld.integration.util.LamsServerException;
 import org.lamsfoundation.ld.integration.util.LineitemUtil;
 
 import blackboard.base.BbList;
-import blackboard.base.FormattedText;
-import blackboard.base.InitializationException;
 import blackboard.data.content.Content;
 import blackboard.data.course.Course;
 import blackboard.data.course.CourseMembership;
@@ -53,22 +49,18 @@ import blackboard.persist.content.ContentDbPersister;
 import blackboard.persist.course.CourseDbLoader;
 import blackboard.persist.course.CourseMembershipDbLoader;
 import blackboard.persist.navigation.CourseTocDbLoader;
-import blackboard.platform.BbServiceException;
 import blackboard.platform.BbServiceManager;
 import blackboard.platform.context.Context;
 import blackboard.platform.context.ContextManager;
-import blackboard.portal.data.ExtraInfo;
-import blackboard.portal.data.PortalExtraInfo;
-import blackboard.portal.servlet.PortalUtil;
 import blackboard.util.StringUtil;
 
 /**
- * Admin on BB side calls this servlet to import old lesson that were copied to the new course.
+ * Admin on BB side calls this servlet to correct lineitems that have been screwed up while copying/importing courses.
  */
-public class ImportLessonsServlet extends HttpServlet {
+public class CorrectLineitemsServlet extends HttpServlet {
 
-    private static final long serialVersionUID = -3587062723412672184L;
-    private static Logger logger = Logger.getLogger(ImportLessonsServlet.class);
+    private static final long serialVersionUID = -3284220455069633836L;
+    private static Logger logger = Logger.getLogger(CorrectLineitemsServlet.class);
 
     public void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 
@@ -77,7 +69,6 @@ public class ImportLessonsServlet extends HttpServlet {
 	    throw new RuntimeException("Required parameters are missing. courseId: " + courseIdParam);
 	}
 
-	String newLessonIds = "";
 	try {
 	    // get Blackboard context
 	    ContextManager ctxMgr = (ContextManager) BbServiceManager.lookupService(ContextManager.class);
@@ -91,11 +82,10 @@ public class ImportLessonsServlet extends HttpServlet {
 	    // find a teacher that will be assigned as lesson's author on LAMS side
 	    User teacher = BlackboardUtil.getCourseTeacher(courseId);
 
-	    logger.debug("Starting importing course lessons (courseId=" + courseId + ").");
+	    logger.debug("Starting clonning course lessons (courseId=" + courseId + ").");
 
 	    ContentDbLoader contentLoader = ContentDbLoader.Default.getInstance();
 	    CourseTocDbLoader cTocDbLoader = CourseTocDbLoader.Default.getInstance();
-	    ContentDbPersister persister =ContentDbPersister.Default.getInstance();
 
 	    //find all lessons that should be updated
 
@@ -117,86 +107,29 @@ public class ImportLessonsServlet extends HttpServlet {
 		    for (Content content : contents) {
 			// only LAMS content
 			if ("resource/x-lams-lamscontent".equals(content.getContentHandler())) {
-			    
-			    PkId contentId =  (PkId) content.getId();
-			    String _content_id = "_" + contentId.getPk1() + "_" + contentId.getPk2();
-			    
-			    String url = content.getUrl();
-			    String urlLessonId = getParameterValue(url, "lsid");
-			    String urlCourseId = getParameterValue(url, "course_id");
-			    String urlContentId = getParameterValue(url, "content_id");
-			    String urlLdId = getParameterValue(url, "ldid");
-
-			    //in case when both courseId and contentId don't coincide with the ones from URL - means lesson needs to be imported
-			    if (!urlCourseId.equals(_course_id) && !urlContentId.equals(_content_id)) {
 				
-				final Long newLdId = LamsSecurityUtil.importLearningDesign(teacher, courseIdParam, urlLessonId,
-					urlLdId);
-				
-				logger.debug("Lesson (lessonId=" + urlLessonId
-					+ ") was successfully imported to the one (learningDesignId=" + newLdId + ").");
+			    // update lesson id
+			    String lessonId = content.getLinkRef();
 
-				// Start the Lesson in LAMS (via Webservices) and capture the lesson ID
-				String teacherUsername = teacher.getUserName();
-				String title = content.getTitle(); 
-				FormattedText descriptionFormatted = content.getBody();
-				String description = URLEncoder.encode(descriptionFormatted.getText(), "UTF-8");
-				final long newLessonId = LamsSecurityUtil.startLesson(ctx, teacherUsername,
-					courseIdParam, newLdId, title, description, false);
-				
-				// update lesson id
-				content.setLinkRef(Long.toString(newLessonId));
-
-				// update URL
-				url = replaceParameterValue(url, "lsid", Long.toString(newLessonId));
-				url = replaceParameterValue(url, "course_id", _course_id);
-				url = replaceParameterValue(url, "content_id", _content_id);
-				content.setUrl(url);
-
-				// persist updated content
-				persister.persist(content);
-
-				//update lineitem details
-				LineitemUtil.updateLineitemLessonId(content, _course_id, newLessonId, ctx, teacher.getUserName());
-
-				logger.debug("Lesson (lessonId=" + urlLessonId
-					+ ") was successfully imported to the one (lessonId=" + newLessonId + ").");
-				
-				newLessonIds += newLessonId + ", ";
-			    }
+			    //update lineitem details
+			    LineitemUtil.updateLineitemLessonId(content, _course_id, Long.parseLong(lessonId), ctx,
+				    teacher.getUserName());
 			}
 
 		    }
 		}
 	    }
 
-	} catch (LamsServerException e) {
-	    //printing out error cause
-	    response.setContentType("text/html");
-	    PrintWriter out = response.getWriter();
-	    out.write("Failed! " + e.getMessage());
-	    out.flush();
-	    out.close();
-	    return;
 	} catch (IllegalStateException e) {
 	    throw new ServletException(
 		    "LAMS Server timeout, did not get a response from the LAMS server. Please contact your systems administrator",
 		    e);
-	} catch (InitializationException e) {
-	    throw new ServletException(e);
-	} catch (BbServiceException e) {
-	    throw new ServletException(e);
 	} catch (Exception e) {
 	    throw new ServletException(e);
 	}
 	
 	//prepare string to write out
-	int newLessonsCounts = newLessonIds.length() - newLessonIds.replace(",", "").length();
-	String resultStr = "Complete! " + newLessonsCounts + " lessons have been imported.";
-	//add all lessonIds (without the last comma)
-	if (newLessonsCounts > 0) {
-	    resultStr += " Their updated lessonIds: " + newLessonIds.substring(0, newLessonIds.length()-2);
-	}
+	String resultStr = "Complete! All lineiems have been corrected.";
 	logger.debug(resultStr);
 	
 	response.setContentType("text/html");
