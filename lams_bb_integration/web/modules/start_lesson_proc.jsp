@@ -135,7 +135,7 @@
         bbContent.setBody(description);
         
         //  LDEV-3510 LAMS Lessons were always at the top and could not be moved. 
-        bbContent.setPosition(0);
+        //bbContent.setPosition(0);
 
         // Start the Lesson in LAMS (via Webservices) and capture the lesson ID
         final long LamsLessonIdLong = LamsSecurityUtil.startLesson(ctx, ldId, strTitle, strDescription, false);
