@@ -605,7 +605,7 @@ public class AssessmentServiceImpl implements IAssessmentService, ToolContentMan
 		    }
 		}
 	    }
-	    // set it so front end knows whether the question was answered correctly/partly/incorrectly even if mark=0
+	    // set answerTotalGrade to let jsp know whether the question was answered correctly/partly/incorrectly even if mark=0
 	    question.setAnswerTotalGrade(totalGrade);
 
 	    if (isMarkNullified) {

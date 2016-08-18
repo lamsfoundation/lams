@@ -1077,6 +1077,17 @@ public class LearningAction extends Action {
 			    }
 			}
 
+			// set answerTotalGrade to let jsp know whether the question was answered correctly/partly/incorrectly even if mark=0
+			if (question.getType() == AssessmentConstants.QUESTION_TYPE_MULTIPLE_CHOICE) {
+			    float totalGrade = 0;
+			    for (AssessmentQuestionOption option : question.getOptions()) {
+				if (option.getAnswerBoolean()) {
+				    totalGrade += option.getGrade();
+				}
+			    }
+			    question.setAnswerTotalGrade(totalGrade);
+			}
+
 			break;
 		    }
 		}
