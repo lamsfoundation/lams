@@ -30,13 +30,13 @@
 			<td class="has-radio-button">
 				<c:choose>
 					<c:when test="${question.multipleAnswersAllowed}">
-						<input type="checkbox" name="question${status.index}_${option.sequenceId}" value="${true}" styleClass="noBorder"
+						<input type="checkbox" name="question${status.index}_${option.sequenceId}" value="${true}" class="noBorder"
 	 						<c:if test="${option.answerBoolean}">checked="checked"</c:if>
 							<c:if test="${isEditingDisabled}">disabled="disabled"</c:if>
 						/>
 					</c:when>
 					<c:otherwise>
-						<input type="radio" name="question${status.index}" value="${option.sequenceId}" styleClass="noBorder"
+						<input type="radio" name="question${status.index}" value="${option.sequenceId}" class="noBorder"
 	 						<c:if test="${option.answerBoolean}">checked="checked"</c:if>
 	 						<c:if test="${isEditingDisabled}">disabled="disabled"</c:if>
 						/>
