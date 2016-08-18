@@ -96,7 +96,9 @@ public class SessionListener implements HttpSessionListener {
 	HttpSession session = sessionEvent.getSession();
 	if (session != null) {
 	    UserDTO userDTO = (UserDTO) session.getAttribute(AttributeNames.USER);
-	    if (userDTO != null) {
+	    if (userDTO == null) {
+		SessionManager.removeSessionByID(session.getId(), false);
+	    } else {
 		// this is set in SsoHandler
 		// if user logs in from another browser, cache must not be flushed,
 		// otherwise current authentication process fails
@@ -108,7 +110,7 @@ public class SessionListener implements HttpSessionListener {
 
 		    // remove obsolete mappings to session
 		    // the session is either already invalidated or will be very soon by another module
-		    SessionManager.removeSession(login, false);
+		    SessionManager.removeSessionByLogin(login, false);
 		}
 	    }
 	}

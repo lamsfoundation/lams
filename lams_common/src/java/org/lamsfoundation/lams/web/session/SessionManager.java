@@ -88,11 +88,30 @@ public class SessionManager {
     /**
      * Unregisteres the session for the given user.
      */
-    public static void removeSession(String login, boolean invalidate) {
+    public static void removeSessionByLogin(String login, boolean invalidate) {
 	HttpSession session = SessionManager.loginMapping.get(login);
 	if (session != null) {
 	    SessionManager.loginMapping.remove(login);
 	    SessionManager.sessionIdMapping.remove(session.getId());
+
+	    if (invalidate) {
+		try {
+		    session.invalidate();
+		} catch (IllegalStateException e) {
+		    System.out.println("SessionMananger invalidation exception");
+		    // if it was already invalidated, do nothing
+		}
+	    }
+	}
+    }
+
+    /**
+     * Unregisteres the session by the given ID.
+     */
+    public static void removeSessionByID(String sessionID, boolean invalidate) {
+	HttpSession session = getSession(sessionID);
+	if (session != null) {
+	    SessionManager.sessionIdMapping.remove(sessionID);
 
 	    if (invalidate) {
 		try {

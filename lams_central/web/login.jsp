@@ -182,7 +182,7 @@
 				    hs.removeAttribute("password");
 					UserDTO userDTO = (UserDTO) hs.getAttribute("user");
 					if (userDTO != null) {
-						SessionManager.removeSession(userDTO.getLogin(), true);
+					    SessionManager.removeSessionByLogin(userDTO.getLogin(), true);
 					}
 				}
 			%>
