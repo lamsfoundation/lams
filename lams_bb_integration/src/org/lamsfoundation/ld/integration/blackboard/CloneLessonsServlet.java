@@ -25,6 +25,7 @@ package org.lamsfoundation.ld.integration.blackboard;
 
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.List;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -36,17 +37,12 @@ import org.lamsfoundation.ld.integration.util.BlackboardUtil;
 import org.lamsfoundation.ld.integration.util.LamsSecurityUtil;
 import org.lamsfoundation.ld.integration.util.LineitemUtil;
 
-import blackboard.base.BbList;
 import blackboard.data.content.Content;
 import blackboard.data.course.Course;
-import blackboard.data.navigation.CourseToc;
 import blackboard.data.user.User;
-import blackboard.persist.Id;
 import blackboard.persist.PkId;
-import blackboard.persist.content.ContentDbLoader;
 import blackboard.persist.content.ContentDbPersister;
 import blackboard.persist.course.CourseDbLoader;
-import blackboard.persist.navigation.CourseTocDbLoader;
 import blackboard.platform.BbServiceManager;
 import blackboard.platform.context.Context;
 import blackboard.platform.context.ContextManager;
@@ -72,79 +68,55 @@ public class CloneLessonsServlet extends HttpServlet {
 	    // get Blackboard context
 	    ContextManager ctxMgr = (ContextManager) BbServiceManager.lookupService(ContextManager.class);
 	    Context ctx = ctxMgr.setContext(request);
+	    ContentDbPersister persister =ContentDbPersister.Default.getInstance();
 	    
 	    CourseDbLoader courseLoader = CourseDbLoader.Default.getInstance();
 	    Course course = courseLoader.loadByCourseId(courseIdParam);
 	    PkId courseId = (PkId) course.getId();
 	    String _course_id = "_" + courseId.getPk1() + "_" + courseId.getPk2();
+	    logger.debug("Starting clonning course lessons (courseId=" + courseId + ").");
 
 	    // find a teacher that will be assigned as lesson's author on LAMS side
 	    User teacher = BlackboardUtil.getCourseTeacher(courseId);
 
-	    logger.debug("Starting clonning course lessons (courseId=" + courseId + ").");
-
-	    ContentDbLoader contentLoader = ContentDbLoader.Default.getInstance();
-	    CourseTocDbLoader cTocDbLoader = CourseTocDbLoader.Default.getInstance();
-	    ContentDbPersister persister =ContentDbPersister.Default.getInstance();
-
 	    //find all lessons that should be updated
+	    List<Content> lamsContents = BlackboardUtil.getLamsLessonsByCourse(courseId);
+	    for (Content content : lamsContents) {
 
-	    // get a CourseTOC (Table of Contents) loader. We will need this to iterate through all of the "areas"
-	    // within the course
-	    BbList<CourseToc> courseTocs = cTocDbLoader.loadByCourseId(courseId);
+		PkId contentId = (PkId) content.getId();
+		String _content_id = "_" + contentId.getPk1() + "_" + contentId.getPk2();
 
-	    // iterate through the course TOC items
-	    for (CourseToc courseToc : courseTocs) {
+		String url = content.getUrl();
+		String urlLessonId = getParameterValue(url, "lsid");
+		String urlCourseId = getParameterValue(url, "course_id");
+		String urlContentId = getParameterValue(url, "content_id");
 
-		// determine if the TOC item is of type "CONTENT" rather than applicaton, or something else
-		if ((courseToc.getTargetType() == CourseToc.Target.CONTENT)
-			&& (courseToc.getContentId() != Id.UNSET_ID)) {
-		    // we have determined that the TOC item is content, next we need to load the content object and
-		    // iterate through it
-		    // load the content tree into an object "content" and iterate through it
-		    BbList<Content> contents = contentLoader.loadListById(courseToc.getContentId());
-		    // iterate through the content items in this content object
-		    for (Content content : contents) {
-			// only LAMS content
-			if ("resource/x-lams-lamscontent".equals(content.getContentHandler())) {
-			    
-			    PkId contentId =  (PkId) content.getId();
-			    String _content_id = "_" + contentId.getPk1() + "_" + contentId.getPk2();
-			    
-			    String url = content.getUrl();
-			    String urlLessonId = getParameterValue(url, "lsid");
-			    String urlCourseId = getParameterValue(url, "course_id");
-			    String urlContentId = getParameterValue(url, "content_id");
+		//in case when both courseId and contentId don't coincide with the ones from URL - means lesson needs to be cloned
+		if (!urlCourseId.equals(_course_id) && !urlContentId.equals(_content_id)) {
 
-			    //in case when both courseId and contentId don't coincide with the ones from URL - means lesson needs to be cloned
-			    if (!urlCourseId.equals(_course_id) && !urlContentId.equals(_content_id)) {
-				
-				final Long newLessonId = LamsSecurityUtil.cloneLesson(teacher, courseIdParam, urlLessonId);
-				
-				// update lesson id
-				content.setLinkRef(Long.toString(newLessonId));
+		    final Long newLessonId = LamsSecurityUtil.cloneLesson(teacher, courseIdParam, urlLessonId);
 
-				// update URL
-				url = replaceParameterValue(url, "lsid", Long.toString(newLessonId));
-				url = replaceParameterValue(url, "course_id", _course_id);
-				url = replaceParameterValue(url, "content_id", _content_id);
-				content.setUrl(url);
+		    // update lesson id
+		    content.setLinkRef(Long.toString(newLessonId));
 
-				// persist updated content
-				persister.persist(content);
-				
-				//update lineitem details
-				LineitemUtil.updateLineitemLessonId(content, _course_id, newLessonId, ctx, teacher.getUserName());
+		    // update URL
+		    url = replaceParameterValue(url, "lsid", Long.toString(newLessonId));
+		    url = replaceParameterValue(url, "course_id", _course_id);
+		    url = replaceParameterValue(url, "content_id", _content_id);
+		    content.setUrl(url);
 
-				logger.debug("Lesson (lessonId=" + urlLessonId
-					+ ") was successfully cloned to the one (lessonId=" + newLessonId + ").");
-				
-				newLessonIds += newLessonId + ", ";
-			    }
-			}
+		    // persist updated content
+		    persister.persist(content);
 
-		    }
+		    //update lineitem details
+		    LineitemUtil.updateLineitemLessonId(content, _course_id, newLessonId, ctx, teacher.getUserName());
+
+		    logger.debug("Lesson (lessonId=" + urlLessonId + ") was successfully cloned to the one (lessonId="
+			    + newLessonId + ").");
+
+		    newLessonIds += newLessonId + ", ";
 		}
+
 	    }
 
 	} catch (IllegalStateException e) {

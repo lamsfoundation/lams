@@ -26,6 +26,7 @@ package org.lamsfoundation.ld.integration.blackboard;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.net.URLEncoder;
+import java.util.List;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -38,28 +39,18 @@ import org.lamsfoundation.ld.integration.util.LamsSecurityUtil;
 import org.lamsfoundation.ld.integration.util.LamsServerException;
 import org.lamsfoundation.ld.integration.util.LineitemUtil;
 
-import blackboard.base.BbList;
 import blackboard.base.FormattedText;
 import blackboard.base.InitializationException;
 import blackboard.data.content.Content;
 import blackboard.data.course.Course;
-import blackboard.data.course.CourseMembership;
-import blackboard.data.navigation.CourseToc;
 import blackboard.data.user.User;
-import blackboard.persist.Id;
 import blackboard.persist.PkId;
-import blackboard.persist.content.ContentDbLoader;
 import blackboard.persist.content.ContentDbPersister;
 import blackboard.persist.course.CourseDbLoader;
-import blackboard.persist.course.CourseMembershipDbLoader;
-import blackboard.persist.navigation.CourseTocDbLoader;
 import blackboard.platform.BbServiceException;
 import blackboard.platform.BbServiceManager;
 import blackboard.platform.context.Context;
 import blackboard.platform.context.ContextManager;
-import blackboard.portal.data.ExtraInfo;
-import blackboard.portal.data.PortalExtraInfo;
-import blackboard.portal.servlet.PortalUtil;
 import blackboard.util.StringUtil;
 
 /**
@@ -82,91 +73,66 @@ public class ImportLessonsServlet extends HttpServlet {
 	    // get Blackboard context
 	    ContextManager ctxMgr = (ContextManager) BbServiceManager.lookupService(ContextManager.class);
 	    Context ctx = ctxMgr.setContext(request);
+	    ContentDbPersister persister =ContentDbPersister.Default.getInstance();
 	    
 	    CourseDbLoader courseLoader = CourseDbLoader.Default.getInstance();
 	    Course course = courseLoader.loadByCourseId(courseIdParam);
 	    PkId courseId = (PkId) course.getId();
 	    String _course_id = "_" + courseId.getPk1() + "_" + courseId.getPk2();
+	    logger.debug("Starting importing course lessons (courseId=" + courseId + ").");
 
 	    // find a teacher that will be assigned as lesson's author on LAMS side
 	    User teacher = BlackboardUtil.getCourseTeacher(courseId);
 
-	    logger.debug("Starting importing course lessons (courseId=" + courseId + ").");
-
-	    ContentDbLoader contentLoader = ContentDbLoader.Default.getInstance();
-	    CourseTocDbLoader cTocDbLoader = CourseTocDbLoader.Default.getInstance();
-	    ContentDbPersister persister =ContentDbPersister.Default.getInstance();
-
 	    //find all lessons that should be updated
+	    List<Content> lamsContents = BlackboardUtil.getLamsLessonsByCourse(courseId);
+	    for (Content content : lamsContents) {
 
-	    // get a CourseTOC (Table of Contents) loader. We will need this to iterate through all of the "areas"
-	    // within the course
-	    BbList<CourseToc> courseTocs = cTocDbLoader.loadByCourseId(courseId);
+		PkId contentId = (PkId) content.getId();
+		String _content_id = "_" + contentId.getPk1() + "_" + contentId.getPk2();
 
-	    // iterate through the course TOC items
-	    for (CourseToc courseToc : courseTocs) {
+		String url = content.getUrl();
+		String urlLessonId = getParameterValue(url, "lsid");
+		String urlCourseId = getParameterValue(url, "course_id");
+		String urlContentId = getParameterValue(url, "content_id");
+		String urlLdId = getParameterValue(url, "ldid");
 
-		// determine if the TOC item is of type "CONTENT" rather than applicaton, or something else
-		if ((courseToc.getTargetType() == CourseToc.Target.CONTENT)
-			&& (courseToc.getContentId() != Id.UNSET_ID)) {
-		    // we have determined that the TOC item is content, next we need to load the content object and
-		    // iterate through it
-		    // load the content tree into an object "content" and iterate through it
-		    BbList<Content> contents = contentLoader.loadListById(courseToc.getContentId());
-		    // iterate through the content items in this content object
-		    for (Content content : contents) {
-			// only LAMS content
-			if ("resource/x-lams-lamscontent".equals(content.getContentHandler())) {
-			    
-			    PkId contentId =  (PkId) content.getId();
-			    String _content_id = "_" + contentId.getPk1() + "_" + contentId.getPk2();
-			    
-			    String url = content.getUrl();
-			    String urlLessonId = getParameterValue(url, "lsid");
-			    String urlCourseId = getParameterValue(url, "course_id");
-			    String urlContentId = getParameterValue(url, "content_id");
-			    String urlLdId = getParameterValue(url, "ldid");
+		//in case when both courseId and contentId don't coincide with the ones from URL - means lesson needs to be imported
+		if (!urlCourseId.equals(_course_id) && !urlContentId.equals(_content_id)) {
 
-			    //in case when both courseId and contentId don't coincide with the ones from URL - means lesson needs to be imported
-			    if (!urlCourseId.equals(_course_id) && !urlContentId.equals(_content_id)) {
-				
-				final Long newLdId = LamsSecurityUtil.importLearningDesign(teacher, courseIdParam, urlLessonId,
-					urlLdId);
-				
-				logger.debug("Lesson (lessonId=" + urlLessonId
-					+ ") was successfully imported to the one (learningDesignId=" + newLdId + ").");
+		    final Long newLdId = LamsSecurityUtil.importLearningDesign(teacher, courseIdParam, urlLessonId,
+			    urlLdId);
 
-				// Start the Lesson in LAMS (via Webservices) and capture the lesson ID
-				String teacherUsername = teacher.getUserName();
-				String title = content.getTitle(); 
-				FormattedText descriptionFormatted = content.getBody();
-				String description = URLEncoder.encode(descriptionFormatted.getText(), "UTF-8");
-				final long newLessonId = LamsSecurityUtil.startLesson(ctx, teacherUsername,
-					courseIdParam, newLdId, title, description, false);
-				
-				// update lesson id
-				content.setLinkRef(Long.toString(newLessonId));
+		    logger.debug("Lesson (lessonId=" + urlLessonId
+			    + ") was successfully imported to the one (learningDesignId=" + newLdId + ").");
 
-				// update URL
-				url = replaceParameterValue(url, "lsid", Long.toString(newLessonId));
-				url = replaceParameterValue(url, "course_id", _course_id);
-				url = replaceParameterValue(url, "content_id", _content_id);
-				content.setUrl(url);
+		    // Start the Lesson in LAMS (via Webservices) and capture the lesson ID
+		    String teacherUsername = teacher.getUserName();
+		    String title = content.getTitle();
+		    FormattedText descriptionFormatted = content.getBody();
+		    String description = URLEncoder.encode(descriptionFormatted.getText(), "UTF-8");
+		    final long newLessonId = LamsSecurityUtil.startLesson(ctx, teacherUsername, courseIdParam, newLdId,
+			    title, description, false);
 
-				// persist updated content
-				persister.persist(content);
+		    // update lesson id
+		    content.setLinkRef(Long.toString(newLessonId));
 
-				//update lineitem details
-				LineitemUtil.updateLineitemLessonId(content, _course_id, newLessonId, ctx, teacher.getUserName());
+		    // update URL
+		    url = replaceParameterValue(url, "lsid", Long.toString(newLessonId));
+		    url = replaceParameterValue(url, "course_id", _course_id);
+		    url = replaceParameterValue(url, "content_id", _content_id);
+		    content.setUrl(url);
 
-				logger.debug("Lesson (lessonId=" + urlLessonId
-					+ ") was successfully imported to the one (lessonId=" + newLessonId + ").");
-				
-				newLessonIds += newLessonId + ", ";
-			    }
-			}
+		    // persist updated content
+		    persister.persist(content);
 
-		    }
+		    //update lineitem details
+		    LineitemUtil.updateLineitemLessonId(content, _course_id, newLessonId, ctx, teacher.getUserName());
+
+		    logger.debug("Lesson (lessonId=" + urlLessonId + ") was successfully imported to the one (lessonId="
+			    + newLessonId + ").");
+
+		    newLessonIds += newLessonId + ", ";
 		}
 	    }
 
