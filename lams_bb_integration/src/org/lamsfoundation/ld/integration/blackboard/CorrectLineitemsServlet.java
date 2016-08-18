@@ -25,6 +25,7 @@ package org.lamsfoundation.ld.integration.blackboard;
 
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.List;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -33,22 +34,13 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.log4j.Logger;
 import org.lamsfoundation.ld.integration.util.BlackboardUtil;
-import org.lamsfoundation.ld.integration.util.LamsSecurityUtil;
 import org.lamsfoundation.ld.integration.util.LineitemUtil;
 
-import blackboard.base.BbList;
 import blackboard.data.content.Content;
 import blackboard.data.course.Course;
-import blackboard.data.course.CourseMembership;
-import blackboard.data.navigation.CourseToc;
 import blackboard.data.user.User;
-import blackboard.persist.Id;
 import blackboard.persist.PkId;
-import blackboard.persist.content.ContentDbLoader;
-import blackboard.persist.content.ContentDbPersister;
 import blackboard.persist.course.CourseDbLoader;
-import blackboard.persist.course.CourseMembershipDbLoader;
-import blackboard.persist.navigation.CourseTocDbLoader;
 import blackboard.platform.BbServiceManager;
 import blackboard.platform.context.Context;
 import blackboard.platform.context.ContextManager;
@@ -78,46 +70,21 @@ public class CorrectLineitemsServlet extends HttpServlet {
 	    Course course = courseLoader.loadByCourseId(courseIdParam);
 	    PkId courseId = (PkId) course.getId();
 	    String _course_id = "_" + courseId.getPk1() + "_" + courseId.getPk2();
+	    logger.debug("Starting clonning course lessons (courseId=" + courseId + ").");
 
 	    // find a teacher that will be assigned as lesson's author on LAMS side
 	    User teacher = BlackboardUtil.getCourseTeacher(courseId);
 
-	    logger.debug("Starting clonning course lessons (courseId=" + courseId + ").");
-
-	    ContentDbLoader contentLoader = ContentDbLoader.Default.getInstance();
-	    CourseTocDbLoader cTocDbLoader = CourseTocDbLoader.Default.getInstance();
-
 	    //find all lessons that should be updated
+	    List<Content> lamsContents = BlackboardUtil.getLamsLessonsByCourse(courseId);
+	    for (Content content : lamsContents) {
 
-	    // get a CourseTOC (Table of Contents) loader. We will need this to iterate through all of the "areas"
-	    // within the course
-	    BbList<CourseToc> courseTocs = cTocDbLoader.loadByCourseId(courseId);
+		// update lesson id
+		String lessonId = content.getLinkRef();
 
-	    // iterate through the course TOC items
-	    for (CourseToc courseToc : courseTocs) {
-
-		// determine if the TOC item is of type "CONTENT" rather than applicaton, or something else
-		if ((courseToc.getTargetType() == CourseToc.Target.CONTENT)
-			&& (courseToc.getContentId() != Id.UNSET_ID)) {
-		    // we have determined that the TOC item is content, next we need to load the content object and
-		    // iterate through it
-		    // load the content tree into an object "content" and iterate through it
-		    BbList<Content> contents = contentLoader.loadListById(courseToc.getContentId());
-		    // iterate through the content items in this content object
-		    for (Content content : contents) {
-			// only LAMS content
-			if ("resource/x-lams-lamscontent".equals(content.getContentHandler())) {
-				
-			    // update lesson id
-			    String lessonId = content.getLinkRef();
-
-			    //update lineitem details
-			    LineitemUtil.updateLineitemLessonId(content, _course_id, Long.parseLong(lessonId), ctx,
-				    teacher.getUserName());
-			}
-
-		    }
-		}
+		//update lineitem details
+		LineitemUtil.updateLineitemLessonId(content, _course_id, Long.parseLong(lessonId), ctx,
+			teacher.getUserName());
 	    }
 
 	} catch (IllegalStateException e) {
@@ -142,48 +109,6 @@ public class CorrectLineitemsServlet extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 	doGet(req, resp);
-    }
-    
-    /*
-     * Returns param value, and empty string in case of there is no such param available
-     * 
-     * @param url
-     * @param paramName
-     * @return
-     */
-    private static String getParameterValue(String url, String paramName) {
-	String paramValue = "";
-
-	int quotationMarkIndex = url.indexOf("?");
-	String queryPart = quotationMarkIndex > -1 ? url.substring(quotationMarkIndex + 1) : url;
-	String[] paramEntries = queryPart.split("&");
-	for (String paramEntry : paramEntries) {
-	    String[] paramEntrySplitted = paramEntry.split("=");
-	    if ((paramEntrySplitted.length > 1) && paramName.equalsIgnoreCase(paramEntrySplitted[0])) {
-		paramValue = paramEntrySplitted[1];
-		break;
-	    }
-	}
-
-	return paramValue;
-    }
-    
-    private static String replaceParameterValue(String url, String paramName, String newParamValue) {
-	String oldParamValue = "";
-
-	int quotationMarkIndex = url.indexOf("?");
-	String queryPart = quotationMarkIndex > -1 ? url.substring(quotationMarkIndex + 1) : url;
-	String[] paramEntries = queryPart.split("&");
-	for (String paramEntry : paramEntries) {
-	    String[] paramEntrySplitted = paramEntry.split("=");
-	    if ((paramEntrySplitted.length > 1) && paramName.equalsIgnoreCase(paramEntrySplitted[0])) {
-		oldParamValue = paramEntrySplitted[1];
-
-		return url.replaceFirst(paramName + "=" + oldParamValue, paramName + "=" + newParamValue);
-	    }
-	}
-
-	return url;
     }
 
 }

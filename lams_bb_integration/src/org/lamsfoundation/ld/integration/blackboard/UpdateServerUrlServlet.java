@@ -33,17 +33,14 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.log4j.Logger;
 import org.lamsfoundation.ld.integration.Constants;
+import org.lamsfoundation.ld.integration.util.BlackboardUtil;
 
 import blackboard.data.content.Content;
 import blackboard.data.course.Course;
-import blackboard.data.navigation.CourseToc;
 import blackboard.persist.BbPersistenceManager;
 import blackboard.persist.Container;
-import blackboard.persist.Id;
 import blackboard.persist.PkId;
-import blackboard.persist.content.ContentDbLoader;
 import blackboard.persist.content.ContentDbPersister;
-import blackboard.persist.navigation.CourseTocDbLoader;
 import blackboard.platform.BbServiceManager;
 import blackboard.platform.context.ContextManager;
 import blackboard.platform.persistence.PersistenceServiceFactory;
@@ -83,38 +80,20 @@ public class UpdateServerUrlServlet extends HttpServlet {
 	    ctxMgr = (ContextManager) BbServiceManager.lookupService(ContextManager.class);
 	    BbPersistenceManager bbPm = PersistenceServiceFactory.getInstance().getDbPersistenceManager();
 	    Container bbContainer = bbPm.getContainer();
+	    ContentDbPersister persister = ContentDbPersister.Default.getInstance();
 
-	    ContentDbLoader contentDbLoader = ContentDbLoader.Default.getInstance();
-	    CourseTocDbLoader courseTocDbLoader = CourseTocDbLoader.Default.getInstance();
-	    ContentDbPersister persister = (ContentDbPersister) bbPm.getPersister(ContentDbPersister.TYPE);
-
-	    Id courseId = new PkId(bbContainer, Course.DATA_TYPE, courseIdParam);
+	    PkId courseId = new PkId(bbContainer, Course.DATA_TYPE, courseIdParam);
 	    
-	    List<CourseToc> listCourseToc = courseTocDbLoader.loadByCourseId(courseId);
-	    for (CourseToc cToc : listCourseToc) {
+	    //find all lessons that should be updated
+	    List<Content> lamsContents = BlackboardUtil.getLamsLessonsByCourse(courseId);
+	    for (Content content : lamsContents) {
+		String oldUrl = content.getUrl();
+		String newUrl = oldUrl.replaceFirst(oldUrlHost, newUrlHost);
+		content.setUrl(newUrl);
+		persister.persist(content);
 
-		// determine if the TOC item is of type "CONTENT" rather than application, or something else
-		if ((cToc.getTargetType() == CourseToc.Target.CONTENT) && (cToc.getContentId() != Id.UNSET_ID)) {
-		    
-		    // load the content object and iterate through it
-		    List<Content> listContent = contentDbLoader.loadListById(cToc.getContentId());
-		    for (Content content : listContent) {
-
-			if (content.getUrlHost().contains(oldUrlHost)
-				&& (content.getContentHandler().equals("resource/x-lams-lamscontent")
-					|| content.getContentHandler().equals("resource/x-ntu-hdllams"))) {
-			    String oldUrl = content.getUrl();
-			    String newUrl = oldUrl.replaceFirst(oldUrlHost, newUrlHost);
-			    content.setUrl(newUrl);
-			    persister.persist(content);
-
-			    out.write("Old Url" + oldUrl + ". New url:" + newUrl + "\n\r");
-			}
-		
-		    }
-		}
+		out.write("Old Url" + oldUrl + ". New url:" + newUrl + "\n\r");
 	    }
-	    
 
 	} catch (Exception e) {
 	    throw new ServletException(e);
@@ -128,21 +107,6 @@ public class UpdateServerUrlServlet extends HttpServlet {
 	}
 
 	out.write("OK");
-    }
-
-    private static String extractParameterValue(String url, String param) {
-	if (url != null && param != null) {
-	    int quotationMarkIndex = url.indexOf("?");
-	    String queryPart = quotationMarkIndex > -1 ? url.substring(quotationMarkIndex + 1) : url;
-	    String[] paramEntries = queryPart.split("&");
-	    for (String paramEntry : paramEntries) {
-		String[] paramEntrySplitted = paramEntry.split("=");
-		if ((paramEntrySplitted.length > 1) && param.equalsIgnoreCase(paramEntrySplitted[0])) {
-		    return paramEntrySplitted[1];
-		}
-	    }
-	}
-	return null;
     }
 
 }
