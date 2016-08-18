@@ -101,6 +101,7 @@ public class SsoHandler implements ServletExtension {
 
 		// prevent session fixation attack
 		// This will become obsolete on Undertow upgrade to version 1.1.10+
+		SessionManager.removeSessionByID(session.getId(), false);
 		request.changeSessionId();
 
 		// store session so UniversalLoginModule can access it
@@ -118,7 +119,7 @@ public class SsoHandler implements ServletExtension {
 			// otherwise this authentication processs fails
 			existingSession.setAttribute(NO_FLUSH_FLAG, true);
 			// remove an existing session for the given user
-			SessionManager.removeSession(login, true);
+			SessionManager.removeSessionByLogin(login, true);
 		    }
 		    // register current session as the only one for the given user
 		    SessionManager.addSession(login, session);
