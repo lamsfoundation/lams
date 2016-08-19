@@ -596,7 +596,7 @@
 		
 		<copy todir="${server.home}/modules/system/layers/base/org/tuckey/urlrewrite/main" overwrite="true" verbose="true">
 			<fileset dir="lib/urlrewritefilter">
-				<include name="urlrewrite-*.jar" />
+				<include name="urlrewritefilter-*.jar" />
 			</fileset>
 		</copy>
 		<copy tofile="${server.home}/modules/system/layers/base/org/tuckey/urlrewrite/main/module.xml"
