@@ -53,14 +53,14 @@
 	        				var loadString = '<html:rewrite page="/learning/viewTopicThread.do?topicID="/>' + rootUid + "&sessionMapID=" + response.sessionMapID + "&threadUid=" + threadUid+"&messageUid="+messageUid;
 	        				$.ajaxSetup({ cache: true });
 							$(threadDiv).load(loadString, function() {
+								setupJRating("<c:url value='/learning/rateMessage.do'/>?toolSessionID=${sessionMap.toolSessionID}&sessionMapID=${sessionMapID}");
+								highlightMessage();
 								// expand up to the reply - in case it is buried down in a lot of replies
 								// don't need to do this if we have started a new thread.
 								if ( threadUid != messageUid ) {
 									$('#tree' + threadUid).treetable("reveal",messageUid);
 									$('#pb-msg'+messageUid).focus();
 								}
-								setupJRating("<c:url value='/learning/rateMessage.do'/>?toolSessionID=${sessionMap.toolSessionID}&sessionMapID=${sessionMapID}");
-								highlightMessage();
 							});
 						}
 
