@@ -32,6 +32,7 @@
 		var url = "<c:url value="/monitoring/statistic.do?sessionMapID=${sessionMapID}"/>";
 		
 		$("#statisticArea_Busy").show();
+		$.ajaxSetup({ cache: true });
 		$("#statisticArea").load(
 			url,
 			{

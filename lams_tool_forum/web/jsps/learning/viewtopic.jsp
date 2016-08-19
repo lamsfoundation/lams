@@ -43,6 +43,7 @@
 	<script type="text/javascript" src="${tool}includes/javascript/message.js"></script>
 	<script type="text/javascript">
 			$(document).ready(function(){
+				$.ajaxSetup({ cache: true });
 				setupJRatingSetPath();
 			});
 				

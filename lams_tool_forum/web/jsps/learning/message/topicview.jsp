@@ -47,6 +47,7 @@
 			var replyDiv = document.createElement("div");
 			replyDiv.id = 'reply';
 			$('#pb-msg'+messageUid).after(replyDiv);
+			$.ajaxSetup({ cache: true });
 			$(replyDiv).load(url);
 		}
 	}
@@ -59,6 +60,7 @@
 			var editDiv = document.createElement("div");
 			editDiv.id = 'edit';
 			$('#pb-msg'+messageUid).after(editDiv);
+			$.ajaxSetup({ cache: true });
 			$(editDiv).load(url);
 		}
 	}

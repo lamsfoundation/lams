@@ -42,6 +42,7 @@
         					// the user won't try to submit it again
 							$('#edit').remove();
 	        				var loadString = '<html:rewrite page="/learning/viewMessage.do?topicID="/>' + rootUid + "&sessionMapID=" + response.sessionMapID + "&messageUid="+messageUid;
+	        				$.ajaxSetup({ cache: true });
 							$(messDiv).load(loadString, function() {
 								$('#pb-msg'+messageUid).focus();
 								setupJRating("<c:url value='/learning/rateMessage.do'/>?toolSessionID=${sessionMap.toolSessionID}&sessionMapID=${sessionMapID}");
