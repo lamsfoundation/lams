@@ -28,9 +28,9 @@
 		#selectLoginTabA {cursor: pointer; color: #47bc23;}
 	</style>	
 	
-	<script language="JavaScript" type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery.js"></script>
-	<script language="JavaScript" type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery-ui.js"></script>
-	<script language="JavaScript" type="text/javascript">
+	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery.js"></script>
+	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery-ui.js"></script>
+	<script type="text/javascript">
 		jQuery(document).ready(function(){
 			var selectedTab = (${(signupOrganisation != null) && signupOrganisation.loginTabActive}) ? 1 : 0;
 			$("#tabs").tabs({
@@ -91,7 +91,3 @@
 </div>
 </body>
 </lams:html>
-
-
-
-

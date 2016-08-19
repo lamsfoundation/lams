@@ -1,6 +1,5 @@
-	<script type='text/javascript'>//<![CDATA[        
-		$(function(){
-			
+<script type='text/javascript'>      
+	$(function(){
 			
 			$('form input[name="username"]').blur(function () {
 			    var username = $(this).val();
@@ -80,12 +79,11 @@
 		
 			});	
 			
-		});
-	//]]>  
-	</script>
-	<div>	
+	});
+</script>
 
-		<html:form action="/signup/signup.do" method="post">
+<div>	
+	<html:form action="/signup/signup.do" method="post">
 			<html:hidden property="method" value="register" />
 			<html:hidden property="submitted" value="1" />
 			<html:hidden property="context" value="${signupOrganisation.context}" />
@@ -139,5 +137,5 @@
 				</tr>
 			</table>
 		
-		</html:form>
-	</div>
+	</html:form>
+</div>
