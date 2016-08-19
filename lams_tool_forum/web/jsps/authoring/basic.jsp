@@ -9,6 +9,8 @@
 	 * Launches the popup window for the instruction files
 	 */
 	function showMessage(url) {
+
+	    $.ajaxSetup({ cache: true });
 		$("#messageArea").load(url, function() {
 			var area=document.getElementById("messageArea");
 			if(area != null){
@@ -114,7 +116,6 @@
 		}
 
 		var formData = new FormData(document.getElementById("topicFormId"));
-		
 	    $.ajax({ // create an AJAX call...
 			data: formData, 
 	        processData: false, // tell jQuery not to process the data

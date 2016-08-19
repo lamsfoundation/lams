@@ -51,6 +51,7 @@
 	        				alert('<fmt:message key="error.cannot.redisplay.please.refresh"/>');
         				} else {
 	        				var loadString = '<html:rewrite page="/learning/viewTopicThread.do?topicID="/>' + rootUid + "&sessionMapID=" + response.sessionMapID + "&threadUid=" + threadUid+"&messageUid="+messageUid;
+	        				$.ajaxSetup({ cache: true });
 							$(threadDiv).load(loadString, function() {
 								// expand up to the reply - in case it is buried down in a lot of replies
 								// don't need to do this if we have started a new thread.
