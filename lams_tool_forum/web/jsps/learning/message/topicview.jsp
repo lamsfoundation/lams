@@ -80,6 +80,9 @@
 			<%-- same test & command appears at bottom of script --%>
 			<c:if test='${messageTablename != ""}'>
 				</table>
+				<script> 
+					$("#${messageTablename}").treetable({${tableCommand}});
+				</script>				
 				</div>
 				 <!--  end thread ${messageTablename} -->	
 			</c:if>
@@ -109,6 +112,9 @@
 	
 	<c:if test='${messageTablename != ""}'>	
 		</table>
+		<script> 
+			$("#${messageTablename}").treetable({${tableCommand}});
+		</script>	
 		</div>
 	</c:if>
 
