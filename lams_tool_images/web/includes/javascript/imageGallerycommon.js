@@ -2,6 +2,7 @@
  * Launches the popup window for the instruction files
  */
 function showMessage(url) {
+	$.ajaxSetup({ cache: true });
 	$("#reourceInputArea").load(url, function() {
 		var area=document.getElementById("reourceInputArea");
 		if (area != null) {
