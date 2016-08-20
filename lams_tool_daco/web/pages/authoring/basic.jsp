@@ -8,6 +8,7 @@
 <script type="text/javascript">
 	//Showes the add/edit question area
 	function showQuestionInputArea(url) {
+		$.ajaxSetup({ cache: true });
 		$("#questionInputArea").load(url, function() {
 			var area=document.getElementById("questionInputArea");
 			if(area != null){
