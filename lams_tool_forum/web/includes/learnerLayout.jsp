@@ -27,7 +27,7 @@
 		<script type="text/javascript" src="${lams}includes/javascript/jquery.jRating.js"></script>
 		<script type="text/javascript" src="${lams}includes/javascript/jquery.treetable.js"></script>
 		<script type="text/javascript" src="${lams}includes/javascript/bootstrap.min.js"></script>		
-		<script type="text/javascript" src="${tool}includes/javascript/jquery.jscroll.js"></script>
+		<script type="text/javascript" src="${lams}includes/javascript/jquery.jscroll.js"></script>
 		
 		<script type="text/javascript">
 			var removeItemAttachmentUrl = "<html:rewrite page="/learning/deleteAttachment.do" />";

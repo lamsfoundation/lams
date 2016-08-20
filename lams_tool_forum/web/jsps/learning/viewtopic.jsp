@@ -22,7 +22,7 @@
 
 	<lams:css />
 	<link type="text/css" href="${lams}css/jquery.jRating.css" rel="stylesheet" />
-	<link type="text/css" href="${tool}css/jquery.treetable.css" rel="stylesheet" />
+	<link type="text/css" href="${lams}css/jquery.treetable.css" rel="stylesheet" />
 	<link type="text/css" href="${tool}css/jquery.treetable.forum.css" rel="stylesheet" />
 
 	<!-- ********************  javascript ********************** -->
@@ -38,7 +38,7 @@
 	<script type="text/javascript" src="${lams}includes/javascript/jquery-ui.js"></script>
 	<script type="text/javascript" src="${lams}includes/javascript/jquery.jRating.js"></script>
 	<script type="text/javascript" src="${lams}includes/javascript/jquery.treetable.js"></script>
-	<script type="text/javascript" src="${tool}includes/javascript/jquery.jscroll.js"></script>
+	<script type="text/javascript" src="${lams}includes/javascript/jquery.jscroll.js"></script>
 	<script type="text/javascript" src="${lams}includes/javascript/bootstrap.min.js"></script>
 	<script type="text/javascript" src="${tool}includes/javascript/message.js"></script>
 	<script type="text/javascript">
