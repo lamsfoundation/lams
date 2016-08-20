@@ -4,6 +4,7 @@
 	
 <script type="text/javascript">
 	function showConditionMessage(url) {
+		$.ajaxSetup({ cache: true });
 		$("#conditionInputArea").load(url, function() {
 			$(this).show();
 			$("#saveCancelButtons").hide();
@@ -20,6 +21,7 @@
 	}
 
 	function deleteCondition(orderId, sessionMapID){
+		$.ajaxSetup({ cache: true });
 		$("#conditionsArea").load("<c:url value='/authoring/removeCondition.do'/>",{
 			'orderId' : orderId,
 			'sessionMapID' : sessionMapID
@@ -27,12 +29,14 @@
 	}
 	
 	function upCondition(orderId,sessionMapID){
+		$.ajaxSetup({ cache: true });
 		$("#conditionsArea").load("<c:url value='/authoring/upCondition.do'/>",{
 			'orderId' : orderId,
 			'sessionMapID' : sessionMapID
 		});
 	}
 	function downCondition(orderId,sessionMapID){
+		$.ajaxSetup({ cache: true });
 		$("#conditionsArea").load("<c:url value='/authoring/downCondition.do'/>",{
 			'orderId' : orderId,
 			'sessionMapID' : sessionMapID
@@ -42,6 +46,7 @@
 	// Packs additional elements and submits the question form
 	function submitCondition(){
 		var form = $('#chatConditionForm');
+		$.ajaxSetup({ cache: true });
 		$('#conditionInputArea').load(form.attr('action'), form.serialize());
 	} 
 </script>
