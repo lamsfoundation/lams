@@ -28,6 +28,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 	
 	<script type="text/javascript">
 		$(document).ready(function(){
+			$.ajaxSetup({ cache: true });
 			$('#headerFrame').load('${initNavUrl}');
 		});
 		

@@ -7,6 +7,7 @@
 
 
 	function showResourceItem(url) {
+		$.ajaxSetup({ cache: true });
 		$("#resourceInputArea").load(url, function() {
 			$(this).show();
 			$("#saveCancelButtons").hide();
