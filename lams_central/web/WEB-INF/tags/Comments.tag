@@ -42,6 +42,7 @@
 <script>
 $(document).ready(function(){
 	var url='<lams:LAMSURL/>comments/comments.do?externalID=${toolSessionId}&externalSig=${toolSignature}&externalType=1${modeStr}&likeAndDislike=${likeAndDislike}&readOnly=${readOnly}&pageSize=${pageSize}&sortBy=${sortBy}';
+	$.ajaxSetup({ cache: true });
 	$('#commentFrame').load(url);
 });
 </script>
