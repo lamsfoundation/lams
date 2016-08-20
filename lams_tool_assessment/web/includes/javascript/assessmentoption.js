@@ -16,6 +16,7 @@
 		var contentFolderID= $("#contentFolderID").val();
 		prepareOptionEditorsForAjaxSubmit();
 		var optionList = $("#optionForm").serialize(true);
+		$.ajaxSetup({ cache: true });
 		$(optionTargetDiv).load(
 			url,
 			{
@@ -31,6 +32,7 @@
 		var contentFolderID= $("#contentFolderID").val();
 		prepareOptionEditorsForAjaxSubmit();
  		var optionList = $("#optionForm").serialize(true);
+ 		$.ajaxSetup({ cache: true });
 		$(optionTargetDiv).load(
 				url,
 				{
@@ -46,6 +48,7 @@
 		var contentFolderID= $("#contentFolderID").val();
 		prepareOptionEditorsForAjaxSubmit();
  		var optionList = $("#optionForm").serialize(true);
+ 		$.ajaxSetup({ cache: true });
 		$(optionTargetDiv).load(
 				url,
 				{
@@ -61,6 +64,7 @@
 		var contentFolderID= $("#contentFolderID").val(); 	
 		prepareOptionEditorsForAjaxSubmit();
  		var optionList = $("#optionForm").serialize(true);
+ 		$.ajaxSetup({ cache: true });
  		$(optionTargetDiv).load(
 				url,
 				{
