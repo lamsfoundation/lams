@@ -12,7 +12,7 @@
 
 <script type="text/javascript" src="${lams}includes/javascript/jquery.jqGrid.locale-en.js"></script>
 <script type="text/javascript" src="${lams}includes/javascript/jquery.jqGrid.js"></script>
-<script type="text/javascript" src="${tool}includes/javascript/jinplace-1.0.1.js"></script>
+<script type="text/javascript" src="${lams}includes/javascript/jinplace-1.0.1.js"></script>
 
 <script type="text/javascript" src="${lams}includes/javascript/bootstrap.min.js"></script>
 <script type="text/javascript" src="${lams}includes/javascript/bootstrap.tabcontroller.js"></script>
