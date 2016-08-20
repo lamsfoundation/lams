@@ -92,6 +92,7 @@
 	    function gotoURL(){
 	    	var reqIDVar = new Date();
 	   		var gurl = "<c:url value="/learning/addurl.do"/>?sessionMapID=${sessionMapID}&mode=${mode}&reqID="+reqIDVar.getTime();
+	   		$.ajaxSetup({ cache: true });
 	        $("#addresource").load(gurl, function() {
 	        	setFormURL();
 	        });
@@ -105,6 +106,7 @@
 		function gotoFile(){
 		    var reqIDVar = new Date();
 		    var gurl = "<c:url value="/learning/addfile.do"/>?sessionMapID=${sessionMapID}&mode=${mode}&reqID="+reqIDVar.getTime();
+		    $.ajaxSetup({ cache: true });
 	        $("#addresource").load(gurl, function() {
 	        	setFormFile();
 	        });
