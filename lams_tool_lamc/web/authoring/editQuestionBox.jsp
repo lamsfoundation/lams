@@ -18,7 +18,9 @@
 					$(this).val(value);
 				});
 				
+				$.ajaxSetup({ cache: true });
 	    		$('#newQuestionForm').ajaxSubmit({
+	    			cache: true,
     	    		target:  $('#candidateArea')
     		    });
 			}
