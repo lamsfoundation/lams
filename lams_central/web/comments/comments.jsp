@@ -46,6 +46,7 @@
 
 			function reloadDivs(url) {
 				$('.scroll').data('jscroll', null);
+				$.ajaxSetup({ cache: true });
 				$('#commentDiv').load(url);
 			}
 			

@@ -52,6 +52,7 @@
 			var parentDiv = document.getElementById('pb-msg'+commentUid);
 			parentDiv.appendChild(replyDiv);
 			
+			$.ajaxSetup({ cache: true });
 			$(replyDiv).load(url);
 		}
 	}
@@ -69,6 +70,7 @@
 			var parentDiv = document.getElementById('pb-msg'+commentUid);
 			parentDiv.appendChild(editDiv);
 
+			$.ajaxSetup({ cache: true });
 			$(editDiv).load(url);
 		}
 	}

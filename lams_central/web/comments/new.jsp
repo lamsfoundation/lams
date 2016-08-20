@@ -56,6 +56,7 @@
 											+ "&threadUid="
 											+ threadUid
 											+ "&commentUid=" + commentUid;
+									$.ajaxSetup({ cache: true });
 									$(newThreadDiv).load(loadString,
 											function() {
 												highlightMessage();
