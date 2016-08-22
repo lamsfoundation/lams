@@ -253,6 +253,8 @@
 
 <body class="stripes">
 
+	<!-- form needs to be outside page so that the form bean can be picked up by Page tag. -->
+	<html:form action="/learning?validate=false" enctype="multipart/form-data" method="POST" target="_self">
 
 	<lams:Page type="learner" title="${qaContent.title}">
 
@@ -424,7 +426,6 @@
 		<!-- End of others questions -->
 
 		<!-- buttons -->
-		<html:form action="/learning?validate=false" enctype="multipart/form-data" method="POST" target="_self">
 			<html:hidden property="toolSessionID" styleId="toolSessionID" />
 			<html:hidden property="userID" styleId="userID" />
 			<html:hidden property="httpSessionID" />
@@ -488,8 +489,6 @@
 				</c:if>
 			</c:if>
 
-		</html:form>
-		<!-- End buttons -->
 
 
 		<div id="footer"></div>
@@ -497,6 +496,8 @@
 
 
 	</lams:Page>
+
+	</html:form>
 
 </body>
 </lams:html>

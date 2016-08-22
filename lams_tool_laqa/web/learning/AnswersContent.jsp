@@ -198,6 +198,11 @@
 </lams:head>
 
 <body class="stripes">
+
+	<!-- form needs to be outside page so that the form bean can be picked up by Page tag. -->
+	<html:form action="/learning?validate=false" enctype="multipart/form-data" method="POST" target="_self"
+		styleId="learningForm">
+
 	<lams:Page type="learner" title="${generalLearnerFlowDTO.activityTitle}">
 
 		<!-- Advanced settings and notices -->
@@ -228,9 +233,7 @@
 
 		<!-- End advanced settings and notices -->
 
-		<!-- Form -->
-		<html:form action="/learning?validate=false" enctype="multipart/form-data" method="POST" target="_self"
-			styleId="learningForm">
+
 			<c:choose>
 				<c:when test="${generalLearnerFlowDTO.questionListingMode == 'questionListingModeSequential'}">
 					<html:hidden property="method" value="getNextQuestion" />
@@ -294,11 +297,11 @@
 				</c:otherwise>
 			</c:choose>
 
-		</html:form>
-
-		<div id="footer"></div>
+	<div id="footer"></div>
 
 	</lams:Page>
+
+	</html:form>
 
 </body>
 </lams:html>
