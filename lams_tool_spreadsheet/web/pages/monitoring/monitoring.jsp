@@ -36,6 +36,7 @@
 			    var reqIDVar = new Date();
 				var param = "toolContentID=" + ${param.toolContentID};
 				messageLoading();
+				$.ajaxSetup({ cache: true });
 				$("#"+statisticTargetDiv).load(
 						url,
 						param,
