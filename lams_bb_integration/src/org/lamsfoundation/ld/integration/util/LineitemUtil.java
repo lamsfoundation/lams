@@ -72,7 +72,7 @@ public class LineitemUtil {
 
     private static Logger logger = Logger.getLogger(LineitemUtil.class);
 
-    public static void createLineitem(Content bbContent, Context ctx, String userName)
+    public static void createLineitem(Content bbContent, String ldId, String userName)
 	    throws ValidationException, PersistenceException, IOException {
 	LineitemDbPersister linePersister = LineitemDbPersister.Default.getInstance();
 	OutcomeDefinitionDbPersister outcomeDefinitionPersister = OutcomeDefinitionDbPersister.Default.getInstance();
@@ -102,7 +102,7 @@ public class LineitemUtil {
 	outcomeDefinition.setCourseId(courseId);
 	outcomeDefinition.setPosition(1);
 
-	boolean hasLessonScoreOutputs = LineitemUtil.hasLessonScoreOutputs(bbContent, ctx, userName);
+	boolean hasLessonScoreOutputs = LineitemUtil.hasLessonScoreOutputs(bbContent, ldId, userName);
 	OutcomeDefinitionScale outcomeDefinitionScale;
 	if (hasLessonScoreOutputs) {
 	    outcomeDefinitionScale = outcomeDefinitionScaleLoader.loadByCourseIdAndTitle(courseId,
@@ -133,8 +133,7 @@ public class LineitemUtil {
      * 
      * @throws IOException
      */
-    private static boolean hasLessonScoreOutputs(Content bbContent, Context ctx, String username) throws IOException {
-	String ldId = ctx.getRequestParameter("sequence_id");
+    private static boolean hasLessonScoreOutputs(Content bbContent, String ldId, String username) throws IOException {
 	
 	//sequence_id parameter is null in case we come from modify_proc
 	if (ldId == null) {
@@ -251,7 +250,8 @@ public class LineitemUtil {
 	    Id lineitemId = getLineitem(_content_id, courseIdStr, false);
 	    //in case admin forgot to check "Grade Center Columns and Settings" option on doing course copy/import
 	    if (lineitemId == null) {
-		createLineitem(bbContent, ctx, userName);
+		String ldId = ctx.getRequestParameter("sequence_id");
+		createLineitem(bbContent, ldId, userName);
 		
 	    //in case he checked it and BB created Lineitem object, then just need to update it
 	    } else {
