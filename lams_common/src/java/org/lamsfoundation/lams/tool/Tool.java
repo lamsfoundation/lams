@@ -436,7 +436,7 @@ public class Tool implements Serializable {
 
     public IToolVO createBasicToolVO() {
 	IToolVO vo = new BasicToolVO(toolId, supportsGrouping, learnerUrl, learnerPreviewUrl, learnerProgressUrl,
-		authorUrl, monitorUrl, helpUrl, defaultToolContentId, toolSignature, toolDisplayName, description,
+		authorUrl, monitorUrl, helpUrl, defaultToolContentId, learningLibraryId, toolSignature, toolDisplayName, description,
 		serviceName, createDateTime, groupingSupportTypeId, toolIdentifier, toolVersion, languageFile,
 		extLmsId);
 	return vo;

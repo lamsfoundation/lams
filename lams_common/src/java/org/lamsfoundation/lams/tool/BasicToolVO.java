@@ -68,6 +68,8 @@ public class BasicToolVO implements Serializable, IToolVO {
     /** nullable persistent field */
     private long defaultToolContentId;
 
+    private Long learningLibraryId;
+
     /** persistent field */
     private String toolSignature;
 
@@ -104,9 +106,9 @@ public class BasicToolVO implements Serializable, IToolVO {
     /** full constructor */
     public BasicToolVO(Long toolId, boolean supportsGrouping, String learnerUrl, String learnerPreviewUrl,
 	    String learnerProgressUrl, String authorUrl, String monitorUrl, String helpUrl, long defaultToolContentId,
-	    String toolSignature, String toolDisplayName, String description, String serviceName, Date createDateTime,
-	    Integer groupingSupportTypeId, String toolIdentifier, String toolVersion, String languageFile,
-	    String extLmsId) {
+	    Long learningLibraryId, String toolSignature, String toolDisplayName, String description,
+	    String serviceName, Date createDateTime, Integer groupingSupportTypeId, String toolIdentifier,
+	    String toolVersion, String languageFile, String extLmsId) {
 	this.supportsGrouping = supportsGrouping;
 	this.learnerUrl = learnerUrl;
 	this.learnerPreviewUrl = learnerPreviewUrl;
@@ -115,6 +117,7 @@ public class BasicToolVO implements Serializable, IToolVO {
 	this.monitorUrl = monitorUrl;
 	this.helpUrl = helpUrl;
 	this.defaultToolContentId = defaultToolContentId;
+	this.learningLibraryId = learningLibraryId;
 	this.toolSignature = toolSignature;
 	this.toolDisplayName = toolDisplayName;
 	this.description = description;
@@ -129,22 +132,6 @@ public class BasicToolVO implements Serializable, IToolVO {
 
     /** default constructor */
     public BasicToolVO() {
-    }
-
-    /** minimal constructor */
-    public BasicToolVO(Long toolId, boolean supportsGrouping, String learnerUrl, String authorUrl, String toolSignature,
-	    String toolDisplayName, String serviceName, Date createDateTime, Integer groupingSupportTypeId,
-	    String toolIdentifier, String toolVersion) {
-	this.supportsGrouping = supportsGrouping;
-	this.learnerUrl = learnerUrl;
-	this.authorUrl = authorUrl;
-	this.toolSignature = toolSignature;
-	this.toolDisplayName = toolDisplayName;
-	this.serviceName = serviceName;
-	this.createDateTime = createDateTime;
-	this.groupingSupportTypeId = groupingSupportTypeId;
-	this.toolIdentifier = toolIdentifier;
-	this.toolVersion = toolVersion;
     }
 
     /*
@@ -225,6 +212,11 @@ public class BasicToolVO implements Serializable, IToolVO {
     @Override
     public void setDefaultToolContentId(long defaultToolContentId) {
 	this.defaultToolContentId = defaultToolContentId;
+    }
+
+    @Override
+    public Long getLearningLibraryId() {
+	return learningLibraryId;
     }
 
     /*

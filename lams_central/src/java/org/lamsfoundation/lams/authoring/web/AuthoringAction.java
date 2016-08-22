@@ -48,6 +48,10 @@ import org.apache.tomcat.util.json.JSONException;
 import org.apache.tomcat.util.json.JSONObject;
 import org.lamsfoundation.lams.authoring.ObjectExtractorException;
 import org.lamsfoundation.lams.authoring.service.IAuthoringService;
+import org.lamsfoundation.lams.integration.ExtCourseClassMap;
+import org.lamsfoundation.lams.integration.ExtServerOrgMap;
+import org.lamsfoundation.lams.integration.service.IIntegrationService;
+import org.lamsfoundation.lams.integration.util.LoginRequestDispatcher;
 import org.lamsfoundation.lams.learningdesign.LearningDesign;
 import org.lamsfoundation.lams.learningdesign.LearningDesignAccess;
 import org.lamsfoundation.lams.learningdesign.LearningLibrary;
@@ -99,6 +103,7 @@ public class AuthoringAction extends LamsDispatchAction {
     private static IAuthoringService authoringService;
     private static ILearningDesignService learningDesignService;
     private static ISecurityService securityService;
+    private static IIntegrationService integrationService;
 
     private static int LEARNING_DESIGN_ACCESS_ENTRIES_LIMIT = 7;
 
@@ -260,9 +265,17 @@ public class AuthoringAction extends LamsDispatchAction {
 	IAuthoringService authoringService = getAuthoringService();
 	Long toolID = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_ID);
 	Long toolContentID = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_CONTENT_ID);
-	Long learningLibraryID = WebUtil.readLongParam(request, AttributeNames.PARAM_LEARNING_LIBRARY_ID);
+	Long learningLibraryID = WebUtil.readLongParam(request, AttributeNames.PARAM_LEARNING_LIBRARY_ID, true);
 	String contentFolderID = request.getParameter(AttributeNames.PARAM_CONTENT_FOLDER_ID);
-	Integer organisationID = WebUtil.readIntParam(request, AttributeNames.PARAM_ORGANISATION_ID);
+	Integer organisationID = WebUtil.readIntParam(request, AttributeNames.PARAM_ORGANISATION_ID, true);
+	if (organisationID == null) {
+	    // if organisation ID is not set explicitly, derived it from external course
+	    String serverID = request.getParameter(LoginRequestDispatcher.PARAM_SERVER_ID);
+	    String courseID = request.getParameter(LoginRequestDispatcher.PARAM_COURSE_ID);
+	    ExtServerOrgMap serverMap = getIntegrationService().getExtServerOrgMap(serverID);
+	    ExtCourseClassMap orgMap = getIntegrationService().getExtCourseClassMap(serverMap.getSid(), courseID);
+	    organisationID = orgMap.getOrganisation().getOrganisationId();
+	}
 	Integer userID = getUserId();
 
 	if (!getSecurityService().isGroupMonitor(organisationID, userID, "create single activity lesson", false)) {
@@ -272,6 +285,10 @@ public class AuthoringAction extends LamsDispatchAction {
 
 	// get title from tool content
 	IToolVO tool = getToolService().getToolByID(toolID);
+	if (learningLibraryID == null) {
+	    // if learning library ID is not set explicitly, derive it from tool
+	    learningLibraryID = tool.getLearningLibraryId();
+	}
 	WebApplicationContext wac = WebApplicationContextUtils
 		.getRequiredWebApplicationContext(getServlet().getServletContext());
 	ToolContentManager toolManager = (ToolContentManager) wac.getBean(tool.getServiceName());
@@ -447,6 +464,15 @@ public class AuthoringAction extends LamsDispatchAction {
 	    AuthoringAction.learningDesignService = (ILearningDesignService) ctx.getBean("learningDesignService");
 	}
 	return AuthoringAction.learningDesignService;
+    }
+
+    private IIntegrationService getIntegrationService() {
+	if (AuthoringAction.integrationService == null) {
+	    WebApplicationContext ctx = WebApplicationContextUtils
+		    .getRequiredWebApplicationContext(getServlet().getServletContext());
+	    AuthoringAction.integrationService = (IIntegrationService) ctx.getBean("integrationService");
+	}
+	return AuthoringAction.integrationService;
     }
 
     private ISecurityService getSecurityService() {
