@@ -5,6 +5,7 @@
 <!-- Common Javascript functions for LAMS -->
 
 function showConditionMessage(url) {
+	$.ajaxSetup({ cache: true });
 	$("#conditionInputArea").load(url, function() {
 		$(this).show();
 		$("#saveCancelButtons").hide();
@@ -29,15 +30,12 @@ function deleteCondition(sequenceId, sessionMapID){
 function upCondition(sequenceId,sessionMapID){
 	var param = "sequenceId=" + sequenceId + "&sessionMapID="+sessionMapID;;
 	var url = "<c:url value="/authoring/upCondition.do"/>?"+param;
-	alert(url);
-	$("#conditionListTargetDiv").load(url,function() {
-		alert("loaded");
-	});
+	$("#conditionsArea").load(url);
 }
 function downCondition(sequenceId,sessionMapID){
 	var param = "sequenceId=" + sequenceId + "&sessionMapID="+sessionMapID;
 	var url = "<c:url value="/authoring/downCondition.do"/>?"+param;
-	$("#conditionListTargetDiv").load(url);
+	$("#conditionsArea").load(url);
 }
 
 //Packs additional elements and submits the question form

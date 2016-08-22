@@ -8,6 +8,7 @@
 	 * Launches the popup window for the instruction files
 	 */
 	function showMessage(url) {
+		$.ajaxSetup({ cache: true });
 		$("#resourceInputArea").load(url, function() {
 			$(this).show();
 			$("#saveCancelButtons").hide();
