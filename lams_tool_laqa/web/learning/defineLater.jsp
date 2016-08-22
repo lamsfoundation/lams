@@ -5,7 +5,7 @@
 	<html:base />
 	<lams:css />
 	<title><fmt:message key="activity.title" /></title>
-	<script type="text/javascript" src="<lams:LAMSURL />javascript/jquery.js"></script>
+	<script type="text/javascript" src="<lams:LAMSURL />includes/javascript/jquery.js"></script>
 </lams:head>
 <body class="stripes">
 	<c:set scope="request" var="title">
