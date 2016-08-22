@@ -4,6 +4,7 @@
 <script type="text/javascript">
 	
 	function showConditionMessage(url) {
+		$.ajaxSetup({ cache: true });
 		$("#conditionInputArea").load(url, function() {
 			$(this).show();
 			$("#saveCancelButtons").hide();

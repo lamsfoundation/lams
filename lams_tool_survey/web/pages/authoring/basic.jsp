@@ -9,6 +9,7 @@
 	 * Launches the popup window for the instruction files
 	 */
 	function showMessage(url) {
+		$.ajaxSetup({ cache: true });
 		$("#questionInputArea").load(url, function() {
 			$(this).show();
 			$("#saveCancelButtons").hide();
