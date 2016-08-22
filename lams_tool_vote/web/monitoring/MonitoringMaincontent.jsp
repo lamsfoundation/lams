@@ -39,6 +39,7 @@
         
 		function doStatistic(){
 			var url = '<c:url value="monitoring.do"/>?dispatch=statistics&toolContentID=${toolContentID}';
+			$.ajaxSetup({ cache: true });
 			$("#statisticArea").load(url);
 		}
 

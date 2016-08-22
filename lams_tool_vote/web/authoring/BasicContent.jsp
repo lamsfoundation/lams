@@ -11,6 +11,7 @@
 <!-- Common Javascript functions for LAMS -->
 
  	function showMessage(url) {
+ 		$.ajaxSetup({ cache: true });
 		$("#messageArea").load(url, function() {
 			$(this).show();
 			$("#saveCancelButtons").hide();
