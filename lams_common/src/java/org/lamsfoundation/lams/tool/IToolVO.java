@@ -40,6 +40,8 @@ public interface IToolVO {
     void setCreateDateTime(Date createDateTime);
 
     long getDefaultToolContentId();
+    
+    Long getLearningLibraryId();
 
     void setDefaultToolContentId(long defaultToolContentId);
 
