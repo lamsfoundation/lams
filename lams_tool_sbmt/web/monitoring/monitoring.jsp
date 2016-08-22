@@ -41,6 +41,7 @@
 			var url = "<c:url value="/monitoring.do"/>";
 			
 			$("#statisticArea_Busy").show();
+			$.ajaxSetup({ cache: true });
 			$("#statisticArea").load(
 				url,
 				{
