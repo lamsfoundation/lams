@@ -3,6 +3,7 @@
 <script type="text/javascript">
 
 	function showMessage(url) {
+		$.ajaxSetup({ cache: true });
 		$("#iframeArea").load(url, function() {
 			$(this).show();
 			$("#saveCancelButtons").hide();
@@ -13,6 +14,7 @@
 		$("#saveCancelButtons").show();
 	}
 	function runUrl(url) {
+		$.ajaxSetup({ cache: true });
 		$("#iframeArea").load(url, function() {
 			$(this).show();
 		});

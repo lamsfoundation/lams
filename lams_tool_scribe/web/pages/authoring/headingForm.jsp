@@ -14,6 +14,7 @@
 	       	type: $("#headingForm").attr('method'),
 			url: $("#headingForm").attr('action'),
 			success: function(data) {
+			   $.ajaxSetup({ cache: true });
 	           $('#itemListArea').html(data);
 			}
 	    });
