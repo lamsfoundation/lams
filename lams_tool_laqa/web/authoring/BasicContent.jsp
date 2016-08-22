@@ -6,6 +6,7 @@
 	 * Launches the popup window for the instruction files
 	 */
 	function showMessage(url) {
+		 $.ajaxSetup({ cache: true });
 		 $("#messageArea").load(url, function() {
 			 $(this).show();
 			 $('#saveCancelButtons').hide();
