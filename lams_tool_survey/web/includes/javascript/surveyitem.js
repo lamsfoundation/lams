@@ -9,6 +9,7 @@
 	    var param = $("#instructionForm").serialize()+"&removeIdx="+idx+"&reqID="+reqIDVar.getTime();
  		var url= removeInstructionUrl+"?"+param;
 	    showInstructionBusy();
+	    $.ajaxSetup({ cache: true });
 	    $('#instructionArea').load(url,function(data) {
 	    	hideInstructionBusy();
 	    });
@@ -19,6 +20,7 @@
 	    var param = $("#instructionForm").serialize()+"&reqID="+reqIDVar.getTime();
 		var url= addInstructionUrl+"?"+param;
 	    showInstructionBusy();
+	    $.ajaxSetup({ cache: true });
 	    $('#instructionArea').load(url,function() {
 	    	hideInstructionBusy();
 	    });
