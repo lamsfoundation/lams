@@ -106,13 +106,12 @@ public class ImportLessonsServlet extends HttpServlet {
 		    logger.debug("Lesson (lessonId=" + urlLessonId
 			    + ") was successfully imported to the one (learningDesignId=" + newLdId + ").");
 
-		    // Start the Lesson in LAMS (via Webservices) and capture the lesson ID
-		    String teacherUsername = teacher.getUserName();
+		    // Start the Lesson in LAMS (via Webservices) and get back the lesson ID
 		    String title = content.getTitle();
 		    FormattedText descriptionFormatted = content.getBody();
 		    String description = URLEncoder.encode(descriptionFormatted.getText(), "UTF-8");
-		    final long newLessonId = LamsSecurityUtil.startLesson(ctx, teacherUsername, courseIdParam, newLdId,
-			    title, description, false);
+		    final long newLessonId = LamsSecurityUtil.startLesson(teacher, courseIdParam, newLdId, title,
+			    description, false);
 
 		    // update lesson id
 		    content.setLinkRef(Long.toString(newLessonId));

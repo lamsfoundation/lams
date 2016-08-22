@@ -50,6 +50,7 @@ import org.w3c.dom.NamedNodeMap;
 import org.xml.sax.SAXException;
 
 import blackboard.base.BbList;
+import blackboard.data.course.Course;
 import blackboard.data.course.CourseMembership;
 import blackboard.data.user.User;
 import blackboard.persist.BbPersistenceManager;
@@ -243,7 +244,7 @@ public class LamsSecurityUtil {
 
 	User user = ctx.getUser();
 	if ( user == null )
-	    user = loadUserFromDB(usernameFromParam);
+	    user = BlackboardUtil.loadUserFromDB(usernameFromParam);
 	
 	String username = user.getUserName();
 	String firstName = user.getGivenName();
@@ -325,22 +326,6 @@ public class LamsSecurityUtil {
 	}
 	
 	return learningDesigns;
-    }
-
-    private static User loadUserFromDB(String username) {
-	User user = null;
-	try {
-	    final UserDbLoader userDbLoader = UserDbLoader.Default.getInstance();
-	    user = userDbLoader.loadByUserName(username);
-	} catch (KeyNotFoundException e) {
-	    throw new RuntimeException("No user details found in context or via username parameter. Unable access LAMS. "+e.getMessage()+" Username "+username,e);
-	} catch (PersistenceException e) {
-	    throw new RuntimeException("No user details found in context or via username parameter. Unable access LAMS. "+e.getMessage()+" Username "+username,e);
-	}
-	if ( user == null ) {
-	    throw new RuntimeException("No user details found in context or via username parameter. Unable access LAMS. Username "+username);
-	}
-	return user;
     }
 
     /**
@@ -425,34 +410,16 @@ public class LamsSecurityUtil {
 	}
 	return courseId;
     }
-    /**
-     * Starts lessons in lams through a LAMS webservice
-     * 
-     * @param ctx
-     *            the blackboard contect, contains session data
-     * @param ldId
-     *            the learning design id for which you wish to start a lesson
-     * @param title
-     *            the title of the lesson
-     * @param desc
-     *            the description of the lesson 
-     *            
-     * @return the learning session id
-     */
-    public static Long startLesson(Context ctx, long ldId, String title, String desc, boolean isPreview) {
-	return startLesson(ctx, null, null, ldId, title, desc, isPreview);
-    }
 
     /**
-     * Starts lessons in lams through a LAMS webservice using the username & courseId parameter, needed
-     * when there won't be a user / courseId in the context.
+     * Starts lessons in lams through a LAMS webservice.
      * 
      * @param ctx
      *            the blackboard contect, contains session data
      * @param usernameFromParam
-     * 		  current user's username as a request parameter
+     * 		  current user's username 
      * @param courseIdStr
-     * 		  courseId as a request parameter
+     * 		  courseId 
      * @param ldId
      *            the learning design id for which you wish to start a lesson
      * @param title
@@ -462,25 +429,17 @@ public class LamsSecurityUtil {
      *            
      * @return the learning session id
      */
-    public static Long startLesson(Context ctx, String usernameFromParam, String courseIdStr, long ldId, String title, String desc, boolean isPreview) {
+    public static Long startLesson(User user, String courseId, long ldId, String title, String desc, boolean isPreview) {
 
 	String serverId = getServerID();
 	String serverAddr = getServerAddress();
 	String serverKey = getServerKey();
-	
-	User user = ctx.getUser();
-	if ( user == null ) 
-	    user = loadUserFromDB(usernameFromParam);
 
 	String username = user.getUserName();
 	String locale = user.getLocale();
 	String country = getCountry(locale);
 	String lang = getLanguage(locale);
 	String method = (isPreview) ? "preview" : "start";
-
-	// courseId always needed to check roles
-	// if it is preview, then can use the DUMMY_COURSE
-	String courseId = setupCourseId(ctx, courseIdStr, isPreview);
 	
 	if (courseId == null || serverId == null || serverAddr == null || serverKey == null) {
 	    logger.info("Unable to start lesson, one or more lams configuration properties or the course id is null");
@@ -705,13 +664,12 @@ public class LamsSecurityUtil {
      * @param lessonId
      *            the lesoon id that was just started
      */
-    public static void preaddLearnersMonitorsToLesson(Context ctx, long lessonId) {
+    public static void preaddLearnersMonitorsToLesson(User user, String courseIdStr, long lessonId) {
 	String serverId = getServerID();
 	String serverAddr = getServerAddress();
 	String serverKey = getServerKey();
-	String courseIdStr = ctx.getCourse().getCourseId();
-	String username = ctx.getUser().getUserName();
-	String locale = ctx.getUser().getLocale();
+	String username = user.getUserName();
+	String locale = user.getLocale();
 	String country = getCountry(locale);
 	String lang = getLanguage(locale);
 
@@ -733,10 +691,9 @@ public class LamsSecurityUtil {
 	    final String DUMMY_VALUE = "-";
 
 	    BbPersistenceManager bbPm = PersistenceServiceFactory.getInstance().getDbPersistenceManager();
-	    Id courseId = ctx.getCourse().getId();
+	    CourseMembershipDbLoader courseMemLoader = CourseMembershipDbLoader.Default.getInstance();
 
-	    CourseMembershipDbLoader courseMemLoader = (CourseMembershipDbLoader) bbPm
-		    .getLoader(CourseMembershipDbLoader.TYPE);
+	    Id courseId = bbPm.generateId(Course.DATA_TYPE, courseIdStr);
 	    BbList<CourseMembership> studentCourseMemberships = courseMemLoader.loadByCourseIdAndRole(courseId,
 		    CourseMembership.Role.STUDENT, null, true);
 	    for (CourseMembership courseMembership : studentCourseMemberships) {

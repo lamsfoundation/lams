@@ -21,6 +21,7 @@
 <%@ page import="blackboard.data.content.ContentFile"%>
 <%@ page import="blackboard.data.content.ContentFolder"%>
 <%@ page import="blackboard.data.content.CourseDocument"%>
+<%@ page import="blackboard.data.user.User"%>
 <%@ page import="blackboard.persist.*"%>
 <%@ page import="blackboard.persist.content.*"%>
 <%@ page import="blackboard.data.gradebook.impl.*"%>
@@ -46,6 +47,8 @@
 <bbNG:genericPage title="LAMS Learning Activity Management System" ctxId="ctx">
 
     <%
+    	BbPersistenceManager bbPm = PersistenceServiceFactory.getInstance().getDbPersistenceManager();
+    
     	//Set the new LAMS Lesson Content Object
     	CourseDocument bbContent = new blackboard.data.content.CourseDocument();
     
@@ -56,143 +59,17 @@
         } catch(PlugInException e) {
             throw new RuntimeException(e);
         }
-
-		// Retrieve the Db persistence manager from the persistence service
-        BbPersistenceManager bbPm = BbServiceManager.getPersistenceService().getDbPersistenceManager();
-        ContentDbPersister contentPersister = (ContentDbPersister) bbPm.getPersister( ContentDbPersister.TYPE );
-
-        // Internal Blackboard IDs for the course and parent content item
-        Id courseId = bbPm.generateId(Course.DATA_TYPE,request.getParameter("course_id"));
-        Id folderId = bbPm.generateId(CourseDocument.DATA_TYPE,request.getParameter("content_id"));
-
-		// Load parent content item
-        ContentDbLoader courseDocumentLoader = (ContentDbLoader) bbPm.getLoader( ContentDbLoader.TYPE );
-		ContentFolder courseDocParent = (ContentFolder)courseDocumentLoader.loadById( folderId );
-
-        // Get the session object to obtain the user and course object
-        BbSessionManagerService sessionService = BbServiceManager.getSessionManagerService();
-        BbSession bbSession = sessionService.getSession( request );
-
-        // Get the form parameters and convert into correct data types
-        // TODO: Use bb text area instead
-        String strTitle = request.getParameter("title").trim();
-        String strDescription = request.getParameter("descriptiontext").trim();
-        FormattedText description = new FormattedText(strDescription, FormattedText.Type.HTML);
-
-        String strSequenceID = request.getParameter("sequence_id").trim();
-        long ldId = Long.parseLong(strSequenceID);
-
-        String strIsAvailable = request.getParameter("isAvailable");
-        String strIsGradecenter = request.getParameter("isGradecenter");
-        String strIsTracked = request.getParameter("isTracked");
-        boolean isAvailable = (strIsAvailable==null || strIsAvailable.equals("true"))?true:false; // default true
-        boolean isGradecenter = (strIsGradecenter!=null && strIsGradecenter.equals("true"))?true:false; // default false
-        boolean isTracked = (strIsTracked!=null && strIsTracked.equals("true"))?true:false; // default false
-
-        String isDisplayDesignImage = request.getParameter("isDisplayDesignImage");
-
-	    // Set Availability Dates
-        SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-
-	    // Start Date
-        String strStartDate = request.getParameter("lessonAvailability_start_datetime");
-        if ( strStartDate != null ) {
-	        Calendar startDate = Calendar.getInstance();
-	        startDate.setTime(formatter.parse(strStartDate));
-	        String strStartDateCheckbox = request.getParameter("lessonAvailability_start_checkbox");
-		    if (strStartDateCheckbox != null){
-		        if (strStartDateCheckbox.equals("1")){
-		            bbContent.setStartDate(startDate);
-		        }
-		    }
-        }
-	        
-	    // End Date
-        String strEndDate = request.getParameter("lessonAvailability_end_datetime");
-	    if ( strEndDate != null ) {
-	        Calendar endDate = Calendar.getInstance();
-    	    endDate.setTime(formatter.parse(strEndDate));
-	        String strEndDateCheckbox = request.getParameter("lessonAvailability_end_checkbox");
-		    if (strEndDateCheckbox != null){
-		        if (strEndDateCheckbox.equals("1")){
-	    	        bbContent.setEndDate(endDate);
-	        	}
-	    	}
-	    }
-
-        // Set the New LAMS Lesson content data (in Blackboard)
-        bbContent.setTitle(strTitle);
-		bbContent.setIsAvailable(isAvailable);
-		bbContent.setIsDescribed(isGradecenter);//isDescribed field is used for storing isGradecenter parameter
-        bbContent.setIsTracked(isTracked);
-        bbContent.setAllowGuests(false);
-        bbContent.setContentHandler(LamsPluginUtil.CONTENT_HANDLE);
-
-        bbContent.setCourseId(courseId);
-        bbContent.setParentId(folderId);
-
-        bbContent.setRenderType(Content.RenderType.URL);
-        bbContent.setBody(description);
         
-        //  LDEV-3510 LAMS Lessons were always at the top and could not be moved. 
-        //bbContent.setPosition(0);
-
-        // Start the Lesson in LAMS (via Webservices) and capture the lesson ID
-        final long LamsLessonIdLong = LamsSecurityUtil.startLesson(ctx, ldId, strTitle, strDescription, false);
-        //error checking
-        if (LamsLessonIdLong == -1) {
-        	response.sendRedirect("lamsServerDown.jsp");
-        	System.exit(1);
-        }
-        String lamsLessonId = Long.toString(LamsLessonIdLong);
-        bbContent.setLinkRef(lamsLessonId);
-
-	    //Persist the New Lesson Object in Blackboard
-	    ContentDbPersister persister= (ContentDbPersister) bbPm.getPersister( ContentDbPersister.TYPE );
-	    persister.persist( bbContent );
-		PkId bbContentPkId = (PkId) bbContent.getId();
-		String bbContentId = "_" + bbContentPkId.getPk1() + "_" + bbContentPkId.getPk2();
-	    
-		//Build and set the content URL. Include new lesson id parameter
-		int bbport = request.getServerPort();// Add port to the url if the port is in the blackboard url.
-		String bbportstr = bbport != 0 ? ":" + bbport : "";
-		String contentUrl = request.getScheme()
-			+ "://" +
-			request.getServerName() +
-			bbportstr +
-			request.getContextPath() +
-			"/modules/learnermonitor.jsp?lsid=" + lamsLessonId +
-			"&course_id=" + request.getParameter("course_id") +
-			"&content_id=" + bbContentId +
-			"&ldid=" + ldId + 
-			"&isDisplayDesignImage=" + isDisplayDesignImage;
-		bbContent.setUrl(contentUrl);
-		persister.persist(bbContent);
-
-		//store internalContentId -> externalContentId. It's used for GradebookServlet
-		PortalExtraInfo pei = PortalUtil.loadPortalExtraInfo(null, null, "LamsStorage");
-		ExtraInfo ei = pei.getExtraInfo();
-		ei.setValue(bbContentId, lamsLessonId);
-		PortalUtil.savePortalExtraInfo(pei);
+        User user = ctx.getUser();
+        BlackboardUtil.storeBlackboardContent(request, response, user);
 		
-		//Create new Gradebook column for current lesson
-		if (isGradecenter) {
-		    String userName = ctx.getUser().getUserName();
-		    LineitemUtil.createLineitem(bbContent, ctx, userName);
-		}
+		String courseIdStr = request.getParameter("course_id");
+		String contentIdStr = request.getParameter("content_id");
+		// Internal Blackboard IDs for the course and parent content item
+		Id courseId = bbPm.generateId(Course.DATA_TYPE, courseIdStr);
+		Id folderId = bbPm.generateId(CourseDocument.DATA_TYPE, contentIdStr);
 		
-        String strReturnUrl = PlugInUtil.getEditableContentReturnURL(bbContent.getParentId(), courseId);
-        
-		// create a new thread to pre-add students and monitors to a lesson (in order to do this task in parallel not to slow down later work)
-		final Context ctxFinal = ctx;
-		Thread preaddLearnersMonitorsThread = new Thread(new Runnable() {
-		    @Override
-		    public void run() {
-				LamsSecurityUtil.preaddLearnersMonitorsToLesson(ctxFinal, LamsLessonIdLong);
-		    }
-		}, "LAMS_preaddLearnersMonitors_thread");
-		preaddLearnersMonitorsThread.start();
-        
+        String strReturnUrl = PlugInUtil.getEditableContentReturnURL(folderId, courseId);
 	%>
 
     <%-- Breadcrumbs --%>

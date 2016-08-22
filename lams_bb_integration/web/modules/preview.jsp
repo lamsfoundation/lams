@@ -21,6 +21,7 @@
 <%@ page import="blackboard.data.content.ContentFile"%>
 <%@ page import="blackboard.data.content.ContentFolder"%>
 <%@ page import="blackboard.data.content.CourseDocument"%>
+<%@ page import="blackboard.data.user.User"%>
 <%@ page import="blackboard.persist.Id"%>
 <%@ page import="blackboard.persist.BbPersistenceManager"%>
 <%@ page import="blackboard.persist.content.ContentDbPersister"%>
@@ -53,11 +54,12 @@
         String strTitle = request.getParameter("title").trim();
         
         String strLdId = request.getParameter("ldId").trim();
-        long ldId = Long.parseLong(strLdId);               
+        long ldId = Long.parseLong(strLdId);
         
-        // Start the Lesson for preview in LAMS (via Webservices)
-        // Capture the lesson ID
-        Long lsId = LamsSecurityUtil.startLesson(ctx, ldId, strTitle, "", true);
+        User user = ctx.getUser();
+        
+        // Start the Lesson for preview in LAMS (via Webservices) and get back the lesson ID
+        Long lsId = LamsSecurityUtil.startLesson(user, "Previews", ldId, strTitle, "", true);
         //error checking
         if (lsId == -1) {
         	response.sendRedirect("lamsServerDown.jsp");
