@@ -5,7 +5,7 @@
 	<html:base />
 	<lams:css />
 	<title><fmt:message key="activity.title" /></title>
-	<script type="text/javascript" src="<lams:LAMSURL />javascript/jquery.js"></script>
+	<script type="text/javascript" src="<lams:LAMSURL />includes/javascript/jquery.js"></script>
 
 	<script language="JavaScript" type="text/JavaScript">
 		function submitLearningMethod(actionMethod) {
@@ -25,9 +25,11 @@
 
 <body class="stripes">
 
+<!-- form needs to be outside page so that the form bean can be picked up by Page tag. -->
+<html:form action="/learning?validate=false" styleId="reflectionForm">
+
 <lams:Page type="learner" title="${generalLearnerFlowDTO.activityTitle}">
 
-	<html:form action="/learning?validate=false" styleId="reflectionForm">
 		<html:hidden property="method" value="submitReflection"/>
 		<html:hidden property="toolSessionID" />
 		<html:hidden property="userID" />
@@ -57,10 +59,12 @@
 				</html:link>
 		
 		</div>
-	</html:form>
 
 	<div id="footer"></div>
 </lams:Page>
+
+</html:form>
+
 
 <script type="text/javascript">
 	window.onload = function() {

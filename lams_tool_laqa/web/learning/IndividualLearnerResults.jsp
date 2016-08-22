@@ -9,7 +9,7 @@
 	<lams:css />
 	<title><fmt:message key="activity.title" /></title>
 
-	<script type="text/javascript" src="<lams:LAMSURL />javascript/jquery.js"></script>
+	<script type="text/javascript" src="<lams:LAMSURL />includes/javascript/jquery.js"></script>
 
 	<script language="JavaScript" type="text/JavaScript">
 		function submitLearningMethod(actionMethod) {
@@ -28,7 +28,10 @@
 
 <body class="stripes">
 
-	<lams:Page type="learner" title="${generalLearnerFlowDTO.activityTitle}">
+	<!-- form needs to be outside page so that the form bean can be picked up by Page tag. -->
+	<html:form action="/learning?validate=false" enctype="multipart/form-data" method="POST" target="_self">
+
+		<lams:Page type="learner" title="${generalLearnerFlowDTO.activityTitle}">
 
 		<!--  Announcements and advanced settings -->
 
@@ -55,8 +58,6 @@
 		</c:if>
 		<!-- End announcements -->
 
-		<!-- form -->
-		<html:form action="/learning?validate=false" enctype="multipart/form-data" method="POST" target="_self">
 			<html:hidden property="method" value="storeAllResults" />
 			<html:hidden property="toolSessionID" />
 			<html:hidden property="userID" />
@@ -170,12 +171,13 @@
 
 			</div>
 
-		</html:form>
-		<!-- end form -->
 
 		<div id="footer"></div>
 
-	</lams:Page>
+		</lams:Page>
+
+	</html:form>
+	<!-- end form -->
 
 </body>
 </lams:html>
