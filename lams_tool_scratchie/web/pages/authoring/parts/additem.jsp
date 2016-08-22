@@ -5,7 +5,7 @@
 <lams:html>
 	<lams:head>
 		<%@ include file="/common/header.jsp"%>
-		<link href="<lams:WebAppURL/>css/scratchie.css" rel="stylesheet" type="text/css" media="screen">
+		<link href="<lams:WebAppURL/>includes/css/scratchie.css" rel="stylesheet" type="text/css" media="screen">
  		<style media="screen,projection" type="text/css">
 			label.error { float: none; color: red; vertical-align: top; font-weight: bold; font-style: italic;}
 		</style>
@@ -44,6 +44,7 @@
     			var contentFolderID= $("#contentFolderID").val();
     			prepareAnswerEditorsForAjaxSubmit();
     			var answerList = $("#answerForm").serialize(true);
+    			$.ajaxSetup({ cache: true });
     			$(answerTargetDiv).load(
     				url,
     				{
