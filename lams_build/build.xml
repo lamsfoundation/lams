@@ -594,13 +594,13 @@
 		
 		
 		
-		<copy todir="${server.home}/modules/system/layers/base/org/tuckey/urlrewrite/main" overwrite="true" verbose="true">
+		<copy todir="${server.home}/modules/system/layers/base/org/tuckey/urlrewritefilter/main" overwrite="true" verbose="true">
 			<fileset dir="lib/urlrewritefilter">
 				<include name="urlrewritefilter-*.jar" />
 			</fileset>
 		</copy>
-		<copy tofile="${server.home}/modules/system/layers/base/org/tuckey/urlrewrite/main/module.xml"
-			  file="lib/urlrewritefilter/urlrewrite.module.xml" overwrite="true" verbose="true" />
+		<copy tofile="${server.home}/modules/system/layers/base/org/tuckey/urlrewritefilter/main/module.xml"
+			  file="lib/urlrewritefilter/urlrewritefilter.module.xml" overwrite="true" verbose="true" />
 		
 		
 		
