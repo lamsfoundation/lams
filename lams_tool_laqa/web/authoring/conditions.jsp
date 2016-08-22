@@ -2,6 +2,7 @@
 <c:set var="formBean" value="<%=request.getAttribute(org.apache.struts.taglib.html.Constants.BEAN_KEY)%>" />
 <script type="text/javascript">
 	function showConditionMessage(url) {
+		$.ajaxSetup({ cache: true });
 		$("#conditionInputArea").load(url, function() {
 			$(this).show();
 			$("#saveCancelButtons").hide();
