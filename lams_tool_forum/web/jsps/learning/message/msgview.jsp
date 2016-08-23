@@ -1,8 +1,6 @@
 <%@ page import="org.lamsfoundation.lams.tool.forum.util.ForumConstants"%>
 <%@ include file="/common/taglibs.jsp"%>
 
-<script type="text/javascript" src="<lams:LAMSURL />/includes/javascript/jquery.timeago.js"></script>
-
 <%--  msgDto, messageUid, msgLevel needs to be in the session elsewhere --%>
 
 <c:set var="hidden" value="${msgDto.message.hideFlag}" />
@@ -172,8 +170,3 @@
 </div> <!--  end div outermsg -->
 </div> <!--  end div no gutter -->
 
-<script type="text/javascript">
-		jQuery(document).ready(function() {
-			jQuery("time.timeago").timeago();
-		});
-</script>

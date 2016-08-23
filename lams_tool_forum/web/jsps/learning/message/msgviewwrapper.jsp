@@ -4,6 +4,8 @@
 
 <%@ include file="/common/taglibs.jsp"%>
 
+<script type="text/javascript" src="<lams:LAMSURL />/includes/javascript/jquery.timeago.js"></script>
+
 <script type="text/javascript">
 
 // The treetable code uses the clicks to expand and collapse the replies but then 
@@ -28,3 +30,9 @@ $(".attachments").click(function (e) {
 	<%@ include file="msgview.jsp"%>
 
 </c:forEach>
+
+<script type="text/javascript">
+		jQuery(document).ready(function() {
+			jQuery("time.timeago").timeago();
+		});
+</script>
