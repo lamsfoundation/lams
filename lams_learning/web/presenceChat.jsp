@@ -55,7 +55,7 @@
 			    	<div id="groupchat_messageArea" class="messageArea"></div>
 			    	<div id="groupchat_sendArea" class="sendArea">
 						<input id="groupchat_messageInput" onkeydown="javascript:handleMessageInput(event, groupChatInfo.nick)" type="text" class="messageInput" />
-						<input type="button" value="<fmt:message key="learner.im.send"/>" class="sendButton"
+						<input type="button" value="<fmt:message key="learner.im.send"/>" class="sendButton btn btn-default btn-xs"
 						       onclick="javascript:sendMessage(groupChatInfo.nick)" />
 					</div>
 	   			</div>
