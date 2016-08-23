@@ -25,3 +25,9 @@
 	<%@ include file="msgview.jsp"%>
 
 </c:forEach>
+
+  <script type="text/javascript">
+    jQuery(document).ready(function() {
+      jQuery("time.timeago").timeago();
+    });
+  </script>

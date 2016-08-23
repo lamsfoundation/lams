@@ -135,10 +135,4 @@
 
   </div>
 
-  <script type="text/javascript">
-
-    jQuery(document).ready(function() {
-      jQuery("time.timeago").timeago();
-    });
-  </script>
 
