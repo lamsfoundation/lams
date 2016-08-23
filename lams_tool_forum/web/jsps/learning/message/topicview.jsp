@@ -1,6 +1,8 @@
 <%@ page import="org.lamsfoundation.lams.tool.forum.util.ForumConstants"%>
 <%@ include file="/common/taglibs.jsp"%>
 
+<script type="text/javascript" src="<lams:LAMSURL />/includes/javascript/jquery.timeago.js"></script>
+
 <c:set var="maxThreadUid" value="0" />
 <c:set var="messageTablename" value="" />
 <c:set var="indent" value="10" />
@@ -118,6 +120,12 @@
 		</div>
 	</c:if>
 
+	<script type="text/javascript">
+		jQuery(document).ready(function() {
+			jQuery("time.timeago").timeago();
+		});
+	</script>
+	
 	<c:set var="pageSize" value="<%=ForumConstants.DEFAULT_PAGE_SIZE%>" />
 	<c:if test='${maxThreadUid > 0 && ! noMorePages}'>
 		<div class="text-center">
@@ -128,3 +136,4 @@
 			<a href="<c:out value="${more}"/>" class="btn btn-xs btn-default"><fmt:message key="label.show.more.messages" /></a>
 		</div>
 	</c:if>
+	
