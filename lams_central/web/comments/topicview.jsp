@@ -196,3 +196,10 @@
 	<a href="<c:out value="${more}"/>" class="btn btn-xs btn-default"><fmt:message key="label.show.more.messages" /></a>
 	</div>
 </c:if>
+
+  <script type="text/javascript">
+    jQuery(document).ready(function() {
+      jQuery("time.timeago").timeago();
+    });
+  </script>
+
