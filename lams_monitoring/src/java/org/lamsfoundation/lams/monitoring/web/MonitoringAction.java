@@ -1076,8 +1076,8 @@ public class MonitoringAction extends LamsDispatchAction {
 		// skip sequence activities as they are just for grouping
 		continue;
 	    }
-	    activities.add(activity);
-	    continue;
+	    // get real activity object, not proxy
+	    activities.add(getMonitoringService().getActivityById(activity.getActivityId()));
 	}
 
 	JSONObject responseJSON = new JSONObject();
