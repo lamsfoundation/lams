@@ -58,6 +58,24 @@
 				not-null="false"
 			</meta>
 		</property>
+		<property name="twoFactorAuthenticationEnabled" type="java.lang.Boolean"
+			column="two_factor_auth_enabled" not-null="true" length="1">
+			<meta attribute="field-description">
+				@hibernate.property
+				column="two_factor_auth_enabled"
+				length="1"
+				not-null="true"
+			</meta>
+		</property>
+		<property name="twoFactorAuthenticationSecret" type="java.lang.String" column="two_factor_auth_secret"
+			not-null="true" length="64">
+			<meta attribute="field-description">
+				@hibernate.property
+				column="two_factor_auth_secret"
+				length="64"
+				not-null="true"
+			</meta>
+		</property>
 		<property name="title" type="java.lang.String" column="title"
 			length="32">
 			<meta attribute="field-description">

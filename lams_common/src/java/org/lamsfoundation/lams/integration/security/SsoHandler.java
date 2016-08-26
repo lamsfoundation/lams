@@ -25,9 +25,11 @@ import java.security.AccessController;
 import javax.servlet.ServletContext;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang.math.NumberUtils;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
@@ -36,6 +38,8 @@ import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
+
+import com.warrenstrange.googleauth.GoogleAuthenticator;
 
 import io.undertow.Handlers;
 import io.undertow.server.session.Session;
@@ -96,6 +100,35 @@ public class SsoHandler implements ServletExtension {
 		    User user = getUserManagementService(session.getServletContext()).getUserByLogin(login);
 		    if (user != null) {
 			userDTO = user.getUserDTO();
+			
+			// if user is not yet authorized and has 2FA shared secret set up - redirect him to
+			// loginTwoFactorAuth.jsp to prompt user to enter his verification code (Time-based One-time Password)
+			if (request.getRemoteUser() == null && user.isTwoFactorAuthenticationEnabled()
+				&& user.getTwoFactorAuthenticationSecret() != null) {
+			    String verificationCodeStr = request.getParameter("verificationCode");		    
+			    int verificationCode = NumberUtils.toInt(verificationCodeStr);
+			    GoogleAuthenticator gAuth = new GoogleAuthenticator();
+			    boolean isCodeValid = gAuth.authorize(user.getTwoFactorAuthenticationSecret(),
+				    verificationCode);
+
+			    //user entered correct TOTP password
+			    if (isCodeValid) {
+				//do nothing and let regular login to happen
+				
+			    //user hasn't yet entered TOTP password (request came from login.jsp) or entered the wrong one
+			    } else {
+				session.setAttribute("login", login);
+				String password = request.getParameter("j_password");
+				session.setAttribute("password", password);
+				
+				//verificationCodeStr equals null in case request came from login.jsp
+				String redirectUrl = "/lams/loginTwoFactorAuth.jsp" + ((verificationCodeStr == null) ? "" : "?failed=true" );
+				HttpServletResponse response = (HttpServletResponse) context.getServletResponse();
+				response.sendRedirect(redirectUrl);
+				return;
+			    }
+			    
+			}
 		    }
 		}
 

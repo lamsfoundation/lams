@@ -66,23 +66,8 @@ import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 
 /**
- * @version
- *
- * <p>
- * <a href="ProfileAction.java.html"><i>View Source</i></a>
- * </p>
  *
  * @author <a href="mailto:fyang@melcoe.mq.edu.au">Fei Yang</a>
- *
- * Created at 14:21:53 on 28/06/2006
- */
-
-/**
- *
- *
- *
- *
- *
  */
 public class ProfileAction extends LamsDispatchAction {
 
@@ -229,6 +214,9 @@ public class ProfileAction extends LamsDispatchAction {
 	}
 	userForm.set("localeId", locale.getLocaleId());
 	request.setAttribute("locales", locales);
+	if (requestor.isTwoFactorAuthenticationEnabled()) {
+	    request.setAttribute("sharedSecret", requestor.getTwoFactorAuthenticationSecret());    
+	}
 	request.setAttribute("tab", "profile");
 
 	boolean hasLamsCommunityToken = requestor.getLamsCommunityToken() != null;

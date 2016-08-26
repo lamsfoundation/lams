@@ -53,6 +53,10 @@ public class User implements Serializable, Comparable {
      * persistent field
      */
     private String password;
+    
+    private Boolean twoFactorAuthenticationEnabled;
+    
+    private String twoFactorAuthenticationSecret;
 
     /**
      * persistent field
@@ -172,6 +176,7 @@ public class User implements Serializable, Comparable {
     /** default constructor */
     public User() {
 	changePassword = false;
+	twoFactorAuthenticationEnabled = false;
     }
 
     public Integer getUserId() {
@@ -204,6 +209,22 @@ public class User implements Serializable, Comparable {
 
     public void setSalt(String salt) {
 	this.salt = salt;
+    }
+    
+    public Boolean isTwoFactorAuthenticationEnabled() {
+	return twoFactorAuthenticationEnabled;
+    }
+
+    public void setTwoFactorAuthenticationEnabled(Boolean twoFactorAuthenticationEnabled) {
+	this.twoFactorAuthenticationEnabled = twoFactorAuthenticationEnabled;
+    }
+    
+    public String getTwoFactorAuthenticationSecret() {
+	return twoFactorAuthenticationSecret;
+    }
+
+    public void setTwoFactorAuthenticationSecret(String twoFactorAuthenticationSecret) {
+	this.twoFactorAuthenticationSecret = twoFactorAuthenticationSecret;
     }
 
     public String getTitle() {

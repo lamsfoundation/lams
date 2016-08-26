@@ -157,6 +157,15 @@
 		</td>
 	</tr>
 	
+	<c:if test="${not empty sharedSecret}">
+		<tr>
+			<td class="align-right"><fmt:message key="label.2FA.shared.secret"/>:</td>
+			<td>
+				${sharedSecret}
+			</td>
+		</tr>
+	</c:if>	
+	
 	<c:if test="${not empty lamsCommunityToken}">
 		<tr>
 			<td class="align-right">

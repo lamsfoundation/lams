@@ -53,29 +53,8 @@ import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 
 /**
- * @version
- *
- * <p>
- * <a href="IndexAction.java.html"><i>View Source</i></a>
- * </p>
  *
  * @author <a href="mailto:fyang@melcoe.mq.edu.au">Fei Yang</a>
- *
- * Created at 16:59:28 on 13/06/2006
- */
-/**
- * struts doclet
- *
- *
- *
- *
- *
- *
- *
- *
- *
- *
- *
  */
 public class IndexAction extends Action {
 
@@ -84,9 +63,6 @@ public class IndexAction extends Action {
 
     private static Logger log = Logger.getLogger(IndexAction.class);
     private static IUserManagementService userManagementService;
-    private static IExportToolContentService exportService;
-    private static IAuthoringService authoringService;
-    private static Configuration configurationService;
 
     @Override
     @SuppressWarnings("unchecked")
@@ -110,10 +86,13 @@ public class IndexAction extends Action {
 
 	// check if user is flagged as needing to change their password
 	User loggedInUser = getUserManagementService().getUserByLogin(request.getRemoteUser());
-	if (loggedInUser.getChangePassword() != null) {
-	    if (loggedInUser.getChangePassword()) {
-		return mapping.findForward("password");
-	    }
+	if (loggedInUser.getChangePassword() != null && loggedInUser.getChangePassword()) {
+	    return mapping.findForward("password");
+	}
+	
+	// check if user needs to get his shared two-factor authorization secret
+	if (loggedInUser.isTwoFactorAuthenticationEnabled() && loggedInUser.getTwoFactorAuthenticationSecret() == null) {
+	    return mapping.findForward("twoFactorAuthentication");
 	}
 
 	User user = getUserManagementService().getUserByLogin(userDTO.getLogin());

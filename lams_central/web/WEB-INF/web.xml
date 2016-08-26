@@ -665,6 +665,7 @@
 			<url-pattern>/forgotPassword.jsp</url-pattern>
 			<url-pattern>/forgotPasswordChange.jsp</url-pattern>
 			<url-pattern>/forgotPasswordProc.jsp</url-pattern>
+			<url-pattern>/loginTwoFactorAuth.jsp</url-pattern>
 			<url-pattern>/signup/*</url-pattern>
 			<url-pattern>/rest/*</url-pattern>
 			<url-pattern>/runtimeStats</url-pattern>

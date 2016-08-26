@@ -149,6 +149,11 @@
         redirect="false"
       />
       <forward
+        name="twoFactorAuthentication"
+        path="/twoFactorAuthentication.do"
+        redirect="false"
+      />
+      <forward
         name="portrait"
         path="/portrait.do"
         redirect="false"
@@ -617,6 +622,20 @@
       validate="true"
     >
     </action>
+    
+    <action
+      path="/twoFactorAuthentication"
+      type="org.lamsfoundation.lams.web.action.TwoFactorAuthenticationAction"
+      scope="request"
+      unknown="false"
+      validate="false"
+    >
+      <forward
+        name="secret"
+        path=".twoFactorAuthenticationSecret"
+        redirect="false"
+      />
+    </action>    
     <action
       path="/passwordChanged"
       type="org.lamsfoundation.lams.web.PasswordChangeAction"
