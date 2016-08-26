@@ -25,13 +25,13 @@
 			<table id="topicTable" class="table table-hover table-condensed">
 				<thead>
 					<tr>
-						<th width=""><fmt:message key="lable.topic.title.subject" /></th>
-						<th width="15%"><fmt:message key="lable.topic.title.startedby" /></th>
-						<th width="8%"><fmt:message key="lable.topic.title.replies" /></th>
-						<th width="8%"><fmt:message key="lable.topic.title.repliesnew" /></th>
-						<th width="20%"><fmt:message key="lable.topic.title.update" /></th>
+						<th class="col-xs-6"><fmt:message key="lable.topic.title.subject" /></th>
+						<th class="col-xs-2"><fmt:message key="lable.topic.title.startedby" /></th>
+						<th class="col-xs-1 hidden-xs" class="hidden-xs"><fmt:message key="lable.topic.title.replies" /></th>
+						<th class="col-xs-1 hidden-xs"><fmt:message key="lable.topic.title.repliesnew" /></th>
+						<th class="col-xs-2"><fmt:message key="lable.topic.title.update" /></th>
 						<c:if test="${not sessionMap.allowNewTopics and sessionMap.minimumReply ne 0}">
-							<th width="8%">&nbsp;</th>
+							<th class=">&nbsp;</th>
 						</c:if>
 					</tr>
 				</thead>
@@ -59,9 +59,9 @@
 									</c:set>
 								</c:if> <c:out value="${author}" escapeXml="true" /></td>
 
-							<td align="center"><c:out value="${topic.message.replyNumber}" /></td>
+							<td class="text-center hidden-xs"><c:out value="${topic.message.replyNumber}" /></td>
 
-							<td align="center"><c:out value="${topic.newPostingsNum}" /></td>
+							<td class="text-center hidden-xs"><c:out value="${topic.newPostingsNum}" /></td>
 							<td><lams:Date value="${topic.message.lastReplyDate}" timeago="true"/></td>
 							<c:if test="${not sessionMap.allowNewTopics and sessionMap.minimumReply ne 0}">
 								<td>${topic.numOfPosts}/${sessionMap.minimumReply}</td>
