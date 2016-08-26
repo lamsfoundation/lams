@@ -21,7 +21,6 @@
  * ****************************************************************
  */
 
-
 package org.lamsfoundation.lams.web;
 
 import javax.servlet.http.HttpServletRequest;
@@ -34,13 +33,6 @@ import org.apache.struts.action.ActionMapping;
 
 /**
  * @author jliew
- *
- *
- *
- *
- *
- *
- *
  */
 public class PasswordAction extends Action {
 

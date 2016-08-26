@@ -53,6 +53,10 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 	<definition name=".passwordChangeOk" path="/main.jsp">
 		<put name="profile" value="passwordChangeOkContent.jsp" />	
 	</definition>
+	
+	<definition name=".twoFactorAuthenticationSecret" path="/main.jsp">
+		<put name="profile" value="twoFactorAuthSecret.jsp"/>	
+	</definition>
 
 	<definition name=".error" path="/template.jsp">
 		<put name="titleKey" value="heading.general.error"/>
