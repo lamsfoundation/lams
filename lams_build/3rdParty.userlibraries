@@ -7,6 +7,7 @@
         <archive path="/lams_build/lib/apache-poi/xmlbeans-2.3.0.jar"/>
         <archive path="/lams_build/lib/autopatch/autopatch-1.4.2-lams.jar"/>
         <archive path="/lams_build/lib/autopatch/discovery-1.0.5-lams.jar"/>
+        <archive path="/lams_build/lib/googleauth/googleauth-1.1.1.jar"/>
         <archive path="/lams_build/lib/jakarta-commons/commons-fileupload.jar"/>
         <archive path="/lams_build/lib/jakarta-commons/commons-validator.jar"/>
         <archive path="/lams_build/lib/struts/struts-el.jar"/>

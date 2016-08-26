@@ -43,6 +43,7 @@
       <module name="org.apache.strutsel" export="true" />
       <module name="org.tuckey.urlrewritefilter" export="true" />
       <module name="com.thoughtworks.xstream" export="true" />
+      <module name="com.warrenstrange.googleauth" export="true" />
       <module name="io.undertow.core" export="true" />
   	  <module name="io.undertow.servlet" export="true" />
   	  <module name="org.joda.time" export="true" />

@@ -7,12 +7,14 @@ apache-poi        poi-3.10-FINAL-20140208.jar           3.10                   A
                   poi-ooxml-schemas-3.10-FINAL-20140208.jar
                   xmlbeans-2.4.0.jar					2.3.0
 
-autopatch		  autopatch-1.4.2-lams.jar			1.4.2-lams				   Apache License				 Tacit Knowledge				  automated Java patching system
+autopatch		  autopatch-1.4.2-lams.jar			    1.4.2-lams		       Apache License				 Tacit Knowledge				  automated Java patching system
 				  discovery-1.0.5-lams.jar				1.0.5-lams				  
 
 batik             batik-1.7.jar                         1.7                    Apache License 2.0            Apache                           toolkit for manipulating images in SVG format
 
 fckeditor         fckeditor-java-core-2.6.jar           2.6					   GPL, LGPL, MPL				 Frederico Caldeira Knabben       Java connector for CKEditor                                                        
+
+googleauth        googleauth-1.1.1.jar                  1.1.1				   Public Domain				 Enrico M. Crisostomo             Java server library that implements the Time-based One-time Password (TOTP) algorithm
 
 jakarta-commons   commons-digester-2.1.jar              2.1                    Apache Software License 2.0   Apache Software Foundation       XML -> Java object mapping tool
                   commons-fileupload.jar                1.0                    Apache Software License 1.1   Apache Software Foundation       File upload component for Java servlets
