@@ -20,7 +20,6 @@
  * ****************************************************************
  */
 
-
 package org.lamsfoundation.lams.questions;
 
 import java.io.File;
@@ -641,16 +640,18 @@ public class QuestionExporter {
     private void appendMaterialElements(Element materialElem, String text) {
 	String[] answerParts = parseImages(text);
 	for (String answerPart : answerParts) {
-	    if (answerPart.startsWith(QuestionExporter.IMAGE_MARKER)) {
-		String imageName = answerPart.substring(QuestionExporter.IMAGE_MARKER.length());
-		String imageType = "image/" + FileUtil.getFileExtension(imageName);
-		Element matimageElem = (Element) materialElem.appendChild(doc.createElement("matimage"));
-		matimageElem.setAttribute("imagtype", imageType);
-		matimageElem.setAttribute("uri", imageName);
-	    } else {
-		Element mattextElem = (Element) materialElem.appendChild(doc.createElement("mattext"));
-		mattextElem.setAttribute("texttype", "text/html");
-		mattextElem.appendChild(doc.createCDATASection(answerPart));
+	    if (StringUtils.isNotBlank(answerPart)) {
+		if (answerPart.startsWith(QuestionExporter.IMAGE_MARKER)) {
+		    String imageName = answerPart.substring(QuestionExporter.IMAGE_MARKER.length());
+		    String imageType = "image/" + FileUtil.getFileExtension(imageName);
+		    Element matimageElem = (Element) materialElem.appendChild(doc.createElement("matimage"));
+		    matimageElem.setAttribute("imagtype", imageType);
+		    matimageElem.setAttribute("uri", imageName);
+		} else {
+		    Element mattextElem = (Element) materialElem.appendChild(doc.createElement("mattext"));
+		    mattextElem.setAttribute("texttype", "text/html");
+		    mattextElem.appendChild(doc.createCDATASection(answerPart));
+		}
 	    }
 	}
     }
