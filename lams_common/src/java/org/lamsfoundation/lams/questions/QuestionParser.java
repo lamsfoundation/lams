@@ -567,7 +567,7 @@ public class QuestionParser {
 		.getLength(); questionElementIndex++) {
 	    Node questionElement = questionElements.item(questionElementIndex);
 	    String elementName = questionElement.getNodeName();
-	    if ("mattext".equalsIgnoreCase(elementName)) {
+	    if ("mattext".equalsIgnoreCase(elementName) && questionElement.getChildNodes().getLength() > 0) {
 		// it is a HTML part
 		String questionTextPart = ((CDATASection) questionElement.getChildNodes().item(0)).getData();
 		result.append(questionTextPart);
