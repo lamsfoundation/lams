@@ -24,13 +24,25 @@ public class UserDAO extends BaseDAO implements IUserDAO {
 	// support for custom search from a toolbar
 	GET_USERS = addNameSearch(GET_USERS, searchString);
 	//order by
-	GET_USERS += " ORDER BY CASE " + " WHEN :sortBy='userId' THEN user.userId "
-		+ " WHEN :sortBy='login' THEN user.login " + " WHEN :sortBy='firstName' THEN user.firstName "
-		+ " WHEN :sortBy='lastName' THEN user.lastName " + " WHEN :sortBy='email' THEN user.email " + " END "
-		+ sortOrder;
+	if ("userId".equals(sortBy)) {
+	    sortBy = "user.userId + 0";
+
+	} else if ("login".equals(sortBy)) {
+	    sortBy = "user.login";
+
+	} else if ("firstName".equals(sortBy)) {
+	    sortBy = "user.firstName";
+
+	} else if ("lastName".equals(sortBy)) {
+	    sortBy = "user.lastName";
+
+	} else if ("email".equals(sortBy)) {
+	    sortBy = "user.email";
+
+	}
+	GET_USERS += " ORDER BY " + sortBy + " " + sortOrder;
 
 	Query query = getSession().createQuery(GET_USERS);
-	query.setString("sortBy", sortBy);
 	query.setFirstResult(page * size);
 	query.setMaxResults(size);
 	List<Object[]> list = query.list();

@@ -149,7 +149,7 @@
 <table id="tablesorter">
 	<thead>
 		<tr>
-			<th width="3%" clas="{sorter: 'digit'}">
+			<th width="3%">
 				<fmt:message key="admin.user.userid"/>
 			</th>
 			<th width="15%" align="center">
