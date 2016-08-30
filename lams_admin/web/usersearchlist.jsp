@@ -18,6 +18,7 @@
 <script type="text/javascript" src="${lams}includes/javascript/jquery.tablesorter-widgets.js"></script>
 <script type="text/javascript">
   	$(document).ready(function(){
+  	
   		var $table = $(".tablesorter").tablesorter({
   			theme: 'bootstrap',
   			headerTemplate : '{content} {icon}',
@@ -134,7 +135,7 @@
 </p>
 
 <lams:TSTable numColumns="6"> 
-	<th width="3%" clas="{sorter: 'digit'}">
+	<th width="3%">
 		<fmt:message key="admin.user.userid"/>
 	</th>
 	<th width="15%" align="center">

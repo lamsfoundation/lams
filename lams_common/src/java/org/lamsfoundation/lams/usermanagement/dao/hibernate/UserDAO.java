@@ -19,18 +19,33 @@ public class UserDAO extends LAMSBaseDAO implements IUserDAO {
     @SuppressWarnings("unchecked")
     @Override
     public List<UserDTO> getAllUsersPaged(int page, int size, String sortBy, String sortOrder, String searchPhrase) {
+	
+	switch (sortBy) {
+	case "userId":
+	    sortBy = "user.userId + 0 ";
+	    break;
+	case "login":
+	    sortBy = "user.login ";
+	    break;
+	case "firstName":
+	    sortBy = "user.firstName ";
+	    break;
+	case "lastName":
+	    sortBy = "user.lastName ";
+	    break;
+	case "email":
+	    sortBy = "user.email ";
+	    break;
+	}
+	
 	StringBuilder queryBuilder = new StringBuilder(
 		"SELECT user.userId, user.login, user.firstName, user.lastName, user.email FROM User user WHERE user.disabledFlag=0 ");
 	// support for custom search from a toolbar
 	UserDAO.addNameSearch(queryBuilder, "user", searchPhrase);
 	//order by
-	queryBuilder
-		.append(" ORDER BY CASE WHEN :sortBy='userId' THEN user.userId WHEN :sortBy='login' THEN user.login WHEN :sortBy='firstName'"
-			+ " THEN user.firstName  WHEN :sortBy='lastName' THEN user.lastName WHEN :sortBy='email' THEN user.email END ")
-		.append(sortOrder);
+	queryBuilder.append(" ORDER BY ").append(sortBy).append(sortOrder);
 
 	Query query = getSession().createQuery(queryBuilder.toString());
-	query.setString("sortBy", sortBy);
 	query.setFirstResult(page * size);
 	query.setMaxResults(size);
 	List<Object[]> list = query.list();
