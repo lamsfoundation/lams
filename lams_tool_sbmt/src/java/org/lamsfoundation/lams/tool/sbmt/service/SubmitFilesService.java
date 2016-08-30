@@ -101,6 +101,7 @@ import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
 import org.lamsfoundation.lams.usermanagement.util.LastNameAlphabeticComparator;
 import org.lamsfoundation.lams.util.JsonUtil;
 import org.lamsfoundation.lams.util.MessageService;
+import org.lamsfoundation.lams.util.audit.IAuditService;
 import org.springframework.dao.DataAccessException;
 
 /**
@@ -140,6 +141,8 @@ public class SubmitFilesService
     private MessageService messageService;
 
     private IGradebookService gradebookService;
+
+    private IAuditService auditService;
 
     private SubmitFilesOutputFactory submitFilesOutputFactory;
 
@@ -616,7 +619,7 @@ public class SubmitFilesService
      *      java.lang.Long)
      */
     @Override
-    public List getFilesUploadedByUser(Integer userID, Long sessionID, Locale currentLocale) {
+    public List getFilesUploadedByUser(Integer userID, Long sessionID, Locale currentLocale, boolean includeRemovedFiles) {
 	List<SubmissionDetails> list = submissionDetailsDAO.getBySessionAndLearner(sessionID, userID);
 	SortedSet details = new TreeSet(this.new FileDtoComparator());
 	if (list == null) {
@@ -625,10 +628,17 @@ public class SubmitFilesService
 
 	NumberFormat numberFormat = currentLocale != null ? NumberFormat.getInstance(currentLocale) : null;
 	for (SubmissionDetails submissionDetails : list) {
-	    FileDetailsDTO detailDto = new FileDetailsDTO(submissionDetails, numberFormat);
-	    details.add(detailDto);
+	    if ( includeRemovedFiles || ! submissionDetails.isRemoved() ) {
+		FileDetailsDTO detailDto = new FileDetailsDTO(submissionDetails, numberFormat);
+		details.add(detailDto);
+	    }
 	}
 	return new ArrayList(details);
+    }
+
+    @Override
+    public SubmissionDetails getSubmissionDetail(Long detailId) {
+	return submissionDetailsDAO.getSubmissionDetailsByID(detailId);
     }
 
     /**
@@ -732,6 +742,49 @@ public class SubmitFilesService
 	}
     }
 
+ 
+    @Override
+    public void removeLearnerFile(Long detailID, UserDTO monitor) {
+
+	SubmissionDetails detail = submissionDetailsDAO.getSubmissionDetailsByID(detailID);
+
+	if (detail != null) {
+
+	    auditRemoveRestore(monitor, detail, "audit.file.delete");
+
+	    detail.setRemoved(true);
+	    submissionDetailsDAO.update(detail);
+	}
+    }
+
+    @Override
+    public void restoreLearnerFile(Long detailID, UserDTO monitor) {
+	
+	SubmissionDetails detail = submissionDetailsDAO.getSubmissionDetailsByID(detailID);
+
+	if (detail != null) {
+	    
+	    auditRemoveRestore(monitor, detail,"audit.file.restore");
+	    
+	    detail.setRemoved(false);
+	    submissionDetailsDAO.update(detail);
+	}
+
+    }
+
+    private void auditRemoveRestore(UserDTO monitor, SubmissionDetails detail, String i18nKey) {
+	SubmitUser learner = detail.getLearner();
+	StringBuilder instructorTxt = new StringBuilder(monitor.getLogin()).append(" (").append(monitor.getUserID()).append(") ")
+	    .append(monitor.getFirstName()).append(" ").append(monitor.getLastName());
+	StringBuilder learnerTxt = new StringBuilder(learner.getLogin()).append("  (").append(learner.getUserID()).append(") ")
+	    .append(learner.getFirstName()).append(" ").append(learner.getLastName());
+
+	String auditMsg = getLocalisedMessage(i18nKey, new Object[] { instructorTxt.toString(), detail.getFilePath(),
+	    learnerTxt.toString() });
+	auditService.log(SbmtConstants.AUDIT_LOG_MODULE_NAME, auditMsg);
+    }
+
+
     @Override
     public IVersionedNode downloadFile(Long uuid, Long versionID) throws SubmitFilesException {
 	ITicket ticket = getRepositoryLoginTicket();
@@ -775,7 +828,7 @@ public class SubmitFilesService
 	    details = (SubmissionDetails) iter.next();
 	    report = details.getReport();
 	    report.setDateMarksReleased(new Date());
-	    if (notifyLearnersOnMarkRelease) {
+	    if (notifyLearnersOnMarkRelease && ! details.isRemoved()) {
 		SubmitUser user = details.getLearner();
 		StringBuilder notificationMessage = notificationMessages.get(user.getUserID());
 		if (notificationMessage == null) {
@@ -835,15 +888,16 @@ public class SubmitFilesService
 	if (detailsList != null) {
 	    Float totalMark = null;
 	    for (SubmissionDetails details : detailsList) {
-		SubmitFilesReport report = details.getReport();
-		if (report != null) {
-		    if (totalMark == null) {
-			totalMark = details.getReport().getMarks();
-		    } else if (report.getMarks() != null) {
-			totalMark += report.getMarks();
+		if ( ! details.isRemoved() ) {
+		    SubmitFilesReport report = details.getReport();
+		    if (report != null) {
+			if (totalMark == null) {
+			    totalMark = details.getReport().getMarks();
+			} else if (report.getMarks() != null) {
+			    totalMark += report.getMarks();
+			}
 		    }
 		}
-
 	    }
 	    if (totalMark != null) {
 		Double mark = new Double(totalMark);
@@ -1133,6 +1187,14 @@ public class SubmitFilesService
 
     public void setMessageService(MessageService messageService) {
 	this.messageService = messageService;
+    }
+
+    public IAuditService getAuditService() {
+        return auditService;
+    }
+
+    public void setAuditService(IAuditService auditService) {
+        this.auditService = auditService;
     }
 
     public void setGradebookService(IGradebookService gradebookService) {

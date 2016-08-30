@@ -91,6 +91,8 @@ public class SbmtConstants {
 
     public static final String SUBMITTED_ITEMS_DEFINITION_NAME = "submitted.items.output.definition.sbmt";
 
+    public static final String AUDIT_LOG_MODULE_NAME = "Submit Files";
+    
     public static final int SORT_BY_NO = 1;
     public static final int SORT_BY_USERNAME_ASC = 2;
     public static final int SORT_BY_USERNAME_DESC = 3;

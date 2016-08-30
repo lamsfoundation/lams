@@ -65,11 +65,14 @@ public class SubmissionDetails implements Serializable, Cloneable {
 
     private SubmitUser learner;
 
+    private Boolean removed;
+    
     /** persistent field, but not cloned to avoid to clone block */
     private SubmitFilesSession submitFileSession;
 
     /** default constructor */
     public SubmissionDetails() {
+	this.removed = Boolean.FALSE;
     }
 
     /**
@@ -241,5 +244,14 @@ public class SubmissionDetails implements Serializable, Cloneable {
     public void setLearner(SubmitUser learner) {
 	this.learner = learner;
     }
+
+    public Boolean isRemoved() {
+	return removed;
+    }
+
+    public void setRemoved(Boolean removed) {
+	this.removed = removed;
+    }
+
 
 }

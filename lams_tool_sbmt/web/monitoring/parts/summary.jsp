@@ -66,9 +66,7 @@
 							} else {
 								rows += '<fmt:message key="label.no"/>';
 							}
-							if ( userData["numFiles"] > 0 ) {
-								rows += ' [<a href=\"javascript:viewMark('+userData["userID"]+','+$(table).attr("data-session-id")+');\"><fmt:message key="label.monitoring.Mark.button" /></a>]';
-							} 
+							rows += ' [<a href=\"javascript:viewMark('+userData["userID"]+','+$(table).attr("data-session-id")+');\"><fmt:message key="label.view.files" /></a>]';
 							rows += '</td>';
 
 							<c:if test="${reflectOn}">
@@ -176,7 +174,7 @@
         	<span class="panel-title collapsable-icon-left">
         	<a class="${status.first ? '' : 'collapsed'}" role="button" data-toggle="collapse" href="#collapse${sessionDto.sessionID}" 
 					aria-expanded="${status.first ? 'false' : 'true'}" aria-controls="collapse${sessionDto.sessionID}" >
-			<fmt:message key="message.session.name" />:	<c:out value="${sessionDto.sessionName}" /></a>
+			<fmt:message key="label.session.name" />:	<c:out value="${sessionDto.sessionName}" /></a>
 			</span>
         </div>
         

@@ -37,6 +37,7 @@ import java.util.SortedSet;
 import java.util.TimeZone;
 import java.util.TreeSet;
 
+import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
@@ -54,8 +55,8 @@ import org.apache.struts.action.DynaActionForm;
 import org.apache.tomcat.util.json.JSONArray;
 import org.apache.tomcat.util.json.JSONException;
 import org.apache.tomcat.util.json.JSONObject;
-import org.lamsfoundation.lams.notebook.model.NotebookEntry;
-import org.lamsfoundation.lams.notebook.service.CoreNotebookConstants;
+import org.lamsfoundation.lams.events.IEventNotificationService;
+import org.lamsfoundation.lams.tool.sbmt.SubmissionDetails;
 import org.lamsfoundation.lams.tool.sbmt.SubmitFilesContent;
 import org.lamsfoundation.lams.tool.sbmt.SubmitFilesSession;
 import org.lamsfoundation.lams.tool.sbmt.SubmitUser;
@@ -63,7 +64,6 @@ import org.lamsfoundation.lams.tool.sbmt.dto.AuthoringDTO;
 import org.lamsfoundation.lams.tool.sbmt.dto.FileDetailsDTO;
 import org.lamsfoundation.lams.tool.sbmt.dto.SessionDTO;
 import org.lamsfoundation.lams.tool.sbmt.dto.StatisticDTO;
-import org.lamsfoundation.lams.tool.sbmt.dto.SubmitUserDTO;
 import org.lamsfoundation.lams.tool.sbmt.service.ISubmitFilesService;
 import org.lamsfoundation.lams.tool.sbmt.service.SubmitFilesServiceProxy;
 import org.lamsfoundation.lams.tool.sbmt.util.SbmtConstants;
@@ -71,6 +71,7 @@ import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.util.DateUtil;
 import org.lamsfoundation.lams.util.MessageService;
 import org.lamsfoundation.lams.util.WebUtil;
+import org.lamsfoundation.lams.util.audit.IAuditService;
 import org.lamsfoundation.lams.web.action.LamsDispatchAction;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
@@ -197,16 +198,17 @@ public class MonitoringAction extends LamsDispatchAction {
 	    responseRow.put(SbmtConstants.USER_ID, user.getUserID());
 	    responseRow.put(SbmtConstants.ATTR_USER_FULLNAME, StringEscapeUtils.escapeHtml(user.getFullName()));
 
-	    if (userAndReflection.length > 1) {
-		responseRow.put(SbmtConstants.ATTR_USER_NUM_FILE, userAndReflection[1]);
-	    }
-
 	    if (userAndReflection.length > 2) {
-		responseRow.put(SbmtConstants.ATTR_USER_FILE_MARKED, (Integer) userAndReflection[2] > 0);
+		responseRow.put(SbmtConstants.ATTR_USER_NUM_FILE, 
+			(Integer)userAndReflection[1] - (Integer)userAndReflection[2]);
 	    }
 
 	    if (userAndReflection.length > 3) {
-		responseRow.put(SbmtConstants.ATTR_USER_REFLECTION, userAndReflection[3]);
+		responseRow.put(SbmtConstants.ATTR_USER_FILE_MARKED, (Integer) userAndReflection[3] > 0);
+	    }
+
+	    if (userAndReflection.length > 4) {
+		responseRow.put(SbmtConstants.ATTR_USER_REFLECTION, userAndReflection[4]);
 	    }
 
 	    rows.put(responseRow);
@@ -326,30 +328,32 @@ public class MonitoringAction extends LamsDispatchAction {
 
 		while (dtoIter.hasNext()) {
 		    FileDetailsDTO dto = (FileDetailsDTO) dtoIter.next();
-		    row = sheet.createRow(idx++);
+		    if ( ! dto.isRemoved() ) {
+			row = sheet.createRow(idx++);
 
-		    int count = 0;
+			int count = 0;
 
-		    cell = row.createCell(count++);
-		    cell.setCellValue(dto.getOwner().getFullName());
+			cell = row.createCell(count++);
+			cell.setCellValue(dto.getOwner().getFullName());
 
-		    ++count;
+			++count;
 
-		    sheet.setColumnWidth(count, 8000);
+			sheet.setColumnWidth(count, 8000);
 
-		    cell = row.createCell(count++);
-		    cell.setCellValue(dto.getFilePath());
+			cell = row.createCell(count++);
+			cell.setCellValue(dto.getFilePath());
 
-		    cell = row.createCell(count++);
-		    cell.setCellValue(dto.getFileDescription());
+			cell = row.createCell(count++);
+			cell.setCellValue(dto.getFileDescription());
 
-		    cell = row.createCell(count++);
+			cell = row.createCell(count++);
 
-		    String marks = dto.getMarks();
-		    cell.setCellValue(marks != null ? marks : "");
+			String marks = dto.getMarks();
+			cell.setCellValue(marks != null ? marks : "");
 
-		    cell = row.createCell(count++);
-		    cell.setCellValue(dto.getComments());
+			cell = row.createCell(count++);
+			cell.setCellValue(dto.getComments());
+		    }
 		}
 	    }
 
@@ -433,7 +437,7 @@ public class MonitoringAction extends LamsDispatchAction {
 
 	submitFilesService = getSubmitFilesService();
 	// return FileDetailsDTO list according to the given userID and sessionID
-	List files = submitFilesService.getFilesUploadedByUser(userID, sessionID, request.getLocale());
+	List files = submitFilesService.getFilesUploadedByUser(userID, sessionID, request.getLocale(), true);
 
 	request.setAttribute(AttributeNames.PARAM_TOOL_SESSION_ID, sessionID);
 	request.setAttribute("report", files);
@@ -463,6 +467,107 @@ public class MonitoringAction extends LamsDispatchAction {
 	return mapping.findForward("listAllMarks");
 
     }
+
+    /**
+     * Remove the original file created by the learner. Does not actually remove it from the content repository - merely
+     * makes it as removed.
+     */
+    public ActionForward removeLearnerFile(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+	    HttpServletResponse response) throws ServletException {
+	return removeRestoreLearnerFile(mapping, form, request, response, true);
+    }
+
+    /**
+     * Remove the original file created by the learner. Does not actually remove it from the content repository - merely
+     * makes it as removed.
+     */
+    public ActionForward restoreLearnerFile(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+	    HttpServletResponse response) throws ServletException {
+	return removeRestoreLearnerFile(mapping, form, request, response, false);
+    }
+
+    private ActionForward removeRestoreLearnerFile(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+	    HttpServletResponse response, boolean remove) throws ServletException {
+
+	UserDTO currentUser = (UserDTO) SessionManager.getSession().getAttribute(AttributeNames.USER);
+
+	if (submitFilesService == null) {
+	    submitFilesService = getSubmitFilesService();
+	}
+
+	Long sessionID = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_SESSION_ID);
+	Integer learnerUserID = WebUtil.readIntParam(request, AttributeNames.PARAM_USER_ID);
+	Long detailID = WebUtil.readLongParam(request, "detailID");
+
+	SubmissionDetails fileToProcess = submitFilesService.getSubmissionDetail(detailID);
+
+	if (fileToProcess == null) {
+	    StringBuilder builder = new StringBuilder("Unable to ").append(remove ? "remove" : "restore")
+		    .append("file as file does not exist. Requested by user ").append(currentUser.getUserID())
+		    .append(" for file ").append(detailID).append(" for user ").append(learnerUserID);
+	    log.error(builder.toString());
+	    throw new ServletException("Invalid call to "+(remove ? "remove" : "restore")+" file. See the server log for more details.");
+	} else {
+
+	    if (!fileToProcess.getSubmitFileSession().getSessionID().equals(sessionID)
+		    || !fileToProcess.getLearner().getUserID().equals(learnerUserID)) {
+		StringBuilder builder = new StringBuilder("Unable to ").append(remove ? "remove" : "restore")
+			.append("file as values in database do not match values in request. Requested by user ")
+			.append(currentUser.getUserID()).append(" for file ").append(detailID).append(" for user ")
+			.append(learnerUserID).append(" in session ").append(sessionID);
+		log.error(builder.toString());
+		throw new ServletException("Invalid call to "+(remove ? "remove" : "restore")+" file. See the server log for more details.");
+	    } else {
+
+		if (remove) {
+		    submitFilesService.removeLearnerFile(detailID, currentUser);
+		    notifyRemoveRestore(fileToProcess, "event.file.restore.subject", "event.file.restore.body", "restore file");
+
+
+		} else {
+		    submitFilesService.restoreLearnerFile(detailID, currentUser);
+		    notifyRemoveRestore(fileToProcess, "event.file.delete.subject", "event.file.delete.body", "delete file");
+		}
+
+	    }
+	}
+
+	List files = submitFilesService.getFilesUploadedByUser(learnerUserID, sessionID, request.getLocale(), true);
+
+	request.setAttribute(AttributeNames.PARAM_TOOL_SESSION_ID, sessionID);
+	request.setAttribute("report", files);
+	return mapping.findForward("listMark");
+    }
+
+    /** Notify the user by email of the file change. Need to do it here rather than in the service so that any issues are caught and logged
+     * without stuffing up the transaction. 
+     */
+    private void notifyRemoveRestore(SubmissionDetails detail, String i18nSubjectKey, String i18nBodyKey, String errorSubject) {
+	Long contentID = detail.getSubmitFileSession().getContent().getContentID();
+	Integer learnerID = detail.getLearner().getUserID();
+
+	// Can't just create a new subscription then call triggerForSingleUser() as 
+	// it needs a subscription id, which doesn't exist for a subscription created in the same 
+	// transaction. So reuse the existing RELEASE MARKS event and subscription (created when
+	// a file is uploaded) and override both the subject and the message.
+
+	try {
+	    boolean eventExists = submitFilesService.getEventNotificationService().eventExists(SbmtConstants.TOOL_SIGNATURE,
+		    SbmtConstants.EVENT_NAME_NOTIFY_LEARNERS_ON_MARK_RELEASE, contentID);
+
+	    if (eventExists) {
+		submitFilesService.getEventNotificationService().triggerForSingleUser(SbmtConstants.TOOL_SIGNATURE,
+			SbmtConstants.EVENT_NAME_NOTIFY_LEARNERS_ON_MARK_RELEASE, contentID, learnerID,
+			submitFilesService.getLocalisedMessage(i18nSubjectKey, null),
+			submitFilesService.getLocalisedMessage(i18nBodyKey, new Object[] { detail.getFilePath() }));
+	    } else {
+		log.error("Unable to notify user of "+errorSubject+". contentID="+contentID+" learner="+learnerID+" file "+detail.getFilePath()+" as "+SbmtConstants.EVENT_NAME_NOTIFY_LEARNERS_ON_MARK_RELEASE+" event is missing");
+	    }
+	}  catch ( Exception e) {
+            log.error("Unable to notify user of "+errorSubject+". contentID="+contentID+" learner="+learnerID+" file "+detail.getFilePath()+" due to exception "+e.getMessage(),e);
+        }
+    }
+
 
     // **********************************************************
     // Private methods
@@ -519,4 +624,5 @@ public class MonitoringAction extends LamsDispatchAction {
 	// request.setAttribute(AttributeNames.PARAM_TOOL_SESSION_ID,sessionID);
 	request.setAttribute("sessions", sessions);
     }
+    
 }

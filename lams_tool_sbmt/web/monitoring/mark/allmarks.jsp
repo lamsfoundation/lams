@@ -30,7 +30,7 @@
 	<table class="table table-condensed">
 		<c:forEach var="user" items="${reports}">
 			<c:forEach items="${user.value}" var="fileInfo" varStatus="status">
-				<%@include file="filelist.jsp"%>
+				<%@include file="fileinfo.jsp"%>
 			</c:forEach>
 		</c:forEach>
 		<tr>

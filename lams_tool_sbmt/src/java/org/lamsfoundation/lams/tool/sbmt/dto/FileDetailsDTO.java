@@ -69,6 +69,8 @@ public class FileDetailsDTO implements Serializable {
     private boolean finished;
     //if this file uploaded by current learner
     private boolean currentLearner;
+    
+    private boolean removed;
 
     /**
      * @param details
@@ -94,6 +96,7 @@ public class FileDetailsDTO implements Serializable {
 	this.dateOfSubmission = details.getDateOfSubmission();
 	this.uuID = details.getUuid();
 	this.versionID = details.getVersionID();
+	this.removed = details.isRemoved();
 	SubmitFilesReport report = details.getReport();
 	if (report != null) {
 	    this.reportID = report.getReportID();
@@ -310,5 +313,13 @@ public class FileDetailsDTO implements Serializable {
 
     public void setMarkFileVersionID(Long markFileVersionID) {
 	this.markFileVersionID = markFileVersionID;
+    }
+
+    public boolean isRemoved() {
+	return removed;
+    }
+
+    public void setRemoved(boolean removed) {
+	this.removed = removed;
     }
 }

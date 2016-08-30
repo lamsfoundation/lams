@@ -131,7 +131,7 @@ public class SubmitUserDAO extends LAMSBaseDAO implements ISubmitUserDAO {
 
 	// Basic select for the user records
 	StringBuilder queryText = new StringBuilder();
-	queryText.append("SELECT user.*, COUNT(details.submission_id) numFiles, count(report.marks) numFilesMarked ");
+	queryText.append("SELECT user.*, COUNT(details.submission_id) numFiles, SUM(details.removed) numFilesRemoved, count(report.marks) numFilesMarked ");
 	queryText.append(notebookEntryStrings != null ? notebookEntryStrings[0] : ", NULL notebookEntry");
 	queryText.append(" FROM tl_lasbmt11_user user ");
 	queryText.append(" LEFT JOIN tl_lasbmt11_submission_details details ON user.uid = details.learner_id ");
@@ -142,7 +142,7 @@ public class SubmitUserDAO extends LAMSBaseDAO implements ISubmitUserDAO {
 	    queryText.append(notebookEntryStrings[1]);
 	}
 
-	queryText.append(" WHERE user.session_id = :sessionId ");
+	queryText.append(" WHERE user.session_id = :sessionId");
 
 	// If filtering by name add a name based where clause
 	buildNameSearch(searchString, queryText);
@@ -154,7 +154,8 @@ public class SubmitUserDAO extends LAMSBaseDAO implements ISubmitUserDAO {
 	queryText.append(" ORDER BY " + sortingOrder);
 
 	SQLQuery query = getSession().createSQLQuery(queryText.toString());
-	query.addEntity("user", SubmitUser.class).addScalar("numFiles", IntegerType.INSTANCE)
+	query.addEntity("user", SubmitUser.class)
+		.addScalar("numFiles", IntegerType.INSTANCE).addScalar("numFilesRemoved", IntegerType.INSTANCE)
 		.addScalar("numFilesMarked", IntegerType.INSTANCE).addScalar("notebookEntry", StringType.INSTANCE)
 		.setLong("sessionId", sessionId.longValue()).setFirstResult(page * size).setMaxResults(size);
 	return query.list();
