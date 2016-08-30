@@ -62,6 +62,7 @@ import blackboard.persist.gradebook.ScoreDbPersister;
 import blackboard.persist.user.UserDbLoader;
 import blackboard.platform.BbServiceManager;
 import blackboard.platform.context.ContextManager;
+import blackboard.util.StringUtil;
 
 /**
  * Deals with Blackboard Grade Center.
@@ -116,9 +117,10 @@ public class GradebookServlet extends HttpServlet {
 	    Id userId = user.getId();
 
 	    String serviceURL = LamsSecurityUtil.getServerAddress() + "/services/xml/LessonManager?"
-		    + LamsSecurityUtil.generateAuthenticateParameters(userName) + "&courseId="
-		    + "&method=toolOutputsUser&lsId=" + lamsLessonIdParam + "&outputsUser="
-		    + URLEncoder.encode(userName, "UTF8");
+		    + LamsSecurityUtil.generateAuthenticateParameters(userName)
+		    + "&method=gradebookMarksUser"
+		    + "&lsId=" + lamsLessonIdParam 
+		    + "&outputsUser=" + URLEncoder.encode(userName, "UTF8");
 	    
 	    URL url = new URL(serviceURL);
 	    URLConnection conn = url.openConnection();
@@ -144,57 +146,70 @@ public class GradebookServlet extends HttpServlet {
 	    DocumentBuilder db = dbf.newDocumentBuilder();
 	    Document document = db.parse(is);
 	    
-	    NodeList activities = document.getDocumentElement().getFirstChild().getChildNodes();
+	    Node lesson = document.getDocumentElement().getFirstChild();
+	    Long maxResult = new Long(lesson.getAttributes().getNamedItem("lessonMaxPossibleMark").getNodeValue());
+	    
+	    Node learnerResult = lesson.getFirstChild();
+	    String userTotalMarkStr = learnerResult.getAttributes().getNamedItem("userTotalMark").getNodeValue();
+	    if (!StringUtil.isEmpty(userTotalMarkStr)) {
+		double userResult = new Double(userTotalMarkStr);
 
-	    float maxResult = 0;
-	    float userResult = 0;
-	    for (int i = 0; i < activities.getLength(); i++) {
-		Node activity = activities.item(i);
-		
-		for (int j = 0; j < activity.getChildNodes().getLength(); j++) {
-		    
-		    Node toolOutput = activity.getChildNodes().item(j);
-		    String toolOutputName = toolOutput.getAttributes().getNamedItem("name").getNodeValue();
-		    // The only numeric outputs we get from LAMS are for the MCQ and Assessment activities
-		    // learner.total.score = Assessment 
-		    // learner.mark = MCQ
-		    if ("learner.mark".equals(toolOutputName) || "learner.total.score".equals(toolOutputName)) {
-			String userResultStr = toolOutput.getAttributes().getNamedItem("output").getNodeValue();
-			String maxResultStr = toolOutput.getAttributes().getNamedItem("marksPossible").getNodeValue();
-			
-			userResult += Float.parseFloat(userResultStr);
-			maxResult += Float.parseFloat(maxResultStr);
-		    }
+		Lineitem lineitem = LineitemUtil.getLineitem(userId, lamsLessonIdParam);
+		if (lineitem == null) {
+		    throw new ServletException(
+			    "Lineitem was not found for userId:" + userId + " and lamsLessonId:" + lamsLessonIdParam);
 		}
-		
-	    }
-            
-	    Lineitem lineitem = LineitemUtil.getLineitem(userId, lamsLessonIdParam);
-	    if (lineitem == null) {
-		throw new ServletException("Lineitem was not found for userId:" + userId + " and lamsLessonId:" + lamsLessonIdParam);
-	    }
-	    //do not remove the following line: it's required to instantiate the object
-	    logger.info("Record score for " +lineitem.getName() + " lesson. It now has "+ lineitem.getScores().size() + " scores.");
+		//do not remove the following line: it's required to instantiate the object
+		logger.info("Record score for " + lineitem.getName() + " lesson. It now has "
+			+ lineitem.getScores().size() + " scores.");
 
-	    // store new score
-	    CourseMembership courseMembership = courseMembershipLoader.loadByCourseAndUserId(lineitem.getCourseId(), userId);
-	    Score currentScore = null;
-	    try {
-		currentScore = scoreLoader.loadByCourseMembershipIdAndLineitemId(courseMembership.getId(), lineitem.getId());
-	    } catch (KeyNotFoundException c) {
-		currentScore = new Score();
-		currentScore.setLineitemId(lineitem.getId());
-		currentScore.setCourseMembershipId(courseMembership.getId());
-	    }
+		// store new Score
+		CourseMembership courseMembership = courseMembershipLoader.loadByCourseAndUserId(lineitem.getCourseId(),
+			userId);
+		Score currentScore = null;
+		try {
+		    currentScore = scoreLoader.loadByCourseMembershipIdAndLineitemId(courseMembership.getId(),
+			    lineitem.getId());
+		} catch (KeyNotFoundException c) {
+		    currentScore = new Score();
+		    currentScore.setLineitemId(lineitem.getId());
+		    currentScore.setCourseMembershipId(courseMembership.getId());
+		}
 
-	    //set score grade. if Lams supplies one (and lineitem will have score type) we set score; otherwise (and lineitme of type Complete/Incomplete) we set 0
-	    float gradebookMark = 0;
-	    if (maxResult > 0) {
-		gradebookMark = (userResult / maxResult) * Constants.GRADEBOOK_POINTS_POSSIBLE;
+		//set Score grade. if Lams supplies one (and lineitem will have score type) we set score; otherwise (and lineitme of type Complete/Incomplete) we set 0
+		double gradebookMark = 0;
+		if (maxResult > 0) {
+		    gradebookMark = (userResult / maxResult) * Constants.GRADEBOOK_POINTS_POSSIBLE;
+		}
+		currentScore.setGrade(new DecimalFormat("##.##").format(gradebookMark));
+		currentScore.validate();
+		scorePersister.persist(currentScore);
 	    }
-	    currentScore.setGrade(new DecimalFormat("##.##").format(gradebookMark));
-	    currentScore.validate();
-	    scorePersister.persist(currentScore);
+	    
+//	    NodeList activities = document.getDocumentElement().getFirstChild().getChildNodes();
+//
+//	    float maxResult = 0;
+//	    float userResult = 0;
+//	    for (int i = 0; i < activities.getLength(); i++) {
+//		Node activity = activities.item(i);
+//		
+//		for (int j = 0; j < activity.getChildNodes().getLength(); j++) {
+//		    
+//		    Node toolOutput = activity.getChildNodes().item(j);
+//		    String toolOutputName = toolOutput.getAttributes().getNamedItem("name").getNodeValue();
+//		    // The only numeric outputs we get from LAMS are for the MCQ and Assessment activities
+//		    // learner.total.score = Assessment 
+//		    // learner.mark = MCQ
+//		    if ("learner.mark".equals(toolOutputName) || "learner.total.score".equals(toolOutputName)) {
+//			String userResultStr = toolOutput.getAttributes().getNamedItem("output").getNodeValue();
+//			String maxResultStr = toolOutput.getAttributes().getNamedItem("marksPossible").getNodeValue();
+//			
+//			userResult += Float.parseFloat(userResultStr);
+//			maxResult += Float.parseFloat(maxResultStr);
+//		    }
+//		}
+//		
+//	    }
 	    
 	} catch (MalformedURLException e) {
 	    throw new ServletException("Unable to get LAMS learning designs, bad URL: "
