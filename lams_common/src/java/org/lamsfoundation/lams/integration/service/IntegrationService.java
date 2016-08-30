@@ -123,14 +123,11 @@ public class IntegrationService implements IIntegrationService {
 	} else {
 	    courseName = extCourseId;
 	}
-	if (StringUtils.equals(method, LoginRequestDispatcher.METHOD_AUTHOR)
-		|| StringUtils.equals(method, LoginRequestDispatcher.METHOD_MONITOR)) {
-	    return getExtCourseClassMap(serverMap, userMap, extCourseId, courseName, countryIsoCode, langIsoCode,
-		    service.getRootOrganisation().getOrganisationId().toString(), true, prefix);
-	} else {
-	    return getExtCourseClassMap(serverMap, userMap, extCourseId, courseName, countryIsoCode, langIsoCode,
-		    service.getRootOrganisation().getOrganisationId().toString(), false, prefix);
-	}
+	
+	Boolean isTeacher = (StringUtils.equals(method, LoginRequestDispatcher.METHOD_AUTHOR)
+		|| StringUtils.equals(method, LoginRequestDispatcher.METHOD_MONITOR));
+	return getExtCourseClassMap(serverMap, userMap, extCourseId, courseName, countryIsoCode, langIsoCode,
+		service.getRootOrganisation().getOrganisationId().toString(), isTeacher, prefix);
     }
 
     // wrapper method for compatibility with original integration modules
