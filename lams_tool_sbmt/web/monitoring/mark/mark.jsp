@@ -20,6 +20,27 @@
 		function updateMark(detailId,reportId,sessionId,userId){
 			location.href="<lams:WebAppURL/>mark.do?method=newMark&updateMode=listMark&userID="+userId+"&toolSessionID="+sessionId+"&detailID="+detailId+"&reportID="+reportId;
 		}
+
+		function removeLearnerFile(detailId,sessionId,userId,filename) {
+			var msg = '<fmt:message key="message.monitor.confirm.original.learner.file.delete"/>';
+			msg = msg.replace('{0}', filename)
+			var answer = confirm(msg);
+			if (answer) {	
+				location.href="<c:url value="/monitoring.do"/>?method=removeLearnerFile&userID="+userId+"&toolSessionID="+sessionId+"&detailID="+detailId;
+			}
+		}
+
+		function restoreLearnerFile(detailId,sessionId,userId,filename) {
+			var msg = '<fmt:message key="message.monitor.confirm.original.learner.file.restore"/>';
+			msg = msg.replace('{0}', filename)
+			var answer = confirm(msg);
+			if (answer) {	
+				location.href="<c:url value="/monitoring.do"/>?method=restoreLearnerFile&userID="+userId+"&toolSessionID="+sessionId+"&detailID="+detailId;
+			}
+		}
+
+	</script>
+
 	</script>
 </lams:head>
 
@@ -29,7 +50,7 @@
 
 	<table class="table table-condensed">
 		<c:forEach var="fileInfo" items="${report}" varStatus="status">
-			<%@include file="filelist.jsp"%>
+			<%@include file="fileinfo.jsp"%>
 		</c:forEach>
 	
 		<tr>

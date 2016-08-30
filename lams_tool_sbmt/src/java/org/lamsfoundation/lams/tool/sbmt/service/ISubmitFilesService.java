@@ -35,6 +35,7 @@ import org.lamsfoundation.lams.contentrepository.InvalidParameterException;
 import org.lamsfoundation.lams.contentrepository.RepositoryCheckedException;
 import org.lamsfoundation.lams.events.IEventNotificationService;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
+import org.lamsfoundation.lams.tool.sbmt.SubmissionDetails;
 import org.lamsfoundation.lams.tool.sbmt.SubmitFilesContent;
 import org.lamsfoundation.lams.tool.sbmt.SubmitFilesReport;
 import org.lamsfoundation.lams.tool.sbmt.SubmitFilesSession;
@@ -90,6 +91,13 @@ public interface ISubmitFilesService {
     public void uploadFileToSession(Long sessionID, FormFile uploadFile, String fileDescription, Integer userID)
 	    throws SubmitFilesException;
 
+    /** 
+     * Get a the details for a single file uploaded by a learner
+     * @param detailId
+     * @return SubmissionDetails
+     */
+    public SubmissionDetails getSubmissionDetail(Long detailId);
+    
     /**
      * This method returns a list of files that were uploaded by the given
      * <code>User<code> for given <code>contentID</code>.
@@ -102,9 +110,11 @@ public interface ISubmitFilesService {
      *            The <code>user_id</code> of the <code>User</code>
      * @param sessionID
      *            The <code>session_id</code> to be looked up
+     * @param includeRemovedFiles
+     * 		  Should files removed in monitor be included.
      * @return List The list of required objects.
      */
-    public List getFilesUploadedByUser(Integer userID, Long sessionID, Locale currentLocale);
+    public List getFilesUploadedByUser(Integer userID, Long sessionID, Locale currentLocale, boolean includeRemovedFiles);
 
     /**
      * This method returns a SortedMap of all files that were submitted users within a given <code>sessionID</code>.
@@ -136,6 +146,19 @@ public interface ISubmitFilesService {
      */
     public void removeMarkFile(Long reportID, Long markFileUUID, Long markFileVersionID);
 
+    /**
+     * Mark the original file uploaded by a learner as deleted. Does not delete the file
+     * from the content repository.
+     * @param detailID
+     */
+    public void removeLearnerFile(Long detailID, UserDTO monitor);
+
+    /**
+     * Mark a deleted original file as not deleted. Undoes what removeLearnerFile().
+     * @param detailID
+     */
+    public void restoreLearnerFile(Long detailID, UserDTO monitor);
+    
     public FileDetailsDTO getFileDetails(Long detailID, Locale currentLocale);
 
     /**

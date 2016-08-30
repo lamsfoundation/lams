@@ -1,5 +1,3 @@
-<%@include file="fileinfo.jsp"%>
-
 <tr>
 	<td>
 		<fmt:message key="label.learner.marks" />

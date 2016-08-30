@@ -117,7 +117,7 @@ public class MarkAction extends LamsDispatchAction {
 	request.setAttribute(AttributeNames.PARAM_TOOL_SESSION_ID, markForm.getToolSessionID());
 	if (StringUtils.equals(markForm.getUpdateMode(), "listMark")) {
 	    List report = submitFilesService.getFilesUploadedByUser(markForm.getUserID(), markForm.getToolSessionID(),
-		    request.getLocale());
+		    request.getLocale(), true);
 	    request.setAttribute("report", report);
 	    return mapping.findForward("listMark");
 	} else {

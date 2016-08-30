@@ -7,28 +7,56 @@
 </c:if> 
 
 <tr>
+	<c:choose>
+	<c:when test="${fileInfo.removed}">
+		<td>
+			<span style="color:red"><fmt:message key="label.deleted"/> : 
+		</td>
+		<td>
+			<span style="color:red"><c:out value="${fileInfo.filePath}" /></span>
+		</td>
+	</c:when>
+	<c:otherwise>
+		<td>
+			<fmt:message key="label.learner.filePath" />
+		</td>
+		<td>
+			<c:out value="${fileInfo.filePath}" />
+		</td>
+	</c:otherwise>
+	</c:choose>
 	<td>
-		<fmt:message key="label.learner.filePath" />
-		:
-	</td>
-	<td>
-		<c:out value="${fileInfo.filePath}" />
-	</td>
-	<td>
-		<c:set var="viewURL">
-			<html:rewrite page="/download/?uuid=${fileInfo.uuID}&versionID=${fileInfo.versionID}&preferDownload=false" />
-		</c:set>
-		<html:link href="javascript:launchInstructionsPopup('${viewURL}')" styleClass="btn btn-default">
-			<fmt:message key="label.view" />
-		</html:link>
-		<c:set var="downloadURL">
-			<html:rewrite page="/download/?uuid=${fileInfo.uuID}&versionID=${fileInfo.versionID}&preferDownload=true" />
-		</c:set>
-		<html:link href="${downloadURL}" styleClass="btn btn-default loffset10">
-			<fmt:message key="label.download" />
-		</html:link>
+		<c:choose>
+		<c:when test="${fileInfo.removed and empty updateMode}">
+			<html:link href="javascript:restoreLearnerFile(${fileInfo.submissionID},${toolSessionID},${fileInfo.owner.userID},'${fileInfo.filePath}');" styleClass="btn btn-default loffset10">
+				<fmt:message key="label.monitoring.original.learner.file.restore" />
+			</html:link>
+		</c:when>
+
+		<c:otherwise>
+			<c:set var="viewURL">
+				<html:rewrite page="/download/?uuid=${fileInfo.uuID}&versionID=${fileInfo.versionID}&preferDownload=false" />
+			</c:set>
+			<html:link href="javascript:launchInstructionsPopup('${viewURL}')" styleClass="btn btn-default">
+				<fmt:message key="label.view" />
+			</html:link>
+			<c:set var="downloadURL">
+				<html:rewrite page="/download/?uuid=${fileInfo.uuID}&versionID=${fileInfo.versionID}&preferDownload=true" />
+			</c:set>
+			<html:link href="${downloadURL}" styleClass="btn btn-default loffset10">
+				<fmt:message key="label.download" />
+			</html:link>
+			<c:if test="${empty updateMode}">
+				<html:link href="javascript:removeLearnerFile(${fileInfo.submissionID},${toolSessionID},${fileInfo.owner.userID},'${fileInfo.filePath}');" styleClass="btn btn-default loffset10">
+					<fmt:message key="label.monitoring.original.learner.file.delete" />
+				</html:link>
+			</c:if>
+		</c:otherwise>
+		</c:choose>
 	</td>
 </tr>
+
+<c:if test="${not fileInfo.removed}">
 <tr>
 	<td>
 		<fmt:message key="label.learner.fileDescription" />
@@ -45,7 +73,10 @@
 		</c:choose>
 	</td>
 </tr>
-<tr>
+</c:if>
+
+<c:set var="style">${fileInfo.removed?"style=\"margin-bottom: 5px; border-bottom: 5px solid #ddd\"":""}</c:set>
+<tr ${style}>
 	<td>
 		<fmt:message key="label.learner.dateOfSubmission" />
 		:
@@ -54,3 +85,8 @@
 		<lams:Date value="${fileInfo.dateOfSubmission}" />
 	</td>
 </tr>
+
+<c:if test="${not fileInfo.removed and empty updateMode}">
+<!--  do not show full details if removed or on mark screen --> 
+	<%@include file="filelist.jsp"%>
+</c:if>
