@@ -5,12 +5,11 @@
 <lams:html>
 <lams:head>
 	<title><fmt:message key="tool.display.name" /></title>
-	<html:base />
 	<%@ include file="/common/header.jsp"%>
 
 	<script type="text/javascript">
-		jQuery(document).ready(function() {
-			jQuery("time.timeago").timeago();
+		$(document).ready(function() {
+			$("time.timeago").timeago();
 		});
 
 		function submitCount(tUrl) {
