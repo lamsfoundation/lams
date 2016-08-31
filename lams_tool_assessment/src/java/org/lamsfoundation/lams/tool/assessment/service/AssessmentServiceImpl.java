@@ -1150,9 +1150,10 @@ public class AssessmentServiceImpl
 		    }
 
 		    for (AssessmentUserDTO userDto : userDtos) {
-			ExcelCell[] userResultRow = new ExcelCell[2];
-			userResultRow[0] = new ExcelCell(userDto.getFirstName() + " " + userDto.getLastName(), false);
-			userResultRow[1] = new ExcelCell(userDto.getGrade(), false);
+			ExcelCell[] userResultRow = new ExcelCell[3];
+			userResultRow[0] = new ExcelCell(userDto.getLogin(), false);
+			userResultRow[1] = new ExcelCell(userDto.getFirstName() + " " + userDto.getLastName(), false);
+			userResultRow[2] = new ExcelCell(userDto.getGrade(), false);
 			summaryTab.add(userResultRow);
 		    }
 
