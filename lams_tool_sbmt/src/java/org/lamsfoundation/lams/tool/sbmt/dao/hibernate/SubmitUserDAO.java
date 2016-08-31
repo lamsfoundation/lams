@@ -158,7 +158,7 @@ public class SubmitUserDAO extends LAMSBaseDAO implements ISubmitUserDAO {
 		.addScalar("numFiles", IntegerType.INSTANCE).addScalar("numFilesRemoved", IntegerType.INSTANCE)
 		.addScalar("numFilesMarked", IntegerType.INSTANCE).addScalar("notebookEntry", StringType.INSTANCE)
 		.setLong("sessionId", sessionId.longValue()).setFirstResult(page * size).setMaxResults(size);
-	return query.list();
+	return query.list(); 
     }
 
     private void buildNameSearch(String searchString, StringBuilder sqlBuilder) {
