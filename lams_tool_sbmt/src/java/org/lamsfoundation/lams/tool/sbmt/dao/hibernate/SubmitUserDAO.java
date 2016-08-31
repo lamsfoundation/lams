@@ -131,7 +131,7 @@ public class SubmitUserDAO extends LAMSBaseDAO implements ISubmitUserDAO {
 
 	// Basic select for the user records
 	StringBuilder queryText = new StringBuilder();
-	queryText.append("SELECT user.*, COUNT(details.submission_id) numFiles, SUM(details.removed) numFilesRemoved, count(report.marks) numFilesMarked ");
+	queryText.append("SELECT user.*, COUNT(details.submission_id) numFiles, COALESCE(SUM(details.removed),0) numFilesRemoved, count(report.marks) numFilesMarked ");
 	queryText.append(notebookEntryStrings != null ? notebookEntryStrings[0] : ", NULL notebookEntry");
 	queryText.append(" FROM tl_lasbmt11_user user ");
 	queryText.append(" LEFT JOIN tl_lasbmt11_submission_details details ON user.uid = details.learner_id ");
