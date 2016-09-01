@@ -5,7 +5,7 @@ import java.io.IOException;
 import javax.servlet.jsp.JspException;
 import javax.servlet.jsp.tagext.SimpleTagSupport;
 
-import org.apache.commons.lang.StringEscapeUtils;
+import org.springframework.web.util.HtmlUtils;
 
 /**
  * JSP tag. It converts text from \n or \r\n to &lt;BR&gt; before rendering.
@@ -24,7 +24,7 @@ public class MultiLinesOutputTag extends SimpleTagSupport {
     @Override
     public void doTag() throws JspException, IOException {
 	if (escapeHtml) {
-	    value = StringEscapeUtils.escapeHtml(value);
+	    value = HtmlUtils.htmlEscape(value);
 	}
 	value = value.replaceAll("\n", "<br>");
 	getJspContext().getOut().write(value.toString());
