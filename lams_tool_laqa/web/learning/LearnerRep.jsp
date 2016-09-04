@@ -11,6 +11,7 @@
 <c:set var="isLeadershipEnabled" value="${qaContent.useSelectLeaderToolOuput}" />
 <c:set var="isCommentsEnabled" value="${sessionMap.isCommentsEnabled}" />
 <c:set var="hasEditRight" value="${!isLeadershipEnabled || isLeadershipEnabled && isUserLeader}" />
+<c:set var="localeLanguage"><lams:user property="localeLanguage" /></c:set>
 
 <lams:html>
 <lams:head>
@@ -46,7 +47,8 @@
 	<script src="${lams}includes/javascript/rating.js" type="text/javascript"></script>
 	<script src="${lams}includes/javascript/bootstrap.min.js" type="text/javascript"></script>
 	<script src="${lams}includes/javascript/jquery.tablesorter-widgets.js" type="text/javascript"></script>
-
+	<c:set var="localeLanguage"><lams:user property="localeLanguage" /></c:set>
+	<script src="${lams}includes/javascript/timeagoi18n/jquery.timeago.${fn:toLowerCase(localeLanguage)}.js" type="text/javascript"></script>
 
 	<script type="text/javascript">
 		var AVG_RATING_LABEL = '<fmt:message key="label.average.rating"><fmt:param>@1@</fmt:param><fmt:param>@2@</fmt:param></fmt:message>',
