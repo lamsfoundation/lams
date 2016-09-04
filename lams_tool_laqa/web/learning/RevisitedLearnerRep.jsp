@@ -11,6 +11,7 @@
 <c:set var="isLeadershipEnabled" value="${qaContent.useSelectLeaderToolOuput}" />
 <c:set var="isCommentsEnabled" value="${sessionMap.isCommentsEnabled}" />
 <c:set var="hasEditRight" value="${!isLeadershipEnabled || isLeadershipEnabled && isUserLeader}" />
+<c:set var="localeLanguage"><lams:user property="localeLanguage" /></c:set>
 <lams:html>
 <lams:head>
 	<html:base />
@@ -23,6 +24,7 @@
 	<lams:css />
 
 	<script src="${lams}includes/javascript/jquery.timeago.js" type="text/javascript"></script>
+	<script type="text/javascript" src="${lams}includes/javascript/timeagoi18n/jquery.timeago.${fn:toLowerCase(localeLanguage)}.js"></script>
 	<script type="text/javascript">
 		//var for jquery.jRating.js
 		var pathToImageFolder = "${lams}images/css/";
@@ -41,10 +43,11 @@
 	<script src="${lams}includes/javascript/jquery.jRating.js" type="text/javascript"></script>
 	<script src="${lams}includes/javascript/jquery.tablesorter.js" type="text/javascript"></script>
 	<script src="${lams}includes/javascript/jquery.tablesorter-pager.js" type="text/javascript"></script>
-	<script src="${lams}includes/javascript/jquery.timeago.js" type="text/javascript"></script>
 	<script src="${lams}includes/javascript/common.js" type="text/javascript"></script>
 	<script src="${lams}includes/javascript/rating.js" type="text/javascript"></script>
 	<script src="${lams}includes/javascript/jquery.tablesorter-widgets.js" type="text/javascript"></script>
+	<script src="${lams}includes/javascript/jquery.timeago.js" type="text/javascript"></script>
+        <script type="text/javascript" src="${lams}includes/javascript/timeagoi18n/jquery.timeago.${fn:toLowerCase(localeLanguage)}.js"></script>
 
 	<script type="text/javascript">
 	

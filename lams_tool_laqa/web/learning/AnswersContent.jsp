@@ -9,6 +9,7 @@
 <c:set var="mode" value="${sessionMap.mode}" scope="request" />
 <c:set var="isLeadershipEnabled" value="${sessionMap.content.useSelectLeaderToolOuput}" scope="request" />
 <c:set var="hasEditRight" value="${!isLeadershipEnabled || isLeadershipEnabled && isUserLeader}" scope="request" />
+<c:set var="localeLanguage"><lams:user property="localeLanguage" /></c:set>
 
 <lams:html>
 <lams:head>
@@ -34,6 +35,7 @@
 	<script type="text/javascript" src="${lams}includes/javascript/jquery.blockUI.js"></script>
 	<script type="text/javascript" src="${lams}includes/javascript/jquery.timeago.js"></script>
 	<script type="text/javascript" src="${lams}includes/javascript/bootstrap.min.js"></script>
+	<script type="text/javascript" src="${lams}includes/javascript/timeagoi18n/jquery.timeago.${fn:toLowerCase(localeLanguage)}.js"></script>
 	<script type="text/JavaScript">
 
 		var minWordsLimitLabel = '<fmt:message key="label.minimum.number.words" ><fmt:param>{0}</fmt:param></fmt:message>';

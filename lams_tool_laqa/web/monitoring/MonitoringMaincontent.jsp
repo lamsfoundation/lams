@@ -11,6 +11,7 @@
 <c:set var="tool">
 	<lams:WebAppURL />
 </c:set>
+<c:set var="localeLanguage"><lams:user property="localeLanguage" /></c:set>
 
 <lams:html>
 	<lams:head>
@@ -92,6 +93,7 @@
 	<script type="text/javascript" src="${lams}includes/javascript/bootstrap.min.js"></script>
 	<script type="text/javascript" src="${lams}includes/javascript/bootstrap.tabcontroller.js"></script>
 	<script type="text/javascript" src="${lams}includes/javascript/jquery.timeago.js"></script>
+	<script type="text/javascript" src="${lams}includes/javascript/timeagoi18n/jquery.timeago.${fn:toLowerCase(localeLanguage)}.js"></script>
 	
 	
  	<!-- ******************** FCK Editor related javascript & HTML ********************** -->
