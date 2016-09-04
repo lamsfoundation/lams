@@ -4,9 +4,9 @@
 
 <%@ include file="/common/taglibs.jsp"%>
 
-<c:set var="userCountry"><lams:user property="userCountry" /></c:set>
+<c:set var="localeLanguage"><lams:user property="localeLanguage" /></c:set>
 <script type="text/javascript" src="<lams:LAMSURL />/includes/javascript/jquery.timeago.js"></script>
-<script type="text/javascript" src="<lams:LAMSURL />/includes/javascript/timeagoi18n/jquery.timeago.${fn:toLowerCase(userCountry)}.js"></script>
+<script type="text/javascript" src="<lams:LAMSURL />/includes/javascript/timeagoi18n/jquery.timeago.${fn:toLowerCase(localeLanguage)}.js"></script>
 <script type="text/javascript">
 
 // The treetable code uses the clicks to expand and collapse the replies but then 
