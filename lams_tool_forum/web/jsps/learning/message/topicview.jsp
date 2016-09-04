@@ -1,7 +1,9 @@
 <%@ page import="org.lamsfoundation.lams.tool.forum.util.ForumConstants"%>
 <%@ include file="/common/taglibs.jsp"%>
 
+<c:set var="userCountry"><lams:user property="localeCountry" /></c:set>
 <script type="text/javascript" src="<lams:LAMSURL />/includes/javascript/jquery.timeago.js"></script>
+<script type="text/javascript" src="<lams:LAMSURL />/includes/javascript/timeagoi18n/jquery.timeago.${fn:toLowerCase(userCountry)}.js"></script>
 
 <c:set var="maxThreadUid" value="0" />
 <c:set var="messageTablename" value="" />
