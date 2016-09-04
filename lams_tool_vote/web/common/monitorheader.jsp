@@ -6,6 +6,7 @@
 	<lams:WebAppURL />
 </c:set>
 <c:set var="ctxPath" value="${pageContext.request.contextPath}" scope="request" />
+<c:set var="localeLanguage"><lams:user property="localeLanguage" /></c:set>
 
 <!-- ********************  CSS ********************** -->
 <lams:css />
@@ -24,6 +25,7 @@
 <script type="text/javascript" src="${lams}includes/javascript/bootstrap.min.js"></script>
 <script type="text/javascript" src="${lams}includes/javascript/bootstrap.tabcontroller.js"></script>
 <script type="text/javascript" src="${lams}includes/javascript/jquery.timeago.js"></script>
+<script type="text/javascript" src="${lams}includes/javascript/timeagoi18n/jquery.timeago.${fn:toLowerCase(localeLanguage)}.js"></script>
 
 <link rel="stylesheet" href="${lams}css/jquery.tablesorter.theme.bootstrap.css">
 <link type="text/css" href="${lams}css/jquery.tablesorter.pager.css" rel="stylesheet">
