@@ -1,9 +1,9 @@
 <%@ page import="org.lamsfoundation.lams.tool.forum.util.ForumConstants"%>
 <%@ include file="/common/taglibs.jsp"%>
 
-<c:set var="userCountry"><lams:user property="localeCountry" /></c:set>
+<c:set var="localeLanguage"><lams:user property="localeLanguage" /></c:set>
 <script type="text/javascript" src="<lams:LAMSURL />/includes/javascript/jquery.timeago.js"></script>
-<script type="text/javascript" src="<lams:LAMSURL />/includes/javascript/timeagoi18n/jquery.timeago.${fn:toLowerCase(userCountry)}.js"></script>
+<script type="text/javascript" src="<lams:LAMSURL />/includes/javascript/timeagoi18n/jquery.timeago.${fn:toLowerCase(localeLanguage)}.js"></script>
 
 <c:set var="pageSize" value="<%=ForumConstants.DEFAULT_PAGE_SIZE%>" />
 <div class="panel panel-default">
