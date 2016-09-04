@@ -2,6 +2,7 @@
 <c:set var="lams"><lams:LAMSURL/></c:set>
 <c:set var="tool"><lams:WebAppURL/></c:set>
 <c:set var="ctxPath" value="${pageContext.request.contextPath}" scope="request"/>
+<c:set var="localeLanguage"><lams:user property="localeLanguage" /></c:set>
 
  	<!-- ********************  CSS ********************** -->
 	<link href="<html:rewrite page='/includes/css/taskList.css'/>" rel="stylesheet" type="text/css">
@@ -15,5 +16,5 @@
 	<script type="text/javascript" src="${lams}includes/javascript/bootstrap.min.js"></script>   
 	<script type="text/javascript" src="${lams}includes/javascript/bootstrap.tabcontroller.js"></script>
 	<script type="text/javascript" src="<html:rewrite page='/includes/javascript/taskListcommon.js'/>"></script>
-
+	<script type="text/javascript" src="${lams}includes/javascript/timeagoi18n/jquery.timeago.${fn:toLowerCase(localeLanguage)}.js"></script>
 	
