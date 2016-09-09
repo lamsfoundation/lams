@@ -20,7 +20,6 @@
  * ****************************************************************
  */
 
-
 package org.lamsfoundation.lams.tool.imageGallery.util;
 
 import java.awt.Color;
@@ -35,6 +34,7 @@ import javax.imageio.ImageIO;
 
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.tool.imageGallery.service.UploadImageGalleryFileException;
+import org.lamsfoundation.lams.util.CircularByteBuffer;
 
 /**
  * @author Andrey Balan
