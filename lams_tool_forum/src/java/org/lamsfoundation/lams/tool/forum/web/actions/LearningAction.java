@@ -775,15 +775,8 @@ public class LearningAction extends Action {
 
     /**
      * Create a replayed topic for a parent topic.
-     *
-     * @param mapping
-     * @param form
-     * @param request
-     * @param response
-     * @return
-     * @throws InterruptedException
      */
-    private synchronized ActionForward replyTopic(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+    private ActionForward replyTopic(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) throws InterruptedException {
 
 	MessageForm messageForm = (MessageForm) form;
@@ -828,17 +821,8 @@ public class LearningAction extends Action {
 
     /**
      * Create a replayed topic for a parent topic.
-     *
-     * @param mapping
-     * @param form
-     * @param request
-     * @param response
-     * @return
-     * @throws InterruptedException
-     * @throws JSONException
-     * @throws IOException
      */
-    private synchronized ActionForward replyTopicInline(ActionMapping mapping, ActionForm form,
+    private ActionForward replyTopicInline(ActionMapping mapping, ActionForm form,
 	    HttpServletRequest request, HttpServletResponse response)
 	    throws InterruptedException, JSONException, IOException {
 

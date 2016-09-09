@@ -21,7 +21,6 @@
  * ****************************************************************
  */
 
-
 package org.lamsfoundation.lams.learning.web.action;
 
 import java.util.Map;
@@ -43,7 +42,6 @@ import org.lamsfoundation.lams.learningdesign.Activity;
 import org.lamsfoundation.lams.lesson.LearnerProgress;
 import org.lamsfoundation.lams.tool.exception.RequiredGroupMissingException;
 import org.lamsfoundation.lams.web.action.LamsAction;
-import org.springframework.transaction.UnexpectedRollbackException;
 
 /**
  * Action class to forward the user to a Tool using an intermediate loading page. Can handle regular tools + grouping
@@ -90,33 +88,34 @@ public class LoadToolActivityAction extends ActivityAction {
 	 * there is no point in repeating a failed attempt to create it.
 	 *
 	 * The synchronisation code below prevents threads from creating sessions at the same time.
+	 *
+	 *
+	 * Object toolSessionCreationLock = null;
+	 * synchronized (LoadToolActivityAction.toolSessionCreationLocks) {
+	 * toolSessionCreationLock = LoadToolActivityAction.toolSessionCreationLocks.get(activityID);
+	 * if (toolSessionCreationLock == null) {
+	 * toolSessionCreationLock = activityID;
+	 * LoadToolActivityAction.toolSessionCreationLocks.put(activityID, toolSessionCreationLock);
+	 * }
+	 * }
+	 * synchronized (toolSessionCreationLock) {
 	 */
-	Object toolSessionCreationLock = null;
-	Long activityID = activity.getActivityId();
-	synchronized (LoadToolActivityAction.toolSessionCreationLocks) {
-	    toolSessionCreationLock = LoadToolActivityAction.toolSessionCreationLocks.get(activityID);
-	    if (toolSessionCreationLock == null) {
-		toolSessionCreationLock = activityID;
-		LoadToolActivityAction.toolSessionCreationLocks.put(activityID, toolSessionCreationLock);
-	    }
-	}
-	synchronized (toolSessionCreationLock) {
-	    try {
-		learnerService.createToolSessionsIfNecessary(activity, learnerProgress);
+	try {
+	    learnerService.createToolSessionsIfNecessary(activity, learnerProgress);
 
-	    } catch (UnexpectedRollbackException e) {
-		LamsAction.log.warn("Got exception while trying to create a tool session, but carrying on.", e);
+	    /*
+	     * } catch (UnexpectedRollbackException e) {
+	     * LamsAction.log.warn("Got exception while trying to create a tool session, but carrying on.", e);
+	     */
+	} catch (RequiredGroupMissingException e) {
 
-	    } catch (RequiredGroupMissingException e) {
-
-		//got here when activity requires existing grouping but no group for user exists yet
-		LamsAction.log.warn(e.getMessage());
-		request.setAttribute("messageKey", e.getMessage());
-		return mapping.findForward("message");
-	    }
+	    //got here when activity requires existing grouping but no group for user exists yet
+	    LamsAction.log.warn(e.getMessage());
+	    request.setAttribute("messageKey", e.getMessage());
+	    return mapping.findForward("message");
 	}
 
-	form.setActivityID(activityID);
+	form.setActivityID(activity.getActivityId());
 
 	String mappingName = "displayTool";
 	if (activity.isToolActivity() || activity.isSystemToolActivity()) {

@@ -267,9 +267,10 @@ public class Call {
 	} catch (Exception e) {
 	    throw new RuntimeException(e);
 	} finally {
-	    TestReporter.addCallRecord(new CallRecord(test.getTestSuite().getSuiteIndex(), test.testName, callee,
-		    description, new SimpleDateFormat("HH:mm:ss SSS").format(new Date(end)), end - start,
-		    httpStatusCode, message));
+	    TestReporter.getCallRecords()
+		    .add(new CallRecord(test.getTestSuite().getSuiteIndex(), test.testName, callee, description,
+			    new SimpleDateFormat("HH:mm:ss SSS").format(new Date(end)), end - start, httpStatusCode,
+			    message));
 	}
     }
 

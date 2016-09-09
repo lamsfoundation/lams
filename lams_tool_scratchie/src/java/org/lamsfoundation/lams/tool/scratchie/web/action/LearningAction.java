@@ -465,11 +465,7 @@ public class LearningAction extends Action {
 	return mapping.findForward(ScratchieConstants.SUCCESS);
     }
 
-    /**
-     * @throws ServletException
-     * @throws ScratchieApplicationException
-     */
-    private synchronized ActionForward like(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+    private ActionForward like(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response)
 	    throws JSONException, IOException, ServletException, ScratchieApplicationException {
 	initializeScratchieService();
@@ -497,11 +493,7 @@ public class LearningAction extends Action {
 	return null;
     }
 
-    /**
-     * @throws ServletException
-     * @throws ScratchieApplicationException
-     */
-    private synchronized ActionForward removeLike(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+    private ActionForward removeLike(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response)
 	    throws JSONException, IOException, ServletException, ScratchieApplicationException {
 	initializeScratchieService();

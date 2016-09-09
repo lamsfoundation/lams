@@ -243,12 +243,6 @@
 	</servlet>
 
 	<servlet>
-		<servlet-name>LessonJoinServlet</servlet-name>
-		<servlet-class>org.lamsfoundation.lams.webservice.xml.LessonJoinServlet
-		</servlet-class>
-	</servlet>
-
-	<servlet>
 		<servlet-name>forgotPasswordServlet</servlet-name>
 		<servlet-class>org.lamsfoundation.lams.web.ForgotPasswordServlet
 		</servlet-class>
@@ -490,10 +484,6 @@
 	<servlet-mapping>
 		<servlet-name>lamsStartupServlet</servlet-name>
 		<url-pattern>/lamsstartupservlet</url-pattern>
-	</servlet-mapping>
-	<servlet-mapping>
-		<servlet-name>LessonJoinServlet</servlet-name>
-		<url-pattern>/services/xml/LessonJoin/*</url-pattern>
 	</servlet-mapping>
 	<servlet-mapping>
 		<servlet-name>forgotPasswordServlet</servlet-name>
