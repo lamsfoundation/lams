@@ -265,7 +265,7 @@ public class LearnerService implements ICoreLearnerService {
      *             in case of problems.
      */
     @Override
-    public synchronized LearnerProgress joinLesson(Integer learnerId, Long lessonID) {
+    public LearnerProgress joinLesson(Integer learnerId, Long lessonID) {
 	User learner = (User) userManagementService.findById(User.class, learnerId);
 
 	Lesson lesson = getLesson(lessonID);
@@ -596,9 +596,13 @@ public class LearnerService implements ICoreLearnerService {
      * @return the updated learner progress
      */
     @Override
-    public synchronized LearnerProgress completeActivity(Integer learnerId, Activity activity,
-	    LearnerProgress progress) {
-	LearnerProgress nextLearnerProgress = null;
+    public LearnerProgress completeActivity(Integer learnerId, Activity activity, LearnerProgress progress) {
+	// load the progress again from DB
+	LearnerProgress nextLearnerProgress = learnerProgressDAO.getLearnerProgress(progress.getLearnerProgressId());
+	if (nextLearnerProgress.getCompletedActivities().keySet().contains(activity)) {
+	    // progress was already updated by another thread, so prevent double processing
+	    return nextLearnerProgress;
+	}
 
 	// Need to synchronise the next bit of code so that if the tool calls
 	// this twice in quick succession, with the same parameters, it won't update
@@ -768,7 +772,7 @@ public class LearnerService implements ICoreLearnerService {
 	    } else {
 		if (grouping.getGroups().size() > 0) {
 		    // if any group exists, put them in there.
-		    Group aGroup = (Group) grouping.getGroups().iterator().next();
+		    Group aGroup = grouping.getGroups().iterator().next();
 		    if (aGroup.getGroupId() != null) {
 			lessonService.performGrouping(grouping, aGroup.getGroupId(), learnerList);
 		    } else {

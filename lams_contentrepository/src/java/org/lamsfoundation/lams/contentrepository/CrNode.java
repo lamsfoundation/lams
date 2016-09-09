@@ -312,9 +312,7 @@ public class CrNode implements Serializable {
      * uuid, and the db can't help us there.
      */
     public synchronized Long incrementNextVersionId() {
-	Long retValue = nextVersionId;
-	nextVersionId = new Long(nextVersionId.longValue() + 1);
-	return retValue;
+	return nextVersionId++;
     }
 
     /**

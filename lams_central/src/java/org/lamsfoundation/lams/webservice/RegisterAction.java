@@ -20,7 +20,6 @@
  * ****************************************************************
  */
 
-
 package org.lamsfoundation.lams.webservice;
 
 import java.io.IOException;
@@ -75,12 +74,6 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
 
 /**
  * @author Andrey Balan
- *
- *
- *
- *
- *
- *
  */
 public class RegisterAction extends HttpServlet {
 
@@ -103,8 +96,7 @@ public class RegisterAction extends HttpServlet {
     private static MessageService messageService = null;
 
     @Override
-    public synchronized void doGet(HttpServletRequest request, HttpServletResponse response)
-	    throws ServletException, IOException {
+    public void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 
 	String method = request.getParameter(CentralConstants.PARAM_METHOD);
 	if (method.equals("addUserToGroupLessons")) {

@@ -133,8 +133,11 @@ public class LamsCoreToolService implements ILamsCoreToolService, ApplicationCon
     // Service Methods
     // ---------------------------------------------------------------------
 
+    /**
+     * Creates a tool session for the given activity.
+     */
     @Override
-    public synchronized ToolSession createToolSession(User learner, ToolActivity activity, Lesson lesson)
+    public ToolSession createToolSession(User learner, ToolActivity activity, Lesson lesson)
 	    throws RequiredGroupMissingException, DataIntegrityViolationException {
 	// look for an existing applicable tool session
 	// could be either a grouped (class group or standard group) or an individual.
@@ -315,7 +318,7 @@ public class LamsCoreToolService implements ILamsCoreToolService, ApplicationCon
 	} else if (activity.isGroupingActivity()) {
 	    GroupingActivity groupingActivity = (GroupingActivity) activity;
 	    Grouping grouping = groupingActivity.getCreateGrouping();
-	    for (Group group : (Set<Group>) grouping.getGroups()) {
+	    for (Group group : grouping.getGroups()) {
 		if (!group.getUsers().isEmpty()) {
 		    return true;
 		}
@@ -486,10 +489,9 @@ public class LamsCoreToolService implements ILamsCoreToolService, ApplicationCon
 	    throw new ToolException(message, e);
 	}
     }
-    
+
     @Override
-    public List<ToolOutput> getOutputsFromTool(String conditionName, ToolActivity toolActivity)
-	    throws ToolException {
+    public List<ToolOutput> getOutputsFromTool(String conditionName, ToolActivity toolActivity) throws ToolException {
 
 	if (toolActivity == null) {
 	    String error = "The toolActivity is null. Unable to get tool outputs";

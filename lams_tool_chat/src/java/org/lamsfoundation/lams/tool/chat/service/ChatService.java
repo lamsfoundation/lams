@@ -21,7 +21,6 @@
  * ****************************************************************
  */
 
-
 package org.lamsfoundation.lams.tool.chat.service;
 
 import java.util.ArrayList;
@@ -194,7 +193,7 @@ public class ChatService implements ToolSessionManager, ToolContentManager, ICha
     public ToolOutput getToolOutput(String name, Long toolSessionId, Long learnerId) {
 	return getChatOutputFactory().getToolOutput(name, this, toolSessionId, learnerId);
     }
-    
+
     @Override
     public List<ToolOutput> getToolOutputs(String name, Long toolContentId) {
 	return new ArrayList<ToolOutput>();
@@ -543,7 +542,7 @@ public class ChatService implements ToolSessionManager, ToolContentManager, ICha
     }
 
     @Override
-    public synchronized ChatUser createChatUser(UserDTO user, ChatSession chatSession) {
+    public ChatUser createChatUser(UserDTO user, ChatSession chatSession) {
 	ChatUser chatUser = new ChatUser(user, chatSession);
 
 	chatUser.setNickname(createNickname(chatUser));
@@ -551,20 +550,21 @@ public class ChatService implements ToolSessionManager, ToolContentManager, ICha
 	return chatUser;
     }
 
-    private String createNickname(ChatUser chatUser) {
-	String desiredNickname = chatUser.getFirstName() + " " + chatUser.getLastName();
+    private synchronized String createNickname(ChatUser chatUser) {
+	String desiredNickname = chatUser.getFirstName() + " " + chatUser.getLastName() + " ";
 	String nickname = desiredNickname;
 
 	boolean valid = false;
 	int count = 1;
+	Long sessionId = chatUser.getChatSession().getSessionId();
 
 	// TODO may need max tries to prevent possibly entering infinite loop.
 	while (!valid) {
-	    if (getUserByNicknameAndSessionID(nickname, chatUser.getChatSession().getSessionId()) == null) {
+	    if (getUserByNicknameAndSessionID(nickname, sessionId) == null) {
 		// nickname is available
 		valid = true;
 	    } else {
-		nickname = desiredNickname + " " + count;
+		nickname = desiredNickname + count;
 		count++;
 	    }
 	}

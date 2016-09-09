@@ -70,13 +70,13 @@ public abstract class Grouping implements Serializable {
     private Integer groupingUIID;
 
     /** persistent field */
-    private Set groups;
+    private Set<Group> groups;
 
     /** persistent field */
-    private Set activities;
+    private Set<Activity> activities;
 
     /** non-persistent field */
-    protected Set learners;
+    protected Set<User> learners;
 
     protected Grouper grouper;
     /**
@@ -112,11 +112,11 @@ public abstract class Grouping implements Serializable {
      * subclass as the grouping being copied. Does not copy the tool sessions.
      * Copies the groups but not users in the groups. Copies any group to
      * branch mappings, updating the group but not the activity.
-     * 
+     *
      * Any implementation of this method can call copyGroupingFields(Grouping newGrouping)
      * to set max number of groups, grouping UIID, copy the groups
      * and the group to branch mappings.
-     * 
+     *
      * @return deep copy of this object
      */
     public abstract Grouping createCopy(int uiidOffset);
@@ -143,7 +143,7 @@ public abstract class Grouping implements Serializable {
     }
 
     /**
-     *            
+     *
      *
      */
     public Long getGroupingId() {
@@ -155,7 +155,7 @@ public abstract class Grouping implements Serializable {
     }
 
     /**
-     *            
+     *
      *
      */
     public Integer getGroupingTypeId() {
@@ -171,13 +171,9 @@ public abstract class Grouping implements Serializable {
 
     }
 
-    /**
-     *            
-     *
-     */
-    public Set getGroups() {
+    public Set<Group> getGroups() {
 	if (groups == null) {
-	    setGroups(new TreeSet());
+	    setGroups(new TreeSet<Group>());
 	}
 	return groups;
     }
@@ -186,18 +182,14 @@ public abstract class Grouping implements Serializable {
 	this.groups = groups;
     }
 
-    /**
-     *           
-     *
-     */
-    public Set getActivities() {
+    public Set<Activity> getActivities() {
 	if (activities == null) {
-	    setActivities(new TreeSet(new ActivityOrderComparator()));
+	    setActivities(new TreeSet<Activity>(new ActivityOrderComparator()));
 	}
 	return activities;
     }
 
-    public void setActivities(Set activities) {
+    public void setActivities(Set<Activity> activities) {
 	this.activities = activities;
     }
 
@@ -224,7 +216,7 @@ public abstract class Grouping implements Serializable {
     }
 
     /**
-     * 
+     *
      */
     public Integer getMaxNumberOfGroups() {
 	return maxNumberOfGroups;
@@ -252,20 +244,20 @@ public abstract class Grouping implements Serializable {
     /**
      * Return the next group order id. Can't do it on size as groups may have been deleted.
      * Returns -1 if the proposed name is the same as existing name
-     * 
+     * Synchronisation is not perfect here as the same order ID can be picked up before the new Group gets created
+     * and added to groups collection.
+     *
      * @return the next order id.
      */
-    public synchronized int getNextGroupOrderIdCheckName(String proposedName) {
+    synchronized int getNextGroupOrderIdCheckName(String proposedName) {
 	int maxOrderId = 0;
 
-	if (this.getGroups() != null) {
-	    Iterator iter = this.getGroups().iterator();
-	    while (iter.hasNext()) {
-		Group element = (Group) iter.next();
-		maxOrderId = element.getOrderId() > maxOrderId ? element.getOrderId() : maxOrderId;
-		if (proposedName.equals(element.getGroupName())) {
-		    return -1;
-		}
+	for (Group group : getGroups()) {
+	    if (proposedName.equals(group.getGroupName())) {
+		return -1;
+	    }
+	    if (group.getOrderId() > maxOrderId) {
+		maxOrderId = group.getOrderId();
 	    }
 	}
 	return ++maxOrderId;
@@ -273,14 +265,13 @@ public abstract class Grouping implements Serializable {
 
     /**
      * Return all the learners who participate this grouping.
-     * 
+     *
      * @return the learners set.
      */
-    public Set getLearners() {
+    public Set<User> getLearners() {
 
-	learners = new HashSet();
-	for (Iterator i = getGroups().iterator(); i.hasNext();) {
-	    Group group = (Group) i.next();
+	learners = new HashSet<User>();
+	for (Group group : groups) {
 	    if (isLearnerGroup(group)) {
 		learners.addAll(group.getUsers());
 	    }
@@ -290,7 +281,7 @@ public abstract class Grouping implements Serializable {
 
     /**
      * Returns the group that current learner is in.
-     * 
+     *
      * @param learner
      *            the user in the group
      * @return the group that has the learner
@@ -308,7 +299,7 @@ public abstract class Grouping implements Serializable {
     /**
      * Iterate through all the groups in this grouping and figure out the group
      * with the least members in it.
-     * 
+     *
      * @return the group with the least member.
      */
     public Group getGroupWithLeastMember() {
@@ -328,14 +319,14 @@ public abstract class Grouping implements Serializable {
     /**
      * Is this group a learner group. It is also possible that the group is a
      * staff group.
-     * 
+     *
      * @return whether the group is learner group or not.
      */
     public abstract boolean isLearnerGroup(Group group);
 
     /**
      * Return whether a learner is a existing learner for this grouping or not.
-     * 
+     *
      * @param learner
      *            the current leaner
      * @return the boolean result

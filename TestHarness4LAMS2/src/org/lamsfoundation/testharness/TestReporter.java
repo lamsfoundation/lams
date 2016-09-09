@@ -33,6 +33,7 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.text.SimpleDateFormat;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -324,14 +325,10 @@ public class TestReporter {
 	    .append("Refer to the formal test report document for the details.").append(TestReporter.NEW_LINE)
 	    .append("\n*****************************************************************************************\n")
 	    .toString();
-    private static List<CallRecord> callRecords = new LinkedList<CallRecord>();
+    private static List<CallRecord> callRecords = Collections.synchronizedList(new LinkedList<CallRecord>());
     private static String fileName;
 
     private static String fileTemplate;
-
-    public static synchronized void addCallRecord(CallRecord callRecord) {
-	TestReporter.callRecords.add(callRecord);
-    }
 
     public static void generateReportFile(TestManager manager) {
 	TestReporter.log.info("Generating the formal test report document");
@@ -407,10 +404,6 @@ public class TestReporter {
 
     public static boolean initialized() {
 	return ((TestReporter.fileName != null) && (TestReporter.fileTemplate != null));
-    }
-
-    public static void setCallRecords(List<CallRecord> callRecords) {
-	TestReporter.callRecords = callRecords;
     }
 
     public static void setFileName(String fileName) {

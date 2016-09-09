@@ -20,7 +20,6 @@
  * ****************************************************************
  */
 
-
 package org.lamsfoundation.lams.comments.web;
 
 import java.io.IOException;
@@ -366,18 +365,8 @@ public class CommentAction extends Action {
 
     /**
      * Create a new comment (not a reply)
-     *
-     * @param mapping
-     * @param form
-     * @param request
-     * @param response
-     * @return
-     * @throws InterruptedException
-     * @throws JSONException
-     * @throws IOException
-     * @throws ServletException
      */
-    private synchronized ActionForward newComment(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+    private ActionForward newComment(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) throws InterruptedException, JSONException, IOException, ServletException {
 
 	SessionMap<String, Object> sessionMap = getSessionMap(request);
@@ -400,8 +389,6 @@ public class CommentAction extends Action {
 	    commentService = getCommentService();
 
 	    User user = getCurrentUser(request);
-	    boolean monitoringMode = ToolAccessMode.TEACHER
-		    .equals(WebUtil.getToolAccessMode((String) sessionMap.get(AttributeNames.ATTR_MODE)));
 	    if (!learnerInToolSession(externalId, user) && !monitorInToolSession(externalId, user, sessionMap)) {
 		throwException("New comment: User does not have the rights to access the comments. ", user.getLogin(),
 			externalId, externalType, externalSignature);
@@ -445,20 +432,9 @@ public class CommentAction extends Action {
 
     /**
      * Create a reply to a parent topic.
-     *
-     * @param mapping
-     * @param form
-     * @param request
-     * @param response
-     * @return
-     * @throws InterruptedException
-     * @throws JSONException
-     * @throws IOException
-     * @throws ServletException
      */
-    private synchronized ActionForward replyTopicInline(ActionMapping mapping, ActionForm form,
-	    HttpServletRequest request, HttpServletResponse response)
-	    throws InterruptedException, JSONException, IOException, ServletException {
+    private ActionForward replyTopicInline(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+	    HttpServletResponse response) throws InterruptedException, JSONException, IOException, ServletException {
 
 	SessionMap<String, Object> sessionMap = getSessionMap(request);
 	Long externalId = (Long) sessionMap.get(CommentConstants.ATTR_EXTERNAL_ID);
@@ -594,11 +570,9 @@ public class CommentAction extends Action {
 
     /**
      * Update the likes/dislikes
-     *
-     * @throws ServletException
      */
-    private synchronized ActionForward updateLikeCount(ActionMapping mapping, ActionForm form,
-	    HttpServletRequest request, HttpServletResponse response, boolean isLike)
+    private ActionForward updateLikeCount(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+	    HttpServletResponse response, boolean isLike)
 	    throws InterruptedException, JSONException, IOException, ServletException {
 
 	SessionMap<String, Object> sessionMap = getSessionMap(request);
@@ -627,10 +601,8 @@ public class CommentAction extends Action {
 
     /**
      * Update hide flag
-     *
-     * @throws ServletException
      */
-    private synchronized ActionForward hideComment(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+    private ActionForward hideComment(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response, boolean isLike)
 	    throws InterruptedException, JSONException, IOException, ServletException {
 
