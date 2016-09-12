@@ -63,8 +63,6 @@ public class McLearningForm extends ActionForm implements McAppConstants {
     protected String learnerProgress;
     protected String learnerProgressUserId;
 
-    protected String questionListingMode;
-
     protected String entryText;
 
     protected String questionIndex;
@@ -363,21 +361,6 @@ public class McLearningForm extends ActionForm implements McAppConstants {
      */
     public void setQuestionIndex(String questionIndex) {
 	this.questionIndex = questionIndex;
-    }
-
-    /**
-     * @return Returns the questionListingMode.
-     */
-    public String getQuestionListingMode() {
-	return questionListingMode;
-    }
-
-    /**
-     * @param questionListingMode
-     *            The questionListingMode to set.
-     */
-    public void setQuestionListingMode(String questionListingMode) {
-	this.questionListingMode = questionListingMode;
     }
 
     /**

@@ -46,11 +46,10 @@ import org.apache.struts.action.ActionRedirect;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.notebook.service.CoreNotebookConstants;
 import org.lamsfoundation.lams.tool.ToolAccessMode;
+import org.lamsfoundation.lams.tool.mc.AnswerDTO;
 import org.lamsfoundation.lams.tool.mc.McAppConstants;
 import org.lamsfoundation.lams.tool.mc.McApplicationException;
 import org.lamsfoundation.lams.tool.mc.McGeneralLearnerFlowDTO;
-import org.lamsfoundation.lams.tool.mc.McLearnerAnswersDTO;
-import org.lamsfoundation.lams.tool.mc.McLearnerStarterDTO;
 import org.lamsfoundation.lams.tool.mc.McUtils;
 import org.lamsfoundation.lams.tool.mc.pojos.McContent;
 import org.lamsfoundation.lams.tool.mc.pojos.McQueUsr;
@@ -123,19 +122,6 @@ public class McLearningStarterAction extends Action implements McAppConstants {
 	    return (mapping.findForward(McAppConstants.ERROR_LIST));
 	}
 
-	/*
-	 * The content we retrieved above must have been created before in Authoring time. And the passed tool session
-	 * id already refers to it.
-	 */
-	McLearnerStarterDTO mcLearnerStarterDTO = new McLearnerStarterDTO();
-	if (mcContent.isQuestionsSequenced()) {
-	    mcLearnerStarterDTO.setQuestionListingMode(McAppConstants.QUESTION_LISTING_MODE_SEQUENTIAL);
-	    mcLearningForm.setQuestionListingMode(McAppConstants.QUESTION_LISTING_MODE_SEQUENTIAL);
-	} else {
-	    mcLearnerStarterDTO.setQuestionListingMode(McAppConstants.QUESTION_LISTING_MODE_COMBINED);
-	    mcLearningForm.setQuestionListingMode(McAppConstants.QUESTION_LISTING_MODE_COMBINED);
-	}
-
 	String mode = request.getParameter(McAppConstants.MODE);
 	McQueUsr user = null;
 	if ((mode != null) && mode.equals(ToolAccessMode.TEACHER.toString())) {
@@ -159,17 +145,14 @@ public class McLearningStarterAction extends Action implements McAppConstants {
 	    TimeZone learnerTimeZone = learnerDto.getTimeZone();
 	    Date tzSubmissionDeadline = DateUtil.convertToTimeZoneFromDefault(learnerTimeZone, submissionDeadline);
 	    Date currentLearnerDate = DateUtil.convertToTimeZoneFromDefault(learnerTimeZone, new Date());
-	    mcLearnerStarterDTO.setSubmissionDeadline(submissionDeadline);
+	    request.setAttribute("submissionDeadline", submissionDeadline);
 
 	    // calculate whether submission deadline has passed, and if so forward to "submissionDeadline"
 	    if (currentLearnerDate.after(tzSubmissionDeadline)) {
-		request.setAttribute(McAppConstants.MC_LEARNER_STARTER_DTO, mcLearnerStarterDTO);
 		return mapping.findForward("submissionDeadline");
 	    }
 	}
 
-	mcLearnerStarterDTO.setActivityTitle(mcContent.getTitle());
-	request.setAttribute(McAppConstants.MC_LEARNER_STARTER_DTO, mcLearnerStarterDTO);
 	mcLearningForm.setToolContentID(mcContent.getMcContentId().toString());
 
 	McGeneralLearnerFlowDTO mcGeneralLearnerFlowDTO = LearningUtil.buildMcGeneralLearnerFlowDTO(mcContent);
@@ -191,7 +174,7 @@ public class McLearningStarterAction extends Action implements McAppConstants {
 	}
 	request.setAttribute(McAppConstants.MC_GENERAL_LEARNER_FLOW_DTO, mcGeneralLearnerFlowDTO);
 
-	List<McLearnerAnswersDTO> learnerAnswersDTOList = mcService.buildLearnerAnswersDTOList(mcContent, user);
+	List<AnswerDTO> learnerAnswersDTOList = mcService.getAnswersFromDatabase(mcContent, user);
 	request.setAttribute(McAppConstants.LEARNER_ANSWERS_DTO_LIST, learnerAnswersDTOList);
 	// should we show the marks for each question - we show the marks if any of the questions
 	// have a mark > 1.
@@ -250,7 +233,6 @@ public class McLearningStarterAction extends Action implements McAppConstants {
 	    return redirect;
 	}
 
-	request.setAttribute(McAppConstants.MC_LEARNER_STARTER_DTO, mcLearnerStarterDTO);
 	return (mapping.findForward(McAppConstants.LOAD_LEARNER));
     }
 

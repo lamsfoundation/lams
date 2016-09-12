@@ -30,7 +30,7 @@ import javax.servlet.http.HttpServletRequest;
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.tool.mc.McAppConstants;
 import org.lamsfoundation.lams.tool.mc.McGeneralLearnerFlowDTO;
-import org.lamsfoundation.lams.tool.mc.McLearnerAnswersDTO;
+import org.lamsfoundation.lams.tool.mc.AnswerDTO;
 import org.lamsfoundation.lams.tool.mc.pojos.McContent;
 
 /**
@@ -63,11 +63,7 @@ public class LearningUtil implements McAppConstants {
 	    mcLearningForm.setLearnerProgress(learnerProgress);
 	    String learnerProgressUserId = request.getParameter("learnerProgressUserId");
 	    mcLearningForm.setLearnerProgressUserId(learnerProgressUserId);
-
 	}
-
-	String questionListingMode = request.getParameter("questionListingMode");
-	mcLearningForm.setQuestionListingMode(questionListingMode);
     }
 
     /**
@@ -82,12 +78,6 @@ public class LearningUtil implements McAppConstants {
 	mcGeneralLearnerFlowDTO.setReportTitleLearner("Report");
 	mcGeneralLearnerFlowDTO.setLearnerProgress(new Boolean(false).toString());
 
-	if (mcContent.isQuestionsSequenced()) {
-	    mcGeneralLearnerFlowDTO.setQuestionListingMode(McAppConstants.QUESTION_LISTING_MODE_SEQUENTIAL);
-	} else {
-	    mcGeneralLearnerFlowDTO.setQuestionListingMode(McAppConstants.QUESTION_LISTING_MODE_COMBINED);
-	}
-
 	mcGeneralLearnerFlowDTO.setTotalQuestionCount(new Integer(mcContent.getMcQueContents().size()));
 	return mcGeneralLearnerFlowDTO;
     }
@@ -95,10 +85,10 @@ public class LearningUtil implements McAppConstants {
     /**
      * Should we show the marks for each question - we show the marks if any of the questions have a mark > 1.
      */
-    public static Boolean isShowMarksOnQuestion(List<McLearnerAnswersDTO> listQuestionAndCandidateAnswersDTO) {
+    public static Boolean isShowMarksOnQuestion(List<AnswerDTO> listQuestionAndCandidateAnswersDTO) {
 	Iterator iter = listQuestionAndCandidateAnswersDTO.iterator();
 	while (iter.hasNext()) {
-	    McLearnerAnswersDTO elem = (McLearnerAnswersDTO) iter.next();
+	    AnswerDTO elem = (AnswerDTO) iter.next();
 	    if (elem.getMark().intValue() > 1) {
 		return Boolean.TRUE;
 	    }

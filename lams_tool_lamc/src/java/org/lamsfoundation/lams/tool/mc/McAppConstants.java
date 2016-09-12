@@ -210,7 +210,7 @@ public interface McAppConstants {
     public static final String MAP_QUESTION_CONTENT_LEARNER = "mapQuestionContentLearner";
     public static final String LEARNER_ANSWERS_DTO_LIST = "learnerAnswersDTOList";
     public static final String MC_GENERAL_LEARNER_FLOW_DTO = "mcGeneralLearnerFlowDTO";
-    public static final String LIST_SELECTED_QUESTION_CANDIDATEANSWERS_DTO = "listSelectedQuestionCandidateAnswersDto";
+    public static final String ANSWER_DTOS = "answerDtos";
     public static final String CURRENT_QUESTION_INDEX = "currentQuestionIndex";
     public static final String TOTAL_QUESTION_COUNT = "totalQuestionCount";
     public static final String HR_COLUMN_COUNT = "hrColumnCount";
@@ -223,7 +223,6 @@ public interface McAppConstants {
     public static final String NOTEBOOK = "notebook";
     public static final String ENTRY_TEXT = "entryText";
 
-    public static final String MC_LEARNER_STARTER_DTO = "mcLearnerStarterDTO";
     public static final String IS_USERNAME_VISIBLE = "isUsernameVisible";
     public static final String IS_CONTENT_IN_USE = "isContentInUse";
     public static final String IS_MONITORED_CONTENT_IN_USE = "isMonitoredContentInUse";
@@ -267,9 +266,6 @@ public interface McAppConstants {
     public static final String SESSION_DTOS = "sessionDtos";
     public static final String TIMEZONE = "timeZone";
 
-    public static final String QUESTION_LISTING_MODE = "questionListingMode";
-    public static final String QUESTION_LISTING_MODE_SEQUENTIAL = "questionListingModeSequential";
-    public static final String QUESTION_LISTING_MODE_COMBINED = "questionListingModeCombined";
     public static final String PREVIEW_ONLY = "previewOnly";
 
     public static final String MODE = "mode";

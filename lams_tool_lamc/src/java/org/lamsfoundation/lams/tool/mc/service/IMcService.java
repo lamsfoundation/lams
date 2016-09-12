@@ -32,7 +32,7 @@ import org.lamsfoundation.lams.tool.ToolSessionExportOutputData;
 import org.lamsfoundation.lams.tool.exception.DataMissingException;
 import org.lamsfoundation.lams.tool.exception.ToolException;
 import org.lamsfoundation.lams.tool.mc.McApplicationException;
-import org.lamsfoundation.lams.tool.mc.McLearnerAnswersDTO;
+import org.lamsfoundation.lams.tool.mc.AnswerDTO;
 import org.lamsfoundation.lams.tool.mc.McOptionDTO;
 import org.lamsfoundation.lams.tool.mc.McQuestionDTO;
 import org.lamsfoundation.lams.tool.mc.McSessionMarkDTO;
@@ -85,7 +85,7 @@ public interface IMcService {
 
     McQueUsr getMcUserBySession(final Long queUsrId, final Long mcSessionUid) throws McApplicationException;
 
-    void saveUserAttempt(McQueUsr user, List<McLearnerAnswersDTO> selectedQuestionAndCandidateAnswersDTO);
+    void saveUserAttempt(McQueUsr user, List<AnswerDTO> answerDtos);
 
     void updateMcUsrAttempt(McUsrAttempt mcUsrAttempt) throws McApplicationException;
 
@@ -193,7 +193,7 @@ public interface IMcService {
      *            user; pass null if there is no need to populate previous answers
      * @return
      */
-    List<McLearnerAnswersDTO> buildLearnerAnswersDTOList(McContent mcContent, McQueUsr user);
+    List<AnswerDTO> getAnswersFromDatabase(McContent mcContent, McQueUsr user);
 
     /**
      * Returns userMarksDtos grouped by sessions. Used *only* for export portfolio.
