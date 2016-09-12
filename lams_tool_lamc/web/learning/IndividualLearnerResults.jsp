@@ -46,7 +46,6 @@
 			<html:hidden property="passMarkApplicable" />
 			<html:hidden property="learnerProgress" />
 			<html:hidden property="learnerProgressUserId" />
-			<html:hidden property="questionListingMode" />
 
 			<c:choose>
 				<c:when test="${mcGeneralLearnerFlowDTO.retries == 'true'}">
@@ -94,7 +93,7 @@
 				<fmt:message key="label.yourAnswers" />
 			</h4>
 
-			<c:forEach var="dto" varStatus="status" items="${requestScope.listSelectedQuestionCandidateAnswersDto}">
+			<c:forEach var="dto" varStatus="status" items="${answerDtos}">
 
 				<div class="shading-bg">
 
@@ -117,12 +116,14 @@
 						<c:out value="${dto.answerOption.mcQueOptionText}" escapeXml="false" />
 								
                     	<c:if test="${mcGeneralLearnerFlowDTO.displayAnswers == 'true'}">
-							<c:if test="${dto.attemptCorrect == 'true'}">
-								<img src="<c:out value="${tool}"/>images/tick.gif" border="0" class="middle">
-							</c:if>
-							<c:if test="${dto.attemptCorrect != 'true'}">
-								<img src="<c:out value="${tool}"/>images/cross.gif" border="0" class="middle">
-							</c:if>
+                    		<c:choose>
+                    			<c:when test="${dto.attemptCorrect}">
+                    				<img src="<c:out value="${tool}"/>images/tick.gif" border="0" class="middle">
+                    			</c:when>
+                    			<c:otherwise>
+                    				<img src="<c:out value="${tool}"/>images/cross.gif" border="0" class="middle">
+                    			</c:otherwise>
+                    		</c:choose>
 						</c:if>
 					</p>
 

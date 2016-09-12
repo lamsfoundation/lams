@@ -34,7 +34,7 @@ import org.lamsfoundation.lams.tool.mc.pojos.McOptsContent;
  *
  * @author Ozgur Demirtas
  */
-public class McLearnerAnswersDTO implements Comparable {
+public class AnswerDTO implements Comparable {
     protected String question;
 
     protected String displayOrder;
@@ -47,7 +47,7 @@ public class McLearnerAnswersDTO implements Comparable {
 
     protected List<McOptsContent> options;
 
-    protected String attemptCorrect;
+    protected boolean attemptCorrect;
 
     protected String feedbackIncorrect;
 
@@ -108,9 +108,9 @@ public class McLearnerAnswersDTO implements Comparable {
 
     @Override
     public int compareTo(Object o) {
-	McLearnerAnswersDTO mcLearnerAnswersDTO = (McLearnerAnswersDTO) o;
+	AnswerDTO answerDto = (AnswerDTO) o;
 
-	if (mcLearnerAnswersDTO == null) {
+	if (answerDto == null) {
 	    return 1;
 	} else {
 	    return 0;
@@ -165,7 +165,7 @@ public class McLearnerAnswersDTO implements Comparable {
     /**
      * @return Returns the attemptCorrect.
      */
-    public String getAttemptCorrect() {
+    public boolean isAttemptCorrect() {
 	return attemptCorrect;
     }
 
@@ -173,7 +173,7 @@ public class McLearnerAnswersDTO implements Comparable {
      * @param attemptCorrect
      *            The attemptCorrect to set.
      */
-    public void setAttemptCorrect(String attemptCorrect) {
+    public void setAttemptCorrect(boolean attemptCorrect) {
 	this.attemptCorrect = attemptCorrect;
     }
 

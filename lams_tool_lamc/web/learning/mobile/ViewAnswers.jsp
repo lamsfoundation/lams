@@ -48,8 +48,6 @@
 			<html:hidden property="passMarkApplicable" />
 			<html:hidden property="learnerProgress" />
 			<html:hidden property="learnerProgressUserId" />
-			<html:hidden property="questionListingMode" />
-
 
 			<h2>
 				<c:if test="${mcGeneralLearnerFlowDTO.learnerProgress != 'true'}">

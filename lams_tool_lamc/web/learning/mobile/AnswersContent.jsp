@@ -64,7 +64,7 @@
 
 		function verifyAllQuestionsAnswered() {
 			// in case oneQuestionPerPage option is ON user has to select 1 answer, and all answers otherwise
-			var isOneQuestionPerPage = ${mcGeneralLearnerFlowDTO.questionListingMode == 'questionListingModeSequential'};
+			var isOneQuestionPerPage = ${sessionMap.content.questionsSequenced};
 			var answersRequiredNumber = (isOneQuestionPerPage) ? 1 : ${fn:length(requestScope.learnerAnswersDTOList)};
 			
 			//check each question is answered
@@ -126,8 +126,7 @@
 		<html:hidden property="userOverPassMark"/>						
 		<html:hidden property="passMarkApplicable"/>										
 		<html:hidden property="learnerProgress"/>										
-		<html:hidden property="learnerProgressUserId"/>										
-		<html:hidden property="questionListingMode"/>					
+		<html:hidden property="learnerProgressUserId"/>			
 		
 		<%@ include file="/common/messages.jsp"%>
 						
@@ -140,7 +139,7 @@
 		</c:if>
 		
 		<c:choose> 
-		  <c:when test="${(mcGeneralLearnerFlowDTO.questionListingMode == 'questionListingModeSequential') && hasEditRight}" > 
+		  <c:when test="${sessionMap.content.questionsSequenced && hasEditRight}" > 
 				<jsp:include page="/learning/mobile/SingleQuestionAnswersContent.jsp" /> 
 		  </c:when> 
 		  <c:otherwise>

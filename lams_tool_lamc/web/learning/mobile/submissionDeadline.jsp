@@ -42,7 +42,7 @@
 			<div data-role="content">
 				<div class="warning">
 					<fmt:message key="authoring.info.teacher.set.restriction" >
-						<fmt:param><lams:Date value="${mcLearnerStarterDTO.submissionDeadline}" /></fmt:param>
+						<fmt:param><lams:Date value="${submissionDeadline}" /></fmt:param>
 					</fmt:message>							
 				</div>	
 			</div>	
