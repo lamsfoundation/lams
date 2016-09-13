@@ -137,6 +137,10 @@ LAMS Learner Style
 .panel-admin-title {
 	color:#337ab7 !important;
 }
+.panel-title {
+	font-size: 	inherit;
+	font-weight: bolder;
+}
 body.stripes {
   background: url('/lams/images/css/light-fabric.jpg');
 }
