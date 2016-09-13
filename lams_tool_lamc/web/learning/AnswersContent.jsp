@@ -36,7 +36,7 @@
 
 		//autoSaveAnswers if hasEditRight
 		if (${hasEditRight}) {
-			var interval = "300000"; // = 30 seconds
+			var interval = "30000"; // = 30 seconds
 			window.setInterval(
 				function(){
 					//ajax form submit
