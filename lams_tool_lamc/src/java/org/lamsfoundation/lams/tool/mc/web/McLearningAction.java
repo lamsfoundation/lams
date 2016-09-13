@@ -29,7 +29,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
-import java.util.regex.Pattern;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -40,7 +39,6 @@ import org.apache.log4j.Logger;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
-import org.apache.struts.action.ActionRedirect;
 import org.apache.tomcat.util.json.JSONException;
 import org.apache.tomcat.util.json.JSONObject;
 import org.lamsfoundation.lams.learning.web.util.LearningWebUtil;
@@ -48,11 +46,10 @@ import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.notebook.service.CoreNotebookConstants;
 import org.lamsfoundation.lams.tool.exception.DataMissingException;
 import org.lamsfoundation.lams.tool.exception.ToolException;
+import org.lamsfoundation.lams.tool.mc.AnswerDTO;
 import org.lamsfoundation.lams.tool.mc.McAppConstants;
 import org.lamsfoundation.lams.tool.mc.McComparator;
 import org.lamsfoundation.lams.tool.mc.McGeneralLearnerFlowDTO;
-import org.lamsfoundation.lams.tool.mc.McLearnerAnswersDTO;
-import org.lamsfoundation.lams.tool.mc.McTempDataHolderDTO;
 import org.lamsfoundation.lams.tool.mc.McUtils;
 import org.lamsfoundation.lams.tool.mc.pojos.McContent;
 import org.lamsfoundation.lams.tool.mc.pojos.McOptsContent;
@@ -68,9 +65,6 @@ import org.lamsfoundation.lams.web.action.LamsDispatchAction;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.lamsfoundation.lams.web.util.SessionMap;
-import org.springframework.dao.DataIntegrityViolationException;
-
-import com.mysql.jdbc.exceptions.MySQLIntegrityConstraintViolationException;
 
 /**
  * @author Ozgur Demirtas
@@ -177,23 +171,15 @@ public class McLearningAction extends LamsDispatchAction implements McAppConstan
 	LearningUtil.saveFormRequestData(request, mcLearningForm, false);
 	// requested learner finished, the learner should be directed to next activity
 
-	String userID = "";
 	HttpSession ss = SessionManager.getSession();
-
-	if (ss != null) {
-	    UserDTO user = (UserDTO) ss.getAttribute(AttributeNames.USER);
-	    if (user != null && user.getUserID() != null) {
-		userID = user.getUserID().toString();
-	    }
-	}
+	UserDTO userDto = (UserDTO) ss.getAttribute(AttributeNames.USER);
 
 	// attempting to leave/complete session with toolSessionId:
-
 	McUtils.cleanUpSessionAbsolute(request);
 
 	String nextUrl = null;
 	try {
-	    nextUrl = mcService.leaveToolSession(new Long(toolSessionID), new Long(userID));
+	    nextUrl = mcService.leaveToolSession(new Long(toolSessionID), userDto.getUserID().longValue());
 	} catch (DataMissingException e) {
 	    McLearningAction.logger.error("failure getting nextUrl: " + e);
 	    return mapping.findForward(McAppConstants.LEARNING_STARTER);
@@ -213,58 +199,49 @@ public class McLearningAction extends LamsDispatchAction implements McAppConstan
     /**
      *
      */
-    protected List<McLearnerAnswersDTO> buildSelectedQuestionAndCandidateAnswersDTO(List<String> learnerInput,
-	    McTempDataHolderDTO mcTempDataHolderDTO, McContent content) {
+    protected List<AnswerDTO> buildAnswerDtos(List<String> answers, McContent content) {
 
-	int learnerMark = 0;
-	int totalMarksPossible = 0;
-
-	List<McLearnerAnswersDTO> questionAndCandidateAnswersList = new LinkedList<McLearnerAnswersDTO>();
+	List<AnswerDTO> answerDtos = new LinkedList<AnswerDTO>();
 
 	for (McQueContent question : (Set<McQueContent>) content.getMcQueContents()) {
 	    String questionUid = question.getUid().toString();
-	    int currentMark = question.getMark().intValue();
-	    totalMarksPossible += currentMark;
+	    int questionMark = question.getMark().intValue();
 
-	    McLearnerAnswersDTO mcLearnerAnswersDTO = new McLearnerAnswersDTO();
-	    mcLearnerAnswersDTO.setQuestion(question.getQuestion());
-	    mcLearnerAnswersDTO.setDisplayOrder(question.getDisplayOrder().toString());
-	    mcLearnerAnswersDTO.setQuestionUid(question.getUid());
-	    mcLearnerAnswersDTO.setFeedback(question.getFeedback() != null ? question.getFeedback() : "");
+	    AnswerDTO answerDto = new AnswerDTO();
+	    answerDto.setQuestion(question.getQuestion());
+	    answerDto.setDisplayOrder(question.getDisplayOrder().toString());
+	    answerDto.setQuestionUid(question.getUid());
+	    answerDto.setFeedback(question.getFeedback() != null ? question.getFeedback() : "");
 
 	    //search for according answer
 	    McOptsContent answerOption = null;
-	    for (String input : learnerInput) {
-		int pos = input.indexOf("-");
-		String inputQuestionUid = input.substring(0, pos);
+	    for (String answer : answers) {
+		int hyphenPosition = answer.indexOf("-");
+		String answeredQuestionUid = answer.substring(0, hyphenPosition);
 
-		if (questionUid.equals(inputQuestionUid)) {
-		    String answerOptionUid = input.substring(pos + 1);
-		    answerOption = question.getOptionsContentByUID(new Long(answerOptionUid));
-		    mcLearnerAnswersDTO.setAnswerOption(answerOption);
+		if (questionUid.equals(answeredQuestionUid)) {
+		    String answeredOptionUid = answer.substring(hyphenPosition + 1);
+		    answerOption = question.getOptionsContentByUID(new Long(answeredOptionUid));
+		    answerDto.setAnswerOption(answerOption);
 		    break;
 		}
 	    }
 
 	    boolean isCorrect = (answerOption != null) && answerOption.isCorrectOption();
-	    mcLearnerAnswersDTO.setAttemptCorrect(new Boolean(isCorrect).toString());
+	    answerDto.setAttemptCorrect(isCorrect);
 	    if (isCorrect) {
-		mcLearnerAnswersDTO.setFeedbackCorrect(question.getFeedback());
-		mcLearnerAnswersDTO.setMark(new Integer(currentMark));
-		learnerMark += currentMark;
+		answerDto.setFeedbackCorrect(question.getFeedback());
+		answerDto.setMark(questionMark);
 	    } else {
-		mcLearnerAnswersDTO.setFeedbackIncorrect(question.getFeedback());
-		mcLearnerAnswersDTO.setMark(new Integer(0));
+		answerDto.setFeedbackIncorrect(question.getFeedback());
+		answerDto.setMark(0);
 	    }
 
-	    questionAndCandidateAnswersList.add(mcLearnerAnswersDTO);
+	    answerDtos.add(answerDto);
 
 	}
 
-	mcTempDataHolderDTO.setLearnerMark(new Integer(learnerMark));
-	mcTempDataHolderDTO.setTotalMarksPossible(new Integer(totalMarksPossible));
-
-	return questionAndCandidateAnswersList;
+	return answerDtos;
     }
 
     /**
@@ -279,57 +256,48 @@ public class McLearningAction extends LamsDispatchAction implements McAppConstan
 
 	String httpSessionID = mcLearningForm.getHttpSessionID();
 	SessionMap<String, Object> sessionMap = (SessionMap) request.getSession().getAttribute(httpSessionID);
+	request.getSession().setAttribute(httpSessionID, sessionMap);
+	
+	String toolSessionID = request.getParameter(AttributeNames.PARAM_TOOL_SESSION_ID);
+	McSession session = mcService.getMcSessionById(new Long(toolSessionID));
+	String toolContentId = session.getMcContent().getMcContentId().toString();
+	McContent mcContent = mcService.getMcContent(new Long(toolContentId));
 
-	String questionListingMode = mcLearningForm.getQuestionListingMode();
-
-	List<String> learnerInput = McLearningAction.parseLearnerAnswers(mcLearningForm, request);
-
-	if (questionListingMode.equals(McAppConstants.QUESTION_LISTING_MODE_SEQUENTIAL)) {
-	    sessionMap.put(McAppConstants.QUESTION_AND_CANDIDATE_ANSWERS_KEY, learnerInput);
+	List<String> answers = McLearningAction.parseLearnerAnswers(mcLearningForm, request, mcContent.isQuestionsSequenced());
+	if (mcContent.isQuestionsSequenced()) {
+	    sessionMap.put(McAppConstants.QUESTION_AND_CANDIDATE_ANSWERS_KEY, answers);
 	}
 
 	mcLearningForm.resetCa(mapping, request);
 
-	String toolSessionID = request.getParameter(AttributeNames.PARAM_TOOL_SESSION_ID);
-	McSession mcSession = mcService.getMcSessionById(new Long(toolSessionID));
-	String toolContentId = mcSession.getMcContent().getMcContentId().toString();
-	/* process the answers */
-	McContent mcContent = mcService.getMcContent(new Long(toolContentId));
-
-	McGeneralLearnerFlowDTO mcGeneralLearnerFlowDTO = LearningUtil.buildMcGeneralLearnerFlowDTO(mcContent);
-
-	McTempDataHolderDTO mcTempDataHolderDTO = new McTempDataHolderDTO();
-	List<McLearnerAnswersDTO> selectedQuestionAndCandidateAnswersDTO = buildSelectedQuestionAndCandidateAnswersDTO(
-		learnerInput, mcTempDataHolderDTO, mcContent);
-	request.setAttribute(McAppConstants.LIST_SELECTED_QUESTION_CANDIDATEANSWERS_DTO,
-		selectedQuestionAndCandidateAnswersDTO);
-
-	mcGeneralLearnerFlowDTO.setQuestionListingMode(McAppConstants.QUESTION_LISTING_MODE_COMBINED);
-
-	Integer learnerMark = mcTempDataHolderDTO.getLearnerMark();
-	mcGeneralLearnerFlowDTO.setLearnerMark(learnerMark);
-	int totalQuestionCount = mcContent.getMcQueContents().size();
-	mcGeneralLearnerFlowDTO.setTotalQuestionCount(new Integer(totalQuestionCount));
-	mcGeneralLearnerFlowDTO.setTotalMarksPossible(mcTempDataHolderDTO.getTotalMarksPossible());
-
-	request.getSession().setAttribute(httpSessionID, sessionMap);
-
-	HttpSession ss = SessionManager.getSession();
-	UserDTO userDto = (UserDTO) ss.getAttribute(AttributeNames.USER);
-	String userID = userDto.getUserID().toString();
-	McQueUsr user = mcService.getMcUserBySession(new Long(userID), mcSession.getUid());
+	McQueUsr user = getCurrentUser(toolSessionID);
 
 	//prohibit users from submitting answers after response is finalized but Resubmit button is not pressed (e.g. using 2 browsers)
 	if (user.isResponseFinalised()) {
 	    return viewAnswers(mapping, mcLearningForm, request, response);
 	}
 
+	/* process the answers */
+	List<AnswerDTO> answerDtos = buildAnswerDtos(answers, mcContent);
+	mcService.saveUserAttempt(user, answerDtos);
+	request.setAttribute(McAppConstants.ANSWER_DTOS, answerDtos);
+	
+	//calculate total learner mark
+	int learnerMark = 0;
+	for (AnswerDTO answerDto : answerDtos) {
+	    learnerMark += answerDto.getMark();
+	}
+
+	McGeneralLearnerFlowDTO mcGeneralLearnerFlowDTO = LearningUtil.buildMcGeneralLearnerFlowDTO(mcContent);
+	mcGeneralLearnerFlowDTO.setLearnerMark(learnerMark);
+	mcGeneralLearnerFlowDTO.setTotalQuestionCount(mcContent.getMcQueContents().size());
+	mcGeneralLearnerFlowDTO.setTotalMarksPossible(mcContent.getTotalMarksPossible());
+
 	// Have to work out in advance if passed so that we can store it against the attempts
 	boolean passed = user.isMarkPassed(learnerMark);
 	mcGeneralLearnerFlowDTO.setUserOverPassMark(new Boolean(passed).toString());
 	mcGeneralLearnerFlowDTO.setPassMarkApplicable(new Boolean(mcContent.getPassMark() != null).toString());
 
-	McLearningAction.saveUserAttempt(user, selectedQuestionAndCandidateAnswersDTO);
 
 	Integer numberOfAttempts = user.getNumberOfAttempts() + 1;
 	user.setNumberOfAttempts(numberOfAttempts);
@@ -341,7 +309,7 @@ public class McLearningAction extends LamsDispatchAction implements McAppConstan
 
 	mcGeneralLearnerFlowDTO.setShowMarks(new Boolean(mcContent.isShowMarks()).toString());
 	if (mcContent.isShowMarks()) {
-	    Integer[] markStatistics = mcService.getMarkStatistics(mcSession);
+	    Integer[] markStatistics = mcService.getMarkStatistics(session);
 	    mcGeneralLearnerFlowDTO.setTopMark(markStatistics[0]);
 	    mcGeneralLearnerFlowDTO.setLowestMark(markStatistics[1]);
 	    mcGeneralLearnerFlowDTO.setAverageMark(markStatistics[2]);
@@ -382,10 +350,7 @@ public class McLearningAction extends LamsDispatchAction implements McAppConstan
 	String toolContentId = mcSession.getMcContent().getMcContentId().toString();
 	McContent mcContent = mcService.getMcContent(new Long(toolContentId));
 
-	HttpSession ss = SessionManager.getSession();
-	UserDTO userDto = (UserDTO) ss.getAttribute(AttributeNames.USER);
-	String userID = userDto.getUserID().toString();
-	McQueUsr user = mcService.getMcUserBySession(new Long(userID), mcSession.getUid());
+	McQueUsr user = getCurrentUser(toolSessionID);
 
 	String httpSessionID = mcLearningForm.getHttpSessionID();
 	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
@@ -397,16 +362,14 @@ public class McLearningAction extends LamsDispatchAction implements McAppConstan
 	}
 
 	//parse learner input
-	List<String> learnerInput = McLearningAction.parseLearnerAnswers(mcLearningForm, request);
-	sessionMap.put(McAppConstants.QUESTION_AND_CANDIDATE_ANSWERS_KEY, learnerInput);
+	List<String> answers = McLearningAction.parseLearnerAnswers(mcLearningForm, request, mcContent.isQuestionsSequenced());
+	sessionMap.put(McAppConstants.QUESTION_AND_CANDIDATE_ANSWERS_KEY, answers);
 
 	//save user attempt
-	List<McLearnerAnswersDTO> selectedQuestionAndCandidateAnswersDTO = buildSelectedQuestionAndCandidateAnswersDTO(
-		learnerInput, new McTempDataHolderDTO(), mcContent);
-	McLearningAction.saveUserAttempt(user, selectedQuestionAndCandidateAnswersDTO);
-
-	McQueUsr mcQueUsr = getCurrentUser(toolSessionID);
-	List<McLearnerAnswersDTO> learnerAnswersDTOList = mcService.buildLearnerAnswersDTOList(mcContent, mcQueUsr);
+	List<AnswerDTO> answerDtos = buildAnswerDtos(answers, mcContent);
+	mcService.saveUserAttempt(user, answerDtos);
+	
+	List<AnswerDTO> learnerAnswersDTOList = mcService.getAnswersFromDatabase(mcContent, user);
 	request.setAttribute(McAppConstants.LEARNER_ANSWERS_DTO_LIST, learnerAnswersDTOList);
 
 	McGeneralLearnerFlowDTO mcGeneralLearnerFlowDTO = LearningUtil.buildMcGeneralLearnerFlowDTO(mcContent);
@@ -419,14 +382,9 @@ public class McLearningAction extends LamsDispatchAction implements McAppConstan
 	}
 
 	mcGeneralLearnerFlowDTO.setReflection(new Boolean(mcContent.isReflect()).toString());
-
-	// String reflectionSubject = McUtils.replaceNewLines(mcContent.getReflectionSubject());
 	mcGeneralLearnerFlowDTO.setReflectionSubject(mcContent.getReflectionSubject());
-
 	mcGeneralLearnerFlowDTO.setRetries(new Boolean(mcContent.isRetries()).toString());
-
 	mcGeneralLearnerFlowDTO.setTotalMarksPossible(mcContent.getTotalMarksPossible());
-
 	mcGeneralLearnerFlowDTO.setQuestionIndex(new Integer(questionIndex));
 	request.setAttribute(McAppConstants.MC_GENERAL_LEARNER_FLOW_DTO, mcGeneralLearnerFlowDTO);
 
@@ -562,9 +520,7 @@ public class McLearningAction extends LamsDispatchAction implements McAppConstan
 	    }
 	}
 	mcGeneralLearnerFlowDTO.setAttemptMap(attemptMap);
-
 	mcGeneralLearnerFlowDTO.setReflection(new Boolean(mcContent.isReflect()).toString());
-	// String reflectionSubject = McUtils.replaceNewLines(mcContent.getReflectionSubject());
 	mcGeneralLearnerFlowDTO.setReflectionSubject(mcContent.getReflectionSubject());
 
 	NotebookEntry notebookEntry = mcService.getEntry(new Long(toolSessionID), CoreNotebookConstants.NOTEBOOK_TOOL,
@@ -623,17 +579,13 @@ public class McLearningAction extends LamsDispatchAction implements McAppConstan
 	List<String> sequentialCheckedCa = new LinkedList<String>();
 	sessionMap.put(McAppConstants.QUESTION_AND_CANDIDATE_ANSWERS_KEY, sequentialCheckedCa);
 
-	List<McLearnerAnswersDTO> learnerAnswersDTOList = mcService.buildLearnerAnswersDTOList(mcContent, mcQueUsr);
+	List<AnswerDTO> learnerAnswersDTOList = mcService.getAnswersFromDatabase(mcContent, mcQueUsr);
 	request.setAttribute(McAppConstants.LEARNER_ANSWERS_DTO_LIST, learnerAnswersDTOList);
 
 	McGeneralLearnerFlowDTO mcGeneralLearnerFlowDTO = LearningUtil.buildMcGeneralLearnerFlowDTO(mcContent);
 	mcGeneralLearnerFlowDTO.setQuestionIndex(new Integer(1));
-
 	mcGeneralLearnerFlowDTO.setReflection(new Boolean(mcContent.isReflect()).toString());
-
-	//String reflectionSubject = McUtils.replaceNewLines(mcContent.getReflectionSubject());
 	mcGeneralLearnerFlowDTO.setReflectionSubject(mcContent.getReflectionSubject());
-
 	mcGeneralLearnerFlowDTO.setRetries(new Boolean(mcContent.isRetries()).toString());
 
 	String passMarkApplicable = new Boolean(mcContent.isPassMarkApplicable()).toString();
@@ -786,65 +738,32 @@ public class McLearningAction extends LamsDispatchAction implements McAppConstan
 	McSession mcSession = mcService.getMcSessionById(new Long(toolSessionID));
 	McContent mcContent = mcSession.getMcContent();
 
-	HttpSession ss = SessionManager.getSession();
-	UserDTO userDto = (UserDTO) ss.getAttribute(AttributeNames.USER);
-	String userID = userDto.getUserID().toString();
-	McQueUsr user = mcService.getMcUserBySession(new Long(userID), mcSession.getUid());
+	Long userID = mcLearningForm.getUserID();
+	McQueUsr user = mcService.getMcUserBySession(userID, mcSession.getUid());
 
 	//prohibit users from autosaving answers after response is finalized but Resubmit button is not pressed (e.g. using 2 browsers)
 	if (user.isResponseFinalised()) {
 	    return null;
 	}
 
-	List<String> learnerInput = McLearningAction.parseLearnerAnswers(mcLearningForm, request);
+	List<String> answers = McLearningAction.parseLearnerAnswers(mcLearningForm, request, mcContent.isQuestionsSequenced());
 
-	List<McLearnerAnswersDTO> selectedQuestionAndCandidateAnswersDTO = buildSelectedQuestionAndCandidateAnswersDTO(
-		learnerInput, new McTempDataHolderDTO(), mcContent);
-	McLearningAction.saveUserAttempt(user, selectedQuestionAndCandidateAnswersDTO);
+	List<AnswerDTO> answerDtos = buildAnswerDtos(answers, mcContent);
+	mcService.saveUserAttempt(user, answerDtos);
 
 	return null;
     }
 
-    /**
-     * Makes a call to mcService.saveUserAttempt(). This method is designed purely for exception handling purposes. It
-     * needs to be performed inside Action class as otherwise Hibernate tries to flush the session which leads to
-     * another exception.
-     */
-    private static void saveUserAttempt(McQueUsr user,
-	    List<McLearnerAnswersDTO> selectedQuestionAndCandidateAnswersDTO) {
-	try {
-	    mcService.saveUserAttempt(user, selectedQuestionAndCandidateAnswersDTO);
-
-	} catch (DataIntegrityViolationException e) {
-
-	    // log DB exceptions occurred due to creating non-unique McUsrAttempt. And propagate all the other exceptions
-	    if (e.getRootCause() instanceof MySQLIntegrityConstraintViolationException) {
-		String rootCauseMessage = e.getRootCause().getMessage();
-
-		Pattern pattern = Pattern.compile("Duplicate entry.*attempt_unique_index");
-		if ((rootCauseMessage != null) && pattern.matcher(rootCauseMessage).find()) {
-		    logger.error("Prevented creation of McUsrAttempt which was not unique for user and question: "
-			    + rootCauseMessage);
-		    return;
-		}
-	    }
-
-	    throw e;
-	}
-    }
-
-    private static List<String> parseLearnerAnswers(McLearningForm mcLearningForm, HttpServletRequest request) {
+    private static List<String> parseLearnerAnswers(McLearningForm mcLearningForm, HttpServletRequest request, boolean isQuestionsSequenced) {
 	String httpSessionID = mcLearningForm.getHttpSessionID();
 	SessionMap<String, Object> sessionMap = (SessionMap) request.getSession().getAttribute(httpSessionID);
 
-	String questionListingMode = mcLearningForm.getQuestionListingMode();
+	List<String> answers = new LinkedList<String>();
+	if (isQuestionsSequenced) {
 
-	List<String> learnerInput = new LinkedList<String>();
-	if (questionListingMode.equals(McAppConstants.QUESTION_LISTING_MODE_SEQUENTIAL)) {
-
-	    List<String> previousLearnerInput = (List<String>) sessionMap
+	    List<String> previousAnswers = (List<String>) sessionMap
 		    .get(McAppConstants.QUESTION_AND_CANDIDATE_ANSWERS_KEY);
-	    learnerInput.addAll(previousLearnerInput);
+	    answers.addAll(previousAnswers);
 
 	    /* checkedCa refers to candidate answers */
 	    String[] checkedCa = mcLearningForm.getCheckedCa();
@@ -852,7 +771,7 @@ public class McLearningAction extends LamsDispatchAction implements McAppConstan
 	    if (checkedCa != null) {
 		for (int i = 0; i < checkedCa.length; i++) {
 		    String currentCa = checkedCa[i];
-		    learnerInput.add(currentCa);
+		    answers.add(currentCa);
 		}
 	    }
 
@@ -864,13 +783,13 @@ public class McLearningAction extends LamsDispatchAction implements McAppConstan
 		if (key.startsWith("checkedCa")) {
 		    String currentCheckedCa = request.getParameter(key);
 		    if (currentCheckedCa != null) {
-			learnerInput.add(currentCheckedCa);
+			answers.add(currentCheckedCa);
 		    }
 		}
 	    }
 	}
 
-	return learnerInput;
+	return answers;
     }
 
     private McQueUsr getCurrentUser(String toolSessionId) {

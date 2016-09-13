@@ -158,9 +158,6 @@ public abstract class McUtils implements McAppConstants {
 	request.getSession().removeAttribute(EDITACTIVITY_EDITMODE);
 	request.getSession().removeAttribute(FORM_INDEX);
 	request.getSession().removeAttribute(LIST_MONITORED_ANSWERS_CONTAINER_DTO);
-	request.getSession().removeAttribute(QUESTION_LISTING_MODE);
-	request.getSession().removeAttribute(QUESTION_LISTING_MODE_SEQUENTIAL);
-	request.getSession().removeAttribute(QUESTION_LISTING_MODE_COMBINED);
 	request.getSession().removeAttribute(PREVIEW_ONLY);
 	request.getSession().removeAttribute(TIMEZONE);
 	request.getSession().removeAttribute(MODE);

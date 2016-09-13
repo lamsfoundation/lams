@@ -41,7 +41,7 @@
 			<lams:Alert id="submissionDeadline" type="danger" close="false">
 				<fmt:message key="authoring.info.teacher.set.restriction">
 					<fmt:param>
-						<lams:Date value="${mcLearnerStarterDTO.submissionDeadline}" />
+						<lams:Date value="${submissionDeadline}" />
 					</fmt:param>
 				</fmt:message>
 			</lams:Alert>

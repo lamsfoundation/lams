@@ -80,7 +80,7 @@ import org.lamsfoundation.lams.tool.exception.DataMissingException;
 import org.lamsfoundation.lams.tool.exception.ToolException;
 import org.lamsfoundation.lams.tool.mc.McAppConstants;
 import org.lamsfoundation.lams.tool.mc.McApplicationException;
-import org.lamsfoundation.lams.tool.mc.McLearnerAnswersDTO;
+import org.lamsfoundation.lams.tool.mc.AnswerDTO;
 import org.lamsfoundation.lams.tool.mc.McOptionDTO;
 import org.lamsfoundation.lams.tool.mc.McQuestionDTO;
 import org.lamsfoundation.lams.tool.mc.McSessionMarkDTO;
@@ -438,25 +438,25 @@ public class McServicePOJO
     }
 
     @Override
-    public void saveUserAttempt(McQueUsr user, List<McLearnerAnswersDTO> selectedQuestionAndCandidateAnswersDTO) {
+    public void saveUserAttempt(McQueUsr user, List<AnswerDTO> answerDtos) {
 
 	Date attemptTime = new Date(System.currentTimeMillis());
 
-	for (McLearnerAnswersDTO mcLearnerAnswersDTO : selectedQuestionAndCandidateAnswersDTO) {
+	for (AnswerDTO answerDto : answerDtos) {
 
-	    Long questionUid = mcLearnerAnswersDTO.getQuestionUid();
+	    Long questionUid = answerDto.getQuestionUid();
 	    McQueContent question = this.getQuestionByUid(questionUid);
 	    if (question == null) {
 		throw new McApplicationException(
-			"Can't find question with specified question uid: " + mcLearnerAnswersDTO.getQuestionUid());
+			"Can't find question with specified question uid: " + answerDto.getQuestionUid());
 	    }
 
-	    McOptsContent answerOption = mcLearnerAnswersDTO.getAnswerOption();
+	    McOptsContent answerOption = answerDto.getAnswerOption();
 	    if (answerOption != null) {
 
-		Integer mark = mcLearnerAnswersDTO.getMark();
+		Integer mark = answerDto.getMark();
 		boolean passed = user.isMarkPassed(mark);
-		boolean isAttemptCorrect = new Boolean(mcLearnerAnswersDTO.getAttemptCorrect());
+		boolean isAttemptCorrect = answerDto.isAttemptCorrect();
 
 		McUsrAttempt userAttempt = this.getUserAttemptByQuestion(user.getUid(), questionUid);
 		if (userAttempt != null) {
@@ -480,7 +480,6 @@ public class McServicePOJO
 		    // create new userAttempt
 		    userAttempt = new McUsrAttempt(attemptTime, question, user, answerOption, mark, passed,
 			    isAttemptCorrect);
-
 		}
 
 		mcUsrAttemptDAO.saveMcUsrAttempt(userAttempt);
@@ -500,12 +499,12 @@ public class McServicePOJO
     }
 
     @Override
-    public List<McLearnerAnswersDTO> buildLearnerAnswersDTOList(McContent mcContent, McQueUsr user) {
-	List<McLearnerAnswersDTO> learnerAnswersDTOList = new LinkedList<McLearnerAnswersDTO>();
+    public List<AnswerDTO> getAnswersFromDatabase(McContent mcContent, McQueUsr user) {
+	List<AnswerDTO> answerDtos = new LinkedList<AnswerDTO>();
 	List<McQueContent> questions = this.getQuestionsByContentUid(mcContent.getUid());
 
 	for (McQueContent question : questions) {
-	    McLearnerAnswersDTO learnerAnswersDTO = new McLearnerAnswersDTO();
+	    AnswerDTO answerDto = new AnswerDTO();
 	    Set<McOptsContent> optionSet = question.getMcOptionsContents();
 	    List<McOptsContent> optionList = new LinkedList<McOptsContent>(optionSet);
 
@@ -516,28 +515,28 @@ public class McServicePOJO
 		optionList = new LinkedList<McOptsContent>(shuffledList);
 	    }
 
-	    learnerAnswersDTO.setQuestion(question.getQuestion());
-	    learnerAnswersDTO.setDisplayOrder(question.getDisplayOrder().toString());
-	    learnerAnswersDTO.setQuestionUid(question.getUid());
+	    answerDto.setQuestion(question.getQuestion());
+	    answerDto.setDisplayOrder(question.getDisplayOrder().toString());
+	    answerDto.setQuestionUid(question.getUid());
 
-	    learnerAnswersDTO.setMark(question.getMark());
-	    learnerAnswersDTO.setOptions(optionList);
+	    answerDto.setMark(question.getMark());
+	    answerDto.setOptions(optionList);
 
-	    learnerAnswersDTOList.add(learnerAnswersDTO);
+	    answerDtos.add(answerDto);
 	}
 
 	// populate answers
 	if (user != null) {
 
-	    for (McLearnerAnswersDTO learnerAnswersDTO : learnerAnswersDTOList) {
-		Long questionUid = learnerAnswersDTO.getQuestionUid();
+	    for (AnswerDTO answerDto : answerDtos) {
+		Long questionUid = answerDto.getQuestionUid();
 
 		McUsrAttempt dbAttempt = this.getUserAttemptByQuestion(user.getUid(), questionUid);
 		if (dbAttempt != null) {
 		    Long selectedOptionUid = dbAttempt.getMcOptionsContent().getUid();
 
 		    // mark selected option as selected
-		    for (McOptsContent option : learnerAnswersDTO.getOptions()) {
+		    for (McOptsContent option : answerDto.getOptions()) {
 			if (selectedOptionUid.equals(option.getUid())) {
 			    option.setSelected(true);
 			}
@@ -546,7 +545,7 @@ public class McServicePOJO
 	    }
 	}
 
-	return learnerAnswersDTOList;
+	return answerDtos;
     }
 
     @Override

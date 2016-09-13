@@ -73,7 +73,7 @@
 			<fmt:message key="label.yourAnswers" />
 		</h4>
 
-		<c:forEach var="dto" varStatus="status" items="${requestScope.listSelectedQuestionCandidateAnswersDto}">
+		<c:forEach var="dto" varStatus="status" items="${answerDtos}">
 
 			<div class="panel panel-default">
 
@@ -96,14 +96,16 @@
 						<tr>
 							<c:if test="${mcGeneralLearnerFlowDTO.displayAnswers == 'true'}">
 								<!-- show right/wrong -->
-								<c:if test="${dto.attemptCorrect == 'true'}">
-									<td class="bg-success" style="vertical-align: top;"><i class="fa fa-check"
-										style="color: green; font-size: 22px"></i></td>
-								</c:if>
-								<c:if test="${dto.attemptCorrect != 'true'}">
-									<td class="bg-danger" style="vertical-align: top;"><i class="fa fa-times"
-										style="color: red; font-size: 22px"></i></td>
-								</c:if>
+								<c:choose>
+									<c:when test="${dto.attemptCorrect}">
+										<td class="bg-success" style="vertical-align: top;"><i class="fa fa-check"
+											style="color: green; font-size: 22px"></i></td>
+									</c:when>
+									<c:otherwise>
+										<td class="bg-danger" style="vertical-align: top;"><i class="fa fa-times"
+											style="color: red; font-size: 22px"></i></td>
+									</c:otherwise>
+								</c:choose>
 							</c:if>
 							<td width="100%"><c:out value="${dto.answerOption.mcQueOptionText}" escapeXml="false" /></td>
 						</tr>
@@ -154,7 +156,6 @@
 			<html:hidden property="passMarkApplicable" />
 			<html:hidden property="learnerProgress" />
 			<html:hidden property="learnerProgressUserId" />
-			<html:hidden property="questionListingMode" />
 
 			<c:if test="${mcGeneralLearnerFlowDTO.retries == 'true'}">
 				<p>
