@@ -26,12 +26,13 @@
 			<lams:TextSearch wrapInFormTag="false" sessionMapID="${sessionMapID}" />
 		</html:form>
 
-		<div class="voffset5">
-			<a href="#" onclick="submitCondition()"
-				class="btn btn-default btn-xs"><fmt:message key="label.save" />
-			</a> <a href="#" onclick="hideConditionMessage()"
+		<div class="voffset5 pull-right">
+		    <a href="#" onclick="hideConditionMessage()"
 				class="btn btn-default btn-xs"><fmt:message key="button.cancel" />
 			</a>
+			<a href="#" onclick="submitCondition()"
+				class="btn btn-default btn-xs"><fmt:message key="label.save" />
+			</a> 
 		</div>
 	</div>
 </div>

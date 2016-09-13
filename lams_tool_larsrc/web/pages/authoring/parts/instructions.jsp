@@ -38,7 +38,7 @@
 			</c:forEach>
 		</table>
 
-		<a href="#nogo" onclick="javascript:addInstruction();" class="btn btn-default btn-sm">
+		<a href="#nogo" onclick="javascript:addInstruction();" class="btn btn-default btn-sm pull-right">
 			<i class="fa fa-plus"></i>&nbsp;<fmt:message key="label.authoring.basic.resource.add.instruction" /> 
 		</a>
 

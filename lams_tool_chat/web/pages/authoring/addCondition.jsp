@@ -31,9 +31,6 @@
 		<%@ include file="/common/messages.jsp"%>
 		<html:form action="/authoring/saveOrUpdateCondition" method="post" styleId="chatConditionForm" focus="displayName" >
 			<html:hidden property="orderId" />
-			<h2 class="no-space-left">
-				<fmt:message key="label.authoring.conditions.add.condition" />
-			</h2>
 
 			<div class="form-group">
             	<label for="displayName"><fmt:message key="label.authoring.conditions.condition.name" /></label>
@@ -43,11 +40,12 @@
 			<lams:TextSearch wrapInFormTag="false" sessionMapID="${sessionMapID}"  />
 		</html:form>
 
-		<div class="voffset5">
+		<div class="voffset5 pull-right">
+		<a href="javascript:;" onclick="hideConditionMessage()" class="btn btn-default btn-xs">
+				<fmt:message key="label.cancel" /> </a>
 			<a href="javascript:;" onclick="submitCondition();" class="btn btn-default btn-xs">
 				<fmt:message key="label.save" /></a>
-			<a href="javascript:;" onclick="hideConditionMessage()" class="btn btn-default btn-xs">
-				<fmt:message key="label.cancel" /> </a>
+			
 		</div>
 
 	</div>

@@ -52,12 +52,13 @@
 		
 			<!-- Instructions -->
 			<%@ include file="instructions.jsp"%>
-			
-			<div class="voffset5">
+			<div><br/></div>
+			<div><br/></div>
+			<div class="voffset5 pull-right">
+			    <a href="javascript:;" onclick="hideResourceItem()" class="btn btn-default btn-sm">
+					<fmt:message key="label.cancel" /> </a>
 				<a href="#" onclick="submitResourceItem()" class="btn btn-default btn-sm">
 					<i class="fa fa-plus"></i>&nbsp;<fmt:message key="label.authoring.basic.add.website" /> </a>
-				<a href="javascript:;" onclick="hideResourceItem()" class="btn btn-default btn-sm">
-					<fmt:message key="label.cancel" /> </a>
 			</div>
 		<br />
 

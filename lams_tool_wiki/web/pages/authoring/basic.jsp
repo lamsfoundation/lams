@@ -180,8 +180,8 @@
 			</label>
 		</div>
 		<div class="pull-right">
+		    <a href="javascript:changeDiv('view');" class="btn btn-default"><fmt:message key="button.cancel"></fmt:message></a>
 			<a href="javascript:doEditOrAdd('editPage');" class="btn btn-primary"><fmt:message key="label.wiki.savechanges"></fmt:message></a>
-			<a href="javascript:changeDiv('view');" class="btn btn-default"><fmt:message key="button.cancel"></fmt:message></a>
 		</div>
 	</div>
 </div>
@@ -212,8 +212,8 @@
 			</label>
 		</div>
 		<div class="pull-right">
+		    <a href="javascript:cancelAdd();changeDiv('view');" class="btn btn-default"><fmt:message key="button.cancel"></fmt:message></a>
 			<a href="javascript:doEditOrAdd('addPage');" class="btn btn-primary"><fmt:message key="label.wiki.savechanges"></fmt:message></a>
-			<a href="javascript:cancelAdd();changeDiv('view');" class="btn btn-default"><fmt:message key="button.cancel"></fmt:message></a>
 		</div>
   </div>
 </div>
