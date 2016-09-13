@@ -72,7 +72,7 @@ div.growlUI h1, div.growlUI h2 {
 
         function verifyAllQuestionsAnswered() {
           // in case oneQuestionPerPage option is ON user has to select 1 answer, and all answers otherwise
-          var isOneQuestionPerPage = ${mcGeneralLearnerFlowDTO.questionListingMode == 'questionListingModeSequential'};
+          var isOneQuestionPerPage = ${sessionMap.content.questionsSequenced};
           var answersRequiredNumber = (isOneQuestionPerPage) ? 1 : ${fn:length(requestScope.learnerAnswersDTOList)};
 
           //check each question is answered
@@ -125,11 +125,11 @@ div.growlUI h1, div.growlUI h2 {
 		</div>
 
 		<!-- Announcements and advanced settings -->
-		<c:if test="${not empty mcLearnerStarterDTO.submissionDeadline}">
+		<c:if test="${not empty submissionDeadline}">
 			<lams:Alert close="false" id="submissionDeadline" type="danger">
 				<fmt:message key="authoring.info.teacher.set.restriction">
 					<fmt:param>
-						<lams:Date value="${mcLearnerStarterDTO.submissionDeadline}" />
+						<lams:Date value="${submissionDeadline}" />
 					</fmt:param>
 				</fmt:message>
 			</lams:Alert>
@@ -153,7 +153,6 @@ div.growlUI h1, div.growlUI h2 {
 				<html:hidden property="passMarkApplicable" />
 				<html:hidden property="learnerProgress" />
 				<html:hidden property="learnerProgressUserId" />
-				<html:hidden property="questionListingMode" />
 
 				<%@ include file="/common/messages.jsp"%>
 
@@ -166,7 +165,7 @@ div.growlUI h1, div.growlUI h2 {
 				</c:if>
 
 				<c:choose>
-					<c:when test="${(mcGeneralLearnerFlowDTO.questionListingMode == 'questionListingModeSequential') && hasEditRight}">
+					<c:when test="${sessionMap.content.questionsSequenced && hasEditRight}">
 						<jsp:include page="/learning/SingleQuestionAnswersContent.jsp" />
 					</c:when>
 					<c:otherwise>

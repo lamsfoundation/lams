@@ -95,8 +95,6 @@ public class McGeneralLearnerFlowDTO implements Comparable {
 
     protected Integer questionIndex;
 
-    protected String questionListingMode;
-
     protected Integer totalMarksPossible;
 
     protected Map mapFeedbackContent;
@@ -116,21 +114,6 @@ public class McGeneralLearnerFlowDTO implements Comparable {
      */
     public void setMapFeedbackContent(Map mapFeedbackContent) {
 	this.mapFeedbackContent = mapFeedbackContent;
-    }
-
-    /**
-     * @return Returns the questionListingMode.
-     */
-    public String getQuestionListingMode() {
-	return questionListingMode;
-    }
-
-    /**
-     * @param questionListingMode
-     *            The questionListingMode to set.
-     */
-    public void setQuestionListingMode(String questionListingMode) {
-	this.questionListingMode = questionListingMode;
     }
 
     /**
@@ -392,10 +375,10 @@ public class McGeneralLearnerFlowDTO implements Comparable {
 		.append("passMarkApplicable: ", passMarkApplicable).append("userPassed: ", userPassed)
 		.append("userOverPassMark: ", userOverPassMark).append("reportTitleLearner: ", reportTitleLearner)
 		.append("activityInstructions: ", activityInstructions).append("activityTitle: ", activityTitle)
-		.append("questionListingMode: ", questionListingMode).append("learnerProgress: ", learnerProgress)
-		.append("displayAnswers: ", displayAnswers).append("reflection: ", reflection)
-		.append("reflectionSubject: ", reflectionSubject).append("notebookEntry: ", notebookEntry)
-		.append("notebookEntriesVisible: ", notebookEntriesVisible).toString();
+		.append("learnerProgress: ", learnerProgress).append("displayAnswers: ", displayAnswers)
+		.append("reflection: ", reflection).append("reflectionSubject: ", reflectionSubject)
+		.append("notebookEntry: ", notebookEntry).append("notebookEntriesVisible: ", notebookEntriesVisible)
+		.toString();
     }
 
     /**
