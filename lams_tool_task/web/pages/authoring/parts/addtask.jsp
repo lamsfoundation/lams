@@ -129,8 +129,8 @@
 	
 			</html:form>
 	
-			<a href="#" onclick="javascript:submitTask();" class="btn btn-default btn-sm"><i class="fa fa-plus"></i>&nbsp;<fmt:message key="button.add" /> </a>
-			<a href="#" onclick="javascript:hideMessage()" class="btn btn-default btn-sm"><fmt:message key="label.cancel" /> </a>
+			<a href="#" onclick="javascript:submitTask();" class="btn btn-default btn-sm pull-right"><i class="fa fa-plus"></i>&nbsp;<fmt:message key="button.add" /> </a>
+			<a href="#" onclick="javascript:hideMessage()" class="btn btn-default btn-sm pull-right"><fmt:message key="label.cancel" /> </a>
 			
 			</div>
 		</div>

@@ -190,12 +190,13 @@
 			</form>
 
 			<div class="voffset10 pull-right clear-both">
+			<a href="#nogo" onclick="javascript:self.parent.tb_remove();" class="btn btn-sm btn-default loffset5">
+					<fmt:message key="label.cancel" />
+				</a>
 				<a href="#nogo" onclick="javascript:$('#assessmentQuestionForm').submit();" class="btn btn-sm btn-default button-add-item">
 					<fmt:message key="label.authoring.matching.pairs.add.matching.pairs" />
 				</a>
-				<a href="#nogo" onclick="javascript:self.parent.tb_remove();" class="btn btn-sm btn-default loffset5">
-					<fmt:message key="label.cancel" />
-				</a>
+				
 			</div>
 
 		</div>

@@ -47,12 +47,13 @@
 		
 			<lams:CKEditor id="heading" value="${headingText}" contentFolderID="${sessionMap.contentFolderID}"/>
 		
-			<div class="voffset5">
+			<div class="voffset5 pull-right">
+			    <a href="#" onclick="javascript:hideMessage()" class="btn btn-default btn-sm">
+					<i class="fa fa-plus"></i>&nbsp;<fmt:message key="button.cancel" /> </a>
 				<a href="#" onclick="submitHeading()" class="btn btn-default btn-sm">
 					<i class="fa fa-plus"></i>&nbsp;<fmt:message key="button.submit" /> </a>
 
-				<a href="#" onclick="javascript:hideMessage()" class="btn btn-default btn-sm">
-					<i class="fa fa-plus"></i>&nbsp;<fmt:message key="button.cancel" /> </a>
+				
 			</div>
 		</div>
 	</div>

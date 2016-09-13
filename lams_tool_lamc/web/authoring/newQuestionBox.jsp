@@ -197,13 +197,15 @@
 				<html:textarea property="feedback" rows="3" cols="70" styleClass="form-control"></html:textarea>
 			</div>
 			
-			<a href="#" onclick="addItem();" onmousedown="self.focus();" class="btn btn-default btn-sm"> 
+			<a href="#" onclick="addItem();" onmousedown="self.focus();" class="btn btn-default btn-sm pull-right"> 
 				<i class="fa fa-plus"></i>&nbsp;<fmt:message key="label.add.new.question" />
 			</a>
-
-			<a href="#" onclick="javascript:self.parent.tb_remove();" onmousedown="self.focus();" class="btn btn-default btn-sm"> 
+			
+			<a href="#" onclick="javascript:self.parent.tb_remove();" onmousedown="self.focus();" class="btn btn-default btn-sm pull-right"> 
 				<fmt:message key="label.cancel" />
 			</a>
+			
+		
 
 		</lams:Page>
 

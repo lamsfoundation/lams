@@ -37,9 +37,9 @@
 		
 	</html:form>
 
-	<div class="voffset5">
+	<div class="voffset5 pull-right">
+	    <a href="#" onclick="hideConditionMessage();" class="btn btn-default btn-xs"><fmt:message key="label.cancel" /> </a>
 		<a href="#" onclick="submitCondition()" class="btn btn-default btn-xs"><fmt:message key="label.save.question" /> </a>
-		<a href="#" onclick="hideConditionMessage();" class="btn btn-default btn-xs"><fmt:message key="label.cancel" /> </a>
 	</div>
 </div>
 </div>

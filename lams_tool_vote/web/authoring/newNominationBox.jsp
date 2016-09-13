@@ -31,11 +31,12 @@
 				</lams:CKEditor>
 			</div>
 			
-			<div class="voffset5">
+			<div class="voffset5 pull-right">
+			    <a href="#" onclick="javascript:hideMessage()"
+				class="btn btn-default btn-sm"> <fmt:message key="label.cancel" /></a>
 				<a href="#" onclick="javascript:submitNomination()" class="btn btn-default btn-sm">
 					<i class="fa fa-plus"></i>&nbsp; <fmt:message key="label.save.nomination" /> </a>
-				<a href="#" onclick="javascript:hideMessage()"
-				class="btn btn-default btn-sm"> <fmt:message key="label.cancel" /></a>
+				
 			</div>
 			
 		</html:form>

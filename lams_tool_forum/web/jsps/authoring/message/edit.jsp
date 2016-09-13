@@ -47,7 +47,7 @@
 				</div>
 			</div>
 
-			<div class="voffset5">
+			<div class="voffset5 pull-right">
 				<a href="#" onclick="hideMessage()" class="btn btn-default btn-xs"> <fmt:message key="button.cancel" /></a>
 				<a href="#" onclick="submitMessage()" class="btn btn-default btn-xs loffset5"> <fmt:message key="button.add" /> </a>
 			</div>

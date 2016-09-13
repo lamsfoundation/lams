@@ -54,12 +54,13 @@
 		</html:form>
 	
 		<div class="voffset10 pull-right">
+		    <a href="#nogo" onclick="javascript:cancelImageGalleryItem()" class="btn btn-sm btn-default loffset5">
+				<fmt:message key="label.cancel" /> 
+			</a>
 			<a href="#nogo" onclick="javascript:submitImageGalleryItem()" class="btn btn-sm btn-default button-add-item">
 				<fmt:message key="label.authoring.basic.add.image" /> 
 			</a>
-			<a href="#nogo" onclick="javascript:cancelImageGalleryItem()" class="btn btn-sm btn-default loffset5">
-				<fmt:message key="label.cancel" /> 
-			</a>
+			
 		</div>
 		
 	</div>
