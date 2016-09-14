@@ -40,7 +40,7 @@
         <a href="#" onclick="submitSurveyItem()" class="btn btn-default btn-sm pull-right">
 			<fmt:message key="label.authoring.basic.add.question" /> </a>
         <a href="javascript:;" onclick="cancelSurveyItem()"
-			class="btn btn-default btn-sm pull-right"> <fmt:message key="label.cancel" /> </a>
+			class="btn btn-default btn-sm pull-right roffset5"> <fmt:message key="label.cancel" /> </a>
 		
 		
 		
