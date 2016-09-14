@@ -98,7 +98,7 @@
 	<option><fmt:message key="label.authoring.basic.dropdown"/></option>
 	<option><fmt:message key="label.authoring.basic.checkbox"/></option>
 	<option><fmt:message key="label.authoring.basic.longlat"/></option>
-</select><html:link href="#" styleClass="btn btn-default btn-sm" onclick="javascript:showQuestionInputAreaByType('${showMessageURL }')">
+</select><html:link href="#" styleClass="btn btn-default btn-sm loffset5" onclick="javascript:showQuestionInputAreaByType('${showMessageURL }')">
 	<i class="fa fa-plus"></i>&nbsp;<fmt:message key="label.authoring.basic.question.add" />
 </html:link></p></div>
 <a name="questionInputAreaAnchor"></a>

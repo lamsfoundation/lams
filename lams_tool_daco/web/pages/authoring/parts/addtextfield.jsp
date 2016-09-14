@@ -38,8 +38,8 @@
 	<%@ include file="description.jsp"%>
   	
   	<!--  Options -->  
-	<a id="toggleAdditionalOptionsAreaLink" href="javascript:toggleAdditionalOptionsArea()" class="btn btn-default btn-xs pull-right"><fmt:message key="label.authoring.basic.additionaloptions.show" /> </a>
-	<div id="additionalOptionsArea" style="display: none;">
+	<a id="toggleAdditionalOptionsAreaLink" href="javascript:toggleAdditionalOptionsArea()" class="btn btn-default btn-xs"><fmt:message key="label.authoring.basic.additionaloptions.show" /> </a>
+	<div id="additionalOptionsArea" style="display: none;" class="voffset5">
  		<div class="form-inline">
  		<div class="form-group">
     	<label for=max><fmt:message key="label.authoring.basic.max.char" /></label>
@@ -57,6 +57,7 @@
 </html:form>
 
 <c:set var="addButtonMessageKey" value="label.authoring.basic.textfield.add" />
+<br/>
 <%@ include file="buttons.jsp"%>
 
 </div>

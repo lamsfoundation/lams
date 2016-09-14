@@ -40,7 +40,9 @@
 	<%@ include file="description.jsp"%>
 
 	<!--  Options -->  
-	<a id="toggleAdditionalOptionsAreaLink" href="javascript:toggleAdditionalOptionsArea()" class="visible-xs-block visible-lg-block btn btn-default btn-xs pull-right"><fmt:message key="label.authoring.basic.additionaloptions.show" /> </a>
+	<div class="voffset5" style="display: inline-block;">
+	<a id="toggleAdditionalOptionsAreaLink" href="javascript:toggleAdditionalOptionsArea()" class="visible-sm-block visible-md-block btn btn-default btn-xs pull-left"><fmt:message key="label.authoring.basic.additionaloptions.show" /> </a>
+	</div>
 	<div id="additionalOptionsArea" style="display: none;">
  		<div class="form-inline">
 		<div class="form-group">
@@ -66,7 +68,6 @@
 	  	</div>
 	  	</div>
 	</div>
-	<a id="toggleAdditionalOptionsAreaLink" href="javascript:toggleAdditionalOptionsArea()" class="visible-sm-block visible-md-block btn btn-default btn-xs pull-right"><fmt:message key="label.authoring.basic.additionaloptions.show" /> </a>
  	<!--  end options -->
   
 </html:form>

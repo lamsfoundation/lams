@@ -4,11 +4,11 @@
 <c:set var="listSize" value="${fn:length(answerOptionList)}" />
 <c:set var="ordinal"><fmt:message key="label.authoring.basic.answeroption.ordinal"/></c:set>
 
-<div id="answerOptionsArea" class="voffset5">
+<div id="answerOptionsArea" class="voffset10">
 <form id="answerOptionsForm"><input type="hidden" id="answerOptionCount" name="answerOptionCount" value="${listSize}"/>
 
 <div class="form-group"><label><fmt:message key="label.authoring.basic.answeroption" /></label>
-<a href="#" onclick="javascript:addAnswerOption()" class="btn btn-default btn-xs loffset5">
+<a href="#nogo" onclick="javascript:addAnswerOption()" class="btn btn-default btn-xs loffset5">
 	<i class="fa fa-plus"></i>&nbsp;<fmt:message key="label.authoring.basic.answeroption.add" />
 </a>
 

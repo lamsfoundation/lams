@@ -37,19 +37,21 @@
 	<%@ include file="description.jsp"%>
   
   	<!--  Options -->  
-	<a id="toggleAdditionalOptionsAreaLink" href="javascript:toggleAdditionalOptionsArea()" class="visible-xs-block visible-lg-block btn btn-default btn-xs pull-right"><fmt:message key="label.authoring.basic.additionaloptions.show" /> </a>
-	<div id="additionalOptionsArea" style="display: none;">
+	<div class="voffset5" style="display: inline-block;">
+	  <a id="toggleAdditionalOptionsAreaLink" href="javascript:toggleAdditionalOptionsArea()" class="btn btn-default btn-xs pull-left"><fmt:message key="label.authoring.basic.additionaloptions.show" /> </a>
+	</div>
+	<div id="additionalOptionsArea" style="display: none;" class="voffset5">
  		<div class="form-inline">
 		<div class="form-group">
-    	<label for=min><fmt:message key="label.common.min" /></label>
-		<html:text styleId="min" property="min" size="10" styleClass="form-control"/>
+    	<label for=min><fmt:message key="label.common.min" />: </label>
+		<html:text styleId="min" property="min" size="5" styleClass="form-control"/>
 		</div>
 		<div class="form-group">
-    	<label for="max"><fmt:message key="label.common.max" /></label>
-		<html:text styleId="max" property="max" size="10" styleClass="form-control"/>
+    	<label for="max"><fmt:message key="label.common.max" />: </label>
+		<html:text styleId="max" property="max" size="5" styleClass="form-control"/>
 		</div>
 		<div class="form-group">
-    	<label for="summary"><fmt:message key="label.common.summary" /></label>
+    	<label for="summary"><fmt:message key="label.common.summary" />: </label>
 		<html:select property="summary" styleClass="form-control">
 			<html:option value="0" styleId="noSummaryOption"><fmt:message key="label.common.summary.none" /></html:option>
 			<html:option value="1"><fmt:message key="label.common.summary.sum" /></html:option>
@@ -64,7 +66,6 @@
 	  	</div>
 	  	</div>
 	</div>	
-	<a id="toggleAdditionalOptionsAreaLink" href="javascript:toggleAdditionalOptionsArea()" class="visible-sm-block visible-md-block btn btn-default btn-xs pull-right"><fmt:message key="label.authoring.basic.additionaloptions.show" /> </a>
  	<!--  end options -->
   
  </html:form>
