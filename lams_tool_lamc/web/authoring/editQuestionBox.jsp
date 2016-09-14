@@ -201,16 +201,15 @@
 				&nbsp;<fmt:message key="label.marks"></fmt:message>
 			</div>
 
-			<lams:ImgButtonWrapper>
+			<div class="pull-right">
+				<a href="#" onclick="javascript:self.parent.tb_remove();" onmousedown="self.focus();" class="btn btn-default btn-sm roffset5"> 
+					<fmt:message key="label.cancel" />
+				</a>
 				<a href="#" onclick="addItem();"
 					onmousedown="self.focus();" class="btn btn-default btn-sm"> 
 					<i class="fa fa-plus"></i>&nbsp;<fmt:message key="label.add.new.question" />
 				</a>
-	
-				<a href="#" onclick="javascript:self.parent.tb_remove();" onmousedown="self.focus();" class="btn btn-default btn-sm"> 
-					<fmt:message key="label.cancel" />
-				</a>
-			</lams:ImgButtonWrapper>
+			</div>
 
 		</lams:Page>
 
