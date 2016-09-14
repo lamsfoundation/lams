@@ -25,7 +25,7 @@
 	</div>
 </c:if>
 
-<div class="btn-group-xs voffset5">
+<div class="btn-group-xs voffset5 pull-right">
 	<html:button property="goback" styleId="cancelButton" onclick="javascript:cancelReply();"
 		styleClass="btn btn-default roffset5">
 		<fmt:message key="button.cancel" />
