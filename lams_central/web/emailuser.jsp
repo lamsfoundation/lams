@@ -161,15 +161,14 @@
 				</table>
 
 				<div id="buttonsDiv" class="space-top">
+				    <a href="#" onclick="javascript:closeDialog()" class="button space-left">
+						<fmt:message key="button.cancel" />
+					</a>
 					<c:if test="${not sendDisabled}">
 						<a href="#" onclick="javascript:sendEmail()" class="button">
 							<fmt:message key="email.send" />
 						</a> 
 					</c:if>
-					
-					<a href="#" onclick="javascript:closeDialog()" class="button space-left">
-						<fmt:message key="button.cancel" />
-					</a>
 				</div>
 			</form>
 		</div>
