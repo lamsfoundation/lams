@@ -1,8 +1,12 @@
 <%@ include file="/common/taglibs.jsp"%>
 
+
 <html:form action="/monitoring/updateMark" method="post">
 	<c:set var="formBean" value="<%=request.getAttribute(org.apache.struts.taglib.html.Constants.BEAN_KEY)%>" />
 	<c:set var="sessionMap" value="${sessionScope[formBean.sessionMapID]}" />
+	<c:set var="localeLanguage"><lams:user property="localeLanguage" /></c:set>
+    <script type="text/javascript" src="<lams:LAMSURL />/includes/javascript/jquery.timeago.js"></script>
+    <script type="text/javascript" src="<lams:LAMSURL />/includes/javascript/timeagoi18n/jquery.timeago.${fn:toLowerCase(localeLanguage)}.js"></script>
 	<html:hidden property="sessionMapID"/>
 	<html:hidden property="topicID"/>
 	<html:hidden property="hideReflection" value="${sessionMap.hideReflection}"/>
@@ -11,7 +15,7 @@
 		<fmt:message key="message.assign.mark" />&nbsp;
 		<c:out value="${user.firstName}" />&nbsp;
 		<c:out value="${user.lastName}" />&nbsp;
-		(<lams:Date value="${topic.message.updated}"/>):
+		<lams:Date value="${topic.message.updated}" timeago="true"/>
 	</p>		
 	
 	<p>
@@ -57,5 +61,11 @@
 	
 		<input type="button" onclick="location.href='${cancelUrl}';" class="btn btn-default" value="<fmt:message key="button.cancel"/>">
 	</div>
+	
+	<script type="text/javascript">
+	jQuery(document).ready(function() {
+		jQuery("time.timeago").timeago();
+	});
+</script>
 
 </html:form>
