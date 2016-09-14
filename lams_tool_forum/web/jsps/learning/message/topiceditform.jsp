@@ -39,7 +39,7 @@
 	</div>		
 </c:if>
 
-<div class="btn-group-xs voffset5">
+<div class="btn-group-xs voffset5 pull-right">
 <html:button property="goback" styleId="cancelButton" onclick="javascript:cancelEdit();" styleClass="btn btn-default">
 	<fmt:message key="button.cancel" />
 </html:button>

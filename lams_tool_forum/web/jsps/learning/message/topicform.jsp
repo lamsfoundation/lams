@@ -22,9 +22,10 @@
 <c:set var="backToForum">
 	<html:rewrite page="/learning/viewForum.do?toolSessionID=${sessionMap.toolSessionID}&hideReflection=${sessionMap.hideReflection}" />
 </c:set>
-<html:button property="goback" onclick="javascript:location.href='${backToForum}';" styleClass="btn btn-default voffset5 pull-left" styleId="cancelButton">
-	<fmt:message key="button.cancel" />
-</html:button>&nbsp;
 <html:submit styleClass="btn btn-primary voffset5 pull-right" styleId="submitButton">
 	<fmt:message key="button.submit" />
 </html:submit>
+<html:button property="goback" onclick="javascript:location.href='${backToForum}';" styleClass="btn btn-default voffset5 pull-right" styleId="cancelButton">
+	<fmt:message key="button.cancel" />
+</html:button>&nbsp;
+
