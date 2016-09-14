@@ -49,7 +49,7 @@
 		
 			<div class="voffset5 pull-right">
 			    <a href="#" onclick="javascript:hideMessage()" class="btn btn-default btn-sm">
-					<i class="fa fa-plus"></i>&nbsp;<fmt:message key="button.cancel" /> </a>
+					<fmt:message key="button.cancel" /> </a>
 				<a href="#" onclick="submitHeading()" class="btn btn-default btn-sm">
 					<i class="fa fa-plus"></i>&nbsp;<fmt:message key="button.submit" /> </a>
 
