@@ -18,11 +18,19 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 
   http://www.gnu.org/licenses/gpl.txt
 --%>
-
+<%@ taglib uri="tags-html" prefix="html" %>
+<%@ taglib uri="tags-core" prefix="c" %>		
 <%@ taglib uri="tags-fmt" prefix="fmt" %>
+<%@ taglib uri="tags-lams" prefix="lams" %>
+<script type="text/javascript" src="<lams:LAMSURL />includes/javascript/jquery.js"></script>
 
-	<lams:Page type="admin">
-		<p><fmt:message key="message.progress.broken"/></p>
-		<p><fmt:message key="message.progress.broken.try.resume"/></p>
-	</lams:Page>
+<lams:Page type="learner">
+	     <div class="voffset10">
+		    <p><fmt:message key="message.progress.broken"/></p>
+		    <p><fmt:message key="message.progress.broken.try.resume"/></p>
+		 <div class="voffset10 pull-right">
+		      <a href="#" class="btn btn-default" id="addNewBtn" onClick="window.close();"><fmt:message key="label.close.button" /></a>
+	     </div>
+	     <div id="footer"></div>
+</lams:Page>
 
