@@ -105,6 +105,9 @@ div.dialogContainer td.pageCell {
 	width: 100px;
 }
 
+span#learnerGroupMultiSelectLabel {
+	font-size: 10px;
+}
 /********** LESSON TAB STYLES **********/
 div#tabLesson {
 /*	height: 540px;*/
