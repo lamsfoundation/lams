@@ -644,15 +644,17 @@ public class MonitoringAction extends LamsDispatchAction {
 	}
 
 	long lessonId = WebUtil.readLongParam(request, AttributeNames.PARAM_LESSON_ID);
-	Integer learnerId = new Integer(WebUtil.readIntParam(request, MonitoringConstants.PARAM_LEARNER_ID));
+	String learnerIDs = request.getParameter(MonitoringConstants.PARAM_LEARNER_ID);
 	Integer requesterId = getUserId();
 	boolean removeLearnerContent = WebUtil.readBooleanParam(request,
 		MonitoringConstants.PARAM_REMOVE_LEARNER_CONTENT, false);
 
 	String message = null;
 	try {
-	    message = getMonitoringService().forceCompleteActivitiesByUser(learnerId, requesterId, lessonId, activityId,
-		    removeLearnerContent);
+	    for (String learnerID : learnerIDs.split(",")) {
+		message = getMonitoringService().forceCompleteActivitiesByUser(Integer.valueOf(learnerID), requesterId,
+			lessonId, activityId, removeLearnerContent);
+	    }
 	} catch (SecurityException e) {
 	    response.sendError(HttpServletResponse.SC_FORBIDDEN, "User is not a monitor in the lesson");
 	    return null;
@@ -660,12 +662,12 @@ public class MonitoringAction extends LamsDispatchAction {
 
 	if (LamsDispatchAction.log.isDebugEnabled()) {
 	    LamsDispatchAction.log
-		    .debug("Force complete for learner " + learnerId + " lesson " + lessonId + ". " + message);
+		    .debug("Force complete for learners " + learnerIDs + " lesson " + lessonId + ". " + message);
 	}
 
 	// audit log force completion attempt
 	String messageKey = (activityId == null) ? "audit.force.complete.end.lesson" : "audit.force.complete";
-	Object[] args = new Object[] { learnerId, activityId, lessonId };
+	Object[] args = new Object[] { learnerIDs, activityId, lessonId };
 	String auditMessage = getMonitoringService().getMessageService().getMessage(messageKey, args);
 	MonitoringAction.auditService.log(MonitoringConstants.MONITORING_MODULE_NAME, auditMessage + " " + message);
 
