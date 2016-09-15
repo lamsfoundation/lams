@@ -20,7 +20,7 @@
 	
 	<p>
 		<c:set var="viewtopic">
-			<html:rewrite page="/monitoring/viewTopic.do?topicID=${topic.message.uid}&create=${topic.message.created.time}&hideReflection=${sessionMap.hideReflection}" />
+		    <html:rewrite page="/learning/viewTopic.do?topicID=${topic.message.uid}&create=${topic.message.created.time}&sessionMapID=${formBean.sessionMapID}&hideReflection=${sessionMap.hideReflection}" />
 		</c:set>
 		<html:link href="javascript:launchPopup('${viewtopic}','viewtopic')">
 			<c:out value="${topic.message.subject}" />
