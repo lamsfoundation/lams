@@ -596,22 +596,28 @@ function initSequenceTab(){
 			            	'id'     : 'learnerGroupDialogForceCompleteButton',
 			            	'class'  : 'learnerGroupDialogSelectableButton',
 			            	'click'  : function() {
-			            		var selectedLearner = $('.dialogList div.dialogListItemSelected', this);
-			            		// make sure there is only one selected learner
-			            		if (selectedLearner.length == 1) {
-			            			// go to "force complete" mode, similar to draggin user to an activity
-			            			var activityId = $(this).dialog('option', 'ajaxProperties').data.activityID,
-			            				dropArea = sequenceCanvas.add('#completedLearnersContainer');
-			            			dropArea.css('cursor', 'url('
-			            					+ LAMS_URL + 'images/icons/user.png),pointer')
-			            				.one('click', function(event) {
-			            					dropArea.off('click').css('cursor', 'default');
-			            					forceComplete(activityId, selectedLearner.attr('userId'), 
-			            							selectedLearner.text(), event.pageX, event.pageY);
-			            				});
-				            		$(this).dialog('close');
-				            		alert(LABELS.FORCE_COMPLETE_CLICK.replace('[0]', selectedLearner.text()));
-			            		}
+			            		var selectedLearners = $('.dialogList div.dialogListItemSelected', this),
+		            				// go to "force complete" mode, similar to draggin user to an activity
+		            				activityId = $(this).dialog('option', 'ajaxProperties').data.activityID,
+		            				dropArea = sequenceCanvas.add('#completedLearnersContainer');
+		            			dropArea.css('cursor', 'url('
+		            					+ LAMS_URL + 'images/icons/' 
+		            					+ (selectedLearners.length > 1 ? 'group' : 'user')
+		            					+ '.png),pointer')
+		            				.one('click', function(event) {
+		            					var learners = [];
+		            					selectedLearners.each(function(){
+		            						var learner = $(this);
+		            						learners.push({
+		            							'id'     : learner.attr('userId'),
+		            							'name'   : learner.text()
+		            						});
+		            					});
+		            					dropArea.off('click').css('cursor', 'default');
+		            					forceComplete(activityId, learners, event.pageX, event.pageY);
+		            				});
+			            		$(this).dialog('close');
+			            		alert(LABELS.FORCE_COMPLETE_CLICK);
 							}
 			             },
 			             {
@@ -725,7 +731,7 @@ function initSequenceTab(){
 		            	'text'   : LABELS.FORCE_COMPLETE_REMOVE_CONTENT_NO,
 		            	'click'  : function() {
 		            		$(this).dialog('close');
-		            		forceCompleteExecute($(this).dialog('option', 'learnerId'),
+		            		forceCompleteExecute($(this).dialog('option', 'learners'),
        							 				 $(this).dialog('option', 'activityId'),
        							 				 false);
 						}
@@ -734,7 +740,7 @@ function initSequenceTab(){
 		            	'text'   : LABELS.FORCE_COMPLETE_REMOVE_CONTENT_YES,
 		            	'click'  : function() {
 							$(this).dialog('close');
-		            		forceCompleteExecute($(this).dialog('option', 'learnerId'),
+		            		forceCompleteExecute($(this).dialog('option', 'learners'),
 		            							 $(this).dialog('option', 'activityId'),
 		            							 true);
 						}
@@ -931,9 +937,9 @@ function updateSequenceTab() {
 
 
 /**
- * Forces given learner to move to activity indicated on SVG by coordinated (drag-drop)
+ * Forces given learners to move to activity indicated on SVG by coordinated (drag-drop)
  */
-function forceComplete(currentActivityId, learnerId, learnerName, x, y) {
+function forceComplete(currentActivityId, learners, x, y) {
 	autoRefreshBlocked = true;
 	
 	var foundActivities = [],
@@ -983,11 +989,17 @@ function forceComplete(currentActivityId, learnerId, learnerName, x, y) {
 	
 	var targetActivityId = null,
 		executeForceComplete = false,
-		isEndLesson = !targetActivity.is('g');
+		isEndLesson = !targetActivity.is('g'),
+		learnerNames = '';
+	
+	$.each(learners, function(){
+		learnerNames += this.name + ', ';
+	});
+	learnerNames = learnerNames.slice(0, -2);
 	
 	if (isEndLesson) {
 		executeForceComplete =  currentActivityId && confirm(LABELS.FORCE_COMPLETE_END_LESSON_CONFIRM
-				.replace('[0]',learnerName));
+				.replace('[0]',learnerNames));
 	} else {
 		var targetActivityId = +targetActivity.attr('id');
 		if (currentActivityId != targetActivityId) {
@@ -1013,9 +1025,9 @@ function forceComplete(currentActivityId, learnerId, learnerName, x, y) {
 			if (!currentActivityId || precedingActivityId) {
 				// move the learner backwards
 				$('#forceBackwardsDialog').text(LABELS.FORCE_COMPLETE_REMOVE_CONTENT
-							.replace('[0]', learnerName).replace('[1]', targetActivityName))
+							.replace('[0]', learnerNames).replace('[1]', targetActivityName))
 							.dialog('option', {
-								'learnerId' : learnerId,
+								'learners' : learners,
 								'activityId': targetActivityId
 							})
 							.dialog('open');
@@ -1024,13 +1036,13 @@ function forceComplete(currentActivityId, learnerId, learnerName, x, y) {
 			} else {
 				// move the learner forward
 				executeForceComplete = confirm(LABELS.FORCE_COMPLETE_ACTIVITY_CONFIRM
-							.replace('[0]', learnerName).replace('[1]', targetActivityName));
+							.replace('[0]', learnerNames).replace('[1]', targetActivityName));
 			}
 		}
 	}
 	
 	if (executeForceComplete) {
-		forceCompleteExecute(learnerId, targetActivityId, false);
+		forceCompleteExecute(learners, targetActivityId, false);
 	}
 
 	autoRefreshBlocked = false;
@@ -1040,7 +1052,12 @@ function forceComplete(currentActivityId, learnerId, learnerName, x, y) {
 /**
  * Tell server to force complete the learner.
  */
-function forceCompleteExecute(learnerId, activityId, removeContent) {
+function forceCompleteExecute(learners, activityId, removeContent) {
+	var learnerIds = '';
+	$.each(learners, function() {
+		learnerIds += this.id + ',';
+	})
+	
 	$.ajax({
 		dataType : 'text',
 		url : LAMS_URL + 'monitoring/monitoring.do',
@@ -1048,7 +1065,7 @@ function forceCompleteExecute(learnerId, activityId, removeContent) {
 		data : {
 			'method'     		 : 'forceComplete',
 			'lessonID'   		 : lessonId,
-			'learnerID'  		 : learnerId,
+			'learnerID'  		 : learnerIds.slice(0, -1),
 			'activityID' 		 : activityId,
 			'removeContent'		 : removeContent
 		},
@@ -1175,9 +1192,12 @@ function addActivityIconsHandlers(activity) {
 									autoRefreshBlocked = true;
 								},
 								'stop' : function(event, ui) {
+									var learners = [{
+										'id'   : learner.id,
+										'name' : getLearnerDisplayName(learner, true)
+									}];
 									// jQuery droppable does not work for SVG, so this is a workaround
-									forceComplete(activity.id, learner.id, getLearnerDisplayName(learner, true),
-											      ui.offset.left, ui.offset.top);
+									forceComplete(activity.id, learners, ui.offset.left, ui.offset.top);
 								}
 							});
 			
@@ -1913,6 +1933,7 @@ function closeMonitorLessonDialog(refresh) {
  */
 function showLearnerGroupDialog(ajaxProperties, dialogTitle, allowSearch, allowForceComplete, allowView, allowEmail) {
 	var learnerGroupDialog = $('#learnerGroupDialog'),
+		learnerGroupDialogParent = learnerGroupDialog.parent(),
 		learnerGroupList = $('.dialogList', learnerGroupDialog).empty(),
 		// no parameters provided? just work on what we saved
 		isRefresh = ajaxProperties == null,
@@ -1989,14 +2010,33 @@ function showLearnerGroupDialog(ajaxProperties, dialogTitle, allowSearch, allowF
 						      .appendTo(learnerGroupList);
 		
 		if (allowForceComplete || allowView || allowEmail) {
-			learnerDiv.click(function(){
-		    	  // select a learner
-		    	  $(this).addClass('dialogListItemSelected')
-		    	  	.siblings('div.dialogListItem')
-		    	  	.removeClass('dialogListItemSelected');
-			    	// enable buttons
-			    	$('button.learnerGroupDialogSelectableButton')
-			    		.attr('disabled', null);
+			learnerDiv.click(function(event){
+				// select the learner
+				var learnerDiv = $(this),
+					selectedSiblings = learnerDiv.siblings('div.dialogListItem.dialogListItemSelected');
+			    // enable buttons
+			    $('button.learnerGroupDialogSelectableButton', learnerGroupDialogParent).prop('disabled', false)
+			    																		.removeClass('ui-state-disabled');
+				if (allowForceComplete && event.ctrlKey) {
+					var isSelected = learnerDiv.hasClass('dialogListItemSelected');
+					if (isSelected) {
+						// do not un-select last learner
+						if (selectedSiblings.length > 0) {
+							learnerDiv.removeClass('dialogListItemSelected')
+						}
+					} else {
+						learnerDiv.addClass('dialogListItemSelected');
+					}
+					if (selectedSiblings.length + (isSelected ? 0 : 1) > 1) {
+						// disable view button - only one learner can be viewed and multiple are selected
+						$('button#learnerGroupDialogViewButton', learnerGroupDialogParent).prop('disabled', true)
+																						  .addClass('ui-state-disabled');
+					}
+				} else {
+					learnerDiv.addClass('dialogListItemSelected');
+					// un-select other learners
+					selectedSiblings.removeClass('dialogListItemSelected');
+				}
 		    });
 			if (allowView){
 				dblTap(learnerDiv, function(){
@@ -2010,14 +2050,15 @@ function showLearnerGroupDialog(ajaxProperties, dialogTitle, allowSearch, allowF
 	colorDialogList(learnerGroupDialog);
 	
 	if (!isRefresh) {
-		// show buttons depending on parameters
-		$('button#learnerGroupDialogForceCompleteButton')
+		
+		// show buttons and labels depending on parameters
+		$('span#learnerGroupMultiSelectLabel, button#learnerGroupDialogForceCompleteButton', learnerGroupDialogParent)
 			.css('display', allowForceComplete ? 'inline' : 'none');
-		$('button#learnerGroupDialogViewButton')
+		$('button#learnerGroupDialogViewButton', learnerGroupDialogParent)
 			.css('display', allowView ? 'inline' : 'none');
-		$('button#learnerGroupDialogEmailButton')
+		$('button#learnerGroupDialogEmailButton', learnerGroupDialogParent)
 			.css('display', allowEmail ? 'inline' : 'none');
-	
+		
 		learnerGroupDialog
 			.dialog('option', 
 				{

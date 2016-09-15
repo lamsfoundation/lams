@@ -518,6 +518,7 @@
 	<!-- Inner dialog placeholders -->
 	
 	<div id="learnerGroupDialog" class="dialogContainer">
+		<span id="learnerGroupMultiSelectLabel"><fmt:message key='learner.group.multi.select'/></span>
 		<table>
 			<tr id="learnerGroupSearchRow">
 				<td>
