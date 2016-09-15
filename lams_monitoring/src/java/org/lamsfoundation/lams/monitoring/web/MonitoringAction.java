@@ -616,15 +616,27 @@ public class MonitoringAction extends LamsDispatchAction {
 	}
 
 	long lessonId = WebUtil.readLongParam(request, AttributeNames.PARAM_LESSON_ID);
-	Integer learnerId = new Integer(WebUtil.readIntParam(request, MonitoringConstants.PARAM_LEARNER_ID));
+	String learnerIDs = request.getParameter(MonitoringConstants.PARAM_LEARNER_ID);
 	Integer requesterId = getUserId();
 	boolean removeLearnerContent = WebUtil.readBooleanParam(request,
 		MonitoringConstants.PARAM_REMOVE_LEARNER_CONTENT, false);
 
+	JSONObject jsonCommand = new JSONObject();
+	jsonCommand.put("message", getMessageService().getMessage("force.complete.learner.command.message"));
+	jsonCommand.put("redirectURL", "/lams/learning/learner.do?method=joinLesson&lessonID=" + lessonId);
+	String command = jsonCommand.toString();
+
 	String message = null;
+	User learner = null;
 	try {
-	    message = getMonitoringService().forceCompleteActivitiesByUser(learnerId, requesterId, lessonId, activityId,
-		    removeLearnerContent);
+	    for (String learnerIDString : learnerIDs.split(",")) {
+		Integer learnerID = Integer.valueOf(learnerIDString);
+		message = getMonitoringService().forceCompleteActivitiesByUser(learnerID, requesterId, lessonId,
+			activityId, removeLearnerContent);
+
+		learner = (User) getUserManagementService().findById(User.class, learnerID);
+		getLearnerService().createCommandForLearner(lessonId, learner.getLogin(), command);
+	    }
 	} catch (SecurityException e) {
 	    response.sendError(HttpServletResponse.SC_FORBIDDEN, "User is not a monitor in the lesson");
 	    return null;
@@ -632,20 +644,14 @@ public class MonitoringAction extends LamsDispatchAction {
 
 	if (LamsDispatchAction.log.isDebugEnabled()) {
 	    LamsDispatchAction.log
-		    .debug("Force complete for learner " + learnerId + " lesson " + lessonId + ". " + message);
+		    .debug("Force complete for learners " + learnerIDs + " lesson " + lessonId + ". " + message);
 	}
 
 	// audit log force completion attempt
 	String messageKey = (activityId == null) ? "audit.force.complete.end.lesson" : "audit.force.complete";
-	Object[] args = new Object[] { learnerId, activityId, lessonId };
+	Object[] args = new Object[] { learnerIDs, activityId, lessonId };
 	String auditMessage = getMonitoringService().getMessageService().getMessage(messageKey, args);
 	MonitoringAction.auditService.log(MonitoringConstants.MONITORING_MODULE_NAME, auditMessage + " " + message);
-
-	JSONObject jsonCommand = new JSONObject();
-	jsonCommand.put("message", getMessageService().getMessage("force.complete.learner.command.message"));
-	jsonCommand.put("redirectURL", "/lams/learning/learner.do?method=joinLesson&lessonID=" + lessonId);
-	User learner = (User) getUserManagementService().findById(User.class, learnerId);
-	getLearnerService().createCommandForLearner(lessonId, learner.getLogin(), jsonCommand.toString());
 
 	PrintWriter writer = response.getWriter();
 	writer.println(message);
