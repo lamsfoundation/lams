@@ -51,10 +51,6 @@
 	<html:hidden property="markersXML" value="" styleId="markersXML" />
 	<html:hidden property="mode" value="${mode}" />	
 	<div class="space-bottom-top align-right">
-	
-		<html:submit styleClass="btn btn-primary voffset10 pull-left" onclick="javascript:document.getElementById('dispatch').value = 'saveMarkers'; return serialiseMarkers();">
-			<fmt:message>button.save</fmt:message>
-		</html:submit>
 		<c:choose>
 			<c:when test="${!gmapUserDTO.finishedActivity and gmapDTO.reflectOnActivity}">
 				<html:submit styleClass="btn btn-primary voffset10 pull-right" onclick="javascript:document.getElementById('dispatch').value = 'openNotebook'; return serialiseMarkers();">
