@@ -39,13 +39,22 @@
 			</div>	
 		</div>
 		</div>
-				
+<html:form action="/learning" method="post" styleId="learningForm">		
 		<div class="btn-group-sm">
 			<c:if test="${contentEditable}">
 				<a href="javascript:addMarkerToCenter()" class="btn btn-default voffset5" role="button"/><fmt:message key="button.addMarker"/></a>
 			</c:if>
-			<a href="javascript:fitMapMarkers()" class="btn btn-default voffset5" role="button"/><fmt:message key="button.fitMarkers"/></a>
-			<a href="javascript:if(confirmLeavePage()){refreshPage();}" class="btn btn-default voffset5" role="button"/><fmt:message key="button.refresh"/></a>
+				<a href="javascript:fitMapMarkers()" class="btn btn-default voffset5" role="button"/><fmt:message key="button.fitMarkers"/></a>
+				<a href="javascript:if(confirmLeavePage()){refreshPage();}" class="btn btn-default voffset5" role="button"/><fmt:message key="button.refresh"/></a>
+		<div class="btn-group-sm col-md-4 pull-right">
+		        &nbsp;&nbsp;&nbsp;
+				<html:hidden property="toolSessionID" styleId="toolSessionID"/>
+		        <html:hidden property="markersXML" value="" styleId="markersXML" />
+		        <html:hidden property="mode" value="${mode}" />	
+				<html:submit styleClass="btn btn-primary voffset5" onclick="javascript:document.getElementById('dispatch').value = 'saveMarkers'; return serialiseMarkers();">
+			           	<fmt:message>button.save</fmt:message>
+		        </html:submit>
+		</div>
 		</div>
 	
 		<div class="voffset5">
@@ -59,7 +68,7 @@
 	<c:if test="${mode == 'learner' || mode == 'author'}">
 		<%@ include file="parts/finishButton.jsp"%>
 	</c:if>
-	
+	 </html:form>
 </lams:Page>
 
 
