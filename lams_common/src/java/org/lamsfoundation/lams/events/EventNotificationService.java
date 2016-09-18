@@ -294,7 +294,7 @@ public class EventNotificationService implements IEventNotificationService {
 	if (!substriptionFound) {
 	    event.getSubscriptions().add(new Subscription(userId, deliveryMethod));
 	}
-	eventDAO.update(event);
+	eventDAO.insertOrUpdate(event);
     }
 
     @Override
