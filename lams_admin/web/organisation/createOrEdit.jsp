@@ -50,15 +50,18 @@
 <table class="table table-condensed table-no-border">
 	<tr>
 		<td width="15%"><fmt:message key="admin.organisation.name"/> *</td>
-		<td><html-el:text property="name" size="40" styleClass="form-control" /></td>
+		<td><html-el:text property="name" size="40" styleClass="form-control" maxlength="240"/></td>
 	</tr>
 	<tr>
 	<td><fmt:message key="admin.organisation.code"/></td>
-		<td><html-el:text property="code" size="20" styleClass="form-control" /></td>
+		<td><html-el:text property="code" size="20" styleClass="form-control" maxlength="20"/></td>
 	</tr>
 	<tr>
 		<td><fmt:message key="admin.organisation.description"/></td>
-		<td><html-el:textarea property="description" cols="50" rows="3" styleClass="form-control" /></td>
+		<td><html-el:textarea property="description" cols="50" rows="3" styleClass="form-control" StyleId="description" /></td>
+		<script type="text/javascript">
+			document.getElementById("description").setAttribute("maxlength", "240");
+		</script>
 	</tr>
 	<tr>
 		<td><fmt:message key="admin.organisation.locale"/></td>
