@@ -19,9 +19,6 @@
 		<html:cancel styleClass="btn btn-default">
 			<fmt:message key="admin.cancel" />
 		</html:cancel>
-		<html:reset styleClass="btn btn-default loffset5">
-			<fmt:message key="admin.reset" />
-		</html:reset>
 		<html:submit styleId="saveButton" styleClass="btn btn-primary loffset5">
 			<fmt:message key="admin.save" />
 		</html:submit>
