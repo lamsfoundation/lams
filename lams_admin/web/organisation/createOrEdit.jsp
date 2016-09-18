@@ -50,15 +50,18 @@
 <table>
 	<tr>
 		<td><fmt:message key="admin.organisation.name"/>:</td>
-		<td><html-el:text property="name" size="40" /> *</td>
+		<td><html-el:text property="name" size="40" maxlength="240"/> *</td>
 	</tr>
 	<tr>
 	<td><fmt:message key="admin.organisation.code"/>:</td>
-		<td><html-el:text property="code" size="20" /></td>
+		<td><html-el:text property="code" size="20" maxlength="20"/></td>
 	</tr>
 	<tr>
 		<td><fmt:message key="admin.organisation.description"/>:</td>
-		<td><html-el:textarea property="description" cols="50" rows="3" /></td>
+		<td><html-el:textarea styleId="description" property="description" cols="50" rows="3" /></td>
+		<script type="text/javascript">
+			document.getElementById("description").setAttribute("maxlength", "240");
+		</script>
 	</tr>
 	<tr>
 		<td><fmt:message key="admin.organisation.locale"/>:</td>
