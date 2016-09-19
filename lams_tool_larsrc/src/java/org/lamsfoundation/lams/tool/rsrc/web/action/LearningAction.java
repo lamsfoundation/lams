@@ -76,8 +76,6 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
 
 /**
  * @author Steve.Ni
- *
- * @version $Revision$
  */
 public class LearningAction extends Action {
 
