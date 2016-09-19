@@ -415,7 +415,7 @@ public class LearningAction extends Action {
 			do {
 			    service.deleteDacoAnswer(localAnswer.getUid());
 			    record.remove(answerNumber);
-			    if (answerNumber <= record.size()) {
+			    if (answerNumber < record.size()) {
 				localAnswer = record.get(answerNumber);
 				if (localAnswer.getQuestion().getType() != DacoConstants.QUESTION_TYPE_CHECKBOX) {
 				    localAnswer = null;
