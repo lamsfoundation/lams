@@ -203,7 +203,6 @@
 				<include name="lucene/*.jar" />
 				<include name="excel/*.jar" />
 				<include name="csv/*.jar" />
-				<include name="joid/*.jar" />
 				<include name="urlrewritefilter/*.jar" />
 				<include name="json/*.jar" />
 			</fileset> 

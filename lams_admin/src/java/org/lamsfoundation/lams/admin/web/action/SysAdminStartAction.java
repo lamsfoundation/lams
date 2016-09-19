@@ -34,7 +34,6 @@ import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.lamsfoundation.lams.admin.service.AdminServiceProxy;
 import org.lamsfoundation.lams.admin.web.dto.LinkBean;
-import org.lamsfoundation.lams.openid.OpenIDConfig;
 import org.lamsfoundation.lams.usermanagement.Role;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
 
@@ -74,10 +73,6 @@ public class SysAdminStartAction extends Action {
 	    links.add(new LinkBean("themeManagement.do", "admin.themes.title"));
 	    links.add(new LinkBean("timezonemanagement.do", "admin.timezone.title"));
 
-	    OpenIDConfig openIDEnabled = (OpenIDConfig) service.findById(OpenIDConfig.class, OpenIDConfig.KEY_ENABLED);
-	    if (openIDEnabled != null && Boolean.parseBoolean(openIDEnabled.getConfigValue()) == Boolean.TRUE) {
-		links.add(new LinkBean("openIDConfig.do", "admin.openid.title"));
-	    }
 	} else if (service.isUserGlobalGroupAdmin()) {
 	    LinkBean linkBean = new LinkBean("usersearch.do", "admin.user.find");
 	    links.add(linkBean);
