@@ -20,7 +20,6 @@
  * ****************************************************************
  */
 
-
 package org.lamsfoundation.lams.tool.forum.service;
 
 import java.util.ArrayList;
@@ -62,24 +61,24 @@ public class ForumOutputFactory extends OutputFactory {
 	    int definitionType) throws ToolException {
 
 	SortedMap<String, ToolOutputDefinition> definitionMap = new TreeMap<String, ToolOutputDefinition>();
-	Class topicDatesToAnswersClass = (new HashMap<Date, Set<String>>()).getClass();
+
 	Class stringArrayClass = String[].class;
 
 	switch (definitionType) {
 	    case ToolOutputDefinition.DATA_OUTPUT_DEFINITION_TYPE_CONDITION:
-		if (toolContentObject != null) {
-		    ToolOutputDefinition chosenTopicAnswersDefinition = buildComplexOutputDefinition(
-			    ForumConstants.TOPIC_DATE_TO_ANSWERS_DEFINITION_NAME, topicDatesToAnswersClass);
-		    Forum forum = (Forum) toolContentObject;
-
-		    // adding all existing conditions
-		    chosenTopicAnswersDefinition
-			    .setDefaultConditions(new ArrayList<BranchCondition>(forum.getConditions()));
-
-		    chosenTopicAnswersDefinition.setShowConditionNameOnly(true);
-		    definitionMap.put(ForumConstants.TOPIC_DATE_TO_ANSWERS_DEFINITION_NAME,
-			    chosenTopicAnswersDefinition);
-		}
+//		if (toolContentObject != null) {
+//		    Class topicDatesToAnswersClass = (new HashMap<Date, Set<String>>()).getClass();
+//		    ToolOutputDefinition chosenTopicAnswersDefinition = buildComplexOutputDefinition(
+//			    ForumConstants.TOPIC_DATE_TO_ANSWERS_DEFINITION_NAME, topicDatesToAnswersClass);
+//		    Forum forum = (Forum) toolContentObject;
+//
+//		    // adding all existing conditions
+//		    chosenTopicAnswersDefinition
+//			    .setDefaultConditions(new ArrayList<BranchCondition>(forum.getConditions()));
+//
+//		    definitionMap.put(ForumConstants.TOPIC_DATE_TO_ANSWERS_DEFINITION_NAME,
+//			    chosenTopicAnswersDefinition);
+//		}
 		ToolOutputDefinition numberOfPostsDefinition = buildRangeDefinition(
 			ForumConstants.LEARNER_NUM_POSTS_DEFINITION_NAME, new Long(0), null);
 		definitionMap.put(ForumConstants.LEARNER_NUM_POSTS_DEFINITION_NAME, numberOfPostsDefinition);

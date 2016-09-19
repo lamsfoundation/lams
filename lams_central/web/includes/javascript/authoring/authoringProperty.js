@@ -1106,7 +1106,7 @@ PropertyLib = {
 		
 						this.toolActivityUIID = activity.input.uiid;
 						var option = $('<option />')
-									   .text(this.description + suffix)
+									   .text(this.description + ' ' + suffix)
 									   .data('output', this)
 									   .appendTo(outputSelect);
 						// select the output for which mappings were already defined

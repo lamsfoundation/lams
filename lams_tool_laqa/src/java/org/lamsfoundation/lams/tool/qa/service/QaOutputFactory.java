@@ -20,7 +20,6 @@
  * ****************************************************************
  */
 
-
 package org.lamsfoundation.lams.tool.qa.service;
 
 import java.util.ArrayList;
@@ -68,18 +67,17 @@ public class QaOutputFactory extends OutputFactory {
 	    Class stringArrayClass = String[].class;
 	    Class arrayofStringArraysClass = String[][].class;
 	    switch (definitionType) {
-		case ToolOutputDefinition.DATA_OUTPUT_DEFINITION_TYPE_CONDITION: {
-		    ToolOutputDefinition userAnswersDefinition = buildComplexOutputDefinition(
-			    QaAppConstants.USER_ANSWERS_DEFINITION_NAME, stringArrayClass);
+		case ToolOutputDefinition.DATA_OUTPUT_DEFINITION_TYPE_CONDITION:
+//		    ToolOutputDefinition userAnswersDefinition = buildComplexOutputDefinition(
+//			    QaAppConstants.USER_ANSWERS_DEFINITION_NAME, stringArrayClass);
+//
+//		    // adding all existing conditions
+//		    userAnswersDefinition
+//			    .setDefaultConditions(new ArrayList<BranchCondition>(qaContent.getConditions()));
+//		    definitionMap.put(QaAppConstants.USER_ANSWERS_DEFINITION_NAME, userAnswersDefinition);
 
-		    // adding all existing conditions
-		    userAnswersDefinition
-			    .setDefaultConditions(new ArrayList<BranchCondition>(qaContent.getConditions()));
-		    userAnswersDefinition.setShowConditionNameOnly(true);
-		    definitionMap.put(QaAppConstants.USER_ANSWERS_DEFINITION_NAME, userAnswersDefinition);
-		}
 		    break;
-		case ToolOutputDefinition.DATA_OUTPUT_DEFINITION_TYPE_DATA_FLOW: {
+		case ToolOutputDefinition.DATA_OUTPUT_DEFINITION_TYPE_DATA_FLOW:
 		    ToolOutputDefinition groupAnswersDefinition = buildComplexOutputDefinition(
 			    QaAppConstants.GROUP_ANSWERS_DEFINITION_NAME, arrayofStringArraysClass);
 		    definitionMap.put(QaAppConstants.GROUP_ANSWERS_DEFINITION_NAME, groupAnswersDefinition);
@@ -87,7 +85,7 @@ public class QaOutputFactory extends OutputFactory {
 		    ToolOutputDefinition questionsDefinition = buildComplexOutputDefinition(
 			    QaAppConstants.QUESTIONS_DEFINITION_NAME, stringArrayClass);
 		    definitionMap.put(QaAppConstants.QUESTIONS_DEFINITION_NAME, questionsDefinition);
-		}
+
 		    break;
 	    }
 	}

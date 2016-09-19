@@ -20,7 +20,6 @@
  * ****************************************************************
  */
 
-
 package org.lamsfoundation.lams.learningdesign;
 
 import org.apache.commons.lang.builder.CompareToBuilder;
@@ -29,6 +28,7 @@ import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.commons.lang.builder.ToStringBuilder;
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.learningdesign.dto.BranchConditionDTO;
+import org.lamsfoundation.lams.tool.OutputType;
 import org.lamsfoundation.lams.tool.ToolOutput;
 import org.lamsfoundation.lams.tool.ToolOutputValue;
 
@@ -218,11 +218,13 @@ public class BranchCondition implements Comparable {
 
     /** Is this condition met? */
     public boolean isMet(ToolOutput output) {
-	if (output != null) {
+	ToolOutputValue value = output == null ? null : output.getValue();
+	if (value != null && OutputType.OUTPUT_COMPLEX != value.getType()
+		&& OutputType.OUTPUT_SET_BOOLEAN != value.getType()) {
 	    if (exactMatchValue != null) {
-		return exactMatchMet(output.getValue());
+		return exactMatchMet(value);
 	    } else if (startValue != null || endValue != null) {
-		return inRange(output.getValue());
+		return inRange(value);
 	    }
 	}
 	return false;
