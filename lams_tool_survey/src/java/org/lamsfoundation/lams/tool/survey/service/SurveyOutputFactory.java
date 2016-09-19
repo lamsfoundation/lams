@@ -20,7 +20,6 @@
  * ****************************************************************
  */
 
-
 package org.lamsfoundation.lams.tool.survey.service;
 
 import java.util.ArrayList;
@@ -58,17 +57,22 @@ public class SurveyOutputFactory extends OutputFactory {
     public SortedMap<String, ToolOutputDefinition> getToolOutputDefinitions(Object toolContentObject,
 	    int definitionType) throws ToolException {
 	SortedMap<String, ToolOutputDefinition> definitionMap = new TreeMap<String, ToolOutputDefinition>();
-	Class stringArrayClass = new String[] {}.getClass();
-	if (toolContentObject != null) {
-	    ToolOutputDefinition allAnswersDefinition = buildComplexOutputDefinition(
-		    SurveyConstants.TEXT_SEARCH_DEFINITION_NAME, stringArrayClass);
-	    Survey survey = (Survey) toolContentObject;
+	switch (definitionType) {
+	    case ToolOutputDefinition.DATA_OUTPUT_DEFINITION_TYPE_CONDITION:
+		break;
+	    case ToolOutputDefinition.DATA_OUTPUT_DEFINITION_TYPE_DATA_FLOW:
+		Class stringArrayClass = new String[] {}.getClass();
+		if (toolContentObject != null) {
+		    ToolOutputDefinition allAnswersDefinition = buildComplexOutputDefinition(
+			    SurveyConstants.TEXT_SEARCH_DEFINITION_NAME, stringArrayClass);
+		    Survey survey = (Survey) toolContentObject;
 
-	    // adding all existing conditions
-	    allAnswersDefinition.setDefaultConditions(new ArrayList<BranchCondition>(survey.getConditions()));
+		    // adding all existing conditions
+		    allAnswersDefinition.setDefaultConditions(new ArrayList<BranchCondition>(survey.getConditions()));
 
-	    allAnswersDefinition.setShowConditionNameOnly(true);
-	    definitionMap.put(SurveyConstants.TEXT_SEARCH_DEFINITION_NAME, allAnswersDefinition);
+		    definitionMap.put(SurveyConstants.TEXT_SEARCH_DEFINITION_NAME, allAnswersDefinition);
+		}
+		break;
 	}
 
 	return definitionMap;

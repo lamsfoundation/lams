@@ -96,7 +96,6 @@ public class VoteOutputFactory extends OutputFactory {
 			    VoteUtils.stripHTML(nomination.getQuestion()), OutputType.OUTPUT_BOOLEAN.toString(), null,
 			    null, trueString));
 		}
-		definition.setShowConditionNameOnly(Boolean.TRUE);
 
 		definitionMap.put(VoteOutputFactory.OUTPUT_NAME_NOMINATION_SELECTION, definition);
 	    }

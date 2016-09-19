@@ -20,7 +20,6 @@
  * ****************************************************************
  */
 
-
 package org.lamsfoundation.lams.tool;
 
 import java.util.ArrayList;
@@ -328,7 +327,7 @@ public abstract class OutputFactory {
      * using the getDescription() method and set the type to OUTPUT_COMPLEX.
      */
     protected ToolOutputDefinition buildComplexOutputDefinition(String definitionName, Class valueClass) {
-	return buildDefinition(definitionName, OutputType.OUTPUT_COMPLEX, null, null, null, Boolean.FALSE, valueClass);
+	return buildDefinition(definitionName, OutputType.OUTPUT_COMPLEX, null, null, null, Boolean.TRUE, valueClass);
     }
 
     /**

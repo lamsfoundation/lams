@@ -85,8 +85,6 @@ public class TaskListOutputFactory extends OutputFactory {
 			condition.getName(), OutputType.OUTPUT_BOOLEAN.toString(), null, null, trueString));
 	    }
 
-	    definition.setShowConditionNameOnly(Boolean.TRUE);
-
 	    definitionMap.put(OUTPUT_NAME_TOOL_CONDITION, definition);
 	}
 

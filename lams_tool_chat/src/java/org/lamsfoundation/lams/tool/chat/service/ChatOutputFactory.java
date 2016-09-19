@@ -20,7 +20,6 @@
  * ****************************************************************
  */
 
-
 package org.lamsfoundation.lams.tool.chat.service;
 
 import java.util.ArrayList;
@@ -54,19 +53,21 @@ public class ChatOutputFactory extends OutputFactory {
     public SortedMap<String, ToolOutputDefinition> getToolOutputDefinitions(Object toolContentObject,
 	    int definitionType) throws ToolException {
 	SortedMap<String, ToolOutputDefinition> definitionMap = new TreeMap<String, ToolOutputDefinition>();
-	Class stringArrayClass = new String[] {}.getClass();
+
 	switch (definitionType) {
 	    case ToolOutputDefinition.DATA_OUTPUT_DEFINITION_TYPE_CONDITION:
+		break;
+	    case ToolOutputDefinition.DATA_OUTPUT_DEFINITION_TYPE_DATA_FLOW:
+		Class stringArrayClass = new String[] {}.getClass();
 		if (toolContentObject != null) {
 		    ToolOutputDefinition chatMessagesDefinition = buildComplexOutputDefinition(
 			    ChatConstants.USER_MESSAGES_DEFINITION_NAME, stringArrayClass);
 		    Chat chat = (Chat) toolContentObject;
 		    // adding all existing conditions
 		    chatMessagesDefinition.setDefaultConditions(new ArrayList<BranchCondition>(chat.getConditions()));
-		    chatMessagesDefinition.setShowConditionNameOnly(true);
 		    definitionMap.put(ChatConstants.USER_MESSAGES_DEFINITION_NAME, chatMessagesDefinition);
 		}
-	    case ToolOutputDefinition.DATA_OUTPUT_DEFINITION_TYPE_DATA_FLOW:
+
 		ToolOutputDefinition allUsersMessagesDefinition = buildComplexOutputDefinition(
 			ChatConstants.ALL_USERS_MESSAGES_DEFINITION_NAME, stringArrayClass);
 		definitionMap.put(ChatConstants.ALL_USERS_MESSAGES_DEFINITION_NAME, allUsersMessagesDefinition);
