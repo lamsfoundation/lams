@@ -574,25 +574,31 @@ function initSequenceTab(){
 			            		var selectedLearners = $('.dialogList div.dialogListItemSelected', this),
 			            			// go to "force complete" mode, similar to draggin user to an activity
 		            				activityId = $(this).dialog('option', 'ajaxProperties').data.activityID,
-			            				dropArea = sequenceCanvas.add('#completedLearnersContainer');
-			            			dropArea.css('cursor', 'url('
-		            					+ LAMS_URL + 'images/icons/' 
-		            					+ (selectedLearners.length > 1 ? 'group' : 'user')
-		            					+ '.png),pointer')
-			            				.one('click', function(event) {
-		            					var learners = [];
-		            					selectedLearners.each(function(){
-		            						var learner = $(this);
-		            						learners.push({
-		            							'id'     : learner.attr('userId'),
-		            							'name'   : learner.text()
-		            						});
-		            					});
-			            					dropArea.off('click').css('cursor', 'default');
-		            					forceComplete(activityId, learners, event.pageX, event.pageY);
-			            				});
-				            		$(this).dialog('close');
-			            		alert(LABELS.FORCE_COMPLETE_CLICK);
+			            			dropArea = sequenceCanvas.add('#completedLearnersContainer');
+		            			dropArea.css('cursor', 'url('
+				            					+ LAMS_URL + 'images/icons/' 
+				            					+ (selectedLearners.length > 1 ? 'group' : 'user')
+				            					+ '.png),pointer')
+				            			.one('click', function(event) {
+			            					var learners = [];
+			            					selectedLearners.each(function(){
+			            						var learner = $(this);
+			            						learners.push({
+			            							'id'     : learner.attr('userId'),
+			            							'name'   : learner.text()
+			            						});
+			            					});
+				            				dropArea.off('click').css('cursor', 'default');
+			            					forceComplete(activityId, learners, event.pageX, event.pageY);
+				            			});
+				            	$(this).dialog('close');
+				            	
+				            	var learnerNames = '';
+				            	selectedLearners.each(function(){
+				            		learnerNames += $(this).text() + ', ';
+				            	});
+				            	learnerNames = learnerNames.slice(0, -2);
+			            		alert(LABELS.FORCE_COMPLETE_CLICK.replace('[0]',learnerNames));
 							}
 			             },
 			             {
@@ -1950,7 +1956,7 @@ function showLearnerGroupDialog(ajaxProperties, dialogTitle, allowSearch, allowF
 				    	// enable buttons
 			    $('button.learnerGroupDialogSelectableButton', learnerGroupDialogParent).prop('disabled', false)
 			    																		.removeClass('ui-state-disabled');
-				if (allowForceComplete && event.ctrlKey) {
+				if (allowForceComplete && (event.metaKey || event.ctrlKey)) {
 					var isSelected = learnerDiv.hasClass('dialogListItemSelected');
 					if (isSelected) {
 						// do not un-select last learner
