@@ -184,7 +184,7 @@ var HandlerLib = {
 	 * Selects an activity/transition/annotation.
 	 */
 	itemClickHandler : function(event) {
-		if (event.ctrlKey || layout.drawMode ||
+		if ((event.ctrlKey || event.metaKey) || layout.drawMode ||
 			(event.originalEvent ? event.originalEvent.defaultPrevented : event.defaultPrevented)){
 			return;
 		}
@@ -272,7 +272,7 @@ HandlerActivityLib = {
 		}
 		
 		var activity = ActivityLib.getParentObject(this);
-		if (event.ctrlKey) {
+		if (event.ctrlKey || event.metaKey) {
 			 // when CTRL is held down, start drawing a transition
 			 HandlerTransitionLib.drawTransitionStartHandler(activity, event, x, y);
 		} else if (!activity.parentActivity
