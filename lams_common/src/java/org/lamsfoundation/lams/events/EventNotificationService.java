@@ -205,7 +205,7 @@ class EventNotificationService implements IEventNotificationService {
 	boolean isSubscribed = false;
 	if (event != null) {
 	    for (Subscription subscription : event.getSubscriptions()) {
-		if (subscription.getUserId().equals(userId)) {
+		if (subscription.getUserId().equals(Integer.valueOf(userId.intValue()))) {
 		    isSubscribed = true;
 		    break;
 		}
