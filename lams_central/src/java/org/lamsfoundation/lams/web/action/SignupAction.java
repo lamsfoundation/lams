@@ -2,8 +2,8 @@ package org.lamsfoundation.lams.web.action;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
-import org.apache.catalina.authenticator.Constants;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.apache.struts.action.Action;
@@ -22,20 +22,9 @@ import org.lamsfoundation.lams.util.Emailer;
 import org.lamsfoundation.lams.util.HashUtil;
 import org.lamsfoundation.lams.util.ValidationUtil;
 import org.lamsfoundation.lams.util.WebUtil;
-import org.lamsfoundation.lams.web.session.SessionManager;
-import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 
-/**
- *
- *
- *
- *
- *
- *
- *
- */
 public class SignupAction extends Action {
 
     private static Logger log = Logger.getLogger(SignupAction.class);
@@ -131,7 +120,6 @@ public class SignupAction extends Action {
 
     private ActionForward signIn(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) {
-
 	try {
 	    DynaActionForm signupForm = (DynaActionForm) form;
 
@@ -146,16 +134,10 @@ public class SignupAction extends Action {
 		String context = signupForm.getString("context");
 		SignupAction.signupService.signinUser(login, context);
 
-		String redirectUrl = Configuration.get(ConfigurationKeys.SERVER_URL);
-
-		//check if user is logged in already
-		if ((SessionManager.getSession() == null)
-			|| (SessionManager.getSession().getAttribute(AttributeNames.USER) == null)) {
-		    redirectUrl += "/j_security_check?" + Constants.FORM_USERNAME + "=" + login + "&"
-			    + Constants.FORM_PASSWORD + "=" + password;
-		}
-
-		response.sendRedirect(redirectUrl);
+		HttpSession hses = request.getSession();
+		hses.setAttribute("login", login);
+		hses.setAttribute("password", password);
+		response.sendRedirect("/lams/login.jsp?redirectURL=/lams");
 		return null;
 	    }
 	} catch (Exception e) {
