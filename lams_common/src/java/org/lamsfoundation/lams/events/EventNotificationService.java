@@ -106,7 +106,7 @@ public class EventNotificationService implements IEventNotificationService {
 	Event event = eventDAO.getEvent(scope, name, eventSessionId);
 	if (event != null) {
 	    for (Subscription subscription : event.getSubscriptions()) {
-		if (subscription.getUserId().equals(userId)) {
+		if (subscription.getUserId().equals(Integer.valueOf(userId.intValue()))) {
 		    return true;
 		}
 	    }
