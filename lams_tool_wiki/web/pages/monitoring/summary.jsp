@@ -1,5 +1,31 @@
 <%@ include file="/common/taglibs.jsp"%>
 <script type="text/javascript" src="<lams:LAMSURL/>/includes/javascript/monitorToolSummaryAdvanced.js" ></script>
+<c:set var="lams">
+        <lams:LAMSURL />
+</c:set>
+
+<c:set var="dto" value="${requestScope.monitoringDTO}" />
+
+<link type="text/css" href="${lams}/css/jquery-ui-smoothness-theme.css" rel="stylesheet">
+<link type="text/css" href="${lams}/css/jquery-ui.timepicker.css" rel="stylesheet">
+
+<script type="text/javascript">
+	//pass settings to monitorToolSummaryAdvanced.js
+	var submissionDeadlineSettings = {
+		lams: '${lams}',
+		submissionDeadline: '${submissionDeadline}',
+		setSubmissionDeadlineUrl: '<c:url value="/monitoring.do?dispatch=setSubmissionDeadline"/>',
+		toolContentID: '${param.toolContentID}',
+		messageNotification: '<fmt:message key="monitor.summary.notification" />',
+		messageRestrictionSet: '<fmt:message key="monitor.summary.date.restriction.set" />',
+		messageRestrictionRemoved: '<fmt:message key="monitor.summary.date.restriction.removed" />'
+	};
+</script>
+
+<script type="text/javascript" src="${lams}includes/javascript/jquery-ui.js"></script>
+<script type="text/javascript" src="${lams}includes/javascript/jquery-ui.timepicker.js"></script>
+<script type="text/javascript" src="${lams}includes/javascript/jquery.blockUI.js"></script>  
+<script type="text/javascript" src="${lams}/includes/javascript/monitorToolSummaryAdvanced.js" ></script>
 
 <script type="text/javascript">
 <!--
@@ -219,3 +245,4 @@
 	
 </table>
 </lams:AdvancedAccordian> 
+<%@include file="daterestriction.jsp"%>

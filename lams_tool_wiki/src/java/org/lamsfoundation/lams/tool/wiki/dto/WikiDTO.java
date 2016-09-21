@@ -25,6 +25,7 @@
 
 package org.lamsfoundation.lams.tool.wiki.dto;
 
+import java.util.Date;
 import java.util.Iterator;
 import java.util.Set;
 import java.util.TreeSet;
@@ -64,8 +65,12 @@ public class WikiDTO {
     private Integer minimumEdits;
 
     private Integer maximumEdits;
+   
+    public Date submissionDeadline;
 
-    public Set<WikiSessionDTO> sessionDTOs = new TreeSet<WikiSessionDTO>();
+    
+
+	public Set<WikiSessionDTO> sessionDTOs = new TreeSet<WikiSessionDTO>();
 
     public Long currentTab;
 
@@ -85,8 +90,10 @@ public class WikiDTO {
 	notifyUpdates = wiki.isNotifyUpdates();
 	reflectOnActivity = wiki.isReflectOnActivity();
 	reflectInstructions = wiki.getReflectInstructions();
+    submissionDeadline = wiki.getSubmissionDeadline();
 	minimumEdits = wiki.getMinimumEdits();
 	maximumEdits = wiki.getMaximumEdits();
+	
 
 	for (Iterator<WikiSession> iter = wiki.getWikiSessions().iterator(); iter.hasNext();) {
 	    WikiSession session = iter.next();
@@ -228,4 +235,12 @@ public class WikiDTO {
     public void setCurrentTab(Long currentTab) {
 	this.currentTab = currentTab;
     }
+    
+    public Date getSubmissionDeadline() {
+    	return submissionDeadline;
+        }
+
+    public void setSubmissionDeadline(Date submissionDeadline) {
+    	this.submissionDeadline = submissionDeadline;
+        }
 }

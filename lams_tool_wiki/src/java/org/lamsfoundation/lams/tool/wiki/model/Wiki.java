@@ -95,6 +95,8 @@ public class Wiki implements java.io.Serializable, Cloneable {
     private boolean defineLater;
 
     private Long toolContentId;
+    
+	private Date submissionDeadline;
 
     private Set<WikiSession> wikiSessions;
 
@@ -368,7 +370,21 @@ public class Wiki implements java.io.Serializable, Cloneable {
     public void setMainPage(WikiPage mainPage) {
 	this.mainPage = mainPage;
     }
+    
+    
+    /**
+    *
+    * @return
+    */
+    public Date getSubmissionDeadline() {
+		return submissionDeadline;
+	}
+    
 
+	public void setSubmissionDeadline(Date submissionDeadline) {
+		this.submissionDeadline = submissionDeadline;
+	}
+    
     /**
      * toString
      *
