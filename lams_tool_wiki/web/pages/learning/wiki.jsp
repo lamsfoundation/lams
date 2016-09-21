@@ -177,12 +177,25 @@
 
 
                     </c:if>
+                    <c:if test="${mode == 'learner' || mode == 'author'}">
+                    <c:if test="${not empty submissionDeadline}">
+
+			<lams:Alert id="submissionDeadline" type="info" close="true">
+				<fmt:message key="authoring.info.teacher.set.restriction">
+					<fmt:param>
+						<lams:Date value="${submissionDeadline}" />
+					</fmt:param>
+				</fmt:message>
+			</lams:Alert>
+		    </c:if>
+		     </c:if>
 
                     <c:if test="${currentWikiPage.deleted}">
                       <lams:Alert id="pageRemoved" type="danger" close="false">
                         <fmt:message key="label.wiki.removed" />
                       </lams:Alert>
                     </c:if>
+                    
                 <!-- end annoucements -->
 
                 <!-- Wiki main -->
@@ -229,7 +242,7 @@
                               </c:choose>
                             </a>
                           </fmt:param>
-                        </fmt:message>
+                        </fmt:message> 
 
                       </div>
                     </div>

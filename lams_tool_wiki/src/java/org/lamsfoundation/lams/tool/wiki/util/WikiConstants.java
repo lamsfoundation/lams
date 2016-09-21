@@ -74,4 +74,13 @@ public interface WikiConstants {
 
     public static final String JAVASCRIPT_TOKEN = "javascript";
     public static final String JAVASCRIPT_REPLACE_TOKEN = "JAVASCRIPTREPLACE";
+    
+    public static final String MESSAGE_SEPARATOR = " ";
+    public static final String TEXT_SEARCH_DEFINITION_NAME = "text.search.output.definition.chat";
+    public static final String TEXT_SEARCH_DEFAULT_CONDITION_DISPLAY_NAME_KEY = "text.search.output.definition.chat.default.condition";
+    
+    /* Date time restriction */
+    public static final String ATTR_SUBMISSION_DEADLINE = "submissionDeadline";
+    public static final String ATTR_IS_SUBMISSION_DEADLINE_PASSED = "isSubmissionDeadlinePassed";
+
 }

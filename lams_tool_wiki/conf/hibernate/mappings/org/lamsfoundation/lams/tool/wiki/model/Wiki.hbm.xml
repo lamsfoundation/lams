@@ -213,6 +213,14 @@
             />
 
         </set>
+        
+        <property
+            name="submissionDeadline"
+            type="java.util.Date"
+            update="true"
+            insert="true"
+            column="submission_deadline"
+        />
 
         <many-to-one
             name="mainPage"

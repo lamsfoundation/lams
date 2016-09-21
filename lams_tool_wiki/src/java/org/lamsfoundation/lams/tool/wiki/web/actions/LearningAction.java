@@ -26,11 +26,13 @@ package org.lamsfoundation.lams.tool.wiki.web.actions;
 
 import java.io.IOException;
 import java.util.Date;
+import java.util.TimeZone;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
 import org.apache.log4j.Logger;
 import org.apache.struts.action.ActionForm;
@@ -41,6 +43,7 @@ import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.notebook.service.CoreNotebookConstants;
 import org.lamsfoundation.lams.tool.ToolAccessMode;
 import org.lamsfoundation.lams.tool.ToolSessionManager;
+
 import org.lamsfoundation.lams.tool.exception.DataMissingException;
 import org.lamsfoundation.lams.tool.exception.ToolException;
 import org.lamsfoundation.lams.tool.wiki.dto.WikiDTO;
@@ -59,6 +62,7 @@ import org.lamsfoundation.lams.tool.wiki.util.WikiException;
 import org.lamsfoundation.lams.tool.wiki.web.forms.LearningForm;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.util.WebUtil;
+import org.lamsfoundation.lams.util.DateUtil;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 
@@ -165,10 +169,12 @@ public class LearningAction extends WikiPageAction {
 	if (wikiService.getEventNotificationService().eventExists(WikiConstants.TOOL_SIGNATURE,
 		WikiConstants.EVENT_NOTIFY_LEARNERS, toolSessionID)
 		&& wikiService.getEventNotificationService().isSubscribed(WikiConstants.TOOL_SIGNATURE,
-			WikiConstants.EVENT_NOTIFY_LEARNERS, toolSessionID, wikiUser.getUserId().longValue())) {
-
+			WikiConstants.EVENT_NOTIFY_LEARNERS, toolSessionID, wikiUser.getUserId())) {
 	    wikiUserDTO.setNotificationEnabled(true);
 	}
+	
+	
+	
 
 	// add the userDTO to attributes
 	request.setAttribute(WikiConstants.ATTR_USER_DTO, wikiUserDTO);
@@ -222,7 +228,30 @@ public class LearningAction extends WikiPageAction {
 	    request.setAttribute(WikiConstants.ATTR_CONTENT_EDITAVLE, true);
 	}
 	request.setAttribute(WikiConstants.ATTR_FINISHED_ACTIVITY, wikiUser.isFinishedActivity());
+	
+	
+	/* Check if submission deadline is null */
+	
+	Date submissionDeadline = wikiDTO.getSubmissionDeadline();
+	request.setAttribute("wikiDTO", wikiDTO);
+	
 
+	if (submissionDeadline != null) {
+
+	    HttpSession ss = SessionManager.getSession();
+	    UserDTO learnerDto = (UserDTO) ss.getAttribute(AttributeNames.USER);
+	    TimeZone learnerTimeZone = learnerDto.getTimeZone();
+	    Date tzSubmissionDeadline = DateUtil.convertToTimeZoneFromDefault(learnerTimeZone, submissionDeadline);
+	    Date currentLearnerDate = DateUtil.convertToTimeZoneFromDefault(learnerTimeZone, new Date());
+	    request.setAttribute("submissionDeadline", submissionDeadline);
+
+	    // calculate whether submission deadline has passed, and if so forward to "submissionDeadline"
+	    if (currentLearnerDate.after(tzSubmissionDeadline)) {
+		return mapping.findForward("submissionDeadline");
+	    }
+
+	}
+	
 	return mapping.findForward("wiki");
     }
 

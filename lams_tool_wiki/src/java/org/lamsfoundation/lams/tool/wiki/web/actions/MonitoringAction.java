@@ -29,6 +29,7 @@ import java.util.TreeSet;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
 import org.apache.log4j.Logger;
 import org.apache.struts.action.ActionForm;
@@ -55,6 +56,9 @@ import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
+import java.util.Date;
+import org.lamsfoundation.lams.util.DateUtil;
+import java.util.TimeZone;
 
 /**
  * This action handles all the monitoring actions, which include opening
@@ -117,6 +121,20 @@ public class MonitoringAction extends WikiPageAction {
 
 	Long currentTab = WebUtil.readLongParam(request, AttributeNames.PARAM_CURRENT_TAB, true);
 	wikiDT0.setCurrentTab(currentTab);
+	
+	/* Check if submission deadline is null */
+
+	Date submissionDeadline = wikiDT0.getSubmissionDeadline();
+
+	if (submissionDeadline != null) {
+
+	    HttpSession ss = SessionManager.getSession();
+	    UserDTO learnerDto = (UserDTO) ss.getAttribute(AttributeNames.USER);
+	    TimeZone learnerTimeZone = learnerDto.getTimeZone();
+	    Date tzSubmissionDeadline = DateUtil.convertToTimeZoneFromDefault(learnerTimeZone, submissionDeadline);
+	    request.setAttribute("submissionDeadline", tzSubmissionDeadline.getTime());
+
+	}
 
 	request.setAttribute(WikiConstants.ATTR_WIKI_DTO, wikiDT0);
 	request.setAttribute(WikiConstants.ATTR_CONTENT_FOLDER_ID, contentFolderID);
@@ -155,6 +173,43 @@ public class MonitoringAction extends WikiPageAction {
 	}
 
 	return wikiUser;
+    }
+    
+    
+    /**
+     * Set Submission Deadline
+     *
+     * @param mapping
+     * @param form
+     * @param request
+     * @param response
+     * @return
+     */
+    public ActionForward setSubmissionDeadline(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+	    HttpServletResponse response) {
+
+	// set up wikiService
+	if (wikiService == null) {
+		wikiService = WikiServiceProxy.getWikiService(this.getServlet().getServletContext());
+	}
+
+	Long contentID = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_CONTENT_ID);
+	Wiki wiki = wikiService.getWikiByContentId(contentID);
+
+	Long dateParameter = WebUtil.readLongParam(request,WikiConstants.ATTR_SUBMISSION_DEADLINE, true);
+	Date tzSubmissionDeadline = null;
+	if (dateParameter != null) {
+	    Date submissionDeadline = new Date(dateParameter);
+	    HttpSession ss = SessionManager.getSession();
+	    UserDTO teacher = (UserDTO) ss.getAttribute(AttributeNames.USER);
+	    TimeZone teacherTimeZone = teacher.getTimeZone();
+	    tzSubmissionDeadline = DateUtil.convertFromTimeZoneToDefault(teacherTimeZone, submissionDeadline);
+	}
+	wiki.setSubmissionDeadline(tzSubmissionDeadline);
+	System.out.println("datasetbefore"+wiki);
+	wikiService.saveOrUpdateWiki(wiki);
+	System.out.println("datasetafter"+wiki);
+	return null;
     }
 
     /**
