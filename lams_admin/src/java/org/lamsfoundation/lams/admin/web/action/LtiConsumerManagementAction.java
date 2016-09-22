@@ -16,7 +16,7 @@ import org.apache.struts.action.ActionMessage;
 import org.apache.struts.action.ActionMessages;
 import org.apache.struts.action.DynaActionForm;
 import org.lamsfoundation.lams.admin.service.AdminServiceProxy;
-import org.lamsfoundation.lams.integration.ExtServerOrgMap;
+import org.lamsfoundation.lams.integration.ExtServer;
 import org.lamsfoundation.lams.integration.service.IIntegrationService;
 import org.lamsfoundation.lams.integration.util.LtiUtils;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
@@ -60,7 +60,7 @@ public class LtiConsumerManagementAction extends LamsDispatchAction {
 	    HttpServletResponse response) {
 	initServices();
 	
-	List<ExtServerOrgMap> ltiConsumers = integrationService.getAllToolConsumers();
+	List<ExtServer> ltiConsumers = integrationService.getAllToolConsumers();
 	Collections.sort(ltiConsumers);
 	request.setAttribute("ltiConsumers", ltiConsumers);
 	
@@ -80,7 +80,7 @@ public class LtiConsumerManagementAction extends LamsDispatchAction {
 
 	// editing a tool consumer
 	if (sid != null) {
-	    ExtServerOrgMap ltiConsumer = integrationService.getExtServerOrgMap(sid);
+	    ExtServer ltiConsumer = integrationService.getExtServer(sid);
 	    BeanUtils.copyProperties(ltiConsumerForm, ltiConsumer);
 	    String lessonFinishUrl = ltiConsumer.getLessonFinishUrl() == null ? "-" : ltiConsumer.getLessonFinishUrl();
 	    request.setAttribute("lessonFinishUrl", lessonFinishUrl);
@@ -103,9 +103,9 @@ public class LtiConsumerManagementAction extends LamsDispatchAction {
 	
 	Integer sid = WebUtil.readIntParam(request, "sid", true);
 	boolean disable = WebUtil.readBooleanParam(request, "disable");
-	ExtServerOrgMap ltiConsumer = integrationService.getExtServerOrgMap(sid);
+	ExtServer ltiConsumer = integrationService.getExtServer(sid);
 	ltiConsumer.setDisabled(disable);
-	integrationService.saveExtServerOrgMap(ltiConsumer);
+	integrationService.saveExtServer(ltiConsumer);
 	
 	return unspecified(mapping, form, request, response);
     }
@@ -119,7 +119,7 @@ public class LtiConsumerManagementAction extends LamsDispatchAction {
 	initServices();
 
 	Integer sid = WebUtil.readIntParam(request, "sid", true);
-	userManagementService.deleteById(ExtServerOrgMap.class, sid);
+	userManagementService.deleteById(ExtServer.class, sid);
 	
 	return unspecified(mapping, form, request, response);
     }
@@ -137,30 +137,30 @@ public class LtiConsumerManagementAction extends LamsDispatchAction {
 	    return unspecified(mapping, form, request, response);
 	}
 
-	DynaActionForm serverOrgMapForm = (DynaActionForm) form;
+	DynaActionForm extServerForm = (DynaActionForm) form;
 	ActionMessages errors = new ActionMessages();
 	String[] requiredFields = { "serverid", "serverkey", "servername", "prefix" };
 	for (String requiredField : requiredFields) {
-	    if (StringUtils.trimToNull(serverOrgMapForm.getString(requiredField)) == null) {
+	    if (StringUtils.trimToNull(extServerForm.getString(requiredField)) == null) {
 		errors.add(requiredField,
 			new ActionMessage("error.required", messageService.getMessage("sysadmin." + requiredField)));
 	    }
 	}
 	
-	Integer sid = (Integer) serverOrgMapForm.get("sid");
+	Integer sid = (Integer) extServerForm.get("sid");
 	//check duplication
 	if (errors.isEmpty()) {
 	    String[] uniqueFields = { "serverid", "prefix" };
 	    for (String uniqueField : uniqueFields) {
-		List<ExtServerOrgMap> list = userManagementService.findByProperty(ExtServerOrgMap.class, uniqueField,
-			serverOrgMapForm.get(uniqueField));
+		List<ExtServer> list = userManagementService.findByProperty(ExtServer.class, uniqueField,
+			extServerForm.get(uniqueField));
 		if (list != null && list.size() > 0) {
 		    if (sid.equals(0)) {//new map
 			errors.add(uniqueField, new ActionMessage("error.not.unique",
 				messageService.getMessage("sysadmin." + uniqueField)));
 		    } else {
-			ExtServerOrgMap map = list.get(0);
-			if (!map.getSid().equals(sid)) {
+			ExtServer ltiConsumer = list.get(0);
+			if (!ltiConsumer.getSid().equals(sid)) {
 			    errors.add(uniqueField, new ActionMessage("error.not.unique",
 				    messageService.getMessage("sysadmin." + uniqueField)));
 			}
@@ -170,19 +170,19 @@ public class LtiConsumerManagementAction extends LamsDispatchAction {
 	    }
 	}
 	if (errors.isEmpty()) {
-	    ExtServerOrgMap map = null;
+	    ExtServer ltiConsumer = null;
 	    if (sid.equals(0)) {
-		map = new ExtServerOrgMap();
-		BeanUtils.copyProperties(map, serverOrgMapForm);
-		map.setSid(null);
-		map.setServerTypeId(ExtServerOrgMap.LTI_CONSUMER_SERVER_TYPE);
-		map.setUserinfoUrl("blank");
-		map.setTimeoutUrl("blank");
+		ltiConsumer = new ExtServer();
+		BeanUtils.copyProperties(ltiConsumer, extServerForm);
+		ltiConsumer.setSid(null);
+		ltiConsumer.setServerTypeId(ExtServer.LTI_CONSUMER_SERVER_TYPE);
+		ltiConsumer.setUserinfoUrl("blank");
+		ltiConsumer.setTimeoutUrl("blank");
 	    } else {
-		map = integrationService.getExtServerOrgMap(sid);
-		BeanUtils.copyProperties(map, serverOrgMapForm);
+		ltiConsumer = integrationService.getExtServer(sid);
+		BeanUtils.copyProperties(ltiConsumer, extServerForm);
 	    }
-	    integrationService.saveExtServerOrgMap(map);
+	    integrationService.saveExtServer(ltiConsumer);
 	    return unspecified(mapping, form, request, response);
 	    
 	} else {

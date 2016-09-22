@@ -28,7 +28,7 @@ import java.util.List;
 
 import org.lamsfoundation.lams.integration.ExtCourseClassMap;
 import org.lamsfoundation.lams.integration.ExtServerLessonMap;
-import org.lamsfoundation.lams.integration.ExtServerOrgMap;
+import org.lamsfoundation.lams.integration.ExtServer;
 import org.lamsfoundation.lams.integration.ExtServerToolAdapterMap;
 import org.lamsfoundation.lams.integration.ExtUserUseridMap;
 import org.lamsfoundation.lams.integration.UserInfoFetchException;
@@ -46,53 +46,53 @@ import org.lamsfoundation.lams.usermanagement.User;
  */
 public interface IIntegrationService {
 
-    ExtCourseClassMap getExtCourseClassMap(ExtServerOrgMap serverMap, ExtUserUseridMap userMap, String extCourseId,
+    ExtCourseClassMap getExtCourseClassMap(ExtServer extServer, ExtUserUseridMap userMap, String extCourseId,
 	    String countryIsoCode, String langIsoCode, String prettyCourseName, String method, Boolean prefix)
 	    throws UserInfoValidationException;
 
-    ExtCourseClassMap getExtCourseClassMap(ExtServerOrgMap serverMap, ExtUserUseridMap userMap, String extCourseId,
+    ExtCourseClassMap getExtCourseClassMap(ExtServer extServer, ExtUserUseridMap userMap, String extCourseId,
 	    String countryIsoCode, String langIsoCode, String prettyCourseName, String method)
 	    throws UserInfoValidationException;
 
-    ExtCourseClassMap getExtCourseClassMap(ExtServerOrgMap serverMap, ExtUserUseridMap userMap, String extCourseId,
+    ExtCourseClassMap getExtCourseClassMap(ExtServer extServer, ExtUserUseridMap userMap, String extCourseId,
 	    String extCourseName, String countryIsoCode, String langIsoCode, String parentOrgId, Boolean isTeacher,
 	    Boolean prefix) throws UserInfoValidationException;
 
-    ExtUserUseridMap getExtUserUseridMap(ExtServerOrgMap serverMap, String extUsername, boolean prefix)
+    ExtUserUseridMap getExtUserUseridMap(ExtServer extServer, String extUsername, boolean prefix)
 	    throws UserInfoFetchException, UserInfoValidationException;
 
     /**
      * compatibility method to support existing integrations. It does callback call to integrated server to get user
      * details.
      *
-     * @param serverMap
+     * @param extServer
      * @param extUsername
      * @return
      * @throws UserInfoFetchException
      * @throws UserInfoValidationException
      */
-    ExtUserUseridMap getExtUserUseridMap(ExtServerOrgMap serverMap, String extUsername)
+    ExtUserUseridMap getExtUserUseridMap(ExtServer extServer, String extUsername)
 	    throws UserInfoFetchException, UserInfoValidationException;
 
     /**
      * Returns ExtUserUseridMap from DB, and null if it doesn't exist
      *
-     * @param serverMap
+     * @param extServer
      * @param userId
      * @return
      */
-    // ExtUserUseridMap getExtUserUseridMapByUserId(ExtServerOrgMap serverMap, Integer userId);
+    // ExtUserUseridMap getExtUserUseridMapByUserId(ExtServer extServer, Integer userId);
 
-    List<ExtUserUseridMap> getExtUserUseridMapByServerMap(ExtServerOrgMap serverMap);
+    List<ExtUserUseridMap> getExtUserUseridMapByExtServer(ExtServer extServer);
 
     /**
      * Returns ExtUserUseridMap from DB, and null if it doesn't exist
      *
-     * @param serverMap
+     * @param extServer
      * @param extUsername
      * @return
      */
-    ExtUserUseridMap getExistingExtUserUseridMap(ExtServerOrgMap serverMap, String extUsername)
+    ExtUserUseridMap getExistingExtUserUseridMap(ExtServer extServer, String extUsername)
 	    throws UserInfoFetchException;
 
     /**
@@ -101,7 +101,7 @@ public interface IIntegrationService {
      * @param serverId
      * @return
      */
-    ExtServerOrgMap getExtServerOrgMap(Integer sid);
+    ExtServer getExtServer(Integer sid);
 
     /**
      * Returns integration server by its human-entered serverId.
@@ -109,17 +109,17 @@ public interface IIntegrationService {
      * @param serverId
      * @return
      */
-    ExtServerOrgMap getExtServerOrgMap(String serverId);
+    ExtServer getExtServer(String serverId);
 
     /**
      * Returns ExtCourseClassMap. If ExtCourseClassMap doesn't existent - returns null and does not create a new
      * ExtCourseClassMap.
      *
-     * @param extServerOrgMapId
+     * @param extServerId
      * @param extCourseId
      * @return ExtCourseClassMap if it exists, null otherwise
      */
-    ExtCourseClassMap getExtCourseClassMap(Integer extServerOrgMapId, String extCourseId);
+    ExtCourseClassMap getExtCourseClassMap(Integer extServerId, String extCourseId);
     
     /**
      * Returns ExtServerLessonMap for the LTI Tool Consumer identified by serverId. 
@@ -131,7 +131,7 @@ public interface IIntegrationService {
     ExtServerLessonMap getLtiConsumerLesson(String serverId, String resourceLinkId);
 
     /**
-     * @param serverMap
+     * @param extServer
      * @param extUsername
      * @param firstName
      * @param lastName
@@ -144,26 +144,26 @@ public interface IIntegrationService {
      * @return
      * @throws UserInfoValidationException
      */
-    ExtUserUseridMap getImplicitExtUserUseridMap(ExtServerOrgMap serverMap, String extUsername, String firstName,
+    ExtUserUseridMap getImplicitExtUserUseridMap(ExtServer extServer, String extUsername, String firstName,
 	    String lastName, String language, String country, String email, boolean prefix, boolean isUpdateUserDetails)
 	    throws UserInfoValidationException;
 
-    ExtUserUseridMap getImplicitExtUserUseridMap(ExtServerOrgMap serverMap, String extUsername, String password,
+    ExtUserUseridMap getImplicitExtUserUseridMap(ExtServer extServer, String extUsername, String password,
 	    String firstName, String lastName, String email) throws UserInfoValidationException;
 
     /**
      * @return all available integrated servers (that is excluding tool consumers)
      */
-    List<ExtServerOrgMap> getAllExtServerOrgMaps();
+    List<ExtServer> getAllExtServers();
     
     /**
      * @return all available tool consumers
      */
-    List<ExtServerOrgMap> getAllToolConsumers();
+    List<ExtServer> getAllToolConsumers();
 
-    void saveExtServerOrgMap(ExtServerOrgMap map);
+    void saveExtServer(ExtServer map);
 
-    String hash(ExtServerOrgMap serverMap, String extUsername, String timestamp);
+    String hash(ExtServer extServer, String extUsername, String timestamp);
 
     List<ExtServerToolAdapterMap> getMappedServers(String toolSig);
 
@@ -179,7 +179,7 @@ public interface IIntegrationService {
      * @param lessonId
      * @param extServer
      */
-    void createExtServerLessonMap(Long lessonId, ExtServerOrgMap extServer);
+    void createExtServerLessonMap(Long lessonId, ExtServer extServer);
     
     /**
      * Creates new ExtServerLessonMap object. Method is suitable for creating lessons via LTI tool consumers as long as
@@ -189,7 +189,7 @@ public interface IIntegrationService {
      * @param resourceLinkId resource_link_id parameter sent by LTI tool consumer
      * @param extServer
      */
-    void createExtServerLessonMap(Long lessonId, String resourceLinkId, ExtServerOrgMap extServer);
+    void createExtServerLessonMap(Long lessonId, String resourceLinkId, ExtServer extServer);
 
     /**
      * Checks whether the lesson was created from extServer and returns lessonFinishCallbackUrl if it's not blank.

@@ -34,7 +34,7 @@ import javax.servlet.http.HttpServlet;
 import org.apache.axis.MessageContext;
 import org.apache.axis.transport.http.HTTPConstants;
 import org.lamsfoundation.lams.integration.ExtCourseClassMap;
-import org.lamsfoundation.lams.integration.ExtServerOrgMap;
+import org.lamsfoundation.lams.integration.ExtServer;
 import org.lamsfoundation.lams.integration.ExtUserUseridMap;
 import org.lamsfoundation.lams.integration.security.Authenticator;
 import org.lamsfoundation.lams.integration.service.IntegrationService;
@@ -76,11 +76,11 @@ public class LessonManagerSoapBindingImpl implements LessonManager {
 	    String courseId, String title, String desc, String countryIsoCode, String langIsoCode, String customCSV)
 	    throws RemoteException {
 	try {
-	    ExtServerOrgMap serverMap = LessonManagerSoapBindingImpl.integrationService.getExtServerOrgMap(serverId);
-	    Authenticator.authenticate(serverMap, datetime, username, hashValue);
-	    ExtUserUseridMap userMap = LessonManagerSoapBindingImpl.integrationService.getExtUserUseridMap(serverMap,
+	    ExtServer extServer = LessonManagerSoapBindingImpl.integrationService.getExtServer(serverId);
+	    Authenticator.authenticate(extServer, datetime, username, hashValue);
+	    ExtUserUseridMap userMap = LessonManagerSoapBindingImpl.integrationService.getExtUserUseridMap(extServer,
 		    username);
-	    ExtCourseClassMap orgMap = LessonManagerSoapBindingImpl.integrationService.getExtCourseClassMap(serverMap,
+	    ExtCourseClassMap orgMap = LessonManagerSoapBindingImpl.integrationService.getExtCourseClassMap(extServer,
 		    userMap, courseId, countryIsoCode, langIsoCode, null, LoginRequestDispatcher.METHOD_MONITOR);
 	    // 1. init lesson
 	    Lesson lesson = LessonManagerSoapBindingImpl.monitoringService.initializeLesson(title, desc, ldId,
@@ -102,11 +102,11 @@ public class LessonManagerSoapBindingImpl implements LessonManager {
 	    String courseId, String title, String desc, String startDate, String countryIsoCode, String langIsoCode,
 	    String customCSV) throws RemoteException {
 	try {
-	    ExtServerOrgMap serverMap = LessonManagerSoapBindingImpl.integrationService.getExtServerOrgMap(serverId);
-	    Authenticator.authenticate(serverMap, datetime, username, hashValue);
-	    ExtUserUseridMap userMap = LessonManagerSoapBindingImpl.integrationService.getExtUserUseridMap(serverMap,
+	    ExtServer extServer = LessonManagerSoapBindingImpl.integrationService.getExtServer(serverId);
+	    Authenticator.authenticate(extServer, datetime, username, hashValue);
+	    ExtUserUseridMap userMap = LessonManagerSoapBindingImpl.integrationService.getExtUserUseridMap(extServer,
 		    username);
-	    ExtCourseClassMap orgMap = LessonManagerSoapBindingImpl.integrationService.getExtCourseClassMap(serverMap,
+	    ExtCourseClassMap orgMap = LessonManagerSoapBindingImpl.integrationService.getExtCourseClassMap(extServer,
 		    userMap, courseId, countryIsoCode, langIsoCode, null, LoginRequestDispatcher.METHOD_MONITOR);
 	    // 1. init lesson
 	    Lesson lesson = LessonManagerSoapBindingImpl.monitoringService.initializeLesson(title, desc, ldId,
@@ -128,9 +128,9 @@ public class LessonManagerSoapBindingImpl implements LessonManager {
     public boolean deleteLesson(String serverId, String datetime, String hashValue, String username, long lsId)
 	    throws RemoteException {
 	try {
-	    ExtServerOrgMap serverMap = LessonManagerSoapBindingImpl.integrationService.getExtServerOrgMap(serverId);
-	    Authenticator.authenticate(serverMap, datetime, username, hashValue);
-	    ExtUserUseridMap userMap = LessonManagerSoapBindingImpl.integrationService.getExtUserUseridMap(serverMap,
+	    ExtServer extServer = LessonManagerSoapBindingImpl.integrationService.getExtServer(serverId);
+	    Authenticator.authenticate(extServer, datetime, username, hashValue);
+	    ExtUserUseridMap userMap = LessonManagerSoapBindingImpl.integrationService.getExtUserUseridMap(extServer,
 		    username);
 	    LessonManagerSoapBindingImpl.monitoringService.removeLesson(lsId, userMap.getUser().getUserId());
 	    return true;

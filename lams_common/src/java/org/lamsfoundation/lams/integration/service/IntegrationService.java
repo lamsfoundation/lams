@@ -50,7 +50,7 @@ import org.lamsfoundation.lams.gradebook.GradebookUserLesson;
 import org.lamsfoundation.lams.gradebook.service.IGradebookService;
 import org.lamsfoundation.lams.integration.ExtCourseClassMap;
 import org.lamsfoundation.lams.integration.ExtServerLessonMap;
-import org.lamsfoundation.lams.integration.ExtServerOrgMap;
+import org.lamsfoundation.lams.integration.ExtServer;
 import org.lamsfoundation.lams.integration.ExtServerToolAdapterMap;
 import org.lamsfoundation.lams.integration.ExtUserUseridMap;
 import org.lamsfoundation.lams.integration.UserInfoFetchException;
@@ -103,10 +103,10 @@ public class IntegrationService implements IIntegrationService {
      * @return
      */
     @Override
-    public ExtServerOrgMap getExtServerOrgMap(String serverId) {
+    public ExtServer getExtServer(String serverId) {
 	Map<String, Object> properties = new HashMap<String, Object>();
 	properties.put("serverid", serverId);
-	List<ExtServerOrgMap> list = service.findByProperties(ExtServerOrgMap.class, properties);
+	List<ExtServer> list = service.findByProperties(ExtServer.class, properties);
 	if (list == null || list.size() == 0) {
 	    return null;
 	} else {
@@ -118,7 +118,7 @@ public class IntegrationService implements IIntegrationService {
     public ExtCourseClassMap getExtCourseClassMap(Integer sid, String extCourseId) {
 	Map<String, Object> properties = new HashMap<String, Object>();
 	properties.put("courseid", extCourseId);
-	properties.put("extServerOrgMap.sid", sid);
+	properties.put("extServer.sid", sid);
 	List<ExtCourseClassMap> list = service.findByProperties(ExtCourseClassMap.class, properties);
 
 	if (list == null || list.size() == 0) {
@@ -130,7 +130,7 @@ public class IntegrationService implements IIntegrationService {
 
     // wrapper method for compatibility with original integration modules
     @Override
-    public ExtCourseClassMap getExtCourseClassMap(ExtServerOrgMap serverMap, ExtUserUseridMap userMap,
+    public ExtCourseClassMap getExtCourseClassMap(ExtServer extServer, ExtUserUseridMap userMap,
 	    String extCourseId, String countryIsoCode, String langIsoCode, String prettyCourseName, String method,
 	    Boolean prefix) throws UserInfoValidationException {
 
@@ -144,37 +144,37 @@ public class IntegrationService implements IIntegrationService {
 	
 	Boolean isTeacher = (StringUtils.equals(method, LoginRequestDispatcher.METHOD_AUTHOR)
 		|| StringUtils.equals(method, LoginRequestDispatcher.METHOD_MONITOR));
-	return getExtCourseClassMap(serverMap, userMap, extCourseId, courseName, countryIsoCode, langIsoCode,
+	return getExtCourseClassMap(extServer, userMap, extCourseId, courseName, countryIsoCode, langIsoCode,
 		service.getRootOrganisation().getOrganisationId().toString(), isTeacher, prefix);
     }
 
     // wrapper method for compatibility with original integration modules
     @Override
-    public ExtCourseClassMap getExtCourseClassMap(ExtServerOrgMap serverMap, ExtUserUseridMap userMap,
+    public ExtCourseClassMap getExtCourseClassMap(ExtServer extServer, ExtUserUseridMap userMap,
 	    String extCourseId, String countryIsoCode, String langIsoCode, String prettyCourseName, String method)
 	    throws UserInfoValidationException {
-	return getExtCourseClassMap(serverMap, userMap, extCourseId, countryIsoCode, langIsoCode, prettyCourseName,
+	return getExtCourseClassMap(extServer, userMap, extCourseId, countryIsoCode, langIsoCode, prettyCourseName,
 		method, true);
     }
 
     // newer method which accepts course name, a parent org id, a flag for whether user should get
     // 'teacher' roles, and a flag for whether to use a prefix in the org's name
     @Override
-    public ExtCourseClassMap getExtCourseClassMap(ExtServerOrgMap serverMap, ExtUserUseridMap userMap,
+    public ExtCourseClassMap getExtCourseClassMap(ExtServer extServer, ExtUserUseridMap userMap,
 	    String extCourseId, String extCourseName, String countryIsoCode, String langIsoCode, String parentOrgId,
 	    Boolean isTeacher, Boolean prefix) throws UserInfoValidationException {
 	Organisation org;
 	User user = userMap.getUser();
 
-	ExtCourseClassMap extCourseClassMap = getExtCourseClassMap(serverMap.getSid(), extCourseId);
+	ExtCourseClassMap extCourseClassMap = getExtCourseClassMap(extServer.getSid(), extCourseId);
 	if (extCourseClassMap == null) {
 	    //create new ExtCourseClassMap
 
-	    org = createOrganisation(serverMap, user, extCourseId, extCourseName, countryIsoCode, langIsoCode,
+	    org = createOrganisation(extServer, user, extCourseId, extCourseName, countryIsoCode, langIsoCode,
 		    parentOrgId, prefix);
 	    extCourseClassMap = new ExtCourseClassMap();
 	    extCourseClassMap.setCourseid(extCourseId);
-	    extCourseClassMap.setExtServerOrgMap(serverMap);
+	    extCourseClassMap.setExtServer(extServer);
 	    extCourseClassMap.setOrganisation(org);
 	    service.save(extCourseClassMap);
 
@@ -182,14 +182,14 @@ public class IntegrationService implements IIntegrationService {
 	    org = extCourseClassMap.getOrganisation();
 
 	    // update external course name if if has changed
-	    String requestedCourseName = prefix ? buildName(serverMap.getPrefix(), extCourseName) : extCourseName;
+	    String requestedCourseName = prefix ? buildName(extServer.getPrefix(), extCourseName) : extCourseName;
 	    if (extCourseName != null && !org.getName().equals(requestedCourseName)) {
 
 		// validate org name
 		if (!ValidationUtil.isOrgNameValid(requestedCourseName)) {
 		    throw new UserInfoValidationException("Can't create organisation due to validation error: "
 			    + "organisation name cannot contain any of these characters < > ^ * @ % $. External server:"
-			    + serverMap.getServerid() + ", orgId:" + extCourseId + ", orgName:" + requestedCourseName);
+			    + extServer.getServerid() + ", orgId:" + extCourseId + ", orgName:" + requestedCourseName);
 		}
 
 		org.setName(requestedCourseName);
@@ -230,37 +230,37 @@ public class IntegrationService implements IIntegrationService {
     }
 
     @Override
-    public List<ExtUserUseridMap> getExtUserUseridMapByServerMap(ExtServerOrgMap serverMap) {
+    public List<ExtUserUseridMap> getExtUserUseridMapByExtServer(ExtServer extServer) {
 	Map<String, Object> properties = new HashMap<String, Object>();
-	properties.put("extServerOrgMap.sid", serverMap.getSid());
+	properties.put("extServer.sid", extServer.getSid());
 	List list = service.findByProperties(ExtUserUseridMap.class, properties);
 	return list;
     }
 
     @Override
-    public ExtUserUseridMap getExtUserUseridMap(ExtServerOrgMap serverMap, String extUsername, boolean prefix)
+    public ExtUserUseridMap getExtUserUseridMap(ExtServer extServer, String extUsername, boolean prefix)
 	    throws UserInfoFetchException, UserInfoValidationException {
-	ExtUserUseridMap extUserUseridMap = getExistingExtUserUseridMap(serverMap, extUsername);
+	ExtUserUseridMap extUserUseridMap = getExistingExtUserUseridMap(extServer, extUsername);
 
 	if (extUserUseridMap == null) {
-	    String[] userData = getUserDataFromExtServer(serverMap, extUsername);
+	    String[] userData = getUserDataFromExtServer(extServer, extUsername);
 	    String password = HashUtil.sha1(RandomPasswordGenerator.nextPassword(10));
-	    return createExtUserUseridMap(serverMap, extUsername, password, userData, prefix);
+	    return createExtUserUseridMap(extServer, extUsername, password, userData, prefix);
 	} else {
 	    return extUserUseridMap;
 	}
     }
 
     @Override
-    public ExtUserUseridMap getExtUserUseridMap(ExtServerOrgMap serverMap, String extUsername)
+    public ExtUserUseridMap getExtUserUseridMap(ExtServer extServer, String extUsername)
 	    throws UserInfoFetchException, UserInfoValidationException {
-	return getExtUserUseridMap(serverMap, extUsername, true);
+	return getExtUserUseridMap(extServer, extUsername, true);
     }
 
     @Override
-    public ExtUserUseridMap getExistingExtUserUseridMap(ExtServerOrgMap serverMap, String extUsername) {
+    public ExtUserUseridMap getExistingExtUserUseridMap(ExtServer extServer, String extUsername) {
 	Map<String, Object> properties = new HashMap<String, Object>();
-	properties.put("extServerOrgMap.sid", serverMap.getSid());
+	properties.put("extServer.sid", extServer.getSid());
 	properties.put("extUsername", extUsername);
 	List<ExtUserUseridMap> list = service.findByProperties(ExtUserUseridMap.class, properties);
 
@@ -272,32 +272,32 @@ public class IntegrationService implements IIntegrationService {
     }
 
     @Override
-    public ExtUserUseridMap getImplicitExtUserUseridMap(ExtServerOrgMap serverMap, String extUsername, String password,
+    public ExtUserUseridMap getImplicitExtUserUseridMap(ExtServer extServer, String extUsername, String password,
 	    String firstName, String lastName, String email) throws UserInfoValidationException {
-	ExtUserUseridMap extUserUseridMap = getExistingExtUserUseridMap(serverMap, extUsername);
+	ExtUserUseridMap extUserUseridMap = getExistingExtUserUseridMap(extServer, extUsername);
 
 	if (extUserUseridMap == null) {
 	    String[] defaultLangCountry = LanguageUtil.getDefaultLangCountry();
 	    String[] userData = { "", firstName, lastName, "", "", "", "", "", "", "", "", email, defaultLangCountry[1],
 		    defaultLangCountry[0] };
-	    return createExtUserUseridMap(serverMap, extUsername, password, userData, false);
+	    return createExtUserUseridMap(extServer, extUsername, password, userData, false);
 	} else {
 	    return extUserUseridMap;
 	}
     }
 
     @Override
-    public ExtUserUseridMap getImplicitExtUserUseridMap(ExtServerOrgMap serverMap, String extUsername, String firstName,
+    public ExtUserUseridMap getImplicitExtUserUseridMap(ExtServer extServer, String extUsername, String firstName,
 	    String lastName, String language, String country, String email, boolean prefix, boolean isUpdateUserDetails)
 	    throws UserInfoValidationException {
 
-	ExtUserUseridMap extUserUseridMap = getExistingExtUserUseridMap(serverMap, extUsername);
+	ExtUserUseridMap extUserUseridMap = getExistingExtUserUseridMap(extServer, extUsername);
 
 	//create new one if it doesn't exist yet
 	if (extUserUseridMap == null) {
 	    String[] userData = { "", firstName, lastName, "", "", "", "", "", "", "", "", email, country, language };
 	    String password = HashUtil.sha1(RandomPasswordGenerator.nextPassword(10));
-	    return createExtUserUseridMap(serverMap, extUsername, password, userData, prefix);
+	    return createExtUserUseridMap(extServer, extUsername, password, userData, prefix);
 
 	    //update user details if it's required
 	} else if (isUpdateUserDetails) {
@@ -307,19 +307,19 @@ public class IntegrationService implements IIntegrationService {
 	    // first name validation
 	    if (StringUtils.isNotBlank(firstName) && !ValidationUtil.isFirstLastNameValid(firstName)) {
 		throw new UserInfoValidationException("Can't update user details due to validation error: "
-			+ "First name contains invalid characters. External server:" + serverMap.getServerid()
+			+ "First name contains invalid characters. External server:" + extServer.getServerid()
 			+ ", Username:" + user.getLogin() + ", firstName:" + firstName + ", lastName:" + lastName);
 	    }
 	    // last name validation
 	    if (StringUtils.isNotBlank(lastName) && !ValidationUtil.isFirstLastNameValid(lastName)) {
 		throw new UserInfoValidationException("Can't update user details due to validation error: "
-			+ "Last name contains invalid characters. External server:" + serverMap.getServerid()
+			+ "Last name contains invalid characters. External server:" + extServer.getServerid()
 			+ ", Username:" + user.getLogin() + ", firstName:" + firstName + ", lastName:" + lastName);
 	    }
 	    // user email validation
 	    if (StringUtils.isNotBlank(email) && !ValidationUtil.isEmailValid(email)) {
 		throw new UserInfoValidationException("Can't update user details due to validation error: "
-			+ "Email format is invalid. External server:" + serverMap.getServerid() + ", Username:"
+			+ "Email format is invalid. External server:" + extServer.getServerid() + ", Username:"
 			+ user.getLogin() + ", firstName:" + firstName + ", lastName:" + lastName);
 	    }
 
@@ -338,18 +338,18 @@ public class IntegrationService implements IIntegrationService {
 	}
     }
 
-    private Organisation createOrganisation(ExtServerOrgMap serverMap, User user, String extCourseId,
+    private Organisation createOrganisation(ExtServer extServer, User user, String extCourseId,
 	    String extCourseName, String countryIsoCode, String langIsoCode, String parentOrgId, Boolean prefix)
 	    throws UserInfoValidationException {
 
 	Organisation org = new Organisation();
 
 	// org name validation
-	String orgName = prefix ? buildName(serverMap.getPrefix(), extCourseName) : extCourseName;
+	String orgName = prefix ? buildName(extServer.getPrefix(), extCourseName) : extCourseName;
 	if (StringUtils.isNotBlank(orgName) && !ValidationUtil.isOrgNameValid(orgName)) {
 	    throw new UserInfoValidationException("Can't create organisation due to validation error: "
 		    + "organisation name cannot contain any of these characters < > ^ * @ % $. External server:"
-		    + serverMap.getServerid() + ", orgId:" + extCourseId + ", orgName:" + orgName);
+		    + extServer.getServerid() + ", orgId:" + extCourseId + ", orgName:" + orgName);
 	}
 	org.setName(orgName);
 
@@ -381,10 +381,10 @@ public class IntegrationService implements IIntegrationService {
     }
 
     // flexible method to specify username and password
-    private ExtUserUseridMap createExtUserUseridMap(ExtServerOrgMap serverMap, String extUsername, String password,
+    private ExtUserUseridMap createExtUserUseridMap(ExtServer extServer, String extUsername, String password,
 	    String[] userData, boolean prefix) throws UserInfoValidationException {
 
-	String login = prefix ? buildName(serverMap.getPrefix(), extUsername) : extUsername;
+	String login = prefix ? buildName(extServer.getPrefix(), extUsername) : extUsername;
 	String firstName = userData[1];
 	String lastName = userData[2];
 	String email = userData[11];
@@ -393,31 +393,31 @@ public class IntegrationService implements IIntegrationService {
 	if (StringUtils.isBlank(login)) {
 	    throw new UserInfoValidationException(
 		    "Can't create user due to validation error: " + "Username cannot be blank. External server:"
-			    + serverMap.getServerid() + ", firstName:" + firstName + ", lastName:" + lastName);
+			    + extServer.getServerid() + ", firstName:" + firstName + ", lastName:" + lastName);
 	} else if (!ValidationUtil.isUserNameValid(login)) {
 	    throw new UserInfoValidationException("Can't create user due to validation error: "
 		    + "Username can only contain alphanumeric characters and no spaces. External server:"
-		    + serverMap.getServerid() + ", Username:" + login);
+		    + extServer.getServerid() + ", Username:" + login);
 	}
 
 	// first name validation
 	if (StringUtils.isNotBlank(firstName) && !ValidationUtil.isFirstLastNameValid(firstName)) {
 	    throw new UserInfoValidationException("Can't create user due to validation error: "
-		    + "First name contains invalid characters. External server:" + serverMap.getServerid()
+		    + "First name contains invalid characters. External server:" + extServer.getServerid()
 		    + ", Username:" + login + ", firstName:" + firstName + ", lastName:" + lastName);
 	}
 
 	// last name validation
 	if (StringUtils.isNotBlank(lastName) && !ValidationUtil.isFirstLastNameValid(lastName)) {
 	    throw new UserInfoValidationException("Can't create user due to validation error: "
-		    + "Last name contains invalid characters. External server:" + serverMap.getServerid()
+		    + "Last name contains invalid characters. External server:" + extServer.getServerid()
 		    + ", Username:" + login + ", firstName:" + firstName + ", lastName:" + lastName);
 	}
 
 	// user email validation
 	if (StringUtils.isNotBlank(email) && !ValidationUtil.isEmailValid(email)) {
 	    throw new UserInfoValidationException("Can't create user due to validation error: "
-		    + "Email format is invalid. External server:" + serverMap.getServerid() + ", Username:" + login
+		    + "Email format is invalid. External server:" + extServer.getServerid() + ", Username:" + login
 		    + ", firstName:" + firstName + ", lastName:" + lastName);
 	}
 
@@ -445,23 +445,23 @@ public class IntegrationService implements IIntegrationService {
 	user.setHtmlTheme(service.getDefaultHtmlTheme());
 	service.save(user);
 	ExtUserUseridMap map = new ExtUserUseridMap();
-	map.setExtServerOrgMap(serverMap);
+	map.setExtServer(extServer);
 	map.setExtUsername(extUsername);
 	map.setUser(user);
 	service.save(map);
 	return map;
     }
 
-    private String[] getUserDataFromExtServer(ExtServerOrgMap serverMap, String extUsername)
+    private String[] getUserDataFromExtServer(ExtServer extServer, String extUsername)
 	    throws UserInfoFetchException {
 	// the callback url must contain %username%, %timestamp% and %hash%
 	// eg:
 	// "http://test100.ics.mq.edu.au/webapps/lams-plglamscontent-bb_bb60/UserData?uid=%username%&ts=%timestamp%&hash=%hash%";
 	// where %username%, %timestamp% and %hash% will be replaced with their real values
 	try {
-	    String userDataCallbackUrl = serverMap.getUserinfoUrl();
+	    String userDataCallbackUrl = extServer.getUserinfoUrl();
 	    String timestamp = Long.toString(new Date().getTime());
-	    String hash = hash(serverMap, extUsername, timestamp);
+	    String hash = hash(extServer, extUsername, timestamp);
 
 	    String encodedExtUsername = URLEncoder.encode(extUsername, "UTF8");
 
@@ -473,13 +473,13 @@ public class IntegrationService implements IIntegrationService {
 	    URLConnection conn = url.openConnection();
 	    if (!(conn instanceof HttpURLConnection)) {
 		throw new UserInfoFetchException("Fail to fetch user data from external server:"
-			+ serverMap.getServerid() + "- Invalid connection type");
+			+ extServer.getServerid() + "- Invalid connection type");
 	    }
 
 	    HttpURLConnection httpConn = (HttpURLConnection) conn;
 	    if (httpConn.getResponseCode() != HttpURLConnection.HTTP_OK) {
 		throw new UserInfoFetchException("Fail to fetch user data from external server:"
-			+ serverMap.getServerid() + " - Unexpected return HTTP Status:" + httpConn.getResponseCode());
+			+ extServer.getServerid() + " - Unexpected return HTTP Status:" + httpConn.getResponseCode());
 	    }
 
 	    InputStream is = url.openConnection().getInputStream();
@@ -487,7 +487,7 @@ public class IntegrationService implements IIntegrationService {
 	    String str = isReader.readLine();
 	    if (str == null) {
 		throw new UserInfoFetchException("Fail to fetch user data from external server:"
-			+ serverMap.getServerid() + " - No data returned from external server");
+			+ extServer.getServerid() + " - No data returned from external server");
 	    }
 
 	    return CSVUtil.parse(str);
@@ -505,9 +505,9 @@ public class IntegrationService implements IIntegrationService {
     }
 
     @Override
-    public String hash(ExtServerOrgMap serverMap, String extUsername, String timestamp) {
-	String serverId = serverMap.getServerid();
-	String serverKey = serverMap.getServerkey();
+    public String hash(ExtServer extServer, String extUsername, String timestamp) {
+	String serverId = extServer.getServerid();
+	String serverKey = extServer.getServerkey();
 	String plaintext = timestamp.trim().toLowerCase() + extUsername.trim().toLowerCase()
 		+ serverId.trim().toLowerCase() + serverKey.trim().toLowerCase();
 	return HashUtil.sha1(plaintext);
@@ -518,17 +518,17 @@ public class IntegrationService implements IIntegrationService {
     }
 
     @Override
-    public List<ExtServerOrgMap> getAllExtServerOrgMaps() {
+    public List<ExtServer> getAllExtServers() {
 	Map<String, Object> properties = new HashMap<String, Object>();
-	properties.put("serverTypeId", ExtServerOrgMap.INTEGRATION_SERVER_TYPE);
-	return service.findByProperties(ExtServerOrgMap.class, properties);
+	properties.put("serverTypeId", ExtServer.INTEGRATION_SERVER_TYPE);
+	return service.findByProperties(ExtServer.class, properties);
     }
     
     @Override
-    public List<ExtServerOrgMap> getAllToolConsumers() {
+    public List<ExtServer> getAllToolConsumers() {
 	Map<String, Object> properties = new HashMap<String, Object>();
-	properties.put("serverTypeId", ExtServerOrgMap.LTI_CONSUMER_SERVER_TYPE);
-	return service.findByProperties(ExtServerOrgMap.class, properties);
+	properties.put("serverTypeId", ExtServer.LTI_CONSUMER_SERVER_TYPE);
+	return service.findByProperties(ExtServer.class, properties);
     }
 
     @Override
@@ -565,22 +565,22 @@ public class IntegrationService implements IIntegrationService {
     }
 
     @Override
-    public void saveExtServerOrgMap(ExtServerOrgMap map) {
+    public void saveExtServer(ExtServer map) {
 	service.save(map);
     }
 
     @Override
-    public ExtServerOrgMap getExtServerOrgMap(Integer sid) {
-	return (ExtServerOrgMap) service.findById(ExtServerOrgMap.class, sid);
+    public ExtServer getExtServer(Integer sid) {
+	return (ExtServer) service.findById(ExtServer.class, sid);
     }
 
     @Override
-    public void createExtServerLessonMap(Long lessonId, ExtServerOrgMap extServer) {
+    public void createExtServerLessonMap(Long lessonId, ExtServer extServer) {
 	createExtServerLessonMap(lessonId, null, extServer);;
     }
     
     @Override
-    public void createExtServerLessonMap(Long lessonId, String resourceLinkId, ExtServerOrgMap extServer) {
+    public void createExtServerLessonMap(Long lessonId, String resourceLinkId, ExtServer extServer) {
 	ExtServerLessonMap map = new ExtServerLessonMap();
 	map.setLessonId(lessonId);
 	map.setResourceLinkId(resourceLinkId);
@@ -601,14 +601,14 @@ public class IntegrationService implements IIntegrationService {
 	    // checks whether the lesson was created from extServer and whether it has lessonFinishCallbackUrl setting
 	    if (extServerLesson != null
 		    && StringUtils.isNotBlank(extServerLesson.getExtServer().getLessonFinishUrl())) {
-		ExtServerOrgMap server = extServerLesson.getExtServer();
+		ExtServer server = extServerLesson.getExtServer();
 
 		ExtUserUseridMap extUser = getExtUserUseridMapByUserId(server, user.getUserId());
 		if (extUser != null) {
 		    String extUsername = extUser.getExtUsername();
 
 		    //return URL in case of integration server
-		    if (server.getServerTypeId().equals(ExtServerOrgMap.INTEGRATION_SERVER_TYPE)) {
+		    if (server.getServerTypeId().equals(ExtServer.INTEGRATION_SERVER_TYPE)) {
 			// construct real lessonFinishCallbackUrl
 			lessonFinishCallbackUrl = server.getLessonFinishUrl();
 			String timestamp = Long.toString(new Date().getTime());
@@ -725,10 +725,10 @@ public class IntegrationService implements IIntegrationService {
 		    + " there is no corresponding ExtCourseClassMap for lessonId " + lessonId);
 	}
 
-	ExtServerOrgMap serverMap = extServerLesson.getExtServer();
+	ExtServer extServer = extServerLesson.getExtServer();
 
 	// construct real lessonFinishCallbackUrl
-	String lmsGroupsUrl = serverMap.getExtGroupsUrl();
+	String lmsGroupsUrl = extServer.getExtGroupsUrl();
 
 	//in case group info is also requested - provide selected groups' ids
 	if (extGroupIds != null && extGroupIds.length > 0) {
@@ -745,7 +745,7 @@ public class IntegrationService implements IIntegrationService {
 
 	String timestamp = Long.toString(new Date().getTime());
 	String hashUsername = "username";
-	String hash = hash(serverMap, hashUsername, timestamp);
+	String hash = hash(extServer, hashUsername, timestamp);
 
 	// set values for the parameters
 	HashMap<String, String> params = new HashMap<String, String>();
@@ -778,7 +778,7 @@ public class IntegrationService implements IIntegrationService {
 
 		    String extUsername = jsonUser.getString("userName");
 
-		    ExtUserUseridMap extUserUseridMap = getExistingExtUserUseridMap(serverMap, extUsername);
+		    ExtUserUseridMap extUserUseridMap = getExistingExtUserUseridMap(extServer, extUsername);
 
 		    //create extUserUseridMap if it's not available
 		    if (extUserUseridMap == null) {
@@ -791,7 +791,7 @@ public class IntegrationService implements IIntegrationService {
 			    userData[k - 1] = userProperty;
 			}
 			String password = HashUtil.sha1(RandomPasswordGenerator.nextPassword(10));
-			extUserUseridMap = createExtUserUseridMap(serverMap, extUsername, password, userData, true);
+			extUserUseridMap = createExtUserUseridMap(extServer, extUsername, password, userData, true);
 		    }
 		    User user = extUserUseridMap.getUser();
 		    Integer userId = extUserUseridMap.getUser().getUserId();
@@ -822,7 +822,7 @@ public class IntegrationService implements IIntegrationService {
     public ExtCourseClassMap getExtCourseClassMap(Integer sid, Long lessonId) {
 	Lesson lesson = lessonService.getLesson(lessonId);
 	Map<String, Object> properties = new HashMap<String, Object>();
-	properties.put("extServerOrgMap.sid", sid);
+	properties.put("extServer.sid", sid);
 	properties.put("organisation.organisationId", lesson.getOrganisation().getOrganisationId());
 	List<ExtCourseClassMap> list = service.findByProperties(ExtCourseClassMap.class, properties);
 	
@@ -848,9 +848,9 @@ public class IntegrationService implements IIntegrationService {
 	}
     }
 
-    private ExtUserUseridMap getExtUserUseridMapByUserId(ExtServerOrgMap serverMap, Integer userId) {
+    private ExtUserUseridMap getExtUserUseridMapByUserId(ExtServer extServer, Integer userId) {
 	Map<String, Object> properties = new HashMap<String, Object>();
-	properties.put("extServerOrgMap.sid", serverMap.getSid());
+	properties.put("extServer.sid", extServer.getSid());
 	properties.put("user.userId", userId);
 	List list = service.findByProperties(ExtUserUseridMap.class, properties);
 	if (list == null || list.size() == 0) {

@@ -22,12 +22,6 @@
  */
 package org.lamsfoundation.lams.admin.web;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -37,11 +31,8 @@ import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.apache.struts.action.DynaActionForm;
 import org.lamsfoundation.lams.admin.service.AdminServiceProxy;
-import org.lamsfoundation.lams.integration.ExtServerOrgMap;
+import org.lamsfoundation.lams.integration.ExtServer;
 import org.lamsfoundation.lams.integration.service.IIntegrationService;
-import org.lamsfoundation.lams.usermanagement.Organisation;
-import org.lamsfoundation.lams.usermanagement.OrganisationState;
-import org.lamsfoundation.lams.usermanagement.OrganisationType;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.action.LamsDispatchAction;
 
@@ -55,7 +46,7 @@ import org.lamsfoundation.lams.web.action.LamsDispatchAction;
 /**
  * struts doclets
  *
- * @struts.action path="/servermaintain" parameter="method" name="ServerOrgMapForm" scope="request" validate="false"
+ * @struts.action path="/servermaintain" parameter="method" name="ExtServerForm" scope="request" validate="false"
  * @struts.action-forward name="servermaintain" path=".servermaintain"
  * @struts.action-forward name="serverlist" path="/serverlist.do"
  */
@@ -64,30 +55,12 @@ public class ServerMaintainAction extends LamsDispatchAction {
     @SuppressWarnings("unchecked")
     public ActionForward edit(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) throws Exception {
-	Map<String, Object> properties = new HashMap<String, Object>();
-	properties.put("organisationType.organisationTypeId", OrganisationType.COURSE_TYPE);
-	properties.put("organisationState.organisationStateId", OrganisationState.ACTIVE);
-	List<Organisation> list = AdminServiceProxy.getService(getServlet().getServletContext())
-		.findByProperties(Organisation.class, properties);
-	Organisation dummy = new Organisation();
-	dummy.setOrganisationId(-1);
-	dummy.setName(AdminServiceProxy.getMessageService(getServlet().getServletContext())
-		.getMessage("sysadmin.organisation.select"));
-	if (list == null) {
-	    list = new ArrayList();
-	}
-	Collections.sort(list);
-	list.add(0, dummy);
-	request.setAttribute("orgs", list);
-	DynaActionForm serverOrgMapForm = (DynaActionForm) form;
+	DynaActionForm extServerForm = (DynaActionForm) form;
 	Integer sid = WebUtil.readIntParam(request, "sid", true);
 	if (sid != null) {
-	    ExtServerOrgMap map = AdminServiceProxy.getIntegrationService(getServlet().getServletContext())
-		    .getExtServerOrgMap(sid);
-	    BeanUtils.copyProperties(serverOrgMapForm, map);
-	    if (map.getOrganisation() != null) {
-		serverOrgMapForm.set("orgId", map.getOrganisation().getOrganisationId());
-	    }
+	    ExtServer extServer = AdminServiceProxy.getIntegrationService(getServlet().getServletContext())
+		    .getExtServer(sid);
+	    BeanUtils.copyProperties(extServerForm, extServer);
 	}
 	return mapping.findForward("servermaintain");
     }
@@ -96,9 +69,9 @@ public class ServerMaintainAction extends LamsDispatchAction {
 	    HttpServletResponse response) throws Exception {
 	IIntegrationService service = AdminServiceProxy.getIntegrationService(getServlet().getServletContext());
 	Integer sid = WebUtil.readIntParam(request, "sid", false);
-	ExtServerOrgMap map = service.getExtServerOrgMap(sid);
-	map.setDisabled(true);
-	service.saveExtServerOrgMap(map);
+	ExtServer extServer = service.getExtServer(sid);
+	extServer.setDisabled(true);
+	service.saveExtServer(extServer);
 	return mapping.findForward("serverlist");
     }
 
@@ -106,16 +79,16 @@ public class ServerMaintainAction extends LamsDispatchAction {
 	    HttpServletResponse response) throws Exception {
 	IIntegrationService service = AdminServiceProxy.getIntegrationService(getServlet().getServletContext());
 	Integer sid = WebUtil.readIntParam(request, "sid", false);
-	ExtServerOrgMap map = service.getExtServerOrgMap(sid);
-	map.setDisabled(false);
-	service.saveExtServerOrgMap(map);
+	ExtServer extServer = service.getExtServer(sid);
+	extServer.setDisabled(false);
+	service.saveExtServer(extServer);
 	return mapping.findForward("serverlist");
     }
 
     public ActionForward delete(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) throws Exception {
 	Integer sid = WebUtil.readIntParam(request, "sid", false);
-	AdminServiceProxy.getService(getServlet().getServletContext()).deleteById(ExtServerOrgMap.class, sid);
+	AdminServiceProxy.getService(getServlet().getServletContext()).deleteById(ExtServer.class, sid);
 	return mapping.findForward("serverlist");
     }
 

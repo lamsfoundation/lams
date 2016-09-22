@@ -7,7 +7,7 @@
 <hibernate-mapping
 >
     <class
-        name="org.lamsfoundation.lams.integration.ExtServerOrgMap"
+        name="org.lamsfoundation.lams.integration.ExtServer"
         table="lams_ext_server_org_map"
     >
 
@@ -19,7 +19,7 @@
             <generator class="native">
               <!--  
                   To add non XDoclet generator parameters, create a file named 
-                  hibernate-generator-params-ExtServerOrgMap.xml 
+                  hibernate-generator-params-ExtServer.xml 
                   containing the additional parameters and place it in your merge dir. 
               --> 
             </generator>
@@ -162,19 +162,6 @@
             column="time_to_live_login_request"
         />
 
-        <many-to-one
-            name="organisation"
-            class="org.lamsfoundation.lams.usermanagement.Organisation"
-            cascade="none"
-            outer-join="auto"
-            update="true"
-            insert="true"
-        >
-            <column
-                name="orgid" 
-            />
-        </many-to-one>
-
         <set
             name="extCourseClassMaps"
             lazy="true"
@@ -215,7 +202,7 @@
 
         <!--
             To add non XDoclet property mappings, create a file named
-                hibernate-properties-ExtServerOrgMap.xml
+                hibernate-properties-ExtServer.xml
             containing the additional properties and place it in your merge dir.
         -->
 

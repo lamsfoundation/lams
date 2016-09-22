@@ -27,7 +27,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.log4j.Logger;
-import org.lamsfoundation.lams.integration.ExtServerOrgMap;
+import org.lamsfoundation.lams.integration.ExtServer;
 import org.lamsfoundation.lams.integration.ExtUserUseridMap;
 import org.lamsfoundation.lams.integration.UserInfoFetchException;
 import org.lamsfoundation.lams.integration.UserInfoValidationException;
@@ -127,14 +127,18 @@ public class LoginRequestDispatcher {
 
 	// get the location from an explicit parameter if it exists
 	String redirectUrlParam = request.getParameter("redirectURL");
+	log.info("LoginRequestDispatcher1 " + request.getParameter("redirectURL"));
 	if (redirectUrlParam != null) {
 	    // for NTU Blackboard's based templates, force to https to co-exist with Blackboard
 	    if (redirectUrlParam.indexOf("ldtemplate") >= 0) {
+		log.info("LoginRequestDispatcher23 " + request.getParameter("redirectURL"));
 		return "https://" + request.getServerName() + request.getContextPath() + "/" + redirectUrlParam;
 	    } else {
+		log.info("LoginRequestDispatcher2 " + request.getContextPath() + URL_REDIRECT + "&redirectURL=" + URLEncoder.encode(redirectUrlParam, "UTF8"));
 		return request.getContextPath() + URL_REDIRECT + "&redirectURL=" + URLEncoder.encode(redirectUrlParam, "UTF8");
 	    }
 	}
+	log.info("LoginRequestDispatcher3 " + request.getParameter("redirectURL"));
 
 	String method = request.getParameter(PARAM_METHOD);
 	String lessonId = request.getParameter(PARAM_LESSON_ID);
@@ -215,8 +219,8 @@ public class LoginRequestDispatcher {
 	}
 	String serverId = request.getParameter(PARAM_SERVER_ID);
 	String extUsername = request.getParameter(PARAM_USER_ID);
-	ExtServerOrgMap serverMap = integrationService.getExtServerOrgMap(serverId);
-	ExtUserUseridMap userMap = integrationService.getExtUserUseridMap(serverMap, extUsername);
+	ExtServer extServer = integrationService.getExtServer(serverId);
+	ExtUserUseridMap userMap = integrationService.getExtUserUseridMap(extServer, extUsername);
 	User user = userMap.getUser();
 	if (user == null) {
 	    String error = "Unable to add user to lesson class as user is missing from the user map";

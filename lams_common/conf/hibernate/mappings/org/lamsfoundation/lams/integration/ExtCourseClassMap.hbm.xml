@@ -55,10 +55,10 @@
 
     <!-- Associations -->
   
-    <!-- bi-directional many-to-one association to ExtServerOrgMap -->
+    <!-- bi-directional many-to-one association to ExtServer -->
     <many-to-one
-        name="extServerOrgMap"
-        class="org.lamsfoundation.lams.integration.ExtServerOrgMap"
+        name="extServer"
+        class="org.lamsfoundation.lams.integration.ExtServer"
         not-null="true"
     >
         <meta attribute="field-description">

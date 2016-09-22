@@ -1,7 +1,7 @@
 -- Turn off autocommit, so nothing is committed if there is an error
 SET AUTOCOMMIT = 0;
 
--- LDEV-
+-- LDEV-3997 LAMS to become LTI compliant tool provider (version 1.1)
 CREATE TABLE lams_ext_server_type (
        server_type_id INT(11) NOT NULL DEFAULT 0
      , description VARCHAR(255) NOT NULL
@@ -16,6 +16,10 @@ UPDATE lams_ext_server_org_map SET server_type_id=1;
 
 ALTER TABLE lams_ext_server_lesson_map ADD COLUMN resource_link_id VARCHAR(255);
 ALTER TABLE lams_ext_user_userid_map ADD COLUMN tc_gradebook_id VARCHAR(250);
+
+-- LDEV-3998 Remove reference to Organisation from ExtServerOrgMap class
+ALTER TABLE lams_ext_server_org_map DROP FOREIGN KEY lams_ext_server_org_map_fk;
+ALTER TABLE lams_ext_server_org_map DROP COLUMN orgid, DROP INDEX orgid;
 
 COMMIT;
 SET AUTOCOMMIT = 1;

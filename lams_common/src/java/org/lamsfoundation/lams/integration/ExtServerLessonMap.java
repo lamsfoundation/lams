@@ -33,7 +33,7 @@ public class ExtServerLessonMap {
     private Long uid;
     private Long lessonId;
     private String resourceLinkId;
-    private ExtServerOrgMap extServer;
+    private ExtServer extServer;
 
     public ExtServerLessonMap() {
     }
@@ -85,11 +85,11 @@ public class ExtServerLessonMap {
      * @hibernate.column name="ext_server_org_map_id"
      *
      */
-    public ExtServerOrgMap getExtServer() {
+    public ExtServer getExtServer() {
 	return extServer;
     }
 
-    public void setExtServer(ExtServerOrgMap extServer) {
+    public void setExtServer(ExtServer extServer) {
 	this.extServer = extServer;
     }
 }
