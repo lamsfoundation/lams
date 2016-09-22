@@ -20,6 +20,12 @@ axis              axis-ant.jar							1.4                    Apache License 2.0  
                   saaj.jar								1.2                    CDDL 1.1 + GPL 2                                               SOAP with Attachments API for Java                                       
                   wsdl4j-1.5.1.jar                      1.5.1                  Common Public License 1.0     IBM                              JWSDL
 
+basiclti-util     basiclti-util-1.2.0.jar               1.2.0                  Apache License 2.0            IMS Global Learning Consortium   Set of utility classes to aid in the development of BasicLTI consumers andproviders
+                  oauth-20100527.jar                    20100527               Apache License 2.0            Sean Sullivan, JM Kristian       An open protocol to allow API authentication in a simple and standard method from desktop and web applications
+                  oauth-provider-20100527.jar           
+                  signpost-commonshttp4-1.2.1.2.jar     1.2.1.2                Apache License 2.0            Matthias Käppler, Qype GmbH      A simple, light-weight, and modular OAuth client library
+                  signpost-core-1.2.1.2.jar             
+
 batik             batik-1.7.jar                         1.7                    Apache License 2.0            Apache                           toolkit for manipulating images in SVG format
 
 cglib             cglib_jboss404GA.jar                  4.0.4.GA               Apache License 2.0            Apache                           bytecode manipulation framework
@@ -37,7 +43,8 @@ jakarta-commons   commons-beanutils.jar                 1.9.2                  A
                   commons-digester.jar                  1.6                    Apache License 2.0            Apache Software Foundation       Jakarta Commons Digester
                   commons-discovery-0.2.jar             0.2                    Apache Software License 1.1   Apache Software Foundation       
                   commons-fileupload.jar                1.0                    Apache Software License 1.1   Apache Software Foundation       File upload component for Java servlets
-                  commons-httpclient-3.0.jar			3.0					   Apache License 2.0 			 Apache Software Foundation		  HTTP tools
+                  commons-httpclient-4.2.3.jar			4.2.3				   Apache License 2.0 			 Apache Software Foundation		  HTTP tools
+                  commons-httpcore-4.2.2.jar			4.2.2				   Apache License 2.0 			 Apache Software Foundation		  Set of low level HTTP transport components
                   commons-io-2.1.jar                    2.1                    Apache License 2.0            Apache Software Foundation       Apache Commons IO
                   commons-lang.jar                      2.6                    Apache Software License 1.1   Apache Software Foundation       Jakarta Commons Lang
                   commons-logging.jar                   1.0.4                  Apache License 2.0            Apache Software Foundation       

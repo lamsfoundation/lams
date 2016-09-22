@@ -10,6 +10,7 @@
         <archive path="/lams_build/lib/autopatch/tk-discovery-1.0.0.jar"/>
         <archive javadoc="http://ws.apache.org/axis/java/apiDocs/" path="/lams_build/lib/axis/axis.jar"/>
         <archive path="/lams_build/lib/axis/jaxrpc.jar"/>
+        <archive path="/lams_build/lib/basiclti-util/basiclti-util-1.2.0.jar"/>
         <archive path="/lams_build/lib/batik/batik-1.7.jar" source="/3rdParty_sources/batik"/>
         <archive path="/lams_build/lib/cglib/cglib_jboss404GA.jar"/>
         <archive path="/lams_build/lib/jakarta-commons/commons-beanutils.jar"/>
@@ -44,7 +45,8 @@
         <archive javadoc="http://www.lhelper.org/dev/lucene-2.4.0/docs/api/contrib-snowball/" path="/lams_build/lib/lucene/lucene-snowball-2.4.0.jar" source="/3rdParty_sources/lucene"/>
         <archive javadoc="http://www.jboss.org/file-access/default/members/jbosscache/freezone/docs/3.1.0.CR1/apidocs" path="/lams_build/lib/jboss/jbosscache-core.jar" source="/3rdParty_sources/jbosscache"/>
         <archive javadoc="http://www.jgroups.org/javadoc/" path="/lams_build/lib/jboss/jgroups-all.jar" source="/3rdParty_sources/jgroups"/>
-        <archive javadoc="http://hc.apache.org/httpclient-3.x/apidocs/" path="/lams_build/lib/jakarta-commons/commons-httpclient-3.1.jar" source="/3rdParty_sources/commons-httpclient"/>
+        <archive javadoc="http://hc.apache.org/httpclient-3.x/apidocs/" path="/lams_build/lib/jakarta-commons/commons-httpclient-4.2.3.jar" source="/3rdParty_sources/commons-httpclient"/>
+        <archive path="/lams_build/lib/jakarta-commons/commons-httpcore-4.2.2.jar"/>
         <archive javadoc="http://joda-time.sourceforge.net/api-release/" path="/lams_build/lib/xstream/joda-time-2.1.jar" source="/3rdParty_sources/joda-time"/>
         <archive javadoc="http://google-gson.googlecode.com/svn/tags/gson-2.2.4/docs/javadocs/" path="/lams_build/lib/json/gson-2.2.4.jar" source="/3rdParty_sources/gson"/>
     </library>

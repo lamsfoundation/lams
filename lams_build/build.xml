@@ -185,6 +185,7 @@
 				<include name="aspirin/*.jar" />
 				<include name="autopatch/*.jar" />
 				<include name="axis/*.jar" />
+				<include name="basiclti-util/*.jar" />
 				<include name="batik/*.jar" />
 				<include name="cglib/*.jar" />
 				<include name="fckeditor/*.jar" />
