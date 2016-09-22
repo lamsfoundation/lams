@@ -108,12 +108,9 @@ public class Authenticator {
 
 	//learnerStrictAuth hash [ts + uid + method + lsid + serverID + serverKey]
 	//otherwise [ts + uid + method + serverID + serverKey]
-	String plaintext = (lsid == null)
-		? datetime.toLowerCase().trim() + username.toLowerCase().trim() + method.toLowerCase().trim()
-			+ map.getServerid().toLowerCase().trim() + map.getServerkey().toLowerCase().trim()
-		: datetime.toLowerCase().trim() + username.toLowerCase().trim() + method.toLowerCase().trim()
-			+ lsid.toLowerCase().trim() + map.getServerid().toLowerCase().trim()
-			+ map.getServerkey().toLowerCase().trim();
+	String plaintext = datetime.toLowerCase().trim() + username.toLowerCase().trim() + method.toLowerCase().trim()
+		+ ("learnerStrictAuth".equals(method) ? lsid.toLowerCase().trim() : "")
+		+ map.getServerid().toLowerCase().trim() + map.getServerkey().toLowerCase().trim();
 	Authenticator.checkHash(plaintext, hashValue);
     }
 

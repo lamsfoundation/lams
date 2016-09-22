@@ -11,6 +11,10 @@
         <archive javadoc="http://ws.apache.org/axis/java/apiDocs/" path="/lams_build/lib/axis/axis.jar"/>
         <archive path="/lams_build/lib/axis/jaxrpc.jar"/>
         <archive path="/lams_build/lib/basiclti-util/basiclti-util-1.2.0.jar"/>
+        <archive path="/lams_build/lib/basiclti-util/oauth-20100527.jar"/>
+        <archive path="/lams_build/lib/basiclti-util/oauth-provider-20100527.jar"/>
+        <archive path="/lams_build/lib/basiclti-util/signpost-commonshttp4-1.2.1.2.jar"/>
+        <archive path="/lams_build/lib/basiclti-util/signpost-core-1.2.1.2.jar"/>    
         <archive path="/lams_build/lib/batik/batik-1.7.jar" source="/3rdParty_sources/batik"/>
         <archive path="/lams_build/lib/cglib/cglib_jboss404GA.jar"/>
         <archive path="/lams_build/lib/jakarta-commons/commons-beanutils.jar"/>

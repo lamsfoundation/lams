@@ -64,6 +64,14 @@
             column="serverdesc"
             length="65535"
         />
+        
+        <property 
+        	name="serverTypeId" 
+        	type="java.lang.Integer" 
+        	column="server_type_id" 
+        	length="11" 
+        	not-null="true"
+        />
 
         <property
             name="prefix"

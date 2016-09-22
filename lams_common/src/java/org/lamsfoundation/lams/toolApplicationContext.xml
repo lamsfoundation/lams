@@ -45,6 +45,7 @@
 	</bean>
 	
 	<bean id="lamsCoreToolServiceTarget" class="org.lamsfoundation.lams.tool.service.LamsCoreToolService" singleton="false">
+		<property name="activityDAO"><ref bean="activityDAO"/></property>
 		<property name="toolContentDAO"><ref bean="toolContentDAO"/></property>
 		<property name="toolSessionDAO"><ref bean="toolSessionDAO"/></property>
 		<property name="systemToolDAO"><ref bean="systemToolDAO"/></property>

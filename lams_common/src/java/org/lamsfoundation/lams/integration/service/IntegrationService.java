@@ -33,6 +33,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.net.URLEncoder;
+import java.security.GeneralSecurityException;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Date;
@@ -44,6 +45,9 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.apache.tomcat.util.json.JSONArray;
 import org.apache.tomcat.util.json.JSONObject;
+import org.imsglobal.pox.IMSPOXRequest;
+import org.lamsfoundation.lams.gradebook.GradebookUserLesson;
+import org.lamsfoundation.lams.gradebook.service.IGradebookService;
 import org.lamsfoundation.lams.integration.ExtCourseClassMap;
 import org.lamsfoundation.lams.integration.ExtServerLessonMap;
 import org.lamsfoundation.lams.integration.ExtServerOrgMap;
@@ -57,6 +61,7 @@ import org.lamsfoundation.lams.integration.util.GroupInfoFetchException;
 import org.lamsfoundation.lams.integration.util.LoginRequestDispatcher;
 import org.lamsfoundation.lams.lesson.Lesson;
 import org.lamsfoundation.lams.lesson.service.ILessonService;
+import org.lamsfoundation.lams.tool.service.ILamsCoreToolService;
 import org.lamsfoundation.lams.usermanagement.AuthenticationMethod;
 import org.lamsfoundation.lams.usermanagement.Organisation;
 import org.lamsfoundation.lams.usermanagement.OrganisationState;
@@ -72,6 +77,8 @@ import org.lamsfoundation.lams.util.LanguageUtil;
 import org.lamsfoundation.lams.util.ValidationUtil;
 import org.lamsfoundation.lams.util.WebUtil;
 
+import oauth.signpost.exception.OAuthException;
+
 /**
  * <p>
  * <a href="IntegrationService.java.html"><i>View Source</i><a>
@@ -83,24 +90,35 @@ public class IntegrationService implements IIntegrationService {
 
     private static Logger log = Logger.getLogger(IntegrationService.class);
 
+    private IGradebookService gradebookService;
     private IUserManagementService service;
     private ILessonService lessonService;
+    private ILamsCoreToolService toolService;
 
+    /**
+     * Returns integration server or LTI tool consumer by its human-entered server key/server id.
+     * 
+     * @param serverId server key/server id
+     * @param isIntegrationServer true in case this is an integration server, false - LTI tool consumer
+     * @return
+     */
     @Override
     public ExtServerOrgMap getExtServerOrgMap(String serverId) {
-	List list = service.findByProperty(ExtServerOrgMap.class, "serverid", serverId);
+	Map<String, Object> properties = new HashMap<String, Object>();
+	properties.put("serverid", serverId);
+	List<ExtServerOrgMap> list = service.findByProperties(ExtServerOrgMap.class, properties);
 	if (list == null || list.size() == 0) {
 	    return null;
 	} else {
-	    return (ExtServerOrgMap) list.get(0);
+	    return list.get(0);
 	}
     }
 
     @Override
-    public ExtCourseClassMap getExtCourseClassMap(Integer extServerOrgMapId, String extCourseId) {
+    public ExtCourseClassMap getExtCourseClassMap(Integer sid, String extCourseId) {
 	Map<String, Object> properties = new HashMap<String, Object>();
 	properties.put("courseid", extCourseId);
-	properties.put("extServerOrgMap.sid", extServerOrgMapId);
+	properties.put("extServerOrgMap.sid", sid);
 	List<ExtCourseClassMap> list = service.findByProperties(ExtCourseClassMap.class, properties);
 
 	if (list == null || list.size() == 0) {
@@ -500,8 +518,17 @@ public class IntegrationService implements IIntegrationService {
     }
 
     @Override
-    public List getAllExtServerOrgMaps() {
-	return service.findAll(ExtServerOrgMap.class);
+    public List<ExtServerOrgMap> getAllExtServerOrgMaps() {
+	Map<String, Object> properties = new HashMap<String, Object>();
+	properties.put("serverTypeId", ExtServerOrgMap.INTEGRATION_SERVER_TYPE);
+	return service.findByProperties(ExtServerOrgMap.class, properties);
+    }
+    
+    @Override
+    public List<ExtServerOrgMap> getAllToolConsumers() {
+	Map<String, Object> properties = new HashMap<String, Object>();
+	properties.put("serverTypeId", ExtServerOrgMap.LTI_CONSUMER_SERVER_TYPE);
+	return service.findByProperties(ExtServerOrgMap.class, properties);
     }
 
     @Override
@@ -547,9 +574,16 @@ public class IntegrationService implements IIntegrationService {
 	return (ExtServerOrgMap) service.findById(ExtServerOrgMap.class, sid);
     }
 
+    @Override
     public void createExtServerLessonMap(Long lessonId, ExtServerOrgMap extServer) {
+	createExtServerLessonMap(lessonId, null, extServer);;
+    }
+    
+    @Override
+    public void createExtServerLessonMap(Long lessonId, String resourceLinkId, ExtServerOrgMap extServer) {
 	ExtServerLessonMap map = new ExtServerLessonMap();
 	map.setLessonId(lessonId);
+	map.setResourceLinkId(resourceLinkId);
 	map.setExtServer(extServer);
 	service.save(map);
     }
@@ -567,23 +601,71 @@ public class IntegrationService implements IIntegrationService {
 	    // checks whether the lesson was created from extServer and whether it has lessonFinishCallbackUrl setting
 	    if (extServerLesson != null
 		    && StringUtils.isNotBlank(extServerLesson.getExtServer().getLessonFinishUrl())) {
-		ExtServerOrgMap serverMap = extServerLesson.getExtServer();
+		ExtServerOrgMap server = extServerLesson.getExtServer();
 
-		ExtUserUseridMap extUserUseridMap = getExtUserUseridMapByUserId(serverMap, user.getUserId());
-		if (extUserUseridMap != null) {
-		    String extUsername = extUserUseridMap.getExtUsername();
+		ExtUserUseridMap extUser = getExtUserUseridMapByUserId(server, user.getUserId());
+		if (extUser != null) {
+		    String extUsername = extUser.getExtUsername();
 
-		    // construct real lessonFinishCallbackUrl
-		    lessonFinishCallbackUrl = serverMap.getLessonFinishUrl();
-		    String timestamp = Long.toString(new Date().getTime());
-		    String hash = hash(serverMap, extUsername, timestamp);
-		    String encodedExtUsername = URLEncoder.encode(extUsername, "UTF8");
+		    //return URL in case of integration server
+		    if (server.getServerTypeId().equals(ExtServerOrgMap.INTEGRATION_SERVER_TYPE)) {
+			// construct real lessonFinishCallbackUrl
+			lessonFinishCallbackUrl = server.getLessonFinishUrl();
+			String timestamp = Long.toString(new Date().getTime());
+			String hash = hash(server, extUsername, timestamp);
+			String encodedExtUsername = URLEncoder.encode(extUsername, "UTF8");
 
-		    // set the values for the parameters
-		    lessonFinishCallbackUrl = lessonFinishCallbackUrl.replaceAll("%username%", encodedExtUsername)
-			    .replaceAll("%lessonid%", lessonId.toString()).replaceAll("%timestamp%", timestamp)
-			    .replaceAll("%hash%", hash);
-		    log.debug(lessonFinishCallbackUrl);
+			// set the values for the parameters
+			lessonFinishCallbackUrl = lessonFinishCallbackUrl.replaceAll("%username%", encodedExtUsername)
+				.replaceAll("%lessonid%", lessonId.toString()).replaceAll("%timestamp%", timestamp)
+				.replaceAll("%hash%", hash);
+			log.debug(lessonFinishCallbackUrl);
+			
+		    // in case of LTI Tool Consumer - create a new thread to report score back to LMS (in order to do this task in parallel not to slow down later work)
+		    } else {
+			
+			// calculate lesson's MaxPossibleMark
+			Long lessonMaxPossibleMark = toolService.getLessonMaxPossibleMark(lesson);
+			GradebookUserLesson gradebookUserLesson = gradebookService.getGradebookUserLesson(lessonId,
+				user.getUserId());
+			Double userTotalMark = (gradebookUserLesson == null) || (gradebookUserLesson.getMark() == null)
+				? null : gradebookUserLesson.getMark();
+			
+			final String lessonFinishUrl = server.getLessonFinishUrl();
+			if (userTotalMark != null && StringUtils.isNotBlank(lessonFinishUrl)) {
+			    
+			    Double score = lessonMaxPossibleMark.equals(0L) ? 0 : userTotalMark / lessonMaxPossibleMark;
+			    final String scoreStr = (userTotalMark == null) || lessonMaxPossibleMark.equals(0L) ? ""
+				    : score.toString();
+
+			    final String serverKey = server.getServerid();
+			    final String serverSecret = server.getServerkey();
+			    final String tcGradebookId = extUser.getTcGradebookId();
+			    final ExtUserUseridMap extUserFinal = extUser;
+
+			    Thread preaddLearnersMonitorsThread = new Thread(new Runnable() {
+				@Override
+				public void run() {
+				    //send Request directly
+				    try {
+					IMSPOXRequest.sendReplaceResult(lessonFinishUrl, serverKey, serverSecret,
+						tcGradebookId, scoreStr);
+				    } catch (IOException e) {
+					throw new RuntimeException(e);
+				    } catch (OAuthException e) {
+					throw new RuntimeException(e);
+				    } catch (GeneralSecurityException e) {
+					throw new RuntimeException(e);
+				    }
+				    log.debug("Score (" + scoreStr + ") posted to Tool Consumer (serverKey:" + serverKey
+					    + "). extUsername:" + extUserFinal.getExtUsername());
+				}
+			    }, "LAMS_sendScoresLTI_thread");
+			    preaddLearnersMonitorsThread.start();
+
+			}
+		    }
+
 		}
 	    }
 	}
@@ -743,7 +825,18 @@ public class IntegrationService implements IIntegrationService {
 	properties.put("extServerOrgMap.sid", sid);
 	properties.put("organisation.organisationId", lesson.getOrganisation().getOrganisationId());
 	List<ExtCourseClassMap> list = service.findByProperties(ExtCourseClassMap.class, properties);
-	return list == null || list.isEmpty() ? null : list.get(0);
+	
+	return (list == null || list.isEmpty()) ? null : list.get(0);
+    }
+    
+    @Override
+    public ExtServerLessonMap getLtiConsumerLesson(String serverId, String resourceLinkId) {
+	Map<String, Object> properties = new HashMap<String, Object>();
+	properties.put("extServer.serverid", serverId);
+	properties.put("resourceLinkId", resourceLinkId);
+	List<ExtServerLessonMap> list = service.findByProperties(ExtServerLessonMap.class, properties);
+	
+	return (list == null || list.isEmpty()) ? null : list.get(0);
     }
 
     private ExtServerLessonMap getExtServerLessonMap(Long lessonId) {
@@ -787,4 +880,13 @@ public class IntegrationService implements IIntegrationService {
     public ILessonService getLessonService() {
 	return lessonService;
     }
+    
+    public void setGradebookService(IGradebookService gradebookService) {
+	this.gradebookService = gradebookService;
+    }
+    
+    public void setToolService(ILamsCoreToolService toolService) {
+	this.toolService = toolService;
+    }
+    
 }

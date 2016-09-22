@@ -32,6 +32,7 @@ import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.learningdesign.Activity;
 import org.lamsfoundation.lams.learningdesign.ActivityEvaluation;
 import org.lamsfoundation.lams.learningdesign.ToolActivity;
+import org.lamsfoundation.lams.learningdesign.dao.IActivityDAO;
 import org.lamsfoundation.lams.lesson.Lesson;
 import org.lamsfoundation.lams.tool.SystemTool;
 import org.lamsfoundation.lams.tool.Tool;
@@ -74,6 +75,7 @@ public class LamsCoreToolService implements ILamsCoreToolService, ApplicationCon
     // Instance variables
     // ---------------------------------------------------------------------
     private ApplicationContext context;
+    private IActivityDAO activityDAO;
     private IToolSessionDAO toolSessionDAO;
     private ISystemToolDAO systemToolDAO;
     private ToolContentIDGenerator contentIDGenerator;
@@ -86,6 +88,10 @@ public class LamsCoreToolService implements ILamsCoreToolService, ApplicationCon
     @Override
     public void setApplicationContext(ApplicationContext context) throws BeansException {
 	this.context = context;
+    }
+    
+    public void setActivityDAO(IActivityDAO activityDAO) {
+	this.activityDAO = activityDAO;
     }
 
     /**
@@ -558,6 +564,51 @@ public class LamsCoreToolService implements ILamsCoreToolService, ApplicationCon
 	    }
 	}
 	return null;
+    }
+    
+    @Override
+    public Long getLessonMaxPossibleMark(Lesson lesson) {
+	// calculate lesson's MaxPossibleMark
+	Set<ToolActivity> activities = getLessonActivities(lesson);
+	Long lessonMaxPossibleMark = 0L;
+	for (ToolActivity activity : activities) {
+	    Long activityMaxPossibleMark = getActivityMaxPossibleMark(activity);
+	    if (activityMaxPossibleMark != null) {
+		lessonMaxPossibleMark += activityMaxPossibleMark;
+	    }
+	}
+	return lessonMaxPossibleMark;
+    }
+    
+    /**
+     * Returns lesson tool activities. It works almost the same as lesson.getLearningDesign().getActivities() except it
+     * solves problem with first activity unable to cast to ToolActivity.
+     */
+    @SuppressWarnings("unchecked")
+    private Set<ToolActivity> getLessonActivities(Lesson lesson) {
+	Set<Activity> activities = new TreeSet<Activity>();
+	Set<ToolActivity> toolActivities = new TreeSet<ToolActivity>();
+
+	/*
+	 * Hibernate CGLIB is failing to load the first activity in the sequence as a ToolActivity for some mysterious
+	 * reason Causes a ClassCastException when you try to cast it, even if it is a ToolActivity.
+	 *
+	 * THIS IS A HACK to retrieve the first tool activity manually so it can be cast as a ToolActivity - if it is
+	 * one
+	 */
+	Activity firstActivity = activityDAO
+		.getActivityByActivityId(lesson.getLearningDesign().getFirstActivity().getActivityId());
+	activities.add(firstActivity);
+	activities.addAll(lesson.getLearningDesign().getActivities());
+
+	for (Activity activity : activities) {
+	    if (activity instanceof ToolActivity) {
+		ToolActivity toolActivity = (ToolActivity) activity;
+		toolActivities.add(toolActivity);
+	    }
+	}
+
+	return toolActivities;
     }
 
     @Override

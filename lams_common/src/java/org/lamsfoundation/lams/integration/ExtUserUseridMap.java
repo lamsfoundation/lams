@@ -23,6 +23,9 @@ public class ExtUserUseridMap implements Serializable {
 
     /** persistent field */
     private ExtServerOrgMap extServerOrgMap;
+    
+    /** id of gradebook item in LTI tool consumer */
+    private String tcGradebookId;
 
     /** full constructor */
     public ExtUserUseridMap(String extUsername, User user, ExtServerOrgMap extServerOrgMap) {
@@ -49,7 +52,6 @@ public class ExtUserUseridMap implements Serializable {
 
     /**
      * @hibernate.property column="external_username" length="250" not-null="true"
-     *
      */
     public String getExtUsername() {
 	return this.extUsername;
@@ -83,6 +85,17 @@ public class ExtUserUseridMap implements Serializable {
 
     public void setExtServerOrgMap(ExtServerOrgMap extServerOrgMap) {
 	this.extServerOrgMap = extServerOrgMap;
+    }
+    
+    /**
+     * @hibernate.property column="tc_gradebook_id" length="250" 
+     */
+    public String getTcGradebookId() {
+	return this.tcGradebookId;
+    }
+
+    public void setTcGradebookId(String tcGradebookId) {
+	this.tcGradebookId = tcGradebookId;
     }
 
     @Override
