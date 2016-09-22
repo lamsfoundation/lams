@@ -79,7 +79,7 @@
 	//in order to be able to use option's value, copy it from CKEditor to textarea
 	function prepareOptionEditorsForAjaxSubmit(){
 		if ((questionType == 1) || (questionType == 7) || (questionType == 8)) {
-			$("textarea[name^=optionString]").each(function() {
+			$("textarea[name^=optionString], textarea[name^=optionFeedback]").each(function()  {
 				prepareOptionEditorForAjaxSubmit(this);
 			});
 			
