@@ -67,6 +67,7 @@ public class SysAdminStartAction extends Action {
 	    links.add(new LinkBean("disabledmanage.do", "admin.list.disabled.users"));
 	    links.add(new LinkBean("loginmaintain.do", "sysadmin.maintain.loginpage"));
 	    links.add(new LinkBean("serverlist.do", "sysadmin.maintain.external.servers"));
+	    links.add(new LinkBean("ltiConsumerManagement.do", "label.manage.tool.consumers"));
 	    links.add(new LinkBean("register.do", "sysadmin.register.server"));
 	    links.add(new LinkBean("statistics.do", "admin.statistics.title"));
 	    links.add(new LinkBean("signupManagement.do", "admin.signup.title"));
