@@ -9,17 +9,25 @@
 <script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery.validate.js"></script>
 
 <h4>
-	<a href="sysadminstart.do"><fmt:message key="sysadmin.maintain" /></a> :
-	<a href="serverlist.do"><fmt:message key="sysadmin.maintain.external.servers" /></a>
+	<a href="sysadminstart.do">
+		<fmt:message key="sysadmin.maintain" />
+	</a> :
+	<a href="serverlist.do">
+		<fmt:message key="sysadmin.maintain.external.servers" />
+	</a>
 </h4>
 <lams:help style="no-tabs" page="Integrations"/>
-<h1><fmt:message key="sysadmin.maintain.server.edit"/></h1>
+<h1>
+	<fmt:message key="sysadmin.maintain.server.edit"/>
+</h1>
 
 <html:errors/>
 <br />
 <html:form action="serversave.do" styleId="ext-server-form" method="post">
-	<c:set var="formBean" value="<%=request.getAttribute(org.apache.struts.taglib.html.Constants.BEAN_KEY)%>" />
-	<html:hidden property="sid" />
+
+<c:set var="formBean" value="<%=request.getAttribute(org.apache.struts.taglib.html.Constants.BEAN_KEY)%>" />
+<html:hidden property="sid" />
+<input type="hidden" name="serverTypeId" value="1">
 	
 <table>
 	<tr>
@@ -93,12 +101,20 @@
 		<td><html:text property="extGroupsUrl" size="70"/></td>
 	</tr>
 </table>
+
 <div align="center">
-	<html:submit property="submitbutton" styleClass="button"><fmt:message key="admin.save" /></html:submit>
-	<html:reset styleClass="button cancel"><fmt:message key="admin.reset" /></html:reset>
-	<html:cancel styleClass="button cancel"><fmt:message key="admin.cancel" /></html:cancel>
+	<html:submit property="submitbutton" styleClass="button">
+		<fmt:message key="admin.save" />
+	</html:submit>
+	<html:reset styleClass="button cancel">
+		<fmt:message key="admin.reset" />
+	</html:reset>
+	<html:cancel styleClass="button cancel">
+		<fmt:message key="admin.cancel" />
+	</html:cancel>
 </div>
 </html:form>
+
 <script type="text/javascript" language="javascript">
 	function changeStatus(obj){
 		document.forms[0].orgId.disabled = obj.checked;

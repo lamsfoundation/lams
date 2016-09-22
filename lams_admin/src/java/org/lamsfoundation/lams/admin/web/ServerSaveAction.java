@@ -157,6 +157,7 @@ public class ServerSaveAction extends Action {
 		map = new ExtServerOrgMap();
 		BeanUtils.copyProperties(map, serverOrgMapForm);
 		map.setSid(null);
+		map.setServerTypeId(ExtServerOrgMap.LTI_CONSUMER_SERVER_TYPE);
 	    } else {
 		map = service.getExtServerOrgMap(sid);
 		BeanUtils.copyProperties(map, serverOrgMapForm);
