@@ -35,7 +35,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.integration.ExtCourseClassMap;
-import org.lamsfoundation.lams.integration.ExtServerOrgMap;
+import org.lamsfoundation.lams.integration.ExtServer;
 import org.lamsfoundation.lams.integration.ExtUserUseridMap;
 import org.lamsfoundation.lams.integration.UserInfoFetchException;
 import org.lamsfoundation.lams.integration.UserInfoValidationException;
@@ -88,16 +88,16 @@ public class OrganisationGroupServlet extends HttpServlet {
 
 	User user = null;
 	Organisation organisation = null;
-	ExtServerOrgMap serverMap = getService().getExtServerOrgMap(serverId);
+	ExtServer extServer = getService().getExtServer(serverId);
 
 	try {
 	    // authenticate the request
-	    Authenticator.authenticate(serverMap, datetime, username, hashValue);
+	    Authenticator.authenticate(extServer, datetime, username, hashValue);
 
 	    // get local user and organisation
-	    ExtUserUseridMap userMap = OrganisationGroupServlet.integrationService.getExtUserUseridMap(serverMap,
+	    ExtUserUseridMap userMap = OrganisationGroupServlet.integrationService.getExtUserUseridMap(extServer,
 		    username);
-	    ExtCourseClassMap orgMap = OrganisationGroupServlet.integrationService.getExtCourseClassMap(serverMap,
+	    ExtCourseClassMap orgMap = OrganisationGroupServlet.integrationService.getExtCourseClassMap(extServer,
 		    userMap, courseId, null, null, null, LoginRequestDispatcher.METHOD_MONITOR);
 	    user = userMap.getUser();
 	    organisation = orgMap.getOrganisation();
@@ -140,9 +140,9 @@ public class OrganisationGroupServlet extends HttpServlet {
 	    } else if (OrganisationGroupServlet.METHOD_REMOVE_GROUP.equals(method)) {
 		removeGroup(request, organisation.getOrganisationId());
 	    } else if (OrganisationGroupServlet.METHOD_ADD_LEARNERS.equals(method)) {
-		addLearners(request, serverMap, organisation.getOrganisationId());
+		addLearners(request, extServer, organisation.getOrganisationId());
 	    } else if (OrganisationGroupServlet.METHOD_REMOVE_LEARNERS.equals(method)) {
-		removeLearners(request, serverMap, organisation.getOrganisationId());
+		removeLearners(request, extServer, organisation.getOrganisationId());
 	    }
 	} catch (ServletException e) {
 	    OrganisationGroupServlet.log.error(e);
@@ -279,7 +279,7 @@ public class OrganisationGroupServlet extends HttpServlet {
 	}
     }
 
-    private void addLearners(HttpServletRequest request, ExtServerOrgMap serverMap, Integer organisationId)
+    private void addLearners(HttpServletRequest request, ExtServer extServer, Integer organisationId)
 	    throws ServletException {
 	String groupingName = request.getParameter(OrganisationGroupServlet.PARAM_GROUPING_NAME);
 	if (StringUtils.isBlank(groupingName)) {
@@ -310,7 +310,7 @@ public class OrganisationGroupServlet extends HttpServlet {
 	for (String learnerLogin : learnerLoginArray) {
 	    User learner = null;
 	    try {
-		ExtUserUseridMap userMap = OrganisationGroupServlet.integrationService.getExtUserUseridMap(serverMap,
+		ExtUserUseridMap userMap = OrganisationGroupServlet.integrationService.getExtUserUseridMap(extServer,
 			learnerLogin);
 		learner = userMap.getUser();
 	    } catch (UserInfoFetchException e) {
@@ -337,7 +337,7 @@ public class OrganisationGroupServlet extends HttpServlet {
 	return;
     }
 
-    private void removeLearners(HttpServletRequest request, ExtServerOrgMap serverMap, Integer organisationId)
+    private void removeLearners(HttpServletRequest request, ExtServer extServer, Integer organisationId)
 	    throws ServletException {
 	String groupingName = request.getParameter(OrganisationGroupServlet.PARAM_GROUPING_NAME);
 	if (StringUtils.isBlank(groupingName)) {
@@ -367,7 +367,7 @@ public class OrganisationGroupServlet extends HttpServlet {
 	for (String learnerLogin : learnerLoginArray) {
 	    User learner = null;
 	    try {
-		ExtUserUseridMap userMap = OrganisationGroupServlet.integrationService.getExtUserUseridMap(serverMap,
+		ExtUserUseridMap userMap = OrganisationGroupServlet.integrationService.getExtUserUseridMap(extServer,
 			learnerLogin);
 		learner = userMap.getUser();
 	    } catch (UserInfoFetchException e) {

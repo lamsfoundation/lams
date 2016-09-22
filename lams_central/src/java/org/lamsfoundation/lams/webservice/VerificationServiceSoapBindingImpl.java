@@ -13,7 +13,7 @@ import javax.servlet.http.HttpServlet;
 
 import org.apache.axis.MessageContext;
 import org.apache.axis.transport.http.HTTPConstants;
-import org.lamsfoundation.lams.integration.ExtServerOrgMap;
+import org.lamsfoundation.lams.integration.ExtServer;
 import org.lamsfoundation.lams.integration.security.Authenticator;
 import org.lamsfoundation.lams.integration.service.IntegrationService;
 import org.springframework.web.context.support.WebApplicationContextUtils;
@@ -29,8 +29,8 @@ public class VerificationServiceSoapBindingImpl implements org.lamsfoundation.la
     @Override
     public boolean verify(String serverId, String datetime, String hash) throws java.rmi.RemoteException {
 	try {
-	    ExtServerOrgMap serverMap = integrationService.getExtServerOrgMap(serverId);
-	    Authenticator.authenticate(serverMap, datetime, hash);
+	    ExtServer extServer = integrationService.getExtServer(serverId);
+	    Authenticator.authenticate(extServer, datetime, hash);
 	    return true;
 	} catch (Exception e) {
 	    e.printStackTrace(System.err);

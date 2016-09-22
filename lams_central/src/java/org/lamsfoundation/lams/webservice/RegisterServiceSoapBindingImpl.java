@@ -16,7 +16,7 @@ import org.apache.axis.transport.http.HTTPConstants;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.integration.ExtCourseClassMap;
-import org.lamsfoundation.lams.integration.ExtServerOrgMap;
+import org.lamsfoundation.lams.integration.ExtServer;
 import org.lamsfoundation.lams.integration.ExtUserUseridMap;
 import org.lamsfoundation.lams.integration.UserInfoValidationException;
 import org.lamsfoundation.lams.integration.security.Authenticator;
@@ -96,7 +96,7 @@ public class RegisterServiceSoapBindingImpl implements Register {
     public boolean createUser(String username, String password, String firstName, String lastName, String email,
 	    String serverId, String datetime, String hash) throws java.rmi.RemoteException {
 	try {
-	    ExtServerOrgMap extServer = integrationService.getExtServerOrgMap(serverId);
+	    ExtServer extServer = integrationService.getExtServer(serverId);
 	    Authenticator.authenticate(extServer, datetime, hash);
 	    if (service.getUserByLogin(username) != null) {
 		return false;
@@ -153,8 +153,8 @@ public class RegisterServiceSoapBindingImpl implements Register {
 	    String datetime, String hash) throws java.rmi.RemoteException {
 	try {
 	    // authenticate external server
-	    ExtServerOrgMap serverMap = integrationService.getExtServerOrgMap(serverId);
-	    Authenticator.authenticate(serverMap, datetime, hash);
+	    ExtServer extServer = integrationService.getExtServer(serverId);
+	    Authenticator.authenticate(extServer, datetime, hash);
 
 	    // get user and organisation
 	    User user = service.getUserByLogin(login);
@@ -220,14 +220,14 @@ public class RegisterServiceSoapBindingImpl implements Register {
 	    throws java.rmi.RemoteException {
 	try {
 	    // authenticate external server
-	    ExtServerOrgMap serverMap = integrationService.getExtServerOrgMap(serverId);
-	    Authenticator.authenticate(serverMap, datetime, hash);
+	    ExtServer extServer = integrationService.getExtServer(serverId);
+	    Authenticator.authenticate(extServer, datetime, hash);
 
 	    // get user map, creating if necessary
-	    ExtUserUseridMap userMap = integrationService.getExtUserUseridMap(serverMap, username);
+	    ExtUserUseridMap userMap = integrationService.getExtUserUseridMap(extServer, username);
 
 	    // add user to org, creating org if necessary
-	    ExtCourseClassMap orgMap = integrationService.getExtCourseClassMap(serverMap, userMap, courseId, courseName,
+	    ExtCourseClassMap orgMap = integrationService.getExtCourseClassMap(extServer, userMap, courseId, courseName,
 		    countryIsoCode, langIsoCode, service.getRootOrganisation().getOrganisationId().toString(),
 		    isTeacher, false);
 	    return true;
@@ -246,18 +246,18 @@ public class RegisterServiceSoapBindingImpl implements Register {
 	    Boolean isTeacher) throws java.rmi.RemoteException {
 	try {
 	    // authenticate external server
-	    ExtServerOrgMap serverMap = integrationService.getExtServerOrgMap(serverId);
-	    Authenticator.authenticate(serverMap, datetime, hash);
+	    ExtServer extServer = integrationService.getExtServer(serverId);
+	    Authenticator.authenticate(extServer, datetime, hash);
 
 	    // get group to use for this request
-	    ExtUserUseridMap userMap = integrationService.getExtUserUseridMap(serverMap, username);
-	    ExtCourseClassMap orgMap = integrationService.getExtCourseClassMap(serverMap, userMap, courseId, courseName,
+	    ExtUserUseridMap userMap = integrationService.getExtUserUseridMap(extServer, username);
+	    ExtCourseClassMap orgMap = integrationService.getExtCourseClassMap(extServer, userMap, courseId, courseName,
 		    countryIsoCode, langIsoCode, service.getRootOrganisation().getOrganisationId().toString(),
 		    isTeacher, false);
 	    Organisation group = orgMap.getOrganisation();
 
 	    // add user to subgroup, creating subgroup if necessary
-	    ExtCourseClassMap subOrgMap = integrationService.getExtCourseClassMap(serverMap, userMap, subgroupId,
+	    ExtCourseClassMap subOrgMap = integrationService.getExtCourseClassMap(extServer, userMap, subgroupId,
 		    subgroupName, countryIsoCode, langIsoCode, group.getOrganisationId().toString(), isTeacher, false);
 	    return true;
 	} catch (Exception e) {
@@ -284,12 +284,12 @@ public class RegisterServiceSoapBindingImpl implements Register {
 	    throws java.rmi.RemoteException {
 	try {
 	    // authenticate external server
-	    ExtServerOrgMap serverMap = integrationService.getExtServerOrgMap(serverId);
-	    Authenticator.authenticate(serverMap, datetime, hash);
+	    ExtServer extServer = integrationService.getExtServer(serverId);
+	    Authenticator.authenticate(extServer, datetime, hash);
 
 	    // get group to use for this request
-	    ExtUserUseridMap userMap = integrationService.getExtUserUseridMap(serverMap, username);
-	    ExtCourseClassMap orgMap = integrationService.getExtCourseClassMap(serverMap, userMap, courseId, courseName,
+	    ExtUserUseridMap userMap = integrationService.getExtUserUseridMap(extServer, username);
+	    ExtCourseClassMap orgMap = integrationService.getExtCourseClassMap(extServer, userMap, courseId, courseName,
 		    countryIsoCode, langIsoCode, service.getRootOrganisation().getOrganisationId().toString(), asStaff,
 		    false);
 	    Organisation org = orgMap.getOrganisation();
@@ -313,18 +313,18 @@ public class RegisterServiceSoapBindingImpl implements Register {
 	    String subgroupName, Boolean asStaff) throws java.rmi.RemoteException {
 	try {
 	    // authenticate external server
-	    ExtServerOrgMap serverMap = integrationService.getExtServerOrgMap(serverId);
-	    Authenticator.authenticate(serverMap, datetime, hash);
+	    ExtServer extServer = integrationService.getExtServer(serverId);
+	    Authenticator.authenticate(extServer, datetime, hash);
 
 	    // get group to use for this request
-	    ExtUserUseridMap userMap = integrationService.getExtUserUseridMap(serverMap, username);
-	    ExtCourseClassMap orgMap = integrationService.getExtCourseClassMap(serverMap, userMap, courseId, courseName,
+	    ExtUserUseridMap userMap = integrationService.getExtUserUseridMap(extServer, username);
+	    ExtCourseClassMap orgMap = integrationService.getExtCourseClassMap(extServer, userMap, courseId, courseName,
 		    countryIsoCode, langIsoCode, service.getRootOrganisation().getOrganisationId().toString(), asStaff,
 		    false);
 	    Organisation group = orgMap.getOrganisation();
 
 	    // get subgroup to add user to
-	    ExtCourseClassMap subOrgMap = integrationService.getExtCourseClassMap(serverMap, userMap, subgroupId,
+	    ExtCourseClassMap subOrgMap = integrationService.getExtCourseClassMap(extServer, userMap, subgroupId,
 		    subgroupName, countryIsoCode, langIsoCode, group.getOrganisationId().toString(), asStaff, false);
 	    Organisation subgroup = subOrgMap.getOrganisation();
 

@@ -34,7 +34,7 @@ import org.lamsfoundation.lams.gradebook.GradebookUserLesson;
 import org.lamsfoundation.lams.gradebook.service.IGradebookService;
 import org.lamsfoundation.lams.index.IndexLessonBean;
 import org.lamsfoundation.lams.integration.ExtCourseClassMap;
-import org.lamsfoundation.lams.integration.ExtServerOrgMap;
+import org.lamsfoundation.lams.integration.ExtServer;
 import org.lamsfoundation.lams.integration.ExtUserUseridMap;
 import org.lamsfoundation.lams.integration.UserInfoFetchException;
 import org.lamsfoundation.lams.integration.UserInfoValidationException;
@@ -366,10 +366,10 @@ public class LessonManagerServlet extends HttpServlet {
 	    boolean exportPortfolioEnable, boolean presenceEnable, boolean imEnable, boolean enableNotifications)
 	    throws RemoteException {
 	try {
-	    ExtServerOrgMap serverMap = integrationService.getExtServerOrgMap(serverId);
-	    Authenticator.authenticate(serverMap, datetime, username, hashValue);
-	    ExtUserUseridMap userMap = integrationService.getExtUserUseridMap(serverMap, username);
-	    ExtCourseClassMap orgMap = integrationService.getExtCourseClassMap(serverMap, userMap,
+	    ExtServer extServer = integrationService.getExtServer(serverId);
+	    Authenticator.authenticate(extServer, datetime, username, hashValue);
+	    ExtUserUseridMap userMap = integrationService.getExtUserUseridMap(extServer, username);
+	    ExtCourseClassMap orgMap = integrationService.getExtCourseClassMap(extServer, userMap,
 		    courseId, countryIsoCode, langIsoCode, null, LoginRequestDispatcher.METHOD_MONITOR);
 	    User user = userMap.getUser();
 	    Organisation organisation = orgMap.getOrganisation();
@@ -383,7 +383,7 @@ public class LessonManagerServlet extends HttpServlet {
 	    // 3. start lesson
 	    monitoringService.startLesson(lesson.getLessonId(), user.getUserId());
 	    // store information which extServer has started the lesson
-	    integrationService.createExtServerLessonMap(lesson.getLessonId(), serverMap);
+	    integrationService.createExtServerLessonMap(lesson.getLessonId(), extServer);
 
 	    return lesson.getLessonId();
 	} catch (Exception e) {
@@ -396,10 +396,10 @@ public class LessonManagerServlet extends HttpServlet {
 	    String customCSV, boolean exportPortfolioEnable, boolean presenceEnable, boolean imEnable,
 	    boolean enableNotifications) throws RemoteException {
 	try {
-	    ExtServerOrgMap serverMap = LessonManagerServlet.integrationService.getExtServerOrgMap(serverId);
-	    Authenticator.authenticate(serverMap, datetime, username, hashValue);
-	    ExtUserUseridMap userMap = LessonManagerServlet.integrationService.getExtUserUseridMap(serverMap, username);
-	    ExtCourseClassMap orgMap = LessonManagerServlet.integrationService.getExtCourseClassMap(serverMap, userMap,
+	    ExtServer extServer = LessonManagerServlet.integrationService.getExtServer(serverId);
+	    Authenticator.authenticate(extServer, datetime, username, hashValue);
+	    ExtUserUseridMap userMap = LessonManagerServlet.integrationService.getExtUserUseridMap(extServer, username);
+	    ExtCourseClassMap orgMap = LessonManagerServlet.integrationService.getExtCourseClassMap(extServer, userMap,
 		    courseId, countryIsoCode, langIsoCode, null, LoginRequestDispatcher.METHOD_MONITOR);
 	    // 1. init lesson
 	    Lesson lesson = LessonManagerServlet.monitoringService.initializeLesson(title, desc, ldId,
@@ -421,13 +421,13 @@ public class LessonManagerServlet extends HttpServlet {
     private Long cloneLesson(String serverId, String datetime, String hashValue, String username, long lsId,
 	    String courseId, String countryIsoCode, String langIsoCode) throws RemoteException {
 	try {
-	    ExtServerOrgMap serverMap = LessonManagerServlet.integrationService.getExtServerOrgMap(serverId);
-	    Authenticator.authenticate(serverMap, datetime, username, hashValue);
+	    ExtServer extServer = LessonManagerServlet.integrationService.getExtServer(serverId);
+	    Authenticator.authenticate(extServer, datetime, username, hashValue);
 
-	    ExtUserUseridMap userMap = LessonManagerServlet.integrationService.getExtUserUseridMap(serverMap, username);
+	    ExtUserUseridMap userMap = LessonManagerServlet.integrationService.getExtUserUseridMap(extServer, username);
 	    Integer creatorId = userMap.getUser().getUserId();
 
-	    ExtCourseClassMap orgMap = LessonManagerServlet.integrationService.getExtCourseClassMap(serverMap, userMap,
+	    ExtCourseClassMap orgMap = LessonManagerServlet.integrationService.getExtCourseClassMap(extServer, userMap,
 		    courseId, countryIsoCode, langIsoCode, null, LoginRequestDispatcher.METHOD_MONITOR);
 	    if (orgMap == null) {
 		LessonManagerServlet.log.debug("No course exists for: " + courseId + ". Can't delete any lessons.");
@@ -439,7 +439,7 @@ public class LessonManagerServlet extends HttpServlet {
 	    Long newLessonId = LessonManagerServlet.monitoringService.cloneLesson(lsId, creatorId, true, true, null,
 		    null, organisation);
 	    // store information which extServer has started the lesson
-	    LessonManagerServlet.integrationService.createExtServerLessonMap(newLessonId, serverMap);
+	    LessonManagerServlet.integrationService.createExtServerLessonMap(newLessonId, extServer);
 
 	    return newLessonId;
 	} catch (Exception e) {
@@ -451,14 +451,14 @@ public class LessonManagerServlet extends HttpServlet {
     private Element getAllStudentProgress(Document document, String serverId, String datetime, String hashValue,
 	    String username, long lsId, String courseID) throws RemoteException {
 	try {
-	    ExtServerOrgMap serverMap = LessonManagerServlet.integrationService.getExtServerOrgMap(serverId);
-	    Authenticator.authenticate(serverMap, datetime, username, hashValue);
+	    ExtServer extServer = LessonManagerServlet.integrationService.getExtServer(serverId);
+	    Authenticator.authenticate(extServer, datetime, username, hashValue);
 	    Lesson lesson = LessonManagerServlet.lessonService.getLesson(lsId);
 
 	    Element element = document.createElement(CentralConstants.ELEM_LESSON_PROGRESS);
 	    element.setAttribute(CentralConstants.ATTR_LESSON_ID, "" + lsId);
 
-	    String prefix = serverMap.getPrefix();
+	    String prefix = extServer.getPrefix();
 	    if (lesson != null) {
 
 		int activitiesTotal = lesson.getLearningDesign().getActivities().size();
@@ -469,7 +469,7 @@ public class LessonManagerServlet extends HttpServlet {
 
 		    // get the username with the integration prefix removed
 		    String userNoPrefixName = learnerProgress.getUserName().substring(prefix.length() + 1);
-		    ExtUserUseridMap learnerMap = LessonManagerServlet.integrationService.getExtUserUseridMap(serverMap,
+		    ExtUserUseridMap learnerMap = LessonManagerServlet.integrationService.getExtUserUseridMap(extServer,
 			    userNoPrefixName);
 
 		    Element learnerProgElem = document.createElement(CentralConstants.ELEM_LEARNER_PROGRESS);
@@ -510,8 +510,8 @@ public class LessonManagerServlet extends HttpServlet {
 	    String username, String firstName, String lastName, String language, String country, String email,
 	    long lsId, String courseID) throws RemoteException {
 	try {
-	    ExtServerOrgMap serverMap = LessonManagerServlet.integrationService.getExtServerOrgMap(serverId);
-	    Authenticator.authenticate(serverMap, datetime, username, hashValue);
+	    ExtServer extServer = LessonManagerServlet.integrationService.getExtServer(serverId);
+	    Authenticator.authenticate(extServer, datetime, username, hashValue);
 	    Lesson lesson = LessonManagerServlet.lessonService.getLesson(lsId);
 
 	    Element element = document.createElement(CentralConstants.ELEM_LESSON_PROGRESS);
@@ -524,7 +524,7 @@ public class LessonManagerServlet extends HttpServlet {
 		final boolean usePrefix = true;
 		final boolean isUpdateUserDetails = false;
 		ExtUserUseridMap userMap = LessonManagerServlet.integrationService.getImplicitExtUserUseridMap(
-			serverMap, username, firstName, lastName, language, country, email, usePrefix,
+			extServer, username, firstName, lastName, language, country, email, usePrefix,
 			isUpdateUserDetails);
 
 		LearnerProgress learnProg = LessonManagerServlet.lessonService
@@ -583,9 +583,9 @@ public class LessonManagerServlet extends HttpServlet {
     private boolean removeLesson(String serverId, String datetime, String hashValue, String username, long lsId)
 	    throws RemoteException {
 	try {
-	    ExtServerOrgMap serverMap = LessonManagerServlet.integrationService.getExtServerOrgMap(serverId);
-	    Authenticator.authenticate(serverMap, datetime, username, hashValue);
-	    ExtUserUseridMap userMap = LessonManagerServlet.integrationService.getExtUserUseridMap(serverMap, username);
+	    ExtServer extServer = LessonManagerServlet.integrationService.getExtServer(serverId);
+	    Authenticator.authenticate(extServer, datetime, username, hashValue);
+	    ExtUserUseridMap userMap = LessonManagerServlet.integrationService.getExtUserUseridMap(extServer, username);
 	    LessonManagerServlet.monitoringService.removeLesson(lsId, userMap.getUser().getUserId());
 	    return true;
 	} catch (Exception e) {
@@ -601,13 +601,13 @@ public class LessonManagerServlet extends HttpServlet {
 	// Create the root node of the xml document
 	Element lessonsElement = document.createElement("Lessons");
 
-	ExtServerOrgMap serverMap = LessonManagerServlet.integrationService.getExtServerOrgMap(serverId);
-	Authenticator.authenticate(serverMap, datetime, username, hashValue);
+	ExtServer extServer = LessonManagerServlet.integrationService.getExtServer(serverId);
+	Authenticator.authenticate(extServer, datetime, username, hashValue);
 
-	ExtUserUseridMap userMap = LessonManagerServlet.integrationService.getExtUserUseridMap(serverMap, username);
+	ExtUserUseridMap userMap = LessonManagerServlet.integrationService.getExtUserUseridMap(extServer, username);
 
 	// find all lesons in organisation
-	ExtCourseClassMap orgMap = LessonManagerServlet.integrationService.getExtCourseClassMap(serverMap.getSid(),
+	ExtCourseClassMap orgMap = LessonManagerServlet.integrationService.getExtCourseClassMap(extServer.getSid(),
 		courseId);
 	if (orgMap == null) {
 	    LessonManagerServlet.log.debug("No course exists for: " + courseId + ". Can't delete any lessons.");
@@ -643,11 +643,11 @@ public class LessonManagerServlet extends HttpServlet {
 	// Create the root node of the xml document
 	Element usersElement = document.createElement("Users");
 
-	ExtServerOrgMap serverMap = LessonManagerServlet.integrationService.getExtServerOrgMap(serverId);
-	Authenticator.authenticate(serverMap, datetime, username, hashValue);
+	ExtServer extServer = LessonManagerServlet.integrationService.getExtServer(serverId);
+	Authenticator.authenticate(extServer, datetime, username, hashValue);
 
 	// check is user monitor
-	ExtUserUseridMap monitorMap = LessonManagerServlet.integrationService.getExtUserUseridMap(serverMap, username);
+	ExtUserUseridMap monitorMap = LessonManagerServlet.integrationService.getExtUserUseridMap(extServer, username);
 	LessonManagerServlet.securityService.isLessonMonitor(lsId, monitorMap.getUser().getUserId(), "remove user",
 		true);
 
@@ -655,7 +655,7 @@ public class LessonManagerServlet extends HttpServlet {
 	String[] extUsernames = (userIds != null) ? userIds.split(",") : new String[0];
 	for (String extUsername : extUsernames) {
 
-	    ExtUserUseridMap userMap = LessonManagerServlet.integrationService.getExtUserUseridMap(serverMap,
+	    ExtUserUseridMap userMap = LessonManagerServlet.integrationService.getExtUserUseridMap(extServer,
 		    extUsername);
 	    Integer userId = userMap.getUser().getUserId();
 	    // remove user
@@ -679,11 +679,11 @@ public class LessonManagerServlet extends HttpServlet {
 	// Create the root node of the xml document
 	Element usersElement = document.createElement("Users");
 
-	ExtServerOrgMap serverMap = LessonManagerServlet.integrationService.getExtServerOrgMap(serverId);
-	Authenticator.authenticate(serverMap, datetime, username, hashValue);
+	ExtServer extServer = LessonManagerServlet.integrationService.getExtServer(serverId);
+	Authenticator.authenticate(extServer, datetime, username, hashValue);
 
 	// check is user monitor
-	ExtUserUseridMap monitorMap = LessonManagerServlet.integrationService.getExtUserUseridMap(serverMap, username);
+	ExtUserUseridMap monitorMap = LessonManagerServlet.integrationService.getExtUserUseridMap(extServer, username);
 	LessonManagerServlet.securityService.isLessonMonitor(lsId, monitorMap.getUser().getUserId(), "remove all users",
 		true);
 
@@ -713,10 +713,10 @@ public class LessonManagerServlet extends HttpServlet {
 	    boolean presenceEnable, boolean imEnable) throws RemoteException {
 
 	try {
-	    ExtServerOrgMap serverMap = LessonManagerServlet.integrationService.getExtServerOrgMap(serverId);
-	    Authenticator.authenticate(serverMap, datetime, username, hashValue);
-	    ExtUserUseridMap userMap = LessonManagerServlet.integrationService.getExtUserUseridMap(serverMap, username);
-	    ExtCourseClassMap orgMap = LessonManagerServlet.integrationService.getExtCourseClassMap(serverMap, userMap,
+	    ExtServer extServer = LessonManagerServlet.integrationService.getExtServer(serverId);
+	    Authenticator.authenticate(extServer, datetime, username, hashValue);
+	    ExtUserUseridMap userMap = LessonManagerServlet.integrationService.getExtUserUseridMap(extServer, username);
+	    ExtCourseClassMap orgMap = LessonManagerServlet.integrationService.getExtCourseClassMap(extServer, userMap,
 		    courseId, countryIsoCode, langIsoCode, null, LoginRequestDispatcher.METHOD_MONITOR);
 	    Integer userId = userMap.getUser().getUserId();
 
@@ -748,11 +748,11 @@ public class LessonManagerServlet extends HttpServlet {
 	Integer workspaceFolderUid = null;
 	ExtUserUseridMap userMap;
 	User user = null;
-	ExtServerOrgMap serverMap = LessonManagerServlet.integrationService.getExtServerOrgMap(serverId);
+	ExtServer extServer = LessonManagerServlet.integrationService.getExtServer(serverId);
 
 	try {
 
-	    userMap = LessonManagerServlet.integrationService.getExtUserUseridMap(serverMap, username);
+	    userMap = LessonManagerServlet.integrationService.getExtUserUseridMap(extServer, username);
 
 	    user = userMap.getUser();
 
@@ -892,9 +892,9 @@ public class LessonManagerServlet extends HttpServlet {
 	    try {
 
 		// get Server map
-		ExtServerOrgMap serverMap = LessonManagerServlet.integrationService.getExtServerOrgMap(serverId);
+		ExtServer extServer = LessonManagerServlet.integrationService.getExtServer(serverId);
 		// authenticate
-		Authenticator.authenticate(serverMap, datetime, requestorUsername, hashValue);
+		Authenticator.authenticate(extServer, datetime, requestorUsername, hashValue);
 
 		String[] learnerIdArray = (learnerIds != null) ? learnerIds.split(",") : new String[0];
 		String[] monitorIdArray = (monitorIds != null) ? monitorIds.split(",") : new String[0];
@@ -927,7 +927,7 @@ public class LessonManagerServlet extends HttpServlet {
 		    }
 
 		    if (StringUtils.isNotBlank(userName)) {
-			addUserToLesson(request, serverMap, LoginRequestDispatcher.METHOD_LEARNER, lsIdStr, userName,
+			addUserToLesson(request, extServer, LoginRequestDispatcher.METHOD_LEARNER, lsIdStr, userName,
 				firstName, lastName, email, courseId, countryIsoCode, langIsoCode);
 		    }
 		    i++;
@@ -944,7 +944,7 @@ public class LessonManagerServlet extends HttpServlet {
 		    }
 
 		    if (StringUtils.isNotBlank(userName)) {
-			addUserToLesson(request, serverMap, LoginRequestDispatcher.METHOD_MONITOR, lsIdStr, userName,
+			addUserToLesson(request, extServer, LoginRequestDispatcher.METHOD_MONITOR, lsIdStr, userName,
 				firstName, lastName, email, courseId, countryIsoCode, langIsoCode);
 		    }
 		    i++;
@@ -963,7 +963,7 @@ public class LessonManagerServlet extends HttpServlet {
 	    }
 	}
 
-	private void addUserToLesson(HttpServletRequest request, ExtServerOrgMap serverMap, String method,
+	private void addUserToLesson(HttpServletRequest request, ExtServer extServer, String method,
 		String lsIdStr, String username, String firstName, String lastName, String email, String courseId,
 		String countryIsoCode, String langIsoCode) throws UserInfoFetchException, UserInfoValidationException {
 
@@ -974,18 +974,18 @@ public class LessonManagerServlet extends HttpServlet {
 
 	    ExtUserUseridMap userMap = null;
 	    if ((firstName == null) && (lastName == null)) {
-		userMap = LessonManagerServlet.integrationService.getExtUserUseridMap(serverMap, username);
+		userMap = LessonManagerServlet.integrationService.getExtUserUseridMap(extServer, username);
 	    } else {
 		final boolean usePrefix = true;
 		final boolean isUpdateUserDetails = false;
-		userMap = LessonManagerServlet.integrationService.getImplicitExtUserUseridMap(serverMap, username,
+		userMap = LessonManagerServlet.integrationService.getImplicitExtUserUseridMap(extServer, username,
 			firstName, lastName, langIsoCode, countryIsoCode, email, usePrefix, isUpdateUserDetails);
 	    }
 
-	    // ExtUserUseridMap userMap = LessonManagerServlet.integrationService.getExtUserUseridMap(serverMap,
+	    // ExtUserUseridMap userMap = LessonManagerServlet.integrationService.getExtUserUseridMap(extServer,
 	    // username);
 	    // adds user to group
-	    ExtCourseClassMap orgMap = LessonManagerServlet.integrationService.getExtCourseClassMap(serverMap, userMap,
+	    ExtCourseClassMap orgMap = LessonManagerServlet.integrationService.getExtCourseClassMap(extServer, userMap,
 		    courseId, countryIsoCode, langIsoCode, null, method);
 
 	    if (LessonManagerServlet.lessonService == null) {
@@ -1029,13 +1029,13 @@ public class LessonManagerServlet extends HttpServlet {
     private Element getGradebookMarks(Document document, String serverId, String datetime, String hashValue,
 	    String username, Long lessonIdParam, String courseId, String outputsUser) throws Exception {
 
-	ExtServerOrgMap serverMap = LessonManagerServlet.integrationService.getExtServerOrgMap(serverId);
-	Authenticator.authenticate(serverMap, datetime, username, hashValue);
+	ExtServer extServer = LessonManagerServlet.integrationService.getExtServer(serverId);
+	Authenticator.authenticate(extServer, datetime, username, hashValue);
 
 	List<Lesson> lessons = new LinkedList<Lesson>();
 	if (courseId != null) {
 
-	    ExtCourseClassMap orgMap = LessonManagerServlet.integrationService.getExtCourseClassMap(serverMap.getSid(),
+	    ExtCourseClassMap orgMap = LessonManagerServlet.integrationService.getExtCourseClassMap(extServer.getSid(),
 		    courseId);
 	    if (orgMap == null) {
 		LessonManagerServlet.log
@@ -1076,7 +1076,7 @@ public class LessonManagerServlet extends HttpServlet {
 	    if (outputsUser != null) {
 
 		ExtUserUseridMap userMap = LessonManagerServlet.integrationService
-			.getExistingExtUserUseridMap(serverMap, outputsUser);
+			.getExistingExtUserUseridMap(extServer, outputsUser);
 		if (userMap == null) {
 		    throw new Exception("No user exists for: " + outputsUser + ". Cannot get tool outputs report.");
 		}
@@ -1097,7 +1097,7 @@ public class LessonManagerServlet extends HttpServlet {
 	    }
 
 	    List<ExtUserUseridMap> allUsers = LessonManagerServlet.integrationService
-		    .getExtUserUseridMapByServerMap(serverMap);
+		    .getExtUserUseridMapByExtServer(extServer);
 
 	    for (GradebookUserLesson gradebookUserLesson : gradebookUserLessons) {
 		Integer userId = gradebookUserLesson.getLearner().getUserId();
@@ -1113,7 +1113,7 @@ public class LessonManagerServlet extends HttpServlet {
 
 		if (extUser == null) {
 		    throw new Exception(
-			    "User with userId: " + userId + " doesn't belong to extServer: " + serverMap.getSid());
+			    "User with userId: " + userId + " doesn't belong to extServer: " + extServer.getSid());
 		}
 
 		Element learnerElement = document.createElement("Learner");
@@ -1152,8 +1152,8 @@ public class LessonManagerServlet extends HttpServlet {
 	    String username, Long lessonId, String courseID, boolean isAuthoredToolOutputs, String outputsUser)
 	    throws Exception {
 
-	ExtServerOrgMap serverMap = LessonManagerServlet.integrationService.getExtServerOrgMap(serverId);
-	Authenticator.authenticate(serverMap, datetime, username, hashValue);
+	ExtServer extServer = LessonManagerServlet.integrationService.getExtServer(serverId);
+	Authenticator.authenticate(extServer, datetime, username, hashValue);
 
 	Lesson lesson = LessonManagerServlet.lessonService.getLesson(lessonId);
 	if (lesson == null) {
@@ -1168,7 +1168,7 @@ public class LessonManagerServlet extends HttpServlet {
 	// if outputsUser is null we build results for the whole lesson, otherwise - for the specified learner
 	if (outputsUser != null) {
 
-	    ExtUserUseridMap userMap = LessonManagerServlet.integrationService.getExistingExtUserUseridMap(serverMap,
+	    ExtUserUseridMap userMap = LessonManagerServlet.integrationService.getExistingExtUserUseridMap(extServer,
 		    outputsUser);
 	    if (userMap == null) {
 		// TODO: handle this error instead of throwing an exception
@@ -1210,7 +1210,7 @@ public class LessonManagerServlet extends HttpServlet {
 
 	    Element learnerElement = document.createElement("LearnerOutput");
 
-	    String userNoPrefixName = learner.getLogin().substring(serverMap.getPrefix().length() + 1);
+	    String userNoPrefixName = learner.getLogin().substring(extServer.getPrefix().length() + 1);
 	    learnerElement.setAttribute("userName", userNoPrefixName);
 	    learnerElement.setAttribute("lamsUserName", learner.getLogin());
 	    learnerElement.setAttribute("lamsUserId", learner.getUserId().toString());
@@ -1294,8 +1294,8 @@ public class LessonManagerServlet extends HttpServlet {
      */
     private boolean verify(String serverId, String datetime, String hash) throws Exception {
 	try {
-	    ExtServerOrgMap serverMap = LessonManagerServlet.integrationService.getExtServerOrgMap(serverId);
-	    Authenticator.authenticate(serverMap, datetime, hash);
+	    ExtServer extServer = LessonManagerServlet.integrationService.getExtServer(serverId);
+	    Authenticator.authenticate(extServer, datetime, hash);
 	    return true;
 	} catch (Exception e) {
 	    LessonManagerServlet.log.error("Problem verifying external server: " + serverId, e);
@@ -1451,12 +1451,12 @@ public class LessonManagerServlet extends HttpServlet {
      */
     private Element getLessonMonitorList(Document document, String serverId, String datetime, String hashValue,
 	    String username, String courseID, String countryIsoCode, String langIsoCode) throws Exception {
-	ExtServerOrgMap serverMap = LessonManagerServlet.integrationService.getExtServerOrgMap(serverId);
-	Authenticator.authenticate(serverMap, datetime, username, hashValue);
+	ExtServer extServer = LessonManagerServlet.integrationService.getExtServer(serverId);
+	Authenticator.authenticate(extServer, datetime, username, hashValue);
 
-	ExtUserUseridMap userMap = LessonManagerServlet.integrationService.getExistingExtUserUseridMap(serverMap,
+	ExtUserUseridMap userMap = LessonManagerServlet.integrationService.getExistingExtUserUseridMap(extServer,
 		username);
-	ExtCourseClassMap orgMap = LessonManagerServlet.integrationService.getExtCourseClassMap(serverMap, userMap,
+	ExtCourseClassMap orgMap = LessonManagerServlet.integrationService.getExtCourseClassMap(extServer, userMap,
 		courseID, countryIsoCode, langIsoCode, null, LoginRequestDispatcher.METHOD_MONITOR);
 	Organisation organisation = orgMap.getOrganisation();
 

@@ -34,12 +34,12 @@ public class ExtServerToolAdapterMap {
 
     private Long uid;
     private Tool tool;
-    private ExtServerOrgMap extServer;
+    private ExtServer extServer;
 
     public ExtServerToolAdapterMap() {
     }
 
-    public ExtServerToolAdapterMap(Tool tool, ExtServerOrgMap extServer) {
+    public ExtServerToolAdapterMap(Tool tool, ExtServer extServer) {
 	this.tool = tool;
 	this.extServer = extServer;
     }
@@ -74,11 +74,11 @@ public class ExtServerToolAdapterMap {
      * @hibernate.column name="ext_server_org_map_id"
      *
      */
-    public ExtServerOrgMap getExtServer() {
+    public ExtServer getExtServer() {
 	return extServer;
     }
 
-    public void setExtServer(ExtServerOrgMap extServer) {
+    public void setExtServer(ExtServer extServer) {
 	this.extServer = extServer;
     }
 }

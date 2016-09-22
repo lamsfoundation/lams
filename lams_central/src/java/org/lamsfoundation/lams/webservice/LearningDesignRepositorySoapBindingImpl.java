@@ -35,7 +35,7 @@ import org.apache.axis.MessageContext;
 import org.apache.axis.transport.http.HTTPConstants;
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.contentrepository.RepositoryCheckedException;
-import org.lamsfoundation.lams.integration.ExtServerOrgMap;
+import org.lamsfoundation.lams.integration.ExtServer;
 import org.lamsfoundation.lams.integration.ExtUserUseridMap;
 import org.lamsfoundation.lams.integration.security.Authenticator;
 import org.lamsfoundation.lams.integration.service.IntegrationService;
@@ -162,10 +162,10 @@ public class LearningDesignRepositorySoapBindingImpl implements LearningDesignRe
     public String getLearningDesigns(String serverId, String datetime, String hashValue, String username,
 	    String courseId, Integer mode, String country, String lang) throws RemoteException {
 	try {
-	    ExtServerOrgMap serverMap = integrationService.getExtServerOrgMap(serverId);
-	    Authenticator.authenticate(serverMap, datetime, username, hashValue);
-	    ExtUserUseridMap userMap = integrationService.getExtUserUseridMap(serverMap, username);
-	    integrationService.getExtCourseClassMap(serverMap, userMap, courseId, country, lang, null,
+	    ExtServer extServer = integrationService.getExtServer(serverId);
+	    Authenticator.authenticate(extServer, datetime, username, hashValue);
+	    ExtUserUseridMap userMap = integrationService.getExtUserUseridMap(extServer, username);
+	    integrationService.getExtCourseClassMap(extServer, userMap, courseId, country, lang, null,
 		    LoginRequestDispatcher.METHOD_MONITOR);
 	    return buildContentTree(userMap.getUser().getUserId(), mode).toString();
 	} catch (Exception e) {

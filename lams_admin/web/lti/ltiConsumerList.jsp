@@ -22,7 +22,6 @@
 		<th><fmt:message key="sysadmin.serverdesc" /></th>
 		<th><fmt:message key="sysadmin.prefix" /></th>
 		<th><fmt:message key="sysadmin.disabled" /></th>
-		<th><fmt:message key="sysadmin.organisation" /></th>
 		<th><fmt:message key="admin.actions"/></th>
 	</tr>
 	
@@ -43,7 +42,6 @@
 					</c:otherwise>
 				</c:choose>
 			</td>
-			<td><c:out value="${ltiConsumer.organisation.name}" /></td>
 			<td>
 				<a href="ltiConsumerManagement.do?method=edit&sid=<c:out value='${ltiConsumer.sid}' />">
 					<fmt:message key="admin.edit" />

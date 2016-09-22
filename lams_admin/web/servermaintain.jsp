@@ -69,17 +69,6 @@
 		<td><fmt:message key="sysadmin.login.request.ttl" />:</td>
 		<td><html:text property="timeToLiveLoginRequest" size="10" styleId="ttl-login-request"/></td>
 	</tr>
-	
-	<logic:notEqual name="ServerOrgMapForm" property="orgId" value="-1">
-		<tr>
-			<td><fmt:message key="sysadmin.organisation" />:</td>
-			<td>
-				<html:select property="orgId" >
-					<html:options collection="orgs" property="organisationId" labelProperty="name"/> 
-				</html:select> &nbsp; 
-			</td>
-		</tr>
-	</logic:notEqual>
 	<tr>
 		<td><fmt:message key="sysadmin.userinfoUrl" />:</td>
 		<td><html:text property="userinfoUrl" size="70"/> *</td>
@@ -115,12 +104,7 @@
 </div>
 </html:form>
 
-<script type="text/javascript" language="javascript">
-	function changeStatus(obj){
-		document.forms[0].orgId.disabled = obj.checked;
-		document.forms[0].orgName.disabled = !obj.checked;
-	}
-	
+<script type="text/javascript">	
 	$(document).ready(function(){
 		$("#ttl-login-request-enabled").click(function(){
 			$('#ttl-login-request-wrap').toggle('slow');

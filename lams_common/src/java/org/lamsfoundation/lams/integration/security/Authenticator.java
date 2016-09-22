@@ -25,7 +25,7 @@ package org.lamsfoundation.lams.integration.security;
 
 import java.util.Date;
 
-import org.lamsfoundation.lams.integration.ExtServerOrgMap;
+import org.lamsfoundation.lams.integration.ExtServer;
 import org.lamsfoundation.lams.util.HashUtil;
 
 /**
@@ -47,7 +47,7 @@ public class Authenticator {
      * @param hashValue
      * @throws AuthenticationException
      */
-    public static void authenticate(ExtServerOrgMap map, String datetime, String username, String method,
+    public static void authenticate(ExtServer map, String datetime, String username, String method,
 	    String hashValue) throws AuthenticationException {
 
 	if (map == null) {
@@ -75,7 +75,7 @@ public class Authenticator {
      * @param hashValue
      * @throws AuthenticationException
      */
-    public static void authenticateLoginRequest(ExtServerOrgMap map, String datetime, String username, String method,
+    public static void authenticateLoginRequest(ExtServer map, String datetime, String username, String method,
 	    String lsid, String hashValue) throws AuthenticationException {
 
 	if (map == null) {
@@ -114,7 +114,7 @@ public class Authenticator {
 	Authenticator.checkHash(plaintext, hashValue);
     }
 
-    public static void authenticate(ExtServerOrgMap map, String datetime, String username, String hashValue)
+    public static void authenticate(ExtServer map, String datetime, String username, String hashValue)
 	    throws AuthenticationException {
 	if (map == null) {
 	    throw new AuthenticationException("The third party server is not configured on LAMS server");
@@ -128,7 +128,7 @@ public class Authenticator {
 	Authenticator.checkHash(plaintext, hashValue);
     }
 
-    public static void authenticate(ExtServerOrgMap map, String datetime, String hashValue)
+    public static void authenticate(ExtServer map, String datetime, String hashValue)
 	    throws AuthenticationException {
 	if (map == null) {
 	    throw new AuthenticationException("The third party server is not configured on LAMS server");

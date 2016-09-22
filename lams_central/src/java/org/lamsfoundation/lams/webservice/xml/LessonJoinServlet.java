@@ -47,7 +47,7 @@ import javax.xml.transform.stream.StreamResult;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
-import org.lamsfoundation.lams.integration.ExtServerOrgMap;
+import org.lamsfoundation.lams.integration.ExtServer;
 import org.lamsfoundation.lams.integration.security.AuthenticationException;
 import org.lamsfoundation.lams.integration.security.Authenticator;
 import org.lamsfoundation.lams.integration.service.IntegrationService;
@@ -148,8 +148,8 @@ public class LessonJoinServlet extends HttpServlet {
 	    }
 
 	    // authenticate integrated server
-	    ExtServerOrgMap serverMap = LessonJoinServlet.integrationService.getExtServerOrgMap(serverId);
-	    Authenticator.authenticate(serverMap, datetime, hashValue);
+	    ExtServer extServer = LessonJoinServlet.integrationService.getExtServer(serverId);
+	    Authenticator.authenticate(extServer, datetime, hashValue);
 
 	    User user = LessonJoinServlet.userService.getUserByLogin(username);
 	    if (user != null) {

@@ -36,7 +36,7 @@ import org.apache.log4j.Logger;
 import org.apache.tomcat.util.json.JSONException;
 import org.apache.tomcat.util.json.JSONObject;
 import org.lamsfoundation.lams.authoring.service.IAuthoringService;
-import org.lamsfoundation.lams.integration.ExtServerOrgMap;
+import org.lamsfoundation.lams.integration.ExtServer;
 import org.lamsfoundation.lams.integration.ExtUserUseridMap;
 import org.lamsfoundation.lams.integration.UserInfoFetchException;
 import org.lamsfoundation.lams.integration.UserInfoValidationException;
@@ -77,16 +77,16 @@ public abstract class RestServlet extends HttpServlet {
 	User user = null;
 	try {
 	    String serverName = authenticationJSON.getString(LoginRequestDispatcher.PARAM_SERVER_ID);
-	    ExtServerOrgMap serverMap = getIntegrationService().getExtServerOrgMap(serverName);
+	    ExtServer extServer = getIntegrationService().getExtServer(serverName);
 	    String userName = authenticationJSON.getString(LoginRequestDispatcher.PARAM_USER_ID);
 	    String method = authenticationJSON.getString(LoginRequestDispatcher.PARAM_METHOD).toLowerCase();
 	    String timestamp = authenticationJSON.getString(LoginRequestDispatcher.PARAM_TIMESTAMP);
 	    String hash = authenticationJSON.getString(LoginRequestDispatcher.PARAM_HASH);
 
 	    // Throws AuthenticationException if it fails
-	    Authenticator.authenticateLoginRequest(serverMap, timestamp, userName, method, null, hash);
+	    Authenticator.authenticateLoginRequest(extServer, timestamp, userName, method, null, hash);
 
-	    ExtUserUseridMap userMap = getIntegrationService().getExtUserUseridMap(serverMap, userName);
+	    ExtUserUseridMap userMap = getIntegrationService().getExtUserUseridMap(extServer, userName);
 	    user = userMap.getUser();
 	    // get concrete user
 	    user = (User) getUserManagementService().findById(User.class, user.getUserId());

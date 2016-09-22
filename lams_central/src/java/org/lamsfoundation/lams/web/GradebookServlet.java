@@ -31,7 +31,7 @@ import javax.servlet.http.HttpSession;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.integration.ExtCourseClassMap;
-import org.lamsfoundation.lams.integration.ExtServerOrgMap;
+import org.lamsfoundation.lams.integration.ExtServer;
 import org.lamsfoundation.lams.integration.ExtUserUseridMap;
 import org.lamsfoundation.lams.integration.UserInfoFetchException;
 import org.lamsfoundation.lams.integration.UserInfoValidationException;
@@ -96,11 +96,11 @@ public class GradebookServlet extends HttpServlet {
 		|| ((lessonId == null) && (extCourseId == null))) {
 	    response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Gradebook request failed - invalid parameters");
 	} else {
-	    ExtServerOrgMap serverMap = getIntegrationService().getExtServerOrgMap(serverId);
+	    ExtServer extServer = getIntegrationService().getExtServer(serverId);
 	    try {
 		// if request comes from LoginRequest, method parameter was meaningful there
 		// if it's a direct call, it can be anything
-		Authenticator.authenticate(serverMap, timestamp, username, method, hash);
+		Authenticator.authenticate(extServer, timestamp, username, method, hash);
 		boolean isTeacher = StringUtils.equals(method, LoginRequestDispatcher.METHOD_AUTHOR)
 			|| StringUtils.equals(method, LoginRequestDispatcher.METHOD_MONITOR);
 
@@ -109,8 +109,8 @@ public class GradebookServlet extends HttpServlet {
 			    : GradebookServlet.GRADEBOOK_LEARNER_ORGANISATION_URL;
 
 		    // translate external course ID to internal organisation ID and then get the gradebook for it
-		    ExtUserUseridMap userMap = getIntegrationService().getExtUserUseridMap(serverMap, username);
-		    ExtCourseClassMap orgMap = getIntegrationService().getExtCourseClassMap(serverMap, userMap,
+		    ExtUserUseridMap userMap = getIntegrationService().getExtUserUseridMap(extServer, username);
+		    ExtCourseClassMap orgMap = getIntegrationService().getExtCourseClassMap(extServer, userMap,
 			    extCourseId, courseName, countryIsoCode, langIsoCode,
 			    getUserManagementService().getRootOrganisation().getOrganisationId().toString(), isTeacher,
 			    false);

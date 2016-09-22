@@ -21,7 +21,7 @@ import org.imsglobal.lti.BasicLTIConstants;
 import org.lamsfoundation.lams.contentrepository.RepositoryCheckedException;
 import org.lamsfoundation.lams.integration.ExtCourseClassMap;
 import org.lamsfoundation.lams.integration.ExtServerLessonMap;
-import org.lamsfoundation.lams.integration.ExtServerOrgMap;
+import org.lamsfoundation.lams.integration.ExtServer;
 import org.lamsfoundation.lams.integration.ExtUserUseridMap;
 import org.lamsfoundation.lams.integration.UserInfoFetchException;
 import org.lamsfoundation.lams.integration.UserInfoValidationException;
@@ -92,10 +92,10 @@ public class LtiAction extends LamsDispatchAction {
 	
 	//update lessonFinishCallbackUrl. We store it one time during the very first call to LAMS and it stays the same all the time afterwards
 	String lessonFinishCallbackUrl = request.getParameter(BasicLTIConstants.LIS_OUTCOME_SERVICE_URL);
-	ExtServerOrgMap serverMap = integrationService.getExtServerOrgMap(consumerKey);
-	if (StringUtils.isNotBlank(lessonFinishCallbackUrl) && StringUtils.isBlank(serverMap.getLessonFinishUrl())) {
-	    serverMap.setLessonFinishUrl(lessonFinishCallbackUrl);
-	    userManagementService.save(serverMap);
+	ExtServer extServer = integrationService.getExtServer(consumerKey);
+	if (StringUtils.isNotBlank(lessonFinishCallbackUrl) && StringUtils.isBlank(extServer.getLessonFinishUrl())) {
+	    extServer.setLessonFinishUrl(lessonFinishCallbackUrl);
+	    userManagementService.save(extServer);
 	}
 
 	//check if learner tries to access the link that hasn't been authored by teacher yet
@@ -116,7 +116,7 @@ public class LtiAction extends LamsDispatchAction {
 	} else {
 
 	    //as per LTI spec we need to update tool consumer's gradebook id on every LTI call 
-	    ExtUserUseridMap extUserMap = integrationService.getExistingExtUserUseridMap(serverMap, extUserId);
+	    ExtUserUseridMap extUserMap = integrationService.getExistingExtUserUseridMap(extServer, extUserId);
 	    extUserMap.setTcGradebookId(tcGradebookId);
 	    userManagementService.save(extUserMap);
 
@@ -140,8 +140,8 @@ public class LtiAction extends LamsDispatchAction {
 	String resourceLinkTitle = request.getParameter(BasicLTIConstants.RESOURCE_LINK_TITLE);
 	String resourceLinkDescription = request.getParameter(BasicLTIConstants.RESOURCE_LINK_DESCRIPTION);
 
-	ExtServerOrgMap serverMap = integrationService.getExtServerOrgMap(consumerKey);
-	ExtCourseClassMap orgMap = integrationService.getExtCourseClassMap(serverMap.getSid(), contextId);
+	ExtServer extServer = integrationService.getExtServer(consumerKey);
+	ExtCourseClassMap orgMap = integrationService.getExtCourseClassMap(extServer.getSid(), contextId);
 	Integer organisationId = orgMap.getOrganisation().getOrganisationId();
 	//only monitors are allowed to create lesson
 	if (!securityService.isGroupMonitor(organisationId, userId, "add lesson", false)) {
@@ -187,7 +187,7 @@ public class LtiAction extends LamsDispatchAction {
 	    return null;
 	}
 
-	ExtServerOrgMap serverMap = integrationService.getExtServerOrgMap(consumerKey);
+	ExtServer extServer = integrationService.getExtServer(consumerKey);
 	Organisation organisation = monitoringService.getOrganisation(organisationId);
 
 	// 1. init lesson
@@ -207,7 +207,7 @@ public class LtiAction extends LamsDispatchAction {
 	// 3. start lesson
 	monitoringService.startLesson(lesson.getLessonId(), user.getUserId());
 	// store information which extServer has started the lesson
-	integrationService.createExtServerLessonMap(lesson.getLessonId(), resourceLinkId, serverMap);
+	integrationService.createExtServerLessonMap(lesson.getLessonId(), resourceLinkId, extServer);
 
 	//set roles to contain monitor so that the user can see monitor link
 	ActionRedirect redirect = new ActionRedirect(mapping.findForwardConfig("learnerMonitorRedirect"));
@@ -230,8 +230,8 @@ public class LtiAction extends LamsDispatchAction {
 	
 	//get orgId
 //	String contextId = request.getParameter(BasicLTIConstants.CONTEXT_ID);
-//	ExtServerOrgMap serverMap = integrationService.getExtServerOrgMap(consumerKey);
-//	ExtCourseClassMap orgMap = integrationService.getExtCourseClassMap(serverMap.getSid(), contextId);
+//	ExtServer extServer = integrationService.getExtServer(consumerKey);
+//	ExtCourseClassMap orgMap = integrationService.getExtCourseClassMap(extServer.getSid(), contextId);
 //	Integer organisationId = orgMap.getOrganisation().getOrganisationId();
 
 	//get lesson
