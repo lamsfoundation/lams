@@ -2,8 +2,10 @@
 <!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN" "http://www.springframework.org/dtd/spring-beans.dtd">
 <beans>
 	<bean id="integrationServiceTarget" class="org.lamsfoundation.lams.integration.service.IntegrationService">
-		<property name="service"><ref bean="userManagementService"/></property>
+		<property name="gradebookService"><ref bean="gradebookService"/></property>
 		<property name="lessonService"><ref bean="lessonService"/></property>
+		<property name="service"><ref bean="userManagementService"/></property>
+		<property name="toolService"><ref bean="lamsCoreToolServiceTarget"/></property>		
 	</bean>
 	
 	<bean id="integrationService" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">

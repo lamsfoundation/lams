@@ -95,8 +95,20 @@ public interface IIntegrationService {
     ExtUserUseridMap getExistingExtUserUseridMap(ExtServerOrgMap serverMap, String extUsername)
 	    throws UserInfoFetchException;
 
+    /**
+     * Returns integration server by its automatically-created sid.
+     * 
+     * @param serverId
+     * @return
+     */
     ExtServerOrgMap getExtServerOrgMap(Integer sid);
 
+    /**
+     * Returns integration server by its human-entered serverId.
+     * 
+     * @param serverId
+     * @return
+     */
     ExtServerOrgMap getExtServerOrgMap(String serverId);
 
     /**
@@ -108,6 +120,15 @@ public interface IIntegrationService {
      * @return ExtCourseClassMap if it exists, null otherwise
      */
     ExtCourseClassMap getExtCourseClassMap(Integer extServerOrgMapId, String extCourseId);
+    
+    /**
+     * Returns ExtServerLessonMap for the LTI Tool Consumer identified by serverId. 
+     * 
+     * @param serverId
+     * @param resourceLinkId resource_link_id parameter from LTI request 
+     * @return
+     */
+    ExtServerLessonMap getLtiConsumerLesson(String serverId, String resourceLinkId);
 
     /**
      * @param serverMap
@@ -130,7 +151,15 @@ public interface IIntegrationService {
     ExtUserUseridMap getImplicitExtUserUseridMap(ExtServerOrgMap serverMap, String extUsername, String password,
 	    String firstName, String lastName, String email) throws UserInfoValidationException;
 
-    List getAllExtServerOrgMaps();
+    /**
+     * @return all available integrated servers (that is excluding tool consumers)
+     */
+    List<ExtServerOrgMap> getAllExtServerOrgMaps();
+    
+    /**
+     * @return all available tool consumers
+     */
+    List<ExtServerOrgMap> getAllToolConsumers();
 
     void saveExtServerOrgMap(ExtServerOrgMap map);
 
@@ -143,6 +172,24 @@ public interface IIntegrationService {
     void saveExtServerToolAdapterMap(ExtServerToolAdapterMap map);
 
     void deleteExtServerToolAdapterMap(ExtServerToolAdapterMap map);
+    
+    /**
+     * Creates new ExtServerLessonMap object. Method is suitable for creating lessons via integration servers.
+     * 
+     * @param lessonId
+     * @param extServer
+     */
+    void createExtServerLessonMap(Long lessonId, ExtServerOrgMap extServer);
+    
+    /**
+     * Creates new ExtServerLessonMap object. Method is suitable for creating lessons via LTI tool consumers as long as
+     * they provide resourceLinkId as a parameter and not lessonId.
+     * 
+     * @param lessonId
+     * @param resourceLinkId resource_link_id parameter sent by LTI tool consumer
+     * @param extServer
+     */
+    void createExtServerLessonMap(Long lessonId, String resourceLinkId, ExtServerOrgMap extServer);
 
     /**
      * Checks whether the lesson was created from extServer and returns lessonFinishCallbackUrl if it's not blank.

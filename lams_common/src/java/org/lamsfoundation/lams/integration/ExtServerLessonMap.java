@@ -32,6 +32,7 @@ public class ExtServerLessonMap {
 
     private Long uid;
     private Long lessonId;
+    private String resourceLinkId;
     private ExtServerOrgMap extServer;
 
     public ExtServerLessonMap() {
@@ -59,6 +60,24 @@ public class ExtServerLessonMap {
 
     public void setLessonId(Long lessonId) {
 	this.lessonId = lessonId;
+    }
+    
+    /**
+     * Used only for LTI tool consumer servers. Stores value of the resource_link_id parameter. Which is an opaque
+     * unique identifier that the TC guarantees will be unique within the TC for every placement of the link. If the
+     * tool / activity is placed multiple times in the same context, each of those placements will be distinct. This
+     * value will also change if the item is exported from one system or context and imported into another system or
+     * context. This parameter is required.
+     * 
+     * @hibernate.property column="resource_link_id"
+     *
+     */
+    public String getResourceLinkId() {
+	return resourceLinkId;
+    }
+
+    public void setResourceLinkId(String resourceLinkId) {
+	this.resourceLinkId = resourceLinkId;
     }
 
     /**
