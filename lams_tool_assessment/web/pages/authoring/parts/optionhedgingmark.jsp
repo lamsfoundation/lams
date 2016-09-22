@@ -28,6 +28,6 @@
     	<fmt:message key="label.authoring.basic.option.feedback"/>
     </label>
     
-    <lams:STRUTS-textarea property="optionFeedback${status.index}" rows="3" value="${option.feedback}" styleClass="form-control"/>
+     <lams:CKEditor id="optionFeedback${status.index}" value="${option.feedback}" contentFolderID="${contentFolderID}" />
 </div>
 
