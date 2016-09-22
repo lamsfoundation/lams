@@ -102,6 +102,11 @@
         redirect="false"
       />
       <forward
+        name="submissionDeadline"
+        path="tiles:/learning/submissionDeadline"
+        redirect="false"
+      />
+      <forward
         name="viewWiki"
         path="/pages/wiki/viewWiki.jsp"
         redirect="false"
