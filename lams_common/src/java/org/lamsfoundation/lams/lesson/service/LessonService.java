@@ -659,6 +659,16 @@ public class LessonService implements ILessonService {
     }
 
     @Override
+    public long[] getPreviewLessonCount() {
+	return lessonDAO.getPreviewLessonCount();
+    }
+
+    @Override
+    public List<Long> getPreviewLessons(Integer limit) {
+	return lessonDAO.getPreviewLessons(limit);
+    }
+
+    @Override
     public boolean checkLessonReleaseConditions(Long lessonId, Integer learnerId) {
 	Lesson lesson = getLesson(lessonId);
 	if (lesson != null) {
@@ -687,6 +697,7 @@ public class LessonService implements ILessonService {
 	return releasedSucceedingLessons;
     }
 
+    @Override
     public void saveLesson(Lesson lesson) {
 	lessonDAO.saveLesson(lesson);
     }

@@ -192,4 +192,14 @@ public interface ILessonDAO extends IBaseDAO {
      * @return list of teachers that monitor the lesson which contains the tool with given session ID
      */
     List<User> getMonitorsByToolSessionId(Long sessionId);
+
+    /**
+     * Finds number of preview and all lessons.
+     */
+    long[] getPreviewLessonCount();
+
+    /**
+     * Finds IDs of preview lessons.
+     */
+    List<Long> getPreviewLessons(Integer limit);
 }

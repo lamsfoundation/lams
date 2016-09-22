@@ -21,7 +21,6 @@
  * ****************************************************************
  */
 
-
 package org.lamsfoundation.lams.lesson.service;
 
 import java.util.Collection;
@@ -414,5 +413,16 @@ public interface ILessonService {
     Set<Lesson> getReleasedSucceedingLessons(Long completedLessonId, Integer learnerId);
 
     void removeLearnerProgress(Long lessonId, Integer userId);
+
     void saveLesson(Lesson lesson);
+
+    /**
+     * Finds number of preview and all lessons.
+     */
+    long[] getPreviewLessonCount();
+
+    /**
+     * Finds IDs of preview lessons.
+     */
+    List<Long> getPreviewLessons(Integer limit);
 }
