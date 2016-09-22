@@ -1,4 +1,3 @@
-	<!--
 		// resolution checking
 		var belowMinRes;
 		if (screen.width <= 800 && screen.height <= 600) {
@@ -50,15 +49,17 @@
 			}
 		}
 		
-		function openAuthor() {
+		function openAuthor(isPostMessageToParent) {
+			var authorUrl = 'home.do?method=author' + (isPostMessageToParent ? "&isPostMessageToParent=true" : "");
+			
 			if (isMac) {
-					authorWin = window.open('home.do?method=author','aWindow','width=' + authoring_width + ',height=' + authoring_height + ',resizable');
+					authorWin = window.open(authorUrl,'aWindow','width=' + authoring_width + ',height=' + authoring_height + ',resizable');
 			} else {
 				if(authorWin && !authorWin.closed && authorWin.location.pathname.indexOf('home.do?method=author') > -1) {
 					//authorWin.location = 'home.do?method=author';
 					authorWin.focus();
 				} else {
-					authorWin = window.open('home.do?method=author','aWindow','width=' + authoring_width + ',height=' + authoring_height + ',resizable');
+					authorWin = window.open(authorUrl,'aWindow','width=' + authoring_width + ',height=' + authoring_height + ',resizable');
 					authorWin.focus();
 				}
 			}
@@ -133,14 +134,16 @@
 		}
 
 		function openLearner( lessonId ) {
+			var learnerUrl = 'home.do?method=learner&lessonID=' + lessonId;
+			
 			if (isMac) {
-				learnWin = window.open('home.do?method=learner&lessonID='+lessonId,'lWindow','width=' + learner_width + ',height=' + learner_height + ',resizable,status=yes');
+				learnWin = window.open(learnerUrl,'lWindow','width=' + learner_width + ',height=' + learner_height + ',resizable,status=yes');
 			} else {
 				if (learnWin && !learnWin.closed ) {
-					learnWin.location = 'home.do?method=learner&lessonID='+lessonId;		
+					learnWin.location = learnerUrl;		
 					learnWin.focus();
 				} else {
-					learnWin = window.open('home.do?method=learner&lessonID='+lessonId,'lWindow','width=' + learner_width + ',height=' + learner_height + ',resizable,status=yes');
+					learnWin = window.open(learnerUrl,'lWindow','width=' + learner_width + ',height=' + learner_height + ',resizable,status=yes');
 				}
 			}
 		}
@@ -284,4 +287,3 @@
 				gradebookMonLessonWin.focus();
 			}
 		}
-	//-->

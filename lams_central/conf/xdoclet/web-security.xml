@@ -20,6 +20,7 @@
 	    	<web-resource-name>Public content</web-resource-name>
  	    	<!-- Integrations -->
     		<url-pattern>/LoginRequest</url-pattern>
+    		<url-pattern>/LoginRequestLti</url-pattern>
     		<url-pattern>/services/xml/LessonManager/*</url-pattern>
     		<url-pattern>/services/xml/LearningDesignRepository/*</url-pattern>
     		<url-pattern>/services/LearningDesignSVG/*</url-pattern>

@@ -468,18 +468,18 @@ public class HomeAction extends DispatchAction {
      * Redirects to URL specified in redirectURL parameter. Used by LoginRequest.
      */
     public ActionForward redirect(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse res) throws IOException, ServletException {
+	    HttpServletResponse response) throws IOException, ServletException {
 	String redirectUrlParam = request.getParameter("redirectURL");
 	if (redirectUrlParam != null) {
-//	    redirectUrlParam = URLDecoder.decode(redirectUrlParam, "UTF8");
 	    log.info("home.do?method=redirect is requested. Redirecting to " + redirectUrlParam);
-	    res.sendRedirect(redirectUrlParam);
+	    redirectUrlParam = response.encodeRedirectURL(redirectUrlParam);
+	    response.sendRedirect(redirectUrlParam);
 	    return null;
 	}
 	
 	log.warn("home.do?method=redirect is requested but no redirectURL paramter is provided.");
 	String defaultUrl = request.getContextPath() + "/index.jsp";
-	res.sendRedirect(defaultUrl);
+	response.sendRedirect(defaultUrl);
 	return null;
     }
 

@@ -62,6 +62,14 @@
 </servlet>
 
 <servlet>
+	<servlet-name>LoginRequestLti</servlet-name>
+	
+	<servlet-class>
+		org.lamsfoundation.lams.web.LoginRequestLtiServlet
+	</servlet-class>
+</servlet>
+
+<servlet>
 	<servlet-name>LearningDesignRepository</servlet-name>
 	
 	<servlet-class>

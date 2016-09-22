@@ -361,29 +361,29 @@ public class LessonManagerServlet extends HttpServlet {
 	doGet(request, response);
     }
 
-    private Long startLesson(String serverId, String datetime, String hashValue, String username, long ldId,
+    private static Long startLesson(String serverId, String datetime, String hashValue, String username, long ldId,
 	    String courseId, String title, String desc, String countryIsoCode, String langIsoCode, String customCSV,
 	    boolean exportPortfolioEnable, boolean presenceEnable, boolean imEnable, boolean enableNotifications)
 	    throws RemoteException {
 	try {
-	    ExtServerOrgMap serverMap = LessonManagerServlet.integrationService.getExtServerOrgMap(serverId);
+	    ExtServerOrgMap serverMap = integrationService.getExtServerOrgMap(serverId);
 	    Authenticator.authenticate(serverMap, datetime, username, hashValue);
-	    ExtUserUseridMap userMap = LessonManagerServlet.integrationService.getExtUserUseridMap(serverMap, username);
-	    ExtCourseClassMap orgMap = LessonManagerServlet.integrationService.getExtCourseClassMap(serverMap, userMap,
+	    ExtUserUseridMap userMap = integrationService.getExtUserUseridMap(serverMap, username);
+	    ExtCourseClassMap orgMap = integrationService.getExtCourseClassMap(serverMap, userMap,
 		    courseId, countryIsoCode, langIsoCode, null, LoginRequestDispatcher.METHOD_MONITOR);
 	    User user = userMap.getUser();
 	    Organisation organisation = orgMap.getOrganisation();
 
 	    // 1. init lesson
-	    Lesson lesson = LessonManagerServlet.monitoringService.initializeLesson(title, desc, ldId,
+	    Lesson lesson = monitoringService.initializeLesson(title, desc, ldId,
 		    organisation.getOrganisationId(), user.getUserId(), customCSV, false, false, exportPortfolioEnable,
 		    presenceEnable, imEnable, true, enableNotifications, false, false, null, null);
 	    // 2. create lessonClass for lesson
 	    createLessonClass(lesson, organisation, user);
 	    // 3. start lesson
-	    LessonManagerServlet.monitoringService.startLesson(lesson.getLessonId(), user.getUserId());
+	    monitoringService.startLesson(lesson.getLessonId(), user.getUserId());
 	    // store information which extServer has started the lesson
-	    LessonManagerServlet.integrationService.createExtServerLessonMap(lesson.getLessonId(), serverMap);
+	    integrationService.createExtServerLessonMap(lesson.getLessonId(), serverMap);
 
 	    return lesson.getLessonId();
 	} catch (Exception e) {
@@ -785,17 +785,16 @@ public class LessonManagerServlet extends HttpServlet {
     }
 
     @SuppressWarnings("unchecked")
-    private void createLessonClass(Lesson lesson, Organisation organisation, User creator) {
+    private static void createLessonClass(Lesson lesson, Organisation organisation, User creator) {
 	List<User> staffList = new LinkedList<User>();
 	staffList.add(creator);
 	List<User> learnerList = new LinkedList<User>();
-	Vector<User> learnerVector = LessonManagerServlet.userManagementService
+	Vector<User> learnerVector = userManagementService
 		.getUsersFromOrganisationByRole(organisation.getOrganisationId(), Role.LEARNER, false, true);
 	learnerList.addAll(learnerVector);
-	LessonManagerServlet.monitoringService.createLessonClassForLesson(lesson.getLessonId(), organisation,
+	monitoringService.createLessonClassForLesson(lesson.getLessonId(), organisation,
 		organisation.getName() + "Learners", learnerList, organisation.getName() + "Staff", staffList,
 		creator.getUserId());
-
     }
 
     /**
@@ -908,7 +907,11 @@ public class LessonManagerServlet extends HttpServlet {
 		if ((firstNames != null) && ((firstNameArray.length != lastNameArray.length)
 			|| (firstNameArray.length != emailArray.length)
 			|| (firstNameArray.length != (learnerIdArray.length + monitorIdArray.length)))) {
-		    LessonManagerServlet.log.error("Invalid parameters sent: wrong array length.");
+		    LessonManagerServlet.log.error("Invalid parameters sent: wrong array length. " + "learnerIds="
+			    + learnerIds + " &monitorIds=" + monitorIds + " &firstNames=" + firstNames + " &lastNames="
+			    + lastNames + " &emails=" + emails + " &array lengths=" + learnerIdArray.length + "!"
+			    + monitorIdArray.length + "!" + firstNameArray.length + "!" + lastNameArray.length + "!"
+			    + emailArray.length);
 		    return false;
 		}
 
@@ -1064,14 +1067,7 @@ public class LessonManagerServlet extends HttpServlet {
 	    lessonElement.setAttribute("lessonName", lesson.getLessonName());
 
 	    // calculate lesson's MaxPossibleMark
-	    Set<ToolActivity> activities = getLessonActivities(lesson);
-	    Long lessonMaxPossibleMark = 0L;
-	    for (ToolActivity activity : activities) {
-		Long activityMaxPossibleMark = LessonManagerServlet.toolService.getActivityMaxPossibleMark(activity);
-		if (activityMaxPossibleMark != null) {
-		    lessonMaxPossibleMark += activityMaxPossibleMark;
-		}
-	    }
+	    Long lessonMaxPossibleMark = toolService.getLessonMaxPossibleMark(lesson);
 	    lessonElement.setAttribute("lessonMaxPossibleMark", lessonMaxPossibleMark.toString());
 
 	    // get gradebook marks from DB
