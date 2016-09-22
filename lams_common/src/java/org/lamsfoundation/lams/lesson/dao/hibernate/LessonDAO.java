@@ -82,6 +82,12 @@ public class LessonDAO extends LAMSBaseDAO implements ILessonDAO {
 	    + "JOIN lams_group AS g ON g.group_id <IS_STAFF> ging.staff_group_id AND g.grouping_id = ging.grouping_id "
 	    + "LEFT JOIN lams_user_group AS ug ON ug.group_id = g.group_id AND users.user_id = ug.user_id";
 
+    private final static String COUNT_LESSONS = "SELECT COUNT (*) FROM " + Lesson.class.getName();
+    private final static String COUNT_PREVIEW_LESSONS = "SELECT COUNT(*) FROM " + Lesson.class.getName()
+	    + " AS lesson WHERE lesson.learningDesign.copyTypeID = " + LearningDesign.COPY_TYPE_PREVIEW;
+    private final static String FIND_PREVIEW_LESSON_IDS = "SELECT lesson.lessonId FROM " + Lesson.class.getName()
+	    + " AS lesson WHERE lesson.learningDesign.copyTypeID = " + LearningDesign.COPY_TYPE_PREVIEW;
+
     /**
      * Retrieves the Lesson. Used in instances where it cannot be lazy loaded so it forces an initialize.
      *
@@ -357,5 +363,25 @@ public class LessonDAO extends LAMSBaseDAO implements ILessonDAO {
 	    result.put((User) entry[0], ((Integer) entry[1]).equals(1));
 	}
 	return result;
+    }
+
+    @Override
+    public long[] getPreviewLessonCount() {
+	Query query = getSession().createQuery(LessonDAO.COUNT_LESSONS);
+	long allLessons = ((Number) query.uniqueResult()).longValue();
+	query = getSession().createQuery(LessonDAO.COUNT_PREVIEW_LESSONS);
+	long previewLessons = ((Number) query.uniqueResult()).longValue();
+
+	return new long[] { previewLessons, allLessons };
+    }
+
+    @Override
+    @SuppressWarnings("unchecked")
+    public List<Long> getPreviewLessons(Integer limit) {
+	Query query = getSession().createQuery(FIND_PREVIEW_LESSON_IDS);
+	if (limit != null) {
+	    query.setMaxResults(limit);
+	}
+	return query.list();
     }
 }

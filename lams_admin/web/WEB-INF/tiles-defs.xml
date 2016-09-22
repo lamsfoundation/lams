@@ -44,6 +44,11 @@
 		<put name="content" value="cleanup.jsp" />	
 	</definition>
 	
+	<definition name=".cleanupPreviewLessons" path="/template.jsp">
+		<put name="title" value="sysadmin.batch.preview.lesson.delete"/>
+		<put name="content" value="cleanupPreviewLessons.jsp" />	
+	</definition>
+	
 	<definition name=".importv1result" path="/template.jsp">
 		<put name="title" value="admin.user.management"/>
 		<put name="content" value="import/importv1result.jsp" />	

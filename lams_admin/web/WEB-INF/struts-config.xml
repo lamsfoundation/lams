@@ -518,6 +518,26 @@
         redirect="false"
       />
     </action>
+    
+    <action
+      path="/cleanupPreviewLessons"
+      type="org.lamsfoundation.lams.admin.web.action.CleanupPreviewLessonsAction"
+      parameter="method"
+      unknown="false"
+      validate="false"
+    >
+      <forward
+        name="cleanup"
+        path=".cleanupPreviewLessons"
+        redirect="false"
+      />
+      <forward
+        name="sysadmin"
+        path="/sysadminstart.do"
+        redirect="false"
+      />
+    </action>
+    
     <action
       path="/importuserresult"
       type="org.lamsfoundation.lams.admin.web.action.ImportUserResultAction"

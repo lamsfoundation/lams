@@ -69,6 +69,7 @@ public class SysAdminStartAction extends Action {
 
 	    links = new ArrayList<LinkBean>();
 	    links.add(new LinkBean("cleanup.do", "sysadmin.batch.temp.file.delete"));
+	    links.add(new LinkBean("cleanupPreviewLessons.do", "sysadmin.batch.preview.lesson.delete"));
 	    links.add(new LinkBean("statistics.do", "admin.statistics.title"));
 	    groupedLinks.add(new Object[]{AdminConstants.START_MONITOR_LINKS,links});
 	    
