@@ -34,7 +34,7 @@
 
 		<div align="center">	
 			<h3><fmt:message key="msg.please.wait"/></h3>
-			<p><img src="<lams:LAMSURL/>/images/loading.gif" alt="loading..." /></p>
+			<p><i class="fa fa-refresh fa-spin fa-3x fa-fw"></i></p>
 <%
 	Integer importTotal = (Integer)SessionManager.getSession().getAttribute(IImportService.STATUS_IMPORT_TOTAL);
 	Integer imported = (Integer)SessionManager.getSession().getAttribute(IImportService.STATUS_IMPORTED);

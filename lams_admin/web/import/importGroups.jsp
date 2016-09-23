@@ -15,7 +15,7 @@ function loading(){
 
 <div id="loading" style="display:none">
 	<h4><fmt:message key="msg.please.wait"/></h4>
-	<p align="center"><img src="<lams:LAMSURL/>/images/loading.gif" alt="loading..." /></p>
+	<p class="text-center"><i class="fa fa-refresh fa-spin fa-2x fa-fw"></i></p>
 </div>
 
 <div id="main-page">
