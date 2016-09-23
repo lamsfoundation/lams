@@ -14,7 +14,7 @@
 									
 						<c:if test="${question.answerRequired}">
 							<span class="asterisk">
-								<img title="* <fmt:message key="label.authoring.answer.required"/>" alt="<fmt:message key="label.authoring.answer.required"/>" src="${ctxPath}/includes/images/req.gif" />
+								<i class="fa fa-xs fa-asterisk text-danger pull-right" title="<fmt:message key="label.answer.required"/>" alt="<fmt:message key="label.answer.required"/>"></i>
 							</span>
 						</c:if>
 							
