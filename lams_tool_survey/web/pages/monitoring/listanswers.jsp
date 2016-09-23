@@ -82,7 +82,7 @@
 						    <c:forEach var="option" items="${question.options}">
 								rows += '<td align="center" width="30px">';
 								if ( $.inArray('${option.uid}',userData.choices) > -1 ) {
-									rows += '<img src="${tool}/includes/images/tick_red.gif" title="<fmt:message key="message.learner.choose.answer"/>">';
+									rows += '<i class="fa fa-check text-success" title="<fmt:message key="message.learner.choose.answer"/>">';
 								}
 								rows += '</td>';
 						    </c:forEach>

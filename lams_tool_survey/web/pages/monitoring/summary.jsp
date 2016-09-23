@@ -87,16 +87,14 @@
 					<a href="javascript:;" onclick="launchPopup('<c:url value="/monitoring/listAnswers.do?"/>toolSessionID=${surveySession.sessionId}&questionUid=${question.uid}')">
 						<c:out value="${question.shortTitle}"/> 
 					</a>
-					<div style="float:right">
+
 					<%-- Only show pie/bar chart when question is single/multiple choics type --%>
 					<c:if test="${question.type != 3}">
 						<c:set var="chartURL" value="${tool}showChart.do?toolSessionID=${surveySession.sessionId}&questionUid=${question.uid}" />
-						<img src='<c:out value="${tool}"/>includes/images/piechart.gif'
-							title="<fmt:message key='message.view.pie.chart'/>"
-							style="cursor: pointer; width: 30px; border: none"
+						<i class="fa fa-lg fa-pie-chart pull-right" title="<fmt:message key='message.view.pie.chart'/>"
 							onclick="javascript:drawChart('pie', 'chartDiv${surveySession.sessionId}_${queStatus.index}', '${chartURL}')"> 
 					</c:if>
-					</div>
+
 				</th>
 			</tr>
 			<c:set var="optSize" value="${fn:length(question.options)}" />
