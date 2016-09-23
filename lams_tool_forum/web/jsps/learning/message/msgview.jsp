@@ -63,7 +63,7 @@
 
 		<c:if test="${not empty msgDto.message.attachments}">
 			<div id="attachments${msgDto.message.uid}" class="attachments">
-				<i class="fa fa-paperclip"></i>
+				<i class="fa fa-paperclip loffset5" title="<fmt:message key='message.label.attachment'/>"></i>
 				<c:if test='${(not hidden) || (hidden && sessionMap.mode == "teacher")}'>
 					<c:forEach var="file" items="${msgDto.message.attachments}">
 						<c:set var="downloadURL">

@@ -77,7 +77,7 @@
 		<c:set var="downloadURL">
 			<html:rewrite page="/download/?uuid=${file.fileUuid}&versionID=${file.fileVersionId}&preferDownload=true" />
 		</c:set>
-		<a href="<c:out value='${downloadURL}' escapeXml='false'/>"> <i class="fa fa-paperclip"></i> <c:out value="${file.fileName}" /> </a>
+		<a href="<c:out value='${downloadURL}' escapeXml='false'/>"><i class="fa fa-paperclip" title="<fmt:message key='message.label.attachment'/>"></i></a>
 	</c:forEach>
 
 	</div>

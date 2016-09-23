@@ -26,7 +26,7 @@
 			<c:out value="${topic.message.subject}" />
 		</html:link>
 		<c:if test="${topic.hasAttachment}">
-			<img src="<html:rewrite page="/images/paperclip.gif"/>">
+			<i class="fa fa-paperclip loffset5" title="<fmt:message key='message.label.attachment'/>"></i>
 		</c:if>
 	</p>
 	
