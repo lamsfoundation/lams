@@ -23,15 +23,13 @@
 			</c:if>			
 			&nbsp;
 			<c:set var="chartURL" value="${tool}chartGenerator.do?currentSessionId=${sessionDto.toolSessionId}&toolContentID=${toolContentID}" />
-			<img src='<c:out value="${tool}"/>images/piechart.gif' 
+			<a class="fa fa-pie-chart text-primary btn btn-xs btn-primary" 
 				title="<fmt:message key='label.tip.displayPieChart'/>"
-				style="cursor: pointer;" height="30" border="0"
-				onclick="javascript:drawChart('pie', 'chartDiv${sessionDto.toolSessionId}', '${chartURL}')">
+				onclick="javascript:drawChart('pie', 'chartDiv${sessionDto.toolSessionId}', '${chartURL}')"></a>
 			&nbsp;
-			<img src='<c:out value="${tool}"/>images/columnchart.gif'
+			<a class="fa fa-bar-chart text-primary btn btn-xs btn-primary"
 				title="<fmt:message key='label.tip.displayBarChart'/>" 
-				style="cursor: pointer;" height="30" border="0"
-				onclick="javascript:drawChart('bar', 'chartDiv${sessionDto.toolSessionId}', '${chartURL}')">
+				onclick="javascript:drawChart('bar', 'chartDiv${sessionDto.toolSessionId}', '${chartURL}')"></a>
 		</div>
 	</c:set>						
 		
