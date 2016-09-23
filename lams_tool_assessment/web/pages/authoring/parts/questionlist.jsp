@@ -9,7 +9,6 @@
 <div class="panel panel-default voffset5">
 	<div class="panel-heading panel-title">
 		<fmt:message key="label.authoring.basic.question.list.title" />
-		<img src="${ctxPath}/includes/images/indicator.gif"	style="display:none" id="referencesArea_Busy" />
 	</div>
 
 	<table class="table table-condensed" id="referencesTable">

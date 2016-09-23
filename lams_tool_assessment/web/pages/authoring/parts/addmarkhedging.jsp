@@ -115,7 +115,7 @@
 				<div class="form-group">
 				    <label for="title">
 				    	<fmt:message key="label.authoring.basic.question.name"/>
-				    	<img src="${ctxPath}/includes/images/req.gif" title="Required field" alt="Required field"/>
+				    	<i class="fa fa-xs fa-asterisk text-danger pull-right" title="<fmt:message key="label.required.field"/>" alt="<fmt:message key="label.required.field"/>"></i>
 				    </label>
 				    <html:text property="title" styleId="title" styleClass="form-control" tabindex="1"/>
 				</div>
@@ -131,7 +131,7 @@
 				<div class="form-group">
 				    <label for="defaultGrade">
 				    	<fmt:message key="label.authoring.basic.default.question.grade" />
-				    	<img src="${ctxPath}/includes/images/req.gif" title="Required field" alt="Required field"/>
+				    	<i class="fa fa-xs fa-asterisk text-danger pull-right" title="<fmt:message key="label.required.field"/>" alt="<fmt:message key="label.required.field"/>"></i>
 				    </label>
 				    <html:text property="defaultGrade" styleClass="form-control short-input-text input-sm"/>
 				</div>
@@ -143,15 +143,10 @@
 					</label>
 				</div>
 				
-				<div class="form-group">
-					<img src="<lams:LAMSURL/>/images/tree_closed.gif" onclick="javascript:toggleVisibility('general-feedback');" />
-
-					<a href="javascript:toggleVisibility('general-feedback');" >
-						<fmt:message key="label.authoring.basic.general.feedback" />
-					</a>
-					
-					<div id="general-feedback" class="initially-hidden">
-						<lams:CKEditor id="generalFeedback" value="${formBean.generalFeedback}" contentFolderID="${formBean.contentFolderID}"/>
+				<div class="generalFeedback">
+				  <a data-toggle="collapse" data-target="#general-feedback"><i class="fa fa-plus-square-o roffset5" aria-hidden="true"></i><fmt:message key="label.authoring.basic.general.feedback" /></a>
+					<div id="general-feedback"  class="collapse form-group">
+						<lams:CKEditor id="generalFeedback" value="${formBean.generalFeedback}" contentFolderID="${formBean.contentFolderID}" />
 					</div>
 				</div>
 	
@@ -184,15 +179,13 @@
 				</a>
 			</form>
 			
+			
 			<!-- Overall feedback -->
-			<div class="form-group">
-				<img src="<lams:LAMSURL/>/images/tree_closed.gif" onclick="javascript:toggleVisibility('overall-feedback');" />
-
-				<a href="javascript:toggleVisibility('overall-feedback');" >
-					<fmt:message key="label.authoring.choice.overall.feedback" />
-				</a>
-				
-				<div id="overall-feedback" class="initially-hidden">
+			<br/>
+			<div class="overallFeedback">
+			  <a data-toggle="collapse" data-target="#overall-feedback"><i class="fa fa-plus-square-o roffset5" aria-hidden="true"></i><fmt:message key="label.authoring.choice.overall.feedback" /></a>
+			
+				<div id="overall-feedback" class="collapse">
 					<div class="form-group">
 						<label for="feedbackOnCorrectOutsideForm">
 							<fmt:message key="label.authoring.choice.feedback.on.correct" />
@@ -216,7 +209,7 @@
 				</div>
 			</div>
 
-			<div class="voffset10 pull-right">
+			<div class="form-group voffset10 pull-right">
 			    <a href="#nogo" onclick="javascript:self.parent.tb_remove();" class="btn btn-sm btn-default loffset5">
 					<fmt:message key="label.cancel" />
 				</a>
