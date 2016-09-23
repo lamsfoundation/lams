@@ -53,7 +53,7 @@
 										</c:otherwise>
 									</c:choose>
 								</html:link> <c:if test="${topic.hasAttachment}">
-									<i class="fa fa-paperclip"></i>
+									<i class="fa fa-paperclip loffset5" title="<fmt:message key='message.label.attachment'/>"></i>
 								</c:if></td>
 							<td><c:set var="author" value="${topic.author}" /> <c:if test="${empty author}">
 									<c:set var="author">
