@@ -130,7 +130,7 @@
 			<th width="20%">
 				<fmt:message key="label.authoring.basic.list.header.type" />
 			</th>
-			<th colspan="3">
+			<th colspan="2">
 				<fmt:message key="label.authoring.basic.list.header.question" />
 			</th>
 		</tr>	
@@ -165,22 +165,17 @@
 						</c:when>
 					</c:choose>
 				</td>
-
 				<td>
 					<c:out value="${question.title}" escapeXml="true" />
 				</td>
 				
-				<td width="30px">
+				<td class="text-right">
 					<c:set var="editQuestionUrl" >
 						<c:url value='/authoring/editQuestion.do'/>?sessionMapID=${sessionMapID}&questionIndex=${status.index}&KeepThis=true&TB_iframe=true&height=540&width=850&modal=true
 					</c:set>
 					
-					<a href="${editQuestionUrl}" class="thickbox" style="margin-left: 20px;"> 
-						<i class="fa fa-pencil"	title="<fmt:message key="label.authoring.basic.edit" />"></i>
-					</a>
-				</td>
-                
-               	<td width="30px">
+					<a href="${editQuestionUrl}" class="thickbox roffset5" style="margin-left: 20px;"> 
+						<i class="fa fa-pencil"	title="<fmt:message key="label.authoring.basic.edit" />"></i></a>
 					<i class="fa fa-times" title="<fmt:message key="label.authoring.basic.delete" />"
 						onclick="javascript:deleteQuestion(${status.index})"></i>
 				</td>
