@@ -115,6 +115,7 @@ import org.quartz.SchedulerException;
 import org.quartz.Trigger;
 import org.quartz.TriggerBuilder;
 import org.quartz.TriggerKey;
+import org.springframework.beans.factory.NoSuchBeanDefinitionException;
 
 /**
  * <p>
@@ -883,7 +884,14 @@ public class MonitoringService implements IMonitoringService {
 	    if (activity.isToolActivity()) {
 		ToolActivity toolActivity = (ToolActivity) activity;
 		// delete content of each tool
-		lamsCoreToolService.notifyToolToDeleteContent(toolActivity);
+		try {
+		    lamsCoreToolService.notifyToolToDeleteContent(toolActivity);
+		} catch (NoSuchBeanDefinitionException e) {
+		    if (log.isDebugEnabled()) {
+			log.debug("Tried to remove content of a non-existent tool: "
+				+ toolActivity.getTool().getToolDisplayName());
+		    }
+		}
 		//  possible nonthreadsafe access to session!!!
 		lessonDAO.flush();
 		Long toolContentId = toolActivity.getToolContentId();
