@@ -94,6 +94,7 @@ import org.lamsfoundation.lams.security.ISecurityService;
 import org.lamsfoundation.lams.tool.ToolContent;
 import org.lamsfoundation.lams.tool.ToolSession;
 import org.lamsfoundation.lams.tool.exception.LamsToolServiceException;
+import org.lamsfoundation.lams.tool.exception.ToolException;
 import org.lamsfoundation.lams.tool.service.ILamsCoreToolService;
 import org.lamsfoundation.lams.usermanagement.Organisation;
 import org.lamsfoundation.lams.usermanagement.Role;
@@ -115,7 +116,6 @@ import org.quartz.SchedulerException;
 import org.quartz.Trigger;
 import org.quartz.TriggerBuilder;
 import org.quartz.TriggerKey;
-import org.springframework.beans.factory.NoSuchBeanDefinitionException;
 
 /**
  * <p>
@@ -886,7 +886,7 @@ public class MonitoringService implements IMonitoringService {
 		// delete content of each tool
 		try {
 		    lamsCoreToolService.notifyToolToDeleteContent(toolActivity);
-		} catch (NoSuchBeanDefinitionException e) {
+		} catch (ToolException e) {
 		    if (log.isDebugEnabled()) {
 			log.debug("Tried to remove content of a non-existent tool: "
 				+ toolActivity.getTool().getToolDisplayName());
