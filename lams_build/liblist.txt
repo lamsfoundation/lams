@@ -10,6 +10,12 @@ apache-poi        poi-3.10-FINAL-20140208.jar           3.10                   A
 autopatch		  autopatch-1.4.2-lams.jar			    1.4.2-lams		       Apache License				 Tacit Knowledge				  automated Java patching system
 				  discovery-1.0.5-lams.jar				1.0.5-lams				  
 
+basiclti-util     basiclti-util-1.2.0.jar               1.2.0                  Apache License 2.0            IMS Global Learning Consortium   Set of utility classes to aid in the development of BasicLTI consumers andproviders
+                  oauth-20100527.jar                    20100527               Apache License 2.0            Sean Sullivan, JM Kristian       An open protocol to allow API authentication in a simple and standard method from desktop and web applications
+                  oauth-provider-20100527.jar           
+                  signpost-commonshttp4-1.2.1.2.jar     1.2.1.2                Apache License 2.0            Matthias Käppler, Qype GmbH      A simple, light-weight, and modular OAuth client library
+                  signpost-core-1.2.1.2.jar             
+
 batik             batik-1.7.jar                         1.7                    Apache License 2.0            Apache                           toolkit for manipulating images in SVG format
 
 fckeditor         fckeditor-java-core-2.6.jar           2.6					   GPL, LGPL, MPL				 Frederico Caldeira Knabben       Java connector for CKEditor                                                        
@@ -18,7 +24,6 @@ googleauth        googleauth-1.1.1.jar                  1.1.1				   Public Domai
 
 jakarta-commons   commons-digester-2.1.jar              2.1                    Apache Software License 2.0   Apache Software Foundation       XML -> Java object mapping tool
                   commons-fileupload.jar                1.0                    Apache Software License 1.1   Apache Software Foundation       File upload component for Java servlets
-                  commons-httpclient-3.0.jar			3.0					   Apache License 2.0 			 Apache Software Foundation		  HTTP tools
                   commons-validator.jar                 1.1.4                  Apache License 2.0            The Apache Software Foundation   Commons Validator
 
 jboss			  jbossweb.jar							2.1.3				   LGPL 2.1						 Apache Software Foundation		  SSO valve and JSON

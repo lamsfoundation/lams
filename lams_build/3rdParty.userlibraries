@@ -6,6 +6,11 @@
         <archive path="/lams_build/lib/apache-poi/poi-ooxml-schemas-3.10-FINAL-20140208.jar"/>
         <archive path="/lams_build/lib/apache-poi/xmlbeans-2.3.0.jar"/>
         <archive path="/lams_build/lib/autopatch/autopatch-1.4.2-lams.jar"/>
+        <archive path="/lams_build/lib/basiclti-util/basiclti-util-1.2.0.jar"/>
+        <archive path="/lams_build/lib/basiclti-util/oauth-20100527.jar"/>
+ 	 	<archive path="/lams_build/lib/basiclti-util/oauth-provider-20100527.jar"/>
+ 	 	<archive path="/lams_build/lib/basiclti-util/signpost-commonshttp4-1.2.1.2.jar"/>
+ 	 	<archive path="/lams_build/lib/basiclti-util/signpost-core-1.2.1.2.jar"/>        
         <archive path="/lams_build/lib/autopatch/discovery-1.0.5-lams.jar"/>
         <archive path="/lams_build/lib/googleauth/googleauth-1.1.1.jar"/>
         <archive path="/lams_build/lib/jakarta-commons/commons-fileupload.jar"/>
@@ -16,7 +21,6 @@
         <archive path="/lams_build/lib/xml-commons/xml-apis.jar"/>
         <archive path="/lams_build/lib/xml-commons/xml-apis-ext.jar"/>
         <archive path="/lams_build/lib/jlatexmath/jlatexmath-1.0.3.jar"/>
-        <archive javadoc="http://hc.apache.org/httpclient-3.x/apidocs/" path="/lams_build/lib/jakarta-commons/commons-httpclient-3.1.jar" source="/3rdParty_sources/commons-httpclient"/>
         <archive javadoc="http://google-gson.googlecode.com/svn/tags/gson-2.2.4/docs/javadocs/" path="/lams_build/lib/json/gson-2.2.4.jar" source="/3rdParty_sources/gson"/>
         <archive path="/lams_build/lib/jboss/jbossweb.jar" source="/3rdParty_sources/jbossweb"/>
         <archive javadoc="http://docs.spring.io/spring/docs/4.0.6.RELEASE/javadoc-api/" path="/lams_build/lib/spring/spring-context-4.0.6.RELEASE.jar" source="/3rdParty_sources/spring"/>

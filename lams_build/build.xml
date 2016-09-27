@@ -439,6 +439,32 @@
 		
 		
 		
+		<copy todir="${server.home}/modules/system/layers/base/org/imsglobal/main" overwrite="true" verbose="true">
+			<fileset dir="lib/basiclti-util">
+				<include name="basiclti-util-*.jar" />
+			</fileset>
+		</copy>
+		<copy tofile="${server.home}/modules/system/layers/base/org/imsglobal/main/module.xml"
+			  file="lib/basiclti-util/basiclti-util.module.xml" overwrite="true" verbose="true" />
+		
+		<copy todir="${server.home}/modules/system/layers/base/net/oauth/core/main" overwrite="true" verbose="true">
+			<fileset dir="lib/basiclti-util">
+				<include name="oauth-*.jar" />
+			</fileset>
+		</copy>
+		<copy tofile="${server.home}/modules/system/layers/base/net/oauth/core/main/module.xml"
+			  file="lib/basiclti-util/oauth.module.xml" overwrite="true" verbose="true" />
+		
+		<copy todir="${server.home}/modules/system/layers/base/oauth/signpost/main" overwrite="true" verbose="true">
+			<fileset dir="lib/basiclti-util">
+				<include name="signpost-*.jar" />
+			</fileset>
+		</copy>
+		<copy tofile="${server.home}/modules/system/layers/base/oauth/signpost/main/module.xml"
+			  file="lib/basiclti-util/signpost.module.xml" overwrite="true" verbose="true" />		
+
+
+
 		<copy todir="${server.home}/modules/system/layers/base/net/fckeditor/main" overwrite="true" verbose="true">
 			<fileset dir="lib/fckeditor">
 				<include name="fckeditor-*.jar" />
@@ -472,14 +498,6 @@
 		</copy>
 		<copy tofile="${server.home}/modules/system/layers/base/org/apache/commons/fileupload/main/module.xml"
 			  file="lib/jakarta-commons/fileupload.module.xml" overwrite="true" verbose="true" />
-		
-		<copy todir="${server.home}/modules/system/layers/base/org/apache/commons/httpclient/main" overwrite="true" verbose="true">
-			<fileset dir="lib/jakarta-commons">
-				<include name="commons-httpclient-*.jar" />
-			</fileset>
-		</copy>
-		<copy tofile="${server.home}/modules/system/layers/base/org/apache/commons/httpclient/main/module.xml"
-			  file="lib/jakarta-commons/httpclient.module.xml" overwrite="true" verbose="true" />
 		
 		<copy todir="${server.home}/modules/system/layers/base/org/apache/commons/validator/main" overwrite="true" verbose="true">
 			<fileset dir="lib/jakarta-commons">
