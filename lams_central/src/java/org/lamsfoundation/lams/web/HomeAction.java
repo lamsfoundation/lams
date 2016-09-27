@@ -177,10 +177,6 @@ public class HomeAction extends DispatchAction {
 		return mapping.findForward("lessonIntro");
 	    }
 
-	    if (lesson.getForceLearnerRestart()) {
-		// start the lesson from the beginning each time
-		getLessonService().removeLearnerProgress(lessonId, user.getUserID());
-	    }
 
 	    if (mode != null) {
 		req.setAttribute(AttributeNames.PARAM_MODE, mode);

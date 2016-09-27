@@ -33,6 +33,8 @@
 			<attribute name="javadoc_location" value="http://commons.apache.org/proper/commons-lang/javadocs/api-2.6/"/>
 		</attributes>
 	</classpathentry>
+	<classpathentry kind="var" path="WILDFLY_HOME/modules/system/layers/base/org/apache/httpcomponents/main/httpclient-4.2.1.jar"/>
+	<classpathentry kind="var" path="WILDFLY_HOME/modules/system/layers/base/org/apache/httpcomponents/main/httpcore-4.2.1.jar"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/lams_gradebook"/>
 	<classpathentry kind="var" path="WILDFLY_HOME/modules/system/layers/base/org/apache/commons/codec/main/commons-codec-1.9.jar"/>
 	<classpathentry kind="var" path="WILDFLY_HOME/modules/system/layers/base/io/undertow/servlet/main/undertow-servlet-1.1.8.Final.jar" sourcepath="/3RDPARTY_SOURCES_PROJECT/undertow"/>

@@ -9,6 +9,14 @@ import org.lamsfoundation.lams.usermanagement.Organisation;
 public class ExtServerOrgMap implements Serializable, Comparable {
 
     private static final long serialVersionUID = 337894825609071182L;
+    
+    /*
+     * static final variables indicating the type of servers available. 
+     */
+    /* **************************************************************** */
+    public static final int INTEGRATION_SERVER_TYPE = 1;
+    public static final int LTI_CONSUMER_SERVER_TYPE = 2;
+    /** *************************************************************** */
 
     /** identifier field */
     private Integer sid;
@@ -24,6 +32,9 @@ public class ExtServerOrgMap implements Serializable, Comparable {
 
     /** persistent field */
     private String serverdesc;
+    
+    /** The type of activity */
+    private Integer serverTypeId;
 
     /** persistent field */
     private String prefix;
@@ -102,6 +113,14 @@ public class ExtServerOrgMap implements Serializable, Comparable {
 
     public void setServerdesc(String serverdesc) {
 	this.serverdesc = serverdesc;
+    }
+    
+    public Integer getServerTypeId() {
+	return serverTypeId;
+    }
+
+    public void setServerTypeId(Integer serverTypeId) {
+	this.serverTypeId = serverTypeId;
     }
 
     public String getPrefix() {
@@ -214,6 +233,14 @@ public class ExtServerOrgMap implements Serializable, Comparable {
     @Override
     public int compareTo(Object o) {
 	return serverid.compareToIgnoreCase(((ExtServerOrgMap) o).getServerid());
+    }
+    
+    public boolean isIntegrationServer() {
+	return getServerTypeId().intValue() == ExtServerOrgMap.INTEGRATION_SERVER_TYPE;
+    }
+    
+    public boolean isLtiConsumer() {
+	return getServerTypeId().intValue() == ExtServerOrgMap.LTI_CONSUMER_SERVER_TYPE;
     }
 
 }

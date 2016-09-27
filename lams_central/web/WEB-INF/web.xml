@@ -298,6 +298,13 @@
 			org.lamsfoundation.lams.web.LoginRequestServlet
 		</servlet-class>
 	</servlet>
+	
+	<servlet>
+		<servlet-name>LoginRequestLti</servlet-name>
+		<servlet-class>
+			org.lamsfoundation.lams.web.LoginRequestLtiServlet
+		</servlet-class>
+	</servlet>
 
 	<servlet>
 		<servlet-name>LearningDesignRepository</servlet-name>
@@ -415,6 +422,11 @@
 	<servlet-mapping>
 		<servlet-name>LoginRequest</servlet-name>
 		<url-pattern>/LoginRequest</url-pattern>
+	</servlet-mapping>
+	
+	<servlet-mapping>
+		<servlet-name>LoginRequestLti</servlet-name>
+		<url-pattern>/LoginRequestLti</url-pattern>
 	</servlet-mapping>
 
 	<servlet-mapping>
@@ -640,6 +652,7 @@
 			<web-resource-name>Public content</web-resource-name>
 			<!-- Integrations -->
 			<url-pattern>/LoginRequest</url-pattern>
+			<url-pattern>/LoginRequestLti</url-pattern>
 			<url-pattern>/services/xml/LessonManager/*</url-pattern>
 			<url-pattern>/services/xml/LearningDesignRepository/*</url-pattern>
 			<url-pattern>/services/LearningDesignSVG/*</url-pattern>
@@ -702,6 +715,7 @@
 		<web-resource-collection>
 			<web-resource-name>Add lesson</web-resource-name>
 			<url-pattern>/addLesson.jsp</url-pattern>
+			<url-pattern>/lti/addLesson.jsp</url-pattern>
 		</web-resource-collection>
 		<auth-constraint>
 			<role-name>MONITOR</role-name>
