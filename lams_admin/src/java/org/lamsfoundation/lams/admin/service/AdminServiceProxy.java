@@ -42,9 +42,9 @@ import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 
 /**
+ * Common class to make it easier to get the Spring beans.
+ *         
  * @author jliew
- *
- *         Common class to make it easier to get the Spring beans.
  */
 public class AdminServiceProxy {
 

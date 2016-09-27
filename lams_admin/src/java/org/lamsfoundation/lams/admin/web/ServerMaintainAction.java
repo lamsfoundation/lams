@@ -52,13 +52,6 @@ import org.lamsfoundation.lams.web.action.LamsDispatchAction;
  *
  * @author <a href="mailto:fyang@melcoe.mq.edu.au">Fei Yang</a>
  */
-/**
- * struts doclets
- *
- *
- *
- *
- */
 public class ServerMaintainAction extends LamsDispatchAction {
 
     @SuppressWarnings("unchecked")
