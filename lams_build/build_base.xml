@@ -50,6 +50,8 @@
 			<include name="org/apache/commons/io/main/commons-io-*.jar" />
 			<include name="org/apache/commons/lang/main/commons-lang-*.jar" />
 			<include name="org/apache/commons/codec/main/commons-codec-*.jar" />
+			<include name="org/apache/httpcomponents/main/httpclient-*.jar" />
+			<include name="org/apache/httpcomponents/main/httpcore-*.jar" />
 			<include name="javax/websocket/api/main/jboss-websocket-api*.jar" />
 		</fileset>
 		<!-- Optional project own libraries -->

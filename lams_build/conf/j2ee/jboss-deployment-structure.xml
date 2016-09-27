@@ -27,11 +27,13 @@
       <module name="org.apache.commons.codec" export="true" />
       <module name="org.apache.commons.pool" export="true" />
       <module name="org.apache.commons.fileupload" export="true" />
-      <module name="org.apache.commons.httpclient" export="true" />
       <module name="org.apache.commons.validator" export="true" />
+      <module name="org.apache.httpcomponents" export="true" />
       <module name="org.apache.xmlcommons" export="true" />
   	  <module name="org.apache.xerces" export="true" />
       <module name="org.infinispan" export="true" />
+      <module name="org.imsglobal" export="true" />
+      <module name="oauth.signpost" export="true" />
       <module name="org.hibernate" export="true" />
       <module name="org.jboss.jbossweb" export="true" />
       <module name="org.scilab.forge.jlatexmath" export="true" />

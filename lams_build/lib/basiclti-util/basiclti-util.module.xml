@@ -22,23 +22,26 @@
   ~ 02110-1301 USA, or see the FSF site: http://www.fsf.org.
   -->
 
-<module xmlns="urn:jboss:module:1.3" name="com.warrenstrange.googleauth">
+<module xmlns="urn:jboss:module:1.3" name="org.imsglobal">
   <resources>
-    <resource-root path="googleauth-1.1.1.jar"/>
+    <resource-root path="basiclti-util-1.2.0.jar"/>
   </resources>
-  
   <dependencies>
-  	<module name="org.apache.commons.codec"/>
-  	<module name="org.apache.httpcomponents"/>
     <system>
   		<paths>
   			<path name="org/xml/sax"/>
-  			<path name="org/xml/sax/helpers"/>
   			<path name="org/w3c/dom"/>
-  			<path name="javax/crypto"/>
-  			<path name="javax/crypto/spec"/>
   			<path name="javax/xml/parsers"/>
+  			<path name="javax/xml/xpath"/>  	
+  			<path name="javax/naming"/>
   		</paths>
-  	</system>
+  	</system>  
+    <module name="javax.servlet.api" />
+    <module name="org.apache.commons.lang"/>
+    <module name="org.apache.commons.codec"/>
+    <module name="net.oauth.core"/>
+    <module name="org.apache.httpcomponents"/>
+    <module name="oauth.signpost"/>
+    <module name="org.apache.commons.io"/>
   </dependencies>
 </module>
