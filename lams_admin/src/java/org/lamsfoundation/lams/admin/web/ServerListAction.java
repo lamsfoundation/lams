@@ -36,19 +36,8 @@ import org.lamsfoundation.lams.admin.service.AdminServiceProxy;
 import org.lamsfoundation.lams.integration.ExtServerOrgMap;
 
 /**
- * <p>
- * <a href="ServerListAction.java.html"><i>View Source</i><a>
- * </p>
  *
  * @author <a href="mailto:fyang@melcoe.mq.edu.au">Fei Yang</a>
- */
-
-/**
- * struts doclets
- *
- *
- *
- *
  */
 public class ServerListAction extends Action {
 

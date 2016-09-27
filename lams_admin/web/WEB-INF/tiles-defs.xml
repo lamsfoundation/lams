@@ -140,6 +140,16 @@
 		<put name="title" value="admin.organisation.entry"/>
 		<put name="content" value="organisation/createOrEdit.jsp" />	
 	</definition>
+	
+	<definition name=".ltiConsumer" path="/template.jsp">
+		<put name="title" value="label.edit.tool.consumer"/>
+		<put name="content" value="lti/ltiConsumer.jsp" />
+	</definition>
+	
+	<definition name=".ltiConsumerList" path="/template.jsp">
+		<put name="title" value="label.manage.tool.consumers"/>
+		<put name="content" value="lti/ltiConsumerList.jsp" />	
+	</definition>
 
 	<definition name=".joblist" path="/template.jsp">
 		<put name="title" value="admin.list.job"/>

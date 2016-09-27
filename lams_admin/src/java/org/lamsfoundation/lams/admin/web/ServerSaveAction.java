@@ -60,9 +60,6 @@ import org.lamsfoundation.lams.web.util.AttributeNames;
  * </p>
  *
  * @author <a href="mailto:fyang@melcoe.mq.edu.au">Fei Yang</a>
- *
- *
- *
  */
 public class ServerSaveAction extends Action {
 
@@ -157,6 +154,7 @@ public class ServerSaveAction extends Action {
 		map = new ExtServerOrgMap();
 		BeanUtils.copyProperties(map, serverOrgMapForm);
 		map.setSid(null);
+		map.setServerTypeId(ExtServerOrgMap.INTEGRATION_SERVER_TYPE);
 	    } else {
 		map = service.getExtServerOrgMap(sid);
 		BeanUtils.copyProperties(map, serverOrgMapForm);
