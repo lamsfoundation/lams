@@ -494,6 +494,34 @@
       />
     </action>
     <action
+      path="/lti"
+      type="org.lamsfoundation.lams.web.action.LtiAction"
+      parameter="method"
+      unknown="false"
+      validate="false"
+    >
+      <forward
+        name="addLesson"
+        path="/lti/addLesson.jsp"
+        redirect="false"
+      />
+      <forward
+        name="learnerMonitor"
+        path="/lti/learnerMonitor.jsp"
+        redirect="false"
+      />
+      <forward
+        name="learnerMonitorRedirect"
+        path="/lti.do?method=learnerMonitor"
+        redirect="true"
+      />
+      <forward
+        name="error"
+        path="/error.jsp"
+        redirect="false"
+      />
+    </action>
+    <action
       path="/saveprofile"
       type="org.lamsfoundation.lams.web.ProfileSaveAction"
       name="UserForm"

@@ -1,4 +1,3 @@
-	<!--
 		// resolution checking
 		var belowMinRes;
 		if (screen.width <= 800 && screen.height <= 600) {
@@ -102,14 +101,16 @@
 		}
 
 		function openLearner( lessonId ) {
+			var learnerUrl = 'home.do?method=learner&lessonID=' + lessonId;
+			
 			if (isMac) {
-				learnWin = window.open('home.do?method=learner&lessonID='+lessonId,'lWindow','width=' + learner_width + ',height=' + learner_height + ',resizable,scrollbars=yes,status=yes');
+				learnWin = window.open(learnerUrl,'lWindow','width=' + learner_width + ',height=' + learner_height + ',resizable,scrollbars=yes,status=yes');
 			} else {
 				if (learnWin && !learnWin.closed ) {
-					learnWin.location = 'home.do?method=learner&lessonID='+lessonId;		
+					learnWin.location = learnerUrl;		
 					learnWin.focus();
 				} else {
-					learnWin = window.open('home.do?method=learner&lessonID='+lessonId,'lWindow','width=' + learner_width + ',height=' + learner_height + ',resizable,scrollbars=yes,status=yes');
+					learnWin = window.open(learnerUrl,'lWindow','width=' + learner_width + ',height=' + learner_height + ',resizable,scrollbars=yes,status=yes');
 				}
 			}
 		}
@@ -240,4 +241,3 @@
 				gradebookMonLessonWin.focus();
 			}
 		}
-	// -->

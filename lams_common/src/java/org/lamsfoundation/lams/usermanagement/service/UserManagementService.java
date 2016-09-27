@@ -831,7 +831,7 @@ public class UserManagementService implements IUserManagementService {
     @Override
     public Theme getDefaultTheme() {
 	String htmlName = Configuration.get(ConfigurationKeys.DEFAULT_THEME);
-	List list = findByProperty(Theme.class, "name", htmlName);
+	List list = findByProperty(Theme.class, "name", "defaultHTML");
 	return list != null ? (Theme) list.get(0) : null;
     }
 

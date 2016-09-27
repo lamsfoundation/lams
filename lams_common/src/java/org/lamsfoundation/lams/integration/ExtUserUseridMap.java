@@ -23,6 +23,9 @@ public class ExtUserUseridMap implements Serializable {
 
     /** persistent field */
     private ExtServerOrgMap extServerOrgMap;
+    
+    /** id of gradebook item in LTI tool consumer */
+    private String tcGradebookId;
 
     /** full constructor */
     public ExtUserUseridMap(String extUsername, User user, ExtServerOrgMap extServerOrgMap) {
@@ -35,10 +38,6 @@ public class ExtUserUseridMap implements Serializable {
     public ExtUserUseridMap() {
     }
 
-    /**
-     *
-     *
-     */
     public Integer getSid() {
 	return this.sid;
     }
@@ -47,10 +46,6 @@ public class ExtUserUseridMap implements Serializable {
 	this.sid = sid;
     }
 
-    /**
-     *
-     *
-     */
     public String getExtUsername() {
 	return this.extUsername;
     }
@@ -59,11 +54,6 @@ public class ExtUserUseridMap implements Serializable {
 	this.extUsername = extUsername;
     }
 
-    /**
-     *
-     *
-     *
-     */
     public User getUser() {
 	return this.user;
     }
@@ -72,17 +62,20 @@ public class ExtUserUseridMap implements Serializable {
 	this.user = user;
     }
 
-    /**
-     *
-     *
-     *
-     */
     public ExtServerOrgMap getExtServerOrgMap() {
 	return this.extServerOrgMap;
     }
 
     public void setExtServerOrgMap(ExtServerOrgMap extServerOrgMap) {
 	this.extServerOrgMap = extServerOrgMap;
+    }
+    
+    public String getTcGradebookId() {
+	return this.tcGradebookId;
+    }
+
+    public void setTcGradebookId(String tcGradebookId) {
+	this.tcGradebookId = tcGradebookId;
     }
 
     @Override

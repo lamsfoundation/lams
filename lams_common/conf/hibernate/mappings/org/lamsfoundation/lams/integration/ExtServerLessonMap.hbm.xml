@@ -34,6 +34,14 @@
             column="lesson_id"
             not-null="true"
         />
+        
+        <property
+            name="resourceLinkId"
+            type="java.lang.String"
+            update="true"
+            insert="true"
+            column="resource_link_id"
+        />
 
         <many-to-one
             name="extServer"

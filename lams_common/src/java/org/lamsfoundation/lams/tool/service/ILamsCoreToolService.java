@@ -290,6 +290,14 @@ public interface ILamsCoreToolService {
     Long getActivityMaxPossibleMark(ToolActivity activity);
 
     /**
+     * Calculates lesson's maximum possible mark by adding up all activities max marks.
+     * 
+     * @param lesson
+     * @return
+     */
+    Long getLessonMaxPossibleMark(Lesson lesson);
+
+    /**
      * Update the tool session data.
      *
      * @param toolSession

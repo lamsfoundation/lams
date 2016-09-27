@@ -61,6 +61,15 @@
                 name="ext_server_org_map_id" 
             />
         </many-to-one>
+        
+        <property
+            name="tcGradebookId"
+            type="java.lang.String"
+            update="true"
+            insert="true"
+            column="tc_gradebook_id"
+            length="250"
+        />
 
         <!--
             To add non XDoclet property mappings, create a file named
