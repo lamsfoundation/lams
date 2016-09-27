@@ -543,6 +543,7 @@ public class SpreadsheetServiceImpl implements ISpreadsheetService, ToolContentM
 	    for (SpreadsheetUser user : users) {
 		UserModifiedSpreadsheet modified = user.getUserModifiedSpreadsheet();
 		if (modified != null) {
+		    user.setUserModifiedSpreadsheet(null);
 		    userModifiedSpreadsheetDao.removeObject(UserModifiedSpreadsheet.class, modified.getUid());
 		}
 	    }
@@ -645,7 +646,7 @@ public class SpreadsheetServiceImpl implements ISpreadsheetService, ToolContentM
     public ToolOutput getToolOutput(String name, Long toolSessionId, Long learnerId) {
 	return null;
     }
-    
+
     @Override
     public List<ToolOutput> getToolOutputs(String name, Long toolContentId) {
 	return new ArrayList<ToolOutput>();

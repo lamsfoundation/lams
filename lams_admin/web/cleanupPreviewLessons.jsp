@@ -18,44 +18,44 @@ $(document).ready(function(){
 		}
 		
 		deleteButton.prop('disabled', true);
-		
-		var previewCountSpan = $('#previewCount'),
-			allLessonCountSpan = $('#allLessonCount'),
-			deletingBox = $('#deletingBox').show();
+		$('#deletingBox').show();
 		
 		// delete lesson in batches of 5 until done
-		while (previewCount > 0) {
-			$.ajax({
-				'async'   : false,
-				'cache'   : false,
-				'url'     : '<lams:WebAppURL />cleanupPreviewLessons.do',
-				'data'    : {
-					'method' : 'deletePreviewLessons',
-					'limit'  : 5
-				},
-				'success' : function(response){
-					try {
-						previewCount = response[0];
-						previewCountSpan.text(previewCount);
-						allLessonCountSpan.text(response[1]);
-					} catch(err) {
-						alert('<fmt:message key="msg.cleanup.preview.lesson.error" />');
-						previewCount = 0;
-					}
-				},
-				'error'	  : function(){
-					alert('<fmt:message key="msg.cleanup.preview.lesson.error" />');
-					previewCount = 0;
-				}
-			});
-		}
-		
-		deletingBox.hide();
-		if (previewCount > 0) {
-			deleteButton.prop('disabled', false);
-		}
+		deletePreviewLessons(previewCount, $('#previewCount'), $('#allLessonCount'));
 	});
 });
+
+function deletePreviewLessons(previewCount, previewCountSpan, allLessonCountSpan){
+	if (previewCount <= 0) {
+		$('#deletingBox').hide();
+		return;
+	}
+	$.ajax({
+		'cache'   : false,
+		'url'     : '<lams:WebAppURL />cleanupPreviewLessons.do',
+		'data'    : {
+			'method' : 'deletePreviewLessons',
+			'limit'  : 5
+		},
+		'success' : function(response){
+			try {
+				previewCount = response[0];
+				previewCountSpan.text(previewCount);
+				allLessonCountSpan.text(response[1]);
+				setTimeout(function(){
+					deletePreviewLessons(previewCount, previewCountSpan, allLessonCountSpan);
+				}, 500);
+			} catch(err) {
+				alert('<fmt:message key="msg.cleanup.preview.lesson.error" />');
+				previewCountSpan.text('ERROR');
+				allLessonCountSpan.text('ERROR');
+			}
+		},
+		'error'	  : function(){
+			alert('<fmt:message key="msg.cleanup.preview.lesson.error" />');
+		}
+	});
+}
 </script>
 
 <p><a href="<lams:LAMSURL/>admin/sysadminstart.do" class="btn btn-default"><fmt:message key="sysadmin.maintain" /></a></p>
@@ -63,9 +63,9 @@ $(document).ready(function(){
 <html:errors />
 
 <fmt:message key="label.cleanup.preview.lesson.count" />&nbsp;<span id="previewCount">${previewCount}</span> / <span id="allLessonCount">${allLessonCount}</span>
-<p id="deletingBox" style="display: none;">
+<div id="deletingBox" style="display: none">
 	<fmt:message key="label.cleanup.preview.lesson.progress" />
-</p>
+</div>
 
 <div class="pull-right">
 	<button id="deleteButton" class="btn btn-primary loffset5"><fmt:message key="admin.delete"/></button>
