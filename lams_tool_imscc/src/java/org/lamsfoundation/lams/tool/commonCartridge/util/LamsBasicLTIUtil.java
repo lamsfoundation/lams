@@ -29,8 +29,8 @@ import javax.servlet.http.HttpSession;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
-import org.imsglobal.basiclti.BasicLTIConstants;
-import org.imsglobal.basiclti.BasicLTIUtil;
+import org.imsglobal.lti.BasicLTIConstants;
+import org.imsglobal.lti.BasicLTIUtil;
 import org.lamsfoundation.lams.tool.commonCartridge.model.CommonCartridgeConfigItem;
 import org.lamsfoundation.lams.tool.commonCartridge.model.CommonCartridgeItem;
 import org.lamsfoundation.lams.tool.commonCartridge.service.ICommonCartridgeService;

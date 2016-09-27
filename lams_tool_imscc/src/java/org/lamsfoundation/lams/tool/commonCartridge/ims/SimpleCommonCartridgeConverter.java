@@ -37,8 +37,8 @@ import javax.xml.parsers.ParserConfigurationException;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.log4j.Logger;
-import org.imsglobal.basiclti.BasicLTIUtil;
-import org.imsglobal.basiclti.XMLMap;
+import org.imsglobal.lti.BasicLTIUtil;
+import org.imsglobal.lti.XMLMap;
 import org.lamsfoundation.lams.tool.commonCartridge.model.CommonCartridgeItem;
 import org.w3c.dom.Document;
 import org.xml.sax.SAXException;
