@@ -12,7 +12,7 @@
 		
 			function submitMethod(actionMethod) {
 				document.McAuthoringForm.dispatch.value=actionMethod;
-				$("textarea[name^=ca]").each(function() {
+					$("textarea[name^=ca],textarea[name=feedback]").each(function() {
 					var name = $(this).attr("name");
 					var value = CKEDITOR.instances[name].getData();
 					$(this).val(value);
@@ -28,7 +28,7 @@
 			function addItem() {
 				document.McAuthoringForm.dispatch.value="addSingleQuestion";
 				$("#newQuestion").val(CKEDITOR.instances.newQuestion.getData());
-				$("textarea[name^=ca]").each(function() {
+				$("textarea[name^=ca],textarea[name=feedback]").each(function() {
 					var name = $(this).attr("name");
 					var value = CKEDITOR.instances[name].getData();
 					$(this).val(value);
@@ -194,8 +194,13 @@
 
 			<div class="form-group">
 				<label for="feedback"><fmt:message key="label.feedback"></fmt:message></label>
-				<html:textarea property="feedback" rows="3" cols="70" styleClass="form-control"></html:textarea>
+				<lams:CKEditor id="feedback"
+				value="${feedback}"
+				contentFolderID="${mcGeneralAuthoringDTO.contentFolderID}">
+			</lams:CKEditor>
 			</div>
+			
+				
 			
 			<a href="#" onclick="addItem();" onmousedown="self.focus();" class="btn btn-default btn-sm pull-right"> 
 				<i class="fa fa-plus"></i>&nbsp;<fmt:message key="label.add.new.question" />
