@@ -136,7 +136,7 @@
 												</h4>
 											</div>
 											<div class="panel-body">
-												<c:out value="${feedbackEntry.value}" escapeXml="true" />
+												<c:out value="${feedbackEntry.value}" escapeXml="false" />
 											</div>
 										</div>
 

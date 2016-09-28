@@ -120,7 +120,7 @@
 								</h4>
 							</div>
 							<div class="panel-body">
-								<c:out value="${dto.feedback}" escapeXml="true" />
+								<c:out value="${dto.feedback}" escapeXml="false" />
 							</div>
 						</div>
 						<!-- end answer feedback -->
