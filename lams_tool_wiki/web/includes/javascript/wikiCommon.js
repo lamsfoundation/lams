@@ -59,7 +59,7 @@ function doRemove(confirmMessage)
 var compareWindow = null;
 function doCompareOrView(webAppUrl, historyId, currentPageId, dispatch)
 {
-	var url = webAppUrl + "/authoring.do?";
+	var url = webAppUrl + "/learning.do?";
 	url += "&historyPageContentId=" + historyId;
 	url += "&currentWikiPage=" + currentPageId;
 	url += "&dispatch=" + dispatch;
