@@ -22,10 +22,7 @@
  */
 package org.lamsfoundation.lams.admin.web;
 
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -40,19 +37,10 @@ import org.apache.struts.action.ActionMessage;
 import org.apache.struts.action.ActionMessages;
 import org.apache.struts.action.DynaActionForm;
 import org.lamsfoundation.lams.admin.service.AdminServiceProxy;
-import org.lamsfoundation.lams.integration.ExtServerOrgMap;
+import org.lamsfoundation.lams.integration.ExtServer;
 import org.lamsfoundation.lams.integration.service.IIntegrationService;
-import org.lamsfoundation.lams.usermanagement.Organisation;
-import org.lamsfoundation.lams.usermanagement.OrganisationState;
-import org.lamsfoundation.lams.usermanagement.OrganisationType;
-import org.lamsfoundation.lams.usermanagement.SupportedLocale;
-import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
-import org.lamsfoundation.lams.util.LanguageUtil;
 import org.lamsfoundation.lams.util.MessageService;
-import org.lamsfoundation.lams.util.ValidationUtil;
-import org.lamsfoundation.lams.web.session.SessionManager;
-import org.lamsfoundation.lams.web.util.AttributeNames;
 
 /**
  * <p>
@@ -80,65 +68,28 @@ public class ServerSaveAction extends Action {
 	userService = AdminServiceProxy.getService(getServlet().getServletContext());
 	messageService = AdminServiceProxy.getMessageService(getServlet().getServletContext());
 
-	DynaActionForm serverOrgMapForm = (DynaActionForm) form;
+	DynaActionForm extServerForm = (DynaActionForm) form;
 	ActionMessages errors = new ActionMessages();
 	String[] requiredFields = { "serverid", "serverkey", "servername", "prefix", "userinfoUrl", "timeoutUrl" };
 	for (String requiredField : requiredFields) {
-	    if (StringUtils.trimToNull(serverOrgMapForm.getString(requiredField)) == null) {
+	    if (StringUtils.trimToNull(extServerForm.getString(requiredField)) == null) {
 		errors.add(requiredField,
 			new ActionMessage("error.required", messageService.getMessage("sysadmin." + requiredField)));
 	    }
 	}
-	Organisation org = null;
-	UserDTO user = (UserDTO) SessionManager.getSession().getAttribute(AttributeNames.USER);
-	if ((Boolean) serverOrgMapForm.get("newOrg")) {
 
-	    String orgName = serverOrgMapForm.getString("orgName");
-	    if (StringUtils.trimToNull(orgName) == null) {
-		errors.add("orgId",
-			new ActionMessage("error.required", messageService.getMessage("sysadmin.organisation")));
-
-	    } else if (!ValidationUtil.isOrgNameValid(orgName)) {
-		errors.add("orgId", new ActionMessage("error.name.invalid.characters"));
-
-	    } else {
-
-		org = new Organisation();
-		org.setName(orgName);
-		org.setParentOrganisation(userService.getRootOrganisation());
-		org.setOrganisationType(
-			(OrganisationType) userService.findById(OrganisationType.class, OrganisationType.COURSE_TYPE));
-		org.setOrganisationState(
-			(OrganisationState) userService.findById(OrganisationState.class, OrganisationState.ACTIVE));
-		SupportedLocale locale = LanguageUtil.getDefaultLocale();
-		org.setLocale(locale);
-		userService.saveOrganisation(org, user.getUserID());
-		serverOrgMapForm.set("orgId", org.getOrganisationId());
-		serverOrgMapForm.set("newOrg", false);
-		serverOrgMapForm.set("orgName", null);
-	    }
-
-	} else {
-	    Integer orgId = (Integer) serverOrgMapForm.get("orgId");
-	    if (orgId.equals(-1)) {
-		// LDEV-1284 no need for integration organisation anymore
-		// errors.add("orgId",new ActionMessage("error.required", messageService.getMessage("sysadmin.organisation")));
-	    } else {
-		org = (Organisation) userService.findById(Organisation.class, orgId);
-	    }
-	}
-	Integer sid = (Integer) serverOrgMapForm.get("sid");
+	Integer sid = (Integer) extServerForm.get("sid");
 	if (errors.isEmpty()) {//check duplication
 	    String[] uniqueFields = { "serverid", "prefix" };
 	    for (String uniqueField : uniqueFields) {
-		List list = userService.findByProperty(ExtServerOrgMap.class, uniqueField,
-			serverOrgMapForm.get(uniqueField));
+		List list = userService.findByProperty(ExtServer.class, uniqueField,
+			extServerForm.get(uniqueField));
 		if (list != null && list.size() > 0) {
 		    if (sid.equals(-1)) {//new map
 			errors.add(uniqueField, new ActionMessage("error.not.unique",
 				messageService.getMessage("sysadmin." + uniqueField)));
 		    } else {
-			ExtServerOrgMap map = (ExtServerOrgMap) list.get(0);
+			ExtServer map = (ExtServer) list.get(0);
 			if (!map.getSid().equals(sid)) {
 			    errors.add(uniqueField, new ActionMessage("error.not.unique",
 				    messageService.getMessage("sysadmin." + uniqueField)));
@@ -149,33 +100,20 @@ public class ServerSaveAction extends Action {
 	    }
 	}
 	if (errors.isEmpty()) {
-	    ExtServerOrgMap map = null;
+	    ExtServer map = null;
 	    if (sid.equals(-1)) {
-		map = new ExtServerOrgMap();
-		BeanUtils.copyProperties(map, serverOrgMapForm);
+		map = new ExtServer();
+		BeanUtils.copyProperties(map, extServerForm);
 		map.setSid(null);
-		map.setServerTypeId(ExtServerOrgMap.INTEGRATION_SERVER_TYPE);
+		map.setServerTypeId(ExtServer.INTEGRATION_SERVER_TYPE);
 	    } else {
-		map = service.getExtServerOrgMap(sid);
-		BeanUtils.copyProperties(map, serverOrgMapForm);
+		map = service.getExtServer(sid);
+		BeanUtils.copyProperties(map, extServerForm);
 	    }
-	    map.setOrganisation(org);
-	    service.saveExtServerOrgMap(map);
+	    service.saveExtServer(map);
 	    return mapping.findForward("success");
 	} else {
 	    saveErrors(request, errors);
-	    Map<String, Object> properties = new HashMap<String, Object>();
-	    properties.put("organisationType.organisationTypeId", OrganisationType.COURSE_TYPE);
-	    properties.put("organisationState.organisationStateId", OrganisationState.ACTIVE);
-	    List list = userService.findByProperties(Organisation.class, properties);
-	    Organisation dummy = new Organisation();
-	    dummy.setOrganisationId(-1);
-	    dummy.setName(messageService.getMessage("sysadmin.organisation.select"));
-	    if (list == null) {
-		list = new ArrayList();
-	    }
-	    list.add(dummy);
-	    request.setAttribute("orgs", list);
 	    return mapping.getInputForward();
 	}
     }

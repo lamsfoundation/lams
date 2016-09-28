@@ -33,7 +33,7 @@ import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.lamsfoundation.lams.admin.service.AdminServiceProxy;
-import org.lamsfoundation.lams.integration.ExtServerOrgMap;
+import org.lamsfoundation.lams.integration.ExtServer;
 
 /**
  *
@@ -45,10 +45,10 @@ public class ServerListAction extends Action {
     @SuppressWarnings("unchecked")
     public ActionForward execute(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) throws Exception {
-	List<ExtServerOrgMap> list = AdminServiceProxy.getIntegrationService(getServlet().getServletContext())
-		.getAllExtServerOrgMaps();
-	Collections.sort(list);
-	request.setAttribute("servers", list);
+	List<ExtServer> extServers = AdminServiceProxy.getIntegrationService(getServlet().getServletContext())
+		.getAllExtServers();
+	Collections.sort(extServers);
+	request.setAttribute("servers", extServers);
 	return mapping.findForward("serverlist");
     }
 

@@ -13,7 +13,7 @@ import javax.xml.parsers.ParserConfigurationException;
 
 import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.log4j.Logger;
-import org.lamsfoundation.lams.integration.ExtServerOrgMap;
+import org.lamsfoundation.lams.integration.ExtServer;
 import org.lamsfoundation.lams.integration.security.Authenticator;
 import org.lamsfoundation.lams.integration.service.IntegrationService;
 import org.lamsfoundation.lams.usermanagement.OrganisationGroup;
@@ -59,8 +59,8 @@ public class OrganisationGroupServlet extends HttpServlet {
 	String username = request.getParameter(CentralConstants.PARAM_USERNAME);
 
 	try {
-	    ExtServerOrgMap serverMap = OrganisationGroupServlet.integrationService.getExtServerOrgMap(serverId);
-	    Authenticator.authenticate(serverMap, datetime, username, hashValue);
+	    ExtServer extServer = OrganisationGroupServlet.integrationService.getExtServer(serverId);
+	    Authenticator.authenticate(extServer, datetime, username, hashValue);
 
 	    String method = request.getParameter(CentralConstants.PARAM_METHOD);
 	    if ("getGroupings".equalsIgnoreCase(method)) {

@@ -26,7 +26,7 @@ import javax.xml.transform.stream.StreamResult;
 
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.contentrepository.RepositoryCheckedException;
-import org.lamsfoundation.lams.integration.ExtServerOrgMap;
+import org.lamsfoundation.lams.integration.ExtServer;
 import org.lamsfoundation.lams.integration.ExtUserUseridMap;
 import org.lamsfoundation.lams.integration.UserInfoFetchException;
 import org.lamsfoundation.lams.integration.UserInfoValidationException;
@@ -272,10 +272,10 @@ public class LearningDesignRepositoryServlet extends HttpServlet {
 	    }
 
 	    // get Server map
-	    ExtServerOrgMap serverMap = LearningDesignRepositoryServlet.integrationService.getExtServerOrgMap(serverId);
+	    ExtServer extServer = LearningDesignRepositoryServlet.integrationService.getExtServer(serverId);
 
 	    // authenticate
-	    Authenticator.authenticate(serverMap, datetime, username, hashValue);
+	    Authenticator.authenticate(extServer, datetime, username, hashValue);
 
 	    // get user map, user is created if this is their first use
 
@@ -287,7 +287,7 @@ public class LearningDesignRepositoryServlet extends HttpServlet {
 		    && (method.equals("getLearningDesignsJSON") || method.equals("getPagedHomeLearningDesignsJSON"))) {
 
 		Integer userId = getUserId(username, courseId, courseName, country, lang, usePrefix,
-			isUpdateUserDetails, firstName, lastName, email, serverMap);
+			isUpdateUserDetails, firstName, lastName, email, extServer);
 
 		boolean allowInvalidDesigns = WebUtil.readBooleanParam(request, "allowInvalidDesigns", false);
 
@@ -315,7 +315,7 @@ public class LearningDesignRepositoryServlet extends HttpServlet {
 	    } else if ((method != null) && method.equals("deleteLearningDesignJSON")) {
 
 		Integer userId = getUserId(username, courseId, courseName, country, lang, usePrefix,
-			isUpdateUserDetails, firstName, lastName, email, serverMap);
+			isUpdateUserDetails, firstName, lastName, email, extServer);
 
 		Long learningDesignId = WebUtil.readLongParam(request,
 			LearningDesignRepositoryServlet.PARAM_LEARING_DESIGN_ID);
@@ -337,15 +337,15 @@ public class LearningDesignRepositoryServlet extends HttpServlet {
 		ExtUserUseridMap userMap = null;
 		boolean prefix = usePrefix == null ? true : Boolean.parseBoolean(usePrefix);
 		if ((firstName == null) && (lastName == null)) {
-		    userMap = LearningDesignRepositoryServlet.integrationService.getExtUserUseridMap(serverMap,
+		    userMap = LearningDesignRepositoryServlet.integrationService.getExtUserUseridMap(extServer,
 			    username, prefix);
 		} else {
-		    userMap = LearningDesignRepositoryServlet.integrationService.getImplicitExtUserUseridMap(serverMap,
+		    userMap = LearningDesignRepositoryServlet.integrationService.getImplicitExtUserUseridMap(extServer,
 			    username, firstName, lastName, lang, country, email, prefix, isUpdateUserDetails);
 		}
 
 		// create group for external course if necessary
-		LearningDesignRepositoryServlet.integrationService.getExtCourseClassMap(serverMap, userMap, courseId,
+		LearningDesignRepositoryServlet.integrationService.getExtCourseClassMap(extServer, userMap, courseId,
 			country, lang, courseName, LoginRequestDispatcher.METHOD_AUTHOR);
 		Integer userId = userMap.getUser().getUserId();
 
@@ -384,19 +384,19 @@ public class LearningDesignRepositoryServlet extends HttpServlet {
 
     private Integer getUserId(String username, String courseId, String courseName, String country, String lang,
 	    String usePrefix, final boolean isUpdateUserDetails, String firstName, String lastName, String email,
-	    ExtServerOrgMap serverMap) throws UserInfoFetchException, UserInfoValidationException {
+	    ExtServer extServer) throws UserInfoFetchException, UserInfoValidationException {
 	ExtUserUseridMap userMap = null;
 	boolean prefix = usePrefix == null ? true : Boolean.parseBoolean(usePrefix);
 	if ((firstName == null) && (lastName == null)) {
-	    userMap = LearningDesignRepositoryServlet.integrationService.getExtUserUseridMap(serverMap, username,
+	    userMap = LearningDesignRepositoryServlet.integrationService.getExtUserUseridMap(extServer, username,
 		    prefix);
 	} else {
-	    userMap = LearningDesignRepositoryServlet.integrationService.getImplicitExtUserUseridMap(serverMap,
+	    userMap = LearningDesignRepositoryServlet.integrationService.getImplicitExtUserUseridMap(extServer,
 		    username, firstName, lastName, lang, country, email, prefix, isUpdateUserDetails);
 	}
 
 	// create group for external course if necessary
-	LearningDesignRepositoryServlet.integrationService.getExtCourseClassMap(serverMap, userMap, courseId, country,
+	LearningDesignRepositoryServlet.integrationService.getExtCourseClassMap(extServer, userMap, courseId, country,
 		lang, courseName, LoginRequestDispatcher.METHOD_AUTHOR);
 	Integer userId = userMap.getUser().getUserId();
 	return userId;

@@ -101,7 +101,7 @@
 	<form-property name="news" type="java.lang.String" />
 </form-bean>
 
-<form-bean name="ServerOrgMapForm" type="org.apache.struts.action.DynaActionForm">
+<form-bean name="ExtServerForm" type="org.apache.struts.action.DynaActionForm">
 	<form-property name="sid" type="java.lang.Integer" initial="-1"/>
 	<form-property name="serverid" type="java.lang.String" />
 	<form-property name="serverkey" type="java.lang.String" />
@@ -116,9 +116,6 @@
 	<form-property name="disabled" type="java.lang.Boolean" initial="false"/>
 	<form-property name="timeToLiveLoginRequestEnabled" type="java.lang.Boolean" initial="true"/>
 	<form-property name="timeToLiveLoginRequest" type="java.lang.Integer" initial="80"/>
-	<form-property name="orgId" type="java.lang.Integer" initial="-1"/>
-	<form-property name="newOrg" type="java.lang.Boolean" initial="false"/>
-	<form-property name="orgName" type="java.lang.String" />
 </form-bean>
 
 <form-bean name="LtiConsumerForm" type="org.apache.struts.action.DynaActionForm">
@@ -218,7 +215,7 @@
     <action
       path="/servermaintain"
       type="org.lamsfoundation.lams.admin.web.ServerMaintainAction"
-      name="ServerOrgMapForm"
+      name="ExtServerForm"
       scope="request"
       parameter="method"
       unknown="false"
@@ -380,7 +377,7 @@
     <action
       path="/serversave"
       type="org.lamsfoundation.lams.admin.web.ServerSaveAction"
-      name="ServerOrgMapForm"
+      name="ExtServerForm"
       scope="request"
       input=".servermaintain"
       unknown="false"
