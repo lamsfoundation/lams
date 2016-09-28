@@ -20,7 +20,7 @@ import org.imsglobal.lti.BasicLTIConstants;
 import org.lamsfoundation.lams.contentrepository.RepositoryCheckedException;
 import org.lamsfoundation.lams.integration.ExtCourseClassMap;
 import org.lamsfoundation.lams.integration.ExtServerLessonMap;
-import org.lamsfoundation.lams.integration.ExtServerOrgMap;
+import org.lamsfoundation.lams.integration.ExtServer;
 import org.lamsfoundation.lams.integration.ExtUserUseridMap;
 import org.lamsfoundation.lams.integration.UserInfoFetchException;
 import org.lamsfoundation.lams.integration.UserInfoValidationException;
@@ -82,7 +82,7 @@ public class LtiAction extends LamsDispatchAction {
 	
 	//update lessonFinishCallbackUrl. We store it one time during the very first call to LAMS and it stays the same all the time afterwards
 	String lessonFinishCallbackUrl = request.getParameter(BasicLTIConstants.LIS_OUTCOME_SERVICE_URL);
-	ExtServerOrgMap extServer = integrationService.getExtServerOrgMap(consumerKey);
+	ExtServer extServer = integrationService.getExtServer(consumerKey);
 	if (StringUtils.isNotBlank(lessonFinishCallbackUrl) && StringUtils.isBlank(extServer.getLessonFinishUrl())) {
 	    extServer.setLessonFinishUrl(lessonFinishCallbackUrl);
 	    userManagementService.save(extServer);
@@ -130,7 +130,7 @@ public class LtiAction extends LamsDispatchAction {
 	String resourceLinkTitle = request.getParameter(BasicLTIConstants.RESOURCE_LINK_TITLE);
 	String resourceLinkDescription = request.getParameter(BasicLTIConstants.RESOURCE_LINK_DESCRIPTION);
 
-	ExtServerOrgMap extServer = integrationService.getExtServerOrgMap(consumerKey);
+	ExtServer extServer = integrationService.getExtServer(consumerKey);
 	ExtCourseClassMap orgMap = integrationService.getExtCourseClassMap(extServer.getSid(), contextId);
 	Integer organisationId = orgMap.getOrganisation().getOrganisationId();
 	//only monitors are allowed to create lesson
@@ -177,7 +177,7 @@ public class LtiAction extends LamsDispatchAction {
 	    return null;
 	}
 
-	ExtServerOrgMap extServer = integrationService.getExtServerOrgMap(consumerKey);
+	ExtServer extServer = integrationService.getExtServer(consumerKey);
 	Organisation organisation = monitoringService.getOrganisation(organisationId);
 
 	// 1. init lesson

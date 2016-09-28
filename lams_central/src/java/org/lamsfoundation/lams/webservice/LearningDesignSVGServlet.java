@@ -34,7 +34,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
-import org.lamsfoundation.lams.integration.ExtServerOrgMap;
+import org.lamsfoundation.lams.integration.ExtServer;
 import org.lamsfoundation.lams.integration.security.Authenticator;
 import org.lamsfoundation.lams.integration.service.IntegrationService;
 import org.lamsfoundation.lams.learningdesign.service.ILearningDesignService;
@@ -80,10 +80,10 @@ public class LearningDesignSVGServlet extends HttpServlet {
 	    }
 
 	    // get Server map
-	    ExtServerOrgMap serverMap = integrationService.getExtServerOrgMap(serverId);
+	    ExtServer extServer = integrationService.getExtServer(serverId);
 
 	    // authenticate
-	    Authenticator.authenticate(serverMap, datetime, username, hashValue);
+	    Authenticator.authenticate(extServer, datetime, username, hashValue);
 
 	    String imagePath = LearningDesignService.getLearningDesignSVGPath(learningDesignId);
 	    File imageFile = new File(imagePath);

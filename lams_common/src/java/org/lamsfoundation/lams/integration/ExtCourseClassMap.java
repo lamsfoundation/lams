@@ -16,15 +16,15 @@ public class ExtCourseClassMap implements Serializable {
     private String courseid;
 
     /** persistent field */
-    private ExtServerOrgMap extServerOrgMap;
+    private ExtServer extServer;
 
     /** persistent field */
     private Organisation organisation;
 
     /** full constructor */
-    public ExtCourseClassMap(String courseid, ExtServerOrgMap extServerOrgMap, Organisation organisation) {
+    public ExtCourseClassMap(String courseid, ExtServer extServer, Organisation organisation) {
 	this.courseid = courseid;
-	this.extServerOrgMap = extServerOrgMap;
+	this.extServer = extServer;
 	this.organisation = organisation;
     }
 
@@ -48,12 +48,12 @@ public class ExtCourseClassMap implements Serializable {
 	this.courseid = courseid;
     }
 
-    public ExtServerOrgMap getExtServerOrgMap() {
-	return this.extServerOrgMap;
+    public ExtServer getExtServer() {
+	return this.extServer;
     }
 
-    public void setExtServerOrgMap(ExtServerOrgMap extServerOrgMap) {
-	this.extServerOrgMap = extServerOrgMap;
+    public void setExtServer(ExtServer extServer) {
+	this.extServer = extServer;
     }
 
     public Organisation getOrganisation() {

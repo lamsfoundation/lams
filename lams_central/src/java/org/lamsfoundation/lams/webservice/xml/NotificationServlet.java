@@ -18,7 +18,7 @@ import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.events.DeliveryMethodNotification;
 import org.lamsfoundation.lams.events.IEventNotificationService;
 import org.lamsfoundation.lams.events.Subscription;
-import org.lamsfoundation.lams.integration.ExtServerOrgMap;
+import org.lamsfoundation.lams.integration.ExtServer;
 import org.lamsfoundation.lams.integration.ExtUserUseridMap;
 import org.lamsfoundation.lams.integration.security.Authenticator;
 import org.lamsfoundation.lams.integration.service.IntegrationService;
@@ -67,9 +67,9 @@ public class NotificationServlet extends HttpServlet {
 	String username = request.getParameter(CentralConstants.PARAM_USERNAME);
 
 	try {
-	    ExtServerOrgMap serverMap = NotificationServlet.integrationService.getExtServerOrgMap(serverId);
-	    Authenticator.authenticate(serverMap, datetime, username, hashValue);
-	    ExtUserUseridMap userMap = NotificationServlet.integrationService.getExtUserUseridMap(serverMap, username);
+	    ExtServer extServer = NotificationServlet.integrationService.getExtServer(serverId);
+	    Authenticator.authenticate(extServer, datetime, username, hashValue);
+	    ExtUserUseridMap userMap = NotificationServlet.integrationService.getExtUserUseridMap(extServer, username);
 	    String method = request.getParameter(CentralConstants.PARAM_METHOD);
 	    if ("getNotifications".equalsIgnoreCase(method)) {
 		getNotifications(userMap.getUser().getUserId(), request, response);

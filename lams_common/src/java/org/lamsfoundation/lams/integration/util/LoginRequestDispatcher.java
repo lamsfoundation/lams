@@ -27,7 +27,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.log4j.Logger;
-import org.lamsfoundation.lams.integration.ExtServerOrgMap;
+import org.lamsfoundation.lams.integration.ExtServer;
 import org.lamsfoundation.lams.integration.ExtUserUseridMap;
 import org.lamsfoundation.lams.integration.UserInfoFetchException;
 import org.lamsfoundation.lams.integration.UserInfoValidationException;
@@ -207,8 +207,8 @@ public class LoginRequestDispatcher {
 	}
 	String serverId = request.getParameter(PARAM_SERVER_ID);
 	String extUsername = request.getParameter(PARAM_USER_ID);
-	ExtServerOrgMap serverMap = integrationService.getExtServerOrgMap(serverId);
-	ExtUserUseridMap userMap = integrationService.getExtUserUseridMap(serverMap, extUsername);
+	ExtServer extServer = integrationService.getExtServer(serverId);
+	ExtUserUseridMap userMap = integrationService.getExtUserUseridMap(extServer, extUsername);
 	User user = userMap.getUser();
 	if (user == null) {
 	    String error = "Unable to add user to lesson class as user is missing from the user map";

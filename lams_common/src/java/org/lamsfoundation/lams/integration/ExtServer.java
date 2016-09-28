@@ -4,9 +4,8 @@ import java.io.Serializable;
 import java.util.Set;
 
 import org.apache.commons.lang.builder.ToStringBuilder;
-import org.lamsfoundation.lams.usermanagement.Organisation;
 
-public class ExtServerOrgMap implements Serializable, Comparable {
+public class ExtServer implements Serializable, Comparable {
 
     private static final long serialVersionUID = 337894825609071182L;
     
@@ -62,16 +61,13 @@ public class ExtServerOrgMap implements Serializable, Comparable {
     private int timeToLiveLoginRequest;
 
     /** persistent field */
-    private Organisation organisation;
-
-    /** persistent field */
     private Set extCourseClassMaps;
 
     /** persistent field */
     private Set extUserUseridMaps;
 
     /** default constructor */
-    public ExtServerOrgMap() {
+    public ExtServer() {
 	timeToLiveLoginRequest = 80;
     }
 
@@ -200,14 +196,6 @@ public class ExtServerOrgMap implements Serializable, Comparable {
 	this.timeToLiveLoginRequest = timeToLiveLoginRequest;
     }
 
-    public Organisation getOrganisation() {
-	return this.organisation;
-    }
-
-    public void setOrganisation(Organisation organisation) {
-	this.organisation = organisation;
-    }
-
     public Set getExtCourseClassMaps() {
 	return this.extCourseClassMaps;
     }
@@ -232,15 +220,15 @@ public class ExtServerOrgMap implements Serializable, Comparable {
 
     @Override
     public int compareTo(Object o) {
-	return serverid.compareToIgnoreCase(((ExtServerOrgMap) o).getServerid());
+	return serverid.compareToIgnoreCase(((ExtServer) o).getServerid());
     }
     
     public boolean isIntegrationServer() {
-	return getServerTypeId().intValue() == ExtServerOrgMap.INTEGRATION_SERVER_TYPE;
+	return getServerTypeId().intValue() == ExtServer.INTEGRATION_SERVER_TYPE;
     }
     
     public boolean isLtiConsumer() {
-	return getServerTypeId().intValue() == ExtServerOrgMap.LTI_CONSUMER_SERVER_TYPE;
+	return getServerTypeId().intValue() == ExtServer.LTI_CONSUMER_SERVER_TYPE;
     }
 
 }

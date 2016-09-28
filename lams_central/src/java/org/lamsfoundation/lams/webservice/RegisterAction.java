@@ -43,7 +43,7 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.events.IEventNotificationService;
 import org.lamsfoundation.lams.integration.ExtCourseClassMap;
-import org.lamsfoundation.lams.integration.ExtServerOrgMap;
+import org.lamsfoundation.lams.integration.ExtServer;
 import org.lamsfoundation.lams.integration.ExtUserUseridMap;
 import org.lamsfoundation.lams.integration.UserInfoFetchException;
 import org.lamsfoundation.lams.integration.security.Authenticator;
@@ -219,7 +219,7 @@ public class RegisterAction extends HttpServlet {
 	    }
 
 	    // authenticate external server
-	    ExtServerOrgMap extServer = integrationService.getExtServerOrgMap(serverId);
+	    ExtServer extServer = integrationService.getExtServer(serverId);
 	    Authenticator.authenticate(extServer, datetime, username, method, hashValue);
 
 	    // create new password
@@ -380,7 +380,7 @@ public class RegisterAction extends HttpServlet {
 	    }
 
 	    // authenticate external server
-	    ExtServerOrgMap extServer = integrationService.getExtServerOrgMap(serverId);
+	    ExtServer extServer = integrationService.getExtServer(serverId);
 	    Authenticator.authenticate(extServer, datetime, username, method, hashValue);
 
 	    // check whether we need to use a prefix for users
@@ -479,7 +479,7 @@ public class RegisterAction extends HttpServlet {
 	    }
 
 	    // authenticate external server
-	    ExtServerOrgMap extServer = integrationService.getExtServerOrgMap(serverId);
+	    ExtServer extServer = integrationService.getExtServer(serverId);
 	    Authenticator.authenticate(extServer, datetime, username, method, hashValue);
 
 	    // check whether we need to use a prefix for users
@@ -532,15 +532,15 @@ public class RegisterAction extends HttpServlet {
 	}
     }
 
-    private ExtUserUseridMap getExtUserUseridMap(ExtServerOrgMap serverMap, String extUsername)
+    private ExtUserUseridMap getExtUserUseridMap(ExtServer extServer, String extUsername)
 	    throws UserInfoFetchException {
 	Map<String, Object> properties = new HashMap<String, Object>();
-	properties.put("extServerOrgMap.sid", serverMap.getSid());
+	properties.put("extServer.sid", extServer.getSid());
 	properties.put("extUsername", extUsername);
 	List list = userManagementService.findByProperties(ExtUserUseridMap.class, properties);
 	if (list == null || list.size() == 0) {
 	    throw new RuntimeException("There is no user with username: " + extUsername
-		    + " assossiated with external server " + serverMap.getSid());
+		    + " assossiated with external server " + extServer.getSid());
 	} else {
 	    return (ExtUserUseridMap) list.get(0);
 	}
@@ -563,11 +563,11 @@ public class RegisterAction extends HttpServlet {
 
     // newer method which accepts course name, a parent org id, a flag for whether user should get
     // 'teacher' roles, and a flag for whether to use a prefix in the org's name
-    private ExtCourseClassMap getExtCourseClassMap(ExtServerOrgMap serverMap, ExtUserUseridMap userMap,
+    private ExtCourseClassMap getExtCourseClassMap(ExtServer extServer, ExtUserUseridMap userMap,
 	    String extCourseId, Boolean isTeacher) {
 	Map<String, Object> properties = new HashMap<String, Object>();
 	properties.put("courseid", extCourseId);
-	properties.put("extServerOrgMap.sid", serverMap.getSid());
+	properties.put("extServer.sid", extServer.getSid());
 	List list = userManagementService.findByProperties(ExtCourseClassMap.class, properties);
 	if (list == null || list.size() == 0) {
 	    throw new RuntimeException("There is no course with courseId: " + extCourseId);

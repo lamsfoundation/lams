@@ -11,7 +11,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.log4j.Logger;
-import org.lamsfoundation.lams.integration.ExtServerOrgMap;
+import org.lamsfoundation.lams.integration.ExtServer;
 import org.lamsfoundation.lams.integration.ExtUserUseridMap;
 import org.lamsfoundation.lams.integration.service.IntegrationService;
 import org.lamsfoundation.lams.security.ISecurityService;
@@ -49,23 +49,23 @@ public class UserRoleServlet extends HttpServlet {
 	String role = request.getParameter(AttributeNames.PARAM_ROLE);
 
 	try {
-	    ExtServerOrgMap serverMap = UserRoleServlet.integrationService.getExtServerOrgMap(serverId);
+	    ExtServer extServer = UserRoleServlet.integrationService.getExtServer(serverId);
 	    String plaintext = datetime.toLowerCase().trim() + username.toLowerCase().trim()
 		    + targetUsername.toLowerCase().trim() + method.toLowerCase().trim() + role.toLowerCase().trim()
-		    + serverMap.getServerid().toLowerCase().trim() + serverMap.getServerkey().toLowerCase().trim();
+		    + extServer.getServerid().toLowerCase().trim() + extServer.getServerkey().toLowerCase().trim();
 	    if (!hashValue.equals(HashUtil.sha1(plaintext))) {
 		log.error("Hash check failed while trying to set role for user: " + targetUsername);
 		response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Authentication failed, invalid hash");
 		return;
 	    }
-	    ExtUserUseridMap sysadminUserMap = UserRoleServlet.integrationService.getExtUserUseridMap(serverMap,
+	    ExtUserUseridMap sysadminUserMap = UserRoleServlet.integrationService.getExtUserUseridMap(extServer,
 		    username);
 	    if (!securityService.isSysadmin(sysadminUserMap.getUser().getUserId(), "set user role", false)) {
 		log.error("Sysadmin role check failed while trying to set role for user: " + targetUsername);
 		response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Authentication failed, user is not sysadmin");
 		return;
 	    }
-	    ExtUserUseridMap userMap = UserRoleServlet.integrationService.getExtUserUseridMap(serverMap,
+	    ExtUserUseridMap userMap = UserRoleServlet.integrationService.getExtUserUseridMap(extServer,
 		    targetUsername);
 	    User targetUser = userMap.getUser();
 	    if ("grant".equalsIgnoreCase(method)) {

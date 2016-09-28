@@ -49,7 +49,7 @@ import org.apache.tomcat.util.json.JSONObject;
 import org.lamsfoundation.lams.authoring.ObjectExtractorException;
 import org.lamsfoundation.lams.authoring.service.IAuthoringService;
 import org.lamsfoundation.lams.integration.ExtCourseClassMap;
-import org.lamsfoundation.lams.integration.ExtServerOrgMap;
+import org.lamsfoundation.lams.integration.ExtServer;
 import org.lamsfoundation.lams.integration.service.IIntegrationService;
 import org.lamsfoundation.lams.integration.util.LoginRequestDispatcher;
 import org.lamsfoundation.lams.learningdesign.LearningDesign;
@@ -272,8 +272,8 @@ public class AuthoringAction extends LamsDispatchAction {
 	    // if organisation ID is not set explicitly, derived it from external course
 	    String serverID = request.getParameter(LoginRequestDispatcher.PARAM_SERVER_ID);
 	    String courseID = request.getParameter(LoginRequestDispatcher.PARAM_COURSE_ID);
-	    ExtServerOrgMap serverMap = getIntegrationService().getExtServerOrgMap(serverID);
-	    ExtCourseClassMap orgMap = getIntegrationService().getExtCourseClassMap(serverMap.getSid(), courseID);
+	    ExtServer extServer = getIntegrationService().getExtServer(serverID);
+	    ExtCourseClassMap orgMap = getIntegrationService().getExtCourseClassMap(extServer.getSid(), courseID);
 	    organisationID = orgMap.getOrganisation().getOrganisationId();
 	}
 	Integer userID = getUserId();

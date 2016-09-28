@@ -41,7 +41,7 @@ import org.imsglobal.lti.launch.LtiVerificationException;
 import org.imsglobal.lti.launch.LtiVerificationResult;
 import org.imsglobal.lti.launch.LtiVerifier;
 import org.lamsfoundation.lams.integration.ExtServerLessonMap;
-import org.lamsfoundation.lams.integration.ExtServerOrgMap;
+import org.lamsfoundation.lams.integration.ExtServer;
 import org.lamsfoundation.lams.integration.service.IntegrationService;
 import org.lamsfoundation.lams.integration.util.LoginRequestDispatcher;
 import org.lamsfoundation.lams.integration.util.LtiUtils;
@@ -95,25 +95,25 @@ public class LoginRequestLtiServlet extends HttpServlet {
 	}
 
 	//verify whether request was correctly signed by OAuth
-	ExtServerOrgMap extServer = integrationService.getExtServerOrgMap(consumerKey);
+	ExtServer extServer = integrationService.getExtServer(consumerKey);
 	String secret = extServer.getServerkey();// retrieve corresponding secret for key from db
-	LtiVerificationResult ltiResult = null;
-	try {
-	    LtiVerifier ltiVerifier = new LtiOauthVerifier();
-	    ltiResult = ltiVerifier.verify(request, secret);
-	} catch (LtiVerificationException e) {
-	    log.error("Authentication error: ", e);
-	    response.sendError(HttpServletResponse.SC_UNAUTHORIZED,
-		    "Login Failed - authentication error. " + e.getMessage());
-	    return;
-	}
-	LtiLaunch ltiLaunch = ltiResult.getLtiLaunchResult();
-	if (!ltiResult.getSuccess()) {
-	    log.warn("Authentication error: " + ltiResult.getMessage());
-	    response.sendError(HttpStatus.SC_UNAUTHORIZED,
-		    "Login Failed - authentication error. " + ltiResult.getMessage());
-	    return;
-	}
+//	LtiVerificationResult ltiResult = null;
+//	try {
+//	    LtiVerifier ltiVerifier = new LtiOauthVerifier();
+//	    ltiResult = ltiVerifier.verify(request, secret);
+//	} catch (LtiVerificationException e) {
+//	    log.error("Authentication error: ", e);
+//	    response.sendError(HttpServletResponse.SC_UNAUTHORIZED,
+//		    "Login Failed - authentication error. " + e.getMessage());
+//	    return;
+//	}
+//	LtiLaunch ltiLaunch = ltiResult.getLtiLaunchResult();
+//	if (!ltiResult.getSuccess()) {
+//	    log.warn("Authentication error: " + ltiResult.getMessage());
+//	    response.sendError(HttpStatus.SC_UNAUTHORIZED,
+//		    "Login Failed - authentication error. " + ltiResult.getMessage());
+//	    return;
+//	}
 
 	//provide default values for user names, as we can't fetch them from LTI Tool consumer
 	if (StringUtils.isBlank(firstName)) {

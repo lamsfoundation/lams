@@ -31,7 +31,7 @@ import javax.servlet.http.HttpSession;
 
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.integration.ExtCourseClassMap;
-import org.lamsfoundation.lams.integration.ExtServerOrgMap;
+import org.lamsfoundation.lams.integration.ExtServer;
 import org.lamsfoundation.lams.integration.ExtUserUseridMap;
 import org.lamsfoundation.lams.integration.UserInfoFetchException;
 import org.lamsfoundation.lams.integration.UserInfoValidationException;
@@ -111,14 +111,14 @@ public class LoginRequestServlet extends HttpServlet {
 	    }
 	}
 
-	ExtServerOrgMap serverMap = getIntegrationService().getExtServerOrgMap(serverId);
+	ExtServer extServer = getIntegrationService().getExtServer(serverId);
 	boolean prefix = (usePrefix == null) ? true : Boolean.parseBoolean(usePrefix);
 	try {
 	    ExtUserUseridMap userMap = null;
 	    if ((firstName == null) && (lastName == null)) {
-		userMap = getIntegrationService().getExtUserUseridMap(serverMap, extUsername, prefix);
+		userMap = getIntegrationService().getExtUserUseridMap(extServer, extUsername, prefix);
 	    } else {
-		userMap = getIntegrationService().getImplicitExtUserUseridMap(serverMap, extUsername, firstName,
+		userMap = getIntegrationService().getImplicitExtUserUseridMap(extServer, extUsername, firstName,
 			lastName, langIsoCode, countryIsoCode, email, prefix, isUpdateUserDetails);
 	    }
 
@@ -129,14 +129,14 @@ public class LoginRequestServlet extends HttpServlet {
 		response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Login Failed - lsId parameter missing");
 		return;
 	    }
-	    Authenticator.authenticateLoginRequest(serverMap, timestamp, extUsername, method, lsId, hash);
+	    Authenticator.authenticateLoginRequest(extServer, timestamp, extUsername, method, lsId, hash);
 
 	    if (extCourseId == null && lsId != null) {
 		// derive course ID from lesson ID
-		ExtCourseClassMap classMap = integrationService.getExtCourseClassMap(serverMap.getSid(),
+		ExtCourseClassMap classMap = integrationService.getExtCourseClassMap(extServer.getSid(),
 			Long.parseLong(lsId));
 		if (classMap == null) {
-		    log.warn("Lesson " + lsId + " is not mapped to any course for server " + serverMap.getServername());
+		    log.warn("Lesson " + lsId + " is not mapped to any course for server " + extServer.getServername());
 		} else {
 		    extCourseId = classMap.getCourseid();
 		}
@@ -144,7 +144,7 @@ public class LoginRequestServlet extends HttpServlet {
 
 	    if (extCourseId != null) {
 		// check if organisation, ExtCourseClassMap and user roles exist and up-to-date, and if not update them
-		getIntegrationService().getExtCourseClassMap(serverMap, userMap, extCourseId, countryIsoCode,
+		getIntegrationService().getExtCourseClassMap(extServer, userMap, extCourseId, countryIsoCode,
 			langIsoCode, courseName, method, prefix);
 	    }
 	    
