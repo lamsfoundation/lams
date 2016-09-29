@@ -88,8 +88,6 @@
 
 </c:forEach>
 
-<html:hidden property="donePreview" />
-
 <div class="space-bottom-top align-right">
 	<html:hidden property="continueOptionsCombined" value="Continue" />
 

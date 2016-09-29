@@ -80,8 +80,6 @@
 </c:forEach>
 </ul>
 
-<html:hidden property="donePreview" />
-
 <div class="space-top button-inside">
 	<html:hidden property="continueOptionsCombined" value="Continue" />
 
