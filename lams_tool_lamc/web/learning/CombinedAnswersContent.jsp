@@ -74,8 +74,6 @@
 
 </c:forEach>
 
-<html:hidden property="donePreview" />
-
 <html:hidden property="continueOptionsCombined" value="Continue" />
 
 <c:if test="${hasEditRight}">

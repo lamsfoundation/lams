@@ -37,15 +37,33 @@
 				</fmt:message>
 			</h4>
 		</c:if>
+		
+		<c:if test="${hasEditRight && mcGeneralLearnerFlowDTO.retries == 'true'
+				&& mcGeneralLearnerFlowDTO.userOverPassMark != 'true'
+				&& mcGeneralLearnerFlowDTO.passMarkApplicable == 'true'}">
+			<p>
+				<fmt:message key="label.notEnoughMarks">
+					<fmt:param>
+						<c:if test="${mcGeneralLearnerFlowDTO.passMark != mcGeneralLearnerFlowDTO.totalMarksPossible}">
+							<fmt:message key="label.atleast" />
+						</c:if>
+                                                                
+						<c:out value="${mcGeneralLearnerFlowDTO.passMark}" />
+						<fmt:message key="label.outof" />
+						<c:out value="${mcGeneralLearnerFlowDTO.totalMarksPossible}" />
+					</fmt:param>
+				</fmt:message>
+			</p>
+			<p>
+				<strong><fmt:message key="label.mark" /> </strong>
+				<c:out value="${mcGeneralLearnerFlowDTO.learnerMark}" />
+				<fmt:message key="label.outof" />
+				<c:out value="${mcGeneralLearnerFlowDTO.totalMarksPossible}" />
+			</p>
+		</c:if> 
 
 		<h4>
-			<c:if test="${mcGeneralLearnerFlowDTO.learnerProgress != 'true'}">
-				<fmt:message key="label.viewAnswers" />
-			</c:if>
-
-			<c:if test="${mcGeneralLearnerFlowDTO.learnerProgress == 'true'}">
-				<fmt:message key="label.learner.viewAnswers" />
-			</c:if>
+			<fmt:message key="label.viewAnswers" />
 		</h4>
 
 		<!--  QUESTIONS  -->
@@ -152,6 +170,15 @@
 		<!-- end page panel -->
 
 		<!-- END QUESTION  -->
+		
+		<c:if test="${(mcGeneralLearnerFlowDTO.retries == 'true') && hasEditRight || (mcGeneralLearnerFlowDTO.displayAnswers == 'true')}">
+			<p>
+				<strong><fmt:message key="label.mark" /> </strong>
+				<c:out value="${mcGeneralLearnerFlowDTO.learnerMark}" />
+				<fmt:message key="label.outof" />
+				<c:out value="${mcGeneralLearnerFlowDTO.totalMarksPossible}" />
+			</p>
+		</c:if>
 
 		<c:if test="${mcGeneralLearnerFlowDTO.showMarks == 'true'}">
 			<h4>
@@ -172,7 +199,7 @@
 		</c:if>
 
 
-		<c:if test="${mcGeneralLearnerFlowDTO.reflection && hasEditRight}">
+		<c:if test="${mcGeneralLearnerFlowDTO.reflection && (notebookEntry != null) && hasEditRight}">
 			<div class="row no-gutter">
 				<div class="col-xs-12">
 					<h4>
@@ -202,59 +229,46 @@
 		</c:if>
 
 		<div class="form-group">
-			<html:form action="/learning?method=displayMc&validate=false" method="POST" target="_self"
-				onsubmit="disableFinishButton();" styleId="Form1">
+			<html:form action="/learning?method=displayMc&validate=false" method="POST" target="_self" onsubmit="disableFinishButton();" styleId="Form1">
 				<html:hidden property="toolContentID" />
 				<html:hidden property="toolSessionID" />
 				<html:hidden property="httpSessionID" />
 				<html:hidden property="userID" />
 				<html:hidden property="userOverPassMark" />
 				<html:hidden property="passMarkApplicable" />
-				<html:hidden property="learnerProgress" />
-				<html:hidden property="learnerProgressUserId" />
 
-
-				<c:if
-					test="${(mcGeneralLearnerFlowDTO.learnerProgress != 'true') && (mcGeneralLearnerFlowDTO.retries == 'true') && hasEditRight}">
+				<c:if test="${(mcGeneralLearnerFlowDTO.retries == 'true') && hasEditRight}">
 					<html:submit property="redoQuestions" styleClass="btn btn-primary pull-left">
 						<fmt:message key="label.redo.questions" />
 					</html:submit>
 				</c:if>
 				
-				<c:if test="${mcGeneralLearnerFlowDTO.learnerProgress != 'true'}">
-					<c:if
-						test="${(mcGeneralLearnerFlowDTO.retries != 'true') || (mcGeneralLearnerFlowDTO.retries == 'true') && (mcGeneralLearnerFlowDTO.passMarkApplicable == 'true') && (mcGeneralLearnerFlowDTO.userOverPassMark == 'true')}">
+				<c:if test="${(mcGeneralLearnerFlowDTO.retries != 'true') 
+						|| (mcGeneralLearnerFlowDTO.retries == 'true') && (mcGeneralLearnerFlowDTO.passMarkApplicable == 'true') && (mcGeneralLearnerFlowDTO.userOverPassMark == 'true')}">
+					<div class="voffset5">
+						<c:if test="${(mcGeneralLearnerFlowDTO.reflection != 'true') || !hasEditRight}">
+							<html:hidden property="learnerFinished" value="Finished" />
 
-						<div class="voffset5">
-							<c:if test="${(mcGeneralLearnerFlowDTO.reflection != 'true') || !hasEditRight}">
-								<html:hidden property="learnerFinished" value="Finished" />
+							<html:link href="#nogo" styleClass="btn btn-primary pull-right na" styleId="finishButton"
+								onclick="submitForm('finish'); return false;">
+								<c:choose>
+									<c:when test="${activityPosition.last}">
+										<fmt:message key="label.submit" />
+									</c:when>
+									<c:otherwise>
+										<fmt:message key="label.finished" />
+									</c:otherwise>
+								</c:choose>
+							</html:link>
+						</c:if>
 
-								<html:link href="#nogo" styleClass="btn btn-primary pull-right na" styleId="finishButton"
-									onclick="submitForm('finish'); return false;">
-									<c:choose>
-										<c:when test="${activityPosition.last}">
-											<fmt:message key="label.submit" />
-										</c:when>
-										<c:otherwise>
-											<fmt:message key="label.finished" />
-										</c:otherwise>
-									</c:choose>
-								</html:link>
-							</c:if>
-
-							<c:if test="${(mcGeneralLearnerFlowDTO.reflection == 'true') && hasEditRight}">
-								<html:submit property="forwardtoReflection" styleClass="btn btn-primary pull-right">
-									<fmt:message key="label.continue" />
-								</html:submit>
-							</c:if>
-						</div>
-
-					</c:if>
+						<c:if test="${(mcGeneralLearnerFlowDTO.reflection == 'true') && hasEditRight}">
+							<html:submit property="forwardtoReflection" styleClass="btn btn-primary pull-right">
+								<fmt:message key="label.continue" />
+							</html:submit>
+						</c:if>
+					</div>
 				</c:if>
-
-				<p>
-					<html:hidden property="doneLearnerProgress" />
-				</p>
 
 			</html:form>
 		</div>

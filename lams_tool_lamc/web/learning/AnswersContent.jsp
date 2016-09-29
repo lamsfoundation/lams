@@ -151,8 +151,6 @@ div.growlUI h1, div.growlUI h2 {
 				<html:hidden property="userID" />
 				<html:hidden property="userOverPassMark" />
 				<html:hidden property="passMarkApplicable" />
-				<html:hidden property="learnerProgress" />
-				<html:hidden property="learnerProgressUserId" />
 
 				<%@ include file="/common/messages.jsp"%>
 

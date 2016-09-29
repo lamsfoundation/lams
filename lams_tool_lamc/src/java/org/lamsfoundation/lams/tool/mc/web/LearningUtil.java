@@ -38,16 +38,11 @@ import org.lamsfoundation.lams.tool.mc.pojos.McContent;
  * Keeps all operations needed for Authoring mode.
  *
  * @author Ozgur Demirtas
- *
  */
 public class LearningUtil implements McAppConstants {
     static Logger logger = Logger.getLogger(LearningUtil.class.getName());
 
-    /**
-     *
-     */
-    public static void saveFormRequestData(HttpServletRequest request, McLearningForm mcLearningForm,
-	    boolean prepareViewAnswersDataMode) {
+    public static void saveFormRequestData(HttpServletRequest request, McLearningForm mcLearningForm) {
 
 	String httpSessionID = request.getParameter("httpSessionID");
 	mcLearningForm.setHttpSessionID(httpSessionID);
@@ -57,13 +52,6 @@ public class LearningUtil implements McAppConstants {
 
 	String userOverPassMark = request.getParameter("userOverPassMark");
 	mcLearningForm.setUserOverPassMark(userOverPassMark);
-
-	if (prepareViewAnswersDataMode == false) {
-	    String learnerProgress = request.getParameter("learnerProgress");
-	    mcLearningForm.setLearnerProgress(learnerProgress);
-	    String learnerProgressUserId = request.getParameter("learnerProgressUserId");
-	    mcLearningForm.setLearnerProgressUserId(learnerProgressUserId);
-	}
     }
 
     /**
@@ -76,7 +64,6 @@ public class LearningUtil implements McAppConstants {
 	mcGeneralLearnerFlowDTO.setActivityInstructions(mcContent.getInstructions());
 	mcGeneralLearnerFlowDTO.setPassMark(mcContent.getPassMark());
 	mcGeneralLearnerFlowDTO.setReportTitleLearner("Report");
-	mcGeneralLearnerFlowDTO.setLearnerProgress(new Boolean(false).toString());
 
 	mcGeneralLearnerFlowDTO.setTotalQuestionCount(new Integer(mcContent.getMcQueContents().size()));
 	return mcGeneralLearnerFlowDTO;
