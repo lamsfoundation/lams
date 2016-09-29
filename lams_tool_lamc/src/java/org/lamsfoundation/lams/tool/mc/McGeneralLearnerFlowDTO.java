@@ -57,8 +57,6 @@ public class McGeneralLearnerFlowDTO implements Comparable {
 
     protected String activityTitle;
 
-    protected Integer latestAttemptMark;
-
     protected Integer currentQuestionIndex;
 
     protected String countSessionComplete;
@@ -76,10 +74,6 @@ public class McGeneralLearnerFlowDTO implements Comparable {
     protected Integer lowestMark;
 
     protected Integer averageMark;
-
-    protected String learnerProgress;
-
-    protected String learnerProgressUserId;
 
     protected String showMarks;
 
@@ -237,21 +231,6 @@ public class McGeneralLearnerFlowDTO implements Comparable {
     }
 
     /**
-     * @return Returns the LatestAttemptMark.
-     */
-    public Integer getLatestAttemptMark() {
-	return latestAttemptMark;
-    }
-
-    /**
-     * @param learnerBestMark
-     *            The learnerBestMark to set.
-     */
-    public void setLatestAttemptMark(Integer latestAttemptMark) {
-	this.latestAttemptMark = latestAttemptMark;
-    }
-
-    /**
      * @return Returns the activityInstructions.
      */
     public String getActivityInstructions() {
@@ -375,10 +354,9 @@ public class McGeneralLearnerFlowDTO implements Comparable {
 		.append("passMarkApplicable: ", passMarkApplicable).append("userPassed: ", userPassed)
 		.append("userOverPassMark: ", userOverPassMark).append("reportTitleLearner: ", reportTitleLearner)
 		.append("activityInstructions: ", activityInstructions).append("activityTitle: ", activityTitle)
-		.append("learnerProgress: ", learnerProgress).append("displayAnswers: ", displayAnswers)
-		.append("reflection: ", reflection).append("reflectionSubject: ", reflectionSubject)
-		.append("notebookEntry: ", notebookEntry).append("notebookEntriesVisible: ", notebookEntriesVisible)
-		.toString();
+		.append("displayAnswers: ", displayAnswers).append("reflection: ", reflection)
+		.append("reflectionSubject: ", reflectionSubject).append("notebookEntry: ", notebookEntry)
+		.append("notebookEntriesVisible: ", notebookEntriesVisible).toString();
     }
 
     /**
@@ -439,36 +417,6 @@ public class McGeneralLearnerFlowDTO implements Comparable {
      */
     public void setCurrentQuestionIndex(Integer currentQuestionIndex) {
 	this.currentQuestionIndex = currentQuestionIndex;
-    }
-
-    /**
-     * @return Returns the learnerProgress.
-     */
-    public String getLearnerProgress() {
-	return learnerProgress;
-    }
-
-    /**
-     * @param learnerProgress
-     *            The learnerProgress to set.
-     */
-    public void setLearnerProgress(String learnerProgress) {
-	this.learnerProgress = learnerProgress;
-    }
-
-    /**
-     * @return Returns the learnerProgressUserId.
-     */
-    public String getLearnerProgressUserId() {
-	return learnerProgressUserId;
-    }
-
-    /**
-     * @param learnerProgressUserId
-     *            The learnerProgressUserId to set.
-     */
-    public void setLearnerProgressUserId(String learnerProgressUserId) {
-	this.learnerProgressUserId = learnerProgressUserId;
     }
 
     /**
