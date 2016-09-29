@@ -48,13 +48,10 @@ public abstract class McUtils implements McAppConstants {
 	request.getSession().removeAttribute("monitoringStarter");
 	request.getSession().removeAttribute(LOAD_LEARNER);
 	request.getSession().removeAttribute(LOAD_MONITORING_CONTENT);
-	request.getSession().removeAttribute(INDIVIDUAL_REPORT);
 	request.getSession().removeAttribute(REDO_QUESTIONS);
 	request.getSession().removeAttribute(SINGLE_QUESTION_ANSWERS);
 	request.getSession().removeAttribute(ERROR_LIST);
 	request.getSession().removeAttribute(PREVIEW);
-	request.getSession().removeAttribute(LEARNER_PROGRESS);
-	request.getSession().removeAttribute(LEARNER_PROGRESS_USERID);
 	request.getSession().removeAttribute(AUTHORING_CANCELLED);
 	request.getSession().removeAttribute(DEFINE_LATER_EDIT_ACTIVITY);
 	request.getSession().removeAttribute(EDIT_OPTIONS_MODE);

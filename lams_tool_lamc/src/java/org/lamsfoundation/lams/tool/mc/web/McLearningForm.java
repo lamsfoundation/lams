@@ -41,8 +41,6 @@ public class McLearningForm extends ActionForm implements McAppConstants {
     protected String redoQuestions;
     protected String viewAnswers;
     protected String learnerFinished;
-    protected String donePreview;
-    protected String doneLearnerProgress;
     protected String submitReflection;
     protected String forwardtoReflection;
 
@@ -60,8 +58,6 @@ public class McLearningForm extends ActionForm implements McAppConstants {
     /** put tghese under SessionMap */
     protected String userOverPassMark;
     protected String passMarkApplicable;
-    protected String learnerProgress;
-    protected String learnerProgressUserId;
 
     protected String entryText;
 
@@ -85,8 +81,6 @@ public class McLearningForm extends ActionForm implements McAppConstants {
 	this.setRedoQuestions(null);
 	this.setViewAnswers(null);
 	this.setLearnerFinished(null);
-	this.setDonePreview(null);
-	this.setDoneLearnerProgress(null);
     }
 
     public void resetParameters() {
@@ -184,36 +178,6 @@ public class McLearningForm extends ActionForm implements McAppConstants {
     }
 
     /**
-     * @return Returns the donePreview.
-     */
-    public String getDonePreview() {
-	return donePreview;
-    }
-
-    /**
-     * @param donePreview
-     *            The donePreview to set.
-     */
-    public void setDonePreview(String donePreview) {
-	this.donePreview = donePreview;
-    }
-
-    /**
-     * @return Returns the doneLearnerProgress.
-     */
-    public String getDoneLearnerProgress() {
-	return doneLearnerProgress;
-    }
-
-    /**
-     * @param doneLearnerProgress
-     *            The doneLearnerProgress to set.
-     */
-    public void setDoneLearnerProgress(String doneLearnerProgress) {
-	this.doneLearnerProgress = doneLearnerProgress;
-    }
-
-    /**
      * @return Returns the userOverPassMark.
      */
     public String getUserOverPassMark() {
@@ -301,36 +265,6 @@ public class McLearningForm extends ActionForm implements McAppConstants {
      */
     public void setCurrentQuestionIndex(String currentQuestionIndex) {
 	this.currentQuestionIndex = currentQuestionIndex;
-    }
-
-    /**
-     * @return Returns the learnerProgress.
-     */
-    public String getLearnerProgress() {
-	return learnerProgress;
-    }
-
-    /**
-     * @param learnerProgress
-     *            The learnerProgress to set.
-     */
-    public void setLearnerProgress(String learnerProgress) {
-	this.learnerProgress = learnerProgress;
-    }
-
-    /**
-     * @return Returns the learnerProgressUserId.
-     */
-    public String getLearnerProgressUserId() {
-	return learnerProgressUserId;
-    }
-
-    /**
-     * @param learnerProgressUserId
-     *            The learnerProgressUserId to set.
-     */
-    public void setLearnerProgressUserId(String learnerProgressUserId) {
-	this.learnerProgressUserId = learnerProgressUserId;
     }
 
     /**

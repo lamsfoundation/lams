@@ -79,8 +79,6 @@
 	</c:if>
 </c:forEach>
 
-<html:hidden property="donePreview" />
-
 <div class="space-bottom-top">
     <c:if test="${mcGeneralLearnerFlowDTO.totalCountReached != 'true'  &&  mcGeneralLearnerFlowDTO.totalQuestionCount != '1'}"> 
     	<html:button property="continueOptionsCombined" onclick="submitNextQuestionSelected();" styleClass="button"> 

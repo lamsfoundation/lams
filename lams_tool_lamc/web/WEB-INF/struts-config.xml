@@ -236,12 +236,6 @@
 	  	/>
 	  	
 	  	<forward
-		    name="individualReport"
-		    path="/learning/IndividualLearnerResults.jsp"
-		    redirect="false"
-	  	/>
-	  	
-	  	<forward
 		    name="redoQuestions"
 		    path="/learning/RedoQuestions.jsp"
 		    redirect="false"

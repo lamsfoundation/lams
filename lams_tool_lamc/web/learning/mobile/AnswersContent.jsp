@@ -124,9 +124,7 @@
 		<html:hidden property="httpSessionID"/>			
 		<html:hidden property="userID"/>								
 		<html:hidden property="userOverPassMark"/>						
-		<html:hidden property="passMarkApplicable"/>										
-		<html:hidden property="learnerProgress"/>										
-		<html:hidden property="learnerProgressUserId"/>			
+		<html:hidden property="passMarkApplicable"/>
 		
 		<%@ include file="/common/messages.jsp"%>
 						

@@ -84,7 +84,7 @@ public class McLearningAction extends LamsDispatchAction implements McAppConstan
     public ActionForward unspecified(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) throws IOException, ServletException {
 	McLearningForm mcLearningForm = (McLearningForm) form;
-	LearningUtil.saveFormRequestData(request, mcLearningForm, false);
+	LearningUtil.saveFormRequestData(request, mcLearningForm);
 	return null;
     }
 
@@ -114,7 +114,7 @@ public class McLearningAction extends LamsDispatchAction implements McAppConstan
 	String toolContentId = mcSession.getMcContent().getMcContentId().toString();
 	mcLearningForm.setToolContentID(toolContentId);
 
-	LearningUtil.saveFormRequestData(request, mcLearningForm, false);
+	LearningUtil.saveFormRequestData(request, mcLearningForm);
 
 	if (mcLearningForm.getNextQuestionSelected() != null && !mcLearningForm.getNextQuestionSelected().equals("")) {
 	    mcLearningForm.resetParameters();
@@ -127,7 +127,6 @@ public class McLearningAction extends LamsDispatchAction implements McAppConstan
 	} else if (mcLearningForm.getRedoQuestions() != null) {
 	    return redoQuestions(request, mcLearningForm, mapping);
 	} else if (mcLearningForm.getViewAnswers() != null) {
-	    mcLearningForm.setLearnerProgress(new Boolean(false).toString());
 	    return viewAnswers(mapping, mcLearningForm, request, response);
 	} else if (mcLearningForm.getSubmitReflection() != null) {
 	    return submitReflection(mapping, form, request, response);
@@ -168,7 +167,7 @@ public class McLearningAction extends LamsDispatchAction implements McAppConstan
 	String toolContentId = mcSession.getMcContent().getMcContentId().toString();
 	mcLearningForm.setToolContentID(toolContentId);
 
-	LearningUtil.saveFormRequestData(request, mcLearningForm, false);
+	LearningUtil.saveFormRequestData(request, mcLearningForm);
 	// requested learner finished, the learner should be directed to next activity
 
 	HttpSession ss = SessionManager.getSession();
@@ -280,7 +279,6 @@ public class McLearningAction extends LamsDispatchAction implements McAppConstan
 	/* process the answers */
 	List<AnswerDTO> answerDtos = buildAnswerDtos(answers, mcContent);
 	mcService.saveUserAttempt(user, answerDtos);
-	request.setAttribute(McAppConstants.ANSWER_DTOS, answerDtos);
 	
 	//calculate total learner mark
 	int learnerMark = 0;
@@ -288,47 +286,13 @@ public class McLearningAction extends LamsDispatchAction implements McAppConstan
 	    learnerMark += answerDto.getMark();
 	}
 
-	McGeneralLearnerFlowDTO mcGeneralLearnerFlowDTO = LearningUtil.buildMcGeneralLearnerFlowDTO(mcContent);
-	mcGeneralLearnerFlowDTO.setLearnerMark(learnerMark);
-	mcGeneralLearnerFlowDTO.setTotalQuestionCount(mcContent.getMcQueContents().size());
-	mcGeneralLearnerFlowDTO.setTotalMarksPossible(mcContent.getTotalMarksPossible());
-
-	// Have to work out in advance if passed so that we can store it against the attempts
-	boolean passed = user.isMarkPassed(learnerMark);
-	mcGeneralLearnerFlowDTO.setUserOverPassMark(new Boolean(passed).toString());
-	mcGeneralLearnerFlowDTO.setPassMarkApplicable(new Boolean(mcContent.getPassMark() != null).toString());
-
-
 	Integer numberOfAttempts = user.getNumberOfAttempts() + 1;
 	user.setNumberOfAttempts(numberOfAttempts);
 	user.setLastAttemptTotalMark(learnerMark);
 	user.setResponseFinalised(true);
 	mcService.updateMcQueUsr(user);
 
-	mcGeneralLearnerFlowDTO.setDisplayAnswers(new Boolean(mcContent.isDisplayAnswers()).toString());
-
-	mcGeneralLearnerFlowDTO.setShowMarks(new Boolean(mcContent.isShowMarks()).toString());
-	if (mcContent.isShowMarks()) {
-	    Integer[] markStatistics = mcService.getMarkStatistics(session);
-	    mcGeneralLearnerFlowDTO.setTopMark(markStatistics[0]);
-	    mcGeneralLearnerFlowDTO.setLowestMark(markStatistics[1]);
-	    mcGeneralLearnerFlowDTO.setAverageMark(markStatistics[2]);
-	} else {
-	    mcGeneralLearnerFlowDTO.setTopMark(0);
-	    mcGeneralLearnerFlowDTO.setLowestMark(0);
-	    mcGeneralLearnerFlowDTO.setAverageMark(0);
-	}
-
-	mcGeneralLearnerFlowDTO.setReflection(new Boolean(mcContent.isReflect()).toString());
-
-	//String reflectionSubject = McUtils.replaceNewLines(mcContent.getReflectionSubject());
-	mcGeneralLearnerFlowDTO.setReflectionSubject(mcContent.getReflectionSubject());
-
-	mcGeneralLearnerFlowDTO.setLatestAttemptMark(user.getLastAttemptTotalMark());
-
-	request.setAttribute(McAppConstants.MC_GENERAL_LEARNER_FLOW_DTO, mcGeneralLearnerFlowDTO);
-
-	return mapping.findForward(McAppConstants.INDIVIDUAL_REPORT);
+	return viewAnswers(mapping, mcLearningForm, request, response);
     }
 
     /**
@@ -422,6 +386,9 @@ public class McLearningAction extends LamsDispatchAction implements McAppConstan
 
 	String toolContentId = mcSession.getMcContent().getMcContentId().toString();
 	McContent mcContent = mcService.getMcContent(new Long(toolContentId));
+	
+	String sessionMapID = mcLearningForm.getHttpSessionID();
+	request.setAttribute("sessionMapID", sessionMapID);
 
 	McGeneralLearnerFlowDTO mcGeneralLearnerFlowDTO = LearningUtil.buildMcGeneralLearnerFlowDTO(mcContent);
 
@@ -489,22 +456,7 @@ public class McLearningAction extends LamsDispatchAction implements McAppConstan
 	}
 	mcGeneralLearnerFlowDTO.setMapFeedbackContent(mapFeedbackContent);
 
-	// Set up the user details. If this is the learner progress screen then we that id,
-	// otherwise we use the user from the session.
-
-	String learnerProgress = mcLearningForm.getLearnerProgress();
-	String learnerProgressUserId = mcLearningForm.getLearnerProgressUserId();
-	mcGeneralLearnerFlowDTO.setLearnerProgressUserId(learnerProgressUserId);
-	mcGeneralLearnerFlowDTO.setLearnerProgress(learnerProgress);
-
-	Boolean learnerProgressOn = Boolean.parseBoolean(learnerProgress);
-
-	McQueUsr mcQueUsr = null;
-	if (learnerProgressOn.equals(Boolean.FALSE)) {
-	    mcQueUsr = getCurrentUser(toolSessionID);
-	} else {
-	    mcQueUsr = mcService.getMcUserBySession(new Long(learnerProgressUserId), mcSession.getUid());
-	}
+	McQueUsr user = getCurrentUser(toolSessionID);
 
 	Long toolContentUID = mcContent.getUid();
 
@@ -513,7 +465,7 @@ public class McLearningAction extends LamsDispatchAction implements McAppConstan
 	for (int i = 1; i <= mcContent.getMcQueContents().size(); i++) {
 	    McQueContent question = mcService.getQuestionByDisplayOrder(new Long(i), toolContentUID);
 
-	    McUsrAttempt userAttempt = mcService.getUserAttemptByQuestion(mcQueUsr.getUid(), question.getUid());
+	    McUsrAttempt userAttempt = mcService.getUserAttemptByQuestion(user.getUid(), question.getUid());
 
 	    if (userAttempt != null) {
 		attemptMap.put(new Integer(i).toString(), userAttempt);
@@ -524,27 +476,30 @@ public class McLearningAction extends LamsDispatchAction implements McAppConstan
 	mcGeneralLearnerFlowDTO.setReflectionSubject(mcContent.getReflectionSubject());
 
 	NotebookEntry notebookEntry = mcService.getEntry(new Long(toolSessionID), CoreNotebookConstants.NOTEBOOK_TOOL,
-		McAppConstants.MY_SIGNATURE, new Integer(mcQueUsr.getQueUsrId().intValue()));
+		McAppConstants.MY_SIGNATURE, new Integer(user.getQueUsrId().intValue()));
+	request.setAttribute("notebookEntry", notebookEntry);
 	if (notebookEntry != null) {
 	    mcGeneralLearnerFlowDTO.setNotebookEntry(notebookEntry.getEntry());
 	}
 
 	mcGeneralLearnerFlowDTO.setRetries(new Boolean(mcContent.isRetries()).toString());
 	mcGeneralLearnerFlowDTO.setPassMarkApplicable(new Boolean(mcContent.isPassMarkApplicable()).toString());
-	mcGeneralLearnerFlowDTO.setUserOverPassMark(new Boolean(mcQueUsr.isLastAttemptMarkPassed()).toString());
+	mcGeneralLearnerFlowDTO.setUserOverPassMark(new Boolean(user.isLastAttemptMarkPassed()).toString());
 	mcGeneralLearnerFlowDTO.setTotalMarksPossible(mcContent.getTotalMarksPossible());
 	mcGeneralLearnerFlowDTO.setShowMarks(new Boolean(mcContent.isShowMarks()).toString());
 	mcGeneralLearnerFlowDTO.setDisplayAnswers(new Boolean(mcContent.isDisplayAnswers()).toString());
+	mcGeneralLearnerFlowDTO.setLearnerMark(user.getLastAttemptTotalMark());
+	
 	if (mcContent.isShowMarks()) {
 	    Integer[] markStatistics = mcService.getMarkStatistics(mcSession);
 	    mcGeneralLearnerFlowDTO.setTopMark(markStatistics[0]);
 	    mcGeneralLearnerFlowDTO.setLowestMark(markStatistics[1]);
 	    mcGeneralLearnerFlowDTO.setAverageMark(markStatistics[2]);
+	    
 	} else {
-	    Integer zero = new Integer(0);
-	    mcGeneralLearnerFlowDTO.setTopMark(zero);
-	    mcGeneralLearnerFlowDTO.setLowestMark(zero);
-	    mcGeneralLearnerFlowDTO.setAverageMark(zero);
+	    mcGeneralLearnerFlowDTO.setTopMark(0);
+	    mcGeneralLearnerFlowDTO.setLowestMark(0);
+	    mcGeneralLearnerFlowDTO.setAverageMark(0);
 	}
 
 	request.setAttribute(McAppConstants.MC_GENERAL_LEARNER_FLOW_DTO, mcGeneralLearnerFlowDTO);
