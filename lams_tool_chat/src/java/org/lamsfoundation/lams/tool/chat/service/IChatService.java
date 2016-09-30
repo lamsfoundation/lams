@@ -21,7 +21,6 @@
  * ****************************************************************
  */
 
-
 package org.lamsfoundation.lams.tool.chat.service;
 
 import java.util.Collection;
@@ -117,6 +116,15 @@ public interface IChatService {
      * @return
      */
     public ChatUser getUserByNicknameAndSessionID(String nickname, Long sessionID);
+
+    /**
+     * Get how many post of this user post in a special session. DOES NOT include posts from author.
+     *
+     * @param userID
+     * @param sessionId
+     * @return
+     */
+    int getTopicsNum(Long userID, Long sessionId);
 
     public void updateUserPresence(Long toolSessionId, Set<String> activeUsers);
 

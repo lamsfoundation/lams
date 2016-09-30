@@ -21,8 +21,6 @@
  * ****************************************************************
  */
 
-
-
 package org.lamsfoundation.lams.tool.chat.dao;
 
 import java.util.List;
@@ -52,4 +50,13 @@ public interface IChatMessageDAO extends IBaseDAO {
     Map<Long, Integer> getCountByFromUser(Long sessionUID);
 
     List<ChatMessage> getSentByUser(Long userUid);
+
+    /**
+     * Return how many post from this user and session. DOES NOT include posts from author.
+     *
+     * @param userID
+     * @param sessionId
+     * @return
+     */
+    int getTopicsNum(Long userID, Long sessionId);
 }
