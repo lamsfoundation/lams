@@ -21,8 +21,6 @@
  * ****************************************************************
  */
 
-
-
 package org.lamsfoundation.lams.tool.chat.dao.hibernate;
 
 import java.util.HashMap;
@@ -68,6 +66,8 @@ public class ChatMessageDAO extends LAMSBaseDAO implements IChatMessageDAO {
 
     public static final String SQL_QUERY_FIND_MESSAGES_SENT_BY_USER = "FROM " + ChatMessage.class.getName()
 	    + " AS f WHERE f.fromUser.uid=?";
+    private static final String SQL_QUERY_TOPICS_NUMBER_BY_USER_SESSION = "select count(*) from "
+	    + ChatMessage.class.getName() + " m " + " where m.fromUser.userId=? and m.chatSession.sessionId=?";
 
     @Override
     public void saveOrUpdate(ChatMessage chatMessage) {
@@ -139,5 +139,15 @@ public class ChatMessageDAO extends LAMSBaseDAO implements IChatMessageDAO {
     public List<ChatMessage> getSentByUser(Long userUid) {
 	return (List<ChatMessage>) doFind(ChatMessageDAO.SQL_QUERY_FIND_MESSAGES_SENT_BY_USER,
 		new Object[] { userUid });
+    }
+
+    @Override
+    public int getTopicsNum(Long userID, Long sessionId) {
+	List list = this.doFind(SQL_QUERY_TOPICS_NUMBER_BY_USER_SESSION, new Object[] { userID, sessionId });
+	if ((list != null) && (list.size() > 0)) {
+	    return ((Number) list.get(0)).intValue();
+	} else {
+	    return 0;
+	}
     }
 }

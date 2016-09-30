@@ -53,12 +53,9 @@ public class ChatOutputFactory extends OutputFactory {
     public SortedMap<String, ToolOutputDefinition> getToolOutputDefinitions(Object toolContentObject,
 	    int definitionType) throws ToolException {
 	SortedMap<String, ToolOutputDefinition> definitionMap = new TreeMap<String, ToolOutputDefinition>();
-
+	Class stringArrayClass = new String[] {}.getClass();
 	switch (definitionType) {
 	    case ToolOutputDefinition.DATA_OUTPUT_DEFINITION_TYPE_CONDITION:
-		break;
-	    case ToolOutputDefinition.DATA_OUTPUT_DEFINITION_TYPE_DATA_FLOW:
-		Class stringArrayClass = new String[] {}.getClass();
 		if (toolContentObject != null) {
 		    ToolOutputDefinition chatMessagesDefinition = buildComplexOutputDefinition(
 			    ChatConstants.USER_MESSAGES_DEFINITION_NAME, stringArrayClass);
@@ -67,7 +64,11 @@ public class ChatOutputFactory extends OutputFactory {
 		    chatMessagesDefinition.setDefaultConditions(new ArrayList<BranchCondition>(chat.getConditions()));
 		    definitionMap.put(ChatConstants.USER_MESSAGES_DEFINITION_NAME, chatMessagesDefinition);
 		}
-
+		ToolOutputDefinition numberOfPostsDefinition = buildRangeDefinition(
+			ChatConstants.LEARNER_NUM_POSTS_DEFINITION_NAME, new Long(0), null);
+		definitionMap.put(ChatConstants.LEARNER_NUM_POSTS_DEFINITION_NAME, numberOfPostsDefinition);
+		break;
+	    case ToolOutputDefinition.DATA_OUTPUT_DEFINITION_TYPE_DATA_FLOW:
 		ToolOutputDefinition allUsersMessagesDefinition = buildComplexOutputDefinition(
 			ChatConstants.ALL_USERS_MESSAGES_DEFINITION_NAME, stringArrayClass);
 		definitionMap.put(ChatConstants.ALL_USERS_MESSAGES_DEFINITION_NAME, allUsersMessagesDefinition);
@@ -119,6 +120,10 @@ public class ChatOutputFactory extends OutputFactory {
 		}
 	    }
 	}
+	if ((names == null) || names.contains(ChatConstants.LEARNER_NUM_POSTS_DEFINITION_NAME)) {
+	    outputs.put(ChatConstants.LEARNER_NUM_POSTS_DEFINITION_NAME,
+		    getNumPosts(chatService, learnerId, toolSessionId));
+	}
 	return outputs;
 
     }
@@ -143,6 +148,8 @@ public class ChatOutputFactory extends OutputFactory {
 
 	    return new ToolOutput(name, getI18NText(ChatConstants.USER_MESSAGES_DEFINITION_NAME, true), textMessages,
 		    false);
+	} else if (ChatConstants.LEARNER_NUM_POSTS_DEFINITION_NAME.equals(nameParts[0])) {
+	    return getNumPosts(chatService, learnerId, toolSessionId);
 	} else if (ChatConstants.ALL_USERS_MESSAGES_DEFINITION_NAME.equals(nameParts[0])) {
 	    Set<ChatUser> users = chatService.getSessionBySessionId(toolSessionId).getChatUsers();
 	    String[] usersMessages = new String[users.size()];
@@ -163,6 +170,12 @@ public class ChatOutputFactory extends OutputFactory {
 		    usersMessages, false);
 	}
 	return null;
+    }
+
+    private ToolOutput getNumPosts(IChatService chatService, Long learnerId, Long toolSessionId) {
+	int num = chatService.getTopicsNum(learnerId, toolSessionId);
+	return new ToolOutput(ChatConstants.LEARNER_NUM_POSTS_DEFINITION_NAME,
+		getI18NText(ChatConstants.LEARNER_NUM_POSTS_DEFINITION_NAME, true), new Long(num));
     }
 
     @Override

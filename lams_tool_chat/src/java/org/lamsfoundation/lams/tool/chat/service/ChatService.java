@@ -172,6 +172,11 @@ public class ChatService implements ToolSessionManager, ToolContentManager, ICha
     }
 
     @Override
+    public int getTopicsNum(Long userID, Long sessionId) {
+	return chatMessageDAO.getTopicsNum(userID, sessionId);
+    }
+
+    @Override
     public ToolSessionExportOutputData exportToolSession(List toolSessionIds)
 	    throws DataMissingException, ToolException {
 	// TODO Auto-generated method stub
