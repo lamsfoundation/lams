@@ -12,7 +12,7 @@
 			
 			function submitMethod(actionMethod) {
 				document.McAuthoringForm.dispatch.value=actionMethod;
-				$("textarea[name^=ca]").each(function() {
+				$("textarea[name^=ca],textarea[name=feedback]").each(function() {
 					var name = $(this).attr("name");
 					var value = CKEDITOR.instances[name].getData();
 					$(this).val(value);
@@ -28,7 +28,7 @@
 			function addItem() {
 				document.McAuthoringForm.dispatch.value="saveSingleQuestion"; 
 				$("#newQuestion").val(CKEDITOR.instances.newQuestion.getData());
-				$("textarea[name^=ca]").each(function() {
+				$("textarea[name^=ca],textarea[name=feedback]").each(function() {
 					var name = $(this).attr("name");
 					var value = CKEDITOR.instances[name].getData();
 					$(this).val(value);
@@ -176,6 +176,14 @@
 			</div>
 
 			<%@ include file="/authoring/candidateAnswersList.jsp"%>
+			
+			<div class="form-group">
+				<label for="feedback"><fmt:message key="label.feedback"></fmt:message></label>
+				<lams:CKEditor id="feedback"
+				value="${mcGeneralAuthoringDTO.editableQuestionFeedback}"
+				contentFolderID="${mcGeneralAuthoringDTO.contentFolderID}">
+			</lams:CKEditor>
+			</div>
 
 			<div class="form-group">
 				<html:button property="newCandidate" onclick="javascript:submitMethod('newCandidateBox');" styleClass="btn btn-default btn-sm">

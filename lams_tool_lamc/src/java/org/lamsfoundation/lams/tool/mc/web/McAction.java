@@ -21,7 +21,6 @@
  * ****************************************************************
  */
 
-
 package org.lamsfoundation.lams.tool.mc.web;
 
 import java.io.IOException;
@@ -399,7 +398,7 @@ public class McAction extends LamsDispatchAction implements McAppConstants {
 			LamsDispatchAction.log.warn("Skipping a blank answer");
 			continue;
 		    }
-		    if (correctAnswer != null && correctAnswer.equals(answerText)) {
+		    if ((correctAnswer != null) && correctAnswer.equals(answerText)) {
 			LamsDispatchAction.log
 				.warn("Skipping an answer with same text as the correct answer: " + answerText);
 
@@ -823,15 +822,15 @@ public class McAction extends LamsDispatchAction implements McAppConstants {
 	String editQuestionBoxRequest = request.getParameter("editQuestionBoxRequest");
 
 	String newQuestion = request.getParameter("newQuestion");
-
+	String feedback = request.getParameter("feedback");
 	// if ((editQuestionBoxRequest != null) && (editQuestionBoxRequest.equals("false")))
 	if ((requestNewEditableQuestionBox != null) && requestNewEditableQuestionBox.equals("true")) {
 	    // String newQuestion=request.getParameter("newQuestion");
 	    // logger.debug("newQuestion: " + newQuestion);
 	    mcGeneralAuthoringDTO.setEditableQuestionText(newQuestion);
+	    mcGeneralAuthoringDTO.setEditableQuestionFeedback(feedback);
 
-	    String feedback = request.getParameter("feedback");
-	    mcAuthoringForm.setFeedback(feedback);
+	    //  mcAuthoringForm.setFeedback(feedback);
 	}
 
 	request.setAttribute(McAppConstants.MC_GENERAL_AUTHORING_DTO, mcGeneralAuthoringDTO);
