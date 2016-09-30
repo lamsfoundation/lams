@@ -135,8 +135,14 @@
 					//show confirmation dialog
 					$.blockUI({ 
 						message: $('#timelimit-start-dialog'), 
-						css: { width: '325px', height: '120px'}, 
-						overlayCSS: { opacity: '.98'} 
+						css: { 
+							width: '325px', 
+							height: '120px', 
+							top: '200px' // added in order to prevent displaying of the dialog out of the page on iOS devices
+						}, 
+						overlayCSS: { 
+							opacity: '.98'
+						} 
 					});
 					
 					//once OK button pressed start countdown
