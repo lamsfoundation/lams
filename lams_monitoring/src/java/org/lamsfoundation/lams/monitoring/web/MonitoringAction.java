@@ -25,6 +25,7 @@ package org.lamsfoundation.lams.monitoring.web;
 
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.security.InvalidParameterException;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -1049,7 +1050,9 @@ public class MonitoringAction extends LamsDispatchAction {
 	Organisation organisation = (Organisation) userManagementService.findById(Organisation.class,
 		lessonDTO.getOrganisationID());
 	request.setAttribute("notificationsAvailable", organisation.getEnableCourseNotifications());
-	request.setAttribute("enableLiveEdit", organisation.getEnableLiveEdit());
+	boolean enableLiveEdit = organisation.getEnableLiveEdit() && getUserManagementService()
+		.isUserInRole(user.getUserID(), organisation.getOrganisationId(), Role.AUTHOR);
+	request.setAttribute("enableLiveEdit", enableLiveEdit);
 	request.setAttribute("enableExportPortfolio", organisation.getEnableExportPortfolio());
 	request.setAttribute("lesson", lessonDTO);
 
@@ -1459,7 +1462,21 @@ public class MonitoringAction extends LamsDispatchAction {
     public ActionForward startLiveEdit(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) throws LearningDesignException, UserException, IOException {
 	long learningDesignId = WebUtil.readLongParam(request, CentralConstants.PARAM_LEARNING_DESIGN_ID);
+
+	LearningDesign learningDesign = (LearningDesign) getUserManagementService().findById(LearningDesign.class,
+		learningDesignId);
+	if (learningDesign.getLessons().isEmpty()) {
+	    throw new InvalidParameterException(
+		    "There are no lessons associated with learning design: " + learningDesignId);
+	}
+	Integer organisationID = ((Lesson) learningDesign.getLessons().iterator().next()).getOrganisation()
+		.getOrganisationId();
 	Integer userID = getUserId();
+	if (!getSecurityService().hasOrgRole(organisationID, userID, new String[] { Role.AUTHOR }, "start live edit",
+		false)) {
+	    response.sendError(HttpServletResponse.SC_FORBIDDEN, "User is not an author in the organisation");
+	    return null;
+	}
 
 	IAuthoringService authoringService = MonitoringServiceProxy
 		.getAuthoringService(getServlet().getServletContext());

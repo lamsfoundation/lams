@@ -61,8 +61,6 @@
     		</web-resource-collection>
     	<auth-constraint>
     		<role-name>AUTHOR</role-name>
-    		<!-- For live edit -->
-    		<role-name>MONITOR</role-name>
     		<role-name>SYSADMIN</role-name>
     	</auth-constraint>
     </security-constraint>
