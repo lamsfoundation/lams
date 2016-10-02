@@ -496,8 +496,7 @@ section{
   bottom: 0;
   width: 100%;
   /* Set the fixed height of the footer here */
-  height: 60px;
   background-color: #f5f5f5;
-  font-size: 80%;
+  font-size: 75%;
   border-top: 1px solid#e7e7e7;
 }
