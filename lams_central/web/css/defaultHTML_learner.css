@@ -492,8 +492,6 @@ section{
 /* Login page */
 
 .footer {
-  position: absolute;
-  bottom: 0;
   width: 100%;
   /* Set the fixed height of the footer here */
   background-color: #f5f5f5;
