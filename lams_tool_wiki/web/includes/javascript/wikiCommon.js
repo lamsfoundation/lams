@@ -73,19 +73,17 @@ function doCompareOrView(webAppUrl, historyId, currentPageId, dispatch)
 
 function toggleWikiList(webUrl)
 {
-	
 	var wikiListDiv = document.getElementById("wikiList");
-	var wikiListImage = document.getElementById("wikiListImage");
+	
+	$('#iconToggle').toggleClass('fa-plus-square-o fa-minus-square-o');
 	
 	if (wikiListDiv.style.display=="block")
 	{
 		wikiListDiv.style.display = "none";
-		wikiListImage.src = webUrl +"/images/tree_closed.gif";
 	}
 	else
 	{
 		wikiListDiv.style.display = "block";
-		wikiListImage.src = webUrl + "/images/tree_open.gif";
 	}
 }
 
