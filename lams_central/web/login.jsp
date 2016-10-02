@@ -25,11 +25,12 @@
 	<c:when test="${empty login}">
 		<lams:head>
 			<title><fmt:message key="title.login.window" /></title>
-			<lams:css style="core" />
-			<link rel="icon" href="<lams:LAMSURL/>/favicon.ico" type="image/x-icon" />
-			<link rel="shortcut icon" href="<lams:LAMSURL/>/favicon.ico" type="image/x-icon" />
-			<script type="text/javascript" src="<lams:LAMSURL />includes/javascript/browser_detect.js"></script>
-			<script type="text/javascript" src="<lams:LAMSURL />includes/javascript/jquery.js"></script>
+			<lams:css/>
+			<link rel="icon" href="/lams/favicon.ico" type="image/x-icon" />
+			<link rel="shortcut icon" href="/lams/favicon.ico" type="image/x-icon" />
+			<script type="text/javascript" src="/lams/includes/javascript/browser_detect.js"></script>
+			<script type="text/javascript" src="/lams/includes/javascript/jquery.js"></script>
+			<script type="text/javascript" src="/lams/includes/javascript/bootstrap.min.js"></script>
 			<script type="text/javascript">
 				function submitForm() {
 					$('#loginForm').submit();
@@ -55,94 +56,88 @@
 						$('#browserNotCompatible').show();
 					}
 					$('#j_username').focus();
-					$('#news').load('<lams:LAMSURL/>www/news.html');
+					$('#news').load('/lams/www/news.html');
 				});
 			</script>
 		</lams:head>
+		<body>
+    <!-- Fixed navbar -->
+    <nav class="navbar navbar-default navbar-login">
+	<div class="container">
+        <div class="navbar-header">
+          <a class="navbar-brand" href="#"><%=Configuration.get(ConfigurationKeys.SITE_NAME)%></a>
+        </div>
+	<div class="navbar-collapse collapse navbar-right">
+	<img height="20" class="navbar-brand pull-right" src="/lams/images/svg/lams_logo_black.svg" title="Version: <%=Configuration.get(ConfigurationKeys.VERSION)%>" alt="LAMS - Learning Activity Management System"/>
+	</div>
+    </nav>
 
-		<body class="stripes">
-			<div id="login-page">
-				<!--main box 'page'-->
-				<h1 class="no-tabs-below">&nbsp;</h1>
 
-				<div id="login-header"></div>
-				<!--closes header-->
+<div class="container no-gutter">
+	<div id="news" class="col-sm-8 col-md-9 hidden-xs"></div>
+	<div id="login-panel" class="col-sm-4 col-md-3">
+            <div class="panel panel-default" >
+                    <div class="panel-heading">
+                        <div class="panel-title"> <fmt:message key="button.login" /></div>
+                    </div>     
 
-				<div id="login-content">
-					<div id="login-left-col">
-						<h1>
-							<img src="<lams:LAMSURL/>/www/images/lams_login.gif" alt="LAMS - Learning Activity Management System" />
-						</h1>
-						
-						<div id="browserNotCompatible" class="warning" style="display: none">
-							<fmt:message key="msg.browser.compat"/>
-						</div>
-
-						<!-- Placeholder for customised login page part -->
-						<div id="news"></div>
+                    <div class="panel-body" >
+                        <div id="browserNotCompatible" class="panel panel-danger" style="display: none">
+                             <div class="panel-heading"><fmt:message key="msg.browser.compat"/></div>
+                        </div>
+			<c:if test="${!empty param.failed}">
+				<div class="panel panel-danger">
+					<div class="panel-heading">
+					<fmt:message key="error.login" />
 					</div>
-					<!--closes left col-->
+				</div>
+			</c:if>
 
-					<div id="login-right-col">
-						<p class="version">
-							<fmt:message key="msg.LAMS.version" />
-							<%=Configuration.get(ConfigurationKeys.VERSION)%></p>
-						<h2>
-							<fmt:message key="button.login" />
-						</h2>
-						<form action="/lams/j_security_check" method="POST" name="loginForm" id="loginForm">
-							<c:if test="${!empty param.failed}">
-								<div class="warning-login">
-									<fmt:message key="error.login" />
-								</div>
-							</c:if>
+		<form action="/lams/j_security_check" method="POST" name="loginForm" role="form" class="form-horizontal" id="loginForm">
+		  <input type="hidden" name="redirectURL" value='<c:out value="${param.redirectURL}" escapeXml="true" />' />
+                                    
+                            <div class="input-group">
+					<span class="input-group-addon"><i class="fa fa-user"></i></span>
+                                        <input id="j_username" type="text" class="form-control" name="j_username" value="" placeholder="<fmt:message key='label.username' />" onkeypress="onEnter(event)" tabindex="1">
+                                    </div>
+                                
+                            <div class="input-group voffset5">
+                                        <span class="input-group-addon"><i class="fa fa-lock"></i></span>
+                                        <input id="j_password" type="password" class="form-control" name="j_password" placeholder="<fmt:message key='label.password' />" onkeypress="onEnter(event)" tabindex="2">
+                                    </div>
+                                <div class="form-group voffset10">
+                                    <!-- Button -->
+                                    <div class="col-sm-12 controls">
+                                      <a id="loginButton" href="javascript:submitForm()" class="btn btn-primary btn-block" tabindex="3">Login  </a>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <div class="col-md-12 control" style="border-top: 1px solid#888; padding-top:5px; font-size:80%">
+					<a href="<lams:LAMSURL/>forgotPassword.jsp"> <fmt:message key="label.forgot.password" /></a>
+                                    </div>
+                                </div>    
+                            </form>     
+			</div>
+			</div>
+</div>
 
-							<input type="hidden" name="redirectURL" value='<c:out value="${param.redirectURL}" escapeXml="true" />' />
 
-							<p class="first">
-								<fmt:message key="label.username" />
-								: <input id="j_username" name="j_username" type="text" size="16" style="width: 125px" tabindex="1"
-									value="${login}" onkeypress="onEnter(event)" />
-							</p>
-
-							<p>
-								<fmt:message key="label.password" />
-								: <input id="j_password" name="j_password" type="password" size="16" style="width: 125px" autocomplete="off"
-									tabindex="2" value="${password}" onkeypress="onEnter(event)" />
-							</p>
-
-							<p class="login-button">
-								<a id="loginButton" href="javascript:submitForm()" class="button" tabindex="3" />
-								<fmt:message key="button.login" />
-								</a>
-							</p>
-						</form>
-						<p class="login-button">
-							<a href="<lams:LAMSURL/>forgotPassword.jsp"> <fmt:message key="label.forgot.password" /></a>
-							<br />
-							<a href="<lams:LAMSURL/>/www/help/troubleshoot-<%=Configuration.get(ConfigurationKeys.SERVER_LANGUAGE)%>.pdf">
-								<fmt:message key="label.help" />
-							</a>
-						</p>
-					</div>
-					<!--closes right col-->
 
 					<div class="clear"></div>
 					<!-- forces the CSS to display the columns-->
 				</div>
 				<!--closes content-->
 
-				<div id="footer">
-					<p>
-						<fmt:message key="msg.LAMS.version" />
-						<%=Configuration.get(ConfigurationKeys.VERSION)%>
-						<a href="<lams:LAMSURL/>/www/copyright.jsp" target='copyright' onClick="openCopyRight()"> &copy; <fmt:message
-								key="msg.LAMS.copyright.short" />
-						</a>
-					</p>
-				</div>
-				<!--closes footer-->
-			</div>
+<!-- starts footer -->
+<footer class="voffset10 footer">
+      <div class="container">
+        <p class="text-muted text-center">
+						<fmt:message key="msg.LAMS.version" />:  <%=Configuration.get(ConfigurationKeys.VERSION)%>
+						<a href="/lams/www/copyright.jsp" target='copyright' onClick="openCopyRight()"> &copy; <fmt:message key="msg.LAMS.copyright.short" /></a>
+    </p>
+      </div>
+</footer>
+<!--closes footer-->
 			<!--closes page-->
 		</body>
 	</c:when>
