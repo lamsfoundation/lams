@@ -28,6 +28,9 @@ LAMS Learner Style
  .navbar-login {
     margin-bottom: 5px;
   }
+ .navbar-brand-login {
+    font-size: large;
+  }
 }
 
 @media (min-width: 501px) {
@@ -37,6 +40,9 @@ LAMS Learner Style
  }
  .navbar-login {
     margin-bottom: 10px;
+  }
+ .navbar-brand-login {
+    font-size: x-large;
   }
 }
 

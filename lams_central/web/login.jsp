@@ -65,7 +65,7 @@
     <nav class="navbar navbar-default navbar-login">
 	<div class="container">
         <div class="navbar-header">
-          <a class="navbar-brand" href="#"><%=Configuration.get(ConfigurationKeys.SITE_NAME)%></a>
+          <a class="navbar-brand navbar-brand-login" href="#"><%=Configuration.get(ConfigurationKeys.SITE_NAME)%></a>
         </div>
 	<div class="navbar-collapse collapse navbar-right">
 	<img height="20" class="navbar-brand pull-right" src="/lams/images/svg/lams_logo_black.svg" title="Version: <%=Configuration.get(ConfigurationKeys.VERSION)%>" alt="LAMS - Learning Activity Management System"/>
