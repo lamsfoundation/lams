@@ -106,17 +106,15 @@
 								<span class="input-group-addon"><i class="fa fa-lock"></i></span>
 								<input id="j_password" type="password" class="form-control" name="j_password" placeholder="<fmt:message key='label.password' />" onkeypress="onEnter(event)" tabindex="2">
 							</div>
-							<div class="form-group voffset10">
+							<div class="form-group voffset5" style="margin-bottom: 5px;">
+						   	<div class="col-md-12 control" style="font-size:75%">
+										<a href="<lams:LAMSURL/>forgotPassword.jsp"> <fmt:message key="label.forgot.password" /></a>
+						    	</div>
 								<!-- Button -->
-								<div class="col-sm-12 controls">
+								<div class="col-sm-12 controls voffset5">
 								  <a id="loginButton" href="javascript:submitForm()" class="btn btn-primary btn-block" tabindex="3"><fmt:message key="button.login" /></a>
 								</div>
 							</div>
-							<div class="form-group">
-						   	<div class="col-md-12 control" style="border-top: 1px solid#888; padding-top:5px; font-size:80%">
-										<a href="<lams:LAMSURL/>forgotPassword.jsp"> <fmt:message key="label.forgot.password" /></a>
-						    	</div>
-						  </div>    
 						</form>     
 				</div>
 			</div>
