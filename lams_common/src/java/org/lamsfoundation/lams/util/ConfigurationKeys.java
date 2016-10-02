@@ -259,4 +259,7 @@ public class ConfigurationKeys {
 
     // LDEV-3254
     public static String CONFIGURATION_CACHE_REFRESH_INTERVAL = "ConfigCacheRefresInterval";
+
+    // LDEV-3961
+    public static String SITE_NAME = 'SiteName';
 }
