@@ -418,9 +418,7 @@
                 <fmt:message key="label.wiki.pages"></fmt:message>
               </h4>
 
-              <img src="<lams:WebAppURL />/images/tree_closed.gif" id="wikiListImage" 
-                   onclick="javascript:toggleWikiList('<lams:WebAppURL />')" />
-              &nbsp;
+							<i id="iconToggle" class="fa fa-sm fa-plus-square-o"  onclick="javascript:toggleWikiList('<lams:WebAppURL />')" aria-hidden="true"></i>
               <a href="javascript:changeWikiPage('${fn:escapeXml(mainWikiPage.javaScriptTitle)}')">${fn:escapeXml(mainWikiPage.title)}</a>
               <div id="wikiList" style="display:none;">
                 <c:forEach var="wikiPage" items="${wikiPages}">
