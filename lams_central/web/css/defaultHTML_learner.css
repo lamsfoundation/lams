@@ -25,12 +25,21 @@ LAMS Learner Style
     padding-right: 5px;
     padding-left: 5px;
   }
+ .navbar-login {
+    margin-bottom: 5px;
+  }
 }
+
 @media (min-width: 501px) {
   .no-gutter > [class*='col-'] {
     padding-right: 8px;
     padding-left: 8px;
+ }
+ .navbar-login {
+    margin-bottom: 10px;
+  }
 }
+
 /* Spacer classes */
 .voffset2 {
   margin-top: 2px;
@@ -478,4 +487,17 @@ nav:hover .forAnimate{
 }
 section{
 	padding-left: 15px;
+}
+
+/* Login page */
+
+.footer {
+  position: absolute;
+  bottom: 0;
+  width: 100%;
+  /* Set the fixed height of the footer here */
+  height: 60px;
+  background-color: #f5f5f5;
+  font-size: 80%;
+  border-top: 1px solid#e7e7e7;
 }
