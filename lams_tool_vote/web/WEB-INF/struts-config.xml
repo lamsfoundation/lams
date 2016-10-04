@@ -155,100 +155,10 @@
         redirect="false"
       />
     </action>
-   <!--Learning Starter Action: initializes the Learning module -->
-   <action 	path="/learningStarter" 
-   			type="org.lamsfoundation.lams.tool.vote.web.VoteLearningStarterAction" 
-   			name="VoteLearningForm" 
-	      	scope="request"
-	      	validate="false"
-	      	unknown="false"
-   			input="/learningIndex.jsp"> 
-
-	  	<forward
-		    name="loadLearner"
-		    path="/learning/AnswersContent.jsp"
-		    redirect="false"
-	  	/>
-	  	
-	  	<forward
-		    name="viewAnswers"
-		    path="/learning/ViewAnswers.jsp"
-		    redirect="false"
-	  	/>
-	  	
-	  	<forward
-		    name="revisitedAllNominations"
-		    path="/learning/RevisitedAllNominations.jsp"
-		    redirect="false"
-	  	/>
-
-
-	  	<forward
-		    name="redoQuestions"
-		    path="/learning/RedoQuestions.jsp"
-		    redirect="false"
-	  	/>
-
-	  	<forward
-		    name="submissionDeadline"
-	        path="/learning/submissionDeadline.jsp"
-		    redirect="false"
-	  	/>
-
-	  	<forward
-		    name="exitPage"
-		    path="/learning/ExitLearning.jsp"
-		    redirect="false"
-	  	/>
-	  	
-	  	<forward
-		    name="allNominations"
-		    path="/learning/AllNominations.jsp"
-		    redirect="false"
-	  	/>
-	  	
-	     <forward
-	        name="preview"
-	        path="/learning/Preview.jsp"
-		    redirect="false"
-	     />
-
-	  	<forward
-		    name="learningStarter"
-		    path="/learningIndex.jsp"
-		    redirect="false"
-	  	/>
-	      
-
-	  	<forward
-		    name="defineLater"
-	        path="/learning/defineLater.jsp"
-		    redirect="false"
-	  	/>
-	  	
-		<forward
-		    name="notebook"
-		    path="/learning/Notebook.jsp"
-		    redirect="false"
-	  	/>   
-
-	  	<forward
-		    name="errorList"
-	        path="/VoteErrorBox.jsp"
-		    redirect="false"
-	  	/>
-	  	
-	  	<forward
-		    name="waitForLeader"
-	        path="/learning/WaitForLeader.jsp"
-		    redirect="false"
-	  	/>
-	</action>  
-	
 	
    <!--Learning Main Action: interacts with the Learning module user -->
 	<action	path="/learning"
-		    type="org.lamsfoundation.lams.tool.vote.web.VoteLearningAction"
+		    type="org.lamsfoundation.lams.tool.vote.web.LearningAction"
 			name="VoteLearningForm"
       		scope="request"
       		input="/learning/AnswersContent.jsp"
@@ -265,7 +175,6 @@
 		    path="/learning/AllNominations.jsp"
 		    redirect="false"
 	  	/>
-
 	  	
 	  	<forward
 		    name="individualReport"
@@ -273,6 +182,12 @@
 		    redirect="false"
 	  	/>
 	  	
+	  	<forward
+		    name="revisitedAllNominations"
+		    path="/learning/RevisitedAllNominations.jsp"
+		    redirect="false"
+	  	/>
+
 	  	<forward
 		    name="redoQuestions"
 		    path="/learning/RedoQuestions.jsp"
@@ -285,14 +200,18 @@
 		    redirect="false"
 	  	/>
 
-
 	  	<forward
 		    name="exitPage"
 		    path="/learning/ExitLearning.jsp"
 		    redirect="false"
 	  	/>
 	  	
-
+	  	<forward
+		    name="submissionDeadline"
+	        path="/learning/submissionDeadline.jsp"
+		    redirect="false"
+	  	/>
+	
 	  	<forward
 	        name="starter"
 	        path="/index.jsp"
@@ -316,7 +235,6 @@
 		    path="/learning/Notebook.jsp"
 		    redirect="false"
 	  	/>   
-	     
 
 	  	<forward
 		    name="errorList"
@@ -324,6 +242,17 @@
 		    redirect="false"
 	  	/>
 
+	  	<forward
+		    name="defineLater"
+	        path="/learning/defineLater.jsp"
+		    redirect="false"
+	  	/>
+
+	  	<forward
+		    name="waitForLeader"
+	        path="/learning/WaitForLeader.jsp"
+		    redirect="false"
+	  	/>
     </action>
     
     
