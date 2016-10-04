@@ -145,4 +145,5 @@ margin-top: expression(0 - parseInt(this.offsetHeight / 2) + (TBWindowMargin = d
 #TB_iframeContent, #TB_overlay, #TB_window {
 	overflow-y: scroll !important;
 	-webkit-overflow-scrolling: touch !important;
+	height:95% !important; 
 }
