@@ -13,7 +13,7 @@
 		<link href="${lams}css/jquery-ui.timepicker.css" rel="stylesheet" type="text/css" >
 		<link href="${lams}css/thickbox.css" rel="stylesheet" type="text/css" media="screen">
 		<link href="${lams}css/jquery.jqGrid.css" rel="stylesheet" type="text/css"/>
-		<style media="screen,projection" type="text/css">
+		<style type="text/css">
 			.ui-jqgrid tr.jqgrow td {
 			    white-space: normal !important;
 			    height:auto;
