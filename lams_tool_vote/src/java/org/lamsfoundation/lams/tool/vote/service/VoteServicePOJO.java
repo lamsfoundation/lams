@@ -139,7 +139,6 @@ public class VoteServicePOJO
 
 	VoteSession session = getSessionBySessionId(toolSessionId);
 	VoteQueUsr groupLeader = session.getGroupLeader();
-
 	boolean isUserLeader = (groupLeader != null) && user.getUid().equals(groupLeader.getUid());
 	return isUserLeader;
     }
@@ -147,6 +146,7 @@ public class VoteServicePOJO
     @Override
     public VoteQueUsr checkLeaderSelectToolForSessionLeader(VoteQueUsr user, Long toolSessionId) {
 	if ((user == null) || (toolSessionId == null)) {
+	    VoteServicePOJO.logger.info("user" + user + "or" + "toolSessionId" + toolSessionId + "is null");
 	    return null;
 	}
 
@@ -155,7 +155,10 @@ public class VoteServicePOJO
 	// check leader select tool for a leader only in case QA tool doesn't know it. As otherwise it will screw
 	// up previous scratches done
 	if (leader == null) {
-
+	    if (VoteServicePOJO.logger.isDebugEnabled()) {
+		VoteServicePOJO.logger
+			.debug("If QA tool does not know it checking leader select tool for leader only" + leader);
+	    }
 	    Long leaderUserId = toolService.getLeaderUserId(toolSessionId, user.getQueUsrId().intValue());
 	    if (leaderUserId != null) {
 
@@ -163,7 +166,9 @@ public class VoteServicePOJO
 
 		// create new user in a DB
 		if (leader == null) {
-		    VoteServicePOJO.logger.debug("creating new user with userId: " + leaderUserId);
+		    if (VoteServicePOJO.logger.isDebugEnabled()) {
+			VoteServicePOJO.logger.debug("creating new user with userId: " + leaderUserId);
+		    }
 		    User leaderDto = (User) getUserManagementService().findById(User.class, leaderUserId.intValue());
 		    String userName = leaderDto.getLogin();
 		    String fullName = leaderDto.getFirstName() + " " + leaderDto.getLastName();
@@ -184,7 +189,11 @@ public class VoteServicePOJO
     public void copyAnswersFromLeader(VoteQueUsr user, VoteQueUsr leader) {
 
 	if ((user == null) || (leader == null) || user.getUid().equals(leader.getUid())) {
-	    return;
+	    if (VoteServicePOJO.logger.isDebugEnabled()) {
+		VoteServicePOJO.logger
+			.debug("User" + user + "or" + "leader" + leader + "or Userid and Leaderid is equal");
+		return;
+	    }
 	}
 
 	List<VoteUsrAttempt> leaderAttempts = this.getAttemptsForUser(leader.getUid());
@@ -206,12 +215,14 @@ public class VoteServicePOJO
 
 	    // if response doesn't exist - create VoteUsrAttempt in the db
 	    if (userAttempt == null) {
+		VoteServicePOJO.logger.info("Response does not exist hence creating VoteUsrAttempt in db");
 		VoteUsrAttempt voteUsrAttempt = new VoteUsrAttempt(attempTime, timeZone, question, user, userEntry,
 			true);
 		voteUsrAttemptDAO.saveVoteUsrAttempt(voteUsrAttempt);
 
 		// if it's been changed by the leader
 	    } else if (leaderAttempt.getAttemptTime().compareTo(userAttempt.getAttemptTime()) != 0) {
+		VoteServicePOJO.logger.info("Incase of the change done by the leader");
 		userAttempt.setUserEntry(userEntry);
 		userAttempt.setAttemptTime(attempTime);
 		userAttempt.setTimeZone(timeZone);
@@ -219,6 +230,9 @@ public class VoteServicePOJO
 
 		// remove userAttempt from the list so we can know which one is redundant(presumably, leader has removed
 		// this one)
+		if (VoteServicePOJO.logger.isDebugEnabled()) {
+		    VoteServicePOJO.logger.debug("Leader has removed the userAttempt" + userAttempt);
+		}
 		userAttempts.remove(userAttempt);
 	    }
 	}
@@ -795,9 +809,11 @@ public class VoteServicePOJO
 
 	    // in case question doesn't exist
 	    if (question == null) {
-
 		question = new VoteQueContent(currentQuestionText, displayOrder, voteContent);
 		// adding a new question to content
+		if (VoteServicePOJO.logger.isDebugEnabled()) {
+		    VoteServicePOJO.logger.debug("Adding a new question to content" + question);
+		}
 		voteContent.getVoteQueContents().add(question);
 		question.setVoteContent(voteContent);
 
@@ -848,6 +864,8 @@ public class VoteServicePOJO
 				// if we reached the maximum number of inputs, i.e. number of students that will be
 				// taken
 				// into account
+				VoteServicePOJO.logger.info(
+					"We have reached max no of inputs,i.e number of students will be taken into account");
 				break;
 			    }
 			    boolean anyAnswersAdded = false;
@@ -877,6 +895,8 @@ public class VoteServicePOJO
 		String[] userAnswers = (String[]) value;
 		for (String questionText : userAnswers) {
 		    if ((maxInputs != null) && (inputsAdded >= maxInputs)) {
+			VoteServicePOJO.logger.info(
+				"We have reached max no of inputs,i.e number of students will be taken into account");
 			// if we reached the maximum number of inputs, i.e. number of students that will be taken
 			// into account
 			break;
@@ -913,6 +933,8 @@ public class VoteServicePOJO
 		    for (SimpleURL[] userUrls : usersAndUrls) {
 			if (userUrls != null) {
 			    if ((maxInputs != null) && (inputsAdded >= maxInputs)) {
+				VoteServicePOJO.logger.info(
+					"We have reached max no of inputs,i.e number of students will be taken into account");
 				// if we reached the maximum number of inputs, i.e. number of students that will be
 				// taken
 				// into account
@@ -1071,11 +1093,13 @@ public class VoteServicePOJO
 
 	//in case of free entry
 	if (mapGeneralCheckedOptionsContent.size() == 0) {
+	    VoteServicePOJO.logger.info("In case of free entry");
 	    VoteQueContent defaultContentFirstQuestion = voteQueContentDAO.getDefaultVoteContentFirstQuestion();
 	    createAttempt(defaultContentFirstQuestion, voteQueUsr, attempTime, timeZone, userEntry, voteSession);
 
 	    //if the question is selected
 	} else if (voteContentUid != null) {
+	    VoteServicePOJO.logger.info("In case of question is selected");
 	    Iterator itCheckedMap = mapGeneralCheckedOptionsContent.entrySet().iterator();
 	    while (itCheckedMap.hasNext()) {
 		Map.Entry checkedPairs = (Map.Entry) itCheckedMap.next();
@@ -1250,7 +1274,10 @@ public class VoteServicePOJO
 
     @Override
     public void copyToolContent(Long fromContentId, Long toContentId) throws ToolException {
-
+	if (VoteServicePOJO.logger.isDebugEnabled()) {
+	    VoteServicePOJO.logger
+		    .debug("Copy tool content fromContentId" + fromContentId + " and toContentId " + toContentId);
+	}
 	if (fromContentId == null) {
 	    // attempt retrieving tool's default content id with signatute VoteAppConstants.MY_SIGNATURE
 	    long defaultContentId = getToolDefaultContentIdBySignature(VoteAppConstants.MY_SIGNATURE);
@@ -1341,6 +1368,7 @@ public class VoteServicePOJO
 	}
 
 	if (toolContentObj == null) {
+	    VoteServicePOJO.logger.error("Unable to find default content for the voting tool");
 	    throw new DataMissingException("Unable to find default content for the voting tool");
 	}
 
@@ -1360,12 +1388,19 @@ public class VoteServicePOJO
     public void importToolContent(Long toolContentID, Integer newUserUid, String toolContentPath, String fromVersion,
 	    String toVersion) throws ToolException {
 	try {
+	    if (VoteServicePOJO.logger.isDebugEnabled()) {
+		VoteServicePOJO.logger.debug("Import tool Content : newUserUid" + newUserUid + " and toolContentID "
+			+ toolContentID + "and toolContentPath" + toolContentPath + "and fromVersion" + fromVersion
+			+ "and toVersion" + toVersion);
+	    }
+
 	    // register version filter class
 	    exportContentService.registerImportVersionFilterClass(VoteImportContentVersionFilter.class);
 
 	    Object toolPOJO = exportContentService.importToolContent(toolContentPath, voteToolContentHandler,
 		    fromVersion, toVersion);
 	    if (!(toolPOJO instanceof VoteContent)) {
+		VoteServicePOJO.logger.error("Import Vote tool content failed. Deserialized object is " + toolPOJO);
 		throw new ImportToolContentException(
 			"Import Vote tool content failed. Deserialized object is " + toolPOJO);
 	    }
@@ -1377,6 +1412,7 @@ public class VoteServicePOJO
 
 	    voteContentDAO.saveVoteContent(toolContentObj);
 	} catch (ImportToolContentException e) {
+	    VoteServicePOJO.logger.error("Error importing the tool content", e);
 	    throw new ToolException(e);
 	}
     }
@@ -1431,8 +1467,10 @@ public class VoteServicePOJO
 	try {
 	    voteSession = getSessionBySessionId(toolSessionID);
 	} catch (VoteApplicationException e) {
+	    VoteServicePOJO.logger.error("error retrieving voteSession:");
 	    throw new DataMissingException("error retrieving voteSession: " + e);
 	} catch (Exception e) {
+	    VoteServicePOJO.logger.error("error retrieving voteSession:");
 	    throw new ToolException("error retrieving voteSession: " + e);
 	}
 
@@ -1469,6 +1507,7 @@ public class VoteServicePOJO
 	try {
 	    voteSession = getSessionBySessionId(toolSessionID);
 	} catch (VoteApplicationException e) {
+	    VoteServicePOJO.logger.error("error retrieving voteSession");
 	    throw new DataMissingException("error retrieving voteSession: " + e);
 	} catch (Exception e) {
 	    throw new ToolException("error retrieving voteSession: " + e);
@@ -1563,7 +1602,7 @@ public class VoteServicePOJO
     public ToolOutput getToolOutput(String name, Long toolSessionId, Long learnerId) {
 	return voteOutputFactory.getToolOutput(name, this, toolSessionId, learnerId);
     }
-    
+
     @Override
     public List<ToolOutput> getToolOutputs(String name, Long toolContentId) {
 	return new ArrayList<ToolOutput>();
@@ -1998,7 +2037,10 @@ public class VoteServicePOJO
     @Override
     public void createRestToolContent(Integer userID, Long toolContentID, JSONObject toolContentJSON)
 	    throws JSONException {
-
+	if (VoteServicePOJO.logger.isDebugEnabled()) {
+	    VoteServicePOJO.logger.debug("Rest call to create a new Vote content for userID" + userID
+		    + " and toolContentID " + toolContentID + "and toolContentJSON" + toolContentJSON);
+	}
 	Date updateDate = new Date();
 
 	VoteContent vote = new VoteContent();
