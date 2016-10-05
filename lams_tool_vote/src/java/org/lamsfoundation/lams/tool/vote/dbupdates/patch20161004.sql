@@ -10,6 +10,14 @@ UPDATE lams_tool SET learner_url = 'tool/lavote11/learning.do?dispatch=start&mod
 					 learner_progress_url = 'tool/lavote11/learning.do?dispatch=start&mode=teacher'
 WHERE tool_signature = 'lavote11';
 
+UPDATE lams_tool SET monitor_url = 'tool/lavote11/monitoring.do?dispatch=start'
+WHERE tool_signature = 'lavote11';
+
+UPDATE lams_tool SET author_url = 'tool/lavote11/authoring.do?dispatch=start'
+WHERE tool_signature = 'lavote11';
+
+
+
 ----------------------Put all sql statements above here-------------------------
 
 -- If there were no errors, commit and restore autocommit to on
