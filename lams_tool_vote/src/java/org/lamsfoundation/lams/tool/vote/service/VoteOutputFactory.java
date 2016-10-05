@@ -20,7 +20,6 @@
  * ****************************************************************
  */
 
-
 package org.lamsfoundation.lams.tool.vote.service;
 
 import java.util.ArrayList;
@@ -30,6 +29,7 @@ import java.util.Set;
 import java.util.SortedMap;
 import java.util.TreeMap;
 
+import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.learningdesign.BranchCondition;
 import org.lamsfoundation.lams.tool.OutputFactory;
 import org.lamsfoundation.lams.tool.OutputType;
@@ -48,6 +48,7 @@ public class VoteOutputFactory extends OutputFactory {
     protected static final String OUTPUT_NAME_NOMINATION_SELECTION = "learner.selection";
     protected static final int FREE_TEXT_NOM_SELECTION = 0;
     protected static final String FREE_TEXT_NOM_SELECTION_STR = "0";
+    private static Logger logger = Logger.getLogger(VoteOutputFactory.class.getName());
 
     /**
      * @see org.lamsfoundation.lams.tool.OutputDefinitionFactory#getToolOutputDefinitions(java.lang.Object)
@@ -55,16 +56,18 @@ public class VoteOutputFactory extends OutputFactory {
     @Override
     public SortedMap<String, ToolOutputDefinition> getToolOutputDefinitions(Object toolContentObject,
 	    int definitionType) {
-
-	TreeMap<String, ToolOutputDefinition> definitionMap = new TreeMap<String, ToolOutputDefinition>();
+	if (VoteOutputFactory.logger.isDebugEnabled()) {
+	    VoteOutputFactory.logger.debug("toolContentObject" + toolContentObject + "definitionType" + definitionType);
+	}
+	TreeMap<String, ToolOutputDefinition> definitionMap = new TreeMap<>();
 
 	if (toolContentObject != null) {
 
 	    VoteContent content = (VoteContent) toolContentObject;
 
 	    if (content.getMaxNominationCount() != null && !content.getMaxNominationCount().equals("1")) {
-		log.error(
-			"Unable to build output definitions for Voting if the user can have more than one nomination. Vote "
+		VoteOutputFactory.logger
+			.error("Unable to build output definitions for Voting if the user can have more than one nomination. Vote "
 				+ content);
 	    } else {
 
@@ -100,7 +103,8 @@ public class VoteOutputFactory extends OutputFactory {
 		definitionMap.put(VoteOutputFactory.OUTPUT_NAME_NOMINATION_SELECTION, definition);
 	    }
 	} else {
-	    log.error("Unable to build output definitions for Vote as no tool content object supplied.");
+	    VoteOutputFactory.logger
+		    .error("Unable to build output definitions for Vote as no tool content object supplied.");
 	}
 
 	return definitionMap;
@@ -113,7 +117,7 @@ public class VoteOutputFactory extends OutputFactory {
 	if (names == null) {
 	    output = createAllDisplayOrderOutputs(voteService, toolSessionId, learnerId);
 	} else {
-	    output = new TreeMap<String, ToolOutput>();
+	    output = new TreeMap<>();
 	    for (String name : names) {
 		ToolOutput newOutput = getToolOutput(name, voteService, toolSessionId, learnerId);
 		if (newOutput != null) {
@@ -143,7 +147,7 @@ public class VoteOutputFactory extends OutputFactory {
 
 	String[] dcNames = splitConditionName(name);
 	if (dcNames[1] == null || dcNames[1].length() == 0) {
-	    log.error("Unable to convert the display order to an int for tool output "
+	    VoteOutputFactory.logger.error("Unable to convert the display order to an int for tool output "
 		    + VoteOutputFactory.OUTPUT_NAME_NOMINATION_SELECTION
 		    + ". Returning false. Name doesn't contain the display order. Condition name was: " + name);
 	    return false;
@@ -153,7 +157,7 @@ public class VoteOutputFactory extends OutputFactory {
 	try {
 	    displayOrder = new Integer(dcNames[1]).intValue();
 	} catch (NumberFormatException e) {
-	    log.error("Unable to convert the display order to an int for tool output "
+	    VoteOutputFactory.logger.error("Unable to convert the display order to an int for tool output "
 		    + VoteOutputFactory.OUTPUT_NAME_NOMINATION_SELECTION
 		    + ". Returning false. Number format exception thrown. Condition name was: " + name, e);
 	    return false;
@@ -163,8 +167,8 @@ public class VoteOutputFactory extends OutputFactory {
 	    Set voteAttempts = queUser.getVoteUsrAttempts();
 	    if (voteAttempts.size() > 0) {
 		if (voteAttempts.size() > 1) {
-		    log.error(
-			    "Attempting to match on nomination, but more than one nomination selected for this user. Will try to match on the given display order. User "
+		    VoteOutputFactory.logger
+			    .error("Attempting to match on nomination, but more than one nomination selected for this user. Will try to match on the given display order. User "
 				    + queUser);
 		}
 
@@ -174,6 +178,7 @@ public class VoteOutputFactory extends OutputFactory {
 		    Long questionUid = attempt.getVoteQueContent().getUid();
 		    if (questionUid.longValue() == 1 && displayOrder == VoteOutputFactory.FREE_TEXT_NOM_SELECTION) {
 			// VoteQueContentId == 1 indicates that it is a free text entry
+			VoteOutputFactory.logger.info("VoteQueContentId == 1 indicates that it is a free entry text");
 			return true;
 		    } else {
 			VoteQueContent nomination = attempt.getVoteQueContent();
