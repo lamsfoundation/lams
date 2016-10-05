@@ -24,65 +24,14 @@
 
  	<!-- ========== Global Forward Definitions =================================== -->
    	<global-forwards>
-		<forward name="starter" path="/authoringStarter"/>   
+		<forward name="starter" path="/authoring.do"/>   
 	</global-forwards>
 	
   <!-- ========== Action Mapping Definitions =================================== -->
   <action-mappings>
-	<!--Authoring Starter Action: initializes the authoring module -->
-   <action path="/authoringStarter" 
-   			type="org.lamsfoundation.lams.tool.vote.web.VoteStarterAction" 
-   			name="VoteAuthoringForm" 
-	      	scope="request"
-   			input="/index.jsp"> 
-	
-	  	<forward
-		    name="load"
-		    path="/authoring/AuthoringMaincontent.jsp"
-		    redirect="false"
-	  	/>
-
-	  	<forward
-		    name="loadMonitoring"
-		    path="/monitoring/MonitoringMaincontent.jsp"
-		    redirect="false"
-	  	/>
-
-	  	<forward
-		    name="loadMonitoringEditActivity"
-		    path="/monitoring/MonitoringMaincontent.jsp"
-		    redirect="false"
-	  	/>
-	  	
-	  	<forward
-		    name="loadLearner"
-		    path="/learning/AnswersContent.jsp"
-		    redirect="false"
-	  	/>
-
-	  	<forward
-	        name="starter"
-	        path="/index.jsp"
-		    redirect="false"
-	     />
-	     
-	     <forward
-	        name="preview"
-	        path="/learning/Preview.jsp"
-		    redirect="false"
-	     />
-	  	
-	  	<forward
-		    name="errorList"
-		    path="/VoteErrorBox.jsp"
-		    redirect="false"
-	  	/>
-	</action>  
-	
-
 	<!--Authoring Main Action : interacts with the authoring module user-->
 	<action path="/authoring"
-	      	type="org.lamsfoundation.lams.tool.vote.web.VoteAction"
+	      	type="org.lamsfoundation.lams.tool.vote.web.AuthoringAction"
     	  	name="VoteAuthoringForm"
 	      	scope="request"
     	  	input="/authoring/AuthoringMaincontent.jsp"
@@ -94,11 +43,23 @@
 		    redirect="false"
 	      />
 
+          <forward
+		    name="loadMonitoringEditActivity"
+		    path="/monitoring/MonitoringMaincontent.jsp"
+		    redirect="false"
+	  	/>
+
 	      <forward
 	        name="loadNominations"
 	        path="/authoring/itemlist.jsp"
 		    redirect="false"
 	      />
+	      
+	      <forward
+		    name="loadLearner"
+		    path="/learning/AnswersContent.jsp"
+		    redirect="false"
+	  	/>
 	    
 	      <forward
 	        name="starter"
@@ -256,39 +217,12 @@
     </action>
     
     
-    <!--Monitoring Starter Action: initializes the Monitoring module -->
-   <action 	path="/monitoringStarter" 
-   			type="org.lamsfoundation.lams.tool.vote.web.VoteMonitoringStarterAction" 
-	      	scope="request"
-   			name="VoteMonitoringForm" 
-      		unknown="false"
-      		validate="false"
-   			input="/monitoringIndex.jsp"> 
-
-	  	<forward
-			name="loadMonitoring"
-			path="/monitoring/MonitoringMaincontent.jsp"
-			redirect="false"
-	  	/>
-	
-	  	<forward
-			name="refreshMonitoring"
-			path="/monitoring/MonitoringMaincontent.jsp"
-			redirect="false"
-	  	/>
-	         			
-   			
-	  	<forward
-		    name="errorList"
-	        path="/VoteErrorBox.jsp"
-		    redirect="false"
-	  	/>
-	</action>  
+    
     
    
    <!--Monitoring Main Action: interacts with the Monitoring module user -->
    <action 	path="/monitoring" 
-   			type="org.lamsfoundation.lams.tool.vote.web.VoteMonitoringAction" 
+   			type="org.lamsfoundation.lams.tool.vote.web.MonitoringAction" 
    			name="VoteMonitoringForm" 
 	      	scope="request"
    			input="/monitoring/MonitoringMaincontent.jsp"
@@ -340,7 +274,7 @@
 
 	    <forward
 			name="monitoringStarterRedirect"
-			path="/monitoringStarter.do"
+			path="/monitoring/start.do"
 			redirect="true"
 	    />
 

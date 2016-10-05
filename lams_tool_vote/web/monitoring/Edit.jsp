@@ -25,7 +25,7 @@
 
 </table>
 
-<c:url  var="authoringUrl" value="/authoringStarter.do">
+<c:url  var="authoringUrl" value="/authoring.do?dispatch=start">
 	<c:param name="toolContentID" value="${formBean.toolContentID}" />
 	<c:param name="contentFolderID" value="${formBean.contentFolderID}" />
 	<c:param name="mode" value="teacher" />

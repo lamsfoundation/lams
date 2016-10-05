@@ -269,7 +269,6 @@
 			<web-resource-name>Authoring content</web-resource-name>
 			<url-pattern>/authoring/*</url-pattern>
 			<url-pattern>/authoring.do</url-pattern>
-			<url-pattern>/authoringStarter.do</url-pattern>
 			<url-pattern>/pedagogicalPlanner.do</url-pattern>
 		</web-resource-collection>
 		<auth-constraint>
@@ -283,7 +282,6 @@
 			<web-resource-name>Staff content</web-resource-name>
 			<url-pattern>/monitoring/*</url-pattern>
 			<url-pattern>/monitoring.do</url-pattern>
-			<url-pattern>/monitoringStarter.do</url-pattern>
 		</web-resource-collection>
 		<auth-constraint>
 			<role-name>MONITOR</role-name>
