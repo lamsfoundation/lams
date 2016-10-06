@@ -21,11 +21,11 @@
  * ****************************************************************
  */
 
-
 package org.lamsfoundation.lams.tool.vote.web;
 
 import javax.servlet.http.HttpSession;
 
+import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.authoring.web.AuthoringConstants;
 import org.lamsfoundation.lams.authoring.web.LamsAuthoringFinishAction;
 import org.lamsfoundation.lams.tool.ToolAccessMode;
@@ -37,24 +37,14 @@ import org.lamsfoundation.lams.tool.vote.VoteAppConstants;
  * @author Steve.Ni, Ozgur Demirtas
  */
 public class ClearSessionAction extends LamsAuthoringFinishAction implements VoteAppConstants {
+    private static Logger logger = Logger.getLogger(ClearSessionAction.class.getName());
 
     @Override
     public void clearSession(String customiseSessionID, HttpSession session, ToolAccessMode mode) {
 	session.removeAttribute(AuthoringConstants.LAMS_AUTHORING_SUCCESS_FLAG);
 	if (mode.isAuthor()) {
-	    session.removeAttribute(TOOL_SERVICE);
-	    session.removeAttribute(TOOL_CONTENT_ID);
-	    session.removeAttribute(IS_DEFINE_LATER);
-	    session.removeAttribute(REMOVABLE_QUESTION_INDEX);
-	    session.removeAttribute(ACTIVITY_TITLE);
-	    session.removeAttribute(ACTIVITY_INSTRUCTIONS);
-	    session.removeAttribute(IS_MONITORED_CONTENT_IN_USE);
-	    session.removeAttribute(OPT_INDEX);
-	    session.removeAttribute(USER_EXCEPTION_DEFAULTCONTENT_NOTSETUP);
-	    session.removeAttribute(USER_EXCEPTION_NO_TOOL_SESSIONS);
-	    session.removeAttribute(USER_EXCEPTION_CONTENT_IN_USE);
-	    session.removeAttribute(USER_EXCEPTION_CONTENTID_REQUIRED);
-	    session.removeAttribute(USER_EXCEPTION_NUMBERFORMAT);
+	    ClearSessionAction.logger.info("In Author mode");
+	    session.removeAttribute(customiseSessionID);
 	}
     }
 
