@@ -148,6 +148,7 @@ public class AuthoringAction extends LamsDispatchAction implements VoteAppConsta
 
 	String maxInputs = request.getParameter(VoteAppConstants.MAX_INPUTS);
 	if (maxInputs == null) {
+	    AuthoringAction.logger.info("Since minNomcount is equal to null hence setting it to '0'");
 	    maxInputs = "0";
 	}
 	voteAuthoringForm.setMaxInputs(new Short(maxInputs));
@@ -282,6 +283,7 @@ public class AuthoringAction extends LamsDispatchAction implements VoteAppConsta
 		.getAttribute(httpSessionID);
 
 	String questionIndexToDelete = request.getParameter("questionIndex");
+	AuthoringAction.logger.info("Question Index to delete" + questionIndexToDelete);
 	List<VoteQuestionDTO> questionDTOs = (List<VoteQuestionDTO>) sessionMap.get(VoteAppConstants.LIST_QUESTION_DTO);
 
 	List<VoteQuestionDTO> listFinalQuestionDTO = new LinkedList<>();
@@ -356,7 +358,7 @@ public class AuthoringAction extends LamsDispatchAction implements VoteAppConsta
 		.getAttribute(httpSessionID);
 
 	String questionIndex = request.getParameter("questionIndex");
-
+	AuthoringAction.logger.info("Question Index" + questionIndex);
 	voteAuthoringForm.setEditableNominationIndex(questionIndex);
 
 	List<VoteQuestionDTO> questionDTOs = (List<VoteQuestionDTO>) sessionMap.get(VoteAppConstants.LIST_QUESTION_DTO);
@@ -518,6 +520,8 @@ public class AuthoringAction extends LamsDispatchAction implements VoteAppConsta
 
 	String editNominationBoxRequest = request.getParameter("editNominationBoxRequest");
 
+	AuthoringAction.logger.info("Edit nomination box request" + editNominationBoxRequest);
+
 	VoteGeneralAuthoringDTO voteGeneralAuthoringDTO = new VoteGeneralAuthoringDTO();
 
 	voteGeneralAuthoringDTO.setContentFolderID(contentFolderID);
@@ -557,9 +561,11 @@ public class AuthoringAction extends LamsDispatchAction implements VoteAppConsta
 		    questionDTOs = AuthoringUtil.reorderUpdateListQuestionDTO(questionDTOs, voteQuestionDTO,
 			    editableNominationIndex);
 		} else {
+		    AuthoringAction.logger.info("Duplicate question entry therefore not adding");
 		    //duplicate question entry, not adding
 		}
 	    } else {
+		AuthoringAction.logger.info("In Request for Save and Edit");
 		//request for edit and save
 		VoteQuestionDTO voteQuestionDTO = null;
 		Iterator iter = questionDTOs.iterator();
@@ -584,6 +590,7 @@ public class AuthoringAction extends LamsDispatchAction implements VoteAppConsta
 			editableNominationIndex);
 	    }
 	} else {
+	    AuthoringAction.logger.info("newNomination entry is blank,therefore not adding");
 	    //entry blank, not adding
 	}
 
@@ -640,6 +647,7 @@ public class AuthoringAction extends LamsDispatchAction implements VoteAppConsta
 		|| voteAuthoringForm.getAssignedDataFlowObject() == 0)) {
 	    ActionMessage error = new ActionMessage("nominations.none.submitted");
 	    errors.add(ActionMessages.GLOBAL_MESSAGE, error);
+	    AuthoringAction.logger.error("Nominations not submitted");
 	}
 
 	String maxNomCount = voteAuthoringForm.getMaxNominationCount();
@@ -647,6 +655,7 @@ public class AuthoringAction extends LamsDispatchAction implements VoteAppConsta
 	    if (maxNomCount.equals("0") || maxNomCount.contains("-")) {
 		ActionMessage error = new ActionMessage("maxNomination.invalid");
 		errors.add(ActionMessages.GLOBAL_MESSAGE, error);
+		AuthoringAction.logger.error("Maximum votes in Advance tab is invalid");
 	    }
 
 	    try {
@@ -654,6 +663,7 @@ public class AuthoringAction extends LamsDispatchAction implements VoteAppConsta
 	    } catch (NumberFormatException e) {
 		ActionMessage error = new ActionMessage("maxNomination.invalid");
 		errors.add(ActionMessages.GLOBAL_MESSAGE, error);
+		AuthoringAction.logger.error("Maximum votes in Advance tab is invalid");
 	    }
 	}
 
@@ -683,6 +693,7 @@ public class AuthoringAction extends LamsDispatchAction implements VoteAppConsta
 	if (isNominationsDuplicate == true) {
 	    ActionMessage error = new ActionMessage("nominations.duplicate");
 	    errors.add(ActionMessages.GLOBAL_MESSAGE, error);
+	    AuthoringAction.logger.error("There are duplicate nomination entries.");
 	}
 
 	VoteGeneralAuthoringDTO voteGeneralAuthoringDTO = new VoteGeneralAuthoringDTO();
@@ -980,12 +991,13 @@ public class AuthoringAction extends LamsDispatchAction implements VoteAppConsta
 	    defaultContentID = voteService.getToolDefaultContentIdBySignature(VoteAppConstants.MY_SIGNATURE);
 	    if (defaultContentID == 0) {
 		VoteUtils.cleanUpUserExceptions(request);
+		AuthoringAction.logger.error("Exception occured: No default content");
 		saveInRequestError(request, "error.defaultContent.notSetup");
 		return mapping.findForward(VoteAppConstants.ERROR_LIST);
 	    }
 	} catch (Exception e) {
 	    VoteUtils.cleanUpUserExceptions(request);
-	    logger.error("error getting the default content id: " + e.getMessage());
+	    AuthoringAction.logger.error("error getting the default content id: " + e.getMessage());
 	    saveInRequestError(request, "error.defaultContent.notSetup");
 	    return mapping.findForward(VoteAppConstants.ERROR_LIST);
 	}
@@ -995,14 +1007,14 @@ public class AuthoringAction extends LamsDispatchAction implements VoteAppConsta
 	    VoteContent voteContent = voteService.getVoteContent(new Long(defaultContentID));
 	    if (voteContent == null) {
 		VoteUtils.cleanUpUserExceptions(request);
-		logger.error("Exception occured: No default content");
+		AuthoringAction.logger.error("Exception occured: No default content");
 		saveInRequestError(request, "error.defaultContent.notSetup");
 		return mapping.findForward(VoteAppConstants.ERROR_LIST);
 	    }
 	} catch (Exception e) {
-	    logger.error("other problems: " + e);
+	    AuthoringAction.logger.error("other problems: " + e);
 	    VoteUtils.cleanUpUserExceptions(request);
-	    logger.error("Exception occured: No default question content");
+	    AuthoringAction.logger.error("Exception occured: No default question content");
 	    saveInRequestError(request, "error.defaultContent.notSetup");
 	    return mapping.findForward(VoteAppConstants.ERROR_LIST);
 	}
@@ -1032,6 +1044,7 @@ public class AuthoringAction extends LamsDispatchAction implements VoteAppConsta
 
 	String maxNomcount = voteContent.getMaxNominationCount();
 	if (maxNomcount.equals("")) {
+	    AuthoringAction.logger.info("Since minNomcount is equal to null hence setting it to '0'");
 	    maxNomcount = "0";
 	}
 	voteAuthoringForm.setMaxNominationCount(maxNomcount);
@@ -1039,6 +1052,7 @@ public class AuthoringAction extends LamsDispatchAction implements VoteAppConsta
 
 	String minNomcount = voteContent.getMinNominationCount();
 	if ((minNomcount == null) || minNomcount.equals("")) {
+	    AuthoringAction.logger.info("Since minNomcount is equal to null hence setting it to '0'");
 	    minNomcount = "0";
 	}
 	voteAuthoringForm.setMinNominationCount(minNomcount);
@@ -1054,7 +1068,7 @@ public class AuthoringAction extends LamsDispatchAction implements VoteAppConsta
     private void saveInRequestError(HttpServletRequest request, String message) {
 	ActionMessages errors = new ActionMessages();
 	errors.add(Globals.ERROR_KEY, new ActionMessage(message));
-	logger.error("add " + message + "  to ActionMessages:");
+	AuthoringAction.logger.error("add " + message + "  to ActionMessages:");
 	saveErrors(request, errors);
     }
 

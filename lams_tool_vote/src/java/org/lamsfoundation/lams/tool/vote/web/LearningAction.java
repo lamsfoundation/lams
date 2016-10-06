@@ -68,7 +68,6 @@ import org.lamsfoundation.lams.tool.vote.util.VoteUtils;
 import org.lamsfoundation.lams.tool.vote.web.form.VoteLearningForm;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.util.DateUtil;
-import org.lamsfoundation.lams.util.MessageService;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.action.LamsDispatchAction;
 import org.lamsfoundation.lams.web.session.SessionManager;
@@ -121,6 +120,7 @@ public class LearningAction extends LamsDispatchAction implements VoteAppConstan
 	repopulateRequestParameters(request, voteLearningForm);
 
 	String toolSessionID = request.getParameter(TOOL_SESSION_ID);
+	LearningAction.logger.info("Tool session ID" + toolSessionID);
 	voteLearningForm.setToolSessionID(toolSessionID);
 
 	String userID = request.getParameter(USER_ID);
@@ -181,9 +181,11 @@ public class LearningAction extends LamsDispatchAction implements VoteAppConstan
 	repopulateRequestParameters(request, voteLearningForm);
 
 	String toolSessionID = request.getParameter(TOOL_SESSION_ID);
+	LearningAction.logger.info("Tool session id :" + toolSessionID);
 	voteLearningForm.setToolSessionID(toolSessionID);
 
 	String userID = request.getParameter(USER_ID);
+	LearningAction.logger.info("User id :" + userID);
 	voteLearningForm.setUserID(userID);
 
 	String revisitingUser = request.getParameter(REVISITING_USER);
@@ -218,6 +220,7 @@ public class LearningAction extends LamsDispatchAction implements VoteAppConstan
 	    request.setAttribute(MAP_GENERAL_CHECKED_OPTIONS_CONTENT, mapQuestionsContent);
 	} else {
 	    //this is not a revisiting user
+	    LearningAction.logger.info("If not a revisiting user");
 	}
 
 	voteLearningForm.resetCommands();
@@ -240,9 +243,11 @@ public class LearningAction extends LamsDispatchAction implements VoteAppConstan
 	repopulateRequestParameters(request, voteLearningForm);
 
 	String toolSessionID = request.getParameter(TOOL_SESSION_ID);
+	LearningAction.logger.info("Tool session id:" + toolSessionID);
 	voteLearningForm.setToolSessionID(toolSessionID);
 
 	String userID = request.getParameter(USER_ID);
+	LearningAction.logger.info("User id:" + userID);
 	voteLearningForm.setUserID(userID);
 
 	String revisitingUser = request.getParameter(REVISITING_USER);
@@ -289,10 +294,12 @@ public class LearningAction extends LamsDispatchAction implements VoteAppConstan
 	repopulateRequestParameters(request, voteLearningForm);
 
 	String toolSessionID = request.getParameter(TOOL_SESSION_ID);
+	LearningAction.logger.info("Tool Session id :" + toolSessionID);
 	voteLearningForm.setToolSessionID(toolSessionID);
 
 	VoteSession voteSession = voteService.getSessionBySessionId(new Long(toolSessionID));
 	String userID = request.getParameter(USER_ID);
+	LearningAction.logger.info("User id:" + userID);
 	voteLearningForm.setUserID(userID);
 
 	VoteQueUsr voteQueUsr = voteService.getVoteUserBySession(new Long(userID), voteSession.getUid());
@@ -324,17 +331,17 @@ public class LearningAction extends LamsDispatchAction implements VoteAppConstan
 	try {
 	    nextUrl = voteService.leaveToolSession(new Long(toolSessionID), new Long(userID));
 	} catch (DataMissingException e) {
-	    logger.error("failure getting nextUrl: " + e);
+	    LearningAction.logger.error("failure getting nextUrl: " + e);
 	    voteLearningForm.resetCommands();
 	    //throw new ServletException(e);
 	    return (mapping.findForward(LEARNING_STARTER));
 	} catch (ToolException e) {
-	    logger.error("failure getting nextUrl: " + e);
+	    LearningAction.logger.error("failure getting nextUrl: " + e);
 	    voteLearningForm.resetCommands();
 	    //throw new ServletException(e);
 	    return (mapping.findForward(LEARNING_STARTER));
 	} catch (Exception e) {
-	    logger.error("unknown exception getting nextUrl: " + e);
+	    LearningAction.logger.error("unknown exception getting nextUrl: " + e);
 	    voteLearningForm.resetCommands();
 	    //throw new ServletException(e);
 	    return (mapping.findForward(LEARNING_STARTER));
@@ -359,9 +366,11 @@ public class LearningAction extends LamsDispatchAction implements VoteAppConstan
 	repopulateRequestParameters(request, voteLearningForm);
 
 	String toolSessionID = request.getParameter(TOOL_SESSION_ID);
+	LearningAction.logger.info("Tool session id:" + toolSessionID);
 	voteLearningForm.setToolSessionID(toolSessionID);
 
 	String userID = request.getParameter(USER_ID);
+	LearningAction.logger.info("User id:" + userID);
 	voteLearningForm.setUserID(userID);
 
 	String maxNominationCount = request.getParameter(MAX_NOMINATION_COUNT);
@@ -399,6 +408,7 @@ public class LearningAction extends LamsDispatchAction implements VoteAppConstan
 	    voteLearningForm.setMaxNominationCountReached(new Boolean(true).toString());
 	    voteGeneralLearnerFlowDTO.setMaxNominationCountReached(new Boolean(true).toString());
 	    persistInRequestError(request, "error.maxNominationCount.reached");
+	    LearningAction.logger.error("You have selected too many nominations.");
 	    return (mapping.findForward(LOAD_LEARNER));
 	}
 
@@ -531,6 +541,7 @@ public class LearningAction extends LamsDispatchAction implements VoteAppConstan
 
 	VoteSession session = voteService.getSessionBySessionId(toolSessionId);
 	VoteQueUsr leader = session.getGroupLeader();
+	LearningAction.logger.info("Leader :" + leader);
 
 	boolean isLeaderResponseFinalized = leader.isResponseFinalised();
 
@@ -549,13 +560,15 @@ public class LearningAction extends LamsDispatchAction implements VoteAppConstan
 
 	IVoteService voteService = VoteServiceProxy.getVoteService(getServlet().getServletContext());
 	String toolSessionID = request.getParameter(AttributeNames.PARAM_TOOL_SESSION_ID);
+	LearningAction.logger.info("Tool Session Id" + toolSessionID);
 	voteLearningForm.setToolSessionID(toolSessionID);
 
 	String userID = request.getParameter("userID");
+	LearningAction.logger.info("User Id:" + userID);
 	voteLearningForm.setUserID(userID);
 
 	String reflectionEntry = request.getParameter(ENTRY_TEXT);
-	logger.info("reflection entry: " + reflectionEntry);
+	LearningAction.logger.info("reflection entry: " + reflectionEntry);
 
 	voteService.createNotebookEntry(new Long(toolSessionID), CoreNotebookConstants.NOTEBOOK_TOOL, MY_SIGNATURE,
 		new Integer(userID), reflectionEntry);
@@ -570,6 +583,7 @@ public class LearningAction extends LamsDispatchAction implements VoteAppConstan
 	IVoteService voteService = VoteServiceProxy.getVoteService(getServlet().getServletContext());
 
 	String toolSessionID = request.getParameter(AttributeNames.PARAM_TOOL_SESSION_ID);
+	LearningAction.logger.info("toolSessionID:" + toolSessionID);
 	VoteSession voteSession = voteService.getSessionBySessionId(new Long(toolSessionID));
 
 	VoteContent voteContent = voteSession.getVoteContent();
@@ -582,6 +596,7 @@ public class LearningAction extends LamsDispatchAction implements VoteAppConstan
 	voteGeneralLearnerFlowDTO.setReflectionSubject(voteContent.getReflectionSubject());
 
 	String userID = request.getParameter("userID");
+	LearningAction.logger.info("User Id :" + userID);
 	voteLearningForm.setUserID(userID);
 
 	NotebookEntry notebookEntry = voteService.getEntry(new Long(toolSessionID), CoreNotebookConstants.NOTEBOOK_TOOL,
@@ -692,7 +707,7 @@ public class LearningAction extends LamsDispatchAction implements VoteAppConstan
 
 	if (voteSession == null) {
 	    VoteUtils.cleanUpUserExceptions(request);
-	    logger.error("error: The tool expects voteSession.");
+	    LearningAction.logger.error("error: The tool expects voteSession.");
 	    return mapping.findForward(VoteAppConstants.ERROR_LIST);
 	}
 
@@ -703,7 +718,7 @@ public class LearningAction extends LamsDispatchAction implements VoteAppConstan
 	VoteContent voteContent = voteSession.getVoteContent();
 	if (voteContent == null) {
 	    VoteUtils.cleanUpUserExceptions(request);
-	    logger.error("error: The tool expects voteContent.");
+	    LearningAction.logger.error("error: The tool expects voteContent.");
 	    persistInRequestError(request, "error.content.doesNotExist");
 	    return mapping.findForward(VoteAppConstants.ERROR_LIST);
 	}
@@ -965,6 +980,7 @@ public class LearningAction extends LamsDispatchAction implements VoteAppConstan
 	    UserDTO user = (UserDTO) ss.getAttribute(AttributeNames.USER);
 	    if (user != null && user.getUserID() != null) {
 		userID = user.getUserID().toString();
+		LearningAction.logger.info("User Id : " + userID);
 		voteLearningForm.setUserID(userID);
 	    }
 	}
@@ -977,6 +993,7 @@ public class LearningAction extends LamsDispatchAction implements VoteAppConstan
 	if (strToolSessionId == null || strToolSessionId.length() == 0) {
 	    VoteUtils.cleanUpUserExceptions(request);
 	    // persistInRequestError(request, "error.toolSessionId.required");
+	    LearningAction.logger.error("error.toolSessionId.required");
 	    return mapping.findForward(VoteAppConstants.ERROR_LIST);
 	} else {
 	    try {
@@ -985,7 +1002,7 @@ public class LearningAction extends LamsDispatchAction implements VoteAppConstan
 	    } catch (NumberFormatException e) {
 		VoteUtils.cleanUpUserExceptions(request);
 		// persistInRequestError(request, "error.sessionId.numberFormatException");
-		logger.error("add error.sessionId.numberFormatException to ActionMessages.");
+		LearningAction.logger.error("add error.sessionId.numberFormatException to ActionMessages.");
 		return mapping.findForward(VoteAppConstants.ERROR_LIST);
 	    }
 	}
@@ -995,13 +1012,13 @@ public class LearningAction extends LamsDispatchAction implements VoteAppConstan
 
 	if (mode == null || mode.length() == 0) {
 	    VoteUtils.cleanUpUserExceptions(request);
-	    logger.error("mode missing: ");
+	    LearningAction.logger.error("mode missing: ");
 	    return mapping.findForward(VoteAppConstants.ERROR_LIST);
 	}
 
 	if (!mode.equals("learner") && !mode.equals("teacher") && !mode.equals("author")) {
 	    VoteUtils.cleanUpUserExceptions(request);
-	    logger.error("mode invalid: ");
+	    LearningAction.logger.error("mode invalid: ");
 	    return mapping.findForward(VoteAppConstants.ERROR_LIST);
 	}
 	voteLearningForm.setLearningMode(mode);
@@ -1054,8 +1071,9 @@ public class LearningAction extends LamsDispatchAction implements VoteAppConstan
 	VoteSession session = voteService.getSessionBySessionId(new Long(toolSessionId));
 	VoteQueUsr user = voteService.getVoteUserBySession(new Long(userId.intValue()), session.getUid());
 	if (user == null) {
-	    logger.error("Unable to find specified user for Vote activity. Screens are likely to fail. SessionId="
-		    + new Long(toolSessionId) + " UserId=" + userId);
+	    LearningAction.logger
+		    .error("Unable to find specified user for Vote activity. Screens are likely to fail. SessionId="
+			    + new Long(toolSessionId) + " UserId=" + userId);
 	}
 	return user;
     }
