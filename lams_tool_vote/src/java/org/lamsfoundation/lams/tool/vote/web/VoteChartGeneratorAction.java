@@ -31,6 +31,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.lang.StringUtils;
+import org.apache.log4j.Logger;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
@@ -53,7 +54,7 @@ import org.lamsfoundation.lams.web.util.AttributeNames;
  * @author Marcin Cieslak
  */
 public class VoteChartGeneratorAction extends LamsDispatchAction {
-
+    private static Logger logger = Logger.getLogger(VoteChartGeneratorAction.class.getName());
     private static IVoteService voteService;
 
     @Override
@@ -62,8 +63,8 @@ public class VoteChartGeneratorAction extends LamsDispatchAction {
 	    HttpServletResponse response) throws JSONException, IOException {
 	String currentSessionId = request.getParameter("currentSessionId");
 
-	Map<Long, String> nominationNames = new HashMap<Long, String>();
-	Map<Long, Double> nominationVotes = new HashMap<Long, Double>();
+	Map<Long, String> nominationNames = new HashMap<>();
+	Map<Long, Double> nominationVotes = new HashMap<>();
 
 	//request for the all session summary
 	if ("0".equals(currentSessionId)) {
@@ -86,6 +87,7 @@ public class VoteChartGeneratorAction extends LamsDispatchAction {
 
 	    //sessionId should not be blank
 	} else if (!StringUtils.isBlank(currentSessionId)) {
+	    VoteChartGeneratorAction.logger.warn("Session Id should not be blank");
 	    VoteSession voteSession = getVoteService().getSessionBySessionId(new Long(currentSessionId));
 	    VoteContent voteContent = voteSession.getVoteContent();
 

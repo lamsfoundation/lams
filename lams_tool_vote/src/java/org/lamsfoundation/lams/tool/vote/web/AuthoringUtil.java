@@ -78,15 +78,18 @@ public class AuthoringUtil implements VoteAppConstants {
 
 	    if (!questionDTO.getDisplayOrder().equals(new Integer(intOriginalQuestionIndex).toString())
 		    && !questionDTO.getDisplayOrder().equals(new Integer(replacedQuestionIndex).toString())) {
+		AuthoringUtil.logger.info("Normal Copy");
 		// normal copy
 		tempQuestion = questionDTO;
 
 	    } else if (questionDTO.getDisplayOrder().equals(new Integer(intOriginalQuestionIndex).toString())) {
 		// move type 1
+		AuthoringUtil.logger.info("Move type 1");
 		tempQuestion = replacedQuestion;
 
 	    } else if (questionDTO.getDisplayOrder().equals(new Integer(replacedQuestionIndex).toString())) {
 		// move type 1
+		AuthoringUtil.logger.info("Move type 1");
 		tempQuestion = mainQuestion;
 	    }
 
@@ -136,6 +139,9 @@ public class AuthoringUtil implements VoteAppConstants {
     }
 
     public static boolean checkDuplicateNominations(List listQuestionDTO, String newQuestion) {
+	if (AuthoringUtil.logger.isDebugEnabled()) {
+	    AuthoringUtil.logger.debug("New Question" + newQuestion);
+	}
 
 	Map mapQuestion = AuthoringUtil.extractMapQuestion(listQuestionDTO);
 
@@ -199,6 +205,9 @@ public class AuthoringUtil implements VoteAppConstants {
 
     public static VoteContent saveOrUpdateVoteContent(IVoteService voteService, VoteAuthoringForm voteAuthoringForm,
 	    HttpServletRequest request, VoteContent voteContent, String strToolContentID) {
+	if (AuthoringUtil.logger.isDebugEnabled()) {
+	    AuthoringUtil.logger.debug("ToolContentID" + strToolContentID);
+	}
 	UserDTO toolUser = (UserDTO) SessionManager.getSession().getAttribute(AttributeNames.USER);
 
 	String richTextTitle = request.getParameter(VoteAppConstants.TITLE);
@@ -293,6 +302,7 @@ public class AuthoringUtil implements VoteAppConstants {
 	voteContent.setMaxExternalInputs(maxInputsShort);
 
 	if (newContent) {
+	    AuthoringUtil.logger.info("In New Content");
 	    voteService.saveVoteContent(voteContent);
 	} else {
 	    voteService.updateVote(voteContent);

@@ -36,6 +36,7 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import org.apache.commons.lang.StringEscapeUtils;
+import org.apache.log4j.Logger;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
@@ -72,6 +73,7 @@ import org.lamsfoundation.lams.web.util.SessionMap;
  * @author Ozgur Demirtas
  */
 public class MonitoringAction extends LamsDispatchAction implements VoteAppConstants {
+    private static Logger logger = Logger.getLogger(MonitoringAction.class.getName());
 
     /**
      * main content/question content management and workflow logic
@@ -99,6 +101,8 @@ public class MonitoringAction extends LamsDispatchAction implements VoteAppConst
 	IVoteService voteService = VoteServiceProxy.getVoteService(getServlet().getServletContext());
 
 	Long currentUid = WebUtil.readLongParam(request, "currentUid");
+	MonitoringAction.logger.info("Current Uid" + currentUid);
+
 	VoteUsrAttempt voteUsrAttempt = voteService.getAttemptByUID(currentUid);
 
 	voteUsrAttempt.setVisible(show);
@@ -151,6 +155,7 @@ public class MonitoringAction extends LamsDispatchAction implements VoteAppConst
 	Long sessionUid = WebUtil.readLongParam(request, VoteAppConstants.ATTR_SESSION_UID, true);
 	if (sessionUid == 0L) {
 	    sessionUid = null;
+	    MonitoringAction.logger.info("Setting sessionUid to null");
 	}
 
 	Long questionUid = WebUtil.readLongParam(request, VoteAppConstants.ATTR_QUESTION_UID, false);
@@ -251,6 +256,7 @@ public class MonitoringAction extends LamsDispatchAction implements VoteAppConst
 
 	Long sessionUid = WebUtil.readLongParam(request, VoteAppConstants.ATTR_SESSION_UID, true);
 	if (sessionUid == 0L) {
+	    MonitoringAction.logger.info("Setting sessionUid to null");
 	    sessionUid = null;
 	}
 
@@ -393,10 +399,12 @@ public class MonitoringAction extends LamsDispatchAction implements VoteAppConst
 
 	/* we have made sure TOOL_CONTENT_ID is passed */
 	String toolContentID = voteMonitoringForm.getToolContentID();
+	MonitoringAction.logger.warn("Make sure ToolContentId is passed" + toolContentID);
 	VoteContent voteContent = voteService.getVoteContent(new Long(toolContentID));
 
 	if (voteContent == null) {
 	    VoteUtils.cleanUpUserExceptions(request);
+	    MonitoringAction.logger.error("Vote Content does not exist");
 	    voteGeneralMonitoringDTO.setUserExceptionContentDoesNotExist(Boolean.TRUE.toString());
 	    return (mapping.findForward(VoteAppConstants.ERROR_LIST));
 	}
@@ -493,7 +501,7 @@ public class MonitoringAction extends LamsDispatchAction implements VoteAppConst
 	    try {
 		voteMonitoringForm.setToolContentID(strToolContentId);
 	    } catch (NumberFormatException e) {
-		//VoteMonitoringStarterAction.logger.error("add error.numberFormatException to ActionMessages.");
+		MonitoringAction.logger.error("Number Format Exception");
 		VoteUtils.cleanUpUserExceptions(request);
 		return (mapping.findForward(VoteAppConstants.ERROR_LIST));
 	    }
