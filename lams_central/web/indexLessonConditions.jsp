@@ -49,96 +49,81 @@
 </lams:head>
     
 <body class="stripes">
-<div id="page">
-<div id="content">
-
+<lams:Page type="admin" title="">
 <logic:messagesPresent> 
-	<div class="warning">
+	<lams:Alert id="errors" type="danger" close="false">
 		<html:messages id="error">
 			<c:out value="${error}" escapeXml="false"/><br/>
 		</html:messages>
-    </div>
+   </lams:Alert>
 </logic:messagesPresent>
 
-<table>
-<!-- Preceding lessons setup -->
-	<tr>
-		<td colspan="2">
-			<h4>
-				<fmt:message key="label.conditions.box.title">
-					<fmt:param>${fn:escapeXml(title)}</fmt:param>
-				</fmt:message>
-			</h4>
-		</td>
-	</tr>
+<div class="container">
+	<div class="col-xs-12">
+	<!-- Preceding lessons setup -->
+		<p class="lead">
+			<fmt:message key="label.conditions.box.title">
+				><fmt:param>${fn:escapeXml(title)}</fmt:param>
+			</fmt:message>
+		</p>
 	<c:choose>
 		<c:when test="${empty precedingLessons}">
-			<tr>
-				<td colspan="2" class="lessonList emptyList">
+			<p>
 					<fmt:message key="label.conditions.box.no.dependency" />
-				</td>
-			</tr>
+			</p>		
 		</c:when>
 		<c:otherwise>
 			<c:forEach var="precedingLesson" items="${precedingLessons}">
-				<tr>
-					<td class="lessonList" style="width: 70%">
-						<c:out value="${precedingLesson.name}" />
-					</td>
-					<td>
-						<c:if test="${edit}">
-							<img src="<lams:LAMSURL/>images/icons/cross.png"
-								 style="cursor: pointer;"
-								 title="<fmt:message key="label.conditions.box.remove.dependency" />"
-								 onclick="javascript:removePrecedingLesson(${precedingLesson.id})" />
-						</c:if>
-					</td>
-				</tr>
+				<div class="row">
+					<div class="col-xs-6">
+								<c:out value="${precedingLesson.name}" />
+					</div>
+					<div class="col-xs-6">
+								<c:if test="${edit}">
+									<i class="fa fa-fw fa-trash-o text-danger" style="cursor: pointer;" title="<fmt:message key="label.conditions.box.remove.dependency" />" onclick="javascript:removePrecedingLesson(${precedingLesson.id})"></i>
+								</c:if>
+					</div>			
+				</div>
 			</c:forEach>
 		</c:otherwise>
 	</c:choose>
-	
+	<hr>
 	<!-- Adding new preceding lesson -->
 	<c:if test="${edit}">
-		<tr>
-			<td colspan="2">
-				<h4>
-					<fmt:message key="label.conditions.box.add.dependency" />
-				</h4>
-			</td>
-		</tr>
-		
-		<c:choose>
-			<c:when test="${empty availableLessons}">
-				<tr>
-					<td colspan="2" class="lessonList emptyList">
+		<div class="panel panel-default">
+			<div class="panel-heading">
+				<fmt:message key="label.conditions.box.add.dependency" />
+			</div>
+			<div class="panel-body">
+			<c:choose>
+				<c:when test="${empty availableLessons}">
+					<p>
 						<fmt:message key="label.conditions.box.no.dependency" />
-					</td>
-				</tr>
-			</c:when>
-			<c:otherwise>
-				<form action="${addLessonDependencyUrl}" method="post">
-				<tr>
-					<td class="lessonList" style="width: 70%">
-						<select name="precedingLessonId">
-							<c:forEach var="availableLesson" items="${availableLessons}">
-								<option value="${availableLesson.id}">${fn:escapeXml(availableLesson.name)}</option>
-							</c:forEach>
-						</select>
-					</td>
-					<td>
-						<input class="button" type="submit" value="<fmt:message key="index.addlesson"/>" />
-					</td>
-				</tr>
-				</form>
-			</c:otherwise>
-		</c:choose>
+					</p>
+				</c:when>
+				<c:otherwise>
+					<form action="${addLessonDependencyUrl}" method="post">
+						<div class="form-group">	
+							<select class="form-control" name="precedingLessonId">
+								<c:forEach var="availableLesson" items="${availableLessons}">
+									<option value="${availableLesson.id}">${fn:escapeXml(availableLesson.name)}</option>
+								</c:forEach>
+							</select>
+						</div>
+						<div class="form-group pull-right">	
+							<input class="btn btn-sm btn-default" type="submit" value="<fmt:message key="index.addlesson"/>" />
+						</div>
+					</form>
+				</c:otherwise>
+			</c:choose>
+			</div>
+		</div>
 	</c:if>
+	<hr>
 	
 	<!-- Finish date setup -->
-	<tr>
-		<td colspan="2">
-			<h4>
+		<div class="panel panel-default">
+			<div class="panel-heading">
 				<c:choose>
 					<c:when test="${empty lessonDaysToFinish}">
 						<fmt:message key="label.conditions.box.finish.no.date" />
@@ -155,43 +140,43 @@
 						</fmt:message>
 					</c:otherwise>
 				</c:choose>
-			</h4>
-		</td>
-	</tr>
+		</div>
 	
 	<!-- Changing finish date -->
 	<c:if test="${edit}">
-		<form action="${setDaysToLessonFinishUrl}" method="post">
-			<tr>
-				<td class="lessonList" style="width: 70%">
-					<select name="lessonDaysToFinish">
-						<c:forEach begin="0" end="180" var="index">
-							<option
-							<c:if test="${(empty lessonDaysToFinish and index eq 0) or index eq lessonDaysToFinish}">
-								selected="selected"
+		<div class="panel-body">
+			<form action="${setDaysToLessonFinishUrl}" method="post">
+						<div class="form-group">
+							<label for="lessonDaysToFinish"><fmt:message key="advanced.tab.form.enter.number.days.label"/>: </label>
+							<select class="form-control" id="lessonDaysToFinish" name="lessonDaysToFinish">
+							<c:forEach begin="0" end="180" var="index">
+								<option
+								<c:if test="${(empty lessonDaysToFinish and index eq 0) or index eq lessonDaysToFinish}">
+									selected="selected"
+								</c:if>
+								>${index}</option>
+							</c:forEach>
+						</select>
+						</div>
+						<div class="checkbox">
+							<label>
+							<input type="checkbox" name="lessonIndividualFinish" value="true" 
+							<c:if test="${lessonIndividualFinish}">
+								checked="checked"
 							</c:if>
-							>${index}</option>
-						</c:forEach>
-					</select>
-					<fmt:message key="advanced.tab.form.enter.number.days.label"/>
-				</td>
-				<td rowspan="2" style="vertical-align: middle">
-					<input class="button" type="submit" value="<fmt:message key="label.set"/>" />
-				</td>
-			</tr>
-			<tr>
-				<td>
-					<input type="checkbox" name="lessonIndividualFinish" value="true" 
-					<c:if test="${lessonIndividualFinish}">
-						checked="checked"
-					</c:if>
-					/><fmt:message key="advanced.tab.form.individual.not.entire.group.label"/>
-				</td>
-			</tr>	
-		</form>
+							/><fmt:message key="advanced.tab.form.individual.not.entire.group.label"/>
+							</label>
+						</div>
+						<div class="form-group">
+							<input class="btn btn-sm btn-default pull-right" type="submit" value="<fmt:message key="label.set"/>" />
+						</div>								
+			</form>
+		</div>
 	</c:if>
-</table>
+	</div>
 </div>
 </div>
+
+</lams:Page>
 </body>
 </lams:html>
