@@ -81,6 +81,7 @@ public class RatingServlet extends HttpServlet {
 	// get rating value as either float or comment String
 	try {
 	    boolean doSave = true;
+	    boolean ratingLimitsByCriteria = WebUtil.readBooleanParam(request, "ratingLimitsByCriteria", false);
 
 	    Long maxRatingsForItem = WebUtil.readLongParam(request, "maxRatingsForItem", true);
 	    log.debug("RatingServlet: Check Max rates for an item reached. Item " + itemId + " criteria id "
@@ -93,8 +94,10 @@ public class RatingServlet extends HttpServlet {
 		    ToolActivityRatingCriteria toolCriteria = (ToolActivityRatingCriteria) criteria;
 		    List<Long> itemIds = new LinkedList<Long>();
 		    itemIds.add(itemId);
-		    Map<Long, Long> itemIdToRatedUsersCountMap = ratingService
-			    .countUsersRatedEachItem(toolCriteria.getToolContentId(), itemIds, userId.intValue());
+		    Map<Long, Long> itemIdToRatedUsersCountMap = ratingLimitsByCriteria ? 
+			ratingService.countUsersRatedEachItemByCriteria(ratingCriteriaId, itemIds, userId) :
+			ratingService.countUsersRatedEachItem(toolCriteria.getToolContentId(), itemIds, userId);
+
 		    Long currentRatings = itemIdToRatedUsersCountMap.get(itemId);
 		    if (currentRatings != null && maxRatingsForItem.compareTo(currentRatings) <= 0) {
 			JSONObject.put("error", true);
@@ -109,11 +112,16 @@ public class RatingServlet extends HttpServlet {
 
 	    if (doSave) {
 		if (criteria.isCommentsEnabled()) {
-		    String comment = WebUtil.readStrParam(request, "comment");
-		    ratingService.commentItem(criteria, userId, itemId, comment);
-		    JSONObject.put("comment", StringEscapeUtils.escapeCsv(comment));
-
-		} else {
+		    // can have but do not have to have comment
+		    String comment = WebUtil.readStrParam(request, "comment", true);
+		    if ( comment != null ) {
+        		    ratingService.commentItem(criteria, userId, itemId, comment);
+        		    JSONObject.put("comment", StringEscapeUtils.escapeCsv(comment));
+		    }
+		} 
+	
+		String floatString = request.getParameter("rate");
+		if ( floatString != null && floatString.length() > 0 ) {
 		    float rating = Float.parseFloat(request.getParameter("rate"));
 
 		    ItemRatingCriteriaDTO averageRatingDTO = ratingService.rateItem(criteria, userId, itemId, rating);
@@ -128,12 +136,15 @@ public class RatingServlet extends HttpServlet {
 		boolean hasRatingLimits = WebUtil.readBooleanParam(request, "hasRatingLimits", false);
 
 		// refresh countRatedItems in case there is rating limit set
+		// Preview tool counts rated items on a criteria basis, other tools on a set of criteria basis!
 		if (hasRatingLimits) {
 		    // as long as this can be requested only for LEARNER_ITEM_CRITERIA_TYPE type, cast Criteria
 		    LearnerItemRatingCriteria learnerItemRatingCriteria = (LearnerItemRatingCriteria) criteria;
 		    Long toolContentId = learnerItemRatingCriteria.getToolContentId();
 
-		    int countRatedItems = ratingService.getCountItemsRatedByUser(toolContentId, userId);
+		    int countRatedItems = ratingLimitsByCriteria ? 
+			ratingService.getCountItemsRatedByUserByCriteria(ratingCriteriaId, userId) :
+			ratingService.getCountItemsRatedByUser(toolContentId, userId);
 		    JSONObject.put("countRatedItems", countRatedItems);
 		}
 	    }

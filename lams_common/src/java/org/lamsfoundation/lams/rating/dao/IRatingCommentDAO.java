@@ -20,7 +20,6 @@
  * ****************************************************************
  */
 
-
 package org.lamsfoundation.lams.rating.dao;
 
 import java.util.Collection;
@@ -62,6 +61,11 @@ public interface IRatingCommentDAO {
 
     List<RatingCommentDTO> getCommentsByCriteriaAndItemsAndUser(Long ratingCriteriaId, Collection<Long> itemIds,
 	    Integer userId);
+
+    /**
+     * Get the comment relating to a ranking/hedging/star criteria, rather than the comment for a comment criteria. 
+     */
+    List<RatingCommentDTO> getRelatedCommentByCriteriaAndUser(Long ratingCriteriaId, Integer userId);
 
     RatingComment getComment(Long ratingCriteriaId, Integer userId, Long itemId);
 
