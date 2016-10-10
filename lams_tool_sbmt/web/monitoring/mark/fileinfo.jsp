@@ -1,4 +1,7 @@
-<c:if test="${status.first}">
+<%@ include file="/common/taglibs.jsp"%>
+<c:set var="localeLanguage"><lams:user property="localeLanguage" /></c:set>
+<script type="text/javascript" src="<lams:LAMSURL />/includes/javascript/jquery.timeago.js"></script>
+<script type="text/javascript" src="<lams:LAMSURL />/includes/javascript/timeagoi18n/jquery.timeago.${fn:toLowerCase(localeLanguage)}.js"></script><c:if test="${status.first}">
 	<tr>
 		<th colspan="3" class="active">
 			<c:out value="${fileInfo.owner.firstName}" />&nbsp;<c:out value="${fileInfo.owner.lastName}" />&nbsp;<fmt:message key="label.submit.file.suffix" />:
@@ -82,7 +85,7 @@
 		:
 	</td>
 	<td colspan="2">
-		<lams:Date value="${fileInfo.dateOfSubmission}" />
+		<lams:Date value="${fileInfo.dateOfSubmission}" timeago="true"/>
 	</td>
 </tr>
 
@@ -90,3 +93,8 @@
 <!--  do not show full details if removed or on mark screen --> 
 	<%@include file="filelist.jsp"%>
 </c:if>
+<script type="text/javascript">
+	jQuery(document).ready(function() {
+		jQuery("time.timeago").timeago();
+	});
+</script>
