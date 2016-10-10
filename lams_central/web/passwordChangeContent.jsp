@@ -64,9 +64,9 @@
 				<tr>
 					<td>&nbsp;</td>
 				
-					<td>
-						<html:submit styleClass="button"><fmt:message key="button.save"/></html:submit>  	
+					<td class="align-center">
 						<html:cancel  styleClass="button"><fmt:message key="button.cancel"/></html:cancel>
+						<html:submit styleClass="button"><fmt:message key="button.save"/></html:submit> 
 					</td>
 				</tr>
 			</table>
