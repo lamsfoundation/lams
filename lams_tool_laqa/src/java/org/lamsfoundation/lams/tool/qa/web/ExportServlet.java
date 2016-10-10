@@ -111,7 +111,7 @@ public class ExportServlet extends AbstractExportPortfolioServlet implements QaA
 	    boolean isNoToolSessions = qaService.isStudentActivityOccurredGlobal(content);
 	    request.getSession().setAttribute(QaAppConstants.IS_TOOL_SESSION_AVAILABLE, isNoToolSessions);
 
-	    GeneralLearnerFlowDTO generalLearnerFlowDTO = LearningUtil.buildGeneralLearnerFlowDTO(content);
+	    GeneralLearnerFlowDTO generalLearnerFlowDTO = LearningUtil.buildGeneralLearnerFlowDTO(qaService, content);
 	    List listMonitoredAnswersContainerDTO = qaService.exportLearner(content, content.isUsernameVisible(), true,
 		    toolSessionID.toString(), userID.toString());
 	    generalLearnerFlowDTO.setListMonitoredAnswersContainerDTO(listMonitoredAnswersContainerDTO);
@@ -149,7 +149,7 @@ public class ExportServlet extends AbstractExportPortfolioServlet implements QaA
 	boolean isToolSessionAvailable = qaService.isStudentActivityOccurredGlobal(content);
 	request.getSession().setAttribute(QaAppConstants.IS_TOOL_SESSION_AVAILABLE, isToolSessionAvailable);
 
-	GeneralLearnerFlowDTO generalLearnerFlowDTO = LearningUtil.buildGeneralLearnerFlowDTO(content);
+	GeneralLearnerFlowDTO generalLearnerFlowDTO = LearningUtil.buildGeneralLearnerFlowDTO(qaService, content);
 	request.getSession().setAttribute(GENERAL_LEARNER_FLOW_DTO, generalLearnerFlowDTO);
 
 	request.getSession().setAttribute(PORTFOLIO_EXPORT_MODE, "teacher");

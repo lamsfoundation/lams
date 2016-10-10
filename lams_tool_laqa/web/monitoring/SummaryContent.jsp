@@ -50,7 +50,7 @@
 						<fmt:message key="label.learning.answer" />
 					</th>
 					
-					<c:if test="${content.allowRateAnswers}">
+					<c:if test="${isRatingsEnabled}">
 						<th title="<fmt:message key='label.sort.by.rating'/>" width="130px">
 							<fmt:message key="label.learning.rating" />
 						</th>

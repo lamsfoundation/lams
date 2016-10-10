@@ -137,8 +137,12 @@ public class QaMonitoringStarterAction extends Action implements QaAppConstants 
 
 	boolean isGroupedActivity = qaService.isGroupedActivity(qaContent.getQaContentId());
 	request.setAttribute("isGroupedActivity", isGroupedActivity);
+	
+	//ratings stuff
+	boolean isRatingsEnabled = qaService.isRatingsEnabled(qaContent);
+	request.setAttribute("isRatingsEnabled", isRatingsEnabled);
 
-	//rating stuff
+	//comments stuff
 	boolean isCommentsEnabled = qaService.isCommentsEnabled(qaContent.getQaContentId());
 	request.setAttribute("isCommentsEnabled", isCommentsEnabled);
 
