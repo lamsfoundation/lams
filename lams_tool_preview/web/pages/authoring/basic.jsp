@@ -13,6 +13,6 @@
 </div>
 
 <div id="criterias-holder">
-	<lams:AuthoringRatingCriteria criterias="${sessionMap.ratingCriterias}" hasRatingLimits="true"
+ 	<lams:AuthoringRatingAllStyleCriteria criterias="${sessionMap.ratingCriterias}" hasRatingLimits="true"
 		formContentPrefix="peerreview"/>
 </div>

@@ -31,6 +31,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -55,6 +56,8 @@ import org.lamsfoundation.lams.notebook.service.CoreNotebookConstants;
 import org.lamsfoundation.lams.rating.dto.ItemRatingCriteriaDTO;
 import org.lamsfoundation.lams.rating.dto.ItemRatingDTO;
 import org.lamsfoundation.lams.rating.dto.RatingCommentDTO;
+import org.lamsfoundation.lams.rating.dto.StyledCriteriaRatingDTO;
+import org.lamsfoundation.lams.rating.model.RatingCriteria;
 import org.lamsfoundation.lams.tool.ToolAccessMode;
 import org.lamsfoundation.lams.tool.peerreview.PeerreviewConstants;
 import org.lamsfoundation.lams.tool.peerreview.model.Peerreview;
@@ -86,8 +89,23 @@ public class LearningAction extends Action {
 	if (param.equals("start")) {
 	    return start(mapping, form, request, response);
 	}
+	if (param.equals("refresh")) {
+	    return refresh(mapping, form, request, response);
+	}
 	if (param.equals("getUsers")) {
 	    return getUsers(mapping, form, request, response);
+	}
+	if (param.equals("edit")) {
+	    return edit(mapping, form, request, response);
+	}
+	if (param.equals("submitHedging")) {
+	    return submitRankingHedging(mapping, form, request, response);
+	}
+	if (param.equals("submitRanking")) {
+	    return submitRankingHedging(mapping, form, request, response);
+	}
+	if (param.equals("nextPrev")) {
+	    return nextPrev(mapping, form, request, response);
 	}
 	if (param.equals("showResults")) {
 	    return showResults(mapping, form, request, response);
@@ -104,6 +122,11 @@ public class LearningAction extends Action {
 	    return submitReflection(mapping, form, request, response);
 	}
 
+	
+	if (param.equals("getUsersMonitoring")) {
+	    return getUsersMonitoring(mapping, form, request, response);
+	}
+	
 	return mapping.findForward(PeerreviewConstants.ERROR);
     }
 
@@ -114,10 +137,11 @@ public class LearningAction extends Action {
      * This method will avoid read database again and lost un-saved resouce item lost when user "refresh page",
      * 
      * @throws IOException
+     * @throws ServletException 
      *
      */
     private ActionForward start(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws IOException {
+	    HttpServletResponse response) throws IOException, ServletException {
 
 	IPeerreviewService service = getPeerreviewService();
 
@@ -127,6 +151,7 @@ public class LearningAction extends Action {
 
 	// save toolContentID into HTTPSession
 	ToolAccessMode mode = WebUtil.readToolAccessModeParam(request, AttributeNames.PARAM_MODE, true);
+	
 
 	Long sessionId = new Long(request.getParameter(AttributeNames.PARAM_TOOL_SESSION_ID));
 
@@ -162,11 +187,46 @@ public class LearningAction extends Action {
 	    return mapping.findForward("defineLater");
 	} else {
 	    // goto standard screen
-	    return startRating(mapping, form, request, response, service, sessionMap, sessionId, user, mode);
+	    sessionMap.put(PeerreviewConstants.PARAM_TOOL_SESSION_ID, sessionId);
+	    sessionMap.put(AttributeNames.ATTR_MODE, mode);
+	    sessionMap.put(PeerreviewConstants.ATTR_USER, user);
+	    return startRating(mapping, form, request, response, service, sessionMap, sessionId, user, mode, null, null);
 	}
 
     }
 
+    /**
+     * Same as start but doesn't create a new session map. 
+     * 
+     * @throws IOException
+     * @throws ServletException 
+     *
+     */
+    private ActionForward refresh(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+	    HttpServletResponse response) throws IOException, ServletException {
+
+	IPeerreviewService service = getPeerreviewService();
+
+	String sessionMapID = request.getParameter(PeerreviewConstants.ATTR_SESSION_MAP_ID);
+	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
+		.getAttribute(sessionMapID);
+	request.setAttribute(PeerreviewConstants.ATTR_SESSION_MAP_ID, sessionMapID);
+
+	Long sessionId = (Long) sessionMap.get(PeerreviewConstants.PARAM_TOOL_SESSION_ID);
+	ToolAccessMode mode = (ToolAccessMode) sessionMap.get(AttributeNames.ATTR_MODE);
+	PeerreviewUser user = (PeerreviewUser) sessionMap.get(PeerreviewConstants.ATTR_USER);
+	    
+	request.setAttribute(PeerreviewConstants.ATTR_SESSION_MAP_ID, sessionMap.getSessionID());
+	request.setAttribute(AttributeNames.ATTR_MODE, mode);
+	request.setAttribute(PeerreviewConstants.PARAM_TOOL_SESSION_ID, sessionId);
+
+	Long criteriaId = WebUtil.readLongParam(request, "criteriaId", true);
+	RatingCriteria criteria = criteriaId != null ? service.getCriteriaByCriteriaId(criteriaId) : null;
+	
+	return startRating(mapping, form, request, response, service, sessionMap, sessionId, user, mode, criteria, null);
+
+    }
+    
     private class UserCreateThread implements Runnable {
 	private Long toolSessionId;
 	private IPeerreviewService service;
@@ -198,11 +258,12 @@ public class LearningAction extends Action {
      * This method will avoid read database again and lost un-saved resouce item lost when user "refresh page",
      * 
      * @throws IOException
+     * @throws ServletException 
      *
      */
     private ActionForward startRating(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response, IPeerreviewService service, SessionMap sessionMap, Long sessionId,
-	    PeerreviewUser user, ToolAccessMode mode) throws IOException {
+	    PeerreviewUser user, ToolAccessMode mode, RatingCriteria currentCriteria, Boolean next) throws IOException, ServletException {
 
 	Peerreview peerreview = service.getPeerreviewBySessionId(sessionId);
 
@@ -219,10 +280,7 @@ public class LearningAction extends Action {
 	sessionMap.put(PeerreviewConstants.ATTR_TITLE, peerreview.getTitle());
 	sessionMap.put(PeerreviewConstants.ATTR_RESOURCE_INSTRUCTION, peerreview.getInstructions());
 	sessionMap.put(PeerreviewConstants.ATTR_LOCK_ON_FINISH, peerreview.getLockWhenFinished());
-	sessionMap.put(PeerreviewConstants.ATTR_USER, user);
 
-	sessionMap.put(PeerreviewConstants.PARAM_TOOL_SESSION_ID, sessionId);
-	sessionMap.put(AttributeNames.ATTR_MODE, mode);
 	// reflection information
 	sessionMap.put(PeerreviewConstants.ATTR_REFLECTION_ON, peerreview.isReflectOnActivity());
 	sessionMap.put(PeerreviewConstants.ATTR_REFLECTION_INSTRUCTION, peerreview.getReflectInstructions());
@@ -232,17 +290,6 @@ public class LearningAction extends Action {
 	if (peerreview.isDefineLater()) {
 	    return mapping.findForward("defineLater");
 	}
-
-	// handle rating criterias
-	boolean isCommentsEnabled = service.isCommentsEnabled(peerreview.getContentId());
-	sessionMap.put("isCommentsEnabled", isCommentsEnabled);
-
-	int commentsMinWordsLimit = service.getCommentsMinWordsLimit(peerreview.getContentId());
-	sessionMap.put("commentsMinWordsLimit", commentsMinWordsLimit);
-
-	// store how many items are rated
-	int countRatedUsers = service.getCountItemsRatedByUser(peerreview.getContentId(), user.getUserId().intValue());
-	sessionMap.put(AttributeNames.ATTR_COUNT_RATED_ITEMS, countRatedUsers);
 
 	// set contentInUse flag to true!
 	peerreview.setContentInUse(true);
@@ -259,20 +306,72 @@ public class LearningAction extends Action {
 	    user.setSessionFinished(false);
 	    service.createUser(user);
 	}
-	sessionMap.put("isDisabled",
-		peerreview.getLockWhenFinished() && user.isSessionFinished() || (mode != null) && mode.isTeacher());
+
+	RatingCriteria newCriteria = null;
+	if (!user.isSessionFinished()) {
+	    // mark user as finished if there are not any criterias or we have processed the last one.
+	    List<RatingCriteria> criterias = service.getCriteriasByToolContentId(peerreview.getContentId());
+	    sessionMap.put("numCriteria", criterias.size());
+
+	    if (criterias.size() > 0) {
+		if (currentCriteria == null) {
+		    // get the first one
+		    newCriteria = criterias.get(0);
+		} else if ( next == null ) {
+		    // reload the current one
+		    newCriteria = currentCriteria;
+		} else if ( next ) {
+		    // get the next one
+		    for (RatingCriteria toCheck : criterias) {
+			if (toCheck.getOrderId() > currentCriteria.getOrderId() ) {
+			    newCriteria = toCheck;
+			    break;
+			}
+		    }
+		} else { 
+		    // get the previous one
+		    RatingCriteria prev = null;
+		    for (RatingCriteria toCheck : criterias) {
+			if ( toCheck.getOrderId() == currentCriteria.getOrderId() ) {
+			    newCriteria = prev != null ? prev : currentCriteria;
+			    break;
+			} else {
+			    prev = toCheck;
+			}
+		    }
+
+		}
+
+	    }
+
+	    if (newCriteria == null) {
+		user.setSessionFinished(true);
+		service.createUser(user);
+	    }
+
+	}
+
+	sessionMap.put("isDisabled", peerreview.getLockWhenFinished() && user.isSessionFinished() || (mode != null)
+	    && mode.isTeacher());
 	sessionMap.put(PeerreviewConstants.ATTR_USER_FINISHED, user.isSessionFinished());
 	sessionMap.put("isSessionCompleted", user.getSession().getStatus() == PeerreviewConstants.COMPLETED);
 
-	// show results page
-	if (user.isSessionFinished() && peerreview.isShowRatingsLeftForUser()) {
-
-	    ActionRedirect redirect = new ActionRedirect(mapping.findForwardConfig("showResults"));
+	// finally, work out which page to go to!
+	if (user.isSessionFinished()) {
+	    ActionRedirect redirect;
+	    if ( peerreview.isShowRatingsLeftForUser() || entryText.length() > 0 ) {
+        	    redirect = new ActionRedirect(mapping.findForwardConfig("showResults"));
+	    } else if ( peerreview.isReflectOnActivity() ) {
+		// do reflection
+        	    redirect = new ActionRedirect(mapping.findForwardConfig("newReflection"));
+	    } else {
+		// finish
+		redirect = new ActionRedirect(mapping.findForwardConfig("finish"));
+	    }
 	    redirect.addParameter(PeerreviewConstants.ATTR_SESSION_MAP_ID, sessionMap.getSessionID());
 	    return redirect;
-
 	} else {
-	    return mapping.findForward(PeerreviewConstants.SUCCESS);
+	    return doEdit(mapping, request, service, sessionMap, sessionId, peerreview, newCriteria);
 	}
 
     }
@@ -302,50 +401,25 @@ public class LearningAction extends Action {
 	}
 
 	// ratings left by the user
-	List<Long> itemIds = new LinkedList<Long>();
-	List<PeerreviewUser> sessionUsers = service.getUsersBySession(sessionId);
-	for (PeerreviewUser userIter : sessionUsers) {
-	    //excempt user himself
-	    if (!user.getUserId().equals(userIter.getUserId())) {
-		itemIds.add(userIter.getUserId());
-	    }
+	List<RatingCriteria> ratingCriterias = service.getRatingCriterias(peerreview.getContentId());
+	List<StyledCriteriaRatingDTO> allUsersDtos = new ArrayList<StyledCriteriaRatingDTO>(ratingCriterias.size());
+	List<StyledCriteriaRatingDTO> currentUserDtos = new ArrayList<StyledCriteriaRatingDTO>(ratingCriterias.size());
+
+	for (RatingCriteria criteria : ratingCriterias) {
+	    boolean showAllUsers = peerreview.isSelfReview() || criteria.isRankingStyleRating()
+		    || criteria.isHedgeStyleRating() || (mode != null && mode.isTeacher());
+	    int sorting = PeerreviewConstants.SORT_BY_AVERAGE_RESULT_DESC;
+	    if (criteria.isRankingStyleRating())
+		sorting = PeerreviewConstants.SORT_BY_AVERAGE_RESULT_ASC;
+	    allUsersDtos.add(service.getUsersRatingsCommentsByCriteriaIdDTO(peerreview.getContentId(), criteria,
+		    user.getUserId(), false, sorting, showAllUsers, true));
+	    currentUserDtos.add(service.getUsersRatingsCommentsByCriteriaIdDTO(peerreview.getContentId(), criteria,
+		    user.getUserId(), false, sorting, showAllUsers, false));
+
 	}
 
-	//filter out not rated by user
-	List<ItemRatingDTO> itemRatingDtos = service.getRatingCriteriaDtos(peerreview.getContentId(), itemIds, false,
-		user.getUserId());
-	List<ItemRatingDTO> ratedByUser = new ArrayList<ItemRatingDTO>();
-	for (ItemRatingDTO itemRatingDto : itemRatingDtos) {
-	    boolean isRatedByUser = itemRatingDto.getCommentPostedByUser() != null;
-
-	    for (ItemRatingCriteriaDTO criteriaDto : itemRatingDto.getCriteriaDtos()) {
-		if (StringUtils.isNotBlank(criteriaDto.getUserRating())) {
-		    isRatedByUser = true;
-		}
-	    }
-
-	    if (isRatedByUser) {
-		ratedByUser.add(itemRatingDto);
-	    }
-	}
-	request.setAttribute("itemRatingDtos", ratedByUser);
-
-	// ratings left by others for this user
-	List<Long> userIdList = Collections.singletonList(user.getUserId());
-	List<ItemRatingDTO> userRatingDtos = service.getRatingCriteriaDtos(peerreview.getContentId(), userIdList, true,
-		user.getUserId());
-	ItemRatingDTO userRatingDto = null;
-	if (userRatingDtos.size() == 1) {
-	    userRatingDto = userRatingDtos.get(0);
-	}
-	request.setAttribute("itemRatingDto", userRatingDto);
-
-	//user name map
-	HashMap<Long, String> userNameMap = new HashMap<Long, String>();
-	for (PeerreviewUser userIter : sessionUsers) {
-	    userNameMap.put(userIter.getUserId(), userIter.getFirstName() + " " + userIter.getLastName());
-	}
-	request.setAttribute("userNameMap", userNameMap);
+	request.setAttribute("allCriteriaRatings", allUsersDtos);
+	request.setAttribute("userRatings", currentUserDtos);
 
 	// check whether finish lock is enabled
 	sessionMap.put(PeerreviewConstants.ATTR_FINISH_LOCK, peerreview.getLockWhenFinished());
@@ -358,9 +432,9 @@ public class LearningAction extends Action {
     }
 
     /**
-     * Refreshes user list.
+     * Refreshes user list. TODO remove once monitoring is done.
      */
-    public ActionForward getUsers(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+    public ActionForward getUsersMonitoring(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse res) throws IOException, ServletException, JSONException {
 	IPeerreviewService service = getPeerreviewService();
 
@@ -440,6 +514,7 @@ public class LearningAction extends Action {
 		criteriasRow.put("averageRating", criteriaDto.getAverageRating());
 		criteriasRow.put("numberOfVotes", criteriaDto.getNumberOfVotes());
 		criteriasRow.put("userRating", criteriaDto.getUserRating());
+		criteriasRow.put("ratingStyle", criteriaDto.getRatingCriteria().getRatingStyle());
 
 		criteriasRows.put(criteriasRow);
 	    }
@@ -466,7 +541,240 @@ public class LearningAction extends Action {
 	res.getWriter().print(new String(responcedata.toString()));
 	return null;
     }
+    /**
+     * Gets a paged set of data for stars or comments. These are directly saved to the database, not through
+     * LearnerAction like Ranking and Hedging. 
+     */
+    public ActionForward getUsers(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+	    HttpServletResponse res) throws IOException, ServletException, JSONException {
 
+	IPeerreviewService service = getPeerreviewService();
+	
+	// get back SessionMap
+	String sessionMapID = request.getParameter(PeerreviewConstants.ATTR_SESSION_MAP_ID);
+	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
+		.getAttribute(sessionMapID);
+	Peerreview peerreview = (Peerreview) sessionMap.get(PeerreviewConstants.ATTR_PEERREVIEW);
+
+	Long toolContentId = WebUtil.readLongParam(request, "toolContentId");
+	Long toolSessionId = WebUtil.readLongParam(request, "toolSessionId");
+
+	// in case of monitoring we show all results. in case of learning - don't show results from the current user
+	boolean isMonitoring = WebUtil.readBooleanParam(request, "isMonitoring", false);
+	Long userId = isMonitoring ? -1 : WebUtil.readLongParam(request, "userId");
+
+	// paging parameters of tablesorter
+	int size = WebUtil.readIntParam(request, "size");
+	int page = WebUtil.readIntParam(request, "page");
+	Integer isSort1 = WebUtil.readIntParam(request, "column[0]", true);
+
+	int sorting = PeerreviewConstants.SORT_BY_NO;
+	if (isSort1 != null && isSort1.equals(0)) {
+	    sorting = PeerreviewConstants.SORT_BY_USERNAME_ASC;
+	} else if (isSort1 != null && isSort1.equals(1)) {
+	    sorting = PeerreviewConstants.SORT_BY_USERNAME_DESC;
+	}
+
+	Long criteriaId = WebUtil.readLongParam(request, "criteriaId");
+	RatingCriteria criteria = service.getCriteriaByCriteriaId(criteriaId);
+	
+	JSONObject responsedata = new JSONObject();
+	responsedata.put("total_rows", service.getCountUsersBySession(toolSessionId, userId));
+	responsedata.put("rows", service.getUsersRatingsCommentsByCriteriaIdJSON(toolContentId, criteria, userId, 
+		page, size, sorting, peerreview.isSelfReview(), true, peerreview.getMaximumRatesPerUser() > 0 ));	
+	    
+	// store how many items are rated - not correct at present. 
+	int countRatedQuestions = service.getCountItemsRatedByUser(toolContentId, userId.intValue());
+	responsedata.put(AttributeNames.ATTR_COUNT_RATED_ITEMS, countRatedQuestions);
+
+	res.setContentType("application/json;charset=utf-8");
+	res.getWriter().print(new String(responsedata.toString()));
+	return null;
+    }
+
+    /**
+     * Edit / View an indiviual criteria.
+     *
+     * @throws IOException
+     * @throws ServletException 
+     *
+     */
+    public ActionForward edit(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+	    HttpServletResponse response) throws IOException, ServletException {
+
+	IPeerreviewService service = getPeerreviewService();
+
+	// get back SessionMap
+	String sessionMapID = request.getParameter(PeerreviewConstants.ATTR_SESSION_MAP_ID);
+	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession().getAttribute(
+		sessionMapID);
+	request.setAttribute(PeerreviewConstants.ATTR_SESSION_MAP_ID, sessionMapID);
+
+	Long toolContentId = WebUtil.readLongParam(request, "toolContentId");
+	Long toolSessionId = WebUtil.readLongParam(request, "toolSessionId");
+	Peerreview peerreview = service.getPeerreviewBySessionId(toolSessionId);
+	
+	Long criteriaId = WebUtil.readLongParam(request, "criteriaId");
+	RatingCriteria criteria = service.getCriteriaByCriteriaId(criteriaId);
+
+	return doEdit(mapping, request, service, sessionMap, toolSessionId, peerreview, criteria);
+    }
+
+    private ActionForward doEdit(ActionMapping mapping, HttpServletRequest request, IPeerreviewService service,
+	    SessionMap<String, Object> sessionMap, Long toolSessionId, Peerreview peerreview,
+	    RatingCriteria criteria) throws ServletException {
+	
+	Long toolContentId = peerreview.getContentId();
+	
+	ToolAccessMode mode = (ToolAccessMode) sessionMap.get(AttributeNames.ATTR_MODE);
+	PeerreviewUser user = (PeerreviewUser) sessionMap.get(PeerreviewConstants.ATTR_USER);
+
+	if ((peerreview.getLockWhenFinished() && user.isSessionFinished()) || (mode != null && mode.isTeacher())) {
+	    log.error("Unable to edit ranking/mark  for criteria " + criteria.getRatingCriteriaId()
+		    + " as either the mode is teacher or the user is finished. ToolSessionId " + toolSessionId
+		    + " User " + user + " mode " + mode);
+	    throw new ServletException(
+		    "Unable to edit ranking/mark as either the mode is teacher or the user is finished.");
+
+	}
+
+	Long userId = ( mode != null && mode.isTeacher() ) ? -1 : user.getUserId();
+
+	StyledCriteriaRatingDTO dto = service.getUsersRatingsCommentsByCriteriaIdDTO(toolContentId, criteria, userId, 
+		(criteria.isCommentRating() || criteria.isStarStyleRating()), PeerreviewConstants.SORT_BY_USERNAME_ASC, 
+		peerreview.isSelfReview(), true );
+	
+	// override the min/max for stars based on old settings if needed (original Peer Review kept one setting for all criteria )
+	if ( ( peerreview.getMinimumRates() > 0 || peerreview.getMaximumRates() > 0 ) && 
+	     ( dto.getRatingCriteria().getMinimumRates() == 0 && dto.getRatingCriteria().getMaximumRates() == 0 ) ) {
+	    dto.getRatingCriteria().setMinimumRates(peerreview.getMinimumRates());
+	    dto.getRatingCriteria().setMaximumRates(peerreview.getMaximumRates());
+	}
+
+	request.setAttribute("criteriaRatings", dto);
+	return mapping.findForward(PeerreviewConstants.SUCCESS);
+    }
+
+    /**
+     * Same as submitRankingHedging but doesn't update the records.
+     *
+     * @throws IOException
+     * @throws ServletException 
+     *
+     */
+    public ActionForward nextPrev(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+	    HttpServletResponse response) throws IOException, ServletException {
+	IPeerreviewService service = getPeerreviewService();
+
+	String sessionMapID = request.getParameter(PeerreviewConstants.ATTR_SESSION_MAP_ID);
+	request.setAttribute(PeerreviewConstants.ATTR_SESSION_MAP_ID, sessionMapID);
+
+	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession().getAttribute(
+		sessionMapID);
+
+	ToolAccessMode mode = (ToolAccessMode) sessionMap.get(AttributeNames.ATTR_MODE);
+	PeerreviewUser user = (PeerreviewUser) sessionMap.get(PeerreviewConstants.ATTR_USER);
+	Long toolSessionId = (Long) sessionMap.get(PeerreviewConstants.PARAM_TOOL_SESSION_ID);
+
+	Long criteriaId = WebUtil.readLongParam(request, "criteriaId");
+	RatingCriteria criteria = service.getCriteriaByCriteriaId(criteriaId);
+
+	request.setAttribute(PeerreviewConstants.ATTR_SESSION_MAP_ID, sessionMap.getSessionID());
+	request.setAttribute(AttributeNames.ATTR_MODE, mode);
+	request.setAttribute(PeerreviewConstants.PARAM_TOOL_SESSION_ID, toolSessionId);
+
+	Boolean next = WebUtil.readBooleanParam(request, "next");
+
+	// goto standard screen
+	return startRating(mapping, form, request, response, service, sessionMap, toolSessionId, user, mode, criteria, next);
+    }
+    
+    /**
+     * Submit the ranking / hedging data and go back to the main learning screen.
+     *
+     * @throws IOException
+     * @throws ServletException 
+     *
+     */
+    public ActionForward submitRankingHedging(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+	    HttpServletResponse response) throws IOException, ServletException {
+
+	IPeerreviewService service = getPeerreviewService();
+
+	String sessionMapID = request.getParameter(PeerreviewConstants.ATTR_SESSION_MAP_ID);
+	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession().getAttribute(
+		sessionMapID);
+	request.setAttribute(PeerreviewConstants.ATTR_SESSION_MAP_ID, sessionMapID);
+
+	ToolAccessMode mode = (ToolAccessMode) sessionMap.get(AttributeNames.ATTR_MODE);
+	PeerreviewUser user = (PeerreviewUser) sessionMap.get(PeerreviewConstants.ATTR_USER);
+	Long toolSessionId = (Long) sessionMap.get(PeerreviewConstants.PARAM_TOOL_SESSION_ID);
+
+	Peerreview peerreview = service.getPeerreviewBySessionId(toolSessionId);
+
+	Long criteriaId = WebUtil.readLongParam(request, "criteriaId");
+	RatingCriteria criteria = service.getCriteriaByCriteriaId(criteriaId);
+
+	if ( ! ( peerreview.getLockWhenFinished() && user.isSessionFinished() ) ) {
+
+	    Integer userId = user.getUserId().intValue();
+	    Map<Long, Float> ratings = new HashMap<Long, Float>();
+	    boolean valid = false;
+
+	    if (criteria.isHedgeStyleRating()) {
+		int totalMark = 0;
+		// mark1 contains the mark for itemid 1
+		for (String key : request.getParameterMap().keySet()) {
+		    if (key.startsWith("mark")) {
+			String itemIdString = key.substring(4);
+			Long itemId = new Long(itemIdString);
+			Long value = WebUtil.readLongParam(request, key);
+			if ( value > 0 ) {
+			    ratings.put(itemId, value.floatValue());
+			}
+			totalMark += value;
+		    }
+		}
+		valid = (totalMark == criteria.getMaxRating());
+	    } else if (criteria.isRankingStyleRating()) {
+		// rank1 contains the itemid for the learner ranked first.
+		for (String key : request.getParameterMap().keySet()) {
+		    if (key.startsWith("rank")) {
+			String valueString = key.substring(4);
+			Long value = new Long(valueString);
+			Long itemId = WebUtil.readLongParam(request, key, true);
+			if (itemId != null) {
+			    ratings.put(itemId, value.floatValue());
+			}
+		    }
+		}
+		valid = (ratings.size() == criteria.getMaxRating() || (ratings.size() >= service.getCountUsersBySession(
+			toolSessionId, userId.longValue())));
+	    }
+
+	    service.rateItems(criteria, userId, ratings);
+	    if (!valid) {
+		request.setAttribute("notcomplete", true);
+		return doEdit(mapping, request, service, sessionMap, toolSessionId, peerreview, criteria);
+	    }
+
+	    if (criteria.isHedgeStyleRating() && criteria.isCommentsEnabled()) {
+		String justify = request.getParameter("justify");
+		service.commentItem(criteria, userId, criteria.getRatingCriteriaId(), justify);
+	    }
+
+	}
+	
+	request.setAttribute(PeerreviewConstants.ATTR_SESSION_MAP_ID, sessionMap.getSessionID());
+	request.setAttribute(AttributeNames.ATTR_MODE, mode);
+	request.setAttribute(PeerreviewConstants.PARAM_TOOL_SESSION_ID, toolSessionId);
+
+	Boolean next = WebUtil.readBooleanParam(request, "next");
+
+	// goto standard screen
+	return startRating(mapping, form, request, response, service, sessionMap, toolSessionId, user, mode, criteria, next);
+    }
+    
     /**
      * Finish learning session.
      *
@@ -487,6 +795,10 @@ public class LearningAction extends Action {
 	// get mode and ToolSessionID from sessionMAP
 	Long sessionId = (Long) sessionMap.get(PeerreviewConstants.PARAM_TOOL_SESSION_ID);
 
+	return doFinish(mapping, request, sessionId);
+    }
+
+    private ActionForward doFinish(ActionMapping mapping, HttpServletRequest request, Long sessionId) {
 	IPeerreviewService service = getPeerreviewService();
 	// get sessionId from HttpServletRequest
 	String nextActivityUrl = null;
@@ -501,7 +813,7 @@ public class LearningAction extends Action {
 	    LearningAction.log.error("Failed get next activity url:" + e.getMessage());
 	}
 
-	return mapping.findForward(PeerreviewConstants.SUCCESS);
+	return mapping.findForward("finish");
     }
 
     /**

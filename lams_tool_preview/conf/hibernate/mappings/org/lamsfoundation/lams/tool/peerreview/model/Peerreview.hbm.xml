@@ -147,6 +147,14 @@
         	insert="true" 
         	column="maximum_rates_per_user"
         />
+
+        <property
+            name="selfReview"
+            type="boolean"
+            update="true"
+            insert="true"
+            column="self_review"
+        />
         
         <set 
         	name="ratingCriterias" 

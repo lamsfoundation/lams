@@ -25,6 +25,8 @@ package org.lamsfoundation.lams.tool.peerreview.dao;
 
 import java.util.List;
 
+import org.lamsfoundation.lams.rating.model.RatingCriteria;
+import org.lamsfoundation.lams.rating.service.IRatingService;
 import org.lamsfoundation.lams.tool.peerreview.model.PeerreviewSession;
 import org.lamsfoundation.lams.tool.peerreview.model.PeerreviewUser;
 
@@ -44,8 +46,13 @@ public interface PeerreviewUserDAO extends DAO {
 
     List<PeerreviewUser> getUsersForTablesorter(final Long toolSessionId, final Long excludeUserId, int page, int size,
 	    int sorting);
-
+    
+    List<Object[]> getRatingsComments(Long toolContentId, RatingCriteria criteria, Long userId, Integer page,
+	    Integer size, int sorting, boolean getByUser, IRatingService coreRatingService);
+	    
     int getCountUsersBySession(Long toolSessionId);
 
     int createUsersForSession(PeerreviewSession session);
+    
+
 }

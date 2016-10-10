@@ -1,4 +1,5 @@
-.rating-stars-div {margin-top: 8px;}
+/* .rating-stars-div {margin-top: 8px;}
+ */
 .user-answer {padding: 0 2px;}
 .tablesorter tr.odd:hover .jStar {
 	background-image: url(/lams/images/css/jquery.jRating-stars-grey.png)!important;
@@ -20,6 +21,10 @@ td.comment {min-width: 250px;}
 	background-image: none;
 	background-color: rgba(205, 205, 205, 0.1);
 	border: 1px solid rgba(205, 205, 205, 0.2);
+}
+.criteria-title{
+	margin-top: 10px;
+	font-weight: bold;	
 }
 textarea {
     margin: 10px 0px;
@@ -47,3 +52,28 @@ textarea {
 .ui-jqgrid td {
 	border-style: none !important;
 }
+
+.divrankx {
+    width: 300px;
+    height: 30px;
+    margin: 5px;
+    padding: 5px;
+    border: 1px solid #aaaaaa;
+}
+
+.divrankxlabel {
+    height: 20px;
+    margin: 5px;
+    padding: 5px;
+}
+
+.drop-target {
+  	background-color: #337ab7;
+}
+.draggable {
+	width: 290px;
+}
+.draggable.can-drop {
+  	background-color: #337ab7;
+}
+

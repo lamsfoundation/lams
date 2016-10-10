@@ -88,11 +88,47 @@
 			<forward name="success" path="/pages/learning/learning.jsp" />
 			<forward name="defineLater" path="/pages/learning/definelater.jsp" />
 			<forward name="showResults" path="/learning/showResults.do" />	
+			<forward name="newReflection" path="/learning/newReflection.do" />	
+			<forward name="finish" path="/pages/learning/finish.jsp" />
+		</action>
+		<action path="/learning/refresh"
+			type="org.lamsfoundation.lams.tool.peerreview.web.action.LearningAction"
+			parameter="refresh" >
+			<forward name="success" path="/pages/learning/learning.jsp" />
+			<forward name="defineLater" path="/pages/learning/definelater.jsp" />
+			<forward name="showResults" path="/learning/showResults.do" />	
+			<forward name="newReflection" path="/learning/newReflection.do" />	
 		</action>
 		<action path="/learning/getUsers"
 			type="org.lamsfoundation.lams.tool.peerreview.web.action.LearningAction"
 			parameter="getUsers" >	
 		</action>
+		<action path="/learning/edit"
+			type="org.lamsfoundation.lams.tool.peerreview.web.action.LearningAction"
+			parameter="edit" >
+			<forward name="success" path="/pages/learning/learning.jsp" />
+		</action>	
+		<action path="/learning/submitHedging"
+			type="org.lamsfoundation.lams.tool.peerreview.web.action.LearningAction"
+			parameter="submitHedging" >
+			<forward name="showResults" path="/learning/showResults.do" />	
+			<forward name="newReflection" path="/learning/newReflection.do" />	
+			<forward name="success" path="/pages/learning/learning.jsp" />
+		</action>	
+		<action path="/learning/submitRanking"
+			type="org.lamsfoundation.lams.tool.peerreview.web.action.LearningAction"
+			parameter="submitRanking" >
+			<forward name="showResults" path="/learning/showResults.do" />	
+			<forward name="newReflection" path="/learning/newReflection.do" />	
+			<forward name="success" path="/pages/learning/learning.jsp" />
+		</action>	
+		<action path="/learning/nextPrev"
+			type="org.lamsfoundation.lams.tool.peerreview.web.action.LearningAction"
+			parameter="nextPrev" >
+			<forward name="showResults" path="/learning/showResults.do" />	
+			<forward name="newReflection" path="/learning/newReflection.do" />	
+			<forward name="success" path="/pages/learning/learning.jsp" />
+		</action>	
 		<action path="/learning/showResults"
 			type="org.lamsfoundation.lams.tool.peerreview.web.action.LearningAction"
 			parameter="showResults" >
@@ -102,7 +138,7 @@
 			type="org.lamsfoundation.lams.tool.peerreview.web.action.LearningAction"
 			input="/pages/learning/learning.jsp"
 			parameter="finish" >
-			<forward name="success" path="/pages/learning/finish.jsp" />
+			<forward name="finish" path="/pages/learning/finish.jsp" />
 		</action>
 		<!--  ========= Reflection =============== -->
 		<action path="/learning/newReflection"
@@ -122,7 +158,7 @@
 			parameter="submitReflection" 
 			scope="request">
 			<forward name="success" path="/pages/learning/finish.jsp" />
-
+			<forward name="finish" path="/pages/learning/finish.jsp" />
 		</action>
 		<!-- ========== BEGIN: Monitoring Definitions ============================== -->
 		<action path="/monitoring/summary"
