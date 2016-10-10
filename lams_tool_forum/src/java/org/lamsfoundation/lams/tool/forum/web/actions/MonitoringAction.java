@@ -184,7 +184,7 @@ public class MonitoringAction extends Action {
 	forumService = getForumService();
 
 	// create sessionMap
-	SessionMap<String, Object> sessionMap = new SessionMap<String, Object>();
+	SessionMap<String, Object> sessionMap = new SessionMap<>();
 	request.getSession().setAttribute(sessionMap.getSessionID(), sessionMap);
 	request.setAttribute(ForumConstants.ATTR_SESSION_MAP_ID, sessionMap.getSessionID());
 
@@ -193,7 +193,7 @@ public class MonitoringAction extends Action {
 
 	List<ForumToolSession> sessions = forumService.getSessionsByContentId(toolContentId);
 
-	Set<SessionDTO> sessionDtos = new TreeSet<SessionDTO>(new SessionDTOComparator());
+	Set<SessionDTO> sessionDtos = new TreeSet<>(new SessionDTOComparator());
 	// build a map with all users in the forumSessionList
 	for (ForumToolSession session : sessions) {
 	    Long sessionId = session.getSessionId();
@@ -312,7 +312,7 @@ public class MonitoringAction extends Action {
 	    if (topicsByUser.get(user) != null) {
 
 		// sort messages by date
-		TreeSet<MessageDTO> messages = new TreeSet<MessageDTO>(new MessageDTOByDateComparator());
+		TreeSet<MessageDTO> messages = new TreeSet<>(new MessageDTOByDateComparator());
 		messages.addAll(topicsByUser.get(user));
 
 		MessageDTO lastMessage = messages.last();
@@ -322,7 +322,7 @@ public class MonitoringAction extends Action {
 		lastMessageDate = DateUtil.convertToTimeZoneFromDefault(teacherTimeZone, lastMessageDate);
 		DateFormat dateFormatter = new SimpleDateFormat("d MMMM yyyy h:mm:ss a");
 		responseRow.put("lastMessageDate", dateFormatter.format(lastMessageDate));
-
+		responseRow.put("timeAgo", DateUtil.convertToStringForTimeagoJSON(lastMessageDate));
 		numberOfPosts = messages.size();
 		for (MessageDTO message : messages) {
 		    if (message.getMark() != null) {
@@ -571,7 +571,8 @@ public class MonitoringAction extends Action {
 	request.setAttribute("topicList", sessionTopicsMap);
 	request.setAttribute("markAverage", sessionAvaMarkMap);
 	request.setAttribute("totalMessage", sessionTotalMsgMap);
-	request.setAttribute(ForumConstants.ATTR_SESSION_MAP_ID, WebUtil.readStrParam(request, ForumConstants.ATTR_SESSION_MAP_ID));
+	request.setAttribute(ForumConstants.ATTR_SESSION_MAP_ID,
+		WebUtil.readStrParam(request, ForumConstants.ATTR_SESSION_MAP_ID));
     }
 
     /**
@@ -865,7 +866,7 @@ public class MonitoringAction extends Action {
      * @return
      */
     private Map<ForumUser, List<MessageDTO>> getTopicsSortedByAuthor(List<MessageDTO> topics) {
-	Map<ForumUser, List<MessageDTO>> topicsByUser = new TreeMap<ForumUser, List<MessageDTO>>(
+	Map<ForumUser, List<MessageDTO>> topicsByUser = new TreeMap<>(
 		new ForumUserComparator());
 	for (MessageDTO topic : topics) {
 	    if (topic.getMessage().getIsAuthored()) {
@@ -876,7 +877,7 @@ public class MonitoringAction extends Action {
 
 	    List<MessageDTO> topicsByUserExist = topicsByUser.get(user);
 	    if (topicsByUserExist == null) {
-		topicsByUserExist = new ArrayList<MessageDTO>();
+		topicsByUserExist = new ArrayList<>();
 		topicsByUser.put(user, topicsByUserExist);
 	    }
 	    topicsByUserExist.add(topic);
