@@ -25,10 +25,17 @@
 	</div>
 	
 	<div class="checkbox">
-	<label for="show-ratings-left-for-user"><html:checkbox property="peerreview.showRatingsLeftForUser"styleId="show-ratings-left-for-user"/>
+	<label for="show-ratings-left-for-user"><html:checkbox property="peerreview.showRatingsLeftForUser" styleId="show-ratings-left-for-user"/>
 	<fmt:message key="label.show.ratings.left.for.user" />
 	</label>
 	</div>
+
+	<div class="checkbox">
+	<label for="self-review"><html:checkbox property="peerreview.selfReview" styleId="self-review"/>
+	<fmt:message key="label.authoring.self.review" />
+	</label>
+	</div>
+
 </lams:SimplePanel>
 
 <lams:SimplePanel titleKey="label.activity.completion">

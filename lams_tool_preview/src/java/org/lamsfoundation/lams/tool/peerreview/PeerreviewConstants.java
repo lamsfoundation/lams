@@ -35,7 +35,13 @@ public class PeerreviewConstants {
     public static final int SORT_BY_NO = 0;
     public static final int SORT_BY_USERNAME_ASC = 1;
     public static final int SORT_BY_USERNAME_DESC = 2;
-
+    public static final int SORT_BY_AVERAGE_RESULT_ASC = 3;
+    public static final int SORT_BY_AVERAGE_RESULT_DESC = 4;
+    
+    public static final int GET_RESULTS_FOR_ALL_USERS_BY_THIS_USER = 0; // used for the edit screens
+    public static final int GET_RESULTS_FOR_ALL_USERS_BY_ALL_USERS = 1; // used for "everyone's results" on the results screen
+    public static final int GET_RESULTS_BY_ALL_USERS_FOR_THIS_USER = 2; //used for "current user's results" on the results screen
+    
     // for action forward name
     public static final String SUCCESS = "success";
 

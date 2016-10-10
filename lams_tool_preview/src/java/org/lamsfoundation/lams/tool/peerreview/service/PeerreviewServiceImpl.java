@@ -38,7 +38,9 @@ import java.util.TreeSet;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.log4j.Logger;
+import org.apache.tomcat.util.json.JSONArray;
 import org.apache.tomcat.util.json.JSONException;
 import org.apache.tomcat.util.json.JSONObject;
 import org.lamsfoundation.lams.learning.service.ILearnerService;
@@ -49,6 +51,7 @@ import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.notebook.service.CoreNotebookConstants;
 import org.lamsfoundation.lams.notebook.service.ICoreNotebookService;
 import org.lamsfoundation.lams.rating.dto.ItemRatingDTO;
+import org.lamsfoundation.lams.rating.dto.StyledCriteriaRatingDTO;
 import org.lamsfoundation.lams.rating.model.LearnerItemRatingCriteria;
 import org.lamsfoundation.lams.rating.model.RatingCriteria;
 import org.lamsfoundation.lams.rating.service.IRatingService;
@@ -157,6 +160,11 @@ public class PeerreviewServiceImpl
     @Override
     public PeerreviewUser getUserByIDAndSession(Long userId, Long sessionId) {
 	return peerreviewUserDao.getUserByUserIDAndSessionID(userId, sessionId);
+    }
+
+    @Override
+    public List<Long> getUserIdsBySessionID(Long sessionId) {
+	return peerreviewUserDao.getUserIdsBySessionID(sessionId);
     }
 
     @Override
@@ -342,6 +350,61 @@ public class PeerreviewServiceImpl
 	}
     }
 
+    @Override
+    public int rateItems(RatingCriteria ratingCriteria, Integer userId, Map<Long, Float> newRatings) {
+	return ratingService.rateItems(ratingCriteria, userId, newRatings);
+    }
+
+    @Override
+    public void commentItem(RatingCriteria ratingCriteria, Integer userId, Long itemId, String comment)
+    {
+	ratingService.commentItem(ratingCriteria, userId, itemId, comment);
+    }
+
+    @Override
+    public RatingCriteria getCriteriaByCriteriaId(Long ratingCriteriaId) {
+	return ratingService.getCriteriaByCriteriaId(ratingCriteriaId);
+    }
+
+    @Override
+    public StyledCriteriaRatingDTO getUsersRatingsCommentsByCriteriaIdDTO(Long toolContentId, RatingCriteria criteria, 
+	    Long currentUserId, boolean skipRatings, int sorting, boolean getAllUsers, boolean getByUser) {
+	
+	if ( skipRatings ) {
+	    return ratingService.convertToStyledDTO(criteria, currentUserId, getAllUsers, null);
+	}
+	
+	List<Object[]> rawData = peerreviewUserDao.getRatingsComments(toolContentId, criteria, 
+		currentUserId, null, null, sorting, getByUser, ratingService);
+
+	for ( Object[] raw : rawData ) {
+	    int len = raw.length;
+	    StringBuilder description = new StringBuilder((String)raw[len-2] ).append(" ").append((String)raw[len-1]);	    
+	    raw[len-1] = (Object) StringEscapeUtils.escapeCsv(description.toString());
+	}
+	// if !getByUser -> is get current user's ratings from other users -> 
+	// convertToStyledJSON.getAllUsers needs to be true otherwise current user (the only one in the set!) is dropped
+	return ratingService.convertToStyledDTO(criteria, currentUserId, !getByUser || getAllUsers, rawData);
+    }
+
+    @Override
+    public JSONArray getUsersRatingsCommentsByCriteriaIdJSON(Long toolContentId, RatingCriteria criteria, Long currentUserId, 
+	    Integer page, Integer size, int sorting, boolean getAllUsers, boolean getByUser, boolean needRatesPerUser) throws JSONException {
+
+	List<Object[]> rawData = peerreviewUserDao.getRatingsComments(toolContentId, criteria, 
+		currentUserId, page, size, sorting, getByUser, ratingService);
+	
+	for ( Object[] raw : rawData ) {
+	    int len = raw.length;
+	    StringBuilder description = new StringBuilder((String)raw[len-2] ).append(" ").append((String)raw[len-1]);	    
+	    raw[len-1] = (Object) StringEscapeUtils.escapeCsv(description.toString());
+	}
+	// if !getByUser -> is get current user's ratings from other users -> 
+	// convertToStyledJSON.getAllUsers needs to be true otherwise current user (the only one in the set!) is dropped
+	return ratingService.convertToStyledJSON(criteria, currentUserId, !getByUser || getAllUsers, rawData, needRatesPerUser);
+    }
+
+    
     // *****************************************************************************
     // private methods
     // *****************************************************************************
@@ -629,6 +692,11 @@ public class PeerreviewServiceImpl
 	return ratingService.getCommentsMinWordsLimit(toolContentId);
     }
 
+    @Override
+    public List<RatingCriteria> getCriteriasByToolContentId(Long toolContentId) {
+	return ratingService.getCriteriasByToolContentId(toolContentId);
+    }
+    
     @Override
     public List<ItemRatingDTO> getRatingCriteriaDtos(Long contentId, Collection<Long> itemIds,
 	    boolean isCommentsByOtherUsersRequired, Long userId) {

@@ -25,10 +25,15 @@ package org.lamsfoundation.lams.tool.peerreview.service;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 
+import org.apache.tomcat.util.json.JSONArray;
+import org.apache.tomcat.util.json.JSONException;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.rating.ToolRatingManager;
 import org.lamsfoundation.lams.rating.dto.ItemRatingDTO;
+import org.lamsfoundation.lams.rating.dto.StyledCriteriaRatingDTO;
+import org.lamsfoundation.lams.rating.model.RatingCriteria;
 import org.lamsfoundation.lams.tool.peerreview.dto.GroupSummary;
 import org.lamsfoundation.lams.tool.peerreview.dto.ReflectDTO;
 import org.lamsfoundation.lams.tool.peerreview.model.Peerreview;
@@ -42,6 +47,12 @@ import org.lamsfoundation.lams.tool.peerreview.model.PeerreviewUser;
  */
 public interface IPeerreviewService extends ToolRatingManager {
 
+    // TODO remove!
+    int rateItems(RatingCriteria ratingCriteria, Integer userId, Map<Long, Float> newRatings);
+    void commentItem(RatingCriteria ratingCriteria, Integer userId, Long itemId, String comment);
+    RatingCriteria getCriteriaByCriteriaId(Long ratingCriteriaId);
+
+    
     /**
      * Get <code>Peerreview</code> by toolContentID.
      *
@@ -69,6 +80,8 @@ public interface IPeerreviewService extends ToolRatingManager {
     List<PeerreviewUser> getUsersBySession(Long toolSessionId);
 
     List<PeerreviewUser> getUsersByContent(Long toolContentId);
+    
+    List<Long> getUserIdsBySessionID(Long sessionId);
 
     /**
      * Get user by given userID and toolContentID.
@@ -215,6 +228,8 @@ public interface IPeerreviewService extends ToolRatingManager {
 
     int getCommentsMinWordsLimit(Long toolContentId);
 
+    List<RatingCriteria> getCriteriasByToolContentId(Long toolContentId);
+    
     /**
      * Returns item DTO with all corresponding ratings and comments. Doesn't contain average and total amount of rates.
      *
@@ -232,6 +247,24 @@ public interface IPeerreviewService extends ToolRatingManager {
      */
     List<ItemRatingDTO> getRatingCriteriaDtos(Long contentId, Collection<Long> itemIds,
 	    boolean isCommentsByOtherUsersRequired, Long userId, boolean isCountUsersRatedEachItem);
+
+    /** 
+     * Gets all the users in the session and any existing ratings for a given criteria. If you want to use the tablesorter
+     * set skipRatings to true and it will just get the main criteria details, then on the jsp page call a tablesorter
+     * function that call getUsersRatingsCommentsByCriteriaJSON, with the page and size are included. 
+     * Self rating === getAllUsers
+     * If you want the ratings done *by* the user XYZ, set getByUser to true and currentUser id to XYZ's user id.
+     * If you want the ratings done *for* user XYZ,  set getByUser to true and currentUser id to XYZ's user id.
+     * user, set getByUser to false and set currentUserId to the current user id. 
+     */
+    StyledCriteriaRatingDTO getUsersRatingsCommentsByCriteriaIdDTO(Long toolContentId, RatingCriteria criteria, 
+	    Long currentUserId, boolean skipRatings, int sorting, boolean getAllUsers, boolean getByUser);
+
+    /** 
+     * Gets all the users in the session and any existing ratings for a given criteria in JSON format. 
+     */
+    JSONArray getUsersRatingsCommentsByCriteriaIdJSON(Long toolContentId, RatingCriteria criteria, Long currentUserId, 
+	    Integer page, Integer size, int sorting, boolean getAllUsers, boolean getByUser, boolean needRatesPerUser) throws JSONException ;
 
     String getLocalisedMessage(String key, Object[] args);
 }

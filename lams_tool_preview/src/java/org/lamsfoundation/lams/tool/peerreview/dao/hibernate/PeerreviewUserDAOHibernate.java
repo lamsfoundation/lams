@@ -25,8 +25,11 @@ package org.lamsfoundation.lams.tool.peerreview.dao.hibernate;
 
 import java.util.List;
 
+import org.hibernate.Query;
 import org.hibernate.SQLQuery;
 import org.lamsfoundation.lams.dao.hibernate.LAMSBaseDAO;
+import org.lamsfoundation.lams.rating.model.RatingCriteria;
+import org.lamsfoundation.lams.rating.service.IRatingService;
 import org.lamsfoundation.lams.tool.peerreview.PeerreviewConstants;
 import org.lamsfoundation.lams.tool.peerreview.dao.PeerreviewUserDAO;
 import org.lamsfoundation.lams.tool.peerreview.model.PeerreviewSession;
@@ -52,7 +55,7 @@ public class PeerreviewUserDAOHibernate extends LAMSBaseDAO implements Peerrevie
     private static final String GET_COUNT_USERS_FOR_SESSION = "SELECT COUNT(*) FROM " + PeerreviewUser.class.getName()
 	    + " AS r WHERE r.session.sessionId=?";
 
-    private static final String LOAD_USERS_FOR_SESSION_LIMIT = "FROM user in class PeerreviewUser "
+    private static final String LOAD_USERS_FOR_SESSION_LIMIT_OLD = "FROM user in class PeerreviewUser "
 	    + "WHERE user.session.sessionId=:toolSessionId AND user.userId!=:excludeUserId order by ";
 
     @Override
@@ -124,10 +127,13 @@ public class PeerreviewUserDAOHibernate extends LAMSBaseDAO implements Peerrevie
 		break;
 	}
 
-	return getSession().createQuery(LOAD_USERS_FOR_SESSION_LIMIT + sortingOrder)
+	return getSession().createQuery(LOAD_USERS_FOR_SESSION_LIMIT_OLD + sortingOrder)
 		.setLong("toolSessionId", toolSessionId.longValue()).setLong("excludeUserId", excludeUserId.longValue())
 		.setFirstResult(page * size).setMaxResults(size).list();
     }
+
+    private static final String LOAD_USERS_FOR_SESSION_LIMIT = "FROM user in class PeerreviewUser "
+	    + "WHERE user.session.sessionId=:toolSessionId AND user.userId!=:excludeUserId order by ";
 
     private static final String CREATE_USERS = "INSERT into tl_laprev11_user (user_id, login_name, first_name, last_name, session_finished, session_uid) "
 	    + " SELECT user.user_id, user.login, user.first_name, user.last_name, 0, :session_uid "
@@ -145,4 +151,59 @@ public class PeerreviewUserDAOHibernate extends LAMSBaseDAO implements Peerrevie
 	query.setLong("session_uid", session.getUid()).setLong("tool_session_id", session.getSessionId());
 	return query.executeUpdate();
     }
+    
+    // column order is very important. The potential itemId must be first, followed by rating.*,
+    // and the user's first name and last name must be the last two columns or the DTO conversion will fail.
+    // See PeerreviewServiceImpl.getUsersRatingsCommentsByCriteriaId
+    private static final String FIND_USER_RATINGS_COMMENTS1 = "SELECT user.user_id, rating.*, user.first_name, user.last_name "
+	    + " FROM tl_laprev11_peerreview p "
+	    + " JOIN tl_laprev11_session sess ON p.content_id = :toolContentId AND p.uid = sess.peerreview_uid  "
+	    + " JOIN tl_laprev11_user user ON user.session_uid = sess.uid "
+	    + " LEFT JOIN ( ";
+    private static final String FIND_USER_RATINGS_COMMENTS2 = " ) rating ON user.user_id = rating.item_id ";
+    
+    
+    @SuppressWarnings("unchecked")
+    @Override
+    public List<Object[]> getRatingsComments(Long toolContentId, RatingCriteria criteria, Long userId, Integer page,
+    Integer size, int sorting, boolean getByUser, IRatingService coreRatingService) {
+	String sortingOrder = "";
+	switch (sorting) {
+	    case PeerreviewConstants.SORT_BY_NO:
+		sortingOrder = "ORDER BY user.user_id";
+		break;
+	    case PeerreviewConstants.SORT_BY_USERNAME_ASC:
+		sortingOrder = "ORDER BY user.first_name ASC";
+		break;
+	    case PeerreviewConstants.SORT_BY_USERNAME_DESC:
+		sortingOrder = "ORDER BY user.first_name DESC";
+		break;
+	    case PeerreviewConstants.SORT_BY_AVERAGE_RESULT_ASC:
+		sortingOrder = criteria.isCommentRating() ? "ORDER BY rating.comment ASC" : "ORDER BY rating.average_rating ASC";
+		break;
+	    case PeerreviewConstants.SORT_BY_AVERAGE_RESULT_DESC:
+		sortingOrder = criteria.isCommentRating() ? "ORDER BY rating.comment DESC" : "ORDER BY rating.average_rating DESC";
+	}
+
+    	StringBuilder bldr =  new StringBuilder(FIND_USER_RATINGS_COMMENTS1);
+    	bldr.append(coreRatingService.getRatingSelectJoinSQL(criteria.getRatingStyle(), getByUser));
+    	bldr.append(FIND_USER_RATINGS_COMMENTS2);
+    	if ( ! getByUser) 
+    	    bldr.append("WHERE user.user_id = :userId ");
+    	
+    	bldr.append(sortingOrder);
+    	
+	String queryString = bldr.toString();
+	Query query = getSession().createSQLQuery(queryString)
+		.setLong("toolContentId", toolContentId)
+		.setLong("ratingCriteriaId", criteria.getRatingCriteriaId());
+	if ( queryString.contains(":userId") ) {
+		query.setLong("userId", userId);
+	}
+	if ( page != null && size != null ) {
+	    query.setFirstResult(page * size).setMaxResults(size);
+	}
+	return (List<Object[]>) query.list();
+    }
+
 }

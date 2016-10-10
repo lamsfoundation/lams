@@ -79,6 +79,8 @@ public class Peerreview implements Cloneable {
     private boolean reflectOnActivity;
 
     private String reflectInstructions;
+    
+    private boolean selfReview;
 
     // **********************************************************
     // Function method for Peerreview
@@ -381,5 +383,13 @@ public class Peerreview implements Cloneable {
 
     public void setReflectOnActivity(boolean reflectOnActivity) {
 	this.reflectOnActivity = reflectOnActivity;
+    }
+
+    public boolean isSelfReview() {
+        return selfReview;
+    }
+
+    public void setSelfReview(boolean selfReview) {
+        this.selfReview = selfReview;
     }
 }
