@@ -164,6 +164,8 @@ public interface IQaService extends ToolRatingManager {
     void createQaContent(QaContent qa);
 
     void updateResponseVisibility(Long responseUid, boolean visible);
+    
+    boolean isRatingsEnabled(QaContent qaContent);
 
     QaQueUsr getUserByIdAndSession(final Long queUsrId, final Long qaSessionId);
 

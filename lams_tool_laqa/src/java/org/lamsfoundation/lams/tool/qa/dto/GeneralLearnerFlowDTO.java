@@ -119,7 +119,7 @@ public class GeneralLearnerFlowDTO implements Comparable {
 
     protected String useSelectLeaderToolOuput;
 
-    protected String allowRateAnswers;
+    protected boolean allowRateAnswers;
 
     /**
      * @return Returns the usernameVisible.
@@ -737,11 +737,11 @@ public class GeneralLearnerFlowDTO implements Comparable {
 	this.useSelectLeaderToolOuput = useSelectLeaderToolOuput;
     }
 
-    public String getAllowRateAnswers() {
+    public boolean isAllowRateAnswers() {
 	return allowRateAnswers;
     }
 
-    public void setAllowRateAnswers(String allowRateAnswers) {
+    public void setAllowRateAnswers(boolean allowRateAnswers) {
 	this.allowRateAnswers = allowRateAnswers;
     }
 }

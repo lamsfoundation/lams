@@ -119,7 +119,7 @@
 								var hasStartedRating = false;
 
 	
-								if (${generalLearnerFlowDTO.allowRateAnswers == 'true'}) {
+								if (${generalLearnerFlowDTO.allowRateAnswers}) {
 									rows += '<td style="width:150px;">';
 									
 									if (userData["visible"] == 'true') {
@@ -276,7 +276,7 @@
 		</c:if>
 		
 		<!-- Rating limits info -->
-		<c:if test="${qaContent.allowRateAnswers && (qaContent.minimumRates ne 0 || qaContent.maximumRates ne 0)}">
+		<c:if test="${generalLearnerFlowDTO.allowRateAnswers && (qaContent.minimumRates ne 0 || qaContent.maximumRates ne 0)}">
 		
 			<div class="info">
 				<c:choose>
@@ -360,7 +360,7 @@
 					</div>
 					
 					<%--Rating area---------------------------------------%>
-					<c:if test="${qaContent.allowRateAnswers}">
+					<c:if test="${generalLearnerFlowDTO.allowRateAnswers}">
 					<lams:Rating itemRatingDto="${userResponse.itemRatingDto}" disabled="true" isItemAuthoredByUser="true"
 							maxRates="${qaContent.maximumRates}"/>
 						<br>
@@ -398,7 +398,7 @@
 									<th title="<fmt:message key='label.sort.by.answer'/>" >
 										<fmt:message key="label.learning.answer" />
 									</th>
-									<c:if test="${generalLearnerFlowDTO.allowRateAnswers == 'true'}">
+									<c:if test="${generalLearnerFlowDTO.allowRateAnswers}">
 										<th title="<fmt:message key='label.sort.by.rating'/>">
 											<fmt:message key="label.learning.rating" />
 										</th>
