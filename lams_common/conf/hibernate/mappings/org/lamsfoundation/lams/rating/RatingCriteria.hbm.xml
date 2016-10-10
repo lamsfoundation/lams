@@ -34,6 +34,12 @@
 		<meta attribute="field-description">@hibernate.property column="rating_criteria_type_id" length="11"</meta>    
    	</property>
    	
+    <property name="ratingStyle" type="java.lang.Integer" column="rating_style" not-null="true">
+   	</property>
+   	
+    <property name="maxRating" type="java.lang.Integer" column="max_rating" not-null="true">
+   	</property>
+   	
    	<property
 		name="commentsEnabled"
 		type="boolean"
@@ -49,6 +55,12 @@
 		insert="true"
 		column="comments_min_words_limit"
 	/>    
+
+    <property name="minimumRates" type="java.lang.Integer" column="minimum_rates">
+   	</property>
+
+    <property name="maximumRates" type="java.lang.Integer" column="maximum_rates">
+   	</property>
     
     <!-- Subclass definations for polymorphic persistence -->
 	<subclass name="org.lamsfoundation.lams.rating.model.ToolActivityRatingCriteria" discriminator-value="1">

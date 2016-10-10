@@ -52,6 +52,9 @@ public class RatingCommentDAO extends LAMSBaseDAO implements IRatingCommentDAO {
     private static final String FIND_COMMENTS_BY_CRITERIA = "SELECT r.itemId, r.learner.userId, r.comment " + "FROM "
 	    + RatingComment.class.getName() + " AS r where r.ratingCriteria.ratingCriteriaId=?";
 
+    private static final String FIND_RELATED_COMMENT_BY_CRITERIA_AND_USER = "SELECT r.itemId, r.learner.userId, r.comment FROM " + RatingComment.class.getName()
+	    + " AS r where r.ratingCriteria.ratingCriteriaId=:ratingCriteriaId AND r.learner.userId=:userId";
+
 //    private static final String COUNT_COMMENTS_BY_ITEM_AND_USER = "SELECT COUNT(r) FROM  "
 //	    + RatingComment.class.getName()
 //	    + " AS r "
@@ -93,6 +96,14 @@ public class RatingCommentDAO extends LAMSBaseDAO implements IRatingCommentDAO {
 	return convertIntoCommentDtos(results);
     }
 
+    @Override
+    public List<RatingCommentDTO> getRelatedCommentByCriteriaAndUser(Long ratingCriteriaId, Integer userId) {
+	List<Object[]> results = getSession().createQuery(FIND_RELATED_COMMENT_BY_CRITERIA_AND_USER)
+		.setLong("ratingCriteriaId", ratingCriteriaId)
+		.setInteger("userId", userId).list();
+
+	return convertIntoCommentDtos(results);
+    }
     /*
      * Converts DB results presentation into list of RatingCommentDTO.
      *

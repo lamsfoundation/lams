@@ -25,6 +25,23 @@ LAMS Learner Style
     padding-right: 5px;
     padding-left: 5px;
   }
+  .rating-criteria-tag {
+	width: 100%;
+  }
+  .rating-criteria-tag input[type="text"] {
+	width: 100%;
+  }
+  .rating-criteria-tag .ui-widget input{
+	font-family:"Helvetica Neue",Helvetica,Arial,sans-serif;
+	font-size:11px;
+  }
+  #criterias-table {
+	margin-left: 0px;
+	border-bottom: inherit;
+  }
+  #criterias-table td {
+	vertical-align:middle;
+  }
  .navbar-login {
     margin-bottom: 5px;
   }
@@ -151,10 +168,6 @@ LAMS Learner Style
 }
 .panel-admin-title {
 	color:#337ab7 !important;
-}
-.panel-title {
-	font-size: 	inherit;
-	font-weight: bolder;
 }
 body.stripes {
   background: url('/lams/images/css/light-fabric.jpg');
@@ -347,8 +360,16 @@ a.button-add-item:before {
 .rating-criteria-tag input[type="text"] {
 	width: 100%;
 }
+.rating-criteria-tag .ui-widget input{
+	font-family:"Helvetica Neue",Helvetica,Arial,sans-serif;
+	font-size:12px;
+	line-height:1.42857143;
+	padding: 2px;
+}
+
 #criterias-table {
 	margin-left: 0px;
+	border-bottom: inherit;
 }
 #criterias-table td {
 	vertical-align:middle;
@@ -493,14 +514,4 @@ nav:hover .forAnimate{
 }
 section{
 	padding-left: 15px;
-}
-
-/* Login page */
-
-.footer {
-  width: 100%;
-  /* Set the fixed height of the footer here */
-  background-color: #f5f5f5;
-  font-size: 75%;
-  border-top: 1px solid#e7e7e7;
 }

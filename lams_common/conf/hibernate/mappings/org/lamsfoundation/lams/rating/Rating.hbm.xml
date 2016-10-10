@@ -58,7 +58,7 @@
 
         <property
             name="rating"
-            type="float"
+            type="java.lang.Float"
             update="true"
             insert="true"
             column="rating"

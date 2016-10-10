@@ -30,9 +30,15 @@ function initializeJRating() {
 		maxRatingsForItem = "";
 	else 
 		maxRatingsForItem = MAX_RATINGS_FOR_ITEM;
-		
+	
+	var ratingLimitsByCriteria;
+	if ( typeof LIMIT_BY_CRITERIA === "undefined" || LIMIT_BY_CRITERIA === undefined )
+		ratingLimitsByCriteria = false;
+	else 
+		ratingLimitsByCriteria = LIMIT_BY_CRITERIA;
+
 	$(".rating-stars-new").filter($(".rating-stars")).jRating({
-		phpPath : LAMS_URL + "servlet/rateItem?hasRatingLimits=" + HAS_RATING_LIMITS+"&maxRatingsForItem="+maxRatingsForItem,
+		phpPath : LAMS_URL + "servlet/rateItem?hasRatingLimits=" + HAS_RATING_LIMITS + "&ratingLimitsByCriteria=" + ratingLimitsByCriteria + "&maxRatingsForItem=" + maxRatingsForItem,
 		rateMax : 5,
 		decimalLength : 1,
 		onSuccess : function(data, itemId){
@@ -40,7 +46,10 @@ function initializeJRating() {
 			$("#average-rating-" + itemId).html(data.averageRating);
 			$("#number-of-votes-" + itemId).html(data.numberOfVotes);
 			$("#rating-stars-caption-" + itemId).css("visibility", "visible");
+			var parts = itemId.split('-');
+			$("#comment-tick-" + parts[1]).css("visibility", "visible");
 			    
+			
 			//handle rating limits if available
 			handleRatingLimits(data.countRatedItems, itemId);
 		},
@@ -93,6 +102,7 @@ function initializeJRating() {
     			idBox: commentsCriteriaId + '-' + itemId, 
     			comment: comment,
     			hasRatingLimits: HAS_RATING_LIMITS,
+    			ratingLimitsByCriteria: ratingLimitsByCriteria,
     			maxRatingsForItem: maxRatingsForItem
     		},
     		success: function(data, textStatus) {
@@ -137,6 +147,8 @@ function handleRatingLimits(countRatedItems, objectId) {
 		
     if (HAS_RATING_LIMITS) {
 
+    	debugger;
+    	
     	//update info box
     	$("#count-rated-items").html(countRatedItems);
 

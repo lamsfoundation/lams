@@ -40,10 +40,10 @@ public class RatingCriteriaDAO extends LAMSBaseDAO implements IRatingCriteriaDAO
 	    + " AS r WHERE r.toolContentId=? order by r.orderId asc";
 
     private static final String IS_COMMENTS_ENABLED_FOR_TOOL_CONTENT_ID = "SELECT COUNT(*) FROM "
-	    + RatingCriteria.class.getName() + " AS r WHERE r.toolContentId=? AND r.commentsEnabled=1";
+	    + RatingCriteria.class.getName() + " AS r WHERE r.toolContentId=? AND r.ratingStyle = 0";
 
     private static final String GET_COMMENTS_MIN_WORDS_LIMIT_FOR_TOOL_CONTENT_ID = "SELECT r.commentsMinWordsLimit FROM "
-	    + RatingCriteria.class.getName() + " AS r WHERE r.toolContentId=? AND r.commentsEnabled=1";
+	    + RatingCriteria.class.getName() + " AS r WHERE r.toolContentId=? AND r.ratingStyle = 0";
 
     @Override
     public void saveOrUpdate(RatingCriteria criteria) {

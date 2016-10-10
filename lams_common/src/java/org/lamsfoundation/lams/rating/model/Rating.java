@@ -41,7 +41,7 @@ public class Rating implements java.io.Serializable, Cloneable {
 
     private User learner;
 
-    private float rating;
+    private Float rating;
 
     public Rating() {
     }
@@ -95,11 +95,11 @@ public class Rating implements java.io.Serializable, Cloneable {
 
     /**
      */
-    public void setRating(float rating) {
+    public void setRating(Float rating) {
 	this.rating = rating;
     }
 
-    public float getRating() {
+    public Float getRating() {
 	return this.rating;
     }
 }
