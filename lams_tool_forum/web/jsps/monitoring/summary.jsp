@@ -25,6 +25,8 @@
 	};
 </script>
 <script type="text/javascript" src="${lams}/includes/javascript/monitorToolSummaryAdvanced.js" ></script>
+<script src="${lams}includes/javascript/jquery.timeago.js" type="text/javascript"></script>
+<script src="${lams}includes/javascript/timeagoi18n/jquery.timeago.${fn:toLowerCase(localeLanguage)}.js" type="text/javascript"></script>
 <script type="text/javascript">
 
 	function releaseMarks(sessionId){
@@ -45,7 +47,7 @@
 	}
 	
   	$(document).ready(function(){
-
+  		jQuery("time.timeago").timeago();
 		$(".tablesorter").tablesorter({
 			theme: 'bootstrap',
 			headerTemplate : '{content} {icon}',
@@ -91,7 +93,11 @@
 
 							rows += '<td align="right">';
 							if ( userData["lastMessageDate"] != null) {
-								rows += userData["lastMessageDate"];
+								rows += 	'(<time class="timeago" title="';
+								rows += 	userData["lastMessageDate"]
+								rows += 	'" datetime="';
+								rows += 	userData["timeAgo"];
+								rows += 	'"></time>)';
 							}
 							rows += '</td>';
 
@@ -126,6 +132,11 @@
 			            
 			    	}
 				}})
+			  .bind('pagerInitialized pagerComplete', function(event, options){
+					$("time.timeago").timeago();
+					initializeJRating();
+				})
+			 
 			});
 	  	})
 
