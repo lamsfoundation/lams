@@ -309,12 +309,12 @@
 			</div>
 			
 			
-			<div class="space-top" align="center">
+			<div class="space-top" align="right">
+			<html:cancel styleClass="button"><fmt:message key="button.cancel"/></html:cancel>
 			<c:if test="${profileEditEnabled or partialProfileEditEnabled}">
 			<html:submit styleClass="button"><fmt:message key="button.save"/></html:submit>
-			<html:reset styleClass="button"><fmt:message key="button.reset"/></html:reset>
 			</c:if>
-			<html:cancel styleClass="button"><fmt:message key="button.cancel"/></html:cancel>
+			
 			</div>
 
 
