@@ -184,7 +184,7 @@ public class QaLearningStarterAction extends Action implements QaAppConstants {
 	sessionMap.put(ATTR_CONTENT, qaContent);
 	sessionMap.put(AttributeNames.USER, user);
 
-	GeneralLearnerFlowDTO generalLearnerFlowDTO = LearningUtil.buildGeneralLearnerFlowDTO(qaContent);
+	GeneralLearnerFlowDTO generalLearnerFlowDTO = LearningUtil.buildGeneralLearnerFlowDTO(qaService, qaContent);
 	generalLearnerFlowDTO.setUserUid(user.getQueUsrId().toString());
 	generalLearnerFlowDTO.setHttpSessionID(sessionMapId);
 	generalLearnerFlowDTO.setToolSessionID(toolSessionID);

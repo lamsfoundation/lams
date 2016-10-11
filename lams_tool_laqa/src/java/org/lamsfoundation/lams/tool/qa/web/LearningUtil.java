@@ -61,7 +61,7 @@ public class LearningUtil implements QaAppConstants {
 	qaLearningForm.setTotalQuestionCount(totalQuestionCount);
     }
 
-    public static GeneralLearnerFlowDTO buildGeneralLearnerFlowDTO(QaContent qaContent) {
+    public static GeneralLearnerFlowDTO buildGeneralLearnerFlowDTO(IQaService service, QaContent qaContent) {
 	GeneralLearnerFlowDTO generalLearnerFlowDTO = new GeneralLearnerFlowDTO();
 	generalLearnerFlowDTO.setActivityTitle(qaContent.getTitle());
 	generalLearnerFlowDTO.setActivityInstructions(qaContent.getInstructions());
@@ -78,9 +78,10 @@ public class LearningUtil implements QaAppConstants {
 	generalLearnerFlowDTO.setAllowRichEditor(new Boolean(qaContent.isAllowRichEditor()).toString());
 	generalLearnerFlowDTO
 		.setUseSelectLeaderToolOuput(new Boolean(qaContent.isUseSelectLeaderToolOuput()).toString());
-	generalLearnerFlowDTO.setAllowRateAnswers(new Boolean(qaContent.isAllowRateAnswers()).toString());
-
 	generalLearnerFlowDTO.setTotalQuestionCount(new Integer(qaContent.getQaQueContents().size()));
+
+	//check if allow rate answers is ON and also that there is at least one non-comments rating criteria available
+	generalLearnerFlowDTO.setAllowRateAnswers(service.isRatingsEnabled(qaContent));
 
 	//create mapQuestions
 	Map<Integer, QaQuestionDTO> mapQuestions = new TreeMap<Integer, QaQuestionDTO>();
