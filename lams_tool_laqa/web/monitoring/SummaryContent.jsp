@@ -58,7 +58,7 @@
 			<lams:TSTable numColumns="${content.allowRateAnswers ? (isCommentsEnabled ? 3 : 2) : (isCommentsEnabled ? 2 : 1)}"
 						  dataId="data-session-id='${groupDto.sessionId}' data-question-uid='${question.uid}'">
 					<th title="<fmt:message key='label.sort.by.answer'/>"><fmt:message key="label.learning.answer"/></th>
-					<c:if test="${content.allowRateAnswers}">
+					<c:if test="${isRatingsEnabled}">
 						<th title="<fmt:message key='label.sort.by.rating'/>" width="130px">
 							<fmt:message key="label.learning.rating" />
 						</th>

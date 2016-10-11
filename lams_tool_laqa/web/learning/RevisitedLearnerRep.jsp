@@ -115,7 +115,7 @@
 								var hasStartedRating = false;
 
 	
-								if (${generalLearnerFlowDTO.allowRateAnswers == 'true'}) {
+								if (${generalLearnerFlowDTO.allowRateAnswers}) {
 									rows += '<td style="width:150px;">';
 									
 									if (userData["visible"] == 'true') {
@@ -264,7 +264,7 @@
 		</c:if>
 
 		<!-- Rating limits info -->
-		<c:if test="${qaContent.allowRateAnswers && (qaContent.minimumRates ne 0 || qaContent.maximumRates ne 0)}">
+		<c:if test="${generalLearnerFlowDTO.allowRateAnswers && (qaContent.minimumRates ne 0 || qaContent.maximumRates ne 0)}">
 
 			<lams:Alert id="ratings-info" type="info" close="true">
 				<c:choose>
@@ -325,7 +325,7 @@
 							<div class="row no-gutter">
 								<!-- split if ratings are on -->
 								<c:set var="splitRow" value="col-xs-12" />
-								<c:if test="${qaContent.allowRateAnswers}">
+								<c:if test="${generalLearnerFlowDTO.allowRateAnswers}">
 									<c:set var="splitRow" value="col-xs-12 col-sm-9 col-md-9 col-lg-10" />
 								</c:if>
 								<div class="${splitRow}">
@@ -345,7 +345,7 @@
 
 
 								<%--Rating area---------------------------------------%>
-								<c:if test="${qaContent.allowRateAnswers}">
+								<c:if test="${generalLearnerFlowDTO.allowRateAnswers}">
 									<div class="col-xs-12 col-sm-3 col-md-3 col-lg-2">
 										<h4 class="text-center">
 											<fmt:message key="label.learning.rating" />
@@ -410,7 +410,7 @@
 					<thead>
 						<tr>
 							<th title="<fmt:message key='label.sort.by.answer'/>"><fmt:message key="label.learning.answer" /></th>
-							<c:if test="${generalLearnerFlowDTO.allowRateAnswers == 'true'}">
+							<c:if test="${generalLearnerFlowDTO.allowRateAnswers}">
 								<th title="<fmt:message key='label.sort.by.rating'/>"><fmt:message key="label.learning.rating" /></th>
 							</c:if>
 							<c:if test="${isCommentsEnabled}">

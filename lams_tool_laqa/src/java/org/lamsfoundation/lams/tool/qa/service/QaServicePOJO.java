@@ -845,6 +845,22 @@ public class QaServicePOJO
     public boolean isCommentsEnabled(Long toolContentId) {
 	return ratingService.isCommentsEnabled(toolContentId);
     }
+    
+    @Override
+    public boolean isRatingsEnabled(QaContent qaContent) {
+	//check if allow rate answers is ON and also that there is at least one non-comments rating criteria available
+	boolean allowRateAnswers = false;
+	if (qaContent.isAllowRateAnswers()) {
+	    List<RatingCriteria> ratingCriterias = getRatingCriterias(qaContent.getQaContentId());
+	    for (RatingCriteria ratingCriteria : ratingCriterias) {
+		if (!ratingCriteria.isCommentsEnabled()) {
+		    allowRateAnswers = true;
+		    break;
+		}
+	    }
+	}
+	return allowRateAnswers;
+    }
 
     @Override
     public List<ItemRatingDTO> getRatingCriteriaDtos(Long contentId, Collection<Long> itemIds,

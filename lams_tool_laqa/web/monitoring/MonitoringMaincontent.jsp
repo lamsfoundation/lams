@@ -163,7 +163,7 @@
 								
 								rows += '</td>';
 								
-								if (${qaContent.allowRateAnswers}) {
+								if (${isRatingsEnabled}) {
 									rows += '<td style="width:150px;">';
 									
 									if (userData["visible"] == 'true') {
