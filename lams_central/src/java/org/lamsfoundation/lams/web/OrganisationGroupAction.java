@@ -62,8 +62,10 @@ import org.lamsfoundation.lams.lesson.Lesson;
 import org.lamsfoundation.lams.lesson.service.ILessonService;
 import org.lamsfoundation.lams.monitoring.web.GroupingAJAXAction;
 import org.lamsfoundation.lams.security.ISecurityService;
+import org.lamsfoundation.lams.usermanagement.Organisation;
 import org.lamsfoundation.lams.usermanagement.OrganisationGroup;
 import org.lamsfoundation.lams.usermanagement.OrganisationGrouping;
+import org.lamsfoundation.lams.usermanagement.OrganisationType;
 import org.lamsfoundation.lams.usermanagement.Role;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.dto.OrganisationGroupingDTO;
@@ -114,10 +116,19 @@ public class OrganisationGroupAction extends DispatchAction {
 	Integer userId = getUserDTO().getUserID();
 	Integer organisationId = WebUtil.readIntParam(request, AttributeNames.PARAM_ORGANISATION_ID, true);
 	Long lessonId = WebUtil.readLongParam(request, AttributeNames.PARAM_LESSON_ID, true);
+	Organisation organisation = null;
 	if (organisationId == null) {
+	    organisation = ((Lesson) getUserManagementService().findById(Lesson.class, lessonId)).getOrganisation();
 	    // read organisation ID from lesson
-	    organisationId = ((Lesson) getUserManagementService().findById(Lesson.class, lessonId)).getOrganisation()
-		    .getOrganisationId();
+	    organisationId = organisation.getOrganisationId();
+	}
+	if (organisation == null) {
+	    organisation = (Organisation) getUserManagementService().findById(Organisation.class, organisationId);
+	}
+	// get course groupings from top-leve course
+	if (OrganisationType.CLASS_TYPE.equals(organisation.getOrganisationType().getOrganisationTypeId())) {
+	    organisation = organisation.getParentOrganisation();
+	    organisationId = organisation.getOrganisationId();
 	}
 
 	// check if user is allowed to view and edit groupings
