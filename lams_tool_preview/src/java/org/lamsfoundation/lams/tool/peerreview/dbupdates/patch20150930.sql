@@ -4,7 +4,7 @@ SET FOREIGN_KEY_CHECKS=0;
 ----------------------Put all sql statements below here-------------------------
 
 --  LDEV-3564 tool session id must be unique in tool's session table
-ALTER IGNORE TABLE tl_laprev11_session ADD UNIQUE (session_id);
+ALTER TABLE tl_laprev11_session ADD UNIQUE (session_id);
 
 ----------------------Put all sql statements above here-------------------------
 
