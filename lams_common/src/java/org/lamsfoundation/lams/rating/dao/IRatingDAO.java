@@ -30,7 +30,6 @@ import java.util.List;
 import java.util.Map;
 
 import org.lamsfoundation.lams.rating.dto.ItemRatingCriteriaDTO;
-import org.lamsfoundation.lams.rating.dto.StyledRatingDTO;
 import org.lamsfoundation.lams.rating.model.Rating;
 
 public interface IRatingDAO {

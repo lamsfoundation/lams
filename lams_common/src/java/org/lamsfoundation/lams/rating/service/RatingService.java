@@ -656,6 +656,11 @@ public class RatingService implements IRatingService {
         		    userRow.put("userRating", row[3] == null ? "" : numberFormat.format((Float) row[3]));
         		    userRow.put("averageRating",  row[4] == null ? "" : numberFormat.format((Double) row[4]));
         		    userRow.put("numberOfVotes", row[5] == null ? "" : numberFormat.format((BigInteger) row[5]));
+		    } else {
+			// don't have missing entries in JSON or an exception can occur if you try to access them
+        		    userRow.put("userRating", "");
+        		    userRow.put("averageRating", "");
+        		    userRow.put("numberOfVotes", "");
 		    }
 
 		    rows.put(userRow);

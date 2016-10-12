@@ -44,108 +44,6 @@
 <script type="text/javascript" src="${lams}includes/javascript/monitorToolSummaryAdvanced.js" ></script>
 <script src="${lams}includes/javascript/jquery.jRating.js" type="text/javascript"></script>
 <script src="${lams}includes/javascript/rating.js" type="text/javascript" ></script>
-<script type="text/javascript">
-	$(document).ready(function(){
-		
-		<c:forEach var="groupSummary" items="${summaryList}" varStatus="status">
-		
-			jQuery("#group${groupSummary.sessionId}").jqGrid({
-			   	url: "<c:url value='/monitoring/getUsers.do'/>?toolContentId=${sessionMap.toolContentID}&toolSessionId=${groupSummary.sessionId}",
-				datatype: "json",
-				height: 'auto',
-				autowidth: true,
-				shrinkToFit: false,
-			   	colNames:[
-						'sessionId',
-						'userId',
-						"<fmt:message key="label.user.name" />",
-						"<fmt:message key="label.rating" />"
-				],
-			   	colModel:[
-			   		{name:'sessionId', index:'sessionId', width:0, hidden: true},
-			   		{name:'userId', index:'userId', width:0, hidden: true},
-			   		{name:'userName', index:'userName', width:260},
-			   		{name:'rating', index:'rating', width:160, align:"center", sortable:false}
-			   	],
-			   	rowNum:10,
-			   	rowList:[10,20,30,40,50,100],
-			   	pager: '#pager${groupSummary.sessionId}',
-			   	viewrecords:true,
-				loadComplete: function(){
-					initializeJRating();
-				},
-			   	// caption: "${groupSummary.sessionName}" use Bootstrap panels as the title bar
-				subGrid: true,
-				subGridOptions: {
-					reloadOnExpand : false 
-				},
-				subGridRowExpanded: function(subgrid_id, row_id) {
-					var subgridTableId = subgrid_id+"_t";
-					var sessionId = jQuery("#group${groupSummary.sessionId}").getRowData(row_id)["sessionId"];
-					var userId = jQuery("#group${groupSummary.sessionId}").getRowData(row_id)["userId"];
-					   
-					jQuery("#"+subgrid_id).html("<table id='" + subgridTableId + "' class='scroll'></table>");
-					   
-					jQuery("#"+subgridTableId).jqGrid({
-						datatype: "json",
-						loadonce:true,
-						rowNum: 10000,
-						url: "<c:url value='/monitoring/getSubgridData.do'/>?sessionMapID=${sessionMapID}&userID=" + userId,
-						height: "100%",
-						autowidth:true,
-						grouping:true,	
-						groupingView : {
-							groupField : ['criteriaId'],
-							groupColumnShow : [false],
-							groupText : ['<b>{0}</b>']
-						},
-						loadComplete: function(){
-							//remove empty subgrids
-					        var table_value = $('#'+subgridTableId).getGridParam('records');
-					        if(table_value === 0){
-					            $('#'+subgrid_id).parent().unbind('click').html('<fmt:message key="label.no.ratings.left" />');
-					        }
-						},
-						colModel:[
-						   {name:'id', index:'id', hidden:true},
-						   {name:'userName',index:'userName'},
-						   {name:'rating', index:'rating', width:140, align:"center"},
-						   {name:'criteriaId', hidden:true}
-						],
-						loadError: function(xhr,st,err) {
-					    	jQuery("#"+subgridTableId).clearGridData();
-					    	info_dialog("<fmt:message key="label.error"/>", "<fmt:message key="gradebook.error.loaderror"/>", "<fmt:message key="label.ok"/>");
-					    }
-					})
-				}
-			}).jqGrid('navGrid','#pager${groupSummary.sessionId}',{add:false,del:false,edit:false,search:false});
-			//$("#group${groupSummary.sessionId}").parents('div.ui-jqgrid-bdiv').css("max-height","1000px");
-			
-		</c:forEach>
-        
-		
-        //jqgrid autowidth (http://stackoverflow.com/a/1610197)
-        $(window).bind('resize', function() {
-            resizeJqgrid(jQuery(".ui-jqgrid-btable:visible"));
-        });
-
-        //resize jqGrid on openning of bootstrap collapsible
-        $('div[id^="collapse"]').on('shown.bs.collapse', function () {
-            resizeJqgrid(jQuery(".ui-jqgrid-btable:visible", this));
-        })
-
-        function resizeJqgrid(jqgrids) {
-            jqgrids.each(function(index) {
-                var gridId = $(this).attr('id');
-                var gridParentWidth = jQuery('#gbox_' + gridId).parent().width();
-                jQuery('#' + gridId).setGridWidth(gridParentWidth, true);
-            });
-        };
-        setTimeout(function(){ window.dispatchEvent(new Event('resize')); }, 300);
-        
-	});
-
-</script>
 
 <div class="panel">
 	<h4>
@@ -182,10 +80,25 @@
         <div id="collapse${groupSummary.sessionId}" class="panel-collapse collapse ${status.first ? 'in' : ''}" role="tabpanel" aria-labelledby="heading${groupSummary.sessionId}">
 	</c:if>
 	
-	<table id="group${groupSummary.sessionId}" class="scroll" cellpadding="0" cellspacing="0"></table>
-	<div id="pager${groupSummary.sessionId}"></div> 
-	<div class="voffset5">&nbsp;</div>
-	
+	<c:choose>
+		<c:when test="${not empty criterias && fn:length(criterias) eq 1}">
+			<c:forEach var="criteria" items="${criterias}">
+			<h4>${criteria.title}</h4>
+			<c:set var="toolSessionId" value="${groupSummary.sessionId}" scope="request"/>
+			<c:set var="criteria" value="${criteria}" scope="request"/>
+			<c:set var="sessionMap" value="${sessionMap}" scope="request"/>
+			<jsp:include page="criteriapart.jsp"/>
+			</c:forEach>
+		</c:when>
+		<c:otherwise>
+			<c:forEach var="criteria" items="${criterias}">
+				<c:set var='url'>criteria.do?sessionMapID=${sessionMapID}&toolSessionId=${groupSummary.sessionId}&criteriaId=${criteria.ratingCriteriaId}</c:set>
+				<a href="javascript:launchPopup('${url}')" class="btn btn-default voffset5 loffset5">View ${criteria.title}</a>
+			</c:forEach>
+			<div class="voffset5">&nbsp;</div>
+		</c:otherwise>
+	</c:choose>
+
 	<c:if test="${sessionMap.isGroupedActivity}">
 		</div> <!-- end collapse area  -->
 		</div> <!-- end collapse panel  -->
