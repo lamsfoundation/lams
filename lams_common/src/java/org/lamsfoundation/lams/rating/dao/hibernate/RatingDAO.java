@@ -89,7 +89,7 @@ public class RatingDAO extends LAMSBaseDAO implements IRatingDAO {
     // Used by tools to get the ratings and comments relating to their items. To be used within SQL and supply criteriaId as :ratingCriteriaId
     // See Peer Review for example usage.
     private static final String TOOL_SELECT_LEFT_JOIN_BY_USER_COMMENT = "SELECT r.item_id, r.comment "
-	    + "     FROM lams_rating_comment r WHERE r.rating_criteria_id = :ratingCriteriaId ";
+	    + "     FROM lams_rating_comment r WHERE r.rating_criteria_id = :ratingCriteriaId AND r.user_id = :userId";
 
     // Same as TOOL_SELECT_LEFT_JOIN_BY_USER_STANDARD except that it returns the average results for a single user (:userId), as left by other users
     private static final String TOOL_SELECT_LEFT_JOIN_FOR_USER_STANDARD = "SELECT DISTINCT r.item_id, rc.comment, NULL rating, calc.average_rating, calc.count_vote "
