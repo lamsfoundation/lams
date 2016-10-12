@@ -166,6 +166,11 @@
 			parameter="summary" >
 			<forward name="success" path="/pages/monitoring/monitoring.jsp" />
 		</action>
+		<action path="/monitoring/criteria"
+			type="org.lamsfoundation.lams.tool.peerreview.web.action.MonitoringAction"
+			parameter="criteria" >
+			<forward name="success" path="/pages/monitoring/criteria.jsp" />
+		</action>
 		<action path="/monitoring/getUsers"
 			type="org.lamsfoundation.lams.tool.peerreview.web.action.MonitoringAction"
 			parameter="getUsers" >	

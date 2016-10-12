@@ -257,14 +257,25 @@ public interface IPeerreviewService extends ToolRatingManager {
      * If you want the ratings done *for* user XYZ,  set getByUser to true and currentUser id to XYZ's user id.
      * user, set getByUser to false and set currentUserId to the current user id. 
      */
-    StyledCriteriaRatingDTO getUsersRatingsCommentsByCriteriaIdDTO(Long toolContentId, RatingCriteria criteria, 
+    StyledCriteriaRatingDTO getUsersRatingsCommentsByCriteriaIdDTO(Long toolContentId, Long toolSessionId, RatingCriteria criteria, 
 	    Long currentUserId, boolean skipRatings, int sorting, boolean getAllUsers, boolean getByUser);
 
     /** 
      * Gets all the users in the session and any existing ratings for a given criteria in JSON format. 
      */
-    JSONArray getUsersRatingsCommentsByCriteriaIdJSON(Long toolContentId, RatingCriteria criteria, Long currentUserId, 
+    JSONArray getUsersRatingsCommentsByCriteriaIdJSON(Long toolContentId, Long toolSessionId, RatingCriteria criteria, Long currentUserId, 
 	    Integer page, Integer size, int sorting, boolean getAllUsers, boolean getByUser, boolean needRatesPerUser) throws JSONException ;
 
+    /**
+     * Gets all the users in the session and the ratings / comments they have left for a particular learner. Used by monitoring.
+     */
+    List<Object[]> getDetailedRatingsComments(Long toolContentId, Long toolSessionId, Long criteriaId, Long itemId );
+    
+    /**
+     * Gets all the users in the session and the number of comments that have been left for them. Used by monitoring.
+     */
+    List<Object[]> getCommentsCounts(Long toolContentId, Long toolSessionId, RatingCriteria criteria,
+	    Integer page, Integer size, int sorting);
+    
     String getLocalisedMessage(String key, Object[] args);
 }

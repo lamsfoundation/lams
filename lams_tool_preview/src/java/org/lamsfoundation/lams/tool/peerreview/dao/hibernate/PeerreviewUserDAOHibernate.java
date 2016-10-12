@@ -157,7 +157,7 @@ public class PeerreviewUserDAOHibernate extends LAMSBaseDAO implements Peerrevie
     // See PeerreviewServiceImpl.getUsersRatingsCommentsByCriteriaId
     private static final String FIND_USER_RATINGS_COMMENTS1 = "SELECT user.user_id, rating.*, user.first_name, user.last_name "
 	    + " FROM tl_laprev11_peerreview p "
-	    + " JOIN tl_laprev11_session sess ON p.content_id = :toolContentId AND p.uid = sess.peerreview_uid  "
+	    + " JOIN tl_laprev11_session sess ON p.content_id = :toolContentId AND p.uid = sess.peerreview_uid AND sess.session_id = :toolSessionId  "
 	    + " JOIN tl_laprev11_user user ON user.session_uid = sess.uid "
 	    + " LEFT JOIN ( ";
     private static final String FIND_USER_RATINGS_COMMENTS2 = " ) rating ON user.user_id = rating.item_id ";
@@ -165,24 +165,24 @@ public class PeerreviewUserDAOHibernate extends LAMSBaseDAO implements Peerrevie
     
     @SuppressWarnings("unchecked")
     @Override
-    public List<Object[]> getRatingsComments(Long toolContentId, RatingCriteria criteria, Long userId, Integer page,
+    public List<Object[]> getRatingsComments(Long toolContentId, Long toolSessionId, RatingCriteria criteria, Long userId, Integer page,
     Integer size, int sorting, boolean getByUser, IRatingService coreRatingService) {
 	String sortingOrder = "";
 	switch (sorting) {
 	    case PeerreviewConstants.SORT_BY_NO:
-		sortingOrder = "ORDER BY user.user_id";
+		sortingOrder = " ORDER BY user.user_id";
 		break;
 	    case PeerreviewConstants.SORT_BY_USERNAME_ASC:
-		sortingOrder = "ORDER BY user.first_name ASC";
+		sortingOrder = " ORDER BY user.first_name ASC";
 		break;
 	    case PeerreviewConstants.SORT_BY_USERNAME_DESC:
-		sortingOrder = "ORDER BY user.first_name DESC";
+		sortingOrder = " ORDER BY user.first_name DESC";
 		break;
 	    case PeerreviewConstants.SORT_BY_AVERAGE_RESULT_ASC:
-		sortingOrder = criteria.isCommentRating() ? "ORDER BY rating.comment ASC" : "ORDER BY rating.average_rating ASC";
+		sortingOrder = criteria.isCommentRating() ? " ORDER BY rating.comment ASC" : " ORDER BY rating.average_rating ASC";
 		break;
 	    case PeerreviewConstants.SORT_BY_AVERAGE_RESULT_DESC:
-		sortingOrder = criteria.isCommentRating() ? "ORDER BY rating.comment DESC" : "ORDER BY rating.average_rating DESC";
+		sortingOrder = criteria.isCommentRating() ? " ORDER BY rating.comment DESC" : " ORDER BY rating.average_rating DESC";
 	}
 
     	StringBuilder bldr =  new StringBuilder(FIND_USER_RATINGS_COMMENTS1);
@@ -196,10 +196,76 @@ public class PeerreviewUserDAOHibernate extends LAMSBaseDAO implements Peerrevie
 	String queryString = bldr.toString();
 	Query query = getSession().createSQLQuery(queryString)
 		.setLong("toolContentId", toolContentId)
+		.setLong("toolSessionId", toolSessionId)
 		.setLong("ratingCriteriaId", criteria.getRatingCriteriaId());
 	if ( queryString.contains(":userId") ) {
 		query.setLong("userId", userId);
 	}
+	if ( page != null && size != null ) {
+	    query.setFirstResult(page * size).setMaxResults(size);
+	}
+	return (List<Object[]>) query.list();
+    }
+
+    // Part of this and the next method should be moved out to RatingDAO in common but not sure on usage at present so leave it here for now. The code is 
+    // used in peer review monitoring and probably wouldn't be used by other tools.
+    // when joining to comments, item_id = :itemId picks up the comments for star and comment styles, while item_id = rating_criteria_id
+    // picks up the justification comments left for hedging (which is one comment per user for all ratings for this criteria)
+    private static final String SELECT_ALL_RATINGS_COMMENTS_LEFT_FOR_ITEM = "SELECT user.user_id, rc.comment, r.rating, user.first_name, user.last_name "
+	    + " FROM tl_laprev11_peerreview p "
+	    + " JOIN tl_laprev11_session sess ON p.content_id = :toolContentId AND p.uid = sess.peerreview_uid AND sess.session_id = :toolSessionId "
+	    + " JOIN tl_laprev11_user user ON user.session_uid = sess.uid "
+	    + " LEFT JOIN ( SELECT rating, user_id FROM lams_rating "
+	    + "    WHERE rating_criteria_id = :ratingCriteriaId AND item_id = :itemId) r ON r.user_id = user.user_id "
+	    + " LEFT JOIN ( SELECT item_id, comment, user_id FROM lams_rating_comment "
+	    + "    WHERE rating_criteria_id = :ratingCriteriaId AND (item_id = :itemId || item_id = rating_criteria_id) ) rc ON rc.user_id = user.user_id " 
+	    + " WHERE r.rating IS NOT NULL OR rc.comment IS NOT NULL";
+    public List<Object[]> getDetailedRatingsComments(Long toolContentId, Long toolSessionId, Long criteriaId, Long itemId ) {
+	Query query = getSession().createSQLQuery(SELECT_ALL_RATINGS_COMMENTS_LEFT_FOR_ITEM)
+		.setLong("toolContentId", toolContentId)
+		.setLong("toolSessionId", toolSessionId)
+		.setLong("ratingCriteriaId", criteriaId)
+		.setLong("itemId", itemId);
+	return (List<Object[]>) query.list();
+    }
+
+    private static final String COUNT_COMMENTS_FOR_SESSION = "SELECT user.user_id, rating.comment_count, user.first_name, user.last_name  "
+    	    + " FROM tl_laprev11_peerreview p "
+	    + " JOIN tl_laprev11_session sess ON p.content_id = :toolContentId AND p.uid = sess.peerreview_uid AND sess.session_id = :toolSessionId  "
+	    + " JOIN tl_laprev11_user user ON user.session_uid = sess.uid "
+	    + " LEFT JOIN ( "
+	    + " 	SELECT r.item_id, count(r.comment)  comment_count "
+	    + " 	FROM lams_rating_comment r "
+	    + "		WHERE r.rating_criteria_id = :ratingCriteriaId "
+	    + " 	GROUP BY r.item_id ) rating ON user.user_id = rating.item_id ";
+    public List<Object[]> getCommentsCounts(Long toolContentId, Long toolSessionId, RatingCriteria criteria,
+	    Integer page, Integer size, int sorting) {
+	String sortingOrder = "";
+	switch (sorting) {
+	    case PeerreviewConstants.SORT_BY_NO:
+		sortingOrder = " ORDER BY user.user_id";
+		break;
+	    case PeerreviewConstants.SORT_BY_USERNAME_ASC:
+		sortingOrder = " ORDER BY user.first_name ASC";
+		break;
+	    case PeerreviewConstants.SORT_BY_USERNAME_DESC:
+		sortingOrder = " ORDER BY user.first_name DESC";
+		break;
+	    case PeerreviewConstants.SORT_BY_AVERAGE_RESULT_ASC:
+		sortingOrder = " ORDER BY rating.comment_count ASC";
+		break;
+	    case PeerreviewConstants.SORT_BY_AVERAGE_RESULT_DESC:
+		sortingOrder = " ORDER BY rating.comment_count DESC";
+	}
+
+    	StringBuilder bldr =  new StringBuilder(COUNT_COMMENTS_FOR_SESSION);
+    	bldr.append(sortingOrder);
+    	
+	String queryString = bldr.toString();
+	Query query = getSession().createSQLQuery(queryString)
+		.setLong("toolContentId", toolContentId)
+		.setLong("toolSessionId", toolSessionId)
+		.setLong("ratingCriteriaId", criteria.getRatingCriteriaId());
 	if ( page != null && size != null ) {
 	    query.setFirstResult(page * size).setMaxResults(size);
 	}
