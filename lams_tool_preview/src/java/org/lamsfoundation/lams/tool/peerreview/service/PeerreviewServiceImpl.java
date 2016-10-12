@@ -23,6 +23,7 @@
 
 package org.lamsfoundation.lams.tool.peerreview.service;
 
+import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -30,6 +31,7 @@ import java.util.Date;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.SortedMap;
 import java.util.SortedSet;
@@ -367,14 +369,14 @@ public class PeerreviewServiceImpl
     }
 
     @Override
-    public StyledCriteriaRatingDTO getUsersRatingsCommentsByCriteriaIdDTO(Long toolContentId, RatingCriteria criteria, 
+    public StyledCriteriaRatingDTO getUsersRatingsCommentsByCriteriaIdDTO(Long toolContentId, Long toolSessionId, RatingCriteria criteria, 
 	    Long currentUserId, boolean skipRatings, int sorting, boolean getAllUsers, boolean getByUser) {
 	
 	if ( skipRatings ) {
 	    return ratingService.convertToStyledDTO(criteria, currentUserId, getAllUsers, null);
 	}
 	
-	List<Object[]> rawData = peerreviewUserDao.getRatingsComments(toolContentId, criteria, 
+	List<Object[]> rawData = peerreviewUserDao.getRatingsComments(toolContentId, toolSessionId, criteria, 
 		currentUserId, null, null, sorting, getByUser, ratingService);
 
 	for ( Object[] raw : rawData ) {
@@ -388,10 +390,10 @@ public class PeerreviewServiceImpl
     }
 
     @Override
-    public JSONArray getUsersRatingsCommentsByCriteriaIdJSON(Long toolContentId, RatingCriteria criteria, Long currentUserId, 
+    public JSONArray getUsersRatingsCommentsByCriteriaIdJSON(Long toolContentId, Long toolSessionId, RatingCriteria criteria, Long currentUserId, 
 	    Integer page, Integer size, int sorting, boolean getAllUsers, boolean getByUser, boolean needRatesPerUser) throws JSONException {
 
-	List<Object[]> rawData = peerreviewUserDao.getRatingsComments(toolContentId, criteria, 
+	List<Object[]> rawData = peerreviewUserDao.getRatingsComments(toolContentId, toolSessionId, criteria, 
 		currentUserId, page, size, sorting, getByUser, ratingService);
 	
 	for ( Object[] raw : rawData ) {
@@ -402,6 +404,39 @@ public class PeerreviewServiceImpl
 	// if !getByUser -> is get current user's ratings from other users -> 
 	// convertToStyledJSON.getAllUsers needs to be true otherwise current user (the only one in the set!) is dropped
 	return ratingService.convertToStyledJSON(criteria, currentUserId, !getByUser || getAllUsers, rawData, needRatesPerUser);
+    }
+
+    @Override
+    public List<Object[]> getDetailedRatingsComments(Long toolContentId, Long toolSessionId, Long criteriaId, Long itemId ) {
+	NumberFormat numberFormat = NumberFormat.getInstance(Locale.US);
+	numberFormat.setMaximumFractionDigits(1);
+	    
+	// raw data: user_id, comment, rating, first_name, last_name 
+	List<Object[]> rawData = peerreviewUserDao.getDetailedRatingsComments( toolContentId,  toolSessionId,  criteriaId,  itemId );
+	for ( Object[] raw : rawData ) {
+	    raw[2] = ( raw[2] == null ? null : numberFormat.format((Float) raw[2])); // format rating
+	    // format name
+	    StringBuilder description = new StringBuilder((String)raw[3] ).append(" ").append((String)raw[4]);	    
+	    raw[4] = (Object) StringEscapeUtils.escapeCsv(description.toString());
+	    
+	}
+	return rawData;
+    }
+    
+    @Override
+    public List<Object[]> getCommentsCounts(Long toolContentId, Long toolSessionId, RatingCriteria criteria,
+	    Integer page, Integer size, int sorting) {
+	
+	List<Object[]> rawData = peerreviewUserDao.getCommentsCounts(toolContentId, toolSessionId, criteria, 
+		page, size, sorting);
+	
+	// raw data: user_id, comment_count, first_name, last_name 
+	for ( Object[] raw : rawData ) {
+	    StringBuilder description = new StringBuilder((String)raw[2] ).append(" ").append((String)raw[3]);	    
+	    raw[3] = (Object) StringEscapeUtils.escapeCsv(description.toString());
+	}
+	
+	return rawData;
     }
 
     

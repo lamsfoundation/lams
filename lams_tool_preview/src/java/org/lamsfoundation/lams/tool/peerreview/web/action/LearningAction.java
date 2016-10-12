@@ -121,11 +121,6 @@ public class LearningAction extends Action {
 	if (param.equals("submitReflection")) {
 	    return submitReflection(mapping, form, request, response);
 	}
-
-	
-	if (param.equals("getUsersMonitoring")) {
-	    return getUsersMonitoring(mapping, form, request, response);
-	}
 	
 	return mapping.findForward(PeerreviewConstants.ERROR);
     }
@@ -311,8 +306,7 @@ public class LearningAction extends Action {
 	if (!user.isSessionFinished()) {
 	    // mark user as finished if there are not any criterias or we have processed the last one.
 	    List<RatingCriteria> criterias = service.getCriteriasByToolContentId(peerreview.getContentId());
-	    sessionMap.put("numCriteria", criterias.size());
-
+	    
 	    if (criterias.size() > 0) {
 		if (currentCriteria == null) {
 		    // get the first one
@@ -341,12 +335,23 @@ public class LearningAction extends Action {
 		    }
 
 		}
-
 	    }
 
 	    if (newCriteria == null) {
 		user.setSessionFinished(true);
 		service.createUser(user);
+	    } else {
+		// work out the step details.
+		int numCriteria = criterias.size();
+		request.setAttribute("numCriteria", numCriteria);
+		
+		int stepNum=1;
+		for (RatingCriteria toCheck : criterias) {
+		    if ( newCriteria.getRatingCriteriaId() == toCheck.getRatingCriteriaId() )
+			break;
+		    stepNum++;
+		}
+		request.setAttribute("stepNumber", stepNum);
 	    }
 
 	}
@@ -411,9 +416,9 @@ public class LearningAction extends Action {
 	    int sorting = PeerreviewConstants.SORT_BY_AVERAGE_RESULT_DESC;
 	    if (criteria.isRankingStyleRating())
 		sorting = PeerreviewConstants.SORT_BY_AVERAGE_RESULT_ASC;
-	    allUsersDtos.add(service.getUsersRatingsCommentsByCriteriaIdDTO(peerreview.getContentId(), criteria,
+	    allUsersDtos.add(service.getUsersRatingsCommentsByCriteriaIdDTO(peerreview.getContentId(), sessionId, criteria,
 		    user.getUserId(), false, sorting, showAllUsers, true));
-	    currentUserDtos.add(service.getUsersRatingsCommentsByCriteriaIdDTO(peerreview.getContentId(), criteria,
+	    currentUserDtos.add(service.getUsersRatingsCommentsByCriteriaIdDTO(peerreview.getContentId(), sessionId, criteria,
 		    user.getUserId(), false, sorting, showAllUsers, false));
 
 	}
@@ -431,116 +436,7 @@ public class LearningAction extends Action {
 	return mapping.findForward(PeerreviewConstants.SUCCESS);
     }
 
-    /**
-     * Refreshes user list. TODO remove once monitoring is done.
-     */
-    public ActionForward getUsersMonitoring(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse res) throws IOException, ServletException, JSONException {
-	IPeerreviewService service = getPeerreviewService();
 
-	// get back SessionMap
-	String sessionMapID = request.getParameter(PeerreviewConstants.ATTR_SESSION_MAP_ID);
-	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
-		.getAttribute(sessionMapID);
-	Peerreview peerreview = (Peerreview) sessionMap.get(PeerreviewConstants.ATTR_PEERREVIEW);
-
-	Long toolContentId = WebUtil.readLongParam(request, "toolContentId");
-	Long toolSessionId = WebUtil.readLongParam(request, "toolSessionId");
-
-	// in case of monitoring we show all results. in case of learning - don't show results from the current user
-	boolean isMonitoring = WebUtil.readBooleanParam(request, "isMonitoring", false);
-	Long userId = isMonitoring ? -1 : WebUtil.readLongParam(request, "userId");
-
-	// paging parameters of tablesorter
-	int size = WebUtil.readIntParam(request, "size");
-	int page = WebUtil.readIntParam(request, "page");
-	Integer isSort1 = WebUtil.readIntParam(request, "column[0]", true);
-
-	int sorting = PeerreviewConstants.SORT_BY_NO;
-	if (isSort1 != null && isSort1.equals(0)) {
-	    sorting = PeerreviewConstants.SORT_BY_USERNAME_ASC;
-	} else if (isSort1 != null && isSort1.equals(1)) {
-	    sorting = PeerreviewConstants.SORT_BY_USERNAME_DESC;
-	}
-
-	List<PeerreviewUser> users = service.getUsersForTablesorter(toolSessionId, userId, page, size, sorting);
-
-	JSONObject responcedata = new JSONObject();
-	JSONArray rows = new JSONArray();
-
-	responcedata.put("total_rows", service.getCountUsersBySession(toolSessionId, userId));
-
-	// handle rating criterias
-	List<ItemRatingDTO> itemRatingDtos = null;
-	if (!users.isEmpty()) {
-	    // create itemIds list
-	    List<Long> itemIds = new LinkedList<Long>();
-	    for (PeerreviewUser user : users) {
-		itemIds.add(user.getUserId());
-	    }
-
-	    // all comments required only for monitoring
-	    boolean isCommentsByOtherUsersRequired = isMonitoring;
-	    boolean isCountUsersRatedEachItem = peerreview.getMaximumRatesPerUser() != 0;
-	    itemRatingDtos = service.getRatingCriteriaDtos(toolContentId, itemIds, isCommentsByOtherUsersRequired,
-		    userId, isCountUsersRatedEachItem);
-
-	    // store how many items are rated
-	    int countRatedQuestions = service.getCountItemsRatedByUser(toolContentId, userId.intValue());
-	    responcedata.put(AttributeNames.ATTR_COUNT_RATED_ITEMS, countRatedQuestions);
-	}
-
-	for (PeerreviewUser user : users) {
-
-	    JSONObject userRow = new JSONObject();
-	    userRow.put("userId", user.getUserId().toString());
-	    userRow.put("userName", StringEscapeUtils.escapeCsv(user.getFirstName() + " " + user.getLastName()));
-
-	    // find corresponding itemRatingDto
-	    ItemRatingDTO itemRatingDto = null;
-	    for (ItemRatingDTO itemRatingDtoIter : itemRatingDtos) {
-		if (user.getUserId().equals(itemRatingDtoIter.getItemId())) {
-		    itemRatingDto = itemRatingDtoIter;
-		    break;
-		}
-	    }
-	    userRow.put("ratesPerUser", itemRatingDto.getCountUsersRatedEachItem());
-
-	    JSONArray criteriasRows = new JSONArray();
-	    for (ItemRatingCriteriaDTO criteriaDto : itemRatingDto.getCriteriaDtos()) {
-		JSONObject criteriasRow = new JSONObject();
-		criteriasRow.put("ratingCriteriaId", criteriaDto.getRatingCriteria().getRatingCriteriaId());
-		criteriasRow.put("title", StringEscapeUtils.escapeHtml(criteriaDto.getRatingCriteria().getTitle()));
-		criteriasRow.put("averageRating", criteriaDto.getAverageRating());
-		criteriasRow.put("numberOfVotes", criteriaDto.getNumberOfVotes());
-		criteriasRow.put("userRating", criteriaDto.getUserRating());
-		criteriasRow.put("ratingStyle", criteriaDto.getRatingCriteria().getRatingStyle());
-
-		criteriasRows.put(criteriasRow);
-	    }
-	    userRow.put("criteriaDtos", criteriasRows);
-
-	    // handle comments
-	    userRow.put("commentsCriteriaId", itemRatingDto.getCommentsCriteriaId());
-	    String commentPostedByUser = itemRatingDto.getCommentPostedByUser() == null ? ""
-		    : itemRatingDto.getCommentPostedByUser().getComment();
-	    userRow.put("commentPostedByUser", StringEscapeUtils.escapeCsv(commentPostedByUser));
-	    if (itemRatingDto.getCommentDtos() != null) {
-		JSONArray comments = new JSONArray();
-		for (RatingCommentDTO commentDto : itemRatingDto.getCommentDtos()) {
-		    comments.put(StringEscapeUtils.escapeCsv(commentDto.getComment()));
-		}
-		userRow.put("comments", comments);
-	    }
-
-	    rows.put(userRow);
-	}
-	responcedata.put("rows", rows);
-
-	res.setContentType("application/json;charset=utf-8");
-	res.getWriter().print(new String(responcedata.toString()));
-	return null;
-    }
     /**
      * Gets a paged set of data for stars or comments. These are directly saved to the database, not through
      * LearnerAction like Ranking and Hedging. 
@@ -559,9 +455,7 @@ public class LearningAction extends Action {
 	Long toolContentId = WebUtil.readLongParam(request, "toolContentId");
 	Long toolSessionId = WebUtil.readLongParam(request, "toolSessionId");
 
-	// in case of monitoring we show all results. in case of learning - don't show results from the current user
-	boolean isMonitoring = WebUtil.readBooleanParam(request, "isMonitoring", false);
-	Long userId = isMonitoring ? -1 : WebUtil.readLongParam(request, "userId");
+	Long userId = WebUtil.readLongParam(request, "userId");
 
 	// paging parameters of tablesorter
 	int size = WebUtil.readIntParam(request, "size");
@@ -580,10 +474,9 @@ public class LearningAction extends Action {
 	
 	JSONObject responsedata = new JSONObject();
 	responsedata.put("total_rows", service.getCountUsersBySession(toolSessionId, userId));
-	responsedata.put("rows", service.getUsersRatingsCommentsByCriteriaIdJSON(toolContentId, criteria, userId, 
+	responsedata.put("rows", service.getUsersRatingsCommentsByCriteriaIdJSON(toolContentId, toolSessionId, criteria, userId, 
 		page, size, sorting, peerreview.isSelfReview(), true, peerreview.getMaximumRatesPerUser() > 0 ));	
 	    
-	// store how many items are rated - not correct at present. 
 	int countRatedQuestions = service.getCountItemsRatedByUser(toolContentId, userId.intValue());
 	responsedata.put(AttributeNames.ATTR_COUNT_RATED_ITEMS, countRatedQuestions);
 
@@ -640,7 +533,7 @@ public class LearningAction extends Action {
 
 	Long userId = ( mode != null && mode.isTeacher() ) ? -1 : user.getUserId();
 
-	StyledCriteriaRatingDTO dto = service.getUsersRatingsCommentsByCriteriaIdDTO(toolContentId, criteria, userId, 
+	StyledCriteriaRatingDTO dto = service.getUsersRatingsCommentsByCriteriaIdDTO(toolContentId, toolSessionId, criteria, userId, 
 		(criteria.isCommentRating() || criteria.isStarStyleRating()), PeerreviewConstants.SORT_BY_USERNAME_ASC, 
 		peerreview.isSelfReview(), true );
 	

@@ -148,7 +148,7 @@ When true, hides the names and groups the comments.  -->
 </c:when> 
  			 
 <c:when test="${criteriaRatings.ratingCriteria.ratingStyle == 2}">
-	Average Rankings: <c:if test="${not currentUserDisplay}">(Your rankings shown in brackets after name)</c:if>
+	<fmt:message key="label.learning.average.rankings"/>&nbsp;<c:if test="${not currentUserDisplay}"><fmt:message key="label.learning.your.rankings.shown.in.brackets"/></c:if>
 	<ul class="list-group">
 	<c:forEach var="rating" items="${criteriaRatings.ratingDtos}">
 		<c:if test="${alwaysShowAverage || not empty rating.averageRating }">
@@ -169,7 +169,7 @@ When true, hides the names and groups the comments.  -->
 </c:when> 
 
 <c:when test="${criteriaRatings.ratingCriteria.ratingStyle == 3}">
-	Average Marks for Hedging: <c:if test="${not currentUserDisplay}">(Your marks shown in brackets after name)</c:if>
+	<fmt:message key="label.learning.average.marks"/>&nbsp;<c:if test="${not currentUserDisplay}"><fmt:message key="label.learning.your.marks.shown.in.brackets"/></c:if>
 	<ul class="list-group">
  	<c:forEach var="rating" items="${criteriaRatings.ratingDtos}">
 		<c:if test="${alwaysShowAverage || not empty rating.averageRating }">
@@ -188,7 +188,7 @@ When true, hides the names and groups the comments.  -->
   	</c:forEach>
  	</ul>
  	<c:if test="${showJustification && criteriaRatings.ratingCriteria.commentsEnabled}">
-	Your justification:
+	<fmt:message key="label.learning.your.justification"/>&nbsp;
 	<div class="rating-comment"><c:out value="${criteriaRatings.justificationComment}" escapeXml="false"/></div>
 	</c:if>
 </c:when> 

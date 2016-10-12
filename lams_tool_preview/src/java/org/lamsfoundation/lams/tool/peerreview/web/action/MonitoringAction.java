@@ -25,8 +25,8 @@
 package org.lamsfoundation.lams.tool.peerreview.web.action;
 
 import java.io.IOException;
+import java.math.BigInteger;
 import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.List;
 
 import javax.servlet.ServletException;
@@ -46,6 +46,9 @@ import org.lamsfoundation.lams.rating.dto.ItemRatingCriteriaDTO;
 import org.lamsfoundation.lams.rating.dto.ItemRatingDTO;
 import org.lamsfoundation.lams.rating.dto.RatingCommentDTO;
 import org.lamsfoundation.lams.rating.dto.RatingDTO;
+import org.lamsfoundation.lams.rating.dto.StyledCriteriaRatingDTO;
+import org.lamsfoundation.lams.rating.dto.StyledRatingDTO;
+import org.lamsfoundation.lams.rating.model.RatingCriteria;
 import org.lamsfoundation.lams.tool.peerreview.PeerreviewConstants;
 import org.lamsfoundation.lams.tool.peerreview.dto.GroupSummary;
 import org.lamsfoundation.lams.tool.peerreview.dto.ReflectDTO;
@@ -70,6 +73,9 @@ public class MonitoringAction extends Action {
 
 	if (param.equals("summary")) {
 	    return summary(mapping, form, request, response);
+	}
+	if (param.equals("criteria")) {
+	    return criteria(mapping, form, request, response);
 	}
 	if (param.equals("getUsers")) {
 	    return getUsers(mapping, form, request, response);
@@ -117,6 +123,38 @@ public class MonitoringAction extends Action {
 	sessionMap.put(PeerreviewConstants.ATTR_PEERREVIEW, peerreview);
 	sessionMap.put(PeerreviewConstants.ATTR_TOOL_CONTENT_ID, contentId);
 	sessionMap.put(PeerreviewConstants.ATTR_IS_GROUPED_ACTIVITY, service.isGroupedActivity(contentId));
+	
+	List<RatingCriteria> criterias = service.getRatingCriterias(contentId);
+	request.setAttribute(PeerreviewConstants.ATTR_CRITERIAS, criterias);
+	return mapping.findForward(PeerreviewConstants.SUCCESS);
+    }
+
+//    private void setupRankHedgeData(HttpServletRequest request, Long contentId, IPeerreviewService service, RatingCriteria criteria) {
+//	int sorting = criteria.isHedgeStyleRating() ? PeerreviewConstants.SORT_BY_AVERAGE_RESULT_DESC : (criteria
+//		.isRankingStyleRating() ? PeerreviewConstants.SORT_BY_AVERAGE_RESULT_ASC
+//		: PeerreviewConstants.SORT_BY_USERNAME_ASC);
+//	StyledCriteriaRatingDTO dto = service.getUsersRatingsCommentsByCriteriaIdDTO(contentId, criteria, -1L,
+//		false, sorting, true, true);
+//	request.setAttribute("criteriaRatings", dto);
+//    }
+
+    private ActionForward criteria(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+	    HttpServletResponse response) {
+
+	String sessionMapID = request.getParameter(PeerreviewConstants.ATTR_SESSION_MAP_ID);
+	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
+		.getAttribute(sessionMapID);
+	request.setAttribute(PeerreviewConstants.ATTR_SESSION_MAP_ID, sessionMap.getSessionID());
+
+	Long contentId = (Long) sessionMap.get(PeerreviewConstants.ATTR_TOOL_CONTENT_ID);
+	Long toolSessionId = WebUtil.readLongParam(request, "toolSessionId");
+
+	IPeerreviewService service = getPeerreviewService();
+	Long criteriaId = WebUtil.readLongParam(request, "criteriaId");
+	RatingCriteria criteria = service.getCriteriaByCriteriaId(criteriaId);
+
+	request.setAttribute("criteria", criteria);
+	request.setAttribute("toolSessionId", toolSessionId);
 	return mapping.findForward(PeerreviewConstants.SUCCESS);
     }
 
@@ -129,6 +167,9 @@ public class MonitoringAction extends Action {
 
 	Long toolContentId = WebUtil.readLongParam(request, "toolContentId");
 	Long toolSessionId = WebUtil.readLongParam(request, "toolSessionId");
+	Long criteriaId = WebUtil.readLongParam(request, "criteriaId");
+
+	RatingCriteria criteria = service.getCriteriaByCriteriaId(criteriaId);
 
 	// Getting the params passed in from the jqGrid
 	int page = WebUtil.readIntParam(request, PeerreviewConstants.PARAM_PAGE) - 1;
@@ -136,88 +177,96 @@ public class MonitoringAction extends Action {
 	String sortOrder = WebUtil.readStrParam(request, PeerreviewConstants.PARAM_SORD);
 	String sortBy = WebUtil.readStrParam(request, PeerreviewConstants.PARAM_SIDX, true);
 
-	int sorting = PeerreviewConstants.SORT_BY_NO;
-	if (sortBy != null && sortBy.equals(PeerreviewConstants.PARAM_ROW_NAME)) {
+	int sorting = PeerreviewConstants.SORT_BY_AVERAGE_RESULT_DESC;
+	if ( criteria.isRankingStyleRating() )
+	    sorting = PeerreviewConstants.SORT_BY_AVERAGE_RESULT_ASC;
+	else if ( criteria.isCommentRating() )
+	    sorting = PeerreviewConstants.SORT_BY_USERNAME_ASC;
+	    
+	if (sortBy != null && sortBy.equals(PeerreviewConstants.PARAM_SORT_NAME)) {
 	    if (sortOrder != null && sortOrder.equals(PeerreviewConstants.SORT_DESC)) {
 		sorting = PeerreviewConstants.SORT_BY_USERNAME_DESC;
 	    } else {
 		sorting = PeerreviewConstants.SORT_BY_USERNAME_ASC;
 	    }
+	} else if (sortBy != null && sortBy.equals(PeerreviewConstants.PARAM_SORT_RATING)) {
+	    if (sortOrder != null && sortOrder.equals(PeerreviewConstants.SORT_DESC)) {
+		sorting = PeerreviewConstants.SORT_BY_AVERAGE_RESULT_DESC;
+	    } else {
+		sorting = PeerreviewConstants.SORT_BY_AVERAGE_RESULT_ASC;
+	    }
 	}
 
 	// in case of monitoring we show all results. in case of learning - don't show results from the current user
-	Long userId = -1L;
-	List<PeerreviewUser> users = service.getUsersForTablesorter(toolSessionId, userId, page, size, sorting);
-
+	Long dummyUserId = -1L;
+	
 	JSONObject responcedata = new JSONObject();
-	JSONArray rows = new JSONArray();
 
 	responcedata.put("page", page + 1);
-	responcedata.put("total", Math.ceil((float) service.getCountUsersBySession(toolSessionId, userId) / size));
-	responcedata.put("records", service.getCountUsersBySession(toolSessionId, userId));
+	responcedata.put("total", Math.ceil((float) service.getCountUsersBySession(toolSessionId, dummyUserId) / size));
+	responcedata.put("records", service.getCountUsersBySession(toolSessionId, dummyUserId));
 
-	// handle rating criterias
-	List<ItemRatingDTO> itemRatingDtos = null;
-	if (!users.isEmpty()) {
-	    // create itemIds list
-	    List<Long> itemIds = new LinkedList<Long>();
-	    for (PeerreviewUser user : users) {
-		itemIds.add(user.getUserId());
-	    }
+	JSONArray rows = new JSONArray();
 
-	    boolean isCommentsByOtherUsersRequired = false;
-	    itemRatingDtos = service.getRatingCriteriaDtos(toolContentId, itemIds, isCommentsByOtherUsersRequired,
-		    userId);
-	}
+	if (criteria.isCommentRating()) {
+	    // special db lookup just for this - gets the user's & how many comments left for them
+	    List<Object[]> rawRows = service.getCommentsCounts(toolContentId, toolSessionId, criteria, page, size,
+		    sorting);
 
-	for (PeerreviewUser user : users) {
-	    JSONArray rowData = new JSONArray();
-	    rowData.put(toolSessionId);
-	    rowData.put(user.getUserId());
-	    rowData.put(StringEscapeUtils.escapeHtml(user.getFirstName()) + " "
-		    + StringEscapeUtils.escapeHtml(user.getLastName()));
+	    for (int i = 0; i < rawRows.size(); i++) {
+		Object[] rawRow = rawRows.get(i);
+		JSONObject cell = new JSONObject();
+		cell.put("itemId", rawRow[0]);
+		cell.put("itemDescription", rawRow[3]);
 
-	    // find corresponding itemRatingDto
-	    ItemRatingDTO itemRatingDto = null;
-	    for (ItemRatingDTO itemRatingDtoIter : itemRatingDtos) {
-		if (user.getUserId().equals(itemRatingDtoIter.getItemId())) {
-		    itemRatingDto = itemRatingDtoIter;
-		    break;
+		Number numCommentsNumber = (Number) rawRow[1];
+		int numComments = numCommentsNumber != null ? numCommentsNumber.intValue() : 0;
+		if (numComments > 0) {
+		    cell.put("rating", service.getLocalisedMessage("label.monitoring.num.of.comments", new Object[] { numComments }));
+		} else {
+		    cell.put("rating", "");
 		}
+
+		JSONObject row = new JSONObject();
+		row.put("id", "" + rawRow[0]);
+		row.put("cell", cell);
+		rows.put(row);
 	    }
+	} else {
+	    // all other styles can use the "normal" routine and munge the JSON to suit jqgrid
+	    JSONArray rawRows = service.getUsersRatingsCommentsByCriteriaIdJSON(toolContentId, toolSessionId, criteria,
+		    dummyUserId, page, size, sorting, true, true, false);
 
-	    String criteriasString = "<div class='rating-stars-holder'>";
-	    for (ItemRatingCriteriaDTO criteriaDto : itemRatingDto.getCriteriaDtos()) {
-		Long ratingCriteriaId = criteriaDto.getRatingCriteria().getRatingCriteriaId();
-		String title = StringEscapeUtils.escapeHtml(criteriaDto.getRatingCriteria().getTitle());
-		String averageRating = criteriaDto.getAverageRating();
-		String numberOfVotes = criteriaDto.getNumberOfVotes();
+	    for (int i = 0; i < rawRows.length(); i++) {
 
-		criteriasString += "<b>";
-		criteriasString += title;
-		criteriasString += "</b>";
+		JSONObject rawRow = rawRows.getJSONObject(i);
 
-		criteriasString += "<div class='rating-stars-disabled rating-stars-new' data-average='" + averageRating
-			+ "' data-id='" + ratingCriteriaId + "'>";
-		criteriasString += "</div>";
+		String averageRating = (String) rawRow.get("averageRating");
+		Object numberOfVotes = rawRow.get("numberOfVotes");
 
-		criteriasString += "<div class='rating-stars-caption' id='rating-stars-caption-" + ratingCriteriaId
-			+ "' >";
-		String msg = service.getLocalisedMessage("label.average.rating",
-			new Object[] { averageRating, numberOfVotes });
-		criteriasString += msg;
-		criteriasString += "</div>";
+		if (averageRating == null || averageRating.length() == 0) {
+		    rawRow.put("rating", "");
+		} else if (criteria.isStarStyleRating()) {
+		    String starString = "<div class='rating-stars-holder'>";
+		    starString += "<div class='rating-stars-disabled rating-stars-new' data-average='" + averageRating
+			    + "' data-id='" + criteriaId + "'>";
+		    starString += "</div>";
+		    starString += "<div class='rating-stars-caption' id='rating-stars-caption-" + criteriaId + "' >";
+		    String msg = service.getLocalisedMessage("label.average.rating", new Object[] { averageRating,
+			    numberOfVotes });
+		    starString += msg;
+		    starString += "</div>";
+		    rawRow.put("rating", starString);
+		} else {
+		    rawRow.put("rating", averageRating);
+		}
 
+		JSONObject row = new JSONObject();
+		row.put("id", "" + rawRow.get("itemId"));
+		row.put("cell", rawRow);
+		rows.put(row);
 	    }
-	    criteriasString += "</div>";
-	    rowData.put(criteriasString);
-
-	    JSONObject row = new JSONObject();
-	    row.put("id", "" + user.getUserId());
-	    row.put("cell", rowData);
-	    rows.put(row);
 	}
-
 	responcedata.put("rows", rows);
 
 	res.setContentType("application/json;charset=utf-8");
@@ -229,56 +278,60 @@ public class MonitoringAction extends Action {
 	    HttpServletResponse response) throws JSONException, IOException {
 	IPeerreviewService service = getPeerreviewService();
 	String sessionMapID = request.getParameter(PeerreviewConstants.ATTR_SESSION_MAP_ID);
-	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
-		.getAttribute(sessionMapID);
-	HashMap<Long, String> userNameMap = (HashMap<Long, String>) sessionMap.get("userNameMap");
 
-	Long userId = WebUtil.readLongParam(request, AttributeNames.PARAM_USER_ID);
-	Long contentId = (Long) sessionMap.get(PeerreviewConstants.ATTR_TOOL_CONTENT_ID);
+	Long itemId = WebUtil.readLongParam(request, "itemId");
+	Long toolContentId = WebUtil.readLongParam(request, "toolContentId");
+	Long toolSessionId = WebUtil.readLongParam(request, "toolSessionId");
+	Long criteriaId = WebUtil.readLongParam(request, "criteriaId");
 
 	// ratings left by others for this user
-	ItemRatingDTO userRatingDto = service.getRatingCriteriaDtoWithActualRatings(contentId, userId);
-
+	List<Object[]> ratings = service.getDetailedRatingsComments(toolContentId, toolSessionId, criteriaId, itemId );
+	RatingCriteria criteria = service.getCriteriaByCriteriaId(criteriaId);
+	String title = StringEscapeUtils.escapeHtml(criteria.getTitle());
+	
+	// processed data from db is userId, comment, rating, first_name, escaped( firstname + last_name)
+	// if no rating or comment, then the entries will be null and not an empty string
 	JSONArray rows = new JSONArray();
 	int i = 0;
-	for (ItemRatingCriteriaDTO criteriaDto : userRatingDto.getCriteriaDtos()) {
+	
+	for (Object[] ratingDetails : ratings) {
+	    if ( ratingDetails[2] != null ) {
+   		JSONArray userData = new JSONArray();
+    		userData.put(i);
+    		userData.put(ratingDetails[4]);
+    		userData.put(ratingDetails[2]);
+    		userData.put(title);
 
-	    for (RatingDTO ratingDto : criteriaDto.getRatingDtos()) {
-		JSONArray userData = new JSONArray();
-		userData.put(i);
-		String userName = StringEscapeUtils
-			.escapeHtml(ratingDto.getLearner().getFirstName() + " " + ratingDto.getLearner().getLastName());
-		userData.put(userName);
-		userData.put(ratingDto.getRating());
-		String title = StringEscapeUtils.escapeHtml(criteriaDto.getRatingCriteria().getTitle());
-		userData.put(title);
-
-		JSONObject userRow = new JSONObject();
-		userRow.put("id", i++);
-		userRow.put("cell", userData);
-
-		rows.put(userRow);
+    		JSONObject userRow = new JSONObject();
+    		userRow.put("id", i++);
+    		userRow.put("cell", userData);
+    
+    		rows.put(userRow);
 	    }
 	}
 
-	// if comments are enabled display them too
-	if (userRatingDto.isCommentsEnabled()) {
-	    for (RatingCommentDTO commentDto : userRatingDto.getCommentDtos()) {
-		JSONArray userData = new JSONArray();
-		userData.put(i);
-		String userName = StringEscapeUtils.escapeHtml(userNameMap.get(commentDto.getUserId()));
-		userData.put(userName);
-		userData.put(StringEscapeUtils.escapeHtml(commentDto.getComment()));
-		userData.put("Comments");
+	if ( criteria.isCommentsEnabled() ) {
+	    for (Object[] ratingDetails : ratings) {
 
-		JSONObject userRow = new JSONObject();
-		userRow.put("id", i++);
-		userRow.put("cell", userData);
+		// Show comment if comment has been left by user. Exclude the special case where it is a hedging rating
+		//  and the rating is not null - otherwise we end up putting the justification comment against entries that were not rated.
+		String comment = (String) ratingDetails[1];
+		if ( comment != null && ( ! criteria.isHedgeStyleRating() || ( criteria.isHedgeStyleRating() && ratingDetails[2] != null ) ) ) {
+		    JSONArray userData = new JSONArray();
+		    userData.put(i);
+		    userData.put(ratingDetails[4]);
+		    userData.put(StringEscapeUtils.escapeHtml(comment));
+		    userData.put("Comments");
 
-		rows.put(userRow);
+		    JSONObject userRow = new JSONObject();
+		    userRow.put("id", i++);
+		    userRow.put("cell", userData);
+
+		    rows.put(userRow); 
+		}
 	    }
 	}
-
+	
 	JSONObject responseJSON = new JSONObject();
 	responseJSON.put("total", 1);
 	responseJSON.put("page", 1);

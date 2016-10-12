@@ -47,9 +47,14 @@ public interface PeerreviewUserDAO extends DAO {
     List<PeerreviewUser> getUsersForTablesorter(final Long toolSessionId, final Long excludeUserId, int page, int size,
 	    int sorting);
     
-    List<Object[]> getRatingsComments(Long toolContentId, RatingCriteria criteria, Long userId, Integer page,
+    List<Object[]> getRatingsComments(Long toolContentId, Long toolSessionId, RatingCriteria criteria, Long userId, Integer page,
 	    Integer size, int sorting, boolean getByUser, IRatingService coreRatingService);
-	    
+	
+    List<Object[]> getCommentsCounts(Long toolContentId, Long toolSessionId, RatingCriteria criteria,
+	    Integer page, Integer size, int sorting);
+	
+    List<Object[]> getDetailedRatingsComments(Long toolContentId, Long toolSessionId, Long criteriaId, Long itemId );
+    
     int getCountUsersBySession(Long toolSessionId);
 
     int createUsersForSession(PeerreviewSession session);

@@ -14,7 +14,6 @@
 <c:set var="isStar" value="<%=RatingCriteria.RATING_STYLE_STAR%>"/>
 <c:set var="isRanking" value="<%=RatingCriteria.RATING_STYLE_RANKING%>"/>
 <c:set var="isHedging" value="<%=RatingCriteria.RATING_STYLE_HEDGING%>"/>
-<c:set var="numCriteria"  value="${sessionMap.numCriteria}" />
 
 <c:choose>
 	<c:when test="${peerreview.showRatingsLeftForUser || peerreview.reflectOnActivity}">
@@ -99,7 +98,9 @@
 
 		<div class="panel">
 			<p><c:out value="${peerreview.instructions}" escapeXml="false"/><p>
-			<p><fmt:message key="label.step"><fmt:param>${criteriaRatings.ratingCriteria.orderId}</fmt:param><fmt:param>${numCriteria}</fmt:param></fmt:message></p>
+			<c:if test="${numCriteria > 1}">
+				<p><fmt:message key="label.step"><fmt:param>${stepNumber}</fmt:param><fmt:param>${numCriteria}</fmt:param></fmt:message></p>
+			</c:if>
 		</div>
 			
 		<div class="panel">
@@ -147,7 +148,7 @@
 			<span id="prevButton" class="btn btn-default" onclick="javascript:${method}(false);"><fmt:message key="label.previous"/></span>
 		</c:if>
 		<c:choose>
-			<c:when test="${criteriaRatings.ratingCriteria.orderId == numCriteria}">
+			<c:when test="${stepNumber == numCriteria}">
 				<span id="finishButton" class="btn btn-primary" onclick="javascript:${method}(true);">${finishButtonLabel}</span>
 			</c:when>
 			<c:otherwise>

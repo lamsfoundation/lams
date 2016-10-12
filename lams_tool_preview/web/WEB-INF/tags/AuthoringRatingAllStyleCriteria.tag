@@ -177,7 +177,6 @@
 			var currentRow = $(this).closest('tr');
 			currentRow.remove();
 			reactivateArrows();
-			renumberOrderIds();
 		});
 	
 		 //addCriteria
@@ -187,26 +186,10 @@
 	  	 
 	})
 
-	function renumberOrderIds() {
-		$('#add-criteria').hide();
-		var newOrderId = 1;
-		$('#criterias-table tr').each(function() {
-		    $this = $(this); // cache $(this)
-			var currentRow = $(this).closest('tr');
-			var currentCriteriaTd = $( ".criteria-info", currentRow);
-			var currentOrderId = $( "input[name^='criteriaOrderId']", currentCriteriaTd);
-			currentOrderId.val(newOrderId++);
-		    if ($this.is(':last-child')) {
-		    	$('#add-criteria').show();			
-		    	maxOrderId=newOrderId-1;
-		    }
-		});
-	}
-	
 	function addCriteria() {
+		debugger;
 		var styleDropDown = document.getElementById("ratingStyle");
 		var style = styleDropDown.options[styleDropDown.selectedIndex].value;
-		//increase maxOrderId by 1
 		maxOrderId++;
 		$("#criteria-max-order-id").val(maxOrderId);
 		addRow(maxOrderId, style, '', '', false, 0, 0, 0);

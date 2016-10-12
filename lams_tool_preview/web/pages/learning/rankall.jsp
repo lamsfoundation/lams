@@ -116,7 +116,6 @@
 			<span class="alert"><fmt:message key="error.assign.rankAll"/></span><br/>
 		</c:if>
 		<span id="instructions"><strong><fmt:message key="label.assign.rankAll">
-			<fmt:param>${criteriaRatings.ratingCriteria.maxRating}</fmt:param>
 			</fmt:message></strong>
 		</span>
 

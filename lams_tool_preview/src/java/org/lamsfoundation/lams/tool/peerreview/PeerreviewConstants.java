@@ -64,7 +64,8 @@ public class PeerreviewConstants {
     public static final String PARAM_SEARCH_FIELD = "searchField";
     public static final String PARAM_SEARCH_OPERATION = "searchOper";
     public static final String PARAM_SEARCH_STRING = "searchString";
-    public static final String PARAM_ROW_NAME = "userName";
+    public static final String PARAM_SORT_NAME = "itemDescription";
+    public static final String PARAM_SORT_RATING = "rating";
     public static final String PARAM_TIME_TAKEN = "timeTaken";
     public static final String PARAM_AVG_TIME_TAKEN = "avgTimeTaken";
     public static final String PARAM_AVG_MARK = "avgMark";
@@ -88,6 +89,8 @@ public class PeerreviewConstants {
     public static final String ATTR_TOOL_SESSION_ID = "toolSessionID";
 
     public static final String ATTR_PEERREVIEW = "peerreview";
+
+    public static final String ATTR_CRITERIAS = "criterias";
 
     public static final String ATTR_NEXT_ACTIVITY_URL = "nextActivityUrl";
 
