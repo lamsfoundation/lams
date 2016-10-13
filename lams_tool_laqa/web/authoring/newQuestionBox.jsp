@@ -24,8 +24,8 @@
 	<html:hidden property="editableQuestionIndex" />
 	<html:hidden property="editQuestionBoxRequest" value="${not empty formBean.editableQuestionIndex}" />
 	
-	<lams:CKEditor id="newQuestion" value="${qaGeneralAuthoringDTO.editableQuestionText}"
-				   contentFolderID="${qaGeneralAuthoringDTO.contentFolderID}"/>
+	<lams:CKEditor id="newQuestion" value="${formBean.editableQuestionText}"
+				   contentFolderID="${formBean.contentFolderID}"/>
 
 	<div class="checkbox">
 	    <label>
@@ -44,8 +44,7 @@
 	
 	<div class="form-group">
 	    <label for="feedback"><fmt:message key="label.feedback" /></label>
-	    <html:textarea property="feedback" styleId="feedback" styleClass="form-control" cols="75" rows="3"
-	    			   value="${qaGeneralAuthoringDTO.editableQuestionFeedback}" />
+	    <html:textarea property="feedback" styleId="feedback" styleClass="form-control" cols="75" rows="3" />
 	</div>
 	
 	<div class="voffset5 pull-right">
