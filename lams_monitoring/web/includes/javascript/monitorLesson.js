@@ -22,7 +22,7 @@ var originalSequenceCanvas = null,
 	learnerProgressCurrentPageNumber = 1,
 
 //auto refresh all tabs every 30 seconds
-	autoRefreshInterval = 30 * 1000,
+	autoRefreshInterval = 300 * 1000,
 	autoRefreshIntervalObject = null,
 // when user is doing something, do not auto refresh
 	autoRefreshBlocked = false,
@@ -116,12 +116,14 @@ function initLessonTab(){
 				
 				if (checked) {
 					$('#imAvailableField').attr('disabled', null);
+					$('#imDiv').css('display','inline');
 					alert(LABELS.LESSON_PRESENCE_ENABLE_ALERT);
 				} else {
 					$('#imAvailableField').attr({
 						'checked'  : null,
 						'disabled' : 'disabled'
 					}).change();
+					$('#imDiv').css('display','none');
 					alert(LABELS.LESSON_PRESENCE_DISABLE_ALERT);
 				}
 			}
@@ -143,9 +145,13 @@ function initLessonTab(){
 			success : function() {
 				if (checked) {
 					$('#openImButton').css('display', 'inline');
+					$('#imButton').attr('class','btn btn-xs btn-success voffset10');
+					$('#imDiv').css('display','inline');
 					alert(LABELS.LESSON_IM_ENABLE_ALERT);
 				} else {
 					$('#openImButton').css('display', 'none');
+					$('#imButton').attr('class','btn btn-xs btn-default voffset10');
+					$('#imDiv').css('display','none');
 					alert(LABELS.LESSON_IM_DISABLE_ALERT);
 				}
 			}
@@ -178,6 +184,7 @@ function initLessonTab(){
 		             {
 		            	'text'   : LABELS.CANCEL_BUTTON,
 		            	'id'     : 'classDialogCancelButton',
+		            	'class'  : 'btn btn-sm btn-default', 
 		            	'click'  : function() {
 							$(this).dialog('close');
 						} 
@@ -312,7 +319,7 @@ function changeLessonState(){
 
 
 /**
- * Updates widgets in lesson tab according to respose sent to refreshMonitor()
+ * Updates widgets in lesson tab according to response sent to refreshMonitor()
  */
 function updateLessonTab(){
 	$.ajax({
@@ -328,30 +335,38 @@ function updateLessonTab(){
 			// update lesson state label
 			lessonStateId = +response.lessonStateID;
 			var label = null;
+			var labelColour = 'warning';
 			switch (lessonStateId) {
 				case 1:
 					label = LABELS.LESSON_STATE_CREATED;
+					labelColour = 'warning';
 					break;
 				case 2:
 					label = LABELS.LESSON_STATE_SCHEDULED;
+					labelColour = 'warning';
 					break;
 				case 3:
 					label = LABELS.LESSON_STATE_STARTED;
+					labelColour = 'success';
 					break;
 				case 4:
 					label = LABELS.LESSON_STATE_SUSPENDED;
+					labelColour = 'danger';
 					break;
 				case 5:
 					label = LABELS.LESSON_STATE_FINISHED;
+					labelColour = 'danger';
 					break;
 				case 6:
 					label = LABELS.LESSON_STATE_ARCHIVED;
+					labelColour = 'danger';
 					break;
 				case 7:
 					label = LABELS.LESSON_STATE_REMOVED;
+					labelColour = 'danger'; 
 					break;
 			}
-			$('#lessonStateLabel').text(label);
+			$('#lessonStateLabel').attr('class', 'label label-' + labelColour).html(label + ' <i class="fa fa-angle-double-down"></i>');
 			
 			// update available options in change state dropdown menu
 			var selectField = $('#lessonStateField');
@@ -377,20 +392,26 @@ function updateLessonTab(){
 			}
 			
 			// show/remove widgets for lesson scheduling
-			var scheduleControls = $('#scheduleDatetimeField, #scheduleLessonButton, #startLessonButton');
+			var scheduleControls = $('#scheduleDatetimeField, #scheduleLessonButton, #startLessonButton, #lessonScheduler');
 			var startDateField = $('#lessonStartDateSpan');
+			var lessonStateChanger = $('#lessonStateChanger');
+			var stateLabel = $('#lessonStateLabel');
 			switch (lessonStateId) {
 				 case 1:
 					 scheduleControls.css('display','inline');
 					 startDateField.css('display','none');
+					 lessonStateChanger.css('display','none');
 					 break;
 				 case 2:
 					 scheduleControls.css('display','none');
 					 startDateField.text(response.startDate).add('#startLessonButton').css('display','inline');
+					 lessonStateChanger.css('display','none');
 					 break;
 				default: 			
 					scheduleControls.css('display','none');
-				 	startDateField.text(response.startDate).css('display','inline');
+				 	startDateField.text(response.startDate).css('display','none');
+				 	lessonStateChanger.css('display','inline');
+				 	stateLabel.attr('title',response.startDate);
 				 	break;
 			}
 			
@@ -480,6 +501,8 @@ function closeEmailDialog(){
 function updatePresenceAvailableCount(){
 	var checked = $('#presenceAvailableField').is(':checked'),
 		counter = $('#presenceAvailableCount');
+		presenceButton = $('#presenceButton');
+		presenceCounter = $('#presenceCounter');
 	if (checked) {
 		$.ajax({
 			dataType : 'text',
@@ -491,11 +514,16 @@ function updatePresenceAvailableCount(){
 			},
 			success : function(result) {
 				$('span', counter).text(result);
+				presenceCounter.text(result);
+				presenceButton.attr('class', 'btn btn-xs btn-success');
+				presenceCounter.show();
 				counter.show();
 			}
 		});
 
 	} else {
+		presenceCounter.hide();
+		presenceButton.attr('class', 'btn btn-xs btn-default');
 		counter.hide();
 	}
 }
@@ -514,8 +542,8 @@ function updateContributeActivities(contributeActivities) {
 	if (contributeActivities) {
 		var row = header;
 		$.each(contributeActivities, function(){
-			var cell = $('<td colspan="2" />').addClass('contributeActivityCell').text(this.title);
-			row = $('<tr />').addClass('contributeRow').insertAfter(row).append(cell);
+			var cell = $('<div />').addClass('contributeActivityCell').text(this.title);
+			row = $('<div />').addClass('contributeRow').insertAfter(row).append(cell);
 			
 			$.each(this.contributeEntries, function(){
 				var entryContent = '';
@@ -525,18 +553,18 @@ function updateContributeActivities(contributeActivities) {
 					case 9  : entryContent = LABELS.CONTRIBUTE_BRANCHING; break;
 					case 11 : entryContent = LABELS.CONTRIBUTE_CONTENT_EDITED; break; 
 				}
-				entryContent += '<a href="#" class="button" onClick="javascript:openPopUp(\''
-							 + this.url + '\',\'ContributeActivity\', 600, 800, true)" title="' + LABELS.CONTRIBUTE_TOOLTIP
-							 + '">' + LABELS.CONTRIBUTE_BUTTON + '</a>';
-				cell = $('<td colspan="2" />').addClass('contributeEntryCell').html(entryContent);
-				row = $('<tr />').addClass('contributeRow').insertAfter(row).append(cell);
+				entryContent += '<span class="btn btn-xs btn-primary pull-right" onClick="javascript:openPopUp(\''
+							 + this.url + '\',\'ContributeActivity\', 800, 1280, true)" title="' + LABELS.CONTRIBUTE_TOOLTIP
+							 + '">' + LABELS.CONTRIBUTE_BUTTON + '</span>';
+				cell = $('<div />').addClass('contributeEntryCell').html(entryContent);
+				row = row.append(cell);
 			});
 		});
 	}
 	if ($('.contributeRow').length == 0) {
-		header.hide();
+		$('#requiredTasks').hide();
 	} else {
-		header.show();
+		$('#requiredTasks').show();
 	}
 }
 
@@ -604,7 +632,7 @@ function initSequenceTab(){
 			             {
 			            	'text'   : LABELS.VIEW_LEARNER_BUTTON,
 			            	'id'     : 'learnerGroupDialogViewButton',
-			            	'class'  : 'learnerGroupDialogSelectableButton',
+			            	'class'  : 'learnerGroupDialogSelectableButton btn btn-sm btn-default',
 			            	'click'  : function() {
 			            		var selectedLearner = $('.dialogList div.dialogListItemSelected', this);
 			            		if (selectedLearner.length == 1) {
@@ -616,7 +644,7 @@ function initSequenceTab(){
 			             {
 			            	'text'   : LABELS.EMAIL_BUTTON,
 			            	'id'     : 'learnerGroupDialogEmailButton',
-			            	'class'  : 'learnerGroupDialogSelectableButton',
+			            	'class'  : 'learnerGroupDialogSelectableButton btn btn-sm btn-default',
 			            	'click'  : function() {
 			            		var selectedLearner = $('.dialogList div.dialogListItemSelected', this);
 			            		if (selectedLearner.length == 1) {
@@ -627,6 +655,7 @@ function initSequenceTab(){
 			             {
 			            	'text'   : LABELS.CLOSE_BUTTON,
 			            	'id'     : 'learnerGroupDialogCloseButton',
+			            	'class'  : 'btn btn-sm btn-default',
 			            	'click'  : function() {
 								$(this).dialog('close');
 							} 
@@ -1708,10 +1737,10 @@ function loadLearnerProgressPage(pageNumber, learnersSearchPhrase){
 	if (!learnerProgressCellsTemplate) {
 		// fill the placeholder, after all required variables were initialised
 		learnerProgressCellsTemplate =
-		  '<tr><td class="progressBarLabel" id="progressBarLabel;00;"><div>;11;</div>';
+		  '<tr><td class="active" id="progressBarLabel;00;"><strong>;11;</strong>';
 
 		learnerProgressCellsTemplate +=
-			'<a class="button" href="#" onClick="javascript:showEmailDialog(;00;)">'
+			'<a class="btn btn-xs btn-default pull-right" href="#" onClick="javascript:showEmailDialog(;00;)"><i class="fa fa-envelope-o"></i> '
 		+ LABELS.EMAIL_BUTTON
 		+ '</a></td></tr><tr><td class="progressBarCell" id="progressBar;00;"></td></tr>';
 	}
@@ -2088,7 +2117,7 @@ function sortClassList(role) {
 function colorDialogList(parent) {
 	$('.dialogList div.dialogListItem', parent).each(function(userIndex, userDiv){
 		// every odd learner has different background
-		$(userDiv).css('background-color', userIndex % 2 ? '#dfeffc' : 'inherit');
+		$(userDiv).css('background-color', userIndex % 2 ? '#f5f5f5' : 'inherit');
 	});
 }
 

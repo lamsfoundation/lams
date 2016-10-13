@@ -336,3 +336,17 @@ td.progressBarLabel a {
 	float: right;
 	margin: 6px 5px 4px 0;
 }
+
+
+/********** BOOTSTRAP ADDITIONS **********/
+
+.contributeActivityCell {
+	font-weight: 600;
+	margin-top: 10px;
+}
+
+.contributeEntryCell {
+	height: 25px;
+	margin-left: 25px;
+	
+}
