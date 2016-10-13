@@ -56,7 +56,6 @@ import org.lamsfoundation.lams.tool.qa.QaCondition;
 import org.lamsfoundation.lams.tool.qa.QaConfigItem;
 import org.lamsfoundation.lams.tool.qa.QaContent;
 import org.lamsfoundation.lams.tool.qa.QaQueContent;
-import org.lamsfoundation.lams.tool.qa.dto.QaGeneralAuthoringDTO;
 import org.lamsfoundation.lams.tool.qa.dto.QaQuestionDTO;
 import org.lamsfoundation.lams.tool.qa.service.IQaService;
 import org.lamsfoundation.lams.tool.qa.service.QaServiceProxy;
@@ -117,15 +116,8 @@ public class QaAction extends LamsDispatchAction implements QaAppConstants {
 	String richTextTitle = request.getParameter(QaAppConstants.TITLE);
 	String richTextInstructions = request.getParameter(QaAppConstants.INSTRUCTIONS);
 
-	QaGeneralAuthoringDTO qaGeneralAuthoringDTO = new QaGeneralAuthoringDTO();
-	qaGeneralAuthoringDTO.setContentFolderID(contentFolderID);
-	qaGeneralAuthoringDTO.setActivityInstructions(richTextInstructions);
-	qaGeneralAuthoringDTO.setActivityTitle(richTextTitle);
-	qaGeneralAuthoringDTO.setToolContentID(strToolContentID);
-	qaGeneralAuthoringDTO.setHttpSessionID(httpSessionID);
-	request.setAttribute(QaAppConstants.QA_GENERAL_AUTHORING_DTO, qaGeneralAuthoringDTO);
-
 	qaAuthoringForm.setTitle(richTextTitle);
+	qaAuthoringForm.setInstructions(richTextInstructions);
 
 	sessionMap.put(QaAppConstants.ACTIVITY_TITLE_KEY, richTextTitle);
 	sessionMap.put(QaAppConstants.ACTIVITY_INSTRUCTIONS_KEY, richTextInstructions);
@@ -184,14 +176,13 @@ public class QaAction extends LamsDispatchAction implements QaAppConstants {
 		    .get(AttributeNames.ATTR_RATING_CRITERIAS);
 	    qaService.saveRatingCriterias(request, oldCriterias, toolContentID);
 
-	    QaUtils.setFormProperties(request, qaAuthoringForm, qaGeneralAuthoringDTO, strToolContentID, httpSessionID);
+	    QaUtils.setFormProperties(request, qaAuthoringForm, strToolContentID, httpSessionID);
 
 	    request.setAttribute(AuthoringConstants.LAMS_AUTHORING_SUCCESS_FLAG, Boolean.TRUE);
 
 	} else {
 	    if (qaContent != null) {
-		QaUtils.setFormProperties(request, qaAuthoringForm, qaGeneralAuthoringDTO, strToolContentID,
-			httpSessionID);
+		QaUtils.setFormProperties(request, qaAuthoringForm, strToolContentID, httpSessionID);
 	    }
 	}
 
@@ -408,10 +399,6 @@ public class QaAction extends LamsDispatchAction implements QaAppConstants {
 
 	String editQuestionBoxRequest = request.getParameter("editQuestionBoxRequest");
 
-	QaGeneralAuthoringDTO qaGeneralAuthoringDTO = new QaGeneralAuthoringDTO();
-
-	qaGeneralAuthoringDTO.setContentFolderID(contentFolderID);
-
 	List<QaQuestionDTO> questionDTOs = (List) sessionMap.get(QaAppConstants.LIST_QUESTION_DTOS);
 
 	String newQuestion = request.getParameter("newQuestion");
@@ -494,28 +481,20 @@ public class QaAction extends LamsDispatchAction implements QaAppConstants {
 	String richTextTitle = request.getParameter(QaAppConstants.TITLE);
 	String richTextInstructions = request.getParameter(QaAppConstants.INSTRUCTIONS);
 
-	qaGeneralAuthoringDTO.setActivityTitle(richTextTitle);
 	qaAuthoringForm.setTitle(richTextTitle);
-
-	qaGeneralAuthoringDTO.setActivityInstructions(richTextInstructions);
+	qaAuthoringForm.setInstructions(richTextInstructions);
 
 	sessionMap.put(QaAppConstants.ACTIVITY_TITLE_KEY, richTextTitle);
 	sessionMap.put(QaAppConstants.ACTIVITY_INSTRUCTIONS_KEY, richTextInstructions);
 
-	qaGeneralAuthoringDTO.setEditActivityEditMode(new Boolean(true).toString());
-
 	request.getSession().setAttribute(httpSessionID, sessionMap);
 
-	QaUtils.setFormProperties(request, qaAuthoringForm, qaGeneralAuthoringDTO, strToolContentID, httpSessionID);
-
-	qaGeneralAuthoringDTO.setToolContentID(strToolContentID);
-	qaGeneralAuthoringDTO.setHttpSessionID(httpSessionID);
+	QaUtils.setFormProperties(request, qaAuthoringForm, strToolContentID, httpSessionID);
 
 	qaAuthoringForm.setToolContentID(strToolContentID);
 	qaAuthoringForm.setHttpSessionID(httpSessionID);
 	qaAuthoringForm.setCurrentTab("1");
 
-	request.setAttribute(QaAppConstants.QA_GENERAL_AUTHORING_DTO, qaGeneralAuthoringDTO);
 	request.getSession().setAttribute(httpSessionID, sessionMap);
 	request.setAttribute(QaAppConstants.TOTAL_QUESTION_COUNT, new Integer(questionDTOs.size()));
 	return mapping.findForward(QaAppConstants.LOAD_QUESTIONS);
@@ -538,10 +517,6 @@ public class QaAction extends LamsDispatchAction implements QaAppConstants {
 	qaAuthoringForm.setContentFolderID(contentFolderID);
 
 	String strToolContentID = request.getParameter(AttributeNames.PARAM_TOOL_CONTENT_ID);
-
-	QaGeneralAuthoringDTO qaGeneralAuthoringDTO = new QaGeneralAuthoringDTO();
-
-	qaGeneralAuthoringDTO.setContentFolderID(contentFolderID);
 
 	List<QaQuestionDTO> questionDTOs = (List) sessionMap.get(QaAppConstants.LIST_QUESTION_DTOS);
 
@@ -576,27 +551,20 @@ public class QaAction extends LamsDispatchAction implements QaAppConstants {
 	String richTextTitle = request.getParameter(QaAppConstants.TITLE);
 	String richTextInstructions = request.getParameter(QaAppConstants.INSTRUCTIONS);
 
-	qaGeneralAuthoringDTO.setActivityTitle(richTextTitle);
 	qaAuthoringForm.setTitle(richTextTitle);
-
-	qaGeneralAuthoringDTO.setActivityInstructions(richTextInstructions);
+	qaAuthoringForm.setInstructions(richTextInstructions);
 
 	sessionMap.put(QaAppConstants.ACTIVITY_TITLE_KEY, richTextTitle);
 	sessionMap.put(QaAppConstants.ACTIVITY_INSTRUCTIONS_KEY, richTextInstructions);
 
-	qaGeneralAuthoringDTO.setEditActivityEditMode(new Boolean(true).toString());
 	request.getSession().setAttribute(httpSessionID, sessionMap);
 
-	QaUtils.setFormProperties(request, qaAuthoringForm, qaGeneralAuthoringDTO, strToolContentID, httpSessionID);
-
-	qaGeneralAuthoringDTO.setToolContentID(strToolContentID);
-	qaGeneralAuthoringDTO.setHttpSessionID(httpSessionID);
+	QaUtils.setFormProperties(request, qaAuthoringForm, strToolContentID, httpSessionID);
 
 	qaAuthoringForm.setToolContentID(strToolContentID);
 	qaAuthoringForm.setHttpSessionID(httpSessionID);
 	qaAuthoringForm.setCurrentTab("1");
 
-	request.setAttribute(QaAppConstants.QA_GENERAL_AUTHORING_DTO, qaGeneralAuthoringDTO);
 	request.getSession().setAttribute(httpSessionID, sessionMap);
 	request.setAttribute(QaAppConstants.TOTAL_QUESTION_COUNT, new Integer(questionDTOs.size()));
 	return mapping.findForward(QaAppConstants.LOAD_QUESTIONS);
@@ -622,23 +590,14 @@ public class QaAction extends LamsDispatchAction implements QaAppConstants {
 
 	String strToolContentID = request.getParameter(AttributeNames.PARAM_TOOL_CONTENT_ID);
 
-	QaGeneralAuthoringDTO qaGeneralAuthoringDTO = new QaGeneralAuthoringDTO();
-
-	qaGeneralAuthoringDTO.setContentFolderID(contentFolderID);
-
 	String richTextTitle = request.getParameter(QaAppConstants.TITLE);
 
 	String richTextInstructions = request.getParameter(QaAppConstants.INSTRUCTIONS);
 
-	qaGeneralAuthoringDTO.setActivityTitle(richTextTitle);
-
 	qaAuthoringForm.setTitle(richTextTitle);
+	qaAuthoringForm.setInstructions(richTextInstructions);
 
-	qaGeneralAuthoringDTO.setActivityInstructions(richTextInstructions);
-
-	QaUtils.setFormProperties(request, qaAuthoringForm, qaGeneralAuthoringDTO, strToolContentID, httpSessionID);
-
-	request.setAttribute(QaAppConstants.QA_GENERAL_AUTHORING_DTO, qaGeneralAuthoringDTO);
+	QaUtils.setFormProperties(request, qaAuthoringForm, strToolContentID, httpSessionID);
 
 	Collection<QaQuestionDTO> questionDTOs = (Collection<QaQuestionDTO>) sessionMap
 		.get(QaAppConstants.LIST_QUESTION_DTOS);
@@ -699,26 +658,18 @@ public class QaAction extends LamsDispatchAction implements QaAppConstants {
 
 	String strToolContentID = request.getParameter(AttributeNames.PARAM_TOOL_CONTENT_ID);
 
-	QaGeneralAuthoringDTO qaGeneralAuthoringDTO = new QaGeneralAuthoringDTO();
-
-	qaGeneralAuthoringDTO.setContentFolderID(contentFolderID);
-
 	String richTextTitle = request.getParameter(QaAppConstants.TITLE);
 	String richTextInstructions = request.getParameter(QaAppConstants.INSTRUCTIONS);
 
-	qaGeneralAuthoringDTO.setActivityTitle(richTextTitle);
 	qaAuthoringForm.setTitle(richTextTitle);
+	qaAuthoringForm.setInstructions(richTextInstructions);
 
-	qaGeneralAuthoringDTO.setActivityInstructions(richTextInstructions);
+	QaUtils.setFormProperties(request, qaAuthoringForm, strToolContentID, httpSessionID);
 
-	QaUtils.setFormProperties(request, qaAuthoringForm, qaGeneralAuthoringDTO, strToolContentID, httpSessionID);
-
-	qaGeneralAuthoringDTO.setEditableQuestionText(editableQuestion);
-	qaGeneralAuthoringDTO.setEditableQuestionFeedback(editableFeedback);
 	qaAuthoringForm.setRequired(requiredBoolean);
 	qaAuthoringForm.setMinWordsLimit(minWordsLimit);
-
-	request.setAttribute(QaAppConstants.QA_GENERAL_AUTHORING_DTO, qaGeneralAuthoringDTO);
+	qaAuthoringForm.setEditableQuestionText(editableQuestion);
+	qaAuthoringForm.setFeedback(editableFeedback);
 
 	request.setAttribute(QaAppConstants.TOTAL_QUESTION_COUNT, new Integer(questionDTOs.size()));
 
@@ -788,20 +739,13 @@ public class QaAction extends LamsDispatchAction implements QaAppConstants {
 	sessionMap.put(QaAppConstants.ACTIVITY_TITLE_KEY, richTextTitle);
 	sessionMap.put(QaAppConstants.ACTIVITY_INSTRUCTIONS_KEY, richTextInstructions);
 	String strToolContentID = request.getParameter(AttributeNames.PARAM_TOOL_CONTENT_ID);
-	QaGeneralAuthoringDTO qaGeneralAuthoringDTO = new QaGeneralAuthoringDTO();
-	qaGeneralAuthoringDTO.setContentFolderID(contentFolderID);
-	qaGeneralAuthoringDTO.setActivityTitle(richTextTitle);
 	qaAuthoringForm.setTitle(richTextTitle);
-	qaGeneralAuthoringDTO.setActivityInstructions(richTextInstructions);
-	qaGeneralAuthoringDTO.setEditActivityEditMode(new Boolean(true).toString());
+	qaAuthoringForm.setInstructions(richTextInstructions);
 	request.getSession().setAttribute(httpSessionID, sessionMap);
-	QaUtils.setFormProperties(request, qaAuthoringForm, qaGeneralAuthoringDTO, strToolContentID, httpSessionID);
-	qaGeneralAuthoringDTO.setToolContentID(strToolContentID);
-	qaGeneralAuthoringDTO.setHttpSessionID(httpSessionID);
+	QaUtils.setFormProperties(request, qaAuthoringForm, strToolContentID, httpSessionID);
 	qaAuthoringForm.setToolContentID(strToolContentID);
 	qaAuthoringForm.setHttpSessionID(httpSessionID);
 	qaAuthoringForm.setCurrentTab("1");
-	request.setAttribute(QaAppConstants.QA_GENERAL_AUTHORING_DTO, qaGeneralAuthoringDTO);
 
 	return mapping.findForward(QaAppConstants.LOAD_QUESTIONS);
     }
@@ -842,29 +786,18 @@ public class QaAction extends LamsDispatchAction implements QaAppConstants {
 
 	String strToolContentID = request.getParameter(AttributeNames.PARAM_TOOL_CONTENT_ID);
 
-	QaGeneralAuthoringDTO qaGeneralAuthoringDTO = new QaGeneralAuthoringDTO();
-	qaGeneralAuthoringDTO.setContentFolderID(contentFolderID);
-
-	qaGeneralAuthoringDTO.setActivityTitle(richTextTitle);
 	qaAuthoringForm.setTitle(richTextTitle);
-
-	qaGeneralAuthoringDTO.setActivityInstructions(richTextInstructions);
-
-	qaGeneralAuthoringDTO.setEditActivityEditMode(new Boolean(true).toString());
-
+	qaAuthoringForm.setInstructions(richTextInstructions);
 	request.getSession().setAttribute(httpSessionID, sessionMap);
 
-	QaUtils.setFormProperties(request, qaAuthoringForm, qaGeneralAuthoringDTO, strToolContentID, httpSessionID);
+	QaUtils.setFormProperties(request, qaAuthoringForm, strToolContentID, httpSessionID);
 
-	qaGeneralAuthoringDTO.setToolContentID(strToolContentID);
-	qaGeneralAuthoringDTO.setHttpSessionID(httpSessionID);
 	qaAuthoringForm.setToolContentID(strToolContentID);
 	qaAuthoringForm.setHttpSessionID(httpSessionID);
 	qaAuthoringForm.setCurrentTab("1");
 
 	request.setAttribute(QaAppConstants.LIST_QUESTION_DTOS, questionDTOs);
 
-	request.setAttribute(QaAppConstants.QA_GENERAL_AUTHORING_DTO, qaGeneralAuthoringDTO);
 	request.setAttribute(QaAppConstants.TOTAL_QUESTION_COUNT, new Integer(questionDTOs.size()));
 	return mapping.findForward(QaAppConstants.LOAD_QUESTIONS);
     }
@@ -906,30 +839,19 @@ public class QaAction extends LamsDispatchAction implements QaAppConstants {
 
 	String strToolContentID = request.getParameter(AttributeNames.PARAM_TOOL_CONTENT_ID);
 
-	QaGeneralAuthoringDTO qaGeneralAuthoringDTO = new QaGeneralAuthoringDTO();
-
-	qaGeneralAuthoringDTO.setContentFolderID(contentFolderID);
-
-	qaGeneralAuthoringDTO.setActivityTitle(richTextTitle);
 	qaAuthoringForm.setTitle(richTextTitle);
-
-	qaGeneralAuthoringDTO.setActivityInstructions(richTextInstructions);
-
-	qaGeneralAuthoringDTO.setEditActivityEditMode(new Boolean(true).toString());
+	qaAuthoringForm.setInstructions(richTextInstructions);
 
 	request.getSession().setAttribute(httpSessionID, sessionMap);
 
-	QaUtils.setFormProperties(request, qaAuthoringForm, qaGeneralAuthoringDTO, strToolContentID, httpSessionID);
+	QaUtils.setFormProperties(request, qaAuthoringForm, strToolContentID, httpSessionID);
 
-	qaGeneralAuthoringDTO.setToolContentID(strToolContentID);
-	qaGeneralAuthoringDTO.setHttpSessionID(httpSessionID);
 	qaAuthoringForm.setToolContentID(strToolContentID);
 	qaAuthoringForm.setHttpSessionID(httpSessionID);
 	qaAuthoringForm.setCurrentTab("1");
 
 	request.setAttribute(QaAppConstants.LIST_QUESTION_DTOS, questionDTOs);
 
-	request.setAttribute(QaAppConstants.QA_GENERAL_AUTHORING_DTO, qaGeneralAuthoringDTO);
 	request.setAttribute(QaAppConstants.TOTAL_QUESTION_COUNT, new Integer(questionDTOs.size()));
 	return mapping.findForward(QaAppConstants.LOAD_QUESTIONS);
     }

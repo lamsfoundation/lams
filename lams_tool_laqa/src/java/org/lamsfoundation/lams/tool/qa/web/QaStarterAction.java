@@ -52,7 +52,6 @@ import org.lamsfoundation.lams.tool.qa.QaAppConstants;
 import org.lamsfoundation.lams.tool.qa.QaCondition;
 import org.lamsfoundation.lams.tool.qa.QaContent;
 import org.lamsfoundation.lams.tool.qa.QaQueContent;
-import org.lamsfoundation.lams.tool.qa.dto.QaGeneralAuthoringDTO;
 import org.lamsfoundation.lams.tool.qa.dto.QaQuestionDTO;
 import org.lamsfoundation.lams.tool.qa.service.IQaService;
 import org.lamsfoundation.lams.tool.qa.service.QaServiceProxy;
@@ -81,9 +80,6 @@ public class QaStarterAction extends Action implements QaAppConstants {
 	String contentFolderID = WebUtil.readStrParam(request, AttributeNames.PARAM_CONTENT_FOLDER_ID);
 	qaAuthoringForm.setContentFolderID(contentFolderID);
 
-	QaGeneralAuthoringDTO qaGeneralAuthoringDTO = new QaGeneralAuthoringDTO();
-	qaGeneralAuthoringDTO.setContentFolderID(contentFolderID);
-
 	qaAuthoringForm.resetRadioBoxes();
 
 	IQaService qaService = null;
@@ -93,15 +89,12 @@ public class QaStarterAction extends Action implements QaAppConstants {
 	    qaService = QaServiceProxy.getQaService(getServlet().getServletContext());
 	}
 
-	qaGeneralAuthoringDTO.setCurrentTab("1");
-
-	validateDefaultContent(request, mapping, qaService, qaGeneralAuthoringDTO, qaAuthoringForm);
+	validateDefaultContent(request, mapping, qaService, qaAuthoringForm);
 
 	//no problems getting the default content, will render authoring screen
 	String strToolContentID = "";
 	/* the authoring url must be passed a tool content id */
 	strToolContentID = request.getParameter(AttributeNames.PARAM_TOOL_CONTENT_ID);
-	qaGeneralAuthoringDTO.setToolContentID(strToolContentID);
 	qaAuthoringForm.setToolContentID(strToolContentID);
 
 	SessionMap<String, Object> sessionMap = new SessionMap<String, Object>();
@@ -109,7 +102,6 @@ public class QaStarterAction extends Action implements QaAppConstants {
 	sessionMap.put(QaAppConstants.ACTIVITY_INSTRUCTIONS_KEY, "");
 	sessionMap.put(AttributeNames.PARAM_CONTENT_FOLDER_ID, contentFolderID);
 	qaAuthoringForm.setHttpSessionID(sessionMap.getSessionID());
-	qaGeneralAuthoringDTO.setHttpSessionID(sessionMap.getSessionID());
 
 	if (strToolContentID == null || strToolContentID.equals("")) {
 	    QaUtils.cleanUpSessionAbsolute(request);
@@ -128,7 +120,7 @@ public class QaStarterAction extends Action implements QaAppConstants {
 	    }
 	}
 
-	prepareDTOandForm(request, qaAuthoringForm, qaContent, qaService, qaGeneralAuthoringDTO, sessionMap);
+	prepareDTOandForm(request, qaAuthoringForm, qaContent, qaService, sessionMap);
 
 	ToolAccessMode mode = getAccessMode(request);
 	// request is from monitoring module
@@ -141,10 +133,7 @@ public class QaStarterAction extends Action implements QaAppConstants {
 	conditionList.clear();
 	conditionList.addAll(qaContent.getConditions());
 
-	qaGeneralAuthoringDTO.setAllowRichEditor(qaContent.isAllowRichEditor());
 	qaAuthoringForm.setAllowRichEditor(qaContent.isAllowRichEditor());
-
-	qaGeneralAuthoringDTO.setUseSelectLeaderToolOuput(qaContent.isUseSelectLeaderToolOuput());
 	qaAuthoringForm.setUseSelectLeaderToolOuput(qaContent.isUseSelectLeaderToolOuput());
 
 	sessionMap.put(QaAppConstants.ATTR_QA_AUTHORING_FORM, qaAuthoringForm);
@@ -153,8 +142,6 @@ public class QaStarterAction extends Action implements QaAppConstants {
 	// get rating criterias from DB
 	List<RatingCriteria> ratingCriterias = qaService.getRatingCriterias(qaContent.getQaContentId());
 	sessionMap.put(AttributeNames.ATTR_RATING_CRITERIAS, ratingCriterias);
-
-	request.setAttribute(QaAppConstants.QA_GENERAL_AUTHORING_DTO, qaGeneralAuthoringDTO);
 
 	return mapping.findForward(LOAD_QUESTIONS);
     }
@@ -170,8 +157,7 @@ public class QaStarterAction extends Action implements QaAppConstants {
      * @return ActionForward
      */
     protected QaContent prepareDTOandForm(HttpServletRequest request, QaAuthoringForm qaAuthoringForm,
-	    QaContent qaContent, IQaService qaService, QaGeneralAuthoringDTO qaGeneralAuthoringDTO,
-	    SessionMap<String, Object> sessionMap) {
+	    QaContent qaContent, IQaService qaService, SessionMap<String, Object> sessionMap) {
 
 	qaAuthoringForm.setUsernameVisible(qaContent.isUsernameVisible() ? "1" : "0");
 	qaAuthoringForm.setAllowRateAnswers(qaContent.isAllowRateAnswers() ? "1" : "0");
@@ -182,22 +168,12 @@ public class QaStarterAction extends Action implements QaAppConstants {
 	qaAuthoringForm.setNoReeditAllowed(qaContent.isNoReeditAllowed() ? "1" : "0");
 	qaAuthoringForm.setMaximumRates(qaContent.getMaximumRates());
 	qaAuthoringForm.setMinimumRates(qaContent.getMinimumRates());
-
-	qaGeneralAuthoringDTO.setReflect(qaContent.isReflect() ? "1" : "0");
-
 	qaAuthoringForm.setReflect(qaContent.isReflect() ? "1" : "0");
-
 	qaAuthoringForm.setReflectionSubject(qaContent.getReflectionSubject());
-	qaGeneralAuthoringDTO.setReflectionSubject(qaContent.getReflectionSubject());
-
-	qaGeneralAuthoringDTO.setActivityTitle(qaContent.getTitle());
 	qaAuthoringForm.setTitle(qaContent.getTitle());
-
-	qaGeneralAuthoringDTO.setActivityInstructions(qaContent.getInstructions());
 	qaAuthoringForm.setInstructions(qaContent.getInstructions());
-
-	sessionMap.put(QaAppConstants.ACTIVITY_TITLE_KEY, qaGeneralAuthoringDTO.getActivityTitle());
-	sessionMap.put(QaAppConstants.ACTIVITY_INSTRUCTIONS_KEY, qaGeneralAuthoringDTO.getActivityInstructions());
+	sessionMap.put(QaAppConstants.ACTIVITY_TITLE_KEY, qaContent.getTitle());
+	sessionMap.put(QaAppConstants.ACTIVITY_INSTRUCTIONS_KEY, qaContent.getInstructions());
 
 	List<QaQuestionDTO> questionDTOs = new LinkedList();
 
@@ -250,7 +226,7 @@ public class QaStarterAction extends Action implements QaAppConstants {
      * @return ActionForward
      */
     public boolean validateDefaultContent(HttpServletRequest request, ActionMapping mapping, IQaService qaService,
-	    QaGeneralAuthoringDTO qaGeneralAuthoringDTO, QaAuthoringForm qaAuthoringForm) {
+	    QaAuthoringForm qaAuthoringForm) {
 
 	/*
 	 * retrieve the default content id based on tool signature
