@@ -495,10 +495,14 @@ public class PeerreviewServiceImpl
 	    throw new DataMissingException("Unable to find default content for the peerreview tool");
 	}
 
+	// need to clone the Peer Review details, otherwise clearing the fields may update the database!
+	toolContentObj = Peerreview.newInstance(toolContentObj, toolContentId);
+	
 	// don't export following fields
 	for (LearnerItemRatingCriteria criteria : toolContentObj.getRatingCriterias()) {
 	    criteria.setToolContentId(null);
 	}
+	toolContentObj.setCreatedBy(null);
 
 	// set PeerreviewToolContentHandler as null to avoid copy file node in repository again.
 	toolContentObj = Peerreview.newInstance(toolContentObj, toolContentId);
