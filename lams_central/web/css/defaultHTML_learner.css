@@ -64,6 +64,26 @@ LAMS Learner Style
 }
 
 /* Spacer classes */
+
+.offset2 {
+	margin: 2px;
+}
+.offset3 {
+	margin: 3px;
+}
+.offset5 {
+	margin: 5px;
+}
+.offset10 {
+	margin: 10px;
+}
+.offset15 {
+	margin: 15px;
+}
+.offset20 {
+	margin: 20px;
+}
+
 .voffset2 {
   margin-top: 2px;
 }
