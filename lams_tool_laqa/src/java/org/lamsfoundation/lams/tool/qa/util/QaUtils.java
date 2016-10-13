@@ -28,7 +28,6 @@ import javax.servlet.http.HttpServletRequest;
 import org.apache.commons.lang.StringUtils;
 import org.lamsfoundation.lams.tool.ToolAccessMode;
 import org.lamsfoundation.lams.tool.qa.QaAppConstants;
-import org.lamsfoundation.lams.tool.qa.dto.QaGeneralAuthoringDTO;
 import org.lamsfoundation.lams.tool.qa.web.form.QaAuthoringForm;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.util.AttributeNames;
@@ -41,55 +40,45 @@ import org.lamsfoundation.lams.web.util.AttributeNames;
 public abstract class QaUtils implements QaAppConstants {
 
     public static void setFormProperties(HttpServletRequest request, QaAuthoringForm qaAuthoringForm,
-	    QaGeneralAuthoringDTO qaGeneralAuthoringDTO, String strToolContentID, String httpSessionID) {
+	    String strToolContentID, String httpSessionID) {
 
 	qaAuthoringForm.setHttpSessionID(httpSessionID);
-	qaGeneralAuthoringDTO.setHttpSessionID(httpSessionID);
 
 	qaAuthoringForm.setToolContentID(strToolContentID);
 
 	String usernameVisible = request.getParameter(USERNAME_VISIBLE);
 	qaAuthoringForm.setUsernameVisible(usernameVisible);
-	qaGeneralAuthoringDTO.setUsernameVisible(usernameVisible);
 
 	String allowRateAnswers = request.getParameter(ALLOW_RATE_ANSWERS);
 	qaAuthoringForm.setAllowRateAnswers(allowRateAnswers);
-	qaGeneralAuthoringDTO.setAllowRateAnswers(allowRateAnswers);
 
 	String notifyTeachersOnResponseSubmit = request.getParameter(NOTIFY_TEACHERS_ON_RESPONSE_SUBMIT);
 	qaAuthoringForm.setNotifyTeachersOnResponseSubmit(notifyTeachersOnResponseSubmit);
 
 	String showOtherAnswers = request.getParameter("showOtherAnswers");
 	qaAuthoringForm.setShowOtherAnswers(showOtherAnswers);
-	qaGeneralAuthoringDTO.setShowOtherAnswers(showOtherAnswers);
 
 	String questionsSequenced = request.getParameter(QUESTIONS_SEQUENCED);
 	qaAuthoringForm.setQuestionsSequenced(questionsSequenced);
-	qaGeneralAuthoringDTO.setQuestionsSequenced(questionsSequenced);
 
 	String lockWhenFinished = request.getParameter("lockWhenFinished");
 	qaAuthoringForm.setLockWhenFinished(lockWhenFinished);
-	qaGeneralAuthoringDTO.setLockWhenFinished(lockWhenFinished);
 
 	int minimumRates = WebUtil.readIntParam(request, MINIMUM_RATES, true) == null ? 0
 		: WebUtil.readIntParam(request, MINIMUM_RATES);
 	qaAuthoringForm.setMinimumRates(minimumRates);
-	qaGeneralAuthoringDTO.setMinimumRates(minimumRates);
 
 	int maximumRates = WebUtil.readIntParam(request, MAXIMUM_RATES, true) == null ? 0
 		: WebUtil.readIntParam(request, MAXIMUM_RATES);
 	qaAuthoringForm.setMaximumRates(maximumRates);
-	qaGeneralAuthoringDTO.setMaximumRates(maximumRates);
 
 	String reflect = request.getParameter(REFLECT);
 
 	qaAuthoringForm.setReflect(reflect);
-	qaGeneralAuthoringDTO.setReflect(reflect);
 
 	String reflectionSubject = request.getParameter(REFLECTION_SUBJECT);
 
 	qaAuthoringForm.setReflectionSubject(reflectionSubject);
-	qaGeneralAuthoringDTO.setReflectionSubject(reflectionSubject);
 
 	ToolAccessMode mode;
 	String modeStr = request.getParameter(AttributeNames.ATTR_MODE);

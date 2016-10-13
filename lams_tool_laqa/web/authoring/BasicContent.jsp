@@ -1,4 +1,5 @@
 <%@ include file="/common/taglibs.jsp"%>
+<c:set var="formBean" value="<%=request.getAttribute(org.apache.struts.taglib.html.Constants.BEAN_KEY)%>" />
 
 <script type="text/javascript">
 <!-- Common Javascript functions for LAMS -->
@@ -70,8 +71,8 @@
 				<fmt:message key="label.authoring.instructions.col"></fmt:message>
 			</div>
 			<lams:CKEditor id="instructions"
-				value="${qaGeneralAuthoringDTO.activityInstructions}"
-				contentFolderID="${qaGeneralAuthoringDTO.contentFolderID}"></lams:CKEditor>
+				value="${formBean.instructions}"
+				contentFolderID="${formBean.contentFolderID}"></lams:CKEditor>
 		</td>
 	</tr>
 </table>
@@ -82,7 +83,7 @@
 </div>
 
 <p>
-	<a href="javascript:showMessage('<html:rewrite page="/authoring.do?dispatch=newQuestionBox&contentFolderID=${qaGeneralAuthoringDTO.contentFolderID}&httpSessionID=${qaGeneralAuthoringDTO.httpSessionID}&toolContentID=${qaGeneralAuthoringDTO.toolContentID}&usernameVisible=${qaGeneralAuthoringDTO.usernameVisible}&showOtherAnswers=${qaGeneralAuthoringDTO.showOtherAnswers}&lockWhenFinished=${qaGeneralAuthoringDTO.lockWhenFinished}&questionsSequenced=${qaGeneralAuthoringDTO.questionsSequenced}"/>');"
+	<a href="javascript:showMessage('<html:rewrite page="/authoring.do?dispatch=newQuestionBox&contentFolderID=${formBean.contentFolderID}&httpSessionID=${formBean.httpSessionID}&toolContentID=${formBean.toolContentID}&usernameVisible=${formBean.usernameVisible}&showOtherAnswers=${formBean.showOtherAnswers}&lockWhenFinished=${formBean.lockWhenFinished}&questionsSequenced=${formBean.questionsSequenced}"/>');"
 			class="button-add-item"> 
 		<fmt:message key="label.add.new.question" /> 
 	</a>

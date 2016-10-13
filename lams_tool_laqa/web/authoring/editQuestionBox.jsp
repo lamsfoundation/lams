@@ -56,8 +56,8 @@
 			</div>
 
 			<lams:CKEditor id="newQuestion"
-				value="${qaGeneralAuthoringDTO.editableQuestionText}"
-				contentFolderID="${qaGeneralAuthoringDTO.contentFolderID}" width="99%">
+				value="${formBean.editableQuestionText}"
+				contentFolderID="${formBean.contentFolderID}" width="99%">
 			</lams:CKEditor>
 
 			<div class="field-name space-top">
