@@ -23,15 +23,69 @@ td#messageCell {
 }
 
 .dialogContainer {
-	display: none;
 	-webkit-overflow-scrolling: touch !important;
 }
 
 .dialogContainer iframe {
 	width: 100%;
-	height: 99%;
+	height: 100%;
 	border: none;
 }
+
+.dialogContainer .close {
+	cursor: pointer;
+}
+
+.dialogContainer .modal-body {
+	height : 100%;
+	max-height: calc(100% - 60px);
+}
+
+.min {
+  width: 250px;
+  height: 35px;
+  overflow: hidden !important;
+  padding: 0px !important;
+  margin: 0px;
+  float: left;
+  position: static !important;
+}
+
+.min .modal-dialog, .min .modal-content {
+  height: 100%;
+  width: 100%;
+  margin: 0px !important;
+  padding: 0px !important;
+}
+
+.min .modal-header {
+  height: 100%;
+  margin: 0px !important;
+  padding: 3px 5px !important;
+}
+
+.display-none { display: none; }
+
+button .fa {
+  font-size: 16px;
+  margin-left: 10px;
+}
+
+.min .fa { font-size: 14px; }
+
+.min .menuTab { display: none; }
+
+button:focus { outline: none; }
+
+.minmaxCon {
+  height: 35px;
+  bottom: 1px;
+  left: 1px;
+  position: fixed;
+  right: 1px;
+  z-index: 9999;
+}
+
 
 #mainContentTable td {
 	vertical-align: top;
@@ -123,29 +177,6 @@ td#messageCell {
 	background : transparent;
 	/* z-index has to be less than the dialog otherwise the helper won't drag in Chrome and IE */
 	z-index: 50;
-}
-
-/* Style for Monitoring and Add Lesson dialogs.
-   Put the transparent dialog's titlebar over the tab bar. */
-body > .tabbedDialog .ui-dialog-titlebar {
-	background : transparent;
-	border : none;
-	z-index : 200;
-	position : absolute;
-	right : 40px;
-	top : 10px;
-}
-
-.tabbedDialog .ui-dialog-title {
-	margin-right: 70px;
-}
-
-body > .addLessonDialog .ui-dialog-titlebar {
-	width: 25px;
-	right : 10px;
-}
-
-#dialogPrivateNotifications table {
 }
 
 #dialogPrivateNotifications table tr:first-child td {
