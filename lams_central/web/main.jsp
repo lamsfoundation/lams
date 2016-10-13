@@ -20,11 +20,14 @@
 	</c:choose>
 	
 	<lams:css style="main" />
+	<link href="/lams/includes/font-awesome/css/font-awesome.css" rel="stylesheet" type="text/css">
+	<link href="/lams/css/defaultHTML_learner.css" rel="stylesheet" type="text/css">
 	
 	<link rel="icon" href="<lams:LAMSURL/>favicon.ico" type="image/x-icon" />
 	<link rel="shortcut icon" href="<lams:LAMSURL/>favicon.ico" type="image/x-icon" />
-	<link rel="stylesheet" href="<lams:LAMSURL/>css/jquery-ui-redmond-theme.css" type="text/css" media="screen">
+	
 	<link rel="stylesheet" href="<lams:LAMSURL/>css/index.css" type="text/css" media="screen">
+	<link rel="stylesheet" href="<lams:LAMSURL/>css/jquery-ui-bootstrap-theme.css" type="text/css" media="screen">
 
 	<script type="text/javascript" src="includes/javascript/getSysInfo.js"></script>
 	<script type="text/javascript" src="loadVars.jsp"></script>
@@ -34,6 +37,8 @@
 	<script type="text/javascript" src="includes/javascript/jquery.dialogextend.js"></script>	
 	<script type="text/javascript" src="includes/javascript/dialog.js"></script>
 	<script type="text/javascript" src="includes/javascript/groupDisplay.js"></script>	
+	<script type="text/javascript" src="/lams/includes/javascript/bootstrap.min.js"></script>
+	<script type="text/javascript" src="/lams/includes/javascript/jquery.ui.touch-punch.js"></script>
 
 	<script type="text/javascript">
 			var LAMS_URL = '<lams:LAMSURL/>',
@@ -99,7 +104,8 @@
 
 	</script>
 </lams:head>
-<body class="my-courses">
+<body>
+
 <div id="page-mycourses">
 	<div id="header-my-courses">
 		<div id="nav-right">
@@ -231,17 +237,12 @@
 											</c:forEach>
 										</ul>
 									</td>
-									<td id="orgTabsPanelCell" class="ui-widget-content ui-corner-all">
-										<c:forEach items="${orgDTOs}" var="dto" varStatus="status">
-											<div id="orgTab-${status.index}-org-${dto.orgId}" class="orgTab"></div>
-										</c:forEach>
-									</td>
 								</tr>
 							</table>
+                                        </td>
+                                </tr>
+                        </table>
 						</c:if>
-					</td>
-				</tr>
-			</table>
 		</c:if>
 		<c:if test="${tab eq 'profile'}">
 			<tiles:insert attribute="profile" />
@@ -259,5 +260,16 @@
 		</p>
 	</div>
 </div>
+<hr>
+<div class="row no-gutter">
+  <div class="col-xs-12">
+    <div class="container">
+      <c:forEach items="${orgDTOs}" var="dto" varStatus="status">
+        <div id="orgTab-${status.index}-org-${dto.orgId}" class="orgTab"></div>
+      </c:forEach>
+     </div>
+  </div>
+</div>
+
 </body>
 </lams:html>

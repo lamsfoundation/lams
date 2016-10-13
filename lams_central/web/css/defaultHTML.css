@@ -21,14 +21,6 @@ body {
 a {
 	color: #47bc23;
 	text-decoration: none;
-	border-bottom: 1px dotted #47bc23;
-	text-decoration: none;
-}
-
-a:hover {
-	color: #47bc23;
-	text-decoration: none;
-	border-bottom: 1px solid #47bc23;
 	text-decoration: none;
 }
 
@@ -104,16 +96,6 @@ p {
 	margin-left: 25px;
 	margin-right: 30px;
 	margin-bottom: 18px;
-}
-
-ul {
-	margin-left: 25px;
-	margin-right: 30px;
-}
-
-ul li {
-	list-style-type: circle;
-	padding-bottom: 5px;
 }
 
 ol {
@@ -342,7 +324,6 @@ Layout of main content section
 #content a {
 	color: #47bc23;
 	text-decoration: none;
-	border-bottom: 1px dotted #47bc23;
 }
 
 #content a:hover {
@@ -478,45 +459,6 @@ a:hover.button-add-item {
 	border: 0px none;
 	padding: 5px 15px 6px 25px;
 	font-size: 11px;
-}
-
-#content-main a.sequence-name-link {
-	color: #0087E5;
-	text-decoration: none;
-}
-
-#content-main a:hover.sequence-name-link {
-	color: #0087E5;
-	text-decoration: none;
-	border-bottom: 1px solid #0087E5;
-}
-
-#content-main a.disabled-sequence-name-link {
-	color: #FF6666;
-	text-decoration: none;
-	border-bottom: 1px dotted #FF6666;
-}
-
-#content-main a:hover.disabled-sequence-name-link {
-	color: #FF6666;
-	text-decoration: none;
-	border-bottom: 1px solid #FF6666;
-}
-
-#content-main a.sequence-action-link {
-	color: #47bc23;
-	text-decoration: none;
-	border: 0px;
-	font-variant: small-caps;
-	margin-left: 20px;
-}
-
-#content-main a:hover.sequence-action-link {
-	color: #47bc23;
-	text-decoration: none;
-	border-bottom: 0px;
-	font-variant: small-caps;
-	margin-left: 20px;
 }
 
 /* my courses individual course boxes */
@@ -878,149 +820,6 @@ div.monitoring-advanced {
 /*
 *************************************************
 
-Login page styles
-
-********************************************** */
-#login-page { /*whole layout of login page*/
-	margin: -35px auto;
-	width: 707px;
-}
-
-/*layout of the header  when no-tabs are required */
-#login-header {
-	width: 707px;
-	height: 25px;
-	background: url('../images/css/top_bg.jpg') no-repeat bottom;
-}
-
-/*box around the main content area */
-#login-content {
-	width: 707px;
-	background: url('../images/css/body_bg.jpg') repeat-y;
-	padding-bottom: 20px;
-	font-size: 11px;
-	margin-top: -5px;
-	line-height: 18px;
-}
-
-#login-left-col {
-	width: 370px;
-	float: left;
-	padding-left: 25px;
-	margin-top: 5px;
-}
-
-#login-left-col h1 {
-	margin: 0px;
-	padding: 0px;
-}
-
-#login-left-col h2 {
-	margin: 10px 0px 0px 3px;
-	padding: 0px;
-	font-weight: 100;
-	font-size: 1.5em;
-}
-
-#login-left-col h3 {
-	color: #239CF7;
-	font-size: 11px;
-	margin: 8px 0px 0px 3px;
-}
-
-#login-left-col ul {
-	list-style-type: none;
-	margin-top: 0px;
-	margin-left: 4px;
-}
-
-#login-left-col li {
-	padding: 10px 0px 15px 0px;
-	border-bottom: 1px dotted #ccc;
-	list-style-type: none;
-}
-
-#login-right-col {
-	width: 285px;
-	float: left;
-	margin-left: 17px;
-	background: url('../images/css/lams_login_bar.jpg') no-repeat 0 0;
-	margin-top: 5px;
-	height: 450px;
-}
-
-#login-right-col h2 {
-	margin-top: 22px;
-	margin-left: 20px;
-	color: #239CF7;
-	margin-bottom: 30px;
-}
-
-#login-right-col p {
-	margin-top: 5px;
-	margin-right: 50px;
-	text-align: right;
-}
-
-#login-right-col p.first {
-	margin-top: 25px;
-	margin-right: 50px;
-	text-align: right;
-	margin-bottom: 15px;
-}
-
-#login-right-col p.version {
-	color: #47bc23;
-	margin-top: 5px;
-	margin-right: 20px;
-	margin-bottom: 0px;
-	text-align: right;
-	font-size: 1.2em;
-}
-
-#login-right-col p.login-button {
-	margin-top: 0px;
-	margin-right: 50px;
-	text-align: right;
-}
-
-#login-right-col a.button {
-	background: url('../images/css/btn_off.gif') no-repeat 0px 0px;
-	color: #333;
-	border: 0px none;
-	padding: 5px 20px 6px 20px;
-	text-decoration: none;
-}
-
-#login-right-col a:hover.button {
-	background: url('../images/css/btn_over.gif') repeat-x 0px 0px;
-	color: #349018;
-	border: 0px none;
-	padding: 5px 20px 6px 20px;
-	text-decoration: none;
-}
-
-#login-page #footer { /*layout of the footer - the bottom of the box */
-	width: 707px;
-	height: 14px;
-	background: url('../images/css/footer_bg.jpg') no-repeat top;
-}
-
-#login-page #footer p {
-	padding: 20px 0px 0px 10px;
-	text-align: center;
-	font-family: arial, helvetica, sans-serif;
-	font-size: .9em;
-	color: #999;
-}
-
-.clear {
-	clear: both
-}
-
-/*
-*************************************************
-
 Floating button containers
 
 ********************************************** */
@@ -1135,11 +934,8 @@ My Courses Pages
 	padding-left: 10px;
 }
 
-.mycourses-right-buttons {
-	float: right;
+.course-right-buttons {
 	padding-right: 20px;
-	height: 24px;
-	font-size: 11px
 }
 
 #content-main a.sorting {
@@ -1189,7 +985,6 @@ My Courses Pages
 #content-main a.sequence-name-link {
 	color: #0087E5;
 	text-decoration: none;
-	border-bottom: 1px dotted #0087E5;
 }
 
 #content-main a:hover.sequence-name-link {
@@ -1216,8 +1011,8 @@ My Courses Pages
 
 /************ The group name box **********/
 .group-name {
-	margin-top: 25px;
-	margin-left: 80px;
+	margin-top: 20px;
+	margin-left: 30px;
 }
 
 .group-name p {
@@ -1281,10 +1076,8 @@ My Courses Pages
 .j-single-lesson {
 	list-style: none;
 	margin: 6px;
-	padding: 6px 9px;
+	padding: 3px 3px 3px 10px;
 	position: relative;
-	/* CSS3 text shadow and rounded corners: */
-	text-shadow: 1px 1px 0 white;
 }
 
 .j-single-lesson:hover {
@@ -1292,9 +1085,9 @@ My Courses Pages
 	background-color: #F0F8FF;
 	display: block;
 	/* CSS3 glow effect: */
-	-moz-border-radius: 6px;
-	-webkit-border-radius: 6px;
-	border-radius: 6px;
+	-moz-border-radius: 3px;
+	-webkit-border-radius: 3px;
+	border-radius: 3px;
 	-moz-box-shadow: 0 0 5px #A6E5FD;
 	-webkit-box-shadow: 0 0 5px #A6E5FD;
 	box-shadow: 0 0 5px #A6E5FD;
@@ -1311,7 +1104,8 @@ My Courses Pages
 
 .lesson-actions {
 	float: right;
-	opacity: 0.1;
+	font-size: 1.2em;
+	opacity: 0.3;
 	filter: alpha(opacity = 10); /* msie */
 }
 
@@ -1322,23 +1116,18 @@ My Courses Pages
 }
 
 .j-single-lesson:hover .mycourses-monitor-img {
-	background: url('../images/css/mycourses_monitor.png') no-repeat 0 0px;
 }
 
 .j-single-lesson:hover .mycourses-mark-img {
-	background: url('../images/css/mark.png') no-repeat 0 0px;
 }
 
 .j-single-lesson:hover .mycourses-notifications-img {
-	background: url('../images/css/notifications_go.png') no-repeat 0 0px;
 }
 
 .j-single-lesson:hover .mycourses-conditions-img {
-	background: url('../images/css/conditions.png') no-repeat 0 0px;
 }
 
 .j-single-lesson:hover .mycourses-removelesson-img {
-	background: url('../images/css/delete.png') no-repeat 0 0px;
 }
 
 .j-single-lesson:hover .mycourses-move-img {
@@ -1368,31 +1157,99 @@ My Courses Pages
 }
 
 .mycourses-monitor-img {
-	background: url('../images/css/mycourses_monitor_bw.png') no-repeat 0 0px;
+    position: relative;
+}
+ 
+/*replace the content value with the
+corresponding value from the list below*/
+ 
+.mycourses-monitor-img:before {
+    content: "\f1e5";
+    font-family: FontAwesome;
+    font-style: normal;
+    font-weight: normal;
+    text-decoration: inherit;
+/*--adjust as necessary--*/
+    color: #000;
+    font-size: initial;
+    position: absolute;
+    left: 0;
 }
 
 .mycourses-mark-img {
-	background: url('../images/css/mark_bw.png') no-repeat 0 0;
+	position:relative;
 }
 
+.mycourses-mark-img:before {
+    content: "\f046";
+    font-family: FontAwesome;
+    font-style: normal;
+    font-weight: normal;
+    text-decoration: inherit;
+/*--adjust as necessary--*/
+    color: #000;
+    font-size: initial;
+    position: absolute;
+    left: 0;
+}
+
+
 .mycourses-notifications-img {
-	background: url('../images/css/notifications_go_bw.png') no-repeat 0 0;
+    position:relative;	
+}
+
+.mycourses-notifications-img:before {
+    content: "\f0a1";
+    font-family: FontAwesome;
+    font-style: normal;
+    font-weight: normal;
+    text-decoration: inherit;
+/*--adjust as necessary--*/
+    color: #000;
+    font-size: initial;
+    position: absolute;
+    left: 0;
 }
 
 .mycourses-conditions-img {
-	background: url('../images/css/conditions_bw.png') no-repeat 0 0;
+    position:relative;
+}
+.mycourses-conditions-img:before {
+    content: "\f126";
+    font-family: FontAwesome;
+    font-style: normal;
+    font-weight: normal;
+    text-decoration: inherit;
+/*--adjust as necessary--*/
+    font-size: initial;
+    position: absolute;
+    padding-left:2px;
 }
 
 .mycourses-removelesson-img {
-	background: url('../images/css/delete_bw.png') no-repeat 0 0;
+    position:relative;
 }
+
+.mycourses-removelesson-img:before {
+    content: "\f014";
+    font-family: FontAwesome;
+    font-style: normal;
+    font-weight: normal;
+    text-decoration: inherit;
+/*--adjust as necessary--*/
+    color: #000;
+    font-size: initial;
+    position: absolute;
+    left: 0;
+}
+
 
 .mycourses-move-img {
 	background: url('../images/css/arrow_move.png') no-repeat 0 0;
 }
 
 .lesson-action-label {
-	display: none;
+	/*-- display: none; --*/
 	color: #999;
 }
 

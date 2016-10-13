@@ -134,13 +134,13 @@ public class DisplayGroupAction extends Action {
 	if (isSysAdmin && stateId.equals(OrganisationState.ACTIVE)) {
 	    if (orgBean.getType().equals(OrganisationType.COURSE_TYPE)) {
 		moreLinks.add(new IndexLinkBean("index.classman",
-			"javascript:openOrgManagement(" + org.getOrganisationId() + ")", "manage-group-button", null));
+			"javascript:openOrgManagement(" + org.getOrganisationId() + ")", "fa fa-fw fa-users", null));
 	    }
 	}
 
 	if (org.getEnableGradebookForLearners() && roles.contains(Role.ROLE_LEARNER)) {
 	    String link = "javascript:showGradebookLearnerDialog(" + org.getOrganisationId() + ")";
-	    links.add(new IndexLinkBean("index.coursegradebook.learner", link, "my-grades-button", null));
+	    links.add(new IndexLinkBean("index.coursegradebook.learner", link, "fa fa-fw fa-list-ol", null));
 	}
 
 	if ((roles.contains(Role.ROLE_GROUP_ADMIN) || roles.contains(Role.ROLE_GROUP_MANAGER)
@@ -149,23 +149,23 @@ public class DisplayGroupAction extends Action {
 		if ((!isSysAdmin)
 			&& (roles.contains(Role.ROLE_GROUP_ADMIN) || roles.contains(Role.ROLE_GROUP_MANAGER))) {
 		    moreLinks.add(new IndexLinkBean("index.classman",
-			    "javascript:openOrgManagement(" + org.getOrganisationId() + ")", "manage-group-button",
+			    "javascript:openOrgManagement(" + org.getOrganisationId() + ")", "fa fa-fw fa-users",
 			    null));
 		}
 		if ((roles.contains(Role.ROLE_GROUP_ADMIN) || roles.contains(Role.ROLE_GROUP_MANAGER)
 			|| roles.contains(Role.ROLE_AUTHOR) || roles.contains(Role.ROLE_MONITOR))) {
 		    moreLinks.add(new IndexLinkBean("index.orggroup",
-			    "javascript:showOrgGroupDialog(" + org.getOrganisationId() + ")", "manage-group-button",
+			    "javascript:showOrgGroupDialog(" + org.getOrganisationId() + ")", "fa fa-fw fa-users",
 			    null));
 		}
 
 		if (roles.contains(Role.ROLE_GROUP_MANAGER) || roles.contains(Role.ROLE_MONITOR)) {
 		    String name = org.getEnableSingleActivityLessons() ? "index.addlesson.single" : "index.addlesson";
 		    links.add(new IndexLinkBean(name, "javascript:showAddLessonDialog(" + org.getOrganisationId() + ")",
-			    "add-lesson-button", null));
+			    "fa fa-fw fa-plus", null));
 		}
 		moreLinks.add(new IndexLinkBean("index.searchlesson",
-			"javascript:showSearchLessonDialog(" + org.getOrganisationId() + ")", "search-lesson",
+			"javascript:showSearchLessonDialog(" + org.getOrganisationId() + ")", "fa fa-fw fa-search",
 			"index.searchlesson.tooltip"));
 
 		// Adding course notifications links if enabled
@@ -173,7 +173,7 @@ public class DisplayGroupAction extends Action {
 			&& (roles.contains(Role.ROLE_GROUP_MANAGER) || roles.contains(Role.ROLE_MONITOR))) {
 		    moreLinks.add(new IndexLinkBean("index.emailnotifications",
 			    "javascript:showNotificationsDialog(" + org.getOrganisationId() + ",null)",
-			    "course-notifications", "index.emailnotifications.tooltip"));
+			    "fa fa-fw fa-bullhorn", "index.emailnotifications.tooltip"));
 		}
 
 		// Adding gradebook course monitor links if enabled
@@ -189,14 +189,14 @@ public class DisplayGroupAction extends Action {
 		    String name = org.getParentOrganisation().getEnableSingleActivityLessons()
 			    ? "index.addlesson.single" : "index.addlesson";
 		    links.add(new IndexLinkBean(name, "javascript:showAddLessonDialog(" + org.getOrganisationId() + ")",
-			    "add-lesson-button", null));
+			    "fa fa-fw fa-plus", null));
 		}
 
 		// Adding gradebook course monitor links if enabled
 		if (org.getParentOrganisation().getEnableGradebookForMonitors()
 			&& (roles.contains(Role.ROLE_GROUP_MANAGER) || roles.contains(Role.ROLE_GROUP_ADMIN))) {
 		    String link = "javascript:showGradebookCourseDialog(" + org.getOrganisationId() + ")";
-		    moreLinks.add(new IndexLinkBean("index.coursegradebook.subgroup", link, "my-grades-button", null));
+		    moreLinks.add(new IndexLinkBean("index.coursegradebook.subgroup", link, "fa fa-fw fa-list-ol", null));
 		}
 	    }
 	}
@@ -319,13 +319,13 @@ public class DisplayGroupAction extends Action {
 	    if ((isGroupManagerOrMonitor && stateId.equals(OrganisationState.ACTIVE))
 		    || (stateId.equals(OrganisationState.ARCHIVED) && roles.contains(Role.ROLE_GROUP_MANAGER))) {
 		lessonLinks.addFirst(new IndexLinkBean("index.monitor",
-			"javascript:showMonitorLessonDialog(" + bean.getId() + ")", "mycourses-monitor-img", null));
+			"javascript:showMonitorLessonDialog(" + bean.getId() + ")", "fa fa-fw fa-heartbeat", null));
 	    }
 
 	    // Adding lesson notifications links if enabled
 	    if (isGroupManagerOrMonitor && bean.isEnableLessonNotifications()) {
 		lessonLinks.addFirst(new IndexLinkBean("index.emailnotifications",
-			"javascript:showNotificationsDialog(null," + bean.getId() + ")", "mycourses-notifications-img",
+			"javascript:showNotificationsDialog(null," + bean.getId() + ")", "fa fa-fw fa-bullhorn",
 			"index.emailnotifications.tooltip"));
 	    }
 
@@ -334,13 +334,13 @@ public class DisplayGroupAction extends Action {
 		    || ((parent != null) && parent.getEnableGradebookForMonitors()))) {
 		String link = "javascript:showGradebookLessonDialog(" + bean.getId() + ")";
 		lessonLinks
-			.addFirst(new IndexLinkBean("index.coursegradebookmonitor", link, "mycourses-mark-img", null));
+			.addFirst(new IndexLinkBean("index.coursegradebookmonitor", link, "fa fa-fw fa-check-square-o", null));
 	    }
 
 	    // Add lesson conditions
 	    if (isGroupManagerOrMonitor) {
 		String conditionsLink = "javascript:showConditionsDialog(" + bean.getId() + ")";
-		lessonLinks.addFirst(new IndexLinkBean("index.conditions", conditionsLink, "mycourses-conditions-img",
+		lessonLinks.addFirst(new IndexLinkBean("index.conditions", conditionsLink, "fa fa-fw fa-code-fork",
 			"index.conditions.tooltip"));
 	    }
 
@@ -348,7 +348,7 @@ public class DisplayGroupAction extends Action {
 	    if (isGroupManagerOrMonitor) {
 		String removeLessonLink = "javascript:removeLesson(" + bean.getId() + ")";
 		lessonLinks.addFirst(new IndexLinkBean("index.remove.lesson", removeLessonLink,
-			"mycourses-removelesson-img", "index.remove.lesson.tooltip"));
+			"fa fa-fw fa-trash-o", "index.remove.lesson.tooltip"));
 	    }
 
 	    if (lessonLinks.size() > 0) {
