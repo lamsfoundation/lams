@@ -155,18 +155,19 @@ function makeSortable(element) {
 function showMonitorLessonDialog(lessonID) {
 	var id = "dialogMonitorLesson" + lessonID,
 		dialog = showDialog(id, {
-			'lessonID' : lessonID,
+			'data' : {
+				'lessonID' : lessonID
+			},
 			'autoOpen' : false,
 			'height' : 600,
 			'width' : 1024,
 			'draggable' : false,
-			'dialogClass' : 'tabbedDialog',
 			'title' : LABELS.MONITORING_TITLE,
 			'open' : function() {
 				// load contents after opening the dialog
 				$('iframe', this).attr('src', LAMS_URL
 					+ 'home.do?method=monitorLesson&lessonID='
-					+ $(this).dialog('option', 'lessonID'));
+					+ $(this).data('lessonID'));
 			},
 
 		}, true);
@@ -174,37 +175,40 @@ function showMonitorLessonDialog(lessonID) {
 	// if it was just created
 	if (dialog) {
 		// tell the dialog contents that it was resized
-		dialog.closest('.ui-dialog').on('resizestop dialogextendmaximize dialogextendrestore', function(){
+		$('.modal-content', dialog).on('resizestop dialogextendmaximize dialogextendrestore', function(){
 			var frame = $('iframe', dialog)[0],
 				win = frame.contentWindow || frame.contentDocument;
 			win.resizeSequenceCanvas(dialog.width() - 10, dialog.height() - 10);
 		});
-		dialog.dialog('open');
+		dialog.modal('show');
 	}
 }
 
 
 function showAddLessonDialog(orgID) {
 	showDialog("dialogAddLesson", {
-		'orgID' : orgID,
-		'autoOpen' : true,
+		'data' : {
+			'orgID' : orgID
+		},
 		'modal' : true,
 		'draggable' : false,
-		'dialogClass' : 'tabbedDialog addLessonDialog',
-		'height' : 600,
-		'width' : 800,
+		'height' : 700,
+		'width' : 850,
 		'open' : function() {
+			var dialog = $(this);
 			// load contents after opening the dialog
-			$('iframe', this)
+			$('iframe', dialog)
 					.attr('src', LAMS_URL
 						+ 'home.do?method=addLesson&organisationID='
-						+ $(this).dialog('option', 'orgID'));
+						+ dialog.data('orgID'));
 			
 			// in case of mobile devices allow iframe scrolling
 			if( /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) ) {
 			    setTimeout(function() {
-			    	 $('.dialogContainer').css('overflow-y','scroll');
-			        $('.dialogContainer').css('-webkit-overflow-scrolling','touch');
+			    	dialog.css({
+			    		'overflow-y' : 'scroll',
+			    		'-webkit-overflow-scrolling' : 'touch'
+			    	});
 			    },500);
 			}
 		}
@@ -214,7 +218,9 @@ function showAddLessonDialog(orgID) {
 
 function showOrgGroupDialog(orgID) {
 	showDialog("dialogOrgGroup", {
-		'orgID' : orgID,
+		'data' : {
+			'orgID' : orgID
+		},
 		'modal' : true,
 		'height' : 460,
 		'width' : 460,
@@ -224,23 +230,25 @@ function showOrgGroupDialog(orgID) {
 			$('iframe', this)
 					.attr('src', LAMS_URL
 						+ 'OrganisationGroup.do?method=viewGroupings&organisationID='
-						+ $(this).dialog('option', 'orgID'));
+						+ $(this).data('orgID'));
 		}
 	}, true);
 }
 
 function showAddSingleActivityLessonDialog(orgID, toolID, learningLibraryID) {
 	showDialog("dialogAddSingleActivityLesson", {
-		'orgID' : orgID,
-		'toolID' : toolID,
-		'learningLibraryID' : learningLibraryID,
+		'data' : {
+			'orgID' : orgID,
+			'toolID' : toolID,
+			'learningLibraryID' : learningLibraryID
+		},
+		'modal' : true,
 		'height' : 600,
 		'width' : 850,
-		'modal' : true,
 		'title' : LABELS.SINGLE_ACTIVITY_LESSON_TITLE,
 		'open' : function() {
 			var dialog = $(this),
-				toolID = dialog.dialog('option', 'toolID');
+				toolID = dialog.data('toolID');
 			$.ajax({
 				async : false,
 				cache : false,
@@ -251,7 +259,7 @@ function showAddSingleActivityLessonDialog(orgID, toolID, learningLibraryID) {
 					'toolID' : toolID
 				},
 				success : function(response) {
-					dialog.dialog('option', {
+					dialog.data({
 						'toolContentID' :  response.toolContentID,
 						'contentFolderID' : response.contentFolderID
 					});
@@ -274,14 +282,16 @@ function showAddSingleActivityLessonDialog(orgID, toolID, learningLibraryID) {
 function showNotificationsDialog(orgID, lessonID) {
 	var id = "dialogNotifications" + (lessonID ? "Lesson" + lessonID : "Org" + orgID);
 	showDialog(id, {
-		'orgID' : orgID,
-		'lessonID' : lessonID,
+		'data' : {
+			'orgID' : orgID,
+			'lessonID' : lessonID
+		},
 		'height' : 600,
 		'width' : 850,
 		'title' : LABELS.EMAIL_NOTIFICATIONS_TITLE,
 		'open' : function() {
 			var dialog = $(this),
-				lessonID = dialog.dialog('option', 'lessonID');
+				lessonID = dialog.data('lessonID');
 			// if lesson ID is given, use lesson view; otherwise use course view
 			if (lessonID) {
 				// load contents after opening the dialog
@@ -438,15 +448,16 @@ function showGradebookCourseDialog(orgID){
 function showGradebookLessonDialog(lessonID){
 	var id = "dialogGradebookLesson" + lessonID;
 	showDialog(id, {
-		'lessonID' : lessonID,
+		'data' : {
+			'lessonID' : lessonID
+		},
 		'height' : 650,
 		'width' : 850,
 		'title' : LABELS.GRADEBOOK_LESSON_TITLE,
 		'open' : function() {
-			var lessonID = $(this).dialog('option', 'lessonID');
+			var lessonID = $(this).data('lessonID');
 			// load contents after opening the dialog
-			$('iframe', this).attr('src', LAMS_URL
-				+ 'gradebook/gradebookMonitoring.do?lessonID=' + lessonID);
+			$('iframe', this).attr('src', LAMS_URL + 'gradebook/gradebookMonitoring.do?lessonID=' + lessonID);
 		}
 	}, true);
 }
@@ -454,12 +465,14 @@ function showGradebookLessonDialog(lessonID){
 function showGradebookLearnerDialog(orgID){
 	var id = "dialoGradebookLearner" + orgID;
 	showDialog(id, {
-		'orgID' : orgID,
+		'data'  : {
+			'orgID' : orgID
+		},
 		'height' : 400,
 		'width' : 750,
 		'title' : LABELS.GRADEBOOK_LEARNER_TITLE,
 		'open' : function() {
-			var orgID = $(this).dialog('option', 'orgID');
+			var orgID = $(this).data('orgID');
 			// load contents after opening the dialog
 			$('iframe', this).attr('src', LAMS_URL
 				+ 'gradebook/gradebookLearning.do?dispatch=courseLearner&organisationID=' + orgID);
@@ -470,12 +483,14 @@ function showGradebookLearnerDialog(orgID){
 function showConditionsDialog(lessonID){
 	var id = "dialogConditions" + lessonID;
 	showDialog(id, {
-		'lessonID' : lessonID,
+		'data' : {
+			'lessonID' : lessonID
+		},
 		'height' : 450,
 		'width' : 610,
 		'title' : LABELS.CONDITIONS_TITLE,
 		'open' : function() {
-			var lessonID = $(this).dialog('option', 'lessonID');
+			var lessonID = $(this).data('lessonID');
 			// load contents after opening the dialog
 			$('iframe', this).attr('src', LAMS_URL
 				+ 'lessonConditions.do?method=getIndexLessonConditions&lsId=' + lessonID);
@@ -486,12 +501,14 @@ function showConditionsDialog(lessonID){
 function showSearchLessonDialog(orgID){
 	var id = "dialogSearchLesson" + orgID;
 	showDialog(id, {
-		'orgID' : orgID,
+		'data' : {
+			'orgID' : orgID
+		},
 		'height' : 500,
 		'width' : 1000,
 		'title' : LABELS.SEARCH_LESSON_TITLE,
 		'open' : function() {
-			var orgID = $(this).dialog('option', 'orgID');
+			var orgID = $(this).data('orgID');
 			// load contents after opening the dialog
 			$('iframe', this).attr('src', LAMS_URL
 				+ 'findUserLessons.do?dispatch=getResults&courseID=' + orgID);
@@ -518,8 +535,7 @@ function showAuthoringDialog(learningDesignID){
 			}
 		},
 		'open' : function() {
-			var orgID = $(this).dialog('option', 'orgID'),
-				url = LAMS_URL + 'authoring/author.do?method=openAuthoring';
+			var url = LAMS_URL + 'authoring/author.do?method=openAuthoring';
 			
 			if (learningDesignID) {
 				url += '&learningDesignID=' + learningDesignID;
@@ -588,7 +604,7 @@ function closeDialog(id, refresh) {
 	if (refresh) {
 		loadOrgTab(null, true);
 	}
-	$("#" + id).dialog('close');
+	$("#" + id).modal('hide');
 }
 
 function showOrgGroupDialogContents(title, width, height, url) {
@@ -598,16 +614,17 @@ function showOrgGroupDialogContents(title, width, height, url) {
 		orgID = null;
 	if (exists) {
 		if (!title) {
-			title = dialog.dialog('option', 'title');
+			title = $('.modal-title', dialog).text();
 		}
-		orgID = dialog.dialog('option', 'orgID');
+		orgID = dialog.data('orgID');
 	}
 	showDialog(id, {
-		'orgID'  : orgID,
+		'data' : {
+			'orgID'  : orgID
+		},
 		'height' : height,
 		'width'  : width,
 		'title'  : title,
-		'hide'   : false,
 		'open'   : function() {
 			$('iframe', this).attr('src', url);
 		}

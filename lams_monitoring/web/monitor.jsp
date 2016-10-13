@@ -16,7 +16,6 @@
 	<link rel="stylesheet" href="<lams:LAMSURL/>css/progressBar.css" type="text/css" />
 	<link rel="stylesheet" href="css/monitorLesson.css" type="text/css" media="screen" />
 	<link href="/lams/css/defaultHTML_learner.css" rel="stylesheet" type="text/css">
-	<link rel="stylesheet" href="<lams:LAMSURL/>css/jquery-ui-bootstrap-theme.css" type="text/css" media="screen">	
   
 	<script src="<lams:LAMSURL/>includes/javascript/jquery.js"></script>
 	<script type="text/javascript" >
