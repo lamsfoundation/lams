@@ -141,6 +141,7 @@
     
     <body onload="javascript:setUpTripleMenu();">
         <html:form action="/authoring?validate=false" styleId="newQuestionForm" enctype="multipart/form-data" method="POST">
+        	<c:set var="formBean" value="<%=request.getAttribute(org.apache.struts.taglib.html.Constants.BEAN_KEY)%>" />
             <html:hidden property="dispatch" value="addSingleQuestion" />
             <html:hidden property="toolContentID" />
             <html:hidden property="currentTab" styleId="currentTab" />
@@ -196,9 +197,8 @@
                 <fmt:message key="label.add.new.question"></fmt:message>
             </div>
 
-            <lams:CKEditor id="newQuestion"
-                value="${qaGeneralAuthoringDTO.editableQuestionText}"
-                contentFolderID="${qaGeneralAuthoringDTO.contentFolderID}" width="99%"></lams:CKEditor>
+            <lams:CKEditor id="newQuestion" value=""
+                contentFolderID="${formBean.contentFolderID}" width="99%"></lams:CKEditor>
                 
             <div class="field-name space-top">
 				<html:checkbox property="required" value="1" styleId="required"

@@ -91,7 +91,6 @@ public interface QaAppConstants {
     public static final String GENERAL_LEARNER_FLOW_DTO = "generalLearnerFlowDTO";
 
     public static final Long INITIAL_QUESTION_COUNT = new Long(1);
-    public static final String QA_GENERAL_AUTHORING_DTO = "qaGeneralAuthoringDTO";
 
     /*
      * Struts level constants

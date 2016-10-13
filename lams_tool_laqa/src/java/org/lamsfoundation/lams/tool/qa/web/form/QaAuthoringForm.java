@@ -77,6 +77,7 @@ public class QaAuthoringForm extends QaLearningForm implements QaAppConstants {
     private String contentFolderID;
     private String addSingleQuestion;
     private String editableQuestionIndex;
+    protected String editableQuestionText;
     private String feedback;
     private boolean required;
     private int minWordsLimit;
@@ -684,6 +685,21 @@ public class QaAuthoringForm extends QaLearningForm implements QaAppConstants {
      */
     public void setEditableQuestionIndex(String editableQuestionIndex) {
 	this.editableQuestionIndex = editableQuestionIndex;
+    }
+
+    /**
+     * @return Returns the editableQuestionText.
+     */
+    public String getEditableQuestionText() {
+	return editableQuestionText;
+    }
+
+    /**
+     * @param editableQuestionText
+     *            The editableQuestionText to set.
+     */
+    public void setEditableQuestionText(String editableQuestionText) {
+	this.editableQuestionText = editableQuestionText;
     }
 
     /**
