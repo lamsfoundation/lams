@@ -286,7 +286,7 @@ function showNotificationsDialog(orgID, lessonID) {
 			'orgID' : orgID,
 			'lessonID' : lessonID
 		},
-		'height' : 600,
+		'height' : 650,
 		'width' : 850,
 		'title' : LABELS.EMAIL_NOTIFICATIONS_TITLE,
 		'open' : function() {
@@ -486,7 +486,7 @@ function showConditionsDialog(lessonID){
 		'data' : {
 			'lessonID' : lessonID
 		},
-		'height' : 450,
+		'height' : 750,
 		'width' : 610,
 		'title' : LABELS.CONDITIONS_TITLE,
 		'open' : function() {
@@ -504,7 +504,7 @@ function showSearchLessonDialog(orgID){
 		'data' : {
 			'orgID' : orgID
 		},
-		'height' : 500,
+		'height' : 350,
 		'width' : 1000,
 		'title' : LABELS.SEARCH_LESSON_TITLE,
 		'open' : function() {
