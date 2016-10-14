@@ -179,6 +179,16 @@
 			type="org.lamsfoundation.lams.tool.peerreview.web.action.MonitoringAction"
 			parameter="getSubgridData" >
 		</action>
+		<action path="/monitoring/statistic"
+			type="org.lamsfoundation.lams.tool.peerreview.web.action.MonitoringAction"
+			parameter="statistic" >
+			<forward name="success" path="/pages/monitoring/statisticpart.jsp" />
+		</action>
+		<action path="/monitoring/reflections"
+			type="org.lamsfoundation.lams.tool.peerreview.web.action.MonitoringAction"
+			parameter="reflections" >
+			<forward name="success" path="/pages/monitoring/reflections.jsp" />
+		</action>
 		<!-- ========== BEGIN: Common ============================== -->
 		<action path="/clearsession"
 			type="org.lamsfoundation.lams.tool.peerreview.web.action.ClearSessionAction">

@@ -81,7 +81,7 @@
 	</c:if>
 	
 	<c:choose>
-		<c:when test="${not empty criterias && fn:length(criterias) eq 1}">
+		<c:when test="${not empty criterias && fn:length(criterias) eq 1 && not sessionMap.peerreview.reflectOnActivity}">
 			<c:forEach var="criteria" items="${criterias}">
 			<h4>${criteria.title}</h4>
 			<c:set var="toolSessionId" value="${groupSummary.sessionId}" scope="request"/>
@@ -93,8 +93,13 @@
 		<c:otherwise>
 			<c:forEach var="criteria" items="${criterias}">
 				<c:set var='url'>criteria.do?sessionMapID=${sessionMapID}&toolSessionId=${groupSummary.sessionId}&criteriaId=${criteria.ratingCriteriaId}</c:set>
-				<a href="javascript:launchPopup('${url}')" class="btn btn-default voffset5 loffset5">View ${criteria.title}</a>
+				<a href="javascript:launchPopup('${url}')" class="btn btn-default voffset5 loffset5">
+					<fmt:message key="label.monitoring.view"><fmt:param>${criteria.title}</fmt:param></fmt:message></a>
 			</c:forEach>
+			<c:if test="${sessionMap.peerreview.reflectOnActivity}">
+				<c:set var='url'>reflections.do?sessionMapID=${sessionMapID}&toolSessionId=${groupSummary.sessionId}&toolContentID=${sessionMap.toolContentID}</c:set>
+				<a href="javascript:launchPopup('${url}')" class="btn btn-default voffset5 loffset5"><fmt:message key="title.reflection"/></a>
+			</c:if>
 			<div class="voffset5">&nbsp;</div>
 		</c:otherwise>
 	</c:choose>
@@ -103,13 +108,9 @@
 		</div> <!-- end collapse area  -->
 		</div> <!-- end collapse panel  -->
 	</c:if>
-	${ !sessionMap.isGroupedActivity || ! status.last || sessionMap.peerreview.reflectOnActivity ? '<div class="voffset5">&nbsp;</div>' :  ''}
+	${ !sessionMap.isGroupedActivity || ! status.last ? '<div class="voffset5">&nbsp;</div>' :  ''}
 
 </c:forEach>
-
-<c:if test="${sessionMap.peerreview.reflectOnActivity}">
-	<%@ include file="reflections.jsp"%>
-</c:if>
 
 <c:if test="${sessionMap.isGroupedActivity}">
 	</div> <!--  end panel group -->

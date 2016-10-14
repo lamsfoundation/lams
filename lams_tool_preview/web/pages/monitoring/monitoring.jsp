@@ -1,8 +1,9 @@
 <!DOCTYPE html>
         
-
 <%@ include file="/common/taglibs.jsp"%>
 <%@ page import="org.lamsfoundation.lams.tool.peerreview.PeerreviewConstants"%>
+
+<c:set var="sessionMap" value="${sessionScope[sessionMapID]}"/>
 
 <lams:html>
 	<lams:head>
@@ -20,14 +21,28 @@
 		    }     
 		        
 		    function doSelectTab(tabId) {
-			   // end optional tab controller stuff
+			   if ( tabId == 3) {
+				   doStatistic();
+			   }
 			   selectTab(tabId);
 		    } 
 		        
-			function viewItem(itemUid){
-				var myUrl = "<c:url value="/reviewItem.do"/>?mode=teacher&itemUid=" + itemUid + "&sessionMapID=${sessionMapID}";
-				launchPopup(myUrl,"MonitoringReview");
-			}
+			function doStatistic(){
+				var url = "<c:url value="/monitoring/statistic.do?sessionMapID=${sessionMapID}"/>";
+				$("#statisticArea_Busy").show();
+				$.ajaxSetup({ cache: true });
+				$("#statisticArea").load(
+					url,
+					{
+						toolContentID: ${sessionMap.toolContentID}, 
+						reqID: (new Date()).getTime()
+					},
+					function() {
+						$("#statisticArea_Busy").hide();
+					}
+				);
+				
+			}       
 		</script>		 
 	</lams:head>
 	<body class="stripes" onLoad="init()">
@@ -37,7 +52,7 @@
         	<lams:Tabs control="true" title="${title}" helpToolSignature="<%= PeerreviewConstants.TOOL_SIGNATURE %>" helpModule="monitoring">		
 				<lams:Tab id="1" key="monitoring.tab.summary" />
 				<lams:Tab id="2" key="monitoring.tab.edit.activity" />			
-				<%-- <lams:Tab id="3" key="monitoring.tab.statistics" /> --%>
+				<lams:Tab id="3" key="monitoring.tab.statistics" />
 			</lams:Tabs>
 			
 			<lams:TabBodyArea>
@@ -45,7 +60,7 @@
 			<lams:TabBodys>
 				<lams:TabBody id="1" titleKey="monitoring.tab.summary" page="summary.jsp" />
 				<lams:TabBody id="2" titleKey="monitoring.tab.edit.activity" page="editactivity.jsp" />			
-				<%-- <lams:TabBody id="3" titleKey="monitoring.tab.statistics" page="statistic.jsp" /> --%>
+				<lams:TabBody id="3" titleKey="monitoring.tab.statistics" page="statistic.jsp" />
 			</lams:TabBodys>
 
 			</lams:TabBodyArea>

@@ -23,6 +23,9 @@
 
 package org.lamsfoundation.lams.tool.peerreview.dao;
 
+import java.util.List;
+
+import org.lamsfoundation.lams.tool.peerreview.dto.PeerreviewStatisticsDTO;
 import org.lamsfoundation.lams.tool.peerreview.model.Peerreview;
 
 public interface PeerreviewDAO extends DAO {
@@ -33,4 +36,5 @@ public interface PeerreviewDAO extends DAO {
 
     void delete(Peerreview peerreview);
 
+    List<PeerreviewStatisticsDTO> getStatistics(Long toolContentId);
 }

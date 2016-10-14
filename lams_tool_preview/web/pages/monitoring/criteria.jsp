@@ -61,7 +61,7 @@
 
 	<lams:Page type="monitor" title="${criteria.title}">
 		<%@ include file="criteriapart.jsp" %>
- 		<span onclick="window.close()" class="btn btn-default voffset5 pull-right">Close</span>
+ 		<span onclick="window.close()" class="btn btn-default voffset5 pull-right"><fmt:message key="label.close"/></span>
 	</lams:Page>
 	<!--closes content-->
 
