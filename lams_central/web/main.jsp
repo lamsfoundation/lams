@@ -27,6 +27,7 @@
 	<link rel="shortcut icon" href="<lams:LAMSURL/>favicon.ico" type="image/x-icon" />
 	
 	<link rel="stylesheet" href="<lams:LAMSURL/>css/index.css" type="text/css" media="screen">
+	<link rel="stylesheet" href="<lams:LAMSURL/>css/jquery-ui-bootstrap-theme.css" type="text/css" media="screen">
 
 	<script type="text/javascript" src="includes/javascript/getSysInfo.js"></script>
 	<script type="text/javascript" src="loadVars.jsp"></script>
@@ -250,9 +251,6 @@
 			<tiles:insert attribute="community" />
 		</c:if>
 	</div>
-	
-	<div class="minmaxCon"></div>
-	
 	<div id="footer">
 		<p>
 			<fmt:message key="msg.LAMS.version" /> <%=Configuration.get(ConfigurationKeys.VERSION)%>

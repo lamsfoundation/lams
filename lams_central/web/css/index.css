@@ -26,66 +26,72 @@ td#messageCell {
 	-webkit-overflow-scrolling: touch !important;
 }
 
+.dialogContainer .modal-body {
+	height : 100%;
+	max-height: calc(100% - 60px);
+}
+
 .dialogContainer iframe {
 	width: 100%;
 	height: 100%;
 	border: none;
 }
 
-.dialogContainer .close {
+.dialogContainer button {
 	cursor: pointer;
 }
-
-.dialogContainer .modal-body {
-	height : 100%;
-	max-height: calc(100% - 60px);
+.dialogContainer button:focus {
+	outline: none;
 }
 
-.min {
-  width: 250px;
-  height: 35px;
-  overflow: hidden !important;
-  padding: 0px !important;
-  margin: 0px;
-  float: left;
-  position: static !important;
-}
-
-.min .modal-dialog, .min .modal-content {
-  height: 100%;
-  width: 100%;
-  margin: 0px !important;
-  padding: 0px !important;
-}
-
-.min .modal-header {
-  height: 100%;
-  margin: 0px !important;
-  padding: 3px 5px !important;
-}
-
-.display-none { display: none; }
-
-button .fa {
+.dialogContainer button .fa {
   font-size: 16px;
   margin-left: 10px;
 }
 
-.min .fa { font-size: 14px; }
-
-.min .menuTab { display: none; }
-
-button:focus { outline: none; }
-
-.minmaxCon {
-  height: 35px;
-  bottom: 1px;
-  left: 1px;
-  position: fixed;
-  right: 1px;
-  z-index: 9999;
+.dialogContainer .ui-draggable .modal-header {
+	cursor: move;
 }
 
+#dialogMinContainer {
+	height: 35px;
+	bottom: 1px;
+	left: 1px;
+	position: fixed;
+	right: 1px;
+	z-index: 9999;
+}
+
+.dialogMin {
+	overflow: hidden !important;
+	padding: 0 !important;
+	margin: 0;
+	float: left;
+	position: static !important;
+}
+
+.dialogMin .modal-title {
+	white-space: nowrap;
+	overflow: hidden;
+}
+
+.dialogMin .modal-dialog {
+	left: 0 !important;
+	top: 0 !important;
+}
+
+.dialogMin .modal-dialog, .dialogMin .modal-content {
+	width: 250px !important;
+	height: 35px !important;
+	margin: 0 !important;
+	padding: 0 !important;
+}
+
+.dialogMin .modal-header {
+	height: 100%;
+	margin: 0 !important;
+	padding: 3px 5px !important;
+}
 
 #mainContentTable td {
 	vertical-align: top;

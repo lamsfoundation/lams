@@ -3,10 +3,13 @@ var dialogTemplate = $('<div class="modal fade dialogContainer" tabindex="-1" ro
 								'<div class="modal-content">' +
 									'<div class="modal-header">' +
 										'<button type="button" class="close" data-dismiss="modal" aria-label="Close">' +
-											'<span aria-hidden="true">&times;</span>' +
+											'<i class="fa fa-times" aria-hidden="true"></i>' +
 										'</button>' + 
-										'<button class="close dialogMinimise">' +
-											'<span aria-hidden="true">&minus;</span>' +
+										'<button type="button" class="close dialogMaximise" aria-label="Maximise">' +
+											'<i class="fa fa-plus" aria-hidden="true"></i>' +
+										'</button>' +
+										'<button type="button" class="close dialogMinimise" aria-label="Minimise">' +
+											'<i class="fa fa-minus" aria-hidden="true"></i>' +
 										'</button>' +
 										'<h4 class="modal-title"></h4>' +
 									'</div>' +
@@ -28,18 +31,17 @@ function showDialog(id, initParams, extraButtons, recreate) {
 	if (dialog.length > 0) {
 		if (recreate){
 			dialog.modal('hide');
-			dialog.remove();
 		} else {
+			// we do not support multiple opened bootstrap dialogs yet
 			// dialog.dialog('moveToTop');
 			return;
 		}
 	}
 	
 	// create a new dialog by cloning a template
-	dialog = dialogTemplate.clone();
+	dialog = dialogTemplate.clone().appendTo('body');
 	
-
-	$('#myModalLabel', dialog).text(LABELS.GRADEBOOK_LESSON_TITLE);
+	// use the input attributes or fall back to default ones
 	initParams = $.extend({
 		'autoOpen' : true,
 		'draggable' : true,
@@ -53,6 +55,7 @@ function showDialog(id, initParams, extraButtons, recreate) {
 		}
 	}, initParams);
 	
+	// update title
 	$('.modal-title', dialog).attr('id',  id + 'Label').text(initParams.title);
 	dialog.attr({
 		'id' : id,
@@ -65,13 +68,13 @@ function showDialog(id, initParams, extraButtons, recreate) {
 	if (initParams.height) {
 		$('.modal-content', dialog).height(initParams.height);
 	}
-	if (initParams.draggable) {
-		$('.modal-dialog', dialog).draggable();
-		$('.modal-header', dialog).css('cursor', 'move');
-	}
 	if (initParams.resizable) {
 		$('.modal-content', dialog).resizable();
 	}
+	if (initParams.draggable) {
+		$('.modal-dialog', dialog).draggable();
+	}
+	// store extra attributes for dialog content internal use
 	if (initParams.data) {
 		dialog.data(initParams.data);
 	}
@@ -87,26 +90,67 @@ function showDialog(id, initParams, extraButtons, recreate) {
 	});
 	
 	if (extraButtons) {
-	    $('.dialogMinimise', dialog).on('click', function() {
-	        dialog.siblings('.modal-backdrop').addClass('display-none');
-	        dialog.toggleClass('min');
-	        if (dialog.hasClass('min')) {
-	            $('.minmaxCon').append(dialog);
-	            $('.dialogMinimise span', dialog).text('&clone;');
+		$('.dialogMaximise', dialog).click(function(){
+			var icon = $('i', this),
+				wasMaxed = icon.hasClass('fa-clone'),
+				internalDialog = $('.modal-dialog', dialog),
+				internalContent = $('.modal-content', dialog);
+			icon.toggleClass('fa-plus').toggleClass('fa-clone');
+			if (wasMaxed) {
+				// restore dialog
+				internalDialog.width(dialog.data('oldWidth'));
+				internalContent.width(dialog.data('oldWidth'));
+				internalContent.height(dialog.data('oldHeight'));
+				
+				// enable resizing
+				$('.ui-resizable-handle', dialog).show();
+			} else {
+				// store previous size
+				dialog.data({
+					'oldWidth' : internalContent.width(),
+					'oldHeight': internalContent.height()
+				});
+				internalDialog.css({
+					'width' : '100%',
+					'height': '100%'
+				});
+				internalContent.css('width', 'calc(100% - 15px)');
+				internalContent.height(internalDialog.height() - 50);
+				
+				// disable resizing
+				$('.ui-resizable-handle', dialog).hide();
+			}
+			// center the dialog
+			internalDialog.position({
+				'my' : 'top',
+				'at' : 'center top+20px',
+				'of' : window
+			});
+		});
+		
+	    $('.dialogMinimise', dialog).click(function() {
+	    	// swap icon
+            $('i', this).toggleClass('fa-minus').toggleClass('fa-clone');
+	        dialog.toggleClass('dialogMin');
+	        if (dialog.hasClass('dialogMin')) {
+	        	// remove overlay
+	        	dialog.siblings('.modal-backdrop').hide();
+	        	// move the dialog to the bar at the bottom
+	            $('<div>').attr('id', 'dialogMinContainer').appendTo('body').append(dialog);
+	            // disable maximising 
+	        	$('.dialogMaximise', dialog).hide();
+	        	// disable rezising
+		        $('.ui-resizable-handle', dialog).hide();
 	        } else {
 	            $('body').append(dialog);
-	            $('.dialogMinimise span', dialog).text('&minus;');
+	            $('#dialogMinContainer').remove();
+	            dialog.siblings('.modal-backdrop').show();
+	            $('.dialogMaximise', dialog).show();
+	            $('.ui-resizable-handle', dialog).show();
 	        };
 	    });
-	    /*
-	    $("button[data-dismiss='modal']").click(function() {
-	        dialog.removeClass('min');
-	        $(body).removeClass($apnData);
-	        $(this).next('.modalMinimize').find("i").removeClass('fa fa-clone').addClass('fa fa-minus');
-	    });
-	    */
 	} else {
-		$('.dialogMinimise', dialog).remove();
+		$('.dialogMinimise, .dialogMaximise', dialog).remove();
 	}
 	
 	return dialog;
