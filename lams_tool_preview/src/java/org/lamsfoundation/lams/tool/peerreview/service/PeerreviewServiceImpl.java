@@ -71,6 +71,7 @@ import org.lamsfoundation.lams.tool.peerreview.dao.PeerreviewDAO;
 import org.lamsfoundation.lams.tool.peerreview.dao.PeerreviewSessionDAO;
 import org.lamsfoundation.lams.tool.peerreview.dao.PeerreviewUserDAO;
 import org.lamsfoundation.lams.tool.peerreview.dto.GroupSummary;
+import org.lamsfoundation.lams.tool.peerreview.dto.PeerreviewStatisticsDTO;
 import org.lamsfoundation.lams.tool.peerreview.dto.ReflectDTO;
 import org.lamsfoundation.lams.tool.peerreview.model.Peerreview;
 import org.lamsfoundation.lams.tool.peerreview.model.PeerreviewSession;
@@ -240,27 +241,22 @@ public class PeerreviewServiceImpl
     }
 
     @Override
-    public List<ReflectDTO> getReflectList(Long contentId) {
+    public List<ReflectDTO> getReflectList(Long contentId, Long sessionId) {
+
 	List<ReflectDTO> reflections = new LinkedList<ReflectDTO>();
 
-	List<PeerreviewSession> sessionList = peerreviewSessionDao.getByContentId(contentId);
-	for (PeerreviewSession session : sessionList) {
-	    Long sessionId = session.getSessionId();
-	    // get all users in this session
-	    List<PeerreviewUser> users = peerreviewUserDao.getBySessionID(sessionId);
-	    for (PeerreviewUser user : users) {
+	List<PeerreviewUser> users = peerreviewUserDao.getBySessionID(sessionId);
+	for (PeerreviewUser user : users) {
 
-		NotebookEntry entry = getEntry(sessionId, CoreNotebookConstants.NOTEBOOK_TOOL,
-			PeerreviewConstants.TOOL_SIGNATURE, user.getUserId().intValue());
-		if (entry != null) {
-		    ReflectDTO ref = new ReflectDTO(user);
-		    ref.setReflect(entry.getEntry());
-		    Date postedDate = (entry.getLastModified() != null) ? entry.getLastModified()
-			    : entry.getCreateDate();
-		    ref.setDate(postedDate);
-		    reflections.add(ref);
-		}
-
+	    NotebookEntry entry = getEntry(sessionId, CoreNotebookConstants.NOTEBOOK_TOOL,
+		    PeerreviewConstants.TOOL_SIGNATURE, user.getUserId().intValue());
+	    if (entry != null) {
+		ReflectDTO ref = new ReflectDTO(user);
+		ref.setReflect(entry.getEntry());
+		Date postedDate = (entry.getLastModified() != null) ? entry.getLastModified()
+			: entry.getCreateDate();
+		ref.setDate(postedDate);
+		reflections.add(ref);
 	    }
 
 	}
@@ -439,6 +435,20 @@ public class PeerreviewServiceImpl
 	return rawData;
     }
 
+    @Override
+    public boolean isGroupedActivity(long toolContentID) {
+	return toolService.isGroupedActivity(toolContentID);
+    }
+
+    @Override
+    public String getLocalisedMessage(String key, Object[] args) {
+	return messageService.getMessage(key, args);
+    }
+
+    @Override
+    public List<PeerreviewStatisticsDTO> getStatistics(Long toolContentId) {
+	return peerreviewDao.getStatistics(toolContentId);
+    }
     
     // *****************************************************************************
     // private methods
@@ -465,16 +475,6 @@ public class PeerreviewServiceImpl
 	    throw new PeerreviewApplicationException(error);
 	}
 	return contentId;
-    }
-
-    @Override
-    public boolean isGroupedActivity(long toolContentID) {
-	return toolService.isGroupedActivity(toolContentID);
-    }
-
-    @Override
-    public String getLocalisedMessage(String key, Object[] args) {
-	return messageService.getMessage(key, args);
     }
 
     // *******************************************************************************
@@ -740,11 +740,6 @@ public class PeerreviewServiceImpl
     public List<ItemRatingDTO> getRatingCriteriaDtos(Long contentId, Collection<Long> itemIds,
 	    boolean isCommentsByOtherUsersRequired, Long userId) {
 	return ratingService.getRatingCriteriaDtos(contentId, itemIds, isCommentsByOtherUsersRequired, userId);
-    }
-
-    @Override
-    public ItemRatingDTO getRatingCriteriaDtoWithActualRatings(Long contentId, Long itemId) {
-	return ratingService.getRatingCriteriaDtoWithActualRatings(contentId, itemId);
     }
 
     @Override

@@ -35,6 +35,7 @@ import org.lamsfoundation.lams.rating.dto.ItemRatingDTO;
 import org.lamsfoundation.lams.rating.dto.StyledCriteriaRatingDTO;
 import org.lamsfoundation.lams.rating.model.RatingCriteria;
 import org.lamsfoundation.lams.tool.peerreview.dto.GroupSummary;
+import org.lamsfoundation.lams.tool.peerreview.dto.PeerreviewStatisticsDTO;
 import org.lamsfoundation.lams.tool.peerreview.dto.ReflectDTO;
 import org.lamsfoundation.lams.tool.peerreview.model.Peerreview;
 import org.lamsfoundation.lams.tool.peerreview.model.PeerreviewSession;
@@ -47,12 +48,6 @@ import org.lamsfoundation.lams.tool.peerreview.model.PeerreviewUser;
  */
 public interface IPeerreviewService extends ToolRatingManager {
 
-    // TODO remove!
-    int rateItems(RatingCriteria ratingCriteria, Integer userId, Map<Long, Float> newRatings);
-    void commentItem(RatingCriteria ratingCriteria, Integer userId, Long itemId, String comment);
-    RatingCriteria getCriteriaByCriteriaId(Long ratingCriteriaId);
-
-    
     /**
      * Get <code>Peerreview</code> by toolContentID.
      *
@@ -194,7 +189,7 @@ public interface IPeerreviewService extends ToolRatingManager {
      * @param contentId
      * @return
      */
-    List<ReflectDTO> getReflectList(Long contentId);
+    List<ReflectDTO> getReflectList(Long contentId, Long sessionId);
 
     /**
      * Get user by UID
@@ -230,15 +225,15 @@ public interface IPeerreviewService extends ToolRatingManager {
 
     List<RatingCriteria> getCriteriasByToolContentId(Long toolContentId);
     
-    /**
-     * Returns item DTO with all corresponding ratings and comments. Doesn't contain average and total amount of rates.
-     *
-     * @param contentId
-     * @param itemId
-     * @return
-     */
-    ItemRatingDTO getRatingCriteriaDtoWithActualRatings(Long contentId, Long itemId);
+    /** Save the ratings for ranking and hedging. */
+    int rateItems(RatingCriteria ratingCriteria, Integer userId, Map<Long, Float> newRatings);
 
+    /** Save a comment made on a comment only page.  */
+    void commentItem(RatingCriteria ratingCriteria, Integer userId, Long itemId, String comment);
+
+    /** Get the details for a single criteria */
+    RatingCriteria getCriteriaByCriteriaId(Long ratingCriteriaId);
+    
     /**
      * It's a modification of org.lamsfoundation.lams.rating.ToolRatingManager.getRatingCriteriaDtos(Long contentId,
      * Collection<Long> itemIds, boolean isCommentsByOtherUsersRequired, Long userId) method, added additional parameter
@@ -278,4 +273,7 @@ public interface IPeerreviewService extends ToolRatingManager {
 	    Integer page, Integer size, int sorting);
     
     String getLocalisedMessage(String key, Object[] args);
+    
+    /** Get the monitoring statistics */
+    List<PeerreviewStatisticsDTO> getStatistics(Long toolContentId);
 }

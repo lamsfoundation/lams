@@ -51,6 +51,7 @@ import org.lamsfoundation.lams.rating.dto.StyledRatingDTO;
 import org.lamsfoundation.lams.rating.model.RatingCriteria;
 import org.lamsfoundation.lams.tool.peerreview.PeerreviewConstants;
 import org.lamsfoundation.lams.tool.peerreview.dto.GroupSummary;
+import org.lamsfoundation.lams.tool.peerreview.dto.PeerreviewStatisticsDTO;
 import org.lamsfoundation.lams.tool.peerreview.dto.ReflectDTO;
 import org.lamsfoundation.lams.tool.peerreview.model.Peerreview;
 import org.lamsfoundation.lams.tool.peerreview.model.PeerreviewUser;
@@ -83,6 +84,13 @@ public class MonitoringAction extends Action {
 	if (param.equals("getSubgridData")) {
 	    return getSubgridData(mapping, form, request, response);
 	}
+	// refresh statistic page by Ajax call.
+	if (param.equals("statistic")) {
+	    return statistic(mapping, form, request, response);
+	}
+	if (param.equals("reflections")) {
+	    return reflections(mapping, form, request, response);
+	}
 
 	return mapping.findForward(PeerreviewConstants.ERROR);
     }
@@ -103,12 +111,6 @@ public class MonitoringAction extends Action {
 
 	Peerreview peerreview = service.getPeerreviewByContentId(contentId);
 
-	// Create reflectList if reflection is enabled.
-	if (peerreview.isReflectOnActivity()) {
-	    List<ReflectDTO> relectList = service.getReflectList(contentId);
-	    sessionMap.put(PeerreviewConstants.ATTR_REFLECT_LIST, relectList);
-	}
-
 	// user name map
 	List<PeerreviewUser> sessionUsers = service.getUsersByContent(contentId);
 	HashMap<Long, String> userNameMap = new HashMap<Long, String>();
@@ -128,15 +130,6 @@ public class MonitoringAction extends Action {
 	request.setAttribute(PeerreviewConstants.ATTR_CRITERIAS, criterias);
 	return mapping.findForward(PeerreviewConstants.SUCCESS);
     }
-
-//    private void setupRankHedgeData(HttpServletRequest request, Long contentId, IPeerreviewService service, RatingCriteria criteria) {
-//	int sorting = criteria.isHedgeStyleRating() ? PeerreviewConstants.SORT_BY_AVERAGE_RESULT_DESC : (criteria
-//		.isRankingStyleRating() ? PeerreviewConstants.SORT_BY_AVERAGE_RESULT_ASC
-//		: PeerreviewConstants.SORT_BY_USERNAME_ASC);
-//	StyledCriteriaRatingDTO dto = service.getUsersRatingsCommentsByCriteriaIdDTO(contentId, criteria, -1L,
-//		false, sorting, true, true);
-//	request.setAttribute("criteriaRatings", dto);
-//    }
 
     private ActionForward criteria(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) {
@@ -343,6 +336,39 @@ public class MonitoringAction extends Action {
 	return null;
     }
 
+    private ActionForward statistic(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+	    HttpServletResponse response) {	
+	IPeerreviewService service = getPeerreviewService();
+	String sessionMapID = request.getParameter(PeerreviewConstants.ATTR_SESSION_MAP_ID);
+	Long toolContentId = WebUtil.readLongParam(request, PeerreviewConstants.ATTR_TOOL_CONTENT_ID);
+	request.setAttribute("summaryList", service.getStatistics(toolContentId));
+	request.setAttribute(PeerreviewConstants.ATTR_SESSION_MAP_ID, sessionMapID);
+	return mapping.findForward(PeerreviewConstants.SUCCESS);
+    }
+    
+    private ActionForward reflections(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+	    HttpServletResponse response) {
+
+	String sessionMapID = request.getParameter(PeerreviewConstants.ATTR_SESSION_MAP_ID);
+	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
+		.getAttribute(sessionMapID);
+	request.setAttribute(PeerreviewConstants.ATTR_SESSION_MAP_ID, sessionMap.getSessionID());
+
+	Long contentId = (Long) sessionMap.get(PeerreviewConstants.ATTR_TOOL_CONTENT_ID);
+	Long toolSessionId = WebUtil.readLongParam(request, "toolSessionId");
+
+	IPeerreviewService service = getPeerreviewService();
+	
+	Peerreview peerreview = service.getPeerreviewByContentId(contentId);
+	List<ReflectDTO> relectList = service.getReflectList(contentId, toolSessionId);
+	request.setAttribute(PeerreviewConstants.ATTR_REFLECT_LIST, relectList);
+	request.setAttribute("toolSessionId", toolSessionId);
+	
+	return mapping.findForward(PeerreviewConstants.SUCCESS);
+    }
+
+
+    
     // *************************************************************************************
     // Private method
     // *************************************************************************************

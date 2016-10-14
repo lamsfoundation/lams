@@ -25,8 +25,10 @@ package org.lamsfoundation.lams.tool.peerreview.dao.hibernate;
 
 import java.util.List;
 
+import org.hibernate.transform.Transformers;
 import org.lamsfoundation.lams.dao.hibernate.LAMSBaseDAO;
 import org.lamsfoundation.lams.tool.peerreview.dao.PeerreviewDAO;
+import org.lamsfoundation.lams.tool.peerreview.dto.PeerreviewStatisticsDTO;
 import org.lamsfoundation.lams.tool.peerreview.model.Peerreview;
 
 /**
@@ -38,6 +40,13 @@ import org.lamsfoundation.lams.tool.peerreview.model.Peerreview;
 public class PeerreviewDAOHibernate extends LAMSBaseDAO implements PeerreviewDAO {
     private static final String GET_RESOURCE_BY_CONTENTID = "from " + Peerreview.class.getName()
 	    + " as r where r.contentId=?";
+    
+    private static final String GET_STATS = "SELECT s.session_id as \"sessionId\", s.session_name as \"sessionName\", "
+	    + " count(u.uid) as \"numLearnersInSession\", sum(u.session_finished) as \"numLearnersComplete\" "
+	    + " FROM tl_laprev11_session s "
+	    + " JOIN tl_laprev11_peerreview p ON p.content_id = :toolContentId AND s.peerreview_uid = p.uid "
+	    + " LEFT JOIN tl_laprev11_user u ON u.session_uid = s.uid "
+	    + " GROUP BY session_id";
 
     @Override
     public Peerreview getByContentId(Long contentId) {
@@ -59,4 +68,13 @@ public class PeerreviewDAOHibernate extends LAMSBaseDAO implements PeerreviewDAO
 	delete(peerreview);
     }
 
+    @SuppressWarnings("unchecked")
+    @Override
+    public List<PeerreviewStatisticsDTO> getStatistics(Long toolContentId) {
+	return getSession().createSQLQuery(GET_STATS)
+		.setLong("toolContentId", toolContentId)
+		.setResultTransformer( Transformers.aliasToBean( PeerreviewStatisticsDTO.class ) )
+		.list();
+	
+    }
 }
