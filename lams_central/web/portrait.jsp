@@ -144,7 +144,7 @@
 			
 			<!--  -->
 			<div class="panel-group" id="accordion" role="tablist" aria-multiselectable="true">
-			  <div class="panel panel-default">
+			  <div class="panel panel-default hidden-xs">
 			    <div class="panel-heading" role="tab" id="headingOne">
 			      <div class="panel-title">
 			        <a role="button" data-toggle="collapse" data-parent="#accordion" href="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
@@ -152,7 +152,7 @@
 			        </a>
 			      </div>
 			    </div>
-			    <div id="collapseOne" class="panel-collapse collapse in" role="tabpanel" aria-labelledby="headingOne">
+			    <div id="collapseOne" class="panel-collapse collapse in hidden-xs" role="tabpanel" aria-labelledby="headingOne">
 			      <div class="panel-body">
 			      <!-- Webcam -->
 			
@@ -169,10 +169,10 @@
 									<fmt:message key='label.portrait.do.you.like.results' />
 								</div>
 			
-								<a class="button" id="uploadWebcam"
+								<a class="btn btn-xs btn-default" id="uploadWebcam"
 									href="javascript:return false;"><fmt:message
 										key='label.portrait.yes.set.it.as.portrait' /></a> <a
-									class="button" id="resetWebcam"
+									class="btn btn-xs btn-default" id="resetWebcam"
 									href="javascript:return false;"><fmt:message
 										key='label.portrait.no.take.another.one' /></a>
 							</div>
