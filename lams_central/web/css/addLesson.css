@@ -56,8 +56,7 @@ table.tabTable {
 
 div.tabTitle {
 	padding: 5px 0px 5px 0px;
-	font-size: small;
-	font-weight: bold;
+	font-size: larger;
 	text-align: center;
 }
 
@@ -132,7 +131,7 @@ td.userContainerCell {
 
 td.userConainterTransferCell {
 	height: 100px;
-	width: 16px;
+	width: 25px;
 	padding: 18px 3px 8px 3px;
 	vertical-align: top;
 }
@@ -158,9 +157,7 @@ td.userConainterTransferCell img {
 }
 
 .userContainerTitle {
-	padding: 0px 0px 5px 0px;
-	height: 15px;
-	font-size: small;
+	margin-bottom: 5px;
 	font-weight: bold;
 	text-align: center;
 }
@@ -187,12 +184,7 @@ div#tabAdvanced, div#tabConditions {
 	padding-left: 30px;
 }
 
-input[type="checkbox"] {
-	margin: 10px 5px 0px 0px;
-	border: none;
-}
-
-.fieldSectionTitle {
+.p {
 	padding: 15px 0px 5px 15px;
 	font-size: small;
 	font-weight: bold;
@@ -214,28 +206,6 @@ textarea#introDescription {
 	display: none;
 }
 
-#introImageField {
-	margin-top: 20px;
-}
-
-table#splitLearnersTable {
-	height: 40px;
-	display: none;
-}
-
-td#splitLearnersCell {
-	padding: 0px 0px 0px 30px;
-}
-
-#splitLearnersCountField {
-	width: 50px;
-	margin: 0px 0px 0px 5px !important;
-}
-
-td#splitLearnersDescriptionCell {
-	padding: 0px;
-}
-
 span#splitLearnersDescription {
 	font-style: italic;
 }
@@ -255,16 +225,20 @@ span#splitLearnersDescription {
 	display: none;
 }
 
-div#timeLimitDiv {
-	padding: 10px 0px 0px 30px;
-	display: none;
-}
-
-#timeLimitDaysField {
-	width: 50px;
-	margin: 0px 0px 0px 5px !important;
-}
-
-#timeLimitIndividualField {
+.lead {
 	margin-top: 15px;
+	margin-bottom: 10px;
 }
+
+.options {
+	margin-left: 25px;
+}
+
+.separator {
+	margin-top: 10px;
+	margin-bottom: 10px;
+	border: 0px;
+	border-top: 1px solid #eee;	
+	width: 100%;
+}
+	
