@@ -186,12 +186,12 @@ function initAdvancedTab(){
 		$('#introDescriptionDiv').hide();
 	});
 	
-	$('#splitLearnersCountField').spinner({
-		'incremental' : false,
+	$('#splitLearnersCountField').attr({
+		'step'        : 1,
 		'min'         : 1,
 		'max'         : users.selectedLearners ? users.selectedLearners.length : 1,
 		'stop'        : updateSplitLearnersFields
-	}).spinner('value', 1);
+	});
 	
 	$('#splitLearnersField').change(function(){
 		if ($(this).is(':checked')) {
@@ -321,7 +321,7 @@ function addLesson(){
 	
 	if ($('#splitLearnersField').is(':checked')) {
 		var maxLearnerCount = $('#selected-learners div.draggableUser').length;
-		var learnerCount = $('#splitLearnersCountField').spinner('value');
+		var learnerCount = $('#splitLearnersCountField').val();
 		var instances = Math.ceil(maxLearnerCount/learnerCount);
 		$('#splitNumberLessonsField').val(instances);
 	}
@@ -532,8 +532,8 @@ function updateSplitLearnersFields(){
 	if ($('#splitLearnersField').is(':checked')) {
 		// put users into groups
 		var maxLearnerCount = $('#selected-learners div.draggableUser').length;
-		var learnerCount = $('#splitLearnersCountField').spinner('option', 'max', maxLearnerCount < 1 ? 1 : maxLearnerCount)
-		                                            .spinner('value');
+		var learnerCount = $('#splitLearnersCountField').val();
+		alert($('#splitLearnersCountField').val());
 		var instances = Math.ceil(maxLearnerCount/learnerCount);
 		learnerCount = Math.ceil(maxLearnerCount/instances);
 		var description = SPLIT_LEARNERS_DESCRIPTION.replace('[0]', instances).replace('[1]', learnerCount);

@@ -192,7 +192,7 @@ function showAddLessonDialog(orgID) {
 		},
 		'modal' : true,
 		'draggable' : false,
-		'height' : 700,
+		'height' : 740,
 		'width' : 850,
 		'open' : function() {
 			var dialog = $(this);
