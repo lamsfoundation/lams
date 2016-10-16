@@ -19,9 +19,6 @@
 	<link rel="stylesheet" type="text/css" href="<lams:LAMSURL/>/css/jquery.jqGrid.css" />
 	<link type="text/css" href="<lams:LAMSURL/>css/jquery-ui.timepicker.css" rel="stylesheet">
 	<style type="text/css">
-		div#content {min-height: 250px; }
-		#emailTextareaDiv {float: right;}
-		#emailButton {text-align: right; float: right;}
 		#additionalParameters {min-height: 50px;}
 		#activityDiv, #daysToDeadlineDiv {display: none;}
 		#pager3_right table{float:right !important; }
@@ -34,7 +31,7 @@
 		}
 		#nowDiv{padding-left: 10px;}
 		.ui-jqgrid-hbox {padding-left: 0;}
-		#accordion {width: 325px;}
+		#accordion {width: 100%;}
 		#accordion h3 a {border-bottom: 0;}
 		#accordion p {text-align: center; padding-bottom: 0px; margin-bottom: 0xp; font-size:12px;}
 	</style>	
@@ -186,56 +183,64 @@
 <body class="stripes">
 
 	<lams:Page title="${title}" type="admin">
-		<h4><fmt:message key="email.notifications.notify.sudents.that"/></h4>
-		
-		<form action="<c:url value="/emailNotifications.do"/>?method=emailUsers" method="post" id="emailNotificationsForm" >	
-		
-		<div id="emailTextareaDiv">
-			<c:set var="emailBody"><fmt:message key="email.notifications.lesson.email.body.header"/><br/><br/><fmt:message key="email.notifications.lesson.email.body.msg"/><br/><br/><br/><fmt:message key="email.notifications.lesson.email.body.footer" ><fmt:param>${lesson.lessonName}</fmt:param><fmt:param><lams:LAMSURL/>home.do?method=learner&lessonID=${lesson.lessonId}</fmt:param></fmt:message>
-			</c:set>
-			<textarea rows="8" name="emailBody" id="emailBody" cols="43"  class="form-control form-control-inline">${fn:replace(emailBody, '<br/>', newLineChar)}</textarea>
-			<br/><br/>
-			<input class="btn btn-primary btn-sm" type="button" id="emailButton" value="<fmt:message key="email.notifications.send"/>" />
-		</div>		
-		
-		<!-- Dropdown menu for choosing a user search type -->
-		<div>
-			<select id="searchType" onchange="getUsers();">
-				<option selected="selected" value="0"><fmt:message key="email.notifications.user.search.property.0" /></option>
-				<option value="1"><fmt:message key="email.notifications.user.search.property.1" /></option>
-				<option value="2"><fmt:message key="email.notifications.user.search.property.2" /></option>
-				<option value="3"><fmt:message key="email.notifications.user.search.property.3" /></option>
-				<option value="4"><fmt:message key="email.notifications.user.search.property.4" /></option>
-				<option value="5"><fmt:message key="email.notifications.user.search.property.5" /></option>
-				<option value="6"><fmt:message key="email.notifications.user.search.property.6" /></option>
-			</select>
-		</div>
-		
-		<div id="additionalParameters">
-			<div id="activityDiv">
-				<h3>
-					<fmt:message key="email.notifications.activity" />
-				</h3>
-				<select id="activityId" onchange="getUsers();">
-					<c:forEach var="activity" items="${activities}" varStatus="i">
-						<option <c:if test="${i.index==0}">selected="selected"</c:if> value="${activity.activityId}"><c:out value="${activity.title}"/></option>
-					</c:forEach>
-				</select>				
-			</div>
-			
-			<div id="daysToDeadlineDiv">
-				<h3>
-					<fmt:message key="email.notifications.days.to.deadline" />
-				</h3>
+		<div class="row">
+			<div class="col-sm-6">
+				<h4><fmt:message key="email.notifications.notify.sudents.that"/></h4>
 				
-				<input name="daysToDeadline" type="text" id="daysToDeadline" value="3" size="3"/> 	
-				<input class="btn btn-default btn-sm" type="button" value="<fmt:message key="button.ok"/>" onclick="getUsers();" />			
+				<form action="<c:url value="/emailNotifications.do"/>?method=emailUsers" method="post" id="emailNotificationsForm" >	
+				
+				
+				<!-- Dropdown menu for choosing a user search type -->
+				<div>
+					<select id="searchType" onchange="getUsers();">
+						<option selected="selected" value="0"><fmt:message key="email.notifications.user.search.property.0" /></option>
+						<option value="1"><fmt:message key="email.notifications.user.search.property.1" /></option>
+						<option value="2"><fmt:message key="email.notifications.user.search.property.2" /></option>
+						<option value="3"><fmt:message key="email.notifications.user.search.property.3" /></option>
+						<option value="4"><fmt:message key="email.notifications.user.search.property.4" /></option>
+						<option value="5"><fmt:message key="email.notifications.user.search.property.5" /></option>
+						<option value="6"><fmt:message key="email.notifications.user.search.property.6" /></option>
+					</select>
+				</div>
+				
+				<div id="additionalParameters">
+					<div id="activityDiv">
+						<h3>
+							<fmt:message key="email.notifications.activity" />
+						</h3>
+						<select id="activityId" onchange="getUsers();">
+							<c:forEach var="activity" items="${activities}" varStatus="i">
+								<option <c:if test="${i.index==0}">selected="selected"</c:if> value="${activity.activityId}"><c:out value="${activity.title}"/></option>
+							</c:forEach>
+						</select>				
+					</div>
+					
+					<div id="daysToDeadlineDiv">
+						<h3>
+							<fmt:message key="email.notifications.days.to.deadline" />
+						</h3>
+						
+						<input name="daysToDeadline" type="text" id="daysToDeadline" value="3" size="3"/> 	
+						<input class="btn btn-default btn-sm" type="button" value="<fmt:message key="button.ok"/>" onclick="getUsers();" />			
+					</div>
+				</div>
+				
+				<%@ include file="additionalSettings.jsp"%>
+				
+				</form>			
+			</div>
+			<div class="col-sm-6">
+				<div id="emailTextareaDiv">
+					<h4>Message:</h4>
+					<c:set var="emailBody"><fmt:message key="email.notifications.lesson.email.body.header"/><br/><br/><fmt:message key="email.notifications.lesson.email.body.msg"/><br/><br/><br/><fmt:message key="email.notifications.lesson.email.body.footer" ><fmt:param>${lesson.lessonName}</fmt:param><fmt:param><lams:LAMSURL/>home.do?method=learner&lessonID=${lesson.lessonId}</fmt:param></fmt:message>
+					</c:set>
+					<textarea rows="8" name="emailBody" id="emailBody" width="100%" class="form-control">${fn:replace(emailBody, '<br/>', newLineChar)}</textarea>
+					<br/>
+					<input class="btn btn-primary btn-sm voffset10 pull-right" type="button" id="emailButton" value="<fmt:message key="email.notifications.send"/>" />
+				</div>		
 			</div>
 		</div>
-		
-		<%@ include file="additionalSettings.jsp"%>
-		
-		</form>
+
 	</lams:Page>
 </body>
 </lams:html>

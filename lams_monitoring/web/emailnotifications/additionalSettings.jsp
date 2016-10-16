@@ -21,13 +21,10 @@
 		<p class="body">
 			<fmt:message key="email.notifications.schedule.description" />
 		</p>
-	
-		<div id="datePickerDiv">
-			<span>
-				<fmt:message key="email.notifications.by.this.date" />
-			</span>
 			
-			<input type="text" name="datePicker" id="datePicker" value=""/>
+		<div class="form-group">
+			<label for="datePicker"><fmt:message key="email.notifications.by.this.date" /></label>
+			<input type="text" class="form-control" name="datePicker" id="datePicker" value=""/>
 		</div>
 		
 		<c:choose>
