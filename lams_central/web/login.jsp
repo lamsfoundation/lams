@@ -99,7 +99,7 @@
 						  <input type="hidden" name="redirectURL" value='<c:out value="${param.redirectURL}" escapeXml="true" />' />
               <div class="input-group">
 								<span class="input-group-addon"><i class="fa fa-user"></i></span>
-								<input id="j_username" type="text" class="form-control" name="j_username" value="" placeholder="<fmt:message key='label.username' />" onkeypress="onEnter(event)" tabindex="1">
+								<input id="j_username" type="text" class="form-control" autocapitalize="off" name="j_username" value="" placeholder="<fmt:message key='label.username' />" onkeypress="onEnter(event)" tabindex="1">
               </div>
 
 							<div class="input-group voffset5">
