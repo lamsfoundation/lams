@@ -66,13 +66,13 @@
 	<table class="table table-condensed table-striped">
 		<thead>
 			<tr>
-				<td class="text-left" width="25%">
+				<th class="text-left" width="25%">
 					<fmt:message key="email.notifications.scheduled.messages.list.scheduled.date"/>		
 				</td>
-				<td  class="text-left">
+				<th  class="text-left">
 					<fmt:message key="email.notify.students.that"/>	
 				</td>
-				<td  class="text-left">
+				<th  class="text-left">
 					<fmt:message key="email.notifications.scheduled.messages.list.email.body"/>		
 				</td>
 			</tr>
@@ -85,7 +85,7 @@
 					
 					<a href="#" class="btn btn-default btn-sm" 
 						onclick="javascript:deleteNotification('${emailJob.triggerName}', '${tDate}', '${deleteUrlParams}');">
-						<fmt:message key="email.notifications.delete" />
+						<i class="fa fa-fw fa-trash-o"></i> <fmt:message key="email.notifications.delete" />
 					</a>
 				</td>
 				<td  style="vertical-align: top;">
