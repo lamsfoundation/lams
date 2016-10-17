@@ -12,22 +12,20 @@
 	margin-top: 30%;
 }
 
-div#tabs {
-	width: 99%;
-	overflow: hidden;
+#content {
+	width: 100%;
+	padding: 0;
+}
+
+#content > .panel {
 	border: none;
+	border-shadow: none;
+	box-shadow: none;
 }
 
-.ui-tabs .ui-tabs-panel {
-	padding: 0px;
-}
-
-div#tabs ul {
-	cursor: move;
-}
-
-div#tabs ul li a {
-	border-bottom: none;
+#content .panel-monitor-page, #content .panel-monitor-body  {
+	margin-bottom: 0;
+	padding-bottom: 0;
 }
 
 .errorMessage {
@@ -223,7 +221,8 @@ td.contributeEntryCell a {
 /********** SEQUENCE TAB STYLES **********/
 div#sequenceCanvas {
 	text-align: center;
-	width: 1024px;
+	width: 100%;
+	height: 100%;
 	overflow: auto;
 }
 

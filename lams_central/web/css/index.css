@@ -29,6 +29,7 @@ td#messageCell {
 .dialogContainer .modal-body {
 	height : 100%;
 	max-height: calc(100% - 60px);
+	padding: 0;
 }
 
 .dialogContainer iframe {

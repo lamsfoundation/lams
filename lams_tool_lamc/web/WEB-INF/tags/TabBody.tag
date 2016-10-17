@@ -41,4 +41,13 @@
 	<c:set var="class">active</c:set>
 </c:if>
 
-<div role="tabpanel" class="tab-pane ${class}" id="t${id}"><jsp:include page="${page}"/></div>
+<div role="tabpanel" class="tab-pane ${class}" id="t${id}">
+<c:choose>
+	<c:when test="${not empty page}">
+		<jsp:include page="${page}"/>
+	</c:when>
+	<c:otherwise>
+		<jsp:doBody />
+	</c:otherwise>
+</c:choose>
+</div>

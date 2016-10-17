@@ -28,8 +28,7 @@
  * Wiki: 
  */
 
-		%>
-<%@ tag body-content="scriptless"%>
+%>
 <%@ attribute name="id" required="true" rtexprvalue="true"%>
 <%@ attribute name="tabTitle" required="false" rtexprvalue="true"%>
 <%@ attribute name="titleKey" required="false" rtexprvalue="true"%>
@@ -37,16 +36,18 @@
 <%@ taglib uri="tags-core" prefix="c"%>
 <%@ taglib uri="tags-bean" prefix="bean"%>
 
-<!-- begin tab content -->
-<div class="box" id="tabbody${id}">
-	<c:choose>
-		<c:when test="${page != null}">
-			<jsp:include page="${page}" />
-		</c:when>
-		<c:otherwise>
-			<jsp:doBody />
-		</c:otherwise>
-	</c:choose>
+<c:set var="class" value=""/>
+<c:if test="${id == 1}">
+	<c:set var="class">active</c:set>
+</c:if>
 
+<div role="tabpanel" class="tab-pane ${class}" id="t${id}">
+<c:choose>
+	<c:when test="${not empty page}">
+		<jsp:include page="${page}"/>
+	</c:when>
+	<c:otherwise>
+		<jsp:doBody />
+	</c:otherwise>
+</c:choose>
 </div>
-<!-- end tab content -->

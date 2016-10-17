@@ -175,12 +175,22 @@ function showMonitorLessonDialog(lessonID) {
 	// if it was just created
 	if (dialog) {
 		// tell the dialog contents that it was resized
-		$('.modal-content', dialog).on('resizestop dialogextendmaximize dialogextendrestore', function(){
-			var frame = $('iframe', dialog)[0],
-				win = frame.contentWindow || frame.contentDocument;
-			win.resizeSequenceCanvas(dialog.width() - 10, dialog.height() - 10);
-		});
+		$('.modal-content', dialog).on('resizestop', resizeSequenceCanvas);
+		// initial resize
+		$('iframe', dialog).load(resizeSequenceCanvas);
+		
 		dialog.modal('show');
+	}
+}
+
+function resizeSequenceCanvas(){
+	var body = $('.modal-body'),
+		frame = $('iframe', body);
+	if (frame.length > 0) {
+		var win = frame[0].contentWindow || frame[0].contentDocument;
+		if (win.resizeSequenceCanvas) {
+			win.resizeSequenceCanvas(body.width(), body.height());
+		}
 	}
 }
 

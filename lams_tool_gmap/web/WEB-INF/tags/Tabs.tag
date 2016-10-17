@@ -31,6 +31,7 @@
 <%@ attribute name="control" required="false" rtexprvalue="true"%>
 <%@ attribute name="title" required="false" rtexprvalue="true"%>
 <%@ attribute name="refreshOnClickAction" required="false" rtexprvalue="true"%>
+<%@ attribute name="helpPage" required="false" rtexprvalue="true"%>
 <%@ attribute name="helpToolSignature" required="false" rtexprvalue="true"%>
 <%@ attribute name="helpModule" required="false" rtexprvalue="true"%>
 <%@ attribute name="extraControl" required="false" rtexprvalue="true"%>
@@ -39,7 +40,7 @@
 <%@ taglib uri="tags-lams" prefix="lams"%>
 
 <c:set var="useActions" value="false" scope="request" />
-<c:if test="${not empty helpToolSignature or not empty helpModule or not empty refreshOnClickAction or not empty extraControl}">
+<c:if test="${not empty helpToolSignature or not empty helpModule or not empty helpPage or not empty refreshOnClickAction or not empty extraControl}">
 	<c:set var="useActions" value="true" scope="request" />
 </c:if>
 
@@ -62,27 +63,34 @@
 	        <span class="icon-bar"></span>
 	        <span class="icon-bar"></span>
 	      </button>
-	      <span class="navbar-brand">${title}</span>
+	      <c:if test="${not empty title}">
+	      	<span class="navbar-brand">${title}</span>
+	      </c:if>
 		</div>
 		<div class="collapse navbar-collapse" id="navbar-collapse-1" role="navigation">
-         <ul class="nav navbar-nav" id="page-tabs">
-	         <li role="separator" class="divider"></li>
-	          <jsp:doBody />
-         </ul>
-         <c:if test="${useActions}">
-         <ul class="nav navbar-nav navbar-right" id="page-actions">
-		     <li role="separator" class="divider"></li>
-		     <c:if test="${not empty refreshOnClickAction}">
-             <li class="navbar-text" ><span onclick="${refreshOnClickAction}"><i class="fa fa-refresh"></i></span></li>
-             </c:if>
-             <c:if test="${not empty helpToolSignature or not empty helpModule}">
-             <li class="navbar-text" ><lams:help toolSignature="${helpToolSignature}" module="${helpModule}" style="small"/></li>
-             </c:if>
-             <c:if test="${not empty extraControl}">
-             <li class="navbar-text" >${extraControl}</li>
-             </c:if>
-         </ul>
-         </c:if>
+        	<ul class="nav navbar-nav" id="page-tabs">
+		     	<c:if test="${not empty title}">
+			    	<li role="separator" class="divider"></li>
+			    </c:if>
+	          	<jsp:doBody />
+         	</ul>
+         	<c:if test="${useActions}">
+		         <ul class="nav navbar-nav navbar-right" id="page-actions">
+				     <li role="separator" class="divider"></li>
+				     <c:if test="${not empty refreshOnClickAction}">
+		             <li class="navbar-text" ><span onclick="${refreshOnClickAction}"><i class="fa fa-refresh"></i></span></li>
+		             </c:if>
+		             <c:if test="${not empty helpToolSignature or not empty helpModule}">
+		             <li class="navbar-text" ><lams:help toolSignature="${helpToolSignature}" module="${helpModule}" style="small"/></li>
+		             </c:if>
+		             <c:if test="${not empty helpPage}">
+		             <li class="navbar-text" ><lams:help page="${helpPage}" style="small"/></li>
+		             </c:if>
+		             <c:if test="${not empty extraControl}">
+		             <li class="navbar-text" >${extraControl}</li>
+		             </c:if>
+		         </ul>
+         	</c:if>
  	    
  		</div>
 	 </div>

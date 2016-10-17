@@ -918,15 +918,8 @@ function loadLearningDesignSVG() {
 		},
 		success : function(response) {
 			originalSequenceCanvas = response;
-			// store body dimensions before manipulating HTML
-			// otherwise resizing will yield bad results
-			var width = $('body').width(),
-				height = $('body').height();
-			// Remove previously set padding and dimensions, if any.
-			// For some reason sequenceCanvas needs to be assigned again here.
 			sequenceCanvas = $('#sequenceCanvas').removeAttr('style')
 						  						 .html(originalSequenceCanvas);
-			resizeSequenceCanvas(width, height);
 		},
 		error : function(error) {
 			exit = true;
@@ -1592,19 +1585,18 @@ function openLiveEdit(){
  */
 function resizeSequenceCanvas(width, height){
 	// can the calculation it be done nicer?
-	var canvasHeight = height - $('#tabs>ul').height() - $('#sequenceTopButtonsContainer').height()
-	  				   - Math.min(20, $('#completedLearnersContainer').height()) - 45,
-		canvasWidth = width - 15,
+	var canvasHeight = height - $('.navbar').height() - $('#sequenceTopButtonsContainer').height()
+	  				   - Math.min(20, $('#completedLearnersContainer').height()),
+		canvasWidth = width,
 		svg = $('svg', sequenceCanvas),
 		// center a small SVG inside large DIV
-		canvasPaddingTop = Math.max(0, canvasHeight/2 - svg.attr('height')/2),
-		canvasPaddingLeft =  Math.max(0, canvasWidth/2 - svg.attr('width')/2);
+		canvasPaddingTop = Math.max(0, canvasHeight/2 - svg.attr('height')/2 - 50),
+		canvasPaddingLeft =  Math.max(0, canvasWidth/2 - svg.attr('width')/2 - 40);
 		
 		sequenceCanvas.css({
-			'padding-top'    : canvasPaddingTop,
-			'padding-left'   : canvasPaddingLeft,
-			'width'          : canvasWidth - canvasPaddingLeft,
-			'height'         : canvasHeight - canvasPaddingTop
+			'padding-top'  : canvasPaddingTop + 'px',
+			'padding-left' : canvasPaddingLeft + 'px',
+			'height'  : canvasHeight - 70 + 'px'
 		});
 }
 
@@ -2018,7 +2010,6 @@ function showLearnerGroupDialog(ajaxProperties, dialogTitle, allowSearch, allowF
 	colorDialogList(learnerGroupDialog);
 	
 	if (!isRefresh) {
-		
 		// show buttons and labels depending on parameters
 		$('span#learnerGroupMultiSelectLabel, button#learnerGroupDialogForceCompleteButton', learnerGroupDialogParent)
 		.css('display', allowForceComplete ? 'inline' : 'none');
@@ -2026,9 +2017,23 @@ function showLearnerGroupDialog(ajaxProperties, dialogTitle, allowSearch, allowF
 		.css('display', allowView ? 'inline' : 'none');
 		$('button#learnerGroupDialogEmailButton', learnerGroupDialogParent)
 		.css('display', allowEmail ? 'inline' : 'none');
-
-	learnerGroupDialog
-		.dialog('option', 
+//
+//	showDialog('learnerGroupDialog', {
+//		'data' : {
+//			
+//		},
+//		'height' : 650,
+//		'width' : 850,
+//		'title' : dialogTitle,
+//		'open' : function() {
+//			$('.modal-body', this).empty().append($('#learnerGroupDialogContents'));
+//		},
+//		'beforeClose' : function(){
+//			$('#learnerGroupDialogContents').appendTo('body')
+//		}
+//	}, false);
+	
+	learnerGroupDialog.dialog('option', 
 			{
 			 'title' : dialogTitle,
 				 // save properties for refresh
@@ -2038,7 +2043,7 @@ function showLearnerGroupDialog(ajaxProperties, dialogTitle, allowSearch, allowF
 				 'allowEmail' : allowEmail
 			})
 		.dialog('open');	
-}
+	}
 }
 
 
@@ -2207,18 +2212,19 @@ function appendXMLElement(tagName, attributesObject, content, target) {
  */
 function dblTap(elem, dblClickFunction) {
  	 // double tap detection on mobile devices; it works also for mouse clicks
- 	 elem.tap(function(event){
- 		 var currentTime = new Date().getTime();
- 	 	  // is the second click on the same element as the first one?
- 		  if (event.currentTarget == lastTapTarget) {
- 		  	  // was the second click quick enough after the first one?
-			  var tapLength = currentTime - lastTapTime;
-		  if (tapLength < tapTimeout && tapLength > 0) {
-			  event.preventDefault();
-			  dblClickFunction(event);
-		  }
- 		  }
-		  lastTapTime = currentTime;
-		  lastTapTarget = event.currentTarget;
-	  });
+	 // temporarly switched to click as jQuery mobile was removed for bootstrapping
+	 elem.click(function(event) {
+		var currentTime = new Date().getTime();
+		// is the second click on the same element as the first one?
+		if (event.currentTarget == lastTapTarget) {
+			// was the second click quick enough after the first one?
+			var tapLength = currentTime - lastTapTime;
+			if (tapLength < tapTimeout && tapLength > 0) {
+				event.preventDefault();
+				dblClickFunction(event);
+			}
+		}
+		lastTapTime = currentTime;
+		lastTapTarget = event.currentTarget;
+	});
 }

@@ -126,6 +126,8 @@ function showDialog(id, initParams, extraButtons, recreate) {
 				'at' : 'center top+20px',
 				'of' : window
 			});
+			
+			internalContent.trigger('resizestop');
 		});
 		
 	    $('.dialogMinimise', dialog).click(function() {
