@@ -135,9 +135,9 @@ public class LineitemUtil {
      */
     private static boolean hasLessonScoreOutputs(Content bbContent, String ldId, String username) throws IOException {
 	
-	//sequence_id parameter is null in case we come from modify_proc
+	//sequence_id parameter is null in case we come from modify_proc or CorrectLineItemServlet/CloneLessonsServlet/ImportLessonsServlet
 	if (ldId == null) {
-	    //get sequence_id from bbcontent URL set in start_lesson_proc
+	    //get sequence_id from bbcontent URL, set in start_lesson_proc
 	    String bbContentUrl = bbContent.getUrl();
 	    String[] params = bbContentUrl.split("&");
 	    for (String param : params) {
@@ -236,7 +236,7 @@ public class LineitemUtil {
      * @throws ValidationException
      * @throws IOException 
      */
-    public static void updateLineitemLessonId(Content bbContent, String courseIdStr, Long newLamsLessonId, Context ctx, String userName)
+    public static void updateLineitemLessonId(Content bbContent, String courseIdStr, Long newLamsLessonId, String userName)
 	    throws PersistenceException, ServletException, ValidationException, IOException {
 	LineitemDbLoader lineitemLoader = LineitemDbLoader.Default.getInstance();
 	LineitemDbPersister linePersister = LineitemDbPersister.Default.getInstance();
@@ -250,8 +250,7 @@ public class LineitemUtil {
 	    Id lineitemId = getLineitem(_content_id, courseIdStr, false);
 	    //in case admin forgot to check "Grade Center Columns and Settings" option on doing course copy/import
 	    if (lineitemId == null) {
-		String ldId = ctx.getRequestParameter("sequence_id");
-		createLineitem(bbContent, ldId, userName);
+		createLineitem(bbContent, null, userName);
 		
 	    //in case he checked it and BB created Lineitem object, then just need to update it
 	    } else {

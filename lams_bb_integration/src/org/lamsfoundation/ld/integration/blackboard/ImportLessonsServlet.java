@@ -40,17 +40,12 @@ import org.lamsfoundation.ld.integration.util.LamsServerException;
 import org.lamsfoundation.ld.integration.util.LineitemUtil;
 
 import blackboard.base.FormattedText;
-import blackboard.base.InitializationException;
 import blackboard.data.content.Content;
 import blackboard.data.course.Course;
 import blackboard.data.user.User;
 import blackboard.persist.PkId;
 import blackboard.persist.content.ContentDbPersister;
 import blackboard.persist.course.CourseDbLoader;
-import blackboard.platform.BbServiceException;
-import blackboard.platform.BbServiceManager;
-import blackboard.platform.context.Context;
-import blackboard.platform.context.ContextManager;
 import blackboard.util.StringUtil;
 
 /**
@@ -70,11 +65,7 @@ public class ImportLessonsServlet extends HttpServlet {
 
 	String newLessonIds = "";
 	try {
-	    // get Blackboard context
-	    ContextManager ctxMgr = (ContextManager) BbServiceManager.lookupService(ContextManager.class);
-	    Context ctx = ctxMgr.setContext(request);
 	    ContentDbPersister persister =ContentDbPersister.Default.getInstance();
-	    
 	    CourseDbLoader courseLoader = CourseDbLoader.Default.getInstance();
 	    Course course = courseLoader.loadByCourseId(courseIdParam);
 	    PkId courseId = (PkId) course.getId();
@@ -126,7 +117,7 @@ public class ImportLessonsServlet extends HttpServlet {
 		    persister.persist(content);
 
 		    //update lineitem details
-		    LineitemUtil.updateLineitemLessonId(content, _course_id, newLessonId, ctx, teacher.getUserName());
+		    LineitemUtil.updateLineitemLessonId(content, _course_id, newLessonId, teacher.getUserName());
 
 		    logger.debug("Lesson (lessonId=" + urlLessonId + ") was successfully imported to the one (lessonId="
 			    + newLessonId + ").");
@@ -147,10 +138,6 @@ public class ImportLessonsServlet extends HttpServlet {
 	    throw new ServletException(
 		    "LAMS Server timeout, did not get a response from the LAMS server. Please contact your systems administrator",
 		    e);
-	} catch (InitializationException e) {
-	    throw new ServletException(e);
-	} catch (BbServiceException e) {
-	    throw new ServletException(e);
 	} catch (Exception e) {
 	    throw new ServletException(e);
 	}
