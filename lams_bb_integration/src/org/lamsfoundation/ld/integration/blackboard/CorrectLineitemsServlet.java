@@ -41,9 +41,6 @@ import blackboard.data.course.Course;
 import blackboard.data.user.User;
 import blackboard.persist.PkId;
 import blackboard.persist.course.CourseDbLoader;
-import blackboard.platform.BbServiceManager;
-import blackboard.platform.context.Context;
-import blackboard.platform.context.ContextManager;
 import blackboard.util.StringUtil;
 
 /**
@@ -62,10 +59,6 @@ public class CorrectLineitemsServlet extends HttpServlet {
 	}
 
 	try {
-	    // get Blackboard context
-	    ContextManager ctxMgr = (ContextManager) BbServiceManager.lookupService(ContextManager.class);
-	    Context ctx = ctxMgr.setContext(request);
-	    
 	    CourseDbLoader courseLoader = CourseDbLoader.Default.getInstance();
 	    Course course = courseLoader.loadByCourseId(courseIdParam);
 	    PkId courseId = (PkId) course.getId();
@@ -83,7 +76,7 @@ public class CorrectLineitemsServlet extends HttpServlet {
 		String lessonId = content.getLinkRef();
 
 		//update lineitem details
-		LineitemUtil.updateLineitemLessonId(content, _course_id, Long.parseLong(lessonId), ctx,
+		LineitemUtil.updateLineitemLessonId(content, _course_id, Long.parseLong(lessonId),
 			teacher.getUserName());
 	    }
 

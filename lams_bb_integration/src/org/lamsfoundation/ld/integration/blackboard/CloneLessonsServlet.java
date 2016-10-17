@@ -20,7 +20,6 @@
  * **************************************************************** 
  */
 
-
 package org.lamsfoundation.ld.integration.blackboard;
 
 import java.io.IOException;
@@ -37,15 +36,14 @@ import org.lamsfoundation.ld.integration.util.BlackboardUtil;
 import org.lamsfoundation.ld.integration.util.LamsSecurityUtil;
 import org.lamsfoundation.ld.integration.util.LineitemUtil;
 
+import blackboard.data.ValidationException;
 import blackboard.data.content.Content;
 import blackboard.data.course.Course;
 import blackboard.data.user.User;
+import blackboard.persist.PersistenceException;
 import blackboard.persist.PkId;
 import blackboard.persist.content.ContentDbPersister;
 import blackboard.persist.course.CourseDbLoader;
-import blackboard.platform.BbServiceManager;
-import blackboard.platform.context.Context;
-import blackboard.platform.context.ContextManager;
 import blackboard.util.StringUtil;
 
 /**
@@ -58,67 +56,14 @@ public class CloneLessonsServlet extends HttpServlet {
 
     public void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 
-	String courseIdParam = request.getParameter("courseId");	
+	String courseIdParam = request.getParameter("courseId");
 	if (StringUtil.isEmpty(courseIdParam)) {
 	    throw new RuntimeException("Required parameters are missing. courseId: " + courseIdParam);
 	}
 
 	String newLessonIds = "";
 	try {
-	    // get Blackboard context
-	    ContextManager ctxMgr = (ContextManager) BbServiceManager.lookupService(ContextManager.class);
-	    Context ctx = ctxMgr.setContext(request);
-	    ContentDbPersister persister =ContentDbPersister.Default.getInstance();
-	    
-	    CourseDbLoader courseLoader = CourseDbLoader.Default.getInstance();
-	    Course course = courseLoader.loadByCourseId(courseIdParam);
-	    PkId courseId = (PkId) course.getId();
-	    String _course_id = "_" + courseId.getPk1() + "_" + courseId.getPk2();
-	    logger.debug("Starting clonning course lessons (courseId=" + courseId + ").");
-
-	    // find a teacher that will be assigned as lesson's author on LAMS side
-	    User teacher = BlackboardUtil.getCourseTeacher(courseId);
-
-	    //find all lessons that should be updated
-	    List<Content> lamsContents = BlackboardUtil.getLamsLessonsByCourse(courseId);
-	    for (Content content : lamsContents) {
-
-		PkId contentId = (PkId) content.getId();
-		String _content_id = "_" + contentId.getPk1() + "_" + contentId.getPk2();
-
-		String url = content.getUrl();
-		String urlLessonId = getParameterValue(url, "lsid");
-		String urlCourseId = getParameterValue(url, "course_id");
-		String urlContentId = getParameterValue(url, "content_id");
-
-		//in case when both courseId and contentId don't coincide with the ones from URL - means lesson needs to be cloned
-		if (!urlCourseId.equals(_course_id) && !urlContentId.equals(_content_id)) {
-
-		    final Long newLessonId = LamsSecurityUtil.cloneLesson(teacher, courseIdParam, urlLessonId);
-
-		    // update lesson id
-		    content.setLinkRef(Long.toString(newLessonId));
-
-		    // update URL
-		    url = replaceParameterValue(url, "lsid", Long.toString(newLessonId));
-		    url = replaceParameterValue(url, "course_id", _course_id);
-		    url = replaceParameterValue(url, "content_id", _content_id);
-		    content.setUrl(url);
-
-		    // persist updated content
-		    persister.persist(content);
-
-		    //update lineitem details
-		    LineitemUtil.updateLineitemLessonId(content, _course_id, newLessonId, ctx, teacher.getUserName());
-
-		    logger.debug("Lesson (lessonId=" + urlLessonId + ") was successfully cloned to the one (lessonId="
-			    + newLessonId + ").");
-
-		    newLessonIds += newLessonId + ", ";
-		}
-
-	    }
-
+	    newLessonIds = recreateLessonsAfterCourseCopy(courseIdParam);
 	} catch (IllegalStateException e) {
 	    throw new ServletException(
 		    "LAMS Server timeout, did not get a response from the LAMS server. Please contact your systems administrator",
@@ -126,33 +71,104 @@ public class CloneLessonsServlet extends HttpServlet {
 	} catch (Exception e) {
 	    throw new ServletException(e);
 	}
-	
+
 	//prepare string to write out
 	int newLessonsCounts = newLessonIds.length() - newLessonIds.replace(",", "").length();
 	String resultStr = "Complete! " + newLessonsCounts + " lessons have been cloned.";
 	//add all lessonIds (without the last comma)
 	if (newLessonsCounts > 0) {
-	    resultStr += " Their updated lessonIds: " + newLessonIds.substring(0, newLessonIds.length()-2);
+	    resultStr += " Their updated lessonIds: " + newLessonIds.substring(0, newLessonIds.length() - 2);
 	}
 	logger.debug(resultStr);
-	
+
 	response.setContentType("text/html");
 	PrintWriter out = response.getWriter();
-        out.write(resultStr);
-        out.flush();
-        out.close();
+	out.write(resultStr);
+	out.flush();
+	out.close();
     }
-    
+
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 	doGet(req, resp);
     }
-    
-    /*
+
+    /**
+     * Recreates lessons after course has been copied. I.e. asks LAMS server to clone old lesson and then updates BB
+     * link with the newly created lesson Id.
+     * 
+     * @param courseIdParam
+     *            id of the course that has been copied
+     * @return
+     * @throws PersistenceException
+     * @throws ValidationException
+     * @throws IOException
+     * @throws ServletException
+     */
+    public static String recreateLessonsAfterCourseCopy(String courseIdParam)
+	    throws PersistenceException, ValidationException, ServletException, IOException {
+	String newLessonIds = "";
+
+	ContentDbPersister persister = ContentDbPersister.Default.getInstance();
+	CourseDbLoader courseLoader = CourseDbLoader.Default.getInstance();
+	Course course = courseLoader.loadByCourseId(courseIdParam);
+	PkId courseId = (PkId) course.getId();
+	String _course_id = "_" + courseId.getPk1() + "_" + courseId.getPk2();
+	logger.debug("Starting clonning course lessons (courseId=" + courseId + ").");
+
+	// find a teacher that will be assigned as lesson's author on LAMS side
+	User teacher = BlackboardUtil.getCourseTeacher(courseId);
+
+	//find all lessons that should be updated
+	List<Content> lamsContents = BlackboardUtil.getLamsLessonsByCourse(courseId);
+	for (Content content : lamsContents) {
+
+	    PkId contentId = (PkId) content.getId();
+	    String _content_id = "_" + contentId.getPk1() + "_" + contentId.getPk2();
+
+	    String url = content.getUrl();
+	    String urlLessonId = getParameterValue(url, "lsid");
+	    String urlCourseId = getParameterValue(url, "course_id");
+	    String urlContentId = getParameterValue(url, "content_id");
+
+	    //in case when both courseId and contentId don't coincide with the ones from URL - means lesson needs to be cloned
+	    if (!urlCourseId.equals(_course_id) && !urlContentId.equals(_content_id)) {
+
+		final Long newLessonId = LamsSecurityUtil.cloneLesson(teacher, courseIdParam, urlLessonId);
+
+		// update lesson id
+		content.setLinkRef(Long.toString(newLessonId));
+
+		// update URL
+		url = replaceParameterValue(url, "lsid", Long.toString(newLessonId));
+		url = replaceParameterValue(url, "course_id", _course_id);
+		url = replaceParameterValue(url, "content_id", _content_id);
+		content.setUrl(url);
+
+		// persist updated content
+		persister.persist(content);
+
+		//update lineitem details
+		LineitemUtil.updateLineitemLessonId(content, _course_id, newLessonId, teacher.getUserName());
+
+		logger.debug("Lesson (lessonId=" + urlLessonId + ") was successfully cloned to the one (lessonId="
+			+ newLessonId + ").");
+
+		newLessonIds += newLessonId + ", ";
+	    }
+
+	}
+
+	return newLessonIds;
+    }
+
+    /**
      * Returns param value, and empty string in case of there is no such param available
      * 
      * @param url
+     * 
      * @param paramName
+     * 
      * @return
      */
     private static String getParameterValue(String url, String paramName) {
@@ -171,7 +187,7 @@ public class CloneLessonsServlet extends HttpServlet {
 
 	return paramValue;
     }
-    
+
     private static String replaceParameterValue(String url, String paramName, String newParamValue) {
 	String oldParamValue = "";
 
