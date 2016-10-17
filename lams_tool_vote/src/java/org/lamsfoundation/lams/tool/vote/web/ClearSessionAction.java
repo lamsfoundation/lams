@@ -43,7 +43,7 @@ public class ClearSessionAction extends LamsAuthoringFinishAction implements Vot
     public void clearSession(String customiseSessionID, HttpSession session, ToolAccessMode mode) {
 	session.removeAttribute(AuthoringConstants.LAMS_AUTHORING_SUCCESS_FLAG);
 	if (mode.isAuthor()) {
-	    ClearSessionAction.logger.info("In Author mode");
+	    ClearSessionAction.logger.debug("In Author mode");
 	    session.removeAttribute(customiseSessionID);
 	}
     }
