@@ -25,9 +25,16 @@ package org.lamsfoundation.lams.tool.peerreview.dao.hibernate;
 
 import java.util.List;
 
+import org.apache.commons.lang.StringEscapeUtils;
+import org.apache.commons.lang.StringUtils;
 import org.hibernate.Query;
 import org.hibernate.SQLQuery;
+import org.hibernate.type.DateType;
+import org.hibernate.type.IntegerType;
+import org.hibernate.type.StringType;
+import org.hibernate.type.TimestampType;
 import org.lamsfoundation.lams.dao.hibernate.LAMSBaseDAO;
+import org.lamsfoundation.lams.notebook.service.ICoreNotebookService;
 import org.lamsfoundation.lams.rating.model.RatingCriteria;
 import org.lamsfoundation.lams.rating.service.IRatingService;
 import org.lamsfoundation.lams.tool.peerreview.PeerreviewConstants;
@@ -272,4 +279,58 @@ public class PeerreviewUserDAOHibernate extends LAMSBaseDAO implements Peerrevie
 	return (List<Object[]>) query.list();
     }
 
+    @Override
+    @SuppressWarnings("unchecked")
+    /**
+     * Will return List<[user.user_id, user.first_name, user.last_name, notebook entry, notebook date]>
+     */
+    public List<Object[]> getUserNotebookEntriesForTablesorter(final Long toolSessionId, int page, int size, int sorting,
+	    ICoreNotebookService coreNotebookService) {
+
+	String sortingOrder;
+	switch (sorting) {
+	    case PeerreviewConstants.SORT_BY_USERNAME_ASC:
+		sortingOrder = " ORDER BY user.first_name ASC";
+		break;
+	    case PeerreviewConstants.SORT_BY_USERNAME_DESC:
+		sortingOrder = " ORDER BY user.first_name DESC";
+		break;
+	    case PeerreviewConstants.SORT_BY_NOTEBOOK_ENTRY_ASC:
+		sortingOrder = " ORDER BY notebookEntry ASC";
+		break;
+	    case PeerreviewConstants.SORT_BY_NOTEBOOK_ENTRY_DESC:
+		sortingOrder = " ORDER BY notebookEntry DESC";
+		break;
+	    case PeerreviewConstants.SORT_BY_NO:
+	    default:
+		sortingOrder = " ORDER BY user.user_id";
+	}
+
+	String[] notebookEntryStrings = coreNotebookService.getNotebookEntrySQLStrings(toolSessionId.toString(),
+		    PeerreviewConstants.TOOL_SIGNATURE, "user.user_id", true);
+	
+	// Basic select for the user records
+	StringBuilder queryText = new StringBuilder();
+
+	queryText.append("SELECT user.user_id, user.first_name, user.last_name ")
+		.append(notebookEntryStrings[0])
+		.append(" FROM tl_laprev11_user user ")
+		.append(" JOIN tl_laprev11_session session ON session.session_id = :toolSessionId AND user.session_uid = session.uid");
+
+	queryText.append(notebookEntryStrings[1]);
+
+	// Now specify the sort based on the switch statement above.
+	queryText.append(sortingOrder);
+
+	SQLQuery query = getSession().createSQLQuery(queryText.toString());
+	query.addScalar("user_id", IntegerType.INSTANCE)
+		.addScalar("first_name", StringType.INSTANCE)
+		.addScalar("last_name", StringType.INSTANCE)
+		.addScalar("notebookEntry", StringType.INSTANCE)
+		.addScalar("notebookModifiedDate", TimestampType.INSTANCE)
+		.setLong("toolSessionId", toolSessionId.longValue())
+		.setFirstResult(page * size).setMaxResults(size);
+	return query.list();
+
+    }
 }

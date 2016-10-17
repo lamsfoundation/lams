@@ -30,6 +30,7 @@ import java.util.Map;
 import org.apache.tomcat.util.json.JSONArray;
 import org.apache.tomcat.util.json.JSONException;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
+import org.lamsfoundation.lams.notebook.service.ICoreNotebookService;
 import org.lamsfoundation.lams.rating.ToolRatingManager;
 import org.lamsfoundation.lams.rating.dto.ItemRatingDTO;
 import org.lamsfoundation.lams.rating.dto.StyledCriteriaRatingDTO;
@@ -184,14 +185,6 @@ public interface IPeerreviewService extends ToolRatingManager {
     void updateEntry(NotebookEntry notebookEntry);
 
     /**
-     * Get Reflect DTO list.
-     *
-     * @param contentId
-     * @return
-     */
-    List<ReflectDTO> getReflectList(Long contentId, Long sessionId);
-
-    /**
      * Get user by UID
      *
      * @param uid
@@ -276,4 +269,9 @@ public interface IPeerreviewService extends ToolRatingManager {
     
     /** Get the monitoring statistics */
     List<PeerreviewStatisticsDTO> getStatistics(Long toolContentId);
+    
+    /** Get all the notebook entries for a session 
+     * 	Will return List<[user.user_id, user.first_name, user.first_name + user.last_name, notebook entry, notebook date]>
+     */
+    List<Object[]> getUserNotebookEntriesForTablesorter(Long toolSessionId, int page, int size, int sorting);
 }

@@ -25,9 +25,12 @@
 package org.lamsfoundation.lams.tool.peerreview.web.action;
 
 import java.io.IOException;
-import java.math.BigInteger;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
+import java.util.TimeZone;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -42,20 +45,13 @@ import org.apache.struts.action.ActionMapping;
 import org.apache.tomcat.util.json.JSONArray;
 import org.apache.tomcat.util.json.JSONException;
 import org.apache.tomcat.util.json.JSONObject;
-import org.lamsfoundation.lams.rating.dto.ItemRatingCriteriaDTO;
-import org.lamsfoundation.lams.rating.dto.ItemRatingDTO;
-import org.lamsfoundation.lams.rating.dto.RatingCommentDTO;
-import org.lamsfoundation.lams.rating.dto.RatingDTO;
-import org.lamsfoundation.lams.rating.dto.StyledCriteriaRatingDTO;
-import org.lamsfoundation.lams.rating.dto.StyledRatingDTO;
 import org.lamsfoundation.lams.rating.model.RatingCriteria;
 import org.lamsfoundation.lams.tool.peerreview.PeerreviewConstants;
 import org.lamsfoundation.lams.tool.peerreview.dto.GroupSummary;
-import org.lamsfoundation.lams.tool.peerreview.dto.PeerreviewStatisticsDTO;
-import org.lamsfoundation.lams.tool.peerreview.dto.ReflectDTO;
 import org.lamsfoundation.lams.tool.peerreview.model.Peerreview;
 import org.lamsfoundation.lams.tool.peerreview.model.PeerreviewUser;
 import org.lamsfoundation.lams.tool.peerreview.service.IPeerreviewService;
+import org.lamsfoundation.lams.util.DateUtil;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.lamsfoundation.lams.web.util.SessionMap;
@@ -90,6 +86,9 @@ public class MonitoringAction extends Action {
 	}
 	if (param.equals("reflections")) {
 	    return reflections(mapping, form, request, response);
+	}
+	if (param.equals("getReflections")) {
+	    return getReflections(mapping, form, request, response);
 	}
 
 	return mapping.findForward(PeerreviewConstants.ERROR);
@@ -354,19 +353,100 @@ public class MonitoringAction extends Action {
 		.getAttribute(sessionMapID);
 	request.setAttribute(PeerreviewConstants.ATTR_SESSION_MAP_ID, sessionMap.getSessionID());
 
-	Long contentId = (Long) sessionMap.get(PeerreviewConstants.ATTR_TOOL_CONTENT_ID);
 	Long toolSessionId = WebUtil.readLongParam(request, "toolSessionId");
-
-	IPeerreviewService service = getPeerreviewService();
-	
-	Peerreview peerreview = service.getPeerreviewByContentId(contentId);
-	List<ReflectDTO> relectList = service.getReflectList(contentId, toolSessionId);
-	request.setAttribute(PeerreviewConstants.ATTR_REFLECT_LIST, relectList);
 	request.setAttribute("toolSessionId", toolSessionId);
 	
 	return mapping.findForward(PeerreviewConstants.SUCCESS);
     }
 
+    private ActionForward getReflections(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+	    HttpServletResponse response) throws JSONException, IOException {
+
+	String sessionMapID = request.getParameter(PeerreviewConstants.ATTR_SESSION_MAP_ID);
+	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
+		.getAttribute(sessionMapID);
+	request.setAttribute(PeerreviewConstants.ATTR_SESSION_MAP_ID, sessionMap.getSessionID());
+
+	Long contentId = (Long) sessionMap.get(PeerreviewConstants.ATTR_TOOL_CONTENT_ID);
+	Long toolSessionId = WebUtil.readLongParam(request, "toolSessionId");
+
+	// Getting the params passed in from the jqGrid
+	int page = WebUtil.readIntParam(request, PeerreviewConstants.PARAM_PAGE) - 1;
+	int size = WebUtil.readIntParam(request, PeerreviewConstants.PARAM_ROWS);
+	String sortOrder = WebUtil.readStrParam(request, PeerreviewConstants.PARAM_SORD);
+	String sortBy = WebUtil.readStrParam(request, PeerreviewConstants.PARAM_SIDX, true);
+
+	int sorting = PeerreviewConstants.SORT_BY_USERNAME_ASC;
+	    
+	if (sortBy != null && sortBy.equals(PeerreviewConstants.PARAM_SORT_NAME)) {
+	    if (sortOrder != null && sortOrder.equals(PeerreviewConstants.SORT_DESC)) {
+		sorting = PeerreviewConstants.SORT_BY_USERNAME_DESC;
+	    } else {
+		sorting = PeerreviewConstants.SORT_BY_USERNAME_ASC;
+	    }
+	} else if (sortBy != null && sortBy.equals(PeerreviewConstants.PARAM_SORT_NOTEBOOK)) {
+	    if (sortOrder != null && sortOrder.equals(PeerreviewConstants.SORT_DESC)) {
+		sorting = PeerreviewConstants.SORT_BY_NOTEBOOK_ENTRY_DESC;
+	    } else {
+		sorting = PeerreviewConstants.SORT_BY_NOTEBOOK_ENTRY_ASC;
+	    }
+	}
+
+	// setting date format to ISO8601 for jquery.timeago 
+	DateFormat dateFormatterTimeAgo = new SimpleDateFormat(DateUtil.ISO8601_FORMAT); 
+	dateFormatterTimeAgo.setTimeZone(TimeZone.getTimeZone("GMT")); 
+
+	Long dummyUserId = -1L;
+	
+	JSONObject responcedata = new JSONObject();
+
+	IPeerreviewService service = getPeerreviewService();
+
+	responcedata.put("page", page + 1);
+	responcedata.put("total", Math.ceil((float) service.getCountUsersBySession(toolSessionId, dummyUserId) / size));
+	responcedata.put("records", service.getCountUsersBySession(toolSessionId, dummyUserId));
+
+	List<Object[]> nbEntryList = service.getUserNotebookEntriesForTablesorter(toolSessionId, 
+		page, size, sorting);
+	
+	// processed data from db is user.user_id, user.first_name, escaped( first_name + last_name), notebook entry, notebook date
+	// if no rating or comment, then the entries will be null and not an empty string
+	JSONArray rows = new JSONArray();
+	int i = 0;
+	
+	for (Object[] nbEntry : nbEntryList) {
+ 		JSONArray userData = new JSONArray();
+    		userData.put(nbEntry[0]);
+
+    		Date entryTime = (Date) nbEntry[4]; 
+    		if ( entryTime == null ) {
+    		    userData.put((String)nbEntry[2]);
+    		} else {
+    		    StringBuilder nameField = new StringBuilder((String)nbEntry[2])
+			.append("<BR/>")
+			.append("<time class=\"timeago\" title=\"") 
+			.append(DateUtil.convertToStringForJSON(entryTime, request.getLocale())) 
+			.append("\" datetime=\"") 
+			.append(dateFormatterTimeAgo.format(entryTime)) 
+			.append("\"></time>");
+    		    userData.put(nameField.toString());
+    		}
+    		
+    		userData.put(StringEscapeUtils.escapeHtml((String)nbEntry[3]));
+
+    		JSONObject userRow = new JSONObject();
+    		userRow.put("id", i++);
+		userRow.put("cell", userData);
+
+		rows.put(userRow);
+	}
+
+	responcedata.put("rows", rows);
+
+	response.setContentType("application/json;charset=utf-8");
+	response.getWriter().write(responcedata.toString());
+	return null;
+    }
 
     
     // *************************************************************************************

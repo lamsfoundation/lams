@@ -189,6 +189,10 @@
 			parameter="reflections" >
 			<forward name="success" path="/pages/monitoring/reflections.jsp" />
 		</action>
+		<action path="/monitoring/getReflections"
+			type="org.lamsfoundation.lams.tool.peerreview.web.action.MonitoringAction"
+			parameter="getReflections" >
+		</action>
 		<!-- ========== BEGIN: Common ============================== -->
 		<action path="/clearsession"
 			type="org.lamsfoundation.lams.tool.peerreview.web.action.ClearSessionAction">

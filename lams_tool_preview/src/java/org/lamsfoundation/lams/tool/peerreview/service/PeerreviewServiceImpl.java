@@ -241,30 +241,6 @@ public class PeerreviewServiceImpl
     }
 
     @Override
-    public List<ReflectDTO> getReflectList(Long contentId, Long sessionId) {
-
-	List<ReflectDTO> reflections = new LinkedList<ReflectDTO>();
-
-	List<PeerreviewUser> users = peerreviewUserDao.getBySessionID(sessionId);
-	for (PeerreviewUser user : users) {
-
-	    NotebookEntry entry = getEntry(sessionId, CoreNotebookConstants.NOTEBOOK_TOOL,
-		    PeerreviewConstants.TOOL_SIGNATURE, user.getUserId().intValue());
-	    if (entry != null) {
-		ReflectDTO ref = new ReflectDTO(user);
-		ref.setReflect(entry.getEntry());
-		Date postedDate = (entry.getLastModified() != null) ? entry.getLastModified()
-			: entry.getCreateDate();
-		ref.setDate(postedDate);
-		reflections.add(ref);
-	    }
-
-	}
-
-	return reflections;
-    }
-
-    @Override
     public List<PeerreviewUser> getUsersForTablesorter(final Long toolSessionId, final Long excludeUserId, int page,
 	    int size, int sorting) {
 	return peerreviewUserDao.getUsersForTablesorter(toolSessionId, excludeUserId, page, size, sorting);
@@ -448,6 +424,18 @@ public class PeerreviewServiceImpl
     @Override
     public List<PeerreviewStatisticsDTO> getStatistics(Long toolContentId) {
 	return peerreviewDao.getStatistics(toolContentId);
+    }
+    
+    public List<Object[]> getUserNotebookEntriesForTablesorter(Long toolSessionId, int page, int size, int sorting) {
+	List<Object[]> rawData = peerreviewUserDao.getUserNotebookEntriesForTablesorter(toolSessionId, 
+		page, size, sorting, coreNotebookService);
+	
+	for ( Object[] raw : rawData ) {
+	    StringBuilder description = new StringBuilder((String)raw[1] ).append(" ").append((String)raw[2]);	    
+	    raw[2] = (Object) StringEscapeUtils.escapeCsv(description.toString());
+	}
+	
+	return rawData;
     }
     
     // *****************************************************************************
