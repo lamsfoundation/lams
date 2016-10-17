@@ -3,13 +3,79 @@
 <c:set var="lams"><lams:LAMSURL /></c:set>
 <c:set var="sessionMap" value="${sessionScope[sessionMapID]}"/>
 <c:set var="summaryList" value="${sessionMap.summaryList}"/>
+<c:set var="localeLanguage"><lams:user property="localeLanguage" /></c:set>
 
 <lams:html>
 <lams:head>
 	<title><fmt:message key="label.learning.title" />
 	</title>
 	<%@ include file="/common/header.jsp"%>
+	
+	<link type="text/css" href="${lams}css/jquery-ui-smoothness-theme.css" rel="stylesheet">
+	<link type="text/css" href="${lams}css/jquery.jqGrid.css" rel="stylesheet" />
+	
+	<script type="text/javascript" src="${lams}includes/javascript/jquery.jqGrid.locale-en.js"></script>
+	<script type="text/javascript" src="${lams}includes/javascript/jquery.jqGrid.js"></script>
 
+	<script type="text/javascript" src="<lams:LAMSURL />/includes/javascript/jquery.timeago.js"></script>
+	<script type="text/javascript" src="<lams:LAMSURL />/includes/javascript/timeagoi18n/jquery.timeago.${fn:toLowerCase(localeLanguage)}.js"></script>
+
+	<script type="text/javascript">
+	
+	$(document).ready(function(){
+
+			debugger;
+			
+			jQuery("#group${toolSessionId}").jqGrid({
+			   	url: "<c:url value='/monitoring/getReflections.do'/>?toolSessionId=${toolSessionId}&sessionMapID=${sessionMapID}",
+				datatype: "json",
+				height: 'auto',
+				autowidth: true,
+				shrinkToFit: false,
+			   	colNames:[
+						'itemId',
+						'<fmt:message key="label.user.name" />',
+						'<fmt:message key="title.reflection" />'
+				],
+			   	colModel:[
+			   		{name:'itemId', index:'itemId', width:0, hidden: true},
+			   		{name:'itemDescription', index:'itemDescription', width:100},
+			   		{name:'notebook', index:'notebook', width:200}
+			   	],
+			   	rowNum:10,
+			   	rowList:[10,20,30,40,50,100],
+			   	pager: '#pager${toolSessionId}',
+			   	viewrecords:true,
+				loadComplete: function(){
+					$("time.timeago").timeago();
+				},
+			   	// caption: "${groupSummary.sessionName}" use Bootstrap panels as the title bar
+				subGrid: false
+			}).jqGrid('navGrid','#pager${toolSessionId}',{add:false,del:false,edit:false,search:false});
+        
+		
+        //jqgrid autowidth (http://stackoverflow.com/a/1610197)
+        $(window).bind('resize', function() {
+            resizeJqgrid(jQuery(".ui-jqgrid-btable:visible"));
+        });
+
+        //resize jqGrid on openning of bootstrap collapsible
+        $('div[id^="collapse"]').on('shown.bs.collapse', function () {
+            resizeJqgrid(jQuery(".ui-jqgrid-btable:visible", this));
+        })
+
+        function resizeJqgrid(jqgrids) {
+            jqgrids.each(function(index) {
+                var gridId = $(this).attr('id');
+                var gridParentWidth = jQuery('#gbox_' + gridId).parent().width();
+                jQuery('#' + gridId).setGridWidth(gridParentWidth, true);
+            });
+        };
+        setTimeout(function(){ window.dispatchEvent(new Event('resize')); }, 300);
+	});
+	
+    </script>
+        
 </lams:head>
 <body class="stripes">
 
@@ -23,23 +89,8 @@
 
 	<lams:Page type="monitor" title="${title}">
 
-		<c:if test="${empty reflectList}">
-			<fmt:message key="message.no.reflection.available"></fmt:message>
-		</c:if>
-		
-		<table class="table table-condensed table-striped">
-	
-			<c:forEach var="reflectDTO" items="${reflectList}">
-				<tr>
-					<td>
-						<strong><c:out value="${reflectDTO.fullName}" escapeXml="true"/></strong> - <lams:Date value="${reflectDTO.date}"/>
-						<br>
-						<lams:out value="${reflectDTO.reflect}" escapeHtml="true" />
-					</td>
-				</tr>
-			</c:forEach>
-		
-		</table>
+		<table id="group${toolSessionId}" class="scroll" cellpadding="0" cellspacing="0"></table>
+		<div id="pager${toolSessionId}"></div> 
 	
 		<span onclick="window.close()" class="btn btn-default voffset5 pull-right"><fmt:message key="label.close"/></span>
 	
