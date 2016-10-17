@@ -7,8 +7,11 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 
+import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+
+import org.apache.log4j.Logger;
 
 import blackboard.base.BbList;
 import blackboard.base.FormattedText;
@@ -26,6 +29,7 @@ import blackboard.persist.PersistenceException;
 import blackboard.persist.PkId;
 import blackboard.persist.content.ContentDbLoader;
 import blackboard.persist.content.ContentDbPersister;
+import blackboard.persist.course.CourseDbLoader;
 import blackboard.persist.course.CourseMembershipDbLoader;
 import blackboard.persist.navigation.CourseTocDbLoader;
 import blackboard.persist.user.UserDbLoader;
