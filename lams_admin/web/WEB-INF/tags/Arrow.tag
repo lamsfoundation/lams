@@ -6,6 +6,8 @@
 <%@ attribute name="state" required="true" rtexprvalue="true"%>
 <%@ attribute name="title" required="false" rtexprvalue="true"%>
 <%@ attribute name="onclick" required="false" rtexprvalue="true"%>
+<%@ attribute name="id" required="false" rtexprvalue="true"%>
+<%@ attribute name="display" required="false"  rtexprvalue="true"%>
 
 <c:choose>
 	<c:when test="${not empty title}">
@@ -26,10 +28,28 @@
 </c:choose>
 
 <c:choose>
-	<c:when test="${fn:containsIgnoreCase(state, 'up')}">
-		<i class="fa fa-long-arrow-up fa-pull-left" ${fullTitle} ${fullOnclick}></i>
+	<c:when test="${not empty id}">
+		<c:set var="fullId">id="${id}"</c:set>
 	</c:when>
 	<c:otherwise>
-		<i class="fa fa-long-arrow-down fa-pull-right"  ${fullTitle} ${fullOnclick}></i>
+		<c:set var="fullId" value=""/>
+	</c:otherwise>
+</c:choose>
+
+<c:choose>
+	<c:when test="${not empty display}">
+	<c:set var="fullDisplay">style='display:${display}'</c:set>
+	</c:when>
+	<c:otherwise>
+		<c:set var="fullDisplay" value=""/>
+	</c:otherwise>
+</c:choose>
+
+<c:choose>
+	<c:when test="${fn:containsIgnoreCase(state, 'up')}">
+		<i class="fa fa-long-arrow-up fa-pull-left" ${fullId} ${fullTitle} ${fullOnclick} ${fullDisplay}></i>
+	</c:when>
+	<c:otherwise>
+		<i class="fa fa-long-arrow-down fa-pull-right"  ${fullId} ${fullTitle} ${fullOnclick} ${fullDisplay}></i>
 	</c:otherwise>
 </c:choose>

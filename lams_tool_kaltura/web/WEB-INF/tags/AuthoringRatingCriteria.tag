@@ -80,13 +80,12 @@
 <c:set var="isCommentsEnabled" value="false"/>
 <c:set var="commentsMinWordsLimit" value="0"/>
 <c:forEach var="criteria" items="${criterias}" varStatus="status">
-	<c:if test="${criteria.commentsEnabled}">
+	<c:if test="${criteria.ratingStyle == 0 && criteria.commentsEnabled}">
 		<c:set var="isCommentsEnabled" value="true"/>
 		<c:set var="commentsMinWordsLimit" value="${criteria.commentsMinWordsLimit}"/>
 	</c:if>
 </c:forEach>
 
-<!-- begin tab content -->
 <script type="text/javascript">
 $(document).ready(function() { 
 	
@@ -253,7 +252,7 @@ $(document).ready(function() {
 			<table class="table table-condensed table-no-border" id="criterias-table">
 		
 				<c:forEach var="criteria" items="${criterias}" varStatus="status">
-					<c:if test="${!criteria.commentsEnabled}">
+					<c:if test="${criteria.ratingStyle > 0}">
 						<tr>
 							
 							<td class="criteria-info">
@@ -341,7 +340,7 @@ $(document).ready(function() {
 						<fmt:param> </fmt:param>
 					</fmt:message>
 				</label>
-				<input type="text" name="commentsMinWordsLimit" id="comments-min-words-limit" value="${commentsMinWordsLimit}" class="form-control-sm"/>
+				<input type="text" name="commentsMinWordsLimit" id="comments-min-words-limit" value="${commentsMinWordsLimit}"/>
 			</div>
 		</div>
 	</div>
