@@ -338,58 +338,6 @@ public class RatingService implements IRatingService {
     }
 
     @Override
-    public ItemRatingDTO getRatingCriteriaDtoWithActualRatings(Long contentId, Long itemId) {
-
-	NumberFormat numberFormat = NumberFormat.getInstance(Locale.US);
-	numberFormat.setMaximumFractionDigits(1);
-	List<RatingCriteria> criterias = getCriteriasByToolContentId(contentId);
-
-	// handle comments criteria
-	List<Long> itemIds = Collections.singletonList(itemId);
-	boolean isCommentsByOtherUsersRequired = false;// not important as it's not used
-	Long userId = -1L; // passing impossible user id as there is no need in this info
-	List<ItemRatingDTO> itemDtos = handleCommentsCriteria(criterias, itemIds, isCommentsByOtherUsersRequired,
-		userId);
-	ItemRatingDTO itemDto = itemDtos.get(0);
-
-	//get all data from DB
-	List<Rating> itemRatings = ratingDAO.getRatingsByItem(contentId, itemId);
-
-	// handle all criterias except for comments' one
-	List<ItemRatingCriteriaDTO> criteriaDtos = new LinkedList<ItemRatingCriteriaDTO>();
-	for (RatingCriteria criteria : criterias) {
-	    Long criteriaId = criteria.getRatingCriteriaId();
-
-	    // comments' criteria are handled earlier, at the beginning of this function
-	    if (criteria.isCommentRating()) {
-		continue;
-	    }
-
-	    ItemRatingCriteriaDTO criteriaDto = new ItemRatingCriteriaDTO();
-	    criteriaDto.setRatingCriteria(criteria);
-	    List<RatingDTO> ratingDtos = new ArrayList<RatingDTO>();
-
-	    //find according to that criteria itemRatings
-	    for (Rating itemRating : itemRatings) {
-		if (itemRating.getRatingCriteria().getRatingCriteriaId().equals(criteria.getRatingCriteriaId())) {
-		    RatingDTO ratingDto = new RatingDTO();
-		    String ratingStr = numberFormat.format(itemRating.getRating());
-		    ratingDto.setRating(ratingStr);
-		    ratingDto.setLearner(itemRating.getLearner());
-		    ratingDtos.add(ratingDto);
-		}
-	    }
-	    criteriaDto.setRatingDtos(ratingDtos);
-
-	    criteriaDtos.add(criteriaDto);
-	}
-	itemDto.setCriteriaDtos(criteriaDtos);
-
-	return itemDto;
-    }
-
-
-    @Override
     public List<RatingCriteria> getCriteriasByToolContentId(Long toolContentId) {
 	List<RatingCriteria> criterias = ratingCriteriaDAO.getByToolContentId(toolContentId);
 	return criterias;
