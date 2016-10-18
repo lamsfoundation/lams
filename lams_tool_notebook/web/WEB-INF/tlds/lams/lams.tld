@@ -432,9 +432,17 @@
        <path>/WEB-INF/tags/AuthoringRatingCriteria.tag</path>
    	</tag-file>
    	<tag-file>
+       <name>AuthoringRatingAllStyleCriteria</name>
+       <path>/WEB-INF/tags/AuthoringRatingAllStyleCriteria.tag</path>
+   	</tag-file>
+   	<tag-file>
        <name>Rating</name>
        <path>/WEB-INF/tags/Rating.tag</path>
    	</tag-file>    		
+   	<tag-file>
+       <name>StyledRating</name>
+       <path>/WEB-INF/tags/StyledRating.tag</path>
+   	</tag-file>
    	<tag-file>
        <name>headItems</name>
        <path>/WEB-INF/tags/headItems.tag</path>
