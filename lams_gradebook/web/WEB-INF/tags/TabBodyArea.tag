@@ -22,28 +22,18 @@
  */
 
 /**
- * Standard Head Items
+ * TabBodyArea.tag
  *	Author: Fiona Malikoff
- *	Description: Includes all the standard head items e.g. the 
- * lams css files, sets the content type, standard javascript files.
+ *	Description: Creates the panel body area for a nav bar screen
+ * Wiki: 
  */
+
 %>
-<%@ tag body-content="empty"%>
-
 <%@ taglib uri="tags-core" prefix="c"%>
-<%@ taglib uri="tags-lams" prefix="lams"%>
-<%@ taglib uri="tags-fmt" prefix="fmt"%>
+<%@ taglib uri="tags-bean" prefix="bean"%>
 
-<c:set var="lams">
-	<lams:LAMSURL />
-</c:set>
-<c:set var="tool">
-	<lams:WebAppURL />
-</c:set>
+<div class="panel-body panel-monitor-body">
+	 <jsp:doBody />
+</div>
 
-<lams:css/>
-
-<script type="text/javascript" src="${lams}includes/javascript/common.js"></script>
-<script type="text/javascript" src="${lams}includes/javascript/jquery.js"></script>
-<script type="text/javascript" src="${lams}includes/javascript/bootstrap.min.js"></script>
-<script type="text/javascript" src="${lams}includes/javascript/bootstrap.tabcontroller.js"></script>
+</div> <!--  close tab opened in TabHeader -->
