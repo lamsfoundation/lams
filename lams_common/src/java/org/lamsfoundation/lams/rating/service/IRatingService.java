@@ -119,16 +119,6 @@ public interface IRatingService {
 	    boolean isCommentsByOtherUsersRequired, Long userId);
 
     /**
-     * Returns item DTO with all corresponding ratings and comments. Doesn't contain average and total amount of rates.
-     *
-     * @param contentId
-     * @param itemId
-     * @return
-     */
-    ItemRatingDTO getRatingCriteriaDtoWithActualRatings(Long contentId, Long itemId);
-
-
-    /**
      *  Used by tools to get the ratings and comments relating to their items. To be used within SQL and supply the toolContentId as :toolContentId, 
      *  criteria id as :ratingCriteriaId and current user id as :userId
      *  If getByUser == true then returns data for all users, as left by the current user, otherwise gives the data for the current user as left by other users
