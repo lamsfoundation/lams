@@ -1,6 +1,6 @@
 
 <%
-	 /****************************************************************
+	/****************************************************************
 	 * Copyright (C) 2005 LAMS Foundation (http://lamsfoundation.org)
 	 * =============================================================
 	 * License Information: http://lamsfoundation.org/licensing/lams/2.0/
@@ -49,10 +49,18 @@
 	<c:set var="buttonTryAgainKey" value="button.try.again" />
 </c:if>
 
-<p>
-	<fmt:message key="${defineLaterMessageKey}" />
-</p>
-<div align="right" class="space-bottom-top">
-	<a href="javascript:location.reload(true);" class="button"><fmt:message
-			key="${buttonTryAgainKey}" /> </a>
+<div class="row no-gutter">
+	<div
+		class="col-xs-12 col-sm-offset-1 col-sm-10 col-lg-offset-2 col-lg-8">
+		<div class="alert alert-info">
+			<fmt:message key="${defineLaterMessageKey}" />
+		</div>
+	</div>
+</div>
+<div class="row no-gutter">
+	<div class="col-xs-12">
+		<a href="javascript:location.reload(true);"
+			class="btn btn-primary pull-right voffset5"><fmt:message
+				key="${buttonTryAgainKey}" /></a>
+	</div>
 </div>

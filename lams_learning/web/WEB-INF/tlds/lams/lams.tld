@@ -178,7 +178,7 @@
       <name>css</name>
       <tag-class>org.lamsfoundation.lams.web.tag.CssTag</tag-class>
       <body-content>empty</body-content>
-
+      
       <attribute>
          <description>Output stylesheet based on the user preferences.</description>
          <name>style</name>
@@ -408,8 +408,16 @@
        <path>/WEB-INF/tags/TabBody.tag</path>
    	</tag-file>
    	<tag-file>
+       <name>TabBodys</name>
+       <path>/WEB-INF/tags/TabBodys.tag</path>
+   	</tag-file>
+   	<tag-file>
        <name>TabName</name>
        <path>/WEB-INF/tags/TabName.tag</path>
+   	</tag-file>
+   	<tag-file>
+       <name>TabBodyArea</name>
+       <path>/WEB-INF/tags/TabBodyArea.tag</path>
    	</tag-file>
    	<tag-file>
        <name>CKEditor</name>
@@ -418,7 +426,23 @@
    	<tag-file>
        <name>AuthoringButton</name>
        <path>/WEB-INF/tags/AuthoringButton.tag</path>
-   	</tag-file>   	
+   	</tag-file>   
+   	<tag-file>
+       <name>AuthoringRatingCriteria</name>
+       <path>/WEB-INF/tags/AuthoringRatingCriteria.tag</path>
+   	</tag-file>
+   	<tag-file>
+       <name>AuthoringRatingAllStyleCriteria</name>
+       <path>/WEB-INF/tags/AuthoringRatingAllStyleCriteria.tag</path>
+   	</tag-file>
+   	<tag-file>
+       <name>Rating</name>
+       <path>/WEB-INF/tags/Rating.tag</path>
+   	</tag-file>    		
+   	<tag-file>
+       <name>StyledRating</name>
+       <path>/WEB-INF/tags/StyledRating.tag</path>
+   	</tag-file>
    	<tag-file>
        <name>headItems</name>
        <path>/WEB-INF/tags/headItems.tag</path>
@@ -438,7 +462,27 @@
    	<tag-file>
 	    <name>Page</name>
 		<path>/WEB-INF/tags/Page.tag</path>
+   	</tag-file>
+   	<tag-file>
+	    <name>TSTable</name>
+		<path>/WEB-INF/tags/TSTable.tag</path>
+   	</tag-file>    
+  	<tag-file>
+	    <name>Arrow</name>
+		<path>/WEB-INF/tags/Arrow.tag</path>
+   	</tag-file>
+   	<tag-file>
+       <name>AdvancedAccordian</name>
+       <path>/WEB-INF/tags/AdvancedAccordian.tag</path>
    	</tag-file>  
+   	<tag-file>
+   		<name>RestrictedUsageAccordian</name>
+   		<path>/WEB-INF/tags/RestrictedUsageAccordian.tag</path>
+   	</tag-file>
+  	<tag-file>
+	    <name>SimplePanel</name>
+		<path>/WEB-INF/tags/SimplePanel.tag</path>
+   	</tag-file>
    	<tag-file>
 	    <name>ImgButtonWrapper</name>
 		<path>/WEB-INF/tags/ImgButtonWrapper.tag</path>
@@ -481,5 +525,13 @@
 		<name>head</name>
 	    <path>/WEB-INF/tags/Head.tag</path>
 	</tag-file>
+   	<tag-file>
+       <name>Comments</name>
+       <path>/WEB-INF/tags/Comments.tag</path>
+   	</tag-file>
+   	<tag-file>
+       <name>CommentsAuthor</name>
+       <path>/WEB-INF/tags/CommentsAuthor.tag</path>
+   	</tag-file>
 
 </taglib>
