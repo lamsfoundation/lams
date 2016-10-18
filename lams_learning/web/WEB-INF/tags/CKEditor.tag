@@ -10,6 +10,11 @@
 <%@ attribute name="contentFolderID" required="false" rtexprvalue="true"%>
 <%@ attribute name="displayExpanded" required="false" rtexprvalue="true"%>
 <%@ attribute name="resizeParentFrameName" required="false" rtexprvalue="true"%>
+<%@ attribute name="method" required="false" rtexprvalue="true"%>
+
+<c:if test="${empty method}">
+	<c:set var="method" value="inline" />
+</c:if>
 
 <c:set var="language">
 	<lams:user property="fckLanguageMapping" />
@@ -17,6 +22,10 @@
 
 <c:if test="${empty toolbarSet}">
 	<c:set var="toolbarSet" value="Default" />
+</c:if>
+
+<c:if test="${fn:containsIgnoreCase(method,'Inline')}">
+	<c:set var="toolbarSet">${toolbarSet}Inline</c:set>
 </c:if>
 
 <c:if test="${empty displayExpanded}">
@@ -33,10 +42,10 @@
 <c:set var="fixedValue" value="${fn:replace(value,'&lt','&amp;lt')}"/>
 <c:set var="fixedValue" value="${fn:replace(fixedValue,'&gt','&amp;gt')}"/>
 
-<textarea id="${id}" name="${id}" style="display: none; visibility: hidden; height: 0px;">${fixedValue}</textarea>
+<textarea id="${id}" name="${id}" style="display: none; visibility: hidden; height: 0px;" placeholder="${placeholder}">${fixedValue}</textarea>
 
 <c:if test="${empty ckEditorBasePath}">
-	<c:set scope="request" var="ckEditorBasePath"><lams:LAMSURL/>ckeditor/</c:set>
+	<c:set scope="request" var="ckEditorBasePath">/lams/ckeditor/</c:set>
 	<script type="text/javascript" src="${ckEditorBasePath}ckeditor.js"></script>
 </c:if>
 
@@ -59,10 +68,9 @@
 	    var editor = CKEDITOR.instances["${id}"];
 	    if (editor) { editor.destroy(true); }
 	    
-		var instance = CKEDITOR.replace( "${id}", {
+		var instance = CKEDITOR.${method}( "${id}", {
 				width                         : "${width}",
 				height                        : "${height}",
-				autoGrow_minHeight            : "${height}".replace("px", ""),
 				toolbar                       : "${toolbarSet}",
 				language                      : "${language}",
 				defaultLangugage              : "en",

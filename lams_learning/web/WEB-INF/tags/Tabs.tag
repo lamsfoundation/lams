@@ -23,47 +23,78 @@
 
 /**
  * Tabs.tag
- *	Author: Mitchell Seaton
- *	Description: Create a tab list from a input collection or nested Tab tags.
- * Wiki: 
+ *	Author: Fiona Malikoff
+ *	Description: Create a hybrid panel header that contains a nav bar that acts like tabs.
  */
 
-		%>
-<%@ tag body-content="scriptless"%>
-<%@ attribute name="collection" type="java.util.Collection" required="false" rtexprvalue="true"%>
+%>
 <%@ attribute name="control" required="false" rtexprvalue="true"%>
-<%@ attribute name="useKey" required="false" rtexprvalue="true"%>
+<%@ attribute name="title" required="false" rtexprvalue="true"%>
+<%@ attribute name="refreshOnClickAction" required="false" rtexprvalue="true"%>
+<%@ attribute name="helpPage" required="false" rtexprvalue="true"%>
+<%@ attribute name="helpToolSignature" required="false" rtexprvalue="true"%>
+<%@ attribute name="helpModule" required="false" rtexprvalue="true"%>
+<%@ attribute name="extraControl" required="false" rtexprvalue="true"%>
+
 <%@ taglib uri="tags-core" prefix="c"%>
 <%@ taglib uri="tags-lams" prefix="lams"%>
+
+<c:set var="useActions" value="false" scope="request" />
+<c:if test="${not empty helpToolSignature or not empty helpModule or not empty helpPage or not empty refreshOnClickAction or not empty extraControl}">
+	<c:set var="useActions" value="true" scope="request" />
+</c:if>
+
 <c:set var="dControl" value="false" scope="request" />
 <c:if test="${control}">
 	<c:set var="dControl" value="${control}" scope="request" />
 </c:if>
 
-<c:set var="dUseKey" value="false" scope="request" />
-<c:if test="${useKey}">
-	<c:set var="dUseKey" value="${useKey}" scope="request" />
-</c:if>
+<!-- navbar combined with tabs -->
+<div class="panel panel-default panel-monitor-page">
+<div class="panel-heading navbar-heading">
 
-<!-- tab holder table -->
-<div id="nav">
-	<c:choose>
-		<c:when test="${collection != null}">
-			<c:set var="count" value="0" />
-			<c:forEach var="tab" begin="0" items="${collection}">
-				<c:set var="count" value="${count+1}" />
-				<c:choose>
-					<c:when test="${dUseKey}">
-						<lams:Tab id="${count}" key="${tab}" />
-					</c:when>
-					<c:otherwise>
-						<lams:Tab id="${count}" value="${tab}" />
-					</c:otherwise>
-				</c:choose>
-			</c:forEach>
-		</c:when>
-		<c:otherwise>
-			<jsp:doBody />
-		</c:otherwise>
-	</c:choose>
+ 	<nav class="navbar navbar-default navbar-heading">
+	<div class="container-fluid">
+    	<!-- Brand and toggle get grouped for better mobile display -->
+		<div class="navbar-header">
+	      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar-collapse-1" aria-expanded="false">
+	        <span class="sr-only">Toggle navigation</span>
+	        <span class="icon-bar"></span>
+	        <span class="icon-bar"></span>
+	        <span class="icon-bar"></span>
+	      </button>
+	      <c:if test="${not empty title}">
+	      	<span class="navbar-brand">${title}</span>
+	      </c:if>
+		</div>
+		<div class="collapse navbar-collapse" id="navbar-collapse-1" role="navigation">
+        	<ul class="nav navbar-nav" id="page-tabs">
+		     	<c:if test="${not empty title}">
+			    	<li role="separator" class="divider"></li>
+			    </c:if>
+	          	<jsp:doBody />
+         	</ul>
+         	<c:if test="${useActions}">
+		         <ul class="nav navbar-nav navbar-right" id="page-actions">
+				     <li role="separator" class="divider"></li>
+				     <c:if test="${not empty refreshOnClickAction}">
+		             <li class="navbar-text" ><span onclick="${refreshOnClickAction}"><i class="fa fa-refresh"></i></span></li>
+		             </c:if>
+		             <c:if test="${not empty helpToolSignature or not empty helpModule}">
+		             <li class="navbar-text" ><lams:help toolSignature="${helpToolSignature}" module="${helpModule}" style="small"/></li>
+		             </c:if>
+		             <c:if test="${not empty helpPage}">
+		             <li class="navbar-text" ><lams:help page="${helpPage}" style="small"/></li>
+		             </c:if>
+		             <c:if test="${not empty extraControl}">
+		             <li class="navbar-text" >${extraControl}</li>
+		             </c:if>
+		         </ul>
+         	</c:if>
+ 	    
+ 		</div>
+	 </div>
+     </nav>
+     <!-- /top nav -->
 </div>
+<!-- panel div closed by TabBodyArea -->
