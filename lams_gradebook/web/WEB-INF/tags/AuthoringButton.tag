@@ -122,12 +122,12 @@
     	window.close();
     }  				
 </script>	
-<p id="saveCancelButtons" >
-		<html:link href="javascript:;" property="cancel" onclick="javascript:doCancel()" styleClass="button right-buttons space-left">
-			<span class="cancelIcon"><fmt:message key="${cancelButtonLabelKey}" /></span>
-		</html:link>
-		<html:link href="javascript:doSubmit_Form_Only();" property="submit" styleClass="button right-buttons space-left">
+<div id="saveCancelButtons" >
+		<html:link href="javascript:doSubmit_Form_Only();" property="submit" styleClass="btn btn-primary pull-right">
 			<span class="okIcon"><fmt:message key="${saveButtonLabelKey}" /></span>
 		</html:link>
-</p>
+		<html:link href="javascript:;" property="cancel" onclick="javascript:doCancel()" styleClass="btn btn-default roffset5 pull-right">
+			<span class="cancelIcon"><fmt:message key="${cancelButtonLabelKey}" /></span>
+		</html:link>
+</div>
 <!-- end tab content -->

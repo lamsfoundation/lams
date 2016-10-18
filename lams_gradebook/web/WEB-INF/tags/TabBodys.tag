@@ -22,28 +22,16 @@
  */
 
 /**
- * Standard Head Items
+ * TabBodys.tag
  *	Author: Fiona Malikoff
- *	Description: Includes all the standard head items e.g. the 
- * lams css files, sets the content type, standard javascript files.
+ *	Description: Create a tabbody list from nested TabBody tags.
+ * Wiki: 
  */
-%>
-<%@ tag body-content="empty"%>
 
-<%@ taglib uri="tags-core" prefix="c"%>
-<%@ taglib uri="tags-lams" prefix="lams"%>
-<%@ taglib uri="tags-fmt" prefix="fmt"%>
+		%>
+<%@ tag body-content="scriptless"%>
 
-<c:set var="lams">
-	<lams:LAMSURL />
-</c:set>
-<c:set var="tool">
-	<lams:WebAppURL />
-</c:set>
-
-<lams:css/>
-
-<script type="text/javascript" src="${lams}includes/javascript/common.js"></script>
-<script type="text/javascript" src="${lams}includes/javascript/jquery.js"></script>
-<script type="text/javascript" src="${lams}includes/javascript/bootstrap.min.js"></script>
-<script type="text/javascript" src="${lams}includes/javascript/bootstrap.tabcontroller.js"></script>
+<!-- tab body holder table -->
+<div class="tab-content">
+	<jsp:doBody />
+</div>
