@@ -31,7 +31,7 @@ import org.apache.commons.lang.builder.ToStringBuilder;
  *
  * @author Ozgur Demirtas
  */
-public class ReflectionDTO implements Comparable {
+public class ReflectionDTO implements Comparable<ReflectionDTO> {
     protected String userName;
 
     protected String userId;
@@ -43,8 +43,7 @@ public class ReflectionDTO implements Comparable {
     protected String entry;
 
     @Override
-    public int compareTo(Object o) {
-	ReflectionDTO reflectionDTO = (ReflectionDTO) o;
+    public int compareTo(ReflectionDTO reflectionDTO) {
 
 	if (reflectionDTO == null) {
 	    return 1;

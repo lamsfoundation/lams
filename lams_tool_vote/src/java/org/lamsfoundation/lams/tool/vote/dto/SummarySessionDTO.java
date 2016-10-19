@@ -29,7 +29,7 @@ import org.apache.commons.lang.builder.ToStringBuilder;
 /**
  * DTO that holds summary data for all the sessions - down to the %s, number of votes etc but not the actual answers.
  */
-public class SummarySessionDTO implements Comparable {
+public class SummarySessionDTO implements Comparable<Object> {
     private Long sessionUid;
     private Long toolSessionId;
     private String sessionName;

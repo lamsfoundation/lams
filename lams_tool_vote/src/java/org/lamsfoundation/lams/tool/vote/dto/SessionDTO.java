@@ -34,24 +34,24 @@ import org.apache.commons.lang.builder.ToStringBuilder;
  *
  * @author Ozgur Demirtas
  */
-public class SessionDTO implements Comparable {
+public class SessionDTO implements Comparable<Object> {
     private int sessionUserCount;
     private int completedSessionUserCount;
     private String sessionId;
     private String sessionName;
-    private Map mapStandardNominationsHTMLedContent;
-    private Map mapStandardQuestionUid;
-    private Map mapStandardToolSessionUid;
+    private Map<Long, String> mapStandardNominationsHTMLedContent;
+    private Map<Long, Long> mapStandardQuestionUid;
+    private Map<Long, Long> mapStandardToolSessionUid;
     private boolean existsOpenVote;
     private Map<Long, Long> mapStandardUserCount;
-    private Map mapStandardRatesContent;
+    private Map<Long, Double> mapStandardRatesContent;
     private List<VoteMonitoredAnswersDTO> openVotes;
     private List<VoteMonitoredAnswersDTO> answers;
 
     /**
      * @return Returns the mapStandardQuestionUid.
      */
-    public Map getMapStandardQuestionUid() {
+    public Map<Long, Long> getMapStandardQuestionUid() {
 	return mapStandardQuestionUid;
     }
 
@@ -59,14 +59,14 @@ public class SessionDTO implements Comparable {
      * @param mapStandardQuestionUid
      *            The mapStandardQuestionUid to set.
      */
-    public void setMapStandardQuestionUid(Map mapStandardQuestionUid) {
+    public void setMapStandardQuestionUid(Map<Long, Long> mapStandardQuestionUid) {
 	this.mapStandardQuestionUid = mapStandardQuestionUid;
     }
 
     /**
      * @return Returns the mapStandardToolSessionUid.
      */
-    public Map getMapStandardToolSessionUid() {
+    public Map<Long, Long> getMapStandardToolSessionUid() {
 	return mapStandardToolSessionUid;
     }
 
@@ -74,7 +74,7 @@ public class SessionDTO implements Comparable {
      * @param mapStandardToolSessionUid
      *            The mapStandardToolSessionUid to set.
      */
-    public void setMapStandardToolSessionUid(Map mapStandardToolSessionUid) {
+    public void setMapStandardToolSessionUid(Map<Long, Long> mapStandardToolSessionUid) {
 	this.mapStandardToolSessionUid = mapStandardToolSessionUid;
     }
 
@@ -111,7 +111,7 @@ public class SessionDTO implements Comparable {
     /**
      * @return Returns the mapStandardRatesContent.
      */
-    public Map getMapStandardRatesContent() {
+    public Map<Long, Double> getMapStandardRatesContent() {
 	return mapStandardRatesContent;
     }
 
@@ -119,7 +119,7 @@ public class SessionDTO implements Comparable {
      * @param mapStandardRatesContent
      *            The mapStandardRatesContent to set.
      */
-    public void setMapStandardRatesContent(Map mapStandardRatesContent) {
+    public void setMapStandardRatesContent(Map<Long, Double> mapStandardRatesContent) {
 	this.mapStandardRatesContent = mapStandardRatesContent;
     }
 
@@ -202,7 +202,7 @@ public class SessionDTO implements Comparable {
     /**
      * @return Returns the mapStandardNominationsHTMLedContent.
      */
-    public Map getMapStandardNominationsHTMLedContent() {
+    public Map<Long, String> getMapStandardNominationsHTMLedContent() {
 	return mapStandardNominationsHTMLedContent;
     }
 
@@ -210,7 +210,7 @@ public class SessionDTO implements Comparable {
      * @param mapStandardNominationsHTMLedContent
      *            The mapStandardNominationsHTMLedContent to set.
      */
-    public void setMapStandardNominationsHTMLedContent(Map mapStandardNominationsHTMLedContent) {
+    public void setMapStandardNominationsHTMLedContent(Map<Long, String> mapStandardNominationsHTMLedContent) {
 	this.mapStandardNominationsHTMLedContent = mapStandardNominationsHTMLedContent;
     }
 

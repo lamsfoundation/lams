@@ -25,7 +25,7 @@ package org.lamsfoundation.lams.tool.vote.dto;
 /**
  * DTO that holds summary data for a nomination, not the answers themselves
  */
-public class SessionNominationDTO implements Comparable {
+public class SessionNominationDTO implements Comparable<Object> {
 
     Long questionUid;
     Integer numberOfVotes;

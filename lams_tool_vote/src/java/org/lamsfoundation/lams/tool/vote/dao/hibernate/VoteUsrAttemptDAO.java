@@ -77,6 +77,7 @@ public class VoteUsrAttemptDAO extends LAMSBaseDAO implements IVoteUsrAttemptDAO
     private static final String COUNT_ENTRIES_BY_SESSION_ID = "select count(*) from VoteUsrAttempt att, VoteQueUsr user, VoteSession ses where "
 	    + "att.voteQueUsr=user and user.voteSession=ses and ses.uid=:voteSessionUid";
 
+    @SuppressWarnings("unchecked")
     @Override
     public VoteUsrAttempt getAttemptByUID(Long uid) {
 	String query = "from VoteUsrAttempt attempt where attempt.uid=?";
@@ -96,13 +97,15 @@ public class VoteUsrAttemptDAO extends LAMSBaseDAO implements IVoteUsrAttemptDAO
 	this.getSession().save(voteUsrAttempt);
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     public List<VoteUsrAttempt> getAttemptsForUser(final Long queUsrId) {
-	List list = getSessionFactory().getCurrentSession().createQuery(VoteUsrAttemptDAO.LOAD_ATTEMPT_FOR_USER)
+	List<VoteUsrAttempt> list = getSessionFactory().getCurrentSession().createQuery(VoteUsrAttemptDAO.LOAD_ATTEMPT_FOR_USER)
 		.setLong("queUsrId", queUsrId.longValue()).list();
 	return list;
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     public Set<String> getUserEntries(final Long voteContentUid) {
 	List<String> list = getSessionFactory().getCurrentSession().createQuery(VoteUsrAttemptDAO.LOAD_USER_ENTRIES)
@@ -121,6 +124,7 @@ public class VoteUsrAttemptDAO extends LAMSBaseDAO implements IVoteUsrAttemptDAO
 	return userEntries;
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     public List<VoteUsrAttempt> getUserAttempts(final Long voteContentUid, final String userEntry) {
 	List<VoteUsrAttempt> list = getSessionFactory().getCurrentSession()
@@ -129,12 +133,14 @@ public class VoteUsrAttemptDAO extends LAMSBaseDAO implements IVoteUsrAttemptDAO
 	return list;
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     public List<VoteUsrAttempt> getSessionOpenTextUserEntries(final Long voteSessionUid) {
 	return getSession().createQuery(VoteUsrAttemptDAO.LOAD_OPEN_TEXT_ENTRIES_BY_SESSION_UID)
 		.setLong("voteSessionUid", voteSessionUid).list();
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     public void removeAttemptsForUserandSession(final Long queUsrId, final Long sessionUid) {
 	String strGetUser = "from voteUsrAttempt in class VoteUsrAttempt where voteUsrAttempt.queUsrId=:queUsrId and voteUsrAttempt.voteQueUsr.voteSession.uid=:sessionUid";
@@ -152,6 +158,7 @@ public class VoteUsrAttemptDAO extends LAMSBaseDAO implements IVoteUsrAttemptDAO
 	}
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     public int getStandardAttemptsForQuestionContentAndSessionUid(final Long questionUid, final Long sessionUid) {
 	List<Number> list = getSession().createQuery(VoteUsrAttemptDAO.COUNT_ATTEMPT_FOR_QUESTION_CONTENT_AND_SESSION)
@@ -165,6 +172,7 @@ public class VoteUsrAttemptDAO extends LAMSBaseDAO implements IVoteUsrAttemptDAO
 
     }
 
+    @SuppressWarnings({ "unchecked", "rawtypes" })
     @Override
     public List<VoteUsrAttempt> getAttemptsForQuestionContentAndSessionUid(final Long questionUid,
 	    final Long sessionUid) {
@@ -181,6 +189,7 @@ public class VoteUsrAttemptDAO extends LAMSBaseDAO implements IVoteUsrAttemptDAO
 
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     public List<VoteUsrAttempt> getAttemptsForUserAndQuestionContent(final Long queUsrId, final Long questionUid) {
 	List<VoteUsrAttempt> list = getSessionFactory().getCurrentSession()
@@ -190,6 +199,7 @@ public class VoteUsrAttemptDAO extends LAMSBaseDAO implements IVoteUsrAttemptDAO
 	return list;
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     public VoteUsrAttempt getAttemptForUserAndQuestionContentAndSession(final Long queUsrId, final Long questionUid,
 	    final Long sessionUid) {
@@ -204,6 +214,7 @@ public class VoteUsrAttemptDAO extends LAMSBaseDAO implements IVoteUsrAttemptDAO
 	return list.get(0);
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     public Set<String> getAttemptsForUserAndSession(final Long queUsrId, final Long sessionUid) {
 
@@ -226,6 +237,7 @@ public class VoteUsrAttemptDAO extends LAMSBaseDAO implements IVoteUsrAttemptDAO
 	return userEntries;
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     public List<VoteUsrAttempt> getAttemptsForUserAndSessionUseOpenAnswer(final Long queUsrId, final Long sessionUid) {
 
@@ -234,9 +246,10 @@ public class VoteUsrAttemptDAO extends LAMSBaseDAO implements IVoteUsrAttemptDAO
 
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     public int getSessionEntriesCount(final Long voteSessionUid) {
-	List result = getSessionFactory().getCurrentSession().createQuery(VoteUsrAttemptDAO.COUNT_ENTRIES_BY_SESSION_ID)
+	List<Long> result = getSessionFactory().getCurrentSession().createQuery(VoteUsrAttemptDAO.COUNT_ENTRIES_BY_SESSION_ID)
 		.setLong("voteSessionUid", voteSessionUid).list();
 	Long resultLong = result.get(0) != null ? (Long) result.get(0) : new Long(0);
 	return resultLong.intValue();
