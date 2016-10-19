@@ -49,10 +49,11 @@ public class VoteUserDAO extends LAMSBaseDAO implements IVoteUserDAO {
     public VoteQueUsr getUserByUserId(Long userId) {
 	String query = "from VoteQueUsr user where user.queUsrId=?";
 
-	List<VoteQueUsr> list = getSessionFactory().getCurrentSession().createQuery(query).setLong(0, userId.longValue()).list();
+	List<VoteQueUsr> list = getSessionFactory().getCurrentSession().createQuery(query)
+		.setLong(0, userId.longValue()).list();
 
 	if (list != null && list.size() > 0) {
-	    VoteQueUsr voteu = (VoteQueUsr) list.get(0);
+	    VoteQueUsr voteu = list.get(0);
 	    return voteu;
 	}
 	return null;
@@ -68,7 +69,7 @@ public class VoteUserDAO extends LAMSBaseDAO implements IVoteUserDAO {
 	if (list != null && list.size() > 0) {
 	    Iterator<VoteQueUsr> listIterator = list.iterator();
 	    while (listIterator.hasNext()) {
-		VoteQueUsr user = (VoteQueUsr) listIterator.next();
+		VoteQueUsr user = listIterator.next();
 		if (user.getVoteSession().getSessionStatus().equals("COMPLETED")) {
 		    ++completedSessionUserCount;
 		}
@@ -87,7 +88,7 @@ public class VoteUserDAO extends LAMSBaseDAO implements IVoteUserDAO {
 		.setLong("queUsrId", queUsrId.longValue()).setLong("voteSessionId", voteSessionId.longValue()).list();
 
 	if (list != null && list.size() > 0) {
-	    VoteQueUsr usr = (VoteQueUsr) list.get(0);
+	    VoteQueUsr usr = list.get(0);
 	    return usr;
 	}
 	return null;
@@ -98,10 +99,11 @@ public class VoteUserDAO extends LAMSBaseDAO implements IVoteUserDAO {
     public VoteQueUsr getVoteQueUsrById(long voteQueUsrId) {
 	String query = "from VoteQueUsr user where user.queUsrId=?";
 
-	List<VoteQueUsr> list = getSessionFactory().getCurrentSession().createQuery(query).setLong(0, voteQueUsrId).list();
+	List<VoteQueUsr> list = getSessionFactory().getCurrentSession().createQuery(query).setLong(0, voteQueUsrId)
+		.list();
 
 	if (list != null && list.size() > 0) {
-	    VoteQueUsr qu = (VoteQueUsr) list.get(0);
+	    VoteQueUsr qu = list.get(0);
 	    return qu;
 	}
 	return null;

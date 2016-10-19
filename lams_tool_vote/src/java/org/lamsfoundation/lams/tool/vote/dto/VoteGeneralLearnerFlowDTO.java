@@ -35,7 +35,7 @@ import org.apache.commons.lang.builder.ToStringBuilder;
  *
  * @author Ozgur Demirtas
  */
-public class VoteGeneralLearnerFlowDTO implements Comparable {
+public class VoteGeneralLearnerFlowDTO implements Comparable<Object> {
     protected String activityTitle;
 
     protected String activityInstructions;
@@ -92,7 +92,7 @@ public class VoteGeneralLearnerFlowDTO implements Comparable {
 
     protected Date submissionDeadline;
 
-    protected Map mapGeneralCheckedOptionsContent;
+    protected Map<String, String> mapGeneralCheckedOptionsContent;
 
     protected Map<Long, String> mapStandardNominationsContent;
 
@@ -108,6 +108,7 @@ public class VoteGeneralLearnerFlowDTO implements Comparable {
 
     //   protected List listMonitoredAnswersContainerDto;
 
+    @SuppressWarnings("rawtypes")
     protected List listUserEntries;
 
     /**
@@ -383,6 +384,7 @@ public class VoteGeneralLearnerFlowDTO implements Comparable {
     /**
      * @return Returns the listUserEntries.
      */
+    @SuppressWarnings("rawtypes")
     public List getListUserEntries() {
 	return listUserEntries;
     }
@@ -391,6 +393,7 @@ public class VoteGeneralLearnerFlowDTO implements Comparable {
      * @param listUserEntries
      *            The listUserEntries to set.
      */
+    @SuppressWarnings("rawtypes")
     public void setListUserEntries(List listUserEntries) {
 	this.listUserEntries = listUserEntries;
     }
@@ -567,7 +570,7 @@ public class VoteGeneralLearnerFlowDTO implements Comparable {
     /**
      * @return Returns the mapGeneralCheckedOptionsContent.
      */
-    public Map getMapGeneralCheckedOptionsContent() {
+    public Map<String, String> getMapGeneralCheckedOptionsContent() {
 	return mapGeneralCheckedOptionsContent;
     }
 
@@ -575,7 +578,7 @@ public class VoteGeneralLearnerFlowDTO implements Comparable {
      * @param mapGeneralCheckedOptionsContent
      *            The mapGeneralCheckedOptionsContent to set.
      */
-    public void setMapGeneralCheckedOptionsContent(Map mapGeneralCheckedOptionsContent) {
+    public void setMapGeneralCheckedOptionsContent(Map<String, String> mapGeneralCheckedOptionsContent) {
 	this.mapGeneralCheckedOptionsContent = mapGeneralCheckedOptionsContent;
     }
 

@@ -100,8 +100,8 @@ public class VoteUsrAttemptDAO extends LAMSBaseDAO implements IVoteUsrAttemptDAO
     @SuppressWarnings("unchecked")
     @Override
     public List<VoteUsrAttempt> getAttemptsForUser(final Long queUsrId) {
-	List<VoteUsrAttempt> list = getSessionFactory().getCurrentSession().createQuery(VoteUsrAttemptDAO.LOAD_ATTEMPT_FOR_USER)
-		.setLong("queUsrId", queUsrId.longValue()).list();
+	List<VoteUsrAttempt> list = getSessionFactory().getCurrentSession()
+		.createQuery(VoteUsrAttemptDAO.LOAD_ATTEMPT_FOR_USER).setLong("queUsrId", queUsrId.longValue()).list();
 	return list;
     }
 
@@ -111,7 +111,7 @@ public class VoteUsrAttemptDAO extends LAMSBaseDAO implements IVoteUsrAttemptDAO
 	List<String> list = getSessionFactory().getCurrentSession().createQuery(VoteUsrAttemptDAO.LOAD_USER_ENTRIES)
 		.setLong("voteContentUid", voteContentUid).list();
 
-	Set<String> userEntries = new HashSet<String>();
+	Set<String> userEntries = new HashSet<>();
 	if ((list != null) && (list.size() > 0)) {
 	    Iterator<String> listIterator = list.iterator();
 	    while (listIterator.hasNext()) {
@@ -222,7 +222,7 @@ public class VoteUsrAttemptDAO extends LAMSBaseDAO implements IVoteUsrAttemptDAO
 		.createQuery(VoteUsrAttemptDAO.LOAD_ATTEMPT_FOR_USER_AND_SESSION)
 		.setLong("queUsrId", queUsrId.longValue()).setLong("sessionUid", sessionUid.longValue()).list();
 
-	Set<String> userEntries = new HashSet<String>();
+	Set<String> userEntries = new HashSet<>();
 	if ((list != null) && (list.size() > 0)) {
 	    Iterator<VoteUsrAttempt> listIterator = list.iterator();
 	    while (listIterator.hasNext()) {
@@ -249,8 +249,9 @@ public class VoteUsrAttemptDAO extends LAMSBaseDAO implements IVoteUsrAttemptDAO
     @SuppressWarnings("unchecked")
     @Override
     public int getSessionEntriesCount(final Long voteSessionUid) {
-	List<Long> result = getSessionFactory().getCurrentSession().createQuery(VoteUsrAttemptDAO.COUNT_ENTRIES_BY_SESSION_ID)
-		.setLong("voteSessionUid", voteSessionUid).list();
+	List<Long> result = getSessionFactory().getCurrentSession()
+		.createQuery(VoteUsrAttemptDAO.COUNT_ENTRIES_BY_SESSION_ID).setLong("voteSessionUid", voteSessionUid)
+		.list();
 	Long resultLong = result.get(0) != null ? (Long) result.get(0) : new Long(0);
 	return resultLong.intValue();
     }

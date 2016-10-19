@@ -23,7 +23,6 @@
 package org.lamsfoundation.lams.tool.vote.dao.hibernate;
 
 import java.util.List;
-import java.util.Set;
 
 import org.hibernate.FlushMode;
 import org.lamsfoundation.lams.dao.hibernate.LAMSBaseDAO;
@@ -64,11 +63,11 @@ public class VoteContentDAO extends LAMSBaseDAO implements IVoteContentDAO {
     @Override
     public VoteContent getVoteContentByContentId(Long voteContentId) {
 	String query = "from VoteContent as vote where vote.voteContentId = ?";
-	List<VoteContent> list = getSessionFactory().getCurrentSession().createQuery(query).setLong(0, voteContentId.longValue())
-		.list();
+	List<VoteContent> list = getSessionFactory().getCurrentSession().createQuery(query)
+		.setLong(0, voteContentId.longValue()).list();
 
 	if (list != null && list.size() > 0) {
-	    VoteContent vote = (VoteContent) list.get(0);
+	    VoteContent vote = list.get(0);
 	    return vote;
 	}
 	return null;
@@ -96,11 +95,11 @@ public class VoteContentDAO extends LAMSBaseDAO implements IVoteContentDAO {
     @Override
     public void removeVoteById(Long voteContentId) {
 	if (voteContentId != null) {
-	    List<VoteContent> list = getSessionFactory().getCurrentSession().createQuery(VoteContentDAO.FIND_VOTE_CONTENT)
-		    .setLong(0, voteContentId.longValue()).list();
+	    List<VoteContent> list = getSessionFactory().getCurrentSession()
+		    .createQuery(VoteContentDAO.FIND_VOTE_CONTENT).setLong(0, voteContentId.longValue()).list();
 
 	    if (list != null && list.size() > 0) {
-		VoteContent vote = (VoteContent) list.get(0);
+		VoteContent vote = list.get(0);
 		getSessionFactory().getCurrentSession().setFlushMode(FlushMode.AUTO);
 		getSession().delete(vote);
 		getSession().flush();
@@ -126,7 +125,7 @@ public class VoteContentDAO extends LAMSBaseDAO implements IVoteContentDAO {
     @Override
     public void removeQuestionsFromCache(VoteContent voteContent) {
 	if (voteContent != null) {
-	    for (VoteQueContent question : (Set<VoteQueContent>) voteContent.getVoteQueContents()) {
+	    for (VoteQueContent question : voteContent.getVoteQueContents()) {
 		getSession().evict(question);
 	    }
 	}

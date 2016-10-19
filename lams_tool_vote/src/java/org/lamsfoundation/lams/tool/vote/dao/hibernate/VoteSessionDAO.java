@@ -61,11 +61,11 @@ public class VoteSessionDAO extends LAMSBaseDAO implements IVoteSessionDAO {
     public VoteSession getSessionBySessionId(Long voteSessionId) {
 	String query = "from VoteSession votes where votes.voteSessionId=?";
 
-	List<VoteSession> list = getSessionFactory().getCurrentSession().createQuery(query).setLong(0, voteSessionId.longValue())
-		.list();
+	List<VoteSession> list = getSessionFactory().getCurrentSession().createQuery(query)
+		.setLong(0, voteSessionId.longValue()).list();
 
 	if (list != null && list.size() > 0) {
-	    VoteSession vote = (VoteSession) list.get(0);
+	    VoteSession vote = list.get(0);
 	    return vote;
 	}
 	return null;
@@ -108,7 +108,7 @@ public class VoteSessionDAO extends LAMSBaseDAO implements IVoteSessionDAO {
 		    .setLong(0, voteSessionId.longValue()).list();
 
 	    if (list != null && list.size() > 0) {
-		VoteSession vote = (VoteSession) list.get(0);
+		VoteSession vote = list.get(0);
 		getSessionFactory().getCurrentSession().setFlushMode(FlushMode.AUTO);
 		getSession().delete(vote);
 		getSession().flush();
