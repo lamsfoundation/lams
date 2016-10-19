@@ -6,7 +6,7 @@
 </c:set>
 <div id="conditionList">
 	<div>
-		<img src="<html:rewrite page='/images/indicator.gif' />" style="display:none" id="conditionListArea_Busy" />
+		<i class="fa fa-refresh fa-spin fa-fw" style="display:none" id="conditionListArea_Busy"></i>
 	</div>	
 	
 	<table class="table table-striped table-condensed" id="conditionTable" >
