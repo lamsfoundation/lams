@@ -6,7 +6,7 @@
 <logic:present name="<%=Globals.ERROR_KEY%>">
 <tr>
 	<td width="10%"  align="right" >
-		<img src="<lams:WebAppURL/>images/error.jpg" alt="<fmt:message key="error.title"/>"/>
+		<i class="fa fa-fw fa-exclamation-circle text-danger" title="<fmt:message key="error.title"/>"></i>
 	</td>
 	<td width="90%" valign="center" class="body" colspan="2">
 		<html:errors/>
