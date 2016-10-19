@@ -21,7 +21,6 @@
  * ****************************************************************
  */
 
-
 package org.lamsfoundation.lams.tool.vote.dto;
 
 import org.apache.commons.lang.builder.ToStringBuilder;
@@ -33,7 +32,7 @@ import org.apache.commons.lang.builder.ToStringBuilder;
  *
  * @author Ozgur Demirtas
  */
-public class VoteStatsDTO implements Comparable {
+public class VoteStatsDTO implements Comparable<Object> {
 
     private String sessionName;
     private Long sessionUid;

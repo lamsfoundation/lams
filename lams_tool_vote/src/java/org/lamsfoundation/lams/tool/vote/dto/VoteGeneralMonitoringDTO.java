@@ -23,14 +23,14 @@
 package org.lamsfoundation.lams.tool.vote.dto;
 
 import java.util.List;
-import java.util.Map;
+//import java.util.Map;
 
 /**
  * DTO that holds monitoring flow properties
  *
  * @author Ozgur Demirtas
  */
-public class VoteGeneralMonitoringDTO implements Comparable {
+public class VoteGeneralMonitoringDTO implements Comparable<Object> {
     protected String requestLearningReport;
     protected String userExceptionNoToolSessions;
     protected String userExceptionContentInUse;
@@ -48,16 +48,16 @@ public class VoteGeneralMonitoringDTO implements Comparable {
     //    protected List listMonitoredAnswersContainerDto;
 
     protected List<SessionDTO> sessionDTOs;
-    protected Map mapStandardNominationsContent;
-    protected Map mapStandardNominationsHTMLedContent;
-    protected Map mapStandardRatesContent;
-    protected Map mapStandardUserCount;
-    protected Map mapStandardQuestionUid;
-    protected Map mapStandardToolSessionUid;
+    //   protected Map mapStandardNominationsContent;
+    //  protected Map mapStandardNominationsHTMLedContent;
+    // protected Map mapStandardRatesContent;
+    //   protected Map mapStandardUserCount;
+    // protected Map mapStandardQuestionUid;
+    //  protected Map mapStandardToolSessionUid;
 
     protected String sessionUserCount;
     protected String completedSessionUserCount;
-    protected List mapStudentsVoted;
+    //  protected List mapStudentsVoted;
 
     protected String contentFolderID;
 
@@ -226,110 +226,110 @@ public class VoteGeneralMonitoringDTO implements Comparable {
 	this.sessionDTOs = sessionDTOs;
     }
 
-    /**
-     * @return Returns the mapStandardNominationsContent.
-     */
-    public Map getMapStandardNominationsContent() {
-	return mapStandardNominationsContent;
-    }
+//    /**
+//     * @return Returns the mapStandardNominationsContent.
+//     */
+//    public Map getMapStandardNominationsContent() {
+//	return mapStandardNominationsContent;
+//    }
+//
+//    /**
+//     * @param mapStandardNominationsContent
+//     *            The mapStandardNominationsContent to set.
+//     */
+//    public void setMapStandardNominationsContent(Map mapStandardNominationsContent) {
+//	this.mapStandardNominationsContent = mapStandardNominationsContent;
+//    }
 
-    /**
-     * @param mapStandardNominationsContent
-     *            The mapStandardNominationsContent to set.
-     */
-    public void setMapStandardNominationsContent(Map mapStandardNominationsContent) {
-	this.mapStandardNominationsContent = mapStandardNominationsContent;
-    }
+//    /**
+//     * @return Returns the mapStandardNominationsHTMLedContent.
+//     */
+//    public Map getMapStandardNominationsHTMLedContent() {
+//	return mapStandardNominationsHTMLedContent;
+//    }
+//
+//    /**
+//     * @param mapStandardNominationsHTMLedContent
+//     *            The mapStandardNominationsHTMLedContent to set.
+//     */
+//    public void setMapStandardNominationsHTMLedContent(Map mapStandardNominationsHTMLedContent) {
+//	this.mapStandardNominationsHTMLedContent = mapStandardNominationsHTMLedContent;
+//    }
 
-    /**
-     * @return Returns the mapStandardNominationsHTMLedContent.
-     */
-    public Map getMapStandardNominationsHTMLedContent() {
-	return mapStandardNominationsHTMLedContent;
-    }
+//    /**
+//     * @return Returns the mapStandardQuestionUid.
+//     */
+//    public Map getMapStandardQuestionUid() {
+//	return mapStandardQuestionUid;
+//    }
+//
+//    /**
+//     * @param mapStandardQuestionUid
+//     *            The mapStandardQuestionUid to set.
+//     */
+//    public void setMapStandardQuestionUid(Map mapStandardQuestionUid) {
+//	this.mapStandardQuestionUid = mapStandardQuestionUid;
+//    }
 
-    /**
-     * @param mapStandardNominationsHTMLedContent
-     *            The mapStandardNominationsHTMLedContent to set.
-     */
-    public void setMapStandardNominationsHTMLedContent(Map mapStandardNominationsHTMLedContent) {
-	this.mapStandardNominationsHTMLedContent = mapStandardNominationsHTMLedContent;
-    }
+//    /**
+//     * @return Returns the mapStandardRatesContent.
+//     */
+//    public Map getMapStandardRatesContent() {
+//	return mapStandardRatesContent;
+//    }
+//
+//    /**
+//     * @param mapStandardRatesContent
+//     *            The mapStandardRatesContent to set.
+//     */
+//    public void setMapStandardRatesContent(Map mapStandardRatesContent) {
+//	this.mapStandardRatesContent = mapStandardRatesContent;
+//    }
 
-    /**
-     * @return Returns the mapStandardQuestionUid.
-     */
-    public Map getMapStandardQuestionUid() {
-	return mapStandardQuestionUid;
-    }
+//    /**
+//     * @return Returns the mapStandardToolSessionUid.
+//     */
+//    public Map getMapStandardToolSessionUid() {
+//	return mapStandardToolSessionUid;
+//    }
+//
+//    /**
+//     * @param mapStandardToolSessionUid
+//     *            The mapStandardToolSessionUid to set.
+//     */
+//    public void setMapStandardToolSessionUid(Map mapStandardToolSessionUid) {
+//	this.mapStandardToolSessionUid = mapStandardToolSessionUid;
+//    }
 
-    /**
-     * @param mapStandardQuestionUid
-     *            The mapStandardQuestionUid to set.
-     */
-    public void setMapStandardQuestionUid(Map mapStandardQuestionUid) {
-	this.mapStandardQuestionUid = mapStandardQuestionUid;
-    }
+//    /**
+//     * @return Returns the mapStandardUserCount.
+//     */
+//    public Map getMapStandardUserCount() {
+//	return mapStandardUserCount;
+//    }
+//
+//    /**
+//     * @param mapStandardUserCount
+//     *            The mapStandardUserCount to set.
+//     */
+//    public void setMapStandardUserCount(Map mapStandardUserCount) {
+//	this.mapStandardUserCount = mapStandardUserCount;
+//    }
 
-    /**
-     * @return Returns the mapStandardRatesContent.
-     */
-    public Map getMapStandardRatesContent() {
-	return mapStandardRatesContent;
-    }
-
-    /**
-     * @param mapStandardRatesContent
-     *            The mapStandardRatesContent to set.
-     */
-    public void setMapStandardRatesContent(Map mapStandardRatesContent) {
-	this.mapStandardRatesContent = mapStandardRatesContent;
-    }
-
-    /**
-     * @return Returns the mapStandardToolSessionUid.
-     */
-    public Map getMapStandardToolSessionUid() {
-	return mapStandardToolSessionUid;
-    }
-
-    /**
-     * @param mapStandardToolSessionUid
-     *            The mapStandardToolSessionUid to set.
-     */
-    public void setMapStandardToolSessionUid(Map mapStandardToolSessionUid) {
-	this.mapStandardToolSessionUid = mapStandardToolSessionUid;
-    }
-
-    /**
-     * @return Returns the mapStandardUserCount.
-     */
-    public Map getMapStandardUserCount() {
-	return mapStandardUserCount;
-    }
-
-    /**
-     * @param mapStandardUserCount
-     *            The mapStandardUserCount to set.
-     */
-    public void setMapStandardUserCount(Map mapStandardUserCount) {
-	this.mapStandardUserCount = mapStandardUserCount;
-    }
-
-    /**
-     * @param mapStudentsVoted
-     *            The mapStudentsVoted to set.
-     */
-    public void setMapStudentsVoted(List mapStudentsVoted) {
-	this.mapStudentsVoted = mapStudentsVoted;
-    }
-
-    /**
-     * @return Returns the mapStudentsVoted.
-     */
-    public List getMapStudentsVoted() {
-	return mapStudentsVoted;
-    }
+//    /**
+//     * @param mapStudentsVoted
+//     *            The mapStudentsVoted to set.
+//     */
+//    public void setMapStudentsVoted(List mapStudentsVoted) {
+//	this.mapStudentsVoted = mapStudentsVoted;
+//    }
+//
+//    /**
+//     * @return Returns the mapStudentsVoted.
+//     */
+//    public List getMapStudentsVoted() {
+//	return mapStudentsVoted;
+//    }
 
     /**
      * @return Returns the responseId.

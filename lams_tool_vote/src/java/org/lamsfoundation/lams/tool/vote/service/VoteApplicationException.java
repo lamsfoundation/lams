@@ -28,11 +28,17 @@ package org.lamsfoundation.lams.tool.vote.service;
  * not suppose to be try and catched in any level. The struts should be taking
  * care of handling this exception.
  * </p>
- * 
+ *
  * @author Ozgur Demirtas
  *
  */
 public class VoteApplicationException extends RuntimeException {
+
+    /**
+     *
+     */
+    private static final long serialVersionUID = 6708356432970104502L;
+
     /**
      * Default Constructor
      */
@@ -42,7 +48,7 @@ public class VoteApplicationException extends RuntimeException {
 
     /**
      * Constructor for customized error message
-     * 
+     *
      * @param message
      */
     public VoteApplicationException(String message) {
@@ -51,7 +57,7 @@ public class VoteApplicationException extends RuntimeException {
 
     /**
      * Constructor for wrapping the throwable object
-     * 
+     *
      * @param cause
      */
     public VoteApplicationException(Throwable cause) {
@@ -61,7 +67,7 @@ public class VoteApplicationException extends RuntimeException {
     /**
      * Constructor for wrapping both the customized error message and
      * throwable exception object.
-     * 
+     *
      * @param message
      * @param cause
      */

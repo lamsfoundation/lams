@@ -22,7 +22,7 @@
 package org.lamsfoundation.lams.tool.vote.dto;
 
 import java.util.Date;
-import java.util.Map;
+//import java.util.Map;
 
 import org.apache.commons.lang.builder.ToStringBuilder;
 
@@ -33,7 +33,7 @@ import org.apache.commons.lang.builder.ToStringBuilder;
  *
  * @author Ozgur Demirtas
  */
-public class VoteMonitoredUserDTO implements Comparable {
+public class VoteMonitoredUserDTO implements Comparable<Object> {
     private String queUsrId;
 
     private String uid;
@@ -58,7 +58,7 @@ public class VoteMonitoredUserDTO implements Comparable {
 
     private String questionUid;
 
-    private Map usersAttempts;
+    //  private Map usersAttempts;
 
     private String responsePresentable;
 
@@ -83,20 +83,20 @@ public class VoteMonitoredUserDTO implements Comparable {
 		.toString();
     }
 
-    /**
-     * @return Returns the usersAttempts.
-     */
-    public Map getUsersAttempts() {
-	return usersAttempts;
-    }
-
-    /**
-     * @param usersAttempts
-     *            The usersAttempts to set.
-     */
-    public void setUsersAttempts(Map usersAttempts) {
-	this.usersAttempts = usersAttempts;
-    }
+//    /**
+//     * @return Returns the usersAttempts.
+//     */
+//    public Map getUsersAttempts() {
+//	return usersAttempts;
+//    }
+//
+//    /**
+//     * @param usersAttempts
+//     *            The usersAttempts to set.
+//     */
+//    public void setUsersAttempts(Map usersAttempts) {
+//	this.usersAttempts = usersAttempts;
+//    }
 
     @Override
     public int compareTo(Object o) {

@@ -20,7 +20,6 @@
  * ****************************************************************
  */
 
-
 package org.lamsfoundation.lams.tool.vote.web.form;
 
 import java.util.ArrayList;
@@ -35,6 +34,10 @@ import org.lamsfoundation.lams.tool.vote.pojos.VoteQueContent;
 import org.lamsfoundation.lams.web.planner.PedagogicalPlannerActivityForm;
 
 public class VotePedagogicalPlannerForm extends PedagogicalPlannerActivityForm {
+    /**
+     *
+     */
+    private static final long serialVersionUID = 4035785085162811572L;
     private List<String> nomination;
     private String contentFolderID;
     private String instructions;
@@ -84,11 +87,11 @@ public class VotePedagogicalPlannerForm extends PedagogicalPlannerActivityForm {
 	    setToolContentID(voteContent.getVoteContentId());
 	    setInstructions(voteContent.getInstructions());
 
-	    nomination = new ArrayList<String>();
-	    Set questions = voteContent.getVoteQueContents();
+	    nomination = new ArrayList<>();
+	    Set<VoteQueContent> questions = voteContent.getVoteQueContents();
 	    if (questions != null) {
 		int topicIndex = 0;
-		for (VoteQueContent message : (Set<VoteQueContent>) questions) {
+		for (VoteQueContent message : questions) {
 		    setNomination(topicIndex++, message.getQuestion());
 		}
 	    }
@@ -97,7 +100,7 @@ public class VotePedagogicalPlannerForm extends PedagogicalPlannerActivityForm {
 
     public void setNomination(int number, String nomination) {
 	if (this.nomination == null) {
-	    this.nomination = new ArrayList<String>();
+	    this.nomination = new ArrayList<>();
 	}
 	while (number >= this.nomination.size()) {
 	    this.nomination.add(null);

@@ -58,7 +58,6 @@ public class VoteChartGeneratorAction extends LamsDispatchAction {
     private static IVoteService voteService;
 
     @Override
-    @SuppressWarnings("unchecked")
     public ActionForward unspecified(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) throws JSONException, IOException {
 	String currentSessionId = request.getParameter("currentSessionId");
@@ -87,7 +86,7 @@ public class VoteChartGeneratorAction extends LamsDispatchAction {
 
 	    //sessionId should not be blank
 	} else if (!StringUtils.isBlank(currentSessionId)) {
-	    VoteChartGeneratorAction.logger.warn("Session Id should not be blank");
+	    logger.warn("Session Id should not be blank");
 	    VoteSession voteSession = getVoteService().getSessionBySessionId(new Long(currentSessionId));
 	    VoteContent voteContent = voteSession.getVoteContent();
 

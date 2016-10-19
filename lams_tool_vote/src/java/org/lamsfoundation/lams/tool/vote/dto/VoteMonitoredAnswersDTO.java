@@ -22,7 +22,7 @@
 
 package org.lamsfoundation.lams.tool.vote.dto;
 
-import java.util.List;
+//import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.lang.builder.ToStringBuilder;
@@ -34,15 +34,16 @@ import org.apache.commons.lang.builder.ToStringBuilder;
  *
  * @author Ozgur Demirtas
  */
-public class VoteMonitoredAnswersDTO implements Comparable {
+public class VoteMonitoredAnswersDTO implements Comparable<Object> {
     protected String questionUid;
 
     private String question;
 
     private String attemptUid;
 
-    private List candidateAnswers;
+    //  private List candidateAnswers;
 
+    @SuppressWarnings("rawtypes")
     private Map questionAttempts;
 
     private String sessionId;
@@ -79,20 +80,20 @@ public class VoteMonitoredAnswersDTO implements Comparable {
 	this.sessionName = sessionName;
     }
 
-    /**
-     * @return Returns the candidateAnswers.
-     */
-    public List getCandidateAnswers() {
-	return candidateAnswers;
-    }
-
-    /**
-     * @param candidateAnswers
-     *            The candidateAnswers to set.
-     */
-    public void setCandidateAnswers(List candidateAnswers) {
-	this.candidateAnswers = candidateAnswers;
-    }
+//    /**
+//     * @return Returns the candidateAnswers.
+//     */
+//    public List getCandidateAnswers() {
+//	return candidateAnswers;
+//    }
+//
+//    /**
+//     * @param candidateAnswers
+//     *            The candidateAnswers to set.
+//     */
+//    public void setCandidateAnswers(List candidateAnswers) {
+//	this.candidateAnswers = candidateAnswers;
+//    }
 
     /**
      * @return Returns the question.
@@ -127,6 +128,7 @@ public class VoteMonitoredAnswersDTO implements Comparable {
     /**
      * @return Returns the questionAttempts.
      */
+    @SuppressWarnings("rawtypes")
     public Map getQuestionAttempts() {
 	return questionAttempts;
     }
@@ -135,6 +137,7 @@ public class VoteMonitoredAnswersDTO implements Comparable {
      * @param questionAttempts
      *            The questionAttempts to set.
      */
+    @SuppressWarnings("rawtypes")
     public void setQuestionAttempts(Map questionAttempts) {
 	this.questionAttempts = questionAttempts;
     }

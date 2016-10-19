@@ -38,6 +38,11 @@ import org.apache.commons.lang.builder.ToStringBuilder;
  */
 public class VoteSession implements Serializable, Comparable<VoteSession> {
 
+    /**
+     *
+     */
+    private static final long serialVersionUID = 5053800653198292982L;
+
     public final static String INCOMPLETE = "INCOMPLETE";
 
     public static final String COMPLETED = "COMPLETED";
@@ -66,13 +71,13 @@ public class VoteSession implements Serializable, Comparable<VoteSession> {
     private VoteContent voteContent;
 
     /** persistent field */
-    private Set voteQueUsers;
+    private Set<VoteQueUsr> voteQueUsers;
 
     /** persistent field */
     private VoteQueUsr groupLeader;
 
     public VoteSession(Long voteSessionId, Date sessionStartDate, String sessionStatus, String session_name,
-	    VoteContent voteContent, Set voteQueUsers) {
+	    VoteContent voteContent, Set<VoteQueUsr> voteQueUsers) {
 	this.voteSessionId = voteSessionId;
 	this.sessionStartDate = sessionStartDate;
 	this.sessionStatus = sessionStatus;
@@ -206,7 +211,7 @@ public class VoteSession implements Serializable, Comparable<VoteSession> {
     /**
      * @return Returns the voteQueUsers.
      */
-    public Set getVoteQueUsers() {
+    public Set<VoteQueUsr> getVoteQueUsers() {
 	return voteQueUsers;
     }
 
@@ -214,7 +219,7 @@ public class VoteSession implements Serializable, Comparable<VoteSession> {
      * @param voteQueUsers
      *            The voteQueUsers to set.
      */
-    public void setVoteQueUsers(Set voteQueUsers) {
+    public void setVoteQueUsers(Set<VoteQueUsr> voteQueUsers) {
 	this.voteQueUsers = voteQueUsers;
     }
 

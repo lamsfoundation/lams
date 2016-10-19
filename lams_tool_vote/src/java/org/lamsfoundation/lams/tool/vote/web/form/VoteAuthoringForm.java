@@ -34,6 +34,10 @@ import org.lamsfoundation.lams.tool.vote.service.IVoteService;
  *
  */
 public class VoteAuthoringForm extends VoteLearningForm implements VoteAppConstants {
+    /**
+     *
+     */
+    private static final long serialVersionUID = 6118856765992233606L;
     /* form controllers */
     protected String addOptionContent;
     protected String currentTab;

@@ -40,6 +40,11 @@ import org.apache.commons.lang.builder.ToStringBuilder;
  */
 public class VoteContent implements Serializable {
 
+    /**
+     *
+     */
+    private static final long serialVersionUID = 1986729606785509746L;
+
     /** identifier field */
     private Long uid;
 
@@ -82,10 +87,10 @@ public class VoteContent implements Serializable {
     private boolean showResults;
 
     /** persistent field */
-    private Set voteQueContents;
+    private Set<VoteQueContent> voteQueContents;
 
     /** persistent field */
-    private Set voteSessions;
+    private Set<VoteSession> voteSessions;
 
     private Date submissionDeadline;
 
@@ -105,7 +110,7 @@ public class VoteContent implements Serializable {
 	    Date updateDate, boolean allowText, boolean useSelectLeaderToolOuput, boolean reflect,
 	    String reflectionSubject, String maxNominationCount, String minNominationCount, long createdBy,
 	    boolean lockOnFinish, boolean showResults, Short maxExternalInputs, Short externalInputsAdded,
-	    Set voteQueContents, Set voteSessions) {
+	    Set<VoteQueContent> voteQueContents, Set<VoteSession> voteSessions) {
 	this.voteContentId = voteContentId;
 	this.title = title;
 	this.instructions = instructions;
@@ -132,7 +137,7 @@ public class VoteContent implements Serializable {
     }
 
     /** minimal constructor */
-    public VoteContent(Long voteContentId, Set voteQueContents, Set voteSessions) {
+    public VoteContent(Long voteContentId, Set<VoteQueContent> voteQueContents, Set<VoteSession> voteSessions) {
 	this.voteContentId = voteContentId;
 	this.voteQueContents = voteQueContents;
 	this.voteSessions = voteSessions;
@@ -155,8 +160,8 @@ public class VoteContent implements Serializable {
 		vote.isDefineLater(), vote.getCreationDate(), vote.getUpdateDate(), vote.isAllowText(),
 		vote.isUseSelectLeaderToolOuput(), vote.isReflect(), vote.getReflectionSubject(),
 		vote.getMaxNominationCount(), vote.getMinNominationCount(), vote.getCreatedBy(), vote.isLockOnFinish(),
-		vote.isShowResults(), vote.getMaxExternalInputs(), vote.getExternalInputsAdded(), new TreeSet(),
-		new TreeSet());
+		vote.isShowResults(), vote.getMaxExternalInputs(), vote.getExternalInputsAdded(),
+		new TreeSet<VoteQueContent>(), new TreeSet<VoteSession>());
 	newContent.setVoteQueContents(vote.deepCopyMcQueContent(newContent));
 	newContent.setAssignedDataFlowObject(vote.getAssignedDataFlowObject());
 
@@ -169,11 +174,11 @@ public class VoteContent implements Serializable {
      * @param newQaContent
      * @return Set
      */
-    public Set deepCopyMcQueContent(VoteContent newMcContent) {
+    public Set<VoteQueContent> deepCopyMcQueContent(VoteContent newMcContent) {
 
-	Set newMcQueContent = new TreeSet();
-	for (Iterator i = this.getVoteQueContents().iterator(); i.hasNext();) {
-	    VoteQueContent queContent = (VoteQueContent) i.next();
+	Set<VoteQueContent> newMcQueContent = new TreeSet<>();
+	for (Iterator<VoteQueContent> i = this.getVoteQueContents().iterator(); i.hasNext();) {
+	    VoteQueContent queContent = i.next();
 	    if (queContent.getMcContent() != null) {
 		int displayOrder = queContent.getDisplayOrder();
 		VoteQueContent mcQueContent = VoteQueContent.newInstance(queContent, displayOrder, newMcContent);
@@ -234,9 +239,9 @@ public class VoteContent implements Serializable {
     /**
      * @return Returns the voteQueContents.
      */
-    public Set getVoteQueContents() {
+    public Set<VoteQueContent> getVoteQueContents() {
 	if (voteQueContents == null) {
-	    setVoteQueContents(new HashSet());
+	    setVoteQueContents(new HashSet<VoteQueContent>());
 	}
 	return voteQueContents;
 
@@ -246,16 +251,16 @@ public class VoteContent implements Serializable {
      * @param voteQueContents
      *            The voteQueContents to set.
      */
-    public void setVoteQueContents(Set voteQueContents) {
+    public void setVoteQueContents(Set<VoteQueContent> voteQueContents) {
 	this.voteQueContents = voteQueContents;
     }
 
     /**
      * @return Returns the voteSessions.
      */
-    public Set getVoteSessions() {
+    public Set<VoteSession> getVoteSessions() {
 	if (voteSessions == null) {
-	    setVoteSessions(new HashSet());
+	    setVoteSessions(new HashSet<VoteSession>());
 	}
 	return voteSessions;
     }
@@ -264,7 +269,7 @@ public class VoteContent implements Serializable {
      * @param voteSessions
      *            The voteSessions to set.
      */
-    public void setVoteSessions(Set voteSessions) {
+    public void setVoteSessions(Set<VoteSession> voteSessions) {
 	this.voteSessions = voteSessions;
     }
 
