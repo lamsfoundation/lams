@@ -41,5 +41,5 @@ public interface IVoteQueContentDAO {
 
     void removeQuestion(VoteQueContent voteQueContent);
 
-    List getAllQuestionsSorted(final long voteContentId);
+    List<VoteQueContent> getAllQuestionsSorted(final long voteContentId);
 }
