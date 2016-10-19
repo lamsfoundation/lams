@@ -60,10 +60,11 @@ public class VoteContentDAO extends LAMSBaseDAO implements IVoteContentDAO {
 	this.getSession().saveOrUpdate(vote);
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     public VoteContent getVoteContentByContentId(Long voteContentId) {
 	String query = "from VoteContent as vote where vote.voteContentId = ?";
-	List list = getSessionFactory().getCurrentSession().createQuery(query).setLong(0, voteContentId.longValue())
+	List<VoteContent> list = getSessionFactory().getCurrentSession().createQuery(query).setLong(0, voteContentId.longValue())
 		.list();
 
 	if (list != null && list.size() > 0) {
@@ -91,10 +92,11 @@ public class VoteContentDAO extends LAMSBaseDAO implements IVoteContentDAO {
 	this.getSession().update(voteContent);
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     public void removeVoteById(Long voteContentId) {
 	if (voteContentId != null) {
-	    List list = getSessionFactory().getCurrentSession().createQuery(VoteContentDAO.FIND_VOTE_CONTENT)
+	    List<VoteContent> list = getSessionFactory().getCurrentSession().createQuery(VoteContentDAO.FIND_VOTE_CONTENT)
 		    .setLong(0, voteContentId.longValue()).list();
 
 	    if (list != null && list.size() > 0) {
