@@ -52,8 +52,8 @@ public class VoteGeneralAuthoringDTO implements Comparable<Object> {
     protected String contentFolderID;
     protected String editableQuestionText;
 
-  //  protected List attachmentList;
-  //  protected List deletedAttachmentList;
+    //  protected List attachmentList;
+    //  protected List deletedAttachmentList;
     protected String reflect;
     protected String reflectionSubject;
 
