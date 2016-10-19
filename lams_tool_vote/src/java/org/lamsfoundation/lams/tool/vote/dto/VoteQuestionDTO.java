@@ -28,7 +28,7 @@ package org.lamsfoundation.lams.tool.vote.dto;
  *
  * @author Ozgur Demirtas
  */
-public class VoteQuestionDTO implements Comparable {
+public class VoteQuestionDTO implements Comparable<Object> {
     private Long uid;
     private String question;
     private String displayOrder;

@@ -31,7 +31,12 @@ import java.util.Comparator;
  *         The TreeMap in the web layer makes use of it.
  *
  */
-public class VoteStringComparator implements Comparator, Serializable {
+public class VoteStringComparator implements Comparator<Object>, Serializable {
+
+    /**
+     *
+     */
+    private static final long serialVersionUID = 2698324740289653704L;
 
     @Override
     public int compare(Object o1, Object o2) {

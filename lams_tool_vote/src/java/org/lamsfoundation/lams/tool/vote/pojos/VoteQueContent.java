@@ -34,6 +34,11 @@ import org.apache.commons.lang.builder.ToStringBuilder;
  */
 public class VoteQueContent implements Serializable, Comparable<VoteQueContent> {
 
+    /**
+     *
+     */
+    private static final long serialVersionUID = 1598466582549757720L;
+
     /** identifier field */
     private Long uid;
 

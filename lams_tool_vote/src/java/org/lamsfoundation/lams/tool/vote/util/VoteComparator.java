@@ -30,7 +30,12 @@ import java.util.Comparator;
  *         the web layer makes use of it.
  *
  */
-public class VoteComparator implements Comparator, Serializable {
+public class VoteComparator implements Comparator<Object>, Serializable {
+
+    /**
+     *
+     */
+    private static final long serialVersionUID = 1411627466727527798L;
 
     @Override
     public int compare(Object o1, Object o2) {

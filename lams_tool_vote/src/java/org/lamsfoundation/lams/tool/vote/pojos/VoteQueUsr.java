@@ -63,10 +63,11 @@ public class VoteQueUsr implements Serializable, Comparable<VoteQueUsr> {
     private VoteSession voteSession;
 
     /** persistent field */
-    private Set voteUsrAttempts;
+    private Set<VoteUsrAttempt> voteUsrAttempts;
 
     /** full constructor */
-    public VoteQueUsr(Long queUsrId, String username, String fullname, VoteSession voteSession, Set voteUsrAttempts) {
+    public VoteQueUsr(Long queUsrId, String username, String fullname, VoteSession voteSession,
+	    Set<VoteUsrAttempt> voteUsrAttempts) {
 	this.queUsrId = queUsrId;
 	this.username = username;
 	this.fullname = fullname;
@@ -80,7 +81,7 @@ public class VoteQueUsr implements Serializable, Comparable<VoteQueUsr> {
     }
 
     /** minimal constructor */
-    public VoteQueUsr(Long queUsrId, Set voteUsrAttempts) {
+    public VoteQueUsr(Long queUsrId, Set<VoteUsrAttempt> voteUsrAttempts) {
 	this.queUsrId = queUsrId;
 	this.voteUsrAttempts = voteUsrAttempts;
     }
@@ -117,14 +118,14 @@ public class VoteQueUsr implements Serializable, Comparable<VoteQueUsr> {
 	this.fullname = fullname;
     }
 
-    public Set getVoteUsrAttempts() {
+    public Set<VoteUsrAttempt> getVoteUsrAttempts() {
 	if (this.voteUsrAttempts == null) {
-	    setVoteUsrAttempts(new HashSet());
+	    setVoteUsrAttempts(new HashSet<VoteUsrAttempt>());
 	}
 	return this.voteUsrAttempts;
     }
 
-    public void setMcUsrAttempts(Set voteUsrAttempts) {
+    public void setMcUsrAttempts(Set<VoteUsrAttempt> voteUsrAttempts) {
 	this.voteUsrAttempts = voteUsrAttempts;
     }
 
@@ -171,7 +172,7 @@ public class VoteQueUsr implements Serializable, Comparable<VoteQueUsr> {
      * @param voteUsrAttempts
      *            The voteUsrAttempts to set.
      */
-    public void setVoteUsrAttempts(Set voteUsrAttempts) {
+    public void setVoteUsrAttempts(Set<VoteUsrAttempt> voteUsrAttempts) {
 	this.voteUsrAttempts = voteUsrAttempts;
     }
 

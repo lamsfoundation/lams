@@ -37,6 +37,11 @@ import org.apache.commons.lang.builder.ToStringBuilder;
  */
 public class VoteUsrAttempt implements Serializable, Comparable<VoteUsrAttempt> {
 
+    /**
+     *
+     */
+    private static final long serialVersionUID = 6756874212158405114L;
+
     /** identifier field */
     private Long uid;
 
