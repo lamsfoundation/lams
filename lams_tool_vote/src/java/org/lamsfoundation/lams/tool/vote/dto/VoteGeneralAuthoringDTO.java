@@ -29,7 +29,7 @@ import java.util.List;
  *
  * @author Ozgur Demirtas
  */
-public class VoteGeneralAuthoringDTO implements Comparable {
+public class VoteGeneralAuthoringDTO implements Comparable<Object> {
     protected String exceptionMaxNominationInvalid;
     protected String toolContentID;
     protected String activityTitle;
@@ -52,8 +52,8 @@ public class VoteGeneralAuthoringDTO implements Comparable {
     protected String contentFolderID;
     protected String editableQuestionText;
 
-    protected List attachmentList;
-    protected List deletedAttachmentList;
+  //  protected List attachmentList;
+  //  protected List deletedAttachmentList;
     protected String reflect;
     protected String reflectionSubject;
 
@@ -336,35 +336,35 @@ public class VoteGeneralAuthoringDTO implements Comparable {
 	this.editableQuestionText = editableQuestionText;
     }
 
-    /**
-     * @return Returns the attachmentList.
-     */
-    public List getAttachmentList() {
-	return attachmentList;
-    }
+//    /**
+//     * @return Returns the attachmentList.
+//     */
+//    public List getAttachmentList() {
+//	return attachmentList;
+//    }
+//
+//    /**
+//     * @param attachmentList
+//     *            The attachmentList to set.
+//     */
+//    public void setAttachmentList(List attachmentList) {
+//	this.attachmentList = attachmentList;
+//    }
 
-    /**
-     * @param attachmentList
-     *            The attachmentList to set.
-     */
-    public void setAttachmentList(List attachmentList) {
-	this.attachmentList = attachmentList;
-    }
-
-    /**
-     * @return Returns the deletedAttachmentList.
-     */
-    public List getDeletedAttachmentList() {
-	return deletedAttachmentList;
-    }
-
-    /**
-     * @param deletedAttachmentList
-     *            The deletedAttachmentList to set.
-     */
-    public void setDeletedAttachmentList(List deletedAttachmentList) {
-	this.deletedAttachmentList = deletedAttachmentList;
-    }
+//    /**
+//     * @return Returns the deletedAttachmentList.
+//     */
+//    public List getDeletedAttachmentList() {
+//	return deletedAttachmentList;
+//    }
+//
+//    /**
+//     * @param deletedAttachmentList
+//     *            The deletedAttachmentList to set.
+//     */
+//    public void setDeletedAttachmentList(List deletedAttachmentList) {
+//	this.deletedAttachmentList = deletedAttachmentList;
+//    }
 
     /**
      * @return Returns the reflect.

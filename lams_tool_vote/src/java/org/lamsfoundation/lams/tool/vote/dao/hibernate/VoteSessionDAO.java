@@ -56,11 +56,12 @@ public class VoteSessionDAO extends LAMSBaseDAO implements IVoteSessionDAO {
 	return (VoteSession) this.getSession().get(VoteSession.class, sessionUid);
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     public VoteSession getSessionBySessionId(Long voteSessionId) {
 	String query = "from VoteSession votes where votes.voteSessionId=?";
 
-	List list = getSessionFactory().getCurrentSession().createQuery(query).setLong(0, voteSessionId.longValue())
+	List<VoteSession> list = getSessionFactory().getCurrentSession().createQuery(query).setLong(0, voteSessionId.longValue())
 		.list();
 
 	if (list != null && list.size() > 0) {
@@ -70,9 +71,10 @@ public class VoteSessionDAO extends LAMSBaseDAO implements IVoteSessionDAO {
 	return null;
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     public int countSessionComplete() {
-	List list = getSessionFactory().getCurrentSession().createQuery(COUNT_SESSION_COMPLETE).list();
+	List<VoteSession> list = getSessionFactory().getCurrentSession().createQuery(COUNT_SESSION_COMPLETE).list();
 
 	if (list != null && list.size() > 0) {
 	    return list.size();
@@ -98,11 +100,11 @@ public class VoteSessionDAO extends LAMSBaseDAO implements IVoteSessionDAO {
 	this.getSession().delete(votes);
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     public void removeVoteSessionById(Long voteSessionId) {
-
 	if (voteSessionId != null) {
-	    List list = getSessionFactory().getCurrentSession().createQuery(FIND_VOTE_SESSION_CONTENT)
+	    List<VoteSession> list = getSessionFactory().getCurrentSession().createQuery(FIND_VOTE_SESSION_CONTENT)
 		    .setLong(0, voteSessionId.longValue()).list();
 
 	    if (list != null && list.size() > 0) {
