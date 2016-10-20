@@ -116,11 +116,11 @@
 								<td style="padding-left:0px; text-align:center;">
 									<c:choose>
 										<c:when test="${userImageContribution.votedForThisImage}">
-											<img src="<html:rewrite page='/includes/images/completeitem.gif'/>"	border="0">
+											<i class="fa fa-check text-success"></i>
 										</c:when>
 											
 										<c:otherwise>
-											<img src="<html:rewrite page='/includes/images/dash.gif'/>" border="0">
+											<i class="fa fa-minus"></i>
 										</c:otherwise>
 									</c:choose>
 								</td>
