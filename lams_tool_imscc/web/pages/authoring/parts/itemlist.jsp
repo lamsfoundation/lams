@@ -7,7 +7,7 @@
 	<div class="panel panel-default voffset5">
 		<div class="panel-heading panel-title">
 			<fmt:message key="label.authoring.basic.resource.list.title" />
-			<img src="${ctxPath}/includes/images/indicator.gif" style="display:none" id="commonCartridgeListArea_Busy" />
+			<i class="fa fa-refresh fa-spin fa-1x fa-fw" style="display:none" id="commonCartridgeListArea_Busy"></i>
 		</div>
 
 		<table class="table table-condensed" id="itemTable">
