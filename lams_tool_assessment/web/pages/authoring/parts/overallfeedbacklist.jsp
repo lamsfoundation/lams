@@ -21,7 +21,7 @@
 <div id="overallFeedbackArea">
 	<form id="overallFeedbackForm">
 		<input type="hidden" name="overallFeedbackCount" id="overallFeedbackCount" value="${overallFeedbackListSize}">
-		<img src="${ctxPath}/includes/images/indicator.gif"	style="display:none;" id="overallFeedbackArea_Busy" />			
+		<i class="fa fa-refresh fa-spin fa-2x fa-fw" style="display:none;" id="overallFeedbackArea_Busy"></i>
 		
 		<table class="table table-condensed">
 			<tr>

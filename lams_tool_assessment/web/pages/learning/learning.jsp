@@ -179,7 +179,7 @@
 						}					
 					},
 					onExpiry: function(periods) {
-				        $.blockUI({ message: '<h1 id="timelimit-expired"><img src="<html:rewrite page='/includes/images/indicator.gif'/>" border="0" > <fmt:message key="label.learning.blockui.time.is.over" /></h1>' }); 
+				        $.blockUI({ message: '<h1 id="timelimit-expired"><i class="fa fa-refresh fa-spin fa-1x fa-fw"></i> <fmt:message key="label.learning.blockui.time.is.over" /></h1>' }); 
 				        
 				        setTimeout(function() { 
 				        	submitAll(true);
