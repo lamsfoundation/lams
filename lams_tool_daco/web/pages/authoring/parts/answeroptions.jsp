@@ -13,9 +13,7 @@
 </a>
 
 <%-- This image is shown when answer options are downloaded from a server. --%>
-<img src="${ctxPath}/includes/images/indicator.gif"
-	style="display:none;" id="answerOptionsArea_Busy" name="answerOptionsArea_Busy"/>
-
+<i class="fa fa-refresh fa-spin fa-1x fa-fw" style="display:none;" id="answerOptionsArea_Busy" name="answerOptionsArea_Busy"></i>
 	
 <table class="table table-condensed table-no-border table-nonfluid">
 	<c:forEach var="item" items="${answerOptionList}" varStatus="status">
