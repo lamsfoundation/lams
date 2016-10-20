@@ -26,7 +26,7 @@
 				</td>
 				
 				<td>
-					<img src="${ctxPath}/includes/images/indicator.gif"	style="display:none" id="itemAttachmentArea_Busy" />
+					<i class="fa fa-refresh fa-spin fa-1x fa-fw" style="display:none" id="itemAttachmentArea_Busy"></i>
 				</td>
 			</tr>
 		</table>
