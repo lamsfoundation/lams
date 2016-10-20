@@ -15,7 +15,7 @@
 	<c:set var="allowUpload" value="${sessionMap.allowUpload}" />
 
 	 <div class="form-group">
-    	<label><fmt:message key="message.label.attachment" />&nbsp;</label><img src="${ctxPath}/images/indicator.gif" style="display:none" id="itemAttachmentArea_Busy" />
+    	<label><fmt:message key="message.label.attachment" />&nbsp;</label><i class="fa fa-refresh fa-spin fa-fw"  style="display:none" id="itemAttachmentArea_Busy"></i>
 		<div id="itemAttachmentArea">
 			<c:set var="ctxPath" value="${pageContext.request.contextPath}" scope="request"/>
 			<input type="hidden" name="hasAttachment" value="${topic.hasAttachment}"/>

@@ -157,7 +157,7 @@
 	</c:if>
 	
 	<!--For release marks feature-->
-	<img src="${tool}/images/indicator.gif" style="display:none" id="message-area-busy" />
+	<i class="fa fa-refresh fa-spin fa-2x fa-fw" style="display:none" id="message-area-busy"></i>
 	<div id="message-area"></div>
 
 </div>
