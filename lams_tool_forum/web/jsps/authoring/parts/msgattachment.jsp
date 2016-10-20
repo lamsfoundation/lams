@@ -18,7 +18,7 @@
 					<fmt:message key="label.delete" /> 
 				</a>
 				
-				<img src="${ctxPath}/images/indicator.gif" style="display:none"	id="itemAttachmentArea_Busy" class="space-left" />
+				<i class="fa fa-refresh fa-spin fa-2x fa-fw" style="display:none" id="conditionListArea_Busy" /></i>
 				
 			</li>
 		</ul>
