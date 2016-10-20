@@ -11,7 +11,7 @@
 <div class="panel panel-default voffset5">
 	<div class="panel-heading panel-title">
 		<fmt:message key="label.authoring.basic.list.title" /> 
-		<img src="${ctxPath}/includes/images/indicator.gif" style="display: none" id="questionListArea_Busy" />
+		<i class="fa fa-refresh fa-spin fa-3x fa-fw" style="display: none" id="questionListArea_Busy"></i>
 	</div>
 
 	<table class="table table-striped table-condensed" id="questionTable">
