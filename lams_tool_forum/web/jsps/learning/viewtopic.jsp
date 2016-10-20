@@ -152,9 +152,8 @@
 			<%@ include file="message/topicview.jsp"%>
 		</div>
 		<script>
-			<c:set var="loading_animation">${lams}images/ajax-loader.gif</c:set>
 			<c:set var="loading_words"><fmt:message key="label.loading.messages" /></c:set>
-			$('.scroll' ).jscroll({loadingHtml: '<img src="${loading_animation}" alt="${loading_words}" />${loading_words}',padding:30,autoTrigger:true,callback:setupJRatingSetPath});
+			$('.scroll' ).jscroll({loadingHtml: '<i class="fa fa-refresh fa-spin fa-fw"></i> ${loading_words}',padding:30,autoTrigger:true,callback:setupJRatingSetPath});
 		</script>
 			
 		${buttonPanel}
