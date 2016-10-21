@@ -62,9 +62,6 @@ public class PeerreviewUserDAOHibernate extends LAMSBaseDAO implements Peerrevie
     private static final String GET_COUNT_USERS_FOR_SESSION = "SELECT COUNT(*) FROM " + PeerreviewUser.class.getName()
 	    + " AS r WHERE r.session.sessionId=?";
 
-    private static final String LOAD_USERS_FOR_SESSION_LIMIT_OLD = "FROM user in class PeerreviewUser "
-	    + "WHERE user.session.sessionId=:toolSessionId AND user.userId!=:excludeUserId order by ";
-
     @Override
     public PeerreviewUser getUserByUserIDAndSessionID(Long userID, Long sessionId) {
 	List list = find(FIND_BY_USER_ID_SESSION_ID, new Object[] { userID, sessionId });
@@ -118,27 +115,6 @@ public class PeerreviewUserDAOHibernate extends LAMSBaseDAO implements Peerrevie
 	return ((Number) list.get(0)).intValue();
     }
 
-    @Override
-    public List<PeerreviewUser> getUsersForTablesorter(final Long toolSessionId, final Long excludeUserId, int page,
-	    int size, int sorting) {
-	String sortingOrder = "";
-	switch (sorting) {
-	    case PeerreviewConstants.SORT_BY_NO:
-		sortingOrder = "user.userId";
-		break;
-	    case PeerreviewConstants.SORT_BY_USERNAME_ASC:
-		sortingOrder = "user.firstName ASC";
-		break;
-	    case PeerreviewConstants.SORT_BY_USERNAME_DESC:
-		sortingOrder = "user.firstName DESC";
-		break;
-	}
-
-	return getSession().createQuery(LOAD_USERS_FOR_SESSION_LIMIT_OLD + sortingOrder)
-		.setLong("toolSessionId", toolSessionId.longValue()).setLong("excludeUserId", excludeUserId.longValue())
-		.setFirstResult(page * size).setMaxResults(size).list();
-    }
-
     private static final String LOAD_USERS_FOR_SESSION_LIMIT = "FROM user in class PeerreviewUser "
 	    + "WHERE user.session.sessionId=:toolSessionId AND user.userId!=:excludeUserId order by ";
 
@@ -169,11 +145,23 @@ public class PeerreviewUserDAOHibernate extends LAMSBaseDAO implements Peerrevie
 	    + " LEFT JOIN ( ";
     private static final String FIND_USER_RATINGS_COMMENTS2 = " ) rating ON user.user_id = rating.item_id ";
     
-    
+    private void buildNameSearch(String searchString, StringBuilder sqlBuilder, boolean whereDone) {
+	if (!StringUtils.isBlank(searchString)) {
+	    String[] tokens = searchString.trim().split("\\s+");
+	    for (String token : tokens) {
+		String escToken = StringEscapeUtils.escapeSql(token);
+		sqlBuilder.append(whereDone ? " AND ( " : " WHERE ( ")
+			.append("user.first_name LIKE '%").append(escToken)
+			.append("%' OR user.last_name LIKE '%").append(escToken).append("%' OR user.login_name LIKE '%")
+			.append(escToken).append("%') ");
+	    }
+	}
+    }
+
     @SuppressWarnings("unchecked")
     @Override
     public List<Object[]> getRatingsComments(Long toolContentId, Long toolSessionId, RatingCriteria criteria, Long userId, Integer page,
-    Integer size, int sorting, boolean getByUser, IRatingService coreRatingService) {
+    Integer size, int sorting, String searchString, boolean getByUser, IRatingService coreRatingService) {
 	String sortingOrder = "";
 	switch (sorting) {
 	    case PeerreviewConstants.SORT_BY_NO:
@@ -198,6 +186,8 @@ public class PeerreviewUserDAOHibernate extends LAMSBaseDAO implements Peerrevie
     	if ( ! getByUser) 
     	    bldr.append("WHERE user.user_id = :userId ");
     	
+    	buildNameSearch(searchString, bldr, ! getByUser);
+
     	bldr.append(sortingOrder);
     	
 	String queryString = bldr.toString();
@@ -246,7 +236,7 @@ public class PeerreviewUserDAOHibernate extends LAMSBaseDAO implements Peerrevie
 	    + "		WHERE r.rating_criteria_id = :ratingCriteriaId "
 	    + " 	GROUP BY r.item_id ) rating ON user.user_id = rating.item_id ";
     public List<Object[]> getCommentsCounts(Long toolContentId, Long toolSessionId, RatingCriteria criteria,
-	    Integer page, Integer size, int sorting) {
+	    Integer page, Integer size, int sorting, String searchString) {
 	String sortingOrder = "";
 	switch (sorting) {
 	    case PeerreviewConstants.SORT_BY_NO:
@@ -266,6 +256,7 @@ public class PeerreviewUserDAOHibernate extends LAMSBaseDAO implements Peerrevie
 	}
 
     	StringBuilder bldr =  new StringBuilder(COUNT_COMMENTS_FOR_SESSION);
+    	buildNameSearch(searchString, bldr, false);
     	bldr.append(sortingOrder);
     	
 	String queryString = bldr.toString();
@@ -285,7 +276,7 @@ public class PeerreviewUserDAOHibernate extends LAMSBaseDAO implements Peerrevie
      * Will return List<[user.user_id, user.first_name, user.last_name, notebook entry, notebook date]>
      */
     public List<Object[]> getUserNotebookEntriesForTablesorter(final Long toolSessionId, int page, int size, int sorting,
-	    ICoreNotebookService coreNotebookService) {
+	    String searchString, ICoreNotebookService coreNotebookService) {
 
 	String sortingOrder;
 	switch (sorting) {
@@ -318,6 +309,8 @@ public class PeerreviewUserDAOHibernate extends LAMSBaseDAO implements Peerrevie
 		.append(" JOIN tl_laprev11_session session ON session.session_id = :toolSessionId AND user.session_uid = session.uid");
 
 	queryText.append(notebookEntryStrings[1]);
+
+    	buildNameSearch(searchString, queryText, true);
 
 	// Now specify the sort based on the switch statement above.
 	queryText.append(sortingOrder);
