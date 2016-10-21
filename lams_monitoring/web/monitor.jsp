@@ -175,10 +175,10 @@
 			initLearnersTab();
 			refreshMonitor();
 			<c:if test="${not empty lesson.lessonDescription}">
-			$('#description').readmore({
-					  speed: 500,
-					  collapsedHeight: 85
-			});
+				$('#description').readmore({
+						  speed: 500,
+						  collapsedHeight: 85
+				});
 			</c:if>
 			
 			// remove "loading..." screen
@@ -290,22 +290,17 @@
 									</dd>
 								</c:if>
 								<!--  lesson actions -->
-								<style>
-										dd { 
-										  margin-bottom: 10px;
-										}
-								</style>
 								<dt><fmt:message key="lesson.manage"/>:</dt>
 								<dd>
 									<div class="btn-group btn-group-xs" role="group" id="lessonActions">
-									  <button id="viewLearnersButton" class="btn btn-sm btn-default roffset10" 
-									  	type="button" class="btn btn-xs btn-default" onClick="javascript:showLessonLearnersDialog()"
+									  <button id="viewLearnersButton" class="btn btn-default roffset10" 
+									  	type="button"onClick="javascript:showLessonLearnersDialog()"
 									  	title='<fmt:message key="button.view.learners.tooltip"/>'><i class="fa fa-sm fa-users"></i> <span class="hidden-xs"><fmt:message key="button.view.learners"/></span></button>
-									  <button id="editClassButton" class="btn btn-sm btn-default roffset10" 
-									  	type="button" class="btn btn-xs btn-default" onClick="javascript:showClassDialog()" 
+									  <button id="editClassButton" class="btn btn-default roffset10" 
+									  	type="button" onClick="javascript:showClassDialog()" 
 									  	title='<fmt:message key="button.edit.class.tooltip"/>'><i class="fa fa-sm fa-user-times"></i> <span class="hidden-xs"><fmt:message key="button.edit.class"/></span></button>
 									<c:if test="${notificationsAvailable && lesson.enabledLessonNotifications}">	
-									  <button id="notificationButton" class="btn btn-sm btn-default roffset10"
+									  <button id="notificationButton" class="btn btn-default" 
 									  	type="button" onClick="javascript:window.parent.showNotificationsDialog(null,${lesson.lessonID})"><i class="fa fa-sm fa-bullhorn"></i> <span class="hidden-xs"><fmt:message key="email.notifications"/></span></button>
 									</c:if>							  
 									</div>
@@ -314,27 +309,31 @@
 								<!-- IM & Presence -->
 								<dt>Instant messaging:</dt>
 								<dd>
-									<div id="presenceDiv">
-									<button id="presenceButton" class="btn btn-xs btn-danger"><i class="fa fa-wifi"></i> <span class="hidden-xs">Presence</span> 
-										<span id="presenceCounter" class="badge">0</span>
-									</button>
-									</div>							
-									<div id="imDiv"
-										<c:if test="${not lesson.learnerPresenceAvailable}">
-											style="display: none"
-										</c:if>
-										<c:if test="${lesson.learnerImAvailable}">
-											style="display: inline"
-										</c:if> 
-										>
-									<button id="imButton" class="btn btn-xs btn-default voffset10"><i id="imButtonToggle" class="fa fa-comments-o"></i> <span class="hidden-xs">Instant messaging</span></button>
+									<div class="btn-group btn-group-xs" role="group">
+										<button id="presenceButton" class="btn btn-default roffset10
+											<c:if test="${lesson.learnerPresenceAvailable}">
+												btn-success
+											</c:if>
+											"><i class="fa fa-sm fa-wifi"></i> <span class="hidden-xs">Presence</span> 
+											<span id="presenceCounter" class="badge">0</span>
+										</button>
+	
+										<button id="imButton" class="btn btn-default
+											<c:if test="${lesson.learnerImAvailable}">
+												btn-success
+											</c:if>
+											"
+											<c:if test="${not lesson.learnerPresenceAvailable}">
+												style="display: none"
+											</c:if>
+										><i class="fa fa-sm fa-comments-o"></i> <span class="hidden-xs">Instant messaging</span></button>
 									</div>
 								</dd>
 							</dl>	
 						</div>
 						
 						
-						<div class="col-sm-3  col-xs-6">
+						<div class="col-sm-3 col-xs-6">
 							<div class="panel panel-default">
 								<div class="panel-heading">Overall Completion
 								</div>
@@ -363,31 +362,6 @@
 					</div>
 				
 					<table id="tabLessonTable" class="table table-striped">
-						<tr>
-							<td>
-							</td>
-							<td>
-								<input type="checkbox" id="presenceAvailableField"
-									<c:if test="${lesson.learnerPresenceAvailable}">
-										checked="checked"
-									</c:if> 
-								/>
-								<fmt:message key="lesson.enable.presence"/>
-								<span id="presenceAvailableCount">(<span>0</span>
-									<fmt:message key="lesson.presence.count"/>)
-								</span>
-								<br />
-								<input type="checkbox" id="imAvailableField"
-									<c:if test="${not lesson.learnerPresenceAvailable}">
-										disabled="disabled"
-									</c:if>
-									<c:if test="${lesson.learnerImAvailable}">
-										checked="checked"
-									</c:if> 
-								/>
-								<fmt:message key="lesson.enable.im"/>
-							</td>
-						</tr>
 						<tr id="contributeHeader">
 							<td colspan="2" class="active">
 								<fmt:message key="lesson.required.tasks"/>
