@@ -55,6 +55,8 @@
 					SORTING_ENABLE : '<c:out value="${SORTING_ENABLE_VAR}" />',
 					<fmt:message key="label.disable.lesson.sorting" var="SORTING_DISABLE_VAR"/>
 					SORTING_DISABLE : '<c:out value="${SORTING_DISABLE_VAR}" />',
+					<fmt:message key="index.addlesson" var="ADD_LESSON_TITLE_VAR"/>
+					ADD_LESSON_TITLE : '<c:out value="${ADD_LESSON_TITLE_VAR}" />',
 					<fmt:message key="index.single.activity.lesson.title" var="SINGLE_ACTIVITY_LESSON_TITLE_VAR"/>
 					SINGLE_ACTIVITY_LESSON_TITLE : '<c:out value="${SINGLE_ACTIVITY_LESSON_TITLE_VAR}" />',
 					<fmt:message key="index.gradebook.course.title" var="GRADEBOOK_COURSE_TITLE_VAR"/>
