@@ -189,27 +189,30 @@ public class MonitoringAction extends Action {
 	    }
 	}
 
+	String searchString = WebUtil.readStrParam(request, "itemDescription", true);
+
 	// in case of monitoring we show all results. in case of learning - don't show results from the current user
 	Long dummyUserId = -1L;
 	
 	JSONObject responcedata = new JSONObject();
 
+	int numUsersInSession = service.getCountUsersBySession(toolSessionId, dummyUserId);
 	responcedata.put("page", page + 1);
-	responcedata.put("total", Math.ceil((float) service.getCountUsersBySession(toolSessionId, dummyUserId) / size));
-	responcedata.put("records", service.getCountUsersBySession(toolSessionId, dummyUserId));
+	responcedata.put("total", Math.ceil((float) numUsersInSession / size));
+	responcedata.put("records", numUsersInSession);
 
 	JSONArray rows = new JSONArray();
 
 	if (criteria.isCommentRating()) {
 	    // special db lookup just for this - gets the user's & how many comments left for them
 	    List<Object[]> rawRows = service.getCommentsCounts(toolContentId, toolSessionId, criteria, page, size,
-		    sorting);
+		    sorting, searchString);
 
 	    for (int i = 0; i < rawRows.size(); i++) {
 		Object[] rawRow = rawRows.get(i);
 		JSONObject cell = new JSONObject();
 		cell.put("itemId", rawRow[0]);
-		cell.put("itemDescription", rawRow[3]);
+		cell.put("itemDescription", (String)rawRow[3]);
 
 		Number numCommentsNumber = (Number) rawRow[1];
 		int numComments = numCommentsNumber != null ? numCommentsNumber.intValue() : 0;
@@ -227,7 +230,7 @@ public class MonitoringAction extends Action {
 	} else {
 	    // all other styles can use the "normal" routine and munge the JSON to suit jqgrid
 	    JSONArray rawRows = service.getUsersRatingsCommentsByCriteriaIdJSON(toolContentId, toolSessionId, criteria,
-		    dummyUserId, page, size, sorting, true, true, false);
+		    dummyUserId, page, size, sorting, searchString, true, true, false);
 
 	    for (int i = 0; i < rawRows.length(); i++) {
 
@@ -236,23 +239,22 @@ public class MonitoringAction extends Action {
 		String averageRating = (String) rawRow.get("averageRating");
 		Object numberOfVotes = rawRow.get("numberOfVotes");
 
-		if (averageRating == null || averageRating.length() == 0) {
-		    rawRow.put("rating", "");
-		} else if (criteria.isStarStyleRating()) {
-		    String starString = "<div class='rating-stars-holder'>";
-		    starString += "<div class='rating-stars-disabled rating-stars-new' data-average='" + averageRating
-			    + "' data-id='" + criteriaId + "'>";
-		    starString += "</div>";
-		    starString += "<div class='rating-stars-caption' id='rating-stars-caption-" + criteriaId + "' >";
-		    String msg = service.getLocalisedMessage("label.average.rating", new Object[] { averageRating,
-			    numberOfVotes });
-		    starString += msg;
-		    starString += "</div>";
-		    rawRow.put("rating", starString);
-		} else {
-		    rawRow.put("rating", averageRating);
+		if (averageRating != null && averageRating.length() > 0) {
+		    if (criteria.isStarStyleRating()) {
+			String starString = "<div class='rating-stars-holder'>";
+			starString += "<div class='rating-stars-disabled rating-stars-new' data-average='" + averageRating
+				+ "' data-id='" + criteriaId + "'>";
+			starString += "</div>";
+			starString += "<div class='rating-stars-caption' id='rating-stars-caption-" + criteriaId + "' >";
+			String msg = service.getLocalisedMessage("label.average.rating", new Object[] { averageRating,
+				numberOfVotes });
+			starString += msg;
+			starString += "</div>";
+			rawRow.put("rating", starString);
+		    } else {
+			rawRow.put("rating", averageRating);
+		    }
 		}
-
 		JSONObject row = new JSONObject();
 		row.put("id", "" + rawRow.get("itemId"));
 		row.put("cell", rawRow);
@@ -367,7 +369,6 @@ public class MonitoringAction extends Action {
 		.getAttribute(sessionMapID);
 	request.setAttribute(PeerreviewConstants.ATTR_SESSION_MAP_ID, sessionMap.getSessionID());
 
-	Long contentId = (Long) sessionMap.get(PeerreviewConstants.ATTR_TOOL_CONTENT_ID);
 	Long toolSessionId = WebUtil.readLongParam(request, "toolSessionId");
 
 	// Getting the params passed in from the jqGrid
