@@ -13,45 +13,35 @@
 	margin-top: 35%;
 }
 
-div#tabs {
-	width: 789px;
-	height: 574px;
+#content {
+	width: 100%;
+	padding: 0;
+}
+
+#content > .panel {
 	border: none;
+	border-shadow: none;
+	box-shadow: none;
 }
 
-div.tabContent {
-	height: 543px;
-	overflow: auto;
+#content .panel-monitor-page, #content .panel-monitor-body  {
+	margin-bottom: 0;
+	padding-bottom: 0;
 }
 
-.ui-tabs .ui-tabs-panel {
-	padding: 0px;
+#content .navbar-collapse {
+	padding-left: 0;
 }
 
 .ui-spinner {
 	margin-left: 10px;
 }
 
-div#tabs ul li a, a.ygtvspacer, a#closeButton, a#addButton {
-	border-bottom: none;
-}
-
-a#addButton {
-	position: absolute;
-	right: 60px;
-	top: 6px;
-	width: 80px;
-	padding: 5px 0 5px 25px;
-	vertical-align: center;
-	font-weight:bolder;
-	border: thin solid #2E6E9E;
-	background-color: #D0E5F5;
-}
-
 table.tabTable {
 	height: 517px;
 	table-layout: fixed;
 	border-top: thin dotted #2E6E9E;
+	border-collapse: separate;
 }
 
 div.tabTitle {
@@ -123,6 +113,10 @@ td#lessonNameCell {
 	margin-left: 10px;
 }
 	
+
+table#classTable {
+	width: 100%;
+}
 
 td.userContainerCell {
 	vertical-align: top;

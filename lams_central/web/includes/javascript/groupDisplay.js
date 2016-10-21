@@ -204,6 +204,7 @@ function showAddLessonDialog(orgID) {
 		'draggable' : false,
 		'height' : 740,
 		'width' : 850,
+		'title' : LABELS.ADD_LESSON_TITLE,
 		'open' : function() {
 			var dialog = $(this);
 			// load contents after opening the dialog
