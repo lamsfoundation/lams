@@ -64,14 +64,14 @@
 	</div>
 	
 	<!--For release marks feature-->
-	<img src="${tool}/images/indicator.gif" style="display:none" id="message-area-busy" />
+	<i class="fa fa-refresh fa-spin fa-fw" style="display:none" id="message-area-busy"></i>
 	<div id="message-area"></div> 
 
 </div>
 
 <%-- Summary list  --%>
 
-<img src="${tool}/images/indicator.gif" style="display:none" id="messageArea_Busy" />
+<i class="fa fa-refresh fa-spin fa-fw" style="display:none" id="messageArea_Busy"></i>
 <span id="messageArea"></span>
 
 <%@ include file="/common/messages.jsp"%>
