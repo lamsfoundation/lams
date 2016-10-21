@@ -4,7 +4,7 @@
 
 <div id="conditionList">
 	<div>
-		<i class="fa fa-refresh fa-spin fa-fw" style="display:none" id="conditionListArea_Busy" />
+		<i class="fa fa-refresh fa-spin fa-fw" style="display:none" id="conditionListArea_Busy"></i>
 	</div>	
 	
 	<table class="table table-striped table-condensed" id="conditionTable" >
