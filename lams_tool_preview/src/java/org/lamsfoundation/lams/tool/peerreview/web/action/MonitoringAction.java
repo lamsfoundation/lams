@@ -392,6 +392,8 @@ public class MonitoringAction extends Action {
 		sorting = PeerreviewConstants.SORT_BY_NOTEBOOK_ENTRY_ASC;
 	    }
 	}
+	
+	String searchString = WebUtil.readStrParam(request, "itemDescription", true);
 
 	// setting date format to ISO8601 for jquery.timeago 
 	DateFormat dateFormatterTimeAgo = new SimpleDateFormat(DateUtil.ISO8601_FORMAT); 
@@ -408,7 +410,7 @@ public class MonitoringAction extends Action {
 	responcedata.put("records", service.getCountUsersBySession(toolSessionId, dummyUserId));
 
 	List<Object[]> nbEntryList = service.getUserNotebookEntriesForTablesorter(toolSessionId, 
-		page, size, sorting);
+		page, size, sorting, searchString);
 	
 	// processed data from db is user.user_id, user.first_name, escaped( first_name + last_name), notebook entry, notebook date
 	// if no rating or comment, then the entries will be null and not an empty string

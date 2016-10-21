@@ -151,9 +151,6 @@ public interface IPeerreviewService extends ToolRatingManager {
      */
     List<GroupSummary> getGroupSummaries(Long contentId);
 
-    List<PeerreviewUser> getUsersForTablesorter(final Long qaSessionId, final Long excludeUserId, int page, int size,
-	    int sorting);
-
     int getCountUsersBySession(final Long qaSessionId, final Long excludeUserId);
 
     /**
@@ -246,13 +243,13 @@ public interface IPeerreviewService extends ToolRatingManager {
      * user, set getByUser to false and set currentUserId to the current user id. 
      */
     StyledCriteriaRatingDTO getUsersRatingsCommentsByCriteriaIdDTO(Long toolContentId, Long toolSessionId, RatingCriteria criteria, 
-	    Long currentUserId, boolean skipRatings, int sorting, boolean getAllUsers, boolean getByUser);
+	    Long currentUserId, boolean skipRatings, int sorting,  String searchString, boolean getAllUsers, boolean getByUser);
 
     /** 
      * Gets all the users in the session and any existing ratings for a given criteria in JSON format. 
      */
     JSONArray getUsersRatingsCommentsByCriteriaIdJSON(Long toolContentId, Long toolSessionId, RatingCriteria criteria, Long currentUserId, 
-	    Integer page, Integer size, int sorting, boolean getAllUsers, boolean getByUser, boolean needRatesPerUser) throws JSONException ;
+	    Integer page, Integer size, int sorting,  String searchString, boolean getAllUsers, boolean getByUser, boolean needRatesPerUser) throws JSONException ;
 
     /**
      * Gets all the users in the session and the ratings / comments they have left for a particular learner. Used by monitoring.
@@ -263,7 +260,7 @@ public interface IPeerreviewService extends ToolRatingManager {
      * Gets all the users in the session and the number of comments that have been left for them. Used by monitoring.
      */
     List<Object[]> getCommentsCounts(Long toolContentId, Long toolSessionId, RatingCriteria criteria,
-	    Integer page, Integer size, int sorting);
+	    Integer page, Integer size, int sorting, String searchString);
     
     String getLocalisedMessage(String key, Object[] args);
     
@@ -273,5 +270,6 @@ public interface IPeerreviewService extends ToolRatingManager {
     /** Get all the notebook entries for a session 
      * 	Will return List<[user.user_id, user.first_name, user.first_name + user.last_name, notebook entry, notebook date]>
      */
-    List<Object[]> getUserNotebookEntriesForTablesorter(Long toolSessionId, int page, int size, int sorting);
-}
+    List<Object[]> getUserNotebookEntriesForTablesorter(Long toolSessionId, int page, int size, int sorting, String searchString);
+
+ }
