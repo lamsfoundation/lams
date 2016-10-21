@@ -417,9 +417,9 @@ public class LearningAction extends Action {
 	    if (criteria.isRankingStyleRating())
 		sorting = PeerreviewConstants.SORT_BY_AVERAGE_RESULT_ASC;
 	    allUsersDtos.add(service.getUsersRatingsCommentsByCriteriaIdDTO(peerreview.getContentId(), sessionId, criteria,
-		    user.getUserId(), false, sorting, showAllUsers, true));
+		    user.getUserId(), false, sorting, null, showAllUsers, true));
 	    currentUserDtos.add(service.getUsersRatingsCommentsByCriteriaIdDTO(peerreview.getContentId(), sessionId, criteria,
-		    user.getUserId(), false, sorting, showAllUsers, false));
+		    user.getUserId(), false, sorting, null, showAllUsers, false));
 
 	}
 
@@ -475,7 +475,7 @@ public class LearningAction extends Action {
 	JSONObject responsedata = new JSONObject();
 	responsedata.put("total_rows", service.getCountUsersBySession(toolSessionId, userId));
 	responsedata.put("rows", service.getUsersRatingsCommentsByCriteriaIdJSON(toolContentId, toolSessionId, criteria, userId, 
-		page, size, sorting, peerreview.isSelfReview(), true, peerreview.getMaximumRatesPerUser() > 0 ));	
+		page, size, sorting, null, peerreview.isSelfReview(), true, peerreview.getMaximumRatesPerUser() > 0 ));	
 	    
 	int countRatedQuestions = service.getCountItemsRatedByUser(toolContentId, userId.intValue());
 	responsedata.put(AttributeNames.ATTR_COUNT_RATED_ITEMS, countRatedQuestions);
@@ -534,7 +534,7 @@ public class LearningAction extends Action {
 	Long userId = ( mode != null && mode.isTeacher() ) ? -1 : user.getUserId();
 
 	StyledCriteriaRatingDTO dto = service.getUsersRatingsCommentsByCriteriaIdDTO(toolContentId, toolSessionId, criteria, userId, 
-		(criteria.isCommentRating() || criteria.isStarStyleRating()), PeerreviewConstants.SORT_BY_USERNAME_ASC, 
+		(criteria.isCommentRating() || criteria.isStarStyleRating()), PeerreviewConstants.SORT_BY_USERNAME_ASC, null, 
 		peerreview.isSelfReview(), true );
 	
 	// override the min/max for stars based on old settings if needed (original Peer Review kept one setting for all criteria )
