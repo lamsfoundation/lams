@@ -13,7 +13,7 @@
 	<div class="panel panel-default voffset5">
 			<div class="panel-heading panel-title">
 				<fmt:message key="label.video.list" />
-				<img src="${ctxPath}/images/indicator.gif"	style="display:none" id="referencesArea_Busy" />
+				<i class="fa fa-refresh fa-spin fa-fw" style="display:none" id="referencesArea_Busy"></i>
 			</div>
 
 		<table class="table table-condensed" id="videoTable">
