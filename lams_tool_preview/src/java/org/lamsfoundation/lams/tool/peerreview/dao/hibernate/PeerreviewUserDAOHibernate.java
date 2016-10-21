@@ -310,7 +310,7 @@ public class PeerreviewUserDAOHibernate extends LAMSBaseDAO implements Peerrevie
 
 	queryText.append(notebookEntryStrings[1]);
 
-    	buildNameSearch(searchString, queryText, true);
+    	buildNameSearch(searchString, queryText, false);
 
 	// Now specify the sort based on the switch statement above.
 	queryText.append(sortingOrder);

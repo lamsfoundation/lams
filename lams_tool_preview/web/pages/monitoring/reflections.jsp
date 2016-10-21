@@ -7,12 +7,13 @@
 
 <lams:html>
 <lams:head>
-	<title><fmt:message key="label.learning.title" />
+	<title><fmt:message key="label.monitoring.heading" />
 	</title>
 	<%@ include file="/common/header.jsp"%>
 	
 	<link type="text/css" href="${lams}css/jquery-ui-smoothness-theme.css" rel="stylesheet">
 	<link type="text/css" href="${lams}css/jquery.jqGrid.css" rel="stylesheet" />
+	<link rel="stylesheet" href="<html:rewrite page='/includes/css/learning.css'/>">
 	
 	<script type="text/javascript" src="${lams}includes/javascript/jquery.jqGrid.locale-en.js"></script>
 	<script type="text/javascript" src="${lams}includes/javascript/jquery.jqGrid.js"></script>
@@ -39,8 +40,8 @@
 				],
 			   	colModel:[
 			   		{name:'itemId', index:'itemId', width:0, hidden: true},
-			   		{name:'itemDescription', index:'itemDescription', width:100},
-			   		{name:'notebook', index:'notebook', width:200}
+			   		{name:'itemDescription', index:'itemDescription', width:100, searchoptions: { clearSearch: false }},
+			   		{name:'notebook', index:'notebook', width:200, search:false}
 			   	],
 			   	rowNum:10,
 			   	rowList:[10,20,30,40,50,100],
@@ -51,7 +52,10 @@
 				},
 			   	// caption: "${groupSummary.sessionName}" use Bootstrap panels as the title bar
 				subGrid: false
-			}).jqGrid('navGrid','#pager${toolSessionId}',{add:false,del:false,edit:false,search:false});
+			}).jqGrid('filterToolbar', { 
+				searchOnEnter: false
+			})
+			.navGrid('#pager${toolSessionId}',{add:false,del:false,edit:false,search:false});
         
 		
         //jqgrid autowidth (http://stackoverflow.com/a/1610197)

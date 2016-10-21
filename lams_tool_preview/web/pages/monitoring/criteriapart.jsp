@@ -28,12 +28,11 @@
 			   	colNames:[
 						'itemId',
 						'<fmt:message key="label.user.name" />',
-						'${heading}'
-				],
+						'${heading}'				],
 			   	colModel:[
 			   		{name:'itemId', index:'itemId', width:0, hidden: true},
-			   		{name:'itemDescription', index:'itemDescription', width:260},
-			   		{name:'rating', index:'rating', width:160, align:"center"}
+			   		{name:'itemDescription', index:'itemDescription', width:200, searchoptions: { clearSearch: false }},
+			   		{name:'rating', index:'rating', width:100, align:"center", search:false}
 			   	],
 			   	rowNum:10,
 			   	rowList:[10,20,30,40,50,100],
@@ -90,9 +89,11 @@
 					    }
 					})
 				}
-			}).jqGrid('navGrid','#pager${toolSessionId}',{add:false,del:false,edit:false,search:false});
+			}).jqGrid('filterToolbar', { 
+				searchOnEnter: false
+			})
+			.navGrid('#pager${toolSessionId}',{add:false,del:false,edit:false,search:false});
         
-		
         //jqgrid autowidth (http://stackoverflow.com/a/1610197)
         $(window).bind('resize', function() {
             resizeJqgrid(jQuery(".ui-jqgrid-btable:visible"));
@@ -113,8 +114,12 @@
         setTimeout(function(){ window.dispatchEvent(new Event('resize')); }, 300);
         
 	});
-
+	
 </script>
+
+<!--For send results feature-->
+<i class="fa fa-spinner" style="display:none" id="messageArea2_Busy"></i>
+<div class="voffset5" id="messageArea2"></div>
 
 <p>
 	<c:choose>

@@ -241,12 +241,6 @@ public class PeerreviewServiceImpl
     }
 
     @Override
-    public List<PeerreviewUser> getUsersForTablesorter(final Long toolSessionId, final Long excludeUserId, int page,
-	    int size, int sorting) {
-	return peerreviewUserDao.getUsersForTablesorter(toolSessionId, excludeUserId, page, size, sorting);
-    }
-
-    @Override
     public int getCountUsersBySession(final Long toolSessionId, final Long excludeUserId) {
 	return peerreviewUserDao.getCountUsersBySession(toolSessionId, excludeUserId);
     }
@@ -342,14 +336,14 @@ public class PeerreviewServiceImpl
 
     @Override
     public StyledCriteriaRatingDTO getUsersRatingsCommentsByCriteriaIdDTO(Long toolContentId, Long toolSessionId, RatingCriteria criteria, 
-	    Long currentUserId, boolean skipRatings, int sorting, boolean getAllUsers, boolean getByUser) {
+	    Long currentUserId, boolean skipRatings, int sorting,  String searchString, boolean getAllUsers, boolean getByUser) {
 	
 	if ( skipRatings ) {
 	    return ratingService.convertToStyledDTO(criteria, currentUserId, getAllUsers, null);
 	}
 	
 	List<Object[]> rawData = peerreviewUserDao.getRatingsComments(toolContentId, toolSessionId, criteria, 
-		currentUserId, null, null, sorting, getByUser, ratingService);
+		currentUserId, null, null, sorting, searchString, getByUser, ratingService);
 
 	for ( Object[] raw : rawData ) {
 	    int len = raw.length;
@@ -363,10 +357,10 @@ public class PeerreviewServiceImpl
 
     @Override
     public JSONArray getUsersRatingsCommentsByCriteriaIdJSON(Long toolContentId, Long toolSessionId, RatingCriteria criteria, Long currentUserId, 
-	    Integer page, Integer size, int sorting, boolean getAllUsers, boolean getByUser, boolean needRatesPerUser) throws JSONException {
+	    Integer page, Integer size, int sorting, String searchString, boolean getAllUsers, boolean getByUser, boolean needRatesPerUser) throws JSONException {
 
 	List<Object[]> rawData = peerreviewUserDao.getRatingsComments(toolContentId, toolSessionId, criteria, 
-		currentUserId, page, size, sorting, getByUser, ratingService);
+		currentUserId, page, size, sorting, searchString, getByUser, ratingService);
 	
 	for ( Object[] raw : rawData ) {
 	    int len = raw.length;
@@ -397,10 +391,10 @@ public class PeerreviewServiceImpl
     
     @Override
     public List<Object[]> getCommentsCounts(Long toolContentId, Long toolSessionId, RatingCriteria criteria,
-	    Integer page, Integer size, int sorting) {
+	    Integer page, Integer size, int sorting, String searchString) {
 	
 	List<Object[]> rawData = peerreviewUserDao.getCommentsCounts(toolContentId, toolSessionId, criteria, 
-		page, size, sorting);
+		page, size, sorting, searchString);
 	
 	// raw data: user_id, comment_count, first_name, last_name 
 	for ( Object[] raw : rawData ) {
@@ -426,9 +420,9 @@ public class PeerreviewServiceImpl
 	return peerreviewDao.getStatistics(toolContentId);
     }
     
-    public List<Object[]> getUserNotebookEntriesForTablesorter(Long toolSessionId, int page, int size, int sorting) {
+    public List<Object[]> getUserNotebookEntriesForTablesorter(Long toolSessionId, int page, int size, int sorting, String searchString) {
 	List<Object[]> rawData = peerreviewUserDao.getUserNotebookEntriesForTablesorter(toolSessionId, 
-		page, size, sorting, coreNotebookService);
+		page, size, sorting, searchString, coreNotebookService);
 	
 	for ( Object[] raw : rawData ) {
 	    StringBuilder description = new StringBuilder((String)raw[1] ).append(" ").append((String)raw[2]);	    

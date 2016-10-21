@@ -7,7 +7,7 @@
 
 <lams:html>
 <lams:head>
-	<title><fmt:message key="label.learning.title" />
+	<title><fmt:message key="label.monitoring.heading" />
 	</title>
 	<%@ include file="/common/header.jsp"%>
 
