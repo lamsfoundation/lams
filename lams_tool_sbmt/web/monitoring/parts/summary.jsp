@@ -159,7 +159,7 @@
 	</c:if>
 	
 	<!--For release marks feature-->
-	<img src="${tool}/images/indicator.gif" style="display:none" id="messageArea_Busy" />
+	<i class="fa fa-refresh fa-spin fa-fw" style="display:none" id="messageArea_Busy"></i>
 	<div id="messageArea"></div>
 
 </div>
