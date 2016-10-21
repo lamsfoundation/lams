@@ -12,6 +12,10 @@
 	margin-top: 30%;
 }
 
+dd {
+	margin-bottom: 10px;
+}
+
 #content {
 	width: 100%;
 	padding: 0;
@@ -27,6 +31,11 @@
 	margin-bottom: 0;
 	padding-bottom: 0;
 }
+
+#content .navbar-collapse {
+	padding-left: 0;
+}
+
 
 .errorMessage {
 	font-weight: bold;

@@ -100,8 +100,8 @@ function initTabs(){
  */
 function initLessonTab(){
 	// sets presence availability
-	$('#presenceAvailableField').change(function(){
-		var checked = $(this).is(':checked');
+	$('#presenceButton').click(function(){
+		var checked = $(this).toggleClass('btn-success').hasClass('btn-success');
 		$.ajax({
 			dataType : 'xml',
 			url : LAMS_URL + 'monitoring/monitoring.do',
@@ -115,15 +115,10 @@ function initLessonTab(){
 				updatePresenceAvailableCount();
 				
 				if (checked) {
-					$('#imAvailableField').attr('disabled', null);
-					$('#imDiv').css('display','inline');
+					$('#imButton').show();
 					alert(LABELS.LESSON_PRESENCE_ENABLE_ALERT);
 				} else {
-					$('#imAvailableField').attr({
-						'checked'  : null,
-						'disabled' : 'disabled'
-					}).change();
-					$('#imDiv').css('display','none');
+					$('#imButton').removeClass('btn-success').hide();
 					alert(LABELS.LESSON_PRESENCE_DISABLE_ALERT);
 				}
 			}
@@ -131,8 +126,8 @@ function initLessonTab(){
 	});
 	
 	// sets instant messaging availability
-	$('#imAvailableField').change(function(){
-		var checked = $(this).is(':checked');
+	$('#imButton').click(function(){
+		var checked = $(this).toggleClass('btn-success').hasClass('btn-success');
 		$.ajax({
 			dataType : 'xml',
 			url : LAMS_URL + 'monitoring/monitoring.do',
@@ -144,14 +139,10 @@ function initLessonTab(){
 			},
 			success : function() {
 				if (checked) {
-					$('#openImButton').css('display', 'inline');
-					$('#imButton').attr('class','btn btn-xs btn-success voffset10');
-					$('#imDiv').css('display','inline');
+					$('#openImButton').show();
 					alert(LABELS.LESSON_IM_ENABLE_ALERT);
 				} else {
-					$('#openImButton').css('display', 'none');
-					$('#imButton').attr('class','btn btn-xs btn-default voffset10');
-					$('#imDiv').css('display','none');
+					$('#openImButton').hide();
 					alert(LABELS.LESSON_IM_DISABLE_ALERT);
 				}
 			}
@@ -499,10 +490,8 @@ function closeEmailDialog(){
 
 
 function updatePresenceAvailableCount(){
-	var checked = $('#presenceAvailableField').is(':checked'),
-		counter = $('#presenceAvailableCount');
-		presenceButton = $('#presenceButton');
-		presenceCounter = $('#presenceCounter');
+	var checked = $('#presenceButton').hasClass('btn-success'),
+		counter = $('#presenceCounter');
 	if (checked) {
 		$.ajax({
 			dataType : 'text',
@@ -513,17 +502,10 @@ function updatePresenceAvailableCount(){
 				'lessonID'      : lessonId
 			},
 			success : function(result) {
-				$('span', counter).text(result);
-				presenceCounter.text(result);
-				presenceButton.attr('class', 'btn btn-xs btn-success');
-				presenceCounter.show();
-				counter.show();
+				counter.text(result).show();
 			}
 		});
-
 	} else {
-		presenceCounter.hide();
-		presenceButton.attr('class', 'btn btn-xs btn-default');
 		counter.hide();
 	}
 }
