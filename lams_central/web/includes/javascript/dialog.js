@@ -123,7 +123,7 @@ function showDialog(id, initParams, extraButtons, recreate) {
 			// center the dialog
 			internalDialog.position({
 				'my' : 'top',
-				'at' : 'center top+20px',
+				'at' : 'center top',
 				'of' : window
 			});
 			

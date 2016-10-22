@@ -161,7 +161,6 @@ function showMonitorLessonDialog(lessonID) {
 			'autoOpen' : false,
 			'height' : 600,
 			'width' : 1024,
-			'draggable' : false,
 			'title' : LABELS.MONITORING_TITLE,
 			'open' : function() {
 				// load contents after opening the dialog
@@ -201,7 +200,6 @@ function showAddLessonDialog(orgID) {
 			'orgID' : orgID
 		},
 		'modal' : true,
-		'draggable' : false,
 		'height' : 740,
 		'width' : 850,
 		'title' : LABELS.ADD_LESSON_TITLE,
@@ -530,7 +528,7 @@ function showSearchLessonDialog(orgID){
 
 function showAuthoringDialog(learningDesignID){
 	showDialog('dialogAuthoring', {
-		'height' : $(window).height() - 10,
+		'height' : $(window).height() - 40,
 		'width' : 1280,
 		'title' : 'Authoring',
 		'beforeClose' : function(){
