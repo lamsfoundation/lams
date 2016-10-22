@@ -89,7 +89,7 @@
 </script>
 
 <html:form action="/learning/replyTopicInline.do"
-		focus="message.subject" enctype="multipart/form-data" styleId="replyForm" >
+		focus="message.body__lamstextarea" enctype="multipart/form-data" styleId="replyForm" >
 		
 	<c:set var="formBean" value="<%= request.getAttribute(org.apache.struts.taglib.html.Constants.BEAN_KEY) %>" />
 	<c:set var="sessionMapID" value="${formBean.sessionMapID}"/>
