@@ -1,8 +1,16 @@
 ﻿// ********** MAIN FUNCTIONS **********
-var tree;
-var lastSelectedUsers = {};
-var sortOrderAscending = {};
-var submitInProgress = false;
+var tree,
+	lastSelectedUsers = {},
+	sortOrderAscending = {},
+	submitInProgress = false;
+
+
+/**
+ * For tabs changing.
+ */
+function doSelectTab(tabId) {
+	selectTab(tabId);
+}
 
 /**
  * Sets up widgets in the main tab.
@@ -189,9 +197,8 @@ function initAdvancedTab(){
 	$('#splitLearnersCountField').attr({
 		'step'        : 1,
 		'min'         : 1,
-		'max'         : users.selectedLearners ? users.selectedLearners.length : 1,
-		'stop'        : updateSplitLearnersFields
-	});
+		'max'         : users.selectedLearners ? users.selectedLearners.length : 1
+	}).change(updateSplitLearnersFields);
 	
 	$('#splitLearnersField').change(function(){
 		if ($(this).is(':checked')) {
@@ -226,13 +233,12 @@ function initAdvancedTab(){
 		var checked = !$(this).is(':checked');
 		if (!checked) {
 			$('#schedulingEnableField, #precedingLessonEnableField, ' +
-	          '#timeLimitEnableField, #timeLimitIndividualField').attr('checked', false);
-			$('#timeLimitIndividualField, #precedingLessonIdField, #schedulingDatetimeField').prop('disabled', true);
-			$('#timeLimitDaysField').spinner('disable');
+	          '#timeLimitEnableField, #timeLimitIndividualField').prop('checked', false).change();
 			$('#schedulingDatetimeField').val(null);
 		}
 		
-		$('#schedulingEnableField, #precedingLessonEnableField, #timeLimitEnableField').prop('disabled', !checked);
+		$('#schedulingEnableField, #precedingLessonEnableField, #timeLimitEnableField, #timeLimitIndividualField,' +
+		  '#precedingLessonIdField, #schedulingDatetimeField').prop('disabled', !checked);
 	});
 	
 	$('#schedulingDatetimeField').datetimepicker({
@@ -249,10 +255,11 @@ function initConditionsTab(){
 		}
 	});
 	
-	$('#timeLimitDaysField').spinner({
+	$('#timeLimitDaysField').attr({
 		'min'         : 0,
-		'max'         : 180
-	}).spinner('value', 30);
+		'max'         : 180,
+		'step'		  : 1
+	}).val(30);
 	
 	$('#timeLimitEnableField').change(function(){
 		if ($(this).is(':checked')) {
@@ -278,7 +285,7 @@ function addLesson(){
 	var ldNode = tree.getHighlightedNode();
 	if (!ldNode || !ldNode.data.learningDesignId) {
 		$('#ldNotChosenError').show();
-		$('#tabs').tabs('option', 'selected', 0);
+		doSelectTab(1);
 		return;
 	}
 	$('#ldIdField').val(ldNode.data.learningDesignId);
@@ -287,13 +294,13 @@ function addLesson(){
 		var nameValidator = /^[^<>^*@%$]*$/igm;	
 		if (!nameValidator.test(lessonName)) {
 			$('#lessonNameInput').addClass('errorField');
-			$('#tabs').tabs('option', 'selected', 0);
+			doSelectTab(1);
 			alert(LABEL_NAME_INVALID_CHARACTERS);
 			return;
 		}
 	} else {
 		$('#lessonNameInput').addClass('errorField');
-		$('#tabs').tabs('option', 'selected', 0);
+		doSelectTab(1);
 		return;
 	}
 	$('#lessonNameField').val(lessonName);
@@ -304,7 +311,7 @@ function addLesson(){
 		$('<div />').addClass('errorMessage')
 		            .text(LABEL_MISSING_LEARNERS)
 		            .appendTo('#selected-learners');
-		$('#tabs').tabs('option', 'selected', 1);
+		doSelectTab(2);
 		return;
 	}
 	$('#learnersField').val(learners);
@@ -314,15 +321,15 @@ function addLesson(){
 		$('<div />').addClass('errorMessage')
 		            .text(LABEL_MISSING_MONITORS)
 		            .appendTo('#selected-monitors');
-		$('#tabs').tabs('option', 'selected', 1);
+		doSelectTab(2);
 		return;
 	}
 	$('#monitorsField').val(monitors);
 	
 	if ($('#splitLearnersField').is(':checked')) {
-		var maxLearnerCount = $('#selected-learners div.draggableUser').length;
-		var learnerCount = $('#splitLearnersCountField').val();
-		var instances = Math.ceil(maxLearnerCount/learnerCount);
+		var maxLearnerCount = $('#selected-learners div.draggableUser').length,
+			learnerCount = $('#splitLearnersCountField').val(),
+			instances = Math.ceil(maxLearnerCount/learnerCount);
 		$('#splitNumberLessonsField').val(instances);
 	}
 	
@@ -531,10 +538,9 @@ function transferUsers(toContainerId) {
 function updateSplitLearnersFields(){
 	if ($('#splitLearnersField').is(':checked')) {
 		// put users into groups
-		var maxLearnerCount = $('#selected-learners div.draggableUser').length;
-		var learnerCount = $('#splitLearnersCountField').val();
-		alert($('#splitLearnersCountField').val());
-		var instances = Math.ceil(maxLearnerCount/learnerCount);
+		var maxLearnerCount = $('#selected-learners div.draggableUser').length,
+			learnerCount = $('#splitLearnersCountField').val(),
+			instances = Math.ceil(maxLearnerCount/learnerCount);
 		learnerCount = Math.ceil(maxLearnerCount/instances);
 		var description = SPLIT_LEARNERS_DESCRIPTION.replace('[0]', instances).replace('[1]', learnerCount);
 		$('#splitLearnersDescription').html(description);
