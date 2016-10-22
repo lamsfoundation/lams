@@ -16,6 +16,7 @@
 	<script type="text/javascript" src="${lams}includes/javascript/common.js"></script>
 	<script type="text/javascript" src="${lams}includes/javascript/jquery.js"></script>
 	<script type="text/javascript" src="${lams}includes/javascript/bootstrap.min.js"></script>
+	<script type="text/javascript" src="${lams}includes/javascript/readmore.min.js"></script>	
 	<script type="text/javascript">
 		function updateMark(detailId,reportId,sessionId,userId){
 			location.href="<lams:WebAppURL/>mark.do?method=newMark&updateMode=listMark&userID="+userId+"&toolSessionID="+sessionId+"&detailID="+detailId+"&reportID="+reportId;
@@ -48,19 +49,14 @@
 <c:set var="title"><fmt:message key="label.monitoring.heading.marking" /></c:set>
 <lams:Page title="${title}" type="monitor">
 
-	<table class="table table-condensed">
 		<c:forEach var="fileInfo" items="${report}" varStatus="status">
 			<%@include file="fileinfo.jsp"%>
+			<hr width="100%">
 		</c:forEach>
 	
-		<tr>
-			<td colspan="3">
-				<html:link href="javascript:window.close();" property="submit" styleClass="btn btn-default">
-					<fmt:message key="label.monitoring.done.button" />
-				</html:link>
-			</td>
-		</tr>
-	</table>
+		<html:link href="javascript:window.close();" property="submit" styleClass="btn btn-primary pull-right">
+			<fmt:message key="label.monitoring.done.button" />
+		</html:link>
 	
 	<div id="footer"></div>
 	
