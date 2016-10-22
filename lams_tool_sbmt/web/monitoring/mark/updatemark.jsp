@@ -33,7 +33,7 @@
 <c:set var="title"><fmt:message key="label.monitoring.updateMarks.button" /></c:set>
 <lams:Page title="${title}" type="monitor">
 
-	<table class="table table-condensed">
+
 		<c:forEach var="fileInfo" items="${report}" varStatus="status">
 			<html:form action="/mark.do" method="post" styleId="updateMarkForm" enctype="multipart/form-data">
 			
@@ -49,104 +49,92 @@
 				<%@include file="fileinfo.jsp"%>
 				
 				<logic:messagesPresent>
-					<tr>
-						<td colspan="3">
 							<%@include file="/common/messages.jsp"%>
-						</td>
-					</tr>
 				</logic:messagesPresent>
-				
-				<tr>
-					<td>
-						<fmt:message key="label.learner.marks" />
-					</td>
-					<td colspan="2">
+			
+			<dl class="dl-horizontal">		
+				<dt>
+						<fmt:message key="label.learner.marks" />:
+				</dt>
+				<dd>
 						<html:text property="marks" />
-					</td>
-				</tr>
+				</dd>
 				
+				</dl>
+				<br/>
+				<dl class="dl-horizontal">
+				<dt>
+						<fmt:message key="label.monitor.mark.updoad" />:
+				</dt>
 				<c:choose>
 					<c:when test="${empty fileInfo.markFileUUID}">
-						<tr>
-							<td>
-								<fmt:message key="label.monitor.mark.updoad" />
-							</td>
-							<td colspan="2">
+						<dd>
 								<html:file property="markFile" />
-							</td>
-						</tr>
+						</dd>
 					</c:when>
 					<c:otherwise>
-						<tr>
-							<td rowspan="2">
-								<fmt:message key="label.monitor.mark.updoad" />
-							</td>
-							<td>
+						<dd>
 								<c:out value='${fileInfo.markFileName}' escapeXml='true'/>
-							</td>
-							<td>
+
+								<div id="actionButtons" class="pull-right">						
 								<c:set var="viewMarkFileURL">
 									<html:rewrite page="/download/?uuid=${fileInfo.markFileUUID}&versionID=${fileInfo.markFileVersionID}&preferDownload=false" />
 								</c:set>
-								<html:link href="javascript:launchInstructionsPopup('${viewMarkFileURL}')" styleClass="btn btn-default">
-									<fmt:message key="label.view" />
+								<html:link href="javascript:launchInstructionsPopup('${viewMarkFileURL}')" styleClass="btn btn-xs btn-default">
+									<i class="fa fa-eye" title="<fmt:message key="label.view" />"></i>
 								</html:link>
 								
 								<c:set var="downloadMarkFileURL">
 									<html:rewrite page="/download/?uuid=${fileInfo.markFileUUID}&versionID=${fileInfo.markFileVersionID}&preferDownload=true" />
 								</c:set>
-								<html:link href="${downloadMarkFileURL}" styleClass="btn btn-default loffset10">
-									<fmt:message key="label.download" />
+								<html:link href="${downloadMarkFileURL}" styleClass="btn btn-xs btn-default loffset10">
+									<i class="fa fa-download" title="<fmt:message key="label.download" />"></i>
 								</html:link>
 								
-								<html:link href="javascript:removeMarkFile()" styleClass="btn btn-default loffset10">
-									<fmt:message key="label.monitoring.file.delete" />
+								<html:link href="javascript:removeMarkFile()" styleClass="btn btn-xs btn-danger loffset10">
+									<i class="fa fa-trash" title="<fmt:message key="label.monitoring.file.delete" />"></i>
 								</html:link>
-							</td>
-						</tr>
-						<tr>
-							<td>
-								<fmt:message key="label.monitor.mark.replaceFile" />:
-							</td>
-							<td>
-								<html:file property="markFile" />
-							</td>
-						</tr>
+								</div>
+								
+								<div class="offset2">
+									<small>
+									<fmt:message key="label.monitor.mark.replaceFile" />:
+									<html:file property="markFile" />
+									</small>
+								</div>
+						</dd>		
 					</c:otherwise>
 				</c:choose>
 				
-				<tr>
-					<td colspan="3">
-						<fmt:message key="label.learner.comments" />
-						<lams:CKEditor id="comments"
-							value="${fileInfo.comments}"
-							toolbarSet="DefaultMonitor"></lams:CKEditor>
-					</td>
-				</tr>
-				<tr>
-					<td colspan="3">
-						<br />
-						<c:if test="${updateMode == 'listMark'}">
-							<c:set var="cancelUrl">
-								<c:url value="/monitoring.do"/>?method=listMark&userID=${fileInfo.owner.userID}&toolSessionID=${toolSessionID}
-							</c:set>
-						</c:if>
-						<c:if test="${updateMode == 'listAllMarks'}">
-							<c:set var="cancelUrl">
-								<c:url value="/monitoring.do"/>?method=listAllMarks&toolSessionID=${toolSessionID}
-							</c:set>
-						</c:if>
-						<html:link href="${cancelUrl}" styleClass="btn btn-default">
-							<fmt:message key="label.cancel" />
-						</html:link>
-						<html:link href="javascript:document.getElementById('updateMarkForm').submit()" styleClass="btn btn-default loffset10">
-							<fmt:message key="label.monitoring.saveMarks.button" />
-						</html:link>
-					</td>
-				</tr>
+				<div id="commentsWrapper" class="voffset10">		
+					<fmt:message key="label.learner.comments" />
+					<lams:CKEditor id="comments"
+						value="${fileInfo.comments}"
+						toolbarSet="DefaultMonitor"></lams:CKEditor>
+				</div>
+
+				<hr width="100%" />
+				<div id="buttons" class="pull-right">	
+					<c:if test="${updateMode == 'listMark'}">
+						<c:set var="cancelUrl">
+							<c:url value="/monitoring.do"/>?method=listMark&userID=${fileInfo.owner.userID}&toolSessionID=${toolSessionID}
+						</c:set>
+					</c:if>
+					<c:if test="${updateMode == 'listAllMarks'}">
+						<c:set var="cancelUrl">
+							<c:url value="/monitoring.do"/>?method=listAllMarks&toolSessionID=${toolSessionID}
+						</c:set>
+					</c:if>
+					<html:link href="${cancelUrl}" styleClass="btn btn-default">
+						<fmt:message key="label.cancel" />
+					</html:link>
+					<html:link href="javascript:document.getElementById('updateMarkForm').submit()" styleClass="btn  btn-primary loffset10">
+						<fmt:message key="label.monitoring.saveMarks.button" />
+					</html:link>
+				</div>
 			</html:form>
 		</c:forEach>
-	</table>
+
 
 <div id="footer"></div>
 </lams:Page>
