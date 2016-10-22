@@ -169,30 +169,27 @@
 						</td>
 					</tr>
 				</c:if>
-					
-					<tr style="margin-bottom: 5px; border-bottom: 5px solid #ddd">
-						<!--Sixth row displaying the marked file-->
+				<!--Sixth row displaying the marked file-->
+				<c:if  test="${not empty file.markFileUUID}">	
+					<tr>
 						<td><fmt:message key="label.monitor.mark.markedFile" /></td>
-						<c:choose>
-							<c:when test="${empty file.markFileUUID}">
-								<td colspan="2">
-									<fmt:message key="label.learner.notAvailable" />
-								</td>
-							</c:when>
-							<c:otherwise>
-								<td>
-									<c:out value="${file.markFileName}" />
-								</td>
-								<td>
-									<c:set var="markFileDownloadURL">
-										<c:url value="/download?uuid=${file.markFileUUID}&versionID=${file.markFileVersionID}&preferDownload=true" />
-									</c:set>
-									<a href="${markFileDownloadURL}" title="<fmt:message key='label.download' />" class="btn btn-default pull-right">
-										<i class="fa fa-download"></i>
-									</a>
-								</td>
-							</c:otherwise>
-						</c:choose>
+						<td>
+							<c:out value="${file.markFileName}" />
+						</td>
+						<td>
+							<c:set var="markFileDownloadURL">
+								<c:url value="/download?uuid=${file.markFileUUID}&versionID=${file.markFileVersionID}&preferDownload=true" />
+							</c:set>
+							<a href="${markFileDownloadURL}" title="<fmt:message key='label.download' />" class="btn btn-default pull-right">
+								<i class="fa fa-download"></i>
+							</a>
+						</td>
+					</tr>
+				</c:if>	
+					<tr style="margin-bottom: 5px; border-bottom: 5px solid #ddd">
+						<td></td>
+						<td></td>
+						<td></td>
 					</tr>
 				</c:forEach>
 			</table>
@@ -200,7 +197,7 @@
 			</c:otherwise>
 		</c:choose>
 
-
+		<hr width="100%"/>
 		<!-- Form -->
 
 		<c:if test="${sessionMap.mode != 'teacher'}">
