@@ -129,16 +129,16 @@
 								</c:set>
 								</td>
 								<td>
-									<html:link href="${downloadURL}" styleClass="btn btn-default">
-										<fmt:message key="label.download" />
-									</html:link>
+									<a href="${downloadURL}" title="<fmt:message key="label.download" />" class="btn btn-default pull-right">
+										<i class="fa fa-download" ></i>
+									</a>
 								</td>
 							</c:if>
 						</td>
 					</tr>
 					<tr>
 						<!--Second Row displaying the description of the File -->
-						<td><fmt:message key="label.learner.fileDescription" /></td>
+						<td style="vertical-align:top"><fmt:message key="label.learner.fileDescription" /></td>
 						<td colspan="2"><lams:out value="${file.fileDescription}" escapeHtml="true" /></td>
 					</tr>
 
@@ -150,35 +150,26 @@
 						</td>
 					</tr>
 
+				<!--Fourth row displaying the comments -->
+				<c:if test="${not empty file.comments}">
 					<tr>
-						<!--Fourth row displaying the comments -->
-						<td><fmt:message key="label.learner.comments" /></td>
+						<td style="vertical-align:top"><fmt:message key="label.learner.comments" /></td>
 						<td colspan="2">
-							<c:choose>
-								<c:when test="${empty file.comments}">
-									<fmt:message key="label.learner.notAvailable" />
-								</c:when>
-								<c:otherwise>
-									<c:out value="${file.comments}" escapeXml="false" />
-								</c:otherwise>
-							</c:choose>
+							<c:out value="${file.comments}" escapeXml="false" />
 						</td>
 					</tr>
+				</c:if>
 
+				<!--Fifth row displaying the marks-->
+				<c:if test="${not empty file.marks}">
 					<tr>
-						<!--Fifth row displaying the marks-->
 						<td><fmt:message key="label.learner.marks" /></td>
 						<td>
-							<c:choose>
-								<c:when test="${empty file.marks}">
-									<fmt:message key="label.learner.notAvailable" />
-								</c:when>
-								<c:otherwise>
-									<c:out value="${file.marks}" escapeXml="true" />
-								</c:otherwise>
-							</c:choose>
+							<c:out value="${file.marks}" escapeXml="true" />
 						</td>
 					</tr>
+				</c:if>
+					
 					<tr style="margin-bottom: 5px; border-bottom: 5px solid #ddd">
 						<!--Sixth row displaying the marked file-->
 						<td><fmt:message key="label.monitor.mark.markedFile" /></td>
@@ -196,9 +187,9 @@
 									<c:set var="markFileDownloadURL">
 										<c:url value="/download?uuid=${file.markFileUUID}&versionID=${file.markFileVersionID}&preferDownload=true" />
 									</c:set>
-									<html:link href="${markFileDownloadURL}" styleClass="btn btn-default">
-										<fmt:message key="label.download" />
-									</html:link>
+									<a href="${markFileDownloadURL}" title="<fmt:message key='label.download' />" class="btn btn-default pull-right">
+										<i class="fa fa-download"></i>
+									</a>
 								</td>
 							</c:otherwise>
 						</c:choose>
@@ -249,8 +240,7 @@
 							<div class="form-group">
 								<button type="submit" <c:if test="${sessionMap.finishLock || sessionMap.arriveLimit}">disabled="disabled"</c:if>
 									class="btn btn-sm btn-default btn-primary">
-									<fmt:message key="label.learner.upload" />
-									&nbsp;<i class="fa fa-xs fa-upload"></i>
+									<i class="fa fa-xs fa-upload"></i> <fmt:message key="label.learner.upload" />
 								</button>
 							</div>
 						</div>
