@@ -177,7 +177,7 @@ GeneralInitLib = {
 				// make some adjustments to layout
 				var toolName = $('div', this);
 				if (toolName.text().length > 12){
-					toolName.css('padding-top', '8px');
+					toolName.css('padding-top', '5px');
 				}
 			}
 		});
