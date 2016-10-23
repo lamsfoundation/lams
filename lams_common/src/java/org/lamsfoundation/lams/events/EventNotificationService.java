@@ -440,7 +440,7 @@ public class EventNotificationService implements IEventNotificationService {
 	Event event = subscription.getEvent();
 	String subjectToSend = subject == null ? event.getSubject() : subject;
 	String messageToSend = message == null ? event.getMessage() : message;
-	notifyUser(subscription, subject, message, event.isHtmlFormat());
+	notifyUser(subscription, subjectToSend, messageToSend, event.isHtmlFormat());
 	if (subscription.getDeliveryMethod().lastOperationFailed(subscription)) {
 	    Event eventFailCopy = (Event) event.clone();
 	    eventFailCopy.setFailTime(new Date());
