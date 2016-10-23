@@ -570,11 +570,11 @@ function closeAddSingleActivityLessonDialog(action) {
 			dataType : 'text',
 			data : {
 				'method' : 'createSingleActivityLesson',
-				'organisationID'  : dialog.dialog('option', 'orgID'),
-				'toolID' : dialog.dialog('option', 'toolID'),
-				'toolContentID' : dialog.dialog('option', 'toolContentID'),
-				'contentFolderID' : dialog.dialog('option', 'contentFolderID'),
-				'learningLibraryID' : dialog.dialog('option', 'learningLibraryID')
+				'organisationID'  : dialog.data('orgID'),
+				'toolID' : dialog.data('toolID'),
+				'toolContentID' : dialog.data('toolContentID'),
+				'contentFolderID' : dialog.data('contentFolderID'),
+				'learningLibraryID' : dialog.data('learningLibraryID')
 			},
 			// create LD SVG
 			success : function(learningDesignID) {
