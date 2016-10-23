@@ -9,11 +9,12 @@
 <lams:head>
 	<title><fmt:message key="authoring.fla.page.title" /></title>
 	
-	<link rel="stylesheet" href="<lams:LAMSURL/>css/jquery-ui-redmond-theme.css" type="text/css" media="screen">
 	<link rel="stylesheet" href="<lams:LAMSURL/>css/yui/treeview.css" type="text/css" media="screen" />
 	<link rel="stylesheet" href="<lams:LAMSURL/>css/yui/folders.css" type="text/css" media="screen" />
-	<link rel="stylesheet" href="<lams:LAMSURL/>css/authoring.css" type="text/css" media="screen">
-
+	<link rel="stylesheet" href="<lams:LAMSURL/>css/defaultHTML_learner.css" type="text/css">
+	<link rel="stylesheet" href="<lams:LAMSURL/>css/jquery-ui-bootstrap-theme.css" type="text/css" media="screen" />
+	<link rel="stylesheet" href="<lams:LAMSURL/>css/authoring.css" type="text/css" media="screen" />
+	
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery.js"></script>
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery-ui.js"></script>
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery.dialogextend.js"></script>
@@ -22,12 +23,14 @@
 	<!-- Fix for iPad
 		<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery.ui.touch-punch.js"></script>
 	-->
-	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/dialog.js"></script>	
+
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/yui/yahoo-dom-event.js" ></script>
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/yui/animation-min.js"></script>
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/yui/json-min.js" ></script> 
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/yui/treeview-min.js" ></script>
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/snap.svg.js"></script>
+	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/bootstrap.min.js"></script>
+	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/dialog.js"></script>	
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/authoring/authoringGeneral.js"></script>
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/authoring/authoringActivity.js"></script>
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/authoring/authoringDecoration.js"></script>
@@ -295,104 +298,113 @@
 		<img src="<lams:LAMSURL/>images/ajax-loader-big.gif" />
 	</div>
 	
-	<div id="toolbar" class="ui-corner-all">
-		<div id="newButton" class="ui-button" onClick="javascript:GeneralLib.newLearningDesign(false)">
-			<fmt:message key="authoring.fla.page.menu.new" />
+	<div id="toolbar" class="btn-group" role="toolbar">
+	
+		<button id="newButton" class="btn btn-default" onClick="javascript:GeneralLib.newLearningDesign(false)">
+			<i class="fa fa-plus"></i> 
+			<span><fmt:message key="authoring.fla.page.menu.new" /></span>
+		</button>
+		
+		<div class="btn-group" role="group">
+		  <button id="openDropButton" class="btn btn-default dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+		  	<i class="fa fa-folder-open-o"></i> 
+		    <span><fmt:message key="authoring.fla.page.menu.open" /></span>
+		    <span class="caret"></span>
+		  </button>
+		  <ul class="dropdown-menu" aria-labelledby="openDropButton">
+			<li id="openButton" onClick="javascript:MenuLib.openLearningDesign()"><a href="#"><fmt:message key="authoring.fla.page.menu.open" /></a></li>
+		    <li id="importSequenceButton" onClick="javascript:MenuLib.importLearningDesign()"><a href="#"><fmt:message key="authoring.fla.page.menu.import" /></a></li>
+		    <li id="importPartSequenceButton" onClick="javascript:MenuLib.importPartLearningDesign()"><a href="#"><fmt:message key="authoring.fla.page.menu.import.part" /></a></li>
+		  </ul>
 		</div>
-		<div>
-			<div class="split-ui-button">
-				<div id="openButton" onClick="javascript:MenuLib.openLearningDesign()">
-					<span><fmt:message key="authoring.fla.page.menu.open" /></span>
-				</div>
-				<div id="openDropButton">&nbsp;</div>
-			</div>
-			<ul>
-				<li id="importSequenceButton" onClick="javascript:MenuLib.importLearningDesign()"><fmt:message key="authoring.fla.page.menu.import" /></li>
-				<li id="importPartSequenceButton" onClick="javascript:MenuLib.importPartLearningDesign()"><fmt:message key="authoring.fla.page.menu.import.part" /></li>
-			</ul>
+		
+		<div class="btn-group" role="group">
+		  <button class="btn btn-default dropdown-toggle" type="button" id="saveDropButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+		  	<i class="fa fa-save"></i>
+		    <span><fmt:message key="authoring.fla.page.menu.save" /></span>
+		    <span class="caret"></span>
+		  </button>
+		  <ul class="dropdown-menu" aria-labelledby="saveDropButton">
+		    <li id="saveButton" onClick="javascript:MenuLib.saveLearningDesign()"><a href="#"><fmt:message key="authoring.fla.page.menu.save" /></a></li>
+		    <li id="saveAsButton" onClick="javascript:MenuLib.saveLearningDesign(true)"><a href="#"><fmt:message key="authoring.fla.page.menu.saveas" /></a></li>
+		    <li role="separator" class="divider"></li>
+		    <li class="dropdown-header"><fmt:message key="authoring.fla.page.menu.export" /></li>
+		    <li id="exportLamsButton" class="exportSequenceButton" onClick="javascript:MenuLib.exportLearningDesign(1)"><a href="#"><fmt:message key="authoring.fla.page.menu.export.lams" /></a></li>
+		    <li id="exportPngButton"  class="exportImageButton"    onClick="javascript:MenuLib.exportPNG(true)"><a href="#"><fmt:message key="authoring.fla.page.menu.export.png" /></a></li>
+		    <li id="exportSvgButton"  class="exportImageButton"    onClick="javascript:MenuLib.exportSVG(true))"><a href="#"><fmt:message key="authoring.fla.page.menu.export.svg" /></a></li>
+		  </ul>
 		</div>
-		<div>
-			<div class="split-ui-button">
-				<div id="saveButton" onClick="javascript:MenuLib.saveLearningDesign()">
-					<span><fmt:message key="authoring.fla.page.menu.save" /></span>
-				</div>
-				<div id="saveDropButton">&nbsp;</div>
-			</div>
-			<ul>
-				<li id="saveAsButton" onClick="javascript:MenuLib.saveLearningDesign(true)"><fmt:message key="authoring.fla.page.menu.saveas" /></li>
-				<li id="exportButton"><fmt:message key="authoring.fla.page.menu.export" /><span class="ui-icon ui-menu-icon ui-icon-carat-1-e"></span>
-					<ul>
-						<li id="exportLamsButton" class="exportSequenceButton"
-							title="Standard LAMS ZIP format"
-							onClick="javascript:MenuLib.exportLearningDesign(1)"><fmt:message key="authoring.fla.page.menu.export.lams" /></li>
-						<li id="exportPngButton" class="exportImageButton" onClick="javascript:MenuLib.exportPNG(true)"><fmt:message key="authoring.fla.page.menu.export.png" /></li>
-						<li id="exportSvgButton" class="exportImageButton" onClick="javascript:MenuLib.exportSVG(true)"><fmt:message key="authoring.fla.page.menu.export.svg" /></li>
-					</ul>
-				</li>
-			</ul>
+		
+		<button id="cancelLiveEditButton" class="btn btn-default" onClick="javascript:GeneralLib.cancelLiveEdit()">
+			<i class="fa fa-ban"></i> 
+			<span><fmt:message key="authoring.fla.cancel.button" /></span>
+		</button>
+		
+		<button id="copyButton" class="btn btn-default" onClick="javascript:MenuLib.copyActivity()">
+			<i class="fa fa-copy"></i> 
+			<span><fmt:message key="authoring.fla.page.menu.copy" /></span>
+		</button>
+		
+		<button id="pasteButton" class="btn btn-default" onClick="javascript:MenuLib.pasteActivity()">
+			<i class="fa fa-paste"></i> 
+			<span><fmt:message key="authoring.fla.page.menu.paste" /></span>
+		</button>
+		
+		<button id="transitionButton" class="btn btn-default" onClick="javascript:MenuLib.addTransition()">
+			<i class="fa fa-long-arrow-right"></i> 
+			<span><fmt:message key="authoring.fla.page.menu.transition" /></span>
+		</button>
+
+		<div class="btn-group" role="group">
+		  <button class="btn btn-default dropdown-toggle" type="button" id="optionalButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+		  	<i class="fa fa-check-square-o"></i>
+		    <span><fmt:message key="authoring.fla.page.menu.optional" /></span>
+		    <span class="caret"></span>
+		  </button>
+		  <ul class="dropdown-menu" aria-labelledby="optionalButton">
+		    <li id="optionalActivityButton" onClick="javascript:MenuLib.addOptionalActivity()"><a href="#"><fmt:message key="authoring.fla.page.menu.optional.activity" /></a></li>
+		    <li id="floatingActivityButton" onClick="javascript:MenuLib.addFloatingActivity()"><a href="#"><fmt:message key="authoring.fla.page.menu.optional.support" /></a></li>
+		  </ul>
 		</div>
-		<div id="cancelLiveEditButton" class="ui-button" onClick="javascript:GeneralLib.cancelLiveEdit()">
-			<fmt:message key="authoring.fla.cancel.button" />
+
+		<div class="btn-group" role="group">
+		  <button class="btn btn-default dropdown-toggle" type="button" id="flowButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+		  	<i class="fa fa-map"></i>
+		    <span><fmt:message key="authoring.fla.page.menu.flow" /></span>
+		    <span class="caret"></span>
+		  </button>
+		  <ul class="dropdown-menu" aria-labelledby="flowButton">
+		    <li id="gateButton" onClick="javascript:MenuLib.addGate()"><a href="#"><fmt:message key="authoring.fla.page.menu.flow.gate" /></a></li>
+		    <li id="branchingButton" onClick="javascript:MenuLib.addBranching()"><a href="#"><fmt:message key="authoring.fla.page.menu.flow.branch" /></a></li>
+		  </ul>
 		</div>
-		<div id="copyButton" class="ui-button" onClick="javascript:MenuLib.copyActivity()">
-			<fmt:message key="authoring.fla.page.menu.copy" />
+		
+		<button id="groupButton" class="btn btn-default" onClick="javascript:MenuLib.addGrouping()">
+			<i class="fa fa-group"></i> 
+			<span><fmt:message key="authoring.fla.page.menu.group" /></span>
+		</button>
+		
+		<div class="btn-group" role="group">
+		  <button class="btn btn-default dropdown-toggle" type="button" id="annotateButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+		  	<i class="fa fa-font"></i>
+		    <span><fmt:message key="authoring.fla.page.menu.annotate" /></span>
+		    <span class="caret"></span>
+		  </button>
+		  <ul class="dropdown-menu" aria-labelledby="annotateButton">
+		    <li id="annotateLabelButton" onClick="javascript:MenuLib.addAnnotationLabel()"><a href="#"><fmt:message key="authoring.fla.page.menu.annotate.label" /></a></li>
+		    <li id="annotateRegionButton" onClick="javascript:MenuLib.addAnnotationRegion()"><a href="#"><fmt:message key="authoring.fla.page.menu.annotate.region" /></a></li>
+		  </ul>
 		</div>
-		<div id="pasteButton" class="ui-button" onClick="javascript:MenuLib.pasteActivity()">
-			<fmt:message key="authoring.fla.page.menu.paste" />
-		</div>
-		<div id="transitionButton" class="ui-button" onClick="javascript:MenuLib.addTransition()">
-			<fmt:message key="authoring.fla.page.menu.transition" />
-		</div>
-		<div>
-			<div id="optionalButton" class="split-ui-button">
-				<div>
-					<span><fmt:message key="authoring.fla.page.menu.optional" /></span>
-				</div>
-				<div id="optionalDropButton">&nbsp;</div>
-			</div>
-			<ul>
-				<li id="optionalActivityButton" onClick="javascript:MenuLib.addOptionalActivity()"><fmt:message key="authoring.fla.page.menu.optional.activity" /></li>
-				<li id="floatingActivityButton" onClick="javascript:MenuLib.addFloatingActivity()"><fmt:message key="authoring.fla.page.menu.optional.support" /></li>
-			</ul>
-		</div>
-		<div>
-			<div id="flowButton" class="split-ui-button">
-				<div>
-					<span><fmt:message key="authoring.fla.page.menu.flow" /></span>
-				</div>
-				<div id="flowDropButton">&nbsp;</div>
-			</div>
-			<ul>
-				<li id="gateButton" onClick="javascript:MenuLib.addGate()"><fmt:message key="authoring.fla.page.menu.flow.gate" /></li>
-				<li id="branchingButton" onClick="javascript:MenuLib.addBranching()"><fmt:message key="authoring.fla.page.menu.flow.branch" /></li>
-			</ul>
-		</div>
-		<div id="groupButton" class="ui-button" onClick="javascript:MenuLib.addGrouping()">
-			<fmt:message key="authoring.fla.page.menu.group" />
-		</div>
-		<div>
-			<div id="annotateButton" class="split-ui-button">
-				<div>
-					<span><fmt:message key="authoring.fla.page.menu.annotate" /></span>
-				</div>
-				<div id="annotateDropButton">&nbsp;</div>
-			</div>
-			<ul>
-				<li id="annotateLabelButton" onClick="javascript:MenuLib.addAnnotationLabel()"><fmt:message key="authoring.fla.page.menu.annotate.label" /></li>
-				<li id="annotateRegionButton" onClick="javascript:MenuLib.addAnnotationRegion()"><fmt:message key="authoring.fla.page.menu.annotate.region" /></li>
-			</ul>
-		</div>
-		<div id="arrangeButton" class="ui-button" onClick="javascript:GeneralLib.arrangeActivities()">
-			<fmt:message key="authoring.fla.page.menu.arrange" />
-		</div>
-		<div id="previewButton" class="ui-button" onClick="javascript:MenuLib.openPreview()">
-			<fmt:message key="authoring.fla.page.menu.preview" />
-		</div>
-		<!-- 
-		<div id="zoomButton" class="ui-button" onClick="javascript:MenuLib.zoom()">
-			Zoom out
-		</div>
- 		-->
+				
+		<button id="arrangeButton" class="btn btn-default" onClick="javascript:GeneralLib.arrangeActivities()">
+			<i class="fa fa-th"></i> 
+			<span><fmt:message key="authoring.fla.page.menu.arrange" /></span>
+		</button>
+				
+		<button id="previewButton" class="btn btn-default" onClick="javascript:MenuLib.openPreview()">
+			<i class="fa fa-search-plus"></i> 
+			<span><fmt:message key="authoring.fla.page.menu.preview" /></span>
+		</button>
 	</div>
 	
 	<table id="authoringTable">
@@ -492,8 +504,17 @@
 			</tr>
 		</table>
 		<%-- This will be moved to dialog's button pane using JS --%>
-		<div id="ldStoreDialogNameContainer" class="ldStoreDialogSaveOnly">
-			<span><fmt:message key="authoring.fla.page.dialog.ld.title" /></span><input id="ldStoreDialogNameField" class="defaultFocus" type="text"/>
+
+		<hr class="separator" />
+		<div class="container-fluid">
+			<div id="ldStoreDialogNameContainer" class="ldStoreDialogSaveOnly">
+				<span><fmt:message key="authoring.fla.page.dialog.ld.title" /></span><input id="ldStoreDialogNameField" class="defaultFocus" type="text"/>
+			</div>
+			<div class="pull-left">
+				<button id="addButton" class="btn btn-primary" href="#" onClick="javascript:addLesson()"><i class="fa fa-plus"></i> 
+					<fmt:message key="button.add.now" />
+				</button>
+			</div>
 		</div>
 	</div>
 	

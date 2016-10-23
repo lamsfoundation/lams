@@ -12,15 +12,6 @@ a.ygtvspacer {
 
 
 /**** Dialog styles ****/
-.ui-dialog {
-	font-size: 12px !important;
-}
-
-/* For jQuery Dialogextend */
-.ui-dialog .ui-dialog-titlebar-buttonpane a {
-	margin-right: 3px;
-}
-
 #loadingOverlay {
 	width: 99%;
 	height: 99%;
@@ -34,8 +25,34 @@ a.ygtvspacer {
 	margin-top: 35%;
 }
 
-div.dialogContainer, .ldChoiceDependentCanvasElement, 
-.dialog-no-title .ui-dialog-titlebar {
+.dialogContainer {
+	-webkit-overflow-scrolling: touch !important;
+}
+
+.dialogContainer .modal-body {
+	height : 100%;
+	max-height: calc(100% - 60px);
+	padding: 0;
+}
+
+.dialogContainer button {
+	cursor: pointer;
+}
+
+.dialogContainer button:focus {
+	outline: none;
+}
+
+.dialogContainer button .fa {
+  font-size: 16px;
+  margin-left: 10px;
+}
+
+.dialogContainer .ui-draggable .modal-header {
+	cursor: move;
+}
+
+div.dialogContainer, .ldChoiceDependentCanvasElement {
 	display: none;
 }
 
@@ -294,45 +311,10 @@ div#exportImageDialog div#exportCanvas {
 
 div#toolbar {
 	padding: 3px;
-	width: 1035px;
-	height: 27px;
 }
 
-div#toolbar > div {
-	float: left;
-	height: 30px;
-	margin-right: 10px;
-}
-
-div#toolbar .ui-button, div#toolbar .split-ui-button {
-	height: 24px;
-	font-size: 11px;
-}
-
-div#toolbar .split-ui-button + ul, div#toolbar .split-ui-button + ul ul {
-	font-size: 11px;
-	font-weight: bold;
-	list-style: none;
-	color: #2E6E9E;
-	z-index: 1100;
-}
-
-div#toolbar .split-ui-button + ul li {
-	padding: 3px 5px;
-	cursor: pointer;
-}
-
-div#toolbar .split-ui-button + ul li:hover {
-	background-color: #dfeffc;
-}
-
-div#toolbar .split-ui-button + ul ul {
-	white-space: nowrap;
-}
-
-table#authoringTable {
-	table-layout: fixed;
-	width: 100%;
+#cancelLiveEditButton {
+	display: none;
 }
 
 #groupingButton span {
@@ -340,8 +322,10 @@ table#authoringTable {
 	padding-left: 25px;
 }
 
-#cancelLiveEditButton {
-	display: none;
+
+table#authoringTable {
+	table-layout: fixed;
+	width: 100%;
 }
 
 td#templateContainerCell {

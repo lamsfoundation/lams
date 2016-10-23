@@ -45,8 +45,6 @@
 			LABEL_NAME_INVALID_CHARACTERS = '<fmt:message key="error.lessonname.invalid.characters" />';
 				
 		$(document).ready(function(){
-			$('#tabs').tabs();
-			
 			initLessonTab();
 			initClassTab();
 			initAdvancedTab();
