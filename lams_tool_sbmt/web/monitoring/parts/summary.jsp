@@ -26,10 +26,11 @@
 	$(document).ready(function(){
 	    
 		$(".tablesorter").tablesorter({
-			theme: 'blue',
+			theme: 'bootstrap',
+			headerTemplate : '{content} {icon}',
 		    sortInitialOrder: 'desc',
             sortList: [[0]],
-            widgets: [ "resizable", "filter" ],
+            widgets: [ "uitheme", "resizable", "filter" ],
             headers: { 1: { filter: false}, 2: { filter: false }, 3: { sorter: false, filter: false} }, 
             widgetOptions: {
             	resizable: true,
@@ -43,6 +44,10 @@
 		$(".tablesorter").each(function() {
 			$(this).tablesorterPager({
 				savePages: false,
+		        container: $(this).find(".ts-pager"),
+		        output: '{startRow} to {endRow} ({totalRows})',
+		        cssPageDisplay: '.pagedisplay',
+		        cssPageSize: '.pagesize',
 				ajaxUrl : "<c:url value='/monitoring.do'/>?method=getUsers&sessionMapID=${sessionMapID}&toolContentID=${param.toolContentID}&page={page}&size={size}&{sortList:column}&{filterList:fcol}&toolSessionID=" + $(this).attr('data-session-id'),
 				ajaxProcessing: function (data, table) {
 					if (data && data.hasOwnProperty('rows')) {
@@ -87,19 +92,7 @@
 						return json;
 			            
 			    	}
-				},					
-			    container: $(this).next(".pager"),
-			    output: '{startRow} to {endRow} ({totalRows})',
-			    // css class names of pager arrows
-			    cssNext: '.tablesorter-next', // next page arrow
-				cssPrev: '.tablesorter-prev', // previous page arrow
-				cssFirst: '.tablesorter-first', // go to first page arrow
-				cssLast: '.tablesorter-last', // go to last page arrow
-				cssGoto: '.gotoPage', // select dropdown to allow choosing a page
-				cssPageDisplay: '.pagedisplay', // location of where the "output" is displayed
-				cssPageSize: '.pagesize', // page size selector - select dropdown that sets the "size" option
-				// class added to arrows when at the extremes (i.e. prev/first arrows are "disabled" when on the first page)
-				cssDisabled: 'disabled' // Note there is no period "." in front of this class name
+				}
 			})
 		});
   	})
