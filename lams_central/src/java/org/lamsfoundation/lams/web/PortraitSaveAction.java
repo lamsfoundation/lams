@@ -55,11 +55,6 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
 /**
  * @author jliew
  * @author Andrey Balan
- *
- *
- *
- *
- *
  */
 public class PortraitSaveAction extends LamsDispatchAction {
 

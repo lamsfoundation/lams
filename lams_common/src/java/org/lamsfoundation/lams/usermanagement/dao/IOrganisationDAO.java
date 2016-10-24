@@ -27,6 +27,7 @@ import java.util.List;
 
 import org.lamsfoundation.lams.dao.IBaseDAO;
 import org.lamsfoundation.lams.usermanagement.Organisation;
+import org.lamsfoundation.lams.usermanagement.dto.OrganisationDTO;
 
 /**
  * @author jliew
@@ -38,9 +39,16 @@ public interface IOrganisationDAO extends IBaseDAO {
      *
      * @param userId
      * @param isSysadmin
+     * @param page
+     * @param size
+     * @param searchString
+     *            filters results by course name. It can be null and then doesn't affect results
      * @return list of orgIds
      */
-    List<Integer> getActiveCourseIdsByUser(Integer userId, boolean isSysadmin);
+    List<OrganisationDTO> getActiveCoursesByUser(Integer userId, boolean isSysadmin, int page, int size,
+	    String searchString);
+
+    int getCountActiveCoursesByUser(Integer userId, boolean isSysadmin, String searchString);
 
     /**
      * Returns courses with specified type, state and parent course.

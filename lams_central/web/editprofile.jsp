@@ -1,20 +1,32 @@
-<%@ page contentType="text/html; charset=utf-8" language="java"%>
+<!DOCTYPE html>
 
+<%@ page contentType="text/html; charset=utf-8" language="java"%>
 <%@ taglib uri="tags-html" prefix="html"%>
 <%@ taglib uri="tags-core" prefix="c"%>
 <%@ taglib uri="tags-bean" prefix="bean"%>
 <%@ taglib uri="tags-logic" prefix="logic"%>
 <%@ taglib uri="tags-fmt" prefix="fmt"%>
 <%@ taglib uri="tags-lams" prefix="lams"%>
-<%@ page
-	import="org.lamsfoundation.lams.usermanagement.AuthenticationMethod"%>
-<%@ page import="org.lamsfoundation.lams.util.Configuration"
+<%@ page import="org.lamsfoundation.lams.usermanagement.AuthenticationMethod"
+	import="org.lamsfoundation.lams.util.Configuration"
 	import="org.lamsfoundation.lams.util.ConfigurationKeys"%>
-<link rel="stylesheet" href="css/defaultHTML_learner.css"
-	type="text/css" />
-<link rel="stylesheet" href="css/bootstrap.min.css" type="text/css" />
 
+<lams:html>
+<lams:head>
+	<link rel="stylesheet" href="css/defaultHTML_learner.css" type="text/css" />
+	
+	<script type="text/javascript" src="includes/javascript/jquery.js"></script>
+	<script type="text/javascript" src="includes/javascript/jquery-ui.js"></script>
+	<script type="text/javascript" src="includes/javascript/groupDisplay.js"></script>
+	<script type="text/javascript">
+		$(document).ready(function () {
+			//update dialog's height and title
+			updateMyProfileDialogSettings('<fmt:message key="title.profile.edit.screen" />', '100%');
+		});
+	</script>
+</lams:head>
 
+<body>
 <html:form action="/saveprofile.do" method="post">
 	<html:hidden property="userId" />
 	<html:hidden property="login" />
@@ -34,12 +46,7 @@
 		<div class="row vertical-center-row">
 			<div
 				class="col-xs-12 col-sm-8 col-sm-offset-2 col-md-6 col-md-offset-3">
-				<div class="panel panel-default">
-					<div class="panel-heading">
-						<div class="panel-title">
-							<fmt:message key="title.profile.edit.screen" />
-						</div>
-					</div>
+				<div class="panel">
 					<div class="panel-body">
 						<form class="form-horizontal">
 							<c:set var="authenticationMethodId">
@@ -412,5 +419,6 @@
 		</div>
 	</div>
 </html:form>
-
+</body>
+</lams:html>
 

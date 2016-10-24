@@ -26,7 +26,6 @@ package org.lamsfoundation.lams.usermanagement.service;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -56,10 +55,9 @@ import org.lamsfoundation.lams.usermanagement.WorkspaceFolder;
 import org.lamsfoundation.lams.usermanagement.dao.IOrganisationDAO;
 import org.lamsfoundation.lams.usermanagement.dao.IRoleDAO;
 import org.lamsfoundation.lams.usermanagement.dao.IUserOrganisationDAO;
-import org.lamsfoundation.lams.usermanagement.dto.CollapsedOrgDTO;
+import org.lamsfoundation.lams.usermanagement.dto.OrganisationDTO;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.usermanagement.dto.UserManageBean;
-import org.lamsfoundation.lams.usermanagement.util.CollapsedOrgDTOComparator;
 import org.lamsfoundation.lams.util.Configuration;
 import org.lamsfoundation.lams.util.ConfigurationKeys;
 import org.lamsfoundation.lams.util.HashUtil;
@@ -879,35 +877,14 @@ public class UserManagementService implements IUserManagementService {
     }
 
     @Override
-    public List getActiveCourseIdsByUser(Integer userId, boolean isSysadmin) {
-	List list = organisationDAO.getActiveCourseIdsByUser(userId, isSysadmin);
-	return populateCollapsedOrgDTOs(list, isSysadmin);
+    public List<OrganisationDTO> getActiveCoursesByUser(Integer userId, boolean isSysadmin, int page, int size,
+	    String searchString) {
+	return organisationDAO.getActiveCoursesByUser(userId, isSysadmin, page, size, searchString);
     }
-
-    private List populateCollapsedOrgDTOs(List list, boolean isSysadmin) {
-	ArrayList<CollapsedOrgDTO> dtoList = new ArrayList<CollapsedOrgDTO>();
-	for (Object obj : list) {
-	    // sysadmins get all orgs collapsed; saves storing boolean for every
-	    // org,
-	    // and saves loading time for the sysadmin
-	    if (isSysadmin) {
-		Organisation org = (Organisation) findById(Organisation.class, (Integer) obj);
-		dtoList.add(new CollapsedOrgDTO((Integer) obj, org.getName(), Boolean.TRUE));
-
-	    } else {
-		Object[] array = (Object[]) obj;
-		if (array.length > 1) {
-		    Organisation org = (Organisation) findById(Organisation.class, (Integer) array[0]);
-		    if (array[1] != null) {
-			dtoList.add(new CollapsedOrgDTO((Integer) array[0], org.getName(), (Boolean) array[1]));
-		    } else {
-			dtoList.add(new CollapsedOrgDTO((Integer) array[0], org.getName(), Boolean.FALSE));
-		    }
-		}
-	    }
-	}
-	Collections.sort(dtoList, new CollapsedOrgDTOComparator());
-	return dtoList;
+    
+    @Override
+    public int getCountActiveCoursesByUser(Integer userId, boolean isSysadmin, String searchString) {
+	return organisationDAO.getCountActiveCoursesByUser(userId, isSysadmin, searchString);
     }
 
     @Override

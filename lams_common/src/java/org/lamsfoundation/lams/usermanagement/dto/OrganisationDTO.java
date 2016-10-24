@@ -45,6 +45,14 @@ public class OrganisationDTO {
 
     public OrganisationDTO() {
     }
+    
+    public OrganisationDTO(Integer organisationID, String name) {
+	super();
+	this.organisationID = organisationID;
+	this.name = name;
+	this.roleNames = new Vector<String>();
+	this.nodes = new Vector<OrganisationDTO>();
+    }
 
     public OrganisationDTO(Integer organisationID, Integer parentID, String name, String description,
 	    Integer organisationTypeId) {

@@ -38,6 +38,7 @@ import org.lamsfoundation.lams.usermanagement.OrganisationType;
 import org.lamsfoundation.lams.usermanagement.Role;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.UserOrganisation;
+import org.lamsfoundation.lams.usermanagement.dto.OrganisationDTO;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.usermanagement.dto.UserManageBean;
 
@@ -367,7 +368,10 @@ public interface IUserManagementService {
      */
     int getCountUsers(String searchString);
 
-    List getActiveCourseIdsByUser(Integer userId, boolean isSysadmin);
+    List<OrganisationDTO> getActiveCoursesByUser(Integer userId, boolean isSysadmin, int page, int size,
+	    String searchString);
+
+    int getCountActiveCoursesByUser(Integer userId, boolean isSysadmin, String searchString);
 
     /**
      * Search users across login, first name, last name and email fields using the search term. Filters out disabled

@@ -44,13 +44,6 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
 
 /**
  * @author Fei Yang
- *
- *
- *
- *
- *
- *
- *
  */
 public class PasswordChangeAction extends Action {
 
@@ -150,7 +143,6 @@ public class PasswordChangeAction extends Action {
 	    return (mapping.findForward("error.system"));
 	}
 
-	request.setAttribute("tab", "password");
 	return mapping.findForward("okay");
 
     }

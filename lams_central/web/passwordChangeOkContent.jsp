@@ -1,13 +1,42 @@
-<%@ taglib uri="tags-fmt" prefix="fmt" %>
+<!DOCTYPE html>
 
-<table width="100%" height="177" border="0" cellpadding="5" cellspacing="0" bgcolor="#FFFFFF">
-	<tr> 
-		<td valign="top">
-			<p class=body><fmt:message key="msg.password.changed"/></p>
-			<p class=body>	
-				<input type="submit" class="button" value="Ok"
-					onClick="javascript:document.location='index.do?state=active&tab=profile';" />
-			</p>
-		</td>
-	</tr>
-</table>
+<%@ page contentType="text/html; charset=utf-8" language="java"%>
+<%@ taglib uri="tags-html" prefix="html"%>
+<%@ taglib uri="tags-core" prefix="c"%>
+<%@ taglib uri="tags-bean" prefix="bean"%>
+<%@ taglib uri="tags-logic" prefix="logic"%>
+<%@ taglib uri="tags-fmt" prefix="fmt"%>
+<%@ taglib uri="tags-lams" prefix="lams"%>
+
+<lams:html>
+<lams:head>
+	<link rel="stylesheet" href="css/defaultHTML_learner.css" type="text/css" />
+</lams:head>
+
+<body>
+	<div style="clear: both"></div>
+
+	<div class="container">
+		<div class="row vertical-center-row">
+			<div class="col-xs-12 col-sm-8 col-sm-offset-2 col-md-6 col-md-offset-3">
+				<div class="panel voffset20">
+					<div class="panel-body">
+					<div class="col-xs-12 text-center">
+						<fmt:message key="msg.password.changed"/>
+					</div>
+					
+					<div class="col-xs-12 text-center voffset10">
+						<a class="btn btn-sm btn-default"
+							href="index.do?state=active&method=profile" role="button">
+							Ok
+						</a>
+					</div>
+					
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+
+</body>
+</lams:html>

@@ -66,7 +66,6 @@ import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 
 /**
- *
  * @author <a href="mailto:fyang@melcoe.mq.edu.au">Fei Yang</a>
  */
 public class ProfileAction extends LamsDispatchAction {
@@ -94,7 +93,6 @@ public class ProfileAction extends LamsDispatchAction {
 	request.setAttribute("fullName", fullName);
 	request.setAttribute("email", (email != null ? email : ""));
 	request.setAttribute("portraitUuid", requestor.getPortraitUuid());
-	request.setAttribute("tab", "profile");
 
 	return mapping.findForward("view");
     }
@@ -173,7 +171,6 @@ public class ProfileAction extends LamsDispatchAction {
 	}
 
 	request.setAttribute("beans", beans);
-	request.setAttribute("tab", "profile");
 
 	return mapping.findForward("lessons");
     }
@@ -217,7 +214,6 @@ public class ProfileAction extends LamsDispatchAction {
 	if (requestor.isTwoFactorAuthenticationEnabled()) {
 	    request.setAttribute("sharedSecret", requestor.getTwoFactorAuthenticationSecret());    
 	}
-	request.setAttribute("tab", "profile");
 
 	boolean hasLamsCommunityToken = requestor.getLamsCommunityToken() != null;
 	request.setAttribute("hasLamsCommunityToken", hasLamsCommunityToken);

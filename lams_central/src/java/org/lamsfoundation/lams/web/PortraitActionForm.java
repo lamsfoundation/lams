@@ -29,8 +29,6 @@ import org.apache.struts.upload.FormFile;
 
 /**
  * @author jliew
- *
- *
  */
 public class PortraitActionForm extends ActionForm {
 
