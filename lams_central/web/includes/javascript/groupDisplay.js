@@ -1,42 +1,52 @@
 function initMainPage() {
 	initButtons();
 	
-	if ($('#orgTabs').length > 0) {
-		$('#orgTabs').tabs({
-			'activate' : function(event, ui){
-				loadOrgTab(ui.newPanel);
-			}
-		}).addClass('ui-tabs-vertical ui-helper-clearfix')
-		  .find('li').removeClass('ui-corner-top').addClass('ui-corner-left');
+	//in case active course is not yet chosen by user, select the fist one from the list
 	
-		loadOrgTab($('.orgTab').first());
+			
+	if (activeOrgId > 0) {
+		//$('#orgTabs').tabs({
+		//	'activate' : function(event, ui){
+		//		loadOrganisation();
+		//	}
+		//}).addClass('ui-tabs-vertical ui-helper-clearfix')
+		// .find('li').removeClass('ui-corner-top').addClass('ui-corner-left');
+	
+		loadOrganisation();
 	}
-	
-	$("#actionAccord").accordion({
-		'heightStyle' : 'content'
-	});
 	
 	refreshPrivateNotificationCount();
 }
 
-function loadOrgTab(orgTab, refresh) {
-	if (!orgTab) {
-		orgTab = $('div.orgTab[id^=orgTab-' + $('#orgTabs').tabs('option','active') + ']');
-	}
-	if (orgTab && (refresh || !orgTab.text())) {
-		var orgTabId = orgTab.attr("id");
-		var orgId = orgTabId.split('-')[3];
-		
-		orgTab.load(
-			"displayGroup.do",
-			{
-				stateId : stateId,
-				orgId   : orgId
-			},
-			function() {
-				initButtons(orgTabId);
-			});
-	}
+function selectOrganisation(newOrgId) {
+	//remove active CSS class from the old org
+	if (activeOrgId > 0) {
+		$("#org-row-" + activeOrgId).removeClass("active");
+		$("#org-row-" + activeOrgId + " a>i").remove();
+	}	
+	
+	//add active CSS class
+	$("#org-row-" + newOrgId).addClass("active");
+	$("#org-row-" + newOrgId + " a").append( "<i class='fa fa-chevron-circle-right fa-lg pull-right'></i>" )
+	
+	activeOrgId = newOrgId;
+	loadOrganisation();
+	
+	//store last visited
+	// TODO
+}
+
+function loadOrganisation() {	
+	$("#org-container").load(
+		"displayGroup.do",
+		{
+			stateId : stateId,
+			orgId   : activeOrgId
+		},
+		function() {
+			initButtons("org-container");
+		}
+	);
 }
 
 
@@ -143,7 +153,7 @@ function makeSortable(element) {
 					ids : ids.join(",")
 				},
 				error : function() {
-					loadOrgTab(null, true);
+					loadOrganisation();
 				}
 			});
 		}
@@ -222,6 +232,49 @@ function showAddLessonDialog(orgID) {
 			}
 		}
 	});
+}
+
+
+function showMyProfileDialog() {
+	showDialog("dialogMyProfile", {
+		'title' : LABELS.MY_PROFILE,
+		'modal' : true,
+		'width' : 'auto',
+		'height' : 430,
+		'open' : function() {
+			var dialog = $(this);
+			// load contents after opening the dialog
+			$('iframe', dialog).attr('src', LAMS_URL + 'index.do?method=profile');
+			$(this).css("maxWidth", "770px").css("margin", "auto");
+			
+			// in case of mobile devices allow iframe scrolling
+			if( /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) ) {
+			    setTimeout(function() {
+			    	dialog.css({
+			    		'overflow-y' : 'scroll',
+			    		'-webkit-overflow-scrolling' : 'touch'
+			    	});
+			    },500);
+			}
+		}
+	});
+}
+
+
+function updateMyProfileDialogSettings(title, height) {
+	var id = 'dialogMyProfile';
+	var dialog = $("#" + id, window.parent.document);
+
+	// update height
+	$('.modal-content', dialog).height(height);
+	if (height.match("%$")) {
+		$('.modal-dialog', dialog).height(height);
+	} else {
+		$('.modal-dialog', dialog).height('');
+	}
+
+	// update title
+	$('.modal-title', dialog).attr('id',  id + 'Label').text(title);
 }
 
 
@@ -433,7 +486,7 @@ function refreshPrivateNotificationCount(){
 			'method' : 'getPendingNotificationCount'
 		},
 		success : function(count) {
-			$('#notificationsPendingCount').text(count == 0 ? '' : '(' + count + ')');
+			$('#notificationsPendingCount').text(count == 0 ? '0' : count);
 		}
 	});
 }
@@ -611,7 +664,7 @@ function closeDialog(id, refresh) {
 	// was the dialog just closed or a lesson removed
 	// if latter, refresh the list
 	if (refresh) {
-		loadOrgTab(null, true);
+		loadOrganisation();
 	}
 	$("#" + id).modal('hide');
 }
@@ -663,7 +716,7 @@ function removeLesson(lessonID) {
 				type : "POST",
 				success : function(json) {
 					if (json.removeLesson == true) {
-						loadOrgTab(null, true);
+						loadOrganisation();
 					} else {
 						alert(json.removeLesson);
 					}

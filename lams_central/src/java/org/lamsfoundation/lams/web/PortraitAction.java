@@ -21,7 +21,6 @@
  * ****************************************************************
  */
 
-
 package org.lamsfoundation.lams.web;
 
 import javax.servlet.http.HttpServletRequest;
@@ -38,13 +37,6 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
 
 /**
  * @author jliew
- *
- *
- *
- *
- *
- *
- *
  */
 public class PortraitAction extends Action {
 
@@ -60,7 +52,6 @@ public class PortraitAction extends Action {
 	log.debug("using portraitUuid=" + portraitUuid);
 	// if no portrait has been uploaded, set the uuid to 0
 	portraitForm.setPortraitUuid(portraitUuid == null ? 0 : portraitUuid);
-	request.setAttribute("tab", "profile");
 	return mapping.findForward("portrait");
     }
 

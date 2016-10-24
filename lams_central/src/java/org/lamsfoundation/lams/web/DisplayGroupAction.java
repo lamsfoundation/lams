@@ -61,9 +61,6 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
 
 /**
  * @author jliew
- *
- *
- *
  */
 public class DisplayGroupAction extends Action {
     private static IUserManagementService service;

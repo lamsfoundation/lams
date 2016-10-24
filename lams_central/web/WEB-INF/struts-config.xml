@@ -115,6 +115,7 @@
     <action
       path="/index"
       type="org.lamsfoundation.lams.web.IndexAction"
+      parameter="dispatch"
       unknown="false"
       validate="false"
     >
@@ -145,7 +146,7 @@
       />
       <forward
         name="passwordChanged"
-        path=".passwordChangeOk"
+        path="/passwordChangeOkContent.jsp"
         redirect="false"
       />
       <forward
@@ -280,7 +281,7 @@
     >
       <forward
         name="passwordChange"
-        path=".passwordChange"
+        path="/passwordChangeContent.jsp"
         redirect="false"
       />
     </action>
@@ -448,7 +449,7 @@
       />
       <forward
         name="passwordChange"
-        path=".passwordChange"
+        path="/passwordChangeContent.jsp"
         redirect="false"
       />
       <forward
@@ -489,7 +490,7 @@
     >
       <forward
         name="portrait"
-        path=".portrait"
+        path="/portrait.jsp"
         redirect="false"
       />
     </action>
@@ -526,18 +527,18 @@
       type="org.lamsfoundation.lams.web.ProfileSaveAction"
       name="UserForm"
       scope="request"
-      input=".editprofile"
+      input="/editprofile.jsp"
       unknown="false"
       validate="false"
     >
       <forward
         name="profile"
-        path="/index.do?state=active&amp;tab=profile"
+        path="/index.do?state=active&amp;method=profile"
         redirect="true"
       />
       <forward
         name="editprofile"
-        path="/index.do?state=active&amp;tab=editprofile"
+        path="/index.do?state=active&amp;method=editprofile"
         redirect="false"
       />
     </action>
@@ -552,17 +553,17 @@
     >
       <forward
         name="view"
-        path=".profile"
+        path="/profile.jsp"
         redirect="false"
       />
       <forward
         name="lessons"
-        path=".lessons"
+        path="/lessons.jsp"
         redirect="false"
       />
       <forward
         name="edit"
-        path=".editprofile"
+        path="/editprofile.jsp"
         redirect="false"
       />
     </action>
@@ -584,19 +585,19 @@
       type="org.lamsfoundation.lams.web.PortraitSaveAction"
       name="PortraitActionForm"
       scope="request"
-      input=".portrait"
+      input="/portrait.jsp"
       parameter="method"
       unknown="false"
       validate="false"
     >
       <forward
         name="profile"
-        path="/index.do?state=active&amp;tab=profile"
+        path="/index.do?state=active&amp;method=profile"
         redirect="false"
       />
       <forward
         name="errors"
-        path="/index.do?state=active&amp;tab=portrait"
+        path="/index.do?state=active&amp;method=portrait"
         redirect="false"
       />
     </action>
@@ -669,23 +670,23 @@
       type="org.lamsfoundation.lams.web.PasswordChangeAction"
       name="PasswordChangeActionForm"
       scope="request"
-      input=".passwordChange"
+      input="/passwordChangeContent.jsp"
       unknown="false"
       validate="false"
     >
       <forward
         name="okay"
-        path="/index.do?state=active&amp;tab=passwordChanged"
+        path="/index.do?state=active&amp;method=passwordChanged"
         redirect="false"
       />
       <forward
         name="cancelled"
-        path="/index.do?state=active&amp;tab=profile"
+        path="/index.do?state=active&amp;method=profile"
         redirect="false"
       />
       <forward
         name="errors"
-        path="/index.do?state=active&amp;tab=password"
+        path="/index.do?state=active&amp;method=password"
         redirect="false"
       />
     </action>

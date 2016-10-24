@@ -13,7 +13,7 @@ function doSelectTab(tabId) {
 }
 
 /**
- * Sets up widgets in the main tab.
+ * Sets up widgets on the main.jsp page
  */
 function initLessonTab(){
 	$('#ldScreenshotAuthor').load(function(){

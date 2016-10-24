@@ -23,6 +23,7 @@
 
 package org.lamsfoundation.lams.usermanagement.dao.hibernate;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.hibernate.Query;
@@ -31,6 +32,7 @@ import org.lamsfoundation.lams.usermanagement.Organisation;
 import org.lamsfoundation.lams.usermanagement.OrganisationState;
 import org.lamsfoundation.lams.usermanagement.OrganisationType;
 import org.lamsfoundation.lams.usermanagement.dao.IOrganisationDAO;
+import org.lamsfoundation.lams.usermanagement.dto.OrganisationDTO;
 import org.springframework.stereotype.Repository;
 
 /**
@@ -39,15 +41,6 @@ import org.springframework.stereotype.Repository;
 @Repository
 public class OrganisationDAO extends LAMSBaseDAO implements IOrganisationDAO {
 
-    private static final String GET_ALL_ACTIVE_COURSE_IDS = "select o.organisationId from Organisation o"
-	    + " where o.organisationType.organisationTypeId = " + OrganisationType.COURSE_TYPE
-	    + " and o.organisationState.organisationStateId = " + OrganisationState.ACTIVE + " order by name";
-
-    private static final String GET_ACTIVE_COURSE_IDS_BY_USER = "select uo.organisation.organisationId, uoc.collapsed"
-	    + " from UserOrganisation uo left join uo.userOrganisationCollapsed uoc"
-	    + " where uo.organisation.organisationType.organisationTypeId = " + OrganisationType.COURSE_TYPE
-	    + " and uo.organisation.organisationState.organisationStateId = " + OrganisationState.ACTIVE
-	    + " and uo.user.userId = :userId order by name";
 
     private static final String GET_PAGED_COURSES = "SELECT o FROM Organisation o WHERE o.organisationType.organisationTypeId =:typeId "
 	    + "AND o.organisationState.organisationStateId =:stateId AND o.parentOrganisation.organisationId =:parentOrgId "
@@ -61,10 +54,73 @@ public class OrganisationDAO extends LAMSBaseDAO implements IOrganisationDAO {
 
     @SuppressWarnings("unchecked")
     @Override
-    public List<Integer> getActiveCourseIdsByUser(Integer userId, boolean isSysadmin) {
-	return isSysadmin ? getSession().createQuery(OrganisationDAO.GET_ALL_ACTIVE_COURSE_IDS).list()
-		: getSession().createQuery(OrganisationDAO.GET_ACTIVE_COURSE_IDS_BY_USER).setInteger("userId", userId)
-			.list();
+    public List<OrganisationDTO> getActiveCoursesByUser(Integer userId, boolean isSysadmin, int page, int size,
+	    String searchString) {
+
+	final String GET_ALL_ACTIVE_COURSE_IDS = "SELECT o.organisationId, o.name FROM Organisation o"
+		+ " WHERE o.organisationType.organisationTypeId = " + OrganisationType.COURSE_TYPE
+		+ " AND o.organisationState.organisationStateId = " + OrganisationState.ACTIVE
+		+ " AND (o.name LIKE CONCAT('%', :searchString, '%')) ORDER BY o.name";
+
+	final String GET_ACTIVE_COURSE_IDS_BY_USER = "SELECT uo.organisation.organisationId, uo.organisation.name"
+	    + " FROM UserOrganisation uo "
+	    + " WHERE uo.organisation.organisationType.organisationTypeId = " + OrganisationType.COURSE_TYPE
+	    + " AND uo.organisation.organisationState.organisationStateId = " + OrganisationState.ACTIVE
+	    + " AND uo.user.userId = :userId "
+	    + " AND (uo.organisation.name LIKE CONCAT('%', :searchString, '%')) ORDER BY uo.organisation.name";
+	
+	String queryStr = isSysadmin ? GET_ALL_ACTIVE_COURSE_IDS : GET_ACTIVE_COURSE_IDS_BY_USER;
+	Query query = getSession().createQuery(queryStr);
+	// support for custom search from a toolbar
+	searchString = searchString == null ? "" : searchString;
+	query.setString("searchString", searchString);
+	if (!isSysadmin) {
+	    query.setInteger("userId", userId);
+	}
+	query.setFirstResult(page * size);
+	query.setMaxResults(size);
+	List<Object[]> list = query.list();
+	
+	List<OrganisationDTO> orgDtos = new ArrayList<OrganisationDTO>();
+	if (list != null && list.size() > 0) {
+	    for (Object[] element : list) {
+
+		Integer orgId = ((Number) element[0]).intValue();
+		String name = (String) element[1];
+
+		OrganisationDTO orgDto = new OrganisationDTO(orgId, name);
+		orgDtos.add(orgDto);
+	    }
+
+	}
+
+	return orgDtos;
+    }
+    
+    @SuppressWarnings("unchecked")
+    @Override
+    public int getCountActiveCoursesByUser(Integer userId, boolean isSysadmin, String searchString) {
+
+	final String GET_ALL_ACTIVE_COURSE_IDS = "SELECT COUNT(o) FROM Organisation o"
+		+ " WHERE o.organisationType.organisationTypeId = " + OrganisationType.COURSE_TYPE
+		+ " AND o.organisationState.organisationStateId = " + OrganisationState.ACTIVE
+		+ " AND (o.name LIKE CONCAT('%', :searchString, '%'))";
+
+	final String GET_ACTIVE_COURSE_IDS_BY_USER = "SELECT COUNT(uo)" + " FROM UserOrganisation uo "
+		+ " WHERE uo.organisation.organisationType.organisationTypeId = " + OrganisationType.COURSE_TYPE
+		+ " AND uo.organisation.organisationState.organisationStateId = " + OrganisationState.ACTIVE
+		+ " AND uo.user.userId = :userId " + " AND (uo.organisation.name LIKE CONCAT('%', :searchString, '%'))";
+
+	String queryStr = isSysadmin ? GET_ALL_ACTIVE_COURSE_IDS : GET_ACTIVE_COURSE_IDS_BY_USER;
+	Query query = getSession().createQuery(queryStr);
+	// support for custom search from a toolbar
+	searchString = searchString == null ? "" : searchString;
+	query.setString("searchString", searchString);
+	if (!isSysadmin) {
+	    query.setInteger("userId", userId);
+	}
+
+	return ((Number) query.uniqueResult()).intValue();
     }
 
     @SuppressWarnings("unchecked")

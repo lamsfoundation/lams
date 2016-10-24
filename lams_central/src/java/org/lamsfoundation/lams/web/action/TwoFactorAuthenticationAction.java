@@ -68,7 +68,6 @@ public class TwoFactorAuthenticationAction extends Action {
 	    request.setAttribute("QRCode", QRCode);
 	}
 
-	request.setAttribute("tab", "profile");
 	return mapping.findForward("secret");
     }
 }

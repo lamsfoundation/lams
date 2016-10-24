@@ -1,33 +1,37 @@
-<%@ page language="java" pageEncoding="UTF-8"
-	contentType="text/html;charset=utf-8"%>
+<!DOCTYPE html>
+
+<%@ page contentType="text/html; charset=utf-8" language="java"%>
 <%@ taglib uri="tags-lams" prefix="lams"%>
 <%@ taglib uri="tags-bean" prefix="bean"%>
 <%@ taglib uri="tags-fmt" prefix="fmt"%>
 <%@ taglib uri="tags-logic" prefix="logic"%>
 <%@ taglib uri="tags-core" prefix="c"%>
-<%@ page
-	import="org.lamsfoundation.lams.usermanagement.AuthenticationMethod"
+<%@ page import="org.lamsfoundation.lams.usermanagement.AuthenticationMethod"
 	import="org.lamsfoundation.lams.util.Configuration"
 	import="org.lamsfoundation.lams.util.ConfigurationKeys"%>
-<link rel="stylesheet" href="css/defaultHTML_learner.css"
-	type="text/css" />
-
-<link rel="stylesheet" href="css/bootstrap.min.css" type="text/css" />
-
-
 <c:set var="showAllMyLessonLink"><%=Configuration.get(ConfigurationKeys.SHOW_ALL_MY_LESSON_LINK)%></c:set>
 
+<lams:html>
+<lams:head>
+	<link rel="stylesheet" href="css/defaultHTML_learner.css" type="text/css" />
+	
+	<script type="text/javascript" src="includes/javascript/jquery.js"></script>
+	<script type="text/javascript" src="includes/javascript/jquery-ui.js"></script>
+	<script type="text/javascript" src="includes/javascript/groupDisplay.js"></script>
+	<script type="text/javascript">
+		$(document).ready(function () {
+			//update dialog's height and title
+			updateMyProfileDialogSettings('<fmt:message key="index.myprofile" />', '430');
+		});
+	</script>
+</lams:head>
 
+<body>
 <div class="container">
 	<div class="row vertical-center-row">
 		<div
 			class="col-xs-12 col-sm-8 col-sm-offset-2 col-md-6 col-md-offset-3">
-			<div class="panel panel-default">
-				<div class="panel-heading">
-					<div class="panel-title">
-						<fmt:message key="index.myprofile" />
-					</div>
-				</div>
+			<div class="panel voffset20">
 				<div class="panel-body">
 					<div class="text-center">
 
@@ -59,7 +63,7 @@
 					<!-- Split button -->
 					<div class="col-xs-12 text-center">
 						<a class="btn btn-sm btn-default offset5"
-							href="index.do?state=active&tab=editprofile" role="button"><i
+							href="index.do?state=active&method=editprofile" role="button"><i
 							class="fa fa-fw fa-pencil"></i> <span class="hidden-xs"><fmt:message
 									key="title.profile.edit.screen" /></span></i></a>&nbsp;&nbsp;
 						<c:set var="authenticationMethodId">
@@ -69,18 +73,18 @@
 						<c:if test="${authenticationMethodId eq dbId}">
 
 							<a class="btn btn-sm btn-default voffset5"
-								href="index.do?state=active&tab=password" role="button"><i
+								href="index.do?state=active&method=password" role="button"><i
 								class="fa fa-fw fa-lock"></i> <span class="hidden-xs"><fmt:message
 										key="title.password.change.screen" /></span></i></a>
 						</c:if>
 						<a class="btn btn-sm btn-default offset5"
-							href="index.do?state=active&tab=portrait" role="button"><i
+							href="index.do?state=active&method=portrait" role="button"><i
 							class="fa fa-fw fa-camera"></i> <span class="hidden-xs"><fmt:message
 									key="title.portrait.change.screen" /></span></i></a>&nbsp;&nbsp;
 
 						<c:if test="${showAllMyLessonLink}">
 							<a class="btn btn-sm btn-default offset5"
-								href="index.do?state=active&tab=lessons" role="button"><i
+								href="index.do?state=active&method=lessons" role="button"><i
 								class="fa fa-fw fa-book"></i> <span class="hidden-xs"><fmt:message
 										key="title.all.my.lessons" /></span></i></a>
 						</c:if>
@@ -91,19 +95,7 @@
 	</div>
 
 </div>
-</div>
 
-</div>
-</div>
-</div>
-
-</div>
-</div>
-</div>
-
-
-
-
-
-
+</body>
+</lams:html>
 

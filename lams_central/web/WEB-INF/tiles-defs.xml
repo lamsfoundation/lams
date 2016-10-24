@@ -25,33 +25,9 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
   http://www.gnu.org/licenses/gpl.txt
 -->
 <tiles-definitions>
-
-	<definition name=".portrait" path="/main.jsp">
-		<put name="profile" value="portrait.jsp"/>	
-	</definition>
-	
-	<definition name=".lessons" path="/main.jsp">
-		<put name="profile" value="lessons.jsp"/>	
-	</definition>
-
-	<definition name=".profile" path="/main.jsp">
-		<put name="profile" value="profile.jsp"/>	
-	</definition>
 	
 	<definition name=".community" path="/main.jsp">
 		<put name="community" value="lamscommunity/community.jsp"/>	
-	</definition>
-	
-	<definition name=".editprofile" path="/main.jsp">
-		<put name="profile" value="editprofile.jsp"/>	
-	</definition>
-
-	<definition name=".passwordChange" path="/main.jsp">
-		<put name="profile" value="passwordChangeContent.jsp"/>	
-	</definition>
-	
-	<definition name=".passwordChangeOk" path="/main.jsp">
-		<put name="profile" value="passwordChangeOkContent.jsp" />	
 	</definition>
 	
 	<definition name=".twoFactorAuthenticationSecret" path="/main.jsp">
