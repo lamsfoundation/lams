@@ -63,7 +63,7 @@
 	<!-- Preceding lessons setup -->
 		<p class="lead">
 			<fmt:message key="label.conditions.box.title">
-				><fmt:param>${fn:escapeXml(title)}</fmt:param>
+				<fmt:param>${fn:escapeXml(title)}</fmt:param>
 			</fmt:message>
 		</p>
 	<c:choose>
@@ -87,10 +87,9 @@
 			</c:forEach>
 		</c:otherwise>
 	</c:choose>
-	<hr>
 	<!-- Adding new preceding lesson -->
 	<c:if test="${edit}">
-		<div class="panel panel-default">
+		<div class="panel panel-default voffset10">
 			<div class="panel-heading">
 				<fmt:message key="label.conditions.box.add.dependency" />
 			</div>
@@ -119,31 +118,37 @@
 			</div>
 		</div>
 	</c:if>
-	<hr>
 	
+	<hr/>
+	
+	<c:choose>
+		<c:when test="${empty lessonDaysToFinish}">
+			<c:set var="conditionFinishText"><fmt:message key="label.conditions.box.finish.no.date" /></c:set>
+		</c:when>
+		<c:when test="${lessonIndividualFinish}">
+			<c:set var="conditionFinishText">
+			<fmt:message key="label.conditions.box.finish.individual.date">
+				<fmt:param>${lessonDaysToFinish}</fmt:param>
+			</fmt:message>
+			</c:set>
+		</c:when>
+		<c:otherwise>
+			<c:set var="conditionFinishText">
+			<fmt:message key="label.conditions.box.finish.global.date">
+				<fmt:param>${lessonDaysToFinish}</fmt:param>
+				<fmt:param><lams:Date style="short" value="${lessonStartDate}"/></fmt:param>
+			</fmt:message>
+			</c:set>
+		</c:otherwise>
+	</c:choose>
+				
+	<c:choose>
+	<c:when test="${edit}">
 	<!-- Finish date setup -->
 		<div class="panel panel-default">
-			<div class="panel-heading">
-				<c:choose>
-					<c:when test="${empty lessonDaysToFinish}">
-						<fmt:message key="label.conditions.box.finish.no.date" />
-					</c:when>
-					<c:when test="${lessonIndividualFinish}">
-						<fmt:message key="label.conditions.box.finish.individual.date">
-							<fmt:param>${lessonDaysToFinish}</fmt:param>
-						</fmt:message>
-					</c:when>
-					<c:otherwise>
-						<fmt:message key="label.conditions.box.finish.global.date">
-							<fmt:param>${lessonDaysToFinish}</fmt:param>
-							<fmt:param><lams:Date style="short" value="${lessonStartDate}"/></fmt:param>
-						</fmt:message>
-					</c:otherwise>
-				</c:choose>
-		</div>
+			<div class="panel-heading">${conditionFinishText}</div>
 	
-	<!-- Changing finish date -->
-	<c:if test="${edit}">
+		<!-- Changing finish date -->
 		<div class="panel-body">
 			<form action="${setDaysToLessonFinishUrl}" method="post">
 						<div class="form-group">
@@ -172,8 +177,12 @@
 						</div>								
 			</form>
 		</div>
-	</c:if>
-	</div>
+		</div>
+	</c:when>
+	<c:otherwise>
+		<p class="lead">${conditionFinishText}</p>
+	</c:otherwise>
+	</c:choose>
 </div>
 </div>
 
