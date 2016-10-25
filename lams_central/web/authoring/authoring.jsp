@@ -7,8 +7,6 @@
 <!DOCTYPE html>
 <lams:html>
 <lams:head>
-	<title><fmt:message key="authoring.fla.page.title" /></title>
-	
 	<link rel="stylesheet" href="<lams:LAMSURL/>css/yui/treeview.css" type="text/css" media="screen" />
 	<link rel="stylesheet" href="<lams:LAMSURL/>css/yui/folders.css" type="text/css" media="screen" />
 	<link rel="stylesheet" href="<lams:LAMSURL/>css/defaultHTML_learner.css" type="text/css">
@@ -87,22 +85,6 @@
 				REGION_FIT_BUTTON_TOOLTIP : '<c:out value="${REGION_FIT_BUTTON_TOOLTIP_VAR}" />',
 				
 				// General
-				<fmt:message key="authoring.fla.new.folder.button" var="NEW_FOLDER_BUTTON_VAR"/>
-				NEW_FOLDER_BUTTON : '<c:out value="${NEW_FOLDER_BUTTON_VAR}" />',
-				<fmt:message key="authoring.fla.copy.button" var="COPY_BUTTON_VAR"/>
-				COPY_BUTTON : '<c:out value="${COPY_BUTTON_VAR}" />',
-				<fmt:message key="authoring.fla.paste.button" var="PASTE_BUTTON_VAR"/>
-				PASTE_BUTTON : '<c:out value="${PASTE_BUTTON_VAR}" />',
-				<fmt:message key="authoring.fla.delete.button" var="DELETE_BUTTON_VAR"/>
-				DELETE_BUTTON : '<c:out value="${DELETE_BUTTON_VAR}" />',
-				<fmt:message key="authoring.fla.rename.button" var="RENAME_BUTTON_VAR"/>
-				RENAME_BUTTON : '<c:out value="${RENAME_BUTTON_VAR}" />',
-				<fmt:message key="authoring.fla.open.button" var="OPEN_BUTTON_VAR"/>
-				OPEN_BUTTON : '<c:out value="${OPEN_BUTTON_VAR}" />',
-				<fmt:message key="authoring.fla.save.button" var="SAVE_BUTTON_VAR"/>
-				SAVE_BUTTON : '<c:out value="${SAVE_BUTTON_VAR}" />',
-				<fmt:message key="authoring.fla.import.button" var="IMPORT_BUTTON_VAR"/>
-				IMPORT_BUTTON : '<c:out value="${IMPORT_BUTTON_VAR}" />',
 				<fmt:message key="authoring.fla.folder" var="FOLDER_VAR"/>
 				FOLDER : '<c:out value="${FOLDER_VAR}" />',
 				<fmt:message key="authoring.fla.sequence" var="SEQUENCE_VAR"/>
@@ -210,8 +192,6 @@
 				// PropertyLib
 				<fmt:message key="authoring.fla.ok.button" var="OK_BUTTON_VAR"/>
 				OK_BUTTON : '<c:out value="${OK_BUTTON_VAR}" />',
-				<fmt:message key="authoring.fla.cancel.button" var="CANCEL_BUTTON_VAR"/>
-				CANCEL_BUTTON : '<c:out value="${CANCEL_BUTTON_VAR}" />',
 				<fmt:message key="authoring.fla.clear.all.button" var="CLEAR_ALL_BUTTON_VAR"/>
 				CLEAR_ALL_BUTTON : '<c:out value="${CLEAR_ALL_BUTTON_VAR}" />',
 				<fmt:message key="authoring.fla.refresh.button" var="REFRESH_BUTTON_VAR"/>
@@ -295,7 +275,7 @@
 <body onresize="javascript:GeneralLib.resizePaper()">
 	<%-- "loading..." screen, gets removed on page full load --%>
 	<div id="loadingOverlay">
-		<img src="<lams:LAMSURL/>images/ajax-loader-big.gif" />
+		<i class="fa fa-refresh fa-spin fa-3x fa-fw"></i>
 	</div>
 	
 	<div id="toolbar" class="btn-group" role="toolbar">
@@ -369,7 +349,7 @@
 
 		<div class="btn-group" role="group">
 		  <button class="btn btn-default dropdown-toggle" type="button" id="flowButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
-		  	<i class="fa fa-map"></i>
+		  	<i class="fa fa-map-o"></i>
 		    <span><fmt:message key="authoring.fla.page.menu.flow" /></span>
 		    <span class="caret"></span>
 		  </button>
@@ -466,8 +446,7 @@
 							</c:forEach>
 						</select>
 						<img id="ldDescriptionLicenseImage" />
-						<input id="ldDescriptionLicenseButton" class="button"
-							   type="button" value="View" />
+						<button id="ldDescriptionLicenseButton" class="btn btn-default"><span>View</span></button>
 						<div id="ldDescriptionLicenseTextContainer">
 							<div class="ldDescriptionLabel"><fmt:message key="authoring.fla.page.ld.license.info" /></div>
 							<textarea id="ldDescriptionLicenseText" rows="5"></textarea>
@@ -482,7 +461,7 @@
 	<!-- DIALOGS CONTENTS -->
 	
 	<!-- SEQUENCE LOAD/SAVE DIALOG -->
-	<div id="ldStoreDialog" class="dialogContainer">
+	<div id="ldStoreDialogContents" class="dialogContents">
 		<table>
 			<tr>
 				<td id="ldStoreDialogTreeCell">
@@ -490,9 +469,8 @@
 				</td>
 				<td id="ldStoreDialogCanvasCell" rowspan="2">
 					<div id="ldStoreDialogCanvasDiv">
-			    		<div id="ldScreenshotAuthor" class="ldChoiceDependentCanvasElement"></div>
-		    			<img id="ldScreenshotLoading" class="ldChoiceDependentCanvasElement"
-		    			     src="<lams:LAMSURL/>images/ajax-loader-big.gif" />
+			    		<div id="ldScreenshotAuthor"></div>
+			    		<i id="ldScreenshotLoading" class="fa fa-refresh fa-spin fa-3x fa-fw"></i>
 		    			<iframe id="ldStoreDialogImportPartFrame"></iframe>
 			    	</div>
 				</td>
@@ -502,26 +480,72 @@
 					<div id="ldStoreDialogAccessTitle"><fmt:message key="authoring.fla.page.dialog.access" /></div>
 				</td>
 			</tr>
-		</table>
-		<%-- This will be moved to dialog's button pane using JS --%>
 
-		<hr class="separator" />
-		<div class="container-fluid">
-			<div id="ldStoreDialogNameContainer" class="ldStoreDialogSaveOnly">
-				<span><fmt:message key="authoring.fla.page.dialog.ld.title" /></span><input id="ldStoreDialogNameField" class="defaultFocus" type="text"/>
-			</div>
-			<div class="pull-left">
-				<button id="addButton" class="btn btn-primary" href="#" onClick="javascript:addLesson()"><i class="fa fa-plus"></i> 
-					<fmt:message key="button.add.now" />
-				</button>
-			</div>
-		</div>
+			<tr>
+				<td id="ldStoreDialogButtonCell" colspan="2">
+					<div class="container-fluid">
+						<div id="ldStoreDialogLeftButtonContainer" class="btn-group" role="group">
+							<button id="ldStoreDialogNewFolderButton" class="btn btn-default">
+								<i class="fa fa-folder"></i> 
+								<span><fmt:message key="authoring.fla.new.folder.button" /></span>
+							</button>
+							
+							<button id="ldStoreDialogCopyButton" class="btn btn-default">
+								<i class="fa fa-copy"></i> 
+								<span><fmt:message key="authoring.fla.copy.button" /></span>
+							</button>
+							
+							<button id="ldStoreDialogPasteButton" class="btn btn-default">
+								<i class="fa fa-paste"></i> 
+								<span><fmt:message key="authoring.fla.paste.button" /></span>
+							</button>
+							
+							<button id="ldStoreDialogDeleteButton" class="btn btn-default">
+								<i class="fa fa-trash-o"></i> 
+								<span><fmt:message key="authoring.fla.delete.button" /></span>
+							</button>
+							
+							<button id="ldStoreDialogRenameButton" class="btn btn-default">
+								<i class="fa fa-font"></i> 
+								<span><fmt:message key="authoring.fla.rename.button" /></span>
+							</button>
+						</div>
+						
+						<div id="ldStoreDialogNameContainer">
+							<span><fmt:message key="authoring.fla.page.dialog.ld.title" /></span>
+							<input type="text"/>
+						</div>
+						
+						<div id="ldStoreDialogRightButtonContainer" class="btn-group pull-right" role="group">
+							<button id="ldStoreDialogSaveButton" class="btn btn-default">
+								<i class="fa fa-save"></i> 
+								<span><fmt:message key="authoring.fla.save.button" /></span>
+							</button>
+							
+							<button id="ldStoreDialogOpenButton" class="btn btn-default">
+								<i class="fa fa-folder-open-o"></i> 
+								<span><fmt:message key="authoring.fla.open.button" /></span>
+							</button>
+							
+							<button id="ldStoreDialogImportPartButton" class="btn btn-default">
+								<i class="fa fa-arrow-circle-o-down"></i> 
+								<span><fmt:message key="authoring.fla.import.button" /></span>
+							</button>
+							
+							<button id="ldStoreDialogCancelButton" class="btn btn-default">
+								<i class="fa fa-ban"></i> 
+								<span><fmt:message key="authoring.fla.cancel.button" /></span>
+							</button>
+						</div>
+					</div>
+				</td>
+			</tr>
+		</table>
 	</div>
-	
 	
 	<!-- GROUP OR CONDITION TO BRANCH MATCHING DIALOG -->
 	
-	<div id="branchMappingDialog" class="dialogContainer branchMappingDialog">
+	<div id="branchMappingDialog" class="dialogContents branchMappingDialog">
 		<table>
 			<tr>
 				<td></td>
@@ -553,7 +577,7 @@
 	
 	<!-- PROPERTY DIALOG CONTENTS FOR DIFFERENT OBJECT TYPES -->
 	
-	<div id="propertiesContentTransition" class="dialogContainer">
+	<div id="propertiesContentTransition" class="dialogContents">
 		<table>
 			<tr>
 				<td>
@@ -574,7 +598,7 @@
 		</table>
 	</div>
 	
-	<div id="propertiesContentTool" class="dialogContainer">
+	<div id="propertiesContentTool" class="dialogContents">
 		<table>
 			<tr>
 				<td>
@@ -604,7 +628,7 @@
 	</div>
 	
 	
-	<div id="propertiesContentGrouping" class="dialogContainer">
+	<div id="propertiesContentGrouping" class="dialogContents">
 		<table>
 			<tr>
 				<td>
@@ -671,7 +695,7 @@
 	</div>
 
 
-	<div id="propertiesContentGate" class="dialogContainer">
+	<div id="propertiesContentGate" class="dialogContents">
 		<table>
 			<tr>
 				<td>
@@ -746,7 +770,7 @@
 	</div>
 	
 	
-	<div id="propertiesContentBranching" class="dialogContainer">
+	<div id="propertiesContentBranching" class="dialogContents">
 		<table>
 			<tr>
 				<td>
@@ -820,7 +844,7 @@
 	</div>
 	
 		
-	<div id="propertiesContentParallel" class="dialogContainer">
+	<div id="propertiesContentParallel" class="dialogContents">
 		<table>
 			<tr>
 				<td>
@@ -842,7 +866,7 @@
 	</div>
 	
 	
-	<div id="propertiesContentOptionalActivity" class="dialogContainer">
+	<div id="propertiesContentOptionalActivity" class="dialogContents">
 		<table>
 			<tr>
 				<td>
@@ -872,7 +896,7 @@
 	</div>
 	
 	
-	<div id="propertiesContentRegion" class="dialogContainer">
+	<div id="propertiesContentRegion" class="dialogContents">
 		<table>
 			<tr>
 				<td>
@@ -894,7 +918,7 @@
 	</div>
 	
 	
-	<div id="propertiesContentLabel" class="dialogContainer">
+	<div id="propertiesContentLabel" class="dialogContents">
 		<table>
 			<tr>
 				<td>
@@ -909,7 +933,7 @@
 	
 	
 	<!-- TOOL OUTPUT CONDITIONS DIALOG -->
-	<div id="outputConditionsDialog" class="dialogContainer">
+	<div id="outputConditionsDialog" class="dialogContents">
 		 <select id="outputSelect">
 		 	<option value="none"><fmt:message key="authoring.fla.page.dialog.cond.output.choose" /></option>
 		 </select>
@@ -941,13 +965,13 @@
 	
 	
 	<!-- EXPORT CANVAS AS IMAGE DIALOG -->
-	<div id="exportImageDialog" class="dialogContainer exportDialog">
+	<div id="exportImageDialog" class="dialogContents exportDialog">
 		<a href="#"><fmt:message key="authoring.fla.page.download.image" /></a>
 	</div>
 	
 	
 	<!-- EXPORT LEARNING DESIGN DIALOG -->
-	<div id="exportLDDialog" class="dialogContainer exportDialog">
+	<div id="exportLDDialog" class="dialogContents exportDialog">
 		<span><fmt:message key="authoring.fla.page.download.wait" /><br /><fmt:message key="authoring.fla.page.download.close" /></span>
 		<iframe></iframe>
 	</div>

@@ -303,633 +303,576 @@ GeneralInitLib = {
 	 */
 	initLayout : function(){
 		// buttons shared by both load and save dialogs
-		var sharedButtons = [
-		{
-		'id'	   : 'cancelButton',
-	    	'text'     : 'Cancel',
-	    	'tabIndex' : -1,
-	    	'click'    : function() {
-				$(this).dialog('close');
+		var ldStoreDialogContents = $('#ldStoreDialogContents');
+		
+		$('#ldStoreDialogCancelButton', ldStoreDialogContents).click(function(){
+			layout.ldStoreDialog.modal('hide');
+		});
+		
+		$('#ldStoreDialogNewFolderButton', ldStoreDialogContents).click(function(){
+    		var dialog = layout.ldStoreDialog,
+				tree = dialog.data('ldTree'),
+				// hightlighted sequence/folder in the tree
+				ldNode = tree.getHighlightedNode();
+    		if (!ldNode) {
+    			return;
+    		}
+    		
+			var	title = prompt(LABELS.NEW_FOLDER_TITLE_PROMPT);
+			// skip if no name was provided
+			if (!title) {
+				return;
 			}
-	    },
-	    	
-		// creates a new folder
-	    {
-			'class'    : 'leftDialogButton',
-			'text'     : LABELS.NEW_FOLDER_BUTTON,
-			'tabIndex' : -1,
-			'click'    : function(){
-	    		var dialog = $(this),
-					tree = dialog.dialog('option', 'ldTree'),
-					// hightlighted sequence/folder in the tree
-					ldNode = tree.getHighlightedNode();
-	    		if (!ldNode) {
-	    			return;
-	    		}
-	    		
-				var	title = prompt(LABELS.NEW_FOLDER_TITLE_PROMPT);
-				// skip if no name was provided
-				if (!title) {
-					return;
+			if (!GeneralLib.nameValidator.test(title)) {
+    			alert(LABELS.TITLE_VALIDATION_ERROR);
+    			return;
+    		}
+			
+			var parentFolder = ldNode.data.learningDesignId ? ldNode.parent : ldNode;
+			$.each(parentFolder.children, function(){
+				if (this.label == title) {
+					alert(LABELS.FOLDER_EXISTS_ERROR);
+					title = null;
+					return false;
 				}
-				if (!GeneralLib.nameValidator.test(title)) {
-	    			alert(LABELS.TITLE_VALIDATION_ERROR);
-	    			return;
-	    		}
-				
-				var parentFolder = ldNode.data.learningDesignId ? ldNode.parent : ldNode;
-				$.each(parentFolder.children, function(){
-					if (this.label == title) {
-						alert(LABELS.FOLDER_EXISTS_ERROR);
-						title = null;
-						return false;
-					}
-				});
-				if (!title) {
-					return;
-				}
-				
-				
-				$.ajax({
-					cache : false,
-					async : false,
-					url : LAMS_URL + "workspace.do",
-					dataType : 'text',
-					data : {
-						'method'         : 'createFolder',
-						'name' 		     : title,
-						'parentFolderID' : parentFolder.data.folderID
-					},
-					success : function() {
-						tree.removeChildren(parentFolder);
-						parentFolder.expand();
-					}
-				});
+			});
+			if (!title) {
+				return;
 			}
-		},
+			
+			
+			$.ajax({
+				cache : false,
+				async : false,
+				url : LAMS_URL + "workspace.do",
+				dataType : 'text',
+				data : {
+					'method'         : 'createFolder',
+					'name' 		     : title,
+					'parentFolderID' : parentFolder.data.folderID
+				},
+				success : function() {
+					tree.removeChildren(parentFolder);
+					parentFolder.expand();
+				}
+			});
+		});
 		
 		// copy sequence or folder
-	    {
-			'class'    : 'leftDialogButton',
-			'text'     : LABELS.COPY_BUTTON,
-			'tabIndex' : -1,
-			'click'    : function(){
-	    		var dialog = $(this),
-					tree = dialog.dialog('option', 'ldTree'),
-					// hightlighted sequence/folder in the tree
-					ldNode = tree.getHighlightedNode(),
-					isFolder = ldNode && !ldNode.data.learningDesignId;
-	    		if (!ldNode) {
-	    			return;
-	    		}
-	    		
-	    		dialog.dialog('option', 'copiedResource', {
-	    			'isFolder'   : isFolder,
-	    			'resourceID' : isFolder ?  ldNode.data.folderID : ldNode.data.learningDesignId
-	    		});
-			}
-		},
+		$('#ldStoreDialogCopyButton', ldStoreDialogContents).click(function(){
+    		var dialog = layout.ldStoreDialog,
+				tree = dialog.data('ldTree'),
+				// hightlighted sequence/folder in the tree
+				ldNode = tree.getHighlightedNode(),
+				isFolder = ldNode && !ldNode.data.learningDesignId;
+    		if (!ldNode) {
+    			return;
+    		}
+    		
+    		dialog.data('copiedResource', {
+    			'isFolder'   : isFolder,
+    			'resourceID' : isFolder ?  ldNode.data.folderID : ldNode.data.learningDesignId
+    		});
+		});
 		
 		// pastes sequence or folder
-	    {
-			'class'    : 'leftDialogButton',
-			'text'     : LABELS.PASTE_BUTTON,
-			'tabIndex' : -1,
-			'click'    : function(){
-	    		var dialog = $(this),
-					tree = dialog.dialog('option', 'ldTree'),
-					// hightlighted sequence/folder in the tree
-					ldNode = tree.getHighlightedNode(),
-					folderNode = ldNode ? (ldNode.data.learningDesignId ? ldNode.parent : ldNode) : null,
-					copiedResource = dialog.dialog('option','copiedResource');
-					
-				if (!folderNode || !copiedResource) {
-	    			return;
-	    		}
+		$('#ldStoreDialogPasteButton', ldStoreDialogContents).click(function(){
+    		var dialog = layout.ldStoreDialog,
+				tree = dialog.data('ldTree'),
+				// hightlighted sequence/folder in the tree
+				ldNode = tree.getHighlightedNode(),
+				folderNode = ldNode ? (ldNode.data.learningDesignId ? ldNode.parent : ldNode) : null,
+				copiedResource = dialog.data('copiedResource');
+				
+			if (!folderNode || !copiedResource) {
+    			return;
+    		}
 
-				$.ajax({
-					cache : false,
-					async : false,
-					url : LAMS_URL + "workspace.do",
-					dataType : 'text',
-					data : {
-						'method'         : 'copyResource',
-						'targetFolderID' : folderNode.data.folderID,
-						'resourceID'     : copiedResource.resourceID,
-						'resourceType'   : copiedResource.isFolder ? 'Folder' : 'LearningDesign'
-					},
-					success : function() {
-						tree.removeChildren(folderNode);
-						folderNode.expand();
-					}
-				});
-			}
-		},
+			$.ajax({
+				cache : false,
+				async : false,
+				url : LAMS_URL + "workspace.do",
+				dataType : 'text',
+				data : {
+					'method'         : 'copyResource',
+					'targetFolderID' : folderNode.data.folderID,
+					'resourceID'     : copiedResource.resourceID,
+					'resourceType'   : copiedResource.isFolder ? 'Folder' : 'LearningDesign'
+				},
+				success : function() {
+					tree.removeChildren(folderNode);
+					folderNode.expand();
+				}
+			});
+		});
 		
 		// removes sequence or folder
-	    {
-			'class'    : 'leftDialogButton',
-			'text'     : LABELS.DELETE_BUTTON,
-			'tabIndex' : -1,
-			'click'    : function(){
-	    		var dialog = $(this),
-					tree = dialog.dialog('option', 'ldTree'),
-					// hightlighted sequence/folder in the tree
-					ldNode = tree.getHighlightedNode();
-	    		if (!ldNode) {
-	    			return;
-	    		}
-	    		if (!ldNode.data.canModify) {
-	    			alert("You can not modify this");
-	    			return;
-	    		}
-	    		var isFolder = !ldNode.data.learningDesignId;
-	    		if (!confirm(LABELS.DELETE_NODE_CONFIRM + (isFolder ? LABELS.FOLDER : LABELS.SEQUENCE) + '?')) {
-	    			return;
-	    		}
-				
-				$.ajax({
-					cache : false,
-					async : false,
-					url : LAMS_URL + "workspace.do",
-					dataType : 'text',
-					data : {
-						'method'       : 'deleteResource',
-						'resourceID'   : isFolder? ldNode.data.folderID : ldNode.data.learningDesignId,
-						'resourceType' : isFolder ? 'Folder' : 'LearningDesign'
-					},
-					success : function() {
-						var parentFolder = ldNode.parent;
-						tree.removeChildren(parentFolder);
-						parentFolder.expand();
-					}
-				});
-			}
-		},
-		
+		$('#ldStoreDialogDeleteButton', ldStoreDialogContents).click(function(){
+    		var dialog = layout.ldStoreDialog,
+				tree = dialog.data('ldTree'),
+				// hightlighted sequence/folder in the tree
+				ldNode = tree.getHighlightedNode();
+    		if (!ldNode) {
+    			return;
+    		}
+    		if (!ldNode.data.canModify) {
+    			alert("You can not modify this");
+    			return;
+    		}
+    		var isFolder = !ldNode.data.learningDesignId;
+    		if (!confirm(LABELS.DELETE_NODE_CONFIRM + (isFolder ? LABELS.FOLDER : LABELS.SEQUENCE) + '?')) {
+    			return;
+    		}
+			
+			$.ajax({
+				cache : false,
+				async : false,
+				url : LAMS_URL + "workspace.do",
+				dataType : 'text',
+				data : {
+					'method'       : 'deleteResource',
+					'resourceID'   : isFolder? ldNode.data.folderID : ldNode.data.learningDesignId,
+					'resourceType' : isFolder ? 'Folder' : 'LearningDesign'
+				},
+				success : function() {
+					var parentFolder = ldNode.parent;
+					tree.removeChildren(parentFolder);
+					parentFolder.expand();
+				}
+			});
+		});
 		
 		// renames sequence or folder
-	    {
-			'class'    : 'leftDialogButton',
-			'text'     : LABELS.RENAME_BUTTON,
-			'tabIndex' : -1,
-			'click'    : function(){
-	    		var dialog = $(this),
-					tree = dialog.dialog('option', 'ldTree'),
-					// hightlighted sequence/folder in the tree
-					ldNode = tree.getHighlightedNode();
-	    		if (!ldNode) {
-	    			return;
-	    		}
-	    		if (!ldNode.data.canModify) {
-	    			alert("You can not modify this");
-	    			return;
-	    		}
-	    		var isFolder = !ldNode.data.learningDesignId,
-	    			title = prompt(LABELS.RENAME_TITLE_PROMPT + (isFolder ? LABELS.FOLDER : LABELS.SEQUENCE)
-							+ ' "' + ldNode.label + '"');
-				
-				// skip if no name or the same name was provided
-				if (!title || ldNode.label == title) {
-					return;
+		$('#ldStoreDialogRenameButton', ldStoreDialogContents).click(function(){
+    		var dialog = layout.ldStoreDialog,
+				tree = dialog.data('ldTree'),
+				// hightlighted sequence/folder in the tree
+				ldNode = tree.getHighlightedNode();
+    		if (!ldNode) {
+    			return;
+    		}
+    		if (!ldNode.data.canModify) {
+    			alert("You can not modify this");
+    			return;
+    		}
+    		var isFolder = !ldNode.data.learningDesignId,
+    			title = prompt(LABELS.RENAME_TITLE_PROMPT + (isFolder ? LABELS.FOLDER : LABELS.SEQUENCE)
+						+ ' "' + ldNode.label + '"');
+			
+			// skip if no name or the same name was provided
+			if (!title || ldNode.label == title) {
+				return;
+			}
+			if (!GeneralLib.nameValidator.test(title)) {
+    			alert(LABELS.TITLE_VALIDATION_ERROR);
+    			return;
+    		}
+			
+			$.each(ldNode.parent.children, function(){
+				if (this.label == title && (isFolder == (this.data.folderID != null))) {
+					alert(isFolder ? LABELS.FOLDER_EXISTS_ERROR : LABELS.SEQUENCE_EXISTS_ERROR);
+					title = null;
+					return false;
 				}
-				if (!GeneralLib.nameValidator.test(title)) {
-	    			alert(LABELS.TITLE_VALIDATION_ERROR);
-	    			return;
-	    		}
-				
-				$.each(ldNode.parent.children, function(){
-					if (this.label == title && (isFolder == (this.data.folderID != null))) {
-						alert(isFolder ? LABELS.FOLDER_EXISTS_ERROR : LABELS.SEQUENCE_EXISTS_ERROR);
-						title = null;
+			});
+			if (!title) {
+				return;
+			}
+			
+			$.ajax({
+				cache : false,
+				async : false,
+				url : LAMS_URL + "workspace.do",
+				dataType : 'text',
+				data : {
+					'method'       : 'renameResource',
+					'name' 		   : title,
+					'resourceID'   : isFolder? ldNode.data.folderID : ldNode.data.learningDesignId,
+					'resourceType' : isFolder ? 'Folder' : 'LearningDesign'
+				},
+				success : function(response) {
+					if (isFolder) {
+						ldNode.label = title;
+						ldNode.getLabelEl().innerHTML = title;
+					} else {
+						// refresh all opened folders in the tree
+	    				var folders = tree.getRoot().children;
+	    				if (folders) {
+	    					$.each(folders, function(){
+	    						var expanded = this.expanded;
+								tree.removeChildren(this);
+	    						if (expanded) {
+	    							this.expand();
+	    						}
+	    					});
+	    				}
+	    				
+	    				// fetch access list again
+						GeneralLib.updateAccess(null, true);
+					}
+				}
+			});
+		});
+	    
+		$('#ldStoreDialogSaveButton', ldStoreDialogContents).click(function(){
+    		var dialog = layout.ldStoreDialog,
+				title = $('#ldStoreDialogNameContainer input', dialog).val().trim();
+			if (!title) {
+				alert(LABELS.SAVE_SEQUENCE_TITLE_PROMPT);
+				return;
+			}
+			
+			if (!GeneralLib.nameValidator.test(title)) {
+				alert(LABELS.TITLE_VALIDATION_ERROR);
+				return;
+			}
+			
+			var learningDesignID = null,
+				folderNode = null,
+				folderID = null,
+				tree = dialog.data('ldTree'),
+				node = tree.getHighlightedNode();
+			if (node) {
+	    		// get folder from LD tree
+				folderNode = node.data.learningDesignId ? node.parent : node;
+				folderID = folderNode.data.folderID;
+			} else {
+				// get data from "recently used sequences" list
+				var selectedAccess = $('#ldStoreDialogAccessCell > div.selected', this);
+				// if title was altered, do not consider this an overwrite
+				if (selectedAccess.length > 0 && title == selectedAccess.text()) {
+					learningDesignID = +selectedAccess.attr('learningDesignId');
+					folderID = +selectedAccess.attr('folderID');
+					
+					var folders = tree.getRoot().children;
+					if (folders) {
+						$.each(folders, function(){
+							if (folderID == this.data.folderID) {
+								this.highlight();
+								folderNode = this;
+								return false;
+							}
+						});
+					}
+				}
+			}
+			
+			if (!folderID) {
+				// although an existing sequence can be highlighted 
+				alert(LABELS.FOLDER_NOT_SELECTED_ERROR);
+				return;
+			}
+			
+			// if a node is highlighted but user modified the title,
+			// it is considered a new sequence
+			// otherwise check if there is no other sequence with the same name
+			if (folderNode && folderNode.children) {
+				$.each(folderNode.children, function(){
+					if (this.label == title) {
+						this.highlight();
+						learningDesignID = this.data.learningDesignId;
 						return false;
 					}
 				});
-				if (!title) {
-					return;
-				}
-				
-				$.ajax({
-					cache : false,
-					async : false,
-					url : LAMS_URL + "workspace.do",
-					dataType : 'text',
-					data : {
-						'method'       : 'renameResource',
-						'name' 		   : title,
-						'resourceID'   : isFolder? ldNode.data.folderID : ldNode.data.learningDesignId,
-						'resourceType' : isFolder ? 'Folder' : 'LearningDesign'
-					},
-					success : function(response) {
-						if (isFolder) {
-							ldNode.label = title;
-							ldNode.getLabelEl().innerHTML = title;
-						} else {
-							// refresh all opened folders in the tree
-		    				var folders = tree.getRoot().children;
-		    				if (folders) {
-		    					$.each(folders, function(){
-		    						var expanded = this.expanded;
-									tree.removeChildren(this);
-		    						if (expanded) {
-		    							this.expand();
-		    						}
-		    					});
-		    				}
-		    				
-		    				// fetch access list again
-							GeneralLib.updateAccess(null, true);
-						}
-					}
-				});
 			}
-		}];
-	    
-		// initalise Learning Design load/save dialog
-		layout.ldStoreDialog = $('#ldStoreDialog').dialog({
-			'autoOpen'      : false,
-			'position'      : {
-				'my' : 'left top',
-				'at' : 'left top',
-				'of' :  'body'
-			},
-			'resizable'     : false,
-			'width'			: 1240,
-			'draggable'     : false,
-			'buttonsLoad' : sharedButtons.concat([
-			             {
-			            	'id'	 : 'openLdStoreButton',
-			            	'class'  : 'defaultFocus',
-			            	'text'   : LABELS.OPEN_BUTTON,
-			            	'click'  : function() {
-			            		var dialog = $(this),
-			            			tree = dialog.dialog('option', 'ldTree'),
-			            			ldNode = tree.getHighlightedNode(),
-			            			learningDesignID = ldNode ? ldNode.data.learningDesignId : null;
-			            		
-			            		if (!learningDesignID) {
-			            			learningDesignID = +$('#ldStoreDialogAccessCell > div.selected', this)
-			            							   .attr('learningDesignId');
-			            		}
-			            		
-			            		// no LD was chosen
-			            		if (!learningDesignID) {
-			            			alert(LABELS.SEQUENCE_NOT_SELECTED_ERROR);
-			            			return;
-			            		}
-			            		
-			            		dialog.dialog('close');
-			            		GeneralLib.openLearningDesign(learningDesignID);
-							}
-			             }
-			]),
-			
-			/**
-			 * Button for saving the current design.
-			 */
-			'buttonsSave' : sharedButtons.concat([
-				             {
-				            	'text'   : LABELS.SAVE_BUTTON,
-                                                'id'     : 'saveLdStoreButton',
-				            	'click'  : function() {	
-				            		var dialog = $(this),
-				            			container = dialog.closest('.ui-dialog'),
-				            			title = $('#ldStoreDialogNameField', container).val().trim();
-				            		if (!title) {
-				            			alert(LABELS.SAVE_SEQUENCE_TITLE_PROMPT);
-				            			return;
-				            		}
-				            		
-				            		if (!GeneralLib.nameValidator.test(title)) {
-				            			alert(LABELS.TITLE_VALIDATION_ERROR);
-				            			return;
-				            		}
-				            		
-				            		var learningDesignID = null,
-				            			folderNode = null,
-				            			folderID = null,
-				            			tree = dialog.dialog('option', 'ldTree'),
-				            			node = tree.getHighlightedNode();
-				            		if (node) {
-					            		// get folder from LD tree
-				            			folderNode = node.data.learningDesignId ? node.parent : node;
-				            			folderID = folderNode.data.folderID;
-				            		} else {
-				            			// get data from "recently used sequences" list
-				            			var selectedAccess = $('#ldStoreDialogAccessCell > div.selected', this);
-				            			// if title was altered, do not consider this an overwrite
-				            			if (selectedAccess.length > 0 && title == selectedAccess.text()) {
-				            				learningDesignID = +selectedAccess.attr('learningDesignId');
-				            				folderID = +selectedAccess.attr('folderID');
-				            				
-				            				var folders = tree.getRoot().children;
-				            				if (folders) {
-				            					$.each(folders, function(){
-				            						if (folderID == this.data.folderID) {
-				            							this.highlight();
-				            							folderNode = this;
-				            							return false;
-				            						}
-				            					});
-				            				}
-				            			}
-				            		}
-				            		
-				            		if (!folderID) {
-				            			// although an existing sequence can be highlighted 
-				            			alert(LABELS.FOLDER_NOT_SELECTED_ERROR);
-				            			return;
-				            		}
-				            		
-			            			// if a node is highlighted but user modified the title,
-			            			// it is considered a new sequence
-			            			// otherwise check if there is no other sequence with the same name
-				            		if (folderNode && folderNode.children) {
-				            			$.each(folderNode.children, function(){
-				            				if (this.label == title) {
-				            					this.highlight();
-				            					learningDesignID = this.data.learningDesignId;
-				            					return false;
-				            				}
-				            			});
-				            		}
-				            		if (learningDesignID
-				            				&& !confirm(LABELS.SEQUENCE_OVERWRITE_CONFIRM)) {
-				            			return;
-				            		}
-
-				            		var result = GeneralLib.saveLearningDesign(folderID, learningDesignID, title);
-				            		if (result) {
-				            			GeneralLib.openLearningDesign();
-				            			dialog.dialog('close');
-				            		}
-								}
-				             }
-			]),
-			
-			
-			/**'
-			 * Button for importing activities from an existing LD.
-			 */
-			'buttonsImportPart' : sharedButtons.concat([
-     			             {
-     			            	'id'	 : 'importPartLdStoreButton',
-     			            	'class'  : 'defaultFocus',
-     			            	'text'   : LABELS.IMPORT_BUTTON,
-     			            	'click'  : function() {
-     			            		var dialog = $(this),
-     			            			frameLayout = $('#ldStoreDialogImportPartFrame', dialog)[0].contentWindow.layout,
-     			            			selectedActivities = [],
-     			            			addActivities = [],
-     			            			selectedAnnotations = [];
-     			            			
-     			            		
-     			            		$.each(frameLayout.activities, function(){
-     			            			if (this.items.selectEffect) {
-     			            				selectedActivities.push(this);
-     			            				dialog.dialog('option', 'importActivity')(this, addActivities);
-     			            			}
-     			            		});
-     			            		$.each(frameLayout.regions.concat(frameLayout.labels), function(){
-     			            			if (this.items.selectEffect) {
-     			            				selectedAnnotations.push(this);
-     			            				// unlike importActivity(), this method already takes care of UIIDs
-     			            				// and adding new items to collections
-     			            				dialog.dialog('option', 'importAnnotation')(this);
-     			            			}
-     			            		});
-     			            		
-     			            		if (addActivities.length == 0 && selectedAnnotations.length == 0) {
-     			            			alert(LABELS.IMPORT_PART_CHOOSE_PROMPT);
-     			            			return;
-     			            		}
-     			            		
-     			            		// add child activities to containers (Optional/Parallel/Floating)
-     			            		if (addActivities.length > 0) {
-	     			            		$.each(addActivities, function(){
-	     			            			var activity = this;
-	     			            			if (activity.childActivities) {
-	     			            				$.each(selectedActivities, function(){
-		     			            				if (this.uiid == activity.uiid) {
-		     			            					$.each(this.childActivities, function(){
-		     			            						var childActivity = this;
-		     			            						$.each(addActivities, function(){
-		     			            							if (this.uiid == childActivity.uiid) {
-		     			            								if (!activity.childActivities) {
-		     			            									activity.childActivities = [];
-		     			            								}
-		     			            								activity.childActivities.push(this);
-		     			            								// container will expand to its child activities
-		     			            								activity.draw(0, 0);
-		     			            							}
-		     			            						});
-		     			            					});
-		     			            				}
-		     			            			});
-	     			            			}
-	     			            		});
-     			            			
-	     			            		// put UIID specific to current LD
-	     			            		$.each(addActivities, function(){
-	     			            			if (this instanceof ActivityDefs.BranchingEdgeActivity) {
-	     			            				if (this.isStart) {
-	     			            					this.branchingActivity.uiid = ++layout.ld.maxUIID;
-	     			            				}
-	     			            			} else {
-	     			            				this.uiid = ++layout.ld.maxUIID;
-	     			            			}
-	     			            		});
-	     			            		
-	     			            		// arrange just the new activities
-	     			            		GeneralLib.arrangeActivities(addActivities);
-	     			            		
-	     			            		layout.activities = layout.activities.concat(addActivities);
-     			            		}
-     	
-     			            		dialog.dialog('close');
-     							}
-     			           }
-     		]),
-			             			
-			'open' : function(){
-				// calculate initial height of the table and maximum height of LD list
-				var documentHeight = +$(document).height();
-				$('table', this).css('height', documentHeight - 120 + 'px');
-				$('#ldStoreDialogTree', this).css('max-height', documentHeight - 285 + 'px');
-				
-				GeneralLib.showLearningDesignThumbnail();
-				
-				$('#leftDialogButtonContainer').remove();
-				var nameContainer = $('#ldStoreDialogNameContainer'),
-					leftButtonContainer = $('<div />').attr('id','leftDialogButtonContainer');
-				$('input', nameContainer).val($(this).dialog('option', 'learningDesignTitle'));
-				$(this).siblings('.ui-dialog-buttonpane').append(leftButtonContainer).append(nameContainer);
-
-				$('.leftDialogButton')
-				   .attr('disabled', 'disabled')
-				   .button('option', 'disabled', true)
-				   .appendTo(leftButtonContainer);
-				$('.defaultFocus').focus();
-				
-				$(this).dialog('option', 'copiedResource', null);
-			},
-			
-			/**
-			 * Extracts a selected activity from another LD.
-			 */
-			'importActivity' : function(activity, addActivities) {
-				$.each(addActivities, function(){
-					if (this.uiid == activity.uiid) {
-						return;
-					}
-				});
-				
-				// activities in the another LD have different clousures, so they can not be imported directly
-				// they need to be recreated from a scratch with current LD being their context
-				var frameWindow = $('#ldStoreDialogImportPartFrame', layout.ldStoreDialog)[0].contentWindow,
-	     			frameActivities = frameWindow.layout.activities,
-	     			frameActivityDefs = frameWindow.ActivityDefs,
-	     			// the local activity
-	     			addActivity = null;
-
-				if (activity instanceof frameActivityDefs.BranchingEdgeActivity) {
-					// add both branching edges right away
-					if (activity.isStart) {
-						var branchingActivity = activity.branchingActivity,
-							branchingEdge = addActivity = new ActivityDefs.BranchingEdgeActivity(
-								null, branchingActivity.uiid, 0, 0, branchingActivity.title, false, branchingActivity.branchingType);
-						
-						branchingEdge = new ActivityDefs.BranchingEdgeActivity(
-								null, null, 0, 0, null, null, false, branchingEdge.branchingActivity);
-						addActivities.push(branchingEdge);
-						
-						if (branchingActivity.branchingType == 'optional'){
-							branchingEdge.branchingActivity.minOptions = branchingActivity.minOptions;
-							branchingEdge.branchingActivity.maxOptions = branchingActivity.maxOptions;
-						}
-					}
-				} else if (activity instanceof frameActivityDefs.FloatingActivity) {
-					if (layout.floatingActivity) {
-						return;
-					}
-					addActivity = new ActivityDefs.FloatingActivity(null, activity.uiid, 0, 0);
-				} else if (activity instanceof frameActivityDefs.GateActivity) {
-					addActivity = new ActivityDefs.GateActivity(
-							null, activity.uiid, 0, 0, activity.title, activity.description, false, activity.gateType,
-							activity.startTimeoffset, activity.gateActivityCompletionBased
-							);
-				} else if (activity instanceof frameActivityDefs.GroupingActivity) {
-					addActivity = new ActivityDefs.GroupingActivity(
-							null, activity.uiid, 0, 0, activity.title, false, null, null, activity.groupingType, activity.groupDivide,
-							activity.groupCount, activity.learnerCount, activity.equalSizes, activity.viewLearners, null
-							);
-				} else if (activity instanceof frameActivityDefs.OptionalActivity) {
-					addActivity = new ActivityDefs.OptionalActivity(
-							null, activity.uiid, 0, 0, activity.title, false, activity.minOptions, activity.maxOptions
-							);
-				} else if (activity instanceof frameActivityDefs.ParallelActivity) {
-					addActivity = new ActivityDefs.ParallelActivity(
-							null, activity.uiid, activity.learningLibraryID, 0, 0, activity.title
-							);
-				} else if (activity instanceof frameActivityDefs.ToolActivity) {
-					// copy tool content
-					var toolContentID = null;
-					// tool content ID can be null if the activity had the default content, i.e. was not edited yet
-					if (activity.toolContentID) {
-						$.ajax({
-							cache : false,
-							async : false,
-							url : LAMS_URL + "authoring/author.do",
-							data : {
-								'method'        : 'copyToolContent',
-								'toolContentID' : activity.toolContentID
-							},
-							dataType : 'text',
-							success : function(response) {
-								toolContentID = response;
-							}
-						});
-					}
-					
-					addActivity = new ActivityDefs.ToolActivity(
-							null, activity.uiid, toolContentID, activity.toolID, activity.learningLibraryID, null, 0, 0, activity.title
-							);
-				}
-				
-				// recreate the transitions
-				if (addActivity) {
-					if (activity.transitions) {
-						$.each(activity.transitions.from, function(){
-							var transition = this;
-							$.each(addActivities, function(){
-								// special processing for transitions from/to branching edges
-								var uiid = this instanceof ActivityDefs.BranchingEdgeActivity
-								 		 ? this.branchingActivity.uiid : this.uiid,
-									toUiid = transition.toActivity instanceof frameActivityDefs.BranchingEdgeActivity
-										   ? transition.toActivity.branchingActivity.uiid : transition.toActivity.uiid;
-								// isStart can be undefined, true or false
-								if (uiid == toUiid && this.isStart == transition.toActivity.isStart) {
-									ActivityLib.addTransition(addActivity, this, true, null, null,
-															  transition.branch ? transition.branch.title : null);
-									return false;
-								}
-							});
-						});
-						
-						$.each(activity.transitions.to, function(){
-							var transition = this;
-							$.each(addActivities, function(){
-								var uiid = this instanceof ActivityDefs.BranchingEdgeActivity
-										 ? this.branchingActivity.uiid : this.uiid,
-									fromUiid = transition.fromActivity instanceof frameActivityDefs.BranchingEdgeActivity
-										 ? transition.fromActivity.branchingActivity.uiid : transition.fromActivity.uiid;
-								if (uiid == fromUiid && this.isStart == transition.fromActivity.isStart) {
-									ActivityLib.addTransition(this, addActivity, true, null, null,
-															  transition.branch ? transition.branch.title : null);
-									return false;
-								}
-							});
-						});
-					}
-
-					addActivities.push(addActivity);
-				}
-			},
-			
-			/**
-			 * Extracts a selected annotation from another LD.
-			 */
-			'importAnnotation' : function(annotation) {
-				// annotations in the another LD have different clousures, so they can not be imported directly
-				// they need to be recreated from a scratch with current LD being their context
-				var frameWindow = $('#ldStoreDialogImportPartFrame', layout.ldStoreDialog)[0].contentWindow,
-	     			frameDecorationDefs = frameWindow.DecorationDefs,
-	     			box = annotation.items.shape.getBBox();
-
-				// there are no transitions or child/parent relations, so they can be directly recreated
-				if (annotation instanceof frameDecorationDefs.Region) {
-					DecorationLib.addRegion(box.x, box.y, box.x2, box.y2, annotation.title, annotation.items.shape.attr('fill'));
-				} else if (annotation instanceof frameDecorationDefs.Label) {
-					DecorationLib.addLabel(box.x, box.y, annotation.title);
-				}
+			if (learningDesignID
+					&& !confirm(LABELS.SEQUENCE_OVERWRITE_CONFIRM)) {
+				return;
+			}
+	
+			var result = GeneralLib.saveLearningDesign(folderID, learningDesignID, title);
+			if (result) {
+				GeneralLib.openLearningDesign();
+				dialog.modal('hide');
 			}
 		});
+		
+		$('#ldStoreDialogOpenButton', ldStoreDialogContents).click(function(){
+    		var dialog = layout.ldStoreDialog,
+				tree = dialog.data('ldTree'),
+				ldNode = tree.getHighlightedNode(),
+				learningDesignID = ldNode ? ldNode.data.learningDesignId : null;
+		
+			if (!learningDesignID) {
+				learningDesignID = +$('#ldStoreDialogAccessCell > div.selected', this)
+								   .attr('learningDesignId');
+			}
+			
+			// no LD was chosen
+			if (!learningDesignID) {
+				alert(LABELS.SEQUENCE_NOT_SELECTED_ERROR);
+				return;
+			}
+			
+			dialog.modal('hide');
+			GeneralLib.openLearningDesign(learningDesignID);
+		});
+		
+		$('#ldStoreDialogImportPartButton', ldStoreDialogContents).click(function(){
+			var dialog = layout.ldStoreDialog,
+	 			frameLayout = $('#ldStoreDialogImportPartFrame', dialog)[0].contentWindow.layout,
+	 			selectedActivities = [],
+	 			addActivities = [],
+	 			selectedAnnotations = [];
+ 			
+ 		
+	 		$.each(frameLayout.activities, function(){
+	 			if (this.items.selectEffect) {
+	 				selectedActivities.push(this);
+	 				dialog.data('importActivity')(this, addActivities);
+	 			}
+	 		});
+	 		$.each(frameLayout.regions.concat(frameLayout.labels), function(){
+	 			if (this.items.selectEffect) {
+	 				selectedAnnotations.push(this);
+	 				// unlike importActivity(), this method already takes care of UIIDs
+	 				// and adding new items to collections
+	 				dialog.data('importAnnotation')(this);
+	 			}
+	 		});
+	 		
+	 		if (addActivities.length == 0 && selectedAnnotations.length == 0) {
+	 			alert(LABELS.IMPORT_PART_CHOOSE_PROMPT);
+	 			return;
+	 		}
+	 		
+	 		// add child activities to containers (Optional/Parallel/Floating)
+	 		if (addActivities.length > 0) {
+	     		$.each(addActivities, function(){
+	     			var activity = this;
+	     			if (activity.childActivities) {
+	     				$.each(selectedActivities, function(){
+	         				if (this.uiid == activity.uiid) {
+	         					$.each(this.childActivities, function(){
+	         						var childActivity = this;
+	         						$.each(addActivities, function(){
+	         							if (this.uiid == childActivity.uiid) {
+	         								if (!activity.childActivities) {
+	         									activity.childActivities = [];
+	         								}
+	         								activity.childActivities.push(this);
+	         								// container will expand to its child activities
+	         								activity.draw(0, 0);
+	         							}
+	         						});
+	         					});
+	         				}
+	         			});
+	     			}
+	     		});
+	 			
+	     		// put UIID specific to current LD
+	     		$.each(addActivities, function(){
+	     			if (this instanceof ActivityDefs.BranchingEdgeActivity) {
+	     				if (this.isStart) {
+	     					this.branchingActivity.uiid = ++layout.ld.maxUIID;
+	     				}
+	     			} else {
+	     				this.uiid = ++layout.ld.maxUIID;
+	     			}
+	     		});
+	     		
+	     		// arrange just the new activities
+	     		GeneralLib.arrangeActivities(addActivities);
+	     		
+	     		layout.activities = layout.activities.concat(addActivities);
+	 		}
+	
+	 		dialog.modal('hide');
+		});
+		
+		// initalise Learning Design load/save dialog
+		layout.ldStoreDialog = showDialog('ldStoreDialog',{
+			'autoOpen'      : false,
+			'resizable'     : false,
+			'draggable'     : false,
+					
+			'open' : function(){
+				var dialog = $(this);
+				$('.modal-dialog', dialog).width(Math.max(500, $(window).width() - 50));
+				$('.modal-content', dialog).height(Math.max(375, $(window).height() - 65));
+				$('#ldStoreDialogTree', dialog).css('max-height', Math.max(90, $(window).height() - 325) + 'px');
+				
+				GeneralLib.showLearningDesignThumbnail();
+				$('#ldStoreDialogLeftButtonContainer button', dialog).prop('disabled', true);
+				
+				dialog.data('copiedResource', null);
+			},
+			'close' : null,
+			'data' : {
+				'prepareForOpen' : function(dialogTitle, learningDesignTitle, shownElementIDs, highlightFirstTreeChild){
+					var tree = MenuLib.loadLearningDesignTree();
+					if (highlightFirstTreeChild) {
+						tree.getRoot().children[0].highlight();
+					}
+					
+					$('#ldStoreDialogNameContainer input', layout.ldStoreDialog).val(learningDesignTitle);
+					$('.modal-title', layout.ldStoreDialog).text(dialogTitle);
+					var rightButtons = $('#ldStoreDialogRightButtonContainer', layout.ldStoreDialog);
+					$('button', rightButtons).hide();
+					$('#ldStoreDialogNameContainer', layout.ldStoreDialog).hide();
+					$(shownElementIDs, layout.ldStoreDialog).show();
+				},
+				/**
+				 * Extracts a selected activity from another LD.
+				 */
+				'importActivity' : function(activity, addActivities) {
+					$.each(addActivities, function(){
+						if (this.uiid == activity.uiid) {
+							return;
+						}
+					});
+					
+					// activities in the another LD have different clousures, so they can not be imported directly
+					// they need to be recreated from a scratch with current LD being their context
+					var frameWindow = $('#ldStoreDialogImportPartFrame', layout.ldStoreDialog)[0].contentWindow,
+		     			frameActivities = frameWindow.layout.activities,
+		     			frameActivityDefs = frameWindow.ActivityDefs,
+		     			// the local activity
+		     			addActivity = null;
+	
+					if (activity instanceof frameActivityDefs.BranchingEdgeActivity) {
+						// add both branching edges right away
+						if (activity.isStart) {
+							var branchingActivity = activity.branchingActivity,
+								branchingEdge = addActivity = new ActivityDefs.BranchingEdgeActivity(
+									null, branchingActivity.uiid, 0, 0, branchingActivity.title, false, branchingActivity.branchingType);
+							
+							branchingEdge = new ActivityDefs.BranchingEdgeActivity(
+									null, null, 0, 0, null, null, false, branchingEdge.branchingActivity);
+							addActivities.push(branchingEdge);
+							
+							if (branchingActivity.branchingType == 'optional'){
+								branchingEdge.branchingActivity.minOptions = branchingActivity.minOptions;
+								branchingEdge.branchingActivity.maxOptions = branchingActivity.maxOptions;
+							}
+						}
+					} else if (activity instanceof frameActivityDefs.FloatingActivity) {
+						if (layout.floatingActivity) {
+							return;
+						}
+						addActivity = new ActivityDefs.FloatingActivity(null, activity.uiid, 0, 0);
+					} else if (activity instanceof frameActivityDefs.GateActivity) {
+						addActivity = new ActivityDefs.GateActivity(
+								null, activity.uiid, 0, 0, activity.title, activity.description, false, activity.gateType,
+								activity.startTimeoffset, activity.gateActivityCompletionBased
+								);
+					} else if (activity instanceof frameActivityDefs.GroupingActivity) {
+						addActivity = new ActivityDefs.GroupingActivity(
+								null, activity.uiid, 0, 0, activity.title, false, null, null, activity.groupingType, activity.groupDivide,
+								activity.groupCount, activity.learnerCount, activity.equalSizes, activity.viewLearners, null
+								);
+					} else if (activity instanceof frameActivityDefs.OptionalActivity) {
+						addActivity = new ActivityDefs.OptionalActivity(
+								null, activity.uiid, 0, 0, activity.title, false, activity.minOptions, activity.maxOptions
+								);
+					} else if (activity instanceof frameActivityDefs.ParallelActivity) {
+						addActivity = new ActivityDefs.ParallelActivity(
+								null, activity.uiid, activity.learningLibraryID, 0, 0, activity.title
+								);
+					} else if (activity instanceof frameActivityDefs.ToolActivity) {
+						// copy tool content
+						var toolContentID = null;
+						// tool content ID can be null if the activity had the default content, i.e. was not edited yet
+						if (activity.toolContentID) {
+							$.ajax({
+								cache : false,
+								async : false,
+								url : LAMS_URL + "authoring/author.do",
+								data : {
+									'method'        : 'copyToolContent',
+									'toolContentID' : activity.toolContentID
+								},
+								dataType : 'text',
+								success : function(response) {
+									toolContentID = response;
+								}
+							});
+						}
+						
+						addActivity = new ActivityDefs.ToolActivity(
+								null, activity.uiid, toolContentID, activity.toolID, activity.learningLibraryID, null, 0, 0, activity.title
+								);
+					}
+					
+					// recreate the transitions
+					if (addActivity) {
+						if (activity.transitions) {
+							$.each(activity.transitions.from, function(){
+								var transition = this;
+								$.each(addActivities, function(){
+									// special processing for transitions from/to branching edges
+									var uiid = this instanceof ActivityDefs.BranchingEdgeActivity
+									 		 ? this.branchingActivity.uiid : this.uiid,
+										toUiid = transition.toActivity instanceof frameActivityDefs.BranchingEdgeActivity
+											   ? transition.toActivity.branchingActivity.uiid : transition.toActivity.uiid;
+									// isStart can be undefined, true or false
+									if (uiid == toUiid && this.isStart == transition.toActivity.isStart) {
+										ActivityLib.addTransition(addActivity, this, true, null, null,
+																  transition.branch ? transition.branch.title : null);
+										return false;
+									}
+								});
+							});
+							
+							$.each(activity.transitions.to, function(){
+								var transition = this;
+								$.each(addActivities, function(){
+									var uiid = this instanceof ActivityDefs.BranchingEdgeActivity
+											 ? this.branchingActivity.uiid : this.uiid,
+										fromUiid = transition.fromActivity instanceof frameActivityDefs.BranchingEdgeActivity
+											 ? transition.fromActivity.branchingActivity.uiid : transition.fromActivity.uiid;
+									if (uiid == fromUiid && this.isStart == transition.fromActivity.isStart) {
+										ActivityLib.addTransition(this, addActivity, true, null, null,
+																  transition.branch ? transition.branch.title : null);
+										return false;
+									}
+								});
+							});
+						}
+	
+						addActivities.push(addActivity);
+					}
+				},
+				
+				/**
+				 * Extracts a selected annotation from another LD.
+				 */
+				'importAnnotation' : function(annotation) {
+					// annotations in the another LD have different clousures, so they can not be imported directly
+					// they need to be recreated from a scratch with current LD being their context
+					var frameWindow = $('#ldStoreDialogImportPartFrame', layout.ldStoreDialog)[0].contentWindow,
+		     			frameDecorationDefs = frameWindow.DecorationDefs,
+		     			box = annotation.items.shape.getBBox();
+	
+					// there are no transitions or child/parent relations, so they can be directly recreated
+					if (annotation instanceof frameDecorationDefs.Region) {
+						DecorationLib.addRegion(box.x, box.y, box.x2, box.y2, annotation.title, annotation.items.shape.attr('fill'));
+					} else if (annotation instanceof frameDecorationDefs.Label) {
+						DecorationLib.addLabel(box.x, box.y, annotation.title);
+					}
+				}
+			}
+		}, false);
+		
+		$('.modal-body', layout.ldStoreDialog).empty().append(ldStoreDialogContents.children());
+		ldStoreDialogContents.remove();
 		
 		layout.dialogs.push(layout.ldStoreDialog);
 
 		$('#ldStoreDialogImportPartFrame').load(function() {
-			if (!$(this).attr('src')){
+			var frame = $(this);
+			if (!frame.attr('src')){
 				return;
 			}
-			
-		    $(this).css('visibility', 'visible').height(+$(this).contents().find('svg').attr('height') + 40);
+		    frame.css('visibility', 'visible').height(+frame.contents().find('svg').attr('height') + 40);
 		});
 		
 		// there should be no focus, just highlight
 		YAHOO.widget.TreeView.FOCUS_CLASS_NAME = null;
 		var tree = new YAHOO.widget.TreeView('ldStoreDialogTree');
 		// store the tree in the dialog's data
-		layout.ldStoreDialog.dialog('option', 'ldTree', tree);
+		layout.ldStoreDialog.data('ldTree', tree);
 		// make folder contents load dynamically on open
 		tree.setDynamicLoad(function(node, callback){
 			// load subfolder contents
@@ -946,11 +889,10 @@ GeneralInitLib = {
 		});
 		tree.singleNodeHighlight = true;
 		tree.subscribe('clickEvent', function(event){
-			var isSaveDialog = layout.ldStoreDialog.closest('.ui-dialog').hasClass('ldStoreDialogSave');
+			var isSaveDialog = $('#ldStoreDialogSaveButton', layout.ldStoreDialog).is(':visible');
 		
-			$('.leftDialogButton')
-			   .attr('disabled', event.node.highlightState > 0 ? 'disabled' : null)
-			   .button('option', 'disabled', event.node.highlightState > 0);
+			$('#ldStoreDialogLeftButtonContainer button', layout.ldStoreDialog)
+				.prop('disabled', event.node.highlightState > 0);
 
 			if (!isSaveDialog && !event.node.data.learningDesignId){
 				// it is a folder in load sequence dialog, highlight but stop processing
@@ -2649,12 +2591,12 @@ GeneralLib = {
 	 */
 	showLearningDesignThumbnail : function(learningDesignID, title) {
 		// display "loading" animation and finally LD thumbnail
-		$('.ldChoiceDependentCanvasElement').hide();
+		$('#ldScreenshotAuthor, #ldScreenshotLoading', layout.ldStoreDialog).hide();
 		// the "import part" frame can't use "display:none" CSS attribute as its JS won't execute right
 		$('#ldStoreDialogImportPartFrame', layout.ldStoreDialog).css('visibility', 'hidden');
 		
 		if (learningDesignID) {
-			if (layout.ldStoreDialog.closest('.ui-dialog').hasClass('ldStoreDialogImportPart')) {
+			if ($('#ldStoreDialogImportPartButton', layout.ldStoreDialog).is(':visible')) {
 				// get read-only Authoring of the chosen LD and prevent caching
 				$('#ldStoreDialogImportPartFrame', layout.ldStoreDialog).attr('src',
 				  LAMS_URL + 'authoring/author.do?method=generateSVG&selectable=true&learningDesignID='
@@ -2669,7 +2611,7 @@ GeneralLib = {
 					cache : false,
 					success : function(response) {
 						// hide "loading" animation
-						$('.ldChoiceDependentCanvasElement', layout.ldStoreDialog).hide();
+						$('#ldScreenshotLoading', layout.ldStoreDialog).hide();
 						// show the thumbnail
 						$('#ldScreenshotAuthor', layout.ldStoreDialog).html(response).show();
 					},
@@ -2696,10 +2638,10 @@ GeneralLib = {
 			
 			if (title) {
 				// copy title of the highligthed sequence to title field
-				$('#ldStoreDialogNameField').val(title).focus();
+				$('#ldStoreDialogNameContainer input', layout.ldStoreDialog).val(title).focus();
 			}
 			
-			var tree =  layout.ldStoreDialog.dialog('option', 'ldTree'),
+			var tree =  layout.ldStoreDialog.data('ldTree'),
 				ldNode = tree.getHighlightedNode();
 				// no LD was chosen
 			if (ldNode && learningDesignID != ldNode.data.learningDesignId) {

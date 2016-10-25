@@ -21,8 +21,8 @@ a.ygtvspacer {
 	text-align: center;
 }
 
-#loadingOverlay img {
-	margin-top: 35%;
+#loadingOverlay * {
+	margin-top: 20%;
 }
 
 .dialogContainer {
@@ -52,7 +52,7 @@ a.ygtvspacer {
 	cursor: move;
 }
 
-div.dialogContainer, .ldChoiceDependentCanvasElement {
+div.dialogContents, #ldScreenshotAuthor, #ldScreenshotLoading {
 	display: none;
 }
 
@@ -129,9 +129,21 @@ div#exportLDDialog {
 }
 
 
-div#ldStoreDialog > table {
+
+div#ldStoreDialog .modal-body > table {
+	height: 100%;
 	width: 100%;
-	table-layout: fixed;
+	border-collapse: separate;
+}
+
+div#ldStoreDialog #ldStoreDialogButtonCell {
+	height: 40px;
+	border-top: thin dotted #2E6E9E;
+	padding-top: 5px;
+}
+
+div#ldStoreDialog #ldStoreDialogButtonCell > div > div {
+	display: inline-block;
 }
 
 div#ldStoreDialog td#ldStoreDialogTreeCell {
@@ -188,28 +200,17 @@ div#ldStoreDialog #ldStoreDialogImportPartFrame {
 	width: 99%;
 }
 
-.ldStoreDialogLoad .ldStoreDialogSaveOnly,
-.ldStoreDialogImportPart .ldStoreDialogSaveOnly {
-	display: none;
+div#ldStoreDialog div#ldStoreDialogNameContainer {
+	margin-left: 20px;
 }
 
-div#leftDialogButtonContainer {
-	float: left;
-	margin-left: 10px;
-}
-
-div#ldStoreDialogNameContainer {
-	float: left;
-	padding: 8px 0 0 215px;
-}
-
-div#ldStoreDialogNameContainer span {
+div#ldStoreDialog div#ldStoreDialogNameContainer span {
 	font-weight: bold;
 }
 
-#ldStoreDialogNameContainer input#ldStoreDialogNameField {
+div#ldStoreDialog #ldStoreDialogNameContainer input {
 	width: 300px;
-	margin-left: 20px;	
+	margin-left: 10px;	
 }
 
 
@@ -368,14 +369,13 @@ td#canvasContainerCell {
 }
 
 #ldDescriptionDiv {
-	background-color: rgb(219, 230, 252);
 	z-index: 1099;
+	border-bottom: 1px solid black;
 }
 
 #ldDescriptionDiv #ldDescriptionTitleContainer {
 	padding: 2px 0 0 0;
 	text-align: center;
-	font-family: "Lucida Console", Monaco, monospace;
 	font-size: 12px;
 	cursor: pointer;
 }
@@ -391,12 +391,11 @@ td#canvasContainerCell {
 }
 
 #ldDescriptionDiv .ldDescriptionLabel {
-	font-family: "Lucida Console", Monaco, monospace;
 	font-size: 12px;
 }
 
 #ldDescriptionDiv #ldDescriptionEditorContainer {
-	margin: -15px 0 15px 0;
+	margin: -15px 15px 15px 0;
 }
 
 #ldDescriptionDiv #ldDescriptionLicenseTextContainer,
