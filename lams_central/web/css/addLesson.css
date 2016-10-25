@@ -9,8 +9,8 @@
 	text-align: center;
 }
 
-#loadingOverlay img {
-	margin-top: 35%;
+#loadingOverlay * {
+	margin-top: 20%;
 }
 
 #content {

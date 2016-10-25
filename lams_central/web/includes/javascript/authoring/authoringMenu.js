@@ -5,62 +5,6 @@
 var MenuLib = {
 		
 	init : function(){
-		// add jQuery UI button functionality
-		$('.ui-button').button();
-		$(".split-ui-button").each(function(){
-			// drop down buttons
-			var buttonContainer = $(this);
-			var buttons = buttonContainer.children();
-			
-			buttons.first().button()
-				   .next().button({
-				text : false,
-				icons : {
-					primary : "ui-icon-triangle-1-s"
-				}
-			});
-			
-			buttons.each(function(){
-				var button = $(this);
-				if (!button.attr('onclick')) {
-					button.click(function() {
-						var menu = $(this).parent().next().show().position({
-							my : "left top+2px",
-							at : "left bottom",
-							of : $(this).parent()
-						});
-						$(document).one("click", function() {
-							menu.hide();
-						});
-						return false;
-					});
-				}
-			});
-			
-			buttonContainer.buttonset().next().hide().menu().children().each(function(){
-				var menuItem = $(this),
-					subMenu = menuItem.children('ul');
-				if (subMenu.length > 0){
-					menuItem.click(function(){
-						// do not show the submenu when the button is disabled
-						if ($(this).attr('disabled') == 'disabled') {
-							return;
-						}
-						var menu = $(this).children('ul').show().position({
-							my : "left+2px top",
-							at : "right top",
-							of : this
-						});
-						$(document).one("click", function() {
-							menu.hide();
-						});
-						return false;
-					});
-				}
-			});
-		});
-		
-		
 		// dialog allowing to save canvas as SVG or PNG image
 		layout.exportImageDialog = $('#exportImageDialog').dialog({
 			'autoOpen' : false,
@@ -564,17 +508,9 @@ var MenuLib = {
 	 * Opens "Import activities" dialog where an user can choose activities from an existing Learning Design. 
 	 */
 	importPartLearningDesign : function(){
-		// remove the directory tree, if it remained for last dialog opening
-		layout.ldStoreDialog.dialog('option', {
-			'title'  			  : LABELS.IMPORT_PART_DIALOG_TITLE,
-			'learningDesignTitle' : null,
-			'buttons' 			  : layout.ldStoreDialog.dialog('option', 'buttonsImportPart'),
-			// it informs widgets that it is the import part dialog
-			'dialogClass'		  : 'ldStoreDialogImportPart'
-		})			   
-		.dialog('open');
-		
-		MenuLib.loadLearningDesignTree();
+		layout.ldStoreDialog.data('prepareForOpen')(LABELS.IMPORT_PART_DIALOG_TITLE, null,
+				'#ldStoreDialogImportPartButton, #ldStoreDialogCancelButton', false);
+		layout.ldStoreDialog.modal('show');
 	},
 	
 	
@@ -582,7 +518,7 @@ var MenuLib = {
 	 * Loads Learning Design Tree from DB
 	 */
 	loadLearningDesignTree : function(){
-		var tree = layout.ldStoreDialog.dialog('option', 'ldTree'),
+		var tree = layout.ldStoreDialog.data('ldTree'),
 			rootNode = tree.getRoot();
 		// remove existing folders
 		$.each(rootNode.children, function(){
@@ -603,17 +539,9 @@ var MenuLib = {
 	 * Opens "Open sequence" dialog where an user can choose a Learning Design to load.
 	 */
 	openLearningDesign : function(){
-		// remove the directory tree, if it remained for last dialog opening
-		layout.ldStoreDialog.dialog('option', {
-			'title'  			  : LABELS.OPEN_DIALOG_TITLE,
-			'learningDesignTitle' : null,
-			'buttons' 			  : layout.ldStoreDialog.dialog('option', 'buttonsLoad'),
-			// it informs widgets that it is load dialog
-			'dialogClass'		  : 'ldStoreDialogLoad'
-		})	   
-		.dialog('open');
-		
-		MenuLib.loadLearningDesignTree();
+		layout.ldStoreDialog.data('prepareForOpen')(LABELS.OPEN_DIALOG_TITLE, null,
+				'#ldStoreDialogOpenButton, #ldStoreDialogCancelButton', false);
+		layout.ldStoreDialog.modal('show');
 	},
 
 	
@@ -743,18 +671,12 @@ var MenuLib = {
 			return;
 		}
 		
-		// remove the directory tree, if it remained for last dialog opening
-		layout.ldStoreDialog.dialog('option', {
-			'title'				  : LABELS.SAVE_DIALOG_TITLE,
-			'learningDesignTitle' : layout.ld.title,
-			'buttons'			  : layout.ldStoreDialog.dialog('option', 'buttonsSave'),
-			// it informs widgets that it is saved dialog
-			'dialogClass'		  : 'ldStoreDialogSave'
-		})			   
-		.dialog('open');
-		
-		var tree = MenuLib.loadLearningDesignTree();
-		tree.getRoot().children[0].highlight();
+		layout.ldStoreDialog.data('prepareForOpen')(LABELS.SAVE_DIALOG_TITLE, layout.ld.title,
+				'#ldStoreDialogSaveButton, #ldStoreDialogCancelButton, #ldStoreDialogNameContainer', true);
+		layout.ldStoreDialog.on('shown.bs.modal', function(){
+			$('#ldStoreDialogNameContainer input', layout.ldStoreDialog).focus();
+		});
+		layout.ldStoreDialog.modal('show');
 	},
 	
 	

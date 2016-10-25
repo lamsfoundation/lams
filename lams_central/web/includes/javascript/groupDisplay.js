@@ -16,14 +16,14 @@ function initMainPage() {
 	}
 	
 	refreshPrivateNotificationCount();
-}
-
+			}
+	
 function selectOrganisation(newOrgId) {
 	//remove active CSS class from the old org
 	if (activeOrgId > 0) {
 		$("#org-row-" + activeOrgId).removeClass("active");
 		$("#org-row-" + activeOrgId + " a>i").remove();
-	}	
+	}
 	
 	//add active CSS class
 	$("#org-row-" + newOrgId).addClass("active");
@@ -31,21 +31,21 @@ function selectOrganisation(newOrgId) {
 	
 	activeOrgId = newOrgId;
 	loadOrganisation();
-	
+
 	//store last visited
 	// TODO
-}
-
+	}
+		
 function loadOrganisation() {	
 	$("#org-container").load(
-		"displayGroup.do",
-		{
-			stateId : stateId,
+			"displayGroup.do",
+			{
+				stateId : stateId,
 			orgId   : activeOrgId
-		},
-		function() {
+			},
+			function() {
 			initButtons("org-container");
-		}
+	}
 	);
 }
 
@@ -581,9 +581,9 @@ function showSearchLessonDialog(orgID){
 
 function showAuthoringDialog(learningDesignID){
 	showDialog('dialogAuthoring', {
-		'height' : $(window).height() - 40,
+		'height' : Math.max(300, $(window).height() - 40),
 		'width' : 1280,
-		'title' : 'Authoring',
+		'title' : LABELS.AUTHORING_TITLE,
 		'beforeClose' : function(){
 			// if LD was modified, ask the user if he really wants to exit
 			var innerLib = $('iframe', this)[0].contentWindow.GeneralLib,
