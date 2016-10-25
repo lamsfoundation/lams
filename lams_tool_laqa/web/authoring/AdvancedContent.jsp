@@ -27,15 +27,17 @@
 			}
 		});
 		
+		$(".rating-criteria-tag").hide();
+		
+		 $('#allowRateAnswers').click(function() {
+		    	$(".rating-criteria-tag").toggle("slow");
+		    });
+		
 		//initial state
 		if (${formBean.showOtherAnswers == 0}) {
 			$("#show-other-answers-options").hide();
 		}
 		
-	    $('#allow-rate-answers').click(function() {
-	    	$(".rating-criteria-tag").toggle("slow");
-	    });
-	    
 	    $('#no-reedit-allowed').click(function() {
 	    	if ($(this).is(':checked')) {
 	    		$("#lockWhenFinished").prop('checked', true);
@@ -47,6 +49,8 @@
 	    	$('#reflect').prop('checked', !isEmpty($(this).val()));
 	    });
 	});
+	
+	
 </script>
 
 <lams:SimplePanel titleKey="label.select.leader">
