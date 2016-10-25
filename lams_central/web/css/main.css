@@ -23,7 +23,7 @@ html {
     width: 100%;
     color: #ECF0F1 !important;
     margin-left: 0 !important;
-    line-height: 59px;
+    line-height: 49px;
     margin: 0;
     padding-left: 25px;
 }
@@ -110,11 +110,14 @@ a {
     background: #293846;
 }
 li.offcanvas-logo {
-	padding: 33px 25px;
+	padding: 20px 0px 0px 25px;
     background-color: #293846;
 }
+img.offcanvas-logo{
+	width: 100px;
+}
 li.offcanvas-header {
-	padding: 10px 0px;
+	padding: 10px 0px 0px 0px;
     background-color: #293846;
     border-bottom: 1px solid rgba(255, 255, 255, 0.16);
 }

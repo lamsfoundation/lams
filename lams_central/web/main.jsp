@@ -10,14 +10,7 @@
 <!DOCTYPE html>
 <lams:html>
 <lams:head>
-	<c:choose>
-		<c:when test="${page_direction == 'RTL'}">
-			<title><fmt:message key="index.welcome" /> :: <fmt:message key="title.lams"/></title>
-		</c:when>
-		<c:otherwise>
-			<title><fmt:message key="title.lams"/> :: <fmt:message key="index.welcome" /></title>
-		</c:otherwise>
-	</c:choose>
+	<title><fmt:message key="title.lams"/> :: <fmt:message key="index.welcome" /></title>
 	<link rel="icon" href="<lams:LAMSURL/>favicon.ico" type="image/x-icon" />
 	<link rel="shortcut icon" href="<lams:LAMSURL/>favicon.ico" type="image/x-icon" />
 	
@@ -190,7 +183,7 @@
             <ul class="nav" id="offcanvas-menu">
                 <li class="offcanvas-logo">
                     <div class="logo-element">
-                        <img alt="image" class="img-circle" src="images/css/lams_login.gif">
+                        <img alt="image" class="offcanvas-logo" src="images/svg/lams_logo_white.svg">
                     </div>
         			<i class="icon-remove fa fa-close fa-lg offcanvas-toggle"></i>
                 </li>
@@ -217,7 +210,7 @@
                 </li>
                 
                 <li class="form-group offcanvas-search">
-						<input type="text" id="offcanvas-search-input" class="form-control" placeholder="Search for courses..."
+						<input type="text" id="offcanvas-search-input" class="form-control input-sm" placeholder="Search for courses..."
 								data-column="1" type="search">
                 </li>
 <!-- 
