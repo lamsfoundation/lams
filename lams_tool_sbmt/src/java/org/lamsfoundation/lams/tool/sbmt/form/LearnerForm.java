@@ -11,7 +11,7 @@ import org.apache.struts.validator.ValidatorForm;
  */
 public class LearnerForm extends ValidatorForm {
 
-    public static int DESCRIPTION_LENGTH = 250;
+    public static int DESCRIPTION_LENGTH = 5000;
 
     private String description;
     private FormFile file;
