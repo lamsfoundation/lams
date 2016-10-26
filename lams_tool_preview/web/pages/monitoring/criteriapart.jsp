@@ -84,7 +84,7 @@
 						colModel:[
 						   {name:'id', index:'id', width:0, hidden:true},
 						   {name:'userName', index:'userName', width:100 },
-						   {name:'rating', index:'rating', width:200, align:"center"},
+						   {name:'rating', index:'rating', width:200, align:"center",  title:false},
 						   {name:'criteriaId', width:0, hidden:true}
 						],
 						loadError: function(xhr,st,err) {
