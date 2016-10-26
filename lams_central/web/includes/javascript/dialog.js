@@ -44,6 +44,7 @@ function showDialog(id, initParams, extraButtons, recreate) {
 	// use the input attributes or fall back to default ones
 	initParams = $.extend({
 		'autoOpen' : true,
+		'modal'    : false,
 		'draggable' : true,
 		'resizable' : extraButtons == true,
 		'beforeClose' : function(){
@@ -62,17 +63,20 @@ function showDialog(id, initParams, extraButtons, recreate) {
 		'aria-labelledby' : id + 'Label'
 	});
 	
+	var modalDialog = $('.modal-dialog', dialog),
+		modalContent = $('.modal-content', dialog);
+	
 	if (initParams.width) {
-		$('.modal-dialog', dialog).width(initParams.width);
+		modalDialog.width(initParams.width);
 	}
 	if (initParams.height) {
-		$('.modal-content', dialog).height(initParams.height);
+		modalContent.height(initParams.height);
 	}
 	if (initParams.resizable) {
-		$('.modal-content', dialog).resizable();
+		modalContent.resizable();
 	}
 	if (initParams.draggable) {
-		$('.modal-dialog', dialog).draggable();
+		modalDialog.draggable();
 	}
 	// store extra attributes for dialog content internal use
 	if (initParams.data) {
@@ -85,9 +89,23 @@ function showDialog(id, initParams, extraButtons, recreate) {
 	
 	dialog.modal({
 		'keyboard' : false,
-		'backdrop' : 'static',
+		'backdrop' : initParams.modal ? 'static' : false,
 		'show' : initParams.autoOpen
 	});
+	
+	if (!initParams.modal) {
+		// make the dialog non-modal
+		dialog.on('shown.bs.modal', function(){
+			// the main modal div is maximised, we need to shrink it
+			modalDialog.css({
+				'margin' : 0
+			});
+			dialog.width(modalDialog.outerWidth(true));
+			dialog.height(modalDialog.outerHeight(true));
+			// remove overlay
+			dialog.siblings('.modal-backdrop').remove();
+		});
+	}
 	
 	if (extraButtons) {
 		$('.dialogMaximise', dialog).click(function(){
