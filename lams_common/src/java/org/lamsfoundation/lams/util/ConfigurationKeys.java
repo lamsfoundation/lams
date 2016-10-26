@@ -262,5 +262,16 @@ public class ConfigurationKeys {
 
     // LDEV-3961
     public static String SITE_NAME = "SiteName";
+    
+    // LDEV-4023 Password policy    
+    public static String PASSWORD_POLICY_MINIMUM_CHARACTERS = "PasswordPolicyMinChars";
+
+    public static String PASSWORD_POLICY_UPPERCASE = "PasswordPolicyUppercase";
+    
+    public static String PASSWORD_POLICY_LOWERCASE = "PasswordPolicyLowercase";
+    
+    public static String PASSWORD_POLICY_NUMERICS = "PasswordPolicyNumerics";
+    
+    public static String PASSWORD_POLICY_SYMBOLS = "PasswordPolicySymbols";
 
 }
