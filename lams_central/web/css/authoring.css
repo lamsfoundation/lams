@@ -29,6 +29,10 @@ a.ygtvspacer {
 	-webkit-overflow-scrolling: touch !important;
 }
 
+.dialogContainer .modal-content {
+	box-shadow: none;
+}
+
 .dialogContainer .modal-body {
 	height : 100%;
 	max-height: calc(100% - 60px);
@@ -105,8 +109,9 @@ input.groupName {
 }
 
 
-div#infoDialog {
+div#infoDialog .modal-body {
 	font-weight: bold;
+	padding: 5px;
 }
 
 

@@ -908,24 +908,31 @@ GeneralInitLib = {
 		
 		GeneralLib.updateAccess(initAccess);
 
-		// initialise a small info dialog
-		layout.infoDialog = $('<div />').attr('id', 'infoDialog').dialog({
-			'autoOpen'   : false,
-			'width'      : 290,
-			'minHeight'  : 'auto',
-			'show'       : 'fold',
-			'hide'       : 'fold',
-			'draggable'  : false,
-			'dialogClass': 'dialog-no-title',
-			'defaultPosition' : {
-							my: "right top",
-						    at: "right top+5px",
-						    of: '#canvas'
-					      }
+		layout.infoDialog = showDialog('infoDialog',{
+			'autoOpen'      : false,
+			'modal'			: false,
+			'resizable'     : false,
+			'draggable'     : false,
+			'width'			: 290,
+			'open'			: function(){
+				// hide the contents so there is no "jump" during repositioning
+				$(this).css('visibility', 'hidden');
+			},
+			'close' : null
 		});
 		
-		layout.infoDialog.dialog('option', 'position', layout.infoDialog.dialog('option', 'defaultPosition'));
-		
+		// remove the title along with X button
+		$('.modal-header', layout.infoDialog).remove();
+		layout.infoDialog.on('shown.bs.modal', function(){
+			// reposition the dialog
+			$(this).css('visibility', 'visible')
+				   .position({
+						'my' : 'right top',
+						'at' : 'right+5px top+10px',
+						'of' : '#canvas'
+					});
+		});
+
 		layout.dialogs.push(layout.infoDialog);
 		
 		// license widgets init
@@ -953,7 +960,6 @@ GeneralInitLib = {
 			}
 		});
 	}
-	
 },
 
 
@@ -1917,11 +1923,12 @@ GeneralLib = {
 				GeneralLib.updateAccess(response.access);
 				
 				if (!ld.validDesign && !isReadOnlyMode) {
-					layout.infoDialog.html(LABELS.SEQUENCE_NOT_VALID)
-									 .dialog('open');
+					$('.modal-body', layout.infoDialog).text(LABELS.SEQUENCE_NOT_VALID);
+					layout.infoDialog.modal('show');
 					
 					setTimeout(function(){
-						layout.infoDialog.text('').dialog('close');
+						$('.modal-body', layout.infoDialog).empty();
+						layout.infoDialog.modal('hide');
 					}, 5000);
 				}
 			}
