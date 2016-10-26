@@ -11,22 +11,6 @@
 	</title>
 	<%@ include file="/common/header.jsp"%>
 
-	<style media="screen,projection" type="text/css">
-		 .ui-jqgrid {
-			border-left-style: none !important;
-			border-right-style: none !important;
-			border-bottom-style: none !important;
-		}
-		
-		.ui-jqgrid tr {
-			border-left-style: none !important;
-		}
-		
-		.ui-jqgrid td {
-			border-style: none !important;
-		}
-	</style>
-
 	<link type="text/css" href="${lams}css/jquery.jRating.css" rel="stylesheet"/>
 	<link type="text/css" href="${lams}css/jquery-ui-smoothness-theme.css" rel="stylesheet">
 	<link type="text/css" href="${lams}css/jquery.jqGrid.css" rel="stylesheet" />

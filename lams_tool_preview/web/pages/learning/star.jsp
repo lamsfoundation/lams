@@ -73,8 +73,6 @@
 			    			$("#no-users-info").show();
 			    		}
 
-						debugger;
-
 						for (i = 0; i < data.rows.length; i++){
 							var userData = data.rows[i];
 							var itemId = userData["itemId"];
@@ -178,7 +176,6 @@
 	}
 	
 	function onRatingSuccessCallback() {
-		debugger;
 		var numItems = $("#count-rated-items").html();
 		if ( ${criteriaRatings.ratingCriteria.minimumRates} <= 0 || numItems >=  ${criteriaRatings.ratingCriteria.minimumRates} )
 			$("#finishButton").css("visibility", "visible");

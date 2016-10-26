@@ -193,6 +193,15 @@
 			type="org.lamsfoundation.lams.tool.peerreview.web.action.MonitoringAction"
 			parameter="getReflections" >
 		</action>
+		<action path="/monitoring/sendResultsToUser"
+			type="org.lamsfoundation.lams.tool.peerreview.web.action.MonitoringAction"
+			parameter="sendResultsToUser" >
+		</action>
+		<action path="/monitoring/sendResultsToSessionUsers"
+			type="org.lamsfoundation.lams.tool.peerreview.web.action.MonitoringAction"
+			parameter="sendResultsToSessionUsers" >
+		</action>
+		
 		<!-- ========== BEGIN: Common ============================== -->
 		<action path="/clearsession"
 			type="org.lamsfoundation.lams.tool.peerreview.web.action.ClearSessionAction">

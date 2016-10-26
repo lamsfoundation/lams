@@ -23,33 +23,16 @@
 	
 	<tr>
 		<td>
-			<fmt:message key="label.minimum" />
+			<fmt:message key="label.show.ratings.left.for.user" />
 		</td>
 		
 		<td>
 			<c:choose>
-				<c:when test="${sessionMap.peerreview.minimumRates == 0}">
-					<fmt:message key="label.no.minimum" />
+				<c:when test="${sessionMap.peerreview.showRatingsLeftForUser}">
+					<fmt:message key="label.on" />
 				</c:when>
 				<c:otherwise>
-					${sessionMap.imageGallery.minimumRates}
-				</c:otherwise>
-			</c:choose>	
-		</td>
-	</tr>
-		
-	<tr>
-		<td>
-			<fmt:message key="label.maximum" />
-		</td>
-			
-		<td>
-			<c:choose>
-				<c:when test="${sessionMap.peerreview.maximumRates == 0}">
-					<fmt:message key="label.no.maximum" />
-				</c:when>
-				<c:otherwise>
-					${sessionMap.imageGallery.maximumRates}
+					<fmt:message key="label.off" />
 				</c:otherwise>
 			</c:choose>	
 		</td>
@@ -57,12 +40,29 @@
 	
 	<tr>
 		<td>
-			<fmt:message key="label.show.ratings.left.for.user" />
+			<fmt:message key="label.self.review" />
 		</td>
 		
 		<td>
 			<c:choose>
-				<c:when test="${sessionMap.peerreview.showRatingsLeftForUser}">
+				<c:when test="${sessionMap.peerreview.selfReview}">
+					<fmt:message key="label.on" />
+				</c:when>
+				<c:otherwise>
+					<fmt:message key="label.off" />
+				</c:otherwise>
+			</c:choose>	
+		</td>
+	</tr>
+		
+	<tr>
+		<td>
+			<fmt:message key="label.notify.user.of.results" />
+		</td>
+			
+		<td>
+			<c:choose>
+				<c:when test="${sessionMap.peerreview.notifyUsersOfResults}">
 					<fmt:message key="label.on" />
 				</c:when>
 				<c:otherwise>

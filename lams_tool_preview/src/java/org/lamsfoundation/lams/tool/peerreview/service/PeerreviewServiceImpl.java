@@ -23,13 +23,13 @@
 
 package org.lamsfoundation.lams.tool.peerreview.service;
 
+import java.security.InvalidParameterException;
 import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
 import java.util.Iterator;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -45,6 +45,8 @@ import org.apache.log4j.Logger;
 import org.apache.tomcat.util.json.JSONArray;
 import org.apache.tomcat.util.json.JSONException;
 import org.apache.tomcat.util.json.JSONObject;
+import org.lamsfoundation.lams.events.AbstractDeliveryMethod;
+import org.lamsfoundation.lams.events.IEventNotificationService;
 import org.lamsfoundation.lams.learning.service.ILearnerService;
 import org.lamsfoundation.lams.learningdesign.service.ExportToolContentException;
 import org.lamsfoundation.lams.learningdesign.service.IExportToolContentService;
@@ -54,6 +56,7 @@ import org.lamsfoundation.lams.notebook.service.CoreNotebookConstants;
 import org.lamsfoundation.lams.notebook.service.ICoreNotebookService;
 import org.lamsfoundation.lams.rating.dto.ItemRatingDTO;
 import org.lamsfoundation.lams.rating.dto.StyledCriteriaRatingDTO;
+import org.lamsfoundation.lams.rating.dto.StyledRatingDTO;
 import org.lamsfoundation.lams.rating.model.LearnerItemRatingCriteria;
 import org.lamsfoundation.lams.rating.model.RatingCriteria;
 import org.lamsfoundation.lams.rating.service.IRatingService;
@@ -72,7 +75,6 @@ import org.lamsfoundation.lams.tool.peerreview.dao.PeerreviewSessionDAO;
 import org.lamsfoundation.lams.tool.peerreview.dao.PeerreviewUserDAO;
 import org.lamsfoundation.lams.tool.peerreview.dto.GroupSummary;
 import org.lamsfoundation.lams.tool.peerreview.dto.PeerreviewStatisticsDTO;
-import org.lamsfoundation.lams.tool.peerreview.dto.ReflectDTO;
 import org.lamsfoundation.lams.tool.peerreview.model.Peerreview;
 import org.lamsfoundation.lams.tool.peerreview.model.PeerreviewSession;
 import org.lamsfoundation.lams.tool.peerreview.model.PeerreviewUser;
@@ -115,6 +117,8 @@ public class PeerreviewServiceImpl
     private ICoreNotebookService coreNotebookService;
 
     private IRatingService ratingService;
+    
+    private IEventNotificationService eventNotificationService;
 
     private SortedSet<Long> creatingUsersForSessionIds;
 
@@ -431,7 +435,112 @@ public class PeerreviewServiceImpl
 	
 	return rawData;
     }
-    
+
+    @Override
+    public int emailReportToSessionUsers(Long toolContentId, Long sessionId) {
+	List<PeerreviewUser> users = peerreviewUserDao.getBySessionID(sessionId);
+	Peerreview peerreview = getPeerreviewByContentId(toolContentId);
+	String subject = getResultsEmailSubject(peerreview);
+	List<RatingCriteria> criterias = getRatingCriterias(toolContentId);
+	int numEmailsSent = 0;
+	for (PeerreviewUser user : users) {
+	    if (emailReport(toolContentId, sessionId, user, peerreview, criterias, subject) != 1) {
+		log.error("Unable to email to all users in session " + sessionId + ". Have processed " + numEmailsSent
+			+ " so far.");
+		return -1;
+	    }
+	    numEmailsSent++;
+	}
+	return numEmailsSent;
+    }
+
+    @Override
+    public int emailReportToUser(Long toolContentId, Long sessionId, Long userId) {
+
+	PeerreviewUser user = peerreviewUserDao.getUserByUserIDAndSessionID(userId, sessionId);
+	Peerreview peerreview = getPeerreviewByContentId(toolContentId);
+	return emailReport(toolContentId, sessionId, user, peerreview, getRatingCriterias(toolContentId),
+		getResultsEmailSubject(peerreview));
+    }
+
+    private String getResultsEmailSubject(Peerreview peerreview) {
+	return getLocalisedMessage("event.sent.results.subject", new Object[] { peerreview.getTitle() });
+    }
+
+    private int emailReport(Long toolContentId, Long sessionId, PeerreviewUser user, Peerreview peerreview, List<RatingCriteria> ratingCriterias, String subject) {
+
+	int userId = user.getUserId().intValue();
+	String name = StringEscapeUtils.escapeCsv(user.getFirstName()+" "+user.getLastName());
+	
+	    StringBuilder notificationMessage = new StringBuilder();
+
+	    for (RatingCriteria criteria : ratingCriterias) {
+		int sorting = PeerreviewConstants.SORT_BY_AVERAGE_RESULT_DESC;
+		if (criteria.isRankingStyleRating())
+		    sorting = PeerreviewConstants.SORT_BY_AVERAGE_RESULT_ASC;
+		StyledCriteriaRatingDTO dto = getUsersRatingsCommentsByCriteriaIdDTO(toolContentId, sessionId, criteria,
+			user.getUserId(), false, sorting, null, true, false);
+		generateRatingEntryForEmail(notificationMessage, criteria, dto);
+	    }
+
+	    eventNotificationService.sendMessage(null, 
+		    userId, 
+		    IEventNotificationService.DELIVERY_METHOD_MAIL,
+		    subject, 
+		    getLocalisedMessage("event.sent.results.body", new Object[]{name, notificationMessage.toString()}), 
+		    true);
+
+	    return 1;
+
+    }
+
+    private void generateRatingEntryForEmail(StringBuilder notificationMessage, RatingCriteria criteria,
+	    StyledCriteriaRatingDTO dto) {
+	if (dto.getRatingDtos().size() >= 1) {
+	    if (criteria.isCommentRating()) {
+		StringBuilder comments = new StringBuilder();
+		for (StyledRatingDTO ratingDto : dto.getRatingDtos()) {
+		    if (ratingDto.getComment() != null)
+			comments.append("<li>").append(ratingDto.getComment()).append("</li>");
+		}
+		notificationMessage.append(getLocalisedMessage("event.sent.results.criteria.comment", new Object[] {
+			dto.getRatingCriteria().getTitle(), comments.toString() }));
+	    } else {
+		String avgRating = dto.getRatingDtos().get(0).getAverageRating().length() > 0 ? dto.getRatingDtos()
+			.get(0).getAverageRating() : "0";
+		StringBuilder comments = null;
+		if (criteria.isStarStyleRating()) {
+		    if (criteria.isCommentsEnabled()) {
+			comments = new StringBuilder();
+			for (StyledRatingDTO ratingDto : dto.getRatingDtos()) {
+			    if (ratingDto.getComment() != null)
+				comments.append("<li>").append(ratingDto.getComment()).append("</li>");
+			}
+		    }
+		    notificationMessage.append(getLocalisedMessage(
+			    "event.sent.results.criteria.star",
+			    new Object[] { dto.getRatingCriteria().getTitle(), avgRating,
+				    comments != null ? comments.toString() : "" }));
+		} else if (criteria.isRankingStyleRating()) {
+		    if (criteria.getMaxRating() > 0) {
+			notificationMessage
+				.append(getLocalisedMessage("event.sent.results.criteria.rank", new Object[] {
+					dto.getRatingCriteria().getTitle(), avgRating, criteria.getMaxRating() }));
+		    } else {
+			notificationMessage.append(getLocalisedMessage("event.sent.results.criteria.rankAll",
+				new Object[] { dto.getRatingCriteria().getTitle(), avgRating }));
+		    }
+		} else { // hedge style rating
+		    notificationMessage.append(getLocalisedMessage("event.sent.results.criteria.hedge", new Object[] {
+			    dto.getRatingCriteria().getTitle(), avgRating, criteria.getMaxRating() }));
+		}
+	    }
+	} else {
+	    notificationMessage.append(dto.getRatingCriteria().getTitle()).append(
+		    getLocalisedMessage("event.sent.results.no.results", null));
+	}
+	notificationMessage.append("\n");
+    }
     // *****************************************************************************
     // private methods
     // *****************************************************************************
@@ -841,6 +950,10 @@ public class PeerreviewServiceImpl
     }
 
     // ****************** REST methods *************************
+
+    public void setEventNotificationService(IEventNotificationService eventNotificationService) {
+        this.eventNotificationService = eventNotificationService;
+    }
 
     /**
      * Used by the Rest calls to create content. Mandatory fields in toolContentJSON: title, instructions, peerreview,
