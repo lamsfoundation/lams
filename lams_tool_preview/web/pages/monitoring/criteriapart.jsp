@@ -28,11 +28,15 @@
 			   	colNames:[
 						'itemId',
 						'<fmt:message key="label.user.name" />',
-						'${heading}'				],
+						'${heading}'
+						<c:if test="${sessionMap.peerreview.notifyUsersOfResults}">, ''</c:if>
+				],
 			   	colModel:[
 			   		{name:'itemId', index:'itemId', width:0, hidden: true},
 			   		{name:'itemDescription', index:'itemDescription', width:200, searchoptions: { clearSearch: false }},
 			   		{name:'rating', index:'rating', width:100, align:"center", search:false}
+					<c:if test="${sessionMap.peerreview.notifyUsersOfResults}">, {name:'email', index:'email', width:100, align:"center", search:false}</c:if>
+			   		
 			   	],
 			   	rowNum:10,
 			   	rowList:[10,20,30,40,50,100],
@@ -78,10 +82,10 @@
 							'criteriaId'
 							],
 						colModel:[
-						   {name:'id', index:'id', hidden:true},
-						   {name:'userName',index:'userName'},
-						   {name:'rating', index:'rating', width:140, align:"center"},
-						   {name:'criteriaId', hidden:true}
+						   {name:'id', index:'id', width:0, hidden:true},
+						   {name:'userName', index:'userName', width:100 },
+						   {name:'rating', index:'rating', width:200, align:"center"},
+						   {name:'criteriaId', width:0, hidden:true}
 						],
 						loadError: function(xhr,st,err) {
 					    	jQuery("#"+subgridTableId).clearGridData();
@@ -115,6 +119,27 @@
         
 	});
 	
+	function sendResultsForLearner(sessionId, userId) {
+		var url = "<c:url value="/monitoring/sendResultsToUser.do"/>";
+		$("#messageArea2").html("");
+		$("#messageArea2_Busy").show();
+		$("#messageArea2").load(
+			url,
+			{
+				sessionMapID: "${sessionMapID}",
+				toolContentID: ${sessionMap.toolContentID},
+				toolSessionId: sessionId, 
+				userID: userId,
+				reqID: (new Date()).getTime()
+			},
+			function() {
+				$("#messageArea2_Busy").hide();
+			}
+		);
+		return false;
+	}
+
+
 </script>
 
 <!--For send results feature-->

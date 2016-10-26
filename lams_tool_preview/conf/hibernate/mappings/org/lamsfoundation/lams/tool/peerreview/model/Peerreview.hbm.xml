@@ -155,6 +155,14 @@
             insert="true"
             column="self_review"
         />
+
+        <property
+            name="notifyUsersOfResults"
+            type="boolean"
+            update="true"
+            insert="true"
+            column="notify_users_of_results"
+        />
         
         <set 
         	name="ratingCriterias" 

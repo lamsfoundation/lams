@@ -51,6 +51,17 @@ textarea {
 
 .ui-jqgrid td {
 	border-style: none !important;
+	padding: 0px 4px 4px 4px;
+}
+
+.ui-jqgrid tr.jqgrow td {
+	padding: 8px 8px 8px 8px;
+	white-space: normal !important;
+}
+
+.ui-jqgrid .ui-jqgrid-view {
+	font-size: 14px;
+	font-family: "Helvetica Neue",Helvetica,Arial,sans-serif;
 }
 
 .divrankx {
@@ -77,3 +88,6 @@ textarea {
   	background-color: #337ab7;
 }
 
+.email-button {
+	margin: 2px;
+}

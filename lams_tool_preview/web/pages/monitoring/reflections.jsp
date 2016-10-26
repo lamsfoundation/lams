@@ -25,8 +25,6 @@
 	
 	$(document).ready(function(){
 
-			debugger;
-			
 			jQuery("#group${toolSessionId}").jqGrid({
 			   	url: "<c:url value='/monitoring/getReflections.do'/>?toolSessionId=${toolSessionId}&sessionMapID=${sessionMapID}",
 				datatype: "json",

@@ -82,6 +82,8 @@ public class Peerreview implements Cloneable {
     
     private boolean selfReview;
 
+    private boolean notifyUsersOfResults;
+
     // **********************************************************
     // Function method for Peerreview
     // **********************************************************
@@ -391,5 +393,13 @@ public class Peerreview implements Cloneable {
 
     public void setSelfReview(boolean selfReview) {
         this.selfReview = selfReview;
+    }
+    
+    public boolean isNotifyUsersOfResults() {
+        return notifyUsersOfResults;
+    }
+
+    public void setNotifyUsersOfResults(boolean notifyUsersOfResults) {
+        this.notifyUsersOfResults = notifyUsersOfResults;
     }
 }

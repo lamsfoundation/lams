@@ -30,14 +30,12 @@ import java.util.Map;
 import org.apache.tomcat.util.json.JSONArray;
 import org.apache.tomcat.util.json.JSONException;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
-import org.lamsfoundation.lams.notebook.service.ICoreNotebookService;
 import org.lamsfoundation.lams.rating.ToolRatingManager;
 import org.lamsfoundation.lams.rating.dto.ItemRatingDTO;
 import org.lamsfoundation.lams.rating.dto.StyledCriteriaRatingDTO;
 import org.lamsfoundation.lams.rating.model.RatingCriteria;
 import org.lamsfoundation.lams.tool.peerreview.dto.GroupSummary;
 import org.lamsfoundation.lams.tool.peerreview.dto.PeerreviewStatisticsDTO;
-import org.lamsfoundation.lams.tool.peerreview.dto.ReflectDTO;
 import org.lamsfoundation.lams.tool.peerreview.model.Peerreview;
 import org.lamsfoundation.lams.tool.peerreview.model.PeerreviewSession;
 import org.lamsfoundation.lams.tool.peerreview.model.PeerreviewUser;
@@ -272,4 +270,10 @@ public interface IPeerreviewService extends ToolRatingManager {
      */
     List<Object[]> getUserNotebookEntriesForTablesorter(Long toolSessionId, int page, int size, int sorting, String searchString);
 
- }
+    /** Send an email with the user's results to each user in the session */
+    int emailReportToSessionUsers(Long toolContentId, Long sessionId);
+
+    /** Send an email with the user's results to the specified user in the session */
+    int emailReportToUser(Long toolContentId, Long sessionId, Long userId);
+
+}

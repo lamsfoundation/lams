@@ -32,9 +32,16 @@
 
 	<div class="checkbox">
 	<label for="self-review"><html:checkbox property="peerreview.selfReview" styleId="self-review"/>
-	<fmt:message key="label.authoring.self.review" />
+	<fmt:message key="label.self.review" />
 	</label>
 	</div>
+
+	<div class="checkbox">
+	<label for="notify-users-of-results"><html:checkbox property="peerreview.notifyUsersOfResults" styleId="notify-users-of-results"/>
+	<fmt:message key="label.notify.user.of.results" />
+	</label>
+	</div>
+
 
 </lams:SimplePanel>
 

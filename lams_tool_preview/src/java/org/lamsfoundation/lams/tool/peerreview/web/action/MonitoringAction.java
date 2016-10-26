@@ -55,6 +55,7 @@ import org.lamsfoundation.lams.util.DateUtil;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.lamsfoundation.lams.web.util.SessionMap;
+import org.springframework.util.StringUtils;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 
@@ -89,6 +90,12 @@ public class MonitoringAction extends Action {
 	}
 	if (param.equals("getReflections")) {
 	    return getReflections(mapping, form, request, response);
+	}
+	if (param.equals("sendResultsToUser")) {
+	    return sendResultsToUser(mapping, form, request, response);
+	}
+	if (param.equals("sendResultsToSessionUsers")) {
+	    return sendResultsToSessionUsers(mapping, form, request, response);
 	}
 
 	return mapping.findForward(PeerreviewConstants.ERROR);
@@ -127,6 +134,7 @@ public class MonitoringAction extends Action {
 	
 	List<RatingCriteria> criterias = service.getRatingCriterias(contentId);
 	request.setAttribute(PeerreviewConstants.ATTR_CRITERIAS, criterias);
+	
 	return mapping.findForward(PeerreviewConstants.SUCCESS);
     }
 
@@ -203,6 +211,7 @@ public class MonitoringAction extends Action {
 
 	JSONArray rows = new JSONArray();
 
+	String emailResultsText = service.getLocalisedMessage("button.email.results", null);
 	if (criteria.isCommentRating()) {
 	    // special db lookup just for this - gets the user's & how many comments left for them
 	    List<Object[]> rawRows = service.getCommentsCounts(toolContentId, toolSessionId, criteria, page, size,
@@ -218,8 +227,11 @@ public class MonitoringAction extends Action {
 		int numComments = numCommentsNumber != null ? numCommentsNumber.intValue() : 0;
 		if (numComments > 0) {
 		    cell.put("rating", service.getLocalisedMessage("label.monitoring.num.of.comments", new Object[] { numComments }));
+		    cell.put("email", generateResultsButton(toolSessionId, rawRow[0], emailResultsText));
 		} else {
 		    cell.put("rating", "");
+		    cell.put("email", "");
+
 		}
 
 		JSONObject row = new JSONObject();
@@ -251,8 +263,10 @@ public class MonitoringAction extends Action {
 			starString += msg;
 			starString += "</div>";
 			rawRow.put("rating", starString);
+			rawRow.put("email", generateResultsButton(toolSessionId, (Long) rawRow.get("itemId"), emailResultsText));
 		    } else {
 			rawRow.put("rating", averageRating);
+			rawRow.put("email", generateResultsButton(toolSessionId, (Long) rawRow.get("itemId"), emailResultsText));
 		    }
 		}
 		JSONObject row = new JSONObject();
@@ -266,6 +280,17 @@ public class MonitoringAction extends Action {
 	res.setContentType("application/json;charset=utf-8");
 	res.getWriter().print(new String(responcedata.toString()));
 	return null;
+    }
+
+    private String generateResultsButton(Object toolSessionId, Object userId, String emailResultsText) {
+	return new StringBuilder("<a href=\"javascript:sendResultsForLearner(")
+		.append(toolSessionId)
+		.append(", ")
+		.append(userId)
+		.append(")\" class=\"btn btn-default btn-xs email-button\">")
+		.append(emailResultsText)
+		.append("</a>")
+		.toString();
     }
 
     private ActionForward getSubgridData(ActionMapping mapping, ActionForm form, HttpServletRequest request,
@@ -314,7 +339,9 @@ public class MonitoringAction extends Action {
 		    JSONArray userData = new JSONArray();
 		    userData.put(i);
 		    userData.put(ratingDetails[4]);
-		    userData.put(StringEscapeUtils.escapeHtml(comment));
+		    String commentText = StringEscapeUtils.escapeHtml(comment);
+		    commentText = StringUtils.replace(commentText, "&lt;BR&gt;", "<BR/>");
+		    userData.put(commentText);
 		    userData.put("Comments");
 
 		    JSONObject userRow = new JSONObject();
@@ -392,7 +419,7 @@ public class MonitoringAction extends Action {
 		sorting = PeerreviewConstants.SORT_BY_NOTEBOOK_ENTRY_ASC;
 	    }
 	}
-	
+
 	String searchString = WebUtil.readStrParam(request, "itemDescription", true);
 
 	// setting date format to ISO8601 for jquery.timeago 
@@ -451,7 +478,42 @@ public class MonitoringAction extends Action {
 	return null;
     }
 
-    
+    private ActionForward sendResultsToUser(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+	    HttpServletResponse response) throws JSONException, IOException {
+	return sendResults(mapping, request, response, true);
+    }
+
+    private ActionForward sendResultsToSessionUsers(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+	    HttpServletResponse response) throws JSONException, IOException {
+	return sendResults(mapping, request, response, false);
+    }
+
+    private ActionForward sendResults(ActionMapping mapping, HttpServletRequest request,
+		    HttpServletResponse response, boolean oneUserOnly) throws JSONException, IOException {
+
+	String sessionMapID = request.getParameter(PeerreviewConstants.ATTR_SESSION_MAP_ID);
+	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
+		.getAttribute(sessionMapID);
+	request.setAttribute(PeerreviewConstants.ATTR_SESSION_MAP_ID, sessionMap.getSessionID());
+
+	Long contentId = (Long) sessionMap.get(PeerreviewConstants.ATTR_TOOL_CONTENT_ID);
+	Long toolSessionId = WebUtil.readLongParam(request, "toolSessionId");
+
+	IPeerreviewService service = getPeerreviewService();
+	int numEmailsSent = 0;
+	
+	if ( oneUserOnly) {
+	    Long userId = WebUtil.readLongParam(request, PeerreviewConstants.PARAM_USERID);
+	    numEmailsSent = service.emailReportToUser(contentId, toolSessionId, userId);
+	} else {
+	    numEmailsSent = service.emailReportToSessionUsers(contentId, toolSessionId);
+	}
+
+	response.setContentType("text/html;charset=utf-8");
+	response.getWriter().write(service.getLocalisedMessage("msg.results.sent", new Object[] { numEmailsSent }));
+	return null;
+    }
+
     // *************************************************************************************
     // Private method
     // *************************************************************************************

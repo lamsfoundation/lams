@@ -8,22 +8,6 @@
 <link type="text/css" href="${lams}css/jquery.jRating.css" rel="stylesheet"/>
 <link rel="stylesheet" href="<html:rewrite page='/includes/css/learning.css'/>">
 
-<style media="screen,projection" type="text/css">
-	 .ui-jqgrid {
-		border-left-style: none !important;
-		border-right-style: none !important;
-		border-bottom-style: none !important;
-	}
-	
-	.ui-jqgrid tr {
-		border-left-style: none !important;
-	}
-	
-	.ui-jqgrid td {
-		border-style: none !important;
-	}
-</style>
-
 <script type="text/javascript">
 	//var for jquery.jRating.js
 	var pathToImageFolder = "${lams}images/css/";
@@ -38,6 +22,25 @@
 	COMMENT_TEXTAREA_TIP_LABEL = '',
 	WARN_COMMENTS_IS_BLANK_LABEL = '',
 	WARN_MIN_NUMBER_WORDS_LABEL = '';
+	
+	function sendResults(sessionId) {
+		var url = "<c:url value="/monitoring/sendResultsToSessionUsers.do"/>";
+		$("#messageArea").html("");
+		$("#messageArea_Busy").show();
+		$("#messageArea").load(
+			url,
+			{
+				sessionMapID: "${sessionMapID}",
+				toolContentID: ${sessionMap.toolContentID},
+				toolSessionId: sessionId, 
+				reqID: (new Date()).getTime()
+			},
+			function() {
+				$("#messageArea_Busy").hide();
+			}
+		);
+		return false;
+	}
 </script>
 <script type="text/javascript" src="${lams}includes/javascript/jquery.jqGrid.locale-en.js"></script>
 <script type="text/javascript" src="${lams}includes/javascript/jquery.jqGrid.js"></script>
@@ -58,6 +61,10 @@
 			<fmt:message key="message.monitoring.summary.no.session" />
 		</lams:Alert>
 	</c:if>
+	
+	<!--For send results feature-->
+	<i class="fa fa-spinner" style="display:none" id="messageArea_Busy"></i>
+	<div class="voffset5" id="messageArea"></div>
 	
 </div>
 
@@ -81,7 +88,7 @@
 	</c:if>
 	
 	<c:choose>
-		<c:when test="${not empty criterias && fn:length(criterias) eq 1 && not sessionMap.peerreview.reflectOnActivity}">
+		<c:when test="${not empty criterias && fn:length(criterias) eq 1}">
 			<c:forEach var="criteria" items="${criterias}">
 			<h4>${criteria.title}</h4>
 			<c:set var="toolSessionId" value="${groupSummary.sessionId}" scope="request"/>
@@ -96,14 +103,23 @@
 				<a href="javascript:launchPopup('${url}')" class="btn btn-default voffset5 loffset5">
 					<fmt:message key="label.monitoring.view"><fmt:param>${criteria.title}</fmt:param></fmt:message></a>
 			</c:forEach>
-			<c:if test="${sessionMap.peerreview.reflectOnActivity}">
-				<c:set var='url'>reflections.do?sessionMapID=${sessionMapID}&toolSessionId=${groupSummary.sessionId}&toolContentID=${sessionMap.toolContentID}</c:set>
-				<a href="javascript:launchPopup('${url}')" class="btn btn-default voffset5 loffset5"><fmt:message key="title.reflection"/></a>
-			</c:if>
 			<div class="voffset5">&nbsp;</div>
 		</c:otherwise>
 	</c:choose>
 
+	<c:if test="${sessionMap.peerreview.reflectOnActivity || sessionMap.peerreview.notifyUsersOfResults}">
+	<div id="btns${groupSummary.sessionId}">
+		<c:if test="${sessionMap.peerreview.reflectOnActivity}">
+			<c:set var='url'>reflections.do?sessionMapID=${sessionMapID}&toolSessionId=${groupSummary.sessionId}&toolContentID=${sessionMap.toolContentID}</c:set>
+			<a href="javascript:launchPopup('${url}')" class="btn btn-default voffset5"><fmt:message key="title.reflection"/></a>
+		<c:set var="offset" value=" loffset5"/>
+		</c:if>
+		<c:if test="${sessionMap.peerreview.notifyUsersOfResults}">
+			<a href="javascript:sendResults(${groupSummary.sessionId})" class="btn btn-default voffset5 ${offset}">Send Results To Learners</a>
+		</c:if>
+	</div>
+	</c:if>
+	
 	<c:if test="${sessionMap.isGroupedActivity}">
 		</div> <!-- end collapse area  -->
 		</div> <!-- end collapse panel  -->
