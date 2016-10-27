@@ -44,7 +44,7 @@ function showDialog(id, initParams, extraButtons, recreate) {
 	// use the input attributes or fall back to default ones
 	initParams = $.extend({
 		'autoOpen' : true,
-		'modal'    : false,
+		'modal'    : true,
 		'draggable' : true,
 		'resizable' : extraButtons == true,
 		'beforeClose' : function(){
