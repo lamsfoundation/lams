@@ -126,7 +126,7 @@
 							
 							<div class="col-xs-12">
 								 <lams:Alert type="info"  id="passwordConditions" close="false">
-								 <strong><fmt:message key='label.password.must.contain'/>:</strong> <c:out value="${mustHaveUppercase}"/>
+								 <strong><fmt:message key='label.password.must.contain'/>:</strong> 
 								 <ul class="list-unstyled" style="line-height: 1.2">
 								  	<li><span class="fa fa-check"></span> <fmt:message key='label.password.min.length'><fmt:param value='${minNumChars}'/></fmt:message></li>
 								  <c:if test="${mustHaveUppercase}">
