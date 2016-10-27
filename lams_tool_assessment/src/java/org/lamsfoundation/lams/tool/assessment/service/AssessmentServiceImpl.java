@@ -620,7 +620,7 @@ public class AssessmentServiceImpl
 
 	} else if (question.getType() == AssessmentConstants.QUESTION_TYPE_SHORT_ANSWER) {
 	    for (AssessmentQuestionOption option : question.getOptions()) {
-		String optionString = option.getOptionString().trim().replaceAll("\\*", ".*");
+		String optionString = option.getOptionString().trim().replaceAll("\\*", ".*").replaceAll("\\+", "\\\\+");
 		Pattern pattern;
 		if (question.isCaseSensitive()) {
 		    pattern = Pattern.compile(optionString);
