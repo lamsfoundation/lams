@@ -6,6 +6,7 @@
 <%@ taglib uri="tags-core" prefix="c"%>
 <%@ taglib uri="tags-function" prefix="fn"%>
 <%@ taglib uri="tags-tiles" prefix="tiles" %>
+<c:set var="lastVisitedOrganisationId"><lams:user property="lastVisitedOrganisationId"/></c:set>
 
 <!DOCTYPE html>
 <lams:html>
@@ -14,12 +15,10 @@
 	<link rel="icon" href="<lams:LAMSURL/>favicon.ico" type="image/x-icon" />
 	<link rel="shortcut icon" href="<lams:LAMSURL/>favicon.ico" type="image/x-icon" />
 	
-	<lams:css style="main"/>
+	<lams:css/>
 	<link rel="stylesheet" href="/lams/includes/font-awesome/css/font-awesome.css" type="text/css">
 	<link rel="stylesheet" href="/lams/css/jquery.tablesorter.theme.bootstrap.css">
-	<link rel="stylesheet" href="/lams/css/defaultHTML_learner.css" type="text/css">
 	<link rel="stylesheet" href="/lams/css/jquery-ui-bootstrap-theme.css" type="text/css" media="screen">
-	<link rel="stylesheet" href="/lams/css/index.css" type="text/css" media="screen">
 	<link rel="stylesheet" href="/lams/css/main.css" type="text/css" media="screen">
 
 	<script type="text/javascript" src="includes/javascript/getSysInfo.js"></script>
@@ -84,13 +83,13 @@
 				<fmt:message key="label.private.notifications.read.all.hint" var="PRIVATE_NOTIFICATIONS_READ_ALL_HINT_VAR"/>
 				PRIVATE_NOTIFICATIONS_READ_ALL_HINT : '<c:out value="${PRIVATE_NOTIFICATIONS_READ_ALL_HINT_VAR}" />',
 				MY_PROFILE : '<fmt:message key="index.myprofile" />',
+				REMOVE_ORG_FAVORITE : '<fmt:message key="label.remove.org.favorite"/>',
+				MARK_ORG_FAVORITE : '<fmt:message key="label.mark.org.favorite"/>',
 			},
 			stateId = 1, // TODO Figure out when stateId is required to be equal 3. Old version code: stateId = tabName == 'profile' ? 3 : 1;
-			activeOrgId = -1; //not set for now
+			activeOrgId = <c:choose><c:when test="${empty lastVisitedOrganisationId}">null</c:when><c:otherwise>${lastVisitedOrganisationId}</c:otherwise></c:choose>;
 
 		$(document).ready(function(){
-			initMainPage();
-				
 			<%-- If it's the user's first login, display a dialog asking if tutorial videos should be shown --%>
 			<c:if test="${firstLogin}">
 				<c:url var="disableAllTutorialVideosUrl" value="tutorial.do">
@@ -100,133 +99,37 @@
 			 		$.get("${disableAllTutorialVideosUrl}");
 				}
 			</c:if>
-
-			var $tablesorter = $(".tablesorter").tablesorter({
-				theme: 'bootstrap',
-				headerTemplate : '{content} {icon}',
-				widgets: ["filter"],
-			    widgetOptions : {
-			        filter_columnFilters: false
-			    },
-			    widthFixed: true,
-			    sortInitialOrder: 'desc',
-	            sortList: [[1]],
-	            headers: { 0: { sorter: false, filter: false} }
-			});
-
-			$.tablesorter.filter.bindSearch($tablesorter, $('#offcanvas-search-input') );
-
-			$(".tablesorter").each(function() {
-				$(this).tablesorterPager({
-					savePages: false,
-	                container: $(this).find(".ts-pager"),
-	                output: '{startRow} to {endRow} ({totalRows})',
-	                cssPageDisplay: '.pagedisplay',
-	                cssPageSize: '.pagesize',
-	                cssDisabled: 'disabled',
-	                ajaxUrl : "<c:url value='/index.do'/>?dispatch=getOrgs&page={page}&size={size}&{sortList:column}&{filterList:fcol}",
-					ajaxProcessing: function (data, table) {
-				    	if (data && data.hasOwnProperty('rows')) {
-				    		var rows = [],
-				            json = {};
-				    		
-							for (i = 0; i < data.rows.length; i++){
-								var orgData = data.rows[i];
-								var orgId = orgData["id"];
-								
-								rows += '<tr>';
-
-								rows += '<td style="display: none;">';
-								rows += '</td>';
-								
-								rows += '<td id="org-row-' + orgId +'">';
-								rows += 	'<a data-id="' + orgId + '" href="#" onClick="javascript:selectOrganisation(' + orgId + ')">';
-								rows += 		orgData["name"];
-								rows += 	'</a>';
-								rows += '</td>';
-								
-								rows += '</tr>';
-							}
-				            
-							json.total = data.total_rows;
-							json.rows = $(rows);
-							return json;
-				    	}
-					}
-				})
-			});
-
-			$('.tablesorter').bind('filterEnd pagerComplete', function(event, data){
-				
-				//hide pager if total amount of courses is less than 10
-	    		if (data.totalRows < 10) {
-	    			$(".tablesorter-pager").hide();
-		    	} else {
-		    		$(".tablesorter-pager").show();
-			    }
-
-	    		//in case active course is not yet chosen by user, select the fist one from the list
-			    if ((activeOrgId < 0) && (event.type == "pagerComplete") && (data.totalRows > 0)) {
-			    	var firstOrgId = $('.tablesorter a').first().data("id");
-					selectOrganisation(firstOrgId);
-				}
-			});
-
 		});
 	</script>
 </lams:head>
-<body > <!-- class="offcanvas-hidden" -->
+<body <c:if test="${not empty lastVisitedOrganisationId}">class="offcanvas-hidden"</c:if>>
 
 <!-- Offcanvas Bar -->
     <nav id="offcanvas" role="navigation">
         <div class="offcanvas-scroll-area">
         
-        <div class="offcanvas-collapse">
-            <ul class="nav" id="offcanvas-menu">
-                <li class="offcanvas-logo">
-                    <div class="logo-element">
-                        <img alt="image" class="offcanvas-logo" src="images/svg/lams_logo_white.svg">
-                    </div>
-        			<i class="icon-remove fa fa-close fa-lg offcanvas-toggle"></i>
-                </li>
-                <li class="offcanvas-header">
-            	    <span class="courses-title "><i class="fa fa-table"></i>&nbsp;&nbsp;Courses</span>
-        		</li> 
-                <li>
-                    <a href="#nogo">
-                    	<span class="nav-label">Previous course asdadljl oijoiu s 1</span>
-                    	<span class="label label-warning2 pull-right"><i class="fa fa-star"></i></span>
-                    </a>
-                </li>
-                <li>
-                    <a href="#nogo">
-                    	<span class="nav-label">Previous course 2</span> 
-                    	<span class="label label-warning2 pull-right"><i class="fa fa-star"></i></span>
-                    </a>
-                </li> 
-                <li>
-                    <a href="#nogo">
-                    	<span class="nav-label">Previous course 3</span> 
-                    	<span class="label label-warning2 pull-right"><i class="fa fa-star"></i></span>
-                    </a>
-                </li>
-                
-                <li class="form-group offcanvas-search">
-						<input type="text" id="offcanvas-search-input" class="form-control input-sm" placeholder="Search for courses..."
-								data-column="1" type="search">
-                </li>
-<!-- 
-                <li class="active">
-                    <a href="#"> Course B  </a>
-                </li>
- -->
-
-            </ul>
+			<div class="offcanvas-logo">
+				<div>
+					<img alt="LAMS" src="images/svg/lams_logo_white.svg">
+				</div>
+				<i class="icon-remove fa fa-close fa-lg offcanvas-toggle"></i>
+			</div>
+			
+			<div class="offcanvas-header">
+				<span class="courses-title ">
+					<i class="fa fa-table"></i>&nbsp;&nbsp;Courses
+				</span>
+			</div>
+        
+			<%@ include file="favoriteOrganisations.jsp"%>
+            
+			<div class="form-group offcanvas-search">
+				<input type="text" id="offcanvas-search-input" class="form-control input-sm" placeholder="Search for courses..."
+						data-column="1" type="search">
+			</div>
             
 			<lams:TSTable numColumns="2">
 			</lams:TSTable>
-
-        </div>
 
         </div>
     </nav>
@@ -335,8 +238,6 @@
 						<a href="javascript:;" onclick="javascript:showPrivateNotificationsDialog();" class="dropdown-toggle info-number" data-toggle="dropdown" aria-expanded="false">
 							<i class="fa fa-envelope-o"></i>
                     		<span id="notificationsPendingCount"></span>
-                    		
-							<span class="xs-hidden">&nbsp;&nbsp;&nbsp;Notifications</span>
 						</a>
 					</li>
 				</ul>
@@ -355,9 +256,7 @@
 		
 		<div class="row no-gutter">
 			<div class="col-xs-12">
-		    	<div class="container-turned-off-lams">
-		        	<div id="org-container" class="orgTab"></div>
-		     	</div>
+	        	<div id="org-container"></div>
 		  	</div>
 		</div>
 	

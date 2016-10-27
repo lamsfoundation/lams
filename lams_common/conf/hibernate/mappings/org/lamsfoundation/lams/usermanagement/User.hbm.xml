@@ -23,8 +23,6 @@
 				generator-class="native"
 				type="java.lang.Integer"
 				column="user_id"
-
-
 			</meta>
 			<generator class="native" />
 		</id>
@@ -214,6 +212,7 @@
 				not-null="true"
 			</meta>
 		</property>
+		<property name="lastVisitedOrganisationId" type="java.lang.Integer" column="last_visited_organisation_id"/>
 
 		<!-- Associations -->
 

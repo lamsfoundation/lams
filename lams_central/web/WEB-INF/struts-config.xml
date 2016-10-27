@@ -130,6 +130,11 @@
         redirect="false"
       />
       <forward
+        name="favoriteOrganisations"
+        path="/favoriteOrganisations.jsp"
+        redirect="false"
+      />      
+      <forward
         name="profile"
         path="/profile.do?method=view"
         redirect="false"

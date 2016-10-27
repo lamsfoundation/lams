@@ -23,7 +23,7 @@
 
 	<script type="text/javascript" src="includes/javascript/jquery.js"></script>
 	<script type="text/javascript" src="includes/javascript/jquery-ui.js"></script>
-	<script type="text/javascript" src="includes/javascript/groupDisplay.js"></script>
+	<script type="text/javascript" src="includes/javascript/profile.js"></script>
 	<script type="text/javascript" src="includes/javascript/jquery.validate.js"></script>
 	<script type="text/javascript">
 		$.validator.addMethod("pwcheck", function(value) {

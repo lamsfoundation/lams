@@ -131,6 +131,31 @@ public interface IUserManagementService {
      * @return UserBasicDTO objectsin a Vector
      */
     Vector getUsersFromOrganisationByRole(Integer organisationID, String roleName, boolean getUser);
+    
+    /**
+     * Return all organisations that were marked as favorite by the specified user
+     * 
+     * @param userId
+     * @return
+     */
+    List<Organisation> getFavoriteOrganisationsByUser(Integer userId);
+    
+    /**
+     * Checks whether user marked this organisation as favorite.
+     * 
+     * @param organisationId
+     * @param userId
+     * @return
+     */
+    boolean isOrganisationFavorite(Integer organisationId, Integer userId);
+    
+    /**
+     * Toggles whether organisation is marked as favorite
+     * 
+     * @param organisation
+     * @param user user performing toggling
+     */
+    void toggleOrganisationFavorite(Integer orgId, Integer userId);
 
     Organisation getRootOrganisation();
 

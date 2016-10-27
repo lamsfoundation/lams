@@ -128,6 +128,9 @@ public class User implements Serializable, Comparable {
 
     /** persistent field */
     private Set<UserOrganisation> userOrganisations;
+    
+    /** persistent field */
+    private Integer lastVisitedOrganisationId;
 
     /** persistent field */
     private Theme theme;
@@ -398,6 +401,14 @@ public class User implements Serializable, Comparable {
     public void setUserOrganisations(Set userOrganisations) {
 	this.userOrganisations = userOrganisations;
     }
+    
+    public Integer getLastVisitedOrganisationId() {
+	return lastVisitedOrganisationId;
+    }
+
+    public void setLastVisitedOrganisationId(Integer lastVisitedOrganisationId) {
+	this.lastVisitedOrganisationId = lastVisitedOrganisationId;
+    }
 
     /** This methods adds a new membership for the given user */
     public void addUserOrganisation(UserOrganisation userOrganisation) {
@@ -493,10 +504,11 @@ public class User implements Serializable, Comparable {
 		new ThemeDTO(theme),
 		// TimeZone.getTimeZone("Australia/Sydney"),
 		timeZone, authenticationMethod.getAuthenticationMethodId(), fckLanguageMapping, lamsCommunityToken,
-		lamsCommunityUsername, (tutorialsDisabled == null ? false : true), // assume tutorials enabled if not
-		// set
-		tutorialPages, (firstLogin == null ? true : false) // assume no firstLogin value means they haven't
-	// logged in
+		lamsCommunityUsername, 
+		(tutorialsDisabled == null ? false : true), // assume tutorials enabled if not set
+		tutorialPages, 
+		(firstLogin == null ? true : false), // assume no firstLogin value means they haven't logged in
+		lastVisitedOrganisationId
 	);
     }
 

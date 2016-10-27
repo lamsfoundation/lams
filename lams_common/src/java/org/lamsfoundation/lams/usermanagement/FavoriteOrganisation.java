@@ -24,17 +24,15 @@
 package org.lamsfoundation.lams.usermanagement;
 
 import java.io.Serializable;
-import java.util.HashSet;
-import java.util.Set;
 
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.commons.lang.builder.ToStringBuilder;
 
-public class UserOrganisation implements Serializable {
+public class FavoriteOrganisation implements Serializable {
 
     /** identifier field */
-    private Integer userOrganisationId;
+    private Integer favoriteOrganisationId;
 
     /** persistent field */
     private User user;
@@ -42,32 +40,22 @@ public class UserOrganisation implements Serializable {
     /** persistent field */
     private Organisation organisation;
 
-    /** persistent field */
-    private Set userOrganisationRoles;
-
     /** full constructor */
-    public UserOrganisation(User user, Organisation organisation, Set userOrganisationRoles) {
-	this.user = user;
-	this.organisation = organisation;
-	this.userOrganisationRoles = userOrganisationRoles;
-    }
-
-    /** minimal constructor */
-    public UserOrganisation(User user, Organisation organisation) {
+    public FavoriteOrganisation(User user, Organisation organisation) {
 	this.user = user;
 	this.organisation = organisation;
     }
 
     /** default constructor */
-    public UserOrganisation() {
+    public FavoriteOrganisation() {
     }
 
-    public Integer getUserOrganisationId() {
-	return this.userOrganisationId;
+    public Integer getFavoriteOrganisationId() {
+	return this.favoriteOrganisationId;
     }
 
-    public void setUserOrganisationId(Integer userOrganisationId) {
-	this.userOrganisationId = userOrganisationId;
+    public void setFavoriteOrganisationId(Integer userOrganisationId) {
+	this.favoriteOrganisationId = userOrganisationId;
     }
 
     public User getUser() {
@@ -86,38 +74,23 @@ public class UserOrganisation implements Serializable {
 	this.organisation = organisation;
     }
 
-    public Set getUserOrganisationRoles() {
-	return this.userOrganisationRoles;
-    }
-
-    public void setUserOrganisationRoles(Set userOrganisationRoles) {
-	this.userOrganisationRoles = userOrganisationRoles;
-    }
-
-    public void addUserOrganisationRole(UserOrganisationRole userOrganisationRole) {
-	if (userOrganisationRoles == null) {
-	    userOrganisationRoles = new HashSet();
-	}
-	userOrganisationRoles.add(userOrganisationRole);
-    }
-
     @Override
     public String toString() {
-	return new ToStringBuilder(this).append("userOrganisationId", getUserOrganisationId()).toString();
+	return new ToStringBuilder(this).append("favoriteOrganisationId", getFavoriteOrganisationId()).toString();
     }
 
     @Override
     public boolean equals(Object other) {
-	if (!(other instanceof UserOrganisation)) {
+	if (!(other instanceof FavoriteOrganisation)) {
 	    return false;
 	}
-	UserOrganisation castOther = (UserOrganisation) other;
-	return new EqualsBuilder().append(this.getUserOrganisationId(), castOther.getUserOrganisationId()).isEquals();
+	FavoriteOrganisation castOther = (FavoriteOrganisation) other;
+	return new EqualsBuilder().append(this.getFavoriteOrganisationId(), castOther.getFavoriteOrganisationId()).isEquals();
     }
 
     @Override
     public int hashCode() {
-	return new HashCodeBuilder().append(getUserOrganisationId()).toHashCode();
+	return new HashCodeBuilder().append(getFavoriteOrganisationId()).toHashCode();
     }
 
 }

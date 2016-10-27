@@ -60,7 +60,7 @@ public class UserDAO extends LAMSBaseDAO implements IUserDAO {
 	    String email = (String) element[4];
 
 	    UserDTO userDto = new UserDTO(userId, firstName, lastName, login, null, null, null, email, null, null, null,
-		    null, null, null, true, null, false);
+		    null, null, null, true, null, false, null);
 
 	    userDtos.add(userDto);
 	}

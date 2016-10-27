@@ -182,12 +182,6 @@
 	</listener>
 
 	<servlet>
-		<servlet-name>updateCollapsedGroup</servlet-name>
-		<servlet-class>org.lamsfoundation.lams.web.UpdateCollapsedGroupServlet
-		</servlet-class>
-	</servlet>
-
-	<servlet>
 		<servlet-name>GetRecordingServlet</servlet-name>
 		<servlet-class>org.lamsfoundation.lams.webservice.GetRecordingServlet
 		</servlet-class>
@@ -464,10 +458,6 @@
 		<url-pattern>/services/getServerTime</url-pattern>
 	</servlet-mapping>
 
-	<servlet-mapping>
-		<servlet-name>updateCollapsedGroup</servlet-name>
-		<url-pattern>/servlet/updateCollapsedGroup</url-pattern>
-	</servlet-mapping>
 	<servlet-mapping>
 		<servlet-name>GetRecordingServlet</servlet-name>
 		<url-pattern>/GetRecording</url-pattern>
