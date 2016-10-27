@@ -100,10 +100,26 @@ function showDialog(id, initParams, extraButtons, recreate) {
 			modalDialog.css({
 				'margin' : 0
 			});
-			dialog.width(modalDialog.outerWidth(true));
-			dialog.height(modalDialog.outerHeight(true));
+			dialog.width(modalDialog.outerWidth(true) + 5);
+			dialog.height(modalDialog.outerHeight(true) + 5);
 			// remove overlay
 			dialog.siblings('.modal-backdrop').remove();
+			
+			dialog.position({
+				'of' : 'body'
+			});
+			
+			if (initParams.draggable) {
+				modalDialog.on('drag', function(event, ui){
+					dialog.offset({
+						'top'  : ui.offset.top + 5,
+						'left' : ui.offset.left + 5
+					});
+					modalDialog.css({
+						'position' : 'static'
+					});
+				});
+			}
 		});
 	}
 	
