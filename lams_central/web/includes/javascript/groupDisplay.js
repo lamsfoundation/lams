@@ -211,7 +211,7 @@ function showAddLessonDialog(orgID) {
 		},
 		'modal' : true,
 		'height' : 740,
-		'width' : 850,
+		'width' : 'auto',
 		'title' : LABELS.ADD_LESSON_TITLE,
 		'open' : function() {
 			var dialog = $(this);
@@ -220,6 +220,7 @@ function showAddLessonDialog(orgID) {
 					.attr('src', LAMS_URL
 						+ 'home.do?method=addLesson&organisationID='
 						+ dialog.data('orgID'));
+			$(this).css("maxWidth", "850px").css("margin", "auto");
 			
 			// in case of mobile devices allow iframe scrolling
 			if( /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) ) {
@@ -285,7 +286,7 @@ function showOrgGroupDialog(orgID) {
 		},
 		'modal' : true,
 		'height' : 460,
-		'width' : 460,
+		'width' : 'auto',
 		'title' : LABELS.COURSE_GROUPS_TITLE,
 		'open' : function() {
 			// load contents after opening the dialog
@@ -293,6 +294,8 @@ function showOrgGroupDialog(orgID) {
 					.attr('src', LAMS_URL
 						+ 'OrganisationGroup.do?method=viewGroupings&organisationID='
 						+ $(this).data('orgID'));
+			$(this).css("maxWidth", "460px").css("margin", "auto");
+
 		}
 	}, true);
 }
@@ -306,11 +309,12 @@ function showAddSingleActivityLessonDialog(orgID, toolID, learningLibraryID) {
 		},
 		'modal' : true,
 		'height' : 600,
-		'width' : 850,
+		'width' : 'auto',
 		'title' : LABELS.SINGLE_ACTIVITY_LESSON_TITLE,
 		'open' : function() {
 			var dialog = $(this),
 				toolID = dialog.data('toolID');
+			$(this).css("maxWidth", "850px").css("margin", "auto");
 			$.ajax({
 				async : false,
 				cache : false,
@@ -361,7 +365,6 @@ function showNotificationsDialog(orgID, lessonID) {
 					+ 'monitoring/emailNotifications.do?method=getLessonView&lessonID='
 					+ lessonID);
 			} else {
-				var orgID = dialog.dialog('option', 'orgID');
 				$('iframe', dialog).attr('src', LAMS_URL
 					+ 'monitoring/emailNotifications.do?method=getCourseView&organisationID='
 					+ orgID);
