@@ -586,6 +586,7 @@ function showAuthoringDialog(learningDesignID){
 	showDialog('dialogAuthoring', {
 		'height' : Math.max(300, $(window).height() - 40),
 		'width' : 1280,
+		'modal' : false,
 		'title' : LABELS.AUTHORING_TITLE,
 		'beforeClose' : function(){
 			// if LD was modified, ask the user if he really wants to exit
