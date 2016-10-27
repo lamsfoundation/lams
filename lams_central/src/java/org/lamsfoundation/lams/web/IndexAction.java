@@ -127,6 +127,7 @@ public class IndexAction extends LamsDispatchAction {
 	
 	List<Organisation> favoriteOrganisations = userManagementService.getFavoriteOrganisationsByUser(userDTO.getUserID());
 	request.setAttribute("favoriteOrganisations", favoriteOrganisations);
+	request.setAttribute("activeOrgId", user.getLastVisitedOrganisationId());
 
 	return mapping.findForward("main");
     }
