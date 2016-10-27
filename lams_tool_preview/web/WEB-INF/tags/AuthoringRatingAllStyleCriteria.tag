@@ -187,7 +187,6 @@
 	})
 
 	function addCriteria() {
-		debugger;
 		var styleDropDown = document.getElementById("ratingStyle");
 		var style = styleDropDown.options[styleDropDown.selectedIndex].value;
 		maxOrderId++;
