@@ -55,12 +55,13 @@ public class UserDTO implements Serializable {
     private Boolean tutorialsDisabled;
     private Set<String> pagesWithDisabledTutorials;
     private Boolean firstLogin;
+    private Integer lastVisitedOrganisationId;
 
     public UserDTO(Integer userID, String firstName, String lastName, String login, String localeLanguage,
 	    String localeCountry, String direction, String email, ThemeDTO htmlTheme, TimeZone timezone,
 	    Integer authenticationMethodId, String fckLanguageMapping, String lamsCommunityToken,
 	    String lamsCommunityUsername, Boolean tutorialsDisabled, Set<String> pagesWithDisabledTutorials,
-	    Boolean firstLogin) {
+	    Boolean firstLogin, Integer lastVisitedOrganisationId) {
 	this.userID = userID;
 	this.firstName = firstName;
 	this.lastName = lastName;
@@ -78,6 +79,7 @@ public class UserDTO implements Serializable {
 	this.tutorialsDisabled = tutorialsDisabled;
 	this.pagesWithDisabledTutorials = pagesWithDisabledTutorials;
 	this.firstLogin = firstLogin;
+	this.lastVisitedOrganisationId = lastVisitedOrganisationId;
     }
 
     /**
@@ -228,5 +230,9 @@ public class UserDTO implements Serializable {
 
     public void setFirstLogin(Boolean firstLogin) {
 	this.firstLogin = firstLogin;
+    }
+
+    public Integer getLastVisitedOrganisationId() {
+	return lastVisitedOrganisationId;
     }
 }

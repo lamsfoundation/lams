@@ -41,6 +41,7 @@ import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.dao.IBaseDAO;
 import org.lamsfoundation.lams.learningdesign.dao.IGroupDAO;
 import org.lamsfoundation.lams.themes.Theme;
+import org.lamsfoundation.lams.usermanagement.FavoriteOrganisation;
 import org.lamsfoundation.lams.usermanagement.ForgotPasswordRequest;
 import org.lamsfoundation.lams.usermanagement.IUserDAO;
 import org.lamsfoundation.lams.usermanagement.Organisation;
@@ -52,6 +53,7 @@ import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.UserOrganisation;
 import org.lamsfoundation.lams.usermanagement.UserOrganisationRole;
 import org.lamsfoundation.lams.usermanagement.WorkspaceFolder;
+import org.lamsfoundation.lams.usermanagement.dao.IFavoriteOrganisationDAO;
 import org.lamsfoundation.lams.usermanagement.dao.IOrganisationDAO;
 import org.lamsfoundation.lams.usermanagement.dao.IRoleDAO;
 import org.lamsfoundation.lams.usermanagement.dao.IUserOrganisationDAO;
@@ -97,6 +99,8 @@ public class UserManagementService implements IUserManagementService {
     private IUserDAO userDAO;
 
     private IUserOrganisationDAO userOrganisationDAO;
+    
+    private IFavoriteOrganisationDAO favoriteOrganisationDAO;
 
     protected MessageService messageService;
 
@@ -241,6 +245,34 @@ public class UserManagementService implements IUserManagementService {
 	}
 
 	return users;
+    }
+    
+    @Override
+    public List<Organisation> getFavoriteOrganisationsByUser(Integer userId) {
+	return favoriteOrganisationDAO.getFavoriteOrganisationsByUser(userId);
+    }
+    
+    @Override
+    public boolean isOrganisationFavorite(Integer organisationId, Integer userId) {
+	return favoriteOrganisationDAO.isOrganisationFavorite(organisationId, userId);
+    }
+    
+    @Override
+    public void toggleOrganisationFavorite(Integer orgId, Integer userId) {
+	FavoriteOrganisation favoriteOrganisation = favoriteOrganisationDAO.getFavoriteOrganisation(orgId, userId);
+	
+	//create new favoriteOrganisation if it doesn't exist
+	if (favoriteOrganisation == null) {
+	    
+	    User user = (User) findById(User.class, userId);
+	    Organisation organisation = (Organisation) findById(Organisation.class, orgId);
+	    favoriteOrganisation = new FavoriteOrganisation(user, organisation);
+	    save(favoriteOrganisation);
+	   
+	//remove favoriteOrganisation if it existed
+	} else {
+	    delete(favoriteOrganisation);
+	}
     }
 
     @Override
@@ -996,6 +1028,10 @@ public class UserManagementService implements IUserManagementService {
 
     public void setUserOrganisationDAO(IUserOrganisationDAO userOrganisationDAO) {
 	this.userOrganisationDAO = userOrganisationDAO;
+    }
+    
+    public void setFavoriteOrganisationDAO(IFavoriteOrganisationDAO favoriteOrganisationDAO) {
+	this.favoriteOrganisationDAO = favoriteOrganisationDAO;
     }
 
     private IAuditService getAuditService() {

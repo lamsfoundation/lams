@@ -49,7 +49,8 @@
 	<script type="text/javascript" src="includes/javascript/jquery-ui.js"></script>
 	<script type="text/javascript" src="includes/javascript/jquery.dialogextend.js"></script>	
 	<script type="text/javascript" src="includes/javascript/dialog.js"></script>
-	<script type="text/javascript" src="includes/javascript/groupDisplay.js"></script>	
+	<!-- import of showAuthoringDialog() method  -->
+	<script type="text/javascript" src="includes/javascript/main.js"></script>
 	<script type="text/javascript">
     	var isSelected = false;
 		var tree;

@@ -50,7 +50,7 @@
 
 	<script type="text/javascript" src="includes/javascript/jquery.js"></script>
 	<script type="text/javascript" src="includes/javascript/jquery-ui.js"></script>
-	<script type="text/javascript" src="includes/javascript/groupDisplay.js"></script>
+	<script type="text/javascript" src="includes/javascript/profile.js"></script>
 	<script type="text/javascript" src="/lams/includes/javascript/bootstrap.min.js"></script>
 	<script type="text/javascript" src="includes/javascript/jquery.blockUI.js"></script>
 	<script type="text/javascript" src="includes/javascript/webcam.js"></script>

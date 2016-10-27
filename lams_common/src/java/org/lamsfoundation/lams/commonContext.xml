@@ -48,6 +48,7 @@
 		<property name="groupDAO"><ref bean="groupDAO"/></property>
 		<property name="roleDAO"><ref bean="roleDAO"/></property>
 		<property name="organisationDAO"><ref bean="organisationDAO"/></property>
+		<property name="favoriteOrganisationDAO"><ref bean="favoriteOrganisationDAO"/></property>
 		<property name="userDAO"><ref bean="userDAO"/></property>
 		<property name="userOrganisationDAO"><ref bean="userOrganisationDAO"/></property>
 		<property name="messageService"><ref bean="commonMessageService"/></property>
@@ -75,6 +76,7 @@
 				<prop key="disable*">PROPAGATION_REQUIRED</prop>
 				<prop key="set*">PROPAGATION_REQUIRED</prop>
 				<prop key="is*">PROPAGATION_REQUIRED</prop>
+				<prop key="toggleOrganisationFavorite">PROPAGATION_REQUIRED</prop>
 				<prop key="userHasData">PROPAGATION_REQUIRED</prop>
 			</props>
 		</property>
@@ -528,6 +530,10 @@
 	</bean>
 	
 	<bean id="organisationDAO" class="org.lamsfoundation.lams.usermanagement.dao.hibernate.OrganisationDAO">
+		<property name="sessionFactory"><ref bean="coreSessionFactory"/></property>
+	</bean>
+	
+	<bean id="favoriteOrganisationDAO" class="org.lamsfoundation.lams.usermanagement.dao.hibernate.FavoriteOrganisationDAO">
 		<property name="sessionFactory"><ref bean="coreSessionFactory"/></property>
 	</bean>
 	

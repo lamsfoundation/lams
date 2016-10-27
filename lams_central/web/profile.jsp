@@ -17,7 +17,7 @@
 	
 	<script type="text/javascript" src="includes/javascript/jquery.js"></script>
 	<script type="text/javascript" src="includes/javascript/jquery-ui.js"></script>
-	<script type="text/javascript" src="includes/javascript/groupDisplay.js"></script>
+	<script type="text/javascript" src="includes/javascript/profile.js"></script>
 	<script type="text/javascript">
 		$(document).ready(function () {
 			//update dialog's height and title

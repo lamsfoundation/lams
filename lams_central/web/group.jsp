@@ -5,12 +5,24 @@
 <%@ taglib uri="tags-lams" prefix="lams"%>
 
 <div class="course-header" style="padding-bottom: 5px; border-bottom: 1px solid #eee;">
-<span class="lead"><strong><c:out value="${orgBean.name}" /></strong></span>
-<!-- Group header -->
-<c:set var="org" value="${orgBean}" />
-<%@ include file="groupHeader.jsp"%>
+	<span class="lead">
+		<strong><c:out value="${orgBean.name}" /></strong>
+	</span>
+	<a href="#" onclick="javascript:toggleFavoriteOrganisation(${orgBean.id});">
+		<c:choose>
+			<c:when test="${orgBean.favorite}">
+				<i id="favorite-star" class="fa fa-star" title="<fmt:message key='label.remove.org.favorite'/>"></i>
+			</c:when>
+			<c:otherwise>
+				<i id="favorite-star" class="fa fa-star-o" title="<fmt:message key='label.mark.org.favorite'/>"></i>
+			</c:otherwise>
+		</c:choose>
+	</a>
+	
+	<!-- Group header -->
+	<c:set var="org" value="${orgBean}" />
+	<%@ include file="groupHeader.jsp"%>
 </div>
-
 
 <!-- Group contents -->
 <div class="j-course-contents">
@@ -40,12 +52,11 @@
 	</c:forEach>
 </div>
 
-
-
 <c:if test="${orgBean.allowSorting}">
 	<div class="pull-right">
-		<a class="sorting text-muted" href="#" onClick="javascript:makeOrgSortable(${orgBean.id})" title="<fmt:message key="label.enable.lesson.sorting"/>">
-			<i class="fa fa-sort"></i></a>
+		<a class="sorting text-muted" href="#" onClick="javascript:makeOrgSortable()" title="<fmt:message key="label.enable.lesson.sorting"/>">
+			<i class="fa fa-sort"></i>
+		</a>
 	</div>
 </c:if>
 

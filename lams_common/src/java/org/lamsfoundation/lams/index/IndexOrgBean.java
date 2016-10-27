@@ -29,15 +29,11 @@ import java.util.List;
 import org.apache.commons.lang.builder.EqualsBuilder;
 
 /**
- * @version
- *
- *          <p>
- *          <a href="OrgIndexBean.java.html"><i>View Source</i></a>
- *          </p>
+ * <p>
+ * <a href="OrgIndexBean.java.html"><i>View Source</i></a>
+ * </p>
  *
  * @author <a href="mailto:fyang@melcoe.mq.edu.au">Fei Yang</a>
- *
- *         Created at 10:01:23 on 14/06/2006
  */
 public class IndexOrgBean implements Comparable {
 
@@ -46,6 +42,7 @@ public class IndexOrgBean implements Comparable {
     private Date archivedDate;
     private Integer type;
     private Boolean allowSorting = false;
+    private boolean favorite = false;
     private List<IndexLinkBean> links;
     private List<IndexLinkBean> moreLinks;
     private List<IndexLessonBean> lessons;
@@ -210,6 +207,17 @@ public class IndexOrgBean implements Comparable {
 
     public void setAllowSorting(Boolean allowSorting) {
 	this.allowSorting = allowSorting;
+    }
+    
+    /**
+     * @return whether user marked this organisation as favorite
+     */
+    public boolean isFavorite() {
+	return favorite;
+    }
+
+    public void setFavorite(boolean favorite) {
+	this.favorite = favorite;
     }
 
 }

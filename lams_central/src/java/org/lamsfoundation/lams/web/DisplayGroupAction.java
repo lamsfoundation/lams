@@ -115,6 +115,10 @@ public class DisplayGroupAction extends Action {
 		request.setAttribute("tools",
 			getLearningDesignService().getToolDTOs(false, false, request.getRemoteUser()));
 	    }
+	    
+	    //set whether organisation is favorite
+	    boolean isFavorite = service.isOrganisationFavorite(orgId, user.getUserId());
+	    iob.setFavorite(isFavorite);
 	}
 
 	return mapping.findForward("group");

@@ -43,6 +43,7 @@ import org.apache.tomcat.util.json.JSONException;
 import org.apache.tomcat.util.json.JSONObject;
 import org.lamsfoundation.lams.config.Registration;
 import org.lamsfoundation.lams.index.IndexLinkBean;
+import org.lamsfoundation.lams.usermanagement.Organisation;
 import org.lamsfoundation.lams.usermanagement.Role;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.dto.OrganisationDTO;
@@ -123,6 +124,9 @@ public class IndexAction extends LamsDispatchAction {
 	if (reg != null) {
 	    request.setAttribute("lamsCommunityEnabled", reg.isEnableLamsCommunityIntegration());
 	}
+	
+	List<Organisation> favoriteOrganisations = userManagementService.getFavoriteOrganisationsByUser(userDTO.getUserID());
+	request.setAttribute("favoriteOrganisations", favoriteOrganisations);
 
 	return mapping.findForward("main");
     }
@@ -159,7 +163,7 @@ public class IndexAction extends LamsDispatchAction {
     }
 
     /**
-     * Returns list of organisations for .
+     * Returns list of organisations for user. Used by offcanvas tablesorter on main.jsp.
      */
     public ActionForward getOrgs(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse res) throws IOException, ServletException, JSONException {
@@ -205,6 +209,52 @@ public class IndexAction extends LamsDispatchAction {
 	res.setContentType("application/json;charset=utf-8");
 	res.getWriter().print(new String(responcedata.toString()));
 	return null;
+    }
+    
+    /**
+     * Toggles whether organisation is marked as favorite.
+     */
+    public ActionForward toggleFavoriteOrganisation(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+	    HttpServletResponse res) throws IOException, ServletException {
+	getUserManagementService();
+	Integer orgId = WebUtil.readIntParam(request, "orgId", false);
+	Integer userId = getUserId();
+
+	if (orgId != null) {
+	    userManagementService.toggleOrganisationFavorite(orgId, userId);
+	}
+
+	List<Organisation> favoriteOrganisations = userManagementService.getFavoriteOrganisationsByUser(userId);
+	request.setAttribute("favoriteOrganisations", favoriteOrganisations);
+	
+	String activeOrgId = request.getParameter("activeOrgId");
+	request.setAttribute("activeOrgId", activeOrgId);
+
+	return mapping.findForward("favoriteOrganisations");
+    }
+    
+    /**
+     * Saves to DB last visited organisation. It's required for displaying some org on main.jsp next time user logs in.
+     */
+    public ActionForward storeLastVisitedOrganisation(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+	    HttpServletResponse res) throws IOException, ServletException {
+	getUserManagementService();
+	Integer lastVisitedOrganisationId = WebUtil.readIntParam(request, "orgId", false);
+
+	//saves to DB last visited organisation
+	if (lastVisitedOrganisationId != null) {
+	    User user = userManagementService.getUserByLogin(request.getRemoteUser());
+	    user.setLastVisitedOrganisationId(lastVisitedOrganisationId);
+	    userManagementService.save(user);
+	}
+
+	return null;
+    }
+    
+    private Integer getUserId() {
+	HttpSession ss = SessionManager.getSession();
+	UserDTO learner = (UserDTO) ss.getAttribute(AttributeNames.USER);
+	return learner != null ? learner.getUserID() : null;
     }
 
     private IUserManagementService getUserManagementService() {
