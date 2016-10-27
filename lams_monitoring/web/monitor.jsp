@@ -198,7 +198,7 @@
 	</div>
 	
 	<lams:Page type="navbar">
-		<lams:Tabs control="true" helpPage="monitoringlesson">
+		<lams:Tabs control="true">
 			<lams:Tab id="1" key="tab.lesson" />
 			<lams:Tab id="2" key="tab.sequence" />
 			<lams:Tab id="3" key="tab.learners" />
