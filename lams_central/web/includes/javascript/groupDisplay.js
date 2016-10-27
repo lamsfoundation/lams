@@ -353,7 +353,7 @@ function showNotificationsDialog(orgID, lessonID) {
 			'lessonID' : lessonID
 		},
 		'height' : 650,
-		'width' : 850,
+		'width' : 'auto',
 		'title' : LABELS.EMAIL_NOTIFICATIONS_TITLE,
 		'open' : function() {
 			var dialog = $(this),
@@ -369,6 +369,7 @@ function showNotificationsDialog(orgID, lessonID) {
 					+ 'monitoring/emailNotifications.do?method=getCourseView&organisationID='
 					+ orgID);
 			}
+			$(this).css("maxWidth", "800px").css("margin", "auto");
 		}
 	}, true);
 }
@@ -499,13 +500,14 @@ function showGradebookCourseDialog(orgID){
 	showDialog(id, {
 		'orgID' : orgID,
 		'height' : 650,
-		'width' : 850,
+		'width' : 'auto',
 		'title' : LABELS.GRADEBOOK_COURSE_TITLE,
 		'open' : function() {
 			var orgID = $(this).dialog('option', 'orgID');
 			// load contents after opening the dialog
 			$('iframe', this).attr('src', LAMS_URL
 				+ 'gradebook/gradebookMonitoring.do?dispatch=courseMonitor&organisationID=' + orgID);
+			$(this).css("maxWidth", "850").css("margin", "auto");
 		}
 	}, true);
 }
@@ -517,30 +519,32 @@ function showGradebookLessonDialog(lessonID){
 			'lessonID' : lessonID
 		},
 		'height' : 650,
-		'width' : 850,
+		'width' : 'auto',
 		'title' : LABELS.GRADEBOOK_LESSON_TITLE,
 		'open' : function() {
 			var lessonID = $(this).data('lessonID');
 			// load contents after opening the dialog
 			$('iframe', this).attr('src', LAMS_URL + 'gradebook/gradebookMonitoring.do?lessonID=' + lessonID);
+			$(this).css("maxWidth", "850px").css("margin", "auto");
 		}
 	}, true);
 }
 
 function showGradebookLearnerDialog(orgID){
-	var id = "dialoGradebookLearner" + orgID;
+	var id = "dialogGradebookLearner" + orgID;
 	showDialog(id, {
 		'data'  : {
 			'orgID' : orgID
 		},
 		'height' : 400,
-		'width' : 750,
+		'width' : 'auto',
 		'title' : LABELS.GRADEBOOK_LEARNER_TITLE,
 		'open' : function() {
 			var orgID = $(this).data('orgID');
 			// load contents after opening the dialog
 			$('iframe', this).attr('src', LAMS_URL
 				+ 'gradebook/gradebookLearning.do?dispatch=courseLearner&organisationID=' + orgID);
+			$(this).css("maxWidth", "750").css("margin", "auto");
 		}
 	}, true);
 }
@@ -552,13 +556,15 @@ function showConditionsDialog(lessonID){
 			'lessonID' : lessonID
 		},
 		'height' : 750,
-		'width' : 610,
+		'width' : 'auto',
 		'title' : LABELS.CONDITIONS_TITLE,
 		'open' : function() {
 			var lessonID = $(this).data('lessonID');
 			// load contents after opening the dialog
 			$('iframe', this).attr('src', LAMS_URL
 				+ 'lessonConditions.do?method=getIndexLessonConditions&lsId=' + lessonID);
+			$(this).css("maxWidth", "610px").css("margin", "auto");
+
 		}
 	}, true);
 }
@@ -569,14 +575,15 @@ function showSearchLessonDialog(orgID){
 		'data' : {
 			'orgID' : orgID
 		},
-		'height' : 350,
-		'width' : 1000,
+		'height' : 400,
+		'width' : 'auto',
 		'title' : LABELS.SEARCH_LESSON_TITLE,
 		'open' : function() {
 			var orgID = $(this).data('orgID');
 			// load contents after opening the dialog
 			$('iframe', this).attr('src', LAMS_URL
 				+ 'findUserLessons.do?dispatch=getResults&courseID=' + orgID);
+			$(this).css("maxWidth", "830px").css("margin", "auto");
 		}
 	}, true);
 }
