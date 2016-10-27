@@ -147,8 +147,6 @@ function handleRatingLimits(countRatedItems, objectId) {
 		
     if (HAS_RATING_LIMITS) {
 
-    	debugger;
-    	
     	//update info box
     	$("#count-rated-items").html(countRatedItems);
 
