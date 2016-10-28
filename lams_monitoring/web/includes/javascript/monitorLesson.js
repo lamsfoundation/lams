@@ -1,4 +1,4 @@
-﻿// ********** GLOBAL VARIABLES **********
+﻿﻿// ********** GLOBAL VARIABLES **********
 // copy of lesson SVG so it does no need to be fetched every time
 var originalSequenceCanvas = null,
 // DIV container for lesson SVG
@@ -173,7 +173,7 @@ function initLessonTab(){
 		},
 		'buttons' : [
 		             {
-		            	'text'   : LABELS.CANCEL_BUTTON,
+		            	'text'   : LABELS.CLOSE_BUTTON,
 		            	'id'     : 'classDialogCancelButton',
 		            	'class'  : 'btn btn-sm btn-default', 
 		            	'click'  : function() {
@@ -217,26 +217,6 @@ function initLessonTab(){
 		            			}
 		            		});
 
-	// sets up dialog for emailing learners
-	$('#emailDialog').dialog({
-		'autoOpen'  : false,
-		'height'    : 530,
-		'width'     : 700,
-		'modal'     : true,
-		'resizable' : false,
-		'show'      : 'fold',
-		'hide'      : 'fold',
-		'title'     : LABELS.EMAIL_BUTTON,
-		'open'      : function(){
-			autoRefreshBlocked = true;
-			$('#emailFrame').attr('src',
-					LAMS_URL + 'emailUser.do?method=composeMail&lessonID=' + lessonId
-					+ '&userID=' + $(this).dialog('option', 'userId'));
-		},
-		'close' : function(){
-			autoRefreshBlocked = false;
-		}
-	});
 }
 
 
@@ -475,17 +455,14 @@ function openChatWindow(){
 			,'width=650,height=350,resizable=no,scrollbars=no,status=no,menubar=no,toolbar=no');
 }
 
-
+//sets up dialog for emailing learners
 function showEmailDialog(userId){
-	$('#emailDialog').dialog('option',{
-		'userId'        : userId
-	}).dialog('open');
+	window.parent.showEmailDialog(userId, lessonId);
 }
 
 
 function closeEmailDialog(){
-	$('#emailFrame').attr('src', null);
-	$('#emailDialog').dialog('close');
+	window.parent.closeEmailDialog();
 }
 
 
