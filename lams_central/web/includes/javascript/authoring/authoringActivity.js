@@ -1525,7 +1525,7 @@ ActivityLib = {
 			
 			if (layout.propertiesDialog) {
 				// no selected activity = no properties dialog
-				layout.propertiesDialog.dialog('close');
+				layout.propertiesDialog.css('visibility', 'hidden');
 			}
 			layout.selectedObject = null;
 		}

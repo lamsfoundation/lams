@@ -566,26 +566,25 @@ HandlerPropertyLib = {
 		var dialog = layout.propertiesDialog,
 			// do not run this method too often
 			thisRun = new Date().getTime();
-		if (thisRun - dialog.lastRun < layout.conf.propertiesDialogDimThrottle){
+		if (thisRun - dialog.data('lastRun') < layout.conf.propertiesDialogDimThrottle){
 			return;
 		}
-		dialog.lastRun = thisRun;
+		dialog.data('lastRun', thisRun);
 		
 		// is the dialog visible at all?
 		if (layout.selectedObject) {
 			// calculate dim/show threshold
-			var container = dialog.container,
-			    dialogPosition = container.offset(),
+			var dialogPosition = dialog.offset(),
 			    dialogStartX = dialogPosition.left,
 			    dialogStartY = dialogPosition.top,
-			    dialogEndX   = dialogStartX + container.width(),
-			    dialogEndY   = dialogStartY + container.height(),
+			    dialogEndX   = dialogStartX + dialog.width(),
+			    dialogEndY   = dialogStartY + dialog.height(),
 			    dimTreshold = layout.conf.propertiesDialogDimThreshold,
 			    tooFarX = event.pageX < dialogStartX - dimTreshold || event.pageX > dialogEndX + dimTreshold,
 			    tooFarY = event.pageY < dialogStartY - dimTreshold || event.pageY > dialogEndY + dimTreshold,
 			    opacity = tooFarX || tooFarY ? layout.conf.propertiesDialogDimOpacity : 1;
 
-			container.css('opacity', opacity);
+			    dialog.css('opacity', opacity);
 		}
 	}	
 },

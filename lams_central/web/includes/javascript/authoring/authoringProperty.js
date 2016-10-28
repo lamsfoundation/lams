@@ -58,7 +58,7 @@ var PropertyDefs = {
 			// make onChange function a local variable, because it's used several times
 			var changeFunction = function(){
 				// extract changed properties and redraw the activity
-				var content = $(this).closest('.dialogContainer'),
+				var content = $(this).closest('.dialogContents'),
 					activity = content.data('parentObject'),
 					branchingActivity = activity.branchingActivity,
 					redrawNeeded = false,
@@ -189,7 +189,7 @@ var PropertyDefs = {
 			// make onChange function a local variable, because it's used several times
 			var changeFunction = function(){
 				// extract changed properties and redraw the activity
-				var content = $(this).closest('.dialogContainer'),
+				var content = $(this).closest('.dialogContents'),
 					activity = content.data('parentObject'),
 					redrawNeeded = false,
 					newTitle = $('.propertiesContentFieldTitle', content).val();
@@ -296,7 +296,7 @@ var PropertyDefs = {
 			// make onChange function a local variable, because it's used several times
 			var changeFunction = function(){
 				// extract changed properties and redraw the activity, if needed
-				var content = $(this).closest('.dialogContainer'),
+				var content = $(this).closest('.dialogContents'),
 					activity = content.data('parentObject'),
 					redrawNeeded = false,
 					newTitle = $('.propertiesContentFieldTitle', content).val(),
@@ -383,7 +383,7 @@ var PropertyDefs = {
 			
 			$('.propertiesContentFieldEqualSizes', content).attr('checked', activity.equalSizes ? 'checked' : null);
 			$('.propertiesContentFieldViewLearners', content).attr('checked', activity.viewLearners ? 'checked' : null);
-			$('.propertiesContentFieldNameGroups', content).button().click(function(){
+			$('.propertiesContentFieldNameGroups', content).click(function(){
 				PropertyLib.openGroupNamingDialog(activity);
 			});
 			
@@ -407,7 +407,7 @@ var PropertyDefs = {
 			
 			$('input', content).change(function(){
 				// extract changed properties and redraw the label, if needed
-				var content = $(this).closest('.dialogContainer'),
+				var content = $(this).closest('.dialogContents'),
 					label = content.data('parentObject'),
 					redrawNeeded = false,
 					newTitle =  $('.propertiesContentFieldTitle', content).val();
@@ -523,7 +523,7 @@ var PropertyDefs = {
 			
 			$('input, select', content).change(function(){
 				// extract changed properties and redraw the activity
-				var content = $(this).closest('.dialogContainer'),
+				var content = $(this).closest('.dialogContents'),
 					activity = content.data('parentObject'),
 					redrawNeeded = false,
 					newTitle =  $('.propertiesContentFieldTitle', content).val();
@@ -588,7 +588,7 @@ var PropertyDefs = {
 			
 			$('input', content).change(function(){
 				// extract changed properties and redraw the transition
-				var content = $(this).closest('.dialogContainer'),
+				var content = $(this).closest('.dialogContents'),
 					region = content.data('parentObject'),
 					redrawNeeded = false,
 					newTitle = $('.propertiesContentFieldTitle', content).val(),
@@ -642,7 +642,7 @@ var PropertyDefs = {
 			
 			$('input, select', content).change(function(){
 				// extract changed properties and redraw the activity
-				var content = $(this).closest('.dialogContainer'),
+				var content = $(this).closest('.dialogContents'),
 					activity = content.data('parentObject'),
 					redrawNeeded = false,
 					newTitle =  $('.propertiesContentFieldTitle', content).val();
@@ -707,7 +707,7 @@ var PropertyDefs = {
 			
 			$('input', content).change(function(){
 				// extract changed properties and redraw the transition
-				var content = $(this).closest('.dialogContainer'),
+				var content = $(this).closest('.dialogContents'),
 					transition = content.data('parentObject'),
 					redrawNeeded = false,
 					newTitle =  $('.propertiesContentFieldTitle', content).val();
@@ -760,80 +760,69 @@ PropertyLib = {
 		
 	init : function(){
 		// initialise the properties dialog singleton
-		var propertiesDialog = layout.propertiesDialog =
-			$('<div />')
-				.appendTo('body')
-				.dialog({
-					'autoOpen'      : false,
-					'closeOnEscape' : false,
-					'position'      : {
-						'my' : 'right top',
-						'at' : 'right top',
-						'of' :  '#canvas'
-					},
-					'resizable'     : false,
-					'title'         : LABELS.PROPERTIES_DIALOG_TITLE
-				});
+		var propertiesDialog = layout.propertiesDialog = showDialog('propertiesDialog',{
+			'autoOpen' 		: false,
+			'title'         : LABELS.PROPERTIES_DIALOG_TITLE,
+			'width'			: 370,
+			'close'			: null,
+			'data'			: {
+				'position'  : false
+			}
+		}, false);
+		$('.modal-body', propertiesDialog).empty();
 		// for proximity detection throttling (see handlers)
-		propertiesDialog.lastRun = 0;
+		propertiesDialog.data('lastRun', 0);
 		// remove close button, add dimming
-		propertiesDialog.container = propertiesDialog.closest('.ui-dialog');
-		propertiesDialog.container.addClass('propertiesDialogContainer')
+		propertiesDialog.addClass('propertiesDialogContainer')
 								  .css('opacity', layout.conf.propertiesDialogDimOpacity)
 		 						  .mousemove(HandlerPropertyLib.approachPropertiesDialogHandler)
-		                          .find('.ui-dialog-titlebar-close').remove();
+		                          .find('.modal-header button').remove();
 		layout.dialogs.push(propertiesDialog);
 		
+		var groupNamingContent = $('#propertiesContentGroupNaming');
+		$('#groupNamingOKButton', groupNamingContent).click(function() {
+    		var dialog = layout.groupNamingDialog,
+				activity = groupNamingContent.data('parentObject'),
+				names = [],
+				error = null;
+			
+			// extract group names from text fields and validate them
+			$('input', groupNamingContent).each(function(){
+				var groupName = $(this).val().trim();
+	    		if (GeneralLib.nameValidator.test(groupName)) {
+	    			names.push(groupName);
+	    		} else {
+	    			error = LABELS.GROUP_TITLE_VALIDATION_ERORR;
+	    			return false;
+	    		}
+			}); 
+			
+			if (error) {
+				alert(error);
+				return;
+			}
+			
+			$('input', groupNamingContent).each(function(index){
+				activity.groups[index].name = names[index];
+			});
+			
+			dialog.modal('hide');
+		});
+		$('#groupNamingCancelButton', groupNamingContent).click(function() {
+			layout.groupNamingDialog.modal('hide');
+		});
 		// initialise dialog from group naming
-		layout.groupNamingDialog = $('<div />').dialog({
+		layout.groupNamingDialog = showDialog('groupNamingDialog',{
 			'autoOpen' : false,
 			'modal'  : true,
-			'show'   : 'fold',
-			'hide'   : 'fold',
-			'position' : {
-				'of' :  '#canvas'
-			},
-			'title'  : LABELS.GROUP_NAMING_DIALOG_TITLE,
-			'buttons' : [
-			             {
-			            	'text'   : LABELS.OK_BUTTON,
-			            	'click'  : function() {
-			            		var dialog = $(this),
-			            			activity = dialog.dialog('option', 'parentObject'),
-			            			names = [],
-			            			error = null;
-			            		
-			            		// extract group names from text fields and validate them
-			            		$('input', dialog).each(function(){
-			            			var groupName = $(this).val().trim();
-				            		if (GeneralLib.nameValidator.test(groupName)) {
-				            			names.push(groupName);
-				            		} else {
-				            			error = LABELS.GROUP_TITLE_VALIDATION_ERORR;
-				            			return false;
-				            		}
-			            		}); 
-			            		
-			            		if (error) {
-			            			alert(error);
-			            			return;
-			            		}
-			            		
-			            		$('input', dialog).each(function(index){
-		            				activity.groups[index].name = names[index];
-			            		});
-			            		
-			            		dialog.dialog('close');
-							}
-			             },
-			             {
-			            	'text'   : LABELS.CANCEL_BUTTON,
-			            	'click'  : function() {
-								$(this).dialog('close');
-							}
-			             }
-			]
-		});
+			'draggable' : true,
+			'width'  : 400,
+			'title'  : LABELS.GROUP_NAMING_DIALOG_TITLE
+		}, false);
+		
+		
+		$('.modal-body', layout.groupNamingDialog).empty().append(groupNamingContent.show());
+		$('.modal-header button', layout.groupNamingDialog).remove();
 		// add to dialogs array so they can be easily closed at once
 		layout.dialogs.push(layout.groupNamingDialog);
 		
@@ -1732,16 +1721,16 @@ PropertyLib = {
 	 * Fills group naming dialog with existing group names and opens it.
 	 */
 	openGroupNamingDialog : function(activity) {
-		var dialog = layout.groupNamingDialog;
-		// remove existing entries and add reference to the initiating activity
-		dialog.empty().dialog('option', 'parentObject', activity);
-		
+		var dialog = layout.groupNamingDialog,
+			// add reference to the initiating activity
+			content = $('.dialogContents', dialog).data('parentObject', activity),
+			// remove existing entries
+			groupsDiv = $('#groupNamingGroups', content).empty();
 		$.each(activity.groups, function(){
-			$('<input type="text" />').addClass('groupName').appendTo(dialog).val(this.name);
-			dialog.append('<br />');
+			$('<input type="text" />').addClass('groupName').appendTo(groupsDiv).val(this.name);
 		});
 		
-		dialog.dialog('open');
+		dialog.modal('show');
 	},
 	
 	
@@ -1760,25 +1749,50 @@ PropertyLib = {
 	 */
 	openPropertiesDialog : function(object) {
 		object.loadPropertiesDialogContent();
-		var dialog = layout.propertiesDialog;
-		dialog.children().detach();
-		dialog.append(object.propertiesContent);
+		var dialog = layout.propertiesDialog,
+			modalBody = $('.modal-body', dialog);
+		modalBody.children().detach();
+		modalBody.append(object.propertiesContent);
 		if (object.readOnly) {
 			// make all widgets read-only
-			dialog.find('input, select, textarea').attr('disabled', 'disabled');
+			dialog.find('input, select, textarea').prop('disabled', true);
 			dialog.find('.spinner').spinner('option', 'disabled', true);
 		}
-		dialog.dialog('open');
 		dialog.find('input').blur();
-		var box = object.items.getBBox(),
-			x = box.x2 + canvas.offset().left + 5,
-			y = box.y + canvas.offset().top;
-		dialog.dialog('option', 'position',	[x, y]);
-		if (dialog.offset().left < box.x2 + canvas.offset().left) {
-			// if dialog covers the activity (too close to right border),
-			// move it to the other side
-			x = box.x + canvas.offset().left - dialog.width() - 35;
-			dialog.dialog('option', 'position',	[x, y]);
+		dialog.on('shown.bs.modal', function(){
+			var box = object.items.getBBox(),
+				canvasOffset = canvas.offset(),
+				canvasWidth = canvas.width(),
+				canvasHeight = canvas.height(),
+				dialogWidth = dialog.width(),
+				dialogHeight = dialog.height(),
+				x = box.x2 + canvasOffset.left + 5,
+				y = box.y + canvasOffset.top - dialogHeight;
+	
+			if (x + dialogWidth > canvasOffset.left + canvasWidth + 30) {
+				// if dialog covers the activity (too close to right border),
+				// move it to the other side
+				x = box.x + canvasOffset.left - dialogWidth;
+			}
+			
+			if (y < canvasOffset.top) {
+				y = box.y + canvasOffset.top;
+				var adjuster = 0;
+				while (y > canvasOffset.top && y + dialogHeight > canvasOffset.top + canvasHeight){
+					y -= adjuster++;
+				};
+			}		
+			
+			dialog.offset({
+				'left' : x,
+				'top'  : y
+			});
+		});
+
+		if (dialog.css('display') == 'none') {
+			dialog.modal('show');
+		} else {
+			dialog.trigger('shown.bs.modal');
 		}
 	},
 	

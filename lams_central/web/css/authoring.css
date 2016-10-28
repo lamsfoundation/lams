@@ -66,24 +66,29 @@ div.dialogContents, #ldScreenshotAuthor, #ldScreenshotLoading {
 	border: none;
 }
 
-div.dialogTitle {
-	padding: 5px 0px 5px 0px;
-	font-weight: bold;
-	text-align: center;
+.dialogContainer .ui-spinner {
+	border: none;
 }
 
 
-
-div.propertiesDialogContainer .ui-dialog-titlebar {
-	padding: 0 0 0 5px;
+div.propertiesDialogContainer .modal-header,
+div#groupNamingDialog .modal-header,
+div#exportLDDialog .modal-header {
+	padding: 5px;
 }
 
-div.propertiesDialogContainer .dialogContainer table {
+div.propertiesDialogContainer .modal-title,
+div#groupNamingDialog .modal-title,
+div#exportLDDialog .modal-title {
+	font-size: 16px;
+}
+
+div.propertiesDialogContainer .dialogContents table {
 	width: 100%;
 }
 
-div.propertiesDialogContainer .dialogContainer td {
-	padding-bottom: 5px;
+div.propertiesDialogContainer .dialogContents td {
+	padding: 5px;
 }
 
 input[name="propertiesContentFieldGroupDivide"] {
@@ -103,9 +108,13 @@ select.propertiesContentFieldGradebook {
 	width: 99%;	
 }
 
+div#groupNamingDialog .btn-group {
+	margin: 5px 0;
+}
+
 input.groupName {
-	margin-bottom: 5px;
-	width: 98%;
+	margin: 5px 0 5px 10px;
+	width: 95%;
 }
 
 
@@ -117,8 +126,6 @@ div#infoDialog .modal-body {
 
 div.exportDialog {
 	text-align: center;
-	font-size: 17px;
-	font-weight: bold;
 }
 
 div.exportDialog a {
@@ -133,36 +140,39 @@ div#exportLDDialog {
 	cursor: pointer;
 }
 
+div#ldStoreDialogContents {
+	width: 100%;
+	height: 100%;
+}
 
-
-div#ldStoreDialog .modal-body > table {
+div#ldStoreDialogContents > table {
 	height: 100%;
 	width: 100%;
 	border-collapse: separate;
 }
 
-div#ldStoreDialog #ldStoreDialogButtonCell {
+div#ldStoreDialogContents #ldStoreDialogButtonCell {
 	height: 40px;
 	border-top: thin dotted #2E6E9E;
 	padding-top: 5px;
 }
 
-div#ldStoreDialog #ldStoreDialogButtonCell > div > div {
+div#ldStoreDialogContents #ldStoreDialogButtonCell > div > div {
 	display: inline-block;
 }
 
-div#ldStoreDialog td#ldStoreDialogTreeCell {
+div#ldStoreDialogContents td#ldStoreDialogTreeCell {
 	padding: 2px 2px 0px 5px;
 	vertical-align: top;
 	width: 200px;
 	border-right: thin dotted #2E6E9E;
 }
 
-div#ldStoreDialog div#ldStoreDialogTree {
+div#ldStoreDialogContents div#ldStoreDialogTree {
 	overflow: auto;
 }
 
-div#ldStoreDialog #ldStoreDialogAccessCell {
+div#ldStoreDialogContents #ldStoreDialogAccessCell {
 	height: 150px;
 	vertical-align: top;
 	border-top: thin dotted #2E6E9E;
@@ -170,50 +180,50 @@ div#ldStoreDialog #ldStoreDialogAccessCell {
 	padding: 5px 0px 5px 0px;
 }
 
-div#ldStoreDialog #ldStoreDialogAccessCell > div#ldStoreDialogAccessTitle {
+div#ldStoreDialogContents #ldStoreDialogAccessCell > div#ldStoreDialogAccessTitle {
 	font-size: 11px;
 	font-weight: bold;
 	text-align: center;
 }
 
-div#ldStoreDialog #ldStoreDialogAccessCell > div.access {
+div#ldStoreDialogContents #ldStoreDialogAccessCell > div.access {
 	padding: 3px 0 3px 3px;
 	cursor: pointer;
 }
 
-div#ldStoreDialog #ldStoreDialogAccessCell > div.selected {
+div#ldStoreDialogContents #ldStoreDialogAccessCell > div.selected {
 	background-color: #dfeffc;
 }
 
 
-div#ldStoreDialog td#ldStoreDialogCanvasCell {
+div#ldStoreDialogContents td#ldStoreDialogCanvasCell {
 	text-align: center;
 	padding: 10px 0px 0px 10px;
 	vertical-align: middle;
 }
 
-div#ldStoreDialog div#ldStoreDialogCanvasDiv {
+div#ldStoreDialogContents div#ldStoreDialogCanvasDiv {
 	overflow: auto;
 }
 
-div#ldStoreDialog img#ldScreenshotLoading  {
+div#ldStoreDialogContents img#ldScreenshotLoading  {
 	padding-top: 200px;
 }
 
-div#ldStoreDialog #ldStoreDialogImportPartFrame {
+div#ldStoreDialogContents #ldStoreDialogImportPartFrame {
 	border: none;
 	width: 99%;
 }
 
-div#ldStoreDialog div#ldStoreDialogNameContainer {
+div#ldStoreDialogContents div#ldStoreDialogNameContainer {
 	margin-left: 20px;
 }
 
-div#ldStoreDialog div#ldStoreDialogNameContainer span {
+div#ldStoreDialogContents div#ldStoreDialogNameContainer span {
 	font-weight: bold;
 }
 
-div#ldStoreDialog #ldStoreDialogNameContainer input {
+div#ldStoreDialogContents #ldStoreDialogNameContainer input {
 	width: 300px;
 	margin-left: 10px;	
 }
@@ -303,16 +313,6 @@ div#outputConditionsDialog tr.selected {
 	background-color: #dfeffc;
 }
 
-
-div#exportImageDialog div#exportCanvas {
-	margin: 5px;
-	padding: 5px;
-	text-align: center;
-	border: thin dashed black;
-}
-
-
-
 /**** Main authoring styles ****/
 
 div#toolbar {
@@ -322,12 +322,6 @@ div#toolbar {
 #cancelLiveEditButton {
 	display: none;
 }
-
-#groupingButton span {
-	background: url('../images/icons/group.png') no-repeat 3px 3px;
-	padding-left: 25px;
-}
-
 
 table#authoringTable {
 	table-layout: fixed;
@@ -426,4 +420,3 @@ td#canvasContainerCell {
 	overflow: auto;
 	vertical-align: top;
 }
-

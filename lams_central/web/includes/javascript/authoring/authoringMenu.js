@@ -6,40 +6,21 @@ var MenuLib = {
 		
 	init : function(){
 		// dialog allowing to save canvas as SVG or PNG image
-		layout.exportImageDialog = $('#exportImageDialog').dialog({
+		layout.exportImageDialog = showDialog('exportImageDialog',{
 			'autoOpen' : false,
 			'width'	   : 350,
 			'height'   : 75,
-			'show'     : 'fold',
-			'hide'     : 'fold',
 			'draggable': false,
 			'resizable': false,
 			'modal'	   : true,
 			'title'	   : LABELS.EXPORT_IMAGE_DIALOG_TITLE
-		}).click(function(){
-			layout.exportImageDialog.dialog('close');
+		}, false);
+		layout.exportImageDialog.click(function(){
+			layout.exportImageDialog.modal('hide');
 		});
+		$('.modal-body', layout.exportImageDialog).empty().append($('#exportImageDialog').show);
 		
 		layout.dialogs.push(layout.exportImageDialog);
-		
-		
-		// dialog for downloading the sequence as ZIP
-		layout.exportLDDialog = $('#exportLDDialog').dialog({
-			'autoOpen' : false,
-			'width'	   : 320,
-			'height'   : 120,
-			'hide'     : 'fold',
-			'draggable': false,
-			'resizable': false,
-			'modal'	   : true,
-			'title'	   : LABELS.EXPORT_SEQUENCE_DIALOG_TITLE,
-			'beforeClose' : function(){
-				$('iframe', layout.exportLDDialog).attr('src', null);
-			}
-		}).click(function(){
-			layout.exportLDDialog.dialog('close');
-		});
-		layout.dialogs.push(layout.exportLDDialog);
 	},
 	
 	
@@ -278,10 +259,24 @@ var MenuLib = {
 			return;
 		}
 		
-		$('iframe', layout.exportLDDialog)
-			.attr('src', LAMS_URL + 'authoring/exportToolContent.do?method=export&learningDesignID='
-								  + layout.ld.learningDesignID);
-		layout.exportLDDialog.dialog('open');
+		// dialog for downloading the sequence as ZIP
+		var exportLDDialog = showDialog('exportLDDialog',{
+			'autoOpen' : false,
+			'width'	   : 320,
+			'height'   : 90,
+			'draggable': false,
+			'resizable': false,
+			'modal'	   : true,
+			'title'	   : LABELS.EXPORT_SEQUENCE_DIALOG_TITLE,
+			'open'	   : function() {
+				$('iframe', this).attr('src', LAMS_URL + 'authoring/exportToolContent.do?method=export&learningDesignID='
+									  	  			   + layout.ld.learningDesignID);
+			}
+		}).click(function(){
+			exportLDDialog.modal('hide');
+		});
+		$('#exportLDDialogContents').clone().attr('id', null).show().appendTo($('.modal-body', exportLDDialog).empty());
+		exportLDDialog.modal('show');
 	},
 
 	
@@ -316,7 +311,7 @@ var MenuLib = {
 				'download' : (layout.ld.title ? layout.ld.title : 'Untitled') + '.png'
 			});
 
-			layout.exportImageDialog.dialog('open');
+			layout.exportImageDialog.modal('show');
 		} else {
 			return imageCode;
 		}
@@ -366,7 +361,7 @@ var MenuLib = {
 								 + '&download=true&_=' + new Date().getTime()
 				});
 			}
-			layout.exportImageDialog.dialog('open');
+			layout.exportImageDialog.modal('show');
 		} else {
 			return imageCode;
 		}
@@ -399,7 +394,7 @@ var MenuLib = {
 			}
 		});
 		
-		var canvasClone = result.canvasClone = canvas.clone()
+		var canvasClone = result.canvasClone = canvas.clone();
 		// remove the rubbish bin icon
 		canvasClone.find('#rubbishBin').remove();
 		// IE needs this. There are 2 xmlns declarations and no xmlns:xlink
