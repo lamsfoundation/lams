@@ -665,10 +665,6 @@
 		</table>
 	</div>
 	
-	<div id="emailDialog" class="dialogContainer">
-		<iframe id="emailFrame"></iframe>
-	</div>
-	
 	<div id="sequenceInfoDialog" class="dialogContainer">
 	  <fmt:message key="sequence.help.info"/>
 	</div>
