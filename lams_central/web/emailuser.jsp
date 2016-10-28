@@ -57,12 +57,13 @@ input[type="checkbox"] {
 
 	function closeDialog() {
 		if (returnUrl == '') {
-			// if this page is in dialog, close it
-			if (parent.closeEmailDialog) {
-				parent.closeEmailDialog();
+ 			if (window.parent.closeEmailDialog) {
+ 				window.parent.closeEmailDialog();
+			} else if (closeEmailDialog) {
+				closeEmailDialog(); 
 			} else {
 				// if this is a pop up, close it
-				window.close();
+	 			close();
 			}
 		} else {
 			// if it is a main page, navigate away 
@@ -113,31 +114,25 @@ input[type="checkbox"] {
 						<input type="hidden" name="lessonID" value="${param.lessonID}" />
 						<input type="hidden" name="ccEmail" id="cc-email-hidden-input"
 							value="" />
-						<div class="form-group">
-							<b><label><fmt:message key="email.to" />:</label></b>
+						<span><b><label><fmt:message key="email.to" />:</label></b>
 							<c:if test="${not empty user}">
-								<c:out value="${user.firstName} ${user.lastName}" /> &lt;<c:out
-									value="${user.email}" />&gt;
-						 </c:if>
-						</div>
-
-
+								<c:out value="${user.firstName} ${user.lastName}" /> &lt;<c:out	value="${user.email}" />&gt;
+							 </c:if>
+						</span>
 
 						<div>
 							<div class="form-group">
 								<input type="checkbox" name="ccEmailEnabled"
-									id="cc-email-enabled" /> <b><label for="cc-email-enabled">Send
-										me a copy</label></b>
+									id="cc-email-enabled" /> <b><label for="cc-email-enabled">
+									<fmt:message key="label.email.send.me.a.copy"/></label></b>
 							</div>
 							<div id="cc-email-area" class="form-group">
 								<span id="cc-email-address"><lams:user property="email" /></span>
-								<sup> <a href="javascript:;"
-									Class="btn btn-sm btn-default voffset5" id="edit-email-address">
+								<a href="javascript:;"
+									class="btn btn-sm btn-default" id="edit-email-address">
 										<fmt:message key="label.edit" />
 								</a>
-								</sup>&nbsp;&nbsp;
-
-
+								&nbsp;&nbsp;
 							</div>
 						</div>
 
@@ -148,7 +143,7 @@ input[type="checkbox"] {
 						</div>
 
 						<div class="form-group">
-							<textarea name="body" rows="16" class="form-control"
+							<textarea name="body" rows="15" class="form-control"
 								<c:if test="${sendDisabled}">disabled="disabled"</c:if>></textarea>
 						</div>
 
