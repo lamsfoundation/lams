@@ -76,7 +76,8 @@ function showDialog(id, initParams, extraButtons, recreate) {
 	if (initParams.resizable) {
 		modalContent.resizable();
 	}
-	if (initParams.draggable) {
+	if (initParams.draggable && ! /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) ) {
+		// breaks the close buttons on Android and iPhone
 		modalDialog.draggable();
 	}
 	// store extra attributes for dialog content internal use
