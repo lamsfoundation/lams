@@ -26,7 +26,6 @@ var dialogTemplate = $('<div class="modal fade dialogContainer" tabindex="-1" ro
  * If not, creates a new dialog with the given ID and init parameters.
  */
 function showDialog(id, initParams, extraButtons, recreate) {
-	
 	var dialog = $('#' + id);
 	// is it open  already?
 	if (dialog.length > 0) {
@@ -45,7 +44,7 @@ function showDialog(id, initParams, extraButtons, recreate) {
 	// use the input attributes or fall back to default ones
 	initParams = $.extend({
 		'autoOpen' : true,
-		'modal'    : true,
+		'modal'    : false,
 		'draggable' : true,
 		'resizable' : extraButtons == true,
 		'beforeClose' : function(){
@@ -76,16 +75,24 @@ function showDialog(id, initParams, extraButtons, recreate) {
 	if (initParams.resizable) {
 		modalContent.resizable();
 	}
-	if (initParams.draggable && ! /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) ) {
-		// breaks the close buttons on Android and iPhone
-		modalDialog.draggable();
+	// breaks the close buttons on Android and iPhone
+	var draggable = initParams.draggable && ! /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+	if (draggable) {
+		modalDialog.draggable({
+			'cancel' : '.modal-body'
+		});
 	}
 	// store extra attributes for dialog content internal use
 	if (initParams.data) {
 		dialog.data(initParams.data);
 	}
 	
-	dialog.on('show.bs.modal', initParams.open);
+	dialog.on('show.bs.modal', initParams.modal ? initParams.open : function(event){
+		dialog.css('visibility', 'hidden');
+		if (initParams.open) {
+			initParams.open.call(dialog, event);
+		}
+	});
 	dialog.on('hide.bs.modal', initParams.beforeClose);
 	dialog.on('hidden.bs.modal', initParams.close);
 	
@@ -102,17 +109,27 @@ function showDialog(id, initParams, extraButtons, recreate) {
 			modalDialog.css({
 				'margin' : 0
 			});
-			dialog.width(modalDialog.outerWidth(true) + 5);
-			dialog.height(modalDialog.outerHeight(true) + 5);
+			dialog.width(modalDialog.outerWidth(true) + 15);
+			dialog.height(modalDialog.outerHeight(true) + 15);
 			// remove overlay
 			dialog.siblings('.modal-backdrop').remove();
+			dialog.css('visibility', 'visible');
 			
-			dialog.position({
-				'of' : 'body'
-			});
+			// center the dialog or put it into previously defined position
+			var position = dialog.data('position');
+			if (position !== false) {
+				position = position || {
+					'my' : 'top',
+					'at' : 'top+15px',
+					'of' : 'body'
+				};
+				dialog.position(position);
+			}
+
 			
-			if (initParams.draggable) {
+			if (draggable) {
 				modalDialog.on('drag', function(event, ui){
+					// pass the event to the dialog, not its internal element
 					dialog.offset({
 						'top'  : ui.offset.top + 5,
 						'left' : ui.offset.left + 5
@@ -120,6 +137,13 @@ function showDialog(id, initParams, extraButtons, recreate) {
 					modalDialog.css({
 						'position' : 'static'
 					});
+				});
+			}
+			
+			if (initParams.resizable) {
+				modalContent.on('resize', function(event, ui){
+					dialog.width(ui.size.width + 15);
+					dialog.height(ui.size.height + 15);
 				});
 			}
 		});

@@ -688,7 +688,7 @@
 			</tr>
 			<tr>
 				<td colspan="2">
-					<div class="propertiesContentFieldNameGroups"><fmt:message key="authoring.fla.page.prop.groups.name" /></div>
+					<button class="btn btn-default propertiesContentFieldNameGroups"><fmt:message key="authoring.fla.page.prop.groups.name" /></button>
 				</td>
 			</tr>
 		</table>
@@ -931,6 +931,23 @@
 		</table>
 	</div>
 	
+	<div id="propertiesContentGroupNaming" class="dialogContents">
+		<div id="groupNamingGroups"></div>
+		<div class="container-fluid">
+			<div class="btn-group pull-right" role="group">
+				<button id="groupNamingOKButton" class="btn btn-default">
+					<i class="fa fa-save"></i> 
+					<span><fmt:message key="label.ok" /></span>
+				</button>
+				
+				<button id="groupNamingCancelButton" class="btn btn-default">
+					<i class="fa fa-ban"></i> 
+					<span><fmt:message key="authoring.fla.cancel.button" /></span>
+				</button>
+			</div>
+		</div>
+	</div>
+	
 	
 	<!-- TOOL OUTPUT CONDITIONS DIALOG -->
 	<div id="outputConditionsDialog" class="dialogContents">
@@ -965,13 +982,13 @@
 	
 	
 	<!-- EXPORT CANVAS AS IMAGE DIALOG -->
-	<div id="exportImageDialog" class="dialogContents exportDialog">
+	<div id="exportImageDialogContents" class="dialogContents exportDialog">
 		<a href="#"><fmt:message key="authoring.fla.page.download.image" /></a>
 	</div>
 	
 	
 	<!-- EXPORT LEARNING DESIGN DIALOG -->
-	<div id="exportLDDialog" class="dialogContents exportDialog">
+	<div id="exportLDDialogContents" class="dialogContents exportDialog">
 		<span><fmt:message key="authoring.fla.page.download.wait" /><br /><fmt:message key="authoring.fla.page.download.close" /></span>
 		<iframe></iframe>
 	</div>

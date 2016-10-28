@@ -855,8 +855,7 @@ GeneralInitLib = {
 			}
 		}, false);
 		
-		$('.modal-body', layout.ldStoreDialog).empty().append(ldStoreDialogContents.children());
-		ldStoreDialogContents.remove();
+		$('.modal-body', layout.ldStoreDialog).empty().append(ldStoreDialogContents.show());
 		
 		layout.dialogs.push(layout.ldStoreDialog);
 
@@ -914,24 +913,18 @@ GeneralInitLib = {
 			'resizable'     : false,
 			'draggable'     : false,
 			'width'			: 290,
-			'open'			: function(){
-				// hide the contents so there is no "jump" during repositioning
-				$(this).css('visibility', 'hidden');
-			},
-			'close' : null
+			'close' : null,
+			'data' : {
+				'position' : {
+					'my' : 'right top',
+					'at' : 'right+10px top+10px',
+					'of' : '#canvas'
+				}
+			}
 		});
 		
 		// remove the title along with X button
 		$('.modal-header', layout.infoDialog).remove();
-		layout.infoDialog.on('shown.bs.modal', function(){
-			// reposition the dialog
-			$(this).css('visibility', 'visible')
-				   .position({
-						'my' : 'right top',
-						'at' : 'right+5px top+10px',
-						'of' : '#canvas'
-					});
-		});
 
 		layout.dialogs.push(layout.infoDialog);
 		
