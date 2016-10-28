@@ -1,5 +1,5 @@
-<%@ page language="java" pageEncoding="UTF-8"
-	contentType="text/html;charset=utf-8"%>
+<!DOCTYPE html>
+<%@ page contentType="text/html; charset=utf-8" language="java"%>
 <%@page import="org.apache.struts.action.ActionMessages"%>
 <%@ page import="org.lamsfoundation.lams.util.Configuration"%>
 <%@ page import="org.lamsfoundation.lams.util.ConfigurationKeys"%>
@@ -10,10 +10,22 @@
 <%@ taglib uri="tags-lams" prefix="lams"%>
 <%@ taglib uri="tags-core" prefix="c"%>
 
-<!DOCTYPE html>
+<c:set var="minNumChars"><%=Configuration.get(ConfigurationKeys.PASSWORD_POLICY_MINIMUM_CHARACTERS)%></c:set>
+<c:set var="mustHaveUppercase"><%=Configuration.get(ConfigurationKeys.PASSWORD_POLICY_UPPERCASE)%></c:set>
+<c:set var="mustHaveNumerics"><%=Configuration.get(ConfigurationKeys.PASSWORD_POLICY_NUMERICS)%></c:set>
+<c:set var="mustHaveSymbols"><%=Configuration.get(ConfigurationKeys.PASSWORD_POLICY_SYMBOLS)%></c:set>
+
 <lams:html>
 
 <lams:head>
+	<link rel="stylesheet" href="css/defaultHTML_learner.css"
+		type="text/css" />
+	<script type="text/javascript" src="includes/javascript/jquery.js"></script>
+	<script type="text/javascript" src="includes/javascript/jquery-ui.js"></script>
+	<script type="text/javascript"
+		src="includes/javascript/groupDisplay.js"></script>
+	<script type="text/javascript"
+		src="includes/javascript/jquery.validate.js"></script>
 	<lams:css />
 	<title><fmt:message key="title.forgot.password" /></title>
 	<link rel="icon" href="<lams:LAMSURL/>/favicon.ico" type="image/x-icon" />
@@ -21,38 +33,75 @@
 		type="image/x-icon" />
 	<script type="text/javascript">
 		function toHome() {
+
 			window.location = "<lams:LAMSURL/>index.do";
 		};
 
-		function validateForm() {
-			var pass = document.getElementById("newPassword").value;
-			var passConfirm = document.getElementById("confirmNewPassword").value;
+		$.validator.addMethod("pwcheck", function(value) {
+			return /[a-z]/.test(value) // has a lowercase letter
+			<c:if test="${mustHaveUppercase}"> && /[A-Z]/.test(value) // has uppercase letters 
+			</c:if>
+			<c:if test="${mustHaveNumerics}"> && /\d/.test(value) // has a digit
+			</c:if>
+			<c:if test="${mustHaveSymbols}">
+					&& /[`~!@#$%^&*\(\)_\-+={}\[\]\\|:\;\"\'\<\>,.?\/]/
+							.test(value) //has symbols
+			</c:if>
+		});
 
-			if (pass == null || pass == "" || passConfirm == null
-					|| passConfirm == "") {
-				alert("<fmt:message key="error.forgot.password.fields" />");
-			} else if (pass != passConfirm) {
-				alert("<fmt:message key="error.newpassword.mismatch" />");
-			} else {
-				document.changePass.submit();
-			}
-		}
+		$.validator
+				.addMethod(
+						"charactersAllowed",
+						function(value) {
+							return /^[A-Za-z0-9\d`~!@#$%^&*\(\)_\-+={}\[\]\\|:\;\"\'\<\>,.?\/]*$/
+									.test(value)
 
-		function submitenter(myfield, e) {
-			var keycode;
-			if (window.event)
-				keycode = window.event.keyCode;
-			else if (e)
-				keycode = e.which;
-			else
-				return true;
+						});
 
-			if (keycode == 13) {
-				validateForm();
-				return false;
-			} else
-				return true;
-		}
+		$(function() {
+			// Setup form validation 
+
+			$("form[name='changePass']")
+					.validate(
+							{
+								debug : true,
+								errorClass : 'help-block',
+								//  validation rules
+								rules : {
+									newPassword : {
+										required : true,
+										minlength : <c:out value="${minNumChars}"/>,
+										maxlength : 25,
+										charactersAllowed : true,
+										pwcheck : true
+									},
+									confirmNewPassword : {
+										required : true,
+										equalTo : "#newPassword"
+									}
+								},
+
+								// Specify the validation error messages
+								messages : {
+									newPassword : {
+										required : "<fmt:message key='error.password.empty'/>",
+										minlength : "<fmt:message key='label.password.min.length'><fmt:param value='${minNumChars}'/></fmt:message>",
+										maxlength : "<fmt:message key='label.password.max.length'/>",
+										charactersAllowed : "<fmt:message key='label.password.symbols.allowed'/> ` ~ ! @ # $ % ^ & * ( ) _ - + = { } [ ] \ | : ; \" ' < > , . ? /",
+										pwcheck : "<fmt:message key='label.password.restrictions'/>"
+									},
+									confirmNewPassword : {
+										required : "<fmt:message key='error.password.empty'/>",
+										equalTo : "<fmt:message key='error.newpassword.mismatch'/>"
+									},
+								},
+
+								submitHandler : function(form) {
+									document.changePass.submit();
+								}
+							});
+
+		});
 	</script>
 </lams:head>
 
@@ -72,24 +121,46 @@
 			<h4>
 				<fmt:message key="label.forgot.password" />
 			</h4>
-
+			<div class="col-xs-12">
+				<lams:Alert type="info" id="passwordConditions" close="false">
+					<strong><fmt:message key='label.password.must.contain' />:</strong>
+					<c:out value="${mustHaveUppercase}" />
+					<ul class="list-unstyled" style="line-height: 1.2">
+						<li><span class="fa fa-check"></span> <fmt:message
+								key='label.password.min.length'>
+								<fmt:param value='${minNumChars}' />
+							</fmt:message></li>
+						<c:if test="${mustHaveUppercase}">
+							<li><span class="fa fa-check"></span> <fmt:message
+									key='label.password.must.ucase' /></li>
+						</c:if>
+						<c:if test="${mustHaveNumerics}">
+							<li><span class="fa fa-check"></span> <fmt:message
+									key='label.password.must.number' /></li>
+						</c:if>
+						<c:if test="${mustHaveSymbols}">
+							<li><span class="fa fa-check"></span> <fmt:message
+									key='label.password.must.symbol' /></li>
+						</c:if>
+					</ul>
+				</lams:Alert>
+			</div>
 			<div class="form-group">
 				<label for="newPassword"><fmt:message
-						key="label.password.new.password" /></label> <input type="password"
-					id="newPassword" name="newPassword" class="form-control"
-					maxlength="50" onKeyPress="return submitenter(this,event)" />
+						key="label.password.new.password" /></label> <input class="form-control"
+					type="password" id="newPassword" name="newPassword"
+					class="form-control" maxlength="25" />
 			</div>
 			<div class="form-group">
 				<label for="confirmNewPassword"><fmt:message
 						key="label.password.confirm.new.password" /></label> <input
-					type="password" id="confirmNewPassword" class="form-control" name="confirmNewPassword"
-					maxlength="50" onKeyPress="return submitenter(this,event)" />
+					type="password" id="confirmNewPassword" class="form-control"
+					name="confirmNewPassword" maxlength="25" />
 			</div>
-			<div class="form-group">
-				<html:button property="save" styleClass="btn btn-primary pull-right"
-					onclick="javascript:validateForm();">
+			<div class="form-group" align="right">
+				<html:submit styleClass="btn btn-sm btn-primary voffset5">
 					<fmt:message key="button.save" />
-				</html:button>
+				</html:submit>
 			</div>
 
 		</form>
