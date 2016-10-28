@@ -114,12 +114,12 @@
 				<div>
 					<img alt="LAMS" src="images/svg/lams_logo_white.svg">
 				</div>
-				<i class="icon-remove fa fa-close fa-lg offcanvas-toggle"></i>
+				<a class="offcanvas-toggle"><i class="icon-remove fa fa-bars fa-lg"></i></a>
 			</div>
 			
 			<div class="offcanvas-header">
 				<span class="courses-title ">
-					<i class="fa fa-table"></i>&nbsp;&nbsp;Courses
+					<i class="fa fa-table"></i>&nbsp;<fmt:message key="organisations" />
 				</span>
 			</div>
         

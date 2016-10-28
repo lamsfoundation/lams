@@ -1,7 +1,5 @@
 $(document).ready(function () {
 	
-	//initButtons(); //TODO remove?
-	
 	// open active course. in case active course is not yet chosen by user, it will be opened after tablesorter's pager receives all orgs
 	if (activeOrgId != null) {
 		loadOrganisation();
@@ -149,9 +147,6 @@ function selectOrganisation(newOrgId) {
 		{
 			dispatch : "storeLastVisitedOrganisation",
 			orgId   : activeOrgId
-		},
-		function() {
-			//initButtons("org-container"); //TODO remove?
 		}
 	);
 }
@@ -164,8 +159,11 @@ function loadOrganisation() {
 			stateId : stateId,
 			orgId   : activeOrgId
 		},
-		function() {
-			//initButtons("org-container"); //TODO remove?
+		function( response, status, xhr ) {
+			//in case of any server error - open offcanvas bar so user can select another course
+			if ( status == "error" ) {
+				$("body").removeClass("offcanvas-hidden");
+			}			
 		}
 	);
 }
@@ -187,44 +185,6 @@ function toggleFavoriteOrganisation(orgId) {
 			}
 		}
 	);	
-}
-
-//TODO remove?
-function initButtons(containerId) {
-	var container = containerId ? $('#' + containerId) : document;
-
-	$(".ui-button", container).button();
-	$(".split-ui-button", container).each(function(){
-		var buttonContainer = $(this),
-			buttons = buttonContainer.children();
-		
-		buttons.first().button()
-			   .next().button({
-			text : false,
-			icons : {
-				primary : "ui-icon-triangle-1-s"
-			}
-		});
-		
-		buttonContainer.buttonset().next().hide().menu();
-		
-		buttons.each(function(){
-			var button = $(this);
-			if (!button.attr('onclick')) {
-				button.click(function() {
-					var menu = $(this).parent().next().show().position({
-						my : "right top",
-						at : "right bottom",
-						of : $(this).parent()
-					});
-					$(document).one("click", function() {
-						menu.hide();
-					});
-					return false;
-				});
-			}
-		});
-	});
 }
 
 

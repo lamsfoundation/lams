@@ -28,6 +28,7 @@ import java.util.List;
 import org.lamsfoundation.lams.dao.hibernate.LAMSBaseDAO;
 import org.lamsfoundation.lams.usermanagement.FavoriteOrganisation;
 import org.lamsfoundation.lams.usermanagement.Organisation;
+import org.lamsfoundation.lams.usermanagement.OrganisationState;
 import org.lamsfoundation.lams.usermanagement.dao.IFavoriteOrganisationDAO;
 import org.springframework.stereotype.Repository;
 
@@ -49,6 +50,7 @@ public class FavoriteOrganisationDAO extends LAMSBaseDAO implements IFavoriteOrg
     @Override
     public List<Organisation> getFavoriteOrganisationsByUser(Integer userId) {
 	final String query = "SELECT fav.organisation from FavoriteOrganisation fav WHERE fav.user.userId=" + userId
+		+ " AND fav.organisation.organisationState.organisationStateId = " + OrganisationState.ACTIVE
 		+ " ORDER BY fav.organisation.name";
 	return find(query);
     }

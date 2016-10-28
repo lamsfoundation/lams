@@ -18,8 +18,8 @@ html {
 .courses-title {
     text-overflow: ellipsis;
     overflow: hidden;
-    font-weight: 400;
-    font-size: 24px;
+    font-weight: 300;
+    font-size: 23px;
     width: 100%;
     color: #ECF0F1 !important;
     margin-left: 0 !important;
@@ -38,7 +38,7 @@ html {
 .offcanvas-hidden #page-wrapper {
 	margin: 0 0 0 0;
 }
-@media (min-width: 768px) {
+@media (min-width: 769px) {
 	.icon-remove {
 		display: none !important;
 	}
@@ -186,7 +186,7 @@ a {
 	cursor: pointer;
 	position: absolute;
 	width: 40px;
-	top: 20px;
+	top: 30px;
 	right: 5px;
 }
 .icon-remove:hover {
@@ -220,6 +220,7 @@ a {
     padding: 15px 15px 0;
     margin: 0;
 }
+
 .offcanvas-toggle i {
     font-size: 26px;
 }
