@@ -620,12 +620,26 @@ public class AssessmentServiceImpl
 
 	} else if (question.getType() == AssessmentConstants.QUESTION_TYPE_SHORT_ANSWER) {
 	    for (AssessmentQuestionOption option : question.getOptions()) {
-		String optionString = option.getOptionString().trim().replaceAll("\\*", ".*").replaceAll("\\+", "\\\\+");
+		
+		//prepare regex which takes into account only * special character
+		String regexWithOnlyAsteriskSymbolActive = "\\Q";
+		String optionString = option.getOptionString().trim();
+		for (int i = 0; i < optionString.length(); i++) {
+		    //everything in between \\Q and \\E are taken literally no matter which characters it contains
+		    if (optionString.charAt(i) == '*') {
+			regexWithOnlyAsteriskSymbolActive += "\\E.*\\Q";
+		    } else {
+			regexWithOnlyAsteriskSymbolActive += optionString.charAt(i);
+		    }
+		}
+		regexWithOnlyAsteriskSymbolActive += "\\E";
+		
+		//check whether answer matches regex
 		Pattern pattern;
 		if (question.isCaseSensitive()) {
-		    pattern = Pattern.compile(optionString);
+		    pattern = Pattern.compile(regexWithOnlyAsteriskSymbolActive);
 		} else {
-		    pattern = Pattern.compile(optionString,
+		    pattern = Pattern.compile(regexWithOnlyAsteriskSymbolActive,
 			    java.util.regex.Pattern.CASE_INSENSITIVE | java.util.regex.Pattern.UNICODE_CASE);
 		}
 		boolean isAnswerCorrect = (question.getAnswerString() != null)
