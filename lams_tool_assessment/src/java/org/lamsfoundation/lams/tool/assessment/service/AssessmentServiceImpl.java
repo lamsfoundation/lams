@@ -51,14 +51,9 @@ import org.apache.tomcat.util.json.JSONObject;
 import org.lamsfoundation.lams.events.IEventNotificationService;
 import org.lamsfoundation.lams.gradebook.service.IGradebookService;
 import org.lamsfoundation.lams.learning.service.ILearnerService;
-import org.lamsfoundation.lams.learningdesign.Activity;
-import org.lamsfoundation.lams.learningdesign.ToolActivity;
-import org.lamsfoundation.lams.learningdesign.dao.IActivityDAO;
 import org.lamsfoundation.lams.learningdesign.service.ExportToolContentException;
 import org.lamsfoundation.lams.learningdesign.service.IExportToolContentService;
 import org.lamsfoundation.lams.learningdesign.service.ImportToolContentException;
-import org.lamsfoundation.lams.lesson.Lesson;
-import org.lamsfoundation.lams.lesson.service.ILessonService;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.notebook.service.CoreNotebookConstants;
 import org.lamsfoundation.lams.notebook.service.ICoreNotebookService;
@@ -68,7 +63,6 @@ import org.lamsfoundation.lams.tool.ToolContentImport102Manager;
 import org.lamsfoundation.lams.tool.ToolContentManager;
 import org.lamsfoundation.lams.tool.ToolOutput;
 import org.lamsfoundation.lams.tool.ToolOutputDefinition;
-import org.lamsfoundation.lams.tool.ToolSession;
 import org.lamsfoundation.lams.tool.ToolSessionExportOutputData;
 import org.lamsfoundation.lams.tool.ToolSessionManager;
 import org.lamsfoundation.lams.tool.assessment.AssessmentConstants;
@@ -102,9 +96,6 @@ import org.lamsfoundation.lams.tool.assessment.util.SequencableComparator;
 import org.lamsfoundation.lams.tool.exception.DataMissingException;
 import org.lamsfoundation.lams.tool.exception.ToolException;
 import org.lamsfoundation.lams.tool.service.ILamsToolService;
-import org.lamsfoundation.lams.usermanagement.Organisation;
-import org.lamsfoundation.lams.usermanagement.OrganisationType;
-import org.lamsfoundation.lams.usermanagement.Role;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
@@ -622,12 +613,26 @@ public class AssessmentServiceImpl implements IAssessmentService, ToolContentMan
 
 	} else if (question.getType() == AssessmentConstants.QUESTION_TYPE_SHORT_ANSWER) {
 	    for (AssessmentQuestionOption option : question.getOptions()) {
-		String optionString = option.getOptionString().trim().replaceAll("\\*", ".*");
+		
+		//prepare regex which takes into account only * special character
+		String regexWithOnlyAsteriskSymbolActive = "\\Q";
+		String optionString = option.getOptionString().trim();
+		for (int i = 0; i < optionString.length(); i++) {
+		    //everything in between \\Q and \\E are taken literally no matter which characters it contains
+		    if (optionString.charAt(i) == '*') {
+			regexWithOnlyAsteriskSymbolActive += "\\E.*\\Q";
+		    } else {
+			regexWithOnlyAsteriskSymbolActive += optionString.charAt(i);
+		    }
+		}
+		regexWithOnlyAsteriskSymbolActive += "\\E";
+		
+		//check whether answer matches regex
 		Pattern pattern;
 		if (question.isCaseSensitive()) {
-		    pattern = Pattern.compile(optionString);
+		    pattern = Pattern.compile(regexWithOnlyAsteriskSymbolActive);
 		} else {
-		    pattern = Pattern.compile(optionString,
+		    pattern = Pattern.compile(regexWithOnlyAsteriskSymbolActive,
 			    java.util.regex.Pattern.CASE_INSENSITIVE | java.util.regex.Pattern.UNICODE_CASE);
 		}
 		boolean isAnswerCorrect = (question.getAnswerString() != null)
