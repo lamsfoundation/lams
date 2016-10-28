@@ -26,6 +26,7 @@ var dialogTemplate = $('<div class="modal fade dialogContainer" tabindex="-1" ro
  * If not, creates a new dialog with the given ID and init parameters.
  */
 function showDialog(id, initParams, extraButtons, recreate) {
+	
 	var dialog = $('#' + id);
 	// is it open  already?
 	if (dialog.length > 0) {

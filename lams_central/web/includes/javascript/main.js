@@ -327,6 +327,7 @@ function makeSortable(element) {
 
 
 function showMonitorLessonDialog(lessonID) {
+
 	var id = "dialogMonitorLesson" + lessonID,
 		dialog = showDialog(id, {
 			'data' : {
@@ -343,7 +344,7 @@ function showMonitorLessonDialog(lessonID) {
 					+ $(this).data('lessonID'));
 			},
 
-		}, true);
+		}, true, true);
 	
 	// if it was just created
 	if (dialog) {
@@ -373,7 +374,7 @@ function showAddLessonDialog(orgID) {
 		'data' : {
 			'orgID' : orgID
 		},
-		'modal' : true,
+		'modal' : false,
 		'height' : 740,
 		'width' : 'auto',
 		'title' : LABELS.ADD_LESSON_TITLE,
@@ -427,7 +428,7 @@ function showAddSingleActivityLessonDialog(orgID, toolID, learningLibraryID) {
 			'toolID' : toolID,
 			'learningLibraryID' : learningLibraryID
 		},
-		'modal' : true,
+		'modal' : false,
 		'height' : 600,
 		'width' : 'auto',
 		'title' : LABELS.SINGLE_ACTIVITY_LESSON_TITLE,
@@ -474,6 +475,7 @@ function showNotificationsDialog(orgID, lessonID) {
 		},
 		'height' : 650,
 		'width' : 'auto',
+		'modal' : false,
 		'title' : LABELS.EMAIL_NOTIFICATIONS_TITLE,
 		'open' : function() {
 			var dialog = $(this),
@@ -621,13 +623,14 @@ function showGradebookCourseDialog(orgID){
 		'orgID' : orgID,
 		'height' : 650,
 		'width' : 'auto',
+		'modal' : false,
 		'title' : LABELS.GRADEBOOK_COURSE_TITLE,
 		'open' : function() {
 			var orgID = $(this).dialog('option', 'orgID');
 			// load contents after opening the dialog
 			$('iframe', this).attr('src', LAMS_URL
 				+ 'gradebook/gradebookMonitoring.do?dispatch=courseMonitor&organisationID=' + orgID);
-			$(this).css("maxWidth", "850").css("margin", "auto");
+			$(this).css("maxWidth", "800px").css("margin", "auto");
 		}
 	}, true);
 }
@@ -640,12 +643,13 @@ function showGradebookLessonDialog(lessonID){
 		},
 		'height' : 650,
 		'width' : 'auto',
+		'modal' : false,
 		'title' : LABELS.GRADEBOOK_LESSON_TITLE,
 		'open' : function() {
 			var lessonID = $(this).data('lessonID');
 			// load contents after opening the dialog
 			$('iframe', this).attr('src', LAMS_URL + 'gradebook/gradebookMonitoring.do?lessonID=' + lessonID);
-			$(this).css("maxWidth", "850").css("margin", "auto");
+			$(this).css("maxWidth", "800px").css("margin", "auto");
 		}
 	}, true);
 }
@@ -660,13 +664,14 @@ function showGradebookLearnerDialog(orgID){
 		},
 		'height' : 400,
 		'width' : 'auto',
+		'modal' : false,
 		'title' : LABELS.GRADEBOOK_LEARNER_TITLE,
 		'open' : function() {
 			var orgID = $(this).data('orgID');
 			// load contents after opening the dialog
 			$('iframe', this).attr('src', LAMS_URL
 				+ 'gradebook/gradebookLearning.do?dispatch=courseLearner&organisationID=' + orgID);
-			$(this).css("maxWidth", "750").css("margin", "auto");
+			$(this).css("maxWidth", "750px").css("margin", "auto");
 		}
 	}, true);
 }
@@ -679,6 +684,7 @@ function showConditionsDialog(lessonID){
 		},
 		'height' : 750,
 		'width' : 'auto',
+		'modal' : false,
 		'title' : LABELS.CONDITIONS_TITLE,
 		'open' : function() {
 			var lessonID = $(this).data('lessonID');
@@ -698,6 +704,7 @@ function showSearchLessonDialog(orgID){
 		},
 		'height' : 400,
 		'width' : 'auto',
+		'modal' : false,
 		'title' : LABELS.SEARCH_LESSON_TITLE,
 		'open' : function() {
 			var orgID = $(this).data('orgID');
@@ -822,3 +829,34 @@ function removeLesson(lessonID) {
 		}
 	}
 }
+
+
+function showEmailDialog(userId, lessonId){
+	
+	var dialog = showDialog("dialogEmail", {
+		'autoOpen'  : true,
+		'height'    : 700,
+		'width'     : 700,
+		'modal'     : true,
+		'resizable' : true,
+		'title'     : LABELS.EMAIL_TITLE,
+		'open'      : function(){
+			autoRefreshBlocked = true;
+			var dialog = $(this);
+			// load contents after opening the dialog
+			$('iframe', dialog).attr('src',
+					LAMS_URL + 'emailUser.do?method=composeMail&lessonID=' + lessonId
+					+ '&userID=' + userId);
+		},
+		'close' : function(){
+			autoRefreshBlocked = false;
+			$(this).remove();
+		}
+	}, false, true);
+}
+
+
+function closeEmailDialog(){
+	$('#dialogEmail').modal('hide');
+}
+
