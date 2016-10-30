@@ -4,7 +4,7 @@
 <%@ taglib uri="tags-core" prefix="c"%>
 <%@ taglib uri="tags-lams" prefix="lams"%>
 
-<div class="course-header" style="padding-bottom: 5px; border-bottom: 1px solid #eee;">
+<div class="course-header">
 	<span class="lead">
 		<strong><c:out value="${orgBean.name}" /></strong>
 	</span>

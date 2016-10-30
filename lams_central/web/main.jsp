@@ -274,7 +274,7 @@
 	<footer>
 		<div class="">
 			<p class="text-muted text-center">
-				<fmt:message key="msg.LAMS.version" /> <%=Configuration.get(ConfigurationKeys.VERSION)%>
+				<fmt:message key="msg.LAMS.version" />&nbsp;<%=Configuration.get(ConfigurationKeys.VERSION)%>
 				<a href="<lams:LAMSURL/>/www/copyright.jsp" target='copyright' onClick="openCopyRight()">
 					&copy; <fmt:message key="msg.LAMS.copyright.short" /> 
 				</a>
