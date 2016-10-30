@@ -33,9 +33,9 @@
 	<html:hidden property="password" />
 
 	<logic:messagesPresent>
-		<p class="warning">
-			<html:errors />
-		</p>
+		<lams:Alert type="warning" id="profileRestrictions" close="false">
+			<html:errors /> 
+		</lams:Alert>
 	</logic:messagesPresent>
 
 	<c:set var="profileEditEnabled"><%=Configuration.get(ConfigurationKeys.PROFILE_EDIT_ENABLE)%></c:set>
@@ -62,24 +62,23 @@
 							<c:if test="${authenticationMethodId eq dbId}">
 
 								<div class="form-group">
-									<b><label><fmt:message key="label.username" /></label></b> <input
-										type="text" class="form-control"
-										value=<bean:write name="UserForm" property="login" />>
+									<span class="lead"><label><fmt:message key="label.username" /></label>: 
+									<bean:write name="UserForm" property="login" /></span>
 								</div>
 								<div class="form-group">
-									<b><label><fmt:message key="label.title" />:</label></b>
+									<label><fmt:message key="label.title" />:</label>
 									<html:text property="title" size="32" maxlength="32"
 										disabled="${!profileEditEnabled}" styleClass="form-control" />
 								</div>
 
 								<div class="form-group">
-									<b><label><fmt:message key="label.first_name" /> *:</label></b>
+									<label><fmt:message key="label.first_name" /> *:</label>
 									<html:text property="firstName" size="50" maxlength="128"
 										disabled="${!profileEditEnabled}" styleClass="form-control" />
 								</div>
 
 								<div class="form-group">
-									<b><label><fmt:message key="label.last_name" /> *:</label></b>
+									<label><fmt:message key="label.last_name" /> *:</label>
 									<html:text property="lastName" size="50" maxlength="128"
 										disabled="${!profileEditEnabled}" styleClass="form-control" />
 								</div>
@@ -88,76 +87,75 @@
 									<html:hidden property="lastName" />
 								</c:if>
 								<div class="form-group">
-									<b><label><fmt:message key="label.email" /> *:</label></b>
+									<label><fmt:message key="label.email" /> *:</label>
 									<html:text property="email" size="50" maxlength="128"
 										disabled="${!profileEditEnabled and !partialProfileEditEnabled}"
 										styleClass="form-control" />
 								</div>
 
 								<div class="form-group">
-									<b><label><fmt:message key="label.address_line_1" />:</label></b>
+									<label><fmt:message key="label.address_line_1" />:</label>
 									<html:text property="addressLine1" size="50" maxlength="64"
 										disabled="${!profileEditEnabled}" styleClass="form-control" />
 								</div>
 								<div class="form-group">
-									<b><label><fmt:message key="label.address_line_2" />:</label></b>
+									<label><fmt:message key="label.address_line_2" />:</label>
 									<html:text property="addressLine2" size="50" maxlength="64"
 										disabled="${!profileEditEnabled}" styleClass="form-control" />
 								</div>
 								<div class="form-group">
-									<b><label><fmt:message key="label.address_line_3" />:</label></b>
+									<label><fmt:message key="label.address_line_3" />:</label>
 									<html:text property="addressLine3" size="50" maxlength="64"
 										disabled="${!profileEditEnabled}" styleClass="form-control" />
 								</div>
 
 								<div class="form-group">
-									<b><label><fmt:message key="label.city" />:</label></b>
+									<label><fmt:message key="label.city" />:</label>
 									<html:text property="city" size="50" maxlength="64"
 										disabled="${!profileEditEnabled}" styleClass="form-control" />
 								</div>
 
 								<div class="form-group">
-									<b><label><fmt:message key="label.state" />:</label></b>
+									<label><fmt:message key="label.state" />:</label>
 									<html:text property="state" size="50" maxlength="64"
 										disabled="${!profileEditEnabled}" styleClass="form-control" />
 								</div>
 								<div class="form-group">
-									<b><label><fmt:message key="label.postcode" />:</label></b>
+									<label><fmt:message key="label.postcode" />:</label>
 									<html:text property="postcode" size="10" maxlength="10"
 										disabled="${!profileEditEnabled}" styleClass="form-control" />
 								</div>
 								<div class="form-group">
-									<b><label><fmt:message key="label.country" />:</label></b>
+									<label><fmt:message key="label.country" />:</label>
 									<html:text property="country" size="50" maxlength="64"
 										disabled="${!profileEditEnabled}" styleClass="form-control" />
 								</div>
 								<div class="form-group">
-									<b><label><fmt:message key="label.day_phone" />:</label></b>
+									<label><fmt:message key="label.day_phone" />:</label>
 									<html:text property="dayPhone" size="50" maxlength="64"
 										disabled="${!profileEditEnabled and !partialProfileEditEnabled}"
 										styleClass="form-control" />
 								</div>
 								<div class="form-group">
-									<b><label><fmt:message key="label.evening_phone" />:</label></b>
+									<label><fmt:message key="label.evening_phone" />:</label>
 									<html:text property="eveningPhone" size="50" maxlength="64"
 										disabled="${!profileEditEnabled and !partialProfileEditEnabled}"
 										styleClass="form-control" />
 								</div>
 								<div class="form-group">
-									<b><label><fmt:message key="label.mobile_phone" />:</label></b>
+									<label><fmt:message key="label.mobile_phone" />:</label>
 									<html:text property="mobilePhone" size="50" maxlength="64"
 										disabled="${!profileEditEnabled and !partialProfileEditEnabled}"
 										styleClass="form-control" />
 								</div>
 
 								<div class="form-group">
-									<b><label><fmt:message key="label.fax" />:</label></b> <input
-										type="text" class="form-control"
-										value=<bean:write name="UserForm" property="fax" />>
+									<label><fmt:message key="label.fax" />:</label> 
+									<html:text property="fax" size="50" maxlength="64" disabled="${!profileEditEnabled and !partialProfileEditEnabled}" styleClass="form-control" />
 								</div>
 
 								<div class="form-group">
-									<b><label><fmt:message key="label.language" />:</label></b>
+									<label><fmt:message key="label.language" />:</label>
 									<html:select property="localeId"
 										disabled="${!profileEditEnabled}" styleClass="form-control">
 										<c:forEach items="${locales}" var="locale">
@@ -169,7 +167,7 @@
 								</div>
 
 								<div class="form-group">
-									<b><label><fmt:message key="label.timezone.title" />:</label></b>
+									<label><fmt:message key="label.timezone.title" />:</label>
 									<html:select property="timeZone"
 										disabled="${!profileEditEnabled}" styleClass="form-control">
 										<c:forEach items="${timezoneDtos}" var="timezoneDto">
@@ -181,7 +179,7 @@
 								</div>
 
 								<div class="form-group">
-									<b><label><fmt:message key="label.tutorial.enabled" />:</label></b>
+									<label><fmt:message key="label.tutorial.enabled" />:</label>
 									<!-- For users' comfort we write it as a positive sentece - "should the tutorials be enabled"?
 			 But for simplicity of coding, we keep it as a negative value - "should the tutorials be disabled?"
 			 This is the reason to mix true/false and yes/no answers.
@@ -198,7 +196,7 @@
 								</div>
 
 								<div class="form-group">
-									<b><label><fmt:message key="label.theme" />:</label></b>
+									<label><fmt:message key="label.theme" />:</label>
 									<html:select property="userTheme"
 										disabled="${!profileEditEnabled}" styleClass="form-control">
 										<c:forEach items="${themes}" var="theme">
@@ -208,17 +206,17 @@
 								</div>
 								<c:if test="${not empty sharedSecret}">
 									<div class="form-group">
-										<b><label><fmt:message
-													key="label.2FA.shared.secret" />:</label></b> ${sharedSecret}
+										<label><fmt:message
+													key="label.2FA.shared.secret" />:</label> ${sharedSecret}
 									</div>
 								</c:if>
 								<c:if test="${not empty lamsCommunityToken}">
 									<div class="form-group">
-										<b><label> <fmt:message
+										<label> <fmt:message
 													key="label.lamscommunity.changeuser">
 													<fmt:param value="${lamsCommunityUsername}" />
 												</fmt:message>
-										</label></b>
+										</label>
 										<html:checkbox
 												property="disableLamsCommunityUsername"
 												disabled="${!profileEditEnabled}" styleClass="form-control"></html:checkbox>
@@ -246,99 +244,99 @@
 								<html:hidden property="fax" />
 
 								<div class="form-group">
-									<b><label><fmt:message key="label.username" /></label></b> <input
+									<label><fmt:message key="label.username" /></label> <input
 										type="text" class="form-control"
 										value=<bean:write name="UserForm" property="login" />>
 								</div>
 
 								<div class="form-group">
-									<b><label><fmt:message key="label.username" /></label></b> <input
+									<label><fmt:message key="label.username" /></label> <input
 										type="text" class="form-control"
 										value=<bean:write name="UserForm" property="login" />>
 								</div>
 								<div class="form-group">
-									<b><label><fmt:message key="label.title" />:</label></b> <input
+									<label><fmt:message key="label.title" />:</label> <input
 										type="text" class="form-control"
 										value=<bean:write name="UserForm" property="title" />>
 								</div>
 								<div class="form-group">
-									<b><label><fmt:message key="label.first_name" /> *:</label></b>
+									<label><fmt:message key="label.first_name" /> *:</label>
 									<input type="text" class="form-control"
 										value=<bean:write name="UserForm" property="firstName" />>
 								</div>
 
 								<div class="form-group">
-									<b><label><fmt:message key="label.last_name" /> *:</label></b>
+									<label><fmt:message key="label.last_name" /> *:</label>
 									<input type="text" class="form-control"
 										value=<bean:write name="UserForm" property="lastName" />>
 								</div>
 
 								<div class="form-group">
-									<b><label><fmt:message key="label.email" /> *:</label></b> <input
+									<label><fmt:message key="label.email" /> *:</label> <input
 										type="text" class="form-control"
 										value=<bean:write name="UserForm" property="email" />>
 								</div>
 								<div class="form-group">
-									<b><label><fmt:message key="label.address_line_1" />:</label></b>
+									<label><fmt:message key="label.address_line_1" />:</label>
 									<input type="text" class="form-control"
 										value=<bean:write name="UserForm" property="addressLine1" />>
 								</div>
 								<div class="form-group">
-									<b><label><fmt:message key="label.address_line_2" />:</label></b>
+									<label><fmt:message key="label.address_line_2" />:</label>
 									<input type="text" class="form-control"
 										value=<bean:write name="UserForm" property="addressLine2" />>
 								</div>
 								<div class="form-group">
-									<b><label><fmt:message key="label.address_line_3" />:</label></b>
+									<label><fmt:message key="label.address_line_3" />:</label>
 									<input type="text" class="form-control"
 										value=<bean:write name="UserForm" property="addressLine3" />>
 								</div>
 
 								<div class="form-group">
-									<b><label><fmt:message key="label.city" />:</label></b> <input
+									<label><fmt:message key="label.city" />:</label> <input
 										type="text" class="form-control"
 										value=<bean:write name="UserForm" property="city" />>
 								</div>
 
 								<div class="form-group">
-									<b><label><fmt:message key="label.state" />:</label></b> <input
+									<label><fmt:message key="label.state" />:</label> <input
 										type="text" class="form-control"
 										value=<bean:write name="UserForm" property="state" />>
 								</div>
 
 								<div class="form-group">
-									<b><label><fmt:message key="label.postcode" />:</label></b> <input
+									<label><fmt:message key="label.postcode" />:</label> <input
 										type="text" class="form-control"
 										value=<bean:write name="UserForm" property="postcode" />>
 								</div>
 								<div class="form-group">
-									<b><label><fmt:message key="label.country" />:</label></b> <input
+									<label><fmt:message key="label.country" />:</label> <input
 										type="text" class="form-control"
 										value=<bean:write name="UserForm" property="country" />>
 								</div>
 								<div class="form-group">
-									<b><label><fmt:message key="label.day_phone" />:</label></b> <input
+									<label><fmt:message key="label.day_phone" />:</label> <input
 										type="text" class="form-control"
 										value=<bean:write name="UserForm" property="dayPhone" />>
 								</div>
 								<div class="form-group">
-									<b><label><fmt:message key="label.evening_phone" />:</label></b>
+									<label><fmt:message key="label.evening_phone" />:</label>
 									<input type="text" class="form-control"
 										value=<bean:write name="UserForm" property="eveningPhone" />>
 								</div>
 								<div class="form-group">
-									<b><label><fmt:message key="label.mobile_phone" />:</label></b>
+									<label><fmt:message key="label.mobile_phone" />:</label>
 									<input type="text" class="form-control"
 										value=<bean:write name="UserForm" property="mobilePhone" />>
 								</div>
 								<div class="form-group">
-									<b><label><fmt:message key="label.fax" />:</label></b> <input
+									<label><fmt:message key="label.fax" />:</label> <input
 										type="text" class="form-control"
 										value=<bean:write name="UserForm" property="fax" />>
 								</div>
 
 								<div class="form-group">
-									<b><label><fmt:message key="label.theme" />:</label></b>
+									<label><fmt:message key="label.theme" />:</label>
 									<html:select property="userTheme"
 										disabled="${!profileEditEnabled}" styleClass="form-control">
 										<c:forEach items="${themes}" var="theme">
@@ -348,7 +346,7 @@
 								</div>
 
 								<div class="form-group">
-									<b><label><fmt:message key="label.language" />:</label></b>
+									<label><fmt:message key="label.language" />:</label>
 									<html:select property="localeId"
 										disabled="${!profileEditEnabled}" styleClass="form-control">
 										<c:forEach items="${locales}" var="locale">
@@ -360,7 +358,7 @@
 								</div>
 
 								<div class="form-group">
-									<b><label><fmt:message key="label.timezone.title" />:</label></b>
+									<label><fmt:message key="label.timezone.title" />:</label>
 									<html:select property="timeZone"
 										disabled="${!profileEditEnabled}" styleClass="form-control">
 										<c:forEach items="${timezoneDtos}" var="timezoneDto">
@@ -371,7 +369,7 @@
 									</html:select>
 								</div>
 								<div class="form-group">
-									<b><label><fmt:message key="label.timezone.title" />:</label></b>
+									<label><fmt:message key="label.timezone.title" />:</label>
 									<c:set var="timeZone">
 										<input type="text" class="form-control"
 											value=<bean:write name="UserForm" property="timeZone" />>
@@ -379,8 +377,8 @@
 									${timeZone}
 								</div>
 								<div class="form-group">
-									<b><label><fmt:message key="label.tutorial.enabled" />:<bean:write
-												name="UserForm" property="tutorialsDisabled" /></label></b>
+									<label><fmt:message key="label.tutorial.enabled" />:<bean:write
+												name="UserForm" property="tutorialsDisabled" /></label>
 									<!-- For users' comfort we write it as a positive sentece - "should the tutorials be enabled"?
 			 But for simplicity of coding, we keep it as a negative value - "should the tutorials be disabled?"
 			 This is the reason to mix true/false and yes/no answers.
