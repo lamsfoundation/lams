@@ -272,51 +272,15 @@ var MenuLib = {
 				$('iframe', this).attr('src', LAMS_URL + 'authoring/exportToolContent.do?method=export&learningDesignID='
 									  	  			   + layout.ld.learningDesignID);
 			}
-		}).click(function(){
+		}, false)
+		.addClass('smallHeader')
+		.click(function(){
 			exportLDDialog.modal('hide');
 		});
 		$('#exportLDDialogContents').clone().attr('id', null).show().appendTo($('.modal-body', exportLDDialog).empty());
 		exportLDDialog.modal('show');
 	},
 
-	
-	/**
-	 * Creates a PNG image out of current SVG contents.
-	 */
-	exportPNG : function(download){
-		ActivityLib.removeSelectEffect();
-		
-		var imageCode = null;
-		if (!download || layout.conf.supportsDownloadAttribute) {
-			var crop = MenuLib.getCanvasCrop();
-			if (crop.x >= crop.x2) {
-				return;
-			}
-			
-			var ctx = crop.workspace.getContext('2d'),
-			w = crop.x2 - crop.x,
-			// slight adjustment so bottom activities are not clipped
-			h = crop.y2 - crop.y + 2,
-			cut = ctx.getImageData(crop.x, crop.y, w, h);
-	
-			crop.workspace.width = w;
-			crop.workspace.height = h;
-			ctx.putImageData(cut, 0, 0);
-			
-			imageCode = crop.workspace.toDataURL("image/png");
-		}
-		if (download) {
-			$('a', layout.exportImageDialog).attr({
-				'href'	   : imageCode,
-				'download' : (layout.ld.title ? layout.ld.title : 'Untitled') + '.png'
-			});
-
-			layout.exportImageDialog.modal('show');
-		} else {
-			return imageCode;
-		}
-	},
-	
 	
 	/**
 	 * Creates a SVG image out of current SVG contents.
@@ -459,7 +423,8 @@ var MenuLib = {
 	 */
 	importLearningDesign : function(){
 		var dialog = showDialog("dialogImportLearningDesign", {
-						'height' : 315,
+						'modal' : true,
+						'height' : 350,
 						'width' : 850,
 						'title' : LABELS.IMPORT_DIALOG_TITLE,
 						'open' : function() {
@@ -468,17 +433,17 @@ var MenuLib = {
 							$('iframe', dialog).attr('src', LAMS_URL + 'authoring/importToolContent.do?method=import').load(function(){
 								// override the close function so it works with the dialog, not window
 								this.contentWindow.closeWin = function(){
-									dialog.dialog('close');
+									dialog.modal('hide');
 								}
 							});
 						},
 						'close' : function(){
-							// stop checking in LD was imported
+							// stop checking in LD was 
 							clearInterval(loadCheckInterval);
 							// completely delete the dialog
 							$(this).remove();
 						}
-					}),
+					}, false),
 			currentLearningDesignID = null,
 			regEx = /learningDesignID=(\d+)/g,
 			// since window.onload does not really work after submitting a form inside the window,
@@ -504,7 +469,7 @@ var MenuLib = {
 	 */
 	importPartLearningDesign : function(){
 		layout.ldStoreDialog.data('prepareForOpen')(LABELS.IMPORT_PART_DIALOG_TITLE, null,
-				'#ldStoreDialogImportPartButton, #ldStoreDialogCancelButton', false);
+				'#ldStoreDialogImportPartButton, #ldStoreDialogCancelButton, #ldStoreDialogImportPartFrame', false);
 		layout.ldStoreDialog.modal('show');
 	},
 	

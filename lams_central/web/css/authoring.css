@@ -36,7 +36,7 @@ a.ygtvspacer {
 .dialogContainer .modal-body {
 	height : 100%;
 	max-height: calc(100% - 60px);
-	padding: 0;
+	padding: 5px;
 }
 
 .dialogContainer button {
@@ -47,7 +47,7 @@ a.ygtvspacer {
 	outline: none;
 }
 
-.dialogContainer button .fa {
+.dialogContainer .modal-header button .fa {
   font-size: 16px;
   margin-left: 10px;
 }
@@ -71,15 +71,11 @@ div.dialogContents, #ldScreenshotAuthor, #ldScreenshotLoading {
 }
 
 
-div.propertiesDialogContainer .modal-header,
-div#groupNamingDialog .modal-header,
-div#exportLDDialog .modal-header {
+div.smallHeader .modal-header {
 	padding: 5px;
 }
 
-div.propertiesDialogContainer .modal-title,
-div#groupNamingDialog .modal-title,
-div#exportLDDialog .modal-title {
+div.smallHeader .modal-title {
 	font-size: 16px;
 }
 
@@ -108,8 +104,11 @@ select.propertiesContentFieldGradebook {
 	width: 99%;	
 }
 
-div#groupNamingDialog .btn-group {
-	margin: 5px 0;
+div#groupNamingDialog .btn-group,
+div#gtbDialog  .btn-group,
+div#ctbDialog .btn-group,
+div#outputConditionsDialog .btn-group {
+	margin: 10px 0 10px 10px;
 }
 
 input.groupName {
@@ -164,11 +163,12 @@ div#ldStoreDialogContents #ldStoreDialogButtonCell > div > div {
 div#ldStoreDialogContents td#ldStoreDialogTreeCell {
 	padding: 2px 2px 0px 5px;
 	vertical-align: top;
-	width: 200px;
 	border-right: thin dotted #2E6E9E;
+	width: 200px;
 }
 
 div#ldStoreDialogContents div#ldStoreDialogTree {
+	width: 200px;
 	overflow: auto;
 }
 
@@ -228,12 +228,15 @@ div#ldStoreDialogContents #ldStoreDialogNameContainer input {
 	margin-left: 10px;	
 }
 
+div.branchMappingDialog .container-fluid {
+	padding-right: 0;
+}
 
 div.branchMappingDialog > table {
 	width: 100%;
 	height: 98%;
 	table-layout: fixed;
-	border-collapse: collapse;
+	border-collapse: collapse;outputConditionsDialogContents
 }
 
 div.branchMappingDialog td {
@@ -258,10 +261,10 @@ div.branchMappingDialog td.branchMappingListCell .selected {
 
 div.branchMappingDialog .branchMappingButton {
 	width: 40%;
-	height: 25px;
 	display: block;
 	margin: auto;
-	margin-bottom: 20px;
+	margin-top: 10px;
+	margin-bottom: 10px;
 }
 
 div.branchMappingDialog td.branchMappingListCell div {
@@ -269,47 +272,47 @@ div.branchMappingDialog td.branchMappingListCell div {
 	cursor: pointer;
 }
 
-
-div#outputConditionsDialog div#complexConditions > div {
+div#outputConditionsDialogContents div#complexConditions > div {
 	font-weight: bold;
 	margin: 10px 0 0 2px;
 }
 
-div#outputConditionsDialog select {
+div#outputConditionsDialogContents select {
 	margin-bottom: 10px;
+	width: 95%;
 }
 
-div#outputConditionsDialog .spinner {
+div#outputConditionsDialogContents .spinner {
 	width: 40px;
 }
 
-div#outputConditionsDialog div#multiRangeDiv {
+div#outputConditionsDialogContents div#multiRangeDiv {
 	display: inline-block;	
 }
 
-div#outputConditionsDialog #rangeAddButton {
+div#outputConditionsDialogContents #rangeAddButton {
 	margin-left: 10px;
 }
 
-div#outputConditionsDialog table#rangeConditions {
+div#outputConditionsDialogContents table#rangeConditions {
 	width: 100%;
 	margin-top: 15px;
 	border-collapse: collapse;
 	text-align: center;
 }
 
-div#outputConditionsDialog table#rangeConditions tr td,
-div#outputConditionsDialog table#rangeConditions tr th {
+div#outputConditionsDialogContents table#rangeConditions tr td,
+div#outputConditionsDialogContents table#rangeConditions tr th {
 	padding: 3px;
 	border: black thin solid;
 	cursor: pointer;
 }
 
-div#outputConditionsDialog table#rangeConditions input {
+div#outputConditionsDialogContents table#rangeConditions input {
 	width: 95%;
 }
 
-div#outputConditionsDialog tr.selected {
+div#outputConditionsDialogContents tr.selected {
 	background-color: #dfeffc;
 }
 
