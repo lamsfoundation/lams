@@ -73,8 +73,9 @@ html {
 
 /*FOOTER*/
 footer {
-    background: #fff;
-    padding: 15px 20px;
+	width: 100%;
+	font-size: 75%;
+	background-color: #fff;
 }
 .text-muted {
     color: #777;
@@ -540,7 +541,14 @@ a.sorting {
 .group-name strong {
 	color: #666;
 }
-
+.course-header {
+	padding-bottom: 5px; 
+	border-bottom: 1px solid #eee;
+}
 .course-header i{
 	font-size: 16px;
+}
+
+.j-course-contents {
+	border-bottom: 1px solid #eee;
 }

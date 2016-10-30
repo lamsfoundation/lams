@@ -189,6 +189,10 @@ LAMS Learner Style
 .panel-admin-title {
 	color:#337ab7 !important;
 }
+.panel-title {
+	font-size: inherit;
+	font-weight: bolder;
+}
 body.stripes {
   background: url('/lams/images/css/light-fabric.jpg');
 }
@@ -534,4 +538,14 @@ nav:hover .forAnimate{
 }
 section{
 	padding-left: 15px;
+}
+
+/* Login page */
+.footer {
+	width: 100%;
+	/* Set the fixed height of the footer here */
+	background-color: #f5f5f5;
+	font-size: 75%;
+	padding-top: 2px;
+	border-top: 1px solid#e7e7e7;
 }
