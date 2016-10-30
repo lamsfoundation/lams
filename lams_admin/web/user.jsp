@@ -3,26 +3,12 @@
 <%@ page import="org.lamsfoundation.lams.util.Configuration"%>
 <%@ page import="org.lamsfoundation.lams.util.ConfigurationKeys"%>
 <%@ page import="org.apache.struts.action.ActionMessages"%>
-<%@ taglib uri="tags-lams" prefix="lams"%>
-<%@ taglib uri="tags-core" prefix="c"%>
-<%@ taglib uri="tags-fmt" prefix="fmt"%>
-<%@ taglib uri="tags-function" prefix="fn"%>
-<%@ taglib uri="tags-html" prefix="html"%>
-<%@ taglib uri="tags-bean" prefix="bean"%>
-<%@ taglib uri="tags-logic" prefix="logic"%>
-<%@ taglib uri="tags-tiles" prefix="tiles"%>
-<%@ taglib uri="tags-html-el" prefix="html-el"%>
-<%@ taglib uri="tags-bean-el" prefix="bean-el"%>
-<%@ taglib uri="tags-logic-el" prefix="logic-el"%>
 
 
-<script type="text/javascript" src="/lams/includes/javascript/jquery.js"></script>
-<script type="text/javascript"
-	src="/lams/includes/javascript/jquery-ui.js"></script>
-<script type="text/javascript"
-	src="/lams/includes/javascript/groupDisplay.js"></script>
-<script type="text/javascript"
-	src="/lams/includes/javascript/jquery.validate.js"></script>
+<script src="/lams/includes/javascript/jquery.js"></script>
+<script src="/lams/includes/javascript/jquery-ui.js"></script>
+<script src="/lams/includes/javascript/groupDisplay.js"></script>
+<script src="/lams/includes/javascript/jquery.validate.js"></script>
 
 <c:set var="minNumChars"><%=Configuration.get(ConfigurationKeys.PASSWORD_POLICY_MINIMUM_CHARACTERS)%></c:set>
 <c:set var="mustHaveUppercase"><%=Configuration.get(ConfigurationKeys.PASSWORD_POLICY_UPPERCASE)%></c:set>
@@ -52,9 +38,8 @@
 	});
 
 	$(function() {
-
 		// Setup form validation 
-		$("#userPass")
+		$("#UserForm")
 				.validate(
 						{
 							debug : true,
@@ -62,7 +47,7 @@
 							//  validation rules
 							rules : {
 								password : {
-									required : true,
+									required: true,
 									minlength : <c:out value="${minNumChars}"/>,
 									maxlength : 25,
 									charactersAllowed : true,
@@ -82,7 +67,7 @@
 									charactersAllowed : "<fmt:message key='label.password.symbols.allowed'/> ` ~ ! @ # $ % ^ & * ( ) _ - + = { } [ ] \ | : ; \" ' < > , . ? /",
 									pwcheck : "<fmt:message key='label.password.restrictions'/>"
 								},
-								password2 : {
+								password2: {
 									equalTo : "<fmt:message key='error.password.mismatch'/>"
 								},
 							},
@@ -94,13 +79,6 @@
 
 	});
 
-	$(document).ready(
-			function() {
-				//update dialog's height and title
-				updateMyProfileDialogSettings(
-						'<fmt:message key="title.password.change.screen" />',
-						'430');
-			});
 </script>
 
 
@@ -108,6 +86,7 @@
 <html-el:form styleId="UserForm" action="/usersave.do" method="post">
 	<html-el:hidden property="userId" />
 	<html-el:hidden property="orgId" />
+
 
 	<logic:notEmpty name="UserForm" property="orgId">
 		<a href="orgmanage.do?org=1" class="btn btn-default"><fmt:message
@@ -145,40 +124,36 @@
 		</div>
 
 		<div class="panel-body">
+
+			 
+			<lams:Alert type="info" id="passwordConditions" close="false">
+			<fmt:message key='label.password.must.contain' />:
+				<ul class="list-unstyled" style="line-height: 1.2">
+					<li><span class="fa fa-check"></span> <fmt:message
+							key='label.password.min.length'>
+							<fmt:param value='${minNumChars}' />
+						</fmt:message></li>
+
+					<c:if test="${mustHaveUppercase}">
+						<li><span class="fa fa-check"></span> <fmt:message
+								key='label.password.must.ucase' /></li>
+					</c:if>
+
+					<c:if test="${mustHaveNumerics}">
+						<li><span class="fa fa-check"></span> <fmt:message
+								key='label.password.must.number' /></li>
+					</c:if>
+
+
+					<c:if test="${mustHaveSymbols}">
+						<li><span class="fa fa-check"></span> <fmt:message
+								key='label.password.must.symbol' /></li>
+					</c:if>
+
+				</ul>
+			</lams:Alert>
+
 			<table class="table table-condensed table-no-border">
-				<tr>
-
-					<td class="align-right"><fmt:message
-							key='label.password.must.contain' />: <lams:Alert type="info"
-							id="passwordConditions" close="false"></td>
-					<td>
-						<ul class="list-unstyled" style="line-height: 1.2">
-							<li><span class="fa fa-check"></span> <fmt:message
-									key='label.password.min.length'>
-									<fmt:param value='${minNumChars}' />
-								</fmt:message></li>
-
-							<c:if test="${mustHaveUppercase}">
-								<li><span class="fa fa-check"></span> <fmt:message
-										key='label.password.must.ucase' /></li>
-							</c:if>
-
-							<c:if test="${mustHaveNumerics}">
-								<li><span class="fa fa-check"></span> <fmt:message
-										key='label.password.must.number' /></li>
-							</c:if>
-
-
-							<c:if test="${mustHaveSymbols}">
-								<li><span class="fa fa-check"></span> <fmt:message
-										key='label.password.must.symbol' /></li>
-							</c:if>
-
-						</ul>
-					</td>
-					</lams:Alert>
-
-				</tr>
 				<tr>
 					<td class="align-right"><fmt:message key="admin.user.login" />
 						*:</td>
