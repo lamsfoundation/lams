@@ -46,6 +46,10 @@
 							errorClass : 'help-block',
 							//  validation rules
 							rules : {
+								login : {
+									required: true,
+									maxlength : 50
+								},
 								password : {
 									required: true,
 									minlength : <c:out value="${minNumChars}"/>,
@@ -55,11 +59,24 @@
 								},
 								password2 : {
 									equalTo : "#password"
+								},
+								firstName : {
+									required : true
+								},
+								lastName : {
+									required : true
+								},
+								email : {
+									required: true,
+									email: true
 								}
 							},
 
 							// Specify the validation error messages
 							messages : {
+								login : {
+									required: "<fmt:message key='error.login.required'/>"
+								},
 								password : {
 									required : "<fmt:message key='error.password.empty'/>",
 									minlength : "<fmt:message key='label.password.min.length'><fmt:param value='${minNumChars}'/></fmt:message>",
@@ -70,6 +87,16 @@
 								password2: {
 									equalTo : "<fmt:message key='error.password.mismatch'/>"
 								},
+								firstName: {
+									required: "<fmt:message key='error.firstname.required'/>"
+								},
+								lastName: {
+									required: "<fmt:message key='error.lastname.required'/>"
+								},
+								email: {
+									required: "<fmt:message key='error.email.required'/>",
+									email: "<fmt:message key='error.valid.email.required'/>"
+								}
 							},
 
 							submitHandler : function(form) {
@@ -157,20 +184,20 @@
 				<tr>
 					<td class="align-right"><fmt:message key="admin.user.login" />
 						*:</td>
-					<td><html-el:text property="login" size="50" maxlength="255"
+					<td><html-el:text styleId="login" property="login"  maxlength="50"
 							styleClass="form-control" /></td>
 				</tr>
 				<tr>
 					<td class="align-right"><fmt:message key="admin.user.password" />
 						*:</td>
-					<td><html-el:password property="password" size="50"
-							maxlength="25" styleClass="form-control" /></td>
+					<td><html-el:password property="password" 
+							maxlength="25" styleId="password" styleClass="form-control" /></td>
 				</tr>
 				<tr>
 					<td class="align-right"><fmt:message
 							key="admin.user.password.confirm" /> *:</td>
-					<td><html-el:password property="password2" size="50"
-							maxlength="25" styleClass="form-control" /></td>
+					<td><html-el:password property="password2" 
+							maxlength="25" styleId="password2" styleClass="form-control" /></td>
 				</tr>
 				<tr>
 					<td class="align-right"><fmt:message
@@ -187,47 +214,47 @@
 				<tr>
 					<td class="align-right"><fmt:message key="admin.user.title" />:</td>
 					<td><html-el:text property="title" size="32" maxlength="32"
-							styleClass="form-control" /></td>
+							styleId="title" styleClass="form-control" /></td>
 				</tr>
 				<tr>
 					<td class="align-right"><fmt:message
 							key="admin.user.first_name" /> *:</td>
-					<td><html-el:text property="firstName" size="50"
-							maxlength="128" styleClass="form-control" /></td>
+					<td><html-el:text property="firstName" 
+							styleId="firstName" maxlength="128" styleClass="form-control" /></td>
 				</tr>
 				<tr>
 					<td class="align-right"><fmt:message
 							key="admin.user.last_name" /> *:</td>
-					<td><html-el:text property="lastName" size="50"
-							maxlength="128" styleClass="form-control" /></td>
+					<td><html-el:text property="lastName" 
+							styleId="lastName" maxlength="128" styleClass="form-control" /></td>
 				</tr>
 				<tr>
 					<td class="align-right"><fmt:message key="admin.user.email" />
 						*:</td>
-					<td><html-el:text property="email" size="50" maxlength="128"
+					<td><html-el:text property="email" maxlength="128"
 							styleClass="form-control" /></td>
 				</tr>
 				<tr>
 					<td class="align-right"><fmt:message
 							key="admin.user.address_line_1" />:</td>
-					<td><html-el:text property="addressLine1" size="50"
+					<td><html-el:text property="addressLine1" 
 							maxlength="64" styleClass="form-control" /></td>
 				</tr>
 				<tr>
 					<td class="align-right"><fmt:message
 							key="admin.user.address_line_2" />:</td>
-					<td><html-el:text property="addressLine2" size="50"
+					<td><html-el:text property="addressLine2" 
 							maxlength="64" styleClass="form-control" /></td>
 				</tr>
 				<tr>
 					<td class="align-right"><fmt:message
 							key="admin.user.address_line_3" />:</td>
-					<td><html-el:text property="addressLine3" size="50"
+					<td><html-el:text property="addressLine3" 
 							maxlength="64" styleClass="form-control" /></td>
 				</tr>
 				<tr>
 					<td class="align-right"><fmt:message key="admin.user.city" />:</td>
-					<td><html-el:text property="city" size="50" maxlength="64"
+					<td><html-el:text property="city"  maxlength="64"
 							styleClass="form-control" /></td>
 				</tr>
 				<tr>
@@ -237,35 +264,35 @@
 				</tr>
 				<tr>
 					<td class="align-right"><fmt:message key="admin.user.state" />:</td>
-					<td><html-el:text property="state" size="50" maxlength="64"
+					<td><html-el:text property="state"  maxlength="64"
 							styleClass="form-control" /></td>
 				</tr>
 				<tr>
 					<td class="align-right"><fmt:message key="admin.user.country" />:</td>
-					<td><html-el:text property="country" size="50" maxlength="64"
+					<td><html-el:text property="country"  maxlength="64"
 							styleClass="form-control" /></td>
 				</tr>
 				<tr>
 					<td class="align-right"><fmt:message
 							key="admin.user.day_phone" />:</td>
-					<td><html-el:text property="dayPhone" size="50" maxlength="64"
+					<td><html-el:text property="dayPhone"  maxlength="64"
 							styleClass="form-control" /></td>
 				</tr>
 				<tr>
 					<td class="align-right"><fmt:message
 							key="admin.user.evening_phone" />:</td>
-					<td><html-el:text property="eveningPhone" size="50"
+					<td><html-el:text property="eveningPhone" 
 							maxlength="64" styleClass="form-control" /></td>
 				</tr>
 				<tr>
 					<td class="align-right"><fmt:message
 							key="admin.user.mobile_phone" />:</td>
-					<td><html-el:text property="mobilePhone" size="50"
+					<td><html-el:text property="mobilePhone" 
 							maxlength="64" styleClass="form-control" /></td>
 				</tr>
 				<tr>
 					<td class="align-right"><fmt:message key="admin.user.fax" />:</td>
-					<td><html-el:text property="fax" size="50" maxlength="64"
+					<td><html-el:text property="fax"  maxlength="64"
 							styleClass="form-control" /></td>
 				</tr>
 
@@ -306,9 +333,7 @@
 			</table>
 
 			<div class="pull-right">
-				<html-el:cancel styleId="cancelButton" styleClass="btn btn-default">
-					<fmt:message key="admin.cancel" />
-				</html-el:cancel>
+				<input type="submit" name="org.apache.struts.taglib.html.CANCEL" value="<fmt:message key="admin.cancel" />" formnovalidate="formnovalidate" onclick="bCancel=true;" id="cancelButton" class="btn btn-default"/>
 				<html-el:submit styleId="saveButton"
 					styleClass="btn btn-primary loffset5">
 					<fmt:message key="admin.save" />
