@@ -686,12 +686,19 @@ GeneralInitLib = {
 			'autoOpen'      : false,
 			'resizable'     : false,
 			'draggable'     : false,
-					
 			'open' : function(){
-				var dialog = $(this);
+				var dialog = $(this),
+					treeHeight = Math.max(90, $(window).height() - 325) + 'px';
 				$('.modal-dialog', dialog).width(Math.max(500, $(window).width() - 50));
-				$('.modal-content', dialog).height(Math.max(375, $(window).height() - 65));
-				$('#ldStoreDialogTree', dialog).css('max-height', Math.max(90, $(window).height() - 325) + 'px');
+				$('#ldStoreDialogTree', layout.ldStoreDialog).css({
+					'height'     : treeHeight,
+					'max-height' : treeHeight
+				});
+				// limit size of the canvas so dialog does not resize after SVG loads
+				$('#ldStoreDialogCanvasDiv', dialog).css({
+					'max-width' : $(window).width() - 275 + 'px',
+					'max-height':  $(window).height() - 190 + 'px',
+				});
 				
 				GeneralLib.showLearningDesignThumbnail();
 				$('#ldStoreDialogLeftButtonContainer button', dialog).prop('disabled', true);
@@ -710,7 +717,7 @@ GeneralInitLib = {
 					$('.modal-title', layout.ldStoreDialog).text(dialogTitle);
 					var rightButtons = $('#ldStoreDialogRightButtonContainer', layout.ldStoreDialog);
 					$('button', rightButtons).hide();
-					$('#ldStoreDialogNameContainer', layout.ldStoreDialog).hide();
+					$('#ldStoreDialogNameContainer, #ldStoreDialogImportPartFrame', layout.ldStoreDialog).hide();
 					$(shownElementIDs, layout.ldStoreDialog).show();
 				},
 				/**
@@ -864,7 +871,7 @@ GeneralInitLib = {
 			if (!frame.attr('src')){
 				return;
 			}
-		    frame.css('visibility', 'visible').height(+frame.contents().find('svg').attr('height') + 40);
+		    frame.height(+frame.contents().find('svg').attr('height') + 40);
 		});
 		
 		// there should be no focus, just highlight
@@ -2592,8 +2599,6 @@ GeneralLib = {
 	showLearningDesignThumbnail : function(learningDesignID, title) {
 		// display "loading" animation and finally LD thumbnail
 		$('#ldScreenshotAuthor, #ldScreenshotLoading', layout.ldStoreDialog).hide();
-		// the "import part" frame can't use "display:none" CSS attribute as its JS won't execute right
-		$('#ldStoreDialogImportPartFrame', layout.ldStoreDialog).css('visibility', 'hidden');
 		
 		if (learningDesignID) {
 			if ($('#ldStoreDialogImportPartButton', layout.ldStoreDialog).is(':visible')) {

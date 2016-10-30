@@ -190,14 +190,6 @@
 				
 				
 				// PropertyLib
-				<fmt:message key="authoring.fla.ok.button" var="OK_BUTTON_VAR"/>
-				OK_BUTTON : '<c:out value="${OK_BUTTON_VAR}" />',
-				<fmt:message key="authoring.fla.clear.all.button" var="CLEAR_ALL_BUTTON_VAR"/>
-				CLEAR_ALL_BUTTON : '<c:out value="${CLEAR_ALL_BUTTON_VAR}" />',
-				<fmt:message key="authoring.fla.refresh.button" var="REFRESH_BUTTON_VAR"/>
-				REFRESH_BUTTON : '<c:out value="${REFRESH_BUTTON_VAR}" />',
-				<fmt:message key="authoring.fla.remove.condition.button" var="REMOVE_CONDITION_BUTTON_VAR"/>
-				REMOVE_CONDITION_BUTTON : '<c:out value="${REMOVE_CONDITION_BUTTON_VAR}" />',
 				<fmt:message key="authoring.fla.properties.dialog.title" var="PROPERTIES_DIALOG_TITLE_VAR"/>
 				PROPERTIES_DIALOG_TITLE : '<c:out value="${PROPERTIES_DIALOG_TITLE_VAR}" />',
 				<fmt:message key="authoring.fla.group.naming.dialog.title" var="GROUP_NAMING_DIALOG_TITLE_VAR"/>
@@ -309,9 +301,8 @@
 		    <li id="saveAsButton" onClick="javascript:MenuLib.saveLearningDesign(true)"><a href="#"><fmt:message key="authoring.fla.page.menu.saveas" /></a></li>
 		    <li role="separator" class="divider"></li>
 		    <li class="dropdown-header"><fmt:message key="authoring.fla.page.menu.export" /></li>
-		    <li id="exportLamsButton" class="exportSequenceButton" onClick="javascript:MenuLib.exportLearningDesign(1)"><a href="#"><fmt:message key="authoring.fla.page.menu.export.lams" /></a></li>
-		    <li id="exportPngButton"  class="exportImageButton"    onClick="javascript:MenuLib.exportPNG(true)"><a href="#"><fmt:message key="authoring.fla.page.menu.export.png" /></a></li>
-		    <li id="exportSvgButton"  class="exportImageButton"    onClick="javascript:MenuLib.exportSVG(true))"><a href="#"><fmt:message key="authoring.fla.page.menu.export.svg" /></a></li>
+		    <li id="exportLamsButton" onClick="javascript:MenuLib.exportLearningDesign(1)"><a href="#"><fmt:message key="authoring.fla.page.menu.export.lams" /></a></li>
+		    <li id="exportSvgButton"  onClick="javascript:MenuLib.exportSVG(true))"><a href="#"><fmt:message key="authoring.fla.page.menu.export.svg" /></a></li>
 		  </ul>
 		</div>
 		
@@ -545,7 +536,7 @@
 	
 	<!-- GROUP OR CONDITION TO BRANCH MATCHING DIALOG -->
 	
-	<div id="branchMappingDialog" class="dialogContents branchMappingDialog">
+	<div id="branchMappingDialogContents" class="dialogContents branchMappingDialog">
 		<table>
 			<tr>
 				<td></td>
@@ -565,11 +556,23 @@
 				<td class="branchMappingFreeItemCell branchMappingListCell"></td>
 				<td class="branchMappingFreeBranchCell branchMappingListCell"></td>
 				<td>
-					<div class="branchMappingAddButton branchMappingButton"></div>
-					<div class="branchMappingRemoveButton branchMappingButton"></div>
+					<button class="btn btn-default branchMappingAddButton branchMappingButton"><i class="fa fa-chevron-right"></i></button>
+					<button class="btn btn-default branchMappingRemoveButton branchMappingButton"><i class="fa fa-chevron-left"></i></button>
 				</td>
 				<td class="branchMappingBoundItemCell branchMappingListCell"></td>
 				<td class="branchMappingBoundBranchCell branchMappingListCell"></td>
+			</tr>
+			<tr>
+				<td colspan="5">
+					<div class="container-fluid">
+						<div class="pull-right btn-group" role="group">
+							<button class="branchMappingOKButton btn btn-default">
+								<i class="fa fa-check"></i> 
+								<span><fmt:message key="authoring.fla.ok.button" /></span>
+							</button>
+						</div>
+					</div>
+				</td>
 			</tr>
 		</table>
 	</div>
@@ -763,7 +766,7 @@
 			</tr>
 			<tr class="propertiesContentRowConditions">
 				<td colspan="3">
-					<div class="propertiesContentFieldMatchConditions"><fmt:message key="authoring.fla.page.prop.gate.conditions.map" /></div>
+					<button class="btn btn-default propertiesContentFieldMatchConditions"><fmt:message key="authoring.fla.page.prop.gate.conditions.map" /></button>
 				</td>
 			</tr>
 		</table>
@@ -811,17 +814,17 @@
 			</tr>
 			<tr class="propertiesContentRowConditions">
 				<td colspan="2">
-					<div class="propertiesContentFieldCreateConditions"><fmt:message key="authoring.fla.page.prop.conditions.create" /></div>
+					<button class="btn btn-default propertiesContentFieldCreateConditions"><fmt:message key="authoring.fla.page.prop.conditions.create" /></button>
 				</td>
 			</tr>
 			<tr class="propertiesContentRowConditions">
 				<td colspan="2">
-					<div class="propertiesContentFieldMatchConditions"><fmt:message key="authoring.fla.page.prop.branching.conditions.match" /></div>
+					<button class="btn btn-default propertiesContentFieldMatchConditions"><fmt:message key="authoring.fla.page.prop.branching.conditions.match" /></button>
 				</td>
 			</tr>
 			<tr>
 				<td colspan="2">
-					<div class="propertiesContentFieldMatchGroups"><fmt:message key="authoring.fla.page.prop.branching.groups.match" /></div>
+					<button class="btn btn-default propertiesContentFieldMatchGroups"><fmt:message key="authoring.fla.page.prop.branching.groups.match" /></button>
 				</td>
 			</tr>
 			<tr>
@@ -936,8 +939,8 @@
 		<div class="container-fluid">
 			<div class="btn-group pull-right" role="group">
 				<button id="groupNamingOKButton" class="btn btn-default">
-					<i class="fa fa-save"></i> 
-					<span><fmt:message key="label.ok" /></span>
+					<i class="fa fa-check"></i> 
+					<span><fmt:message key="authoring.fla.ok.button" /></span>
 				</button>
 				
 				<button id="groupNamingCancelButton" class="btn btn-default">
@@ -950,7 +953,7 @@
 	
 	
 	<!-- TOOL OUTPUT CONDITIONS DIALOG -->
-	<div id="outputConditionsDialog" class="dialogContents">
+	<div id="outputConditionsDialogContents" class="dialogContents">
 		 <select id="outputSelect">
 		 	<option value="none"><fmt:message key="authoring.fla.page.dialog.cond.output.choose" /></option>
 		 </select>
@@ -961,12 +964,15 @@
 		 	<option value="range"><fmt:message key="authoring.fla.page.dialog.cond.range" /></option>
 		 </select>
 		 <div id="rangeAddDiv" class="outputSelectDependent">
-			 <input id="singleRangeSpinner" class="outputSelectDependent spinner" />
+			 <input id="singleRangeSpinner" class="outputSelectDependent spinner"/>
 			 <div id="multiRangeDiv" class="outputSelectDependent">
 			 	<fmt:message key="authoring.fla.page.dialog.cond.range.from" /> <input id="multiRangeFromSpinner" class="spinner" />
 			 	<fmt:message key="authoring.fla.page.dialog.cond.range.to" /> <input id="multiRangeToSpinner" class="spinner" />
 			 </div>
-			 <span id="rangeAddButton"><fmt:message key="authoring.fla.page.dialog.cond.add" /></span>
+			 <button id="rangeAddButton" class="btn btn-default">
+			 	<i class="fa fa-plus"></i>
+			 	<span><fmt:message key="authoring.fla.page.dialog.cond.add" /></span>
+			 </button>
 		 </div>
 		 <div id="complexConditions" class="outputSelectDependent">
 		 	<div><fmt:message key="authoring.fla.page.dialog.cond.name" /></div>
@@ -978,6 +984,37 @@
 		 		<th><fmt:message key="authoring.fla.page.dialog.cond.list.condition" /></th>
 		 	</tr>
 		 </table>
+		 <div class="container-fluid">
+		 	<div class="btn-group pull-right" role="group">
+				<button id="outputConditionsOKButton" class="btn btn-default">
+					<i class="fa fa-check"></i> 
+					<span><fmt:message key="authoring.fla.ok.button" /></span>
+				</button>
+				
+				<button id="outputConditionsCancelButton" class="btn btn-default">
+					<i class="fa fa-ban"></i> 
+					<span><fmt:message key="authoring.fla.cancel.button" /></span>
+				</button>
+
+			</div>
+			
+			<div class="btn-group pull-right" role="group">
+				<button id="outputConditionsClearAllButton" class="btn btn-default outputSelectDependent rangeOutputButton">
+					<i class="fa fa-remove"></i> 
+					<span><fmt:message key="authoring.fla.clear.all.button" /></span>
+				</button>
+				
+				<button id="outputConditionsRemoveButton" class="btn btn-default outputSelectDependent rangeOutputButton">
+					<i class="fa fa-remove"></i> 
+					<span><fmt:message key="authoring.fla.remove.condition.button" /></span>
+				</button>
+				
+				<button id="outputConditionsRefreshButton" class="btn btn-default outputSelectDependent complexOutputButton">
+					<i class="fa fa-refresh"></i> 
+					<span><fmt:message key="authoring.fla.refresh.button" /></span>
+				</button>
+			</div>
+		 </div>
 	</div>
 	
 	
