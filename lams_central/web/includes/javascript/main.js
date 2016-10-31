@@ -458,109 +458,34 @@ function showNotificationsDialog(orgID, lessonID) {
 
 
 function showPrivateNotificationsDialog(){
-	showDialog("dialogPrivateNotifications", {
-		'height' : 470,
-		'width' : 600,
+	var notificationDialog = showDialog("dialogPrivateNotifications", {
+		'height' : 650,
+		'width' : 'auto',
 		'title' : LABELS.PRIVATE_NOTIFICATIONS_TITLE,
 		'close' : function(){
 			refreshPrivateNotificationCount();
-			// completely delete the dialog
 			$(this).remove();
 		},
 		'open' : function() {
-			// build the table from the scratch
-			var dialog = $(this),
-				table = $('<table />').appendTo(dialog),
-				// table header
-				headerRow = $('<tr />').appendTo(table);
-			$('<td />').text(LABELS.PRIVATE_NOTIFICATIONS_MESSAGES).appendTo(headerRow);
-			// click it to mark all notifications as read
-			$('<td class="notificationsClickableCell"/>').text(LABELS.PRIVATE_NOTIFICATIONS_READ)
-														 .attr('title', LABELS.PRIVATE_NOTIFICATIONS_READ_ALL_HINT)
-														 .click(markAllPrivateNotificationsAsRead)
-														 .appendTo(headerRow);
-			$('iframe', dialog).remove();
-			$.ajax({
-				cache : false,
-				url : LAMS_URL + "notification.do",
-				dataType : 'json',
-				data : {
-					'method' : 'getNotificationSubscriptions',
-					// maybe it will change for paging; "offset" param is also available
-					'limit'  : 10
-				},
-				success : function(notifications) {
-					if (!notifications) {
-						return;
-					}
-					
-					// build notification rows one by one
-					$.each(notifications, function(){
-						var notification = this,
-							row = $('<tr />').attr('id', 'subscription-' + notification.subscriptionUid)
-											 .appendTo(table),
-							messageCell = $('<td />').appendTo(row),
-							readCell = $('<td class="notificationsReadCell" />')
-											.appendTo(row);
-						// is it a link?
-						if (notification.message.indexOf('<a ') === 0) {
-							var link = $(notification.message);
-							// make it navigable
-							messageCell.text(link.text()).addClass('notificationsClickableCell').click(function(){
-								if (!readCell.text()) {
-									markPrivateNotificationAsRead(notification.subscriptionUid);
-								}
-								// open in a new tab/window
-								window.open(link.attr('href'), '_blank');
-							});
-						} else {
-							messageCell.text(notification.message);
-						}
-						// was it read already?
-						if (notification.pending) {
-							messageCell.addClass('notificationsPendingCell');
-							readCell.addClass('notificationsClickableCell')
-									.attr('title', LABELS.PRIVATE_NOTIFICATIONS_READ_HINT)
-									.click(function(){
-										markPrivateNotificationAsRead(notification.subscriptionUid);
-									});
-						} else {
-							readCell.html('&#10004;');
-						}
-					});
-				}
-			});
-		}
-	}, true);
-}
+			var dialog = $(this);
+			$('iframe', dialog).attr('src', LAMS_URL
+					+ 'notificationsprivate.jsp');
 
-function markAllPrivateNotificationsAsRead(){
-	$('#dialogPrivateNotifications tr[id^=subscription-]').each(function(){
-		var row = $(this),
-			read = $('td', row).last().text();
-		if (!read) {
-			markPrivateNotificationAsRead(row.attr('id').split('-')[1]);
-		}
-	});
-}
+			$(this).css("maxWidth", "600px").css("margin", "auto");
+			
+			// in case of mobile devices allow iframe scrolling
+			if( /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) ) {
+			    setTimeout(function() {
+			    	dialog.css({
+			    		'overflow-y' : 'scroll',
+			    		'-webkit-overflow-scrolling' : 'touch'
+			    	});
+			    },500);
+			}
 
-function markPrivateNotificationAsRead(subscriptionUid){
-	$.ajax({
-		cache : false,
-		url : LAMS_URL + "notification.do",
-		data : {
-			'method' 		  : 'markNotificationAsRead',
-			'subscriptionUid' : subscriptionUid
-		},
-		success : function() {
-			// mark the message as read
-			$('#dialogPrivateNotifications tr#subscription-' + subscriptionUid + ' > td')
-				// message cell
-				.first().removeClass('notificationsPendingCell')
-				// read cell
-				.next().html('&#10004;').removeClass('notificationsClickableCell').attr('title', null).off('click');
 		}
-	});
+	}, false);
+	
 }
 
 function refreshPrivateNotificationCount(){

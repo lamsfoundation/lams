@@ -63,11 +63,8 @@ public class NotificationAction extends DispatchAction {
 	List<Subscription> subscriptions = getEventNotificationService().getNotificationSubscriptions(null,
 		getUser().getUserID(), false, limit, offset);
 	JSONArray responseJSON = new JSONArray();
-	Event event = null;
 	for (Subscription subscription : subscriptions) {
-	    if (event == null) {
-		event = subscription.getEvent();
-	    }
+	    Event event = subscription.getEvent();
 	    JSONObject subscriptionJSON = new JSONObject();
 	    subscriptionJSON.put("subscriptionUid", subscription.getUid());
 	    subscriptionJSON.put("message", event.getMessage());
