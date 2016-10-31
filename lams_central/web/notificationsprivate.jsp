@@ -71,6 +71,7 @@
 			dataType : 'json',
 			data : {
 				'method' : 'getNotificationSubscriptions',
+				'limit'  : 30
 			},
 			success : function(notifications) {
 
