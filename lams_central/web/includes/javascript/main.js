@@ -459,7 +459,7 @@ function showNotificationsDialog(orgID, lessonID) {
 
 function showPrivateNotificationsDialog(){
 	var notificationDialog = showDialog("dialogPrivateNotifications", {
-		'height' : 650,
+		'height' : 600,
 		'width' : 'auto',
 		'title' : LABELS.PRIVATE_NOTIFICATIONS_TITLE,
 		'close' : function(){
@@ -567,7 +567,7 @@ function showConditionsDialog(lessonID){
 		'data' : {
 			'lessonID' : lessonID
 		},
-		'height' : 750,
+		'height' : 600,
 		'width' : 'auto',
 		'modal' : false,
 		'title' : LABELS.CONDITIONS_TITLE,
@@ -587,7 +587,7 @@ function showSearchLessonDialog(orgID){
 		'data' : {
 			'orgID' : orgID
 		},
-		'height' : 400,
+		'height' : 600,
 		'width' : 'auto',
 		'modal' : false,
 		'title' : LABELS.SEARCH_LESSON_TITLE,
