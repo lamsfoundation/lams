@@ -24,8 +24,6 @@ $(document).ready(function(){
 		toggleBackButton();
 	} else {
 		$('#groupingName').val(grouping.name);
-		// move Save button to the titlebar, i.e. outside of this iframe to the enveloping dialog
-		$('div.ui-dialog-titlebar', window.parent.document).append($('.customDialogButton'));
 	}
 	
 	if (canEdit) {
@@ -398,15 +396,14 @@ function saveGroups(){
 		return false;
 	}
 	
-	var groupsSaved = false;
 	var newGrouping = {
 			'groupingId' : grouping.groupingId,
 			'name' : groupingName,
 			'groups' : []
 	};
 	groupContainers.each(function(){
-		var groupId = $(this).attr('groupId');
-		var users = $('div.draggableUser', this);
+		var groupId = $(this).attr('groupId'),
+			users = $('div.draggableUser', this);
 		if (!groupId && users.length == 0) {
 			return true;
 		}
@@ -435,11 +432,9 @@ function saveGroups(){
 		},
 		type : 'POST',
 		success : function() {
-			groupsSaved = true;
+			window.parent.showOrgGroupingDialog(organisationId);
 		}
 	});
-	
-	return groupsSaved;
 }
 
 /**
@@ -486,18 +481,7 @@ function assignUsersToGroup(userIds, groupContainer) {
  * If there are any existing (not new) groups, forbid going back to grouping list.
  */
 function toggleBackButton() {
-	if (lessonMode) {
-		var backButton = $('#backButton');
-		var disabled = $('.groupContainer[groupId]').length > 0;
-		if (disabled) {
-			backButton.off('click').button('option', 'disabled', true);
-		} else {
-			backButton.click(function(){
-				document.location.href = LAMS_URL + 'OrganisationGroup.do?method=viewGroupings&activityID='
-					+ groupingActivityId + '&organisationID=' + grouping.organisationId;
-			}).button('option', 'disabled', false);
-		}
-	}
+	$('#backButton').prop('disabled', $('.groupContainer[groupId]').length == 0);
 }
 
 /**

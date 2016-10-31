@@ -360,25 +360,64 @@ function showAddLessonDialog(orgID) {
 	});
 }
 
-
-function showOrgGroupDialog(orgID) {
-	showDialog("dialogOrgGroup", {
-		'data' : {
-			'orgID' : orgID
-		},
-		'modal' : true,
-		'height' : 460,
-		'width' : 'auto',
+function showOrgGroupingDialog(orgID, activityID) {
+	$('#dialogOrgGroup').modal('hide');
+	showDialog("dialogOrgGrouping", {
+		'width' : 460,
+		'height': 460,
 		'title' : LABELS.COURSE_GROUPS_TITLE,
 		'open' : function() {
 			// load contents after opening the dialog
-			$('iframe', this)
-					.attr('src', LAMS_URL
-						+ 'OrganisationGroup.do?method=viewGroupings&organisationID='
-						+ $(this).data('orgID'));
-			$(this).css("maxWidth", "460px").css("margin", "auto");
+			$('iframe', this).attr('src', LAMS_URL + 'OrganisationGroup.do?method=viewGroupings&organisationID=' + orgID
+												   + (activityID ? '&activityID=' + activityID : ''));
 		}
 	}, true);
+}
+
+function showOrgGroupDialog(url) {
+	$('#dialogOrgGrouping').modal('hide');
+	showDialog("dialogOrgGroup", {
+		'width' : 850,
+		'height': 470,
+		'title' : LABELS.COURSE_GROUPS_TITLE,
+		'open' : function() {
+			// load contents after opening the dialog
+			$('iframe', this).attr('src', url);
+		}
+	}, true);
+}
+
+function saveOrgGroups() {
+	var groupsSaved = saveGroups();
+	if (groupsSaved) {
+		showOrgGroupDialogContents(null, 460, 460,
+			LAMS_URL + 'OrganisationGroup.do?method=viewGroupings&organisationID='
+			         + $('#dialogOrgGroup').data('orgID'));
+	}
+}
+
+function showOrgGroupDialogContents(title, width, height, url) {
+	var id = "dialogOrgGroup",
+		dialog = $('#' + id),
+		exists = dialog.length > 0,
+		orgID = null;
+	if (exists) {
+		if (!title) {
+			title = $('.modal-title', dialog).text();
+		}
+		orgID = dialog.data('orgID');
+	}
+	showDialog(id, {
+		'data' : {
+			'orgID'  : orgID
+		},
+		'height' : height,
+		'width'  : width,
+		'title'  : title,
+		'open'   : function() {
+			$('iframe', this).attr('src', url);
+		}
+	}, true, exists);
 }
 
 function showAddSingleActivityLessonDialog(orgID, toolID, learningLibraryID) {

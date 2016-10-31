@@ -150,13 +150,13 @@ public class DisplayGroupAction extends Action {
 		if ((!isSysAdmin)
 			&& (roles.contains(Role.ROLE_GROUP_ADMIN) || roles.contains(Role.ROLE_GROUP_MANAGER))) {
 		    moreLinks.add(new IndexLinkBean("index.classman",
-			    "javascript:openOrgManagement(" + org.getOrganisationId() + ")", "fa fa-fw fa-users",
+			    "javascript:openOrgManagement(" + org.getOrganisationId() + ")", "fa fa-fw fa-ellipsis-v",
 			    null));
 		}
 		if ((roles.contains(Role.ROLE_GROUP_ADMIN) || roles.contains(Role.ROLE_GROUP_MANAGER)
 			|| roles.contains(Role.ROLE_AUTHOR) || roles.contains(Role.ROLE_MONITOR))) {
 		    moreLinks.add(new IndexLinkBean("index.orggroup",
-			    "javascript:showOrgGroupDialog(" + org.getOrganisationId() + ")", "fa fa-fw fa-users",
+			    "javascript:showOrgGroupingDialog(" + org.getOrganisationId() + ")", "fa fa-fw fa-users",
 			    null));
 		}
 
@@ -181,7 +181,7 @@ public class DisplayGroupAction extends Action {
 		if (org.getEnableGradebookForMonitors()
 			&& (roles.contains(Role.ROLE_GROUP_MANAGER) || roles.contains(Role.ROLE_GROUP_ADMIN))) {
 		    String link = "javascript:showGradebookCourseDialog(" + org.getOrganisationId() + ")";
-		    moreLinks.add(new IndexLinkBean("index.coursegradebook", link, "course-gradebook-button",
+		    moreLinks.add(new IndexLinkBean("index.coursegradebook", link, "fa fa-fw fa-list-ol",
 			    "index.coursegradebook.tooltip"));
 		}
 

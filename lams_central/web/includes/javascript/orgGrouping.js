@@ -1,9 +1,5 @@
 ﻿﻿var gtbDialog = null;
 
-$(document).ready(function() {
-	$(".ui-button").button();
-});
-
 function removeGrouping(groupingId) {
 	if (!lessonMode && confirm(LABELS.REMOVE_GROUPING_CONFIRM_LABEL)) {
 		document.location.href = "OrganisationGroup.do?method=removeGrouping&organisationID="
@@ -12,8 +8,7 @@ function removeGrouping(groupingId) {
 }
 
 function viewGroups(groupingId, force) {
-	var url = LAMS_URL + 'OrganisationGroup.do?method=viewGroups&organisationID='
-		+ organisationId;
+	var url = LAMS_URL + 'OrganisationGroup.do?method=viewGroups&organisationID=' + organisationId;
 	if (lessonId) {
 		url += '&lessonID=' + lessonId;
 	}
@@ -35,7 +30,7 @@ function viewGroups(groupingId, force) {
 		}
 	} else {
 		// load to dialog
-		window.parent.showOrgGroupDialogContents(null, 880, 500, url);
+		window.parent.showOrgGroupDialog(url);
 	}
 }
 /**

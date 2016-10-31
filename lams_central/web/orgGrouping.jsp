@@ -7,7 +7,7 @@
 <lams:html>
 <lams:head>
 	<lams:css style="main" />
-	<link rel="stylesheet" href="css/jquery-ui-redmond-theme.css" type="text/css" media="screen" />
+	<link rel="stylesheet" href="css/defaultHTML_learner.css" type="text/css" media="screen" />
 	<link rel="stylesheet" href="css/orgGrouping.css" type="text/css" media="screen" />
 	<style type="text/css">
 		div.branchMappingDialog > table {
@@ -55,7 +55,7 @@
 	<c:set var="groupingMethod" value="${usedForBranching eq true ? 'openGroupMappingDialog' : 'viewGroups'}" />
 	
 	<script type="text/javascript" src="includes/javascript/jquery.js"></script>
-	<script type="text/javascript" src="includes/javascript/jquery-ui.js"></script>
+	<script type="text/javascript" src="includes/javascript/bootstrap.min.js"></script>
 	<script type="text/javascript" src="includes/javascript/orgGrouping.js"></script>
 	<script type="text/javascript">
 		var groupingActivityId = '${param.activityID}',
@@ -100,16 +100,17 @@
 				</a> <span class="groupCount" title='<fmt:message key="label.course.groups.grouping.count.label" />'>
 					(${grouping.groupCount}) </span>
 			<c:if test="${canEdit and not lessonMode}">
-				<img class="removeGroupingButton" src="<lams:LAMSURL/>images/css/delete.png"
-						title="<fmt:message key='label.course.groups.remove.tooltip' />" onClick="javascript:removeGrouping(${grouping.groupingId})" />
+				<i class="removeGroupingButton fa fa-remove fa-lg" title="<fmt:message key='label.course.groups.remove.tooltip' />"
+				   onClick="javascript:removeGrouping(${grouping.groupingId})" ></i>
 			</c:if>
 		</div>
 	</c:if>
 </c:forEach>
 
 <c:if test="${canEdit}">
-		<div id="addGroupingButton" class="ui-button" onClick="javascript:viewGroups()">
-		<fmt:message key='label.course.groups.grouping.create' />
+		<div id="addGroupingButton" class="btn btn-default" onClick="javascript:viewGroups()">
+		<i class="fa fa-plus"></i>
+		<span><fmt:message key='label.course.groups.grouping.create' /></span>
 	</div>
 </c:if>
 	
