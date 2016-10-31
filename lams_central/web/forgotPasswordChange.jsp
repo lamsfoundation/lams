@@ -23,8 +23,6 @@
 	<script type="text/javascript" src="includes/javascript/jquery.js"></script>
 	<script type="text/javascript" src="includes/javascript/jquery-ui.js"></script>
 	<script type="text/javascript"
-		src="includes/javascript/groupDisplay.js"></script>
-	<script type="text/javascript"
 		src="includes/javascript/jquery.validate.js"></script>
 	<lams:css />
 	<title><fmt:message key="title.forgot.password" /></title>

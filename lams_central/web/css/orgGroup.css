@@ -10,38 +10,31 @@ html, body {
 }
 
 div#titleDiv {
-	padding: 0 5px 0 5px;
-    font-size: small;
-    font-weight: bold;
-	border-bottom: thin dotted #2E6E9E;
+	padding: 5px 0 0 5px;
 }
 
 div#titleDiv input {
-	margin: 5px 0 5px 0;
+	margin-left: 10px;
 	width: 290px;
 }
 
-div#titleDiv .ui-button {
-	margin-bottom: 5px;
-	font-size: inherit;
+div#titleDiv button {
+	margin-right: 10px;
 }
 
 #titleInstructions {
+	text-align: center;
 	margin-top: 7px;
-	float: right;
-}
-
-table#groupsTable {
-	height: 375px;
+	border-bottom: thin dotted #2E6E9E;
 }
 
 table#groupsTable td {
 	vertical-align: top;
+	padding: 5px;
 }
 
 td#unassignedUserCell {
 	width: 200px;
-	padding: 5px;
 	border-right: thin dotted #2E6E9E;
 }
 
@@ -81,8 +74,6 @@ td#unassignedUserCell {
 .removeGroupButton {
 	float: left;
 	cursor: pointer;
-	width: 16px;
-	height: 16px;
 }
 
 .userContainer {
@@ -100,7 +91,7 @@ td#unassignedUserCell .userContainer {
 	margin-right: 5px;
 }
 
-.groupContainer .sortUsersButton, .groupContainer .removeGroupButton {
+.groupContainer .sortUsersButton {
 	padding-top: 3px;
 }
 
