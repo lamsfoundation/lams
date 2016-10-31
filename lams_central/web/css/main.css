@@ -393,25 +393,23 @@ ul.dropdown-usermenu li {
 	padding: 3px;
 }
 
-#dialogPrivateNotifications table tr:first-child td {
+#tablePrivateNotifications tr:first-child td {
 	font-weight: bold;
 	text-align: center;
 }
 
-#dialogPrivateNotifications td.notificationsReadCell {
+#tablePrivateNotifications td.notificationsReadCell {
 	font-size: 16px;
 	width: 30px;
 	text-align: center;
 }
 
-#dialogPrivateNotifications td.notificationsPendingCell {
+#tablePrivateNotifications td.notificationsPendingCell {
 	font-weight: bold;
 }
 
-#dialogPrivateNotifications td.notificationsClickableCell:hover {
+#tablePrivateNotifications td.notificationsClickableCell:hover {
 	cursor: pointer;
-	border-color: #9be0f9;
-	background-color: #F0F8FF;
 	/* CSS3 glow effect: */
 	-moz-border-radius: 6px;
 	-webkit-border-radius: 6px;
