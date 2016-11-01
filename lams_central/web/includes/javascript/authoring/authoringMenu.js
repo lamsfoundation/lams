@@ -18,8 +18,7 @@ var MenuLib = {
 		layout.exportImageDialog.click(function(){
 			layout.exportImageDialog.modal('hide');
 		});
-		$('.modal-body', layout.exportImageDialog).empty().append($('#exportImageDialog').show);
-		
+		$('.modal-body', layout.exportImageDialog).empty().append($('#exportImageDialogContents').show());
 		layout.dialogs.push(layout.exportImageDialog);
 	},
 	
@@ -286,6 +285,7 @@ var MenuLib = {
 	 * Creates a SVG image out of current SVG contents.
 	 */
 	exportSVG : function(download){
+		
 		ActivityLib.removeSelectEffect();
 		
 		var imageCode = null;
