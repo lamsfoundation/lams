@@ -11,11 +11,11 @@
 <lams:head>
 
 	<link rel="stylesheet" href="<lams:LAMSURL/>css/jquery-ui.timepicker.css" type="text/css" media="screen" />
-
-	<link rel="stylesheet" href="<lams:LAMSURL/>css/progressBar.css" type="text/css" />
-	<link rel="stylesheet" href="css/monitorLesson.css" type="text/css" media="screen" />
 	<link href="/lams/css/defaultHTML_learner.css" rel="stylesheet" type="text/css">
   	<link rel="stylesheet" href="<lams:LAMSURL/>css/jquery-ui-bootstrap-theme.css" type="text/css" media="screen">	
+	<link rel="stylesheet" href="<lams:LAMSURL/>css/progressBar.css" type="text/css" />
+	<link rel="stylesheet" href="css/monitorLesson.css" type="text/css" media="screen" />
+
   
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery.js"></script>
 	<script type="text/javascript" >
@@ -58,8 +58,6 @@
 			LABELS = {
 				<fmt:message key="force.complete.click" var="FORCE_COMPLETE_CLICK_VAR"/>
 				FORCE_COMPLETE_CLICK : decoderDiv.html('<c:out value="${FORCE_COMPLETE_CLICK_VAR}" />').text(),
-				<fmt:message key="button.force.complete" var="FORCE_COMPLETE_BUTTON_VAR"/>
-				FORCE_COMPLETE_BUTTON : '<c:out value="${FORCE_COMPLETE_BUTTON_VAR}" />',
 				<fmt:message key="force.complete.end.lesson.confirm" var="FORCE_COMPLETE_END_LESSON_CONFIRM_VAR"/>
 				FORCE_COMPLETE_END_LESSON_CONFIRM : decoderDiv.html('<c:out value="${FORCE_COMPLETE_END_LESSON_CONFIRM_VAR}" />').text(),
 				<fmt:message key="force.complete.activity.confirm" var="FORCE_COMPLETE_ACTIVITY_CONFIRM_VAR"/>
@@ -78,12 +76,6 @@
 				LEARNER_GROUP_SHOW : '<c:out value="${LEARNER_GROUP_SHOW_VAR}" />',
 				<fmt:message key="learner.group.remove.progress" var="LEARNER_GROUP_REMOVE_PROGRESS_VAR"/>
 				LEARNER_GROUP_REMOVE_PROGRESS : decoderDiv.html('<c:out value="${LEARNER_GROUP_REMOVE_PROGRESS_VAR}" />').text(),
-				<fmt:message key="button.view.learner" var="VIEW_LEARNER_BUTTON_VAR"/>
-				VIEW_LEARNER_BUTTON : '<c:out value="${VIEW_LEARNER_BUTTON_VAR}" />',
-				<fmt:message key="button.email" var="EMAIL_BUTTON_VAR"/>
-				EMAIL_BUTTON : '<c:out value="${EMAIL_BUTTON_VAR}" />',
-				<fmt:message key="button.close" var="CLOSE_BUTTON_VAR"/>
-				CLOSE_BUTTON : '<c:out value="${CLOSE_BUTTON_VAR}" />',
 				<fmt:message key="email.notifications" var="NOTIFCATIONS_VAR"/>
 				NOTIFCATIONS : '<c:out value="${NOTIFCATIONS_VAR}" />',
 				<fmt:message key="button.save" var="SAVE_BUTTON_VAR"/>
@@ -169,7 +161,6 @@
 			}
 	    
 		$(document).ready(function(){
-			initTabs();
 			initLessonTab();
 			initSequenceTab();
 			initLearnersTab();
@@ -498,7 +489,7 @@
 	 
 	<!-- Inner dialog placeholders -->
 	
-	<div id="learnerGroupDialog" class="dialogContainer">
+	<div id="learnerGroupDialogContents" class="dialogContainer">
 		<span id="learnerGroupMultiSelectLabel"><fmt:message key='learner.group.multi.select'/></span>
 		<table>
 			<tr id="learnerGroupSearchRow">
@@ -551,9 +542,23 @@
 				<td colspan="6" class="dialogList"></td>
 			</tr>
 		</table>
+		<div class="btn-group pull-right">
+			<button id="learnerGroupDialogForceCompleteButton" class="learnerGroupDialogSelectableButton btn btn-default">
+				<span><fmt:message key="button.force.complete" /></span>
+			</button>
+			<button id="learnerGroupDialogViewButton" class="learnerGroupDialogSelectableButton btn btn-default">
+				<span><fmt:message key="button.view.learner" /></span>
+			</button>
+			<button id="learnerGroupDialogEmailButton" class="learnerGroupDialogSelectableButton btn btn-default">
+				<span><fmt:message key="button.email" /></span>
+			</button>
+			<button id="learnerGroupDialogCloseButton" class="btn btn-default">
+				<span><fmt:message key="button.close" /></span>
+			</button>
+		</div>
 	</div>
 		
-	<div id="classDialog" class="dialogContainer">
+	<div id="classDialogContents" class="dialogContainer">
 		<table id="classDialogTable">
 			<tr>
 				<td>
