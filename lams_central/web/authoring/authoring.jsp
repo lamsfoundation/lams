@@ -302,7 +302,7 @@
 		    <li role="separator" class="divider"></li>
 		    <li class="dropdown-header"><fmt:message key="authoring.fla.page.menu.export" /></li>
 		    <li id="exportLamsButton" onClick="javascript:MenuLib.exportLearningDesign(1)"><a href="#"><fmt:message key="authoring.fla.page.menu.export.lams" /></a></li>
-		    <li id="exportSvgButton"  onClick="javascript:MenuLib.exportSVG(true))"><a href="#"><fmt:message key="authoring.fla.page.menu.export.svg" /></a></li>
+		    <li id="exportSvgButton"  onClick="javascript:MenuLib.exportSVG(true)"><a href="#"><fmt:message key="authoring.fla.page.menu.export.svg" /></a></li>
 		  </ul>
 		</div>
 		
