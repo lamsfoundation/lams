@@ -2,6 +2,7 @@
 var tree,
 	lastSelectedUsers = {},
 	sortOrderAscending = {},
+	generatingLearningDesign = false;
 	submitInProgress = false;
 
 
@@ -17,6 +18,7 @@ function doSelectTab(tabId) {
  */
 function initLessonTab(){
 	$('#ldScreenshotAuthor').load(function(){
+		generatingLearningDesign = false;
 		// hide "loading" animation
 		$('.ldChoiceDependentCanvasElement').css('display', 'none');
 		// show the thumbnail
@@ -25,23 +27,32 @@ function initLessonTab(){
 		var resized = resizeImage('ldScreenshotAuthor', 477);
 		toggleCanvasResize(resized ? CANVAS_RESIZE_OPTION_FIT
 				: CANVAS_RESIZE_OPTION_NONE);
-	}).error(function(){
+	}).error(function(event){
+
 		// the LD SVG is missing, try to re-generate it
-		var image = $(this),
-			learningDesignID = $(this).data('learningDesignID');
-		
-		// iframe just to load Authoring for a single purpose, generate the SVG
-		$('<iframe />').appendTo('body').load(function(){
-			// call svgGenerator.jsp code to store LD SVG on the server
-			var frame = $(this),
-				win = frame[0].contentWindow || frame[0].contentDocument;
-			win.GeneralLib.saveLearningDesignImage();
-			frame.remove();
-			// load the image again, avoid caching
-			image.attr('src', LD_THUMBNAIL_URL_BASE + learningDesignID + '&_t=' + new Date().getTime());
-		}).attr('src', LAMS_URL 
-					   + 'authoring/author.do?method=generateSVG&selectable=false&learningDesignID='
-					   + learningDesignID);
+		// check first though that we haven't tried already to do that!
+		if ( generatingLearningDesign ) {
+			generatingLearningDesign = false;
+			$('.ldChoiceDependentCanvasElement').css('display', 'none');
+			$('#ldCannotLoadSVG').css('display', 'inline');
+		} else {
+			var image = $(this),
+				learningDesignID = $(this).data('learningDesignID');
+			
+			// iframe just to load Authoring for a single purpose, generate the SVG
+			$('<iframe />').appendTo('body').load(function(){
+				// call svgGenerator.jsp code to store LD SVG on the server
+				generatingLearningDesign = true;
+				var frame = $(this),
+					win = frame[0].contentWindow || frame[0].contentDocument;
+				win.GeneralLib.saveLearningDesignImage();
+				frame.remove();
+				// load the image again, avoid caching
+				image.attr('src', LD_THUMBNAIL_URL_BASE + learningDesignID + '&_t=' + new Date().getTime());
+			}).attr('src', LAMS_URL 
+						   + 'authoring/author.do?method=generateSVG&selectable=false&learningDesignID='
+						   + learningDesignID);
+		}
 	});
 	
 	// generate LD initial tree; folderContents is declared in newLesson.jsp
