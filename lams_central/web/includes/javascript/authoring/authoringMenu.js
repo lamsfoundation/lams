@@ -9,15 +9,13 @@ var MenuLib = {
 		layout.exportImageDialog = showDialog('exportImageDialog',{
 			'autoOpen' : false,
 			'width'	   : 350,
-			'height'   : 75,
 			'draggable': false,
 			'resizable': false,
 			'modal'	   : true,
-			'title'	   : LABELS.EXPORT_IMAGE_DIALOG_TITLE
+			'title'	   : LABELS.EXPORT_IMAGE_DIALOG_TITLE,
+			'close'    : null
 		}, false);
-		layout.exportImageDialog.click(function(){
-			layout.exportImageDialog.modal('hide');
-		});
+		
 		$('.modal-body', layout.exportImageDialog).empty().append($('#exportImageDialogContents').show());
 		layout.dialogs.push(layout.exportImageDialog);
 	},
