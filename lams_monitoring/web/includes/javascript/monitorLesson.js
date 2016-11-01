@@ -32,66 +32,6 @@ var originalSequenceCanvas = null,
 	lastTapTime = 0,
 	lastTapTarget = null;
 
-// ********* GENERAL TABS FUNCTIONS *********
-
-function initTabs(){
-	$('#tabs').tabs({
-		'activate' : function(event, ui) {
-			var sequenceInfoDialog = $('#sequenceInfoDialog');
-			if (ui.newPanel.attr('id') == 'tabSequence') {
-				if (sequenceTabShowInfo && !sequenceInfoDialog.dialog('option', 'showed')) {
-					sequenceInfoDialog.dialog('open');
-				}
-			} else if (sequenceInfoDialog.dialog('isOpen')) {
-				sequenceInfoDialog.dialog('close');
-			}
-		}
-	}).draggable({
-		// scroll plugin has to be disabled here as it throws errors
-		// when dragging helper appended to parent document
-		'scroll' : false,
-		'handle' : $('#tabs>ul'),
-		'helper' : function(){
-			// since this code is inside an iframe, the helper is
-			// a transparent div with black borders attached to parent document
-			var dialogName = "dialogMonitorLesson" + lessonId,
-				dialog = $('#' + dialogName, window.parent.document).closest('.ui-dialog'),	
-				helper = $('<div />').attr('id', 'dragHelper').css({
-					'width'  : dialog.width(),
-					'height' : dialog.height()
-				});
-			return helper;
-		},
-		'appendTo' : window.parent.document.body,
-		'start' : function(){
-			$(window.parent.document.body).mouseup(function(){
-				// IE sometimes does not trigger drag stop, so we need to help it
-				$('#tabs').trigger('mouseup');
-			});
-		},
-		'drag' : function(event, ui) {
-			// adjust position to be relative to parent document, not iframe contents
-			var dialogName = "dialogMonitorLesson" + lessonId,
-				dialog = $('#' + dialogName, window.parent.document).closest('.ui-dialog');
-			ui.position.top += dialog.position().top;
-			ui.position.left += dialog.position().left;
-		},
-		'stop' : function(event, ui) {
-			$(window.parent.document.body).off('mouseup');
-			var dialogName = "dialogMonitorLesson" + lessonId,
-				dialog = $('#' + dialogName, window.parent.document).closest('.ui-dialog');
-			dialog.offset({
-				'top' : ui.offset.top,
-				'left' : ui.offset.left
-			});
-		}
-	}).mousedown(function(){
-		// bring clicked Monitor window to front
-		var dialogName = "dialogMonitorLesson" + lessonId;
-		window.parent.moveDialogToTop(dialogName);
-	});
-}
-
 
 //********** LESSON TAB FUNCTIONS **********
 
@@ -155,34 +95,21 @@ function initLessonTab(){
 	});
 	
 	// sets up dialog for editing class
-	var classDialog = $('#classDialog').dialog({
+	var classDialog = showDialog('classDialog',{
 		'autoOpen'  : false,
-		'height'    : 435,
 		'width'     : 700,
-		'minWidth'  : 700,
-		'modal'     : true,
+		'title' 	: LABELS.LESSON_EDIT_CLASS,
 		'resizable' : true,
-		'show'      : 'fold',
-		'hide'      : 'fold',
 		'open'      : function(){
 			autoRefreshBlocked = true;
 		},
 		'close' : function(){
 			autoRefreshBlocked = false;
 			refreshMonitor();
-		},
-		'buttons' : [
-		             {
-		            	'text'   : LABELS.CLOSE_BUTTON,
-		            	'id'     : 'classDialogCancelButton',
-		            	'class'  : 'btn btn-sm btn-default', 
-		            	'click'  : function() {
-							$(this).dialog('close');
-						} 
-		            			}
-		]
-		            		});
-		            		
+		}
+	}, false);
+	
+	$('.modal-body', classDialog).empty().append($('#classDialogContents').show());
 	
 	// search for users in the organisation with the term the Monitor entered
 	$('.dialogSearchPhrase', classDialog).autocomplete({
@@ -196,10 +123,10 @@ function initLessonTab(){
 				// show the "clear search phrase" button
 				$('.dialogSearchPhraseClear', dialog).css('visibility', 'visible');
 				// reset to page 1
-				dialog.dialog('option','LearnerAjaxProperties').pageNumber = 1;
+				dialog.data('LearnerAjaxProperties').data.pageNumber = 1;
 				showClassDialog('Learner');
 				return false;
-		            		}
+		   }
 		})
 		// run the real search when the Monitor presses Enter
 		.keypress(function(e){
@@ -210,12 +137,12 @@ function initLessonTab(){
 				phraseField.autocomplete("close");
 				if (phraseField.val()) {
 					$('.dialogSearchPhraseClear', dialog).css('visibility', 'visible');
-		            				}
+		        }
 				// reset to page 1
-				dialog.dialog('option','LearnerAjaxProperties').pageNumber = 1;
+				dialog.data('LearnerAjaxProperties').pageNumber = 1;
 				showClassDialog('Learner');
-		            			}
-		            		});
+			}
+		});
 
 }
 
@@ -533,94 +460,76 @@ function updateContributeActivities(contributeActivities) {
  * Sets up the sequence tab.
  */
 function initSequenceTab(){
+	var learnerGroupDialogContents = $('#learnerGroupDialogContents');
+	$('#learnerGroupDialogForceCompleteButton', learnerGroupDialogContents).click(function() {
+		var dialog = $('#learnerGroupDialog'),
+			selectedLearners = $('.dialogList div.dialogListItemSelected', dialog),
+			// go to "force complete" mode, similar to draggin user to an activity
+			activityId = dialog.data('ajaxProperties').data.activityID,
+			dropArea = sequenceCanvas.add('#completedLearnersContainer');
+		dropArea.css('cursor', 'url('
+						+ LAMS_URL + 'images/icons/' 
+						+ (selectedLearners.length > 1 ? 'group' : 'user')
+						+ '.png),pointer')
+				.one('click', function(event) {
+					var learners = [];
+					selectedLearners.each(function(){
+						var learner = $(this);
+						learners.push({
+							'id'     : learner.attr('userId'),
+							'name'   : learner.text()
+						});
+					});
+					dropArea.off('click').css('cursor', 'default');
+					forceComplete(activityId, learners, event.pageX, event.pageY);
+				});
+		dialog.modal('hide');
+		
+		var learnerNames = '';
+		selectedLearners.each(function(){
+			learnerNames += $(this).text() + ', ';
+		});
+		learnerNames = learnerNames.slice(0, -2);
+		alert(LABELS.FORCE_COMPLETE_CLICK.replace('[0]',learnerNames));
+	});
+	
+	$('#learnerGroupDialogViewButton', learnerGroupDialogContents).click(function() {
+		var dialog = $('#learnerGroupDialog'),
+			selectedLearner = $('.dialogList div.dialogListItemSelected', dialog);
+		if (selectedLearner.length == 1) {
+			// open pop up with user progress in the given activity
+			openPopUp(selectedLearner.attr('viewUrl'), "LearnActivity", 600, 800, true);
+		}
+	});
+	
+	$('#learnerGroupDialogEmailButton', learnerGroupDialogContents).click(function() {
+		var dialog = $('#learnerGroupDialog'),
+			selectedLearner = $('.dialogList div.dialogListItemSelected', dialog);
+		if (selectedLearner.length == 1) {
+			showEmailDialog(selectedLearner.attr('userId'));
+		}
+	});
+	
+	$('#learnerGroupDialogCloseButton', learnerGroupDialogContents).click(function(){
+		$('#learnerGroupDialog').modal('hide');
+	});
     // initialise lesson dialog
-	var learnerGroupDialog = $('#learnerGroupDialog').dialog({
+	var learnerGroupDialog = showDialog('learnerGroupDialog',{
 			'autoOpen'  : false,
-			'height'    : 390,
 			'width'     : 400,
-			'minWidth'  : 400,
-			'modal'     : true,
+			'height'	: 400,
 			'resizable' : true,
-			'show'      : 'fold',
-			'hide'      : 'fold',
 			'open'      : function(){
 				autoRefreshBlocked = true;
 				// until operator selects an user, buttons remain disabled
-				$('button.learnerGroupDialogSelectableButton').blur().removeClass('ui-state-hover')
-					.attr('disabled', 'disabled');
+				$('button.learnerGroupDialogSelectableButton').blur().prop('disabled', true);
 			},
 			'close' 	: function(){
 				autoRefreshBlocked = false;
-			},
-			'buttons' : [
-			             {
-			            	'text'   : LABELS.FORCE_COMPLETE_BUTTON,
-			            	'id'     : 'learnerGroupDialogForceCompleteButton',
-			            	'class'  : 'learnerGroupDialogSelectableButton',
-			            	'click'  : function() {
-			            		var selectedLearners = $('.dialogList div.dialogListItemSelected', this),
-			            			// go to "force complete" mode, similar to draggin user to an activity
-		            				activityId = $(this).dialog('option', 'ajaxProperties').data.activityID,
-			            			dropArea = sequenceCanvas.add('#completedLearnersContainer');
-		            			dropArea.css('cursor', 'url('
-				            					+ LAMS_URL + 'images/icons/' 
-				            					+ (selectedLearners.length > 1 ? 'group' : 'user')
-				            					+ '.png),pointer')
-				            			.one('click', function(event) {
-			            					var learners = [];
-			            					selectedLearners.each(function(){
-			            						var learner = $(this);
-			            						learners.push({
-			            							'id'     : learner.attr('userId'),
-			            							'name'   : learner.text()
-			            						});
-			            					});
-				            				dropArea.off('click').css('cursor', 'default');
-			            					forceComplete(activityId, learners, event.pageX, event.pageY);
-				            			});
-				            	$(this).dialog('close');
-				            	
-				            	var learnerNames = '';
-				            	selectedLearners.each(function(){
-				            		learnerNames += $(this).text() + ', ';
-				            	});
-				            	learnerNames = learnerNames.slice(0, -2);
-			            		alert(LABELS.FORCE_COMPLETE_CLICK.replace('[0]',learnerNames));
-							}
-			             },
-			             {
-			            	'text'   : LABELS.VIEW_LEARNER_BUTTON,
-			            	'id'     : 'learnerGroupDialogViewButton',
-			            	'class'  : 'learnerGroupDialogSelectableButton btn btn-sm btn-default',
-			            	'click'  : function() {
-			            		var selectedLearner = $('.dialogList div.dialogListItemSelected', this);
-			            		if (selectedLearner.length == 1) {
-			            			// open pop up with user progress in the given activity
-			            			openPopUp(selectedLearner.attr('viewUrl'), "LearnActivity", 600, 800, true);
-			            		}
-							}
-			             },
-			             {
-			            	'text'   : LABELS.EMAIL_BUTTON,
-			            	'id'     : 'learnerGroupDialogEmailButton',
-			            	'class'  : 'learnerGroupDialogSelectableButton btn btn-sm btn-default',
-			            	'click'  : function() {
-			            		var selectedLearner = $('.dialogList div.dialogListItemSelected', this);
-			            		if (selectedLearner.length == 1) {
-			            			showEmailDialog(selectedLearner.attr('userId'));
-			            		}
-			            	}	
-			             },
-			             {
-			            	'text'   : LABELS.CLOSE_BUTTON,
-			            	'id'     : 'learnerGroupDialogCloseButton',
-			            	'class'  : 'btn btn-sm btn-default',
-			            	'click'  : function() {
-								$(this).dialog('close');
-							} 
-			             }
-			]
-		});
+			}
+		}, false);
+	
+	$('.modal-body', learnerGroupDialog).empty().append(learnerGroupDialogContents.show());
 	
 	// search for users with the term the Monitor entered
 	$('.dialogSearchPhrase', learnerGroupDialog).autocomplete({
@@ -633,7 +542,7 @@ function initSequenceTab(){
 				phraseField.val(ui.item.label);
 				$('.dialogSearchPhraseClear', dialog).css('visibility', 'visible');
 				// reset to page 1
-				dialog.dialog('option','ajaxProperties').pageNumber = 1;
+				dialog.data('ajaxProperties').data.pageNumber = 1;
 				showLearnerGroupDialog();
 				return false;
 			}
@@ -649,7 +558,7 @@ function initSequenceTab(){
 					$('.dialogSearchPhraseClear', dialog).css('visibility', 'visible');
 				}
 				// reset to page 1
-				dialog.dialog('option','ajaxProperties').pageNumber = 1;
+				dialog.data('ajaxProperties').data.pageNumber = 1;
 				showLearnerGroupDialog();
 			}
 		});
@@ -1212,7 +1121,7 @@ function addActivityIconsHandlers(activity) {
 		$('*[id^="act' + activity.id + 'attention"]', sequenceCanvas).click(function(event){
 			event.stopPropagation();
 			// switch to first tab where attention prompts are listed
-			$('#tabs').tabs('option', 'active', 0);     
+			doSelectTab(1); 
 		});
 	}
 }
@@ -1393,17 +1302,12 @@ function showClassDialog(role){
 		fillClassList('Learner', false);
 		fillClassList('Monitor', true);
 	
-		$('#classDialog')
-			.dialog('option',
-				{
-				 'title' : LABELS.LESSON_EDIT_CLASS
-				})
-			.dialog('open');
+		$('#classDialog').modal('show');
 	} else {
 		// refresh after page shift or search
 		fillClassList(role, role.toLowerCase() == 'monitor');
 	}
-		}
+}
 
 
 /**
@@ -1414,7 +1318,7 @@ function fillClassList(role, disableCreator) {
 		table = $('#class' + role + 'Table', dialog),
 		list = $('.dialogList', table).empty(),
 		searchPhrase = role == 'Learner' ? $('.dialogSearchPhrase', table).val().trim() : null,
-		ajaxProperties = dialog.dialog('option', role + 'AjaxProperties'),
+		ajaxProperties = dialog.data(role + 'AjaxProperties'),
 		users = null,
 		userCount = null;
 	
@@ -1434,7 +1338,7 @@ function fillClassList(role, disableCreator) {
 		}
 			};
 	
-		dialog.dialog('option', role + 'AjaxProperties', ajaxProperties);
+		dialog.data(role + 'AjaxProperties', ajaxProperties);
 	}
 
 	// add properties for this call only
@@ -1783,7 +1687,7 @@ function learnersClearSearchPhrase(){
 function classClearSearchPhrase(){
 	var dialog = $('#classDialog');
 	$('.dialogSearchPhrase', dialog).val('').autocomplete("close");
-	dialog.dialog('option', 'LearnerAjaxProperties').data.pageNumber = 1;
+	dialog.data('LearnerAjaxProperties').data.pageNumber = 1;
 	showClassDialog('Learner');
 	$('.dialogSearchPhraseClear', dialog).css('visibility', 'hidden');
 }
@@ -1795,7 +1699,7 @@ function classClearSearchPhrase(){
 function learnerGroupClearSearchPhrase(){
 	var dialog = $('#learnerGroupDialog');
 	$('.dialogSearchPhrase', dialog).val('').autocomplete("close");
-	dialog.dialog('option', 'ajaxProperties').data.pageNumber = 1;
+	dialog.data('ajaxProperties').data.pageNumber = 1;
 	showLearnerGroupDialog();
 	$('.dialogSearchPhraseClear', dialog).css('visibility', 'hidden');
 }
@@ -1852,7 +1756,6 @@ function closeMonitorLessonDialog(refresh) {
  */
 function showLearnerGroupDialog(ajaxProperties, dialogTitle, allowSearch, allowForceComplete, allowView, allowEmail) {
 	var learnerGroupDialog = $('#learnerGroupDialog'),
-		learnerGroupDialogParent = learnerGroupDialog.parent(),
 		learnerGroupList = $('.dialogList', learnerGroupDialog).empty(),
 		// no parameters provided? just work on what we saved
 		isRefresh = ajaxProperties == null,
@@ -1861,10 +1764,10 @@ function showLearnerGroupDialog(ajaxProperties, dialogTitle, allowSearch, allowF
 	
 	if (isRefresh) {
 		// ajax and other properties were saved when the dialog was opened
-		ajaxProperties = learnerGroupDialog.dialog('option', 'ajaxProperties');
-		allowForceComplete = learnerGroupDialog.dialog('option', 'allowForceComplete');
-		allowView = learnerGroupDialog.dialog('option', 'allowView');
-		allowEmail = learnerGroupDialog.dialog('option', 'allowEmail');
+		ajaxProperties = learnerGroupDialog.data('ajaxProperties');
+		allowForceComplete = learnerGroupDialog.data('allowForceComplete');
+		allowView = learnerGroupDialog.data('allowView');
+		allowEmail = learnerGroupDialog.data('allowEmail');
 		allowSearch = $('#learnerGroupSearchRow', learnerGroupDialog).is(':visible');
 	} else {
 		// add few standard properties to ones provided by method calls
@@ -1899,7 +1802,7 @@ function showLearnerGroupDialog(ajaxProperties, dialogTitle, allowSearch, allowF
 	// close the dialog and refresh the main screen
 	if (!learnerCount && !searchPhrase) {
 		if (isRefresh) {
-			 learnerGroupDialog.dialog('close');
+			 learnerGroupDialog.modal('hide');
 		}
 		updateSequenceTab();
 		return;
@@ -1934,8 +1837,8 @@ function showLearnerGroupDialog(ajaxProperties, dialogTitle, allowSearch, allowF
 				var learnerDiv = $(this),
 					selectedSiblings = learnerDiv.siblings('div.dialogListItem.dialogListItemSelected');
 				    	// enable buttons
-			    $('button.learnerGroupDialogSelectableButton', learnerGroupDialogParent).prop('disabled', false)
-			    																		.removeClass('ui-state-disabled');
+			    $('button.learnerGroupDialogSelectableButton', learnerGroupDialog).prop('disabled', false);
+			    
 				if (allowForceComplete && (event.metaKey || event.ctrlKey)) {
 					var isSelected = learnerDiv.hasClass('dialogListItemSelected');
 					if (isSelected) {
@@ -1948,8 +1851,7 @@ function showLearnerGroupDialog(ajaxProperties, dialogTitle, allowSearch, allowF
 					}
 					if (selectedSiblings.length + (isSelected ? 0 : 1) > 1) {
 						// disable view button - only one learner can be viewed and multiple are selected
-						$('button#learnerGroupDialogViewButton', learnerGroupDialogParent).prop('disabled', true)
-																						  .addClass('ui-state-disabled');
+						$('button#learnerGroupDialogViewButton', learnerGroupDialog).prop('disabled', true);
 					}
 				} else {
 					learnerDiv.addClass('dialogListItemSelected');
@@ -1970,38 +1872,22 @@ function showLearnerGroupDialog(ajaxProperties, dialogTitle, allowSearch, allowF
 	
 	if (!isRefresh) {
 		// show buttons and labels depending on parameters
-		$('span#learnerGroupMultiSelectLabel, button#learnerGroupDialogForceCompleteButton', learnerGroupDialogParent)
+		$('span#learnerGroupMultiSelectLabel, button#learnerGroupDialogForceCompleteButton', learnerGroupDialog)
 		.css('display', allowForceComplete ? 'inline' : 'none');
-		$('button#learnerGroupDialogViewButton', learnerGroupDialogParent)
+		$('button#learnerGroupDialogViewButton', learnerGroupDialog)
 		.css('display', allowView ? 'inline' : 'none');
-		$('button#learnerGroupDialogEmailButton', learnerGroupDialogParent)
+		$('button#learnerGroupDialogEmailButton', learnerGroupDialog)
 		.css('display', allowEmail ? 'inline' : 'none');
-//
-//	showDialog('learnerGroupDialog', {
-//		'data' : {
-//			
-//		},
-//		'height' : 650,
-//		'width' : 850,
-//		'title' : dialogTitle,
-//		'open' : function() {
-//			$('.modal-body', this).empty().append($('#learnerGroupDialogContents'));
-//		},
-//		'beforeClose' : function(){
-//			$('#learnerGroupDialogContents').appendTo('body')
-//		}
-//	}, false);
 	
-	learnerGroupDialog.dialog('option', 
-			{
-			 'title' : dialogTitle,
-				 // save properties for refresh
-				 'ajaxProperties' : ajaxProperties,
-				 'allowForceComplete' : allowForceComplete,
-				 'allowView' : allowView,
-				 'allowEmail' : allowEmail
-			})
-		.dialog('open');	
+	$('.modal-title', learnerGroupDialog).text(dialogTitle);
+	learnerGroupDialog.data({
+		 // save properties for refresh
+		 'ajaxProperties' : ajaxProperties,
+		 'allowForceComplete' : allowForceComplete,
+		 'allowView' : allowView,
+		 'allowEmail' : allowEmail
+		})
+		.modal('show');	
 	}
 }
 
@@ -2038,7 +1924,7 @@ function escapeHtml(unsafe) {
 function sortLearnerGroupList() {
 	var learnerGroupDialog = $('#learnerGroupDialog'),
 		sortIcon = $('td.sortCell span', learnerGroupDialog),
-		ajaxProperties = learnerGroupDialog.dialog('option', 'ajaxProperties'),
+		ajaxProperties = learnerGroupDialog.data('ajaxProperties'),
 		// reverse current order after click
 		orderAscending = !ajaxProperties.data.orderAscending;
 		
@@ -2060,7 +1946,7 @@ function sortClassList(role) {
 	var classDialog = $('#classDialog'),
 		table = $('#class' + role + 'Table', classDialog),
 		sortIcon = $('td.sortCell span', table),
-		ajaxProperties = classDialog.dialog('option', role + 'AjaxProperties'),
+		ajaxProperties = classDialog.data(role + 'AjaxProperties'),
 		// reverse current order after click
 		orderAscending = !ajaxProperties.data.orderAscending;
 
@@ -2090,7 +1976,7 @@ function colorDialogList(parent) {
 */
 function shiftLearnerGroupList(shift) {
 	var learnerGroupDialog = $('#learnerGroupDialog'),
-		ajaxProperties = learnerGroupDialog.dialog('option', 'ajaxProperties'),
+		ajaxProperties = learnerGroupDialog.data('ajaxProperties'),
 		pageNumber = ajaxProperties.data.pageNumber + shift;
 	if (pageNumber < 0) {
 		pageNumber = 1;
@@ -2105,7 +1991,7 @@ function shiftLearnerGroupList(shift) {
 */
 function shiftClassList(role, shift) {
 	var classDialog = $('#classDialog'),
-		ajaxProperties = classDialog.dialog('option', role + 'AjaxProperties'),
+		ajaxProperties = classDialog.data(role + 'AjaxProperties'),
 		pageNumber = ajaxProperties.data.pageNumber + shift;
 	if (pageNumber < 0) {
 		pageNumber = 1;

@@ -51,8 +51,16 @@ input[type="checkbox"] {
 	border: none;
 }
 
-.dialogContainer,
-.dialog-no-title .ui-dialog-titlebar {
+.modal-header button .fa {
+    font-size: 16px;
+    margin-left: 10px;
+}
+
+.ui-front {
+	z-index: 1100;
+}
+
+.dialogContainer {
 	display: none;
 	-webkit-overflow-scrolling: touch !important;
 }
@@ -115,6 +123,11 @@ div.dialogContainer td.pageCell {
 span#learnerGroupMultiSelectLabel {
 	font-size: 10px;
 }
+
+#learnerGroupDialogContents .btn-group {
+	margin-top: 10px;
+}
+
 /********** LESSON TAB STYLES **********/
 div#tabLesson {
 /*	height: 540px;*/
