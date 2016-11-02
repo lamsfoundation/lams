@@ -24,10 +24,6 @@
 		  $.mobile.ignoreContentEnabled = true;
 		  $('body').attr('data-enhance', 'false');
 		});
-		
-        function doSelectTab(tabId) {
-	    	selectTab(tabId);
-        }
 	</script>
 	
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery-ui.js"></script>
@@ -175,6 +171,21 @@
 			// remove "loading..." screen
 			$('#loadingOverlay').remove();
 		});
+			
+        function doSelectTab(tabId) {
+	    	selectTab(tabId);
+			var sequenceInfoDialog = $('#sequenceInfoDialog');
+	    	if ( tabId == '2' ) {
+				if (sequenceTabShowInfo) {
+					showSequenceInfoDialog();
+					sequenceTabShowInfo = false; // only show it once
+                }
+			} else {
+				closeSequenceInfoDialog();
+            }
+        }
+        
+
 	</script>
 	
 	
@@ -670,7 +681,7 @@
 		</table>
 	</div>
 	
-	<div id="sequenceInfoDialog" class="dialogContainer">
+	<div id="sequenceInfoDialogContents" class="dialogContainer">
 	  <fmt:message key="sequence.help.info"/>
 	</div>
 	

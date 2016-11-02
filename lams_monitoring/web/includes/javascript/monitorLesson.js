@@ -1,4 +1,4 @@
-﻿﻿// ********** GLOBAL VARIABLES **********
+﻿﻿﻿// ********** GLOBAL VARIABLES **********
 // copy of lesson SVG so it does no need to be fetched every time
 var originalSequenceCanvas = null,
 // DIV container for lesson SVG
@@ -563,33 +563,6 @@ function initSequenceTab(){
 			}
 		});
 	
-	
-	
-	// small info box on Sequence tab, activated when the tab is showed
-	$('#sequenceInfoDialog').dialog({
-		'autoOpen'   : false,
-		'height'     : 35,
-		'width'      : 290,
-		'modal'      : false,
-		'resizable'  : false,
-		'show'       : 'fold',
-		'hide'       : 'fold',
-		'dialogClass': 'dialog-no-title',
-		'position'   : {my: "left top",
-					   at: "left top+10",
-					   of: '#sequenceTopButtonsContainer'
-				      },
-		'open'      : function(){
-			var dialog = $(this);
-			// show only once in this Monitor
-			dialog.dialog('option', 'showed', true);
-			// close after given time
-			setTimeout(function(){
-				dialog.dialog('close');
-			}, sequenceInfoTimeout);
-		}
-	});
-	
 	$('#forceBackwardsDialog').dialog({
 		'autoOpen'  : false,
 		'modal'     : true,
@@ -648,6 +621,31 @@ function initSequenceTab(){
 }
 	
 
+
+function showSequenceInfoDialog(){
+	// small info box on Sequence tab, activated when the tab is showed
+	var sequenceInfoDialog = showDialog('sequenceInfoDialog', {
+		'height'     : 150,
+		'width'      : 300,
+		'modal'      : false, 
+		'resizable'  : false, 
+		'open'      : function(){
+			$('.modal-body', sequenceInfoDialog).empty().append($('#sequenceInfoDialogContents').show());
+			// close after given time
+			setTimeout(function(){
+				sequenceInfoDialog.modal('hide')
+			}, sequenceInfoTimeout);
+		}
+	}, false);
+	
+}
+
+function closeSequenceInfoDialog(){
+	var sequenceInfoDialog = $('#sequenceInfoDialog');
+	if ( sequenceInfoDialog && sequenceInfoDialog.data() && sequenceInfoDialog.data('bs.modal').isShown ) {
+		sequenceInfoDialog.modal('hide');
+	}
+}
 
 /**
  * Updates learner progress in sequence tab according to respose sent to refreshMonitor()
@@ -747,7 +745,8 @@ function updateSequenceTab() {
 			if (sequenceSearchedLearner != null && !response.searchedLearnerFound) {
 				// the learner has not started the lesson yet, display an info box
 				sequenceClearSearchPhrase();
-				$('#sequenceInfoDialog').text(LABELS.PROGRESS_NOT_STARTED).dialog('open');
+				$('#sequenceInfoDialogContent').text(LABELS.PROGRESS_NOT_STARTED);
+				showSequenceInfoDialog();
 			}
 			
 			var learnerTotalCount = learnerCount + response.completedLearnerCount;
