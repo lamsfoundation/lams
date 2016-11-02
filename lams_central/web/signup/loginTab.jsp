@@ -1,32 +1,45 @@
-	<div>
-		<html:form action="/signup/signup.do" method="post">
-			<html:hidden property="method" value="login" />
-			<html:hidden property="submitted" value="1" />
-			<html:hidden property="context" value="${signupOrganisation.context}" />
-			<html:hidden property="selectedTab" value="1" />
-			
-			<table>
-				<tr>
-					<td class="table-row-caption"><fmt:message key="login.username"/>:	</td>
-					<td width="30%"><html:text property="usernameTab2" size="40" maxlength="255" /></td>
-					<td><html:errors property="usernameTab2" /></td>
-				</tr>
-				<tr>
-					<td class="table-row-caption"><fmt:message key="login.password"/>:	</td>
-					<td><input name="passwordTab2" type="password" size="40" maxlength="255" autocomplete="off"/></td>
-					<td><html:errors property="passwordTab2" /></td>
-				</tr>
-				<tr>
-					<td class="table-row-caption"><fmt:message key="login.course.key"/>:	</td>
-					<td><html:password property="courseKeyTab2" size="40" maxlength="255"/></td>
-					<td><html:errors property="courseKeyTab2" /></td>
-				</tr>
-				<tr>
-					<td></td>
-					<td class="align-right"><html:submit styleClass="button"><fmt:message key="login.submit"/></html:submit></td>
-					<td></td>
-				</tr>
-			</table>
-		
-		</html:form>
-	</div>
+<body>
+	<html:form action="/signup/signup.do" method="post">
+		<html:hidden property="method" value="login" />
+		<html:hidden property="submitted" value="1" />
+		<html:hidden property="context" value="${signupOrganisation.context}" />
+		<html:hidden property="selectedTab" value="1" />
+		<div class="container">
+			<div class="row vertical-center-row">
+				<div
+					class="col-xs-12 col-sm-8 col-sm-offset-2 col-md-6 col-md-offset-3">
+					<div class="panel">
+						<div class="panel-body">
+							<div class="form-group">
+								<b><label><fmt:message key="login.username" /></label>:</b>
+								<html:text property="usernameTab2" size="40" maxlength="255"
+									styleClass="form-control" />
+								<html:errors property="usernameTab2" />
+							</div>
+							<div class="form-group">
+								<b><label><fmt:message key="login.password" /></label>:</b> <input
+									name="passwordTab2" type="password" size="40" maxlength="255"
+									class="form-control" autocomplete="off" />
+								<html:errors property="passwordTab2" />
+							</div>
+							<div class="form-group">
+								<b> <label><fmt:message key="login.course.key" /></label>:
+								</b>
+								<html:text property="courseKeyTab2" size="40" maxlength="255"
+									styleClass="form-control" />
+								<html:errors property="courseKeyTab2" />
+							</div>
+							<div class="form-group" align="right">
+								<html:submit styleClass="btn btn-sm btn-default voffset5">
+									<fmt:message key="login.submit" />
+								</html:submit>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</html:form>
+</body>
+
+
