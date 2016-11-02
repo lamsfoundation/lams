@@ -206,6 +206,10 @@
 			    </div>
 			  </div>
 		</div>
+		<div align="right">
+		<a class="btn btn-sm btn-file btn-default offset5" role="button"
+								href="<c:url value='/index.do'/>?method=profile"><fmt:message
+									key="button.cancel" /></a></div>
 	</div>
 </div>
 </div>	
