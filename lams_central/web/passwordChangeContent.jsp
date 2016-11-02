@@ -16,7 +16,6 @@
 <c:set var="mustHaveNumerics"><%=Configuration.get(ConfigurationKeys.PASSWORD_POLICY_NUMERICS)%></c:set>
 <c:set var="mustHaveSymbols"><%=Configuration.get(ConfigurationKeys.PASSWORD_POLICY_SYMBOLS)%></c:set>
 	
-
 <lams:html>
 <lams:head>
 	<link rel="stylesheet" href="css/defaultHTML_learner.css" type="text/css" />
@@ -38,7 +37,6 @@
 						&& /[`~!@#$%^&*\(\)_\-+={}\[\]\\|:\;\"\'\<\>,.?\/]/.test(value) //has symbols
 					</c:if>
 			});
-			
 			
 		$.validator.addMethod("charactersAllowed", function(value) {
 				return /^[A-Za-z0-9\d`~!@#$%^&*\(\)_\-+={}\[\]\\|:\;\"\'\<\>,.?\/]*$/.test(value)
@@ -154,9 +152,7 @@
 									placeholder="<fmt:message key='label.password.confirm.new.password' />" maxlength="25"/>
 							</div>
 							<div class="form-group" align="right">
-								<html:cancel styleClass="btn btn-sm btn-default voffset5">
-									<fmt:message key="button.cancel" />
-								</html:cancel>
+							<input type="submit" name="org.apache.struts.taglib.html.CANCEL" value="<fmt:message key="button.cancel"/>" formnovalidate="formnovalidate" onclick="bCancel=true;" id="cancelButton" class="btn btn-sm btn-default voffset5"/>
 								&nbsp;&nbsp;
 								<html:submit styleClass="btn btn-sm btn-primary voffset5">
 									<fmt:message key="button.save" />
