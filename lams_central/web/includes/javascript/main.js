@@ -550,7 +550,6 @@ function showGradebookCourseDialog(orgID){
 		'modal' : false,
 		'title' : LABELS.GRADEBOOK_COURSE_TITLE,
 		'open' : function() {
-			var orgID = $(this).dialog('option', 'orgID');
 			// load contents after opening the dialog
 			$('iframe', this).attr('src', LAMS_URL
 				+ 'gradebook/gradebookMonitoring.do?dispatch=courseMonitor&organisationID=' + orgID);
