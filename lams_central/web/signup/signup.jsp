@@ -92,7 +92,7 @@
 	<div class="container">
 		<div class="page-header">
 			<h1 align="center">
-				<img src="<lams:LAMSURL/>/images/css/lams_login.gif"
+				<img src="<lams:LAMSURL/>/images/svg/lams_logo_black.svg"
 					alt="LAMS - Learning Activity Management System" width="186"
 					height="90"></img>
 			</h1>
