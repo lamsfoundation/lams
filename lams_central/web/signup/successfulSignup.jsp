@@ -14,29 +14,23 @@
 <script type="text/javascript"
 	src="/lams/includes/javascript/bootstrap.min.js"></script>
 <div class="container">
-	<div class="row vertical-center-row">
-		<div
-			class="col-xs-12 col-sm-8 col-sm-offset-2 col-md-6 col-md-offset-3">
-			<div class="panel">
-				<div class="panel-heading">
-					<h1 align="center">
-						<img src="<lams:LAMSURL/>/images/css/lams_login.gif" alt=""
-							width="186" height="90"></img>
-					</h1>
-				</div>
-				<div class="panel-body">
-					<c:if test="${not empty error}">
-						<div Class="warning">
-							<fmt:message key="success.errors" />
-							,
+	<div class="panel" align="center">
+		<div class="panel-heading">
+
+			<img src="<lams:LAMSURL/>/images/svg/lams_logo_black.svg" alt=""
+				class="img-center" width="200"></img>
+
+		</div>
+		<div class="panel-body">
+			<c:if test="${not empty error}">
+				<lams:Alert type="warning" id="error-messages" close="false">
+					<fmt:message key="success.errors" />,
 							<c:out value="${error}" />
-						</div>
-					</c:if>
-					<div class="form-group">
-						<fmt:message key="success.msg.1" />
-						: <a href="<lams:LAMSURL />"><fmt:message key="success.login" /></a>.
-					</div>
-				</div>
+				</lams:Alert>
+			</c:if>
+			<div class="panel">
+				<fmt:message key="success.msg.1" />
+				: <a href="<lams:LAMSURL />"><fmt:message key="success.login" /></a>.
 			</div>
 		</div>
 	</div>
