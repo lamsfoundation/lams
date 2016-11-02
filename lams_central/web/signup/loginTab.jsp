@@ -11,20 +11,19 @@
 					<div class="panel">
 						<div class="panel-body">
 							<div class="form-group">
-								<b><label><fmt:message key="login.username" /></label>:</b>
+								<label for="usernameTab2"><fmt:message key="login.username" /></label>:
 								<html:text property="usernameTab2" size="40" maxlength="255"
 									styleClass="form-control" />
 								<html:errors property="usernameTab2" />
 							</div>
 							<div class="form-group">
-								<b><label><fmt:message key="login.password" /></label>:</b> <input
+								<label for="passwordTab2"><fmt:message key="login.password" /></label>: <input
 									name="passwordTab2" type="password" size="40" maxlength="255"
 									class="form-control" autocomplete="off" />
 								<html:errors property="passwordTab2" />
 							</div>
 							<div class="form-group">
-								<b> <label><fmt:message key="login.course.key" /></label>:
-								</b>
+								 <label for="courseKeyTab2"><fmt:message key="login.course.key" /></label>:
 								<html:text property="courseKeyTab2" size="40" maxlength="255"
 									styleClass="form-control" />
 								<html:errors property="courseKeyTab2" />
