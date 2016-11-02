@@ -16,7 +16,10 @@
 	src="/lams/includes/javascript/jquery-ui.js"></script>
 <script type="text/javascript"
 	src="/lams/includes/javascript/jquery.validate.js"></script>
-
+<link rel="stylesheet" href="/lams/css/defaultHTML_learner.css"
+	type="text/css" />
+<script type="text/javascript"
+	src="/lams/includes/javascript/bootstrap.min.js"></script>
 
 
 <script type="text/javascript">
@@ -72,7 +75,6 @@
 									pwcheck : true
 								},
 								confirmPassword : {
-									required : true,
 									equalTo : $('form input[name="password"]')
 								},
 
@@ -114,7 +116,6 @@
 									pwcheck : "<fmt:message key='label.password.restrictions'/>"
 								},
 								confirmPassword : {
-									required : "<fmt:message key='error.password.empty'/>",
 									equalTo : "<fmt:message key='error.passwords.unequal'/>"
 								},
 								username : {
@@ -140,11 +141,6 @@
 
 	});
 </script>
-
-
-
-
-
 <div>
 	<html:form styleId="SignupForm" action="/signup/signup.do"
 		method="post">
@@ -153,114 +149,119 @@
 		<html:hidden property="context" value="${signupOrganisation.context}" />
 		<html:hidden property="selectedTab" value="0" />
 
-		<table>
+		<div class="container">
+			<div class="row vertical-center-row">
+				<div
+					class="col-xs-12 col-sm-8 col-sm-offset-2 col-md-6 col-md-offset-3">
+					<div class="panel">
+						<div class="panel-body">
 
-			<tr>
-				<td class="table-row-caption"><fmt:message
-						key="signup.username" />:</td>
-				<td width="30%"><html:text property="username" size="40"
-						maxlength="255" /></td>
-				<td><html:errors property="username" /> <span
-					style="display: none;'" class="msg error"> <fmt:message
-							key="error.username.invalid.characters" /></span></td>
-			</tr>
+							<div class="form-group">
+								<b><label><fmt:message key="signup.username" /></label>:</b>
+								<html:text property="username" size="40" maxlength="255"
+									styleClass="form-control" />
+								<html:errors property="username" />
+								<span style="display: none;'" class="msg error"> <fmt:message
+										key="error.username.invalid.characters" /></span>
+							</div>
 
-			<tr>
+							<div class="col-xs-12">
+								<lams:Alert type="info" id="passwordConditions" close="false">
+									<strong><fmt:message key='label.password.must.contain' />:</strong>
+									<c:out value="${mustHaveUppercase}" />
+									<ul class="list-unstyled" style="line-height: 1.2">
+										<li><span class="fa fa-check"></span> <fmt:message
+												key='label.password.min.length'>
+												<fmt:param value='${minNumChars}' />
+											</fmt:message></li>
+										<c:if test="${mustHaveUppercase}">
+											<li><span class="fa fa-check"></span> <fmt:message
+													key='label.password.must.ucase' /></li>
+										</c:if>
+										<c:if test="${mustHaveNumerics}">
+											<li><span class="fa fa-check"></span> <fmt:message
+													key='label.password.must.number' /></li>
+										</c:if>
+										<c:if test="${mustHaveSymbols}">
+											<li><span class="fa fa-check"></span> <fmt:message
+													key='label.password.must.symbol' /></li>
+										</c:if>
+									</ul>
+								</lams:Alert>
+							</div>
 
-				<td class="table-row-caption"><fmt:message
-						key='label.password.must.contain' />: <lams:Alert type="info"
-						id="passwordConditions" close="false"></td>
-				<td width="30%">
-					<ul class="list-unstyled" style="line-height: 1.2">
-						<li><span class="fa fa-check"></span> <fmt:message
-								key='label.password.min.length'>
-								<fmt:param value='${minNumChars}' />
-							</fmt:message></li>
+							<div class="form-group">
+								<b><label><fmt:message key="signup.password" /></label>:</b>
 
-						<c:if test="${mustHaveUppercase}">
-							<li><span class="fa fa-check"></span> <fmt:message
-									key='label.password.must.ucase' /></li>
-						</c:if>
+								<html:password property="password" size="40"
+									styleClass="form-control" maxlength="25" />
+								<html:errors property="password" />
+							</div>
 
-						<c:if test="${mustHaveNumerics}">
-							<li><span class="fa fa-check"></span> <fmt:message
-									key='label.password.must.number' /></li>
-						</c:if>
+							<div class="form-group">
+								<b><label><fmt:message key="signup.confirm.password" /></label>:</b>
+
+								<html:password property="confirmPassword" size="40"
+									maxlength="25" styleClass="form-control" />
+								<span style="display: none;'" class="confirmPassword error"><fmt:message
+										key="error.passwords.unequal" /></span>
+							</div>
+							<div class="form-group">
+								<b><label><fmt:message key="signup.first.name" /></label>:</b>
+
+								<html:text property="firstName" size="40" maxlength="255"
+									styleClass="form-control" />
+								<html:errors property="firstName" />
+								<span style="display: none;'" class="first error"><fmt:message
+										key="error.firstname.invalid.characters" /></span>
+							</div>
+
+							<div class="form-group">
+								<b><label><fmt:message key="signup.last.name" /></label>:</b>
+
+								<html:text property="lastName" size="40" maxlength="255"
+									styleClass="form-control" />
+								<html:errors property="lastName" />
+								<span style="display: none;'" class="last error"><fmt:message
+										key="error.lastname.invalid.characters" /></span>
+							</div>
+							<div class="form-group">
+								<b><label><fmt:message key="signup.email" /></label>:</b>
+
+								<html:text property="email" size="40" maxlength="255"
+									styleClass="form-control" />
+								<html:errors property="email" />
+								<span style="display: none;'" class="email error"><fmt:message
+										key="error.email.invalid.format" /></span>
+							</div>
+
+							<div class="form-group">
+								<b><label><fmt:message key="signup.confirm.email" /></label>:</b>
+
+								<html:text property="confirmEmail" size="40" maxlength="255"
+									styleClass="form-control" />
+								<span style="display: none;'" class="confirmEmail error"><fmt:message
+										key="error.emails.unequal" /></span>
+							</div>
 
 
-						<c:if test="${mustHaveSymbols}">
-							<li><span class="fa fa-check"></span> <fmt:message
-									key='label.password.must.symbol' /></li>
-						</c:if>
+							<div class="form-group">
+								<b><label><fmt:message key="signup.course.key" /></label>:</b>
 
-					</ul>
-				</td>
-				</lams:Alert>
+								<html:text property="courseKey" size="40" maxlength="255"
+									styleClass="form-control" />
+								<html:errors property="courseKey" />
+							</div>
 
-			</tr>
-			<tr>
-				<td class="table-row-caption"><fmt:message
-						key="signup.password" />:</td>
-				<td><html:password property="password" size="40"
-						styleClass="form-control" maxlength="25" /></td>
-				<td><html:errors property="password" /></td>
-
-			</tr>
-			<tr>
-				<td class="table-row-caption"><fmt:message
-						key="signup.confirm.password" />:</td>
-				<td><html:password property="confirmPassword" size="40"
-						maxlength="25" /></td>
-				<td><span style="display: none;'" class="confirmPassword error"><fmt:message
-							key="error.passwords.unequal" /></span></td>
-			</tr>
-			<tr>
-				<td class="table-row-caption"><fmt:message
-						key="signup.first.name" />:</td>
-				<td><html:text property="firstName" size="40" maxlength="255" /></td>
-				<td><html:errors property="firstName" /> <span
-					style="display: none;'" class="first error"><fmt:message
-							key="error.firstname.invalid.characters" /></span></td>
-			</tr>
-			<tr>
-				<td class="table-row-caption"><fmt:message
-						key="signup.last.name" />:</td>
-				<td><html:text property="lastName" size="40" maxlength="255" /></td>
-				<td><html:errors property="lastName" /> <span
-					style="display: none;'" class="last error"><fmt:message
-							key="error.lastname.invalid.characters" /></span></td>
-			</tr>
-			<tr>
-				<td class="table-row-caption"><fmt:message key="signup.email" />:
-				</td>
-				<td><html:text property="email" size="40" maxlength="255" /></td>
-				<td><html:errors property="email" /><span
-					style="display: none;'" class="email error"><fmt:message
-							key="error.email.invalid.format" /></span></td>
-			</tr>
-			<tr>
-				<td class="table-row-caption"><fmt:message
-						key="signup.confirm.email" />:</td>
-				<td><html:text property="confirmEmail" size="40"
-						maxlength="255" /></td>
-				<td><span style="display: none;'" class="confirmEmail error"><fmt:message
-							key="error.emails.unequal" /></span></td>
-			</tr>
-			<tr>
-				<td class="table-row-caption"><fmt:message
-						key="signup.course.key" />:</td>
-				<td><html:password property="courseKey" size="40"
-						maxlength="255" /></td>
-				<td><html:errors property="courseKey" /></td>
-			</tr>
-			<tr>
-				<td></td>
-				<td class="align-right"><html:submit>
-						<fmt:message key="signup.submit" />
-					</html:submit></td>
-				<td></td>
-			</tr>
-		</table>
-
+							<div class="form-group" align="right">
+								<html:submit styleClass="btn btn-sm btn-default voffset5">
+									<fmt:message key="login.submit" />
+								</html:submit>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
 	</html:form>
 </div>
