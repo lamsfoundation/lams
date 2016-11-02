@@ -157,7 +157,7 @@
 						<div class="panel-body">
 
 							<div class="form-group">
-								<b><label><fmt:message key="signup.username" /></label>:</b>
+								<label for="username"><fmt:message key="signup.username" /></label>:
 								<html:text property="username" size="40" maxlength="255"
 									styleClass="form-control" />
 								<html:errors property="username" />
@@ -191,7 +191,7 @@
 							</div>
 
 							<div class="form-group">
-								<b><label><fmt:message key="signup.password" /></label>:</b>
+								<label for="password"><fmt:message key="signup.password" /></label>:
 
 								<html:password property="password" size="40"
 									styleClass="form-control" maxlength="25" />
@@ -199,7 +199,7 @@
 							</div>
 
 							<div class="form-group">
-								<b><label><fmt:message key="signup.confirm.password" /></label>:</b>
+								<label for="confirmPassword"><fmt:message key="signup.confirm.password" /></label>:
 
 								<html:password property="confirmPassword" size="40"
 									maxlength="25" styleClass="form-control" />
@@ -207,7 +207,7 @@
 										key="error.passwords.unequal" /></span>
 							</div>
 							<div class="form-group">
-								<b><label><fmt:message key="signup.first.name" /></label>:</b>
+								<label for="firstName"><fmt:message key="signup.first.name" /></label>:
 
 								<html:text property="firstName" size="40" maxlength="255"
 									styleClass="form-control" />
@@ -217,7 +217,7 @@
 							</div>
 
 							<div class="form-group">
-								<b><label><fmt:message key="signup.last.name" /></label>:</b>
+								<label for="lastName"><fmt:message key="signup.last.name" /></label>:
 
 								<html:text property="lastName" size="40" maxlength="255"
 									styleClass="form-control" />
@@ -226,7 +226,7 @@
 										key="error.lastname.invalid.characters" /></span>
 							</div>
 							<div class="form-group">
-								<b><label><fmt:message key="signup.email" /></label>:</b>
+								<label for="email"><fmt:message key="signup.email" /></label>:
 
 								<html:text property="email" size="40" maxlength="255"
 									styleClass="form-control" />
@@ -236,7 +236,7 @@
 							</div>
 
 							<div class="form-group">
-								<b><label><fmt:message key="signup.confirm.email" /></label>:</b>
+								<label for="confirmEmail"><fmt:message key="signup.confirm.email" /></label>:
 
 								<html:text property="confirmEmail" size="40" maxlength="255"
 									styleClass="form-control" />
@@ -246,7 +246,7 @@
 
 
 							<div class="form-group">
-								<b><label><fmt:message key="signup.course.key" /></label>:</b>
+								<label for="courseKey"><fmt:message key="signup.course.key" /></label>:
 
 								<html:text property="courseKey" size="40" maxlength="255"
 									styleClass="form-control" />
