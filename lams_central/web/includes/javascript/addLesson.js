@@ -3,7 +3,9 @@ var tree,
 	lastSelectedUsers = {},
 	sortOrderAscending = {},
 	generatingLearningDesign = false;
-	submitInProgress = false;
+	submitInProgress = false,
+	originalThumbnailWidth = 0,
+	originalThumbnailHeight = 0,
 
 
 /**
@@ -17,43 +19,6 @@ function doSelectTab(tabId) {
  * Sets up widgets on the main.jsp page
  */
 function initLessonTab(){
-	$('#ldScreenshotAuthor').load(function(){
-		generatingLearningDesign = false;
-		// hide "loading" animation
-		$('.ldChoiceDependentCanvasElement').css('display', 'none');
-		// show the thumbnail
-		$('#ldScreenshotAuthor').css('display', 'inline');
-		// resize if needed
-		var resized = resizeImage('ldScreenshotAuthor', 477);
-		toggleCanvasResize(resized ? CANVAS_RESIZE_OPTION_FIT
-				: CANVAS_RESIZE_OPTION_NONE);
-	}).error(function(event){
-
-		// the LD SVG is missing, try to re-generate it
-		// check first though that we haven't tried already to do that!
-		if ( generatingLearningDesign ) {
-			generatingLearningDesign = false;
-			$('.ldChoiceDependentCanvasElement').css('display', 'none');
-			$('#ldCannotLoadSVG').css('display', 'inline');
-		} else {
-			var image = $(this),
-				learningDesignID = $(this).data('learningDesignID');
-			
-			// iframe just to load Authoring for a single purpose, generate the SVG
-			$('<iframe />').appendTo('body').load(function(){
-				// call svgGenerator.jsp code to store LD SVG on the server
-				generatingLearningDesign = true;
-				var frame = $(this),
-					win = frame[0].contentWindow || frame[0].contentDocument;
-				win.GeneralLib.saveLearningDesignImage();
-				frame.remove();
-				// load the image again, avoid caching
-				image.attr('src', LD_THUMBNAIL_URL_BASE + learningDesignID + '&_t=' + new Date().getTime());
-			}).attr('src', LAMS_URL 
-						   + 'authoring/author.do?method=generateSVG&selectable=false&learningDesignID='
-						   + learningDesignID);
-		}
-	});
 	
 	// generate LD initial tree; folderContents is declared in newLesson.jsp
 	var treeNodes = parseFolderContents(folderContents);
@@ -96,12 +61,7 @@ function initLessonTab(){
 		// display "loading" animation and finally LD thumbnail
 		$('.ldChoiceDependentCanvasElement').css('display', 'none');
 		if (event.node.highlightState == 0) {
-			$('#ldScreenshotLoading').css('display', 'inline');
-			$('#ldScreenshotAuthor').data('learningDesignID', event.node.data.learningDesignId)
-									.attr('src', LD_THUMBNAIL_URL_BASE + event.node.data.learningDesignId 
-																	   + '&_t=' + new Date().getTime())
-									.css('width', 'auto')
-									.css('height', 'auto');
+			loadLearningDesignSVG(event.node.data.learningDesignId);
 		} else {
 			toggleCanvasResize(CANVAS_RESIZE_OPTION_NONE);
 		}
@@ -356,19 +316,88 @@ function addLesson(){
 
 // ********** LESSON TAB FUNCTIONS **********
 
-function resizeImage(id, width) {
-	var elem = $('#' + id),
-		elemWidth = elem.width();
+function loadLearningDesignSVG(ldId) {
 	
-	if (width != null && elemWidth > width) {
-		elem.css({
-			'width'  : width,
-			// compute ratio same as width change
-			'height' : Math.round(elem.height() * (width / elemWidth))
-		});
-		return true;
+	$.ajax({
+		dataType : 'text',
+		url : LAMS_URL + 'home.do',
+		async : false,
+		cache : false,
+		data : {
+			'method'    : 'getLearningDesignThumbnail',
+			'ldId'      : ldId,
+			'_t'		: new Date().getTime()
+			
+		},
+		success : function(response) {
+			// hide "loading" animation
+			$('.ldChoiceDependentCanvasElement').css('display', 'none');
+			generatingLearningDesign = false;
+			
+			// show the thumbnail
+			$('#ldScreenshotAuthor').html(response);
+			$('#ldScreenshotAuthor').css('display', 'block').css('width', 'auto').css('height', 'auto');
+
+			originalThumbnailWidth = $('svg','#ldScreenshotAuthor').attr('width');
+			originalThumbnailHeight = $('svg','#ldScreenshotAuthor').attr('height');
+
+			// resize if needed
+			var resized = resizeSequenceThumbnail();
+			toggleCanvasResize(resized ? CANVAS_RESIZE_OPTION_FIT
+					: CANVAS_RESIZE_OPTION_NONE);
+		},
+		error : function(error) {
+
+			// the LD SVG is missing, try to re-generate it; if it is an another error, fail
+			if (error.status != 404 || generatingLearningDesign ) {
+				$('.ldChoiceDependentCanvasElement').css('display', 'none');
+				$('#ldCannotLoadSVG').css('display', 'inline');
+				generatingLearningDesign = false;
+				return;
+			}
+
+			generatingLearningDesign = true;
+			// iframe just to load Authoring for a single purpose, generate the SVG
+			$('<iframe />').appendTo('body').load(function(){
+				// call svgGenerator.jsp code to store LD SVG on the server
+				var frame = $(this),
+					win = frame[0].contentWindow || frame[0].contentDocument;
+				win.GeneralLib.saveLearningDesignImage();
+				frame.remove();
+				// load the image again, avoid caching
+				loadLearningDesignSVG(ldId);
+			}).attr('src', LAMS_URL 
+						   + 'authoring/author.do?method=generateSVG&selectable=false&learningDesignID='
+						   + ldId);
+		}
+	});
+	
+}
+
+function resizeSequenceThumbnail(reset) {
+
+	var returnValue = false;
+	var svg = $('svg','#ldScreenshotAuthor');
+	if ( svg ) {
+		if ( reset ) {
+			svg.attr('width',originalThumbnailWidth);
+			svg.attr('height',originalThumbnailHeight);
+			if ( originalThumbnailWidth > 550 ) {
+				$('#ldScreenshotAuthor').css('width', 550).css('height', originalThumbnailHeight);
+			}
+		} else { 
+			var svgWidth = svg.attr('width'),
+				svgHeight = svg.attr('height');
+			if ( svgWidth > 550 ) {
+				svg.attr('width', 550);
+				svg.attr('height', Math.ceil(svgHeight * (550 / svgWidth)));
+				returnValue = true;
+			} 
+			$('#ldScreenshotAuthor').css('width', 'auto').css('height', 'auto');
+		}
 	}
-	return false;
+	
+	return returnValue;
 }
 
 
@@ -376,6 +405,7 @@ function resizeImage(id, width) {
  * Chooses whether LD thumbnail will be shrinked or full size.
  */
 function toggleCanvasResize(mode) {
+
 	var toggleCanvasResizeLink = $('#toggleCanvasResizeLink');
 	switch (mode) {
 	case CANVAS_RESIZE_OPTION_NONE:
@@ -387,7 +417,7 @@ function toggleCanvasResize(mode) {
 					toggleCanvasResize(CANVAS_RESIZE_OPTION_FULL)
 				});
 		toggleCanvasResizeLink.css('display', 'inline');
-		resizeImage('ldScreenshotAuthor', 477);
+		resizeSequenceThumbnail();
 		break;
 	case CANVAS_RESIZE_OPTION_FULL:
 		toggleCanvasResizeLink.html(CANVAS_RESIZE_LABEL_FIT).one('click',
@@ -395,7 +425,7 @@ function toggleCanvasResize(mode) {
 					toggleCanvasResize(CANVAS_RESIZE_OPTION_FIT)
 				});
 		toggleCanvasResizeLink.css('display', 'inline');
-		$('#ldScreenshotAuthor').css('width', 'auto').css('height', 'auto');
+		resizeSequenceThumbnail(true);
 		break;
 	}
 }
