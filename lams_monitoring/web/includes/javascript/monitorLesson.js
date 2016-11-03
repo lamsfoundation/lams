@@ -1,4 +1,4 @@
-﻿﻿﻿// ********** GLOBAL VARIABLES **********
+﻿﻿﻿﻿// ********** GLOBAL VARIABLES **********
 // copy of lesson SVG so it does no need to be fetched every time
 var originalSequenceCanvas = null,
 // DIV container for lesson SVG
@@ -513,6 +513,7 @@ function initSequenceTab(){
 	$('#learnerGroupDialogCloseButton', learnerGroupDialogContents).click(function(){
 		$('#learnerGroupDialog').modal('hide');
 	});
+	
     // initialise lesson dialog
 	var learnerGroupDialog = showDialog('learnerGroupDialog',{
 			'autoOpen'  : false,
@@ -563,48 +564,6 @@ function initSequenceTab(){
 			}
 		});
 	
-	$('#forceBackwardsDialog').dialog({
-		'autoOpen'  : false,
-		'modal'     : true,
-		'resizable' : false,
-		'minWidth'  : 350,
-		'show'      : 'fold',
-		'hide'      : 'fold',
-		'title'		: LABELS.FORCE_COMPLETE_BUTTON,
-		'open'      : function(){
-			autoRefreshBlocked = true;
-		},
-		'close' 	: function(){
-			autoRefreshBlocked = false;
-		},
-		'buttons' : [
-		             {
-		            	'text'   : LABELS.FORCE_COMPLETE_REMOVE_CONTENT_NO,
-		            	'click'  : function() {
-		            		$(this).dialog('close');
-		            		forceCompleteExecute($(this).dialog('option', 'learners'),
-       							 				 $(this).dialog('option', 'activityId'),
-       							 				 false);
-						}
-		             },
-		             {
-		            	'text'   : LABELS.FORCE_COMPLETE_REMOVE_CONTENT_YES,
-		            	'click'  : function() {
-							$(this).dialog('close');
-		            		forceCompleteExecute($(this).dialog('option', 'learners'),
-		            							 $(this).dialog('option', 'activityId'),
-		            							 true);
-						}
-		             },
-		             {
-		            	'text'   : LABELS.CLOSE_BUTTON,
-		            	'click'  : function() {
-							$(this).dialog('close');
-						} 
-		             }
-		]
-	});
-	
 	// search for users with the term the Monitor entered
 	$("#sequenceSearchPhrase").autocomplete( {
 		'source' : LAMS_URL + "monitoring/monitoring.do?method=autocomplete&scope=lesson&lessonID=" + lessonId,
@@ -618,33 +577,68 @@ function initSequenceTab(){
 			return false;
 		}
 	});
-}
 	
+	var forceBackwardsDialogContents = $('#forceBackwardsDialogContents');
+	showDialog('forceBackwardsDialog', {
+		'autoOpen'	: false,
+		'modal'     : true,
+		'resizable' : true,
+		'height'	: 300,
+		'width'  	: 400,
+		'title'		: LABELS.FORCE_COMPLETE_BUTTON,
+		'open'      : function(){
+			autoRefreshBlocked = true;
+		},
+		'close' 	: function(){
+			autoRefreshBlocked = false;
+		}
+	}, false);
+	// only need to do this once as then it updates the msg field directly.
+	$('.modal-body', '#forceBackwardsDialog').empty().append($('#forceBackwardsDialogContents').show());
+	
+	$('#forceBackwardsRemoveContentNoButton', forceBackwardsDialogContents).click(function(){
+		var forceBackwardsDialog = $('#forceBackwardsDialog');
+		forceCompleteExecute(forceBackwardsDialog.data('learners'),
+			 forceBackwardsDialog.data('activityId'),
+			 false);
+		forceBackwardsDialog.modal('hide');
+	});
 
+	$('#forceBackwardsRemoveContentYesButton', forceBackwardsDialogContents).click(function(){
+		var forceBackwardsDialog = $('#forceBackwardsDialog');
+		forceCompleteExecute(forceBackwardsDialog.data('learners'),
+			 forceBackwardsDialog.data('activityId'),
+			 true);
+		forceBackwardsDialog.modal('hide');
+	});
 
-function showSequenceInfoDialog(){
+	$('#forceBackwardsCloseButton', forceBackwardsDialogContents).click(function(){
+		$('#forceBackwardsDialog').modal('hide');
+	});
+
 	// small info box on Sequence tab, activated when the tab is showed
-	var sequenceInfoDialog = showDialog('sequenceInfoDialog', {
+	showDialog('sequenceInfoDialog', {
+		'autoOpen'   : false,
 		'height'     : 150,
 		'width'      : 300,
 		'modal'      : false, 
 		'resizable'  : false, 
+		'title'		 : LABELS.HELP,
 		'open'      : function(){
-			$('.modal-body', sequenceInfoDialog).empty().append($('#sequenceInfoDialogContents').show());
 			// close after given time
 			setTimeout(function(){
-				sequenceInfoDialog.modal('hide')
+				$('#sequenceInfoDialog').modal('hide')
 			}, sequenceInfoTimeout);
+		},
+		'close' 	: function(){
 		}
 	}, false);
-	
-}
+	$('.modal-body', '#sequenceInfoDialog').empty().append($('#sequenceInfoDialogContents').show());
 
-function closeSequenceInfoDialog(){
-	var sequenceInfoDialog = $('#sequenceInfoDialog');
-	if ( sequenceInfoDialog && sequenceInfoDialog.data() && sequenceInfoDialog.data('bs.modal').isShown ) {
-		sequenceInfoDialog.modal('hide');
-	}
+	$('#sequenceInfoDialogCloseButton', '#sequenceInfoDialogContents').click(function(){
+		$('#sequenceInfoDialog').modal('hide');
+	});
+
 }
 
 /**
@@ -745,8 +739,8 @@ function updateSequenceTab() {
 			if (sequenceSearchedLearner != null && !response.searchedLearnerFound) {
 				// the learner has not started the lesson yet, display an info box
 				sequenceClearSearchPhrase();
-				$('#sequenceInfoDialogContent').text(LABELS.PROGRESS_NOT_STARTED);
-				showSequenceInfoDialog();
+				$('#sequenceInfoDialogContents').html(LABELS.PROGRESS_NOT_STARTED);
+				$('#sequenceInfoDialog').modal('show');
 			}
 			
 			var learnerTotalCount = learnerCount + response.completedLearnerCount;
@@ -903,13 +897,13 @@ function forceComplete(currentActivityId, learners, x, y) {
 			// check if the target activity was found or we are moving the learner from end of lesson
 			if (moveBackwards) {
 				// move the learner backwards
-				$('#forceBackwardsDialog').text(LABELS.FORCE_COMPLETE_REMOVE_CONTENT
-							.replace('[0]', learnerNames).replace('[1]', targetActivityName))
-							.dialog('option', {
-								'learners' : learners,
-								'activityId': targetActivityId
-							})
-							.dialog('open');
+				var msgString = LABELS.FORCE_COMPLETE_REMOVE_CONTENT
+						.replace('[0]', learnerNames).replace('[1]', targetActivityName);
+				$('#forceBackwardsMsg', '#forceBackwardsDialogContents').html(msgString);				
+				$('#forceBackwardsDialog').data({
+					'learners' : learners,
+					'activityId': targetActivityId});
+				$('#forceBackwardsDialog').modal('show');
 				// so autoRefreshBlocked = false is not set
 				return;
 			} else {
