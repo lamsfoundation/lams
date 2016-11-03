@@ -70,6 +70,8 @@
 				LEARNER_GROUP_SHOW : '<c:out value="${LEARNER_GROUP_SHOW_VAR}" />',
 				<fmt:message key="learner.group.remove.progress" var="LEARNER_GROUP_REMOVE_PROGRESS_VAR"/>
 				LEARNER_GROUP_REMOVE_PROGRESS : decoderDiv.html('<c:out value="${LEARNER_GROUP_REMOVE_PROGRESS_VAR}" />').text(),
+                <fmt:message key="button.email" var="EMAIL_BUTTON_VAR"/>
+                EMAIL_BUTTON : '<c:out value="${EMAIL_BUTTON_VAR}" />',
 				<fmt:message key="email.notifications" var="NOTIFCATIONS_VAR"/>
 				NOTIFCATIONS : '<c:out value="${NOTIFCATIONS_VAR}" />',
 				<fmt:message key="button.save" var="SAVE_BUTTON_VAR"/>
