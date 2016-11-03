@@ -20,9 +20,7 @@ $(document).ready(function(){
 	skipAssigningWhenCreatingGroup = false;
 	
 	// initialisation based on mode
-	if (lessonMode) {
-		toggleBackButton();
-	} else {
+	if (!lessonMode) {
 		$('#groupingName').val(grouping.name);
 	}
 	
@@ -336,7 +334,6 @@ function removeGroup(container) {
 		if (executeDelete) {
 			$('#unassignedUserCell .userContainer').append($('.userContainer div.draggableUser', container));
 			container.remove();
-			toggleBackButton();
 		}
 	}
 }
@@ -470,18 +467,10 @@ function assignUsersToGroup(userIds, groupContainer) {
 				markGroupLocked($('div[userId="' + userIds[0] + '"]').parents('.groupContainer'));
 				alert(LABELS.GROUP_LOCK_LABEL);
 			}
-			toggleBackButton();
 		}
 	});
 	
 	return result;
-}
-
-/**
- * If there are any existing (not new) groups, forbid going back to grouping list.
- */
-function toggleBackButton() {
-	$('#backButton').prop('disabled', $('.groupContainer[groupId]').length == 0);
 }
 
 /**

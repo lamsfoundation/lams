@@ -50,43 +50,33 @@
 </lams:head>
 <body>
 
-<div id="titleDiv">
-	<c:choose>
-		<c:when test="${lessonMode}">
-			<!-- Button opening grouping page again -->
-			<button id="backButton" class="btn btn-default"
-				 onClick="javascript:document.location.href=LAMS_URL + 'OrganisationGroup.do?method=viewGroupings&organisationID='+orgID+'&activityID='+activityID">
-				<i class="fa fa-users"></i>
-				<fmt:message key="label.course.groups.back" />
-			</button>
-		</c:when>
-		<c:otherwise>
-			<fmt:message key="label.course.groups.name" />
-			<input id="groupingName" type="text"
-				<c:if test="${not canEdit or lessonMode}">
-					readonly="readonly"
-				</c:if>
-			/>
-			<!-- It is showed when user tries to save a grouping with empty name -->
-			<span id="groupingNameBlankError" class="errorMessage">
-				<fmt:message key="label.course.groups.name.blank" />
-			</span>
-			
-			<c:if test="${canEdit}">
-				<button class="pull-right btn btn-default" onClick="javascript:saveGroups()">
-					<i class="fa fa-save"></i>
-					<span><fmt:message key="button.save" /></span>
-				</button>
+<c:if test="${not lessonMode and (empty usedForBranching or usedForBranching eq false)}">
+	<div id="titleDiv">
+		<fmt:message key="label.course.groups.name" />
+		<input id="groupingName" type="text"
+			<c:if test="${not canEdit or lessonMode}">
+				readonly="readonly"
 			</c:if>
-			<button class="pull-right btn btn-default" 
-			   onClick="javascript:window.parent.showOrgGroupingDialog(organisationId)"
-			>
-				<i class="fa fa-users"></i>
-				<fmt:message key="label.course.groups.back" />
+		/>
+		<!-- It is showed when user tries to save a grouping with empty name -->
+		<span id="groupingNameBlankError" class="errorMessage">
+			<fmt:message key="label.course.groups.name.blank" />
+		</span>
+		
+		<c:if test="${canEdit}">
+			<button class="pull-right btn btn-default" onClick="javascript:saveGroups()">
+				<i class="fa fa-save"></i>
+				<span><fmt:message key="button.save" /></span>
 			</button>
-		</c:otherwise>
-	</c:choose>
-</div>
+		</c:if>
+		<button class="pull-right btn btn-default" 
+		   onClick="javascript:window.parent.showOrgGroupingDialog(organisationId)"
+		>
+			<i class="fa fa-users"></i>
+			<fmt:message key="label.course.groups.back" />
+		</button>
+	</div>
+</c:if>
 
 <div id="titleInstructions">
 	<c:choose>
