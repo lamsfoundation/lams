@@ -44,7 +44,7 @@
 			LABEL_RUN_SEQUENCES_FOLDER = '<fmt:message key="label.tab.lesson.sequence.folder" />',
 			LABEL_NAME_INVALID_CHARACTERS = '<fmt:message key="error.lessonname.invalid.characters" />';
 				
-		$(document).ready(function(){
+ 		$(document).ready(function(){
 			initLessonTab();
 			initClassTab();
 			initAdvancedTab();
@@ -64,7 +64,7 @@
 <form id="lessonForm" action="<lams:LAMSURL/>monitoring/monitoring.do" method="POST">
 
 <lams:Page type="navbar">
-		<lams:Tabs control="true">
+		<lams:Tabs>
 			<lams:Tab id="1" key="label.tab.lesson" />
 			<lams:Tab id="2" key="label.tab.class" />
 			<lams:Tab id="3" key="label.tab.advanced" />
