@@ -14,41 +14,59 @@
 <lams:html>
 <lams:head>
 	<link rel="stylesheet" href="css/defaultHTML_learner.css" type="text/css" />
-	
+
 	<script type="text/javascript" src="includes/javascript/jquery.js"></script>
 	<script type="text/javascript" src="includes/javascript/jquery-ui.js"></script>
 	<script type="text/javascript" src="includes/javascript/profile.js"></script>
 	<script type="text/javascript">
-		$(document).ready(function () {
-			//update dialog's height and title
-			updateMyProfileDialogSettings('<fmt:message key="title.profile.edit.screen" />', '100%');
-		});
+		function submitMessage() {
+			var formData = new FormData(document.getElementById("newForm"));
+
+			$.ajax({ // create an AJAX call...
+				data : formData,
+				processData : false, // tell jQuery not to process the data
+				contentType : false, // tell jQuery not to set contentType
+				type : $("#newForm").attr('method'),
+				url : $("#newForm").attr('action'),
+				success : function(data) {
+					window.parent.location.reload();
+				}
+			});
+		}
 	</script>
+	<script type="text/javascript">
+		$(document).ready(
+				function() {
+					//update dialog's height and title
+					updateMyProfileDialogSettings(
+							'<fmt:message key="title.profile.edit.screen" />',
+							'100%');
+				});
+	</script>
+
 </lams:head>
 
 <body>
-<html:form action="/saveprofile.do" method="post">
-	<html:hidden property="userId" />
-	<html:hidden property="login" />
-	<html:hidden property="password" />
+	<html:form action="/saveprofile.do" method="post" styleId='newForm'>
+		<html:hidden property="userId" />
+		<html:hidden property="login" />
+		<html:hidden property="password" />
 
-	<logic:messagesPresent>
-		<lams:Alert type="warning" id="profileRestrictions" close="false">
-			<html:errors /> 
-		</lams:Alert>
-	</logic:messagesPresent>
+		<logic:messagesPresent>
+			<lams:Alert type="warning" id="profileRestrictions" close="false">
+				<html:errors />
+			</lams:Alert>
+		</logic:messagesPresent>
 
-	<c:set var="profileEditEnabled"><%=Configuration.get(ConfigurationKeys.PROFILE_EDIT_ENABLE)%></c:set>
-	<c:set var="partialProfileEditEnabled"><%=Configuration.get(ConfigurationKeys.PROFILE_PARTIAL_EDIT_ENABLE)%></c:set>
-	<div style="clear: both;"></div>
-	<div class="container">
-
-		<div class="row vertical-center-row">
-			<div
-				class="col-xs-12 col-sm-8 col-sm-offset-2 col-md-6 col-md-offset-3">
-				<div class="panel">
-					<div class="panel-body">
-						<form class="form-horizontal">
+		<c:set var="profileEditEnabled"><%=Configuration.get(ConfigurationKeys.PROFILE_EDIT_ENABLE)%></c:set>
+		<c:set var="partialProfileEditEnabled"><%=Configuration.get(ConfigurationKeys.PROFILE_PARTIAL_EDIT_ENABLE)%></c:set>
+		<div style="clear: both;"></div>
+		<div class="container">
+			<div class="row vertical-center-row">
+				<div
+					class="col-xs-12 col-sm-8 col-sm-offset-2 col-md-6 col-md-offset-3">
+					<div class="panel">
+						<div class="panel-body">
 							<c:set var="authenticationMethodId">
 								<lams:user property="authenticationMethodId" />
 							</c:set>
@@ -62,8 +80,9 @@
 							<c:if test="${authenticationMethodId eq dbId}">
 
 								<div class="form-group">
-									<span class="lead"><label><fmt:message key="label.username" /></label>: 
-									<bean:write name="UserForm" property="login" /></span>
+									<span class="lead"><label><fmt:message
+												key="label.username" /></label>: <bean:write name="UserForm"
+											property="login" /></span>
 								</div>
 								<div class="form-group">
 									<label><fmt:message key="label.title" />:</label>
@@ -150,8 +169,10 @@
 								</div>
 
 								<div class="form-group">
-									<label><fmt:message key="label.fax" />:</label> 
-									<html:text property="fax" size="50" maxlength="64" disabled="${!profileEditEnabled and !partialProfileEditEnabled}" styleClass="form-control" />
+									<label><fmt:message key="label.fax" />:</label>
+									<html:text property="fax" size="50" maxlength="64"
+										disabled="${!profileEditEnabled and !partialProfileEditEnabled}"
+										styleClass="form-control" />
 								</div>
 
 								<div class="form-group">
@@ -206,21 +227,20 @@
 								</div>
 								<c:if test="${not empty sharedSecret}">
 									<div class="form-group">
-										<label><fmt:message
-													key="label.2FA.shared.secret" />:</label> ${sharedSecret}
+										<label><fmt:message key="label.2FA.shared.secret" />:</label>
+										${sharedSecret}
 									</div>
 								</c:if>
 								<c:if test="${not empty lamsCommunityToken}">
 									<div class="form-group">
 										<label> <fmt:message
-													key="label.lamscommunity.changeuser">
-													<fmt:param value="${lamsCommunityUsername}" />
-												</fmt:message>
+												key="label.lamscommunity.changeuser">
+												<fmt:param value="${lamsCommunityUsername}" />
+											</fmt:message>
 										</label>
-										<html:checkbox
-												property="disableLamsCommunityUsername"
-												disabled="${!profileEditEnabled}" styleClass="form-control"></html:checkbox>
-										
+										<html:checkbox property="disableLamsCommunityUsername"
+											disabled="${!profileEditEnabled}" styleClass="form-control"></html:checkbox>
+
 									</div>
 								</c:if>
 							</c:if>
@@ -260,14 +280,14 @@
 										value=<bean:write name="UserForm" property="title" />>
 								</div>
 								<div class="form-group">
-									<label><fmt:message key="label.first_name" /> *:</label>
-									<input type="text" class="form-control"
+									<label><fmt:message key="label.first_name" /> *:</label> <input
+										type="text" class="form-control"
 										value=<bean:write name="UserForm" property="firstName" />>
 								</div>
 
 								<div class="form-group">
-									<label><fmt:message key="label.last_name" /> *:</label>
-									<input type="text" class="form-control"
+									<label><fmt:message key="label.last_name" /> *:</label> <input
+										type="text" class="form-control"
 										value=<bean:write name="UserForm" property="lastName" />>
 								</div>
 
@@ -277,18 +297,18 @@
 										value=<bean:write name="UserForm" property="email" />>
 								</div>
 								<div class="form-group">
-									<label><fmt:message key="label.address_line_1" />:</label>
-									<input type="text" class="form-control"
+									<label><fmt:message key="label.address_line_1" />:</label> <input
+										type="text" class="form-control"
 										value=<bean:write name="UserForm" property="addressLine1" />>
 								</div>
 								<div class="form-group">
-									<label><fmt:message key="label.address_line_2" />:</label>
-									<input type="text" class="form-control"
+									<label><fmt:message key="label.address_line_2" />:</label> <input
+										type="text" class="form-control"
 										value=<bean:write name="UserForm" property="addressLine2" />>
 								</div>
 								<div class="form-group">
-									<label><fmt:message key="label.address_line_3" />:</label>
-									<input type="text" class="form-control"
+									<label><fmt:message key="label.address_line_3" />:</label> <input
+										type="text" class="form-control"
 										value=<bean:write name="UserForm" property="addressLine3" />>
 								</div>
 
@@ -320,13 +340,13 @@
 										value=<bean:write name="UserForm" property="dayPhone" />>
 								</div>
 								<div class="form-group">
-									<label><fmt:message key="label.evening_phone" />:</label>
-									<input type="text" class="form-control"
+									<label><fmt:message key="label.evening_phone" />:</label> <input
+										type="text" class="form-control"
 										value=<bean:write name="UserForm" property="eveningPhone" />>
 								</div>
 								<div class="form-group">
-									<label><fmt:message key="label.mobile_phone" />:</label>
-									<input type="text" class="form-control"
+									<label><fmt:message key="label.mobile_phone" />:</label> <input
+										type="text" class="form-control"
 										value=<bean:write name="UserForm" property="mobilePhone" />>
 								</div>
 								<div class="form-group">
@@ -378,7 +398,7 @@
 								</div>
 								<div class="form-group">
 									<label><fmt:message key="label.tutorial.enabled" />:<bean:write
-												name="UserForm" property="tutorialsDisabled" /></label>
+											name="UserForm" property="tutorialsDisabled" /></label>
 									<!-- For users' comfort we write it as a positive sentece - "should the tutorials be enabled"?
 			 But for simplicity of coding, we keep it as a negative value - "should the tutorials be disabled?"
 			 This is the reason to mix true/false and yes/no answers.
@@ -396,27 +416,27 @@
 
 							</c:if>
 
-							<div class="form-group" align="right">
-								<html:cancel styleClass="btn btn-sm btn-default voffset5">
-									<fmt:message key="button.cancel" />
-								</html:cancel>&nbsp;&nbsp;
-								<c:if test="${profileEditEnabled or partialProfileEditEnabled}">
-									<html:submit styleClass="btn btn-sm btn-default voffset5">
-										<fmt:message key="button.save" />
-									</html:submit>
-								</c:if>
-
-							</div>
-
-
-						</form>
+						</div>
 					</div>
-
 				</div>
 			</div>
-		</div>
+	</html:form>
+	<div class="form-group" align="right">
+		<html:cancel styleClass="btn btn-sm btn-default voffset5">
+			<fmt:message key="button.cancel" />
+		</html:cancel>
+		&nbsp;&nbsp;
+		<c:if test="${profileEditEnabled or partialProfileEditEnabled}">
+			<html:button styleClass="btn btn-sm btn-default voffset5"
+				property="submit" onclick="submitMessage()">
+				<fmt:message key="button.save" />
+			</html:button>
+		</c:if>
 	</div>
-</html:form>
+	</div>
 </body>
 </lams:html>
+
+
+
 
