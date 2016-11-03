@@ -54,16 +54,14 @@
 			LABELS = {
 				<fmt:message key="force.complete.click" var="FORCE_COMPLETE_CLICK_VAR"/>
 				FORCE_COMPLETE_CLICK : decoderDiv.html('<c:out value="${FORCE_COMPLETE_CLICK_VAR}" />').text(),
+				<fmt:message key="button.force.complete" var="FORCE_COMPLETE_BUTTON_VAR"/>
+                FORCE_COMPLETE_BUTTON : '<c:out value="${FORCE_COMPLETE_BUTTON_VAR}" />',
 				<fmt:message key="force.complete.end.lesson.confirm" var="FORCE_COMPLETE_END_LESSON_CONFIRM_VAR"/>
 				FORCE_COMPLETE_END_LESSON_CONFIRM : decoderDiv.html('<c:out value="${FORCE_COMPLETE_END_LESSON_CONFIRM_VAR}" />').text(),
 				<fmt:message key="force.complete.activity.confirm" var="FORCE_COMPLETE_ACTIVITY_CONFIRM_VAR"/>
 				FORCE_COMPLETE_ACTIVITY_CONFIRM : decoderDiv.html('<c:out value="${FORCE_COMPLETE_ACTIVITY_CONFIRM_VAR}" />').text(),
 				<fmt:message key="force.complete.remove.content" var="FORCE_COMPLETE_REMOVE_CONTENT_VAR"/>
 				FORCE_COMPLETE_REMOVE_CONTENT : decoderDiv.html('<c:out value="${FORCE_COMPLETE_REMOVE_CONTENT_VAR}" />').text(),
-				<fmt:message key="force.complete.remove.content.yes" var="FORCE_COMPLETE_REMOVE_CONTENT_YES_VAR"/>
-				FORCE_COMPLETE_REMOVE_CONTENT_YES : '<c:out value="${FORCE_COMPLETE_REMOVE_CONTENT_YES_VAR}" />',
-				<fmt:message key="force.complete.remove.content.no" var="FORCE_COMPLETE_REMOVE_CONTENT_NO_VAR"/>
-				FORCE_COMPLETE_REMOVE_CONTENT_NO : '<c:out value="${FORCE_COMPLETE_REMOVE_CONTENT_NO_VAR}" />',
 				<fmt:message key="force.complete.drop.fail" var="FORCE_COMPLETE_DROP_FAIL_VAR"/>
 				FORCE_COMPLETE_DROP_FAIL : '<c:out value="${FORCE_COMPLETE_DROP_FAIL_VAR}" />',
 				<fmt:message key="learner.group.count" var="LEARNER_GROUP_COUNT_VAR"/>
@@ -153,7 +151,9 @@
 				<fmt:message key="button.task.go" var="CONTRIBUTE_BUTTON_VAR"/>
 				CONTRIBUTE_BUTTON : '<c:out value="${CONTRIBUTE_BUTTON_VAR}" />',
 				<fmt:message key="lesson.task.attention" var="CONTRIBUTE_ATTENTION_VAR"/>
-				CONTRIBUTE_ATTENTION : '<c:out value="${CONTRIBUTE_ATTENTION_VAR}" />'
+				CONTRIBUTE_ATTENTION : '<c:out value="${CONTRIBUTE_ATTENTION_VAR}" />',
+				HELP : '<fmt:message key="button.help"/>'
+				
 			}
 	    
 		$(document).ready(function(){
@@ -177,11 +177,11 @@
 			var sequenceInfoDialog = $('#sequenceInfoDialog');
 	    	if ( tabId == '2' ) {
 				if (sequenceTabShowInfo) {
-					showSequenceInfoDialog();
+					sequenceInfoDialog.modal("show");
 					sequenceTabShowInfo = false; // only show it once
                 }
 			} else {
-				closeSequenceInfoDialog();
+				sequenceInfoDialog.modal("hide");
             }
         }
         
@@ -554,13 +554,13 @@
 			</tr>
 		</table>
 		<div class="btn-group pull-right">
-			<button id="learnerGroupDialogForceCompleteButton" class="learnerGroupDialogSelectableButton btn btn-default">
+			<button id="learnerGroupDialogForceCompleteButton" class="learnerGroupDialogSelectableButton btn btn-default roffset5">
 				<span><fmt:message key="button.force.complete" /></span>
 			</button>
-			<button id="learnerGroupDialogViewButton" class="learnerGroupDialogSelectableButton btn btn-default">
+			<button id="learnerGroupDialogViewButton" class="learnerGroupDialogSelectableButton btn btn-default roffset5">
 				<span><fmt:message key="button.view.learner" /></span>
 			</button>
-			<button id="learnerGroupDialogEmailButton" class="learnerGroupDialogSelectableButton btn btn-default">
+			<button id="learnerGroupDialogEmailButton" class="learnerGroupDialogSelectableButton btn btn-default roffset5">
 				<span><fmt:message key="button.email" /></span>
 			</button>
 			<button id="learnerGroupDialogCloseButton" class="btn btn-default">
@@ -685,7 +685,23 @@
 	  <fmt:message key="sequence.help.info"/>
 	</div>
 	
-	<div id="forceBackwardsDialog" class="dialogContainer"></div>
+	<div id="forceBackwardsDialogContents" class="dialogContainer">
+		<div id="forceBackwardsMsg"></div>
+        <div class="btn-group pull-right voffset10">
+
+               <button id="forceBackwardsRemoveContentNoButton" class="btn btn-default roffset5">
+                       <span><fmt:message key="force.complete.remove.content.no"/></span>
+               </button>
+
+               <button id="forceBackwardsRemoveContentYesButton" class="btn btn-default roffset5">
+                       <span><fmt:message key="force.complete.remove.content.yes" /></span>
+               </button>
+
+               <button id="forceBackwardsCloseButton" class="btn btn-default">
+                       <span><fmt:message key="button.close" /></span>
+               </button>
+       </div>
+	</div>
 	
 	<div id="tooltip"></div>
 </body>
