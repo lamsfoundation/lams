@@ -113,10 +113,27 @@
 			updateMyProfileDialogSettings('<fmt:message key="title.portrait.change.screen" />', '680');
 		});
 	</script>
+	<script type="text/javascript">
+	
+		function submitPortrait() {
+			var formData = new FormData(document.getElementById("PortraitActionForm"));
+
+			$.ajax({ // create an AJAX call...
+				data : formData,
+				processData : false, // tell jQuery not to process the data
+				contentType : false, // tell jQuery not to set contentType
+				type : $("#PortraitActionForm").attr('method'),
+				url : $("#PortraitActionForm").attr('action'),
+				success : function(data) {
+					window.parent.location.reload();
+				}
+			});
+		}
+	</script>
 </lams:head>
 
 <body>
-<html:form action="/saveportrait.do" method="post"	enctype="multipart/form-data">
+<html:form action="/saveportrait.do" method="post" styleId="PortraitActionForm"	enctype="multipart/form-data">
 	<html:hidden name="PortraitActionForm" property="portraitUuid" />
 	<div style="clear: both"></div>
 	<div class="container">
@@ -167,7 +184,7 @@
 								</div>
 			
 								<a class="btn btn-xs btn-default" id="uploadWebcam"
-									href="javascript:return false;"><fmt:message
+									><fmt:message
 										key='label.portrait.yes.set.it.as.portrait' /></a> <a
 									class="btn btn-xs btn-default" id="resetWebcam"
 									href="javascript:return false;"><fmt:message
@@ -194,12 +211,11 @@
 									<fmt:message key="msg.portrait.resized" />
 								</p>								
 							</div>	
-							<br /> <a
-								class="btn btn-sm btn-file btn-default offset5" role="button"
+							<br />
+							 <a class="btn btn-sm btn-file btn-default offset5" role="button"
 								href="<c:url value='/index.do'/>?method=profile"><fmt:message
 									key="button.cancel" /></a>
-									<a class="btn btn-sm btn-default offset5"
-								href="javascript:document.PortraitActionForm.submit();"
+							<a class="btn btn-sm btn-default offset5" onclick="submitPortrait()"
 								role="button"><fmt:message key="button.save" /></a>
 			
 			      </div>
