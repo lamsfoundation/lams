@@ -455,7 +455,6 @@ public class OrganisationGroupAction extends DispatchAction {
     /**
      * Fetches course and branching so they can get matched by user.
      */
-    @SuppressWarnings("unchecked")
     public ActionForward getGroupsForMapping(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) throws IOException, JSONException {
 	Long orgGroupingId = WebUtil.readLongParam(request, "groupingId");
@@ -471,11 +470,10 @@ public class OrganisationGroupAction extends DispatchAction {
 	    groupJSON.put("name", group.getName());
 	    groupsJSON.put(groupJSON);
 	}
+	Activity branchingActivity = (Activity) getUserManagementService().findById(Activity.class, activityID);
+	Grouping grouping = branchingActivity.getGrouping();
 
-	GroupingActivity branchingGrouping = (GroupingActivity) getUserManagementService().findById(Activity.class,
-		activityID);
 	JSONArray branchesJSON = new JSONArray();
-	Grouping grouping = branchingGrouping.getCreateGrouping();
 	SortedSet<Group> groups = new TreeSet<Group>(grouping.getGroups());
 	for (Group group : groups) {
 	    JSONObject groupJSON = new JSONObject();
@@ -593,7 +591,6 @@ public class OrganisationGroupAction extends DispatchAction {
     /**
      * Checks if lesson-level groups exist for the given activity.
      */
-    @SuppressWarnings("unchecked")
     private Grouping getLessonGrouping(HttpServletRequest request, Long activityID, boolean allowDefault) {
 	if (activityID != null) {
 	    // we need to fetch real objects instead of stubs/proxies
@@ -608,7 +605,6 @@ public class OrganisationGroupAction extends DispatchAction {
 		boolean isUsedForBranching = grouping.isUsedForBranching();
 		request.setAttribute(GroupingAJAXAction.PARAM_USED_FOR_BRANCHING, isUsedForBranching);
 
-		// check if it is immutable (for branching) or default groups are allowed
 		return !groups.isEmpty() && (allowDefault || !isDefaultChosenGrouping(grouping)) ? grouping : null;
 	    }
 	}
@@ -620,17 +616,16 @@ public class OrganisationGroupAction extends DispatchAction {
      * Check if the given groups are default for chosen grouping. There is actually no good way to detect this, but even
      * if a custom grouping is mistaken for the default one, it should bring little harm.
      */
-    @SuppressWarnings("unchecked")
     private boolean isDefaultChosenGrouping(Grouping grouping) {
 	Set<Group> groups = grouping.getGroups();
-	if ((groups == null) || (grouping.getMaxNumberOfGroups() == null)
-		|| !grouping.getMaxNumberOfGroups().equals(groups.size())) {
-	    return false;
-	}
 	for (Group group : groups) {
 	    if (!group.getUsers().isEmpty()) {
 		return false;
 	    }
+	}
+	if (groups == null || (grouping.getMaxNumberOfGroups() != null
+		&& !grouping.getMaxNumberOfGroups().equals(groups.size()))) {
+	    return false;
 	}
 	return true;
     }

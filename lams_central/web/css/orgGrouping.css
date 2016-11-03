@@ -39,3 +39,47 @@ div#titleDiv {
 	font-size: 12px;
 	padding-left: 10px;
 }
+
+
+#gtbDialog > table {
+	width: 100%;
+	height: 98%;
+	table-layout: fixed;
+	border-collapse: collapse;
+}
+
+#gtbDialog td {
+	text-align: center;
+	vertical-align: top;
+}
+
+#gtbDialog td.branchMappingLabelCell {
+	height: 15px;
+	font-weight: bold;
+}
+
+#gtbDialog td.branchMappingListCell {
+	border: thin black solid;
+	padding: 3px;
+}
+
+#gtbDialog td.branchMappingListCell .selected {
+	background-color: #5c9ccc;
+	color: white;
+}
+
+#gtbDialog .branchMappingButton {
+	display: block;
+	margin: auto;
+	margin-top: 10px;
+	margin-bottom: 10px;
+}
+
+#gtbDialog #branchMappingOKButton {
+	margin-top: 5px;
+}
+
+#gtbDialog td.branchMappingListCell div {
+	text-align: left;
+	cursor: pointer;
+}

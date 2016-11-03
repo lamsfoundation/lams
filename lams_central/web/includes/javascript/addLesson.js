@@ -5,7 +5,7 @@ var tree,
 	generatingLearningDesign = false;
 	submitInProgress = false,
 	originalThumbnailWidth = 0,
-	originalThumbnailHeight = 0,
+	originalThumbnailHeight = 0;
 
 
 /**
