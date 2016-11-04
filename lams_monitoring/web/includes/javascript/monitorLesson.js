@@ -5,7 +5,7 @@ var originalSequenceCanvas = null,
 // it gets accessed so many times it's worth to cache it here
 	sequenceCanvas = $('#sequenceCanvas'),
 // info box show timeout
-	sequenceInfoTimeout = 10000,
+	sequenceInfoTimeout = 8000,
 // which learner was selected in the search box
 	sequenceSearchedLearner = null,
 // container for learners' progress bars metadata
@@ -619,10 +619,10 @@ function initSequenceTab(){
 	// small info box on Sequence tab, activated when the tab is showed
 	showDialog('sequenceInfoDialog', {
 		'autoOpen'   : false,
-		'height'     : 150,
 		'width'      : 300,
 		'modal'      : false, 
-		'resizable'  : false, 
+		'resizable'  : false,
+		'draggable'  : false,
 		'title'		 : LABELS.HELP,
 		'open'      : function(){
 			// close after given time
@@ -630,15 +630,19 @@ function initSequenceTab(){
 				$('#sequenceInfoDialog').modal('hide')
 			}, sequenceInfoTimeout);
 		},
-		'close' 	: function(){
+		'close' 	: null,
+		'data'		: {
+			'position' : {
+				'my' : 'left top',
+				'at' : 'left top',
+				'of' : '#sequenceCanvas'
+			}
 		}
-	}, false);
-	$('.modal-body', '#sequenceInfoDialog').empty().append($('#sequenceInfoDialogContents').show());
-
-	$('#sequenceInfoDialogCloseButton', '#sequenceInfoDialogContents').click(function(){
+	}, false).click(function(){
 		$('#sequenceInfoDialog').modal('hide');
-	});
-
+	}).find('.modal-header').remove();
+	
+	$('#sequenceInfoDialog .modal-body').empty().append($('#sequenceInfoDialogContents').show());
 }
 
 /**
