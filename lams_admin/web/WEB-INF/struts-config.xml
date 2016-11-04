@@ -66,6 +66,7 @@
 	<form-property name="login" type="java.lang.String" />
 	<form-property name="password" type="java.lang.String" />
 	<form-property name="password2" type="java.lang.String" />
+	<form-property name="changePassword" type="java.lang.String" />
 	<form-property name="salt" type="java.lang.String" />
 	<form-property name="authenticationMethodId" type="java.lang.Integer" />
 	<form-property name="title" type="java.lang.String" />

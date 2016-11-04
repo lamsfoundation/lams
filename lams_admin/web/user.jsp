@@ -330,6 +330,11 @@
 							</c:forEach>
 						</html:select></td>
 				</tr>
+				<tr>
+					<td class="align-right"><fmt:message key="admin.user.change.password" />:</td>
+					<td><html-el:checkbox property="changePassword" value="true"
+						 styleId="changePassword"  /></td>
+				</tr>
 			</table>
 
 			<div class="pull-right">
