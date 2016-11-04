@@ -1028,8 +1028,10 @@ function fillProgressBar(barId) {
 				return;
 			}
 			// if there is no progress returned for the given user
+			// in monitoring we show not started, in learning just do not show anything.
 			if (!result) {
-				barContainer.text(LABELS.PROGRESS_NOT_STARTED);
+				if ( typeof LABELS != "undefined" && typeof LABELS.PROGRESS_NOT_STARTED != "undefined")
+					barContainer.text(LABELS.PROGRESS_NOT_STARTED);
 				return;
 			}
 			// if nothing changed, don't do any calculations
