@@ -27,7 +27,7 @@
 					
 					<div class="col-xs-12 text-center voffset10">
 						<a class="btn btn-sm btn-default"
-							href="index.do?state=active&method=profile" role="button">
+							href="<lams:LAMSURL/>index.do" role="button">
 							Ok
 						</a>
 					</div>
