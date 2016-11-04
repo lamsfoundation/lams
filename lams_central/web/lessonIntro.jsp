@@ -11,17 +11,75 @@
 <lams:html>
 <lams:head>
 	<TITLE><fmt:message key="title.learner.window"/></TITLE>
+	<link rel="stylesheet" href="css/defaultHTML_learner.css" type="text/css" media="screen" />
+	<link rel="stylesheet" href="css/thickbox.css" type="text/css" media="screen">
 	
 	<script type="text/javascript" src="includes/javascript/jquery.js"></script>
 	<script type="text/javascript" src="includes/javascript/thickbox.js"></script>
 	
-	<lams:css/>
-	<link rel="stylesheet" href="css/thickbox.css" type="text/css" media="screen">
 	<style media="screen,projection" type="text/css">
-		#sequence-preview {padding: 10px; text-align: center;}
 		#TB_iframeContent {width: 820px !important}
 	</style>	
 	
+	<c:if test="${displayDesignImage}">
+		<script>
+		var originalThumbnailWidth = 0,
+			originalThumbnailHeight = 0;
+
+		$(document).ready(function(){
+			$.ajax({
+				dataType : 'text',
+				url : '<lams:LAMSURL/>home.do',
+				async : false,
+				cache : false,
+				data : {
+					'method'    : 'getLearningDesignThumbnail',
+					'ldId'      : '${learningDesignID}',
+					'_t'		: new Date().getTime()
+				},
+				success : function(response) {
+					$('#ldScreenshotLoading').css('display', 'none');
+					$('#ldSVG').html(response);
+					$('#ldSVG').css('display', 'block');
+					
+					var svg = $('svg','#ldSVG');
+					if ( svg ) {
+						originalThumbnailWidth = svg.attr('width'),
+						originalThumbnailHeight = svg.attr('height');
+						resizeSVG();
+					}
+				},
+				error : function(error) {
+					$('#ldScreenshotLoading').css('display', 'none');
+					$('#ldCannotLoadSVG').css('display', 'block');
+				}
+			});
+			
+			$( window ).resize(function() {
+				resizeSVG();
+			});
+			
+		});
+		
+		function resizeSVG() {
+			var svg = $('svg','#ldSVG');
+			if ( svg ) {
+				var panelWidth = $('.panel-learner-page').width(),
+					svgWidth = svg.attr('width'),
+					svgHeight = svg.attr('height');
+		
+				if ( originalThumbnailWidth > panelWidth ) {
+					var newWidth = panelWidth > 100 ? panelWidth - 100 : panelWidth;
+					svg.attr('width', newWidth);
+					svg.attr('height', Math.ceil(originalThumbnailHeight * (newWidth / originalThumbnailWidth)));
+				} else {
+					svg.attr('width', originalThumbnailWidth);
+					svg.attr('height', originalThumbnailHeight);
+				}
+			}
+		}
+		</script>
+	</c:if>	
 </lams:head>
 
 <body class="stripes">
@@ -32,13 +90,14 @@
 		<p><c:out value="${lesson.lessonDescription}" escapeXml="false"/></p>	
 	
 		<c:if test="${displayDesignImage}">
-			<div id="sequence-preview">
-				<img src="<lams:LAMSURL/>home.do?method=getLearningDesignThumbnail&ldId=${learningDesignID}" alt="Sequence Preview" />
+			<div id="sequence-preview" class="voffset10 text-center">
+				<i id="ldScreenshotLoading" class="fa fa-refresh fa-spin fa-2x fa-fw"></i>
+    			<div id="ldCannotLoadSVG" style="display:none" ><fmt:message key="error.cannot.load.thumbnail" /></div>
+    			<div id="ldSVG" style="display:none" ></div>
 			</div>
 		</c:if>
 			
 		<div class="voffset10 pull-right">
-
 			<c:if test="${isMonitor}">
 			 	<a class="thickbox btn btn-default" href="editLessonIntro.do?method=edit&lessonID=${lesson.lessonId}&KeepThis=true&TB_iframe=true&height=600&width=800" title="<fmt:message key='label.edit'/>">
 					<fmt:message key="label.edit"/>
