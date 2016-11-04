@@ -10,7 +10,7 @@
 <lams:head>
 	<html:base/>
 	<title><fmt:message><tiles:getAsString name="titleKey"/></fmt:message></title>
-	<lams:css style="core"/>
+	<lams:css/>
 	<script language="JavaScript" type="text/JavaScript" src="<html:rewrite page='/includes/javascript/changeStyle.js'/>"></script>
 	<script language="JavaScript" type="text/javascript" src="includes/javascript/getSysInfo.js"></script>
 	<script language="JavaScript" type="text/javascript" src="includes/javascript/openUrls.js"></script>
@@ -19,10 +19,8 @@
 </lams:head>
     
 <body class="stripes">
-<div id="page">
-	<div id="content">
+<lams:Page type="learner" title="">
 			<tiles:insert attribute="content" />
-	</div>
-</div>
+</lams:Page>
 </body>
 </lams:html>
