@@ -270,7 +270,7 @@
 		<i class="fa fa-refresh fa-spin fa-3x fa-fw"></i>
 	</div>
 	
-	<div id="toolbar" class="btn-group" role="toolbar">
+	<div id="toolbar" class="buttons">
 	
 		<button id="newButton" class="btn btn-default" onClick="javascript:GeneralLib.newLearningDesign(false)">
 			<i class="fa fa-plus"></i> 
@@ -305,21 +305,21 @@
 		    <li id="exportSvgButton"  onClick="javascript:MenuLib.exportSVG(true)"><a href="#"><fmt:message key="authoring.fla.page.menu.export.svg" /></a></li>
 		  </ul>
 		</div>
-		
+
 		<button id="cancelLiveEditButton" class="btn btn-default" onClick="javascript:GeneralLib.cancelLiveEdit()">
 			<i class="fa fa-ban"></i> 
 			<span><fmt:message key="authoring.fla.cancel.button" /></span>
 		</button>
-		
+		<div class="btn-group" role="group">
 		<button id="copyButton" class="btn btn-default" onClick="javascript:MenuLib.copyActivity()">
 			<i class="fa fa-copy"></i> 
 			<span><fmt:message key="authoring.fla.page.menu.copy" /></span>
 		</button>
-		
 		<button id="pasteButton" class="btn btn-default" onClick="javascript:MenuLib.pasteActivity()">
 			<i class="fa fa-paste"></i> 
 			<span><fmt:message key="authoring.fla.page.menu.paste" /></span>
 		</button>
+		</div>	
 		
 		<button id="transitionButton" class="btn btn-default" onClick="javascript:MenuLib.addTransition()">
 			<i class="fa fa-long-arrow-right"></i> 
