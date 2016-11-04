@@ -293,6 +293,10 @@ div#completedLearnersContainer span {
 	margin-right: 5px;
 }
 
+#sequenceInfoDialog {
+	cursor: pointer;
+}
+
 /********** LEARNERS TAB STYLES **********/
 #tabLearnerControlTable td {
 	padding: 0px;
