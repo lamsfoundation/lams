@@ -225,7 +225,8 @@ div#ldStoreDialogContents div#ldStoreDialogNameContainer span {
 
 div#ldStoreDialogContents #ldStoreDialogNameContainer input {
 	width: 300px;
-	margin-left: 10px;	
+	margin-left: 10px;
+	color: #000000;
 }
 
 div.branchMappingDialog .container-fluid {
@@ -332,7 +333,7 @@ table#authoringTable {
 }
 
 td#templateContainerCell {
-	width: 150px;
+	width: 175px;
 	vertical-align: top;
 }
 
@@ -344,26 +345,32 @@ td#templateContainerCell select {
 div.templateContainer {
 	display: none;
 	overflow: auto;
-	border: black thin solid;
-	background-color: rgb(219, 230, 252);
+	border: 0.5px solid #a9a9a9;
+	border-radius: 3px;
+	// background-color: rgb(219, 230, 252);
 }
 
 div.template {
-	height: 40px;
-	border-bottom: black thin solid;
+	height: 45px;
+	border-bottom: 0.5px solid #a9a9a9;
 	cursor: pointer;
 }
 
+.tooltemplate {
+}
+
+.tooltemplate :hover {
+	background-color: #EDEDED;
+}
+
 div.template img {
-	margin: 5px 0 5px 5px;
+	margin: 8px 0 5px 5px;
 }
 
 div.template div {
 	float: right;
-	width: 89px;
-	padding-top: 14px;
-	font-size: 12px;
-	font-family: "Lucida Console", Monaco, monospace;
+	width: 130px;
+	padding-top: 12px;
 }
 
 td#canvasContainerCell {
@@ -372,13 +379,14 @@ td#canvasContainerCell {
 
 #ldDescriptionDiv {
 	z-index: 1099;
-	border-bottom: 1px solid black;
+	border-bottom: 1px solid #000000;
 }
 
 #ldDescriptionDiv #ldDescriptionTitleContainer {
 	padding: 2px 0 0 0;
 	text-align: center;
-	font-size: 12px;
+	font-size: 14px;
+	font-weight: bold;
 	cursor: pointer;
 }
 
