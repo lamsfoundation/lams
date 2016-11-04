@@ -13,26 +13,21 @@
 	type="text/css" />
 <script type="text/javascript"
 	src="/lams/includes/javascript/bootstrap.min.js"></script>
-<div class="container">
-	<div class="panel" align="center">
-		<div class="panel-heading">
-
-			<img src="<lams:LAMSURL/>/images/svg/lams_logo_black.svg" alt=""
-				class="img-center" width="200"></img>
-
-		</div>
-		<div class="panel-body">
-			<c:if test="${not empty error}">
-				<lams:Alert type="warning" id="error-messages" close="false">
-					<fmt:message key="success.errors" />,
-							<c:out value="${error}" />
-				</lams:Alert>
-			</c:if>
-			<div class="panel">
-				<fmt:message key="success.msg.1" />
-				: <a href="<lams:LAMSURL />"><fmt:message key="success.login" /></a>.
-			</div>
-		</div>
+<div class="panel-heading text-center">
+	<img src="<lams:LAMSURL/>/images/svg/lams_logo_black.svg" class="img-center" width="200px"></img>
+</div>
+<div class="panel-body text-center">
+	<c:if test="${not empty error}">
+		<lams:Alert type="danger" id="error-messages" close="false">
+			<fmt:message key="success.errors" />,
+					<c:out value="${error}" />
+		</lams:Alert>
+	</c:if>
+	<div class="panel">
+		<fmt:message key="success.msg.1" />
+		<p class="voffset20">
+			<a class="btn btn-sm btn-primary" href="<lams:LAMSURL />"><fmt:message key="success.login" /></a>
+		</p>
 	</div>
 </div>
 
