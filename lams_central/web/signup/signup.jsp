@@ -19,7 +19,7 @@
 <lams:html>
 <lams:head>
 	<title><fmt:message key="title.lams.signup" /></title>
-	<lams:css style="core" />
+	<lams:css/>
 	<link rel="icon" href="<lams:LAMSURL/>/favicon.ico" type="image/x-icon" />
 	<link rel="shortcut icon" href="<lams:LAMSURL/>/favicon.ico"
 		type="image/x-icon" />
@@ -88,16 +88,13 @@
 	</script>
 </lams:head>
 
-<body>
-	<div class="container">
+<body class="stripes">
+	<lams:Page type="admin">
 		<div class="page-header">
-			<h1 align="center">
+			<p class="text-center">
 				<img src="<lams:LAMSURL/>/images/svg/lams_logo_black.svg"
-					alt="LAMS - Learning Activity Management System" width="186"
-					height="90"></img>
-			</h1>
-
-
+					alt="LAMS - Learning Activity Management System" width="200px"></img>
+			</p>
 			<c:if test="${not empty signupOrganisation}">
 				<h1 align="center">
 					<c:out value="${signupOrganisation.organisation.name}" />
@@ -106,21 +103,25 @@
 				</c:if>
 				</h1>
 				<c:if test="${not empty signupOrganisation.blurb}">
-					<div id="signup-intro">
+					<div id="signup-intro" class="panel">
 						<c:out value="${signupOrganisation.blurb}" escapeXml="false" />
 					</div>
 				</c:if>
 			</c:if>
 
-			<div id="signup-intro">
-				<span class="ui-icon ui-icon-info"></span>
-				<fmt:message key="register.if.you.want.to.signup" />
+			<div class="media">
+  				<div class="media-left">
+					<i class="ui-icon ui-icon-info"></i>
+				</div>
+				<div class="media-body">
+					<small><fmt:message key="register.if.you.want.to.signup" /></small>
+				</div>
 			</div>
 
 			<c:if test="${not empty error}">
-				<p class="warning">
+				<lams:Alert type="danger" id="errors" close="false">
 					<c:out value="${error}" />
-				</p>
+				</lams:Alert>
 			</c:if>
 		</div>
 		<div class="row">
@@ -152,6 +153,6 @@
 				</div>
 			</div>
 		</div>
-	</div>
+	</lams:Page>
 </body>
 </lams:html>
