@@ -73,7 +73,7 @@
 		<lams:TabBodyArea>
 			<lams:TabBodys>
 				<lams:TabBody id="1" titleKey="label.basic">
-					<div id="tabLessonTitle" class="tabTitle"><fmt:message key="label.tab.lesson.title" /></div>
+					<div id="tabLessonTitle" class="tabTitle bg-warning"><fmt:message key="label.tab.lesson.title" /></div>
 					<table class="tabTable">
 						<tr>
 							<td id="learningDesignTreeCell" rowspan="3">
@@ -102,7 +102,7 @@
 				</lams:TabBody>
 				<lams:TabBody id="2" titleKey="label.tab.class">
 					<!-- Class panel -->
-					<div id="tabClassTitle" class="tabTitle"><fmt:message key="label.tab.class.title" /></div>
+					<div id="tabClassTitle" class="tabTitle bg-warning"><fmt:message key="label.tab.class.title" /></div>
 					<table id="classTable" class="tabTable">
 						<tr>
 							<td class="userContainerCell" rowspan="2">
