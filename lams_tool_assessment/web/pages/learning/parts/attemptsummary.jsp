@@ -24,8 +24,8 @@
 					<fmt:message key="label.learning.summary.time.taken" />
 				</th>
 				<td>
-					<fmt:formatDate value="${result.timeTaken}" pattern="H" timeZone="GMT" /> <fmt:message key="label.learning.summary.hours" />
-					<fmt:formatDate value="${result.timeTaken}" pattern="m" timeZone="GMT" /> <fmt:message key="label.learning.summary.minutes" />
+					<fmt:formatDate value="${result.timeTaken}" pattern="H" timeZone="GMT" />&nbsp;<fmt:message key="label.learning.summary.hours" />&nbsp;
+					<fmt:formatDate value="${result.timeTaken}" pattern="m" timeZone="GMT" />&nbsp;<fmt:message key="label.learning.summary.minutes" />
 				</td>
 			</tr>
 			
