@@ -176,8 +176,8 @@ GeneralInitLib = {
 				// if a tool's name is too long and gets broken into two lines
 				// make some adjustments to layout
 				var toolName = $('div', this);
-				if (toolName.text().length > 12){
-					toolName.css('padding-top', '5px');
+				if (toolName.text().length > 17){
+					toolName.css('padding-top', '2px');
 				}
 			}
 		});
