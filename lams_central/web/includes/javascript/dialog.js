@@ -121,7 +121,7 @@ function showDialog(id, initParams, extraButtons, recreate) {
 				position = position || {
 					'my' : 'top',
 					'at' : 'top+15px',
-					'of' : 'body'
+					'of' : window
 				};
 				dialog.position(position);
 			}
@@ -144,6 +144,12 @@ function showDialog(id, initParams, extraButtons, recreate) {
 				modalContent.on('resize', function(event, ui){
 					dialog.width(ui.size.width + 15);
 					dialog.height(ui.size.height + 15);
+				}).on('resizestart', function(){
+					// disable iframe as a target
+					// so it does not consume mouse movement when shrinking the dialog
+					$('iframe', this).css('pointer-events', 'none');
+				}).on('resizestop', function(){
+					$('iframe', this).css('pointer-events', 'auto');
 				});
 			}
 		});
@@ -154,13 +160,20 @@ function showDialog(id, initParams, extraButtons, recreate) {
 			var icon = $('i', this),
 				wasMaxed = icon.hasClass('fa-clone'),
 				internalDialog = $('.modal-dialog', dialog),
-				internalContent = $('.modal-content', dialog);
+				internalContent = $('.modal-content', dialog),
+				positionTarget = initParams.modal ? internalDialog : dialog;
 			icon.toggleClass('fa-plus').toggleClass('fa-clone');
 			if (wasMaxed) {
 				// restore dialog
-				internalDialog.width(dialog.data('oldWidth'));
-				internalContent.width(dialog.data('oldWidth'));
-				internalContent.height(dialog.data('oldHeight'));
+				var oldWidth = dialog.data('oldWidth'),
+					oldHeight = dialog.data('oldHeight');
+				if (!initParams.modal) {
+					dialog.width(oldWidth + 15);
+					dialog.height(oldHeight + 15);
+				}
+				internalDialog.width(oldWidth);
+				internalContent.width(oldWidth);
+				internalContent.height(oldHeight);
 				
 				// enable resizing
 				$('.ui-resizable-handle', dialog).show();
@@ -170,18 +183,24 @@ function showDialog(id, initParams, extraButtons, recreate) {
 					'oldWidth' : internalContent.width(),
 					'oldHeight': internalContent.height()
 				});
+				if (!initParams.modal) {
+					dialog.css({
+						'width' : '100%',
+						'height': '100%'
+					});
+				}
 				internalDialog.css({
 					'width' : '100%',
 					'height': '100%'
 				});
 				internalContent.css('width', 'calc(100% - 15px)');
-				internalContent.height(internalDialog.height() - 50);
+				internalContent.height(internalDialog.height() - 20);
 				
 				// disable resizing
 				$('.ui-resizable-handle', dialog).hide();
 			}
 			// center the dialog
-			internalDialog.position({
+			 (initParams.modal ? internalDialog : dialog).position({
 				'my' : 'top',
 				'at' : 'center top',
 				'of' : window
@@ -198,14 +217,21 @@ function showDialog(id, initParams, extraButtons, recreate) {
 	        	// remove overlay
 	        	dialog.siblings('.modal-backdrop').hide();
 	        	// move the dialog to the bar at the bottom
-	            $('<div>').attr('id', 'dialogMinContainer').appendTo('body').append(dialog);
+	        	var minContainer = $('#dialogMinContainer');
+	        	if (minContainer.length == 0) {
+	        		minContainer = $('<div>').attr('id', 'dialogMinContainer').appendTo('body');
+	        	}
+	        	minContainer.append(dialog);
 	            // disable maximising 
 	        	$('.dialogMaximise', dialog).hide();
 	        	// disable rezising
 		        $('.ui-resizable-handle', dialog).hide();
 	        } else {
 	            $('body').append(dialog);
-	            $('#dialogMinContainer').remove();
+	            var minContainer = $('#dialogMinContainer');
+	            if (minContainer.children().length == 0) {
+		            $('#dialogMinContainer').remove();
+	            }
 	            dialog.siblings('.modal-backdrop').show();
 	            $('.dialogMaximise', dialog).show();
 	            $('.ui-resizable-handle', dialog).show();

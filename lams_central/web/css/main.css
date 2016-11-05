@@ -354,9 +354,10 @@ ul.dropdown-usermenu li {
 .dialogMin {
 	overflow: hidden !important;
 	padding: 0 !important;
-	margin: 0;
+	margin: 0 10px 0 0;
 	float: left;
 	position: static !important;
+	width: 257px !important;
 }
 
 .dialogMin .modal-title {

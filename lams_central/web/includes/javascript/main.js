@@ -293,7 +293,7 @@ function showMonitorLessonDialog(lessonID) {
 				'lessonID' : lessonID
 			},
 			'autoOpen' : false,
-			'height': Math.max(380, Math.min(600, $(window).height() - 60)),
+			'height': Math.max(380, Math.min(600, $(window).height() - 30)),
 			'width' : Math.max(380, Math.min(1024, $(window).width() - 60)),
 			'title' : LABELS.MONITORING_TITLE,
 			'open' : function() {
@@ -333,8 +333,7 @@ function showAddLessonDialog(orgID) {
 		'data' : {
 			'orgID' : orgID
 		},
-		'modal' : false,
-		'height': Math.max(380, Math.min(740, $(window).height() - 60)),
+		'height': Math.max(380, Math.min(740, $(window).height() - 30)),
 		'width' : Math.max(380, Math.min(850, $(window).width() - 60)),
 		'title' : LABELS.ADD_LESSON_TITLE,
 		'open' : function() {
@@ -375,8 +374,8 @@ function showOrgGroupingDialog(orgID, activityID) {
 function showOrgGroupDialog(url) {
 	$('#dialogOrgGrouping').modal('hide');
 	showDialog("dialogOrgGroup", {
-		'width' : 850,
-		'height': 470,
+		'width' : Math.max(380, Math.min(850, $(window).width() - 60)),
+		'height': Math.max(380, Math.min(470, $(window).height() - 30)),
 		'title' : LABELS.COURSE_GROUPS_TITLE,
 		'open' : function() {
 			// load contents after opening the dialog
@@ -392,8 +391,7 @@ function showAddSingleActivityLessonDialog(orgID, toolID, learningLibraryID) {
 			'toolID' : toolID,
 			'learningLibraryID' : learningLibraryID
 		},
-		'modal' : false,
-		'height' : Math.max(400, $(window).height() - 60),
+		'height' : Math.max(400, $(window).height() - 30),
 		'width' : Math.max(380, Math.min(850, $(window).width() - 60)),
 		'title' : LABELS.SINGLE_ACTIVITY_LESSON_TITLE,
 		'open' : function() {
@@ -436,9 +434,8 @@ function showNotificationsDialog(orgID, lessonID) {
 			'orgID' : orgID,
 			'lessonID' : lessonID
 		},
-		'height': Math.max(380, Math.min(650, $(window).height() - 60)),
+		'height': Math.max(380, Math.min(650, $(window).height() - 30)),
 		'width' : Math.max(380, Math.min(800, $(window).width() - 60)),
-		'modal' : false,
 		'title' : LABELS.EMAIL_NOTIFICATIONS_TITLE,
 		'open' : function() {
 			var dialog = $(this),
@@ -461,7 +458,7 @@ function showNotificationsDialog(orgID, lessonID) {
 
 function showPrivateNotificationsDialog(){
 	var notificationDialog = showDialog("dialogPrivateNotifications", {
-		'height': Math.max(380, Math.min(600, $(window).height() - 60)),
+		'height': Math.max(380, Math.min(600, $(window).height() - 30)),
 		'width' : Math.max(380, Math.min(600, $(window).width() - 60)),
 		'title' : LABELS.PRIVATE_NOTIFICATIONS_TITLE,
 		'close' : function(){
@@ -505,9 +502,8 @@ function showGradebookCourseDialog(orgID){
 	var id = "dialoGradebookCourse" + orgID;
 	showDialog(id, {
 		'orgID' : orgID,
-		'height': Math.max(380, Math.min(650, $(window).height() - 60)),
+		'height': Math.max(380, Math.min(650, $(window).height() - 30)),
 		'width' : Math.max(380, Math.min(800, $(window).width() - 60)),
-		'modal' : false,
 		'title' : LABELS.GRADEBOOK_COURSE_TITLE,
 		'open' : function() {
 			// load contents after opening the dialog
@@ -523,9 +519,8 @@ function showGradebookLessonDialog(lessonID){
 		'data' : {
 			'lessonID' : lessonID
 		},
-		'height': Math.max(380, Math.min(650, $(window).height() - 60)),
+		'height': Math.max(380, Math.min(650, $(window).height() - 30)),
 		'width' : Math.max(380, Math.min(800, $(window).width() - 60)),
-		'modal' : false,
 		'title' : LABELS.GRADEBOOK_LESSON_TITLE,
 		'open' : function() {
 			var lessonID = $(this).data('lessonID');
@@ -547,7 +542,6 @@ function showGradebookLearnerDialog(orgID){
 		// so just keep it always 400
 		'height' : 400,
 		'width' : Math.max(380, Math.min(750, $(window).width() - 60)),
-		'modal' : false,
 		'title' : LABELS.GRADEBOOK_LEARNER_TITLE,
 		'open' : function() {
 			var orgID = $(this).data('orgID');
@@ -564,9 +558,8 @@ function showConditionsDialog(lessonID){
 		'data' : {
 			'lessonID' : lessonID
 		},
-		'height': Math.max(380, Math.min(600, $(window).height() - 60)),
+		'height': Math.max(380, Math.min(600, $(window).height() - 30)),
 		'width' : Math.max(380, Math.min(610, $(window).width() - 60)),
-		'modal' : false,
 		'title' : LABELS.CONDITIONS_TITLE,
 		'open' : function() {
 			var lessonID = $(this).data('lessonID');
@@ -583,9 +576,8 @@ function showSearchLessonDialog(orgID){
 		'data' : {
 			'orgID' : orgID
 		},
-		'height': Math.max(380, Math.min(600, $(window).height() - 60)),
+		'height': Math.max(380, Math.min(600, $(window).height() - 30)),
 		'width' : Math.max(380, Math.min(830, $(window).width() - 60)),
-		'modal' : false,
 		'title' : LABELS.SEARCH_LESSON_TITLE,
 		'open' : function() {
 			var orgID = $(this).data('orgID');
@@ -660,9 +652,8 @@ function closeDialog(id, refresh) {
 //used in main.jsp and /lti/addlesson.jsp
 function showAuthoringDialog(learningDesignID){
 	showDialog('dialogAuthoring', {
-		'height' : Math.max(300, $(window).height() - 40),
+		'height' : Math.max(300, $(window).height() - 30),
 		'width' : Math.max(600, Math.min(1280, $(window).width() - 60)),
-		'modal' : false,
 		'title' : LABELS.AUTHORING_TITLE,
 		'beforeClose' : function(){
 			// if LD was modified, ask the user if he really wants to exit
@@ -712,11 +703,10 @@ function removeLesson(lessonID) {
 
 
 function showEmailDialog(userId, lessonId){
-	
 	var dialog = showDialog("dialogEmail", {
 		'autoOpen'  : true,
-		'height'    : 700,
-		'width'     : 700,
+		'height'    : Math.max(380, Math.min(700, $(window).height() - 30)),
+		'width'     : Math.max(380, Math.min(700, $(window).width() - 60)),
 		'modal'     : true,
 		'resizable' : true,
 		'title'     : LABELS.EMAIL_TITLE,
