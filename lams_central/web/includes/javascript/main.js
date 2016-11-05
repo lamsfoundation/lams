@@ -192,13 +192,12 @@ function showMyProfileDialog() {
 	showDialog("dialogMyProfile", {
 		'title' : LABELS.MY_PROFILE,
 		'modal' : true,
-		'width' : 'auto',
+		'width' : Math.max(380, Math.min(770, $(window).width() - 60)),
 		'height' : 430,
 		'open' : function() {
 			var dialog = $(this);
 			// load contents after opening the dialog
 			$('iframe', dialog).attr('src', LAMS_URL + 'index.do?method=profile');
-			$(this).css("maxWidth", "770px").css("margin", "auto");
 			
 			// in case of mobile devices allow iframe scrolling
 			if( /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) ) {
@@ -294,8 +293,8 @@ function showMonitorLessonDialog(lessonID) {
 				'lessonID' : lessonID
 			},
 			'autoOpen' : false,
-			'height' : 600,
-			'width' : 1024,
+			'height': Math.max(380, Math.min(600, $(window).height() - 60)),
+			'width' : Math.max(380, Math.min(1024, $(window).width() - 60)),
 			'title' : LABELS.MONITORING_TITLE,
 			'open' : function() {
 				// load contents after opening the dialog
@@ -335,8 +334,8 @@ function showAddLessonDialog(orgID) {
 			'orgID' : orgID
 		},
 		'modal' : false,
-		'height' : 740,
-		'width' : 'auto',
+		'height': Math.max(380, Math.min(740, $(window).height() - 60)),
+		'width' : Math.max(380, Math.min(850, $(window).width() - 60)),
 		'title' : LABELS.ADD_LESSON_TITLE,
 		'open' : function() {
 			var dialog = $(this);
@@ -345,7 +344,6 @@ function showAddLessonDialog(orgID) {
 					.attr('src', LAMS_URL
 						+ 'home.do?method=addLesson&organisationID='
 						+ dialog.data('orgID'));
-			$(this).css("maxWidth", "850px").css("margin", "auto");
 			
 			// in case of mobile devices allow iframe scrolling
 			if( /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) ) {
@@ -395,13 +393,12 @@ function showAddSingleActivityLessonDialog(orgID, toolID, learningLibraryID) {
 			'learningLibraryID' : learningLibraryID
 		},
 		'modal' : false,
-		'height' : 600,
-		'width' : 'auto',
+		'height' : Math.max(400, $(window).height() - 60),
+		'width' : Math.max(380, Math.min(850, $(window).width() - 60)),
 		'title' : LABELS.SINGLE_ACTIVITY_LESSON_TITLE,
 		'open' : function() {
 			var dialog = $(this),
 				toolID = dialog.data('toolID');
-			$(this).css("maxWidth", "850px").css("margin", "auto");
 			$.ajax({
 				async : false,
 				cache : false,
@@ -439,8 +436,8 @@ function showNotificationsDialog(orgID, lessonID) {
 			'orgID' : orgID,
 			'lessonID' : lessonID
 		},
-		'height' : 650,
-		'width' : 'auto',
+		'height': Math.max(380, Math.min(650, $(window).height() - 60)),
+		'width' : Math.max(380, Math.min(800, $(window).width() - 60)),
 		'modal' : false,
 		'title' : LABELS.EMAIL_NOTIFICATIONS_TITLE,
 		'open' : function() {
@@ -457,7 +454,6 @@ function showNotificationsDialog(orgID, lessonID) {
 					+ 'monitoring/emailNotifications.do?method=getCourseView&organisationID='
 					+ orgID);
 			}
-			$(this).css("maxWidth", "800px").css("margin", "auto");
 		}
 	}, true);
 }
@@ -465,8 +461,8 @@ function showNotificationsDialog(orgID, lessonID) {
 
 function showPrivateNotificationsDialog(){
 	var notificationDialog = showDialog("dialogPrivateNotifications", {
-		'height' : 600,
-		'width' : 'auto',
+		'height': Math.max(380, Math.min(600, $(window).height() - 60)),
+		'width' : Math.max(380, Math.min(600, $(window).width() - 60)),
 		'title' : LABELS.PRIVATE_NOTIFICATIONS_TITLE,
 		'close' : function(){
 			refreshPrivateNotificationCount();
@@ -474,11 +470,8 @@ function showPrivateNotificationsDialog(){
 		},
 		'open' : function() {
 			var dialog = $(this);
-			$('iframe', dialog).attr('src', LAMS_URL
-					+ 'notificationsprivate.jsp');
+			$('iframe', dialog).attr('src', LAMS_URL + 'notificationsprivate.jsp');
 
-			$(this).css("maxWidth", "600px").css("margin", "auto");
-			
 			// in case of mobile devices allow iframe scrolling
 			if( /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) ) {
 			    setTimeout(function() {
@@ -512,15 +505,14 @@ function showGradebookCourseDialog(orgID){
 	var id = "dialoGradebookCourse" + orgID;
 	showDialog(id, {
 		'orgID' : orgID,
-		'height' : 650,
-		'width' : 'auto',
+		'height': Math.max(380, Math.min(650, $(window).height() - 60)),
+		'width' : Math.max(380, Math.min(800, $(window).width() - 60)),
 		'modal' : false,
 		'title' : LABELS.GRADEBOOK_COURSE_TITLE,
 		'open' : function() {
 			// load contents after opening the dialog
 			$('iframe', this).attr('src', LAMS_URL
 				+ 'gradebook/gradebookMonitoring.do?dispatch=courseMonitor&organisationID=' + orgID);
-			$(this).css("maxWidth", "800px").css("margin", "auto");
 		}
 	}, true);
 }
@@ -531,15 +523,14 @@ function showGradebookLessonDialog(lessonID){
 		'data' : {
 			'lessonID' : lessonID
 		},
-		'height' : 650,
-		'width' : 'auto',
+		'height': Math.max(380, Math.min(650, $(window).height() - 60)),
+		'width' : Math.max(380, Math.min(800, $(window).width() - 60)),
 		'modal' : false,
 		'title' : LABELS.GRADEBOOK_LESSON_TITLE,
 		'open' : function() {
 			var lessonID = $(this).data('lessonID');
 			// load contents after opening the dialog
 			$('iframe', this).attr('src', LAMS_URL + 'gradebook/gradebookMonitoring.do?lessonID=' + lessonID);
-			$(this).css("maxWidth", "800px").css("margin", "auto");
 		}
 	}, true);
 }
@@ -552,8 +543,10 @@ function showGradebookLearnerDialog(orgID){
 		'data'  : {
 			'orgID' : orgID
 		},
+		// too little difference between min height of 380 and standard height of 400,
+		// so just keep it always 400
 		'height' : 400,
-		'width' : 'auto',
+		'width' : Math.max(380, Math.min(750, $(window).width() - 60)),
 		'modal' : false,
 		'title' : LABELS.GRADEBOOK_LEARNER_TITLE,
 		'open' : function() {
@@ -561,7 +554,6 @@ function showGradebookLearnerDialog(orgID){
 			// load contents after opening the dialog
 			$('iframe', this).attr('src', LAMS_URL
 				+ 'gradebook/gradebookLearning.do?dispatch=courseLearner&organisationID=' + orgID);
-			$(this).css("maxWidth", "750px").css("margin", "auto");
 		}
 	}, true);
 }
@@ -572,8 +564,8 @@ function showConditionsDialog(lessonID){
 		'data' : {
 			'lessonID' : lessonID
 		},
-		'height' : 600,
-		'width' : 'auto',
+		'height': Math.max(380, Math.min(600, $(window).height() - 60)),
+		'width' : Math.max(380, Math.min(610, $(window).width() - 60)),
 		'modal' : false,
 		'title' : LABELS.CONDITIONS_TITLE,
 		'open' : function() {
@@ -581,7 +573,6 @@ function showConditionsDialog(lessonID){
 			// load contents after opening the dialog
 			$('iframe', this).attr('src', LAMS_URL
 				+ 'lessonConditions.do?method=getIndexLessonConditions&lsId=' + lessonID);
-			$(this).css("maxWidth", "610px").css("margin", "auto");
 		}
 	}, true);
 }
@@ -592,8 +583,8 @@ function showSearchLessonDialog(orgID){
 		'data' : {
 			'orgID' : orgID
 		},
-		'height' : 600,
-		'width' : 'auto',
+		'height': Math.max(380, Math.min(600, $(window).height() - 60)),
+		'width' : Math.max(380, Math.min(830, $(window).width() - 60)),
 		'modal' : false,
 		'title' : LABELS.SEARCH_LESSON_TITLE,
 		'open' : function() {
@@ -601,7 +592,6 @@ function showSearchLessonDialog(orgID){
 			// load contents after opening the dialog
 			$('iframe', this).attr('src', LAMS_URL
 				+ 'findUserLessons.do?dispatch=getResults&courseID=' + orgID);
-			$(this).css("maxWidth", "830px").css("margin", "auto");
 		}
 	}, true);
 }
@@ -671,7 +661,7 @@ function closeDialog(id, refresh) {
 function showAuthoringDialog(learningDesignID){
 	showDialog('dialogAuthoring', {
 		'height' : Math.max(300, $(window).height() - 40),
-		'width' : 1280,
+		'width' : Math.max(600, Math.min(1280, $(window).width() - 60)),
 		'modal' : false,
 		'title' : LABELS.AUTHORING_TITLE,
 		'beforeClose' : function(){
@@ -749,4 +739,3 @@ function showEmailDialog(userId, lessonId){
 function closeEmailDialog(){
 	$('#dialogEmail').modal('hide');
 }
-
