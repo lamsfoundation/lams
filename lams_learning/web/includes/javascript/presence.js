@@ -1,7 +1,7 @@
 $(document).ready(function (){
 	presenceChat = $("#presenceChat");
 	rosterDiv = $("#presenceUserListings");
-	$( window ).resize(function() {
+	$(window).resize(function() {
 		resizeChat();
 	});
 
@@ -24,8 +24,7 @@ $(document).ready(function (){
 });
 
 
-var windowHeight = null,
-	roster = {
+var roster = {
 		// association nick -> localId, the latter being just some ID made in this script
 		users : {},
 		maxUserLocalId : 0,
@@ -177,24 +176,20 @@ function generateMessageHTML(nick, message, date) {
 }
 
 function resizeChat() {
-	
-	// refresh the window height
-	windowHeight = $(window).height() - 30;
+	var windowHeight = $(window).height();
 
 	// if presence is shown
 	if (presenceShown) {
 		// set presence chat to maximized height
 		presenceChat.css({
-			'top' : windowHeight - 300 + "px",
-			'position' : 'absolute'
+			'top' : windowHeight - 300 + "px"
 		});
 	}
 	// otherwise
 	else {
 		// set presence chat to minimized height
 		presenceChat.css({
-			'top' : windowHeight + "px",
-			'position' : 'fixed'
+			'top' : windowHeight - 23 + "px"
 		});
 	}
 }	
@@ -291,9 +286,10 @@ function handleCloseTab(tag){
 }
 
 function handlePresenceClick() {
+	var windowHeight = $(window).height();
 	if (presenceShown) {
 		presenceChat.animate({
-			top : windowHeight + "px"
+			top : windowHeight - 23 + "px"
 		}, 1000);
 		presenceShown = false;
 	} else {

@@ -311,18 +311,19 @@
 								</dd>
 		
 								<!-- IM & Presence -->
-								<dt>Instant messaging:</dt>
+								<dt><fmt:message key="lesson.im"/>:</dt>
 								<dd>
 									<div class="btn-group btn-group-xs" role="group">
 										<button id="presenceButton" class="btn btn-default roffset10
 											<c:if test="${lesson.learnerPresenceAvailable}">
 												btn-success
 											</c:if>
-											"><i class="fa fa-sm fa-wifi"></i> <span class="hidden-xs">Presence</span> 
+											"><i class="fa fa-sm fa-wifi"></i>
+											<span class="hidden-xs"><fmt:message key="lesson.presence"/></span> 
 											<span id="presenceCounter" class="badge">0</span>
 										</button>
 	
-										<button id="imButton" class="btn btn-default
+										<button id="imButton" class="btn btn-default roffset10
 											<c:if test="${lesson.learnerImAvailable}">
 												btn-success
 											</c:if>
@@ -330,7 +331,14 @@
 											<c:if test="${not lesson.learnerPresenceAvailable}">
 												style="display: none"
 											</c:if>
-										><i class="fa fa-sm fa-comments-o"></i> <span class="hidden-xs">Instant messaging</span></button>
+										><i class="fa fa-sm fa-comments-o"></i>
+										 <span class="hidden-xs"><fmt:message key="lesson.im"/></span>
+										</button>
+										<button id="openImButton" class="btn btn-default">
+											<i class="fa fa-sm fa-comments"></i>
+											<span class="hidden-xs"><fmt:message key="button.open.im"/></span> 
+										</button>
+	
 									</div>
 								</dd>
 							</dl>	
