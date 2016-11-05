@@ -1337,9 +1337,10 @@ ActivityLib = {
 		
 		if (activity.authorURL) {
 			showDialog("dialogActivity" + activity.toolContentID, {
-				'height' : Math.max(200, $(window).height() - 60),
-				'width' : 1024,
-				'draggable' : false,
+				'height' : Math.max(300, $(window).height() - 30),
+				'width' :  Math.max(380, Math.min(1024, $(window).width() - 60)),
+				'draggable' : true,
+				'resizable' : true,
 				'title' : activity.title + ' ' + LABELS.ACTIVITY_DIALOG_TITLE_SUFFIX,
 				'beforeClose' : function(event){
 					// ask the user if he really wants to exit before saving his work
