@@ -9,10 +9,12 @@
 <lams:head>
 	
 	<%-- css --%>
-	<link type="text/css" href="<lams:LAMSURL/>css/jquery-ui-smoothness-theme.css" rel="stylesheet">
+	<link type="text/css" rel="stylesheet" href="<lams:LAMSURL/>css/jquery-ui-bootstrap-theme.css">
+	<link type="text/css" rel="stylesheet" href="<lams:LAMSURL/>css/bootstrap.min.css" />
 	<link type="text/css" rel="stylesheet" href="<lams:WebAppURL />css/presence.css" />
 
 	<%-- javascript --%>
+	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery.js"></script>
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery-ui.js"></script>
 	<script type="text/javascript">
 		var LAMS_URL = "<lams:LAMSURL/>",
@@ -64,7 +66,7 @@
 		
 		<%-- always pop the roster --%>
 		<div id="presenceChatRoster" class="ui-corner-all">
-			<div id="presenceUserCount" onclick="javascript:handlePresenceClick()"></div>
+			<div id="presenceUserCount" class="ui-corner-all" onclick="javascript:handlePresenceClick()"></div>
 			<div id="presenceUserListings"></div>
 		</div>
 	</div>

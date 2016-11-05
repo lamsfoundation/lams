@@ -89,6 +89,8 @@ function initLessonTab(){
 		});
 	});
 	
+	$('#openImButton').click(openChatWindow);
+	
 	// sets up calendar for schedule date choice
 	$('#scheduleDatetimeField').datetimepicker({
 		'minDate' : 0
@@ -375,7 +377,7 @@ function getSelectedClassUserList(containerId) {
 
 function openChatWindow(){
 	// variables are set in JSP page
-	window.open(LAMS_URL + 'learning/lessonChat.jsp?lessonID=' + lessonId 
+	window.open(LAMS_URL + 'learning/presenceChat.jsp?lessonID=' + lessonId 
 			+ '&presenceEnabledPatch=true&presenceImEnabled=true&presenceShown=true&createDateTime='
 			+ createDateTimeStr
 			,'Chat'
