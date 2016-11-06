@@ -351,26 +351,21 @@ div.templateContainer {
 }
 
 div.template {
-	height: 45px;
+	min-height: 45px;
 	border-bottom: 0.5px solid #a9a9a9;
 	cursor: pointer;
-}
-
-.tooltemplate {
 }
 
 .tooltemplate :hover {
 	background-color: #EDEDED;
 }
 
-div.template img {
-	margin: 8px 0 5px 5px;
+.tooltemplate .media {
+	margin-top: 0px;
+	padding: 8px 0px 5px 5px;
 }
 
-div.template div {
-	float: right;
-	width: 130px;
-	padding-top: 12px;
+.media #toolDisplayName {
 }
 
 td#canvasContainerCell {
