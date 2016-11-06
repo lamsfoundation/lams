@@ -414,7 +414,12 @@
 							 	style="display: none"
 							 </c:if>
 							 >
-							<div><c:out value="${tool.toolDisplayName}" /></div>
+							<div class="media">
+  								<div class="media-left img-${tool.learningLibraryId}"></div>
+  								<div class="media-body media-middle" id="toolDisplayName">
+									<c:out value="${tool.toolDisplayName}" />
+								</div>
+							</div>
 						</div>
 						</div>
 					</c:forEach>

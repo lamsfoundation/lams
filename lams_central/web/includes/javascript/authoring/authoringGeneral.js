@@ -162,7 +162,7 @@ GeneralInitLib = {
 			// assign icons' data uris to their learning library IDs instead of labels
 			ActivityIcons[learningLibraryID] = ActivityIcons[learningLibraryTitle];
 			delete ActivityIcons[learningLibraryTitle];
-			$('<img />').attr('src', ActivityIcons[learningLibraryID]).appendTo(this);
+			$('<img />').attr('src', ActivityIcons[learningLibraryID]).appendTo(".img-"+learningLibraryID);
 			// register tool properties so they are later easily accessible
 			layout.toolMetadata[learningLibraryID] = {
 				'iconPath'				  : $(this).attr('iconPath'),
@@ -172,14 +172,6 @@ GeneralInitLib = {
 				'parallelChildActivityDefs' : parallelChildActivityDefs
 			};
 			
-			if (!isReadOnlyMode) {
-				// if a tool's name is too long and gets broken into two lines
-				// make some adjustments to layout
-				var toolName = $('div', this);
-				if (toolName.text().length > 17){
-					toolName.css('padding-top', '2px');
-				}
-			}
 		});
 		
 		if (!isReadOnlyMode){
@@ -264,22 +256,22 @@ GeneralInitLib = {
 							activityCategoryID = +draggable.draggable.attr('activityCategoryId'),
 					    	x = draggable.offset.left  + canvas.scrollLeft() - canvas.offset().left,
 					    	y = draggable.offset.top   + canvas.scrollTop()  - canvas.offset().top,
-					    	label = $('div', draggable.draggable).text(),
+					    	label = $('#toolDisplayName', draggable.draggable).text().trim(),
 					    	activity = null,
 					    	translatedEvent = GeneralLib.translateEventOnCanvas(event),
 							eventX = translatedEvent[0],
 							eventY = translatedEvent[1];
-										    
+
 					    if (activityCategoryID == 5) {
 					    	// construct child activities out of previously referenced HTML templates
 					    	var childActivities = [];
 					    	layout.toolMetadata[learningLibraryID].parallelChildActivityDefs.each(function(){
 					    		var childLearningLibraryID = +$(this).attr('learningLibraryId'),
 					    			childToolID = +$(this).attr('toolId'),
-					    			toolLabel = $('div', this).text(),
+					    			toolLabel = $('#toolDisplayName', this).text().trim(),
 					    			childActivity = new ActivityDefs.ToolActivity(null, null, null,
 					    					childToolID, childLearningLibraryID, null, x, y, toolLabel);
-					    		
+					    	
 					    		layout.activities.push(childActivity);
 					    		childActivities.push(childActivity);
 					    	});
@@ -1949,7 +1941,7 @@ GeneralLib = {
 		$('.templateContainer').height(windowHeight - 81);
 		$('#canvas').height(windowHeight - 75)
 		// width of window minus templates on the left; minimum is toolbar width so it does not collapse
-					.width(Math.max($('#toolbar').width() - 160, $(window).width() - 170));
+					.width(Math.max($('#toolbar').width() - 180, $(window).width() - 190));
 		
 		if (!width || !height) {
 			var width = 0,
