@@ -2,7 +2,6 @@
 <%@ include file="/common/taglibs.jsp"%>
 <lams:html>
 <lams:head>
-	<html:base />
 	<title><fmt:message key="activity.title" /></title>
 	<lams:css />
 
