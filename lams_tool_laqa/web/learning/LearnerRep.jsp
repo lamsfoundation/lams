@@ -15,7 +15,6 @@
 
 <lams:html>
 <lams:head>
-	<html:base />
 	<title><fmt:message key="activity.title" /></title>
 	<link type="text/css" href="${lams}css/jquery.jRating.css" rel="stylesheet" />
 	<link rel="stylesheet" href="${lams}css/jquery.tablesorter.theme-blue.css">

@@ -14,7 +14,6 @@
 <c:set var="localeLanguage"><lams:user property="localeLanguage" /></c:set>
 <lams:html>
 <lams:head>
-	<html:base />
 	<title><fmt:message key="activity.title" /></title>
 	<link rel="stylesheet" href="${lams}css/jquery.jRating.css" />
 	<link rel="stylesheet" href="${lams}css/jquery.tablesorter.theme-blue.css">

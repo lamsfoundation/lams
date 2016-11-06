@@ -3,7 +3,6 @@
 
 <lams:html>
 <lams:head>
-	<html:base />
 	<title><fmt:message key="activity.title" /></title>
 	<lams:css />
 	<script type="text/javascript" src="<lams:LAMSURL />includes/javascript/jquery.js"></script>
