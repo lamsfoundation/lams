@@ -7,7 +7,6 @@
 <c:set var="hasEditRight" value="${!isLeadershipEnabled || isLeadershipEnabled && isUserLeader}" />
 <lams:html>
 <lams:head>
-	<html:base />
 	<lams:css />
 
 	<title><fmt:message key="activity.title" /></title>
@@ -28,6 +27,9 @@
 </lams:head>
 
 <body class="stripes">
+
+
+	<html:form action="/learning?method=displayMc&validate=false" method="POST" target="_self" onsubmit="disableFinishButton();" styleId="Form1">
 
 	<lams:Page type="learner" title="${mcGeneralLearnerFlowDTO.activityTitle}">
 		<c:if test="${isLeadershipEnabled}">
@@ -228,8 +230,9 @@
 			</div>
 		</c:if>
 
+
+		<!--  now really start the form -->
 		<div class="form-group">
-			<html:form action="/learning?method=displayMc&validate=false" method="POST" target="_self" onsubmit="disableFinishButton();" styleId="Form1">
 				<html:hidden property="toolContentID" />
 				<html:hidden property="toolSessionID" />
 				<html:hidden property="httpSessionID" />
@@ -270,8 +273,8 @@
 					</div>
 				</c:if>
 
-			</html:form>
 		</div>
 		</lams:Page>
+			</html:form>
 </body>
 </lams:html>

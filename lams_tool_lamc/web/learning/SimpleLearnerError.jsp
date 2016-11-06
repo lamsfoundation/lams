@@ -2,7 +2,6 @@
 <%@ include file="/common/taglibs.jsp"%>
 <lams:html>
 <lams:head>
-	<html:base />
 	<lams:css />
 	<title><fmt:message key="label.learner.error" /></title>
 </lams:head>
