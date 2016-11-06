@@ -9,7 +9,6 @@
 
 <lams:html>
 <lams:head>
-	<html:base />
 	<lams:css />
 	<title><fmt:message key="activity.title" />
 	</title>
