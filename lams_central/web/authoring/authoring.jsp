@@ -272,14 +272,14 @@
 		<i class="fa fa-refresh fa-spin fa-3x fa-fw"></i>
 	</div>
 	
-	<div id="toolbar" class="buttons">
+	<div id="toolbar" class="buttons btn-group-sm">
 	
 		<button id="newButton" class="btn btn-default" onClick="javascript:GeneralLib.newLearningDesign(false)">
 			<i class="fa fa-plus"></i> 
 			<span><fmt:message key="authoring.fla.page.menu.new" /></span>
 		</button>
 
-		<div class="btn-group">
+		<div class="btn-group btn-group-sm">
 			<button type="button" class="btn btn-default" onClick="javascript:MenuLib.openLearningDesign()">
 				<i class="fa fa-folder-open-o"></i>
 				<span><fmt:message key="authoring.fla.page.menu.open" /></span>
@@ -294,7 +294,7 @@
 			</ul>
 		</div>
 
-		<div class="btn-group">
+		<div class="btn-group btn-group-sm">
 			<button type="button" class="btn btn-default" onClick="javascript:MenuLib.saveLearningDesign()">
 				<i class="fa fa-save"></i>
 				<span><fmt:message key="authoring.fla.page.menu.save" /></span>
@@ -316,7 +316,7 @@
 			<i class="fa fa-ban"></i> 
 			<span><fmt:message key="authoring.fla.cancel.button" /></span>
 		</button>
-		<div class="btn-group" role="group">
+		<div class="btn-group btn-group-sm" role="group">
 		<button id="copyButton" class="btn btn-default" onClick="javascript:MenuLib.copyActivity()">
 			<i class="fa fa-copy"></i> 
 			<span><fmt:message key="authoring.fla.page.menu.copy" /></span>
@@ -332,7 +332,7 @@
 			<span><fmt:message key="authoring.fla.page.menu.transition" /></span>
 		</button>
 
-		<div class="btn-group" role="group">
+		<div class="btn-group btn-group-sm" role="group">
 		  <button class="btn btn-default dropdown-toggle" type="button" id="optionalButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
 		  	<i class="fa fa-check-square-o"></i>
 		    <span><fmt:message key="authoring.fla.page.menu.optional" /></span>
@@ -344,7 +344,7 @@
 		  </ul>
 		</div>
 
-		<div class="btn-group" role="group">
+		<div class="btn-group btn-group-sm" role="group">
 		  <button class="btn btn-default dropdown-toggle" type="button" id="flowButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
 		  	<i class="fa fa-map-o"></i>
 		    <span><fmt:message key="authoring.fla.page.menu.flow" /></span>
@@ -361,7 +361,7 @@
 			<span><fmt:message key="authoring.fla.page.menu.group" /></span>
 		</button>
 		
-		<div class="btn-group" role="group">
+		<div class="btn-group btn-group-sm" role="group">
 		  <button class="btn btn-default dropdown-toggle" type="button" id="annotateButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
 		  	<i class="fa fa-font"></i>
 		    <span><fmt:message key="authoring.fla.page.menu.annotate" /></span>
@@ -490,7 +490,7 @@
 			<tr>
 				<td id="ldStoreDialogButtonCell" colspan="2">
 					<div class="container-fluid">
-						<div id="ldStoreDialogLeftButtonContainer" class="buttonsbar">
+						<div id="ldStoreDialogLeftButtonContainer" class="buttonsbar btn-group-sm">
 							<button id="ldStoreDialogNewFolderButton" class="btn btn-default">
 								<i class="fa fa-folder"></i> 
 								<span><fmt:message key="authoring.fla.new.folder.button" /></span>
@@ -524,22 +524,22 @@
 						
 						<div id="ldStoreDialogRightButtonContainer" class="action-buttons pull-right">
 
-							<button id="ldStoreDialogCancelButton" class="btn btn-default">
+							<button id="ldStoreDialogCancelButton" class="btn btn-sm btn-default">
 								<i class="fa fa-ban"></i> 
 								<span><fmt:message key="authoring.fla.cancel.button" /></span>
 							</button>
 
-							<button id="ldStoreDialogSaveButton" class="btn btn-primary">
+							<button id="ldStoreDialogSaveButton" class="btn btn-sm btn-primary">
 								<i class="fa fa-save"></i> 
 								<span><fmt:message key="authoring.fla.save.button" /></span>
 							</button>
 							
-							<button id="ldStoreDialogOpenButton" class="btn btn-primary">
+							<button id="ldStoreDialogOpenButton" class="btn btn-sm btn-primary">
 								<i class="fa fa-folder-open-o"></i> 
 								<span><fmt:message key="authoring.fla.open.button" /></span>
 							</button>
 							
-							<button id="ldStoreDialogImportPartButton" class="btn btn-primary">
+							<button id="ldStoreDialogImportPartButton" class="btn btn-sm btn-primary">
 								<i class="fa fa-arrow-circle-o-down"></i> 
 								<span><fmt:message key="authoring.fla.import.button" /></span>
 							</button>
@@ -581,7 +581,7 @@
 			<tr>
 				<td colspan="5">
 					<div class="container-fluid">
-						<div class="pull-right btn-group" role="group">
+						<div class="pull-right btn-group btn-group-sm" role="group">
 							<button class="branchMappingOKButton btn btn-default">
 								<i class="fa fa-check"></i> 
 								<span><fmt:message key="authoring.fla.ok.button" /></span>
@@ -953,7 +953,7 @@
 	<div id="propertiesContentGroupNaming" class="dialogContents">
 		<div id="groupNamingGroups"></div>
 		<div class="container-fluid">
-			<div class="btn-group pull-right" role="group">
+			<div class="btn-group btn-group-sm pull-right" role="group">
 				<button id="groupNamingOKButton" class="btn btn-default">
 					<i class="fa fa-check"></i> 
 					<span><fmt:message key="authoring.fla.ok.button" /></span>
@@ -1001,7 +1001,7 @@
 		 	</tr>
 		 </table>
 		 <div class="container-fluid">
-		 	<div class="btn-group pull-right" role="group">
+		 	<div class="btn-group btn-group-sm pull-right" role="group">
 				<button id="outputConditionsOKButton" class="btn btn-default">
 					<i class="fa fa-check"></i> 
 					<span><fmt:message key="authoring.fla.ok.button" /></span>
@@ -1014,7 +1014,7 @@
 
 			</div>
 			
-			<div class="btn-group pull-right" role="group">
+			<div class="btn-group btn-group-sm pull-right" role="group">
 				<button id="outputConditionsClearAllButton" class="btn btn-default outputSelectDependent rangeOutputButton">
 					<i class="fa fa-remove"></i> 
 					<span><fmt:message key="authoring.fla.clear.all.button" /></span>
