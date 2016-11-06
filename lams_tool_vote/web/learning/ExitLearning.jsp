@@ -11,7 +11,6 @@
 
 <lams:html>
 <lams:head>
-	<html:base />
 	<lams:css />
 	<link type="text/css" href="${lams}/css/chart.css" rel="stylesheet" />
 
