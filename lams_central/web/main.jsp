@@ -238,7 +238,7 @@
 					<li role="presentation" class="dropdown">       
 						<a href="javascript:;" onclick="javascript:showPrivateNotificationsDialog();" class="dropdown-toggle info-number" data-toggle="dropdown" aria-expanded="false">
 							<i class="fa fa-envelope-o"></i>
-                    		<span id="notificationsPendingCount"></span>
+                    		<span id="notificationsPendingCount" class="btn-primary"></span>
 						</a>
 					</li>
 				</ul>

@@ -299,11 +299,10 @@ ul.dropdown-usermenu li {
 	position: absolute;
 	left: 25px;
 	top: 10px;
-	background: #1ABB9C !important;
-	border: 1px solid #1ABB9C !important;
+	border-style: solid;
+	border-width: 1px;
 	display: inline-block;
 	min-width: 10px;
-	color: #fff;
 	text-align: center;
 	white-space: nowrap;
 	vertical-align: middle;
