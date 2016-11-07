@@ -27,7 +27,9 @@ div#titleDiv button {
 	margin-top: 7px;
 	border-bottom: thin dotted #2E6E9E;
 }
-
+table#groupsTable {
+	height: calc(100% - 80px);
+}
 table#groupsTable td {
 	vertical-align: top;
 	padding: 5px;
@@ -84,6 +86,7 @@ td#unassignedUserCell {
 
 td#unassignedUserCell .userContainer {
 	height: 100%;
+	overflow-x: auto;
 }
 
 .groupContainer input {
