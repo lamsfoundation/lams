@@ -138,6 +138,7 @@ a {
 	line-height: 1;
 	border: 1px solid rgba(221, 226, 232, 0.49);
 	background: #072B57; 
+	color: #A7B1C2;
 }
 .offcanvas-search .form-control::-webkit-input-placeholder { /* WebKit, Blink, Edge */
     color: #ddd;
@@ -535,6 +536,7 @@ a.sorting {
 }
 .course-header {
 	padding-bottom: 5px; 
+	margin-bottom: 12px;
 	border-bottom: 1px solid #EEE;
 }
 .course-header i{
