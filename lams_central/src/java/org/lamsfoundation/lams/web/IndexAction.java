@@ -112,9 +112,7 @@ public class IndexAction extends LamsDispatchAction {
 	    return mapping.findForward("editprofile");
 	} else if (StringUtils.equals(method, "password")) {
 	    return mapping.findForward("password");
-	} else if (StringUtils.equals(method, "passwordChanged")) {
-	    return mapping.findForward("passwordChanged");
-	} else if (StringUtils.equals(method, "portrait")) {
+	}  else if (StringUtils.equals(method, "portrait")) {
 	    return mapping.findForward("portrait");
 	} else if (StringUtils.equals(method, "lessons")) {
 	    return mapping.findForward("lessons");

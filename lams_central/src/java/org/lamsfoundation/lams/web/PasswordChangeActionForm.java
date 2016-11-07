@@ -40,6 +40,8 @@ import org.apache.struts.action.ActionMapping;
 public class PasswordChangeActionForm extends ActionForm {
 
     public static final String formName = "PasswordChangeActionForm"; // must match name in @struts:action section above
+    
+    private String redirectURL;
 
     private String oldPassword;
 
@@ -122,6 +124,14 @@ public class PasswordChangeActionForm extends ActionForm {
      */
     public void setOldPassword(String oldPassword) {
 	this.oldPassword = StringUtils.trimToEmpty(oldPassword);
+    }
+    
+    public String getRedirectURL() {
+        return redirectURL;
+    }
+
+    public void setRedirectURL(String redirectURL) {
+        this.redirectURL = redirectURL;
     }
 
     /**

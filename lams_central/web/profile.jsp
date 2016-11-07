@@ -19,22 +19,21 @@
 	<script type="text/javascript" src="includes/javascript/jquery-ui.js"></script>
 	<script type="text/javascript" src="includes/javascript/profile.js"></script>
 	<script type="text/javascript">
+	
 		$(document).ready(function () {
 			//update dialog's height and title
 			updateMyProfileDialogSettings('<fmt:message key="index.myprofile" />', '430');
 		});
 	</script>
 </lams:head>
-
 <body>
+
 <div class="container">
 	<div class="row vertical-center-row">
-		<div
-			class="col-xs-12 col-sm-8 col-sm-offset-2 col-md-6 col-md-offset-3">
+		<div class="col-xs-12 col-sm-8 col-sm-offset-2 col-md-6 col-md-offset-3">
 			<div class="panel voffset20">
 				<div class="panel-body">
 					<div class="text-center">
-
 						<c:choose>
 							<c:when test="${empty portraitUuid}">
 								<div class="text-center">
@@ -73,7 +72,7 @@
 						<c:if test="${authenticationMethodId eq dbId}">
 
 							<a class="btn btn-sm btn-default voffset5"
-								href="index.do?state=active&method=password" role="button"><i
+								href="index.do?state=active&method=password&redirectURL=index.do%3Fstate%3Dactive%26method%3Dprofile" role="button"><i
 								class="fa fa-fw fa-lock"></i> <span class="hidden-xs"><fmt:message
 										key="title.password.change.screen" /></span></i></a>
 						</c:if>

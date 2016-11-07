@@ -142,7 +142,7 @@ public class PasswordChangeAction extends Action {
 	    // If no input page, use error forwarding
 	    return (mapping.findForward("error.system"));
 	}
-
+	request.setAttribute("redirectURL",passwordChangeForm.getRedirectURL());
 	return mapping.findForward("okay");
 
     }
