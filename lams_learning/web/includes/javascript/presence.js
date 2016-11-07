@@ -92,11 +92,11 @@ var roster = {
 	},
 	
 	// init the connection with server using server URL but with different protocol
-	websocket = new WebSocket(APP_URL.replace('http', 'ws') + 'presenceChatWebsocket?lessonID=' + lessonId + 
+	presenceWebsocket = new WebSocket(APP_URL.replace('http', 'ws') + 'presenceChatWebsocket?lessonID=' + lessonId + 
 															   '&imEnabled=' + presenceImEnabled + '&nickname=' + encodeURIComponent(nickname));
 
 // when the server pushes new messages and roster to the learner's browser
-websocket.onmessage = function(e){
+presenceWebsocket.onmessage = function(e){
 	// create JSON object
   var input = JSON.parse(e.data);
   if (input.roster) {
@@ -212,7 +212,7 @@ function addTab(nick, tag) {
 		 'to'       : nick
 		};
 	
-	websocket.send(JSON.stringify(data));
+	presenceWebsocket.send(JSON.stringify(data));
 	
 	return tab;
 }
@@ -274,7 +274,7 @@ function sendMessage(receiver) {
 		 'message'  : message
 		};
 	
-	websocket.send(JSON.stringify(data));
+	presenceWebsocket.send(JSON.stringify(data));
 }
 
 /* ******* Click handlers ******* */
