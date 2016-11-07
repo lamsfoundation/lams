@@ -212,7 +212,7 @@ public class LearningWebsocketServer {
     /**
      * The leader finished the activity. Non-leaders will have Finish button displayed.
      */
-    static void sendCloseRequest(Long toolSessionId) throws JSONException, IOException {
+    public static void sendCloseRequest(Long toolSessionId) throws JSONException, IOException {
 	Set<Session> sessionWebsockets = LearningWebsocketServer.websockets.get(toolSessionId);
 	if (sessionWebsockets == null) {
 	    return;
