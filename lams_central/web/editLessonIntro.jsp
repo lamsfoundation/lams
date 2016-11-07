@@ -21,7 +21,8 @@
 				},
 			    success:    function() {
 			    	alert('<fmt:message key="label.lesson.introduction.updated"/>');
-			    	if ( typeof parent.window.closeIntroductionDialog !== "undefined") {
+			    	if ( typeof parent.window.refreshMonitor !== "undefined") {
+						parent.window.refreshMonitor('lesson', false);
 						parent.window.closeIntroductionDialog();
 			    	}
 			    }

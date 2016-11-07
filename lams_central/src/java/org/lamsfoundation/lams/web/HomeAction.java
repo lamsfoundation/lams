@@ -167,7 +167,6 @@ public class HomeAction extends DispatchAction {
 		req.setAttribute("learnerURL", "learnerURL");
 		req.setAttribute("lesson", lesson);
 		req.setAttribute("displayDesignImage", lesson.isDisplayDesignImage());
-		req.setAttribute("isMonitor", lesson.getLessonClass().isStaffMember(getRealUser(user)));
 
 		// check if we need to create learning design SVG
 		if (lesson.isDisplayDesignImage()) {

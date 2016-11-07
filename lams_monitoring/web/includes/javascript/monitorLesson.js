@@ -316,6 +316,8 @@ function updateLessonTab(){
 			}
 			
 			updateContributeActivities(response.contributeActivities);
+			$('.lead','#tabLessonLessonName').html('<strong>'+response.lessonName+'</strong>');
+			$('#description').html(response.lessonDescription);
 		}
 	});
 	

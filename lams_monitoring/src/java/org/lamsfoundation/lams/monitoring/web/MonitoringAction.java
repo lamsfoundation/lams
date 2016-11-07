@@ -48,6 +48,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
+import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
@@ -1040,6 +1041,9 @@ public class MonitoringAction extends LamsDispatchAction {
 	responseJSON.put("numberPossibleLearners", getLessonService().getCountLessonLearners(lessonId, null));
 	responseJSON.put("lessonStateID", lesson.getLessonStateId());
 
+	responseJSON.put("lessonName", StringEscapeUtils.escapeHtml(lesson.getLessonName()));
+	responseJSON.put("lessonDescription", lesson.getLessonDescription());
+	
 	Date startOrScheduleDate = lesson.getStartDateTime() == null ? lesson.getScheduleStartDate()
 		: lesson.getStartDateTime();
 	if (startOrScheduleDate != null) {
