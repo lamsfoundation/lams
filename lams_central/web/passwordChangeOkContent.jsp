@@ -27,7 +27,7 @@
 					
 					<div class="col-xs-12 text-center voffset10">
 						<a class="btn btn-sm btn-default"
-							href="<lams:LAMSURL/>index.do" role="button">
+						href="<lams:LAMSURL/>${empty redirectURL ? 'index.do' : redirectURL}" role="button">
 							Ok
 						</a>
 					</div>

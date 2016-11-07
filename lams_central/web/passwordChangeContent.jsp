@@ -98,9 +98,7 @@
 
 <body>
 <html:form styleId="change-password" action="/passwordChanged" method="post">
-
 	<div style="clear: both"></div>
-
 	<div class="container">
 		<div class="row vertical-center-row">
 			<div class="col-xs-12 col-sm-8 col-sm-offset-2 col-md-6 col-md-offset-3">
@@ -114,7 +112,7 @@
 						</p>
 					</logic:messagesPresent>
 					<div class="panel-body">
-						<form class="form-horizontal">
+					<input type="hidden" name="redirectURL" value="${param.redirectURL}" />
 							<html:hidden name="<%=PasswordChangeActionForm.formName%>"
 								property="login" />
 							<div class="form-group">
@@ -159,7 +157,6 @@
 								</html:submit>
 
 							</div>
-						</form>
 					</div>
 
 				</div>

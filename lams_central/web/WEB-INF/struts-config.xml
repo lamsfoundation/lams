@@ -150,11 +150,6 @@
         redirect="false"
       />
       <forward
-        name="passwordChanged"
-        path="/passwordChangeOkContent.jsp"
-        redirect="false"
-      />
-      <forward
         name="twoFactorAuthentication"
         path="/twoFactorAuthentication.do"
         redirect="false"
@@ -679,9 +674,9 @@
       unknown="false"
       validate="false"
     >
-      <forward
+    <forward
         name="okay"
-        path="/index.do?state=active&amp;method=passwordChanged"
+        path="/passwordChangeOkContent.jsp"
         redirect="false"
       />
       <forward
