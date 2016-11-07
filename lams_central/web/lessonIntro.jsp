@@ -98,12 +98,6 @@
 		</c:if>
 			
 		<div class="voffset10 pull-right">
-			<c:if test="${isMonitor}">
-			 	<a class="thickbox btn btn-default" href="editLessonIntro.do?method=edit&lessonID=${lesson.lessonId}&KeepThis=true&TB_iframe=true&height=600&width=800" title="<fmt:message key='label.edit'/>">
-					<fmt:message key="label.edit"/>
-				</a>
-			</c:if>
-
 			<html:link href="${lams}home.do?method=learner&lessonID=${lesson.lessonId}&isLessonIntroWatched=true" styleClass="btn btn-primary na">
 				<span class="nextActivity"><fmt:message key="label.start.lesson" /></span>
 			</html:link>

@@ -1,4 +1,4 @@
-﻿﻿﻿﻿// ********** GLOBAL VARIABLES **********
+﻿﻿﻿﻿﻿// ********** GLOBAL VARIABLES **********
 // copy of lesson SVG so it does no need to be fetched every time
 var originalSequenceCanvas = null,
 // DIV container for lesson SVG
@@ -647,6 +647,28 @@ function initSequenceTab(){
 	$('#sequenceInfoDialog .modal-body').empty().append($('#sequenceInfoDialogContents').show());
 }
 
+function showIntroductionDialog(lessonId) {
+	
+	showDialog('introductionDialog', {
+		'height'	: 450,
+		'width'  	: Math.max(380, Math.min(800, $(window).width() - 60)),
+		'resizable' : false,
+		'title'		: LABELS.LESSON_INTRODUCTION,
+		'open'      : function(){
+			$('iframe', this).attr('src', LAMS_URL + 'editLessonIntro.do?method=edit&lessonID='+lessonId);
+			$('iframe', this).css('height', '360px'); 
+			autoRefreshBlocked = true;
+		},
+		'close' 	: function(){
+			closeIntroductionDialog()
+		}
+	}, false);
+}	
+	
+function closeIntroductionDialog() {
+	autoRefreshBlocked = false;
+	$('#introductionDialog').remove();
+}
 /**
  * Updates learner progress in sequence tab according to respose sent to refreshMonitor()
  */
