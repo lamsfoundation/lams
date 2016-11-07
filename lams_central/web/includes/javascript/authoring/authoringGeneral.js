@@ -226,17 +226,12 @@ GeneralInitLib = {
 				    'scope'       : 'template',
 				    'helper'      : function(event){
 				    	// build a simple helper
-						var helper = $(this).clone().css({
-							'width'   : '135px',
+						return $(this).clone().css({
+							'width'   : '150px',
 							'border'  : 'thin black solid',
 							'z-index' : 1,
 							'cursor'  : 'move'
 						});
-						
-						// Chrome does not render name of the tool correctly in the helper
-						// so just remove it
-						helper.children('div').remove();
-						return helper;
 					}
 				});
 			});
