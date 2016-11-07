@@ -10,7 +10,7 @@ $(document).ready(function() {
 	sendMessageArea.keydown(function(e) {
 		if (e.which == 13) {
 			e.preventDefault();
-			sendMessage();
+			sendChatToolMessage();
 		}
 	});
 });
@@ -21,9 +21,9 @@ var PALETTE = ["#008CD2", "#DF7C08", "#83B532", "#E0BE40", "#AE8124", "#5F0704",
 	// only Monitor can send a personal message
 	selectedUser = null,
 	// init the connection with server using server URL but with different protocol
-	websocket = new WebSocket(APP_URL.replace('http', 'ws') + 'learningWebsocket?toolSessionID=' + TOOL_SESSION_ID);
+	chatToolWebsocket = new WebSocket(APP_URL.replace('http', 'ws') + 'learningWebsocket?toolSessionID=' + TOOL_SESSION_ID);
 
-websocket.onmessage = function(e){
+chatToolWebsocket.onmessage = function(e){
 	// create JSON object
 	var input = JSON.parse(e.data);
 	// clear old messages
@@ -65,7 +65,7 @@ websocket.onmessage = function(e){
 	});
 }
 
-websocket.onerror = function(e){
+chatToolWebsocket.onerror = function(e){
 	alert("Error estabilishing connection to server: " + e.data);
 }
 
@@ -84,7 +84,7 @@ function userSelected(userDiv) {
 	userDiv.attr('class', selectedUser ? 'selected' : 'unselected');
 }
 
-function sendMessage() {
+function sendChatToolMessage() {
 	var message = sendMessageArea.val();
 	if (!message || message == '') {
 		return false;  // do not send empty messages.
@@ -100,7 +100,7 @@ function sendMessage() {
 		};
 	
 	// send it to server
-	websocket.send(JSON.stringify(output)); 
+	chatToolWebsocket.send(JSON.stringify(output)); 
 }
 
 function getColour(nick) {
