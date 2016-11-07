@@ -26,19 +26,6 @@
 	    <c:out value="${survey.instructions}" escapeXml="false"/>
 	</div>
 	
-		<c:set var="sessionButtons">
-			<c:if test="${sessionMap.survey.reflectOnActivity}">
-				<c:set var="listReflections"><c:url value="/pages/monitoring/listreflections.jsp?toolSessionID=${surveySession.sessionId}"/></c:set>
-				<html:link href="javascript:launchPopup('${listReflections}')" styleClass="btn btn-default ${sessionButtonSize}">
-					<fmt:message key="page.title.monitoring.view.reflection" />
-				</html:link>
-			</c:if>	
-			<html:link href="javascript:exportSurvey(${surveySession.sessionId});" property="exportExcel" styleClass="btn btn-default ${sessionButtonSize} loffset5">
-				<fmt:message key="label.monitoring.button.export.excel" />
-			</html:link>
-		</c:set>
-
-	
 	<c:if test="${empty summaryList}">
 		<lams:Alert type="info" id="no-session-summary" close="false">
 			<fmt:message key="message.monitoring.summary.no.session" />
@@ -57,6 +44,18 @@
 	<c:forEach var="group" items="${summaryList}" varStatus="status">
 		<c:set var="surveySession"  value="${group.key}"/>
 		<c:set var="questions"  value="${group.value}"/>
+		
+		<c:set var="sessionButtons">
+			<c:if test="${sessionMap.survey.reflectOnActivity}">
+				<c:set var="listReflections"><c:url value="/pages/monitoring/listreflections.jsp?toolSessionID=${surveySession.sessionId}"/></c:set>
+				<html:link href="javascript:launchPopup('${listReflections}')" styleClass="btn btn-default ${sessionButtonSize}">
+					<fmt:message key="page.title.monitoring.view.reflection" />
+				</html:link>
+			</c:if>	
+			<html:link href="javascript:exportSurvey(${surveySession.sessionId});" property="exportExcel" styleClass="btn btn-default ${sessionButtonSize} loffset5">
+				<fmt:message key="label.monitoring.button.export.excel" />
+			</html:link>
+		</c:set>
 
 		<c:choose>
 		<c:when test="${sessionMap.isGroupedActivity}">	
