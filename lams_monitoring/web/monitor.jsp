@@ -154,7 +154,8 @@
 				CONTRIBUTE_BUTTON : '<c:out value="${CONTRIBUTE_BUTTON_VAR}" />',
 				<fmt:message key="lesson.task.attention" var="CONTRIBUTE_ATTENTION_VAR"/>
 				CONTRIBUTE_ATTENTION : '<c:out value="${CONTRIBUTE_ATTENTION_VAR}" />',
-				HELP : '<fmt:message key="button.help"/>'
+				HELP : '<fmt:message key="button.help"/>',
+				LESSON_INTRODUCTION : '<fmt:message key="label.lesson.introduction"/>'
 				
 			}
 	    
@@ -304,8 +305,12 @@
 									  	type="button" onClick="javascript:showClassDialog()" 
 									  	title='<fmt:message key="button.edit.class.tooltip"/>'><i class="fa fa-sm fa-user-times"></i> <span class="hidden-xs"><fmt:message key="button.edit.class"/></span></button>
 									<c:if test="${notificationsAvailable && lesson.enabledLessonNotifications}">	
-									  <button id="notificationButton" class="btn btn-default" 
+									  <button id="notificationButton" class="btn btn-default roffset10" 
 									  	type="button" onClick="javascript:window.parent.showNotificationsDialog(null,${lesson.lessonID})"><i class="fa fa-sm fa-bullhorn"></i> <span class="hidden-xs"><fmt:message key="email.notifications"/></span></button>
+									</c:if>							  
+									<c:if test="${lesson.enableLessonIntro}">	
+									  <button id="editIntroButton" class="btn btn-default" 
+									  	type="button" onClick="javascript:showIntroductionDialog(${lesson.lessonID})"><i class="fa fa-sm fa-info"></i> <span class="hidden-xs"><fmt:message key="label.lesson.introduction"/></span></button>
 									</c:if>							  
 									</div>
 								</dd>

@@ -14,25 +14,22 @@
 	<script type="text/javascript" src="includes/javascript/jquery.js"></script>
 	<script type="text/javascript" src="includes/javascript/jquery.form.js"></script>
 	<script language="JavaScript" type="text/javascript">
-	<!--
-
 		$(function() {
 			$('#lessonForm').ajaxForm( {
 				beforeSerialize: function(arr, $form, options) { 
 					$("#lessonDescription").val(CKEDITOR.instances.lessonDescription.getData());                 
 				},
 			    success:    function() {
-			    	self.parent.document.location.reload();
-			    	self.parent.tb_remove();
+			    	alert('<fmt:message key="label.lesson.introduction.updated"/>');
+			    	if ( typeof parent.window.closeIntroductionDialog !== "undefined") {
+						parent.window.closeIntroductionDialog();
+			    	}
 			    }
 			 } );
 		});
-	//-->
 	</script>
 	
 	<lams:css/>
-	<style media="screen,projection" type="text/css">
-	</style>	
 	
 </lams:head>
 
@@ -59,18 +56,11 @@
 				<fmt:message key="label.display.lesson.design"></fmt:message>
 			</div>
 			
-			<br /><br /><br />        
-			
-			<lams:ImgButtonWrapper>
-				<div class="pull-right">
-					<a href="#nogo" onclick="$('#lessonForm').submit();" onmousedown="self.focus();" class="btn btn-primary">
-						<fmt:message key="button.save" /> 
-					</a>
-					<a href="#nogo" onclick="self.parent.tb_remove();" onmousedown="self.focus();" class="btn btn-default loffset5">
-						<fmt:message key="label.cancel" /> 
-					</a>
-				</div>
-			</lams:ImgButtonWrapper>
+			<div class="pull-right">
+				<a href="#nogo" onclick="$('#lessonForm').submit();" class="btn btn-primary">
+					<fmt:message key="button.save" /> 
+				</a>
+			</div>
 		
 		</form>
 			
