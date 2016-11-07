@@ -23,6 +23,7 @@
 
 package org.lamsfoundation.lams.tool.scratchie.service;
 
+import java.io.IOException;
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -89,6 +90,7 @@ import org.lamsfoundation.lams.tool.scratchie.model.ScratchieUser;
 import org.lamsfoundation.lams.tool.scratchie.util.ScratchieAnswerComparator;
 import org.lamsfoundation.lams.tool.scratchie.util.ScratchieItemComparator;
 import org.lamsfoundation.lams.tool.scratchie.util.ScratchieToolContentHandler;
+import org.lamsfoundation.lams.tool.scratchie.web.action.LearningWebsocketServer;
 import org.lamsfoundation.lams.tool.service.ILamsToolService;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
@@ -471,11 +473,12 @@ public class ScratchieServiceImpl
     }
 
     @Override
-    public void setScratchingFinished(Long toolSessionId) {
+    public void setScratchingFinished(Long toolSessionId) throws JSONException, IOException {
 	ScratchieSession session = this.getScratchieSessionBySessionId(toolSessionId);
 	session.setScratchingFinished(true);
-
 	scratchieSessionDao.saveObject(session);
+	
+	LearningWebsocketServer.sendCloseRequest(toolSessionId);
     }
 
     @Override
