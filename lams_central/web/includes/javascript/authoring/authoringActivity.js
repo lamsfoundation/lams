@@ -1365,7 +1365,7 @@ ActivityLib = {
 						}
 					});
 				}
-			}, false);
+			}, true);
 			
 			GeneralLib.setModified(true);
 		}
