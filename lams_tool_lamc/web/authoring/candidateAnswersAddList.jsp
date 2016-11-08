@@ -64,7 +64,7 @@
 								<c:set var="ISCORRECT" scope="request" value="Correct" />
 							</c:if>
 	
-							<input type="radio" name="correct" class="form-control" value="<c:out value="${caIndex}"/>" ${SELECTED_ANSWER} >  
+							<input type="radio" name="correct" value="<c:out value="${caIndex}"/>" ${SELECTED_ANSWER} >  
 	
 						</c:forEach>
 					</td>		
