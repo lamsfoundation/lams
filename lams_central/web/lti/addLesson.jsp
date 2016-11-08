@@ -47,6 +47,7 @@
 	<script type="text/javascript" src="includes/javascript/addLesson.js"></script>	
 	<script type="text/javascript" src="includes/javascript/jquery.js"></script>
 	<script type="text/javascript" src="includes/javascript/jquery-ui.js"></script>
+	<script type="text/javascript" src="includes/javascript/bootstrap.min.js"></script>
 	<script type="text/javascript" src="includes/javascript/jquery.dialogextend.js"></script>	
 	<script type="text/javascript" src="includes/javascript/dialog.js"></script>
 	<script type="text/javascript">

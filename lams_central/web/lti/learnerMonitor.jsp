@@ -25,8 +25,10 @@
 			color:red;
 			font-size:0.8em;
 		}
-		
-		#sequence-preview {padding: 10px; text-align: center;}
+		#sequence-preview {
+			padding: 10px; 
+			text-align: center;
+		}
 	</style>
 	
 	<script type="text/javascript" src="includes/javascript/jquery.js"></script>
