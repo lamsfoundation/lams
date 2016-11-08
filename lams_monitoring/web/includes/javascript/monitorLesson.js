@@ -829,7 +829,8 @@ function loadLearningDesignSVG() {
 				// run the whole fetch again
 				updateSequenceTab();
 			}).attr('src', LAMS_URL 
-						   + 'authoring/author.do?method=generateSVG&selectable=false&learningDesignID=' + ldId);
+						   + 'authoring/author.do?method=generateSVG&selectable=false&learningDesignID=' + ldId).attr('width',0).attr('height',0).attr('style','border: 0px');
+			
 		}
 	});
 	
