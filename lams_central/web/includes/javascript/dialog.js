@@ -251,3 +251,35 @@ function showDialog(id, initParams, extraButtons, recreate) {
 function moveDialogToTop(id) {
 	// $('#' + id).dialog('moveToTop');
 }
+
+
+//used by both main.jsp and /lti/addlesson.jsp pages
+function showAuthoringDialog(learningDesignID){
+	showDialog('dialogAuthoring', {
+		'height' : Math.max(300, $(window).height() - 30),
+		'width' : Math.max(600, Math.min(1280, $(window).width() - 60)),
+		'title' : LABELS.AUTHORING_TITLE,
+		'beforeClose' : function(){
+			// if LD was modified, ask the user if he really wants to exit
+			var innerLib = $('iframe', this)[0].contentWindow.GeneralLib,
+				// no innerLib means that an exception occured in Authoring
+				// and the interface is not usable anyway
+				canClose = !innerLib || innerLib.canClose() || confirm(LABELS.NAVIGATE_AWAY_CONFIRM);
+			if (canClose) {
+				$('iframe', this).attr('src', null);
+			} else {
+				return false;
+			}
+		},
+		'open' : function() {
+			var url = LAMS_URL + 'authoring/author.do?method=openAuthoring';
+			
+			if (learningDesignID) {
+				url += '&learningDesignID=' + learningDesignID;
+			}
+			
+			// load contents after opening the dialog
+			$('iframe', this).attr('src', url);
+		}
+	}, true);
+}
