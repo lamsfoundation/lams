@@ -63,9 +63,9 @@
 								<c:set var="SELECTED_ANSWER" scope="request" value="CHECKED" />
 								<c:set var="ISCORRECT" scope="request" value="Correct" />
 							</c:if>
-	
+	                        <div class="radio">
 							<input type="radio" name="correct" value="<c:out value="${caIndex}"/>" ${SELECTED_ANSWER} >  
-	
+	                          </div>
 						</c:forEach>
 					</td>		
 					
