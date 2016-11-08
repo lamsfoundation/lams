@@ -458,17 +458,6 @@
       document.getElementById("wikiLinks").value = wikiLinkArray.toString();
       }
 
-      displayMessageDiv();
-      function displayMessageDiv()
-      {
-        var messageDiv = document.getElementById("messageDiv");
-
-        if (trim(messageDiv.innerHTML) != "")
-        {
-          messageDiv.style.display="block";
-        }
-      }
-
       function doEditOrAdd(dispatch)
       {
 
