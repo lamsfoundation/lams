@@ -49,13 +49,12 @@
 	<script type="text/javascript" src="includes/javascript/jquery-ui.js"></script>
 	<script type="text/javascript" src="includes/javascript/jquery.dialogextend.js"></script>	
 	<script type="text/javascript" src="includes/javascript/dialog.js"></script>
-	<!-- import of showAuthoringDialog() method  -->
-	<script type="text/javascript" src="includes/javascript/main.js"></script>
 	<script type="text/javascript">
     	var isSelected = false;
 		var tree;
 		var userId = '<lams:user property="userID"/>',
 			LAMS_URL = '<lams:LAMSURL/>',
+			decoderDiv = $('<div />'),
 			LABEL_RUN_SEQUENCES_FOLDER = '<fmt:message key="label.tab.lesson.sequence.folder" />',
 			LABEL_NAME_INVALID_CHARACTERS = '<fmt:message key="error.lessonname.invalid.characters" />',
 			LABELS = {
