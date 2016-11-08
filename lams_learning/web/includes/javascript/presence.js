@@ -21,10 +21,8 @@ $(document).ready(function (){
 			}
 		});
 	}
-});
-
-
-var roster = {
+	
+	roster = {
 		// association nick -> localId, the latter being just some ID made in this script
 		users : {},
 		maxUserLocalId : 0,
@@ -148,6 +146,9 @@ presenceWebsocket.onmessage = function(e){
 	  }
 	});
 };
+
+});
+
 
 /* ******* HTML write Functions ******* */
 

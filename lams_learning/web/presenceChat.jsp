@@ -16,6 +16,12 @@
 	<%-- javascript --%>
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery.js"></script>
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery-ui.js"></script>
+
+	<%-- if the page has tabs, we need to reload bootstrap or the tabs won't work --%>
+	<c:if test="${param.reloadBootstrap}">
+	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/bootstrap.min.js"></script>		
+	</c:if>
+		
 	<script type="text/javascript">
 		var LAMS_URL = "<lams:LAMSURL/>",
 			APP_URL = "<lams:WebAppURL />",
