@@ -170,7 +170,7 @@
 			<%@ include file="/authoring/candidateAnswersAddList.jsp"%>
 
 			<div class="form-group">
-				<a href="#" onclick="javascript:submitMethod('newAddedCandidateBox');" class="btn btn-default btn-sm"> 
+				<a href="#nogo" onclick="javascript:submitMethod('newAddedCandidateBox');" class="btn btn-default btn-sm"> 
 					<i class="fa fa-plus"></i>&nbsp;<fmt:message key="label.add.candidates" />
 				</a>
 			</div>
