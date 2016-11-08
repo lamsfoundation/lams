@@ -69,7 +69,7 @@
 		
 					<div class="input-group">
 						<span class="input-group-addon"><i class="fa fa-mobile"></i></span>
-					  <input id="verificationCode"  maxlength="6" class="form-control" placeholder="<fmt:message key='label.verification.code' />" name="verificationCode" type="text" tabindex="1" onkeypress="onEnter(event)" />
+					  <input id="verificationCode"  maxlength="6" class="form-control" placeholder="<fmt:message key='label.verification.code' />" name="verificationCode" type="text" autocomplete="off" tabindex="1" onkeypress="onEnter(event)" />
 					</div>
 		
 					<div class="form-group voffset10">
