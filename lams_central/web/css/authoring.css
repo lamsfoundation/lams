@@ -440,7 +440,7 @@ td#canvasContainerCell {
 }
 
 #ldDescriptionDiv #ldDescriptionEditorContainer {
-	margin: -15px 15px 15px 0;
+	margin: 0px 15px 15px 0;
 }
 
 #ldDescriptionDiv #ldDescriptionLicenseTextContainer,

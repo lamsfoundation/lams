@@ -140,6 +140,14 @@ CKEDITOR.on('instanceCreated', function(e){
 });
 
 CKEDITOR.on('instanceReady', function(e){
+	var height = e.editor.config.height;
+	if ( ! height ) {
+		height = "60px";
+	} else if ( height.indexOf("px") == -1 ){
+		height = height + "px";
+	}
+	e.editor._.editable.$.style.minHeight = height;
+	
 	// make all links open in new window
 	e.editor.on('getData', function(f){
 		// create a DOM element for easier manipulation
