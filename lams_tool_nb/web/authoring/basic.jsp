@@ -7,6 +7,6 @@
 
 <div class="form-group">
     <label for="title"><fmt:message key="basic.content"/></label>
-	<lams:CKEditor id="basicContent" value="${NbAuthoringForm.basicContent}"
+	<lams:CKEditor id="basicContent" value="${NbAuthoringForm.basicContent}" 
 			contentFolderID="${NbAuthoringForm.contentFolderID}" height="400"></lams:CKEditor>
 </div>

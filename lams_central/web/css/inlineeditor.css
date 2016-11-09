@@ -16,7 +16,8 @@
   -webkit-transition: border-color ease-in-out .15s, -webkit-box-shadow ease-in-out .15s;
        -o-transition: border-color ease-in-out .15s, box-shadow ease-in-out .15s;
           transition: border-color ease-in-out .15s, box-shadow ease-in-out .15s;	border: 1px solid #c1c1c1;
-  /* LAMS */
+  /* LAMS -  min height is set in ckconfig_custom.js but keep the default here too so that most fields 
+   * are the right size and only the ones where the height is overridden does the size change.  */
   min-height: 60px;
  -webkit-appearance: textfield;
 }

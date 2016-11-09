@@ -25,4 +25,5 @@
 		</attributes>
 	</classpathentry>
 	<classpathentry kind="output" path="bin"/>
+	<classpathentry kind="var" path="WILDFLY_HOME/modules/system/layers/base/javax/mail/api/main/javax.mail-1.5.1.jar"/>
 </classpath>
