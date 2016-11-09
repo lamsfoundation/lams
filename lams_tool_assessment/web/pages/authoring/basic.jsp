@@ -188,7 +188,7 @@
     	<fmt:message key="label.authoring.basic.instruction"/>
     </label>
 	<lams:CKEditor id="assessment.instructions" value="${formBean.assessment.instructions}"
-			contentFolderID="${formBean.contentFolderID}" height="400">
+			contentFolderID="${formBean.contentFolderID}">
 	</lams:CKEditor>
 </div>
 
@@ -213,26 +213,7 @@
 	<a onclick="createNewQuestionInitHref();return false;" href="" class="btn btn-default btn-sm button-add-item thickbox" id="newQuestionInitHref">  
 		<fmt:message key="label.authoring.basic.add.question.to.pool" />
 	</a>
-	
-	<c:set var="importInitUrl" >
-		<c:url value='/authoring/importInit.do'/>?sessionMapID=${sessionMapID}&KeepThis=true&TB_iframe=true&height=240&width=650
-	</c:set>
-	<a href="${importInitUrl}" class="btn btn-default btn-xs pull-right loffset5 thickbox" id="importButton">  
-		<fmt:message key="label.authoring.basic.import.questions" />
-	</a>
-	
-	<a onclick="javascript:exportQuestions();" class="btn btn-default btn-xs pull-right" id="exportButton">  
-		<fmt:message key="label.authoring.basic.export.questions" />
-	</a>
-	
-	<br>
-	<a href="#nogo" onClick="javascript:importQTI()" class="btn btn-default btn-xs pull-right loffset5">
-		<fmt:message key="label.authoring.basic.import.qti" /> 
-	</a>
-	<a href="#nogo" onClick="javascript:exportQTI()" class="btn btn-default btn-xs pull-right">
-		<fmt:message key="label.authoring.basic.export.qti" />
-	</a>
-
+		
 </div>
 <br><br>
 
