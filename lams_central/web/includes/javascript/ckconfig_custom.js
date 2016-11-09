@@ -140,8 +140,6 @@ CKEDITOR.on('instanceCreated', function(e){
 });
 
 CKEDITOR.on('instanceReady', function(e){
-	e.editor.element.$.style.display = '';
-	
 	// make all links open in new window
 	e.editor.on('getData', function(f){
 		// create a DOM element for easier manipulation

@@ -17,8 +17,8 @@
        -o-transition: border-color ease-in-out .15s, box-shadow ease-in-out .15s;
           transition: border-color ease-in-out .15s, box-shadow ease-in-out .15s;	border: 1px solid #c1c1c1;
   /* LAMS */
-   min-height: 100px;
-  -webkit-appearance: textfield;
+  min-height: 60px;
+ -webkit-appearance: textfield;
 }
 
 .cke_textarea_inline:focus{
