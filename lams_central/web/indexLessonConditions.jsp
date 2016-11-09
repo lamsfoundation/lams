@@ -58,35 +58,35 @@
    </lams:Alert>
 </logic:messagesPresent>
 
-<div class="container">
-	<div class="col-xs-12">
 	<!-- Preceding lessons setup -->
 		<p class="lead">
 			<fmt:message key="label.conditions.box.title">
 				<fmt:param>${fn:escapeXml(title)}</fmt:param>
 			</fmt:message>
 		</p>
-	<c:choose>
+		<ul class="list-group">
+		<c:choose>
 		<c:when test="${empty precedingLessons}">
-			<p>
+			<div class="list-group-item">
 					<fmt:message key="label.conditions.box.no.dependency" />
-			</p>		
+			</div>		
 		</c:when>
 		<c:otherwise>
 			<c:forEach var="precedingLesson" items="${precedingLessons}">
-				<div class="row">
-					<div class="col-xs-6">
-								<c:out value="${precedingLesson.name}" />
-					</div>
-					<div class="col-xs-6">
-								<c:if test="${edit}">
-									<i class="fa fa-fw fa-trash-o text-danger" style="cursor: pointer;" title="<fmt:message key="label.conditions.box.remove.dependency" />" onclick="javascript:removePrecedingLesson(${precedingLesson.id})"></i>
-								</c:if>
-					</div>			
+				 <div class="list-group-item">
+					<c:out value="${precedingLesson.name}" />
+					<c:if test="${edit}">
+						<span class="badge" style="background-color:white">
+							<i class="fa fa-fw fa-trash-o text-danger" style="cursor: pointer;" title="<fmt:message key="label.conditions.box.remove.dependency" />" onclick="javascript:removePrecedingLesson(${precedingLesson.id})"></i>
+						</span>
+					</c:if>
 				</div>
 			</c:forEach>
 		</c:otherwise>
-	</c:choose>
+		</c:choose>
+		</ul>
+			
+	
 	<!-- Adding new preceding lesson -->
 	<c:if test="${edit}">
 		<div class="panel panel-default voffset10">
@@ -183,8 +183,6 @@
 		<p class="lead">${conditionFinishText}</p>
 	</c:otherwise>
 	</c:choose>
-</div>
-</div>
 
 </lams:Page>
 </body>
