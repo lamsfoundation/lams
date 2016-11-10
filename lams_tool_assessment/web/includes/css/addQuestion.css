@@ -33,3 +33,8 @@ table.alternative-color td {
 	width: 0;
 	float: right !important;
 }
+
+/* overwriting bootstrap value. */
+.panel {
+	margin-bottom: 0 !important;
+}
