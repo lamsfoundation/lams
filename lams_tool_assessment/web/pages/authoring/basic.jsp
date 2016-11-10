@@ -106,23 +106,8 @@
 		location.href="<c:url value='/authoring/exportQuestions.do'/>" + param;
 	};
 
-	function resizeIframe() {
-		if (document.getElementById('TB_iframeContent') != null) {
-		    var height = top.window.innerHeight;
-		    if ( height == undefined || height == 0 ) {
-		    	// IE doesn't use window.innerHeight.
-		    	height = document.documentElement.clientHeight;
-		    	// alert("using clientHeight");
-		    }
-			// alert("doc height "+height);
-		    height -= document.getElementById('TB_iframeContent').offsetTop + 140;
-		    document.getElementById('TB_iframeContent').style.height = height +"px";
-	
-			TB_HEIGHT = height + 28;
-			tb_position();
-		}
-	};
-	window.onresize = resizeIframe;
+	//autoresize Thickbox iframe on window resizing
+	window.onresize = resizeThickbox;
 
 	function createNewQuestionInitHref() {
 		var questionTypeDropdown = document.getElementById("questionType");

@@ -87,8 +87,8 @@
 	</script>
 		
 </lams:head>
-	
-<body onload="parent.resizeIframe();">
+
+<body onload="parent.resizeThickbox();">
 	<div class="panel panel-default add-file">
 		<div class="panel-heading panel-title">
 			<fmt:message key="label.authoring.basic.type.matching.pairs" />
