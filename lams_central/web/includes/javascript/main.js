@@ -428,14 +428,19 @@ function showAddSingleActivityLessonDialog(orgID, toolID, learningLibraryID) {
 
 
 function showNotificationsDialog(orgID, lessonID) {
+	// if screen is narrow, then it is much longer
+	var width = Math.max(380, Math.min(800, $(window).width() - 60)),
+		height = width < 798 ? 850 : 650;
+	height = Math.max(380, Math.min(height, $(window).height() - 30));
+		
 	var id = "dialogNotifications" + (lessonID ? "Lesson" + lessonID : "Org" + orgID);
 	showDialog(id, {
 		'data' : {
 			'orgID' : orgID,
 			'lessonID' : lessonID
 		},
-		'height': Math.max(380, Math.min(650, $(window).height() - 30)),
-		'width' : Math.max(380, Math.min(800, $(window).width() - 60)),
+		'height': height,
+		'width' : width,
 		'title' : LABELS.EMAIL_NOTIFICATIONS_TITLE,
 		'open' : function() {
 			var dialog = $(this),
@@ -502,7 +507,7 @@ function showGradebookCourseDialog(orgID){
 	var id = "dialoGradebookCourse" + orgID;
 	showDialog(id, {
 		'orgID' : orgID,
-		'height': Math.max(380, Math.min(650, $(window).height() - 30)),
+		'height': Math.max(380, Math.min(900, $(window).height() - 30)),
 		'width' : Math.max(380, Math.min(800, $(window).width() - 60)),
 		'title' : LABELS.GRADEBOOK_COURSE_TITLE,
 		'open' : function() {
@@ -519,7 +524,7 @@ function showGradebookLessonDialog(lessonID){
 		'data' : {
 			'lessonID' : lessonID
 		},
-		'height': Math.max(380, Math.min(650, $(window).height() - 30)),
+		'height': Math.max(380, Math.min(800, $(window).height() - 30)),
 		'width' : Math.max(380, Math.min(800, $(window).width() - 60)),
 		'title' : LABELS.GRADEBOOK_LESSON_TITLE,
 		'open' : function() {
@@ -538,10 +543,8 @@ function showGradebookLearnerDialog(orgID){
 		'data'  : {
 			'orgID' : orgID
 		},
-		// too little difference between min height of 380 and standard height of 400,
-		// so just keep it always 400
-		'height' : 400,
-		'width' : Math.max(380, Math.min(750, $(window).width() - 60)),
+		'height': Math.max(380, Math.min(650, $(window).height() - 30)),
+		'width' : Math.max(380, Math.min(800, $(window).width() - 60)),
 		'title' : LABELS.GRADEBOOK_LEARNER_TITLE,
 		'open' : function() {
 			var orgID = $(this).data('orgID');
@@ -558,7 +561,7 @@ function showConditionsDialog(lessonID){
 		'data' : {
 			'lessonID' : lessonID
 		},
-		'height': Math.max(380, Math.min(600, $(window).height() - 30)),
+		'height': Math.max(380, Math.min(650, $(window).height() - 30)),
 		'width' : Math.max(380, Math.min(610, $(window).width() - 60)),
 		'title' : LABELS.CONDITIONS_TITLE,
 		'open' : function() {
