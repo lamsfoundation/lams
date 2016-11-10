@@ -10,9 +10,6 @@
 		<c:forEach items="${questionDTOs}" var="currentDTO"	varStatus="status">
 			<tr>
 				<td>
-					<fmt:message key="label.question" />
-				</td>
-				<td>
 					<c:out value="${currentDTO.question}" escapeXml="false" />
 				</td>
 				<td class="arrows" style="width:5%">
