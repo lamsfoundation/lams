@@ -14,7 +14,6 @@
 		<fmt:message key="label.questions"/>
 		
 	</div>
-	<div class="panel-body">
 		<input type="hidden" name="itemCount" id="itemCount" value="${fn:length(sessionMap.itemList)}">
 		
 		<table class="table table-condensed table-striped">
@@ -48,7 +47,6 @@
 				</tr>
 			</c:forEach>
 		</table>
-	</div>
 </div>
 	
 	
