@@ -191,8 +191,18 @@ LAMS Learner Style
 }
 .panel-title {
 	font-size: inherit;
-	font-weight: bolder;
+	font-weight: 500;
 }
+.panel-heading {
+  padding: 7px 10px;
+}
+
+th {
+	font-weight: normal;
+	font-style: italic;
+	
+}
+
 body.stripes {
   background: url('/lams/images/css/light-fabric.jpg');
 }
