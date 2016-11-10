@@ -137,12 +137,6 @@
 		<a href="${addItemUrl}" class="btn btn-default btn-sm thickbox">
 			<i class="fa fa-plus"></i>&nbsp;<fmt:message key="label.authoring.basic.add.another.scratchie" /> 
 		</a>
-		<a href="#" onClick="javascript:importQTI()" class="btn btn-default btn-sm loffset5">
-			<fmt:message key="label.authoring.import.qti" /> 
-		</a>
-		<a href="#" onClick="javascript:exportQTI()" class="btn btn-default btn-sm loffset5">
-			<fmt:message key="label.authoring.export.qti" />
-		</a>
 	</div>
 </div>
 
