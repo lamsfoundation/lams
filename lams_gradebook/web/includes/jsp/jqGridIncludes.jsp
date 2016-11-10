@@ -4,7 +4,7 @@
 <!-- 
 Include this jsp in your jqGrid page head to get some jqGrid functionaility
  -->
-<link type="text/css" href="<lams:LAMSURL />css/jquery-ui-redmond-theme.css" rel="stylesheet">
+<link type="text/css" href="<lams:LAMSURL/>css/jquery-ui-smoothness-theme.css" rel="stylesheet">
 <link type="text/css" href="<lams:LAMSURL />css/jquery.jqGrid.css" rel="stylesheet" />
 
 <script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery.js"></script>
