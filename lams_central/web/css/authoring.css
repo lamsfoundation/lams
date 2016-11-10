@@ -70,22 +70,14 @@ div.dialogContents, #ldScreenshotAuthor, #ldScreenshotLoading {
 	border: none;
 }
 
-#dialogMinContainer {
-	height: 35px;
-	bottom: 1px;
-	left: 1px;
-	position: fixed;
-	right: 1px;
-	z-index: 9999;
-}
-
 .dialogMin {
+	top: auto !important;
+	bottom: 5px !important;
 	overflow: hidden !important;
 	padding: 0 !important;
-	margin: 0 10px 0 0;
-	float: left;
-	position: static !important;
-	width: 257px !important;
+	position: fixed !important;
+	width: 250px !important;
+	height: 35px !important;
 }
 
 .dialogMin .modal-title {
@@ -109,6 +101,7 @@ div.dialogContents, #ldScreenshotAuthor, #ldScreenshotLoading {
 	height: 100%;
 	margin: 0 !important;
 	padding: 3px 5px !important;
+	cursor: default !important;
 }
 
 div.smallHeader .modal-header {

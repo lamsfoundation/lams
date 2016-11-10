@@ -126,7 +126,6 @@ function showDialog(id, initParams, extraButtons, recreate) {
 				dialog.position(position);
 			}
 
-			
 			if (draggable) {
 				modalDialog.on('drag', function(event, ui){
 					// pass the event to the dialog, not its internal element
@@ -212,36 +211,56 @@ function showDialog(id, initParams, extraButtons, recreate) {
 	    $('.dialogMinimise', dialog).click(function() {
 	    	// swap icon
             $('i', this).toggleClass('fa-minus').toggleClass('fa-clone');
-	        dialog.toggleClass('dialogMin');
 	        if (dialog.hasClass('dialogMin')) {
+	        	shiftMinimisedDialogs(dialog);
+	        	// restore old left position
+	        	dialog.css('left', dialog.data('oldLeft'));
+	        	dialog.removeClass('dialogMin');
+	            dialog.siblings('.modal-backdrop').show();
+	            $('.dialogMaximise', dialog).show();
+	            $('.ui-resizable-handle', dialog).show();
+	            if (draggable) {
+	            	modalDialog.draggable('enable');
+	            }
+	        } else {
+	        	// store current left position
+	            dialog.data('oldLeft', dialog.css('left'));
+	        	dialog.css('left', $('.dialogMin').length * 260 + 5 + 'px');
+	        	dialog.addClass('dialogMin');
 	        	// remove overlay
 	        	dialog.siblings('.modal-backdrop').hide();
-	        	// move the dialog to the bar at the bottom
-	        	var minContainer = $('#dialogMinContainer');
-	        	if (minContainer.length == 0) {
-	        		minContainer = $('<div>').attr('id', 'dialogMinContainer').appendTo('body');
-	        	}
-	        	minContainer.append(dialog);
 	            // disable maximising 
 	        	$('.dialogMaximise', dialog).hide();
 	        	// disable rezising
 		        $('.ui-resizable-handle', dialog).hide();
-	        } else {
-	            $('body').append(dialog);
-	            var minContainer = $('#dialogMinContainer');
-	            if (minContainer.children().length == 0) {
-		            $('#dialogMinContainer').remove();
+	            if (draggable) {
+	            	modalDialog.draggable('disable');
 	            }
-	            dialog.siblings('.modal-backdrop').show();
-	            $('.dialogMaximise', dialog).show();
-	            $('.ui-resizable-handle', dialog).show();
 	        };
+	    });
+	    
+	    dialog.on('hide.bs.modal', function(){
+	    	shiftMinimisedDialogs($(this));
 	    });
 	} else {
 		$('.dialogMinimise, .dialogMaximise', dialog).remove();
 	}
 	
 	return dialog;
+}
+
+/**
+ * Moves other minimised dialogs to the left after the given dialog was restored or closed.
+ */
+function shiftMinimisedDialogs(dialog){
+	var left = dialog.offset().left;
+	$('.dialogMin').each(function(){
+		var thisDialogLeft = $(this).offset().left;
+		// if the dialog was to the right of the given dialog, shift it to left
+		if (left < thisDialogLeft) {
+			$(this).css('left', thisDialogLeft - 260 + 'px');
+		}
+	});
 }
 
 
