@@ -13,23 +13,20 @@
 	<lams:css />
 	<link type="text/css" href="includes/css/gradebook.css" rel="stylesheet" />
 	
-	<style>
-		#content {width:680px; }
-	</style>
-
 	<jsp:include page="includes/jsp/jqGridIncludes.jsp"></jsp:include>
 
 	<script type="text/javascript">
-
 		
 		jQuery(document).ready(function(){
   
+			// for the ipad, we seem to need to force the grid to a sensible size to start
 			jQuery("#organisationGrid").jqGrid({
 				caption: "${organisationName}",
 			    datatype: "xml",
 			    url: "<lams:LAMSURL />/gradebook/gradebook.do?dispatch=getCourseGridData&view=lrnCourse&organisationID=${organisationID}",
-			    height: "100%",
-			    width: 600,
+				height: 'auto',
+				width: $(window).width() - 100,
+				shrinkToFit: false,
 			    sortorder: "asc", 
 			    sortname: "id", 
 			    pager: 'organisationGridPager',
@@ -52,7 +49,7 @@
 			      {name:'rowName',index:'rowName', sortable:true, editable:false},
 			      {name:'subGroup',index:'subGroup', sortable:false, editable:false, search:false},
 			      {name:'status',index:'status', sortable:false, editable:false, search:false, width:50, align:"center"},
-			      {name:'feedback',index:'feedback', sortable:false, editable:false, search:false, width:200},
+			      {name:'feedback',index:'feedback', sortable:false, editable:false, search:false, width:200}, 
 			      {name:'startDate',index:'startDate', sortable:false, editable:false, hidden:true, search:false},
 			      {name:'finishDate',index:'finishDate', sortable:false, editable:false, hidden:true, search:false},
 			      {name:'medianTimeTaken',index:'medianTimeTaken', sortable:true, hidden:true, editable:false, search:false, width:80, align:"center"},
@@ -139,37 +136,56 @@
 				onClickButton: function(){
 					jQuery("#organisationGrid").setColumns();
 				}
-			});	
+			});
+			
+	        //jqgrid autowidth (http://stackoverflow.com/a/1610197)
+	        $(window).bind('resize', function() {
+	            resizeJqgrid(jQuery(".ui-jqgrid-btable:visible"));
+	        });
+
+	        //resize jqGrid on openning of bootstrap collapsible
+	        $('div[id^="collapse"]').on('shown.bs.collapse', function () {
+	            resizeJqgrid(jQuery(".ui-jqgrid-btable:visible", this));
+	        })
+
+	        function resizeJqgrid(jqgrids) {
+	            jqgrids.each(function(index) {
+	                var gridId = $(this).attr('id');
+	                var gridParentWidth = jQuery('#gbox_' + gridId).parent().width();
+	                jQuery('#' + gridId).setGridWidth(gridParentWidth, true);
+	            });
+	        };
+	        setTimeout(function(){ window.dispatchEvent(new Event('resize')); }, 300);
+
 		});
 	</script>
 
 </lams:head>
 
-<body class="stripes" style="text-align: center">
-	<div id="page">
-	
-		<div id="header-no-tabs"></div>
-		
-		<div id="content">
-			<lams:help module="gradebook" page="My+Grades" style="no-tabs"/>
-			<h1 class="no-tabs-below">
-				<fmt:message key="gradebook.title.myGradebook">
-					<fmt:param>
-						<c:out value="${fullName}" escapeXml="true"/>
-					</fmt:param>
-				</fmt:message>
-			</h1>
-			<br />
-			<div style="width: 600px; margin-left: 20px; margin-right: 20px">
-				<table id="organisationGrid" class="scroll"></table>
-				<div id="organisationGridPager" class="scroll"></div>
-				
-				<div class="tooltip" id="tooltip"></div>
-			</div>
-		</div> <!-- Closes content -->
-		
-		<div id="footer">
+<body class="stripes">
+
+	<lams:Page type="admin">
+
+		<a target="_blank" class="btn btn-sm btn-default pull-right" title="<fmt:message key='button.help.tooltip'/>"
+		   href="http://wiki.lamsfoundation.org/display/lamsdocs/My+Grades">
+		<i class="fa fa-question-circle"></i> <span class="hidden-xs"><fmt:message key="button.help"/></span></a>
+
+		<h4><fmt:message key="gradebook.title.myGradebook">
+				<fmt:param>
+					<c:out value="${fullName}" escapeXml="true"/>
+				</fmt:param>
+			</fmt:message>
+		</h4>
+
+ 		<div>
+ 			<table id="organisationGrid" class="scroll"></table>
+			<div id="organisationGridPager" class="scroll"></div>
+ 			<div class="tooltip" id="tooltip"></div>
+		</div>
+ 		<div id="footer">
 		</div> <!--Closes footer-->
-	</div> <!-- Closes page -->
+		
+	</lams:Page>
+
 </body>
 </lams:html>

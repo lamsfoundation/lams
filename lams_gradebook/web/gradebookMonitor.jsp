@@ -62,6 +62,7 @@
 		
 		jQuery(document).ready(function(){
   
+			var jqgridWidth = $(window).width() - 100;
 			displayReleaseOption();
 			
 			// Create the user view grid with sub grid for activities	
@@ -70,7 +71,8 @@
 			    datatype: "xml",
 			    url: "<lams:LAMSURL />/gradebook/gradebook.do?dispatch=getUserGridData&view=monUserView&lessonID=${lessonDetails.lessonID}",
 			    height: "100%",
-			    width: 670,
+			    width: jqgridWidth,
+				shrinkToFit: false,
 			    cellEdit: true,
 			    viewrecords: true,
 			    sortorder: "asc", 
@@ -253,7 +255,8 @@
 				    datatype: "xml",
 				    url: "<lams:LAMSURL />/gradebook/gradebook.do?dispatch=getActivityGridData&view=monActivityView&lessonID=${lessonDetails.lessonID}",
 				    height: "100%",
-				    width: 670,
+				    width: jqgridWidth,
+				    shrinkToFit: false,
 				    cellEdit: true,
 				    pager: "activityViewPager",
 				    rowList:[5,10,20,30],
@@ -436,34 +439,51 @@
 					
 					return false;
 				});
+				
+		        //jqgrid autowidth (http://stackoverflow.com/a/1610197)
+		        $(window).bind('resize', function() {
+		            resizeJqgrid(jQuery(".ui-jqgrid-btable:visible"));
+		        });
+
+		        //resize jqGrid on openning of bootstrap collapsible
+		        $('div[id^="collapse"]').on('shown.bs.collapse', function () {
+		            resizeJqgrid(jQuery(".ui-jqgrid-btable:visible", this));
+		        })
+
+		        function resizeJqgrid(jqgrids) {
+		            jqgrids.each(function(index) {
+		                var gridId = $(this).attr('id');
+		                var gridParentWidth = jQuery('#gbox_' + gridId).parent().width();
+		                jQuery('#' + gridId).setGridWidth(gridParentWidth, true);
+		            });
+		        };
+		        setTimeout(function(){ window.dispatchEvent(new Event('resize')); }, 300);
+
 		});
 	</script>
 	
 </lams:head>
 
-<body class="stripes" style="text-align:center">
-	<div id="page">
-		
-		<div id="header-no-tabs"></div> <!--closes footer-->
-		<div id="content" >
-			<lams:help module="gradebook" page="Gradebook+Lesson+Marking" style="no-tabs"/>
-			<h1 class="no-tabs-below">
-				<fmt:message key="gradebook.title.lessonGradebook">
+<body class="stripes">
+
+	<lams:Page type="admin">
+
+		<a target="_blank" class="btn btn-sm btn-default pull-right" title="<fmt:message key='button.help.tooltip'/>"
+		   href="http://wiki.lamsfoundation.org/display/lamsdocs/Gradebook+Lesson+Marking">
+		<i class="fa fa-question-circle"></i> <span class="hidden-xs"><fmt:message key="button.help"/></span></a>
+
+		<h4><fmt:message key="gradebook.title.lessonGradebook">
 					<fmt:param>
 						<c:out value="${lessonDetails.lessonName}" escapeXml="true"/>
 					</fmt:param>
-				</fmt:message>
-			</h1> 
-			<br />
+				</fmt:message></h4>
 			
 			<div id="marksNotReleased" style="display:none">
 				<a href="javascript:toggleRelease()"><fmt:message key="gradebook.monitor.releasemarks.1" /></a> <fmt:message key="gradebook.monitor.releasemarks.3" /><br />
-				<br />
 			</div>
 			
 			<div id="marksReleased" style="display:none">
 				<a href="javascript:toggleRelease()"><fmt:message key="gradebook.monitor.releasemarks.2" /></a> <fmt:message key="gradebook.monitor.releasemarks.3" /><br />
-				<br />
 			</div>
 			
 			<div id="export-link-area">
@@ -489,6 +509,6 @@
 		</div> <!-- Closes content -->
 	
 		<div id="footer"></div><!--closes footer-->
-	</div> <!-- Closes page -->
+	</lams:Page> <!-- Closes page -->
 </body>
 </lams:html>
