@@ -57,9 +57,9 @@ div#errorArea {
 					type="hidden" name="limitType" value="${empty param.limitType ? limitType : param.limitType}" /> <input
 					type="file" name="file" size="53" />
 				<div class="voffset10" id="buttonsDiv">
-					<input class="btn btn-default" value='<fmt:message key="button.cancel"/>' type="button"
+					<input class="btn btn-sm btn-default" value='<fmt:message key="button.cancel"/>' type="button"
 						onClick="javascript:window.close()" />
-					<button class="btn btn-primary" value='<fmt:message key="label.upload"/>' type="submit">
+					<button class="btn btn-sm btn-primary" value='<fmt:message key="label.upload"/>' type="submit">
 						<fmt:message key="button.import" />&nbsp;<i class="fa fa-sm fa-upload"></i>
 					</button>
 				</div>
