@@ -1,14 +1,4 @@
 <%@ include file="/common/taglibs.jsp"%>
-
-<script type="text/javascript">
-	$(document).ready(function() {
-	 	//spinner
-	 	$("#min-words-limit").spinner({ 
-	 		min: 0
-	 	});
-	});
-</script>
-
 <div class="panel panel-default">
 <div class="panel-heading">
 	<div class="panel-title"><fmt:message key="label.add.new.question" /></div>
@@ -33,13 +23,15 @@
 	    </label>
   	</div>
   	        
-	<div class="form-group">
-	  	<label for="minWordsLimit">
-	    	<fmt:message key="label.minimum.number.words" >
-				<fmt:param> </fmt:param>
-			</fmt:message>
-		</label>
-	    <html:text property="minWordsLimit" styleId="min-words-limit"/>
+	<div class="form-inline">
+		<div class="form-group">
+		  	<label for="minWordsLimit">
+		    	<fmt:message key="label.minimum.number.words" >:
+					<fmt:param> </fmt:param>
+				</fmt:message>
+			</label>
+				<input type="number" class="form-control input-sm" id="minWordsLimit" name="minWordsLimit" value="${formBean.minWordsLimit}" min="0"/>
+		</div>
 	</div>
 	
 	<div class="form-group">
