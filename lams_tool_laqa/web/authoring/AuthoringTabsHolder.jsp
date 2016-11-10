@@ -22,19 +22,23 @@
 	<script type="text/javascript" src="${lams}includes/javascript/bootstrap.tabcontroller.js"></script>
 	
 	<script type="text/JavaScript">
-		function submitMethod(actionMethod) {
-			document.QaAuthoringForm.dispatch.value=actionMethod; 
-			document.QaAuthoringForm.submit();
-		}
-		
-		function submitModifyAuthoringQuestion(questionIndexValue, actionMethod) {
-			document.QaAuthoringForm.questionIndex.value=questionIndexValue; 
-			submitMethod(actionMethod);
-		}
-        
-        function doSelectTab(tabId) {
-	    	selectTab(tabId);
-        } 
+	  function submitMethod(actionMethod) {
+		   var form = document.QaAuthoringForm;
+		   if (!form.dispatch) {
+		    form = form[0];
+		   }
+		   form.dispatch.value=actionMethod; 
+		   form.submit();
+		  }
+		  
+		  function submitModifyAuthoringQuestion(questionIndexValue, actionMethod) {
+		   var form = document.QaAuthoringForm;
+		   if (!form.questionIndex) {
+		    form = form[0];
+		   }
+		   form.questionIndex.value=questionIndexValue; 
+		   submitMethod(actionMethod);
+		  }
 	</script>
 </lams:head>
 
