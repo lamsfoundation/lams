@@ -142,8 +142,10 @@ margin-top: expression(0 - parseInt(this.offsetHeight / 2) + (TBWindowMargin = d
 }
 
 /* Added by LAMS. Enables scrolling on iOS devices. */
-#TB_iframeContent, #TB_overlay, #TB_window {
-	overflow-y: scroll !important;
+#TB_window {
+	overflow-y: auto !important;
 	-webkit-overflow-scrolling: touch !important;
-	height:95% !important;
+}
+#TB_iframeContent, #TB_overlay, #TB_window {
+	height:100% !important;
 }
