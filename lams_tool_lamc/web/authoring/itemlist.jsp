@@ -6,6 +6,15 @@
 	<div class="panel-heading panel-title">
 		<fmt:message key="label.questions" />
 		<i class="fa fa-spinner" style="display: none" id="resourceListArea_Busy"></i>
+		<div class="btn-group btn-group-xs pull-right">
+			<a href="#nogo" onClick="javascript:importQTI()" class="btn btn-default">
+				<fmt:message key="label.authoring.import.qti" />
+			</a>
+			<a href="#nogo" onClick="javascript:exportQTI()" class="btn btn-default">
+				<fmt:message key="label.authoring.export.qti" />
+			</a>
+		</div>
+		
 	</div>
 
 	<c:set var="formBean" value="<%=request.getAttribute(org.apache.struts.taglib.html.Constants.BEAN_KEY)%>" />

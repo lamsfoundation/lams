@@ -93,14 +93,7 @@
 		class="btn btn-default btn-sm thickbox"> 
 		<i class="fa fa-plus"></i>&nbsp;<fmt:message key="label.save.question" /> 
 	</a>
-	
-	<a href="#" onClick="javascript:importQTI()" class="btn btn-default btn-sm">
-		<fmt:message key="label.authoring.import.qti" />
-	</a>
-	<a href="#" onClick="javascript:exportQTI()" class="btn btn-default btn-sm">
-		<fmt:message key="label.authoring.export.qti" />
-	</a>
-</p>
+	</p>
 
 <!-- For exporting QTI packages -->
 <iframe id="downloadFileDummyIframe" style="display: none;"></iframe>
