@@ -95,7 +95,7 @@
 						</div>
 						</c:if>
 
-						<form action="/lams/j_security_check" method="POST" name="loginForm" role="form" class="form-horizontal" id="loginForm">
+						<form action="/lams/j_security_check" method="POST" name="loginForm" role="form" class="form-horizontal" id="loginForm" autocomplete="off">
 						  <input type="hidden" name="redirectURL" value='<c:out value="${param.redirectURL}" escapeXml="true" />' />
               <div class="input-group">
 								<span class="input-group-addon"><i class="fa fa-user"></i></span>
