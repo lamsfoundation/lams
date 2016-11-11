@@ -3,10 +3,10 @@
 
 <script type="text/javascript">
 	function verifyAllowRateMessagesCheckbox() {
-		var minRateDropDown = document.getElementById("minimumRate");
-		var minRatings  = parseInt(minRateDropDown.options[minRateDropDown.selectedIndex].value);
-		var maxRateDropDown  = document.getElementById("maximumRate");
-		var maxRatings = parseInt(maxRateDropDown.options[maxRateDropDown.selectedIndex].value);
+		  var minRateInput = document.getElementById("minimumRate");
+		   var minRatings = parseInt(minRateInput.value);
+		   var maxRateInput = document.getElementById("maximumRate");
+		   var maxRatings = parseInt(maxRateInput.value);
 		
 		if((minRatings == 0) && (maxRatings == 0)){
 			var allowRateMessages = document.getElementById("allowRateMessages");
@@ -15,6 +15,8 @@
 		
 		return true;
 	}
+	
+	
 </script>
 
 <html:form action="authoring/update" method="post"
