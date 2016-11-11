@@ -28,6 +28,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang.StringUtils;
 import org.hibernate.FetchMode;
 import org.hibernate.HibernateException;
@@ -176,6 +177,7 @@ public class LessonDAO extends BaseDAO implements ILessonDAO {
 	if (!StringUtils.isBlank(searchPhrase)) {
 	    String[] tokens = searchPhrase.trim().split("\\s+");
 	    for (String token : tokens) {
+		token = StringEscapeUtils.escapeSql(token).replace("\\", "\\\\");
 		queryTextBuilder.append(" AND (users.firstName LIKE '%").append(token)
 			.append("%' OR users.lastName LIKE '%").append(token).append("%' OR users.login LIKE '%")
 			.append(token).append("%')");
@@ -209,6 +211,7 @@ public class LessonDAO extends BaseDAO implements ILessonDAO {
 	if (!StringUtils.isBlank(searchPhrase)) {
 	    String[] tokens = searchPhrase.trim().split("\\s+");
 	    for (String token : tokens) {
+		token = StringEscapeUtils.escapeSql(token).replace("\\", "\\\\");
 		queryTextBuilder.append(" AND (users.firstName LIKE '%").append(token)
 			.append("%' OR users.lastName LIKE '%").append(token).append("%' OR users.login LIKE '%")
 			.append(token).append("%')");
@@ -397,6 +400,7 @@ public class LessonDAO extends BaseDAO implements ILessonDAO {
 	    queryTextBuilder.append(" WHERE");
 	    String[] tokens = searchPhrase.trim().split("\\s+");
 	    for (String token : tokens) {
+		token = StringEscapeUtils.escapeSql(token).replace("\\", "\\\\");
 		queryTextBuilder.append(" (users.first_name LIKE '%").append(token)
 			.append("%' OR users.last_name LIKE '%").append(token).append("%' OR users.login LIKE '%")
 			.append(token).append("%') AND");
