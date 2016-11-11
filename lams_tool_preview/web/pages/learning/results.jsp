@@ -106,7 +106,7 @@
 		<c:forEach var="criteriaRatings" items="${allCriteriaRatings}" varStatus="status">
 			<div class="panel panel-default">
 			<div class="panel-heading panel-title">
-				${criteriaRatings.ratingCriteria.title}
+				<c:out value="${criteriaRatings.ratingCriteria.title}" escapeXml="true"/>
 			</div>
 			<div class="panel-body">
 			<lams:StyledRating criteriaRatings="${criteriaRatings}" showJustification="true" alwaysShowAverage="false" currentUserDisplay="false"/>
@@ -121,7 +121,7 @@
 		</div>
 		<div class="panel-body">
 			<c:forEach var="criteriaRatings" items="${userRatings}" varStatus="status">
-				<h4>${criteriaRatings.ratingCriteria.title}</h4>
+				<h4><c:out value="${criteriaRatings.ratingCriteria.title}" escapeXml="true"/></h4>
 		 		<lams:StyledRating criteriaRatings="${criteriaRatings}" showJustification="false" alwaysShowAverage="true" currentUserDisplay="true"/>
 		</c:forEach>
 		</div>

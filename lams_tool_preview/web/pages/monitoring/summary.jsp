@@ -90,7 +90,7 @@
 	<c:choose>
 		<c:when test="${not empty criterias && fn:length(criterias) eq 1}">
 			<c:forEach var="criteria" items="${criterias}">
-			<h4>${criteria.title}</h4>
+			<h4><c:out value="${criteria.title}" escapeXml="true"/></h4>
 			<c:set var="toolSessionId" value="${groupSummary.sessionId}" scope="request"/>
 			<c:set var="criteria" value="${criteria}" scope="request"/>
 			<c:set var="sessionMap" value="${sessionMap}" scope="request"/>
@@ -101,7 +101,7 @@
 			<c:forEach var="criteria" items="${criterias}">
 				<c:set var='url'>criteria.do?sessionMapID=${sessionMapID}&toolSessionId=${groupSummary.sessionId}&criteriaId=${criteria.ratingCriteriaId}</c:set>
 				<a href="javascript:launchPopup('${url}')" class="btn btn-default voffset5 loffset5">
-					<fmt:message key="label.monitoring.view"><fmt:param>${criteria.title}</fmt:param></fmt:message></a>
+					<fmt:message key="label.monitoring.view"><fmt:param><c:out value="${criteria.title}" escapeXml="true"/></fmt:param></fmt:message></a>
 			</c:forEach>
 			<div class="voffset5">&nbsp;</div>
 		</c:otherwise>

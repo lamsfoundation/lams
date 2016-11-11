@@ -496,15 +496,18 @@ public class PeerreviewServiceImpl
 
     private void generateRatingEntryForEmail(StringBuilder notificationMessage, RatingCriteria criteria,
 	    StyledCriteriaRatingDTO dto) {
+	String escapedTitle = StringEscapeUtils.escapeHtml(dto.getRatingCriteria().getTitle());
 	if (dto.getRatingDtos().size() >= 1) {
 	    if (criteria.isCommentRating()) {
 		StringBuilder comments = new StringBuilder();
 		for (StyledRatingDTO ratingDto : dto.getRatingDtos()) {
-		    if (ratingDto.getComment() != null)
-			comments.append("<li>").append(ratingDto.getComment()).append("</li>");
+		    if (ratingDto.getComment() != null) {
+			String escaped = StringEscapeUtils.escapeHtml(ratingDto.getComment());
+			comments.append("<li>").append(escaped).append("</li>");
+		    }
 		}
 		notificationMessage.append(getLocalisedMessage("event.sent.results.criteria.comment", new Object[] {
-			dto.getRatingCriteria().getTitle(), comments.toString() }));
+			escapedTitle, comments.toString() }));
 	    } else {
 		String avgRating = dto.getRatingDtos().get(0).getAverageRating().length() > 0 ? dto.getRatingDtos()
 			.get(0).getAverageRating() : "0";
@@ -513,30 +516,32 @@ public class PeerreviewServiceImpl
 		    if (criteria.isCommentsEnabled()) {
 			comments = new StringBuilder();
 			for (StyledRatingDTO ratingDto : dto.getRatingDtos()) {
-			    if (ratingDto.getComment() != null)
-				comments.append("<li>").append(ratingDto.getComment()).append("</li>");
+			    if (ratingDto.getComment() != null) {
+				String escaped = StringEscapeUtils.escapeHtml(ratingDto.getComment());
+				comments.append("<li>").append(escaped).append("</li>");
+			    }
 			}
 		    }
 		    notificationMessage.append(getLocalisedMessage(
 			    "event.sent.results.criteria.star",
-			    new Object[] { dto.getRatingCriteria().getTitle(), avgRating,
+			    new Object[] { escapedTitle, avgRating,
 				    comments != null ? comments.toString() : "" }));
 		} else if (criteria.isRankingStyleRating()) {
 		    if (criteria.getMaxRating() > 0) {
 			notificationMessage
 				.append(getLocalisedMessage("event.sent.results.criteria.rank", new Object[] {
-					dto.getRatingCriteria().getTitle(), avgRating, criteria.getMaxRating() }));
+					escapedTitle, avgRating, criteria.getMaxRating() }));
 		    } else {
 			notificationMessage.append(getLocalisedMessage("event.sent.results.criteria.rankAll",
-				new Object[] { dto.getRatingCriteria().getTitle(), avgRating }));
+				new Object[] { escapedTitle, avgRating }));
 		    }
 		} else { // hedge style rating
 		    notificationMessage.append(getLocalisedMessage("event.sent.results.criteria.hedge", new Object[] {
-			    dto.getRatingCriteria().getTitle(), avgRating, criteria.getMaxRating() }));
+			    escapedTitle, avgRating, criteria.getMaxRating() }));
 		}
 	    }
 	} else {
-	    notificationMessage.append(dto.getRatingCriteria().getTitle()).append(
+	    notificationMessage.append(escapedTitle).append(
 		    getLocalisedMessage("event.sent.results.no.results", null));
 	}
 	notificationMessage.append("\n");
