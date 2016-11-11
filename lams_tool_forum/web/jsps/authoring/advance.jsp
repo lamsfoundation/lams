@@ -2,6 +2,8 @@
 
 <!--   Advance Tab Content    -->
 
+
+
 <lams:SimplePanel titleKey="label.posting.options">
 
 <div class="checkbox">
@@ -23,13 +25,13 @@
 <label for="limited-min-characters"><html:checkbox property="forum.limitedMinCharacters" styleId="limited-min-characters"/>
 <fmt:message key="label.authoring.advance.min.limited.input" />
 </label>
-<html:text property="forum.minCharacters" styleId="min-characters"  styleClass="form-control form-control-inline input-sm"/>
+ <input type="number" name="forum.minCharacters"  id="min-characters" value="${forumForm.forum.minCharacters}" class="form-control form-control-inline input-sm" min="0"/>
 </div>
 
 <div class="checkbox">
 <label for="limited-max-characters"><html:checkbox property="forum.limitedMaxCharacters" styleId="limited-max-characters"/>
 <fmt:message key="label.authoring.advance.limited.input" /></label>
-<html:text property="forum.maxCharacters" styleId="max-characters"  styleClass="form-control form-control-inline input-sm"/>
+ <input type="number" name="forum.maxCharacters"  id="max-characters" value="${forumForm.forum.maxCharacters}" class="form-control form-control-inline input-sm" max="5000"/>
 </div>
 
 <lams:SimplePanel panelBodyClass="panel-body-sm">
@@ -41,39 +43,12 @@
 	<div class="form-inline loffset20">
 		<div class="form-group">
 		<label for="minimumRate"><fmt:message key="label.authoring.advance.minimum.reply" /></label>
-		<html:select property="forum.minimumRate" styleId="minimumRate"  onchange="validateRatings(true);" styleClass="form-control input-sm">
-			<html:option value="0">
-				<fmt:message key="label.authoring.advance.no.minimum" />
-			</html:option>
-			<html:option value="1">1</html:option>
-			<html:option value="2">2</html:option>
-			<html:option value="3">3</html:option>
-			<html:option value="4">4</html:option>
-			<html:option value="5">5</html:option>
-			<html:option value="6">6</html:option>
-			<html:option value="7">7</html:option>
-			<html:option value="8">8</html:option>
-			<html:option value="9">9</html:option>
-			<html:option value="10">10</html:option>
-		</html:select>
+		
+		<input type="number" name="forum.minimumRate"  id="minimumRate" value="${forumForm.forum.minimumRate}" onchange="validateRatings(true);" class="form-control input-sm" min="0"/>
 		</div>
 		<div class="form-group">
 		<label for="maximumRate"><fmt:message key="label.authoring.advance.maximum.reply" /></label>
-		<html:select property="forum.maximumRate" styleId="maximumRate"   onchange="validateRatings(false);"  styleClass="form-control input-sm">
-			<html:option value="0">
-				<fmt:message key="label.authoring.advance.no.maximum" />
-			</html:option>
-			<html:option value="1">1</html:option>
-			<html:option value="2">2</html:option>
-			<html:option value="3">3</html:option>
-			<html:option value="4">4</html:option>
-			<html:option value="5">5</html:option>
-			<html:option value="6">6</html:option>
-			<html:option value="7">7</html:option>
-			<html:option value="8">8</html:option>
-			<html:option value="9">9</html:option>
-			<html:option value="10">10</html:option>
-		</html:select>
+		<input type="number" name="forum.maximumRate"  id="maximumRate" value="${forumForm.forum.maximumRate}" onchange="validateRatings(true);" class="form-control input-sm" min="0"/>
 		</div>
 	</div>
 </lams:SimplePanel>
@@ -97,39 +72,12 @@
 	<div class="form-inline loffset20">
 		<div class="form-group">
 		<label for="minimumReply"><fmt:message key="label.authoring.advance.minimum.reply" /></label>
-		<html:select property="forum.minimumReply" styleId="minimumReply" styleClass="form-control input-sm">
-			<html:option value="0">
-				<fmt:message key="label.authoring.advance.no.minimum" />
-			</html:option>
-			<html:option value="1">1</html:option>
-			<html:option value="2">2</html:option>
-			<html:option value="3">3</html:option>
-			<html:option value="4">4</html:option>
-			<html:option value="5">5</html:option>
-			<html:option value="6">6</html:option>
-			<html:option value="7">7</html:option>
-			<html:option value="8">8</html:option>
-			<html:option value="9">9</html:option>
-			<html:option value="10">10</html:option>
-		</html:select>
+		
+		<input type="number" name="forum.minimumReply"  id="minimumReply" value="${forumForm.forum.minimumReply}" class="form-control input-sm" min="0"/>
 		</div>
 		<div class="form-group">
 		<label for="maximumReply"><fmt:message key="label.authoring.advance.maximum.reply" /></label>
-		<html:select property="forum.maximumReply" styleId="maximumReply" styleClass="form-control input-sm">
-			<html:option value="0">
-				<fmt:message key="label.authoring.advance.no.maximum" />
-			</html:option>
-			<html:option value="1">1</html:option>
-			<html:option value="2">2</html:option>
-			<html:option value="3">3</html:option>
-			<html:option value="4">4</html:option>
-			<html:option value="5">5</html:option>
-			<html:option value="6">6</html:option>
-			<html:option value="7">7</html:option>
-			<html:option value="8">8</html:option>
-			<html:option value="9">9</html:option>
-			<html:option value="10">10</html:option>
-		</html:select>
+		<input type="number" name="forum.maximumReply"  id="maximumReply" value="${forumForm.forum.maximumReply}" class="form-control input-sm" min="0"/>
 		</div>
 	</div>
 </lams:SimplePanel>
@@ -265,18 +213,20 @@
 		}
 	}
 	checkRating();
+	
+	
 
 	function validateRatings(isMinimunRateDropdownUsed) {
-		var minRateDropDown = document.getElementById("minimumRate");
-		var minRatings = parseInt(minRateDropDown.options[minRateDropDown.selectedIndex].value);
-		var maxRateDropDown = document.getElementById("maximumRate");
-		var maxRatings = parseInt(maxRateDropDown.options[maxRateDropDown.selectedIndex].value);
-
+		
+		var minRateInput = document.getElementById("minimumRate");
+		 var minRatings = parseInt(minRateInput.value);
+		 var maxRateInput = document.getElementById("maximumRate");
+		 var maxRatings = parseInt(maxRateInput.value);
 		if ((minRatings > maxRatings) && !(maxRatings == 0)) {
 			if (isMinimunRateDropdownUsed) {
-				minRateDropDown.selectedIndex = maxRateDropDown.selectedIndex;
+				minRateInput.value = maxRatings;
 			} else {
-				maxRateDropDown.selectedIndex = minRateDropDown.selectedIndex;
+				maxRateInput.value = minRatings;
 			}
 
 			alert('<fmt:message key="js.error.validate.number"/>');
