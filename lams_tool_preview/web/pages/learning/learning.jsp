@@ -104,7 +104,7 @@
 		</div>
 			
 		<div class="panel">
-			<h4>${criteriaRatings.ratingCriteria.title}</h4>
+			<h4><c:out value="${criteriaRatings.ratingCriteria.title}" escapeXml="true"/></h4>
 		<c:choose>
 		<c:when test="${criteriaRatings.ratingCriteria.ratingStyle == isComment}">
 			<%@ include file="comment.jsp" %>
