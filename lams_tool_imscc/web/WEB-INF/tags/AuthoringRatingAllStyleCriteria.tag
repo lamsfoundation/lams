@@ -116,7 +116,8 @@
 				<c:set var="maxOrderId" value="${criteria.orderId}"/>
 			</c:if>
 			<c:if test="${criteria.ratingStyle > 0}">
-	 			addRow('${criteria.orderId}', '${criteria.ratingStyle}', '${criteria.title}', '${criteria.maxRating}', 
+				<c:set var="escapedTitle"><c:out value="${criteria.title}" escapeXml="true"/></c:set>
+	 			addRow('${criteria.orderId}', '${criteria.ratingStyle}', '${escapedTitle}', '${criteria.maxRating}', 
 	 					${criteria.commentsEnabled}, '${criteria.commentsMinWordsLimit}', '${criteria.minimumRates}', '${criteria.maximumRates}' );
 	 		</c:if>
 		</c:forEach>
