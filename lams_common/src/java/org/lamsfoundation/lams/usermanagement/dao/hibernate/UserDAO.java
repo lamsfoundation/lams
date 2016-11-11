@@ -19,25 +19,25 @@ public class UserDAO extends LAMSBaseDAO implements IUserDAO {
     @SuppressWarnings("unchecked")
     @Override
     public List<UserDTO> getAllUsersPaged(int page, int size, String sortBy, String sortOrder, String searchPhrase) {
-	
+
 	switch (sortBy) {
-	case "userId":
-	    sortBy = "user.userId + 0 ";
-	    break;
-	case "login":
-	    sortBy = "user.login ";
-	    break;
-	case "firstName":
-	    sortBy = "user.firstName ";
-	    break;
-	case "lastName":
-	    sortBy = "user.lastName ";
-	    break;
-	case "email":
-	    sortBy = "user.email ";
-	    break;
+	    case "userId":
+		sortBy = "user.userId + 0 ";
+		break;
+	    case "login":
+		sortBy = "user.login ";
+		break;
+	    case "firstName":
+		sortBy = "user.firstName ";
+		break;
+	    case "lastName":
+		sortBy = "user.lastName ";
+		break;
+	    case "email":
+		sortBy = "user.email ";
+		break;
 	}
-	
+
 	StringBuilder queryBuilder = new StringBuilder(
 		"SELECT user.userId, user.login, user.firstName, user.lastName, user.email FROM User user WHERE user.disabledFlag=0 ");
 	// support for custom search from a toolbar
@@ -155,9 +155,9 @@ public class UserDAO extends LAMSBaseDAO implements IUserDAO {
 
     private static void addNameSearch(StringBuilder queryBuilder, String entityName, String searchPhrase) {
 	if (!StringUtils.isBlank(searchPhrase)) {
-	    String[] tokens = StringEscapeUtils.escapeSql(searchPhrase).trim().split("\\s+");
+	    String[] tokens = searchPhrase.trim().split("\\s+");
 	    for (String token : tokens) {
-		String escToken = StringEscapeUtils.escapeSql(token);
+		String escToken = StringEscapeUtils.escapeSql(token).replace("\\", "\\\\");
 		queryBuilder.append(" AND (").append(entityName).append(".firstName LIKE '%").append(escToken)
 			.append("%' OR ").append(entityName).append(".lastName LIKE '%").append(escToken)
 			.append("%' OR ").append(entityName).append(".login LIKE '%").append(escToken).append("%' OR ")
