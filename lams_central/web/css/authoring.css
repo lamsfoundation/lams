@@ -35,8 +35,8 @@ a.ygtvspacer {
 
 .dialogContainer .modal-body {
 	height : 100%;
-	max-height: calc(100% - 60px);
-	padding: 5px;
+	max-height: calc(100% - 56px);
+	padding: 0;
 }
 
 .dialogContainer button {

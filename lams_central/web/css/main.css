@@ -316,7 +316,7 @@ ul.dropdown-usermenu li {
 
 .dialogContainer .modal-body {
 	height : 100%;
-	max-height: calc(100% - 60px);
+	max-height: calc(100% - 56px);
 	padding: 0;
 }
 
