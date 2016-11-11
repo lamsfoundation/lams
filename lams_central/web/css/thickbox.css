@@ -38,7 +38,7 @@
 }
 #TB_window {
   position: fixed;
-  background: #ffffff;
+  background: #525252;
   z-index: 102;
   color:#000000;
   display:none;
@@ -129,13 +129,14 @@
 
 /* Added by LAMS. Enables scrolling on iOS devices. */
 #TB_window {
+	-webkit-overflow-scrolling: touch !important;
+	overflow-y: auto !important;
 	height:100%;
 	width:90%;
 	max-width: 1200px;
+	border-width: 4px 4px 2px 4px;/* to compensate TB_iframeContent's cut in height of 2px */
 }
 #TB_iframeContent {
-	overflow-y: auto !important;
-	-webkit-overflow-scrolling: touch !important;
-	height:100%;
+	height:calc(100% - 2px);
 	width:100%;
 }
