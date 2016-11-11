@@ -20,7 +20,7 @@
 	</script>
 </lams:head>
 	
-<body class="stripes" onload="parent.resizeIframe();">
+<body class="stripes">
 	<html:form action="/authoring/saveOrUpdateItem" method="post" styleId="commonCartridgeItemForm">
 		<c:set var="formBean" value="<%= request.getAttribute(org.apache.struts.taglib.html.Constants.BEAN_KEY) %>" />
 	

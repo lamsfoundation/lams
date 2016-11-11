@@ -207,7 +207,7 @@
 		
 	</lams:head>
 	
-	<body class="stripes" onload="parent.resizeIframe();">
+	<body class="stripes">
 	
 	<div class="row no-gutter">
 		<div class="col-xs-12">

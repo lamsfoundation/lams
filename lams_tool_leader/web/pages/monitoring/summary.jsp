@@ -76,7 +76,7 @@
 </div> 
 </c:if>
 
-<a href="<c:url value='/monitoring.do'/>?dispatch=manageLeaders&sessionMapID=${sessionMapID}&KeepThis=true&TB_iframe=true&height=400&width=650" class="btn btn-default thickbox" title="<fmt:message key="label.manage.leaders" />">
+<a href="<c:url value='/monitoring.do'/>?dispatch=manageLeaders&sessionMapID=${sessionMapID}&KeepThis=true&TB_iframe=true" class="btn btn-default thickbox" title="<fmt:message key="label.manage.leaders" />">
 	<fmt:message key="label.manage.leaders" />
 </a>
 

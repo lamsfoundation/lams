@@ -30,24 +30,6 @@
 	    });
 	}
 
-	function resizeIframe() {
-		if (document.getElementById('TB_iframeContent') != null) {
-		    var height = top.window.innerHeight;
-		    if ( height == undefined || height == 0 ) {
-		    	// IE doesn't use window.innerHeight.
-		    	height = document.documentElement.clientHeight;
-		    	// alert("using clientHeight");
-		    }
-		 	// alert("doc height "+height);
-		    height -= document.getElementById('TB_iframeContent').offsetTop + 260;
-		    document.getElementById('TB_iframeContent').style.height = height +"px";
-	
-			TB_HEIGHT = height + 28;
-			tb_position();
-		}
-	};
-	window.onresize = resizeIframe;
-
 	function refreshThickbox(){
 		tb_init('a.thickbox, area.thickbox, input.thickbox');//pass where to apply thickbox
 	};
@@ -89,7 +71,7 @@
 </div>
   
 <p>
-	<a href="<html:rewrite page="/authoring.do"/>?dispatch=newQuestionBox&contentFolderID=${mcGeneralAuthoringDTO.contentFolderID}&httpSessionID=${mcGeneralAuthoringDTO.httpSessionID}&toolContentID=${mcGeneralAuthoringDTO.toolContentID}&sln=${mcGeneralAuthoringDTO.sln}&showMarks=${mcGeneralAuthoringDTO.showMarks}&randomize=${mcGeneralAuthoringDTO.randomize}&questionsSequenced=${mcGeneralAuthoringDTO.questionsSequenced}&retries=${mcGeneralAuthoringDTO.retries}&KeepThis=true&TB_iframe=true&height=540&width=950&modal=true"
+	<a href="<html:rewrite page="/authoring.do"/>?dispatch=newQuestionBox&contentFolderID=${mcGeneralAuthoringDTO.contentFolderID}&httpSessionID=${mcGeneralAuthoringDTO.httpSessionID}&toolContentID=${mcGeneralAuthoringDTO.toolContentID}&sln=${mcGeneralAuthoringDTO.sln}&showMarks=${mcGeneralAuthoringDTO.showMarks}&randomize=${mcGeneralAuthoringDTO.randomize}&questionsSequenced=${mcGeneralAuthoringDTO.questionsSequenced}&retries=${mcGeneralAuthoringDTO.retries}&KeepThis=true&TB_iframe=true&modal=true"
 		class="btn btn-default btn-sm thickbox"> 
 		<i class="fa fa-plus"></i>&nbsp;<fmt:message key="label.save.question" /> 
 	</a>

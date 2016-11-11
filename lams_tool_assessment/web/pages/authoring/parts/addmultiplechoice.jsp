@@ -109,7 +109,7 @@
    		}    
 	</script>
 </lams:head>
-<body onload="parent.resizeThickbox();">
+<body>
 	<div class="panel panel-default add-file">
 		<div class="panel-heading panel-title">
 			<fmt:message key="label.authoring.basic.type.multiple.choice" />

@@ -18,21 +18,4 @@
 <script type="text/javascript" src="${lams}includes/javascript/bootstrap.min.js"></script>
 <script type="text/javascript" src="${lams}includes/javascript/bootstrap.tabcontroller.js"></script>
 <script type="text/javascript" src="${tool}includes/javascript/monitoring.js"></script>
-<script type="text/javascript">
-	function resizeIframe() {
-		if (document.getElementById('TB_iframeContent') != null) {
-		    var height = top.window.innerHeight;
-		    if ( height == undefined || height == 0 ) {
-		    	// IE doesn't use window.innerHeight.
-		    	height = document.documentElement.clientHeight;
-		    }
-		    height -= document.getElementById('TB_iframeContent').offsetTop + 60;
-		    document.getElementById('TB_iframeContent').style.height = height +"px";
-	
-			TB_HEIGHT = height + 28;
-			tb_position();
-		}
-	};
-	window.onresize = resizeIframe;
-</script>
 

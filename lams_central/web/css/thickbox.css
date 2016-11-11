@@ -36,10 +36,6 @@
   -moz-opacity: 0.75;
   opacity: 0.75;
 }
-* html #TB_overlay { /* ie6 hack */
-     position: absolute;
-     height: expression(document.body.scrollHeight > document.body.offsetHeight ? document.body.scrollHeight : document.body.offsetHeight + 'px');
-}
 #TB_window {
   position: fixed;
   background: #ffffff;
@@ -48,12 +44,11 @@
   display:none;
   border: 4px solid #525252;
   text-align:left;
-  top:50%;
-  left:50%;
-}
-* html #TB_window { /* ie6 hack */
-position: absolute;
-margin-top: expression(0 - parseInt(this.offsetHeight / 2) + (TBWindowMargin = document.documentElement && document.documentElement.scrollTop || document.body.scrollTop) + 'px');
+  margin-left: auto;
+  margin-right: auto;
+  left: 0;
+  right: 0;
+  top: 0;
 }
 #TB_window img#TB_Image {
   display:block;
@@ -112,10 +107,6 @@ margin-top: expression(0 - parseInt(this.offsetHeight / 2) + (TBWindowMargin = d
   margin: -6px 0 0 -104px; /* -height/2 0 0 -width/2 */
   background-image: url(../images/loadingAnimation.gif); /* modified by LAMS */
 }
-* html #TB_load { /* ie6 hack */
-position: absolute;
-margin-top: expression(0 - parseInt(this.offsetHeight / 2) + (TBWindowMargin = document.documentElement && document.documentElement.scrollTop || document.body.scrollTop) + 'px');
-}
 #TB_HideSelect{
   z-index:99;
   position:fixed;
@@ -129,23 +120,22 @@ margin-top: expression(0 - parseInt(this.offsetHeight / 2) + (TBWindowMargin = d
   height:100%;
   width:100%;
 }
-* html #TB_HideSelect { /* ie6 hack */
-     position: absolute;
-     height: expression(document.body.scrollHeight > document.body.offsetHeight ? document.body.scrollHeight : document.body.offsetHeight + 'px');
-}
 #TB_iframeContent{
   clear:both;
   border:none;
   margin-bottom:-1px;
-  margin-top:1px;
   _margin-bottom:1px;
 }
 
 /* Added by LAMS. Enables scrolling on iOS devices. */
 #TB_window {
+	height:100%;
+	width:90%;
+	max-width: 1200px;
+}
+#TB_iframeContent {
 	overflow-y: auto !important;
 	-webkit-overflow-scrolling: touch !important;
-}
-#TB_iframeContent, #TB_overlay, #TB_window {
-	height:100% !important;
+	height:100%;
+	width:100%;
 }

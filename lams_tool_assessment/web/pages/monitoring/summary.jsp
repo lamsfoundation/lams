@@ -34,7 +34,7 @@
 			   		var userId = jQuery("#list${sessionDto.sessionId}").getCell(rowid, 'userId');
 			   		var sessionId = jQuery("#list${sessionDto.sessionId}").getCell(rowid, 'sessionId');
 					var userSummaryUrl = '<c:url value="/monitoring/userSummary.do?sessionMapID=${sessionMapID}"/>';
-					var newUserSummaryHref = userSummaryUrl + "&userID=" + userId + "&sessionId=" + sessionId + "&KeepThis=true&TB_iframe=true&height=540&width=750&modal=true";
+					var newUserSummaryHref = userSummaryUrl + "&userID=" + userId + "&sessionId=" + sessionId + "&KeepThis=true&TB_iframe=true&modal=true";
 					$("#userSummaryHref").attr("href", newUserSummaryHref);	
 					$("#userSummaryHref").click(); 		
 			  	},
@@ -144,7 +144,7 @@
 			var questionUid = $("#questionUid").val();
 			if (questionUid != -1) {
 				var questionSummaryUrl = '<c:url value="/monitoring/questionSummary.do?sessionMapID=${sessionMapID}"/>';
-				var questionSummaryHref = questionSummaryUrl + "&questionUid=" + questionUid + "&KeepThis=true&TB_iframe=true&height=400&width=750&modal=true";
+				var questionSummaryHref = questionSummaryUrl + "&questionUid=" + questionUid + "&KeepThis=true&TB_iframe=true&modal=true";
 				$("#questionSummaryHref").attr("href", questionSummaryHref);	
 				$("#questionSummaryHref").click(); 		 
 			}
@@ -166,31 +166,6 @@
 		url = url + param;
 		location.href=url;
 	};
-
-	function resizeIframe() {
-		if (document.getElementById('TB_iframeContent') != null) {
-		    var height = top.window.innerHeight;
-		    if ( height == undefined || height == 0 ) {
-		    	// IE doesn't use window.innerHeight.
-		    	height = document.documentElement.clientHeight;
-		    }
-		    height -= document.getElementById('TB_iframeContent').offsetTop + 60;
-		    document.getElementById('TB_iframeContent').style.height = height +"px";
-			TB_HEIGHT = height + 28;
-			
-		    var width = top.window.innerWidth;
-		    if ( width == undefined || width == 0 ) {
-		    	// IE doesn't use window.innerWidth.
-		    	width = document.documentElement.clientWidth;
-		    }
-		    width -= document.getElementById('TB_iframeContent').offsetLeft + 60;
-		    document.getElementById('TB_iframeContent').style.width = width +"px";
-			TB_WIDTH = width + 1;
-			
-			tb_position();
-		}
-	};
-	window.onresize = resizeIframe;
 </script>
 
 <div class="panel">

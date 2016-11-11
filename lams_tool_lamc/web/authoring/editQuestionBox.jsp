@@ -149,7 +149,7 @@
 		</script>
 	</lams:head>
 
-<body class="stripes" onload="parent.resizeIframe();">
+<body class="stripes">
 
 	<html:form action="/authoring?validate=false" styleId="newQuestionForm" enctype="multipart/form-data" method="POST">
 

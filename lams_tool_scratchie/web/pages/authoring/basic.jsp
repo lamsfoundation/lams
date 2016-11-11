@@ -53,29 +53,11 @@
 			}
 		);
 	}
-	
-	function resizeIframe() {
-		if (document.getElementById('TB_iframeContent') != null) {
-		    var height = top.window.innerHeight;
-		    if ( height == undefined || height == 0 ) {
-		    	// IE doesn't use window.innerHeight.
-		    	height = document.documentElement.clientHeight;
-		    	// alert("using clientHeight");
-		    }
-		 	// alert("doc height "+height);
-		    height -= document.getElementById('TB_iframeContent').offsetTop + 260;
-		    document.getElementById('TB_iframeContent').style.height = height +"px";
-	
-			TB_HEIGHT = height + 28;
-			tb_position();
-		}
-	};
-	window.onresize = resizeIframe;
 
 	function createNewQuestionInitHref() {
 		var questionTypeDropdown = document.getElementById("questionType");
 		var questionType = questionTypeDropdown.selectedIndex + 1;
-		var newQuestionInitHref = "${newQuestionInitUrl}&questionType=" + questionType + "&referenceGrades=" + encodeURIComponent(serializeReferenceGrades()) + "&KeepThis=true&TB_iframe=true&height=640&width=950&modal=true";
+		var newQuestionInitHref = "${newQuestionInitUrl}&questionType=" + questionType + "&referenceGrades=" + encodeURIComponent(serializeReferenceGrades()) + "&KeepThis=true&TB_iframe=true&modal=true";
 		$("#newQuestionInitHref").attr("href", newQuestionInitHref)
 	};
 	
@@ -132,7 +114,7 @@
 	
 	<div>
 		<c:set var="addItemUrl" >
-			<c:url value='/authoring/addItem.do'/>?sessionMapID=${sessionMapID}&KeepThis=true&TB_iframe=true&height=540&width=850&modal=true
+			<c:url value='/authoring/addItem.do'/>?sessionMapID=${sessionMapID}&KeepThis=true&TB_iframe=true&modal=true
 		</c:set>
 		<a href="${addItemUrl}" class="btn btn-default btn-sm thickbox">
 			<i class="fa fa-plus"></i>&nbsp;<fmt:message key="label.authoring.basic.add.another.scratchie" /> 
