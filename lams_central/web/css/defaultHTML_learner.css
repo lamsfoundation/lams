@@ -345,6 +345,79 @@ nav.navbar-heading {
 	cursor: pointer;
 }
 
+/** Special settings for the nav bar used in monitoring, authoring, etc */
+.panel-monitor-page .navbar {
+    min-height: 40px;
+}   
+
+.panel-monitor-page .navbar-heading .divider {
+	height: 40px;
+}
+
+/* small display - drop down menu view */
+@media (max-width: 767px) {
+	.panel-monitor-page .navbar-brand {
+		color:#337ab7 !important;
+	 	height: 35px;
+	    margin-top: 5px;
+	    margin-bottom: 3px;
+	   	padding: 5px 10px 5px 25px;
+	}
+	
+	.panel-monitor-page>.navbar-toggle {
+	    margin-top: 3px;
+	    margin-bottom: 3px;
+	}
+	.panel-monitor-page .navbar-nav>li>a {
+	 	padding: 5px;
+	}
+	
+	.panel-monitor-page .navbar-text {
+		cursor: pointer;
+	 	margin-top: 5px;
+		margin-bottom: 5px;
+	}
+	
+	.panel-monitor-page .navbar-header .navbar-toggle {
+	    margin-top: 3px;
+	    margin-bottom: 3px;
+	}
+	
+	.panel-monitor-page .divider {
+		display:none
+	}
+	
+	.panel-monitor-page .navbar-heading .in .navbar-text {
+		padding-left: 4px;
+	}
+
+}
+
+/* normal display */ 
+@media (min-width: 768px) {
+	
+	.panel-monitor-page .navbar-brand {
+		color:#337ab7 !important;
+ 		height: 40px;
+   		padding: 10px;
+	}
+
+	.panel-monitor-page .navbar-nav>li>a {
+	 	padding: 10px;
+	}
+	
+	.panel-monitor-page .navbar-text {
+		cursor: pointer;
+	 	margin-top: 10px;
+		margin-bottom: 10px;
+	}
+	
+	.panel-monitor-page .navbar-heading .in .navbar-text {
+		padding-left: 15px;
+	}
+	
+}
+
 ul.dropdown-menu {
 	left: auto;
 	right: 0;
