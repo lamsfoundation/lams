@@ -32,11 +32,6 @@ dd {
 	padding-bottom: 0;
 }
 
-#content .navbar-collapse {
-	padding-left: 0;
-}
-
-
 .errorMessage {
 	font-weight: bold;
 	color: red;
