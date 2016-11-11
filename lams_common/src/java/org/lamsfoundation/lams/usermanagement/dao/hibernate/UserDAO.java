@@ -90,7 +90,7 @@ public class UserDAO extends BaseDAO implements IUserDAO {
 	if (!StringUtils.isBlank(searchString)) {
 	    String[] tokens = searchString.trim().split("\\s+");
 	    for (String token : tokens) {
-		String escToken = StringEscapeUtils.escapeSql(token);
+		String escToken = StringEscapeUtils.escapeSql(token).replace("\\", "\\\\");
 		queryWithSearch.append(" AND (user.firstName LIKE '%").append(escToken)
 			.append("%' OR user.lastName LIKE '%").append(escToken).append("%' OR user.login LIKE '%")
 			.append(escToken).append("%' OR user.email LIKE '%").append(escToken).append("%')");
