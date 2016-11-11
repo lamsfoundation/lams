@@ -110,7 +110,7 @@ j_security_login_page
 				<div id="login-right-col">
 				<p class="version"><fmt:message key="msg.LAMS.version"/> <%= Configuration.get(ConfigurationKeys.VERSION) %></p>
 				 <h2><fmt:message key="button.login"/></h2>
-				 <form action="j_security_check" method="post" name="loginForm" id="loginForm">
+				 <form action="j_security_check" method="post" name="loginForm" id="loginForm" autocomplete="off">
 					<c:if test="${!empty param.failed}">
 						<div class="warning-login">
 							<fmt:message key="error.login"/>
