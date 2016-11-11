@@ -56,7 +56,7 @@
 		</script>
 	</lams:head>
 
-	<body class="stripes" onload="parent.resizeIframe();">
+	<body class="stripes">
 		<lams:Page type="learner" title="${item.title}">
 			
 			<div id="kplayer">

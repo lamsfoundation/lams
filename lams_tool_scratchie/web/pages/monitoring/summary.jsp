@@ -178,7 +178,7 @@
 			var itemUid = $(this).val();
 			if (itemUid != -1) {
 				var itemSummaryUrl = '<c:url value="/monitoring/itemSummary.do?sessionMapID=${sessionMapID}"/>';
-				var itemSummaryHref = itemSummaryUrl + "&itemUid=" + itemUid + "&KeepThis=true&TB_iframe=true&height=400&width=650";
+				var itemSummaryHref = itemSummaryUrl + "&itemUid=" + itemUid + "&KeepThis=true&TB_iframe=true";
 				$("#item-summary-href").attr("href", itemSummaryHref);	
 
 				//return;
@@ -217,22 +217,6 @@
 	function exportExcel(){
 		location.href = "<c:url value='/monitoring/exportExcel.do'/>?sessionMapID=${sessionMapID}&reqID=" + (new Date()).getTime();
 	};
-
-	function resizeIframe() {
-		if (document.getElementById('TB_iframeContent') != null) {
-		    var height = top.window.innerHeight;
-		    if ( height == undefined || height == 0 ) {
-		    	// IE doesn't use window.innerHeight.
-		    	height = document.documentElement.clientHeight;
-		    }
-		    height -= document.getElementById('TB_iframeContent').offsetTop + 60;
-		    document.getElementById('TB_iframeContent').style.height = height +"px";
-	
-			TB_HEIGHT = height + 28;
-			tb_position();
-		}
-	};
-	window.onresize = resizeIframe;
 	
 	// pass settings to monitorToolSummaryAdvanced.js
 	var submissionDeadlineSettings = {

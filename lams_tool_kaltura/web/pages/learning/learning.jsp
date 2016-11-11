@@ -257,7 +257,7 @@
 		
 			<div id="add-new-item">
 				<c:if test="${sessionMap.isAllowUpload && (not finishedLock)}">
-					<a href="<c:url value='/pages/learning/uploaditem.jsp'/>?sessionMapID=${sessionMapID}&KeepThis=true&TB_iframe=true&height=570&width=740&modal=true" class="btn btn-sm btn-default thickbox">  
+					<a href="<c:url value='/pages/learning/uploaditem.jsp'/>?sessionMapID=${sessionMapID}&KeepThis=true&TB_iframe=true&modal=true" class="btn btn-sm btn-default thickbox">  
 						<fmt:message key="label.learning.add.new.image" />
 					</a>
 				</c:if>

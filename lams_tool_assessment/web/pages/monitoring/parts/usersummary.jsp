@@ -137,7 +137,7 @@
   		</script>
 	</lams:head>
 	
-<body class="stripes" onload="parent.resizeIframe();">
+<body class="stripes">
 
 	<div class="panel panel-default">
 		<div class="panel-heading">

@@ -8,7 +8,7 @@
 	
 	<%@ include file="/common/tabbedheader.jsp"%>
 	
-	<link rel="stylesheet" type="text/css" href="<html:rewrite page='/includes/css/thickbox.css'/>" />
+	<link rel="stylesheet" type="text/css" href="${lams}/css/thickbox.css" />
 	
  	<script type="text/javascript" src="${lams}includes/javascript/thickbox.js"></script>
 	<script>

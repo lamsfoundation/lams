@@ -24,7 +24,7 @@
 	</script>
 </lams:head>
 
-<body class="stripes" onload="parent.resizeIframe();">
+<body class="stripes">
 <form id="itemForm" name="itemForm" action="<c:url value='/authoring/selectResources.do'/>">
 	<c:set var="formBean" value="<%= request.getAttribute(org.apache.struts.taglib.html.Constants.BEAN_KEY) %>" />
 	

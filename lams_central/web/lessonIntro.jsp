@@ -12,15 +12,8 @@
 <lams:head>
 	<TITLE><fmt:message key="title.learner.window"/></TITLE>
 	<link rel="stylesheet" href="css/defaultHTML_learner.css" type="text/css" media="screen" />
-	<link rel="stylesheet" href="css/thickbox.css" type="text/css" media="screen">
 	
-	<script type="text/javascript" src="includes/javascript/jquery.js"></script>
-	<script type="text/javascript" src="includes/javascript/thickbox.js"></script>
-	
-	<style media="screen,projection" type="text/css">
-		#TB_iframeContent {width: 820px !important}
-	</style>	
-	
+	<script type="text/javascript" src="includes/javascript/jquery.js"></script>	
 	<c:if test="${displayDesignImage}">
 		<script>
 		var originalThumbnailWidth = 0,

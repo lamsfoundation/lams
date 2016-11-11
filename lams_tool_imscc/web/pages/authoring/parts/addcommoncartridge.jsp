@@ -8,7 +8,7 @@
 	<script type="text/javascript" src="<html:rewrite page='/includes/javascript/commonCartridgeItem.js'/>"></script>
 </lams:head>
 	
-<body class="stripes" onload="parent.resizeIframe();">
+<body class="stripes">
 	<html:form action="/authoring/saveOrUpdateItem" method="post" styleId="commonCartridgeItemForm" enctype="multipart/form-data">
 		<c:set var="itemAttachment" value="<%=request.getAttribute(org.apache.struts.taglib.html.Constants.BEAN_KEY)%>" />
 	

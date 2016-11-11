@@ -132,7 +132,7 @@
 		</div>
 		<div class="btn-group btn-group-xs pull-right roffset5" role="group">		
 			<c:set var="importInitUrl" >
-				<c:url value='/authoring/importInit.do'/>?sessionMapID=${sessionMapID}&KeepThis=true&TB_iframe=true&height=240&width=650
+				<c:url value='/authoring/importInit.do'/>?sessionMapID=${sessionMapID}&KeepThis=true&TB_iframe=true
 			</c:set>
 			<a href="${importInitUrl}" class="btn btn-default btn-xs loffset5 thickbox" id="importButton">  
 				<fmt:message key="label.authoring.basic.import.questions" />
@@ -191,7 +191,7 @@
 				
 				<td class="text-right">
 					<c:set var="editQuestionUrl" >
-						<c:url value='/authoring/editQuestion.do'/>?sessionMapID=${sessionMapID}&questionIndex=${status.index}&KeepThis=true&TB_iframe=true&height=540&width=850&modal=true
+						<c:url value='/authoring/editQuestion.do'/>?sessionMapID=${sessionMapID}&questionIndex=${status.index}&KeepThis=true&TB_iframe=true&modal=true
 					</c:set>
 					
 					<a href="${editQuestionUrl}" class="thickbox roffset5" style="margin-left: 20px;"> 

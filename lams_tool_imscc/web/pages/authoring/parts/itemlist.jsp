@@ -29,7 +29,7 @@
 						</td>
 						<td width="5%">
 							<c:set var="editItemUrl" >
-								<c:url value='/authoring/editItemInit.do'/>?sessionMapID=${sessionMapID}&itemIndex=${status.index}&KeepThis=true&TB_iframe=true&height=540&width=850&modal=true
+								<c:url value='/authoring/editItemInit.do'/>?sessionMapID=${sessionMapID}&itemIndex=${status.index}&KeepThis=true&TB_iframe=true&modal=true
 							</c:set>		
 							<a href="${editItemUrl}" class="thickbox" style="border-style: none;"> 
 								<i class="fa fa-pencil"	title="<fmt:message key="label.authoring.basic.resource.edit" />"></i>

@@ -35,7 +35,7 @@
 					
 					<td align="center" style="width:5%">
 						<c:set var="editItemUrl" >
-							<c:url value='/authoring/editItem.do'/>?sessionMapID=${sessionMapID}&itemIndex=${status.index}&KeepThis=true&TB_iframe=true&height=540&width=850&modal=true
+							<c:url value='/authoring/editItem.do'/>?sessionMapID=${sessionMapID}&itemIndex=${status.index}&KeepThis=true&TB_iframe=true&modal=true
 						</c:set>		
 						<a href="${editItemUrl}" class="thickbox"> 
 							<i class="fa fa-pencil"	title="<fmt:message key='label.edit' />"/></i>

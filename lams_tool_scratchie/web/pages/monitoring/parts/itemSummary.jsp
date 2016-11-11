@@ -81,7 +81,7 @@
 		
 	</lams:head>
 	
-	<body class="stripes" onload="parent.resizeIframe();">
+	<body class="stripes">
 	
 		<c:set var="title"><fmt:message key="label.monitoring.summary.report.for" >
 					<fmt:param>${fn:escapeXml(item.title)}</fmt:param>

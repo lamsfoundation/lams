@@ -30,7 +30,7 @@
 		
 	</lams:head>
 	
-	<body class="stripes" onload="parent.resizeIframe();">
+	<body class="stripes">
 
 	<c:set var="title"><fmt:message key="label.plese.select.leaders" /></c:set>
 	<lams:Page type="learner" title="${title}">
