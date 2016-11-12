@@ -23,6 +23,8 @@
 		<label for="showAggregatedReports">
 		<html:checkbox property="showAggregatedReports" value="1" styleId="showAggregatedReports"></html:checkbox>
 		<fmt:message key="advanced.showAggregatedReports" />
+		<br/>
+		<span class="help-block"><fmt:message key="advanced.showAggregatedReportsNote"/></span>
 		</label>
 	</div>
 </lams:SimplePanel>
