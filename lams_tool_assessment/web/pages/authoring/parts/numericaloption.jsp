@@ -3,7 +3,7 @@
 <table class="table-row-spacing">
 	<tr>
 		<td style="width: 120px;">
-			<fmt:message key="label.authoring.basic.option.answer"/> ${status.index+1}
+			<fmt:message key="label.authoring.basic.option.answer"/>&nbsp;${status.index+1}
 		</td>
 		<td>
 			<div class="form-inline">    	
@@ -42,10 +42,11 @@
 		<td colspan="2">
 			<div class="form-group">
 				<label for="optionFeedback${status.index}">
-					<fmt:message key="label.authoring.basic.option.feedback"></fmt:message>
+					<a data-toggle="collapse" data-target="#feedback${status.index}"><i class="fa fa-xs fa-plus-square-o roffset5" aria-hidden="true"></i><fmt:message key="label.authoring.basic.option.feedback"></fmt:message></a>
 				</label>
-					            	
-				<lams:CKEditor id="optionFeedback${status.index}" value="${option.feedback}" contentFolderID="${contentFolderID}"/>
+				<div id="feedback${status.index}" class="collapse <c:if test="${not empty option.feedback}">in</c:if>">
+					<lams:CKEditor id="optionFeedback${status.index}" value="${option.feedback}" contentFolderID="${contentFolderID}"/>
+				</div>	
 			</div>
 		</td>
 	</tr>
