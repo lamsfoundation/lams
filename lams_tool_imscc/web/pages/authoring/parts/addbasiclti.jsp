@@ -92,11 +92,11 @@
 			</c:if>
 
 			<div class="voffset10 pull-right">
-				<a href="#nogo" onclick="javascript:formSubmit();" class="btn btn-sm btn-default button-add-item">
-					<fmt:message key="label.authoring.basic.add.url" /> 
-				</a>
 				<a href="#nogo" onclick="javascript:self.parent.tb_remove();" class="btn btn-sm btn-default loffset5">
 					<fmt:message key="label.cancel" /> 
+				</a>
+				<a href="#nogo" onclick="javascript:formSubmit();" class="btn btn-sm btn-primary button-add-item">
+					<fmt:message key="label.authoring.basic.add.url" /> 
 				</a>
 			</div>
 					

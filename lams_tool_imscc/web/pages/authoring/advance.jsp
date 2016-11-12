@@ -14,7 +14,7 @@
 
 <div class="select">
 	<html:select property="commonCartridge.miniViewCommonCartridgeNumber"
-			styleId="viewNumList" styleClass="form-control form-control-inline roffset5">
+			styleId="viewNumList" styleClass="form-control input-sm form-control-inline roffset5">
 		<c:forEach begin="1" end="${fn:length(commonCartridgeList)}" varStatus="status">
 			<c:choose>
 				<c:when test="${formBean.commonCartridge.miniViewCommonCartridgeNumber == status.index}">
