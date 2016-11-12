@@ -41,9 +41,9 @@
 				contentFolderID="${sessionMap.contentFolderID}"></lams:CKEditor>
 </div>
 
-<h4 class="spacer-left">
+<strong>
 	<fmt:message key="label.authoring.basic.heading" />
-</h4>
+</strong>
 
 <div id="itemListArea">
 	<%@ include file="parts/headingList.jsp"%>
@@ -51,8 +51,9 @@
 
 <a 
 	href="javascript:showMessage('<html:rewrite page="/authoring.do?dispatch=loadHeadingForm&amp;sessionMapID=${formBean.sessionMapID}"/>');"
-	class="btn btn-default"><i class="fa fa-plus"></i>&nbsp;<fmt:message key="label.authoring.basic.heading.add" /> </a>
-</p>
+	class="btn btn-sm btn-default"><i class="fa fa-plus"></i>&nbsp;<fmt:message key="label.authoring.basic.heading.add" /> </a>
+</a>
+
 
 <div id="iframeArea" name="iframeArea" class="voffset10"></div>
 
