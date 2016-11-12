@@ -2,7 +2,7 @@
 
 <div class="form-group">
 	<label for="optionQuestion${status.index}">
-		<fmt:message key="label.authoring.basic.option.question"/> ${status.index+1}
+		<fmt:message key="label.authoring.basic.option.question"/>&nbsp;${status.index+1}
 	</label>
 		            	
 	<lams:CKEditor id="optionQuestion${status.index}" value="${option.question}" contentFolderID="${contentFolderID}"/>

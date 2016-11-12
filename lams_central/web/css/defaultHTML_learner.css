@@ -636,3 +636,9 @@ section{
 	padding-top: 2px;
 	border-top: 1px solid#e7e7e7;
 }
+
+/* fontawesome icon x-small */
+.fa-xs {
+	font-size: smaller;
+}
+}

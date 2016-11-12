@@ -128,28 +128,21 @@
 					<lams:CKEditor id="question" value="${formBean.question}" contentFolderID="${formBean.contentFolderID}" />
 				</div>
 				
-				<div class="form-group">
-				    <label for="defaultGrade">
-				    	<fmt:message key="label.authoring.basic.default.question.grade" />
-				    	<i class="fa fa-xs fa-asterisk text-danger pull-right" title="<fmt:message key="label.required.field"/>" alt="<fmt:message key="label.required.field"/>"></i>
-				    </label>
-				    <html:text property="defaultGrade" styleClass="form-control short-input-text input-sm"/>
-				</div>
-				
 				<div class="checkbox">
 					<label for="answer-required">
 						<html:checkbox property="answerRequired" styleId="answer-required"/>
 						<fmt:message key="label.authoring.answer.required" />
 					</label>
 				</div>
-				
-				<div class="generalFeedback">
-				  <a data-toggle="collapse" data-target="#general-feedback"><i class="fa fa-plus-square-o roffset5" aria-hidden="true"></i><fmt:message key="label.authoring.basic.general.feedback" /></a>
-					<div id="general-feedback"  class="collapse form-group">
-						<lams:CKEditor id="generalFeedback" value="${formBean.generalFeedback}" contentFolderID="${formBean.contentFolderID}" />
-					</div>
+
+				<div class="form-group form-inline">
+				    <label for="defaultGrade">
+				    	<fmt:message key="label.authoring.basic.default.question.grade" />:
+				    	<i class="fa fa-xs fa-asterisk text-danger pull-right" title="<fmt:message key="label.required.field"/>" alt="<fmt:message key="label.required.field"/>"></i>
+				    </label>
+				    <html:text property="defaultGrade" styleClass="form-control short-input-text input-sm"/>
 				</div>
-	
+					
 				<div class="checkbox">
 					<label for="shuffle">
 						<html:checkbox property="shuffle" styleId="shuffle"/>
@@ -162,6 +155,13 @@
 						<html:checkbox property="hedgingJustificationEnabled" styleId="hedging-justification"/>
 						<fmt:message key="label.ask.for.hedging.justification" />
 					</label>
+				</div>
+
+				<div class="generalFeedback">
+				  <a data-toggle="collapse" data-target="#general-feedback"><i class="fa fa-xs fa-plus-square-o roffset5" aria-hidden="true"></i><fmt:message key="label.authoring.basic.general.feedback" /></a>
+					<div id="general-feedback"  class="voffset5 collapse form-group <c:if test="${not empty formBean.generalFeedback}">in</c:if>">
+						<lams:CKEditor id="generalFeedback" value="${formBean.generalFeedback}" contentFolderID="${formBean.contentFolderID}" />
+					</div>
 				</div>
 				
 				<h5 class="voffset20">
@@ -183,9 +183,9 @@
 			<!-- Overall feedback -->
 			<br/>
 			<div class="overallFeedback">
-			  <a data-toggle="collapse" data-target="#overall-feedback"><i class="fa fa-plus-square-o roffset5" aria-hidden="true"></i><fmt:message key="label.authoring.choice.overall.feedback" /></a>
+			  <a data-toggle="collapse" data-target="#overall-feedback"><i class="fa fa-xs fa-plus-square-o roffset5" aria-hidden="true"></i><fmt:message key="label.authoring.choice.overall.feedback" /></a>
 			
-				<div id="overall-feedback" class="collapse">
+				<div id="overall-feedback" class="collapse <c:if test="${(not empty formBean.feedbackOnCorrect) || (not empty formBean.feedbackOnPartiallyCorrect) || (not empty formBean.feedbackOnIncorrect) }">in</c:if>">
 					<div class="form-group">
 						<label for="feedbackOnCorrectOutsideForm">
 							<fmt:message key="label.authoring.choice.feedback.on.correct" />
@@ -214,7 +214,7 @@
 					<fmt:message key="label.cancel" />
 				</a>
 				<a href="#nogo" onclick="javascript:$('#assessmentQuestionForm').submit();" class="btn btn-sm btn-default button-add-item">
-					<fmt:message key="label.authoring.choice.add.multiple.choice" />
+					<fmt:message key="label.authoring.save.button" />
 				</a>
 				
 			</div>
