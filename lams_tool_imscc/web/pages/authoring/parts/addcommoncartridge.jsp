@@ -28,11 +28,11 @@
 			</div>		
 		
 			<div class="voffset10 pull-right">
-				<a href="#nogo" onclick="javascript:submitCommonCartridgeItem();" onmousedown="self.focus();" class="btn btn-sm btn-default button-add-item">
-					<fmt:message key="button.upload" />
-				</a>
 				<a href="#nogo" onclick="javascript:self.parent.tb_remove();" onmousedown="self.focus();" class="btn btn-sm btn-default loffset5">
 					<fmt:message key="label.cancel" /> 
+				</a>
+				<a href="#nogo" onclick="javascript:submitCommonCartridgeItem();" onmousedown="self.focus();" class="btn btn-sm btn-primary">
+					<i class="fa fa-upload"></i> <fmt:message key="button.upload" />
 				</a>
 			</div>
 			
