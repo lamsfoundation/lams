@@ -14,6 +14,13 @@
 			});
 			currentMark = mark;
 			$("#totalMark").html(currentMark);
+			
+			if ( currentMark == ${criteriaRatings.ratingCriteria.maxRating} ) {
+				showButtons();
+			} else {
+				hideButtons();
+			}
+
 		} 		
 				
 		function submitEntry(next){
@@ -24,7 +31,6 @@
 				$("#editForm").submit();
 			} else {
 				alert('<fmt:message key="error.assign.marks"><fmt:param>${criteriaRatings.ratingCriteria.maxRating}</fmt:param></fmt:message>');
-				showButtons();
 			}
 		}
 		

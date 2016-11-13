@@ -40,10 +40,10 @@
 	<script type="text/javascript">
 
 		function hideButtons() {
-			$("#buttondiv").css("visibility", "hidden");
+			$("#buttonNextPrevDiv").css("visibility", "hidden");
 		}	
 		function showButtons() {
-			$("#buttondiv").css("visibility", "visible");
+			$("#buttonNextPrevDiv").css("visibility", "visible");
 		}	
 
  		function finishSession(){
@@ -114,7 +114,7 @@
 		</c:when>
 		<c:when test="${criteriaRatings.ratingCriteria.ratingStyle == isRanking}">
 			<c:choose>
-			<c:when test="${criteriaRatings.ratingCriteria.maxRating == 0}">
+			<c:when test="${rateAllUsers > 0}">
 			<%@ include file="rankall.jsp" %>
 			</c:when>
 			<c:otherwise>
@@ -143,7 +143,7 @@
 		<span id="refreshButton" class="btn btn-default" onclick="javascript:refresh();"><fmt:message key="label.refresh"/></span>
 		</div>
 		
-		<div class="pull-right">		
+		<div class="pull-right" id="buttonNextPrevDiv">		
 		<c:if test="${criteriaRatings.ratingCriteria.orderId > 1}">
 			<span id="prevButton" class="btn btn-default" onclick="javascript:${method}(false);"><fmt:message key="label.previous"/></span>
 		</c:if>
@@ -152,7 +152,7 @@
 				<span id="finishButton" class="btn btn-primary" onclick="javascript:${method}(true);">${finishButtonLabel}</span>
 			</c:when>
 			<c:otherwise>
-				<span id="nextButton" class="btn btn-default" onclick="javascript:${method}(true);"><fmt:message key="label.next"/></span>
+				<span id="finishButton" class="btn btn-default" onclick="javascript:${method}(true);"><fmt:message key="label.next"/></span>
 			</c:otherwise>
 		</c:choose>
 		</div>

@@ -24,6 +24,8 @@
 
 		$(document).ready(function(){
 			${javascriptReady}
+			
+			testButtons();
 		});
 		
 
@@ -49,6 +51,8 @@
 	    	}
 		    newChild.classList.remove('can-drop');
 		    resetXY(newChild);
+		    
+			testButtons();
 		}
 
 		function setRanking(itemDescription, itemId, rank) {
@@ -63,28 +67,43 @@
 			}
 		}
 			
-		function submitEntry(next){
+		function submitEntry(next) {
 			hideButtons();
-			var numFilled = 0;
 			var editForm = document.getElementById("editForm");
+			if ( testCanSubmitEntry(editForm) ) {
+				$("#next").val(next);
+				editForm.submit();
+			} else {
+				alert('<fmt:message key="error.assign.ranks"><fmt:param>${criteriaRatings.ratingCriteria.maxRating}</fmt:param></fmt:message>');
+			}
+		}
+
+		function testButtons() {
+			var editForm = document.getElementById("editForm");
+			if ( testCanSubmitEntry(editForm) ) {
+				showButtons();
+			} else {
+				hideButtons();
+			}
+		}
+		
+		function testCanSubmitEntry(editForm) {
+			var numFilled = 0;
 			<c:forEach begin="1" end="${criteriaRatings.ratingCriteria.maxRating}" var="index">
 			numFilled = numFilled + processHidden(editForm, 'rank${index}', 'divrank${index}');
 			</c:forEach>
 			if ( numFilled == ${criteriaRatings.ratingCriteria.maxRating}) {
-				$("#next").val(next);
-				editForm.submit();
+				return true;
 			} else {
 				var learners = document.getElementById("learners");
 				if ( learners.children.length > 0 ) {
-					alert('<fmt:message key="error.assign.ranks"><fmt:param>${criteriaRatings.ratingCriteria.maxRating}</fmt:param></fmt:message>');
-					showButtons();
 					return false;
 				} else {
 					// no more learners to rank so allow
-					$("#next").val(next);
-					editForm.submit();
+					return true;
 				}
 			}
+			return false;
 		}
 		
 		function processHidden(editForm, key, valueDivId) {
@@ -92,6 +111,7 @@
 			if ( ! rankField ) {
 				rankField = document.createElement('input'); 
 				rankField.type = 'hidden';
+				rankField.id = key;
 				rankField.name = key;
 			    editForm.appendChild(rankField);
 			}
@@ -118,8 +138,8 @@
 	<form action="<c:url value="/learning/submitRanking.do?"/>" method="get" id="editForm">
 
 		<c:if test="${notcomplete}">
-			<lams:Alert type="danger" id="warn-assign-more" close="true">
-				<fmt:message key="error.assign.ranks"/>
+			<lams:Alert type="info"  id="warn-assign-more" close="true">
+				<fmt:message key="error.assign.ranks"><fmt:param>${criteriaRatings.ratingCriteria.maxRating}</fmt:param></fmt:message>
 			</lams:Alert>
 		</c:if>
 		<span id="instructions"><strong><fmt:message key="label.assign.ranks">
