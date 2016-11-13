@@ -29,13 +29,23 @@
 		
 		$(".rating-criteria-tag").hide();
 		
+		
 		 $('#allowRateAnswers').click(function() {
 		    	$(".rating-criteria-tag").toggle("slow");
 		    });
 		
+		 $('#reflect').click(function() {
+		    	$("#reflectionInstructions").toggle("slow");
+		    });
+		 
 		//initial state
+		
 		if (${formBean.showOtherAnswers == 0}) {
 			$("#show-other-answers-options").hide();
+		}
+		
+		if (${formBean.reflect == 0}) {
+			$("#reflectionInstructions").hide();
 		}
 		
 	    $('#no-reedit-allowed').click(function() {
@@ -139,7 +149,7 @@
 		</label>
 	</div>
 	
-	<div class="form-group">
+	<div id="reflectionInstructions" class="form-group">
 		<html:textarea property="reflectionSubject" styleId="reflectionSubject" styleClass="form-control" cols="30" rows="3"	/>
 	</div>
 </lams:SimplePanel>
