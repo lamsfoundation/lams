@@ -1,7 +1,6 @@
 <%@ include file="/common/taglibs.jsp"%>
 <c:set var="ctxPath" value="${pageContext.request.contextPath}"	scope="request" />
 <input type="hidden" name="hasFile" value="${itemAttachment.hasFile}" id="has-file"/>
-
 <c:choose>
 	<c:when test="${itemAttachment.hasFile}">
 		<table border="0" style="align:left; width:400px">
@@ -33,6 +32,28 @@
 	</c:when>
 	
 	<c:otherwise>
-		<input type="file" name="file" id="file-select"/>
+		<div class="input-group">
+		    <span class="input-group-btn">
+					<button id="fileButtonBrowse" type="button" class="btn btn-sm btn-default">
+					<i class="fa fa-upload"></i> <fmt:message key="label.authoring.basic.resource.file.input"/>
+				</button>
+			</span>
+			<input type="file" id="fileSelector" name="file" multiple style="display:none"> 
+			<input type="text" id="fileInputName" style="display:none" disabled="disabled" placeholder="File not selected" class="form-control input-sm">
+		</div>
+				
+		<script type="text/javascript">
+			// Fake file upload
+			document.getElementById('fileButtonBrowse').addEventListener('click', function() {
+				document.getElementById('fileSelector').click();
+			});
+			
+			document.getElementById('fileSelector').addEventListener('change', function() {
+				$('#fileInputName').show();
+				document.getElementById('fileInputName').value = this.value.replace(/^.*\\/, "");
+				
+			});
+		</script>    
+    
 	</c:otherwise>
 </c:choose>

@@ -101,7 +101,7 @@
     	<fmt:message key="label.authoring.basic.instruction"/>
     </label>
 	<lams:CKEditor id="imageGallery.instructions" value="${formBean.imageGallery.instructions}"
-			contentFolderID="${formBean.contentFolderID}" height="400">
+			contentFolderID="${formBean.contentFolderID}">
 	</lams:CKEditor>
 </div>
 
@@ -113,7 +113,7 @@
 <c:url var="showMessageURL" value='/authoring/newImageInit.do'>
 	<c:param name="sessionMapID" value="${formBean.sessionMapID}" />
 </c:url>
-<html:link href="#" styleClass="btn btn-default btn-sm" onclick="javascript:showMessage('${showMessageURL}')">
+<html:link href="#nogo" styleClass="btn btn-default btn-sm" onclick="javascript:showMessage('${showMessageURL}')">
 	<i class="fa fa-plus"></i>&nbsp;<fmt:message key="label.authoring.basic.add.image" />
 </html:link>
 <p>
