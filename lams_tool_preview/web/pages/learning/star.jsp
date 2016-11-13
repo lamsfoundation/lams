@@ -5,13 +5,16 @@
 		#no-users-info {display: none;}
 	</style>
 
+	<c:set var="maxRates" value="${rateAllUsers > 0 ? rateAllUsers : criteriaRatings.ratingCriteria.maximumRates}"/>
+	<c:set var="minRates" value="${rateAllUsers > 0 ? rateAllUsers : criteriaRatings.ratingCriteria.minimumRates}"/>
+	
 	<script type="text/javascript">
 		//var for jquery.jRating.js
 		var pathToImageFolder = "${lams}images/css/";
-		
+
 		//vars for rating.js
-		var MAX_RATES = ${criteriaRatings.ratingCriteria.maximumRates},
-		MIN_RATES = ${criteriaRatings.ratingCriteria.minimumRates},
+		var MAX_RATES = ${maxRates},
+		MIN_RATES = ${minRates},
 		COMMENTS_MIN_WORDS_LIMIT = ${criteriaRatings.ratingCriteria.commentsMinWordsLimit},
 		MAX_RATINGS_FOR_ITEM = ${peerreview.maximumRatesPerUser},
 		LIMIT_BY_CRITERIA = "true";
@@ -34,8 +37,8 @@
 	
 	$(document).ready(function(){
 		
-		if ( ${criteriaRatings.ratingCriteria.minimumRates} > 0 && ${criteriaRatings.countRatedItems} < ${criteriaRatings.ratingCriteria.minimumRates}) {
-			$("#finishButton").css("visibility", "hidden");
+		if ( ${minRates} > 0 && ${criteriaRatings.countRatedItems} < ${minRates}) {
+			hideButtons();
 		}
 		
 		$(".tablesorter").tablesorter({
@@ -177,34 +180,40 @@
 	
 	function onRatingSuccessCallback() {
 		var numItems = $("#count-rated-items").html();
-		if ( ${criteriaRatings.ratingCriteria.minimumRates} <= 0 || numItems >=  ${criteriaRatings.ratingCriteria.minimumRates} )
-			$("#finishButton").css("visibility", "visible");
+		if ( ${minRates} <= 0 || numItems >=  ${minRates} ) {
+			showButtons();
+		}
 	}
     </script>
 
 		<!-- Rating limits info -->
-		<c:if test="${criteriaRatings.ratingCriteria.minimumRates ne 0 || criteriaRatings.ratingCriteria.maximumRates ne 0}">
+		<c:if test="${rateAllUsers > 0 || criteriaRatings.ratingCriteria.minimumRates ne 0 || criteriaRatings.ratingCriteria.maximumRates ne 0}">
 		
 			<lams:Alert type="info" id="rate-limits-reminder" close="false">
 				<c:choose>
-					<c:when test="${criteriaRatings.ratingCriteria.minimumRates ne 0 and criteriaRatings.ratingCriteria.maximumRates ne 0}">
-						<fmt:message key="label.rate.limits.reminder">
-							<fmt:param value="${criteriaRatings.ratingCriteria.minimumRates}"/>
-							<fmt:param value="${criteriaRatings.ratingCriteria.maximumRates}"/>
-						</fmt:message>
+					<c:when test="${rateAllUsers > 0}">
+						<fmt:message key="label.rate.all.users"></fmt:message>
 					</c:when>
-					
-					<c:when test="${criteriaRatings.ratingCriteria.minimumRates ne 0 and criteriaRatings.ratingCriteria.maximumRates eq 0}">
-						<fmt:message key="label.rate.limits.reminder.min">
-							<fmt:param value="${criteriaRatings.ratingCriteria.minimumRates}"/>
-						</fmt:message>
-					</c:when>
-					
-					<c:when test="${criteriaRatings.ratingCriteria.minimumRates eq 0 and criteriaRatings.ratingCriteria.maximumRates ne 0}">
-						<fmt:message key="label.rate.limits.reminder.max">
-							<fmt:param value="${criteriaRatings.ratingCriteria.maximumRates}"/>
-						</fmt:message>
-					</c:when>
+					<c:otherwise>
+						<c:choose>
+							<c:when test="${criteriaRatings.ratingCriteria.minimumRates ne 0 and criteriaRatings.ratingCriteria.maximumRates ne 0}">
+								<fmt:message key="label.rate.limits.reminder">
+									<fmt:param value="${criteriaRatings.ratingCriteria.minimumRates}"/>
+									<fmt:param value="${criteriaRatings.ratingCriteria.maximumRates}"/>
+								</fmt:message>
+							</c:when>
+							<c:when test="${criteriaRatings.ratingCriteria.minimumRates ne 0 and criteriaRatings.ratingCriteria.maximumRates eq 0}">
+								<fmt:message key="label.rate.limits.reminder.min">
+									<fmt:param value="${criteriaRatings.ratingCriteria.minimumRates}"/>
+								</fmt:message>
+							</c:when>
+							<c:when test="${criteriaRatings.ratingCriteria.minimumRates eq 0 and criteriaRatings.ratingCriteria.maximumRates ne 0}">
+								<fmt:message key="label.rate.limits.reminder.max">
+									<fmt:param value="${criteriaRatings.ratingCriteria.maximumRates}"/>
+								</fmt:message>
+							</c:when>
+						</c:choose>
+					</c:otherwise>
 				</c:choose>
 
 				<BR/>

@@ -537,13 +537,23 @@ public class LearningAction extends Action {
 		(criteria.isCommentRating() || criteria.isStarStyleRating()), PeerreviewConstants.SORT_BY_USERNAME_ASC, null, 
 		peerreview.isSelfReview(), true );
 	
-	// override the min/max for stars based on old settings if needed (original Peer Review kept one setting for all criteria )
-	if ( ( peerreview.getMinimumRates() > 0 || peerreview.getMaximumRates() > 0 ) && 
-	     ( dto.getRatingCriteria().getMinimumRates() == 0 && dto.getRatingCriteria().getMaximumRates() == 0 ) ) {
-	    dto.getRatingCriteria().setMinimumRates(peerreview.getMinimumRates());
-	    dto.getRatingCriteria().setMaximumRates(peerreview.getMaximumRates());
+	// Send the number of users to rate in rateAll, or send 0. Do not want to modify the criteria min/max as it is originally
+	// a Hibernate object and don't want to risk updating it in the db. Need to send a flag so why not make flag double as the 
+	// runtime min/max value while leaving min/max as the original criteria definition.
+	int rateAllUsers = 0;
+	if ( ( criteria.isRankingStyleRating() && criteria.getMaxRating() == RatingCriteria.RATING_RANK_ALL ) ||
+		( criteria.isStarStyleRating() && criteria.getMinimumRates() == RatingCriteria.RATING_RANK_ALL ) ) {
+	    rateAllUsers = service.getCountUsersBySession(toolSessionId, peerreview.isSelfReview() ? -1 : userId);
+	} else if ( criteria.isStarStyleRating() &&
+		( peerreview.getMinimumRates() > 0 || peerreview.getMaximumRates() > 0 ) && 
+		( dto.getRatingCriteria().getMinimumRates() == 0 && dto.getRatingCriteria().getMaximumRates() == 0 ) ) {
+	    // override the min/max for stars based on old settings if needed (original Peer Review kept one setting for all criteria )
+	    // does not matter if this change gets persisted to database. 
+	    criteria.setMinimumRates(peerreview.getMinimumRates());
+	    criteria.setMaximumRates(peerreview.getMaximumRates());
 	}
 
+	request.setAttribute("rateAllUsers",rateAllUsers);
 	request.setAttribute("criteriaRatings", dto);
 	return mapping.findForward(PeerreviewConstants.SUCCESS);
     }

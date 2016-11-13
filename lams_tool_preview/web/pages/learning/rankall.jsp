@@ -27,6 +27,7 @@
 		var learners;
 		
 		$(document).ready(function(){
+			
 			var rankedArray = new Array();
 			${javascriptReady}
 			var numRankings = rankedArray.length;
@@ -45,9 +46,19 @@
 			
 			learners = document.getElementById('learners');
 			updateAddLabel();
+			testButtons();
+
 		});
 		
 
+		function testButtons() {
+			if ( learners.children.length == 0 ) {
+				showButtons();
+			} else {
+				hideButtons();
+			}
+		}
+		
 		function updateAddLabel() {
 			if ( learners.children == undefined || learners.children.length == 0  ) {
 		    	$('#lastEntry').html('<fmt:message key="label.alllearnersadded"/>');
@@ -72,15 +83,18 @@
 		    newChild.classList.add('${rowdrop}');
 		    resetXY(newChild);
 		    updateAddLabel();
+		    
+		    testButtons();
 		}
 
 		function submitEntry(next){
+			hideButtons();
+
 			if ( learners.children.length > 0 ) {
 				alert('<fmt:message key="error.assign.rankAll"/>');
 				return false;
 			}
 
-			hideButtons();
 			var editForm = document.getElementById('editForm');
 			var children = document.getElementById('ranked').children;
 			for (var i = 0; i < children.length; i++) {
