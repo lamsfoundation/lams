@@ -96,7 +96,7 @@ public abstract class RatingCriteria implements Serializable, Nullable, Comparab
 
     public static final int RATING_STYLE_STAR_DEFAULT_MAX = 5;
     public static final int RATING_STYLE_RANKING_DEFAULT_MAX = 5;
-    public static final int RATING_STYLE_RANKING_RANK_ALL = 0;
+    public static final int RATING_RANK_ALL = -1;
     
     // ---------------------------------------------------------------------
     // Instance variables
