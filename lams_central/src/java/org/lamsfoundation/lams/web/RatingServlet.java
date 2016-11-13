@@ -84,8 +84,8 @@ public class RatingServlet extends HttpServlet {
 	    boolean ratingLimitsByCriteria = WebUtil.readBooleanParam(request, "ratingLimitsByCriteria", false);
 
 	    Long maxRatingsForItem = WebUtil.readLongParam(request, "maxRatingsForItem", true);
-	    log.debug("RatingServlet: Check Max rates for an item reached. Item " + itemId + " criteria id "
-		    + criteria.getRatingCriteriaId() + " maxRatingsForItem " + maxRatingsForItem);
+//	    log.debug("RatingServlet: Check Max rates for an item reached. Item " + itemId + " criteria id "
+//		    + criteria.getRatingCriteriaId() + " maxRatingsForItem " + maxRatingsForItem);
 	    if (maxRatingsForItem != null && maxRatingsForItem > 0) {
 		if (!ToolActivityRatingCriteria.class.isInstance(criteria)) {
 		    log.error(
@@ -103,8 +103,8 @@ public class RatingServlet extends HttpServlet {
 			JSONObject.put("error", true);
 			JSONObject.put("message",
 				"Maximum number of ratings for this item has been reached. No more may be saved.");
-			log.debug("RatingServlet: Max rates for an item reached. Item " + itemId + " criteria id "
-				+ criteria.getRatingCriteriaId() + " count " + currentRatings);
+//			log.debug("RatingServlet: Max rates for an item reached. Item " + itemId + " criteria id "
+//				+ criteria.getRatingCriteriaId() + " count " + currentRatings);
 			doSave = false;
 		    }
 		}
