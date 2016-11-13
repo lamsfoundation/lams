@@ -178,14 +178,6 @@
 			<%@ include file="/authoring/candidateAnswersList.jsp"%>
 			
 			<div class="form-group">
-				<label for="feedback"><fmt:message key="label.feedback"></fmt:message></label>
-				<lams:CKEditor id="feedback"
-				value="${mcGeneralAuthoringDTO.editableQuestionFeedback}"
-				contentFolderID="${mcGeneralAuthoringDTO.contentFolderID}">
-			</lams:CKEditor>
-			</div>
-
-			<div class="form-group">
 				<html:button property="newCandidate" onclick="javascript:submitMethod('newCandidateBox');" styleClass="btn btn-default btn-sm">
 					<fmt:message key="label.add.candidates" />
 				</html:button>
@@ -208,6 +200,17 @@
 				</select>
 				&nbsp;<fmt:message key="label.marks"></fmt:message>
 			</div>
+
+			<div class="form-group">
+				<a data-toggle="collapse" data-target="#feedbackDiv"><i class="fa fa-xs fa-plus-square-o roffset5" aria-hidden="true"></i><fmt:message key="label.feedback" /></a>
+				<div id="feedbackDiv" class="panel-body collapse <c:if test="${not empty mcGeneralAuthoringDTO.editableQuestionFeedback}">in</c:if>">
+					<lams:CKEditor id="feedback"
+						value="${mcGeneralAuthoringDTO.editableQuestionFeedback}"
+						contentFolderID="${mcGeneralAuthoringDTO.contentFolderID}">
+					</lams:CKEditor>
+				</div>
+			</div>
+
 
 			<div class="pull-right">
 				<a href="#" onclick="javascript:self.parent.tb_remove();" onmousedown="self.focus();" class="btn btn-default btn-sm roffset5"> 
