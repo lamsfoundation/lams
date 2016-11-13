@@ -40,34 +40,30 @@
 	<%@ include file="description.jsp"%>
 
 	<!--  Options -->  
-	<div class="voffset5" style="display: inline-block;">
-	<a id="toggleAdditionalOptionsAreaLink" href="javascript:toggleAdditionalOptionsArea()" class="visible-sm-block visible-md-block btn btn-default btn-xs pull-left"><fmt:message key="label.authoring.basic.additionaloptions.show" /> </a>
-	</div>
-	<div id="additionalOptionsArea" style="display: none;">
- 		<div class="form-inline">
+	<a href="javascript:toggleAdditionalOptionsArea()" class="fa-xs"><i id="faIcon" class="fa fa-plus-square-o"></i> <span id="toggleAdditionalOptionsAreaLink"><fmt:message key="label.authoring.basic.additionaloptions.show" /></span></a>
+	<div id="additionalOptionsArea" style="display: none;" class="panel-body">
 		<div class="form-group">
-    	<label for="min"><fmt:message key="label.authoring.basic.min.select" /></label>
-		<html:text styleId="min" property="min" size="10" styleClass="form-control"/>
+			<div class="checkbox">
+			    <label>
+		 	      <html:checkbox property="questionRequired" styleId="questionRequired"/>&nbsp;<fmt:message key="label.authoring.basic.required" />
+			    </label>
+		  </div>
 		</div>
 		<div class="form-group">
-    	<label for="max"><fmt:message key="label.authoring.basic.max.select" /></label>
-		<html:text styleId="max" property="max" size="10" styleClass="form-control"/>
+    	<label for="min"><fmt:message key="label.authoring.basic.min.select" /></label>:
+			<html:text styleId="min" property="min" size="10" styleClass="form-control-inline input-sm"/>
+    	<label class="roffset5" for="max"><fmt:message key="label.authoring.basic.max.select" /></label>
+			<html:text styleId="max" property="max" size="10" styleClass="form-control-inline input-sm"/>
 		</div>
 		<div class="form-group">
-    	<label for="summary"><fmt:message key="label.common.summary" /></label>
-		<html:select property="summary" styleClass="form-control">
-			<html:option value="0" styleId="noSummaryOption"><fmt:message key="label.common.summary.none" /></html:option>
-			<html:option value="2"><fmt:message key="label.common.summary.average" /></html:option>
-			<html:option value="3"><fmt:message key="label.common.summary.count" /></html:option>
-		</html:select>
+    	<label for="summary"><fmt:message key="label.common.summary" /></label>:
+			<html:select property="summary" styleClass="form-control-inline input-sm">
+				<html:option value="0" styleId="noSummaryOption"><fmt:message key="label.common.summary.none" /></html:option>
+				<html:option value="2"><fmt:message key="label.common.summary.average" /></html:option>
+				<html:option value="3"><fmt:message key="label.common.summary.count" /></html:option>
+			</html:select>
 		</div>
-		<div class="checkbox">
-		    <label>
-	 	      <html:checkbox property="questionRequired" styleId="questionRequired"/>&nbsp;<fmt:message key="label.authoring.basic.required" />
-		    </label>
-	  	</div>
-	  	</div>
-	</div>
+	 </div>
  	<!--  end options -->
   
 </html:form>

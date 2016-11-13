@@ -87,7 +87,7 @@
 <!-- Dropdown menu for choosing a question type -->
 <div id="questionListArea"><c:set var="sessionMapID" value="${formBean.sessionMapID}" />
 <%@ include	file="/pages/authoring/parts/questionlist.jsp"%></div>
-<div class="form-inline"><select id="questionTypeDropdown" class="form-control">
+<div class="form-inline"><select id="questionTypeDropdown" class="form-control input-sm">
 	<option selected="selected"><fmt:message key="label.authoring.basic.textfield"/></option>
 	<option><fmt:message key="label.authoring.basic.textarea"/></option>
 	<option><fmt:message key="label.authoring.basic.number"/></option>
