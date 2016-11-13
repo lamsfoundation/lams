@@ -40,25 +40,25 @@
 	<%@ include file="description.jsp"%>
 
   	<!--  Options -->  
-	<a id="toggleAdditionalOptionsAreaLink" href="javascript:toggleAdditionalOptionsArea()" class="btn btn-default btn-xs"><fmt:message key="label.authoring.basic.additionaloptions.show" /> </a>
-	<div id="additionalOptionsArea" style="display: none;">
- 		<div class="form-inline">
+	<a href="javascript:toggleAdditionalOptionsArea()" class="fa-xs"><i id="faIcon" class="fa fa-plus-square-o"></i> <span id="toggleAdditionalOptionsAreaLink"><fmt:message key="label.authoring.basic.additionaloptions.show" /></span></a>
+	<div id="additionalOptionsArea" style="display: none;" class="panel-body">
 		<div class="form-group">
-    	<label for="summary"><fmt:message key="label.common.summary" /></label>
-    	<label for="summary"><fmt:message key="label.common.summary" />&nbsp;
-		<html:select property="summary"  styleClass="form-control">
-			<html:option value="0" styleId="noSummaryOption"><fmt:message key="label.common.summary.none" /></html:option>
-			<html:option value="2" ><fmt:message key="label.common.summary.average" /></html:option>
-			<html:option value="3" ><fmt:message key="label.common.summary.count" /></html:option>
-		</html:select>
+			<div class="checkbox">
+			    <label>
+		 	      <html:checkbox property="questionRequired" styleId="questionRequired"/>&nbsp;<fmt:message key="label.authoring.basic.required" />
+			    </label>
+		 	</div>
 		</div>
-		<div class="checkbox">
-		    <label>
-	 	      <html:checkbox property="questionRequired" styleId="questionRequired"/>&nbsp;<fmt:message key="label.authoring.basic.required" />
-		    </label>
-	  	</div>
-	  	</div>
-	</div>
+		<div class="form-group">
+    	<label for="summary"><fmt:message key="label.common.summary" /></label>: 
+			<html:select property="summary"  styleClass="form-control-inline input-sm">
+				<html:option value="0" styleId="noSummaryOption"><fmt:message key="label.common.summary.none" /></html:option>
+				<html:option value="2" ><fmt:message key="label.common.summary.average" /></html:option>
+				<html:option value="3" ><fmt:message key="label.common.summary.count" /></html:option>
+			</html:select>
+		</div>
+ 	</div>
+
  	<!--  end options -->
 
  </html:form>

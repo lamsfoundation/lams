@@ -19,7 +19,7 @@
 	<c:forEach var="item" items="${answerOptionList}" varStatus="status">
 		<tr>
 			<td width="3px">${fn:substring(ordinal,status.index,status.index+1)})</td>
-			<td><input type="text" name="answerOptionItemDesc${status.index+1}" id="answerOptionItemDesc${status.index+1}" size="60" value="<c:out  value='${item}'/>" class="form-control"></td>
+			<td><input type="text" name="answerOptionItemDesc${status.index+1}" id="answerOptionItemDesc${status.index+1}" size="60" value="<c:out  value='${item}'/>" class="form-control input-sm"></td>
 
 			<td class="arrows">
 			<!-- Don't display up icon if first line -->

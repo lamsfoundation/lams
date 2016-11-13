@@ -22,10 +22,13 @@
    function toggleAdditionalOptionsArea(){
 	$("#additionalOptionsArea").toggle("slow",function(){
 			if ($('#additionalOptionsArea').is(':visible')){
-				$('#toggleAdditionalOptionsAreaLink').text(msgHideAdditionalOptions);	
+				$('#toggleAdditionalOptionsAreaLink').text(msgHideAdditionalOptions);
+				$('#faIcon').toggleClass('fa-plus-square-o fa-minus-square-o');
 			}
 			else {
-				$('#toggleAdditionalOptionsAreaLink').text(msgShowAdditionalOptions);	
+				$('#toggleAdditionalOptionsAreaLink').text(msgShowAdditionalOptions);
+				$('#faIcon').toggleClass('fa-plus-square-o fa-minus-square-o')
+				
 			}
 		});
 	}

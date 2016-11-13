@@ -37,8 +37,8 @@
 	<%@ include file="description.jsp"%>
   
 	<!--  Options -->  
-	<a id="toggleAdditionalOptionsAreaLink" href="javascript:toggleAdditionalOptionsArea()" class="btn btn-default btn-xs"><fmt:message key="label.authoring.basic.additionaloptions.show" /> </a>
-	<div id="additionalOptionsArea" style="display: none;">
+	<a href="javascript:toggleAdditionalOptionsArea()" class="fa-xs"><i id="faIcon" class="fa fa-plus-square-o"></i> <span id="toggleAdditionalOptionsAreaLink"><fmt:message key="label.authoring.basic.additionaloptions.show" /></span></a>
+	<div id="additionalOptionsArea" style="display: none;" class="panel-body">
 		<div class="checkbox">
 		    <label>
 	 	      <html:checkbox property="questionRequired" styleId="questionRequired"/>&nbsp;<fmt:message key="label.authoring.basic.required" />
