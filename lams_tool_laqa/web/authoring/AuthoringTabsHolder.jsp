@@ -39,6 +39,9 @@
 		   form.questionIndex.value=questionIndexValue; 
 		   submitMethod(actionMethod);
 		  }
+		  function doSelectTab(tabId) {
+			selectTab(tabId);
+		  }
 	</script>
 </lams:head>
 
