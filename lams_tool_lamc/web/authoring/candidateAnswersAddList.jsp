@@ -54,7 +54,7 @@
 						</lams:CKEditor>
 					</td>		
 					
-					<td width="60px" class="text-center">
+					<td width="20px" class="text-center">
 						<c:forEach var="correctEntry" items="${mcGeneralAuthoringDTO.correctMap}">
 							<c:set var="SELECTED_ANSWER" scope="request" value="" />
 							<c:set var="ISCORRECT" scope="request" value="Incorrect" />
@@ -63,9 +63,7 @@
 								<c:set var="SELECTED_ANSWER" scope="request" value="CHECKED" />
 								<c:set var="ISCORRECT" scope="request" value="Correct" />
 							</c:if>
-	                        <div class="radio">
 							<input type="radio" name="correct" value="<c:out value="${caIndex}"/>" ${SELECTED_ANSWER} >  
-	                          </div>
 						</c:forEach>
 					</td>		
 					

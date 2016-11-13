@@ -193,23 +193,24 @@
 			</div>
 
 			<div class="form-group">
-				<label for="feedback"><fmt:message key="label.feedback"></fmt:message></label>
-				<lams:CKEditor id="feedback"
-				value="${feedback}"
-				contentFolderID="${mcGeneralAuthoringDTO.contentFolderID}">
-			</lams:CKEditor>
+				<a data-toggle="collapse" data-target="#feedbackDiv"><i class="fa fa-xs fa-plus-square-o roffset5" aria-hidden="true"></i><fmt:message key="label.feedback" /></a>
+				<div id="feedbackDiv" class="panel-body collapse">
+					<lams:CKEditor id="feedback"
+						value="${feedback}"
+						contentFolderID="${mcGeneralAuthoringDTO.contentFolderID}">
+					</lams:CKEditor>
+				</div>
 			</div>
 			
 				
-			
-			<a href="#" onclick="addItem();" onmousedown="self.focus();" class="btn btn-default btn-sm pull-right"> 
-				<i class="fa fa-plus"></i>&nbsp;<fmt:message key="label.add.new.question" />
-			</a>
-			
-			<a href="#" onclick="javascript:self.parent.tb_remove();" onmousedown="self.focus();" class="btn btn-default btn-sm pull-right roffset5"> 
-				<fmt:message key="label.cancel" />
-			</a>
-			
+			<div id="actionButtons" class="pull-right">
+				<a href="#" onclick="javascript:self.parent.tb_remove();" onmousedown="self.focus();" class="btn btn-default btn-sm roffset5"> 
+					<fmt:message key="label.cancel" />
+				</a>
+				<a href="#" onclick="addItem();" onmousedown="self.focus();" class="btn btn-default btn-sm"> 
+					<i class="fa fa-plus"></i>&nbsp;<fmt:message key="label.add.new.question" />
+				</a>
+			</div>
 		
 
 		</lams:Page>
