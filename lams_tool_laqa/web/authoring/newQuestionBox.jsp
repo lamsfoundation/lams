@@ -22,23 +22,23 @@
  	      <html:checkbox property="required" styleId="required"/>&nbsp;<fmt:message key="label.required.desc" />
 	    </label>
   	</div>
-  	        
-	<div class="form-inline">
-		<div class="form-group">
-		  	<label for="minWordsLimit">
-		    	<fmt:message key="label.minimum.number.words" >:
-					<fmt:param> </fmt:param>
-				</fmt:message>
-			</label>
-				<input type="number" class="form-control input-sm" id="minWordsLimit" name="minWordsLimit" value="${formBean.minWordsLimit}" min="0"/>
-		</div>
+
+<a data-toggle="collapse" data-target="#extra"><i class="fa fa-xs fa-plus-square-o roffset5" aria-hidden="true"></i><fmt:message key="label.other.options"/></a>
+<div id="extra" class="panel-body collapse" >  	        
+	<div class="form-group form-inline">
+	  	<label for="minWordsLimit">
+	    	<fmt:message key="label.minimum.number.words" >
+				<fmt:param> </fmt:param>
+			</fmt:message>:
+		</label>
+			<input type="number" class="form-control input-sm" id="minWordsLimit" name="minWordsLimit" value="${formBean.minWordsLimit}" min="0"/>
 	</div>
 	
 	<div class="form-group">
 	    <label for="feedback"><fmt:message key="label.feedback" /></label>
-	    <html:textarea property="feedback" styleId="feedback" styleClass="form-control" cols="75" rows="3" />
+	    <html:textarea property="feedback" styleId="feedback" styleClass="form-control" cols="75" rows="2" />
 	</div>
-	
+</div>	
 	<div class="voffset5 pull-right">
 		<a href="#" onclick="hideMessage()" class="btn btn-default btn-xs loffset5"> <fmt:message key="label.cancel" /> </a>
 		<a href="#" onclick="submitMessage()" class="btn btn-default btn-xs"> <fmt:message key="label.save.question" /></a>
