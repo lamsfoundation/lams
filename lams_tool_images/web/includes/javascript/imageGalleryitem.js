@@ -40,7 +40,7 @@ function submitImageGalleryItem(){
 	
 	// validate uploading file if we add it for the first time
 	if (!eval($("#has-file").val())) {
-		var fileSelect = document.getElementById('file-select');
+		var fileSelect = document.getElementById('fileSelector');
 		// Get the selected files from the input.
 		var files = fileSelect.files;
 		
@@ -64,6 +64,10 @@ function submitImageGalleryItem(){
 
 		// Add the file to the request.
 		formData.append('file', file, file.name);
+		$('#uploadButtons').hide();
+		$('#itemAttachmentArea_Busy').show();
+		
+		
 	}
 
 	$.ajax({
@@ -135,6 +139,10 @@ function submitMultipleImageGalleryItems(){
 
 		  // Add the file to the request.
 	}
+	
+	$('#uploadButtons').hide();
+	$('#itemAttachmentArea_Busy').show();
+
 
 	$.ajax({
     	type: 'POST',
