@@ -435,6 +435,10 @@ a.button-add-item:before {
   color: inherit;
 }
 
+.modal-header {
+    padding: 8px 15px 8px 15px;
+}
+
 .table-no-border>thead>tr>th, 
 .table-no-border>tbody>tr>th, 
 .table-no-border>tfoot>tr>th, 
