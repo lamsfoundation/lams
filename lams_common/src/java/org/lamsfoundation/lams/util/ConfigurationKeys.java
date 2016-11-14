@@ -273,5 +273,7 @@ public class ConfigurationKeys {
     public static String PASSWORD_POLICY_NUMERICS = "PasswordPolicyNumerics";
     
     public static String PASSWORD_POLICY_SYMBOLS = "PasswordPolicySymbols";
+    
+    public static String ERROR_STACK_TRACE = "ErrorStackTrace";
 
 }
