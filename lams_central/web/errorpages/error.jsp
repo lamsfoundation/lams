@@ -2,9 +2,12 @@
 <%@ taglib uri="tags-lams" prefix="lams"%>
 <%@ taglib uri="tags-core" prefix="c"%>
 <%@ taglib uri="tags-fmt" prefix="fmt"%>
+<%@ page import="org.lamsfoundation.lams.util.Configuration" import="org.lamsfoundation.lams.util.ConfigurationKeys" %>
+
 <c:set var="lams">
 	<lams:LAMSURL />
 </c:set>
+<c:set var="showErrorStack1"><lams:Configuration key='<%= ConfigurationKeys.ERROR_STACK_TRACE %>'/></c:set>
 
 <!DOCTYPE html>
 <lams:html>
@@ -12,7 +15,6 @@
 	<title><fmt:message key="heading.general.error" /></title>
 	<lams:css />
 	<script type="text/javascript" src="${lams}includes/javascript/prototype.js"></script>
-
 	<script type="text/javascript">
 		function closeWin() {
 			window.close();
@@ -46,11 +48,14 @@
 		</div>
 
 		<div class="voffset10">
+		<c:if test="${showErrorStack1}">
 			<lams:Alert id="errors" type="danger" close="false">
+			
 				<c:if test="${not empty param.errorName}">
 
 					<c:out value="${param.errorName}" escapeXml="true" />:
 						<c:out value="${param.errorMessage}" escapeXml="true" />
+
 
 
 					<div id="showButton" class="voffset5">
@@ -60,14 +65,18 @@
 
 
 					<span id="messageDetail" style="display: none"> <c:if test="${not empty param.errorStack}">
-							<c:out value="${param.errorStack}" escapeXml="true" />
-						</c:if> <c:if test="${empty param.errorStack}">
+								<c:out value="${param.errorStack}" escapeXml="true" />
+							</c:if> <c:if test="${empty param.errorStack}">
 							<fmt:message key="msg.no.more.detail" />
 						</c:if>
 					</span>
-				</c:if>
+					</c:if>
+					
+		
 			</lams:Alert>
+			</c:if>
 		</div>
+		
 
 		<div id="footer"></div>
 		<!--closes footer-->
