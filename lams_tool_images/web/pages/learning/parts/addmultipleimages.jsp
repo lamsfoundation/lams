@@ -47,7 +47,7 @@
 					</div>
 				</div>
 				
-				<a href="<html:rewrite page='/learning/newImageInit.do'/>?sessionMapID=${sessionMapID}&KeepThis=true&TB_iframe=true&height=540&width=480&modal=true" 
+				<a href="<html:rewrite page='/learning/newImageInit.do'/>?sessionMapID=${sessionMapID}&KeepThis=true&TB_iframe=true&modal=true" 
 						class="thickbox btn btn-default btn-xs">  
 					<fmt:message key="label.authoring.basic.upload.single.image" />
 				</a>

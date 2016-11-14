@@ -21,7 +21,11 @@
 			.tablesorter td {
 				padding-bottom: 10px;
 				padding-top: 10px;
-			]
+			}
+			#add-image-container {
+				margin-bottom: 10px;
+				overflow: hidden;
+			}
 		</style>
 		
 		<script type="text/javascript">

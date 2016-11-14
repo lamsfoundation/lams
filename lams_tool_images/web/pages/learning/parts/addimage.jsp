@@ -51,7 +51,7 @@
 					<input type="file" name="file" />
 				</div>
 				
-				<a href="<html:rewrite page='/learning/initMultipleImages.do?sessionMapID='/>${sessionMapID}&KeepThis=true&TB_iframe=true&height=500&width=480&modal=true" 
+				<a href="<html:rewrite page='/learning/initMultipleImages.do?sessionMapID='/>${sessionMapID}&KeepThis=true&TB_iframe=true&height=500&modal=true" 
 						class="thickbox btn btn-default btn-xs">  
 					<fmt:message key="label.authoring.basic.upload.multiple.images" />
 				</a>
