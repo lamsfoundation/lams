@@ -274,6 +274,7 @@ public class ConfigurationKeys {
     
     public static String PASSWORD_POLICY_SYMBOLS = "PasswordPolicySymbols";
     
+ // LDEV-4049 Option for not displaying stacktraces in config settings
     public static String ERROR_STACK_TRACE = "ErrorStackTrace";
 
 }
