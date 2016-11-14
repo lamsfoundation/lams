@@ -62,6 +62,7 @@
 									$('#pb-msg'+messageUid).focus();
 								}
 							});
+							window.parent.location.reload();
 						}
 
     		     		if ( response.noMorePosts ) {

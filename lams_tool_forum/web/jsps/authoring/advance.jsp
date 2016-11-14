@@ -25,13 +25,13 @@
 <label for="limited-min-characters"><html:checkbox property="forum.limitedMinCharacters" styleId="limited-min-characters"/>
 <fmt:message key="label.authoring.advance.min.limited.input" />
 </label>
- <input type="number" name="forum.minCharacters"  id="min-characters" value="${forumForm.forum.minCharacters}" class="form-control form-control-inline input-sm" min="0"/>
+ <input type="number" name="forum.minCharacters"  id="min-characters" onchange="validatePostings(true);" value="${forumForm.forum.minCharacters}" class="form-control form-control-inline input-sm" min="0"/>
 </div>
 
 <div class="checkbox">
 <label for="limited-max-characters"><html:checkbox property="forum.limitedMaxCharacters" styleId="limited-max-characters"/>
 <fmt:message key="label.authoring.advance.limited.input" /></label>
- <input type="number" name="forum.maxCharacters"  id="max-characters" value="${forumForm.forum.maxCharacters}" class="form-control form-control-inline input-sm" max="5000"/>
+ <input type="number" name="forum.maxCharacters"  id="max-characters" onchange="validatePostings(true);" value="${forumForm.forum.maxCharacters}" class="form-control form-control-inline input-sm" max="5000"/>
 </div>
 
 <lams:SimplePanel panelBodyClass="panel-body-sm">
@@ -216,17 +216,32 @@
 	
 	
 
+	function validatePostings(isMinimunPostingDropdownUsed) {
+		var minCharacters = document.getElementById("min-characters");
+		 var minPostings = parseInt(minCharacters.value);
+		 var maxCharacters = document.getElementById("max-characters");
+		 var maxPostings = parseInt(maxCharacters.value);
+		if ((minPostings > maxPostings) && !(maxPostings == 0)) {
+			if (isMinimunPostingDropdownUsed) {
+				minCharacters.value = maxCharacters.value;
+			} else {
+				maxCharacters.value = minCharacters.value;
+			}
+
+			alert('<fmt:message key="js.error.validate.posting.number"/>');
+		}
+	}
+	
 	function validateRatings(isMinimunRateDropdownUsed) {
-		
-		var minRateInput = document.getElementById("minimumRate");
-		 var minRatings = parseInt(minRateInput.value);
-		 var maxRateInput = document.getElementById("maximumRate");
-		 var maxRatings = parseInt(maxRateInput.value);
+		var minRateDropDown = document.getElementById("minimumRate");
+		 var minRatings = parseInt(minRateDropDown.value);
+		 var maxRateDropDown = document.getElementById("maximumRate");
+		 var maxRatings = parseInt(maxRateDropDown.value);
 		if ((minRatings > maxRatings) && !(maxRatings == 0)) {
 			if (isMinimunRateDropdownUsed) {
-				minRateInput.value = maxRatings;
+				minRateDropDown.value = maxRateDropDown.value;
 			} else {
-				maxRateInput.value = minRatings;
+				maxRateDropDown.value = minRateDropDown.value;
 			}
 
 			alert('<fmt:message key="js.error.validate.number"/>');
