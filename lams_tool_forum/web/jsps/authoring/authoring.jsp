@@ -3,10 +3,10 @@
 
 <script type="text/javascript">
 	function verifyAllowRateMessagesCheckbox() {
-		  var minRateInput = document.getElementById("minimumRate");
-		   var minRatings = parseInt(minRateInput.value);
-		   var maxRateInput = document.getElementById("maximumRate");
-		   var maxRatings = parseInt(maxRateInput.value);
+		  var minRateDropDown = document.getElementById("minimumRate");
+		   var minRatings = parseInt(minRateDropDown.value);
+		   var maxRateDropDown = document.getElementById("maximumRate");
+		   var maxRatings = parseInt(maxRateDropDown.value);
 		
 		if((minRatings == 0) && (maxRatings == 0)){
 			var allowRateMessages = document.getElementById("allowRateMessages");
