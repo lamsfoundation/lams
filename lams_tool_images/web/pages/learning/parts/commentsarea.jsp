@@ -10,7 +10,7 @@
 <c:set var="finishedLock" value="${sessionMap.finishedLock}" />
 <c:set var="isImageSelected" value="${not empty sessionMap.currentImage}" />
 
-<script type="text/javascript" src="<html:rewrite page='/includes/javascript/thickbox.js'/>"></script>
+<script type="text/javascript" src="${lams}includes/javascript/thickbox.js"></script>
 <script type="text/javascript" src="${lams}includes/javascript/common.js"></script>
 <c:if test="${isImageSelected}">
 	<script type="text/javascript">
@@ -104,7 +104,7 @@
 							
 				<c:if test="${not finishedLock}">
 					<br>
-					<a href="<html:rewrite page='/learning/newImageInit.do?sessionMapID='/>${sessionMapID}&KeepThis=true&TB_iframe=true&height=540&width=480&modal=true" 
+					<a href="<html:rewrite page='/learning/newImageInit.do?sessionMapID='/>${sessionMapID}&KeepThis=true&TB_iframe=true&modal=true" 
 							class="btn btn-default voffset10 thickbox" id="add-new-image-button">  
 						<fmt:message key="label.learning.add.new.image" />
 					</a>

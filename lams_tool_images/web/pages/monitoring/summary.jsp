@@ -94,7 +94,7 @@
 						   	<html:rewrite page='/download/?uuid='/>${image.thumbnailFileUuid}&preferDownload=false
 						</c:set>
 						<c:set var="url" >
-							<c:url value='/monitoring/imageSummary.do'/>?sessionMapID=${sessionMapID}&imageUid=${image.uid}&KeepThis=true&TB_iframe=true&height=640&width=740&modal=true
+							<c:url value='/monitoring/imageSummary.do'/>?sessionMapID=${sessionMapID}&imageUid=${image.uid}&KeepThis=true&TB_iframe=true&modal=true
 						</c:set>				
 						<a href="${url}" class="thickbox" title="<fmt:message key='label.monitoring.imagesummary.image.summary' />" style="border-style: none;"> 
 							<c:set var="title">
@@ -224,9 +224,9 @@
 	</div> <!--  end panel group -->
 </c:if>
 
-<P style=" margin-bottom: 10px;">
-	<a href="<html:rewrite page='/monitoring/newImageInit.do?sessionMapID='/>${sessionMapID}&KeepThis=true&TB_iframe=true&height=540&width=480&modal=true" 
-			class="btn btn-default loffset5 voffset10 thickbox">  
+<P id="add-image-container">
+	<a href="<html:rewrite page='/monitoring/newImageInit.do?sessionMapID='/>${sessionMapID}&KeepThis=true&TB_iframe=true&modal=true" 
+			class="btn btn-default btn-xs loffset5 voffset10 pull-right thickbox">  
 		<i class="fa fa-plus"></i>&nbsp;<fmt:message key="label.monitoring.summary.add.new.image" />
 	</a>
 </P>
