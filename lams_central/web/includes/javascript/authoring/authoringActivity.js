@@ -419,7 +419,8 @@ ActivityDraw = {
 										   })
 							  )
 						 .attr({
-							 'stroke' : layout.colors.activityBorder,
+							 'stroke' : layout.colors.gateBorder,
+							 'stroke-width' : '0.5',
 							 'fill'   : layout.colors.gate
 						 }),
 			label = paper.text(x + 17, y + 20, LABELS.GATE_ACTIVITY_LABEL)
@@ -439,7 +440,7 @@ ActivityDraw = {
 	
 	
 	/**
-	 * Draws a Gropuing activity
+	 * Draws a Grouping activity
 	 */
 	grouping : function(x, y) {
 		if (x == undefined || y == undefined) {
@@ -460,7 +461,8 @@ ActivityDraw = {
 										   })
 							  )
 						 .attr({
-							    'stroke' : layout.colors.activityBorder,
+							    'stroke' : layout.colors.groupingBorder,
+							    'stroke-width' : '0.5',
 								'fill' : layout.colors.grouping
 							 }),
 			icon = paper.image(ActivityIcons.grouping, x + 47, y - 3, 32, 45),
@@ -608,7 +610,9 @@ ActivityDraw = {
 										   }))
 						 // activity colour depends on its category ID
 						 .attr({
-							'stroke' : layout.colors.activityBorder,
+							'stroke' : layout.colors.toolActivityBorder[layout.toolMetadata[this.learningLibraryID].activityCategoryID],
+							'stroke-width' : '0.5',
+							'stroke-linejoin' : 'round',
 							'fill'   : layout.colors.activity[layout.toolMetadata[this.learningLibraryID].activityCategoryID]
 						 }),
 			// check for icon in the library

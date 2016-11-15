@@ -94,9 +94,10 @@ var paper = null,
 		},
 		
 		'colors' : {
-			'activityBorder'      : 'black',
+			'activityBorder'	  : 'black',
+			'toolActivityBorder'      : ['','#808699','#ff0000','#625F67','#ffa500','#808080','#7aa712'],
 			// each activity type has its own colour
-			'activity'     		  : ['','#d0defd','#fffccb','#ece9f7','#fdf1d3','#FFFFFF','#e9f9c0'],
+			'activity'     		  : ['','#d0defd','#fffccb','#ece9f7','#fdf1d3','#ffffff','#e9f9c0'],
 			'activityText' 		  : 'black',
 			// default region colour
 			'annotation'		  : '#FFFF00',
@@ -113,11 +114,13 @@ var paper = null,
 			// highlight branching edges on mouse hover
 			'branchingEdgeMatch'  : 'blue',
 			'gate'         		  : 'red',
+                        'gateBorder'              : '#801515',
 			'gateText'     		  : 'white',
-			'grouping'			  : '#A9C8FD',
+			'grouping'		  : '#A9C8FD',
+			'groupingBorder'	  : '#485067',
 			'optionalActivity'    : 'rgb(194,213,254)',
 			// dashed border around a selected activity 
-			'selectEffect'        : 'blue',
+			'selectEffect'        : 'black',
 			'transition'   		  : 'rgb(119,126,157)'
 		},
 	
