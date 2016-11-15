@@ -17,7 +17,7 @@
     	<fmt:message key="label.authoring.basic.instructions"/>
     </label>
 	<lams:CKEditor id="instructions" value="${formBean.instructions}"
-			contentFolderID="${sessionMap.contentFolderID}" height="400">
+			contentFolderID="${sessionMap.contentFolderID}">
 	</lams:CKEditor>
 </div>
 
