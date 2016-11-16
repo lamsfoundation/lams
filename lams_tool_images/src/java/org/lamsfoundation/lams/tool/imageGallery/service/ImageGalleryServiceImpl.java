@@ -560,6 +560,10 @@ public class ImageGalleryServiceImpl implements IImageGalleryService, ToolConten
 	    // Read the original image from the repository
 	    InputStream originalIS = imageGalleryToolContentHandler.getFileNode(nodeKey.getUuid()).getFile();
 	    BufferedImage originalImage = ImageIO.read(originalIS);
+	    //throw exception if image was not successfully read
+	    if (originalImage == null) {
+		throw new UploadImageGalleryFileException("Impossible to read image file");
+	    }
 	    image.setOriginalImageWidth(originalImage.getWidth(null));
 	    image.setOriginalImageHeight(originalImage.getHeight(null));
 	    InputStream mediumIS = ResizePictureUtil.resizePicture(originalImage, mediumImageDimensions);
