@@ -108,6 +108,13 @@
 			parameter="edit" >
 			<forward name="success" path="/pages/learning/learning.jsp" />
 		</action>	
+		<action path="/learning/submitComments"
+			type="org.lamsfoundation.lams.tool.peerreview.web.action.LearningAction"
+			parameter="submitComments" >
+			<forward name="showResults" path="/learning/showResults.do" />	
+			<forward name="newReflection" path="/learning/newReflection.do" />	
+			<forward name="success" path="/pages/learning/learning.jsp" />
+		</action>	
 		<action path="/learning/submitHedging"
 			type="org.lamsfoundation.lams.tool.peerreview.web.action.LearningAction"
 			parameter="submitHedging" >

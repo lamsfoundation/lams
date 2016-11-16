@@ -94,7 +94,7 @@
 								rows += '<div class="no-gutter">';
 								rows += '';
 								rows += '<div class="col-xs-12 col-sm-11 ">';										
-								rows +=		'<textarea name="comment" rows="4" id="comment-textarea-'+ itemId +'" onfocus="if(this.value==this.defaultValue)this.value=\'\';" onblur="if(this.value==\'\')this.value=this.defaultValue;" class="form-control"><fmt:message key="label.comment.textarea.tip"/></textarea>';
+								rows +=		'<textarea name="comment-textarea-'+itemId+'" rows="4" id="comment-textarea-'+ itemId +'" onfocus="if(this.value==this.defaultValue)this.value=\'\';" onblur="if(this.value==\'\')this.value=this.defaultValue;" class="form-control"><fmt:message key="label.comment.textarea.tip"/></textarea>';
 								rows += '</div>';
 								rows += 	'<div class="button add-comment add-comment-new col-xs-12 col-sm-1" data-item-id="'+ itemId +'" data-comment-criteria-id="${criteriaRatings.ratingCriteria.ratingCriteriaId}">';
 								rows += 	'</div>';
@@ -123,22 +123,37 @@
 		});
 	 });
 	
-	function submitEntry(next) {
-		// data saved by the tick boxes so don't use next button to submit
-		nextprev(next);
+
+	function submitEntry(next){
+		// ratings already saved, just save any unsaved comments.
+		hideButtons();
+		$("#next").val(next);
+		$('textarea').each(function() {
+			if (this.value==this.defaultValue)
+				this.value="";
+		});
+		$("#editForm").submit();
 	}
+
     </script>
 
-	<lams:TSTable numColumns="2">
-		<th class="username" title="<fmt:message key='label.sort.by.user.name'/>" > 
-			<fmt:message key="label.user.name" />
-		</th>
-		<th class="comment"> 
-			<fmt:message key="label.comment" />
-		</th>
-	</lams:TSTable>
-						
+	<form action="<c:url value="/learning/submitComments.do?"/>" method="get" id="editForm">
+		<input type="hidden" name="sessionMapID" value="${sessionMapID}"/>
+		<input type="hidden" name="toolContentId" value="${toolContentId}"/>
+		<input type="hidden" name="criteriaId" value="${criteriaRatings.ratingCriteria.ratingCriteriaId}"/>
+		<input type="hidden" name="next" id="next" value=""/>		
+
+		<lams:TSTable numColumns="2">
+			<th class="username" title="<fmt:message key='label.sort.by.user.name'/>" > 
+				<fmt:message key="label.user.name" />
+			</th>
+			<th class="comment"> 
+				<fmt:message key="label.comment" />
+			</th>
+		</lams:TSTable>
+
+	</form>
+								
 	<div id="no-users-info">
 		<fmt:message key="label.no.users" />
 	</div>
-	
