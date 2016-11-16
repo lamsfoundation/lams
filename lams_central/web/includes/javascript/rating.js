@@ -47,8 +47,8 @@ function initializeJRating() {
 			$("#number-of-votes-" + itemId).html(data.numberOfVotes);
 			$("#rating-stars-caption-" + itemId).css("visibility", "visible");
 			var parts = itemId.split('-');
-			$("#comment-tick-" + parts[1]).css("visibility", "visible");
-			    
+			$("#comment-tick-" + parts[1]).css("visibility", "visible");	
+			$("#add-comment-area-" + parts[1]).css("visibility", "visible");
 			
 			//handle rating limits if available
 			handleRatingLimits(data.countRatedItems, itemId);
