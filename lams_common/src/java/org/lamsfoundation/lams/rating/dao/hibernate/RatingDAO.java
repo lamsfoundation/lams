@@ -171,12 +171,9 @@ public class RatingDAO extends LAMSBaseDAO implements IRatingDAO {
 	Object[] results = list.get(0);
 
 	Object averageRatingObj = (results[0] == null) ? 0 : results[0];
-	NumberFormat numberFormat = NumberFormat.getInstance(Locale.US);
-	numberFormat.setMaximumFractionDigits(1);
-	String averageRating = numberFormat.format(averageRatingObj);
 
 	String numberOfVotes = (results[1] == null) ? "0" : String.valueOf(results[1]);
-	return new ItemRatingCriteriaDTO(averageRating, numberOfVotes);
+	return new ItemRatingCriteriaDTO((Number)averageRatingObj, numberOfVotes);
     }
 
     @Override

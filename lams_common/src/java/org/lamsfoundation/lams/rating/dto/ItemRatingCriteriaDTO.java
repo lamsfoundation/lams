@@ -23,7 +23,9 @@
 
 package org.lamsfoundation.lams.rating.dto;
 
+import java.text.NumberFormat;
 import java.util.List;
+import java.util.Locale;
 
 import org.lamsfoundation.lams.rating.model.RatingCriteria;
 
@@ -36,6 +38,7 @@ public class ItemRatingCriteriaDTO {
     private String userRating;
     private String averageRating;
     private String numberOfVotes;
+    private Number averageRatingAsNumber;
 
     //used in case of filling with all rating
     private List<RatingDTO> ratingDtos;
@@ -43,8 +46,11 @@ public class ItemRatingCriteriaDTO {
     public ItemRatingCriteriaDTO() {
     }
 
-    public ItemRatingCriteriaDTO(String rating, String numberOfVotes) {
-	this.averageRating = rating;
+    public ItemRatingCriteriaDTO(Number rating, String numberOfVotes) {
+	NumberFormat numberFormat = NumberFormat.getInstance(Locale.US);
+	numberFormat.setMaximumFractionDigits(1);
+	this.averageRatingAsNumber = rating;
+	this.averageRating = numberFormat.format(rating);
 	this.numberOfVotes = numberOfVotes;
     }
 
@@ -86,6 +92,14 @@ public class ItemRatingCriteriaDTO {
 
     public void setRatingDtos(List<RatingDTO> ratingDtos) {
 	this.ratingDtos = ratingDtos;
+    }
+
+    public Number getAverageRatingAsNumber() {
+	return averageRatingAsNumber;
+    }
+
+    public void setAverageRatingAsNumber(Number averageRatingAsFloat) {
+	this.averageRatingAsNumber = averageRatingAsFloat;
     }
 
 }
