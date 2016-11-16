@@ -1,4 +1,4 @@
-﻿﻿/**
+﻿﻿﻿/**
  * This file contains methods for Activity definition and manipulation on canvas.
  */
 
@@ -386,12 +386,12 @@ ActivityDraw = {
 			this.drawContainer(x, y,
 							   box.x2 + layout.conf.containerActivityPadding,
 							   box.y2 + layout.conf.containerActivityPadding,
-							   layout.colors.optionalActivity);
+							   layout.colors.optionalActivity, layout.colors.optionalActivityBorder, 0.5);
 		} else {
 			this.drawContainer(x, y,
 							   x + layout.conf.containerActivityEmptyWidth,
 							   y + layout.conf.containerActivityEmptyHeight,
-							   layout.colors.optionalActivity);
+							   layout.colors.optionalActivity, layout.colors.optionalActivityBorder, 0.5);
 		}
 		
 		this.items.data('parentObject', this);
@@ -520,12 +520,12 @@ ActivityDraw = {
 			this.drawContainer(x, y,
 							  box.x2 + layout.conf.containerActivityPadding,
 							  box.y2 + layout.conf.containerActivityPadding,
-							  layout.colors.optionalActivity);
+							  layout.colors.optionalActivity, layout.colors.optionalActivityBorder, 0.5);
 		} else {
 			this.drawContainer(x, y,
 							   x + layout.conf.containerActivityEmptyWidth,
 							   y + layout.conf.containerActivityEmptyHeight,
-							   layout.colors.optionalActivity);
+							   layout.colors.optionalActivity, layout.colors.optionalActivityBorder, 0.5);
 		}
 		
 		if (!isReadOnlyMode){
@@ -567,12 +567,12 @@ ActivityDraw = {
 			this.drawContainer(x, y,
 							  box.x2 + layout.conf.containerActivityPadding,
 							  box.y2 + layout.conf.containerActivityPadding,
-							  layout.colors.optionalActivity);
+							  layout.colors.optionalActivity, layout.colors.optionalActivityBorder, 0.5);
 		} else {
 			this.drawContainer(x, y,
 							   x + layout.conf.containerActivityEmptyWidth,
 							   y + layout.conf.containerActivityEmptyHeight,
-							   layout.colors.optionalActivity);
+							   layout.colors.optionalActivity, layout.colors.optionalActivityBorder, 0.5);
 		}
 		
 		if (this.grouping) {
@@ -806,15 +806,17 @@ ActivityLib = {
 		// do not draw twice if it already exists
 		if (!activity.items.groupingEffect) {
 			var shape = activity.items.shape,
-				activityBox = activity.items.getBBox();
-			
+				activityBox = activity.items.getBBox(),
+				activityBorderColor = layout.colors.toolActivityBorder[layout.toolMetadata[activity.learningLibraryID].activityCategoryID];
+
 			activity.items.groupingEffect = paper.rect(
 					activityBox.x + layout.conf.groupingEffectPadding,
 					activityBox.y + layout.conf.groupingEffectPadding,
 					activityBox.width,
 					activityBox.height)
 				.attr({
-					'stroke' : layout.colors.activityBorder,
+					'stroke' : activityBorderColor,
+				    'stroke-width' : '0.5',
 					'fill' : shape.attr('fill')
 				});
 			

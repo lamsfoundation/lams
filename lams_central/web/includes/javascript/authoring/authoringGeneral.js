@@ -1,4 +1,4 @@
-﻿/**
+﻿﻿/**
  * This file contains main methods for Authoring.
  */
 
@@ -95,9 +95,9 @@ var paper = null,
 		
 		'colors' : {
 			'activityBorder'	  : 'black',
-			'toolActivityBorder'      : ['','#808699','#ff0000','#625F67','#ffa500','#808080','#7aa712'],
+			'toolActivityBorder'      : ['','#00007f','#ff8300','#625F67','#ffa500','#00007f','#7aa712'],
 			// each activity type has its own colour
-			'activity'     		  : ['','#d0defd','#fffccb','#ece9f7','#fdf1d3','#ffffff','#e9f9c0'],
+			'activity'     		  : ['','#caddfb','#ffffbb','#ece9f7','#fdf1d3','#caddfb','#e9f9c0'],
 			'activityText' 		  : 'black',
 			// default region colour
 			'annotation'		  : '#FFFF00',
@@ -116,9 +116,10 @@ var paper = null,
 			'gate'         		  : 'red',
                         'gateBorder'              : '#801515',
 			'gateText'     		  : 'white',
-			'grouping'		  : '#A9C8FD',
-			'groupingBorder'	  : '#485067',
-			'optionalActivity'    : 'rgb(194,213,254)',
+			'grouping'		  : '#caddfb',
+			'groupingBorder'	  : '#00007f',
+			'optionalActivity'    : '#caddfb',
+			'optionalActivityBorder'    : '#00007f',
 			// dashed border around a selected activity 
 			'selectEffect'        : 'black',
 			'transition'   		  : 'rgb(119,126,157)'

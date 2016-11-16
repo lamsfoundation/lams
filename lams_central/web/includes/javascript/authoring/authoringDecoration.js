@@ -1,4 +1,4 @@
-﻿/**
+﻿﻿/**
  * This file contains methods for Decoration (annotations, containers) manipulation on canvas.
  */
 
@@ -61,7 +61,7 @@ var DecorationDefs = {
 	methods : {
 		container : {
 			
-			draw : function(x, y, x2, y2, color){
+			draw : function(x, y, x2, y2, color, borderColor, strokeWidth){
 				// check for new coordinates or just take them from the existing shape
 				var box = this.items   ? this.items.shape.getBBox() : null,
 					x = x != undefined ? x : box.x,
@@ -96,6 +96,11 @@ var DecorationDefs = {
 					x2 = Math.max(x2, label.getBBox().x2 + 5);
 				}
 				
+				if ( ! borderColor )
+					borderColor = layout.colors.activityBorder;
+				if ( ! strokeWidth )
+					strokeWidth = 1;
+				
 				// the rectangle
 				this.items.shape = paper.path(Snap.format('M {x} {y} h {width} v {height} h -{width} z',
 														  {
@@ -105,7 +110,8 @@ var DecorationDefs = {
 														   'height'    : y2 - y
 														  }))
 						 			    .attr({
-						 			    	'stroke' : layout.colors.activityBorder,
+						 			    	'stroke' : borderColor,
+										    'stroke-width' : strokeWidth,
 						 			    	'fill'   : color
 						 			    });
 				this.items.prepend(this.items.shape);
