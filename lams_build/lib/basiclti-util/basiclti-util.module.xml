@@ -32,6 +32,7 @@
   			<path name="org/xml/sax"/>
   			<path name="org/w3c/dom"/>
   			<path name="javax/xml/parsers"/>
+  			<path name="javax/xml/transform"/>
   			<path name="javax/xml/xpath"/>  	
   			<path name="javax/naming"/>
   		</paths>
