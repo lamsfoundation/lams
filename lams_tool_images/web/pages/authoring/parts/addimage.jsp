@@ -37,7 +37,7 @@
 	            	
 				<lams:CKEditor id="description" value="${formBean.description}" width="99%" 
 					contentFolderID="${sessionMap.imageGalleryForm.contentFolderID}" 
-					resizeParentFrameName="reourceInputArea" />
+					resizeParentFrameName="new-image-input-area" />
 			</div>
 				
 			<div class="form-group">
@@ -50,7 +50,6 @@
 			<div class="panel-body text-center" style="display:none" id="itemAttachmentArea_Busy">
 				<i class="fa fa-refresh fa-spin fa-2x fa-fw text-primary"></i>
 			</div>
-		
 		
 			<div id="uploadButtons" class="voffset10 pull-right">
 			    <a href="#nogo" onclick="javascript:cancelImageGalleryItem()" class="btn btn-sm btn-default loffset5">

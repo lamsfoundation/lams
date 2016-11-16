@@ -1,6 +1,5 @@
 <%@ include file="/common/taglibs.jsp"%>
-<c:set var="ctxPath" value="${pageContext.request.contextPath}"
-	scope="request" />
+<c:set var="ctxPath" value="${pageContext.request.contextPath}"	scope="request" />
 <div id="itemList">
 
 <div class="panel panel-default voffset5">
@@ -70,7 +69,9 @@
 
 <%-- This script will works when a new resource item submit in order to refresh "Survey List" panel. --%>
 <script lang="javascript">
-	hideMessage();
-	var obj = document.getElementById('surveyListArea');
-	obj.innerHTML= document.getElementById("itemList").innerHTML;
+	if ($("#questionInputArea").is(':visible')) {
+		hideMessage();
+		var itemList = $("#itemList", "#questionInputArea").html();
+		$("#surveyListArea").html(itemList);
+	}
 </script>

@@ -8,19 +8,10 @@
 
 <c:set var="formBean" value="<%=request.getAttribute(org.apache.struts.taglib.html.Constants.BEAN_KEY)%>" />
 <script lang="javascript">
-<!-- Common Javascript functions for LAMS -->
 
 	function hideMessage(){
-		var area=document.getElementById("reourceInputArea");
-		if(area != null){
-			area.style.width="0px";
-			area.style.height="0px";
-			area.style.display="none";
-		}
-		var elem = document.getElementById("saveCancelButtons");
-		if (elem != null) {
-			elem.style.display="block";
-		}
+		$("#new-image-input-area").hide();
+		$("#saveCancelButtons").show();
 	}
 	
 	function editItem(idx,sessionMapID){
@@ -116,7 +107,5 @@
 <html:link href="#nogo" styleClass="btn btn-default btn-sm" onclick="javascript:showMessage('${showMessageURL}')">
 	<i class="fa fa-plus"></i>&nbsp;<fmt:message key="label.authoring.basic.add.image" />
 </html:link>
-<p>
-	<div onload="javascript:window.location.hash = '#reourceInputArea';" id="reourceInputArea" name="reourceInputArea" style="voffset10"> 
-	</div>
-</p>
+
+<div id="new-image-input-area" class="voffset10"></div>

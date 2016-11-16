@@ -1,10 +1,4 @@
 <%@ include file="/common/taglibs.jsp"%>
-<c:set var="ctxPath" value="${pageContext.request.contextPath}"
-	scope="request" />
-
-<c:set var="tool">
-	<lams:WebAppURL />
-</c:set>
 
 <div id="itemList">
 	<h4>
@@ -15,8 +9,7 @@
 	<table class="table table-condensed table-striped" id="itemTable">
 		<c:set var="sessionMap" value="${sessionScope[sessionMapID]}" />
 
-		<c:forEach var="taskList" items="${sessionMap.taskListList}"
-			varStatus="status">
+		<c:forEach var="taskList" items="${sessionMap.taskListList}" varStatus="status">
 			<tr>
 				<td width="5%" class="field-name align-right">
 					<fmt:message key="label.authoring.basic.resource.task" />
@@ -52,7 +45,9 @@
 
 <%-- This script will works when a new item is submitted in order to refresh "TaskList List" panel. --%>
 <script lang="javascript">
-	hideMessage();
-	var obj = document.getElementById('taskListListArea');
-	obj.innerHTML= document.getElementById("itemList").innerHTML;
+	if ($("#resourceInputArea").is(':visible')) { 
+		hideMessage();
+		var tasks = $("#itemList", "#resourceInputArea").html();
+		$("#taskListListArea").html(itemList);
+	}
 </script>

@@ -75,7 +75,10 @@
 	function submitTask(){
 		refreshCKEditors();
 		var form = $('#taskListItemForm');
-		$('#taskListListArea').load(form.attr('action'), form.serialize());
+		$('#resourceInputArea').load(
+			form.attr('action'), 
+			form.serialize()
+		);
 	} 
 	
 </script>
@@ -86,8 +89,9 @@
     <html:text property="taskList.title" styleClass="form-control"></html:text>
 </div>
 <div class="form-group">
-    <label for="taskList"><fmt:message key="label.authoring.basic.description" /></label>
-    <lams:CKEditor id="taskList.instructions" value="${formBean.taskList.instructions}" contentFolderID="${formBean.contentFolderID}"></lams:CKEditor>
+    <label for="taskList.instructions"><fmt:message key="label.authoring.basic.description" /></label>
+    <lams:CKEditor id="taskList.instructions" value="${formBean.taskList.instructions}" contentFolderID="${formBean.contentFolderID}">
+    </lams:CKEditor>
 </div>
 
 <div id="taskListListArea">
@@ -96,7 +100,7 @@
 </div>
 
 <a href="javascript:showMessage('<html:rewrite page="/authoring/newItemInit.do?sessionMapID=${formBean.sessionMapID}"/>');" class="btn btn-default btn-sm">
-		<i class="fa fa-plus"></i>&nbsp;<fmt:message key="label.authoring.basic.add.task" /></a> 
+	<i class="fa fa-plus"></i>&nbsp;<fmt:message key="label.authoring.basic.add.task" />
+</a> 
 
-<div id="resourceInputArea" name="resourceInputArea" class="voffset10"></div>
-
+<div id="resourceInputArea" class="voffset10"></div>

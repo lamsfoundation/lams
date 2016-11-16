@@ -85,4 +85,4 @@
 <a href="javascript:showMessage('<html:rewrite page="/authoring/newItemInit.do?itemType=3&contentFolderID=${formBean.contentFolderID}&sessionMapID=${formBean.sessionMapID}"/>');"
 	class="btn btn-default"> <i class="fa fa-plus"></i>&nbsp; <fmt:message key="label.authoring.basic.add.survey.open.question" /> </a>
 
-<div id="questionInputArea" name="questionInputArea" class="voffset10"></div>
+<div id="questionInputArea" class="voffset10"></div>
