@@ -98,6 +98,9 @@ public class LearningAction extends Action {
 	if (param.equals("edit")) {
 	    return edit(mapping, form, request, response);
 	}
+	if (param.equals("submitComments")) {
+	    return submitComments(mapping, form, request, response);
+	}
 	if (param.equals("submitHedging")) {
 	    return submitRankingHedging(mapping, form, request, response);
 	}
@@ -592,6 +595,60 @@ public class LearningAction extends Action {
 	return startRating(mapping, form, request, response, service, sessionMap, toolSessionId, user, mode, criteria, next);
     }
     
+    /** 
+     * Submit any comments not already submitted and go back to the main learning screen.
+     */
+    /**
+     * Submit the ranking / hedging data and go back to the main learning screen.
+     *
+     * @throws IOException
+     * @throws ServletException 
+     *
+     */
+    public ActionForward submitComments(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+	    HttpServletResponse response) throws IOException, ServletException {
+
+	IPeerreviewService service = getPeerreviewService();
+
+	String sessionMapID = request.getParameter(PeerreviewConstants.ATTR_SESSION_MAP_ID);
+	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession().getAttribute(
+		sessionMapID);
+	request.setAttribute(PeerreviewConstants.ATTR_SESSION_MAP_ID, sessionMapID);
+
+	ToolAccessMode mode = (ToolAccessMode) sessionMap.get(AttributeNames.ATTR_MODE);
+	PeerreviewUser user = (PeerreviewUser) sessionMap.get(PeerreviewConstants.ATTR_USER);
+	Long toolSessionId = (Long) sessionMap.get(PeerreviewConstants.PARAM_TOOL_SESSION_ID);
+
+	Peerreview peerreview = service.getPeerreviewBySessionId(toolSessionId);
+
+	Long criteriaId = WebUtil.readLongParam(request, "criteriaId");
+	RatingCriteria criteria = service.getCriteriaByCriteriaId(criteriaId);
+
+	if ( ! ( peerreview.getLockWhenFinished() && user.isSessionFinished() ) ) {
+
+	    Integer userId = user.getUserId().intValue();
+	    for (String key : request.getParameterMap().keySet()) {
+		if (key.startsWith("comment-textarea-")) {
+		    String itemIdString = key.substring(17);
+		    Long itemId = new Long(itemIdString);
+		    String comment = request.getParameter(key);
+		    if ( comment != null && comment.length() > 0 ) {
+			// save the comment to the database.
+			service.commentItem(criteria, userId, itemId, comment);
+		    }
+		}
+	    }
+	}
+	
+	request.setAttribute(PeerreviewConstants.ATTR_SESSION_MAP_ID, sessionMap.getSessionID());
+	request.setAttribute(AttributeNames.ATTR_MODE, mode);
+	request.setAttribute(PeerreviewConstants.PARAM_TOOL_SESSION_ID, toolSessionId);
+
+	Boolean next = WebUtil.readBooleanParam(request, "next");
+
+	// goto standard screen
+	return startRating(mapping, form, request, response, service, sessionMap, toolSessionId, user, mode, criteria, next);
+    }
     /**
      * Submit the ranking / hedging data and go back to the main learning screen.
      *
