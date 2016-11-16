@@ -13,13 +13,7 @@
 	<script type="text/javascript" src="${lams}includes/javascript/jquery.form.js"></script>
 	<script type="text/javascript">
    		function formSubmit(){
-   			$('#itemForm').ajaxSubmit({
-   				target: $("#commonCartridgeListArea", self.parent.document),
-   				success: function() {
-   					self.parent.refreshThickbox();
-   					self.parent.tb_remove();
-   				}
-   			});
+   			$("#itemForm").submit();
    		}
 	</script>
 </lams:head>

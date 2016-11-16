@@ -128,9 +128,6 @@
 			parameter="selectResources"
 			scope="request" 
 			validate="false">
-			<forward name="basiclti" path="/pages/authoring/parts/addbasiclti.jsp" />
-			<forward name="commoncartridge" path="/pages/authoring/parts/addcommoncartridge.jsp" />
-			<forward name="selectResources" path="/pages/authoring/parts/selectResources.jsp" />
 			<forward name="success" path="/pages/authoring/parts/itemlist.jsp" />
 		</action>
 		<action path="/authoring/removeItem"

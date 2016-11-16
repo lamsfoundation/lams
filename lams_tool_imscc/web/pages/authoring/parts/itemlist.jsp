@@ -114,19 +114,10 @@
 
 <%-- This script will works when a new resoruce item submit in order to refresh "CommonCartridge List" panel. --%>
 <script lang="javascript">	
-	var win = null;
-	try {
-		if (window.parent && window.parent.hideMessage) {
-			win = window.parent;
-		} else if (window.top && window.top.hideMessage) {
-			win = window.top;
-		}
-	} catch(err) {
-		// mute cross-domain iframe access errors
-	}
-	if (win) {
-		win.hideMessage();
-		var obj = win.document.getElementById('commonCartridgeListArea');
+	if (window.parent && window.parent.refreshThickbox) {
+		window.parent.tb_remove();
+		var obj = window.parent.document.getElementById('commonCartridgeListArea');
 		obj.innerHTML= document.getElementById("itemList").innerHTML;
+		window.parent.refreshThickbox();
 	}
 </script>
