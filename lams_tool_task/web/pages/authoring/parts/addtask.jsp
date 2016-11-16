@@ -2,30 +2,29 @@
 <%@ include file="/common/taglibs.jsp"%>
 
 <lams:html>
-	<lams:head>
-		<%@ include file="/common/header.jsp"%>
-		<lams:css />
+<lams:head>
+	<%@ include file="/common/header.jsp"%>
+	<lams:css />
 
-		<script type="text/javascript">
-		
-			function uncheckIsFilesRequired() {
-				document.getElementById("isFilesRequired").checked=false;
-			}
+	<script type="text/javascript">
+		function uncheckIsFilesRequired() {
+			document.getElementById("isFilesRequired").checked=false;
+		}
 			
-			function uncheckIsCommentsRequired() {
-				document.getElementById("isCommentsRequired").checked=false;
-			}
-		</script>
+		function uncheckIsCommentsRequired() {
+			document.getElementById("isCommentsRequired").checked=false;
+		}
+	</script>
 
-	</lams:head>
-	<body>
+</lams:head>
+<body>
 
-		<div class="panel panel-default add-file">
-			<div class="panel-heading panel-title">
-				<fmt:message key="label.authoring.basic.add.task" />
-			</div>
+	<div class="panel panel-default add-file">
+		<div class="panel-heading panel-title">
+			<fmt:message key="label.authoring.basic.add.task" />
+		</div>
 			
-			<div class="panel-body">
+		<div class="panel-body">
 
 			<%@ include file="/common/messages.jsp"%>
 
@@ -129,11 +128,15 @@
 	
 			</html:form>
 	
-			<a href="#" onclick="javascript:submitTask();" class="btn btn-default btn-sm pull-right"><i class="fa fa-plus"></i>&nbsp;<fmt:message key="button.add" /> </a>
-			<a href="#" onclick="javascript:hideMessage()" class="btn btn-default btn-sm pull-right roffset5"><fmt:message key="label.cancel" /> </a>
+			<a href="#" onclick="javascript:submitTask();" class="btn btn-default btn-sm pull-right">
+				<i class="fa fa-plus"></i>&nbsp;<fmt:message key="button.add" /> 
+			</a>
+			<a href="#" onclick="javascript:hideMessage()" class="btn btn-default btn-sm pull-right roffset5">
+				<fmt:message key="label.cancel" /> 
+			</a>
 			
-			</div>
 		</div>
+	</div>
 
-	</body>
+</body>
 </lams:html>

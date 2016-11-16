@@ -66,8 +66,6 @@ function submitImageGalleryItem(){
 		formData.append('file', file, file.name);
 		$('#uploadButtons').hide();
 		$('#itemAttachmentArea_Busy').show();
-		
-		
 	}
 
 	$.ajax({
@@ -77,7 +75,7 @@ function submitImageGalleryItem(){
         processData: false,
         contentType: false,
     	success: function(data) {
-    		$('#imageGalleryListArea').html(data);
+    		$('#new-image-input-area').html(data);
     	},
     	error: function(jqXHR, textStatus, errorMessage) {
         	alert(errorMessage);
@@ -151,7 +149,7 @@ function submitMultipleImageGalleryItems(){
         processData: false,
         contentType: false,
     	success: function(data) {
-    		$('#imageGalleryListArea').html(data);
+    		$('#new-image-input-area').html(data);
     	},
     	error: function(jqXHR, textStatus, errorMessage) {
         	alert(errorMessage);

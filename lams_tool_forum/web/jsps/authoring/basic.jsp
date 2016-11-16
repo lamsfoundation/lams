@@ -145,9 +145,9 @@
 </div>
 
 <div class="form-inline">
-<a href="javascript:showMessage('<html:rewrite page="/authoring/newTopic.do?sessionMapID=${formBean.sessionMapID}"/>');" id="addTopic" 
-		class="btn btn-default btn-sm"><i class="fa fa-plus"></i>&nbsp;<fmt:message key="label.authoring.create.new.topic" /> 
-</a>
+	<a href="javascript:showMessage('<html:rewrite page="/authoring/newTopic.do?sessionMapID=${formBean.sessionMapID}"/>');" id="addTopic" 
+			class="btn btn-default btn-sm"><i class="fa fa-plus"></i>&nbsp;<fmt:message key="label.authoring.create.new.topic" /> 
+	</a>
 </div>
 
 <div id="messageArea" name="messageArea" class="voffset10"></div>

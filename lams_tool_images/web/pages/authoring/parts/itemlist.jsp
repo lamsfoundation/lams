@@ -1,8 +1,4 @@
 <%@ include file="/common/taglibs.jsp"%>
-<c:set var="ctxPath" value="${pageContext.request.contextPath}" scope="request" />
-<c:set var="tool">
-	<lams:WebAppURL />
-</c:set>
 <c:set var="sessionMap" value="${sessionScope[sessionMapID]}" />
 
 <div id="itemList" >
@@ -58,7 +54,7 @@
 							onclick="javascript:deleteItem(${status.index},'${sessionMapID}')"></i>
 					</td>
 				</tr>
-				
+
 			</c:forEach>
 		</table>
 		
@@ -67,8 +63,10 @@
 
 <%-- This script will works when a new resoruce item submit in order to refresh "ImageGallery List" panel. --%>
 <script lang="javascript">
-	hideMessage();
-	var obj = document.getElementById('imageGalleryListArea');
-	obj.innerHTML= document.getElementById("itemList").innerHTML;
-	initLytebox();
+	if ($("#new-image-input-area").is(':visible')) {
+		hideMessage();
+		var itemList = $("#itemList", "#new-image-input-area").html();
+		$("#imageGalleryListArea").html(itemList);
+		initLytebox();
+	}
 </script>
