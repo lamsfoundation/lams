@@ -196,9 +196,15 @@
 		reactivateArrows();
 	}
 	
-	function generateSelect(id, validate, zeroDescription, orderId, currentValue) {
-		var str = '<select name="' + id + '" id="'+id+'" onmouseup="validateRatingLimits('+validate+','+orderId+');" class="form-control form-control-inline">'
-			+'<option value="0">'+zeroDescription+'</option>';
+	function generateSelect(id, validate, zeroDescription, orderId, currentValue) {		
+		var str = '<select name="' + id + '" id="'+id+'" class="form-control form-control-inline"';
+		if ( validate ) {
+			str += ' onchange="validateRatingLimits('+validate+','+orderId+');" '
+		} 
+		str	+= '> <option value="-1" '+ ( -1 == currentValue ? ' selected="selected"' : '' ) + '><fmt:message key="${allLabel}"/></option>';
+		if ( zeroDescription ) {
+			str += '<option value="0" '+ ( 0 == currentValue ? ' selected="selected"' : '' ) + '>'+zeroDescription+'</option>';
+		}
 		for (var i = 1; i < 11; i++) {
 			str += '<option value="'+i+'"' + (i == currentValue ? ' selected="selected"' : '' ) + '>'+i+'</option>';
 		}
@@ -263,12 +269,7 @@
 	
 		} else if ( style == 2 ) { 
 			var rankingStr = '<div class="voffset5"><label for="maxRating' + orderId + '"><fmt:message key="${rankLabel}"/></label>&nbsp;'
-			  + '<select name="maxRating' + orderId + '" id="maxRating' + orderId + '" class="voffset5 form-control" >'
-			  + '<option value="0" '+ ( 0 == maxRating ? ' selected="selected"' : '' ) + '><fmt:message key="${allLabel}"/></option>';
-			for (var i = 1; i < 11; i++) {
-				rankingStr += '<option value="'+i+'"' + (i == maxRating ? ' selected="selected"' : '' ) + '>'+i+'</option>';
-			}
-			rankingStr += '</select></div>';
+			  + generateSelect('maxRating' + orderId, null, null, orderId, maxRating);
 			row.append(jQuery('<td/>', {
 				'class': 'criteria-info',
 			    html: '<div class="voffset5"><fmt:message key="${styleRanking}" />:&nbsp;</div>'+ inputField + rankingStr 
@@ -330,7 +331,25 @@
 		var maxRateDropDown = document.getElementById("maximumRates" + orderId);
 		var maxLimit = parseInt(maxRateDropDown.options[maxRateDropDown.selectedIndex].value);
 
-		if ((minLimit > maxLimit) && !(maxLimit == 0)) {
+		// RANK ALL
+		if ( minLimit == -1 || maxLimit == -1 ) {
+			if ( isMinimum ) {
+				if ( minLimit == -1 ) {
+					maxRateDropDown.selectedIndex = 0;
+				} else {
+					maxRateDropDown.selectedIndex = minRateDropDown.selectedIndex;
+				}
+			} else {
+				if ( maxLimit == -1 ) {
+					minRateDropDown.selectedIndex = 0;
+				} else {
+					minRateDropDown.selectedIndex = maxRateDropDown.selectedIndex;
+				}
+			}
+		}
+
+		// OTHERWISE MIN <= MAX
+		else if ((minLimit > maxLimit) && !(maxLimit == 0)) {
 			if (isMinimum) {
 				minRateDropDown.selectedIndex = maxRateDropDown.selectedIndex;
 			} else {
