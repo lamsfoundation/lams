@@ -254,10 +254,16 @@ public class RatingService implements IRatingService {
 		    }
 		}
 
-		String averageRating = itemStatistics == null ? "0" : numberFormat.format(itemStatistics[2]);
-		String numberOfVotes = itemStatistics == null ? "0" : String.valueOf(itemStatistics[3]);
-		criteriaDto.setAverageRating(averageRating);
-		criteriaDto.setNumberOfVotes(numberOfVotes);
+		if ( itemStatistics != null ) {
+		    Number averageRating = (Number) itemStatistics[2];
+		    criteriaDto.setAverageRating(numberFormat.format(averageRating));
+		    criteriaDto.setAverageRatingAsNumber(averageRating);
+		    criteriaDto.setNumberOfVotes(String.valueOf(itemStatistics[3]));
+		} else {
+		    criteriaDto.setAverageRating("0");
+		    criteriaDto.setAverageRatingAsNumber(0);
+		    criteriaDto.setNumberOfVotes("0");
+		}
 
 		criteriaDtos.add(criteriaDto);
 
