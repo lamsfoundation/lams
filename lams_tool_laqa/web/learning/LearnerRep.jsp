@@ -374,7 +374,7 @@
 
 		<!-- Others questions -->
 
-		<c:if test="${generalLearnerFlowDTO.existMultipleUserResponses == 'true'}">
+		<c:if test="${generalLearnerFlowDTO.showOtherAnswers}">
 			<h4>
 				<fmt:message key="label.other.answers" />
 			</h4>
