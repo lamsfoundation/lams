@@ -1,4 +1,4 @@
-﻿/**
+﻿﻿/**
  * This file contains methods for Activity properties dialogs.
  */
 
@@ -580,8 +580,8 @@ var PropertyDefs = {
 													  .simpleColor({
 														'colors' : layout.colors.annotationPalette,
 														'chooserCSS' : {
-															'left'	   : 0,
-															'top'      : '30px',
+															'left'	   : 2,
+															'top'      : '25px',
 															'margin'   : '0'
 														}
 													  });

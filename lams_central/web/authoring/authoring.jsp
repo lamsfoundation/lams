@@ -925,7 +925,7 @@
 					 <input class="propertiesContentFieldTitle" type="text"></input>
 				</td>
 			</tr>
-			<tr>
+			<tr height="50px" valign="top">
 				<td>
 					<fmt:message key="authoring.fla.page.prop.color" />
 				</td>
