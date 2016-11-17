@@ -1,4 +1,4 @@
-﻿﻿/**
+﻿﻿﻿/**
  * This file contains main methods for Authoring.
  */
 
@@ -100,11 +100,11 @@ var paper = null,
 			'activity'     		  : ['','#caddfb','#ffffbb','#ece9f7','#fdf1d3','#caddfb','#e9f9c0'],
 			'activityText' 		  : 'black',
 			// default region colour
-			'annotation'		  : '#FFFF00',
+			'annotation'		  : '#CCFF99',
 			// region colours to choose from
-			'annotationPalette'	  : ['FFFF00', '00FFFF', '8A2BE2', '7FFF00', '6495ED',
-			                   	     'FFF8DC', 'FF8C00', '00BFFF', 'DCDCDC', 'ADD8E6', '20B2AA',
-			                   	     'B0C4DE', 'FFE4E1', 'FF4500', 'EE82EE'],
+			'annotationPalette'	  : ['CCFF99', 'CDA5F3', 'FFFFCC', '99E6DF', '6495ED',
+			                   	     'FFF8DC', 'FFDDB3', 'D1DFFA', 'DCDCDC', '20B2AA',
+			                   	     'B0C4DE', 'FFE4E1', 'F9D2F9', 'FF2200'],
 
 			// when mouse hovers over rubbish bin
 			'binSelect' 		  : 'red',
