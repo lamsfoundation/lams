@@ -80,7 +80,7 @@ public class GeneralLearnerFlowDTO implements Comparable {
 
     protected String userNameVisible;
 
-    protected String showOtherAnswers;
+    protected boolean showOtherAnswers;
 
     protected String requestLearningReport;
 
@@ -110,8 +110,6 @@ public class GeneralLearnerFlowDTO implements Comparable {
     protected boolean noReeditAllowed;
 
     protected String userUid;
-
-    protected String existMultipleUserResponses;
 
     protected String usernameVisible;
 
@@ -679,7 +677,7 @@ public class GeneralLearnerFlowDTO implements Comparable {
     /**
      * @return Returns the showOtherAnswers.
      */
-    public String getShowOtherAnswers() {
+    public boolean getShowOtherAnswers() {
 	return showOtherAnswers;
     }
 
@@ -687,7 +685,7 @@ public class GeneralLearnerFlowDTO implements Comparable {
      * @param showOtherAnswers
      *            The showOtherAnswers to set.
      */
-    public void setShowOtherAnswers(String showOtherAnswers) {
+    public void setShowOtherAnswers(boolean showOtherAnswers) {
 	this.showOtherAnswers = showOtherAnswers;
     }
 
@@ -704,21 +702,6 @@ public class GeneralLearnerFlowDTO implements Comparable {
      */
     public void setUserUid(String userUid) {
 	this.userUid = userUid;
-    }
-
-    /**
-     * @return Returns the existMultipleUserResponses.
-     */
-    public String getExistMultipleUserResponses() {
-	return existMultipleUserResponses;
-    }
-
-    /**
-     * @param existMultipleUserResponses
-     *            The existMultipleUserResponses to set.
-     */
-    public void setExistMultipleUserResponses(String existMultipleUserResponses) {
-	this.existMultipleUserResponses = existMultipleUserResponses;
     }
 
     public String getAllowRichEditor() {
