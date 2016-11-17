@@ -19,7 +19,7 @@
 	<fmt:message key="label.showhide.prompt" />
 </c:set>
 <c:set var="tableCommand">expandable:true,initialState:'expanded',
-	expanderTemplate:'<a href=\"#\">&nbsp;&nbsp;&nbsp;&nbsp;${prompt}</a>',
+	expanderTemplate:'<a href=\"#\"><span style="margin-left:20px">${prompt}</span></a>',
 	stringCollapse:'${hide}',stringExpand:'${show}',
 	clickableNodeNames:true,indent:${indent},
 	onNodeInitialized:function() {
