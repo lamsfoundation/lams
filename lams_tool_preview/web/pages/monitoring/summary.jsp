@@ -115,7 +115,7 @@
 		<c:set var="offset" value=" loffset5"/>
 		</c:if>
 		<c:if test="${sessionMap.peerreview.notifyUsersOfResults}">
-			<a href="javascript:sendResults(${groupSummary.sessionId})" class="btn btn-default voffset5 ${offset}">Send Results To Learners</a>
+			<a href="javascript:sendResults(${groupSummary.sessionId})" class="btn btn-default voffset5 ${offset}"><fmt:message key="label.notify.user.of.results"/></a>
 		</c:if>
 	</div>
 	</c:if>
