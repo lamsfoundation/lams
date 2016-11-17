@@ -135,14 +135,14 @@
 					</html:button>
 				</c:if>
 
-				<c:if test="${generalLearnerFlowDTO.showOtherAnswers == 'true'}">
+				<c:if test="${generalLearnerFlowDTO.showOtherAnswers}">
 					<html:button property="viewAllResults" onclick="submitMethod('storeAllResults');"
 						styleClass="btn btn-default pull-right">
 						<fmt:message key="label.allResponses" />
 					</html:button>
 				</c:if>
 
-				<c:if test="${generalLearnerFlowDTO.showOtherAnswers != 'true'}">
+				<c:if test="${!generalLearnerFlowDTO.showOtherAnswers}">
 					<c:if test="${generalLearnerFlowDTO.reflection != 'true'}">
 						<div class="space-bottom-top align-right">
 							<html:link href="#nogo" property="endLearning" styleId="finishButton"

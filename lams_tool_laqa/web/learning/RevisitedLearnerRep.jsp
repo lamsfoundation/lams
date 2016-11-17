@@ -362,19 +362,19 @@
 			</div>
 		</c:forEach>
 
-
-		<c:if test="${generalLearnerFlowDTO.teacherViewOnly != 'true' }">
-			<c:if test="${(generalLearnerFlowDTO.lockWhenFinished != 'true') && hasEditRight}">
+		<c:if test="${generalLearnerFlowDTO.teacherViewOnly != 'true' 
+				&& (generalLearnerFlowDTO.lockWhenFinished != 'true') && hasEditRight}">
+			<div style="overflow: hidden;">
 				<html:button property="redoQuestions" styleClass="btn btn-default pull-left"
 					onclick="submitMethod('redoQuestions');">
 					<fmt:message key="label.redo" />
 				</html:button>
-			</c:if>
+			</div>
 		</c:if>
 
 		<!-- Others questions -->
 
-		<c:if test="${generalLearnerFlowDTO.existMultipleUserResponses == 'true'}">
+		<c:if test="${generalLearnerFlowDTO.showOtherAnswers}">
 			<h4>
 				<fmt:message key="label.other.answers" />
 			</h4>
