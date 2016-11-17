@@ -252,22 +252,6 @@ public class QaLearningStarterAction extends Action implements QaAppConstants {
 	generalLearnerFlowDTO.setInitialScreen(new Boolean(true).toString());
 
 	request.setAttribute(GENERAL_LEARNER_FLOW_DTO, generalLearnerFlowDTO);
-	/*
-	 * Is the request for a preview by the author?
-	 * Preview The tool must be able to show the specified content as if it was running in a lesson.
-	 * It will be the learner url with tool access mode set to ToolAccessMode.AUTHOR
-	 * 3 modes are:
-	 * author
-	 * teacher
-	 * learner
-	 */
-	/* handling PREVIEW mode */
-
-	if ((qaSession.getQaQueUsers() != null) && (qaSession.getQaQueUsers().size() > 1)
-		&& !qaContent.isUseSelectLeaderToolOuput()) {
-	    //there are multiple user responses
-	    generalLearnerFlowDTO.setExistMultipleUserResponses(new Boolean(true).toString());
-	}
 
 	/*
 	 * by now, we know that the mode is either teacher or learner

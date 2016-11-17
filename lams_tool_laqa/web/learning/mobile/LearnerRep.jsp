@@ -370,7 +370,7 @@
 			</c:forEach>	
 		</ul>
 		
-		<c:if test="${generalLearnerFlowDTO.existMultipleUserResponses == 'true'}">				
+		<c:if test="${generalLearnerFlowDTO.showOtherAnswers}">				
 			<h2 style="padding-top: 20px; padding-bottom: 0;">
 				<fmt:message key="label.other.answers" />
 			</h2>

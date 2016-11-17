@@ -65,7 +65,7 @@
 			</div>
 		</c:if>	
 
-		<c:if test="${(generalLearnerFlowDTO.lockWhenFinished == 'true')  && !generalLearnerFlowDTO.noReeditAllowed && (generalLearnerFlowDTO.showOtherAnswers == 'true') }">
+		<c:if test="${(generalLearnerFlowDTO.lockWhenFinished == 'true')  && !generalLearnerFlowDTO.noReeditAllowed && (generalLearnerFlowDTO.showOtherAnswers) }">
 			<div class="info space-bottom">
 				<fmt:message key="label.responses.locked" />								
 			</div>
@@ -127,13 +127,13 @@
 	
 	<div data-role="footer" data-theme="b" class="ui-bar">
 		<span class="ui-finishbtn-right">
-			<c:if test="${generalLearnerFlowDTO.showOtherAnswers == 'true'}">
+			<c:if test="${generalLearnerFlowDTO.showOtherAnswers}">
 				<button name="viewAllResults" onclick="submitMethod('storeAllResults');" data-icon="arrow-r" data-theme="b">
 					<fmt:message key="label.allResponses" />
 				</button>
 			</c:if>				
 
-			<c:if test="${generalLearnerFlowDTO.showOtherAnswers != 'true'}">
+			<c:if test="${!generalLearnerFlowDTO.showOtherAnswers}">
 				<c:if test="${generalLearnerFlowDTO.reflection != 'true'}">
 				    <div class="space-bottom-top align-right">
 						<a href="#nogo" name="endLearning" id="finishButton"

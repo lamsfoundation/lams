@@ -348,18 +348,17 @@
 			</c:forEach>
 		</ul>
 				
-		<c:if test="${generalLearnerFlowDTO.teacherViewOnly != 'true' }">
-			<c:if test="${(generalLearnerFlowDTO.lockWhenFinished != 'true') && hasEditRight}">
-				<br>
-				<span class="button-inside">
-					<html:button property="redoQuestions" styleClass="button" onclick="submitMethod('redoQuestions');">
-						<fmt:message key="label.redo" />
-					</html:button>
-				</span>
-			</c:if>						
+		<c:if test="${generalLearnerFlowDTO.teacherViewOnly != 'true' 
+				&& (generalLearnerFlowDTO.lockWhenFinished != 'true') && hasEditRight}">
+			<br>
+			<span class="button-inside">
+				<html:button property="redoQuestions" styleClass="button" onclick="submitMethod('redoQuestions');">
+					<fmt:message key="label.redo" />
+				</html:button>
+			</span>				
 		</c:if>
 				
-		<c:if test="${generalLearnerFlowDTO.existMultipleUserResponses == 'true'}">				
+		<c:if test="${generalLearnerFlowDTO.showOtherAnswers}">				
 			<h2>
 				<fmt:message key="label.other.answers" />
 			</h2>

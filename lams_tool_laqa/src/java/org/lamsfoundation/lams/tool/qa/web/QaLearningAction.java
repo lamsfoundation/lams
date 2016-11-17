@@ -397,16 +397,6 @@ public class QaLearningAction extends LamsDispatchAction implements QaAppConstan
 	    generalLearnerFlowDTO.setAllowRichEditor(new Boolean(allowRichEditor).toString());
 	    generalLearnerFlowDTO.setUserUid(user.getQueUsrId().toString());
 
-	    int sessionUserCount = 0;
-	    if (qaSession.getQaQueUsers() != null) {
-		sessionUserCount = qaSession.getQaQueUsers().size();
-	    }
-
-	    if (sessionUserCount > 1) {
-		// there are multiple user responses
-		generalLearnerFlowDTO.setExistMultipleUserResponses(new Boolean(true).toString());
-	    }
-
 	    boolean usernameVisible = qaContent.isUsernameVisible();
 	    generalLearnerFlowDTO.setUserNameVisible(new Boolean(usernameVisible).toString());
 
@@ -499,15 +489,6 @@ public class QaLearningAction extends LamsDispatchAction implements QaAppConstan
 
 	QaQueUsr qaQueUsr = getCurrentUser(toolSessionID);
 	generalLearnerFlowDTO.setUserUid(qaQueUsr.getQueUsrId().toString());
-
-	int sessionUserCount = 0;
-	if (qaSession.getQaQueUsers() != null) {
-	    sessionUserCount = qaSession.getQaQueUsers().size();
-	}
-
-	if (sessionUserCount > 1) {
-	    generalLearnerFlowDTO.setExistMultipleUserResponses(new Boolean(true).toString());
-	}
 
 	boolean usernameVisible = qaContent.isUsernameVisible();
 	generalLearnerFlowDTO.setUserNameVisible(new Boolean(usernameVisible).toString());
@@ -821,16 +802,6 @@ public class QaLearningAction extends LamsDispatchAction implements QaAppConstan
 
 	QaLearningAction.refreshSummaryData(request, qaContent, QaLearningAction.qaService, httpSessionID, qaQueUsr,
 		generalLearnerFlowDTO);
-
-	int sessionUserCount = 0;
-	if (qaSession.getQaQueUsers() != null) {
-	    sessionUserCount = qaSession.getQaQueUsers().size();
-	}
-
-	if (sessionUserCount > 1) {
-	    // there are multiple user responses
-	    generalLearnerFlowDTO.setExistMultipleUserResponses(new Boolean(true).toString());
-	}
 
 	boolean isLearnerFinished = qaQueUsr.isLearnerFinished();
 	generalLearnerFlowDTO.setRequestLearningReportViewOnly(new Boolean(isLearnerFinished).toString());
