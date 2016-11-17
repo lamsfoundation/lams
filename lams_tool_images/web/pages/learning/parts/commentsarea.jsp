@@ -96,27 +96,25 @@
 			
 			<%--"Check for new", "Add new image" and "Delete" buttons---------------%>
 				
-			<c:if test="${imageGallery.allowShareImages}">
-			
-				<a href="#nogo" onclick="return checkNew()" class="btn btn-default" id="check-for-new-button"> 
-					<fmt:message key="label.check.for.new" /> 
-				</a>
-							
-				<c:if test="${not finishedLock}">
-					<br>
-					<a href="<html:rewrite page='/learning/newImageInit.do?sessionMapID='/>${sessionMapID}&KeepThis=true&TB_iframe=true&modal=true" 
-							class="btn btn-default voffset10 thickbox" id="add-new-image-button">  
-						<fmt:message key="label.learning.add.new.image" />
-					</a>
+			<div class="btn-group" role="group">	
+				<c:if test="${imageGallery.allowShareImages}">
+					<button href="#nogo" onclick="return checkNew()" class="btn btn-sm btn-default" id="check-for-new-button"> 
+						<i class="fa fa-refresh"></i> <fmt:message key="label.check.for.new" /> 
+					</button>
+								
+					<c:if test="${not finishedLock}">
+						<a href="<html:rewrite page='/learning/newImageInit.do?sessionMapID='/>${sessionMapID}&KeepThis=true&TB_iframe=true&modal=true" 
+								class="btn btn-default btn-sm thickbox" id="add-new-image-button">  
+							<i class="fa fa-upload"></i> <fmt:message key="label.learning.add.new.image" />
+						</a>
+					</c:if>
+					
+					<c:if test="${sessionMap.isAuthor}">
+						<button href="#nogo" onclick="return deleteImage(${sessionMap.currentImage.uid});" class="btn btn-default btn-sm" id="delete-button"> 
+							<i class="fa fa-trash"></i> <fmt:message key="label.learning.delete.image" /> 
+						</button>
+					</c:if>
 				</c:if>
-				
-				<c:if test="${sessionMap.isAuthor}">
-					<br>
-					<a href="#nogo" onclick="return deleteImage(${sessionMap.currentImage.uid});" class="btn btn-default voffset10" id="delete-button"> 
-						<fmt:message key="label.learning.delete.image" /> 
-					</a>
-				</c:if>
-			</c:if>
-		
+			</div>
 	</div>
 </c:if>
