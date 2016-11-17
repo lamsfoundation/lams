@@ -814,21 +814,21 @@ public class LearningAction extends Action {
     private List<FormFile> createFileListFromMultipleForm(MultipleImagesForm multipleForm) {
 
 	List<FormFile> fileList = new ArrayList<FormFile>();
-	if (!StringUtils.isEmpty(multipleForm.getFile1().getFileName())) {
+	if (multipleForm.getFile1() != null && !StringUtils.isEmpty(multipleForm.getFile1().getFileName())) {
 	    fileList.add(multipleForm.getFile1());
 	}
-	if (!StringUtils.isEmpty(multipleForm.getFile2().getFileName())) {
+	if (multipleForm.getFile2() != null && !StringUtils.isEmpty(multipleForm.getFile2().getFileName())) {
 	    fileList.add(multipleForm.getFile2());
 	}
-	if (!StringUtils.isEmpty(multipleForm.getFile3().getFileName())) {
+	if (multipleForm.getFile3() != null && !StringUtils.isEmpty(multipleForm.getFile3().getFileName())) {
 	    fileList.add(multipleForm.getFile3());
 	}
-	if (!StringUtils.isEmpty(multipleForm.getFile4().getFileName())) {
+	if (multipleForm.getFile4() != null && !StringUtils.isEmpty(multipleForm.getFile4().getFileName())) {
 	    fileList.add(multipleForm.getFile4());
 	}
-	if (!StringUtils.isEmpty(multipleForm.getFile5().getFileName())) {
+	if (multipleForm.getFile5() != null && !StringUtils.isEmpty(multipleForm.getFile5().getFileName())) {
 	    fileList.add(multipleForm.getFile5());
-	}
+	}	
 
 	return fileList;
     }

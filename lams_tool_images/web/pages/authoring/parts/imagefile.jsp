@@ -38,7 +38,7 @@
 					<i class="fa fa-upload"></i> <fmt:message key="label.authoring.basic.resource.file.input"/>
 				</button>
 			</span>
-			<input type="file" id="fileSelector" name="file" multiple style="display:none"> 
+			<input type="file" id="fileSelector" name="file" style="display:none"> 
 			<input type="text" id="fileInputName" style="display:none" disabled="disabled" placeholder="File not selected" class="form-control input-sm">
 		</div>
 				

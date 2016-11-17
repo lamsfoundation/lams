@@ -75,6 +75,12 @@
 				launchPopup(myUrl,"MonitoringReview");
 			}
 			
+			function checkNew(){
+				var monitorURL = window.location.href;
+				document.location.href = monitorURL;
+	 		    return false;
+			}			
+			
 			$(document).ready(function(){
 
 				$(".tablesorter").tablesorter({

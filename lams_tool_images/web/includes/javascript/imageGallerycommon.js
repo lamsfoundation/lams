@@ -6,6 +6,7 @@ function showMessage(url) {
 	$("#new-image-input-area").load(url, function() {
 		$(this).show();
 		$("#saveCancelButtons").hide();
+		$('#file-title').focus();		
 	});
 }
 	

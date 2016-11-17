@@ -163,7 +163,8 @@
 					sessionMapID: "${sessionMapID}"
 				}
 			);
-		}  
+		}
+				
     </script>
    
 </lams:head>

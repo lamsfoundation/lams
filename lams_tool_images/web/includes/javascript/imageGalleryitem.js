@@ -54,11 +54,11 @@ function submitImageGalleryItem(){
 		if (file.name.length < 1) {
 			alert("file.name.length < 1");
 			return;
-		} else if (file.size > UPLOAD_FILE_LARGE_MAX_SIZE) {
-			alert(LABEL_MAX_FILE_SIZE);
-			return;
 		} else if (file.type != 'image/png' && file.type != 'image/jpg' && file.type != 'image/gif' && file.type != 'image/jpeg' ) {
 			alert(LABEL_NOT_ALLOWED_FORMAT);
+			return;
+		} else if (file.size > UPLOAD_FILE_LARGE_MAX_SIZE) {
+			alert(LABEL_MAX_FILE_SIZE);
 			return;
 		}
 
@@ -66,6 +66,7 @@ function submitImageGalleryItem(){
 		formData.append('file', file, file.name);
 		$('#uploadButtons').hide();
 		$('#itemAttachmentArea_Busy').show();
+		
 	}
 
 	$.ajax({
@@ -75,9 +76,11 @@ function submitImageGalleryItem(){
         processData: false,
         contentType: false,
     	success: function(data) {
-    		$('#new-image-input-area').html(data);
+   			$('#new-image-input-area').html(data);
     	},
     	error: function(jqXHR, textStatus, errorMessage) {
+    		$('#uploadButtons').show();
+    		$('#itemAttachmentArea_Busy').hide();    		
         	alert(errorMessage);
     	}
 	});
@@ -152,7 +155,9 @@ function submitMultipleImageGalleryItems(){
     		$('#new-image-input-area').html(data);
     	},
     	error: function(jqXHR, textStatus, errorMessage) {
-        	alert(errorMessage);
+    		$('#uploadButtons').show();
+    		$('#itemAttachmentArea_Busy').hide();            	
+    		alert(errorMessage);
     	}
 	});
 } 

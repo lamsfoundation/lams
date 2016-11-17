@@ -134,11 +134,11 @@
 			<br>
 			
 			<div class="voffset10 pull-right">
+				<a href="#nogo" onclick="javascript:self.parent.tb_remove();" class="btn btn-default roffset5">
+					<fmt:message key="label.cancel" /> 
+				</a>
 				<a href="#nogo" onclick="javascript:document.imageGalleryItemForm.submit();" class="btn btn-default">
 					<fmt:message key="label.monitoring.imagesummary.save" /> 
-				</a>
-				<a href="#nogo" onclick="javascript:self.parent.tb_remove();" class="btn btn-default loffset5">
-					<fmt:message key="label.cancel" /> 
 				</a>
 			</div>
 		</div>
