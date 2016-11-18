@@ -65,13 +65,12 @@
 		.jGrowl-notification {
 			opacity: .6;
 			border-radius: 10px;
-			width: 230px;
+			width: 260px;
 			padding: 10px 20px;
   			margin: 10px 20px;
-			background: black url(${lams}/images/css/check48.png) no-repeat 10px 10px;
 		}
 		.jGrowl-message {
-			padding-left: 60px;
+			padding-left: 10px;
 			padding-top: 5px;
 		}
 	</style>
@@ -218,7 +217,7 @@
 						url: "<c:url value='/learning/autoSaveAnswers.do'/>?sessionMapID=${sessionMapID}&date=" + new Date().getTime(),
 		                success: function() {
 		                	$.jGrowl(
-		                		"<fmt:message key="label.learning.draft.autosaved" />",
+		                		"<i class='fa fa-lg fa-floppy-o'></i> <fmt:message key="label.learning.draft.autosaved" />",
 		                		{ life: 2000, closeTemplate: '' }
 		                	);
 		                }
