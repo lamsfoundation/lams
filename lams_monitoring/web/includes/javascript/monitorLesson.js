@@ -234,8 +234,8 @@ function updateLessonTab(){
 		success : function(response) {
 			// update lesson state label
 			lessonStateId = +response.lessonStateID;
-			var label = null;
-			var labelColour = 'warning';
+			var label = null,
+				labelColour = 'warning';
 			switch (lessonStateId) {
 				case 1:
 					label = LABELS.LESSON_STATE_CREATED;
@@ -292,10 +292,10 @@ function updateLessonTab(){
 			}
 			
 			// show/remove widgets for lesson scheduling
-			var scheduleControls = $('#scheduleDatetimeField, #scheduleLessonButton, #startLessonButton, #lessonScheduler');
-			var startDateField = $('#lessonStartDateSpan');
-			var lessonStateChanger = $('#lessonStateChanger');
-			var stateLabel = $('#lessonStateLabel');
+			var scheduleControls = $('#scheduleDatetimeField, #scheduleLessonButton, #startLessonButton, #lessonScheduler'),
+				startDateField = $('#lessonStartDateSpan'),
+				lessonStateChanger = $('#lessonStateChanger'),
+				stateLabel = $('#lessonStateLabel');
 			switch (lessonStateId) {
 				 case 1:
 					 scheduleControls.css('display','inline');
@@ -320,6 +320,10 @@ function updateLessonTab(){
 			$('#description').html(response.lessonDescription);
 		}
 	});
+	
+	drawChart('pie', 'chartDiv',
+			  LAMS_URL + 'monitoring/monitoring.do?method=getLessonChartData&lessonID=' + lessonId,
+			  true);
 	
 	updatePresenceAvailableCount();
 }

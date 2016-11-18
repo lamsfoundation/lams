@@ -14,8 +14,8 @@
 	<link href="/lams/css/defaultHTML_learner.css" rel="stylesheet" type="text/css">
   	<link rel="stylesheet" href="<lams:LAMSURL/>css/jquery-ui-bootstrap-theme.css" type="text/css" media="screen">	
 	<link rel="stylesheet" href="<lams:LAMSURL/>css/progressBar.css" type="text/css" />
+	<link rel="stylesheet" href="<lams:LAMSURL/>/css/chart.css" type="text/css" />
 	<link rel="stylesheet" href="css/monitorLesson.css" type="text/css" media="screen" />
-
   
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery.js"></script>
 	<script type="text/javascript" >
@@ -30,10 +30,13 @@
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery-ui.timepicker.js"></script>
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/snap.svg.js"></script>
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/readmore.min.js"></script>
+	<script type="text/javascript" src="<lams:LAMSURL />includes/javascript/d3.js"></script>
+	<script type="text/javascript" src="<lams:LAMSURL />includes/javascript/chart.js"></script>
 	<script type="text/javascript" src="<lams:WebAppURL />includes/javascript/monitorLesson.js"></script>
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/bootstrap.min.js"></script>
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/bootstrap.tabcontroller.js"></script>
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/dialog.js"></script>
+
 	
 	<script type="text/javascript">
 		var lessonId = ${lesson.lessonID},
@@ -348,23 +351,9 @@
 								</dd>
 							</dl>	
 						</div>
-						
-						
-						<div class="col-sm-3 col-xs-6">
-							<div class="panel panel-default">
-								<div class="panel-heading">Overall Completion
-								</div>
-								<div class="panel-body">60%
-		
-								</div>
-							</div>
-						</div>
-					</div>
-					
-					<!-- start lesson details -->
-					<div class="row">
-						<div class="col-xs-12">
-							
+						<div class="panel panel-default pull-right">
+							<div class="panel-heading"><fmt:message key="lesson.chart.title"/></div>
+							<div id="chartDiv" class="panel-body"></div>
 						</div>
 					</div>
 					
