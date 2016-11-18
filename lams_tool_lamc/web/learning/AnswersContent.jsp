@@ -18,7 +18,7 @@
 
 		div.growlUI h1, div.growlUI h2 {
 		color: white;
-		marcin: 5px 5px 5px 0px;
+		margin: 5px 5px 5px 0px;
 		text-align: center;
 		font-size: 18px;
 }
