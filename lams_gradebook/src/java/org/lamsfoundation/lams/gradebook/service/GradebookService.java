@@ -88,6 +88,11 @@ import org.lamsfoundation.lams.util.MessageService;
 import org.lamsfoundation.lams.util.audit.IAuditService;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
+import org.springframework.web.context.WebApplicationContext;
+import org.springframework.web.context.support.WebApplicationContextUtils;
+import org.lamsfoundation.lams.learning.service.ICoreLearnerService;
+import org.lamsfoundation.lams.learning.web.bean.ActivityURL;
+
 
 /**
  *
@@ -113,6 +118,9 @@ public class GradebookService implements IGradebookService {
     private IActivityDAO activityDAO;
     private MessageService messageService;
     private IAuditService auditService;
+    private static ICoreLearnerService learnerService;
+	
+    
 
     @Override
     public List<GradebookGridRowDTO> getGBActivityRowsForLearner(Long lessonId, Integer userId) {
@@ -123,7 +131,7 @@ public class GradebookService implements IGradebookService {
 
 	List<GradebookGridRowDTO> gradebookActivityDTOs = new ArrayList<GradebookGridRowDTO>();
 
-	Set<ToolActivity> activities = getLessonActivities(lesson);
+	List<ToolActivity> activities = getLessonActivities(lesson);
 	for (ToolActivity activity : activities) {
 
 	    String groupName = null;
@@ -185,7 +193,7 @@ public class GradebookService implements IGradebookService {
 	Lesson lesson = lessonService.getLesson(lessonId);
 	List<GradebookGridRowDTO> gradebookActivityDTOs = new ArrayList<GradebookGridRowDTO>();
 
-	Set<ToolActivity> activities = getLessonActivities(lesson);
+	List<ToolActivity> activities = getLessonActivities(lesson);
 
 	for (ToolActivity activity : activities) {
 
@@ -721,9 +729,9 @@ public class GradebookService implements IGradebookService {
 	return lessonRows;
     }
 
-    private HashMap<ToolActivity, List<GBUserGridRowDTO>> getDataForLessonGradebookExport(Lesson lesson) {
+    private Map<ToolActivity, List<GBUserGridRowDTO>> getDataForLessonGradebookExport(Lesson lesson) {
 
-	HashMap<ToolActivity, List<GBUserGridRowDTO>> activityToUserDTOMap = new HashMap<ToolActivity, List<GBUserGridRowDTO>>();
+	Map<ToolActivity, List<GBUserGridRowDTO>> activityToUserDTOMap = new LinkedHashMap<ToolActivity, List<GBUserGridRowDTO>>();
 
 	Set<User> learners = new TreeSet<User>(new UserComparator());
 	if (lesson.getAllLearners() != null) {
@@ -731,7 +739,7 @@ public class GradebookService implements IGradebookService {
 	}
 
 	Map<Integer, LearnerProgress> userToLearnerProgressMap = getUserToLearnerProgressMap(lesson, null);
-	Set<ToolActivity> activities = getLessonActivities(lesson);
+	List<ToolActivity> activities = getLessonActivities(lesson);
 
 	for (ToolActivity activity : activities) {
 
@@ -849,7 +857,7 @@ public class GradebookService implements IGradebookService {
 
 	// -------------------- process activity excel page --------------------------------
 
-	HashMap<ToolActivity, List<GBUserGridRowDTO>> activityToUserDTOMap = getDataForLessonGradebookExport(lesson);
+	Map<ToolActivity, List<GBUserGridRowDTO>> activityToUserDTOMap = getDataForLessonGradebookExport(lesson);
 	List<ExcelCell[]> rowList1 = new LinkedList<ExcelCell[]>();
 
 	for (Activity activity : activityToUserDTOMap.keySet()) {
@@ -1144,7 +1152,7 @@ public class GradebookService implements IGradebookService {
 
 	// collect users from all lessons
 	Set<User> allLearners = new LinkedHashSet<User>();
-	Map<Long, Set<ToolActivity>> lessonActivitiesMap = new HashMap<Long, Set<ToolActivity>>();
+	Map<Long, List<ToolActivity>> lessonActivitiesMap = new HashMap<Long, List<ToolActivity>>();
 	List<ToolActivity> allActivities = new ArrayList<ToolActivity>();
 
 	for (String lessonIdStr : lessonIds) {
@@ -1159,7 +1167,7 @@ public class GradebookService implements IGradebookService {
 
 	    allLearners.addAll(lesson.getAllLearners());
 
-	    Set<ToolActivity> lessonActivities = getLessonActivities(lesson);
+	    List<ToolActivity> lessonActivities = getLessonActivities(lesson);
 	    lessonActivitiesMap.put(lesson.getLessonId(), lessonActivities);
 	    allActivities.addAll(lessonActivities);
 	}
@@ -1191,7 +1199,7 @@ public class GradebookService implements IGradebookService {
 	    ExcelCell[] lessonsNames = new ExcelCell[numberCellsPerRow];
 	    int i = 4;
 	    for (Lesson lesson : selectedLessons) {
-		Set<ToolActivity> lessonActivities = lessonActivitiesMap.get(lesson.getLessonId());
+		List<ToolActivity> lessonActivities = lessonActivitiesMap.get(lesson.getLessonId());
 		int numberActivities = lessonActivities.size();
 		lessonsNames[i + numberActivities] = new ExcelCell(lesson.getLessonName(), true);
 		i += 9 + (numberActivities * 2);
@@ -1215,7 +1223,7 @@ public class GradebookService implements IGradebookService {
 		headerRow[i++] = new ExcelCell(getMessage("gradebook.columntitle.startDate"), false);
 		headerRow[i++] = new ExcelCell(getMessage("gradebook.columntitle.completeDate"), false);
 
-		Set<ToolActivity> activities = lessonActivitiesMap.get(lesson.getLessonId());
+		List<ToolActivity> activities = lessonActivitiesMap.get(lesson.getLessonId());
 		for (Activity activity : activities) {
 		    headerRow[i++] = new ExcelCell(activity.getTitle(), true);
 		    headerRow[i++] = new ExcelCell(getMessage("label.max.possible"), false);
@@ -1244,7 +1252,7 @@ public class GradebookService implements IGradebookService {
 
 		    Double lessonTotal = 0d;
 		    Double lessonMaxMark = 0d;
-		    Set<ToolActivity> activities = lessonActivitiesMap.get(lesson.getLessonId());
+		    List<ToolActivity> activities = lessonActivitiesMap.get(lesson.getLessonId());
 
 		    //first, last names and login
 		    String lastName = (learner.getLastName() == null) ? "" : learner.getLastName().toUpperCase();
@@ -1355,28 +1363,17 @@ public class GradebookService implements IGradebookService {
     public Activity getActivityById(Long activityID) {
 	return activityDAO.getActivityByActivityId(activityID);
     }
-
+    
+    
     /**
      * Returns lesson activities. It works almost the same as lesson.getLearningDesign().getActivities() except it
      * solves problem with first activity unable to cast to ToolActivity.
      */
-    private Set<ToolActivity> getLessonActivities(Lesson lesson) {
-	Set<Activity> activities = new TreeSet<Activity>();
-	Set<ToolActivity> toolActivities = new TreeSet<ToolActivity>();
-
-	/*
-	 * Hibernate CGLIB is failing to load the first activity in the sequence as a ToolActivity for some mysterious
-	 * reason Causes a ClassCastException when you try to cast it, even if it is a ToolActivity.
-	 *
-	 * THIS IS A HACK to retrieve the first tool activity manually so it can be cast as a ToolActivity - if it is
-	 * one
-	 */
-	Activity firstActivity = activityDAO
-		.getActivityByActivityId(lesson.getLearningDesign().getFirstActivity().getActivityId());
-	activities.add(firstActivity);
-	activities.addAll(lesson.getLearningDesign().getActivities());
-
-	for (Activity activity : activities) {
+    private List<ToolActivity> getLessonActivities(Lesson lesson) {
+	List<ToolActivity> toolActivities = new ArrayList<ToolActivity>();
+	List<ActivityURL>  activityUrls = getLearnerService().getStructuredActivityURLs(lesson.getLessonId());
+	for (ActivityURL activityUrl : activityUrls) {
+	    Activity activity = activityDAO.getActivityByActivityId(activityUrl.getActivityId());
 	    if (activity instanceof ToolActivity) {
 		ToolActivity toolActivity = (ToolActivity) activity;
 		toolActivities.add(toolActivity);
@@ -1731,6 +1728,16 @@ public class GradebookService implements IGradebookService {
 
 	return map;
     }
+    
+    
+    private ICoreLearnerService getLearnerService() {
+  	if (GradebookService.learnerService== null) {
+  	    WebApplicationContext ctx = WebApplicationContextUtils
+  		    .getWebApplicationContext(SessionManager.getServletContext());
+  	  GradebookService.learnerService = (ICoreLearnerService) ctx.getBean("learnerService");
+  	}
+  	return GradebookService.learnerService;
+      }
 
     @Override
     public String getMessage(String key) {

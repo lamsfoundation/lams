@@ -43,6 +43,7 @@ import org.lamsfoundation.lams.learning.progress.ProgressBuilder;
 import org.lamsfoundation.lams.learning.progress.ProgressEngine;
 import org.lamsfoundation.lams.learning.progress.ProgressException;
 import org.lamsfoundation.lams.learning.web.bean.ActivityPositionDTO;
+import org.lamsfoundation.lams.learning.web.bean.ActivityURL;
 import org.lamsfoundation.lams.learning.web.bean.GateActivityDTO;
 import org.lamsfoundation.lams.learning.web.util.ActivityMapping;
 import org.lamsfoundation.lams.learning.web.util.LearningWebUtil;
@@ -415,6 +416,18 @@ public class LearnerService implements ICoreLearnerService {
 
 	return retValue;
     }
+    
+    
+    @Override
+    public List<ActivityURL> getStructuredActivityURLs(Long lessonId) {
+	 Lesson lesson = getLesson(lessonId);
+	 User learner = (User) lesson.getAllLearners().iterator().next();
+	 LearnerProgress learnerProgress = new LearnerProgress(learner, lesson);
+
+	 ProgressBuilder builder = new ProgressBuilder(learnerProgress, activityDAO, activityMapping);
+	 builder.parseLearningDesign();
+	 return builder.getActivityList();
+	    }
 
     /**
      * @see org.lamsfoundation.lams.learning.service.ICoreLearnerService#chooseActivity(org.lamsfoundation.lams.usermanagement.User,
