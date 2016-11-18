@@ -53,13 +53,13 @@
 				test="${!chatUserDTO.finishedActivity and chatDTO.reflectOnActivity}">
 				<html:hidden property="dispatch" value="openNotebook" />
 
-				<html:submit styleClass="btn btn-primary pull-right voffset10">
+				<html:submit styleClass="btn btn-responsive btn-primary pull-right voffset10">
 					<fmt:message key="button.continue" />
 				</html:submit>
 			</c:when>
 			<c:otherwise>
 				<html:hidden property="dispatch" value="finishActivity" />
-				<html:link href="#nogo" styleClass="btn btn-primary pull-right voffset10 na" styleId="finishButton"  onclick="submitForm('finish')">
+				<html:link href="#nogo" styleClass="btn btn-primary pull-right voffset10 na btn-autoresize" styleId="finishButton"  onclick="submitForm('finish')">
 					 <span class="nextActivity">
 						 <c:choose>
 						 	<c:when test="${activityPosition.last}">
