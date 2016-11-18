@@ -16,15 +16,12 @@
 	<title><fmt:message key="activity.title" /></title>
 	<lams:css />
 	<style media="screen,projection" type="text/css">
-		div.growlUI {
-			background: url(check48.png) no-repeat 10px 10px
-		}
 		
 		div.growlUI h1, div.growlUI h2 {
 			color: white;
-			padding: 5px 5px 5px 0px;
+			margin: 5px 5px 5px 0px;
 			text-align: center;
-			font-size: 20px;
+			font-size: 18px;
 		}
 	</style>
 
@@ -138,7 +135,7 @@
 					$('#learningForm').ajaxSubmit({
 						url: "<c:url value='/learning.do?method=autoSaveAnswers&date='/>" + new Date().getTime(),
 			               success: function() {
-			               	$.growlUI('<fmt:message key="label.learning.draft.autosaved" />');
+			               	$.growlUI('<i class="fa fa-lg fa-floppy-o"></i> <fmt:message key="label.learning.draft.autosaved" />');
 			               }
 					});
 		       	}, interval
