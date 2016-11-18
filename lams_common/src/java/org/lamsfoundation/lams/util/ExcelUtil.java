@@ -57,6 +57,8 @@ public class ExcelUtil {
     private static CellStyle borderStyleRightThick;
     private static CellStyle borderStyleLeftThinBoldFont;
     private static CellStyle borderStyleRightThickBoldFont;
+    private static CellStyle borderStyleBottomThin;
+    private static CellStyle borderStyleBottomThinBoldFont;
 
     public final static String DEFAULT_FONT_NAME = "Calibri-Regular";
 
@@ -127,6 +129,12 @@ public class ExcelUtil {
 	borderStyleRightThickBoldFont = workbook.createCellStyle();
 	borderStyleRightThickBoldFont.setBorderRight(CellStyle.BORDER_THICK);
 	borderStyleRightThickBoldFont.setFont(boldFont);
+	borderStyleBottomThin = workbook.createCellStyle();
+	borderStyleBottomThin.setBorderBottom(CellStyle.BORDER_THIN);
+	borderStyleBottomThin.setFont(defaultFont);
+	borderStyleBottomThinBoldFont = workbook.createCellStyle();
+	borderStyleBottomThinBoldFont.setBorderBottom(CellStyle.BORDER_THIN);
+	borderStyleBottomThinBoldFont.setFont(boldFont);
 
 	int i = 0;
 	for (String sheetName : dataToExport.keySet()) {
@@ -258,6 +266,13 @@ public class ExcelUtil {
 			    cell.setCellStyle(borderStyleRightThickBoldFont);
 			} else {
 			    cell.setCellStyle(borderStyleRightThick);
+			}
+			break;
+		    case ExcelCell.BORDER_STYLE_BOTTOM_THIN:
+			if (excelCell.isBold()) {
+			    cell.setCellStyle(borderStyleBottomThinBoldFont);
+			} else {
+			    cell.setCellStyle(borderStyleBottomThin);
 			}
 			break;
 		    default:
