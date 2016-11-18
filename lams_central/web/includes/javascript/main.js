@@ -102,28 +102,6 @@ $(document).ready(function () {
         });
     });
 
-    // Full height of offcanvas bar
-    function adjustOffcanvasBarHeight() {
-        var heightWithoutNavbar = $("body > #wrapper").height() - 61;
-        $(".offcanvasd-panel").css("min-height", heightWithoutNavbar + "px");
-
-        var navbarHeigh = $('#offcanvas').height();
-        var wrapperHeigh = $('#page-wrapper').height();
-
-        if (navbarHeigh > wrapperHeigh) {
-            $('#page-wrapper').css("min-height", navbarHeigh + "px");
-        }
-
-        if (navbarHeigh < wrapperHeigh) {
-            $('#page-wrapper').css("min-height", $(window).height() + "px");
-        }
-    }
-
-    $(window).bind("load resize scroll", function () {
-    	adjustOffcanvasBarHeight();
-    });
-    adjustOffcanvasBarHeight();
-
 });
 
 
