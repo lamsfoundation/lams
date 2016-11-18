@@ -1410,9 +1410,9 @@ public class GradebookService implements IGradebookService {
 	String originalStatus = userRow.getStatus();
 
 	String status;
-	if (originalStatus.contains("tick.png")) {
+	if (originalStatus.contains("check")) {
 	    status = getMessage("gradebook.exportcourse.ok");
-	} else if (originalStatus.contains("cog.png")) {
+	} else if (originalStatus.contains("cog")) {
 	    status = getMessage("gradebook.exportcourse.current.activity",
 		    new String[] { userRow.getCurrentActivity() });
 	} else {
@@ -1570,14 +1570,14 @@ public class GradebookService implements IGradebookService {
 	final String IMAGES_DIR = Configuration.get(ConfigurationKeys.SERVER_URL) + "images";
 	if (learnerProgress != null) {
 	    if (learnerProgress.isComplete()) {
-		status = "<img src='" + IMAGES_DIR + "/tick.png' />";
+		status = "<i class='fa fa-check text-success'></i>";
 
 	    } else if ((learnerProgress.getAttemptedActivities() != null)
 		    && (learnerProgress.getAttemptedActivities().size() > 0)) {
 
 		String currentActivityTitle = learnerProgress.getCurrentActivity() == null ? ""
 			: StringEscapeUtils.escapeHtml(learnerProgress.getCurrentActivity().getTitle());
-		status = "<img src='" + IMAGES_DIR + "/cog.png' title='" + currentActivityTitle + "' />";
+		status = "<i class='fa fa-cog' title='" + currentActivityTitle + "'></i>";
 	    }
 	}
 	return status;
@@ -1596,10 +1596,10 @@ public class GradebookService implements IGradebookService {
 	if (learnerProgress != null) {
 	    byte statusByte = learnerProgress.getProgressState(activity);
 	    if (statusByte == LearnerProgress.ACTIVITY_ATTEMPTED && learnerProgress.getCurrentActivity() != null) {
-		return "<img src='" + IMAGES_DIR + "/cog.png' title='"
-			+ StringEscapeUtils.escapeHtml(learnerProgress.getCurrentActivity().getTitle()) + "' />";
+		return "<i class='fa fa-cog' title='"
+			+ StringEscapeUtils.escapeHtml(learnerProgress.getCurrentActivity().getTitle()) + "'></i>";
 	    } else if (statusByte == LearnerProgress.ACTIVITY_COMPLETED) {
-		return "<img src='" + IMAGES_DIR + "/tick.png' />";
+		return "<i class='fa fa-check text-success'></i>";
 	    }
 	}
 	return "-";
