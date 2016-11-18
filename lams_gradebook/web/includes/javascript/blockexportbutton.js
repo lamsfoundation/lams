@@ -6,7 +6,7 @@ function blockExportButton(areaToBlock, exportExcelUrl, labelWait) {
 	var token = new Date().getTime(); //use the current timestamp as the token value
 		    
 	$('#' + areaToBlock).block({
-		message: '<h1 style="color:#fff";>' + labelWait + '</h1>',
+		message: '<span style="font-size: 18px;color:#fff";>' + labelWait + '</span>',
 		baseZ: 1000000,
 		fadeIn:  0, 
 		css: { 
