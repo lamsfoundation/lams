@@ -24,8 +24,10 @@
 
 package org.lamsfoundation.lams.learning.service;
 
+import java.util.List;
 import java.util.Set;
 
+import org.lamsfoundation.lams.learning.web.bean.ActivityURL;
 import org.lamsfoundation.lams.learning.web.bean.GateActivityDTO;
 import org.lamsfoundation.lams.learningdesign.Activity;
 import org.lamsfoundation.lams.learningdesign.BranchingActivity;
@@ -109,6 +111,9 @@ public interface ICoreLearnerService extends ILearnerService {
      *             in case of problems.
      */
     Object[] getStructuredActivityURLs(Integer learnerId, Long lessonId);
+    
+    
+    List<ActivityURL> getStructuredActivityURLs(Long lessonId);
 
     /**
      * Return the current progress data against progress id.
