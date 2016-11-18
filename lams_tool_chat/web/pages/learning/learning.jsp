@@ -71,7 +71,7 @@
 			</div>
 			<div class="col-xs-12 col-sm-3 col-md-2 col-lg-2 ">
 				<div id="sendMessageButtonCell" class="voffset5">
-					<input id="sendMessageButton" class="btn btn-sm btn-default" type="button" onclick="javascript:sendChatToolMessage()"
+					<input id="sendMessageButton" class="btn btn-autoresize btn-default" type="button" onclick="javascript:sendChatToolMessage()"
 						value='<fmt:message key="button.send"/>' />
 				</div>
 			</div>

@@ -13,6 +13,10 @@
 	font-weight: bold;
 }
 
+
+
+
+
 /* ==================== LEARNING PAGE STYLES ==================== */
 
 #chatContent {
@@ -21,16 +25,33 @@
 	border-spacing: 10px;
 }
 
-#messages {
-	height: 260px;
-	overflow: auto;
-	border: 1px solid #999;
-	padding: 2px;
-	padding-left:5px;
+@media (max-width: 768px) {
+	#messages {
+		height: 100px;
+		resize: vertical;
+		overflow: auto;
+		border: 1px solid #999;
+		padding: 2px;
+		padding-left:5px;
+	}
+	
+}
+
+@media (min-width: 769px) {
+	#messages {
+		height: 200px;
+		resize: vertical;
+		overflow: auto;
+		border: 1px solid #999;
+		padding: 2px;
+		padding-left:5px;
+	}
+
+  
 }
 
 #roster {
-	height: 260px;
+	height: 200px;
 	overflow: auto;
 	border: 1px solid #999;
 	font-size: 12px;
@@ -40,7 +61,7 @@
 	
 #sendMessageArea {
 	border: 1px solid #999;
-	width: 99%;
+	width: 100%;
 }
 
 #sendMessageButtonCell {
