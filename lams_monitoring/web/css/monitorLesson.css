@@ -234,6 +234,12 @@ td.contributeEntryCell a {
 	width: 100%;
 }
 
+#chartDiv {
+	width: 150px;
+	height: 150px;
+	padding: 0;
+}
+
 
 /********** SEQUENCE TAB STYLES **********/
 div#sequenceCanvas {

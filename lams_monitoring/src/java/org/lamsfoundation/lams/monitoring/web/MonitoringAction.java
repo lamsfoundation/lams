@@ -1043,7 +1043,7 @@ public class MonitoringAction extends LamsDispatchAction {
 
 	responseJSON.put("lessonName", StringEscapeUtils.escapeHtml(lesson.getLessonName()));
 	responseJSON.put("lessonDescription", lesson.getLessonDescription());
-	
+
 	Date startOrScheduleDate = lesson.getStartDateTime() == null ? lesson.getScheduleStartDate()
 		: lesson.getStartDateTime();
 	if (startOrScheduleDate != null) {
@@ -1058,6 +1058,36 @@ public class MonitoringAction extends LamsDispatchAction {
 	    Gson gson = new GsonBuilder().create();
 	    responseJSON.put("contributeActivities", new JSONArray(gson.toJson(contributeActivities)));
 	}
+
+	response.setContentType("application/json;charset=utf-8");
+	response.getWriter().write(responseJSON.toString());
+	return null;
+    }
+
+    public ActionForward getLessonChartData(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+	    HttpServletResponse response) throws IOException, JSONException {
+	long lessonId = WebUtil.readLongParam(request, AttributeNames.PARAM_LESSON_ID);
+
+	Integer possibleLearnersCount = getLessonService().getCountLessonLearners(lessonId, null);
+	Integer completedLearnersCount = getMonitoringService().getCountLearnersCompletedLesson(lessonId);
+	Integer startedLearnersCount = getLessonService().getCountActiveLessonLearners(lessonId);
+	Integer notStartedLearnersCount = possibleLearnersCount - startedLearnersCount - completedLearnersCount;
+
+	JSONObject responseJSON = new JSONObject();
+	JSONObject notStartedJSON = new JSONObject();
+	notStartedJSON.put("name", getMessageService().getMessage("lesson.chart.not.started"));
+	notStartedJSON.put("value", Math.round(notStartedLearnersCount.doubleValue() / possibleLearnersCount * 100));
+	responseJSON.append("data", notStartedJSON);
+
+	JSONObject startedJSON = new JSONObject();
+	startedJSON.put("name", getMessageService().getMessage("lesson.chart.started"));
+	startedJSON.put("value", Math.round(startedLearnersCount.doubleValue() / possibleLearnersCount * 100));
+	responseJSON.append("data", startedJSON);
+
+	JSONObject completedJSON = new JSONObject();
+	completedJSON.put("name", getMessageService().getMessage("lesson.chart.completed"));
+	completedJSON.put("value", Math.round(completedLearnersCount.doubleValue() / possibleLearnersCount * 100));
+	responseJSON.append("data", completedJSON);
 
 	response.setContentType("application/json;charset=utf-8");
 	response.getWriter().write(responseJSON.toString());
