@@ -418,6 +418,16 @@ nav.navbar-heading {
 	
 }
 
+
+@media (min-width: 0px) and (max-width: 992px) {
+  .btn-primary, .btn-default, .btn-success, .btn-info, .btn-danger {
+    padding:4px 9px;
+    font-size:90%;
+    line-height: 1.2;
+  }
+}
+
+
 ul.dropdown-menu {
 	left: auto;
 	right: 0;
