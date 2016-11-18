@@ -31,3 +31,7 @@ img.validationWarning, div.errors img.icon, div.messages img.icon {
 div.message img.icon {
     vertical-align: middle;
 }
+
+span.input-group-btn {
+    font-size:inherit;
+}
