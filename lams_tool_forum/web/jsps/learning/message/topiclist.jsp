@@ -33,7 +33,7 @@
 						<th class="col-xs-1 hidden-xs"><fmt:message key="lable.topic.title.repliesnew" /></th>
 						<th class="col-xs-2"><fmt:message key="lable.topic.title.update" /></th>
 						<c:if test="${not sessionMap.allowNewTopics and sessionMap.minimumReply ne 0}">
-							<th class=">&nbsp;</th>
+							<th class="col-xs-2">&nbsp;</th>
 						</c:if>
 					</tr>
 				</thead>
