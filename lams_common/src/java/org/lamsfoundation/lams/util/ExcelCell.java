@@ -32,6 +32,7 @@ public class ExcelCell {
 
     public final static int BORDER_STYLE_LEFT_THIN = 1;
     public final static int BORDER_STYLE_RIGHT_THICK = 2;
+    public final static int BORDER_STYLE_BOTTOM_THIN = 3;
 
     private Object cellValue;
     private Boolean isBold;
