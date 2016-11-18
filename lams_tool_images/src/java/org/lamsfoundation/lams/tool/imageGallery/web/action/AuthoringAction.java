@@ -373,15 +373,16 @@ public class AuthoringAction extends Action {
 	    ImageGalleryItem delAtt = (ImageGalleryItem) iter.next();
 	    iter.remove();
 	}
-
 	// **********************************************
 	// finally persist imageGalleryPO again
 	service.saveOrUpdateImageGallery(imageGalleryPO);
 
 	// ************************* Handle rating criterias *******************
+	if (mode.isAuthor()) {
 	List<RatingCriteria> oldCriterias = (List<RatingCriteria>) sessionMap.get(AttributeNames.ATTR_RATING_CRITERIAS);
+	
 	service.saveRatingCriterias(request, oldCriterias, contentId);
-
+	}
 	imageGalleryForm.setImageGallery(imageGalleryPO);
 
 	request.setAttribute(AuthoringConstants.LAMS_AUTHORING_SUCCESS_FLAG, Boolean.TRUE);
