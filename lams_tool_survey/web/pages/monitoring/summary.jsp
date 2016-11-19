@@ -100,19 +100,18 @@
 			<c:set var="optSize" value="${fn:length(question.options)}" />
 			<c:forEach var="option" items="${question.options}"  varStatus="optStatus">
 				<tr>
-					<td><c:out value="${option.description}" escapeXml="true"/></td>
-					<td>
+					<td width="50%"><c:out value="${option.description}" escapeXml="true"/></td>
+					<td width="50%">
 						<c:set var="imgTitle">
 							<fmt:message key="message.learner.choose.answer.percentage">
 								<fmt:param>${option.response}</fmt:param>
 							</fmt:message>
 						</c:set>
-						<c:set var="imgIdx">
-							${optStatus.index % 5 + 1}
-						</c:set>			
-						<img src="${tool}/includes/images/bar${imgIdx}.gif" height="10" width="${option.response * 2}" 
-						title="${imgTitle}">
-						${option.responseCount} (${option.responseFormatStr}%)
+						<div class="progress">
+							<div class="progress-bar" role="progressbar" aria-valuenow="${option.response}" aria-valuemin="0" title="${imgTitle}" aria-valuemax="100" style="width:${option.response}%; min-width: 2em;">
+								${option.responseCount} (${option.responseFormatStr}%)
+							</div>
+						</div>
 					</td>
 				</tr>
 			</c:forEach>
@@ -122,8 +121,8 @@
 			</tr>
 			<c:if test="${question.appendText}">
 				<tr>
-					<td><fmt:message key="label.open.response"/></td>
-					<td>
+					<td width="50%"><fmt:message key="label.open.response"/></td>
+					<td width="50%">
 						<c:set var="imgTitle">
 							<fmt:message key="message.learner.choose.answer.percentage">
 								<fmt:param>${question.openResponseFormatStr}</fmt:param>
@@ -132,9 +131,11 @@
 						<c:set var="imgIdx">
 							${(optSize % 5)  + 1}
 						</c:set>						
-						<img src="${tool}/includes/images/bar${imgIdx}.gif" height="10" width="${question.openResponse * 2}" 
-						title="${imgTitle}">
-						${question.openResponseCount} (${question.openResponseFormatStr}%)
+						<div class="progress">
+							<div class="progress-bar" role="progressbar" aria-valuenow="${question.openResponse}" aria-valuemin="0" title="${imgTitle}" aria-valuemax="100" style="width:${question.openResponse}%; min-width: 2em;">
+								${question.openResponseCount} (${question.openResponseFormatStr}%)
+							</div>
+						</div>
 					</td>
 				</tr>
 			</c:if>
