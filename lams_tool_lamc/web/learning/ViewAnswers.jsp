@@ -59,7 +59,7 @@
 			<p>
 				<strong><fmt:message key="label.mark" /> </strong>
 				<c:out value="${mcGeneralLearnerFlowDTO.learnerMark}" />
-				<fmt:message key="label.outof" />
+				&nbsp;<fmt:message key="label.outof" />&nbsp;
 				<c:out value="${mcGeneralLearnerFlowDTO.totalMarksPossible}" />
 			</p>
 		</c:if> 
@@ -177,7 +177,7 @@
 			<p>
 				<strong><fmt:message key="label.mark" /> </strong>
 				<c:out value="${mcGeneralLearnerFlowDTO.learnerMark}" />
-				<fmt:message key="label.outof" />
+				&nbsp;<fmt:message key="label.outof" />&nbsp;
 				<c:out value="${mcGeneralLearnerFlowDTO.totalMarksPossible}" />
 			</p>
 		</c:if>
