@@ -51,7 +51,7 @@
 						</c:if>
                                                                 
 						<c:out value="${mcGeneralLearnerFlowDTO.passMark}" />
-						<fmt:message key="label.outof" />
+						&nbsp;<fmt:message key="label.outof" />&nbsp;
 						<c:out value="${mcGeneralLearnerFlowDTO.totalMarksPossible}" />
 					</fmt:param>
 				</fmt:message>
