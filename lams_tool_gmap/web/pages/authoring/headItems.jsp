@@ -9,7 +9,7 @@
 <!-- Include the gmap API header -->
 <c:choose>
 	<c:when test="${gmapKey != null}">
-		<script src="http://maps.google.com/maps?file=api&amp;v=2&amp;key=${gmapKey}" type="text/javascript"></script>
+		<script src="https://maps.google.com/maps?file=api&amp;v=2&amp;key=${gmapKey}" type="text/javascript"></script>
 	</c:when>
 	<c:otherwise>
 		<script type="text/javascript">	
