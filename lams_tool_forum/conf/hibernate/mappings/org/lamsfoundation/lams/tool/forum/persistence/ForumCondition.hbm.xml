@@ -18,7 +18,6 @@
 	            table="tl_lafrum11_condition_topics"
 	            lazy="false"
 	            inverse="false"
-	            cascade="all"
 	            sort="unsorted"
 	            order-by="topic_uid asc"
 	            
