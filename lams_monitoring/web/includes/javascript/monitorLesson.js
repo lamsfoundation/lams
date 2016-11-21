@@ -22,7 +22,7 @@ var originalSequenceCanvas = null,
 	learnerProgressCurrentPageNumber = 1,
 
 //auto refresh all tabs every 30 seconds
-	autoRefreshInterval = 300 * 1000,
+	autoRefreshInterval = 30 * 1000,
 	autoRefreshIntervalObject = null,
 // when user is doing something, do not auto refresh
 	autoRefreshBlocked = false,
