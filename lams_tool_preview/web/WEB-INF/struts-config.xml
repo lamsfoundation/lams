@@ -208,7 +208,10 @@
 			type="org.lamsfoundation.lams.tool.peerreview.web.action.MonitoringAction"
 			parameter="sendResultsToSessionUsers" >
 		</action>
-		
+		<action path="/monitoring/exportTeamReport"
+			type="org.lamsfoundation.lams.tool.peerreview.web.action.MonitoringAction"
+			parameter="exportTeamReport" >
+		</action>
 		<!-- ========== BEGIN: Common ============================== -->
 		<action path="/clearsession"
 			type="org.lamsfoundation.lams.tool.peerreview.web.action.ClearSessionAction">

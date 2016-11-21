@@ -23,13 +23,13 @@
 
 package org.lamsfoundation.lams.tool.peerreview.service;
 
-import java.security.InvalidParameterException;
 import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -45,7 +45,6 @@ import org.apache.log4j.Logger;
 import org.apache.tomcat.util.json.JSONArray;
 import org.apache.tomcat.util.json.JSONException;
 import org.apache.tomcat.util.json.JSONObject;
-import org.lamsfoundation.lams.events.AbstractDeliveryMethod;
 import org.lamsfoundation.lams.events.IEventNotificationService;
 import org.lamsfoundation.lams.learning.service.ILearnerService;
 import org.lamsfoundation.lams.learningdesign.service.ExportToolContentException;
@@ -79,10 +78,12 @@ import org.lamsfoundation.lams.tool.peerreview.model.Peerreview;
 import org.lamsfoundation.lams.tool.peerreview.model.PeerreviewSession;
 import org.lamsfoundation.lams.tool.peerreview.model.PeerreviewUser;
 import org.lamsfoundation.lams.tool.peerreview.util.PeerreviewToolContentHandler;
+import org.lamsfoundation.lams.tool.peerreview.util.SpreadsheetBuilder;
 import org.lamsfoundation.lams.tool.service.ILamsToolService;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
+import org.lamsfoundation.lams.util.ExcelCell;
 import org.lamsfoundation.lams.util.JsonUtil;
 import org.lamsfoundation.lams.util.MessageService;
 
@@ -546,6 +547,22 @@ public class PeerreviewServiceImpl
 	}
 	notificationMessage.append("\n");
     }
+    
+    @Override
+    @SuppressWarnings("unchecked")
+    public LinkedHashMap<String, ExcelCell[][]> exportTeamReportSpreadsheet(Long toolContentId) {
+
+	Peerreview peerreview = peerreviewDao.getByContentId(toolContentId);
+	if (peerreview == null) {
+	    PeerreviewServiceImpl.log.warn("Did not find activity with toolContentId: " + toolContentId + " to remove learner content");
+	    return null;
+	}
+
+	return new SpreadsheetBuilder(peerreview, ratingService, peerreviewSessionDao, peerreviewUserDao, this).generateTeamReport();
+	
+    }
+	
+
     // *****************************************************************************
     // private methods
     // *****************************************************************************
