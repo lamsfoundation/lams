@@ -342,11 +342,14 @@
 										><i class="fa fa-sm fa-comments-o"></i>
 										 <span class="hidden-xs"><fmt:message key="lesson.im"/></span>
 										</button>
-										<button id="openImButton" class="btn btn-default">
-											<i class="fa fa-sm fa-comments"></i>
-											<span class="hidden-xs"><fmt:message key="button.open.im"/></span> 
+										
+										<button id="openImButton" class="btn btn-default"
+											<c:if test="${not lesson.learnerImAvailable}">
+												style="display: none"
+											</c:if>
+										><i class="fa fa-sm fa-comments"></i>
+										 <span class="hidden-xs"><fmt:message key="button.open.im"/></span> 
 										</button>
-	
 									</div>
 								</dd>
 							</dl>	
