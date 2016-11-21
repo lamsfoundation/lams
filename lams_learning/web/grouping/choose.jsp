@@ -27,6 +27,25 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 <%@ taglib uri="tags-function" prefix="fn"%>
 <%@ taglib uri="tags-lams" prefix="lams"%>
 
+<script type="text/javascript" src="/lams/includes/javascript/bootstrap.min.js"></script>
+
+<!-- Modal -->
+<div class="modal fade" id="confirmationModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+  <div class="modal-dialog modal-sm" role="popup">
+    <div class="modal-content">
+      <div class="modal-header bg-warning">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title"><i class="fa fa-sm fa-users"></i> <fmt:message key="label.group.confirm.header"/></h4>
+      </div>
+      <div class="modal-body text-center" style="min-height: 60px;">
+      </div>
+      <div class="modal-footer" style="padding: 8px">
+        	<button type="button" class="btn  btn-sm btn-default" data-dismiss="modal"><fmt:message key="label.cancel.button" /></button>
+					<button id="submitter" onclick="" class="btn btn-sm btn-primary"><fmt:message key="label.group.confirm.button"/></button>
+      </div>
+    </div>
+  </div>
+</div>
 
 <lams:Page type="learner" title="${title}">
 
@@ -49,7 +68,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 					<td width="60%"><c:if test="${viewStudentsBeforeSelection}">
 							<c:forEach items="${group.users}" var="user">
 								<i class="fa fa-sm fa-user"></i>&nbsp;<c:out value="${user.firstName}" />&nbsp;<c:out value="${user.lastName}" />
-								<BR>
+								<br/>
 							</c:forEach>
 						&nbsp;
 					</c:if></td>
@@ -60,15 +79,29 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 							<c:otherwise>
 								<html:form
 									action="/grouping.do?method=learnerChooseGroup&userId=${user.userID}&activityID=${activityID}&groupId=${group.groupId}"
-									target="_self">
-									<html:submit styleClass="btn btn-sm btn-default">
-										<fmt:message key="label.choose.group.button" />
-									</html:submit>
-								</html:form>
-							</c:otherwise>
+									styleId="form${user.userID}${activityID}${group.groupId}" target="_self">
+								</html:form>							
+								<button type="button" class="btn btn-sm btn-primary" 
+									data-toggle="modal" data-target="#confirmationModal" 
+									data-u="form${user.userID}${activityID}${group.groupId}" 
+									data-gn="<c:out value="${group.groupName}" />"><fmt:message key="label.choose.group.button" />
+								</button>							
+								
+							</c:otherwise>							
 						</c:choose></td>
 				</tr>
 			</logic:iterate>
 		</table>
 	</div>
 </lams:Page>
+<script>
+	$('#confirmationModal').on('show.bs.modal', function (event) {
+		  var button = $(event.relatedTarget) 
+		  var url = button.data('u') 
+		  var groupName = button.data('gn')
+
+		  var modal = $(this)
+		  modal.find('.modal-body').html('<fmt:message key="label.group.confirm.areyoujoining"/>:&nbsp;<strong>' + groupName + '</strong>?')
+		  modal.find('#submitter').attr('onclick', "javascript:document.getElementById('" +url+ "').submit();")
+		})
+</script>
