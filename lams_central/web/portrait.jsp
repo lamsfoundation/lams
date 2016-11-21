@@ -61,11 +61,6 @@
 		webcam.set_api_url('<c:url value="/saveportrait.do"/>?method=saveWebcamPortrait');
 		webcam.set_quality(100); // JPEG quality (1 - 100)
 		
-		//set onComplete callback
-		webcam.set_hook('onComplete', 'onCompleteWebcam');
-		function onCompleteWebcam(response) {
-			window.location.href = '<c:url value="/index.do"/>?method=profile';
-		}
 		
 		//set onError callback
 		webcam.set_hook('onError', 'onErrorWebcam');
@@ -114,12 +109,11 @@
 		});
 	</script>
 	<script type="text/javascript">
-	
 		function submitPortrait() {
 			var formData = new FormData(document.getElementById("PortraitActionForm"));
-
 			$.ajax({ // create an AJAX call...
 				data : formData,
+				async : false,
 				processData : false, // tell jQuery not to process the data
 				contentType : false, // tell jQuery not to set contentType
 				type : $("#PortraitActionForm").attr('method'),
@@ -183,7 +177,7 @@
 									<fmt:message key='label.portrait.do.you.like.results' />
 								</div>
 			
-								<a class="btn btn-xs btn-default" id="uploadWebcam"
+								<a class="btn btn-xs btn-default" id="uploadWebcam" onclick="submitPortrait()"
 									><fmt:message
 										key='label.portrait.yes.set.it.as.portrait' /></a> <a
 									class="btn btn-xs btn-default" id="resetWebcam"
