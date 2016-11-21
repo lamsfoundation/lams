@@ -61,6 +61,8 @@
 	</div>
 
 
+<div id="actionbuttons" class="voffset20">
+	<button type="button" onclick="location.reload();" class="btn btn-sm btn-default"><i class="fa fa-refresh"></i> <span class="hidden-xs">Refresh</span></button>
 	<html:link href="#nogo" styleClass="btn btn-primary pull-right na" styleId="finishButton" onclick="finishActivity()">
 		<span class="nextActivity"> <c:choose>
 				<c:when test="${activityPosition.last}">
@@ -72,7 +74,7 @@
 			</c:choose>
 		</span>
 	</html:link>
-
+</div>
 </lams:Page>
 
 
@@ -112,11 +114,11 @@
 				</div>
 			</div>
 			<div class="modal-footer">
+				<button data-dismiss="modal" class="btn btn-sm btn-default">
+					<fmt:message key="label.no" />
+				</button>
 				<button onclick="leaderSelection();" class="btn btn-sm btn-primary">
 					<fmt:message key="label.yes.become.leader" />
-				</button>
-				<button data-dismiss="modal" class="btn btn-sm btn-primary">
-					<fmt:message key="label.no" />
 				</button>
 
 			</div>
