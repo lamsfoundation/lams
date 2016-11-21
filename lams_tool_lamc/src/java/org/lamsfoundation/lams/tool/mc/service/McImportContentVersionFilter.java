@@ -50,5 +50,7 @@ public class McImportContentVersionFilter extends ToolContentVersionFilter {
      */
     public void up20140102To20140505() {
 	this.removeField(McContent.class, "contentInUse");
+	this.removeField(McQueContent.class, "mcUsrAttempts");
+	this.removeField(McOptsContent.class, "mcUsrAttempts");
     }
 }
