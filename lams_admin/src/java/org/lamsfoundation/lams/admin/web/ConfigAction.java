@@ -120,6 +120,8 @@ public class ConfigAction extends LamsDispatchAction {
 	    }
 	}
 	getConfiguration().persistUpdate();
+	
+	Configuration.refreshCache();
 
 	return mapping.findForward("sysadmin");
     }
