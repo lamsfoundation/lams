@@ -1,12 +1,16 @@
 <%@ include file="/common/taglibs.jsp"%>
 <c:set var="lams"><lams:LAMSURL /></c:set>
+<c:set var="webapp"><lams:WebAppURL/></c:set>
+
 <c:set var="sessionMap" value="${sessionScope[sessionMapID]}"/>
 <c:set var="summaryList" value="${sessionMap.summaryList}"/>
 
 <link type="text/css" href="${lams}css/jquery-ui-smoothness-theme.css" rel="stylesheet">
 <link type="text/css" href="${lams}css/jquery.jqGrid.css" rel="stylesheet" />
 <link type="text/css" href="${lams}css/jquery.jRating.css" rel="stylesheet"/>
-<link rel="stylesheet" href="<html:rewrite page='/includes/css/learning.css'/>">
+<link rel="stylesheet" href="${webapp}includes/css/learning.css'/>">
+
+<script type="text/javascript" src="${lams}includes/javascript/jquery.cookie.js"></script>
 
 <script type="text/javascript">
 	//var for jquery.jRating.js
@@ -41,6 +45,33 @@
 		);
 		return false;
 	}
+
+	//Detecting the file download dialog in the browser: 
+	//http://geekswithblogs.net/GruffCode/archive/2010/10/28/detecting-the-file-download-dialog-in-the-browser.aspx
+	var fileDownloadCheckTimer;
+
+	function exportResults() {
+		$("#messageArea").html("");
+		$("#messageArea_Busy").show();
+
+		var token = new Date().getTime(); //use the current timestamp as the token value
+
+		fileDownloadCheckTimer = window.setInterval(function () {
+			var cookieValue = $.cookie('fileDownloadToken');
+			if (cookieValue == token) {
+			    //unBlock export button
+				window.clearInterval(fileDownloadCheckTimer);
+				$.cookie('fileDownloadToken', null); //clears this cookie value
+				$("#messageArea").html('File downloaded');
+				$("#messageArea_Busy").hide();
+			}
+		}, 1000);
+				
+		var exportExcelUrl = "exportTeamReport.do?sessionMapID=${sessionMapID}&toolSessionId=${groupSummary.sessionId}&toolContentID=${sessionMap.toolContentID}";
+		document.location.href = exportExcelUrl + "&downloadTokenValue=" + token;
+		return false;
+	}
+	
 </script>
 <script type="text/javascript" src="${lams}includes/javascript/jquery.jqGrid.locale-en.js"></script>
 <script type="text/javascript" src="${lams}includes/javascript/jquery.jqGrid.js"></script>
@@ -65,6 +96,12 @@
 	<!--For send results feature-->
 	<i class="fa fa-spinner" style="display:none" id="messageArea_Busy"></i>
 	<div class="voffset5" id="messageArea"></div>
+
+	<div id="export-link-area">
+		<a href="#nogo" id="export-team-results-button" onClick="javascript:exportResults()" class="btn btn-default">
+			<i class="fa fa-download" aria-hidden="true"></i> Export
+		</a> Team Results to Spreadsheet
+	</div>
 	
 </div>
 
@@ -103,19 +140,19 @@
 				<a href="javascript:launchPopup('${url}')" class="btn btn-default voffset5 loffset5">
 					<fmt:message key="label.monitoring.view"><fmt:param><c:out value="${criteria.title}" escapeXml="true"/></fmt:param></fmt:message></a>
 			</c:forEach>
-			<div class="voffset5">&nbsp;</div>
 		</c:otherwise>
 	</c:choose>
 
 	<c:if test="${sessionMap.peerreview.reflectOnActivity || sessionMap.peerreview.notifyUsersOfResults}">
-	<div id="btns${groupSummary.sessionId}">
+	<div id="btns${groupSummary.sessionId}" class="offset5">
+		<c:set var="offset"></c:set>
 		<c:if test="${sessionMap.peerreview.reflectOnActivity}">
 			<c:set var='url'>reflections.do?sessionMapID=${sessionMapID}&toolSessionId=${groupSummary.sessionId}&toolContentID=${sessionMap.toolContentID}</c:set>
-			<a href="javascript:launchPopup('${url}')" class="btn btn-default voffset5"><fmt:message key="title.reflection"/></a>
-		<c:set var="offset" value=" loffset5"/>
+			<a href="javascript:launchPopup('${url}')" class="btn btn-default ${offset}"><fmt:message key="title.reflection"/></a>
+			<c:set var="offset">loffset5</c:set>
 		</c:if>
 		<c:if test="${sessionMap.peerreview.notifyUsersOfResults}">
-			<a href="javascript:sendResults(${groupSummary.sessionId})" class="btn btn-default voffset5 ${offset}"><fmt:message key="label.notify.user.of.results"/></a>
+			<a href="#nogo" onClick="javascript:sendResults(${groupSummary.sessionId})" class="btn btn-default ${offset}"><fmt:message key="label.notify.user.of.results"/></a>
 		</c:if>
 	</div>
 	</c:if>

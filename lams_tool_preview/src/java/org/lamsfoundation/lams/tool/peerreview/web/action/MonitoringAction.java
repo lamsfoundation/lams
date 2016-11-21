@@ -29,10 +29,13 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.TimeZone;
 
 import javax.servlet.ServletException;
+import javax.servlet.ServletOutputStream;
+import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -52,6 +55,9 @@ import org.lamsfoundation.lams.tool.peerreview.model.Peerreview;
 import org.lamsfoundation.lams.tool.peerreview.model.PeerreviewUser;
 import org.lamsfoundation.lams.tool.peerreview.service.IPeerreviewService;
 import org.lamsfoundation.lams.util.DateUtil;
+import org.lamsfoundation.lams.util.ExcelCell;
+import org.lamsfoundation.lams.util.ExcelUtil;
+import org.lamsfoundation.lams.util.FileUtil;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.lamsfoundation.lams.web.util.SessionMap;
@@ -97,7 +103,9 @@ public class MonitoringAction extends Action {
 	if (param.equals("sendResultsToSessionUsers")) {
 	    return sendResultsToSessionUsers(mapping, form, request, response);
 	}
-
+	if ( param.equals("exportTeamReport")) {
+	    return exportTeamReport(mapping, form, request, response);
+	}
 	return mapping.findForward(PeerreviewConstants.ERROR);
     }
 
@@ -514,6 +522,55 @@ public class MonitoringAction extends Action {
 	return null;
     }
 
+    
+    /**
+     * Exports Team Report into Excel spreadsheet.
+     * @throws ServletException 
+     * @throws IOException 
+     */
+    public ActionForward exportTeamReport(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+	    HttpServletResponse response) throws ServletException {
+	
+	IPeerreviewService service = getPeerreviewService();
+	Long toolContentId = WebUtil.readLongParam(request, PeerreviewConstants.ATTR_TOOL_CONTENT_ID);
+
+	Peerreview peerreview = service.getPeerreviewByContentId(toolContentId);
+	if (peerreview == null) {
+	    log.warn("Did not find Peer Review with toolContentId: " + toolContentId + " export content");
+	    return null; 
+	}
+	
+	String fileName = peerreview.getTitle().replaceAll(" ", "_") + ".xlsx";
+	
+	try {
+        	fileName = FileUtil.encodeFilenameForDownload(request, fileName);
+        
+        	if (log.isDebugEnabled()) {
+        	    log.debug("Exporting to a spreadsheet for toolContentId: " + toolContentId + "filename "+fileName);
+        	}
+        
+        	response.setContentType("application/x-download");
+        	response.setHeader("Content-Disposition", "attachment;filename=" + fileName);
+        	ServletOutputStream out = response.getOutputStream();
+        
+        	LinkedHashMap<String, ExcelCell[][]> dataToExport = service.exportTeamReportSpreadsheet(toolContentId);
+        
+        	// set cookie that will tell JS script that export has been finished
+        	String downloadTokenValue = WebUtil.readStrParam(request, "downloadTokenValue");
+        	Cookie fileDownloadTokenCookie = new Cookie("fileDownloadToken", downloadTokenValue);
+        	fileDownloadTokenCookie.setPath("/");
+        	response.addCookie(fileDownloadTokenCookie);
+        	
+        	ExcelUtil.createExcel(out, dataToExport, "Exported on:", true);
+
+	} catch (IOException e) {
+	    log.error("exportTeamReportExcelSpreadsheet i/o error occured: "+e.getMessage(), e);
+	    throw new ServletException(e);
+	}
+
+	return null;
+    }
+    
     // *************************************************************************************
     // Private method
     // *************************************************************************************

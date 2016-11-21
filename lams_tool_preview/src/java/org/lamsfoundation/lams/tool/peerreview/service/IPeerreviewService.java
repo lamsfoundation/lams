@@ -24,6 +24,7 @@
 package org.lamsfoundation.lams.tool.peerreview.service;
 
 import java.util.Collection;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -39,6 +40,7 @@ import org.lamsfoundation.lams.tool.peerreview.dto.PeerreviewStatisticsDTO;
 import org.lamsfoundation.lams.tool.peerreview.model.Peerreview;
 import org.lamsfoundation.lams.tool.peerreview.model.PeerreviewSession;
 import org.lamsfoundation.lams.tool.peerreview.model.PeerreviewUser;
+import org.lamsfoundation.lams.util.ExcelCell;
 
 /**
  * Interface that defines the contract that all Peerreview service provider must follow.
@@ -276,4 +278,6 @@ public interface IPeerreviewService extends ToolRatingManager {
     /** Send an email with the user's results to the specified user in the session */
     int emailReportToUser(Long toolContentId, Long sessionId, Long userId);
 
+    /** Spreadsheet */
+    LinkedHashMap<String, ExcelCell[][]> exportTeamReportSpreadsheet(Long toolContentId);
 }
