@@ -28,7 +28,6 @@
         <many-to-one
             name="organisation"
             class="org.lamsfoundation.lams.usermanagement.Organisation"
-            cascade="delete" 
             lazy="false"
             outer-join="auto"
             update="true"
