@@ -35,13 +35,13 @@
 		}
 	</script>
 	<script type="text/javascript">
-		$(document).ready(
-				function() {
-					//update dialog's height and title
-					updateMyProfileDialogSettings(
-							'<fmt:message key="title.profile.edit.screen" />',
-							'100%');
-				});
+		$(document).ready( function() {
+			//update dialog's height and title
+			updateMyProfileDialogSettings(
+				'<fmt:message key="title.profile.edit.screen" />',
+				'100%'
+			);
+		});
 	</script>
 
 </lams:head>
@@ -189,12 +189,11 @@
 
 								<div class="form-group">
 									<label><fmt:message key="label.timezone.title" />:</label>
-									<html:select property="timeZone"
-										disabled="${!profileEditEnabled}" styleClass="form-control">
+									<html:select property="timeZone" disabled="${!profileEditEnabled}" styleClass="form-control">
 										<c:forEach items="${timezoneDtos}" var="timezoneDto">
 											<html:option value="${timezoneDto.timeZoneId}">
-						${timezoneDto.timeZoneId} - ${timezoneDto.displayName}
-					</html:option>
+												${timezoneDto.timeZoneId} - ${timezoneDto.displayName}
+											</html:option>
 										</c:forEach>
 									</html:select>
 								</div>
@@ -218,29 +217,30 @@
 
 								<div class="form-group">
 									<label><fmt:message key="label.theme" />:</label>
-									<html:select property="userTheme"
-										disabled="${!profileEditEnabled}" styleClass="form-control">
+									<html:select property="userTheme" disabled="${!profileEditEnabled}" styleClass="form-control">
 										<c:forEach items="${themes}" var="theme">
 											<html:option value="${theme.themeId}">${theme.name}</html:option>
 										</c:forEach>
 									</html:select>
 								</div>
+								
 								<c:if test="${not empty sharedSecret}">
 									<div class="form-group">
 										<label><fmt:message key="label.2FA.shared.secret" />:</label>
+										<br>
 										${sharedSecret}
 									</div>
 								</c:if>
+								
 								<c:if test="${not empty lamsCommunityToken}">
 									<div class="form-group">
-										<label> <fmt:message
-												key="label.lamscommunity.changeuser">
+										<label> 
+											<fmt:message key="label.lamscommunity.changeuser">
 												<fmt:param value="${lamsCommunityUsername}" />
 											</fmt:message>
 										</label>
 										<html:checkbox property="disableLamsCommunityUsername"
-											disabled="${!profileEditEnabled}" styleClass="form-control"></html:checkbox>
-
+												disabled="${!profileEditEnabled}" styleClass="form-control"/>
 									</div>
 								</c:if>
 							</c:if>
@@ -379,12 +379,11 @@
 
 								<div class="form-group">
 									<label><fmt:message key="label.timezone.title" />:</label>
-									<html:select property="timeZone"
-										disabled="${!profileEditEnabled}" styleClass="form-control">
+									<html:select property="timeZone" disabled="${!profileEditEnabled}" styleClass="form-control">
 										<c:forEach items="${timezoneDtos}" var="timezoneDto">
 											<html:option value="${timezoneDto.timeZoneId}">
-						${timezoneDto.timeZoneId} - ${timezoneDto.displayName}
-					</html:option>
+												${timezoneDto.timeZoneId} - ${timezoneDto.displayName}
+											</html:option>
 										</c:forEach>
 									</html:select>
 								</div>
