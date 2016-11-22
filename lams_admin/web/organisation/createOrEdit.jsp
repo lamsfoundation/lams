@@ -59,9 +59,6 @@
 	<tr>
 		<td><fmt:message key="admin.organisation.description"/></td>
 		<td><html-el:textarea property="description" cols="50" rows="3" styleClass="form-control" styleId="description" /></td>
-		<script type="text/javascript">
-			document.getElementById("description").setAttribute("maxlength", "240");
-		</script>
 	</tr>
 	<tr>
 		<td><fmt:message key="admin.organisation.locale"/></td>
