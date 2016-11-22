@@ -64,7 +64,7 @@ public class DacoConstants {
 	    "Multimap" };
 
     // for date parsing
-    public static final DateFormat DEFAULT_DATE_FORMAT = new SimpleDateFormat("EEE MMM dd hh:mm:ss zzz yyyy");
+    public static final DateFormat DEFAULT_DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd");
 
     // answer options' constants
     public static final int INIT_ANSWER_OPTION_COUNT = 3;
