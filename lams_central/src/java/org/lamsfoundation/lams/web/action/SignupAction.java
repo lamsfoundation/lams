@@ -42,15 +42,13 @@ public class SignupAction extends Action {
 
 	DynaActionForm signupForm = (DynaActionForm) form;
 	String method = WebUtil.readStrParam(request, "method", true);
-	if ((signupForm.get("submitted") == null) || !((Boolean) signupForm.get("submitted"))) {
-
-	    String context = WebUtil.readStrParam(request, "context", true);
+	String context = WebUtil.readStrParam(request, "context", true);
 	    SignupOrganisation signupOrganisation = null;
 	    if (StringUtils.isNotBlank(context)) {
 		signupOrganisation = SignupAction.signupService.getSignupOrganisation(context);
 		request.setAttribute("signupOrganisation", signupOrganisation);
 	    }
-
+	if ((signupForm.get("submitted") == null) || !((Boolean) signupForm.get("submitted"))) {
 	    if (signupOrganisation == null) {
 		request.setAttribute("messageKey", "No such signup page exists");
 		return mapping.findForward("message");
@@ -71,7 +69,7 @@ public class SignupAction extends Action {
 	try {
 
 	    DynaActionForm signupForm = (DynaActionForm) form;
-
+	    
 	    // validation
 	    ActionMessages errors = validateSignup(signupForm);
 	    if (!errors.isEmpty()) {
