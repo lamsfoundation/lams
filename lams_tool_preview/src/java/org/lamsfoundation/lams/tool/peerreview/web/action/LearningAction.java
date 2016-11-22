@@ -603,10 +603,11 @@ public class LearningAction extends Action {
      *
      * @throws IOException
      * @throws ServletException 
+     * @throws JSONException 
      *
      */
     public ActionForward submitComments(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws IOException, ServletException {
+	    HttpServletResponse response) throws IOException, ServletException, JSONException {
 
 	IPeerreviewService service = getPeerreviewService();
 
@@ -618,12 +619,14 @@ public class LearningAction extends Action {
 	ToolAccessMode mode = (ToolAccessMode) sessionMap.get(AttributeNames.ATTR_MODE);
 	PeerreviewUser user = (PeerreviewUser) sessionMap.get(PeerreviewConstants.ATTR_USER);
 	Long toolSessionId = (Long) sessionMap.get(PeerreviewConstants.PARAM_TOOL_SESSION_ID);
+	Long toolContentId = WebUtil.readLongParam(request, "toolContentId");
 
 	Peerreview peerreview = service.getPeerreviewBySessionId(toolSessionId);
 
 	Long criteriaId = WebUtil.readLongParam(request, "criteriaId");
 	RatingCriteria criteria = service.getCriteriaByCriteriaId(criteriaId);
 
+	int countCommentsSaved = 0;
 	if ( ! ( peerreview.getLockWhenFinished() && user.isSessionFinished() ) ) {
 
 	    Integer userId = user.getUserId().intValue();
@@ -632,22 +635,22 @@ public class LearningAction extends Action {
 		    String itemIdString = key.substring(17);
 		    Long itemId = new Long(itemIdString);
 		    String comment = request.getParameter(key);
-		    if ( comment != null && comment.length() > 0 ) {
+		    if ( comment != null ) {
 			// save the comment to the database.
 			service.commentItem(criteria, userId, itemId, comment);
+			countCommentsSaved++;
 		    }
 		}
 	    }
 	}
 	
-	request.setAttribute(PeerreviewConstants.ATTR_SESSION_MAP_ID, sessionMap.getSessionID());
-	request.setAttribute(AttributeNames.ATTR_MODE, mode);
-	request.setAttribute(PeerreviewConstants.PARAM_TOOL_SESSION_ID, toolSessionId);
-
-	Boolean next = WebUtil.readBooleanParam(request, "next");
-
-	// goto standard screen
-	return startRating(mapping, form, request, response, service, sessionMap, toolSessionId, user, mode, criteria, next);
+	JSONObject responsedata = new JSONObject();
+	int countRatedQuestions = service.getCountItemsRatedByUser(toolContentId, user.getUserId().intValue());
+	responsedata.put(AttributeNames.ATTR_COUNT_RATED_ITEMS, countRatedQuestions);
+	responsedata.put("countCommentsSaved", countCommentsSaved);
+	response.setContentType("application/json;charset=utf-8");
+	response.getWriter().print(new String(responsedata.toString()));
+	return null;
     }
     /**
      * Submit the ranking / hedging data and go back to the main learning screen.
@@ -720,7 +723,8 @@ public class LearningAction extends Action {
 
 	    if (criteria.isHedgeStyleRating() && criteria.isCommentsEnabled()) {
 		String justify = request.getParameter("justify");
-		service.commentItem(criteria, userId, criteria.getRatingCriteriaId(), justify);
+		if ( justify != null && justify.length() > 0)
+		    service.commentItem(criteria, userId, criteria.getRatingCriteriaId(), justify);
 	    }
 
 	}

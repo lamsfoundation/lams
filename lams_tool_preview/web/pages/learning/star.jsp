@@ -32,7 +32,8 @@
 	<script type="text/javascript">
 	
 	var YOUR_RATING_LABEL = '<fmt:message key="label.your.rating"><fmt:param>@1@</fmt:param><fmt:param>@2@</fmt:param><fmt:param>@3@</fmt:param></fmt:message>',
-	IS_DISABLED =  ${sessionMap.isDisabled};
+		IS_DISABLED =  ${sessionMap.isDisabled},
+		commentsSaved = true;
 	
 	
 	$(document).ready(function(){
@@ -65,7 +66,19 @@
 				cssPageDisplay: '.pagedisplay',
 				cssPageSize: '.pagesize',
 				cssDisabled: 'disabled',
+
 				ajaxUrl : "<c:url value='/learning/getUsers.do'/>?page={page}&size={size}&{sortList:column}&sessionMapID=${sessionMapID}&toolContentId=${peerreview.contentId}&toolSessionId=${toolSessionId}&criteriaId=${criteriaRatings.ratingCriteria.ratingCriteriaId}&userId=<lams:user property='userID' />",
+				<c:if test="${criteriaRatings.ratingCriteria.commentsEnabled}">
+				customAjaxUrl: function(table, url) {
+					if ( commentsSaved ) {
+						return url;
+					} else { 
+						<!-- Save comments first - this will retrigger the page call. Have to wait for submitEntrys ajax call to complete or end up not showing the comments when the pagesize is changed -->
+						submitEntry();
+						return "";
+					}
+				}, 
+				</c:if>
 				ajaxProcessing: function (data) {
 			    	if (data && data.hasOwnProperty('rows')) {
 			    		var rows = [],
@@ -99,6 +112,7 @@
 							
 							var isDisabled = IS_DISABLED || (MAX_RATES > 0) && ( COUNT_RATED_ITEMS >= MAX_RATES) || isMaximumRatesPerUserReached;
 							
+							
 							var objectId = "${criteriaRatings.ratingCriteria.ratingCriteriaId}-" + itemId;
 							var averageRating = userData["averageRating"];
 							var numberOfVotes = userData["numberOfVotes"];
@@ -129,30 +143,18 @@
 								var commentPostedByUser = userData["comment"];
 									
 								//show all comments needs to be shown
-								if (commentPostedByUser != "") {
+								if (commentPostedByUser != "" && IS_DISABLED) {
 									rows += '<div class="rating-comment">';
 									rows += 	commentPostedByUser;
 									rows += '</div>';
 										
 								//show comments textarea and a submit button
-								} else if (!isDisabled) {
+								} else if (!IS_DISABLED) {
 									rows += '<div id="add-comment-area-' + itemId;
 									if ( isCriteriaNotRatedByUser )
 										rows += '" style="visibility: hidden;';
 									rows += '">';	
-									rows += '<div class="no-gutter">';
-									rows += '';
-									rows += '<div class="col-xs-12 col-sm-11 ">';										
-									rows +=		'<textarea name="comment-textarea-'+itemId+'" rows="4" id="comment-textarea-'+ itemId +'" onfocus="if(this.value==this.defaultValue)this.value=\'\';" onblur="if(this.value==\'\')this.value=this.defaultValue;" class="form-control"><fmt:message key="label.comment.textarea.tip"/></textarea>';
-									rows += '</div>';
-									rows += 	'<div id="comment-tick-'+itemId+'" class="button add-comment add-comment-new col-xs-12 col-sm-1" ';
-									if ( isCriteriaNotRatedByUser )
-										rows += 'style="visibility: hidden;"';
-									rows += 'data-item-id="'+ itemId +'" data-comment-criteria-id="${criteriaRatings.ratingCriteria.ratingCriteriaId}">';
-									rows += 	'</div>';
-									
-									rows += '';
-									rows += '';
+									rows +=		'<textarea name="comment-textarea-'+itemId+'" rows="4" id="comment-textarea-'+ itemId +'" onblur="onRatingSuccessCallback()" class="form-control">'+commentPostedByUser+'</textarea>';
 									rows += '</div>';											
 								}
 								
@@ -171,7 +173,9 @@
 			
 			// bind to pager events
 			.bind('pagerInitialized pagerComplete', function(event, options){
+				commentsSaved = false;
 				initializeJRating();
+				onRatingSuccessCallback(); // show buttons if appropriate
 			});
 		});
 	 });
@@ -179,15 +183,69 @@
 
 <c:choose>
 <c:when test="${criteriaRatings.ratingCriteria.commentsEnabled}">
-	function submitEntry(next){
-		// ratings already saved, just save any unsaved comments.
+	function submitEntry(next, url){	
+
 		hideButtons();
-		$("#next").val(next);
+
+		var validationFailed = false, 
+			commentsToSave = 0,
+			data = {
+				sessionMapID: '${sessionMapID}', 
+				toolContentId: '${peerreview.contentId}',
+				criteriaId: '${criteriaRatings.ratingCriteria.ratingCriteriaId}'
+			};
+		
+		// save the modified values
 		$('textarea').each(function() {
-			if (this.value==this.defaultValue)
-				this.value="";
+			if ( ! ( $('#'+this.id).parent().css('visibility') == 'hidden') ) {
+				var comment = validComment(this.id, true);
+				if ( ! ( typeof comment === "undefined" )  ) {
+					if (comment!=this.defaultValue) {
+						data[this.id] = comment;
+						commentsToSave++;
+					}
+				} else  {
+					validationFailed = true;
+					return false; // validation failed! abort!
+				}
+			}
 		});
-		$("#editForm").submit();
+		if ( validationFailed )
+			return false;
+		
+		if ( commentsToSave > 0 ) {
+			$.ajax({ 
+				data: data, 
+		        type: 'POST', 
+	 	        url: '<c:url value="/learning/submitComments.do?"/>', 
+		        success: function (response) {
+	    			var countCommentsSaved = response.countCommentsSaved;
+					if ( ! ( countCommentsSaved >= 0 ) ) {
+	       				alert('Unable to save comments');
+	       				return false;
+					} else {
+						commentsSaved = true;
+						if ( next ) {
+							return nextprev(next);
+						} else {
+							$(".tablesorter").trigger('pagerUpdate');
+							return true;
+						}
+					}
+				}
+			});
+			
+		} else {
+			commentsSaved = true;
+			if ( next ) {
+				return nextprev(next);
+			} else {
+				$(".tablesorter").trigger('pagerUpdate');
+				return true;
+			}
+		}
+		
+		return false;
 	}
 </c:when>
 <c:otherwise>
@@ -245,20 +303,12 @@
 			
 		</c:if>
 
-		<c:if test="${criteriaRatings.ratingCriteria.commentsEnabled}">
-		<form action="<c:url value="/learning/submitComments.do?"/>" method="get" id="editForm">
-			<input type="hidden" name="sessionMapID" value="${sessionMapID}"/>
-			<input type="hidden" name="toolContentId" value="${toolContentId}"/>
-			<input type="hidden" name="criteriaId" value="${criteriaRatings.ratingCriteria.ratingCriteriaId}"/>
-			<input type="hidden" name="next" id="next" value=""/>		
-		</c:if>
-				
 		<c:set var="numColumns" value="2"/>
 		<c:if test="${criteriaRatings.ratingCriteria.commentsEnabled}">
 			<c:set var="numColumns" value="3"/>
 		</c:if>
 	
-		<lams:TSTable numColumns="${numColumns}">
+		<lams:TSTable numColumns="${numColumns}" test="yup">
 			<th class="username" title="<fmt:message key='label.sort.by.user.name'/>"  width="20%"> 
 				<fmt:message key="label.user.name" />
 			</th>
@@ -272,10 +322,6 @@
 			</c:if>
 		</lams:TSTable>
 
-		<c:if test="${criteriaRatings.ratingCriteria.commentsEnabled}">
-		</form>
-		</c:if>
-							
 		<div id="no-users-info">
 			<fmt:message key="label.no.users" />
 		</div>
