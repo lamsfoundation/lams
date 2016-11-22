@@ -61,6 +61,11 @@
 		webcam.set_api_url('<c:url value="/saveportrait.do"/>?method=saveWebcamPortrait');
 		webcam.set_quality(100); // JPEG quality (1 - 100)
 		
+		//set onComplete callback
+		webcam.set_hook('onComplete', 'onCompleteWebcam');
+		function onCompleteWebcam(response) {
+			window.parent.location.reload();
+		}
 		
 		//set onError callback
 		webcam.set_hook('onError', 'onErrorWebcam');
@@ -177,7 +182,7 @@
 									<fmt:message key='label.portrait.do.you.like.results' />
 								</div>
 			
-								<a class="btn btn-xs btn-default" id="uploadWebcam" onclick="submitPortrait()"
+								<a class="btn btn-xs btn-default" id="uploadWebcam" 
 									><fmt:message
 										key='label.portrait.yes.set.it.as.portrait' /></a> <a
 									class="btn btn-xs btn-default" id="resetWebcam"
