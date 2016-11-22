@@ -51,19 +51,6 @@ import org.lamsfoundation.lams.util.ValidationUtil;
 
 /**
  * @author Jun-Dir Liew
- *
- * Created at 12:35:38 on 14/06/2006
- */
-
-/**
- * struts doclets
- *
- *
- *
- *
- *
- *
- *
  */
 public class UserSaveAction extends Action {
 

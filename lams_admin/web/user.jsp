@@ -15,9 +15,7 @@
 <c:set var="mustHaveNumerics"><%=Configuration.get(ConfigurationKeys.PASSWORD_POLICY_NUMERICS)%></c:set>
 <c:set var="mustHaveSymbols"><%=Configuration.get(ConfigurationKeys.PASSWORD_POLICY_SYMBOLS)%></c:set>
 
-<link rel="stylesheet" href="css/defaultHTML_learner.css"
-	type="text/css" />
-
+<link rel="stylesheet" href="css/defaultHTML_learner.css" type="text/css" />
 
 <script type="text/javascript">
 	$.validator.addMethod("pwcheck", function(value) {
@@ -34,14 +32,11 @@
 	$.validator.addMethod("charactersAllowed", function(value) {
 		return /^[A-Za-z0-9\d`~!@#$%^&*\(\)_\-+={}\[\]\\|:\;\"\'\<\>,.?\/]*$/
 				.test(value)
-
 	});
 
 	$(function() {
 		// Setup form validation 
-		$("#UserForm")
-				.validate(
-						{
+		$("#UserForm").validate({
 							debug : true,
 							errorClass : 'help-block',
 							//  validation rules
@@ -102,39 +97,38 @@
 							submitHandler : function(form) {
 								form.submit();
 							}
-						});
+		});
 
 	});
-
 </script>
-
-
 
 <html-el:form styleId="UserForm" action="/usersave.do" method="post">
 	<html-el:hidden property="userId" />
 	<html-el:hidden property="orgId" />
 
-
 	<logic:notEmpty name="UserForm" property="orgId">
-		<a href="orgmanage.do?org=1" class="btn btn-default"><fmt:message
-				key="admin.course.manage" /></a>
+		<a href="orgmanage.do?org=1" class="btn btn-default">
+			<fmt:message key="admin.course.manage" />
+		</a>
 		<logic:notEmpty name="pOrgId">
-		: <a href="orgmanage.do?org=<c:out value="${pOrgId}" />"
-				class="btn btn-default"><c:out value="${parentName}" /></a>
-		: <a
-				href="usermanage.do?org=<bean:write name="UserForm" property="orgId" />"
-				class="btn btn-default"><c:out value="${orgName}" /></a>
+			: <a href="orgmanage.do?org=<c:out value="${pOrgId}" />" class="btn btn-default">
+				<c:out value="${parentName}" />
+			  </a>
+			: <a href="usermanage.do?org=<bean:write name="UserForm" property="orgId" />" class="btn btn-default">
+				<c:out value="${orgName}" />
+			  </a>
 		</logic:notEmpty>
 		<logic:empty name="pOrgId">
-		: <a
-				href="orgmanage.do?org=<bean:write name="UserForm" property="orgId" />"
-				class="btn btn-default"><c:out value="${orgName}" /></a>
+			: <a href="orgmanage.do?org=<bean:write name="UserForm" property="orgId" />" class="btn btn-default">
+				<c:out value="${orgName}" />
+			  </a>
 		</logic:empty>
 	</logic:notEmpty>
 
 	<logic:empty name="UserForm" property="orgId">
-		<a href="orgmanage.do?org=1" class="btn btn-default"><fmt:message
-				key="admin.course.manage" /></a>
+		<a href="orgmanage.do?org=1" class="btn btn-default">
+			<fmt:message key="admin.course.manage" />
+		</a>
 	</logic:empty>
 
 	<html-el:errors />
@@ -151,7 +145,6 @@
 		</div>
 
 		<div class="panel-body">
-
 			 
 			<lams:Alert type="info" id="passwordConditions" close="false">
 			<fmt:message key='label.password.must.contain' />:
@@ -176,7 +169,6 @@
 						<li><span class="fa fa-check"></span> <fmt:message
 								key='label.password.must.symbol' /></li>
 					</c:if>
-
 				</ul>
 			</lams:Alert>
 
@@ -258,89 +250,130 @@
 							styleClass="form-control" /></td>
 				</tr>
 				<tr>
-					<td class="align-right"><fmt:message key="admin.user.postcode" />:</td>
-					<td><html-el:text property="postcode" size="10" maxlength="10"
-							styleClass="form-control" /></td>
+					<td class="align-right">
+						<fmt:message key="admin.user.postcode" />:
+					</td>
+					<td>
+						<html-el:text property="postcode" size="10" maxlength="10" styleClass="form-control" />
+					</td>
 				</tr>
 				<tr>
-					<td class="align-right"><fmt:message key="admin.user.state" />:</td>
+					<td class="align-right">	
+						<fmt:message key="admin.user.state" />:
+					</td>
 					<td><html-el:text property="state"  maxlength="64"
-							styleClass="form-control" /></td>
+							styleClass="form-control" />
+					</td>
 				</tr>
 				<tr>
-					<td class="align-right"><fmt:message key="admin.user.country" />:</td>
+					<td class="align-right">
+						<fmt:message key="admin.user.country" />:
+					</td>
 					<td><html-el:text property="country"  maxlength="64"
-							styleClass="form-control" /></td>
+							styleClass="form-control" />
+					</td>
 				</tr>
 				<tr>
-					<td class="align-right"><fmt:message
-							key="admin.user.day_phone" />:</td>
-					<td><html-el:text property="dayPhone"  maxlength="64"
-							styleClass="form-control" /></td>
+					<td class="align-right">
+						<fmt:message key="admin.user.day_phone" />:
+					</td>
+					<td>
+						<html-el:text property="dayPhone"  maxlength="64" styleClass="form-control" />
+					</td>
 				</tr>
 				<tr>
-					<td class="align-right"><fmt:message
-							key="admin.user.evening_phone" />:</td>
-					<td><html-el:text property="eveningPhone" 
-							maxlength="64" styleClass="form-control" /></td>
+					<td class="align-right">
+						<fmt:message key="admin.user.evening_phone" />:
+					</td>
+					<td>
+						<html-el:text property="eveningPhone" maxlength="64" styleClass="form-control" />		
+					</td>
 				</tr>
 				<tr>
-					<td class="align-right"><fmt:message
-							key="admin.user.mobile_phone" />:</td>
-					<td><html-el:text property="mobilePhone" 
-							maxlength="64" styleClass="form-control" /></td>
+					<td class="align-right">
+						<fmt:message key="admin.user.mobile_phone" />:
+					</td>
+					<td>
+						<html-el:text property="mobilePhone" maxlength="64" styleClass="form-control" />
+					</td>
 				</tr>
 				<tr>
-					<td class="align-right"><fmt:message key="admin.user.fax" />:</td>
-					<td><html-el:text property="fax"  maxlength="64"
-							styleClass="form-control" /></td>
+					<td class="align-right">
+						<fmt:message key="admin.user.fax" />:</td>
+					<td>
+						<html-el:text property="fax"  maxlength="64" styleClass="form-control" />
+					</td>
 				</tr>
 
 				<tr>
-					<td class="align-right"><fmt:message
-							key="admin.organisation.locale" />:</td>
-					<td><html-el:select property="localeId"
-							styleClass="form-control">
+					<td class="align-right">
+						<fmt:message key="admin.organisation.locale" />:
+					</td>
+					<td>
+						<html-el:select property="localeId" styleClass="form-control">
 							<c:forEach items="${locales}" var="locale">
 								<html-el:option value="${locale.localeId}">
 									<c:out value="${locale.description}" />
 								</html-el:option>
 							</c:forEach>
-						</html-el:select></td>
+						</html-el:select>
+					</td>
 				</tr>
 
 				<tr>
-					<td class="align-right"><fmt:message
-							key="admin.user.time.zone" />:</td>
-					<td><html:select property="timeZone" styleClass="form-control">
+					<td class="align-right">
+						<fmt:message key="admin.user.time.zone" />:
+					</td>
+					<td>
+						<html:select property="timeZone" styleClass="form-control">
 							<c:forEach items="${timezoneDtos}" var="timezoneDto">
 								<html:option value="${timezoneDto.timeZoneId}">
-								${timezoneDto.timeZoneId} - ${timezoneDto.displayName}
-							</html:option>
+									${timezoneDto.timeZoneId} - ${timezoneDto.displayName}
+								</html:option>
 							</c:forEach>
-						</html:select></td>
+						</html:select>
+					</td>
 				</tr>
 
 				<tr>
-					<td class="align-right"><fmt:message key="label.theme" />:</td>
-					<td><html:select property="userTheme"
-							styleClass="form-control">
+					<td class="align-right">
+						<fmt:message key="label.theme" />:
+					</td>
+					<td>
+						<html:select property="userTheme" styleClass="form-control">
 							<c:forEach items="${themes}" var="theme">
 								<html:option value="${theme.themeId}">${theme.name}</html:option>
 							</c:forEach>
-						</html:select></td>
+						</html:select>
+					</td>
 				</tr>
+				
 				<tr>
-					<td class="align-right"><fmt:message key="admin.user.change.password" />:</td>
-					<td><html-el:checkbox property="changePassword" value="true"
-						 styleId="changePassword"  /></td>
+					<td class="align-right">
+						<fmt:message key="admin.user.change.password" />:
+					</td>
+					<td>
+						<html-el:checkbox property="changePassword" value="true" styleId="changePassword"  />
+					</td>
 				</tr>
+				
+				<c:if test="${isSysadmin}">
+					<tr>
+						<td class="align-right">
+							<fmt:message key="label.2FA.property.enable" />:
+						</td>
+						<td>
+							<html-el:checkbox property="twoFactorAuthenticationEnabled" value="true"  />
+						</td>
+					</tr>
+				</c:if>
+				
 			</table>
 
 			<div class="pull-right">
-				<input type="submit" name="org.apache.struts.taglib.html.CANCEL" value="<fmt:message key="admin.cancel" />" formnovalidate="formnovalidate" onclick="bCancel=true;" id="cancelButton" class="btn btn-default"/>
-				<html-el:submit styleId="saveButton"
-					styleClass="btn btn-primary loffset5">
+				<input type="submit" name="org.apache.struts.taglib.html.CANCEL" value="<fmt:message key="admin.cancel" />" 
+						formnovalidate="formnovalidate" onclick="bCancel=true;" id="cancelButton" class="btn btn-default"/>
+				<html-el:submit styleId="saveButton" styleClass="btn btn-primary loffset5">
 					<fmt:message key="admin.save" />
 				</html-el:submit>
 			</div>
@@ -368,10 +401,12 @@
 									<th><fmt:message key="label.global.roles" />:</th>
 								</tr>
 								<tr>
-									<td><c:forEach var="role" items="${globalRoles.roles}">
+									<td>
+										<c:forEach var="role" items="${globalRoles.roles}">
 											<fmt:message>role.<lams:role role="${role}" />
 											</fmt:message>&nbsp;
-							</c:forEach></td>
+										</c:forEach>
+									</td>
 								</tr>
 							</table>
 						</td>
@@ -381,20 +416,22 @@
 				<c:if test="${not empty userOrgRoles}">
 					<tr>
 						<td>
-							<table id="tableRoles"
-								class="table table-striped table-condensed">
+							<table id="tableRoles" class="table table-striped table-condensed">
 								<tr>
 									<th><fmt:message key="label.member.of" />:</th>
 									<th><fmt:message key="label.with.roles" />:</th>
 								</tr>
+								
 								<c:forEach var="userOrgRole" items="${userOrgRoles}">
 									<tr>
 										<td><c:out value="${userOrgRole.orgName}" /></td>
 										<td><c:forEach var="role" items="${userOrgRole.roles}">
 												<fmt:message>role.<lams:role role="${role}" />
 												</fmt:message>&nbsp;
-								</c:forEach></td>
+											</c:forEach>
+										</td>
 									</tr>
+									
 									<c:if test="${not empty userOrgRole.childDTOs}">
 										<c:forEach var="child" items="${userOrgRole.childDTOs}">
 											<tr>
@@ -403,11 +440,13 @@
 												<td><c:forEach var="role" items="${child.roles}">
 														<fmt:message>role.<lams:role role="${role}" />
 														</fmt:message>&nbsp;
-										</c:forEach></td>
+													</c:forEach>
+												</td>
 											</tr>
 										</c:forEach>
 									</c:if>
 								</c:forEach>
+								
 							</table>
 						</td>
 					</tr>
