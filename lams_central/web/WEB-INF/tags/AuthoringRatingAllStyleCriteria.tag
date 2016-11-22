@@ -192,7 +192,7 @@
 		var style = styleDropDown.options[styleDropDown.selectedIndex].value;
 		maxOrderId++;
 		$("#criteria-max-order-id").val(maxOrderId);
-		addRow(maxOrderId, style, '', '', false, 0, 0, 0);
+		addRow(maxOrderId, style, '', '', false, 1, 0, 0);
 		reactivateArrows();
 	}
 	
