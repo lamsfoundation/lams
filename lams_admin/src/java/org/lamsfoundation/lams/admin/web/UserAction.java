@@ -65,18 +65,6 @@ import org.lamsfoundation.lams.web.action.LamsDispatchAction;
 
 /**
  * @author Jun-Dir Liew
- *
- * Created at 17:00:18 on 13/06/2006
- */
-
-/**
- *
- *
- *
- *
- *
- *
- *
  */
 public class UserAction extends LamsDispatchAction {
 
@@ -187,6 +175,9 @@ public class UserAction extends LamsDispatchAction {
 		userSelectedTheme = UserAction.themeService.getDefaultTheme().getThemeId();
 	    }
 	    userForm.set("userTheme", userSelectedTheme);
+	    
+	    //property available for modification only to sysadmins
+	    userForm.set("twoFactorAuthenticationEnabled", user.isTwoFactorAuthenticationEnabled());
 	} else { // create a user
 	    try {
 		SupportedLocale locale = LanguageUtil.getDefaultLocale();
@@ -196,6 +187,11 @@ public class UserAction extends LamsDispatchAction {
 	    }
 	}
 	userForm.set("orgId", (org == null ? null : org.getOrganisationId()));
+	
+	// sysadmins can mark users as required to use two-factor authentication
+	if (request.isUserInRole(Role.SYSADMIN)) {
+	    request.setAttribute("isSysadmin", true);
+	}
 
 	// Get all available time zones
 	List<Timezone> availableTimeZones = UserAction.timezoneService.getDefaultTimezones();

@@ -89,6 +89,7 @@
 	<form-property name="firstLogin" type="java.lang.Boolean" initial="true" />
 	<form-property name="timeZone" type="java.lang.String" />
 	<form-property name="userTheme" type="java.lang.Long" />
+	<form-property name="twoFactorAuthenticationEnabled" type="java.lang.Boolean" initial="false" />
 </form-bean>
 
 <form-bean name="UserOrgForm" type="org.apache.struts.action.DynaActionForm">
