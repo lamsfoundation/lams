@@ -128,13 +128,7 @@
 												<input type="text" size="10" readonly="readonly" value="<c:out  value='${answer.answer}'/>"/>
 											</c:when>
  											<c:when test="${question.type==4}">
-												<c:set var="date">
-													<c:if test="${not empty answer.answer}">
-														<fmt:parseDate pattern="EEE MMM dd HH:mm:ss zzz yyyy" value="${answer.answer}" var="parsedDate" />
-														<lams:Date value="${parsedDate}" type="date" style="medium"/>
-														</c:if>
-												</c:set>
-												<input type="text" size="20" readonly="readonly" value="${date}" />
+												<input type="text" size="20" readonly="readonly" value="${answer.answer}" />
 											</c:when>
 											<c:when test="${question.type==5 || question.type==6}">
 												<c:choose>
