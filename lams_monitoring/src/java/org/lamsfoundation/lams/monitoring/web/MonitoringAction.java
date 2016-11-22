@@ -1081,7 +1081,8 @@ public class MonitoringAction extends LamsDispatchAction {
 
 	JSONObject startedJSON = new JSONObject();
 	startedJSON.put("name", getMessageService().getMessage("lesson.chart.started"));
-	startedJSON.put("value", Math.round(startedLearnersCount.doubleValue() / possibleLearnersCount * 100));
+	startedJSON.put("value", Math
+		.round((startedLearnersCount - completedLearnersCount.doubleValue()) / possibleLearnersCount * 100));
 	responseJSON.append("data", startedJSON);
 
 	JSONObject completedJSON = new JSONObject();
