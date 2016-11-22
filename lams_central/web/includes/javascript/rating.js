@@ -70,31 +70,11 @@ function initializeJRating() {
     	var itemId = $(this).data("item-id");
     	var commentsCriteriaId = $(this).data("comment-criteria-id");
     	
-    	//replace special characters with HTML tags
-    	var tempTextarea = jQuery('<textarea/>');
-    	filterData(document.getElementById('comment-textarea-' + itemId), tempTextarea);
-		var comment = tempTextarea.value;
-
-		//comment can't be blank
-		if (comment == "" || comment == COMMENT_TEXTAREA_TIP_LABEL) {
-			alert(WARN_COMMENTS_IS_BLANK_LABEL);
+		var comment = validComment("comment-textarea-" + itemId, false);
+		if ( ! comment )
 			return false;
-		}
-    	
-		//word count limit
-		if (COMMENTS_MIN_WORDS_LIMIT != 0) { //removed isCommentsEnabled && --was it worth it?
-			var value =  $("#comment-textarea-" + itemId).val();
-			value = value.trim();
-			
-		    var wordCount = value ? (value.replace(/['";:,.?\-!]+/g, '').match(/\S+/g) || []).length : 0;
-		    
-		    if(wordCount < COMMENTS_MIN_WORDS_LIMIT){
-				alert( WARN_MIN_NUMBER_WORDS_LABEL.replace("{1}", wordCount));
-				return false;
-			}
-		}
-    	
-    	//add new comment
+
+		//add new comment
     	$.ajax({
     		type: "POST",
     		url: LAMS_URL + 'servlet/rateItem',
@@ -132,6 +112,36 @@ function initializeJRating() {
     }).removeClass("add-comment-new");
 }
 
+// allowBlankComment is needed for Peer Review, where comments are always checked even if minWords = 0
+function validComment(textAreaId, allowBlankComment) {
+
+	
+	//replace special characters with HTML tags
+    var tempTextarea = jQuery('<textarea/>');
+    filterData(document.getElementById(textAreaId), tempTextarea);
+	var comment = tempTextarea.value;
+
+	//comment can't be blank
+	if ( ! allowBlankComment && ( comment == "" || comment == COMMENT_TEXTAREA_TIP_LABEL ) ) {
+		alert(WARN_COMMENTS_IS_BLANK_LABEL);
+		return;
+	}
+    	
+	//word count limit
+	if (COMMENTS_MIN_WORDS_LIMIT != 0) { //removed isCommentsEnabled && --was it worth it?
+		var value =  $("#" + textAreaId).val();
+		value = value.trim();
+		
+	    var wordCount = value ? (value.replace(/['";:,.?\-!]+/g, '').match(/\S+/g) || []).length : 0;
+		    
+	    if(wordCount < COMMENTS_MIN_WORDS_LIMIT){
+			alert( WARN_MIN_NUMBER_WORDS_LABEL.replace("{1}", wordCount));
+			return;
+		}
+	}
+	
+	return comment;
+}    	
 // If the call is from a rating then it is ratingCriteriaId-itemId format string, otherwise a comment 
 // only returns itemId as a number. Pull a string version of itemId of this. 
 function getItemIdFromObjectId(objectId) {
