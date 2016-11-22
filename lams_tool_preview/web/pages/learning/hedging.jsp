@@ -26,13 +26,51 @@
 		function submitEntry(next){
 			hideButtons();
 			updateMark();
+
 			if (  currentMark == ${criteriaRatings.ratingCriteria.maxRating} ) {
 				$("#next").val(next);
+
+				var finishedLock = '${finishedLock}';
+				<c:if test="${criteriaRatings.ratingCriteria.commentsEnabled && ! finishedLock}">
+				if ( validateJustification() )
+				</c:if>
+				{				
 				$("#editForm").submit();
+				}
 			} else {
 				alert('<fmt:message key="error.assign.marks"><fmt:param>${criteriaRatings.ratingCriteria.maxRating}</fmt:param></fmt:message>');
 			}
 		}
+		
+		<c:if test="${criteriaRatings.ratingCriteria.commentsEnabled && ! finishedLock}">
+		function validateJustification() {
+			
+			var justify = document.getElementById("justify");
+			
+			//replace special characters with HTML tags
+		    var tempTextarea = jQuery('<textarea/>');
+		    filterData(justify, tempTextarea);
+			var comment = tempTextarea.value;
+
+			//word count limit
+			var wordLimit = ${criteriaRatings.ratingCriteria.commentsMinWordsLimit};
+			if (wordLimit != 0) { 
+				var value =  $("#justify").val();
+				value = value.trim();
+				
+			    var wordCount = value ? (value.replace(/['";:,.?\-!]+/g, '').match(/\S+/g) || []).length : 0;
+				    
+			    if(wordCount < wordLimit){
+			    	var alertMessage = '<fmt:message key="warning.minimum.number.words"><fmt:param value="${criteriaRatings.ratingCriteria.commentsMinWordsLimit}"/></fmt:message>';
+					alert( alertMessage.replace("{1}", wordCount));
+					return false;
+				}
+			}
+			
+			justify.value = comment;
+			return true;
+		} 
+		</c:if>
 		
 		function cancel() {
 			document.location.href='<c:url value="/learning/refresh.do?sessionMapID=${sessionMapID}"/>';
@@ -89,8 +127,14 @@
 		<c:if test="${criteriaRatings.ratingCriteria.commentsEnabled}">
 			<div class="form-group">
 			<h4><label for="justify" class="voffset10"><fmt:message key="label.justify.hedging.marks" /></label></h4>
-			<lams:STRUTS-textarea property="justify" rows="4" cols="60" value="${criteriaRatings.justificationComment}" 
-					disabled="${finishedLock}" styleClass="mark-hedging-select"	/>
+			<c:choose>
+			<c:when test="${finishedLock}">
+				<span>${criteriaRatings.justificationComment}</span>
+			</c:when>
+			<c:otherwise>
+				<textarea id="justify" name="justify" rows="4" cols="60" class="mark-hedging-select" onblur="updateMark()">${criteriaRatings.justificationComment}</textarea>
+			</c:otherwise>
+			</c:choose>
 			</div>
 		</c:if>
 	
