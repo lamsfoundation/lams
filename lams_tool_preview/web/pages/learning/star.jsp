@@ -308,7 +308,7 @@
 			<c:set var="numColumns" value="3"/>
 		</c:if>
 	
-		<lams:TSTable numColumns="${numColumns}" test="yup">
+		<lams:TSTable numColumns="${numColumns}">
 			<th class="username" title="<fmt:message key='label.sort.by.user.name'/>"  width="20%"> 
 				<fmt:message key="label.user.name" />
 			</th>
