@@ -131,8 +131,8 @@ public class BlackboardUtil {
 	// Retrieve the Db persistence manager from the persistence service
 	BbPersistenceManager bbPm = PersistenceServiceFactory.getInstance().getDbPersistenceManager();
 
-	String courseIdStr = request.getParameter("course_id");
-	String contentIdStr = request.getParameter("content_id");
+	String _course_id = request.getParameter("course_id");
+	String _content_id = request.getParameter("content_id");
 	String strTitle = getTrimmedString(request, "title");
 	String strSequenceID = getTrimmedString(request, "sequence_id");
 	// TODO: Use bb text area instead
@@ -143,8 +143,8 @@ public class BlackboardUtil {
 	String isDisplayDesignImage = request.getParameter("isDisplayDesignImage");
 
 	// Internal Blackboard IDs for the course and parent content item
-	Id courseId = bbPm.generateId(Course.DATA_TYPE, courseIdStr);
-	Id folderId = bbPm.generateId(CourseDocument.DATA_TYPE, contentIdStr);
+	Id courseId = bbPm.generateId(Course.DATA_TYPE, _course_id);	
+	Id folderId = bbPm.generateId(CourseDocument.DATA_TYPE, _content_id);
 
 	FormattedText description = new FormattedText(strDescription, FormattedText.Type.HTML);
 	long ldId = Long.parseLong(strSequenceID);
@@ -199,6 +199,11 @@ public class BlackboardUtil {
 	// LDEV-3510 LAMS Lessons were always at the top and could not be moved.
 	//bbContent.setPosition(0);
 
+	//get course's courseId string that we need to provide LAMS with 
+	CourseDbLoader courseLoader = CourseDbLoader.Default.getInstance();
+	Course course = courseLoader.loadById(courseId);
+	String courseIdStr = course.getCourseId();
+
 	// Start the Lesson in LAMS (via Webservices) and capture the lesson ID
 	final long LamsLessonIdLong = LamsSecurityUtil.startLesson(user, courseIdStr, ldId, strTitle, strDescription,
 		false);
@@ -244,7 +249,7 @@ public class BlackboardUtil {
 	// create a new thread to pre-add students and monitors to a lesson (in order to do this task in parallel not to
 	// slow down later work)
 	final User userFinal = user;
-	final String courseIdStrFinal = courseIdStr;
+	final String courseIdStrFinal = _course_id;
 	Thread preaddLearnersMonitorsThread = new Thread(new Runnable() {
 	    @Override
 	    public void run() {
