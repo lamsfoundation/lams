@@ -87,7 +87,6 @@
 				EMAIL_TITLE : '<fmt:message key="label.email"/>',
 
 			},
-			stateId = 1, // TODO Figure out when stateId is required to be equal 3. Old version code: stateId = tabName == 'profile' ? 3 : 1;
 			activeOrgId = <c:choose><c:when test="${empty lastVisitedOrganisationId}">null</c:when><c:otherwise>${lastVisitedOrganisationId}</c:otherwise></c:choose>;
 
 		$(document).ready(function(){

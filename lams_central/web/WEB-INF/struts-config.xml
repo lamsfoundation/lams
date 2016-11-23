@@ -533,12 +533,12 @@
     >
       <forward
         name="profile"
-        path="/index.do?state=active&amp;method=profile"
+        path="/index.do?method=profile"
         redirect="true"
       />
       <forward
         name="editprofile"
-        path="/index.do?state=active&amp;method=editprofile"
+        path="/index.do?method=editprofile"
         redirect="false"
       />
     </action>
@@ -592,12 +592,12 @@
     >
       <forward
         name="profile"
-        path="/index.do?state=active&amp;method=profile"
+        path="/index.do?method=profile"
         redirect="false"
       />
       <forward
         name="errors"
-        path="/index.do?state=active&amp;method=portrait"
+        path="/index.do?method=portrait"
         redirect="false"
       />
     </action>
@@ -681,12 +681,12 @@
       />
       <forward
         name="cancelled"
-        path="/index.do?state=active&amp;method=profile"
+        path="/index.do?method=profile"
         redirect="false"
       />
       <forward
         name="errors"
-        path="/index.do?state=active&amp;method=password"
+        path="/index.do?method=password"
         redirect="false"
       />
     </action>

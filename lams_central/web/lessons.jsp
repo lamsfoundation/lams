@@ -75,7 +75,7 @@
 					<div align="center">
 						<input class="btn btn-sm btn-default offset5" type="button"
 							value="<fmt:message key="label.return.to.myprofile" />"
-							onclick="javascript:document.location='index.do?state=active&method=profile'" />
+							onclick="javascript:document.location='index.do?method=profile'" />
 					</div>
 
 				</div>
