@@ -38,7 +38,7 @@
 	}
 </script>
 
-<html:form action="/learning" method="post" onsubmit="return validateForm();" styleId="messageForm">
+<html:form action="/learning" method="post" styleId="messageForm">
 	<html:hidden property="dispatch" value="finishActivity" />
 	<html:hidden property="toolSessionID" />
 	<html:hidden property="contentEditable" value="${contentEditable}" />
