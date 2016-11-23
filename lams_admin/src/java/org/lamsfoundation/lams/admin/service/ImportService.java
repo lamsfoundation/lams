@@ -242,7 +242,7 @@ public class ImportService implements IImportService {
 	Organisation org = new Organisation();
 	String[] args = new String[1];
 
-	String name = parseStringCell(row.getCell(ImportService.NAME));
+	String name = StringUtils.substring(parseStringCell(row.getCell(ImportService.NAME)),0,240);
 
 	//validate organisation name
 	if (StringUtils.isBlank(name)) {
