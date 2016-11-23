@@ -426,7 +426,7 @@
 		</html:cancel>
 		&nbsp;&nbsp;
 		<c:if test="${profileEditEnabled or partialProfileEditEnabled}">
-			<html:button styleClass="btn btn-sm btn-default voffset5"
+			<html:button styleClass="btn btn-sm btn-primary voffset5"
 				property="submit" onclick="submitMessage()">
 				<fmt:message key="button.save" />
 			</html:button>
