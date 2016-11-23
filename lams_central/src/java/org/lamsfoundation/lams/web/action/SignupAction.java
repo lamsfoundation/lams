@@ -50,7 +50,7 @@ public class SignupAction extends Action {
 	    }
 	if ((signupForm.get("submitted") == null) || !((Boolean) signupForm.get("submitted"))) {
 	    if (signupOrganisation == null) {
-		request.setAttribute("messageKey", "No such signup page exists");
+		request.setAttribute("messageKey", "no.such.signup.page.exist");
 		return mapping.findForward("message");
 	    }
 
