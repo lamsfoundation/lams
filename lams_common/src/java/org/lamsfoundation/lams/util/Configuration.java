@@ -23,6 +23,8 @@
 
 package org.lamsfoundation.lams.util;
 
+import java.io.IOException;
+import java.net.ConnectException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -34,6 +36,9 @@ import java.util.Map;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
+import org.jboss.as.controller.client.ModelControllerClient;
+import org.jboss.as.controller.client.helpers.Operations;
+import org.jboss.dmr.ModelNode;
 import org.lamsfoundation.lams.config.ConfigurationItem;
 import org.lamsfoundation.lams.config.Registration;
 import org.lamsfoundation.lams.config.dao.IConfigurationDAO;
@@ -164,13 +169,7 @@ public class Configuration implements InitializingBean {
 
     @Override
     public void afterPropertiesSet() {
-	if (Configuration.items != null) {
-	    return;
-	}
 	Configuration.refreshCache();
-	if (Configuration.items == null) {
-	    return;
-	}
 
 	String refreshCacheIntervalString = Configuration.get(ConfigurationKeys.CONFIGURATION_CACHE_REFRESH_INTERVAL);
 	Integer refreshCacheInterval = StringUtils.isBlank(refreshCacheIntervalString) ? null
@@ -191,6 +190,37 @@ public class Configuration implements InitializingBean {
 			e);
 	    }
 	}
+
+	new Thread("LAMSConfigurationServerStateCheckThread") {
+	    @Override
+	    public void run() {
+		boolean check = true;
+		do {
+		    try (ModelControllerClient client = ModelControllerClient.Factory.create("localhost", 9990)) {
+			// try every 5 seconds
+			Thread.sleep(5000);
+			// read servedr state
+			ModelNode address = new ModelNode().setEmptyList();
+			ModelNode op = Operations.createReadAttributeOperation(address, "server-state");
+			ModelNode result = client.execute(op);
+			if (Operations.isSuccessfulOutcome(result)) {
+			    String state = Operations.readResult(result).asString();
+			    if ("running".equalsIgnoreCase(state)) {
+				log.info("Refreshing configuration cache after server start");
+				// refresh and die
+				Configuration.refreshCache();
+				check = false;
+			    }
+			}
+		    } catch (ConnectException e) {
+			// this exception happens all the time until server starts up
+		    } catch (IOException | InterruptedException e) {
+			// something really wrong happenned, die
+			check = false;
+		    }
+		} while (check);
+	    }
+	}.start();
     }
 
     /**
