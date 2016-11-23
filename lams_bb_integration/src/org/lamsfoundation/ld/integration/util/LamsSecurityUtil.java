@@ -664,7 +664,7 @@ public class LamsSecurityUtil {
      * @param lessonId
      *            the lesoon id that was just started
      */
-    public static void preaddLearnersMonitorsToLesson(User user, String courseIdStr, long lessonId) {
+    public static void preaddLearnersMonitorsToLesson(User user, Course course, long lessonId) {
 	String serverId = getServerID();
 	String serverAddr = getServerAddress();
 	String serverKey = getServerKey();
@@ -693,7 +693,7 @@ public class LamsSecurityUtil {
 	    BbPersistenceManager bbPm = PersistenceServiceFactory.getInstance().getDbPersistenceManager();
 	    CourseMembershipDbLoader courseMemLoader = CourseMembershipDbLoader.Default.getInstance();
 
-	    Id courseId = bbPm.generateId(Course.DATA_TYPE, courseIdStr);
+	    Id courseId = course.getId();
 	    BbList<CourseMembership> studentCourseMemberships = courseMemLoader.loadByCourseIdAndRole(courseId,
 		    CourseMembership.Role.STUDENT, null, true);
 	    for (CourseMembership courseMembership : studentCourseMemberships) {
@@ -754,7 +754,7 @@ public class LamsSecurityUtil {
 	    String serviceURL = serverAddr + "/services/xml/LessonManager?" + "&serverId="
 		    + URLEncoder.encode(serverId, "utf8") + "&datetime=" + timestamp + "&username="
 		    + URLEncoder.encode(username, "utf8") + "&hashValue=" + hash + "&courseId="
-		    + URLEncoder.encode(courseIdStr, "utf8") + "&lsId=" + lessonId + "&country=" + country + "&lang="
+		    + URLEncoder.encode(course.getCourseId(), "utf8") + "&lsId=" + lessonId + "&country=" + country + "&lang="
 		    + lang + "&method=join" + "&firstNames="
 		    + firstNames + "&lastNames=" + lastNames + "&emails=" + emails;
 	    if (!monitorIds.isEmpty()) {
