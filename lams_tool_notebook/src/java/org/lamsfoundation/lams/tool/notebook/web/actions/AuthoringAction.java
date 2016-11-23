@@ -194,6 +194,7 @@ public class AuthoringAction extends LamsDispatchAction {
 	notebook.setTitle(authForm.getTitle());
 	notebook.setInstructions(authForm.getInstructions());
 	if (mode.isAuthor()) { // Teacher cannot modify following
+	    notebook.setForceResponse(authForm.isForceResponse());
 	    notebook.setLockOnFinished(authForm.isLockOnFinished());
 	    notebook.setAllowRichEditor(authForm.isAllowRichEditor());
 
@@ -211,6 +212,7 @@ public class AuthoringAction extends LamsDispatchAction {
 	authForm.setTitle(notebook.getTitle());
 	authForm.setInstructions(notebook.getInstructions());
 	authForm.setLockOnFinished(notebook.isLockOnFinished());
+	authForm.setForceResponse(notebook.isForceResponse());
 	authForm.setAllowRichEditor(notebook.isAllowRichEditor());
 
     }

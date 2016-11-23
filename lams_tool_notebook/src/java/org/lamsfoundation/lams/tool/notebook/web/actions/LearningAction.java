@@ -116,6 +116,8 @@ public class LearningAction extends LamsDispatchAction {
 	notebookDTO.instructions = notebook.getInstructions();
 	notebookDTO.allowRichEditor = notebook.isAllowRichEditor();
 	notebookDTO.lockOnFinish = notebook.isLockOnFinished();
+	notebookDTO.forceResponse = notebook.isForceResponse();
+	
 
 	request.setAttribute("notebookDTO", notebookDTO);
 

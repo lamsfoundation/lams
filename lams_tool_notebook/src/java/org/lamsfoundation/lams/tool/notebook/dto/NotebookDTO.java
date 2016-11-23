@@ -44,6 +44,8 @@ public class NotebookDTO {
     public boolean allowRichEditor;
 
     public boolean lockOnFinish;
+    
+    public boolean forceResponse;
 
     public Date submissionDeadline;
 
@@ -60,6 +62,7 @@ public class NotebookDTO {
 	contentInUse = notebook.isContentInUse();
 	allowRichEditor = notebook.isAllowRichEditor();
 	lockOnFinish = notebook.isLockOnFinished();
+	forceResponse = notebook.isForceResponse();
 
 	for (Iterator iter = notebook.getNotebookSessions().iterator(); iter.hasNext();) {
 	    NotebookSession session = (NotebookSession) iter.next();
@@ -124,6 +127,14 @@ public class NotebookDTO {
 
     public void setLockOnFinish(boolean lockOnFinish) {
 	this.lockOnFinish = lockOnFinish;
+    }
+    
+    public boolean isForceResponse() {
+        return forceResponse;
+    }
+
+    public void setForceResponse(boolean forceResponse) {
+        this.forceResponse = forceResponse;
     }
 
     /**

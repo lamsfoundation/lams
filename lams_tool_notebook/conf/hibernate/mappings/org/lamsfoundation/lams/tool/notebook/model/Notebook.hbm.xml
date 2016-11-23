@@ -59,6 +59,15 @@
             column="title"
             length="255"
         />
+        
+         <property
+            name="forceResponse"
+            type="boolean"
+            update="true"
+            insert="true"
+            column="force_response"
+            length="1"
+        />
 
         <property
             name="instructions"
