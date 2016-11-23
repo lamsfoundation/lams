@@ -54,6 +54,8 @@ public class Notebook implements java.io.Serializable, Cloneable {
     private String title;
 
     private String instructions;
+    
+    private boolean forceResponse;
 
     private boolean lockOnFinished;
 
@@ -159,6 +161,20 @@ public class Notebook implements java.io.Serializable, Cloneable {
     public void setLockOnFinished(boolean lockOnFinished) {
 	this.lockOnFinished = lockOnFinished;
     }
+    
+    /**
+    *
+    *
+    */
+
+    public boolean isForceResponse() {
+        return forceResponse;
+    }
+
+    public void setForceResponse(boolean forceResponse) {
+        this.forceResponse = forceResponse;
+    }
+
 
     /**
      *

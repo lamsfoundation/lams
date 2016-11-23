@@ -2,13 +2,14 @@
 
 <script type="text/javascript">
 	var mode = "${mode}";
+	var forceResponse = "${notebookDTO.forceResponse}";
 
 	function disableFinishButton() {
 		document.getElementById("finishButton").disabled = true;
 	}
 
 	function validateForm() {
-
+	
 		// Validates that there's input from the user. 
 
 		// disables the Finish button to avoid double submittion 
@@ -37,6 +38,16 @@
 	}
 
 	function submitForm(methodName) {
+		if (forceResponse =="true" && document.learningForm.focusedInput.value == "") {
+			if (confirm("<fmt:message>message.learner.blank.alertforceResponse</fmt:message>")) {
+				return true;
+			} else {
+				// otherwise, focus on the text area
+				document.learningForm.entryText.focus();
+				document.getElementById("finishButton").disabled = false;
+				return false;
+			}
+		} 
 		var f = document.getElementById('messageForm');
 		f.submit();
 	}
