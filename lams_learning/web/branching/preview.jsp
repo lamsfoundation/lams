@@ -21,12 +21,11 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 
 <%@ include file="/common/taglibs.jsp"%>
 
-<script language="JavaScript" type="text/javascript"><!--
+<script type="text/javascript">
 	function validate() {
-		var validated = false;
-		
-		var form = document.forms[0];
-		var elements = form.elements;
+		var validated = false,
+			form = document.forms[0],
+			elements = form.elements;
 		for (var i = 0; i < elements.length; i++) {
 			if (elements[i].name == "branchID") {
 				if (elements[i].checked) {
@@ -35,20 +34,19 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 				}
 			}
 		}
-		if (!validated) {
-			alert("<fmt:message key="message.activity.options.noActivitySelected" />");
-			return false;
-		}
-		else {
+		
+		if (validated) {
 			return true;
 		}
+	
+		alert("<fmt:message key="message.activity.options.noActivitySelected" />");
+		return false;
 	}
-        function submitForm(methodName){
-                var f = document.getElementById('messageForm');
-                f.submit();
-        }
-
-	//-->
+	
+	function submitForm(methodName) {
+		var f = document.getElementById('messageForm');
+		f.submit();
+	}
 </script>
 
 <c:set var="title"><c:out value="${BranchingForm.map.title}" /></c:set>
@@ -121,31 +119,12 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 				</c:forEach>
 			</table>
 
-			<c:if test="${BranchingForm.map.showNextButton}">
-				<html:submit styleClass="btn btn-default pull-left">
-					<fmt:message key="label.activity.options.choose" />
-				</html:submit>
-			</c:if>
+			<html:submit styleClass="btn btn-primary pull-right">
+				<fmt:message key="label.activity.options.choose" />
+			</html:submit>
 
 		</html:form>
 	</div>
-
-	<c:if test="${BranchingForm.map.showFinishButton}">
-		<html:form action="/CompleteActivity" method="post" styleId="messageForm">
-			<input type="hidden" name="activityID"
-				value="<c:out value='${BranchingForm.map.activityID}' />">
-			<input type="hidden" name="lessonID"
-				value="<c:out value='${BranchingForm.map.lessonID}' />">
-			<input type="hidden" name="progressID"
-				value="<c:out value='${BranchingForm.map.progressID}' />">
-
-	        <html:link href="javascript:;" styleClass="btn btn-default pull-right" styleId="finishButton" onclick="submitForm('finish')">
-				<span class="nextActivity"><fmt:message key="label.finish.button" /></span>
-			</html:link>
-
-		</html:form>
-	</c:if>
-
 <!--closes content-->
 
 <div id="footer"></div>
