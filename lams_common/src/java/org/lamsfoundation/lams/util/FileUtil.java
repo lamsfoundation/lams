@@ -673,6 +673,9 @@ public class FileUtil {
 	    filename = unEncodedFilename;
 
 	}
+	
+	// wrap filename in quotes as if it contains comma character Chrome can throw a multiple headers error 
+	filename = "\"" + filename + "\"";
 
 	return filename;
     }
