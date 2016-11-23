@@ -8,46 +8,31 @@
 		document.getElementById("finishButton").disabled = true;
 	}
 
-	function validateForm() {
-	
-		// Validates that there's input from the user. 
-
-		// disables the Finish button to avoid double submittion 
-		disableFinishButton();
-
-		if (mode == "learner") {
-			// if this is learner mode, then we add this validation see (LDEV-1319)
-
-			if (document.learningForm.entryText.value == "") {
-
-				// if the input is blank, then we further inquire to make sure it is correct
-				if (confirm("<fmt:message>message.learner.blank.input</fmt:message>")) {
-					// if correct, submit form
-					return true;
-				} else {
-					// otherwise, focus on the text area
-					document.learningForm.entryText.focus();
-					document.getElementById("finishButton").disabled = false;
-					return false;
-				}
-			} else {
-				// there was something on the form, so submit the form
-				return true;
-			}
-		}
+	function textAreaReady() {
+		document.learningForm.focusedInput.focus();
+		document.getElementById("finishButton").disabled = false;
 	}
-
+	
 	function submitForm(methodName) {
+		disableFinishButton();
 		if (forceResponse =="true" && document.learningForm.focusedInput.value == "") {
 			if (confirm("<fmt:message>message.learner.blank.alertforceResponse</fmt:message>")) {
 				return true;
 			} else {
 				// otherwise, focus on the text area
-				document.learningForm.entryText.focus();
-				document.getElementById("finishButton").disabled = false;
+				textAreaReady();
 				return false;
 			}
-		} 
+			
+		} else if  (forceResponse =="false" && document.learningForm.focusedInput.value == "" && mode == "learner") {
+
+			if (!confirm("<fmt:message>message.learner.blank.input</fmt:message>")) {
+				// otherwise, focus on the text area
+				textAreaReady();
+				return false;
+			}
+		}
+		
 		var f = document.getElementById('messageForm');
 		f.submit();
 	}
@@ -103,7 +88,7 @@
 						</c:when>
 
 						<c:otherwise>
-							<html:textarea rows="8" property="entryText" styleClass="form-control" styleId="focusedInput" />
+							<html:textarea rows="8" property="entryText" styleClass="form-control" styleId="focusedInput"/>
 						</c:otherwise>
 					</c:choose>
 				</c:when>
@@ -152,6 +137,9 @@
 
 <script type="text/javascript">
 	window.onload = function() {
-		document.getElementById("focusedInput").focus();
+		textAreaReady();
+		if (forceResponse == 'true') {
+			$('#focusedInput').attr('placeholder', '<fmt:message>message.learner.blank.alertforceResponse</fmt:message>');
+		}
 	}
 </script>
