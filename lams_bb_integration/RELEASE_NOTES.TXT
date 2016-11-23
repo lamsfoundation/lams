@@ -133,3 +133,4 @@ Now reverted back to previous behaviour with lesson loading in the same tab.
 * LDEV-3927: Fixed a FF bug: "Open Lesson" not open in firefox browser for the second time after closing the opened window
 * LDEV-3510: Remove previously added line that made LAMS Lessons always appear at top of content list
 * LDEV-3958: Add a button to admin page that can fix grade center columns
+* LDEV-4080: Blackboard sends _course_id instead of courseId string to LAMS on creating new lessons
