@@ -53,6 +53,8 @@
 			<include name="org/apache/httpcomponents/main/httpclient-*.jar" />
 			<include name="org/apache/httpcomponents/main/httpcore-*.jar" />
 			<include name="javax/websocket/api/main/jboss-websocket-api*.jar" />
+			<include name="org/jboss/as/controller-client/main/wildfly-controller-client-*.jar" />
+			<include name="org/jboss/dmr/main/jboss-dmr-*.jar" />
 		</fileset>
 		<!-- Optional project own libraries -->
 		<fileset dir="lib" erroronmissingdir="false">
