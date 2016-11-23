@@ -48,6 +48,8 @@ public class AuthoringForm extends ActionForm {
     String instructions;
 
     boolean lockOnFinished;
+    
+    boolean forceResponse;
 
     boolean allowRichEditor;
 
@@ -73,6 +75,15 @@ public class AuthoringForm extends ActionForm {
 
     public void setSessionMapID(String sessionMapID) {
 	this.sessionMapID = sessionMapID;
+    }
+    
+
+    public boolean isForceResponse() {
+        return forceResponse;
+    }
+
+    public void setForceResponse(boolean forceResponse) {
+        this.forceResponse = forceResponse;
     }
 
     public String getCurrentTab() {
