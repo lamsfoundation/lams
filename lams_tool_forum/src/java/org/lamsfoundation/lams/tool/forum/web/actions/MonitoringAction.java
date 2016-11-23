@@ -319,7 +319,6 @@ public class MonitoringAction extends Action {
 
 		// format lastEdited date
 		Date lastMessageDate = lastMessage.getMessage().getUpdated();
-		lastMessageDate = DateUtil.convertToTimeZoneFromDefault(teacherTimeZone, lastMessageDate);
 		DateFormat dateFormatter = new SimpleDateFormat("d MMMM yyyy h:mm:ss a");
 		responseRow.put("lastMessageDate", dateFormatter.format(lastMessageDate));
 		responseRow.put("timeAgo", DateUtil.convertToStringForTimeagoJSON(lastMessageDate));
