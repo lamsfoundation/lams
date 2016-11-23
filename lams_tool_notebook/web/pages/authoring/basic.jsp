@@ -12,3 +12,9 @@
     <label for="instructions"><fmt:message key="label.authoring.basic.instructions" /></label>
     <lams:CKEditor id="instructions" value="${formBean.instructions}" contentFolderID="${sessionMap.contentFolderID}"></lams:CKEditor>
 </div>
+<div class="checkbox">
+	<label for="forceResponse">
+		<html:checkbox property="forceResponse" styleId="forceResponse" value="1" />
+		<fmt:message key="basic.forceResponse" />
+	</label>
+</div>
