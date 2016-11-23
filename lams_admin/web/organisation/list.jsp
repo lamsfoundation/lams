@@ -103,11 +103,12 @@
 <logic:equal name="OrgManageForm" property="type" value="1">
 	<form>
 	
-	<div class="pull-right">
-		<input id="userCreate" class="btn btn-default" type="button" value="<fmt:message key="admin.user.create"/>" onclick=javascript:document.location='user.do?method=edit' />
-		<input id="findUsers" class="btn btn-default" type="button" value="<fmt:message key="admin.user.find"/>" onclick=javascript:document.location='usersearch.do' />
+	<div class="btn-group btn-group-sm">
+		<a id="userCreate" class="btn btn-default" href="user.do?method=edit"><i class="fa fa-user-plus"></i> <fmt:message key="admin.user.create"/></a>
+		<a id="findUsers" class="btn btn-default" href="usersearch.do"><i class="fa fa-search"></i> <fmt:message key="admin.user.find"/></a>
+		
 		<logic:equal name="manageGlobalRoles" value="true">
-			<input id="manageGlobalRoles" class="btn btn-default" type="button" value="<fmt:message key="admin.global.roles.manage" />" onclick=javascript:document.location='usermanage.do?org=<c:out value="${OrgManageForm.parentId}"/>' />
+			<a id="manageGlobalRoles" class="btn btn-default" href="usermanage.do?org=<c:out value="${OrgManageForm.parentId}"/>"><i class="fa fa-globe"></i> <fmt:message key="admin.global.roles.manage" /></a>
 		</logic:equal>
 		<logic:equal name="createGroup" value="true">
 			<c:url var="editaction" value="organisation.do">
@@ -115,7 +116,7 @@
 				<c:param name="typeId" value="2" />
 				<c:param name="parentId" value="${OrgManageForm.parentId}" />
 			</c:url>
-			<input id="createCourse" class="btn btn-default" type="button" value="<fmt:message key="admin.course.add"/>" onclick=javascript:document.location='<c:out value="${editaction}"/>' />
+			<a id="createCourse" class="btn btn-default" href="<c:out value="${editaction}"/>"><i class="fa fa-graduation-cap"></i> <fmt:message key="admin.course.add"/></a>
 		</logic:equal>
 	</div>
 	<p style="padding-top:10px;"><c:out value="${numUsers}"/></p>
@@ -138,27 +139,26 @@
 
 	<div class="panel panel-default voffset5" >
 		<div class="panel-heading">
-			<span class="panel-title">
-				<bean:write name="OrgManageForm" property="parentName"/>
-			</span>
-			<div class="btn-group btn-group-sm  pull-right">
-				<logic:equal name="editGroup" value="true">
-					<input id="editCourse" class="btn btn-default" type="button" value="<fmt:message key="admin.edit" />&nbsp;<bean:write name="OrgManageForm" property="parentName"/>" onclick=javascript:document.location='organisation.do?method=edit&orgId=<c:out value="${OrgManageForm.parentId}"/>' />
-				</logic:equal>
-				<input id="manageUsers" class="btn btn-default" type="button" value="<fmt:message key="admin.user.manage" />" onclick=javascript:document.location='usermanage.do?org=<c:out value="${OrgManageForm.parentId}"/>' />
-				<% if (request.isUserInRole(Role.SYSADMIN)) { %>
-					<input id="closeLessons" class="btn btn-default" type="button" value="<fmt:message key="title.clone.lessons" />" onclick="javascript:document.location='clone.do?groupId=<c:out value="${OrgManageForm.parentId}"/>';">
-				<% } %>
+			<div class="panel-title">
+				<span id="courseName"><bean:write name="OrgManageForm" property="parentName"/></span>
+
+				<div class="btn-group btn-group-sm  pull-right">
+					<logic:equal name="editGroup" value="true">
+						<a href="organisation.do?method=edit&orgId=<c:out value="${OrgManageForm.parentId}"/>" id="editCourse" class="btn btn-default"><i class="fa fa-edit"></i><span class="hidden-xs"> <fmt:message key="admin.edit" /></span></a> 
+					</logic:equal>
+					<a href="usermanage.do?org=<c:out value="${OrgManageForm.parentId}"/>" id="manageUsers" class="btn btn-default"><i class="fa fa-users"></i> <span class="hidden-xs"><fmt:message key="admin.user.manage" /></span></a>
+					
+					<% if (request.isUserInRole(Role.SYSADMIN)) { %>
+						<a href="clone.do?groupId=<c:out value="${OrgManageForm.parentId}"/>" class="btn btn-default"><i class="fa fa-clone"></i><span class="hidden-xs"> <fmt:message key="title.clone.lessons" /></span></a>
+					<% } %>
+				</div>
 			</div>
 		</div>
-	
-		<table class="table table-striped">
+		<div class="panel-body">
+
+		<table class="table table-striped table-bordered">
 			<tr>
-				<td id="courseName" width="50%"><fmt:message key="admin.organisation.name"/>:</td>
-				<td><c:out value="${org.name}" /></td>
-			</tr>
-			<tr>
-				<td><fmt:message key="admin.organisation.code"/>:</td>
+				<td width="50%"><fmt:message key="admin.organisation.code"/>:</td>
 				<td><c:out value="${org.code}" /></td>
 			</tr>
 			<tr>
@@ -188,7 +188,8 @@
 			<tr>
 				<td colspan="2"><c:out value="${numUsers}"/></td>
 			</tr>
-		</table>		
+		</table>
+		</div>		
 	</div>
 	
 	<form>
