@@ -133,7 +133,6 @@ public class BranchingActivityAction extends LamsDispatchAction {
 		    activityURLs.add(activityURL);
 		}
 		branchForm.set("activityURLs", activityURLs);
-		branchForm.set("showNextButton", branchingActivity.getActivities().size() != completedCount);
 
 	    } else if (branch == null) {
 
