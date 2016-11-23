@@ -68,14 +68,11 @@ public class DisplayGroupAction extends Action {
     private static ILearningDesignService learningDesignService;
     private static ISecurityService securityService;
 
-    private Integer stateId = OrganisationState.ACTIVE;
-
     @Override
     @SuppressWarnings({ "unchecked" })
     public ActionForward execute(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) throws Exception {
 
-	stateId = WebUtil.readIntParam(request, "stateId", false);
 	Integer orgId = WebUtil.readIntParam(request, "orgId", false);
 
 	Organisation org = null;
@@ -132,7 +129,7 @@ public class DisplayGroupAction extends Action {
 	// First, populate header part
 	List<IndexLinkBean> links = new ArrayList<IndexLinkBean>();
 	List<IndexLinkBean> moreLinks = new ArrayList<IndexLinkBean>();
-	if (isSysAdmin && stateId.equals(OrganisationState.ACTIVE)) {
+	if (isSysAdmin) {
 	    if (orgBean.getType().equals(OrganisationType.COURSE_TYPE)) {
 		moreLinks.add(new IndexLinkBean("index.classman",
 			"javascript:openOrgManagement(" + org.getOrganisationId() + ")", "fa fa-fw fa-users", null));
@@ -144,8 +141,8 @@ public class DisplayGroupAction extends Action {
 	    links.add(new IndexLinkBean("index.coursegradebook.learner", link, "fa fa-fw fa-list-ol", null));
 	}
 
-	if ((roles.contains(Role.ROLE_GROUP_ADMIN) || roles.contains(Role.ROLE_GROUP_MANAGER)
-		|| roles.contains(Role.ROLE_MONITOR)) && stateId.equals(OrganisationState.ACTIVE)) {
+	if (roles.contains(Role.ROLE_GROUP_ADMIN) || roles.contains(Role.ROLE_GROUP_MANAGER)
+		|| roles.contains(Role.ROLE_MONITOR)) {
 	    if (orgBean.getType().equals(OrganisationType.COURSE_TYPE)) {
 		if ((!isSysAdmin)
 			&& (roles.contains(Role.ROLE_GROUP_ADMIN) || roles.contains(Role.ROLE_GROUP_MANAGER))) {
@@ -204,12 +201,6 @@ public class DisplayGroupAction extends Action {
 	orgBean.setLinks(links);
 	orgBean.setMoreLinks(moreLinks);
 
-	// set archived date if archived
-	if (stateId.equals(OrganisationState.ARCHIVED)
-		&& org.getOrganisationState().getOrganisationStateId().equals(OrganisationState.ARCHIVED)) {
-	    orgBean.setArchivedDate(org.getArchivedDate());
-	}
-
 	// now populate group contents
 	orgBean = populateContentsOrgBean(orgBean, org, roles, username, isSysAdmin);
 
@@ -235,7 +226,7 @@ public class DisplayGroupAction extends Action {
 
 	    List<IndexOrgBean> childOrgBeans = new ArrayList<IndexOrgBean>();
 	    for (Organisation organisation : children) {
-		if (organisation.getOrganisationState().getOrganisationStateId().equals(stateId)) {
+		if (OrganisationState.ACTIVE.equals(organisation.getOrganisationState().getOrganisationStateId())) {
 		    List<Integer> classRoles = new ArrayList<Integer>();
 		    List<UserOrganisationRole> userOrganisationRoles = getService()
 			    .getUserOrganisationRoles(organisation.getOrganisationId(), username);
@@ -285,7 +276,7 @@ public class DisplayGroupAction extends Action {
 	    LinkedList<IndexLinkBean> lessonLinks = new LinkedList<IndexLinkBean>();
 	    String url = null;
 	    Integer lessonStateId = bean.getState();
-	    if (stateId.equals(OrganisationState.ACTIVE) && roles.contains(Role.ROLE_LEARNER)
+	    if (roles.contains(Role.ROLE_LEARNER)
 		    && (lessonStateId.equals(Lesson.STARTED_STATE) || lessonStateId.equals(Lesson.FINISHED_STATE))) {
 		url = "javascript:openLearner(" + bean.getId() + ")";
 	    }
@@ -317,8 +308,7 @@ public class DisplayGroupAction extends Action {
 		lessonLinks = new LinkedList<IndexLinkBean>();
 	    }
 
-	    if ((isGroupManagerOrMonitor && stateId.equals(OrganisationState.ACTIVE))
-		    || (stateId.equals(OrganisationState.ARCHIVED) && roles.contains(Role.ROLE_GROUP_MANAGER))) {
+	    if (isGroupManagerOrMonitor) {
 		lessonLinks.addFirst(new IndexLinkBean("index.monitor",
 			"javascript:showMonitorLessonDialog(" + bean.getId() + ")", "fa fa-fw fa-heartbeat", null));
 	    }

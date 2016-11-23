@@ -134,7 +134,6 @@ function loadOrganisation() {
 	$("#org-container").load(
 		"displayGroup.do",
 		{
-			stateId : stateId,
 			orgId   : activeOrgId
 		},
 		function( response, status, xhr ) {

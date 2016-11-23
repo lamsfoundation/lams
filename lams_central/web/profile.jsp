@@ -62,7 +62,7 @@
 					<!-- Split button -->
 					<div class="col-xs-12 text-center">
 						<a class="btn btn-sm btn-default offset5"
-							href="index.do?state=active&method=editprofile" role="button"><i
+							href="index.do?method=editprofile" role="button"><i
 							class="fa fa-fw fa-pencil"></i> <span class="hidden-xs"><fmt:message
 									key="title.profile.edit.screen" /></span></i></a>&nbsp;&nbsp;
 						<c:set var="authenticationMethodId">
@@ -72,18 +72,18 @@
 						<c:if test="${authenticationMethodId eq dbId}">
 
 							<a class="btn btn-sm btn-default voffset5"
-								href="index.do?state=active&method=password&redirectURL=index.do%3Fstate%3Dactive%26method%3Dprofile" role="button"><i
+								href="index.do?method=password&redirectURL=index.do%3Fstate%3Dactive%26method%3Dprofile" role="button"><i
 								class="fa fa-fw fa-lock"></i> <span class="hidden-xs"><fmt:message
 										key="title.password.change.screen" /></span></i></a>
 						</c:if>
 						<a class="btn btn-sm btn-default offset5"
-							href="index.do?state=active&method=portrait" role="button"><i
+							href="index.do?method=portrait" role="button"><i
 							class="fa fa-fw fa-camera"></i> <span class="hidden-xs"><fmt:message
 									key="title.portrait.change.screen" /></span></i></a>&nbsp;&nbsp;
 
 						<c:if test="${showAllMyLessonLink}">
 							<a class="btn btn-sm btn-default offset5"
-								href="index.do?state=active&method=lessons" role="button"><i
+								href="index.do?method=lessons" role="button"><i
 								class="fa fa-fw fa-book"></i> <span class="hidden-xs"><fmt:message
 										key="title.all.my.lessons" /></span></i></a>
 						</c:if>
