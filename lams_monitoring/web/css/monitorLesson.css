@@ -202,6 +202,25 @@ td.contributeEntryCell a {
 	height: 23px;
 }
 
+#classDialogTable input[type="checkbox"] {
+	margin: 0 5px 0px 0px;
+	border: none;
+}
+
+#classLearnerTable {
+	width: 320px;
+	border-right: thin solid black;
+}
+
+#classLearnerTable #addAllLearnersButton {
+	margin-right: 10px;
+}
+
+#classMonitorTable {
+	width: 320px;
+	margin-left: 10px;
+}
+
 .dialogSearchPhrase {
 	width: 90%;
 }
@@ -214,20 +233,6 @@ td.contributeEntryCell a {
 	visibility: hidden;
 	margin-top: 3px;
 	cursor: pointer;
-}
-
-#classDialogTable input[type="checkbox"] {
-	margin: 0 5px 0px 0px;
-	border: none;
-}
-
-#classLearnerTable {
-	width: 320px;
-	border-right: thin solid black;
-}
-
-#classMonitorTable {
-	margin-left: 10px;
 }
 
 #emailDialog {

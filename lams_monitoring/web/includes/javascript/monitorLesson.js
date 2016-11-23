@@ -1444,6 +1444,26 @@ function editClassMember(userCheckbox){
 	});
 }
 
+/**
+ * Adds all learners to the class.
+ */
+function addAllLearners(){
+	if (confirm(LABELS.CLASS_ADD_ALL_CONFIRM)) {
+		$.ajax({
+			url : LAMS_URL + 'monitoring/monitoring.do',
+			type : 'POST',
+			cache : false,
+			data : {
+				'method'   : 'addAllOrganisationLearnersToLesson',
+				'lessonID' : lessonId
+			},
+			success : function(){
+				alert(LABELS.CLASS_ADD_ALL_SUCCESS);
+				$('#classDialog').modal('hide');
+			}
+		});
+	}
+}
 
 /**
  * Opens Authoring for live edit.

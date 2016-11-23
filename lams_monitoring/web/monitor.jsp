@@ -123,6 +123,10 @@
 				LESSON_ERROR_SCHEDULE_DATE : decoderDiv.html('<c:out value="${LESSON_ERROR_SCHEDULE_DATE_VAR}" />').text(),
 				<fmt:message key="button.edit.class" var="LESSON_EDIT_CLASS_VAR"/>
 				LESSON_EDIT_CLASS : '<c:out value="${LESSON_EDIT_CLASS_VAR}" />',
+				<fmt:message key="class.add.all.confirm" var="CLASS_ADD_ALL_CONFIRM_VAR"/>
+				CLASS_ADD_ALL_CONFIRM : '<c:out value="${CLASS_ADD_ALL_CONFIRM_VAR}" />',
+				<fmt:message key="class.add.all.success" var="CLASS_ADD_ALL_SUCCESS_VAR"/>
+				CLASS_ADD_ALL_SUCCESS : '<c:out value="${CLASS_ADD_ALL_SUCCESS_VAR}" />',
 				<fmt:message key="lesson.group.dialog.class" var="LESSON_GROUP_DIALOG_CLASS_VAR"/>
 				LESSON_GROUP_DIALOG_CLASS : '<c:out value="${LESSON_GROUP_DIALOG_CLASS_VAR}" />',
 				<fmt:message key="label.learner.progress.activity.current.tooltip" var="CURRENT_ACTIVITY_VAR"/>
@@ -634,6 +638,14 @@
 						</tr>
 						<tr>
 							<td class="dialogList" colspan="6">
+							</td>
+						</tr>
+						<tr>
+							<td colspan="6">
+								<button id="addAllLearnersButton" class="btn btn-default pull-right"
+										onClick="javascript:addAllLearners()">
+									<fmt:message key="button.edit.class.add.all"/>
+								</button>
 							</td>
 						</tr>
 					</table>
