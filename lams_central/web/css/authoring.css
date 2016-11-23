@@ -172,6 +172,10 @@ div#exportLDDialog {
 	cursor: pointer;
 }
 
+div#ldStoreDialog {
+	z-index: 1051;
+}
+
 div#ldStoreDialogContents {
 	width: 100%;
 	height: 100%;
