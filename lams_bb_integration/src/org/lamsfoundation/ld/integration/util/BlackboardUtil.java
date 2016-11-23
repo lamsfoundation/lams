@@ -249,11 +249,11 @@ public class BlackboardUtil {
 	// create a new thread to pre-add students and monitors to a lesson (in order to do this task in parallel not to
 	// slow down later work)
 	final User userFinal = user;
-	final String courseIdStrFinal = _course_id;
+	final Course courseFinal = course;
 	Thread preaddLearnersMonitorsThread = new Thread(new Runnable() {
 	    @Override
 	    public void run() {
-		LamsSecurityUtil.preaddLearnersMonitorsToLesson(userFinal, courseIdStrFinal, LamsLessonIdLong);
+		LamsSecurityUtil.preaddLearnersMonitorsToLesson(userFinal, courseFinal, LamsLessonIdLong);
 	    }
 	}, "LAMS_preaddLearnersMonitors_thread");
 	preaddLearnersMonitorsThread.start();
