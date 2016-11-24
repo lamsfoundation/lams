@@ -48,11 +48,6 @@ public class ScratchieBurningQuestionDAOHibernate extends LAMSBaseDAO implements
     private static final String FIND_BY_ITEM_UID = "from " + ScratchieBurningQuestion.class.getName()
 	    + " as r where r.scratchieItem.uid=? order by r.sessionId asc";
 
-//  @Override
-//  public List<ScratchieBurningQuestion> getBurningQuestionsByContentId(Long contentId) {
-//	return getHibernateTemplate().find(FIND_BY_CONTENT_ID, new Object[] { contentId});
-//  }
-
     @Override
     @SuppressWarnings("unchecked")
     public List<BurningQuestionDTO> getBurningQuestionsByContentId(Long scratchieUid, Long sessionId) {

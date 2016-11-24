@@ -20,7 +20,6 @@
  * ****************************************************************
  */
 
-
 package org.lamsfoundation.lams.rating.dao.hibernate;
 
 import java.util.List;
@@ -32,7 +31,7 @@ import org.lamsfoundation.lams.rating.model.LearnerItemRatingCriteria;
 import org.lamsfoundation.lams.rating.model.LessonRatingCriteria;
 import org.lamsfoundation.lams.rating.model.RatingCriteria;
 import org.lamsfoundation.lams.rating.model.ToolActivityRatingCriteria;
-import org.springframework.dao.DataRetrievalFailureException;
+import org.lamsfoundation.lams.tool.exception.DataMissingException;
 
 public class RatingCriteriaDAO extends LAMSBaseDAO implements IRatingCriteriaDAO {
 
@@ -89,7 +88,7 @@ public class RatingCriteriaDAO extends LAMSBaseDAO implements IRatingCriteriaDAO
 			break;
 		}
 	    }
-	    throw new DataRetrievalFailureException(
+	    throw new DataMissingException(
 		    "Unable to get RatingCriteria as the RatingCriteria type is unknown or missing. RatingCriteria type is "
 			    + criteriaType);
 	}

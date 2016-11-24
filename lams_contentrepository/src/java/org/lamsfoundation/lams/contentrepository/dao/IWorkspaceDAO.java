@@ -60,16 +60,4 @@ public interface IWorkspaceDAO extends IBaseDAO {
      * @return first (and expected only) workspace with this name.
      */
     public List findWorkspaceNodes(Long workspaceId);
-
-    /**
-     * Finds an object. Return null if not found (note: this
-     * is not the standard behaviour for Spring and Hibernate combined.)
-     * 
-     * @param objClass
-     * @param id
-     * @return object built from database
-     */
-    @Override
-    public Object find(Class objClass, Serializable id);
-
 }

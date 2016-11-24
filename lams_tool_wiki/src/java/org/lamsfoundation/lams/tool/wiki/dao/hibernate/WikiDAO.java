@@ -61,7 +61,6 @@ public class WikiDAO extends LAMSBaseDAO implements IWikiDAO {
 	// Removing duplicate pages
 	removeDuplicatePages(wiki);
 	getSession().saveOrUpdate(wiki);
-	//this.getHibernateTemplate().flush();
     }
 
     /**
