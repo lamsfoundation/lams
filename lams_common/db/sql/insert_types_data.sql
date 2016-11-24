@@ -284,39 +284,32 @@ VALUES (31, 'id', 'ID', 'Indonesian', 'LTR', 'en-au');
 
 
 -- Default TimeZones
+INSERT INTO lams_timezone (timezone_id) VALUES ('Etc/GMT+14');
+INSERT INTO lams_timezone (timezone_id) VALUES ('Etc/GMT+13');
 INSERT INTO lams_timezone (timezone_id) VALUES ('Etc/GMT+12');
 INSERT INTO lams_timezone (timezone_id) VALUES ('Etc/GMT+11');
 INSERT INTO lams_timezone (timezone_id) VALUES ('Etc/GMT+10');
-INSERT INTO lams_timezone (timezone_id) VALUES ('US/Alaska');
-INSERT INTO lams_timezone (timezone_id) VALUES ('America/Vancouver');
-INSERT INTO lams_timezone (timezone_id) VALUES ('America/Denver');
-INSERT INTO lams_timezone (timezone_id) VALUES ('America/Chicago');
-INSERT INTO lams_timezone (timezone_id) VALUES ('America/Detroit');
-INSERT INTO lams_timezone (timezone_id) VALUES ('America/Halifax');
-INSERT INTO lams_timezone (timezone_id) VALUES ('Canada/Newfoundland');
+INSERT INTO lams_timezone (timezone_id) VALUES ('Etc/GMT+9');
+INSERT INTO lams_timezone (timezone_id) VALUES ('Etc/GMT+8');
+INSERT INTO lams_timezone (timezone_id) VALUES ('Etc/GMT+7');
+INSERT INTO lams_timezone (timezone_id) VALUES ('Etc/GMT+6');
+INSERT INTO lams_timezone (timezone_id) VALUES ('Etc/GMT+5');
+INSERT INTO lams_timezone (timezone_id) VALUES ('Etc/GMT+4');
 INSERT INTO lams_timezone (timezone_id) VALUES ('Etc/GMT+3');
 INSERT INTO lams_timezone (timezone_id) VALUES ('Etc/GMT+2');
-INSERT INTO lams_timezone (timezone_id) VALUES ('Etc/GMT+1');
-INSERT INTO lams_timezone (timezone_id) VALUES ('Europe/London');
-INSERT INTO lams_timezone (timezone_id) VALUES ('Europe/Brussels');
-INSERT INTO lams_timezone (timezone_id) VALUES ('Europe/Athens');
-INSERT INTO lams_timezone (timezone_id) VALUES ('Europe/Moscow');
-INSERT INTO lams_timezone (timezone_id) VALUES ('Asia/Tehran');
+INSERT INTO lams_timezone (timezone_id) VALUES ('Etc/GMT');
+INSERT INTO lams_timezone (timezone_id) VALUES ('Etc/GMT-1');
+INSERT INTO lams_timezone (timezone_id) VALUES ('Etc/GMT-2');
+INSERT INTO lams_timezone (timezone_id) VALUES ('Etc/GMT-3');
 INSERT INTO lams_timezone (timezone_id) VALUES ('Etc/GMT-4');
-INSERT INTO lams_timezone (timezone_id) VALUES ('Asia/Kabul');
 INSERT INTO lams_timezone (timezone_id) VALUES ('Etc/GMT-5');
-INSERT INTO lams_timezone (timezone_id) VALUES ('Asia/Calcutta');
-INSERT INTO lams_timezone (timezone_id) VALUES ('Asia/Katmandu');
 INSERT INTO lams_timezone (timezone_id) VALUES ('Etc/GMT-6');
 INSERT INTO lams_timezone (timezone_id) VALUES ('Etc/GMT-7');
-INSERT INTO lams_timezone (timezone_id) VALUES ('Australia/West');
+INSERT INTO lams_timezone (timezone_id) VALUES ('Etc/GMT-8');
 INSERT INTO lams_timezone (timezone_id) VALUES ('Etc/GMT-9');
-INSERT INTO lams_timezone (timezone_id) VALUES ('Australia/Adelaide');
-INSERT INTO lams_timezone (timezone_id) VALUES ('Australia/Sydney');
+INSERT INTO lams_timezone (timezone_id) VALUES ('Etc/GMT-10');
 INSERT INTO lams_timezone (timezone_id) VALUES ('Etc/GMT-11');
-INSERT INTO lams_timezone (timezone_id) VALUES ('Pacific/Auckland');
-INSERT INTO lams_timezone (timezone_id) VALUES ('Pacific/Tongatapu');
-INSERT INTO lams_timezone (timezone_id) VALUES ('Pacific/Kiritimati');
+INSERT INTO lams_timezone (timezone_id) VALUES ('Etc/GMT-12');
 
 -- which current tool supports the old 1.0.x tools?
 INSERT INTO lams_tool_import_support VALUES (1, 'lafrum11', 'messageboard');
