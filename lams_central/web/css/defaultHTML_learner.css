@@ -641,14 +641,30 @@ section{
 	padding-left: 15px;
 }
 
-/* Login page */
-.footer {
+/* Login page
+ * CSS to make the footer stick to the bottom see http://cssreset.com/how-to-keep-footer-at-bottom-of-page-with-css/ 
+ * Height of footer set to match the navbar at the top for visual reasons - it may be changed. 
+ */
+.login-body {
+	margin:0;
+	padding:0;
+	height:100%;
+}
+.login-content{
+	min-height:100%;
+	position:relative;
+	padding-bottom:50px;
+}
+.login-footer {
 	width: 100%;
-	/* Set the fixed height of the footer here */
 	background-color: #f5f5f5;
-	font-size: 75%;
-	padding-top: 2px;
+	font-size: 85%;
+	padding-top: 15px;
 	border-top: 1px solid#e7e7e7;
+	height:50px;
+	position:absolute;
+	bottom:0;
+	left:0;
 }
 
 /* fontawesome icon x-small */
