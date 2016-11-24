@@ -52,6 +52,7 @@
 				}
 
 				$(document).ready(function() {
+					$('html').addClass('login-body');
 					if (!isBrowserCompatible()) {
 						$('#browserNotCompatible').show();
 					}
@@ -60,7 +61,9 @@
 				});
 			</script>
 		</lams:head>
-		<body>
+		<body class="login-body">
+		<div class="login-content">
+		
     <!-- Fixed navbar -->
     <nav class="navbar navbar-default navbar-login">
 		<div class="container">
@@ -123,16 +126,15 @@
 		<!--closes content-->
 
 		<!-- starts footer -->
-		<footer class="voffset10 footer">
-			<div class="container">
+		<div class="login-footer">
 			  <p class="text-muted text-center">
 					<fmt:message key="msg.LAMS.version" />:  <%=Configuration.get(ConfigurationKeys.VERSION)%>
 					<a href="/lams/www/copyright.jsp" target='copyright' onClick="openCopyRight()"> &copy; <fmt:message key="msg.LAMS.copyright.short" /></a>
 				</p>
-		  </div>
-		</footer>
+		</div>
 		<!--closes footer-->
 		<!--closes page-->
+		</div> <!--  close login-content -->
 		</body>
 	</c:when>
 
