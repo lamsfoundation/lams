@@ -28,7 +28,6 @@ import java.util.List;
 import org.lamsfoundation.lams.dao.IBaseDAO;
 import org.lamsfoundation.lams.learningdesign.Activity;
 import org.lamsfoundation.lams.learningdesign.LearningDesign;
-import org.springframework.dao.DataRetrievalFailureException;
 
 /**
  * @author Manpreet Minhas

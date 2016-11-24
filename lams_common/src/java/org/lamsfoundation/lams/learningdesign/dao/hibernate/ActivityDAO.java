@@ -45,7 +45,7 @@ import org.lamsfoundation.lams.learningdesign.SystemGateActivity;
 import org.lamsfoundation.lams.learningdesign.ToolActivity;
 import org.lamsfoundation.lams.learningdesign.ToolBranchingActivity;
 import org.lamsfoundation.lams.learningdesign.dao.IActivityDAO;
-import org.springframework.dao.DataRetrievalFailureException;
+import org.lamsfoundation.lams.tool.exception.DataMissingException;
 import org.springframework.stereotype.Repository;
 
 /**
@@ -121,7 +121,7 @@ public class ActivityDAO extends LAMSBaseDAO implements IActivityDAO {
 			break;
 		}
 	    }
-	    throw new DataRetrievalFailureException(
+	    throw new DataMissingException(
 		    "Unable to get activity as the activity type is unknown or missing. Activity type is "
 			    + activityType);
 	}

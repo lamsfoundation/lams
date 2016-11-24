@@ -145,15 +145,4 @@ public class RatingCommentDAO extends LAMSBaseDAO implements IRatingCommentDAO {
 	    return null;
 	}
     }
-
-//    @Override
-//    public boolean isUserCommentedItem(Long toolContentId, Long itemId, Integer userId) {
-//	List list = getHibernateTemplate().find(COUNT_COMMENTS_BY_ITEM_AND_USER,
-//		new Object[] { toolContentId, itemId, userId });
-//	if (list == null || list.size() == 0) {
-//	    return false;
-//	} else {
-//	    return ((Number) list.get(0)).intValue() > 0;
-//	}
-//    }
 }

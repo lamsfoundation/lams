@@ -28,6 +28,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 
+import org.hibernate.HibernateException;
 import org.lamsfoundation.lams.dao.hibernate.LAMSBaseDAO;
 import org.lamsfoundation.lams.learningdesign.Activity;
 import org.lamsfoundation.lams.learningdesign.ChosenGrouping;
@@ -36,7 +37,6 @@ import org.lamsfoundation.lams.learningdesign.GroupingActivity;
 import org.lamsfoundation.lams.learningdesign.LearnerChoiceGrouping;
 import org.lamsfoundation.lams.learningdesign.RandomGrouping;
 import org.lamsfoundation.lams.learningdesign.dao.IGroupingDAO;
-import org.springframework.dao.DataRetrievalFailureException;
 import org.springframework.stereotype.Repository;
 
 /**
@@ -101,11 +101,10 @@ public class GroupingDAO extends LAMSBaseDAO implements IGroupingDAO {
 	    } else if (grouping.isLearnerChoiceGrouping()) {
 		return (Grouping) super.find(LearnerChoiceGrouping.class, grouping.getGroupingId());
 	    }
-	    throw new DataRetrievalFailureException(
+	    throw new HibernateException(
 		    "Unable to get grouping as the grouping type is unknown or missing. Grouping object is "
 			    + grouping);
 	}
 	return null;
     }
-
 }

@@ -21,7 +21,6 @@
  * ****************************************************************
  */
 
-
 package org.lamsfoundation.lams.contentrepository.dao.hibernate;
 
 import java.io.Serializable;
@@ -34,7 +33,6 @@ import org.lamsfoundation.lams.contentrepository.CrWorkspace;
 import org.lamsfoundation.lams.contentrepository.RepositoryCheckedException;
 import org.lamsfoundation.lams.contentrepository.dao.IWorkspaceDAO;
 import org.lamsfoundation.lams.dao.hibernate.LAMSBaseDAO;
-import org.springframework.orm.hibernate4.HibernateObjectRetrievalFailureException;
 import org.springframework.stereotype.Repository;
 
 /**
@@ -92,15 +90,6 @@ public class WorkspaceDAO extends LAMSBaseDAO implements IWorkspaceDAO {
 	return new ArrayList(nodes);
     }
 
-    @Override
-    public Object find(Class objClass, Serializable id) {
-	try {
-	    return super.find(objClass, id);
-	} catch (HibernateObjectRetrievalFailureException e) {
-	    return null;
-	}
-    }
-
     public void flushSession() throws RepositoryCheckedException {
 	try {
 	    getSessionFactory().getCurrentSession().flush();
@@ -109,5 +98,4 @@ public class WorkspaceDAO extends LAMSBaseDAO implements IWorkspaceDAO {
 	    throw new RepositoryCheckedException("Unable to write changes to db successfully (flush).", e);
 	}
     }
-
 }

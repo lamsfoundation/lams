@@ -52,7 +52,6 @@ public interface DAO {
      * @param id
      *            the identifier (primary key) of the class
      * @return a populated object
-     * @see org.springframework.orm.ObjectRetrievalFailureException
      */
     public Object getObject(Class clazz, Serializable id);
 

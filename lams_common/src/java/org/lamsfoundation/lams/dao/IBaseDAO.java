@@ -75,33 +75,10 @@ public interface IBaseDAO {
      */
     public void insertOrUpdateAll(Collection objects);
 
-    /**
-     * Just a wrapper of the method in HibernateTemplate
-     * shouldn't be used unless a complicated query needed
-     * 
-     * @param queryString
-     * @return void
-     */
     public void update(String queryString);
 
-    /**
-     * Just a wrapper of the method in HibernateTemplate
-     * shouldn't be used unless a complicated query needed
-     * 
-     * @param queryString
-     * @param value
-     * @return void
-     */
     public void update(String queryString, Object value);
 
-    /**
-     * Just a wrapper of the method in HibernateTemplate
-     * shouldn't be used unless a complicated query needed
-     * 
-     * @param queryString
-     * @param values
-     * @return void
-     */
     public void update(String queryString, Object[] values);
 
     /**
@@ -259,62 +236,16 @@ public interface IBaseDAO {
      */
     public List findAnythingLike(Object object);
 
-    /**
-     * Just a wrapper of the method in HibernateTemplate
-     * shouldn't be used unless a complicated query needed
-     * 
-     * @param queryString
-     * @return void
-     */
     public List find(String queryString);
 
-    /**
-     * Just a wrapper of the method in HibernateTemplate
-     * shouldn't be used unless a complicated query needed
-     * 
-     * @param queryString
-     * @param value
-     * @return void
-     */
     public List find(String queryString, Object value);
 
-    /**
-     * Just a wrapper of the method in HibernateTemplate
-     * shouldn't be used unless a complicated query needed
-     * 
-     * @param queryString
-     * @param values
-     * @return void
-     */
     public List find(String queryString, Object[] values);
 
-    /**
-     * Just a wrapper of the method in HibernateTemplate
-     * shouldn't be used unless a complicated query needed
-     * 
-     * @param queryName
-     * @return void
-     */
     public List findByNamedQuery(String queryName);
 
-    /**
-     * Just a wrapper of the method in HibernateTemplate
-     * shouldn't be used unless a complicated query needed
-     * 
-     * @param queryName
-     * @param value
-     * @return void
-     */
     public List findByNamedQuery(String queryName, Object value);
 
-    /**
-     * Just a wrapper of the method in HibernateTemplate
-     * shouldn't be used unless a complicated query needed
-     * 
-     * @param queryName
-     * @param values
-     * @return void
-     */
     public List findByNamedQuery(String queryName, Object[] values);
 
     /**
