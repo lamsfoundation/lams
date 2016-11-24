@@ -297,6 +297,7 @@ INSERT INTO lams_timezone (timezone_id) VALUES ('Etc/GMT+5');
 INSERT INTO lams_timezone (timezone_id) VALUES ('Etc/GMT+4');
 INSERT INTO lams_timezone (timezone_id) VALUES ('Etc/GMT+3');
 INSERT INTO lams_timezone (timezone_id) VALUES ('Etc/GMT+2');
+INSERT INTO lams_timezone (timezone_id) VALUES ('Etc/GMT+1');
 INSERT INTO lams_timezone (timezone_id) VALUES ('Etc/GMT');
 INSERT INTO lams_timezone (timezone_id) VALUES ('Etc/GMT-1');
 INSERT INTO lams_timezone (timezone_id) VALUES ('Etc/GMT-2');
