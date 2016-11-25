@@ -161,6 +161,16 @@
             insert="true"
             column="time_to_live_login_request"
         />
+        
+        <property
+			name="ltiToolConsumerMonitorRoles"
+			type="java.lang.String"
+			update="true"
+			insert="true"
+			column="lti_consumer_monitor_roles"
+			length="65535"
+			not-null="false"
+        />
 
         <set
             name="extCourseClassMaps"

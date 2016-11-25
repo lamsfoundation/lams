@@ -78,6 +78,10 @@
 			<td><fmt:message key="sysadmin.lessonFinishUrl" />:</td>
 			<td>${lessonFinishUrl}</td>
 		</tr>
+		<tr>
+			<td><fmt:message key="sysadmin.lti.consumer.monitor.roles" />:</td>
+			<td><html:text property="ltiToolConsumerMonitorRoles" size="30"/></td>
+		</tr>
 	</table>
 	
 	<div class="pull-right">

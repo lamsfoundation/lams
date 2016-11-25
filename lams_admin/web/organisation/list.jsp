@@ -2,7 +2,7 @@
 <%@ page import="org.lamsfoundation.lams.usermanagement.Role" %>
 <c:set var="lams"><lams:LAMSURL /></c:set>
 
- <link rel="stylesheet" href="${lams}css/jquery.tablesorter.theme.bootstrap.css">
+<link rel="stylesheet" href="${lams}css/jquery.tablesorter.theme.bootstrap.css">
 <link type="text/css" href="${lams}css/jquery.tablesorter.pager.css" rel="stylesheet">
 <style>
 	table.infoDisplay {

@@ -60,10 +60,6 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
  * </p>
  *
  * @author <a href="mailto:fyang@melcoe.mq.edu.au">Fei Yang</a>
- *
- *
- *
- *
  */
 public class OrgManageAction extends LamsDispatchAction {
 
