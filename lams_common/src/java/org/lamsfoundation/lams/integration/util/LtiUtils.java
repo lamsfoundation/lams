@@ -1,5 +1,6 @@
 package org.lamsfoundation.lams.integration.util;
 
+import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -35,6 +36,15 @@ public class LtiUtils {
 	rolesToSearchFor.add("urn:lti:role:ims/lis/ContentDeveloper");
 	rolesToSearchFor.add("urn:lti:role:ims/lis/TeachingAssistant");
 	
+	return hasRole(roles, rolesToSearchFor);
+    }
+    
+    public static boolean isToolConsumerCustomRole(String roles, String toolConsumerCustomRoles) {
+	if (roles == null || toolConsumerCustomRoles == null) {
+	    return false;
+	}
+	
+	List<String> rolesToSearchFor = Arrays.asList(toolConsumerCustomRoles.split(","));
 	return hasRole(roles, rolesToSearchFor);
     }
 

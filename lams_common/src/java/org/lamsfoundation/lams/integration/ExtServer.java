@@ -66,6 +66,11 @@ public class ExtServer implements Serializable, Comparable {
 
     /** persistent field */
     private Set extUserUseridMaps;
+    
+    /**
+     * Comma-separated list of roles that LTI tool consumer uses to indicate user monitor role
+     */
+    private String ltiToolConsumerMonitorRoles;
 
     /** default constructor */
     public ExtServer() {
@@ -212,6 +217,14 @@ public class ExtServer implements Serializable, Comparable {
     public void setExtUserUseridMaps(Set extUserUseridMaps) {
 	this.extUserUseridMaps = extUserUseridMaps;
     }
+    
+    public String getLtiToolConsumerMonitorRoles() {
+	return this.ltiToolConsumerMonitorRoles;
+    }
+
+    public void setLtiToolConsumerMonitorRoles(String ltiToolConsumerMonitorRoles) {
+	this.ltiToolConsumerMonitorRoles = ltiToolConsumerMonitorRoles;
+    }    
 
     @Override
     public String toString() {
