@@ -39,9 +39,10 @@ public interface ResourceItemVisitDAO extends DAO {
      * Return list which contains key pair which key is resource item uid, value is number view.
      *
      * @param contentId
+     * @param sessionId
      * @return
      */
-    Map<Long, Integer> getSummary(Long contentId);
+    Map<Long, Integer> getSummary(Long contentId, Long sessionId);
 
     List<ResourceItemVisitLog> getResourceItemLogBySession(Long sessionId, Long itemUid);
 

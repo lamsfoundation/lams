@@ -420,8 +420,6 @@ public class ResourceServiceImpl implements IResourceService, ToolContentManager
     public List<SessionDTO> getSummary(Long contentId) {
 	List<SessionDTO> groupList = new ArrayList<SessionDTO>();
 
-	// get all item which is accessed by user
-	Map<Long, Integer> visitCountMap = resourceItemVisitDao.getSummary(contentId);
 	Resource resource = resourceDao.getByContentId(contentId);
 
 	// get all sessions in a resource and retrieve all resource items under this session
@@ -439,6 +437,9 @@ public class ResourceServiceImpl implements IResourceService, ToolContentManager
 	    items.addAll(resource.getResourceItems());
 	    // add this session's resource items
 	    items.addAll(session.getResourceItems());
+
+	    // get all item which is accessed by users in this session
+	    Map<Long, Integer> visitCountMap = resourceItemVisitDao.getSummary(contentId, session.getSessionId());
 
 	    for (ResourceItem item : items) {
 		ResourceItemDTO resourceItemDTO = new ResourceItemDTO(item);

@@ -53,8 +53,8 @@ public class ResourceItemVisitDAOHibernate extends LAMSBaseDAO implements Resour
 
     private static final String FIND_SUMMARY = "select v.resourceItem.uid, count(v.resourceItem) from  "
 	    + ResourceItemVisitLog.class.getName() + " as v , " + ResourceSession.class.getName() + " as s, "
-	    + Resource.class.getName() + "  as r " + " where v.sessionId = s.sessionId "
-	    + " and s.resource.uid = r.uid " + " and r.contentId =? " + " group by v.sessionId, v.resourceItem.uid ";
+	    + Resource.class.getName() + "  as r " + " where v.sessionId = :sessionId and v.sessionId = s.sessionId "
+	    + " and s.resource.uid = r.uid " + " and r.contentId =:contentId " + " group by v.sessionId, v.resourceItem.uid ";
 
     @Override
     public ResourceItemVisitLog getResourceItemLog(Long itemUid, Long userId) {
@@ -76,10 +76,14 @@ public class ResourceItemVisitDAOHibernate extends LAMSBaseDAO implements Resour
 
     @Override
     @SuppressWarnings("unchecked")
-    public Map<Long, Integer> getSummary(Long contentId) {
+    public Map<Long, Integer> getSummary(Long contentId, Long sessionId) {
 
 	// Note: Hibernate 3.1 query.uniqueResult() returns Integer, Hibernate 3.2 query.uniqueResult() returns Long
-	List<Object[]> result = (List<Object[]>) doFind(FIND_SUMMARY, contentId);
+    	List<Object[]> result = getSession().createQuery(FIND_SUMMARY)
+    		.setLong("sessionId", sessionId)
+    		.setLong("contentId", contentId)
+    		.list();
+	
 	Map<Long, Integer> summaryList = new HashMap<Long, Integer>(result.size());
 	for (Object[] list : result) {
 	    if (list[1] != null) {
