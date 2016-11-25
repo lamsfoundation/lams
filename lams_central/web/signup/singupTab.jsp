@@ -40,11 +40,6 @@
 	$.validator.addMethod("charactersAllowed", function(value) {
 		return /^[A-Za-z0-9\d`~!@#$%^&*\(\)_\-+={}\[\]\\|:\;\"\'\<\>,.?\/]*$/
 				.test(value)
-	});
-
-	$.validator.addMethod("charactersAllowed", function(value) {
-		return /^[A-Za-z0-9\d`~!@#$%^&*\(\)_\-+={}\[\]\\|:\;\"\'\<\>,.?\/]*$/
-				.test(value)
 
 	});
 	$.validator.addMethod("charactersNotAllowed", function(value) {
