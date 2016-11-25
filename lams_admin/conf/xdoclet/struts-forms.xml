@@ -93,6 +93,7 @@
 	<form-property name="disabled" type="java.lang.Boolean" initial="false"/>
 	<form-property name="lessonFinishUrl" type="java.lang.String"/>
 	<form-property name="timeToLiveLoginRequestEnabled" type="java.lang.Boolean" initial="false"/>
+	<form-property name="ltiToolConsumerMonitorRoles" type="java.lang.String"/>
 </form-bean>
 
 <form-bean name="ConfigForm" type="org.apache.struts.action.DynaActionForm">
