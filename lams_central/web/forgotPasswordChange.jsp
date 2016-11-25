@@ -12,6 +12,7 @@
 
 <c:set var="minNumChars"><%=Configuration.get(ConfigurationKeys.PASSWORD_POLICY_MINIMUM_CHARACTERS)%></c:set>
 <c:set var="mustHaveUppercase"><%=Configuration.get(ConfigurationKeys.PASSWORD_POLICY_UPPERCASE)%></c:set>
+<c:set var="mustHaveLowercase"><%=Configuration.get(ConfigurationKeys.PASSWORD_POLICY_LOWERCASE)%></c:set>
 <c:set var="mustHaveNumerics"><%=Configuration.get(ConfigurationKeys.PASSWORD_POLICY_NUMERICS)%></c:set>
 <c:set var="mustHaveSymbols"><%=Configuration.get(ConfigurationKeys.PASSWORD_POLICY_SYMBOLS)%></c:set>
 
@@ -35,17 +36,17 @@
 			window.location = "<lams:LAMSURL/>index.do";
 		};
 
-		$.validator.addMethod("pwcheck", function(value) {
-			return /[a-z]/.test(value) // has a lowercase letter
-			<c:if test="${mustHaveUppercase}"> && /[A-Z]/.test(value) // has uppercase letters 
-			</c:if>
-			<c:if test="${mustHaveNumerics}"> && /\d/.test(value) // has a digit
-			</c:if>
-			<c:if test="${mustHaveSymbols}">
-					&& /[`~!@#$%^&*\(\)_\-+={}\[\]\\|:\;\"\'\<\>,.?\/]/
-							.test(value) //has symbols
-			</c:if>
-		});
+		var mustHaveUppercase = ${mustHaveUppercase},
+	     mustHaveNumerics  = ${mustHaveNumerics},
+	     mustHaveLowercase  = ${mustHaveLowercase},
+	     mustHaveSymbols   = ${mustHaveSymbols};
+
+	     $.validator.addMethod("pwcheck", function(value) {
+	      return (!mustHaveUppercase || /[A-Z]/.test(value)) && // has uppercase letters 
+	    (!mustHaveNumerics || /\d/.test(value)) && // has a digit
+	    (!mustHaveLowercase || /[a-z]/.test(value)) && // has a lower case
+	    (!mustHaveSymbols || /[`~!@#$%^&*\(\)_\-+={}\[\]\\|:\;\"\'\<\>,.?\/]/.test(value)); //has symbols
+	     });
 
 		$.validator
 				.addMethod(
@@ -132,6 +133,10 @@
 							<li><span class="fa fa-check"></span> <fmt:message
 									key='label.password.must.ucase' /></li>
 						</c:if>
+						<c:if test="${mustHaveLowercase}">
+						<li><span class="fa fa-check"></span> <fmt:message
+								    key='label.password.must.lcase' /></li>
+					    </c:if>
 						<c:if test="${mustHaveNumerics}">
 							<li><span class="fa fa-check"></span> <fmt:message
 									key='label.password.must.number' /></li>
