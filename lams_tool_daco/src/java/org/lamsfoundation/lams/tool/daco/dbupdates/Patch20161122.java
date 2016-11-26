@@ -60,7 +60,8 @@ public class Patch20161122 extends MigrationTaskSupport {
 	    conn.setAutoCommit(false);
 
 	    // read dates one by one and convert them to new format
-	    PreparedStatement readQuery = conn.prepareStatement("SELECT uid, answer FROM tl_ladaco10_answers");
+	    PreparedStatement readQuery = conn.prepareStatement("SELECT a.uid, a.answer FROM tl_ladaco10_answers AS a "
+		    + "JOIN tl_ladaco10_questions AS q ON a.question_uid = q.uid WHERE q.question_type = 4");
 	    PreparedStatement updateQuery = conn
 		    .prepareStatement("UPDATE tl_ladaco10_answers SET answer=? WHERE uid=?");
 	    if (readQuery.execute()) {
@@ -73,7 +74,7 @@ public class Patch20161122 extends MigrationTaskSupport {
 		    updateQuery.executeUpdate();
 		}
 	    }
-	    
+
 	    ctx.commit();
 	} catch (Exception e) {
 	    ctx.rollback();
