@@ -36,6 +36,17 @@
 				$('#verificationCode').focus();
 			});
 		</script>
+		<style>
+			/* hide spinner in input number */
+			input[type="number"]::-webkit-outer-spin-button,
+			input[type="number"]::-webkit-inner-spin-button {
+			    -webkit-appearance: none;
+			    margin: 0;
+			}
+			input[type="number"] {
+			    -moz-appearance: textfield;
+			}
+		</style>
 	</lams:head>
 	<body>
     <!-- Fixed navbar -->
@@ -69,7 +80,7 @@
 		
 					<div class="input-group">
 						<span class="input-group-addon"><i class="fa fa-mobile"></i></span>
-					  <input id="verificationCode"  maxlength="6" class="form-control" placeholder="<fmt:message key='label.verification.code' />" name="verificationCode" type="text" autocomplete="off" tabindex="1" onkeypress="onEnter(event)" />
+					  <input id="verificationCode"  class="form-control" placeholder="<fmt:message key='label.verification.code' />" name="verificationCode" type="number" autocomplete="off" tabindex="1" onkeypress="onEnter(event)" />
 					</div>
 		
 					<div class="form-group voffset10">
