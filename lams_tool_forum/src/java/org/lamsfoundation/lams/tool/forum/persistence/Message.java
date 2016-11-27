@@ -21,7 +21,6 @@
  * ****************************************************************
  */
 
-
 package org.lamsfoundation.lams.tool.forum.persistence;
 
 import java.util.Date;
@@ -34,7 +33,6 @@ import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.commons.lang.builder.ToStringBuilder;
 import org.apache.log4j.Logger;
-import org.lamsfoundation.lams.tool.forum.util.AttachmentComparator;
 
 /**
  * @author conradb
@@ -70,7 +68,7 @@ public class Message implements Cloneable {
     private Set sessionClones;
 
     public Message() {
-	attachments = new TreeSet<Attachment>(new AttachmentComparator());
+	attachments = new TreeSet<Attachment>();
 	sessionClones = new HashSet();
     }
 
@@ -111,7 +109,7 @@ public class Message implements Cloneable {
 	    // clone attachment
 	    if (attachments != null) {
 		Iterator iter = attachments.iterator();
-		Set<Attachment> set = new TreeSet<Attachment>(new AttachmentComparator());
+		Set<Attachment> set = new TreeSet<Attachment>();
 		while (iter.hasNext()) {
 		    Attachment file = (Attachment) iter.next();
 		    Attachment newFile = (Attachment) file.clone();

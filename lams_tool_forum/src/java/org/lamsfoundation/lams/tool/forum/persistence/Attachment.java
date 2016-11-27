@@ -21,7 +21,6 @@
  * ****************************************************************
  */
 
-
 package org.lamsfoundation.lams.tool.forum.persistence;
 
 import java.util.Date;
@@ -41,7 +40,7 @@ import org.apache.log4j.Logger;
  *
  *
  */
-public class Attachment implements Cloneable {
+public class Attachment implements Cloneable, Comparable<Attachment> {
     private static final Logger log = Logger.getLogger(Attachment.class);
 
     private Long uid;
@@ -164,5 +163,17 @@ public class Attachment implements Cloneable {
 
     public void setCreated(Date created) {
 	this.created = created;
+    }
+
+    @Override
+    public int compareTo(Attachment o) {
+	if (o == null) {
+	    return 1;
+	}
+	if (this.getUid() != null && o.getUid() != null) {
+	    return (int) (this.getUid() - o.getUid());
+	} else {
+	    return this.getUid() == null ? -1 : 1;
+	}
     }
 }

@@ -21,8 +21,6 @@
  * ****************************************************************
  */
 
-
-
 package org.lamsfoundation.lams.tool.forum.web.actions;
 
 import java.io.IOException;
@@ -66,7 +64,6 @@ import org.lamsfoundation.lams.tool.forum.persistence.ForumUser;
 import org.lamsfoundation.lams.tool.forum.persistence.Message;
 import org.lamsfoundation.lams.tool.forum.persistence.PersistenceException;
 import org.lamsfoundation.lams.tool.forum.service.IForumService;
-import org.lamsfoundation.lams.tool.forum.util.AttachmentComparator;
 import org.lamsfoundation.lams.tool.forum.util.ForumConstants;
 import org.lamsfoundation.lams.tool.forum.util.ForumWebUtils;
 import org.lamsfoundation.lams.tool.forum.util.MessageComparator;
@@ -509,7 +506,7 @@ public class AuthoringAction extends Action {
 	    for (ForumToolSession toolSession : toolSessions) {
 		Message newMsg = Message.newInstance(message);
 		newMsg.setToolSession(toolSession);
-		newMsg.setAttachments(new TreeSet<Attachment>(new AttachmentComparator()));
+		newMsg.setAttachments(new TreeSet<Attachment>());
 		newMsg.setModifiedBy(null);
 		newMsg.setCreatedBy(null);
 		message.getSessionClones().add(newMsg);
@@ -859,7 +856,8 @@ public class AuthoringAction extends Action {
 		    ActionMessage error = new ActionMessage("error.limit.char.less.zero");
 		    errors.add(ActionMessages.GLOBAL_MESSAGE, error);
 		}
-	    }if (!form.getForum().isAllowRichEditor()) {
+	    }
+	    if (!form.getForum().isAllowRichEditor()) {
 		if (form.getForum().getMaxCharacters() != 0
 			&& form.getForum().getMaxCharacters() < form.getForum().getMinCharacters()) {
 		    ActionMessage error = new ActionMessage("error.min.post.char.less");
@@ -871,14 +869,15 @@ public class AuthoringAction extends Action {
 		    ActionMessage error = new ActionMessage("error.limit.char.less.zero");
 		    errors.add(ActionMessages.GLOBAL_MESSAGE, error);
 		}
-	    }if (form.getForum().isAllowRateMessages()) {
+	    }
+	    if (form.getForum().isAllowRateMessages()) {
 		if (form.getForum().getMaximumRate() != 0
 			&& form.getForum().getMaximumRate() < form.getForum().getMinimumRate()) {
 		    ActionMessage error = new ActionMessage("error.min.rate.less.max");
 		    errors.add(ActionMessages.GLOBAL_MESSAGE, error);
 		}
 	    }
-	 
+
 	    if (!form.getForum().isAllowNewTopic()) {
 		if (form.getForum().getMaximumReply() != 0
 			&& form.getForum().getMaximumReply() < form.getForum().getMinimumReply()) {
