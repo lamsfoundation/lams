@@ -8,13 +8,16 @@
  */
 $(document).ready(function() {
 	canvas = $('#canvas');
-	
 	GeneralInitLib.initTemplates();
 	if (!isReadOnlyMode) {
 		// in read-only mode (SVG generator), some parts are not necessary and not loaded
 		GeneralInitLib.initLayout();
 		PropertyLib.init();
 		MenuLib.init();
+		
+		if (/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)){
+			$('.desktopButton').hide();
+		}
 	}
 	
 	GeneralLib.newLearningDesign(true);
@@ -179,6 +182,9 @@ GeneralInitLib = {
 		});
 		
 		if (!isReadOnlyMode){
+			// store the initial window height now as on iPad the iframe grows when templates are show,
+			// reporting incorrect window height to the first resizePaper() run
+			layout.initWindowHeight = $(window).height();
 			// create list of learning libraries for each group
 			var templateContainerCell = $('#templateContainerCell'),
 				learningLibraryGroupSelect = $('select', templateContainerCell),
@@ -1935,9 +1941,12 @@ GeneralLib = {
 			return;
 		}
 		
-		var windowHeight = $(window).height();
+		// the inital window height was saved just before templates were displayed
+		var windowHeight = layout.initWindowHeight ? layout.initWindowHeight : $(window).height();
+		// next runs use the regular window height
+		layout.initWindowHeight = null;
 		// height of window minus toolbar, padding...
-		$('.templateContainer').height(windowHeight - 81);
+		$('.templateContainer').height(windowHeight - 80);
 		$('#canvas').height(windowHeight - 75)
 		// width of window minus templates on the left; minimum is toolbar width so it does not collapse
 					.width(Math.max($('#toolbar').width() - 180, $(window).width() - 190));
@@ -1960,7 +1969,7 @@ GeneralLib = {
 		// -20 so Chrome does not create unnecessary scrollbars when dropping a tool template to canvas
 		// +50 so there is space for rubbish bin
 		width = Math.max(0, width, canvas.width() - 20);
-		height = Math.max(0, height + (isReadOnlyMode ? 20 : 50), canvas.height() - 20);
+		height = Math.max(0, height + (isReadOnlyMode ? 20 : 48), canvas.height() - 22);
 		
 		paper.attr({
 			'width'  : width, 
