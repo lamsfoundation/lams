@@ -1,6 +1,7 @@
 <%@ include file="/common/taglibs.jsp"%>
 
 <c:set var="formBean" value="<%=request.getAttribute(org.apache.struts.taglib.html.Constants.BEAN_KEY)%>" />
+<c:set var="sessionMap" value="${sessionScope[formBean.httpSessionID]}" />
 
 <script type="text/javascript">
 	
@@ -27,11 +28,8 @@
 			}
 		});
 		
-		$(".rating-criteria-tag").hide();
-		
-		
 		 $('#allowRateAnswers').click(function() {
-		    	$(".rating-criteria-tag").toggle("slow");
+		    	$("#criterias-holder").toggle("slow");
 		    });
 		
 		 $('#reflect').click(function() {
@@ -117,8 +115,11 @@
 			</label>
 		</div>
 	
+		<div id="criterias-holder" <c:if test="${formBean.allowRateAnswers == 0}"> style="display:none;"</c:if>>
 		<lams:AuthoringRatingCriteria criterias="${sessionMap.ratingCriterias}" hasRatingLimits="true"
 			upLabel="label.authoring.up" downLabel="label.authoring.down" />
+		</div>
+		
 	</div>
 	
 </lams:SimplePanel>
