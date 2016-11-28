@@ -23,8 +23,6 @@ http://www.gnu.org/licenses/gpl.txt
 package org.lamsfoundation.lams.tool.qa.web;
 
 import java.io.IOException;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -57,7 +55,7 @@ import org.lamsfoundation.lams.notebook.service.CoreNotebookConstants;
 import org.lamsfoundation.lams.rating.dto.ItemRatingCriteriaDTO;
 import org.lamsfoundation.lams.rating.dto.ItemRatingDTO;
 import org.lamsfoundation.lams.rating.dto.RatingCommentDTO;
-import org.lamsfoundation.lams.rating.model.RatingCriteria;
+import org.lamsfoundation.lams.rating.model.LearnerItemRatingCriteria;
 import org.lamsfoundation.lams.tool.exception.ToolException;
 import org.lamsfoundation.lams.tool.qa.QaAppConstants;
 import org.lamsfoundation.lams.tool.qa.QaContent;
@@ -940,45 +938,58 @@ public class QaLearningAction extends LamsDispatchAction implements QaAppConstan
 	generalLearnerFlowDTO.setQuestions(questions);
 	generalLearnerFlowDTO.setUserNameVisible(new Boolean(qaContent.isUsernameVisible()).toString());
 
+	// potentially empty list if the user starts the lesson after the time restriction has expired.
 	List<QaUsrResp> userResponses = qaService.getResponsesByUserUid(user.getUid());
 
 	//handle rating criterias
 	int commentsMinWordsLimit = 0;
 	boolean isCommentsEnabled = false;
 	int countRatedQuestions = 0;
-	if (qaContent.isAllowRateAnswers()) {
+	if (qaContent.isAllowRateAnswers() ) {
 
-	    // create itemIds list
-	    List<Long> itemIds = new LinkedList<Long>();
-	    for (QaUsrResp responseIter : userResponses) {
-		itemIds.add(responseIter.getResponseId());
-	    }
-	    List<ItemRatingDTO> itemRatingDtos = qaService.getRatingCriteriaDtos(qaContent.getQaContentId(), itemIds,
-		    true, userId);
-	    sessionMap.put(AttributeNames.ATTR_ITEM_RATING_DTOS, itemRatingDtos);
-
-	    if (itemRatingDtos.size() > 0) {
-		commentsMinWordsLimit = itemRatingDtos.get(0).getCommentsMinWordsLimit();
-		isCommentsEnabled = itemRatingDtos.get(0).isCommentsEnabled();
-	    }
-
-	    //map itemRatingDto to corresponding response
-	    for (QaUsrResp response : userResponses) {
-
-		//find corresponding itemRatingDto
-		ItemRatingDTO itemRatingDto = null;
-		for (ItemRatingDTO itemRatingDtoIter : itemRatingDtos) {
-		    if (itemRatingDtoIter.getItemId().equals(response.getResponseId())) {
-			itemRatingDto = itemRatingDtoIter;
+	    if ( userResponses.isEmpty()) {
+		Set<LearnerItemRatingCriteria> criterias = qaContent.getRatingCriterias();
+		for ( LearnerItemRatingCriteria criteria : criterias ) {
+		    if ( criteria.isCommentRating() ) {
+			isCommentsEnabled = true;
 			break;
 		    }
 		}
+		
+	    } else {
+		// create itemIds list 
+		List<Long> itemIds = new LinkedList<Long>();
+		for (QaUsrResp responseIter : userResponses) {
+		    itemIds.add(responseIter.getResponseId());
+		}
 
-		response.setItemRatingDto(itemRatingDto);
+		List<ItemRatingDTO> itemRatingDtos = qaService.getRatingCriteriaDtos(qaContent.getQaContentId(), itemIds,
+			true, userId);
+		sessionMap.put(AttributeNames.ATTR_ITEM_RATING_DTOS, itemRatingDtos);
+
+		if (itemRatingDtos.size() > 0) {
+		    commentsMinWordsLimit = itemRatingDtos.get(0).getCommentsMinWordsLimit();
+		    isCommentsEnabled = itemRatingDtos.get(0).isCommentsEnabled();
+		}
+
+		//map itemRatingDto to corresponding response
+		for (QaUsrResp response : userResponses) {
+
+		    //find corresponding itemRatingDto
+		    ItemRatingDTO itemRatingDto = null;
+		    for (ItemRatingDTO itemRatingDtoIter : itemRatingDtos) {
+			if (itemRatingDtoIter.getItemId().equals(response.getResponseId())) {
+			    itemRatingDto = itemRatingDtoIter;
+			    break;
+			}
+		    }
+
+		    response.setItemRatingDto(itemRatingDto);
+		}
+
+		// store how many items are rated
+		countRatedQuestions = qaService.getCountItemsRatedByUser(qaContent.getQaContentId(), userId.intValue());
 	    }
-
-	    // store how many items are rated
-	    countRatedQuestions = qaService.getCountItemsRatedByUser(qaContent.getQaContentId(), userId.intValue());
 	}
 	sessionMap.put("commentsMinWordsLimit", commentsMinWordsLimit);
 	sessionMap.put("isCommentsEnabled", isCommentsEnabled);
