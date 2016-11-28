@@ -193,6 +193,11 @@ public class RatingService implements IRatingService {
     public List<ItemRatingDTO> getRatingCriteriaDtos(Long contentId, Collection<Long> itemIds,
 	    boolean isCommentsByOtherUsersRequired, Long userId) {
 
+	// fail safe - if there are no items, don't try to look anything up! LDEV-4094
+	if ( itemIds == null || itemIds.isEmpty() ) {
+	    return new LinkedList<ItemRatingDTO>();
+	}
+
 	//initial preparations
 	NumberFormat numberFormat = NumberFormat.getInstance(Locale.US);
 	numberFormat.setMaximumFractionDigits(1);
