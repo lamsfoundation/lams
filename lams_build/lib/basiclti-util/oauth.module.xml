@@ -28,6 +28,16 @@
     <resource-root path="oauth-provider-20100527.jar"/>
   </resources>
   <dependencies>
+    <system>
+  		<paths>
+  			<path name="org/xml/sax"/>
+  			<path name="org/xml/sax/helpers"/>
+  			<path name="org/w3c/dom"/>
+  			<path name="javax/crypto"/>
+  			<path name="javax/crypto/spec"/>
+  			<path name="javax/xml/parsers"/>
+  		</paths>
+  	</system>   
     <module name="javax.servlet.api" />
   </dependencies>    
 </module>
