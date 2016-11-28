@@ -266,7 +266,7 @@
 			initAccess = ${access};
 	</script>
 </lams:head>
-<body onresize="javascript:GeneralLib.resizePaper()">
+<body>
 	<%-- "loading..." screen, gets removed on page full load --%>
 	<div id="loadingOverlay">
 		<i class="fa fa-refresh fa-spin fa-3x fa-fw"></i>
@@ -274,7 +274,7 @@
 	
 	<div id="toolbar" class="buttons btn-group-sm">
 	
-		<button id="newButton" class="btn btn-default" onClick="javascript:GeneralLib.newLearningDesign(false)">
+		<button id="newButton" class="btn btn-default desktopButton" onClick="javascript:GeneralLib.newLearningDesign(false)">
 			<i class="fa fa-plus"></i> 
 			<span><fmt:message key="authoring.fla.page.menu.new" /></span>
 		</button>
@@ -284,11 +284,11 @@
 				<i class="fa fa-folder-open-o"></i>
 				<span><fmt:message key="authoring.fla.page.menu.open" /></span>
 			</button>
-			<button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+			<button type="button" class="btn btn-default desktopButton dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
 				<span class="caret"></span>
 				<span class="sr-only">Toggle Dropdown</span>
 			</button>
-			<ul class="dropdown-menu">
+			<ul class="dropdown-menu desktopButton">
 				<li id="importSequenceButton" onClick="javascript:MenuLib.importLearningDesign()"><a href="#"><fmt:message key="authoring.fla.page.menu.import" /></a></li>
 				<li id="importPartSequenceButton" onClick="javascript:MenuLib.importPartLearningDesign()"><a href="#"><fmt:message key="authoring.fla.page.menu.import.part" /></a></li>
 			</ul>
@@ -299,11 +299,11 @@
 				<i class="fa fa-save"></i>
 				<span><fmt:message key="authoring.fla.page.menu.save" /></span>
 			</button>
-			<button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+			<button type="button" class="btn btn-default desktopButton dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
 				<span class="caret"></span>
 				<span class="sr-only">Toggle Dropdown</span>
 			</button>
-			<ul class="dropdown-menu">
+			<ul class="dropdown-menu desktopButton">
 				<li id="saveAsButton" onClick="javascript:MenuLib.saveLearningDesign(true)"><a href="#"><fmt:message key="authoring.fla.page.menu.saveas" /></a></li>
 				<li role="separator" class="divider"></li>
 				<li class="dropdown-header"><fmt:message key="authoring.fla.page.menu.export" /></li>
@@ -316,7 +316,7 @@
 			<i class="fa fa-ban"></i> 
 			<span><fmt:message key="authoring.fla.cancel.button" /></span>
 		</button>
-		<div class="btn-group btn-group-sm" role="group">
+		<div class="btn-group btn-group-sm desktopButton" role="group">
 		<button id="copyButton" class="btn btn-default" onClick="javascript:MenuLib.copyActivity()">
 			<i class="fa fa-copy"></i> 
 			<span><fmt:message key="authoring.fla.page.menu.copy" /></span>
@@ -332,7 +332,7 @@
 			<span><fmt:message key="authoring.fla.page.menu.transition" /></span>
 		</button>
 
-		<div class="btn-group btn-group-sm" role="group">
+		<div class="btn-group btn-group-sm desktopButton" role="group">
 		  <button class="btn btn-default dropdown-toggle" type="button" id="optionalButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
 		  	<i class="fa fa-check-square-o"></i>
 		    <span><fmt:message key="authoring.fla.page.menu.optional" /></span>
@@ -344,7 +344,7 @@
 		  </ul>
 		</div>
 
-		<div class="btn-group btn-group-sm" role="group">
+		<div class="btn-group btn-group-sm desktopButton" role="group">
 		  <button class="btn btn-default dropdown-toggle" type="button" id="flowButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
 		  	<i class="fa fa-map-o"></i>
 		    <span><fmt:message key="authoring.fla.page.menu.flow" /></span>
@@ -361,7 +361,7 @@
 			<span><fmt:message key="authoring.fla.page.menu.group" /></span>
 		</button>
 		
-		<div class="btn-group btn-group-sm" role="group">
+		<div class="btn-group btn-group-sm desktopButton" role="group">
 		  <button class="btn btn-default dropdown-toggle" type="button" id="annotateButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
 		  	<i class="fa fa-font"></i>
 		    <span><fmt:message key="authoring.fla.page.menu.annotate" /></span>
@@ -373,7 +373,7 @@
 		  </ul>
 		</div>
 				
-		<button id="arrangeButton" class="btn btn-default" onClick="javascript:GeneralLib.arrangeActivities()">
+		<button id="arrangeButton " class="btn btn-default desktopButton" onClick="javascript:GeneralLib.arrangeActivities()">
 			<i class="fa fa-th"></i> 
 			<span><fmt:message key="authoring.fla.page.menu.arrange" /></span>
 		</button>

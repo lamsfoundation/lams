@@ -274,7 +274,7 @@ function moveDialogToTop(id) {
 
 //used by both main.jsp and /lti/addlesson.jsp pages
 function showAuthoringDialog(learningDesignID){
-	showDialog('dialogAuthoring', {
+	var dialog = showDialog('dialogAuthoring', {
 		'height' : Math.max(300, $(window).height() - 30),
 		'width' : Math.max(600, Math.min(1280, $(window).width() - 60)),
 		'title' : LABELS.AUTHORING_TITLE,
@@ -301,4 +301,9 @@ function showAuthoringDialog(learningDesignID){
 			$('iframe', this).attr('src', url);
 		}
 	}, true);
+	
+	// resize the paper when dialog is resized
+	$('.modal-content', dialog).on('resizestop', function() {
+		$('iframe', this)[0].contentWindow.GeneralLib.resizePaper();
+	});
 }
