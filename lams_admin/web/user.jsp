@@ -12,22 +12,24 @@
 
 <c:set var="minNumChars"><%=Configuration.get(ConfigurationKeys.PASSWORD_POLICY_MINIMUM_CHARACTERS)%></c:set>
 <c:set var="mustHaveUppercase"><%=Configuration.get(ConfigurationKeys.PASSWORD_POLICY_UPPERCASE)%></c:set>
+<c:set var="mustHaveLowercase"><%=Configuration.get(ConfigurationKeys.PASSWORD_POLICY_LOWERCASE)%></c:set>
 <c:set var="mustHaveNumerics"><%=Configuration.get(ConfigurationKeys.PASSWORD_POLICY_NUMERICS)%></c:set>
 <c:set var="mustHaveSymbols"><%=Configuration.get(ConfigurationKeys.PASSWORD_POLICY_SYMBOLS)%></c:set>
 
 <link rel="stylesheet" href="css/defaultHTML_learner.css" type="text/css" />
 
 <script type="text/javascript">
-	$.validator.addMethod("pwcheck", function(value) {
-		return /[a-z]/.test(value) // has a lowercase letter
-		<c:if test="${mustHaveUppercase}"> && /[A-Z]/.test(value) // has uppercase letters 
-		</c:if>
-		<c:if test="${mustHaveNumerics}"> && /\d/.test(value) // has a digit
-		</c:if>
-		<c:if test="${mustHaveSymbols}">
-				&& /[`~!@#$%^&*\(\)_\-+={}\[\]\\|:\;\"\'\<\>,.?\/]/.test(value) //has symbols
-		</c:if>
-	});
+var mustHaveUppercase = ${mustHaveUppercase},
+mustHaveNumerics  = ${mustHaveNumerics},
+mustHaveLowercase  = ${mustHaveLowercase},
+mustHaveSymbols   = ${mustHaveSymbols};
+
+$.validator.addMethod("pwcheck", function(value) {
+ return (!mustHaveUppercase || /[A-Z]/.test(value)) && // has uppercase letters 
+(!mustHaveNumerics || /\d/.test(value)) && // has a digit
+(!mustHaveLowercase || /[a-z]/.test(value)) && // has a lower case
+(!mustHaveSymbols || /[`~!@#$%^&*\(\)_\-+={}\[\]\\|:\;\"\'\<\>,.?\/]/.test(value)); //has symbols
+});
 
 	$.validator.addMethod("charactersAllowed", function(value) {
 		return /^[A-Za-z0-9\d`~!@#$%^&*\(\)_\-+={}\[\]\\|:\;\"\'\<\>,.?\/]*$/
@@ -102,7 +104,7 @@
 	});
 </script>
 
-<html-el:form styleId="UserForm" action="/usersave.do" method="post">
+<html-el:form styleId="UserForm" action="usersave.do?method=saveUserDetails" method="post">
 	<html-el:hidden property="userId" />
 	<html-el:hidden property="orgId" />
 
@@ -145,7 +147,7 @@
 		</div>
 
 		<div class="panel-body">
-			 
+			<logic:empty name="UserForm" property="userId">
 			<lams:Alert type="info" id="passwordConditions" close="false">
 			<fmt:message key='label.password.must.contain' />:
 				<ul class="list-unstyled" style="line-height: 1.2">
@@ -158,6 +160,10 @@
 						<li><span class="fa fa-check"></span> <fmt:message
 								key='label.password.must.ucase' /></li>
 					</c:if>
+					<c:if test="${mustHaveLowercase}">
+								<li><span class="fa fa-check"></span> <fmt:message
+										key='label.password.must.lcase' /></li>
+							</c:if>
 
 					<c:if test="${mustHaveNumerics}">
 						<li><span class="fa fa-check"></span> <fmt:message
@@ -171,6 +177,7 @@
 					</c:if>
 				</ul>
 			</lams:Alert>
+		</logic:empty>
 
 			<table class="table table-condensed table-no-border">
 				<tr>
@@ -179,6 +186,7 @@
 					<td><html-el:text styleId="login" property="login"  maxlength="50"
 							styleClass="form-control" /></td>
 				</tr>
+				<logic:empty name="UserForm" property="userId">
 				<tr>
 					<td class="align-right"><fmt:message key="admin.user.password" />
 						*:</td>
@@ -191,6 +199,7 @@
 					<td><html-el:password property="password2" 
 							maxlength="25" styleId="password2" styleClass="form-control" /></td>
 				</tr>
+				</logic:empty>
 				<tr>
 					<td class="align-right"><fmt:message
 							key="admin.user.authentication.method" />:</td>
@@ -369,7 +378,11 @@
 				</c:if>
 				
 			</table>
-
+			<logic:notEmpty name="UserForm" property="userId">
+			<div class="pull-left">
+			<a href="userChangePass.jsp?userId=<bean:write name='UserForm' property='userId' />&login=<bean:write name='UserForm' property='login' />" class="btn btn-primary"><fmt:message key="admin.user.changePassword" /></a>
+			</div>
+			</logic:notEmpty>
 			<div class="pull-right">
 				<input type="submit" name="org.apache.struts.taglib.html.CANCEL" value="<fmt:message key="admin.cancel" />" 
 						formnovalidate="formnovalidate" onclick="bCancel=true;" id="cancelButton" class="btn btn-default"/>
