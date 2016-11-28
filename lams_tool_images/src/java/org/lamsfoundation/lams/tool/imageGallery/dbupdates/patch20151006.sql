@@ -27,6 +27,8 @@ ALTER TABLE tl_laimag10_imagegallery DROP COLUMN allow_comment_images;
 DROP TABLE tl_laimag10_image_rating;
 DROP TABLE tl_laimag10_image_comment;
 
+UPDATE lams_tool SET tool_version='20151006' WHERE tool_signature='laimag10';
+
 ----------------------Put all sql statements above here-------------------------
 
 -- If there were no errors, commit and restore autocommit to on
