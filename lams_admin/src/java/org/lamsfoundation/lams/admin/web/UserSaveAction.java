@@ -32,7 +32,6 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.commons.beanutils.BeanUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
-import org.apache.struts.action.Action;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
@@ -48,19 +47,34 @@ import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
 import org.lamsfoundation.lams.util.HashUtil;
 import org.lamsfoundation.lams.util.ValidationUtil;
+import org.lamsfoundation.lams.util.WebUtil;
+import org.lamsfoundation.lams.web.action.LamsDispatchAction;
 
 /**
  * @author Jun-Dir Liew
+ *
+ * Created at 12:35:38 on 14/06/2006
  */
-public class UserSaveAction extends Action {
+
+/**
+ * struts doclets
+ *
+ *
+ *
+ *
+ *
+ *
+ *
+ */
+public class UserSaveAction extends LamsDispatchAction {
 
     private static Logger log = Logger.getLogger(UserSaveAction.class);
     private static IUserManagementService service;
 
-    @Override
-    public ActionForward execute(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws Exception {
 
+    public ActionForward saveUserDetails(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+	    HttpServletResponse response) throws Exception {
+	
 	UserSaveAction.service = AdminServiceProxy.getService(getServlet().getServletContext());
 
 	// action input
@@ -71,7 +85,6 @@ public class UserSaveAction extends Action {
 
 	UserSaveAction.log.debug("orgId: " + orgId);
 	Boolean edit = false;
-	Boolean passwordChanged = true;
 	SupportedLocale locale = (SupportedLocale) UserSaveAction.service.findById(SupportedLocale.class,
 		(Integer) userForm.get("localeId"));
 	AuthenticationMethod authenticationMethod = (AuthenticationMethod) UserSaveAction.service
@@ -112,18 +125,7 @@ public class UserSaveAction extends Action {
 	    }
 	}
 
-	//password validation
-	String password = (userForm.get("password") == null) ? null : (String) userForm.get("password");
-	if (!StringUtils.equals(password, ((String) userForm.get("password2")))) {
-	    errors.add("password", new ActionMessage("error.newpassword.mismatch"));
-	}
-	if (StringUtils.isBlank(password)) {
-	    passwordChanged = false;
-	    if (!edit) {
-		errors.add("password", new ActionMessage("error.password.required"));
-	    }
-	}
-
+	
 	//first name validation
 	String firstName = (userForm.get("firstName") == null) ? null : (String) userForm.get("firstName");
 	if (StringUtils.isBlank(firstName)) {
@@ -152,15 +154,7 @@ public class UserSaveAction extends Action {
 	    if (edit) { // edit user
 		UserSaveAction.log.debug("editing userId: " + userId);
 		// hash the new password if necessary, and audit the fact
-		if (passwordChanged) {
-		    UserSaveAction.service.auditPasswordChanged(user, AdminConstants.MODULE_NAME);
-		    String salt = HashUtil.salt();
-		    String passwordHash = HashUtil.sha256((String) userForm.get("password"), salt);
-		    userForm.set("salt", salt);
-		    userForm.set("password", passwordHash);
-		} else {
 		    userForm.set("password", user.getPassword());
-		}
 		BeanUtils.copyProperties(user, userForm);
 		user.setLocale(locale);
 		user.setAuthenticationMethod(authenticationMethod);
@@ -170,12 +164,23 @@ public class UserSaveAction extends Action {
 
 		UserSaveAction.service.save(user);
 	    } else { // create user
+		
+		//password validation
+		String password = (userForm.get("password") == null) ? null : (String) userForm.get("password");
+		if (StringUtils.isBlank(password)) {
+			errors.add("password", new ActionMessage("error.password.required"));
+		}
+		if (!StringUtils.equals(password, ((String) userForm.get("password2")))) {
+		    errors.add("password", new ActionMessage("error.newpassword.mismatch"));
+		}
+		
+		if (errors.isEmpty()){
 		user = new User();
 		String salt = HashUtil.salt();
 		String passwordHash = HashUtil.sha256((String) userForm.get("password"), salt);
-		userForm.set("salt", salt);
-		userForm.set("password", passwordHash);
 		BeanUtils.copyProperties(user, userForm);
+		user.setSalt(salt);
+		user.setPassword(passwordHash);
 		UserSaveAction.log.debug("creating user... new login: " + user.getLogin());
 		if (errors.isEmpty()) {
 		    // TODO set theme according to user input
@@ -201,6 +206,7 @@ public class UserSaveAction extends Action {
 		    UserSaveAction.log.debug("user: " + user.toString());
 		}
 	    }
+	    }
 	}
 
 	if (errors.isEmpty()) {
@@ -221,5 +227,37 @@ public class UserSaveAction extends Action {
 	    return mapping.findForward("user");
 	}
     }
+    
+    
+    public ActionForward changePass(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+	    HttpServletResponse response) throws Exception {
+	UserSaveAction.service = AdminServiceProxy.getService(getServlet().getServletContext());
+	ActionMessages errors = new ActionMessages();
+	
+	
+	Integer userId = WebUtil.readIntParam(request, "userId", true);
+	String password = WebUtil.readStrParam(request, "password");
+	String password2 = WebUtil.readStrParam(request, "password2");
+	
+	
+	//password validation
+	if (StringUtils.isBlank(password)) {
+		errors.add("password", new ActionMessage("error.password.required"));
+	}
+		if (!StringUtils.equals(password,password2)) {
+		    errors.add("password", new ActionMessage("error.newpassword.mismatch"));
+		}
+		 User user = (User) UserSaveAction.service.findById(User.class, userId);
+		 String salt = HashUtil.salt();
+		String passwordHash = HashUtil.sha256(password, salt);
+		user.setSalt(salt);
+		user.setPassword(passwordHash);
+		UserSaveAction.service.save(user);
+	return mapping.findForward("userChangePass");
+    }
+    
+    
+    
+    
 
 }
