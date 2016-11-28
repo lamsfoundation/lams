@@ -60,10 +60,8 @@
 <lams:Page title="${title}" type="navbar">
 	<lams:Tabs control="true" title="${title}" helpToolSignature="<%= QaAppConstants.MY_SIGNATURE %>" helpModule="authoring">
 		<lams:Tab id="1" key="label.basic" />
-		<c:if test="${mode == 'author'}">
-			<lams:Tab id="2" key="label.advanced" />
-			<lams:Tab id="3" key="label.conditions" />
-		</c:if>
+		<lams:Tab id="2" key="label.advanced" />
+		<lams:Tab id="3" key="label.conditions" />
 	</lams:Tabs>
 
 	<lams:TabBodyArea>
@@ -77,10 +75,8 @@
 		
 		<lams:TabBodys>
 			<lams:TabBody id="1" titleKey="label.basic" page="BasicContent.jsp"/>
-			<c:if test="${mode == 'author'}">
-				<lams:TabBody id="2" titleKey="label.advanced" page="AdvancedContent.jsp" />
-				<lams:TabBody id="3" titleKey="label.conditions" page="conditions.jsp" />
-			</c:if>
+			<lams:TabBody id="2" titleKey="label.advanced" page="AdvancedContent.jsp" />
+			<lams:TabBody id="3" titleKey="label.conditions" page="conditions.jsp" />
 	    </lams:TabBodys>
 	    
 		<lams:AuthoringButton formID="authoringForm"
