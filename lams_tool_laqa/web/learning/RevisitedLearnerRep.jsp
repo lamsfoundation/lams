@@ -259,7 +259,6 @@
 					</fmt:param>
 				</fmt:message>
 			</lams:Alert>
-			</div>
 		</c:if>
 
 		<!-- Rating limits info -->
