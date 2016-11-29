@@ -117,7 +117,7 @@ a {
     background: #2B5B95;
 }
 .offcanvas-logo {
-	padding: 20px 0px 0px 25px;
+	padding: 20px 0px 15px 25px;
     background-color: #072B57;
 }
 .offcanvas-logo img{
@@ -197,7 +197,7 @@ a {
     margin-bottom: 10px;
     width: 100%;
 }
-.offcanvas-toggle-wrapper {
+.offcanvas-toggle-header {
     float: left;
     margin: 0;
     padding: 15px 0 10px 7px;
@@ -205,14 +205,14 @@ a {
     cursor: pointer;
 }
 @media (min-width: 768px) {
-	.offcanvas-toggle-wrapper {
+	.offcanvas-toggle-header {
 	    padding-top: 20px;
 	    padding-bottom: 15px;
 	}
 }
-.offcanvas-toggle {
-    padding: 15px 15px 0;
-    margin: 0;
+.offcanvas-toggle-header i {
+    padding: 0 15px 0;
+    color: #5A738E;
 }
 
 .offcanvas-toggle i {
@@ -248,7 +248,7 @@ ul.dropdown-usermenu li {
 }
 
 /*TOP HEADER LINKS*/
-.offcanvas-toggle-wrapper:hover, ul.dropdown-usermenu li a:focus, ul.dropdown-usermenu li a:hover, .top_nav .nav > li > a:hover, .top_nav .nav .open > a, .top_nav .nav .open > a:focus, .top_nav .nav .open > a:hover {
+.offcanvas-toggle-header:hover, ul.dropdown-usermenu li a:focus, ul.dropdown-usermenu li a:hover, .top_nav .nav > li > a:hover, .top_nav .nav .open > a, .top_nav .nav .open > a:focus, .top_nav .nav .open > a:hover {
     background: #D9DEE4;
 }
 .nav > li > a:hover, .nav > li > a:focus {
