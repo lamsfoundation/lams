@@ -13,7 +13,12 @@
 
 <lams:html>
 <lams:head>
-	<link rel="stylesheet" href="css/defaultHTML_learner.css" type="text/css" />
+	<lams:css/>
+	<style type="text/css">
+		body {
+			overflow-x:hidden;
+		}
+	</style>
 
 	<script type="text/javascript" src="includes/javascript/jquery.js"></script>
 	<script type="text/javascript" src="includes/javascript/jquery-ui.js"></script>
@@ -33,8 +38,7 @@
 				}
 			});
 		}
-	</script>
-	<script type="text/javascript">
+		
 		$(document).ready( function() {
 			//update dialog's height and title
 			updateMyProfileDialogSettings(
@@ -43,7 +47,6 @@
 			);
 		});
 	</script>
-
 </lams:head>
 
 <body>
