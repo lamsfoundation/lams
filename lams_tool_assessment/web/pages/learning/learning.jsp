@@ -481,7 +481,7 @@
 				if (missingRequiredQuestions.length != 0) {
 					//add .bg-warning class to those needs to be filled
 					for (i = 0; i < missingRequiredQuestions.length; i++) {
-					    $("#question-area-" + missingRequiredQuestions[i]).find(".panel-body").addClass('bg-warning');
+					    $("#question-area-" + missingRequiredQuestions[i]).addClass('bg-warning');
 					}
 					//show alert message as well
 					$("#warning-answers-required").show();
@@ -491,7 +491,7 @@
 				if (maxWordsLimitExceededQuestions.length != 0) {
 					//add .bg-warning class to those needs to be filled
 					for (i = 0; i < maxWordsLimitExceededQuestions.length; i++) {
-					    $("#question-area-" + maxWordsLimitExceededQuestions[i]).find(".panel-body").addClass('bg-warning');
+					    $("#question-area-" + maxWordsLimitExceededQuestions[i]).addClass('bg-warning');
 					}
 					//show alert message as well
 					$("#warning-words-limit").show();		
@@ -500,7 +500,7 @@
 				if (minWordsLimitNotReachedQuestions.length != 0) {
 					//add .bg-warning class to those needs to be filled
 					for (i = 0; i < minWordsLimitNotReachedQuestions.length; i++) {
-					    $("#question-area-" + minWordsLimitNotReachedQuestions[i]).find(".panel-body").addClass('bg-warning');
+					    $("#question-area-" + minWordsLimitNotReachedQuestions[i]).addClass('bg-warning');
 					}
 					//show alert message as well
 					$("#warning-words-limit").show();		
@@ -509,7 +509,7 @@
 				if (markHedgingWrongTotalQuestions.length != 0) {
 					//add .bg-warning class to those needs to be filled
 					for (i = 0; i < markHedgingWrongTotalQuestions.length; i++) {
-					    $("#question-area-" + markHedgingWrongTotalQuestions[i]).find(".panel-body").addClass('bg-warning');
+					    $("#question-area-" + markHedgingWrongTotalQuestions[i]).addClass('bg-warning');
 					}
 					//show alert message as well
 					$("#warning-mark-hedging-wrong-total").show();		
