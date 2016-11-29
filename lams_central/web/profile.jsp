@@ -13,13 +13,12 @@
 
 <lams:html>
 <lams:head>
-	<link rel="stylesheet" href="css/defaultHTML_learner.css" type="text/css" />
+	<lams:css/>
 	
 	<script type="text/javascript" src="includes/javascript/jquery.js"></script>
 	<script type="text/javascript" src="includes/javascript/jquery-ui.js"></script>
 	<script type="text/javascript" src="includes/javascript/profile.js"></script>
 	<script type="text/javascript">
-	
 		$(document).ready(function () {
 			//update dialog's height and title
 			updateMyProfileDialogSettings('<fmt:message key="index.myprofile" />', '430');
