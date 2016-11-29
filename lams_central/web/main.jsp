@@ -141,8 +141,8 @@
 	<div class="top_nav">
 		<div class="nav_menu">
 			<nav>
-				<div class="nav offcanvas-toggle-wrapper">
-					<a class="offcanvas-toggle"><i class="fa fa-bars"></i></a>
+				<div class="offcanvas-toggle offcanvas-toggle-header">
+					<i class="fa fa-bars"></i>
 				</div>
 
 				<ul class="nav navbar-nav navbar-right">
