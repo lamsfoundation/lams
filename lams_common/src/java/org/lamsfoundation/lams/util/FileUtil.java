@@ -25,6 +25,7 @@ package org.lamsfoundation.lams.util;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.Reader;
@@ -820,7 +821,7 @@ public class FileUtil {
     }
 
     public static void writeXMLtoFile(Document doc, File file) throws IOException {
-	StreamResult streamResult = new StreamResult(file);
+	StreamResult streamResult = new StreamResult(new FileOutputStream(file));
 	DOMSource domSource = new DOMSource(doc);
 	try {
 	    FileUtil.xmlTransformer.transform(domSource, streamResult);
