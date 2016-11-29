@@ -11,13 +11,9 @@
 <c:set var="language"><lams:user property="localeLanguage"/></c:set>
 <p><fmt:message key="sysadmin.login.text"/></p>
 
-<div align="center"> 
-
 <c:set var="existingContent"><bean:write name='LoginMaintainForm' property='news' filter='false' /></c:set>
 
 <lams:CKEditor id="news" value="${existingContent}"	contentFolderID="../public" height="600px"></lams:CKEditor>
-
-</div>
 
 <div class="pull-right voffset5">
 	<html:cancel styleId="cancelButton" styleClass="btn btn-default"><fmt:message key="admin.cancel" /></html:cancel>
