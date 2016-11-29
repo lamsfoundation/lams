@@ -102,7 +102,7 @@ public class LdapService implements ILdapService {
 	user.setMobilePhone(map.get("mobile"));
 	user.setLocale(getLocale(map.get("locale")));
 	user.setDisabledFlag(getDisabledBoolean(attrs));
-	getService().save(user);
+	getService().saveUser(user);
     }
 
     // tries to match ldap attribute to a locale, otherwise returns server
@@ -162,7 +162,7 @@ public class LdapService implements ILdapService {
 		user.setTimeZone(user.getTimeZone());
 		user.setTutorialsDisabled(false);
 		user.setFirstLogin(true);
-		service.save(user);
+		service.saveUser(user);
 		service.auditUserCreated(user, "common");
 		return true;
 	    } else {

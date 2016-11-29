@@ -210,7 +210,7 @@ public class IntegrationService implements IIntegrationService {
 	    uo = new UserOrganisation(user, org);
 	    service.save(uo);
 	    user.addUserOrganisation(uo);
-	    service.save(user);
+	    service.saveUser(user);
 	}
 
 	Integer[] roles;
@@ -330,7 +330,7 @@ public class IntegrationService implements IIntegrationService {
 	    user.setEmail(email);
 	    user.setModifiedDate(new Date());
 	    user.setLocale(LanguageUtil.getSupportedLocale(language, country));
-	    service.save(user);
+	    service.saveUser(user);
 
 	    return extUserUseridMap;
 
@@ -445,7 +445,7 @@ public class IntegrationService implements IIntegrationService {
 	user.setDisabledFlag(false);
 	user.setLocale(LanguageUtil.getSupportedLocale(userData[13], userData[12]));
 	user.setTheme(service.getDefaultTheme());
-	service.save(user);
+	service.saveUser(user);
 	ExtUserUseridMap extUserUseridMap = new ExtUserUseridMap();
 	extUserUseridMap.setExtServer(extServer);
 	extUserUseridMap.setExtUsername(extUsername);

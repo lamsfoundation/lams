@@ -61,7 +61,7 @@ public class TwoFactorAuthenticationAction extends Action {
 	    String sharedSecret = key.getKey();
 	    
 	    loggedInUser.setTwoFactorAuthenticationSecret(sharedSecret);
-	    userManagementService.save(loggedInUser);
+	    userManagementService.saveUser(loggedInUser);
 	    
 	    request.setAttribute("sharedSecret", sharedSecret);
 	    String QRCode = GoogleAuthenticatorQRGenerator.getOtpAuthURL(null, "LAMS account: " + loggedInUser.getLogin(), key);

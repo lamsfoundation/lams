@@ -120,7 +120,7 @@ public class PortraitSaveAction extends LamsDispatchAction {
 	    getCentralToolContentHandler().deleteFile(user.getPortraitUuid());
 	}
 	user.setPortraitUuid(node.getUuid());
-	getService().save(user);
+	getService().saveUser(user);
 
 	return mapping.findForward("profile");
     }
@@ -163,7 +163,7 @@ public class PortraitSaveAction extends LamsDispatchAction {
 	    getCentralToolContentHandler().deleteFile(user.getPortraitUuid());
 	}
 	user.setPortraitUuid(node.getUuid());
-	getService().save(user);
+	getService().saveUser(user);
 
 	return null;
     }

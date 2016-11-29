@@ -58,6 +58,8 @@ public interface IUserManagementService {
      *            The object to be inserted
      */
     void save(Object object);
+    
+    User saveUser(User user);
 
     /**
      * Remove an object from the database.

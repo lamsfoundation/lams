@@ -338,7 +338,7 @@ public class ImportService implements IImportService {
 		continue;
 	    } else {
 		try {
-		    service.save(user);
+		    service.saveUser(user);
 		    successful++;
 		    writeAuditLog(user, userDTO);
 		    ImportService.log.debug("Row " + i + " saved user: " + user.getLogin());
