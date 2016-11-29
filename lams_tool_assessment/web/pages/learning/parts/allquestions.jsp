@@ -4,7 +4,7 @@
 						
 				<input type="hidden" name="questionUid${status.index}" id="questionUid${status.index}" value="${question.uid}" />						
 							
-				<div class="panel panel-default" id="question-area-${status.index}">
+				<div class="panel panel-default">
 					<div class="panel-heading">
 						<c:if test="${assessment.numbered}">
 							<span class="question-numbers">
@@ -25,7 +25,7 @@
 						${question.question}
 					</div>
 					
-					<div class="panel-body">
+					<div class="panel-body" id="question-area-${status.index}">
 						<c:choose>
 							<c:when test="${question.type == 1}">
 								<%@ include file="multiplechoice.jsp"%>
