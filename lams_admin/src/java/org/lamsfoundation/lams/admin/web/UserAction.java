@@ -380,7 +380,7 @@ public class UserAction extends LamsDispatchAction {
 
 	UserAction.log.debug("enabling user: " + userId);
 	user.setDisabledFlag(false);
-	service.save(user);
+	service.saveUser(user);
 
 	return mapping.findForward("disabledlist");
     }

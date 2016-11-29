@@ -1669,7 +1669,7 @@ public class PedagogicalPlannerAction extends LamsDispatchAction {
 	    Long recentLD = iter.next();
 	    if (recentLD.equals(learningDesignId)) {
 		iter.remove();
-		getUserManagementService().save(user);
+		getUserManagementService().saveUser(user);
 		ldFound = true;
 		break;
 	    }

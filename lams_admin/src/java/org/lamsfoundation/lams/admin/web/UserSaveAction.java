@@ -162,7 +162,7 @@ public class UserSaveAction extends LamsDispatchAction {
 		Theme cssTheme = (Theme) UserSaveAction.service.findById(Theme.class, (Long) userForm.get("userTheme"));
 		user.setTheme(cssTheme);
 
-		UserSaveAction.service.save(user);
+		UserSaveAction.service.saveUser(user);
 	    } else { // create user
 		
 		//password validation
@@ -198,7 +198,7 @@ public class UserSaveAction extends LamsDispatchAction {
 			    (Long) userForm.get("userTheme"));
 		    user.setTheme(theme);
 
-		    UserSaveAction.service.save(user);
+		    UserSaveAction.service.saveUser(user);
 
 		    // make 'create user' audit log entry
 		    UserSaveAction.service.auditUserCreated(user, AdminConstants.MODULE_NAME);
@@ -252,7 +252,7 @@ public class UserSaveAction extends LamsDispatchAction {
 		String passwordHash = HashUtil.sha256(password, salt);
 		user.setSalt(salt);
 		user.setPassword(passwordHash);
-		UserSaveAction.service.save(user);
+		UserSaveAction.service.saveUser(user);
 	return mapping.findForward("userChangePass");
     }
     

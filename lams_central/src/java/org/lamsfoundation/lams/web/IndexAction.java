@@ -86,7 +86,7 @@ public class IndexAction extends LamsDispatchAction {
 	    request.setAttribute("firstLogin", true);
 	    User user = getUserManagementService().getUserByLogin(userDTO.getLogin());
 	    user.setFirstLogin(false);
-	    getUserManagementService().save(user);
+	    getUserManagementService().saveUser(user);
 	    userDTO.setFirstLogin(false);
 	}
 
@@ -244,7 +244,7 @@ public class IndexAction extends LamsDispatchAction {
 	if (lastVisitedOrganisationId != null) {
 	    User user = userManagementService.getUserByLogin(request.getRemoteUser());
 	    user.setLastVisitedOrganisationId(lastVisitedOrganisationId);
-	    userManagementService.save(user);
+	    userManagementService.saveUser(user);
 	}
 
 	return null;

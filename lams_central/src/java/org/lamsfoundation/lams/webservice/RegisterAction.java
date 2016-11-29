@@ -582,7 +582,7 @@ public class RegisterAction extends HttpServlet {
 
 	Set<UserOrganisation> userOrganisations = user.getUserOrganisations();
 	userOrganisations.remove(userOrganisation);
-	userManagementService.save(user);
+	userManagementService.saveUser(user);
 
 	// userOrganisation and UserOrganisationRoles will be deleted by Hibernate automatically.
     }

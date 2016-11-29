@@ -37,7 +37,7 @@ public class SignupService implements ISignupService {
 	user.setAuthenticationMethod(getAuthenticationMethod(AuthenticationMethod.DB));
 	user.setLocale(getDefaultLocale());
 	user.setCreateDate(new Date());
-	userManagementService.save(user);
+	userManagementService.saveUser(user);
 
 	// add to org
 	SignupOrganisation signup = signupDAO.getSignupOrganisation(context);

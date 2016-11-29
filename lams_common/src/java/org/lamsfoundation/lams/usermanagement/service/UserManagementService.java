@@ -99,7 +99,7 @@ public class UserManagementService implements IUserManagementService {
     private IUserDAO userDAO;
 
     private IUserOrganisationDAO userOrganisationDAO;
-    
+
     private IFavoriteOrganisationDAO favoriteOrganisationDAO;
 
     protected MessageService messageService;
@@ -112,14 +112,10 @@ public class UserManagementService implements IUserManagementService {
 
     @Override
     public void save(Object object) {
-	if (object instanceof User) {
-	    User user = (User) object;
-	    object = saveUser(user);
-	}
 	baseDAO.insertOrUpdate(object);
     }
 
-    protected User saveUser(User user) {
+    public User saveUser(User user) {
 	if (user != null) {
 	    // create user
 	    if (user.getUserId() == null) {
@@ -246,30 +242,30 @@ public class UserManagementService implements IUserManagementService {
 
 	return users;
     }
-    
+
     @Override
     public List<Organisation> getFavoriteOrganisationsByUser(Integer userId) {
 	return favoriteOrganisationDAO.getFavoriteOrganisationsByUser(userId);
     }
-    
+
     @Override
     public boolean isOrganisationFavorite(Integer organisationId, Integer userId) {
 	return favoriteOrganisationDAO.isOrganisationFavorite(organisationId, userId);
     }
-    
+
     @Override
     public void toggleOrganisationFavorite(Integer orgId, Integer userId) {
 	FavoriteOrganisation favoriteOrganisation = favoriteOrganisationDAO.getFavoriteOrganisation(orgId, userId);
-	
+
 	//create new favoriteOrganisation if it doesn't exist
 	if (favoriteOrganisation == null) {
-	    
+
 	    User user = (User) findById(User.class, userId);
 	    Organisation organisation = (Organisation) findById(Organisation.class, orgId);
 	    favoriteOrganisation = new FavoriteOrganisation(user, organisation);
 	    save(favoriteOrganisation);
-	   
-	//remove favoriteOrganisation if it existed
+
+	    //remove favoriteOrganisation if it existed
 	} else {
 	    delete(favoriteOrganisation);
 	}
@@ -590,7 +586,7 @@ public class UserManagementService implements IUserManagementService {
 	    iter.remove();
 	}
 	log.debug("disabling user " + user.getLogin());
-	save(user);
+	saveUser(user);
     }
 
     @Override
@@ -668,7 +664,7 @@ public class UserManagementService implements IUserManagementService {
 	    }
 	}
 	uo.setUserOrganisationRoles(uors);
-	save(user);
+	saveUser(user);
 	// make sure group managers have monitor and learner in each subgroup
 	checkGroupManager(user, org);
     }
@@ -913,7 +909,7 @@ public class UserManagementService implements IUserManagementService {
 	    String searchString) {
 	return organisationDAO.getActiveCoursesByUser(userId, isSysadmin, page, size, searchString);
     }
-    
+
     @Override
     public int getCountActiveCoursesByUser(Integer userId, boolean isSysadmin, String searchString) {
 	return organisationDAO.getCountActiveCoursesByUser(userId, isSysadmin, searchString);
@@ -1029,7 +1025,7 @@ public class UserManagementService implements IUserManagementService {
     public void setUserOrganisationDAO(IUserOrganisationDAO userOrganisationDAO) {
 	this.userOrganisationDAO = userOrganisationDAO;
     }
-    
+
     public void setFavoriteOrganisationDAO(IFavoriteOrganisationDAO favoriteOrganisationDAO) {
 	this.favoriteOrganisationDAO = favoriteOrganisationDAO;
     }

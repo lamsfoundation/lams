@@ -161,7 +161,7 @@ public class LamsCommunityLoginAction extends LamsDispatchAction {
 		User user = getUser(request);
 		user.setLamsCommunityUsername(loginForm.getLcUserName());
 		user.setLamsCommunityToken(result[1]);
-		getService().save(user);
+		getService().saveUser(user);
 
 		// then login
 		return loginToLamsCommunity(mapping, form, request, response);

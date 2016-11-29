@@ -141,7 +141,7 @@ public class ProfileSaveAction extends Action {
 	    }
 	}
 
-	getService().save(requestor);
+	getService().saveUser(requestor);
 
 	// replace UserDTO in the shared session
 	HttpSession ss = SessionManager.getSession();

@@ -112,7 +112,7 @@ public class PasswordChangeAction extends Action {
 			user.setSalt(salt);
 			user.setPassword(HashUtil.sha256(password, salt));
 			user.setChangePassword(false);
-			service.save(user);
+			service.saveUser(user);
 
 			// make 'password changed' audit log entry
 			IAuditService auditService = (IAuditService) ctx.getBean("auditService");

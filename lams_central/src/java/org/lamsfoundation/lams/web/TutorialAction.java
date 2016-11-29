@@ -73,7 +73,7 @@ public class TutorialAction extends DispatchAction {
 	User user = getService().getUserByLogin(userDTO.getLogin());
 
 	user.getPagesWithDisabledTutorials().add(pageString);
-	getService().save(user);
+	getService().saveUser(user);
 
 	ss.setAttribute(AttributeNames.USER, user.getUserDTO());
 
@@ -99,7 +99,7 @@ public class TutorialAction extends DispatchAction {
 	User user = getService().getUserByLogin(userDTO.getLogin());
 
 	user.getPagesWithDisabledTutorials().remove(pageString);
-	getService().save(user);
+	getService().saveUser(user);
 
 	ss.setAttribute(AttributeNames.USER, user.getUserDTO());
 
@@ -152,7 +152,7 @@ public class TutorialAction extends DispatchAction {
 	User user = getService().getUserByLogin(userDTO.getLogin());
 
 	user.setTutorialsDisabled(true);
-	getService().save(user);
+	getService().saveUser(user);
 
 	ss.setAttribute(AttributeNames.USER, user.getUserDTO());
 
