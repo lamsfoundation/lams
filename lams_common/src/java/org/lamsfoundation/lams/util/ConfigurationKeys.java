@@ -274,7 +274,12 @@ public class ConfigurationKeys {
     
     public static String PASSWORD_POLICY_SYMBOLS = "PasswordPolicySymbols";
     
- // LDEV-4049 Option for not displaying stacktraces in config settings
+    // LDEV-4049 Option for not displaying stacktraces in config settings
     public static String ERROR_STACK_TRACE = "ErrorStackTrace";
+    
+    // LDEV-4030 Disable login for a few minutes after X number of attempts
+    public static String FAILED_ATTEMPTS = "FailedAttempts";
+    
+    public static String LOCK_OUT_TIME = "LockOutTime";
 
 }
