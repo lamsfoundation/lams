@@ -424,6 +424,12 @@
 				not-null="false"
 			</meta>
 		</property>
+		
+		<property name="failedAttempts" type="java.lang.Integer" column="failed_attempts"/>
+		
+		<property name="lockOutTime" type="java.sql.Timestamp"
+			column="lock_out_time" not-null="false" length="19">
+		</property>
 
 	</class>
 

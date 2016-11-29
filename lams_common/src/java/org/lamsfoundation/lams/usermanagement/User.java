@@ -21,7 +21,6 @@
  * ****************************************************************
  */
 
-
 package org.lamsfoundation.lams.usermanagement;
 
 import java.io.Serializable;
@@ -53,9 +52,13 @@ public class User implements Serializable, Comparable {
      * persistent field
      */
     private String password;
-    
+
+    private Integer failedAttempts;
+
+    private Date lockOutTime;
+
     private Boolean twoFactorAuthenticationEnabled;
-    
+
     private String twoFactorAuthenticationSecret;
 
     /**
@@ -128,7 +131,7 @@ public class User implements Serializable, Comparable {
 
     /** persistent field */
     private Set<UserOrganisation> userOrganisations;
-    
+
     /** persistent field */
     private Integer lastVisitedOrganisationId;
 
@@ -213,7 +216,7 @@ public class User implements Serializable, Comparable {
     public void setSalt(String salt) {
 	this.salt = salt;
     }
-    
+
     public Boolean isTwoFactorAuthenticationEnabled() {
 	return twoFactorAuthenticationEnabled;
     }
@@ -221,7 +224,7 @@ public class User implements Serializable, Comparable {
     public void setTwoFactorAuthenticationEnabled(Boolean twoFactorAuthenticationEnabled) {
 	this.twoFactorAuthenticationEnabled = twoFactorAuthenticationEnabled;
     }
-    
+
     public String getTwoFactorAuthenticationSecret() {
 	return twoFactorAuthenticationSecret;
     }
@@ -401,7 +404,7 @@ public class User implements Serializable, Comparable {
     public void setUserOrganisations(Set userOrganisations) {
 	this.userOrganisations = userOrganisations;
     }
-    
+
     public Integer getLastVisitedOrganisationId() {
 	return lastVisitedOrganisationId;
     }
@@ -540,7 +543,7 @@ public class User implements Serializable, Comparable {
      */
     public boolean hasMemberAccess(WorkspaceFolder workspaceFolder) {
 	for (UserOrganisation userOrganisation : userOrganisations) {
-		// not all orgs have a folder
+	    // not all orgs have a folder
 	    Set<WorkspaceFolder> folders = userOrganisation.getOrganisation().getWorkspaceFolders();
 	    if (folders != null) {
 		if (checkFolders(folders, workspaceFolder.getWorkspaceFolderId())) {
@@ -658,5 +661,21 @@ public class User implements Serializable, Comparable {
 
     public void setModifiedDate(Date modifiedDate) {
 	this.modifiedDate = modifiedDate;
+    }
+
+    public Integer getFailedAttempts() {
+        return failedAttempts;
+    }
+
+    public void setFailedAttempts(Integer failedAttempts) {
+        this.failedAttempts = failedAttempts;
+    }
+
+    public Date getLockOutTime() {
+	return lockOutTime;
+    }
+
+    public void setLockOutTime(Date lockOutTime) {
+	this.lockOutTime = lockOutTime;
     }
 }
