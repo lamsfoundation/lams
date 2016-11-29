@@ -59,7 +59,7 @@
 		<c:forEach var="session" items="${sessionDTOs}">
 			<tr>
 				<td>
-					<a href="<c:url value="/monitoring.do"/>?dispatch=showGroupLearning&toolSessionID=${session.sessionID}&TB_iframe=true" class="btn btn-default btn-sm thickbox" title="<fmt:message key='heading.notebookEntry' />">
+					<a href="<c:url value="/monitoring.do"/>?dispatch=showGroupLearning&toolSessionID=${session.sessionID}&TB_iframe=true" class="btn btn-default btn-sm thickbox" title="${session.sessionName}">
 						${session.sessionName}
 					</a>
 				</td>
