@@ -38,6 +38,7 @@ import org.lamsfoundation.lams.usermanagement.service.UserManagementService;
 import org.lamsfoundation.lams.util.CentralConstants;
 import org.lamsfoundation.lams.util.HashUtil;
 import org.lamsfoundation.lams.util.MessageService;
+import org.lamsfoundation.lams.util.ValidationUtil;
 import org.lamsfoundation.lams.util.audit.IAuditService;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
@@ -107,6 +108,11 @@ public class PasswordChangeAction extends Action {
 			errors.add("password", new ActionMessage("error.password.empty"));
 			PasswordChangeAction.log.debug("new password cannot be empty");
 		    }
+		    if (!ValidationUtil.isPasswordValueValid(password, passwordConfirm)) {
+			errors.add("password", new ActionMessage("label.password.restrictions"));
+			PasswordChangeAction.log.debug("Password must follow the restrictions");
+		    }
+
 		    if (errors.isEmpty()) {
 			String salt = HashUtil.salt();
 			user.setSalt(salt);
@@ -142,7 +148,7 @@ public class PasswordChangeAction extends Action {
 	    // If no input page, use error forwarding
 	    return (mapping.findForward("error.system"));
 	}
-	request.setAttribute("redirectURL",passwordChangeForm.getRedirectURL());
+	request.setAttribute("redirectURL", passwordChangeForm.getRedirectURL());
 	return mapping.findForward("okay");
 
     }
