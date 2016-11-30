@@ -1,5 +1,4 @@
 	<div>
-	signupOrganisation ${signupOrganisation}
 		<form id="SignupForm" name="SignupForm" action="/lams/signup/signup.do" method="post" autocomplete="off" >
  		<c:set var="org.apache.struts.taglib.html.BEAN"  value="${SignupForm}" />
 			<html:hidden property="method" value="login" />
