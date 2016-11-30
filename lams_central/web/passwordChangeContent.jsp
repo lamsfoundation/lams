@@ -97,7 +97,7 @@
 </lams:head>
 
 <body>
-<form name="PasswordChangeActionForm" id="change-password" method="post" action="/lams/passwordChanged.do">
+<form name="PasswordChangeActionForm" id="change-password" method="post" action="/lams/passwordChanged.do" autocomplete="off" >
 	<div style="clear: both"></div>
 	<div class="container">
 		<div class="row vertical-center-row">
