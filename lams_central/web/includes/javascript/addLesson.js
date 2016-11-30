@@ -314,6 +314,52 @@ function addLesson(){
 	}});
 }
 
+function previewLesson(){
+	var ldNode = tree.getHighlightedNode();
+	if (!ldNode || !ldNode.data.learningDesignId) {
+		$('#ldNotChosenError').show();
+		doSelectTab(1);
+		return;
+	}
+	$('body').css('cursor', 'wait');
+	// initialize, create and enter the preview lesson
+	$.ajax({
+		url : LAMS_URL + 'monitoring/monitoring.do',
+		data : {
+			'method' : 'initializeLesson',
+			'learningDesignID' : ldNode.data.learningDesignId,
+			'copyType' : 3,
+			'lessonName' : LABEL_PREVIEW_LESSON_DEFAULT_TITLE
+		},
+		cache : false,
+		dataType : 'text',
+		success : function(lessonID) {
+			if (!lessonID) {
+				alert(LABELS.PREVIEW_ERROR);
+				$('body').css('cursor', 'auto');
+				return;
+			}
+			
+			$.ajax({
+				url : LAMS_URL + 'monitoring/monitoring.do',
+				data : {
+					'method' : 'startPreviewLesson',
+					'lessonID' : lessonID
+				},
+				cache : false,
+				dataType : 'text',
+				success : function() {
+					$('body').css('cursor', 'auto');
+					// open preview pop up window
+					window.open(LAMS_URL + 'home.do?method=learner&mode=preview&lessonID='+lessonID,'Preview',
+								'width=1280,height=720,resizable,status=yes');
+				}
+			});
+
+		}
+	});
+}
+
 // ********** LESSON TAB FUNCTIONS **********
 
 function loadLearningDesignSVG(ldId) {

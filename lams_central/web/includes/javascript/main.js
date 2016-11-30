@@ -310,7 +310,7 @@ function showAddLessonDialog(orgID) {
 		'data' : {
 			'orgID' : orgID
 		},
-		'height': Math.max(380, Math.min(740, $(window).height() - 30)),
+		'height': Math.max(380, Math.min(700, $(window).height() - 30)),
 		'width' : Math.max(380, Math.min(850, $(window).width() - 60)),
 		'title' : LABELS.ADD_LESSON_TITLE,
 		'open' : function() {
