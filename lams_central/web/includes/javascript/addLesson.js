@@ -315,7 +315,10 @@ function addLesson(){
 }
 
 function previewLesson(){
-	var ldNode = tree.getHighlightedNode();
+	var ldNode = tree.getHighlightedNode(),
+	popupWidth = 1280,
+	popupHeight = 720;
+
 	if (!ldNode || !ldNode.data.learningDesignId) {
 		$('#ldNotChosenError').show();
 		doSelectTab(1);
@@ -352,7 +355,7 @@ function previewLesson(){
 					$('body').css('cursor', 'auto');
 					// open preview pop up window
 					window.open(LAMS_URL + 'home.do?method=learner&mode=preview&lessonID='+lessonID,'Preview',
-								'width=1280,height=720,resizable,status=yes');
+								'width=' + popupWidth + ',height=' + popupHeight + ',resizable,status=yes');
 				}
 			});
 
