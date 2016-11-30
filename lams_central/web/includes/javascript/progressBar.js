@@ -45,19 +45,32 @@ var lessonId = lessonId || null,
 	},
 
 	isPreview = false,
-	controlFramePadding = 0;
+	controlFramePadding = 0,
+
+	// popup window size
+	popupWidth = 1280,
+	popupHeight = 720;
 
 // ----- CONTROL FRAME & WINDOW MANIPULATION -----
 
 // generic function for opening a pop up
 function openPopUp(url, title, h, w, status, forceNewWindow) {
+
+	var width = screen.width;
+	var height = screen.height;
+
+	var left = ((width / 2) - (w / 2));
+	var top = ((height / 2) - (h / 2));
+
 	if (forceNewWindow) {
 		// opens a new window rather than loading content to existing one
 		title += new Date().getTime();
 	}
+
 	window.open(url, title, "HEIGHT=" + h + ",WIDTH=" + w
 			+ ",resizable=yes,scrollbars=yes,status=" + status
-			+ ",menubar=no, toolbar=no");
+			+ ",menubar=no, toolbar=no"
+			+ ",top=" + top + ",left=" + left);
 }
 
 // just a short cut to openPopUp function
@@ -67,8 +80,8 @@ function openActivity(url) {
 		if (!dialog.hasClass('ui-dialog')) {
 			dialog.dialog({
 				'autoOpen' : false,
-				'height' : 600,
-				'width' : 800,
+				'height' : popupHeight,
+				'width' : popupWidth,
 				'modal' : true,
 				'resizable' : false,
 				'hide' : 'fold',
@@ -89,7 +102,7 @@ function openActivity(url) {
 		
 		dialog.dialog('open');
 	} else {
-		openPopUp(url, "LearnerActivity", 600, 800, "yes");
+		openPopUp(url, "LearnerActivity", popupHeight, popupWidth, "yes");
 	}
 }
 
