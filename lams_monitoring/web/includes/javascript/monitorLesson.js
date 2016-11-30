@@ -30,7 +30,10 @@ var originalSequenceCanvas = null,
 // double tap support
 	tapTimeout = 500,
 	lastTapTime = 0,
-	lastTapTarget = null;
+	lastTapTarget = null
+// popup window size
+	popupWidth = 1280,
+	popupHeight = 720;
 
 
 //********** LESSON TAB FUNCTIONS **********
@@ -506,7 +509,7 @@ function initSequenceTab(){
 			selectedLearner = $('.dialogList div.dialogListItemSelected', dialog);
 		if (selectedLearner.length == 1) {
 			// open pop up with user progress in the given activity
-			openPopUp(selectedLearner.attr('viewUrl'), "LearnActivity", 600, 800, true);
+			openPopUp(selectedLearner.attr('viewUrl'), "LearnActivity", popupHeight, popupWidth, true);
 		}
 	});
 	
@@ -789,7 +792,7 @@ function updateSequenceTab() {
 					activityGroup.css('cursor', 'pointer');
 					dblTap(activityGroup, function(){  
 						// double click on activity shape to open Monitoring for this activity
-						openPopUp(LAMS_URL + activity.url, "MonitorActivity", 720, 900, true, true);
+						openPopUp(LAMS_URL + activity.url, "MonitorActivity", popupHeight, popupWidth, true, true);
 					});
 				}
 			});	
@@ -1116,7 +1119,7 @@ function addActivityIconsHandlers(activity) {
 					event.stopPropagation();
 					var url = LAMS_URL + 'monitoring/monitoring.do?method=getLearnerActivityURL&userID=' 
 						               + learner.id + '&activityID=' + activity.id + '&lessonID=' + lessonId;
-					openPopUp(url, "LearnActivity", 600, 800, true);
+					openPopUp(url, "LearnActivity", popupHeight, popupWidth, true);
 				});
 			}
 			
@@ -1910,7 +1913,7 @@ function showLearnerGroupDialog(ajaxProperties, dialogTitle, allowSearch, allowF
 				if (allowView){
 					dblTap(learnerDiv, function(){
 						// same as clicking View Learner button
-						openPopUp(viewUrl, "LearnActivity", 600, 800, true);
+						openPopUp(viewUrl, "LearnActivity", popupHeight, popupWidth, true);
 					});
 				}
 			}
