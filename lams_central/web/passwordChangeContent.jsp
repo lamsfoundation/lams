@@ -97,7 +97,7 @@
 </lams:head>
 
 <body>
-<html:form styleId="change-password" action="/passwordChanged" method="post">
+<form name="PasswordChangeActionForm" id="change-password" method="post" action="/lams/passwordChanged.do">
 	<div style="clear: both"></div>
 	<div class="container">
 		<div class="row vertical-center-row">
@@ -166,6 +166,6 @@
 			</div>
 		</div>
 	</div>
-</html:form>
+</form>
 </body>
 </lams:html>

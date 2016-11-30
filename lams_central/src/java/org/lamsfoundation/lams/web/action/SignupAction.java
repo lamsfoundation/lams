@@ -220,12 +220,16 @@ public class SignupAction extends Action {
 	    String login = signupForm.getString("usernameTab2");
 	    String password = signupForm.getString("passwordTab2");
 	    User user = SignupAction.signupService.getUserByLogin(login);
-	    String passwordHash = user.getPassword().length() == HashUtil.SHA1_HEX_LENGTH ? HashUtil.sha1(password)
-		    : HashUtil.sha256(password, user.getSalt());
-
-	    if ((user == null) || !user.getPassword().equals(passwordHash)) {
+	    if ( user == null ) {
 		errors.add("usernameTab2", new ActionMessage("error.login.or.password.incorrect",
 			"<a onclick='selectSignupTab();' id='selectLoginTabA'>", "</a>"));
+	    } else {
+		String passwordHash = user.getPassword().length() == HashUtil.SHA1_HEX_LENGTH ? HashUtil.sha1(password)
+		    : HashUtil.sha256(password, user.getSalt());
+		if (!user.getPassword().equals(passwordHash)) {
+		    errors.add("usernameTab2", new ActionMessage("error.login.or.password.incorrect",
+			"<a onclick='selectSignupTab();' id='selectLoginTabA'>", "</a>"));
+		}
 	    }
 	}
 
