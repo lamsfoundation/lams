@@ -89,6 +89,8 @@
 
 	});
 </script>
+
+
 <body class="stripes">
 	<form id="UserChangePassForm" action="usersave.do?method=changePass"
 		method="post">
@@ -97,7 +99,9 @@
 			<div
 				class="col-xs-12 col-sm-8 col-sm-offset-2 col-md-6 col-md-offset-3">
 				<div class="panel voffset20">
+
 					<div class="panel panel-default">
+
 						<div class="panel-heading">
 							<div class="panel-title">
 								<fmt:message key="admin.user.edit" />
@@ -105,7 +109,6 @@
 						</div>
 					</div>
 					<div class="panel-body">
-
 						<lams:Alert type="info" id="passwordConditions" close="false">
 							<fmt:message key='label.password.must.contain' />:
 				<ul class="list-unstyled" style="line-height: 1.2">
@@ -135,6 +138,14 @@
 								</c:if>
 							</ul>
 						</lams:Alert>
+						<logic:messagesPresent>
+							<lams:Alert type="danger" id="form-error" close="false">
+								<html:messages id="error">
+									<c:out value="${error}" escapeXml="false" />
+									<br />
+								</html:messages>
+							</lams:Alert>
+						</logic:messagesPresent>
 						<div>
 							<label for="login"><fmt:message key="admin.user.login" />:</label>
 							<span>${param.login}</span>

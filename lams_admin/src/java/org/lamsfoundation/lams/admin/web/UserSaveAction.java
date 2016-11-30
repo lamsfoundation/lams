@@ -21,7 +21,6 @@
  * ****************************************************************
  */
 
-
 package org.lamsfoundation.lams.admin.web;
 
 import java.util.Date;
@@ -40,15 +39,19 @@ import org.apache.struts.action.ActionMessages;
 import org.apache.struts.action.DynaActionForm;
 import org.lamsfoundation.lams.admin.AdminConstants;
 import org.lamsfoundation.lams.admin.service.AdminServiceProxy;
+import org.lamsfoundation.lams.security.ISecurityService;
 import org.lamsfoundation.lams.themes.Theme;
 import org.lamsfoundation.lams.usermanagement.AuthenticationMethod;
 import org.lamsfoundation.lams.usermanagement.SupportedLocale;
 import org.lamsfoundation.lams.usermanagement.User;
+import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
 import org.lamsfoundation.lams.util.HashUtil;
 import org.lamsfoundation.lams.util.ValidationUtil;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.action.LamsDispatchAction;
+import org.lamsfoundation.lams.web.session.SessionManager;
+import org.lamsfoundation.lams.web.util.AttributeNames;
 
 /**
  * @author Jun-Dir Liew
@@ -66,22 +69,29 @@ import org.lamsfoundation.lams.web.action.LamsDispatchAction;
  *
  *
  */
+
 public class UserSaveAction extends LamsDispatchAction {
 
     private static Logger log = Logger.getLogger(UserSaveAction.class);
     private static IUserManagementService service;
 
-
     public ActionForward saveUserDetails(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) throws Exception {
-	
-	UserSaveAction.service = AdminServiceProxy.getService(getServlet().getServletContext());
 
+	UserSaveAction.service = AdminServiceProxy.getService(getServlet().getServletContext());
 	// action input
 	ActionMessages errors = new ActionMessages();
 	DynaActionForm userForm = (DynaActionForm) form;
 	Integer orgId = (Integer) userForm.get("orgId");
 	Integer userId = (Integer) userForm.get("userId");
+	ISecurityService securityService = AdminServiceProxy.getSecurityService(getServlet().getServletContext());
+	Integer loggeduserId = ((UserDTO) SessionManager.getSession().getAttribute(AttributeNames.USER)).getUserID();
+
+	// check if logged in User is Sysadmin
+	if (!securityService.isSysadmin(loggeduserId, "Edit User Details " + userId, true)) {
+	    response.sendError(HttpServletResponse.SC_FORBIDDEN, "Only Sysadmin has edit permisions");
+	    return null;
+	}
 
 	UserSaveAction.log.debug("orgId: " + orgId);
 	Boolean edit = false;
@@ -125,7 +135,6 @@ public class UserSaveAction extends LamsDispatchAction {
 	    }
 	}
 
-	
 	//first name validation
 	String firstName = (userForm.get("firstName") == null) ? null : (String) userForm.get("firstName");
 	if (StringUtils.isBlank(firstName)) {
@@ -154,7 +163,7 @@ public class UserSaveAction extends LamsDispatchAction {
 	    if (edit) { // edit user
 		UserSaveAction.log.debug("editing userId: " + userId);
 		// hash the new password if necessary, and audit the fact
-		    userForm.set("password", user.getPassword());
+		userForm.set("password", user.getPassword());
 		BeanUtils.copyProperties(user, userForm);
 		user.setLocale(locale);
 		user.setAuthenticationMethod(authenticationMethod);
@@ -164,48 +173,52 @@ public class UserSaveAction extends LamsDispatchAction {
 
 		UserSaveAction.service.saveUser(user);
 	    } else { // create user
-		
+
 		//password validation
+		String password2 = userForm.getString("password2");
 		String password = (userForm.get("password") == null) ? null : (String) userForm.get("password");
 		if (StringUtils.isBlank(password)) {
-			errors.add("password", new ActionMessage("error.password.required"));
+		    errors.add("password", new ActionMessage("error.password.required"));
 		}
 		if (!StringUtils.equals(password, ((String) userForm.get("password2")))) {
 		    errors.add("password", new ActionMessage("error.newpassword.mismatch"));
 		}
-		
-		if (errors.isEmpty()){
-		user = new User();
-		String salt = HashUtil.salt();
-		String passwordHash = HashUtil.sha256((String) userForm.get("password"), salt);
-		BeanUtils.copyProperties(user, userForm);
-		user.setSalt(salt);
-		user.setPassword(passwordHash);
-		UserSaveAction.log.debug("creating user... new login: " + user.getLogin());
-		if (errors.isEmpty()) {
-		    // TODO set theme according to user input
-		    // instead of server default.
-		    user.setTheme(UserSaveAction.service.getDefaultTheme());
-		    user.setDisabledFlag(false);
-		    user.setCreateDate(new Date());
-		    user.setAuthenticationMethod((AuthenticationMethod) UserSaveAction.service
-			    .findByProperty(AuthenticationMethod.class, "authenticationMethodName", "LAMS-Database")
-			    .get(0));
-		    user.setUserId(null);
-		    user.setLocale(locale);
-
-		    Theme theme = (Theme) UserSaveAction.service.findById(Theme.class,
-			    (Long) userForm.get("userTheme"));
-		    user.setTheme(theme);
-
-		    UserSaveAction.service.saveUser(user);
-
-		    // make 'create user' audit log entry
-		    UserSaveAction.service.auditUserCreated(user, AdminConstants.MODULE_NAME);
-
-		    UserSaveAction.log.debug("user: " + user.toString());
+		if (!ValidationUtil.isPasswordValueValid(password, password2)) {
+		    errors.add("password", new ActionMessage("error.newpassword.mismatch"));
 		}
-	    }
+
+		if (errors.isEmpty()) {
+		    user = new User();
+		    String salt = HashUtil.salt();
+		    String passwordHash = HashUtil.sha256((String) userForm.get("password"), salt);
+		    BeanUtils.copyProperties(user, userForm);
+		    user.setSalt(salt);
+		    user.setPassword(passwordHash);
+		    UserSaveAction.log.debug("creating user... new login: " + user.getLogin());
+		    if (errors.isEmpty()) {
+			// TODO set theme according to user input
+			// instead of server default.
+			user.setTheme(UserSaveAction.service.getDefaultTheme());
+			user.setDisabledFlag(false);
+			user.setCreateDate(new Date());
+			user.setAuthenticationMethod((AuthenticationMethod) UserSaveAction.service
+				.findByProperty(AuthenticationMethod.class, "authenticationMethodName", "LAMS-Database")
+				.get(0));
+			user.setUserId(null);
+			user.setLocale(locale);
+
+			Theme theme = (Theme) UserSaveAction.service.findById(Theme.class,
+				(Long) userForm.get("userTheme"));
+			user.setTheme(theme);
+
+			UserSaveAction.service.saveUser(user);
+
+			// make 'create user' audit log entry
+			UserSaveAction.service.auditUserCreated(user, AdminConstants.MODULE_NAME);
+
+			UserSaveAction.log.debug("user: " + user.toString());
+		    }
+		}
 	    }
 	}
 
@@ -227,37 +240,48 @@ public class UserSaveAction extends LamsDispatchAction {
 	    return mapping.findForward("user");
 	}
     }
-    
-    
+
     public ActionForward changePass(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) throws Exception {
 	UserSaveAction.service = AdminServiceProxy.getService(getServlet().getServletContext());
 	ActionMessages errors = new ActionMessages();
-	
-	
 	Integer userId = WebUtil.readIntParam(request, "userId", true);
+	ISecurityService securityService = AdminServiceProxy.getSecurityService(getServlet().getServletContext());
+	Integer loggeduserId = ((UserDTO) SessionManager.getSession().getAttribute(AttributeNames.USER)).getUserID();
+
+	// check if logged in User is Sysadmin
+	if (!securityService.isSysadmin(loggeduserId, "Change Password of User " + userId, true)) {
+	    response.sendError(HttpServletResponse.SC_FORBIDDEN, "Only Sysadmin has edit permisions");
+	    return null;
+	}
+
 	String password = WebUtil.readStrParam(request, "password");
 	String password2 = WebUtil.readStrParam(request, "password2");
-	
-	
+
 	//password validation
 	if (StringUtils.isBlank(password)) {
-		errors.add("password", new ActionMessage("error.password.required"));
+	    errors.add("password", new ActionMessage("error.password.required"));
 	}
-		if (!StringUtils.equals(password,password2)) {
-		    errors.add("password", new ActionMessage("error.newpassword.mismatch"));
-		}
-		 User user = (User) UserSaveAction.service.findById(User.class, userId);
-		 String salt = HashUtil.salt();
-		String passwordHash = HashUtil.sha256(password, salt);
-		user.setSalt(salt);
-		user.setPassword(passwordHash);
-		UserSaveAction.service.saveUser(user);
-	return mapping.findForward("userChangePass");
+
+	if (!StringUtils.equals(password, password2)) {
+	    errors.add("password", new ActionMessage("error.newpassword.mismatch"));
+	}
+	if (!ValidationUtil.isPasswordValueValid(password, password2)) {
+	    errors.add("password", new ActionMessage("label.password.restrictions"));
+	}
+
+	if (errors.isEmpty()) {
+	    User user = (User) UserSaveAction.service.findById(User.class, userId);
+	    String salt = HashUtil.salt();
+	    String passwordHash = HashUtil.sha256(password, salt);
+	    user.setSalt(salt);
+	    user.setPassword(passwordHash);
+	    UserSaveAction.service.saveUser(user);
+	    return mapping.findForward("userChangePass");
+	}
+	saveErrors(request, errors);
+	return mapping.findForward("errorPass");
+
     }
-    
-    
-    
-    
 
 }

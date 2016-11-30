@@ -335,6 +335,12 @@
         redirect="false"
       />
       <forward
+        name="errorPass"
+         path="/userChangePass.jsp"
+        redirect="false"
+      />
+      
+      <forward
         name="userlist"
         path="/usermanage.do"
         redirect="false"
