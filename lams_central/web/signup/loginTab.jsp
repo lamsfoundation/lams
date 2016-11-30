@@ -1,5 +1,7 @@
 	<div>
-		<html:form action="/signup/signup.do" method="post">
+	signupOrganisation ${signupOrganisation}
+		<form id="SignupForm" name="SignupForm" action="/lams/signup/signup.do" method="post" autocomplete="off" >
+ 		<c:set var="org.apache.struts.taglib.html.BEAN"  value="${SignupForm}" />
 			<html:hidden property="method" value="login" />
 			<html:hidden property="submitted" value="1" />
 			<html:hidden property="context" value="${signupOrganisation.context}" />
@@ -28,5 +30,5 @@
 				</tr>
 			</table>
 		
-		</html:form>
+		</form>
 	</div>
