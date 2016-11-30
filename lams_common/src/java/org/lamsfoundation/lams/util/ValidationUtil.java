@@ -20,7 +20,6 @@
  * ****************************************************************
  */
 
-
 package org.lamsfoundation.lams.util;
 
 import java.util.regex.Matcher;
@@ -41,6 +40,18 @@ public class ValidationUtil {
 	    .compile("^[_A-Za-z0-9-\\+']+(\\.[_A-Za-z0-9-']+)*@[A-Za-z0-9-]+(\\.[A-Za-z0-9]+)*(\\.[A-Za-z]{2,})$");
 
     private final static Pattern REGEX_ORGANISATION_NAME = Pattern.compile("^[^<>^*@%$]*$");
+
+    private final static Pattern REGEX_PASSWORD_UPPER_CASE = Pattern.compile("[A-Z]");
+
+    private final static Pattern REGEX_PASSWORD_LOWER_CASE = Pattern.compile("[a-z]");
+
+    private final static Pattern REGEX_PASSWORD_NUMERICS = Pattern.compile("\\d");
+
+    private final static Pattern REGEX_PASSWORD_SYMBOLS = Pattern
+	    .compile("[`~!@#$%^&*\\(\\)_\\-+={}\\[\\]\\\\|:\\;\\\"\\'\\<\\>,.?\\/]");
+
+    private final static Pattern REGEX_PASSWORD_CHARATERS_ALLOWED = Pattern
+	    .compile("^[A-Za-z0-9\\d`~!@#$%^&*\\(\\)_\\-+={}\\[\\]\\\\|:\\;\\\"\\'\\<\\>,.?\\/]*$");
 
     /**
      * Checks whether supplied username is valid. Username can only contain alphanumeric characters and no spaces.
@@ -67,6 +78,64 @@ public class ValidationUtil {
 	if (isValidationRequired) {
 	    return ValidationUtil.isRegexMatches(ValidationUtil.REGEX_FIRST_LAST_NAME, name);
 	}
+	return true;
+    }
+
+    public static boolean isPasswordValueValid(String password, String password2) {
+
+	if (password == null || password2 == null || !password.equals(password2)) {
+	    return false;
+	}
+
+	boolean isCharactersAllowed = ValidationUtil.isRegexMatches(ValidationUtil.REGEX_PASSWORD_CHARATERS_ALLOWED,
+		password);
+	if (!isCharactersAllowed) {
+	    return false;
+	}
+
+	int isValidationRequiredMinLength = Configuration
+		.getAsInt(ConfigurationKeys.PASSWORD_POLICY_MINIMUM_CHARACTERS);
+	if (password.length() < isValidationRequiredMinLength) {
+	    return false;
+	}
+
+	boolean isValidationRequiredSymbols = Configuration.getAsBoolean(ConfigurationKeys.PASSWORD_POLICY_SYMBOLS);
+
+	if (isValidationRequiredSymbols) {
+
+	    boolean isSymbols = ValidationUtil.isRegexFound(ValidationUtil.REGEX_PASSWORD_SYMBOLS, password);
+	    if (!isSymbols) {
+		return false;
+	    }
+	}
+
+	boolean isValidationRequiredNumerics = Configuration.getAsBoolean(ConfigurationKeys.PASSWORD_POLICY_NUMERICS);
+	if (isValidationRequiredNumerics) {
+
+	    boolean isNumerics = ValidationUtil.isRegexFound(ValidationUtil.REGEX_PASSWORD_NUMERICS, password);
+	    if (!isNumerics) {
+		return false;
+	    }
+	}
+
+	boolean isValidationRequiredLowerCase = Configuration.getAsBoolean(ConfigurationKeys.PASSWORD_POLICY_LOWERCASE);
+	if (isValidationRequiredLowerCase) {
+	    boolean isLowerCase = ValidationUtil.isRegexFound(ValidationUtil.REGEX_PASSWORD_LOWER_CASE, password);
+	    if (!isLowerCase) {
+		return false;
+	    }
+
+	}
+
+	boolean isValidationRequiredUpperCase = Configuration.getAsBoolean(ConfigurationKeys.PASSWORD_POLICY_UPPERCASE);
+	if (isValidationRequiredUpperCase) {
+	    boolean isUpperCase = ValidationUtil.isRegexFound(ValidationUtil.REGEX_PASSWORD_UPPER_CASE, password);
+	    if (!isUpperCase) {
+		return false;
+	    }
+
+	}
+
 	return true;
     }
 
@@ -114,6 +183,15 @@ public class ValidationUtil {
 
 	Matcher m = pattern.matcher(input.trim());
 	return m.matches();
+    }
+
+    private static boolean isRegexFound(Pattern pattern, String input) {
+	if (input == null) {
+	    return true;
+	}
+
+	Matcher m = pattern.matcher(input.trim());
+	return m.find();
     }
 
     /**
