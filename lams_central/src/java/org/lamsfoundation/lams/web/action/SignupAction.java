@@ -43,11 +43,11 @@ public class SignupAction extends Action {
 	DynaActionForm signupForm = (DynaActionForm) form;
 	String method = WebUtil.readStrParam(request, "method", true);
 	String context = WebUtil.readStrParam(request, "context", true);
-	    SignupOrganisation signupOrganisation = null;
-	    if (StringUtils.isNotBlank(context)) {
-		signupOrganisation = SignupAction.signupService.getSignupOrganisation(context);
-		request.setAttribute("signupOrganisation", signupOrganisation);
-	    }
+	SignupOrganisation signupOrganisation = null;
+	if (StringUtils.isNotBlank(context)) {
+	    signupOrganisation = SignupAction.signupService.getSignupOrganisation(context);
+	    request.setAttribute("signupOrganisation", signupOrganisation);
+	}
 	if ((signupForm.get("submitted") == null) || !((Boolean) signupForm.get("submitted"))) {
 	    if (signupOrganisation == null) {
 		request.setAttribute("messageKey", "no.such.signup.page.exist");
@@ -69,7 +69,7 @@ public class SignupAction extends Action {
 	try {
 
 	    DynaActionForm signupForm = (DynaActionForm) form;
-	    
+
 	    // validation
 	    ActionMessages errors = validateSignup(signupForm);
 	    if (!errors.isEmpty()) {
@@ -183,6 +183,9 @@ public class SignupAction extends Action {
 	    errors.add("password", new ActionMessage("error.password.blank"));
 	} else if (!StringUtils.equals(signupForm.getString("password"), signupForm.getString("confirmPassword"))) {
 	    errors.add("password", new ActionMessage("error.passwords.unequal"));
+	} else if (!ValidationUtil.isPasswordValueValid(signupForm.getString("password"),
+		signupForm.getString("confirmPassword"))) {
+	    errors.add("password", new ActionMessage("label.password.restrictions"));
 	}
 
 	//user email validation
@@ -220,15 +223,15 @@ public class SignupAction extends Action {
 	    String login = signupForm.getString("usernameTab2");
 	    String password = signupForm.getString("passwordTab2");
 	    User user = SignupAction.signupService.getUserByLogin(login);
-	    if ( user == null ) {
+	    if (user == null) {
 		errors.add("usernameTab2", new ActionMessage("error.login.or.password.incorrect",
 			"<a onclick='selectSignupTab();' id='selectLoginTabA'>", "</a>"));
 	    } else {
 		String passwordHash = user.getPassword().length() == HashUtil.SHA1_HEX_LENGTH ? HashUtil.sha1(password)
-		    : HashUtil.sha256(password, user.getSalt());
+			: HashUtil.sha256(password, user.getSalt());
 		if (!user.getPassword().equals(passwordHash)) {
 		    errors.add("usernameTab2", new ActionMessage("error.login.or.password.incorrect",
-			"<a onclick='selectSignupTab();' id='selectLoginTabA'>", "</a>"));
+			    "<a onclick='selectSignupTab();' id='selectLoginTabA'>", "</a>"));
 		}
 	    }
 	}
