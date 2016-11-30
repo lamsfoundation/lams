@@ -5,8 +5,7 @@
 <%@ taglib uri="tags-bean" prefix="bean" %>
 <%@ taglib uri="tags-fmt" prefix="fmt" %>
 
-<html:form action="/passwordChanged" method="post">
-
+<form name="PasswordChangeActionForm" id="change-password" method="post" action="/lams/passwordChanged.do">
 
 <div style="clear:both"></div>
 
@@ -71,5 +70,5 @@
 				</tr>
 			</table>
 
-</html:form>
+</form>
 			
