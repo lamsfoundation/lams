@@ -42,8 +42,10 @@
 			LABEL_MISSING_LEARNERS = '<fmt:message key="error.tab.class.learners" />',
 			LABEL_MISSING_MONITORS = '<fmt:message key="error.tab.class.monitors" />',
 			LABEL_RUN_SEQUENCES_FOLDER = '<fmt:message key="label.tab.lesson.sequence.folder" />',
-			LABEL_NAME_INVALID_CHARACTERS = '<fmt:message key="error.lessonname.invalid.characters" />';
-				
+			LABEL_NAME_INVALID_CHARACTERS = '<fmt:message key="error.lessonname.invalid.characters" />',
+			LABEL_PREVIEW_LESSON_DEFAULT_TITLE = '<fmt:message key="authoring.fla.preview.lesson.default.title" />',
+			LABEL_PREVIEW_ERROR = '<fmt:message key="authoring.fla.preview.error" />';
+			
  		$(document).ready(function(){
 			initLessonTab();
 			initClassTab();
@@ -291,6 +293,9 @@
 
 <hr class="separator" />
 <div class="container-fluid">
+	<button id="previewButton" class="btn btn-default" href="#" onClick="javascript:previewLesson()"><i class="fa fa-search-plus"></i>
+		<fmt:message key="authoring.fla.page.menu.preview" />
+	</button>
 	<div class="pull-right">
 		<button id="addButton" class="btn btn-primary" href="#" onClick="javascript:addLesson()"><i class="fa fa-plus"></i> 
 			<fmt:message key="button.add.now" />
