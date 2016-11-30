@@ -5,7 +5,7 @@
 <%@ taglib uri="tags-bean" prefix="bean" %>
 <%@ taglib uri="tags-fmt" prefix="fmt" %>
 
-<form name="PasswordChangeActionForm" id="change-password" method="post" action="/lams/passwordChanged.do">
+<form name="PasswordChangeActionForm" id="change-password" method="post" action="/lams/passwordChanged.do"  autocomplete="off" >
 
 <div style="clear:both"></div>
 
