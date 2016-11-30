@@ -145,8 +145,10 @@
 	});
 </script>
 <div>
-	<html:form styleId="SignupForm" action="/signup/signup.do"
-		method="post">
+
+	<form id="SignupForm" name="SignupForm" method="post" action="/lams/signup/signup.do" novalidate="novalidate"  autocomplete="off">
+		<c:set var="org.apache.struts.taglib.html.BEAN"  value="${SignupForm}" />
+	
 		<html:hidden property="method" value="register" />
 		<html:hidden property="submitted" value="1" />
 		<html:hidden property="context" value="${signupOrganisation.context}" />
@@ -270,5 +272,5 @@
 				</div>
 			</div>
 		</div>
-	</html:form>
+	</form>
 </div>
