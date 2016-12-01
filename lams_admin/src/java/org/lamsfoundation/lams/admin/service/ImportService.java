@@ -20,7 +20,6 @@
  * ****************************************************************
  */
 
-
 package org.lamsfoundation.lams.admin.service;
 
 import java.io.IOException;
@@ -242,7 +241,7 @@ public class ImportService implements IImportService {
 	Organisation org = new Organisation();
 	String[] args = new String[1];
 
-	String name = StringUtils.substring(parseStringCell(row.getCell(ImportService.NAME)),0,240);
+	String name = StringUtils.substring(parseStringCell(row.getCell(ImportService.NAME)), 0, 240);
 
 	//validate organisation name
 	if (StringUtils.isBlank(name)) {
@@ -517,6 +516,11 @@ public class ImportService implements IImportService {
 	// password validation
 	if (StringUtils.isBlank(password)) {
 	    rowResult.add(messageService.getMessage("error.password.required"));
+	    hasError = true;
+	    return null;
+	}
+	if (!ValidationUtil.isPasswordValueValid(password, password)) {
+	    rowResult.add(messageService.getMessage("label.password.restrictions"));
 	    hasError = true;
 	    return null;
 	}
