@@ -293,7 +293,7 @@ public class UniversalLoginModule implements LoginModule {
 	}
 
 	// check for internal authentication made by LoginRequestServlet or LoginAsAction
-	if (inputPassword.startsWith("#")) {
+	if (inputPassword.startsWith("#LAMS")) {
 	    if (UniversalLoginModule.log.isDebugEnabled()) {
 		UniversalLoginModule.log.debug("Authenticating internally user: " + userName);
 	    }

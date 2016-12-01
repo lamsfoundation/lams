@@ -97,6 +97,13 @@
 							</div>
 						</div>
 						</c:if>
+						<c:if test="${!empty param.lockedOut}">
+						<div class="panel panel-danger">
+							<div class="panel-heading">
+								<fmt:message key="error.lockedOut" />
+							</div>
+						</div>
+						</c:if>
 
 						<form action="/lams/j_security_check" method="POST" name="loginForm" role="form" class="form-horizontal" id="loginForm" autocomplete="off">
 						  <input type="hidden" name="redirectURL" value='<c:out value="${param.redirectURL}" escapeXml="true" />' />
