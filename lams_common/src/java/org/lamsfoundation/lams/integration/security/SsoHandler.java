@@ -31,13 +31,13 @@ import javax.servlet.http.HttpSession;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.math.NumberUtils;
-import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
 import org.lamsfoundation.lams.usermanagement.service.UserManagementService;
 import org.lamsfoundation.lams.util.Configuration;
 import org.lamsfoundation.lams.util.ConfigurationKeys;
+import org.lamsfoundation.lams.util.audit.IAuditService;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.springframework.web.context.WebApplicationContext;
@@ -59,7 +59,7 @@ import io.undertow.servlet.spec.HttpSessionImpl;
  *
  */
 public class SsoHandler implements ServletExtension {
-    private static Logger log = Logger.getLogger(SsoHandler.class);
+    private static IAuditService auditService = null;
     private static IUserManagementService userManagementService = null;
 
     protected static final String SESSION_KEY = "io.undertow.servlet.form.auth.redirect.location";
@@ -106,16 +106,13 @@ public class SsoHandler implements ServletExtension {
 		    response.sendRedirect("/lams/login.jsp?failed=true");
 		    return;
 		}
+		UserDTO userDTO = user.getUserDTO();
 		String password = request.getParameter("j_password");
 		if (user.getLockOutTime() != null && user.getLockOutTime().getTime() > System.currentTimeMillis()
 			&& password != null && !password.startsWith("#LAMS")) {
 		    response.sendRedirect("/lams/login.jsp?lockedOut=true");
-		    log.debug(user.getFirstName() + " is logged out for " + Configuration.getAsInt(ConfigurationKeys.LOCK_OUT_TIME)
-			    + " mins after " + Configuration.getAsInt(ConfigurationKeys.FAILED_ATTEMPTS)
-			    + " failed attempts.");
 		    return;
 		}
-		UserDTO userDTO = user.getUserDTO();
 
 		// LoginRequestServlet (integrations) and LoginAsAction (sysadmin) set this parameter
 		String redirectURL = request.getParameter("redirectURL");
@@ -199,6 +196,9 @@ public class SsoHandler implements ServletExtension {
 			Long currentTimeMillis = System.currentTimeMillis();
 			Date date = new Date(currentTimeMillis + lockOutTimeMillis);
 			user.setLockOutTime(date);
+			getAuditService(session.getServletContext()).log(userDTO, "sso",
+				"User is locked out for " + Configuration.getAsInt(ConfigurationKeys.LOCK_OUT_TIME)
+					+ " mins after " + failedAttempts + " failed attempts.");
 		    }
 		    getUserManagementService(session.getServletContext()).save(user);
 		}
@@ -267,5 +267,13 @@ public class SsoHandler implements ServletExtension {
 	    SsoHandler.userManagementService = (UserManagementService) ctx.getBean("userManagementService");
 	}
 	return SsoHandler.userManagementService;
+    }
+
+    protected IAuditService getAuditService(ServletContext context) {
+	if (SsoHandler.auditService == null) {
+	    WebApplicationContext ctx = WebApplicationContextUtils.getWebApplicationContext(context);
+	    SsoHandler.auditService = (IAuditService) ctx.getBean("auditService");
+	}
+	return SsoHandler.auditService;
     }
 }
