@@ -130,7 +130,9 @@ public class UserManagementService implements IUserManagementService {
 	    }
 	    // LDEV-1356 modification date
 	    user.setModifiedDate(new Date());
+	    baseDAO.insertOrUpdate(user);
 	}
+
 	return user;
     }
 
