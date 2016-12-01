@@ -725,8 +725,7 @@ ActivityLib = {
 			// set all the handlers
 			activity.items.attr('cursor', 'pointer')
 						  .mousedown(HandlerActivityLib.activityMousedownHandler)
-						  .click(HandlerLib.itemClickHandler)
-	  		      		  .dblclick(HandlerActivityLib.activityDblclickHandler);
+	  		      		  .click(HandlerActivityLib.activityClickHandler);
 			
 			if (activity instanceof ActivityDefs.BranchingEdgeActivity
 					&& activity.branchingActivity.end) {

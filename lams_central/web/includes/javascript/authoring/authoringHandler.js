@@ -249,17 +249,35 @@ var HandlerLib = {
  * Contains handlers for actions over Activities.
  */
 HandlerActivityLib = {
+	// double tap support
+	tapTimeout : 500,
+	lastTapTime : 0,
+	lastTapTarget : null,
 		
 	/**
 	 * Double click opens activity authoring.
 	 */
-	activityDblclickHandler : function(event) {
-		var activity = ActivityLib.getParentObject(this);
-		if (activity.readOnly) {
-			alert(LABELS.LIVEEDIT_READONLY_ACTIVITY_ERROR);
-		} else {
-			ActivityLib.openActivityAuthoring(activity);
+	activityClickHandler : function(event) {
+		var activity = ActivityLib.getParentObject(this),
+			currentTime = new Date().getTime();
+		// is the second click on the same activity as the first one?
+		if (activity == HandlerActivityLib.lastTapTarget) {
+			// was the second click quick enough after the first one?
+			var tapLength = currentTime - HandlerActivityLib.lastTapTime;
+			if (tapLength < HandlerActivityLib.tapTimeout && tapLength > 0) {
+				event.preventDefault();
+				if (activity.readOnly) {
+					alert(LABELS.LIVEEDIT_READONLY_ACTIVITY_ERROR);
+				} else {
+					ActivityLib.openActivityAuthoring(activity);
+				}
+				return;
+			}
 		}
+		HandlerActivityLib.lastTapTime = currentTime;
+		HandlerActivityLib.lastTapTarget = activity;
+		// single click
+		HandlerLib.itemClickHandler.call(this, event);
 	},
 	
 	
