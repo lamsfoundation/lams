@@ -100,7 +100,7 @@
 						<c:if test="${!empty param.lockedOut}">
 						<div class="panel panel-danger">
 							<div class="panel-heading">
-								<fmt:message key="error.lockedOut" />
+								<fmt:message key="error.locked.out" />
 							</div>
 						</div>
 						</c:if>
