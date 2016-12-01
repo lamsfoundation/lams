@@ -75,7 +75,7 @@ public class LoginAsAction extends Action {
 
 		    // login.jsp knows what to do with these
 		    request.setAttribute("login", login);
-		    String token = "#" + RandomPasswordGenerator.nextPassword(10);
+		    String token = "#LAMS" + RandomPasswordGenerator.nextPassword(10);
 		    request.setAttribute("password", token);
 		    // notify the login module that the user has been authenticated correctly
 		    UniversalLoginModule.setAuthenticationToken(token);

@@ -21,6 +21,7 @@
 package org.lamsfoundation.lams.integration.security;
 
 import java.security.AccessController;
+import java.util.Date;
 
 import javax.servlet.ServletContext;
 import javax.servlet.http.Cookie;
@@ -30,10 +31,13 @@ import javax.servlet.http.HttpSession;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.math.NumberUtils;
+import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
 import org.lamsfoundation.lams.usermanagement.service.UserManagementService;
+import org.lamsfoundation.lams.util.Configuration;
+import org.lamsfoundation.lams.util.ConfigurationKeys;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.springframework.web.context.WebApplicationContext;
@@ -55,6 +59,7 @@ import io.undertow.servlet.spec.HttpSessionImpl;
  *
  */
 public class SsoHandler implements ServletExtension {
+    private static Logger log = Logger.getLogger(SsoHandler.class);
     private static IUserManagementService userManagementService = null;
 
     protected static final String SESSION_KEY = "io.undertow.servlet.form.auth.redirect.location";
@@ -72,6 +77,7 @@ public class SsoHandler implements ServletExtension {
 	    // just forward all requests except one for logging in
 	    return Handlers.path().addPrefixPath("/", handler).addExactPath("/j_security_check", exchange -> {
 		ServletRequestContext context = exchange.getAttachment(ServletRequestContext.ATTACHMENT_KEY);
+		HttpServletResponse response = (HttpServletResponse) context.getServletResponse();
 		HttpServletRequest request = (HttpServletRequest) context.getServletRequest();
 
 		// initialise jvmRoute for runtime statistics servlet
@@ -82,60 +88,73 @@ public class SsoHandler implements ServletExtension {
 		// recreate session here in case it was invalidated in login.jsp by sysadmin's LoginAs
 		HttpSession session = request.getSession();
 
-		// LoginRequestServlet (integrations) and LoginAsAction (sysadmin) set this parameter
-		String redirectURL = request.getParameter("redirectURL");
-		if (!StringUtils.isBlank(redirectURL)) {
-		    SsoHandler.handleRedirectBack(context, redirectURL);
-		}
-
 		/*
 		 * Fetch UserDTO before completing request so putting it later in session is done ASAP
 		 * Response is sent in another thread and if UserDTO is not present in session when browser completes
 		 * redirect,
 		 * it results in error. Winning this race is the easiest option.
 		 */
-		UserDTO userDTO = null;
-		String login = request.getParameter("j_username");
-		if (!StringUtils.isBlank(login)) {
-		    User user = getUserManagementService(session.getServletContext()).getUserByLogin(login);
-		    if (user != null) {
-			userDTO = user.getUserDTO();
-			
-			// if user is not yet authorized and has 2FA shared secret set up - redirect him to
-			// loginTwoFactorAuth.jsp to prompt user to enter his verification code (Time-based One-time Password)
-			if (request.getRemoteUser() == null && user.isTwoFactorAuthenticationEnabled()
-				&& user.getTwoFactorAuthenticationSecret() != null) {
-			    String verificationCodeStr = request.getParameter("verificationCode");		    
-			    int verificationCode = NumberUtils.toInt(verificationCodeStr);
-			    GoogleAuthenticator gAuth = new GoogleAuthenticator();
-			    boolean isCodeValid = gAuth.authorize(user.getTwoFactorAuthenticationSecret(),
-				    verificationCode);
 
-			    //user entered correct TOTP password
-			    if (isCodeValid) {
-				//do nothing and let regular login to happen
-				
-			    //user hasn't yet entered TOTP password (request came from login.jsp) or entered the wrong one
-			    } else {
-				session.setAttribute("login", login);
-				String password = request.getParameter("j_password");
-				session.setAttribute("password", password);
-				
-				//verificationCodeStr equals null in case request came from login.jsp
-				String redirectUrl = "/lams/loginTwoFactorAuth.jsp" + ((verificationCodeStr == null) ? "" : "?failed=true" );
-				HttpServletResponse response = (HttpServletResponse) context.getServletResponse();
-				response.sendRedirect(redirectUrl);
-				return;
-			    }
-			    
-			}
+		String login = request.getParameter("j_username");
+		User user = null;
+		if (StringUtils.isBlank(login)) {
+		    response.sendRedirect("/lams/login.jsp?failed=true");
+		    return;
+		}
+		user = getUserManagementService(session.getServletContext()).getUserByLogin(login);
+		if (user == null) {
+		    response.sendRedirect("/lams/login.jsp?failed=true");
+		    return;
+		}
+		String password = request.getParameter("j_password");
+		if (user.getLockOutTime() != null && user.getLockOutTime().getTime() > System.currentTimeMillis()
+			&& password != null && !password.startsWith("#LAMS")) {
+		    response.sendRedirect("/lams/login.jsp?lockedOut=true");
+		    log.debug(user.getFirstName() + " is logged out for " + Configuration.getAsInt(ConfigurationKeys.LOCK_OUT_TIME)
+			    + " mins after " + Configuration.getAsInt(ConfigurationKeys.FAILED_ATTEMPTS)
+			    + " failed attempts.");
+		    return;
+		}
+		UserDTO userDTO = user.getUserDTO();
+
+		// LoginRequestServlet (integrations) and LoginAsAction (sysadmin) set this parameter
+		String redirectURL = request.getParameter("redirectURL");
+		if (!StringUtils.isBlank(redirectURL)) {
+		    SsoHandler.handleRedirectBack(context, redirectURL);
+		}
+
+		// if user is not yet authorized and has 2FA shared secret set up - redirect him to
+		// loginTwoFactorAuth.jsp to prompt user to enter his verification code (Time-based One-time Password)
+		if (request.getRemoteUser() == null && user.isTwoFactorAuthenticationEnabled()
+			&& user.getTwoFactorAuthenticationSecret() != null) {
+		    String verificationCodeStr = request.getParameter("verificationCode");
+		    int verificationCode = NumberUtils.toInt(verificationCodeStr);
+		    GoogleAuthenticator gAuth = new GoogleAuthenticator();
+		    boolean isCodeValid = gAuth.authorize(user.getTwoFactorAuthenticationSecret(), verificationCode);
+
+		    //user entered correct TOTP password
+		    if (isCodeValid) {
+			//do nothing and let regular login to happen
+
+			//user hasn't yet entered TOTP password (request came from login.jsp) or entered the wrong one
+		    } else {
+			session.setAttribute("login", login);
+			session.setAttribute("password", password);
+
+			//verificationCodeStr equals null in case request came from login.jsp
+			String redirectUrl = "/lams/loginTwoFactorAuth.jsp"
+				+ ((verificationCodeStr == null) ? "" : "?failed=true");
+			response.sendRedirect(redirectUrl);
+			return;
 		    }
+
 		}
 
 		// prevent session fixation attack
 		// This will become obsolete on Undertow upgrade to version 1.1.10+
 		SessionManager.removeSessionByID(session.getId(), false);
 		request.changeSessionId();
+		session = request.getSession();
 
 		// store session so UniversalLoginModule can access it
 		SessionManager.startSession(request);
@@ -143,7 +162,7 @@ public class SsoHandler implements ServletExtension {
 		// do the logging in UniversalLoginModule or cache
 		handler.handleRequest(exchange);
 
-		if (!StringUtils.isBlank(login) && login.equals(request.getRemoteUser())) {
+		if (login.equals(request.getRemoteUser())) {
 		    session.setAttribute(AttributeNames.USER, userDTO);
 
 		    HttpSession existingSession = SessionManager.getSessionForLogin(login);
@@ -156,6 +175,32 @@ public class SsoHandler implements ServletExtension {
 		    }
 		    // register current session as the only one for the given user
 		    SessionManager.addSession(login, session);
+		    Integer failedAttempts = user.getFailedAttempts();
+		    if (failedAttempts != null && failedAttempts > 0 && password != null
+			    && !password.startsWith("#LAMS")) {
+			user.setFailedAttempts(null);
+			user.setLockOutTime(null);
+			getUserManagementService(session.getServletContext()).save(user);
+		    }
+
+		} else {
+		    Integer failedAttempts = user.getFailedAttempts();
+		    if (failedAttempts == null) {
+			failedAttempts = 1;
+		    } else {
+			failedAttempts++;
+		    }
+		    user.setFailedAttempts(failedAttempts);
+		    Integer failedAttemptsConfig = Configuration.getAsInt(ConfigurationKeys.FAILED_ATTEMPTS);
+
+		    if (failedAttempts >= failedAttemptsConfig) {
+			Integer lockOutTimeConfig = Configuration.getAsInt(ConfigurationKeys.LOCK_OUT_TIME);
+			Long lockOutTimeMillis = lockOutTimeConfig * 60L * 1000;
+			Long currentTimeMillis = System.currentTimeMillis();
+			Date date = new Date(currentTimeMillis + lockOutTimeMillis);
+			user.setLockOutTime(date);
+		    }
+		    getUserManagementService(session.getServletContext()).save(user);
 		}
 
 		SessionManager.endSession();
