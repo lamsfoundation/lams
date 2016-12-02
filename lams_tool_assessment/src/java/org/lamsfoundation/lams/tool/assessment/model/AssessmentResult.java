@@ -42,6 +42,8 @@ public class AssessmentResult {
     private Long uid;
     private Assessment assessment;
     private Date startDate;
+    //date when user has started activity (pressed start button) that has time limitation
+    private Date timeLimitLaunchedDate;
     //indicates the latest retry
     private boolean isLatest;
     private Date finishDate;
@@ -106,6 +108,19 @@ public class AssessmentResult {
     public void setStartDate(Date startDate) {
 	this.startDate = startDate;
     }
+    
+    /**
+     * @hibernate.property column="time_limit_launched_date"
+     * @return
+     */
+    public Date getTimeLimitLaunchedDate() {
+	return timeLimitLaunchedDate;
+    }
+
+    public void setTimeLimitLaunchedDate(Date timeLimitLaunchedDate) {
+	this.timeLimitLaunchedDate = timeLimitLaunchedDate;
+    }
+    
 
     /**
      * @hibernate.property column="latest"
