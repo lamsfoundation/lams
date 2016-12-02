@@ -1,18 +1,36 @@
 <!DOCTYPE html>
 <%@ include file="/common/taglibs.jsp"%>
+<%@ page import="org.lamsfoundation.lams.util.Configuration" %>
+<%@ page import="org.lamsfoundation.lams.util.ConfigurationKeys" %>
+<c:set var="UPLOAD_FILE_LARGE_MAX_SIZE"><%=Configuration.get(ConfigurationKeys.UPLOAD_FILE_LARGE_MAX_SIZE)%></c:set>
+
 <lams:html>
-	<lams:head>
+	<lams:head>		
 		<%@ include file="addheader.jsp"%>
 		<script type="text/javascript">
+		  var UPLOAD_FILE_LARGE_MAX_SIZE = '<c:out value="${UPLOAD_FILE_LARGE_MAX_SIZE}"/>';
+		  
 			$(document).ready(function(){
 				$('#title').focus();
-			});		
+			});	
+						
+			$.validator.addMethod("fileType", function(value, element) {
+				return this.optional(element) || (element.files[0].type == 'application/zip')
+			});
+			
+			$.validator.addMethod('filesize', function (value, element, param) {
+			    return this.optional(element) || (element.files[0].size <= param)
+			}, '<fmt:message key="errors.maxfilesize"><fmt:param>{0}</fmt:param></fmt:message>');
+			
 	 		$( "#resourceItemForm" ).validate({
-				errorClass: "text-danger loffset5",
+	 			ignore: [],
+				errorClass: "text-danger",
 				wrapper: "span",
 	 			rules: {
 	 				file: {
-	 			    	required: true
+	 			    	required: true,
+	 			    	fileType: true,
+	 			    	filesize: UPLOAD_FILE_LARGE_MAX_SIZE,
 	 			    },
 				    title: {
 				    	required: true
@@ -20,7 +38,8 @@
 	 			},
 				messages : {
 					file : {
-						required : '<fmt:message key="error.resource.item.file.blank"/> '
+						required : '<fmt:message key="error.resource.item.file.blank"/> ',
+						fileType: 'File type incorrect?'
 					},
 					title : {
 						required : '<fmt:message key="error.resource.item.title.blank"/> '
@@ -50,13 +69,13 @@
 				<html:hidden property="itemIndex" />
 	
 				<div class="form-group">
-				   	<label for="title"><fmt:message key="label.authoring.basic.resource.title.input" /></label>
-					<html:text property="title" styleId="title" size="55" styleClass="form-control form-control-inline" />
+				   	<label for="title"><fmt:message key="label.authoring.basic.resource.title.input" /></label>:
+					<html:text property="title" styleId="title"  styleClass="form-control" />
 			  	</div>	
 			  
 
 				<div class="form-group">
-					<label for="file"><fmt:message key="label.authoring.basic.resource.zip.file.input" /></label>
+					<!--  <label for="file"><fmt:message key="label.authoring.basic.resource.zip.file.input" /></label>: -->
 					<c:set var="itemAttachment" value="<%=request.getAttribute(org.apache.struts.taglib.html.Constants.BEAN_KEY)%>" />
 					<span id="itemAttachmentArea">
 					<%@ include file="/pages/authoring/parts/itemattachment.jsp"%>
