@@ -1,11 +1,13 @@
 <!DOCTYPE html>
-		
-
 <%@ include file="/common/taglibs.jsp"%>
 <lams:html>
 	<lams:head>
 		<%@ include file="addheader.jsp"%>
 		<script type="text/javascript">
+			$(document).ready(function(){
+				$('#url').attr("placeholder","<fmt:message key="label.authoring.basic.resource.url.input.placeholder" />");
+				$('#title').focus();
+			});		
 	 		$( "#resourceItemForm" ).validate({
 				errorClass: "text-danger loffset5",
 				wrapper: "span",
@@ -50,12 +52,12 @@
 				<html:hidden property="itemIndex" />
 
 				<div class="form-group">
-			    	<label for="title"><fmt:message key="label.authoring.basic.resource.title.input" /></label>
-					<html:text property="title" size="55" styleClass="form-control form-control-inline" />
+			    	<label for="title"><fmt:message key="label.authoring.basic.resource.title.input" /></label>:
+					<html:text property="title" styleId="title" size="55" styleClass="form-control form-control-inline" />
 			  	</div>	
 			  
 				<div class="form-group">
-					<label for="url"><fmt:message key="label.authoring.basic.resource.url.input" /></label>
+					<label for="url"><fmt:message key="label.authoring.basic.resource.url.input" /></label>:
 					<html:text styleId="url" property="url" size="55" styleClass="form-control form-control-inline"/>
 					&nbsp;<html:checkbox property="openUrlNewWindow" styleId="openUrlNewWindow" styleClass="loffset5"/>
 					&nbsp;<label for="openUrlNewWindow"><fmt:message key="open.in.new.window" /></label>
@@ -70,7 +72,7 @@
 			<div class="voffset5 pull-right">
 			    <a href="javascript:;" onclick="hideResourceItem()" class="btn btn-default btn-sm">
 					<fmt:message key="label.cancel" /> </a>
-				<a href="#" onclick="submitResourceItem()" class="btn btn-default btn-sm">
+				<a href="#nogo" onclick="submitResourceItem()" class="btn btn-default btn-sm">
 					<i class="fa fa-plus"></i>&nbsp;<fmt:message key="label.authoring.basic.add.url" /> </a>
 				
 			</div>
