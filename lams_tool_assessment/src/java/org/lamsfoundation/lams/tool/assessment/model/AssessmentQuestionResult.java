@@ -35,9 +35,6 @@ import org.apache.commons.lang.builder.HashCodeBuilder;
  * Assessment Question Result
  *
  * @author Andrey Balan
- *
- *
- *
  */
 public class AssessmentQuestionResult {
 

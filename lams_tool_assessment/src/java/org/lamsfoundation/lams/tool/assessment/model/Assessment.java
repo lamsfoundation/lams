@@ -37,9 +37,6 @@ import org.lamsfoundation.lams.tool.assessment.util.SequencableComparator;
  * Assessment
  *
  * @author Andrey Balan
- *
- *
- *
  */
 public class Assessment implements Cloneable {
 
@@ -308,9 +305,6 @@ public class Assessment implements Cloneable {
 
     /**
      * @return Returns the userid of the user who created the Share assessment.
-     *
-     *
-     *
      */
     public AssessmentUser getCreatedBy() {
 	return createdBy;
@@ -337,9 +331,6 @@ public class Assessment implements Cloneable {
 
     /**
      * @return Returns the title.
-     *
-     *
-     *
      */
     public String getTitle() {
 	return title;
@@ -355,9 +346,6 @@ public class Assessment implements Cloneable {
 
     /**
      * If the tool utilizes leaders from Select Leader tool.
-     *
-     * @return
-     *
      */
     public boolean isUseSelectLeaderToolOuput() {
 	return useSelectLeaderToolOuput;
@@ -369,9 +357,6 @@ public class Assessment implements Cloneable {
 
     /**
      * @return Returns the time limitation, that students have to complete an attempt.
-     *
-     *
-     *
      */
     public int getTimeLimit() {
 	return timeLimit;

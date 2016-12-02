@@ -53,6 +53,14 @@
             insert="true"
             column="start_date"
         />
+        
+		<property
+            name="timeLimitLaunchedDate"
+            type="java.util.Date"
+            update="true"
+            insert="true"
+            column="time_limit_launched_date"
+        />
 
         <property
             name="latest"

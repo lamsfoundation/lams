@@ -29,9 +29,6 @@ import org.apache.log4j.Logger;
  * Reference to the Question
  *
  * @author Andrey Balan
- *
- *
- *
  */
 public class QuestionReference implements Cloneable, Sequencable {
     private static final Logger log = Logger.getLogger(QuestionReference.class);
