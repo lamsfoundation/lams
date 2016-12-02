@@ -22,7 +22,7 @@
 
  		<div class="form-group" id="addfile">
 	    	<label for="file"><fmt:message key="label.authoring.basic.resource.file.input" /></label>
-	    	<html:file tabindex="3" property="file" styleId="file"/>
+	    	<html:file tabindex="3" property="file" styleId="file" style="display:inline"/>
 	        <label><html:checkbox property="openUrlNewWindow" tabindex="4" styleId="openUrlNewWindow" ></html:checkbox>&nbsp;
 			 <fmt:message key="open.in.new.window" /></label>
 	    </div>
@@ -42,7 +42,27 @@
 	</html:form>
 	
 	<script type="text/javascript">
-	$('#resourceItemForm').submit(submitResourceForm);
+		$('#resourceItemForm').submit(submitResourceForm);
+		$('#resourceItemForm').validate({
+			errorClass: "text-danger loffset5",
+			wrapper: "span",
+			rules: {
+				file: {
+			    	required: true,
+			    },
+			    title: {
+			    	required: true
+			    }
+			},
+			messages : {
+				file : {
+					required : '<fmt:message key="error.resource.item.file.blank"/> '
+				},
+				title : {
+					required : '<fmt:message key="error.resource.item.title.blank"/> '
+				}
+			},
+		});	
 	</script>
 	
 </div>

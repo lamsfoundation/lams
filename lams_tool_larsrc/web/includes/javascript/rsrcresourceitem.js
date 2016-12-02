@@ -97,6 +97,16 @@
 	function submitResourceItem(){
 		//prepare lams_textarea value to Ajax submit and add instructions to form
 		$('textarea').trigger('change');
+		
+		// validation will fail with spaces
+		var urlField = document.getElementById("url");
+		if ( urlField ) {
+			urlField.value = urlField.value.trim();
+		}
+		
+		if ( ! $("#resourceItemForm").valid() ) 
+			return false;
+
 		document.getElementById("instructionList").value = $("#instructionForm").serialize();
 		var formData = new FormData(document.getElementById("resourceItemForm"));
 

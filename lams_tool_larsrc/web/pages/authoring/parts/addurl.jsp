@@ -4,12 +4,31 @@
 <%@ include file="/common/taglibs.jsp"%>
 <lams:html>
 	<lams:head>
-		<%@ include file="/common/header.jsp"%>
-		<lams:css/>
-		<%-- user for  rsrcresourceitem.js --%>
+		<%@ include file="addheader.jsp"%>
 		<script type="text/javascript">
-			var removeInstructionUrl = "<c:url value='/authoring/removeInstruction.do'/>";
-    		var addInstructionUrl = "<c:url value='/authoring/newInstruction.do'/>";
+	 		$( "#resourceItemForm" ).validate({
+				errorClass: "text-danger loffset5",
+				wrapper: "span",
+	 			rules: {
+	 				url: {
+	 			    	required: true,
+	 			    	url: true
+	 			    },
+				    title: {
+				    	required: true
+				    }
+	 			},
+				messages : {
+					url : {
+						required : '<fmt:message key="error.resource.item.url.blank"/> ',
+						url : '<fmt:message key="error.resource.item.invalid.url"/> ',
+					},
+					title : {
+						required : '<fmt:message key="error.resource.item.title.blank"/> '
+					}
+				}
+			});
+
 		</script>
 		<script type="text/javascript" src="<html:rewrite page='/includes/javascript/rsrcresourceitem.js'/>"></script>
 	</lams:head>
@@ -35,10 +54,9 @@
 					<html:text property="title" size="55" styleClass="form-control form-control-inline" />
 			  	</div>	
 			  
-
 				<div class="form-group">
 					<label for="url"><fmt:message key="label.authoring.basic.resource.url.input" /></label>
-					<html:text property="url" size="55" styleClass="form-control form-control-inline"/>
+					<html:text styleId="url" property="url" size="55" styleClass="form-control form-control-inline"/>
 					&nbsp;<html:checkbox property="openUrlNewWindow" styleId="openUrlNewWindow" styleClass="loffset5"/>
 					&nbsp;<label for="openUrlNewWindow"><fmt:message key="open.in.new.window" /></label>
 				</div>

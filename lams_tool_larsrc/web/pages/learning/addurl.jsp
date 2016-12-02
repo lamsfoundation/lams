@@ -42,7 +42,29 @@
 	</html:form>
 	
 	<script type="text/javascript">
-	$('#resourceItemForm').submit(submitResourceForm);
+		$('#resourceItemForm').submit(submitResourceForm);
+		$('#resourceItemForm').validate({
+			errorClass: "text-danger loffset5",
+			wrapper: "span",
+ 			rules: {
+ 				url: {
+ 			    	required: true,
+ 			    	url: true
+ 			    },
+			    title: {
+			    	required: true
+			    }
+ 			},
+			messages : {
+				url : {
+					required : '<fmt:message key="error.resource.item.url.blank"/> ',
+					url : '<fmt:message key="error.resource.item.invalid.url"/> '
+				},
+				title : {
+					required : '<fmt:message key="error.resource.item.title.blank"/> '
+				}
+			},
+		});
 	</script>
 	
 </div>
