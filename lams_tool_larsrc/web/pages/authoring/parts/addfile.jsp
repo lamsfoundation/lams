@@ -1,11 +1,14 @@
 <!DOCTYPE html>
-		
-
 <%@ include file="/common/taglibs.jsp"%>
+
 <lams:html>
 	<lams:head>
 		<%@ include file="addheader.jsp"%>
 		<script type="text/javascript">
+			$(document).ready(function(){
+				$('#title').focus();
+			});
+			
 	 		$( "#resourceItemForm" ).validate({
 				errorClass: "text-danger loffset5",
 				wrapper: "span",
@@ -48,13 +51,13 @@
 				<html:hidden property="itemIndex" />
 	
 				<div class="form-group">
-				   	<label for="title"><fmt:message key="label.authoring.basic.resource.title.input" /></label>
-					<html:text property="title" size="55" styleClass="form-control form-control-inline" />
+				   	<label for="title"><fmt:message key="label.authoring.basic.resource.title.input" /></label>:
+					<html:text styleId="title" property="title" size="55" styleClass="form-control form-control-inline" />
 			  	</div>	
 			  
 
 				<div class="form-group">
-					<label for="file"><fmt:message key="label.authoring.basic.resource.file.input" /></label>
+					<label for="file"><fmt:message key="label.authoring.basic.resource.file.input" /></label>:
 					<c:set var="itemAttachment" value="<%=request.getAttribute(org.apache.struts.taglib.html.Constants.BEAN_KEY)%>" />
 					<span id="itemAttachmentArea">
 					<%@ include file="/pages/authoring/parts/itemattachment.jsp"%>
@@ -71,7 +74,7 @@
 			<div class="voffset5 pull-right">
 			    <a href="javascript:;" onclick="hideResourceItem()" class="btn btn-default btn-sm">
 					<fmt:message key="label.cancel" /> </a>
-				<a href="#" onclick="submitResourceItem()" class="btn btn-default btn-sm">
+				<a href="#nogo" onclick="submitResourceItem()" class="btn btn-default btn-sm">
 					<i class="fa fa-plus"></i>&nbsp;<fmt:message key="label.authoring.basic.add.file" /> </a>
 			    
 			</div>
