@@ -4,14 +4,29 @@
 <%@ include file="/common/taglibs.jsp"%>
 <lams:html>
 	<lams:head>
-		<%@ include file="/common/header.jsp"%>
-		<lams:css/>
-
+		<%@ include file="addheader.jsp"%>
 		<script type="text/javascript">
-		   <%-- user for  rsrcresourceitem.js --%>
-		   var removeInstructionUrl = "<c:url value='/authoring/removeInstruction.do'/>";
-	       var addInstructionUrl = "<c:url value='/authoring/newInstruction.do'/>";
-	       var removeItemAttachmentUrl = "<c:url value='/authoring/removeItemAttachment.do'/>";
+	 		$( "#resourceItemForm" ).validate({
+				errorClass: "text-danger loffset5",
+				wrapper: "span",
+	 			rules: {
+	 				file: {
+	 			    	required: true
+	 			    },
+				    title: {
+				    	required: true
+				    }
+	 			},
+				messages : {
+					file : {
+						required : '<fmt:message key="error.resource.item.file.blank"/> ',
+					},
+					title : {
+						required : '<fmt:message key="error.resource.item.title.blank"/> '
+					}
+				}
+			});
+
 		</script>
 		<script type="text/javascript" src="<html:rewrite page='/includes/javascript/rsrcresourceitem.js'/>"></script>
 	</lams:head>

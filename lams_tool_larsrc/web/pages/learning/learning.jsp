@@ -22,51 +22,18 @@
 	<c:set var="resource" value="${sessionMap.resource}" />
 	<c:set var="finishedLock" value="${sessionMap.finishedLock}" />
 
-<script type="text/javascript" src="${lams}includes/javascript/jquery.js"></script>
+	<script type="text/javascript" src="${lams}includes/javascript/jquery.js"></script>
+	<script type="text/javascript" src="/lams/includes/javascript/jquery.validate.js"></script>
+	
 	<script type="text/javascript">
 	
 		$(document).ready(function(){
 			cancel();
 		});
 
-		function validateForm(itemType) {
-			var error = "";
-			var title = $("#resourcetitle").val();
-			if ( ! title || title == "" ) {
-				error='<fmt:message key="error.resource.item.title.blank" />';
-			}
-			if ( itemType == '1') {
-				var url = $("#url").val();
-				if ( ! url || url == "" ) {
-					if ( error == "" ) {
-						error='<fmt:message key="error.resource.item.url.blank" />';
-					} else {
-						error+='\n<fmt:message key="error.resource.item.url.blank" />';
-					}
-				}
-			}
-			if ( itemType == '2') {
-				var file = $("#file").val();
-				if ( ! file || file == "" ) {
-					if ( error == "" ) {
-						error='<fmt:message key="error.resource.item.file.blank" />';
-					} else {
-						error+='\n<fmt:message key="error.resource.item.file.blank" />';
-					}
-				}
-			}
-			if ( error != "" ) {
-				alert(error);
-				return false;
-			} else { 
-				return true;
-			}
-		}
-		
  		function submitResourceForm() {
-			var itemType = $("#itemType").val();
-			<%-- Firefox is sending an empty string rather than nothing when there isn't a file, which breaks Struts. So validate to avoid. --%>
-			if ( validateForm(itemType)) {
+ 			debugger;
+			if ( $(this).valid() ) {
 				var formData = new FormData(this);
 			    $.ajax({ // create an AJAX call...
 			        data: formData, 
