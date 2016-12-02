@@ -29,8 +29,6 @@ import org.apache.log4j.Logger;
  * AssessmentOverallFeedback
  *
  * @author Andrey Balan
- *
- *
  */
 public class AssessmentOverallFeedback implements Cloneable, Sequencable {
     private static final Logger log = Logger.getLogger(AssessmentOverallFeedback.class);

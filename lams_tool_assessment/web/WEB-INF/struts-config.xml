@@ -222,6 +222,7 @@
 			<forward name="defineLater" path="/pages/learning/definelater.jsp" />
 			<forward name="submissionDeadline" path="/pages/learning/submissionDeadline.jsp" />
 			<forward name="waitForLeader" path="/pages/learning/waitforleader.jsp" />
+			<forward name="waitForLeaderTimeLimit" path="/pages/learning/waitForLeaderTimeLimit.jsp" />
 		</action>
 		<action path="/learning/nextPage"
 			type="org.lamsfoundation.lams.tool.assessment.web.action.LearningAction"
@@ -268,6 +269,10 @@
 			type="org.lamsfoundation.lams.tool.assessment.web.action.LearningAction"
 			parameter="autoSaveAnswers">
 		</action>
+		<action path="/learning/launchTimeLimit"
+			type="org.lamsfoundation.lams.tool.assessment.web.action.LearningAction"
+			parameter="launchTimeLimit">
+		</action>		
 		<!--  ========= Reflection =============== -->
 		<action path="/learning/newReflection"
 			type="org.lamsfoundation.lams.tool.assessment.web.action.LearningAction"

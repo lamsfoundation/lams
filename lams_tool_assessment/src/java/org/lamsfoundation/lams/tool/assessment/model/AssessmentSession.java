@@ -32,9 +32,6 @@ import org.apache.log4j.Logger;
  * Assessment session
  *
  * @author Andrey Balan
- *
- *
- *
  */
 public class AssessmentSession {
 
@@ -138,7 +135,6 @@ public class AssessmentSession {
     }
 
     /**
-     *
      * @param sessionName
      *            The session name to set.
      */
@@ -147,12 +143,6 @@ public class AssessmentSession {
     }
 
     /**
-     *
-     *
-     *
-     *
-     *
-     *
      * @return
      */
     public Set getAssessmentQuestions() {
@@ -164,10 +154,6 @@ public class AssessmentSession {
     }
 
     /**
-     *
-     *
-     *
-     *
      * @return
      */
     public Set<AssessmentUser> getAssessmentUsers() {

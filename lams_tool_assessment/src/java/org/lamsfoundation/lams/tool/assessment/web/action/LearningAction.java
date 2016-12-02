@@ -85,7 +85,6 @@ import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 
 /**
- *
  * @author Andrey Balan
  */
 public class LearningAction extends Action {
@@ -124,6 +123,9 @@ public class LearningAction extends Action {
 	}
 	if (param.equals("autoSaveAnswers")) {
 	    return autoSaveAnswers(mapping, form, request, response);
+	}
+	if (param.equals("launchTimeLimit")) {
+	    return launchTimeLimit(mapping, form, request, response);
 	}
 	if (param.equals("checkLeaderProgress")) {
 	    return checkLeaderProgress(mapping, form, request, response);
@@ -165,45 +167,63 @@ public class LearningAction extends Action {
 
 	// get back the assessment and question list and display them on page
 	IAssessmentService service = getAssessmentService();
-	AssessmentUser assessmentUser = null;
+	AssessmentUser user = null;
 	if ((mode != null) && mode.isTeacher()) {
 	    // monitoring mode - user is specified in URL
 	    // assessmentUser may be null if the user was force completed.
-	    assessmentUser = getSpecifiedUser(service, toolSessionId,
+	    user = getSpecifiedUser(service, toolSessionId,
 		    WebUtil.readIntParam(request, AttributeNames.PARAM_USER_ID, false));
 	} else {
-	    assessmentUser = getCurrentUser(toolSessionId);
+	    user = getCurrentUser(toolSessionId);
 	}
 
 	Assessment assessment = service.getAssessmentBySessionId(toolSessionId);
 
-	//support for leader select feature
-	AssessmentUser groupLeader = null;
-	if (assessment.isUseSelectLeaderToolOuput()) {
-	    groupLeader = service.checkLeaderSelectToolForSessionLeader(assessmentUser,
-		    new Long(toolSessionId).longValue());
+	// support for leader select feature
+	AssessmentUser groupLeader = assessment.isUseSelectLeaderToolOuput()
+		? service.checkLeaderSelectToolForSessionLeader(user, new Long(toolSessionId).longValue())
+		: null;
+	if (assessment.isUseSelectLeaderToolOuput() && !mode.isTeacher()) {
 
 	    // forwards to the leaderSelection page
-	    if (groupLeader == null && !mode.isTeacher()) {
-
+	    if (groupLeader == null) {
 		List<AssessmentUser> groupUsers = service.getUsersBySession(new Long(toolSessionId).longValue());
 		request.setAttribute(AssessmentConstants.ATTR_GROUP_USERS, groupUsers);
 		request.setAttribute(AssessmentConstants.ATTR_ASSESSMENT, assessment);
 
 		return mapping.findForward(AssessmentConstants.WAIT_FOR_LEADER);
 	    }
+	    
+	    // forwards to the waitForLeader pages
+	    boolean isNonLeader = !user.getUserId().equals(groupLeader.getUserId());
+	    if (assessment.getTimeLimit() != 0 && isNonLeader && !user.isSessionFinished()) {
+		AssessmentResult lastLeaderResult = service.getLastAssessmentResult(assessment.getUid(), groupLeader.getUserId());
+
+		//show waitForLeaderLaunchTimeLimit page if the leader hasn't started activity or hasn't pressed OK button to launch time limit
+		if (lastLeaderResult == null || lastLeaderResult.getTimeLimitLaunchedDate() == null) {
+		    request.setAttribute(AssessmentConstants.PARAM_WAITING_MESSAGE_KEY, "label.waiting.for.leader.launch.time.limit");
+		    return mapping.findForward(AssessmentConstants.WAIT_FOR_LEADER_TIME_LIMIT);
+		}		
+		
+		//if the time is up and leader hasn't submitted response - show waitForLeaderFinish page
+		boolean isTimeLimitExceeded = service.checkTimeLimitExceeded(assessment, groupLeader);
+		if (isTimeLimitExceeded && !groupLeader.isSessionFinished()) {
+		    request.setAttribute(AssessmentConstants.PARAM_WAITING_MESSAGE_KEY, "label.waiting.for.leader.finish");
+		    return mapping.findForward(AssessmentConstants.WAIT_FOR_LEADER_TIME_LIMIT);
+		}
+	    }
 
 	    // check if leader has submitted all answers
-	    if (groupLeader.isSessionFinished() && !mode.equals(ToolAccessMode.TEACHER.toString())) {
+	    if (groupLeader.isSessionFinished()) {
 
 		// in case user joins the lesson after leader has answers some answers already - we need to make sure
 		// he has the same scratches as leader
-		service.copyAnswersFromLeader(assessmentUser, groupLeader);
+		service.copyAnswersFromLeader(user, groupLeader);
 	    }
 	}
 
 	sessionMap.put(AssessmentConstants.ATTR_GROUP_LEADER, groupLeader);
-	boolean isUserLeader = service.isUserGroupLeader(assessmentUser, new Long(toolSessionId));
+	boolean isUserLeader = service.isUserGroupLeader(user, new Long(toolSessionId));
 	sessionMap.put(AssessmentConstants.ATTR_IS_USER_LEADER, isUserLeader);
 
 	Set<QuestionReference> questionReferences = new TreeSet<QuestionReference>(new SequencableComparator());
@@ -235,21 +255,21 @@ public class LearningAction extends Action {
 	    }
 	}
 
-	int dbResultCount = service.getAssessmentResultCount(assessment.getUid(), assessmentUser.getUserId());
+	int dbResultCount = service.getAssessmentResultCount(assessment.getUid(), user.getUserId());
 	int attemptsAllowed = assessment.getAttemptsAllowed();
 	boolean isResubmitAllowed = ((attemptsAllowed > dbResultCount) | (attemptsAllowed == 0));
 
-	AssessmentResult lastResult = service.getLastAssessmentResult(assessment.getUid(), assessmentUser.getUserId());
+	AssessmentResult lastResult = service.getLastAssessmentResult(assessment.getUid(), user.getUserId());
 	boolean hasEditRight = !assessment.isUseSelectLeaderToolOuput()
 		|| assessment.isUseSelectLeaderToolOuput() && isUserLeader;
 	boolean isLastResultFinished = (lastResult != null) && (lastResult.getFinishDate() != null);
 	//finishedLockForMonitor is a lock for displaying results page for teacher only if user see it, and displaying learner page if user see it accordingly
 	boolean finishedLockForMonitor = (mode != null) && mode.isTeacher() && isLastResultFinished;
-	boolean finishedLock = assessmentUser.isSessionFinished() || finishedLockForMonitor || isLastResultFinished;
+	boolean finishedLock = user.isSessionFinished() || finishedLockForMonitor || isLastResultFinished;
 
 	// get notebook entry
 	String entryText = new String();
-	AssessmentUser notebookCreator = (groupLeader == null) ? assessmentUser : groupLeader;
+	AssessmentUser notebookCreator = (groupLeader == null) ? user : groupLeader;
 	NotebookEntry notebookEntry = service.getEntry(toolSessionId, notebookCreator.getUserId().intValue());
 	if (notebookEntry != null) {
 	    entryText = notebookEntry.getEntry();
@@ -260,16 +280,24 @@ public class LearningAction extends Action {
 	sessionMap.put(AssessmentConstants.ATTR_INSTRUCTIONS, assessment.getInstructions());
 	sessionMap.put(AssessmentConstants.ATTR_IS_RESUBMIT_ALLOWED, isResubmitAllowed);
 	sessionMap.put(AssessmentConstants.ATTR_FINISHED_LOCK, finishedLock);
-	sessionMap.put(AssessmentConstants.ATTR_USER_FINISHED, assessmentUser.isSessionFinished());
+	sessionMap.put(AssessmentConstants.ATTR_HAS_EDIT_RIGHT, hasEditRight);
+	sessionMap.put(AssessmentConstants.ATTR_USER_FINISHED, user.isSessionFinished());
 	sessionMap.put(AttributeNames.ATTR_LEARNER_CONTENT_FOLDER,
-		service.getLearnerContentFolder(toolSessionId, assessmentUser.getUserId()));
+		service.getLearnerContentFolder(toolSessionId, user.getUserId()));
 	sessionMap.put(AttributeNames.PARAM_TOOL_SESSION_ID, toolSessionId);
-	sessionMap.put(AssessmentConstants.ATTR_USER, assessmentUser);
+	sessionMap.put(AssessmentConstants.ATTR_USER, user);
 	sessionMap.put(AttributeNames.ATTR_MODE, mode);
 	// reflection information
 	sessionMap.put(AssessmentConstants.ATTR_REFLECTION_ON, assessment.isReflectOnActivity());
 	sessionMap.put(AssessmentConstants.ATTR_REFLECTION_INSTRUCTION, assessment.getReflectInstructions());
 	sessionMap.put(AssessmentConstants.ATTR_REFLECTION_ENTRY, entryText);
+	
+	//time limit
+	boolean isTimeLimitEnabled = hasEditRight && !finishedLock && assessment.getTimeLimit() != 0;
+	long secondsLeft = isTimeLimitEnabled ? service.getSecondsLeft(assessment, user) : 0;
+	request.setAttribute(AssessmentConstants.ATTR_SECONDS_LEFT, secondsLeft);
+	boolean isTimeLimitNotLaunched = (lastResult == null) || (lastResult.getTimeLimitLaunchedDate() == null);
+	sessionMap.put(AssessmentConstants.ATTR_IS_TIME_LIMIT_NOT_LAUNCHED, isTimeLimitNotLaunched);
 
 	ActivityPositionDTO activityPosition = LearningWebUtil
 		.putActivityPositionInRequestByToolSessionId(toolSessionId, request, getServlet().getServletContext());
@@ -355,7 +383,7 @@ public class LearningAction extends Action {
 
 	//set attempt started
 	if (!finishedLock && hasEditRight) {
-	    service.setAttemptStarted(assessment, pagedQuestions, assessmentUser, toolSessionId);
+	    service.setAttemptStarted(assessment, pagedQuestions, user, toolSessionId);
 	}
 
 	// loadupLastAttempt for display purpose
@@ -382,23 +410,28 @@ public class LearningAction extends Action {
 	AssessmentSession session = service.getAssessmentSessionBySessionId(toolSessionId);
 	AssessmentUser leader = session.getGroupLeader();
 
+	//in case of time limit - prevent user from seeing questions page longer than time limit allows
+	boolean isTimeLimitExceeded = service.checkTimeLimitExceeded(session.getAssessment(), leader);
 	boolean isLeaderResponseFinalized = leader.isSessionFinished();
 
 	JSONObject JSONObject = new JSONObject();
-	JSONObject.put("isLeaderResponseFinalized", isLeaderResponseFinalized);
+	JSONObject.put("isPageRefreshRequested", isLeaderResponseFinalized || isTimeLimitExceeded);
 	response.setContentType("application/x-json;charset=utf-8");
 	response.getWriter().print(JSONObject);
 	return null;
     }
 
     /**
-     * Display same entire authoring page content from HttpSession variable.
+     * Shows next page. It's available only to leaders as non-leaders see all questions on one page.
      */
     private ActionForward nextPage(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) throws ServletException {
+	IAssessmentService service = getAssessmentService();
 	String sessionMapID = WebUtil.readStrParam(request, AssessmentConstants.ATTR_SESSION_MAP_ID);
 	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
 		.getAttribute(sessionMapID);
+	Assessment assessment = (Assessment) sessionMap.get(AssessmentConstants.ATTR_ASSESSMENT);
+	AssessmentUser user = (AssessmentUser) sessionMap.get(AssessmentConstants.ATTR_USER);
 
 	boolean finishedLock = (Boolean) sessionMap.get(AssessmentConstants.ATTR_FINISHED_LOCK);
 	if (!finishedLock) {
@@ -407,8 +440,8 @@ public class LearningAction extends Action {
 	    // store results from sessionMap into DB
 	    storeUserAnswersIntoDatabase(sessionMap, true);
 
-	    request.setAttribute(AssessmentConstants.PARAM_SECONDS_LEFT,
-		    request.getParameter(AssessmentConstants.PARAM_SECONDS_LEFT));
+	    long secondsLeft = service.getSecondsLeft(assessment, user);
+	    request.setAttribute(AssessmentConstants.ATTR_SECONDS_LEFT, secondsLeft);
 	}
 
 	//get pageNumber as request parameter in normal case and as attribute in case of submitAll returned it back
@@ -566,6 +599,10 @@ public class LearningAction extends Action {
 	request.setAttribute(AssessmentConstants.ATTR_SESSION_MAP_ID, sessionMapID);
 	//clear isUserFailed indicator
 	sessionMap.put(AssessmentConstants.ATTR_IS_USER_FAILED, false);
+	
+	//time limit feature
+	sessionMap.put(AssessmentConstants.ATTR_IS_TIME_LIMIT_NOT_LAUNCHED, true);
+	request.setAttribute(AssessmentConstants.ATTR_SECONDS_LEFT, assessment.getTimeLimit() * 60);
 
 	return mapping.findForward(AssessmentConstants.SUCCESS);
     }
@@ -670,6 +707,25 @@ public class LearningAction extends Action {
 	storeUserAnswersIntoSessionMap(request);
 	//store results from sessionMap into DB
 	storeUserAnswersIntoDatabase(sessionMap, true);
+
+	return null;
+    }
+    
+    /**
+     * Stores date when user has started activity with time limit
+     */
+    private ActionForward launchTimeLimit(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+	    HttpServletResponse response) {
+	IAssessmentService service = getAssessmentService();
+	String sessionMapID = WebUtil.readStrParam(request, AssessmentConstants.ATTR_SESSION_MAP_ID);
+	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
+		.getAttribute(sessionMapID);
+	
+	Long assessmentUid = ((Assessment) sessionMap.get(AssessmentConstants.ATTR_ASSESSMENT)).getUid();
+	Long userId = ((AssessmentUser) sessionMap.get(AssessmentConstants.ATTR_USER)).getUserId();
+	sessionMap.put(AssessmentConstants.ATTR_IS_TIME_LIMIT_NOT_LAUNCHED, false);
+	
+	service.launchTimeLimit(assessmentUid, userId);
 
 	return null;
     }

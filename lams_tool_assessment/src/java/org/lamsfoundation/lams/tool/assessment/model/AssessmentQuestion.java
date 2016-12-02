@@ -39,8 +39,6 @@ import org.lamsfoundation.lams.tool.assessment.util.SequencableComparator;
  * Assessment Question
  *
  * @author Andrey Balan
- *
- *
  */
 public class AssessmentQuestion implements Cloneable, Sequencable, Comparable {
     private static final Logger log = Logger.getLogger(AssessmentQuestion.class);

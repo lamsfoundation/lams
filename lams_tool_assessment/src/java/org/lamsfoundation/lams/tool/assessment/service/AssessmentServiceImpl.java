@@ -281,6 +281,45 @@ public class AssessmentServiceImpl
 
 	assessmentResultDao.saveObject(userResult);
     }
+    
+    @Override
+    public void launchTimeLimit(Long assessmentUid, Long userId) {
+	AssessmentResult lastResult = getLastAssessmentResult(assessmentUid, userId);
+	lastResult.setTimeLimitLaunchedDate(new Date());
+	assessmentResultDao.saveObject(lastResult);
+    }
+    
+    @Override
+    public long getSecondsLeft(Assessment assessment, AssessmentUser user) {
+	AssessmentResult lastResult = getLastAssessmentResult(assessment.getUid(), user.getUserId());
+	
+	long secondsLeft = 1;
+	if (assessment.getTimeLimit() != 0) {
+	    // if user has pressed OK button already - calculate remaining time, and full time otherwise
+	    boolean isTimeLimitNotLaunched = (lastResult == null) || (lastResult.getTimeLimitLaunchedDate() == null);
+	    secondsLeft = isTimeLimitNotLaunched ? assessment.getTimeLimit() * 60
+		    : assessment.getTimeLimit() * 60 - (System.currentTimeMillis() - lastResult.getTimeLimitLaunchedDate().getTime()) / 1000;
+	    // change negative or zero number to 1
+	    secondsLeft = Math.max(1, secondsLeft);
+	}
+	
+	return secondsLeft;
+    }
+    
+    @Override
+    public boolean checkTimeLimitExceeded(Assessment assessment, AssessmentUser groupLeader) {
+	int timeLimit = assessment.getTimeLimit();
+	if (timeLimit == 0) {
+	    return false;
+	}
+	
+	AssessmentResult lastLeaderResult = getLastAssessmentResult(assessment.getUid(), groupLeader.getUserId());
+	
+	//check if the time limit is exceeded
+	return (lastLeaderResult != null) && (lastLeaderResult.getTimeLimitLaunchedDate() != null)
+		&& lastLeaderResult.getTimeLimitLaunchedDate().getTime() + timeLimit * 60000 < System.currentTimeMillis();
+    }
+    
 
     @Override
     public List<AssessmentUser> getUsersBySession(Long toolSessionID) {

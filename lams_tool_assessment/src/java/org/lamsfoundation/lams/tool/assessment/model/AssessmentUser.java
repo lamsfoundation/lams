@@ -34,9 +34,6 @@ import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
  * Assessment User
  *
  * @author Andrey Balan
- *
- *
- *
  */
 public class AssessmentUser implements Cloneable {
     private static final long serialVersionUID = -7043502180037866257L;

@@ -29,8 +29,6 @@ import org.apache.log4j.Logger;
  * AssessmentOptionAnswer
  *
  * @author Andrey Balan
- *
- *
  */
 public class AssessmentOptionAnswer implements Cloneable {
     private static final Logger log = Logger.getLogger(AssessmentOptionAnswer.class);

@@ -29,8 +29,6 @@ import org.apache.log4j.Logger;
  * AssessmentQuestionOption
  *
  * @author Andrey Balan
- *
- *
  */
 public class AssessmentQuestionOption implements Cloneable, Sequencable {
     private static final Logger log = Logger.getLogger(AssessmentQuestionOption.class);

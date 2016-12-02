@@ -1,9 +1,6 @@
 <!DOCTYPE html>
 <%@ include file="/common/taglibs.jsp"%>
-
-<c:set var="lams">
-	<lams:LAMSURL />
-</c:set>
+<c:set var="lams"><lams:LAMSURL /></c:set>
 
 <lams:html>
 <lams:head>
@@ -22,18 +19,11 @@
 	<c:set var="pageNumber" value="${sessionMap.pageNumber}" />
 	<c:set var="finishedLock" value="${sessionMap.finishedLock}" />
 	<c:set var="isResubmitAllowed" value="${sessionMap.isResubmitAllowed}" />
+	<c:set var="hasEditRight" value="${sessionMap.hasEditRight}"/>
+	<c:set var="isTimeLimitEnabled" value="${hasEditRight && assessment.getTimeLimit() != 0 && !finishedLock}" />
 	<c:set var="result" value="${sessionMap.assessmentResult}" />
-	<c:choose>
-		<c:when test="${not empty param.secondsLeft}">
-			<c:set var="secondsLeft" value="${param.secondsLeft - 1}" />		
-		</c:when>
-		<c:otherwise>
-			<c:set var="secondsLeft" value="${assessment.timeLimit * 60}" />		
-		</c:otherwise>
-	</c:choose>	
 	<c:set var="isUserLeader" value="${sessionMap.isUserLeader}"/>
 	<c:set var="isLeadershipEnabled" value="${assessment.useSelectLeaderToolOuput}"/>
-	<c:set var="hasEditRight" value="${!isLeadershipEnabled || isLeadershipEnabled && isUserLeader}"/>
 	<c:set var="isEditingDisabled" value="${finishedLock || !hasEditRight}"/>
 		
 	<!-- hasEditRight=${hasEditRight} -->
@@ -126,12 +116,14 @@
 		}
 	
 		//boolean to indicate whether ok dialog is still ON so that autosave can't be run
-		var isWaitingForConfirmation = ${not finishedLock && assessment.timeLimit > 0 && empty param.secondsLeft};
+		var isWaitingForConfirmation = ${isTimeLimitEnabled && sessionMap.isTimeLimitNotLaunched};
 	
-		<c:if test="${not finishedLock && assessment.timeLimit > 0}">
+		//timelimit feature
+		<c:if test="${isTimeLimitEnabled}">
 			$(document).ready(function(){
-				if (${empty param.secondsLeft}) {
-					//show confirmation dialog
+				//show timelimit-start-dialog in order to start countdown
+				if (${sessionMap.isTimeLimitNotLaunched}) {
+					
 					$.blockUI({ 
 						message: $('#timelimit-start-dialog'), 
 						css: { width: '325px', height: '120px'}, 
@@ -140,6 +132,15 @@
 					
 					//once OK button pressed start countdown
 			        $('#timelimit-start-ok').click(function() {
+			        	
+			        	//store date when user has started activity with time limit
+				        $.ajax({
+				        	async: true,
+				            url: '<c:url value="/learning/launchTimeLimit.do"/>',
+				            data: 'sessionMapID=${sessionMapID}',
+				            type: 'post'
+				       	});
+			        	
 			        	$.unblockUI();
 			        	displayCountdown();
 			        	isWaitingForConfirmation = false;
@@ -168,7 +169,7 @@
 				});
 				
 				$('#countdown').countdown({
-					until: '+${secondsLeft}S',  
+					until: '+${secondsLeft}S',
 					format: 'hMS',
 					compact: true,
 					onTick: function(periods) {
@@ -254,36 +255,23 @@
 			if (!validateAnswers()) {
 				return;
 			}
-			
-			var secondsLeft = 0;
-			if (${not finishedLock && assessment.timeLimit > 0}) {
-				var times = $("#countdown").countdown('getTimes'); 
-				secondsLeft = times[4]*3600 + times[5]*60 + times[6];
-			}
+
         	var myForm = $("#answers");
-        	myForm.attr("action", "<c:url value='/learning/nextPage.do?sessionMapID=${sessionMapID}&pageNumber='/>" + pageNumber + "&secondsLeft=" + secondsLeft);
+        	myForm.attr("action", "<c:url value='/learning/nextPage.do?sessionMapID=${sessionMapID}&pageNumber='/>" + pageNumber);
         	myForm.submit();
 		}
 		
 		function submitAll(isTimelimitExpired){
 			
-			var secondsLeft = 0;
-			
 			//only if time limit is not expired
 			if (!isTimelimitExpired) {
-
 				if (!validateAnswers()) {
 					return;
-				}
-				
-				if (${not finishedLock && assessment.timeLimit > 0}) {
-					var times = $("#countdown").countdown('getTimes'); 
-					secondsLeft = times[4]*3600 + times[5]*60 + times[6];
 				}
 			}
 
         	var myForm = $("#answers");
-        	myForm.attr("action", "<c:url value='/learning/submitAll.do?sessionMapID=${sessionMapID}'/>&secondsLeft=" + secondsLeft + "&isTimelimitExpired=" + isTimelimitExpired);
+        	myForm.attr("action", "<c:url value='/learning/submitAll.do?sessionMapID=${sessionMapID}'/>&isTimelimitExpired=" + isTimelimitExpired);
         	myForm.submit();
 		}
 		
@@ -325,12 +313,12 @@
 			var orderingArea = "#orderingArea" + questionUid;
 			var url = "<c:url value="/learning/downOption.do"/>";
 			$(orderingArea).load(
-					url,
-					{
-						questionUid: questionUid,
-						optionIndex: idx, 
-						sessionMapID: "${sessionMapID}"
-					}
+				url,
+				{
+					questionUid: questionUid,
+					optionIndex: idx, 
+					sessionMapID: "${sessionMapID}"
+				}
 			);		    
 		}		
 		
@@ -339,7 +327,6 @@
 		}
 		
 		function checkLeaderProgress() {
-			
 	        $.ajax({
 	        	async: false,
 	            url: '<c:url value="/learning/checkLeaderProgress.do"/>',
@@ -347,7 +334,7 @@
 	            dataType: 'json',
 	            type: 'post',
 	            success: function (json) {
-	            	if (json.isLeaderResponseFinalized) {
+	            	if (json.isPageRefreshRequested) {
 	            		location.reload();
 	            	}
 	            }
@@ -654,10 +641,9 @@
 					
 					<c:otherwise>
 						<c:if test="${isResubmitAllowed && hasEditRight}">
-							<html:link href="javascript:;" property="resubmit" onclick="return resubmit()" 
-									styleClass="btn btn-default">
+							<a href="javascript:;" onclick="return resubmit()" class="btn btn-default">
 								<fmt:message key="label.learning.resubmit" />
-							</html:link>
+							</a>
 						</c:if>	
 						
 						<c:if test="${! sessionMap.isUserFailed}">

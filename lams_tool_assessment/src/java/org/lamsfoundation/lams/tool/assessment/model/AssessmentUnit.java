@@ -29,8 +29,6 @@ import org.apache.log4j.Logger;
  * AssessmentUnit
  *
  * @author Andrey Balan
- *
- *
  */
 public class AssessmentUnit implements Cloneable, Sequencable {
     private static final Logger log = Logger.getLogger(AssessmentUnit.class);
