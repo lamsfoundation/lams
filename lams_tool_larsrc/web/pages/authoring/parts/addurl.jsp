@@ -9,7 +9,7 @@
 				$('#title').focus();
 			});		
 	 		$( "#resourceItemForm" ).validate({
-				errorClass: "text-danger loffset5",
+				errorClass: "text-danger",
 				wrapper: "span",
 	 			rules: {
 	 				url: {
@@ -53,13 +53,13 @@
 
 				<div class="form-group">
 			    	<label for="title"><fmt:message key="label.authoring.basic.resource.title.input" /></label>:
-					<html:text property="title" styleId="title" size="55" styleClass="form-control form-control-inline" />
+					<html:text property="title" styleId="title" styleClass="form-control" />
 			  	</div>	
 			  
 				<div class="form-group">
 					<label for="url"><fmt:message key="label.authoring.basic.resource.url.input" /></label>:
-					<html:text styleId="url" property="url" size="55" styleClass="form-control form-control-inline"/>
-					&nbsp;<html:checkbox property="openUrlNewWindow" styleId="openUrlNewWindow" styleClass="loffset5"/>
+					<html:text styleId="url" property="url"  styleClass="form-control"/>
+					<br/><html:checkbox property="openUrlNewWindow" styleId="openUrlNewWindow" styleClass="loffset5"/>
 					&nbsp;<label for="openUrlNewWindow"><fmt:message key="open.in.new.window" /></label>
 				</div>
 

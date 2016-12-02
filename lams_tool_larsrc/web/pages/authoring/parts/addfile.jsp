@@ -1,16 +1,23 @@
 <!DOCTYPE html>
 <%@ include file="/common/taglibs.jsp"%>
+<%@ page import="org.lamsfoundation.lams.util.Configuration" %>
+<%@ page import="org.lamsfoundation.lams.util.ConfigurationKeys" %>
+<c:set var="UPLOAD_FILE_LARGE_MAX_SIZE"><%=Configuration.get(ConfigurationKeys.UPLOAD_FILE_LARGE_MAX_SIZE)%></c:set>
 
 <lams:html>
 	<lams:head>
 		<%@ include file="addheader.jsp"%>
 		<script type="text/javascript">
+			var UPLOAD_FILE_LARGE_MAX_SIZE = '<c:out value="${UPLOAD_FILE_LARGE_MAX_SIZE}"/>';
+			
 			$(document).ready(function(){
 				$('#title').focus();
 			});
-			
+
+						
 	 		$( "#resourceItemForm" ).validate({
-				errorClass: "text-danger loffset5",
+	 			ignore: [],
+				errorClass: "text-danger",
 				wrapper: "span",
 	 			rules: {
 	 				file: {
@@ -52,12 +59,11 @@
 	
 				<div class="form-group">
 				   	<label for="title"><fmt:message key="label.authoring.basic.resource.title.input" /></label>:
-					<html:text styleId="title" property="title" size="55" styleClass="form-control form-control-inline" />
+					<html:text styleId="title" property="title" styleClass="form-control" />
 			  	</div>	
 			  
 
 				<div class="form-group">
-					<label for="file"><fmt:message key="label.authoring.basic.resource.file.input" /></label>:
 					<c:set var="itemAttachment" value="<%=request.getAttribute(org.apache.struts.taglib.html.Constants.BEAN_KEY)%>" />
 					<span id="itemAttachmentArea">
 					<%@ include file="/pages/authoring/parts/itemattachment.jsp"%>
