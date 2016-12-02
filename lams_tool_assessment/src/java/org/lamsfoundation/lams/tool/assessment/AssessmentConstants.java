@@ -65,8 +65,13 @@ public class AssessmentConstants {
     public static final String DEFINE_LATER = "definelater";
 
     public static final String WAIT_FOR_LEADER = "waitForLeader";
+    
+    public static final String WAIT_FOR_LEADER_TIME_LIMIT = "waitForLeaderTimeLimit";
 
     // for parameters' name
+    
+    public static final String PARAM_WAITING_MESSAGE_KEY = "waitingMessageKey";
+    
     public static final String PARAM_TOOL_CONTENT_ID = "toolContentID";
 
     public static final String PARAM_TOOL_SESSION_ID = "toolSessionID";
@@ -84,8 +89,6 @@ public class AssessmentConstants {
     public static final String PARAM_OPTION_INDEX = "optionIndex";
 
     public static final String PARAM_TITLE = "title";
-
-    public static final String PARAM_SECONDS_LEFT = "secondsLeft";
 
     public static final String PARAM_NOT_A_NUMBER = "nan";
 
@@ -143,6 +146,12 @@ public class AssessmentConstants {
     public static final String ATTR_UNIT_LIST = "unitList";
 
     public static final String ATTR_QUESTION_REFERENCES_GRADES = "referenceGrades";
+    
+    public static final String ATTR_HAS_EDIT_RIGHT = "hasEditRight";
+    
+    public static final String ATTR_IS_TIME_LIMIT_NOT_LAUNCHED = "isTimeLimitNotLaunched";
+    
+    public static final String ATTR_SECONDS_LEFT = "secondsLeft";
 
     public static final String ATTR_UNIT_COUNT = "unitCount";
 
