@@ -672,3 +672,17 @@ section{
 	font-size: smaller;
 }
 }
+
+/* Growl functionality, jquery.blockUI (version: 2.38) */
+.growlUI {
+	width: auto;
+	padding: 0px;
+}
+
+div.growlUI h1,div.growlUI h2 {
+	color: white;
+	padding: 0px;
+	margin: 5px;
+	text-align: center;
+	font-size: medium;
+}
