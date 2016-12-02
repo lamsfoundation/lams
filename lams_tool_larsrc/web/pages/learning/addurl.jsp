@@ -16,35 +16,42 @@
 		<html:hidden property="sessionMapID"/>
 	
 		<div class="form-group">
-	    	<label for="title"><fmt:message key="label.authoring.basic.resource.title.input" /></label>
-			<html:text property="title" size="50" tabindex="1" styleId="resourcetitle"/>
+	    	<label for="title"><fmt:message key="label.authoring.basic.resource.title.input" /></label>:
+			<html:text property="title" tabindex="1" styleClass="form-control" styleId="resourcetitle"/>
 	  	</div>	
 
 		<div class="form-group" id="addurl">
 	    	<label for="url"><fmt:message key="label.authoring.basic.resource.url.input" /></label>
-			<html:text property="url" size="50" tabindex="2" styleId="url"/>&nbsp;
+			<html:text property="url" styleClass="form-control" tabindex="2" styleId="url"/><br/>&nbsp;
 	        <label><html:checkbox property="openUrlNewWindow" tabindex="3" styleId="openUrlNewWindow" ></html:checkbox>&nbsp;
 			 <fmt:message key="open.in.new.window" /></label>
 	    </div>
 
 		<div class="form-group">
 	    	<label for="description"><fmt:message key="label.learning.comment.or.instruction" /></label>
-			<html:text property="description" tabindex="5" styleClass="text-area" maxlength="255" size="50" />
+			<html:text property="description" tabindex="5" maxlength="255" styleClass="form-control" />
 	  	</div>	
 
- 		<html:button property="goback" onclick="javascript:cancel()" styleClass="btn btn-xs btn-default" styleId="cancelButton">
-			<fmt:message key="button.cancel" />
-		</html:button>&nbsp;
-		<html:submit styleClass="btn btn-xs btn-default" styleId="submitButton">
-		 	<fmt:message key="button.add" />
-		</html:submit>
+		<div id="buttons" class="pull-right" >
+	 		<html:button property="goback" onclick="javascript:cancel()" styleClass="btn btn-sm btn-default" styleId="cancelButton">
+				<fmt:message key="button.cancel" />
+			</html:button>&nbsp;
+			<html:submit styleClass="btn btn-sm btn-default" styleId="submitButton">
+			 	<fmt:message key="button.add" />
+			</html:submit>
+		</div>
 	
 	</html:form>
 	
 	<script type="text/javascript">
+		$(document).ready(function(){
+			$('#url').attr("placeholder","<fmt:message key="label.authoring.basic.resource.url.input.placeholder" />");
+			$('#title').focus();
+		});		
+	
 		$('#resourceItemForm').submit(submitResourceForm);
 		$('#resourceItemForm').validate({
-			errorClass: "text-danger loffset5",
+			errorClass: "text-danger",
 			wrapper: "span",
  			rules: {
  				url: {
