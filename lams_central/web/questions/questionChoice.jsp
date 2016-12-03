@@ -45,7 +45,7 @@
 	</style>
 	<script type="text/javascript" src="includes/javascript/jquery.js"></script>
 	<script type="text/javascript">
-		window.resizeTo(800, 600);
+		window.resizeTo(1152, 648);
 	
 		var returnURL = '${returnURL}';
 		
