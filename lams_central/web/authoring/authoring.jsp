@@ -774,7 +774,7 @@
 			</tr>
 			<tr class="propertiesContentRowConditions">
 				<td colspan="3">
-					<div class="propertiesContentFieldCreateConditions"><fmt:message key="authoring.fla.page.prop.conditions.create" /></div>
+					<div class="btn btn-default propertiesContentFieldCreateConditions"><fmt:message key="authoring.fla.page.prop.conditions.create" /></div>
 				</td>
 			</tr>
 			<tr class="propertiesContentRowConditions">
