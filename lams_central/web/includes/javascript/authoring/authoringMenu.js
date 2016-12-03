@@ -172,21 +172,29 @@ var MenuLib = {
 	 * Creates a new grouping activity.
 	 */
 	addGrouping : function() {
-		HandlerLib.resetCanvasMode();
-		
-		canvas.css('cursor', 'url("' + layout.toolMetadata.grouping.iconPath + '"), move')
-			  .click(function(event){
-			// pageX and pageY tell event coordinates relative to the whole page
-			// we need relative to canvas
-			var translatedEvent = GeneralLib.translateEventOnCanvas(event),
-				x = translatedEvent[0] - 47,
-				y = translatedEvent[1] -  2;
-
-			layout.activities.push(new ActivityDefs.GroupingActivity(null, null, x, y));
-			
-			GeneralLib.setModified(true);
+		if (layout.isGroupingStarted) {
+			layout.isGroupingStarted = false;
 			HandlerLib.resetCanvasMode(true);
-		});
+			$('#groupButton').blur();
+		} else {
+			layout.isGroupingStarted = true;
+			HandlerLib.resetCanvasMode();
+			
+			canvas.css('cursor', 'url("' + layout.toolMetadata.grouping.iconPath + '"), move')
+				.click(function(event){
+					layout.isGroupingStarted = false;
+					// pageX and pageY tell event coordinates relative to the whole page
+					// we need relative to canvas
+					var translatedEvent = GeneralLib.translateEventOnCanvas(event),
+						x = translatedEvent[0] - 47,
+						y = translatedEvent[1] -  2;
+		
+					layout.activities.push(new ActivityDefs.GroupingActivity(null, null, x, y));
+					
+					GeneralLib.setModified(true);
+					HandlerLib.resetCanvasMode(true);
+				});
+		}
 	},
 	
 
@@ -194,24 +202,24 @@ var MenuLib = {
 	 * Creates a new optional activity.
 	 */
 	addOptionalActivity : function() {
-		HandlerLib.resetCanvasMode();
-		
-		$('.modal-body', layout.infoDialog).text(LABELS.OPTIONAL_ACTIVITY_PLACE_PROMPT);
-		layout.infoDialog.modal('show');
-	
-		canvas.css('cursor', 'pointer').click(function(event){
-			$('.modal-body', layout.infoDialog).empty();
-			layout.infoDialog.modal('hide');
-
-			var translatedEvent = GeneralLib.translateEventOnCanvas(event),
-				x = translatedEvent[0],
-				y = translatedEvent[1];
+			HandlerLib.resetCanvasMode();
 			
-			GeneralLib.setModified(true);
-			HandlerLib.resetCanvasMode(true);
-
-			layout.activities.push(new ActivityDefs.OptionalActivity(null, null, x, y));
-		});
+			$('.modal-body', layout.infoDialog).text(LABELS.OPTIONAL_ACTIVITY_PLACE_PROMPT);
+			layout.infoDialog.modal('show');
+		
+			canvas.css('cursor', 'pointer').click(function(event){
+				$('.modal-body', layout.infoDialog).empty();
+				layout.infoDialog.modal('hide');
+	
+				var translatedEvent = GeneralLib.translateEventOnCanvas(event),
+					x = translatedEvent[0],
+					y = translatedEvent[1];
+				
+				GeneralLib.setModified(true);
+				HandlerLib.resetCanvasMode(true);
+	
+				layout.activities.push(new ActivityDefs.OptionalActivity(null, null, x, y));
+			});
 	},
 	
 
@@ -219,24 +227,33 @@ var MenuLib = {
 	 * Creates a new transition.
 	 */
 	addTransition : function() {
-		HandlerLib.resetCanvasMode();
-		
-		$('.modal-body', layout.infoDialog).text(LABELS.TRANSITION_PLACE_PROMPT);
-		layout.infoDialog.modal('show');
-		
-		canvas.css('cursor', 'pointer').click(function(event){
-			$('.modal-body', layout.infoDialog).empty();
-			layout.infoDialog.modal('hide');
+		if (layout.isTransitionStarted) {
+			layout.isTransitionStarted = false;
+			HandlerLib.resetCanvasMode(true);
+			$('#transitionButton').blur();
+		} else {
+			layout.isTransitionStarted = true;
+			HandlerLib.resetCanvasMode();
 			
-			var startActivity = null,
-				targetElement = Snap.getElementByPoint(event.pageX, event.pageY);
-			if (targetElement) {
-				startActivity = ActivityLib.getParentObject(targetElement);
-				if (startActivity) {
-					HandlerTransitionLib.drawTransitionStartHandler(startActivity, null, event.pageX, event.pageY);
+			$('.modal-body', layout.infoDialog).text(LABELS.TRANSITION_PLACE_PROMPT);
+			layout.infoDialog.modal('show');
+			
+			canvas.css('cursor', 'pointer').click(function(event){
+				layout.isTransitionStarted = false;
+				
+				$('.modal-body', layout.infoDialog).empty();
+				layout.infoDialog.modal('hide');
+				
+				var startActivity = null,
+					targetElement = Snap.getElementByPoint(event.pageX, event.pageY);
+				if (targetElement) {
+					startActivity = ActivityLib.getParentObject(targetElement);
+					if (startActivity) {
+						HandlerTransitionLib.drawTransitionStartHandler(startActivity, null, event.pageX, event.pageY);
+					}
 				}
-			}
-		});
+			});
+		}
 	},
 	
 	
@@ -244,6 +261,7 @@ var MenuLib = {
 	 * Mark an activity as ready for pasting.
 	 */
 	copyActivity : function(){
+		$('#copyButton').blur();
 		layout.copiedActivity = layout.selectedObject;
 	},
 	
@@ -554,6 +572,8 @@ var MenuLib = {
 	 * Make a copy of an existing activity.
 	 */
 	pasteActivity : function(){
+		$('#pasteButton').blur();
+		
 		var activity = layout.copiedActivity;
 		if (!activity) {
 			return;
@@ -628,6 +648,8 @@ var MenuLib = {
 	 * Opens "Save sequence" dialog where an user can choose where to save the Learning Design.
 	 */
 	saveLearningDesign : function(showDialog){
+		$('#saveButton').blur();
+		
 		if (!showDialog && layout.ld.learningDesignID) {
 			GeneralLib.saveLearningDesign(layout.ld.folderID, layout.ld.learningDesignID, layout.ld.title);
 			return;

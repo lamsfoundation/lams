@@ -17,6 +17,11 @@ $(document).ready(function() {
 		
 		if (/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)){
 			$('.desktopButton').hide();
+			
+			document.addEventListener("touchstart", HandlerLib.touchHandler, true);
+			document.addEventListener("touchmove", HandlerLib.touchHandler, true);
+			document.addEventListener("touchend", HandlerLib.touchHandler, true);
+			document.addEventListener("touchcancel", HandlerLib.touchHandler, true);
 		}
 	}
 	
@@ -984,6 +989,8 @@ GeneralLib = {
 	 * Sorts activities on canvas.
 	 */
 	arrangeActivities : function(activities){
+		$('#arrangeButton').blur();
+		
 		// when importing parts of another LD, activities get appended and only they get sorted
 		var append = activities,
 			activities = activities || layout.activities;

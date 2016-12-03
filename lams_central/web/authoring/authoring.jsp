@@ -19,8 +19,6 @@
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery-ui.js"></script>
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery.dialogextend.js"></script>
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery.simple-color.js"></script>
-	<!-- Fix for iPad -->
-	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery.ui.touch-punch.js"></script>
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/yui/yahoo-dom-event.js" ></script>
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/yui/animation-min.js"></script>
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/yui/json-min.js" ></script> 
@@ -292,7 +290,7 @@
 		</div>
 
 		<div class="btn-group btn-group-sm">
-			<button type="button" class="btn btn-default" onClick="javascript:MenuLib.saveLearningDesign()">
+			<button id="saveButton" type="button" class="btn btn-default" onClick="javascript:MenuLib.saveLearningDesign()">
 				<i class="fa fa-save"></i>
 				<span><fmt:message key="authoring.fla.page.menu.save" /></span>
 			</button>
@@ -370,7 +368,7 @@
 		  </ul>
 		</div>
 				
-		<button id="arrangeButton " class="btn btn-default desktopButton" onClick="javascript:GeneralLib.arrangeActivities()">
+		<button id="arrangeButton" class="btn btn-default desktopButton" onClick="javascript:GeneralLib.arrangeActivities()">
 			<i class="fa fa-th"></i> 
 			<span><fmt:message key="authoring.fla.page.menu.arrange" /></span>
 		</button>
@@ -390,7 +388,7 @@
 				<select>
 					<option><fmt:message key="authoring.fla.tool.groups.all" /></option>
 				</select>
-				<div class="templateContainer">
+				<div class="templateContainer scrollable">
 					<c:forEach var="tool" items="${tools}">
 						<div class="tooltemplate">
 						<div

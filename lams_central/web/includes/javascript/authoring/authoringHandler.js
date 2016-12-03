@@ -6,7 +6,60 @@
  * Contains general (canvas, group of shapes) action handlers
  */
 var HandlerLib = {
+	// taken from http://jsfiddle.net/LQuyr/8/
+	touchHandler : function(event) {
+	    var self = this,
+	    	touches = event.changedTouches,
+	        first = touches[0],
+	        type = "";
+
+	    switch (event.type) {
+	    case "touchstart":
+	        type = "mousedown";
+	        window.startY = event.pageY;
+	        break;
+	    case "touchmove":
+	        type = "mousemove";
+	        break;
+	    case "touchend":
+	        type = "mouseup";
+	        break;
+	    default:
+	        return;
+	    }
+	    var simulatedEvent = document.createEvent("MouseEvent");
+	    simulatedEvent.initMouseEvent(type, true, true, window, 1, first.screenX, first.screenY,
+	    		first.clientX, first.clientY, false, false, false, false, 0 /*left*/ , null);
+
+	    first.target.dispatchEvent(simulatedEvent);
+
+	    var scrollables = [],
+	    	clickedInScrollArea = false,
+	    	// check if any of the parents has is-scollable class
+	    	parentEls = $(event.target).parents().map(function() {
+	        try {
+	            if ($(this).hasClass('scrollable')) {
+	                clickedInScrollArea = true;
+	                // get vertical direction of touch event
+	                var direction = (window.startY < first.clientY) ? 'down' : 'up';
+	                // calculate stuff... :o)
+	                if ((($(this).scrollTop() <= 0) && (direction === 'down'))
+	                		|| (($(this).height() <= $(this).scrollTop()) && (direction === 'up')) ){
+
+	                } else {
+	                    scrollables.push(this);
+	                }
+	            }
+	        } catch (e) {}
+	    });
+	    
+	    // if not, prevent default to prevent bouncing
+	    if ((scrollables.length === 0) && (type === 'mousemove')) {
+	        event.preventDefault();
+	    }
+	},
 		
+	
 	/**
 	 * Remove activity selection when user clicks on canvas.
 	 */
