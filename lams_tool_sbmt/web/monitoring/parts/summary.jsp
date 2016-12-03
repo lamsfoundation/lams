@@ -104,7 +104,7 @@
 			wd.close();
 		}
 		wd = window.open(url, title,
-				'resizable,width=796,height=570,scrollbars');
+				'resizable,width=1152,height=648,scrollbars');
 		wd.window.focus();
 	}
 

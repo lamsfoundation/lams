@@ -112,7 +112,7 @@
 			function viewNotebookEntries(){
 				openPopUp(APP_URL + "notebook.do?method=viewAll&lessonID=" + lessonId,
 						"Notebook",
-						570,796,
+						648,1152,
 						"no");
 				hideSlideMenu(); /* For touch screen */
 			}

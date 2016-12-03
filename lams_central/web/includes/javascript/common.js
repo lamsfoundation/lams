@@ -10,7 +10,7 @@ function launchInstructionsPopup(url) {
 			if(instructionsWindow && instructionsWindow.open && !instructionsWindow.closed){
 				instructionsWindow.close();
 			}
-			instructionsWindow = window.open(url,'instructions','resizable,width=796,height=570,scrollbars');
+			instructionsWindow = window.open(url,'instructions','resizable,width=1152,height=648,scrollbars');
 			instructionsWindow.window.focus();
 //		}	
 }
