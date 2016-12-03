@@ -283,3 +283,6 @@
 <!-- End Reflection -->
 
 </div> <!-- End addRecordDiv -->
+<script type="text/javascript">
+	$("input[name='answer[0]']").focus();
+</script>
