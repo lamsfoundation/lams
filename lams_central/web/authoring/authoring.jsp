@@ -375,7 +375,8 @@
 			<span><fmt:message key="authoring.fla.page.menu.arrange" /></span>
 		</button>
 				
-		<button id="previewButton" class="btn btn-default" onClick="javascript:MenuLib.openPreview()">
+		<button id="previewButton" class="btn btn-default" onClick="javascript:MenuLib.openPreview()"
+				data-loading-text="<i class='fa fa-circle-o-notch fa-spin'></i><span> <fmt:message key="authoring.fla.page.menu.preview" /></span>">
 			<i class="fa fa-search-plus"></i> 
 			<span><fmt:message key="authoring.fla.page.menu.preview" /></span>
 		</button>

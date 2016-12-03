@@ -509,6 +509,8 @@ var MenuLib = {
 			return;
 		}
 		
+		var previewButton = $('#previewButton').button('loading');
+		
 		// initialize, create and enter the preview lesson
 		$.ajax({
 			url : LAMS_URL + 'monitoring/monitoring.do',
@@ -523,6 +525,7 @@ var MenuLib = {
 			success : function(lessonID) {
 				if (!lessonID) {
 					alert(LABELS.PREVIEW_ERROR);
+					previewButton.button('reset');
 					return;
 				}
 				
@@ -538,6 +541,7 @@ var MenuLib = {
 						// open preview pop up window
 						window.open(LAMS_URL + 'home.do?method=learner&mode=preview&lessonID='+lessonID,'Preview',
 									'width=1280,height=720,resizable,status=yes');
+						previewButton.button('reset');
 					}
 				});
 
