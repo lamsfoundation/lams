@@ -37,13 +37,13 @@
 		
 		function openProfile() {
 			if(isMac) {
-				pWin = window.open('profile.do?method=view','pWindow','width=796,height=570,resizable,scrollbars');
+				pWin = window.open('profile.do?method=view','pWindow','width=1152,height=648,resizable,scrollbars');
 			} else {
 				if (pWin && !pWin.closed) {
 					pWin.location='profile.do?method=view';
 					pWin.focus();
 				} else {
-					pWin = window.open('profile.do?method=view','pWindow','width=796,height=570,resizable,scrollbars');
+					pWin = window.open('profile.do?method=view','pWindow','width=1152,height=648,resizable,scrollbars');
 					pWin.focus();
 				}
 			}
@@ -158,8 +158,8 @@
 		}
 		
 		function openOrgManagement(orgId) {
-			var height = 570;
-			var width = 796;
+			var height = 648;
+			var width = 1152;
 			var left = 0;
 			var top = 0;
 			if (self.screen) {
