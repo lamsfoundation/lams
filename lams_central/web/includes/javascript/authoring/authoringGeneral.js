@@ -1920,7 +1920,7 @@ GeneralLib = {
 				GeneralLib.updateAccess(response.access);
 				
 				if (!ld.validDesign && !isReadOnlyMode) {
-					$('.modal-body', layout.infoDialog).text(LABELS.SEQUENCE_NOT_VALID);
+					$('.modal-body', layout.infoDialog).html(LABELS.SEQUENCE_NOT_VALID);
 					layout.infoDialog.modal('show');
 					
 					setTimeout(function(){
