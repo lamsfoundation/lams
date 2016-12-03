@@ -25,7 +25,7 @@
 			wd.close();
 		}
 		wd = window.open("<c:url value='/monitoring/viewAllMarks.do?toolSessionID='/>" + sessionId + "&sessionMapID=${sessionMapID}", 
-				"mark", 'resizable, width=796, height=570, scrollbars');
+				"mark", 'resizable, width=1152, height=648, scrollbars');
 		wd.window.focus();
 	}
 	

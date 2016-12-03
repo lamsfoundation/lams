@@ -35,7 +35,7 @@
 		if(viewWindow && viewWindow.open && !viewWindow.closed){
 			viewWindow.close();
 		}
-		viewWindow = window.open(url,'viewWindow','resizable,width=796,height=570,scrollbars');
+		viewWindow = window.open(url,'viewWindow','resizable,width=1152,height=648,scrollbars');
 		viewWindow.window.focus();
 	}
 	

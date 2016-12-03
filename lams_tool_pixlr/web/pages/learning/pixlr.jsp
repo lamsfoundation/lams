@@ -8,7 +8,7 @@
 		
 		url += "&target=" + escape("${returnURL}");
 		url += "&image=" + escape("${currentImageURL}");
-		openPopup(url, 570, 796);
+		openPopup(url, 648, 1152);
 	}
 
 	function refresh() {
