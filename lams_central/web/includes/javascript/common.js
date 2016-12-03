@@ -20,7 +20,7 @@ function launchPopup(url,title) {
 	if(wd && wd.open && !wd.closed){
 		wd.close();
 	}
-	wd = window.open(url,title,'resizable,width=840,height=570,scrollbars');
+	wd = window.open(url,title,'resizable,width=1152,height=648,scrollbars');
 	wd.window.focus();
 }	
 	
