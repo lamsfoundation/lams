@@ -24,7 +24,7 @@
 <script type="text/javascript">
 	var evalcomixWindow = null;
 	function openEvalcomixWindow(url) {
-    	evalcomixWindow=window.open(url, 'evalcomixWindow', 'width=800,height=600,scrollbars=yes,resizable=yes');
+    	evalcomixWindow=window.open(url, 'evalcomixWindow', 'width=1152,height=648,scrollbars=yes,resizable=yes');
 		if (window.focus) {evalcomixWindow.focus()}
 	}
 </script>
