@@ -230,6 +230,8 @@ var MenuLib = {
 		if (layout.isTransitionStarted) {
 			layout.isTransitionStarted = false;
 			HandlerLib.resetCanvasMode(true);
+			$('.modal-body', layout.infoDialog).empty();
+			layout.infoDialog.modal('hide');
 			$('#transitionButton').blur();
 		} else {
 			layout.isTransitionStarted = true;
