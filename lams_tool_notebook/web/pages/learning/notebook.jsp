@@ -9,30 +9,34 @@
 	}
 
 	function textAreaReady() {
-		document.learningForm.focusedInput.focus();
+		<c:if test="${not notebookDTO.allowRichEditor}">
+			document.learningForm.focusedInput.focus();
+		</c:if>
 		document.getElementById("finishButton").disabled = false;
 	}
 	
 	function submitForm(methodName) {
 		disableFinishButton();
-		if (forceResponse =="true" && document.learningForm.focusedInput.value == "") {
-			if (confirm("<fmt:message>message.learner.blank.alertforceResponse</fmt:message>")) {
-				return true;
-			} else {
-				// otherwise, focus on the text area
-				textAreaReady();
-				return false;
-			}
-			
-		} else if  (forceResponse =="false" && document.learningForm.focusedInput.value == "" && mode == "learner") {
-
-			if (!confirm("<fmt:message>message.learner.blank.input</fmt:message>")) {
-				// otherwise, focus on the text area
-				textAreaReady();
-				return false;
-			}
-		}
+		<c:if test="${not notebookDTO.allowRichEditor}">
 		
+			if (forceResponse =="true" && document.learningForm.focusedInput.value == "") {
+				if (confirm("<fmt:message>message.learner.blank.alertforceResponse</fmt:message>")) {
+					return true;
+				} else {
+					// otherwise, focus on the text area
+					textAreaReady();
+					return false;
+				}
+				
+			} else if  (forceResponse =="false" && document.learningForm.focusedInput.value == "" && mode == "learner") {
+	
+				if (!confirm("<fmt:message>message.learner.blank.input</fmt:message>")) {
+					// otherwise, focus on the text area
+					textAreaReady();
+					return false;
+				}
+			}
+		</c:if>		
 		var f = document.getElementById('messageForm');
 		f.submit();
 	}
@@ -82,7 +86,7 @@
 				<c:when test="${contentEditable}">
 					<c:choose>
 						<c:when test="${notebookDTO.allowRichEditor}">
-							<lams:CKEditor id="entryText" value="${lrnForm.entryText}" contentFolderID="${learnerContentFolder}"
+							<lams:CKEditor id="entryText" value="${lrnForm.entryText}" height="200" contentFolderID="${learnerContentFolder}"
 								toolbarSet="DefaultLearner">
 							</lams:CKEditor>
 						</c:when>
