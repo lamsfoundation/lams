@@ -402,7 +402,7 @@
 												</c:when>
 											</c:choose>
 											<a href="#" class="btn btn-sm btn-default"
-											   onClick="javascript:openPopUp('${entry.URL}','ContributeActivity', 600, 800, true)"
+											   onClick="javascript:openPopUp('${entry.URL}','ContributeActivity', 648, 1152, true)"
 											   title='<fmt:message key="button.task.go.tooltip"/>'>
 											   <fmt:message key="button.task.go"/>
 											</a>
