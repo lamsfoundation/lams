@@ -772,7 +772,7 @@ ActivityLib = {
 			    branchEdgeStartX = branchPoints1.middleX + (branchPoints2.middleX - branchPoints1.middleX)/2,
 			    branchEdgeStartY = branchPoints1.middleY + (branchPoints2.middleY - branchPoints1.middleY)/2,
 			    branchingEdgeStart = new ActivityDefs.BranchingEdgeActivity(null, null, branchEdgeStartX,
-			    		branchEdgeStartY, null, null, null);
+			    		branchEdgeStartY, null, false, null, null);
 			layout.activities.push(branchingEdgeStart);
 			
 			// find last activities in subsequences and make an converge point between them
@@ -780,9 +780,9 @@ ActivityLib = {
 				convergeActivity2 = convergeActivity2.transitions.from[0].toActivity;
 			};
 
-			var convergePoints = ActivityLib.findTransitionPoints(convergeActivity1, convergeActivity2),
+			var convergePoints = ActivityLib.findTransitionPoints(convergeActivity1, convergeActivity2), 
 				branchingEdgeEnd = new ActivityDefs.BranchingEdgeActivity(null, null, convergePoints.middleX,
-					convergePoints.middleY, null, null, branchingEdgeStart.branchingActivity);
+					convergePoints.middleY, null, false, null, branchingEdgeStart.branchingActivity);
 			layout.activities.push(branchingEdgeEnd);
 			
 			// draw all required transitions
