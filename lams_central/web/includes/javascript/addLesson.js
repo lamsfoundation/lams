@@ -316,15 +316,15 @@ function addLesson(){
 
 function previewLesson(){
 	var ldNode = tree.getHighlightedNode(),
-	popupWidth = 1280,
-	popupHeight = 720;
+		popupWidth = 1280,
+		popupHeight = 720;
 
 	if (!ldNode || !ldNode.data.learningDesignId) {
 		$('#ldNotChosenError').show();
 		doSelectTab(1);
 		return;
 	}
-	$('body').css('cursor', 'wait');
+	var previewButton = $('#previewButton').button('loading');
 	// initialize, create and enter the preview lesson
 	$.ajax({
 		url : LAMS_URL + 'monitoring/monitoring.do',
@@ -339,7 +339,7 @@ function previewLesson(){
 		success : function(lessonID) {
 			if (!lessonID) {
 				alert(LABELS.PREVIEW_ERROR);
-				$('body').css('cursor', 'auto');
+				previewButton.button('reset');
 				return;
 			}
 			
@@ -352,10 +352,10 @@ function previewLesson(){
 				cache : false,
 				dataType : 'text',
 				success : function() {
-					$('body').css('cursor', 'auto');
 					// open preview pop up window
 					window.open(LAMS_URL + 'home.do?method=learner&mode=preview&lessonID='+lessonID,'Preview',
 								'width=' + popupWidth + ',height=' + popupHeight + ',resizable,status=yes');
+					previewButton.button('reset');
 				}
 			});
 
