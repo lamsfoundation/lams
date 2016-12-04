@@ -99,7 +99,7 @@ var DecorationDefs = {
 				if ( ! borderColor )
 					borderColor = layout.colors.activityBorder;
 				if ( ! strokeWidth )
-					strokeWidth = 1;
+					strokeWidth = 0.5;
 				
 				// the rectangle
 				this.items.shape = paper.path(Snap.format('M {x} {y} h {width} v {height} h -{width} z',
