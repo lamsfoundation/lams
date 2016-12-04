@@ -361,19 +361,25 @@ GeneralInitLib = {
 		});
 		
 		// copy sequence or folder
-		$('#ldStoreDialogCopyButton', ldStoreDialogContents).click(function(){
+		$('#ldStoreDialogCopyButton, #ldStoreDialogCutButton', ldStoreDialogContents).click(function(){
     		var dialog = layout.ldStoreDialog,
 				tree = dialog.data('ldTree'),
 				// hightlighted sequence/folder in the tree
 				ldNode = tree.getHighlightedNode(),
-				isFolder = ldNode && !ldNode.data.learningDesignId;
+				isFolder = ldNode && !ldNode.data.learningDesignId,
+				isCut = $(this).is('#ldStoreDialogCutButton');
     		if (!ldNode) {
+    			return;
+    		}
+    		if (isCut && !ldNode.data.canModify) {
+    			alert(LABELS.RESOURCE_MODIFY_ERROR);
     			return;
     		}
     		
     		dialog.data('copiedResource', {
-    			'isFolder'   : isFolder,
-    			'resourceID' : isFolder ?  ldNode.data.folderID : ldNode.data.learningDesignId
+    			'isCut'	 	  : isCut,
+    			'isFolder'    : isFolder,
+    			'resourceNode': ldNode
     		});
 		});
 		
@@ -385,28 +391,45 @@ GeneralInitLib = {
 				ldNode = tree.getHighlightedNode(),
 				folderNode = ldNode ? (ldNode.data.learningDesignId ? ldNode.parent : ldNode) : null,
 				copiedResource = dialog.data('copiedResource');
-				
+
 			if (!folderNode || !copiedResource) {
     			return;
     		}
+			
+			if (copiedResource.isCut) {
+				var parent = ldNode.parent;
+				while (parent) {
+					if (parent.index == copiedResource.resourceNode.index) {
+						alert(LABELS.FOLDER_MOVE_TO_CHILD_ERROR);
+						return;
+					}
+					parent = parent.parent;
+				}
+			}
 
 			$.ajax({
 				cache : false,
-				async : false,
 				url : LAMS_URL + "workspace.do",
 				dataType : 'text',
 				data : {
-					'method'         : 'copyResource',
+					'method'         : copiedResource.isCut ? 'moveResource' : 'copyResource',
 					'targetFolderID' : folderNode.data.folderID,
-					'resourceID'     : copiedResource.resourceID,
+					'resourceID'     : copiedResource.isFolder ? copiedResource.resourceNode.data.folderID
+															   : copiedResource.resourceNode.data.learningDesignId ,
 					'resourceType'   : copiedResource.isFolder ? 'Folder' : 'LearningDesign'
 				},
 				success : function() {
+					if (copiedResource.isCut) {
+						tree.removeNode(copiedResource.resourceNode, true);
+					}
 					tree.removeChildren(folderNode);
 					folderNode.expand();
+					
+					dialog.data('copiedResource', null);
 				}
 			});
 		});
+
 		
 		// removes sequence or folder
 		$('#ldStoreDialogDeleteButton', ldStoreDialogContents).click(function(){
@@ -418,7 +441,7 @@ GeneralInitLib = {
     			return;
     		}
     		if (!ldNode.data.canModify) {
-    			alert("You can not modify this");
+    			alert(LABELS.RESOURCE_MODIFY_ERROR);
     			return;
     		}
     		var isFolder = !ldNode.data.learningDesignId;

@@ -577,6 +577,28 @@ public class WorkspaceManagementService implements IWorkspaceManagementService {
 	}
     }
 
+    @Override
+    public void moveResource(Long resourceID, String resourceType, Integer targetFolderID)
+	    throws WorkspaceFolderException {
+	WorkspaceFolder targetFolder = getWorkspaceFolder(targetFolderID);
+	if (FolderContentDTO.DESIGN.equals(resourceType)) {
+	    LearningDesign learningDesign = learningDesignDAO.getLearningDesignById(resourceID);
+	    learningDesign.setWorkspaceFolder(targetFolder);
+	    learningDesignDAO.insertOrUpdate(learningDesign);
+	} else if (FolderContentDTO.FOLDER.equals(resourceType)) {
+	    WorkspaceFolder folder = getWorkspaceFolder(resourceID.intValue());
+	    WorkspaceFolder parent = targetFolder.getParentWorkspaceFolder();
+	    while (parent != null) {
+		if (parent.equals(folder)) {
+		    throw new WorkspaceFolderException("Can not move a folder into its descendant");
+		}
+		parent = parent.getParentWorkspaceFolder();
+	    }
+	    folder.setParentWorkspaceFolder(targetFolder);
+	    baseDAO.update(folder);
+	}
+    }
+
     /**
      * This method copies one folder inside another folder. To be able to successfully perform this action following
      * conditions must be met in the order they are listed.

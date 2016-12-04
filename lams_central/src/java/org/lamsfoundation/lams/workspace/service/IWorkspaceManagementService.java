@@ -206,6 +206,11 @@ public interface IWorkspaceManagementService {
 	    throws IOException, LearningDesignException, UserException, WorkspaceFolderException;
 
     /**
+     * Changes the parent of given Learning Design or WorkspaceFolder to the target WorkspaceFolder
+     */
+    void moveResource(Long resourceID, String resourceType, Integer targetFolderID) throws WorkspaceFolderException;
+
+    /**
      * This method returns a list of organisation workspace folders.
      *
      * The organisation folders returned are determined based on whether the user has "write" access. A user can

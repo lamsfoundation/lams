@@ -169,14 +169,36 @@ public class WorkspaceAction extends LamsDispatchAction {
 	Integer targetFolderID = WebUtil.readIntParam(request, "targetFolderID", false);
 
 	if (targetFolderID == null) {
-	    log.error("Can not create folder, parent folder ID is NULL");
-	    response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Parent folder ID is NULL");
+	    log.error("Can not copy resource, missing target folder ID");
+	    response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Missing target folder ID");
 	    return null;
 	}
 
 	Integer copyType = WebUtil.readIntParam(request, "copyType", true);
 	Integer userID = getUserId();
 	getWorkspaceManagementService().copyResource(resourceID, resourceType, copyType, targetFolderID, userID);
+	return null;
+    }
+
+    public ActionForward moveResource(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+	    HttpServletResponse response) throws IOException {
+	Long resourceID = WebUtil.readLongParam(request, WorkspaceAction.RESOURCE_ID, false);
+	String resourceType = WebUtil.readStrParam(request, WorkspaceAction.RESOURCE_TYPE, false);
+	Integer targetFolderID = WebUtil.readIntParam(request, "targetFolderID", false);
+
+	if (targetFolderID == null) {
+	    log.error("Can not move resource, missing target folder ID");
+	    response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Missing target folder ID");
+	    return null;
+	}
+
+	try {
+	    getWorkspaceManagementService().moveResource(resourceID, resourceType, targetFolderID);
+	} catch (WorkspaceFolderException e) {
+	    log.error("Error while moving a resource", e);
+	    response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Error while moving a resource");
+	    return null;
+	}
 	return null;
     }
 

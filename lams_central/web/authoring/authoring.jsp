@@ -124,6 +124,10 @@
 				SEQUENCE_NOT_SELECTED_ERROR : decoderDiv.html('<c:out value="${SEQUENCE_NOT_SELECTED_ERROR_VAR}" />').text(),
 				<fmt:message key="authoring.fla.sequence.load.error" var="SEQUENCE_LOAD_ERROR_VAR"/>
 				SEQUENCE_LOAD_ERROR : decoderDiv.html('<c:out value="${SEQUENCE_LOAD_ERROR_VAR}" />').text(),
+				<fmt:message key="authoring.fla.modify.error" var="RESOURCE_MODIFY_ERROR_VAR"/>
+				RESOURCE_MODIFY_ERROR : decoderDiv.html('<c:out value="${RESOURCE_MODIFY_ERROR_VAR}" />').text(),
+				<fmt:message key="authoring.fla.folder.move.to.child.error" var="FOLDER_MOVE_TO_CHILD_ERROR_VAR"/>
+				FOLDER_MOVE_TO_CHILD_ERROR : decoderDiv.html('<c:out value="${FOLDER_MOVE_TO_CHILD_ERROR_VAR}" />').text(),
 				
 				// HandlerLib
 				<fmt:message key="authoring.fla.transition.from.exists.error" var="TRANSITION_FROM_EXISTS_ERROR_VAR"/>
@@ -495,6 +499,11 @@
 							<button id="ldStoreDialogCopyButton" class="btn btn-default">
 								<i class="fa fa-copy"></i> 
 								<span><fmt:message key="authoring.fla.copy.button" /></span>
+							</button>
+							
+							<button id="ldStoreDialogCutButton" class="btn btn-default">
+								<i class="fa fa-cut"></i> 
+								<span><fmt:message key="authoring.fla.cut.button" /></span>
 							</button>
 							
 							<button id="ldStoreDialogPasteButton" class="btn btn-default">
