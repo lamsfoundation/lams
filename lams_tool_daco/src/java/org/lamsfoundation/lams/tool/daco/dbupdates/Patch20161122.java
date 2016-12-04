@@ -29,6 +29,7 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
+import org.apache.commons.lang.StringUtils;
 import org.lamsfoundation.lams.tool.daco.DacoConstants;
 
 import com.tacitknowledge.util.migration.MigrationContext;
@@ -67,7 +68,11 @@ public class Patch20161122 extends MigrationTaskSupport {
 	    if (readQuery.execute()) {
 		ResultSet rs = readQuery.getResultSet();
 		while (rs.next()) {
-		    Date date = OLD_DATE_FORMAT.parse(rs.getString(2));
+		    String answer = rs.getString(2);
+		    if (StringUtils.isBlank(answer)) {
+			continue;
+		    }
+		    Date date = OLD_DATE_FORMAT.parse(answer);
 		    String newFormat = DacoConstants.DEFAULT_DATE_FORMAT.format(date);
 		    updateQuery.setString(1, newFormat);
 		    updateQuery.setLong(2, rs.getLong(1));
