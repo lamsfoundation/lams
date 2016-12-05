@@ -15,8 +15,7 @@ $(document).ready(function() {
 	});
 });
 
-
-	// for chat users to be indetified by different colours
+// for chat users to be indetified by different colours
 var PALETTE = ["#008CD2", "#DF7C08", "#83B532", "#E0BE40", "#AE8124", "#5F0704", "#004272", "#CD322B", "#254806"],
 	// only Monitor can send a personal message
 	selectedUser = null,
@@ -24,6 +23,23 @@ var PALETTE = ["#008CD2", "#DF7C08", "#83B532", "#E0BE40", "#AE8124", "#5F0704",
 	chatToolWebsocket = new WebSocket(APP_URL.replace('http', 'ws') + 'learningWebsocket?toolSessionID=' + TOOL_SESSION_ID);
 
 chatToolWebsocket.onmessage = function(e){
+	
+	//if messageDiv has been already initialized in $(document).ready(..) simply invoke onmessageHandler, otherwise run it with a timeout
+	if (typeof messageDiv == 'undefined') {
+		setTimeout(function() {
+			onmessageHandler(e);
+		}, 500);
+	} else {
+		onmessageHandler(e);
+	}
+	
+}
+
+chatToolWebsocket.onerror = function(e){
+	alert("Error estabilishing connection to server: " + e.data);
+}
+
+function onmessageHandler(e) {
 	// create JSON object
 	var input = JSON.parse(e.data);
 	// clear old messages
@@ -63,10 +79,6 @@ chatToolWebsocket.onmessage = function(e){
 			});
 		}
 	});
-}
-
-chatToolWebsocket.onerror = function(e){
-	alert("Error estabilishing connection to server: " + e.data);
 }
 
 function userSelected(userDiv) {
