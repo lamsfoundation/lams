@@ -66,7 +66,7 @@
 		<div class="row">
 			<div class="col-xs-12 col-sm-9 col-md-10 col-lg-10">
 				<div id="textArea" class="voffset5">
-					<textarea id="sendMessageArea" rows="2" class="form-control"></textarea>
+					<textarea id="sendMessageArea" rows="2" class="form-control" autofocus></textarea>
 				</div>
 			</div>
 			<div class="col-xs-12 col-sm-3 col-md-2 col-lg-2 ">
