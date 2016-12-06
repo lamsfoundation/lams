@@ -42,6 +42,8 @@ public class ScratchieConstants {
     public static final String ERROR = "error";
 
     public static final String DEFINE_LATER = "definelater";
+    
+    public static final String WAIT_FOR_LEADER_TIME_LIMIT = "waitForLeaderTimeLimit";
 
     // for parameters' name
     public static final String PARAM_TOOL_CONTENT_ID = "toolContentID";

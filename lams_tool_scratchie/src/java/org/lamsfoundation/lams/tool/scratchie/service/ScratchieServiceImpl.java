@@ -301,6 +301,30 @@ public class ScratchieServiceImpl
 	
 	scheduler.scheduleJob(finishScratchingJob, fnishScratchingTrigger);
     }
+    
+    @Override
+    public boolean isWaitingForLeaderToSubmit(ScratchieSession toolSession) {
+	Long toolSessionId = toolSession.getSessionId();
+	Scratchie scratchie = toolSession.getScratchie();
+	ScratchieUser groupLeader = toolSession.getGroupLeader();
+	
+	boolean isReflectOnActivity = scratchie.isReflectOnActivity();
+	// get notebook entry
+	NotebookEntry notebookEntry = null;
+	if (isReflectOnActivity && (groupLeader != null)) {
+	    notebookEntry = getEntry(toolSessionId, CoreNotebookConstants.NOTEBOOK_TOOL,
+		    ScratchieConstants.TOOL_SIGNATURE, groupLeader.getUserId().intValue());
+	}
+	List<ScratchieBurningQuestion> burningQuestions = null;
+	if (scratchie.isBurningQuestionsEnabled()) {
+	    burningQuestions = getBurningQuestionsBySession(toolSessionId);
+	}
+	boolean isWaitingForLeaderToSubmitNotebook = isReflectOnActivity && (notebookEntry == null);
+	boolean isWaitingForLeaderToSubmitBurningQuestions = scratchie.isBurningQuestionsEnabled()
+		&& ((burningQuestions == null) || burningQuestions.isEmpty()) && !toolSession.isSessionFinished();
+	
+	return isWaitingForLeaderToSubmitNotebook || isWaitingForLeaderToSubmitBurningQuestions;
+    }
 
     @Override
     public void changeUserMark(Long userId, Long sessionId, Integer newMark) {

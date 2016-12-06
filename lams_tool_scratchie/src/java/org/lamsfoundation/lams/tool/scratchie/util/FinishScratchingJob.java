@@ -16,8 +16,9 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.scheduling.quartz.QuartzJobBean;
 
 /**
- * The Quartz sheduling job that finishes scratching for the given ToolSession (which will automatically lead to showing
- * Finish button all non-leaders and thus let then finish the activity).
+ * The Quartz sheduling job that finishes scratching for the given ToolSession. It will lead to showing Finish button to
+ * all non-leaders in case they are not waiting for notebook/burning question to be submitted by the leader, and showing
+ * waitForLeaderSubmit page if they are waiting.
  *
  * @author Andrey Balan
  */
@@ -34,10 +35,20 @@ public class FinishScratchingJob extends QuartzJobBean {
 	Long toolSessionId = (Long) properties.get("toolSessionId");
 	ScratchieSession toolSession = scratchieService.getScratchieSessionBySessionId(toolSessionId);
 	
-	// if leader hasn't finished scratching yet - let all non-leaders see Next Activity button
+	//proceed only in case the leader hasn't finished scratching on his own
 	if (!toolSession.isScratchingFinished()) {
 	    try {
+		//mark scratching as finished to stop showing learning.jsp to the leader
 		scratchieService.setScratchingFinished(toolSessionId);
+		
+		// if non-leaders should not wait for notebook or burning questions to be submitted by the leader - let them see Finish button
+		boolean isWaitingForLeaderToSubmit = scratchieService.isWaitingForLeaderToSubmit(toolSession);
+		if (isWaitingForLeaderToSubmit) {
+		    LearningWebsocketServer.sendPageRefreshRequest(toolSessionId);
+		} else {
+		    LearningWebsocketServer.sendCloseRequest(toolSessionId);
+		}
+		
 	    } catch (JSONException | IOException e) {
 		throw new RuntimeException(e);
 	    }
