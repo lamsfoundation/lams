@@ -159,7 +159,7 @@
 		<action path="/learning/start"
 			type="org.lamsfoundation.lams.tool.scratchie.web.action.LearningAction"
 			parameter="start" >
-			<forward name="success" path="/pages/learning/start.jsp" />
+			<forward name="success" path="/pages/learning/learning.jsp" />
 			<forward name="waitforleader" path="/pages/learning/waitforleader.jsp" />
 			<forward name="newReflection" path="/learning/newReflection.do" />
 			<forward name="showBurningQuestions" path="/learning/showBurningQuestions.do" />
