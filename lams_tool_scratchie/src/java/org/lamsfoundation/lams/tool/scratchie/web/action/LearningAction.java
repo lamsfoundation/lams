@@ -328,13 +328,13 @@ public class LearningAction extends Action {
 	boolean isShowResults = (isScratchingFinished && !isWaitingForLeaderToSubmitNotebook
 		&& !isWaitingForLeaderToSubmitBurningQuestions) && !mode.isTeacher();
 
-	// show leader showBurningQuestions page
+	// show showBurningQuestions page to the leader
 	if (isUserLeader && isScratchingFinished && isWaitingForLeaderToSubmitBurningQuestions) {
 	    ActionRedirect redirect = new ActionRedirect(mapping.findForwardConfig("showBurningQuestions"));
 	    redirect.addParameter(ScratchieConstants.ATTR_SESSION_MAP_ID, sessionMap.getSessionID());
 	    return redirect;
 
-	// show leader notebook page
+	// show notebook page to the leader
 	} else if (isUserLeader && isScratchingFinished && isWaitingForLeaderToSubmitNotebook) {
 	    ActionRedirect redirect = new ActionRedirect(mapping.findForwardConfig("newReflection"));
 	    redirect.addParameter(ScratchieConstants.ATTR_SESSION_MAP_ID, sessionMap.getSessionID());
@@ -483,11 +483,16 @@ public class LearningAction extends Action {
 	final Long toolSessionId = (Long) sessionMap.get(AttributeNames.PARAM_TOOL_SESSION_ID);
 	ScratchieSession toolSession = service.getScratchieSessionBySessionId(toolSessionId);
 	Long userUid = (Long) sessionMap.get(ScratchieConstants.ATTR_USER_UID);
-
-	// in case of the leader (and if he hasn't done this when accessing notebook) we should let all other learners
-	// see Next Activity button
+	boolean isUserFinished = (boolean) sessionMap.get(ScratchieConstants.ATTR_USER_FINISHED);
+	
 	if (toolSession.isUserGroupLeader(userUid) && !toolSession.isScratchingFinished()) {
 	    service.setScratchingFinished(toolSessionId);
+	}
+
+	// in case of the leader (and if he hasn't done this last time accessing showResults page) we should let all other learners
+	// see Next Activity button
+	if (toolSession.isUserGroupLeader(userUid) && !isUserFinished) {
+	    LearningWebsocketServer.sendCloseRequest(toolSessionId);
 	}
 
 	// get updated score from ScratchieSession
