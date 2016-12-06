@@ -19,7 +19,7 @@
 	<script type="text/javascript">
 	$(document).ready(function(){
 		// hide Finish button for non-leaders until leader finishes
-		if (${!isUserLeader && !isScratchingFinished}) {
+		if (${!isUserLeader && (!isScratchingFinished || !isWaitingForLeaderToSubmitNotebook)}) {
 			$("#finishButton").hide();
 		}
 	});

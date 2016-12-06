@@ -522,8 +522,6 @@ public class ScratchieServiceImpl
 	ScratchieSession session = this.getScratchieSessionBySessionId(toolSessionId);
 	session.setScratchingFinished(true);
 	scratchieSessionDao.saveObject(session);
-	
-	LearningWebsocketServer.sendCloseRequest(toolSessionId);
     }
 
     @Override
