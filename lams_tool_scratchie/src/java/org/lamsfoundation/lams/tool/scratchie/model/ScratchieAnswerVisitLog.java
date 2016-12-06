@@ -30,9 +30,6 @@ import java.util.Date;
  * Scratchie
  *
  * @author Andrey Balan
- *
- *
- *
  */
 public class ScratchieAnswerVisitLog {
 

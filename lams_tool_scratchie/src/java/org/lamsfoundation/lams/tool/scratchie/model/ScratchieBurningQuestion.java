@@ -29,9 +29,6 @@ import java.util.Date;
  * ScratchieBurningQuestion
  *
  * @author Andrey Balan
- *
- *
- *
  */
 public class ScratchieBurningQuestion {
 

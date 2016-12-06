@@ -33,6 +33,14 @@
             insert="true"
             column="session_end_date"
         />
+        
+        <property
+            name="timeLimitLaunchedDate"
+            type="java.util.Date"
+            update="true"
+            insert="true"
+            column="time_limit_launched_date"
+        />
 
         <property
             name="sessionStartDate"

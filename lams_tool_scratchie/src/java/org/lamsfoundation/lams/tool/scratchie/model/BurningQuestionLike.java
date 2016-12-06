@@ -2,8 +2,6 @@ package org.lamsfoundation.lams.tool.scratchie.model;
 
 /**
  * @author Andrey Balan
- *
- *
  */
 public class BurningQuestionLike {
 

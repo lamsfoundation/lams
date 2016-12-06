@@ -69,20 +69,38 @@
 		}
 
 		//time limit feature
-		<c:if test="${not sessionMap.userFinished && scratchie.timeLimit > 0 && (mode != 'teacher')}">
+		<c:if test="${isTimeLimitEnabled}">
 			$(document).ready(function(){
-				//show confirmation dialog
-				$.blockUI({ 
-					message: $('#timelimit-start-dialog'), 
-					css: { width: '325px', height: '120px'}, 
-					overlayCSS: { opacity: '.98'} 
-				});
+				
+				//show timelimit-start-dialog in order to start countdown
+				if (${isTimeLimitNotLaunched}) {
 					
-				//once OK button pressed start countdown
-			    $('#timelimit-start-ok').click(function() {
-			       	$.unblockUI();
-			       	displayCountdown();
-			    });
+					//show confirmation dialog
+					$.blockUI({ 
+						message: $('#timelimit-start-dialog'), 
+						css: { width: '325px', height: '120px'}, 
+						overlayCSS: { opacity: '.98'} 
+					});
+						
+					//once OK button pressed start countdown
+				    $('#timelimit-start-ok').click(function() {
+				    	
+			        	//store date when user has started activity with time limit
+				        $.ajax({
+				        	async: true,
+				            url: '<c:url value="/learning/launchTimeLimit.do"/>',
+				            data: 'sessionMapID=${sessionMapID}',
+				            type: 'post'
+				       	});
+			        	
+				       	$.unblockUI();
+				       	displayCountdown();
+				    });
+					
+				} else {
+					displayCountdown();
+				}
+
 			});
 			
 			function displayCountdown(){
@@ -103,14 +121,14 @@
 				});
 				
 				$('#countdown').countdown({
-					until: '+${scratchie.timeLimit * 60}S',  
+					until: '+${secondsLeft}S',  
 					format: 'hMS',
 					compact: true,
 					onTick: function(periods) {
 						//check for 30 seconds
 						if ((periods[4] == 0) && (periods[5] == 0) && (periods[6] <= 30)) {
 							$('#countdown').css('color', '#FF3333');
-						}					
+						}		
 					},
 					onExpiry: function(periods) {
 				        $.blockUI({ message: '<h1 id="timelimit-expired"><i class="fa fa-refresh fa-spin fa-fw"></i> <fmt:message key="label.time.is.over" /></h1>' }); 

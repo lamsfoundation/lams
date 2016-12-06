@@ -29,9 +29,6 @@ import org.apache.log4j.Logger;
  * Tool may contain several questions. Which in turn contain answers.
  *
  * @author Andrey Balan
- *
- *
- *
  */
 public class ScratchieAnswer implements Cloneable {
     private static final Logger log = Logger.getLogger(ScratchieAnswer.class);

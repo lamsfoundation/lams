@@ -72,6 +72,7 @@ import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.lamsfoundation.lams.web.util.SessionMap;
+import org.quartz.SchedulerException;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 
@@ -87,7 +88,7 @@ public class LearningAction extends Action {
     @Override
     public ActionForward execute(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response)
-	    throws IOException, ServletException, JSONException, ScratchieApplicationException {
+	    throws IOException, ServletException, JSONException, ScratchieApplicationException, SchedulerException {
 
 	String param = mapping.getParameter();
 	// -----------------------Scratchie Learner function ---------------------------
@@ -96,6 +97,9 @@ public class LearningAction extends Action {
 	}
 	if (param.equals("recordItemScratched")) {
 	    return recordItemScratched(mapping, form, request, response);
+	}
+	if (param.equals("launchTimeLimit")) {
+	    return launchTimeLimit(mapping, form, request, response);
 	}
 	if (param.equals("finish")) {
 	    return finish(mapping, form, request, response);
@@ -174,6 +178,30 @@ public class LearningAction extends Action {
 	    request.setAttribute(ScratchieConstants.PARAM_TOOL_SESSION_ID, toolSessionId);
 	    request.setAttribute(ScratchieConstants.ATTR_SCRATCHIE, scratchie);
 	    return mapping.findForward("waitforleader");
+	}
+
+	// forwards to the waitForLeader time limit pages
+	if (!mode.isTeacher()) {
+	    boolean isNonLeader = !user.getUserId().equals(groupLeader.getUserId());
+	    if (isNonLeader && scratchie.getTimeLimit() != 0 && !user.isSessionFinished()) {
+
+		//show waitForLeaderLaunchTimeLimit page if the leader hasn't started activity or hasn't pressed OK button to launch time limit
+		if (toolSession.getTimeLimitLaunchedDate() == null) {
+		    request.setAttribute(ScratchieConstants.ATTR_WAITING_MESSAGE_KEY, "label.waiting.for.leader.launch.time.limit");
+		    return mapping.findForward("waitForLeaderTimeLimit");
+		}
+		
+		// check if the time limit is exceeded
+		boolean isTimeLimitExceeded = toolSession.getTimeLimitLaunchedDate().getTime()
+			+ scratchie.getTimeLimit() * 60000 < System.currentTimeMillis();
+		
+		// if the time is up and leader hasn't submitted response (as there will be a little delay between time
+		// is up and scratching is finished) - show waitForLeaderFinish page
+		if (isTimeLimitExceeded && !toolSession.isScratchingFinished()) {
+		    request.setAttribute(ScratchieConstants.ATTR_WAITING_MESSAGE_KEY, "label.waiting.for.leader.finish");
+		    return mapping.findForward("waitForLeaderTimeLimit");
+		}
+	    }
 	}
 
 	// initial Session Map
@@ -306,14 +334,14 @@ public class LearningAction extends Action {
 	    redirect.addParameter(ScratchieConstants.ATTR_SESSION_MAP_ID, sessionMap.getSessionID());
 	    return redirect;
 
-	    // show leader notebook page
+	// show leader notebook page
 	} else if (isUserLeader && isScratchingFinished && isWaitingForLeaderToSubmitNotebook) {
 	    ActionRedirect redirect = new ActionRedirect(mapping.findForwardConfig("newReflection"));
 	    redirect.addParameter(ScratchieConstants.ATTR_SESSION_MAP_ID, sessionMap.getSessionID());
 	    redirect.addParameter(AttributeNames.ATTR_MODE, mode);
 	    return redirect;
 
-	    // show results page
+	// show results page
 	} else if (isShowResults) {
 
 	    ActionRedirect redirect = new ActionRedirect(mapping.findForwardConfig("showResults"));
@@ -321,8 +349,24 @@ public class LearningAction extends Action {
 	    redirect.addParameter(AttributeNames.ATTR_MODE, mode);
 	    return redirect;
 
-	    // show learning.jsp page
+	// show learning.jsp page
 	} else {
+
+	    // time limit feature
+	    boolean isTimeLimitEnabled = isUserLeader && !isScratchingFinished && scratchie.getTimeLimit() != 0;
+	    boolean isTimeLimitNotLaunched = toolSession.getTimeLimitLaunchedDate() == null;
+	    long secondsLeft = 1;
+	    if (isTimeLimitEnabled) {
+		// if user has pressed OK button already - calculate remaining time, and full time otherwise
+		secondsLeft = isTimeLimitNotLaunched ? scratchie.getTimeLimit() * 60
+			: scratchie.getTimeLimit() * 60
+				- (System.currentTimeMillis() - toolSession.getTimeLimitLaunchedDate().getTime()) / 1000;
+		// change negative number or zero to 1 so it can autosubmit results
+		secondsLeft = Math.max(1, secondsLeft);
+	    }
+	    request.setAttribute(ScratchieConstants.ATTR_IS_TIME_LIMIT_ENABLED, isTimeLimitEnabled);
+	    request.setAttribute(ScratchieConstants.ATTR_IS_TIME_LIMIT_NOT_LAUNCHED, isTimeLimitNotLaunched);
+	    request.setAttribute(ScratchieConstants.ATTR_SECONDS_LEFT, secondsLeft);
 
 	    // make non leaders also wait for burning questions submit
 	    isWaitingForLeaderToSubmitNotebook |= isWaitingForLeaderToSubmitBurningQuestions;
@@ -351,7 +395,7 @@ public class LearningAction extends Action {
 
 	ScratchieSession toolSession = service.getScratchieSessionBySessionId(toolSessionId);
 
-	ScratchieUser leader = this.getCurrentUser(toolSessionId);
+	ScratchieUser leader = getCurrentUser(toolSessionId);
 	// only leader is allowed to scratch answers
 	if (!toolSession.isUserGroupLeader(leader.getUid())) {
 	    return null;
@@ -383,6 +427,31 @@ public class LearningAction extends Action {
 	    }
 	}, "LAMS_recordItemScratched_thread");
 	recordItemScratchedThread.start();
+
+	return null;
+    }
+    
+    /**
+     * Stores date when user has started activity with time limit
+     * @throws ScratchieApplicationException 
+     * @throws SchedulerException 
+     */
+    private ActionForward launchTimeLimit(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+	    HttpServletResponse response) throws ScratchieApplicationException, SchedulerException {
+	initializeScratchieService();
+	String sessionMapID = WebUtil.readStrParam(request, ScratchieConstants.ATTR_SESSION_MAP_ID);
+	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
+		.getAttribute(sessionMapID);
+	final Long toolSessionId = (Long) sessionMap.get(AttributeNames.PARAM_TOOL_SESSION_ID);
+	ScratchieSession toolSession = service.getScratchieSessionBySessionId(toolSessionId);
+	
+	ScratchieUser leader = getCurrentUser(toolSessionId);
+	// only leader is allowed to launch time limit
+	if (!toolSession.isUserGroupLeader(leader.getUid())) {
+	    return null;
+	}
+	
+	service.launchTimeLimit(toolSessionId);
 
 	return null;
     }
