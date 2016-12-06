@@ -43,6 +43,7 @@ import org.lamsfoundation.lams.tool.scratchie.model.ScratchieItem;
 import org.lamsfoundation.lams.tool.scratchie.model.ScratchieSession;
 import org.lamsfoundation.lams.tool.scratchie.model.ScratchieUser;
 import org.lamsfoundation.lams.util.ExcelCell;
+import org.quartz.SchedulerException;
 
 /**
  * Interface that defines the contract that all ShareScratchie service provider must follow.
@@ -66,6 +67,14 @@ public interface IScratchieService {
      * @param toolSessionId
      */
     ScratchieUser checkLeaderSelectToolForSessionLeader(ScratchieUser user, Long toolSessionId);
+    
+    /**
+     * Stores date when user has started activity with time limit.
+     * 
+     * @param sessionId
+     * @throws SchedulerException 
+     */
+    void launchTimeLimit(Long sessionId) throws SchedulerException;
 
     List<ScratchieBurningQuestion> getBurningQuestionsBySession(Long sessionId);
 

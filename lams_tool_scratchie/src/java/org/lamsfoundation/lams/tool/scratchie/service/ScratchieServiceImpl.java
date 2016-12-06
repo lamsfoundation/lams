@@ -28,8 +28,10 @@ import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Calendar;
 import java.util.Collection;
 import java.util.Date;
+import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
@@ -39,6 +41,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.SortedMap;
+import java.util.TimeZone;
 import java.util.TreeSet;
 
 import org.apache.commons.lang.StringEscapeUtils;
@@ -87,6 +90,7 @@ import org.lamsfoundation.lams.tool.scratchie.model.ScratchieConfigItem;
 import org.lamsfoundation.lams.tool.scratchie.model.ScratchieItem;
 import org.lamsfoundation.lams.tool.scratchie.model.ScratchieSession;
 import org.lamsfoundation.lams.tool.scratchie.model.ScratchieUser;
+import org.lamsfoundation.lams.tool.scratchie.util.FinishScratchingJob;
 import org.lamsfoundation.lams.tool.scratchie.util.ScratchieAnswerComparator;
 import org.lamsfoundation.lams.tool.scratchie.util.ScratchieItemComparator;
 import org.lamsfoundation.lams.tool.scratchie.util.ScratchieToolContentHandler;
@@ -99,6 +103,12 @@ import org.lamsfoundation.lams.util.ExcelCell;
 import org.lamsfoundation.lams.util.JsonUtil;
 import org.lamsfoundation.lams.util.MessageService;
 import org.lamsfoundation.lams.util.audit.IAuditService;
+import org.quartz.JobBuilder;
+import org.quartz.JobDetail;
+import org.quartz.Scheduler;
+import org.quartz.SchedulerException;
+import org.quartz.Trigger;
+import org.quartz.TriggerBuilder;
 
 /**
  * @author Andrey Balan
@@ -149,6 +159,8 @@ public class ScratchieServiceImpl
     private IEventNotificationService eventNotificationService;
 
     private ScratchieOutputFactory scratchieOutputFactory;
+    
+    private Scheduler scheduler;
 
     // *******************************************************************************
     // Service method
@@ -255,6 +267,39 @@ public class ScratchieServiceImpl
 	    }
 	}
 	return leader;
+    }
+    
+    @Override
+    public void launchTimeLimit(Long sessionId) throws SchedulerException {
+	ScratchieSession session = getScratchieSessionBySessionId(sessionId);
+	int timeLimit = session.getScratchie().getTimeLimit();
+	if (timeLimit == 0) {
+	    return;
+	}
+	
+	//store timeLimitLaunchedDate into DB
+	Date timeLimitLaunchedDate = new Date();
+	session.setTimeLimitLaunchedDate(timeLimitLaunchedDate);
+	scratchieSessionDao.saveObject(session);
+	
+	//calculate timeLimit finish date
+	Calendar timeLimitFinishDate = new GregorianCalendar(TimeZone.getDefault());
+	timeLimitFinishDate.setTime(timeLimitLaunchedDate);
+	timeLimitFinishDate.add(Calendar.MINUTE, timeLimit);
+	//adding 5 extra seconds to let leader auto-submit results and store them in DB
+	timeLimitFinishDate.add(Calendar.SECOND, 5);
+	
+	//start quartz job to notify non-leaders time is over
+	JobDetail finishScratchingJob = JobBuilder.newJob(FinishScratchingJob.class)
+		.withIdentity("finishScratching:" + sessionId)
+		.withDescription("Group name: " + session.getSessionName())
+		.usingJobData("toolSessionId", sessionId).build();
+	
+	Trigger fnishScratchingTrigger = TriggerBuilder.newTrigger()
+		.withIdentity("fnishScratchingTrigger:" + sessionId)
+		.startAt(timeLimitFinishDate.getTime()).build();
+	
+	scheduler.scheduleJob(finishScratchingJob, fnishScratchingTrigger);
     }
 
     @Override
@@ -2043,6 +2088,14 @@ public class ScratchieServiceImpl
 
     public void setScratchieOutputFactory(ScratchieOutputFactory scratchieOutputFactory) {
 	this.scratchieOutputFactory = scratchieOutputFactory;
+    }
+    
+    /**
+     * @param scheduler
+     *            The scheduler to set.
+     */
+    public void setScheduler(Scheduler scheduler) {
+	this.scheduler = scheduler;
     }
 
     // ****************** REST methods *************************

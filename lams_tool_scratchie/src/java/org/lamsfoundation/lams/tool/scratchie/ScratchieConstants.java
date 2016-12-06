@@ -108,6 +108,8 @@ public class ScratchieConstants {
     public static final String ATTR_IS_SCRATCHING_FINISHED = "isScratchingFinished";
 
     public static final String ATTR_IS_WAITING_FOR_LEADER_TO_SUBMIT_NOTEBOOK = "isWaitingForLeaderToSubmitNotebook";
+    
+    public static final String ATTR_WAITING_MESSAGE_KEY = "waitingMessageKey";
 
     public static final String ATTR_LEARNERS = "learners";
 
@@ -162,6 +164,12 @@ public class ScratchieConstants {
     public static final String ATTR_GROUP_LEADER_NAME = "groupLeaderName";
 
     public static final String ATTR_IS_USER_LEADER = "isUserLeader";
+    
+    public static final String ATTR_IS_TIME_LIMIT_ENABLED = "isTimeLimitEnabled";
+    
+    public static final String ATTR_IS_TIME_LIMIT_NOT_LAUNCHED = "isTimeLimitNotLaunched";
+    
+    public static final String ATTR_SECONDS_LEFT = "secondsLeft";
 
     public static final String ATTR_SUBMISSION_DEADLINE = "submissionDeadline";
 

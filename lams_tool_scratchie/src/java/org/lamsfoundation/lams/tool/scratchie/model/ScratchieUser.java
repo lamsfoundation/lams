@@ -32,9 +32,6 @@ import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
  * Scratchie
  *
  * @author Andrey Balan
- *
- *
- *
  */
 public class ScratchieUser implements Cloneable, Comparable {
     private static final long serialVersionUID = -7043502180037866257L;
