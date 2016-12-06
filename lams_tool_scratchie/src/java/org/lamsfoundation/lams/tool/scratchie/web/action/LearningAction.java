@@ -180,30 +180,6 @@ public class LearningAction extends Action {
 	    return mapping.findForward("waitforleader");
 	}
 
-	// forwards to the waitForLeader time limit pages
-	if (!mode.isTeacher()) {
-	    boolean isNonLeader = !user.getUserId().equals(groupLeader.getUserId());
-	    if (isNonLeader && scratchie.getTimeLimit() != 0 && !user.isSessionFinished()) {
-
-		//show waitForLeaderLaunchTimeLimit page if the leader hasn't started activity or hasn't pressed OK button to launch time limit
-		if (toolSession.getTimeLimitLaunchedDate() == null) {
-		    request.setAttribute(ScratchieConstants.ATTR_WAITING_MESSAGE_KEY, "label.waiting.for.leader.launch.time.limit");
-		    return mapping.findForward("waitForLeaderTimeLimit");
-		}
-		
-		// check if the time limit is exceeded
-		boolean isTimeLimitExceeded = toolSession.getTimeLimitLaunchedDate().getTime()
-			+ scratchie.getTimeLimit() * 60000 < System.currentTimeMillis();
-		
-		// if the time is up and leader hasn't submitted response (as there will be a little delay between time
-		// is up and scratching is finished) - show waitForLeaderFinish page
-		if (isTimeLimitExceeded && !toolSession.isScratchingFinished()) {
-		    request.setAttribute(ScratchieConstants.ATTR_WAITING_MESSAGE_KEY, "label.waiting.for.leader.finish");
-		    return mapping.findForward("waitForLeaderTimeLimit");
-		}
-	    }
-	}
-
 	// initial Session Map
 	SessionMap<String, Object> sessionMap = new SessionMap<String, Object>();
 	request.getSession().setAttribute(sessionMap.getSessionID(), sessionMap);
@@ -368,12 +344,38 @@ public class LearningAction extends Action {
 	    request.setAttribute(ScratchieConstants.ATTR_IS_TIME_LIMIT_NOT_LAUNCHED, isTimeLimitNotLaunched);
 	    request.setAttribute(ScratchieConstants.ATTR_SECONDS_LEFT, secondsLeft);
 
-	    // make non leaders also wait for burning questions submit
-	    isWaitingForLeaderToSubmitNotebook |= isWaitingForLeaderToSubmitBurningQuestions;
+	    // in case we can't show learning.jsp to non-leaders forward them to the waitForLeaderTimeLimit page
+	    if (!isUserLeader && scratchie.getTimeLimit() != 0 && !mode.isTeacher()) {
+
+		// show waitForLeaderLaunchTimeLimit page if the leader hasn't started activity or hasn't pressed OK
+		// button to launch time limit
+		if (toolSession.getTimeLimitLaunchedDate() == null) {
+		    request.setAttribute(ScratchieConstants.ATTR_WAITING_MESSAGE_KEY,
+			    "label.waiting.for.leader.launch.time.limit");
+		    return mapping.findForward(ScratchieConstants.WAIT_FOR_LEADER_TIME_LIMIT);
+		}
+
+		// check if the time limit is exceeded
+		boolean isTimeLimitExceeded = toolSession.getTimeLimitLaunchedDate().getTime()
+			+ scratchie.getTimeLimit() * 60000 < System.currentTimeMillis();
+
+		// if the time limit is over and the leader hasn't submitted notebook or burning questions (thus
+		// non-leaders should wait) - show waitForLeaderFinish page
+		if (isTimeLimitExceeded && isWaitingForLeaderToSubmitNotebook) {
+		    request.setAttribute(ScratchieConstants.ATTR_WAITING_MESSAGE_KEY,
+			    "label.waiting.for.leader.submit.notebook");
+		    return mapping.findForward(ScratchieConstants.WAIT_FOR_LEADER_TIME_LIMIT);
+		} else if (isTimeLimitExceeded && isWaitingForLeaderToSubmitBurningQuestions) {
+		    request.setAttribute(ScratchieConstants.ATTR_WAITING_MESSAGE_KEY,
+			    "label.waiting.for.leader.submit.burning.questions");
+		    return mapping.findForward(ScratchieConstants.WAIT_FOR_LEADER_TIME_LIMIT);
+		}
+	    }
 
 	    sessionMap.put(ScratchieConstants.ATTR_IS_SCRATCHING_FINISHED, isScratchingFinished);
+	    // make non leaders also wait for burning questions submit
 	    sessionMap.put(ScratchieConstants.ATTR_IS_WAITING_FOR_LEADER_TO_SUBMIT_NOTEBOOK,
-		    isWaitingForLeaderToSubmitNotebook);
+		    isWaitingForLeaderToSubmitNotebook | isWaitingForLeaderToSubmitBurningQuestions);
 	    return mapping.findForward(ScratchieConstants.SUCCESS);
 	}
 

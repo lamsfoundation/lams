@@ -75,6 +75,14 @@ public interface IScratchieService {
      * @throws SchedulerException 
      */
     void launchTimeLimit(Long sessionId) throws SchedulerException;
+    
+    /**
+     * Checks if non-leaders should still wait for leader to submit either notebook or burning questions.
+     * 
+     * @param toolSession
+     * @return
+     */
+    boolean isWaitingForLeaderToSubmit(ScratchieSession toolSession);
 
     List<ScratchieBurningQuestion> getBurningQuestionsBySession(Long sessionId);
 
