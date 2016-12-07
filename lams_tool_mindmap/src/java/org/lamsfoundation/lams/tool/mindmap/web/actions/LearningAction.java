@@ -770,7 +770,7 @@ public class LearningAction extends LamsDispatchAction {
 	}
 
 	// Saving Mindmap Nodes
-	if (!mindmap.isMultiUserMode()) {
+	if (!mindmap.isMultiUserMode() && !StringUtils.isBlank(learningForm.getMindmapContent())) {
 	    saveMindmapXML(mindmap, mindmapUser, learningForm.getMindmapContent(), mindmapSession);
 	}
 

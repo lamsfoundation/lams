@@ -12,9 +12,11 @@
 	}
 
 	function submitForm() {
-		// Sets mindmap content in Flash
-		setMindmapContent();
-
+		var hasFlash = ((typeof navigator.plugins != "undefined" && typeof navigator.plugins["Shockwave Flash"] == "object") || (window.ActiveXObject && (new ActiveXObject("ShockwaveFlash.ShockwaveFlash")) != false));
+		if(hasFlash == true){
+			// Sets mindmap content in Flash
+			setMindmapContent();
+			}
  	 	var f = document.getElementById('submitForm');
  		f.submit();
 	}
