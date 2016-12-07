@@ -2450,9 +2450,10 @@ GeneralLib = {
 			success : function(response) {
 				layout.ld.folderID = folderID;
 				layout.ld.title = title;
+				layout.ld.invalid = response.validation.length > 0;
 				
 				// check if there were any validation errors
-				if (response.validation.length > 0) {
+				if (layout.ld.invalid) {
 					var message = LABELS.SEQUENCE_VALIDATION_ISSUES + '\n';
 					$.each(response.validation, function() {
 						var uiid = this.UIID,
@@ -2587,15 +2588,13 @@ GeneralLib = {
 		var activitiesExist = layout.activities.length > 0,
 			enableExportButton = false;
 		if (!modified && activitiesExist) {
-			$('#previewButton').attr('disabled', null)
-						   	   .button('option', 'disabled', false);
+			$('#previewButton').prop('disabled', layout.ld.invalid);
 			$('.exportSequenceButton').attr('disabled', null)
 								  	  .css('opacity', 1);
 			$('#ldDescriptionFieldModified').text('');
 			enableExportButton = true;
 		} else {
-			$('#previewButton').attr('disabled', 'disabled')
-			   				   .button('option', 'disabled', true);
+			$('#previewButton').prop('disabled', true);
 			$('.exportSequenceButton').attr('disabled', 'disabled')
 							      	  .css('opacity', 0.2);
 			$('#ldDescriptionFieldModified').text('*');
