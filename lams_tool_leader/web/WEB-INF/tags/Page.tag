@@ -92,7 +92,7 @@
 				mode = '${mode}',
 				
 				LAMS_URL = '<lams:LAMSURL/>',
-				APP_URL = LAMS_URL + 'learning/',
+				LEARNING_URL = LAMS_URL + 'learning/',
 
 				// it gets initialised along with progress bar
 				commandWebsocket = null,
@@ -105,12 +105,12 @@
 
 			function restartLesson(){
 				if (confirm(restartLessonConfirmation)) {
-					window.location.href = APP_URL + 'learner.do?method=restartLesson&lessonID=' + lessonId;
+					window.location.href = LEARNING_URL + 'learner.do?method=restartLesson&lessonID=' + lessonId;
 				}
 			}
 
 			function viewNotebookEntries(){
-				openPopUp(APP_URL + "notebook.do?method=viewAll&lessonID=" + lessonId,
+				openPopUp(LEARNING_URL + "notebook.do?method=viewAll&lessonID=" + lessonId,
 						"Notebook",
 						648,1152,
 						"no");
@@ -167,7 +167,7 @@
 
 				if ( lessonId != "" || toolSessionId != "" ) {
 					$.ajax({
-						url : APP_URL + 'learner.do',
+						url : LEARNING_URL + 'learner.do',
 						data : {
 							'method'   : 'getLessonDetails',
 							'lessonID' : lessonId,
@@ -191,7 +191,7 @@
 							var presenceEnabledPatch = result.presenceEnabledPatch;
 							var presenceImEnabled = result.presenceImEnabled;
 							if ( showIM && (presenceEnabledPatch || presenceImEnabled) ) {
-								presenceURL = APP_URL+"presenceChat.jsp?presenceEnabledPatch="+presenceEnabledPatch
+								presenceURL = LEARNING_URL+"presenceChat.jsp?presenceEnabledPatch="+presenceEnabledPatch
 										+"&presenceImEnabled="+presenceImEnabled+"&lessonID="+lessonId;
 								<c:if test="${not usePanel}">
 								presenceURL = presenceURL + "&reloadBootstrap=true";
@@ -204,7 +204,7 @@
 							}
 
 							// it is not an obvious place to init the websocket, but we need lesson ID
-							commandWebsocket = new WebSocket(APP_URL.replace('http', 'ws') + 'commandWebsocket?lessonID=' + lessonId);
+							commandWebsocket = new WebSocket(LEARNING_URL.replace('http', 'ws') + 'commandWebsocket?lessonID=' + lessonId);
 							// when the server pushes new commands
 							commandWebsocket.onmessage = function(e){
 								// read JSON object
