@@ -1,5 +1,3 @@
--- CVS ID: $Id$
- 
 INSERT INTO lams_learning_activity
 (
 activity_ui_id
@@ -31,8 +29,6 @@ activity_ui_id
 , gate_open_flag
 , gate_start_time_offset
 , gate_end_time_offset
-, gate_start_date_time
-, gate_end_date_time
 , library_activity_ui_image
 , create_grouping_id
 , create_grouping_ui_id
@@ -66,8 +62,6 @@ NULL
 , ${tool_id}
 , NULL
 , 2
-, NULL
-, NULL
 , NULL
 , NULL
 , NULL

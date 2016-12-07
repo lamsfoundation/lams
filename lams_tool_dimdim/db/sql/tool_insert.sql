@@ -1,5 +1,3 @@
--- CVS ID: $Id$
- 
 INSERT INTO lams_tool
 (
 tool_signature,
@@ -19,15 +17,12 @@ learner_progress_url,
 author_url,
 monitor_url,
 define_later_url,
-export_pfolio_learner_url,
-export_pfolio_class_url,
-contribute_url,
-moderation_url,
+pedagogical_planner_url,
 help_url,
-admin_url,
 language_file,
 create_date_time,
-modified_date_time
+modified_date_time,
+supports_outputs
 )
 VALUES
 (
@@ -47,14 +42,11 @@ NULL,
 'tool/laddim10/learning.do?mode=teacher',
 'tool/laddim10/authoring.do',
 'tool/laddim10/monitoring.do',
-'tool/laddim10/authoring.do?mode=teacher',
-'tool/laddim10/exportPortfolio?mode=learner',
-'tool/laddim10/exportPortfolio?mode=teacher',
-'tool/laddim10/contribute.do',
-'tool/laddim10/moderate.do',
-'http://wiki.lamsfoundation.org/display/lamsdocs/laddim10',
-'tool/laddim10/admin/view.do',
+NULL,
+'tool/laddim10/authoring.do',
+NULL,
 'org.lamsfoundation.lams.tool.dimdim.ApplicationResources',
 NOW(),
-NOW()
+NOW(),
+0
 )
