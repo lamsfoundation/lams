@@ -224,15 +224,15 @@ $(document).ready(function() {
 	//check minimum is not bigger than maximum
 	function validateRatingLimits(isMinimum) {
 		var minRateDropDown = document.getElementById("minimum-rates");
-		var minLimit = parseInt(minRateDropDown.options[minRateDropDown.selectedIndex].value);
+		var minLimit = parseInt(minRateDropDown.value);
 		var maxRateDropDown = document.getElementById("maximum-rates");
-		var maxLimit = parseInt(maxRateDropDown.options[maxRateDropDown.selectedIndex].value);
+		var maxLimit = parseInt(maxRateDropDown.value);
 
 		if ((minLimit > maxLimit) && !(maxLimit == 0)) {
 			if (isMinimum) {
-				minRateDropDown.selectedIndex = maxRateDropDown.selectedIndex;
+				minRateDropDown.value = maxRateDropDown.value;
 			} else {
-				maxRateDropDown.selectedIndex = minRateDropDown.selectedIndex;
+				maxRateDropDown.value = minRateDropDown.value;
 			}
 
 			alert('<fmt:message key="js.warning.max.min.limit"/>');
@@ -284,42 +284,11 @@ $(document).ready(function() {
 					<label for="minimum-rates">
 						<fmt:message key="${minimumLabel}" />
 					</label>
-					<html:select property="${formContentPrefix}minimumRates" styleId="minimum-rates" onmouseup="validateRatingLimits(true);" 
-							styleClass="form-control form-control-inline">
-						<html:option value="0">
-							<fmt:message key="${noMinimumLabel}" />
-						</html:option>
-						<html:option value="1">1</html:option>
-						<html:option value="2">2</html:option>
-						<html:option value="3">3</html:option>
-						<html:option value="4">4</html:option>
-						<html:option value="5">5</html:option>
-						<html:option value="6">6</html:option>
-						<html:option value="7">7</html:option>
-						<html:option value="8">8</html:option>
-						<html:option value="9">9</html:option>
-						<html:option value="10">10</html:option>
-					</html:select>
-				
+					<input type="number" name="${formContentPrefix}minimumRates"  id="minimum-rates" value="${imageGalleryForm.imageGallery.minimumRates}" onchange="validateRatingLimits(true);" class="form-control input-sm" min="0"/>	
 					<label for="maximum-rates">
 						<fmt:message key="${maximumLabel}" />
 					</label>
-					<html:select property="${formContentPrefix}maximumRates" styleId="maximum-rates" onmouseup="validateRatingLimits(false);" 
-							styleClass="form-control form-control-inline">
-						<html:option value="0">
-							<fmt:message key="${noMaximumLabel}" />
-						</html:option>
-						<html:option value="1">1</html:option>
-						<html:option value="2">2</html:option>
-						<html:option value="3">3</html:option>
-						<html:option value="4">4</html:option>
-						<html:option value="5">5</html:option>
-						<html:option value="6">6</html:option>
-						<html:option value="7">7</html:option>
-						<html:option value="8">8</html:option>
-						<html:option value="9">9</html:option>
-						<html:option value="10">10</html:option>
-					</html:select>
+					<input type="number" name="${formContentPrefix}maximumRates"  id="maximum-rates" value="${imageGalleryForm.imageGallery.maximumRates}" onchange="validateRatingLimits(true);" class="form-control input-sm" min="0"/>
 				</div>
 			</c:if>
 	
@@ -340,7 +309,7 @@ $(document).ready(function() {
 						<fmt:param> </fmt:param>
 					</fmt:message>
 				</label>
-				<input type="text" name="commentsMinWordsLimit" id="comments-min-words-limit" value="${commentsMinWordsLimit}"/>
+				<input type="number" name="commentsMinWordsLimit" id="comments-min-words-limit" value="${commentsMinWordsLimit}"/>
 			</div>
 		</div>
 	</div>
