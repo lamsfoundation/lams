@@ -16,13 +16,6 @@
 	</label>
 </div>
 
-<div class="form-group form-inline">
-	<label for="optionGrade${status.index}">
-		<fmt:message key="label.authoring.basic.option.grade"></fmt:message>:
-	</label>
-	<%@ include file="gradeselector.jsp"%>
-</div>
-
 <div class="form-group">
     <label for="optionFeedback${status.index}">
     	<a data-toggle="collapse" data-target="#feedback${status.index}"><i class="fa fa-xs fa-plus-square-o roffset5" aria-hidden="true"></i><fmt:message key="label.authoring.basic.option.feedback"></fmt:message></a>
