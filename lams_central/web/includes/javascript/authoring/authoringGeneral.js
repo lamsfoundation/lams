@@ -563,22 +563,11 @@ GeneralInitLib = {
 				folderID = folderNode.data.folderID;
 			} else {
 				// get data from "recently used sequences" list
-				var selectedAccess = $('#ldStoreDialogAccessCell > div.selected', this);
+				var selectedAccess = $('#ldStoreDialogAccessCell > div.selected', dialog);
 				// if title was altered, do not consider this an overwrite
 				if (selectedAccess.length > 0 && title == selectedAccess.text()) {
-					learningDesignID = +selectedAccess.attr('learningDesignId');
-					folderID = +selectedAccess.attr('folderID');
-					
-					var folders = tree.getRoot().children;
-					if (folders) {
-						$.each(folders, function(){
-							if (folderID == this.data.folderID) {
-								this.highlight();
-								folderNode = this;
-								return false;
-							}
-						});
-					}
+					learningDesignID = +selectedAccess.data('learningDesignId');
+					folderID = +selectedAccess.data('folderID');
 				}
 			}
 			
@@ -619,8 +608,8 @@ GeneralInitLib = {
 				learningDesignID = ldNode ? ldNode.data.learningDesignId : null;
 		
 			if (!learningDesignID) {
-				learningDesignID = +$('#ldStoreDialogAccessCell > div.selected', this)
-								   .attr('learningDesignId');
+				learningDesignID = +$('#ldStoreDialogAccessCell > div.selected', dialog)
+								   .data('learningDesignId');
 			}
 			
 			// no LD was chosen
@@ -2685,7 +2674,7 @@ GeneralLib = {
 		
 		$('#ldStoreDialogAccessCell > div.access', layout.ldStoreDialog).each(function(){
 			var access = $(this);
-			if (+access.attr('learningDesignId') == learningDesignID){
+			if (+access.data('learningDesignId') == learningDesignID){
 				access.addClass('selected');
 			} else {
 				access.removeClass('selected');
@@ -2757,21 +2746,27 @@ GeneralLib = {
 			accessCell.children('div.access').remove();
 			$.each(access, function(){
 				$('<div />').addClass('access')
-							.attr({
+							.data({
 								'learningDesignId' : this.learningDesignId,
 								'folderID'         : this.workspaceFolderId
 							})
 							.text(this.title)
 							.appendTo(accessCell)
 							.click(function(){
-								var accessEntry = $(this);
-								if (accessEntry.hasClass('selected')) {
+								var accessEntry = $(this).toggleClass('selected');
+								if (!accessEntry.hasClass('selected')) {
 									return;
 								}
 								
-								var	isSaveDialog = layout.ldStoreDialog.closest('.ui-dialog').hasClass('ldStoreDialogSave'),
-									learningDesignID = +accessEntry.attr('learningDesignId'),
-									title = isSaveDialog ? accessEntry.text() : null;
+								var dialog = layout.ldStoreDialog,
+									tree = dialog.data('ldTree'),
+									node = tree.getHighlightedNode(),
+									learningDesignID = +accessEntry.data('learningDesignId'),
+									title = accessEntry.text();
+									
+								if (node) {
+									node.unhighlight(true);
+								}
 									
 								GeneralLib.showLearningDesignThumbnail(learningDesignID, title);
 							});
