@@ -1,3 +1,8 @@
+// for chat users to be indetified by different colours
+var PALETTE = ["#008CD2", "#DF7C08", "#83B532", "#E0BE40", "#AE8124", "#5F0704", "#004272", "#CD322B", "#254806"],
+	// to be accessible from learning.jsp
+	sendChatToolMessage;
+
 $(document).ready(function() {
 	messageDiv = $("#messages");
 	rosterDiv = $("#roster");
@@ -14,10 +19,8 @@ $(document).ready(function() {
 		}
 	});
 	
-	// for chat users to be indetified by different colours
-	var PALETTE = ["#008CD2", "#DF7C08", "#83B532", "#E0BE40", "#AE8124", "#5F0704", "#004272", "#CD322B", "#254806"],
-		// only Monitor can send a personal message
-		selectedUser = null,
+	// only Monitor can send a personal message
+	var selectedUser = null,
 		// init the connection with server using server URL but with different protocol
 		chatToolWebsocket = new WebSocket(APP_URL.replace('http', 'ws') + 'learningWebsocket?toolSessionID=' + TOOL_SESSION_ID);
 
@@ -84,7 +87,7 @@ $(document).ready(function() {
 		userDiv.attr('class', selectedUser ? 'selected' : 'unselected');
 	}
 
-	function sendChatToolMessage() {
+	sendChatToolMessage = function() {
 		var message = sendMessageArea.val();
 		if (!message || message == '') {
 			return false;  // do not send empty messages.
@@ -102,13 +105,13 @@ $(document).ready(function() {
 		// send it to server
 		chatToolWebsocket.send(JSON.stringify(output)); 
 	}
-
-	function getColour(nick) {
-		// same nick should give same colour
-		var charSum = 0;
-		for ( var i = 0; i < nick.length; i++) {
-			charSum += nick.charCodeAt(i);
-		}
-		return PALETTE[charSum % (PALETTE.length)];
-	}
 });
+
+function getColour(nick) {
+	// same nick should give same colour
+	var charSum = 0;
+	for ( var i = 0; i < nick.length; i++) {
+		charSum += nick.charCodeAt(i);
+	}
+	return PALETTE[charSum % (PALETTE.length)];
+}
