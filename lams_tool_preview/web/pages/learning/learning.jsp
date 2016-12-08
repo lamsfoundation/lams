@@ -100,7 +100,7 @@
 			<p><c:out value="${peerreview.instructions}" escapeXml="false"/><p>
 			<c:if test="${numCriteria > 1}">
 				<p><fmt:message key="label.step"><fmt:param>${stepNumber}</fmt:param><fmt:param>${numCriteria}</fmt:param></fmt:message></p>
-			</c:if>
+		 	</c:if> 
 		</div>
 			
 		<div class="panel">
@@ -144,7 +144,7 @@
 		</div>
 		
 		<div class="pull-right" id="buttonNextPrevDiv">		
-		<c:if test="${criteriaRatings.ratingCriteria.orderId > 1}">
+		<c:if test="${stepNumber > 1}">
 			<span id="prevButton" class="btn btn-default" onclick="javascript:${method}(false);"><fmt:message key="label.previous"/></span>
 		</c:if>
 		<c:choose>
