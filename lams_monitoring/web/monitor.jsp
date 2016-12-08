@@ -55,6 +55,8 @@
 			
 			decoderDiv = $('<div />'),
 			LABELS = {
+				<fmt:message key="index.emailnotifications" var="EMAIL_NOTIFICATIONS_TITLE_VAR"/>
+				EMAIL_NOTIFICATIONS_TITLE : '<c:out value="${EMAIL_NOTIFICATIONS_TITLE_VAR}" />',
 				<fmt:message key="force.complete.click" var="FORCE_COMPLETE_CLICK_VAR"/>
 				FORCE_COMPLETE_CLICK : decoderDiv.html('<c:out value="${FORCE_COMPLETE_CLICK_VAR}" />').text(),
 				<fmt:message key="button.force.complete" var="FORCE_COMPLETE_BUTTON_VAR"/>
@@ -313,8 +315,8 @@
 									  	title='<fmt:message key="button.edit.class.tooltip"/>'><i class="fa fa-sm fa-user-times"></i> <span class="hidden-xs"><fmt:message key="button.edit.class"/></span></button>
 									<c:if test="${lesson.enabledLessonNotifications}">	
 									  <button id="notificationButton" class="btn btn-default roffset10" 
-									  	type="button" onClick="javascript:window.parent.showNotificationsDialog(null,${lesson.lessonID})"><i class="fa fa-sm fa-bullhorn"></i> <span class="hidden-xs"><fmt:message key="email.notifications"/></span></button>
-									</c:if>							  
+									  	type="button" onClick="javascript:showNotificationsDialog(null,${lesson.lessonID})"><i class="fa fa-sm fa-bullhorn"></i> <span class="hidden-xs"><fmt:message key="email.notifications"/></span></button>
+									</c:if>
 									<c:if test="${lesson.enableLessonIntro}">	
 									  <button id="editIntroButton" class="btn btn-default" 
 									  	type="button" onClick="javascript:showIntroductionDialog(${lesson.lessonID})"><i class="fa fa-sm fa-info"></i> <span class="hidden-xs"><fmt:message key="label.lesson.introduction"/></span></button>
