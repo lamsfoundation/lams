@@ -108,7 +108,7 @@
 
 		<center id="center12">
 			<div id="flashContent">
-				<fmt:message key="message.enableJavaScript"/>
+				<fmt:message key="message.enableFlash"/>
 			</div>
 		</center>
 		
