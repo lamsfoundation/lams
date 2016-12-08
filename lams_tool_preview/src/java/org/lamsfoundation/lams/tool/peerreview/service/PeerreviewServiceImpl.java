@@ -881,6 +881,10 @@ public class PeerreviewServiceImpl
 	return ratingService.getCountItemsRatedByUser(toolContentId, userId);
     }
 
+    public int getCountItemsRatedByUserByCriteria(final Long criteriaId, final Integer userId) {
+	return ratingService.getCountItemsRatedByUserByCriteria(criteriaId, userId);
+    }
+    
     @Override
     public ToolSessionExportOutputData exportToolSession(Long toolSessionId)
 	    throws DataMissingException, ToolException {
