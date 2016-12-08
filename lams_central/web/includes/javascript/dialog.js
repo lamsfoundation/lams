@@ -272,7 +272,7 @@ function moveDialogToTop(id) {
 }
 
 
-//used by both main.jsp and /lti/addlesson.jsp pages
+//used by both /lams_central/web/main.jsp and /lams_central/web/lti/addlesson.jsp pages
 function showAuthoringDialog(learningDesignID){
 	var dialog = showDialog('dialogAuthoring', {
 		'height' : Math.max(300, $(window).height() - 30),
@@ -306,4 +306,39 @@ function showAuthoringDialog(learningDesignID){
 	$('.modal-content', dialog).on('resizestop', function() {
 		$('iframe', this)[0].contentWindow.GeneralLib.resizePaper();
 	});
+}
+
+
+//used by both /lams_central/web/main.jsp and /lams_monitoring/web/monitor.jsp pages
+function showNotificationsDialog(orgID, lessonID) {
+	// if screen is narrow, then it is much longer
+	var width = Math.max(380, Math.min(800, $(window).width() - 60)),
+		height = width < 798 ? 850 : 650;
+	height = Math.max(380, Math.min(height, $(window).height() - 30));
+		
+	var id = "dialogNotifications" + (lessonID ? "Lesson" + lessonID : "Org" + orgID);
+	showDialog(id, {
+		'data' : {
+			'orgID' : orgID,
+			'lessonID' : lessonID
+		},
+		'height': height,
+		'width' : width,
+		'title' : LABELS.EMAIL_NOTIFICATIONS_TITLE,
+		'open' : function() {
+			var dialog = $(this),
+				lessonID = dialog.data('lessonID');
+			// if lesson ID is given, use lesson view; otherwise use course view
+			if (lessonID) {
+				// load contents after opening the dialog
+				$('iframe', dialog).attr('src', LAMS_URL
+					+ 'monitoring/emailNotifications.do?method=getLessonView&lessonID='
+					+ lessonID);
+			} else {
+				$('iframe', dialog).attr('src', LAMS_URL
+					+ 'monitoring/emailNotifications.do?method=getCourseView&organisationID='
+					+ orgID);
+			}
+		}
+	}, true);
 }
