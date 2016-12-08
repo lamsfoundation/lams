@@ -504,7 +504,7 @@ public class User implements Serializable, Comparable {
 		: pagesWithDisabledTutorials;
 
 	return new UserDTO(userId, firstName, lastName, login, languageIsoCode, countryIsoCode, direction, email,
-		new ThemeDTO(theme),
+		theme != null ? new ThemeDTO(theme) : null,
 		// TimeZone.getTimeZone("Australia/Sydney"),
 		timeZone, authenticationMethod.getAuthenticationMethodId(), fckLanguageMapping, lamsCommunityToken,
 		lamsCommunityUsername, 
