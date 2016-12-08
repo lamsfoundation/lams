@@ -106,7 +106,8 @@ public class UserTag extends TagSupport {
 
 		    if (property.equals("htmlTheme")) {
 			ThemeDTO theme = (ThemeDTO) value;
-			value = theme.getName();
+			if ( theme != null )
+			    value = theme.getName();
 		    }
 
 		} catch (Exception e) {

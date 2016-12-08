@@ -34,7 +34,10 @@
 				type : $("#newForm").attr('method'),
 				url : $("#newForm").attr('action'),
 				success : function(data) {
-					window.parent.location.reload();
+					if ( data.indexOf('profileRestrictions') > 0)
+						$("html").html(data);
+					else
+						window.parent.location.reload();
 				}
 			});
 		}
