@@ -154,6 +154,7 @@
 									if ( isCriteriaNotRatedByUser )
 										rows += '" style="visibility: hidden;';
 									rows += '">';	
+									commentPostedByUser = commentPostedByUser.replace(/<BR>/gi, '\n');
 									rows +=		'<textarea name="comment-textarea-'+itemId+'" rows="4" id="comment-textarea-'+ itemId +'" onblur="onRatingSuccessCallback()" class="form-control">'+commentPostedByUser+'</textarea>';
 									rows += '</div>';											
 								}
@@ -198,7 +199,7 @@
 		// save the modified values
 		$('textarea').each(function() {
 			if ( ! ( $('#'+this.id).parent().css('visibility') == 'hidden') ) {
-				var comment = validComment(this.id, true);
+				var comment = validComment(this.id, true, false);
 				if ( ! ( typeof comment === "undefined" )  ) {
 					if (comment!=this.defaultValue) {
 						data[this.id] = comment;
@@ -217,36 +218,35 @@
 			$.ajax({ 
 				data: data, 
 		        type: 'POST', 
-	 	        url: '<c:url value="/learning/submitComments.do?"/>', 
+	 	        url: '<c:url value="/learning/submitCommentsAjax.do?"/>', 
 		        success: function (response) {
 	    			var countCommentsSaved = response.countCommentsSaved;
 					if ( ! ( countCommentsSaved >= 0 ) ) {
-	       				alert('Unable to save comments');
+	       				alert('<fmt:message key="error.unable.save.comments"/>');
 	       				return false;
 					} else {
-						commentsSaved = true;
-						if ( next ) {
-							return nextprev(next);
-						} else {
-							$(".tablesorter").trigger('pagerUpdate');
-							return true;
-						}
+						return moveOn(next);
 					}
 				}
 			});
 			
 		} else {
-			commentsSaved = true;
-			if ( next ) {
-				return nextprev(next);
-			} else {
-				$(".tablesorter").trigger('pagerUpdate');
-				return true;
-			}
+			return moveOn(next);
 		}
 		
 		return false;
 	}
+	
+	function moveOn(next) {
+		commentsSaved = true;
+		if ( ! ( typeof next === "undefined" ) ) {
+			return nextprev(next);
+		} else {
+			$(".tablesorter").trigger('pagerUpdate');
+			return true;
+		}
+	}
+	
 </c:when>
 <c:otherwise>
 	function submitEntry(next) {
