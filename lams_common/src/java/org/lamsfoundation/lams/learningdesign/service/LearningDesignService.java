@@ -43,11 +43,13 @@ import org.lamsfoundation.lams.learningdesign.dao.IActivityDAO;
 import org.lamsfoundation.lams.learningdesign.dao.IGroupingDAO;
 import org.lamsfoundation.lams.learningdesign.dao.ILearningDesignDAO;
 import org.lamsfoundation.lams.learningdesign.dao.ILearningLibraryDAO;
+import org.lamsfoundation.lams.learningdesign.dto.AuthoringActivityDTO;
 import org.lamsfoundation.lams.learningdesign.dto.LearningDesignDTO;
 import org.lamsfoundation.lams.learningdesign.dto.LearningLibraryDTO;
 import org.lamsfoundation.lams.learningdesign.dto.LibraryActivityDTO;
 import org.lamsfoundation.lams.learningdesign.dto.ValidationErrorDTO;
 import org.lamsfoundation.lams.tool.Tool;
+import org.lamsfoundation.lams.tool.dao.IToolDAO;
 import org.lamsfoundation.lams.tool.dto.ToolDTO;
 import org.lamsfoundation.lams.tool.dto.ToolDTONameComparator;
 import org.lamsfoundation.lams.usermanagement.User;
@@ -78,11 +80,16 @@ public class LearningDesignService implements ILearningDesignService {
     protected ILearningDesignDAO learningDesignDAO;
     protected IActivityDAO activityDAO;
     protected IGroupingDAO groupingDAO;
+    protected IToolDAO toolDAO;
 
     protected ILearningLibraryDAO learningLibraryDAO;
     protected ILoadedMessageSourceService toolActMessageService;
 
     private static final String LD_SVG_DIR = "lams-www.war\\secure\\learning-design-images";
+
+    // words found both in current complex learning library descriptions and in old exported LD XML files
+    private static final String[][] COMPLEX_LEARNING_LIBRARY_KEY_WORDS = { { "Share", "Forum" }, { "Chat", "Scribe" },
+	    { "Forum", "Scribe" } };
 
     /*
      * Default constructor
@@ -136,6 +143,9 @@ public class LearningDesignService implements ILearningDesignService {
 	this.groupingDAO = groupingDAO;
     }
 
+    public void setToolDAO(IToolDAO toolDAO) {
+        this.toolDAO = toolDAO;
+    }
     /**********************************************
      * Service Methods
      *******************************************/
@@ -330,6 +340,42 @@ public class LearningDesignService implements ILearningDesignService {
 
 	Collections.sort(tools, new ToolDTONameComparator());
 	return tools;
+    }
+
+    /**
+     * Guess missing Learning Library ID based on other activity details. Old LDs may not contain this value.
+     */
+    @Override
+    public void fillLearningLibraryID(AuthoringActivityDTO activity) {
+	if (activity.getLearningLibraryID() == null) {
+	    switch (activity.getActivityTypeID()) {
+		case Activity.PARALLEL_ACTIVITY_TYPE:
+		    String description = activity.getDescription();
+		    // recognise learning libraries by their word description
+		    for (LearningLibrary library : learningLibraryDAO.getAllLearningLibraries()) {
+			for (String[] keyWords : COMPLEX_LEARNING_LIBRARY_KEY_WORDS) {
+			    boolean found = false;
+			    for (String keyWord : keyWords) {
+				found = description.contains(keyWord) && library.getDescription().contains(keyWord);
+				if (!found) {
+				    break;
+				}
+			    }
+			    if (found) {
+				activity.setLearningLibraryID(library.getLearningLibraryId());
+				return;
+			    }
+			}
+		    }
+		    break;
+		case Activity.TOOL_ACTIVITY_TYPE:
+		    Tool tool = toolDAO.getToolByID(activity.getToolID());
+		    if (tool != null) {
+			activity.setLearningLibraryID(tool.getLearningLibraryId());
+		    }
+		    break;
+	    }
+	}
     }
 
     private void internationaliseActivities(Collection<LibraryActivityDTO> activities) {

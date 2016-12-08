@@ -21,7 +21,6 @@
  * ****************************************************************
  */
 
-
 package org.lamsfoundation.lams.learningdesign.service;
 
 import java.io.BufferedReader;
@@ -82,7 +81,6 @@ import org.lamsfoundation.lams.learningdesign.Grouping;
 import org.lamsfoundation.lams.learningdesign.GroupingActivity;
 import org.lamsfoundation.lams.learningdesign.LearnerChoiceGrouping;
 import org.lamsfoundation.lams.learningdesign.LearningDesign;
-import org.lamsfoundation.lams.learningdesign.LearningLibrary;
 import org.lamsfoundation.lams.learningdesign.License;
 import org.lamsfoundation.lams.learningdesign.OptionsActivity;
 import org.lamsfoundation.lams.learningdesign.PermissionGateActivity;
@@ -203,10 +201,6 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 
     // message keys
     private static final String KEY_MSG_IMPORT_FILE_FORMAT = "msg.import.file.format";
-
-    // words found both in current complex learning library descriptions and in old exported LD XML files
-    private static final String[][] COMPLEX_LEARNING_LIBRARY_KEY_WORDS = { { "Share", "Forum" }, { "Chat", "Scribe" },
-	    { "Forum", "Scribe" } };
 
     private static MessageService messageService;
 
@@ -695,9 +689,9 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 	    Map<Long, AuthoringActivityDTO> removedActMap = new HashMap<Long, AuthoringActivityDTO>();
 	    List<AuthoringActivityDTO> activities = ldDto.getActivities();
 	    for (AuthoringActivityDTO activity : activities) {
+		getLearningDesignService().fillLearningLibraryID(activity);
 		// skip non-tool activities
 		if (!activity.getActivityTypeID().equals(Activity.TOOL_ACTIVITY_TYPE)) {
-		    fillLearningLibraryID(activity);
 		    continue;
 		}
 
@@ -1895,32 +1889,6 @@ public class ExportToolContentService implements IExportToolContentService, Appl
 	act.setEndXcoord(actDto.getEndXCoord());
 	act.setStartYcoord(actDto.getStartYCoord());
 	act.setEndYcoord(actDto.getEndYCoord());
-    }
-
-    /**
-     * Guess missing Learning Library ID based on activity description. Old exported LDs may not contain this value.
-     */
-    private void fillLearningLibraryID(AuthoringActivityDTO activity) {
-	if ((activity.getLearningLibraryID() == null)
-		&& activity.getActivityTypeID().equals(Activity.PARALLEL_ACTIVITY_TYPE)) {
-	    String description = activity.getDescription();
-	    // recognise learning libraries by their word description
-	    for (LearningLibrary library : learningLibraryDAO.getAllLearningLibraries()) {
-		for (String[] keyWords : ExportToolContentService.COMPLEX_LEARNING_LIBRARY_KEY_WORDS) {
-		    boolean found = false;
-		    for (String keyWord : keyWords) {
-			found = description.contains(keyWord) && library.getDescription().contains(keyWord);
-			if (!found) {
-			    break;
-			}
-		    }
-		    if (found) {
-			activity.setLearningLibraryID(library.getLearningLibraryId());
-			return;
-		    }
-		}
-	    }
-	}
     }
 
     private static String generateUniqueLDTitle(WorkspaceFolder folder, String titleFromFile,

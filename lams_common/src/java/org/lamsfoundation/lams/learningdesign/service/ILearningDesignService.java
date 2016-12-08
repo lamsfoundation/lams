@@ -32,6 +32,7 @@ import java.util.Vector;
 import org.lamsfoundation.lams.learningdesign.LearningDesign;
 import org.lamsfoundation.lams.learningdesign.LearningLibrary;
 import org.lamsfoundation.lams.learningdesign.LearningLibraryGroup;
+import org.lamsfoundation.lams.learningdesign.dto.AuthoringActivityDTO;
 import org.lamsfoundation.lams.learningdesign.dto.LearningDesignDTO;
 import org.lamsfoundation.lams.learningdesign.dto.LearningLibraryDTO;
 import org.lamsfoundation.lams.learningdesign.dto.ValidationErrorDTO;
@@ -45,58 +46,40 @@ public interface ILearningDesignService {
 
     /**
      * Get the learning design DTO
-     *
-     * @param learningDesignId
-     * @param languageCode
-     *            Two letter language code needed to I18N the help url
-     * @return LearningDesignDTO
      */
-    public LearningDesignDTO getLearningDesignDTO(Long learningDesignID, String languageCode);
+    LearningDesignDTO getLearningDesignDTO(Long learningDesignID, String languageCode);
 
     /**
      * This method calls other validation methods which apply the validation rules to determine whether or not the
      * learning design is valid.
-     *
-     * @param learningDesign
-     * @return list of validation errors
      */
-    public Vector<ValidationErrorDTO> validateLearningDesign(LearningDesign learningDesign);
+    Vector<ValidationErrorDTO> validateLearningDesign(LearningDesign learningDesign);
 
     /**
      * Get the DTO list of all valid learning libraries, which equals getAllLearningLibraryDetails(true) method.
-     *
-     * @return list of LearningLibraryDTO
-     * @throws IOException
      */
-    public ArrayList<LearningLibraryDTO> getAllLearningLibraryDetails(String languageCode) throws IOException;
+    ArrayList<LearningLibraryDTO> getAllLearningLibraryDetails(String languageCode) throws IOException;
 
     /**
      * Get the DTO list of all learning libraries whatever it is valid or not.
-     *
-     * @param valid
-     * @return
-     * @throws IOException
      */
-    public ArrayList<LearningLibraryDTO> getAllLearningLibraryDetails(boolean valid, String languageCode)
-	    throws IOException;
+    ArrayList<LearningLibraryDTO> getAllLearningLibraryDetails(boolean valid, String languageCode) throws IOException;
 
-    public LearningLibrary getLearningLibrary(Long learningLibraryId);
+    LearningLibrary getLearningLibrary(Long learningLibraryId);
 
     /**
      * Gets all existing learning library groups.
      */
-    public List<LearningLibraryGroup> getLearningLibraryGroups();
+    List<LearningLibraryGroup> getLearningLibraryGroups();
 
-    public void saveLearningLibraryGroups(Collection<LearningLibraryGroup> groups);
+    void saveLearningLibraryGroups(Collection<LearningLibraryGroup> groups);
 
     /**
      * Set valid flag to learning library.
-     *
-     * @param learningLibraryId
-     * @param valid
      */
-    public void setValid(Long learningLibraryId, boolean valid);
+    void setValid(Long learningLibraryId, boolean valid);
 
-    public List<ToolDTO> getToolDTOs(boolean includeParallel, boolean includeInvalid, String userName)
-	    throws IOException;
+    List<ToolDTO> getToolDTOs(boolean includeParallel, boolean includeInvalid, String userName) throws IOException;
+
+    void fillLearningLibraryID(AuthoringActivityDTO activity);
 }
