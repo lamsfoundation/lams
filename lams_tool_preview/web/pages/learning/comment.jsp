@@ -162,7 +162,6 @@
 	 });
 	
 	function checkButtons() {
-		debugger;
 		<c:choose>
 		<c:when test="${minRates ne 0 || maxRates ne 0}">
 			if ( numCommentsOnPage + commentsOnOtherPages < ${minRates} ) {
