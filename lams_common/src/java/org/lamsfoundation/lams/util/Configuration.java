@@ -46,11 +46,13 @@ import org.lamsfoundation.lams.config.dao.IRegistrationDAO;
 import org.lamsfoundation.lams.usermanagement.WorkspaceFolder;
 import org.quartz.JobBuilder;
 import org.quartz.JobDetail;
+import org.quartz.JobKey;
 import org.quartz.Scheduler;
 import org.quartz.SchedulerException;
 import org.quartz.SimpleScheduleBuilder;
 import org.quartz.Trigger;
 import org.quartz.TriggerBuilder;
+import org.quartz.TriggerKey;
 import org.springframework.beans.factory.InitializingBean;
 
 /**
@@ -143,6 +145,47 @@ public class Configuration implements InitializingBean {
 	} catch (Exception e) {
 	    Configuration.log.error("Exception while refreshing Configuration cache", e);
 	}
+
+	String refreshCacheIntervalString = Configuration.get(ConfigurationKeys.CONFIGURATION_CACHE_REFRESH_INTERVAL);
+	Integer refreshCacheInterval = StringUtils.isBlank(refreshCacheIntervalString) ? null
+		: Integer.valueOf(refreshCacheIntervalString);
+	// check cache refresh is configured
+	if (refreshCacheInterval != null) {
+	    JobKey jobKey = new JobKey("configurationCacheRefresh");
+	    TriggerKey triggerKey = new TriggerKey("configurationCacheRefreshTrigger");
+	    try {
+		// check if the job already exists
+		if (scheduler.checkExists(jobKey)) {
+		    Trigger existingTrigger = scheduler.getTrigger(triggerKey);
+		    // check if trigger exists and interval has not changed
+		    if (existingTrigger != null) {
+			Integer storedRefreshCacheInterval = existingTrigger.getJobDataMap()
+				.containsKey("refreshCacheInterval")
+					? existingTrigger.getJobDataMap().getInt("refreshCacheInterval") : null;
+			if (refreshCacheInterval.equals(storedRefreshCacheInterval)) {
+			    // nothing to do, exit
+			    return;
+			}
+			// interval changed, remove obsolete trigger
+			scheduler.unscheduleJob(triggerKey);
+		    }
+		}
+
+		// 0 means never refresh
+		if (refreshCacheInterval > 0) {
+		    // create a new job (or overwrite old one), new trigger, keep the interval in memory and schedule it all
+		    JobDetail job = JobBuilder.newJob(ConfigurationRefreshCacheJob.class).withIdentity(jobKey).build();
+		    Trigger trigger = TriggerBuilder.newTrigger().withIdentity(triggerKey)
+			    .withSchedule(SimpleScheduleBuilder.repeatMinutelyForever(refreshCacheInterval)).build();
+		    trigger.getJobDataMap().put("refreshCacheInterval", refreshCacheInterval);
+		    scheduler.scheduleJob(job, trigger);
+		}
+	    } catch (SchedulerException e) {
+		Configuration.log.error(
+			"Error while scheduling Configuration cache refresh. The cache will NOT be periodically updated.",
+			e);
+	    }
+	}
     }
 
     public static void saveOrUpdateRegistration(Registration reg) {
@@ -170,26 +213,6 @@ public class Configuration implements InitializingBean {
     @Override
     public void afterPropertiesSet() {
 	Configuration.refreshCache();
-
-	String refreshCacheIntervalString = Configuration.get(ConfigurationKeys.CONFIGURATION_CACHE_REFRESH_INTERVAL);
-	Integer refreshCacheInterval = StringUtils.isBlank(refreshCacheIntervalString) ? null
-		: Integer.valueOf(refreshCacheIntervalString);
-	if ((refreshCacheInterval != null) && (refreshCacheInterval > 0)) {
-	    JobDetail jobDetail = JobBuilder.newJob(ConfigurationRefreshCacheJob.class)
-		    .withIdentity("configurationCacheRefresh").build();
-	    try {
-		if (scheduler.checkExists(jobDetail.getKey())) {
-		    return;
-		}
-		Trigger trigger = TriggerBuilder.newTrigger().withIdentity("configurationCacheRefreshTrigger")
-			.withSchedule(SimpleScheduleBuilder.repeatMinutelyForever(refreshCacheInterval)).build();
-		scheduler.scheduleJob(jobDetail, trigger);
-	    } catch (SchedulerException e) {
-		Configuration.log.error(
-			"Error while scheduling Configuration cache refresh. The cache will NOT be periodically updated.",
-			e);
-	    }
-	}
 
 	new Thread("LAMSConfigurationServerStateCheckThread") {
 	    @Override
