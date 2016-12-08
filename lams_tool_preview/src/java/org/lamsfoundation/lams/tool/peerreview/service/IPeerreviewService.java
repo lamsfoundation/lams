@@ -280,4 +280,6 @@ public interface IPeerreviewService extends ToolRatingManager {
 
     /** Spreadsheet */
     LinkedHashMap<String, ExcelCell[][]> exportTeamReportSpreadsheet(Long toolContentId);
+    
+    int getCountItemsRatedByUserByCriteria(final Long criteriaId, final Integer userId);
 }

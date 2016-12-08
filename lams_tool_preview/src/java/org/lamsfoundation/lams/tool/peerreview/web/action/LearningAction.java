@@ -101,6 +101,9 @@ public class LearningAction extends Action {
 	if (param.equals("submitComments")) {
 	    return submitComments(mapping, form, request, response);
 	}
+	if (param.equals("submitCommentsAjax")) {
+	    return submitCommentsAjax(mapping, form, request, response);
+	}
 	if (param.equals("submitHedging")) {
 	    return submitRankingHedging(mapping, form, request, response);
 	}
@@ -476,13 +479,11 @@ public class LearningAction extends Action {
 	RatingCriteria criteria = service.getCriteriaByCriteriaId(criteriaId);
 	
 	JSONObject responsedata = new JSONObject();
-	responsedata.put("total_rows", service.getCountUsersBySession(toolSessionId, userId));
+	responsedata.put("total_rows", service.getCountUsersBySession(toolSessionId, peerreview.isSelfReview() ? -1 : userId));
 	responsedata.put("rows", service.getUsersRatingsCommentsByCriteriaIdJSON(toolContentId, toolSessionId, criteria, userId, 
 		page, size, sorting, null, peerreview.isSelfReview(), true, peerreview.getMaximumRatesPerUser() > 0 ));	
+	responsedata.put("countRatedItems", service.getCountItemsRatedByUserByCriteria(criteriaId, userId.intValue()));
 	    
-	int countRatedQuestions = service.getCountItemsRatedByUser(toolContentId, userId.intValue());
-	responsedata.put(AttributeNames.ATTR_COUNT_RATED_ITEMS, countRatedQuestions);
-
 	res.setContentType("application/json;charset=utf-8");
 	res.getWriter().print(new String(responsedata.toString()));
 	return null;
@@ -545,9 +546,10 @@ public class LearningAction extends Action {
 	// runtime min/max value while leaving min/max as the original criteria definition.
 	int rateAllUsers = 0;
 	if ( ( criteria.isRankingStyleRating() && criteria.getMaxRating() == RatingCriteria.RATING_RANK_ALL ) ||
-		( criteria.isStarStyleRating() && criteria.getMinimumRates() == RatingCriteria.RATING_RANK_ALL ) ) {
+		( criteria.isStarStyleRating() && criteria.getMinimumRates() == RatingCriteria.RATING_RANK_ALL ) ||
+		( criteria.isCommentRating() && criteria.getMinimumRates() == RatingCriteria.RATING_RANK_ALL )) {
 	    rateAllUsers = service.getCountUsersBySession(toolSessionId, peerreview.isSelfReview() ? -1 : userId);
-	} else if ( criteria.isStarStyleRating() &&
+	} else if ( ( criteria.isStarStyleRating() || criteria.isCommentRating() ) &&
 		( peerreview.getMinimumRates() > 0 || peerreview.getMaximumRates() > 0 ) && 
 		( dto.getRatingCriteria().getMinimumRates() == 0 && dto.getRatingCriteria().getMaximumRates() == 0 ) ) {
 	    // override the min/max for stars based on old settings if needed (original Peer Review kept one setting for all criteria )
@@ -556,6 +558,8 @@ public class LearningAction extends Action {
 	    criteria.setMaximumRates(peerreview.getMaximumRates());
 	}
 
+	int countRatedUsers = service.getCountItemsRatedByUserByCriteria(criteria.getRatingCriteriaId(), user.getUserId().intValue());
+	request.setAttribute(AttributeNames.ATTR_COUNT_RATED_ITEMS, countRatedUsers);
 	request.setAttribute("rateAllUsers",rateAllUsers);
 	request.setAttribute("criteriaRatings", dto);
 	return mapping.findForward(PeerreviewConstants.SUCCESS);
@@ -608,6 +612,11 @@ public class LearningAction extends Action {
      */
     public ActionForward submitComments(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) throws IOException, ServletException, JSONException {
+	return submitComments(mapping, form, request, response, false);
+    }
+    
+    private ActionForward submitComments(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+	    HttpServletResponse response, boolean ajaxResponse) throws IOException, ServletException, JSONException {
 
 	IPeerreviewService service = getPeerreviewService();
 
@@ -620,7 +629,7 @@ public class LearningAction extends Action {
 	PeerreviewUser user = (PeerreviewUser) sessionMap.get(PeerreviewConstants.ATTR_USER);
 	Long toolSessionId = (Long) sessionMap.get(PeerreviewConstants.PARAM_TOOL_SESSION_ID);
 	Long toolContentId = WebUtil.readLongParam(request, "toolContentId");
-
+	
 	Peerreview peerreview = service.getPeerreviewBySessionId(toolSessionId);
 
 	Long criteriaId = WebUtil.readLongParam(request, "criteriaId");
@@ -636,22 +645,55 @@ public class LearningAction extends Action {
 		    Long itemId = new Long(itemIdString);
 		    String comment = request.getParameter(key);
 		    if ( comment != null ) {
-			// save the comment to the database.
-			service.commentItem(criteria, userId, itemId, comment);
 			countCommentsSaved++;
+			// save the comment to the database.
+			if ( comment.length() > 0 )
+			    service.commentItem(criteria, userId, itemId, comment);
 		    }
 		}
 	    }
 	}
-	
-	JSONObject responsedata = new JSONObject();
-	int countRatedQuestions = service.getCountItemsRatedByUser(toolContentId, user.getUserId().intValue());
-	responsedata.put(AttributeNames.ATTR_COUNT_RATED_ITEMS, countRatedQuestions);
-	responsedata.put("countCommentsSaved", countCommentsSaved);
-	response.setContentType("application/json;charset=utf-8");
-	response.getWriter().print(new String(responsedata.toString()));
-	return null;
+
+	if ( ajaxResponse ) {
+	    JSONObject responsedata = new JSONObject();
+	    int countRatedQuestions = service.getCountItemsRatedByUserByCriteria(criteriaId, user.getUserId().intValue());
+	    responsedata.put(AttributeNames.ATTR_COUNT_RATED_ITEMS, countRatedQuestions);
+	    responsedata.put("countCommentsSaved", countCommentsSaved);
+	    response.setContentType("application/json;charset=utf-8");
+	    response.getWriter().print(new String(responsedata.toString()));
+	    return null;
+	} else {
+	    request.setAttribute(PeerreviewConstants.ATTR_SESSION_MAP_ID, sessionMap.getSessionID());
+	    request.setAttribute(AttributeNames.ATTR_MODE, mode);
+	    request.setAttribute(PeerreviewConstants.PARAM_TOOL_SESSION_ID, toolSessionId);
+
+	    int countRatedItems = service.getCountItemsRatedByUserByCriteria(criteriaId, user.getUserId().intValue());
+	    sessionMap.put(AttributeNames.ATTR_COUNT_RATED_ITEMS, countRatedItems);
+	    
+	    boolean valid = true;
+	    if ( criteria.getMaxRating() == RatingCriteria.RATING_RANK_ALL ) {
+		valid = ( countRatedItems == service.getCountUsersBySession(toolSessionId, peerreview.isSelfReview() ? -1 : user.getUserId()) );
+	    } else {
+		valid = ( criteria.getMinimumRates() <= countRatedItems );
+	    }
+
+	    if (!valid) {
+		request.setAttribute("notcomplete", true);
+		return doEdit(mapping, request, service, sessionMap, toolSessionId, peerreview, criteria);
+	    }
+	    
+	    Boolean next = WebUtil.readBooleanParam(request, "next");
+
+	    // goto standard screen
+	    return startRating(mapping, form, request, response, service, sessionMap, toolSessionId, user, mode, criteria, next);
+	}
     }
+    
+    public ActionForward submitCommentsAjax(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+	    HttpServletResponse response) throws IOException, ServletException, JSONException {
+	return submitComments( mapping,  form,  request, response, true);
+    }
+
     /**
      * Submit the ranking / hedging data and go back to the main learning screen.
      *
@@ -711,8 +753,8 @@ public class LearningAction extends Action {
 			}
 		    }
 		}
-		valid = (ratings.size() == criteria.getMaxRating() || (ratings.size() >= service.getCountUsersBySession(
-			toolSessionId, userId.longValue())));
+		valid = (ratings.size() == criteria.getMaxRating() || 
+			(ratings.size() >= service.getCountUsersBySession(toolSessionId, peerreview.isSelfReview() ? -1 : user.getUserId())));
 	    }
 
 	    service.rateItems(criteria, userId, ratings);
