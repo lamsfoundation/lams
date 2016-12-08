@@ -70,7 +70,7 @@ function initializeJRating() {
     	var itemId = $(this).data("item-id");
     	var commentsCriteriaId = $(this).data("comment-criteria-id");
     	
-		var comment = validComment("comment-textarea-" + itemId, false);
+		var comment = validComment("comment-textarea-" + itemId, false, false);
 		if ( ! comment )
 			return false;
 
@@ -112,8 +112,9 @@ function initializeJRating() {
     }).removeClass("add-comment-new");
 }
 
-// allowBlankComment is needed for Peer Review, where comments are always checked even if minWords = 0
-function validComment(textAreaId, allowBlankComment) {
+// allowBlankComment is needed for Peer Review, where rating related comments are always checked even if minWords = 0
+// skipMinWordCheckOnBlank is used for the explicit comment type fields may be blank even when minWord > 0
+function validComment(textAreaId, allowBlankComment, skipMinWordCheckOnBlank) {
 
 	
 	//replace special characters with HTML tags
@@ -121,12 +122,15 @@ function validComment(textAreaId, allowBlankComment) {
     filterData(document.getElementById(textAreaId), tempTextarea);
 	var comment = tempTextarea.value;
 
-	//comment can't be blank
 	if ( ! allowBlankComment && ( comment == "" || comment == COMMENT_TEXTAREA_TIP_LABEL ) ) {
 		alert(WARN_COMMENTS_IS_BLANK_LABEL);
 		return;
 	}
     	
+	if ( skipMinWordCheckOnBlank && comment == "" ) {
+		return comment;
+	}
+	
 	//word count limit
 	if (COMMENTS_MIN_WORDS_LIMIT != 0) { //removed isCommentsEnabled && --was it worth it?
 		var value =  $("#" + textAreaId).val();
@@ -142,6 +146,7 @@ function validComment(textAreaId, allowBlankComment) {
 	
 	return comment;
 }    	
+
 // If the call is from a rating then it is ratingCriteriaId-itemId format string, otherwise a comment 
 // only returns itemId as a number. Pull a string version of itemId of this. 
 function getItemIdFromObjectId(objectId) {
