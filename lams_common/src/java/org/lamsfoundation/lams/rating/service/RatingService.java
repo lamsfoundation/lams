@@ -367,12 +367,16 @@ public class RatingService implements IRatingService {
     @Override
     public void saveRatingCriterias(HttpServletRequest request, Collection<RatingCriteria> oldCriterias,
 	    Long toolContentId) {
+	
+	// different handling for comments - simple tag sets the isCommentsEnabled flag,
+	// the complex tag sends explicit comment type entry.
+	boolean explicitCommentTypeFound = false;
+	
 	// create orderId to RatingCriteria map
 	Map<Integer, RatingCriteria> mapOrderIdToRatingCriteria = new HashMap<Integer, RatingCriteria>();
 	for (RatingCriteria ratingCriteriaIter : oldCriterias) {
 	    mapOrderIdToRatingCriteria.put(ratingCriteriaIter.getOrderId(), ratingCriteriaIter);
 	}
-
 	
 	for ( Map.Entry entry : request.getParameterMap().entrySet()) {
 	    log.debug("entry: "+entry.getKey()+" "+entry.getValue());
@@ -398,6 +402,7 @@ public class RatingService implements IRatingService {
 			maxRating = RatingCriteria.RATING_STYLE_RANKING_DEFAULT_MAX;
 			break;
 		    case RatingCriteria.RATING_STYLE_HEDGING:
+		    case RatingCriteria.RATING_STYLE_COMMENT:
 			maxRating = 0;
 			break;
 		}
@@ -405,11 +410,16 @@ public class RatingService implements IRatingService {
 
 	    Integer minRatings = 0;
 	    Integer maxRatings = 0;
-	    if ( ratingStyle == RatingCriteria.RATING_STYLE_STAR ) {
+	    if ( ratingStyle == RatingCriteria.RATING_STYLE_STAR || ratingStyle == RatingCriteria.RATING_STYLE_COMMENT ) {
 		minRatings = WebUtil.readIntParam(request, "minimumRates" + i, true);
 		maxRatings = WebUtil.readIntParam(request, "maximumRates" + i, true);
+	    } 
+	    
+	    if ( ratingStyle == RatingCriteria.RATING_STYLE_COMMENT ) {
+		explicitCommentTypeFound = true;
 	    }
-	    boolean commentsEnabled = ( ratingStyle != RatingCriteria.RATING_STYLE_COMMENT ? WebUtil.readBooleanParam(request,  "enableComments" + i, false) : false );
+
+	    boolean commentsEnabled = ( ratingStyle != RatingCriteria.RATING_STYLE_COMMENT ? WebUtil.readBooleanParam(request,  "enableComments" + i, false) : true );
 	    
 	    RatingCriteria ratingCriteria = mapOrderIdToRatingCriteria.get(i);
 	    if (StringUtils.isNotBlank(criteriaTitle)) {
@@ -437,7 +447,7 @@ public class RatingService implements IRatingService {
 		ratingCriteria.setMinimumRates( minRatings );
 		ratingCriteria.setMaximumRates( maxRatings );
 		
-		ratingCriteriaDAO.saveOrUpdate(ratingCriteria);
+    		ratingCriteriaDAO.saveOrUpdate(ratingCriteria);
 		// !!updatedCriterias.add(ratingCriteria);
 
 		// delete
@@ -447,37 +457,39 @@ public class RatingService implements IRatingService {
 
 	}
 
-	// ==== handle comments criteria ====
+	// ==== handle comments criteria - simple tag support ====
+	if ( ! explicitCommentTypeFound ) {
+	    boolean isCommentsEnabled = WebUtil.readBooleanParam(request, "isCommentsEnabled", false);
 
-	boolean isCommentsEnabled = WebUtil.readBooleanParam(request, "isCommentsEnabled", false);
-	// find comments' responsible RatingCriteria
-	RatingCriteria commentsResponsibleCriteria = null;
-	for (RatingCriteria ratingCriteriaIter : oldCriterias) {
-	    if (ratingCriteriaIter.isCommentRating()) {
-		commentsResponsibleCriteria = ratingCriteriaIter;
-		break;
+	    // find comments' responsible RatingCriteria
+	    RatingCriteria commentsResponsibleCriteria = null;
+	    for (RatingCriteria ratingCriteriaIter : oldCriterias) {
+		if (ratingCriteriaIter.isCommentRating()) {
+		    commentsResponsibleCriteria = ratingCriteriaIter;
+		    break;
+		}
 	    }
-	}
-	// create commentsRatingCriteria if it's required
-	if (isCommentsEnabled) {
-	    if (commentsResponsibleCriteria == null) {
-		commentsResponsibleCriteria = new LearnerItemRatingCriteria();
-		commentsResponsibleCriteria.setRatingCriteriaTypeId(RatingCriteria.LEARNER_ITEM_CRITERIA_TYPE);
-		((LearnerItemRatingCriteria) commentsResponsibleCriteria).setToolContentId(toolContentId);
-		commentsResponsibleCriteria.setOrderId(0);
-		commentsResponsibleCriteria.setCommentsEnabled(true);
-		commentsResponsibleCriteria.setRatingStyle(RatingCriteria.RATING_STYLE_COMMENT);
-	    }
+	    // create commentsRatingCriteria if it's required
+	    if (isCommentsEnabled) {
+		if (commentsResponsibleCriteria == null) {
+		    commentsResponsibleCriteria = new LearnerItemRatingCriteria();
+		    commentsResponsibleCriteria.setRatingCriteriaTypeId(RatingCriteria.LEARNER_ITEM_CRITERIA_TYPE);
+		    ((LearnerItemRatingCriteria) commentsResponsibleCriteria).setToolContentId(toolContentId);
+		    commentsResponsibleCriteria.setOrderId(0);
+		    commentsResponsibleCriteria.setCommentsEnabled(true);
+		    commentsResponsibleCriteria.setRatingStyle(RatingCriteria.RATING_STYLE_COMMENT);
+		}
 
-	    int commentsMinWordsLimit = WebUtil.readIntParam(request, "commentsMinWordsLimit");
-	    commentsResponsibleCriteria.setCommentsMinWordsLimit(commentsMinWordsLimit);
+		int commentsMinWordsLimit = WebUtil.readIntParam(request, "commentsMinWordsLimit");
+		commentsResponsibleCriteria.setCommentsMinWordsLimit(commentsMinWordsLimit);
 
-	    ratingCriteriaDAO.saveOrUpdate(commentsResponsibleCriteria);
+		ratingCriteriaDAO.saveOrUpdate(commentsResponsibleCriteria);
 
-	    // delete commentsRatingCriteria if it's not required
-	} else {
-	    if (commentsResponsibleCriteria != null) {
-		ratingCriteriaDAO.deleteRatingCriteria(commentsResponsibleCriteria.getRatingCriteriaId());
+		// delete commentsRatingCriteria if it's not required
+	    } else {
+		if (commentsResponsibleCriteria != null) {
+		    ratingCriteriaDAO.deleteRatingCriteria(commentsResponsibleCriteria.getRatingCriteriaId());
+		}
 	    }
 	}
     }
