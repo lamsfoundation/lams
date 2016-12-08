@@ -311,7 +311,7 @@
 									  <button id="editClassButton" class="btn btn-default roffset10" 
 									  	type="button" onClick="javascript:showClassDialog()" 
 									  	title='<fmt:message key="button.edit.class.tooltip"/>'><i class="fa fa-sm fa-user-times"></i> <span class="hidden-xs"><fmt:message key="button.edit.class"/></span></button>
-									<c:if test="${notificationsAvailable && lesson.enabledLessonNotifications}">	
+									<c:if test="${lesson.enabledLessonNotifications}">	
 									  <button id="notificationButton" class="btn btn-default roffset10" 
 									  	type="button" onClick="javascript:window.parent.showNotificationsDialog(null,${lesson.lessonID})"><i class="fa fa-sm fa-bullhorn"></i> <span class="hidden-xs"><fmt:message key="email.notifications"/></span></button>
 									</c:if>							  
