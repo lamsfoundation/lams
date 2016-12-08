@@ -71,6 +71,12 @@ input[type="checkbox"] {
 	padding: 5px;
 }
 
+.dialogContainer .modal-body {
+	height : 100%;
+	max-height: calc(100% - 56px);
+	padding: 0;
+}
+
 div.dialogListItem {
 	padding: 3px 0px 3px 0px;
 	cursor: pointer;
