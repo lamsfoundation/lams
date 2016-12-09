@@ -164,8 +164,8 @@
 				<fmt:message key="lesson.task.attention" var="CONTRIBUTE_ATTENTION_VAR"/>
 				CONTRIBUTE_ATTENTION : '<c:out value="${CONTRIBUTE_ATTENTION_VAR}" />',
 				HELP : '<fmt:message key="button.help"/>',
-				LESSON_INTRODUCTION : '<fmt:message key="label.lesson.introduction"/>'
-				
+				LESSON_INTRODUCTION : '<fmt:message key="label.lesson.introduction"/>',
+				EMAIL_TITLE : '<fmt:message key="label.email"/>'
 			}
 	    
 		$(document).ready(function(){
