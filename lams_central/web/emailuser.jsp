@@ -55,10 +55,9 @@ input[type="checkbox"] {
 
 	function closeDialog() {
 		if (returnUrl == '') {
-			if (window.parent.closeEmailDialog) {
-				window.parent.closeEmailDialog();
-			} else if (closeEmailDialog) {
-				closeEmailDialog();
+			if (window.top.$("#dialogEmail").length > 0) {
+				//clicking the button is added in order to circumwent the problem with the issue with hiding dialog using window.top.$("#dialogEmail").modal('hide');
+				window.top.$("#dialogEmail .close").click();
 			} else {
 				// if this is a pop up, close it
 				close();

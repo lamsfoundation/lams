@@ -83,9 +83,7 @@
 				PRIVATE_NOTIFICATIONS_READ_ALL_HINT : '<c:out value="${PRIVATE_NOTIFICATIONS_READ_ALL_HINT_VAR}" />',
 				MY_PROFILE : '<fmt:message key="index.myprofile" />',
 				REMOVE_ORG_FAVORITE : '<fmt:message key="label.remove.org.favorite"/>',
-				MARK_ORG_FAVORITE : '<fmt:message key="label.mark.org.favorite"/>',
-				EMAIL_TITLE : '<fmt:message key="label.email"/>',
-
+				MARK_ORG_FAVORITE : '<fmt:message key="label.mark.org.favorite"/>'
 			},
 			activeOrgId = <c:choose><c:when test="${empty lastVisitedOrganisationId}">null</c:when><c:otherwise>${lastVisitedOrganisationId}</c:otherwise></c:choose>;
 
