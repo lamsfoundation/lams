@@ -23,6 +23,6 @@
 
 <center id="center12">
 	<div id="flashContent">
-		<fmt:message>message.enableJavaScript</fmt:message>
+		<fmt:message>message.enableFlashAuthorMonitor</fmt:message>
 	</div>
 </center>
