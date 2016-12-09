@@ -395,18 +395,19 @@ function openChatWindow(){
 
 function showEmailDialog(userId){
 	
-	//Check whether current window is a top level window. Otherwise it's an iframe, popup or something
+	//check whether current window is a top level one (otherwise it's an iframe or popup)
 	var isTopLevelWindow = window.top == window.self;
-	var windowElement = isTopLevelWindow ? $(window) : $(window.parent);
+	//calculate width and height based on the dimensions of the window to which dialog is added
+	var dialogWindow = isTopLevelWindow ? $(window) : $(window.parent);
 	
 	var dialog = showDialog("dialogEmail", {
 		'autoOpen'  : true,
-		'height'    : Math.max(380, Math.min(700, windowElement.height() - 30)),
-		'width'     : Math.max(380, Math.min(700, windowElement.width() - 60)),
+		'height'    : Math.max(380, Math.min(700, dialogWindow.height() - 30)),
+		'width'     : Math.max(380, Math.min(700, dialogWindow.width() - 60)),
 		'modal'     : true,
 		'resizable' : true,
 		'title'     : LABELS.EMAIL_TITLE,
-		//whether dialog should be created in a parent window
+		//dialog needs to be added to a top level window to avoid boundary limitations of the interim iframe
 		"isCreateInParentWindow" : !isTopLevelWindow, 
 		'open'      : function(){
 			autoRefreshBlocked = true;
