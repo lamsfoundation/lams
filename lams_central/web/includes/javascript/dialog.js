@@ -37,9 +37,13 @@ function showDialog(id, initParams, extraButtons, recreate) {
 			return;
 		}
 	}
+
+	// checks whether the dialog should be created inside a current window or in a parent one. The latter is prefered 
+	//in case we want dialog to be not constrained by the boundaries of a current window
+	var body = initParams.isCreateInParentWindow ? parent.$("body") : 'body';
 	
 	// create a new dialog by cloning a template
-	dialog = dialogTemplate.clone().appendTo('body');
+	dialog = dialogTemplate.clone().appendTo(body);
 	
 	// use the input attributes or fall back to default ones
 	initParams = $.extend({
