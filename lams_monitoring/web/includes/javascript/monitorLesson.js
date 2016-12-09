@@ -393,14 +393,34 @@ function openChatWindow(){
 			,'width=650,height=350,resizable=no,scrollbars=no,status=no,menubar=no,toolbar=no');
 }
 
-//sets up dialog for emailing learners
 function showEmailDialog(userId){
-	window.parent.showEmailDialog(userId, lessonId);
-}
-
-
-function closeEmailDialog(){
-	window.parent.closeEmailDialog();
+	
+	//Check whether current window is a top level window. Otherwise it's an iframe, popup or something
+	var isTopLevelWindow = window.top == window.self;
+	var windowElement = isTopLevelWindow ? $(window) : $(window.parent);
+	
+	var dialog = showDialog("dialogEmail", {
+		'autoOpen'  : true,
+		'height'    : Math.max(380, Math.min(700, windowElement.height() - 30)),
+		'width'     : Math.max(380, Math.min(700, windowElement.width() - 60)),
+		'modal'     : true,
+		'resizable' : true,
+		'title'     : LABELS.EMAIL_TITLE,
+		//whether dialog should be created in a parent window
+		"isCreateInParentWindow" : !isTopLevelWindow, 
+		'open'      : function(){
+			autoRefreshBlocked = true;
+			var dialog = $(this);
+			// load contents after opening the dialog
+			$('iframe', dialog).attr('src',
+					LAMS_URL + 'emailUser.do?method=composeMail&lessonID=' + lessonId
+					+ '&userID=' + userId);
+		},
+		'close' : function(){
+			autoRefreshBlocked = false;
+			$(this).remove();
+		}
+	}, false, true);
 }
 
 
