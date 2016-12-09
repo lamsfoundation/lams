@@ -615,31 +615,3 @@ function removeLesson(lessonID) {
 	}
 }
 
-
-function showEmailDialog(userId, lessonId){
-	var dialog = showDialog("dialogEmail", {
-		'autoOpen'  : true,
-		'height'    : Math.max(380, Math.min(700, $(window).height() - 30)),
-		'width'     : Math.max(380, Math.min(700, $(window).width() - 60)),
-		'modal'     : true,
-		'resizable' : true,
-		'title'     : LABELS.EMAIL_TITLE,
-		'open'      : function(){
-			autoRefreshBlocked = true;
-			var dialog = $(this);
-			// load contents after opening the dialog
-			$('iframe', dialog).attr('src',
-					LAMS_URL + 'emailUser.do?method=composeMail&lessonID=' + lessonId
-					+ '&userID=' + userId);
-		},
-		'close' : function(){
-			autoRefreshBlocked = false;
-			$(this).remove();
-		}
-	}, false, true);
-}
-
-
-function closeEmailDialog(){
-	$('#dialogEmail').modal('hide');
-}
