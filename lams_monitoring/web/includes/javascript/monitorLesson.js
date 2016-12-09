@@ -1819,7 +1819,10 @@ function refreshMonitor(tabName, isAuto){
  * Tells parent document to close this Monitor dialog.
  */
 function closeMonitorLessonDialog(refresh) {
-	window.parent.closeDialog('dialogMonitorLesson' + lessonId, refresh);
+	//check method is available in order to avoid JS errors (as it's not available from integrations)
+	if (typeof window.parent.closeDialog === "function") {
+		window.parent.closeDialog('dialogMonitorLesson' + lessonId, refresh);
+	}
 }
 
 /**
