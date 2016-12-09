@@ -132,7 +132,7 @@ div.growlUI h1, div.growlUI h2 {
 	color: red;
 }
 
-#warning-answers-required, #warning-words-limit, #warning-mark-hedging-wrong-total, .initially-hidden {
+#warning-answers-required, #warning-words-limit, #warning-mark-hedging-wrong-total,#warning-mark-hedging-wrong-justification{
 	display: none;
 }
 
