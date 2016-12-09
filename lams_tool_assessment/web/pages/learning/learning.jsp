@@ -351,6 +351,7 @@
 			var minWordsLimitNotReachedQuestions = [];
 			var maxWordsLimitExceededQuestions = [];
 			var markHedgingWrongTotalQuestions = [];
+			var markHedgingWrongJustification = [];
 			
 			<c:forEach var="question" items="${sessionMap.pagedQuestions[pageNumber-1]}" varStatus="status">
 				<c:if test="${question.answerRequired}">
@@ -443,9 +444,11 @@
 						var totalSelected = countHedgeQuestionSelectTotal(questionIndex);
 				
 						//if totalSelected not equals to question's grade OR textarea is empty or contains only white-space - show warning
-						if (totalSelected != grade
-								|| ${question.hedgingJustificationEnabled} && !$.trim($("#question" + questionIndex + "__lamstextarea").val())) {
+						if (totalSelected != grade) {
 							markHedgingWrongTotalQuestions.push("${status.index}");
+						}
+						if(${question.hedgingJustificationEnabled} && !$.trim($("#question" + questionIndex + "__lamstextarea").val())){
+							markHedgingWrongJustification.push("${status.index}");
 						}
 					}
 					
@@ -455,7 +458,7 @@
 			
 			//return true in case all required questions were answered, false otherwise
 			if (missingRequiredQuestions.length == 0 && minWordsLimitNotReachedQuestions.length == 0 
-					&& maxWordsLimitExceededQuestions.length == 0 && markHedgingWrongTotalQuestions.length == 0) {
+					&& maxWordsLimitExceededQuestions.length == 0 && markHedgingWrongTotalQuestions.length == 0 && markHedgingWrongJustification.length ==0) {
 				return true;
 				
 			} else {
@@ -464,6 +467,7 @@
 				$('#warning-answers-required').hide();
 				$('#warning-words-limit').hide();
 				$('#warning-mark-hedging-wrong-total').hide();
+				$('#warning-mark-hedging-wrong-justification').hide();
 				
 				if (missingRequiredQuestions.length != 0) {
 					//add .bg-warning class to those needs to be filled
@@ -500,6 +504,14 @@
 					}
 					//show alert message as well
 					$("#warning-mark-hedging-wrong-total").show();		
+				}
+				if (markHedgingWrongJustification.length != 0) {
+					//add .bg-warning class to those needs to be filled
+					for (i = 0; i < markHedgingWrongJustification.length; i++) {
+					    $("#question-area-" + markHedgingWrongJustification[i]).addClass('bg-warning');
+					}
+					//show alert message as well
+					$("#warning-mark-hedging-wrong-justification").show();
 				}
 				
 				$("html, body").animate({ scrollTop: 0 }, "slow");//window.scrollTo(0, 0);
@@ -565,6 +577,10 @@
 		
 		<lams:Alert id="warning-mark-hedging-wrong-total" type="warning" close="true">
 			<fmt:message key="warn.mark.hedging.wrong.total" />
+		</lams:Alert>
+		
+		<lams:Alert id="warning-mark-hedging-wrong-justification" type="warning" close="true">
+			<fmt:message key="warn.mark.hedging.wrong.justification" />
 		</lams:Alert>
 		
 		<div id="timelimit-start-dialog"> 
