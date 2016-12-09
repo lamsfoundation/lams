@@ -315,10 +315,16 @@ function showAuthoringDialog(learningDesignID){
 
 //used by both /lams_central/web/main.jsp and /lams_monitoring/web/monitor.jsp pages
 function showNotificationsDialog(orgID, lessonID) {
+	
+	//check whether current window is a top level one (otherwise it's an iframe or popup)
+	var isTopLevelWindow = window.top == window.self;
+	//calculate width and height based on the dimensions of the window to which dialog is added
+	var dialogWindow = isTopLevelWindow ? $(window) : $(window.parent);
+	
 	// if screen is narrow, then it is much longer
-	var width = Math.max(380, Math.min(800, $(window).width() - 60)),
+	var width = Math.max(380, Math.min(800, dialogWindow.width() - 60)),
 		height = width < 798 ? 850 : 650;
-	height = Math.max(380, Math.min(height, $(window).height() - 30));
+	height = Math.max(380, Math.min(height, dialogWindow.height() - 30));
 		
 	var id = "dialogNotifications" + (lessonID ? "Lesson" + lessonID : "Org" + orgID);
 	showDialog(id, {
@@ -328,6 +334,8 @@ function showNotificationsDialog(orgID, lessonID) {
 		},
 		'height': height,
 		'width' : width,
+		//dialog needs to be added to a top level window to avoid boundary limitations of the interim iframe
+		"isCreateInParentWindow" : !isTopLevelWindow,		
 		'title' : LABELS.EMAIL_NOTIFICATIONS_TITLE,
 		'open' : function() {
 			var dialog = $(this),
