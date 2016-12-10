@@ -270,7 +270,7 @@ function showMonitorLessonDialog(lessonID) {
 				'lessonID' : lessonID
 			},
 			'autoOpen' : false,
-			'height': Math.max(380, Math.min(600, $(window).height() - 30)),
+			'height': Math.max(380, Math.min(800, $(window).height() - 30)),
 			'width' : Math.max(380, Math.min(1024, $(window).width() - 60)),
 			'title' : LABELS.MONITORING_TITLE,
 			'open' : function() {
