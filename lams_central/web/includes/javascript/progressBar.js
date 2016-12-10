@@ -1166,7 +1166,7 @@ function fillProgressBar(barId) {
 			}
 
 			// draw support activities if they exist
-			if (result.support) {
+			if (result.support && $('#supportPart').length == 1) {
 				var svgheight = 17 + 33 * result.support.length;
 				// separate paper for Support Activities frame
 				var supportPaper = Snap();
