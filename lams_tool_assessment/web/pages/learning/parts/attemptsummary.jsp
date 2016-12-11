@@ -32,7 +32,7 @@
 			<c:if test="${assessment.allowGradesAfterAttempt}">
 				<tr>
 					<th>
-						<fmt:message key="label.learning.summary.grade" />
+						<fmt:message key="label.learning.summary.grade" />:&thinsp;
 					</th>
 					<td style="padding-left: 5px">
 						<fmt:formatNumber value="${result.grade}" maxFractionDigits="3"/>
