@@ -59,7 +59,7 @@
 						  dataId="data-session-id='${groupDto.sessionId}' data-question-uid='${question.uid}'">
 					<th title="<fmt:message key='label.sort.by.answer'/>"><fmt:message key="label.learning.answer"/></th>
 					<c:if test="${isRatingsEnabled}">
-						<th title="<fmt:message key='label.sort.by.rating'/>" width="130px">
+						<th title="<fmt:message key='label.sort.by.rating'/>">
 							<fmt:message key="label.learning.rating" />
 						</th>
 					</c:if>

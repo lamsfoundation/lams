@@ -106,7 +106,7 @@
 			$(".tablesorter").tablesorter({
 				theme: 'bootstrap',
 			    widthFixed: true,
-				widgets: ["uitheme", "zebra", "filter"],
+				widgets: ["uitheme", "zebra", "filter", "resizable"],
 				headerTemplate : '{content} {icon}',
 				headers: { 1: { filter: false }, 2: { filter: false, sorter: false } },
 			    widgetOptions : {
@@ -122,12 +122,11 @@
 				$(this).tablesorterPager({
 					// set to false otherwise it remembers setting from other jsFiddle demos
 					savePages: false,
-				      // use this format: "http:/mydatabase.com?page={page}&size={size}&{sortList:col}"
-				      // where {page} is replaced by the page number (or use {page+1} to get a one-based index),
-				      // {size} is replaced by the number of records to show,
-				      // {sortList:col} adds the sortList to the url into a "col" array, and {filterList:fcol} adds
-				      // the filterList to the url into an "fcol" array.
-				      // So a sortList = [[2,0],[3,0]] becomes "&col[2]=0&col[3]=0" in the url
+					container: $(this).find(".ts-pager"),
+	                output: '{startRow} to {endRow} ({totalRows})',
+	                cssPageDisplay: '.pagedisplay',
+	                cssPageSize: '.pagesize',
+	                cssDisabled: 'disabled',
 					ajaxUrl : "<c:url value='/learning.do'/>?method=getResponses&page={page}&size={size}&{sortList:column}&{filterList:fcol}&isMonitoring=true&isAllowRateAnswers=${qaContent.allowRateAnswers}&isAllowRichEditor=${qaContent.allowRichEditor}&isOnlyLeadersIncluded=${qaContent.useSelectLeaderToolOuput}&qaContentId=${qaContent.qaContentId}&qaSessionId=" + $(this).attr('data-session-id') + "&questionUid=" + $(this).attr('data-question-uid') + "&userId=" + $("#userID").val() + "&reqID=" + (new Date()).getTime(),
 					ajaxProcessing: function (data) {
 				    	if (data && data.hasOwnProperty('rows')) {
@@ -228,20 +227,7 @@
 							return json;
 				            
 				    	}
-					},
-				    container: $(this).next(".pager"),
-				    output: '{startRow} to {endRow} ({totalRows})',
-				    //removeRows: false,
-				    // css class names of pager arrows
-				    cssNext: '.tablesorter-next', // next page arrow
-					cssPrev: '.tablesorter-prev', // previous page arrow
-					cssFirst: '.tablesorter-first', // go to first page arrow
-					cssLast: '.tablesorter-last', // go to last page arrow
-					cssGoto: '.gotoPage', // select dropdown to allow choosing a page
-					cssPageDisplay: '.pagedisplay', // location of where the "output" is displayed
-					cssPageSize: '.pagesize', // page size selector - select dropdown that sets the "size" option
-					// class added to arrows when at the extremes (i.e. prev/first arrows are "disabled" when on the first page)
-					cssDisabled: 'disabled' // Note there is no period "." in front of this class name
+					}
 				})
 				
 				// bind to pager events
