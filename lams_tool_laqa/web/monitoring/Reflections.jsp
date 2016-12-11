@@ -30,23 +30,32 @@
 	
 			$(document).ready(function(){
 				$(".tablesorter").tablesorter({
-					theme: 'blue',
-				    sortInitialOrder: 'desc',
-		            sortList: [[0]],
-		            widgets: [ "resizable", "filter" ],
-		            headers: { 1: { filter: false, sorter: false} }, 
-		            widgetOptions: {
+					theme: 'bootstrap',
+				    widthFixed: true,
+					widgets: ["uitheme", "zebra", "filter", "resizable"],
+					headerTemplate : '{content} {icon}',
+					headers: { 1: { filter: false, sorter: false} },
+				    widgetOptions : {
 		            	resizable: true,
-		            	// include column filters 
-		                filter_columnFilters: true, 
-		                filter_placeholder: { search : '<fmt:message key="label.search"/>' }, 
-		                filter_searchDelay: 700 
-		            }
+				        // include column filters
+				        filter_columnFilters: true,
+			    	    filter_placeholder: { search : '<fmt:message key="label.search"/>' },
+			    	    filter_searchDelay: 700
+			    	    
+			      	},
+				    sortInitialOrder: 'desc',
+		            sortList: [[0]]
 				});
-			
+				
 				$(".tablesorter").each(function() {
 					$(this).tablesorterPager({
+						// set to false otherwise it remembers setting from other jsFiddle demos
 						savePages: false,
+						container: $(this).find(".ts-pager"),
+		                output: '{startRow} to {endRow} ({totalRows})',
+		                cssPageDisplay: '.pagedisplay',
+		                cssPageSize: '.pagesize',
+		                cssDisabled: 'disabled',
 						ajaxUrl : "<lams:WebAppURL/>monitoring.do?dispatch=getReflectionsJSON&page={page}&size={size}&{sortList:column}&{filterList:fcol}&toolSessionID=" + $(this).attr('data-session-id'),
 						ajaxProcessing: function (data, table) {
 							if (data && data.hasOwnProperty('rows')) {
@@ -78,18 +87,6 @@
 					            
 					    	}
 						},					
-					    container: $(this).next(".pager"),
-					    output: '{startRow} to {endRow} ({totalRows})',
-					    // css class names of pager arrows
-					    cssNext: '.tablesorter-next', // next page arrow
-						cssPrev: '.tablesorter-prev', // previous page arrow
-						cssFirst: '.tablesorter-first', // go to first page arrow
-						cssLast: '.tablesorter-last', // go to last page arrow
-						cssGoto: '.gotoPage', // select dropdown to allow choosing a page
-						cssPageDisplay: '.pagedisplay', // location of where the "output" is displayed
-						cssPageSize: '.pagesize', // page size selector - select dropdown that sets the "size" option
-						// class added to arrows when at the extremes (i.e. prev/first arrows are "disabled" when on the first page)
-						cssDisabled: 'disabled' // Note there is no period "." in front of this class name
 					})
 				});
 		  	});
