@@ -182,6 +182,9 @@
 			    	});
 			    }
 			});
+			
+			// trigger the resize when the window first opens so that the grid uses all the space available.
+			setTimeout(function(){ window.dispatchEvent(new Event('resize')); }, 300);
 		    
 		})
 	
