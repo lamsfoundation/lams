@@ -13,7 +13,7 @@
 <lams:head>
 	<title><fmt:message key="label.learning.title" /></title>
 	<%@ include file="/common/header.jsp"%>
-	<link rel="stylesheet" href="${lams}css/jquery.tablesorter.theme-blue.css">
+	<link rel="stylesheet" href="${lams}css/jquery.tablesorter.theme.bootstrap.css">
 	<link rel="stylesheet" href="${lams}css/jquery.tablesorter.pager.css">
 	<link type="text/css" href="${lams}/css/chart.css" rel="stylesheet" />
 	<style media="screen,projection" type="text/css">
@@ -37,81 +37,55 @@ table.alternative-color td:first-child {
 	<script type="text/javascript" src="${lams}includes/javascript/chart.js"></script>
 	<script type="text/javascript" src="${lams}includes/javascript/jquery.tablesorter.js"></script>
 	<script type="text/javascript" src="${lams}includes/javascript/jquery.tablesorter-pager.js"></script>
+	<script type="text/javascript" src="${lams}includes/javascript/jquery.tablesorter-widgets.js"></script>
 
 	<script type="text/javascript">
-		$(document)
-				.ready(
-						function() {
+		$(document).ready(function() {
 
-							$(".tablesorter").tablesorter({
-								theme : 'blue',
-								widthFixed : true,
-								widgets : [ 'zebra' ]
-							});
+			$(".tablesorter").tablesorter({
+				theme : 'bootstrap',
+				headerTemplate : '{content} {icon}',
+				widthFixed : true,
+				widgets : [ 'uitheme', 'zebra' ]
+			});
 
-							$(".tablesorter")
-									.each(
-											function() {
-												$(this)
-														.tablesorterPager(
-																{
-																	// set to false otherwise it remembers setting from other jsFiddle demos
-																	savePages : false,
-																	// use this format: "http:/mydatabase.com?page={page}&size={size}&{sortList:col}"
-																	// where {page} is replaced by the page number (or use {page+1} to get a one-based index),
-																	// {size} is replaced by the number of records to show,
-																	// {sortList:col} adds the sortList to the url into a "col" array, and {filterList:fcol} adds
-																	// the filterList to the url into an "fcol" array.
-																	// So a sortList = [[2,0],[3,0]] becomes "&col[2]=0&col[3]=0" in the url
-																	ajaxUrl : "<c:url value='/learning/getOpenResponses.do'/>?page={page}&size={size}&{sortList:column}&sessionId=${sessionMap.toolSessionID}&questionUid="
-																			+ $(
-																					this)
-																					.attr(
-																							'data-question-uid'),
-																	ajaxProcessing : function(
-																			data) {
+			$(".tablesorter").each(function() {
+				$(this).tablesorterPager({
+					// set to false otherwise it remembers setting from other jsFiddle demos
+					savePages : false,
+					ajaxUrl : "<c:url value='/learning/getOpenResponses.do'/>?page={page}&size={size}&{sortList:column}&sessionId=${sessionMap.toolSessionID}&questionUid="
+							+ $(this).attr('data-question-uid'),
+					ajaxProcessing : function(data) {
 
-																		if (data
-																				&& data
-																						.hasOwnProperty('rows')) {
-																			var rows = [], json = {};
+						if (data && data.hasOwnProperty('rows')) {
+							var rows = [], json = {};
 
-																			for (i = 0; i < data.rows.length; i++) {
-																				var userData = data.rows[i];
+							for (i = 0; i < data.rows.length; i++) {
+								var userData = data.rows[i];
 
-																				rows += '<tr>';
-																				rows += '<td>';
-																				rows += '<div class="user-answer">';
-																				rows += userData["answer"];
-																				rows += '</div>';
-																				rows += '</td>';
-																				rows += '</tr>';
-																			}
+								rows += '<tr>';
+								rows += '<td>';
+								rows += '<div class="user-answer">';
+								rows += userData["answer"];
+								rows += '</div>';
+								rows += '</td>';
+								rows += '</tr>';
+							}
 
-																			json.total = data.total_rows; // only allow 100 rows in total
-																			//json.filteredRows = 100; // no filtering
-																			json.rows = $(rows);
-																			return json;
-																		}
-																	},
-																	container : $(
-																			this)
-																			.next(
-																					".pager"),
-																	output : '{startRow} to {endRow} ({totalRows})',
-																	// css class names of pager arrows
-																	cssNext : '.tablesorter-next', // next page arrow
-																	cssPrev : '.tablesorter-prev', // previous page arrow
-																	cssFirst : '.tablesorter-first', // go to first page arrow
-																	cssLast : '.tablesorter-last', // go to last page arrow
-																	cssGoto : '.gotoPage', // select dropdown to allow choosing a page
-																	cssPageDisplay : '.pagedisplay', // location of where the "output" is displayed
-																	cssPageSize : '.pagesize', // page size selector - select dropdown that sets the "size" option
-																	// class added to arrows when at the extremes (i.e. prev/first arrows are "disabled" when on the first page)
-																	cssDisabled : 'disabled' // Note there is no period "." in front of this class name
-																})
-											});
-						});
+							json.total = data.total_rows; // only allow 100 rows in total
+							//json.filteredRows = 100; // no filtering
+							json.rows = $(rows);
+							return json;
+						}
+					},
+					container: $(this).find(".ts-pager"),
+					output: '{startRow} to {endRow} ({totalRows})',
+	                cssPageDisplay: '.pagedisplay',
+	                cssPageSize: '.pagesize',
+	                cssDisabled: 'disabled'
+				})
+			});
+		});
 
 		function finishSession() {
 			document.getElementById("finishButton").disabled = true;
@@ -285,30 +259,10 @@ table.alternative-color td:first-child {
 						<c:if test="${question.type == 3}">
 							<tr>
 								<td colspan="2">
-									<table class="tablesorter" data-question-uid="${question.uid}">
-										<thead>
-											<tr>
-												<th title="<fmt:message key='label.sort.by.answer'/>"
-													style="background-color: #D2E1DF; color: black; height: 15px;"><fmt:message key="label.answer" /></th>
-											</tr>
-										</thead>
-										<tbody>
-
-										</tbody>
-									</table> <!-- pager -->
-									<div class="pager">
-										<form>
-											<img class="tablesorter-first" /> <img class="tablesorter-prev" /> <span class="pagedisplay"></span> <img
-												class="tablesorter-next" /> <img class="tablesorter-last" /> <select class="pagesize">
-												<option selected="selected" value="10">10</option>
-												<option value="20">20</option>
-												<option value="30">30</option>
-												<option value="40">40</option>
-												<option value="50">50</option>
-												<option value="100">100</option>
-											</select>
-										</form>
-									</div>
+									<lams:TSTable numColumns="1" dataId='data-question-uid="${question.uid}"' test="2"> 
+										<th title="<fmt:message key='label.sort.by.answer'/>"><fmt:message key="label.answer" /></th>
+									</lams:TSTable>
+									
 								</td>
 							</tr>
 						</c:if>
