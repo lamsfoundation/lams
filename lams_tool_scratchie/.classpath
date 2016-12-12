@@ -13,6 +13,11 @@
 			<attribute name="javadoc_location" value="http://www.jboss.org/file-access/default/members/jbossweb/freezone/docs/latest/api/"/>
 		</attributes>
 	</classpathentry>
+	<classpathentry kind="var" path="JBOSS_HOME/common/lib/quartz.jar" sourcepath="/3RDPARTY_SOURCES_PROJECT/quartz">
+		<attributes>
+			<attribute name="javadoc_location" value="http://javasourcecode.org/html/open-source/quartz/quartz-1.5.2/"/>
+		</attributes>
+	</classpathentry>	
 	<classpathentry kind="var" path="JBOSS_HOME/common/lib/servlet-api.jar"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/com.genuitec.eclipse.j2eedt.core.J2EE14_CONTAINER"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/lams_common"/>

@@ -47,6 +47,8 @@ public class ScratchieSession {
     private Scratchie scratchie;
     private Date sessionStartDate;
     private Date sessionEndDate;
+    //date when user has started activity (pressed start button) that has time limitation
+    private Date timeLimitLaunchedDate;
     // finish or not
     private int status;
     // scratchie Items
@@ -80,6 +82,18 @@ public class ScratchieSession {
 
     public void setSessionEndDate(Date sessionEndDate) {
 	this.sessionEndDate = sessionEndDate;
+    }
+    
+    /**
+     * @hibernate.property column="time_limit_launched_date"
+     * @return
+     */
+    public Date getTimeLimitLaunchedDate() {
+	return timeLimitLaunchedDate;
+    }
+
+    public void setTimeLimitLaunchedDate(Date timeLimitLaunchedDate) {
+	this.timeLimitLaunchedDate = timeLimitLaunchedDate;
     }
 
     /**
