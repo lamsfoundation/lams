@@ -13,5 +13,12 @@
 	<classpathentry kind="lib" path="lib/xercesImpl-2.6.1.jar"/>
 	<classpathentry kind="lib" path="lib/jbossweb.jar" sourcepath="/3rdParty_sources/jbossweb"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+	<classpathentry kind="lib" path="lib/jboss-websocket-api_1.1_spec-1.1.0.Final.jar"/>
+	<classpathentry kind="lib" path="lib/undertow-websockets-jsr-1.1.8.Final.jar"/>
+	<classpathentry kind="lib" path="lib/xnio-api-3.3.0.Final.jar"/>
+	<classpathentry kind="lib" path="lib/xnio-nio-3.3.0.Final.jar"/>
+	<classpathentry kind="lib" path="lib/undertow-servlet-1.1.8.Final.jar"/>
+	<classpathentry kind="lib" path="lib/jboss-logging-3.1.4.GA.jar"/>
+	<classpathentry kind="lib" path="lib/undertow-core-1.1.8.Final.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

@@ -24,7 +24,6 @@ package org.lamsfoundation.testharness.learner;
 
 import java.io.File;
 import java.io.IOException;
-import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -35,7 +34,11 @@ import java.util.TreeMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import javax.websocket.MessageHandler;
+
 import org.apache.log4j.Logger;
+import org.apache.tomcat.util.json.JSONException;
+import org.apache.tomcat.util.json.JSONObject;
 import org.lamsfoundation.testharness.Call;
 import org.lamsfoundation.testharness.MockUser;
 import org.lamsfoundation.testharness.TestHarnessException;
@@ -67,7 +70,7 @@ public class MockLearner extends MockUser implements Runnable {
     private static final String LESSON_FINISHED_FLAG = "LessonComplete.do";
     private static final String LOAD_TOOL_ACTIVITY_FLAG = "Load Tool Activity";
     private static final Pattern SESSION_MAP_ID_PATTERN = Pattern.compile("sessionMapID=(.+)\\&");
-    private static final Pattern TOOL_SESSION_ID_PATTERN = Pattern.compile("var TOOL_SESSION_ID = '(\\d+)'");
+    private static final Pattern TOOL_SESSION_ID_PATTERN = Pattern.compile("TOOL_SESSION_ID = '(\\d+)'");
     private static final String FINISH_SUBSTRING = "finish.do";
 
     private static final String FORUM_FINISH_SUBSTRING = "lafrum11/learning/finish.do";
@@ -510,6 +513,7 @@ public class MockLearner extends MockUser implements Runnable {
 	return nextResp;
     }
 
+    @SuppressWarnings("deprecation")
     private void handleToolChat(WebResponse resp) throws IOException {
 	String asText = resp.getText();
 	Matcher m = MockLearner.TOOL_SESSION_ID_PATTERN.matcher(asText);
@@ -518,14 +522,32 @@ public class MockLearner extends MockUser implements Runnable {
 	    return;
 	}
 
-	String url = MockLearner.CHAT_FINISH_SUBSTRING + "?dispatch=sendMessage&toolSessionID=" + m.group(1)
-		+ "&message=";
-	// send few messages
-	for (int replyIndex = 0; replyIndex < MockLearner.CHAT_REPLIES; replyIndex++) {
-	    String message = MockLearner.composeArbitraryText();
-	    message = URLEncoder.encode(message, "UTF-8");
-	    new Call(wc, test, username + " sends Chat message", url + message).execute();
-	    delay();
+	String toolSessionID = m.group(1);
+	String url = test.getTestSuite().getTargetServer().replace("http", "ws")
+		+ "/lams/tool/lachat11/learningWebsocket?toolSessionID=" + toolSessionID;
+	String sessionID = wc.getCookieJar().getCookieValue("JSESSIONID");
+	WebsocketClient websocketClient = new WebsocketClient(url, sessionID, new MessageHandler.Whole<String>() {
+	    @Override
+	    public void onMessage(String message) {
+		log.debug(username + " received Chat " + toolSessionID + " history from server: " + message);
+	    }
+	});
+
+	// send few messages to the whole group
+	JSONObject messageJSON = new JSONObject();
+	try {
+	    messageJSON.put("toolSessionID", toolSessionID);
+	    messageJSON.put("toUser", "");
+	    for (int replyIndex = 0; replyIndex < MockLearner.CHAT_REPLIES; replyIndex++) {
+		String message = MockLearner.composeArbitraryText();
+		messageJSON.put("message", message);
+		// send message to websocket
+		websocketClient.sendMessage(messageJSON.toString());
+		delay();
+	    }
+	    websocketClient.close();
+	} catch (JSONException e) {
+	    throw new IOException("Error while creating Chat JSON for websocket", e);
 	}
     }
 
