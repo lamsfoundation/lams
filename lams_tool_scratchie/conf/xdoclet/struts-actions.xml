@@ -161,6 +161,7 @@
 			parameter="start" >
 			<forward name="success" path="/pages/learning/learning.jsp" />
 			<forward name="waitforleader" path="/pages/learning/waitforleader.jsp" />
+			<forward name="waitForLeaderTimeLimit" path="/pages/learning/waitForLeaderTimeLimit.jsp" />
 			<forward name="newReflection" path="/learning/newReflection.do" />
 			<forward name="showBurningQuestions" path="/learning/showBurningQuestions.do" />
 			<forward name="showResults" path="/learning/showResults.do" />
@@ -171,6 +172,10 @@
 			type="org.lamsfoundation.lams.tool.scratchie.web.action.LearningAction"
 			parameter="refreshQuestionList" >
 			<forward name="success" path="/pages/learning/questionlist.jsp" />		
+		</action>
+		<action path="/learning/launchTimeLimit"
+			type="org.lamsfoundation.lams.tool.scratchie.web.action.LearningAction"
+			parameter="launchTimeLimit" >
 		</action>
 		<action path="/learning/checkLeaderSubmittedNotebook"
 			type="org.lamsfoundation.lams.tool.scratchie.web.action.LearningAction"

@@ -29,12 +29,18 @@
 		}
 	});
 	
-	//query for leader status (only in case there is notebook at the end of activity and leader hasn't answered it yet)
+	
+	// if time limit is ON and time is over (i.e. isScratchingFinished is true) - refresh page for non-leaders in order to stop showing them learning.jsp
+	if (${!isUserLeader && isScratchingFinished && (scratchie.timeLimit > 0) && isTimeLimitExceeded && mode != "teacher"}) {
+		alert("isTimeLimitExceeded${isTimeLimitExceeded}");
+		location.reload();
+	}
+		
+	// in case there is notebook at the end of activity and leader hasn't answered it yet - query for leader's status
 	var checkLeaderIntervalId = null;
 	if (${!isUserLeader && isScratchingFinished && isWaitingForLeaderToSubmitNotebook && mode != "teacher"}) {
-		checkLeaderIntervalId = setInterval("checkLeaderSubmittedNotebook();",2000);// ask for leader status every 20 seconds
-	}
-	
+		checkLeaderIntervalId = setInterval("checkLeaderSubmittedNotebook();", 2000);// ask for leader status every 20 seconds
+	}	
 	//check Leader Submitted Notebook and if true show finishButton
 	function checkLeaderSubmittedNotebook() {
         $.ajax({
@@ -43,6 +49,11 @@
             dataType: 'json',
             type: 'post',
             success: function (json) {
+				if (json.isTimeLimitExceeded) {
+					alert("isTimeLimitExceededx${isTimeLimitExceeded}");
+					location.reload();
+				}
+                
             	if (!json.isWaitingForLeaderToSubmitNotebook) {
             		if (checkLeaderIntervalId != null) {
             			clearInterval(checkLeaderIntervalId);

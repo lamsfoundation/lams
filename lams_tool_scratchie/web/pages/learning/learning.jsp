@@ -21,7 +21,7 @@
 	<%@ include file="/common/header.jsp"%>
 	<link rel="stylesheet" type="text/css" href="${lams}css/jquery.countdown.css" />
 	<link rel="stylesheet" type="text/css" href="${lams}css/jquery.jgrowl.css" />
-	<link rel="stylesheet" type="text/css" href="includes/css/scratchie-learning.css" />
+	<link rel="stylesheet" type="text/css" href="<html:rewrite page='/includes/css/scratchie-learning.css'/>" />
 
 	<script type="text/javascript" src="${lams}includes/javascript/jquery-ui.js"></script>
 	<script type="text/javascript" src="${lams}includes/javascript/jquery.plugin.js"></script>
@@ -66,20 +66,35 @@
 		}
 
 		//time limit feature
-		<c:if test="${not sessionMap.userFinished && scratchie.timeLimit > 0 && (mode != 'teacher')}">
+		<c:if test="${isTimeLimitEnabled}">
 			$(document).ready(function(){
-				//show confirmation dialog
-				$.blockUI({ 
-					message: $('#timelimit-start-dialog'), 
-					css: { width: '325px', height: '120px'}, 
-					overlayCSS: { opacity: '.98'} 
-				});
+			
+				//show timelimit-start-dialog in order to start countdown
+				if (${isTimeLimitNotLaunched}) {
+				
+					$.blockUI({ 
+						message: $('#timelimit-start-dialog'), 
+						css: { width: '325px', height: '120px'}, 
+						overlayCSS: { opacity: '.98'} 
+					});
 					
-				//once OK button pressed start countdown
-			    $('#timelimit-start-ok').click(function() {
-			       	$.unblockUI();
-			       	displayCountdown();
-			    });
+					//once OK button pressed start countdown
+			    	$('#timelimit-start-ok').click(function() {
+			    	
+			    		//store date when user has started activity with time limit
+				        $.ajax({
+				        	async: true,
+				            url: '<c:url value="/learning/launchTimeLimit.do"/>',
+				            data: 'sessionMapID=${sessionMapID}',
+				            type: 'post'
+				       	});
+				       	
+			       		$.unblockUI();
+			       		displayCountdown();
+			    	});
+			    } else {
+					displayCountdown();
+				}
 			});
 			
 			function displayCountdown(){
@@ -100,7 +115,7 @@
 				});
 				
 				$('#countdown').countdown({
-					until: '+${scratchie.timeLimit * 60}S',  
+					until: '+${secondsLeft}S',  
 					format: 'hMS',
 					compact: true,
 					onTick: function(periods) {
@@ -147,6 +162,7 @@
 		function refreshQuestionList() {
 			var url = "<c:url value="/learning/refreshQuestionList.do"/>",
 				scrollTop = document.documentElement.scrollTop || document.body.scrollTop;
+			
 			$("#questionListArea").load(
 				url,
 				{
