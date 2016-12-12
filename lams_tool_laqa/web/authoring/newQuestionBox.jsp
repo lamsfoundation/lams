@@ -17,16 +17,13 @@
 	<lams:CKEditor id="newQuestion" value="${formBean.editableQuestionText}"
 				   contentFolderID="${formBean.contentFolderID}"/>
 
-
-			<div class="field-name space-top">
-				<html:checkbox property="required" value="1" styleId="required"
-					styleClass="noBorder"></html:checkbox>
-				<label for="required"> <fmt:message
-						key="label.required.desc" />
+			<div class="checkbox">
+				<label> <html:checkbox property="required" value="1"
+						styleId="required" />&nbsp;<fmt:message key="label.required.desc" />
 				</label>
 			</div>
 
-<a data-toggle="collapse" data-target="#extra"><i class="fa fa-xs fa-plus-square-o roffset5" aria-hidden="true"></i><fmt:message key="label.other.options"/></a>
+			<a data-toggle="collapse" data-target="#extra"><i class="fa fa-xs fa-plus-square-o roffset5" aria-hidden="true"></i><fmt:message key="label.other.options"/></a>
 <div id="extra" class="panel-body collapse" >  	        
 	<div class="form-group form-inline">
 	  	<label for="minWordsLimit">
