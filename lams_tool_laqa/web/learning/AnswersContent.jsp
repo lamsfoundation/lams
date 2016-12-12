@@ -247,19 +247,21 @@
 			<html:hidden property="questionIndex" />
 			<html:hidden property="totalQuestionCount" />
 
-			<logic:messagesPresent>
-				<p class="warning">
-					<html:messages id="error" message="false">
-						<c:out value="${error}" escapeXml="false" />
-						<BR>
-					</html:messages>
-				</p>
-			</logic:messagesPresent>
+			
 
 			<div class="panel">
 				<c:out value="${generalLearnerFlowDTO.activityInstructions}" escapeXml="false" />
 			</div>
 
+			<logic:messagesPresent>
+			<lams:Alert id="error" type="danger" close="false">
+				<html:messages id="error" message="false">
+						<c:out value="${error}" escapeXml="false" />
+						<BR>
+					</html:messages>
+			</lams:Alert>
+			</logic:messagesPresent>
+			
 			<c:choose>
 				<c:when test="${(generalLearnerFlowDTO.questionListingMode == 'questionListingModeSequential') && hasEditRight}">
 
