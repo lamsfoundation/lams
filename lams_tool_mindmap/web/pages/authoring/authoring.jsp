@@ -37,6 +37,10 @@
 
 	// set Mindmap content before submitting authoring form
 	$(document).ready(function() {
+		var hasFlash = ((typeof navigator.plugins != "undefined" && typeof navigator.plugins["Shockwave Flash"] == "object") || (window.ActiveXObject && (new ActiveXObject("ShockwaveFlash.ShockwaveFlash")) != false));
+		if(hasFlash != true){
+			 $("#save").hide();
+			}
 		// selects "save" button in lams:AuthoringButton tag
 		$('a[href*="doSubmit_Form_Only()"]').click(setMindmapContent);
 	});	
