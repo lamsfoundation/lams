@@ -162,7 +162,7 @@ public interface IQaService extends ToolRatingManager {
     void createQaContent(QaContent qa);
 
     void updateResponseVisibility(Long responseUid, boolean visible);
-    
+
     boolean isRatingsEnabled(QaContent qaContent);
 
     QaQueUsr getUserByIdAndSession(final Long queUsrId, final Long qaSessionId);
@@ -242,8 +242,6 @@ public interface IQaService extends ToolRatingManager {
     String createConditionName(Collection<QaCondition> existingConditions);
 
     void deleteCondition(QaCondition condition);
-
-    QaCondition createDefaultComplexCondition(QaContent qaContent);
 
     /**
      * Gets the qa config item with the given key

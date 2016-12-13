@@ -54,7 +54,6 @@ public interface ChatConstants {
     public static final String PARAM_ORDER_ID = "orderId";
     public static final String ATTR_DELETED_CONDITION_LIST = "deletedConditionList";
     public static final String USER_MESSAGES_DEFINITION_NAME = "user.messages.output.definition.chat";
-    public static final String USER_MESSAGES_DEFAULT_CONDITION_DISPLAY_NAME_KEY = "user.messages.output.definition.chat.default.condition";
     public static final String ALL_USERS_MESSAGES_DEFINITION_NAME = "all.users.messages.output.definition.chat";
     public final static String LEARNER_NUM_POSTS_DEFINITION_NAME = "learner.number.of.posts";
     public static final String TEXT_SEARCH_DEFINITION_NAME = "text.search.output.definition.chat";

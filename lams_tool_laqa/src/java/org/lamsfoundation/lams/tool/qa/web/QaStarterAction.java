@@ -114,10 +114,6 @@ public class QaStarterAction extends Action implements QaAppConstants {
 	    long defaultContentID = qaService.getToolDefaultContentIdBySignature(QaAppConstants.MY_SIGNATURE);
 	    qaContent = qaService.getQaContent(defaultContentID);
 	    qaContent = QaContent.newInstance(qaContent, new Long(strToolContentID));
-
-	    if (qaContent.getConditions().isEmpty()) {
-		qaContent.getConditions().add(qaService.createDefaultComplexCondition(qaContent));
-	    }
 	}
 
 	prepareDTOandForm(request, qaAuthoringForm, qaContent, qaService, sessionMap);

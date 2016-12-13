@@ -73,16 +73,16 @@ public class VoteOutputFactory extends OutputFactory {
 
 		ToolOutputDefinition definition = buildBooleanSetOutputDefinition(
 			VoteOutputFactory.OUTPUT_NAME_NOMINATION_SELECTION);
-		if (definition.getDefaultConditions() == null) {
-		    definition.setDefaultConditions(new ArrayList<BranchCondition>());
+		if (definition.getConditions() == null) {
+		    definition.setConditions(new ArrayList<BranchCondition>());
 		}
 
-		List<BranchCondition> defaultConditions = definition.getDefaultConditions();
+		List<BranchCondition> conditions = definition.getConditions();
 		String trueString = Boolean.TRUE.toString();
 		int conditionOrderId = 1;
 
 		if (content.isAllowText()) {
-		    defaultConditions.add(new BranchCondition(null, null, new Integer(conditionOrderId++),
+		    conditions.add(new BranchCondition(null, null, new Integer(conditionOrderId++),
 			    buildConditionName(VoteOutputFactory.OUTPUT_NAME_NOMINATION_SELECTION,
 				    VoteOutputFactory.FREE_TEXT_NOM_SELECTION_STR),
 			    getI18NText("label.open.vote", false), OutputType.OUTPUT_BOOLEAN.toString(), null, null,
@@ -95,7 +95,7 @@ public class VoteOutputFactory extends OutputFactory {
 		    int displayOrder = nomination.getDisplayOrder();
 		    String name = buildConditionName(VoteOutputFactory.OUTPUT_NAME_NOMINATION_SELECTION,
 			    new Integer(displayOrder).toString());
-		    defaultConditions.add(new BranchCondition(null, null, new Integer(conditionOrderId++), name,
+		    conditions.add(new BranchCondition(null, null, new Integer(conditionOrderId++), name,
 			    VoteUtils.stripHTML(nomination.getQuestion()), OutputType.OUTPUT_BOOLEAN.toString(), null,
 			    null, trueString));
 		}

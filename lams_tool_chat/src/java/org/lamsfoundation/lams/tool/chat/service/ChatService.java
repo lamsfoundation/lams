@@ -431,10 +431,6 @@ public class ChatService implements ToolSessionManager, ToolContentManager, ICha
 	    ChatService.logger.error(error);
 	    throw new ChatException(error);
 	}
-	if (defaultContent.getConditions().isEmpty()) {
-	    defaultContent.getConditions()
-		    .add(getChatOutputFactory().createDefaultUserMessagesCondition(defaultContent));
-	}
 	return defaultContent;
     }
 

@@ -144,9 +144,6 @@ public class SurveyServiceImpl implements ISurveyService, ToolContentManager, To
 	}
 
 	Survey defaultContent = getDefaultSurvey();
-	if (defaultContent.getConditions().isEmpty()) {
-	    defaultContent.getConditions().add(getSurveyOutputFactory().createDefaultComplexCondition(defaultContent));
-	}
 	// save default content by given ID.
 	Survey content = new Survey();
 	content = Survey.newInstance(defaultContent, contentId);

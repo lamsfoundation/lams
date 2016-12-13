@@ -68,7 +68,7 @@ public class SurveyOutputFactory extends OutputFactory {
 		    Survey survey = (Survey) toolContentObject;
 
 		    // adding all existing conditions
-		    allAnswersDefinition.setDefaultConditions(new ArrayList<BranchCondition>(survey.getConditions()));
+		    allAnswersDefinition.setConditions(new ArrayList<BranchCondition>(survey.getConditions()));
 
 		    definitionMap.put(SurveyConstants.TEXT_SEARCH_DEFINITION_NAME, allAnswersDefinition);
 		}
@@ -166,30 +166,5 @@ public class SurveyOutputFactory extends OutputFactory {
 
     private boolean isTextSearchConditionName(String name) {
 	return name != null && name.startsWith(SurveyConstants.TEXT_SEARCH_DEFINITION_NAME);
-    }
-
-    /**
-     * Creates a default condition so teachers know how to use complex conditions for this tool.
-     *
-     * @param survey
-     *            content of the tool
-     * @return default survey condition
-     */
-    protected SurveyCondition createDefaultComplexCondition(Survey survey) {
-	Set<SurveyQuestion> questions = new HashSet<SurveyQuestion>();
-	for (SurveyQuestion question : survey.getQuestions()) {
-	    if (question.getType() == SurveyConstants.SURVEY_TYPE_TEXT_ENTRY) {
-		questions.add(question);
-		break;
-	    }
-	}
-	if (questions.isEmpty()) {
-	    return null;
-	}
-	String name = buildConditionName(SurveyConstants.TEXT_SEARCH_DEFINITION_NAME, survey.getContentId().toString());
-	// Default condition checks if the first answer contains word "LAMS"
-	return new SurveyCondition(null, null, 1, name,
-		getI18NText(SurveyConstants.TEXT_SEARCH_DEFAULT_CONDITION_DISPLAY_NAME_KEY, false), "LAMS", null, null,
-		null, questions);
     }
 }

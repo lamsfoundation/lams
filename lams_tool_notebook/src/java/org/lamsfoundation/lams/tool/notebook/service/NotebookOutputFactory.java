@@ -63,7 +63,7 @@ public class NotebookOutputFactory extends OutputFactory {
 		    Notebook notebook = (Notebook) toolContentObject;
 		    // adding all existing conditions
 		    notebookEntryDefinition
-			    .setDefaultConditions(new ArrayList<BranchCondition>(notebook.getConditions()));
+			    .setConditions(new ArrayList<BranchCondition>(notebook.getConditions()));
 		    notebookEntryDefinition.setShowConditionNameOnly(true);
 		    definitionMap.put(NotebookConstants.USER_ENTRY_DEFINITION_NAME, notebookEntryDefinition);
 		}
@@ -163,21 +163,5 @@ public class NotebookOutputFactory extends OutputFactory {
 
     protected String buildUserEntryConditionName(String uniquePart) {
 	return super.buildConditionName(NotebookConstants.USER_ENTRY_DEFINITION_NAME, uniquePart);
-    }
-
-    /**
-     * Creates a default condition so teachers know how to use complex conditions for this tool.
-     *
-     * @param notebook
-     *            content of the tool
-     * @return default notebook condition
-     */
-    protected NotebookCondition createDefaultUserEntryCondition(Notebook notebook) {
-	String name = buildConditionName(NotebookConstants.USER_ENTRY_DEFINITION_NAME,
-		notebook.getToolContentId().toString());
-	// Default condition checks if the text contains word "LAMS"
-	return new NotebookCondition(null, null, 1, name,
-		getI18NText(NotebookConstants.USER_ENTRY_DEFAULT_CONDITION_DISPLAY_NAME_KEY, false), "LAMS", null, null,
-		null);
     }
 }

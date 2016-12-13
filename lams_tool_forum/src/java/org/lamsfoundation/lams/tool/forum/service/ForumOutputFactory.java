@@ -22,10 +22,8 @@
 
 package org.lamsfoundation.lams.tool.forum.service;
 
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -33,7 +31,6 @@ import java.util.SortedMap;
 import java.util.TreeMap;
 import java.util.TreeSet;
 
-import org.lamsfoundation.lams.learningdesign.BranchCondition;
 import org.lamsfoundation.lams.tool.OutputFactory;
 import org.lamsfoundation.lams.tool.ToolOutput;
 import org.lamsfoundation.lams.tool.ToolOutputDefinition;
@@ -212,34 +209,5 @@ public class ForumOutputFactory extends OutputFactory {
 
     protected String buildTopicDatesToAnswersConditionName(String uniquePart) {
 	return super.buildConditionName(ForumConstants.TOPIC_DATE_TO_ANSWERS_DEFINITION_NAME, uniquePart);
-    }
-
-    /**
-     * Creates a default condition so teachers know how to use complex conditions for this tool.
-     *
-     * @param forum
-     *            content of the tool
-     * @return default Forum condition
-     */
-    protected ForumCondition createDefaultTopicDateToAnswersCondition(Forum forum) {
-
-	Set<Message> messages = new HashSet<Message>();
-	for (Message message : forum.getMessages()) {
-	    if (message.getIsAuthored() && message.getToolSession() == null) {
-		messages.add(message);
-		break;
-	    }
-	}
-
-	if (messages.isEmpty()) {
-	    return null;
-	}
-
-	String name = buildConditionName(ForumConstants.TOPIC_DATE_TO_ANSWERS_DEFINITION_NAME,
-		forum.getContentId().toString());
-	// Default condition checks if the answers for the first topic contain word "LAMS"
-	return new ForumCondition(null, null, 1, name,
-		getI18NText(ForumConstants.TOPIC_DATE_TO_ANSWERS_DEFAULT_CONDITION_DISPLAY_NAME_KEY, false), "LAMS",
-		null, null, null, messages);
     }
 }

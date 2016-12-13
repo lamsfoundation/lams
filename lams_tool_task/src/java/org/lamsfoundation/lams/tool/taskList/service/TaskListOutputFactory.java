@@ -70,18 +70,18 @@ public class TaskListOutputFactory extends OutputFactory {
 
 	    TaskList taskList = (TaskList) toolContentObject;
 	    ToolOutputDefinition definition = buildBooleanSetOutputDefinition(OUTPUT_NAME_TOOL_CONDITION);
-	    if (definition.getDefaultConditions() == null) {
-		definition.setDefaultConditions(new ArrayList<BranchCondition>());
+	    if (definition.getConditions() == null) {
+		definition.setConditions(new ArrayList<BranchCondition>());
 	    }
 
-	    List<BranchCondition> defaultConditions = definition.getDefaultConditions();
+	    List<BranchCondition> conditions = definition.getConditions();
 	    String trueString = Boolean.TRUE.toString();
 
 	    Iterator<TaskListCondition> iter2 = taskList.getConditions().iterator();
 	    while (iter2.hasNext()) {
 		TaskListCondition condition = iter2.next();
 		String name = buildConditionName(OUTPUT_NAME_TOOL_CONDITION, condition.getName());
-		defaultConditions.add(new BranchCondition(null, null, condition.getSequenceId(), name,
+		conditions.add(new BranchCondition(null, null, condition.getSequenceId(), name,
 			condition.getName(), OutputType.OUTPUT_BOOLEAN.toString(), null, null, trueString));
 	    }
 

@@ -61,7 +61,7 @@ public class ChatOutputFactory extends OutputFactory {
 			    ChatConstants.USER_MESSAGES_DEFINITION_NAME, stringArrayClass);
 		    Chat chat = (Chat) toolContentObject;
 		    // adding all existing conditions
-		    chatMessagesDefinition.setDefaultConditions(new ArrayList<BranchCondition>(chat.getConditions()));
+		    chatMessagesDefinition.setConditions(new ArrayList<BranchCondition>(chat.getConditions()));
 		    definitionMap.put(ChatConstants.USER_MESSAGES_DEFINITION_NAME, chatMessagesDefinition);
 		}
 		ToolOutputDefinition numberOfPostsDefinition = buildRangeDefinition(
@@ -185,21 +185,5 @@ public class ChatOutputFactory extends OutputFactory {
 
     protected String buildUserMessagesConditionName(String uniquePart) {
 	return super.buildConditionName(ChatConstants.USER_MESSAGES_DEFINITION_NAME, uniquePart);
-    }
-
-    /**
-     * Creates a default condition so teachers know how to use complex conditions for this tool.
-     *
-     * @param chat
-     *            content of the tool
-     * @return default chat condition
-     */
-    protected ChatCondition createDefaultUserMessagesCondition(Chat chat) {
-	String name = buildConditionName(ChatConstants.USER_MESSAGES_DEFINITION_NAME,
-		chat.getToolContentId().toString());
-	// Default condition checks if messages contain word "LAMS"
-	return new ChatCondition(null, null, 1, name,
-		getI18NText(ChatConstants.USER_MESSAGES_DEFAULT_CONDITION_DISPLAY_NAME_KEY, false), "LAMS", null, null,
-		null);
     }
 }
