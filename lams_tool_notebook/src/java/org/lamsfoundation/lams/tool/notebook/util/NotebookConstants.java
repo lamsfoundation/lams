@@ -54,7 +54,6 @@ public interface NotebookConstants {
     public static final String PARAM_USER_UID = "userUid";
     public static final String ATTR_DELETED_CONDITION_LIST = "deletedConditionList";
     public static final String USER_ENTRY_DEFINITION_NAME = "user.entry.output.definition.notebook";
-    public static final String USER_ENTRY_DEFAULT_CONDITION_DISPLAY_NAME_KEY = "user.entry.output.definition.notebook.default.condition";
     public static final String ALL_USERS_ENTRIES_DEFINITION_NAME = "all.users.entries.definition.notebook";
     public static final String SUCCESS = "success";
     public static final String ERROR_MSG_CONDITION = "error.condition";

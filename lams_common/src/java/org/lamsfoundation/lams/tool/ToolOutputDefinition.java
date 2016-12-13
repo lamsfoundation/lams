@@ -20,7 +20,6 @@
  * ****************************************************************
  */
 
-
 package org.lamsfoundation.lams.tool;
 
 import java.util.List;
@@ -45,7 +44,7 @@ import org.lamsfoundation.lams.learningdesign.BranchCondition;
  * Sample ToolOutputDefinition: ToolOutputDefinition { name = "LEARNERS_MARK", description = "Mark for an individual
  * learner"; type = "NUMERIC"; startValue = "0.0"; endValue = "10.0"; complexDefinition = null; }
  */
-public class ToolOutputDefinition implements Comparable {
+public class ToolOutputDefinition implements Comparable<ToolOutputDefinition> {
     /*
      * Definition Type indicates what kind of definitions should be provided. Some outputs are not valid for conditions,
      * some are not valid for data flow between tools.
@@ -62,7 +61,7 @@ public class ToolOutputDefinition implements Comparable {
     private Object complexDefinition;
     private Boolean showConditionNameOnly;
     private Boolean isDefaultGradebookMark;
-    private List<BranchCondition> defaultConditions;
+    private List<BranchCondition> conditions;
     // we need it to filter definitions which other tools can not process; it must be set in the definition, otherwise
     // unsupported values can be passed to the receiving end of the data flow; most methods for creating Output
     // Definitions set the class already, but it must be set manually for complex definitions
@@ -161,24 +160,16 @@ public class ToolOutputDefinition implements Comparable {
     }
 
     @Override
-    public int compareTo(Object o) {
-
-	ToolOutputDefinition myClass = (ToolOutputDefinition) o;
-	return new CompareToBuilder().append(name, myClass.name).append(type, myClass.type).toComparison();
+    public int compareTo(ToolOutputDefinition o) {
+	return new CompareToBuilder().append(name, o.name).append(type, o.type).toComparison();
     }
 
-    /**
-     * Default Conditions are sample conditions that should be presented to the user as a starting point for using this
-     * OutputDefinition
-     *
-     * @return
-     */
-    public List<BranchCondition> getDefaultConditions() {
-	return defaultConditions;
+    public List<BranchCondition> getConditions() {
+	return conditions;
     }
 
-    public void setDefaultConditions(List<BranchCondition> defaultConditions) {
-	this.defaultConditions = defaultConditions;
+    public void setConditions(List<BranchCondition> conditions) {
+	this.conditions = conditions;
     }
 
     /**

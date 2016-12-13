@@ -954,8 +954,8 @@ PropertyLib = {
 		
 		$('#outputConditionsRefreshButton', outputConditionsDialogContents).click(function(){
 			// get output definitions again
-			$(this).data('refreshDefinitions')();
-			$(this).data('buildContent')(true);
+			$(layout.outputConditionsDialog).data('refreshDefinitions')();
+			$(layout.outputConditionsDialog).data('buildContent')(true);
 		});
 		
 		$('#outputConditionsCancelButton', outputConditionsDialogContents).click(function(){
@@ -1112,9 +1112,9 @@ PropertyLib = {
 								activity.conditionsToBranches = [];
 							}
 							
-							if (output.defaultConditions) {
+							if (output.conditions) {
 								// build list using conditions from Tool activity output definitions
-								$.each(output.defaultConditions, function(){
+								$.each(output.conditions, function(){
 									entries.push({
 										'condition' : {
 											'name' 			  : this.name,

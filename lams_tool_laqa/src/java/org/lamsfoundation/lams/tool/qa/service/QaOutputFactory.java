@@ -246,25 +246,4 @@ public class QaOutputFactory extends OutputFactory {
     protected String buildUserAnswersConditionName(String uniquePart) {
 	return super.buildConditionName(QaAppConstants.USER_ANSWERS_DEFINITION_NAME, uniquePart);
     }
-
-    /**
-     * Creates a default condition so teachers know how to use complex conditions for this tool.
-     *
-     * @param qaContent
-     *            content of the tool
-     * @return default Q&A condition
-     */
-    protected QaCondition createDefaultComplexUserAnswersCondition(QaContent qaContent) {
-	if (qaContent.getQaQueContents().isEmpty()) {
-	    return null;
-	}
-	Set<QaQueContent> questions = new HashSet<QaQueContent>();
-	questions.add(qaContent.getQaQueContents().iterator().next());
-	String name = buildConditionName(QaAppConstants.USER_ANSWERS_DEFINITION_NAME,
-		qaContent.getQaContentId().toString());
-	// Default condition checks if the first answer contains word "LAMS"
-	return new QaCondition(null, null, 1, name,
-		getI18NText(QaAppConstants.USER_ANSWERS_DEFAULT_CONDITION_DISPLAY_NAME_KEY, false), "LAMS", null, null,
-		null, questions);
-    }
 }

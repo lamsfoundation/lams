@@ -393,10 +393,6 @@ public class NotebookService implements ToolSessionManager, ToolContentManager, 
 	    NotebookService.logger.error(error);
 	    throw new NotebookException(error);
 	}
-	if (defaultContent.getConditions().isEmpty()) {
-	    defaultContent.getConditions()
-		    .add(getNotebookOutputFactory().createDefaultUserEntryCondition(defaultContent));
-	}
 	return defaultContent;
     }
 

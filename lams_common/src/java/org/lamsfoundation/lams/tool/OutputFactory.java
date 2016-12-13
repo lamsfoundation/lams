@@ -286,16 +286,16 @@ public abstract class OutputFactory {
 	ToolOutputDefinition definition = buildDefinition(definitionName, OutputType.OUTPUT_BOOLEAN, null, null, null,
 		Boolean.FALSE, Boolean.class);
 
-	List<BranchCondition> defaultConditions = new ArrayList<BranchCondition>();
-	defaultConditions.add(new BranchCondition(null, null, new Integer(1), definitionName,
+	List<BranchCondition> conditions = new ArrayList<BranchCondition>();
+	conditions.add(new BranchCondition(null, null, new Integer(1), definitionName,
 		getI18NText(definitionName + ".true", true), OutputType.OUTPUT_BOOLEAN.toString(), null, null,
 		Boolean.TRUE.toString()));
 
-	defaultConditions.add(new BranchCondition(null, null, new Integer(2), definitionName,
+	conditions.add(new BranchCondition(null, null, new Integer(2), definitionName,
 		getI18NText(definitionName + ".false", true), OutputType.OUTPUT_BOOLEAN.toString(), null, null,
 		Boolean.FALSE.toString()));
 
-	definition.setDefaultConditions(defaultConditions);
+	definition.setConditions(conditions);
 
 	return definition;
     }
@@ -310,7 +310,7 @@ public abstract class OutputFactory {
 	ToolOutputDefinition definition = buildDefinition(definitionName, OutputType.OUTPUT_SET_BOOLEAN, null, null,
 		null, Boolean.TRUE, (new HashSet<Boolean>()).getClass());
 	List<BranchCondition> defaultConditions = new ArrayList<BranchCondition>();
-	definition.setDefaultConditions(defaultConditions);
+	definition.setConditions(defaultConditions);
 	return definition;
     }
 

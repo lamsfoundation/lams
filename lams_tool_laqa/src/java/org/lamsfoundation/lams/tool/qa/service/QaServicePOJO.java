@@ -529,9 +529,6 @@ public class QaServicePOJO
 
 	    fromContent = qaDAO.getQaByContentId(fromContentId.longValue());
 	}
-	if (fromContentId.equals(defaultContentId) && (fromContent != null) && fromContent.getConditions().isEmpty()) {
-	    fromContent.getConditions().add(getQaOutputFactory().createDefaultComplexUserAnswersCondition(fromContent));
-	}
 	QaContent toContent = QaContent.newInstance(fromContent, toContentId);
 	if (toContent == null) {
 	    QaServicePOJO.logger.error("throwing ToolException: WARNING!, retrieved toContent is null.");
@@ -647,10 +644,6 @@ public class QaServicePOJO
 	if (toolContentObj == null) {
 	    long defaultToolContentId = toolService.getToolDefaultContentIdBySignature(QaAppConstants.MY_SIGNATURE);
 	    toolContentObj = getQaContent(defaultToolContentId);
-	    if ((toolContentObj != null) && toolContentObj.getConditions().isEmpty()) {
-		toolContentObj.getConditions()
-			.add(getQaOutputFactory().createDefaultComplexUserAnswersCondition(toolContentObj));
-	    }
 	}
 	if (toolContentObj == null) {
 	    throw new DataMissingException("Unable to find default content for the question and answer tool");
@@ -720,9 +713,6 @@ public class QaServicePOJO
 	if (qaContent == null) {
 	    long defaultToolContentId = toolService.getToolDefaultContentIdBySignature(QaAppConstants.MY_SIGNATURE);
 	    qaContent = getQaContent(defaultToolContentId);
-	    if ((qaContent != null) && qaContent.getConditions().isEmpty()) {
-		qaContent.getConditions().add(getQaOutputFactory().createDefaultComplexUserAnswersCondition(qaContent));
-	    }
 	}
 	return getQaOutputFactory().getToolOutputDefinitions(qaContent, definitionType);
     }
@@ -1138,11 +1128,6 @@ public class QaServicePOJO
 	if ((condition != null) && (condition.getConditionId() != null)) {
 	    qaDAO.deleteCondition(condition);
 	}
-    }
-
-    @Override
-    public QaCondition createDefaultComplexCondition(QaContent qaContent) {
-	return getQaOutputFactory().createDefaultComplexUserAnswersCondition(qaContent);
     }
 
     @Override

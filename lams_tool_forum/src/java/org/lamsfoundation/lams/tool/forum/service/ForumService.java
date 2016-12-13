@@ -1185,13 +1185,6 @@ public class ForumService implements IForumService, ToolContentManager, ToolSess
 	}
 
 	Forum defaultContent = getDefaultForum();
-	if (defaultContent.getConditions().isEmpty()) {
-	    ForumCondition defaultCondition = getForumOutputFactory()
-		    .createDefaultTopicDateToAnswersCondition(defaultContent);
-	    if (defaultCondition != null) {
-		defaultContent.getConditions().add(defaultCondition);
-	    }
-	}
 	// get default content by given ID.
 	Forum content = Forum.newInstance(defaultContent, contentID);
 

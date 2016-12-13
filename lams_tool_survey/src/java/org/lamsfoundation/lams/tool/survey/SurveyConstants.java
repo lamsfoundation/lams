@@ -198,5 +198,4 @@ public class SurveyConstants {
     public static final String ATTR_DELETED_CONDITION_LIST = "deletedConditionList";
 
     public static final String TEXT_SEARCH_DEFINITION_NAME = "text.search.output.definition.survey";
-    public static final String TEXT_SEARCH_DEFAULT_CONDITION_DISPLAY_NAME_KEY = "text.search.output.definition.survey.default.condition";
 }

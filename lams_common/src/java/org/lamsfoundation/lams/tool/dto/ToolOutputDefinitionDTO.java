@@ -48,7 +48,7 @@ public class ToolOutputDefinitionDTO {
     private String complexDefinition;
     private Boolean showConditionNameOnly;
     private Boolean isDefaultGradebookMark;
-    private ArrayList defaultConditions;
+    private ArrayList conditions;
 
     public ToolOutputDefinitionDTO(String name, String description, String type, String startValue, String endValue,
 	    String complexDefinition, Boolean showConditionNameOnly) {
@@ -78,10 +78,10 @@ public class ToolOutputDefinitionDTO {
 		? definition.getComplexDefinition().toString() : null;
 
 	this.showConditionNameOnly = definition.isShowConditionNameOnly();
-	if (definition.getDefaultConditions() != null && definition.getDefaultConditions().size() > 0) {
-	    defaultConditions = new ArrayList();
-	    for (BranchCondition condition : definition.getDefaultConditions()) {
-		defaultConditions.add(condition.getBranchConditionDTO(null));
+	if (definition.getConditions() != null && definition.getConditions().size() > 0) {
+	    conditions = new ArrayList();
+	    for (BranchCondition condition : definition.getConditions()) {
+		conditions.add(condition.getBranchConditionDTO(null));
 	    }
 	}
 
@@ -143,12 +143,12 @@ public class ToolOutputDefinitionDTO {
 	return complexDefinition;
     }
 
-    public ArrayList getDefaultConditions() {
-	return defaultConditions;
+    public ArrayList getConditions() {
+	return conditions;
     }
 
-    public void setDefaultConditions(ArrayList defaultConditions) {
-	this.defaultConditions = defaultConditions;
+    public void setConditions(ArrayList conditions) {
+	this.conditions = conditions;
     }
 
     public Boolean getShowConditionNameOnly() {
