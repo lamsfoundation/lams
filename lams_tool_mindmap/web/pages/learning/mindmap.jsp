@@ -108,10 +108,12 @@
 
 		<center id="center12">
 			<div id="flashContent">
-				<fmt:message key="message.enableFlash"/>
+				<lams:Alert type="warn" close="false">
+					<fmt:message key="message.enableFlash" />
+				</lams:Alert>
 			</div>
 		</center>
-		
+
 		<div class="voffset10 pull-right">
 			<c:choose>
 				<c:when test="${isMonitor}">
