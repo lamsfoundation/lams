@@ -25,7 +25,12 @@ if ((typeof jQuery != 'undefined') && (typeof submissionDeadlineSettings != 'und
 		$("#datetime").datetimepicker();
 		if (submissionDeadlineSettings.submissionDeadline != "") {
 			var date = new Date(eval(submissionDeadlineSettings.submissionDeadline));
-			$("#dateInfo").html( formatDate(date) );
+
+			if ( typeof submissionDeadlineSettings.submissionDateString != 'undefined' ) {
+				$("#dateInfo").html( submissionDeadlineSettings.submissionDateString );
+			} else {
+				$("#dateInfo").html( formatDate(date) );
+			}
 			
 			if ( $("#restrictUsageDiv").hasClass("collapse") )  {
 				// new version - using the according
@@ -38,6 +43,7 @@ if ((typeof jQuery != 'undefined') && (typeof submissionDeadlineSettings != 'und
 		}
 	});	
 	
+	// fallback routine for when Java formatted dates are not available
 	function formatDate(date) {
 		var currHour = "" + date.getHours();
 		if (currHour.length == 1) {
@@ -64,10 +70,15 @@ if ((typeof jQuery != 'undefined') && (typeof submissionDeadlineSettings != 'und
 					+ date.getTime() + "&reqID=" + reqIDVar.getTime();
 		$.ajax({
 			url : url,
-			success : function() {
+			success : function(data) {
+				debugger;
 				$.growlUI(submissionDeadlineSettings.messageNotification, submissionDeadlineSettings.messageRestrictionSet);
 				$("#datetimeDiv").hide();
-				$("#dateInfo").html(formatDate(date) );
+				if ( data != '' ) {
+					$("#dateInfo").html( data );
+				} else {
+					$("#dateInfo").html( formatDate(date) );
+				}
 				$("#dateInfoDiv").show();
 			}
 		});
@@ -84,7 +95,6 @@ if ((typeof jQuery != 'undefined') && (typeof submissionDeadlineSettings != 'und
 			success : function() {
 				$.growlUI(submissionDeadlineSettings.messageNotification, submissionDeadlineSettings.messageRestrictionRemoved);
 				$("#dateInfoDiv").hide();
-				
 				$("#datetimeDiv").show();
 				$("#datetime").val("");
 			}

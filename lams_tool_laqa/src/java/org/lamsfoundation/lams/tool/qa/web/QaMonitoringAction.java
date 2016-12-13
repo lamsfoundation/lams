@@ -107,9 +107,10 @@ public class QaMonitoringAction extends LamsDispatchAction implements QaAppConst
      * @param request
      * @param response
      * @return
+     * @throws IOException 
      */
     public ActionForward setSubmissionDeadline(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) {
+	    HttpServletResponse response) throws IOException {
 	IQaService qaService = getQAService();
 
 	Long contentID = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_CONTENT_ID);
@@ -117,13 +118,14 @@ public class QaMonitoringAction extends LamsDispatchAction implements QaAppConst
 
 	Long dateParameter = WebUtil.readLongParam(request, QaAppConstants.ATTR_SUBMISSION_DEADLINE, true);
 	Date tzSubmissionDeadline = null;
+	String formattedDate = "";
 	if (dateParameter != null) {
 	    Date submissionDeadline = new Date(dateParameter);
 	    HttpSession ss = SessionManager.getSession();
 	    UserDTO teacher = (UserDTO) ss.getAttribute(AttributeNames.USER);
 	    TimeZone teacherTimeZone = teacher.getTimeZone();
 	    tzSubmissionDeadline = DateUtil.convertFromTimeZoneToDefault(teacherTimeZone, submissionDeadline);
-
+	    formattedDate = DateUtil.convertToStringForJSON(submissionDeadline, request.getLocale());
 	} else {
 	    //set showOtherAnswersAfterDeadline to false
 	    content.setShowOtherAnswersAfterDeadline(false);
@@ -131,6 +133,8 @@ public class QaMonitoringAction extends LamsDispatchAction implements QaAppConst
 	content.setSubmissionDeadline(tzSubmissionDeadline);
 	qaService.saveOrUpdateQaContent(content);
 
+	response.setContentType("text/plain;charset=utf-8");
+	response.getWriter().print(formattedDate);
 	return null;
     }
 
