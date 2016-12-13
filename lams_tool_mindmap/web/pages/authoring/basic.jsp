@@ -22,7 +22,9 @@
 </div>
 
 <center id="center12">
-	<lams:Alert type="warn" id="flashContent" close="false">
+<div id="flashContent">
+	<lams:Alert type="warn" close="false">
 				<fmt:message>message.enableFlashAuthorMonitor</fmt:message>
 	</lams:Alert>
+</div>
 </center>
