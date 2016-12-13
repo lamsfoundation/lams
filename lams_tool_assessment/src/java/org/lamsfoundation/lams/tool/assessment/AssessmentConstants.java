@@ -222,6 +222,8 @@ public class AssessmentConstants {
     public static final String ATTR_QUESTION_NUMBERING_OFFSET = "questionNumberingOffset";
 
     public static final String ATTR_SUBMISSION_DEADLINE = "submissionDeadline";
+    
+    public static final String ATTR_SUBMISSION_DEADLINE_DATESTRING = "submissionDateString";
 
     public static final String ATTR_IS_SUBMISSION_DEADLINE_PASSED = "isSubmissionDeadlinePassed";
 
