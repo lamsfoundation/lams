@@ -142,9 +142,8 @@ public interface IMonitoringService {
      *            name of staff group
      * @param staffs
      *            a list of staffs who will be in charge of this lesson.
-     * @return the lesson with lesson class and organization
      */
-    Lesson createLessonClassForLesson(long lessonId, Organisation organisation, String learnerGroupName,
+    void createLessonClassForLesson(long lessonId, Organisation organisation, String learnerGroupName,
 	    List<User> organizationUsers, String staffGroupName, List<User> staffs, Integer userID)
 	    throws UserAccessDeniedException;
 
@@ -438,9 +437,8 @@ public interface IMonitoringService {
      *            User ID of the teacher running the preview. Mandatory.
      * @param lessonID
      *            ID of the lesson
-     * @return Lesson
      */
-    abstract Lesson createPreviewClassForLesson(int userID, long lessonID) throws UserAccessDeniedException;
+    abstract void createPreviewClassForLesson(int userID, long lessonID) throws UserAccessDeniedException;
 
     /* Supports the Chosen Groupings and Branching */
     /**

@@ -451,9 +451,10 @@ public class MonitoringService implements IMonitoringService {
     }
 
     @Override
-    public Lesson createLessonClassForLesson(long lessonId, Organisation organisation, String learnerGroupName,
+    public void createLessonClassForLesson(long lessonId, Organisation organisation, String learnerGroupName,
 	    List<User> organizationUsers, String staffGroupName, List<User> staffs, Integer userId) {
 	Lesson newLesson = lessonDAO.getLesson(new Long(lessonId));
+	
 	// if lesson isn't started recreate the lesson class
 	if (newLesson.isLessonStarted()) {
 	    securityService.isLessonMonitor(lessonId, userId, "create class for lesson", true);
@@ -480,8 +481,6 @@ public class MonitoringService implements IMonitoringService {
 		lessonClassDAO.deleteLessonClass(oldLessonClass);
 	    }
 	}
-
-	return newLesson;
     }
 
     @Override
@@ -1715,13 +1714,15 @@ public class MonitoringService implements IMonitoringService {
 	lessonClassDAO.saveLessonClass(newLessonClass);
 
 	// setup staff group
-	newLessonClass.setStaffGroup(Group.createStaffGroup(newLessonClass, staffGroupName, new HashSet(staffs)));
+	Group staffGroup = Group.createStaffGroup(newLessonClass, staffGroupName, new HashSet(staffs));
+	newLessonClass.setStaffGroup(staffGroup);
+	
 	// setup learner group
 	// TODO:need confirm group name!
 	newLessonClass.getGroups()
 		.add(Group.createLearnerGroup(newLessonClass, learnerGroupName, new HashSet(organizationUsers)));
 
-	lessonClassDAO.updateLessonClass(newLessonClass);
+	lessonClassDAO.saveLessonClass(newLessonClass);
 
 	return newLessonClass;
     }
@@ -1783,7 +1784,7 @@ public class MonitoringService implements IMonitoringService {
     // ---------------------------------------------------------------------
 
     @Override
-    public Lesson createPreviewClassForLesson(int userID, long lessonID) throws UserAccessDeniedException {
+    public void createPreviewClassForLesson(int userID, long lessonID) throws UserAccessDeniedException {
 
 	User user = (User) baseDAO.find(User.class, userID);
 	if (user == null) {
@@ -1797,7 +1798,7 @@ public class MonitoringService implements IMonitoringService {
 	LinkedList<User> staffs = new LinkedList<User>();
 	staffs.add(user);
 
-	return createLessonClassForLesson(lessonID, null, "Learner Group", learners, "Staff Group", staffs, userID);
+	createLessonClassForLesson(lessonID, null, "Learner Group", learners, "Staff Group", staffs, userID);
     }
 
     /* Grouping and branching related calls */
@@ -2258,12 +2259,11 @@ public class MonitoringService implements IMonitoringService {
 			    lesson.getForceLearnerRestart(), lesson.getAllowLearnerRestart(), null, null);
 
 		    // save LessonClasses
-		    newLesson = this.createLessonClassForLesson(newLesson.getLessonId(), group, learnerGroupName,
+		    this.createLessonClassForLesson(newLesson.getLessonId(), group, learnerGroupName,
 			    learnerUsers, staffGroupName, staffUsers, creatorId);
 
-		    // start Lessons
-		    // TODO user-specified creator; must be someone in staff group
-		    this.startLesson(newLesson.getLessonId(), staffUsers.get(0).getUserId());
+		    // start lesson; passing creatorId as this parameter is only used for security check whether user is allowed to start a lesson
+		    this.startLesson(newLesson.getLessonId(), creatorId);
 
 		} else {
 		    throw new MonitoringServiceException("No learners specified, can't create any Lessons.");
