@@ -102,6 +102,7 @@ public class MonitoringAction extends LamsDispatchAction {
 	    TimeZone teacherTimeZone = teacher.getTimeZone();
 	    Date tzSubmissionDeadline = DateUtil.convertToTimeZoneFromDefault(teacherTimeZone, submissionDeadline);
 	    request.setAttribute(NotebookConstants.ATTR_SUBMISSION_DEADLINE, tzSubmissionDeadline.getTime());
+	    request.setAttribute(NotebookConstants.ATTR_SUBMISSION_DEADLINE_DATESTRING, DateUtil.convertToStringForJSON(submissionDeadline, request.getLocale()));
 	}
 
 	return mapping.findForward("success");
@@ -223,9 +224,10 @@ public class MonitoringAction extends LamsDispatchAction {
      * @param request
      * @param response
      * @return
+     * @throws IOException 
      */
     public ActionForward setSubmissionDeadline(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) {
+	    HttpServletResponse response) throws IOException {
 
 	setupService();
 
@@ -235,6 +237,7 @@ public class MonitoringAction extends LamsDispatchAction {
 
 	Long dateParameter = WebUtil.readLongParam(request, NotebookConstants.ATTR_SUBMISSION_DEADLINE, true);
 	Date tzSubmissionDeadline = null;
+	String formattedDate = "";
 	if (dateParameter != null) {
 	    Date submissionDeadline = new Date(dateParameter);
 	    HttpSession ss = SessionManager.getSession();
@@ -242,9 +245,12 @@ public class MonitoringAction extends LamsDispatchAction {
 		    .getAttribute(AttributeNames.USER);
 	    TimeZone teacherTimeZone = teacher.getTimeZone();
 	    tzSubmissionDeadline = DateUtil.convertFromTimeZoneToDefault(teacherTimeZone, submissionDeadline);
+	    formattedDate = DateUtil.convertToStringForJSON(submissionDeadline, request.getLocale());
 	}
 	notebook.setSubmissionDeadline(tzSubmissionDeadline);
 	notebookService.saveOrUpdateNotebook(notebook);
+	response.setContentType("text/plain;charset=utf-8");
+	response.getWriter().print(formattedDate);
 	return null;
     }
 

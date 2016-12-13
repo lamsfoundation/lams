@@ -11,7 +11,7 @@
 		</fmt:message>							
 	</lams:Alert>
 	 	
-	<c:if test="${MODE == 'learner' || MODE == 'author'}">
+	<c:if test="${mode == 'learner' || mode == 'author'}">
 		<%@ include file="parts/finishButton.jsp"%>
 	</c:if>
 </lams:Page>

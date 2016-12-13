@@ -235,9 +235,10 @@ public class McMonitoringAction extends LamsDispatchAction implements McAppConst
 
     /**
      * Set Submission Deadline
+     * @throws IOException 
      */
     public ActionForward setSubmissionDeadline(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) {
+	    HttpServletResponse response) throws IOException {
 
 	IMcService service = McServiceProxy.getMcService(getServlet().getServletContext());
 
@@ -246,6 +247,7 @@ public class McMonitoringAction extends LamsDispatchAction implements McAppConst
 
 	Long dateParameter = WebUtil.readLongParam(request, McAppConstants.ATTR_SUBMISSION_DEADLINE, true);
 	Date tzSubmissionDeadline = null;
+	String formattedDate = "";
 	if (dateParameter != null) {
 	    Date submissionDeadline = new Date(dateParameter);
 	    HttpSession ss = SessionManager.getSession();
@@ -253,10 +255,12 @@ public class McMonitoringAction extends LamsDispatchAction implements McAppConst
 		    .getAttribute(AttributeNames.USER);
 	    TimeZone teacherTimeZone = teacher.getTimeZone();
 	    tzSubmissionDeadline = DateUtil.convertFromTimeZoneToDefault(teacherTimeZone, submissionDeadline);
+	    formattedDate = DateUtil.convertToStringForJSON(submissionDeadline, request.getLocale());
 	}
 	mcContent.setSubmissionDeadline(tzSubmissionDeadline);
 	service.updateMc(mcContent);
-
+	response.setContentType("text/plain;charset=utf-8");
+	response.getWriter().print(formattedDate);
 	return null;
     }
 

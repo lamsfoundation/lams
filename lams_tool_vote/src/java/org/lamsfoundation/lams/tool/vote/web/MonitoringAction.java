@@ -352,9 +352,10 @@ public class MonitoringAction extends LamsDispatchAction implements VoteAppConst
      * @param request
      * @param response
      * @return
+     * @throws IOException 
      */
     public ActionForward setSubmissionDeadline(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) {
+	    HttpServletResponse response) throws IOException {
 
 	IVoteService voteService = VoteServiceProxy.getVoteService(getServlet().getServletContext());
 
@@ -363,6 +364,7 @@ public class MonitoringAction extends LamsDispatchAction implements VoteAppConst
 
 	Long dateParameter = WebUtil.readLongParam(request, VoteAppConstants.ATTR_SUBMISSION_DEADLINE, true);
 	Date tzSubmissionDeadline = null;
+	String formattedDate = "";
 	if (dateParameter != null) {
 	    Date submissionDeadline = new Date(dateParameter);
 	    HttpSession ss = SessionManager.getSession();
@@ -370,9 +372,12 @@ public class MonitoringAction extends LamsDispatchAction implements VoteAppConst
 		    .getAttribute(AttributeNames.USER);
 	    TimeZone teacherTimeZone = teacher.getTimeZone();
 	    tzSubmissionDeadline = DateUtil.convertFromTimeZoneToDefault(teacherTimeZone, submissionDeadline);
+	    formattedDate = DateUtil.convertToStringForJSON(submissionDeadline, request.getLocale());
 	}
 	voteContent.setSubmissionDeadline(tzSubmissionDeadline);
 	voteService.updateVote(voteContent);
+	response.setContentType("text/plain;charset=utf-8");
+	response.getWriter().print(formattedDate);
 	return null;
     }
 
@@ -438,6 +443,8 @@ public class MonitoringAction extends LamsDispatchAction implements VoteAppConst
 	    TimeZone teacherTimeZone = teacher.getTimeZone();
 	    Date tzSubmissionDeadline = DateUtil.convertToTimeZoneFromDefault(teacherTimeZone, submissionDeadline);
 	    request.setAttribute(VoteAppConstants.ATTR_SUBMISSION_DEADLINE, tzSubmissionDeadline.getTime());
+	    // use the unconverted time, as convertToStringForJSON() does the timezone conversion if needed
+	    request.setAttribute(VoteAppConstants.ATTR_SUBMISSION_DEADLINE_DATESTRING, DateUtil.convertToStringForJSON(submissionDeadline, request.getLocale()));
 	}
 
 	voteMonitoringForm.setCurrentTab("1");

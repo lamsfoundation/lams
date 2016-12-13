@@ -24,6 +24,7 @@
 
 package org.lamsfoundation.lams.tool.wiki.web.actions;
 
+import java.io.IOException;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
@@ -56,8 +57,11 @@ import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
+
 import java.util.Date;
+
 import org.lamsfoundation.lams.util.DateUtil;
+
 import java.util.TimeZone;
 
 /**
@@ -69,17 +73,6 @@ import java.util.TimeZone;
  * author
  *
  * @author lfoxton
- * @version
- *
- *
- *
- *
- *
- *
- *
- *
- *
- *
  */
 public class MonitoringAction extends WikiPageAction {
 
@@ -133,6 +126,9 @@ public class MonitoringAction extends WikiPageAction {
 	    TimeZone learnerTimeZone = learnerDto.getTimeZone();
 	    Date tzSubmissionDeadline = DateUtil.convertToTimeZoneFromDefault(learnerTimeZone, submissionDeadline);
 	    request.setAttribute("submissionDeadline", tzSubmissionDeadline.getTime());
+	    // use the unconverted time, as convertToStringForJSON() does the timezone conversion if needed
+	    request.setAttribute("submissionDateString", DateUtil.convertToStringForJSON(submissionDeadline, request.getLocale()));
+
 
 	}
 
@@ -186,7 +182,7 @@ public class MonitoringAction extends WikiPageAction {
      * @return
      */
     public ActionForward setSubmissionDeadline(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) {
+	    HttpServletResponse response) throws IOException {
 
 	// set up wikiService
 	if (wikiService == null) {
@@ -198,17 +194,19 @@ public class MonitoringAction extends WikiPageAction {
 
 	Long dateParameter = WebUtil.readLongParam(request,WikiConstants.ATTR_SUBMISSION_DEADLINE, true);
 	Date tzSubmissionDeadline = null;
+	String formattedDate = "";
 	if (dateParameter != null) {
 	    Date submissionDeadline = new Date(dateParameter);
 	    HttpSession ss = SessionManager.getSession();
 	    UserDTO teacher = (UserDTO) ss.getAttribute(AttributeNames.USER);
 	    TimeZone teacherTimeZone = teacher.getTimeZone();
 	    tzSubmissionDeadline = DateUtil.convertFromTimeZoneToDefault(teacherTimeZone, submissionDeadline);
+	    formattedDate = DateUtil.convertToStringForJSON(submissionDeadline, request.getLocale());
 	}
 	wiki.setSubmissionDeadline(tzSubmissionDeadline);
-	System.out.println("datasetbefore"+wiki);
 	wikiService.saveOrUpdateWiki(wiki);
-	System.out.println("datasetafter"+wiki);
+	response.setContentType("text/plain;charset=utf-8");
+	response.getWriter().print(formattedDate);
 	return null;
     }
 

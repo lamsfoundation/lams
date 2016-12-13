@@ -60,5 +60,6 @@ public interface MindmapConstants {
     //public static final String ERROR_MSG_NAME_DUPLICATED = "error.condition.duplicated.name";
 
     public static final String ATTR_SUBMISSION_DEADLINE = "submissionDeadline";
+    public static final String ATTR_SUBMISSION_DEADLINE_DATESTRING = "submissionDateString";
     public static final String ATTR_IS_SUBMISSION_DEADLINE_PASSED = "isSubmissionDeadlinePassed";
 }

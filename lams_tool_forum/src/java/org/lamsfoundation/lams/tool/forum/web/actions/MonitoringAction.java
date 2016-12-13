@@ -220,6 +220,8 @@ public class MonitoringAction extends Action {
 	    TimeZone learnerTimeZone = learnerDto.getTimeZone();
 	    Date tzSubmissionDeadline = DateUtil.convertToTimeZoneFromDefault(learnerTimeZone, submissionDeadline);
 	    sessionMap.put(ForumConstants.ATTR_SUBMISSION_DEADLINE, tzSubmissionDeadline.getTime());
+	    // use the unconverted time, as convertToStringForJSON() does the timezone conversion if needed
+	    request.setAttribute(ForumConstants.ATTR_SUBMISSION_DEADLINE_DATESTRING, DateUtil.convertToStringForJSON(submissionDeadline, request.getLocale()));
 	}
 
 	boolean isGroupedActivity = forumService.isGroupedActivity(toolContentId);
@@ -818,9 +820,10 @@ public class MonitoringAction extends Action {
      * @param request
      * @param response
      * @return
+     * @throws IOException 
      */
     public ActionForward setSubmissionDeadline(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) {
+	    HttpServletResponse response) throws IOException {
 	forumService = getForumService();
 
 	Long contentID = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_CONTENT_ID);
@@ -828,6 +831,7 @@ public class MonitoringAction extends Action {
 
 	Long dateParameter = WebUtil.readLongParam(request, ForumConstants.ATTR_SUBMISSION_DEADLINE, true);
 	Date tzSubmissionDeadline = null;
+	String formattedDate = "";
 	if (dateParameter != null) {
 	    Date submissionDeadline = new Date(dateParameter);
 	    HttpSession ss = SessionManager.getSession();
@@ -835,10 +839,13 @@ public class MonitoringAction extends Action {
 		    .getAttribute(AttributeNames.USER);
 	    TimeZone teacherTimeZone = teacher.getTimeZone();
 	    tzSubmissionDeadline = DateUtil.convertFromTimeZoneToDefault(teacherTimeZone, submissionDeadline);
+	    formattedDate = DateUtil.convertToStringForJSON(submissionDeadline, request.getLocale());
 	}
 	forum.setSubmissionDeadline(tzSubmissionDeadline);
 	forumService.updateForum(forum);
 
+	response.setContentType("text/plain;charset=utf-8");
+	response.getWriter().print(formattedDate);
 	return null;
     }
 

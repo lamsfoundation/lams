@@ -123,6 +123,7 @@ public interface VoteAppConstants {
     public static final String OPT_INDEX = "optIndex";
 
     public static final String ATTR_SUBMISSION_DEADLINE = "submissionDeadline";
+    public static final String ATTR_SUBMISSION_DEADLINE_DATESTRING = "submissionDateString";
     public static final String ATTR_IS_SUBMISSION_DEADLINE_PASSED = "isSubmissionDeadlinePassed";
     public static final String ATTR_GROUP_USERS = "groupUsers";
     public static final String ATTR_IS_USER_LEADER = "isUserLeader";
