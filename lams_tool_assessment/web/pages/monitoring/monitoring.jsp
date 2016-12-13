@@ -23,6 +23,7 @@
 			var submissionDeadlineSettings = {
 				lams: '<lams:LAMSURL />',
 				submissionDeadline: '${submissionDeadline}',
+				submissionDateString: '${submissionDateString}',
 				setSubmissionDeadlineUrl: '<c:url value="/monitoring/setSubmissionDeadline.do"/>',
 				toolContentID: '${param.toolContentID}',
 				messageNotification: '<fmt:message key="monitor.summary.notification" />',
