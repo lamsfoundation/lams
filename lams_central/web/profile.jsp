@@ -70,7 +70,7 @@
 						<c:set var="dbId"><%=AuthenticationMethod.DB%></c:set>
 						<c:if test="${authenticationMethodId eq dbId}">
 
-							<a class="btn btn-sm btn-default voffset5"
+							<a class="btn btn-sm btn-default offset5"
 								href="index.do?method=password&redirectURL=index.do%3Fstate%3Dactive%26method%3Dprofile" role="button"><i
 								class="fa fa-fw fa-lock"></i> <span class="hidden-xs"><fmt:message
 										key="title.password.change.screen" /></span></i></a>
