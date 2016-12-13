@@ -658,7 +658,8 @@ public class LearningAction extends LamsDispatchAction implements VoteAppConstan
 	String groupLeaderName = request.getParameter(ATTR_GROUP_LEADER_NAME);
 	voteLearningForm.setGroupLeaderName(groupLeaderName);
 
-	boolean isUserLeader = WebUtil.readBooleanParam(request, "userLeader");
+	// will be null if submission deadline is passed
+	boolean isUserLeader = WebUtil.readBooleanParam(request, "userLeader", false);
 	voteLearningForm.setIsUserLeader(isUserLeader);
     }
 

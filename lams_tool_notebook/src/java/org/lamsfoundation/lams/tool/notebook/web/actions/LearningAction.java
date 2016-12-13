@@ -204,7 +204,8 @@ public class LearningAction extends LamsDispatchAction {
 	LearningForm learningForm = (LearningForm) form;
 	NotebookUser notebookUser = getCurrentUser(toolSessionID);
 
-	if (learningForm.getContentEditable()) {
+	// learningForm.getContentEditable() will be null if the deadline has passed
+	if (learningForm.getContentEditable() != null && learningForm.getContentEditable()) {
 	    // TODO fix idType to use real value not 999
 	    if (notebookUser.getEntryUID() == null) {
 		notebookUser.setEntryUID(notebookService.createNotebookEntry(toolSessionID,

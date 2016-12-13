@@ -84,7 +84,7 @@ public class SbmtConstants {
     public static final String EVENT_NAME_NOTIFY_TEACHERS_ON_FILE_SUBMIT = "notify_teachers_on_file_submit";
 
     public static final String ATTR_SUBMISSION_DEADLINE = "submissionDeadline";
-
+    public static final String ATTR_SUBMISSION_DEADLINE_DATESTRING = "submissionDateString";
     public static final String ATTR_IS_SUBMISSION_DEADLINE_PASSED = "isSubmissionDeadlinePassed";
 
     public static final String EVENT_NAME_NOTIFY_LEARNERS_ON_MARKED_FILE = "notify_learners_on_marked_file";

@@ -172,7 +172,10 @@ public class MonitoringUtil implements McAppConstants {
 	    UserDTO learnerDto = (UserDTO) ss.getAttribute(AttributeNames.USER);
 	    TimeZone learnerTimeZone = learnerDto.getTimeZone();
 	    Date tzSubmissionDeadline = DateUtil.convertToTimeZoneFromDefault(learnerTimeZone, submissionDeadline);
-	    request.setAttribute("submissionDeadline", tzSubmissionDeadline.getTime());
+	    request.setAttribute(McAppConstants.ATTR_SUBMISSION_DEADLINE, tzSubmissionDeadline.getTime());
+	    // use the unconverted time, as convertToStringForJSON() does the timezone conversion if needed
+	    request.setAttribute(McAppConstants.ATTR_SUBMISSION_DEADLINE_DATESTRING, DateUtil.convertToStringForJSON(submissionDeadline, request.getLocale()));
+
 	}
 
 	//prepare toolOutputDefinitions and activityEvaluation

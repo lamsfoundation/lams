@@ -174,7 +174,7 @@ public class ScratchieConstants {
     public static final String ATTR_SECONDS_LEFT = "secondsLeft";
 
     public static final String ATTR_SUBMISSION_DEADLINE = "submissionDeadline";
-
+    public static final String ATTR_SUBMISSION_DEADLINE_DATESTRING = "submissionDateString";
     public static final String ATTR_IS_SUBMISSION_DEADLINE_PASSED = "isSubmissionDeadlinePassed";
 
     public static final String ATTR_ANSWER_UIDS = "answerUids";

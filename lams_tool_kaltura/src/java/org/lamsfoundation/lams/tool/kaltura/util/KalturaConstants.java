@@ -34,6 +34,7 @@ public interface KalturaConstants {
     public static final String ATTR_ITEMS = "items";
     public static final String ATTR_SESSION_MAP_ID = "sessionMapID";
     public static final String ATTR_SUBMISSION_DEADLINE = "submissionDeadline";
+    public static final String ATTR_SUBMISSION_DEADLINE_DATESTRING = "submissionDateString";
     public static final String ATTR_IS_SUBMISSION_DEADLINE_PASSED = "isSubmissionDeadlinePassed";
     public static final String ATTR_ITEM_LIST = "itemList";
     public static final String ATTR_DELETED_ITEM_LIST = "deletedItemList";

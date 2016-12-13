@@ -7,11 +7,20 @@
 <lams:html>
 	<lams:head>
 	
+		<%-- param has higher level for request attribute --%>
+		<c:if test="${not empty param.sessionMapID}">
+			<c:set var="sessionMapID" value="${param.sessionMapID}" />
+		</c:if>
+	
+		<c:set var="sessionMap" value="${sessionScope[sessionMapID]}" />
+		
+	
 		<script type="text/javascript">
 			//pass settings to monitorToolSummaryAdvanced.js
 			var submissionDeadlineSettings = {
 				lams: '${lams}',
 				submissionDeadline: '${sessionMap.submissionDeadline}',
+				submissionDateString: '${sessionMap.submissionDateString}',
 				setSubmissionDeadlineUrl: '<c:url value="/monitoring/setSubmissionDeadline.do"/>',
 				toolContentID: '${toolContentID}',
 				messageNotification: '<fmt:message key="monitor.summary.notification" />',
