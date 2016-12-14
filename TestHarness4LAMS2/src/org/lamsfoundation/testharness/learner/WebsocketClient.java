@@ -25,16 +25,16 @@ import javax.websocket.WebSocketContainer;
  * @author Marcin Cieslak
  */
 public class WebsocketClient {
-    private WebsocketEndpoint websocketEndpoint = null;
+    private final WebsocketEndpoint websocketEndpoint;
 
-    public WebsocketClient(String uri, String sessionID, MessageHandler.Whole<String> messageHandler)
+    public WebsocketClient(String uri, final String sessionID, MessageHandler.Whole<String> messageHandler)
 	    throws IOException {
 
 	// add session ID so the request gets through LAMS security
 	Builder configBuilder = ClientEndpointConfig.Builder.create();
 	configBuilder.configurator(new Configurator() {
 	    @Override
-	    public void beforeRequest(final Map<String, List<String>> headers) {
+	    public void beforeRequest(Map<String, List<String>> headers) {
 		headers.put("Cookie", Arrays.asList("JSESSIONID=" + sessionID));
 	    }
 	});
@@ -65,7 +65,7 @@ public class WebsocketClient {
 
 class WebsocketEndpoint extends Endpoint {
     Session session = null;
-    private MessageHandler.Whole<String> messageHandler = null;
+    private final MessageHandler.Whole<String> messageHandler;
 
     WebsocketEndpoint(MessageHandler.Whole<String> messageHandler) {
 	this.messageHandler = messageHandler;
