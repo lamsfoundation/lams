@@ -136,6 +136,11 @@
 	max-width: 1200px;
 	border-width: 4px 4px 2px 4px;/* to compensate TB_iframeContent's cut in height of 2px */
 }
+@media (min-width: 1330px) {
+	#navcontent ~ #TB_window {
+	    padding-left: 170px; /* to be able to see entire navbar which gets enlarged at 1330px */
+	}
+}
 #TB_iframeContent {
 	height:calc(100% - 2px);
 	width:100%;
