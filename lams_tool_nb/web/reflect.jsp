@@ -40,16 +40,13 @@
 
 	</html:form>
 
-	<!-- Comments -->
-	<div class="row no-gutter">
-		<div class="col-xs-12">
-			<c:if test="${allowComments}">
-				<lams:Comments toolSessionId="${NbLearnerForm.toolSessionID}"
-					toolSignature="<%=NoticeboardConstants.TOOL_SIGNATURE%>" likeAndDislike="${likeAndDislike}" readOnly="true"
-					pageSize="10" sortBy="1" />
-			</c:if>
-		</div>
-	</div>
+	<!-- Comments: the extra div counteracts the float -->
+	<c:if test="${allowComments}">
+		<div class="row no-gutter"><div class="col-xs-12"></div></div>
+		<lams:Comments toolSessionId="${NbLearnerForm.toolSessionID}"
+			toolSignature="<%=NoticeboardConstants.TOOL_SIGNATURE%>" likeAndDislike="${likeAndDislike}" readOnly="true"
+			pageSize="10" sortBy="1" />
+	</c:if>
 	<!-- End comments -->
 
 </lams:Page>
