@@ -12,14 +12,17 @@
 <c:set var="isUserLeader" value="${sessionMap.isUserLeader}" />
 <c:set var="isScratchingFinished" value="${sessionMap.isScratchingFinished}" />
 <c:set var="isWaitingForLeaderToSubmitNotebook" value="${sessionMap.isWaitingForLeaderToSubmitNotebook}" />
+<c:set var="hideFinishButton" value="${!isUserLeader && (!isScratchingFinished || !isWaitingForLeaderToSubmitNotebook)}" />
 
-<!-- isUserLeader=${sessionMap.isUserLeader} -->
+<!-- Used by TestHarness 
+	 isUserLeader=${isUserLeader}
+	 hideFinishButton=${hideFinishButton} -->
 
-<c:if test="${not sessionMap.isUserLeader}">
+<c:if test="${not isUserLeader}">
 	<script type="text/javascript">
 	$(document).ready(function(){
 		// hide Finish button for non-leaders until leader finishes
-		if (${!isUserLeader && (!isScratchingFinished || !isWaitingForLeaderToSubmitNotebook)}) {
+		if (${hideFinishButton}) {
 			$("#finishButton").hide();
 		}
 	});

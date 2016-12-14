@@ -31,6 +31,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Random;
 import java.util.TreeMap;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -70,7 +71,7 @@ public class MockLearner extends MockUser implements Runnable {
     private static final String LESSON_FINISHED_FLAG = "LessonComplete.do";
     private static final String LOAD_TOOL_ACTIVITY_FLAG = "Load Tool Activity";
     private static final Pattern SESSION_MAP_ID_PATTERN = Pattern.compile("sessionMapID=(.+)\\&");
-    private static final Pattern TOOL_SESSION_ID_PATTERN = Pattern.compile("TOOL_SESSION_ID = '(\\d+)'");
+
     private static final String FINISH_SUBSTRING = "finish.do";
 
     private static final String FORUM_FINISH_SUBSTRING = "lafrum11/learning/finish.do";
@@ -80,20 +81,25 @@ public class MockLearner extends MockUser implements Runnable {
     private static final String FORUM_VIEW_FORUM_SUBSTRING = "lafrum11/learning/viewForum.do";
 
     private static final String LEADER_FINISH_SUBSTRING = "/lams/tool/lalead11/learning.do";
+    private static final Pattern LEADER_SHOW_DIALOG_PATTERN = Pattern.compile("show: (\\w+),");
     private static final Pattern LEADER_BECOME_PATTERN = Pattern.compile("dispatch=becomeLeader&toolSessionID=\\d+");
 
     private static final String SCRATCHIE_FINISH_SUBSTRING = "/lams/tool/lascrt11/learning/finish.do";
     private static final String SCRATCHIE_METHOD_SUBSTRING = "' + method + '";
     private static final Pattern SCRATCHIE_FINISH_METHOD_PATTERN = Pattern
 	    .compile("/lams/tool/lascrt11/learning/' \\+ method \\+ '\\.do\\?sessionMapID=sessionMapID-\\d+");
-    private static final Pattern SCRATCHIE_FINISH_METHOD_CALL_PATTERN = Pattern.compile("return finish\\('(\\w+)'\\)");
+    private static final Pattern SCRATCHIE_FINISH_METHOD_CALL_PATTERN = Pattern
+	    .compile("name=\"method\" id=\"method\" value=\"(\\w+)\"");
     private static final String SCRATCHIE_REFLECTION_SUBSTRING = "newReflection";
     private static final String SCRATCHIE_LEARNING_SUBSTRING = "/lams/tool/lascrt11/pages/learning/learning.jsp";
     private static final Pattern SCRATCHIE_SCRATCH_PATTERN = Pattern.compile("scratchItem\\((\\d+), (\\d+)\\)");
     private static final String SCRATCHIE_IS_LEADER_SUBSTRING = "isUserLeader=true";
+    private static final Pattern SCRATCHIE_TOOL_SESSION_ID_PATTERN = Pattern.compile("toolSessionID=' \\+ (\\d+)\\)");
+    private static final String SCRATCHIE_FINISH_SESSION_SUBSTRING = "return finishSession()";
 
     private static final String CHAT_FINISH_SUBSTRING = "/lams/tool/lachat11/learning.do";
     private static final int CHAT_REPLIES = 3;
+    private static final Pattern CHAT_TOOL_SESSION_ID_PATTERN = Pattern.compile("TOOL_SESSION_ID = '(\\d+)'");
 
     private static final String KNOCK_GATE_SUBSTRING = "/lams/learning/gate.do?method=knockGate";
 
@@ -516,7 +522,7 @@ public class MockLearner extends MockUser implements Runnable {
     @SuppressWarnings("deprecation")
     private void handleToolChat(WebResponse resp) throws IOException {
 	String asText = resp.getText();
-	Matcher m = MockLearner.TOOL_SESSION_ID_PATTERN.matcher(asText);
+	Matcher m = MockLearner.CHAT_TOOL_SESSION_ID_PATTERN.matcher(asText);
 	if (!m.find()) {
 	    MockLearner.log.debug("No TOOL_SESSION_ID found in Chat page, it's probably reflection page, carry on");
 	    return;
@@ -612,14 +618,20 @@ public class MockLearner extends MockUser implements Runnable {
 
     private WebResponse handleToolLeader(WebResponse resp) throws SAXException, IOException {
 	String asText = resp.getText();
-	Matcher m = MockLearner.LEADER_BECOME_PATTERN.matcher(asText);
-	if (m.find()) {
+	Matcher m = MockLearner.LEADER_SHOW_DIALOG_PATTERN.matcher(asText);
+	if (!m.find()) {
+	    throw new TestHarnessException("Could not tell whether the user can become the leader");
+	}
+	if (Boolean.valueOf(m.group(1))) {
+	    m = MockLearner.LEADER_BECOME_PATTERN.matcher(asText);
+	    if (!m.find()) {
+		throw new TestHarnessException("Could not \"become leader\" URL");
+	    }
 	    String becomeLeaderQueryOptions = m.group();
 	    String url = "/lams/tool/lalead11/learning.do?" + becomeLeaderQueryOptions;
 	    MockLearner.log.debug("Becoming a leader using link: " + url);
 	    new Call(wc, test, username + " becomes Leader", url).execute();
 	}
-
 	String finishURL = MockLearner.findURLInLocationHref(resp, MockLearner.LEADER_FINISH_SUBSTRING);
 	if (finishURL == null) {
 	    throw new TestHarnessException("Unable to finish the leader, no finish link found. " + asText);
@@ -629,113 +641,130 @@ public class MockLearner extends MockUser implements Runnable {
 	return (WebResponse) new Call(wc, test, username + " finishes Leader", finishURL).execute();
     }
 
+    @SuppressWarnings("deprecation")
     private WebResponse handleToolScratchie(WebResponse resp) throws SAXException, IOException {
 	String asText = resp.getText();
-	// check if current user is the leader
-	boolean isLeader = asText.contains(MockLearner.SCRATCHIE_IS_LEADER_SUBSTRING);
-	String sessionMapID = null;
-	String recordScratchedURL = null;
-	String refreshQuestionsURL = null;
-	// read session map ID for the current user
-	Matcher m = MockLearner.SESSION_MAP_ID_PATTERN.matcher(asText);
-	if (m.find()) {
-	    // prepare URLs
-	    sessionMapID = m.group(1);
-	    recordScratchedURL = "/lams/tool/lascrt11/learning/recordItemScratched.do?sessionMapID=" + sessionMapID
-		    + "&answerUid=";
-	    refreshQuestionsURL = "/lams/tool/lascrt11/learning/refreshQuestionList.do?sessionMapID=" + sessionMapID;
-	} else {
-	    MockLearner.log.debug(asText);
-	    throw new TestHarnessException("Session map ID was not found in Scratchie Tool");
-	}
-
-	// check if navigate-away URL is ready, or do we wait for leader
 	String finishURL = null;
-	String finishMethod = null;
-	m = MockLearner.SCRATCHIE_FINISH_METHOD_PATTERN.matcher(asText);
-	if (m.find()) {
-	    finishURL = m.group();
-	} else {
-	    throw new TestHarnessException("Could not find finish method body in Scratchie Tool");
-	}
-	// we are looking for a button with "return finish(someAction)" call
-	m = MockLearner.SCRATCHIE_FINISH_METHOD_CALL_PATTERN.matcher(asText);
-	if (m.find()) {
-	    finishMethod = m.group(1);
-	    // build the exit URL using the extracted action and rest of the URL
-	    finishURL = finishURL.replace(MockLearner.SCRATCHIE_METHOD_SUBSTRING, finishMethod);
-	}
-
-	if (isLeader) {
-	    // find all answers on the page
-	    m = MockLearner.SCRATCHIE_SCRATCH_PATTERN.matcher(asText);
-	    Map<Long, List<Long>> uids = new TreeMap<Long, List<Long>>();
-	    while (m.find()) {
-		Long questionID = Long.valueOf(m.group(1));
-		List<Long> answerUids = uids.get(questionID);
-		if (answerUids == null) {
-		    answerUids = new ArrayList<Long>();
-		    uids.put(questionID, answerUids);
-		}
-		answerUids.add(Long.valueOf(m.group(2)));
+	if (!asText.contains(SCRATCHIE_FINISH_SESSION_SUBSTRING)) {
+	    // check if current user is the leader
+	    boolean isLeader = asText.contains(MockLearner.SCRATCHIE_IS_LEADER_SUBSTRING);
+	    String sessionMapID = null;
+	    String recordScratchedURL = null;
+	    // read session map ID for the current user
+	    Matcher m = MockLearner.SESSION_MAP_ID_PATTERN.matcher(asText);
+	    if (m.find()) {
+		// prepare URLs
+		sessionMapID = m.group(1);
+		recordScratchedURL = "/lams/tool/lascrt11/learning/recordItemScratched.do?sessionMapID=" + sessionMapID
+			+ "&answerUid=";
+	    } else {
+		MockLearner.log.debug(asText);
+		throw new TestHarnessException("Session map ID was not found in Scratchie Tool");
 	    }
 
-	    Random generator = new Random();
-	    // start scratching random answers
-	    while (!uids.isEmpty()) {
-		Long questionID = uids.keySet().iterator().next();
-		List<Long> answerUids = uids.get(questionID);
+	    // check if navigate-away URL is ready, or do we wait for leader
 
-		if (answerUids.isEmpty()) {
-		    throw new TestHarnessException("No correct answer was found for scratchie question " + questionID);
-		}
-		int index = generator.nextInt(answerUids.size());
-		Long answerUid = answerUids.get(index);
-		answerUids.remove(index);
-		MockLearner.log.debug("Scratching answer UID " + answerUid + " for question " + questionID);
-		WebResponse scratchResponse = (WebResponse) new Call(wc, test,
-			username + " scratches answer in Scratchie", recordScratchedURL + answerUid).execute();
-		boolean answerCorrect = scratchResponse.getText().indexOf("true") != -1;
-		MockLearner.log.debug("Scratched answer UID " + answerUid + " for question " + questionID
-			+ " and it was " + (answerCorrect ? "correct" : "incorrect"));
+	    String finishMethod = null;
+	    m = MockLearner.SCRATCHIE_FINISH_METHOD_PATTERN.matcher(asText);
+	    if (!m.find()) {
+		throw new TestHarnessException("Could not find finish method body in Scratchie Tool");
+	    }
+	    finishURL = m.group();
 
-		if (answerCorrect) {
-		    uids.remove(questionID);
+	    m = MockLearner.SCRATCHIE_FINISH_METHOD_CALL_PATTERN.matcher(asText);
+	    if (m.find()) {
+		finishMethod = m.group(1);
+		// build the exit URL using the extracted action and rest of the URL
+		finishURL = finishURL.replace(MockLearner.SCRATCHIE_METHOD_SUBSTRING, finishMethod);
+	    }
+
+	    if (isLeader) {
+		// find all answers on the page
+		m = MockLearner.SCRATCHIE_SCRATCH_PATTERN.matcher(asText);
+		Map<Long, List<Long>> uids = new TreeMap<Long, List<Long>>();
+		while (m.find()) {
+		    Long questionID = Long.valueOf(m.group(1));
+		    List<Long> answerUids = uids.get(questionID);
+		    if (answerUids == null) {
+			answerUids = new ArrayList<Long>();
+			uids.put(questionID, answerUids);
+		    }
+		    answerUids.add(Long.valueOf(m.group(2)));
 		}
-		if (!answerUids.isEmpty()) {
+
+		Random generator = new Random();
+		// start scratching random answers
+		while (!uids.isEmpty()) {
+		    Long questionID = uids.keySet().iterator().next();
+		    List<Long> answerUids = uids.get(questionID);
+
+		    if (answerUids.isEmpty()) {
+			throw new TestHarnessException(
+				"No correct answer was found for scratchie question " + questionID);
+		    }
+		    int index = generator.nextInt(answerUids.size());
+		    Long answerUid = answerUids.get(index);
+		    answerUids.remove(index);
+		    MockLearner.log.debug("Scratching answer UID " + answerUid + " for question " + questionID);
+		    WebResponse scratchResponse = (WebResponse) new Call(wc, test,
+			    username + " scratches answer in Scratchie", recordScratchedURL + answerUid).execute();
+		    boolean answerCorrect = scratchResponse.getText().indexOf("true") != -1;
+		    MockLearner.log.debug("Scratched answer UID " + answerUid + " for question " + questionID
+			    + " and it was " + (answerCorrect ? "correct" : "incorrect"));
+
+		    if (answerCorrect) {
+			uids.remove(questionID);
+		    }
+		    if (!answerUids.isEmpty()) {
+			delay();
+		    }
+		}
+	    } else {
+		// non-leaders just wait for leader to finish
+		m = MockLearner.SCRATCHIE_TOOL_SESSION_ID_PATTERN.matcher(asText);
+		if (!m.find()) {
+		    throw new TestHarnessException("Could not find tool session ID in Scratchie Tool");
+		}
+		String toolSessionID = m.group(1);
+		String websocketURL = test.getTestSuite().getTargetServer().replace("http", "ws")
+			+ "/lams/tool/lascrt11/learningWebsocket?toolSessionID=" + toolSessionID;
+		String sessionID = wc.getCookieJar().getCookieValue("JSESSIONID");
+		AtomicBoolean close = new AtomicBoolean();
+		WebsocketClient websocketClient = new WebsocketClient(websocketURL, sessionID,
+			new MessageHandler.Whole<String>() {
+			    @Override
+			    public void onMessage(String message) {
+				log.debug(username + " received Scratchie " + toolSessionID + " message from server: "
+					+ message);
+				try {
+				    JSONObject responseJSON = new JSONObject(message);
+				    if (responseJSON.optBoolean("close")) {
+					close.set(true);
+				    }
+				} catch (Exception e) {
+				    log.error("JSON exception in Scratchie " + toolSessionID, e);
+				}
+			    }
+			});
+
+		while (!close.get()) {
+		    MockLearner.log.debug(username + " waiting for leader to finish scratchie");
 		    delay();
 		}
-	    }
-	} else {
-	    // non-leaders just wait for leader to finish
-	    while (finishMethod == null) {
-		MockLearner.log.debug("Waiting for leader to finish scratchie");
-		try {
-		    Thread.sleep(3000);
-		} catch (InterruptedException e) {
-		    MockLearner.log.error("Interrupted waiting between question list refresh in scratchie");
-		}
-		WebResponse questionRefreshResp = (WebResponse) new Call(wc, test,
-			username + " refreshes Scratchie question list", refreshQuestionsURL).execute();
-		asText = questionRefreshResp.getText();
 
-		// the answer will contain just the button to finish, but not the method body
-		m = MockLearner.SCRATCHIE_FINISH_METHOD_CALL_PATTERN.matcher(asText);
-		if (m.find()) {
-		    finishMethod = m.group(1);
-		    finishURL = finishURL.replace(MockLearner.SCRATCHIE_METHOD_SUBSTRING, finishMethod);
-		}
+		websocketClient.close();
 	    }
-	}
 
-	if (finishURL != null) {
-	    if (finishMethod.equals(MockLearner.SCRATCHIE_REFLECTION_SUBSTRING)) {
-		MockLearner.log.debug("Showing reflection of scratchie using url " + finishURL);
-		resp = (WebResponse) new Call(wc, test, username + " gets Scratchie reflection", finishURL).execute();
-		resp = handlePageWithForms(resp);
-	    } else {
-		MockLearner.log.debug("Showing results of scratchie using url " + finishURL);
-		resp = (WebResponse) new Call(wc, test, username + " gets Scratchie results", finishURL).execute();
+	    if (finishURL != null) {
+		if (finishMethod.equals(MockLearner.SCRATCHIE_REFLECTION_SUBSTRING)) {
+		    MockLearner.log.debug("Showing reflection of scratchie using url " + finishURL);
+		    resp = (WebResponse) new Call(wc, test, username + " gets Scratchie reflection", finishURL)
+			    .execute();
+		    resp = handlePageWithForms(resp);
+		} else {
+		    MockLearner.log.debug("Showing results of scratchie using url " + finishURL);
+		    resp = (WebResponse) new Call(wc, test, username + " gets Scratchie results", finishURL).execute();
+		}
 	    }
 	}
 
