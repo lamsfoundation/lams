@@ -389,7 +389,9 @@ public class CommentAction extends Action {
 	    commentService = getCommentService();
 
 	    User user = getCurrentUser(request);
-	    if (!learnerInToolSession(externalId, user) && !monitorInToolSession(externalId, user, sessionMap)) {
+	    ToolAccessMode mode = WebUtil.getToolAccessMode((String) sessionMap.get(AttributeNames.ATTR_MODE));
+	    boolean isMonitor = ToolAccessMode.TEACHER.equals(mode) && monitorInToolSession(externalId, user, sessionMap);
+	    if (!isMonitor && !learnerInToolSession(externalId, user) ) {
 		throwException("New comment: User does not have the rights to access the comments. ", user.getLogin(),
 			externalId, externalType, externalSignature);
 	    }
@@ -397,7 +399,7 @@ public class CommentAction extends Action {
 	    Comment rootSeq = commentService.getRoot(externalId, externalType, externalSignature);
 
 	    // save message into database
-	    Comment newComment = commentService.createReply(rootSeq, commentText, user);
+	    Comment newComment = commentService.createReply(rootSeq, commentText, user, isMonitor);
 
 	    JSONObject = new JSONObject();
 	    JSONObject.put(CommentConstants.ATTR_COMMENT_ID, newComment.getUid());
@@ -455,15 +457,16 @@ public class CommentAction extends Action {
 
 	} else {
 
-	    commentService = getCommentService();
 	    User user = getCurrentUser(request);
-	    if (!learnerInToolSession(externalId, user) && !monitorInToolSession(externalId, user, sessionMap)) {
+	    ToolAccessMode mode = WebUtil.getToolAccessMode((String) sessionMap.get(AttributeNames.ATTR_MODE));
+	    boolean isMonitor = ToolAccessMode.TEACHER.equals(mode) && monitorInToolSession(externalId, user, sessionMap);
+	    if (!isMonitor && !learnerInToolSession(externalId, user) ) {
 		throwException("New comment: User does not have the rights to access the comments. ", user.getLogin(),
 			externalId, externalType, externalSignature);
 	    }
 
 	    // save message into database
-	    Comment newComment = commentService.createReply(parentId, commentText.trim(), user);
+	    Comment newComment = commentService.createReply(parentId, commentText.trim(), user, isMonitor);
 
 	    JSONObject = new JSONObject();
 	    JSONObject.put(CommentConstants.ATTR_COMMENT_ID, newComment.getUid());

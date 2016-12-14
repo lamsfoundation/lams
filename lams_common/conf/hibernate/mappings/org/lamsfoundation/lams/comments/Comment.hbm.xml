@@ -145,6 +145,14 @@
             column="sticky"
         />
 
+        <property
+            name="monitor"
+            type="boolean"
+            update="true"
+            insert="true"
+            column="monitor"
+        />
+
     </class>
 
 </hibernate-mapping>

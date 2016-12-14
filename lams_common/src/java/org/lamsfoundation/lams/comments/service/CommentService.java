@@ -150,12 +150,13 @@ public class CommentService implements ICommentService {
     }
 
     @Override
-    public Comment createReply(Comment parent, String replyText, User user) {
+    public Comment createReply(Comment parent, String replyText, User user, boolean isMonitor) {
 
 	Comment replyMessage = new Comment();
 	replyMessage.setBody(replyText);
 	replyMessage.setHideFlag(false);
 	replyMessage.updateModificationData(user);
+	replyMessage.setMonitor(isMonitor);
 
 	replyMessage.setParent(parent);
 	replyMessage.setSession(parent.getSession());
@@ -202,10 +203,10 @@ public class CommentService implements ICommentService {
     }
 
     @Override
-    public Comment createReply(Long parentId, String replyText, User user) {
+    public Comment createReply(Long parentId, String replyText, User user, boolean isMonitor) {
 
 	Comment parent = commentDAO.getById(parentId);
-	return (createReply(parent, replyText, user));
+	return (createReply(parent, replyText, user, isMonitor));
 
     }
 

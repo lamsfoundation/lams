@@ -47,9 +47,9 @@ public interface ICommentService {
 	    Integer sortBy, String extraSortParam, Integer userId);
 
     /** Saves a comment - either creating a whole tree one if there is no parent or saving under the given parent. */
-    Comment createReply(Long parentId, String replyText, User user);
+    Comment createReply(Long parentId, String replyText, User user, boolean isMonitor);
 
-    Comment createReply(Comment parent, String replyText, User user);
+    Comment createReply(Comment parent, String replyText, User user, boolean isMonitor);
 
     /** Gets the dummy root for the comment system and if one doesn't exist for this session then set it up! */
     Comment createOrGetRoot(Long externalId, Integer externalIdType, String externalSignature, User user);
