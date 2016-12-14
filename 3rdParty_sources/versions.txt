@@ -7,7 +7,9 @@ This project contains following versions:
 
 CKEditor Java 2.6
 
-Commons HttpClient 3.1
+Apache HttpClient 4.2.1
+
+Apache HttpCore 4.2.1
 
 Commons Lang 2.6
 
