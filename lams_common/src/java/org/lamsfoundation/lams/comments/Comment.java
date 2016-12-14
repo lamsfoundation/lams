@@ -53,6 +53,7 @@ public class Comment implements Cloneable {
     private int replyNumber;
     private boolean hideFlag;
     private boolean sticky;
+    private boolean monitor;
 
     private Comment rootComment;
     private Comment threadComment;
@@ -244,6 +245,14 @@ public class Comment implements Cloneable {
 
     public void setVote(Integer vote) {
 	this.vote = vote;
+    }
+
+    public boolean isMonitor() {
+	return monitor;
+    }
+
+    public void setMonitor(boolean monitor) {
+	this.monitor = monitor;
     }
 
     @Override

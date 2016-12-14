@@ -10,6 +10,7 @@
       <c:set var="indentSize" value="${(commentDto.level-1)*indent}" />
     </c:otherwise>
   </c:choose>
+  <c:set var="paddingRightSize" value="${(commentDto.level-1)*indent+6}" />
 
   <c:choose>
     <c:when test='${commentDto.comment.uid == commentUid}'>
@@ -21,7 +22,7 @@
   </c:choose>
 
   <div class="row no-gutter">
-    <div class="col-xs-12" style="margin-left:<c:out value="${indentSize}"/>px;">
+    <div class="col-xs-12" style="margin-left:${indentSize}px;padding-right:${paddingRightSize}px">
       <div class="panel panel-default ${highlightClass} msg" id="msg${commentDto.comment.uid}">
         <div class="panel-heading">
           <h4 class="panel-title">
@@ -33,17 +34,29 @@
             </c:if>
 
           	<c:choose>
+            <c:when test="${isMonitor and isSticky}">
+				<c:set var="textClass" value="text-info"/>
+				<c:set var="bgClass" value="bg-info"/>
+				<i class="fa fa-thumb-tack ${textClass}"></i>
+            </c:when>
+            <c:when test="${isMonitor}">
+				<c:set var="textClass" value="text-info"/>
+				<c:set var="bgClass" value="bg-info"/>
+				<i class="fa fa-mortar-board ${textClass}"></i>
+            </c:when>
             <c:when test="${isSticky}">
-				<c:set var="colourClass" value="text-primary"/>
-				<i class="fa fa-thumb-tack ${colourClass}"></i>
+				<c:set var="textClass" value="text-info"/>
+				<c:set var="bgClass" value=""/>
+				<i class="fa fa-thumb-tack ${textClass}"></i>
             </c:when>
             <c:otherwise>
-				<c:set var="colourClass" value=""/>
-	            <i class="fa fa-user"></i> 
+				<c:set var="textClass" value=""/>
+				<c:set var="bgClass" value=""/>
+				<i class="fa fa-user"></i> 
 			</c:otherwise>
 			</c:choose>            
 
-            <span class="${colourClass}"><strong><c:out value="${author}" escapeXml="true"/></strong> - 
+            <span class="${textClass}"><strong><c:out value="${author}" escapeXml="true"/></strong> - 
             <lams:Date value="${commentDto.comment.updated}" timeago="true"/>
             <c:if test='${commentDto.comment.created != commentDto.comment.updated}'>
               | <small>(<fmt:message key="label.edited"/>)</small>
@@ -51,7 +64,7 @@
             </span>         
           </h4>
         </div>
-        <div class="panel-body" id="pb-msg${commentDto.comment.uid}">
+        <div class="panel-body ${bgClass}" id="pb-msg${commentDto.comment.uid}">
           <c:if
                 test='${(not hidden) || (hidden && sessionMap.mode == "teacher")}'>
             <lams:out value="${commentDto.comment.body}" escapeHtml="true" />

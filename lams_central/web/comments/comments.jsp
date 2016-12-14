@@ -70,7 +70,7 @@
     			<option value='1' <c:if test='${sessionMap.sortBy == 1}'>selected</c:if>><fmt:message key="label.top.comments"/></option>
 			</select>
 
-			<div id="commentDiv">
+			<div id="commentDiv" class="voffset2">
 			<%@ include file="allview.jsp"%>
 			</div>	
 			</div>
