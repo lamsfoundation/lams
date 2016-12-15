@@ -125,21 +125,6 @@ public class LoginRequestDispatcher {
 
     public static String getRequestURL(HttpServletRequest request) throws ServletException, UnsupportedEncodingException {
 
-	// get the location from an explicit parameter if it exists
-	String redirectUrlParam = request.getParameter("redirectURL");
-	log.info("LoginRequestDispatcher1 " + request.getParameter("redirectURL"));
-	if (redirectUrlParam != null) {
-	    // for NTU Blackboard's based templates, force to https to co-exist with Blackboard
-	    if (redirectUrlParam.indexOf("ldtemplate") >= 0) {
-		log.info("LoginRequestDispatcher23 " + request.getParameter("redirectURL"));
-		return "https://" + request.getServerName() + request.getContextPath() + "/" + redirectUrlParam;
-	    } else {
-		log.info("LoginRequestDispatcher2 " + request.getContextPath() + URL_REDIRECT + "&redirectURL=" + URLEncoder.encode(redirectUrlParam, "UTF8"));
-		return request.getContextPath() + URL_REDIRECT + "&redirectURL=" + URLEncoder.encode(redirectUrlParam, "UTF8");
-	    }
-	}
-	log.info("LoginRequestDispatcher3 " + request.getParameter("redirectURL"));
-
 	String method = request.getParameter(PARAM_METHOD);
 	String lessonId = request.getParameter(PARAM_LESSON_ID);
 	String mode = request.getParameter(PARAM_MODE);
@@ -151,6 +136,17 @@ public class LoginRequestDispatcher {
 		throw new ServletException(e);
 	    } catch (UserInfoValidationException e) {
 		throw new ServletException(e);
+	    }
+	}
+
+	// get the location from an explicit parameter if it exists
+	String redirectUrlParam = request.getParameter("redirectURL");
+	if (redirectUrlParam != null) {
+	    // for NTU Blackboard's based templates, force to https to co-exist with Blackboard
+	    if (redirectUrlParam.indexOf("ldtemplate") >= 0) {
+		return "https://" + request.getServerName() + request.getContextPath() + "/" + redirectUrlParam;
+	    } else {
+		return request.getContextPath() + URL_REDIRECT + "&redirectURL=" + URLEncoder.encode(redirectUrlParam, "UTF8");
 	    }
 	}
 
