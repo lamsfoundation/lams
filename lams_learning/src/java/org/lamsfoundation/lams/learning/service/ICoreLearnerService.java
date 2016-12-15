@@ -21,7 +21,6 @@
  * ****************************************************************
  */
 
-
 package org.lamsfoundation.lams.learning.service;
 
 import java.util.List;
@@ -93,7 +92,7 @@ public interface ICoreLearnerService extends ILearnerService {
      *             in case of problems.
      */
     LearnerProgress getProgress(Integer learnerId, Long lessonId);
-    
+
     /**
      * Get the last attempt ID for the given learner and lesson.
      */
@@ -111,8 +110,7 @@ public interface ICoreLearnerService extends ILearnerService {
      *             in case of problems.
      */
     Object[] getStructuredActivityURLs(Integer learnerId, Long lessonId);
-    
-    
+
     List<ActivityURL> getStructuredActivityURLs(Long lessonId);
 
     /**
@@ -147,12 +145,10 @@ public interface ICoreLearnerService extends ILearnerService {
      *            identifies the activity just completed
      * @param learner
      *            the Learner
-     * @return the bean containing the display data for the Learner
      * @throws LearnerServiceException
      *             in case of problems.
      */
-    LearnerProgress calculateProgress(Activity completedActivity, Integer learnerId,
-	    LearnerProgress currentLearnerProgress);
+    void calculateProgress(Activity completedActivity, Integer learnerId, LearnerProgress learnerProgress);
 
     /**
      * Complete the activity in the progress engine and delegate to the progress engine to calculate the next activity
@@ -165,9 +161,8 @@ public interface ICoreLearnerService extends ILearnerService {
      *            the activity is being run.
      * @param lessonId
      *            lesson id
-     * @return the updated learner progress
      */
-    LearnerProgress completeActivity(Integer learnerId, Activity activity, LearnerProgress progress);
+    void completeActivity(Integer learnerId, Activity activity, LearnerProgress progress);
 
     /**
      * If specified activity is set to produce ToolOutput, calculates and stores mark to gradebook.
