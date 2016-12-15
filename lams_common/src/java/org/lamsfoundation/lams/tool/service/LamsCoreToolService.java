@@ -95,7 +95,7 @@ public class LamsCoreToolService implements ILamsCoreToolService, ApplicationCon
     public void setApplicationContext(ApplicationContext context) throws BeansException {
 	this.context = context;
     }
-    
+
     public void setActivityDAO(IActivityDAO activityDAO) {
 	this.activityDAO = activityDAO;
     }
@@ -152,7 +152,6 @@ public class LamsCoreToolService implements ILamsCoreToolService, ApplicationCon
 
 	// if haven't found an existing tool session then create one
 	if (toolSession == null) {
-
 	    if (LamsCoreToolService.log.isDebugEnabled()) {
 		LamsCoreToolService.log.debug("Creating tool session for [" + activity.getActivityId() + ","
 			+ activity.getTitle() + "] for learner [" + learner.getLogin() + "] lesson ["
@@ -162,11 +161,14 @@ public class LamsCoreToolService implements ILamsCoreToolService, ApplicationCon
 	    toolSession = activity.createToolSessionForActivity(messageService, learner, lesson);
 	    toolSessionDAO.saveToolSession(toolSession);
 
-	    return toolSession;
+	    // create a session on tool side within the same transaction,
+	    // otherwise core session can exist but tool's one not
+	    // and a learner entering an activity will get an error
+	    activity.getToolSessions().add(toolSession);
+	    notifyToolsToCreateSession(toolSession, activity);
 	}
 
-	// indicate that we found an existing tool session by returning null
-	return null;
+	return toolSession;
     }
 
     @Override
@@ -638,7 +640,6 @@ public class LamsCoreToolService implements ILamsCoreToolService, ApplicationCon
 	return null;
     }
 
-    
     @Override
     public Long getLessonMaxPossibleMark(Lesson lesson) {
 	// calculate lesson's MaxPossibleMark
@@ -652,7 +653,7 @@ public class LamsCoreToolService implements ILamsCoreToolService, ApplicationCon
 	}
 	return lessonMaxPossibleMark;
     }
-    
+
     /**
      * Returns lesson tool activities. It works almost the same as lesson.getLearningDesign().getActivities() except it
      * solves problem with first activity unable to cast to ToolActivity.
