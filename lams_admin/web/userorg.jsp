@@ -13,6 +13,9 @@
 		height:250px; 
 		overflow-y:auto;
 	}
+	a {
+		cursor: pointer;
+	}
 </style>
 
 <script type="text/javascript" src="<lams:LAMSURL/>/includes/javascript/jquery.js"></script>
