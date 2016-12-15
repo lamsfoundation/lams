@@ -122,12 +122,6 @@ public class LoginRequestDispatcher {
 
     public static String getRequestURL(HttpServletRequest request) throws ServletException {
 
-	// get the location from an explicit parameter if it exists
-	String redirect = request.getParameter("redirectURL");
-	if (redirect != null) {
-	    return request.getContextPath() + "/" + redirect;
-	}
-
 	String method = request.getParameter(PARAM_METHOD);
 	String lessonId = request.getParameter(PARAM_LESSON_ID);
 	String mode = request.getParameter(PARAM_MODE);
@@ -140,6 +134,12 @@ public class LoginRequestDispatcher {
 	    } catch (UserInfoValidationException e) {
 		throw new ServletException(e);
 	    }
+	}
+
+	// get the location from an explicit parameter if it exists
+	String redirect = request.getParameter("redirectURL");
+	if (redirect != null) {
+	    return request.getContextPath() + "/" + redirect;
 	}
 
 	if (MODE_GRADEBOOK.equals(mode)) {
