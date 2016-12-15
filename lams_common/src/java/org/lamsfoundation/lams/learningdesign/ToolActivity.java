@@ -59,7 +59,7 @@ public class ToolActivity extends SimpleActivity implements Serializable {
     private Tool tool;
 
     /** List of sessions associated with this ToolActivity */
-    private Set toolSessions;
+    private Set<ToolSession> toolSessions;
 
     private Set<CompetenceMapping> competenceMappings;
 
@@ -290,7 +290,7 @@ public class ToolActivity extends SimpleActivity implements Serializable {
     /**
      * @return Returns the toolSessions.
      */
-    public Set getToolSessions() {
+    public Set<ToolSession> getToolSessions() {
 	return toolSessions;
     }
 
@@ -298,7 +298,7 @@ public class ToolActivity extends SimpleActivity implements Serializable {
      * @param toolSessions
      *            The toolSessions to set.
      */
-    public void setToolSessions(Set toolSessions) {
+    public void setToolSessions(Set<ToolSession> toolSessions) {
 	this.toolSessions = toolSessions;
     }
 
