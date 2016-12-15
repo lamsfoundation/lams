@@ -146,7 +146,9 @@ public class PresenceWebsocketServer {
 		    responseJSON.put("roster", rosterJSON);
 
 		    // send the payload to the Learner's browser
-		    websocket.session.getBasicRemote().sendText(responseJSON.toString());
+		    if (websocket.session.isOpen()) {
+			websocket.session.getBasicRemote().sendText(responseJSON.toString());
+		    }
 		} catch (Exception e) {
 		    PresenceWebsocketServer.log.error("Error while building message JSON", e);
 		}
