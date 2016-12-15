@@ -30,8 +30,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
+import java.util.Set;
 import java.util.TreeMap;
-import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.TreeSet;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -96,6 +97,7 @@ public class MockLearner extends MockUser implements Runnable {
     private static final String SCRATCHIE_IS_LEADER_SUBSTRING = "isUserLeader=true";
     private static final Pattern SCRATCHIE_TOOL_SESSION_ID_PATTERN = Pattern.compile("toolSessionID=' \\+ (\\d+)\\)");
     private static final String SCRATCHIE_FINISH_SESSION_SUBSTRING = "return finishSession()";
+    private static final Set<Long> SCRATCHIE_FINISHED_TOOL_CONTENT = new TreeSet<Long>();
 
     private static final String CHAT_FINISH_SUBSTRING = "/lams/tool/lachat11/learning.do";
     private static final int CHAT_REPLIES = 3;
@@ -645,6 +647,7 @@ public class MockLearner extends MockUser implements Runnable {
     private WebResponse handleToolScratchie(WebResponse resp) throws SAXException, IOException {
 	String asText = resp.getText();
 	String finishURL = null;
+	// check if scratchie is not finished already
 	if (!asText.contains(SCRATCHIE_FINISH_SESSION_SUBSTRING)) {
 	    // check if current user is the leader
 	    boolean isLeader = asText.contains(MockLearner.SCRATCHIE_IS_LEADER_SUBSTRING);
@@ -725,11 +728,10 @@ public class MockLearner extends MockUser implements Runnable {
 		if (!m.find()) {
 		    throw new TestHarnessException("Could not find tool session ID in Scratchie Tool");
 		}
-		String toolSessionID = m.group(1);
+		Long toolSessionID = Long.valueOf(m.group(1));
 		String websocketURL = test.getTestSuite().getTargetServer().replace("http", "ws")
 			+ "/lams/tool/lascrt11/learningWebsocket?toolSessionID=" + toolSessionID;
 		String sessionID = wc.getCookieJar().getCookieValue("JSESSIONID");
-		AtomicBoolean close = new AtomicBoolean();
 		WebsocketClient websocketClient = new WebsocketClient(websocketURL, sessionID,
 			new MessageHandler.Whole<String>() {
 			    @Override
@@ -739,7 +741,8 @@ public class MockLearner extends MockUser implements Runnable {
 				try {
 				    JSONObject responseJSON = new JSONObject(message);
 				    if (responseJSON.optBoolean("close")) {
-					close.set(true);
+					// mark the activity as finished for everyone
+					SCRATCHIE_FINISHED_TOOL_CONTENT.add(toolSessionID);
 				    }
 				} catch (Exception e) {
 				    log.error("JSON exception in Scratchie " + toolSessionID, e);
@@ -747,8 +750,8 @@ public class MockLearner extends MockUser implements Runnable {
 			    }
 			});
 
-		while (!close.get()) {
-		    MockLearner.log.debug(username + " waiting for leader to finish scratchie");
+		while (!SCRATCHIE_FINISHED_TOOL_CONTENT.contains(toolSessionID)) {
+		    MockLearner.log.debug("Waiting for leader to finish scratchie");
 		    delay();
 		}
 
