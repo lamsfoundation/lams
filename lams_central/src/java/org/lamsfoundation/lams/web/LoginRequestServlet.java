@@ -147,12 +147,6 @@ public class LoginRequestServlet extends HttpServlet {
 		getIntegrationService().getExtCourseClassMap(extServer, userMap, extCourseId, countryIsoCode,
 			langIsoCode, courseName, method, prefix);
 	    }
-	    
-	    // in case of method=monitor is requested, check whether the user is lesson's monitor. And if not - add him
-	    if (LoginRequestDispatcher.METHOD_MONITOR.equals(method)) {
-		getIntegrationService().getLessonService().addStaffMember(Long.parseLong(lsId),
-			userMap.getUser().getUserId());
-	    }
 
 	    User user = userMap.getUser();
 	    String login = user.getLogin();
@@ -167,7 +161,8 @@ public class LoginRequestServlet extends HttpServlet {
 		return;
 	    }
 
-	    // check if there is a redirect URL parameter already
+	    // check if there is a redirect URL parameter already; besides, LoginRequestDispatcher.getRequestURL() method also adds
+	    // users to the lesson with respective roles
 	    String redirectURL = WebUtil.getBaseServerURL() + LoginRequestDispatcher.getRequestURL(request);
 	    redirectURL = URLEncoder.encode(redirectURL, "UTF-8");
 
