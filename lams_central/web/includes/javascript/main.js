@@ -119,14 +119,14 @@ function selectOrganisation(newOrgId) {
 	activeOrgId = newOrgId;
 	loadOrganisation();
 	
-	//store last visited
-	$("#org-container").load(
-		"index.do",
-		{
+	//store last visited organisation
+	$.ajax({
+		url : "index.do",
+		data : {
 			dispatch : "storeLastVisitedOrganisation",
 			orgId   : activeOrgId
 		}
-	);
+	});
 }
 
 
