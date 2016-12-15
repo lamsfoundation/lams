@@ -21,7 +21,6 @@
  * ****************************************************************
  */
 
-
 package org.lamsfoundation.lams.learning.web.util;
 
 import java.io.UnsupportedEncodingException;
@@ -205,11 +204,10 @@ public class LearningWebUtil {
      *
      */
     public static ActionForward completeActivity(HttpServletRequest request, HttpServletResponse response,
-	    ActivityMapping actionMappings, LearnerProgress currentProgress, Activity currentActivity,
-	    Integer learnerId, ICoreLearnerService learnerService, boolean redirect)
+	    ActivityMapping actionMappings, LearnerProgress progress, Activity currentActivity, Integer learnerId,
+	    ICoreLearnerService learnerService, boolean redirect)
 	    throws LearnerServiceException, UnsupportedEncodingException {
 
-	LearnerProgress progress = currentProgress;
 	Lesson lesson = progress.getLesson();
 
 	if (currentActivity == null) {
@@ -221,7 +219,7 @@ public class LearningWebUtil {
 
 	    return actionMappings.getCloseForward(currentActivity, lesson.getLessonId());
 	} else {
-	    progress = learnerService.completeActivity(learnerId, currentActivity, progress);
+	    learnerService.completeActivity(learnerId, currentActivity, progress);
 	}
 
 	if (currentActivity != null && (currentActivity.isFloating() || (currentActivity.getParentActivity() != null

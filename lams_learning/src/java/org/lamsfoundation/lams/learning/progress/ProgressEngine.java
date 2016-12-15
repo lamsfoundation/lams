@@ -21,7 +21,6 @@
  * ****************************************************************
  */
 
-
 package org.lamsfoundation.lams.learning.progress;
 
 import java.util.Date;
@@ -76,20 +75,20 @@ public class ProgressEngine {
      * @throws ProgressException
      *             if progress cannot be calculated successfully.
      */
-    public LearnerProgress calculateProgress(User learner, Activity completedActivity, LearnerProgress learnerProgress)
+    public void calculateProgress(User learner, Activity completedActivity, LearnerProgress learnerProgress)
 	    throws ProgressException {
 	if (learnerProgress.getParallelWaiting() == LearnerProgress.PARALLEL_WAITING_COMPLETE) {
 	    learnerProgress.setParallelWaiting(LearnerProgress.PARALLEL_NO_WAIT);
 	}
-	return doCalculateProgress(learner, completedActivity, learnerProgress, new LinkedList<Long>());
+	doCalculateProgress(learner, completedActivity, learnerProgress, new LinkedList<Long>());
     }
 
     /**
      * Internal method used for recursion. Does the actual "work" of
      * calculateProgress.
      */
-    private LearnerProgress doCalculateProgress(User learner, Activity completedActivity,
-	    LearnerProgress learnerProgress, List<Long> completedActivityList) throws ProgressException {
+    private void doCalculateProgress(User learner, Activity completedActivity, LearnerProgress learnerProgress,
+	    List<Long> completedActivityList) throws ProgressException {
 	learnerProgress.setProgressState(completedActivity, LearnerProgress.ACTIVITY_COMPLETED, activityDAO);
 	completedActivityList.add(completedActivity.getActivityId());
 
@@ -103,17 +102,16 @@ public class ProgressEngine {
 	    }
 	    populateCurrentCompletedActivityList(learnerProgress, completedActivityList);
 	    learnerProgress.setFinishDate(new Date());
-	    return setLessonComplete(learnerProgress, LearnerProgress.LESSON_IN_DESIGN_COMPLETE);
+	    setLessonComplete(learnerProgress, LearnerProgress.LESSON_IN_DESIGN_COMPLETE);
 	} else if (completedActivity.isFloating() && !completedActivity.getParentActivity().isParallelActivity()) {
 	    // special case - floating activity and not parallel activity (floating) child.
-	    return learnerProgress;
 	} else {
 	    Transition transition = completedActivity.getTransitionFrom();
 	    if (transition != null) {
-		return progressCompletedActivity(learner, completedActivity, learnerProgress, transition,
+		progressCompletedActivity(learner, completedActivity, learnerProgress, transition,
 			completedActivityList);
 	    } else {
-		return progressParentActivity(learner, completedActivity, learnerProgress, completedActivityList);
+		progressParentActivity(learner, completedActivity, learnerProgress, completedActivityList);
 	    }
 	}
     }
@@ -134,31 +132,30 @@ public class ProgressEngine {
      * @throws ProgressException
      *             if the start point cannot be calculated successfully.
      */
-    public LearnerProgress setUpStartPoint(LearnerProgress progress) throws ProgressException {
+    public void setUpStartPoint(LearnerProgress progress) throws ProgressException {
 
 	LearningDesign ld = progress.getLesson().getLearningDesign();
 
 	if (progress.getLesson().getLockedForEdit()) {
 	    // special case - currently setting up the stop gates for live edit.
-	    return clearProgressNowhereToGoNotCompleted(progress, "setUpStartPoint");
+	    clearProgressNowhereToGoNotCompleted(progress, "setUpStartPoint");
 	} else if (progress.isComplete()) {
-	    return progress;
+	    return;
 	} else if (ld.getFirstActivity() == null) {
 	    throw new ProgressException("Could not find first activity for " + "learning design [" + ld.getTitle()
 		    + "], id[" + ld.getLearningDesignId().longValue() + "]");
 	} else if (progress.getCompletedActivities().containsKey(ld.getFirstActivity())) {
 	    // special case - recalculating the appropriate current activity.
-	    return doCalculateProgress(progress.getUser(), ld.getFirstActivity(), progress, new LinkedList<Long>());
+	    doCalculateProgress(progress.getUser(), ld.getFirstActivity(), progress, new LinkedList<Long>());
 	} else if (canDoActivity(progress.getLesson(), ld.getFirstActivity())) {
 	    // normal case
 	    progress.setCurrentActivity(ld.getFirstActivity());
 	    progress.setNextActivity(ld.getFirstActivity());
 	    setActivityAttempted(progress, ld.getFirstActivity());
-	    return progress;
 	} else {
 	    // special case - trying to get to a whole new activity (past the stop gate)
 	    // during a live edit
-	    return clearProgressNowhereToGoNotCompleted(progress, "setUpStartPoint");
+	    clearProgressNowhereToGoNotCompleted(progress, "setUpStartPoint");
 	}
     }
 
@@ -193,7 +190,7 @@ public class ProgressEngine {
      * Writes a warning to the log if callingMethod is not null. If it is null,
      * we assume the calling code has written out a warning/error already.
      */
-    private LearnerProgress clearProgressNowhereToGoNotCompleted(LearnerProgress progress, String callingMethod) {
+    private void clearProgressNowhereToGoNotCompleted(LearnerProgress progress, String callingMethod) {
 	if (callingMethod != null) {
 	    log.warn("Learner " + progress.getUser().getFullName() + "(" + progress.getUser().getUserId()
 		    + ") has a problem with the progress for lesson " + progress.getLesson().getLessonName() + "("
@@ -205,7 +202,6 @@ public class ProgressEngine {
 	progress.setCurrentActivity(null);
 	progress.setNextActivity(null);
 	progress.setLessonComplete(LearnerProgress.LESSON_NOT_COMPLETE);
-	return progress;
     }
 
     /**
@@ -254,9 +250,8 @@ public class ProgressEngine {
      * @return the learner progress data we calculated.
      * @throws ProgressException
      */
-    private LearnerProgress progressCompletedActivity(User learner, Activity completedActivity,
-	    LearnerProgress learnerProgress, Transition transition, List<Long> completedActivityList)
-	    throws ProgressException {
+    private void progressCompletedActivity(User learner, Activity completedActivity, LearnerProgress learnerProgress,
+	    Transition transition, List<Long> completedActivityList) throws ProgressException {
 	Activity nextActivity = transition.getToActivity();
 
 	if (!learnerProgress.getCompletedActivities().containsKey(nextActivity)) {
@@ -276,16 +271,13 @@ public class ProgressEngine {
 		}
 
 	    } else {
-		return clearProgressNowhereToGoNotCompleted(learnerProgress, "progressCompletedActivity");
+		clearProgressNowhereToGoNotCompleted(learnerProgress, "progressCompletedActivity");
 	    }
-
-	    return learnerProgress;
 
 	} else {
 	    // abnormal case: next activity already done. Must have jumped back to an earlier
 	    // optional activity, done another activity and then kept going
-
-	    return doCalculateProgress(learner, nextActivity, learnerProgress, completedActivityList);
+	    doCalculateProgress(learner, nextActivity, learnerProgress, completedActivityList);
 	}
 
     }
@@ -336,7 +328,7 @@ public class ProgressEngine {
 			    "Error occurred in progress engine." + " Unexpected Null activity received when progressing"
 				    + " to the next activity within a incomplete parent activity:"
 				    + " Parent activity id [" + parent.getActivityId() + "]");
-		    learnerProgress = clearProgressNowhereToGoNotCompleted(learnerProgress, null);
+		    clearProgressNowhereToGoNotCompleted(learnerProgress, null);
 		} else if (isParallelWaitActivity(nextActivity)) {
 		    learnerProgress.setParallelWaiting(LearnerProgress.PARALLEL_WAITING);
 		    // learnerProgress.setNextActivity(null);
@@ -346,7 +338,7 @@ public class ProgressEngine {
 		    setActivityAttempted(learnerProgress, nextActivity);
 		    populateCurrentCompletedActivityList(learnerProgress, completedActivityList);
 		} else {
-		    learnerProgress = clearProgressNowhereToGoNotCompleted(learnerProgress, "progressParentActivity");
+		    clearProgressNowhereToGoNotCompleted(learnerProgress, "progressParentActivity");
 		}
 	    }
 	    //recurvisely call back to calculateProgress to calculate completed

@@ -86,7 +86,6 @@ import org.lamsfoundation.lams.tool.exception.ToolException;
 import org.lamsfoundation.lams.tool.service.ILamsCoreToolService;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
-import org.springframework.dao.DataIntegrityViolationException;
 
 /**
  * This class is a facade over the Learning middle tier.
@@ -351,8 +350,8 @@ public class LearnerService implements ICoreLearnerService {
     public void createToolSessionsIfNecessary(Activity activity, LearnerProgress learnerProgress) {
 	try {
 	    if ((activity != null) && activity.isToolActivity()) {
-		ToolActivity toolActivity = (ToolActivity) activity;
-		createToolSessionFor(toolActivity, learnerProgress.getUser(), learnerProgress.getLesson());
+		lamsCoreToolService.createToolSession(learnerProgress.getUser(), (ToolActivity) activity,
+			learnerProgress.getLesson());
 	    }
 	} catch (RequiredGroupMissingException e) {
 	    LearnerService.log.warn("error occurred in 'createToolSessionFor':" + e.getMessage());
@@ -416,18 +415,17 @@ public class LearnerService implements ICoreLearnerService {
 
 	return retValue;
     }
-    
-    
+
     @Override
     public List<ActivityURL> getStructuredActivityURLs(Long lessonId) {
-	 Lesson lesson = getLesson(lessonId);
-	 User learner = (User) lesson.getAllLearners().iterator().next();
-	 LearnerProgress learnerProgress = new LearnerProgress(learner, lesson);
+	Lesson lesson = getLesson(lessonId);
+	User learner = (User) lesson.getAllLearners().iterator().next();
+	LearnerProgress learnerProgress = new LearnerProgress(learner, lesson);
 
-	 ProgressBuilder builder = new ProgressBuilder(learnerProgress, activityDAO, activityMapping);
-	 builder.parseLearningDesign();
-	 return builder.getActivityList();
-	    }
+	ProgressBuilder builder = new ProgressBuilder(learnerProgress, activityDAO, activityMapping);
+	builder.parseLearningDesign();
+	return builder.getActivityList();
+    }
 
     /**
      * @see org.lamsfoundation.lams.learning.service.ICoreLearnerService#chooseActivity(org.lamsfoundation.lams.usermanagement.User,
@@ -542,13 +540,10 @@ public class LearnerService implements ICoreLearnerService {
      *             in case of problems.
      */
     @Override
-    public LearnerProgress calculateProgress(Activity completedActivity, Integer learnerId,
-	    LearnerProgress currentLearnerProgress) {
+    public void calculateProgress(Activity completedActivity, Integer learnerId, LearnerProgress learnerProgress) {
 	try {
-	    LearnerProgress learnerProgress = progressEngine.calculateProgress(currentLearnerProgress.getUser(),
-		    completedActivity, currentLearnerProgress);
+	    progressEngine.calculateProgress(learnerProgress.getUser(), completedActivity, learnerProgress);
 	    learnerProgressDAO.updateLearnerProgress(learnerProgress);
-	    return learnerProgress;
 	} catch (ProgressException e) {
 	    throw new LearnerServiceException(e.getMessage());
 	}
@@ -609,12 +604,12 @@ public class LearnerService implements ICoreLearnerService {
      * @return the updated learner progress
      */
     @Override
-    public LearnerProgress completeActivity(Integer learnerId, Activity activity, LearnerProgress progress) {
+    public void completeActivity(Integer learnerId, Activity activity, LearnerProgress progress) {
 	// load the progress again from DB
-	LearnerProgress nextLearnerProgress = learnerProgressDAO.getLearnerProgress(progress.getLearnerProgressId());
-	if (nextLearnerProgress.getCompletedActivities().keySet().contains(activity)) {
+	progress = learnerProgressDAO.getLearnerProgress(progress.getLearnerProgressId());
+	if (progress.getCompletedActivities().keySet().contains(activity)) {
 	    // progress was already updated by another thread, so prevent double processing
-	    return nextLearnerProgress;
+	    return;
 	}
 
 	// Need to synchronise the next bit of code so that if the tool calls
@@ -628,7 +623,7 @@ public class LearnerService implements ICoreLearnerService {
 	// bottleneck synchronized (this) {
 	if (activity == null) {
 	    try {
-		nextLearnerProgress = progressEngine.setUpStartPoint(progress);
+		progressEngine.setUpStartPoint(progress);
 	    } catch (ProgressException e) {
 		LearnerService.log.error("error occurred in 'setUpStartPoint':" + e.getMessage(), e);
 		throw new LearnerServiceException(e);
@@ -637,7 +632,7 @@ public class LearnerService implements ICoreLearnerService {
 	} else {
 	    // load the activity again so it is attached to the current Hibernate session
 	    activity = getActivity(activity.getActivityId());
-	    nextLearnerProgress = calculateProgress(activity, learnerId, progress);
+	    calculateProgress(activity, learnerId, progress);
 
 	    updateGradebookMark(activity, progress);
 	}
@@ -645,8 +640,6 @@ public class LearnerService implements ICoreLearnerService {
 	logEventService.logEvent(LogEvent.TYPE_LEARNER_ACTIVITY_FINISH, learnerId,
 		activity.getLearningDesign().getLearningDesignId(), progress.getLesson().getLessonId(),
 		activity.getActivityId());
-
-	return nextLearnerProgress;
     }
 
     /**
@@ -657,7 +650,8 @@ public class LearnerService implements ICoreLearnerService {
     @Override
     public LearnerProgress completeActivity(Integer learnerId, Activity activity, Long lessonId) {
 	LearnerProgress currentProgress = getProgress(new Integer(learnerId.intValue()), lessonId);
-	return completeActivity(learnerId, activity, currentProgress);
+	completeActivity(learnerId, activity, currentProgress);
+	return currentProgress;
     }
 
     @Override
@@ -910,37 +904,6 @@ public class LearnerService implements ICoreLearnerService {
     // ---------------------------------------------------------------------
     // Helper Methods
     // ---------------------------------------------------------------------
-
-    /**
-     * <p>
-     * Create a lams tool session for learner against a tool activity. This will have concurrency issues interms of
-     * grouped tool session because it might be inserting some tool session that has already been inserted by other
-     * member in the group. If the unique_check is broken, we need to query the database to get the instance instead of
-     * inserting it. It should be done in the Spring rollback strategy.
-     * </p>
-     *
-     * Once lams tool session is inserted, we need to notify the tool to its own session.
-     *
-     * @param toolActivity
-     * @param learner
-     * @throws LamsToolServiceException
-     */
-    private void createToolSessionFor(ToolActivity toolActivity, User learner, Lesson lesson)
-	    throws RequiredGroupMissingException, ToolException {
-	// if the tool session already exists, createToolSession() will return null
-	ToolSession toolSession = null;
-	try {
-	    toolSession = lamsCoreToolService.createToolSession(learner, toolActivity, lesson);
-	} catch (DataIntegrityViolationException e) {
-	    LearnerService.log.warn(
-		    "There was an attempt to create two tool sessions with the same name. Skipping further attempts as the session exists.",
-		    e);
-	}
-	if (toolSession != null) {
-	    toolActivity.getToolSessions().add(toolSession);
-	    lamsCoreToolService.notifyToolsToCreateSession(toolSession, toolActivity);
-	}
-    }
 
     /**
      * Create an array of lesson dto based a list of lessons.
