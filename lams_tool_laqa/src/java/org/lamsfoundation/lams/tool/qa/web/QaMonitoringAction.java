@@ -125,7 +125,7 @@ public class QaMonitoringAction extends LamsDispatchAction implements QaAppConst
 	    UserDTO teacher = (UserDTO) ss.getAttribute(AttributeNames.USER);
 	    TimeZone teacherTimeZone = teacher.getTimeZone();
 	    tzSubmissionDeadline = DateUtil.convertFromTimeZoneToDefault(teacherTimeZone, submissionDeadline);
-	    formattedDate = DateUtil.convertToStringForJSON(submissionDeadline, request.getLocale());
+	    formattedDate = DateUtil.convertToStringForJSON(tzSubmissionDeadline, request.getLocale());
 	} else {
 	    //set showOtherAnswersAfterDeadline to false
 	    content.setShowOtherAnswersAfterDeadline(false);

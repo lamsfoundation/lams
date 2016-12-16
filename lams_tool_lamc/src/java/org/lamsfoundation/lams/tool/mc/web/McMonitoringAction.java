@@ -255,7 +255,7 @@ public class McMonitoringAction extends LamsDispatchAction implements McAppConst
 		    .getAttribute(AttributeNames.USER);
 	    TimeZone teacherTimeZone = teacher.getTimeZone();
 	    tzSubmissionDeadline = DateUtil.convertFromTimeZoneToDefault(teacherTimeZone, submissionDeadline);
-	    formattedDate = DateUtil.convertToStringForJSON(submissionDeadline, request.getLocale());
+	    formattedDate = DateUtil.convertToStringForJSON(tzSubmissionDeadline, request.getLocale());
 	}
 	mcContent.setSubmissionDeadline(tzSubmissionDeadline);
 	service.updateMc(mcContent);

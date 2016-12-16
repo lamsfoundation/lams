@@ -201,7 +201,7 @@ public class MonitoringAction extends WikiPageAction {
 	    UserDTO teacher = (UserDTO) ss.getAttribute(AttributeNames.USER);
 	    TimeZone teacherTimeZone = teacher.getTimeZone();
 	    tzSubmissionDeadline = DateUtil.convertFromTimeZoneToDefault(teacherTimeZone, submissionDeadline);
-	    formattedDate = DateUtil.convertToStringForJSON(submissionDeadline, request.getLocale());
+	    formattedDate = DateUtil.convertToStringForJSON(tzSubmissionDeadline, request.getLocale());
 	}
 	wiki.setSubmissionDeadline(tzSubmissionDeadline);
 	wikiService.saveOrUpdateWiki(wiki);

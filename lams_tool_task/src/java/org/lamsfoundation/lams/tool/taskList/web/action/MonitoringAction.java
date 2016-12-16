@@ -456,7 +456,7 @@ public class MonitoringAction extends Action {
 		    .getAttribute(AttributeNames.USER);
 	    TimeZone teacherTimeZone = teacher.getTimeZone();
 	    tzSubmissionDeadline = DateUtil.convertFromTimeZoneToDefault(teacherTimeZone, submissionDeadline);
-	    formattedDate = DateUtil.convertToStringForJSON(submissionDeadline, request.getLocale());
+	    formattedDate = DateUtil.convertToStringForJSON(tzSubmissionDeadline, request.getLocale());
 	}
 	taskList.setSubmissionDeadline(tzSubmissionDeadline);
 	service.saveOrUpdateTaskList(taskList);
