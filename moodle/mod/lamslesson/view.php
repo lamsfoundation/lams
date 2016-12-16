@@ -146,7 +146,7 @@ if ($progress['lessonComplete'] == 'true') {
     lamslesson_set_as_completed($cm,$course,$lamslesson);
   }
 
-  echo '<div class="progress-header">' . get_string('lessoncompleted','lamslesson') . ' ' . $OUTPUT->pix_icon('i/tick_green_big', get_string('lessoncompleted','lamslesson')) . '</div>';
+  echo '<div class="progress-header">' . get_string('lessoncompleted','lamslesson') . ' ' . $OUTPUT->pix_icon('e/tick', get_string('lessoncompleted','lamslesson')) . '</div>';
 
 
   // Does this lesson has to record a score in Moodle?
