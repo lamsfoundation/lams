@@ -39,6 +39,7 @@ import java.util.regex.Pattern;
 import javax.websocket.MessageHandler;
 
 import org.apache.log4j.Logger;
+import org.apache.tomcat.util.json.JSONArray;
 import org.apache.tomcat.util.json.JSONException;
 import org.apache.tomcat.util.json.JSONObject;
 import org.lamsfoundation.testharness.Call;
@@ -140,6 +141,18 @@ public class MockLearner extends MockUser implements Runnable {
     private static final String PEER_REVIEW_SUBSTRING = "/lams/tool/laprev11/";
     private static final String PEER_REVIEW_SHOW_RESULTS_SUBSTRING = "/lams/tool/laprev11/learning/showResults.do";
     private static final String PEER_REVIEW_FINISH_SUBSTRING = "/lams/tool/laprev11/learning/finish.do";
+
+    private static final String SCRIBE_TOOL_SUBSTRING = "/lams/tool/lascrb11/learning.do";
+    private static final String SCRIBE_SUBMIT_REPORT_SUBSTRING = "javascript:submitReport()";
+    private static final String SCRIBE_START_ACTIVITY_SUBSTRING = "value=\"startActivity\"";
+    private static final String SCRIBE_FINISH_ACTIVITY_SUBSTRING = "value=\"finishActivity\"";
+    private static final String SCRIBE_DISPLAY_REFLECTION_SUBSTRING = "value=\"openNotebook\"";
+    private static final String SCRIBE_SUBMIT_REFLECTION_SUBSTRING = "value=\"submitReflection\"";
+    private static final Pattern SCRIBE_REPORT_ENTRY_PATTERN = Pattern.compile("id=\"report-(\\d+)\"");
+    private static final Pattern SCRIBE_TOOL_SESSION_ID_PATTERN = Pattern.compile("toolSessionID=' \\+ (\\d+)\\)");
+    private static final Set<Long> SCRIBE_FINISHED_TOOL_CONTENT = new TreeSet<Long>();
+    private static final short SCRIBE_SUBMIT_REPORT_ATTEMPTS = 3;
+
     private static int joinLessonUserCount = 0;
     private static int topJoinLessonUserCount = 0;
     private boolean finished = false;
@@ -445,6 +458,8 @@ public class MockLearner extends MockUser implements Runnable {
 		form = handleToolWiki(form, action);
 	    } else if (asText.contains(MockLearner.ASSESSMENT_TOOL_SUBSTRING)) {
 		return handleToolAssessment(resp, form);
+	    } else if (asText.contains(SCRIBE_TOOL_SUBSTRING)) {
+		return handleToolScribe(resp, form);
 	    }
 	}
 	log.debug("Filling form fillFormArbitrarily");
@@ -486,6 +501,9 @@ public class MockLearner extends MockUser implements Runnable {
 	    // Scratchie start page
 	    String url = MockLearner.findURLInLocationHref(resp, MockLearner.SCRATCHIE_LEARNING_SUBSTRING);
 	    return (WebResponse) new Call(wc, test, username + " starts Scratchie", url).execute();
+	}
+	if (asText.contains(SCRIBE_TOOL_SUBSTRING)) {
+	    return handleToolScribe(resp, null);
 	}
 
 	Matcher m = MockLearner.SHARE_RESOURCES_REDIRECT_PATTERN.matcher(asText);
@@ -778,6 +796,102 @@ public class MockLearner extends MockUser implements Runnable {
 	}
 
 	throw new TestHarnessException("Unable to finish the scratchie, no finish link found. " + asText);
+    }
+
+    @SuppressWarnings("deprecation")
+    private WebResponse handleToolScribe(WebResponse resp, WebForm form) throws SAXException, IOException {
+	String asText = resp.getText();
+	if (asText.contains(SCRIBE_START_ACTIVITY_SUBSTRING)) {
+	    return (WebResponse) new Call(wc, test, username + " starts Scribe", form).execute();
+	}
+	if (asText.contains(SCRIBE_DISPLAY_REFLECTION_SUBSTRING)) {
+	    return (WebResponse) new Call(wc, test, username + " displays Scribe reflection", form).execute();
+	}
+	if (asText.contains(SCRIBE_SUBMIT_REFLECTION_SUBSTRING)) {
+	    return (WebResponse) new Call(wc, test, username + " submits reflection and finishes scribe",
+		    fillFormArbitrarily(form)).execute();
+	}
+	if (asText.contains(SCRIBE_FINISH_ACTIVITY_SUBSTRING)) {
+	    return (WebResponse) new Call(wc, test, username + " finishes Scribe", form).execute();
+	}
+	boolean isScribe = asText.contains(SCRIBE_SUBMIT_REPORT_SUBSTRING);
+	Matcher m = MockLearner.SCRIBE_TOOL_SESSION_ID_PATTERN.matcher(asText);
+	if (!m.find()) {
+	    log.debug(asText);
+	    throw new TestHarnessException("Could not find tool session ID in Scribe Tool");
+	}
+	Long toolSessionID = Long.valueOf(m.group(1));
+	String websocketURL = test.getTestSuite().getTargetServer().replace("http", "ws")
+		+ "/lams/tool/lascrb11/learningWebsocket?toolSessionID=" + toolSessionID;
+	String sessionID = wc.getCookieJar().getCookieValue("JSESSIONID");
+	try {
+	    if (isScribe) {
+		WebsocketClient websocketClient = new WebsocketClient(websocketURL, sessionID,
+			new MessageHandler.Whole<String>() {
+			    @Override
+			    public void onMessage(String message) {
+				log.debug(username + " (scribe) received Scribe " + toolSessionID
+					+ " message from server: " + message);
+			    }
+			});
+
+		// send few version of reports
+		JSONObject requestJSON = new JSONObject();
+		requestJSON.put("type", "submitReport");
+		for (short attempt = 0; attempt < SCRIBE_SUBMIT_REPORT_ATTEMPTS; attempt++) {
+		    JSONArray reportsJSON = new JSONArray();
+		    m = MockLearner.SCRIBE_REPORT_ENTRY_PATTERN.matcher(asText);
+		    while (m.find()) {
+			JSONObject reportJSON = new JSONObject();
+			reportJSON.put("uid", m.group(1));
+			reportJSON.put("text", MockLearner.composeArbitraryText());
+			reportsJSON.put(reportJSON);
+		    }
+		    requestJSON.put("reports", reportsJSON);
+		    websocketClient.sendMessage(requestJSON.toString());
+
+		    delay();
+		}
+
+		websocketClient.close();
+		log.debug(username + " (scribe) force completes scribe " + toolSessionID);
+		return (WebResponse) new Call(wc, test, username + " the scribe force completes Scribe", form)
+			.execute();
+	    } else {
+		WebsocketClient websocketClient = new WebsocketClient(websocketURL, sessionID,
+			new MessageHandler.Whole<String>() {
+			    @Override
+			    public void onMessage(String message) {
+				log.debug(username + " (regular learner) received Scribe " + toolSessionID
+					+ " message from server: " + message);
+				try {
+				    JSONObject responseJSON = new JSONObject(message);
+				    if (responseJSON.optBoolean("close")) {
+					// mark the activity as finished for everyone
+					SCRIBE_FINISHED_TOOL_CONTENT.add(toolSessionID);
+				    }
+				} catch (JSONException e) {
+				    log.error("JSON exception in Scribe " + toolSessionID, e);
+				}
+			    }
+			});
+
+		// vote few times
+		JSONObject requestJSON = new JSONObject();
+		requestJSON.put("type", "vote");
+		for (short attempt = 0; attempt < SCRIBE_SUBMIT_REPORT_ATTEMPTS
+			&& !SCRIBE_FINISHED_TOOL_CONTENT.contains(toolSessionID); attempt++) {
+		    websocketClient.sendMessage(requestJSON.toString());
+		    delay();
+		}
+
+		websocketClient.close();
+		return (WebResponse) new Call(wc, test, username + " refreshes Scribe",
+			MockLearner.findURLInLocationHref(resp, SCRIBE_TOOL_SUBSTRING)).execute();
+	    }
+	} catch (JSONException e) {
+	    throw new IOException("Error while trying to create Scribe JSON for websocket", e);
+	}
     }
 
     private WebResponse handleToolAssessment(WebResponse resp, WebForm form) throws SAXException, IOException {
