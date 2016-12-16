@@ -247,7 +247,7 @@ public class MonitoringAction extends LamsDispatchAction {
 	    UserDTO teacher = (UserDTO) ss.getAttribute(AttributeNames.USER);
 	    TimeZone teacherTimeZone = teacher.getTimeZone();
 	    tzSubmissionDeadline = DateUtil.convertFromTimeZoneToDefault(teacherTimeZone, submissionDeadline);
-	    formattedDate = DateUtil.convertToStringForJSON(submissionDeadline, request.getLocale());
+	    formattedDate = DateUtil.convertToStringForJSON(tzSubmissionDeadline, request.getLocale());
 	}
 	chat.setSubmissionDeadline(tzSubmissionDeadline);
 	chatService.saveOrUpdateChat(chat);

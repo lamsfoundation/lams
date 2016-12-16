@@ -372,7 +372,7 @@ public class MonitoringAction extends LamsDispatchAction implements VoteAppConst
 		    .getAttribute(AttributeNames.USER);
 	    TimeZone teacherTimeZone = teacher.getTimeZone();
 	    tzSubmissionDeadline = DateUtil.convertFromTimeZoneToDefault(teacherTimeZone, submissionDeadline);
-	    formattedDate = DateUtil.convertToStringForJSON(submissionDeadline, request.getLocale());
+	    formattedDate = DateUtil.convertToStringForJSON(tzSubmissionDeadline, request.getLocale());
 	}
 	voteContent.setSubmissionDeadline(tzSubmissionDeadline);
 	voteService.updateVote(voteContent);
