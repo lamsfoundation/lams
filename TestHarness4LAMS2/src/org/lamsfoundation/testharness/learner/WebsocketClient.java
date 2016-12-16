@@ -74,6 +74,8 @@ class WebsocketEndpoint extends Endpoint {
     @Override
     public void onOpen(Session session, EndpointConfig endpointConfig) {
 	this.session = session;
-	session.addMessageHandler(messageHandler);
+	if (messageHandler != null) {
+	    session.addMessageHandler(messageHandler);
+	}
     }
 }
