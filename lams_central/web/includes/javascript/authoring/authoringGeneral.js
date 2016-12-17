@@ -13,7 +13,6 @@ $(document).ready(function() {
 		// in read-only mode (SVG generator), some parts are not necessary and not loaded
 		GeneralInitLib.initLayout();
 		PropertyLib.init();
-		MenuLib.init();
 		
 		if (/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)){
 			$('.desktopButton').hide();
@@ -1376,6 +1375,7 @@ GeneralLib = {
 			layout.conf.readOnlyFilter = paper.filter(Snap.filter.grayscale(1));
 			
 			GeneralLib.resizePaper();
+			GeneralLib.setModified(false);
 		} else {
 			// do not prompt again
 			window.onbeforeunload = null;
@@ -1930,7 +1930,7 @@ GeneralLib = {
 					layout.liveEdit = true;
 					
 					// remove unnecessary buttons, show Cancel, move Open after Save and Cancel
-					$('#newButton, #importSequenceButton, #saveAsButton, #exportLamsButton, #exportImsButton, #previewButton').remove();
+					$('#newButton, #importSequenceButton, #saveAsButton, #exportLamsButton, #previewButton').remove();
 					$('#cancelLiveEditButton').show()
 											  .after($('#openButton').parent().parent());
 				}
@@ -2574,39 +2574,14 @@ GeneralLib = {
 			return;
 		}
 		layout.modified = modified;
-		var activitiesExist = layout.activities.length > 0,
-			enableExportButton = false;
-		if (!modified && activitiesExist) {
+		if (!modified && layout.activities.length > 0) {
 			$('#previewButton').prop('disabled', layout.ld.invalid);
-			$('.exportSequenceButton').attr('disabled', null)
-								  	  .css('opacity', 1);
+			$('#exportLamsButton').removeClass('disabled');
 			$('#ldDescriptionFieldModified').text('');
-			enableExportButton = true;
 		} else {
 			$('#previewButton').prop('disabled', true);
-			$('.exportSequenceButton').attr('disabled', 'disabled')
-							      	  .css('opacity', 0.2);
+			$('#exportLamsButton').addClass('disabled');
 			$('#ldDescriptionFieldModified').text('*');
-		}
-		
-		// if the browser does not support HTML5 "download" attribute,
-		// the image can only be received from the LD saved on the server
-		if ((!modified || layout.conf.supportsDownloadAttribute) && activitiesExist) {
-			$('.exportImageButton').attr('disabled', null)
-			  					   .css('opacity', 1);
-			enableExportButton = true;
-		} else {
-			$('.exportImageButton').attr('disabled', 'disabled')
-			   					   .css('opacity', 0.2);
-		}
-		
-		// disabled the whole export button if all children are disabled
-		if (enableExportButton) {
-			$('#exportButton').attr('disabled', null)
-		  	  				  .css('opacity', 1);
-		} else {
-			$('#exportButton').attr('disabled', 'disabled')
-	      	  				  .css('opacity', 0.2);
 		}
 	},
 	

@@ -142,8 +142,6 @@
 				LIVEEDIT_REMOVE_TRANSITION_ERROR : '<c:out value="${LIVEEDIT_REMOVE_TRANSITION_ERROR_VAR}" />',
 					
 				// MenuLib
-				<fmt:message key="authoring.fla.export.image.dialog.title" var="EXPORT_IMAGE_DIALOG_TITLE_VAR"/>
-				EXPORT_IMAGE_DIALOG_TITLE : '<c:out value="${EXPORT_IMAGE_DIALOG_TITLE_VAR}" />',
 				<fmt:message key="authoring.fla.export.sequence.dialog.title" var="EXPORT_SEQUENCE_DIALOG_TITLE_VAR"/>
 				EXPORT_SEQUENCE_DIALOG_TITLE : '<c:out value="${EXPORT_SEQUENCE_DIALOG_TITLE_VAR}" />',
 				<fmt:message key="authoring.fla.activity.copy.title.prefix" var="ACTIVITY_COPY_TITLE_PREFIX_VAR"/>
@@ -304,10 +302,7 @@
 			</button>
 			<ul class="dropdown-menu desktopButton">
 				<li id="saveAsButton" onClick="javascript:MenuLib.saveLearningDesign(true)"><a href="#"><fmt:message key="authoring.fla.page.menu.saveas" /></a></li>
-				<li role="separator" class="divider"></li>
-				<li class="dropdown-header"><fmt:message key="authoring.fla.page.menu.export" /></li>
 				<li id="exportLamsButton" onClick="javascript:MenuLib.exportLearningDesign(1)"><a href="#"><fmt:message key="authoring.fla.page.menu.export.lams" /></a></li>
-				<li id="exportSvgButton"  onClick="javascript:MenuLib.exportSVG(true)"><a href="#"><fmt:message key="authoring.fla.page.menu.export.svg" /></a></li>
 			</ul>
 		</div>
 		
