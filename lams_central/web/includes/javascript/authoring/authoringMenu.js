@@ -3,24 +3,6 @@
  */
 
 var MenuLib = {
-		
-	init : function(){
-		// dialog allowing to save canvas as SVG or PNG image
-		layout.exportImageDialog = showDialog('exportImageDialog',{
-			'autoOpen' : false,
-			'width'	   : 350,
-			'draggable': false,
-			'resizable': false,
-			'modal'	   : true,
-			'title'	   : LABELS.EXPORT_IMAGE_DIALOG_TITLE,
-			'close'    : null
-		}, false);
-		
-		$('.modal-body', layout.exportImageDialog).empty().append($('#exportImageDialogContents').show());
-		layout.dialogs.push(layout.exportImageDialog);
-	},
-	
-	
 	/**
 	 * Creates a new annotation label.
 	 */
@@ -303,50 +285,27 @@ var MenuLib = {
 	 * Creates a SVG image out of current SVG contents.
 	 */
 	exportSVG : function(download){
-		
 		ActivityLib.removeSelectEffect();
 		
-		var imageCode = null;
-		if (!download || layout.conf.supportsDownloadAttribute) {
-			var crop = MenuLib.getCanvasCrop();
-			if (crop.x >= crop.x2) {
-				return;
-			}
-			// set viewBox so content is nicely aligned
-			var width = crop.x2 - crop.x + 2,
-				height = crop.y2 - crop.y + 2;
-				svg = $('svg', crop.canvasClone)[0];
-				
-			// need to set attributes using pure JS as jQuery sets them with lower case, which is unacceptable in SVG
-			svg.setAttribute('viewBox', crop.x + ' ' + crop.y + ' ' + width + ' ' + height);
-			svg.setAttribute('preserveAspectRatio', 'xMinYMin slice');
-			svg.setAttribute('width', width);
-			svg.setAttribute('height', height);
-			
-			
-			// reset any cursor=pointer styles
-			$('*[style*="cursor"]', svg).css('cursor', 'default');
-			
-			imageCode = crop.canvasClone.html();
+		var crop = MenuLib.getCanvasCrop();
+		if (crop.x >= crop.x2) {
+			return;
 		}
+		// set viewBox so content is nicely aligned
+		var width = crop.x2 - crop.x + 2,
+			height = crop.y2 - crop.y + 2;
+			svg = $('svg', crop.canvasClone)[0];
+			
+		// need to set attributes using pure JS as jQuery sets them with lower case, which is unacceptable in SVG
+		svg.setAttribute('viewBox', crop.x + ' ' + crop.y + ' ' + width + ' ' + height);
+		svg.setAttribute('preserveAspectRatio', 'xMinYMin slice');
+		svg.setAttribute('width', width);
+		svg.setAttribute('height', height);
 		
-		if (download) {
-			var anchor = $('a', layout.exportImageDialog);
-			if (layout.conf.supportsDownloadAttribute) {
-				anchor.attr({
-					'href'	   : 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(imageCode),
-					'download' : (layout.ld.title ? layout.ld.title : 'Untitled') + '.svg'
-				});
-			} else {
-				anchor.attr({
-					'href'	   : LD_THUMBNAIL_URL_BASE + layout.ld.learningDesignID
-								 + '&download=true&_=' + new Date().getTime()
-				});
-			}
-			layout.exportImageDialog.modal('show');
-		} else {
-			return imageCode;
-		}
+		// reset any cursor=pointer styles
+		$('*[style*="cursor"]', svg).css('cursor', 'default');
+		
+		return crop.canvasClone.html();
 	},
 	
 	
