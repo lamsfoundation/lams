@@ -98,15 +98,13 @@
 				}
 			</c:if>
 
-			debugger;
 		    var current_date = new Date( );
 		    var client_gmt_offset_minutes = current_date.getTimezoneOffset( );
 		    $('#offset').html( client_gmt_offset_minutes / 60 );
 		    var lams_gmt_offset_minutes = ( <lams:user property="timeZone.rawOffset"/> + <lams:user property="timeZone.DSTSavings"/> ) / 60000;
 		    if ( client_gmt_offset_minutes != -lams_gmt_offset_minutes ) {
-			    $('#timezoneWarning').html( "<BR/>Warning: The timezone in LAMS does not match timezone on your computer. The times shown in LAMS will be for the LAMS timezone set in your profile. "
-			    		+": os "+client_gmt_offset_minutes+" minutes : lams "+lams_gmt_offset_minutes+" minutes" );
-		    }			
+			    $('#timezoneWarning').html( '<BR/><fmt:message key="label.timezone.warning"/>');
+			}			
 		});
 	</script>
 </lams:head>
