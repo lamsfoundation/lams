@@ -31,7 +31,7 @@
 				</td>
 				<td>
 					<div>
-						${currentAssessmentResult.finishDate} 
+						<lams:Date value="${currentAssessmentResult.finishDate}" />  
 					</div>
 				</td>					
 				<td>
