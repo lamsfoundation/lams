@@ -108,6 +108,7 @@ public class ImportLessonsServlet extends HttpServlet {
 		    content.setLinkRef(Long.toString(newLessonId));
 
 		    // update URL
+		    url = replaceParameterValue(url, "ldid", Long.toString(newLdId));
 		    url = replaceParameterValue(url, "lsid", Long.toString(newLessonId));
 		    url = replaceParameterValue(url, "course_id", _course_id);
 		    url = replaceParameterValue(url, "content_id", _content_id);
