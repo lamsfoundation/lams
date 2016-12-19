@@ -647,7 +647,7 @@ public class MonitoringService implements IMonitoringService {
 	    }
 
 	    activity.setInitialised(Boolean.TRUE);
-	    activityDAO.update(activity);
+	    activityDAO.insertOrUpdate(activity);
 	}
 
 	if (designModified) {
