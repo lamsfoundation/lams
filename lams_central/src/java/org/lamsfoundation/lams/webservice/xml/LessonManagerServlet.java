@@ -75,6 +75,12 @@ import org.w3c.dom.ls.LSOutput;
 import org.w3c.dom.ls.LSSerializer;
 
 public class LessonManagerServlet extends HttpServlet {
+    
+    private static final String TOOL_SIGNATURE_ASSESSMENT = "laasse10";
+    
+    public static final String TOOL_SIGNATURE_SCRATCHIE = "lascrt11";
+    
+    public static final String TOOL_SIGNATURE_MCQ = "lamc11";
 
     private static Logger log = Logger.getLogger(LessonManagerServlet.class);
 
@@ -282,6 +288,10 @@ public class LessonManagerServlet extends HttpServlet {
 		lsId = new Long(lsIdStr);
 		element = getToolOutputs(document, serverId, datetime, hashValue, username, lsId, courseId, true,
 			outputsUser);
+
+	    } else if (method.equals(CentralConstants.METHOD_CHECK_LESSON_FOR_NUMERIC_TOOL_OUTPUTS)) {
+		lsId = new Long(lsIdStr);
+		element = checkLessonForNumericToolOutputs(document, serverId, datetime, hashValue, username, lsId);
 
 	    } else if (method.equals(CentralConstants.METHOD_VERIFY_EXT_SERVER)) {
 		verify(serverId, datetime, hashValue);
@@ -1150,7 +1160,7 @@ public class LessonManagerServlet extends HttpServlet {
      * @throws Exception
      */
     @SuppressWarnings("unchecked")
-    public Element getToolOutputs(Document document, String serverId, String datetime, String hashValue,
+    private Element getToolOutputs(Document document, String serverId, String datetime, String hashValue,
 	    String username, Long lessonId, String courseID, boolean isAuthoredToolOutputs, String outputsUser)
 	    throws Exception {
 
@@ -1251,6 +1261,40 @@ public class LessonManagerServlet extends HttpServlet {
 
 	return toolOutputsElement;
 
+    }
+    
+    /**
+     * Returns whether specified lesson has numeric tool outputs (i.e. contains Scratchie, Assessment or MCQ).
+     */
+    @SuppressWarnings("unchecked")
+    private Element checkLessonForNumericToolOutputs(Document document, String serverId, String datetime,
+	    String hashValue, String username, Long lessonId)
+	    throws Exception {
+
+	ExtServer extServer = LessonManagerServlet.integrationService.getExtServer(serverId);
+	Authenticator.authenticate(extServer, datetime, username, hashValue);
+
+	Lesson lesson = LessonManagerServlet.lessonService.getLesson(lessonId);
+	if (lesson == null) {
+	    throw new Exception("No lesson exists for: " + lessonId);
+	}
+
+	Set<ToolActivity> activities = getLessonActivities(lesson);
+	
+	//Scratchie, Assessment and MCQ are the tools that produce numeric tool outputs
+	boolean hasNumericToolOutput = false;
+	for (ToolActivity activity : activities) {
+	    String toolSignature = activity.getTool().getToolSignature();
+	    hasNumericToolOutput |= TOOL_SIGNATURE_ASSESSMENT.equals(toolSignature)
+		    || TOOL_SIGNATURE_ASSESSMENT.equals(toolSignature)
+		    || TOOL_SIGNATURE_ASSESSMENT.equals(toolSignature);
+	}
+
+	// Create the root node of the xml document
+	Element lessonElement = document.createElement("Lesson");
+	lessonElement.setAttribute(CentralConstants.ATTR_LESSON_ID, "" + lessonId);
+	lessonElement.setAttribute("hasNumericToolOutput", Boolean.toString(hasNumericToolOutput));
+	return lessonElement;
     }
 
     /**
