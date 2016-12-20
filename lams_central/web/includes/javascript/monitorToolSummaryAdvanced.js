@@ -71,7 +71,6 @@ if ((typeof jQuery != 'undefined') && (typeof submissionDeadlineSettings != 'und
 		$.ajax({
 			url : url,
 			success : function(data) {
-				debugger;
 				$.growlUI(submissionDeadlineSettings.messageNotification, submissionDeadlineSettings.messageRestrictionSet);
 				$("#datetimeDiv").hide();
 				if ( data != '' ) {
