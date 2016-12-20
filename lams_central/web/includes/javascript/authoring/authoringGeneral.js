@@ -562,7 +562,7 @@ GeneralInitLib = {
 				folderID = folderNode.data.folderID;
 			} else {
 				// get data from "recently used sequences" list
-				var selectedAccess = $('#ldStoreDialogAccessCell > div.selected', dialog);
+				var selectedAccess = $('#ldStoreDialogAccessDiv > div.selected', dialog);
 				// if title was altered, do not consider this an overwrite
 				if (selectedAccess.length > 0 && title == selectedAccess.text()) {
 					learningDesignID = +selectedAccess.data('learningDesignId');
@@ -607,7 +607,7 @@ GeneralInitLib = {
 				learningDesignID = ldNode ? ldNode.data.learningDesignId : null;
 		
 			if (!learningDesignID) {
-				learningDesignID = +$('#ldStoreDialogAccessCell > div.selected', dialog)
+				learningDesignID = +$('#ldStoreDialogAccessDiv > div.selected', dialog)
 								   .data('learningDesignId');
 			}
 			
@@ -2647,7 +2647,7 @@ GeneralLib = {
 			}
 		}
 		
-		$('#ldStoreDialogAccessCell > div.access', layout.ldStoreDialog).each(function(){
+		$('#ldStoreDialogAccessDiv > div.access', layout.ldStoreDialog).each(function(){
 			var access = $(this);
 			if (+access.data('learningDesignId') == learningDesignID){
 				access.addClass('selected');
@@ -2717,7 +2717,7 @@ GeneralLib = {
 		}
 		
 		if (access) {
-			var accessCell = $('#ldStoreDialogAccessCell', layout.ldStoreDialog);
+			var accessCell = $('#ldStoreDialogAccessDiv', layout.ldStoreDialog);
 			accessCell.children('div.access').remove();
 			$.each(access, function(){
 				$('<div />').addClass('access')
