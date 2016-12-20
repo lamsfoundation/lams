@@ -163,9 +163,12 @@
 				CONTRIBUTE_BUTTON : '<c:out value="${CONTRIBUTE_BUTTON_VAR}" />',
 				<fmt:message key="lesson.task.attention" var="CONTRIBUTE_ATTENTION_VAR"/>
 				CONTRIBUTE_ATTENTION : '<c:out value="${CONTRIBUTE_ATTENTION_VAR}" />',
-				HELP : '<fmt:message key="button.help"/>',
-				LESSON_INTRODUCTION : '<fmt:message key="label.lesson.introduction"/>',
-				EMAIL_TITLE : '<fmt:message key="label.email"/>'
+				<fmt:message key="button.help" var="BUTTON_HELP_VAR"/>
+				HELP : '<c:out value="${BUTTON_HELP_VAR}" />',
+				<fmt:message key="label.lesson.introduction" var="LESSON_INTRODUCTION_VAR"/>
+				LESSON_INTRODUCTION : '<c:out value="${LESSON_INTRODUCTION_VAR}" />',
+				<fmt:message key="label.email" var="EMAIL_TITLE_VAR"/>
+				EMAIL_TITLE : '<c:out value="${EMAIL_TITLE_VAR}" />'
 			}
 	    
 		$(document).ready(function(){
