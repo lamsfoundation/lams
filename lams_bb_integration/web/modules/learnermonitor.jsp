@@ -80,6 +80,7 @@
     }
 
 	String strLessonId = request.getParameter("lsid").trim();
+	long lessonId = Long.parseLong(strLessonId);
 	String courseIdParam = request.getParameter("course_id");  
 	
     // Get Course ID and User ID
@@ -151,12 +152,9 @@
  	boolean isDisplayDesignImage = "true".equals(strIsDisplayDesignImage) ? true : false;
  	String learningDesignImageUrl = "";
  	if (isDisplayDesignImage) {
- 	    String strLearningDesignId = request.getParameter("ldid").trim();
- 	    long learningDesignId = Long.parseLong(strLearningDesignId);
-
  	    String username = ctx.getUser().getUserName();
- 	    learningDesignImageUrl = LamsSecurityUtil.generateRequestLearningDesignImage(username, false) + "&ldId="
- 		    + learningDesignId;
+ 	    learningDesignImageUrl = LamsSecurityUtil.generateRequestLearningDesignImage(username, false) + "&lsId="
+ 		    + lessonId;
  	}
 
  	//check whether user has score for this lesson
@@ -186,7 +184,6 @@
     boolean isScoreAvailable = (current_score != null);
 
     //prepare learnerProgressDto for displaying on jsp
-	long lessonId = Long.parseLong(strLessonId);
 	LearnerProgressDTO learnerProgressDto = LamsSecurityUtil.getLearnerProgress(ctx, lessonId);
 %>
 
