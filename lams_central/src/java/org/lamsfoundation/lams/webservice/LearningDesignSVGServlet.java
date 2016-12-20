@@ -39,6 +39,7 @@ import org.lamsfoundation.lams.integration.security.Authenticator;
 import org.lamsfoundation.lams.integration.service.IntegrationService;
 import org.lamsfoundation.lams.learningdesign.service.ILearningDesignService;
 import org.lamsfoundation.lams.learningdesign.service.LearningDesignService;
+import org.lamsfoundation.lams.lesson.service.ILessonService;
 import org.lamsfoundation.lams.util.CentralConstants;
 import org.lamsfoundation.lams.util.Configuration;
 import org.lamsfoundation.lams.util.ConfigurationKeys;
@@ -55,6 +56,8 @@ public class LearningDesignSVGServlet extends HttpServlet {
     private static IntegrationService integrationService = null;
 
     private ILearningDesignService learningDesignService = null;
+    
+    private ILessonService lessonService = null;
 
     @Override
     public void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
@@ -64,7 +67,11 @@ public class LearningDesignSVGServlet extends HttpServlet {
 	    String hashValue = request.getParameter(CentralConstants.PARAM_HASH_VALUE);
 	    String username = request.getParameter(CentralConstants.PARAM_USERNAME);
 
-	    Long learningDesignId = WebUtil.readLongParam(request, CentralConstants.PARAM_LEARNING_DESIGN_ID);
+	    // in case lsId parameter is provided - get learningDesignId from the responsible lesson, otherwise try to get
+	    // it from a request as "ldId" parameter
+	    Long lessonId = WebUtil.readLongParam(request, CentralConstants.PARAM_LESSON_ID, true);
+	    Long learningDesignId = (lessonId == null) ? WebUtil.readLongParam(request, CentralConstants.PARAM_LEARNING_DESIGN_ID) : 
+		lessonService.getLessonDetails(lessonId).getLearningDesignID();
 
 	    if (serverId == null || datetime == null || hashValue == null || username == null) {
 		String msg = "Parameters missing";
@@ -129,5 +136,8 @@ public class LearningDesignSVGServlet extends HttpServlet {
 
 	learningDesignService = (ILearningDesignService) WebApplicationContextUtils
 		.getRequiredWebApplicationContext(getServletContext()).getBean("learningDesignService");
+	
+	lessonService = (ILessonService) WebApplicationContextUtils
+		.getRequiredWebApplicationContext(getServletContext()).getBean("lessonService");
     }
 }
