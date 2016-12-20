@@ -210,20 +210,25 @@ div#ldStoreDialogContents div#ldStoreDialogTree {
 }
 
 div#ldStoreDialogContents #ldStoreDialogAccessCell {
-	height: 150px;
-	vertical-align: top;
 	border-top: thin dotted #2E6E9E;
 	border-right: thin dotted #2E6E9E;
+}
+
+div#ldStoreDialogContents #ldStoreDialogAccessDiv {
+	width: 200px;
+	overflow: auto;
+	height: 150px;
+	vertical-align: top;
 	padding: 5px 0px 5px 0px;
 }
 
-div#ldStoreDialogContents #ldStoreDialogAccessCell > div#ldStoreDialogAccessTitle {
+div#ldStoreDialogContents #ldStoreDialogAccessDiv > div#ldStoreDialogAccessTitle {
 	font-size: 13px;
 	font-weight: bold;
 	text-align: center;
 }
 
-div#ldStoreDialogContents #ldStoreDialogAccessCell > div.access {
+div#ldStoreDialogContents #ldStoreDialogAccessDiv > div.access {
 	padding: 3px 0 3px 3px;
 	cursor: pointer;
 	margin-left: 10px;
@@ -231,7 +236,7 @@ div#ldStoreDialogContents #ldStoreDialogAccessCell > div.access {
 	font-size: small;
 }
 
-div#ldStoreDialogContents #ldStoreDialogAccessCell > div.selected {
+div#ldStoreDialogContents #ldStoreDialogAccessDiv > div.selected {
 	background-color: #dfeffc;
 }
 

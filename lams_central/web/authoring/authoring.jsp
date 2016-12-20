@@ -478,7 +478,9 @@
 			</tr>
 			<tr>
 				<td id="ldStoreDialogAccessCell" >
-					<div id="ldStoreDialogAccessTitle"><fmt:message key="authoring.fla.page.dialog.access" /></div>
+					<div id="ldStoreDialogAccessDiv">
+						<div id="ldStoreDialogAccessTitle"><fmt:message key="authoring.fla.page.dialog.access" /></div>
+					</div>
 				</td>
 			</tr>
 
