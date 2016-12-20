@@ -10,8 +10,10 @@ import java.util.List;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.xml.parsers.ParserConfigurationException;
 
 import org.apache.log4j.Logger;
+import org.xml.sax.SAXException;
 
 import blackboard.base.BbList;
 import blackboard.base.FormattedText;
@@ -122,9 +124,11 @@ public class BlackboardUtil {
      * @throws ParseException
      * @throws IOException
      * @throws ValidationException
+     * @throws SAXException 
+     * @throws ParserConfigurationException 
      */
     public static String storeBlackboardContent(HttpServletRequest request, HttpServletResponse response, User user)
-	    throws PersistenceException, ParseException, IOException, ValidationException {
+	    throws PersistenceException, ParseException, IOException, ValidationException, ParserConfigurationException, SAXException {
 
 	// Set the new LAMS Lesson Content Object
 	CourseDocument bbContent = new blackboard.data.content.CourseDocument();
@@ -205,14 +209,14 @@ public class BlackboardUtil {
 	String courseIdStr = course.getCourseId();
 
 	// Start the Lesson in LAMS (via Webservices) and capture the lesson ID
-	final long LamsLessonIdLong = LamsSecurityUtil.startLesson(user, courseIdStr, ldId, strTitle, strDescription,
+	final long lamsLessonIdLong = LamsSecurityUtil.startLesson(user, courseIdStr, ldId, strTitle, strDescription,
 		false);
 	// error checking
-	if (LamsLessonIdLong == -1) {
+	if (lamsLessonIdLong == -1) {
 	    response.sendRedirect("lamsServerDown.jsp");
 	    System.exit(1);
 	}
-	String lamsLessonId = Long.toString(LamsLessonIdLong);
+	String lamsLessonId = Long.toString(lamsLessonIdLong);
 	bbContent.setLinkRef(lamsLessonId);
 
 	// Persist the New Lesson Object in Blackboard
@@ -243,7 +247,7 @@ public class BlackboardUtil {
 	// Create new Gradebook column for current lesson
 	if (isGradecenter) {
 	    String userName = user.getUserName();
-	    LineitemUtil.createLineitem(bbContent, strSequenceID, userName);
+	    LineitemUtil.createLineitem(bbContent, userName);
 	}
 
 	// create a new thread to pre-add students and monitors to a lesson (in order to do this task in parallel not to
@@ -253,7 +257,7 @@ public class BlackboardUtil {
 	Thread preaddLearnersMonitorsThread = new Thread(new Runnable() {
 	    @Override
 	    public void run() {
-		LamsSecurityUtil.preaddLearnersMonitorsToLesson(userFinal, courseFinal, LamsLessonIdLong);
+		LamsSecurityUtil.preaddLearnersMonitorsToLesson(userFinal, courseFinal, lamsLessonIdLong);
 	    }
 	}, "LAMS_preaddLearnersMonitors_thread");
 	preaddLearnersMonitorsThread.start();

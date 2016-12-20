@@ -86,7 +86,7 @@
         if (!bbContent.getIsDescribed() && isGradecenter) {
 
     		String username = ctx.getUser().getUserName();
-            LineitemUtil.createLineitem(bbContent, null, username);
+            LineitemUtil.createLineitem(bbContent, username);
             
         //if teacher turned Gradecenter option OFF (and it was ON previously) - remove lineitem
         } else if (bbContent.getIsDescribed() && !isGradecenter) {
