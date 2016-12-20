@@ -30,11 +30,13 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.xml.parsers.ParserConfigurationException;
 
 import org.apache.log4j.Logger;
 import org.lamsfoundation.ld.integration.util.BlackboardUtil;
 import org.lamsfoundation.ld.integration.util.LamsSecurityUtil;
 import org.lamsfoundation.ld.integration.util.LineitemUtil;
+import org.xml.sax.SAXException;
 
 import blackboard.data.ValidationException;
 import blackboard.data.content.Content;
@@ -104,9 +106,11 @@ public class CloneLessonsServlet extends HttpServlet {
      * @throws ValidationException
      * @throws IOException
      * @throws ServletException
+     * @throws SAXException 
+     * @throws ParserConfigurationException 
      */
     public static String recreateLessonsAfterCourseCopy(String courseIdParam)
-	    throws PersistenceException, ValidationException, ServletException, IOException {
+	    throws PersistenceException, ValidationException, ServletException, IOException, ParserConfigurationException, SAXException {
 	String newLessonIds = "";
 
 	ContentDbPersister persister = ContentDbPersister.Default.getInstance();

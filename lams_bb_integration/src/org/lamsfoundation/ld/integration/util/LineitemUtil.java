@@ -24,20 +24,22 @@ package org.lamsfoundation.ld.integration.util;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.List;
 import java.util.Set;
 
 import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletResponse;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
 
-import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
 import org.lamsfoundation.ld.integration.Constants;
+import org.w3c.dom.Document;
+import org.w3c.dom.Node;
+import org.xml.sax.SAXException;
 
 import blackboard.data.ValidationException;
 import blackboard.data.content.Content;
@@ -49,7 +51,6 @@ import blackboard.data.gradebook.impl.OutcomeDefinitionScale;
 import blackboard.persist.BbPersistenceManager;
 import blackboard.persist.Container;
 import blackboard.persist.Id;
-import blackboard.persist.KeyNotFoundException;
 import blackboard.persist.PersistenceException;
 import blackboard.persist.PkId;
 import blackboard.persist.content.ContentDbLoader;
@@ -59,8 +60,6 @@ import blackboard.persist.gradebook.LineitemDbPersister;
 import blackboard.persist.gradebook.ext.OutcomeDefinitionScaleDbLoader;
 import blackboard.persist.gradebook.ext.OutcomeDefinitionScaleDbPersister;
 import blackboard.persist.gradebook.impl.OutcomeDefinitionDbPersister;
-import blackboard.platform.BbServiceManager;
-import blackboard.platform.context.Context;
 import blackboard.platform.persistence.PersistenceServiceFactory;
 import blackboard.portal.data.ExtraInfo;
 import blackboard.portal.data.PortalExtraInfo;
@@ -72,8 +71,8 @@ public class LineitemUtil {
 
     private static Logger logger = Logger.getLogger(LineitemUtil.class);
 
-    public static void createLineitem(Content bbContent, String ldId, String userName)
-	    throws ValidationException, PersistenceException, IOException {
+    public static void createLineitem(Content bbContent, String userName)
+	    throws ValidationException, PersistenceException, IOException, ParserConfigurationException, SAXException {
 	LineitemDbPersister linePersister = LineitemDbPersister.Default.getInstance();
 	OutcomeDefinitionDbPersister outcomeDefinitionPersister = OutcomeDefinitionDbPersister.Default.getInstance();
 	OutcomeDefinitionScaleDbLoader outcomeDefinitionScaleLoader = OutcomeDefinitionScaleDbLoader.Default
@@ -102,7 +101,7 @@ public class LineitemUtil {
 	outcomeDefinition.setCourseId(courseId);
 	outcomeDefinition.setPosition(1);
 
-	boolean hasLessonScoreOutputs = LineitemUtil.hasLessonScoreOutputs(bbContent, ldId, userName);
+	boolean hasLessonScoreOutputs = LineitemUtil.hasLessonScoreOutputs(bbContent, userName);
 	OutcomeDefinitionScale outcomeDefinitionScale;
 	if (hasLessonScoreOutputs) {
 	    outcomeDefinitionScale = outcomeDefinitionScaleLoader.loadByCourseIdAndTitle(courseId,
@@ -133,31 +132,19 @@ public class LineitemUtil {
      * 
      * @throws IOException
      */
-    private static boolean hasLessonScoreOutputs(Content bbContent, String ldId, String username) throws IOException {
+    private static boolean hasLessonScoreOutputs(Content bbContent, String username) throws IOException, ParserConfigurationException, SAXException {
 	
-	//sequence_id parameter is null in case we come from modify_proc or CorrectLineItemServlet/CloneLessonsServlet/ImportLessonsServlet
-	if (ldId == null) {
-	    //get sequence_id from bbcontent URL, set in start_lesson_proc
-	    String bbContentUrl = bbContent.getUrl();
-	    String[] params = bbContentUrl.split("&");
-	    for (String param : params) {
-		String paramName = param.split("=")[0];
-		String paramValue = param.split("=")[1];
+	//at this moment bbContent contains already updated lessonId
+	String lessonId = bbContent.getLinkRef();
 
-		if ("ldid".equals(paramName)) {
-		    ldId = paramValue;
-		    break;
-		}
-	    }
-	}
+	String serviceURL = LamsSecurityUtil.getServerAddress() + "/services/xml/LessonManager?"
+		+ LamsSecurityUtil.generateAuthenticateParameters(username)
+		+ "&method=checkLessonForNumericToolOutputs&lsId=" + lessonId;
 
-	String learningDesignSvgUrl = LamsSecurityUtil.generateRequestLearningDesignImage(username, true) + "&ldId="
-		+ ldId.trim();
-
-	URL url = new URL(learningDesignSvgUrl);
+	URL url = new URL(serviceURL);
 	URLConnection conn = url.openConnection();
 	if (!(conn instanceof HttpURLConnection)) {
-	    throw new RuntimeException("Unable to open connection to: " + learningDesignSvgUrl);
+	    throw new RuntimeException("Unable to open connection to: " + serviceURL);
 	}
 
 	HttpURLConnection httpConn = (HttpURLConnection) conn;
@@ -167,15 +154,17 @@ public class LineitemUtil {
 		    + httpConn.getResponseMessage());
 	}
 
-	// InputStream is = url.openConnection().getInputStream();
 	InputStream is = conn.getInputStream();
 
 	// parse xml response
-	String learningDesignSvg = IOUtils.toString(is, "UTF-8");
-	boolean hasLessonScoreOutputs = (learningDesignSvg.indexOf("icon_mcq.png") != -1)
-		|| (learningDesignSvg.indexOf("icon_assessment.png") != -1);
+	DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+	DocumentBuilder db = dbf.newDocumentBuilder();
+	Document document = db.parse(is);
+	Node lesson = document.getDocumentElement().getFirstChild();
+	boolean hasNumericToolOutput = Boolean
+		.parseBoolean(lesson.getAttributes().getNamedItem("hasNumericToolOutput").getNodeValue());
 
-	return hasLessonScoreOutputs;
+	return hasNumericToolOutput;
     }
 
     /**
@@ -235,9 +224,11 @@ public class LineitemUtil {
      * @throws ServletException
      * @throws ValidationException
      * @throws IOException 
+     * @throws SAXException 
+     * @throws ParserConfigurationException 
      */
     public static void updateLineitemLessonId(Content bbContent, String courseIdStr, Long newLamsLessonId, String userName)
-	    throws PersistenceException, ServletException, ValidationException, IOException {
+	    throws PersistenceException, ServletException, ValidationException, IOException, ParserConfigurationException, SAXException {
 	LineitemDbLoader lineitemLoader = LineitemDbLoader.Default.getInstance();
 	LineitemDbPersister linePersister = LineitemDbPersister.Default.getInstance();
 	
@@ -250,7 +241,7 @@ public class LineitemUtil {
 	    Id lineitemId = getLineitem(_content_id, courseIdStr, false);
 	    //in case admin forgot to check "Grade Center Columns and Settings" option on doing course copy/import
 	    if (lineitemId == null) {
-		createLineitem(bbContent, null, userName);
+		createLineitem(bbContent, userName);
 		
 	    //in case he checked it and BB created Lineitem object, then just need to update it
 	    } else {
