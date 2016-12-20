@@ -82,9 +82,12 @@
 				PRIVATE_NOTIFICATIONS_READ_HINT : '<c:out value="${PRIVATE_NOTIFICATIONS_READ_HINT_VAR}" />',
 				<fmt:message key="label.private.notifications.read.all.hint" var="PRIVATE_NOTIFICATIONS_READ_ALL_HINT_VAR"/>
 				PRIVATE_NOTIFICATIONS_READ_ALL_HINT : '<c:out value="${PRIVATE_NOTIFICATIONS_READ_ALL_HINT_VAR}" />',
-				MY_PROFILE : '<fmt:message key="index.myprofile" />',
-				REMOVE_ORG_FAVORITE : '<fmt:message key="label.remove.org.favorite"/>',
-				MARK_ORG_FAVORITE : '<fmt:message key="label.mark.org.favorite"/>'
+				<fmt:message key="index.myprofile" var="MY_PROFILE_VAR"/>
+				MY_PROFILE : '<c:out value="${MY_PROFILE_VAR}" />',
+				<fmt:message key="label.remove.org.favorite" var="REMOVE_ORG_FAVORITE_VAR"/>
+				REMOVE_ORG_FAVORITE : '<c:out value="${REMOVE_ORG_FAVORITE_VAR}" />',
+				<fmt:message key="label.mark.org.favorite" var="MARK_ORG_FAVORITE_VAR"/>
+				MARK_ORG_FAVORITE : '<c:out value="${MARK_ORG_FAVORITE_VAR}" />'
 			},
 			activeOrgId = <c:choose><c:when test="${empty lastVisitedOrganisationId}">null</c:when><c:otherwise>${lastVisitedOrganisationId}</c:otherwise></c:choose>;
 
