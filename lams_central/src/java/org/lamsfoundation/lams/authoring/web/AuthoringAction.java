@@ -186,8 +186,10 @@ public class AuthoringAction extends LamsDispatchAction {
 	}
 
 	Integer userId = getUserId();
-	getAuthoringService().storeLearningDesignAccess(learningDesignID, userId);
-
+	if (learningDesignDTO.getWorkspaceFolderID() != null) {
+	    getAuthoringService().storeLearningDesignAccess(learningDesignID, userId);
+	}
+	
 	response.setContentType("application/json;charset=utf-8");
 	JSONObject responseJSON = new JSONObject();
 	Gson gson = new GsonBuilder().create();

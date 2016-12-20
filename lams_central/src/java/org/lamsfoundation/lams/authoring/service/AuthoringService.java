@@ -1809,7 +1809,7 @@ public class AuthoringService implements IAuthoringService, BeanFactoryAware {
 		log.warn("When getting recent access list for Author with ID " + userId + " LD with ID "
 			+ access.getLearningDesignId() + " was found missing. Deleting access entry.");
 		baseDAO.delete(access);
-	    } else {
+	    } else if (learningDesign.getWorkspaceFolder() != null) {
 		access.setTitle(learningDesign.getTitle());
 		access.setWorkspaceFolderId(learningDesign.getWorkspaceFolder().getWorkspaceFolderId());
 		result.add(access);
