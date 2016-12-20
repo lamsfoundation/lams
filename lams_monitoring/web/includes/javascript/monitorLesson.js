@@ -30,7 +30,7 @@ var originalSequenceCanvas = null,
 // double tap support
 	tapTimeout = 500,
 	lastTapTime = 0,
-	lastTapTarget = null
+	lastTapTarget = null,
 // popup window size
 	popupWidth = 1280,
 	popupHeight = 720;
