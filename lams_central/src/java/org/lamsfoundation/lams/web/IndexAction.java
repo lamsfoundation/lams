@@ -123,6 +123,18 @@ public class IndexAction extends LamsDispatchAction {
 	    request.setAttribute("lamsCommunityEnabled", reg.isEnableLamsCommunityIntegration());
 	}
 	
+	// only show the growl warning the first time after a user has logged in & if turned on in configuration
+	Boolean tzWarning = Configuration.getAsBoolean(ConfigurationKeys.SHOW_TIMEZONE_WARNING);
+	request.setAttribute("showTimezoneWarning", tzWarning);
+	request.setAttribute("showTimezoneWarningPopup", false);
+	if ( tzWarning ) {
+	    Boolean ssWarningShown = (Boolean) ss.getAttribute("timezoneWarningShown");
+	    if ( ! Boolean.TRUE.equals(ssWarningShown) ) {
+		ss.setAttribute("timezoneWarningShown", Boolean.TRUE);
+		request.setAttribute("showTimezoneWarningPopup", true);
+	    }
+	}
+    	    
 	List<Organisation> favoriteOrganisations = userManagementService.getFavoriteOrganisationsByUser(userDTO.getUserID());
 	request.setAttribute("favoriteOrganisations", favoriteOrganisations);
 	request.setAttribute("activeOrgId", user.getLastVisitedOrganisationId());

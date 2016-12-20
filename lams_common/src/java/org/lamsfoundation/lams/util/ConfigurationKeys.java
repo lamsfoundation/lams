@@ -282,4 +282,7 @@ public class ConfigurationKeys {
     
     public static String LOCK_OUT_TIME = "LockOutTime";
 
+    // LDEV-4144
+    public static String SHOW_TIMEZONE_WARNING = "ShowTimezoneWarning";
+
 }
