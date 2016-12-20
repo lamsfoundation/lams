@@ -61,15 +61,15 @@ div.tabTitle {
 
 
 td#learningDesignTreeCell {
-	padding: 2px 2px 0px 5px;
-	vertical-align: top;
-	width: 35%;
 	border-right: thin dotted #2E6E9E;
 }
 
 div#learningDesignTree {
 	overflow: auto;
 	height: 510px;
+	width: 250px;
+	padding: 2px 2px 0px 5px;
+	vertical-align: top;
 }
 
 .ygtv-highlight1, .ygtv-highlight1 .ygtvlabel {
@@ -236,4 +236,3 @@ span#splitLearnersDescription {
 	border-top: 1px solid #eee;	
 	width: 100%;
 }
-	
