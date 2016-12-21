@@ -27,8 +27,10 @@ import java.util.Date;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.SortedSet;
 import java.util.TimeZone;
+import java.util.TreeMap;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -52,6 +54,7 @@ import org.lamsfoundation.lams.tool.vote.dto.SummarySessionDTO;
 import org.lamsfoundation.lams.tool.vote.dto.VoteGeneralAuthoringDTO;
 import org.lamsfoundation.lams.tool.vote.dto.VoteGeneralLearnerFlowDTO;
 import org.lamsfoundation.lams.tool.vote.dto.VoteGeneralMonitoringDTO;
+import org.lamsfoundation.lams.tool.vote.dto.VoteMonitoredUserDTO;
 import org.lamsfoundation.lams.tool.vote.dto.VoteQuestionDTO;
 import org.lamsfoundation.lams.tool.vote.pojos.VoteContent;
 import org.lamsfoundation.lams.tool.vote.pojos.VoteQueContent;
@@ -59,6 +62,7 @@ import org.lamsfoundation.lams.tool.vote.pojos.VoteUsrAttempt;
 import org.lamsfoundation.lams.tool.vote.service.IVoteService;
 import org.lamsfoundation.lams.tool.vote.service.VoteApplicationException;
 import org.lamsfoundation.lams.tool.vote.service.VoteServiceProxy;
+import org.lamsfoundation.lams.tool.vote.util.VoteComparator;
 import org.lamsfoundation.lams.tool.vote.util.VoteUtils;
 import org.lamsfoundation.lams.tool.vote.web.form.VoteMonitoringForm;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
@@ -101,7 +105,7 @@ public class MonitoringAction extends LamsDispatchAction implements VoteAppConst
 	IVoteService voteService = VoteServiceProxy.getVoteService(getServlet().getServletContext());
 
 	Long currentUid = WebUtil.readLongParam(request, "currentUid");
-	MonitoringAction.logger.info("Current Uid" + currentUid);
+	logger.info("Current Uid" + currentUid);
 
 	VoteUsrAttempt voteUsrAttempt = voteService.getAttemptByUID(currentUid);
 
@@ -133,7 +137,7 @@ public class MonitoringAction extends LamsDispatchAction implements VoteAppConst
 	voteMonitoringForm.setVoteService(voteService);
 
 	VoteGeneralMonitoringDTO voteGeneralMonitoringDTO = new VoteGeneralMonitoringDTO();
-	MonitoringUtil.repopulateRequestParameters(request, voteMonitoringForm, voteGeneralMonitoringDTO);
+	MonitoringAction.repopulateRequestParameters(request, voteMonitoringForm, voteGeneralMonitoringDTO);
 
 	Long questionUid = WebUtil.readLongParam(request, VoteAppConstants.ATTR_QUESTION_UID, false);
 	Long sessionUid = WebUtil.readLongParam(request, VoteAppConstants.ATTR_SESSION_UID, true);
@@ -155,7 +159,7 @@ public class MonitoringAction extends LamsDispatchAction implements VoteAppConst
 	Long sessionUid = WebUtil.readLongParam(request, VoteAppConstants.ATTR_SESSION_UID, true);
 	if (sessionUid == 0L) {
 	    sessionUid = null;
-	    MonitoringAction.logger.info("Setting sessionUid to null");
+	    logger.info("Setting sessionUid to null");
 	}
 
 	Long questionUid = WebUtil.readLongParam(request, VoteAppConstants.ATTR_QUESTION_UID, false);
@@ -256,7 +260,7 @@ public class MonitoringAction extends LamsDispatchAction implements VoteAppConst
 
 	Long sessionUid = WebUtil.readLongParam(request, VoteAppConstants.ATTR_SESSION_UID, true);
 	if (sessionUid == 0L) {
-	    MonitoringAction.logger.info("Setting sessionUid to null");
+	    logger.info("Setting sessionUid to null");
 	    sessionUid = null;
 	}
 
@@ -322,7 +326,7 @@ public class MonitoringAction extends LamsDispatchAction implements VoteAppConst
 	    HttpServletResponse response) throws IOException, ServletException, ToolException {
 	IVoteService VoteService = VoteServiceProxy.getVoteService(getServlet().getServletContext());
 
-	String uid = request.getParameter("uid");
+	//String uid = request.getParameter("uid");
 
 	String userId = request.getParameter("userId");
 
@@ -352,7 +356,7 @@ public class MonitoringAction extends LamsDispatchAction implements VoteAppConst
      * @param request
      * @param response
      * @return
-     * @throws IOException 
+     * @throws IOException
      */
     public ActionForward setSubmissionDeadline(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) throws IOException {
@@ -404,12 +408,12 @@ public class MonitoringAction extends LamsDispatchAction implements VoteAppConst
 
 	/* we have made sure TOOL_CONTENT_ID is passed */
 	String toolContentID = voteMonitoringForm.getToolContentID();
-	MonitoringAction.logger.warn("Make sure ToolContentId is passed" + toolContentID);
+	logger.warn("Make sure ToolContentId is passed" + toolContentID);
 	VoteContent voteContent = voteService.getVoteContent(new Long(toolContentID));
 
 	if (voteContent == null) {
 	    VoteUtils.cleanUpUserExceptions(request);
-	    MonitoringAction.logger.error("Vote Content does not exist");
+	    logger.error("Vote Content does not exist");
 	    voteGeneralMonitoringDTO.setUserExceptionContentDoesNotExist(Boolean.TRUE.toString());
 	    return (mapping.findForward(VoteAppConstants.ERROR_LIST));
 	}
@@ -444,7 +448,8 @@ public class MonitoringAction extends LamsDispatchAction implements VoteAppConst
 	    Date tzSubmissionDeadline = DateUtil.convertToTimeZoneFromDefault(teacherTimeZone, submissionDeadline);
 	    request.setAttribute(VoteAppConstants.ATTR_SUBMISSION_DEADLINE, tzSubmissionDeadline.getTime());
 	    // use the unconverted time, as convertToStringForJSON() does the timezone conversion if needed
-	    request.setAttribute(VoteAppConstants.ATTR_SUBMISSION_DEADLINE_DATESTRING, DateUtil.convertToStringForJSON(submissionDeadline, request.getLocale()));
+	    request.setAttribute(VoteAppConstants.ATTR_SUBMISSION_DEADLINE_DATESTRING,
+		    DateUtil.convertToStringForJSON(submissionDeadline, request.getLocale()));
 	}
 
 	voteMonitoringForm.setCurrentTab("1");
@@ -465,9 +470,9 @@ public class MonitoringAction extends LamsDispatchAction implements VoteAppConst
 	voteMonitoringForm.setHttpSessionID(sessionMap.getSessionID());
 	request.getSession().setAttribute(sessionMap.getSessionID(), sessionMap);
 
-	List listQuestionDTO = new LinkedList();
+	List<VoteQuestionDTO> listQuestionDTO = new LinkedList<VoteQuestionDTO>();
 
-	Iterator queIterator = voteContent.getVoteQueContents().iterator();
+	Iterator<VoteQueContent> queIterator = voteContent.getVoteQueContents().iterator();
 	while (queIterator.hasNext()) {
 	    VoteQuestionDTO voteQuestionDTO = new VoteQuestionDTO();
 
@@ -487,7 +492,7 @@ public class MonitoringAction extends LamsDispatchAction implements VoteAppConst
 	voteGeneralAuthoringDTO.setActivityTitle(voteGeneralMonitoringDTO.getActivityTitle());
 	voteGeneralAuthoringDTO.setActivityInstructions(voteGeneralMonitoringDTO.getActivityInstructions());
 
-	MonitoringUtil.repopulateRequestParameters(request, voteMonitoringForm, voteGeneralMonitoringDTO);
+	MonitoringAction.repopulateRequestParameters(request, voteMonitoringForm, voteGeneralMonitoringDTO);
 
 	boolean isGroupedActivity = voteService.isGroupedActivity(new Long(toolContentID));
 	request.setAttribute("isGroupedActivity", isGroupedActivity);
@@ -508,11 +513,42 @@ public class MonitoringAction extends LamsDispatchAction implements VoteAppConst
 	    try {
 		voteMonitoringForm.setToolContentID(strToolContentId);
 	    } catch (NumberFormatException e) {
-		MonitoringAction.logger.error("Number Format Exception");
+		logger.error("Number Format Exception");
 		VoteUtils.cleanUpUserExceptions(request);
 		return (mapping.findForward(VoteAppConstants.ERROR_LIST));
 	    }
 	}
 	return null;
+    }
+
+    public static Map<String, VoteMonitoredUserDTO> convertToVoteMonitoredUserDTOMap(List<VoteMonitoredUserDTO> list) {
+	Map<String, VoteMonitoredUserDTO> map = new TreeMap<String, VoteMonitoredUserDTO>(new VoteComparator());
+
+	Iterator<VoteMonitoredUserDTO> listIterator = list.iterator();
+	Long mapIndex = new Long(1);
+
+	while (listIterator.hasNext()) {
+	    ;
+	    VoteMonitoredUserDTO data = listIterator.next();
+
+	    map.put(mapIndex.toString(), data);
+	    mapIndex = new Long(mapIndex.longValue() + 1);
+	}
+	return map;
+    }
+
+    public static void repopulateRequestParameters(HttpServletRequest request, VoteMonitoringForm voteMonitoringForm,
+	    VoteGeneralMonitoringDTO voteGeneralMonitoringDTO) {
+
+	String toolContentID = request.getParameter(VoteAppConstants.TOOL_CONTENT_ID);
+	voteMonitoringForm.setToolContentID(toolContentID);
+	voteGeneralMonitoringDTO.setToolContentID(toolContentID);
+
+	String responseId = request.getParameter(VoteAppConstants.RESPONSE_ID);
+	voteMonitoringForm.setResponseId(responseId);
+	voteGeneralMonitoringDTO.setResponseId(responseId);
+
+	String currentUid = request.getParameter(VoteAppConstants.CURRENT_UID);
+	voteMonitoringForm.setCurrentUid(currentUid);
     }
 }
