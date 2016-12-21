@@ -38,7 +38,7 @@ import javax.xml.parsers.ParserConfigurationException;
 import org.apache.log4j.Logger;
 import org.lamsfoundation.ld.integration.Constants;
 import org.w3c.dom.Document;
-import org.w3c.dom.Node;
+import org.w3c.dom.Element;
 import org.xml.sax.SAXException;
 
 import blackboard.data.ValidationException;
@@ -160,7 +160,7 @@ public class LineitemUtil {
 	DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
 	DocumentBuilder db = dbf.newDocumentBuilder();
 	Document document = db.parse(is);
-	Node lesson = document.getDocumentElement().getFirstChild();
+	Element lesson = document.getDocumentElement();
 	boolean hasNumericToolOutput = Boolean
 		.parseBoolean(lesson.getAttributes().getNamedItem("hasNumericToolOutput").getNodeValue());
 
