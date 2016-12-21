@@ -130,6 +130,8 @@ public class BlackboardUtil {
     public static String storeBlackboardContent(HttpServletRequest request, HttpServletResponse response, User user)
 	    throws PersistenceException, ParseException, IOException, ValidationException, ParserConfigurationException, SAXException {
 
+	ContentDbLoader contentLoader = ContentDbLoader.Default.getInstance();
+	
 	// Set the new LAMS Lesson Content Object
 	CourseDocument bbContent = new blackboard.data.content.CourseDocument();
 	// Retrieve the Db persistence manager from the persistence service
@@ -200,9 +202,11 @@ public class BlackboardUtil {
 	bbContent.setRenderType(Content.RenderType.URL);
 	bbContent.setBody(description);
 
-	// LDEV-3510 LAMS Lessons were always at the top and could not be moved.
-	//bbContent.setPosition(0);
-
+	// assign LAMS lesson the last position number so it appears at the bottom of the list
+	BbList<Content> contents = contentLoader.loadListById(folderId);
+	int countContentsInsideFolder = contents.size();
+	bbContent.setPosition(countContentsInsideFolder);
+	
 	//get course's courseId string that we need to provide LAMS with 
 	CourseDbLoader courseLoader = CourseDbLoader.Default.getInstance();
 	Course course = courseLoader.loadById(courseId);
