@@ -41,6 +41,10 @@ import org.lamsfoundation.lams.tool.vote.VoteAppConstants;
  * @author Ozgur Demirtas
  */
 public class VoteLearningForm extends ActionForm implements VoteAppConstants {
+    /**
+     *
+     */
+    private static final long serialVersionUID = -7165633875677826696L;
     protected String optionCheckBoxSelected;
     protected String questionIndex;
     protected String optionIndex;
@@ -93,7 +97,7 @@ public class VoteLearningForm extends ActionForm implements VoteAppConstants {
     protected String minNominationCountReached;
     protected int castVoteCount;
 
-    protected Map mapGeneralCheckedOptionsContent;
+    protected Map<String, String> mapGeneralCheckedOptionsContent;
 
     protected String entryText;
     protected String userID;
@@ -781,7 +785,7 @@ public class VoteLearningForm extends ActionForm implements VoteAppConstants {
     /**
      * @return Returns the mapGeneralCheckedOptionsContent.
      */
-    public Map getMapGeneralCheckedOptionsContent() {
+    public Map<String, String> getMapGeneralCheckedOptionsContent() {
 	return mapGeneralCheckedOptionsContent;
     }
 
@@ -789,7 +793,7 @@ public class VoteLearningForm extends ActionForm implements VoteAppConstants {
      * @param mapGeneralCheckedOptionsContent
      *            The mapGeneralCheckedOptionsContent to set.
      */
-    public void setMapGeneralCheckedOptionsContent(Map mapGeneralCheckedOptionsContent) {
+    public void setMapGeneralCheckedOptionsContent(Map<String, String> mapGeneralCheckedOptionsContent) {
 	this.mapGeneralCheckedOptionsContent = mapGeneralCheckedOptionsContent;
     }
 
