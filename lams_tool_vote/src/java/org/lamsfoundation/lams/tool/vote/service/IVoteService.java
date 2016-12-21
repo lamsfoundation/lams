@@ -66,9 +66,9 @@ public interface IVoteService {
     MessageService getMessageService();
 
     /**
-     * 
+     *
      * /**
-     * 
+     *
      * @param user
      * @param toolSessionId
      * @return
@@ -155,7 +155,7 @@ public interface IVoteService {
     /**
      * creates a new vote record in the database
      */
-    void createAttempt(VoteQueUsr voteQueUsr, Map mapGeneralCheckedOptionsContent, String userEntry,
+    void createAttempt(VoteQueUsr voteQueUsr, Map<String, String> mapGeneralCheckedOptionsContent, String userEntry,
 	    VoteSession voteSession, Long voteContentUid);
 
     VoteQueContent getQuestionByUid(Long uid);
@@ -219,19 +219,19 @@ public interface IVoteService {
 
     ToolSessionExportOutputData exportToolSession(Long toolSessionId) throws DataMissingException, ToolException;
 
-    ToolSessionExportOutputData exportToolSession(List toolSessionIds) throws DataMissingException, ToolException;
+    ToolSessionExportOutputData exportToolSession(List<Long> toolSessionIds) throws DataMissingException, ToolException;
 
     IToolVO getToolBySignature(String toolSignature);
 
     long getToolDefaultContentIdBySignature(String toolSignature);
 
-    List getToolSessionsForContent(VoteContent vote);
+    List<Long> getToolSessionsForContent(VoteContent vote);
 
-    List getAttemptsForUser(final Long userUid);
+    List<VoteUsrAttempt> getAttemptsForUser(final Long userUid);
 
     int countSessionComplete();
 
-    List getAllQuestionsSorted(final long voteContentId);
+    List<VoteQueContent> getAllQuestionsSorted(final long voteContentId);
 
     List<Long> getSessionsFromContent(VoteContent mcContent);
 
