@@ -66,9 +66,9 @@ public class VoteOutputFactory extends OutputFactory {
 	    VoteContent content = (VoteContent) toolContentObject;
 
 	    if (content.getMaxNominationCount() != null && !content.getMaxNominationCount().equals("1")) {
-		VoteOutputFactory.logger
-			.error("Unable to build output definitions for Voting if the user can have more than one nomination. Vote "
-				+ content);
+		logger.error(
+			"Unable to build output definitions for Voting if the user can have more than one nomination. Vote "
+				+ content.getUid());
 	    } else {
 
 		ToolOutputDefinition definition = buildBooleanSetOutputDefinition(
@@ -89,7 +89,7 @@ public class VoteOutputFactory extends OutputFactory {
 			    trueString));
 		}
 
-		Iterator iter = content.getVoteQueContents().iterator();
+		Iterator<VoteQueContent> iter = content.getVoteQueContents().iterator();
 		while (iter.hasNext()) {
 		    VoteQueContent nomination = (VoteQueContent) iter.next();
 		    int displayOrder = nomination.getDisplayOrder();
@@ -103,8 +103,8 @@ public class VoteOutputFactory extends OutputFactory {
 		definitionMap.put(VoteOutputFactory.OUTPUT_NAME_NOMINATION_SELECTION, definition);
 	    }
 	} else {
-	    VoteOutputFactory.logger
-		    .error("Unable to build output definitions for Vote as no tool content object supplied.");
+
+	    logger.error("Unable to build output definitions for Vote as no tool content object supplied.");
 	}
 
 	return definitionMap;
@@ -147,8 +147,8 @@ public class VoteOutputFactory extends OutputFactory {
 
 	String[] dcNames = splitConditionName(name);
 	if (dcNames[1] == null || dcNames[1].length() == 0) {
-	    VoteOutputFactory.logger.error("Unable to convert the display order to an int for tool output "
-		    + VoteOutputFactory.OUTPUT_NAME_NOMINATION_SELECTION
+	    logger.error("Unable to convert the display order to an int for tool output "
+		    + VoteOutputFactory.OUTPUT_NAME_NOMINATION_SELECTION + " "
 		    + ". Returning false. Name doesn't contain the display order. Condition name was: " + name);
 	    return false;
 	}
@@ -157,28 +157,29 @@ public class VoteOutputFactory extends OutputFactory {
 	try {
 	    displayOrder = new Integer(dcNames[1]).intValue();
 	} catch (NumberFormatException e) {
-	    VoteOutputFactory.logger.error("Unable to convert the display order to an int for tool output "
-		    + VoteOutputFactory.OUTPUT_NAME_NOMINATION_SELECTION
+	    logger.error("Unable to convert the display order to an int for tool output "
+		    + VoteOutputFactory.OUTPUT_NAME_NOMINATION_SELECTION + " "
 		    + ". Returning false. Number format exception thrown. Condition name was: " + name, e);
 	    return false;
 	}
 
 	if (queUser != null) {
-	    Set voteAttempts = queUser.getVoteUsrAttempts();
+	    Set<VoteUsrAttempt> voteAttempts = queUser.getVoteUsrAttempts();
 	    if (voteAttempts.size() > 0) {
 		if (voteAttempts.size() > 1) {
-		    VoteOutputFactory.logger
-			    .error("Attempting to match on nomination, but more than one nomination selected for this user. Will try to match on the given display order. User "
+
+		    logger.error(
+			    "Attempting to match on nomination, but more than one nomination selected for this user. Will try to match on the given display order. User "
 				    + queUser);
 		}
 
-		Iterator iter = voteAttempts.iterator();
+		Iterator<VoteUsrAttempt> iter = voteAttempts.iterator();
 		while (iter.hasNext()) {
 		    VoteUsrAttempt attempt = (VoteUsrAttempt) iter.next();
 		    Long questionUid = attempt.getVoteQueContent().getUid();
 		    if (questionUid.longValue() == 1 && displayOrder == VoteOutputFactory.FREE_TEXT_NOM_SELECTION) {
 			// VoteQueContentId == 1 indicates that it is a free text entry
-			VoteOutputFactory.logger.info("VoteQueContentId == 1 indicates that it is a free entry text");
+			logger.info("VoteQueContentId == 1 indicates that it is a free entry text");
 			return true;
 		    } else {
 			VoteQueContent nomination = attempt.getVoteQueContent();
@@ -199,7 +200,7 @@ public class VoteOutputFactory extends OutputFactory {
     private TreeMap<String, ToolOutput> createAllDisplayOrderOutputs(IVoteService voteService, Long toolSessionId,
 	    Long learnerId) {
 
-	TreeMap<String, ToolOutput> output = null;
+	TreeMap<String, ToolOutput> output = new TreeMap<String, ToolOutput>();
 
 	VoteSession session = voteService.getSessionBySessionId(toolSessionId);
 	VoteContent content = session.getVoteContent();
@@ -210,8 +211,8 @@ public class VoteOutputFactory extends OutputFactory {
 	if (content.isAllowText()) {
 	    boolean found = false;
 	    if (queUser != null) {
-		Set voteAttempts = queUser.getVoteUsrAttempts();
-		Iterator iter = voteAttempts.iterator();
+		Set<VoteUsrAttempt> voteAttempts = queUser.getVoteUsrAttempts();
+		Iterator<VoteUsrAttempt> iter = voteAttempts.iterator();
 		while (iter.hasNext() && !found) {
 		    VoteUsrAttempt attempt = (VoteUsrAttempt) iter.next();
 		    Long questionUid = attempt.getVoteQueContent().getUid();
@@ -223,7 +224,7 @@ public class VoteOutputFactory extends OutputFactory {
 	    output.put(name, new ToolOutput(name, i18nDescription, found));
 	}
 
-	Iterator contentIter = content.getVoteQueContents().iterator();
+	Iterator<VoteQueContent> contentIter = content.getVoteQueContents().iterator();
 	while (contentIter.hasNext()) {
 	    VoteQueContent nomination = (VoteQueContent) contentIter.next();
 	    int displayOrder = nomination.getDisplayOrder();
@@ -231,8 +232,8 @@ public class VoteOutputFactory extends OutputFactory {
 		    new Integer(displayOrder).toString());
 	    boolean found = false;
 	    if (queUser != null) {
-		Set voteAttempts = queUser.getVoteUsrAttempts();
-		Iterator iter = voteAttempts.iterator();
+		Set<VoteUsrAttempt> voteAttempts = queUser.getVoteUsrAttempts();
+		Iterator<VoteUsrAttempt> iter = voteAttempts.iterator();
 		while (iter.hasNext() && !found) {
 		    VoteUsrAttempt attempt = (VoteUsrAttempt) iter.next();
 		    found = attempt.getVoteQueContent().getDisplayOrder() == displayOrder;
@@ -244,6 +245,7 @@ public class VoteOutputFactory extends OutputFactory {
 	return output;
     }
 
+    @SuppressWarnings("rawtypes")
     @Override
     public Class[] getSupportedDefinitionClasses(int definitionType) {
 	if (ToolOutputDefinition.DATA_OUTPUT_DEFINITION_TYPE_DATA_FLOW == definitionType) {

@@ -33,6 +33,11 @@ import org.lamsfoundation.lams.tool.vote.VoteAppConstants;
 public class VoteMonitoringForm extends VoteAuthoringForm implements VoteAppConstants {
     // controls which method is called by the Lookup map */
 
+    /**
+     *
+     */
+    private static final long serialVersionUID = 2343930982864832471L;
+
     protected String method;
 
     protected String sessionUserCount;
