@@ -842,7 +842,18 @@ public class ForumService implements IForumService, ToolContentManager, ToolSess
 	}
 
 	Forum toContent = Forum.newInstance(fromContent, toContentId);
-
+	
+	// remove session Messages from topics
+	for (ForumCondition condition : toContent.getConditions()) {
+	    Iterator<Message> conditionMessageIter = condition.getTopics().iterator();
+	    while (conditionMessageIter.hasNext()) {
+		Message conditionMessage = conditionMessageIter.next();
+		if (conditionMessage.getToolSession() != null) {
+		    conditionMessageIter.remove();
+		}
+	    }
+	}
+	
 	// save topics in this forum, only save the author created topic!!! and reset its reply number to zero.
 	Set topics = toContent.getMessages();
 	if (topics != null) {
