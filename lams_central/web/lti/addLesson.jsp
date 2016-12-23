@@ -157,7 +157,7 @@
 					success : function() {
 						// open preview pop up window
 						window.open(LAMS_URL + 'home.do?method=learner&mode=preview&lessonID='+lessonID,'Preview',
-									'width=920,height=700,resizable,status=yes');
+									'width=920,height=700,resizable,scrollbars=yes,status=yes');
 					}
 				});
 
