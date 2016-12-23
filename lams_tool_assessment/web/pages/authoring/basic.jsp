@@ -162,7 +162,7 @@
     <label for="assessment.title">
     	<fmt:message key="label.authoring.basic.title"/>
     </label>
-    <html:text property="assessment.title" styleClass="form-control"/>
+    <html:text property="assessment.title" styleClass="form-control" maxlength="255"/>
 </div>
 
 <div class="form-group">
