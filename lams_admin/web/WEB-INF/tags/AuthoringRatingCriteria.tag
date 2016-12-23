@@ -340,7 +340,7 @@ $(document).ready(function() {
 						<fmt:param> </fmt:param>
 					</fmt:message>
 				</label>
-				<input type="text" name="commentsMinWordsLimit" id="comments-min-words-limit" value="${commentsMinWordsLimit}"/>
+				<input type="number" name="commentsMinWordsLimit" id="comments-min-words-limit" value="${commentsMinWordsLimit}"/>
 			</div>
 		</div>
 	</div>
