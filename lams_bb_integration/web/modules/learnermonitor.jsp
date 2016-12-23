@@ -153,8 +153,7 @@
  	String learningDesignImageUrl = "";
  	if (isDisplayDesignImage) {
  	    String username = ctx.getUser().getUserName();
- 	    learningDesignImageUrl = LamsSecurityUtil.generateRequestLearningDesignImage(username, false) + "&lsId="
- 		    + lessonId;
+ 	    learningDesignImageUrl = LamsSecurityUtil.generateRequestLearningDesignImage(username) + "&lsId=" + lessonId;
  	}
 
  	//check whether user has score for this lesson

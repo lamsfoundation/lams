@@ -81,7 +81,7 @@ public class RenderDesignImageServlet extends HttpServlet {
 	    ctx = ctxMgr.setContext(request);
 
 	    String username = ctx.getUser().getUserName();
-	    String learningDesignImageUrl = LamsSecurityUtil.generateRequestLearningDesignImage(username, false) + "&ldId=" + learningDesignId;
+	    String learningDesignImageUrl = LamsSecurityUtil.generateRequestLearningDesignImage(username) + "&ldId=" + learningDesignId;
 	    response.sendRedirect(learningDesignImageUrl);
 	    
 	} catch (InitializationException e) {
