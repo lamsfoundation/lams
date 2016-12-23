@@ -181,15 +181,13 @@ public class LamsSecurityUtil {
      * @return a url pointing to the LAMS lesson, monitor, author session
      * @throws UnsupportedEncodingException 
      */
-    public static String generateRequestLearningDesignImage(String username, boolean isSvgImage) throws UnsupportedEncodingException {
+    public static String generateRequestLearningDesignImage(String username) throws UnsupportedEncodingException {
 	String serverAddr = getServerAddress();
-	int svgFormat = (isSvgImage) ? 1 : 2;
 	
         //$request = "$CFG->lamslesson_serverurl/services/LearningDesignSVG?serverId=" . $CFG->lamslesson_serverid . "&datetime=" . $datetime_encoded . "&hashValue=" . 
         //$hashvalue . "&username=" . $username  . "&courseId=" . $courseid . "&courseName=" . urlencode($coursename) . "&mode=2&country=" . $country . "&lang=" . $lang . 
-        //"&ldId=" . $ldid . "&svgFormat=" . $format;
-	String url = serverAddr + "/services/LearningDesignSVG?" + generateAuthenticateParameters(username)
-		+ "&svgFormat=" + svgFormat;
+        //"&ldId=" . $ldid;
+	String url = serverAddr + "/services/LearningDesignSVG?" + generateAuthenticateParameters(username);
 
 	logger.info("LAMS Req: " + url);
 
