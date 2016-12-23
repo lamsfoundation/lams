@@ -243,6 +243,8 @@ function showDialog(id, initParams, extraButtons, recreate) {
 	            if (draggable) {
 	            	modalDialog.draggable('disable');
 	            }
+	            //enable scrolling of the parent's content
+	            dialog.parent().removeClass("modal-open");		        	
 	        };
 	    });
 	    
@@ -270,6 +272,8 @@ function restoreMinimisedDialog(dialog) {
     	var modalDialog = $('.modal-dialog', dialog);
     	modalDialog.draggable('enable');
     }
+    //disable scrolling of the parent's content
+    dialog.parent().addClass("modal-open");
 }
 
 /**
