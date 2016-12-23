@@ -1457,9 +1457,8 @@ GeneralLib = {
 											activityData.toolContentID,
 											activityData.toolID,
 											activityData.learningLibraryID,
-											LAMS_URL + activityData.authoringURL
-													 + '?toolContentID='   + activityData.toolContentID
-													 + '&contentFolderID=' + layout.ld.contentFolderID,
+											LAMS_URL + activityData.authoringURL+ (activityData.authoringURL.includes('?') ? '&' : '?') + 'toolContentID='   + activityData.toolContentID
+											+ '&contentFolderID=' + layout.ld.contentFolderID,
 											activityData.xCoord ? activityData.xCoord : 1,
 											activityData.yCoord ? activityData.yCoord : 1,
 											activityData.activityTitle,
