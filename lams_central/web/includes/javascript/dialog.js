@@ -27,13 +27,22 @@ var dialogTemplate = $('<div class="modal fade dialogContainer" tabindex="-1" ro
  */
 function showDialog(id, initParams, extraButtons, recreate) {
 	var dialog = $('#' + id);
-	// is it open  already?
+	// is it opened already?
 	if (dialog.length > 0) {
 		if (recreate){
 			dialog.modal('hide');
+			
+		//try to open already existing dialog
 		} else {
-			// we do not support multiple opened bootstrap dialogs yet
-			// dialog.dialog('moveToTop');
+			//restore minimised dialog
+			if (dialog.hasClass('dialogMin')) {
+				restoreMinimisedDialog(dialog);
+			
+			} else {
+				// we do not support multiple opened bootstrap dialogs yet
+				// dialog.dialog('moveToTop');
+			}
+			
 			return;
 		}
 	}
@@ -79,13 +88,16 @@ function showDialog(id, initParams, extraButtons, recreate) {
 	if (initParams.resizable) {
 		modalContent.resizable();
 	}
-	// breaks the close buttons on Android and iPhone
+	
+	// disable draggable for Android and iPhone as it breaks the close buttons
 	var draggable = initParams.draggable && ! /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
 	if (draggable) {
 		modalDialog.draggable({
 			'cancel' : '.modal-body'
 		});
 	}
+	dialog.data("isDraggable", draggable);
+	
 	// store extra attributes for dialog content internal use
 	if (initParams.data) {
 		dialog.data(initParams.data);
@@ -213,20 +225,11 @@ function showDialog(id, initParams, extraButtons, recreate) {
 		});
 		
 	    $('.dialogMinimise', dialog).click(function() {
-	    	// swap icon
-            $('i', this).toggleClass('fa-minus').toggleClass('fa-clone');
 	        if (dialog.hasClass('dialogMin')) {
-	        	shiftMinimisedDialogs(dialog);
-	        	// restore old left position
-	        	dialog.css('left', dialog.data('oldLeft'));
-	        	dialog.removeClass('dialogMin');
-	            dialog.siblings('.modal-backdrop').show();
-	            $('.dialogMaximise', dialog).show();
-	            $('.ui-resizable-handle', dialog).show();
-	            if (draggable) {
-	            	modalDialog.draggable('enable');
-	            }
+	        	restoreMinimisedDialog(dialog);
 	        } else {
+		    	// swap icon
+	            $('.dialogMinimise i', dialog).toggleClass('fa-minus').toggleClass('fa-clone');
 	        	// store current left position
 	            dialog.data('oldLeft', dialog.css('left'));
 	        	dialog.css('left', $('.dialogMin').length * 260 + 5 + 'px');
@@ -236,7 +239,7 @@ function showDialog(id, initParams, extraButtons, recreate) {
 	            // disable maximising 
 	        	$('.dialogMaximise', dialog).hide();
 	        	// disable rezising
-		        $('.ui-resizable-handle', dialog).hide();
+	            $('.ui-resizable-handle', dialog).hide();
 	            if (draggable) {
 	            	modalDialog.draggable('disable');
 	            }
@@ -251,6 +254,22 @@ function showDialog(id, initParams, extraButtons, recreate) {
 	}
 	
 	return dialog;
+}
+
+function restoreMinimisedDialog(dialog) {
+	// swap icon
+    $('.dialogMinimise i', dialog).toggleClass('fa-minus').toggleClass('fa-clone');
+	shiftMinimisedDialogs(dialog);
+	// restore old left position
+	dialog.css('left', dialog.data('oldLeft'));
+	dialog.removeClass('dialogMin');
+    dialog.siblings('.modal-backdrop').show();
+    $('.dialogMaximise', dialog).show();
+    $('.ui-resizable-handle', dialog).show();
+    if (dialog.data("isDraggable")) {
+    	var modalDialog = $('.modal-dialog', dialog);
+    	modalDialog.draggable('enable');
+    }
 }
 
 /**
