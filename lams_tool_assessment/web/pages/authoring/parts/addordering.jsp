@@ -120,7 +120,7 @@
 				    	<fmt:message key="label.authoring.basic.question.name"/>
 				    	<i class="fa fa-xs fa-asterisk text-danger pull-right" title="<fmt:message key="label.required.field"/>" alt="<fmt:message key="label.required.field"/>"></i>
 				    </label>
-				    <html:text property="title" styleId="title" styleClass="form-control" tabindex="1"/>
+				    <html:text property="title" maxlength="255" styleId="title" styleClass="form-control" tabindex="1"/>
 				</div>
 			
 				<div class="form-group">
