@@ -519,7 +519,7 @@ var MenuLib = {
 					success : function() {
 						// open preview pop up window
 						window.open(LAMS_URL + 'home.do?method=learner&mode=preview&lessonID='+lessonID,'Preview',
-									'width=1280,height=720,resizable,status=yes');
+									'width=1280,height=720,resizable,scrollbars=yes,status=yes');
 						previewButton.button('reset');
 					}
 				});
