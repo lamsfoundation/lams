@@ -181,7 +181,7 @@
 							
 							if ( showControlBar == 1  ) {
 								allowRestart = result.allowRestart;
-								$('.lessonName').html(result.title);
+								$('.lessonName').html(result.title.replace(/_/g, " "));
 								fillProgressBar('learnerMainBar');
 								$('#navcontent').addClass('navcontent');
 							} else if ( showControlBar == 2 ) {
