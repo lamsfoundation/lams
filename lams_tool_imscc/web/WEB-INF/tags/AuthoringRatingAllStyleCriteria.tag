@@ -101,6 +101,9 @@
 <c:if test="${empty styleHedging}">
 	<c:set var="styleHedging" value="label.rating.style.hedging" scope="request"/>
 </c:if>
+<c:if test="${empty styleComment}">
+	<c:set var="styleComment" value="label.rating.style.comment" scope="request"/>
+</c:if>
 
 
 <script type="text/javascript">
@@ -115,11 +118,9 @@
 			<c:if test="${criteria.orderId > maxOrderId}">
 				<c:set var="maxOrderId" value="${criteria.orderId}"/>
 			</c:if>
-			<c:if test="${criteria.ratingStyle > 0}">
-				<c:set var="escapedTitle"><c:out value="${criteria.title}" escapeXml="true"/></c:set>
-	 			addRow('${criteria.orderId}', '${criteria.ratingStyle}', '${escapedTitle}', '${criteria.maxRating}', 
-	 					${criteria.commentsEnabled}, '${criteria.commentsMinWordsLimit}', '${criteria.minimumRates}', '${criteria.maximumRates}' );
-	 		</c:if>
+			<c:set var="escapedTitle"><c:out value="${criteria.title}" escapeXml="true"/></c:set>
+ 			addRow('${criteria.orderId}', '${criteria.ratingStyle}', '${escapedTitle}', '${criteria.maxRating}', 
+ 					${criteria.commentsEnabled}, '${criteria.commentsMinWordsLimit}', '${criteria.minimumRates}', '${criteria.maximumRates}' );
 		</c:forEach>
 		maxOrderId = ${maxOrderId};
 		if ( maxOrderId == 0 ) {
@@ -192,7 +193,7 @@
 		var style = styleDropDown.options[styleDropDown.selectedIndex].value;
 		maxOrderId++;
 		$("#criteria-max-order-id").val(maxOrderId);
-		addRow(maxOrderId, style, '', '', false, 0, 0, 0);
+		addRow(maxOrderId, style, '', '', false, 1, 0, 0);
 		reactivateArrows();
 	}
 	
@@ -211,7 +212,17 @@
 		str += '</select>';
 		return str;
 	}
-	
+
+	function generateManadatorySpinner(orderId, spinnerLabel, commentMinWordsLimitData) {
+		var enableCommentsId = 'enableComments' + orderId;
+		var spinnerId = 'commentsMinWordsLimit' + orderId;
+		var spinnerlabelId = 'commentsMinWordsLimitLabel' + orderId;
+		return '<div class="form-group loffset10 voffset5" id="commentsMinWordsLimitDiv'+orderId
+			+ '"><input type="text" name="' + spinnerId + '" id="' + spinnerId +'" value="'+commentMinWordsLimitData+'" size="4"/>'
+			+ '<label for="'+spinnerId+'" id="'+spinnerlabelId+'"'
+			+ '>&nbsp;' + spinnerLabel + '</label></div>';
+	}
+
 	function generateSpinner(orderId, justifyOrComment, enableCommentsLabel, spinnerLabel, commentMinWordsLimitData) {
 		var enableCommentsId = 'enableComments' + orderId;
 		var spinnerId = 'commentsMinWordsLimit' + orderId;
@@ -252,15 +263,30 @@
 		  + '<input type="hidden" name="ratingStyle' + orderId + '" value="' + style + '">' 
 		  + '<input type="hidden" name="criteriaOrderId' + orderId + '" value="' + orderId + '">';
 
-		if ( style == 1 ) {
+		if ( style == 0 ) {
 			var ratingLimitsStr = '';
-				if ( '${hasRatingLimits}' == 'true' ) {
+			if ( '${hasRatingLimits}' == 'true' ) {
 				ratingLimitsStr = '<div class="voffset5"><label for="minimumRates"><fmt:message key="${minimumLabel}" /></label>&nbsp;'
-					+ generateSelect('minimumRates' + orderId, 'true', '<fmt:message key="${noMinimumLabel}"/>', orderId, minimumRates)
-		  			+ '<label for="maximumRates" class="loffset10"><fmt:message key="${maximumLabel}" /></label>&nbsp;'
-					+ generateSelect('maximumRates' + orderId, 'false', '<fmt:message key="${noMaximumLabel}"/>', orderId, maximumRates)
-					+ '<BR/>'
-				 	+ generateSpinner(orderId, justifyOrComment, '<fmt:message key="${allowCommentsLabel}" />', '<fmt:message key="${minNumberWordsLabel}"><fmt:param> </fmt:param></fmt:message>', commentMinWordsLimit);
+				+ generateSelect('minimumRates' + orderId, 'true', '<fmt:message key="${noMinimumLabel}"/>', orderId, minimumRates)
+	  			+ '<label for="maximumRates" class="loffset10"><fmt:message key="${maximumLabel}" /></label>&nbsp;'
+				+ generateSelect('maximumRates' + orderId, 'false', '<fmt:message key="${noMaximumLabel}"/>', orderId, maximumRates)
+				+ '<BR/>'
+			 	+ generateManadatorySpinner(orderId, '<fmt:message key="${minNumberWordsLabel}"><fmt:param> </fmt:param></fmt:message>', commentMinWordsLimit);
+			}
+			row.append(jQuery('<td/>', {
+				'class': 'criteria-info',
+			    html: '<div class="voffset5"><fmt:message key="${styleComment}" />:&nbsp;</div>'+inputField+ratingLimitsStr
+			})); 
+	
+		} else if ( style == 1 ) {
+			var ratingLimitsStr = '';
+			if ( '${hasRatingLimits}' == 'true' ) {
+				ratingLimitsStr = '<div class="voffset5"><label for="minimumRates"><fmt:message key="${minimumLabel}" /></label>&nbsp;'
+				+ generateSelect('minimumRates' + orderId, 'true', '<fmt:message key="${noMinimumLabel}"/>', orderId, minimumRates)
+	  			+ '<label for="maximumRates" class="loffset10"><fmt:message key="${maximumLabel}" /></label>&nbsp;'
+				+ generateSelect('maximumRates' + orderId, 'false', '<fmt:message key="${noMaximumLabel}"/>', orderId, maximumRates)
+				+ '<BR/>'
+			 	+ generateSpinner(orderId, justifyOrComment, '<fmt:message key="${allowCommentsLabel}" />', '<fmt:message key="${minNumberWordsLabel}"><fmt:param> </fmt:param></fmt:message>', commentMinWordsLimit);
 			}
 			row.append(jQuery('<td/>', {
 				'class': 'criteria-info',
@@ -297,7 +323,9 @@
 		})).appendTo('#criterias-table');	
 		
 		// cannot activate the spinners until after the fields have been created by the appendTo above.
-		if ( style == 1 ) {
+		if ( style == 0 ) {
+			activateSpinner(orderId, true);
+		} else if ( style == 1) {
 			activateSpinner(orderId, justifyOrComment);
 		} else if ( style == 3 ) {
 			activateSpinner(orderId, justifyOrComment);
@@ -380,6 +408,7 @@
 				<option selected="selected" value="1"><fmt:message key="${styleStar}" /></option>
 				<option value="2"><fmt:message key="${styleRanking}" /></option>
 				<option value="3"><fmt:message key="${styleHedging}" /></option>
+				<option value="0"><fmt:message key="${styleComment}" /></option>
 			</select>
 
 			<a href="#nogo" class="btn btn-default btn-sm loffset10" id="add-criteria">
