@@ -23,7 +23,7 @@ $(document).ready(function(){
 });
 
 //initialize jRating and post comment button. Note: we need the quotes around undefined for the typeof !
-function initializeJRating() {
+function initializeJRating(allowReRate) {
 
 	var maxRatingsForItem;
 	if ( typeof MAX_RATINGS_FOR_ITEM === "undefined" || MAX_RATINGS_FOR_ITEM === undefined )
@@ -37,10 +37,19 @@ function initializeJRating() {
 	else 
 		ratingLimitsByCriteria = LIMIT_BY_CRITERIA;
 
+	var nbRates = 0;
+	var canRateAgain = false; 
+	if ( allowReRate ) {
+		nbRates = 100;
+		canRateAgain = true;
+	}
+		
 	$(".rating-stars-new").filter($(".rating-stars")).jRating({
 		phpPath : LAMS_URL + "servlet/rateItem?hasRatingLimits=" + HAS_RATING_LIMITS + "&ratingLimitsByCriteria=" + ratingLimitsByCriteria + "&maxRatingsForItem=" + maxRatingsForItem,
 		rateMax : 5,
 		decimalLength : 1,
+		canRateAgain : canRateAgain,
+        nbRates : nbRates,
 		onSuccess : function(data, itemId){
 			$("#user-rating-" + itemId).html(data.userRating);
 			$("#average-rating-" + itemId).html(data.averageRating);

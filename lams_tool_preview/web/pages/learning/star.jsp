@@ -119,7 +119,7 @@
 							var userRating = userData["userRating"];
 							var isCriteriaNotRatedByUser = userRating == "";
 							var averageRatingDisplayed = (!isCriteriaNotRatedByUser) ? averageRating : 0;
-							var ratingStarsClass = (isDisabled || !isCriteriaNotRatedByUser) ? "rating-stars-disabled" : "rating-stars";
+							var ratingStarsClass = (isDisabled && isCriteriaNotRatedByUser) ? "rating-stars-disabled" : "rating-stars";
 							
 							rows += '<div class="'+ ratingStarsClass +' rating-stars-new" data-average="'+ averageRatingDisplayed +'" data-id="'+ objectId +'">';
 							rows += '</div>';
@@ -175,7 +175,7 @@
 			// bind to pager events
 			.bind('pagerInitialized pagerComplete', function(event, options){
 				commentsSaved = false;
-				initializeJRating();
+				initializeJRating(true);
 				onRatingSuccessCallback(); // show buttons if appropriate
 			});
 		});
