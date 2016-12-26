@@ -70,7 +70,7 @@ $(document).ready(function () {
 		})
 	});
 
-	$('.tablesorter').bind('filterEnd pagerComplete', function(event, data){
+	$('.tablesorter').bind('pagerComplete', function(event, data){
 		
 		//hide pager if total amount of courses is less than 10
 		if (data.totalRows < 10) {
@@ -80,7 +80,7 @@ $(document).ready(function () {
 	    }
 
 		//in case active course is not yet chosen by user, select the fist one from the list
-	    if ((activeOrgId == null) && (event.type == "pagerComplete") && (data.totalRows > 0)) {
+	    if ((activeOrgId == null) && (data.totalRows > 0)) {
 	    	var firstOrgId = $('.tablesorter a').first().data("id");
 			selectOrganisation(firstOrgId);
 		}
