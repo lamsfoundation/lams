@@ -31,7 +31,7 @@
 	<script src="${lams}includes/javascript/rating.js" type="text/javascript" ></script> 	
 	<script type="text/javascript">
 	
-	var YOUR_RATING_LABEL = '<fmt:message key="label.your.rating"><fmt:param>@1@</fmt:param><fmt:param>@2@</fmt:param><fmt:param>@3@</fmt:param></fmt:message>',
+	var YOUR_RATING_LABEL = '<fmt:message key="label.you.gave.rating"><fmt:param>@1@</fmt:param></fmt:message>',
 		IS_DISABLED =  ${sessionMap.isDisabled},
 		commentsSaved = true;
 	
@@ -112,16 +112,14 @@
 							
 							var isDisabled = IS_DISABLED || (MAX_RATES > 0) && ( COUNT_RATED_ITEMS >= MAX_RATES) || isMaximumRatesPerUserReached;
 							
-							
+							debugger;
 							var objectId = "${criteriaRatings.ratingCriteria.ratingCriteriaId}-" + itemId;
-							var averageRating = userData["averageRating"];
-							var numberOfVotes = userData["numberOfVotes"];
 							var userRating = userData["userRating"];
 							var isCriteriaNotRatedByUser = userRating == "";
-							var averageRatingDisplayed = (!isCriteriaNotRatedByUser) ? averageRating : 0;
+							var userRatingDisplayed = (!isCriteriaNotRatedByUser) ? userRating : 0;
 							var ratingStarsClass = (isDisabled && isCriteriaNotRatedByUser) ? "rating-stars-disabled" : "rating-stars";
 							
-							rows += '<div class="'+ ratingStarsClass +' rating-stars-new" data-average="'+ averageRatingDisplayed +'" data-id="'+ objectId +'">';
+							rows += '<div class="'+ ratingStarsClass +' rating-stars-new" data-average="'+ userRatingDisplayed +'" data-id="'+ objectId +'">';
 							rows += '</div>';
 									
 							rows += '<div class="rating-stars-caption" id="rating-stars-caption-'+ objectId +'"';
@@ -129,11 +127,7 @@
 								rows += ' style="visibility: hidden;"';	
 							}
 							rows += '>';
-							var temp = YOUR_RATING_LABEL.replace("@1@", '<span id="user-rating-'+ objectId +'">'+ userRating + '</span>');
-							temp = temp.replace("@2@", '<span id="average-rating-'+ objectId +'">'+ averageRating + '</span>');
-							temp = temp.replace("@3@", '<span id="number-of-votes-'+ objectId +'">'+ numberOfVotes + '</span>');
-							rows += 	temp;
-							rows += '</div>';
+							rows += YOUR_RATING_LABEL.replace("@1@", '<span id="user-rating-'+ objectId +'">'+ userRating + '</span>');							rows += '</div>';
 									
 							rows += '</td>';
 							
