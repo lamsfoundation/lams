@@ -282,4 +282,7 @@ public interface IPeerreviewService extends ToolRatingManager {
     LinkedHashMap<String, ExcelCell[][]> exportTeamReportSpreadsheet(Long toolContentId);
     
     int getCountItemsRatedByUserByCriteria(final Long criteriaId, final Integer userId);
+    
+    /** For this user, there has be int[0] ratings out of a possible int[1] ratings */
+    public int[] getNumberPossibleRatings(Long toolContentId, Long toolSessionId, Long userId);
 }
