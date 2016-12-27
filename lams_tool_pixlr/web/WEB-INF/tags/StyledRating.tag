@@ -89,10 +89,17 @@ When true, hides the names and groups the comments.  -->
 					<c:set var="objectId">${criteriaRatings.ratingCriteria.ratingCriteriaId}-${rating.itemId}</c:set>
 					<div class="rating-stars-disabled rating-stars-new" data-average="${rating.averageRating}" data-id="${objectId}"></div>
 					<c:set var="userRating">${rating.userRating}</c:set>
-					<c:if test="${empty userRating}"><c:set var="userRating" value="-"/></c:if>
 					<div class="rating-stars-caption" id="rating-stars-caption-${objectId}">
-						<fmt:message key="label.your.rating">
-							<fmt:param><span id="user-rating-${objectId}">${userRating}</span></fmt:param>
+						<c:choose>
+							<c:when test="${empty userRating}">
+								<fmt:message key="label.not.rated"></fmt:message>
+							</c:when>
+							<c:otherwise>
+								<fmt:message key="label.you.gave.rating"><fmt:param><span id="user-rating-${objectId}">${userRating}</span></fmt:param></fmt:message>
+							</c:otherwise>
+						</c:choose>
+						<br/>
+						<fmt:message key="label.avg.rating">
 							<fmt:param><span id="average-rating-${objectId}">${rating.averageRating}</span></fmt:param>
 							<fmt:param><span id="number-of-votes-${objectId}">${rating.numberOfVotes}</span></fmt:param>
 						</fmt:message>
@@ -120,11 +127,8 @@ When true, hides the names and groups the comments.  -->
 					<div class="rating-stars-holder text-center center-block">
 					<c:set var="objectId">${criteriaRatings.ratingCriteria.ratingCriteriaId}-${rating.itemId}</c:set>
 					<div class="rating-stars-disabled rating-stars-new" data-average="${rating.averageRating}" data-id="${objectId}"></div>
-					<c:set var="userRating">${rating.userRating}</c:set>
-					<c:if test="${empty userRating}"><c:set var="userRating" value="-"/></c:if>
 					<div class="rating-stars-caption" id="rating-stars-caption-${objectId}">
-						<fmt:message key="label.your.rating">
-							<fmt:param><span id="user-rating-${objectId}">${userRating}</span></fmt:param>
+						<fmt:message key="label.avg.rating">
 							<fmt:param><span id="average-rating-${objectId}">${rating.averageRating}</span></fmt:param>
 							<fmt:param><span id="number-of-votes-${objectId}">${rating.numberOfVotes}</span></fmt:param>
 						</fmt:message>
