@@ -86,6 +86,7 @@ import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
 import org.lamsfoundation.lams.util.ExcelCell;
 import org.lamsfoundation.lams.util.JsonUtil;
 import org.lamsfoundation.lams.util.MessageService;
+import org.springframework.util.StringUtils;
 
 /**
  * @author Andrey Balan
@@ -476,9 +477,9 @@ public class PeerreviewServiceImpl
 	    StringBuilder notificationMessage = new StringBuilder();
 
 	    for (RatingCriteria criteria : ratingCriterias) {
-		int sorting = PeerreviewConstants.SORT_BY_AVERAGE_RESULT_DESC;
-		if (criteria.isRankingStyleRating())
-		    sorting = PeerreviewConstants.SORT_BY_AVERAGE_RESULT_ASC;
+		int sorting = (criteria.isStarStyleRating() || criteria.isHedgeStyleRating()) 
+			    ? PeerreviewConstants.SORT_BY_AVERAGE_RESULT_DESC
+			    : PeerreviewConstants.SORT_BY_AVERAGE_RESULT_ASC;
 		StyledCriteriaRatingDTO dto = getUsersRatingsCommentsByCriteriaIdDTO(toolContentId, sessionId, criteria,
 			user.getUserId(), false, sorting, null, true, false);
 		generateRatingEntryForEmail(notificationMessage, criteria, dto);
@@ -506,9 +507,9 @@ public class PeerreviewServiceImpl
 			String escaped = StringEscapeUtils.escapeHtml(ratingDto.getComment());
 			comments.append("<li>").append(escaped).append("</li>");
 		    }
-		}
-		notificationMessage.append(getLocalisedMessage("event.sent.results.criteria.comment", new Object[] {
-			escapedTitle, comments.toString() }));
+		};
+		notificationMessage.append(getLocalisedMessage("event.sent.results.criteria.comment", 
+			new Object[] { escapedTitle, StringUtils.replace(comments.toString(), "&lt;BR&gt;", "<BR>") }));
 	    } else {
 		String avgRating = dto.getRatingDtos().get(0).getAverageRating().length() > 0 ? dto.getRatingDtos()
 			.get(0).getAverageRating() : "0";
@@ -562,6 +563,21 @@ public class PeerreviewServiceImpl
 	
     }
 	
+    @Override
+    public int[] getNumberPossibleRatings(Long toolContentId, Long toolSessionId, Long userId) {
+	int[] retValue = new int[2];
+
+	ArrayList<Long> itemIds = new ArrayList<Long>(1);
+	itemIds.add(userId);
+	Map<Long, Long> numRatingsForUserMap = ratingService.countUsersRatedEachItem(toolContentId, itemIds, -1);
+	Long numRatingsForUser = numRatingsForUserMap.get(userId);
+	retValue[0] = numRatingsForUser != null ? numRatingsForUser.intValue() : 0;
+	
+	int numUsersInSession = peerreviewUserDao.getCountUsersBySession(toolSessionId);
+	Peerreview peerreview = peerreviewDao.getByContentId(toolContentId);
+	retValue[1] = peerreview.isSelfReview() ? numUsersInSession : numUsersInSession - 1;
+	return retValue;
+    }
 
     // *****************************************************************************
     // private methods

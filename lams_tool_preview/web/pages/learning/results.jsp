@@ -100,7 +100,7 @@
 		</lams:Alert>
 	</c:if>
 
-	<c:if test="${peerreview.showRatingsLeftForUser}">
+	<c:if test="${peerreview.showRatingsLeftByUser}">
 
 		<c:if test="${not empty allCriteriaRatings}">
 		<c:forEach var="criteriaRatings" items="${allCriteriaRatings}" varStatus="status">
@@ -109,17 +109,25 @@
 				<c:out value="${criteriaRatings.ratingCriteria.title}" escapeXml="true"/>
 			</div>
 			<div class="panel-body">
-			<lams:StyledRating criteriaRatings="${criteriaRatings}" showJustification="true" alwaysShowAverage="false" currentUserDisplay="false"/>
+			<lams:StyledRating criteriaRatings="${criteriaRatings}" showJustification="true" alwaysShowAverage="false" currentUserDisplay="false" />
 			</div>
 			</div>
 		</c:forEach>
 		</c:if>
+	</c:if>
+	
+	<c:if test="${peerreview.showRatingsLeftForUser}">
 
 		<div class="panel panel-default">
 		<div class="panel-heading panel-title">
 			<fmt:message key="label.ratings.by.others" />
 		</div>
 		<div class="panel-body">
+		
+			<lams:Alert type="info" id="warn-lock" close="false">
+				<fmt:message key="label.no.ratings.out.of.possible.ratings" ><fmt:param>${numberRatings}</fmt:param><fmt:param>${numberPotentialRatings}</fmt:param></fmt:message>
+			</lams:Alert>
+		
 			<c:forEach var="criteriaRatings" items="${userRatings}" varStatus="status">
 				<h4><c:out value="${criteriaRatings.ratingCriteria.title}" escapeXml="true"/></h4>
 		 		<lams:StyledRating criteriaRatings="${criteriaRatings}" showJustification="false" alwaysShowAverage="true" currentUserDisplay="true"/>

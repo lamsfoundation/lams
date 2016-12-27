@@ -25,6 +25,12 @@
 	</div>
 	
 	<div class="checkbox">
+	<label for="show-ratings-left-by-user"><html:checkbox property="peerreview.showRatingsLeftByUser" styleId="show-ratings-left-by-user"/>
+	<fmt:message key="label.show.ratings.left.by.user" />
+	</label>
+	</div>
+
+	<div class="checkbox">
 	<label for="show-ratings-left-for-user"><html:checkbox property="peerreview.showRatingsLeftForUser" styleId="show-ratings-left-for-user"/>
 	<fmt:message key="label.show.ratings.left.for.user" />
 	</label>

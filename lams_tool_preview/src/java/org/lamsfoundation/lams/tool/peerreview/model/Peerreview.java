@@ -75,6 +75,8 @@ public class Peerreview implements Cloneable {
     private int maximumRatesPerUser;
 
     private boolean showRatingsLeftForUser;
+    
+    private boolean showRatingsLeftByUser;
 
     private boolean reflectOnActivity;
 
@@ -83,7 +85,7 @@ public class Peerreview implements Cloneable {
     private boolean selfReview;
 
     private boolean notifyUsersOfResults;
-
+    
     // **********************************************************
     // Function method for Peerreview
     // **********************************************************
@@ -401,5 +403,13 @@ public class Peerreview implements Cloneable {
 
     public void setNotifyUsersOfResults(boolean notifyUsersOfResults) {
         this.notifyUsersOfResults = notifyUsersOfResults;
+    }
+
+    public boolean isShowRatingsLeftByUser() {
+        return showRatingsLeftByUser;
+    }
+
+    public void setShowRatingsLeftByUser(boolean showRatingsLeftByUser) {
+        this.showRatingsLeftByUser = showRatingsLeftByUser;
     }
 }

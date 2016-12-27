@@ -174,10 +174,19 @@ public class PeerreviewUserDAOHibernate extends LAMSBaseDAO implements Peerrevie
 		sortingOrder = " ORDER BY user.first_name DESC";
 		break;
 	    case PeerreviewConstants.SORT_BY_AVERAGE_RESULT_ASC:
-		sortingOrder = criteria.isCommentRating() ? " ORDER BY rating.comment ASC" : " ORDER BY rating.average_rating ASC";
+		if ( criteria.isCommentRating() ) {
+		    sortingOrder = " ORDER BY rating.comment ASC" ;
+		} else {
+		    sortingOrder = " ORDER BY rating.average_rating ASC, rating.comment ASC ";
+		}
 		break;
 	    case PeerreviewConstants.SORT_BY_AVERAGE_RESULT_DESC:
-		sortingOrder = criteria.isCommentRating() ? " ORDER BY rating.comment DESC" : " ORDER BY rating.average_rating DESC";
+		if ( criteria.isCommentRating() ) {
+		    sortingOrder = " ORDER BY rating.comment DESC" ;
+		} else {
+		    sortingOrder = " ORDER BY rating.average_rating DESC, rating.comment ASC ";
+		}
+		break;
 	}
 
     	StringBuilder bldr =  new StringBuilder(FIND_USER_RATINGS_COMMENTS1);

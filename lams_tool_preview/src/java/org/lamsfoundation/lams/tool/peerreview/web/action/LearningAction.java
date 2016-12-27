@@ -370,17 +370,19 @@ public class LearningAction extends Action {
 	// finally, work out which page to go to!
 	if (user.isSessionFinished()) {
 	    ActionRedirect redirect;
-	    if ( peerreview.isShowRatingsLeftForUser() || entryText.length() > 0 ) {
-        	    redirect = new ActionRedirect(mapping.findForwardConfig("showResults"));
+	    if ( peerreview.isShowRatingsLeftForUser() || peerreview.isShowRatingsLeftByUser() || entryText.length() > 0 ) {
+		redirect = new ActionRedirect(mapping.findForwardConfig("showResults"));
+        	redirect.addParameter(PeerreviewConstants.ATTR_SESSION_MAP_ID, sessionMap.getSessionID());
+        	return redirect;
 	    } else if ( peerreview.isReflectOnActivity() ) {
 		// do reflection
-        	    redirect = new ActionRedirect(mapping.findForwardConfig("newReflection"));
+		redirect = new ActionRedirect(mapping.findForwardConfig("newReflection"));
+           	redirect.addParameter(PeerreviewConstants.ATTR_SESSION_MAP_ID, sessionMap.getSessionID());
+            	return redirect;
 	    } else {
 		// finish
-		redirect = new ActionRedirect(mapping.findForwardConfig("finish"));
+		return finish(mapping, form, request, response);
 	    }
-	    redirect.addParameter(PeerreviewConstants.ATTR_SESSION_MAP_ID, sessionMap.getSessionID());
-	    return redirect;
 	} else {
 	    return doEdit(mapping, request, service, sessionMap, sessionId, peerreview, newCriteria);
 	}
@@ -411,27 +413,43 @@ public class LearningAction extends Action {
 	    sessionMap.put(PeerreviewConstants.ATTR_USER_FINISHED, true);
 	}
 
-	// ratings left by the user
+    	// ratings left by and by the user
 	List<RatingCriteria> ratingCriterias = service.getRatingCriterias(peerreview.getContentId());
-	List<StyledCriteriaRatingDTO> allUsersDtos = new ArrayList<StyledCriteriaRatingDTO>(ratingCriterias.size());
-	List<StyledCriteriaRatingDTO> currentUserDtos = new ArrayList<StyledCriteriaRatingDTO>(ratingCriterias.size());
-
+	List<StyledCriteriaRatingDTO> allUsersDtos = peerreview.isShowRatingsLeftByUser() 
+		? new ArrayList<StyledCriteriaRatingDTO>(ratingCriterias.size()) 
+		: null;
+	List<StyledCriteriaRatingDTO> currentUserDtos = peerreview.isShowRatingsLeftForUser() 
+		? new ArrayList<StyledCriteriaRatingDTO>(ratingCriterias.size()) 
+		: null;
+    
 	for (RatingCriteria criteria : ratingCriterias) {
 	    boolean showAllUsers = peerreview.isSelfReview() || criteria.isRankingStyleRating()
 		    || criteria.isHedgeStyleRating() || (mode != null && mode.isTeacher());
-	    int sorting = PeerreviewConstants.SORT_BY_AVERAGE_RESULT_DESC;
-	    if (criteria.isRankingStyleRating())
-		sorting = PeerreviewConstants.SORT_BY_AVERAGE_RESULT_ASC;
-	    allUsersDtos.add(service.getUsersRatingsCommentsByCriteriaIdDTO(peerreview.getContentId(), sessionId, criteria,
-		    user.getUserId(), false, sorting, null, showAllUsers, true));
-	    currentUserDtos.add(service.getUsersRatingsCommentsByCriteriaIdDTO(peerreview.getContentId(), sessionId, criteria,
-		    user.getUserId(), false, sorting, null, showAllUsers, false));
+	    
+	    int sorting = (criteria.isStarStyleRating() || criteria.isHedgeStyleRating()) 
+		    ? PeerreviewConstants.SORT_BY_AVERAGE_RESULT_DESC
+		    : PeerreviewConstants.SORT_BY_AVERAGE_RESULT_ASC;
+	    
+	    if ( allUsersDtos!=null )
+		allUsersDtos.add(service.getUsersRatingsCommentsByCriteriaIdDTO(peerreview.getContentId(), sessionId,
+			criteria, user.getUserId(), false, sorting, null, showAllUsers, true));
+
+	    if ( currentUserDtos!=null )
+		currentUserDtos.add(service.getUsersRatingsCommentsByCriteriaIdDTO(peerreview.getContentId(),
+			sessionId, criteria, user.getUserId(), false, sorting, null, showAllUsers, false));
 
 	}
 
-	request.setAttribute("allCriteriaRatings", allUsersDtos);
-	request.setAttribute("userRatings", currentUserDtos);
+	if ( allUsersDtos!=null ) 
+	    request.setAttribute("allCriteriaRatings", allUsersDtos);
 
+	if ( currentUserDtos!=null ) 
+	    request.setAttribute("userRatings", currentUserDtos);
+
+	int[] numPossibleRatings = service.getNumberPossibleRatings(peerreview.getContentId(), sessionId, user.getUserId());
+	request.setAttribute("numberRatings", numPossibleRatings[0]);
+	request.setAttribute("numberPotentialRatings", numPossibleRatings[1]);
+	
 	// check whether finish lock is enabled
 	sessionMap.put(PeerreviewConstants.ATTR_FINISH_LOCK, peerreview.getLockWhenFinished());
 

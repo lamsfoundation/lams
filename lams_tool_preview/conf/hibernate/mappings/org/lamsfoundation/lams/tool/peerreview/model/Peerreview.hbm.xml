@@ -163,6 +163,14 @@
             insert="true"
             column="notify_users_of_results"
         />
+ 
+         <property
+            name="showRatingsLeftByUser"
+            type="boolean"
+            update="true"
+            insert="true"
+            column="show_ratings_left_by_user"
+        />
         
         <set 
         	name="ratingCriterias" 
