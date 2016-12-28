@@ -63,7 +63,7 @@
 				<prop key="calculate*">PROPAGATION_REQUIRED</prop>
 				<prop key="chooseActivity">PROPAGATION_REQUIRED</prop>
 				<prop key="moveToActivity">PROPAGATION_REQUIRED</prop>
-				<prop key="completeToolSession">PROPAGATION_REQUIRED</prop>
+				<prop key="completeToolSession">PROPAGATION_REQUIRES_NEW</prop>
 				<prop key="completeActivity">PROPAGATION_REQUIRED</prop>
 				<prop key="exitLesson">PROPAGATION_REQUIRED</prop>
 				<prop key="performGrouping">PROPAGATION_REQUIRED</prop>
