@@ -149,9 +149,17 @@ public class CommandWebsocketServer {
      */
     @OnClose
     public void unregisterUser(Session session, CloseReason reason) {
+	String login = session.getUserPrincipal().getName();
+	if (login == null) {
+	    return;
+	}
+
 	Long lessonId = Long.valueOf(session.getRequestParameterMap().get(AttributeNames.PARAM_LESSON_ID).get(0));
 	Map<String, Session> lessonWebsockets = CommandWebsocketServer.websockets.get(lessonId);
-	String login = session.getUserPrincipal().getName();
+	if (lessonWebsockets == null) {
+	    return;
+	}
+
 	lessonWebsockets.remove(login);
     }
 
