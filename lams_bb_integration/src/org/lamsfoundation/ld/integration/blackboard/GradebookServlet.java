@@ -151,40 +151,38 @@ public class GradebookServlet extends HttpServlet {
 	    
 	    Node learnerResult = lesson.getFirstChild();
 	    String userTotalMarkStr = learnerResult.getAttributes().getNamedItem("userTotalMark").getNodeValue();
-	    if (!StringUtil.isEmpty(userTotalMarkStr)) {
-		double userResult = new Double(userTotalMarkStr);
+	    double userResult = StringUtil.isEmpty(userTotalMarkStr) ? 0 : new Double(userTotalMarkStr);
 
-		Lineitem lineitem = LineitemUtil.getLineitem(userId, lamsLessonIdParam);
-		if (lineitem == null) {
-		    throw new ServletException(
-			    "Lineitem was not found for userId:" + userId + " and lamsLessonId:" + lamsLessonIdParam);
-		}
-		//do not remove the following line: it's required to instantiate the object
-		logger.info("Record score for " + lineitem.getName() + " lesson. It now has "
-			+ lineitem.getScores().size() + " scores.");
-
-		// store new Score
-		CourseMembership courseMembership = courseMembershipLoader.loadByCourseAndUserId(lineitem.getCourseId(),
-			userId);
-		Score currentScore = null;
-		try {
-		    currentScore = scoreLoader.loadByCourseMembershipIdAndLineitemId(courseMembership.getId(),
-			    lineitem.getId());
-		} catch (KeyNotFoundException c) {
-		    currentScore = new Score();
-		    currentScore.setLineitemId(lineitem.getId());
-		    currentScore.setCourseMembershipId(courseMembership.getId());
-		}
-
-		//set Score grade. if Lams supplies one (and lineitem will have score type) we set score; otherwise (and lineitme of type Complete/Incomplete) we set 0
-		double gradebookMark = 0;
-		if (maxResult > 0) {
-		    gradebookMark = (userResult / maxResult) * Constants.GRADEBOOK_POINTS_POSSIBLE;
-		}
-		currentScore.setGrade(new DecimalFormat("##.##").format(gradebookMark));
-		currentScore.validate();
-		scorePersister.persist(currentScore);
+	    Lineitem lineitem = LineitemUtil.getLineitem(userId, lamsLessonIdParam);
+	    if (lineitem == null) {
+		throw new ServletException("Lineitem was not found for userId:" + userId + " and lamsLessonId:" + lamsLessonIdParam);
 	    }
+	    // do not remove the following line: it's required to instantiate the object
+	    logger.info("Record score for " + lineitem.getName() + " lesson. It now has " + lineitem.getScores().size()
+		    + " scores.");
+
+	    // store new score
+	    CourseMembership courseMembership = courseMembershipLoader.loadByCourseAndUserId(lineitem.getCourseId(),
+		    userId);
+	    Score currentScore = null;
+	    try {
+		currentScore = scoreLoader.loadByCourseMembershipIdAndLineitemId(courseMembership.getId(),
+			lineitem.getId());
+	    } catch (KeyNotFoundException c) {
+		currentScore = new Score();
+		currentScore.setLineitemId(lineitem.getId());
+		currentScore.setCourseMembershipId(courseMembership.getId());
+	    }
+
+	    //set score grade. if Lams supplies one (and lineitem will have score type) we set score; otherwise (and
+	    // lineitme of type Complete/Incomplete) we set 0
+	    double gradebookMark = 0;
+	    if (maxResult > 0) {
+		gradebookMark = (userResult / maxResult) * Constants.GRADEBOOK_POINTS_POSSIBLE;
+	    }
+	    currentScore.setGrade(new DecimalFormat("##.##").format(gradebookMark));
+	    currentScore.validate();
+	    scorePersister.persist(currentScore);
 	    
 //	    NodeList activities = document.getDocumentElement().getFirstChild().getChildNodes();
 //
