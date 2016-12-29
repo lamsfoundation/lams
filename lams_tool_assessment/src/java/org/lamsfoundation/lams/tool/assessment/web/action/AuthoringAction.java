@@ -368,6 +368,13 @@ public class AuthoringAction extends Action {
 	} else {
 	    Long uid = assessmentPO.getUid();
 	    PropertyUtils.copyProperties(assessmentPO, assessment);
+
+	    // copyProperties() above may result in "collection assigned to two objects in a session" exception
+	    // Below we remove reference to one of Assessment objects,
+	    // so maybe there will be just one object in session when save is done
+	    // If this fails, we may have to evict the object from session using DAO
+	    assessmentForm.setAssessment(null);
+	    assessment = null;
 	    // set back UID
 	    assessmentPO.setUid(uid);
 
@@ -471,7 +478,7 @@ public class AuthoringAction extends Action {
 	questionForm.setContentFolderID(contentFolderID);
 	questionForm.setDefaultGrade("1");
 	questionForm.setPenaltyFactor("0");
-	questionForm.setAnswerRequired(false);
+	questionForm.setAnswerRequired(true);
 
 	List<AssessmentQuestionOption> optionList = new ArrayList<AssessmentQuestionOption>();
 	for (int i = 0; i < AssessmentConstants.INITIAL_OPTIONS_NUMBER; i++) {

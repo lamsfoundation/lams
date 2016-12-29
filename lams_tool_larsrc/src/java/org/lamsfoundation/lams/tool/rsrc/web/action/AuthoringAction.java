@@ -541,6 +541,13 @@ public class AuthoringAction extends Action {
 	    if (mode.isAuthor()) {
 		Long uid = resourcePO.getUid();
 		PropertyUtils.copyProperties(resourcePO, resource);
+
+		// copyProperties() above may result in "collection assigned to two objects in a session" exception
+		// Below we remove reference to one of Assessment objects,
+		// so maybe there will be just one object in session when save is done
+		// If this fails, we may have to evict the object from session using DAO
+		resourceForm.setResource(null);
+		resource = null;
 		// get back UID
 		resourcePO.setUid(uid);
 	    } else { // if it is Teacher, then just update basic tab content
