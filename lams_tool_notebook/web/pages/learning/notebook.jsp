@@ -5,28 +5,50 @@
 	var forceResponse = "${notebookDTO.forceResponse}";
 
 	function disableFinishButton() {
-		document.getElementById("finishButton").disabled = true;
+		document.getElementById("finishButton").style.visibility = 'hidden';
 	}
 
 	function textAreaReady() {
-		<c:if test="${not notebookDTO.allowRichEditor}">
+		<c:choose>
+		<c:when test="${notebookDTO.allowRichEditor}">
+			CKEDITOR.instances["entryText"].focus();
+		</c:when>		
+		<c:otherwise>
 			document.learningForm.focusedInput.focus();
-		</c:if>
-		document.getElementById("finishButton").disabled = false;
+		</c:otherwise>
+		</c:choose>
+		document.getElementById("finishButton").style.visibility = 'visible';
 	}
 	
 	function submitForm(methodName) {
 		disableFinishButton();
-		<c:if test="${not notebookDTO.allowRichEditor}">
-		
-			if (forceResponse =="true" && document.learningForm.focusedInput.value == "") {
-				if (confirm("<fmt:message>message.learner.blank.alertforceResponse</fmt:message>")) {
-					return true;
-				} else {
+		<c:choose>
+		<c:when test="${notebookDTO.allowRichEditor}">
+	      	CKEDITOR.instances["entryText"].updateElement(); // update textarea
+	      	var editorcontent = document.getElementById("entryText").value.replace(/<[^>]*>/gi, ''); // strip tags
+	      	var isEmpty = editorcontent.length === 0;
+
+			if (forceResponse =="true" && isEmpty ) {
+
+				retValue = confirm("<fmt:message>message.learner.blank.alertforceResponse</fmt:message>");
+				textAreaReady();
+				return retValue;
+				
+			} else if  (forceResponse =="false" && isEmpty && mode == "learner") {
+	
+				if (!confirm("<fmt:message>message.learner.blank.input</fmt:message>")) {
 					// otherwise, focus on the text area
 					textAreaReady();
 					return false;
 				}
+			}
+		</c:when>		
+		<c:otherwise>
+			if (forceResponse =="true" && document.learningForm.focusedInput.value == "") {
+
+				retValue = confirm("<fmt:message>message.learner.blank.alertforceResponse</fmt:message>");
+				textAreaReady();
+				return retValue;
 				
 			} else if  (forceResponse =="false" && document.learningForm.focusedInput.value == "" && mode == "learner") {
 	
@@ -36,10 +58,13 @@
 					return false;
 				}
 			}
-		</c:if>		
+		</c:otherwise>		
+		</c:choose>
+		
 		var f = document.getElementById('messageForm');
 		f.submit();
 	}
+	
 </script>
 
 <html:form action="/learning" method="post" styleId="messageForm">
@@ -78,6 +103,13 @@
 				</c:choose>
 			</lams:Alert>
 		</c:if>
+		
+		<c:if test="${notebookDTO.forceResponse and notebookDTO.allowRichEditor}">
+			<lams:Alert id="requiredWarning" type="info" close="true">
+				<fmt:message>message.learner.blank.alertforceResponse</fmt:message>
+			</lams:Alert>
+		</c:if>
+		
 		<!-- End Notifications and warnings -->
 
 		<!-- Form -->
@@ -142,8 +174,10 @@
 <script type="text/javascript">
 	window.onload = function() {
 		textAreaReady();
+		<c:if test="${not notebookDTO.allowRichEditor}">
 		if (forceResponse == 'true') {
 			$('#focusedInput').attr('placeholder', '<fmt:message>message.learner.blank.alertforceResponse</fmt:message>');
 		}
+		</c:if>
 	}
 </script>
