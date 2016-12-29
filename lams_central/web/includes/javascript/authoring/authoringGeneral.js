@@ -2574,7 +2574,7 @@ GeneralLib = {
 		}
 		layout.modified = modified;
 		if (!modified && layout.activities.length > 0) {
-			$('#previewButton').prop('disabled', layout.ld.invalid);
+			$('#previewButton').prop('disabled', layout.ld.invalid === true);
 			$('#exportLamsButton').removeClass('disabled');
 			$('#ldDescriptionFieldModified').text('');
 		} else {
