@@ -392,7 +392,7 @@ public class AuthoringAction extends Action {
 	// get back login user DTO
 	UserDTO user = (UserDTO) ss.getAttribute(AttributeNames.USER);
 	AssessmentUser assessmentUser = service.getUserByIDAndContent(new Long(user.getUserID().intValue()),
-		assessmentForm.getAssessment().getContentId());
+		assessmentPO.getContentId());
 	if (assessmentUser == null) {
 	    assessmentUser = new AssessmentUser(user, assessmentPO);
 	}
