@@ -28,6 +28,7 @@ import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerConfigurationException;
 import javax.xml.transform.TransformerException;
 
+import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.gradebook.GradebookUserLesson;
@@ -926,9 +927,10 @@ public class LessonManagerServlet extends HttpServlet {
 		    String lastName = null;
 		    String email = null;
 		    if (firstNames != null) {
-			firstName = firstNameArray[i];
-			lastName = lastNameArray[i];
-			email = emailArray[i];
+			//unescape values passed from the external server. Works OK even if the values were not escaped
+			firstName = StringEscapeUtils.unescapeCsv(firstNameArray[i]);
+			lastName = StringEscapeUtils.unescapeCsv(lastNameArray[i]);
+			email = StringEscapeUtils.unescapeCsv(emailArray[i]);
 		    }
 
 		    if (StringUtils.isNotBlank(userName)) {
@@ -943,9 +945,10 @@ public class LessonManagerServlet extends HttpServlet {
 		    String lastName = null;
 		    String email = null;
 		    if (firstNames != null) {
-			firstName = firstNameArray[i];
-			lastName = lastNameArray[i];
-			email = emailArray[i];
+			//unescape values passed from the external server. Works OK even if the values were not escaped
+			firstName = StringEscapeUtils.unescapeCsv(firstNameArray[i]);
+			lastName = StringEscapeUtils.unescapeCsv(lastNameArray[i]);
+			email = StringEscapeUtils.unescapeCsv(emailArray[i]);
 		    }
 
 		    if (StringUtils.isNotBlank(userName)) {
