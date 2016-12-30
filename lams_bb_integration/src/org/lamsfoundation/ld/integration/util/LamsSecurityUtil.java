@@ -43,6 +43,8 @@ import javax.xml.parsers.ParserConfigurationException;
 
 import org.apache.commons.codec.binary.Hex;
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang.StringEscapeUtils;
+import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.lamsfoundation.ld.integration.dto.LearnerProgressDTO;
 import org.w3c.dom.Document;
@@ -695,19 +697,17 @@ public class LamsSecurityUtil {
 	    BbList<CourseMembership> studentCourseMemberships = courseMemLoader.loadByCourseIdAndRole(courseId,
 		    CourseMembership.Role.STUDENT, null, true);
 	    for (CourseMembership courseMembership : studentCourseMemberships) {
-		learnerIds += URLEncoder.encode(courseMembership.getUser().getUserName(), "utf8") + ",";
+		String learnerId = escapeValue(courseMembership.getUser().getUserName());
+		learnerIds += learnerId + ",";
 		
-		String firstName = courseMembership.getUser().getGivenName().isEmpty() ? DUMMY_VALUE : courseMembership
-			.getUser().getGivenName();
-		firstNames += URLEncoder.encode(firstName, "utf8") + ",";
+		String firstName = escapeValue(courseMembership.getUser().getGivenName());
+		firstNames += firstName + ",";
 		
-		String lastName = courseMembership.getUser().getFamilyName().isEmpty() ? DUMMY_VALUE : courseMembership
-			.getUser().getFamilyName();
-		lastNames += URLEncoder.encode(lastName, "utf8") + ",";
+		String lastName = escapeValue(courseMembership.getUser().getFamilyName());
+		lastNames += lastName + ",";
 		
-		String email = courseMembership.getUser().getEmailAddress().isEmpty() ? DUMMY_VALUE : courseMembership
-			.getUser().getEmailAddress();
-		emails += URLEncoder.encode(email, "utf8") + ",";
+		String email = escapeValue(courseMembership.getUser().getEmailAddress());
+		emails += email + ",";
 	    }
 
 	    BbList<CourseMembership> monitorCourseMemberships = courseMemLoader.loadByCourseIdAndRole(courseId,
@@ -719,19 +719,17 @@ public class LamsSecurityUtil {
 		    CourseMembership.Role.COURSE_BUILDER, null, true);
 	    monitorCourseMemberships.addAll(courseBuilderCourseMemberships);
 	    for (CourseMembership courseMembership : monitorCourseMemberships) {
-		monitorIds += URLEncoder.encode(courseMembership.getUser().getUserName(), "utf8") + ",";
+		String monitorId = escapeValue(courseMembership.getUser().getUserName());
+		monitorIds += monitorId + ",";
 
-		String firstName = courseMembership.getUser().getGivenName().isEmpty() ? DUMMY_VALUE : courseMembership
-			.getUser().getGivenName();
-		firstNames += URLEncoder.encode(firstName, "utf8") + ",";
+		String firstName = escapeValue(courseMembership.getUser().getGivenName());
+		firstNames += firstName + ",";
 
-		String lastName = courseMembership.getUser().getFamilyName().isEmpty() ? DUMMY_VALUE : courseMembership
-			.getUser().getFamilyName();
-		lastNames += URLEncoder.encode(lastName, "utf8") + ",";
+		String lastName = escapeValue(courseMembership.getUser().getFamilyName());
+		lastNames += lastName + ",";
 
-		String email = courseMembership.getUser().getEmailAddress().isEmpty() ? DUMMY_VALUE : courseMembership
-			.getUser().getEmailAddress();
-		emails += URLEncoder.encode(email, "utf8") + ",";
+		String email = escapeValue(courseMembership.getUser().getEmailAddress());
+		emails += email + ",";
 	    }
 
 	    //no learners & no monitors - do nothing
@@ -790,6 +788,24 @@ public class LamsSecurityUtil {
 		    "Unable to preadd users to the lesson. Please contact your system administrator.", e);
 	}
 
+    }
+    
+    /**
+     * Takes care about blank values. Besides, escapes CSV sensitive symbols (commas, quotes, etc) and then encodes it to be sent as a URL parameter.
+     * 
+     * @param value
+     * @param CSV
+     * @return
+     * @throws UnsupportedEncodingException
+     */
+    private static String escapeValue(String value) throws UnsupportedEncodingException {
+	final String DUMMY_VALUE = "-";
+
+	String notBlankValue = StringUtils.isBlank(value) ? DUMMY_VALUE : value;
+	String escapedCsv = StringEscapeUtils.escapeCsv(notBlankValue);
+	String encodedValue = URLEncoder.encode(escapedCsv, "utf8");
+
+	return encodedValue;
     }
     
     /**
