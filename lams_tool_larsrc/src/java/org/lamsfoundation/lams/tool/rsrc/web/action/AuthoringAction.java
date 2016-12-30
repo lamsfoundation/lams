@@ -531,7 +531,7 @@ public class AuthoringAction extends Action {
 
 	// **********************************Get Resource
 	// PO*********************
-	Resource resourcePO = service.getResourceByContentId(resourceForm.getResource().getContentId());
+	Resource resourcePO = service.getResourceByContentId(resource.getContentId());
 	if (resourcePO == null) {
 	    // new Resource, create it.
 	    resourcePO = resource;
@@ -566,7 +566,7 @@ public class AuthoringAction extends Action {
 	// get back login user DTO
 	UserDTO user = (UserDTO) ss.getAttribute(AttributeNames.USER);
 	ResourceUser resourceUser = service.getUserByIDAndContent(new Long(user.getUserID().intValue()),
-		resourceForm.getResource().getContentId());
+		resourcePO.getContentId());
 	if (resourceUser == null) {
 	    resourceUser = new ResourceUser(user, resourcePO);
 	}
