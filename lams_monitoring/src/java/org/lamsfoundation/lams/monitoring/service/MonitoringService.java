@@ -454,7 +454,7 @@ public class MonitoringService implements IMonitoringService {
     public void createLessonClassForLesson(long lessonId, Organisation organisation, String learnerGroupName,
 	    List<User> organizationUsers, String staffGroupName, List<User> staffs, Integer userId) {
 	Lesson newLesson = lessonDAO.getLesson(new Long(lessonId));
-	
+
 	// if lesson isn't started recreate the lesson class
 	if (newLesson.isLessonStarted()) {
 	    securityService.isLessonMonitor(lessonId, userId, "create class for lesson", true);
@@ -905,8 +905,10 @@ public class MonitoringService implements IMonitoringService {
 	    if (activity.isBranchingActivity()) {
 		BranchingActivity branchingActivity = (BranchingActivity) activity;
 		Grouping grouping = branchingActivity.getGrouping();
-		groupingDAO.delete(grouping);
-
+		if (grouping != null) {
+		    groupingDAO.delete(grouping);
+		}
+		
 		for (BranchActivityEntry entry : branchingActivity.getBranchActivityEntries()) {
 		    BranchCondition condition = entry.getCondition();
 		    if (condition != null) {
@@ -1716,7 +1718,7 @@ public class MonitoringService implements IMonitoringService {
 	// setup staff group
 	Group staffGroup = Group.createStaffGroup(newLessonClass, staffGroupName, new HashSet(staffs));
 	newLessonClass.setStaffGroup(staffGroup);
-	
+
 	// setup learner group
 	// TODO:need confirm group name!
 	newLessonClass.getGroups()
@@ -2259,8 +2261,8 @@ public class MonitoringService implements IMonitoringService {
 			    lesson.getForceLearnerRestart(), lesson.getAllowLearnerRestart(), null, null);
 
 		    // save LessonClasses
-		    this.createLessonClassForLesson(newLesson.getLessonId(), group, learnerGroupName,
-			    learnerUsers, staffGroupName, staffUsers, creatorId);
+		    this.createLessonClassForLesson(newLesson.getLessonId(), group, learnerGroupName, learnerUsers,
+			    staffGroupName, staffUsers, creatorId);
 
 		    // start lesson; passing creatorId as this parameter is only used for security check whether user is allowed to start a lesson
 		    this.startLesson(newLesson.getLessonId(), creatorId);
