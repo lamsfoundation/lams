@@ -110,6 +110,8 @@
 				LIVEEDIT_CANCEL_CONFIRM : '<c:out value="${LIVEEDIT_CANCEL_CONFIRM_VAR}" />',
 				<fmt:message key="authoring.fla.folder.not.selected.error" var="FOLDER_NOT_SELECTED_ERROR_VAR"/>
 				FOLDER_NOT_SELECTED_ERROR : decoderDiv.html('<c:out value="${FOLDER_NOT_SELECTED_ERROR_VAR}" />').text(),
+				<fmt:message key="authoring.fla.folder.can.not.save.error" var="FOLDER_CAN_NOT_SAVE_ERROR_VAR"/>
+				FOLDER_CAN_NOT_SAVE_ERROR : decoderDiv.html('<c:out value="${FOLDER_CAN_NOT_SAVE_ERROR_VAR}" />').text(),
 				<fmt:message key="authoring.fla.title.validation.error" var="TITLE_VALIDATION_ERROR_VAR"/>
 				TITLE_VALIDATION_ERROR : decoderDiv.html('<c:out value="${TITLE_VALIDATION_ERROR_VAR}" />').text(),
 				<fmt:message key="authoring.fla.folder.exists.error" var="FOLDER_EXISTS_ERROR_VAR"/>
