@@ -904,8 +904,8 @@ public class LessonManagerServlet extends HttpServlet {
 
 		String[] learnerIdArray = (learnerIds != null) ? learnerIds.split(",") : new String[0];
 		String[] monitorIdArray = (monitorIds != null) ? monitorIds.split(",") : new String[0];
-		String[] firstNameArray = (firstNames != null) ? firstNames.split(",") : new String[0];
-		String[] lastNameArray = (lastNames != null) ? lastNames.split(",") : new String[0];
+		String[] firstNameArray = (firstNames != null) ? firstNames.split(",(?=(?:[^\"]*\"[^\"]*\")*[^\"]*$)", -1) : new String[0];
+		String[] lastNameArray = (lastNames != null) ? lastNames.split(",(?=(?:[^\"]*\"[^\"]*\")*[^\"]*$)", -1) : new String[0];
 		String[] emailArray = (emails != null) ? emails.split(",") : new String[0];
 
 		// in case there is firstNames available - check all arrays have the same length, as otherwise it's
