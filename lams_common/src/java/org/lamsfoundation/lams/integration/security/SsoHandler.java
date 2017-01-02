@@ -164,9 +164,13 @@ public class SsoHandler implements ServletExtension {
 
 		    HttpSession existingSession = SessionManager.getSessionForLogin(login);
 		    if (existingSession != null) {
-			// tell SessionListener not to flush credential cache on session destroy,
-			// otherwise this authentication processs fails
-			existingSession.setAttribute(NO_FLUSH_FLAG, true);
+			try {
+			    // tell SessionListener not to flush credential cache on session destroy,
+			    // otherwise this authentication processs fails
+			    existingSession.setAttribute(NO_FLUSH_FLAG, true);
+			} catch (IllegalStateException e) {
+			    // if it was already invalidated, do nothing
+			}
 			// remove an existing session for the given user
 			SessionManager.removeSessionByLogin(login, true);
 		    }
