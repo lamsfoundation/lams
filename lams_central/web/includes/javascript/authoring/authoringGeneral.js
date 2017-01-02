@@ -559,6 +559,10 @@ GeneralInitLib = {
 			if (node) {
 	    		// get folder from LD tree
 				folderNode = node.data.learningDesignId ? node.parent : node;
+				if (!folderNode.data.canSave) {
+					alert(LABELS.FOLDER_CAN_NOT_SAVE_ERROR);
+					return;
+				}
 				folderID = folderNode.data.folderID;
 			} else {
 				// get data from "recently used sequences" list
