@@ -21,7 +21,6 @@
  * ****************************************************************
  */
 
-
 package org.lamsfoundation.lams.tool.scribe.model;
 
 import java.util.Date;
@@ -47,8 +46,6 @@ public class ScribeSession implements java.io.Serializable {
 
     // Fields
     private Long uid;
-
-    private int version;
 
     private Date sessionEndDate;
 
@@ -101,21 +98,6 @@ public class ScribeSession implements java.io.Serializable {
     public void setUid(Long uid) {
 	this.uid = uid;
     }
-
-    /**
-     *
-     */
-    public int getVersion() {
-	return version;
-    }
-
-    public void setVersion(int version) {
-	this.version = version;
-    }
-
-    /**
-     *
-     */
 
     public Date getSessionEndDate() {
 	return this.sessionEndDate;
