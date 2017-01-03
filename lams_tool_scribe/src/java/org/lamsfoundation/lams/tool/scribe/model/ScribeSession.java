@@ -47,6 +47,8 @@ public class ScribeSession implements java.io.Serializable {
     // Fields
     private Long uid;
 
+    private Integer version;
+
     private Date sessionEndDate;
 
     private Date sessionStartDate;
@@ -98,6 +100,21 @@ public class ScribeSession implements java.io.Serializable {
     public void setUid(Long uid) {
 	this.uid = uid;
     }
+
+    /**
+     *
+     */
+    public Integer getVersion() {
+	return version;
+    }
+
+    public void setVersion(Integer version) {
+	this.version = version;
+    }
+
+    /**
+     *
+     */
 
     public Date getSessionEndDate() {
 	return this.sessionEndDate;
