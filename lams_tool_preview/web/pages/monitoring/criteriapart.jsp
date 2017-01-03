@@ -8,7 +8,7 @@
 	<c:set var="heading"><fmt:message key="label.rating" /></c:set>
 </c:when>
 <c:when test="${criteria.ratingStyle eq 2 }">
-	<c:set var="heading"><fmt:message key="label.rank" /></c:set>
+	<c:set var="heading"><fmt:message key="label.rating.rank" /></c:set>
 </c:when>
 <c:when test="${criteria.ratingStyle eq 3 }">
 	<c:set var="heading"><fmt:message key="label.mark" /></c:set>
