@@ -293,15 +293,17 @@ function showMonitorLessonDialog(lessonID) {
 	}
 }
 
+/**
+ * Adjust the position of LD SVG in Monitoring.
+ */
 function resizeSequenceCanvas(){
-	var body = $('.modal-body'),
-		frame = $('iframe', body);
-	if (frame.length > 0) {
-		var win = frame[0].contentWindow || frame[0].contentDocument;
+	$('div[id^="dialogMonitorLesson"] iframe').each(function(){
+		var win = this.contentWindow || this.contentDocument;
 		if (win.resizeSequenceCanvas) {
+			var body = $(this).closest('.modal-body');
 			win.resizeSequenceCanvas(body.width(), body.height());
 		}
-	}
+	});
 }
 
 
@@ -614,4 +616,3 @@ function removeLesson(lessonID) {
 		}
 	}
 }
-
