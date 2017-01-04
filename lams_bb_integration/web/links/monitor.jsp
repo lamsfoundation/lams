@@ -243,7 +243,7 @@ public String getChild(Content f, ContentDbLoader cLoader) {
                 
             } else {
                 try {
-                    monitorWin = window.open(monitorURL,'mWindow','width=1280,height=720,resizable');
+                    monitorWin = window.open(monitorURL,'mWindow','width=1280,height=720,resizable,scrollbars=yes');
                     monitorWin.focus();
                 } catch(e) {
                     // popups blocked by a 3rd party
