@@ -231,7 +231,7 @@
                 }
                 else{
                     try {
-                        authorWin = window.open(authorUrl,'aWindow','width=1280,height=720,resizable');
+                        authorWin = window.open(authorUrl,'aWindow','width=1280,height=720,resizable,scrollbars=yes');
                         authorWin.focus();
                     }catch(e){
                         // popups blocked by a 3rd party
@@ -260,7 +260,7 @@
                     
                 } else {
                     try {
-                        previewWin = window.open(previewUrl,'pWindow','width=1280,height=720,resizable');
+                        previewWin = window.open(previewUrl,'pWindow','width=1280,height=720,resizable,scrollbars=yes');
                         previewWin.focus();
                     } catch(e) {
                         // popups blocked by a 3rd party
