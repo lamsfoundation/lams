@@ -692,6 +692,15 @@ public class QaServicePOJO
 	    if (criterias != null) {
 		for (LearnerItemRatingCriteria criteria : toolContentObj.getRatingCriterias()) {
 		    criteria.setToolContentId(toolContentID);
+		    if (criteria.getMaxRating() == null || criteria.getRatingStyle() == null) {
+			if (criteria.getOrderId() == 0) {
+			    criteria.setMaxRating(0);
+			    criteria.setRatingStyle(RatingCriteria.RATING_STYLE_COMMENT);
+			} else {
+			    criteria.setMaxRating(RatingCriteria.RATING_STYLE_STAR_DEFAULT_MAX);
+			    criteria.setRatingStyle(RatingCriteria.RATING_STYLE_STAR);
+			}
+		    }
 		}
 	    }
 
