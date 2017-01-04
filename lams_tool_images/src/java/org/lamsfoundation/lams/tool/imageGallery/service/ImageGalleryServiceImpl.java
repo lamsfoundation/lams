@@ -799,6 +799,15 @@ public class ImageGalleryServiceImpl implements IImageGalleryService, ToolConten
 	    if (criterias != null) {
 		for (LearnerItemRatingCriteria criteria : criterias) {
 		    criteria.setToolContentId(toolContentId);
+		    if (criteria.getMaxRating() == null || criteria.getRatingStyle() == null) {
+			if (criteria.getOrderId() == 0) {
+			    criteria.setMaxRating(0);
+			    criteria.setRatingStyle(RatingCriteria.RATING_STYLE_COMMENT);
+			} else {
+			    criteria.setMaxRating(RatingCriteria.RATING_STYLE_STAR_DEFAULT_MAX);
+			    criteria.setRatingStyle(RatingCriteria.RATING_STYLE_STAR);
+			}
+		    }
 		}
 	    }
 	    ImageGalleryUser user = imageGalleryUserDao.getUserByUserIDAndContentID(new Long(newUserUid.longValue()),
