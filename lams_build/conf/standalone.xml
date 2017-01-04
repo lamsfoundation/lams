@@ -216,7 +216,11 @@
                     <handler name="HIBERNATEFILE" />
                 </handlers>
             </logger>
-
+            
+            <logger category="org.hibernate.engine.internal.StatefulPersistenceContext">
+                <level name="ERROR"/>
+            </logger>
+            
             <logger category="org.jboss">
                 <level name="INFO" />
             </logger>
