@@ -408,7 +408,7 @@ public class WorkspaceManagementService implements IWorkspaceManagementService {
 	    String contentType = folderContent.getResourceType();
 	    if (FolderContentDTO.FOLDER.equals(contentType) && !designsOnly) {
 		JSONObject subfolderJSON = new JSONObject();
-		subfolderJSON.put("name", folderContent.getName());
+		subfolderJSON.put("name", folderContent.getName() == null ? "" : folderContent.getName());
 		subfolderJSON.put("isRunSequencesFolder",
 			WorkspaceFolder.RUN_SEQUENCES.equals(folderContent.getResourceTypeID() == null ? null
 				: folderContent.getResourceTypeID().intValue()));
@@ -428,7 +428,7 @@ public class WorkspaceManagementService implements IWorkspaceManagementService {
 			: (designType.equals(WorkspaceManagementService.ALL_DESIGN_TYPES)
 				|| designType.equals(folderContent.getDesignType()))) {
 		    JSONObject learningDesignJSON = new JSONObject();
-		    learningDesignJSON.put("name", folderContent.getName());
+		    learningDesignJSON.put("name", folderContent.getName() == null ? "" : folderContent.getName());
 		    learningDesignJSON.put("learningDesignId", folderContent.getResourceID());
 		    learningDesignJSON.putOpt("type", folderContent.getDesignType());
 		    learningDesignJSON.put("date", folderContent.getLastModifiedDateTime());

@@ -137,16 +137,15 @@ public class FolderContentDTO implements Comparable<FolderContentDTO> {
     }
 
     @Override
-    public int compareTo(FolderContentDTO o) {
-	if ((o != null) && (o instanceof FolderContentDTO)) {
-	    FolderContentDTO anotherQuestion = o;
-	    // folders go first, then sort by name
-	    return resourceType.equals(anotherQuestion.getResourceType())
-		    ? name.compareToIgnoreCase(anotherQuestion.getName())
-		    : FolderContentDTO.FOLDER.equals(anotherQuestion.getResourceType()) ? -1 : 1;
-	} else {
+    public int compareTo(FolderContentDTO anotherContent) {
+	if (anotherContent == null) {
 	    return 1;
 	}
+	// folders go first, then sort by name
+	return resourceType.equals(anotherContent.getResourceType())
+		? (name == null ? (anotherContent.getName() == null ? 0 : -1)
+			: (anotherContent.getName() == null ? 1 : name.compareToIgnoreCase(anotherContent.getName())))
+		: (FolderContentDTO.FOLDER.equals(anotherContent.getResourceType()) ? -1 : 1);
     }
 
     /**
