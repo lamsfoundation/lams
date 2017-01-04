@@ -6,7 +6,7 @@ SET FOREIGN_KEY_CHECKS=0;
 -- LDEV-4180 Update configuration to 3.0 release
 
 update lams_configuration set config_value='3.0' where config_key='Version';
-update lams_configuration set config_value='3.0.201701010000' where config_key='LearnerClientVersion' OR config_key='ServerVersionNumber' OR config_key='MonitorClientVersion' OR config_key='AuthoringClientVersion';
+update lams_configuration set config_value='3.0.0.201701010000' where config_key='LearnerClientVersion' OR config_key='ServerVersionNumber' OR config_key='MonitorClientVersion' OR config_key='AuthoringClientVersion';
 update lams_configuration set config_value='2017-01-01' where config_key='DictionaryDateCreated';
 
 ----------------------Put all sql statements above here-------------------------
