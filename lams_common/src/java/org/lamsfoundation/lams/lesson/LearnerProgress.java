@@ -36,6 +36,7 @@ import java.util.TreeMap;
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.commons.lang.builder.ToStringBuilder;
+import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.learningdesign.Activity;
 import org.lamsfoundation.lams.learningdesign.ActivityOrderComparator;
 import org.lamsfoundation.lams.learningdesign.ComplexActivity;
@@ -63,6 +64,8 @@ import org.lamsfoundation.lams.usermanagement.User;
  */
 public class LearnerProgress implements Serializable {
     private static final long serialVersionUID = -7866830317967062822L;
+
+    private static Logger log = Logger.getLogger(LearnerProgress.class);
 
     //---------------------------------------------------------------------
     // Class level constants
@@ -346,17 +349,28 @@ public class LearnerProgress implements Serializable {
 	// remove activity from current set
 	byte oldState = getProgressState(activity);
 	if (oldState == state) {
+	    log.debug("Progress " + this.getLearnerProgressId() + " does not change state " + state + " of activity "
+		    + activity.getActivityId());
 	    // no real change, forget the rest of the method
 	    return;
 	}
 
 	Date activityStartDate = attemptedActivities.get(activity);
-
+	if (activityStartDate == null) {
+	    log.warn("Progress " + this.getLearnerProgressId() + " found NULL start date of activity "
+		    + activity.getActivityId());
+	}
 	if (oldState == LearnerProgress.ACTIVITY_NOT_ATTEMPTED) {
+	    log.debug("Progress " + this.getLearnerProgressId() + " does not remove not attempted activity "
+		    + activity.getActivityId());
 	    ;
 	} else if (oldState == LearnerProgress.ACTIVITY_ATTEMPTED) {
+	    log.debug("Progress " + this.getLearnerProgressId() + " removes attempted activity "
+		    + activity.getActivityId());
 	    this.attemptedActivities.remove(activity);
 	} else if (oldState == LearnerProgress.ACTIVITY_COMPLETED) {
+	    log.debug("Progress " + this.getLearnerProgressId() + " removes completed activity "
+		    + activity.getActivityId());
 	    this.completedActivities.remove(activity);
 	    if (activity.isComplexActivity()) {
 		ComplexActivity complex = (ComplexActivity) activityDAO
@@ -371,10 +385,16 @@ public class LearnerProgress implements Serializable {
 
 	// add activity to new set
 	if (state == LearnerProgress.ACTIVITY_NOT_ATTEMPTED) {
+	    log.debug("Progress " + this.getLearnerProgressId() + " does not add not attempted activity "
+		    + activity.getActivityId());
 	    ;
 	} else if (state == LearnerProgress.ACTIVITY_ATTEMPTED) {
+	    log.debug(
+		    "Progress " + this.getLearnerProgressId() + " adds attempted activity " + activity.getActivityId());
 	    this.attemptedActivities.put(activity, new Date());
 	} else if (state == LearnerProgress.ACTIVITY_COMPLETED) {
+	    log.debug(
+		    "Progress " + this.getLearnerProgressId() + " adds completed activity " + activity.getActivityId());
 	    this.completedActivities.put(activity,
 		    new CompletedActivityProgress(this, activity, activityStartDate, new Date()));
 	}

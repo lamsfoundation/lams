@@ -604,9 +604,9 @@ public class LearnerService implements ICoreLearnerService {
      * @return the updated learner progress
      */
     @Override
-    public void completeActivity(Integer learnerId, Activity activity, LearnerProgress progress) {
+    public synchronized void completeActivity(Integer learnerId, Activity activity, LearnerProgress progress) {
 	// load the progress again from DB
-	progress = learnerProgressDAO.getLearnerProgress(progress.getLearnerProgressId());
+	// progress = learnerProgressDAO.getLearnerProgress(progress.getLearnerProgressId());
 	if (progress.getCompletedActivities().keySet().contains(activity)) {
 	    // progress was already updated by another thread, so prevent double processing
 	    return;
