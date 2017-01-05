@@ -356,10 +356,14 @@ public class LearnerProgress implements Serializable {
 	}
 
 	Date activityStartDate = attemptedActivities.get(activity);
-	if (activityStartDate == null) {
+	if ( activityStartDate != null && state == LearnerProgress.ACTIVITY_ATTEMPTED ) {
+	    log.warn("Progress " + this.getLearnerProgressId() + " found newly attempted activity "
+		    + activity.getActivityId()+" already in in the attempted activities set.");
+	} else if ( activityStartDate == null && state != LearnerProgress.ACTIVITY_ATTEMPTED ) {
 	    log.warn("Progress " + this.getLearnerProgressId() + " found NULL start date of activity "
-		    + activity.getActivityId());
+		    + activity.getActivityId()+". Activity missing from attempted activities list.");
 	}
+	
 	if (oldState == LearnerProgress.ACTIVITY_NOT_ATTEMPTED) {
 	    log.debug("Progress " + this.getLearnerProgressId() + " does not remove not attempted activity "
 		    + activity.getActivityId());
