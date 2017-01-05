@@ -15,10 +15,10 @@
 			<select name="activityEvaluation" id="activity-evaluation" autocomplete="off">
 				<option value="dummy"></option>
 				
-				<c:forEach var="toolOutputDefinition" items="${sessionMap.toolOutputDefinitions}" varStatus="firstGroup">
+				<c:forEach var="toolOutputDefinition" items="${toolOutputDefinitions}" varStatus="firstGroup">
 				
 					<option value="${toolOutputDefinition}"
-							<c:if test="${toolOutputDefinition == sessionMap.activityEvaluation}">selected="selected"</c:if>>
+							<c:if test="${toolOutputDefinition == activityEvaluation}">selected="selected"</c:if>>
 						<fmt:message key="output.desc.${toolOutputDefinition}" />
 					</option>
 					
