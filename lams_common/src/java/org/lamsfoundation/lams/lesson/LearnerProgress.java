@@ -266,6 +266,7 @@ public class LearnerProgress implements Serializable {
 	for (Activity act : completedActivities.keySet()) {
 	    bldr.append(act.getActivityId()).append(act.getTitle()).append(", ");
 	}
+	log.debug(bldr.toString());
 	return this.completedActivities;
     }
 
