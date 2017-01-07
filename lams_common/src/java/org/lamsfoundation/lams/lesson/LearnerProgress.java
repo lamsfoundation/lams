@@ -25,6 +25,7 @@ package org.lamsfoundation.lams.lesson;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -242,11 +243,16 @@ public class LearnerProgress implements Serializable {
      *
      */
     public Map<Activity, Date> getAttemptedActivities() {
+	StringBuilder bldr = new StringBuilder("Progress ").append(this.getLearnerProgressId()).append(" user ")
+		.append(this.getUser().getLogin()).append(" attempted fetch: ");
+	for (Activity act : attemptedActivities.keySet()) {
+	    bldr.append(act.getActivityId()).append(act.getTitle()).append(", ");
+	}
+	log.debug(bldr.toString());
 	return this.attemptedActivities;
     }
 
     public void setAttemptedActivities(Map<Activity, Date> attemptedActivities) {
-
 	this.attemptedActivities = attemptedActivities;
     }
 
@@ -255,7 +261,11 @@ public class LearnerProgress implements Serializable {
      *
      */
     public Map<Activity, CompletedActivityProgress> getCompletedActivities() {
-
+	StringBuilder bldr = new StringBuilder("Progress ").append(this.getLearnerProgressId()).append(" user ")
+		.append(this.getUser().getLogin()).append(" completed fetch: ");
+	for (Activity act : completedActivities.keySet()) {
+	    bldr.append(act.getActivityId()).append(act.getTitle()).append(", ");
+	}
 	return this.completedActivities;
     }
 
@@ -315,9 +325,9 @@ public class LearnerProgress implements Serializable {
      *         <code>ACTIVITY_NOT_ATTEMPTED</code>.
      */
     public byte getProgressState(Activity activity) {
-	if (completedActivities.containsKey(activity)) {
+	if (getCompletedActivities().containsKey(activity)) {
 	    return ACTIVITY_COMPLETED;
-	} else if (attemptedActivities.containsKey(activity)) {
+	} else if (getAttemptedActivities().containsKey(activity)) {
 	    return ACTIVITY_ATTEMPTED;
 	} else {
 	    return ACTIVITY_NOT_ATTEMPTED;
@@ -345,20 +355,16 @@ public class LearnerProgress implements Serializable {
      *            needed to get any child activities correctly from
      *            Hibernate (grr - shouldn't be required)
      */
-    public void setProgressState(Activity activity, byte state, IActivityDAO activityDAO) {
-	
-	StringBuilder bldr = new StringBuilder("Progress ")
-		.append(this.getLearnerProgressId())
-		.append(" before dump: activity ")
-		.append(activity.getActivityId())
-		.append(" state ")
-		.append(state)
+    public synchronized void setProgressState(Activity activity, byte state, IActivityDAO activityDAO) {
+
+	StringBuilder bldr = new StringBuilder("Progress ").append(this.getLearnerProgressId())
+		.append(" before dump: activity ").append(activity.getActivityId()).append(" state ").append(state)
 		.append(" attempted ");
-	for ( Activity act : attemptedActivities.keySet() ) {
+	for (Activity act : getAttemptedActivities().keySet()) {
 	    bldr.append(act.getActivityId()).append(act.getTitle()).append(", ");
 	}
 	bldr.append(" completed ");
-	for ( Activity act : completedActivities.keySet() ) {
+	for (Activity act : getCompletedActivities().keySet()) {
 	    bldr.append(act.getActivityId()).append(act.getTitle()).append(", ");
 	}
 	log.debug(bldr.toString());
@@ -372,15 +378,15 @@ public class LearnerProgress implements Serializable {
 	    return;
 	}
 
-	Date activityStartDate = attemptedActivities.get(activity);
-	if ( activityStartDate != null && state == LearnerProgress.ACTIVITY_ATTEMPTED ) {
+	Date activityStartDate = getAttemptedActivities().get(activity);
+	if (activityStartDate != null && state == LearnerProgress.ACTIVITY_ATTEMPTED) {
 	    log.warn("Progress " + this.getLearnerProgressId() + " found newly attempted activity "
-		    + activity.getActivityId()+" already in in the attempted activities set.");
-	} else if ( activityStartDate == null && state != LearnerProgress.ACTIVITY_ATTEMPTED ) {
+		    + activity.getActivityId() + " already in in the attempted activities set.");
+	} else if (activityStartDate == null && state != LearnerProgress.ACTIVITY_ATTEMPTED) {
 	    log.warn("Progress " + this.getLearnerProgressId() + " found NULL start date of activity "
-		    + activity.getActivityId()+". Activity missing from attempted activities list.");
+		    + activity.getActivityId() + ". Activity missing from attempted activities list.");
 	}
-	
+
 	if (oldState == LearnerProgress.ACTIVITY_NOT_ATTEMPTED) {
 	    log.debug("Progress " + this.getLearnerProgressId() + " does not remove not attempted activity "
 		    + activity.getActivityId());
@@ -388,11 +394,11 @@ public class LearnerProgress implements Serializable {
 	} else if (oldState == LearnerProgress.ACTIVITY_ATTEMPTED) {
 	    log.debug("Progress " + this.getLearnerProgressId() + " removes attempted activity "
 		    + activity.getActivityId());
-	    this.attemptedActivities.remove(activity);
+	    this.getAttemptedActivities().remove(activity);
 	} else if (oldState == LearnerProgress.ACTIVITY_COMPLETED) {
 	    log.debug("Progress " + this.getLearnerProgressId() + " removes completed activity "
 		    + activity.getActivityId());
-	    this.completedActivities.remove(activity);
+	    this.getCompletedActivities().remove(activity);
 	    if (activity.isComplexActivity()) {
 		ComplexActivity complex = (ComplexActivity) activityDAO
 			.getActivityByActivityId(activity.getActivityId(), ComplexActivity.class);
@@ -412,30 +418,28 @@ public class LearnerProgress implements Serializable {
 	} else if (state == LearnerProgress.ACTIVITY_ATTEMPTED) {
 	    log.debug(
 		    "Progress " + this.getLearnerProgressId() + " adds attempted activity " + activity.getActivityId());
-	    this.attemptedActivities.put(activity, new Date());
+	    this.getAttemptedActivities().put(activity, new Date());
 	} else if (state == LearnerProgress.ACTIVITY_COMPLETED) {
 	    log.debug(
 		    "Progress " + this.getLearnerProgressId() + " adds completed activity " + activity.getActivityId());
-	    this.completedActivities.put(activity,
+	    this.getCompletedActivities().put(activity,
 		    new CompletedActivityProgress(this, activity, activityStartDate, new Date()));
 	}
-	
-	bldr = new StringBuilder("Progress ")
-    	.append(this.getLearnerProgressId())
-    	.append(" after dump: activity ")
-    	.append(activity.getActivityId())
-    	.append(" state ")
-    	.append(state)
-    	.append(" attempted ");
-        for ( Activity act : attemptedActivities.keySet() ) {
-            bldr.append(act.getActivityId()).append(act.getTitle()).append(", ");
-        }
-        bldr.append(" completed ");
-        for ( Activity act : completedActivities.keySet() ) {
-            bldr.append(act.getActivityId()).append(act.getTitle()).append(", ");
-        }
-        log.debug(bldr.toString());
 
+	bldr = new StringBuilder("Progress ").append(this.getLearnerProgressId()).append(" after dump: activity ")
+		.append(activity.getActivityId()).append(" state ").append(state).append(" attempted ");
+	for (Activity act : getAttemptedActivities().keySet()) {
+	    bldr.append(act.getActivityId()).append(act.getTitle()).append(", ");
+	}
+	bldr.append(" completed ");
+	for (Activity act : getCompletedActivities().keySet()) {
+	    bldr.append(act.getActivityId()).append(act.getTitle()).append(", ");
+	}
+	log.debug(bldr.toString());
+
+//	if (this.getLearnerProgressId() != null) {
+//	    activityDAO.update(this);
+//	}
     }
 
     /**
@@ -560,14 +564,14 @@ public class LearnerProgress implements Serializable {
 	return new LearnerProgressDTO(this.lesson.getLessonId(), this.lesson.getLessonName(), this.user.getLogin(),
 		this.user.getLastName(), this.user.getFirstName(), this.user.getUserId(),
 		this.currentActivity != null ? this.currentActivity.getActivityId() : null,
-		this.createIdArrayFrom(this.attemptedActivities.keySet()),
-		this.createIdArrayFrom(this.completedActivities.keySet()), isComplete());
+		this.createIdArrayFrom(this.getAttemptedActivities().keySet()),
+		this.createIdArrayFrom(this.getCompletedActivities().keySet()), isComplete());
     }
 
     public LearnerProgressCompletedDTO getLearnerProgressCompletedData() {
 	return new LearnerProgressCompletedDTO(this.lesson.getLessonId(), this.lesson.getLessonName(),
 		this.user.getLogin(), this.user.getLastName(), this.user.getFirstName(), this.user.getUserId(),
-		createCompletedActivityArrayFromMap(this.completedActivities), isComplete(),
+		createCompletedActivityArrayFromMap(this.getCompletedActivities()), isComplete(),
 		this.lesson.getStartDateTime().getTime(), this.startDate.getTime());
 
     }
