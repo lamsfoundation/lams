@@ -346,6 +346,23 @@ public class LearnerProgress implements Serializable {
      *            Hibernate (grr - shouldn't be required)
      */
     public void setProgressState(Activity activity, byte state, IActivityDAO activityDAO) {
+	
+	StringBuilder bldr = new StringBuilder("Progress ")
+		.append(this.getLearnerProgressId())
+		.append(" before dump: activity ")
+		.append(activity.getActivityId())
+		.append(" state ")
+		.append(state)
+		.append(" attempted ");
+	for ( Activity act : attemptedActivities.keySet() ) {
+	    bldr.append(act.getActivityId()).append(act.getTitle()).append(", ");
+	}
+	bldr.append(" completed ");
+	for ( Activity act : completedActivities.keySet() ) {
+	    bldr.append(act.getActivityId()).append(act.getTitle()).append(", ");
+	}
+	log.debug(bldr.toString());
+
 	// remove activity from current set
 	byte oldState = getProgressState(activity);
 	if (oldState == state) {
@@ -402,6 +419,23 @@ public class LearnerProgress implements Serializable {
 	    this.completedActivities.put(activity,
 		    new CompletedActivityProgress(this, activity, activityStartDate, new Date()));
 	}
+	
+	bldr = new StringBuilder("Progress ")
+    	.append(this.getLearnerProgressId())
+    	.append(" after dump: activity ")
+    	.append(activity.getActivityId())
+    	.append(" state ")
+    	.append(state)
+    	.append(" attempted ");
+        for ( Activity act : attemptedActivities.keySet() ) {
+            bldr.append(act.getActivityId()).append(act.getTitle()).append(", ");
+        }
+        bldr.append(" completed ");
+        for ( Activity act : completedActivities.keySet() ) {
+            bldr.append(act.getActivityId()).append(act.getTitle()).append(", ");
+        }
+        log.debug(bldr.toString());
+
     }
 
     /**
