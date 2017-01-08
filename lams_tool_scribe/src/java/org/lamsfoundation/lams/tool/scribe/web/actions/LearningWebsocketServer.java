@@ -59,6 +59,8 @@ public class LearningWebsocketServer {
 	@Override
 	public void run() {
 	    while (!stopFlag) {
+		// websocket communication bypasses standard HTTP filters, so Hibernate session needs to be initialised manually
+		HibernateSessionManager.openSession();
 		try {
 		    // synchronize websockets as a new Learner entering the activity could modify this collection
 		    synchronized (LearningWebsocketServer.websockets) {
@@ -81,14 +83,17 @@ public class LearningWebsocketServer {
 			    }
 			}
 		    }
-
-		    Thread.sleep(SendWorker.CHECK_INTERVAL);
-		} catch (InterruptedException e) {
-		    LearningWebsocketServer.log.warn("Stopping Scribe worker thread");
-		    stopFlag = true;
 		} catch (Exception e) {
 		    // error caught, but carry on
 		    LearningWebsocketServer.log.error("Error in Scribe worker thread", e);
+		} finally {
+		    HibernateSessionManager.closeSession();
+		    try {
+			Thread.sleep(SendWorker.CHECK_INTERVAL);
+		    } catch (InterruptedException e) {
+			LearningWebsocketServer.log.warn("Stopping Scribe worker thread");
+			stopFlag = true;
+		    }
 		}
 	    }
 	}
@@ -105,10 +110,6 @@ public class LearningWebsocketServer {
 		sessionCache = new ScribeSessionCache();
 		LearningWebsocketServer.cache.put(toolSessionId, sessionCache);
 	    }
-
-	    // websocket communication bypasses standard HTTP filters, so Hibernate session needs to be initialised manually
-	    // A new session needs to be created on each thread run as the session keeps stale Hibernate data (single transaction).
-	    HibernateSessionManager.bindHibernateSessionToCurrentThread(true);
 
 	    boolean send = false;
 	    ScribeSession scribeSession = LearningWebsocketServer.getScribeService()
@@ -222,7 +223,15 @@ public class LearningWebsocketServer {
 		    + " entered Scribe with toolSessionId: " + toolSessionId);
 	}
 
-	LearningWebsocketServer.sendWorker.send(toolSessionId, websocket);
+	new Thread(() -> {
+	    HibernateSessionManager.openSession();
+	    try {
+		LearningWebsocketServer.sendWorker.send(toolSessionId, websocket);
+	    } catch (Exception e) {
+		log.error("Error while sending messages", e);
+	    }
+	    HibernateSessionManager.closeSession();
+	}).start();
     }
 
     /**
