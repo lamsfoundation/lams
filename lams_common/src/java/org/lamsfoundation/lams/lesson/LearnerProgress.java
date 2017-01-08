@@ -243,12 +243,12 @@ public class LearnerProgress implements Serializable {
      *
      */
     public Map<Activity, Date> getAttemptedActivities() {
-	StringBuilder bldr = new StringBuilder("Progress ").append(this.getLearnerProgressId()).append(" user ")
-		.append(this.getUser().getLogin()).append(" attempted fetch: ");
-	for (Activity act : attemptedActivities.keySet()) {
-	    bldr.append(act.getActivityId()).append(act.getTitle()).append(", ");
-	}
-	log.debug(bldr.toString());
+//	StringBuilder bldr = new StringBuilder("Progress ").append(this.getLearnerProgressId()).append(" user ")
+//		.append(this.getUser().getLogin()).append(" attempted fetch: ");
+//	for (Activity act : attemptedActivities.keySet()) {
+//	    bldr.append(act.getActivityId()).append(act.getTitle()).append(", ");
+//	}
+//	log.debug(bldr.toString());
 	return this.attemptedActivities;
     }
 
@@ -261,12 +261,12 @@ public class LearnerProgress implements Serializable {
      *
      */
     public Map<Activity, CompletedActivityProgress> getCompletedActivities() {
-	StringBuilder bldr = new StringBuilder("Progress ").append(this.getLearnerProgressId()).append(" user ")
-		.append(this.getUser().getLogin()).append(" completed fetch: ");
-	for (Activity act : completedActivities.keySet()) {
-	    bldr.append(act.getActivityId()).append(act.getTitle()).append(", ");
-	}
-	log.debug(bldr.toString());
+//	StringBuilder bldr = new StringBuilder("Progress ").append(this.getLearnerProgressId()).append(" user ")
+//		.append(this.getUser().getLogin()).append(" completed fetch: ");
+//	for (Activity act : completedActivities.keySet()) {
+//	    bldr.append(act.getActivityId()).append(act.getTitle()).append(", ");
+//	}
+//	log.debug(bldr.toString());
 	return this.completedActivities;
     }
 
@@ -358,23 +358,23 @@ public class LearnerProgress implements Serializable {
      */
     public synchronized void setProgressState(Activity activity, byte state, IActivityDAO activityDAO) {
 
-	StringBuilder bldr = new StringBuilder("Progress ").append(this.getLearnerProgressId())
-		.append(" before dump: activity ").append(activity.getActivityId()).append(" state ").append(state)
-		.append(" attempted ");
-	for (Activity act : getAttemptedActivities().keySet()) {
-	    bldr.append(act.getActivityId()).append(act.getTitle()).append(", ");
-	}
-	bldr.append(" completed ");
-	for (Activity act : getCompletedActivities().keySet()) {
-	    bldr.append(act.getActivityId()).append(act.getTitle()).append(", ");
-	}
-	log.debug(bldr.toString());
-
+//	StringBuilder bldr = new StringBuilder("Progress ").append(this.getLearnerProgressId())
+//		.append(" before dump: activity ").append(activity.getActivityId()).append(" state ").append(state)
+//		.append(" attempted ");
+//	for (Activity act : getAttemptedActivities().keySet()) {
+//	    bldr.append(act.getActivityId()).append(act.getTitle()).append(", ");
+//	}
+//	bldr.append(" completed ");
+//	for (Activity act : getCompletedActivities().keySet()) {
+//	    bldr.append(act.getActivityId()).append(act.getTitle()).append(", ");
+//	}
+//	log.debug(bldr.toString());
+//
 	// remove activity from current set
 	byte oldState = getProgressState(activity);
 	if (oldState == state) {
-	    log.debug("Progress " + this.getLearnerProgressId() + " does not change state " + state + " of activity "
-		    + activity.getActivityId());
+//	    log.debug("Progress " + this.getLearnerProgressId() + " does not change state " + state + " of activity "
+//		    + activity.getActivityId());
 	    // no real change, forget the rest of the method
 	    return;
 	}
@@ -389,16 +389,16 @@ public class LearnerProgress implements Serializable {
 	}
 
 	if (oldState == LearnerProgress.ACTIVITY_NOT_ATTEMPTED) {
-	    log.debug("Progress " + this.getLearnerProgressId() + " does not remove not attempted activity "
-		    + activity.getActivityId());
+//	    log.debug("Progress " + this.getLearnerProgressId() + " does not remove not attempted activity "
+//		    + activity.getActivityId());
 	    ;
 	} else if (oldState == LearnerProgress.ACTIVITY_ATTEMPTED) {
-	    log.debug("Progress " + this.getLearnerProgressId() + " removes attempted activity "
-		    + activity.getActivityId());
+//	    log.debug("Progress " + this.getLearnerProgressId() + " removes attempted activity "
+//		    + activity.getActivityId());
 	    this.getAttemptedActivities().remove(activity);
 	} else if (oldState == LearnerProgress.ACTIVITY_COMPLETED) {
-	    log.debug("Progress " + this.getLearnerProgressId() + " removes completed activity "
-		    + activity.getActivityId());
+//	    log.debug("Progress " + this.getLearnerProgressId() + " removes completed activity "
+//		    + activity.getActivityId());
 	    this.getCompletedActivities().remove(activity);
 	    if (activity.isComplexActivity()) {
 		ComplexActivity complex = (ComplexActivity) activityDAO
@@ -413,30 +413,30 @@ public class LearnerProgress implements Serializable {
 
 	// add activity to new set
 	if (state == LearnerProgress.ACTIVITY_NOT_ATTEMPTED) {
-	    log.debug("Progress " + this.getLearnerProgressId() + " does not add not attempted activity "
-		    + activity.getActivityId());
+//	    log.debug("Progress " + this.getLearnerProgressId() + " does not add not attempted activity "
+//		    + activity.getActivityId());
 	    ;
 	} else if (state == LearnerProgress.ACTIVITY_ATTEMPTED) {
-	    log.debug(
-		    "Progress " + this.getLearnerProgressId() + " adds attempted activity " + activity.getActivityId());
+//	    log.debug(
+//		    "Progress " + this.getLearnerProgressId() + " adds attempted activity " + activity.getActivityId());
 	    this.getAttemptedActivities().put(activity, new Date());
 	} else if (state == LearnerProgress.ACTIVITY_COMPLETED) {
-	    log.debug(
-		    "Progress " + this.getLearnerProgressId() + " adds completed activity " + activity.getActivityId());
+//	    log.debug(
+//		    "Progress " + this.getLearnerProgressId() + " adds completed activity " + activity.getActivityId());
 	    this.getCompletedActivities().put(activity,
 		    new CompletedActivityProgress(this, activity, activityStartDate, new Date()));
 	}
 
-	bldr = new StringBuilder("Progress ").append(this.getLearnerProgressId()).append(" after dump: activity ")
-		.append(activity.getActivityId()).append(" state ").append(state).append(" attempted ");
-	for (Activity act : getAttemptedActivities().keySet()) {
-	    bldr.append(act.getActivityId()).append(act.getTitle()).append(", ");
-	}
-	bldr.append(" completed ");
-	for (Activity act : getCompletedActivities().keySet()) {
-	    bldr.append(act.getActivityId()).append(act.getTitle()).append(", ");
-	}
-	log.debug(bldr.toString());
+//	bldr = new StringBuilder("Progress ").append(this.getLearnerProgressId()).append(" after dump: activity ")
+//		.append(activity.getActivityId()).append(" state ").append(state).append(" attempted ");
+//	for (Activity act : getAttemptedActivities().keySet()) {
+//	    bldr.append(act.getActivityId()).append(act.getTitle()).append(", ");
+//	}
+//	bldr.append(" completed ");
+//	for (Activity act : getCompletedActivities().keySet()) {
+//	    bldr.append(act.getActivityId()).append(act.getTitle()).append(", ");
+//	}
+//	log.debug(bldr.toString());
 
 //	if (this.getLearnerProgressId() != null) {
 //	    activityDAO.update(this);
