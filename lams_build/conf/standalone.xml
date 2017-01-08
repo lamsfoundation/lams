@@ -217,6 +217,14 @@
                 </handlers>
             </logger>
             
+            <logger category="org.springframework.beans.factory.support.DefaultListableBeanFactory">
+            	<level name="INFO"/>
+            </logger>
+            
+            <logger category="org.lamsfoundation.lams.util.hibernate.TransactionAwareSessionContext">
+            	<level name="ERROR"/>
+            </logger>
+            
             <logger category="org.hibernate.engine.internal.StatefulPersistenceContext">
                 <level name="ERROR"/>
             </logger>
