@@ -68,12 +68,10 @@ public class PresenceWebsocketServer {
 
 	@Override
 	public void run() {
+	    // websocket communication bypasses standard HTTP filters, so Hibernate session needs to be initialised manually
+	    HibernateSessionManager.openSession();
 	    while (!stopFlag) {
 		try {
-		    // websocket communication bypasses standard HTTP filters, so Hibernate session needs to be initialised manually
-		    // A new session needs to be created on each thread run as the session keeps stale Hibernate data (single transaction).
-		    HibernateSessionManager.bindHibernateSessionToCurrentThread(true);
-
 		    // synchronize websockets as a new Learner entering chat could modify this collection
 		    synchronized (PresenceWebsocketServer.websockets) {
 			Iterator<Entry<Long, Set<Websocket>>> entryIterator = PresenceWebsocketServer.websockets
@@ -97,7 +95,6 @@ public class PresenceWebsocketServer {
 			    }
 			}
 		    }
-
 		    Thread.sleep(SendWorker.CHECK_INTERVAL);
 		} catch (InterruptedException e) {
 		    PresenceWebsocketServer.log.warn("Stopping Presence Chat worker thread");
@@ -107,6 +104,7 @@ public class PresenceWebsocketServer {
 		    PresenceWebsocketServer.log.error("Error in Presence Chat worker thread", e);
 		}
 	    }
+	    HibernateSessionManager.closeSession();
 	}
 
 	/**
@@ -246,10 +244,12 @@ public class PresenceWebsocketServer {
 	    PresenceWebsocketServer.rosters.put(lessonId, roster);
 	}
 
-	// websocket communication bypasses standard HTTP filters, so Hibernate session needs to be initialised manually
-	HibernateSessionManager.bindHibernateSessionToCurrentThread(false);
-	// update the chat window immediatelly
-	PresenceWebsocketServer.sendWorker.send(lessonId, websocket.nickName);
+	new Thread(() -> {
+	    // websocket communication bypasses standard HTTP filters, so Hibernate session needs to be initialised manually
+	    HibernateSessionManager.openSession();
+	    PresenceWebsocketServer.sendWorker.send(lessonId, websocket.nickName);
+	    HibernateSessionManager.closeSession();
+	}).start();
 
 	if (PresenceWebsocketServer.log.isDebugEnabled()) {
 	    PresenceWebsocketServer.log
@@ -318,7 +318,6 @@ public class PresenceWebsocketServer {
 	Long lessonId = requestJSON.getLong("lessonID");
 
 	// websocket communication bypasses standard HTTP filters, so Hibernate session needs to be initialised manually
-	HibernateSessionManager.bindHibernateSessionToCurrentThread(false);
 
 	String from = session.getRequestParameterMap().get("nickname").get(0);
 	String to = requestJSON.getString("to");
@@ -326,8 +325,13 @@ public class PresenceWebsocketServer {
 	    to = null;
 	}
 
-	PresenceWebsocketServer.getPresenceChatService().createPresenceChatMessage(lessonId, from, to, new Date(),
-		message);
+	final String finalTo = to;
+	new Thread(() -> {
+	    HibernateSessionManager.openSession();
+	    PresenceWebsocketServer.getPresenceChatService().createPresenceChatMessage(lessonId, from, finalTo,
+		    new Date(), message);
+	    HibernateSessionManager.closeSession();
+	}).start();
     }
 
     /**
@@ -336,25 +340,31 @@ public class PresenceWebsocketServer {
     private static void sendConversation(JSONObject requestJSON, Session session) throws JSONException, IOException {
 	Long lessonId = requestJSON.getLong("lessonID");
 
-	// websocket communication bypasses standard HTTP filters, so Hibernate session needs to be initialised manually
-	HibernateSessionManager.bindHibernateSessionToCurrentThread(false);
-
 	String to = requestJSON.getString("to");
 	String from = session.getRequestParameterMap().get("nickname").get(0);
 
-	List<PresenceChatMessage> messages = PresenceWebsocketServer.getPresenceChatService()
-		.getMessagesByConversation(lessonId, from, to);
-	JSONArray messagesJSON = new JSONArray();
+	// websocket communication bypasses standard HTTP filters, so Hibernate session needs to be initialised manually
+	new Thread(() -> {
+	    HibernateSessionManager.openSession();
+	    List<PresenceChatMessage> messages = PresenceWebsocketServer.getPresenceChatService()
+		    .getMessagesByConversation(lessonId, from, to);
+	    JSONArray messagesJSON = new JSONArray();
 
-	for (PresenceChatMessage message : messages) {
-	    JSONObject messageJSON = PresenceWebsocketServer.buildMessageJSON(message);
-	    messagesJSON.put(messageJSON);
-	}
+	    try {
+		for (PresenceChatMessage message : messages) {
+		    JSONObject messageJSON = PresenceWebsocketServer.buildMessageJSON(message);
+		    messagesJSON.put(messageJSON);
+		}
 
-	JSONObject responseJSON = new JSONObject();
-	responseJSON.put("messages", messagesJSON);
-	// send the payload to the Learner's browser
-	session.getBasicRemote().sendText(responseJSON.toString());
+		JSONObject responseJSON = new JSONObject();
+		responseJSON.put("messages", messagesJSON);
+		// send the payload to the Learner's browser
+		session.getBasicRemote().sendText(responseJSON.toString());
+	    } catch (Exception e) {
+		log.error("Error while seding conversation", e);
+	    }
+	    HibernateSessionManager.closeSession();
+	}).start();
     }
 
     /**
