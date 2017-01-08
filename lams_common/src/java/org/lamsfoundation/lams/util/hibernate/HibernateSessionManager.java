@@ -19,27 +19,30 @@ public class HibernateSessionManager {
      * Puts a Hibernate session into the thread. Useful when thread missed the servlet filters but needs access to DB.
      */
     public static void bindHibernateSessionToCurrentThread(boolean recreate) {
-	SessionFactory sessionFactory = HibernateSessionManager.getSessionFactory();
-	// is there a session bound to the current thread already?
-	Object session = TransactionSynchronizationManager.getResource(sessionFactory);
-	if (session != null) {
-	    if (recreate) {
-		TransactionSynchronizationManager.unbindResource(sessionFactory);
-	    } else {
-		return;
-	    }
-	}
-
-	SessionHolder sessionHolder = new SessionHolder(sessionFactory.openSession());
-	TransactionSynchronizationManager.bindResource(sessionFactory, sessionHolder);
+	return;
+	
+// disabled to stop progress mayhem LDEV-4187
+//	SessionFactory sessionFactory = HibernateSessionManager.getSessionFactory();
+//	// is there a session bound to the current thread already?
+//	Object session = TransactionSynchronizationManager.getResource(sessionFactory);
+//	if (session != null) {
+//	    if (recreate) {
+//		TransactionSynchronizationManager.unbindResource(sessionFactory);
+//	    } else {
+//		return;
+//	    }
+//	}
+//
+//	SessionHolder sessionHolder = new SessionHolder(sessionFactory.openSession());
+//	TransactionSynchronizationManager.bindResource(sessionFactory, sessionHolder);
     }
 
-    private static SessionFactory getSessionFactory() {
-	if (HibernateSessionManager.sessionFactory == null) {
-	    WebApplicationContext wac = WebApplicationContextUtils
-		    .getRequiredWebApplicationContext(SessionManager.getServletContext());
-	    HibernateSessionManager.sessionFactory = (SessionFactory) wac.getBean("coreSessionFactory");
-	}
-	return HibernateSessionManager.sessionFactory;
-    }
+//    private static SessionFactory getSessionFactory() {
+//	if (HibernateSessionManager.sessionFactory == null) {
+//	    WebApplicationContext wac = WebApplicationContextUtils
+//		    .getRequiredWebApplicationContext(SessionManager.getServletContext());
+//	    HibernateSessionManager.sessionFactory = (SessionFactory) wac.getBean("coreSessionFactory");
+//	}
+//	return HibernateSessionManager.sessionFactory;
+//    }
 }
