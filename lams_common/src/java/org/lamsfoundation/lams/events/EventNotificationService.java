@@ -52,7 +52,6 @@ public class EventNotificationService implements IEventNotificationService {
 	}
     }
 
-    @SuppressWarnings("unchecked")
     @Override
     public void createLessonEvent(String scope, String name, Long toolContentId, String defaultSubject,
 	    String defaultMessage, boolean isHtmlFormat, AbstractDeliveryMethod deliveryMethod)
@@ -220,7 +219,7 @@ public class EventNotificationService implements IEventNotificationService {
 	}
 	// create a new thread to send the messages as it can take some time
 	new Thread(() -> {
-	    HibernateSessionManager.bindHibernateSessionToCurrentThread(false);
+	    HibernateSessionManager.openSession();
 
 	    Event event = null;
 	    for (Integer id : toUserIds) {
@@ -235,6 +234,7 @@ public class EventNotificationService implements IEventNotificationService {
 		event.setFailTime(new Date());
 		eventDAO.insertOrUpdate(event);
 	    }
+	    HibernateSessionManager.closeSession();
 	}).start();
     }
 
@@ -328,7 +328,7 @@ public class EventNotificationService implements IEventNotificationService {
 
 	// create a new thread to send the messages as it can take some time
 	new Thread(() -> {
-	    HibernateSessionManager.bindHibernateSessionToCurrentThread(false);
+	    HibernateSessionManager.openSession();
 
 	    Event eventFailCopy = null;
 	    Iterator<Subscription> subscriptionIterator = event.getSubscriptions().iterator();
@@ -362,6 +362,8 @@ public class EventNotificationService implements IEventNotificationService {
 		eventFailCopy.setMessage(messageToSend);
 		eventDAO.insertOrUpdate(eventFailCopy);
 	    }
+
+	    HibernateSessionManager.closeSession();
 	}).start();
     }
 

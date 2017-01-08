@@ -46,7 +46,10 @@ public class LearningWebsocketServer {
 
 	@Override
 	public void run() {
+
 	    while (!stopFlag) {
+		// websocket communication bypasses standard HTTP filters, so Hibernate session needs to be initialised manually
+		HibernateSessionManager.openSession();
 		try {
 		    // synchronize websockets as a new Learner entering the activity could modify this collection
 		    synchronized (LearningWebsocketServer.websockets) {
@@ -69,14 +72,17 @@ public class LearningWebsocketServer {
 			    }
 			}
 		    }
-
-		    Thread.sleep(SendWorker.CHECK_INTERVAL);
-		} catch (InterruptedException e) {
-		    LearningWebsocketServer.log.warn("Stopping Scratchie worker thread");
-		    stopFlag = true;
 		} catch (Exception e) {
 		    // error caught, but carry on
 		    LearningWebsocketServer.log.error("Error in Scratchie worker thread", e);
+		} finally {
+		    HibernateSessionManager.closeSession();
+		    try {
+			Thread.sleep(SendWorker.CHECK_INTERVAL);
+		    } catch (InterruptedException e) {
+			LearningWebsocketServer.log.warn("Stopping Scratchie worker thread");
+			stopFlag = true;
+		    }
 		}
 	    }
 	}
@@ -87,9 +93,6 @@ public class LearningWebsocketServer {
 	@SuppressWarnings("unchecked")
 	private void send(Long toolSessionId) throws JSONException, IOException {
 	    JSONObject responseJSON = new JSONObject();
-	    // websocket communication bypasses standard HTTP filters, so Hibernate session needs to be initialised manually
-	    // A new session needs to be created on each thread run as the session keeps stale Hibernate data (single transaction).
-	    HibernateSessionManager.bindHibernateSessionToCurrentThread(true);
 
 	    Collection<ScratchieItem> items = LearningWebsocketServer.getScratchieService()
 		    .getItemsWithIndicatedScratches(toolSessionId);
@@ -231,7 +234,7 @@ public class LearningWebsocketServer {
 	    }
 	}
     }
-    
+
     /**
      * The time limit is expired but leader hasn't submitted required notebook/burning questions yet. Non-leaders
      * will need to refresh the page in order to stop showing them questions page.

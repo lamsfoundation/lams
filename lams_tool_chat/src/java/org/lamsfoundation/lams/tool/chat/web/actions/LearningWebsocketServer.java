@@ -75,11 +75,10 @@ public class LearningWebsocketServer {
 	@Override
 	public void run() {
 	    while (!stopFlag) {
-		try {
-		    // websocket communication bypasses standard HTTP filters, so Hibernate session needs to be initialised manually
-		    // A new session needs to be created on each thread run as the session keeps stale Hibernate data (single transaction).
-		    HibernateSessionManager.bindHibernateSessionToCurrentThread(true);
+		// websocket communication bypasses standard HTTP filters, so Hibernate session needs to be initialised manually
+		HibernateSessionManager.openSession();
 
+		try {
 		    // synchronize websockets as a new Learner entering Chat could modify this collection
 		    synchronized (LearningWebsocketServer.websockets) {
 			Iterator<Entry<Long, Set<Websocket>>> entryIterator = LearningWebsocketServer.websockets
@@ -93,7 +92,6 @@ public class LearningWebsocketServer {
 				    || ((System.currentTimeMillis() - lastSendTime) >= SendWorker.CHECK_INTERVAL)) {
 				send(toolSessionId);
 			    }
-
 			    // if all users left the chat, remove the obsolete mapping
 			    Set<Websocket> sessionWebsockets = entry.getValue();
 			    if (sessionWebsockets.isEmpty()) {
@@ -103,14 +101,17 @@ public class LearningWebsocketServer {
 			    }
 			}
 		    }
-
-		    Thread.sleep(SendWorker.CHECK_INTERVAL);
-		} catch (InterruptedException e) {
-		    LearningWebsocketServer.log.warn("Interrupted Chat worker thread");
-		    stopFlag = true;
 		} catch (Exception e) {
 		    // error caught, but carry on
 		    LearningWebsocketServer.log.error("Error in Chat worker thread", e);
+		} finally {
+		    HibernateSessionManager.closeSession();
+		    try {
+			Thread.sleep(SendWorker.CHECK_INTERVAL);
+		    } catch (InterruptedException e) {
+			LearningWebsocketServer.log.warn("Stopping Chat worker thread");
+			stopFlag = true;
+		    }
 		}
 	    }
 	}
@@ -248,21 +249,26 @@ public class LearningWebsocketServer {
 	    sessionWebsockets = Collections.synchronizedSet(new HashSet<Websocket>());
 	    LearningWebsocketServer.websockets.put(toolSessionId, sessionWebsockets);
 	}
+	final Set<Websocket> finalSessionWebsockets = sessionWebsockets;
+
 	String userName = session.getUserPrincipal().getName();
-	ChatUser chatUser = LearningWebsocketServer.getChatService().getUserByLoginNameAndSessionId(userName,
-		toolSessionId);
-	Websocket websocket = new Websocket(session, chatUser.getNickname());
-	sessionWebsockets.add(websocket);
+	new Thread(() -> {
+	    // websocket communication bypasses standard HTTP filters, so Hibernate session needs to be initialised manually
+	    HibernateSessionManager.openSession();
+	    ChatUser chatUser = LearningWebsocketServer.getChatService().getUserByLoginNameAndSessionId(userName,
+		    toolSessionId);
+	    Websocket websocket = new Websocket(session, chatUser.getNickname());
+	    finalSessionWebsockets.add(websocket);
 
-	// websocket communication bypasses standard HTTP filters, so Hibernate session needs to be initialised manually
-	HibernateSessionManager.bindHibernateSessionToCurrentThread(false);
-	// update the chat window immediatelly
-	LearningWebsocketServer.sendWorker.send(toolSessionId);
+	    // update the chat window immediatelly
+	    LearningWebsocketServer.sendWorker.send(toolSessionId);
+	    HibernateSessionManager.closeSession();
 
-	if (LearningWebsocketServer.log.isDebugEnabled()) {
-	    LearningWebsocketServer.log
-		    .debug("User " + userName + " entered Chat with toolSessionId: " + toolSessionId);
-	}
+	    if (LearningWebsocketServer.log.isDebugEnabled()) {
+		LearningWebsocketServer.log
+			.debug("User " + userName + " entered Chat with toolSessionId: " + toolSessionId);
+	    }
+	}).start();
     }
 
     /**
@@ -308,34 +314,45 @@ public class LearningWebsocketServer {
 	if (StringUtils.isBlank(message)) {
 	    return;
 	}
+
 	Long toolSessionId = messageJSON.getLong("toolSessionID");
-
-	// websocket communication bypasses standard HTTP filters, so Hibernate session needs to be initialised manually
-	HibernateSessionManager.bindHibernateSessionToCurrentThread(false);
-
-	ChatUser toChatUser = null;
 	String toUser = messageJSON.getString("toUser");
-	if (!StringUtils.isBlank(toUser)) {
-	    toChatUser = LearningWebsocketServer.getChatService().getUserByNicknameAndSessionID(toUser, toolSessionId);
-	    if (toChatUser == null) {
-		// there should be an user, but he could not be found, so don't send the message to everyone
-		LearningWebsocketServer.log.error("Could not find nick: " + toUser + " in session: " + toolSessionId);
-		return;
+	new Thread(() -> {
+	    try {
+		// websocket communication bypasses standard HTTP filters, so Hibernate session needs to be initialised manually
+		HibernateSessionManager.openSession();
+
+		ChatUser toChatUser = null;
+		if (!StringUtils.isBlank(toUser)) {
+		    toChatUser = LearningWebsocketServer.getChatService().getUserByNicknameAndSessionID(toUser,
+			    toolSessionId);
+		    if (toChatUser == null) {
+			// there should be an user, but he could not be found, so don't send the message to everyone
+			LearningWebsocketServer.log
+				.error("Could not find nick: " + toUser + " in session: " + toolSessionId);
+			return;
+		    }
+		}
+
+		ChatUser chatUser = LearningWebsocketServer.getChatService()
+			.getUserByLoginNameAndSessionId(session.getUserPrincipal().getName(), toolSessionId);
+
+		ChatMessage chatMessage = new ChatMessage();
+		chatMessage.setFromUser(chatUser);
+		chatMessage.setChatSession(chatUser.getChatSession());
+		chatMessage.setToUser(toChatUser);
+		chatMessage.setType(
+			toChatUser == null ? ChatMessage.MESSAGE_TYPE_PUBLIC : ChatMessage.MESSAGE_TYPE_PRIVATE);
+		chatMessage.setBody(message);
+		chatMessage.setSendDate(new Date());
+		chatMessage.setHidden(Boolean.FALSE);
+		LearningWebsocketServer.getChatService().saveOrUpdateChatMessage(chatMessage);
+
+		HibernateSessionManager.closeSession();
+	    } catch (Exception e) {
+		log.error("Error in thread", e);
 	    }
-	}
-
-	ChatUser chatUser = LearningWebsocketServer.getChatService()
-		.getUserByLoginNameAndSessionId(session.getUserPrincipal().getName(), toolSessionId);
-
-	ChatMessage chatMessage = new ChatMessage();
-	chatMessage.setFromUser(chatUser);
-	chatMessage.setChatSession(chatUser.getChatSession());
-	chatMessage.setToUser(toChatUser);
-	chatMessage.setType(toChatUser == null ? ChatMessage.MESSAGE_TYPE_PUBLIC : ChatMessage.MESSAGE_TYPE_PRIVATE);
-	chatMessage.setBody(message);
-	chatMessage.setSendDate(new Date());
-	chatMessage.setHidden(Boolean.FALSE);
-	LearningWebsocketServer.getChatService().saveOrUpdateChatMessage(chatMessage);
+	}).start();
     }
 
     /**
