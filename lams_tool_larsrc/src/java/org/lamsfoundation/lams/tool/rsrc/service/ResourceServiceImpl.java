@@ -1038,7 +1038,7 @@ public class ResourceServiceImpl implements IResourceService, ToolContentManager
     public ToolOutput getToolOutput(String name, Long toolSessionId, Long learnerId) {
 	return getResourceOutputFactory().getToolOutput(name, this, toolSessionId, learnerId);
     }
-    
+
     @Override
     public List<ToolOutput> getToolOutputs(String name, Long toolContentId) {
 	return new ArrayList<ToolOutput>();
@@ -1241,5 +1241,9 @@ public class ResourceServiceImpl implements IResourceService, ToolContentManager
 
 	saveOrUpdateResource(resource);
 
+    }
+
+    public void evict(Object object) {
+	resourceDao.releaseFromCache(object);
     }
 }

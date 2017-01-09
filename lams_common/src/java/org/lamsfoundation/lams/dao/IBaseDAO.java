@@ -305,4 +305,6 @@ public interface IBaseDAO {
      * @return a list of objects which have the same property values
      */
     public long countByProperties(Class clazz, Map<String, Object> properties);
+
+    public void releaseFromCache(Object o);
 }

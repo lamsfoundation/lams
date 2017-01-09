@@ -268,4 +268,6 @@ public interface IResourceService {
      * @return
      */
     boolean isGroupedActivity(long toolContentID);
+    
+    void evict(Object object);
 }

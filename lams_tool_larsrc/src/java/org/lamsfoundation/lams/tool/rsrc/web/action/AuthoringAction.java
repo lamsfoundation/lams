@@ -543,9 +543,7 @@ public class AuthoringAction extends Action {
 		PropertyUtils.copyProperties(resourcePO, resource);
 
 		// copyProperties() above may result in "collection assigned to two objects in a session" exception
-		// Below we remove reference to one of Assessment objects,
-		// so maybe there will be just one object in session when save is done
-		// If this fails, we may have to evict the object from session using DAO
+		service.evict(resource);
 		resourceForm.setResource(null);
 		resource = null;
 		// get back UID
