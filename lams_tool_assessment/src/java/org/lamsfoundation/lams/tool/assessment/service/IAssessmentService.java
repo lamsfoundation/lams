@@ -79,7 +79,7 @@ public interface IAssessmentService {
      */
     void copyAnswersFromLeader(AssessmentUser user, AssessmentUser leader)
 	    throws IllegalAccessException, InstantiationException, InvocationTargetException, NoSuchMethodException;
-    
+
     /**
      * Stores date when user has started activity with time limit.
      * 
@@ -87,7 +87,7 @@ public interface IAssessmentService {
      * @param userId
      */
     void launchTimeLimit(Long assessmentUid, Long userId);
-    
+
     /**
      * Calculates how many seconds left till the time limit will expire. If it's expired already - returns 1 in order to
      * show learning.jsp and autosubmit results.
@@ -97,7 +97,7 @@ public interface IAssessmentService {
      * @return
      */
     long getSecondsLeft(Assessment assessment, AssessmentUser user);
-    
+
     /**
      * @param assessment
      * @param groupLeader
@@ -263,7 +263,7 @@ public interface IAssessmentService {
      * @return
      */
     Float getBestTotalScoreByUser(Long sessionId, Long userId);
-    
+
     List<AssessmentUserDTO> getBestTotalScoresByContentId(Long toolContentId);
 
     /**
@@ -274,7 +274,7 @@ public interface IAssessmentService {
      * @return
      */
     Float getFirstTotalScoreByUser(Long sessionId, Long userId);
-    
+
     List<AssessmentUserDTO> getFirstTotalScoresByContentId(Long toolContentId);
 
     /**
@@ -285,7 +285,7 @@ public interface IAssessmentService {
      * @return
      */
     Float getAvergeTotalScoreByUser(Long sessionId, Long userId);
-    
+
     List<AssessmentUserDTO> getAverageTotalScoresByContentId(Long toolContentId);
 
     /**
@@ -346,7 +346,7 @@ public interface IAssessmentService {
      * @return
      */
     String finishToolSession(Long toolSessionId, Long userId) throws AssessmentApplicationException;
-    
+
     /**
      * Set userFinished to false
      * 
@@ -461,5 +461,5 @@ public interface IAssessmentService {
 	    Set<QuestionReference> oldReferences, Set<QuestionReference> newReferences,
 	    List<QuestionReference> deletedReferences);
 
-    void releaseQuestionsAndReferencesFromCache(Assessment assessment);
+    void releaseFromCache(Object object);
 }

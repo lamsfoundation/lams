@@ -50,14 +50,9 @@ import org.apache.tomcat.util.json.JSONObject;
 import org.lamsfoundation.lams.events.IEventNotificationService;
 import org.lamsfoundation.lams.gradebook.service.IGradebookService;
 import org.lamsfoundation.lams.learning.service.ILearnerService;
-import org.lamsfoundation.lams.learningdesign.Activity;
-import org.lamsfoundation.lams.learningdesign.ToolActivity;
-import org.lamsfoundation.lams.learningdesign.dao.IActivityDAO;
 import org.lamsfoundation.lams.learningdesign.service.ExportToolContentException;
 import org.lamsfoundation.lams.learningdesign.service.IExportToolContentService;
 import org.lamsfoundation.lams.learningdesign.service.ImportToolContentException;
-import org.lamsfoundation.lams.lesson.Lesson;
-import org.lamsfoundation.lams.lesson.service.ILessonService;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.notebook.service.CoreNotebookConstants;
 import org.lamsfoundation.lams.notebook.service.ICoreNotebookService;
@@ -66,7 +61,6 @@ import org.lamsfoundation.lams.rest.ToolRestManager;
 import org.lamsfoundation.lams.tool.ToolContentManager;
 import org.lamsfoundation.lams.tool.ToolOutput;
 import org.lamsfoundation.lams.tool.ToolOutputDefinition;
-import org.lamsfoundation.lams.tool.ToolSession;
 import org.lamsfoundation.lams.tool.ToolSessionExportOutputData;
 import org.lamsfoundation.lams.tool.ToolSessionManager;
 import org.lamsfoundation.lams.tool.assessment.AssessmentConstants;
@@ -100,9 +94,6 @@ import org.lamsfoundation.lams.tool.assessment.util.SequencableComparator;
 import org.lamsfoundation.lams.tool.exception.DataMissingException;
 import org.lamsfoundation.lams.tool.exception.ToolException;
 import org.lamsfoundation.lams.tool.service.ILamsToolService;
-import org.lamsfoundation.lams.usermanagement.Organisation;
-import org.lamsfoundation.lams.usermanagement.OrganisationType;
-import org.lamsfoundation.lams.usermanagement.Role;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
@@ -281,45 +272,46 @@ public class AssessmentServiceImpl
 
 	assessmentResultDao.saveObject(userResult);
     }
-    
+
     @Override
     public void launchTimeLimit(Long assessmentUid, Long userId) {
 	AssessmentResult lastResult = getLastAssessmentResult(assessmentUid, userId);
 	lastResult.setTimeLimitLaunchedDate(new Date());
 	assessmentResultDao.saveObject(lastResult);
     }
-    
+
     @Override
     public long getSecondsLeft(Assessment assessment, AssessmentUser user) {
 	AssessmentResult lastResult = getLastAssessmentResult(assessment.getUid(), user.getUserId());
-	
+
 	long secondsLeft = 1;
 	if (assessment.getTimeLimit() != 0) {
 	    // if user has pressed OK button already - calculate remaining time, and full time otherwise
 	    boolean isTimeLimitNotLaunched = (lastResult == null) || (lastResult.getTimeLimitLaunchedDate() == null);
 	    secondsLeft = isTimeLimitNotLaunched ? assessment.getTimeLimit() * 60
-		    : assessment.getTimeLimit() * 60 - (System.currentTimeMillis() - lastResult.getTimeLimitLaunchedDate().getTime()) / 1000;
+		    : assessment.getTimeLimit() * 60
+			    - (System.currentTimeMillis() - lastResult.getTimeLimitLaunchedDate().getTime()) / 1000;
 	    // change negative or zero number to 1
 	    secondsLeft = Math.max(1, secondsLeft);
 	}
-	
+
 	return secondsLeft;
     }
-    
+
     @Override
     public boolean checkTimeLimitExceeded(Assessment assessment, AssessmentUser groupLeader) {
 	int timeLimit = assessment.getTimeLimit();
 	if (timeLimit == 0) {
 	    return false;
 	}
-	
+
 	AssessmentResult lastLeaderResult = getLastAssessmentResult(assessment.getUid(), groupLeader.getUserId());
-	
+
 	//check if the time limit is exceeded
 	return (lastLeaderResult != null) && (lastLeaderResult.getTimeLimitLaunchedDate() != null)
-		&& lastLeaderResult.getTimeLimitLaunchedDate().getTime() + timeLimit * 60000 < System.currentTimeMillis();
+		&& lastLeaderResult.getTimeLimitLaunchedDate().getTime() + timeLimit * 60000 < System
+			.currentTimeMillis();
     }
-    
 
     @Override
     public List<AssessmentUser> getUsersBySession(Long toolSessionID) {
@@ -400,13 +392,8 @@ public class AssessmentServiceImpl
     }
 
     @Override
-    public void releaseQuestionsAndReferencesFromCache(Assessment assessment) {
-	for (AssessmentQuestion question : (Set<AssessmentQuestion>) assessment.getQuestions()) {
-	    assessmentQuestionDao.evict(question);
-	}
-	for (QuestionReference reference : (Set<QuestionReference>) assessment.getQuestionReferences()) {
-	    assessmentQuestionDao.evict(reference);
-	}
+    public void releaseFromCache(Object object) {
+	assessmentQuestionDao.evict(object);
     }
 
     @Override
@@ -441,10 +428,11 @@ public class AssessmentServiceImpl
 
 	    // don't instantiate new attempt if the previous one wasn't finished and thus continue working with it
 	    if (lastResult.getFinishDate() == null) {
-		
+
 		//check all required questionResults exist, it can be missing in case of random question - create new one then
 		Set<AssessmentQuestionResult> questionResults = lastResult.getQuestionResults();
-		Set<AssessmentQuestionResult> updatedQuestionResults = new TreeSet(new AssessmentQuestionResultComparator());
+		Set<AssessmentQuestionResult> updatedQuestionResults = new TreeSet(
+			new AssessmentQuestionResultComparator());
 		for (Set<AssessmentQuestion> questionsForOnePage : pagedQuestions) {
 		    for (AssessmentQuestion question : questionsForOnePage) {
 
@@ -462,10 +450,10 @@ public class AssessmentServiceImpl
 		    }
 		}
 		lastResult.setQuestionResults(updatedQuestionResults);
-		assessmentResultDao.saveObject(lastResult);	
+		assessmentResultDao.saveObject(lastResult);
 		return;
 
-	    // mark previous attempt as being not the latest any longer
+		// mark previous attempt as being not the latest any longer
 	    } else {
 		lastResult.setLatest(false);
 		assessmentResultDao.saveObject(lastResult);
@@ -490,10 +478,15 @@ public class AssessmentServiceImpl
 
 	assessmentResultDao.saveObject(result);
     }
-    
-    /* Auiliary method for setAttemptStarted(). Simply init new AssessmentQuestionResult object and fills it in with values.
+
+    /*
+     * Auiliary method for setAttemptStarted(). Simply init new AssessmentQuestionResult object and fills it in with
+     * values.
+     *
      * @param question
+     *
      * @param questionResults
+     *
      * @return
      */
     private AssessmentQuestionResult createQuestionResultObject(AssessmentQuestion question) {
@@ -659,7 +652,7 @@ public class AssessmentServiceImpl
 
 	} else if (question.getType() == AssessmentConstants.QUESTION_TYPE_SHORT_ANSWER) {
 	    for (AssessmentQuestionOption option : question.getOptions()) {
-		
+
 		//prepare regex which takes into account only * special character
 		String regexWithOnlyAsteriskSymbolActive = "\\Q";
 		String optionString = option.getOptionString().trim();
@@ -672,7 +665,7 @@ public class AssessmentServiceImpl
 		    }
 		}
 		regexWithOnlyAsteriskSymbolActive += "\\E";
-		
+
 		//check whether answer matches regex
 		Pattern pattern;
 		if (question.isCaseSensitive()) {
@@ -829,7 +822,7 @@ public class AssessmentServiceImpl
     public Float getBestTotalScoreByUser(Long sessionId, Long userId) {
 	return assessmentResultDao.getBestTotalScoreByUser(sessionId, userId);
     }
-    
+
     @Override
     public List<AssessmentUserDTO> getBestTotalScoresByContentId(Long toolContentId) {
 	return assessmentResultDao.getBestTotalScoresByContentId(toolContentId);
@@ -839,7 +832,7 @@ public class AssessmentServiceImpl
     public Float getFirstTotalScoreByUser(Long sessionId, Long userId) {
 	return assessmentResultDao.getFirstTotalScoreByUser(sessionId, userId);
     }
-    
+
     @Override
     public List<AssessmentUserDTO> getFirstTotalScoresByContentId(Long toolContentId) {
 	return assessmentResultDao.getFirstTotalScoresByContentId(toolContentId);
@@ -849,7 +842,7 @@ public class AssessmentServiceImpl
     public Float getAvergeTotalScoreByUser(Long sessionId, Long userId) {
 	return assessmentResultDao.getAvergeTotalScoreByUser(sessionId, userId);
     }
-    
+
     @Override
     public List<AssessmentUserDTO> getAverageTotalScoresByContentId(Long toolContentId) {
 	return assessmentResultDao.getAverageTotalScoresByContentId(toolContentId);
@@ -952,13 +945,13 @@ public class AssessmentServiceImpl
 	}
 	return nextUrl;
     }
-    
+
     @Override
     public void unsetSessionFinished(Long toolSessionId, Long userId) {
 	AssessmentUser user = assessmentUserDao.getUserByUserIDAndSessionID(userId, toolSessionId);
 	user.setSessionFinished(false);
 	assessmentUserDao.saveObject(user);
-    }   
+    }
 
     @Override
     public List<SessionDTO> getSessionDtos(Long contentId) {
@@ -1231,7 +1224,7 @@ public class AssessmentServiceImpl
 
 	if (assessment.getQuestions() != null) {
 	    Set<AssessmentQuestion> questions = assessment.getQuestions();
-	   
+
 	    int count = 0;
 	    // question row title
 	    ExcelCell[] questionTitleRow = showUserNames ? new ExcelCell[10] : new ExcelCell[9];
@@ -1251,7 +1244,7 @@ public class AssessmentServiceImpl
 
 	    for (AssessmentQuestion question : questions) {
 		int colsNum = showUserNames ? 10 : 9;
-		
+
 		//add question title row
 		if (question.getType() == AssessmentConstants.QUESTION_TYPE_MARK_HEDGING) {
 		    count = 0;
@@ -1277,7 +1270,7 @@ public class AssessmentServiceImpl
 			hedgeQuestionTitleRow[count++] = new ExcelCell(
 				option.getOptionString().replaceAll("\\<.*?\\>", ""), true);
 			if (option.isCorrect()) {
-			    hedgeQuestionTitleRow[count-1].setColor(IndexedColors.GREEN);
+			    hedgeQuestionTitleRow[count - 1].setColor(IndexedColors.GREEN);
 			}
 		    }
 		    hedgeQuestionTitleRow[count++] = new ExcelCell(getMessage("label.export.time.taken"), true);
@@ -1286,7 +1279,6 @@ public class AssessmentServiceImpl
 		} else {
 		    questionSummaryTab.add(questionTitleRow);
 		}
-		
 
 		QuestionSummary questionSummary = questionSummaries.get(question.getUid());
 
@@ -1320,7 +1312,7 @@ public class AssessmentServiceImpl
 			userResultRow[count++] = new ExcelCell(questionResult.getFinishDate(), false);
 			//answer
 			if (question.getType() == AssessmentConstants.QUESTION_TYPE_MARK_HEDGING) {
-			    
+
 			    Set<AssessmentOptionAnswer> optionAnswers = questionResult.getOptionAnswers();
 			    for (AssessmentQuestionOption option : question.getOptions()) {
 				for (AssessmentOptionAnswer optionAnswer : optionAnswers) {
@@ -1332,7 +1324,7 @@ public class AssessmentServiceImpl
 			    }
 			} else {
 			    userResultRow[count++] = new ExcelCell(
-					AssessmentEscapeUtils.printResponsesForExcelExport(questionResult), false);
+				    AssessmentEscapeUtils.printResponsesForExcelExport(questionResult), false);
 			}
 			//time taken
 			if (questionResult.getAssessmentResult() != null) {
@@ -2264,7 +2256,7 @@ public class AssessmentServiceImpl
     public ToolOutput getToolOutput(String name, Long toolSessionId, Long learnerId) {
 	return assessmentOutputFactory.getToolOutput(name, this, toolSessionId, learnerId);
     }
-    
+
     /**
      * Get the tool output for the given tool output name.
      *

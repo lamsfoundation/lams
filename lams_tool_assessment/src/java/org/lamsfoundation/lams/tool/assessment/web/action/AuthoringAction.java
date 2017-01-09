@@ -352,7 +352,12 @@ public class AuthoringAction extends Action {
 
 	//allow using old and modified questions and references altogether
 	if (mode.isTeacher()) {
-	    service.releaseQuestionsAndReferencesFromCache(assessmentPO);
+	    for (AssessmentQuestion question : (Set<AssessmentQuestion>) assessment.getQuestions()) {
+		service.releaseFromCache(question);
+	    }
+	    for (QuestionReference reference : (Set<QuestionReference>) assessment.getQuestionReferences()) {
+		service.releaseFromCache(reference);
+	    }
 	}
 
 	Set<AssessmentQuestion> oldQuestions = (assessmentPO == null) ? new HashSet<AssessmentQuestion>()
@@ -370,9 +375,7 @@ public class AuthoringAction extends Action {
 	    PropertyUtils.copyProperties(assessmentPO, assessment);
 
 	    // copyProperties() above may result in "collection assigned to two objects in a session" exception
-	    // Below we remove reference to one of Assessment objects,
-	    // so maybe there will be just one object in session when save is done
-	    // If this fails, we may have to evict the object from session using DAO
+	    service.releaseFromCache(assessment);
 	    assessmentForm.setAssessment(null);
 	    assessment = null;
 	    // set back UID
