@@ -101,14 +101,8 @@ public class OrganisationGroupAction extends DispatchAction {
     public ActionForward viewGroupings(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) throws Exception {
 	Long activityID = WebUtil.readLongParam(request, AttributeNames.PARAM_ACTIVITY_ID, true);
-	Grouping lessonGrouping = getLessonGrouping(request, activityID, false);
-
-	// if this grouping is used for branching then it should use groups set in authoring. It will be possible to
-	// remove users from the groups, but not delete groups due to the branching relationships
-	boolean isUsedForBranching = lessonGrouping != null && lessonGrouping.isUsedForBranching();
-	request.setAttribute(GroupingAJAXAction.PARAM_USED_FOR_BRANCHING, isUsedForBranching);
 	
-	boolean lessonGroupsExist = lessonGrouping != null;
+	boolean lessonGroupsExist = getLessonGrouping(request, activityID, false) != null;
 	if (lessonGroupsExist) {
 	    // this is lesson mode and user have already chosen a grouping before, so show it
 	    return viewGroups(mapping, form, request, response);
@@ -147,7 +141,7 @@ public class OrganisationGroupAction extends DispatchAction {
 	request.setAttribute(AttributeNames.PARAM_ORGANISATION_ID, organisationId);
 
 	// if it's not a group-based branching and lesson is created using integrations - show groups received from LMS instead of actual LAMS ones
-	if (!isUsedForBranching && getIntegrationService().isIntegratedServerGroupFetchingAvailable(lessonId)) {
+	if (getIntegrationService().isIntegratedServerGroupFetchingAvailable(lessonId)) {
 
 	    if (lessonId == null) {
 		//it's when a learner clicks back button on groups page
@@ -252,11 +246,6 @@ public class OrganisationGroupAction extends DispatchAction {
 
 	    lessonGroups = null;
 	}
-	
-	// if this grouping is used for branching then it should use groups set in authoring. It will be possible to
-	// remove users from the groups, but not delete groups due to the branching relationships
-	boolean isUsedForBranching = lessonGrouping.isUsedForBranching();
-	request.setAttribute(GroupingAJAXAction.PARAM_USED_FOR_BRANCHING, isUsedForBranching);
 
 	JSONArray orgGroupsJSON = new JSONArray();
 	Collection<User> learners = null;
@@ -612,8 +601,15 @@ public class OrganisationGroupAction extends DispatchAction {
 			    .getCreateGrouping();
 
 	    if ((grouping != null) && (grouping.getGroups() != null)) {
+		
+		// if this grouping is used for branching then it should use groups set in authoring. It will be possible to
+		// remove users from the groups, but not delete groups due to the branching relationships.
+		// (Not very obvious place to use it, but it made most sense.)
+		boolean isUsedForBranching = grouping.isUsedForBranching();
+		request.setAttribute(GroupingAJAXAction.PARAM_USED_FOR_BRANCHING, isUsedForBranching);
+		
 		Set<Group> groups = grouping.getGroups();
-		return !groups.isEmpty() && (allowDefault || !isDefaultChosenGrouping(grouping)) ? grouping : null;
+		return !groups.isEmpty() && (allowDefault || isUsedForBranching || !isDefaultChosenGrouping(grouping)) ? grouping : null;
 	    }
 	}
 
