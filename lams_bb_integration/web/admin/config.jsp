@@ -34,8 +34,6 @@
     String ReqSrc = p.getProperty("BB_REQ_SRC");
     String lamsServerTimeRefreshInterval = p.getProperty("LAMS_SERVER_TIME_REFRESH_INTERVAL");
     String lamsAltServerUrl = p.getProperty("LAMS_ALT_SERVER_URL", "https://");
-    //*NTU* added for i-NTULearn project
-    String idpServer = p.getProperty("IDP_SERVER", "");
 
     //Add port to the url if the port is in the blackboard url
     int bbport = request.getServerPort();
@@ -77,10 +75,6 @@
                 <bbNG:dataElement label="LAMS ALTERNATIVE SERVER URL" isRequired="false" labelFor="lams_alt_server_url">
                     <input type="text" name="lams_alt_server_url"  size="70" value="<%=lamsAltServerUrl%>">
                 </bbNG:dataElement>
-                <%--*NTU* added for i-NTULearn project--%>
-                <bbNG:dataElement label="IdP SERVER" isRequired="false" labelFor="idp_server">
-                    <input type="text" name="idp_server" size="70" value="<%=idpServer%>">
-                </bbNG:dataElement>             
 				<p>For further information on how to configure these settings, see <a target="_blank" href="http://wiki.lamsfoundation.org/display/lamsdocs/Blackboard+9">this tutorial</a>.</p>
             </bbNG:step>  
             <bbNG:stepSubmit title="Submit" />
