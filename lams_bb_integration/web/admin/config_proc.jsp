@@ -38,8 +38,6 @@
     String bbReqSrc =  request.getParameter("bb_req_src");
     String lamsServerTimeRefreshInterval = request.getParameter("lams_server_time_refresh_interval");
     String lamsAltServerUrl = request.getParameter("lams_alt_server_url");
-    //*NTU* added for i-NTULearn project
-    String idpServer = request.getParameter("idp_server");
 
     // Save the properties to Blackboard
     p.setProperty(LamsPluginUtil.PROP_LAMS_URL, lamsServerUrl);
@@ -48,8 +46,6 @@
     p.setProperty(LamsPluginUtil.PROP_REQ_SRC, bbReqSrc); 
     p.setProperty(LamsPluginUtil.PROP_LAMS_SERVER_TIME_REFRESH_INTERVAL, lamsServerTimeRefreshInterval); 
     p.setProperty(LamsPluginUtil.PROP_ALT_LAMS_URL, lamsAltServerUrl); 
-    //*NTU* added for i-NTULearn project
-    p.setProperty(LamsPluginUtil.PROP_IDP_SERVER, idpServer);
     
     // Persist the properties object
     LamsPluginUtil.setProperties(p); 
@@ -80,8 +76,6 @@
             BB_REQ_SRC: <%= bbReqSrc %><br>
             LAMS_SERVER_TIME_REFRESH_INTERVAL: <%= lamsServerTimeRefreshInterval %><br>
             LAMS_ALT_SERVER_URL: <%= lamsAltServerUrl %>
-            <%--*NTU* added for i-NTULearn project--%>
-            <br>IDP_SERVER: <%= idpServer %>
     </bbNG:receipt>
     
 </bbNG:genericPage>
