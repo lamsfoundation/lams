@@ -20,7 +20,6 @@
  * ****************************************************************
  */
 
-
 package org.lamsfoundation.lams.monitoring.quartz.job;
 
 import java.util.Collection;
@@ -30,6 +29,7 @@ import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.events.IEventNotificationService;
 import org.lamsfoundation.lams.monitoring.service.IMonitoringService;
 import org.lamsfoundation.lams.usermanagement.User;
+import org.lamsfoundation.lams.util.hibernate.HibernateSessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
@@ -64,9 +64,10 @@ public class EmailScheduleMessageJob extends MonitoringJob {
 	Long activityId = (Long) properties.get(AttributeNames.PARAM_ACTIVITY_ID);
 	Integer xDaystoFinish = (Integer) properties.get("daysToDeadline");
 	String[] lessonIds = (String[]) properties.get("lessonIDs");
+	
+	HibernateSessionManager.openSession();
 	Collection<User> users = getMonitoringService(context).getUsersByEmailNotificationSearchType(searchType,
 		lessonId, lessonIds, activityId, xDaystoFinish, orgId);
-
 	for (User user : users) {
 	    boolean isHtmlFormat = false;
 	    int userId = user.getUserId();
@@ -76,6 +77,7 @@ public class EmailScheduleMessageJob extends MonitoringJob {
 			    .getMessage("event.emailnotifications.email.subject", new Object[] {}),
 		    emailBody, isHtmlFormat);
 	}
+	HibernateSessionManager.closeSession();
     }
 
     private IEventNotificationService getEventNotificationService(JobExecutionContext context)
