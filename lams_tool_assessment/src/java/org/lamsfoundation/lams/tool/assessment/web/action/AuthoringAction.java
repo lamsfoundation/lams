@@ -364,6 +364,7 @@ public class AuthoringAction extends Action {
 		: assessmentPO.getQuestions();
 	Set<QuestionReference> oldReferences = (assessmentPO == null) ? new HashSet<QuestionReference>()
 		: assessmentPO.getQuestionReferences();
+	AssessmentUser assessmentUser = null;
 
 	if (assessmentPO == null) {
 	    // new Assessment, create it.
@@ -372,6 +373,7 @@ public class AuthoringAction extends Action {
 
 	} else {
 	    Long uid = assessmentPO.getUid();
+	    assessmentUser = assessmentPO.getCreatedBy();
 	    PropertyUtils.copyProperties(assessmentPO, assessment);
 
 	    // copyProperties() above may result in "collection assigned to two objects in a session" exception
@@ -390,14 +392,16 @@ public class AuthoringAction extends Action {
 	}
 
 	// *******************************Handle user*******************
-	// try to get form system session
-	HttpSession ss = SessionManager.getSession();
-	// get back login user DTO
-	UserDTO user = (UserDTO) ss.getAttribute(AttributeNames.USER);
-	AssessmentUser assessmentUser = service.getUserByIDAndContent(new Long(user.getUserID().intValue()),
-		assessmentPO.getContentId());
 	if (assessmentUser == null) {
-	    assessmentUser = new AssessmentUser(user, assessmentPO);
+	    // try to get form system session
+	    HttpSession ss = SessionManager.getSession();
+	    // get back login user DTO
+	    UserDTO user = (UserDTO) ss.getAttribute(AttributeNames.USER);
+	    assessmentUser = service.getUserByIDAndContent(new Long(user.getUserID().intValue()),
+		    assessmentPO.getContentId());
+	    if (assessmentUser == null) {
+		assessmentUser = new AssessmentUser(user, assessmentPO);
+	    }
 	}
 	assessmentPO.setCreatedBy(assessmentUser);
 
