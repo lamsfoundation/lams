@@ -48,6 +48,7 @@ import org.lamsfoundation.lams.notebook.service.CoreNotebookConstants;
 import org.lamsfoundation.lams.notebook.service.ICoreNotebookService;
 import org.lamsfoundation.lams.rest.RestTags;
 import org.lamsfoundation.lams.rest.ToolRestManager;
+import org.lamsfoundation.lams.tool.ToolCompletionStatus;
 import org.lamsfoundation.lams.tool.ToolContentManager;
 import org.lamsfoundation.lams.tool.ToolOutput;
 import org.lamsfoundation.lams.tool.ToolOutputDefinition;
@@ -806,6 +807,32 @@ public class ChatService implements ToolSessionManager, ToolContentManager, ICha
     @Override
     public Class[] getSupportedToolOutputDefinitionClasses(int definitionType) {
 	return getChatOutputFactory().getSupportedDefinitionClasses(definitionType);
+    }
+    
+    @Override
+    public ToolCompletionStatus getCompletionStatus(Long learnerId, Long toolSessionId) {
+	ChatUser learner = getUserByUserIdAndSessionId(learnerId, toolSessionId);
+	if (learner == null) {
+	    return new ToolCompletionStatus(ToolCompletionStatus.ACTIVITY_NOT_ATTEMPTED, null, null);
+	}
+
+	Date startDate = null;
+	Date endDate = learner.getLastPresence();
+	List<ChatMessage> messages = getMessagesForUser(learner);
+	for ( ChatMessage message : messages ) {
+	    Date sendDate = message.getSendDate();
+	    if ( sendDate != null ) {
+		if ( startDate == null || sendDate.before(startDate) )
+		    startDate = sendDate;
+		if ( endDate == null || sendDate.after(endDate) )
+		    endDate = sendDate;
+	    }
+	}
+	
+	if (learner.isFinishedActivity())
+	    return new ToolCompletionStatus(ToolCompletionStatus.ACTIVITY_COMPLETED, startDate, endDate);
+	else
+	    return new ToolCompletionStatus(ToolCompletionStatus.ACTIVITY_ATTEMPTED, startDate, null);
     }
     // =========================================================================================
 

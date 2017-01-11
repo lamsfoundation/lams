@@ -44,6 +44,7 @@ import org.lamsfoundation.lams.tool.SystemTool;
 import org.lamsfoundation.lams.tool.Tool;
 import org.lamsfoundation.lams.tool.ToolAccessMode;
 import org.lamsfoundation.lams.tool.ToolAdapterContentManager;
+import org.lamsfoundation.lams.tool.ToolCompletionStatus;
 import org.lamsfoundation.lams.tool.ToolContent;
 import org.lamsfoundation.lams.tool.ToolContentIDGenerator;
 import org.lamsfoundation.lams.tool.ToolContentManager;
@@ -878,4 +879,15 @@ public class LamsCoreToolService implements ILamsCoreToolService, ApplicationCon
 	}
 	return false;
     }
+
+    @Override
+    public ToolCompletionStatus getCompletionStatusFromTool(User learner, Activity activity)  {
+	if (activity.isToolActivity()) {
+	    ToolSession session = getToolSessionByLearner(learner, activity);
+	    ToolSessionManager toolService = (ToolSessionManager) findToolService(((ToolActivity)activity).getTool());
+	    return toolService.getCompletionStatus(learner.getUserId().longValue(), session.getToolSessionId());
+	}
+	return null;
+    }
+
 }

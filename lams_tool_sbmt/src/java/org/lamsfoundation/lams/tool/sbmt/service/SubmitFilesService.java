@@ -71,6 +71,7 @@ import org.lamsfoundation.lams.notebook.service.CoreNotebookConstants;
 import org.lamsfoundation.lams.notebook.service.ICoreNotebookService;
 import org.lamsfoundation.lams.rest.RestTags;
 import org.lamsfoundation.lams.rest.ToolRestManager;
+import org.lamsfoundation.lams.tool.ToolCompletionStatus;
 import org.lamsfoundation.lams.tool.ToolContentManager;
 import org.lamsfoundation.lams.tool.ToolOutput;
 import org.lamsfoundation.lams.tool.ToolOutputDefinition;
@@ -1213,6 +1214,32 @@ public class SubmitFilesService
 
     public void setSubmitFilesOutputFactory(SubmitFilesOutputFactory submitFilesOutputFactory) {
 	this.submitFilesOutputFactory = submitFilesOutputFactory;
+    }
+    
+    @Override
+    public ToolCompletionStatus getCompletionStatus(Long learnerId, Long toolSessionId) {
+	SubmitUser learner = getSessionUser(toolSessionId, learnerId.intValue());
+	if (learner == null) {
+	    return new ToolCompletionStatus(ToolCompletionStatus.ACTIVITY_NOT_ATTEMPTED, null, null);
+	}
+
+	Date startDate = null;
+	Date endDate = null;
+	List<SubmissionDetails> list = submissionDetailsDAO.getBySessionAndLearner(toolSessionId, learnerId.intValue());
+	for ( SubmissionDetails detail : list ) {
+	    Date newDate = detail.getDateOfSubmission();
+	    if ( newDate != null ) {
+		if ( startDate == null || newDate.before(startDate) )
+		    startDate = newDate;
+		if ( endDate == null || newDate.after(endDate) )
+		    endDate = newDate;
+	    }
+	}
+	
+	if (learner.isFinished())
+	    return new ToolCompletionStatus(ToolCompletionStatus.ACTIVITY_COMPLETED, startDate, endDate);
+	else
+	    return new ToolCompletionStatus(ToolCompletionStatus.ACTIVITY_ATTEMPTED, startDate, null);
     }
 
     // ****************** REST methods *************************

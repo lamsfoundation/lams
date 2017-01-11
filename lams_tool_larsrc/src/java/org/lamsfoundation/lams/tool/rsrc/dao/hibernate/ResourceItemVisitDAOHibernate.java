@@ -31,6 +31,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.hibernate.Query;
+import org.hibernate.SQLQuery;
 import org.lamsfoundation.lams.dao.hibernate.LAMSBaseDAO;
 import org.lamsfoundation.lams.tool.rsrc.dao.ResourceItemVisitDAO;
 import org.lamsfoundation.lams.tool.rsrc.dto.VisitLogDTO;
@@ -55,6 +56,9 @@ public class ResourceItemVisitDAOHibernate extends LAMSBaseDAO implements Resour
 	    + ResourceItemVisitLog.class.getName() + " as v , " + ResourceSession.class.getName() + " as s, "
 	    + Resource.class.getName() + "  as r " + " where v.sessionId = :sessionId and v.sessionId = s.sessionId "
 	    + " and s.resource.uid = r.uid " + " and r.contentId =:contentId " + " group by v.sessionId, v.resourceItem.uid ";
+
+    private static final String SQL_QUERY_DATES_BY_USER_SESSION = "SELECT MIN(access_date) start_date, MAX(access_date) end_date "
+	    + " FROM tl_larsrc11_item_log WHERE user_uid = :userUid  && session_id = :sessionId";
 
     @Override
     public ResourceItemVisitLog getResourceItemLog(Long itemUid, Long userId) {
@@ -170,4 +174,11 @@ public class ResourceItemVisitDAOHibernate extends LAMSBaseDAO implements Resour
 	}
     }
 
+    @Override
+    public Object[] getDateRangeOfAccesses(Long userUid, Long toolSessionId) {
+	SQLQuery query = (SQLQuery) getSession().createSQLQuery(SQL_QUERY_DATES_BY_USER_SESSION.toString())
+		.setLong("userUid", userUid).setLong("sessionId", toolSessionId);
+	Object[] values = (Object[]) query.list().get(0);
+	return values;
+    }
 }

@@ -47,6 +47,7 @@ import org.lamsfoundation.lams.learningdesign.service.ImportToolContentException
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.notebook.service.CoreNotebookConstants;
 import org.lamsfoundation.lams.notebook.service.ICoreNotebookService;
+import org.lamsfoundation.lams.tool.ToolCompletionStatus;
 import org.lamsfoundation.lams.tool.ToolContentManager;
 import org.lamsfoundation.lams.tool.ToolOutput;
 import org.lamsfoundation.lams.tool.ToolOutputDefinition;
@@ -702,5 +703,31 @@ public class GmapService implements ToolSessionManager, ToolContentManager, IGma
     @Override
     public Class[] getSupportedToolOutputDefinitionClasses(int definitionType) {
 	return null;
+    }
+    
+    @Override
+    public ToolCompletionStatus getCompletionStatus(Long learnerId, Long toolSessionId) {
+	GmapUser learner = getUserByUserIdAndSessionId(learnerId, toolSessionId);
+	if (learner == null) {
+	    return new ToolCompletionStatus(ToolCompletionStatus.ACTIVITY_NOT_ATTEMPTED, null, null);
+	}
+
+	Date startDate = null;
+	Date endDate = null;
+	List<GmapMarker> markers = getGmapMarkersBySessionId(toolSessionId);
+	for ( GmapMarker marker : markers ) {
+	    Date createdDate = marker.getCreated();
+	    if ( marker.getCreatedBy().getUserId() == learnerId && createdDate != null ) {
+		if ( startDate == null || createdDate.before(startDate) )
+		    startDate = createdDate;
+		if ( endDate == null || createdDate.after(endDate) )
+		    endDate = createdDate;
+	    }
+	}
+	
+	if (learner.isFinishedActivity())
+	    return new ToolCompletionStatus(ToolCompletionStatus.ACTIVITY_COMPLETED, startDate, endDate);
+	else
+	    return new ToolCompletionStatus(ToolCompletionStatus.ACTIVITY_ATTEMPTED, startDate, null);
     }
 }

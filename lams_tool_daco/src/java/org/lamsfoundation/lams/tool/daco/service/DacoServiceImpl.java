@@ -28,6 +28,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
@@ -55,6 +56,7 @@ import org.lamsfoundation.lams.learningdesign.service.ImportToolContentException
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.notebook.service.CoreNotebookConstants;
 import org.lamsfoundation.lams.notebook.service.ICoreNotebookService;
+import org.lamsfoundation.lams.tool.ToolCompletionStatus;
 import org.lamsfoundation.lams.tool.ToolContentManager;
 import org.lamsfoundation.lams.tool.ToolOutput;
 import org.lamsfoundation.lams.tool.ToolOutputDefinition;
@@ -1020,5 +1022,31 @@ public class DacoServiceImpl implements IDacoService, ToolContentManager, ToolSe
     @Override
     public Class[] getSupportedToolOutputDefinitionClasses(int definitionType) {
 	return getDacoOutputFactory().getSupportedDefinitionClasses(definitionType);
+    }
+    
+    @Override
+    public ToolCompletionStatus getCompletionStatus(Long learnerId, Long toolSessionId) {
+	DacoUser learner = getUserByUserIdAndSessionId(learnerId, toolSessionId);
+	if (learner == null) {
+	    return new ToolCompletionStatus(ToolCompletionStatus.ACTIVITY_NOT_ATTEMPTED, null, null);
+	}
+
+	Date startDate = null;
+	Date endDate = null;
+	Set<DacoAnswer> answers = learner.getAnswers();
+	for ( DacoAnswer answer : answers ) {
+	    Date createDate = answer.getCreateDate();
+	    if ( createDate != null ) {
+		if ( startDate == null || createDate.before(startDate) )
+		    startDate = createDate;
+		if ( endDate == null || createDate.after(endDate) )
+		    endDate = createDate;
+	    }
+	}
+
+	if (learner.isSessionFinished())
+	    return new ToolCompletionStatus(ToolCompletionStatus.ACTIVITY_COMPLETED, startDate, endDate);
+	else
+	    return new ToolCompletionStatus(ToolCompletionStatus.ACTIVITY_ATTEMPTED, startDate, null);
     }
 }

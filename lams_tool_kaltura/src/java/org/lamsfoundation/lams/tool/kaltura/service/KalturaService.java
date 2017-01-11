@@ -43,6 +43,7 @@ import org.lamsfoundation.lams.learningdesign.service.ImportToolContentException
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.notebook.service.CoreNotebookConstants;
 import org.lamsfoundation.lams.notebook.service.ICoreNotebookService;
+import org.lamsfoundation.lams.tool.ToolCompletionStatus;
 import org.lamsfoundation.lams.tool.ToolContentManager;
 import org.lamsfoundation.lams.tool.ToolOutput;
 import org.lamsfoundation.lams.tool.ToolOutputDefinition;
@@ -735,4 +736,34 @@ public class KalturaService implements ToolSessionManager, ToolContentManager, I
     public Class[] getSupportedToolOutputDefinitionClasses(int definitionType) {
 	return getKalturaOutputFactory().getSupportedDefinitionClasses(definitionType);
     }
+    
+    @Override
+    public ToolCompletionStatus getCompletionStatus(Long learnerId, Long toolSessionId) {
+	KalturaUser learner = getUserByUserIdAndSessionId(learnerId, toolSessionId);
+	if (learner == null) {
+	    return new ToolCompletionStatus(ToolCompletionStatus.ACTIVITY_NOT_ATTEMPTED, null, null);
+	}
+
+	Kaltura kaltura = getSessionBySessionId(toolSessionId).getKaltura();
+	Date startDate = null;
+	Date endDate = null;
+	Set<KalturaItem> allItems = kaltura.getKalturaItems();
+	for (KalturaItem item : allItems) {
+	    if (!item.isCreateByAuthor() && item.getCreatedBy().getUserId() == learnerId) {
+		Date newDate = item.getCreateDate();
+		if (newDate != null) {
+		    if (startDate == null || newDate.before(startDate))
+			startDate = newDate;
+		    if (endDate == null || newDate.after(endDate))
+			endDate = newDate;
+		}
+	    }
+	}
+
+	if (learner.isFinishedActivity())
+	    return new ToolCompletionStatus(ToolCompletionStatus.ACTIVITY_COMPLETED, startDate, endDate);
+	else
+	    return new ToolCompletionStatus(ToolCompletionStatus.ACTIVITY_ATTEMPTED, startDate, null);
+    }
+    
 }

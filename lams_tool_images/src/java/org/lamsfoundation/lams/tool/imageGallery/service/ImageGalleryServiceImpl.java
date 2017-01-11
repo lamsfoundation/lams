@@ -61,6 +61,7 @@ import org.lamsfoundation.lams.rating.dto.ItemRatingDTO;
 import org.lamsfoundation.lams.rating.model.LearnerItemRatingCriteria;
 import org.lamsfoundation.lams.rating.model.RatingCriteria;
 import org.lamsfoundation.lams.rating.service.IRatingService;
+import org.lamsfoundation.lams.tool.ToolCompletionStatus;
 import org.lamsfoundation.lams.tool.ToolContentManager;
 import org.lamsfoundation.lams.tool.ToolOutput;
 import org.lamsfoundation.lams.tool.ToolOutputDefinition;
@@ -1066,6 +1067,35 @@ public class ImageGalleryServiceImpl implements IImageGalleryService, ToolConten
 	//no actions required
     }
 
+    @Override
+    public ToolCompletionStatus getCompletionStatus(Long learnerId, Long toolSessionId) {
+	ImageGalleryUser learner = getUserByIDAndSession(learnerId, toolSessionId);
+	if (learner == null) {
+	    return new ToolCompletionStatus(ToolCompletionStatus.ACTIVITY_NOT_ATTEMPTED, null, null);
+	}
+
+	Date startDate = null;
+	Date endDate = null;
+	ImageGallery imageGallery = getImageGallerySessionBySessionId(toolSessionId).getImageGallery();
+	Set<ImageGalleryItem> items = getImagesForGroup(imageGallery, toolSessionId);
+	for (ImageGalleryItem item : items) {
+	    if (item.getCreateBy().getUserId() == learnerId) {
+		Date newDate = item.getCreateDate();
+		if (newDate != null) {
+		    if (startDate == null || newDate.before(startDate))
+			startDate = newDate;
+		    if (endDate == null || newDate.after(endDate))
+			endDate = newDate;
+		}
+	    }
+	}
+
+	if (learner.isSessionFinished())
+	    return new ToolCompletionStatus(ToolCompletionStatus.ACTIVITY_COMPLETED, startDate, endDate);
+	else
+	    return new ToolCompletionStatus(ToolCompletionStatus.ACTIVITY_ATTEMPTED, startDate, null);
+    }
+    
     /* =================================================================================== */
 
     public IExportToolContentService getExportContentService() {

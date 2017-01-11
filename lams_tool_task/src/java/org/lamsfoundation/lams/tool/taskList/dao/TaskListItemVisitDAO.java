@@ -68,4 +68,5 @@ public interface TaskListItemVisitDAO extends DAO {
 
     int getCountCompletedTasksBySessionAndItem(Long toolSessionId, Long itemUid);
 
+    public Object[] getDateRangeOfTasks(Long userUid, Long sessionId);
 }

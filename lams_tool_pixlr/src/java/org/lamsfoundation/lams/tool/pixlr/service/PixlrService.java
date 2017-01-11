@@ -40,6 +40,7 @@ import org.lamsfoundation.lams.learningdesign.service.ImportToolContentException
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.notebook.service.CoreNotebookConstants;
 import org.lamsfoundation.lams.notebook.service.ICoreNotebookService;
+import org.lamsfoundation.lams.tool.ToolCompletionStatus;
 import org.lamsfoundation.lams.tool.ToolContentManager;
 import org.lamsfoundation.lams.tool.ToolOutput;
 import org.lamsfoundation.lams.tool.ToolOutputDefinition;
@@ -679,5 +680,17 @@ public class PixlrService implements ToolSessionManager, ToolContentManager, IPi
     @Override
     public Class[] getSupportedToolOutputDefinitionClasses(int definitionType) {
 	return getPixlrOutputFactory().getSupportedDefinitionClasses(definitionType);
+    }
+    
+    @Override
+    public ToolCompletionStatus getCompletionStatus(Long learnerId, Long toolSessionId) {
+	// db doesn't have a start/finish date for learner, and session start/finish is null
+	PixlrUser learner = getUserByUserIdAndSessionId(learnerId, toolSessionId);
+	if (learner == null) {
+	    return new ToolCompletionStatus(ToolCompletionStatus.ACTIVITY_NOT_ATTEMPTED, null, null);
+	}
+
+	return new ToolCompletionStatus(learner.isFinishedActivity() ? ToolCompletionStatus.ACTIVITY_COMPLETED
+		: ToolCompletionStatus.ACTIVITY_ATTEMPTED, null, null);
     }
 }

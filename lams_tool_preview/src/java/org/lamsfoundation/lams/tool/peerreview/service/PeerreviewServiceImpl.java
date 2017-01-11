@@ -61,6 +61,7 @@ import org.lamsfoundation.lams.rating.model.RatingCriteria;
 import org.lamsfoundation.lams.rating.service.IRatingService;
 import org.lamsfoundation.lams.rest.RestTags;
 import org.lamsfoundation.lams.rest.ToolRestManager;
+import org.lamsfoundation.lams.tool.ToolCompletionStatus;
 import org.lamsfoundation.lams.tool.ToolContentManager;
 import org.lamsfoundation.lams.tool.ToolOutput;
 import org.lamsfoundation.lams.tool.ToolOutputDefinition;
@@ -991,6 +992,18 @@ public class PeerreviewServiceImpl
 	this.ratingService = ratingService;
     }
 
+    @Override
+    public ToolCompletionStatus getCompletionStatus(Long learnerId, Long toolSessionId) {
+	// db doesn't have a start/finish date for learner, and session start/finish is null
+	PeerreviewUser learner = getUserByIDAndSession(learnerId, toolSessionId);
+	if (learner == null) {
+	    return new ToolCompletionStatus(ToolCompletionStatus.ACTIVITY_NOT_ATTEMPTED, null, null);
+	}
+
+	return new ToolCompletionStatus(learner.isSessionFinished() ? ToolCompletionStatus.ACTIVITY_COMPLETED
+		: ToolCompletionStatus.ACTIVITY_ATTEMPTED, null, null);
+    }
+    
     // ****************** REST methods *************************
 
     public void setEventNotificationService(IEventNotificationService eventNotificationService) {

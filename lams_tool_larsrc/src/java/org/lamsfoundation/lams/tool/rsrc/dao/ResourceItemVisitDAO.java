@@ -51,4 +51,5 @@ public interface ResourceItemVisitDAO extends DAO {
 
     int getCountVisitLogsBySessionAndItem(Long sessionId, Long itemUid, String searchString);
 
+    public Object[] getDateRangeOfAccesses(Long userUid, Long toolSessionId);
 }
