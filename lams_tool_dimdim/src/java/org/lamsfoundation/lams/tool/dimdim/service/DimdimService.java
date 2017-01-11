@@ -28,6 +28,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.SortedMap;
 
+import org.lamsfoundation.lams.tool.ToolCompletionStatus;
 import org.lamsfoundation.lams.tool.ToolContentManager;
 import org.lamsfoundation.lams.tool.ToolOutput;
 import org.lamsfoundation.lams.tool.ToolOutputDefinition;
@@ -132,5 +133,9 @@ public class DimdimService implements ToolSessionManager, ToolContentManager {
     @Override
     public boolean isReadOnly(Long toolContentId) {
 	return false;
+    }
+    @Override
+    public ToolCompletionStatus getCompletionStatus(Long learnerId, Long toolSessionId) {
+	return null;
     }
 }
