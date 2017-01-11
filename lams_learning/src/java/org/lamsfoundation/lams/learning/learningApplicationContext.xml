@@ -73,6 +73,7 @@
 				<prop key="create*">PROPAGATION_REQUIRED</prop>
 				<prop key="learner*">PROPAGATION_REQUIRED</prop>
 				<prop key="get*">PROPAGATION_REQUIRED,readOnly</prop>
+				<prop key="recalcProgressForLearner">PROPAGATION_REQUIRES_NEW</prop>
    			</props>
 		</property>
 	</bean> 
