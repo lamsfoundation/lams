@@ -23,6 +23,7 @@
 
 package org.lamsfoundation.lams.learning.service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
@@ -34,6 +35,7 @@ import org.lamsfoundation.lams.learningdesign.GateActivity;
 import org.lamsfoundation.lams.learningdesign.Group;
 import org.lamsfoundation.lams.learningdesign.Grouping;
 import org.lamsfoundation.lams.learningdesign.SequenceActivity;
+import org.lamsfoundation.lams.learningdesign.dao.IActivityDAO;
 import org.lamsfoundation.lams.lesson.LearnerProgress;
 import org.lamsfoundation.lams.lesson.Lesson;
 import org.lamsfoundation.lams.lesson.dto.LessonDTO;
@@ -335,4 +337,9 @@ public interface ICoreLearnerService extends ILearnerService {
      */
     SequenceActivity selectBranch(Lesson lesson, BranchingActivity branchingActivity, Integer learnerId, Long branchId)
 	    throws LearnerServiceException;
+    
+    /* Added for RepopulateProgressMarksServlet - can be removed later */
+    String[] recalcProgressForLearner(Lesson lesson, ArrayList<Activity> activityList, LearnerProgress learnerProgress, boolean updateGradebookForAll);
+    IActivityDAO getActivityDAO();
+
 }

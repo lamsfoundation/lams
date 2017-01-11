@@ -51,6 +51,7 @@ import org.lamsfoundation.lams.learningdesign.Activity;
 import org.lamsfoundation.lams.learningdesign.BranchActivityEntry;
 import org.lamsfoundation.lams.learningdesign.BranchCondition;
 import org.lamsfoundation.lams.learningdesign.BranchingActivity;
+import org.lamsfoundation.lams.learningdesign.ComplexActivity;
 import org.lamsfoundation.lams.learningdesign.ConditionGateActivity;
 import org.lamsfoundation.lams.learningdesign.DataFlowObject;
 import org.lamsfoundation.lams.learningdesign.GateActivity;
@@ -69,6 +70,7 @@ import org.lamsfoundation.lams.learningdesign.dao.IActivityDAO;
 import org.lamsfoundation.lams.learningdesign.dao.IDataFlowDAO;
 import org.lamsfoundation.lams.learningdesign.dao.IGroupUserDAO;
 import org.lamsfoundation.lams.learningdesign.dao.IGroupingDAO;
+import org.lamsfoundation.lams.lesson.CompletedActivityProgress;
 import org.lamsfoundation.lams.lesson.LearnerProgress;
 import org.lamsfoundation.lams.lesson.Lesson;
 import org.lamsfoundation.lams.lesson.dao.ILearnerProgressDAO;
@@ -78,6 +80,8 @@ import org.lamsfoundation.lams.lesson.service.ILessonService;
 import org.lamsfoundation.lams.lesson.service.LessonServiceException;
 import org.lamsfoundation.lams.logevent.LogEvent;
 import org.lamsfoundation.lams.logevent.service.ILogEventService;
+import org.lamsfoundation.lams.tool.Tool;
+import org.lamsfoundation.lams.tool.ToolCompletionStatus;
 import org.lamsfoundation.lams.tool.ToolOutput;
 import org.lamsfoundation.lams.tool.ToolSession;
 import org.lamsfoundation.lams.tool.exception.LamsToolServiceException;
@@ -1415,4 +1419,184 @@ public class LearnerService implements ICoreLearnerService {
 	}
 	return true;
     }
+    
+    /* Added for RepopulateProgressMarksServlet - can be removed later */
+    private static final String TOOL_SIGNATURE_ASSESSMENT = "laasse10";
+    private static final String TOOL_SIGNATURE_SCRATCHIE = "lascrt11";
+    private static final String TOOL_SIGNATURE_MCQ = "lamc11";
+
+    public String[] recalcProgressForLearner(Lesson lesson, ArrayList<Activity> activityList, LearnerProgress learnerProgress, boolean updateGradebookForAll) {
+	
+	StringBuilder auditLogBuilder = new StringBuilder("");
+	StringBuilder errorBuilder = new StringBuilder("");
+
+	User learner = learnerProgress.getUser();
+       	Date lessonStartDate = learnerProgress.getStartDate();
+       	auditLogBuilder.append("\n\nUpdating ").append(learner.getLogin()).append(" ")
+    		.append(learner.getFullName()).append("\n");
+    
+    	boolean updated = false;
+    	for (Activity activity : activityList) {
+    
+    	    CompletedActivityProgress completedProgress = learnerProgress.getCompletedActivities().get(activity);
+    	    if (completedProgress == null || completedProgress.getStartDate() == null || completedProgress.getFinishDate() == null) {
+    		updated = updateProgress(lesson.getLessonId(), auditLogBuilder, errorBuilder, learnerProgress, 
+    			learner, lessonStartDate, activity) || updated;
+    	    }
+
+	    // is completed (previously or just now?), in which case update gradebook.
+	    if (activity.isToolActivity()) {
+		CompletedActivityProgress updatedCompletedProgress = learnerProgress.getCompletedActivities().get(
+			activity);
+		if (updatedCompletedProgress != null) {
+		    ToolActivity toolActivity = (ToolActivity) activity;
+		    Tool tool = toolActivity.getTool();
+		    if (updateGradebookForAll || TOOL_SIGNATURE_ASSESSMENT.equals(tool.getToolSignature())
+			    || TOOL_SIGNATURE_SCRATCHIE.equals(tool.getToolSignature())
+			    || TOOL_SIGNATURE_MCQ.equals(tool.getToolSignature())) {
+			auditLogBuilder.append("Pushing mark to Gradebook for activity ")
+				.append(activity.getActivityId()).append(" ").append(activity.getTitle()).append("\n");
+			gradebookService.updateUserActivityGradebookMark(lesson, activity, learner);
+		    }
+		}
+	    }
+
+    	}
+
+    	if ( updated )
+    	    learnerProgressDAO.updateLearnerProgress(learnerProgress);
+
+	return new String[] { auditLogBuilder.toString(), errorBuilder.toString() };
+    }
+
+    private boolean updateProgress(Long lessonId, StringBuilder auditLogBuilder, StringBuilder errorBuilder, 
+	    LearnerProgress learnerProgress, User learner, Date lessonStartDate, Activity activity) {
+
+	boolean updated = false;
+	ToolCompletionStatus results = recalcActivityProgress(activity, learner, lessonId, learnerProgress, auditLogBuilder, errorBuilder);
+
+	// results ==  null ignore - won't harm anything if it is in attempted and nothing in the tool and
+	// do not remove from completed in case it was force completed, or the tool doesn't support this
+
+	if (results != null) {
+
+	    if (results.getStatus() == ToolCompletionStatus.ACTIVITY_COMPLETED) {
+		// completed
+		Date startedDateFromAttempted = learnerProgress.getAttemptedActivities().get(activity);
+		CompletedActivityProgress cap = learnerProgress.getCompletedActivities().get(activity);
+		if (cap != null) {
+		    if (cap.getStartDate() == null) {
+			if (startedDateFromAttempted != null)
+			    cap.setStartDate(startedDateFromAttempted);
+			else if (results.getStartDate() != null)
+			    cap.setStartDate(results.getStartDate());
+		    }
+		    if (cap.getFinishDate() == null && results.getFinishDate() != null) {
+			cap.setFinishDate(results.getFinishDate());
+		    }
+		} else {
+		    cap = new CompletedActivityProgress(learnerProgress, activity,
+			    startedDateFromAttempted != null ? startedDateFromAttempted : results.getStartDate(),
+			    results.getFinishDate());
+		}
+		if ( cap.getStartDate() == null ) {
+		    // must have something or it is not seen as completed
+		    cap.setStartDate(lessonStartDate);
+		}
+		learnerProgress.getCompletedActivities().put(activity, cap);
+		learnerProgress.getAttemptedActivities().remove(activity);
+
+		auditLogBuilder.append("Progress updated for completed activity ").append(activity.getActivityId())
+			.append(" ").append(activity.getTitle()).append("\n");
+		updated = true;
+
+	    } else if (results.getStatus() == ToolCompletionStatus.ACTIVITY_ATTEMPTED) {
+		// Attempted - if not already there add with tool's start date, or failing that the tool's value for  
+		// session start date, or the core's value for session start date, or the lesson start date. 
+		// Must have a date or it can't be saved.
+		if (results.getStartDate() != null)
+		    learnerProgress.getAttemptedActivities().putIfAbsent(activity, results.getStartDate());
+		else {
+		    learnerProgress.getAttemptedActivities().putIfAbsent(activity, lessonStartDate);
+		}
+		auditLogBuilder.append("Progress updated for attempted activity ").append(activity.getActivityId())
+			.append(" ").append(activity.getTitle()).append("\n");
+		updated = true;
+	    }
+
+	}
+	
+	return updated;
+    }
+
+    private ToolCompletionStatus recalcActivityProgress(Activity activity, User learner, Long lessonId, LearnerProgress learnerProgress, StringBuilder auditLogEntry, StringBuilder errorBuilder) {
+
+	ToolCompletionStatus status = null;
+	
+	if (activity.isToolActivity()) {
+	    ToolSession toolSession = lamsCoreToolService.getToolSessionByLearner(learner, activity);
+	    if (toolSession != null) {
+		status = lamsCoreToolService.getCompletionStatusFromTool(learner, activity);	    
+		if ( status.getStartDate() == null ) 
+		    status.setStartDate(toolSession.getCreateDateTime());
+	    }
+
+	} else if ( activity.isComplexActivity() ) {
+		ComplexActivity complexActivity = (ComplexActivity) activity; 
+		boolean attempted = false;
+		boolean allComplete = true;
+		Date caStartDate = null;
+		Date caEndDate = null;
+		for (Iterator i = complexActivity.getActivities().iterator(); i.hasNext();) {
+		    Activity childActivity = (Activity) i.next();
+		    Date childStartDate = learnerProgress.getAttemptedActivities().get(childActivity);
+		    Date childEndDate = null;
+		    if ( childStartDate != null ) {
+			attempted = true;
+		    }
+		    CompletedActivityProgress childCap = learnerProgress.getCompletedActivities().get(childActivity);
+		    if ( childCap == null ) {
+			allComplete = false;
+		    } else {
+			attempted = true;
+			if ( childStartDate == null )
+			    childStartDate = childCap.getStartDate();
+			childEndDate = childCap.getFinishDate();
+		    }
+		    if ( caStartDate == null || (childStartDate != null && childStartDate.before(caStartDate)) )
+			caStartDate = childStartDate;
+		    if ( caEndDate == null || (childEndDate != null && childEndDate.after(caStartDate)) )
+			caEndDate = childEndDate;
+		}
+		
+		if ( attempted ) {
+		    if ( allComplete ) 
+			status =  new ToolCompletionStatus(ToolCompletionStatus.ACTIVITY_COMPLETED, caStartDate, caEndDate);
+		    else 
+			status =  new ToolCompletionStatus(ToolCompletionStatus.ACTIVITY_ATTEMPTED, caStartDate, null);
+		}
+		    
+	} else if ( activity.isGateActivity() ){
+	    // do nothing
+	    ;
+	} else if ( activity.isGroupingActivity() ) {
+	    GroupingActivity groupingActivity = (GroupingActivity) activity;
+	    Grouping grouping = groupingActivity.getCreateGrouping();
+	    if ( grouping.doesLearnerExist(learner) ) {
+		status =  new ToolCompletionStatus(ToolCompletionStatus.ACTIVITY_COMPLETED, null, null);
+	    }
+	} else {
+	    errorBuilder.append("Unable to update status for unexpected activity ").append(activity.getActivityId())
+		    .append(" ").append(activity.getTitle());
+	}
+	return status;
+
+    }
+
+    @Override
+    public IActivityDAO getActivityDAO() {
+	return activityDAO;
+    }
+
+ 
 }

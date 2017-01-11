@@ -96,6 +96,18 @@
 		<load-on-startup>1</load-on-startup>
 	</servlet>
 
+	<!--  Temporary servlet for fixing progress bar and gradebook -->
+	<servlet>
+		<servlet-name>RepopulateProgressMarksServlet</servlet-name>
+		<servlet-class>
+			org.lamsfoundation.lams.learning.web.RepopulateProgressMarksServlet
+		</servlet-class>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>RepopulateProgressMarksServlet</servlet-name>
+		<url-pattern>/repopulateProgress</url-pattern>
+	</servlet-mapping>
+
 	<!-- Optional Module Placeholder - do not remove -->
 
 	<servlet-mapping>
