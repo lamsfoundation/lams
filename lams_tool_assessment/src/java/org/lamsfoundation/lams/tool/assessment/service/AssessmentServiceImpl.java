@@ -58,6 +58,7 @@ import org.lamsfoundation.lams.notebook.service.CoreNotebookConstants;
 import org.lamsfoundation.lams.notebook.service.ICoreNotebookService;
 import org.lamsfoundation.lams.rest.RestTags;
 import org.lamsfoundation.lams.rest.ToolRestManager;
+import org.lamsfoundation.lams.tool.ToolCompletionStatus;
 import org.lamsfoundation.lams.tool.ToolContentManager;
 import org.lamsfoundation.lams.tool.ToolOutput;
 import org.lamsfoundation.lams.tool.ToolOutputDefinition;
@@ -2369,6 +2370,29 @@ public class AssessmentServiceImpl
 	return getAssessmentByContentId(toolContentId).getTitle();
     }
 
+    @Override
+    public ToolCompletionStatus getCompletionStatus(Long learnerId, Long toolSessionId) {
+	AssessmentUser learner = getUserByIDAndSession(learnerId, toolSessionId);
+	if ( learner == null ) {
+	    return new ToolCompletionStatus(ToolCompletionStatus.ACTIVITY_NOT_ATTEMPTED, null, null);
+	} 
+	
+	Assessment assessment = getAssessmentBySessionId(toolSessionId);
+	List<AssessmentResult> results = assessmentResultDao.getAssessmentResults(assessment.getUid(), learner.getUserId());
+	Date startDate = null;
+	Date finishDate = null;
+	for ( AssessmentResult result: results ) {
+	    if ( startDate == null || ( result.getStartDate()  != null && result.getStartDate().before(startDate)) )
+		startDate = result.getStartDate();
+	    if ( finishDate == null || ( result.getFinishDate()  != null && result.getFinishDate().after(finishDate)) )
+		finishDate = result.getFinishDate();
+	}
+
+	if ( learner.isSessionFinished()  )
+	    return new ToolCompletionStatus(ToolCompletionStatus.ACTIVITY_COMPLETED, startDate, finishDate);
+	else
+	    return new ToolCompletionStatus(ToolCompletionStatus.ACTIVITY_ATTEMPTED, startDate, null);
+    }
     // ****************** REST methods *************************
 
     /**

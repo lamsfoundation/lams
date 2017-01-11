@@ -44,4 +44,5 @@ public interface CommonCartridgeItemVisitDAO extends DAO {
 
     public List<CommonCartridgeItemVisitLog> getCommonCartridgeItemLogBySession(Long sessionId, Long itemUid);
 
+    public Object[] getDateRangeOfAccesses(Long userUid);
 }

@@ -49,6 +49,7 @@ import org.lamsfoundation.lams.notebook.service.CoreNotebookConstants;
 import org.lamsfoundation.lams.notebook.service.ICoreNotebookService;
 import org.lamsfoundation.lams.rest.RestTags;
 import org.lamsfoundation.lams.rest.ToolRestManager;
+import org.lamsfoundation.lams.tool.ToolCompletionStatus;
 import org.lamsfoundation.lams.tool.ToolContentManager;
 import org.lamsfoundation.lams.tool.ToolOutput;
 import org.lamsfoundation.lams.tool.ToolOutputDefinition;
@@ -1017,6 +1018,21 @@ public class WikiService implements ToolSessionManager, ToolContentManager, IWik
 	return getWikiOutputFactory().getSupportedDefinitionClasses(definitionType);
     }
 
+    @Override
+    public ToolCompletionStatus getCompletionStatus(Long learnerId, Long toolSessionId) {
+	WikiUser learner = getUserByUserIdAndSessionId(learnerId, toolSessionId);
+	if (learner == null) {
+	    return new ToolCompletionStatus(ToolCompletionStatus.ACTIVITY_NOT_ATTEMPTED, null, null);
+	}
+
+	// very complicated to try to work out from edit page, so not doing dates.
+
+	if (learner.isFinishedActivity())
+	    return new ToolCompletionStatus(ToolCompletionStatus.ACTIVITY_COMPLETED, null, null);
+	else
+	    return new ToolCompletionStatus(ToolCompletionStatus.ACTIVITY_ATTEMPTED, null, null);
+    }
+    
     /* ****************** REST methods **************************************************************************/
 
     /**

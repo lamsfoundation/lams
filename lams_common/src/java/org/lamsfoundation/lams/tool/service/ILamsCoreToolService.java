@@ -31,6 +31,7 @@ import org.lamsfoundation.lams.learningdesign.ToolActivity;
 import org.lamsfoundation.lams.lesson.Lesson;
 import org.lamsfoundation.lams.tool.Tool;
 import org.lamsfoundation.lams.tool.ToolAccessMode;
+import org.lamsfoundation.lams.tool.ToolCompletionStatus;
 import org.lamsfoundation.lams.tool.ToolOutput;
 import org.lamsfoundation.lams.tool.ToolOutputDefinition;
 import org.lamsfoundation.lams.tool.ToolSession;
@@ -415,4 +416,7 @@ public interface ILamsCoreToolService {
     String setupToolURLWithToolContent(ToolActivity activity, String toolURL);
 
     Object findToolService(Tool tool) throws NoSuchBeanDefinitionException;
+    
+    ToolCompletionStatus getCompletionStatusFromTool(User learner, Activity activity) 
+	    throws LamsToolServiceException;
 }

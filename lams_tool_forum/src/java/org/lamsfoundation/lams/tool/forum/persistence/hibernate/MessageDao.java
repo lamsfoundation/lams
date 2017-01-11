@@ -28,7 +28,10 @@ package org.lamsfoundation.lams.tool.forum.persistence.hibernate;
 import java.util.List;
 
 import org.hibernate.LockOptions;
+import org.hibernate.SQLQuery;
+import org.hibernate.type.StringType;
 import org.lamsfoundation.lams.dao.hibernate.LAMSBaseDAO;
+import org.lamsfoundation.lams.tool.forum.persistence.ForumUser;
 import org.lamsfoundation.lams.tool.forum.persistence.IMessageDAO;
 import org.lamsfoundation.lams.tool.forum.persistence.Message;
 import org.springframework.stereotype.Repository;
@@ -55,6 +58,9 @@ public class MessageDao extends LAMSBaseDAO implements IMessageDAO {
     private static final String SQL_QUERY_TOPICS_NUMBER_BY_USER_SESSION = "select count(*) from "
 	    + Message.class.getName() + " m "
 	    + " where m.createdBy.userId=? and m.toolSession.sessionId=? and m.isAuthored = false";
+
+    private static final String SQL_QUERY_DATES_BY_USER_SESSION = "SELECT MIN(create_date) start_date, MAX(create_date) end_date "
+	    + " FROM tl_lafrum11_message WHERE create_by = :userUid";
 
     @Override
     public void saveOrUpdate(Message message) {
@@ -117,5 +123,13 @@ public class MessageDao extends LAMSBaseDAO implements IMessageDAO {
 	} else {
 	    return 0;
 	}
+    }
+    
+    @Override
+    public Object[] getDateRangeOfMessages(Long userUid) {
+	SQLQuery query = (SQLQuery) getSession().createSQLQuery(SQL_QUERY_DATES_BY_USER_SESSION.toString())
+		.setLong("userUid", userUid);
+	Object[] values = (Object[]) query.list().get(0);
+	return values;
     }
 }

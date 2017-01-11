@@ -66,4 +66,10 @@ public interface IMessageDAO extends IBaseDAO {
      */
     int getTopicsNum(Long userID, Long sessionId);
 
+    /** Get the create date of the first message left by this user in the session and the last
+     * message left.
+     * @param userUid
+     * @return
+     */
+    Object[] getDateRangeOfMessages(Long userUid);
 }

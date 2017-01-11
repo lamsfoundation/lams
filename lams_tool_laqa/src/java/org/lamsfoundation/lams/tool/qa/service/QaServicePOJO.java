@@ -58,6 +58,7 @@ import org.lamsfoundation.lams.rating.service.IRatingService;
 import org.lamsfoundation.lams.rest.RestTags;
 import org.lamsfoundation.lams.rest.ToolRestManager;
 import org.lamsfoundation.lams.tool.IToolVO;
+import org.lamsfoundation.lams.tool.ToolCompletionStatus;
 import org.lamsfoundation.lams.tool.ToolContentManager;
 import org.lamsfoundation.lams.tool.ToolOutput;
 import org.lamsfoundation.lams.tool.ToolOutputDefinition;
@@ -1194,6 +1195,31 @@ public class QaServicePOJO
 	return getQaOutputFactory().getSupportedDefinitionClasses(definitionType);
     }
 
+    @Override
+    public ToolCompletionStatus getCompletionStatus(Long learnerId, Long toolSessionId) {
+	QaQueUsr learner = qaQueUsrDAO.getQaUserBySession(learnerId, toolSessionId);
+	if (learner == null) {
+	    return new ToolCompletionStatus(ToolCompletionStatus.ACTIVITY_NOT_ATTEMPTED, null, null);
+	}
+	
+	Date startDate = null;
+	Date endDate = null;
+	Set<QaUsrResp> attempts = learner.getQaUsrResps();
+	for (QaUsrResp item : attempts) {
+	    Date newDate = item.getAttemptTime();
+	    if (newDate != null) {
+		if (startDate == null || newDate.before(startDate))
+		    startDate = newDate;
+		if (endDate == null || newDate.after(endDate))
+		    endDate = newDate;
+	    }
+	}
+
+	if (learner.isLearnerFinished())
+	    return new ToolCompletionStatus(ToolCompletionStatus.ACTIVITY_COMPLETED, startDate, endDate);
+	else
+	    return new ToolCompletionStatus(ToolCompletionStatus.ACTIVITY_ATTEMPTED, startDate, null);
+    }
     // ****************** REST methods *************************
 
     /**

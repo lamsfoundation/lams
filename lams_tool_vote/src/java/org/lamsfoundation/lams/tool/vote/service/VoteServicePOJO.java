@@ -60,6 +60,7 @@ import org.lamsfoundation.lams.rest.RestTags;
 import org.lamsfoundation.lams.rest.ToolRestManager;
 import org.lamsfoundation.lams.tool.IToolVO;
 import org.lamsfoundation.lams.tool.SimpleURL;
+import org.lamsfoundation.lams.tool.ToolCompletionStatus;
 import org.lamsfoundation.lams.tool.ToolContentManager;
 import org.lamsfoundation.lams.tool.ToolOutput;
 import org.lamsfoundation.lams.tool.ToolOutputDefinition;
@@ -1944,6 +1945,34 @@ public class VoteServicePOJO
     @Override
     public Class[] getSupportedToolOutputDefinitionClasses(int definitionType) {
 	return getVoteOutputFactory().getSupportedDefinitionClasses(definitionType);
+    }
+
+    @Override
+    public ToolCompletionStatus getCompletionStatus(Long learnerId, Long toolSessionId) {
+	VoteSession session = getSessionBySessionId(toolSessionId);
+	VoteQueUsr learner = getVoteUserBySession(learnerId, session.getUid());
+	if (learner == null) {
+	    return new ToolCompletionStatus(ToolCompletionStatus.ACTIVITY_NOT_ATTEMPTED, null, null);
+	}
+
+	
+	Date startDate = null;
+	Date endDate = null;
+	Set<VoteUsrAttempt> attempts = learner.getVoteUsrAttempts(); // expect only one
+	for (VoteUsrAttempt item : attempts) {
+	    Date newDate = item.getAttemptTime();
+	    if (newDate != null) {
+		if (startDate == null || newDate.before(startDate))
+		    startDate = newDate;
+		if (endDate == null || newDate.after(endDate))
+		    endDate = newDate;
+	    }
+	}
+
+	if (learner.isResponseFinalised())
+	    return new ToolCompletionStatus(ToolCompletionStatus.ACTIVITY_COMPLETED, startDate, endDate);
+	else
+	    return new ToolCompletionStatus(ToolCompletionStatus.ACTIVITY_ATTEMPTED, startDate, null);
     }
 
     // ****************** REST methods *************************

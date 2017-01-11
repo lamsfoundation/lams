@@ -70,6 +70,7 @@ import org.lamsfoundation.lams.notebook.service.CoreNotebookConstants;
 import org.lamsfoundation.lams.notebook.service.ICoreNotebookService;
 import org.lamsfoundation.lams.rest.RestTags;
 import org.lamsfoundation.lams.rest.ToolRestManager;
+import org.lamsfoundation.lams.tool.ToolCompletionStatus;
 import org.lamsfoundation.lams.tool.ToolContentManager;
 import org.lamsfoundation.lams.tool.ToolOutput;
 import org.lamsfoundation.lams.tool.ToolOutputDefinition;
@@ -1469,6 +1470,21 @@ public class ForumService implements IForumService, ToolContentManager, ToolSess
     public Class[] getSupportedToolOutputDefinitionClasses(int definitionType) {
 	return getForumOutputFactory().getSupportedDefinitionClasses(definitionType);
     }
+    
+    @Override
+    public ToolCompletionStatus getCompletionStatus(Long learnerId, Long toolSessionId) {
+	ForumUser learner = getUserByUserAndSession(learnerId, toolSessionId);
+	if (learner == null) {
+	    return new ToolCompletionStatus(ToolCompletionStatus.ACTIVITY_NOT_ATTEMPTED, null, null);
+	}
+
+	Object[] dates = messageDao.getDateRangeOfMessages(learner.getUid());
+	if (learner.isSessionFinished())
+	    return new ToolCompletionStatus(ToolCompletionStatus.ACTIVITY_COMPLETED, (Date)dates[0], (Date)dates[1]);
+	else
+	    return new ToolCompletionStatus(ToolCompletionStatus.ACTIVITY_ATTEMPTED,(Date) dates[0], null);
+    }
+
 
     // ****************** REST methods *************************
 

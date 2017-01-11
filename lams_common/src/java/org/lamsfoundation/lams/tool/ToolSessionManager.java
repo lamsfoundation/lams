@@ -26,6 +26,7 @@ package org.lamsfoundation.lams.tool;
 import java.util.List;
 import java.util.SortedMap;
 
+import org.lamsfoundation.lams.learningdesign.Activity;
 import org.lamsfoundation.lams.tool.exception.DataMissingException;
 import org.lamsfoundation.lams.tool.exception.ToolException;
 import org.lamsfoundation.lams.usermanagement.User;
@@ -167,4 +168,11 @@ public interface ToolSessionManager {
      */
     void forceCompleteUser(Long toolSessionId, User user);
 
+    /** 
+     * Get the completion status as according to the tool.
+     * @param learner
+     * @param activity
+     * @return
+     */
+    ToolCompletionStatus getCompletionStatus(Long learnerId, Long toolSessionId);
 }

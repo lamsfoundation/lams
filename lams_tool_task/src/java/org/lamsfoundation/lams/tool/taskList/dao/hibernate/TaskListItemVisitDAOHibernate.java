@@ -25,6 +25,7 @@ package org.lamsfoundation.lams.tool.taskList.dao.hibernate;
 
 import java.util.List;
 
+import org.hibernate.SQLQuery;
 import org.lamsfoundation.lams.dao.hibernate.LAMSBaseDAO;
 import org.lamsfoundation.lams.tool.taskList.dao.TaskListItemVisitDAO;
 import org.lamsfoundation.lams.tool.taskList.model.TaskListItemVisitLog;
@@ -53,6 +54,9 @@ public class TaskListItemVisitDAOHibernate extends LAMSBaseDAO implements TaskLi
 	    + TaskListItemVisitLog.class.getName()
 	    + " as r where r.complete=true and r.sessionId=? and  r.taskListItem.uid =?";
 
+    private static final String SQL_QUERY_DATES_BY_USER_SESSION = "SELECT MIN(access_date) start_date, MAX(access_date) end_date "
+	    + " FROM tl_latask10_item_log WHERE user_uid = :userUid and session_id = :sessionId";
+    
     @Override
     public TaskListItemVisitLog getTaskListItemLog(Long itemUid, Long userId) {
 	List list = doFind(FIND_BY_ITEM_AND_USER, new Object[] { userId, itemUid });
@@ -87,4 +91,11 @@ public class TaskListItemVisitDAOHibernate extends LAMSBaseDAO implements TaskLi
 	return (List<TaskListItemVisitLog>) doFind(FIND_BY_ITEM_BYSESSION, new Object[] { sessionId, itemUid });
     }
 
+    @Override
+    public Object[] getDateRangeOfTasks(Long userUid, Long sessionId) {
+	SQLQuery query = (SQLQuery) getSession().createSQLQuery(SQL_QUERY_DATES_BY_USER_SESSION.toString())
+		.setLong("userUid", userUid).setLong("sessionId", sessionId);
+	Object[] values = (Object[]) query.list().get(0);
+	return values;
+    }
 }
