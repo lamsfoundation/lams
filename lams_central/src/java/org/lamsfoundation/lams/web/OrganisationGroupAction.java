@@ -471,8 +471,8 @@ public class OrganisationGroupAction extends DispatchAction {
 	    groupJSON.put("name", group.getName());
 	    groupsJSON.put(groupJSON);
 	}
-	Activity branchingActivity = (Activity) getUserManagementService().findById(Activity.class, activityID);
-	Grouping grouping = branchingActivity.getGrouping();
+	GroupingActivity branchingActivity = (GroupingActivity) getUserManagementService().findById(Activity.class, activityID);
+	Grouping grouping = branchingActivity.getCreateGrouping();
 
 	JSONArray branchesJSON = new JSONArray();
 	SortedSet<Group> groups = new TreeSet<Group>(grouping.getGroups());
