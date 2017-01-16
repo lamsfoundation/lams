@@ -1,0 +1,161 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!DOCTYPE struts-config PUBLIC "-//Apache Software Foundation//DTD Struts Configuration 1.2//EN" "http://jakarta.apache.org/struts/dtds/struts-config_1_2.dtd">
+
+<struts-config>
+
+  <!-- ========== Data Sources Definitions =================================== -->
+  <!--
+    Define your Struts data sources in a file called struts-data-sources.xml and place
+    it in your merge directory.
+  -->
+
+  <!-- ========== Form Bean Definitions =================================== -->
+  <form-beans>
+
+    <form-bean
+      name="ladoku11AdminForm"
+      type="org.lamsfoundation.lams.tool.dokumaran.web.form.AdminForm"
+    />
+    <form-bean
+      name="dokumaranForm"
+      type="org.lamsfoundation.lams.tool.dokumaran.web.form.DokumaranForm"
+    />
+    <form-bean
+      name="reflectionForm"
+      type="org.lamsfoundation.lams.tool.dokumaran.web.form.ReflectionForm"
+    />
+
+   <form-bean name="emptyForm" type="org.apache.struts.action.DynaActionForm" />
+
+  </form-beans>
+
+  <!-- ========== Global Exceptions Definitions =================================== -->
+  <global-exceptions>
+  <exception
+    handler="org.lamsfoundation.lams.web.util.CustomStrutsExceptionHandler"
+    key="error.system"
+    path="/error.jsp"
+    scope="request"
+    type="java.lang.Exception"/>
+</global-exceptions>
+
+  <!-- ========== Global Forward Definitions =================================== -->
+  <global-forwards>
+
+</global-forwards>
+
+  <!-- ========== Action Mapping Definitions =================================== -->
+   <action-mappings>
+
+   		<!-- ========== Action Mapping Definitions ============================== -->
+		<!-- ========== BEGIN: Authroing Definitions ============================== -->
+		<action path="/authoring/start"
+			type="org.lamsfoundation.lams.tool.dokumaran.web.action.AuthoringAction"
+			name="dokumaranForm" 
+			scope="request" 
+			parameter="start" 
+			validate="false">
+			<forward name="success" path="/pages/authoring/start.jsp" />
+		</action>
+		<action path="/definelater"
+			type="org.lamsfoundation.lams.tool.dokumaran.web.action.AuthoringAction"
+			name="dokumaranForm" 
+			scope="request" 
+			parameter="definelater" 
+			validate="false">
+			<forward name="forbidden" path="/pages/authoring/definelaterforbid.jsp" />
+			<forward name="success" path="/pages/authoring/start.jsp" />
+		</action>
+		<action path="/authoring/init"
+			type="org.lamsfoundation.lams.tool.dokumaran.web.action.AuthoringAction"
+			name="dokumaranForm" 
+			scope="request" 
+			parameter="initPage" 
+			validate="false">
+			<forward name="success" path="/pages/authoring/authoring.jsp" />
+			<forward name="definelater" path="/pages/authoring/definelater.jsp" />
+		</action>
+		<action path="/authoring/update"
+			type="org.lamsfoundation.lams.tool.dokumaran.web.action.AuthoringAction"
+			name="dokumaranForm" 
+			scope="request" 
+			parameter="updateContent" 
+			validate="false">
+			<forward name="author" path="/pages/authoring/authoring.jsp" />
+			<forward name="monitor" path="/pages/authoring/definelater.jsp" />
+		</action>
+		<!-- ========== BEGIN: Learning Definitions ============================== -->
+		<action path="/learning/start"
+			type="org.lamsfoundation.lams.tool.dokumaran.web.action.LearningAction"
+			parameter="start" >
+			<forward name="success" path="/pages/learning/learning.jsp" />
+			<forward name="waitforleader" path="/pages/learning/waitforleader.jsp" />
+			<forward name="notconfigured" path="/pages/learning/notconfigured.jsp" />
+			<forward name="defineLater" path="/pages/learning/definelater.jsp" />	
+		</action>
+		<action path="/learning/checkLeaderProgress"
+			type="org.lamsfoundation.lams.tool.dokumaran.web.action.LearningAction"
+			parameter="checkLeaderProgress" >
+		</action>
+		<action path="/learning/finish"
+			type="org.lamsfoundation.lams.tool.dokumaran.web.action.LearningAction"
+			input="/pages/learning/learning.jsp"
+			parameter="finish" >
+			<forward name="success" path="/pages/learning/finish.jsp" />
+		</action>
+		<!--  ========= Reflection =============== -->
+		<action path="/learning/newReflection"
+			type="org.lamsfoundation.lams.tool.dokumaran.web.action.LearningAction"
+			name="reflectionForm" 
+			validate="false" 
+			parameter="newReflection" 
+			input="/pages/learning/learning.jsp" 
+			scope="request">
+			<forward name="success" path="/pages/learning/notebook.jsp" />
+		</action>
+		<action path="/learning/submitReflection"
+			type="org.lamsfoundation.lams.tool.dokumaran.web.action.LearningAction"
+			name="reflectionForm" 
+			validate="false" 
+			input="/pages/learning/notebook.jsp"
+			parameter="submitReflection" 
+			scope="request">
+			<forward name="success" path="/pages/learning/finish.jsp" />
+
+		</action>
+		<!-- ========== BEGIN: Monitoring Definitions ============================== -->
+		<action path="/monitoring/summary"
+			type="org.lamsfoundation.lams.tool.dokumaran.web.action.MonitoringAction"
+			parameter="summary" >
+			<forward name="notconfigured" path="/pages/learning/notconfigured.jsp" />
+			<forward name="success" path="/pages/monitoring/monitoring.jsp" />
+		</action>
+	    <action
+	      path="/ladoku11admin"
+	      type="org.lamsfoundation.lams.tool.dokumaran.web.action.AdminAction"
+	      name="ladoku11AdminForm"
+	      scope="request"
+	      parameter="dispatch"
+	      unknown="false"
+	      validate="false"
+	    >
+	      <forward
+	        name="config"
+	        path="/pages/admin/config.jsp"
+	        redirect="false"
+	      />
+	    </action>		
+		<!-- ========== BEGIN: Common ============================== -->
+		<action path="/clearsession"
+			type="org.lamsfoundation.lams.tool.dokumaran.web.action.ClearSessionAction">
+		</action>
+  </action-mappings>
+
+   <!-- Define your Struts controller in a file called struts-controller.xml and place it in your merge directory. -->
+
+  <message-resources parameter="org.lamsfoundation.lams.tool.dokumaran.ApplicationResources" />
+
+  <!-- Put custom struts plugin here -->
+
+</struts-config>
