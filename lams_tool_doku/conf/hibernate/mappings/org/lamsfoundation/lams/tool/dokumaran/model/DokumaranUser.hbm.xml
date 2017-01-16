@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE hibernate-mapping PUBLIC
+    "-//Hibernate/Hibernate Mapping DTD 3.0//EN" 
+    "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+
+<hibernate-mapping
+>
+
+    <class
+        name="org.lamsfoundation.lams.tool.dokumaran.model.DokumaranUser"
+        table="tl_ladoku11_user"
+    >
+
+        <id
+            name="uid"
+            column="uid"
+            type="java.lang.Long"
+        >
+            <generator class="native">
+              <!--  
+                  To add non XDoclet generator parameters, create a file named 
+                  hibernate-generator-params-DokumaranUser.xml 
+                  containing the additional parameters and place it in your merge dir. 
+              --> 
+            </generator>
+        </id>
+
+        <property
+            name="userId"
+            type="java.lang.Long"
+            update="true"
+            insert="true"
+            column="user_id"
+            length="20"
+        />
+
+        <property
+            name="lastName"
+            type="java.lang.String"
+            update="true"
+            insert="true"
+            column="last_name"
+            length="255"
+        />
+
+        <property
+            name="firstName"
+            type="java.lang.String"
+            update="true"
+            insert="true"
+            column="first_name"
+            length="255"
+        />
+
+        <property
+            name="loginName"
+            type="java.lang.String"
+            update="true"
+            insert="true"
+            column="login_name"
+        />
+
+        <many-to-one
+            name="session"
+            class="org.lamsfoundation.lams.tool.dokumaran.model.DokumaranSession"
+            cascade="none"
+            outer-join="auto"
+            update="true"
+            insert="true"
+            column="session_uid"
+        />
+
+        <many-to-one
+            name="dokumaran"
+            class="org.lamsfoundation.lams.tool.dokumaran.model.Dokumaran"
+            cascade="none"
+            outer-join="auto"
+            update="true"
+            insert="true"
+            column="dokumaran_uid"
+        />
+
+        <property
+            name="sessionFinished"
+            type="boolean"
+            update="true"
+            insert="true"
+            column="session_finished"
+        />
+
+        <!--
+            To add non XDoclet property mappings, create a file named
+                hibernate-properties-DokumaranUser.xml
+            containing the additional properties and place it in your merge dir.
+        -->
+
+    </class>
+
+</hibernate-mapping>
