@@ -21,6 +21,7 @@
         <archive path="/lams_build/lib/xml-commons/xml-apis.jar"/>
         <archive path="/lams_build/lib/xml-commons/xml-apis-ext.jar"/>
         <archive path="/lams_build/lib/jlatexmath/jlatexmath-1.0.3.jar"/>
+        <archive javadoc="http://alex-public-doc.s3.amazonaws.com/json_simple-1.1/index.html" path="/lams_build/lib/json/json-simple-1.1.1.jar"/>
         <archive javadoc="http://google-gson.googlecode.com/svn/tags/gson-2.2.4/docs/javadocs/" path="/lams_build/lib/json/gson-2.2.4.jar" source="/3rdParty_sources/gson"/>
         <archive path="/lams_build/lib/jboss/jbossweb.jar" source="/3rdParty_sources/jbossweb"/>
         <archive javadoc="http://docs.spring.io/spring/docs/4.0.6.RELEASE/javadoc-api/" path="/lams_build/lib/spring/spring-context-4.0.6.RELEASE.jar" source="/3rdParty_sources/spring"/>
