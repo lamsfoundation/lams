@@ -68,9 +68,9 @@ public class PresenceWebsocketServer {
 
 	@Override
 	public void run() {
-	    // websocket communication bypasses standard HTTP filters, so Hibernate session needs to be initialised manually
-	    HibernateSessionManager.openSession();
 	    while (!stopFlag) {
+		// websocket communication bypasses standard HTTP filters, so Hibernate session needs to be initialised manually
+		HibernateSessionManager.openSession();
 		try {
 		    // synchronize websockets as a new Learner entering chat could modify this collection
 		    synchronized (PresenceWebsocketServer.websockets) {
@@ -95,16 +95,19 @@ public class PresenceWebsocketServer {
 			    }
 			}
 		    }
-		    Thread.sleep(SendWorker.CHECK_INTERVAL);
-		} catch (InterruptedException e) {
-		    PresenceWebsocketServer.log.warn("Stopping Presence Chat worker thread");
-		    stopFlag = true;
 		} catch (Exception e) {
 		    // error caught, but carry on
 		    PresenceWebsocketServer.log.error("Error in Presence Chat worker thread", e);
+		} finally {
+		    HibernateSessionManager.closeSession();
+		    try {
+			Thread.sleep(SendWorker.CHECK_INTERVAL);
+		    } catch (InterruptedException e) {
+			log.warn("Stopping Presence Chat worker thread");
+			stopFlag = true;
+		    }
 		}
 	    }
-	    HibernateSessionManager.closeSession();
 	}
 
 	/**
