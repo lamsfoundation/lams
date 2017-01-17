@@ -30,6 +30,8 @@ jboss			  jbossweb.jar							2.1.3				   LGPL 2.1						 Apache Software Foundati
 				  
 jlatexmath		  jlatexmath-1.0.3.jar                  1.0.3
 
+json-simple       json-simple-1.1.1.jar                 1.1.1                  Apache License 2.0            fangyidong                       A simple Java toolkit for JSON
+
 lucene			  lucene-core-2.4.0.jar					2.4.0				   Apache License 2.0			 Apache							  text search engine library
 				  lucene-snowball-2.4.0.jar				2.4.0
 
