@@ -67,7 +67,7 @@
 		<ant antfile="../lams_tool_bbb/build.xml"           target="_clean-dirs" inheritAll="false"/>
 		<ant antfile="../lams_tool_chat/build.xml"          target="_clean-dirs" inheritAll="false"/>
 		<ant antfile="../lams_tool_daco/build.xml"          target="_clean-dirs" inheritAll="false"/>
-		<ant antfile="../lams_tool_doku/build.xml"          target="_clean-dirs" inheritAll="false"/>
+		<!--<ant antfile="../lams_tool_doku/build.xml"          target="_clean-dirs" inheritAll="false"/>-->
 		<ant antfile="../lams_tool_forum/build.xml"         target="_clean-dirs" inheritAll="false"/>
 		<ant antfile="../lams_tool_gmap/build.xml"          target="_clean-dirs" inheritAll="false"/>
 		<ant antfile="../lams_tool_images/build.xml"        target="_clean-dirs" inheritAll="false"/>
@@ -110,7 +110,7 @@
 		<ant antfile="../lams_tool_bbb/build.xml"           target="copy-tags" inheritAll="false"/>
 		<ant antfile="../lams_tool_chat/build.xml"          target="copy-tags" inheritAll="false"/>
 		<ant antfile="../lams_tool_daco/build.xml"          target="copy-tags" inheritAll="false"/>
-		<ant antfile="../lams_tool_doku/build.xml"          target="copy-tags" inheritAll="false"/>
+		<!--<ant antfile="../lams_tool_doku/build.xml"          target="copy-tags" inheritAll="false"/>-->
 		<ant antfile="../lams_tool_forum/build.xml"         target="copy-tags" inheritAll="false"/>
 		<ant antfile="../lams_tool_gmap/build.xml"          target="copy-tags" inheritAll="false"/>
 		<ant antfile="../lams_tool_images/build.xml"        target="copy-tags" inheritAll="false"/>
@@ -287,7 +287,7 @@
 		<ant antfile="../lams_tool_bbb/build.xml"           target="deploy-tool" inheritAll="false" />
 		<ant antfile="../lams_tool_chat/build.xml"          target="deploy-tool" inheritAll="false" />
 		<ant antfile="../lams_tool_daco/build.xml"          target="deploy-tool" inheritAll="false" />
-		<ant antfile="../lams_tool_doku/build.xml"          target="deploy-tool" inheritAll="false" />
+		<!--<ant antfile="../lams_tool_doku/build.xml"          target="deploy-tool" inheritAll="false" />-->
 		<ant antfile="../lams_tool_forum/build.xml"         target="deploy-tool" inheritAll="false" />
 		<ant antfile="../lams_tool_gmap/build.xml"          target="deploy-tool" inheritAll="false" />
 		<ant antfile="../lams_tool_images/build.xml"        target="deploy-tool" inheritAll="false" />
@@ -738,7 +738,7 @@
 		<ant antfile="../lams_tool_bbb/build.xml"           target="explode-war" inheritAll="false" />
 		<ant antfile="../lams_tool_chat/build.xml"          target="explode-war" inheritAll="false" />
 		<ant antfile="../lams_tool_daco/build.xml"          target="explode-war" inheritAll="false" />
-		<ant antfile="../lams_tool_doku/build.xml"          target="explode-war" inheritAll="false" />
+		<!--<ant antfile="../lams_tool_doku/build.xml"          target="explode-war" inheritAll="false" />-->
 		<ant antfile="../lams_tool_forum/build.xml"         target="explode-war" inheritAll="false" />
 		<ant antfile="../lams_tool_gmap/build.xml"          target="explode-war" inheritAll="false" />
 		<ant antfile="../lams_tool_images/build.xml"        target="explode-war" inheritAll="false" />
