@@ -103,6 +103,8 @@ public abstract class LamsAuthoringFinishAction extends Action {
 		    AttributeNames.PARAM_TOOL_CONTENT_ID, toolContentId.toString());
 	    reeditUrl = WebUtil.appendParameterToURL(reeditUrl, AttributeNames.PARAM_CONTENT_FOLDER_ID,
 		    contentFolderID);
+	    if ( notifyCloseURL != null && notifyCloseURL.length() > 0 ) 
+		reeditUrl = WebUtil.appendParameterToURL(reeditUrl, AttributeNames.PARAM_NOTIFY_CLOSE_URL, notifyCloseURL);
 	    nextUrl = WebUtil.appendParameterToURL(nextUrl, RE_EDIT_URL, URLEncoder.encode(reeditUrl, "UTF-8"));
 
 	    if (!StringUtils.isBlank(notifyCloseURL)) {
