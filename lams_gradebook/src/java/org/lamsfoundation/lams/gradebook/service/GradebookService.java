@@ -56,10 +56,17 @@ import org.lamsfoundation.lams.gradebook.util.GBGridView;
 import org.lamsfoundation.lams.gradebook.util.GradebookConstants;
 import org.lamsfoundation.lams.gradebook.util.LessonComparator;
 import org.lamsfoundation.lams.gradebook.util.UserComparator;
+import org.lamsfoundation.lams.learning.service.ICoreLearnerService;
+import org.lamsfoundation.lams.learning.web.bean.ActivityURL;
 import org.lamsfoundation.lams.learningdesign.Activity;
 import org.lamsfoundation.lams.learningdesign.ActivityEvaluation;
+import org.lamsfoundation.lams.learningdesign.ComplexActivity;
+import org.lamsfoundation.lams.learningdesign.FloatingActivity;
 import org.lamsfoundation.lams.learningdesign.Group;
 import org.lamsfoundation.lams.learningdesign.Grouping;
+import org.lamsfoundation.lams.learningdesign.OptionsActivity;
+import org.lamsfoundation.lams.learningdesign.ParallelActivity;
+import org.lamsfoundation.lams.learningdesign.SequenceActivity;
 import org.lamsfoundation.lams.learningdesign.ToolActivity;
 import org.lamsfoundation.lams.learningdesign.dao.IActivityDAO;
 import org.lamsfoundation.lams.lesson.CompletedActivityProgress;
@@ -90,8 +97,6 @@ import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
-import org.lamsfoundation.lams.learning.service.ICoreLearnerService;
-import org.lamsfoundation.lams.learning.web.bean.ActivityURL;
 
 
 /**
@@ -131,7 +136,7 @@ public class GradebookService implements IGradebookService {
 
 	List<GradebookGridRowDTO> gradebookActivityDTOs = new ArrayList<GradebookGridRowDTO>();
 
-	List<ToolActivity> activities = getLessonActivities(lesson);
+	List<ToolActivity> activities = getLessonActivitiesForLearner(lesson, userId);
 	for (ToolActivity activity : activities) {
 
 	    String groupName = null;
@@ -193,7 +198,7 @@ public class GradebookService implements IGradebookService {
 	Lesson lesson = lessonService.getLesson(lessonId);
 	List<GradebookGridRowDTO> gradebookActivityDTOs = new ArrayList<GradebookGridRowDTO>();
 
-	List<ToolActivity> activities = getLessonActivities(lesson);
+	List<ToolActivity> activities = getLessonToolActivitiesForLesson(lesson);
 
 	for (ToolActivity activity : activities) {
 
@@ -739,35 +744,77 @@ public class GradebookService implements IGradebookService {
 	}
 
 	Map<Integer, LearnerProgress> userToLearnerProgressMap = getUserToLearnerProgressMap(lesson, null);
-	List<ToolActivity> activities = getLessonActivities(lesson);
+	List<Activity> activities = getLessonActivitiesForLesson(lesson);
 
-	for (ToolActivity activity : activities) {
-
-	    Map<Integer, GradebookUserActivity> userToGradebookUserActivityMap = getUserToGradebookUserActivityMap(
-		    activity, null);
-
-	    List<GBUserGridRowDTO> userDTOs = new ArrayList<GBUserGridRowDTO>();
-
-	    for (User learner : learners) {
-		GBUserGridRowDTO userDTO = new GBUserGridRowDTO(learner);
-
-		// Set the progress
-		LearnerProgress learnerProgress = userToLearnerProgressMap.get(learner.getUserId());
-		userDTO.setTimeTaken(getActivityDuration(learnerProgress, activity));
-		userDTO.setStartDate(getActivityStartDate(learnerProgress, activity, null));
-		userDTO.setFinishDate(getActivityFinishDate(learnerProgress, activity, null));
-
-		// Add marks and feedback
-		GradebookUserActivity gradebookUserActivity = userToGradebookUserActivityMap.get(learner.getUserId());
-		if (gradebookUserActivity != null) {
-		    userDTO.setMark(gradebookUserActivity.getMark());
-		}
-		userDTOs.add(userDTO);
-	    }
-	    activityToUserDTOMap.put(activity, userDTOs);
+	for (Activity activity : activities) {
+	    getActivityDataForLessonGradebookExport(activityToUserDTOMap, learners, userToLearnerProgressMap, activity);
 	}
 
 	return activityToUserDTOMap;
+    }
+
+    @SuppressWarnings("unchecked")
+    private void getActivityDataForLessonGradebookExport(
+	    Map<ToolActivity, List<GBUserGridRowDTO>> activityToUserDTOMap, Set<User> learners,
+	    Map<Integer, LearnerProgress> userToLearnerProgressMap, Activity activity) {
+
+	if (activity.isToolActivity()) {
+	    List<GBUserGridRowDTO> userDTOs = getToolActivityDataForLessonGradebookExport(learners,
+		    userToLearnerProgressMap, (ToolActivity) activity);
+	    activityToUserDTOMap.put((ToolActivity) activity, userDTOs);
+
+	} else if (activity instanceof ComplexActivity) {
+	    // encountered a sequence, branch, optional or parallel within a branching sequence
+	    Set<User> complexLearners = learners;
+
+	    if (activity instanceof SequenceActivity) {
+		// use only a subset of learners for this branch of the branching activity based on who has started the branch
+		complexLearners = new TreeSet<User>(new UserComparator());
+		for (User learner : learners) {
+		    LearnerProgress learnerProgress = userToLearnerProgressMap.get(learner.getUserId());
+		    if (learnerProgress != null
+			    && (learnerProgress.getCompletedActivities().get(activity) != null || learnerProgress
+				    .getAttemptedActivities().get(activity) != null)) {
+			complexLearners.add(learner);
+		    }
+		}
+	    }
+
+	    ComplexActivity sequence = (ComplexActivity) activity;
+	    Set<Activity> childActivities = (Set<Activity>) sequence.getActivities();
+	    for (Activity childActivity : childActivities) {
+		getActivityDataForLessonGradebookExport(activityToUserDTOMap, complexLearners,
+			userToLearnerProgressMap, activityDAO.getActivityByActivityId(childActivity.getActivityId()));
+	    }
+	}
+    }
+
+    private List<GBUserGridRowDTO> getToolActivityDataForLessonGradebookExport(Set<User> learners,
+	    Map<Integer, LearnerProgress> userToLearnerProgressMap, ToolActivity toolActivity) {
+
+	Map<Integer, GradebookUserActivity> userToGradebookUserActivityMap = getUserToGradebookUserActivityMap(
+		toolActivity, null);
+
+	List<GBUserGridRowDTO> userDTOs = new ArrayList<GBUserGridRowDTO>();
+
+	for (User learner : learners) {
+	    GBUserGridRowDTO userDTO = new GBUserGridRowDTO(learner);
+
+	    // Set the progress
+	    LearnerProgress learnerProgress = userToLearnerProgressMap.get(learner.getUserId());
+	    userDTO.setTimeTaken(getActivityDuration(learnerProgress, toolActivity));
+	    userDTO.setStartDate(getActivityStartDate(learnerProgress, toolActivity, null));
+	    userDTO.setFinishDate(getActivityFinishDate(learnerProgress, toolActivity, null));
+
+	    // Add marks and feedback
+	    GradebookUserActivity gradebookUserActivity = userToGradebookUserActivityMap.get(learner.getUserId());
+	    if (gradebookUserActivity != null) {
+		userDTO.setMark(gradebookUserActivity.getMark());
+	    }
+	    userDTOs.add(userDTO);
+	}
+
+	return userDTOs;
     }
 
     @Override
@@ -937,32 +984,35 @@ public class GradebookService implements IGradebookService {
 		    }
 		}
 
-		//construct activityRowName
-		String groupName = null;
-		Long groupId = null;
-		if (activity.getGrouping() != null) {
-		    Group group = activity.getGroupFor(learner);
-		    if (group != null) {
-			groupName = group.getGroupName();
-			groupId = group.getGroupId();
+		// userDto will be null if this tool activity was within a branch and the user has not attempted that branch
+		if ( userDto != null ) {
+		    //construct activityRowName
+		    String groupName = null;
+		    Long groupId = null;
+		    if (activity.getGrouping() != null) {
+			Group group = activity.getGroupFor(learner);
+			if (group != null) {
+			    groupName = group.getGroupName();
+			    groupId = group.getGroupId();
+			}
 		    }
+		    String activityRowName = (groupName != null && groupId != null)
+			    ? StringEscapeUtils.escapeHtml(activity.getTitle()) + " (" + groupName + ")"
+				    : StringEscapeUtils.escapeHtml(activity.getTitle());
+
+		    String startDate = (userDto.getStartDate() == null) ? ""
+			    : cellDateFormat.format(userDto.getStartDate());
+		    String finishDate = (userDto.getFinishDate() == null) ? ""
+			    : cellDateFormat.format(userDto.getFinishDate());
+
+		    ExcelCell[] activityDataRow = new ExcelCell[5];
+		    activityDataRow[0] = new ExcelCell(activityRowName, false);
+		    activityDataRow[1] = new ExcelCell(startDate, false);
+		    activityDataRow[2] = new ExcelCell(finishDate, false);
+		    activityDataRow[3] = new ExcelCell(userDto.getTimeTakenSeconds(), false);
+		    activityDataRow[4] = new ExcelCell(userDto.getMark(), false);
+		    rowList.add(activityDataRow);
 		}
-		String activityRowName = (groupName != null && groupId != null)
-			? StringEscapeUtils.escapeHtml(activity.getTitle()) + " (" + groupName + ")"
-			: StringEscapeUtils.escapeHtml(activity.getTitle());
-
-		String startDate = (userDto.getStartDate() == null) ? ""
-			: cellDateFormat.format(userDto.getStartDate());
-		String finishDate = (userDto.getFinishDate() == null) ? ""
-			: cellDateFormat.format(userDto.getFinishDate());
-
-		ExcelCell[] activityDataRow = new ExcelCell[5];
-		activityDataRow[0] = new ExcelCell(activityRowName, false);
-		activityDataRow[1] = new ExcelCell(startDate, false);
-		activityDataRow[2] = new ExcelCell(finishDate, false);
-		activityDataRow[3] = new ExcelCell(userDto.getTimeTakenSeconds(), false);
-		activityDataRow[4] = new ExcelCell(userDto.getMark(), false);
-		rowList.add(activityDataRow);
 	    }
 
 	    rowList.add(GradebookService.EMPTY_ROW);
@@ -1167,7 +1217,7 @@ public class GradebookService implements IGradebookService {
 
 	    allLearners.addAll(lesson.getAllLearners());
 
-	    List<ToolActivity> lessonActivities = getLessonActivities(lesson);
+	    List<ToolActivity> lessonActivities = getLessonToolActivitiesForLesson(lesson);
 	    lessonActivitiesMap.put(lesson.getLessonId(), lessonActivities);
 	    allActivities.addAll(lessonActivities);
 	}
@@ -1366,23 +1416,88 @@ public class GradebookService implements IGradebookService {
     
     
     /**
-     * Returns lesson activities. It works almost the same as lesson.getLearningDesign().getActivities() except it
-     * solves problem with first activity unable to cast to ToolActivity.
+     * Returns a completely flat list of lesson activities for the whole lesson. 
      */
-    private List<ToolActivity> getLessonActivities(Lesson lesson) {
+    private List<ToolActivity> getLessonToolActivitiesForLesson(Lesson lesson) {
 	List<ToolActivity> toolActivities = new ArrayList<ToolActivity>();
 	List<ActivityURL>  activityUrls = getLearnerService().getStructuredActivityURLs(lesson.getLessonId());
 	for (ActivityURL activityUrl : activityUrls) {
-	    Activity activity = activityDAO.getActivityByActivityId(activityUrl.getActivityId());
-	    if (activity instanceof ToolActivity) {
-		ToolActivity toolActivity = (ToolActivity) activity;
-		toolActivities.add(toolActivity);
+	    processLessonToolActivity(activityUrl, toolActivities);
+	}
+	return toolActivities;
+    }
+
+    private void processLessonToolActivity(ActivityURL activityUrl, List<ToolActivity> toolActivities) {
+ 	Activity activity = activityDAO.getActivityByActivityId(activityUrl.getActivityId());
+ 	if (activity instanceof ToolActivity) {
+       	    ToolActivity toolActivity = (ToolActivity) activity;
+       	    toolActivities.add(toolActivity);
+ 	} else if (activity instanceof ComplexActivity ) {
+ 	    for (ActivityURL childUrl : activityUrl.getChildActivities()) {
+ 		processLessonToolActivity(childUrl, toolActivities);
+ 	    }
+ 	} 
+     }
+    
+    /**
+     * Returns a list of lesson activities made up of tool activities and sequence activities for the whole lesson. 
+     * The sequence activities allow the export to tweak the learner out.
+     */
+    private List<Activity> getLessonActivitiesForLesson(Lesson lesson) {
+	List<Activity> activities = new ArrayList<Activity>();
+	List<ActivityURL>  activityUrls = getLearnerService().getStructuredActivityURLs(lesson.getLessonId());
+	for (ActivityURL activityUrl : activityUrls) {
+	    processLessonActivity(activityUrl, activities);
+	}
+	return activities;
+    }
+
+    private void processLessonActivity(ActivityURL activityUrl, List<Activity> activities) {
+ 	Activity activity = activityDAO.getActivityByActivityId(activityUrl.getActivityId());
+ 	if (activity instanceof ToolActivity || activity instanceof SequenceActivity) {
+ 	   activities.add(activity);
+ 	} else if (activity instanceof ComplexActivity ) {
+ 	    for (ActivityURL childUrl : activityUrl.getChildActivities()) {
+ 		processLessonActivity(childUrl, activities);
+ 	    }
+ 	} 
+     }
+
+    /**
+     * Returns lesson activities for a particular user
+     */
+    @SuppressWarnings("unchecked")
+    private List<ToolActivity> getLessonActivitiesForLearner(Lesson lesson, Integer learnerId) {
+	List<ToolActivity> toolActivities = new ArrayList<ToolActivity>();
+	Object[] objs = getLearnerService().getStructuredActivityURLs(learnerId, lesson.getLessonId());
+	// will be null if learner has not started the lesson.
+	if ( objs != null ) {
+	    List<ActivityURL>  activityUrls = (List<ActivityURL>) objs[0];
+	    for (ActivityURL activityUrl : activityUrls) {
+		processLearnerActivity(activityUrl, toolActivities, false);
 	    }
 	}
 
 	return toolActivities;
     }
-
+    
+    private void processLearnerActivity(ActivityURL activityUrl, List<ToolActivity> toolActivities, boolean includeOnlyAttemptedCompleted) {
+	Activity activity = activityDAO.getActivityByActivityId(activityUrl.getActivityId());
+	if (activity instanceof ToolActivity) {
+	    if ( ! includeOnlyAttemptedCompleted || activityUrl.getStatus() != LearnerProgress.ACTIVITY_NOT_ATTEMPTED ) {
+        	    ToolActivity toolActivity = (ToolActivity) activity;
+        	    toolActivities.add(toolActivity);
+	    }
+	} else if (activity instanceof ParallelActivity || activity instanceof FloatingActivity) {
+	    for (ActivityURL childUrl : activityUrl.getChildActivities()) {
+		processLearnerActivity(childUrl, toolActivities, false);
+	    }
+	} else if ( activity instanceof OptionsActivity ) {
+	    for (ActivityURL childUrl : activityUrl.getChildActivities()) {
+		processLearnerActivity(childUrl, toolActivities, true);
+	    }
+	} 
+    }
     /**
      * Gets the internationalised date
      *

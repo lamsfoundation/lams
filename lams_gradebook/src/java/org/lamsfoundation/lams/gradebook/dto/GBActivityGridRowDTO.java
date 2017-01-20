@@ -30,6 +30,7 @@ import java.util.Set;
 import org.apache.commons.lang.StringEscapeUtils;
 import org.lamsfoundation.lams.gradebook.util.GBGridView;
 import org.lamsfoundation.lams.gradebook.util.GradebookUtil;
+import org.lamsfoundation.lams.learningdesign.Activity;
 import org.lamsfoundation.lams.learningdesign.CompetenceMapping;
 import org.lamsfoundation.lams.learningdesign.ToolActivity;
 
@@ -56,7 +57,7 @@ public class GBActivityGridRowDTO extends GradebookGridRowDTO {
 	this.groupId = groupId;
     }
 
-    public GBActivityGridRowDTO(ToolActivity activity, String groupName, Long groupId) {
+    public GBActivityGridRowDTO(Activity activity, String groupName, Long groupId) {
 
 	if (groupName != null && groupId != null) {
 	    // Need to make the id unique, so appending the group id for this row
@@ -71,21 +72,26 @@ public class GBActivityGridRowDTO extends GradebookGridRowDTO {
 	    this.rowName = StringEscapeUtils.escapeHtml(activity.getTitle());
 	}
 
-	//Constructs the competences for this activity.
-	Set<CompetenceMapping> competenceMappings = activity.getCompetenceMappings();
 	String competenceMappingsStr = "";
-	if (competenceMappings != null) {
-	    for (CompetenceMapping mapping : competenceMappings) {
-		competenceMappingsStr += mapping.getCompetence().getTitle() + ", ";
-	    }
-
-	    // trim the last comma off
-	    if (competenceMappingsStr.length() > 0) {
-		competenceMappingsStr = competenceMappingsStr.substring(0, competenceMappingsStr.lastIndexOf(","));
-	    }
-	}
-
+	if ( activity.isToolActivity() ) {
+	    ToolActivity toolActivity = (ToolActivity) activity;
+        	//Constructs the competences for this activity.
+        	Set<CompetenceMapping> competenceMappings = toolActivity.getCompetenceMappings();
+        	
+        	if (competenceMappings != null) {
+        	    for (CompetenceMapping mapping : competenceMappings) {
+        		competenceMappingsStr += mapping.getCompetence().getTitle() + ", ";
+        	    }
+        
+        	    // trim the last comma off
+        	    if (competenceMappingsStr.length() > 0) {
+        		competenceMappingsStr = competenceMappingsStr.substring(0, competenceMappingsStr.lastIndexOf(","));
+        	    }
+        	}
+        
+	} 
 	this.competences = competenceMappingsStr;
+
     }
 
     @Override
