@@ -5,7 +5,7 @@
 		<%@ include file="addheader.jsp"%>
 		<script type="text/javascript">
 			$(document).ready(function(){
-				$('#url').attr("placeholder","<fmt:message key="label.authoring.basic.resource.url.input.placeholder" />");
+				$('#url').attr("placeholder","<fmt:message key="label.authoring.basic.resource.url.placeholder" />");
 				$('#title').focus();
 			});		
 	 		$( "#resourceItemForm" ).validate({
