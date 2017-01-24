@@ -182,8 +182,13 @@ public class LearningWebUtil {
 	ActivityURL activityURL = new ActivityURL();
 	activityURL.setType(activity.getClass().getSimpleName());
 
-	String url = activityMapping.getActivityURL(activity);
-	activityURL.setUrl(url);
+	if ( isFloating && activity.isFloatingActivity() ) {
+	    // special case - progress engine. Do not want the unknown activity warning
+	    activityURL.setUrl(null);
+	} else {
+	    activityURL.setUrl(activityMapping.getActivityURL(activity));
+	}
+
 	activityURL.setActivityId(activity.getActivityId());
 	activityURL.setTitle(activity.getTitle());
 	activityURL.setDescription(activity.getDescription());
