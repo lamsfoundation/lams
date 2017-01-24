@@ -23,7 +23,10 @@
 
 package org.lamsfoundation.lams.tool.dokumaran.service;
 
+import java.net.URISyntaxException;
 import java.util.List;
+
+import javax.servlet.http.Cookie;
 
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.tool.dokumaran.dto.ReflectDTO;
@@ -32,6 +35,7 @@ import org.lamsfoundation.lams.tool.dokumaran.model.Dokumaran;
 import org.lamsfoundation.lams.tool.dokumaran.model.DokumaranConfigItem;
 import org.lamsfoundation.lams.tool.dokumaran.model.DokumaranSession;
 import org.lamsfoundation.lams.tool.dokumaran.model.DokumaranUser;
+import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 
 import net.gjerull.etherpad.client.EPLiteClient;
 
@@ -68,15 +72,9 @@ public interface IDokumaranService {
      */
     DokumaranUser checkLeaderSelectToolForSessionLeader(DokumaranUser user, Long toolSessionId);
     
-    String getEtherpadReadOnlyId(String padId) throws DokumaranConfigurationException;
+    Cookie createEtherpadCookieForLearner(DokumaranUser user, DokumaranSession session) throws DokumaranConfigurationException, URISyntaxException;
     
-    /**
-     * Stores etherpadReadOnlyId to the session.
-     * 
-     * @param toolSessionId
-     * @param etherpadReadOnlyId
-     */
-    void setEtherpadReadOnlyId(Long toolSessionId, String etherpadReadOnlyId);
+    Cookie createEtherpadCookieForMonitor(UserDTO user, Long contentId) throws DokumaranConfigurationException, URISyntaxException;
     
     /**
      * Creates EPLiteClient that will make calls to Etherpad server. Throws DokumaranConfigurationException tf the tool

@@ -116,6 +116,14 @@
             insert="true"
             column="show_line_numbers"
         />
+        
+        <property
+            name="sharedPadId"
+            type="java.lang.String"
+            update="true"
+            insert="true"
+            column="shared_pad_id"
+        />
 
         <property
             name="useSelectLeaderToolOuput"

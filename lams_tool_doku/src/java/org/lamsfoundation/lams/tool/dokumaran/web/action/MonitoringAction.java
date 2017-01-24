@@ -25,11 +25,14 @@
 package org.lamsfoundation.lams.tool.dokumaran.web.action;
 
 import java.io.IOException;
+import java.net.URISyntaxException;
 import java.util.List;
 
 import javax.servlet.ServletException;
+import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
 import org.apache.log4j.Logger;
 import org.apache.struts.action.Action;
@@ -46,8 +49,11 @@ import org.lamsfoundation.lams.tool.dokumaran.model.Dokumaran;
 import org.lamsfoundation.lams.tool.dokumaran.model.DokumaranConfigItem;
 import org.lamsfoundation.lams.tool.dokumaran.model.DokumaranSession;
 import org.lamsfoundation.lams.tool.dokumaran.model.DokumaranUser;
+import org.lamsfoundation.lams.tool.dokumaran.service.DokumaranConfigurationException;
 import org.lamsfoundation.lams.tool.dokumaran.service.IDokumaranService;
+import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.util.WebUtil;
+import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.lamsfoundation.lams.web.util.SessionMap;
 import org.springframework.web.context.WebApplicationContext;
@@ -58,7 +64,7 @@ public class MonitoringAction extends Action {
 
     @Override
     public ActionForward execute(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws IOException, ServletException, JSONException {
+	    HttpServletResponse response) throws IOException, ServletException, JSONException, DokumaranConfigurationException, URISyntaxException {
 	String param = mapping.getParameter();
 
 	request.setAttribute("initialTabId", WebUtil.readLongParam(request, AttributeNames.PARAM_CURRENT_TAB, true));
@@ -66,15 +72,12 @@ public class MonitoringAction extends Action {
 	if (param.equals("summary")) {
 	    return summary(mapping, form, request, response);
 	}
-	if (param.equals("viewReflection")) {
-	    return viewReflection(mapping, form, request, response);
-	}
 
 	return mapping.findForward(DokumaranConstants.ERROR);
     }
 
     private ActionForward summary(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) {
+	    HttpServletResponse response) throws DokumaranConfigurationException, URISyntaxException {
 	// initial Session Map
 	SessionMap<String, Object> sessionMap = new SessionMap<String, Object>();
 	request.getSession().setAttribute(sessionMap.getSessionID(), sessionMap);
@@ -110,39 +113,24 @@ public class MonitoringAction extends Action {
 	String etherpadServerUrl = etherpadServerUrlConfig.getConfigValue();
 	request.setAttribute(DokumaranConstants.KEY_ETHERPAD_SERVER_URL, etherpadServerUrl);
 	
-	return mapping.findForward(DokumaranConstants.SUCCESS);
-    }
-
-    private ActionForward viewReflection(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) {
-
-	Long uid = WebUtil.readLongParam(request, DokumaranConstants.ATTR_USER_UID);
-	Long sessionID = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_SESSION_ID);
-
-	IDokumaranService service = getDokumaranService();
-	DokumaranUser user = service.getUser(uid);
-	NotebookEntry notebookEntry = service.getEntry(sessionID, CoreNotebookConstants.NOTEBOOK_TOOL,
-		DokumaranConstants.TOOL_SIGNATURE, user.getUserId().intValue());
-
-	DokumaranSession session = service.getDokumaranSessionBySessionId(sessionID);
-
-	ReflectDTO refDTO = new ReflectDTO(user);
-	if (notebookEntry == null) {
-	    refDTO.setFinishReflection(false);
-	    refDTO.setReflect(null);
-	} else {
-	    refDTO.setFinishReflection(true);
-	    refDTO.setReflect(notebookEntry.getEntry());
+	HttpSession ss = SessionManager.getSession();
+	// get back login user DTO
+	UserDTO user = (UserDTO) ss.getAttribute(AttributeNames.USER);
+	
+	//no need to store cookie if there are no sessions created yet
+	if (!groupList.isEmpty()) {
+	    // add new sessionID cookie in order to access pad
+	    Cookie etherpadSessionCookie = service.createEtherpadCookieForMonitor(user, contentId);
+	    response.addCookie(etherpadSessionCookie);
 	}
-	refDTO.setReflectInstrctions(session.getDokumaran().getReflectInstructions());
-
-	request.setAttribute("userDTO", refDTO);
-	return mapping.findForward("success");
+	
+	return mapping.findForward(DokumaranConstants.SUCCESS);
     }
 
     // *************************************************************************************
     // Private method
     // *************************************************************************************
+    
     private IDokumaranService getDokumaranService() {
 	WebApplicationContext wac = WebApplicationContextUtils
 		.getRequiredWebApplicationContext(getServlet().getServletContext());

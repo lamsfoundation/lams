@@ -23,13 +23,19 @@
 
 package org.lamsfoundation.lams.tool.dokumaran.service;
 
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.SortedMap;
 
+import javax.servlet.http.Cookie;
+
+import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.apache.tomcat.util.json.JSONException;
 import org.apache.tomcat.util.json.JSONObject;
@@ -54,6 +60,7 @@ import org.lamsfoundation.lams.tool.ToolCompletionStatus;
 import org.lamsfoundation.lams.tool.ToolContentManager;
 import org.lamsfoundation.lams.tool.ToolOutput;
 import org.lamsfoundation.lams.tool.ToolOutputDefinition;
+import org.lamsfoundation.lams.tool.ToolSession;
 import org.lamsfoundation.lams.tool.ToolSessionExportOutputData;
 import org.lamsfoundation.lams.tool.ToolSessionManager;
 import org.lamsfoundation.lams.tool.dokumaran.DokumaranConstants;
@@ -117,7 +124,7 @@ public class DokumaranService implements IDokumaranService, ToolContentManager, 
     private ICoreNotebookService coreNotebookService;
 
     private DokumaranOutputFactory dokumaranOutputFactory;
-    
+
     private EPLiteClient client = null;
 
     // *******************************************************************************
@@ -216,6 +223,14 @@ public class DokumaranService implements IDokumaranService, ToolContentManager, 
 	}
 
 	DokumaranSession session = getDokumaranSessionBySessionId(toolSessionId);
+	Long toolContentId = session.getDokumaran().getContentId();
+	boolean isMultipleLeadersAllowed = isGroupedActivity(toolContentId);
+	if (isMultipleLeadersAllowed) {
+
+	} else {
+
+	}
+
 	DokumaranUser leader = session.getGroupLeader();
 	// check leader select tool for a leader only in case Dokumaran tool doesn't know it. As otherwise it will screw
 	// up previous scratches done
@@ -321,8 +336,6 @@ public class DokumaranService implements IDokumaranService, ToolContentManager, 
     public List<SessionDTO> getSummary(Long contentId) {
 	List<SessionDTO> groupList = new ArrayList<SessionDTO>();
 
-	Dokumaran dokumaran = dokumaranDao.getByContentId(contentId);
-
 	// get all sessions in a dokumaran and retrieve all dokumaran items under this session
 	// plus initial dokumaran items by author creating (resItemList)
 	List<DokumaranSession> sessionList = dokumaranSessionDao.getByContentId(contentId);
@@ -332,10 +345,10 @@ public class DokumaranService implements IDokumaranService, ToolContentManager, 
 	    SessionDTO group = new SessionDTO();
 	    group.setSessionId(session.getSessionId());
 	    group.setSessionName(session.getSessionName());
-	    
-	    String padId = HashUtil.sha1(DokumaranConstants.PAD_ID_PREFIX + session.getSessionId());
+
+	    String padId = session.getPadId();
 	    group.setPadId(padId);
-	    
+
 	    groupList.add(group);
 	}
 
@@ -629,42 +642,81 @@ public class DokumaranService implements IDokumaranService, ToolContentManager, 
 	Dokumaran dokumaran = dokumaranDao.getByContentId(toolContentId);
 	session.setDokumaran(dokumaran);
 	dokumaranSessionDao.saveObject(session);
-	
-//	//create pad in a new thread so it doesn't affect session creation operation
-//	Thread t = new Thread(
-//		new CreatePadThread(this, toolSessionId, dokumaran.getInstructions()));
-//	t.start();
-	
+
+	// //create pad in a new thread so it doesn't affect session creation operation
+	// Thread t = new Thread(
+	// new CreatePadThread(this, toolSessionId, dokumaran.getInstructions()));
+	// t.start();
+
 	try {
+	    String groupIdentifier = DokumaranConstants.PREFIX_REGULAR_GROUP + toolSessionId;
+
+	    // in case sharedPadId is present - all sessions will share the same padId
+	    if (dokumaran.isSharedPadEnabled()) {
+
+		// find existing pad in any of the sessions associated with this toolContentId
+		List<DokumaranSession> sessions = dokumaranSessionDao.getByContentId(toolContentId);
+		DokumaranSession sessionWithAlreadyCreatedPad = null;
+		for (DokumaranSession sessionIter : sessions) {
+		    if (StringUtils.isNotBlank(session.getEtherpadGroupId())) {
+			sessionWithAlreadyCreatedPad = sessionIter;
+			break;
+		    }
+		}
+
+		if (sessionWithAlreadyCreatedPad == null) {
+		    ToolSession toolSession = toolService.getToolSession(toolSessionId);
+		    Long lessonId = toolSession.getLesson().getLessonId();
+		    groupIdentifier = DokumaranConstants.PREFIX_SHARED_GROUP + dokumaran.getSharedPadId() + lessonId;
+
+		} else {
+		    session.setEtherpadGroupId(sessionWithAlreadyCreatedPad.getEtherpadGroupId());
+		    session.setEtherpadReadOnlyId(sessionWithAlreadyCreatedPad.getEtherpadReadOnlyId());
+		    dokumaranSessionDao.saveObject(session);
+		    return;
+		}
+	    }
+
 	    EPLiteClient client = initializeEPLiteClient();
 
-	    String padId = HashUtil.sha1(DokumaranConstants.PAD_ID_PREFIX + toolSessionId);
+	    // create Etherpad Group assossiated with this session
+	    Map map = client.createGroupIfNotExistsFor(groupIdentifier);
+	    String groupId = (String) map.get("groupID");
+	    session.setEtherpadGroupId(groupId);
+	    String padId = session.getPadId();
+
+	    boolean isPadAlreadyCreated = false;
 	    try {
-		client.createPad(padId);
+		client.createGroupPad(groupId, DokumaranConstants.DEFAULT_PAD_NAME);
 	    } catch (EPLiteException e) {
 		// allow recreating existing pads
-		if (!"padID does already exist".equals(e.getMessage())) {
+		if ("padName does already exist".equals(e.getMessage())) {
+		    isPadAlreadyCreated = true;
+		//throw exception in all other cases
+		} else {
 		    throw e;
 		}
 	    }
 
 	    // set initial content
-	    String etherpadHtml = "<html><body>"
-		    + dokumaran.getInstructions().replaceAll("[\n\r\f]", "").replaceAll("&nbsp;", "")
-		    + "</body></html>";
-	    client.setHTML(padId, etherpadHtml);
+	    if (!dokumaran.isSharedPadEnabled() || !isPadAlreadyCreated) {
+		String etherpadHtml = "<html><body>"
+			+ dokumaran.getInstructions().replaceAll("[\n\r\f]", "").replaceAll("&nbsp;", "")
+			+ "</body></html>";
+		client.setHTML(padId, etherpadHtml);
+	    }
 
 	    // gets read-only id
 	    String etherpadReadOnlyId = (String) client.getReadOnlyID(padId).get("readOnlyID");
-
 	    session.setEtherpadReadOnlyId(etherpadReadOnlyId);
+
 	    dokumaranSessionDao.saveObject(session);
-	} catch (DokumaranConfigurationException e1) {
-	    log.warn(e1.getMessage(), e1);
+	} catch (Exception e) {
+	    log.warn(e.getMessage(), e);
 	}
 
     }
-    
+
     @Override
     public ToolCompletionStatus getCompletionStatus(Long learnerId, Long toolSessionId) {
 	DokumaranUser learner = getUserByIDAndSession(learnerId, toolSessionId);
@@ -675,45 +727,148 @@ public class DokumaranService implements IDokumaranService, ToolContentManager, 
 	return new ToolCompletionStatus(learner.isSessionFinished() ? ToolCompletionStatus.ACTIVITY_COMPLETED
 		: ToolCompletionStatus.ACTIVITY_ATTEMPTED, null, null);
     }
-    
-    @Override
-    public String getEtherpadReadOnlyId(String padId) throws DokumaranConfigurationException {
 
-	Map etherpadReadOnlyId = null;
-	try {
-	    etherpadReadOnlyId = initializeEPLiteClient().getReadOnlyID(padId);
-	} catch (EPLiteException e) {
-//	    if (!"padID does already exist".equals(e.getMessage())) {
-		throw e;
-//	    }
-	}
-	
-	return etherpadReadOnlyId == null ? null : (String)etherpadReadOnlyId.get("readOnlyID");
-    }
-    
     @Override
-    public void setEtherpadReadOnlyId(Long toolSessionId, String etherpadReadOnlyId) {
-	DokumaranSession session = dokumaranSessionDao.getSessionBySessionId(toolSessionId);
-	session.setEtherpadReadOnlyId(etherpadReadOnlyId);
-	dokumaranSessionDao.saveObject(session);
+    public Cookie createEtherpadCookieForLearner(DokumaranUser user, DokumaranSession session)
+	    throws DokumaranConfigurationException, URISyntaxException {
+
+	EPLiteClient client = initializeEPLiteClient();
+	String groupId = session.getEtherpadGroupId();
+
+	String userName = user.getFirstName() + " " + user.getLastName();
+	Map<String, String> map = client.createAuthorIfNotExistsFor(user.getUserId().toString(), userName);
+	String authorId = map.get("authorID");
+
+	// search for already existing user's session at Etherpad server
+	Map sessionsMap = client.listSessionsOfAuthor(authorId);
+	String userSessionId = null;
+	for (String sessionId : (Set<String>) sessionsMap.keySet()) {
+	    Map<String, String> sessessionAttributes = (Map<String, String>) sessionsMap.get(sessionId);
+	    String groupIdIter = sessessionAttributes.get("groupID");
+	    if (groupIdIter.equals(groupId)) {
+		userSessionId = sessionId;
+	    }
+	}
+
+	// if session doesn't exist yet - create it
+	if (userSessionId == null) {
+	    Map<String, String> map2 = client.createSession(groupId, authorId, 24);
+	    userSessionId = (String) map2.get("sessionID");
+	}
+
+	DokumaranConfigItem etherpadServerUrlConfig = getConfigItem(DokumaranConfigItem.KEY_ETHERPAD_URL);
+	String etherpadServerUrl = etherpadServerUrlConfig.getConfigValue();
+	URI uri = new URI(etherpadServerUrl);
+	String domain = uri.getHost();
+
+	Cookie etherpadSessionCookie = new Cookie("sessionID", userSessionId);
+	etherpadSessionCookie.setDomain(domain);
+	// A negative value means that the cookie is not stored persistently and will be deleted when the Web browser
+	// exits. A zero value causes the cookie to be deleted.
+	etherpadSessionCookie.setMaxAge(-1);
+	etherpadSessionCookie.setPath("/");
+
+	return etherpadSessionCookie;
     }
-    
+
+    @Override
+    public Cookie createEtherpadCookieForMonitor(UserDTO user, Long contentId)
+	    throws DokumaranConfigurationException, URISyntaxException {
+
+	EPLiteClient client = initializeEPLiteClient();
+
+	String userName = user.getFirstName() + " " + user.getLastName();
+	Map<String, String> map = client.createAuthorIfNotExistsFor(user.getUserID().toString(), userName);
+	String authorId = map.get("authorID");
+
+	Map etherpadSessions = client.listSessionsOfAuthor(authorId);
+
+	List<DokumaranSession> sessionList = dokumaranSessionDao.getByContentId(contentId);
+	if (sessionList.isEmpty()) {
+	    return null;
+	}
+
+	// in case sharedPadId is present - all sessions will share the same padId - and thus show only one pad
+	Dokumaran dokumaran = getDokumaranByContentId(contentId);
+	if (StringUtils.isEmpty(dokumaran.getSharedPadId())) {
+	    sessionList = sessionList.subList(0, 0);
+	}
+
+	// find according session
+	String etherpadSessionIds = "";
+	for (DokumaranSession session : sessionList) {
+	    String groupId = session.getEtherpadGroupId();
+
+	    // search for already existing user's session
+	    String userSessionId = null;
+	    for (String etherpadSessionId : (Set<String>) etherpadSessions.keySet()) {
+		Map<String, String> sessessionAttributes = (Map<String, String>) etherpadSessions
+			.get(etherpadSessionId);
+		String groupIdIter = sessessionAttributes.get("groupID");
+		if (groupIdIter.equals(groupId)) {
+		    userSessionId = etherpadSessionId;
+		}
+	    }
+
+	    // if session doesn't exist yet - create it
+	    if (userSessionId == null) {
+		Map map2 = client.createSession(groupId, authorId, 24);
+		userSessionId = (String) map2.get("sessionID");
+	    }
+
+	    etherpadSessionIds += StringUtils.isEmpty(etherpadSessionIds) ? userSessionId : "," + userSessionId;
+	}
+
+	DokumaranConfigItem etherpadServerUrlConfig = getConfigItem(DokumaranConfigItem.KEY_ETHERPAD_URL);
+	String etherpadServerUrl = etherpadServerUrlConfig.getConfigValue();
+	URI uri = new URI(etherpadServerUrl);
+	String domain = uri.getHost();
+
+	Cookie etherpadSessionCookie = new Cookie("sessionID", etherpadSessionIds);
+	etherpadSessionCookie.setDomain(domain);
+	// A negative value means that the cookie is not stored persistently and will be deleted when the Web browser
+	// exits. A zero value causes the cookie to be deleted.
+	etherpadSessionCookie.setMaxAge(-1);
+	etherpadSessionCookie.setPath("/");
+
+	return etherpadSessionCookie;
+    }
+
     @Override
     public EPLiteClient initializeEPLiteClient() throws DokumaranConfigurationException {
 	if (client == null) {
-	    // get the API key from the config table and add it to the session
+	    // get the API key from the config table and create EPLiteClient using it
 	    DokumaranConfigItem etherpadServerUrlConfig = getConfigItem(DokumaranConfigItem.KEY_ETHERPAD_URL);
 	    DokumaranConfigItem etherpadApiKeyConfig = getConfigItem(DokumaranConfigItem.KEY_API_KEY);
 	    if (etherpadApiKeyConfig == null || etherpadApiKeyConfig.getConfigValue() == null
 		    || etherpadServerUrlConfig == null || etherpadServerUrlConfig.getConfigValue() == null) {
-		throw new DokumaranConfigurationException("Dokumaran settings are not configured. apiKeyConfig=" + etherpadApiKeyConfig
-			+ " etherpadServerUrlConfig=" + etherpadServerUrlConfig + " Please seek help from your administrator");
+		throw new DokumaranConfigurationException("Dokumaran settings are not configured. apiKeyConfig="
+			+ etherpadApiKeyConfig + " etherpadServerUrlConfig=" + etherpadServerUrlConfig
+			+ " Please seek help from your administrator");
 	    }
 
 	    // create EPLiteClient
 	    String etherpadServerUrl = etherpadServerUrlConfig.getConfigValue();
 	    String etherpadApiKey = etherpadApiKeyConfig.getConfigValue();
 	    client = new EPLiteClient(etherpadServerUrl, etherpadApiKey);
+
+	    // // get the API key from the config table and create EPLiteClient using it
+	    // DokumaranConfigItem lamsServerUrlConfig = getConfigItem(ConfigurationKeys.SERVER_URL);
+	    // DokumaranConfigItem etherpadApiKeyConfig = getConfigItem(DokumaranConfigItem.KEY_API_KEY);
+	    // if (etherpadApiKeyConfig == null || etherpadApiKeyConfig.getConfigValue() == null
+	    // || lamsServerUrlConfig == null || lamsServerUrlConfig.getConfigValue() == null) {
+	    // throw new DokumaranConfigurationException("Dokumaran settings are not configured. apiKeyConfig=" +
+	    // etherpadApiKeyConfig
+	    // + " etherpadServerUrlConfig=" + lamsServerUrlConfig + " Please seek help from your administrator");
+	    // }
+	    //
+	    // // create EPLiteClient
+	    // String lamsServerUrl = lamsServerUrlConfig.getConfigValue();
+	    // URI uri = new URI(url);
+	    // String domain = uri.getHost();
+	    // String etherpadServerUrl = lamsServerUrlConfig.getConfigValue();
+	    // String etherpadApiKey = etherpadApiKeyConfig.getConfigValue();
+	    // client = new EPLiteClient(etherpadServerUrl, etherpadApiKey);
 	}
 	return client;
     }
@@ -869,6 +1024,7 @@ public class DokumaranService implements IDokumaranService, ToolContentManager, 
 
 	dokumaran.setShowChat(JsonUtil.opt(toolContentJSON, "showChat", Boolean.FALSE));
 	dokumaran.setShowLineNumbers(JsonUtil.opt(toolContentJSON, "showLineNumbers", Boolean.FALSE));
+	dokumaran.setSharedPadId(JsonUtil.opt(toolContentJSON, "sharedPadId", (String) null));
 	dokumaran.setLockWhenFinished(JsonUtil.opt(toolContentJSON, RestTags.LOCK_WHEN_FINISHED, Boolean.FALSE));
 	dokumaran.setReflectOnActivity(JsonUtil.opt(toolContentJSON, RestTags.REFLECT_ON_ACTIVITY, Boolean.FALSE));
 	dokumaran.setReflectInstructions(JsonUtil.opt(toolContentJSON, RestTags.REFLECT_INSTRUCTIONS, (String) null));

@@ -25,6 +25,7 @@ package org.lamsfoundation.lams.tool.dokumaran.model;
 
 import java.util.Date;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.log4j.Logger;
@@ -55,6 +56,8 @@ public class Dokumaran implements Cloneable {
     private boolean showChat;
 
     private boolean showLineNumbers;
+    
+    private String sharedPadId;
 
     private boolean lockWhenFinished;
 
@@ -318,6 +321,22 @@ public class Dokumaran implements Cloneable {
     public void setShowLineNumbers(boolean showLineNumbers) {
 	this.showLineNumbers = showLineNumbers;
     }
+    
+    /**
+    *
+    * @return
+    */
+   public String getSharedPadId() {
+	return sharedPadId;
+   }
+
+   public void setSharedPadId(String sharedPadId) {
+	this.sharedPadId = sharedPadId;
+   }
+   
+   public boolean isSharedPadEnabled() {
+       return StringUtils.isNotEmpty(sharedPadId);
+   }
 
     /**
      *
