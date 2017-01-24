@@ -95,7 +95,11 @@ public class DokumaranConstants {
     
     public static final String KEY_ETHERPAD_SERVER_URL = "etherpadServerUrl";
     
-    public static final String PAD_ID_PREFIX = "LAMS-sessionId-";
+    public static final String DEFAULT_PAD_NAME = "LAMS-pad";
+    
+    public static final String PREFIX_REGULAR_GROUP = "LAMS-group-";
+    
+    public static final String PREFIX_SHARED_GROUP = "LAMS-sharedGroup-";
 
     // error message keys
 

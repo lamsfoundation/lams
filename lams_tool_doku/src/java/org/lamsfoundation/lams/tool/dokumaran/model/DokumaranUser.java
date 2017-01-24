@@ -45,6 +45,7 @@ public class DokumaranUser implements Cloneable {
     private String lastName;
     private String loginName;
     private boolean sessionFinished;
+    private boolean leader;
 
     private DokumaranSession session;
     private Dokumaran dokumaran;
@@ -68,6 +69,7 @@ public class DokumaranUser implements Cloneable {
 	this.session = session;
 	this.dokumaran = null;
 	this.sessionFinished = false;
+	this.leader = false;
     }
 
     public DokumaranUser(UserDTO user, Dokumaran content) {
@@ -78,6 +80,7 @@ public class DokumaranUser implements Cloneable {
 	this.session = null;
 	this.dokumaran = content;
 	this.sessionFinished = false;
+	this.leader = false;
     }
 
     /**
@@ -205,6 +208,18 @@ public class DokumaranUser implements Cloneable {
     public void setSessionFinished(boolean sessionFinished) {
 	this.sessionFinished = sessionFinished;
     }
+    
+    /**
+    *
+    * @return
+    */
+   public boolean isLeader() {
+	return leader;
+   }
+
+   public void setLeader(boolean leader) {
+	this.leader = leader;
+   }
 
     @Override
     public boolean equals(Object obj) {

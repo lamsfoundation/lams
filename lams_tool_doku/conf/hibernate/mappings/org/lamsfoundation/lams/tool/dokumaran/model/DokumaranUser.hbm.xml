@@ -88,6 +88,14 @@
             insert="true"
             column="session_finished"
         />
+        
+       <property
+            name="leader"
+            type="boolean"
+            update="true"
+            insert="true"
+            column="leader"
+        />
 
         <!--
             To add non XDoclet property mappings, create a file named

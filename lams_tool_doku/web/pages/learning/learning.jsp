@@ -10,20 +10,21 @@
 <c:set var="dokumaran" value="${sessionMap.dokumaran}" />
 <c:set var="finishedLock" value="${sessionMap.finishedLock}" />
 <c:set var="hasEditRight" value="${sessionMap.hasEditRight}"/>
+<c:set var="localeLanguage"><lams:user property="localeLanguage" /></c:set>
 	
 <lams:html>
 <lams:head>
-	<title><fmt:message key="label.learning.title" />
-	</title>
+	<title><fmt:message key="label.learning.title" /></title>
 	<%@ include file="/common/header.jsp"%>
 
 	<script type="text/javascript" src="<html:rewrite page='/includes/javascript/etherpad.js'/>"></script>
 	<script type="text/javascript">
 		$(document).ready(function(){
+			
 			$('#etherpad-container').pad({
 				'padId':'${padId}',
 				'host':'${etherpadServerUrl}',
-				//'lang':'',
+				'lang':'${fn:toLowerCase(localeLanguage)}',
 				'showControls':'${hasEditRight}',
 				'showChat':'${dokumaran.showChat}',
 				'showLineNumbers':'${dokumaran.showLineNumbers}',
