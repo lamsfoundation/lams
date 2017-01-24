@@ -477,7 +477,7 @@ public class AssessmentServiceImpl
 	    }
 	}
 
-	assessmentResultDao.saveObject(result);
+	assessmentResultDao.insert(result);
     }
 
     /*
@@ -572,7 +572,7 @@ public class AssessmentServiceImpl
 	    result.setMaximumGrade(maximumGrade);
 	    result.setGrade(grade);
 	    result.setFinishDate(new Timestamp(new Date().getTime()));
-	    assessmentResultDao.saveObject(result);
+	    assessmentResultDao.update(result);
 	}
 
 	return true;
@@ -2373,22 +2373,23 @@ public class AssessmentServiceImpl
     @Override
     public ToolCompletionStatus getCompletionStatus(Long learnerId, Long toolSessionId) {
 	AssessmentUser learner = getUserByIDAndSession(learnerId, toolSessionId);
-	if ( learner == null ) {
+	if (learner == null) {
 	    return new ToolCompletionStatus(ToolCompletionStatus.ACTIVITY_NOT_ATTEMPTED, null, null);
-	} 
-	
+	}
+
 	Assessment assessment = getAssessmentBySessionId(toolSessionId);
-	List<AssessmentResult> results = assessmentResultDao.getAssessmentResults(assessment.getUid(), learner.getUserId());
+	List<AssessmentResult> results = assessmentResultDao.getAssessmentResults(assessment.getUid(),
+		learner.getUserId());
 	Date startDate = null;
 	Date finishDate = null;
-	for ( AssessmentResult result: results ) {
-	    if ( startDate == null || ( result.getStartDate()  != null && result.getStartDate().before(startDate)) )
+	for (AssessmentResult result : results) {
+	    if (startDate == null || (result.getStartDate() != null && result.getStartDate().before(startDate)))
 		startDate = result.getStartDate();
-	    if ( finishDate == null || ( result.getFinishDate()  != null && result.getFinishDate().after(finishDate)) )
+	    if (finishDate == null || (result.getFinishDate() != null && result.getFinishDate().after(finishDate)))
 		finishDate = result.getFinishDate();
 	}
 
-	if ( learner.isSessionFinished()  )
+	if (learner.isSessionFinished())
 	    return new ToolCompletionStatus(ToolCompletionStatus.ACTIVITY_COMPLETED, startDate, finishDate);
 	else
 	    return new ToolCompletionStatus(ToolCompletionStatus.ACTIVITY_ATTEMPTED, startDate, null);

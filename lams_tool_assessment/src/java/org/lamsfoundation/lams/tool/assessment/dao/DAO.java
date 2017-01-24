@@ -26,13 +26,15 @@ package org.lamsfoundation.lams.tool.assessment.dao;
 import java.io.Serializable;
 import java.util.List;
 
+import org.lamsfoundation.lams.dao.IBaseDAO;
+
 /**
  * Data Access Object (DAO) interface. This is an interface used to tag our DAO classes and to provide common methods to
  * all DAOs.
  *
  * @author Andrey Balan
  */
-public interface DAO {
+public interface DAO extends IBaseDAO {
 
     /**
      * Generic method used to get all objects of a particular type. This is the same as lookup up all rows in a table.
