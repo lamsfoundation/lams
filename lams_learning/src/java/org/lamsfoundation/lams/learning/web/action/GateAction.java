@@ -21,7 +21,6 @@
  * ****************************************************************
  */
 
-
 package org.lamsfoundation.lams.learning.web.action;
 
 import java.io.IOException;
@@ -130,13 +129,7 @@ public class GateAction extends LamsDispatchAction {
 	User learner = LearningWebUtil.getUser(learnerService);
 	Lesson lesson = learnerService.getLesson(lessonId);
 
-	// don't use LearningWebUtil.getLearnerProgress(request, learnerService) as it may try to get the lesson
-	// from the activity and the activity may be null (if this was a system stop gate).
-	LearnerProgress learnerProgress = (LearnerProgress) request
-		.getAttribute(ActivityAction.LEARNER_PROGRESS_REQUEST_ATTRIBUTE);
-	if (learnerProgress == null) {
-	    learnerProgress = learnerService.getProgress(learner.getUserId(), lessonId);
-	}
+	LearnerProgress learnerProgress = learnerService.getProgress(learner.getUserId(), lessonId);
 
 	if (activity != null) {
 	    // knock the gate

@@ -21,7 +21,6 @@
  * ****************************************************************
  */
 
-
 package org.lamsfoundation.lams.learning.web.action;
 
 import java.io.UnsupportedEncodingException;
@@ -84,7 +83,6 @@ public class SequenceActivityAction extends ActivityAction {
 	    learnerProgress = learnerService.chooseActivity(learnerId, learnerProgress.getLesson().getLessonId(),
 		    firstActivityInSequence, true);
 	    forward = actionMappings.getActivityForward(firstActivityInSequence, learnerProgress, true);
-	    LearningWebUtil.putActivityInRequest(request, firstActivityInSequence, learnerService);
 	    return forward;
 	} else {
 	    // No activities exist in the sequence, so go to the next activity.

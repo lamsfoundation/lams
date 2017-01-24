@@ -34,8 +34,6 @@ import org.lamsfoundation.lams.web.action.LamsAction;
  */
 public abstract class ActivityAction extends LamsAction {
 
-    public static final String ACTIVITY_REQUEST_ATTRIBUTE = "activity";
-    public static final String LEARNER_PROGRESS_REQUEST_ATTRIBUTE = "learnerprogress";
     public static final String RELEASED_LESSONS_REQUEST_ATTRIBUTE = "releasedLessons";
 
     private ICoreLearnerService learnerService = null;

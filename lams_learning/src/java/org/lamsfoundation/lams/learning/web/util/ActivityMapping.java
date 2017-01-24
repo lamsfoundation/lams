@@ -21,7 +21,6 @@
  * ****************************************************************
  */
 
-
 package org.lamsfoundation.lams.learning.web.util;
 
 import java.io.Serializable;
@@ -35,7 +34,6 @@ import org.apache.struts.action.ForwardingActionForward;
 import org.apache.struts.action.RedirectingActionForward;
 import org.lamsfoundation.lams.learning.service.ICoreLearnerService;
 import org.lamsfoundation.lams.learning.service.LearnerServiceException;
-import org.lamsfoundation.lams.learning.web.action.ActivityAction;
 import org.lamsfoundation.lams.learning.web.action.DisplayActivityAction;
 import org.lamsfoundation.lams.learningdesign.Activity;
 import org.lamsfoundation.lams.lesson.LearnerProgress;
@@ -83,10 +81,11 @@ public class ActivityMapping implements Serializable {
     public ActionForward getActivityForward(Activity activity, LearnerProgress progress, boolean redirect) {
 	ActionForward actionForward = null;
 
-	//String strutsAction = getActivityAction(activity, progress);
 	String strutsAction = this.activityMappingStrategy.getActivityAction(activity);
-	strutsAction = WebUtil.appendParameterToURL(strutsAction, LearningWebUtil.PARAM_PROGRESS_ID,
+	strutsAction = WebUtil.appendParameterToURL(strutsAction, AttributeNames.PARAM_LEARNER_PROGRESS_ID,
 		progress.getLearnerProgressId().toString());
+	strutsAction = WebUtil.appendParameterToURL(strutsAction, AttributeNames.PARAM_ACTIVITY_ID,
+		activity.getActivityId().toString());
 
 	if ((activity != null) && activity.isToolActivity()) {
 	    // always use redirect false for a ToolActivity as ToolDisplayActivity
@@ -124,7 +123,7 @@ public class ActivityMapping implements Serializable {
 	    // and there isn't an activity from which we can determine the lesson and hence
 	    // the progress.
 	    String strutsAction = this.getActivityMappingStrategy().getLessonCompleteAction();
-	    strutsAction = WebUtil.appendParameterToURL(strutsAction, LearningWebUtil.PARAM_PROGRESS_ID,
+	    strutsAction = WebUtil.appendParameterToURL(strutsAction, AttributeNames.PARAM_LEARNER_PROGRESS_ID,
 		    progress.getLearnerProgressId().toString());
 	    strutsAction = ActivityMapping.strutsActionToURL(strutsAction, null, true);
 	    actionForward = this.getClearFramesForward(strutsAction, progress.getLearnerProgressId().toString());
@@ -143,13 +142,6 @@ public class ActivityMapping implements Serializable {
 		    actionForward = this.getClearFramesForward(activityURL, progress.getLearnerProgressId().toString());
 		} else {
 		    actionForward = getActivityForward(progress.getNextActivity(), progress, redirect);
-		    if (progress.getNextActivity() != null) {
-			//setup activity into request for display
-			Activity realActivity = learnerService.getActivity(progress.getNextActivity().getActivityId());
-			request.setAttribute(ActivityAction.ACTIVITY_REQUEST_ATTRIBUTE, realActivity);
-
-			LearningWebUtil.putActivityInRequest(request, progress.getNextActivity(), learnerService);
-		    }
 		}
 	    }
 	}
@@ -174,7 +166,7 @@ public class ActivityMapping implements Serializable {
 	ActionForward actionForward = null;
 
 	String strutsAction = "/requestDisplay.do?url=" + encodedURL;
-	strutsAction = WebUtil.appendParameterToURL(strutsAction, LearningWebUtil.PARAM_PROGRESS_ID, progressId);
+	strutsAction = WebUtil.appendParameterToURL(strutsAction, AttributeNames.PARAM_LEARNER_PROGRESS_ID, progressId);
 
 	actionForward = strutsActionToForward(strutsAction, null, false);
 	return actionForward;
@@ -229,7 +221,7 @@ public class ActivityMapping implements Serializable {
     public static String strutsActionToURL(String strutsAction, Activity activity, boolean useContext) {
 	String url = strutsAction;
 
-	if (activity != null) {
+	if (activity != null && !url.contains(AttributeNames.PARAM_ACTIVITY_ID)) {
 	    url = WebUtil.appendParameterToURL(url, AttributeNames.PARAM_ACTIVITY_ID,
 		    activity.getActivityId().toString());
 	}
@@ -356,7 +348,7 @@ public class ActivityMapping implements Serializable {
 	    url = WebUtil.appendParameterToURL(url, AttributeNames.PARAM_ACTIVITY_ID, activityId.toString());
 	}
 	if (progressId != null) {
-	    url = WebUtil.appendParameterToURL(url, LearningWebUtil.PARAM_PROGRESS_ID, progressId.toString());
+	    url = WebUtil.appendParameterToURL(url, AttributeNames.PARAM_LEARNER_PROGRESS_ID, progressId.toString());
 	}
 	return url;
     }

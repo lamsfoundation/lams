@@ -21,7 +21,6 @@
  * ****************************************************************
  */
 
-
 package org.lamsfoundation.lams.learning.web.action;
 
 import java.io.IOException;
@@ -141,8 +140,6 @@ public class GroupingAction extends LamsDispatchAction {
 	boolean groupingDone = learnerService.performGrouping(lessonId, activity.getActivityId(),
 		LearningWebUtil.getUserId(), forceGroup);
 
-	LearningWebUtil.putActivityInRequest(request, activity, learnerService);
-
 	DynaActionForm groupForm = (DynaActionForm) form;
 	groupForm.set("previewLesson", learnerProgress.getLesson().isPreviewLesson());
 	groupForm.set("title", activity.getTitle());
@@ -197,12 +194,13 @@ public class GroupingAction extends LamsDispatchAction {
 	LearningWebUtil.putActivityPositionInRequest(activityId, request, getServlet().getServletContext());
 
 	// make sure the lesson id is always in the request for the progress bar.
-	if ( request.getAttribute(AttributeNames.PARAM_LESSON_ID) == null ) {
-	    if ( learnerProgress == null ) {
-		ICoreLearnerService learnerService = LearnerServiceProxy.getLearnerService(getServlet().getServletContext());
+	if (request.getAttribute(AttributeNames.PARAM_LESSON_ID) == null) {
+	    if (learnerProgress == null) {
+		ICoreLearnerService learnerService = LearnerServiceProxy
+			.getLearnerService(getServlet().getServletContext());
 		learnerProgress = LearningWebUtil.getLearnerProgress(request, learnerService);
 	    }
-	    request.setAttribute(AttributeNames.PARAM_LESSON_ID,  learnerProgress.getLesson().getLessonId());
+	    request.setAttribute(AttributeNames.PARAM_LESSON_ID, learnerProgress.getLesson().getLessonId());
 	}
 	return mapping.findForward(GroupingAction.SHOW_GROUP);
     }

@@ -161,7 +161,6 @@ public class BranchingActivityAction extends LamsDispatchAction {
 		learnerProgress = learnerService.chooseActivity(learnerId, learnerProgress.getLesson().getLessonId(),
 			branch, true);
 		forward = actionMappings.getActivityForward(branch, learnerProgress, true);
-		LearningWebUtil.putLearnerProgressInRequest(request, learnerProgress);
 	    }
 	}
 
@@ -215,7 +214,6 @@ public class BranchingActivityAction extends LamsDispatchAction {
 	    learnerProgress = learnerService.chooseActivity(learnerId, learnerProgress.getLesson().getLessonId(),
 		    branch, true);
 	    forward = actionMappings.getActivityForward(branch, learnerProgress, true);
-	    LearningWebUtil.putLearnerProgressInRequest(request, learnerProgress);
 	}
 
 	return forward;
