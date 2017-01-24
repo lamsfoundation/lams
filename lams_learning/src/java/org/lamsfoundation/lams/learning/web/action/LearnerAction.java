@@ -96,14 +96,12 @@ public class LearnerAction extends LamsDispatchAction {
     private static final String[] MONITOR_MESSAGE_KEYS = new String[] {
 	    "label.learner.progress.activity.current.tooltip", "label.learner.progress.activity.completed.tooltip",
 	    "label.learner.progress.activity.attempted.tooltip", "label.learner.progress.activity.tostart.tooltip",
-	    "label.learner.progress.activity.support.tooltip"};
+	    "label.learner.progress.activity.support.tooltip" };
 
-    private static final String[] LEARNER_MESSAGE_KEYS = new String[] {
-	    "message.learner.progress.restart.confirm", "message.lesson.restart.button",
-	    "label.learner.progress.notebook", "button.exit",
-	    "label.learner.progress.support", "label.my.progress"};
+    private static final String[] LEARNER_MESSAGE_KEYS = new String[] { "message.learner.progress.restart.confirm",
+	    "message.lesson.restart.button", "label.learner.progress.notebook", "button.exit",
+	    "label.learner.progress.support", "label.my.progress" };
 
-    
     // ---------------------------------------------------------------------
     // Class level constants - Struts forward
     // ---------------------------------------------------------------------
@@ -177,8 +175,6 @@ public class LearnerAction extends LamsDispatchAction {
 		LearnerAction.log.debug("The learner [" + learner + "] joined lesson. The" + "progress data is:"
 			+ learnerProgress.toString());
 	    }
-
-	    LearningWebUtil.putLearnerProgressInRequest(request, learnerProgress);
 
 	    ActivityMapping activityMapping = LearnerServiceProxy
 		    .getActivityMapping(this.getServlet().getServletContext());
@@ -270,7 +266,7 @@ public class LearnerAction extends LamsDispatchAction {
 	}
 
 	responseJSON.put("messages", getProgressBarMessages());
-	
+
 	ICoreLearnerService learnerService = LearnerServiceProxy.getLearnerService(getServlet().getServletContext());
 	Object[] ret = learnerService.getStructuredActivityURLs(learnerId, lessonId);
 	if (ret == null) {
@@ -403,7 +399,8 @@ public class LearnerAction extends LamsDispatchAction {
     private JSONObject getProgressBarMessages() throws JSONException {
 	if (progressBarMessages == null) {
 	    progressBarMessages = new JSONObject();
-	    MessageService messageService = LearnerServiceProxy.getMonitoringMessageService(getServlet().getServletContext());
+	    MessageService messageService = LearnerServiceProxy
+		    .getMonitoringMessageService(getServlet().getServletContext());
 	    for (String key : MONITOR_MESSAGE_KEYS) {
 		String value = messageService.getMessage(key);
 		progressBarMessages.put(key, value);
@@ -416,7 +413,7 @@ public class LearnerAction extends LamsDispatchAction {
 	}
 	return progressBarMessages;
     }
-    
+
     /**
      * Gets the lesson details based on lesson id or the current tool session
      */
@@ -425,9 +422,9 @@ public class LearnerAction extends LamsDispatchAction {
 
 	JSONObject responseJSON = new JSONObject();
 	Lesson lesson = null;
-	
+
 	Long lessonID = WebUtil.readLongParam(request, AttributeNames.PARAM_LESSON_ID, true);
-	if ( lessonID != null ) {
+	if (lessonID != null) {
 	    lesson = LearnerServiceProxy.getLearnerService(getServlet().getServletContext()).getLesson(lessonID);
 
 	} else {

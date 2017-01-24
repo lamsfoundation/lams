@@ -35,7 +35,6 @@ import org.apache.struts.action.ActionForward;
 import org.lamsfoundation.lams.learning.service.ICoreLearnerService;
 import org.lamsfoundation.lams.learning.service.ILearnerService;
 import org.lamsfoundation.lams.learning.service.LearnerServiceException;
-import org.lamsfoundation.lams.learning.web.action.ActivityAction;
 import org.lamsfoundation.lams.learning.web.bean.ActivityPositionDTO;
 import org.lamsfoundation.lams.learning.web.bean.ActivityURL;
 import org.lamsfoundation.lams.learningdesign.Activity;
@@ -62,10 +61,6 @@ public class LearningWebUtil {
     // ---------------------------------------------------------------------
     // Class level constants - session attributes
     // ---------------------------------------------------------------------
-    public static final String PARAM_PROGRESS_ID = "progressID";
-
-    // public static final String POPUP_WINDOW_NAME = "LearnerActivity";
-    // public static final String LEARNER_WINDOW_NAME = "lWindow";
 
     /**
      * Helper method to retrieve the user data. Gets the id from the user details in the shared session
@@ -90,18 +85,6 @@ public class LearningWebUtil {
     }
 
     /**
-     * Put the learner progress in the request. This allows some optimisation between the code that updates the progress
-     * and the next action which will access the progress.
-     */
-    public static void putLearnerProgressInRequest(HttpServletRequest request, LearnerProgress progress) {
-	if (progress != null) {
-	    request.setAttribute(ActivityAction.LEARNER_PROGRESS_REQUEST_ATTRIBUTE, progress);
-	} else {
-	    request.removeAttribute(ActivityAction.LEARNER_PROGRESS_REQUEST_ATTRIBUTE);
-	}
-    }
-
-    /**
      * Get the current learner progress. Check the request - in some cases it may be there.
      *
      * If not, the learner progress id might be in the request (if we've just come from complete activity). If so, get
@@ -111,29 +94,16 @@ public class LearningWebUtil {
      * activity id in the request.
      */
     public static LearnerProgress getLearnerProgress(HttpServletRequest request, ICoreLearnerService learnerService) {
-	LearnerProgress learnerProgress = (LearnerProgress) request
-		.getAttribute(ActivityAction.LEARNER_PROGRESS_REQUEST_ATTRIBUTE);
-	if (learnerProgress != null) {
-	    if (LearningWebUtil.log.isDebugEnabled()) {
-		LearningWebUtil.log.debug("getLearnerProgress: found progress in the request");
-	    }
-	    return learnerProgress;
+	LearnerProgress learnerProgress = null;
+
+	Long learnerProgressId = WebUtil.readLongParam(request, AttributeNames.PARAM_LEARNER_PROGRESS_ID, true);
+	// temp hack until UI side updates it call.
+	if (learnerProgressId == null) {
+	    learnerProgressId = WebUtil.readLongParam(request, "progressId", true);
 	}
 
-	if (learnerProgress == null) {
-	    Long learnerProgressId = WebUtil.readLongParam(request, LearningWebUtil.PARAM_PROGRESS_ID, true);
-	    // temp hack until UI side updates it call.
-	    if (learnerProgressId == null) {
-		learnerProgressId = WebUtil.readLongParam(request, "progressId", true);
-	    }
-
-	    if (learnerProgressId != null) {
-		learnerProgress = learnerService.getProgressById(new Long(learnerProgressId));
-		if ((learnerProgress != null) && LearningWebUtil.log.isDebugEnabled()) {
-		    LearningWebUtil.log.debug("getLearnerProgress: found progress via progress id");
-		}
-	    }
-
+	if (learnerProgressId != null) {
+	    learnerProgress = learnerService.getProgressById(new Long(learnerProgressId));
 	}
 
 	if (learnerProgress == null) {
@@ -141,53 +111,22 @@ public class LearningWebUtil {
 	    Activity act = LearningWebUtil.getActivityFromRequest(request, learnerService);
 	    Lesson lesson = learnerService.getLessonByActivity(act);
 	    learnerProgress = learnerService.getProgress(learnerId, lesson.getLessonId());
-	    if ((learnerProgress != null) && LearningWebUtil.log.isDebugEnabled()) {
-		LearningWebUtil.log.debug("getLearnerProgress: found progress via learner id and activity");
-	    }
 	}
 
-	LearningWebUtil.putLearnerProgressInRequest(request, learnerProgress);
 	return learnerProgress;
     }
 
     /**
-     * Get the activity from request. We assume there is a parameter coming in if there is no activity can be found in
-     * the http request. Then the activity id parameter is used to retrieve from database.
+     * Get the activity from request. We assume there is a parameter coming in. Then the activity id parameter is used
+     * to retrieve from database.
      *
      * @param request
      * @return
      */
     public static Activity getActivityFromRequest(HttpServletRequest request, ICoreLearnerService learnerService) {
-	Activity activity = (Activity) request.getAttribute(ActivityAction.ACTIVITY_REQUEST_ATTRIBUTE);
-
-	if (activity == null) {
-	    long activityId = WebUtil.readLongParam(request, AttributeNames.PARAM_ACTIVITY_ID);
-
-	    activity = learnerService.getActivity(new Long(activityId));
-
-	    if (activity != null) {
-		// getActivityFromRequest() may be called multiple times, so make it quicker next time
-		request.setAttribute(ActivityAction.ACTIVITY_REQUEST_ATTRIBUTE, activity);
-	    }
-	}
+	long activityId = WebUtil.readLongParam(request, AttributeNames.PARAM_ACTIVITY_ID);
+	Activity activity = learnerService.getActivity(new Long(activityId));
 	return activity;
-    }
-
-    /**
-     * Put an activity into the request. Calls LearnerService to get the activity, to ensure that it is a "real"
-     * activity, not one of the cglib proxies. activity.
-     *
-     * @param request
-     * @param activity
-     */
-    public static void putActivityInRequest(HttpServletRequest request, Activity activity,
-	    ICoreLearnerService learnerService) {
-	if (activity != null) {
-	    Activity realActivity = learnerService.getActivity(activity.getActivityId());
-	    request.setAttribute(ActivityAction.ACTIVITY_REQUEST_ATTRIBUTE, realActivity);
-	} else {
-	    request.setAttribute(ActivityAction.ACTIVITY_REQUEST_ATTRIBUTE, null);
-	}
     }
 
     /**
@@ -227,8 +166,6 @@ public class LearningWebUtil {
 	    return actionMappings.getCloseForward(currentActivity, lesson.getLessonId());
 	}
 
-	LearningWebUtil.putActivityInRequest(request, progress.getNextActivity(), learnerService);
-	LearningWebUtil.putLearnerProgressInRequest(request, progress);
 	return actionMappings.getProgressForward(progress, redirect, false, request, learnerService);
     }
 
@@ -245,13 +182,8 @@ public class LearningWebUtil {
 	ActivityURL activityURL = new ActivityURL();
 	activityURL.setType(activity.getClass().getSimpleName());
 
-	if ( isFloating && activity.isFloatingActivity() ) {
-	    // special case - progress engine. Do not want the unknown activity warning
-	    activityURL.setUrl(null);
-	} else {
-	    activityURL.setUrl(activityMapping.getActivityURL(activity));
-	}
-
+	String url = activityMapping.getActivityURL(activity);
+	activityURL.setUrl(url);
 	activityURL.setActivityId(activity.getActivityId());
 	activityURL.setTitle(activity.getTitle());
 	activityURL.setDescription(activity.getDescription());
