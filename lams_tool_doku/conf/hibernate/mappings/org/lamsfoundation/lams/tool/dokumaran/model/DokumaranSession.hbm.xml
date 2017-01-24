@@ -98,6 +98,15 @@
             column="etherpad_read_only_id"
             length="50"
         />
+        
+        <property
+            name="etherpadGroupId"
+            type="java.lang.String"
+            update="true"
+            insert="true"
+            column="etherpad_group_id"
+            length="50"
+        />
 
         <!--
             To add non XDoclet property mappings, create a file named

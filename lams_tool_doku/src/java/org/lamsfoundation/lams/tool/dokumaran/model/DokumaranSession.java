@@ -26,6 +26,7 @@ package org.lamsfoundation.lams.tool.dokumaran.model;
 import java.util.Date;
 
 import org.apache.log4j.Logger;
+import org.lamsfoundation.lams.tool.dokumaran.DokumaranConstants;
 
 /**
  * Dokumaran
@@ -45,6 +46,7 @@ public class DokumaranSession {
     // finish or not
     private int status;
     private DokumaranUser groupLeader;
+    private String etherpadGroupId;
     private String etherpadReadOnlyId;
 
     // **********************************************************
@@ -142,9 +144,23 @@ public class DokumaranSession {
    }
 
    public boolean isUserGroupLeader(Long userUid) {
-
 	boolean isUserLeader = (this.groupLeader != null) && userUid.equals(this.groupLeader.getUid());
 	return isUserLeader;
+   }
+   
+   /**
+    * @return Returns the etherpadReadOnlyId
+    */
+   public String getEtherpadGroupId() {
+	return etherpadGroupId;
+   }
+
+   /**
+    * @param etherpadReadOnlyId
+    *            The etherpadReadOnlyId to set.
+    */
+   public void setEtherpadGroupId(String etherpadGroupId) {
+	this.etherpadGroupId = etherpadGroupId;
    }
    
    /**
@@ -161,5 +177,10 @@ public class DokumaranSession {
    public void setEtherpadReadOnlyId(String etherpadReadOnlyId) {
 	this.etherpadReadOnlyId = etherpadReadOnlyId;
    }
+   
+    public String getPadId() {
+	// HashUtil.sha1(DokumaranConstants.DEFAULT_PAD_NAME + sessionId);
+	return etherpadGroupId + "$" + DokumaranConstants.DEFAULT_PAD_NAME;
+    }
 
 }

@@ -24,11 +24,13 @@
 package org.lamsfoundation.lams.tool.dokumaran.web.action;
 
 import java.io.IOException;
+import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
 import javax.servlet.ServletException;
+import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
@@ -52,6 +54,7 @@ import org.lamsfoundation.lams.tool.dokumaran.model.DokumaranSession;
 import org.lamsfoundation.lams.tool.dokumaran.model.DokumaranUser;
 import org.lamsfoundation.lams.tool.dokumaran.service.DokumaranApplicationException;
 import org.lamsfoundation.lams.tool.dokumaran.service.DokumaranConfigurationException;
+import org.lamsfoundation.lams.tool.dokumaran.service.DokumaranService;
 import org.lamsfoundation.lams.tool.dokumaran.service.IDokumaranService;
 import org.lamsfoundation.lams.tool.dokumaran.web.form.ReflectionForm;
 import org.lamsfoundation.lams.usermanagement.User;
@@ -75,7 +78,7 @@ public class LearningAction extends Action {
 
     @Override
     public ActionForward execute(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws IOException, ServletException, JSONException, DokumaranConfigurationException {
+	    HttpServletResponse response) throws IOException, ServletException, JSONException, DokumaranConfigurationException, URISyntaxException {
 
 	String param = mapping.getParameter();
 	// -----------------------Dokumaran Learner function ---------------------------
@@ -106,10 +109,11 @@ public class LearningAction extends Action {
      *
      * This method will avoid read database again and lost un-saved resouce item lost when user "refresh page",
      * @throws DokumaranConfigurationException 
+     * @throws URISyntaxException 
      *
      */
     private ActionForward start(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws DokumaranConfigurationException {
+	    HttpServletResponse response) throws DokumaranConfigurationException, URISyntaxException {
 
 	// initial Session Map
 	SessionMap<String, Object> sessionMap = new SessionMap<String, Object>();
@@ -211,7 +215,7 @@ public class LearningAction extends Action {
 	String etherpadServerUrl = etherpadServerUrlConfig.getConfigValue();
 	request.setAttribute(DokumaranConstants.KEY_ETHERPAD_SERVER_URL, etherpadServerUrl);
 	
-	String padId = HashUtil.sha1(DokumaranConstants.PAD_ID_PREFIX + toolSessionId);
+	String padId = session.getPadId();
 	//in case of non-leader or finished lock - show Etherpad in readonly mode
 	if (dokumaran.isUseSelectLeaderToolOuput() && !isUserLeader || finishedLock) {
 	    padId = session.getEtherpadReadOnlyId();
@@ -221,6 +225,10 @@ public class LearningAction extends Action {
 	    }
 	}
 	request.setAttribute(DokumaranConstants.ATTR_PAD_ID, padId);
+	
+	//add new sessionID cookie in order to access pad
+	Cookie etherpadSessionCookie = service.createEtherpadCookieForLearner(user, session);
+	response.addCookie(etherpadSessionCookie);
 
 	return mapping.findForward(DokumaranConstants.SUCCESS);
     }
