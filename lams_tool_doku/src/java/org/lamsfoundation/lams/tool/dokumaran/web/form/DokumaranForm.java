@@ -76,6 +76,7 @@ public class DokumaranForm extends ActionForm {
 	    dokumaran.setLockWhenFinished(false);
 	    dokumaran.setDefineLater(false);
 	    dokumaran.setUseSelectLeaderToolOuput(false);
+	    dokumaran.setAllowMultipleLeaders(false);
 	    dokumaran.setReflectOnActivity(false);
 	}
     }

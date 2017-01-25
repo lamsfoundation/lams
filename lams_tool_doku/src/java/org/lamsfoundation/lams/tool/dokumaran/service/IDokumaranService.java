@@ -69,8 +69,39 @@ public interface IDokumaranService {
      *
      * @param userId
      * @param toolSessionId
+     * @param isFirstTimeAccess
+     *            whether user is accessing this doKumaran tool for the first time. If it's true - it will try to update
+     *            leaders list from the Leader Selection activity
      */
-    DokumaranUser checkLeaderSelectToolForSessionLeader(DokumaranUser user, Long toolSessionId);
+    List<DokumaranUser> checkLeaderSelectToolForSessionLeader(DokumaranUser user, Long toolSessionId, boolean isFirstTimeAccess);
+    
+    /**
+     * Is user is as a leader. It works OK in all cases regardless whether isAllowMultipleLeaders option is ON or OFF
+     * (as all leaders are kept in leaders list anyway).
+     * 
+     * @param leaders
+     * @param userId
+     * @return
+     */
+    boolean isUserLeader(List<DokumaranUser> leaders, Long userId);
+    
+    /**
+     * Checks whether at least one of the leaders has finished activity and thus all non-leaders can proceed with finishing it as well.
+     * 
+     * @param leaders
+     * @return
+     */
+    boolean isLeaderResponseFinalized(List<DokumaranUser> leaders);
+    
+    /**
+     * Checks whether at least one of the leaders has finished activity and thus all non-leaders can proceed with
+     * finishing it as well. It differs from the above method that is should be used when leaders list is not
+     * constructed yet.
+     * 
+     * @param session
+     * @return
+     */
+    boolean isLeaderResponseFinalized(Long toolSessionId);
     
     Cookie createEtherpadCookieForLearner(DokumaranUser user, DokumaranSession session) throws DokumaranConfigurationException, URISyntaxException;
     
@@ -89,7 +120,7 @@ public interface IDokumaranService {
     /**
      * Create a new user in database.
      */
-    void createUser(DokumaranUser dokumaranUser);
+    void saveUser(DokumaranUser dokumaranUser);
 
     /**
      * Get user by given userID and toolContentID.

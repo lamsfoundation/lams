@@ -10,6 +10,14 @@
 			<fmt:message key="label.use.select.leader.tool.output" />
 		</label>
 	</div>
+	
+	<div class="checkbox">
+		<label for="allowMultipleLeaders">
+			<html:checkbox property="dokumaran.allowMultipleLeaders" value="1" styleId="allowMultipleLeaders"
+				disabled="${!formBean.dokumaran.useSelectLeaderToolOuput}"/>
+			<fmt:message key="label.allow.multiple.leaders" />
+		</label>
+	</div>
 </lams:SimplePanel>
 
 <lams:SimplePanel titleKey="label.resource.options">
@@ -73,5 +81,10 @@
 	//automatically turn on shared-pad-id-on option if there are text input in shared-pad-id area
 	$('#shared-pad-id').keyup(function(){
 		$('#shared-pad-id-on').prop('checked', !isEmpty($(this).val()));
+	});
+	
+	//automatically turn on shared-pad-id-on option if there are text input in shared-pad-id area
+	$('#useSelectLeaderToolOuput').change(function(){
+		$('#allowMultipleLeaders').prop('disabled', !$('#allowMultipleLeaders').prop('disabled'));
 	});
 </script>

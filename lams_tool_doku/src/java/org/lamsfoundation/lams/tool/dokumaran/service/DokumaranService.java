@@ -217,48 +217,132 @@ public class DokumaranService implements IDokumaranService, ToolContentManager, 
     }
 
     @Override
-    public DokumaranUser checkLeaderSelectToolForSessionLeader(DokumaranUser user, Long toolSessionId) {
+    public List<DokumaranUser> checkLeaderSelectToolForSessionLeader(DokumaranUser user, Long toolSessionId, boolean isFirstTimeAccess) {
 	if ((user == null) || (toolSessionId == null)) {
 	    return null;
 	}
 
 	DokumaranSession session = getDokumaranSessionBySessionId(toolSessionId);
-	Long toolContentId = session.getDokumaran().getContentId();
-	boolean isMultipleLeadersAllowed = isGroupedActivity(toolContentId);
-	if (isMultipleLeadersAllowed) {
+	Dokumaran dokumaran = session.getDokumaran();
+	List<DokumaranUser> leaders = new ArrayList<DokumaranUser>();
+	if (dokumaran.isAllowMultipleLeaders() && !isGroupedActivity(dokumaran.getContentId())) {
+	    
+	    List<DokumaranUser> createdLeaders = dokumaranUserDao.getLeadersBySessionId(toolSessionId);
+	    leaders.addAll(createdLeaders);
+	    
+	    // check leader select tool for a leader only in case Dokumaran activity is accessed by this user for the first
+	    // time. We need to add this check in order to reduce amount of queries to Leader Selection tool.
+	    if (isFirstTimeAccess) {
 
-	} else {
-
-	}
-
-	DokumaranUser leader = session.getGroupLeader();
-	// check leader select tool for a leader only in case Dokumaran tool doesn't know it. As otherwise it will screw
-	// up previous scratches done
-	if (leader == null) {
-
-	    Long leaderUserId = toolService.getLeaderUserId(toolSessionId, user.getUserId().intValue());
-	    if (leaderUserId != null) {
-		leader = getUserByIDAndSession(leaderUserId, toolSessionId);
-
-		// create new user in a DB
-		if (leader == null) {
-		    log.debug("creating new user with userId: " + leaderUserId);
-		    User leaderDto = (User) userManagementService.findById(User.class, leaderUserId.intValue());
-		    leader = new DokumaranUser(leaderDto.getUserDTO(), session);
-		    createUser(leader);
+		//get all leaders from Leader Selection tool
+		Set<Long> allLeaderUserIds = toolService.getAllLeaderUserIds(toolSessionId, user.getUserId().intValue());
+		for (Long leaderUserId : allLeaderUserIds) {
+		    //in case current user is leader - store his leader status
+		    if (leaderUserId.equals(user.getUserId())) {
+			user.setLeader(true);
+			saveUser(user);
+			leaders.add(user);
+			continue;
+		    }
+		    
+		    //check if such leader is already created inside doKumaran
+		    boolean isLeaderCreated = false;
+		    for (DokumaranUser leader : createdLeaders) {
+			if (leader.getUserId().equals(leaderUserId)) {
+			    isLeaderCreated = true;
+			    break;
+			}
+		    }
+		    
+		    //if the leader is not yet created - create him
+		    if (!isLeaderCreated && (getUserByIDAndSession(leaderUserId, toolSessionId) == null)) {
+			log.debug("creating new user with userId: " + leaderUserId);
+			User leaderDto = (User) userManagementService.findById(User.class, leaderUserId.intValue());
+			DokumaranUser leader = new DokumaranUser(leaderDto.getUserDTO(), session);
+			leader.setLeader(true);
+			saveUser(leader);
+			leaders.add(leader);
+		    }
 		}
-
-		// set group leader
-		session.setGroupLeader(leader);
-		dokumaranSessionDao.saveObject(session);
+		
 	    }
+	} else {
+	    DokumaranUser leader = session.getGroupLeader();
+	    // check leader select tool for a leader only in case Dokumaran tool doesn't know it. As otherwise it will
+	    // screw
+	    // up previous scratches done
+	    if (leader == null) {
+
+		Long leaderUserId = toolService.getLeaderUserId(toolSessionId, user.getUserId().intValue());
+		if (leaderUserId != null) {
+		    leader = getUserByIDAndSession(leaderUserId, toolSessionId);
+
+		    // create new user in a DB
+		    if (leader == null) {
+			log.debug("creating new user with userId: " + leaderUserId);
+			User leaderDto = (User) userManagementService.findById(User.class, leaderUserId.intValue());
+			leader = new DokumaranUser(leaderDto.getUserDTO(), session);
+			saveUser(leader);
+		    }
+
+		    // set group leader
+		    session.setGroupLeader(leader);
+		    dokumaranSessionDao.saveObject(session);
+		}
+	    }
+	    
+	    leaders.add(leader);
 	}
 
-	return leader;
+	return leaders;
     }
 
     @Override
-    public void createUser(DokumaranUser dokumaranUser) {
+    public boolean isUserLeader(List<DokumaranUser> leaders, Long userId) {
+	for (DokumaranUser leader : leaders) {
+	    if (userId.equals(leader.getUserId())) {
+		return true;
+	    }
+	}
+	return false;
+    }
+    
+    @Override
+    public boolean isLeaderResponseFinalized(List<DokumaranUser> leaders) {
+	for (DokumaranUser leader : leaders) {
+	    if (leader.isSessionFinished()) {
+		return true;
+	    }
+	}
+	return false;
+    }
+    
+    @Override
+    public boolean isLeaderResponseFinalized(Long toolSessionId) {
+	DokumaranSession session = getDokumaranSessionBySessionId(toolSessionId);
+	Dokumaran dokumaran = session.getDokumaran();
+	
+	boolean isLeaderResponseFinalized = false;
+	if (dokumaran.isAllowMultipleLeaders() && !isGroupedActivity(dokumaran.getContentId())) {
+	    
+	    List<DokumaranUser> leaders = dokumaranUserDao.getLeadersBySessionId(toolSessionId);
+	    for (DokumaranUser leader : leaders) {
+		if (leader.isSessionFinished()) {
+		    isLeaderResponseFinalized = true;
+		    break;
+		}
+	    }
+	    
+	} else {
+	    DokumaranUser leader = session.getGroupLeader();
+	    isLeaderResponseFinalized = (leader != null) && leader.isSessionFinished();
+	}
+
+	return isLeaderResponseFinalized;
+    }
+
+    @Override
+    public void saveUser(DokumaranUser dokumaranUser) {
 	dokumaranUserDao.saveObject(dokumaranUser);
     }
 
@@ -1029,6 +1113,7 @@ public class DokumaranService implements IDokumaranService, ToolContentManager, 
 	dokumaran.setReflectOnActivity(JsonUtil.opt(toolContentJSON, RestTags.REFLECT_ON_ACTIVITY, Boolean.FALSE));
 	dokumaran.setReflectInstructions(JsonUtil.opt(toolContentJSON, RestTags.REFLECT_INSTRUCTIONS, (String) null));
 	dokumaran.setUseSelectLeaderToolOuput(JsonUtil.opt(toolContentJSON, "useSelectLeaderToolOuput", Boolean.FALSE));
+	dokumaran.setAllowMultipleLeaders(JsonUtil.opt(toolContentJSON, "allowMultipleLeaders", Boolean.FALSE));
 
 	dokumaran.setContentInUse(false);
 	dokumaran.setDefineLater(false);
