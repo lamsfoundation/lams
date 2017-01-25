@@ -128,21 +128,30 @@ public class LearningAction extends Action {
 
 	// get back the dokumaran and item list and display them on page
 	DokumaranUser user = null;
+	boolean isFirstTimeAccess = false;
 	if ((mode != null) && mode.isTeacher()) {
 	    // monitoring mode - user is specified in URL
 	    // dokumaranUser may be null if the user was force completed.
 	    user = getSpecifiedUser(service, toolSessionId,
 		    WebUtil.readIntParam(request, AttributeNames.PARAM_USER_ID, false));
 	} else {
-	    user = getCurrentUser(service, toolSessionId);
+	    // get back login user DTO
+	    HttpSession ss = SessionManager.getSession();
+	    UserDTO userDto = (UserDTO) ss.getAttribute(AttributeNames.USER);
+	    user = service.getUserByIDAndSession(new Long(userDto.getUserID().intValue()), toolSessionId);
+	    if (user == null) {
+		user = new DokumaranUser(userDto, session);
+		service.saveUser(user);
+		isFirstTimeAccess = true;
+	    }
 	}
 
 	// support for leader select feature
-	DokumaranUser groupLeader = dokumaran.isUseSelectLeaderToolOuput()
-		? service.checkLeaderSelectToolForSessionLeader(user, new Long(toolSessionId).longValue())
+	List<DokumaranUser> leaders = dokumaran.isUseSelectLeaderToolOuput()
+		? service.checkLeaderSelectToolForSessionLeader(user, new Long(toolSessionId).longValue(), isFirstTimeAccess)
 		: null;
-		// forwards to the leaderSelection page
-	if (dokumaran.isUseSelectLeaderToolOuput() && (groupLeader == null) && !mode.isTeacher()) {
+	// forwards to the leaderSelection page
+	if (dokumaran.isUseSelectLeaderToolOuput() && leaders.isEmpty() && !mode.isTeacher()) {
 	
 	    // get group users and store it to request as DTO objects
 	    List<DokumaranUser> groupUsers = service.getUsersBySession(toolSessionId);
@@ -157,8 +166,7 @@ public class LearningAction extends Action {
 	    request.setAttribute(DokumaranConstants.ATTR_DOKUMARAN, dokumaran);
 	    return mapping.findForward("waitforleader");
 	}
-	sessionMap.put(DokumaranConstants.ATTR_GROUP_LEADER, groupLeader);
-	boolean isUserLeader = session.isUserGroupLeader(user.getUid());
+	boolean isUserLeader = (user != null) && service.isUserLeader(leaders, user.getUserId());
 
 	// check whether finish lock is on/off
 	boolean finishedLock = dokumaran.getLockWhenFinished() && (user != null) && user.isSessionFinished();
@@ -170,10 +178,9 @@ public class LearningAction extends Action {
 	sessionMap.put(DokumaranConstants.ATTR_INSTRUCTIONS, dokumaran.getInstructions());
 	sessionMap.put(DokumaranConstants.ATTR_FINISH_LOCK, finishedLock);
 	sessionMap.put(DokumaranConstants.ATTR_LOCK_ON_FINISH, dokumaran.getLockWhenFinished());
-	sessionMap.put(DokumaranConstants.ATTR_USER_FINISHED,
-		(user != null) && user.isSessionFinished());
+	sessionMap.put(DokumaranConstants.ATTR_USER_FINISHED, (user != null) && user.isSessionFinished());
 	sessionMap.put(DokumaranConstants.ATTR_HAS_EDIT_RIGHT, hasEditRight);
-	sessionMap.put(DokumaranConstants.ATTR_IS_LEADER_RESPONSE_FINALIZED, groupLeader != null && groupLeader.isSessionFinished());
+	sessionMap.put(DokumaranConstants.ATTR_IS_LEADER_RESPONSE_FINALIZED, service.isLeaderResponseFinalized(leaders));
 	sessionMap.put(AttributeNames.PARAM_TOOL_SESSION_ID, toolSessionId);
 	sessionMap.put(AttributeNames.ATTR_MODE, mode);
 
@@ -227,8 +234,10 @@ public class LearningAction extends Action {
 	request.setAttribute(DokumaranConstants.ATTR_PAD_ID, padId);
 	
 	//add new sessionID cookie in order to access pad
-	Cookie etherpadSessionCookie = service.createEtherpadCookieForLearner(user, session);
-	response.addCookie(etherpadSessionCookie);
+	if (user != null) {
+	    Cookie etherpadSessionCookie = service.createEtherpadCookieForLearner(user, session);
+	    response.addCookie(etherpadSessionCookie);
+	}
 
 	return mapping.findForward(DokumaranConstants.SUCCESS);
     }
@@ -242,10 +251,7 @@ public class LearningAction extends Action {
 	IDokumaranService service = getDokumaranService();
 	Long toolSessionId = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_SESSION_ID);
 
-	DokumaranSession session = service.getDokumaranSessionBySessionId(toolSessionId);
-	DokumaranUser leader = session.getGroupLeader();
-
-	boolean isLeaderResponseFinalized = leader.isSessionFinished();
+	boolean isLeaderResponseFinalized = service.isLeaderResponseFinalized(toolSessionId);
 
 	JSONObject JSONObject = new JSONObject();
 	JSONObject.put(DokumaranConstants.ATTR_IS_LEADER_RESPONSE_FINALIZED, isLeaderResponseFinalized);
@@ -378,21 +384,6 @@ public class LearningAction extends Action {
 	    LearningAction.dokumaranService = (IDokumaranService) wac.getBean(DokumaranConstants.RESOURCE_SERVICE);
 	}
 	return LearningAction.dokumaranService;
-    }
-
-    private DokumaranUser getCurrentUser(IDokumaranService service, Long sessionId) {
-	// try to get form system session
-	HttpSession ss = SessionManager.getSession();
-	// get back login user DTO
-	UserDTO user = (UserDTO) ss.getAttribute(AttributeNames.USER);
-	DokumaranUser dokumaranUser = service.getUserByIDAndSession(new Long(user.getUserID().intValue()), sessionId);
-
-	if (dokumaranUser == null) {
-	    DokumaranSession session = service.getDokumaranSessionBySessionId(sessionId);
-	    dokumaranUser = new DokumaranUser(user, session);
-	    service.createUser(dokumaranUser);
-	}
-	return dokumaranUser;
     }
 
     private DokumaranUser getSpecifiedUser(IDokumaranService service, Long sessionId, Integer userId) {

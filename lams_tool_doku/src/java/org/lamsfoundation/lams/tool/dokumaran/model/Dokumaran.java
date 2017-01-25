@@ -52,6 +52,8 @@ public class Dokumaran implements Cloneable {
     // advance
 
     private boolean useSelectLeaderToolOuput;
+    
+    private boolean allowMultipleLeaders;
 
     private boolean showChat;
 
@@ -349,6 +351,18 @@ public class Dokumaran implements Cloneable {
     public void setUseSelectLeaderToolOuput(boolean useSelectLeaderToolOuput) {
 	this.useSelectLeaderToolOuput = useSelectLeaderToolOuput;
     }
+    
+    /**
+    *
+    * @return
+    */
+   public boolean isAllowMultipleLeaders() {
+	return allowMultipleLeaders;
+   }
+
+   public void setAllowMultipleLeaders(boolean allowMultipleLeaders) {
+	this.allowMultipleLeaders = allowMultipleLeaders;
+   }
 
     /**
      *

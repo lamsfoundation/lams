@@ -39,6 +39,8 @@ public class DokumaranUserDAOHibernate extends LAMSBaseDAO implements DokumaranU
 	    + " as u where u.userId =? and u.session.sessionId=?";
     private static final String FIND_BY_SESSION_ID = "from " + DokumaranUser.class.getName()
 	    + " as u where u.session.sessionId=?";
+    private static final String FIND_LEADERS_BY_SESSION_ID = "from " + DokumaranUser.class.getName()
+	    + " as u where u.session.sessionId=? AND u.leader=1";
 
     @Override
     public DokumaranUser getUserByUserIDAndSessionID(Long userID, Long sessionId) {
@@ -62,6 +64,11 @@ public class DokumaranUserDAOHibernate extends LAMSBaseDAO implements DokumaranU
     @SuppressWarnings("unchecked")
     public List<DokumaranUser> getBySessionID(Long sessionId) {
 	return (List<DokumaranUser>) this.doFind(FIND_BY_SESSION_ID, sessionId);
+    }
+    
+    @Override
+    public List<DokumaranUser> getLeadersBySessionId(Long sessionId) {
+	return (List<DokumaranUser>) this.doFind(FIND_LEADERS_BY_SESSION_ID, sessionId);
     }
 
 }
