@@ -20,6 +20,41 @@
 
 	<script type="text/javascript">
 	
+		var lessonDatesHidden = false;
+		
+		// Show/hide the dates for the start and end of the lesson. 
+		function toggleLessonDates() {
+			lessonDatesHidden = !lessonDatesHidden;
+			jQuery(".ui-jqgrid-btable:visible").each(function(index) {
+				var gridId = $(this).attr('id');
+				processLessonDateFields(lessonDatesHidden, jQuery('#' + gridId));
+            });
+		}
+		
+		function processLessonDateFields( hide, grid ) {
+
+ 			if ( hide ) {
+ 				grid.jqGrid('hideCol','startDate');
+ 				grid.jqGrid('hideCol','finishDate');
+				document.getElementById("datesShown").style.display="none";
+				document.getElementById("datesNotShown").style.display="block";
+	        } else { 
+	        	grid.jqGrid('showCol','startDate');
+	        	grid.jqGrid('showCol','finishDate');
+				document.getElementById("datesShown").style.display="block";
+				document.getElementById("datesNotShown").style.display="none";
+	        }
+	        resizeJqgrid(grid);
+ 		}
+
+        function resizeJqgrid(jqgrids) {
+            jqgrids.each(function(index) {
+                var gridId = $(this).attr('id');
+                var gridParentWidth = jQuery('#gbox_' + gridId).parent().width();
+                jQuery('#' + gridId).setGridWidth(gridParentWidth, true);
+            });
+        };
+
 		jQuery(document).ready(function(){
 
 			var jqgridWidth = $(window).width() - 100;
@@ -80,6 +115,8 @@
 					     	"<fmt:message key="gradebook.columntitle.learnerName"/>",
 					     	"<fmt:message key="gradebook.columntitle.progress"/>", 
 					     	"<fmt:message key="gradebook.columntitle.timeTaken"/>", 
+					    	"<fmt:message key="gradebook.columntitle.startDate"/>", 
+					    	"<fmt:message key="gradebook.columntitle.completeDate"/>", 
 					     	"<fmt:message key="gradebook.columntitle.lessonFeedback"/>", 
 			    			"<fmt:message key="gradebook.columntitle.mark"/>"
 					     ],
@@ -88,6 +125,8 @@
 					     	{name:'rowName',index:'rowName', sortable:true, editable:false},
 					      	{name:'status', index:'status', sortable:false, editable:false, search:false, title:false, width:50, align:"center"},
 					      	{name:'timeTaken', index:'timeTaken', sortable:true, editable:false, search:false, width:80, align:"center"},
+						    {name:'startDate',index:'startDate', sortable:true, editable:false, search:false, width:85, align:"left"},
+						    {name:'finishDate',index:'finishDate', sortable:false, editable:false, search:false, width:85, align:"left"},
 					     	{name:'feedback',index:'feedback', sortable:false, editable:true, edittype:'textarea', editoptions:{rows:'4',cols:'20'} , search:false},
 					     	{name:'mark',index:'mark', sortable:true, editable:true, editrules:{number:true}, search:false, width:50, align:"center"}
 					     ],
@@ -123,6 +162,7 @@
 					     	$("#userView").trigger("reloadGrid");
 					     },
 						 gridComplete: function(){
+							processLessonDateFields( lessonDatesHidden, jQuery("#"+subgrid_table_id) );
 						 	toolTip($(".jqgrow"));	// enable tooltips for grid
 						 }	
 					 }).navGrid("#"+subgrid_table_id+"_pager", {edit:false,add:false,del:false,search:false})
@@ -137,13 +177,6 @@
 									sopt:['cn','bw','eq','ne','ew']
 								});
 							}
-					  });
-					  jQuery("#"+subgrid_table_id).navButtonAdd("#"+subgrid_table_id+"_pager",{
-						caption: "",
-						buttonimg:"<lams:LAMSURL />images/table_edit.png", 
-						onClickButton: function(){
-							jQuery("#"+subgrid_table_id).setColumns();
-						}
 					  });
 					},
 					gridComplete: function(){
@@ -163,14 +196,6 @@
 				}
 			});
 
-			jQuery("#organisationGrid").navButtonAdd('#organisationGridPager',{
-				caption: "",
-				buttonimg:"<lams:LAMSURL />images/table_edit.png", 
-				onClickButton: function(){
-					jQuery("#organisationGrid").setColumns();
-				}
-			});
-			
 			// Create the user view grid with sub grid for lessons
 			jQuery("#userView").jqGrid({
 				caption: "<fmt:message key="gradebook.gridtitle.learner.view"/>",
@@ -217,9 +242,9 @@
 								"<fmt:message key="gradebook.columntitle.lessonName"/>", 
 								"<fmt:message key="gradebook.columntitle.subGroup"/>", 
 								"<fmt:message key="gradebook.columntitle.progress"/>", 
-								"<fmt:message key="gradebook.columntitle.lessonFeedback"/>", 
 								"<fmt:message key="gradebook.columntitle.startDate"/>", 
 								"<fmt:message key="gradebook.columntitle.completeDate"/>", 
+								"<fmt:message key="gradebook.columntitle.lessonFeedback"/>", 
 								"<fmt:message key="gradebook.columntitle.averageTimeTaken"/>", 
 								"<fmt:message key="gradebook.columntitle.timeTaken"/>", 
 								"<fmt:message key="gradebook.columntitle.averageMark"/>", 
@@ -230,9 +255,9 @@
 								{name:'rowName',index:'rowName', sortable:true, editable:false, width:150},
 								{name:'subGroup',index:'subGroup', sortable:false, editable:false, search:false, width:130},
 								{name:'status',index:'status', sortable:false, editable:false, search:false, width:60, align:"center"},
+								{name:'startDate',index:'startDate', sortable:false, editable:false, search:false, width:85, align:"left"},
+							    {name:'finishDate',index:'finishDate', sortable:false, editable:false, search:false, width:85, align:"left"},
 								{name:'feedback',  index:'feedback', sortable:false, editable: true, edittype:'textarea', editoptions:{rows:'4',cols:'20'}, width:150},
-								{name:'startDate',index:'startDate', sortable:false, editable:false, hidden:true, search:false},
-								{name:'finishDate',index:'finishDate', sortable:false, editable:false, hidden:true, search:false},
 								{name:'medianTimeTaken',index:'medianTimeTaken', sortable:true, hidden:true, editable:false, search:false, width:80, align:"center"},
 								{name:'timeTaken',index:'timeTaken', sortable:true, editable:false, hidden:true, search:false, width:80, align:"center"},
 								{name:'averageMark',index:'averageMark', sortable:true, editable:false, hidden:true, search:false, width:50, align:"center"},
@@ -309,18 +334,11 @@
 						     	$.jgrid.info_dialog("<fmt:message key="label.error"/>", "<fmt:message key="error.cellsave"/>", "<fmt:message key="label.ok"/>");
 						     },
 							 gridComplete: function(){
+								processLessonDateFields( lessonDatesHidden, jQuery("#"+subgrid_table_id) );
 							 	toolTip($(".jqgrow"));
 							 }
 					  	}).navGrid("#"+subgrid_table_id+"_pager", {edit:false,add:false,del:false,search:false}); // applying refresh button
 					  
-					  	// Adding button for show/hiding collumn
-					  	jQuery("#"+subgrid_table_id).navButtonAdd("#"+subgrid_table_id+"_pager",{
-							caption: "",
-							buttonimg:"<lams:LAMSURL />images/table_edit.png", 
-							onClickButton: function(){
-								jQuery("#"+subgrid_table_id).setColumns();
-							}
-						});
 					},
 					gridComplete: function(){
 						toolTip($(".jqgrow"));  // allowing tooltips for this grid	
@@ -397,13 +415,6 @@
 	            resizeJqgrid(jQuery(".ui-jqgrid-btable:visible", this));
 	        })
 
-	        function resizeJqgrid(jqgrids) {
-	            jqgrids.each(function(index) {
-	                var gridId = $(this).attr('id');
-	                var gridParentWidth = jQuery('#gbox_' + gridId).parent().width();
-	                jQuery('#' + gridId).setGridWidth(gridParentWidth, true);
-	            });
-	        };
 	        setTimeout(function(){ window.dispatchEvent(new Event('resize')); }, 300);
 
 			
@@ -453,8 +464,17 @@
 				
 				<input class="button" type="button" value="<fmt:message key="label.button.export"/>" id="export-selected-lessons-button" />			
 			</div>
+
+			<div id="datesNotShown"  style="display:none">
+				<a href="javascript:toggleLessonDates()"><fmt:message key="gradebook.monitor.show" /></a> <fmt:message key="gradebook.monitor.learner.lesson.dates" /><br />
+			</div>
+
+			<div id="datesShown">
+				<a href="javascript:toggleLessonDates()"><fmt:message key="gradebook.monitor.releasemarks.2" /></a> <fmt:message key="gradebook.monitor.learner.lesson.dates" /><br />
+			</div>
 			
-			<div class="grid-holder">
+					
+			<div class="grid-holder voffset20">
 				<table id="organisationGrid" class="scroll"></table>
 				<div id="organisationGridPager" class="scroll"></div>
 				

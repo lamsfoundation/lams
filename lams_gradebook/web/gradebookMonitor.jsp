@@ -60,6 +60,46 @@
 			}
 		}
 		
+		// Show/hide the dates for the start and end of the lesson. 
+		function toggleLessonDates(){
+		    var colModel = jQuery("#userView").jqGrid('getGridParam', 'colModel'), 
+		    	i, 
+		    	l = colModel.length,
+		    	hidden = false;
+		    
+	        for (i = 0; ! hidden && i < l; i++) {
+	            var colItem = colModel[i];
+	            var cmName = colItem.name;
+	            if (cmName == 'startDate' || cmName == 'finishDate') {
+	            	hidden = colItem.hidden;
+	            }
+	        }
+	            
+            if ( hidden ) {
+				jQuery("#userView").jqGrid('showCol','startDate');
+				jQuery("#userView").jqGrid('showCol','finishDate');
+				document.getElementById("datesShown").style.display="block";
+				document.getElementById("datesNotShown").style.display="none";
+
+            } else { 
+				jQuery("#userView").jqGrid('hideCol','startDate');
+				jQuery("#userView").jqGrid('hideCol','finishDate');
+				document.getElementById("datesShown").style.display="none";
+				document.getElementById("datesNotShown").style.display="block";
+            }
+
+            resizeJqgrid(jQuery("#userView"));
+
+		}
+
+        function resizeJqgrid(jqgrids) {
+            jqgrids.each(function(index) {
+                var gridId = $(this).attr('id');
+                var gridParentWidth = jQuery('#gbox_' + gridId).parent().width();
+                jQuery('#' + gridId).setGridWidth(gridParentWidth, true);
+            });
+        };
+
 		jQuery(document).ready(function(){
   
 			var jqgridWidth = $(window).width() - 100;
@@ -85,6 +125,8 @@
 			    	"<fmt:message key="gradebook.columntitle.name"/>", 
 			    	"<fmt:message key="gradebook.columntitle.progress"/>", 
 			    	"<fmt:message key="gradebook.columntitle.timeTaken"/>", 
+			    	"<fmt:message key="gradebook.columntitle.startDate"/>", 
+			    	"<fmt:message key="gradebook.columntitle.completeDate"/>", 
 			    	"<fmt:message key="gradebook.columntitle.lessonFeedback"/>", 
 			    	"<fmt:message key="gradebook.columntitle.mark"/>"
 			    ],
@@ -93,6 +135,8 @@
 			      {name:'rowNamer',index:'rowName', sortable:true, editable:false, autoencode:true},
 			      {name:'status',index:'status', sortable:false, editable:false, search:false, width:50, align:"center"},
 			      {name:'timeTaken',index:'timeTaken', sortable:true, editable:false, search:false, width:80, align:"center"},
+			      {name:'startDate',index:'startDate', sortable:true, editable:false, search:false, width:85, align:"left"},
+			      {name:'finishDate',index:'finishDate', sortable:false, editable:false, search:false, width:85, align:"left"},
 			      {name:'feedback',index:'feedback', sortable:true, editable:true, edittype:'textarea', editoptions:{rows:'4',cols:'20'}, search:false },
 			      {name:'mark',index:'mark', sortable:true, editable:true, editrules:{number:true}, search:false, width:50, align:"center"}
 			    ],
@@ -122,6 +166,8 @@
 						     	"<fmt:message key="gradebook.columntitle.activity"/>",
 						     	"<fmt:message key="gradebook.columntitle.progress"/>",
 						     	"<fmt:message key="gradebook.columntitle.timeTaken"/>", 
+						    	"<fmt:message key="gradebook.columntitle.startDate"/>", 
+						    	"<fmt:message key="gradebook.columntitle.completeDate"/>", 
 						     	"<fmt:message key="gradebook.columntitle.activityFeedback"/>", 
 						     	"<fmt:message key="gradebook.columntitle.mark"/>"
 						     ],
@@ -131,6 +177,8 @@
 								{name:'rowName',  index:'rowName', sortable:false, editable: false},
 								{name:'status',  index:'status', sortable:false, editable:false, width:50, align:"center"},
 								{name:'timeTaken',index:'timeTaken', sortable:true, editable: false, width:80, align:"center"},
+							    {name:'startDate',index:'startDate', sortable:true, editable:false, search:false, width:85, align:"left"},
+							    {name:'finishDate',index:'finishDate', sortable:false, editable:false, search:false, width:85, align:"left"},
 								{name:'feedback',  index:'feedback', sortable:false, editable: true, edittype:'textarea', editoptions:{rows:'4',cols:'20'}, width:200, hidden:true},
 								{name:'mark', index:'mark', sortable:true, editable: true, editrules:{number:true}, width:50, align:"center" }
 						     ],
@@ -211,14 +259,6 @@
 							 }
 					  	}).navGrid("#"+subgrid_table_id+"_pager", {edit:false,add:false,del:false,search:false}); // applying refresh button
 					  
-					  	// Adding button for show/hiding collumn
-					  	jQuery("#"+subgrid_table_id).navButtonAdd("#"+subgrid_table_id+"_pager",{
-							caption: "",
-							buttonimg:"<lams:LAMSURL />images/table_edit.png", 
-							onClickButton: function(){
-								jQuery("#"+subgrid_table_id).setColumns();
-							}
-						});
 					},
 					gridComplete: function(){
 						toolTip($(".jqgrow"));  // allowing tooltips for this grid	
@@ -238,17 +278,7 @@
 							});
 						}
 				});
-				
-				// Allowing column editing for this grid
-				jQuery("#userView").navButtonAdd('#userViewPager',{
-					caption: "",
-					buttonimg:"<lams:LAMSURL />images/table_edit.png", 
-					onClickButton: function(){
-						jQuery("#userView").setColumns();
-					}
-				});
-				
-				
+								
 				// Creating activity view with sub learner view
 				jQuery("#activityView").jqGrid({
 					caption: "<fmt:message key="gradebook.gridtitle.activitygrid"/>",
@@ -309,6 +339,8 @@
 						     	"<fmt:message key="gradebook.columntitle.name"/>",
 						     	"<fmt:message key="gradebook.columntitle.progress"/>", 
 						     	"<fmt:message key="gradebook.columntitle.timeTaken"/>", 
+						    	"<fmt:message key="gradebook.columntitle.startDate"/>", 
+						    	"<fmt:message key="gradebook.columntitle.completeDate"/>", 
 						     	"<fmt:message key="gradebook.columntitle.activityFeedback"/>", 
 						     	"<fmt:message key="gradebook.columntitle.mark"/>"
 						     ],
@@ -318,6 +350,8 @@
 						     	{name:'rowName',index:'rowName', sortable:true, editable:false},
 						      	{name:'status', index:'status', sortable:false, editable:false, search:false, width:30, align:"center"},
 						      	{name:'timeTaken', index:'timeTaken', sortable:true, editable: false, width:80, align:"center"},
+							    {name:'startDate',index:'startDate', sortable:true, editable:false, search:false, width:85, align:"left"},
+							    {name:'finishDate',index:'finishDate', sortable:false, editable:false, search:false, width:85, align:"left"},
 						     	{name:'feedback',index:'feedback', sortable:false, editable:true, edittype:'textarea', editoptions:{rows:'4',cols:'20'} , search:false, width:200, hidden:true},
 						     	{name:'mark',index:'mark', sortable:true, editable:true, editrules:{number:true}, search:false, width:50, align:"center"}
 						     ],
@@ -406,29 +440,11 @@
 								}
 						  });
 						  
-						  // Allowing column editing for this grid
-						  jQuery("#"+subgrid_table_id).navButtonAdd("#"+subgrid_table_id+"_pager",{
-							caption: "",
-							buttonimg:"<lams:LAMSURL />images/table_edit.png", 
-							onClickButton: function(){
-								jQuery("#"+subgrid_table_id).setColumns();
-							}
-						  });
 					 },
 					 gridComplete: function(){
 					 	toolTip($(".jqgrow"));	// enable tooltips for grid
 					 }	 
 				}).navGrid("#activityViewPager", {edit:false,add:false,del:false,search:false}); // enable refresh button
-				
-				// Enable show/hide columns
-				jQuery("#activityView").navButtonAdd('#activityViewPager',{
-					caption: "",
-					title: "<fmt:message key="gradebook.function.window.showColumns"/>",
-					buttonimg:"<lams:LAMSURL />images/table_edit.png", 
-					onClickButton: function(){
-						jQuery("#activityView").setColumns();
-					}
-				});
 				
 				$("#export-grades-button").click(function() {
 					
@@ -450,13 +466,6 @@
 		            resizeJqgrid(jQuery(".ui-jqgrid-btable:visible", this));
 		        })
 
-		        function resizeJqgrid(jqgrids) {
-		            jqgrids.each(function(index) {
-		                var gridId = $(this).attr('id');
-		                var gridParentWidth = jQuery('#gbox_' + gridId).parent().width();
-		                jQuery('#' + gridId).setGridWidth(gridParentWidth, true);
-		            });
-		        };
 		        setTimeout(function(){ window.dispatchEvent(new Event('resize')); }, 300);
 
 		});
@@ -485,7 +494,7 @@
 			<div id="marksReleased" style="display:none">
 				<a href="javascript:toggleRelease()"><fmt:message key="gradebook.monitor.releasemarks.2" /></a> <fmt:message key="gradebook.monitor.releasemarks.3" /><br />
 			</div>
-			
+
 			<div id="export-link-area">
 				<a href="#nogo" id="export-grades-button">
 					<fmt:message key="gradebook.export.excel.1" />
@@ -493,7 +502,16 @@
 				<fmt:message key="gradebook.export.excel.2" />
 			</div>
 			
-			<div class="grid-holder">
+			<div id="datesNotShown"  style="display:none">
+				<a href="javascript:toggleLessonDates()"><fmt:message key="gradebook.monitor.show" /></a> <fmt:message key="gradebook.monitor.learner.lesson.dates" /><br />
+			</div>
+
+			<div id="datesShown">
+				<a href="javascript:toggleLessonDates()"><fmt:message key="gradebook.monitor.releasemarks.2" /></a> <fmt:message key="gradebook.monitor.learner.lesson.dates" /><br />
+			</div>
+			
+
+			<div class="grid-holder voffset20">
 				<table id="userView" class="scroll" ></table>
 				<div id="userViewPager" class="scroll" ></div>
 				

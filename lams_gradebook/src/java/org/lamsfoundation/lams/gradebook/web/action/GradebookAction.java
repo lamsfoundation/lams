@@ -110,7 +110,7 @@ public class GradebookAction extends LamsDispatchAction {
 	String searchOper = WebUtil.readStrParam(request, GradebookConstants.PARAM_SEARCH_OPERATION, true);
 	String searchString = WebUtil.readStrParam(request, GradebookConstants.PARAM_SEARCH_STRING, true);
 	GBGridView view = GradebookUtil.readGBGridViewParam(request, GradebookConstants.PARAM_VIEW, false);
-
+	
 	Long lessonID = WebUtil.readLongParam(request, AttributeNames.PARAM_LESSON_ID);
 	if (!getSecurityService().isLessonParticipant(lessonID, getUser().getUserID(), "get activity gradebook data",
 		false)) {
@@ -119,13 +119,13 @@ public class GradebookAction extends LamsDispatchAction {
 	}
 
 	// Getting userID param, it is passed differently from different views
+	UserDTO currentUserDTO = getUser();
 	Integer userID = null;
 	if (view == GBGridView.MON_USER) {
 	    userID = WebUtil.readIntParam(request, GradebookConstants.PARAM_USERID);
 	} else if (view == GBGridView.LRN_ACTIVITY) {
-	    UserDTO userDTO = getUser();
-	    if (userDTO != null) {
-		userID = userDTO.getUserID();
+	    if (currentUserDTO != null) {
+		userID = currentUserDTO.getUserID();
 	    }
 	}
 
@@ -134,9 +134,9 @@ public class GradebookAction extends LamsDispatchAction {
 	// Get the user gradebook list from the db
 	// A slightly different list is needed for userview or activity view
 	if ((view == GBGridView.MON_USER) || (view == GBGridView.LRN_ACTIVITY)) {//2nd level && from personal marks page (2nd level or 1st)
-	    gradebookActivityDTOs = getGradebookService().getGBActivityRowsForLearner(lessonID, userID);
+	    gradebookActivityDTOs = getGradebookService().getGBActivityRowsForLearner(lessonID, userID, currentUserDTO.getTimeZone());
 	} else if (view == GBGridView.MON_ACTIVITY) {
-	    gradebookActivityDTOs = getGradebookService().getGBActivityRowsForLesson(lessonID);
+	    gradebookActivityDTOs = getGradebookService().getGBActivityRowsForLesson(lessonID, currentUserDTO.getTimeZone());
 	}
 
 	if ((sortBy == null) || sortBy.equals("")) {
@@ -203,7 +203,7 @@ public class GradebookAction extends LamsDispatchAction {
 	    //GBGridView.MON_COURSE - Subgrid of 1st table of gradebook course monitor
 	    if (view == GBGridView.MON_USER || view == GBGridView.MON_COURSE) {
 		gradebookUserDTOs = getGradebookService().getGBUserRowsForLesson(lesson, page - 1, rowLimit, sortBy,
-			sortOrder, searchString);
+			sortOrder, searchString, user.getTimeZone());
 		totalUsers = lesson.getAllLearners().size();
 
 		// Subgrid of 2nd table of gradebook lesson monitor
@@ -226,7 +226,7 @@ public class GradebookAction extends LamsDispatchAction {
 		Activity activity = getGradebookService().getActivityById(activityID);
 		if ((activity != null) && (activity instanceof ToolActivity)) {
 		    gradebookUserDTOs = getGradebookService().getGBUserRowsForActivity(lesson, (ToolActivity) activity,
-			    groupId, page - 1, rowLimit, sortBy, sortOrder, searchString);
+			    groupId, page - 1, rowLimit, sortBy, sortOrder, searchString, user.getTimeZone());
 
 		    //calculate totalUsers
 		    totalUsers = lesson.getAllLearners().size();
@@ -367,7 +367,7 @@ public class GradebookAction extends LamsDispatchAction {
 	    return null;
 	}
 	List<GBLessonGridRowDTO> gradebookLessonDTOs = getGradebookService().getGBLessonRows(organisation, user, viewer,
-		view, page - 1, rowLimit, sortBy, sortOrder, searchString);
+		view, page - 1, rowLimit, sortBy, sortOrder, searchString, getUser().getTimeZone());
 
 	String ret;
 	if (view == GBGridView.MON_COURSE || view == GBGridView.LIST) {

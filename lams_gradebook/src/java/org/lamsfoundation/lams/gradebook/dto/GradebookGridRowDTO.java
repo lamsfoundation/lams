@@ -49,6 +49,12 @@ public abstract class GradebookGridRowDTO {
     // A unit of time in milliseconds that  determines the time taken for the corressponding task
     protected Long timeTaken;
 
+    // Start date of lesson / activity
+    protected Date startDate;
+
+    // Start date of lesson / activity
+    protected Date finishDate;
+
     // Another unit of time that represents average time taken for a corresponding task
     protected Long medianTimeTaken;
 
@@ -241,4 +247,22 @@ public abstract class GradebookGridRowDTO {
     public void setFeedback(String feedback) {
 	this.feedback = feedback;
     }
+    
+    public Date getStartDate() {
+	return startDate;
+    }
+
+    public void setStartDate(Date startDate) {
+	this.startDate = startDate;
+    }
+
+    public Date getFinishDate() {
+	return finishDate;
+    }
+
+    public void setFinishDate(Date finishDate) {
+	this.finishDate = finishDate;
+    }
+
+
 }
