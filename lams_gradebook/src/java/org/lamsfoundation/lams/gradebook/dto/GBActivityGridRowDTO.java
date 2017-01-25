@@ -24,7 +24,6 @@
 package org.lamsfoundation.lams.gradebook.dto;
 
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.Set;
 
 import org.apache.commons.lang.StringEscapeUtils;
@@ -43,7 +42,7 @@ public class GBActivityGridRowDTO extends GradebookGridRowDTO {
 
     // Properties for user view
     private String activityUrl;
-    private Date startDate;
+    // private Date startDate; defined in GradebookGridRowDTO
 
     // Properties for activity view
     private String monitorUrl;
@@ -110,6 +109,8 @@ public class GBActivityGridRowDTO extends GradebookGridRowDTO {
 	    }
 	    ret.add(status);
 	    ret.add(timeTaken != null ? convertTimeToString(timeTaken) : CELL_EMPTY);
+	    ret.add(startDate != null ? convertDateToString(startDate, null) : CELL_EMPTY);
+	    ret.add(finishDate != null ? convertDateToString(finishDate, null) : CELL_EMPTY);
 	    ret.add(feedback);
 	    ret.add(mark != null ? GradebookUtil.niceFormatting(mark) : CELL_EMPTY);
 
@@ -125,6 +126,8 @@ public class GBActivityGridRowDTO extends GradebookGridRowDTO {
 	    }
 
 	    ret.add((medianTimeTaken != null) ? convertTimeToString(medianTimeTaken) : CELL_EMPTY);
+	    ret.add(CELL_EMPTY);
+	    ret.add(CELL_EMPTY);
 	    ret.add(competences);
 	    ret.add(averageMark != null ? GradebookUtil.niceFormatting(averageMark) : CELL_EMPTY);
 
@@ -166,11 +169,4 @@ public class GBActivityGridRowDTO extends GradebookGridRowDTO {
 	this.monitorUrl = monitorUrl;
     }
 
-    public Date getStartDate() {
-	return startDate;
-    }
-
-    public void setStartDate(Date startDate) {
-	this.startDate = startDate;
-    }
 }

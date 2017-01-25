@@ -23,7 +23,6 @@
 
 package org.lamsfoundation.lams.gradebook.service;
 
-import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -35,14 +34,12 @@ import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import java.util.TimeZone;
 import java.util.TreeSet;
 
 import org.apache.commons.lang.StringEscapeUtils;
-import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.dao.IBaseDAO;
 import org.lamsfoundation.lams.gradebook.GradebookUserActivity;
@@ -128,7 +125,7 @@ public class GradebookService implements IGradebookService {
     
 
     @Override
-    public List<GradebookGridRowDTO> getGBActivityRowsForLearner(Long lessonId, Integer userId) {
+    public List<GradebookGridRowDTO> getGBActivityRowsForLearner(Long lessonId, Integer userId, TimeZone userTimezone) {
 	GradebookService.logger.debug("Getting gradebook user data for lesson: " + lessonId + ". For user: " + userId);
 
 	Lesson lesson = lessonService.getLesson(lessonId);
@@ -163,7 +160,8 @@ public class GradebookService implements IGradebookService {
 	    LearnerProgress learnerProgress = lessonService.getUserProgressForLesson(learner.getUserId(),
 		    lesson.getLessonId());
 	    // Setting status
-	    activityDTO.setStartDate(getActivityStartDate(learnerProgress, activity, learner.getTimeZone()));
+	    activityDTO.setStartDate(getActivityStartDate(learnerProgress, activity, userTimezone));
+	    activityDTO.setFinishDate(getActivityFinishDate(learnerProgress, activity, userTimezone));
 	    activityDTO.setTimeTaken(getActivityDuration(learnerProgress, activity));
 	    activityDTO.setStatus(getActivityStatusStr(learnerProgress, activity));
 
@@ -192,7 +190,7 @@ public class GradebookService implements IGradebookService {
 
     @Override
     @SuppressWarnings("unchecked")
-    public List<GradebookGridRowDTO> getGBActivityRowsForLesson(Long lessonId) {
+    public List<GradebookGridRowDTO> getGBActivityRowsForLesson(Long lessonId, TimeZone userTimezone) {
 	GradebookService.logger.debug("Getting gradebook data for lesson: " + lessonId);
 
 	Lesson lesson = lessonService.getLesson(lessonId);
@@ -226,7 +224,7 @@ public class GradebookService implements IGradebookService {
     @Override
     @SuppressWarnings("unchecked")
     public List<GBUserGridRowDTO> getGBUserRowsForActivity(Lesson lesson, ToolActivity activity, Long groupId, int page,
-	    int size, String sortBy, String sortOrder, String searchString) {
+	    int size, String sortBy, String sortOrder, String searchString, TimeZone timezone) {
 	Long lessonId = lesson.getLessonId();
 	Long activityId = activity.getActivityId();
 
@@ -273,6 +271,8 @@ public class GradebookService implements IGradebookService {
 		LearnerProgress learnerProgress = userToLearnerProgressMap.get(learner.getUserId());
 		gUserDTO.setStatus(getActivityStatusStr(learnerProgress, activity));
 		gUserDTO.setTimeTaken(getActivityDuration(learnerProgress, activity));
+		gUserDTO.setStartDate(getActivityStartDate(learnerProgress, activity, timezone));
+		gUserDTO.setFinishDate(getActivityFinishDate(learnerProgress, activity, timezone));
 
 		// Get the tool outputs for this user if there are any
 		ToolSession toolSession = toolService.getToolSessionByLearner(learner, activity);
@@ -302,14 +302,14 @@ public class GradebookService implements IGradebookService {
     }
 
     @Override
-    public ArrayList<GBUserGridRowDTO> getGBUserRowsForLesson(Lesson lesson) {
-	return getGBUserRowsForLesson(lesson, 0, 0, null, null, null);
+    public ArrayList<GBUserGridRowDTO> getGBUserRowsForLesson(Lesson lesson, TimeZone timeZone) {
+	return getGBUserRowsForLesson(lesson, 0, 0, null, null, null, timeZone);
     }
 
     @Override
     @SuppressWarnings("unchecked")
     public ArrayList<GBUserGridRowDTO> getGBUserRowsForLesson(Lesson lesson, int page, int size, String sortBy,
-	    String sortOrder, String searchString) {
+	    String sortOrder, String searchString, TimeZone userTimeZone) {
 
 	ArrayList<GBUserGridRowDTO> gradebookUserDTOs = new ArrayList<GBUserGridRowDTO>();
 
@@ -347,10 +347,25 @@ public class GradebookService implements IGradebookService {
 
 		// calculate time taken
 		if (learnerProgress != null) {
-		    if ((learnerProgress.getStartDate() != null) && (learnerProgress.getFinishDate() != null)) {
-			gradebookUserDTO.setTimeTaken(
-				learnerProgress.getFinishDate().getTime() - learnerProgress.getStartDate().getTime());
+		    Date startDate = learnerProgress.getStartDate();
+		    Date finishDate = learnerProgress.getFinishDate();
+		    
+		    if (startDate != null && finishDate != null) {
+			gradebookUserDTO.setTimeTaken(finishDate.getTime() - startDate.getTime());
 		    }
+
+		    if ( startDate != null ) {
+			if ( userTimeZone != null )
+			    startDate = DateUtil.convertToTimeZoneFromDefault(userTimeZone, startDate);
+			gradebookUserDTO.setStartDate(startDate);
+		    }
+		    
+		    if ( learnerProgress.getFinishDate() != null ) {
+			if ( userTimeZone != null )
+				finishDate = DateUtil.convertToTimeZoneFromDefault(userTimeZone, finishDate);
+			gradebookUserDTO.setFinishDate(finishDate);
+		    }
+
 		}
 
 		GradebookUserLesson gradebookUserLesson = userToGradebookUserLessonMap.get(learner.getUserId());
@@ -648,7 +663,7 @@ public class GradebookService implements IGradebookService {
     @Override
     @SuppressWarnings("unchecked")
     public List<GBLessonGridRowDTO> getGBLessonRows(Organisation organisation, User user, User viewer, GBGridView view,
-	    int page, int size, String sortBy, String sortOrder, String searchString) {
+	    int page, int size, String sortBy, String sortOrder, String searchString, TimeZone userTimeZone) {
 	List<GBLessonGridRowDTO> lessonRows = new ArrayList<GBLessonGridRowDTO>();
 	Integer userId = user.getUserId();
 	Integer orgId = organisation.getOrganisationId();
@@ -690,6 +705,15 @@ public class GradebookService implements IGradebookService {
 			String gbMonURL = Configuration.get(ConfigurationKeys.SERVER_URL)
 				+ "gradebook/gradebookMonitoring.do?lessonID=" + lesson.getLessonId().toString();
 			lessonRow.setGradebookMonitorURL(gbMonURL);
+			
+			Date startDate = lesson.getStartDateTime();
+			if ( startDate != null ) {
+			    if ( userTimeZone != null )
+				startDate = DateUtil.convertToTimeZoneFromDefault(userTimeZone, startDate);
+			    lessonRow.setStartDate(startDate);
+			}
+			
+
 		    } else if ((view == GBGridView.LRN_COURSE) || (view == GBGridView.MON_USER)) {
 
 			GradebookUserLesson gbLesson = gradebookDAO.getGradebookUserDataForLesson(lesson.getLessonId(),
@@ -707,12 +731,24 @@ public class GradebookService implements IGradebookService {
 				lesson.getLessonId());
 			lessonRow.setStatus(getLessonStatusStr(learnerProgress));
 			if (learnerProgress != null) {
-			    if ((learnerProgress.getStartDate() != null) && (learnerProgress.getFinishDate() != null)) {
-				lessonRow.setTimeTaken(learnerProgress.getFinishDate().getTime()
-					- learnerProgress.getStartDate().getTime());
+			    Date startDate = learnerProgress.getStartDate();
+			    Date finishDate = learnerProgress.getFinishDate();
+			    
+			    if (startDate != null && finishDate != null) {
+				lessonRow.setTimeTaken(finishDate.getTime() - startDate.getTime());
 			    }
 
-			    lessonRow.setFinishDate(getLocaleDateString(user, learnerProgress.getFinishDate()));
+			    if ( startDate != null ) {
+				if ( userTimeZone != null )
+				    startDate = DateUtil.convertToTimeZoneFromDefault(userTimeZone, startDate);
+				lessonRow.setStartDate(startDate);
+			    }
+			    
+			    if ( learnerProgress.getFinishDate() != null ) {
+				if ( userTimeZone != null )
+					finishDate = DateUtil.convertToTimeZoneFromDefault(userTimeZone, finishDate);
+				lessonRow.setFinishDate(finishDate);
+			    }
 			}
 		    }
 
@@ -721,8 +757,6 @@ public class GradebookService implements IGradebookService {
 		    } else {
 			lessonRow.setSubGroup("");
 		    }
-
-		    lessonRow.setStartDate(getLocaleDateString(viewer, lesson.getStartDateTime()));
 
 		}
 	    }
@@ -843,7 +877,7 @@ public class GradebookService implements IGradebookService {
 	rowList.add(GradebookService.EMPTY_ROW);
 
 	// Adding the activity average data to the summary
-	List<GradebookGridRowDTO> activityRows = getGBActivityRowsForLesson(lesson.getLessonId());
+	List<GradebookGridRowDTO> activityRows = getGBActivityRowsForLesson(lesson.getLessonId(), null);
 	ExcelCell[] activityAverageTitle = new ExcelCell[1];
 	activityAverageTitle[0] = new ExcelCell(getMessage("gradebook.export.activities"), true);
 	rowList.add(activityAverageTitle);
@@ -875,7 +909,7 @@ public class GradebookService implements IGradebookService {
 	rowList.add(userMarksTitle);
 
 	// Fetching the user data
-	ArrayList<GBUserGridRowDTO> userRows = getGBUserRowsForLesson(lesson);
+	ArrayList<GBUserGridRowDTO> userRows = getGBUserRowsForLesson(lesson, null);
 
 	// Setting up the user marks table
 	ExcelCell[] userTitleRow = new ExcelCell[6];
@@ -1498,22 +1532,23 @@ public class GradebookService implements IGradebookService {
 	    }
 	} 
     }
-    /**
-     * Gets the internationalised date
-     *
-     * @param user
-     * @param date
-     * @return
-     */
-    private String getLocaleDateString(User user, Date date) {
-	if ((user == null) || (date == null)) {
-	    return null;
-	}
-
-	Locale locale = new Locale(user.getLocale().getLanguageIsoCode(), user.getLocale().getCountryIsoCode());
-	String dateStr = DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.MEDIUM, locale).format(date);
-	return dateStr;
-    }
+    // TODO Remove
+//    /**
+//     * Gets the internationalised date
+//     *
+//     * @param user
+//     * @param date
+//     * @return
+//     */
+//    private String getLocaleDateString(User user, Date date) {
+//	if ((user == null) || (date == null)) {
+//	    return null;
+//	}
+//
+//	Locale locale = new Locale(user.getLocale().getLanguageIsoCode(), user.getLocale().getCountryIsoCode());
+//	String dateStr = DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.MEDIUM, locale).format(date);
+//	return dateStr;
+//    }
 
     /**
      * Returns progress status as text message.
@@ -1600,7 +1635,7 @@ public class GradebookService implements IGradebookService {
      * @param timeZone
      * @return
      */
-    private Date getActivityStartDate(LearnerProgress learnerProgress, Activity activity, String timeZone) {
+    private Date getActivityStartDate(LearnerProgress learnerProgress, Activity activity, TimeZone timeZone) {
 	Date startDate = null;
 	if (learnerProgress != null) {
 	    startDate = learnerProgress.getAttemptedActivities().get(activity);
@@ -1613,28 +1648,27 @@ public class GradebookService implements IGradebookService {
 	}
 
 	if (startDate != null) {
-	    if (StringUtils.isBlank(timeZone)) {
+	    if (timeZone == null) {
 		GradebookService.logger.warn("No user time zone provided, leaving server default");
 	    } else {
 		if (GradebookService.logger.isTraceEnabled()) {
 		    GradebookService.logger.trace("Adjusting time according to zone \"" + timeZone + "\"");
 		}
-		TimeZone userTimeZone = TimeZone.getTimeZone(timeZone);
-		startDate = DateUtil.convertToTimeZoneFromDefault(userTimeZone, startDate);
+		startDate = DateUtil.convertToTimeZoneFromDefault(timeZone, startDate);
 	    }
 	}
 	return startDate;
     }
 
     /**
-     * Gets completed activity finish time ajusted to monitor time zone.
+     * Gets completed activity finish time adjusted to monitor time zone.
      *
      * @param learnerProgress
      * @param activity
      * @param timeZone
      * @return
      */
-    private Date getActivityFinishDate(LearnerProgress learnerProgress, Activity activity, String timeZone) {
+    private Date getActivityFinishDate(LearnerProgress learnerProgress, Activity activity, TimeZone timeZone) {
 	Date finishDate = null;
 	if (learnerProgress != null) {
 	    CompletedActivityProgress compProg = learnerProgress.getCompletedActivities().get(activity);
@@ -1644,14 +1678,13 @@ public class GradebookService implements IGradebookService {
 	}
 
 	if (finishDate != null) {
-	    if (StringUtils.isBlank(timeZone)) {
+	    if (timeZone == null) {
 		GradebookService.logger.warn("No user time zone provided, leaving server default");
 	    } else {
 		if (GradebookService.logger.isTraceEnabled()) {
 		    GradebookService.logger.trace("Adjusting time according to zone \"" + timeZone + "\"");
 		}
-		TimeZone userTimeZone = TimeZone.getTimeZone(timeZone);
-		finishDate = DateUtil.convertToTimeZoneFromDefault(userTimeZone, finishDate);
+		finishDate = DateUtil.convertToTimeZoneFromDefault(timeZone, finishDate);
 	    }
 	}
 	return finishDate;

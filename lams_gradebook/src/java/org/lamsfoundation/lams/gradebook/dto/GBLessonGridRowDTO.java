@@ -35,14 +35,14 @@ public class GBLessonGridRowDTO extends GradebookGridRowDTO {
     public static final String VIEW_LEARNER = "learnerView";
 
     private String subGroup;
-    private String startDate;
+    // private String startDate;  defined in GradebookGridRowDTO
 
     // Only for monitor view
     private String gradebookMonitorURL;
 
     // Only for learner view
     private String gradebookLearnerURL;
-    private String finishDate;
+    // private String finishDate;  defined in GradebookGridRowDTO
 
     public GBLessonGridRowDTO() {
     }
@@ -63,7 +63,7 @@ public class GBLessonGridRowDTO extends GradebookGridRowDTO {
 		ret.add(rowName);
 	    }
 	    ret.add(subGroup);
-	    ret.add(startDate);
+	    ret.add(startDate != null ? convertDateToString(startDate, null) : CELL_EMPTY);
 	    ret.add((medianTimeTaken != null && medianTimeTaken != 0) ? convertTimeToString(medianTimeTaken)
 		    : CELL_EMPTY);
 	    ret.add((averageMark != null) ? GradebookUtil.niceFormatting(averageMark) : CELL_EMPTY);
@@ -77,9 +77,9 @@ public class GBLessonGridRowDTO extends GradebookGridRowDTO {
 	    }
 	    ret.add(subGroup);
 	    ret.add((status != null) ? status : CELL_EMPTY);
+	    ret.add(startDate != null ? convertDateToString(startDate, null) : CELL_EMPTY);
+	    ret.add(finishDate != null ? convertDateToString(finishDate, null) : CELL_EMPTY);
 	    ret.add(feedback);
-	    ret.add((startDate != null) ? startDate : CELL_EMPTY);
-	    ret.add((finishDate != null) ? finishDate : CELL_EMPTY);
 	    ret.add((medianTimeTaken != null && medianTimeTaken != 0)
 		    ? toItalic(convertTimeToString(medianTimeTaken)) : CELL_EMPTY);
 	    ret.add((timeTaken != null) ? convertTimeToString(timeTaken) : CELL_EMPTY);
@@ -123,22 +123,6 @@ public class GBLessonGridRowDTO extends GradebookGridRowDTO {
 
     public void setSubGroup(String subGroup) {
 	this.subGroup = subGroup;
-    }
-
-    public String getStartDate() {
-	return startDate;
-    }
-
-    public void setStartDate(String startDate) {
-	this.startDate = startDate;
-    }
-
-    public String getFinishDate() {
-	return finishDate;
-    }
-
-    public void setFinishDate(String finishDate) {
-	this.finishDate = finishDate;
     }
 
 }

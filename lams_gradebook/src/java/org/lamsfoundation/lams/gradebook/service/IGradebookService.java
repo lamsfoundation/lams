@@ -26,6 +26,7 @@ package org.lamsfoundation.lams.gradebook.service;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.TimeZone;
 
 import org.lamsfoundation.lams.gradebook.GradebookUserActivity;
 import org.lamsfoundation.lams.gradebook.GradebookUserLesson;
@@ -49,7 +50,7 @@ public interface IGradebookService {
      * @param lesson
      * @return
      */
-    List<GradebookGridRowDTO> getGBActivityRowsForLesson(Long lessonId);
+    List<GradebookGridRowDTO> getGBActivityRowsForLesson(Long lessonId, TimeZone userTimezone);
 
     /**
      * Gets all the activity rows for a user, with the mark for the activity being the user's individual mark
@@ -58,7 +59,7 @@ public interface IGradebookService {
      * @param learner
      * @return
      */
-    List<GradebookGridRowDTO> getGBActivityRowsForLearner(Long lessonId, Integer userId);
+    List<GradebookGridRowDTO> getGBActivityRowsForLearner(Long lessonId, Integer userId, TimeZone userTimezone);
 
     /**
      * Gets the GBActivityDTO list for an activity, which provides the marks for all users in an activity
@@ -69,7 +70,7 @@ public interface IGradebookService {
      * @return
      */
     List<GBUserGridRowDTO> getGBUserRowsForActivity(Lesson lesson, ToolActivity activity, Long groupId, int page,
-	    int size, String sortBy, String sortOrder, String searchString);
+	    int size, String sortBy, String sortOrder, String searchString, TimeZone userTimezone);
 
     /**
      * Gets the user rows and the user's entire lesson mark for all users in a lesson
@@ -77,7 +78,7 @@ public interface IGradebookService {
      * @param lesson
      * @return
      */
-    List<GBUserGridRowDTO> getGBUserRowsForLesson(Lesson lesson);
+    List<GBUserGridRowDTO> getGBUserRowsForLesson(Lesson lesson, TimeZone userTimezone);
 
     /**
      * Gets the user rows containing only users' names. Do proper paging on DB side.
@@ -90,7 +91,7 @@ public interface IGradebookService {
      * @return
      */
     List<GBUserGridRowDTO> getGBUserRowsForLesson(Lesson lesson, int page, int size, String sortBy, String sortOrder,
-	    String searchString);
+	    String searchString, TimeZone userTimezone);
 
 //    /**
 //     * Gets the user rows containing only users' names. Do proper paging on DB side.
@@ -194,7 +195,7 @@ public interface IGradebookService {
      * @return
      */
     List<GBLessonGridRowDTO> getGBLessonRows(Organisation organisation, User user, User viewer, GBGridView view,
-	    int page, int size, String sortBy, String sortOrder, String searchString);
+	    int page, int size, String sortBy, String sortOrder, String searchString, TimeZone userTimeZone);
 
     /**
      * Gets a gradebook lesson mark/feedback for a given user and lesson

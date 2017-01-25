@@ -24,7 +24,6 @@
 package org.lamsfoundation.lams.gradebook.dto;
 
 import java.util.ArrayList;
-import java.util.Date;
 
 import org.apache.commons.lang.StringEscapeUtils;
 import org.lamsfoundation.lams.gradebook.util.GBGridView;
@@ -34,11 +33,11 @@ import org.lamsfoundation.lams.usermanagement.User;
 public class GBUserGridRowDTO extends GradebookGridRowDTO {
 
     // For activity view
-    private Date startDate;
+    // private Date startDate; defined in GradebookGridRowDTO
     private String activityUrl;
 
     // For excel export
-    private Date finishDate;
+    // private Date finishDate; defined in GradebookGridRowDTO
     private String firstName;
     private String lastName;
     private String login;
@@ -66,6 +65,8 @@ public class GBUserGridRowDTO extends GradebookGridRowDTO {
 	    ret.add(rowName);
 	    ret.add(status);
 	    ret.add((timeTaken != null) ? convertTimeToString(timeTaken) : CELL_EMPTY);
+	    ret.add(startDate != null ? convertDateToString(startDate, null) : CELL_EMPTY);
+	    ret.add(finishDate != null ? convertDateToString(finishDate, null) : CELL_EMPTY);
 	    ret.add(feedback);
 	    ret.add((mark != null) ? GradebookUtil.niceFormatting(mark) : CELL_EMPTY);
 
@@ -80,6 +81,8 @@ public class GBUserGridRowDTO extends GradebookGridRowDTO {
 	    }
 	    ret.add(status);
 	    ret.add((timeTaken != null) ? convertTimeToString(timeTaken) : CELL_EMPTY);
+	    ret.add(startDate != null ? convertDateToString(startDate, null) : CELL_EMPTY);
+	    ret.add(finishDate != null ? convertDateToString(finishDate, null) : CELL_EMPTY);
 	    ret.add(feedback);
 	    ret.add((mark != null) ? GradebookUtil.niceFormatting(mark) : CELL_EMPTY);
 
@@ -87,6 +90,8 @@ public class GBUserGridRowDTO extends GradebookGridRowDTO {
 	    ret.add(rowName);
 	    ret.add(status);
 	    ret.add((timeTaken != null) ? convertTimeToString(timeTaken) : CELL_EMPTY);
+	    ret.add(startDate != null ? convertDateToString(startDate, null) : CELL_EMPTY);
+	    ret.add(finishDate != null ? convertDateToString(finishDate, null) : CELL_EMPTY);
 	    ret.add(feedback);
 	    ret.add((mark != null) ? GradebookUtil.niceFormatting(mark) : CELL_EMPTY);
 
@@ -135,22 +140,6 @@ public class GBUserGridRowDTO extends GradebookGridRowDTO {
 
     public void setCurrentActivity(String currentActivity) {
 	this.currentActivity = currentActivity;
-    }
-
-    public Date getStartDate() {
-	return startDate;
-    }
-
-    public void setStartDate(Date startTime) {
-	this.startDate = startTime;
-    }
-
-    public Date getFinishDate() {
-	return finishDate;
-    }
-
-    public void setFinishDate(Date finishDate) {
-	this.finishDate = finishDate;
     }
 
 }
