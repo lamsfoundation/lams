@@ -51,16 +51,7 @@
 				
 				<c:if test="${finishedLock && assessment.allowQuestionFeedback}">
 	
-					<c:choose>
-	                	<c:when test="${option.grade <= 0}">
-	                    	<c:set var="color" scope="page" value="red" />
-	        			</c:when>
-						<c:otherwise>
-	                    	<c:set var="color" scope="page" value="blue" />
-	        			</c:otherwise>
-	        		</c:choose>
-	
-					<td style="padding:5px 10px 2px; font-style: italic; color:${color}; width=30%;">
+					<td width=30%;">
 						<c:if test="${option.answerBoolean}">
 							<c:out value="${option.feedback}" escapeXml="false" />
 						</c:if>
@@ -73,7 +64,7 @@
 </div>	
 
 <c:if test="${finishedLock && assessment.allowQuestionFeedback}">
-	<div class="question-feedback">
+	<div class="feedback">
 		<c:choose>
 			<c:when test="${question.answerTotalGrade >= 1}">
 				<c:out value="${question.feedbackOnCorrect}" escapeXml="false" />

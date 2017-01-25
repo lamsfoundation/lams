@@ -29,7 +29,7 @@
 </div>		
 
 <c:if test="${finishedLock && assessment.allowQuestionFeedback && (question.questionFeedback != null)}">
-	<div class="question-feedback">
+	<div class="feedback">
 		<c:out value="${question.questionFeedback}" escapeXml="false" />
 	</div>
 </c:if>	
