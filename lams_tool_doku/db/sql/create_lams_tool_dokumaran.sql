@@ -18,6 +18,7 @@ CREATE TABLE tl_ladoku11_dokumaran (
    show_line_numbers tinyint,
    shared_pad_id varchar(255),
    use_select_leader_tool_ouput tinyint,
+   allow_multiple_leaders tinyint,
    reflect_instructions TEXT, 
    reflect_on_activity smallint,
    primary key (uid)
@@ -63,8 +64,8 @@ ALTER TABLE tl_ladoku11_session ADD INDEX tl_ladoku11_session (group_leader_uid)
 
 INSERT INTO `tl_ladoku11_dokumaran` (`uid`, `create_date`, `update_date`, `create_by`, `title`, `lock_on_finished`,
  `instructions`, `content_in_use`, `define_later`, `content_id`, `show_chat`, 
- `show_line_numbers`, `shared_pad_id`, `use_select_leader_tool_ouput`,`reflect_on_activity`) VALUES
-  (1,NULL,NULL,NULL,'doKumaran','0','Instructions ',0,0,${default_content_id},0,0,NULL,0,0);
+ `show_line_numbers`, `shared_pad_id`, `use_select_leader_tool_ouput`, `allow_multiple_leaders`, `reflect_on_activity`) VALUES
+  (1,NULL,NULL,NULL,'doKumaran','0','Instructions ',0,0,${default_content_id},0,0,NULL,0,0,0);
   
 -- Inserting the required config item into the config table
 -- Etherpad API key is added so the Etherpad works there automatically for each build

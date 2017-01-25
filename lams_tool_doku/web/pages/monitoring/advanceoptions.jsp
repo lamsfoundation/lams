@@ -40,6 +40,23 @@
 	
 	<tr>
 		<td>
+			<fmt:message key="label.allow.multiple.leaders" />
+		</td>
+		
+		<td>
+			<c:choose>
+				<c:when test="${sessionMap.dokumaran.allowMultipleLeaders}">
+					<fmt:message key="label.on" />
+				</c:when>
+				<c:otherwise>
+					<fmt:message key="label.off" />
+				</c:otherwise>
+			</c:choose>	
+		</td>
+	</tr>
+	
+	<tr>
+		<td>
 			<fmt:message key="label.show.chat" />
 		</td>
 		

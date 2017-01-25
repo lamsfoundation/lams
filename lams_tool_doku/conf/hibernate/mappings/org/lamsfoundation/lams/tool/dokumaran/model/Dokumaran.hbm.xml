@@ -132,6 +132,14 @@
             insert="true"
             column="use_select_leader_tool_ouput"
         />
+        
+        <property
+            name="allowMultipleLeaders"
+            type="boolean"
+            update="true"
+            insert="true"
+            column="allow_multiple_leaders"
+        />
 
         <property
             name="reflectInstructions"

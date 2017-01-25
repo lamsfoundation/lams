@@ -142,11 +142,6 @@ public class DokumaranSession {
    public void setGroupLeader(DokumaranUser groupLeader) {
 	this.groupLeader = groupLeader;
    }
-
-   public boolean isUserGroupLeader(Long userUid) {
-	boolean isUserLeader = (this.groupLeader != null) && userUid.equals(this.groupLeader.getUid());
-	return isUserLeader;
-   }
    
    /**
     * @return Returns the etherpadReadOnlyId
