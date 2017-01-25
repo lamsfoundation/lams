@@ -453,7 +453,7 @@ function showGradebookCourseDialog(orgID){
 	showDialog(id, {
 		'orgID' : orgID,
 		'height': Math.max(380, Math.min(900, $(window).height() - 30)),
-		'width' : Math.max(380, Math.min(800, $(window).width() - 60)),
+		'width' : Math.max(380, Math.min(1024, $(window).width() - 60)),
 		'title' : LABELS.GRADEBOOK_COURSE_TITLE,
 		'open' : function() {
 			// load contents after opening the dialog
@@ -470,7 +470,7 @@ function showGradebookLessonDialog(lessonID){
 			'lessonID' : lessonID
 		},
 		'height': Math.max(380, Math.min(800, $(window).height() - 30)),
-		'width' : Math.max(380, Math.min(800, $(window).width() - 60)),
+		'width' : Math.max(380, Math.min(1024, $(window).width() - 60)),
 		'title' : LABELS.GRADEBOOK_LESSON_TITLE,
 		'open' : function() {
 			var lessonID = $(this).data('lessonID');
