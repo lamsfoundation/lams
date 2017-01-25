@@ -44,16 +44,7 @@
 				
 				<c:if test="${(finishedLock || question.responseSubmitted) && assessment.allowQuestionFeedback}">
 	
-					<c:choose>
-	                	<c:when test="${option.correct}">
-	                    	<c:set var="color" scope="page" value="red" />
-	        			</c:when>
-						<c:otherwise>
-	                    	<c:set var="color" scope="page" value="blue" />
-	        			</c:otherwise>
-	        		</c:choose>
-	
-					<td width="30%" style="padding:5px 10px 2px; font-style: italic; color:${color};">
+					<td width="30%">
 						<c:if test="${option.answerInt > 0}">
 							<c:out value="${option.feedback}" escapeXml="false" />
 						</c:if>
@@ -92,7 +83,7 @@
 
 <c:if test="${finishedLock || question.responseSubmitted}">
 	<c:if test="${assessment.allowQuestionFeedback}">
-		<div class="question-feedback">
+		<div class="feedback">
 			<c:choose>
 				<c:when test="${question.mark == question.grade}">
 					<c:out value="${question.feedbackOnCorrect}" escapeXml="false" />
@@ -108,7 +99,7 @@
 	</c:if>
 
 	<c:if test="${assessment.allowQuestionFeedback && (question.generalFeedback != null)}">
-		<div class="question-feedback">
+		<div class="feedback">
 			<c:out value="${question.generalFeedback}" escapeXml="false" />
 		</div>
 	</c:if>
