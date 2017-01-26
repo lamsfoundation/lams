@@ -149,7 +149,7 @@ public class LearningAction extends Action {
 	// support for leader select feature
 	List<DokumaranUser> leaders = dokumaran.isUseSelectLeaderToolOuput()
 		? service.checkLeaderSelectToolForSessionLeader(user, new Long(toolSessionId).longValue(), isFirstTimeAccess)
-		: null;
+		: new ArrayList<DokumaranUser>();
 	// forwards to the leaderSelection page
 	if (dokumaran.isUseSelectLeaderToolOuput() && leaders.isEmpty() && !mode.isTeacher()) {
 	
