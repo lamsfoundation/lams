@@ -32,6 +32,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.SortedMap;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.servlet.http.Cookie;
 
@@ -404,6 +406,31 @@ public class DokumaranService implements IDokumaranService, ToolContentManager, 
 	// DokumaranSession session = dokumaranSessionDao.getSessionBySessionId(toolSessionId);
 	// session.setStatus(DokumaranConstants.COMPLETED);
 	// dokumaranSessionDao.saveObject(session);
+	
+	//finish Etherpad session. Encapsulate it in try-catch block as we don't want it to affect regular LAMS workflow.
+	try {
+	    EPLiteClient client = initializeEPLiteClient();
+
+	    DokumaranSession session = dokumaranSessionDao.getSessionBySessionId(toolSessionId);
+	    String groupId = session.getEtherpadGroupId();
+
+	    String userName = user.getFirstName() + " " + user.getLastName();
+	    Map<String, String> map = client.createAuthorIfNotExistsFor(user.getUserId().toString(), userName);
+	    String authorId = map.get("authorID");
+
+	    // search for already existing user's session at Etherpad server
+	    Map sessionsMap = client.listSessionsOfAuthor(authorId);
+	    for (String sessionId : (Set<String>) sessionsMap.keySet()) {
+		Map<String, String> sessessionAttributes = (Map<String, String>) sessionsMap.get(sessionId);
+		String groupIdIter = sessessionAttributes.get("groupID");
+		if (groupIdIter.equals(groupId)) {
+		    client.deleteSession(sessionId);
+		    break;
+		}
+	    }
+	} catch (DokumaranConfigurationException e1) {
+	    log.debug(e1.getMessage());
+	}
 
 	String nextUrl = null;
 	try {
@@ -840,19 +867,7 @@ public class DokumaranService implements IDokumaranService, ToolContentManager, 
 	    userSessionId = (String) map2.get("sessionID");
 	}
 
-	DokumaranConfigItem etherpadServerUrlConfig = getConfigItem(DokumaranConfigItem.KEY_ETHERPAD_URL);
-	String etherpadServerUrl = etherpadServerUrlConfig.getConfigValue();
-	URI uri = new URI(etherpadServerUrl);
-	String domain = uri.getHost();
-
-	Cookie etherpadSessionCookie = new Cookie("sessionID", userSessionId);
-	etherpadSessionCookie.setDomain(domain);
-	// A negative value means that the cookie is not stored persistently and will be deleted when the Web browser
-	// exits. A zero value causes the cookie to be deleted.
-	etherpadSessionCookie.setMaxAge(-1);
-	etherpadSessionCookie.setPath("/");
-
-	return etherpadSessionCookie;
+	return createEtherpadCookie(userSessionId);
     }
 
     @Override
@@ -874,8 +889,8 @@ public class DokumaranService implements IDokumaranService, ToolContentManager, 
 
 	// in case sharedPadId is present - all sessions will share the same padId - and thus show only one pad
 	Dokumaran dokumaran = getDokumaranByContentId(contentId);
-	if (StringUtils.isEmpty(dokumaran.getSharedPadId())) {
-	    sessionList = sessionList.subList(0, 0);
+	if (dokumaran.isSharedPadEnabled()) {
+	    sessionList = sessionList.subList(0, 1);
 	}
 
 	// find according session
@@ -903,19 +918,34 @@ public class DokumaranService implements IDokumaranService, ToolContentManager, 
 	    etherpadSessionIds += StringUtils.isEmpty(etherpadSessionIds) ? userSessionId : "," + userSessionId;
 	}
 
+	return createEtherpadCookie(etherpadSessionIds);
+    }
+    
+    /**
+     * Constructs cookie to be stored at a clientside browser.
+     * 
+     * @param etherpadSessionIds
+     * @return
+     * @throws URISyntaxException
+     */
+    private Cookie createEtherpadCookie(String etherpadSessionIds) throws URISyntaxException {
 	DokumaranConfigItem etherpadServerUrlConfig = getConfigItem(DokumaranConfigItem.KEY_ETHERPAD_URL);
 	String etherpadServerUrl = etherpadServerUrlConfig.getConfigValue();
 	URI uri = new URI(etherpadServerUrl);
-	String domain = uri.getHost();
+	//regex to get the top level part of a domain
+        Pattern p = Pattern.compile("^(?:\\w+://)?[^:?#/\\s]*?([^.\\s]+\\.(?:[a-z]{2,}|co\\.uk|org\\.uk|ac\\.uk|edu\\.au|org\\.au|com\\.au|edu\\.sg|com\\.sg|net\\.sg|org\\.sg|gov\\.sg|per\\.sg))(?:[:?#/]|$)");
+	// eg: uri.getHost() will return "www.foo.com"
+	Matcher m = p.matcher(uri.getHost());
+	String topLevelDomain = m.matches() ? m.group(1) : uri.getHost();
 
 	Cookie etherpadSessionCookie = new Cookie("sessionID", etherpadSessionIds);
-	etherpadSessionCookie.setDomain(domain);
+	etherpadSessionCookie.setDomain(topLevelDomain);
 	// A negative value means that the cookie is not stored persistently and will be deleted when the Web browser
 	// exits. A zero value causes the cookie to be deleted.
 	etherpadSessionCookie.setMaxAge(-1);
 	etherpadSessionCookie.setPath("/");
 
-	return etherpadSessionCookie;
+	return etherpadSessionCookie;	
     }
 
     @Override

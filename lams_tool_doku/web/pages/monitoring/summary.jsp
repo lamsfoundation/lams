@@ -24,7 +24,7 @@
 			});
 			
 		</c:forEach>
-		
+
 	});
 
 </script>
@@ -64,6 +64,23 @@
         <div id="collapse${groupSummary.sessionId}" class="panel-collapse collapse in" role="tabpanel" aria-labelledby="heading${groupSummary.sessionId}">
 	</c:if>
 
+	<div class="btn-group btn-group-xs pull-right">
+
+	<c:url  var="timesliderUrl" value="${etherpadServerUrl}/p/${groupSummary.padId}/timeslider"/>
+	<a href="javascript:;" onclick="launchPopup('${timesliderUrl}','timeslider')" class="btn btn-default btn-sm "
+			title="<fmt:message key="label.timeslider" />">
+		<i class="fa fa-lg fa-clock-o"></i>
+		<fmt:message key="label.timeslider" />
+	</a>
+	
+	<c:url  var="exportHtmlUrl" value="${etherpadServerUrl}/p/${groupSummary.padId}/export/html"/>
+	<a href="javascript:;" onclick="window.location = '${exportHtmlUrl}';" class="btn btn-default btn-sm " 
+			title="<fmt:message key="label.export.pad.html" />">
+		<i class="fa fa-lg fa-file-text-o"></i>
+		<fmt:message key="label.export.pad.html" />
+	</a>
+	</div>	
+			
 	<div id="etherpad-container-${groupSummary.sessionId}"></div>
 	
 	<c:if test="${sessionMap.isGroupedActivity}">
@@ -83,3 +100,25 @@
 </c:if>
 
 <%@ include file="advanceoptions.jsp"%>
+
+<c:if test="${not empty faultySessions}">
+	<c:set var="adTitle"><fmt:message key="label.manage.faulty.pads" /></c:set>
+	<lams:AdvancedAccordian title="${adTitle}">
+	      
+		<table class="table table-striped table-condensed">
+		
+			<c:forEach var="faultySession" items="${faultySessions}">
+				<tr>
+					<td>
+						${faultySession.sessionName}
+					</td>
+					
+					<td>
+						
+					</td>
+				</tr>
+			</c:forEach>
+			
+		</table>
+	</lams:AdvancedAccordian>
+</c:if>

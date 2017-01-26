@@ -5,6 +5,12 @@
 <lams:html>
 	<lams:head>
 		<%@ include file="/common/tabbedheader.jsp" %>
+		<style type="text/css">
+			.btn-group.btn-group-xs {
+				padding-bottom: 3px;
+			}
+		</style>
+		
 		<script>
 			var initialTabId = "${initialTabId}";
 	
