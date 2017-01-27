@@ -466,13 +466,12 @@
 			</div>
 
 			<div id="datesNotShown"  style="display:none">
-				<a href="javascript:toggleLessonDates()"><fmt:message key="gradebook.monitor.show" /></a> <fmt:message key="gradebook.monitor.learner.lesson.dates" /><br />
+				<a class="pull-right label label-primary" href="javascript:toggleLessonDates()"><fmt:message key="gradebook.monitor.show.dates" /></a><br>
 			</div>
 
 			<div id="datesShown">
-				<a href="javascript:toggleLessonDates()"><fmt:message key="gradebook.monitor.releasemarks.2" /></a> <fmt:message key="gradebook.monitor.learner.lesson.dates" /><br />
-			</div>
-			
+				<a class="pull-right label label-primary" href="javascript:toggleLessonDates()"><fmt:message key="gradebook.monitor.hide.dates" /></a><br>
+			</div>			
 					
 			<div class="grid-holder voffset20">
 				<table id="organisationGrid" class="scroll"></table>
