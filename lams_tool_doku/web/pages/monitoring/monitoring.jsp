@@ -6,9 +6,21 @@
 	<lams:head>
 		<%@ include file="/common/tabbedheader.jsp" %>
 		<style type="text/css">
-			.btn-group.btn-group-xs {
-				padding-bottom: 3px;
+			.panel-collapse > .btn-group.btn-group-xs {
+				margin-top: -33px;
 			}
+			.btn-group.btn-group-xs {
+				background-color: #f5f5f5; 
+				padding: 5px;
+			}
+			.faulty-pad-container {
+				margin: 5px 10px;
+			}
+			.faulty-pad-container a{
+				margin-left: 10px;
+			}
+			
+			    margin-top: -33px;
 		</style>
 		
 		<script>

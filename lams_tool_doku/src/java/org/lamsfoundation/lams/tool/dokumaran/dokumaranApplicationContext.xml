@@ -59,9 +59,6 @@
         <property name="dokumaranToolContentHandler">
             <ref bean="dokumaranToolContentHandler"/>
         </property>
-        <property name="repositoryService">
-            <ref bean="repositoryService"/>
-        </property>
    		<property name="toolService">
    			<ref bean="lamsToolService"/>
    		</property>

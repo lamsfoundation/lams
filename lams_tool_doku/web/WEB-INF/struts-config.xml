@@ -131,6 +131,10 @@
 			<forward name="notconfigured" path="/pages/learning/notconfigured.jsp" />
 			<forward name="success" path="/pages/monitoring/monitoring.jsp" />
 		</action>
+		<action path="/monitoring/fixFaultySession"
+			type="org.lamsfoundation.lams.tool.dokumaran.web.action.MonitoringAction"
+			parameter="fixFaultySession" >
+		</action>
 	    <action
 	      path="/ladoku11admin"
 	      type="org.lamsfoundation.lams.tool.dokumaran.web.action.AdminAction"

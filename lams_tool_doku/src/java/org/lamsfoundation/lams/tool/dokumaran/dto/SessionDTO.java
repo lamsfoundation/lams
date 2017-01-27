@@ -28,6 +28,7 @@ public class SessionDTO {
     private Long sessionId;
     private String sessionName;
     private String padId;
+    private boolean sessionFaulty;
 
     public Long getSessionId() {
 	return sessionId;
@@ -51,5 +52,13 @@ public class SessionDTO {
 
     public void setPadId(String padId) {
 	this.padId = padId;
+    }
+    
+    public boolean isSessionFaulty() {
+	return sessionFaulty;
+    }
+
+    public void setSessionFaulty(boolean sessionFaulty) {
+	this.sessionFaulty = sessionFaulty;
     }
 }
