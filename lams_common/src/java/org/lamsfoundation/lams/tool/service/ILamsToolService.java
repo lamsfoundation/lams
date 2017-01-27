@@ -102,6 +102,15 @@ public interface ILamsToolService {
      * @return
      */
     Long getLeaderUserId(Long toolSessionId, Integer learnerId);
+    
+    /**
+     * Returns all leaders available in the nearest leader selection tool (that is all leaders in all sessions).
+     * 
+     * @param toolSessionId
+     * @param learnerId
+     * @return
+     */
+    Set<Long> getAllLeaderUserIds(Long toolSessionId, Integer learnerId);
 
     /**
      * Returns leaders' userIds for all tool sessions from the given Leader Selection Tool.
