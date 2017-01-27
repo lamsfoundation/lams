@@ -237,6 +237,23 @@ public class LamsToolService implements ILamsToolService {
 
 	return leaderUserId;
     }
+    
+    @Override
+    public Set<Long> getAllLeaderUserIds(Long toolSessionId, Integer learnerId) {
+	Set<Long> leaderUserIds = null;
+
+	ToolSession toolSession = this.getToolSession(toolSessionId);
+	ToolActivity specifiedActivity = toolSession.getToolActivity();
+	Activity leaderSelectionActivity = getNearestLeaderSelectionActivity(specifiedActivity, learnerId,
+		toolSession.getLesson().getLessonId());
+	
+	// check if there is leaderSelectionTool available
+	if (leaderSelectionActivity != null) {
+	    leaderUserIds = getLeaderUserId(leaderSelectionActivity.getActivityId());
+	}
+	
+	return leaderUserIds;
+    }
 
     @Override
     @SuppressWarnings("unchecked")
