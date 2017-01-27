@@ -41,14 +41,6 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.apache.tomcat.util.json.JSONException;
 import org.apache.tomcat.util.json.JSONObject;
-import org.lamsfoundation.lams.contentrepository.AccessDeniedException;
-import org.lamsfoundation.lams.contentrepository.ICredentials;
-import org.lamsfoundation.lams.contentrepository.ITicket;
-import org.lamsfoundation.lams.contentrepository.IVersionedNode;
-import org.lamsfoundation.lams.contentrepository.LoginException;
-import org.lamsfoundation.lams.contentrepository.WorkspaceNotFoundException;
-import org.lamsfoundation.lams.contentrepository.service.IRepositoryService;
-import org.lamsfoundation.lams.contentrepository.service.SimpleCredentials;
 import org.lamsfoundation.lams.learning.service.ILearnerService;
 import org.lamsfoundation.lams.learningdesign.service.ExportToolContentException;
 import org.lamsfoundation.lams.learningdesign.service.IExportToolContentService;
@@ -83,7 +75,6 @@ import org.lamsfoundation.lams.tool.service.ILamsToolService;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
-import org.lamsfoundation.lams.util.HashUtil;
 import org.lamsfoundation.lams.util.JsonUtil;
 import org.lamsfoundation.lams.util.MessageService;
 import org.lamsfoundation.lams.util.audit.IAuditService;
@@ -111,7 +102,6 @@ public class DokumaranService implements IDokumaranService, ToolContentManager, 
     private MessageService messageService;
 
     // system services
-    private IRepositoryService repositoryService;
 
     private ILamsToolService toolService;
 
@@ -132,70 +122,6 @@ public class DokumaranService implements IDokumaranService, ToolContentManager, 
     // *******************************************************************************
     // Service method
     // *******************************************************************************
-    /**
-     * Try to get the file. If forceLogin = false and an access denied exception occurs, call this method again to get a
-     * new ticket and retry file lookup. If forceLogin = true and it then fails then throw exception.
-     *
-     * @param uuid
-     * @param versionId
-     * @param relativePath
-     * @param attemptCount
-     * @return file node
-     * @throws ImscpApplicationException
-     */
-    private IVersionedNode getFile(Long uuid, Long versionId, String relativePath)
-	    throws DokumaranApplicationException {
-
-	ITicket tic = getRepositoryLoginTicket();
-
-	try {
-
-	    return repositoryService.getFileItem(tic, uuid, versionId, relativePath);
-
-	} catch (AccessDeniedException e) {
-
-	    String error = "Unable to access repository to get file uuid " + uuid + " version id " + versionId
-		    + " path " + relativePath + ".";
-
-	    error = error + "AccessDeniedException: " + e.getMessage() + " Unable to retry further.";
-	    DokumaranService.log.error(error);
-	    throw new DokumaranApplicationException(error, e);
-
-	} catch (Exception e) {
-
-	    String error = "Unable to access repository to get file uuid " + uuid + " version id " + versionId
-		    + " path " + relativePath + "." + " Exception: " + e.getMessage();
-	    DokumaranService.log.error(error);
-	    throw new DokumaranApplicationException(error, e);
-
-	}
-    }
-
-    /**
-     * This method verifies the credentials of the Dokumaran Tool and gives it the <code>Ticket</code> to login and
-     * access the Content Repository.
-     *
-     * A valid ticket is needed in order to access the content from the repository. This method would be called evertime
-     * the tool needs to upload/download files from the content repository.
-     *
-     * @return ITicket The ticket for repostory access
-     * @throws DokumaranApplicationException
-     */
-    private ITicket getRepositoryLoginTicket() throws DokumaranApplicationException {
-	ICredentials credentials = new SimpleCredentials(dokumaranToolContentHandler.getRepositoryUser(),
-		dokumaranToolContentHandler.getRepositoryId());
-	try {
-	    ITicket ticket = repositoryService.login(credentials,
-		    dokumaranToolContentHandler.getRepositoryWorkspaceName());
-	    return ticket;
-	} catch (AccessDeniedException ae) {
-	    throw new DokumaranApplicationException("Access Denied to repository." + ae.getMessage());
-	} catch (WorkspaceNotFoundException we) {
-	    throw new DokumaranApplicationException("Workspace not found." + we.getMessage());
-	} catch (LoginException e) {
-	    throw new DokumaranApplicationException("Login failed." + e.getMessage());
-	}
-    }
 
     @Override
     public Dokumaran getDokumaranByContentId(Long contentId) {
@@ -459,6 +385,11 @@ public class DokumaranService implements IDokumaranService, ToolContentManager, 
 
 	    String padId = session.getPadId();
 	    group.setPadId(padId);
+	    
+	    //mark all session that has had problems with pad initializations so that they could be fixed in monitoring by a teacher
+	    if (StringUtils.isEmpty(session.getEtherpadReadOnlyId()) || StringUtils.isEmpty(session.getEtherpadGroupId())) {
+		group.setSessionFaulty(true);
+	    }
 
 	    groupList.add(group);
 	}
@@ -754,78 +685,81 @@ public class DokumaranService implements IDokumaranService, ToolContentManager, 
 	session.setDokumaran(dokumaran);
 	dokumaranSessionDao.saveObject(session);
 
-	// //create pad in a new thread so it doesn't affect session creation operation
-	// Thread t = new Thread(
-	// new CreatePadThread(this, toolSessionId, dokumaran.getInstructions()));
-	// t.start();
-
+	//create pad in a try-catch block so it doesn't affect session creation operation
 	try {
-	    String groupIdentifier = DokumaranConstants.PREFIX_REGULAR_GROUP + toolSessionId;
-
-	    // in case sharedPadId is present - all sessions will share the same padId
-	    if (dokumaran.isSharedPadEnabled()) {
-
-		// find existing pad in any of the sessions associated with this toolContentId
-		List<DokumaranSession> sessions = dokumaranSessionDao.getByContentId(toolContentId);
-		DokumaranSession sessionWithAlreadyCreatedPad = null;
-		for (DokumaranSession sessionIter : sessions) {
-		    if (StringUtils.isNotBlank(session.getEtherpadGroupId())) {
-			sessionWithAlreadyCreatedPad = sessionIter;
-			break;
-		    }
-		}
-
-		if (sessionWithAlreadyCreatedPad == null) {
-		    ToolSession toolSession = toolService.getToolSession(toolSessionId);
-		    Long lessonId = toolSession.getLesson().getLessonId();
-		    groupIdentifier = DokumaranConstants.PREFIX_SHARED_GROUP + dokumaran.getSharedPadId() + lessonId;
-
-		} else {
-		    session.setEtherpadGroupId(sessionWithAlreadyCreatedPad.getEtherpadGroupId());
-		    session.setEtherpadReadOnlyId(sessionWithAlreadyCreatedPad.getEtherpadReadOnlyId());
-		    dokumaranSessionDao.saveObject(session);
-		    return;
-		}
-	    }
-
-	    EPLiteClient client = initializeEPLiteClient();
-
-	    // create Etherpad Group assossiated with this session
-	    Map map = client.createGroupIfNotExistsFor(groupIdentifier);
-	    String groupId = (String) map.get("groupID");
-	    session.setEtherpadGroupId(groupId);
-	    String padId = session.getPadId();
-
-	    boolean isPadAlreadyCreated = false;
-	    try {
-		client.createGroupPad(groupId, DokumaranConstants.DEFAULT_PAD_NAME);
-	    } catch (EPLiteException e) {
-		// allow recreating existing pads
-		if ("padName does already exist".equals(e.getMessage())) {
-		    isPadAlreadyCreated = true;
-		//throw exception in all other cases
-		} else {
-		    throw e;
-		}
-	    }
-
-	    // set initial content
-	    if (!dokumaran.isSharedPadEnabled() || !isPadAlreadyCreated) {
-		String etherpadHtml = "<html><body>"
-			+ dokumaran.getInstructions().replaceAll("[\n\r\f]", "").replaceAll("&nbsp;", "")
-			+ "</body></html>";
-		client.setHTML(padId, etherpadHtml);
-	    }
-
-	    // gets read-only id
-	    String etherpadReadOnlyId = (String) client.getReadOnlyID(padId).get("readOnlyID");
-	    session.setEtherpadReadOnlyId(etherpadReadOnlyId);
-
-	    dokumaranSessionDao.saveObject(session);
+	    createPad(dokumaran, session);
 	} catch (Exception e) {
 	    log.warn(e.getMessage(), e);
 	}
 
+    }
+    
+    @Override
+    public void createPad(Dokumaran dokumaran, DokumaranSession session) throws DokumaranConfigurationException {
+	Long toolSessionId = session.getSessionId();
+	Long toolContentId = dokumaran.getContentId();
+	String groupIdentifier = DokumaranConstants.PREFIX_REGULAR_GROUP + toolSessionId;
+
+	// in case sharedPadId is present - all sessions will share the same padId
+	if (dokumaran.isSharedPadEnabled()) {
+
+	    // find existing pad in any of the sessions associated with this toolContentId
+	    List<DokumaranSession> sessions = dokumaranSessionDao.getByContentId(toolContentId);
+	    DokumaranSession sessionWithAlreadyCreatedPad = null;
+	    for (DokumaranSession sessionIter : sessions) {
+		if (StringUtils.isNotBlank(session.getEtherpadGroupId())) {
+		    sessionWithAlreadyCreatedPad = sessionIter;
+		    break;
+		}
+	    }
+
+	    if (sessionWithAlreadyCreatedPad == null) {
+		ToolSession toolSession = toolService.getToolSession(toolSessionId);
+		Long lessonId = toolSession.getLesson().getLessonId();
+		groupIdentifier = DokumaranConstants.PREFIX_SHARED_GROUP + dokumaran.getSharedPadId() + lessonId;
+
+	    } else {
+		session.setEtherpadGroupId(sessionWithAlreadyCreatedPad.getEtherpadGroupId());
+		session.setEtherpadReadOnlyId(sessionWithAlreadyCreatedPad.getEtherpadReadOnlyId());
+		dokumaranSessionDao.saveObject(session);
+		return;
+	    }
+	}
+
+	EPLiteClient client = initializeEPLiteClient();
+
+	// create Etherpad Group assossiated with this session
+	Map map = client.createGroupIfNotExistsFor(groupIdentifier);
+	String groupId = (String) map.get("groupID");
+	session.setEtherpadGroupId(groupId);
+	String padId = session.getPadId();
+
+	boolean isPadAlreadyCreated = false;
+	try {
+	    client.createGroupPad(groupId, DokumaranConstants.DEFAULT_PAD_NAME);
+	} catch (EPLiteException e) {
+	    // allow recreating existing pads
+	    if ("padName does already exist".equals(e.getMessage())) {
+		isPadAlreadyCreated = true;
+		// throw exception in all other cases
+	    } else {
+		throw e;
+	    }
+	}
+
+	// set initial content
+	if (!dokumaran.isSharedPadEnabled() || !isPadAlreadyCreated) {
+	    String etherpadHtml = "<html><body>"
+		    + dokumaran.getInstructions().replaceAll("[\n\r\f]", "").replaceAll("&nbsp;", "")
+		    + "</body></html>";
+	    client.setHTML(padId, etherpadHtml);
+	}
+
+	// gets read-only id
+	String etherpadReadOnlyId = (String) client.getReadOnlyID(padId).get("readOnlyID");
+	session.setEtherpadReadOnlyId(etherpadReadOnlyId);
+
+	dokumaranSessionDao.saveObject(session);
     }
 
     @Override
@@ -897,6 +831,11 @@ public class DokumaranService implements IDokumaranService, ToolContentManager, 
 	String etherpadSessionIds = "";
 	for (DokumaranSession session : sessionList) {
 	    String groupId = session.getEtherpadGroupId();
+	    
+	    //skip sessions that has had problems with pad initializations so that they could be fixed in monitoring by a teacher
+	    if (StringUtils.isEmpty(session.getEtherpadReadOnlyId()) || StringUtils.isEmpty(groupId)) {
+		continue;
+	    }
 
 	    // search for already existing user's session
 	    String userSessionId = null;
@@ -965,24 +904,6 @@ public class DokumaranService implements IDokumaranService, ToolContentManager, 
 	    String etherpadServerUrl = etherpadServerUrlConfig.getConfigValue();
 	    String etherpadApiKey = etherpadApiKeyConfig.getConfigValue();
 	    client = new EPLiteClient(etherpadServerUrl, etherpadApiKey);
-
-	    // // get the API key from the config table and create EPLiteClient using it
-	    // DokumaranConfigItem lamsServerUrlConfig = getConfigItem(ConfigurationKeys.SERVER_URL);
-	    // DokumaranConfigItem etherpadApiKeyConfig = getConfigItem(DokumaranConfigItem.KEY_API_KEY);
-	    // if (etherpadApiKeyConfig == null || etherpadApiKeyConfig.getConfigValue() == null
-	    // || lamsServerUrlConfig == null || lamsServerUrlConfig.getConfigValue() == null) {
-	    // throw new DokumaranConfigurationException("Dokumaran settings are not configured. apiKeyConfig=" +
-	    // etherpadApiKeyConfig
-	    // + " etherpadServerUrlConfig=" + lamsServerUrlConfig + " Please seek help from your administrator");
-	    // }
-	    //
-	    // // create EPLiteClient
-	    // String lamsServerUrl = lamsServerUrlConfig.getConfigValue();
-	    // URI uri = new URI(url);
-	    // String domain = uri.getHost();
-	    // String etherpadServerUrl = lamsServerUrlConfig.getConfigValue();
-	    // String etherpadApiKey = etherpadApiKeyConfig.getConfigValue();
-	    // client = new EPLiteClient(etherpadServerUrl, etherpadApiKey);
 	}
 	return client;
     }
@@ -1066,10 +987,6 @@ public class DokumaranService implements IDokumaranService, ToolContentManager, 
 
     public void setMessageService(MessageService messageService) {
 	this.messageService = messageService;
-    }
-
-    public void setRepositoryService(IRepositoryService repositoryService) {
-	this.repositoryService = repositoryService;
     }
 
     public void setDokumaranDao(DokumaranDAO dokumaranDao) {

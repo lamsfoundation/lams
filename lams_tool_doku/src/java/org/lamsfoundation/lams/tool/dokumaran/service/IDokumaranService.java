@@ -115,6 +115,15 @@ public interface IDokumaranService {
      * @throws DokumaranConfigurationException
      */
     EPLiteClient initializeEPLiteClient() throws DokumaranConfigurationException;
+    
+    /**
+     * Creates pad on Etherpad server side.
+     * 
+     * @param dokumaran
+     * @param session
+     * @throws DokumaranConfigurationException 
+     */
+    void createPad(Dokumaran dokumaran, DokumaranSession session) throws DokumaranConfigurationException;
 
     // ********** for user methods *************
     /**

@@ -32,11 +32,9 @@ import org.lamsfoundation.lams.contentrepository.client.ToolContentHandler;
  */
 public class DokumaranToolContentHandler extends ToolContentHandler {
 
-    private static String repositoryWorkspaceName = "shareddokumaranworkspace";
-    private static String repositoryUser = "shareddokumaran";
-    //shareddokumaran
-    private static char[] repositoryId = { 'l', 'a', 'm', 's', '-', 's', 'h', 'a', 'r', 'e', 'd', 'r', 'e', 's', 'o',
-	    'u', 'r', 'c', 'e', 's' };
+    private static String repositoryWorkspaceName = "dokumaranworkspace";
+    private static String repositoryUser = "dokumaran";
+    private static char[] repositoryId = { 'l', 'a', 'm', 's', '-', 'd', 'o', 'k', 'u', 'm', 'a', 'r', 'a', 'n' };
 
     /**
      *
@@ -45,31 +43,16 @@ public class DokumaranToolContentHandler extends ToolContentHandler {
 	super();
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.lamsfoundation.lams.contentrepository.client.ToolContentHandler#getRepositoryWorkspaceName()
-     */
     @Override
     public String getRepositoryWorkspaceName() {
 	return repositoryWorkspaceName;
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.lamsfoundation.lams.contentrepository.client.ToolContentHandler#getRepositoryUser()
-     */
     @Override
     public String getRepositoryUser() {
 	return repositoryUser;
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.lamsfoundation.lams.contentrepository.client.ToolContentHandler#getRepositoryId()
-     */
     @Override
     public char[] getRepositoryId() {
 	return repositoryId;
