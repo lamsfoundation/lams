@@ -202,7 +202,7 @@ public class LearnerProgressDAO extends LAMSBaseDAO implements ILearnerProgressD
 	if (!StringUtils.isBlank(searchPhrase)) {
 	    String[] tokens = searchPhrase.trim().split("\\s+");
 	    for (String token : tokens) {
-		queryText.append(" AND (u.firstName LIKE '%").append(token).append("%' OR u.lastName LIKE '%")
+		queryText.append(" AND (u.first_name LIKE '%").append(token).append("%' OR u.last_name LIKE '%")
 			.append(token).append("%' OR u.login LIKE '%").append(token).append("%')");
 	    }
 	}
