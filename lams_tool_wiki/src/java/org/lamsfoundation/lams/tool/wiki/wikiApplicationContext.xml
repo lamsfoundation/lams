@@ -32,6 +32,7 @@
 		   		<property name="eventNotificationService"><ref bean="eventNotificationService"/></property> 
 		   		<property name="messageService"><ref bean="wikiMessageService"/></property>
 		   		<property name="lessonService"><ref bean="lessonService"/></property>
+		   		<property name="wikiOutputFactory"><ref bean="wikiOutputFactory"/></property>
 			</bean>
 		</property>
 		<property name="transactionAttributes">
@@ -54,6 +55,11 @@
 			</props>
 		</property>
 	</bean>
+	
+	<!-- OutputFactory -->
+	<bean id="wikiOutputFactory" class="org.lamsfoundation.lams.tool.wiki.service.WikiOutputFactory">  
+    	<property name="toolMessageService"><ref bean="wikiMessageService"/></property>  
+	</bean> 
 	
 	<!--  DAO classes -->
 	<bean id="wikiDAO" class="org.lamsfoundation.lams.tool.wiki.dao.hibernate.WikiDAO">
