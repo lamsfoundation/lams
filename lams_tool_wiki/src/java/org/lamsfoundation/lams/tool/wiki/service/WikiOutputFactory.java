@@ -38,10 +38,10 @@ import org.lamsfoundation.lams.tool.exception.ToolException;
 public class WikiOutputFactory extends OutputFactory {
 
     /** The number of edit the learner has made in one wiki activity. */
-    protected final static String OUTPUT_NAME_LEARNER_NUM_EDITS = "output.learner.number.of.edits";
+    protected final static String OUTPUT_NAME_LEARNER_NUM_EDITS = "number.of.edits";
 
     /** The number of wiki pages added by the learner. */
-    protected final static String OUTPUT_NAME_LEARNER_NUM_ADDS = "output.learner.number.of.adds";
+    protected final static String OUTPUT_NAME_LEARNER_NUM_ADDS = "number.of.add";
 
     /**
      * @see org.lamsfoundation.lams.tool.OutputDefinitionFactory#getToolOutputDefinitions(java.lang.Object)

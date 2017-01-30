@@ -967,10 +967,6 @@ public class WikiService implements ToolSessionManager, ToolContentManager, IWik
     }
 
     public WikiOutputFactory getWikiOutputFactory() {
-
-	if (wikiOutputFactory == null) {
-	    wikiOutputFactory = new WikiOutputFactory();
-	}
 	return wikiOutputFactory;
     }
 
