@@ -1,4 +1,4 @@
-﻿﻿/**
+﻿﻿﻿/**
  * This file contains methods for Activity properties dialogs.
  */
 
@@ -1547,7 +1547,7 @@ PropertyLib = {
 			optionsFound = true;
 			
 			var option = $('<option />')
-						   .text(this.name + ' ' + LABELS.RANGE_OUTPUT_SUFFIX)
+						   .text(this.description + ' ' + LABELS.RANGE_OUTPUT_SUFFIX)
 						   .val(this.name)
 						   .appendTo(gradebookDropdown);
 			
