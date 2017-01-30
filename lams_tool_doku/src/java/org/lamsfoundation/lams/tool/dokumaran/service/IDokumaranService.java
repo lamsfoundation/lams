@@ -103,7 +103,7 @@ public interface IDokumaranService {
      */
     boolean isLeaderResponseFinalized(Long toolSessionId);
     
-    Cookie createEtherpadCookieForLearner(DokumaranUser user, DokumaranSession session) throws DokumaranConfigurationException, URISyntaxException;
+    Cookie createEtherpadCookieForLearner(DokumaranUser user, DokumaranSession session) throws DokumaranConfigurationException, URISyntaxException, DokumaranApplicationException;
     
     Cookie createEtherpadCookieForMonitor(UserDTO user, Long contentId) throws DokumaranConfigurationException, URISyntaxException;
     

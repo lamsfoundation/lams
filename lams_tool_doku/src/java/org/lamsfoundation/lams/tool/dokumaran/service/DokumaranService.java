@@ -354,7 +354,7 @@ public class DokumaranService implements IDokumaranService, ToolContentManager, 
 		    break;
 		}
 	    }
-	} catch (DokumaranConfigurationException e1) {
+	} catch (Exception e1) {
 	    log.debug(e1.getMessage());
 	}
 
@@ -775,33 +775,26 @@ public class DokumaranService implements IDokumaranService, ToolContentManager, 
 
     @Override
     public Cookie createEtherpadCookieForLearner(DokumaranUser user, DokumaranSession session)
-	    throws DokumaranConfigurationException, URISyntaxException {
+	    throws DokumaranConfigurationException, URISyntaxException, DokumaranApplicationException {
+	String groupId = session.getEtherpadGroupId();
+	
+	//don't allow sessions that has had problems with pad initializations. they could be fixed in monitoring by a teacher
+	if (StringUtils.isEmpty(session.getEtherpadReadOnlyId()) || StringUtils.isEmpty(groupId)) {
+	    throw new DokumaranApplicationException(
+		    "This session has had problems with initialization. Please seek help from your teacher.");
+	}
 
 	EPLiteClient client = initializeEPLiteClient();
-	String groupId = session.getEtherpadGroupId();
 
 	String userName = user.getFirstName() + " " + user.getLastName();
 	Map<String, String> map = client.createAuthorIfNotExistsFor(user.getUserId().toString(), userName);
 	String authorId = map.get("authorID");
 
 	// search for already existing user's session at Etherpad server
-	Map sessionsMap = client.listSessionsOfAuthor(authorId);
-	String userSessionId = null;
-	for (String sessionId : (Set<String>) sessionsMap.keySet()) {
-	    Map<String, String> sessessionAttributes = (Map<String, String>) sessionsMap.get(sessionId);
-	    String groupIdIter = sessessionAttributes.get("groupID");
-	    if (groupIdIter.equals(groupId)) {
-		userSessionId = sessionId;
-	    }
-	}
+	Map etherpadSessions = client.listSessionsOfAuthor(authorId);
+	String etherpadSessionId = getEtherpadSession(authorId, groupId, etherpadSessions);
 
-	// if session doesn't exist yet - create it
-	if (userSessionId == null) {
-	    Map<String, String> map2 = client.createSession(groupId, authorId, 24);
-	    userSessionId = (String) map2.get("sessionID");
-	}
-
-	return createEtherpadCookie(userSessionId);
+	return createEtherpadCookie(etherpadSessionId);
     }
 
     @Override
@@ -813,8 +806,6 @@ public class DokumaranService implements IDokumaranService, ToolContentManager, 
 	String userName = user.getFirstName() + " " + user.getLastName();
 	Map<String, String> map = client.createAuthorIfNotExistsFor(user.getUserID().toString(), userName);
 	String authorId = map.get("authorID");
-
-	Map etherpadSessions = client.listSessionsOfAuthor(authorId);
 
 	List<DokumaranSession> sessionList = dokumaranSessionDao.getByContentId(contentId);
 	if (sessionList.isEmpty()) {
@@ -829,6 +820,7 @@ public class DokumaranService implements IDokumaranService, ToolContentManager, 
 
 	// find according session
 	String etherpadSessionIds = "";
+	Map etherpadSessions = client.listSessionsOfAuthor(authorId);
 	for (DokumaranSession session : sessionList) {
 	    String groupId = session.getEtherpadGroupId();
 	    
@@ -837,27 +829,52 @@ public class DokumaranService implements IDokumaranService, ToolContentManager, 
 		continue;
 	    }
 
-	    // search for already existing user's session
-	    String userSessionId = null;
-	    for (String etherpadSessionId : (Set<String>) etherpadSessions.keySet()) {
-		Map<String, String> sessessionAttributes = (Map<String, String>) etherpadSessions
-			.get(etherpadSessionId);
-		String groupIdIter = sessessionAttributes.get("groupID");
-		if (groupIdIter.equals(groupId)) {
-		    userSessionId = etherpadSessionId;
-		}
-	    }
-
-	    // if session doesn't exist yet - create it
-	    if (userSessionId == null) {
-		Map map2 = client.createSession(groupId, authorId, 24);
-		userSessionId = (String) map2.get("sessionID");
-	    }
-
-	    etherpadSessionIds += StringUtils.isEmpty(etherpadSessionIds) ? userSessionId : "," + userSessionId;
+	    String etherpadSessionId = getEtherpadSession(authorId, groupId, etherpadSessions);
+	    etherpadSessionIds += StringUtils.isEmpty(etherpadSessionIds) ? etherpadSessionId : "," + etherpadSessionId;
 	}
 
 	return createEtherpadCookie(etherpadSessionIds);
+    }
+    
+    /**
+     * Returns valid Etherpad session. Returns existing one if finds such one and creates the new one otherwise
+     */
+    private String getEtherpadSession(String authorId, String etherpadGroupId, Map etherpadSessions) {
+	String etherpadSessionId = null;
+	
+	// search for already existing user's session
+	boolean isValidForMoreThan1Hour = false;
+	for (String etherpadSessionIdIter : (Set<String>) etherpadSessions.keySet()) {
+	    Map<String, Object> sessessionAttributes = (Map<String, Object>) etherpadSessions
+		    .get(etherpadSessionIdIter);
+	    String groupIdIter = (String) sessessionAttributes.get("groupID");
+	    if (groupIdIter.equals(etherpadGroupId)) {
+
+		// check session expiration date
+		long validUntil = (Long) sessessionAttributes.get("validUntil") * 1000;
+		long now = System.currentTimeMillis();
+		isValidForMoreThan1Hour = ((validUntil - now) > 0) && ((validUntil - now) >= 60 * 60 * 1000);
+
+		//use existing session if it's valid for more than 1 hour
+		if (isValidForMoreThan1Hour) {
+		    etherpadSessionId = etherpadSessionIdIter;
+		    break;
+		
+		} else {
+		    // can't delete expired sessions as Etherpad throws an exception. Nonetheless it returns expired
+		    // ones when client.listSessionsOfAuthor(authorId) is requested
+		}
+	    }
+
+	}
+
+	// if session with validity of more than 1 hour doesn't exist yet  - create it
+	if (etherpadSessionId == null) {
+	    Map map2 = client.createSession(etherpadGroupId, authorId, 24);
+	    etherpadSessionId = (String) map2.get("sessionID");
+	}
+
+	return etherpadSessionId;
     }
     
     /**
