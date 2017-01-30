@@ -78,7 +78,7 @@ public class LearningAction extends Action {
 
     @Override
     public ActionForward execute(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws IOException, ServletException, JSONException, DokumaranConfigurationException, URISyntaxException {
+	    HttpServletResponse response) throws IOException, ServletException, JSONException, DokumaranConfigurationException, URISyntaxException, DokumaranApplicationException {
 
 	String param = mapping.getParameter();
 	// -----------------------Dokumaran Learner function ---------------------------
@@ -113,7 +113,7 @@ public class LearningAction extends Action {
      *
      */
     private ActionForward start(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws DokumaranConfigurationException, URISyntaxException {
+	    HttpServletResponse response) throws DokumaranConfigurationException, DokumaranApplicationException, URISyntaxException {
 
 	// initial Session Map
 	SessionMap<String, Object> sessionMap = new SessionMap<String, Object>();
