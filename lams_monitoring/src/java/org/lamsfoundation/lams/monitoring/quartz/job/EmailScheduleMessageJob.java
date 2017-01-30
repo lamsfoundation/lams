@@ -49,6 +49,7 @@ public class EmailScheduleMessageJob extends MonitoringJob {
     // ---------------------------------------------------------------------
     private static Logger log = Logger.getLogger(EmailScheduleMessageJob.class);
 
+    @SuppressWarnings("rawtypes")
     @Override
     protected void executeInternal(JobExecutionContext context) throws JobExecutionException {
 	IMonitoringService monitoringService = getMonitoringService(context);
@@ -64,20 +65,22 @@ public class EmailScheduleMessageJob extends MonitoringJob {
 	Long activityId = (Long) properties.get(AttributeNames.PARAM_ACTIVITY_ID);
 	Integer xDaystoFinish = (Integer) properties.get("daysToDeadline");
 	String[] lessonIds = (String[]) properties.get("lessonIDs");
-	
-	HibernateSessionManager.openSession();
-	Collection<User> users = getMonitoringService(context).getUsersByEmailNotificationSearchType(searchType,
-		lessonId, lessonIds, activityId, xDaystoFinish, orgId);
-	for (User user : users) {
-	    boolean isHtmlFormat = false;
-	    int userId = user.getUserId();
-	    log.debug("Sending scheduled email to user [" + userId + "].");
-	    eventNotificationService.sendMessage(null,
-		    userId, IEventNotificationService.DELIVERY_METHOD_MAIL, monitoringService.getMessageService()
-			    .getMessage("event.emailnotifications.email.subject", new Object[] {}),
-		    emailBody, isHtmlFormat);
+	try {
+	    HibernateSessionManager.openSession();
+	    Collection<User> users = getMonitoringService(context).getUsersByEmailNotificationSearchType(searchType,
+		    lessonId, lessonIds, activityId, xDaystoFinish, orgId);
+	    for (User user : users) {
+		boolean isHtmlFormat = false;
+		int userId = user.getUserId();
+		log.debug("Sending scheduled email to user [" + userId + "].");
+		eventNotificationService.sendMessage(null, userId,
+			IEventNotificationService.DELIVERY_METHOD_MAIL, monitoringService.getMessageService()
+				.getMessage("event.emailnotifications.email.subject", new Object[] {}),
+			emailBody, isHtmlFormat);
+	    }
+	} finally {
+	    HibernateSessionManager.closeSession();
 	}
-	HibernateSessionManager.closeSession();
     }
 
     private IEventNotificationService getEventNotificationService(JobExecutionContext context)

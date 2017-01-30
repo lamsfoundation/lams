@@ -48,9 +48,9 @@ public class LearningWebsocketServer {
 	public void run() {
 
 	    while (!stopFlag) {
-		// websocket communication bypasses standard HTTP filters, so Hibernate session needs to be initialised manually
-		HibernateSessionManager.openSession();
 		try {
+		    // websocket communication bypasses standard HTTP filters, so Hibernate session needs to be initialised manually
+		    HibernateSessionManager.openSession();
 		    // synchronize websockets as a new Learner entering the activity could modify this collection
 		    synchronized (LearningWebsocketServer.websockets) {
 			Iterator<Entry<Long, Set<Session>>> entryIterator = LearningWebsocketServer.websockets
