@@ -219,22 +219,25 @@ public class EventNotificationService implements IEventNotificationService {
 	}
 	// create a new thread to send the messages as it can take some time
 	new Thread(() -> {
-	    HibernateSessionManager.openSession();
+	    try {
+		HibernateSessionManager.openSession();
 
-	    Event event = null;
-	    for (Integer id : toUserIds) {
-		String result = deliveryMethod.send(fromUserId, id, subject, message, isHtmlFormat);
-		if (result != null) {
-		    event = new Event(IEventNotificationService.SINGLE_MESSAGE_SCOPE,
-			    String.valueOf(System.currentTimeMillis()), null, subject, message, isHtmlFormat);
-		    subscribe(event, id, deliveryMethod);
+		Event event = null;
+		for (Integer id : toUserIds) {
+		    String result = deliveryMethod.send(fromUserId, id, subject, message, isHtmlFormat);
+		    if (result != null) {
+			event = new Event(IEventNotificationService.SINGLE_MESSAGE_SCOPE,
+				String.valueOf(System.currentTimeMillis()), null, subject, message, isHtmlFormat);
+			subscribe(event, id, deliveryMethod);
+		    }
 		}
+		if (event != null) {
+		    event.setFailTime(new Date());
+		    eventDAO.insertOrUpdate(event);
+		}
+	    } finally {
+		HibernateSessionManager.closeSession();
 	    }
-	    if (event != null) {
-		event.setFailTime(new Date());
-		eventDAO.insertOrUpdate(event);
-	    }
-	    HibernateSessionManager.closeSession();
 	}).start();
     }
 
@@ -328,42 +331,44 @@ public class EventNotificationService implements IEventNotificationService {
 
 	// create a new thread to send the messages as it can take some time
 	new Thread(() -> {
-	    HibernateSessionManager.openSession();
+	    try {
+		HibernateSessionManager.openSession();
 
-	    Event eventFailCopy = null;
-	    Iterator<Subscription> subscriptionIterator = event.getSubscriptions().iterator();
-	    while (subscriptionIterator.hasNext()) {
-		Subscription subscription = subscriptionIterator.next();
-		notifyUser(subscription, subjectToSend, messageToSend, event.isHtmlFormat());
-		if (subscription.getDeliveryMethod().lastOperationFailed(subscription)) {
-		    if (event.getFailTime() != null) {
-			subscriptionIterator.remove();
+		Event eventFailCopy = null;
+		Iterator<Subscription> subscriptionIterator = event.getSubscriptions().iterator();
+		while (subscriptionIterator.hasNext()) {
+		    Subscription subscription = subscriptionIterator.next();
+		    notifyUser(subscription, subjectToSend, messageToSend, event.isHtmlFormat());
+		    if (subscription.getDeliveryMethod().lastOperationFailed(subscription)) {
+			if (event.getFailTime() != null) {
+			    subscriptionIterator.remove();
+			}
+		    } else if (event.getFailTime() == null) {
+			if (eventFailCopy == null) {
+			    eventFailCopy = (Event) event.clone();
+			}
+			subscribe(eventFailCopy, subscription.getUserId(), subscription.getDeliveryMethod());
 		    }
-		} else if (event.getFailTime() == null) {
-		    if (eventFailCopy == null) {
-			eventFailCopy = (Event) event.clone();
-		    }
-		    subscribe(eventFailCopy, subscription.getUserId(), subscription.getDeliveryMethod());
 		}
-	    }
-	    if (event.getSubscriptions().isEmpty()) {
-		eventDAO.delete(event);
-	    } else {
-		eventDAO.insertOrUpdate(event);
-	    }
+		if (event.getSubscriptions().isEmpty()) {
+		    eventDAO.delete(event);
+		} else {
+		    eventDAO.insertOrUpdate(event);
+		}
 
-	    /*
-	     * if any of the notifications failed,
-	     * a copy of the event is created in order to repeat the attempt later
-	     */
-	    if (eventFailCopy != null) {
-		eventFailCopy.setFailTime(new Date());
-		eventFailCopy.setSubject(subjectToSend);
-		eventFailCopy.setMessage(messageToSend);
-		eventDAO.insertOrUpdate(eventFailCopy);
+		/*
+		 * if any of the notifications failed,
+		 * a copy of the event is created in order to repeat the attempt later
+		 */
+		if (eventFailCopy != null) {
+		    eventFailCopy.setFailTime(new Date());
+		    eventFailCopy.setSubject(subjectToSend);
+		    eventFailCopy.setMessage(messageToSend);
+		    eventDAO.insertOrUpdate(eventFailCopy);
+		}
+	    } finally {
+		HibernateSessionManager.closeSession();
 	    }
-
-	    HibernateSessionManager.closeSession();
 	}).start();
     }
 

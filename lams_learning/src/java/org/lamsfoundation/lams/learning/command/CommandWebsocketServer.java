@@ -46,9 +46,9 @@ public class CommandWebsocketServer {
 
 	@Override
 	public void run() {
-	    // websocket communication bypasses standard HTTP filters, so Hibernate session needs to be initialised manually
-	    HibernateSessionManager.openSession();
 	    while (!stopFlag) {
+		// websocket communication bypasses standard HTTP filters, so Hibernate session needs to be initialised manually
+		HibernateSessionManager.openSession();
 		try {
 		    // synchronize websockets as a new Learner entering Learner interface could modify this collection
 		    Iterator<Entry<Long, Map<String, Session>>> entryIterator = null;
@@ -83,15 +83,19 @@ public class CommandWebsocketServer {
 		    } while (entry != null);
 
 		    Thread.sleep(SendWorker.CHECK_INTERVAL);
-		} catch (InterruptedException e) {
-		    CommandWebsocketServer.log.warn("Stopping Command Websocket Server worker thread");
-		    stopFlag = true;
 		} catch (Exception e) {
 		    // error caught, but carry on
 		    CommandWebsocketServer.log.error("Error in Command Websocket Server worker thread", e);
+		} finally {
+		    HibernateSessionManager.closeSession();
+		    try {
+			Thread.sleep(SendWorker.CHECK_INTERVAL);
+		    } catch (InterruptedException e) {
+			log.warn("Stopping Command Websocket worker thread");
+			stopFlag = true;
+		    }
 		}
 	    }
-	    HibernateSessionManager.closeSession();
 	}
 
 	/**

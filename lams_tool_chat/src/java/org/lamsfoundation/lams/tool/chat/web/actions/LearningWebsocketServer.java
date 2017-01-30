@@ -75,10 +75,9 @@ public class LearningWebsocketServer {
 	@Override
 	public void run() {
 	    while (!stopFlag) {
-		// websocket communication bypasses standard HTTP filters, so Hibernate session needs to be initialised manually
-		HibernateSessionManager.openSession();
-
 		try {
+		    // websocket communication bypasses standard HTTP filters, so Hibernate session needs to be initialised manually
+		    HibernateSessionManager.openSession();
 		    // synchronize websockets as a new Learner entering Chat could modify this collection
 		    synchronized (LearningWebsocketServer.websockets) {
 			Iterator<Entry<Long, Set<Websocket>>> entryIterator = LearningWebsocketServer.websockets
@@ -253,20 +252,23 @@ public class LearningWebsocketServer {
 
 	String userName = session.getUserPrincipal().getName();
 	new Thread(() -> {
-	    // websocket communication bypasses standard HTTP filters, so Hibernate session needs to be initialised manually
-	    HibernateSessionManager.openSession();
-	    ChatUser chatUser = LearningWebsocketServer.getChatService().getUserByLoginNameAndSessionId(userName,
-		    toolSessionId);
-	    Websocket websocket = new Websocket(session, chatUser.getNickname());
-	    finalSessionWebsockets.add(websocket);
+	    try {
+		// websocket communication bypasses standard HTTP filters, so Hibernate session needs to be initialised manually
+		HibernateSessionManager.openSession();
+		ChatUser chatUser = LearningWebsocketServer.getChatService().getUserByLoginNameAndSessionId(userName,
+			toolSessionId);
+		Websocket websocket = new Websocket(session, chatUser.getNickname());
+		finalSessionWebsockets.add(websocket);
 
-	    // update the chat window immediatelly
-	    LearningWebsocketServer.sendWorker.send(toolSessionId);
-	    HibernateSessionManager.closeSession();
+		// update the chat window immediatelly
+		LearningWebsocketServer.sendWorker.send(toolSessionId);
 
-	    if (LearningWebsocketServer.log.isDebugEnabled()) {
-		LearningWebsocketServer.log
-			.debug("User " + userName + " entered Chat with toolSessionId: " + toolSessionId);
+		if (LearningWebsocketServer.log.isDebugEnabled()) {
+		    LearningWebsocketServer.log
+			    .debug("User " + userName + " entered Chat with toolSessionId: " + toolSessionId);
+		}
+	    } finally {
+		HibernateSessionManager.closeSession();
 	    }
 	}).start();
     }
@@ -347,10 +349,10 @@ public class LearningWebsocketServer {
 		chatMessage.setSendDate(new Date());
 		chatMessage.setHidden(Boolean.FALSE);
 		LearningWebsocketServer.getChatService().saveOrUpdateChatMessage(chatMessage);
-
-		HibernateSessionManager.closeSession();
 	    } catch (Exception e) {
 		log.error("Error in thread", e);
+	    } finally {
+		HibernateSessionManager.closeSession();
 	    }
 	}).start();
     }
