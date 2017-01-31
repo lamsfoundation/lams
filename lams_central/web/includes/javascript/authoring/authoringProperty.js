@@ -1,4 +1,4 @@
-﻿﻿﻿/**
+﻿﻿﻿﻿/**
  * This file contains methods for Activity properties dialogs.
  */
 
@@ -1049,6 +1049,10 @@ PropertyLib = {
 								case 'OUTPUT_LONG' :
 									suffix = LABELS.RANGE_OUTPUT_SUFFIX;
 									break;
+									
+								case 'OUTPUT_BOOLEAN' :
+									suffix = LABELS.BOOLEAN_OUTPUT_SUFFIX;
+									break;
 							};
 			
 							this.toolActivityUIID = activity.input.uiid;
@@ -1541,13 +1545,24 @@ PropertyLib = {
 			gradebookDropdown = $('.propertiesContentFieldGradebook', activity.propertiesContent).empty().append(emptyOption);
 		// build output dropdown and bind data to each option
 		$.each(activity.outputDefinitions,function(){
-			if (this.type != 'OUTPUT_LONG') {
+			if (this.type != 'OUTPUT_LONG' && this.type != 'OUTPUT_BOOLEAN') {
 				return true;
 			}
 			optionsFound = true;
 			
+			var suffix = '';
+			switch(this.type) {
+				case 'OUTPUT_BOOLEAN' :
+					suffix = LABELS.BOOLEAN_OUTPUT_SUFFIX;
+					break;
+                                                            
+				case 'OUTPUT_LONG' :
+					suffix = LABELS.RANGE_OUTPUT_SUFFIX;
+					break;
+			};
+			
 			var option = $('<option />')
-						   .text(this.description + ' ' + LABELS.RANGE_OUTPUT_SUFFIX)
+						   .text(this.description + ' ' + suffix)
 						   .val(this.name)
 						   .appendTo(gradebookDropdown);
 			
