@@ -227,6 +227,8 @@
 				COMPLEX_OUTPUT_SUFFIX : '<c:out value="${COMPLEX_OUTPUT_SUFFIX_VAR}" />',
 				<fmt:message key="authoring.fla.range.output.suffix" var="RANGE_OUTPUT_SUFFIX_VAR"/>
 				RANGE_OUTPUT_SUFFIX : '<c:out value="${RANGE_OUTPUT_SUFFIX_VAR}" />',
+				<fmt:message key="authoring.fla.boolean.output.suffix" var="BOOLEAN_OUTPUT_SUFFIX_VAR"/>
+				BOOLEAN_OUTPUT_SUFFIX : '<c:out value="${BOOLEAN_OUTPUT_SUFFIX_VAR}" />',
 				<fmt:message key="authoring.fla.range.condition.description" var="RANGE_CONDITION_DESCRIPTION_VAR"/>
 				RANGE_CONDITION_DESCRIPTION : '<c:out value="${RANGE_CONDITION_DESCRIPTION_VAR}" />',
 				<fmt:message key="authoring.fla.exact.condition.description" var="EXACT_CONDITION_DESCRIPTION_VAR"/>
