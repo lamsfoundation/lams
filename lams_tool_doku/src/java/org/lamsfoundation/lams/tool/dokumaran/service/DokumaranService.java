@@ -892,7 +892,7 @@ public class DokumaranService implements IDokumaranService, ToolContentManager, 
         Pattern p = Pattern.compile("^(?:\\w+://)?[^:?#/\\s]*?([^.\\s]+\\.(?:[a-z]{2,}|co\\.uk|org\\.uk|ac\\.uk|edu\\.au|org\\.au|com\\.au|edu\\.sg|com\\.sg|net\\.sg|org\\.sg|gov\\.sg|per\\.sg))(?:[:?#/]|$)");
 	// eg: uri.getHost() will return "www.foo.com"
 	Matcher m = p.matcher(uri.getHost());
-	String topLevelDomain = m.matches() ? m.group(1) : uri.getHost();
+	String topLevelDomain = m.matches() ? "." + m.group(1) : uri.getHost();
 
 	Cookie etherpadSessionCookie = new Cookie("sessionID", etherpadSessionIds);
 	etherpadSessionCookie.setDomain(topLevelDomain);
