@@ -51,6 +51,9 @@
 		    			},
 		    			hasOptionFilled: {
 		    				required: function(element) {
+		    					$("input[name^='optionFloat']").each(function() {
+		    						$(this).attr("value", this.value);
+		    					});
 		    		        	return $("input[name^=optionFloat][value!='0.0']").length < 1;
 			    		    }			    		    
 	    			    },
