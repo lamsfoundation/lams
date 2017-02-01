@@ -675,10 +675,10 @@ public class AssessmentServiceImpl
 		    pattern = Pattern.compile(regexWithOnlyAsteriskSymbolActive,
 			    java.util.regex.Pattern.CASE_INSENSITIVE | java.util.regex.Pattern.UNICODE_CASE);
 		}
-		boolean isAnswerCorrect = (question.getAnswerString() != null)
+		boolean isAnswerMatchedCurrentOption = (question.getAnswerString() != null)
 			? pattern.matcher(question.getAnswerString().trim()).matches() : false;
 
-		if (isAnswerCorrect) {
+		if (isAnswerMatchedCurrentOption) {
 		    mark = option.getGrade() * maxMark;
 		    questionResult.setSubmittedOptionUid(option.getUid());
 		    break;
@@ -689,15 +689,15 @@ public class AssessmentServiceImpl
 	    String answerString = question.getAnswerString();
 	    if (answerString != null) {
 		for (AssessmentQuestionOption option : question.getOptions()) {
-		    boolean isAnswerCorrect = false;
+		    boolean isAnswerMatchedCurrentOption = false;
 		    try {
 			float answerFloat = Float.valueOf(question.getAnswerString());
-			isAnswerCorrect = ((answerFloat >= (option.getOptionFloat() - option.getAcceptedError()))
+			isAnswerMatchedCurrentOption = ((answerFloat >= (option.getOptionFloat() - option.getAcceptedError()))
 				&& (answerFloat <= (option.getOptionFloat() + option.getAcceptedError())));
 		    } catch (Exception e) {
 		    }
 
-		    if (!isAnswerCorrect) {
+		    if (!isAnswerMatchedCurrentOption) {
 			for (AssessmentUnit unit : question.getUnits()) {
 			    String regex = ".*" + unit.getUnit() + "$";
 			    Pattern pattern = Pattern.compile(regex,
@@ -708,10 +708,10 @@ public class AssessmentServiceImpl
 				try {
 				    float answerFloat = Float.valueOf(answerFloatStr);
 				    answerFloat = answerFloat / unit.getMultiplier();
-				    isAnswerCorrect = ((answerFloat >= (option.getOptionFloat()
+				    isAnswerMatchedCurrentOption = ((answerFloat >= (option.getOptionFloat()
 					    - option.getAcceptedError()))
 					    && (answerFloat <= (option.getOptionFloat() + option.getAcceptedError())));
-				    if (isAnswerCorrect) {
+				    if (isAnswerMatchedCurrentOption) {
 					break;
 				    }
 				} catch (Exception e) {
@@ -719,7 +719,7 @@ public class AssessmentServiceImpl
 			    }
 			}
 		    }
-		    if (isAnswerCorrect) {
+		    if (isAnswerMatchedCurrentOption) {
 			mark = option.getGrade() * maxMark;
 			questionResult.setSubmittedOptionUid(option.getUid());
 			break;
