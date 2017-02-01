@@ -20,10 +20,21 @@
  */
 package org.lamsfoundation.lams.integration.security;
 
+import io.undertow.Handlers;
+import io.undertow.server.HttpServerExchange;
+import io.undertow.server.session.Session;
+import io.undertow.servlet.ServletExtension;
+import io.undertow.servlet.api.DeploymentInfo;
+import io.undertow.servlet.handlers.ServletRequestContext;
+import io.undertow.servlet.spec.HttpSessionImpl;
+import io.undertow.util.Headers;
+
+import java.io.IOException;
 import java.security.AccessController;
 import java.util.Date;
 
 import javax.servlet.ServletContext;
+import javax.servlet.ServletException;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -44,13 +55,6 @@ import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 
 import com.warrenstrange.googleauth.GoogleAuthenticator;
-
-import io.undertow.Handlers;
-import io.undertow.server.session.Session;
-import io.undertow.servlet.ServletExtension;
-import io.undertow.servlet.api.DeploymentInfo;
-import io.undertow.servlet.handlers.ServletRequestContext;
-import io.undertow.servlet.spec.HttpSessionImpl;
 
 /**
  * Allows access to LAMS WARs when an user logs in.
@@ -98,19 +102,19 @@ public class SsoHandler implements ServletExtension {
 		String login = request.getParameter("j_username");
 		User user = null;
 		if (StringUtils.isBlank(login)) {
-		    response.sendRedirect("/lams/login.jsp?failed=true");
+		    serveLoginPage(exchange, "/login.jsp?failed=true");
 		    return;
 		}
 		user = getUserManagementService(session.getServletContext()).getUserByLogin(login);
 		if (user == null) {
-		    response.sendRedirect("/lams/login.jsp?failed=true");
+		    serveLoginPage(exchange, "/login.jsp?failed=true");
 		    return;
 		}
 		UserDTO userDTO = user.getUserDTO();
 		String password = request.getParameter("j_password");
 		if (user.getLockOutTime() != null && user.getLockOutTime().getTime() > System.currentTimeMillis()
 			&& password != null && !password.startsWith("#LAMS")) {
-		    response.sendRedirect("/lams/login.jsp?lockedOut=true");
+		    serveLoginPage(exchange, "/login.jsp?lockedOut=true");
 		    return;
 		}
 
@@ -210,6 +214,29 @@ public class SsoHandler implements ServletExtension {
 		SessionManager.endSession();
 	    });
 	});
+    }
+
+    /**
+     * Forward to the login page with a specific error message. Avoids a redirect. Based on the
+     * ServletFormAuthenticationMechanism method. The location should be relative to the current
+     * context and start with "/" e.g. /login.jsp
+     * 
+     * @throws IOException
+     * @throws ServletException
+     */
+    protected Integer serveLoginPage(final HttpServerExchange exchange, final String location) throws ServletException,
+	    IOException {
+
+	ServletRequestContext context = exchange.getAttachment(ServletRequestContext.ATTACHMENT_KEY);
+	HttpServletRequest request = (HttpServletRequest) context.getServletRequest();
+	HttpServletResponse response = (HttpServletResponse) context.getServletResponse();
+
+	exchange.getResponseHeaders().add(Headers.CACHE_CONTROL, "no-cache, no-store, must-revalidate");
+	exchange.getResponseHeaders().add(Headers.PRAGMA, "no-cache");
+	exchange.getResponseHeaders().add(Headers.EXPIRES, "0");
+
+	request.getRequestDispatcher(location).forward(request, response);
+	return null;
     }
 
     /**
