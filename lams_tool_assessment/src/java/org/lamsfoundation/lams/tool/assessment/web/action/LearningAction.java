@@ -1024,7 +1024,13 @@ public class LearningAction extends Action {
 			//required for showing right/wrong answers icons on results page correctly
 			if (question.getType() == AssessmentConstants.QUESTION_TYPE_SHORT_ANSWER
 				|| question.getType() == AssessmentConstants.QUESTION_TYPE_NUMERICAL) {
-			    boolean isAnsweredCorrectly = questionResult.getSubmittedOptionUid() != null;
+			    boolean isAnsweredCorrectly = false;
+			    for (AssessmentQuestionOption option : question.getOptions()) {
+				if (option.getUid().equals(questionResult.getSubmittedOptionUid())) {
+				    isAnsweredCorrectly = option.getGrade() > 0;
+				    break;
+				}
+			    }
 			    question.setAnswerBoolean(isAnsweredCorrectly);
 			}
 
