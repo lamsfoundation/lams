@@ -646,7 +646,8 @@
 			<div class="space-bottom-top align-right">
 				<c:choose>
 					<c:when	test="${not finishedLock && hasEditRight}">					
-						<html:button property="submitAll" onclick="return submitAll(false);" 
+						<html:button property="submitAll"
+								onclick="javascript:$(this).prop('disabled',true);return submitAll(false);" 
 								styleClass="btn btn-primary voffset10 pull-right na">
 							<fmt:message key="label.learning.submit.all" />
 						</html:button>	
@@ -672,8 +673,9 @@
 									</html:button>
 								</c:when>
 								<c:otherwise>
-									<html:link href="#nogo" property="FinishButton" onclick="return finishSession()" 
-											styleClass="btn btn-primary voffset10 pull-right na">
+									<button name="FinishButton"
+											onClick="$(this).prop('disabled',true);return finishSession()"
+											class="btn btn-primary voffset10 pull-right na">
 										<span class="nextActivity">
 											<c:choose>
 							 					<c:when test="${sessionMap.activityPosition.last}">
@@ -684,7 +686,7 @@
 							 					</c:otherwise>
 							 				</c:choose>
 		 								</span>
-									</html:link>
+									</button>
 								</c:otherwise>
 							</c:choose>
 						</c:if>
