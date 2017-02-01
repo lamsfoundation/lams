@@ -21,7 +21,6 @@
  * ****************************************************************
  */
 
-
 package org.lamsfoundation.lams.monitoring.web;
 
 import java.io.IOException;
@@ -29,6 +28,7 @@ import java.util.Calendar;
 import java.util.Collection;
 import java.util.GregorianCalendar;
 import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 import java.util.TimeZone;
@@ -37,6 +37,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
@@ -216,8 +217,15 @@ public class GateAction extends LamsDispatchAction {
 
 	DynaActionForm gateForm = (DynaActionForm) form;
 	Long gateIdLong = (Long) gateForm.get(GateAction.ACTIVITY_FORM_FIELD);
-	Integer userId = (Integer) gateForm.get(GateAction.USER_ID);
-	GateActivity gate = monitoringService.openGateForSingleUser(gateIdLong, userId);
+	String userId = (String) gateForm.get(GateAction.USER_ID);
+	String[] userIdsString = userId.split(",");
+	List<Integer> userIds = new LinkedList<Integer>();
+	for (String userIdString : userIdsString) {
+	    if (StringUtils.isNotBlank(userIdString)) {
+		userIds.add(Integer.valueOf(userIdString));
+	    }
+	}
+	GateActivity gate = monitoringService.openGateForSingleUser(gateIdLong, userIds.toArray(new Integer[] {}));
 	return findViewByGateType(mapping, gateForm, gate);
     }
 

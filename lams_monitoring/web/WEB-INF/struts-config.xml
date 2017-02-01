@@ -24,7 +24,7 @@
 	<form-property name="waitingLearnerList" type="java.util.Collection" />
 	<form-property name="forbiddenLearnerList" type="java.util.Collection" />
 	<form-property name="allowedToPassLearnerList" type="java.util.Collection" />
-	<form-property name="userId" type="java.lang.Integer" />
+	<form-property name="userId" type="java.lang.String" />
 </form-bean>
 
   </form-beans>
