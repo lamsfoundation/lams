@@ -4,18 +4,22 @@
 	<%@ taglib uri="tags-core" prefix="c" %>		
 	<%@ taglib uri="tags-fmt" prefix="fmt" %>
 	<%@ taglib uri="tags-lams" prefix="lams" %>
+	
+	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery.js"></script>
 	<script type="text/javascript">
-		function onSubmitForm(){
-			var select = document.getElementById(document.pressed);
-			if (select.selectedIndex==-1){
+		function allowUsers(who){
+			var allowed = '';
+			$('#' + who + ' input:checked').each(function(){
+				allowed += $(this).val() + ',';
+			});
+			if (allowed == ''){
 				return false;
 			}
-			else {
-				document.getElementById("userId").value=select.options[select.selectedIndex].value;
-				return true;
-			}
+			$('#userId').val(allowed);
+			return true;
 		}
 	</script>
+	
 	<c:set var="title"><fmt:message key="label.permission.gate.title"/></c:set>
 	<lams:Page title="${title}" type="monitoring">
 		

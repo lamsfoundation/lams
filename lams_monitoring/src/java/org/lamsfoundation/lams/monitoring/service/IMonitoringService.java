@@ -337,7 +337,7 @@ public interface IMonitoringService {
      * @param userId
      * @return
      */
-    GateActivity openGateForSingleUser(Long gateId, Integer userId);
+    GateActivity openGateForSingleUser(Long gateId, Integer[] userIds);
 
     /**
      * Set the gate to closed.

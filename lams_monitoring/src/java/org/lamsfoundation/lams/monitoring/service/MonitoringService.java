@@ -908,7 +908,7 @@ public class MonitoringService implements IMonitoringService {
 		if (grouping != null) {
 		    groupingDAO.delete(grouping);
 		}
-		
+
 		for (BranchActivityEntry entry : branchingActivity.getBranchActivityEntries()) {
 		    BranchCondition condition = entry.getCondition();
 		    if (condition != null) {
@@ -978,9 +978,9 @@ public class MonitoringService implements IMonitoringService {
     }
 
     @Override
-    public GateActivity openGateForSingleUser(Long gateId, Integer userId) {
+    public GateActivity openGateForSingleUser(Long gateId, Integer[] userIds) {
 	GateActivity gate = (GateActivity) activityDAO.getActivityByActivityId(gateId);
-	if ((gate != null) && (userId != null) && (userId >= 0)) {
+	for (Integer userId : userIds) {
 	    User user = (User) baseDAO.find(User.class, userId);
 	    gate.getAllowedToPassLearners().add(user);
 	    activityDAO.update(gate);
