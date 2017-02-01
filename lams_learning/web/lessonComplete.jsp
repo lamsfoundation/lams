@@ -28,6 +28,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 <%@ taglib uri="tags-lams" prefix="lams"%>
 
 <script type="text/javascript" src="<lams:LAMSURL />includes/javascript/jquery.js"></script>
+<script type="text/javascript" src="<lams:LAMSURL />includes/javascript/bootstrap.min.js"></script>
 
 <c:set var="displayPrintButton"><lams:Configuration key="DisplayPrintButton"/></c:set>
 
