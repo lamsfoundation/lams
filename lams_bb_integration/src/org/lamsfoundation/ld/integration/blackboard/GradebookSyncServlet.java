@@ -88,7 +88,6 @@ public class GradebookSyncServlet extends HttpServlet {
 	    Context ctx = ctxMgr.setContext(request);
 	    CourseMembershipDbLoader courseMemLoader = CourseMembershipDbLoader.Default.getInstance();
 	    ScoreDbLoader scoreLoader = ScoreDbLoader.Default.getInstance();
-	    ScoreDbPersister scorePersister = ScoreDbPersister.Default.getInstance();
 
 	    // get Parameter values
 	    String lamsLessonIdParam = request.getParameter(Constants.PARAM_LESSON_ID);
@@ -130,7 +129,6 @@ public class GradebookSyncServlet extends HttpServlet {
 	    DocumentBuilder db = dbf.newDocumentBuilder();
 	    Document document = db.parse(is);
 	    Node lesson = document.getDocumentElement().getFirstChild();
-	    Long lessonMaxPossibleMark = new Long(lesson.getAttributes().getNamedItem("lessonMaxPossibleMark").getNodeValue());
 	    NodeList learnerResults = lesson.getChildNodes();
 	    
 	    //in order to reduce DB queries we get scores and courseMemberships all at once
@@ -158,34 +156,24 @@ public class GradebookSyncServlet extends HttpServlet {
 		    String extUsername = learnerResult.getAttributes().getNamedItem("extUsername").getNodeValue();
 
 		    if (userName.equals(extUsername)) {
-			String userTotalMarkStr = learnerResult.getAttributes().getNamedItem("userTotalMark")
-				.getNodeValue();
-			if (!StringUtil.isEmpty(userTotalMarkStr)) {
-			    double newScore = new Double(userTotalMarkStr);
-			    
-			    //update old score
-			    if (currentScore == null) {
-				currentScore = new Score();
-				currentScore.setLineitemId(lineitem.getId());
-				currentScore.setCourseMembershipId(courseMembershipId);
-			    }
-			    
-			    // set score grade. if Lams supplies one (and lineitem will have score type) we set score; otherwise (and
-			    // lineitme of type Complete/Incomplete) we set 0
-			    double gradebookMark = 0;
-			    if (lessonMaxPossibleMark > 0) {
-				gradebookMark = (newScore / lessonMaxPossibleMark) * Constants.GRADEBOOK_POINTS_POSSIBLE;
-			    }
-			    
-			    //calculate how many marks updated
-			    if (StringUtil.isEmpty(currentScore.getGrade()) || ! new Double(currentScore.getGrade()).equals(new Double(gradebookMark))) {
-				numberUpdatedScores++;
-			    }
-			    
-			    currentScore.setGrade(new DecimalFormat("##.##").format(gradebookMark));
-			    currentScore.validate();
-			    scorePersister.persist(currentScore);
+
+			//update old score
+			if (currentScore == null) {
+			    currentScore = new Score();
+			    currentScore.setLineitemId(lineitem.getId());
+			    currentScore.setCourseMembershipId(courseMembershipId);
 			}
+
+			//updates and persists currentScore in the DB
+			double gradebookMark = LineitemUtil.updateScoreBasedOnLamsResponse(lesson, learnerResult,
+				currentScore);
+
+			//calculate how many marks updated
+			if (StringUtil.isEmpty(currentScore.getGrade())
+				|| !new Double(currentScore.getGrade()).equals(new Double(gradebookMark))) {
+			    numberUpdatedScores++;
+			}
+
 			break;
 		    }
 		}
