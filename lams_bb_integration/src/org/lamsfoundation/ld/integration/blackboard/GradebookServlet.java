@@ -85,7 +85,6 @@ public class GradebookServlet extends HttpServlet {
 	    UserDbLoader userLoader = UserDbLoader.Default.getInstance();
 	    CourseMembershipDbLoader courseMembershipLoader = CourseMembershipDbLoader.Default.getInstance();
 	    ScoreDbLoader scoreLoader = ScoreDbLoader.Default.getInstance();
-	    ScoreDbPersister scorePersister = ScoreDbPersister.Default.getInstance();
 
 	    // get Parameter values
 	    String userName = request.getParameter(Constants.PARAM_USER_ID);
@@ -147,11 +146,7 @@ public class GradebookServlet extends HttpServlet {
 	    Document document = db.parse(is);
 	    
 	    Node lesson = document.getDocumentElement().getFirstChild();
-	    Long maxResult = new Long(lesson.getAttributes().getNamedItem("lessonMaxPossibleMark").getNodeValue());
-	    
 	    Node learnerResult = lesson.getFirstChild();
-	    String userTotalMarkStr = learnerResult.getAttributes().getNamedItem("userTotalMark").getNodeValue();
-	    double userResult = StringUtil.isEmpty(userTotalMarkStr) ? 0 : new Double(userTotalMarkStr);
 
 	    Lineitem lineitem = LineitemUtil.getLineitem(userId, lamsLessonIdParam);
 	    if (lineitem == null) {
@@ -173,17 +168,11 @@ public class GradebookServlet extends HttpServlet {
 		currentScore.setLineitemId(lineitem.getId());
 		currentScore.setCourseMembershipId(courseMembership.getId());
 	    }
-
-	    //set score grade. if Lams supplies one (and lineitem will have score type) we set score; otherwise (and
-	    // lineitme of type Complete/Incomplete) we set 0
-	    double gradebookMark = 0;
-	    if (maxResult > 0) {
-		gradebookMark = (userResult / maxResult) * Constants.GRADEBOOK_POINTS_POSSIBLE;
-	    }
-	    currentScore.setGrade(new DecimalFormat("##.##").format(gradebookMark));
-	    currentScore.validate();
-	    scorePersister.persist(currentScore);
 	    
+	    //updates and persists currentScore in the DB
+	    LineitemUtil.updateScoreBasedOnLamsResponse(lesson, learnerResult, currentScore);
+	    
+	    //the following paragraph is kept due to the Ernie's request to keep it for potential usage in the future
 //	    NodeList activities = document.getDocumentElement().getFirstChild().getChildNodes();
 //
 //	    float maxResult = 0;
