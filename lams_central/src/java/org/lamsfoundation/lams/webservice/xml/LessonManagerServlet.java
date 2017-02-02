@@ -1116,34 +1116,75 @@ public class LessonManagerServlet extends HttpServlet {
 
 	    for (GradebookUserLesson gradebookUserLesson : gradebookUserLessons) {
 		Integer userId = gradebookUserLesson.getLearner().getUserId();
-
-		//find user
-		ExtUserUseridMap extUser = null;
-		for (ExtUserUseridMap extUserIter : allUsers) {
-		    if (extUserIter.getUser().getUserId().equals(userId)) {
-			extUser = extUserIter;
-			break;
+		Double gradebookUserLessonMark = gradebookUserLesson.getMark();
+		
+		//Creates learner element and appends it to the specified lessonElement
+		createLearnerElement(extServer, lessonElement, allUsers, userId, gradebookUserLessonMark);
+	    }
+	    
+	    // in case of "gradebookMarksLesson" is requested - add all users that have completed the lesson but have no
+	    // gradebookUserLesson (it happens when lesson contains zero activities that set to produce toolOutputs)
+	    boolean isGradebookMarksLessonRequest = courseId == null && outputsUser == null;
+	    if (isGradebookMarksLessonRequest) {
+		List<User> usersCompletedLesson = monitoringService.getUsersCompletedLesson(lessonId, null, null, true);
+		
+		//add all users that haven't been added yet
+		for (User userCompletedLesson : usersCompletedLesson) {
+		    boolean isUserHaventBeenAddedYet = true;
+		    for (GradebookUserLesson gradebookUserLesson : gradebookUserLessons) {
+			if (userCompletedLesson.getUserId().equals(gradebookUserLesson.getLearner().getUserId())) {
+			    isUserHaventBeenAddedYet = false;
+			    break;
+			}
+		    }
+		    
+		    //creates learner element and appends it to the specified lessonElement
+		    if (isUserHaventBeenAddedYet) {
+			createLearnerElement(extServer, lessonElement, allUsers, userCompletedLesson.getUserId(), null);
 		    }
 		}
-
-		if (extUser == null) {
-		    throw new Exception(
-			    "User with userId: " + userId + " doesn't belong to extServer: " + extServer.getSid());
-		}
-
-		Element learnerElement = document.createElement("Learner");
-		learnerElement.setAttribute("extUsername", extUser.getExtUsername());
-		String userTotalMark = gradebookUserLesson.getMark() == null ? ""
-			: gradebookUserLesson.getMark().toString();
-		learnerElement.setAttribute("userTotalMark", userTotalMark);
-
-		lessonElement.appendChild(learnerElement);
 	    }
 
 	    gradebookMarksElement.appendChild(lessonElement);
 	}
 
 	return gradebookMarksElement;
+    }
+
+    /*
+     * Creates learner element and appends it to the specified lessonElement.
+     * 
+     * @param extServer
+     * @param lessonElement
+     * @param allUsers all available users associated with extServer 
+     * @param userId userId of the learner to whom this learnerElement corresponds 
+     * @param gradebookUserLessonMark mark of the gradebookUserLesson
+     * @return
+     * @throws Exception
+     */
+    private void createLearnerElement(ExtServer extServer, Element lessonElement, List<ExtUserUseridMap> allUsers,
+	    Integer userId, Double gradebookUserLessonMark) throws Exception {
+
+	// find user
+	ExtUserUseridMap extUser = null;
+	for (ExtUserUseridMap extUserIter : allUsers) {
+	    if (extUserIter.getUser().getUserId().equals(userId)) {
+		extUser = extUserIter;
+		break;
+	    }
+	}
+
+	if (extUser == null) {
+	    throw new Exception("User with userId: " + userId + " doesn't belong to extServer: " + extServer.getSid());
+	}
+
+	Document document = lessonElement.getOwnerDocument();
+	Element learnerElement = document.createElement("Learner");
+	learnerElement.setAttribute("extUsername", extUser.getExtUsername());
+	String userTotalMark = gradebookUserLessonMark == null ? "" : gradebookUserLessonMark.toString();
+	learnerElement.setAttribute("userTotalMark", userTotalMark);
+
+	lessonElement.appendChild(learnerElement);
     }
 
     /**
