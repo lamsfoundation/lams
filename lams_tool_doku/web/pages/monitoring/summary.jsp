@@ -19,7 +19,7 @@
 				'showControls':'true',
 				'showChat':'${dokumaran.showChat}',
 				'showLineNumbers':'${dokumaran.showLineNumbers}',
-				'height':'200',
+				'height':'600',
 				'userName':'<lams:user property="firstName" />&nbsp;<lams:user property="lastName" />'
 			});
 		</c:forEach>
