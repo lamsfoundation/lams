@@ -28,6 +28,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.SortedMap;
 
+import org.lamsfoundation.lams.tool.ToolCompletionStatus;
 import org.lamsfoundation.lams.tool.ToolContentManager;
 import org.lamsfoundation.lams.tool.ToolOutput;
 import org.lamsfoundation.lams.tool.ToolOutputDefinition;
@@ -133,5 +134,10 @@ public class WookieService implements ToolSessionManager, ToolContentManager {
 
     @Override
     public void forceCompleteUser(Long toolSessionId, User user) {
+    }
+
+    @Override
+    public ToolCompletionStatus getCompletionStatus(Long learnerId, Long toolSessionId) {
+	return null;
     }
 }
