@@ -27,6 +27,7 @@ import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLConnection;
+import java.text.DecimalFormat;
 import java.util.List;
 import java.util.Set;
 
@@ -39,6 +40,7 @@ import org.apache.log4j.Logger;
 import org.lamsfoundation.ld.integration.Constants;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+import org.w3c.dom.Node;
 import org.xml.sax.SAXException;
 
 import blackboard.data.ValidationException;
@@ -46,6 +48,7 @@ import blackboard.data.content.Content;
 import blackboard.data.content.CourseDocument;
 import blackboard.data.course.Course;
 import blackboard.data.gradebook.Lineitem;
+import blackboard.data.gradebook.Score;
 import blackboard.data.gradebook.impl.OutcomeDefinition;
 import blackboard.data.gradebook.impl.OutcomeDefinitionScale;
 import blackboard.persist.BbPersistenceManager;
@@ -57,6 +60,7 @@ import blackboard.persist.content.ContentDbLoader;
 import blackboard.persist.course.CourseDbLoader;
 import blackboard.persist.gradebook.LineitemDbLoader;
 import blackboard.persist.gradebook.LineitemDbPersister;
+import blackboard.persist.gradebook.ScoreDbPersister;
 import blackboard.persist.gradebook.ext.OutcomeDefinitionScaleDbLoader;
 import blackboard.persist.gradebook.ext.OutcomeDefinitionScaleDbPersister;
 import blackboard.persist.gradebook.impl.OutcomeDefinitionDbPersister;
@@ -64,6 +68,7 @@ import blackboard.platform.persistence.PersistenceServiceFactory;
 import blackboard.portal.data.ExtraInfo;
 import blackboard.portal.data.PortalExtraInfo;
 import blackboard.portal.servlet.PortalUtil;
+import blackboard.util.StringUtil;
 
 public class LineitemUtil {
 
@@ -428,5 +433,38 @@ public class LineitemUtil {
 
 	//get lineitem
 	return LineitemUtil.getLineitem(bbContentId == null ? "" : bbContentId, userId, lamsLessonIdParam);
+    }
+    
+    /**
+     * Updates and persists currentScore in the DB.
+     * 
+     * @param lesson
+     * @param learnerResult
+     * @param currentScore provided score must be initialized (can't be null)
+     * @throws PersistenceException 
+     * @throws ValidationException 
+     */
+    public static double updateScoreBasedOnLamsResponse(Node lesson, Node learnerResult, Score currentScore)
+	    throws PersistenceException, ValidationException {
+	ScoreDbPersister scorePersister = ScoreDbPersister.Default.getInstance();
+
+	Long lessonMaxPossibleMark = new Long(
+		lesson.getAttributes().getNamedItem("lessonMaxPossibleMark").getNodeValue());
+	String userTotalMarkStr = learnerResult.getAttributes().getNamedItem("userTotalMark").getNodeValue();
+
+	double newScore = StringUtil.isEmpty(userTotalMarkStr) ? 0 : new Double(userTotalMarkStr);
+
+	//set score grade. if Lams supplies one (and lineitem will have score type) we set score; otherwise (and
+	// lineitme of type Complete/Incomplete) we set 0
+	double gradebookMark = 0;
+	if (lessonMaxPossibleMark > 0) {
+	    gradebookMark = (newScore / lessonMaxPossibleMark) * Constants.GRADEBOOK_POINTS_POSSIBLE;
+	}
+	
+	currentScore.setGrade(new DecimalFormat("##.##").format(gradebookMark));
+	currentScore.validate();
+	scorePersister.persist(currentScore);
+	
+	return gradebookMark;
     }
 }
