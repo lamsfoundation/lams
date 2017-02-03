@@ -130,6 +130,11 @@
 		</init-param>
 		<load-on-startup>1</load-on-startup>
 	</servlet>
+	
+	<servlet>
+		<servlet-name>recalculateTotalMarksForLesson</servlet-name>
+		<servlet-class>org.lamsfoundation.lams.gradebook.web.servlet.RecalculateTotalMarksForLessonServlet</servlet-class>
+	</servlet>
 
 	<servlet-mapping>
 		<servlet-name>action</servlet-name>
@@ -139,6 +144,11 @@
 	<servlet-mapping>
 		<servlet-name>Connector</servlet-name>
 		<url-pattern>/ckeditor/filemanager/browser/default/connectors/jsp/connector</url-pattern>
+	</servlet-mapping>
+	
+	<servlet-mapping>
+		<servlet-name>recalculateTotalMarksForLesson</servlet-name>
+		<url-pattern>/recalculateTotalMarksForLesson</url-pattern>
 	</servlet-mapping>
 
 	<error-page>

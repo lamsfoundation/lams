@@ -124,7 +124,17 @@ public interface IGradebookService {
      * 
      * @param activity
      */
-    void updateUserMarksForActivity(Activity activity);
+    void recalculateGradebookMarksForActivity(Activity activity);
+    
+    /**
+     * Recalculates total marks for all users in a lesson. Then stores that mark in a gradebookUserLesson. Doesn't
+     * affect anyhow gradebookUserActivity objects. If total mark is positive but there is no gradebookUserLesson
+     * available - throws exception.
+     * 
+     * @param lessonId
+     * @throws Exception
+     */
+    void recalculateTotalMarksForLesson(Long lessonId) throws Exception;
 
     /**
      * Updates a user's lesson mark, this will make it desynchronised with the aggregated marks from the activities

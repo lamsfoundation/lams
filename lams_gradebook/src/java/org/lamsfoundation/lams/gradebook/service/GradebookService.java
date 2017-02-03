@@ -469,9 +469,39 @@ public class GradebookService implements IGradebookService {
 	}
     }
 
+    @Override
+    public void recalculateTotalMarksForLesson(Long lessonId) throws Exception {
+	Lesson lesson = lessonDAO.getLesson(lessonId);
+	if (lesson == null) {
+	    return;
+	}
+	
+	Map<Integer, GradebookUserLesson> userToGradebookUserLessonMap = getUserToGradebookUserLessonMap(lesson, null);
+
+	//update for all users in activity
+	Set<User> users = lesson.getAllLearners();
+	for (User user : users) {
+	    Integer userId = user.getUserId();
+	    GradebookUserLesson gradebookUserLesson = userToGradebookUserLessonMap.get(userId);
+
+	    Double totalMark = gradebookDAO.getGradebookUserActivityMarkSum(lessonId, userId);
+	    if (totalMark != null) {
+		
+		if (totalMark > 0 && gradebookUserLesson == null) {
+		    throw new Exception("An error detected: user (userId:" + userId + ") has total mark that equals to "
+			    + totalMark + " but no assocciated gradebookUserLesson exist ");
+		}
+
+		if (gradebookUserLesson != null) {
+		    gradebookUserLesson.setMark(totalMark);
+		    gradebookDAO.insertOrUpdate(gradebookUserLesson);
+		}
+	    }
+	}
+    }
     
     @Override
-    public void updateUserMarksForActivity(Activity activity) {
+    public void recalculateGradebookMarksForActivity(Activity activity) {
 	Long activityId = activity.getActivityId();
 	Lesson lesson = lessonDAO.getLessonForActivity(activityId);
 
