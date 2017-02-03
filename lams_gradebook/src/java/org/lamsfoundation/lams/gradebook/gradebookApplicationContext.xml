@@ -37,6 +37,7 @@
 		<property name="transactionAttributes">
 			<props>
 				<prop key="update*">PROPAGATION_REQUIRED</prop>
+				<prop key="recalculate*">PROPAGATION_REQUIRED</prop>
 				<prop key="toggleMarksReleased">PROPAGATION_REQUIRED</prop>
 				<prop key="get*">PROPAGATION_REQUIRED,readOnly</prop>
 				<prop key="export*">PROPAGATION_REQUIRED,readOnly</prop>
