@@ -54,28 +54,13 @@ import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 
 /**
- *
  * @author M Seaton
- *
- *
- *
- *
- *
- *
- *
- *
- *
- *
- *
- *
  */
 public class NotebookAction extends LamsDispatchAction {
     // ---------------------------------------------------------------------
     // Instance variables
     // ---------------------------------------------------------------------
     private static Logger log = Logger.getLogger(NotebookAction.class);
-
-    private static IAuditService auditService;
 
     private static final String VIEW_ALL = "viewAll";
     private static final String VIEW_SINGLE = "viewSingle";
@@ -223,7 +208,7 @@ public class NotebookAction extends LamsDispatchAction {
 	notebookService.createNotebookEntry(id, CoreNotebookConstants.SCRATCH_PAD, signature, userID, title, entry);
 
 	boolean skipViewAll = WebUtil.readBooleanParam(request, "skipViewAll", false);
-	return skipViewAll ? null : viewAll(mapping, actionForm, request, response);
+	return skipViewAll ? null : mapping.findForward("viewAllRedirect");
     }
 
     /**
@@ -259,22 +244,8 @@ public class NotebookAction extends LamsDispatchAction {
 
 	notebookService.updateEntry(entryObj);
 
-	return viewAll(mapping, actionForm, request, response);
+	return mapping.findForward("viewAllRedirect");
 
-    }
-
-    /**
-     * Get AuditService bean.
-     *
-     * @return
-     */
-    private IAuditService getAuditService() {
-	if (NotebookAction.auditService == null) {
-	    WebApplicationContext ctx = WebApplicationContextUtils
-		    .getRequiredWebApplicationContext(getServlet().getServletContext());
-	    NotebookAction.auditService = (IAuditService) ctx.getBean("auditService");
-	}
-	return NotebookAction.auditService;
     }
 
 }

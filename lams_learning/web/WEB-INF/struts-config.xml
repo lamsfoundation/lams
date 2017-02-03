@@ -116,6 +116,11 @@
         redirect="false"
       />
       <forward
+        name="viewAllRedirect"
+        path="/notebook.do?method=viewAll"
+        redirect="true"
+      />
+      <forward
         name="viewSingle"
         path=".notebookViewSingle"
         redirect="false"
