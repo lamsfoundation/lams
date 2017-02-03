@@ -59,7 +59,6 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 		<html:hidden property="signature" />
 		<html:hidden property="lessonID" value="${entry.externalID}" />
 
-
 		<!-- set title -->
 		<c:set var="title">
 			<c:choose>
@@ -114,11 +113,13 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 							<lams:out value="${entryTxt}" />
 						</div>
 						<c:if test="${mode == 'teacher'}">
-										<i><fmt:message key="mynotes.entry.submitted.by">
-												<fmt:param>
-													<c:out value="${entry.user.fullName}" escapeXml="false" />
-												</fmt:param>
-											</fmt:message></i>
+							<i>
+								<fmt:message key="mynotes.entry.submitted.by">
+									<fmt:param>
+										<c:out value="${entry.user.fullName}" escapeXml="false" />
+									</fmt:param>
+								</fmt:message>
+							</i>
 						</c:if>
 					</c:otherwise>
 				</c:choose>
@@ -126,11 +127,15 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 				<div class="voffset10">
 					<c:choose>
 						<c:when test="${param.mode == 'edit'}">
-							<a href="#" class="btn btn-default" id="saveInNotebookBtn" onClick="doSubmit('${scratchPadSig}')"><fmt:message
-									key="mynotes.notebook.save.button" /></a>
-							<a href="#" class="btn btn-default" id="saveInJournalBtn" onClick="doSubmit('${scratchJournalSig}')"><fmt:message
-									key="mynotes.journal.save.button" /></a>
-							<a href="javascript: history.back();" class="btn btn-default" id="cancelBtn"><fmt:message key="label.cancel.button" /></a>
+							<a href="#" class="btn btn-default" id="saveInNotebookBtn" onClick="doSubmit('${scratchPadSig}')">
+								<fmt:message key="mynotes.notebook.save.button" />
+							</a>
+							<a href="#" class="btn btn-default" id="saveInJournalBtn" onClick="doSubmit('${scratchJournalSig}')">
+								<fmt:message key="mynotes.journal.save.button" />
+							</a>
+							<a href="javascript: history.back();" class="btn btn-default" id="cancelBtn">
+								<fmt:message key="label.cancel.button" />
+							</a>
 						</c:when>
 						<c:otherwise>
 							<c:set var="editnote">
@@ -138,18 +143,19 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 								<c:out value="${entry.uid}" />
 							</c:set>
 							<c:if test="${entry.externalSignature != scratchJournalSig}">
-								<a href="${editnote}" class="btn btn-default" id="saveBtn"><fmt:message key="label.edit.button" /></a>
+								<a href="${editnote}" class="btn btn-default" id="saveBtn">
+									<fmt:message key="label.edit.button" />
+								</a>
 							</c:if>
-							<a href="javascript: history.back();" class="btn btn-default" id="viewAllBtn"><fmt:message
-									key="mynotes.view.all.button" /></a>
+							<a href="javascript: history.back();" class="btn btn-default" id="viewAllBtn">
+								<fmt:message key="mynotes.view.all.button" />
+							</a>
 						</c:otherwise>
 					</c:choose>
 				</div>
 
 			</div>
 		</div>
-
-
 
 	</html:form>
 </lams:Page>
