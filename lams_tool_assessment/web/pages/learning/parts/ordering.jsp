@@ -52,7 +52,7 @@
 	</div>
 	
 	<c:if test="${finishedLock && assessment.allowQuestionFeedback}">
-		<div class="question-feedback">
+		<div class="feedback">
 			<c:choose>
 				<c:when	test="${question.mark > 0}">
 					<c:out value="${question.feedbackOnCorrect}" escapeXml="false" />
