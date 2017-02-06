@@ -1189,7 +1189,7 @@ public class MonitoringAction extends LamsDispatchAction {
 
 	    String monitorUrl = getMonitoringService().getActivityMonitorURL(lessonId, activityId, contentFolderId,
 		    monitorUserId);
-	    if (monitorUrl != null) {
+	    if (monitorUrl != null && ! activity.isBranchingActivity()) {
 		// whole activity monitor URL
 		activityJSON.put("url", monitorUrl);
 	    }
