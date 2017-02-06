@@ -36,7 +36,8 @@
 	
 	<div class="form-group">
 	    <label for="feedback"><fmt:message key="label.feedback" /></label>
-	    <html:textarea property="feedback" styleId="feedback" styleClass="form-control" cols="75" rows="2" />
+		<lams:CKEditor id="feedback" value="${formBean.feedback}"
+				   contentFolderID="${formBean.contentFolderID}"/>
 	</div>
 </div>	
 	<div class="voffset5 pull-right">
