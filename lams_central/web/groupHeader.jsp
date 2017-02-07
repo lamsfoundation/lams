@@ -8,7 +8,7 @@
 	<!-- bootstrap More options dropdown -->
 	<div class="course-right-buttons pull-right">
 	<div class="btn-group">
-	  <button type="button" class="btn btn-primary btn-sm dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><i class="fa fa-fw fa-sliders" title="<fmt:message key="index.moreActions" />"></i> <span class="hidden-xs"><fmt:message key="index.moreActions" /></span> <span class="caret"></span></button>
+	  <button type="button" class="btn btn-primary btn-sm dropdown-toggle ${addTourClass?'tour-more-options':''}" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><i class="fa fa-fw fa-sliders" title="<fmt:message key="index.moreActions" />"></i> <span class="hidden-xs"><fmt:message key="index.moreActions" /></span> <span class="caret"></span></button>
 	  <ul class="dropdown-menu" style="padding: 10px;">
 		<c:forEach var="link" items="${org.moreLinks}">
 			 <li onClick="${link.url}"
@@ -30,9 +30,9 @@
 		<c:when test="${link.name eq 'index.addlesson.single'}">
 			<div class="course-right-buttons pull-right">
 				<div class="btn-group" role="group">
-					<button onClick="<c:out value='${link.url}'/>" type="button" class="btn btn-primary btn-sm"><i class="${link.style}" title="<fmt:message key="index.addlesson" />"></i> <span class="hidden-xs"><fmt:message key="index.addlesson" /></span></button>
+					<button onClick="<c:out value='${link.url}'/>" type="button" class="btn btn-primary btn-sm ${addTourClass?'tour-add-lesson':''}"><i class="${link.style}" title="<fmt:message key="index.addlesson" />"></i> <span class="hidden-xs"><fmt:message key="index.addlesson" /></span></button>
 					<div class="btn-group" role="group">
-						<button id="addSingleActivityLessonDrop" type="button" class="btn btn-primary btn-sm dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+						<button id="addSingleActivityLessonDrop" type="button" class="btn btn-primary btn-sm dropdown-toggle ${addTourClass?'tour-add-single-lesson':''}" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
 							<span class="caret"></span>
 						</button>
 						<ul class="dropdown-menu" aria-labelledby="openDropButton">
@@ -49,7 +49,7 @@
 		</c:when>
 		<c:otherwise>
 			<div class="course-right-buttons pull-right">
-				<a class="btn btn-primary btn-sm" onClick="<c:out value='${link.url}'/>"
+				<a class="btn btn-primary btn-sm tour-${link.id}" onClick="<c:out value='${link.url}'/>"
                                         <c:if test="${not empty link.tooltip}">
                                         title="<fmt:message key='${link.tooltip}'/>"
                                     </c:if>>
