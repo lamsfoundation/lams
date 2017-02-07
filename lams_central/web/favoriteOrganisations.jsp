@@ -5,7 +5,7 @@
 <%@ taglib uri="tags-function" prefix="fn"%>
 <%@ taglib uri="tags-tiles" prefix="tiles" %>
 
-<div id="favorite-organisations-container">
+<div id="favorite-organisations-container" class="tour-organisations-favorites">
 
 	<c:if test="${not empty favoriteOrganisations}">
 		<ul class="nav" id="favorite-organisations">

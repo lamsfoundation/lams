@@ -20,6 +20,7 @@
 	<link rel="stylesheet" href="/lams/css/jquery.tablesorter.theme.bootstrap.css">
 	<link rel="stylesheet" href="/lams/css/jquery-ui-bootstrap-theme.css" type="text/css" media="screen">
 	<link rel="stylesheet" href="/lams/css/main.css" type="text/css" media="screen">
+	<link rel="stylesheet" href="/lams/css/bootstrap-tour.min.css" type="text/css" media="screen">
 
 	<script type="text/javascript" src="includes/javascript/getSysInfo.js"></script>
 	<script type="text/javascript" src="loadVars.jsp"></script>
@@ -33,6 +34,7 @@
 	<script type="text/javascript" src="includes/javascript/jquery.dialogextend.js"></script>	
 	<script type="text/javascript" src="includes/javascript/dialog.js"></script>
 	<script type="text/javascript" src="includes/javascript/bootstrap.min.js"></script>
+	<script type="text/javascript" src="includes/javascript/bootstrap-tour.min.js"></script>
 	<script type="text/javascript" src="includes/javascript/jquery.ui.touch-punch.js"></script>
 	<script type="text/javascript" src="includes/javascript/jquery.slimscroll.js"></script>
 	<script type="text/javascript" src="includes/javascript/main.js"></script>
@@ -129,7 +131,11 @@
 	 			</c:if>
   		    } 
 		    </c:if>
+		    
 		});
+	
+		<%@ include file="mainTour.jsp" %>
+
 	</script>
 </lams:head>
 <body <c:if test="${not empty lastVisitedOrganisationId}">class="offcanvas-hidden"</c:if>>
@@ -158,9 +164,11 @@
 						data-column="1" type="search">
 			</div>
             
+            <div class="tour-organisations">
 			<lams:TSTable numColumns="2">
 			</lams:TSTable>
-
+			</div>
+			
         </div>
     </nav>
 <!-- /Offcanvas Bar -->
@@ -172,12 +180,12 @@
 		<div class="nav_menu">
 			<nav>
 				<div class="offcanvas-toggle offcanvas-toggle-header">
-					<i class="fa fa-bars"></i>
+					<i class="fa fa-bars tour-course-reveal"></i>
 				</div>
 
 				<ul class="nav navbar-nav navbar-right">
 					<li>
-						<a href="javascript:;" class="user-profile dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
+						<a href="javascript:;" class="user-profile dropdown-toggle tour-user-profile" data-toggle="dropdown" aria-expanded="false">
 	                  		<c:choose>
 	                  			<c:when test="${not empty portraitUuid}">
 	                  				<c:set var="portraitSrc">download/?uuid=${portraitUuid}&preferDownload=false</c:set>
@@ -257,19 +265,27 @@
 						</c:choose>
 						
 						<li role="presentation">       
-							<a href="<c:out value='${headerlink.url}' />" title="${headerLinkTitle}">
+							<a href="<c:out value='${headerlink.url}' />"  class="tour-${headerlink.id}" title="${headerLinkTitle}">
 								<i class="fa ${headerLinkIcon}"></i> 
 								<span class="xs-hidden"><c:out value='${headerLinkName}'/></span>
 							</a>
 						</li>
 					</c:forEach>
-					
-					<li role="presentation" class="dropdown">       
-						<a href="javascript:;" onclick="javascript:showPrivateNotificationsDialog();" class="dropdown-toggle info-number" data-toggle="dropdown" aria-expanded="false">
+
+					<li role="presentation" class="dropdown">   
+						<a href="javascript:;" onclick="javascript:showPrivateNotificationsDialog();" class="dropdown-toggle info-number tour-user-notifications" data-toggle="dropdown" aria-expanded="false">
 							<i class="fa fa-envelope-o"></i>
                     		<span id="notificationsPendingCount" class="btn-primary"></span>
 						</a>
 					</li>
+					
+					<li role="presentation" class="dropdown">       
+						<a href="javascript:;" onclick="javascript:startTour();" class="dropdown-toggle info-number" data-toggle="dropdown" aria-expanded="false">
+							<i class="fa fa-question-circle"></i>
+							<span class="xs-hidden">Take Tour</span>
+						</a>
+					</li>
+					
 				</ul>
 			</nav>
 		</div>
@@ -286,8 +302,8 @@
 		
 		<div class="row no-gutter">
 			<div class="col-xs-12">
-	        	<div id="org-container"></div>
-		  	</div>
+	        	<div id="org-container" class="tour-org-container"></div>
+			</div>
 		</div>
 	
 	<!-- TODO ADD this button	<div id="refreshButton" class="btn btn-default btn-sm pull-right" title="<fmt:message key="index.refresh.hint"/>"

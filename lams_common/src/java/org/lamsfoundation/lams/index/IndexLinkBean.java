@@ -39,6 +39,7 @@ public class IndexLinkBean {
     private String url;
     private String style;
     private String tooltip;
+    private String id;
 
     public IndexLinkBean(String name, String url, String style, String tooltip) {
 	super();
@@ -46,11 +47,13 @@ public class IndexLinkBean {
 	this.url = url;
 	this.style = style;
 	this.tooltip = tooltip;
+	this.id = name != null ? name.replace('.', '-') : null;
     }
 
     public IndexLinkBean(String name, String url) {
 	this.name = name;
 	this.url = url;
+	this.id = name != null ? name.replace('.', '-') : null;
     }
 
     /**
@@ -66,6 +69,7 @@ public class IndexLinkBean {
      */
     public void setName(String name) {
 	this.name = name;
+	this.id = name != null ? name.replace('.', '-') : null;
     }
 
     /**
@@ -97,6 +101,14 @@ public class IndexLinkBean {
 
     public void setTooltip(String tooltip) {
 	this.tooltip = tooltip;
+    }
+
+    public String getId() {
+	return id;
+    }
+
+    public void setId(String id) {
+	this.id = id;
     }
 
 }

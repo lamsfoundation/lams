@@ -30,12 +30,16 @@
 
 		<div class="lesson-actions" style="transform: rotate(180deg);">
 			<c:forEach var="lessonlink" items="${lesson.links}">
-				<a href="<c:out value='${lessonlink.url}'/>"  style="padding-left: 10px; padding-right:10px;"
+				<c:choose><c:when test="${addTourClass}"><c:set var="tourClass">class="tour-${lessonlink.id}"</c:set></c:when>
+				<c:otherwise><c:set var="tourClass"></c:set></c:otherwise></c:choose>
+				
+				<a href="<c:out value='${lessonlink.url}'/>"  ${tourClass} style="padding-left: 10px; padding-right:10px;"
 					<c:if test="${not empty lessonlink.tooltip}">
 						title="<fmt:message key='${lessonlink.tooltip}'/>"
 					</c:if>>
 					 	<i style="transform: rotate(-180deg);" class="${lessonlink.style} lesson-action-label" title="<fmt:message key='${lessonlink.name}'/>"></i></a>
 			</c:forEach>
 		</div>
+		<c:set var="addTourClass" value="false" />
 	</div>
 </c:forEach>

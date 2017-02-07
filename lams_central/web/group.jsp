@@ -8,7 +8,7 @@
 	<span class="lead">
 		<strong><c:out value="${orgBean.name}" /></strong>
 	</span>
-	<a href="#" onclick="javascript:toggleFavoriteOrganisation(${orgBean.id});">
+	<a href="#" onclick="javascript:toggleFavoriteOrganisation(${orgBean.id});" class="tour-favorite-organisation">
 		<c:choose>
 			<c:when test="${orgBean.favorite}">
 				<i id="favorite-star" class="fa fa-star" title="<fmt:message key='label.remove.org.favorite'/>"></i>
@@ -21,6 +21,7 @@
 	
 	<!-- Group header -->
 	<c:set var="org" value="${orgBean}" />
+	<c:set var="addTourClass" value="true" /> <%-- turn on for the buttons in the course header and for the first lesson then turn off --%>
 	<%@ include file="groupHeader.jsp"%>
 </div>
 
@@ -44,7 +45,7 @@
 			
 			<c:set var="org" value="${childOrg}" />
 			<%@ include file="groupHeader.jsp"%>
-			
+
 			<div id="${childOrg.id}-lessons" class="lesson-table subgroup-lesson-table">
 				<%@ include file="groupContents.jsp"%>
 			</div>
@@ -54,7 +55,7 @@
 
 <c:if test="${orgBean.allowSorting}">
 	<div class="pull-right">
-		<a class="sorting text-muted" href="#" onClick="javascript:makeOrgSortable()" title="<fmt:message key="label.enable.lesson.sorting"/>">
+		<a class="sorting text-muted tour-sorting" href="#" onClick="javascript:makeOrgSortable()" title="<fmt:message key="label.enable.lesson.sorting"/>">
 			<i class="fa fa-sort"></i>
 		</a>
 	</div>
