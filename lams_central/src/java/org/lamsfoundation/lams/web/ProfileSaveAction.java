@@ -133,12 +133,6 @@ public class ProfileSaveAction extends Action {
 
 	    Theme cssTheme = (Theme) getService().findById(Theme.class, (Long) userForm.get("userTheme"));
 	    requestor.setTheme(cssTheme);
-
-	    if ((userForm.get("disableLamsCommunityUsername") != null)
-		    && (Boolean) userForm.get("disableLamsCommunityUsername")) {
-		requestor.setLamsCommunityToken(null);
-		requestor.setLamsCommunityUsername(null);
-	    }
 	}
 
 	getService().saveUser(requestor);

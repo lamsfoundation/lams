@@ -41,7 +41,6 @@ import org.apache.struts.action.ActionMapping;
 import org.apache.tomcat.util.json.JSONArray;
 import org.apache.tomcat.util.json.JSONException;
 import org.apache.tomcat.util.json.JSONObject;
-import org.lamsfoundation.lams.config.Registration;
 import org.lamsfoundation.lams.index.IndexLinkBean;
 import org.lamsfoundation.lams.usermanagement.Organisation;
 import org.lamsfoundation.lams.usermanagement.Role;
@@ -116,11 +115,6 @@ public class IndexAction extends LamsDispatchAction {
 	    return mapping.findForward("portrait");
 	} else if (StringUtils.equals(method, "lessons")) {
 	    return mapping.findForward("lessons");
-	}
-
-	Registration reg = Configuration.getRegistration();
-	if (reg != null) {
-	    request.setAttribute("lamsCommunityEnabled", reg.isEnableLamsCommunityIntegration());
 	}
 	
 	// only show the growl warning the first time after a user has logged in & if turned on in configuration

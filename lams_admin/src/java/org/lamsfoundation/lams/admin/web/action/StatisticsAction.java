@@ -39,15 +39,9 @@ import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.action.LamsDispatchAction;
 
 /**
+ * Gives the overall statistics for a LAMS server
+ * 
  * @author Luke Foxton
- *
- *         Gives the overall statistics for a LAMS server
- *
- *
- *
- *
- *
- *
  */
 public class StatisticsAction extends LamsDispatchAction {
 
@@ -59,7 +53,7 @@ public class StatisticsAction extends LamsDispatchAction {
 
 	// check permission
 	if (!request.isUserInRole(Role.SYSADMIN)) {
-	    request.setAttribute("errorName", "RegisterAction");
+	    request.setAttribute("errorName", "StatisticsAction");
 	    request.setAttribute("errorMessage", AdminServiceProxy.getMessageService(getServlet().getServletContext())
 		    .getMessage("error.authorisation"));
 	    return mapping.findForward("error");
@@ -85,7 +79,7 @@ public class StatisticsAction extends LamsDispatchAction {
 
 	// check permission
 	if (!request.isUserInRole(Role.SYSADMIN)) {
-	    request.setAttribute("errorName", "RegisterAction");
+	    request.setAttribute("errorName", "StatisticsAction");
 	    request.setAttribute("errorMessage", AdminServiceProxy.getMessageService(getServlet().getServletContext())
 		    .getMessage("error.authorisation"));
 	    return mapping.findForward("error");

@@ -18,10 +18,6 @@
       type="org.lamsfoundation.lams.web.TextSearchActionForm"
     />
     <form-bean
-      name="lamsCommunityLoginForm"
-      type="org.lamsfoundation.lams.web.lamscommunity.LamsCommunityLoginForm"
-    />
-    <form-bean
       name="PasswordChangeActionForm"
       type="org.lamsfoundation.lams.web.PasswordChangeActionForm"
     />
@@ -41,11 +37,6 @@
 <form-bean
   name="PedagogicalPlannerSequenceNodeForm"
   type="org.lamsfoundation.lams.web.planner.PedagogicalPlannerSequenceNodeForm"
-/>
-
-<form-bean
-  name="lamsCommunityLoginForm"
-  type="org.lamsfoundation.lams.web.lamscommunity.LamsCommunityLoginForm"
 />
 
 <form-bean name="UserForm" type="org.apache.struts.action.DynaActionForm">
@@ -69,9 +60,6 @@
 	<form-property name="email" type="java.lang.String" />
 	<form-property name="localeId" type="java.lang.Integer" />
 	<form-property name="timeZone" type="java.lang.String" />
-	<form-property name="lamsCommunityToken" type="java.lang.String" />
-	<form-property name="lamsCommunityUsername" type="java.lang.String" />
-	<form-property name="disableLamsCommunityUsername" type="java.lang.Boolean" />
 	<form-property name="tutorialsDisabled" type="java.lang.Boolean" />
 	<form-property name="userTheme" type="java.lang.Long" />
 </form-bean>
@@ -125,11 +113,6 @@
         redirect="false"
       />
       <forward
-        name="community"
-        path=".community"
-        redirect="false"
-      />
-      <forward
         name="favoriteOrganisations"
         path="/favoriteOrganisations.jsp"
         redirect="false"
@@ -166,21 +149,6 @@
       />
     </action>
     <action
-      path="/lamsCommunityLogin"
-      type="org.lamsfoundation.lams.web.lamscommunity.LamsCommunityLoginAction"
-      name="lamsCommunityLoginForm"
-      scope="request"
-      parameter="dispatch"
-      unknown="false"
-      validate="false"
-    >
-      <forward
-        name="lamsCommunityLogin"
-        path="/lamscommunity/lamscommunityLogin.jsp"
-        redirect="false"
-      />
-    </action>
-    <action
       path="/authoring/importToolContent"
       type="org.lamsfoundation.lams.authoring.web.ImportToolContentAction"
       unknown="false"
@@ -194,16 +162,6 @@
       <forward
         name="success"
         path="/toolcontent/importresult.jsp"
-        redirect="false"
-      />
-      <forward
-        name="successLC"
-        path="/toolcontent/importresultLC.jsp"
-        redirect="false"
-      />
-      <forward
-        name="importLC"
-        path="/toolcontent/importLC.jsp"
         redirect="false"
       />
     </action>

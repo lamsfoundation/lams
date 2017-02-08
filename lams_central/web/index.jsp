@@ -29,8 +29,3 @@
 	</lams:Page>
 </body>
 </lams:html>
-
-<c:if test="${logoutLamsCommunity}">
-	<iframe id="lamscommunityLogoutIframe" name="lamscommunityLogoutIframe" src="http://lamscommunity.org/logout"
-		style="width: 0px; height: 0px; border: 0px; display: none; overflow: auto" frameborder="no"> </iframe>
-</c:if>

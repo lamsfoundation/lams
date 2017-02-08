@@ -40,9 +40,7 @@ import org.jboss.as.controller.client.ModelControllerClient;
 import org.jboss.as.controller.client.helpers.Operations;
 import org.jboss.dmr.ModelNode;
 import org.lamsfoundation.lams.config.ConfigurationItem;
-import org.lamsfoundation.lams.config.Registration;
 import org.lamsfoundation.lams.config.dao.IConfigurationDAO;
-import org.lamsfoundation.lams.config.dao.IRegistrationDAO;
 import org.lamsfoundation.lams.usermanagement.WorkspaceFolder;
 import org.quartz.JobBuilder;
 import org.quartz.JobDetail;
@@ -74,7 +72,6 @@ public class Configuration implements InitializingBean {
     private static Map<String, ConfigurationItem> items = null;
 
     protected static IConfigurationDAO configurationDAO;
-    protected static IRegistrationDAO registrationDAO;
     protected static MessageService messageService;
     protected static Scheduler scheduler;
 
@@ -116,10 +113,6 @@ public class Configuration implements InitializingBean {
 	    return item.getValue().trim();
 	}
 	return null;
-    }
-
-    public static Registration getRegistration() {
-	return Configuration.registrationDAO.get();
     }
 
     public static void refreshCache() {
@@ -186,10 +179,6 @@ public class Configuration implements InitializingBean {
 			e);
 	    }
 	}
-    }
-
-    public static void saveOrUpdateRegistration(Registration reg) {
-	Configuration.registrationDAO.saveOrUpdate(reg);
     }
 
     public static void setItemValue(Object obj, String value) {
@@ -315,10 +304,6 @@ public class Configuration implements InitializingBean {
 	return Configuration.messageService;
     }
 
-    public IRegistrationDAO getRegistrationDAO() {
-	return Configuration.registrationDAO;
-    }
-
     public void persistUpdate() {
 	updatePublicFolderName();
 	Configuration.configurationDAO.insertOrUpdateAll(Configuration.items.values());
@@ -334,10 +319,6 @@ public class Configuration implements InitializingBean {
 
     public void setMessageService(MessageService messageService) {
 	Configuration.messageService = messageService;
-    }
-
-    public void setRegistrationDAO(IRegistrationDAO registrationDAO) {
-	Configuration.registrationDAO = registrationDAO;
     }
 
     public void setScheduler(Scheduler scheduler) {

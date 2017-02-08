@@ -430,7 +430,6 @@
 		<property name ="target">
 			<bean class="org.lamsfoundation.lams.util.Configuration">
 				<property name="configurationDAO"><ref bean="configurationDAO" /></property>
-				<property name="registrationDAO"><ref bean="registrationDAO" /></property>
 				<property name="messageService"><ref bean="commonMessageService" /></property>
 				<property name="scheduler"><ref bean="scheduler" /></property>
 			</bean>
@@ -585,9 +584,6 @@
 	
 	<!--  Configuration related beans -->
 	<bean id="configurationDAO" class="org.lamsfoundation.lams.config.dao.hibernate.ConfigurationDAO">
-		<property name="sessionFactory"><ref bean="coreSessionFactory"/></property>
-	</bean>
-	<bean id="registrationDAO" class="org.lamsfoundation.lams.config.dao.hibernate.RegistrationDAO">
 		<property name="sessionFactory"><ref bean="coreSessionFactory"/></property>
 	</bean>
 	

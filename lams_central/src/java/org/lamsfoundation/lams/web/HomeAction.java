@@ -356,20 +356,8 @@ public class HomeAction extends DispatchAction {
     public ActionForward logout(ActionMapping mapping, ActionForm form, HttpServletRequest req, HttpServletResponse res)
 	    throws IOException, ServletException {
 
-	UserDTO userDTO = (UserDTO) SessionManager.getSession().getAttribute(AttributeNames.USER);
-	if ((userDTO.getLoggedIntoLamsCommunity() != null) && userDTO.getLoggedIntoLamsCommunity()) {
-	    HomeAction.log.debug("Need to log out user from lamscoomunity");
-	    req.getSession().invalidate();
-
-	    // redirect to lamscommunity logout servlet to log out.
-	    String url = "http://lamscommunity.org/register/logout?return_url=";
-	    url += URLEncoder.encode(Configuration.get(ConfigurationKeys.SERVER_URL), "UTF8");
-	    res.sendRedirect(url);
-	    return null;
-	} else {
-	    req.getSession().invalidate();
-	    return mapping.findForward("index");
-	}
+	req.getSession().invalidate();
+	return mapping.findForward("index");
     }
 
     private ActionForward displayMessage(ActionMapping mapping, HttpServletRequest req, String messageKey) {

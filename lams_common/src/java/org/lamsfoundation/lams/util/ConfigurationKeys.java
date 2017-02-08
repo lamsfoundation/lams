@@ -116,8 +116,6 @@ public class ConfigurationKeys {
 
     public static String ALLOW_DIRECT_LESSON_LAUNCH = "AllowDirectLessonLaunch";
 
-    public static String LAMS_COMMUNITY_ENABLE = "LAMS_Community_enable";
-
     public static String ALLOW_EDIT_ON_FLY = "AllowLiveEdit";
 
     public static String SHOW_ALL_MY_LESSON_LINK = "ShowAllMyLessonLink";
