@@ -18,10 +18,6 @@
       type="org.lamsfoundation.lams.admin.web.form.OrgManageForm"
     />
     <form-bean
-      name="RegisterForm"
-      type="org.lamsfoundation.lams.admin.web.RegisterForm"
-    />
-    <form-bean
       name="themeForm"
       type="org.lamsfoundation.lams.admin.web.form.ThemeForm"
     />
@@ -591,37 +587,6 @@
       <forward
         name="importresult"
         path=".importresult"
-        redirect="false"
-      />
-    </action>
-    <action
-      path="/register"
-      type="org.lamsfoundation.lams.admin.web.RegisterAction"
-      name="RegisterForm"
-      scope="request"
-      input=".register"
-      parameter="method"
-      unknown="false"
-      validate="false"
-    >
-      <forward
-        name="register"
-        path=".register"
-        redirect="false"
-      />
-      <forward
-        name="sysadmin"
-        path="/sysadminstart.do"
-        redirect="false"
-      />
-      <forward
-        name="success"
-        path="http://lamscommunity.org/registration"
-        redirect="false"
-      />
-      <forward
-        name="error"
-        path=".error"
         redirect="false"
       />
     </action>

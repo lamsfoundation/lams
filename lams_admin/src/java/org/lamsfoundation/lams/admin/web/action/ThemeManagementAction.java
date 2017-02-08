@@ -43,14 +43,9 @@ import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 
 /**
+ * Actions for maintaining and altering system themes
+ * 
  * @author Luke Foxton
- *
- *         Actions for maintaining and altering system themes
- *
- *
- *
- *
- *
  */
 public class ThemeManagementAction extends LamsDispatchAction {
 
@@ -63,7 +58,7 @@ public class ThemeManagementAction extends LamsDispatchAction {
 
 	// check permission
 	if (!request.isUserInRole(Role.SYSADMIN)) {
-	    request.setAttribute("errorName", "RegisterAction");
+	    request.setAttribute("errorName", "ThemeManagementAction");
 	    request.setAttribute("errorMessage", AdminServiceProxy.getMessageService(getServlet().getServletContext())
 		    .getMessage("error.authorisation"));
 	    return mapping.findForward("error");

@@ -160,12 +160,6 @@ public class User implements Serializable, Comparable {
     private Boolean changePassword;
 
     /** persistent field */
-    private String lamsCommunityToken;
-
-    /** persistent field */
-    private String lamsCommunityUsername;
-
-    /** persistent field */
     private Boolean tutorialsDisabled;
 
     /** persistent field */
@@ -506,8 +500,7 @@ public class User implements Serializable, Comparable {
 	return new UserDTO(userId, firstName, lastName, login, languageIsoCode, countryIsoCode, direction, email,
 		theme != null ? new ThemeDTO(theme) : null,
 		// TimeZone.getTimeZone("Australia/Sydney"),
-		timeZone, authenticationMethod.getAuthenticationMethodId(), fckLanguageMapping, lamsCommunityToken,
-		lamsCommunityUsername, 
+		timeZone, authenticationMethod.getAuthenticationMethodId(), fckLanguageMapping, 
 		(tutorialsDisabled == null ? false : true), // assume tutorials enabled if not set
 		tutorialPages, 
 		(firstLogin == null ? true : false), // assume no firstLogin value means they haven't logged in
@@ -594,22 +587,6 @@ public class User implements Serializable, Comparable {
 
     public void setChangePassword(Boolean changePassword) {
 	this.changePassword = changePassword;
-    }
-
-    public String getLamsCommunityToken() {
-	return lamsCommunityToken;
-    }
-
-    public void setLamsCommunityToken(String lamsCommunityToken) {
-	this.lamsCommunityToken = lamsCommunityToken;
-    }
-
-    public String getLamsCommunityUsername() {
-	return lamsCommunityUsername;
-    }
-
-    public void setLamsCommunityUsername(String lamsCommunityUsername) {
-	this.lamsCommunityUsername = lamsCommunityUsername;
     }
 
     public String getTimeZone() {

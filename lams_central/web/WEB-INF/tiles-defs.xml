@@ -25,10 +25,6 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
   http://www.gnu.org/licenses/gpl.txt
 -->
 <tiles-definitions>
-	
-	<definition name=".community" path="/main.jsp">
-		<put name="community" value="lamscommunity/community.jsp"/>	
-	</definition>
 
 	<definition name=".error" path="/template.jsp">
 		<put name="titleKey" value="heading.general.error"/>

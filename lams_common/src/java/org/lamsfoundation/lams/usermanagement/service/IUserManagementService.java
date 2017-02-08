@@ -356,14 +356,6 @@ public interface IUserManagementService {
     boolean isUserSysAdmin();
 
     /**
-     * Count the number of unique (distinct) users with a particular role in the system.
-     *
-     * @param roleId
-     *            Role ID
-     */
-    Integer getCountRoleForSystem(Integer roleId);
-
-    /**
      * Count then umber of users with a particular role in a given org.
      *
      * @param orgId

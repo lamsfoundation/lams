@@ -49,16 +49,9 @@ import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 
 /**
- *
- *
- *
- *
- *
- *
  * Export tool content action. It needs learingDesignID as input parameter.
  *
  * @author Steve.Ni
- * @version $Revision$
  */
 public class ExportToolContentAction extends LamsAction {
 

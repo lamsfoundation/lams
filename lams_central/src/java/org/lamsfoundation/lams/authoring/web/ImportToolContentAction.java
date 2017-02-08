@@ -24,11 +24,7 @@
 
 package org.lamsfoundation.lams.authoring.web;
 
-import java.io.BufferedOutputStream;
 import java.io.File;
-import java.io.FileOutputStream;
-import java.io.InputStream;
-import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -47,32 +43,20 @@ import org.apache.log4j.Logger;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
-import org.lamsfoundation.lams.config.Registration;
 import org.lamsfoundation.lams.learningdesign.service.IExportToolContentService;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
-import org.lamsfoundation.lams.util.Configuration;
 import org.lamsfoundation.lams.util.FileUtil;
 import org.lamsfoundation.lams.util.MessageService;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.action.LamsAction;
-import org.lamsfoundation.lams.web.lamscommunity.LamsCommunityUtil;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 
 /**
- * *
- *
- *
- *
- *
- *
- *
- *
- *
  * Import tool content servlet. It needs an uploaded learning design zip file.
  *
  * @author Steve.Ni
@@ -83,7 +67,6 @@ public class ImportToolContentAction extends LamsAction {
     public static final String USER_SERVICE_BEAN_NAME = "userManagementService";
     public static final String MESSAGE_SERVICE_BEAN_NAME = "authoringMessageService";
     public static final String PARAM_LEARING_DESIGN_ID = "learningDesignID";
-    public static final String PARAM_LEARNING_DESIGN_LOCATION = "ldLocation";
     public static final String PARAM_LEARNING_FILE_NAME = "fileName";
     public static final String ATTR_TOOLS_ERROR_MESSAGE = "toolsErrorMessages";
     public static final String ATTR_LD_ERROR_MESSAGE = "ldErrorMessages";
@@ -106,29 +89,6 @@ public class ImportToolContentAction extends LamsAction {
 	    }
 	    //display initial page for upload
 	    return mapping.findForward("upload");
-	} else if (StringUtils.equals(param, "importLC")) {
-	    // Checking the server is registered
-	    Registration reg = Configuration.getRegistration();
-	    if (reg == null || reg.isEnableLamsCommunityIntegration() == false) {
-		request.setAttribute("registered", Boolean.FALSE);
-	    } else {
-		request.setAttribute("registered", Boolean.TRUE);
-	    }
-
-	    // import from lams community, redirect to sso page
-	    if (customCSV != null) {
-		request.setAttribute(AttributeNames.PARAM_CUSTOM_CSV, customCSV);
-	    }
-	    //display initial lamscommunity import
-	    return mapping.findForward("importLC");
-	} else if (StringUtils.equals(param, "importLCFinish")) {
-
-	    // uploading the file from lams commmunity, have to feed the
-	    // location from the request
-	    String learningDesignLocation = WebUtil.readStrParam(request, PARAM_LEARNING_DESIGN_LOCATION);
-
-	    importLDFromURL(request, learningDesignLocation, customCSV);
-	    return mapping.findForward("successLC");
 	} else {
 	    importLD(request);
 	    return mapping.findForward("success");
@@ -219,92 +179,6 @@ public class ImportToolContentAction extends LamsAction {
 	    request.setAttribute(ATTR_TOOLS_ERROR_MESSAGE, toolsErrorMsgs);
 	}
 
-    }
-
-    /**
-     * Import a LD from a url.
-     *
-     * @param request
-     */
-    @SuppressWarnings("unchecked")
-    private void importLDFromURL(HttpServletRequest request, String learningDesignLocation, String customCSV) {
-
-	List<String> ldErrorMsgs = new ArrayList<String>();
-	List<String> toolsErrorMsgs = new ArrayList<String>();
-	Long ldId = null;
-
-	String fileExt = WebUtil.readStrParam(request, "ext");
-	String fileName = FileUtil.generateUniqueContentFolderID() + "." + fileExt;
-
-	try {
-	    //get shared session
-	    HttpSession ss = SessionManager.getSession();
-	    //get back login user DTO
-	    UserDTO userDto = (UserDTO) ss.getAttribute(AttributeNames.USER);
-	    User user = (User) getUserService().findById(User.class, userDto.getUserID());
-
-	    // append the lams community auth info
-	    learningDesignLocation = LamsCommunityUtil.appendAuthInfoToURL(learningDesignLocation, user);
-
-	    Integer workspaceFolderUid = null;
-
-	    File designFile = null;
-	    String uploadPath = FileUtil.createTempDirectory("_uploaded_learningdesign") + File.separator
-		    + FileUtil.getFileName(fileName);
-
-	    // get the ld input stream form the location
-	    InputStream is = WebUtil.getResponseInputStreamFromExternalServer(learningDesignLocation,
-		    new HashMap<String, String>());
-
-	    // Get the output stream to write the file for export
-	    OutputStream out = new BufferedOutputStream(new FileOutputStream(uploadPath));
-
-	    byte[] buffer = new byte[1024];
-	    int numRead;
-	    long numWritten = 0;
-	    while ((numRead = is.read(buffer)) != -1) {
-		out.write(buffer, 0, numRead);
-		numWritten += numRead;
-	    }
-	    log.debug("Path to ld import file: " + uploadPath);
-
-	    out.flush();
-	    out.close();
-	    is.close();
-
-	    designFile = new File(uploadPath);
-
-	    if (designFile == null) {
-		MessageService msgService = getMessageService();
-		log.error("Upload file missing. Filename was " + fileName);
-		String msg = msgService.getMessage(KEY_MSG_IMPORT_FILE_NOT_FOUND);
-		ldErrorMsgs.add(msg != null ? msg : "Upload file missing");
-
-	    } else {
-
-		IExportToolContentService service = getExportService();
-		Object[] ldResults = service.importLearningDesign(designFile, user, workspaceFolderUid, toolsErrorMsgs,
-			customCSV);
-		ldId = (Long) ldResults[0];
-		ldErrorMsgs = (List<String>) ldResults[1];
-		toolsErrorMsgs = (List<String>) ldResults[2];
-	    }
-	} catch (Exception e) {
-	    log.error("Error occured during import", e);
-	    ldErrorMsgs.add(e.getClass().getName() + " " + e.getMessage());
-	}
-
-	request.setAttribute(ATTR_LD_ID, ldId);
-	if ((ldId == null || ldId.longValue() == -1) && ldErrorMsgs.size() == 0) {
-	    MessageService msgService = getMessageService();
-	    ldErrorMsgs.add(msgService.getMessage(KEY_MSG_IMPORT_FAILED_UNKNOWN_REASON));
-	}
-	if (ldErrorMsgs.size() > 0) {
-	    request.setAttribute(ATTR_LD_ERROR_MESSAGE, ldErrorMsgs);
-	}
-	if (toolsErrorMsgs.size() > 0) {
-	    request.setAttribute(ATTR_TOOLS_ERROR_MESSAGE, toolsErrorMsgs);
-	}
     }
 
     //***************************************************************************************

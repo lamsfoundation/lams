@@ -215,9 +215,6 @@ public class ProfileAction extends LamsDispatchAction {
 	    request.setAttribute("sharedSecret", requestor.getTwoFactorAuthenticationSecret());    
 	}
 
-	boolean hasLamsCommunityToken = requestor.getLamsCommunityToken() != null;
-	request.setAttribute("hasLamsCommunityToken", hasLamsCommunityToken);
-
 	themeService = getThemeService();
 
 	// Get all the css themes

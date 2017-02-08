@@ -61,7 +61,6 @@ public class SysAdminStartAction extends Action {
 	    links.add(new LinkBean("signupManagement.do", "admin.signup.title"));
 	    links.add(new LinkBean("serverlist.do", "sysadmin.maintain.external.servers"));
 	    links.add(new LinkBean("ltiConsumerManagement.do", "label.manage.tool.consumers"));
-	    links.add(new LinkBean("register.do", "sysadmin.register.server"));
 	    links.add(new LinkBean("toolcontentlist.do", "sysadmin.tool.management"));
 	    links.add(new LinkBean("themeManagement.do", "admin.themes.title"));
 	    groupedLinks.add(new Object[]{AdminConstants.START_CONFIG_LINKS,links});

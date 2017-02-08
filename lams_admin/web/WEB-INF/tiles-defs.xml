@@ -197,11 +197,6 @@
 		<put name="content" value=".editconfig-items"/>
 	</definition>
 	
-	<definition name=".register" path="/template.jsp">
-		<put name="title" value="sysadmin.register.server"/>
-		<put name="content" value="register.jsp"/>
-	</definition>
-	
 	<definition name=".statistics" path="/template.jsp">
 		<put name="title" value="admin.statistics.title"/>
 		<put name="content" value="statistics.jsp"/>

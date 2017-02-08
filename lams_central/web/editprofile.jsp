@@ -77,12 +77,6 @@
 								<lams:user property="authenticationMethodId" />
 							</c:set>
 							<c:set var="dbId"><%=AuthenticationMethod.DB%></c:set>
-							<c:set var="lamsCommunityToken">
-								<bean:write name="UserForm" property="lamsCommunityToken" />
-							</c:set>
-							<c:set var="lamsCommunityUsername">
-								<bean:write name="UserForm" property="lamsCommunityUsername" />
-							</c:set>
 							<c:if test="${authenticationMethodId eq dbId}">
 
 								<div class="form-group">
@@ -235,18 +229,6 @@
 										<label><fmt:message key="label.2FA.shared.secret" />:</label>
 										<br>
 										${sharedSecret}
-									</div>
-								</c:if>
-								
-								<c:if test="${not empty lamsCommunityToken}">
-									<div class="form-group">
-										<label> 
-											<fmt:message key="label.lamscommunity.changeuser">
-												<fmt:param value="${lamsCommunityUsername}" />
-											</fmt:message>
-										</label>
-										<html:checkbox property="disableLamsCommunityUsername"
-												disabled="${!profileEditEnabled}" styleClass="form-control"/>
 									</div>
 								</c:if>
 							</c:if>

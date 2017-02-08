@@ -49,9 +49,6 @@ public class UserDTO implements Serializable {
     private ThemeDTO theme;
     private TimeZone timeZone;
     private Integer authenticationMethodId;
-    private String lamsCommunityToken;
-    private String lamsCommunityUsername;
-    private Boolean loggedIntoLamsCommunity;
     private Boolean tutorialsDisabled;
     private Set<String> pagesWithDisabledTutorials;
     private Boolean firstLogin;
@@ -59,9 +56,8 @@ public class UserDTO implements Serializable {
 
     public UserDTO(Integer userID, String firstName, String lastName, String login, String localeLanguage,
 	    String localeCountry, String direction, String email, ThemeDTO htmlTheme, TimeZone timezone,
-	    Integer authenticationMethodId, String fckLanguageMapping, String lamsCommunityToken,
-	    String lamsCommunityUsername, Boolean tutorialsDisabled, Set<String> pagesWithDisabledTutorials,
-	    Boolean firstLogin, Integer lastVisitedOrganisationId) {
+	    Integer authenticationMethodId, String fckLanguageMapping, Boolean tutorialsDisabled,
+	    Set<String> pagesWithDisabledTutorials, Boolean firstLogin, Integer lastVisitedOrganisationId) {
 	this.userID = userID;
 	this.firstName = firstName;
 	this.lastName = lastName;
@@ -74,8 +70,6 @@ public class UserDTO implements Serializable {
 	timeZone = timezone;
 	this.authenticationMethodId = authenticationMethodId;
 	this.fckLanguageMapping = fckLanguageMapping;
-	this.lamsCommunityToken = lamsCommunityToken;
-	this.lamsCommunityUsername = lamsCommunityUsername;
 	this.tutorialsDisabled = tutorialsDisabled;
 	this.pagesWithDisabledTutorials = pagesWithDisabledTutorials;
 	this.firstLogin = firstLogin;
@@ -174,38 +168,11 @@ public class UserDTO implements Serializable {
 		.append("direction", getDirection()).append("email", getEmail()).append("htmlTheme", getTheme())
 		.append("timeZone", getTimeZone()).append("authenticationMethodId", getAuthenticationMethodId())
 		.append("fckLanguageMapping", getFckLanguageMapping())
-		.append("lamsCommunityUser", this.getLamsCommunityUsername())
-		.append("lamsCommunityToken", this.getLamsCommunityToken())
-		.append("loggedIntoLamsCommunity", "" + this.getLoggedIntoLamsCommunity())
 		.append("tutorialsDisabled", "" + getTutorialsDisabled()).toString();
     }
 
     public String getFckLanguageMapping() {
 	return fckLanguageMapping;
-    }
-
-    public String getLamsCommunityToken() {
-	return lamsCommunityToken;
-    }
-
-    public void setLamsCommunityToken(String lamsCommunityToken) {
-	this.lamsCommunityToken = lamsCommunityToken;
-    }
-
-    public String getLamsCommunityUsername() {
-	return lamsCommunityUsername;
-    }
-
-    public void setLamsCommunityUsername(String lamsCommunityUsername) {
-	this.lamsCommunityUsername = lamsCommunityUsername;
-    }
-
-    public Boolean getLoggedIntoLamsCommunity() {
-	return loggedIntoLamsCommunity;
-    }
-
-    public void setLoggedIntoLamsCommunity(Boolean loggedIntoLamsCommunity) {
-	this.loggedIntoLamsCommunity = loggedIntoLamsCommunity;
     }
 
     public Boolean getTutorialsDisabled() {

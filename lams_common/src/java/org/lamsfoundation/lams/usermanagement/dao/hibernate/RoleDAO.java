@@ -44,10 +44,6 @@ public class RoleDAO extends LAMSBaseDAO implements IRoleDAO {
 	    + "u.id = uo.user.id and " + "uo.organisation = :org and " + "uor.userOrganisation.id = uo.id and "
 	    + "uor.role.id = :roleId";
 
-    private final static String COUNT_ROLE = "select count(distinct userOrganisationRole.userOrganisation.user)"
-	    + " from " + UserOrganisationRole.class.getName() + " userOrganisationRole"
-	    + " where userOrganisationRole.role.roleId = :roleId";
-
     private final static String COUNT_ROLE_FOR_ORG = "select count(distinct uor.userOrganisation.user) from "
 	    + UserOrganisationRole.class.getName() + " uor where uor.role.roleId = :roleId"
 	    + " and uor.userOrganisation.organisation.organisationId = :orgId";
@@ -56,15 +52,6 @@ public class RoleDAO extends LAMSBaseDAO implements IRoleDAO {
     public User getUserByOrganisationAndRole(Integer userId, Integer roleId, Organisation organisation) {
 	return (User) getSession().createQuery(RoleDAO.LOAD_USER_BY_ORG_AND_ROLE).setInteger("userId", userId)
 		.setEntity("org", organisation).setInteger("roleId", roleId).uniqueResult();
-    }
-
-    @Override
-    public Integer getCountRoleForSystem(Integer roleId) {
-
-	Query query = getSession().createQuery(RoleDAO.COUNT_ROLE);
-	query.setInteger("roleId", roleId.intValue());
-	Object value = query.uniqueResult();
-	return new Integer(((Number) value).intValue());
     }
 
     @Override
