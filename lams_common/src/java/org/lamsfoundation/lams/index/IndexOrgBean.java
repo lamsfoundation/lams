@@ -41,7 +41,6 @@ public class IndexOrgBean implements Comparable {
     private String name;
     private Date archivedDate;
     private Integer type;
-    private Boolean allowSorting = false;
     private boolean favorite = false;
     private List<IndexLinkBean> links;
     private List<IndexLinkBean> moreLinks;
@@ -199,14 +198,6 @@ public class IndexOrgBean implements Comparable {
 
     public void addChildOrgBean(IndexOrgBean orgBean) {
 	childIndexOrgBeans.add(orgBean);
-    }
-
-    public Boolean getAllowSorting() {
-	return allowSorting;
-    }
-
-    public void setAllowSorting(Boolean allowSorting) {
-	this.allowSorting = allowSorting;
     }
     
     /**

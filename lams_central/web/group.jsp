@@ -52,12 +52,3 @@
 		</div>
 	</c:forEach>
 </div>
-
-<c:if test="${orgBean.allowSorting}">
-	<div class="pull-right">
-		<a class="sorting text-muted tour-sorting" href="#" onClick="javascript:makeOrgSortable()" title="<fmt:message key="label.enable.lesson.sorting"/>">
-			<i class="fa fa-sort"></i>
-		</a>
-	</div>
-</c:if>
-
