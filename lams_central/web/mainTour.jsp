@@ -1,3 +1,4 @@
+	<%--  The definition of Bootstrap Tour for main.jsp --%>
 	var tour = null;
 	var courseIsHidden = null;
 	function startTour() {
@@ -5,115 +6,110 @@
 
 		if ( tour == null ) {
 			tour = new Tour({
-			  name: "LAMSMainTour",
+			  name: "LAMSTour",
 		      steps: [
 		          {
-			        title: "LAMS Tour",
-			        content: "This short tour will show you the features of the main LAMS screen. You can stop the tour at any time by clicking End Tour, and restart it by clicking on the Tour button again.",
+			        title: "<fmt:message key="tour.intro.title"/>",
+			        content: "<fmt:message key="tour.intro.content"/>",
 			        placement: "top",
 			        orphan: true
 			      }, {
 			        element: ".tour-course-reveal",
-			        title: "Courses",
-			        content: "Click here to reveal or hide your courses.",
+			        title: "<fmt:message key="organisations"/>",
+			        content: "<fmt:message key="tour.course.reveal.content"/>",
 		        	placement: "bottom",
 			      }, {
 			        element: ".tour-organisations",
-			        title: "Courses",
-			        content: "Click on a course to make it the current course.",
-		        	placement: "right",
+			        title: "<fmt:message key="organisations"/>",
+			        content: "<fmt:message key="tour.courses.content"/>",
+		        	placement: "top",
 		        	onShow: revealCourses
 			      }, {
 			        element: ".tour-organisations-favorites",
-			        title: "Courses",
-			        content: "Your favorite courses will appear at the top of the list.",
-		        	placement: "right",
+			        title: "<fmt:message key="organisations"/>",
+			        content: "<fmt:message key="tour.favorites.content"/>",
+		        	placement: "bottom",
 		        	onHidden: hideCourses
 			      }, {
 			        element: ".tour-org-container",
-			        title: "Lessons",
-			        content: "Lessons will appear here for the current course.",
+			        title: "<fmt:message key="lessons"/>",
+			        content: "<fmt:message key="tour.lessons.content"/>",
 		        	placement: "top",
 		        	backdrop: true
 			      }, {
 			        element: ".tour-user-notifications",
-			        title: "Notifications",
-			        content: "Look at the notifications that you receive about your lessons.",
+			        title: "<fmt:message key="index.emailnotifications"/>",
+			        content: "<fmt:message key="tour.notification.content"/>",
 			        placement: "left"
 			      }, {
 			        element: ".tour-index-author",
-			        title: "Authoring",
-			        content: "Create or modify the learning designs used for lessons.",
+			        title: "<fmt:message key="authoring.fla.page.title"/>",
+			        content: "<fmt:message key="tour.authoring.content"/>",
 			        placement: "left"
 			      }, {
 			        element: ".tour-user-profile",
-			        title: "User Profile",
-			        content: "Update your user settings.",
+			        title: "<fmt:message key="index.myprofile"/>",
+			        content: "<fmt:message key="tour.user.profile.content"/>",
 			        placement: "left"
 			      }, {
 			        element: ".tour-favorite-organisation",
-			        title: "Course Name",
-			        content: "Current course name. Click on the star to add this course to your favourites in the course list.",
+			        title: "<fmt:message key="index.mycourses"/>",
+			        content: "<fmt:message key="tour.course.name.content"/>",
 			        placement: "right"
 			      }, {
 			        element: ".tour-add-lesson",
-			        title: "Add Lesson",
-			        content: "Create a new lesson for the course, or a course subgroup, depending on which button is used.",
+			        title: "<fmt:message key="index.addlesson"/>",
+			        content: "<fmt:message key="tour.add.lesson.content"/>",
 			        placement: "left"
 			      }, {
 			        element: ".tour-add-single-lesson",
-			        title: "Add Lesson",
-			        content: "Use the down arrow to select an activity and create a lesson with just this single activity.",
+			        title: "<fmt:message key="index.addlesson"/>",
+			        content: "<fmt:message key="tour.add.single.activity.lesson.content"/>",
 			        placement: "left"
 			      }, {
 			        element: ".tour-index-coursegradebook-learner",
-			        title: "Course Gradebook",
-			        content: "View your marks for lessons in this course.",
+			        title: "<fmt:message key="index.coursegradebook"/>",
+			        content: "<fmt:message key="tour.course.gradebook.content"/>",
 			        placement: "left"
 			      }, {
 			        element: ".tour-more-options",
-			        title: "More Options",
-			        content: "General options for managing a course such as notifications, subgroups, gradebook. The contents of this menu will vary depending on your responsibilities.",
+			        title: "<fmt:message key="index.moreActions"/>",
+			        content: "<fmt:message key="tour.more.actions.content"/>",
 			        placement: "left"
 			      }, {
 			        element: ".tour-index-monitor",
-			        title: "Lesson Monitoring",
-			        content: "The monitoring screen shows you where the learners are in the lesson and to see the learner\'s contributions",
+			        title: "<fmt:message key="tour.lesson.monitoring.title"/>",
+			        content: "<fmt:message key="tour.lesson.monitoring.content"/>",
 			        placement: "left"			        
 			      }, {
 			        element: ".tour-index-emailnotifications",
-			        title: "Lesson Notifications",
-			        content: "Send notifications to lesson learners.",
+			        title: "<fmt:message key="tour.lesson.notifications.title"/>",
+			        content: "<fmt:message key="tour.lesson.notifications.content"/>",
 			        placement: "left"
 			      }, {
 			        element: ".tour-index-coursegradebookmonitor",
-			        title: "Lesson Gradebook",
-			        content: "Review learner\'s marks and the length of time taken in the lesson.",
+			        title: "<fmt:message key="tour.lesson.gradebook.title"/>",
+			        content: "<fmt:message key="tour.lesson.gradebook.content"/>",
 			        placement: "left"
 			      }, {
 			        element: ".tour-index-conditions",
-			        title: "Lesson Conditions",
-			        content: "Set up conditions for starting or ending the lesson.",
+			        title: "<fmt:message key="tour.lesson.conditions.title"/>",
+			        content: "<fmt:message key="tour.lesson.conditions.content"/>",
 			        placement: "left"
 			      }, {
 			        element: ".tour-index-remove-lesson",
-			        title: "Remove Lesson",
-			        content: "Delete the lesson completely. This is permanent - it cannot be undone.",
+			        title: "<fmt:message key="tour.lesson.remove.title"/>",
+			        content: "<fmt:message key="tour.lesson.remove.content"/>",
 			        placement: "left"
 			      }, {
-			        element: ".tour-sorting",
-			        title: "Lesson Sorting",
-			        content: "Turn on or off lesson sorting.",
-			        placement: "left"
-			      }, {
-			        title: "End Of Tour",
-			        content: "Thank you for taking the tour. To restart the tour, click the Tour button again.",
+			        title: "<fmt:message key="tour.end.title"/>",
+			        content: "<fmt:message key="tour.end.content"/>",
 			        placement: "top",
 			        orphan: true
 			      }			      
 			    ],
 			  onEnd: resetCourses,
-			  debug: true,
+			  debug: false,
 			  backdrop: false,
 			});
 
@@ -139,4 +135,7 @@
 		else
 			revealCourses(tour);
 	}
+	
+	
+
 	

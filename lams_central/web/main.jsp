@@ -281,8 +281,8 @@
 					
 					<li role="presentation" class="dropdown">       
 						<a href="javascript:;" onclick="javascript:startTour();" class="dropdown-toggle info-number" data-toggle="dropdown" aria-expanded="false">
+							<span class="xs-hidden"><fmt:message key="label.tour"/></span>
 							<i class="fa fa-question-circle"></i>
-							<span class="xs-hidden">Take Tour</span>
 						</a>
 					</li>
 					
