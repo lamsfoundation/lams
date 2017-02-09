@@ -196,13 +196,14 @@ function makeOrgSortable() {
 		makeSortable(this);
 	});
 	
-	$("a.sorting", org).attr({
-		"onClick" : null,
+	//modify parent <li> element
+	$("i.sorting", org).parent().parent().attr({
+		"onClick" : "makeOrgUnsortable()",
 		"title"   : LABELS.SORTING_DISABLE
-	}).off('click').click(function(){
-		makeOrgUnsortable();
-	}).find("img")
-	  .attr("src", "images/sorting_enabled.gif");
+	});
+	
+	//modify link's text
+	$("i.sorting", org).parent().contents().get(1).nodeValue = LABELS.SORTING_DISABLE;
 }
 
 function makeOrgUnsortable() {
@@ -211,13 +212,14 @@ function makeOrgUnsortable() {
 		$(this).sortable('destroy');
 	});
 	
-	$("a.sorting", org).attr({
-		"onClick" : null,
+	//modify parent <li> element
+	$("i.sorting", org).parent().parent().attr({
+		"onClick" : "makeOrgSortable()",
 		"title"   : LABELS.SORTING_ENABLE
-	}).off('click').click(function(){
-		makeOrgSortable();
-	}).find("img")
-	  .attr("src", "images/sorting_disabled.gif");
+	});
+	
+	//modify link's text
+	$("i.sorting", org).parent().contents().get(1).nodeValue = LABELS.SORTING_ENABLE;
 }
 
 function makeSortable(element) {

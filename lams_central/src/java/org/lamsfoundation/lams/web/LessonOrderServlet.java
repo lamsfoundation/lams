@@ -50,9 +50,6 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
  * single comma separated string in lams_organisation.
  *
  * @author jliew
- *
- *
- *
  */
 public class LessonOrderServlet extends HttpServlet {
 
@@ -75,12 +72,10 @@ public class LessonOrderServlet extends HttpServlet {
 	    if (org != null) {
 		// make sure user has permission to sort org lessons
 		boolean allowSorting = false;
-		List<Integer> roles = new ArrayList<Integer>();
 		List<UserOrganisationRole> userOrganisationRoles = service.getUserOrganisationRoles(orgId,
 			request.getRemoteUser());
 		for (UserOrganisationRole userOrganisationRole : userOrganisationRoles) {
 		    Integer roleId = userOrganisationRole.getRole().getRoleId();
-		    roles.add(roleId);
 		    if (roleId.equals(Role.ROLE_GROUP_MANAGER) || roleId.equals(Role.ROLE_MONITOR)) {
 			allowSorting = true;
 			break;

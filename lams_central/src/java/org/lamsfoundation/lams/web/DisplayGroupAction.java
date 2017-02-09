@@ -89,23 +89,17 @@ public class DisplayGroupAction extends Action {
 		return null;
 	    }
 
-	    boolean allowSorting = false;
 	    List<Integer> roles = new ArrayList<Integer>();
 	    List<UserOrganisationRole> userOrganisationRoles = getService().getUserOrganisationRoles(orgId,
 		    request.getRemoteUser());
 	    for (UserOrganisationRole userOrganisationRole : userOrganisationRoles) {
 		Integer roleId = userOrganisationRole.getRole().getRoleId();
 		roles.add(roleId);
-		if (roleId.equals(Role.ROLE_GROUP_MANAGER) || roleId.equals(Role.ROLE_MONITOR)) {
-		    allowSorting = true;
-		}
 	    }
 
 	    IndexOrgBean iob = createOrgBean(org, roles, request.getRemoteUser(), request.isUserInRole(Role.SYSADMIN));
 
 	    request.setAttribute("orgBean", iob);
-	    request.setAttribute("allowSorting", allowSorting);
-	    iob.setAllowSorting(allowSorting && iob.getAllowSorting());
 	    if (org.getEnableSingleActivityLessons()
 		    && (roles.contains(Role.ROLE_GROUP_MANAGER) || roles.contains(Role.ROLE_MONITOR))) {
 		// if single activity lessons are enabled, put sorted list of tools
@@ -125,6 +119,9 @@ public class DisplayGroupAction extends Action {
 	    throws SQLException, NamingException {
 	IndexOrgBean orgBean = new IndexOrgBean(org.getOrganisationId(), org.getName(),
 		org.getOrganisationType().getOrganisationTypeId());
+
+	// populate group contents
+	orgBean = populateContentsOrgBean(orgBean, org, roles, username, isSysAdmin);
 
 	// First, populate header part
 	List<IndexLinkBean> links = new ArrayList<IndexLinkBean>();
@@ -173,6 +170,21 @@ public class DisplayGroupAction extends Action {
 			    "javascript:showNotificationsDialog(" + org.getOrganisationId() + ",null)",
 			    "fa fa-fw fa-bullhorn", "index.emailnotifications.tooltip"));
 		}
+		
+		// Adding lesson sorting link
+		if (roles.contains(Role.ROLE_GROUP_MANAGER) || roles.contains(Role.ROLE_MONITOR)) {
+
+		    // make sure the group or any of its subgroups has at least one lesson
+		    boolean hasLesson = !orgBean.getLessons().isEmpty();
+		    for (IndexOrgBean childOrgBean : orgBean.getChildIndexOrgBeans()) {
+			hasLesson |= (childOrgBean.getLessons() != null) && !childOrgBean.getLessons().isEmpty();
+		    }
+
+		    if (hasLesson) {
+			moreLinks.add(new IndexLinkBean("label.enable.lesson.sorting", "javascript:makeOrgSortable()",
+				"fa fa-fw fa-sort sorting tour-sorting", "label.enable.lesson.sorting"));
+		    }
+		}
 
 		// Adding gradebook course monitor links if enabled
 		if (org.getEnableGradebookForMonitors()
@@ -201,9 +213,6 @@ public class DisplayGroupAction extends Action {
 	orgBean.setLinks(links);
 	orgBean.setMoreLinks(moreLinks);
 
-	// now populate group contents
-	orgBean = populateContentsOrgBean(orgBean, org, roles, username, isSysAdmin);
-
 	return orgBean;
     }
 
@@ -214,11 +223,7 @@ public class DisplayGroupAction extends Action {
 	Map<Long, IndexLessonBean> map = populateLessonBeans(getUser(username).getUserId(), org.getOrganisationId(),
 		roles);
 	List<IndexLessonBean> lessonBeans = IndexUtils.sortLessonBeans(org.getOrderedLessonIds(), map);
-
 	orgBean.setLessons(lessonBeans);
-	if (!lessonBeans.isEmpty()) {
-	    orgBean.setAllowSorting(true);
-	}
 
 	// create subgroup beans
 	if (orgBean.getType().equals(OrganisationType.COURSE_TYPE)) {
@@ -244,9 +249,6 @@ public class DisplayGroupAction extends Action {
 		    }
 		    IndexOrgBean childOrgBean = createOrgBean(organisation, classRoles, username, isSysAdmin);
 		    childOrgBeans.add(childOrgBean);
-		    if ((childOrgBean.getLessons() != null) && !childOrgBean.getLessons().isEmpty()) {
-			orgBean.setAllowSorting(true);
-		    }
 		}
 	    }
 	    Collections.sort(childOrgBeans);
