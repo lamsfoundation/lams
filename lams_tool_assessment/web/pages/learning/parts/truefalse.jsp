@@ -72,12 +72,12 @@
 <c:if test="${finishedLock && assessment.allowQuestionFeedback && (question.answerString != null)}">
 	<c:choose>
 		<c:when test="${question.answerBoolean}">
-			<div class="question-feedback">
+			<div class="feedback">
 				<c:out value="${question.feedbackOnCorrect}" escapeXml="false" />
 			</div>
 		</c:when>
 		<c:when test="${!question.answerBoolean}">
-			<div class="question-feedback">
+			<div class="feedback">
 				<c:out value="${question.feedbackOnIncorrect}" escapeXml="false" />
 			</div>
 		</c:when>		
