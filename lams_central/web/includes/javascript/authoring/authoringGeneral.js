@@ -1,4 +1,4 @@
-﻿﻿﻿/**
+﻿﻿﻿﻿/**
  * This file contains main methods for Authoring.
  */
 
@@ -625,6 +625,13 @@ GeneralInitLib = {
 			GeneralLib.openLearningDesign(learningDesignID);
 		});
 		
+		// ability to save a sequence on pressing the Enter key in a title input field
+		$('#ldStoreDialogNameContainer input', layout.ldStoreDialog).on('keyup', function (e) {
+		    if (e.keyCode == 13) {
+				$('#ldStoreDialogSaveButton', $('#ldStoreDialogContents')).trigger( "click" );
+		    }
+		});
+		
 		$('#ldStoreDialogImportPartButton', ldStoreDialogContents).click(function(){
 			var dialog = layout.ldStoreDialog,
 	 			frameLayout = $('#ldStoreDialogImportPartFrame', dialog)[0].contentWindow.layout,
@@ -704,6 +711,7 @@ GeneralInitLib = {
 			'resizable'     : false,
 			'draggable'     : false,
 			'open' : function(){
+				
 				var dialog = $(this),
 					treeHeight = Math.max(90, $(window).height() - 325) + 'px';
 				$('.modal-dialog', dialog).width(Math.max(500, $(window).width() - 50));
@@ -721,6 +729,14 @@ GeneralInitLib = {
 				$('#ldStoreDialogLeftButtonContainer button', dialog).prop('disabled', true);
 				
 				dialog.data('copiedResource', null);
+				
+				//focus dialog itself so it can be closed on pressing Esc button
+				setTimeout(function() {
+					if ($("#ldStoreDialogOpenButton:visible").is(':visible')) {
+						dialog.focus();
+					}
+		        }, 500);
+				
 			},
 			'close' : null,
 			'data' : {
@@ -879,6 +895,14 @@ GeneralInitLib = {
 			}
 		}, false);
 		
+		//alow to close open/save dialog on pressing Esc button
+		layout.ldStoreDialog.on('keydown', function(evt) {
+	        if (evt.keyCode === $.ui.keyCode.ESCAPE) {
+	        	layout.ldStoreDialog.modal('hide');
+	        }
+	        evt.stopPropagation();
+	    });
+		
 		$('.modal-body', layout.ldStoreDialog).empty().append(ldStoreDialogContents.show());
 		
 		layout.dialogs.push(layout.ldStoreDialog);
@@ -911,23 +935,40 @@ GeneralInitLib = {
 			callback();
 		});
 		tree.singleNodeHighlight = true;
-		tree.subscribe('clickEvent', function(event){
-			var isSaveDialog = $('#ldStoreDialogSaveButton', layout.ldStoreDialog).is(':visible');
-		
+		tree.subscribe('clickEvent', function(event) {
+			var isOpenDialog = $('#ldStoreDialogSaveButton', layout.ldStoreDialog).is(':hidden');
+			
+			//prevent item from being deselected on any subsequent clicks
+			if (isOpenDialog && event.node.highlightState == 1) {
+				return false;
+			}
+			
+			//disable edit buttons if no elements is selected
 			$('#ldStoreDialogLeftButtonContainer button', layout.ldStoreDialog)
 				.prop('disabled', event.node.highlightState > 0);
 
-			if (!isSaveDialog && !event.node.data.learningDesignId){
-				// it is a folder in load sequence dialog, highlight but stop processing
+			// if it's a folder in load sequence dialog - highlight but stop processing
+			if (isOpenDialog && !event.node.data.learningDesignId){
 				return true;
 			}
 			
+			//show LearningDesign thumbnail and title
 			var learningDesignID = event.node.highlightState == 0   ? +event.node.data.learningDesignId : null,
-				title            = isSaveDialog && learningDesignID ? event.node.label : null;
-			
-			GeneralLib.showLearningDesignThumbnail(learningDesignID, title);
+				title            = !isOpenDialog && learningDesignID ? event.node.label : null;
+			GeneralLib.showLearningDesignThumbnail(learningDesignID, title);				
 		});
 		tree.subscribe('clickEvent', tree.onEventToggleHighlight);
+		
+		tree.subscribe('dblClickEvent', function(event){
+			
+			//trigger "clickEvent" first so that save/open function will know which element is selected 
+			tree.fireEvent("clickEvent", event);
+			
+			// open/save sequence
+			var buttonToClick = $('#ldStoreDialogSaveButton', layout.ldStoreDialog).is(':visible') 
+					? '#ldStoreDialogSaveButton' : '#ldStoreDialogOpenButton'; 
+			$(buttonToClick, $('#ldStoreDialogContents')).trigger( "click" );
+		});
 		
 		GeneralLib.updateAccess(initAccess);
 
@@ -2731,10 +2772,21 @@ GeneralLib = {
 							.text(this.title)
 							.appendTo(accessCell)
 							.click(function(){
-								var accessEntry = $(this).toggleClass('selected');
-								if (!accessEntry.hasClass('selected')) {
-									return;
+								var accessEntry = $(this);
+								var isOpenDialog = $('#ldStoreDialogSaveButton', layout.ldStoreDialog).is(':hidden');
+								
+								//if item is already selected - either deselect it (in case of save dialog) or don't do anything (in case of open dialog)
+								if (accessEntry.hasClass('selected')) {
+									if (isOpenDialog) {
+										return;
+									} else {
+										accessEntry.removeClass('selected');
+										GeneralLib.showLearningDesignThumbnail(null, null);
+										return;
+									}
 								}
+								
+								accessEntry.addClass('selected');
 								
 								var dialog = layout.ldStoreDialog,
 									tree = dialog.data('ldTree'),
@@ -2747,6 +2799,14 @@ GeneralLib = {
 								}
 									
 								GeneralLib.showLearningDesignThumbnail(learningDesignID, title);
+							})
+							.dblclick(function(){
+								$(this).trigger( "click" );
+								
+								// open/save sequence
+								var buttonToClick = $('#ldStoreDialogSaveButton', layout.ldStoreDialog).is(':visible') 
+										? '#ldStoreDialogSaveButton' : '#ldStoreDialogOpenButton'; 
+								$(buttonToClick, $('#ldStoreDialogContents')).trigger( "click" );
 							});
 			});
 		}
