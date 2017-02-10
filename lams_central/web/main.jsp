@@ -305,12 +305,6 @@
 	        	<div id="org-container" class="tour-org-container"></div>
 			</div>
 		</div>
-	
-	<!-- TODO ADD this button	<div id="refreshButton" class="btn btn-default btn-sm pull-right" title="<fmt:message key="index.refresh.hint"/>"
-				 onClick="javascript:refreshPrivateNotificationCount();loadOrganisation()">
-				<fmt:message key="index.refresh" />
-		</div>
-	 -->
 	</div>
 	<!-- /content -->
 	        
