@@ -1,5 +1,7 @@
 <c:if test="${finishedLock}">
 	<table class="forum">
+<%-- *LKC* commented out the following paragraph --%>
+<!--
 		<tr>
 			<th style="width: 130px;">
 				<fmt:message key="label.learning.summary.started.on" />
@@ -26,6 +28,7 @@
 				<fmt:formatDate value="${result.timeTaken}" pattern="m" timeZone="GMT" /> <fmt:message key="label.learning.summary.minutes" />
 			</td>
 		</tr>
+-->
 		<c:if test="${assessment.allowGradesAfterAttempt}">
 			<tr>
 				<th>

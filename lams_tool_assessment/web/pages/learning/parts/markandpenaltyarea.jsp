@@ -3,7 +3,7 @@
 <c:if test="${finishedLock}">
 
 	<c:if test="${assessment.allowQuestionFeedback && (question.generalFeedback != null)}">
-		<div class="question-feedback">
+		<div class="feedback">
 			<c:out value="${question.generalFeedback}" escapeXml="false" />
 		</div>
 	</c:if>
