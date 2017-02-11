@@ -378,9 +378,9 @@ public class RatingService implements IRatingService {
 	    mapOrderIdToRatingCriteria.put(ratingCriteriaIter.getOrderId(), ratingCriteriaIter);
 	}
 	
-	for ( Map.Entry entry : request.getParameterMap().entrySet()) {
-	    log.debug("entry: "+entry.getKey()+" "+entry.getValue());
-	}
+//	for ( Map.Entry entry : request.getParameterMap().entrySet()) {
+//	    log.debug("entry: "+entry.getKey()+" "+entry.getValue());
+//	}
 	
 	int criteriaMaxOrderId = WebUtil.readIntParam(request, "criteriaMaxOrderId");
 	// i is equal to an old orderId
@@ -415,13 +415,14 @@ public class RatingService implements IRatingService {
 		maxRatings = WebUtil.readIntParam(request, "maximumRates" + i, true);
 	    } 
 	    
-	    if ( ratingStyle == RatingCriteria.RATING_STYLE_COMMENT ) {
-		explicitCommentTypeFound = true;
-	    }
 
 	    boolean commentsEnabled = ( ratingStyle != RatingCriteria.RATING_STYLE_COMMENT ? WebUtil.readBooleanParam(request,  "enableComments" + i, false) : true );
 	    
 	    RatingCriteria ratingCriteria = mapOrderIdToRatingCriteria.get(i);
+	    if ( ratingStyle == RatingCriteria.RATING_STYLE_COMMENT || (ratingCriteria != null && ratingCriteria.isCommentRating()) ) {
+		explicitCommentTypeFound = true;
+	    }
+	    
 	    if (StringUtils.isNotBlank(criteriaTitle)) {
 		int newCriteriaOrderId = WebUtil.readIntParam(request, "criteriaOrderId" + i);
 
