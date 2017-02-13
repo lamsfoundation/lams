@@ -19,7 +19,7 @@
 			</logic:notEmpty>
 			</c:set>
 
-			<lams:Page type="learner" title="${title}">
+			<lams:Page type="monitor" title="${title}">
 
 			<tiles:insert attribute="body" />
 

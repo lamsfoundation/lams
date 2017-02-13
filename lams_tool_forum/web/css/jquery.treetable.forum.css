@@ -54,9 +54,12 @@ table.treetable tr.expanded.accept td span.indenter a {
 }
 
 div.highlight {
-	border:2px solid #cacdd1; 
+	background-color: #fcf0ad;
 }
- 
+table.highlight {
+	background : none;
+}
+
 #clearfix:after { 
     content: " "; 
     display: block;

@@ -42,8 +42,10 @@
 	
 	function highlightMessage() {
 		$('.highlight').filter($('table')).css('background','none');
-		$('.highlight').filter($('div')).effect('highlight', {color: "#fcf0ad"}, 6000);
-		$('.highlight').removeClass('highlight');
+		$('.highlight').filter($('div')).switchClass('highlight', '', 6000);
+		// monitor messages have bg-info class - need to fade from highlight yellow to that, otherwise from yellow to nothing
+		$('.highlight').filter($('div')).children('.bg-info').removeClass('bg-info').switchClass('highlight', 'bg-info', 6000);
+
 	}
 
 	function setupJRating(rateMessagePath) {

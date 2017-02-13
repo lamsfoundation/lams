@@ -29,7 +29,21 @@
 <div class="panel panel-default ${highlightClass} msg" id="msg${msgDto.message.uid}">
 	<div class="panel-heading">
 		<h4 class="panel-title">
-			<span style="float: right"> <i class="fa fa-xs fa-user"></i> 
+
+			<c:choose>
+				<c:when test="${msgDto.message.isMonitor}">
+ 	            	<c:set var="textClass" value="text-info"/>
+ 	                <c:set var="bgClass" value="bg-info"/>
+ 	                <c:set var="iconClass" value ="fa-mortar-board ${textClass}"/>
+ 	            </c:when>
+				<c:otherwise>
+ 	            	<c:set var="textClass" value=""/>
+ 	                <c:set var="bgClass" value=""/>
+ 	                <c:set var="iconClass" value ="fa-user ${textClass}"/>
+ 	            </c:otherwise>
+ 	        </c:choose>
+ 	        
+			<span style="float: right" class="${textClass}"> <i class="fa fa-xs ${iconClass}"></i> 
 			  <c:if test='${(sessionMap.mode == "teacher") || (not hidden)}'>
 					<c:set var="author" value="${msgDto.author}" />
 					<c:if test="${empty author}">
@@ -42,6 +56,7 @@
 				<lams:Date value="${msgDto.message.updated}" timeago="true"/>
 				</c:if>
 			</span>
+			<span class="${textClass}">
 			<c:choose>
 				<c:when test='${(sessionMap.mode == "teacher") || (not hidden)}'>
 					<c:out value="${msgDto.message.subject}" />
@@ -50,10 +65,11 @@
 				&nbsp;<fmt:message key="topic.message.subject.hidden" />
 				</c:otherwise>
 			</c:choose>
+			</span>
 		</h4>
 	</div> <!--  end of panel-heading -->
 
-	<div class="panel-body" id="pb-msg${msgDto.message.uid}">
+	<div class="panel-body ${bgClass}" id="pb-msg${msgDto.message.uid}">
 		<span> <c:if test='${(not hidden) || (hidden && sessionMap.mode == "teacher")}'>
 				<c:out value="${msgDto.message.body}" escapeXml="false" />
 			</c:if> <c:if test='${hidden}'>
