@@ -696,6 +696,7 @@ public class LearningAction extends Action {
 	message.setCreatedBy(forumUser);
 	message.setModifiedBy(forumUser);
 	setAttachment(messageForm, message);
+	setMonitorMode(sessionMap, message);
 
 	// save message into database
 	forumService = getForumManager();
@@ -797,6 +798,7 @@ public class LearningAction extends Action {
 	message.setCreatedBy(forumUser);
 	message.setModifiedBy(forumUser);
 	setAttachment(messageForm, message);
+	setMonitorMode(sessionMap, message);
 
 	// save message into database
 	forumService = getForumManager();
@@ -844,6 +846,7 @@ public class LearningAction extends Action {
 	message.setCreatedBy(forumUser);
 	message.setModifiedBy(forumUser);
 	setAttachment(messageForm, message);
+	setMonitorMode(sessionMap, message);
 
 	// save message into database
 	forumService = getForumManager();
@@ -871,6 +874,11 @@ public class LearningAction extends Action {
 	return null;
     }
 
+    private void setMonitorMode(SessionMap<String, Object> sessionMap, Message message) {
+	message.setIsMonitor(ToolAccessMode.TEACHER.equals(sessionMap.get(AttributeNames.ATTR_MODE)));
+    }
+    
+    
     /**
      * Display a editable form for a special topic in order to update it.
      *

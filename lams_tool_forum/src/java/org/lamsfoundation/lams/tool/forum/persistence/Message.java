@@ -51,6 +51,7 @@ public class Message implements Cloneable {
     private int sequenceId;
     private boolean isAuthored;
     private boolean isAnonymous;
+    private boolean isMonitor;
 
     private Date created;
     private Date updated;
@@ -134,6 +135,7 @@ public class Message implements Cloneable {
 	clone.setSequenceId(this.getSequenceId());
 	clone.setHideFlag(this.isHideFlag());
 	clone.setIsAnonymous(this.isAnonymous);
+	clone.setIsMonitor(this.isMonitor);
 	clone.setIsAuthored(this.getIsAuthored());
 	clone.setLastReplyDate(this.getLastReplyDate());
 	clone.setModifiedBy(clone.getModifiedBy());
@@ -389,6 +391,24 @@ public class Message implements Cloneable {
      */
     public void setIsAnonymous(boolean isAnonymous) {
 	this.isAnonymous = isAnonymous;
+    }
+
+    /**
+     * @return Returns whether the Message should be shown as a teacher/tutor message created in monitoring
+     *
+     *
+     *
+     */
+    public boolean getIsMonitor() {
+	return isMonitor;
+    }
+
+    /**
+     * @param isAnonymous
+     *            Indicates whether the Message should be shown as a teacher/tutor message created in monitoring
+     */
+    public void setIsMonitor(boolean isMonitor) {
+	this.isMonitor = isMonitor;
     }
 
     /**

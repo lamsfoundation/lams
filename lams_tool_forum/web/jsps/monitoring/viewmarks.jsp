@@ -19,16 +19,32 @@
 <c:forEach items="${messages}" var="topic">
 
 <div class="panel panel-default ${highlightClass} msg" >
+
+	<c:choose>
+		<c:when test="${topic.message.isMonitor}">
+            	<c:set var="textClass" value="text-info"/>
+                <c:set var="bgClass" value="bg-info"/>
+                <c:set var="iconClass" value ="fa-mortar-board ${textClass}"/>
+            </c:when>
+		<c:otherwise>
+            	<c:set var="textClass" value=""/>
+                <c:set var="bgClass" value=""/>
+                <c:set var="iconClass" value ="fa-user ${textClass}"/>
+        </c:otherwise>
+    </c:choose>
+
 	<div class="panel-heading">
 		<h4 class="panel-title">
-			<span style="float: right"> <i class="fa fa-xs fa-user"></i> 
+		<span class="${textClass}">
+			<span style="float: right"> <i class="fa fa-xs ${iconClass}"></i> 
 				<lams:Date value="${topic.message.updated}" />
 			</span>
 			<c:out value="${topic.message.subject}" />
+		</span>
 		</h4>
 	</div>
 
-	<div class="panel-body" >
+	<div class="panel-body ${bgClass}" >
 
 	<div class="pull-right"><html:form action="/monitoring/editMark" method="post">
 			<html:hidden property="sessionMapID" value="${sessionMapID}"/>

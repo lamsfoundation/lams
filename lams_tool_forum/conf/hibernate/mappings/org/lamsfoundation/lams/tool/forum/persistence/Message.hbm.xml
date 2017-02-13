@@ -177,6 +177,14 @@
             column="hide_flag"
         />
 
+        <property
+            name="isMonitor"
+            type="boolean"
+            update="true"
+            insert="true"
+            column="is_monitor"
+        />
+
         <many-to-one
             name="report"
             class="org.lamsfoundation.lams.tool.forum.persistence.ForumReport"
