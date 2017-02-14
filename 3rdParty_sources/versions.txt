@@ -5,6 +5,8 @@ check if you should also update source code here.
 
 This project contains following versions:
 
+basiclti-util 1.2
+
 CKEditor Java 2.6
 
 Apache HttpClient 4.2.1
