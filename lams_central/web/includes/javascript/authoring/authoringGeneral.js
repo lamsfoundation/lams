@@ -1,4 +1,4 @@
-﻿﻿﻿﻿/**
+﻿﻿﻿﻿﻿/**
  * This file contains main methods for Authoring.
  */
 
@@ -2657,9 +2657,10 @@ GeneralLib = {
 						// show the thumbnail
 						$('#ldScreenshotAuthor', layout.ldStoreDialog).html(response).show();
 					},
+					// the LD SVG is missing, try to re-generate it
 					error : function(error) {
-						// the LD SVG is missing, try to re-generate it; if it is an another error, fail
-						if (error.status != 404) {
+						// skip re-generate if it is an another error or generated SVG is empty
+						if ((error.status != 404) || (MenuLib.exportSVG() === undefined)) {
 							return;
 						}
 						// iframe just to load another instance of Authoring for a single purpose, generate the SVG
