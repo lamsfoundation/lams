@@ -221,6 +221,9 @@ public class SpreadsheetBuilder {
     }
     
     private double roundTo2Places(double d) {
+	if ( Double.isNaN(d) )
+	    return 0D;
+	
 	BigDecimal bd = new BigDecimal(d);
 	bd = bd.setScale(2, RoundingMode.HALF_UP);
 	return bd.doubleValue();
