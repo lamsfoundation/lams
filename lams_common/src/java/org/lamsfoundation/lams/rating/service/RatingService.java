@@ -559,7 +559,7 @@ public class RatingService implements IRatingService {
 		    dto.setComment((String) row[2]);
 		    dto.setItemDescription((String) row[numColumns - 1]);
 		    if ( ! isComment ) {
-			dto.setUserRating(row[3] == null ? "" : numberFormat.format((Float) row[3]));
+			dto.setUserRating(row[3] == null ? "" : numberFormat.format((Double) row[3]));
 			dto.setAverageRating(row[4] == null ? "" : numberFormat.format((Double) row[4]));
 			dto.setNumberOfVotes(row[5] == null ? "" : numberFormat.format((BigInteger) row[5]));
 		    }

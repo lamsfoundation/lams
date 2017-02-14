@@ -41,7 +41,9 @@ public class PeerreviewDAOHibernate extends LAMSBaseDAO implements PeerreviewDAO
     private static final String GET_RESOURCE_BY_CONTENTID = "from " + Peerreview.class.getName()
 	    + " as r where r.contentId=?";
     
-    private static final String GET_STATS = "SELECT s.session_id as \"sessionId\", s.session_name as \"sessionName\", "
+    // ANY_VALUE is needed for Mysql setting ONLY_FULL_GROUP_BY - the sessionName will always be the same 
+    // as it is from the same table as sessionId.  (LDEV-4222)
+    private static final String GET_STATS = "SELECT s.session_id as \"sessionId\", ANY_VALUE(s.session_name) as \"sessionName\", "
 	    + " count(u.uid) as \"numLearnersInSession\", sum(u.session_finished) as \"numLearnersComplete\" "
 	    + " FROM tl_laprev11_session s "
 	    + " JOIN tl_laprev11_peerreview p ON p.content_id = :toolContentId AND s.peerreview_uid = p.uid "
