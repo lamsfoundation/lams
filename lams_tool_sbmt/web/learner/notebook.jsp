@@ -9,10 +9,6 @@
 		function disableFinishButton() {
 			document.getElementById("finishButton").disabled = true;
 		}
-		function submitForm(methodName) {
-			var f = document.getElementById('messageForm');
-			f.submit();
-		}
 	</script>
 </lams:head>
 
@@ -36,8 +32,7 @@
 				<html:textarea property="entryText" styleClass="form-control" styleId="focused" rows="5" />
 
 
-				<html:link href="#nogo" styleClass="btn btn-primary voffset10 pull-right na" styleId="finishButton"
-					onclick="submitForm('finish')">
+				<button class="btn btn-primary voffset10 pull-right na" id="finishButton" type="submit" ">
 
 					<c:choose>
 						<c:when test="${activityPosition.last}">
@@ -48,7 +43,7 @@
 						</c:otherwise>
 					</c:choose>
 
-				</html:link>
+				</button>
 
 			</html:form>
 
