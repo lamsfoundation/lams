@@ -17,10 +17,6 @@
 	<link rel="stylesheet" href="${lams}css/jquery.tablesorter.pager.css">
 	<link type="text/css" href="${lams}/css/chart.css" rel="stylesheet" />
 	<style media="screen,projection" type="text/css">
-#other-users-answers-title {
-	margin-top: 20px;
-}
-
 table.alternative-color td:first-child {
 	width: 25%;
 }
@@ -87,17 +83,23 @@ table.alternative-color td:first-child {
 			});
 		});
 
+		function disableButtons() {
+			$('.btn').prop('disabled', true);
+		}
+
 		function finishSession() {
-			document.getElementById("finishButton").disabled = true;
+			disableButtons();
 			document.location.href = '<c:url value="/learning/finish.do?sessionMapID=${sessionMapID}"/>';
 			return false;
 		}
 
 		function continueReflect() {
+			disableButtons();
 			document.location.href = '<c:url value="/learning/newReflection.do?sessionMapID=${sessionMapID}"/>';
 		}
 
 		function retakeSurvey() {
+			disableButtons();
 			document.location.href = '<c:url value="/learning/retake.do?sessionMapID=${sessionMapID}"/>';
 		}
 	</script>
@@ -116,6 +118,7 @@ table.alternative-color td:first-child {
 		</c:if>
 
 		<%-- user personal results--%>
+		<div class="panel">
 		<c:forEach var="element" items="${sessionMap.questionList}">
 			<div class="sbox voffset10">
 				<div class="sbox-heading clearfix">
@@ -167,10 +170,11 @@ table.alternative-color td:first-child {
 		</c:forEach>
 
 		<c:if test="${not sessionMap.lockOnFinish}">
-			<html:button property="RetakeButton" onclick="return retakeSurvey()" styleClass="btn btn-sm btn-default pull-left">
+			<div class="voffset5"><html:button property="RetakeButton" onclick="return retakeSurvey()" styleClass="btn btn-default">
 				<fmt:message key="label.retake.survey" />
-			</html:button>
+			</html:button></div>
 		</c:if>
+		</div>
 
 		<c:if test="${sessionMap.userFinished and sessionMap.reflectOn}">
 			<div class="voffset10 panel panel-default">
@@ -195,7 +199,7 @@ table.alternative-color td:first-child {
 						</c:otherwise>
 					</c:choose>
 
-					<html:button property="ContinueButton" onclick="return continueReflect()" styleClass="button">
+					<html:button property="ContinueButton" onclick="return continueReflect()" styleClass="btn btn-default btn-primary pull-right">
 						<fmt:message key="label.edit" />
 					</html:button>
 				</div>
@@ -204,10 +208,12 @@ table.alternative-color td:first-child {
 
 		<%-- other users personal results--%>
 		<c:if test="${sessionMap.showOtherUsersAnswers}">
-			<h4 id="other-users-answers-title">
+		<div class="voffset10 panel panel-default">
+			<div class="panel-heading panel-title" id="other-users-answers-title">
 				<fmt:message key="label.other.answers" />
-			</h4>
-
+			</div>
+			
+			<div class="panel-body">
 			<div>
 				<fmt:message key="label.total.responses">
 					<fmt:param>${countFinishedUser}</fmt:param>
@@ -268,7 +274,9 @@ table.alternative-color td:first-child {
 						</c:if>
 
 					</table>
-			</c:forEach>
+				</c:forEach>
+			</div>
+		</div>
 		</c:if>
 
 		<c:if test="${sessionMap.mode != 'teacher'}">
@@ -276,14 +284,14 @@ table.alternative-color td:first-child {
 				<c:choose>
 
 					<c:when test="${sessionMap.reflectOn}">
-						<html:button property="ContinueButton" onclick="return continueReflect()" styleClass="button">
+						<html:button property="ContinueButton" onclick="return continueReflect()" styleClass="btn btn-default btn-primary pull-right">
 							<fmt:message key="label.continue" />
 						</html:button>
 					</c:when>
 
 					<c:otherwise>
-						<html:link href="#nogo" property="FinishButton" styleId="finishButton" onclick="return finishSession()"
-							styleClass="btn btn-sm btn-primary pull-right na">
+						<html:button property="FinishButton" styleId="finishButton" onclick="return finishSession()"
+							styleClass="btn btn-primary pull-right na">
 							<span class="nextActivity"> <c:choose>
 									<c:when test="${sessionMap.activityPosition.last}">
 										<fmt:message key="label.submit" />
@@ -294,7 +302,7 @@ table.alternative-color td:first-child {
 									</c:otherwise>
 								</c:choose>
 							</span>
-						</html:link>
+						</html:button>
 					</c:otherwise>
 				</c:choose>
 			</div>

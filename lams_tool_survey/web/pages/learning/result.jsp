@@ -9,26 +9,32 @@
 
 	<script type="text/javascript">
 		function finishSession(){
-			document.getElementById("finishButton").disabled = true;
+			disableButtons();
 			document.location.href ='<c:url value="/learning/finish.do?sessionMapID=${sessionMapID}"/>';
 			return false;
 		}
 		
 		function showOtherUsersAnswers(){
+			disableButtons();
 			document.location.href='<c:url value="/learning/showOtherUsersAnswers.do?sessionMapID=${sessionMapID}"/>';
 		}
 		
 		function continueReflect(){
+			disableButtons();
 			document.location.href='<c:url value="/learning/newReflection.do?sessionMapID=${sessionMapID}"/>';
 		}
 		
 		function retakeSurvey(questionSeqId){
+			disableButtons();
 			//retake for all questions
 			if(questionSeqId == -1) {
 				document.location.href='<c:url value="/learning/retake.do?sessionMapID=${sessionMapID}"/>';
 			} else {
 				document.location.href='<c:url value="/learning/retake.do?sessionMapID=${sessionMapID}&questionSeqID="/>' +questionSeqId ;
 			}
+		}
+		function disableButtons() {
+			$('.btn').prop('disabled', true);
 		}
     </script>
 </lams:head>
@@ -197,7 +203,7 @@
 					</c:when>
 
 					<c:otherwise>
-						<html:link href="#nogo" property="FinishButton" styleId="finishButton" onclick="return finishSession()"
+						<html:button property="FinishButton" styleId="finishButton" onclick="return finishSession()"
 							styleClass="btn btn-sm btn-primary pull-right na">
 							<c:choose>
 								<c:when test="${sessionMap.activityPosition.last}">
@@ -208,7 +214,7 @@
 									<fmt:message key="label.finished" />
 								</c:otherwise>
 							</c:choose>
-						</html:link>
+						</html:button>
 					</c:otherwise>
 				</c:choose>
 			</div>

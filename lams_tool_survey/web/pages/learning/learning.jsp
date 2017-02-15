@@ -22,10 +22,15 @@
 			for (idx = 0; idx < rs.length; idx++)
 				rs[idx].checked = false;
 		}
+		
+		function disableButtons() {
+			$('.btn').prop('disabled', true);
+		}
+
 	</script>
 </lams:head>
 <body class="stripes">
-	<html:form action="/learning/doSurvey" method="post" styleId="surveyForm">
+	<html:form action="/learning/doSurvey" method="post" styleId="surveyForm" onsubmit="disableButtons();">
 		<c:set var="formBean" value="<%=request
 							.getAttribute(org.apache.struts.taglib.html.Constants.BEAN_KEY)%>" />
 		<html:hidden property="questionSeqID" />
