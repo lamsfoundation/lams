@@ -17,9 +17,7 @@
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery.js"></script>
 	<script language="JavaScript" type="text/JavaScript">
 		function submitMethod(actionMethod) {
-			if (actionMethod == 'learnerFinished') {
-				document.getElementById("finishButton").disabled = true;
-			}
+			$('.btn').prop('disabled', true);
 			document.VoteLearningForm.action += "&dispatch=" + actionMethod;
 			document.VoteLearningForm.submit();
 		}
@@ -119,9 +117,8 @@
 				</c:when>
 
 				<c:when test="${voteGeneralLearnerFlowDTO.reflection != 'true' || !hasEditRight}">
-					<html:link href="#nogo" property="learnerFinished" styleId="finishButton"
-						onclick="javascript:submitMethod('learnerFinished');return false"
-						styleClass="btn btn-primary voffset10 pull-right na">
+					<html:submit property="learnerFinished" styleId="finishButton" onclick="javascript:submitMethod('learnerFinished')"
+						styleClass="btn btn-primary voffset10 pull-right n	a">
 						<c:choose>
 							<c:when test="${activityPosition.last}">
 								<fmt:message key="button.submitActivity" />
@@ -130,7 +127,7 @@
 								<fmt:message key="button.endLearning" />
 							</c:otherwise>
 						</c:choose>
-					</html:link>
+					</html:submit>
 				</c:when>
 
 				<c:otherwise>

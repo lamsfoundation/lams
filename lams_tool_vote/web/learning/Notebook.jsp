@@ -15,6 +15,7 @@
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery.js"></script>
 	<script language="JavaScript" type="text/JavaScript">
 		function submitMethod(actionMethod) {
+			$('.btn').prop('disabled', true);
 			document.VoteLearningForm.dispatch.value = actionMethod;
 			document.VoteLearningForm.submit();
 		}
@@ -40,10 +41,10 @@
 			</div>
 
 			<html:textarea rows="5" property="entryText" styleClass="form-control" styleId="focused"></html:textarea>
-			<html:link href="#" property="submitReflection" onclick="javascript:submitMethod('submitReflection');return false"
+			<html:submit property="submitReflection" onclick="javascript:submitMethod('submitReflection')"
 				styleClass="btn btn-primary voffset10 pull-right na" styleId="finishButton">
 				<fmt:message key="button.endLearning" />
-			</html:link>
+			</html:submit>
 
 		</lams:Page>
 

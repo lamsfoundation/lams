@@ -61,6 +61,7 @@
 				alert("<fmt:message key="error.empty.selection"/>");
 				return false;
 			} else {
+				$('.btn').prop('disabled', true);
 				return true;
 			}
 		}
@@ -69,11 +70,6 @@
 			var msg = "<fmt:message key="error.maxNominationCount.reached"/> "
 					+ maxVotes + " <fmt:message key="label.nominations"/>";
 			alert(msg);
-		}
-
-		function submitMethod(actionMethod) {
-			document.VoteLearningForm.dispatch.value = actionMethod;
-			document.VoteLearningForm.submit();
 		}
 
 		function checkLeaderProgress() {

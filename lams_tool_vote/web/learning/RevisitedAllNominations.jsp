@@ -22,9 +22,7 @@
 
 	<script type="text/javascript">
 		function submitMethod(actionMethod) {
-			if (actionMethod == "learnerFinished") {
-				document.getElementById("finishButton").disabled = true;
-			}
+			$('.btn').prop('disabled', true);
 			document.VoteLearningForm.dispatch.value = actionMethod;
 			document.VoteLearningForm.submit();
 		}
@@ -115,21 +113,18 @@
 			</c:if>
 
 
-
-			<html:link href="#nogo" property="learnerFinished" styleId="finishButton"
-				onclick="javascript:submitMethod('learnerFinished');return false"
+			<html:submit property="learnerFinished" styleId="finishButton"
+				onclick="javascript:submitMethod('learnerFinished');"
 				styleClass="btn btn-primary voffset10 pull-right na">
-				<span class="nextActivity"> <c:choose>
+				<c:choose>
 						<c:when test="${activityPosition.last}">
 							<fmt:message key="button.submitActivity" />
 						</c:when>
 						<c:otherwise>
 							<fmt:message key="button.endLearning" />
 						</c:otherwise>
-					</c:choose>
-				</span>
-			</html:link>
-
+				</c:choose>
+			</html:submit>
 			<div id="footer"></div>
 
 		</lams:Page>
