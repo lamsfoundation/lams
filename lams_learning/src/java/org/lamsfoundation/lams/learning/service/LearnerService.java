@@ -603,18 +603,15 @@ public class LearnerService implements ICoreLearnerService {
      *            the learner who are running this activity in the design.
      * @param activity
      *            the activity is being run.
-     * @param lessonId
-     *            lesson id
      * @return the updated learner progress
      */
     @Override
-    public synchronized void completeActivity(Integer learnerId, Activity activity, LearnerProgress progress) {
+    public synchronized void completeActivity(Integer learnerId, Activity activity, Long progressID) {
 	if (LearnerService.log.isDebugEnabled()) {
 	    LearnerService.log
 		    .debug("Completing activity ID " + activity.getActivityId() + " for learner " + learnerId);
 	}
-	// load the progress again from DB
-	// progress = learnerProgressDAO.getLearnerProgress(progress.getLearnerProgressId());
+	LearnerProgress progress = learnerProgressDAO.getLearnerProgress(progressID);
 	if (progress.getCompletedActivities().keySet().contains(activity)) {
 	    // progress was already updated by another thread, so prevent double processing
 	    return;
@@ -648,18 +645,6 @@ public class LearnerService implements ICoreLearnerService {
 	logEventService.logEvent(LogEvent.TYPE_LEARNER_ACTIVITY_FINISH, learnerId,
 		activity.getLearningDesign().getLearningDesignId(), progress.getLesson().getLessonId(),
 		activity.getActivityId());
-    }
-
-    /**
-     * @throws @see
-     *             org.lamsfoundation.lams.learning.service.ICoreLearnerService#completeActivity(java.lang.Integer,
-     *             org.lamsfoundation.lams.learningdesign.Activity, java.lang.Long )
-     */
-    @Override
-    public LearnerProgress completeActivity(Integer learnerId, Activity activity, Long lessonId) {
-	LearnerProgress currentProgress = getProgress(new Integer(learnerId.intValue()), lessonId);
-	completeActivity(learnerId, activity, currentProgress);
-	return currentProgress;
     }
 
     @Override
@@ -1429,6 +1414,7 @@ public class LearnerService implements ICoreLearnerService {
     private static final String TOOL_SIGNATURE_SCRATCHIE = "lascrt11";
     private static final String TOOL_SIGNATURE_MCQ = "lamc11";
 
+    @Override
     public String[] recalcProgressForLearner(Lesson lesson, ArrayList<Activity> activityList,
 	    LearnerProgress learnerProgress, boolean updateGradebookForAll) {
 
@@ -1469,8 +1455,9 @@ public class LearnerService implements ICoreLearnerService {
 
 	}
 
-	if (updated)
+	if (updated) {
 	    learnerProgressDAO.updateLearnerProgress(learnerProgress);
+	}
 
 	return new String[] { auditLogBuilder.toString(), errorBuilder.toString() };
     }
@@ -1493,10 +1480,11 @@ public class LearnerService implements ICoreLearnerService {
 		CompletedActivityProgress cap = learnerProgress.getCompletedActivities().get(activity);
 		if (cap != null) {
 		    if (cap.getStartDate() == null) {
-			if (startedDateFromAttempted != null)
+			if (startedDateFromAttempted != null) {
 			    cap.setStartDate(startedDateFromAttempted);
-			else if (results.getStartDate() != null)
+			} else if (results.getStartDate() != null) {
 			    cap.setStartDate(results.getStartDate());
+			}
 		    }
 		    if (cap.getFinishDate() == null && results.getFinishDate() != null) {
 			cap.setFinishDate(results.getFinishDate());
@@ -1518,12 +1506,12 @@ public class LearnerService implements ICoreLearnerService {
 		updated = true;
 
 	    } else if (results.getStatus() == ToolCompletionStatus.ACTIVITY_ATTEMPTED) {
-		// Attempted - if not already there add with tool's start date, or failing that the tool's value for  
-		// session start date, or the core's value for session start date, or the lesson start date. 
+		// Attempted - if not already there add with tool's start date, or failing that the tool's value for
+		// session start date, or the core's value for session start date, or the lesson start date.
 		// Must have a date or it can't be saved.
-		if (results.getStartDate() != null)
+		if (results.getStartDate() != null) {
 		    learnerProgress.getAttemptedActivities().putIfAbsent(activity, results.getStartDate());
-		else {
+		} else {
 		    learnerProgress.getAttemptedActivities().putIfAbsent(activity, lessonStartDate);
 		}
 		auditLogBuilder.append("Progress updated for attempted activity ").append(activity.getActivityId())
@@ -1545,8 +1533,9 @@ public class LearnerService implements ICoreLearnerService {
 	    ToolSession toolSession = lamsCoreToolService.getToolSessionByLearner(learner, activity);
 	    if (toolSession != null) {
 		status = lamsCoreToolService.getCompletionStatusFromTool(learner, activity);
-		if (status.getStartDate() == null)
+		if (status.getStartDate() == null) {
 		    status.setStartDate(toolSession.getCreateDateTime());
+		}
 	    }
 
 	} else if (activity.isComplexActivity()) {
@@ -1567,21 +1556,25 @@ public class LearnerService implements ICoreLearnerService {
 		    allComplete = false;
 		} else {
 		    attempted = true;
-		    if (childStartDate == null)
+		    if (childStartDate == null) {
 			childStartDate = childCap.getStartDate();
+		    }
 		    childEndDate = childCap.getFinishDate();
 		}
-		if (caStartDate == null || (childStartDate != null && childStartDate.before(caStartDate)))
+		if (caStartDate == null || (childStartDate != null && childStartDate.before(caStartDate))) {
 		    caStartDate = childStartDate;
-		if (caEndDate == null || (childEndDate != null && childEndDate.after(caStartDate)))
+		}
+		if (caEndDate == null || (childEndDate != null && childEndDate.after(caStartDate))) {
 		    caEndDate = childEndDate;
+		}
 	    }
 
 	    if (attempted) {
-		if (allComplete)
+		if (allComplete) {
 		    status = new ToolCompletionStatus(ToolCompletionStatus.ACTIVITY_COMPLETED, caStartDate, caEndDate);
-		else
+		} else {
 		    status = new ToolCompletionStatus(ToolCompletionStatus.ACTIVITY_ATTEMPTED, caStartDate, null);
+		}
 	    }
 
 	} else if (activity.isGateActivity()) {

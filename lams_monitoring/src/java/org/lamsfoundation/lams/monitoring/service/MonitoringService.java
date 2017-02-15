@@ -1118,7 +1118,7 @@ public class MonitoringService implements IMonitoringService {
 				    MonitoringService.FORCE_COMPLETE_STOP_MESSAGE_GROUPING_ERROR,
 				    new Object[] { activity.getTitle() });
 			}
-			learnerService.completeActivity(learner.getUserId(), activity, lessonId);
+			learnerService.completeActivity(learner.getUserId(), activity, progress.getLearnerProgressId());
 			if (MonitoringService.log.isDebugEnabled()) {
 			    MonitoringService.log
 				    .debug("Grouping activity [" + activity.getActivityId() + "] is completed.");

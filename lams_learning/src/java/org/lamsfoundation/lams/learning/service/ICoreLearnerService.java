@@ -156,15 +156,8 @@ public interface ICoreLearnerService extends ILearnerService {
      * Complete the activity in the progress engine and delegate to the progress engine to calculate the next activity
      * in the learning design. It is currently triggered by various progress engine related action classes, which then
      * calculate the url to go to next, based on the ActivityMapping class.
-     *
-     * @param learnerId
-     *            the learner who are running this activity in the design.
-     * @param activity
-     *            the activity is being run.
-     * @param lessonId
-     *            lesson id
      */
-    void completeActivity(Integer learnerId, Activity activity, LearnerProgress progress);
+    void completeActivity(Integer learnerId, Activity activity, Long progressID);
 
     /**
      * If specified activity is set to produce ToolOutput, calculates and stores mark to gradebook.
@@ -173,22 +166,6 @@ public interface ICoreLearnerService extends ILearnerService {
      * @param progress
      */
     void updateGradebookMark(Activity activity, LearnerProgress progress);
-
-    /**
-     * Same as LearnerProgress completeActivity(Integer learnerId,Activity activity,LearnerProgress progress) except
-     * that the it works out the current learner's progress from the given lesson id.
-     *
-     * Use the other method if you already have the learner progress, as this method looks up the learner progress.
-     *
-     * @param learnerId
-     *            the learner who are running this activity in the design.
-     * @param activity
-     *            the activity is being run.
-     * @param lessonId
-     *            lesson id
-     * @return the updated learner progress
-     */
-    LearnerProgress completeActivity(Integer learnerId, Activity activity, Long lessonId);
 
     /**
      * Retrieve all lessons that has been started, suspended or finished. All finished but archived lesson should not be
@@ -337,9 +314,11 @@ public interface ICoreLearnerService extends ILearnerService {
      */
     SequenceActivity selectBranch(Lesson lesson, BranchingActivity branchingActivity, Integer learnerId, Long branchId)
 	    throws LearnerServiceException;
-    
+
     /* Added for RepopulateProgressMarksServlet - can be removed later */
-    String[] recalcProgressForLearner(Lesson lesson, ArrayList<Activity> activityList, LearnerProgress learnerProgress, boolean updateGradebookForAll);
+    String[] recalcProgressForLearner(Lesson lesson, ArrayList<Activity> activityList, LearnerProgress learnerProgress,
+	    boolean updateGradebookForAll);
+
     IActivityDAO getActivityDAO();
 
 }
