@@ -284,16 +284,18 @@
 						</c:choose>
 					</div>
 
+					<c:if test="${sessionMap.mode != 'teacher'}">
 					<html:button property="notebookButton" style="margin-top: 10px" onclick="javascript:notebook();"
 						styleClass="btn btn-sm btn-primary btn-disable-on-submit pull-left" >
 						<fmt:message key="label.edit" />
 					</html:button>
+					</c:if>
 				</div>
 			</div>
 			<!-- end reflection -->
 		</c:if>
 
-
+		<c:if test="${sessionMap.mode != 'teacher'}">
 		<c:choose>
 			<c:when test="${sessionMap.reflectOn and (not sessionMap.userFinished)}">
 				<html:button property="notebookButton" onclick="javascript:notebook();" styleClass="btn btn-primary btn-disable-on-submit pull-right">
@@ -313,7 +315,7 @@
 				</html:button>
 			</c:otherwise>
 		</c:choose>
-
+		</c:if>
 
 
 		<div id="footer"></div>
