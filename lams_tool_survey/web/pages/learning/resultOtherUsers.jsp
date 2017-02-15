@@ -290,8 +290,8 @@ table.alternative-color td:first-child {
 					</c:when>
 
 					<c:otherwise>
-						<html:button property="FinishButton" styleId="finishButton" onclick="return finishSession()"
-							styleClass="btn btn-primary pull-right na">
+						<button type="submit" id="finishButton" onclick="return finishSession()"
+							class="btn btn-primary pull-right na">
 							<span class="nextActivity"> <c:choose>
 									<c:when test="${sessionMap.activityPosition.last}">
 										<fmt:message key="label.submit" />
@@ -302,7 +302,7 @@ table.alternative-color td:first-child {
 									</c:otherwise>
 								</c:choose>
 							</span>
-						</html:button>
+						</button>
 					</c:otherwise>
 				</c:choose>
 			</div>
