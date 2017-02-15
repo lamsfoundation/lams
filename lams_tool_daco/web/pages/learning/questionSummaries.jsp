@@ -227,8 +227,6 @@
 </div> <!--  end summary panel -->
 
 <c:if test='${includeMode=="learning"}'>
-	<p>
-		<a href="#" class="btn btn-default" onclick="javascript:refreshQuestionSummaries('${sessionMapID}')"><fmt:message key="label.common.summary.refresh" /></a>
-	</p>
+	<button class="btn btn-default btn-disable-on-submit" onclick="javascript:refreshQuestionSummaries('${sessionMapID}')"><fmt:message key="label.common.summary.refresh" /></a>
 </c:if>
 </div>

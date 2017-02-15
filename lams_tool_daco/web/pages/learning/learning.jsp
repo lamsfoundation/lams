@@ -59,6 +59,9 @@
 </c:choose>
 </c:set> 
 
+<%-- push mode into request so it is available in the tab pages --%>
+<c:set var="mode" scope="request">${mode}</c:set>
+
 <lams:Tabs control="true" title="${daco.title}" helpToolSignature="<%= DacoConstants.TOOL_SIGNATURE %>" helpModule="learning" extraControl="${ellipsisControl}">
  	<lams:Tab id="1" key="label.learning.heading.add" />
  	<lams:Tab id="2" key="label.learning.heading.list" />
@@ -76,14 +79,13 @@
 <c:if test="${mode != 'teacher'}">
 		<c:choose>
 			<c:when test="${daco.reflectOnActivity && (not sessionMap.userFinished)}">
-				<html:button property="FinishButton" onclick="javascript:continueReflect()" styleClass="btn btn-default voffset5 pull-right">
+				<html:button property="FinishButton" onclick="javascript:continueReflect()" styleClass="btn btn-default btn-disable-on-submit voffset5 pull-right">
 					<fmt:message key="label.learning.continue" />
 				</html:button>
 			</c:when>
 			<c:otherwise>
-				<html:link href="#nogo" property="FinishButton" styleId="finishButton" onclick="javascript:finishSession()" styleClass="btn btn-primary voffset5 pull-right na">
-					<span class="nextActivity">
-						<c:choose>
+				<button type="submit" property="FinishButton" id="finishButton" onclick="javascript:finishSession()" class="btn btn-primary btn-disable-on-submit voffset5 pull-right na">
+					<c:choose>
 		 					<c:when test="${sessionMap.activityPosition.last}">
 		 						<fmt:message key="label.learning.submit" />
 		 					</c:when>
@@ -91,8 +93,7 @@
 		 		 				<fmt:message key="label.learning.finished" />
 		 					</c:otherwise>
 		 				</c:choose>
-		 			</span>
-				</html:link>
+				</button>
 			</c:otherwise>
 		</c:choose>
 </c:if>
