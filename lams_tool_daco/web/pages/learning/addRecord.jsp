@@ -245,7 +245,9 @@
 			</c:forEach>
 		</table>
 
-		<a href="#" onclick="javascript:saveOrUpdateRecord()" class="btn btn-sm btn-default voffset5 pull-left"><i class="fa fa-plus"></i> <fmt:message key="label.learning.add" /></a>
+		<c:if test="${mode != 'teacher'}">
+			<button onclick="javascript:saveOrUpdateRecord()" class="btn btn-sm btn-default btn-disable-on-submit voffset5 pull-left"><i class="fa fa-plus"></i> <fmt:message key="label.learning.add" /></button>
+		</c:if>
 	</html:form>
 </div>
 <!--  end record panel -->

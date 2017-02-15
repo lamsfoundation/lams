@@ -37,7 +37,7 @@
 			<html:textarea styleId="focused" rows="5" property="entryText" styleClass="form-control"></html:textarea>
 
 			<div class="space-bottom-top align-right">
-				<html:link href="#nogo" styleClass="btn btn-primary voffset5 pull-right na" styleId="finishButton" onclick="submitForm('finish')">
+				<button type="submit" class="btn btn-primary voffset5 pull-right na" id="finishButton" onclick="submitForm('finish')">
 					<span class="nextActivity">
 						<c:choose>
 		 					<c:when test="${sessionMap.activityPosition.last}">
@@ -48,7 +48,7 @@
 		 					</c:otherwise>
 		 				</c:choose>
 					</span>
-				</html:link>
+				</button>
 			</div>
 		</div>
 	</html:form>

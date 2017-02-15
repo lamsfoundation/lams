@@ -9,16 +9,18 @@
     }
         
 	function finishSession(){
-		document.getElementById("finishButton").disabled = true;
+		$('.btn-disable-on-submit').prop('disabled', true);
 		document.location.href = finishUrl;
 		return false;
 	}
 		
 	function continueReflect(){
+		$('.btn-disable-on-submit').prop('disabled', true);
 		document.location.href=continueReflectUrl;
 	}
 	
 	function saveOrUpdateRecord()	{
+		$('.btn-disable-on-submit').prop('disabled', true);
 		setHiddenFormValues();
 		document.getElementById("recordForm").submit();
 	}
