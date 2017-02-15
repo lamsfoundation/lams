@@ -203,8 +203,8 @@
 					</c:when>
 
 					<c:otherwise>
-						<html:button property="FinishButton" styleId="finishButton" onclick="return finishSession()"
-							styleClass="btn btn-sm btn-primary pull-right na">
+						<button type="submit" id="finishButton" onclick="return finishSession()"
+							class="btn btn-sm btn-primary pull-right na">
 							<c:choose>
 								<c:when test="${sessionMap.activityPosition.last}">
 									<fmt:message key="label.submit" />
@@ -214,7 +214,7 @@
 									<fmt:message key="label.finished" />
 								</c:otherwise>
 							</c:choose>
-						</html:button>
+						</button>
 					</c:otherwise>
 				</c:choose>
 			</div>
