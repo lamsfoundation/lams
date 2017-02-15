@@ -224,7 +224,7 @@
 				</c:if>
 
 				<c:if test="${voteGeneralLearnerFlowDTO.reflection != 'true' || !hasEditRight}">
-					<button onclick="javascript:submitMethod('learnerFinished');"
+					<button type="submit" onclick="javascript:submitMethod('learnerFinished');"
 						class="btn btn-primary pull-right voffset10 na" id="finishButton">
 						<c:choose>
 							<c:when test="${activityPosition.last}">

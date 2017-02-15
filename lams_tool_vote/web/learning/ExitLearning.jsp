@@ -106,8 +106,8 @@
 			</c:if>
 
 			<c:if test="${voteGeneralLearnerFlowDTO.learningMode != 'teacher'}">
-				<html:link href="#nogo" property="learnerFinished" styleClass="btn btn-primary voffset10 pull-right na"
-					styleId="finishButton" onclick="submitMethod('learnerFinished');return false">
+				<button type="submit" class="btn btn-primary voffset10 pull-right na"
+					id="finishButton" onclick="submitMethod('learnerFinished')">
 					<c:choose>
 						<c:when test="${activityPosition.last}">
 							<fmt:message key="button.submitActivity" />
@@ -117,7 +117,7 @@
 						</c:otherwise>
 					</c:choose>
 
-				</html:link>
+				</button>
 			</c:if>
 			<div id="footer"></div>
 

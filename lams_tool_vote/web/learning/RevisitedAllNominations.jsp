@@ -113,9 +113,9 @@
 			</c:if>
 
 
-			<html:submit property="learnerFinished" styleId="finishButton"
+			<button type="submit" id="finishButton"
 				onclick="javascript:submitMethod('learnerFinished');"
-				styleClass="btn btn-primary voffset10 pull-right na">
+				class="btn btn-primary voffset10 pull-right na">
 				<c:choose>
 						<c:when test="${activityPosition.last}">
 							<fmt:message key="button.submitActivity" />
@@ -124,7 +124,7 @@
 							<fmt:message key="button.endLearning" />
 						</c:otherwise>
 				</c:choose>
-			</html:submit>
+			</button>
 			<div id="footer"></div>
 
 		</lams:Page>
