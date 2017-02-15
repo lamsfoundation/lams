@@ -303,7 +303,7 @@
 				</html:button>
 			</c:when>
 			<c:otherwise>
-				<html:button property="finishButton" onclick="javascript:finish();" styleClass="btn btn-primary btn-disable-on-submit pull-right na" styleId="finishButton">
+				<button type="submit"  onclick="javascript:finish();" class="btn btn-primary btn-disable-on-submit pull-right na" id="finishButton">
 					<c:choose>
 						<c:when test="${activityPosition.last}">
 							<fmt:message key="button.submit" />
@@ -312,7 +312,7 @@
 							<fmt:message key="button.finish" />
 						</c:otherwise>
 					</c:choose>
-				</html:button>
+				</button>
 			</c:otherwise>
 		</c:choose>
 		</c:if>
