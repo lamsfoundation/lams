@@ -27,21 +27,29 @@
 				//					return false;
 				//			}
 			} else if (uploadFileNum == 0) {
-				if (confirm("<fmt:message key='messsage.learner.finish.confirm'/>"))
+				if (confirm("<fmt:message key='messsage.learner.finish.confirm'/>")) {
+					disableButtons();
 					location.href = tUrl;
-				else
+				} else {
 					return false;
-			} else
+				}
+			} else {
+				disableButtons();
 				location.href = tUrl;
+			}
 		}
 		function finish() {
-			document.getElementById("finishButton").disabled = true;
 			var finishUrl = "<html:rewrite page='/learner.do?method=finish&sessionMapID=${sessionMapID}'/>";
 			return submitCount(finishUrl);
 		}
 		function notebook() {
 			var continueUrl = "<html:rewrite page='/learning/newReflection.do?sessionMapID=${sessionMapID}'/>";
 			return submitCount(continueUrl);
+		}
+		function disableButtons() {
+			// do not disable the file button or the file will be missing on the upload.
+			$('.btn-disable-on-submit').prop('disabled', true);
+			$('a.btn-disable-on-submit').hide(); // links must be hidden, cannot be disabled
 		}
 	</script>
 
@@ -129,7 +137,7 @@
 								</c:set>
 								</td>
 								<td>
-									<a href="${downloadURL}" title="<fmt:message key="label.download" />" class="btn btn-default pull-right">
+									<a href="${downloadURL}" title="<fmt:message key="label.download" />" class="btn btn-default btn-disable-on-submit pull-right">
 										<i class="fa fa-download" ></i>
 									</a>
 								</td>
@@ -180,7 +188,7 @@
 							<c:set var="markFileDownloadURL">
 								<c:url value="/download?uuid=${file.markFileUUID}&versionID=${file.markFileVersionID}&preferDownload=true" />
 							</c:set>
-							<a href="${markFileDownloadURL}" title="<fmt:message key='label.download' />" class="btn btn-default pull-right">
+							<a href="${markFileDownloadURL}" title="<fmt:message key='label.download' />" class="btn btn-default btn-disable-on-submit pull-right">
 								<i class="fa fa-download"></i>
 							</a>
 						</td>
@@ -208,7 +216,7 @@
 
 			<c:if test="${!displayForm}">
 
-				<html:form action="/learner?method=uploadFile" method="post" enctype="multipart/form-data">
+				<html:form action="/learner?method=uploadFile" method="post" enctype="multipart/form-data" onsubmit="disableButtons();" >
 					<html:hidden property="sessionMapID" />
 
 					<!-- Hidden fields -->
@@ -235,8 +243,8 @@
 									<p class="help-block"><small><fmt:message key="errors.required"><fmt:param>*</fmt:param></fmt:message></small></p>
 							</div>
 							<div class="form-group">
-								<button type="submit" <c:if test="${sessionMap.finishLock || sessionMap.arriveLimit}">disabled="disabled"</c:if>
-									class="btn btn-sm btn-default btn-primary">
+								<button id="uploadButton" type="submit" <c:if test="${sessionMap.finishLock || sessionMap.arriveLimit}">disabled="disabled"</c:if>
+									class="btn btn-sm btn-default btn-primary btn-disable-on-submit">
 									<i class="fa fa-xs fa-upload"></i> <fmt:message key="label.learner.upload" />
 								</button>
 							</div>
@@ -277,7 +285,7 @@
 					</div>
 
 					<html:button property="notebookButton" style="margin-top: 10px" onclick="javascript:notebook();"
-						styleClass="btn btn-sm btn-primary pull-left">
+						styleClass="btn btn-sm btn-primary btn-disable-on-submit pull-left" >
 						<fmt:message key="label.edit" />
 					</html:button>
 				</div>
@@ -288,13 +296,12 @@
 
 		<c:choose>
 			<c:when test="${sessionMap.reflectOn and (not sessionMap.userFinished)}">
-				<html:button property="notebookButton" onclick="javascript:notebook();" styleClass="btn btn-primary pull-right">
+				<html:button property="notebookButton" onclick="javascript:notebook();" styleClass="btn btn-primary btn-disable-on-submit pull-right">
 					<fmt:message key="label.continue" />
 				</html:button>
 			</c:when>
 			<c:otherwise>
-				<html:link href="#nogo" property="finishButton" onclick="finish();return false"
-					styleClass="btn btn-primary pull-right na" styleId="finishButton">
+				<html:button property="finishButton" onclick="javascript:finish();" styleClass="btn btn-primary btn-disable-on-submit pull-right na" styleId="finishButton">
 					<c:choose>
 						<c:when test="${activityPosition.last}">
 							<fmt:message key="button.submit" />
@@ -303,7 +310,7 @@
 							<fmt:message key="button.finish" />
 						</c:otherwise>
 					</c:choose>
-				</html:link>
+				</html:button>
 			</c:otherwise>
 		</c:choose>
 
