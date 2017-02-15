@@ -41,10 +41,10 @@
 			</div>
 
 			<html:textarea rows="5" property="entryText" styleClass="form-control" styleId="focused"></html:textarea>
-			<html:submit property="submitReflection" onclick="javascript:submitMethod('submitReflection')"
-				styleClass="btn btn-primary voffset10 pull-right na" styleId="finishButton">
+			<button type="submit" onclick="javascript:submitMethod('submitReflection')"
+				class="btn btn-primary voffset10 pull-right na" id="finishButton">
 				<fmt:message key="button.endLearning" />
-			</html:submit>
+			</button>
 
 		</lams:Page>
 
