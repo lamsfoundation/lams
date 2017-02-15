@@ -22,9 +22,7 @@
 
 	<script type="text/javascript">
 		function submitMethod(actionMethod) {
-			if (actionMethod == 'learnerFinished') {
-				document.getElementById("finishButton").disabled = true;
-			}
+			$('.btn').prop('disabled', true);
 			document.VoteLearningForm.action += "&dispatch=" + actionMethod;
 			document.VoteLearningForm.submit();
 		}
@@ -215,21 +213,19 @@
 
 
 			<c:if test="${voteGeneralLearnerFlowDTO.reportViewOnly != 'true' }">
-				<html:submit property="refreshVotes" styleClass="btn btn-sm btn-default voffset10 pull-left"
-					onclick="submitMethod('viewAllResults');">
+				<button class="btn btn-sm btn-default voffset10 pull-left" onclick="submitMethod('viewAllResults');">
 					<fmt:message key="label.refresh" />
-				</html:submit>
+				</button>
 
 				<c:if test="${VoteLearningForm.lockOnFinish != 'true' && hasEditRight}">
-					<html:submit property="redoQuestionsOk" styleClass="btn btn-sm btn-default voffset10 pull-left "
-						onclick="submitMethod('redoQuestionsOk');">
+					<button class="btn btn-sm btn-default voffset10 pull-left " onclick="submitMethod('redoQuestionsOk');">
 						<fmt:message key="label.retake" />
-					</html:submit>
+					</button>
 				</c:if>
 
 				<c:if test="${voteGeneralLearnerFlowDTO.reflection != 'true' || !hasEditRight}">
-					<html:link href="#" property="learnerFinished" onclick="javascript:submitMethod('learnerFinished');return false"
-						styleClass="btn btn-primary pull-right voffset10 na" styleId="finishButton">
+					<button onclick="javascript:submitMethod('learnerFinished');"
+						class="btn btn-primary pull-right voffset10 na" id="finishButton">
 						<c:choose>
 							<c:when test="${activityPosition.last}">
 								<fmt:message key="button.submitActivity" />
@@ -238,14 +234,13 @@
 								<fmt:message key="button.endLearning" />
 							</c:otherwise>
 						</c:choose>
-					</html:link>
+					</button>
 				</c:if>
 
 				<c:if test="${voteGeneralLearnerFlowDTO.reflection == 'true' && hasEditRight}">
-					<html:submit property="forwardtoReflection" onclick="javascript:submitMethod('forwardtoReflection');"
-						styleClass="btn btn-primary pull-right voffset10">
+					<button onclick="javascript:submitMethod('forwardtoReflection');" class="btn btn-primary pull-right voffset10">
 						<fmt:message key="label.continue" />
-					</html:submit>
+					</button>
 				</c:if>
 			</c:if>
 			</div>

@@ -23,9 +23,7 @@
 
 	<script type="text/javascript">
 		function submitMethod(actionMethod) {
-			if (actionMethod == "learnerFinished") {
-				document.getElementById("finishButton").disabled = true;
-			}
+			$('.btn').prop('disabled', true);
 			document.VoteLearningForm.dispatch.value = actionMethod;
 			document.VoteLearningForm.submit();
 		}
