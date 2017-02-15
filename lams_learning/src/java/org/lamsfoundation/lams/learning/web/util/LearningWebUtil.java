@@ -158,7 +158,7 @@ public class LearningWebUtil {
 
 	    return actionMappings.getCloseForward(currentActivity, lesson.getLessonId());
 	} else {
-	    learnerService.completeActivity(learnerId, currentActivity, progress);
+	    learnerService.completeActivity(learnerId, currentActivity, progress.getLearnerProgressId());
 	}
 
 	if (currentActivity != null && (currentActivity.isFloating() || (currentActivity.getParentActivity() != null
@@ -182,7 +182,7 @@ public class LearningWebUtil {
 	ActivityURL activityURL = new ActivityURL();
 	activityURL.setType(activity.getClass().getSimpleName());
 
-	if ( isFloating && activity.isFloatingActivity() ) {
+	if (isFloating && activity.isFloatingActivity()) {
 	    // special case - progress engine. Do not want the unknown activity warning
 	    activityURL.setUrl(null);
 	} else {
