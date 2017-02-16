@@ -769,7 +769,7 @@ function lamslesson_get_course_userids($lamslessonid, $context=NULL) {
 	}
 	
 	// we are looking for all users assigned in this context or higher
-	if ($usercontexts = get_parent_contexts($context)) {
+	if ($usercontexts = $context->get_parent_context_ids($context)) {
 		$listofcontexts = '('.implode(',', $usercontexts).')';
 	} else {
 		$sitecontext = get_context_instance(CONTEXT_SYSTEM);
