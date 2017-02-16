@@ -55,11 +55,6 @@ public class RatingCommentDAO extends LAMSBaseDAO implements IRatingCommentDAO {
     private static final String FIND_RELATED_COMMENT_BY_CRITERIA_AND_USER = "SELECT r.itemId, r.learner.userId, r.comment FROM " + RatingComment.class.getName()
 	    + " AS r where r.ratingCriteria.ratingCriteriaId=:ratingCriteriaId AND r.learner.userId=:userId";
 
-//    private static final String COUNT_COMMENTS_BY_ITEM_AND_USER = "SELECT COUNT(r) FROM  "
-//	    + RatingComment.class.getName()
-//	    + " AS r "
-//	    + " WHERE r.ratingCriteria.toolContentId = ? AND r.ratingCriteria.commentsEnabled IS TRUE AND r.itemId =? AND r.learner.userId =?";
-
     @Override
     public List<RatingCommentDTO> getCommentsByCriteriaAndItem(Long ratingCriteriaId, Long itemId) {
 	List<Object[]> results = (List<Object[]>) (doFind(FIND_COMMENTS_BY_CRITERIA_AND_ITEM,
@@ -144,5 +139,13 @@ public class RatingCommentDAO extends LAMSBaseDAO implements IRatingCommentDAO {
 	} else {
 	    return null;
 	}
+    }
+    
+    @Override
+    public List<RatingComment> getCommentsByContentAndUser(Long contentId, Integer userId) {
+	final String FIND_RATINGS_BY_USER = "FROM " + RatingComment.class.getName()
+		+ " AS r where r.ratingCriteria.toolContentId=? AND r.learner.userId=?";
+
+	return (List<RatingComment>) doFind(FIND_RATINGS_BY_USER, new Object[] { contentId, userId });
     }
 }
