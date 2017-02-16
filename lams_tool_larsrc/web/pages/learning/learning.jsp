@@ -32,8 +32,8 @@
 		});
 
  		function submitResourceForm() {
- 			debugger;
 			if ( $(this).valid() ) {
+				$('.btn-disable-on-submit').prop('disabled', true);
 				var formData = new FormData(this);
 			    $.ajax({ // create an AJAX call...
 			        data: formData, 
@@ -43,14 +43,13 @@
 			        url: $(this).attr('action'), // the file to call
 			        success: function (response) {
 						$('#addresource').html(response);
-						if ( itemType == 1)
-							setFormURL();
-						else if ( itemType == 2)
-							setFormFile();
 			    	},
 			    	error: function (jqXHR, textStatus, errorThrown ) {
 			    		alert(textStatus+": "+errorThrown);
 			    	},
+			    	complete: function(response) {
+			            $('.btn-disable-on-submit').prop('disabled', false);
+					}
 			    });
 			}
 			return false;
@@ -84,6 +83,7 @@
 			$("#sessionMapID").val("${sessionMapID}");
 		}
 		function cancel(){
+			$('.btn-disable-on-submit').prop('disabled', false);
 			$("#addresource").html('');
 		}		
 		
@@ -97,11 +97,12 @@
 			launchPopup(myUrl,"LearnerView");
 		}
 		function finishSession(){
-			document.getElementById("finishButton").disabled = true;
+			$('.btn-disable-on-submit').prop('disabled', true);
 			document.location.href ='<c:url value="/learning/finish.do?sessionMapID=${sessionMapID}&mode=${mode}&toolSessionID=${toolSessionID}"/>';
 			return false;
 		}
 		function continueReflect(){
+			$('.btn-disable-on-submit').prop('disabled', true);
 			document.location.href='<c:url value="/learning/newReflection.do?sessionMapID=${sessionMapID}"/>';
 		}
 		    </script>
@@ -242,7 +243,7 @@
 					</c:choose>
 
 					<c:if test="${mode != 'teacher'}">
-						<html:button property="FinishButton" onclick="return continueReflect()" styleClass="btn btn-sm btn-default voffset5">
+						<html:button property="FinishButton" onclick="return continueReflect()" styleClass="btn btn-sm btn-default voffset5 btn-disable-on-submit">
 						<fmt:message key="label.edit" />
 						</html:button>
 					</c:if>
@@ -256,13 +257,13 @@
 					<c:when
 						test="${sessionMap.reflectOn && (not sessionMap.userFinished)}">
 						<html:button property="FinishButton"
-							onclick="return continueReflect()" styleClass="btn btn-default voffset5 pull-right">
+							onclick="return continueReflect()" styleClass="btn btn-default voffset5 pull-right btn-disable-on-submit">
 							<fmt:message key="label.continue" />
 						</html:button>
 					</c:when>
 					<c:otherwise>
-						<html:link href="#nogo" property="FinishButton" styleId="finishButton"
-							onclick="return finishSession()" styleClass="btn btn-primary voffset5 pull-right na">
+						<button type="submit" id="finishButton"
+							onclick="return finishSession()" class="btn btn-primary btn-disable-on-submit voffset5 pull-right na">
 							<span class="nextActivity">
 								<c:choose>
 				 					<c:when test="${sessionMap.activityPosition.last}">
@@ -273,7 +274,7 @@
 				 					</c:otherwise>
 				 				</c:choose>
 							</span>
-						</html:link>
+						</button>
 					</c:otherwise>
 				</c:choose>
 			</div>

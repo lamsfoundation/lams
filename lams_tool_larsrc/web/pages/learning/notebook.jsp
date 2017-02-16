@@ -12,10 +12,6 @@
 		function disableFinishButton() {
 			document.getElementById("finishButton").disabled = true;
 		}
-	        function submitForm(methodName){
-        	        var f = document.getElementById('reflectionForm');
-	                f.submit();
-	        }
 	</script>
 </lams:head>
 <body class="stripes">
@@ -36,11 +32,10 @@
 				<lams:out value="${sessionMap.reflectInstructions}" escapeHtml="true"/>
 			</p>
 
-			<html:textarea cols="60" rows="8" property="entryText"
-				styleClass="text-area" />
+			<html:textarea rows="8" property="entryText" styleId="focused" styleClass="form-control" />
 
 			<div class="space-bottom-top align-right">
-				<html:link href="#nogo" styleClass="btn btn-primary voffset5 pull-right na" styleId="finishButton" onclick="submitForm('finish')">
+				<button type="submit" class="btn btn-primary voffset5 pull-right na" id="finishButton">
 					<span class="nextActivity">
 						<c:choose>
 		 					<c:when test="${sessionMap.activityPosition.last}">
@@ -51,7 +46,7 @@
 		 					</c:otherwise>
 		 				</c:choose>
 		 			</span>
-				</html:link>
+				</button>
 			</div>
 		</div>
 	</html:form>

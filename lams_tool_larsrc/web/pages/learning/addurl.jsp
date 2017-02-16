@@ -36,7 +36,7 @@
 	 		<html:button property="goback" onclick="javascript:cancel()" styleClass="btn btn-sm btn-default" styleId="cancelButton">
 				<fmt:message key="button.cancel" />
 			</html:button>&nbsp;
-			<html:submit styleClass="btn btn-sm btn-default" styleId="submitButton">
+			<html:submit styleClass="btn btn-sm btn-default btn-disable-on-submit" styleId="submitButton">
 			 	<fmt:message key="button.add" />
 			</html:submit>
 		</div>
