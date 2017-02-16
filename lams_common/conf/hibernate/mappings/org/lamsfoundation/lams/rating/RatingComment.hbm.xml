@@ -36,7 +36,7 @@
         <many-to-one
             name="ratingCriteria"
             class="org.lamsfoundation.lams.rating.model.RatingCriteria"
-            cascade="all"
+            cascade="none"
             outer-join="auto"
             update="true"
             insert="true"
