@@ -32,7 +32,7 @@
 				<html:textarea property="entryText" styleClass="form-control" styleId="focused" rows="5" />
 
 
-				<button class="btn btn-primary voffset10 pull-right na" id="finishButton" type="submit" ">
+				<button class="btn btn-primary voffset10 pull-right na" id="finishButton" type="submit">
 
 					<c:choose>
 						<c:when test="${activityPosition.last}">
