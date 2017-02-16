@@ -33,9 +33,6 @@ import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
  * Peerreview User
  *
  * @author Dapeng Ni
- *
- *
- *
  */
 public class PeerreviewUser implements Cloneable {
     private static final long serialVersionUID = -7043502180037866257L;
@@ -47,6 +44,8 @@ public class PeerreviewUser implements Cloneable {
     private String lastName;
     private String loginName;
     private boolean sessionFinished;
+    //status set by monitor to indicate users that shouldn't be rated
+    private boolean hidden;
 
     private PeerreviewSession session;
     private Peerreview peerreview;
@@ -62,6 +61,7 @@ public class PeerreviewUser implements Cloneable {
 	this.session = session;
 	this.peerreview = null;
 	this.sessionFinished = false;
+	this.hidden = false;
     }
 
     public PeerreviewUser(UserDTO user, Peerreview content) {
@@ -72,6 +72,7 @@ public class PeerreviewUser implements Cloneable {
 	this.session = null;
 	this.peerreview = content;
 	this.sessionFinished = false;
+	this.hidden = false;
     }
 
     /**
@@ -199,6 +200,17 @@ public class PeerreviewUser implements Cloneable {
     public void setSessionFinished(boolean sessionFinished) {
 	this.sessionFinished = sessionFinished;
     }
+    
+    /**
+    * @return status set by monitor to indicate users that shouldn't be rated
+    */
+   public boolean isHidden() {
+	return hidden;
+   }
+
+   public void setHidden(boolean hidden) {
+	this.hidden = hidden;
+   }
 
     @Override
     public boolean equals(Object obj) {

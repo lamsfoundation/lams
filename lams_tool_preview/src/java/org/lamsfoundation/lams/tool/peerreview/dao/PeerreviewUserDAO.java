@@ -34,15 +34,21 @@ import org.lamsfoundation.lams.tool.peerreview.model.PeerreviewUser;
 public interface PeerreviewUserDAO extends DAO {
 
     PeerreviewUser getUserByUserIDAndSessionID(Long userID, Long sessionId);
+    
+    PeerreviewUser getUserByUid(Long userUid);
 
     PeerreviewUser getUserByUserIDAndContentID(Long userId, Long contentId);
 
     List<PeerreviewUser> getBySessionID(Long sessionId);
 
-    List<Long> getUserIdsBySessionID(Long sessionId);
-
-    List<PeerreviewUser> getByContentId(Long toolContentId);
-
+    /**
+     * Counts number of users in a session excluding specified user. Besides, it also *excludes all hidden users*.
+     * 
+     * @param toolSessionId
+     * @param excludeUserId
+     * @param includeHiddenUsers whether hidden users should be counted as well or not
+     * @return
+     */
     int getCountUsersBySession(final Long toolSessionId, final Long excludeUserId);
 
     List<Object[]> getRatingsComments(Long toolContentId, Long toolSessionId, RatingCriteria criteria, Long userId, Integer page,
@@ -53,10 +59,28 @@ public interface PeerreviewUserDAO extends DAO {
 	
     List<Object[]> getDetailedRatingsComments(Long toolContentId, Long toolSessionId, Long criteriaId, Long itemId );
     
+    /**
+     * Counts number of users in a specified session. It counts it regardless whether a user is hidden or not.
+     * 
+     * @param toolSessionId
+     * @return
+     */
     int getCountUsersBySession(Long toolSessionId);
 
     int createUsersForSession(PeerreviewSession session);
     
     List<Object[]> getUserNotebookEntriesForTablesorter(final Long toolSessionId, int page, int size, int sorting, String searchString, 
 	    ICoreNotebookService coreNotebookService);
+    
+    /**
+     * Returns list of <userUid, userName> pairs. Used by monitor's manageUsers functionality.
+     * 
+     * @param toolSessionId
+     * @param page
+     * @param size
+     * @param sorting
+     * @param searchString
+     * @return
+     */
+    List<Object[]> getPagedUsers(Long toolSessionId, Integer page, Integer size, int sorting, String searchString);
 }

@@ -86,6 +86,7 @@
 			type="org.lamsfoundation.lams.tool.peerreview.web.action.LearningAction"
 			parameter="start" >
 			<forward name="success" path="/pages/learning/learning.jsp" />
+			<forward name="learningHiddenUser" path="/pages/learning/learningHiddenUser.jsp" />
 			<forward name="defineLater" path="/pages/learning/definelater.jsp" />
 			<forward name="showResults" path="/learning/showResults.do" />	
 			<forward name="newReflection" path="/learning/newReflection.do" />	
@@ -215,6 +216,19 @@
 		<action path="/monitoring/exportTeamReport"
 			type="org.lamsfoundation.lams.tool.peerreview.web.action.MonitoringAction"
 			parameter="exportTeamReport" >
+		</action>
+		<action path="/monitoring/manageUsers"
+			type="org.lamsfoundation.lams.tool.peerreview.web.action.MonitoringAction"
+			parameter="manageUsers" >
+			<forward name="success" path="/pages/monitoring/manageUsers.jsp" />
+		</action>
+		<action path="/monitoring/getManageUsers"
+			type="org.lamsfoundation.lams.tool.peerreview.web.action.MonitoringAction"
+			parameter="getManageUsers" >
+		</action>
+		<action path="/monitoring/setUserHidden"
+			type="org.lamsfoundation.lams.tool.peerreview.web.action.MonitoringAction"
+			parameter="setUserHidden" >
 		</action>
 		<!-- ========== BEGIN: Common ============================== -->
 		<action path="/clearsession"

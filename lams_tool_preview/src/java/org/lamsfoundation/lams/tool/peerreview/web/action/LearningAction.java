@@ -159,6 +159,7 @@ public class LearningAction extends Action {
 	request.setAttribute(PeerreviewConstants.ATTR_SESSION_MAP_ID, sessionMap.getSessionID());
 	request.setAttribute(AttributeNames.ATTR_MODE, mode);
 	request.setAttribute(PeerreviewConstants.PARAM_TOOL_SESSION_ID, sessionId);
+	sessionMap.put(PeerreviewConstants.PARAM_TOOL_SESSION_ID, sessionId);
 
 	// If user already exists go straight to the normal screen, otherwise go to a refresh screen
 	// until the user is created. The user will be created by the UserCreateThread(), which should
@@ -181,14 +182,18 @@ public class LearningAction extends Action {
 	} catch (Throwable e) {
 	    throw new IOException(e);
 	}
-
+	
+	// goto refresh screen TODO create a specialised page
 	if (user == null) {
-	    // goto refresh screen TODO create a specialised page
 	    request.setAttribute(PeerreviewConstants.ATTR_CREATING_USERS, "true");
 	    return mapping.findForward("defineLater");
+	    
+	//in case user is hidden by the monitor - show him learningHiddenUser.jsp page 
+	} else if (user.isHidden()) {
+	    return mapping.findForward("learningHiddenUser");
+	    
+	// goto standard screen
 	} else {
-	    // goto standard screen
-	    sessionMap.put(PeerreviewConstants.PARAM_TOOL_SESSION_ID, sessionId);
 	    sessionMap.put(AttributeNames.ATTR_MODE, mode);
 	    sessionMap.put(PeerreviewConstants.ATTR_USER, user);
 	    return startRating(mapping, form, request, response, service, sessionMap, sessionId, user, mode, null, null);
@@ -263,7 +268,7 @@ public class LearningAction extends Action {
      *
      */
     private ActionForward startRating(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response, IPeerreviewService service, SessionMap sessionMap, Long sessionId,
+	    HttpServletResponse response, IPeerreviewService service, SessionMap<String, Object> sessionMap, Long sessionId,
 	    PeerreviewUser user, ToolAccessMode mode, RatingCriteria currentCriteria, Boolean next) throws IOException, ServletException {
 
 	Peerreview peerreview = service.getPeerreviewBySessionId(sessionId);

@@ -73,12 +73,6 @@ public interface IPeerreviewService extends ToolRatingManager {
      */
     void createUser(PeerreviewUser peerreviewUser);
 
-    List<PeerreviewUser> getUsersBySession(Long toolSessionId);
-
-    List<PeerreviewUser> getUsersByContent(Long toolContentId);
-    
-    List<Long> getUserIdsBySessionID(Long sessionId);
-
     /**
      * Get user by given userID and toolContentID.
      *
@@ -151,7 +145,23 @@ public interface IPeerreviewService extends ToolRatingManager {
      */
     List<GroupSummary> getGroupSummaries(Long contentId);
 
+    /**
+     * Counts number of users in a session excluding specified user. Besides, it also *excludes all hidden users*.
+     * 
+     * @param qaSessionId
+     * @param excludeUserId
+     * @param includeHiddenUsers whether hidden users should be counted as well or not
+     * @return
+     */
     int getCountUsersBySession(final Long qaSessionId, final Long excludeUserId);
+    
+    /**
+     * Counts number of users in a specified session. It counts it regardless whether a user is hidden or not.
+     * 
+     * @param toolSessionId
+     * @return
+     */
+    int getCountUsersBySession(Long toolSessionId);
 
     /**
      * Create refection entry into notebook tool.
@@ -202,6 +212,15 @@ public interface IPeerreviewService extends ToolRatingManager {
      * @throws Throwable
      */
     boolean createUsersFromLesson(Long toolSessionId) throws Throwable;
+    
+    /**
+     * Store user hidden status in a DB. If user is marked as hidden - it will automatically remove all rating left by
+     * him to prevent statistics mess up.
+     * 
+     * @param userUid
+     * @param isHidden
+     */
+    void setUserHidden(Long toolContentId, Long userUid, boolean isHidden);
 
     /**
      * Returns whether activity is grouped and therefore it is expected more than one tool session.
@@ -271,6 +290,18 @@ public interface IPeerreviewService extends ToolRatingManager {
      * 	Will return List<[user.user_id, user.first_name, user.first_name + user.last_name, notebook entry, notebook date]>
      */
     List<Object[]> getUserNotebookEntriesForTablesorter(Long toolSessionId, int page, int size, int sorting, String searchString);
+    
+    /**
+     * Returns list of <userUid, userName> pairs. Used by monitor's manageUsers functionality.
+     * 
+     * @param toolSessionId
+     * @param page
+     * @param size
+     * @param sorting
+     * @param searchString
+     * @return
+     */
+    List<Object[]> getPagedUsers(Long toolSessionId, Integer page, Integer size, int sorting, String searchString);
 
     /** Send an email with the user's results to each user in the session */
     int emailReportToSessionUsers(Long toolContentId, Long sessionId);

@@ -28,7 +28,6 @@ import java.io.IOException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.TimeZone;
@@ -52,7 +51,6 @@ import org.lamsfoundation.lams.rating.model.RatingCriteria;
 import org.lamsfoundation.lams.tool.peerreview.PeerreviewConstants;
 import org.lamsfoundation.lams.tool.peerreview.dto.GroupSummary;
 import org.lamsfoundation.lams.tool.peerreview.model.Peerreview;
-import org.lamsfoundation.lams.tool.peerreview.model.PeerreviewUser;
 import org.lamsfoundation.lams.tool.peerreview.service.IPeerreviewService;
 import org.lamsfoundation.lams.util.DateUtil;
 import org.lamsfoundation.lams.util.ExcelCell;
@@ -103,8 +101,17 @@ public class MonitoringAction extends Action {
 	if (param.equals("sendResultsToSessionUsers")) {
 	    return sendResultsToSessionUsers(mapping, form, request, response);
 	}
-	if ( param.equals("exportTeamReport")) {
+	if (param.equals("exportTeamReport")) {
 	    return exportTeamReport(mapping, form, request, response);
+	}
+	if (param.equals("manageUsers")) {
+	    return manageUsers(mapping, form, request, response);
+	}
+	if (param.equals("getManageUsers")) {
+	    return getManageUsers(mapping, form, request, response);
+	}
+	if (param.equals("setUserHidden")) {
+	    return setUserHidden(mapping, form, request, response);
 	}
 	return mapping.findForward(PeerreviewConstants.ERROR);
     }
@@ -124,14 +131,6 @@ public class MonitoringAction extends Action {
 	List<GroupSummary> groupList = service.getGroupSummaries(contentId);
 
 	Peerreview peerreview = service.getPeerreviewByContentId(contentId);
-
-	// user name map
-	List<PeerreviewUser> sessionUsers = service.getUsersByContent(contentId);
-	HashMap<Long, String> userNameMap = new HashMap<Long, String>();
-	for (PeerreviewUser userIter : sessionUsers) {
-	    userNameMap.put(userIter.getUserId(), userIter.getFirstName() + " " + userIter.getLastName());
-	}
-	sessionMap.put("userNameMap", userNameMap);
 
 	// cache into sessionMap
 	sessionMap.put(PeerreviewConstants.ATTR_SUMMARY_LIST, groupList);
@@ -211,7 +210,6 @@ public class MonitoringAction extends Action {
 	Long dummyUserId = -1L;
 	
 	JSONObject responcedata = new JSONObject();
-
 	int numUsersInSession = service.getCountUsersBySession(toolSessionId, dummyUserId);
 	responcedata.put("page", page + 1);
 	responcedata.put("total", Math.ceil((float) numUsersInSession / size));
@@ -239,7 +237,6 @@ public class MonitoringAction extends Action {
 		} else {
 		    cell.put("rating", "");
 		    cell.put("email", "");
-
 		}
 
 		JSONObject row = new JSONObject();
@@ -304,7 +301,6 @@ public class MonitoringAction extends Action {
     private ActionForward getSubgridData(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) throws JSONException, IOException {
 	IPeerreviewService service = getPeerreviewService();
-	String sessionMapID = request.getParameter(PeerreviewConstants.ATTR_SESSION_MAP_ID);
 
 	Long itemId = WebUtil.readLongParam(request, "itemId");
 	Long toolContentId = WebUtil.readLongParam(request, "toolContentId");
@@ -434,15 +430,13 @@ public class MonitoringAction extends Action {
 	DateFormat dateFormatterTimeAgo = new SimpleDateFormat(DateUtil.ISO8601_FORMAT); 
 	dateFormatterTimeAgo.setTimeZone(TimeZone.getTimeZone("GMT")); 
 
-	Long dummyUserId = -1L;
+	IPeerreviewService service = getPeerreviewService();
+	int sessionUserCount = service.getCountUsersBySession(toolSessionId, -1L);
 	
 	JSONObject responcedata = new JSONObject();
-
-	IPeerreviewService service = getPeerreviewService();
-
 	responcedata.put("page", page + 1);
-	responcedata.put("total", Math.ceil((float) service.getCountUsersBySession(toolSessionId, dummyUserId) / size));
-	responcedata.put("records", service.getCountUsersBySession(toolSessionId, dummyUserId));
+	responcedata.put("total", Math.ceil((float) sessionUserCount / size));
+	responcedata.put("records", sessionUserCount);
 
 	List<Object[]> nbEntryList = service.getUserNotebookEntriesForTablesorter(toolSessionId, 
 		page, size, sorting, searchString);
@@ -521,14 +515,13 @@ public class MonitoringAction extends Action {
 	response.getWriter().write(service.getLocalisedMessage("msg.results.sent", new Object[] { numEmailsSent }));
 	return null;
     }
-
     
     /**
      * Exports Team Report into Excel spreadsheet.
      * @throws ServletException 
      * @throws IOException 
      */
-    public ActionForward exportTeamReport(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+    private ActionForward exportTeamReport(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) throws ServletException {
 	
 	IPeerreviewService service = getPeerreviewService();
@@ -568,6 +561,85 @@ public class MonitoringAction extends Action {
 	    throw new ServletException(e);
 	}
 
+	return null;
+    }
+    
+    private ActionForward manageUsers(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+	    HttpServletResponse response) throws ServletException {
+	
+	IPeerreviewService service = getPeerreviewService();
+	String sessionMapID = request.getParameter(PeerreviewConstants.ATTR_SESSION_MAP_ID);
+	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
+		.getAttribute(sessionMapID);
+	request.setAttribute(PeerreviewConstants.ATTR_SESSION_MAP_ID, sessionMap.getSessionID());
+	
+	return mapping.findForward(PeerreviewConstants.SUCCESS);
+    }
+    
+    /**
+     * Gets a paged set of data for stars or comments. These are directly saved to the database, not through
+     * LearnerAction like Ranking and Hedging. 
+     */
+    private ActionForward getManageUsers(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+	    HttpServletResponse res) throws IOException, ServletException, JSONException {
+	
+	IPeerreviewService service = getPeerreviewService();
+	Long toolSessionId = WebUtil.readLongParam(request, "toolSessionId");
+	
+	// Getting the params passed in from the jqGrid
+	int page = WebUtil.readIntParam(request, PeerreviewConstants.PARAM_PAGE) - 1;
+	int size = WebUtil.readIntParam(request, PeerreviewConstants.PARAM_ROWS);
+	String sortOrder = WebUtil.readStrParam(request, PeerreviewConstants.PARAM_SORD);
+	String sortBy = WebUtil.readStrParam(request, PeerreviewConstants.PARAM_SIDX, true);
+
+	int sorting = PeerreviewConstants.SORT_BY_USERNAME_ASC;
+	if (sortBy != null && sortBy.equals(PeerreviewConstants.PARAM_SORT_USER_NAME)) {
+	    if (sortOrder != null && sortOrder.equals(PeerreviewConstants.SORT_DESC)) {
+		sorting = PeerreviewConstants.SORT_BY_USERNAME_DESC;
+	    } else {
+		sorting = PeerreviewConstants.SORT_BY_USERNAME_ASC;
+	    }
+	}
+	String searchString = WebUtil.readStrParam(request, "userName", true);
+	
+	JSONObject responcedata = new JSONObject();
+
+	int numUsersInSession = service.getCountUsersBySession(toolSessionId);
+	responcedata.put("page", page + 1);
+	responcedata.put("total", Math.ceil((float) numUsersInSession / size));
+	responcedata.put("records", numUsersInSession);
+	
+	// gets the user
+	List<Object[]> rawRows = service.getPagedUsers(toolSessionId, page, size, sorting, searchString);
+	JSONArray rows = new JSONArray();
+	for (int i = 0; i < rawRows.size(); i++) {
+	    Object[] rawRow = rawRows.get(i);
+	    JSONObject cell = new JSONObject();
+	    cell.put("hidden", !(Boolean)rawRow[1]);
+	    cell.put("userUid", rawRow[0]);
+	    cell.put("userName", (String) rawRow[2]);
+
+	    JSONObject row = new JSONObject();
+	    row.put("id", "" + rawRow[0]);
+	    row.put("cell", cell);
+	    rows.put(row);
+	}
+	responcedata.put("rows", rows);
+
+	res.setContentType("application/json;charset=utf-8");
+	res.getWriter().print(new String(responcedata.toString()));
+	return null;
+    }
+    
+    private ActionForward setUserHidden(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+	    HttpServletResponse response) {
+	IPeerreviewService service = getPeerreviewService();
+
+	Long toolContentId = WebUtil.readLongParam(request, PeerreviewConstants.ATTR_TOOL_CONTENT_ID);
+	Long userUid = WebUtil.readLongParam(request, "userUid");
+	boolean isHidden = !WebUtil.readBooleanParam(request, "hidden");
+	
+	service.setUserHidden(toolContentId, userUid, isHidden);
 	return null;
     }
     

@@ -87,6 +87,14 @@
             insert="true"
             column="session_finished"
         />
+        
+        <property
+            name="hidden"
+            type="boolean"
+            update="true"
+            insert="true"
+            column="hidden"
+        />
 
         <!--
             To add non XDoclet property mappings, create a file named

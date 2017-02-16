@@ -120,7 +120,7 @@ public class PeerreviewServiceImpl
     private ICoreNotebookService coreNotebookService;
 
     private IRatingService ratingService;
-    
+
     private IEventNotificationService eventNotificationService;
 
     private SortedSet<Long> creatingUsersForSessionIds;
@@ -137,7 +137,7 @@ public class PeerreviewServiceImpl
     public Peerreview getPeerreviewByContentId(Long contentId) {
 	Peerreview rs = peerreviewDao.getByContentId(contentId);
 	if (rs == null) {
-	    PeerreviewServiceImpl.log.debug("Could not find the content by given ID:" + contentId);
+	    log.debug("Could not find the content by given ID:" + contentId);
 	}
 	return rs;
     }
@@ -146,7 +146,7 @@ public class PeerreviewServiceImpl
     public Peerreview getDefaultContent(Long contentId) throws PeerreviewApplicationException {
 	if (contentId == null) {
 	    String error = messageService.getMessage("error.msg.default.content.not.find");
-	    PeerreviewServiceImpl.log.error(error);
+	    log.error(error);
 	    throw new PeerreviewApplicationException(error);
 	}
 
@@ -170,11 +170,6 @@ public class PeerreviewServiceImpl
     @Override
     public PeerreviewUser getUserByIDAndSession(Long userId, Long sessionId) {
 	return peerreviewUserDao.getUserByUserIDAndSessionID(userId, sessionId);
-    }
-
-    @Override
-    public List<Long> getUserIdsBySessionID(Long sessionId) {
-	return peerreviewUserDao.getUserIdsBySessionID(sessionId);
     }
 
     @Override
@@ -251,6 +246,11 @@ public class PeerreviewServiceImpl
     public int getCountUsersBySession(final Long toolSessionId, final Long excludeUserId) {
 	return peerreviewUserDao.getCountUsersBySession(toolSessionId, excludeUserId);
     }
+    
+    @Override
+    public int getCountUsersBySession(final Long toolSessionId) {
+	return peerreviewUserDao.getCountUsersBySession(toolSessionId);
+    }
 
     @Override
     public Long createNotebookEntry(Long sessionId, Integer notebookToolType, String toolSignature, Integer userId,
@@ -280,16 +280,6 @@ public class PeerreviewServiceImpl
     }
 
     @Override
-    public List<PeerreviewUser> getUsersBySession(Long toolSessionId) {
-	return peerreviewUserDao.getBySessionID(toolSessionId);
-    }
-
-    @Override
-    public List<PeerreviewUser> getUsersByContent(Long toolContentId) {
-	return peerreviewUserDao.getByContentId(toolContentId);
-    }
-
-    @Override
     public boolean createUsersFromLesson(Long toolSessionId) throws Throwable {
 
 	User currentUser = null;
@@ -299,7 +289,7 @@ public class PeerreviewServiceImpl
 		return false;
 	    }
 
-//	    long start = System.currentTimeMillis();
+	    // long start = System.currentTimeMillis();
 
 	    PeerreviewSession session = getPeerreviewSessionBySessionId(toolSessionId);
 	    int numberPotentialLearners = toolService.getCountUsersForActivity(toolSessionId);
@@ -309,20 +299,36 @@ public class PeerreviewServiceImpl
 		numUsersCreated = peerreviewUserDao.createUsersForSession(session);
 	    }
 
-//	    log.debug("Peer Review UserCreateThread " + toolSessionId + ": numUsersCreated "+numUsersCreated+" took: "
-//	    	    + (System.currentTimeMillis() - start) + "ms.");
+	    // log.debug("Peer Review UserCreateThread " + toolSessionId + ": numUsersCreated "+numUsersCreated+" took:
+	    // "
+	    // + (System.currentTimeMillis() - start) + "ms.");
 
 	    creatingUsersForSessionIds.remove(toolSessionId);
 	    return true;
 	} catch (Throwable e) {
 	    creatingUsersForSessionIds.remove(toolSessionId);
 	    String message = e.getMessage() != null ? e.getMessage() : e.getClass().getName();
-	    PeerreviewServiceImpl.log
-		    .error("Exception thrown creating Peer Review users for session " + toolSessionId + " user id: "
-			    + (currentUser != null ? currentUser.getUserId().toString() : "null") + "; " + message, e);
+	    log.error("Exception thrown creating Peer Review users for session " + toolSessionId + " user id: "
+		    + (currentUser != null ? currentUser.getUserId().toString() : "null") + "; " + message, e);
 	    e.printStackTrace();
 	    throw (e);
 	}
+    }
+
+    @Override
+    public void setUserHidden(Long toolContentId, Long userUid, boolean isHidden) {
+	PeerreviewUser user = peerreviewUserDao.getUserByUid(userUid);
+	if (user == null) {
+	    return;
+	}
+	
+	//If user is marked as hidden - it will automatically remove all rating left by him to prevent statistics mess up.
+	if (isHidden) {
+	    ratingService.removeUserCommitsByContent(toolContentId, user.getUserId().intValue());
+	}
+	
+	user.setHidden(isHidden);
+	peerreviewUserDao.saveObject(user);
     }
 
     @Override
@@ -331,8 +337,7 @@ public class PeerreviewServiceImpl
     }
 
     @Override
-    public void commentItem(RatingCriteria ratingCriteria, Integer userId, Long itemId, String comment)
-    {
+    public void commentItem(RatingCriteria ratingCriteria, Integer userId, Long itemId, String comment) {
 	ratingService.commentItem(ratingCriteria, userId, itemId, comment);
     }
 
@@ -342,73 +347,80 @@ public class PeerreviewServiceImpl
     }
 
     @Override
-    public StyledCriteriaRatingDTO getUsersRatingsCommentsByCriteriaIdDTO(Long toolContentId, Long toolSessionId, RatingCriteria criteria, 
-	    Long currentUserId, boolean skipRatings, int sorting,  String searchString, boolean getAllUsers, boolean getByUser) {
-	
-	if ( skipRatings ) {
+    public StyledCriteriaRatingDTO getUsersRatingsCommentsByCriteriaIdDTO(Long toolContentId, Long toolSessionId,
+	    RatingCriteria criteria, Long currentUserId, boolean skipRatings, int sorting, String searchString,
+	    boolean getAllUsers, boolean getByUser) {
+
+	if (skipRatings) {
 	    return ratingService.convertToStyledDTO(criteria, currentUserId, getAllUsers, null);
 	}
-	
-	List<Object[]> rawData = peerreviewUserDao.getRatingsComments(toolContentId, toolSessionId, criteria, 
+
+	List<Object[]> rawData = peerreviewUserDao.getRatingsComments(toolContentId, toolSessionId, criteria,
 		currentUserId, null, null, sorting, searchString, getByUser, ratingService);
 
-	for ( Object[] raw : rawData ) {
+	for (Object[] raw : rawData) {
 	    int len = raw.length;
-	    StringBuilder description = new StringBuilder((String)raw[len-2] ).append(" ").append((String)raw[len-1]);	    
-	    raw[len-1] = (Object) StringEscapeUtils.escapeCsv(description.toString());
+	    StringBuilder description = new StringBuilder((String) raw[len - 2]).append(" ")
+		    .append((String) raw[len - 1]);
+	    raw[len - 1] = (Object) StringEscapeUtils.escapeCsv(description.toString());
 	}
-	// if !getByUser -> is get current user's ratings from other users -> 
+	// if !getByUser -> is get current user's ratings from other users ->
 	// convertToStyledJSON.getAllUsers needs to be true otherwise current user (the only one in the set!) is dropped
 	return ratingService.convertToStyledDTO(criteria, currentUserId, !getByUser || getAllUsers, rawData);
     }
 
     @Override
-    public JSONArray getUsersRatingsCommentsByCriteriaIdJSON(Long toolContentId, Long toolSessionId, RatingCriteria criteria, Long currentUserId, 
-	    Integer page, Integer size, int sorting, String searchString, boolean getAllUsers, boolean getByUser, boolean needRatesPerUser) throws JSONException {
+    public JSONArray getUsersRatingsCommentsByCriteriaIdJSON(Long toolContentId, Long toolSessionId,
+	    RatingCriteria criteria, Long currentUserId, Integer page, Integer size, int sorting, String searchString,
+	    boolean getAllUsers, boolean getByUser, boolean needRatesPerUser) throws JSONException {
 
-	List<Object[]> rawData = peerreviewUserDao.getRatingsComments(toolContentId, toolSessionId, criteria, 
+	List<Object[]> rawData = peerreviewUserDao.getRatingsComments(toolContentId, toolSessionId, criteria,
 		currentUserId, page, size, sorting, searchString, getByUser, ratingService);
-	
-	for ( Object[] raw : rawData ) {
+
+	for (Object[] raw : rawData) {
 	    int len = raw.length;
-	    StringBuilder description = new StringBuilder((String)raw[len-2] ).append(" ").append((String)raw[len-1]);	    
-	    raw[len-1] = (Object) StringEscapeUtils.escapeCsv(description.toString());
+	    StringBuilder description = new StringBuilder((String) raw[len - 2]).append(" ")
+		    .append((String) raw[len - 1]);
+	    raw[len - 1] = (Object) StringEscapeUtils.escapeCsv(description.toString());
 	}
-	// if !getByUser -> is get current user's ratings from other users -> 
+	// if !getByUser -> is get current user's ratings from other users ->
 	// convertToStyledJSON.getAllUsers needs to be true otherwise current user (the only one in the set!) is dropped
-	return ratingService.convertToStyledJSON(criteria, currentUserId, !getByUser || getAllUsers, rawData, needRatesPerUser);
+	return ratingService.convertToStyledJSON(criteria, currentUserId, !getByUser || getAllUsers, rawData,
+		needRatesPerUser);
     }
 
     @Override
-    public List<Object[]> getDetailedRatingsComments(Long toolContentId, Long toolSessionId, Long criteriaId, Long itemId ) {
+    public List<Object[]> getDetailedRatingsComments(Long toolContentId, Long toolSessionId, Long criteriaId,
+	    Long itemId) {
 	NumberFormat numberFormat = NumberFormat.getInstance(Locale.US);
 	numberFormat.setMaximumFractionDigits(1);
-	    
-	// raw data: user_id, comment, rating, first_name, last_name 
-	List<Object[]> rawData = peerreviewUserDao.getDetailedRatingsComments( toolContentId,  toolSessionId,  criteriaId,  itemId );
-	for ( Object[] raw : rawData ) {
-	    raw[2] = ( raw[2] == null ? null : numberFormat.format((Float) raw[2])); // format rating
+
+	// raw data: user_id, comment, rating, first_name, last_name
+	List<Object[]> rawData = peerreviewUserDao.getDetailedRatingsComments(toolContentId, toolSessionId, criteriaId,
+		itemId);
+	for (Object[] raw : rawData) {
+	    raw[2] = (raw[2] == null ? null : numberFormat.format((Float) raw[2])); // format rating
 	    // format name
-	    StringBuilder description = new StringBuilder((String)raw[3] ).append(" ").append((String)raw[4]);	    
+	    StringBuilder description = new StringBuilder((String) raw[3]).append(" ").append((String) raw[4]);
 	    raw[4] = (Object) StringEscapeUtils.escapeCsv(description.toString());
-	    
+
 	}
 	return rawData;
     }
-    
+
     @Override
     public List<Object[]> getCommentsCounts(Long toolContentId, Long toolSessionId, RatingCriteria criteria,
 	    Integer page, Integer size, int sorting, String searchString) {
-	
-	List<Object[]> rawData = peerreviewUserDao.getCommentsCounts(toolContentId, toolSessionId, criteria, 
-		page, size, sorting, searchString);
-	
-	// raw data: user_id, comment_count, first_name, last_name 
-	for ( Object[] raw : rawData ) {
-	    StringBuilder description = new StringBuilder((String)raw[2] ).append(" ").append((String)raw[3]);	    
+
+	List<Object[]> rawData = peerreviewUserDao.getCommentsCounts(toolContentId, toolSessionId, criteria, page, size,
+		sorting, searchString);
+
+	// raw data: user_id, comment_count, first_name, last_name
+	for (Object[] raw : rawData) {
+	    StringBuilder description = new StringBuilder((String) raw[2]).append(" ").append((String) raw[3]);
 	    raw[3] = (Object) StringEscapeUtils.escapeCsv(description.toString());
 	}
-	
+
 	return rawData;
     }
 
@@ -426,17 +438,25 @@ public class PeerreviewServiceImpl
     public List<PeerreviewStatisticsDTO> getStatistics(Long toolContentId) {
 	return peerreviewDao.getStatistics(toolContentId);
     }
-    
-    public List<Object[]> getUserNotebookEntriesForTablesorter(Long toolSessionId, int page, int size, int sorting, String searchString) {
-	List<Object[]> rawData = peerreviewUserDao.getUserNotebookEntriesForTablesorter(toolSessionId, 
-		page, size, sorting, searchString, coreNotebookService);
-	
-	for ( Object[] raw : rawData ) {
-	    StringBuilder description = new StringBuilder((String)raw[1] ).append(" ").append((String)raw[2]);	    
+
+    @Override
+    public List<Object[]> getUserNotebookEntriesForTablesorter(Long toolSessionId, int page, int size, int sorting,
+	    String searchString) {
+	List<Object[]> rawData = peerreviewUserDao.getUserNotebookEntriesForTablesorter(toolSessionId, page, size,
+		sorting, searchString, coreNotebookService);
+
+	for (Object[] raw : rawData) {
+	    StringBuilder description = new StringBuilder((String) raw[1]).append(" ").append((String) raw[2]);
 	    raw[2] = (Object) StringEscapeUtils.escapeCsv(description.toString());
 	}
-	
+
 	return rawData;
+    }
+
+    @Override
+    public List<Object[]> getPagedUsers(Long toolSessionId, Integer page, Integer size, int sorting,
+	    String searchString) {
+	return peerreviewUserDao.getPagedUsers(toolSessionId, page, size, sorting, searchString);
     }
 
     @Override
@@ -470,30 +490,27 @@ public class PeerreviewServiceImpl
 	return getLocalisedMessage("event.sent.results.subject", new Object[] { peerreview.getTitle() });
     }
 
-    private int emailReport(Long toolContentId, Long sessionId, PeerreviewUser user, Peerreview peerreview, List<RatingCriteria> ratingCriterias, String subject) {
+    private int emailReport(Long toolContentId, Long sessionId, PeerreviewUser user, Peerreview peerreview,
+	    List<RatingCriteria> ratingCriterias, String subject) {
 
 	int userId = user.getUserId().intValue();
-	String name = StringEscapeUtils.escapeCsv(user.getFirstName()+" "+user.getLastName());
-	
-	    StringBuilder notificationMessage = new StringBuilder();
+	String name = StringEscapeUtils.escapeCsv(user.getFirstName() + " " + user.getLastName());
 
-	    for (RatingCriteria criteria : ratingCriterias) {
-		int sorting = (criteria.isStarStyleRating() || criteria.isHedgeStyleRating()) 
-			    ? PeerreviewConstants.SORT_BY_AVERAGE_RESULT_DESC
-			    : PeerreviewConstants.SORT_BY_AVERAGE_RESULT_ASC;
-		StyledCriteriaRatingDTO dto = getUsersRatingsCommentsByCriteriaIdDTO(toolContentId, sessionId, criteria,
-			user.getUserId(), false, sorting, null, true, false);
-		generateRatingEntryForEmail(notificationMessage, criteria, dto);
-	    }
+	StringBuilder notificationMessage = new StringBuilder();
 
-	    eventNotificationService.sendMessage(null, 
-		    userId, 
-		    IEventNotificationService.DELIVERY_METHOD_MAIL,
-		    subject, 
-		    getLocalisedMessage("event.sent.results.body", new Object[]{name, notificationMessage.toString()}), 
-		    true);
+	for (RatingCriteria criteria : ratingCriterias) {
+	    int sorting = (criteria.isStarStyleRating() || criteria.isHedgeStyleRating())
+		    ? PeerreviewConstants.SORT_BY_AVERAGE_RESULT_DESC : PeerreviewConstants.SORT_BY_AVERAGE_RESULT_ASC;
+	    StyledCriteriaRatingDTO dto = getUsersRatingsCommentsByCriteriaIdDTO(toolContentId, sessionId, criteria,
+		    user.getUserId(), false, sorting, null, true, false);
+	    generateRatingEntryForEmail(notificationMessage, criteria, dto);
+	}
 
-	    return 1;
+	eventNotificationService.sendMessage(null, userId, IEventNotificationService.DELIVERY_METHOD_MAIL, subject,
+		getLocalisedMessage("event.sent.results.body", new Object[] { name, notificationMessage.toString() }),
+		true);
+
+	return 1;
 
     }
 
@@ -508,12 +525,12 @@ public class PeerreviewServiceImpl
 			String escaped = StringEscapeUtils.escapeHtml(ratingDto.getComment());
 			comments.append("<li>").append(escaped).append("</li>");
 		    }
-		};
-		notificationMessage.append(getLocalisedMessage("event.sent.results.criteria.comment", 
+		}
+		notificationMessage.append(getLocalisedMessage("event.sent.results.criteria.comment",
 			new Object[] { escapedTitle, StringUtils.replace(comments.toString(), "&lt;BR&gt;", "<BR>") }));
 	    } else {
-		String avgRating = dto.getRatingDtos().get(0).getAverageRating().length() > 0 ? dto.getRatingDtos()
-			.get(0).getAverageRating() : "0";
+		String avgRating = dto.getRatingDtos().get(0).getAverageRating().length() > 0
+			? dto.getRatingDtos().get(0).getAverageRating() : "0";
 		StringBuilder comments = null;
 		if (criteria.isStarStyleRating()) {
 		    if (criteria.isCommentsEnabled()) {
@@ -525,45 +542,42 @@ public class PeerreviewServiceImpl
 			    }
 			}
 		    }
-		    notificationMessage.append(getLocalisedMessage(
-			    "event.sent.results.criteria.star",
-			    new Object[] { escapedTitle, avgRating,
-				    comments != null ? comments.toString() : "" }));
+		    notificationMessage.append(getLocalisedMessage("event.sent.results.criteria.star",
+			    new Object[] { escapedTitle, avgRating, comments != null ? comments.toString() : "" }));
 		} else if (criteria.isRankingStyleRating()) {
 		    if (criteria.getMaxRating() > 0) {
-			notificationMessage
-				.append(getLocalisedMessage("event.sent.results.criteria.rank", new Object[] {
-					escapedTitle, avgRating, criteria.getMaxRating() }));
+			notificationMessage.append(getLocalisedMessage("event.sent.results.criteria.rank",
+				new Object[] { escapedTitle, avgRating, criteria.getMaxRating() }));
 		    } else {
 			notificationMessage.append(getLocalisedMessage("event.sent.results.criteria.rankAll",
 				new Object[] { escapedTitle, avgRating }));
 		    }
 		} else { // hedge style rating
-		    notificationMessage.append(getLocalisedMessage("event.sent.results.criteria.hedge", new Object[] {
-			    escapedTitle, avgRating, criteria.getMaxRating() }));
+		    notificationMessage.append(getLocalisedMessage("event.sent.results.criteria.hedge",
+			    new Object[] { escapedTitle, avgRating, criteria.getMaxRating() }));
 		}
 	    }
 	} else {
-	    notificationMessage.append(escapedTitle).append(
-		    getLocalisedMessage("event.sent.results.no.results", null));
+	    notificationMessage.append(escapedTitle).append(getLocalisedMessage("event.sent.results.no.results", null));
 	}
 	notificationMessage.append("\n");
     }
-    
+
     @Override
     @SuppressWarnings("unchecked")
     public LinkedHashMap<String, ExcelCell[][]> exportTeamReportSpreadsheet(Long toolContentId) {
 
 	Peerreview peerreview = peerreviewDao.getByContentId(toolContentId);
 	if (peerreview == null) {
-	    PeerreviewServiceImpl.log.warn("Did not find activity with toolContentId: " + toolContentId + " to remove learner content");
+	    log.warn("Did not find activity with toolContentId: " + toolContentId + " to remove learner content");
 	    return null;
 	}
 
-	return new SpreadsheetBuilder(peerreview, ratingService, peerreviewSessionDao, peerreviewUserDao, this).generateTeamReport();
-	
+	return new SpreadsheetBuilder(peerreview, ratingService, peerreviewSessionDao, peerreviewUserDao, this)
+		.generateTeamReport();
+
     }
-	
+
     @Override
     public int[] getNumberPossibleRatings(Long toolContentId, Long toolSessionId, Long userId) {
 	int[] retValue = new int[2];
@@ -573,8 +587,8 @@ public class PeerreviewServiceImpl
 	Map<Long, Long> numRatingsForUserMap = ratingService.countUsersRatedEachItem(toolContentId, itemIds, -1);
 	Long numRatingsForUser = numRatingsForUserMap.get(userId);
 	retValue[0] = numRatingsForUser != null ? numRatingsForUser.intValue() : 0;
-	
-	int numUsersInSession = peerreviewUserDao.getCountUsersBySession(toolSessionId);
+
+	int numUsersInSession = peerreviewUserDao.getCountUsersBySession(toolSessionId, -1L);
 	Peerreview peerreview = peerreviewDao.getByContentId(toolContentId);
 	retValue[1] = peerreview.isSelfReview() ? numUsersInSession : numUsersInSession - 1;
 	return retValue;
@@ -589,7 +603,7 @@ public class PeerreviewServiceImpl
 	Peerreview defaultPeerreview = getPeerreviewByContentId(defaultPeerreviewId);
 	if (defaultPeerreview == null) {
 	    String error = messageService.getMessage("error.msg.default.content.not.find");
-	    PeerreviewServiceImpl.log.error(error);
+	    log.error(error);
 	    throw new PeerreviewApplicationException(error);
 	}
 
@@ -601,7 +615,7 @@ public class PeerreviewServiceImpl
 	contentId = new Long(toolService.getToolDefaultContentIdBySignature(toolSignature));
 	if (contentId == null) {
 	    String error = messageService.getMessage("error.msg.default.content.not.find");
-	    PeerreviewServiceImpl.log.error(error);
+	    log.error(error);
 	    throw new PeerreviewApplicationException(error);
 	}
 	return contentId;
@@ -627,7 +641,7 @@ public class PeerreviewServiceImpl
 
 	// need to clone the Peer Review details, otherwise clearing the fields may update the database!
 	toolContentObj = Peerreview.newInstance(toolContentObj, toolContentId);
-	
+
 	// don't export following fields
 	for (LearnerItemRatingCriteria criteria : toolContentObj.getRatingCriterias()) {
 	    criteria.setToolContentId(null);
@@ -741,18 +755,17 @@ public class PeerreviewServiceImpl
 	Iterator<PeerreviewSession> iter = list.iterator();
 	while (iter.hasNext()) {
 	    PeerreviewSession session = iter.next();
-	    if (peerreviewUserDao.getCountUsersBySession(session.getSessionId(), -1L) == 0) {
-		PeerreviewServiceImpl.log
-			.debug("Peer Review isReadOnly called. Returning true. Count of users for session id "
-				+ session.getSessionId() + " is "
-				+ peerreviewUserDao.getCountUsersBySession(session.getSessionId(), -1L));
+	    int sessionUsersNumber = peerreviewUserDao.getCountUsersBySession(session.getSessionId());
+	    if (sessionUsersNumber == 0) {
+		log.debug("Peer Review isReadOnly called. Returning true. Count of users for session id "
+			+ session.getSessionId() + " is " + sessionUsersNumber);
 		return true;
 	    } else {
-		PeerreviewServiceImpl.log.debug("Peer Review isReadOnly called. Count of users for session id "
-			+ session.getSessionId() + " is 0");
+		log.debug("Peer Review isReadOnly called. Count of users for session id " + session.getSessionId()
+			+ " is 0");
 	    }
 	}
-	PeerreviewServiceImpl.log.debug("Peer Review isReadOnly called. Returning false.");
+	log.debug("Peer Review isReadOnly called. Returning false.");
 	return false;
     }
 
@@ -760,8 +773,7 @@ public class PeerreviewServiceImpl
     public void removeToolContent(Long toolContentId) throws ToolException {
 	Peerreview peerreview = peerreviewDao.getByContentId(toolContentId);
 	if (peerreview == null) {
-	    PeerreviewServiceImpl.log
-		    .warn("Can not remove the tool content as it does not exist, ID: " + toolContentId);
+	    log.warn("Can not remove the tool content as it does not exist, ID: " + toolContentId);
 	    return;
 	}
 
@@ -779,15 +791,13 @@ public class PeerreviewServiceImpl
     @Override
     @SuppressWarnings("unchecked")
     public void removeLearnerContent(Long toolContentId, Integer userId) throws ToolException {
-	if (PeerreviewServiceImpl.log.isDebugEnabled()) {
-	    PeerreviewServiceImpl.log
-		    .debug("Removing Peerreview content for user ID " + userId + " and toolContentId " + toolContentId);
+	if (log.isDebugEnabled()) {
+	    log.debug("Removing Peerreview content for user ID " + userId + " and toolContentId " + toolContentId);
 	}
 
 	Peerreview peerreview = peerreviewDao.getByContentId(toolContentId);
 	if (peerreview == null) {
-	    PeerreviewServiceImpl.log
-		    .warn("Did not find activity with toolContentId: " + toolContentId + " to remove learner content");
+	    log.warn("Did not find activity with toolContentId: " + toolContentId + " to remove learner content");
 	    return;
 	}
 
@@ -819,11 +829,11 @@ public class PeerreviewServiceImpl
     @Override
     public String leaveToolSession(Long toolSessionId, Long learnerId) throws DataMissingException, ToolException {
 	if (toolSessionId == null) {
-	    PeerreviewServiceImpl.log.error("Fail to leave tool Session based on null tool session id.");
+	    log.error("Fail to leave tool Session based on null tool session id.");
 	    throw new ToolException("Fail to remove tool Session based on null tool session id.");
 	}
 	if (learnerId == null) {
-	    PeerreviewServiceImpl.log.error("Fail to leave tool Session based on null learner.");
+	    log.error("Fail to leave tool Session based on null learner.");
 	    throw new ToolException("Fail to remove tool Session based on null learner.");
 	}
 
@@ -832,8 +842,8 @@ public class PeerreviewServiceImpl
 	    session.setStatus(PeerreviewConstants.COMPLETED);
 	    peerreviewSessionDao.saveObject(session);
 	} else {
-	    PeerreviewServiceImpl.log.error("Fail to leave tool Session.Could not find peerreview "
-		    + "session by given session id: " + toolSessionId);
+	    log.error("Fail to leave tool Session.Could not find peerreview " + "session by given session id: "
+		    + toolSessionId);
 	    throw new DataMissingException("Fail to leave tool Session."
 		    + "Could not find peerreview session by given session id: " + toolSessionId);
 	}
@@ -865,7 +875,7 @@ public class PeerreviewServiceImpl
     public List<RatingCriteria> getCriteriasByToolContentId(Long toolContentId) {
 	return ratingService.getCriteriasByToolContentId(toolContentId);
     }
-    
+
     @Override
     public List<ItemRatingDTO> getRatingCriteriaDtos(Long contentId, Collection<Long> itemIds,
 	    boolean isCommentsByOtherUsersRequired, Long userId) {
@@ -901,7 +911,7 @@ public class PeerreviewServiceImpl
     public int getCountItemsRatedByUserByCriteria(final Long criteriaId, final Integer userId) {
 	return ratingService.getCountItemsRatedByUserByCriteria(criteriaId, userId);
     }
-    
+
     @Override
     public ToolSessionExportOutputData exportToolSession(Long toolSessionId)
 	    throws DataMissingException, ToolException {
@@ -928,7 +938,7 @@ public class PeerreviewServiceImpl
     public ToolOutput getToolOutput(String name, Long toolSessionId, Long learnerId) {
 	return null;
     }
-    
+
     @Override
     public List<ToolOutput> getToolOutputs(String name, Long toolContentId) {
 	return new ArrayList<ToolOutput>();
@@ -1003,11 +1013,11 @@ public class PeerreviewServiceImpl
 	return new ToolCompletionStatus(learner.isSessionFinished() ? ToolCompletionStatus.ACTIVITY_COMPLETED
 		: ToolCompletionStatus.ACTIVITY_ATTEMPTED, null, null);
     }
-    
+
     // ****************** REST methods *************************
 
     public void setEventNotificationService(IEventNotificationService eventNotificationService) {
-        this.eventNotificationService = eventNotificationService;
+	this.eventNotificationService = eventNotificationService;
     }
 
     /**

@@ -9,9 +9,14 @@
 <link type="text/css" href="${lams}css/jquery.jqGrid.css" rel="stylesheet" />
 <link type="text/css" href="${lams}css/jquery.jRating.css" rel="stylesheet"/>
 <link rel="stylesheet" href="${webapp}includes/css/learning.css'/>">
+<style type="text/css">
+	#common-buttons-area {
+		overflow: auto;
+		margin-bottom: 10px;
+	}
+</style>
 
 <script type="text/javascript" src="${lams}includes/javascript/jquery.cookie.js"></script>
-
 <script type="text/javascript">
 	//var for jquery.jRating.js
 	var pathToImageFolder = "${lams}images/css/";
@@ -96,17 +101,11 @@
 	<!--For send results feature-->
 	<i class="fa fa-spinner" style="display:none" id="messageArea_Busy"></i>
 	<div class="voffset5" id="messageArea"></div>
-
-	<div id="export-link-area">
-		<a href="#nogo" id="export-team-results-button" onClick="javascript:exportResults()" class="btn btn-default">
-			<i class="fa fa-download" aria-hidden="true"></i> Export
-		</a> Team Results to Spreadsheet
-	</div>
 	
 </div>
 
 <c:if test="${sessionMap.isGroupedActivity}">
-<div class="panel-group" id="accordionSessions" role="tablist" aria-multiselectable="true"> 
+	<div class="panel-group" id="accordionSessions" role="tablist" aria-multiselectable="true"> 
 </c:if>
 
 <c:forEach var="groupSummary" items="${summaryList}" varStatus="status">
@@ -167,7 +166,23 @@
 
 <c:if test="${sessionMap.isGroupedActivity}">
 	</div> <!--  end panel group -->
-</c:if>		
+</c:if>
 
+<div id="common-buttons-area">
+	<a href="#nogo" onClick="javascript:exportResults()" class="btn btn-default loffset5 pull-right">
+		<i class="fa fa-download" aria-hidden="true"></i> 
+		<fmt:message key="label.export.team.results" />
+	</a>
+	
+	<c:if test="${!empty summaryList}">
+		<c:set var='url'>
+			<c:url value="/monitoring/manageUsers.do"/>?sessionMapID=${sessionMapID}
+		</c:set>
+		<a href="#nogo" onClick="javascript:launchPopup('${url}');" class="btn btn-default pull-right">
+			<i class="fa fa-remove" aria-hidden="true"></i> 
+			<fmt:message key="label.manage.users" />
+		</a>
+	</c:if>
+</div>
 
 <%@ include file="advanceoptions.jsp"%>

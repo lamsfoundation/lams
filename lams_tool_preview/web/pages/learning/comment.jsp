@@ -28,7 +28,6 @@
 			commentsLocked = false;
 			commentsOnOtherPages = ${countRatedItems};
 			numCommentsOnPage = 0;
-
 	</script>
 	
 	<script src="${lams}includes/javascript/jquery.jRating.js" type="text/javascript"></script>
@@ -326,7 +325,6 @@
 				</span>
 			</lams:Alert>
 				
-			
 		</c:if>
 		
 	<form action="<c:url value="/learning/submitComments.do?"/>" method="get" id="editForm">
