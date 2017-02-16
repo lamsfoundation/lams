@@ -66,6 +66,7 @@ public class PeerreviewConstants {
     public static final String PARAM_SEARCH_FIELD = "searchField";
     public static final String PARAM_SEARCH_OPERATION = "searchOper";
     public static final String PARAM_SEARCH_STRING = "searchString";
+    public static final String PARAM_SORT_USER_NAME = "userName";
     public static final String PARAM_SORT_NAME = "itemDescription";
     public static final String PARAM_SORT_RATING = "rating";
     public static final String PARAM_SORT_NOTEBOOK = "notebook";

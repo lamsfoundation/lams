@@ -24,8 +24,6 @@
 	</c:otherwise>
 </c:choose>
 
-
- 
 <lams:html>
 <lams:head>
 	<title><fmt:message key="label.learning.title" /></title>

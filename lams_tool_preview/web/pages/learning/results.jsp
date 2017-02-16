@@ -1,6 +1,4 @@
 <!DOCTYPE html>
-        
-
 <%@ include file="/common/taglibs.jsp"%>
 
 <c:if test="${not empty param.sessionMapID}">
@@ -131,7 +129,7 @@
 			<c:forEach var="criteriaRatings" items="${userRatings}" varStatus="status">
 				<h4><c:out value="${criteriaRatings.ratingCriteria.title}" escapeXml="true"/></h4>
 		 		<lams:StyledRating criteriaRatings="${criteriaRatings}" showJustification="false" alwaysShowAverage="true" currentUserDisplay="true"/>
-		</c:forEach>
+			</c:forEach>
 		</div>
 		</div>
 	</c:if>
@@ -149,6 +147,7 @@
 	</c:if>	
 
 	<c:if test="${mode != 'teacher'}">
+		<div>
 			<c:choose>			
 				<c:when test="${(not sessionMap.isSessionCompleted) and sessionMap.reflectOn}">
 					<html:button property="FinishButton" onclick="return continueReflect()" styleClass="btn btn-default voffset5 pull-right">

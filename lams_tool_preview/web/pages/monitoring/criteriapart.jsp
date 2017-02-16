@@ -15,42 +15,40 @@
 </c:when>
 </c:choose>
 
-
-	<script type="text/javascript">
+<script type="text/javascript">
 	$(document).ready(function(){
 
-			jQuery("#group${toolSessionId}").jqGrid({
-			   	url: "<c:url value='/monitoring/getUsers.do'/>?toolContentId=${sessionMap.toolContentID}&toolSessionId=${toolSessionId}&criteriaId=${criteria.ratingCriteriaId}",
-				datatype: "json",
-				height: 'auto',
-				autowidth: true,
-				shrinkToFit: false,
-			   	colNames:[
-						'itemId',
-						'<fmt:message key="label.user.name" />',
-						'${heading}'
-						<c:if test="${sessionMap.peerreview.notifyUsersOfResults}">, ''</c:if>
-				],
-			   	colModel:[
-			   		{name:'itemId', index:'itemId', width:0, hidden: true},
-			   		{name:'itemDescription', index:'itemDescription', width:200, searchoptions: { clearSearch: false }},
-			   		{name:'rating', index:'rating', width:100, align:"center", search:false}
-					<c:if test="${sessionMap.peerreview.notifyUsersOfResults}">, {name:'email', index:'email', width:100, align:"center", search:false}</c:if>
-			   		
-			   	],
-			   	rowNum:10,
-			   	rowList:[10,20,30,40,50,100],
-			   	pager: '#pager${toolSessionId}',
-			   	viewrecords:true,
-				loadComplete: function(){
-					initializeJRating();
-				},
-			   	// caption: "${groupSummary.sessionName}" use Bootstrap panels as the title bar
-				subGrid: true,
-				subGridOptions: {
-					reloadOnExpand : false 
-				},
-				subGridRowExpanded: function(subgrid_id, row_id) {
+		jQuery("#group${toolSessionId}").jqGrid({
+		   	url: "<c:url value='/monitoring/getUsers.do'/>?toolContentId=${sessionMap.toolContentID}&toolSessionId=${toolSessionId}&criteriaId=${criteria.ratingCriteriaId}",
+			datatype: "json",
+			height: 'auto',
+			autowidth: true,
+			shrinkToFit: false,
+		   	colNames:[
+				'itemId',
+				'<fmt:message key="label.user.name" />',
+				'${heading}'
+				<c:if test="${sessionMap.peerreview.notifyUsersOfResults}">, ''</c:if>
+			],
+		   	colModel:[
+		   		{name:'itemId', index:'itemId', width:0, hidden: true},
+		   		{name:'itemDescription', index:'itemDescription', width:200, searchoptions: { clearSearch: false }},
+		   		{name:'rating', index:'rating', width:100, align:"center", search:false}
+				<c:if test="${sessionMap.peerreview.notifyUsersOfResults}">, {name:'email', index:'email', width:100, align:"center", search:false}</c:if>		   		
+		   	],
+		   	rowNum:10,
+		   	rowList:[10,20,30,40,50,100],
+		   	pager: '#pager${toolSessionId}',
+		   	viewrecords:true,
+			loadComplete: function(){
+				initializeJRating();
+			},
+		   	// caption: "${groupSummary.sessionName}" use Bootstrap panels as the title bar
+			subGrid: true,
+			subGridOptions: {
+				reloadOnExpand : false 
+			},
+			subGridRowExpanded: function(subgrid_id, row_id) {
 					var subgridTableId = subgrid_id+"_t";
 					var itemId = jQuery("#group${toolSessionId}").getRowData(row_id)["itemId"];
 					   
@@ -60,7 +58,7 @@
 						datatype: "json",
 						loadonce:true,
 						rowNum: 10000,
-						url: "<c:url value='/monitoring/getSubgridData.do'/>?toolContentId=${sessionMap.toolContentID}&toolSessionId=${toolSessionId}&sessionMapID=${sessionMapID}&criteriaId=${criteria.ratingCriteriaId}&itemId=" + itemId,
+						url: "<c:url value='/monitoring/getSubgridData.do'/>?toolContentId=${sessionMap.toolContentID}&toolSessionId=${toolSessionId}&criteriaId=${criteria.ratingCriteriaId}&itemId=" + itemId,
 						height: "100%",
 						autowidth:true,
 						grouping:true,	
@@ -92,11 +90,11 @@
 					    	info_dialog("<fmt:message key="label.error"/>", "<fmt:message key="gradebook.error.loaderror"/>", "<fmt:message key="label.ok"/>");
 					    }
 					})
-				}
-			}).jqGrid('filterToolbar', { 
-				searchOnEnter: false
-			})
-			.navGrid('#pager${toolSessionId}',{add:false,del:false,edit:false,search:false});
+			}
+		}).jqGrid('filterToolbar', { 
+			searchOnEnter: false
+		})
+		.navGrid('#pager${toolSessionId}',{add:false,del:false,edit:false,search:false});
         
         //jqgrid autowidth (http://stackoverflow.com/a/1610197)
         $(window).bind('resize', function() {
@@ -139,7 +137,6 @@
 		return false;
 	}
 
-
 </script>
 
 <!--For send results feature-->
@@ -167,8 +164,7 @@
 	</span>
 	</c:when>
 	</c:choose>
-
 </p>
 
-		<table id="group${toolSessionId}" class="scroll" cellpadding="0" cellspacing="0"></table>
-		<div id="pager${toolSessionId}"></div> 
+<table id="group${toolSessionId}" class="scroll" cellpadding="0" cellspacing="0"></table>
+<div id="pager${toolSessionId}"></div> 

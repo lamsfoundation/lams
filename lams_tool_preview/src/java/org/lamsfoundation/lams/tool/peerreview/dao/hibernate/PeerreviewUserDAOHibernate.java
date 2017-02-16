@@ -46,21 +46,18 @@ public class PeerreviewUserDAOHibernate extends LAMSBaseDAO implements Peerrevie
 
     private static final String FIND_BY_USER_ID_CONTENT_ID = "FROM " + PeerreviewUser.class.getName()
 	    + " AS u WHERE u.userId =? AND u.peerreview.contentId=?";
+    
     private static final String FIND_BY_USER_ID_SESSION_ID = "FROM " + PeerreviewUser.class.getName()
 	    + " AS u WHERE u.userId =? AND u.session.sessionId=?";
+    
     private static final String FIND_BY_SESSION_ID = "FROM " + PeerreviewUser.class.getName()
 	    + " AS u WHERE u.session.sessionId=?";
-    private static final String GET_USERIDS_BY_SESSION_ID = "SELECT userId FROM " + PeerreviewUser.class.getName()
-	    + " AS u WHERE u.session.sessionId=?";
-
-    private static final String FIND_BY_CONTENT_ID = "FROM " + PeerreviewUser.class.getName()
-	    + " AS u WHERE u.session.peerreview.contentId=?";
 
     private static final String GET_COUNT_USERS_FOR_SESSION_EXCLUDE_USER = "SELECT COUNT(*) FROM "
-	    + PeerreviewUser.class.getName() + " AS r WHERE r.session.sessionId=? AND r.userId!=?";
+	    + PeerreviewUser.class.getName() + " AS u WHERE u.session.sessionId=? AND u.userId!=? AND u.hidden=0";
 
     private static final String GET_COUNT_USERS_FOR_SESSION = "SELECT COUNT(*) FROM " + PeerreviewUser.class.getName()
-	    + " AS r WHERE r.session.sessionId=?";
+	    + " AS u WHERE u.session.sessionId=?";
 
     @Override
     public PeerreviewUser getUserByUserIDAndSessionID(Long userID, Long sessionId) {
@@ -69,6 +66,11 @@ public class PeerreviewUserDAOHibernate extends LAMSBaseDAO implements Peerrevie
 	    return null;
 	}
 	return (PeerreviewUser) list.get(0);
+    }
+    
+    @Override
+    public PeerreviewUser getUserByUid(Long userUid) {
+	return (PeerreviewUser) this.find(PeerreviewUser.class, userUid);
     }
 
     @Override
@@ -83,16 +85,6 @@ public class PeerreviewUserDAOHibernate extends LAMSBaseDAO implements Peerrevie
     @Override
     public List<PeerreviewUser> getBySessionID(Long sessionId) {
 	return find(FIND_BY_SESSION_ID, sessionId);
-    }
-
-    @Override
-    public List<Long> getUserIdsBySessionID(Long sessionId) {
-	return find(GET_USERIDS_BY_SESSION_ID, sessionId);
-    }
-
-    @Override
-    public List<PeerreviewUser> getByContentId(Long toolContentId) {
-	return find(FIND_BY_CONTENT_ID, toolContentId);
     }
 
     @Override
@@ -114,9 +106,6 @@ public class PeerreviewUserDAOHibernate extends LAMSBaseDAO implements Peerrevie
 	}
 	return ((Number) list.get(0)).intValue();
     }
-
-    private static final String LOAD_USERS_FOR_SESSION_LIMIT = "FROM user in class PeerreviewUser "
-	    + "WHERE user.session.sessionId=:toolSessionId AND user.userId!=:excludeUserId order by ";
 
     private static final String CREATE_USERS = "INSERT into tl_laprev11_user (user_id, login_name, first_name, last_name, session_finished, session_uid) "
 	    + " SELECT user.user_id, user.login, user.first_name, user.last_name, 0, :session_uid "
@@ -141,7 +130,7 @@ public class PeerreviewUserDAOHibernate extends LAMSBaseDAO implements Peerrevie
     private static final String FIND_USER_RATINGS_COMMENTS1 = "SELECT user.user_id, rating.*, user.first_name, user.last_name "
 	    + " FROM tl_laprev11_peerreview p "
 	    + " JOIN tl_laprev11_session sess ON p.content_id = :toolContentId AND p.uid = sess.peerreview_uid AND sess.session_id = :toolSessionId  "
-	    + " JOIN tl_laprev11_user user ON user.session_uid = sess.uid "
+	    + " JOIN tl_laprev11_user user ON user.session_uid = sess.uid AND user.hidden = 0 "
 	    + " LEFT JOIN ( ";
     private static final String FIND_USER_RATINGS_COMMENTS2 = " ) rating ON user.user_id = rating.item_id ";
     
@@ -220,12 +209,13 @@ public class PeerreviewUserDAOHibernate extends LAMSBaseDAO implements Peerrevie
     private static final String SELECT_ALL_RATINGS_COMMENTS_LEFT_FOR_ITEM = "SELECT user.user_id, rc.comment, r.rating, user.first_name, user.last_name "
 	    + " FROM tl_laprev11_peerreview p "
 	    + " JOIN tl_laprev11_session sess ON p.content_id = :toolContentId AND p.uid = sess.peerreview_uid AND sess.session_id = :toolSessionId "
-	    + " JOIN tl_laprev11_user user ON user.session_uid = sess.uid "
+	    + " JOIN tl_laprev11_user user ON user.session_uid = sess.uid AND user.hidden = 0 "
 	    + " LEFT JOIN ( SELECT rating, user_id FROM lams_rating "
 	    + "    WHERE rating_criteria_id = :ratingCriteriaId AND item_id = :itemId) r ON r.user_id = user.user_id "
 	    + " LEFT JOIN ( SELECT item_id, comment, user_id FROM lams_rating_comment "
 	    + "    WHERE rating_criteria_id = :ratingCriteriaId AND (item_id = :itemId || item_id = rating_criteria_id) ) rc ON rc.user_id = user.user_id " 
 	    + " WHERE r.rating IS NOT NULL OR rc.comment IS NOT NULL";
+    @Override
     public List<Object[]> getDetailedRatingsComments(Long toolContentId, Long toolSessionId, Long criteriaId, Long itemId ) {
 	Query query = getSession().createSQLQuery(SELECT_ALL_RATINGS_COMMENTS_LEFT_FOR_ITEM)
 		.setLong("toolContentId", toolContentId)
@@ -238,12 +228,13 @@ public class PeerreviewUserDAOHibernate extends LAMSBaseDAO implements Peerrevie
     private static final String COUNT_COMMENTS_FOR_SESSION = "SELECT user.user_id, rating.comment_count, user.first_name, user.last_name  "
     	    + " FROM tl_laprev11_peerreview p "
 	    + " JOIN tl_laprev11_session sess ON p.content_id = :toolContentId AND p.uid = sess.peerreview_uid AND sess.session_id = :toolSessionId  "
-	    + " JOIN tl_laprev11_user user ON user.session_uid = sess.uid "
+	    + " JOIN tl_laprev11_user user ON user.session_uid = sess.uid AND user.hidden = 0 "
 	    + " LEFT JOIN ( "
 	    + " 	SELECT r.item_id, count(r.comment)  comment_count "
 	    + " 	FROM lams_rating_comment r "
 	    + "		WHERE r.rating_criteria_id = :ratingCriteriaId "
 	    + " 	GROUP BY r.item_id ) rating ON user.user_id = rating.item_id ";
+    @Override
     public List<Object[]> getCommentsCounts(Long toolContentId, Long toolSessionId, RatingCriteria criteria,
 	    Integer page, Integer size, int sorting, String searchString) {
 	String sortingOrder = "";
@@ -334,5 +325,46 @@ public class PeerreviewUserDAOHibernate extends LAMSBaseDAO implements Peerrevie
 		.setFirstResult(page * size).setMaxResults(size);
 	return query.list();
 
+    }
+    
+    @Override
+    public List<Object[]> getPagedUsers(Long toolSessionId, Integer page, Integer size, int sorting,
+	    String searchString) {
+
+	String GET_USERS_FOR_SESSION = "SELECT user.uid, user.hidden, CONCAT(user.firstName, ' ', user.lastName) FROM "
+		+ PeerreviewUser.class.getName() + " user WHERE user.session.sessionId = :toolSessionId ";
+	
+	String sortingOrder = "";
+	switch (sorting) {
+	    case PeerreviewConstants.SORT_BY_NO:
+		sortingOrder = " ORDER BY user.uid";
+		break;
+	    case PeerreviewConstants.SORT_BY_USERNAME_ASC:
+		sortingOrder = " ORDER BY user.firstName ASC";
+		break;
+	    case PeerreviewConstants.SORT_BY_USERNAME_DESC:
+		sortingOrder = " ORDER BY user.firstName DESC";
+		break;
+	}
+
+    	StringBuilder bldr =  new StringBuilder(GET_USERS_FOR_SESSION);
+	if (!StringUtils.isBlank(searchString)) {
+	    String[] tokens = searchString.trim().split("\\s+");
+	    for (String token : tokens) {
+		String escToken = StringEscapeUtils.escapeSql(token);
+		bldr.append(" AND ( ").append("user.firstName LIKE '%").append(escToken)
+			.append("%' OR user.lastName LIKE '%").append(escToken).append("%' OR user.loginName LIKE '%")
+			.append(escToken).append("%') ");
+	    }
+	}
+    	bldr.append(sortingOrder);
+    	
+	String queryString = bldr.toString();
+	Query query = getSession().createQuery(queryString)
+		.setLong("toolSessionId", toolSessionId);
+	if ( page != null && size != null ) {
+	    query.setFirstResult(page * size).setMaxResults(size);
+	}
+	return (List<Object[]>) query.list();
     }
 }
