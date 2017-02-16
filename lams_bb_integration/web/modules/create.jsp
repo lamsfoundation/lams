@@ -11,7 +11,7 @@
     Then the user must select a LAMS lesson before proceeding to Step 2.
 
     Step 1 - create.jsp
-    Step 2 - start_lesson_proc.jsp
+    Step 2 - /StartLessonServlet (StartLessonServlet.java)
 --%>
 <%@ page import="blackboard.platform.plugin.PlugInUtil"%>
 <%@ page import="blackboard.platform.plugin.PlugInException"%>
@@ -131,7 +131,7 @@
     </bbNG:pageHeader>
     
     <%-- Form to Collect ID of Selected LAMS Sequence --%>
-    <form name="lesson_form" id="lesson_form" action="start_lesson_proc.jsp" method="post" onSubmit="return confirmSubmit();">
+    <form name="lesson_form" id="lesson_form" action="../StartLessonServlet" method="post" onSubmit="return confirmSubmit();">
     	<input type="hidden" name="content_id" value="<%=request.getParameter("content_id")%>">
         <input type="hidden" name="course_id" value="<%=request.getParameter("course_id")%>">
     	<input type="hidden" name="sequence_id" id="sequence_id" value="0">
@@ -219,7 +219,7 @@
         
             // Open the LAMS Seuence Author Window
             function openAuthor() {
-                var authorUrl = 'openAuthor.jsp?course_id=<%=request.getParameter("course_id")%>&content_id=<%=request.getParameter("content_id")%>';
+                var authorUrl = '../openLamsPage?method=openAuthor&course_id=<%=request.getParameter("course_id")%>&content_id=<%=request.getParameter("content_id")%>';
                 
                 if(authorWin && !authorWin.closed){
                     try {
@@ -248,7 +248,7 @@
             // Open the LAMS Seuence Preview Window
             function openPreview() {
             	
-                var previewUrl = "preview.jsp?course_id=<%=request.getParameter("course_id")%>&ldId=" + document.getElementsByName("sequence_id")[0].value + "&title=" + document.lesson_form.title.value;
+                var previewUrl = "../openLamsPage?method=openPreview&course_id=<%=request.getParameter("course_id")%>&ldId=" + document.getElementsByName("sequence_id")[0].value + "&title=" + document.lesson_form.title.value;
                 
                if (previewWin && !previewWin.closed) {
                     try {

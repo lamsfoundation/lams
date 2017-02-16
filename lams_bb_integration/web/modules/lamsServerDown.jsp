@@ -13,8 +13,8 @@
 <%@ taglib uri="/bbNG" prefix="bbNG"%>
 <bbNG:genericPage title="LAMS Server Timeout">	
     <bbNG:receipt type="FAIL" 
-        iconUrl="/images/ci/icons/receiptfail_u.gif" 
-        title="LAMS Server Timeout">
-            <h3>Did not get a response from the LAMS server. Please contact your systems administrator.</h3>
+        	iconUrl="/images/ci/icons/receiptfail_u.gif" 
+        	title="LAMS Server Timeout">
+		<h3>Did not get a response from the LAMS server. Please contact your systems administrator.</h3>
     </bbNG:receipt>
 </bbNG:genericPage>

@@ -44,9 +44,9 @@
 		    throw new RuntimeException(e);
 		}
 	
+		//remove Lineitem object from Blackboard DB
 		String bbContentId = request.getParameter("content_id");
 		String courseId = request.getParameter("course_id");
-		
 		LineitemUtil.removeLineitem(bbContentId, courseId);
 	%>
 

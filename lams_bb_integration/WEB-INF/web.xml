@@ -4,7 +4,7 @@
     PUBLIC "-//Sun Microsystems, Inc.//DTD Web Application 2.2//EN"
     "http://java.sun.com/j2ee/dtds/web-app_2_2.dtd">
 
-<web-app>
+<web-app  xmlns="http://java.sun.com/xml/ns/j2ee" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://java.sun.com/xml/ns/j2ee http://java.sun.com/xml/ns/j2ee/web-app_2_4.xsd" version="2.4">
   <servlet>
     <servlet-name>UserDataServlet</servlet-name>
     <servlet-class>org.lamsfoundation.ld.integration.blackboard.UserDataServlet</servlet-class>
@@ -42,6 +42,10 @@
     <servlet-class>org.lamsfoundation.ld.integration.blackboard.GradebookSyncServlet</servlet-class>
   </servlet>
   <servlet>
+    <servlet-name>OpenLamsPageServlet</servlet-name>
+    <servlet-class>org.lamsfoundation.ld.integration.blackboard.OpenLamsPageServlet</servlet-class>
+  </servlet> 
+  <servlet>
     <servlet-name>RenderDesignImageServlet</servlet-name>
     <servlet-class>org.lamsfoundation.ld.integration.blackboard.RenderDesignImageServlet</servlet-class>
   </servlet>
@@ -49,6 +53,10 @@
     <servlet-name>StartLessonServlet</servlet-name>
     <servlet-class>org.lamsfoundation.ld.integration.blackboard.StartLessonServlet</servlet-class>
   </servlet>
+  <servlet>
+    <servlet-name>StartLessonAjaxServlet</servlet-name>
+    <servlet-class>org.lamsfoundation.ld.integration.blackboard.StartLessonAjaxServlet</servlet-class>
+  </servlet> 
   <servlet>
     <servlet-name>UpdateServerUrlServlet</servlet-name>
     <servlet-class>org.lamsfoundation.ld.integration.blackboard.UpdateServerUrlServlet</servlet-class>
@@ -89,13 +97,21 @@
   <servlet-mapping>
     <servlet-name>GradebookSyncServlet</servlet-name>
     <url-pattern>/GradebookSync</url-pattern>
-  </servlet-mapping>   
+  </servlet-mapping>
+  <servlet-mapping>
+    <servlet-name>OpenLamsPageServlet</servlet-name>
+    <url-pattern>/openLamsPage</url-pattern>
+  </servlet-mapping>
   <servlet-mapping>
     <servlet-name>RenderDesignImageServlet</servlet-name>
     <url-pattern>/RenderImage</url-pattern>
   </servlet-mapping>   
   <servlet-mapping>
     <servlet-name>StartLessonServlet</servlet-name>
+    <url-pattern>/StartLessonServlet</url-pattern>
+  </servlet-mapping>
+  <servlet-mapping>
+    <servlet-name>StartLessonAjaxServlet</servlet-name>
     <url-pattern>/StartLesson</url-pattern>
   </servlet-mapping>
   <servlet-mapping>
