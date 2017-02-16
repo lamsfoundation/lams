@@ -255,7 +255,7 @@
                 
             // Open the Lesson as a Learner
             function openLearner() {
-            	var learnerUrl = 'openLearner.jsp?course_id=<%=request.getParameter("course_id")%>&content_id=<%=request.getParameter("content_id")%>&lsid=<%=request.getParameter("lsid")%>';
+            	var learnerUrl = '../openLamsPage?method=openLearner&course_id=<%=request.getParameter("course_id")%>&content_id=<%=request.getParameter("content_id")%>&lsid=<%=request.getParameter("lsid")%>';
                 if (learnerWin && !learnerWin.closed) {
                     try {
                         learnerWin.focus();
@@ -276,7 +276,7 @@
             
             // Open the Lesson Monitor                
             function openMonitor() {
-            	var monitorUrl = 'openMonitor.jsp?course_id=<%=request.getParameter("course_id")%>&content_id=<%=request.getParameter("content_id")%>&lsid=<%=request.getParameter("lsid")%>';
+            	var monitorUrl = '../openLamsPage?method=openMonitor&course_id=<%=request.getParameter("course_id")%>&content_id=<%=request.getParameter("content_id")%>&lsid=<%=request.getParameter("lsid")%>';
                 if(monitorWin && !monitorWin.closed) {
                     try {
                         monitorWin.focus();

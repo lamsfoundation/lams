@@ -33,8 +33,6 @@
 <bbNG:genericPage title="Modify A LAMS Lesson" ctxId="ctx">
 
 <%
-    String NOT_AVAILABLE = "<i>Item is not available.</i><br>";
-
     // Authorise current user for Course Control Panel (automatic redirect)
     try{
         if (!PlugInUtil.authorizeForCourseControlPanel(request, response))
@@ -43,19 +41,17 @@
         throw new RuntimeException(e);
     }
 
- 	// Get the Course Document (Lams Lesson)
+ 	// retrive the LAMS lesson
     BbPersistenceManager bbPm = PersistenceServiceFactory.getInstance().getDbPersistenceManager();
     Container bbContainer = bbPm.getContainer();
     Id contentId = new PkId( bbContainer, CourseDocument.DATA_TYPE, request.getParameter("content_id") );
     ContentDbLoader courseDocumentLoader = (ContentDbLoader) bbPm.getLoader( ContentDbLoader.TYPE );
     Content bbContent = (Content)courseDocumentLoader.loadById( contentId );
 
-    // Get the Item Attributes
+    // get LAMS lessons's properties
     Calendar startDate = bbContent.getStartDate();
     Calendar endDate = bbContent.getEndDate();	
     FormattedText description = bbContent.getBody();
-    //String description = desc.getText().replaceFirst(NOT_AVAILABLE, ""); //remove the NOT_AVAILABLE substring
-
 %>
 
     <%-- Breadcrumbs --%>
