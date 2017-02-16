@@ -7,7 +7,7 @@
 			<!-- Comments Part -->
 			<c:if test="${item.commentsAllowed}">
 				<html:form action="/learning/addNewComment.do?sessionMapID=${sessionMapID}&mode=${mode}&itemUid=${item.uid}"
-					method="post" enctype="multipart/form-data">
+					method="post" enctype="multipart/form-data" onsubmit="disableButtons()">
 
 					<%@ include file="commentlist.jsp"%>
 
@@ -23,7 +23,7 @@
 							</c:if>
 
 							<input type="submit" name="commentButton" value='<fmt:message key="label.preview.post" />'
-								class="btn btn-sm btn-default voffset5" />
+								class="btn btn-sm btn-default btn-disable-on-submit voffset5" />
 						</div>
 
 					</c:if>
@@ -33,7 +33,7 @@
 			<!-- Uploaded Attachments -->
 			<c:if test="${item.filesAllowed}">
 				<html:form action="/learning/uploadFile.do?sessionMapID=${sessionMapID}&mode=${mode}&itemUid=${item.uid}"
-					method="post" enctype="multipart/form-data">
+					method="post" enctype="multipart/form-data" onsubmit="disableButtons()">
 					<c:choose>
 						<c:when test="${(mode != 'teacher') && !itemDTO.attachmentRequirementsMet}">
 							<lams:Alert id="fileRequired" close="true" type="info">
@@ -55,7 +55,7 @@
 						</html:file>
 
 						<input type="submit" name="uploadedFileButton" value='<fmt:message key="label.preview.upload.button" />'
-							class="btn btn-sm btn-default voffset5" />
+							class="btn btn-sm btn-default btn-disable-on-submit voffset5" />
 					</c:if>
 				</html:form>
 			</c:if>
