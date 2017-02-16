@@ -11,16 +11,10 @@
 	<script type="text/javascript" src="<lams:LAMSURL />includes/javascript/jquery.js"></script>
 
 	<script language="JavaScript" type="text/JavaScript">
-		function submitLearningMethod(actionMethod) {
-			if (actionMethod == 'endLearning') {
-				document.getElementById("finishButton").disabled = true;
-			}
+		function submitMethod(actionMethod) {
+			$('.btn').prop('disabled', true);
 			document.QaLearningForm.method.value = actionMethod;
 			document.QaLearningForm.submit();
-		}
-
-		function submitMethod(actionMethod) {
-			submitLearningMethod(actionMethod);
 		}
 	</script>
 </lams:head>
@@ -145,8 +139,8 @@
 				<c:if test="${!generalLearnerFlowDTO.showOtherAnswers}">
 					<c:if test="${generalLearnerFlowDTO.reflection != 'true'}">
 						<div class="space-bottom-top align-right">
-							<html:link href="#nogo" property="endLearning" styleId="finishButton"
-								onclick="javascript:submitMethod('storeAllResults');return false" styleClass="btn btn-primary pull-right na">
+							<button type="submit" id="finishButton" 
+								onclick="javascript:submitMethod('storeAllResults');return false" class="btn btn-primary pull-right na">
 								<c:choose>
 									<c:when test="${sessionMap.activityPosition.last}">
 										<fmt:message key="button.submit" />
@@ -156,7 +150,7 @@
 									</c:otherwise>
 								</c:choose>
 
-							</html:link>
+							</button>
 						</div>
 					</c:if>
 

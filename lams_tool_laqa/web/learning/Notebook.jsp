@@ -7,16 +7,8 @@
 	<script type="text/javascript" src="<lams:LAMSURL />includes/javascript/jquery.js"></script>
 
 	<script language="JavaScript" type="text/JavaScript">
-		function submitLearningMethod(actionMethod) {
-			if (actionMethod == 'submitReflection') {
-				document.getElementById("finishButton").disabled = true;
-			}		
-			document.QaLearningForm.method.value=actionMethod; 
-			document.QaLearningForm.submit();
-		}
-		
-		function submitMethod(actionMethod) {
-			submitLearningMethod(actionMethod);
+		function disableFinishButton() {
+			document.getElementById("finishButton").disabled = true;
 		}
 		
 	</script>
@@ -25,7 +17,7 @@
 <body class="stripes">
 
 <!-- form needs to be outside page so that the form bean can be picked up by Page tag. -->
-<html:form action="/learning?validate=false" styleId="reflectionForm">
+<html:form action="/learning?validate=false" styleId="reflectionForm" onsubmit="disableFinishButton()">
 
 <lams:Page type="learner" title="${generalLearnerFlowDTO.activityTitle}">
 
@@ -35,7 +27,6 @@
 		<html:hidden property="httpSessionID" />
 		<html:hidden property="totalQuestionCount" />
 
-
 			<p>
 				<lams:out value="${generalLearnerFlowDTO.reflectionSubject}" escapeHtml="true" />
 			</p>
@@ -43,9 +34,8 @@
 			<html:textarea styleId="focused" rows="5" property="entryText" styleClass="form-control"></html:textarea>
 
 			
-				<html:link href="#nogo" property="submitReflection" styleId="finishButton"
-					onclick="javascript:submitMethod('submitReflection');return false" styleClass="btn btn-primary voffset5 pull-right">
-					<div class="na">					
+				<button id="finishButton" class="btn btn-primary voffset5 pull-right na">
+					<span class="nextActivity">
 						<c:choose>
 		 					<c:when test="${sessionMap.activityPosition.last}">
 		 						<fmt:message key="button.submit" />
@@ -54,11 +44,9 @@
 		 		 				<fmt:message key="button.endLearning" />
 		 					</c:otherwise>
 		 				</c:choose>
-		 			</div>
-				</html:link>
+		 			</span>
+				</button>
 		
-		</div>
-
 	<div id="footer"></div>
 </lams:Page>
 

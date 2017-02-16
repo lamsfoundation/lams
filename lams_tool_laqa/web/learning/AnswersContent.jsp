@@ -92,6 +92,7 @@
 		}
 		
 		function doSubmit(actionMethod) {
+			$('.btn').prop('disabled', true);
 			document.QaLearningForm.method.value=actionMethod; 
 			document.QaLearningForm.submit();
 		}

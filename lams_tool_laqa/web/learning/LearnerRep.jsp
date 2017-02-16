@@ -238,16 +238,10 @@
 			});
 		 });
 	
-		function submitLearningMethod(actionMethod) {	
-			if (actionMethod == 'endLearning') {
-				$("#finishButton").attr("disabled", true);
-			}
+		function submitMethod(actionMethod) {
+			$('.btn').prop('disabled', true);
 			document.QaLearningForm.method.value=actionMethod; 
 			document.QaLearningForm.submit();
-		}
-		
-		function submitMethod(actionMethod) {
-			submitLearningMethod(actionMethod);
 		}
 	</script>
 </lams:head>
@@ -467,8 +461,8 @@
 
 
 						<c:if test="${(generalLearnerFlowDTO.reflection != 'true') || !hasEditRight}">
-							<html:link href="#nogo" property="endLearning" styleId="finishButton"
-								onclick="javascript:submitMethod('endLearning'); return false;" styleClass="btn btn-primary pull-right na">
+							<button type="submit" id="finishButton"
+								onclick="javascript:submitMethod('endLearning'); return false;" class="btn btn-primary pull-right na">
 								<c:choose>
 									<c:when test="${sessionMap.activityPosition.last}">
 										<fmt:message key="button.submit" />
@@ -477,7 +471,7 @@
 										<fmt:message key="button.endLearning" />
 									</c:otherwise>
 								</c:choose>
-							</html:link>
+							</button>
 						</c:if>
 
 						<c:if test="${(generalLearnerFlowDTO.reflection == 'true') && hasEditRight}">
@@ -490,11 +484,7 @@
 				</c:if>
 			</c:if>
 
-
-
 		<div id="footer"></div>
-
-
 
 	</lams:Page>
 
