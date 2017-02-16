@@ -218,9 +218,14 @@ public class ValidationUtil {
 	    text = text.replaceAll("(?:<BR>)", " ");
 	}
 
-	int wordCount = (text.length() == 0) ? 0
-		: text.replaceAll("[\'\";:,\\.\\?\\-!]+", "").trim().split("\\S+").length;//.match(/\S+/g) || []) ;
-
+	int wordCount = 0;
+	if ( text.length() >  0) {
+	    wordCount = text.replaceAll("[\'\";:,\\.\\?\\-!]+", "").trim().split("\\S+").length;//.match(/\S+/g) || []) ;
+	    // special case - if only one word and no spaces then the split array is empty.
+	    if ( wordCount == 0 )
+		wordCount = 1;
+	}
+    	
 	// check min words limit is reached
 	return (wordCount >= minWordsLimit);
     }
