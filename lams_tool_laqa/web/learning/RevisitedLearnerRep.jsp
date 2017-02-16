@@ -232,16 +232,10 @@
 			});
 		 });	
 	
-		function submitLearningMethod(actionMethod) {
-			if (actionMethod == 'endLearning') {
-				$("#finishButton").attr("disabled", true);
-			}
+		function submitMethod(actionMethod) {
+			$('.btn').prop('disabled', true);
 			document.QaLearningForm.method.value=actionMethod; 
 			document.QaLearningForm.submit();
-		}
-		
-		function submitMethod(actionMethod) {
-			submitLearningMethod(actionMethod);
 		}
 	</script>
 </lams:head>
@@ -455,8 +449,8 @@
 		<c:if test="${generalLearnerFlowDTO.teacherViewOnly != 'true' }">
 			<div class="row no-gutter">
 				<div class="col-xs-12">
-					<html:button property="endLearning" styleId="finishButton" onclick="javascript:submitMethod('endLearning');"
-						styleClass="btn btn-primary pull-right na">
+					<button type="submit" id="finishButton" onclick="javascript:submitMethod('endLearning');"
+						class="btn btn-primary pull-right na">
 						<c:choose>
 							<c:when test="${sessionMap.activityPosition.last}">
 								<fmt:message key="button.submit" />
@@ -465,7 +459,7 @@
 								<fmt:message key="button.endLearning" />
 							</c:otherwise>
 						</c:choose>
-					</html:button>
+					</button>
 
 				</div>
 			</div>
