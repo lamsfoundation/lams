@@ -220,9 +220,10 @@ public class ValidationUtil {
 
 	int wordCount = 0;
 	if ( text.length() >  0) {
-	    wordCount = text.replaceAll("[\'\";:,\\.\\?\\-!]+", "").trim().split("\\S+").length;//.match(/\S+/g) || []) ;
+	    String cleanedString = text.replaceAll("[\'\";:,\\.\\?\\-!]+", "").trim();
+	    wordCount = cleanedString.split("\\S+").length;//.match(/\S+/g) || []) ;
 	    // special case - if only one word and no spaces then the split array is empty.
-	    if ( wordCount == 0 )
+	    if ( wordCount == 0 && cleanedString.length() > 0)
 		wordCount = 1;
 	}
     	
