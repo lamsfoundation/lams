@@ -68,5 +68,7 @@ public interface IRatingCommentDAO {
     List<RatingCommentDTO> getRelatedCommentByCriteriaAndUser(Long ratingCriteriaId, Integer userId);
 
     RatingComment getComment(Long ratingCriteriaId, Integer userId, Long itemId);
+    
+    List<RatingComment> getCommentsByContentAndUser(Long contentId, Integer userId);
 
 }

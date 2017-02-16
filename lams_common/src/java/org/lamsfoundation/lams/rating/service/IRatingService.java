@@ -161,6 +161,15 @@ public interface IRatingService {
     int getCountItemsRatedByUserByCriteria(final Long criteriaId, final Integer userId);
     
     /**
+     * Removes all ratings and comments left by the specified user.
+     * 
+     * @param contentId
+     * @param userId
+     * @return
+     */
+    void removeUserCommitsByContent(final Long contentId, final Integer userId);
+    
+    /**
      * Count how many users rated and commented each item.
      *
      * @param contentId

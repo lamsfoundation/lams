@@ -95,6 +95,19 @@ public class RatingService implements IRatingService {
     public int getCountItemsRatedByUserByCriteria(final Long criteriaId, final Integer userId) {
 	return ratingDAO.getCountItemsRatedByUserByCriteria(criteriaId, userId);
     }
+    
+    @Override
+    public void removeUserCommitsByContent(final Long contentId, final Integer userId) {
+	List<Rating> ratings = ratingDAO.getRatingsByUser(contentId, userId);
+	for (Rating rating : ratings) {
+	    ratingDAO.delete(rating);
+	}
+	
+	List<RatingComment> comments = ratingCommentDAO.getCommentsByContentAndUser(contentId, userId);
+	for (RatingComment comment : comments) {
+	    ratingDAO.delete(comment);
+	}
+    }
 
     @Override
     public Map<Long, Long> countUsersRatedEachItem(final Long contentId, final Collection<Long> itemIds,
@@ -625,7 +638,7 @@ public class RatingService implements IRatingService {
 		    userRow.put("comment", row[2] == null ? "" : (String) row[2]);
     		    userRow.put("itemDescription", row[numColumns - 1] == null ? "" : (String) row[numColumns - 1]);
 		    if ( ! isComment ) {
-        		    userRow.put("userRating", row[3] == null ? "" : numberFormat.format((Float) row[3]));
+        		    userRow.put("userRating", row[3] == null ? "" : numberFormat.format((Double) row[3]));
         		    userRow.put("averageRating",  row[4] == null ? "" : numberFormat.format((Double) row[4]));
         		    userRow.put("numberOfVotes", row[5] == null ? "" : numberFormat.format((BigInteger) row[5]));
 		    } else {
