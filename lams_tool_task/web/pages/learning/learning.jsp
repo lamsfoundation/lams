@@ -22,24 +22,37 @@
 	<script type="text/javascript">
 	<!--
 
+		function disableButtons() {
+			// logic to disable all buttons depends on contained pages so to avoid future changes breaking this code and stopping the page working, wrap in a try.
+			try {
+				$('.btn-disable-on-submit').prop('disabled', true);
+				var addTaskArea = document.getElementById('reourceInputArea');
+				if ( addTaskArea && addTaskArea.contentWindow.disableButtons  ) {
+					addTaskArea.contentWindow.disableButtons();
+				}
+			} catch(err) {}
+		}
+	
 		function checkNew() {
 			document.location.href = "<c:url value="/learning/start.do"/>?mode=${mode}&toolSessionID=${toolSessionID}";
 			return false;
 		}
 
 		function completeItem(itemUid) {
+			disableButtons() ;
 			document.location.href = "<c:url value="/learning/completeItem.do"/>?sessionMapID=${sessionMapID}&mode=${mode}&itemUid="
 					+ itemUid;
 			return false;
 		}
 
 		function finishSession() {
-			document.getElementById("finishButton").disabled = true;
+			disableButtons() ;
 			document.location.href = '<c:url value="/learning/finish.do?sessionMapID=${sessionMapID}&mode=${mode}&toolSessionID=${toolSessionID}"/>';
 			return false;
 		}
 
 		function continueReflect() {
+			disableButtons() ;
 			document.location.href = '<c:url value="/learning/newReflection.do?sessionMapID=${sessionMapID}"/>';
 		}
 
@@ -129,9 +142,9 @@
 
 		<c:if test="${mode != 'teacher'}">
 			<p>
-				<a href="#" onclick="return checkNew()" class="btn btn-sm btn-default"> <fmt:message
+				<button onclick="return checkNew()" class="btn btn-sm btn-default btn-disable-on-submit"> <fmt:message
 						key="label.learning.check.for.new" />
-				</a>
+				</button>
 			</p>
 		</c:if>
 
@@ -141,10 +154,9 @@
 			<c:if test="${taskList.allowContributeTasks}">
 
 				<p>
-					<a
-						href="javascript:showMessage('<html:rewrite page="/learning/addtask.do?sessionMapID=${sessionMapID}&mode=${mode}"/>');"
-						class="btn btn-sm btn-default"><i class="fa fa-sm fa-plus-circle"></i>&nbsp;<fmt:message
-							key="label.authoring.basic.add.task" /> </a>
+					<button onclick="javascript:showMessage('<html:rewrite page="/learning/addtask.do?sessionMapID=${sessionMapID}&mode=${mode}"/>');"
+						class="btn btn-sm btn-default btn-disable-on-submit"><i class="fa fa-sm fa-plus-circle"></i>&nbsp;<fmt:message
+							key="label.authoring.basic.add.task" /> </button>
 				<p>
 
 					<iframe onload="javascript:this.style.height=this.contentWindow.document.body.scrollHeight+'px'"
@@ -156,9 +168,6 @@
 		<!--Reflection-->
 
 		<c:if test="${sessionMap.userFinished and sessionMap.reflectOn}">
-			<div class="voffset10">
-				<div class="row">
-					<div class="col-xs12">
 						<div class="panel panel-default">
 							<div class="panel-heading panel-title">
 								<fmt:message key="label.monitoring.summary.title.reflection" />
@@ -186,7 +195,7 @@
 
 									<c:if test="${mode != 'teacher'}">
 										<html:button property="FinishButton" onclick="return continueReflect()"
-											styleClass="btn btn-sm btn-default pull-left voffset10">
+											styleClass="btn btn-sm btn-default pull-left voffset10 btn-disable-on-submit">
 											<fmt:message key="label.edit" />
 										</html:button>
 									</c:if>
@@ -196,10 +205,6 @@
 
 							</div>
 						</div>
-					</div>
-				</div>
-
-			</div>
 		</c:if>
 
 		<!--Bottom buttons-->
@@ -221,14 +226,14 @@
 
 					<c:when test="${sessionMap.reflectOn && (not sessionMap.userFinished)}">
 						<html:button property="FinishButton" onclick="return continueReflect()"
-							styleClass="btn btn-primary voffset10 pull-right">
+							styleClass="btn btn-primary btn-disable-on-submit voffset10 pull-right">
 							<fmt:message key="label.continue" />
 						</html:button>
 					</c:when>
 
 					<c:otherwise>
-						<html:link href="#nogo" property="FinishButton" styleId="finishButton" onclick="return finishSession()"
-							styleClass="btn btn-primary voffset10 pull-right na">
+						<button type="submit" id="finishButton" onclick="return finishSession()"
+							class="btn btn-primary btn-disable-on-submit voffset10 pull-right na">
 							<span class="nextActivity"> <c:choose>
 									<c:when test="${sessionMap.activityPosition.last}">
 										<fmt:message key="label.submit" />
@@ -238,7 +243,7 @@
 									</c:otherwise>
 								</c:choose>
 							</span>
-						</html:link>
+						</button>
 					</c:otherwise>
 				</c:choose>
 			</div>

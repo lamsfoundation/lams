@@ -6,6 +6,24 @@
 <lams:html>
 <lams:head>
 	<%@ include file="/common/header.jsp"%>
+	
+	<script type="text/javascript">
+
+		function disableButtons() {
+			$('.btn-disable-on-submit').prop('disabled', true);
+		}
+	
+		function saveTask() {
+			disableButtons();
+			try { window.parent.disableButtons(); } catch(err) {}
+			taskListItemForm.submit();
+		}
+		
+		function cancel() {
+			 window.parent.hideMessage();
+		}
+		
+	</script>		
 </lams:head>
 <body>
 
@@ -31,11 +49,11 @@
 
 	<div class="form-group">
 		<lams:ImgButtonWrapper>
-			<a href="javascript:;" onclick="window.parent.hideMessage();" class="btn btn-sm btn-default"> <fmt:message
+			<button onclick="cancel();" class="btn btn-sm btn-default btn-disable-on-submit"> <fmt:message
 					key="label.cancel" />
-			</a>
-			<a href="#" onclick="taskListItemForm.submit();" class="btn btn-sm btn-default"> <fmt:message key="button.add" />
-			</a>
+			</button>
+			<button onclick="saveTask()" class="btn btn-sm btn-default btn-disable-on-submit"> <fmt:message key="button.add" />
+			</button>
 		</lams:ImgButtonWrapper>
 	</div>
 
