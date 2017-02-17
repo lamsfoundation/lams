@@ -358,12 +358,26 @@ public class LearningAction extends Action {
 	    HttpServletResponse response) {
 	AnswerForm answerForm = (AnswerForm) form;
 	Integer questionSeqID = answerForm.getQuestionSeqID();
-	answerForm.setPosition(SurveyConstants.POSITION_ONLY_ONE);
+	
 	String sessionMapID = answerForm.getSessionMapID();
 	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
 		.getAttribute(sessionMapID);
 
 	SortedMap<Integer, AnswerDTO> surveyItemMap = getQuestionList(sessionMap);
+	Collection<AnswerDTO> surveyItemList = surveyItemMap.values();
+
+	if ( surveyItemList.size() < 2 || ( questionSeqID != null && questionSeqID > 0 ) ) {
+	    answerForm.setPosition(SurveyConstants.POSITION_ONLY_ONE);
+	} else {
+	    answerForm.setPosition(SurveyConstants.POSITION_FIRST);
+	}
+	if ( questionSeqID == null || questionSeqID <= 0 ) {
+	    Boolean onePage = (Boolean) sessionMap.get(SurveyConstants.ATTR_SHOW_ON_ONE_PAGE);
+	    if ( ! onePage && surveyItemList.size() > 0) {
+		answerForm.setQuestionSeqID(surveyItemMap.firstKey());
+	    }
+	}
+
 	// get current question index of total questions
 	int currIdx = new ArrayList<Integer>(surveyItemMap.keySet()).indexOf(questionSeqID) + 1;
 	answerForm.setCurrentIdx(currIdx);
