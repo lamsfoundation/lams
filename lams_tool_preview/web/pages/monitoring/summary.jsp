@@ -179,7 +179,7 @@
 			<c:url value="/monitoring/manageUsers.do"/>?sessionMapID=${sessionMapID}
 		</c:set>
 		<a href="#nogo" onClick="javascript:launchPopup('${url}');" class="btn btn-default pull-right">
-			<i class="fa fa-remove" aria-hidden="true"></i> 
+			<i class="fa fa-check-square" aria-hidden="true"></i> 
 			<fmt:message key="label.manage.users" />
 		</a>
 	</c:if>
