@@ -13,11 +13,6 @@
 		function disableFinishButton() {
 			document.getElementById("finishButton").disabled = true;
 		}
-	    function submitForm(methodName) {
-        	var f = document.getElementById('reflectionForm');
-	    	f.submit();
-	    }
-
 	    $(document).ready(function(){
 	    	window.onload = function() {
 	    		document.getElementById("focused").focus();
@@ -40,7 +35,7 @@
 
 			<html:textarea rows="5" property="entryText" styleClass="form-control" styleId="focused" />
 
-			<html:link href="#nogo" styleClass="btn btn-primary voffset10 pull-right na" styleId="finishButton" onclick="submitForm('finish')">
+			<button type="submit" class="btn btn-primary voffset10 pull-right na" id="finishButton">
 				<c:choose>
 					<c:when test="${sessionMap.activityPosition.last}">
 						<fmt:message key="label.submit" />
@@ -49,7 +44,7 @@
 						<fmt:message key="label.finished" />
 					</c:otherwise>
 				</c:choose>
-			</html:link>
+			</button>
 				
 		</html:form>
 

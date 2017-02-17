@@ -234,11 +234,15 @@
 			}
 		});
 		
+		function disableButtons() {
+			$('.btn').prop('disabled',true);
+		}
+		
 		function finishSession(){
 			if (!validateAnswers()) {
 				return;
 			}
-			
+			disableButtons();
 			document.location.href ='<c:url value="/learning/finish.do?sessionMapID=${sessionMapID}&mode=${mode}&toolSessionID=${toolSessionID}"/>';
 			return false;
 		}
@@ -247,7 +251,7 @@
 			if (!validateAnswers()) {
 				return;
 			}
-			
+			disableButtons();
 			document.location.href='<c:url value="/learning/newReflection.do?sessionMapID=${sessionMapID}"/>';
 		}
 		
@@ -255,7 +259,7 @@
 			if (!validateAnswers()) {
 				return;
 			}
-
+			disableButtons();
         	var myForm = $("#answers");
         	myForm.attr("action", "<c:url value='/learning/nextPage.do?sessionMapID=${sessionMapID}&pageNumber='/>" + pageNumber);
         	myForm.submit();
@@ -269,7 +273,7 @@
 					return;
 				}
 			}
-
+			disableButtons();
         	var myForm = $("#answers");
         	myForm.attr("action", "<c:url value='/learning/submitAll.do?sessionMapID=${sessionMapID}'/>&isTimelimitExpired=" + isTimelimitExpired);
         	myForm.submit();
@@ -293,6 +297,7 @@
 		}		
 		
 		function resubmit(){
+			disableButtons();
 			document.location.href ="<c:url value='/learning/resubmit.do?sessionMapID=${sessionMapID}'/>";
 			return false;			
 		}		
@@ -647,7 +652,7 @@
 				<c:choose>
 					<c:when	test="${not finishedLock && hasEditRight}">					
 						<html:button property="submitAll"
-								onclick="javascript:$(this).prop('disabled',true);return submitAll(false);" 
+								onclick="return submitAll(false);" 
 								styleClass="btn btn-primary voffset10 pull-right na">
 							<fmt:message key="label.learning.submit.all" />
 						</html:button>	
@@ -658,9 +663,9 @@
 					
 					<c:otherwise>
 						<c:if test="${isResubmitAllowed && hasEditRight}">
-							<a href="javascript:;" onclick="return resubmit()" class="btn btn-default">
+							<button type="submit" onclick="resubmit()" class="btn btn-default">
 								<fmt:message key="label.learning.resubmit" />
-							</a>
+							</button>
 						</c:if>	
 						
 						<c:if test="${! sessionMap.isUserFailed}">
@@ -674,7 +679,7 @@
 								</c:when>
 								<c:otherwise>
 									<button name="FinishButton"
-											onClick="$(this).prop('disabled',true);return finishSession()"
+											onClick="return finishSession()"
 											class="btn btn-primary voffset10 pull-right na">
 										<span class="nextActivity">
 											<c:choose>
