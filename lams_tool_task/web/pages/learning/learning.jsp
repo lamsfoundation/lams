@@ -1,26 +1,20 @@
 <!DOCTYPE html>
-
-
 <%@ include file="/common/taglibs.jsp"%>
+<c:if test="${not empty param.sessionMapID}">
+	<c:set var="sessionMapID" value="${param.sessionMapID}" />
+</c:if>
+<c:set var="sessionMap" value="${sessionScope[sessionMapID]}" />
+<c:set var="mode" value="${sessionMap.mode}" />
+<c:set var="toolSessionID" value="${sessionMap.toolSessionID}" />
+<c:set var="taskList" value="${sessionMap.taskList}" />
+<c:set var="finishedLock" value="${sessionMap.finishedLock}" />
+
 <lams:html>
 <lams:head>
 	<title><fmt:message key="label.learning.title" /></title>
 	<%@ include file="/common/header.jsp"%>
 
-	<%-- param has higher level for request attribute --%>
-	<c:if test="${not empty param.sessionMapID}">
-		<c:set var="sessionMapID" value="${param.sessionMapID}" />
-	</c:if>
-
-	<c:set var="sessionMap" value="${sessionScope[sessionMapID]}" />
-
-	<c:set var="mode" value="${sessionMap.mode}" />
-	<c:set var="toolSessionID" value="${sessionMap.toolSessionID}" />
-	<c:set var="taskList" value="${sessionMap.taskList}" />
-	<c:set var="finishedLock" value="${sessionMap.finishedLock}" />
-
 	<script type="text/javascript">
-	<!--
 
 		function disableButtons() {
 			// logic to disable all buttons depends on contained pages so to avoid future changes breaking this code and stopping the page working, wrap in a try.
@@ -83,7 +77,6 @@
 			}
 		}
 
-		-->
 	</script>
 	<script type="text/javascript" src="/lams/includes/javascript/jquery.timeago.js"></script>
 </lams:head>
