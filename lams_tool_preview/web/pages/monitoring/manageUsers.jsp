@@ -54,15 +54,19 @@
 			   	viewrecords:true,
 			   	// caption: "${groupSummary.sessionName}" use Bootstrap panels as the title bar
 			   	loadComplete: function() {
-			   		var table = this;
 			   		
 					// storing isHidden change to DB
-				    $(":checkbox").change(function(){
-				    	var userUid = $(this).parent().parent().prop('id');
-				    	//var userUid = jQuery("#user${question.uid}").getCell(rowid, 'userUid');
-			            //var iRow = $("#grid").getInd($(this).parent('td').parent('tr').attr('id'));
-			            //var iCol = $(this).parent('td').parent('tr').find('td').index($(this).parent('td'));
+				    $(":checkbox").on("click", function(event){
 				    	
+				    	//if teacher doesn't confirm - prevent checkbox from being unchecked and do not save to DB
+				    	if (!$(this).is(":checked") && !confirm('<fmt:message key="label.hide.user.confirmation" />')) {
+					    	event.preventDefault();
+					    	event.stopPropagation();
+					    	return false;
+				    	}
+				    	
+				    	//store to DB in case checkbox wasn't checked previously or the teacher has confirmed hiding the user
+					    var userUid = $(this).parent().parent().prop('id');
 						$.ajax({ 
 							data: {
 								toolContentID: ${sessionMap.toolContentID},
@@ -72,6 +76,7 @@
 						    type: 'POST', 
 					 	    url: '<c:url value="/monitoring/setUserHidden.do"/>'
 						});
+				    	
 				    });
 			   	}
 			}).jqGrid('filterToolbar', { 
