@@ -83,8 +83,6 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
 /**
  *
  * @author Steve.Ni
- *
- * @version $Revision$
  */
 public class LearningAction extends Action {
 
@@ -144,7 +142,7 @@ public class LearningAction extends Action {
 	    HttpServletResponse response) {
 
 	// initial Session Map
-	SessionMap sessionMap = new SessionMap();
+	SessionMap<String, Object> sessionMap = new SessionMap<String, Object>();
 	request.getSession().setAttribute(sessionMap.getSessionID(), sessionMap);
 
 	// save toolContentID into HTTPSession
@@ -378,7 +376,7 @@ public class LearningAction extends Action {
 	    HttpServletResponse response) {
 	String mode = request.getParameter(AttributeNames.ATTR_MODE);
 	String sessionMapID = request.getParameter(TaskListConstants.ATTR_SESSION_MAP_ID);
-	SessionMap sessionMap = (SessionMap) request.getSession().getAttribute(sessionMapID);
+	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession().getAttribute(sessionMapID);
 	Long sessionId = (Long) sessionMap.get(TaskListConstants.ATTR_TOOL_SESSION_ID);
 
 	doComplete(request);
@@ -403,7 +401,7 @@ public class LearningAction extends Action {
 
 	// get back SessionMap
 	String sessionMapID = request.getParameter(TaskListConstants.ATTR_SESSION_MAP_ID);
-	SessionMap sessionMap = (SessionMap) request.getSession().getAttribute(sessionMapID);
+	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession().getAttribute(sessionMapID);
 
 	Long sessionId = (Long) sessionMap.get(AttributeNames.PARAM_TOOL_SESSION_ID);
 
@@ -470,7 +468,7 @@ public class LearningAction extends Action {
 	    HttpServletResponse response) {
 	// get back SessionMap
 	String sessionMapID = request.getParameter(TaskListConstants.ATTR_SESSION_MAP_ID);
-	SessionMap sessionMap = (SessionMap) request.getSession().getAttribute(sessionMapID);
+	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession().getAttribute(sessionMapID);
 
 	TaskListItemForm itemForm = (TaskListItemForm) form;
 	ActionErrors errors = validateTaskListItem(itemForm);
@@ -527,7 +525,7 @@ public class LearningAction extends Action {
 	    HttpServletResponse response) {
 	TaskListItemForm taskListItemForm = (TaskListItemForm) form;
 	String mode = request.getParameter(AttributeNames.ATTR_MODE);
-	SessionMap sessionMap = (SessionMap) request.getSession().getAttribute(taskListItemForm.getSessionMapID());
+	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession().getAttribute(taskListItemForm.getSessionMapID());
 	request.setAttribute(TaskListConstants.ATTR_SESSION_MAP_ID, sessionMap.getSessionID());
 	Long sessionId = (Long) sessionMap.get(TaskListConstants.ATTR_TOOL_SESSION_ID);
 
@@ -579,7 +577,7 @@ public class LearningAction extends Action {
 
 	TaskListItemForm taskListItemForm = (TaskListItemForm) form;
 	String mode = request.getParameter(AttributeNames.ATTR_MODE);
-	SessionMap sessionMap = (SessionMap) request.getSession().getAttribute(taskListItemForm.getSessionMapID());
+	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession().getAttribute(taskListItemForm.getSessionMapID());
 	request.setAttribute(TaskListConstants.ATTR_SESSION_MAP_ID, sessionMap.getSessionID());
 	Long sessionId = (Long) sessionMap.get(TaskListConstants.ATTR_TOOL_SESSION_ID);
 
@@ -591,8 +589,9 @@ public class LearningAction extends Action {
 
 	// validate file size
 	ActionMessages errors = new ActionMessages();
-	FileValidatorUtil.validateFileSize(file, true, errors);
+	FileValidatorUtil.validateFileSize(file, false, errors);
 	if (!errors.isEmpty()) {
+	    this.addErrors(request, errors);
 	    this.saveErrors(request, errors);
 	    return mapping.findForward("refresh");
 	}
@@ -650,7 +649,7 @@ public class LearningAction extends Action {
 	// get the existing reflection entry
 	ITaskListService submitFilesService = getTaskListService();
 
-	SessionMap map = (SessionMap) request.getSession().getAttribute(sessionMapID);
+	SessionMap<String, Object> map = (SessionMap<String, Object>) request.getSession().getAttribute(sessionMapID);
 	Long toolSessionID = (Long) map.get(AttributeNames.PARAM_TOOL_SESSION_ID);
 	NotebookEntry entry = submitFilesService.getEntry(toolSessionID, CoreNotebookConstants.NOTEBOOK_TOOL,
 		TaskListConstants.TOOL_SIGNATURE, user.getUserID());
@@ -677,7 +676,7 @@ public class LearningAction extends Action {
 	Integer userId = refForm.getUserID();
 
 	String sessionMapID = WebUtil.readStrParam(request, TaskListConstants.ATTR_SESSION_MAP_ID);
-	SessionMap sessionMap = (SessionMap) request.getSession().getAttribute(sessionMapID);
+	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession().getAttribute(sessionMapID);
 	Long sessionId = (Long) sessionMap.get(AttributeNames.PARAM_TOOL_SESSION_ID);
 
 	ITaskListService service = getTaskListService();
@@ -747,7 +746,7 @@ public class LearningAction extends Action {
     }
 
     private boolean validateBeforeFinish(HttpServletRequest request, String sessionMapID) {
-	SessionMap sessionMap = (SessionMap) request.getSession().getAttribute(sessionMapID);
+	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession().getAttribute(sessionMapID);
 	Long sessionId = (Long) sessionMap.get(AttributeNames.PARAM_TOOL_SESSION_ID);
 
 	HttpSession ss = SessionManager.getSession();
