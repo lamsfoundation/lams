@@ -446,6 +446,13 @@ function refreshPrivateNotificationCount(){
 		},
 		success : function(count) {
 			$('#notificationsPendingCount').text(count == 0 ? '0' : count);
+			
+			//#notificationsPendingCount will have .btn-primary class when there are some messages available and .btn-default otherwise
+			if (count == 0) {
+				$('#notificationsPendingCount').removeClass("btn-primary").addClass("btn-default");
+			} else {
+				$('#notificationsPendingCount').removeClass("btn-default").addClass("btn-primary");
+			}
 		}
 	});
 }

@@ -1,4 +1,4 @@
-﻿// ********** MAIN FUNCTIONS **********
+﻿﻿// ********** MAIN FUNCTIONS **********
 var tree,
 	lastSelectedUsers = {},
 	sortOrderAscending = {},
@@ -6,7 +6,6 @@ var tree,
 	submitInProgress = false,
 	originalThumbnailWidth = 0,
 	originalThumbnailHeight = 0;
-
 
 /**
  * For tabs changing.
@@ -50,13 +49,17 @@ function initLessonTab(){
 	});
 	
 	tree.singleNodeHighlight = true;
-	tree.subscribe('clickEvent', function(event){
-		if (!event.node.data.learningDesignId){
-			// it is a folder
+	tree.subscribe('clickEvent', function(event) {
+		// if it's a folder - do not select it. if design is already selected - do not allow deselecting it on subsequent click
+		if (!event.node.data.learningDesignId || event.node.highlightState == 1) {
 			return false;
 		}
 		
 		$('#lessonNameInput').val(event.node.label);
+		//focus element only if it's visible in the current viewport (to avoid unwanted scrolling)
+		if (isElementInViewport($('#lessonNameInput'))) {
+			$('#lessonNameInput').focus();
+		}
 		
 		// display "loading" animation and finally LD thumbnail
 		$('.ldChoiceDependentCanvasElement').css('display', 'none');
@@ -67,10 +70,43 @@ function initLessonTab(){
 		}
 	});
 	tree.subscribe('clickEvent',tree.onEventToggleHighlight);
+	tree.subscribe('dblClickEvent', function(event){
+		
+		// if it's a folder - do not select it
+		if (!event.node.data.learningDesignId) {
+			return false;
+		}
+		
+		//trigger "clickEvent" first so that addLesson() function will know which element is selected 
+		tree.fireEvent("clickEvent", event);
+		
+		// start lesson
+		addLesson();
+	});
 	tree.render();
 	
 	// expand the first (user) folder
 	tree.getRoot().children[0].expand();
+	
+	// ability to start a lesson on pressing Enter button in a lesson name input
+	$('#lessonNameInput').on('keyup', function (e) {
+	    if (e.keyCode == 13) {
+	    	 addLesson();
+	    }
+	});
+}
+
+//checks whether element is visible in the current viewport
+function isElementInViewport(el) {
+	el = el[0];
+    var rect = el.getBoundingClientRect();
+
+    return (
+        rect.top >= 0 &&
+        rect.left >= 0 &&
+        rect.bottom <= (window.innerHeight || document.documentElement.clientHeight) && /*or $(window).height() */
+        rect.right <= (window.innerWidth || document.documentElement.clientWidth) /*or $(window).width() */
+    );
 }
 
 
