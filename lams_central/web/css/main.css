@@ -307,6 +307,9 @@ ul.dropdown-usermenu li {
 	vertical-align: middle;
 	border-radius: 10px;
 }
+#notificationsPendingCount.btn-default {
+    background-color: #ddd;
+}
 
 /*DIALOGS*/
 .dialogContainer {

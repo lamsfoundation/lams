@@ -275,14 +275,14 @@
 					<li role="presentation" class="dropdown">   
 						<a href="javascript:;" onclick="javascript:showPrivateNotificationsDialog();" class="dropdown-toggle info-number tour-user-notifications" data-toggle="dropdown" aria-expanded="false">
 							<i class="fa fa-envelope-o"></i>
-                    		<span id="notificationsPendingCount" class="btn-primary"></span>
+                    		<span id="notificationsPendingCount" class="btn-default"></span>
 						</a>
 					</li>
 					
 					<li role="presentation" class="dropdown">       
 						<a href="javascript:;" onclick="javascript:startTour();" class="dropdown-toggle info-number" data-toggle="dropdown" aria-expanded="false">
-							<span class="xs-hidden"><fmt:message key="label.tour"/></span>
 							<i class="fa fa-question-circle"></i>
+							<span class="xs-hidden"><fmt:message key="label.tour"/></span>
 						</a>
 					</li>
 					
