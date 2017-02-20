@@ -1,9 +1,4 @@
-<?xml version="1.0" encoding="ISO-8859-1"?>
-
-<!DOCTYPE web-app
-    PUBLIC "-//Sun Microsystems, Inc.//DTD Web Application 2.2//EN"
-    "http://java.sun.com/j2ee/dtds/web-app_2_2.dtd">
-
+<?xml version="1.0" encoding="UTF-8"?>
 <web-app  xmlns="http://java.sun.com/xml/ns/j2ee" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://java.sun.com/xml/ns/j2ee http://java.sun.com/xml/ns/j2ee/web-app_2_4.xsd" version="2.4">
   <servlet>
     <servlet-name>UserDataServlet</servlet-name>
@@ -42,16 +37,16 @@
     <servlet-class>org.lamsfoundation.ld.integration.blackboard.GradebookSyncServlet</servlet-class>
   </servlet>
   <servlet>
+    <servlet-name>LessonManagerServlet</servlet-name>
+    <servlet-class>org.lamsfoundation.ld.integration.blackboard.LessonManagerServlet</servlet-class>
+  </servlet>
+  <servlet>
     <servlet-name>OpenLamsPageServlet</servlet-name>
     <servlet-class>org.lamsfoundation.ld.integration.blackboard.OpenLamsPageServlet</servlet-class>
   </servlet> 
   <servlet>
     <servlet-name>RenderDesignImageServlet</servlet-name>
     <servlet-class>org.lamsfoundation.ld.integration.blackboard.RenderDesignImageServlet</servlet-class>
-  </servlet>
-  <servlet>
-    <servlet-name>StartLessonServlet</servlet-name>
-    <servlet-class>org.lamsfoundation.ld.integration.blackboard.StartLessonServlet</servlet-class>
   </servlet>
   <servlet>
     <servlet-name>StartLessonAjaxServlet</servlet-name>
@@ -97,6 +92,10 @@
   <servlet-mapping>
     <servlet-name>GradebookSyncServlet</servlet-name>
     <url-pattern>/GradebookSync</url-pattern>
+  </servlet-mapping>  
+  <servlet-mapping>
+    <servlet-name>LessonManagerServlet</servlet-name>
+    <url-pattern>/LessonManager</url-pattern>
   </servlet-mapping>
   <servlet-mapping>
     <servlet-name>OpenLamsPageServlet</servlet-name>
@@ -105,11 +104,7 @@
   <servlet-mapping>
     <servlet-name>RenderDesignImageServlet</servlet-name>
     <url-pattern>/RenderImage</url-pattern>
-  </servlet-mapping>   
-  <servlet-mapping>
-    <servlet-name>StartLessonServlet</servlet-name>
-    <url-pattern>/StartLessonServlet</url-pattern>
-  </servlet-mapping>
+  </servlet-mapping> 
   <servlet-mapping>
     <servlet-name>StartLessonAjaxServlet</servlet-name>
     <url-pattern>/StartLesson</url-pattern>
@@ -117,6 +112,13 @@
   <servlet-mapping>
     <servlet-name>UpdateServerUrlServlet</servlet-name>
     <url-pattern>/UpdateServerUrl</url-pattern>
-  </servlet-mapping>   
+  </servlet-mapping>  
+  
+  <jsp-config>	
+		  <taglib>
+		    <taglib-uri>/tags-core</taglib-uri>
+		    <taglib-location>/WEB-INF/tlds/c.tld</taglib-location>
+		  </taglib>
+  </jsp-config> 
   
 </web-app>
