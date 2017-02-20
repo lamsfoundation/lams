@@ -1,17 +1,14 @@
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
-<%--
-    Original Version: 2007 LAMS Foundation
-    Updated for Blackboard 9.1 SP6 (including new bbNG tag library) 2011
-    Richard Stals (www.stals.com.au)
-    Edith Cowan University, Western Australia
---%>
+<%@ page contentType="text/html; charset=utf-8" language="java"%>
+<%@ page isELIgnored="false" %>
+
+<!DOCTYPE HTML>
 <%--
     Step 1 For Creating a New LAMS Lesson
     Allows the user to (optionally) author a new LAMS lesson
     Then the user must select a LAMS lesson before proceeding to Step 2.
 
     Step 1 - create.jsp
-    Step 2 - /StartLessonServlet (StartLessonServlet.java)
+    Step 2 - /LessonManager?method=start
 --%>
 <%@ page import="blackboard.platform.plugin.PlugInUtil"%>
 <%@ page import="blackboard.platform.plugin.PlugInException"%>
@@ -28,29 +25,14 @@
 <bbNG:cssFile href="../includes/css/treeview.css" />
 <bbNG:cssFile href="../includes/css/folders.css" />
 
-<%
-    // Authorise current user for Course Control Panel (automatic redirect)
-    try{
-        if (!PlugInUtil.authorizeForCourseControlPanel(request, response))
-            return;
-    } catch(PlugInException e) {
-        throw new RuntimeException(e);
-    }
-    
-    String lamsServerUrl = LamsSecurityUtil.getServerAddress();
-    
-	// get all user accessible folders and LD descriptions as JSON
-	String learningDesigns = LamsSecurityUtil.getLearningDesigns(ctx, ctx.getCourse().getCourseId(), null);
-%>
-
 <bbNG:jsBlock>
-	<script language="JavaScript" type="text/javascript">
+	<script type="text/javascript">
 	var $j = jQuery.noConflict();
 	
 	$j(document).ready(function(){
 		
 		// generate LD initial tree; folderContents is declared in newLesson.jsp
-		var treeNodes = parseFolderContents(<%=learningDesigns%>);
+		var treeNodes = parseFolderContents(${learningDesigns});
 		
 		tree = new YAHOO.widget.TreeView('learningDesignTree', treeNodes);
 		tree.setDynamicLoad(function(node, callback){
@@ -131,7 +113,7 @@
     </bbNG:pageHeader>
     
     <%-- Form to Collect ID of Selected LAMS Sequence --%>
-    <form name="lesson_form" id="lesson_form" action="../StartLessonServlet" method="post" onSubmit="return confirmSubmit();">
+    <form name="lesson_form" id="lesson_form" action="../LessonManager?method=start" method="post" onSubmit="return confirmSubmit();">
     	<input type="hidden" name="content_id" value="<%=request.getParameter("content_id")%>">
         <input type="hidden" name="course_id" value="<%=request.getParameter("course_id")%>">
     	<input type="hidden" name="sequence_id" id="sequence_id" value="0">
@@ -211,7 +193,7 @@
     </form>
 
     <bbNG:jsBlock>
-        <script language="JavaScript" type="text/javascript">
+        <script type="text/javascript">
         	
             var authorWin = null;
         	var previewWin = null;
@@ -322,7 +304,7 @@
             }
             
             function receiveMessage(event) {
-            	var lamsServerUrl = "<%=lamsServerUrl%>";
+            	var lamsServerUrl = "${lamsServerUrl}";
             	
             	// verify the sender of this message
             	if ((lamsServerUrl.substring(0, event.origin.length) === event.origin) && (event.data == "refresh")) {
