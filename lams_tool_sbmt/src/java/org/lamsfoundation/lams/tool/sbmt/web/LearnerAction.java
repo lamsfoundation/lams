@@ -64,6 +64,8 @@ import org.lamsfoundation.lams.tool.sbmt.service.ISubmitFilesService;
 import org.lamsfoundation.lams.tool.sbmt.service.SubmitFilesServiceProxy;
 import org.lamsfoundation.lams.tool.sbmt.util.SbmtConstants;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
+import org.lamsfoundation.lams.util.Configuration;
+import org.lamsfoundation.lams.util.ConfigurationKeys;
 import org.lamsfoundation.lams.util.DateUtil;
 import org.lamsfoundation.lams.util.FileUtil;
 import org.lamsfoundation.lams.util.FileValidatorUtil;
@@ -76,14 +78,6 @@ import org.lamsfoundation.lams.web.util.SessionMap;
 /**
  * @author Manpreet Minhas
  * @author Steve.Ni
- *
- *
- *
- *
- *
- *
- *
- *
  */
 public class LearnerAction extends DispatchAction {
 
@@ -157,6 +151,8 @@ public class LearnerAction extends DispatchAction {
 	sessionMap.put(SbmtConstants.ATTR_LIMIT_UPLOAD_NUMBER, content.getLimitUploadNumber());
 	sessionMap.put(SbmtConstants.ATTR_USER_FINISHED, learner.isFinished());
 
+	sessionMap.put(SbmtConstants.ATTR_UPLOAD_MAX_FILE_SIZE, 
+		FileValidatorUtil.formatSize(Configuration.getAsInt(ConfigurationKeys.UPLOAD_FILE_MAX_SIZE)));
 	setLearnerDTO(request, sessionMap, learner, filesUploaded, mode);
 
 	// if content in use, return special page.
@@ -351,11 +347,11 @@ public class LearnerAction extends DispatchAction {
 	FileValidatorUtil.validateFileSize(learnerForm.getFile(), false, errors);
 
 	if (learnerForm.getFile() != null) {
-	    DispatchAction.log.debug("Learner submit file : " + learnerForm.getFile().getFileName());
+	    LearnerAction.logger.debug("Learner submit file : " + learnerForm.getFile().getFileName());
 	}
 
 	if (learnerForm.getFile() != null && FileUtil.isExecutableFile(learnerForm.getFile().getFileName())) {
-	    DispatchAction.log.debug("File is executatable : " + learnerForm.getFile().getFileName());
+	    LearnerAction.logger.debug("File is executatable : " + learnerForm.getFile().getFileName());
 	    ActionMessage msg = new ActionMessage("error.attachment.executable");
 	    errors.add(ActionMessages.GLOBAL_MESSAGE, msg);
 	}
