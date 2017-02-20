@@ -79,6 +79,8 @@ public class SbmtConstants {
 
     public static final String ATTR_IS_GROUPED_ACTIVITY = "isGroupedActivity";
 
+    public static final String ATTR_UPLOAD_MAX_FILE_SIZE = "uploadMaxFileSize";
+
     public static final String EVENT_NAME_NOTIFY_LEARNERS_ON_MARK_RELEASE = "notify_learners_on_mark_release";
 
     public static final String EVENT_NAME_NOTIFY_TEACHERS_ON_FILE_SUBMIT = "notify_teachers_on_file_submit";

@@ -233,6 +233,11 @@
 								<label for="file"><fmt:message key="label.learner.filePath" />&nbsp;<span style="color: red">*</span></label>
 								<html:file property="file" styleClass="btn btn-sm btn-file"
 									disabled="${sessionMap.finishLock || sessionMap.arriveLimit}" />
+								<p class="help-block">
+									<fmt:message key="label.learner.uploadMessage">
+										<fmt:param>${sessionMap.uploadMaxFileSize}</fmt:param>
+									</fmt:message>
+								</p>
 							</div>
 							<div class="form-group">
 								<!--File Description row -->
