@@ -298,4 +298,31 @@ public class LessonManagerServlet extends HttpServlet {
         request.getRequestDispatcher("/modules/modifyLessonSuccess.jsp").forward(request, response);
     }
 
+    private void delete(HttpServletRequest request, HttpServletResponse response, Context ctx)
+	    throws InitializationException, BbServiceException, PersistenceException, IOException, ServletException {
+
+	//remove Lineitem object from Blackboard DB
+	String bbContentId = request.getParameter("content_id");
+	String courseId = request.getParameter("course_id");
+	LineitemUtil.removeLineitem(bbContentId, courseId);
+	
+	// remove internalContentId -> externalContentId key->value pair (it's used for GradebookServlet)
+	PortalExtraInfo pei = PortalUtil.loadPortalExtraInfo(null, null, "LamsStorage");
+	ExtraInfo ei = pei.getExtraInfo();
+	ei.clearEntry(bbContentId);
+	PortalUtil.savePortalExtraInfo(pei);
+	
+	//remove lesson from LAMS server
+	BbPersistenceManager bbPm = PersistenceServiceFactory.getInstance().getDbPersistenceManager();
+	Container bbContainer = bbPm.getContainer();
+	ContentDbLoader courseDocumentLoader = ContentDbLoader.Default.getInstance();
+	Id contentId = new PkId(bbContainer, CourseDocument.DATA_TYPE, bbContentId);
+	Content bbContent = courseDocumentLoader.loadById(contentId);
+	String lsId = bbContent.getLinkRef();
+	String userName = ctx.getUser().getUserName();
+	Boolean isDeletedSuccessfully = LamsSecurityUtil.deleteLesson(userName, lsId);
+	
+	System.out.println("Lesson (bbContentId:" + bbContentId + ") successfully deleted by userName:" + userName);
+    }
+
 }
