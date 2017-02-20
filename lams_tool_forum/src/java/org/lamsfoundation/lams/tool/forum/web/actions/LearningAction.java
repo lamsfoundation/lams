@@ -233,7 +233,14 @@ public class LearningAction extends Action {
 	sessionMap.put(ForumConstants.ATTR_LOCK_WHEN_FINISHED, forum.getLockWhenFinished());
 	sessionMap.put(ForumConstants.ATTR_USER_FINISHED, forumUser.isSessionFinished());
 	sessionMap.put(ForumConstants.ATTR_ALLOW_EDIT, forum.isAllowEdit());
+	
 	sessionMap.put(ForumConstants.ATTR_ALLOW_UPLOAD, forum.isAllowUpload());
+	int uploadMaxFileSize = Configuration.getAsInt(ConfigurationKeys.UPLOAD_FILE_MAX_SIZE);
+	// it defaults to -1 if property was not found
+	if (uploadMaxFileSize > 0) {
+	    sessionMap.put(ForumConstants.ATTR_UPLOAD_MAX_FILE_SIZE, FileValidatorUtil.formatSize(uploadMaxFileSize));
+	}
+	
 	sessionMap.put(ForumConstants.ATTR_ALLOW_RATE_MESSAGES, forum.isAllowRateMessages());
 	sessionMap.put(ForumConstants.ATTR_MINIMUM_RATE, forum.getMinimumRate());
 	sessionMap.put(ForumConstants.ATTR_MAXIMUM_RATE, forum.getMaximumRate());
@@ -764,12 +771,6 @@ public class LearningAction extends Action {
 	// as it has a link from the view topic screen back to View Forum screen.
 	boolean hideReflection = WebUtil.readBooleanParam(request, ForumConstants.ATTR_HIDE_REFLECTION, false);
 	sessionMap.put(ForumConstants.ATTR_HIDE_REFLECTION, hideReflection);
-
-	int uploadMaxFileSize = Configuration.getAsInt(ConfigurationKeys.UPLOAD_FILE_MAX_SIZE);
-	// it defaults to -1 if property was not found
-	if (uploadMaxFileSize > 0) {
-	    sessionMap.put(ForumConstants.ATTR_UPLOAD_MAX_FILE_SIZE, FileValidatorUtil.formatSize(uploadMaxFileSize));
-	}
 
 	return mapping.findForward("success");
     }

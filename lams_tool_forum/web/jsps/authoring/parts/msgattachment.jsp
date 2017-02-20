@@ -26,5 +26,11 @@
 	</c:when>
 	<c:otherwise>
 		<input type="file" name="attachmentFile" class="form-control" />
+		<p class="help-block">
+			<fmt:message key="label.upload.info">
+				<fmt:param>${sessionMap.uploadMaxFileSize}</fmt:param>
+			</fmt:message>
+		</p>
+
 	</c:otherwise>
 </c:choose>

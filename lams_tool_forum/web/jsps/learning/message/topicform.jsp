@@ -15,6 +15,11 @@
 	<div class="form-group">
 		<label><fmt:message key="message.label.attachment" /></label><BR/>
 		<html:file tabindex="3" property="attachmentFile" /><BR/>
+		<p class="help-block">
+			<fmt:message key="label.upload.info">
+				<fmt:param>${sessionMap.uploadMaxFileSize}</fmt:param>
+			</fmt:message>
+		</p>
 		<html:errors property="message.attachment" />
 	</div>
 </c:if>
