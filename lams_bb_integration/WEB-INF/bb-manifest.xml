@@ -25,9 +25,9 @@
             <name value="LAMS Lesson" />
             <handle value="resource/x-lams-lamscontent" />
             <http-actions>
-                <create value="modules/create.jsp" />
-                <modify value="modules/modify.jsp"/>
-                <remove value="modules/delete.jsp"/>
+                <create value="/LessonManager?method=configureLessonStart"/>
+                <modify value="/LessonManager?method=configureLessonModification"/>
+                <remove value="/LessonManager?method=delete"/>
             </http-actions>
             <icons>
                 <toolbar value="includes/images/logo.gif" />
