@@ -447,7 +447,6 @@ public class LamsSecurityUtil {
 	}
 
 	try {
-
 	    String timestamp = new Long(System.currentTimeMillis()).toString();
 	    String hash = generateAuthenticationHash(timestamp, username, serverId);
 	    String course = courseId != null ? "&courseId=" + URLEncoder.encode(courseId, "UTF8") : "";
@@ -469,6 +468,71 @@ public class LamsSecurityUtil {
 	    Document document = db.parse(is);
 	    return Long.parseLong(document.getElementsByTagName("Lesson").item(0).getAttributes()
 		    .getNamedItem("lessonId").getNodeValue());
+	    
+	} catch (MalformedURLException e) {
+	    throw new RuntimeException("Unable to start LAMS lesson, bad URL: '" + serverAddr
+		    + "', please check lams.properties", e);
+	} catch (IllegalStateException e) {
+	    throw new RuntimeException(
+		    "LAMS Server timeout, did not get a response from the LAMS server. Please contact your systems administrator",
+		    e);
+	} catch (RemoteException e) {
+	    throw new RuntimeException("Unable to start LAMS lesson, RMI Remote Exception", e);
+	} catch (UnsupportedEncodingException e) {
+	    throw new RuntimeException("Unable to start LAMS lesson, Unsupported Encoding Exception", e);
+	} catch (ConnectException e) {
+	    throw new RuntimeException(
+		    "LAMS Server timeout, did not get a response from the LAMS server. Please contact your systems administrator",
+		    e);
+	} catch (IOException e) {
+		    throw new RuntimeException("Unable to start LAMS lesson. " + e.getMessage()
+			    + " Please contact your system administrator.", e);
+	} catch (Exception e) {
+	    throw new RuntimeException("Unable to start LAMS lesson. Please contact your system administrator.", e);
+	}
+
+    }
+
+    /**
+     * Deletes lesson on LAMS server through a LAMS webservice.
+     * 
+     * @param ctx
+     *            the blackboard contect, contains session data
+     * @param usernameFromParam
+     *            current user's username
+     * @param lsId
+     *            the lesson id to be deleted
+     * 
+     * @return boolean whether lesson was successfully deleted
+     */
+    public static Boolean deleteLesson(String userName, String lsId) {
+
+	String serverId = getServerID();
+	String serverAddr = getServerAddress();
+	String serverKey = getServerKey();
+
+	if (serverId == null || serverAddr == null || serverKey == null) {
+	    throw new RuntimeException("Unable to delete lesson. One or more LAMS configuration properties are null");
+	}
+
+	try {
+	    String timestamp = new Long(System.currentTimeMillis()).toString();
+	    String hash = generateAuthenticationHash(timestamp, userName, serverId);
+
+	    String serviceURL = serverAddr + "/services/xml/LessonManager?" + "serverId="
+		    + URLEncoder.encode(serverId, "utf8") + "&datetime=" + timestamp + "&username="
+		    + URLEncoder.encode(userName, "utf8") + "&hashValue=" + hash + "&method=removeLesson" + "&lsId="
+		    + lsId;
+
+	    logger.info("LAMS DELETE LESSON Req: " + serviceURL);
+
+	    // parse xml response and get the lesson id
+	    InputStream is = LamsSecurityUtil.callLamsServerPost(serviceURL);
+	    DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+	    DocumentBuilder db = dbf.newDocumentBuilder();
+	    Document document = db.parse(is);
+	    return Boolean.parseBoolean(document.getElementsByTagName("Lesson").item(0).getAttributes()
+		    .getNamedItem("deleted").getNodeValue());
 	    
 	} catch (MalformedURLException e) {
 	    throw new RuntimeException("Unable to start LAMS lesson, bad URL: '" + serverAddr
