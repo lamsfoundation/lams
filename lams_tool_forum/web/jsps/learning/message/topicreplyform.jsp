@@ -16,11 +16,11 @@
 		<label><fmt:message key="message.label.attachment" />&nbsp;</label>
 		<html:file tabindex="3" property="attachmentFile" />
 
-		<div style="font-style: italic; margin-top: 10px">
+		<p class="help-block">
 			<fmt:message key="label.upload.info">
 				<fmt:param>${sessionMap.uploadMaxFileSize}</fmt:param>
 			</fmt:message>
-		</div>
+		</p>
 		<html:errors property="message.attachment" />
 	</div>
 </c:if>
