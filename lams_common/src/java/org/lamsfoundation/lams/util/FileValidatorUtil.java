@@ -27,6 +27,7 @@ import java.text.NumberFormat;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.validator.Field;
 import org.apache.commons.validator.Validator;
 import org.apache.commons.validator.ValidatorAction;
@@ -125,8 +126,27 @@ public class FileValidatorUtil {
 	}
 
 	return FileValidatorUtil.validateFileSize(fileSize, largeFile, errorKey, errors);
-
     }
+    
+    /**
+    *
+    * @param file
+    * @param largeFile
+    * @return return null if file size is below max filesize, otherwise, return error message
+    */
+   public static ActionMessage validateFileSize(FileItem file, boolean largeFile) {
+	int fileSize = (int) file.getSize();
+	ActionMessages errors = new ActionMessages();
+	
+	ActionMessage errorMessage = null;
+	boolean isMaxFilesizeExceeded = !FileValidatorUtil.validateFileSize(fileSize, largeFile,
+		ActionMessages.GLOBAL_MESSAGE, errors);
+	if (isMaxFilesizeExceeded) {
+	    errorMessage = (ActionMessage)errors.get().next();
+	}
+	
+	return errorMessage;
+   }
 
     private static boolean validateFileSize(int fileSize, boolean largeFile, String errorKey, ActionMessages errors) {
 	float maxFileSize = largeFile ? Configuration.getAsInt(ConfigurationKeys.UPLOAD_FILE_LARGE_MAX_SIZE)

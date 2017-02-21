@@ -21,8 +21,13 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.commons.fileupload.DiskFileUpload;
 import org.apache.commons.fileupload.FileItem;
 import org.apache.log4j.Logger;
+import org.apache.struts.action.ActionMessage;
 import org.lamsfoundation.lams.util.FileUtil;
+import org.lamsfoundation.lams.util.FileValidatorUtil;
+import org.lamsfoundation.lams.util.MessageService;
 import org.lamsfoundation.lams.util.UploadFileUtil;
+import org.springframework.web.context.WebApplicationContext;
+import org.springframework.web.context.support.WebApplicationContextUtils;
 
 /**
  * Servlet to upload files.<br>
@@ -37,16 +42,19 @@ import org.lamsfoundation.lams.util.UploadFileUtil;
  *
  * @author Simone Chiaretta (simo@users.sourceforge.net)
  * @author Mitchell Seaton
- *
- *
- *
- *
  */
-
 public class LAMSUploadServlet extends HttpServlet {
 
     private static final long serialVersionUID = 7839808388592495717L;
     private static final Logger log = Logger.getLogger(LAMSUploadServlet.class);
+    
+    private static MessageService messageService;
+    
+    public void init() {
+	WebApplicationContext ctx = WebApplicationContextUtils
+		.getRequiredWebApplicationContext(this.getServletContext());
+	messageService = (MessageService) ctx.getBean("centralMessageService");
+    }
 
     /**
      * Manage the Upload requests.<br>
@@ -102,7 +110,17 @@ public class LAMSUploadServlet extends HttpServlet {
 		String[] pathParts = fileNameLong.split("/");
 		String fileName = pathParts[pathParts.length - 1];
 
-		if (FileUtil.isExtensionAllowed(fileType, fileName)) {
+		// validate file size
+		ActionMessage maxFilesizeExceededMessage = FileValidatorUtil.validateFileSize(uplFile, true);
+		if (maxFilesizeExceededMessage != null) {
+		    returnMessage = messageService.getMessage(maxFilesizeExceededMessage.getKey(),
+			    maxFilesizeExceededMessage.getValues());
+
+		// validate file extension
+		} else if  (!FileUtil.isExtensionAllowed(fileType, fileName)) {
+		    returnMessage = "Invalid file type";
+		    
+		} else {
 		    File uploadDir = UploadFileUtil.getUploadDir(currentFolderStr, fileType);
 		    fileName = UploadFileUtil.getUploadFileName(uploadDir, fileName);
 		    newName = fileName;
@@ -115,12 +133,10 @@ public class LAMSUploadServlet extends HttpServlet {
 		    if (LAMSUploadServlet.log.isDebugEnabled()) {
 			LAMSUploadServlet.log.debug("Uploaded file to " + destinationFile.getAbsolutePath());
 		    }
-		} else {
-		    returnMessage = "Invalid file type";
 		}
 	    } catch (Exception e) {
 		LAMSUploadServlet.log.error(e);
-		returnMessage = "Error while uploading file";
+		returnMessage = "Error while uploading file: " + e.getMessage();
 	    }
 	}
 

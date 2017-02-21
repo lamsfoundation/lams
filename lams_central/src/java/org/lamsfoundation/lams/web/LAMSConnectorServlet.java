@@ -34,13 +34,18 @@ import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.fileupload.FileUploadException;
 import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
+import org.apache.struts.action.ActionMessage;
 import org.lamsfoundation.lams.authoring.web.AuthoringConstants;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.util.Configuration;
 import org.lamsfoundation.lams.util.ConfigurationKeys;
 import org.lamsfoundation.lams.util.FileUtil;
+import org.lamsfoundation.lams.util.FileValidatorUtil;
+import org.lamsfoundation.lams.util.MessageService;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
+import org.springframework.web.context.WebApplicationContext;
+import org.springframework.web.context.support.WebApplicationContextUtils;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -65,14 +70,7 @@ import org.w3c.dom.Node;
  *
  * @author Simone Chiaretta (simo@users.sourceforge.net)
  * @author Mitchell Seaton
- *
- *
- *
- *
- *
- *
  */
-
 public class LAMSConnectorServlet extends HttpServlet {
 
     private static final Logger log = Logger.getLogger(LAMSConnectorServlet.class);
@@ -82,15 +80,20 @@ public class LAMSConnectorServlet extends HttpServlet {
 
     private String realBaseDir;
     private String lamsContextPath;
-
+    
+    private static MessageService messageService;
+    
     /**
      * Initialize the servlet.<br>
      * Retrieve from the servlet configuration the "baseDir" which is the root of the file repository:<br>
      * If not specified the value of "/UserFiles/" will be used.
-     *
      */
     @Override
     public void init() throws ServletException {
+	WebApplicationContext ctx = WebApplicationContextUtils
+		.getRequiredWebApplicationContext(this.getServletContext());
+	messageService = (MessageService) ctx.getBean("centralMessageService");
+
 	LAMSConnectorServlet.baseDir = getInitParameter("baseDir");
 	debug = (new Boolean(getInitParameter("debug"))).booleanValue() && log.isDebugEnabled();
 
@@ -323,8 +326,25 @@ public class LAMSConnectorServlet extends HttpServlet {
 	fileNameLong = fileNameLong.replace('\\', '/');
 	String[] pathParts = fileNameLong.split("/");
 	String fileName = pathParts[pathParts.length - 1];
+	
+	// validate file size
+	ActionMessage maxFilesizeExceededMessage = FileValidatorUtil.validateFileSize(uplFile, true);
+	if (maxFilesizeExceededMessage != null) {
+	    //assign fileName an error message to be shown on a client side
+	    fileName = messageService.getMessage(maxFilesizeExceededMessage.getKey(),
+		    maxFilesizeExceededMessage.getValues());
+	    retVal.append("1");
 
-	if (FileUtil.isExtensionAllowed(fileType, fileName)) {
+	// validate file extension
+	} else if (!FileUtil.isExtensionAllowed(fileType, fileName)) {
+	    if (LAMSConnectorServlet.debug) {
+		log.debug("File extension is prohibited for upload " + fileName);
+	    }
+
+	    //will generate client-side alert message 'Invalid file type'
+	    retVal.append("204");
+	    
+	} else {  
 	    File pathToSave = new File(validCurrentDirPath, fileName);
 
 	    int counter = 1;
@@ -347,14 +367,6 @@ public class LAMSConnectorServlet extends HttpServlet {
 	    if (LAMSConnectorServlet.debug) {
 		log.debug("File save finished");
 	    }
-
-	} else {
-	    if (LAMSConnectorServlet.debug) {
-		log.debug("File extension is prohibited for upload " + fileName);
-	    }
-
-	    //will generate client-side alert message 'Invalid file type'
-	    retVal.append("204");
 	}
 
 	return fileName;
