@@ -205,7 +205,7 @@ public class LamsToolService implements ILamsToolService {
 
 	//update gradebook marks if required
 	if (isToolOutputDefinitionChanged) {
-	    gradebookService.updateUserMarksForActivity(toolActivity);
+	    gradebookService.recalculateGradebookMarksForActivity(toolActivity);
 	}
 
     }
