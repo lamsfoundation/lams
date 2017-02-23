@@ -135,6 +135,14 @@
             column="burning_questions_enabled"
         />
         
+       <property
+            name="shuffleItems"
+            type="boolean"
+            update="true"
+            insert="true"
+            column="shuffle_items"
+        />
+        
         <property
             name="timeLimit"
             type="int"

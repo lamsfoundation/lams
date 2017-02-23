@@ -16,9 +16,16 @@
 	</c:if>
 	
 	<div class="checkbox">
-		<label for="burningQuestionsEnabled">
-			<html:checkbox property="scratchie.burningQuestionsEnabled" styleId="burningQuestionsEnabled"/>
+		<label for="burning-questions-enabled">
+			<html:checkbox property="scratchie.burningQuestionsEnabled" styleId="burning-questions-enabled"/>
 			<fmt:message key="label.authoring.advanced.burning.questions" />
+		</label>
+	</div>
+	
+	<div class="checkbox">
+		<label for="shuffle-items">
+			<html:checkbox property="scratchie.shuffleItems" styleId="shuffle-items"/>
+			<fmt:message key="label.authoring.advanced.shuffle.items" />
 		</label>
 	</div>
 	
@@ -44,8 +51,7 @@
 </lams:SimplePanel>
 
 <script type="text/javascript">
-<!--
-//automatically turn on refect option if there are text input in refect instruction area
+	//automatically turn on refect option if there are text input in refect instruction area
 	var ra = document.getElementById("reflectInstructions");
 	var rao = document.getElementById("reflectOn");
 	function turnOnRefect(){
@@ -57,7 +63,18 @@
 			rao.checked = true;		
 		}
 	}
-
 	ra.onkeyup=turnOnRefect;
-//-->
+	
+	//disable #shuffle-items when burning questions option is ON
+	$("#burning-questions-enabled").click(function() {
+		var isBurningQuestionsOn = $("#burning-questions-enabled").is(":checked");
+	
+		$("#shuffle-items").prop("disabled", isBurningQuestionsOn);
+		if (isBurningQuestionsOn) {
+			$("#shuffle-items").prop("checked", false);
+		}
+	});
+	
+	<c:if test="${formBean.scratchie.burningQuestionsEnabled}">$("#shuffle-items").prop("disabled", true);</c:if>
+	
 </script>
