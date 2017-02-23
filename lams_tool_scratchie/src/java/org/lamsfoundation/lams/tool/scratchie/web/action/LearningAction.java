@@ -26,6 +26,7 @@ package org.lamsfoundation.lams.tool.scratchie.web.action;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -251,6 +252,14 @@ public class LearningAction extends Action {
 
 	// set scratched flag for display purpose
 	Collection<ScratchieItem> items = service.getItemsWithIndicatedScratches(toolSessionId);
+	
+	// shuffling items
+	if (scratchie.isShuffleItems()) {
+	    //items is a Set at this moment
+	    ArrayList<ScratchieItem> shuffledItems = new ArrayList<ScratchieItem>(items);
+	    Collections.shuffle(shuffledItems);
+	    items = shuffledItems;
+	}
 
 	// for teacher in monitoring display the number of attempt.
 	if (mode.isTeacher()) {

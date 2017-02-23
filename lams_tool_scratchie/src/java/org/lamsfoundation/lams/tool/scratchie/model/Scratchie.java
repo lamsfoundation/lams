@@ -69,6 +69,8 @@ public class Scratchie implements Cloneable {
 
     private boolean burningQuestionsEnabled;
     
+    private boolean shuffleItems;
+    
     private int timeLimit;
 
     private boolean reflectOnActivity;
@@ -343,6 +345,18 @@ public class Scratchie implements Cloneable {
     public void setBurningQuestionsEnabled(boolean burningQuestionsEnabled) {
 	this.burningQuestionsEnabled = burningQuestionsEnabled;
     }
+    
+    /**
+    *
+    * @return
+    */
+   public boolean isShuffleItems() {
+	return shuffleItems;
+   }
+
+   public void setShuffleItems(boolean shuffleItems) {
+	this.shuffleItems = shuffleItems;
+   }
     
     /**
      * @return Returns the time limitation, that students have to complete an attempt.
