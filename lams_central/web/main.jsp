@@ -6,7 +6,6 @@
 <%@ taglib uri="tags-core" prefix="c"%>
 <%@ taglib uri="tags-function" prefix="fn"%>
 <%@ taglib uri="tags-tiles" prefix="tiles" %>
-<c:set var="lastVisitedOrganisationId"><lams:user property="lastVisitedOrganisationId"/></c:set>
 
 <!DOCTYPE html>
 <lams:html>
@@ -91,7 +90,7 @@
 				<fmt:message key="label.mark.org.favorite" var="MARK_ORG_FAVORITE_VAR"/>
 				MARK_ORG_FAVORITE : '<c:out value="${MARK_ORG_FAVORITE_VAR}" />'
 			},
-			activeOrgId = <c:choose><c:when test="${empty lastVisitedOrganisationId}">null</c:when><c:otherwise>${lastVisitedOrganisationId}</c:otherwise></c:choose>;
+			activeOrgId = <c:choose><c:when test="${empty activeOrgId}">null</c:when><c:otherwise>${activeOrgId}</c:otherwise></c:choose>;
 
 		$(document).ready(function(){
 			<%-- If it's the user's first login, display a dialog asking if tutorial videos should be shown --%>
@@ -138,7 +137,7 @@
 
 	</script>
 </lams:head>
-<body <c:if test="${not empty lastVisitedOrganisationId}">class="offcanvas-hidden"</c:if>>
+<body <c:if test="${not empty activeOrgId}">class="offcanvas-hidden"</c:if>>
 
 <!-- Offcanvas Bar -->
     <nav id="offcanvas" role="navigation">
