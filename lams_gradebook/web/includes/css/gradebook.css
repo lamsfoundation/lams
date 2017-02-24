@@ -1,13 +1,16 @@
 #select-lessons-area {
 	display: none;
-	padding-top: 10px;
 }
 
 #export-selected-lessons-button {
-	margin-left: 200px;
+	margin-left: 295px;
 	margin-bottom: 10px;
 }
 
 #gbox_lessons-jqgrid {
-    margin: 15px auto 25px auto;
+	margin: 10px 5px;
+}
+
+.ui-widget-content {
+    border: 0px solid #aaaaaa !important;
 }

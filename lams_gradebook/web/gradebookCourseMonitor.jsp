@@ -366,7 +366,7 @@
 				colNames:['Id', '<fmt:message key="gradebook.columntitle.lessonName"/>'],
 				colModel:[
 					{name:'id',index:'id', width:35, sorttype:"int", hidden:true},
-				   	{name:'rowName',index:'rowName', width:225, firstsortorder:'desc', sorttype: 'text'}
+				   	{name:'rowName',index:'rowName', width:325, firstsortorder:'desc', sorttype: 'text'}
 				],
 				rowNum: 10000,
 				sortname: 'id',
@@ -424,7 +424,6 @@
 			$("#select-lessons-area").toggle("slow");
 			return false;
 		}
-
 		
 	</script>
 
@@ -436,41 +435,41 @@
 
 		<a target="_blank" class="btn btn-sm btn-default pull-right" title="<fmt:message key='button.help.tooltip'/>"
 		   href="http://wiki.lamsfoundation.org/display/lamsdocs/Gradebook+Course+Monitor">
-		<i class="fa fa-question-circle"></i> <span class="hidden-xs"><fmt:message key="button.help"/></span></a>
+			<i class="fa fa-question-circle"></i> <span class="hidden-xs"><fmt:message key="button.help"/></span>
+		</a>
 
-		<h4><fmt:message key="gradebook.title.courseMonitor">
-					<fmt:param>
-						<c:out value="${organisationName}" escapeXml="true"/>
-					</fmt:param>
-				</fmt:message>
-			</h4>
+		<h4>
+			<fmt:message key="gradebook.title.courseMonitor">
+				<fmt:param>
+					<c:out value="${organisationName}" escapeXml="true"/>
+				</fmt:param>
+			</fmt:message>
+		</h4>
 			
 			<div id="export-link-area">
-				<a href="#nogo" id="export-course-button">
-					<fmt:message key="gradebook.export.excel.1" />
-				</a> 
-				<fmt:message key="gradebook.export.excel.2" />
+				<a href="#nogo" id="export-course-button" class="btn btn-xs btn-default">
+					<fmt:message key="gradebook.export.excel" />
+				</a>
 			</div>
 			
-			<div>
-				<a href="#nogo" onclick="return openSelectLessonsArea();" >
-					<fmt:message key="label.select" />
+			<div class="voffset5">
+				<a class="btn btn-xs btn-default" href="#nogo" onclick="return openSelectLessonsArea();" >
+					<fmt:message key="label.select.lessons.to.export" />
 				</a>
-				<fmt:message key="label.lessons.to.export" />
 			</div>
 			
 			<div id="select-lessons-area" >
 				<table id="lessons-jqgrid" style="text-align: center;"></table>
 				
-				<input class="button" type="button" value="<fmt:message key="label.button.export"/>" id="export-selected-lessons-button" />			
+				<input class="btn btn-sm btn-default" type="button" value="<fmt:message key="label.button.export"/>" id="export-selected-lessons-button" />			
 			</div>
 
 			<div id="datesNotShown"  style="display:none">
-				<a class="pull-right label label-primary" href="javascript:toggleLessonDates()"><fmt:message key="gradebook.monitor.show.dates" /></a><br>
+				<a class="pull-right label label-default" href="javascript:toggleLessonDates()"><fmt:message key="gradebook.monitor.show.dates" /></a>
 			</div>
 
 			<div id="datesShown">
-				<a class="pull-right label label-primary" href="javascript:toggleLessonDates()"><fmt:message key="gradebook.monitor.hide.dates" /></a><br>
+				<a class="pull-right label label-default" href="javascript:toggleLessonDates()"><fmt:message key="gradebook.monitor.hide.dates" /></a>
 			</div>			
 					
 			<div class="grid-holder voffset20">
