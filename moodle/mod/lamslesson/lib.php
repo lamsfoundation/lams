@@ -132,23 +132,66 @@ function lamslesson_update_instance($lamslesson) {
 /**
  * Given an ID of an instance of this module,
  * this function will permanently delete the instance
- * and any data that depends on it.
+ * and any data that depends on it. Besides, it will also delete lesson from the LAMS server.
  *
  * @param int $id Id of the module instance
  * @return boolean Success/Failure
  */
 function lamslesson_delete_instance($id) {
-    global $DB;
+    global $USER, $DB;
 
     if (! $lamslesson = $DB->get_record('lamslesson', array('id' => $id))) {
         return false;
     }
+    
+    $lsId = $lamslesson->lesson_id;
 
     # Delete any dependent records here #
-
     $DB->delete_records('lamslesson', array('id' => $lamslesson->id));
+    
+    // delete the lesson from LAMS server
+    lamslesson_delete_lesson($USER->username, $lsId);
 
     return true;
+}
+
+/**
+ * Remove lesson from LAMS server.
+ *
+ * @param string $username The username of the user. Set this to "" if you would just like the currently logged in user to delete the lesson
+ * @param int $lsId The id of the lesson that should be deleted
+ * @return boolean whether lesson was successfully deleted or not
+ */
+function lamslesson_delete_lesson($username,$lsId) {
+
+  global $CFG, $USER;
+  if (!isset($CFG->lamslesson_serverid, $CFG->lamslesson_serverkey) || $CFG->lamslesson_serverid == "") {
+    print_error(get_string('notsetup', 'lamslesson'));
+    return NULL;
+  }
+
+  $datetime = lamslesson_get_datetime();
+  if(!isset($username)){
+    $username = $USER->username;
+  }
+  $plaintext = $datetime.$username.$CFG->lamslesson_serverid.$CFG->lamslesson_serverkey;
+  $hashvalue = sha1(strtolower($plaintext));
+
+  $request = "$CFG->lamslesson_serverurl" . LAMSLESSON_LESSON_MANAGER;
+
+  $load = array('method'	=>	'removeLesson',
+		'serverId'	=>	$CFG->lamslesson_serverid,
+		'datetime'	=>	$datetime,
+		'hashValue'	=>	$hashvalue,
+		'username'	=>	$username,
+		'lsId'		=>	$lsId);
+
+  // GET call to LAMS
+  $xml = lamslesson_http_call_post($request, $load);
+
+  $xml_array = xmlize($xml);
+  $deleted = $xml_array['Lesson']['@']['deleted'];
+  return $deleted;
 }
 
 /**
