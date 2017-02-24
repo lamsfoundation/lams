@@ -11,14 +11,14 @@ function blockExportButton(areaToBlock, exportExcelUrl, labelWait) {
 		fadeIn:  0, 
 		css: { 
 			border: 'none', 
-		    padding: $('#' + areaToBlock).height()/2 + 'px', 
+		    padding: '20px', 
 		    backgroundColor: '#000', 
 		    '-webkit-border-radius': '10px', 
 		    '-moz-border-radius': '10px', 
 		    opacity: .98 
 		},
 		overlayCSS: {
-			opacity: 0
+			opacity: 0.3
 		}
 	});
 		    

@@ -488,28 +488,30 @@
 				</fmt:message></h4>
 			
 			<div id="marksNotReleased" style="display:none">
-				<a href="javascript:toggleRelease()"><fmt:message key="gradebook.monitor.releasemarks.1" /></a> <fmt:message key="gradebook.monitor.releasemarks.3" /><br />
+				<a href="javascript:toggleRelease()" class="btn btn-xs btn-default">
+					<fmt:message key="gradebook.monitor.releasemarks.1" />&nbsp;<fmt:message key="gradebook.monitor.releasemarks.3" />
+				</a>
 			</div>
 			
 			<div id="marksReleased" style="display:none">
-				<a href="javascript:toggleRelease()"><fmt:message key="gradebook.monitor.releasemarks.2" /></a> <fmt:message key="gradebook.monitor.releasemarks.3" /><br />
+				<a href="javascript:toggleRelease()" class="btn btn-xs btn-default">
+					<fmt:message key="gradebook.monitor.releasemarks.2" />&nbsp;<fmt:message key="gradebook.monitor.releasemarks.3" />
+				</a> 
 			</div>
 
-			<div id="export-link-area">
-				<a href="#nogo" id="export-grades-button">
-					<fmt:message key="gradebook.export.excel.1" />
+			<div id="export-link-area" class="voffset5">
+				<a href="#nogo" id="export-grades-button" class="btn btn-xs btn-default">
+					<fmt:message key="gradebook.export.excel" />
 				</a> 
-				<fmt:message key="gradebook.export.excel.2" />
 			</div>
 			
-			<div id="datesNotShown"  style="display:none">
-				<a class="pull-right label label-primary" href="javascript:toggleLessonDates()"><fmt:message key="gradebook.monitor.show.dates" /></a><br>
+			<div id="datesNotShown" style="display:none">
+				<a class="pull-right label label-default" href="javascript:toggleLessonDates()"><fmt:message key="gradebook.monitor.show.dates" /></a>
 			</div>
 
 			<div id="datesShown">
-				<a class="pull-right label label-primary" href="javascript:toggleLessonDates()"><fmt:message key="gradebook.monitor.hide.dates" /></a><br>
+				<a class="pull-right label label-default" href="javascript:toggleLessonDates()"><fmt:message key="gradebook.monitor.hide.dates" /></a>
 			</div>
-			
 
 			<div class="grid-holder voffset20">
 				<table id="userView" class="scroll" ></table>
