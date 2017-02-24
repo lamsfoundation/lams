@@ -1,6 +1,6 @@
 $(document).ready(function () {
 	
-	// open active course. in case active course is not yet chosen by user, it will be opened after tablesorter's pager receives all orgs
+	// Open active course. If it's not yet chosen by user - it will be opened once tablesorter's pager receives all orgs
 	if (activeOrgId != null) {
 		loadOrganisation();
 	}
@@ -140,7 +140,15 @@ function loadOrganisation() {
 			//in case of any server error - open offcanvas bar so user can select another course
 			if ( status == "error" ) {
 				$("body").removeClass("offcanvas-hidden");
-			}			
+				return;
+			}
+			
+			// if screen is smaller than 768px (i.e. offcanvas occupies 100%) and offcanvas is shown - then hide it on user selecting an organisation
+			if (window.matchMedia('(max-width: 768px)').matches && !$("body").hasClass("offcanvas-hidden")) {
+				//do it with a small delay so it will be understood that the new organisation is selected indeed
+				$("body").addClass('offcanvas-hidden', 300);
+			}
+			
 		}
 	);
 }
