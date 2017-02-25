@@ -204,10 +204,11 @@ function tb_show(caption, url, imageGroup) {//function called when the user clic
 					$("#TB_load").remove();
 					$("#TB_window").css({display:"block"}); 
 				}else if(url.indexOf('TB_iframe') != -1){
-					if($.browser.safari){//safari needs help because it will not fire iframe onload
-						$("#TB_load").remove();
-						$("#TB_window").css({display:"block"});
-					}
+					//*LAMS* commented out by LAMS to prevent exception on accessing $.browser which is null
+					//if($.browser.safari){//safari needs help because it will not fire iframe onload
+					//	$("#TB_load").remove();
+					//	$("#TB_window").css({display:"block"});
+					//}
 				}else{
 					$("#TB_ajaxContent").load(url += "&random=" + (new Date().getTime()),function(){//to do a post change this load method
 						$("#TB_load").remove();
@@ -219,7 +220,8 @@ function tb_show(caption, url, imageGroup) {//function called when the user clic
 		}
 
 		if(!params['modal']){
-			document.onkeyup = function(e){ 	
+			
+			document.onkeyup = function(e){
 				if (e == null) { // ie
 					keycode = event.keyCode;
 				} else { // mozilla
