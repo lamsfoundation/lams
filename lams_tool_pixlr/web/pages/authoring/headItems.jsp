@@ -8,3 +8,4 @@
 
 <script type="text/javascript" src="${tool}includes/javascript/authoring.js"></script>
 <script type="text/javascript" src="${tool}includes/javascript/common.js"></script>
+<script type="text/javascript" src="${lams}includes/javascript/upload.js"></script>
