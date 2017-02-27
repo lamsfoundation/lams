@@ -14,18 +14,34 @@
 		}
 			
 		function verifyAndSubmit() {
-			if (document.getElementById("UPLOAD_FILE").value.length == 0) {
+			debugger;
+			var filename = document.getElementById("UPLOAD_FILE").value;
+			if (filename.length == 0) {
 				var msg = "<fmt:message key="button.select.importfile"/>";
 				alert(msg);
 				return (false);
 			} else {
-    	    	var options = { 
-	    	    	target:  parent.jQuery('#questionListArea'), 
-	    		   	success: afterRatingSubmit  // post-submit callback
-	    		}; 				
-		    		    				
-	    		$('#importForm').ajaxSubmit(options);
+				if ( filename ) {
+					var msg = '<fmt:message key="error.import.file.format"/>';
+					var extname = filename.substr((~-filename.lastIndexOf(".") >>> 0) + 2);
+					if ( extname.length == 0) {
+						alert(msg);
+						return (false);
+					} else {
+						extname = extname.toUpperCase();
+						if ( "XML" != extname) {
+							alert(msg);
+							return (false);
+						}
+					}
+				}
+				
 			}
+			var options = { 
+	    	   	target:  parent.jQuery('#questionListArea'), 
+	    	   	success: afterRatingSubmit  // post-submit callback
+	    	}; 							
+    		$('#importForm').ajaxSubmit(options);
 		}
 		// post-submit callback 
    		function afterRatingSubmit(responseText, statusText) { 
@@ -52,16 +68,15 @@
 			</p>
 				
 			<form action="<c:url value="/authoring/importQuestions.do"/>?sessionMapID=${sessionMapID}" method="post" enctype="multipart/form-data" id="importForm">	
-				<div class="form-group">
-				    <label for="UPLOAD_FILE">
-				    	<fmt:message key="label.import.file" />
-				    </label>
-					<input type="file" name="UPLOAD_FILE" id="UPLOAD_FILE"/>
-				</div>
+				<input type="file" name="UPLOAD_FILE" id="UPLOAD_FILE"/>
 						
-				<a href="#nogo" class="btn btn-primary pull-right" onclick="javascript:verifyAndSubmit();">
-					<fmt:message key="button.import" />
-				</a>
+				<div class="voffset10" id="buttonsDiv">
+					<input class="btn btn-sm btn-default" value='<fmt:message key="label.authoring.cancel.button"/>' type="button"
+						onClick="javascript:self.parent.tb_remove();" />
+					<a href="#nogo" class="btn btn-sm btn-primary" onclick="javascript:verifyAndSubmit();">
+						<i class="fa fa-sm fa-upload"></i>&nbsp;<fmt:message key="button.import" />
+					</a>
+				</div>
 			</form>
 
 		</div>
