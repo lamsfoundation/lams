@@ -14,12 +14,7 @@
 <c:if test="${sessionMap.allowUpload}">
 	<div class="form-group">
 		<label><fmt:message key="message.label.attachment" /></label><BR/>
-		<html:file tabindex="3" property="attachmentFile" /><BR/>
-		<p class="help-block">
-			<fmt:message key="label.upload.info">
-				<fmt:param>${sessionMap.uploadMaxFileSize}</fmt:param>
-			</fmt:message>
-		</p>
+		<lams:FileUpload fileFieldname="attachmentFile" maxFileSize="${sessionMap.uploadMaxFileSize}" tabindex="3" />
 		<html:errors property="message.attachment" />
 	</div>
 </c:if>

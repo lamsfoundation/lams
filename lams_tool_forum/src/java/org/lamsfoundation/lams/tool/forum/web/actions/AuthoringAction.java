@@ -72,9 +72,6 @@ import org.lamsfoundation.lams.tool.forum.web.forms.ForumForm;
 import org.lamsfoundation.lams.tool.forum.web.forms.ForumPedagogicalPlannerForm;
 import org.lamsfoundation.lams.tool.forum.web.forms.MessageForm;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
-import org.lamsfoundation.lams.util.Configuration;
-import org.lamsfoundation.lams.util.ConfigurationKeys;
-import org.lamsfoundation.lams.util.FileValidatorUtil;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
@@ -188,9 +185,6 @@ public class AuthoringAction extends Action {
 	forumForm.setSessionMapID(sessionMap.getSessionID());
 	forumForm.setContentFolderID(contentFolderID);
 	sessionMap.put(AttributeNames.PARAM_CONTENT_FOLDER_ID, contentFolderID);
-
-	sessionMap.put(ForumConstants.ATTR_UPLOAD_MAX_FILE_SIZE, 
-		FileValidatorUtil.formatSize(Configuration.getAsInt(ConfigurationKeys.UPLOAD_FILE_LARGE_MAX_SIZE)));
 
 	// get back the topic list and display them on page
 	forumService = getForumManager();

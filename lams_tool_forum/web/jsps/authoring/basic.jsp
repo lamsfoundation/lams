@@ -1,4 +1,9 @@
 <%@ include file="/common/taglibs.jsp"%>
+<%@ page import="org.lamsfoundation.lams.util.Configuration" %>
+<%@ page import="org.lamsfoundation.lams.util.ConfigurationKeys" %>
+<c:set var="UPLOAD_FILE_MAX_SIZE"><%=Configuration.get(ConfigurationKeys.UPLOAD_FILE_LARGE_MAX_SIZE)%></c:set>
+<c:set var="EXE_FILE_TYPES"><%=Configuration.get(ConfigurationKeys.EXE_EXTENSIONS)%></c:set>
+
 <c:set var="formBean" value="<%=request.getAttribute(org.apache.struts.taglib.html.Constants.BEAN_KEY)%>" />
 
 <!--  Basic Tab Content -->
@@ -115,6 +120,19 @@
 				CKEDITOR.instances[instance].updateElement();
 		}
 
+		var LABEL_MAX_FILE_SIZE = '<fmt:message key="errors.maxfilesize"><param>{0}</param></fmt:message>';
+		var LABEL_NOT_ALLOWED_FORMAT = '<fmt:message key="error.attachment.executable"/>';	
+
+		var fileSelect = document.getElementById('attachmentFile');
+		// Get the selected files from the input.
+		var files = fileSelect.files;
+		if (files.length > 0) {
+			var file = files[0];
+			if ( ! validateShowErrorNotExecutable(file, LABEL_NOT_ALLOWED_FORMAT, false, '${EXE_FILE_TYPES}') || ! validateShowErrorFileSize(file, '${UPLOAD_FILE_MAX_SIZE}', LABEL_MAX_FILE_SIZE, false) )
+				return false;
+		}
+
+		showBusy("itemAttachmentArea");
 		var formData = new FormData(document.getElementById("topicFormId"));
 	    $.ajax({ // create an AJAX call...
 			data: formData, 
@@ -123,7 +141,8 @@
            	type: $("#topicFormId").attr('method'),
 			url: $("#topicFormId").attr('action'),
 			success: function(data) {
-               $('#messageArea').html(data);
+               	$('#messageArea').html(data);
+	       		hideBusy("itemAttachmentArea");
 			}
 	    });
 	}   
@@ -143,6 +162,8 @@
 	<c:set var="sessionMapID" value="${formBean.sessionMapID}" />
 	<%@ include file="/jsps/authoring/message/topiclist.jsp"%>
 </div>
+
+<lams:WaitingSpinner id="messageListArea_Busy"/>
 
 <div class="form-inline">
 	<a href="javascript:showMessage('<html:rewrite page="/authoring/newTopic.do?sessionMapID=${formBean.sessionMapID}"/>');" id="addTopic" 

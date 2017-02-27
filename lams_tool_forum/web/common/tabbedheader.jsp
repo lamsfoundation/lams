@@ -29,5 +29,6 @@
 <script type="text/javascript" src="${lams}includes/javascript/jquery.tablesorter-pager.js"></script> 
 <script type="text/javascript" src="${lams}includes/javascript/bootstrap.min.js"></script>
 <script type="text/javascript" src="${lams}includes/javascript/bootstrap.tabcontroller.js"></script>
+<script type="text/javascript" src="${lams}includes/javascript/upload.js"></script>
 <script type="text/javascript" src="${tool}includes/javascript/message.js"></script>
 

@@ -13,16 +13,11 @@
 <c:if test="${sessionMap.allowUpload}">
 
 	<div class="form-group">
-		<label><fmt:message key="message.label.attachment" />&nbsp;</label>
-		<html:file tabindex="3" property="attachmentFile" />
-
-		<p class="help-block">
-			<fmt:message key="label.upload.info">
-				<fmt:param>${sessionMap.uploadMaxFileSize}</fmt:param>
-			</fmt:message>
-		</p>
-		<html:errors property="message.attachment" />
+ 		<lams:FileUpload fileFieldname="attachmentFile" maxFileSize="${sessionMap.uploadMaxFileSize}" tabindex="3" />
+ 		<html:errors property="message.attachment" />
 	</div>
+	
+	<lams:WaitingSpinner id="itemAttachmentArea_Busy"/>
 </c:if>
 
 <div class="btn-group-xs voffset5 pull-right">

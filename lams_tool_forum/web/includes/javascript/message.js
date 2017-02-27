@@ -30,13 +30,16 @@
 	}
 
 	function showBusy(targetDiv){
-		if($(targetDiv+"_Busy") != null){
-			$(targetDiv+"_Busy").show();
+		var div = document.getElementById(targetDiv+"_Busy");
+		if(div != null){
+			document.getElementById(targetDiv+"_Busy").style.display = '';
 		}
 	}
+
 	function hideBusy(targetDiv){
-		if($(targetDiv+"_Busy") != null){
-			$(targetDiv+"_Busy").hide();
+		var div = document.getElementById(targetDiv+"_Busy");
+		if(div != null){
+			document.getElementById(targetDiv+"_Busy").style.display = 'none';
 		}				
 	}
 	
