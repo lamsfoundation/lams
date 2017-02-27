@@ -1,5 +1,3 @@
-
- 
 INSERT INTO lams_tool
 (
 tool_signature,
@@ -8,8 +6,6 @@ tool_display_name,
 description,
 tool_identifier,
 tool_version,
-learning_library_id,
-default_tool_content_id,
 valid_flag,
 grouping_support_type_id,
 supports_run_offline_flag,
@@ -34,8 +30,6 @@ VALUES
 'Kaltura',
 'kaltura',
 '@tool_version@',
-NULL,
-NULL,
 0,
 2,
 1,
