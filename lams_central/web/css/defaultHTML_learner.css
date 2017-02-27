@@ -425,6 +425,13 @@ nav.navbar-heading {
     font-size:90%;
     line-height: 1.2;
   }
+  
+  .file-input-name {
+  	height: 25px; /* match height of btn */
+    padding:4px 9px;
+    font-size:90%;
+    line-height: 1.2;		
+  }
 }
 
 
