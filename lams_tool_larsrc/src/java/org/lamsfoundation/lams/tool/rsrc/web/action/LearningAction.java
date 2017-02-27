@@ -48,6 +48,7 @@ import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.apache.struts.action.ActionMessage;
 import org.apache.struts.action.ActionMessages;
+import org.apache.struts.action.ActionRedirect;
 import org.lamsfoundation.lams.learning.web.bean.ActivityPositionDTO;
 import org.lamsfoundation.lams.learning.web.util.LearningWebUtil;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
@@ -134,17 +135,13 @@ public class LearningAction extends Action {
     }
 
     /**
-     * Read resource data from database and put them into HttpSession. It will redirect to init.do directly after this
-     * method run successfully.
-     *
-     * This method will avoid read database again and lost un-saved resouce item lost when user "refresh page",
      *
      */
     private ActionForward start(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) {
 
 	// initial Session Map
-	SessionMap sessionMap = new SessionMap();
+	SessionMap<String, Object> sessionMap = new SessionMap<String, Object>();
 	request.getSession().setAttribute(sessionMap.getSessionID(), sessionMap);
 
 	// save toolContentID into HTTPSession
@@ -178,6 +175,7 @@ public class LearningAction extends Action {
 
 	// check whether there is only one resource item and run auto flag is true or not.
 	boolean runAuto = false;
+	Long runAutoItemUid = null;
 	int itemsNumber = 0;
 	if (resource.getResourceItems() != null) {
 	    itemsNumber = resource.getResourceItems().size();
@@ -186,7 +184,7 @@ public class LearningAction extends Action {
 		// only visible item can be run auto.
 		if (!item.isHide()) {
 		    runAuto = true;
-		    request.setAttribute(ResourceConstants.ATTR_RESOURCE_ITEM_UID, item.getUid());
+		    runAutoItemUid = item.getUid();
 		}
 	    }
 	}
@@ -254,7 +252,17 @@ public class LearningAction extends Action {
 	}
 	sessionMap.put(ResourceConstants.ATTR_RESOURCE, resource);
 
-	return mapping.findForward(ResourceConstants.SUCCESS);
+	if (runAuto) {
+	    ActionRedirect redirect = new ActionRedirect(mapping.findForwardConfig("viewItem"));
+	    redirect.addParameter(ResourceConstants.ATTR_SESSION_MAP_ID, sessionMap.getSessionID());
+	    redirect.addParameter(ResourceConstants.ATTR_TOOL_SESSION_ID, sessionId);
+	    redirect.addParameter(ResourceConstants.ATTR_RESOURCE_ITEM_UID, runAutoItemUid);
+	    return redirect;
+	    
+	} else {
+	    return mapping.findForward(ResourceConstants.SUCCESS);
+	}
+	
     }
 
     /**
@@ -271,7 +279,7 @@ public class LearningAction extends Action {
 
 	// get back SessionMap
 	String sessionMapID = request.getParameter(ResourceConstants.ATTR_SESSION_MAP_ID);
-	SessionMap sessionMap = (SessionMap) request.getSession().getAttribute(sessionMapID);
+	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession().getAttribute(sessionMapID);
 
 	// get mode and ToolSessionID from sessionMAP
 	ToolAccessMode mode = (ToolAccessMode) sessionMap.get(AttributeNames.ATTR_MODE);
@@ -323,7 +331,7 @@ public class LearningAction extends Action {
 	    HttpServletResponse response) {
 	// get back SessionMap
 	String sessionMapID = request.getParameter(ResourceConstants.ATTR_SESSION_MAP_ID);
-	SessionMap sessionMap = (SessionMap) request.getSession().getAttribute(sessionMapID);
+	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession().getAttribute(sessionMapID);
 	request.setAttribute(ResourceConstants.ATTR_SESSION_MAP_ID, sessionMapID);
 
 	Long sessionId = (Long) sessionMap.get(ResourceConstants.ATTR_TOOL_SESSION_ID);
@@ -428,7 +436,7 @@ public class LearningAction extends Action {
 	// get the existing reflection entry
 	IResourceService submitFilesService = getResourceService();
 
-	SessionMap map = (SessionMap) request.getSession().getAttribute(sessionMapID);
+	SessionMap<String, Object> map = (SessionMap<String, Object>) request.getSession().getAttribute(sessionMapID);
 	Long toolSessionID = (Long) map.get(AttributeNames.PARAM_TOOL_SESSION_ID);
 	NotebookEntry entry = submitFilesService.getEntry(toolSessionID, CoreNotebookConstants.NOTEBOOK_TOOL,
 		ResourceConstants.TOOL_SIGNATURE, user.getUserID());
@@ -455,7 +463,7 @@ public class LearningAction extends Action {
 	Integer userId = refForm.getUserID();
 
 	String sessionMapID = WebUtil.readStrParam(request, ResourceConstants.ATTR_SESSION_MAP_ID);
-	SessionMap sessionMap = (SessionMap) request.getSession().getAttribute(sessionMapID);
+	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession().getAttribute(sessionMapID);
 	Long sessionId = (Long) sessionMap.get(AttributeNames.PARAM_TOOL_SESSION_ID);
 
 	IResourceService service = getResourceService();
@@ -482,7 +490,7 @@ public class LearningAction extends Action {
     // Private method
     // *************************************************************************************
     private boolean validateBeforeFinish(HttpServletRequest request, String sessionMapID) {
-	SessionMap sessionMap = (SessionMap) request.getSession().getAttribute(sessionMapID);
+	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession().getAttribute(sessionMapID);
 	Long sessionId = (Long) sessionMap.get(AttributeNames.PARAM_TOOL_SESSION_ID);
 
 	HttpSession ss = SessionManager.getSession();
@@ -518,7 +526,7 @@ public class LearningAction extends Action {
      * @param request
      * @return
      */
-    private SortedSet<ResourceItem> getResourceItemList(SessionMap sessionMap) {
+    private SortedSet<ResourceItem> getResourceItemList(SessionMap<String, Object> sessionMap) {
 	SortedSet<ResourceItem> list = (SortedSet<ResourceItem>) sessionMap
 		.get(ResourceConstants.ATTR_RESOURCE_ITEM_LIST);
 	if (list == null) {
@@ -653,7 +661,7 @@ public class LearningAction extends Action {
     private void doComplete(HttpServletRequest request) {
 	// get back sessionMap
 	String sessionMapID = request.getParameter(ResourceConstants.ATTR_SESSION_MAP_ID);
-	SessionMap sessionMap = (SessionMap) request.getSession().getAttribute(sessionMapID);
+	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession().getAttribute(sessionMapID);
 
 	Long resourceItemUid = new Long(request.getParameter(ResourceConstants.PARAM_RESOURCE_ITEM_UID));
 	IResourceService service = getResourceService();

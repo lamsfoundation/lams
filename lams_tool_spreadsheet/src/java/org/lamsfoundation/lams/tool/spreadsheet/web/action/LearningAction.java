@@ -32,6 +32,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
+import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.apache.struts.action.Action;
@@ -64,9 +65,7 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
 
 /**
  *
- * @author Steve.Ni
- *
- * @version $Revision$
+ * @author Andrey Balan
  */
 public class LearningAction extends Action {
 
@@ -80,9 +79,6 @@ public class LearningAction extends Action {
 	//-----------------------Spreadsheet Learner function ---------------------------
 	if (param.equals("start")) {
 	    return start(mapping, form, request, response);
-	}
-	if (param.equals("initPage")) {
-	    return initPage(mapping, form, request, response);
 	}
 	if (param.equals("saveUserSpreadsheet")) {
 	    return saveUserSpreadsheet(mapping, form, request, response);
@@ -104,17 +100,15 @@ public class LearningAction extends Action {
 
     /**
      * Read spreadsheet data from database and put them into HttpSession. It will redirect to init.do directly after
-     * this
-     * method run successfully.
+     * this method run successfully.
      * 
      * This method will avoid read database again and lost un-saved resouce item lost when user "refresh page",
-     * 
      */
     private ActionForward start(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) {
 
 	//initial Session Map 
-	SessionMap sessionMap = new SessionMap();
+	SessionMap<String, Object> sessionMap = new SessionMap<String, Object>();
 	request.getSession().setAttribute(sessionMap.getSessionID(), sessionMap);
 
 	//save toolContentID into HTTPSession
@@ -126,7 +120,7 @@ public class LearningAction extends Action {
 	request.setAttribute(AttributeNames.ATTR_MODE, mode);
 	request.setAttribute(AttributeNames.PARAM_TOOL_SESSION_ID, sessionId);
 
-//		get back the spreadsheet and item list and display them on page
+	//get back the spreadsheet and item list and display them on page
 	ISpreadsheetService service = getSpreadsheetService();
 	SpreadsheetUser spreadsheetUser = null;
 	if (mode != null && mode.isTeacher()) {
@@ -172,53 +166,24 @@ public class LearningAction extends Action {
 
 	//add define later support
 	if (spreadsheet.isDefineLater()) {
-	    return mapping.findForward("defineLater");
+	    return mapping.findForward(SpreadsheetConstants.DEFINE_LATER);
 	}
 
-	//set contentInUse flag to true!
-	spreadsheet.setContentInUse(true);
-	spreadsheet.setDefineLater(false);
-	service.saveOrUpdateSpreadsheet(spreadsheet);
-
-	ActivityPositionDTO activityPosition = LearningWebUtil.putActivityPositionInRequestByToolSessionId(sessionId,
-		request, getServlet().getServletContext());
-	sessionMap.put(AttributeNames.ATTR_ACTIVITY_POSITION, activityPosition);
-
-	sessionMap.put(SpreadsheetConstants.ATTR_RESOURCE, spreadsheet);
-
-	return mapping.findForward(SpreadsheetConstants.SUCCESS);
-    }
-
-    /**
-     * Display same entire authoring page content from HttpSession variable.
-     * 
-     * @param mapping
-     * @param form
-     * @param request
-     * @param response
-     * @return
-     * @throws ServletException
-     */
-    private ActionForward initPage(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws ServletException {
-	String sessionMapID = WebUtil.readStrParam(request, SpreadsheetConstants.ATTR_SESSION_MAP_ID);
-	SessionMap sessionMap = (SessionMap) request.getSession().getAttribute(sessionMapID);
-//		SpreadsheetForm existForm = (SpreadsheetForm) sessionMap.get(SpreadsheetConstants.ATTR_RESOURCE_FORM);
-
-	//get mode and ToolSessionID from sessionMAP
-	ToolAccessMode mode = getAccessMode(request);
-	Long sessionId = (Long) sessionMap.get(AttributeNames.PARAM_TOOL_SESSION_ID);
-	//load up learner changes in spreadsheet if such option is activated in spreadsheet
-	ISpreadsheetService service = getSpreadsheetService();
-	Spreadsheet spreadsheet = (Spreadsheet) sessionMap.get(SpreadsheetConstants.ATTR_RESOURCE);
-	SpreadsheetUser spreadsheetUser = getCurrentUser(service, sessionId);
+	//set contentInUse flag to true
+	if (!spreadsheet.isContentInUse()) {
+	    spreadsheet.setContentInUse(true);
+	    service.saveOrUpdateSpreadsheet(spreadsheet);
+	}
+	
+	String code;
 	if (spreadsheet.isLearnerAllowedToSave() && !mode.isTeacher()
 		&& (spreadsheetUser.getUserModifiedSpreadsheet() != null)) {
-	    spreadsheet.setCode(spreadsheetUser.getUserModifiedSpreadsheet().getUserModifiedSpreadsheet());
+	    code = spreadsheetUser.getUserModifiedSpreadsheet().getUserModifiedSpreadsheet();
+	} else {
+	    code = spreadsheet.getCode();
 	}
-
-	SpreadsheetForm spreadsheetForm = (SpreadsheetForm) form;
-	spreadsheetForm.setSpreadsheet(spreadsheet);
+	sessionMap.put(SpreadsheetConstants.ATTR_CODE, StringEscapeUtils.escapeHtml(code));
+	sessionMap.put(SpreadsheetConstants.ATTR_RESOURCE, spreadsheet);
 
 	if ((spreadsheetUser != null) && (spreadsheetUser.getUserModifiedSpreadsheet() != null)
 		&& (spreadsheetUser.getUserModifiedSpreadsheet().getMark() != null)
@@ -227,11 +192,11 @@ public class LearningAction extends Action {
 		    spreadsheetUser.getUserModifiedSpreadsheet().getMark());
 	}
 
-	if (mode.isAuthor()) {
-	    return mapping.findForward(SpreadsheetConstants.SUCCESS);
-	} else {
-	    return mapping.findForward(SpreadsheetConstants.DEFINE_LATER);
-	}
+	ActivityPositionDTO activityPosition = LearningWebUtil.putActivityPositionInRequestByToolSessionId(sessionId,
+		request, getServlet().getServletContext());
+	sessionMap.put(AttributeNames.ATTR_ACTIVITY_POSITION, activityPosition);
+
+	return mapping.findForward(SpreadsheetConstants.SUCCESS);
     }
 
     /**
@@ -248,7 +213,7 @@ public class LearningAction extends Action {
 
 	//get back SessionMap
 	String sessionMapID = request.getParameter(SpreadsheetConstants.ATTR_SESSION_MAP_ID);
-	SessionMap sessionMap = (SessionMap) request.getSession().getAttribute(sessionMapID);
+	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession().getAttribute(sessionMapID);
 
 	//get mode and ToolSessionID from sessionMAP
 	ToolAccessMode mode = (ToolAccessMode) sessionMap.get(AttributeNames.ATTR_MODE);
@@ -264,7 +229,7 @@ public class LearningAction extends Action {
 
 	    SpreadsheetUser spreadsheetUser = getCurrentUser(service, sessionId);
 	    UserModifiedSpreadsheet userModifiedSpreadsheet = new UserModifiedSpreadsheet();
-	    String code = ((SpreadsheetForm) form).getSpreadsheet().getCode();
+	    String code = WebUtil.readStrParam(request, SpreadsheetConstants.ATTR_CODE);
 	    userModifiedSpreadsheet.setUserModifiedSpreadsheet(code);
 	    spreadsheetUser.setUserModifiedSpreadsheet(userModifiedSpreadsheet);
 	    service.saveOrUpdateUser(spreadsheetUser);
@@ -277,7 +242,7 @@ public class LearningAction extends Action {
 	} else if ("continueReflect".equals(typeOfAction)) {
 	    conf = mapping.findForwardConfig("continueReflect");
 	} else {
-	    conf = mapping.findForwardConfig("initPage");
+	    conf = mapping.findForwardConfig("start");
 	}
 	ActionRedirect redirect = new ActionRedirect(conf);
 	redirect.addParameter(SpreadsheetConstants.ATTR_SESSION_MAP_ID, sessionMapID);
@@ -300,7 +265,7 @@ public class LearningAction extends Action {
 
 	//get back SessionMap
 	String sessionMapID = request.getParameter(SpreadsheetConstants.ATTR_SESSION_MAP_ID);
-	SessionMap sessionMap = (SessionMap) request.getSession().getAttribute(sessionMapID);
+	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession().getAttribute(sessionMapID);
 
 	//get mode and ToolSessionID from sessionMAP
 	Long sessionId = (Long) sessionMap.get(AttributeNames.PARAM_TOOL_SESSION_ID);
@@ -347,7 +312,7 @@ public class LearningAction extends Action {
 //		 get the existing reflection entry
 	ISpreadsheetService submitFilesService = getSpreadsheetService();
 
-	SessionMap sessionMap = (SessionMap) request.getSession().getAttribute(sessionMapID);
+	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession().getAttribute(sessionMapID);
 	Long toolSessionID = (Long) sessionMap.get(AttributeNames.PARAM_TOOL_SESSION_ID);
 	NotebookEntry entry = submitFilesService.getEntry(toolSessionID, CoreNotebookConstants.NOTEBOOK_TOOL,
 		SpreadsheetConstants.TOOL_SIGNATURE, user.getUserID());
@@ -374,7 +339,7 @@ public class LearningAction extends Action {
 	Integer userId = refForm.getUserID();
 
 	String sessionMapID = WebUtil.readStrParam(request, SpreadsheetConstants.ATTR_SESSION_MAP_ID);
-	SessionMap sessionMap = (SessionMap) request.getSession().getAttribute(sessionMapID);
+	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession().getAttribute(sessionMapID);
 	Long sessionId = (Long) sessionMap.get(AttributeNames.PARAM_TOOL_SESSION_ID);
 
 	ISpreadsheetService service = getSpreadsheetService();

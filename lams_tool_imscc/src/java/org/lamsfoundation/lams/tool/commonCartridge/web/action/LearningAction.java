@@ -44,6 +44,7 @@ import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.apache.struts.action.ActionMessage;
 import org.apache.struts.action.ActionMessages;
+import org.apache.struts.action.ActionRedirect;
 import org.lamsfoundation.lams.learning.web.bean.ActivityPositionDTO;
 import org.lamsfoundation.lams.learning.web.util.LearningWebUtil;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
@@ -59,6 +60,7 @@ import org.lamsfoundation.lams.tool.commonCartridge.service.ICommonCartridgeServ
 import org.lamsfoundation.lams.tool.commonCartridge.util.CommonCartridgeItemComparator;
 import org.lamsfoundation.lams.tool.commonCartridge.web.form.ReflectionForm;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
+import org.lamsfoundation.lams.util.CentralConstants;
 import org.lamsfoundation.lams.util.MessageService;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.session.SessionManager;
@@ -111,7 +113,7 @@ public class LearningAction extends Action {
 	    HttpServletResponse response) {
 
 	// initial Session Map
-	SessionMap sessionMap = new SessionMap();
+	SessionMap<String, Object> sessionMap = new SessionMap<String, Object>();
 	request.getSession().setAttribute(sessionMap.getSessionID(), sessionMap);
 
 	// save toolContentID into HTTPSession
@@ -145,6 +147,7 @@ public class LearningAction extends Action {
 
 	// check whether there is only one commonCartridge item and run auto flag is true or not.
 	boolean runAuto = false;
+	Long runAutoItemUid = null;
 	int itemsNumber = 0;
 	if (commonCartridge.getCommonCartridgeItems() != null) {
 	    itemsNumber = commonCartridge.getCommonCartridgeItems().size();
@@ -154,7 +157,7 @@ public class LearningAction extends Action {
 		// only visible item can be run auto.
 		if (!item.isHide()) {
 		    runAuto = true;
-		    request.setAttribute(CommonCartridgeConstants.ATTR_RESOURCE_ITEM_UID, item.getUid());
+		    runAutoItemUid = item.getUid();
 		}
 	    }
 	}
@@ -222,7 +225,17 @@ public class LearningAction extends Action {
 	}
 	sessionMap.put(CommonCartridgeConstants.ATTR_RESOURCE, commonCartridge);
 
-	return mapping.findForward(CommonCartridgeConstants.SUCCESS);
+	if (runAuto) {
+	    ActionRedirect redirect = new ActionRedirect(mapping.findForwardConfig("viewItem"));
+	    redirect.addParameter(CommonCartridgeConstants.ATTR_SESSION_MAP_ID, sessionMap.getSessionID());
+	    redirect.addParameter(CommonCartridgeConstants.ATTR_TOOL_SESSION_ID, sessionId);
+	    redirect.addParameter(CommonCartridgeConstants.ATTR_RESOURCE_ITEM_UID, runAutoItemUid);
+	    redirect.addParameter(CentralConstants.PARAM_MODE, mode.toString());
+	    return redirect;
+	    
+	} else {
+	    return mapping.findForward(CommonCartridgeConstants.SUCCESS);
+	}
     }
 
     /**
@@ -239,7 +252,7 @@ public class LearningAction extends Action {
 
 	// get back SessionMap
 	String sessionMapID = request.getParameter(CommonCartridgeConstants.ATTR_SESSION_MAP_ID);
-	SessionMap sessionMap = (SessionMap) request.getSession().getAttribute(sessionMapID);
+	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession().getAttribute(sessionMapID);
 
 	// get mode and ToolSessionID from sessionMAP
 	ToolAccessMode mode = (ToolAccessMode) sessionMap.get(AttributeNames.ATTR_MODE);
@@ -306,7 +319,7 @@ public class LearningAction extends Action {
 	// get the existing reflection entry
 	ICommonCartridgeService submitFilesService = getCommonCartridgeService();
 
-	SessionMap map = (SessionMap) request.getSession().getAttribute(sessionMapID);
+	SessionMap<String, Object> map = (SessionMap<String, Object>) request.getSession().getAttribute(sessionMapID);
 	Long toolSessionID = (Long) map.get(AttributeNames.PARAM_TOOL_SESSION_ID);
 	NotebookEntry entry = submitFilesService.getEntry(toolSessionID, CoreNotebookConstants.NOTEBOOK_TOOL,
 		CommonCartridgeConstants.TOOL_SIGNATURE, user.getUserID());
@@ -333,7 +346,7 @@ public class LearningAction extends Action {
 	Integer userId = refForm.getUserID();
 
 	String sessionMapID = WebUtil.readStrParam(request, CommonCartridgeConstants.ATTR_SESSION_MAP_ID);
-	SessionMap sessionMap = (SessionMap) request.getSession().getAttribute(sessionMapID);
+	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession().getAttribute(sessionMapID);
 	Long sessionId = (Long) sessionMap.get(AttributeNames.PARAM_TOOL_SESSION_ID);
 
 	ICommonCartridgeService service = getCommonCartridgeService();
@@ -360,7 +373,7 @@ public class LearningAction extends Action {
     // Private method
     // *************************************************************************************
     private boolean validateBeforeFinish(HttpServletRequest request, String sessionMapID) {
-	SessionMap sessionMap = (SessionMap) request.getSession().getAttribute(sessionMapID);
+	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession().getAttribute(sessionMapID);
 	Long sessionId = (Long) sessionMap.get(AttributeNames.PARAM_TOOL_SESSION_ID);
 
 	HttpSession ss = SessionManager.getSession();
@@ -410,7 +423,7 @@ public class LearningAction extends Action {
      * @param name
      * @return
      */
-    private List getListFromSession(SessionMap sessionMap, String name) {
+    private List getListFromSession(SessionMap<String, Object> sessionMap, String name) {
 	List list = (List) sessionMap.get(name);
 	if (list == null) {
 	    list = new ArrayList();
@@ -454,7 +467,7 @@ public class LearningAction extends Action {
     private void doComplete(HttpServletRequest request) {
 	// get back sessionMap
 	String sessionMapID = request.getParameter(CommonCartridgeConstants.ATTR_SESSION_MAP_ID);
-	SessionMap sessionMap = (SessionMap) request.getSession().getAttribute(sessionMapID);
+	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession().getAttribute(sessionMapID);
 
 	Long commonCartridgeItemUid = new Long(request.getParameter(CommonCartridgeConstants.PARAM_RESOURCE_ITEM_UID));
 	ICommonCartridgeService service = getCommonCartridgeService();

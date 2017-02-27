@@ -3,12 +3,12 @@
 <lams:head>
 	<%@ include file="/common/header.jsp"%>
 
-	<c:set var="initNavUrl"><c:url value="/pages/itemreview/initnav.jsp"/>?mode=${mode}&itemIndex=${itemIndex}&itemUid=${itemUid}&toolSessionID=${toolSessionID}&sessionMapID=${sessionMapID}</c:set>
+	<c:set var="nextInstructionUrl"><c:url value="/nextInstruction.do"/>?mode=${mode}&itemIndex=${itemIndex}&itemUid=${itemUid}&toolSessionID=${toolSessionID}&sessionMapID=${sessionMapID}</c:set>
 	<c:set var="sessionMap" value="${sessionScope[sessionMapID]}"/>
 		
 	<script type="text/javascript">
 		$(document).ready(function(){
-			$('#headerFrame').load('${initNavUrl}');
+			$('#headerFrame').load('${nextInstructionUrl}');
 		});
 		
 		function setIframeHeight() {

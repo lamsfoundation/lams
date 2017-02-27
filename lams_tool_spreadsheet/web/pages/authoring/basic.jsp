@@ -1,6 +1,6 @@
 <%@ include file="/common/taglibs.jsp"%>
 <c:set var="formBean" value="<%= request.getAttribute(org.apache.struts.taglib.html.Constants.BEAN_KEY) %>" />
-<html:hidden property="spreadsheet.code" styleId="spreadsheet.code"/>
+<html:hidden property="spreadsheet.code" styleId="spreadsheet-code"/>
 		
 <!-- Basic Tab Content -->
 <div class="form-group">

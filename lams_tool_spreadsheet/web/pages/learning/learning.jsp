@@ -1,50 +1,39 @@
 <!DOCTYPE html>
-
 <%@ include file="/common/taglibs.jsp"%>
+
+<c:set var="sessionMap" value="${sessionScope[sessionMapID]}" />
+<c:set var="mode" value="${sessionMap.mode}" />
+<c:set var="toolSessionID" value="${sessionMap.toolSessionID}" />
+<c:set var="spreadsheet" value="${sessionMap.spreadsheet}" />
+<c:set var="finishedLock" value="${sessionMap.finishedLock}" />
+<c:set var="language" value="${pageContext.response.locale.language}" />
 <%@ page import="org.lamsfoundation.lams.tool.spreadsheet.SpreadsheetConstants"%>
+
 <lams:html>
 <lams:head>
 	<title>
 		<fmt:message key="label.learning.title" />
 	</title>
 	<%@ include file="/common/header.jsp"%>
-
-	<%-- param has higher level for request attribute --%>
-	<c:if test="${not empty param.sessionMapID}">
-		<c:set var="sessionMapID" value="${param.sessionMapID}" />
-	</c:if>
-
-	<c:set var="sessionMap" value="${sessionScope[sessionMapID]}" />
-	<c:set var="mode" value="${sessionMap.mode}" />
-	<c:set var="toolSessionID" value="${sessionMap.toolSessionID}" />
-	<c:set var="spreadsheet" value="${sessionMap.spreadsheet}" />
-	<c:set var="finishedLock" value="${sessionMap.finishedLock}" />
-	<c:set var="language" value="${pageContext.response.locale.language}" />
 	
 	<script type="text/javascript">
-	<!--
 		function finishSession(){
 			document.getElementById("finishButton").disabled = true;
-        	//var url = '<c:url value="/learning/finish.do?sessionMapID=${sessionMapID}&toolSessionID=${toolSessionID}"/>';
         	saveUserSpreadsheet("finishSession");
 			return false;
 		}
 		
 		function continueReflect(){
-			//var url = '<c:url value="/learning/newReflection.do?sessionMapID=${sessionMapID}"/>';
 			saveUserSpreadsheet("continueReflect");
 		}
 		
 		//save changes made in spreadsheet
 		function saveUserSpreadsheet(typeOfAction){
 			var code = window.frames["externalSpreadsheet"].cellsToJS();
-			document.getElementById("spreadsheet.code").value = code;
-		
-			$("#learningForm").attr('action', '<c:url value="/learning/saveUserSpreadsheet.do?sessionMapID=${sessionMapID}&mode=${mode}&toolSessionID=${toolSessionID}&typeOfAction="/>' + typeOfAction);
-		    $("#learningForm").submit();
-		}
-		
-	-->        
+			code = encodeURIComponent(code);
+		    var url = '<c:url value="/learning/saveUserSpreadsheet.do"/>?sessionMapID=${sessionMapID}&mode=${mode}&toolSessionID=${toolSessionID}&typeOfAction=' + typeOfAction + '&code=' + code;
+		    location.href = url;
+		}  
     </script>
 </lams:head>
 <body class="stripes">
@@ -69,9 +58,7 @@
 			<c:out value="${spreadsheet.instructions}" escapeXml="false"/>
 		</p>
 
-		<html:form action="learning/saveUserSpreadsheet" method="post" styleId="learningForm" enctype="multipart/form-data">
-			<html:hidden property="spreadsheet.code" styleId="spreadsheet.code"/>	
-		</html:form>
+		<input type=hidden name="spreadsheetCode" id="spreadsheet-code" value="${sessionMap.code}"/>
 		<br>
 		
 		<c:if test="${spreadsheet.markingEnabled}">

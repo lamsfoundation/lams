@@ -202,7 +202,8 @@
 		<action path="/learning/start"
 			type="org.lamsfoundation.lams.tool.rsrc.web.action.LearningAction"
 			parameter="start" >
-			<forward name="success" path="/pages/learning/start.jsp" />
+			<forward name="success" path="/pages/learning/learning.jsp" />
+			<forward name="viewItem" path="/reviewItem.do" redirect="true"/>
 			<forward name="defineLater" path="/pages/learning/definelater.jsp" />	
 		</action>
 		<!-- <action path="/learning/completeItem"
