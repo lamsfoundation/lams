@@ -68,8 +68,6 @@ public class AuthoringAction extends Action {
 	    HttpServletResponse response) throws Exception {
 
 	String param = mapping.getParameter();
-	// -----------------------Peerreview Author function
-	// ---------------------------
 	if (param.equals("start")) {
 	    ToolAccessMode mode = getAccessMode(request);
 	    // teacher mode "check for new" button enter.
