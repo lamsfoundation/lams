@@ -14,7 +14,6 @@
 		}
 			
 		function verifyAndSubmit() {
-			debugger;
 			var filename = document.getElementById("UPLOAD_FILE").value;
 			if (filename.length == 0) {
 				var msg = "<fmt:message key="button.select.importfile"/>";
