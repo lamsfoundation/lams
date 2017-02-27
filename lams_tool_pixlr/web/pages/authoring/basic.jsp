@@ -50,10 +50,11 @@
 					</div>
 				</c:when>
 				<c:otherwise>
-					<label for="file">
-				    	<fmt:message key="label.authoring.basic.add.image"/>
-				    </label>
-					<input type="file" name="file" />
+				    <lams:FileUpload fileFieldname="file" fileInputMessageKey="label.authoring.basic.add.image" maxFileSize="${UPLOAD_FILE_MAX_SIZE_AS_USER_STRING}"/>
 				</c:otherwise>
 			</c:choose>
 </div>
+
+
+<lams:WaitingSpinner id="imageAttachmentDiv_Busy"/>
+
