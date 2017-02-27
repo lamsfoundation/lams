@@ -45,7 +45,7 @@
 				</lams:Alert>
 			</c:when>
 			<c:otherwise>
-			    <html:hidden property="spreadsheet.code" styleId="spreadsheet.code" value="${formBean.code}"/>	
+			    <html:hidden property="spreadsheetCode" styleId="spreadsheet-code" value="${formBean.code}"/>	
 				<iframe
 					id="externalSpreadsheet" name="externalSpreadsheet" src="${spreadsheetURL}"
 					style="width:99%" frameborder="no" height="385px"

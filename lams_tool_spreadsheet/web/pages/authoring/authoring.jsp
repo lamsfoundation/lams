@@ -30,9 +30,10 @@
         
     	function onSubmitHandler() {
         	var code = window.frames["externalSpreadsheet"].cellsToJS();
- 			document.getElementById("spreadsheet.code").value = code;
+ 			document.getElementById("spreadsheet-code").value = code;
          	return true;
     	}
+    	var spreadsheetCode = "${sessionMap.code}";
         
     </script>
 	<!-- ******************** END CK Editor related javascript & HTML ********************** -->

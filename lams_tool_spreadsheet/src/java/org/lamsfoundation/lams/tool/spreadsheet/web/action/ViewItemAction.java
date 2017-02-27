@@ -57,54 +57,6 @@ public class ViewItemAction extends Action {
 
 	return mapping.findForward(SpreadsheetConstants.ERROR);
     }
-//	/**
-//	 * Open url in popup window page.
-//	 * @param mapping
-//	 * @param form
-//	 * @param request
-//	 * @param response
-//	 * @return
-//	 */
-//	private ActionForward openUrlPopup(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) {
-//		String url = request.getParameter(SpreadsheetConstants.PARAM_OPEN_URL_POPUP);
-//		String title = request.getParameter(SpreadsheetConstants.PARAM_TITLE);
-//		request.setAttribute(SpreadsheetConstants.PARAM_OPEN_URL_POPUP,url);
-//		request.setAttribute(SpreadsheetConstants.PARAM_TITLE,title);
-//		return mapping.findForward(SpreadsheetConstants.SUCCESS);
-//	}
-//	/**
-//	 * Return next instrucion to page. It need four input parameters, mode, itemIndex or itemUid, and insIdx.
-//	 * @param mapping
-//	 * @param form
-//	 * @param request
-//	 * @param response
-//	 * @return
-//	 */
-//	private ActionForward nextInstruction(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) {
-//		String mode = request.getParameter(AttributeNames.ATTR_MODE);
-//
-//		String sessionMapID = WebUtil.readStrParam(request, SpreadsheetConstants.ATTR_SESSION_MAP_ID);
-//		SessionMap sesionMap = (SessionMap)request.getSession().getAttribute(sessionMapID);
-//
-//		int currIns = NumberUtils.stringToInt(request.getParameter(SpreadsheetConstants.PARAM_CURRENT_INSTRUCTION_INDEX),0);
-//
-//		//For Learner upload item, its instruction will display description/comment fields in ReosourceItem.
-//		if(!item.isCreateByAuthor()){
-//			List<SpreadsheetItemInstruction> navItems = new ArrayList<SpreadsheetItemInstruction>(1);
-//			//create a new instruction and put SpreadsheetItem description into it: just for display use.
-//			SpreadsheetItemInstruction ins = new SpreadsheetItemInstruction();
-//			ins.setSequenceId(1);
-//			ins.setDescription(item.getDescription());
-//			navItems.add(ins);
-//			navDto.setAllInstructions(navItems);
-//			instructions.add(ins);
-//		}else{
-//			navDto.setAllInstructions(new ArrayList(instructions));
-//		}
-//
-//		request.setAttribute(SpreadsheetConstants.ATTR_SESSION_MAP_ID,sessionMapID);
-//		return mapping.findForward(SpreadsheetConstants.SUCCESS);
-//	}
 
     /**
      * Display main frame to display instrcution and item content.

@@ -95,27 +95,19 @@
 		<!-- ========== BEGIN: Learning Definitions ============================== -->
 		<action path="/learning/start"
 			type="org.lamsfoundation.lams.tool.spreadsheet.web.action.LearningAction"
-			parameter="start">
-			<forward name="success" path="/pages/learning/start.jsp" />
-			<forward name="defineLater" path="/pages/learning/definelater.jsp" />		
-		</action>
-		<action path="/learning/init"
-			type="org.lamsfoundation.lams.tool.spreadsheet.web.action.LearningAction"
-			parameter="initPage"
-			name="spreadsheetForm" 
+			parameter="start"
 			validate="false" 
-			scope="request">			
+			scope="request">
 			<forward name="success" path="/pages/learning/learning.jsp" />
-			<forward name="definelater" path="/pages/learning/definelater.jsp" />			
+			<forward name="definelater" path="/pages/learning/definelater.jsp" />		
 		</action>
 		<action path="/learning/saveUserSpreadsheet"
 			type="org.lamsfoundation.lams.tool.spreadsheet.web.action.LearningAction"
-			parameter="saveUserSpreadsheet" 			
-			name="spreadsheetForm" 
+			parameter="saveUserSpreadsheet"
 			validate="false" 
 			input="/pages/learning/learning.jsp" 
 			scope="request">
-			<forward name="initPage" redirect="true" path="/learning/init.do" />
+			<forward name="start" redirect="true" path="/learning/start.do" />
 			<forward name="continueReflect" redirect="true" path="/learning/newReflection.do" />			
 			<forward name="finishSession" redirect="true" path="/learning/finish.do" />
 		</action>
