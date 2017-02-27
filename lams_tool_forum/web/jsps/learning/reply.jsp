@@ -22,8 +22,8 @@
     				CKEDITOR.instances[instance].updateElement();
     		}
     		
+			showBusy("itemAttachmentArea");
 			var formData = new FormData(this);
-			
 		    $.ajax({ // create an AJAX call...
 		        data: formData, 
 		        processData: false, // tell jQuery not to process the data
@@ -78,6 +78,7 @@
 		} // end validateForm()
 		else {
 			enableSubmitButton();
+			hideBusy("itemAttachmentArea");
 		}
 		return false;
 	});
@@ -103,10 +104,10 @@
 		<div class="panel-heading panel-title">
 			<fmt:message key="title.message.reply" />
 		</div>
-		<div class="panel-body">
+ 		<div class="panel-body">
 			<html:errors property="error" />
 			<%@ include file="/jsps/learning/message/topicreplyform.jsp"%>
-		</div>
+		</div> 
 	</div>
 	</div>
 </html:form>

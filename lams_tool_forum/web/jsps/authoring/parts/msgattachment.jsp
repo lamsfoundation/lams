@@ -1,4 +1,9 @@
 <%@ include file="/common/taglibs.jsp"%>
+<%@ page import="org.lamsfoundation.lams.util.Configuration" %>
+<%@ page import="org.lamsfoundation.lams.util.ConfigurationKeys" %>
+<%@ page import="org.lamsfoundation.lams.util.FileValidatorUtil" %>
+<c:set var="UPLOAD_FILE_MAX_SIZE_AS_USER_STRING"><%=FileValidatorUtil.formatSize(Configuration.getAsInt(ConfigurationKeys.UPLOAD_FILE_LARGE_MAX_SIZE))%></c:set>
+
 <c:set var="ctxPath" value="${pageContext.request.contextPath}"	scope="request" />
 <input type="hidden" name="hasAttachment" value="${itemAttachment.hasAttachment}" />
 <c:choose>
@@ -17,20 +22,14 @@
 				<a href="#" onclick="removeItemAttachment()" class="btn btn-default btn-xs"> 
 					<fmt:message key="label.delete" /> 
 				</a>
-				
-				<i class="fa fa-refresh fa-spin fa-2x fa-fw" style="display:none" id="conditionListArea_Busy" /></i>
-				
 			</li>
 		</ul>
 
 	</c:when>
 	<c:otherwise>
-		<input type="file" name="attachmentFile" class="form-control" />
-		<p class="help-block">
-			<fmt:message key="label.upload.info">
-				<fmt:param>${sessionMap.uploadMaxFileSize}</fmt:param>
-			</fmt:message>
-		</p>
-
+		<lams:FileUpload fileFieldname="attachmentFile" maxFileSize="${UPLOAD_FILE_MAX_SIZE_AS_USER_STRING}"/>
 	</c:otherwise>
 </c:choose>
+
+<lams:WaitingSpinner id="itemAttachmentArea_Busy"/>
+				

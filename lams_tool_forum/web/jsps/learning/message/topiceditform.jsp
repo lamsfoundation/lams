@@ -15,7 +15,7 @@
 	<c:set var="allowUpload" value="${sessionMap.allowUpload}" />
 
 	 <div class="form-group">
-    	<label><fmt:message key="message.label.attachment" />&nbsp;</label><i class="fa fa-refresh fa-spin fa-fw"  style="display:none" id="itemAttachmentArea_Busy"></i>
+    	<label><fmt:message key="message.label.attachment" />&nbsp;</label>
 		<div id="itemAttachmentArea">
 			<c:set var="ctxPath" value="${pageContext.request.contextPath}" scope="request"/>
 			<input type="hidden" name="hasAttachment" value="${topic.hasAttachment}"/>
@@ -33,10 +33,12 @@
 			</c:if>
 			
 			<c:if test="${not topic.hasAttachment && allowUpload}">
-				<input type="file" name="attachmentFile" size="55"  /> 
+				<lams:FileUpload fileFieldname="attachmentFile" maxFileSize="${sessionMap.uploadMaxFileSize}"/>
 			</c:if>
 		</div>
 	</div>		
+
+	<lams:WaitingSpinner id="itemAttachmentArea_Busy"/>
 </c:if>
 
 <div class="btn-group-xs voffset5 pull-right">

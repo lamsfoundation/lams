@@ -1,6 +1,10 @@
 <!DOCTYPE html>
-
 <%@ include file="/common/taglibs.jsp"%>
+<%@ page import="org.lamsfoundation.lams.util.Configuration" %>
+<%@ page import="org.lamsfoundation.lams.util.ConfigurationKeys" %>
+<%@ page import="org.lamsfoundation.lams.util.FileValidatorUtil" %>
+<c:set var="UPLOAD_FILE_MAX_SIZE_AS_USER_STRING"><%=FileValidatorUtil.formatSize(Configuration.getAsInt(ConfigurationKeys.UPLOAD_FILE_LARGE_MAX_SIZE))%></c:set>
+
 <lams:html>
 	<lams:head>
 		<%@ include file="/common/header.jsp"%>
@@ -37,13 +41,9 @@
 
 			<div class="form-group">
 				<label for="attachmentFile"><fmt:message key="message.label.attachment" /></label>
-				<html:file tabindex="3" property="attachmentFile" styleClass="form-control"/><BR>
-				<p class="help-block">
-					<fmt:message key="label.upload.info">
-						<fmt:param>${sessionMap.uploadMaxFileSize}</fmt:param>
-					</fmt:message>
-				</p>
+				<lams:FileUpload fileFieldname="attachmentFile" maxFileSize="${UPLOAD_FILE_MAX_SIZE_AS_USER_STRING}" tabindex="3" />
 				<html:errors property="message.attachment" />
+				<lams:WaitingSpinner id="itemAttachmentArea_Busy"/>
 			</div>
 
 			<div class="voffset5 pull-right">

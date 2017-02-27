@@ -13,7 +13,6 @@
 	});
 	
 	$('#editForm').submit(function() { // catch the form's submit event
-
 		disableSubmitButton();
 		if ( validateForm() ) {
 
@@ -22,6 +21,7 @@
     				CKEDITOR.instances[instance].updateElement();
     		}
     		
+			showBusy("itemAttachmentArea");
 			var formData = new FormData(this);
 			
 		    $.ajax({ // create an AJAX call...
@@ -54,6 +54,7 @@
 		    			// No valid id? Validation failed! Assume it is the form coming back.
 						$('#edit').html(response);
 		    		} 
+					hideBusy("itemAttachmentArea");
 		    	} 
 		    });
 		} // end validateForm()

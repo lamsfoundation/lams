@@ -3,9 +3,7 @@
 
 
 <div id="conditionList">
-	<div>
-		<i class="fa fa-refresh fa-spin fa-2x fa-fw" style="display:none" id="conditionListArea_Busy" /></i>
-	</div>	
+	<lams:WaitingSpinner id="conditionListArea_Busy" /></i>
 	
 	<table class="table table-striped table-condensed" id="conditionTable" >
 		<tr>

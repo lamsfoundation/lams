@@ -4,6 +4,7 @@
 	function doSubmit() {
 		disableSubmitButton(); 
 		if (validateForm()) {
+			showBusy("itemAttachmentArea");
 			return true;
 		}
 		enableSubmitButton();

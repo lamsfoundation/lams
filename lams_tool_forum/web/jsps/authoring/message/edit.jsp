@@ -1,5 +1,4 @@
 <!DOCTYPE html>
-
 <%@ include file="/common/taglibs.jsp"%>
 <lams:html>
 	<lams:head>
@@ -16,7 +15,7 @@
 	
 		<!-- Basic Info Form-->
 		<%@ include file="/common/messages.jsp"%>
-		<html:form action="/authoring/updateTopic.do" focus="message.subject" enctype="multipart/form-data" styleId="topicFormId">
+		<html:form action="/authoring/updateTopic.do" focus="message.subject" enctype="multipart/form-data" styleId="topicFormId" onsubmit="return validate();">
 			<input type="hidden" name="topicIndex" value="<c:out value="${topicIndex}"/>">
 			<html:hidden property="sessionMapID" />
 			<c:set var="formBean" value="<%=request.getAttribute(org.apache.struts.taglib.html.Constants.BEAN_KEY)%>" />
