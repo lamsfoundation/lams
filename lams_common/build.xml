@@ -34,19 +34,13 @@
 			</classpath>
 			
 			<transaction src="${basedir}/build/sql/create_lams_11_db.sql"/>
-			<transaction src="${db.scripts}/drop_lams_11_tables.sql"/>
 			<transaction src="${db.scripts}/create_lams_11_tables.sql"/>
 			<!-- Create tables for LAMS and other application's integration -->
-			<transaction src="${db.scripts}/create_integration_tables.sql"/>
 			<transaction src="${db.scripts}/insert_lams_users.sql"/> 
 			<transaction src="${db.scripts}/insert_types_data.sql"/>
 			<transaction src="${basedir}/build/sql/${lamsconf.table.sql}"/>
 			<!-- Create Quartz table --> 
 	    	<transaction src="${db.scripts}/create_quartz_table.sql"/>
-			<!-- Create tables for Core Notebook Service -->
-			<transaction src="${db.scripts}/create_notebook_tables.sql"/>
-			<!-- Create tables for Presence Chat Service -->
-			<transaction src="${db.scripts}/create_presence_chat_tables.sql"/>
 		</sql>
 	</target>
 				

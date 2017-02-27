@@ -1,5 +1,3 @@
-
-
 INSERT INTO lams_learning_library
 (
 description,

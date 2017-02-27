@@ -14,7 +14,7 @@ insert into lams_configuration (config_key, config_value, description_key, heade
 values ('EARDir','@ear.directory@', 'config.ear.dir', 'config.header.system', 'STRING', 1);
 
 insert into lams_configuration (config_key, config_value, description_key, header_name, format, required) 
-values ('InternalSMTPServer','true', 'config.use.internal.smtp.server', 'config.header.email', 'BOOLEAN', 0);
+values ('EnableServerRegistration', 'false', 'config.server2server.registration.enable', 'config.header.system', 'BOOLEAN', 1);
 
 insert into lams_configuration (config_key, config_value, description_key, header_name, format, required) 
 values ('SMTPServer','', 'config.smtp.server', 'config.header.email', 'STRING', 0);
@@ -38,10 +38,7 @@ insert into lams_configuration (config_key, config_value, description_key, heade
 values ('ExecutableExtensions','.bat,.bin,.com,.cmd,.exe,.msi,.msp,.ocx,.pif,.scr,.sct,.sh,.shs,.vbs,.php,.jsp,.asp,.aspx,.pl,.do,.py,.tcl,.cgi,.shtml,.stm,.cfm,.adp', 'config.executable.extensions', 'config.header.uploads', 'STRING', 1);
 
 insert into lams_configuration (config_key, config_value, description_key, header_name, format, required) 
-values ('UserInactiveTimeout','1800', 'config.user.inactive.timeout', 'config.header.system', 'LONG', 1);
-
-insert into lams_configuration (config_key, config_value, description_key, header_name, format, required) 
-values ('UseCacheDebugListener','false', 'config.use.cache.debug.listener', 'config.header.system', 'BOOLEAN', 1);
+values ('UserInactiveTimeout','10800', 'config.user.inactive.timeout', 'config.header.system', 'LONG', 1);
 
 insert into lams_configuration (config_key, config_value, description_key, header_name, format, required) 
 values ('CleanupPreviewOlderThanDays','7', 'config.cleanup.preview.older.than.days', 'config.header.system', 'LONG', 1);
@@ -50,16 +47,16 @@ insert into lams_configuration (config_key, config_value, description_key, heade
 values ('AuthoringActivitiesColour', 'true', 'config.authoring.activities.colour', 'config.header.look.feel', 'BOOLEAN', 1);
 
 insert into lams_configuration (config_key, config_value, description_key, header_name, format, required) 
-values ('AuthoringClientVersion','3.0.0.@datetimestamp@', 'config.authoring.client.version', 'config.header.versions', 'STRING', 1);
+values ('AuthoringClientVersion','3.0.0.201701010000', 'config.authoring.client.version', 'config.header.versions', 'STRING', 1);
 
 insert into lams_configuration (config_key, config_value, description_key, header_name, format, required) 
-values ('MonitorClientVersion','3.0.0.@datetimestamp@', 'config.monitor.client.version', 'config.header.versions', 'STRING', 1);
+values ('MonitorClientVersion','3.0.0.201701010000', 'config.monitor.client.version', 'config.header.versions', 'STRING', 1);
 
 insert into lams_configuration (config_key, config_value, description_key, header_name, format, required) 
-values ('LearnerClientVersion','3.0.0.@datetimestamp@', 'config.learner.client.version', 'config.header.versions', 'STRING', 1);
+values ('LearnerClientVersion','3.0.0.201701010000', 'config.learner.client.version', 'config.header.versions', 'STRING', 1);
 
 insert into lams_configuration (config_key, config_value, description_key, header_name, format, required) 
-values ('ServerVersionNumber','3.0.0.@datetimestamp@', 'config.server.version.number', 'config.header.versions', 'STRING', 1);
+values ('ServerVersionNumber','3.0.0.201701010000', 'config.server.version.number', 'config.header.versions', 'STRING', 1);
 
 insert into lams_configuration (config_key, config_value, description_key, header_name, format, required) 
 values ('ServerLanguage','en_AU', 'config.server.language', 'config.header.look.feel', 'STRING', 1);
@@ -74,19 +71,7 @@ insert into lams_configuration (config_key, config_value, description_key, heade
 values ('HelpURL','http://wiki.lamsfoundation.org/display/lamsdocs/', 'config.help.url', 'config.header.system', 'STRING', 1);
 
 insert into lams_configuration (config_key, config_value, description_key, header_name, format, required) 
-values ('XmppDomain','shaun.melcoe.mq.edu.au', 'config.xmpp.domain', 'config.header.chat', 'STRING', 0);
-
-insert into lams_configuration (config_key, config_value, description_key, header_name, format, required) 
-values ('XmppConference','conference.shaun.melcoe.mq.edu.au', 'config.xmpp.conference', 'config.header.chat', 'STRING', 0);
-
-insert into lams_configuration (config_key, config_value, description_key, header_name, format, required) 
-values ('XmppAdmin','admin', 'config.xmpp.admin', 'config.header.chat', 'STRING', 0);
-
-insert into lams_configuration (config_key, config_value, description_key, header_name, format, required) 
-values ('XmppPassword','wildfire', 'config.xmpp.password', 'config.header.chat', 'STRING', 0);
-
-insert into lams_configuration (config_key, config_value, description_key, header_name, format, required) 
-values ('DefaultHTMLTheme','defaultHTML', 'config.default.html.theme', 'config.header.look.feel', 'STRING', 1);
+values ('DefaultTheme','defaultHTML', 'config.default.html.theme', 'config.header.look.feel', 'STRING', 1);
 
 insert into lams_configuration (config_key, config_value, description_key, header_name, format, required) 
 values ('AllowDirectLessonLaunch','false', 'config.allow.direct.lesson.launch', 'config.header.features', 'BOOLEAN', 1);
@@ -103,9 +88,6 @@ values ('ShowAllMyLessonLink','true', 'config.show.all.my.lesson.link', 'config.
 insert into lams_configuration (config_key, config_value, description_key, header_name, format, required)
 values ('DisplayPrintButton','false', 'config.display.print.button', 'config.header.features', 'BOOLEAN', 1);
 
-insert into lams_configuration (config_key, config_value, description_key, header_name, format, required)
-values ('EnableServerRegistration', 'false', 'config.server2server.registration.enable', 'config.header.features', 'BOOLEAN', 1);
-
 insert into lams_configuration (config_key, config_value, description_key, header_name, format, required) 
 values ('LDAPProvisioningEnabled','false', 'config.ldap.provisioning.enabled', 'config.header.ldap', 'BOOLEAN', 1);
 
@@ -119,7 +101,7 @@ insert into lams_configuration (config_key, config_value, description_key, heade
 values ('LDAPSearchFilter','(cn={0})', 'config.ldap.search.filter', 'config.header.ldap', 'STRING', 0);
 
 insert into lams_configuration (config_key, config_value, description_key, header_name, format, required) 
-values ('LDAPBaseDN',',ou=Users,dc=melcoe,dc=mq,dc=edu,dc=au', 'config.ldap.base.dn', 'config.header.ldap', 'STRING', 0);
+values ('LDAPBaseDN','ou=Users,dc=melcoe,dc=mq,dc=edu,dc=au', 'config.ldap.base.dn', 'config.header.ldap', 'STRING', 0);
 
 insert into lams_configuration (config_key, config_value, description_key, header_name, format, required) 
 values ('LDAPBindUserDN','', 'config.ldap.bind.user.dn', 'config.header.ldap', 'STRING', 0);
@@ -129,12 +111,6 @@ values ('LDAPBindUserPassword','', 'config.ldap.bind.user.password', 'config.hea
 
 insert into lams_configuration (config_key, config_value, description_key, header_name, format, required) 
 values ('LDAPSecurityProtocol','', 'config.ldap.security.protocol', 'config.header.ldap', 'STRING', 0);
-
-insert into lams_configuration (config_key, config_value, description_key, header_name, format, required) 
-values ('TruststorePath','', 'config.ldap.truststore.path', 'config.header.system', 'STRING', 0);
-
-insert into lams_configuration (config_key, config_value, description_key, header_name, format, required) 
-values ('TruststorePassword','', 'config.ldap.truststore.password', 'config.header.system', 'STRING', 0);
 
 insert into lams_configuration (config_key, config_value, description_key, header_name, format, required) 
 values ('LDAPLoginAttr','uid', 'admin.user.login', 'config.header.ldap.attributes', 'STRING', 0);
@@ -218,9 +194,6 @@ insert into lams_configuration (config_key, config_value, description_key, heade
 values ('LDAPOnlyOneOrg', 'true', 'config.ldap.only.one.org', 'config.header.ldap', 'BOOLEAN', 1);
 
 insert into lams_configuration (config_key, config_value, description_key, header_name, format, required) 
-values ('LDAPEncryptPasswordFromBrowser', 'true', 'config.ldap.encrypt.password.from.browser', 'config.header.ldap', 'BOOLEAN', 1);
-
-insert into lams_configuration (config_key, config_value, description_key, header_name, format, required) 
 values ('LDAPSearchResultsPageSize', '100', 'config.ldap.search.results.page.size', 'config.header.ldap', 'LONG', 0);
 
 insert into lams_configuration (config_key, config_value, description_key, header_name, format, required) 
@@ -233,16 +206,16 @@ insert into lams_configuration (config_key, config_value, description_key, heade
 values ('CustomTabTitle','', 'config.custom.tab.title', 'config.header.look.feel', 'STRING', 0);
 
 insert into lams_configuration (config_key, config_value, description_key, header_name, format, required) 
-values ('AuthoringScreenSize','1024x768', 'config.authoring.screen.size', 'config.header.look.feel', 'STRING', 1);
+values ('AuthoringScreenSize','1280x720', 'config.authoring.screen.size', 'config.header.look.feel', 'STRING', 1);
 
 insert into lams_configuration (config_key, config_value, description_key, header_name, format, required) 
-values ('MonitorScreenSize','1024x768', 'config.monitor.screen.size', 'config.header.look.feel', 'STRING', 1);
+values ('MonitorScreenSize','1280x720', 'config.monitor.screen.size', 'config.header.look.feel', 'STRING', 1);
 
 insert into lams_configuration (config_key, config_value, description_key, header_name, format, required) 
-values ('LearnerScreenSize','1024x768', 'config.learner.screen.size', 'config.header.look.feel', 'STRING', 1);
+values ('LearnerScreenSize','1280x720', 'config.learner.screen.size', 'config.header.look.feel', 'STRING', 1);
 
 insert into lams_configuration (config_key, config_value, description_key, header_name, format, required) 
-values ('AdminScreenSize','1024x768', 'config.admin.screen.size', 'config.header.look.feel', 'STRING', 1);
+values ('AdminScreenSize','1280x720', 'config.admin.screen.size', 'config.header.look.feel', 'STRING', 1);
 
 insert into lams_configuration (config_key, config_value, description_key, header_name, format, required) 
 values ('SMTPUser','', 'config.smtp.user', 'config.header.email', 'STRING', 0);
@@ -279,3 +252,51 @@ values ('KalturaKCWUiConfId','1000741', 'config.kaltura.kcw.uiconfid', 'config.h
 
 insert into lams_configuration (config_key, config_value, description_key, header_name, format, required) 
 values ('KalturaKDPUiConfId','6308762', 'config.kaltura.kdp.uiconfid', 'config.header.kaltura', 'STRING', 0);
+
+insert into lams_configuration (config_key, config_value, description_key, header_name, format, required) 
+values ('ConfigCacheRefresInterval', 0, 'config.cache.refresh', 'config.header.system', 'LONG', 0);
+
+insert into lams_configuration (config_key, config_value, description_key, header_name, format, required)
+values ('ErrorStackTrace','true', 'config.stacktrace.error', 'config.header.system', 'BOOLEAN', 0);
+
+insert into lams_configuration (config_key, config_value, description_key, header_name, format, required)
+values ('FailedAttempts','3', 'config.failed.attempts', 'config.header.password.policy', 'LONG', 1);
+
+insert into lams_configuration (config_key, config_value, description_key, header_name, format, required)
+values ('LockOutTime','5', 'config.lock.out.time', 'config.header.password.policy', 'LONG', 1);
+
+insert into lams_configuration (config_key, config_value, description_key, header_name, format, required) 
+values ('LearnerCollapsProgressPanel','true', 'config.learner.collapsible.progress.panel', 'config.header.features', 'BOOLEAN', 0);
+
+insert into lams_configuration (config_key, config_value, description_key, header_name, format, required)
+values ('PasswordPolicyMinChars','8', 'config.password.minimum.characters', 'config.header.password.policy', 'LONG', 1);
+
+insert into lams_configuration (config_key, config_value, description_key, header_name, format, required)
+values ('PasswordPolicyUppercase','true', 'config.password.uppercase', 'config.header.password.policy', 'BOOLEAN', 0);
+ 
+insert into lams_configuration (config_key, config_value, description_key, header_name, format, required)
+values ('PasswordPolicyLowercase','true', 'config.password.lowercase', 'config.header.password.policy', 'BOOLEAN', 0);
+
+insert into lams_configuration (config_key, config_value, description_key, header_name, format, required)
+values ('PasswordPolicyNumerics','true', 'config.password.numerics', 'config.header.password.policy', 'BOOLEAN', 0);
+
+insert into lams_configuration (config_key, config_value, description_key, header_name, format, required)
+values ('PasswordPolicySymbols','false', 'config.password.symbols', 'config.header.password.policy', 'BOOLEAN', 0);
+
+insert into lams_configuration (config_key, config_value, description_key, header_name, format, required)
+values ('ShowTimezoneWarning','true', 'config.show.timezone.warning', 'config.header.features', 'BOOLEAN', 1);
+
+INSERT INTO lams_configuration (config_key, config_value, description_key, header_name, format, required)
+VALUES ('SiteName','LAMS', 'config.site.name', 'config.header.system', 'STRING', 1);
+
+insert into lams_configuration (config_key, config_value, description_key, header_name, format, required) 
+values ('SuffixImportedLD','false', 'config.authoring.suffix', 'config.header.features', 'BOOLEAN', 0);
+
+insert into lams_configuration (config_key, config_value, description_key, header_name, format, required) 
+values ('UserValidationUsername','true', 'config.user.validation.username', 'config.header.user.validation', 'BOOLEAN', 0);
+
+insert into lams_configuration (config_key, config_value, description_key, header_name, format, required) 
+values ('UserValidationFirstLastName','true', 'config.user.validation.first.last.name', 'config.header.user.validation', 'BOOLEAN', 0);
+
+insert into lams_configuration (config_key, config_value, description_key, header_name, format, required) 
+values ('UserValidationEmail','true', 'config.user.validation.emails', 'config.header.user.validation', 'BOOLEAN', 0);

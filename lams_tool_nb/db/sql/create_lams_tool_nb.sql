@@ -1,22 +1,20 @@
-
-
 CREATE TABLE tl_lanb11_content (
        uid BIGINT(20) NOT NULL AUTO_INCREMENT
-     , nb_content_id BIGINT(20) UNIQUE NOT NULL
+     , nb_content_id BIGINT(20) NOT NULL
      , title TEXT
      , content TEXT
-     , online_instructions TEXT
-     , offline_instructions TEXT
      , define_later TINYINT(1)
-     , force_offline TINYINT(1)
      , reflect_on_activity TINYINT(1)
      , reflect_instructions TEXT
      , content_in_use TINYINT(1)
      , creator_user_id BIGINT(20)
      , date_created DATETIME
      , date_updated DATETIME
+     , allow_comments tinyint(1) DEFAULT 0
+     , comments_like_dislike tinyint(1) DEFAULT 0
      , PRIMARY KEY (uid)
-)ENGINE=InnoDB;
+     , UNIQUE KEY nb_content_id (nb_content_id)
+);
 
 CREATE TABLE tl_lanb11_session (
        uid BIGINT(20) NOT NULL AUTO_INCREMENT
@@ -30,7 +28,7 @@ CREATE TABLE tl_lanb11_session (
      , INDEX (nb_content_uid)
      , CONSTRAINT FK_tl_lanb11_session_1 FOREIGN KEY (nb_content_uid)
                   REFERENCES tl_lanb11_content (uid)
-)ENGINE=InnoDB;
+);
 
 CREATE TABLE tl_lanb11_user (
        uid BIGINT(20) NOT NULL AUTO_INCREMENT
@@ -43,31 +41,14 @@ CREATE TABLE tl_lanb11_user (
      , INDEX (nb_session_uid)
      , CONSTRAINT FK_tl_lanb11_user_1 FOREIGN KEY (nb_session_uid)
                   REFERENCES tl_lanb11_session (uid)
-)ENGINE=InnoDB;
-
-
-CREATE TABLE tl_lanb11_attachment (
-       attachment_id BIGINT(20) NOT NULL AUTO_INCREMENT
-     , nb_content_uid BIGINT(20) NOT NULL
-     , filename VARCHAR(255) NOT NULL
-     , uuid BIGINT(20) NOT NULL
-     , version_id BIGINT(20)
-     , online_file TINYINT(1) NOT NULL
-     , PRIMARY KEY (attachment_id)
-     , INDEX (nb_content_uid)
-     , CONSTRAINT FK_tl_lanb11_attachment_1 FOREIGN KEY (nb_content_uid)
-                  REFERENCES tl_lanb11_content (uid)
-)ENGINE=InnoDB;
+);
 
 -- Default Content For Noticeboard Tool
 
 INSERT INTO tl_lanb11_content ( nb_content_id,
 								title,
 								content,
-								online_instructions,
-								offline_instructions,
 								define_later,
-								force_offline,
 								reflect_on_activity,
 								reflect_instructions,
 								content_in_use,
@@ -75,9 +56,6 @@ INSERT INTO tl_lanb11_content ( nb_content_id,
 VALUES (${default_content_id},
 		'Noticeboard',
 		'Content',
-		'',
-		'',
-		0,
 		0,
 		0,
 		'Reflect on noticeboard',

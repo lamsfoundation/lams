@@ -1,8 +1,5 @@
-
- 
 SET FOREIGN_KEY_CHECKS=0;
 DROP TABLE IF EXISTS tl_lamind10_user;
-DROP TABLE IF EXISTS tl_lamind10_attachment;
 DROP TABLE IF EXISTS tl_lamind10_session;
 DROP TABLE IF EXISTS tl_lamind10_mindmap;
 DROP TABLE IF EXISTS tl_lamind10_node;

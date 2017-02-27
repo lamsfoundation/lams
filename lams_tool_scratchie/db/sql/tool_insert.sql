@@ -1,7 +1,3 @@
-# Connection: ROOT LOCAL
-# Host: localhost
-# Saved: 2005-04-07 10:42:43
-# 
 INSERT INTO lams_tool
 (
 tool_signature,
@@ -10,8 +6,6 @@ tool_display_name,
 description,
 tool_identifier,
 tool_version,
-learning_library_id,
-default_tool_content_id,
 valid_flag,
 grouping_support_type_id,
 supports_run_offline_flag,
@@ -26,6 +20,7 @@ help_url,
 language_file,
 create_date_time,
 modified_date_time,
+admin_url,
 supports_outputs
 )
 VALUES
@@ -36,8 +31,6 @@ VALUES
 'Scratchie',
 'scratchie',
 '@tool_version@',
-NULL,
-NULL,
 0,
 2,
 1,
@@ -52,5 +45,6 @@ NULL,
 'org.lamsfoundation.lams.tool.scratchie.ApplicationResources',
 NOW(),
 NOW(),
+'tool/lascrt11/admin/start.do',
 1
 )
