@@ -1,6 +1,0 @@
-SET FOREIGN_KEY_CHECKS=0;
-DROP TABLE IF EXISTS tl_laddim10_user;
-DROP TABLE IF EXISTS tl_laddim10_attachment;
-DROP TABLE IF EXISTS tl_laddim10_session;
-DROP TABLE IF EXISTS tl_laddim10_dimdim;
-SET FOREIGN_KEY_CHECKS=1;
