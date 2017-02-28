@@ -26,7 +26,6 @@
 	<target name="print-usage" depends="build_base.print-usage"
 	        description="Displays Ant targets descriptions">
 		<echo>
-		clean-db                --> Removes DB tables and entries
 		build-db                --> Creates database tables and entries
 		deploy-tool             --> Deploys all Tool content
 		</echo>	
@@ -35,14 +34,6 @@
 	<!-- =================================================================== -->
 	<!-- Database Tasks                                             		 -->
 	<!-- =================================================================== -->
-		
-	<target name="clean-db" description="Deletes Tool Tables">
-		<echo>${ant.project.name}: Dropping Tool database tables</echo>
-		<antcall target="_db-script">
-		    <param name="sql.script" value="${db.scripts}/${tool.build.sql.drop}"/>
-		</antcall>
-	</target>
-	
 	
 	<target name="build-db" description="Deletes and creates Tool tables and inserts default content.">
 		<echo>${ant.project.name}: Creating Tool database tables</echo>
@@ -79,7 +70,6 @@
 		<echo>${ant.project.name}: Copying Tool SQL files</echo>
 		<copy overwrite="true" todir="${basedir}/build/deploy/sql" verbose="true">
 			<fileset dir="${db.scripts}/">
-				<include name="${tool.build.sql.drop}" />
 				<include name="${tool.build.sql.create}" />
 				<include name="activity_insert.sql" />
 				<include name="library_insert.sql" />
@@ -141,7 +131,6 @@
 			hideTool="${tool.hide}"
 			minServerVersionNumber="${min.server.version.number}"
 			toolTablesScriptPath="${basedir}/build/deploy/sql/${tool.build.sql.create}" 
-			toolTablesDeleteScriptPath="${basedir}/build/deploy/sql/${tool.build.sql.drop}" 
 			toolActivityInsertScriptPath="${basedir}/build/deploy/sql/activity_insert.sql" 
 			toolLibraryInsertScriptPath="${basedir}/build/deploy/sql/library_insert.sql" 
 			toolInsertScriptPath="${basedir}/build/deploy/sql/tool_insert.sql" 

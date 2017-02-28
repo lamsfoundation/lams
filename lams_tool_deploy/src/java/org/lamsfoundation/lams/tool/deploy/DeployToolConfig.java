@@ -21,7 +21,6 @@
  * ****************************************************************
  */
 
-
 package org.lamsfoundation.lams.tool.deploy;
 
 import java.io.IOException;
@@ -53,7 +52,6 @@ public class DeployToolConfig extends DeployConfig {
     private static final String TOOL_INSERT_SCRIPT_PATH = "toolInsertScriptPath";
     private static final String TOOL_LIBRARY_INSERT_SCRIPT_PATH = "toolLibraryInsertScriptPath";
     private static final String TOOL_TABLES_SCRIPT_PATH = "toolTablesScriptPath";
-    private static final String TOOL_TABLES_DELETE_SCRIPT_PATH = "toolTablesDeleteScriptPath";
     private static final String TOOL_DB_VERSION_SCRIPT_PATH = "toolDBVersionScriptPath";
     private static final String TOOL_APP_CONTEXT_FILE_PATH = "toolApplicationContextPath";
     private static final String TOOL_JAR_FILE_NAME = "toolJarFileName";
@@ -112,18 +110,10 @@ public class DeployToolConfig extends DeployConfig {
     private String toolTablesScriptPath;
 
     /**
-     * Holds value of property toolTablesDeleteScriptPath.
-     */
-    private String toolTablesDeleteScriptPath;
-
-    /**
      * Holds value of property toolDBVersionScriptPath.
      */
     private String toolDBVersionScriptPath;
 
-    /**
-     * Holds value of property toolTablesDeleteScriptPath.
-     */
     private String toolApplicationContextPath;
 
     /**
@@ -157,7 +147,7 @@ public class DeployToolConfig extends DeployConfig {
     /**
      * Creates an instance of DeployToolConfig object, with the values
      * of its properties, set to that specified by the Xml configuration file
-     * 
+     *
      * @param configurationFilePath
      *            - only needed when generating the initial deploy.xml
      * @throws ParserConfigurationException
@@ -237,10 +227,6 @@ public class DeployToolConfig extends DeployConfig {
 	    toolTablesScriptPath = value;
 	}
 
-	if (key.equalsIgnoreCase(TOOL_TABLES_DELETE_SCRIPT_PATH)) {
-	    toolTablesDeleteScriptPath = value;
-	}
-
 	if (key.equalsIgnoreCase(TOOL_DB_VERSION_SCRIPT_PATH)) {
 	    toolDBVersionScriptPath = value;
 	}
@@ -281,7 +267,7 @@ public class DeployToolConfig extends DeployConfig {
 
     /**
      * Converts a String to a List. Entries should be comma separated.
-     * 
+     *
      * @param Input
      *            string containing entries.
      * @return List of (String) properties, null if not found.
@@ -331,7 +317,7 @@ public class DeployToolConfig extends DeployConfig {
      * Upon deserialisation of the xml string, a new object will be created.
      * The properties of this object will be copied to the calling object.
      * Only copy properties if the properties are not null
-     * 
+     *
      * @param config
      */
     protected void copyProperties(DeployToolConfig config) {
@@ -360,9 +346,6 @@ public class DeployToolConfig extends DeployConfig {
 	}
 	if (config.getToolTablesScriptPath() != null) {
 	    this.toolTablesScriptPath = config.getToolTablesScriptPath();
-	}
-	if (config.getToolTablesDeleteScriptPath() != null) {
-	    this.toolTablesDeleteScriptPath = config.getToolTablesDeleteScriptPath();
 	}
 	if (config.getToolDBVersionScriptPath() != null) {
 	    this.toolDBVersionScriptPath = config.getToolDBVersionScriptPath();
@@ -398,7 +381,6 @@ public class DeployToolConfig extends DeployConfig {
 	System.out.println("ToolLibraryInsertScriptPath: " + this.toolLibraryInsertScriptPath);
 	System.out.println("ToolActivityInsertScriptPath: " + this.toolActivityInsertScriptPath);
 	System.out.println("ToolTableScriptPath: " + this.toolTablesScriptPath);
-	System.out.println("ToolTableDeleteScriptPath: " + this.toolTablesDeleteScriptPath);
 	System.out.println("ToolDBVersionScriptPath: " + this.toolDBVersionScriptPath);
 	System.out.println("ToolApplicationContextPath: " + this.toolApplicationContextPath);
 	System.out.println("ToolJarFileName: " + this.toolJarFileName);
@@ -541,21 +523,6 @@ public class DeployToolConfig extends DeployConfig {
     }
 
     /**
-     * @return Returns the toolTablesDeleteScriptPath.
-     */
-    public String getToolTablesDeleteScriptPath() {
-	return toolTablesDeleteScriptPath;
-    }
-
-    /**
-     * @param toolTablesDeleteScriptPath
-     *            The toolTablesDeleteScriptPath to set.
-     */
-    public void setToolTablesDeleteScriptPath(String toolTablesDeleteScriptPath) {
-	this.toolTablesDeleteScriptPath = toolTablesDeleteScriptPath;
-    }
-
-    /**
      * @return Returns the toolTablesScriptPath.
      */
     public String getToolTablesScriptPath() {
@@ -641,7 +608,6 @@ public class DeployToolConfig extends DeployConfig {
 	    toolLibraryInsertScriptPath = stripPath(toolLibraryInsertScriptPath, outputPath, lengthOfPath);
 	    toolActivityInsertScriptPath = stripPath(toolActivityInsertScriptPath, outputPath, lengthOfPath);
 	    toolTablesScriptPath = stripPath(toolTablesScriptPath, outputPath, lengthOfPath);
-	    toolTablesDeleteScriptPath = stripPath(toolTablesDeleteScriptPath, outputPath, lengthOfPath);
 	    if (toolDBVersionScriptPath != null && toolDBVersionScriptPath.trim().length() > 0) {
 		toolDBVersionScriptPath = stripPath(toolDBVersionScriptPath, outputPath, lengthOfPath);
 	    }

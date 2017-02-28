@@ -1,7 +1,0 @@
-SET FOREIGN_KEY_CHECKS=0;
-DROP TABLE IF EXISTS tl_lagmap10_user;
-DROP TABLE IF EXISTS tl_lagmap10_configuration;
-DROP TABLE IF EXISTS tl_lagmap10_session;
-DROP TABLE IF EXISTS tl_lagmap10_gmap;
-DROP TABLE IF EXISTS tl_lagmap10_marker;
-SET FOREIGN_KEY_CHECKS=1;
