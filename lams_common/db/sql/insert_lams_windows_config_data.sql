@@ -254,7 +254,7 @@ insert into lams_configuration (config_key, config_value, description_key, heade
 values ('KalturaKDPUiConfId','6308762', 'config.kaltura.kdp.uiconfid', 'config.header.kaltura', 'STRING', 0);
 
 insert into lams_configuration (config_key, config_value, description_key, header_name, format, required) 
-values ('ConfigCacheRefresInterval', 0, 'config.cache.refresh', 'config.header.system', 'LONG', 0);
+values ('ConfigCacheRefreshInterval', 0, 'config.cache.refresh', 'config.header.system', 'LONG', 0);
 
 insert into lams_configuration (config_key, config_value, description_key, header_name, format, required)
 values ('ErrorStackTrace','true', 'config.stacktrace.error', 'config.header.system', 'BOOLEAN', 0);

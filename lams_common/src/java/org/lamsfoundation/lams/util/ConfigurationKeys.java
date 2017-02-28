@@ -256,7 +256,7 @@ public class ConfigurationKeys {
     public static String SUFFIX_IMPORTED_LD = "SuffixImportedLD";
 
     // LDEV-3254
-    public static String CONFIGURATION_CACHE_REFRESH_INTERVAL = "ConfigCacheRefresInterval";
+    public static String CONFIGURATION_CACHE_REFRESH_INTERVAL = "ConfigCacheRefreshInterval";
 
     // LDEV-3961
     public static String SITE_NAME = "SiteName";
