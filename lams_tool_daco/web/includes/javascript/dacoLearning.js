@@ -18,11 +18,52 @@
 		$('.btn-disable-on-submit').prop('disabled', true);
 		document.location.href=continueReflectUrl;
 	}
+
+	function getFile(errorId) {
+		var arr = errorId.split('-');
+		if ( arr.length > 1 ) {
+			var filenum = arr[1];
+			var fileSelect = document.getElementById('file-'+filenum);
+			if ( fileSelect ) {
+				var files = fileSelect.files;
+				if (files.length > 0) {
+					return files[0];
+				}
+			}
+		}
+		return null;
+	}
 	
 	function saveOrUpdateRecord()	{
-		$('.btn-disable-on-submit').prop('disabled', true);
-		setHiddenFormValues();
-		document.getElementById("recordForm").submit();
+		var valid = true;
+		
+		$('[id^=fileerror-]').each(function(index, element) {
+			console.log(element);
+			var file = getFile(element.id);
+			if ( file ) { 
+				if ( ! validateShowErrorNotExecutable(file, LABEL_NOT_ALLOWED_EXE, false, EXE_STRING, element.id ) || 
+						! validateShowErrorFileSize(file, UPLOAD_FILE_MAX_SIZE, LABEL_MAX_FILE_SIZE, false, element.id) ) {
+					valid = false;
+				}
+			}
+		});
+		$('[id^=imageerror-]').each(function(index, element) {
+			console.log(element);
+			var file = getFile(element.id);
+			if ( file ) { 
+				if ( ! validateShowErrorImageType(file, LABEL_NOT_ALLOWED_FORMAT, false, element.id ) ||
+						! validateShowErrorFileSize(file, UPLOAD_FILE_MAX_SIZE, LABEL_MAX_FILE_SIZE, false, element.id) ) {
+					valid = false;
+				}
+			}
+		});
+		
+		if ( valid ) {
+			$('.btn-disable-on-submit').prop('disabled', true);
+			setHiddenFormValues();
+			document.getElementById("recordForm").submit();
+		}
+		return valid;
 	}
 	
 	function setHiddenFormValues(){

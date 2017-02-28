@@ -1,12 +1,18 @@
 <!DOCTYPE html>
-        
-
 <%@ include file="/common/taglibs.jsp"%>
 <%@ page import="org.lamsfoundation.lams.tool.daco.DacoConstants"%>
+<%@ page import="org.lamsfoundation.lams.util.Configuration" %>
+<%@ page import="org.lamsfoundation.lams.util.ConfigurationKeys" %>
+<%@ page import="org.lamsfoundation.lams.util.FileValidatorUtil" %>
+<c:set var="UPLOAD_FILE_MAX_SIZE"><%=Configuration.get(ConfigurationKeys.UPLOAD_FILE_MAX_SIZE)%></c:set>
+<c:set var="UPLOAD_FILE_MAX_SIZE_AS_USER_STRING" scope="request"><%=FileValidatorUtil.formatSize(Configuration.getAsInt(ConfigurationKeys.UPLOAD_FILE_MAX_SIZE))%></c:set>
+<c:set var="EXE_STRING"><%=Configuration.get(ConfigurationKeys.EXE_EXTENSIONS)%></c:set>
+
 <lams:html>
 <lams:head>
 	<title><fmt:message key="label.learning.title" /></title>
 	<%@ include file="/common/header.jsp"%>
+	<script type="text/javascript" src="${lams}includes/javascript/upload.js"></script>		
 	
 	<c:if test="${not empty param.sessionMapID}">
 		<c:set var="sessionMapID" value="${param.sessionMapID}" />
@@ -37,6 +43,18 @@
 	 	var finishUrl = '<c:url value="/learning/finish.do?sessionMapID=${sessionMapID}&displayedRecordNumber=${displayedRecordNumber}"/>';
 	 	var continueReflectUrl = '<c:url value="/learning/startReflection.do?sessionMapID=${sessionMapID}&displayedRecordNumber=${displayedRecordNumber}"/>';
 	 	var refreshQuestionSummariesUrl = '<c:url value="/learning/refreshQuestionSummaries.do"/>';
+		var UPLOAD_FILE_MAX_SIZE = '${UPLOAD_FILE_MAX_SIZE}';
+	 	var EXE_STRING = '${EXE_STRING}';
+	 	
+		<fmt:message key="errors.maxfilesize" var="LABEL_MAX_FILE_SIZE_VAR"><param>{0}</param></fmt:message>
+		var LABEL_MAX_FILE_SIZE = '<c:out value="${LABEL_MAX_FILE_SIZE_VAR}" />';
+		
+		<fmt:message key="error.attachment.executable" var="LABEL_NOT_ALLOWED_EXE_VAR"/>
+		var LABEL_NOT_ALLOWED_EXE = '<c:out value="${LABEL_NOT_ALLOWED_EXE_VAR}" />';	
+
+		<fmt:message key="error.attachment.must.be.image" var="LABEL_NOT_ALLOWED_FORMAT_VAR"/>
+		var LABEL_NOT_ALLOWED_FORMAT = '<c:out value="${LABEL_NOT_ALLOWED_FORMAT_VAR}" />';	
+
     </script>
     <script type="text/javascript" src="<html:rewrite page='/includes/javascript/dacoLearning.js'/>"></script>
 </lams:head>

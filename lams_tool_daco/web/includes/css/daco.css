@@ -44,6 +44,10 @@ div.message img.icon {
 form#recordForm input, form#recordForm textarea, form#recordForm select{
 	margin-top: 6px;
 }
+/* overrides form#recordForm input for file input */
+form#recordForm input.file-input-name{ 
+	margin-top: 0px;
+}
 div.bigNumber{
 	font-weight: bold;
 	font-size: larger;

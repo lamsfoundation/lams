@@ -159,15 +159,19 @@
 							<c:if test="${horizontal}">
 								</td><td style="vertical-align: middle;">
 							</c:if>
-							<html:file styleId="file-${fileNumber+1}" property="file[${fileNumber}]" size="50"/>
+							<lams:FileUpload fileFieldId="file-${fileNumber+1}" fileFieldname="file[${fileNumber}]" 
+								fileInputMessageKey="label.authoring.basic.file" maxFileSize="${UPLOAD_FILE_MAX_SIZE_AS_USER_STRING}"
+								fileButtonBrowse="fileButtonBrowse-${fileNumber+1}" fileInputNameFieldname="fileInputName-${fileNumber+1}" errorMsgDiv="fileerror-${fileNumber+1}"/>
 							<c:set var="fileNumber" value="${fileNumber+1}" />
 						</c:when>
-						<c:when test="${question.type==6}"><%-- Image --%>
+						<c:when test="${question.type==6}"><%-- Image --%>  
 							<div class="hint"><fmt:message key="label.learning.image.hint" /></div>
 							<c:if test="${horizontal}">
 								</td><td style="vertical-align: middle;">
 							</c:if>
-							<html:file styleId="file-${fileNumber+1}" property="file[${fileNumber}]" size="50" />
+							<lams:FileUpload fileFieldId="file-${fileNumber+1}" fileFieldname="file[${fileNumber}]" 
+								fileInputMessageKey="label.authoring.basic.image" maxFileSize="${UPLOAD_FILE_MAX_SIZE_AS_USER_STRING}"
+								fileButtonBrowse="fileButtonBrowse-${fileNumber+1}" fileInputNameFieldname="fileInputName-${fileNumber+1}" errorMsgDiv="imageerror-${fileNumber+1}"/>
 							<c:set var="fileNumber" value="${fileNumber+1}" />
 						</c:when>
 						<c:when test="${question.type==7}"><%-- Radio buttons  --%>
@@ -246,7 +250,7 @@
 		</table>
 
 		<c:if test="${mode != 'teacher'}">
-			<button onclick="javascript:saveOrUpdateRecord()" class="btn btn-sm btn-default btn-disable-on-submit voffset5 pull-left"><i class="fa fa-plus"></i> <fmt:message key="label.learning.add" /></button>
+			<button type="submit" onclick="return saveOrUpdateRecord();" class="btn btn-sm btn-default btn-disable-on-submit voffset5 pull-left"><i class="fa fa-plus"></i> <fmt:message key="label.learning.add" /></button>
 		</c:if>
 	</html:form>
 </div>
