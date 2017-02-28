@@ -1,7 +1,0 @@
-SET FOREIGN_KEY_CHECKS=0;
-DROP TABLE IF EXISTS tl_lascrb11_user;
-DROP TABLE IF EXISTS tl_lascrb11_heading;
-DROP TABLE IF EXISTS tl_lascrb11_report_entry;
-DROP TABLE IF EXISTS tl_lascrb11_session;
-DROP TABLE IF EXISTS tl_lascrb11_scribe;
-SET FOREIGN_KEY_CHECKS=1;

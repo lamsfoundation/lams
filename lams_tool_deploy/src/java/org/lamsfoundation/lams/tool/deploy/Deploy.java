@@ -32,8 +32,7 @@ import java.util.List;
  * Command Line Parameters: properties_file_path: mandatory forcedb: optional, defaults to false. if true, deletes any
  * old entries in db.
  *
- * Only use forceDB for development - not designed for production. If forceDB is set, then toolSignature and
- * toolTablesDeleteScriptPath are needed.
+ * Only use forceDB for development - not designed for production. If forceDB is set, then toolSignature is needed.
  *
  * @author Chris Perfect, modifications by Fiona Malikoff, Luke Foxton
  */
@@ -131,18 +130,6 @@ public class Deploy {
 		System.out.println("The tool to be installed: " + toolSignature + " does not exist in database");
 		System.out.println("Continuing with full install");
 		// Do nothing, continue with full install
-	    }
-
-	    if (forceDB.booleanValue()) {
-		System.out.println("Removing old tool entries from database");
-		ToolDBRemoveToolEntriesTask dbRemoveTask = new ToolDBRemoveToolEntriesTask();
-		dbRemoveTask.setDbUsername(config.getDbUsername());
-		dbRemoveTask.setDbPassword(config.getDbPassword());
-		dbRemoveTask.setDbDriverClass(config.getDbDriverClass());
-		dbRemoveTask.setDbDriverUrl(config.getDbDriverUrl());
-		dbRemoveTask.setToolSignature(config.getToolSignature());
-		dbRemoveTask.setToolTablesDeleteScriptPath(config.getToolTablesDeleteScriptPath());
-		dbRemoveTask.execute();
 	    }
 
 	    System.out.println("Running Tool DB Deploy");
