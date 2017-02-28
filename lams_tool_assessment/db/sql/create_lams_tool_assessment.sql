@@ -11,6 +11,7 @@ create table tl_laasse10_assessment (
    attempts_allowed integer DEFAULT 1,
    passing_mark integer DEFAULT 0,
    instructions text,
+   define_later tinyint(1),
    content_id bigint,
    allow_question_feedback tinyint(1),
    allow_overall_feedback tinyint(1),
@@ -206,9 +207,9 @@ ALTER TABLE tl_laasse10_session ADD CONSTRAINT tl_laasse10_session FOREIGN KEY (
    		REFERENCES tl_laasse10_user (uid) ON DELETE CASCADE ON UPDATE CASCADE;
   
 
-INSERT INTO tl_laasse10_assessment (uid, title, instructions, content_id, allow_question_feedback,
+INSERT INTO tl_laasse10_assessment (uid, title, instructions, define_later, content_id, allow_question_feedback,
 								    allow_overall_feedback, allow_right_answers, allow_wrong_answers,
 								    allow_grades_after_attempt, allow_history_responses, display_summary, shuffled) VALUES
-  (1,'Assessment','Instructions ',${default_content_id},0,0,0,0,0,0,0,0);
+  (1,'Assessment','Instructions',0,${default_content_id},0,0,0,0,0,0,0,0);
 
 SET FOREIGN_KEY_CHECKS=1;
