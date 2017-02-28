@@ -1,4 +1,9 @@
 <%@ include file="/common/taglibs.jsp"%>
+<%@ page import="org.lamsfoundation.lams.util.Configuration" %>
+<%@ page import="org.lamsfoundation.lams.util.ConfigurationKeys" %>
+<%@ page import="org.lamsfoundation.lams.util.FileValidatorUtil" %>
+<c:set var="UPLOAD_FILE_MAX_SIZE_AS_USER_STRING"><%=FileValidatorUtil.formatSize(Configuration.getAsInt(ConfigurationKeys.UPLOAD_FILE_LARGE_MAX_SIZE))%></c:set>
+
 <c:set var="ctxPath" value="${pageContext.request.contextPath}"	scope="request" />
 <input type="hidden" name="hasFile" value="${itemAttachment.hasFile}" id="has-file"/>
 <c:choose>
@@ -32,28 +37,6 @@
 	</c:when>
 	
 	<c:otherwise>
-		<div class="input-group">
-		    <span class="input-group-btn">
-					<button id="fileButtonBrowse" type="button" class="btn btn-sm btn-default">
-					<i class="fa fa-upload"></i> <fmt:message key="label.authoring.basic.resource.file.input"/>
-				</button>
-			</span>
-			<input type="file" id="fileSelector" name="file" style="display:none"> 
-			<input type="text" id="fileInputName" style="display:none" disabled="disabled" placeholder="File not selected" class="form-control input-sm">
-		</div>
-				
-		<script type="text/javascript">
-			// Fake file upload
-			document.getElementById('fileButtonBrowse').addEventListener('click', function() {
-				document.getElementById('fileSelector').click();
-			});
-			
-			document.getElementById('fileSelector').addEventListener('change', function() {
-				$('#fileInputName').show();
-				document.getElementById('fileInputName').value = this.value.replace(/^.*\\/, "");
-				
-			});
-		</script>    
-    
+		<lams:FileUpload maxFileSize="${UPLOAD_FILE_MAX_SIZE_AS_USER_STRING}"/>
 	</c:otherwise>
 </c:choose>

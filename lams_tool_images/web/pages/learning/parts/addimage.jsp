@@ -1,7 +1,10 @@
 <%@ include file="/common/taglibs.jsp"%>
 <%@ page import="org.lamsfoundation.lams.util.Configuration" %>
 <%@ page import="org.lamsfoundation.lams.util.ConfigurationKeys" %>
+<%@ page import="org.lamsfoundation.lams.util.FileValidatorUtil" %>
 <c:set var="UPLOAD_FILE_MAX_SIZE"><%=Configuration.get(ConfigurationKeys.UPLOAD_FILE_MAX_SIZE)%></c:set>
+<c:set var="UPLOAD_FILE_MAX_SIZE_AS_USER_STRING"><%=FileValidatorUtil.formatSize(Configuration.getAsInt(ConfigurationKeys.UPLOAD_FILE_MAX_SIZE))%></c:set>
+
 <!DOCTYPE html>
 
 <lams:html>
@@ -10,8 +13,11 @@
 			<fmt:message key="label.learning.title" />
 		</title>
 		<%@ include file="/common/header.jsp"%>
-					
+ 		<script type="text/javascript" src="${lams}includes/javascript/upload.js"></script>
+		
 		<script type="text/javascript">
+		
+
 			$(document).ready(function(){ 
 				document.getElementById("imageTitle").focus();
 				
@@ -21,7 +27,7 @@
 
 				var UPLOAD_FILE_MAX_SIZE = ${UPLOAD_FILE_MAX_SIZE};
 				var LABEL_ITEM_BLANK = '<fmt:message key="error.resource.item.file.blank"/>';
-				var LABEL_MAX_FILE_SIZE = '<fmt:message key="errors.maxfilesize"/>';
+				var LABEL_MAX_FILE_SIZE = '<fmt:message key="errors.maxfilesize"><param>{0}</param></fmt:message>';
 				var LABEL_NOT_ALLOWED_FORMAT = '<fmt:message key="error.resource.image.not.alowed.format"/>';	
 				
 				if ( typeof CKEDITOR !== 'undefined' ) {
@@ -40,19 +46,14 @@
 					var fileSelect = document.getElementById('file');
 					// Get the selected files from the input.
 					var files = fileSelect.files;
-					
 					if (files.length == 0) {
-						alert(LABEL_ITEM_BLANK);
+						clearFileError();
+						showFileError(LABEL_ITEM_BLANK);
 						return;
 					}
-					var file = files[0];
 
-				    // Check the file type.
-					if (file.type != 'image/png' && file.type != 'image/jpg' && file.type != 'image/gif' && file.type != 'image/jpeg' ) {
-						alert(LABEL_NOT_ALLOWED_FORMAT);
-						return;
-					} else if (file.size > UPLOAD_FILE_MAX_SIZE) {
-						alert(LABEL_MAX_FILE_SIZE + ' ' + (UPLOAD_FILE_MAX_SIZE/1024/1000) + 'MBs');
+					var file = files[0];
+					if ( ! validateShowErrorImageType(file, LABEL_NOT_ALLOWED_FORMAT, false) || ! validateShowErrorFileSize(file, UPLOAD_FILE_MAX_SIZE, LABEL_MAX_FILE_SIZE, false) ) {
 						return;
 					}
 
@@ -63,21 +64,21 @@
 					
 				}
 
-				$.ajax({
+ 				$.ajax({
 			    	type: 'POST',
 			    	url: $("#imageGalleryItemForm").attr('action'),
 			    	data: formData,
 			        processData: false,
 			        contentType: false,
 			    	success: function(data) {
-			   				self.parent.checkNew();
+			   			self.parent.checkNew();
 			    	},
 			    	error: function(jqXHR, textStatus, errorMessage) {
-								$('#uploadButtons').show();
-								$('#itemAttachmentArea_Busy').hide();
+						$('#uploadButtons').show();
+						$('#itemAttachmentArea_Busy').hide();
 			        	alert(errorMessage);
 			    	}
-				});
+				}); 
 			} 		
 				
 		</script>
@@ -117,28 +118,7 @@
 					<lams:STRUTS-textarea rows="5" tabindex="2" styleClass="text-area form-control" property="description" />
 				</div>
 	
-				<div class="input-group">
-				    <span class="input-group-btn">
-							<button id="fileButtonBrowse" tabindex="3" type="button" class="btn btn-sm btn-default">
-							<i class="fa fa-upload"></i> <fmt:message key="label.authoring.basic.resource.file.input"/>
-						</button>
-					</span>
-					<input type="file" id="file" name="file" multiple style="display:none"> 
-					<input type="text" id="fileInputName" style="display:none" disabled="disabled" placeholder="File not selected" class="form-control input-sm">
-				</div>
-						
-				<script type="text/javascript">
-					// Fake file upload
-					document.getElementById('fileButtonBrowse').addEventListener('click', function() {
-						document.getElementById('file').click();
-					});
-					
-					document.getElementById('file').addEventListener('change', function() {
-						$('#fileInputName').show();
-						document.getElementById('fileInputName').value = this.value.replace(/^.*\\/, "");
-						
-					});
-				</script>  
+				<lams:FileUpload fileFieldname="file" maxFileSize="${UPLOAD_FILE_MAX_SIZE_AS_USER_STRING}" tabindex="3"/>
 										
 			</html:form>
 

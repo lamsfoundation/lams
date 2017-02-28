@@ -3,6 +3,7 @@
 <%@ page import="org.lamsfoundation.lams.tool.imageGallery.ImageGalleryConstants"%>
 <%@ page import="org.lamsfoundation.lams.util.Configuration" %>
 <%@ page import="org.lamsfoundation.lams.util.ConfigurationKeys" %>
+<%@ page import="org.lamsfoundation.lams.util.FileValidatorUtil" %>
 <c:set var="UPLOAD_FILE_LARGE_MAX_SIZE"><%=Configuration.get(ConfigurationKeys.UPLOAD_FILE_LARGE_MAX_SIZE)%></c:set>
 
 <lams:html>
@@ -10,8 +11,9 @@
 	<title><fmt:message key="label.author.title" /></title>
 
 	<%@ include file="/common/tabbedheader.jsp"%>
+	<script type="text/javascript" src="${lams}includes/javascript/upload.js"></script>
 	
-	<link href="${lams}css/jquery-ui-redmond-theme.css" rel="stylesheet" type="text/css" >
+	<link href="${lams}css/jquery-ui-smoothness-theme.css" rel="stylesheet" type="text/css" >
 
 	<script type="text/javascript">
 		<%-- used for  imageGalleryitem.js --%>

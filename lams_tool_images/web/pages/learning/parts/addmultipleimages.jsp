@@ -1,7 +1,9 @@
 <%@ include file="/common/taglibs.jsp"%>
 <%@ page import="org.lamsfoundation.lams.util.Configuration" %>
 <%@ page import="org.lamsfoundation.lams.util.ConfigurationKeys" %>
+<%@ page import="org.lamsfoundation.lams.util.FileValidatorUtil" %>
 <c:set var="UPLOAD_FILE_MAX_SIZE"><%=Configuration.get(ConfigurationKeys.UPLOAD_FILE_MAX_SIZE)%></c:set>
+<c:set var="UPLOAD_FILE_MAX_SIZE_AS_USER_STRING"><%=FileValidatorUtil.formatSize(Configuration.getAsInt(ConfigurationKeys.UPLOAD_FILE_MAX_SIZE))%></c:set>
 <!DOCTYPE html>
 <lams:html>
 	<lams:head>
@@ -9,12 +11,15 @@
 			<fmt:message key="label.learning.title" />
 		</title>
 		<%@ include file="/common/header.jsp"%>
+		<script type="text/javascript" src="${lams}includes/javascript/upload.js"></script>
+		
 		<script type="text/javascript">
 			
 			function submitMultipleImages(){
 				
+				var UPLOAD_FILE_MAX_SIZE = ${UPLOAD_FILE_MAX_SIZE};
 				var LABEL_ITEM_BLANK = '<fmt:message key="error.resource.item.file.blank"/>';
-				var LABEL_MAX_FILE_SIZE = '<fmt:message key="errors.maxfilesize"/>';
+				var LABEL_MAX_FILE_SIZE = '<fmt:message key="errors.maxfilesize"><param>{0}</param></fmt:message>';
 				var LABEL_NOT_ALLOWED_FORMAT = '<fmt:message key="error.resource.image.not.alowed.format"/>';	
 				
 				var formData = new FormData();
@@ -22,29 +27,35 @@
 				
 				// Get selected files from the inputs
 				var validateFiles = [];
+				var errorDivs = [];
 				if ($('#file1').val()) { 
 					var file = document.getElementById('file1').files[0];
 					validateFiles.push(file);
+					errorDivs.push('fileerror1');
 					formData.append('file1', file, file.name);
 				}
 				if ($('#file2').val()) { 
 					var file = document.getElementById('file2').files[0];
 					validateFiles.push(file);
+					errorDivs.push('fileerror2');
 					formData.append('file2', file, file.name);
 				}
 				if ($('#file3').val()) { 
 					var file = document.getElementById('file3').files[0];
 					validateFiles.push(file);
+					errorDivs.push('fileerror3');
 					formData.append('file3', file, file.name);
 				}
 				if ($('#file4').val()) {
 					var file = document.getElementById('file4').files[0];
 					validateFiles.push(file);
+					errorDivs.push('fileerror4');
 					formData.append('file4', file, file.name);
 				}
 				if ($('#file5').val()) { 
 					var file = document.getElementById('file5').files[0];
 					validateFiles.push(file);
+					errorDivs.push('fileerror5');
 					formData.append('file5', file, file.name);
 				}
 					
@@ -53,19 +64,18 @@
 					alert(LABEL_ITEM_BLANK);
 					return;
 				}
+				var valid = true;
 				for (var i = 0; i < validateFiles.length; i++) {
-					  var file = validateFiles[i];
-			
-					  // Check the file type.
-					  if (file.size > ${UPLOAD_FILE_MAX_SIZE}) {
-						  alert(LABEL_MAX_FILE_SIZE + ' ' + (UPLOAD_FILE_MAX_SIZE/1024/1000) + ' MBs');
-						  return;
-					  } else if (file.type != 'image/png' && file.type != 'image/jpg' && file.type != 'image/gif' && file.type != 'image/jpeg' ) {
-						  alert(LABEL_NOT_ALLOWED_FORMAT);
-						  return;
-					  }
-			
-					  // Add the file to the request.
+				    // Check the file type and file size
+					var file = validateFiles[i];
+					var errorDivId = errorDivs[i];
+					if ( ! validateShowErrorImageType(file, LABEL_NOT_ALLOWED_FORMAT, false, errorDivId ) || 
+							! validateShowErrorFileSize(file, UPLOAD_FILE_MAX_SIZE, LABEL_MAX_FILE_SIZE, false, errorDivId) ) {
+						valid=false;
+					}
+				}
+				if ( ! valid ) {
+					return;
 				}
 				
 				$('#uploadButtons').hide();
@@ -113,117 +123,32 @@
 					<label>
 						<fmt:message key="label.authoring.basic.resource.files.input" />
 					</label>
+
+					<div class="help-block">
+						<fmt:message key="label.upload.info">
+						<fmt:param>${UPLOAD_FILE_MAX_SIZE_AS_USER_STRING}</fmt:param>
+						</fmt:message>
+					</div>
 					
-					<div>
-						<div class="input-group">
-						    <span class="input-group-btn">
-									<button id="fileButtonBrowse1" type="button" class="btn btn-sm btn-default">
-									<i class="fa fa-upload"></i> <fmt:message key="label.authoring.basic.resource.file.input"/>
-								</button>
-							</span>
-							<input type="file" id="file1" name="file1" style="display:none"> 
-							<input type="text" id="fileInputName1" style="display:none" disabled="disabled" class="form-control input-sm">
-						</div>
-								
-						<script type="text/javascript">
-							document.getElementById('fileButtonBrowse1').addEventListener('click', function() {
-								document.getElementById('file1').click();
-							});
-							
-							document.getElementById('file1').addEventListener('change', function() {
-								$('#fileInputName1').show();
-								document.getElementById('fileInputName1').value = this.value.replace(/^.*\\/, "");
-								
-							});
-						</script>    
-				
-						<div class="input-group voffset5">
-						    <span class="input-group-btn">
-									<button id="fileButtonBrowse2" type="button" class="btn btn-sm btn-default">
-									<i class="fa fa-upload"></i> <fmt:message key="label.authoring.basic.resource.file.input"/>
-								</button>
-							</span>
-							<input type="file" id="file2" name="file2" style="display:none"> 
-							<input type="text" id="fileInputName2" style="display:none" disabled="disabled" class="form-control input-sm">
-						</div>
-								
-						<script type="text/javascript">
-							document.getElementById('fileButtonBrowse2').addEventListener('click', function() {
-								document.getElementById('file2').click();
-							});
-							
-							document.getElementById('file2').addEventListener('change', function() {
-								$('#fileInputName2').show();
-								document.getElementById('fileInputName2').value = this.value.replace(/^.*\\/, "");
-								
-							});
-						</script>    
-									
-						<div class="input-group voffset5">
-						    <span class="input-group-btn">
-									<button id="fileButtonBrowse3" type="button" class="btn btn-sm btn-default">
-									<i class="fa fa-upload"></i> <fmt:message key="label.authoring.basic.resource.file.input"/>
-								</button>
-							</span>
-							<input type="file" id="file3" name="file3" style="display:none"> 
-							<input type="text" id="fileInputName3" style="display:none" disabled="disabled" class="form-control input-sm">
-						</div>
-								
-						<script type="text/javascript">
-							document.getElementById('fileButtonBrowse3').addEventListener('click', function() {
-								document.getElementById('file3').click();
-							});
-							
-							document.getElementById('file3').addEventListener('change', function() {
-								$('#fileInputName3').show();
-								document.getElementById('fileInputName3').value = this.value.replace(/^.*\\/, "");
-								
-							});
-						</script>    
-						
-						<div class="input-group voffset5">
-						    <span class="input-group-btn">
-									<button id="fileButtonBrowse4" type="button" class="btn btn-sm btn-default">
-									<i class="fa fa-upload"></i> <fmt:message key="label.authoring.basic.resource.file.input"/>
-								</button>
-							</span>
-							<input type="file" id="file4" name="file4" style="display:none"> 
-							<input type="text" id="fileInputName4" style="display:none" disabled="disabled" class="form-control input-sm">
-						</div>
-								
-						<script type="text/javascript">
-							document.getElementById('fileButtonBrowse4').addEventListener('click', function() {
-								document.getElementById('file4').click();
-							});
-							
-							document.getElementById('file4').addEventListener('change', function() {
-								$('#fileInputName4').show();
-								document.getElementById('fileInputName4').value = this.value.replace(/^.*\\/, "");
-								
-							});
-						</script>    
-						
-						<div class="input-group voffset5">
-						    <span class="input-group-btn">
-									<button id="fileButtonBrowse5" type="button" class="btn btn-sm btn-default">
-									<i class="fa fa-upload"></i> <fmt:message key="label.authoring.basic.resource.file.input"/>
-								</button>
-							</span>
-							<input type="file" id="file5" name="file5" style="display:none"> 
-							<input type="text" id="fileInputName5" style="display:none" disabled="disabled" class="form-control input-sm">
-						</div>
-								
-						<script type="text/javascript">
-							document.getElementById('fileButtonBrowse5').addEventListener('click', function() {
-								document.getElementById('file5').click();
-							});
-							
-							document.getElementById('file5').addEventListener('change', function() {
-								$('#fileInputName5').show();
-								document.getElementById('fileInputName5').value = this.value.replace(/^.*\\/, "");
-								
-							});
-						</script>
+					<lams:FileUpload fileButtonBrowse="fileButtonBrowse1" fileFieldname="file1" errorMsgDiv="fileerror1" uploadInfoMessageKey="-"
+						fileInputNameFieldname="fileInputName1" maxFileSize="${UPLOAD_FILE_MAX_SIZE_AS_USER_STRING}"/>
+		
+					<div class="voffset5"></div>
+					<lams:FileUpload fileButtonBrowse="fileButtonBrowse2" fileFieldname="file2" errorMsgDiv="fileerror2" uploadInfoMessageKey="-"
+						fileInputNameFieldname="fileInputName2" maxFileSize="${UPLOAD_FILE_MAX_SIZE_AS_USER_STRING}"/>
+	
+					<div class="voffset5"></div>
+					<lams:FileUpload fileButtonBrowse="fileButtonBrowse3" fileFieldname="file3" errorMsgDiv="fileerror3" uploadInfoMessageKey="-"
+						fileInputNameFieldname="fileInputName3" maxFileSize="${UPLOAD_FILE_MAX_SIZE_AS_USER_STRING}"/>
+	
+					<div class="voffset5"></div>
+					<lams:FileUpload fileButtonBrowse="fileButtonBrowse4" fileFieldname="file4" errorMsgDiv="fileerror4" uploadInfoMessageKey="-"
+						fileInputNameFieldname="fileInputName4" maxFileSize="${UPLOAD_FILE_MAX_SIZE_AS_USER_STRING}"/>
+	
+					<div class="voffset5"></div>
+					<lams:FileUpload fileButtonBrowse="fileButtonBrowse5" fileFieldname="file5" errorMsgDiv="fileerror5" uploadInfoMessageKey="-"
+						fileInputNameFieldname="fileInputName5" maxFileSize="${UPLOAD_FILE_MAX_SIZE_AS_USER_STRING}"/>
+
 				</div>
 				
 			</html:form>
