@@ -291,7 +291,7 @@ CREATE TABLE lams_learning_design (
      , date_read_only DATETIME
      , user_id BIGINT(20) NOT NULL
      , original_user_id BIGINT(20) NOT NULL
-     , help_TEXT TEXT
+     , help_text TEXT
      , copy_type_id TINYINT(4) NOT NULL
      , create_date_time DATETIME NOT NULL
      , version VARCHAR(56)
