@@ -2,7 +2,6 @@ INSERT INTO lams_learning_activity
 (
   description
 , title
-, help_text
 , learning_activity_type_id
 , grouping_support_type_id
 , apply_grouping_flag
@@ -17,7 +16,6 @@ VALUES
 (
   'Displays a NoticeboardX'
 , 'NoticeboardX'
-, 'Put some help text here.'
 , 1
 , 2
 , 0

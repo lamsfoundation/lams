@@ -1032,7 +1032,6 @@ public class ObjectExtractor implements IObjectExtractor {
 	activity.setActivityUIID(activityUIID);
 	activity.setDescription((String) JsonUtil.opt(activityDetails, AuthoringJsonTags.DESCRIPTION));
 	activity.setTitle((String) JsonUtil.opt(activityDetails, AuthoringJsonTags.ACTIVITY_TITLE));
-	activity.setHelpText((String) JsonUtil.opt(activityDetails, AuthoringJsonTags.HELP_TEXT));
 
 	activity.setXcoord(getCoord(activityDetails, AuthoringJsonTags.XCOORD));
 	activity.setYcoord(getCoord(activityDetails, AuthoringJsonTags.YCOORD));
