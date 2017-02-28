@@ -38,7 +38,8 @@ ALTER TABLE lams_configuration MODIFY COLUMN required TINYINT(1);
 
 ALTER TABLE lams_timezone MODIFY COLUMN server_timezone TINYINT(1);
 
-
+-- fix a typo
+UPDATE lams_configuration SET config_key = 'ConfigCacheRefreshInterval' WHERE config_key = 'ConfigCacheRefresInterval';
 ----------------------Put all sql statements above here-------------------------
 
 -- If there were no errors, commit and restore autocommit to on
