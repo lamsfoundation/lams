@@ -388,12 +388,10 @@ CREATE TABLE lams_tool (
      , default_tool_content_id BIGINT(20)
      , valid_flag TINYINT(1) NOT NULL DEFAULT 1
      , grouping_support_type_id INT(3) NOT NULL
-     , supports_run_offline_flag TINYINT(1) NOT NULL
      , learner_url TEXT NOT NULL
      , learner_preview_url TEXT
      , learner_progress_url TEXT
      , author_url TEXT NOT NULL
-     , define_later_url TEXT
      , monitor_url TEXT 
 	 , pedagogical_planner_url TEXT
      , help_url TEXT
