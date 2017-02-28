@@ -58,7 +58,6 @@
 </action>
 <action path="/definelater" type="org.lamsfoundation.lams.tool.daco.web.action.AuthoringAction" name="dacoForm" scope="request"
 	parameter="definelater" validate="false">
-	<forward name="forbidden" path="/pages/authoring/definelaterforbid.jsp" />
 	<forward name="success" path="/pages/authoring/start.jsp" />
 </action>
 <action path="/authoring/init" type="org.lamsfoundation.lams.tool.daco.web.action.AuthoringAction" name="dacoForm" scope="request"
