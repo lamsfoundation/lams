@@ -60,7 +60,7 @@ div#errorArea {
 					<input class="btn btn-sm btn-default" value='<fmt:message key="button.cancel"/>' type="button"
 						onClick="javascript:window.close()" />
 					<button class="btn btn-sm btn-primary" value='<fmt:message key="label.upload"/>' type="submit">
-						<fmt:message key="button.import" />&nbsp;<i class="fa fa-sm fa-upload"></i>
+						<i class="fa fa-sm fa-upload"></i>&nbsp;<fmt:message key="button.import" />
 					</button>
 				</div>
 			</form>
