@@ -419,7 +419,6 @@ CREATE TABLE lams_learning_activity (
      , activity_ui_id INT(11)
      , description TEXT
      , title VARCHAR(255)
-     , help_TEXT TEXT
      , xcoord INT(11)
      , ycoord INT(11)
      , parent_activity_id BIGINT(20)

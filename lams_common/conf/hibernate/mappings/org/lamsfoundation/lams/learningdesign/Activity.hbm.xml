@@ -36,10 +36,6 @@
     <property name="title" type="java.lang.String" column="title" length="255" >
         <meta attribute="field-description">@hibernate.property column="title" length="255" </meta>    
     </property>
-    
-    <property name="helpText" type="java.lang.String" column="help_text" length="65535">
-        <meta attribute="field-description">@hibernate.property column="help_text" length="65535" </meta>    
-    </property>
 
     <property name="xcoord" type="java.lang.Integer" column="xcoord" length="11" >
         <meta attribute="field-description">@hibernate.property column="xcoord" length="11" </meta>    

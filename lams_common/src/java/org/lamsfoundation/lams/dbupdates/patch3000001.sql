@@ -24,6 +24,7 @@ ALTER TABLE lams_grouping MODIFY COLUMN equal_number_of_learners_per_group TINYI
 						  
 ALTER TABLE lams_learning_activity DROP COLUMN define_later_flag,
 								   DROP COLUMN run_offline_flag,
+								   DROP COLUMN help_text,
 								   MODIFY COLUMN readonly TINYINT(1),
 								   MODIFY COLUMN initialised TINYINT(1),
 								   MODIFY COLUMN stop_after_activity TINYINT(1);
