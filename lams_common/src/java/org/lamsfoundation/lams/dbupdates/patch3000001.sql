@@ -40,6 +40,11 @@ ALTER TABLE lams_timezone MODIFY COLUMN server_timezone TINYINT(1);
 
 -- fix a typo
 UPDATE lams_configuration SET config_key = 'ConfigCacheRefreshInterval' WHERE config_key = 'ConfigCacheRefresInterval';
+
+-- LDEV-3147 Get rid of 'supports_run_offline_flag' and 'define_later_url' columns from lams_tool table
+ALTER TABLE lams_tool DROP COLUMN supports_run_offline_flag;
+ALTER TABLE lams_tool DROP COLUMN define_later_url;
+
 ----------------------Put all sql statements above here-------------------------
 
 -- If there were no errors, commit and restore autocommit to on
