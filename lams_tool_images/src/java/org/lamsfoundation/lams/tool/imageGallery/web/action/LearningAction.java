@@ -761,7 +761,7 @@ public class LearningAction extends Action {
 	ActionErrors errors = new ActionErrors();
 
 	// validate file size
-	FileValidatorUtil.validateFileSize(itemForm.getFile(), true, errors);
+	FileValidatorUtil.validateFileSize(itemForm.getFile(), false, errors);
 	// for edit validate: file already exist
 	if (itemForm.getFile() == null || StringUtils.isEmpty(itemForm.getFile().getFileName())) {
 	    errors.add(ActionMessages.GLOBAL_MESSAGE, new ActionMessage(ImageGalleryConstants.ERROR_MSG_FILE_BLANK));
@@ -792,7 +792,7 @@ public class LearningAction extends Action {
 
 	// validate files size
 	for (FormFile file : fileList) {
-	    FileValidatorUtil.validateFileSize(file, true, errors);
+	    FileValidatorUtil.validateFileSize(file, false, errors);
 
 	    // check for allowed format : gif, png, jpg
 	    String contentType = file.getContentType();

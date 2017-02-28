@@ -50,15 +50,9 @@ function submitImageGalleryItem(){
 		}
 		var file = files[0];
 
-	    // Check the file type.
-		if (file.name.length < 1) {
-			alert("file.name.length < 1");
-			return;
-		} else if (file.type != 'image/png' && file.type != 'image/jpg' && file.type != 'image/gif' && file.type != 'image/jpeg' ) {
-			alert(LABEL_NOT_ALLOWED_FORMAT);
-			return;
-		} else if (file.size > UPLOAD_FILE_LARGE_MAX_SIZE) {
-			alert(LABEL_MAX_FILE_SIZE);
+	    // Check the file type and file size
+		if ( ! validateShowErrorImageType(file, LABEL_NOT_ALLOWED_FORMAT ) || 
+				! validateShowErrorFileSize(file, UPLOAD_FILE_LARGE_MAX_SIZE, LABEL_MAX_FILE_SIZE) ) {
 			return;
 		}
 
@@ -92,29 +86,35 @@ function submitMultipleImageGalleryItems(){
 	
 	// Get selected files from the inputs
 	var validateFiles = [];
+	var errorDivs = [];
 	if ($('#file1').val()) { 
 		var file = document.getElementById('file1').files[0];
 		validateFiles.push(file);
+		errorDivs.push('fileerror1');
 		formData.append('file1', file, file.name);
 	}
 	if ($('#file2').val()) { 
 		var file = document.getElementById('file2').files[0];
 		validateFiles.push(file);
+		errorDivs.push('fileerror2');
 		formData.append('file2', file, file.name);
 	}
 	if ($('#file3').val()) { 
 		var file = document.getElementById('file3').files[0];
 		validateFiles.push(file);
+		errorDivs.push('fileerror3');
 		formData.append('file3', file, file.name);
 	}
 	if ($('#file4').val()) {
 		var file = document.getElementById('file4').files[0];
 		validateFiles.push(file);
+		errorDivs.push('fileerror4');
 		formData.append('file4', file, file.name);
 	}
 	if ($('#file5').val()) { 
 		var file = document.getElementById('file5').files[0];
 		validateFiles.push(file);
+		errorDivs.push('fileerror5');
 		formData.append('file5', file, file.name);
 	}
 		
@@ -123,22 +123,18 @@ function submitMultipleImageGalleryItems(){
 		alert(LABEL_ITEM_BLANK);
 		return;
 	}
+	var valid = true;
 	for (var i = 0; i < validateFiles.length; i++) {
-		  var file = validateFiles[i];
-
-		  // Check the file type.
-		  if(file.name.length < 1) {
-			  alert("file.name.length < 1");
-			  return;
-		  } else if (file.size > UPLOAD_FILE_LARGE_MAX_SIZE) {
-			  alert(LABEL_MAX_FILE_SIZE);
-			  return;
-		  } else if (file.type != 'image/png' && file.type != 'image/jpg' && file.type != 'image/gif' && file.type != 'image/jpeg' ) {
-			  alert(LABEL_NOT_ALLOWED_FORMAT);
-			  return;
-		  }
-
-		  // Add the file to the request.
+	    // Check the file type and file size
+		var file = validateFiles[i];
+		var errorDivId = errorDivs[i];
+		if ( ! validateShowErrorImageType(file, LABEL_NOT_ALLOWED_FORMAT, false, errorDivId ) || 
+				! validateShowErrorFileSize(file, UPLOAD_FILE_LARGE_MAX_SIZE, LABEL_MAX_FILE_SIZE, false, errorDivId) ) {
+			valid=false;
+		}
+	}
+	if ( ! valid ) {
+		return;
 	}
 	
 	$('#uploadButtons').hide();
