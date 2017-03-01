@@ -23,8 +23,8 @@
 	<c:set var="finishedLock" value="${sessionMap.finishedLock}" />
 
 	<script type="text/javascript" src="${lams}includes/javascript/jquery.js"></script>
-	<script type="text/javascript" src="/lams/includes/javascript/jquery.validate.js"></script>
-	
+	<script type="text/javascript" src="${lams}includes/javascript/jquery.validate.js"></script>
+	<script type="text/javascript" src="${lams}includes/javascript/upload.js"></script>
 	<script type="text/javascript">
 	
 		$(document).ready(function(){
@@ -32,9 +32,11 @@
 		});
 
  		function submitResourceForm() {
+ 			clearFileError();
 			if ( $(this).valid() ) {
 				$('.btn-disable-on-submit').prop('disabled', true);
 				var formData = new FormData(this);
+				showBusy('itemAttachmentArea');
 			    $.ajax({ // create an AJAX call...
 			        data: formData, 
 			        processData: false, // tell jQuery not to process the data
@@ -48,6 +50,7 @@
 			    		alert(textStatus+": "+errorThrown);
 			    	},
 			    	complete: function(response) {
+			    		hideBusy(itemAttachmentArea_Busy);
 			            $('.btn-disable-on-submit').prop('disabled', false);
 					}
 			    });

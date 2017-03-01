@@ -2,7 +2,9 @@
 <%@ include file="/common/taglibs.jsp"%>
 <%@ page import="org.lamsfoundation.lams.util.Configuration" %>
 <%@ page import="org.lamsfoundation.lams.util.ConfigurationKeys" %>
+<%@ page import="org.lamsfoundation.lams.util.FileValidatorUtil" %>
 <c:set var="UPLOAD_FILE_LARGE_MAX_SIZE"><%=Configuration.get(ConfigurationKeys.UPLOAD_FILE_LARGE_MAX_SIZE)%></c:set>
+<c:set var="UPLOAD_FILE_MAX_SIZE_AS_USER_STRING"><%=FileValidatorUtil.formatSize(Configuration.getAsInt(ConfigurationKeys.UPLOAD_FILE_LARGE_MAX_SIZE))%></c:set>
 
 <lams:html>
 	<lams:head>		
@@ -18,10 +20,11 @@
 				return this.optional(element) || (element.files[0].type == 'application/zip')
 			});
 			
-			$.validator.addMethod('filesize', function (value, element, param) {
-			    return this.optional(element) || (element.files[0].size <= param)
-			}, '<fmt:message key="errors.maxfilesize"><fmt:param>{0}</fmt:param></fmt:message>');
-			
+			$.validator.addMethod('validateSize', function (value, element, param) {
+				return validateFileSize(element.files[0], param);
+			}, '<fmt:message key="errors.maxfilesize"><fmt:param>${UPLOAD_FILE_MAX_SIZE_AS_USER_STRING}</fmt:param></fmt:message>');
+
+								  
 	 		$( "#resourceItemForm" ).validate({
 	 			ignore: [],
 				errorClass: "text-danger",
@@ -30,7 +33,7 @@
 	 				file: {
 	 			    	required: true,
 	 			    	fileType: true,
-	 			    	filesize: UPLOAD_FILE_LARGE_MAX_SIZE,
+	 			    	validateSize: UPLOAD_FILE_LARGE_MAX_SIZE,
 	 			    },
 				    title: {
 				    	required: true
@@ -39,12 +42,19 @@
 				messages : {
 					file : {
 						required : '<fmt:message key="error.resource.item.file.blank"/> ',
-						fileType: 'File type incorrect?'
+						fileType: '<fmt:message key="error.file.type.zip"/>'
 					},
 					title : {
 						required : '<fmt:message key="error.resource.item.title.blank"/> '
 					}
-				}
+				},
+				errorPlacement: function(error, element) {
+			        if (element.hasClass("fileUpload")) {
+			           error.insertAfter(element.parent());
+			        } else {
+			           error.insertAfter(element);
+			        }
+			    }
 			});
 		</script>
 		<script type="text/javascript" src="<html:rewrite page='/includes/javascript/rsrcresourceitem.js'/>"></script>
@@ -80,8 +90,9 @@
 					<span id="itemAttachmentArea">
 					<%@ include file="/pages/authoring/parts/itemattachment.jsp"%>
 					</span>
-					<i class="fa fa-spinner" style="display:none" id="itemAttachmentArea_Busy"></i>
 				</div>
+
+				<lams:WaitingSpinner id="itemAttachmentArea_Busy"/>
 	
 			</html:form>
 		

@@ -2,17 +2,28 @@
 <%@ include file="/common/taglibs.jsp"%>
 <%@ page import="org.lamsfoundation.lams.util.Configuration" %>
 <%@ page import="org.lamsfoundation.lams.util.ConfigurationKeys" %>
+<%@ page import="org.lamsfoundation.lams.util.FileValidatorUtil" %>
 <c:set var="UPLOAD_FILE_LARGE_MAX_SIZE"><%=Configuration.get(ConfigurationKeys.UPLOAD_FILE_LARGE_MAX_SIZE)%></c:set>
+<c:set var="UPLOAD_FILE_MAX_SIZE_AS_USER_STRING"><%=FileValidatorUtil.formatSize(Configuration.getAsInt(ConfigurationKeys.UPLOAD_FILE_LARGE_MAX_SIZE))%></c:set>
+<c:set var="EXE_FILE_TYPES"><%=Configuration.get(ConfigurationKeys.EXE_EXTENSIONS)%></c:set>
 
 <lams:html>
 	<lams:head>
-		<%@ include file="addheader.jsp"%>
+		<%@ include file="addheader.jsp"%>		
 		<script type="text/javascript">
 			var UPLOAD_FILE_LARGE_MAX_SIZE = '<c:out value="${UPLOAD_FILE_LARGE_MAX_SIZE}"/>';
 			
 			$(document).ready(function(){
 				$('#title').focus();
 			});
+
+			$.validator.addMethod('validateType', function (value, element, param) {
+				return validateNotExecutable(element.files[0], param);
+			}, '<fmt:message key="error.attachment.executable"/>');
+
+			$.validator.addMethod('validateSize', function (value, element, param) {
+				return validateFileSize(element.files[0], param);
+			}, '<fmt:message key="errors.maxfilesize"><fmt:param>${UPLOAD_FILE_MAX_SIZE_AS_USER_STRING}</fmt:param></fmt:message>');
 
 						
 	 		$( "#resourceItemForm" ).validate({
@@ -21,8 +32,10 @@
 				wrapper: "span",
 	 			rules: {
 	 				file: {
-	 			    	required: true
-	 			    },
+				    	required: true,
+				    	validateType: '<c:out value="${EXE_FILE_TYPES}"/>',
+				    	validateSize: '<c:out value="${UPLOAD_FILE_LARGE_MAX_SIZE}"/>', 
+				    },
 				    title: {
 				    	required: true
 				    }
@@ -34,7 +47,14 @@
 					title : {
 						required : '<fmt:message key="error.resource.item.title.blank"/> '
 					}
-				}
+				},
+				errorPlacement: function(error, element) {
+			        if (element.hasClass("fileUpload")) {
+			           error.insertAfter(element.parent());
+			        } else {
+			           error.insertAfter(element);
+			        }
+			    }
 			});
 
 		</script>
@@ -68,7 +88,8 @@
 					<span id="itemAttachmentArea">
 					<%@ include file="/pages/authoring/parts/itemattachment.jsp"%>
 					</span>
-					<i class="fa fa-spinner" style="display:none" id="itemAttachmentArea_Busy"></i>
+					<lams:WaitingSpinner id="itemAttachmentArea_Busy"/>
+					</div>			
 				</div>
 	
 			</html:form>

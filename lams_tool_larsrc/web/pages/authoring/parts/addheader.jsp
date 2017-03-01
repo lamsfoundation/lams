@@ -9,9 +9,10 @@
  	<!-- ********************  javascript ********************** -->
 	<script type="text/javascript" src="${lams}includes/javascript/common.js"></script>
 	<script type="text/javascript" src="${lams}includes/javascript/jquery.js"></script>
-	<script type="text/javascript" src="/lams/includes/javascript/jquery.validate.js"></script>
+	<script type="text/javascript" src="${lams}includes/javascript/jquery.validate.js"></script>
 	<script type="text/javascript" src="${lams}includes/javascript/bootstrap.min.js"></script>
 	<script type="text/javascript" src="${lams}includes/javascript/bootstrap.tabcontroller.js"></script>
+	<script type="text/javascript" src="${lams}includes/javascript/upload.js"></script>
 	<script type="text/javascript" src="<html:rewrite page='/includes/javascript/rsrccommon.js'/>"></script>
 
 	<script type="text/javascript">

@@ -5,7 +5,7 @@
 <div class="panel panel-default voffset5">
 	<div class="panel-heading panel-title">
 		<fmt:message key="label.authoring.basic.resource.list.title" /> 
-		<i class="fa fa-spinner" style="display: none" id="resourceListArea_Busy"></i>
+		<lams:WaitingSpinner id="resourceListArea_Busy" showInline="true"/>
 	</div>
 
 	<table class="table table-striped table-condensed" id="itemTable">
