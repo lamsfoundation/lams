@@ -1,6 +1,12 @@
 <!DOCTYPE html>
-
 <%@include file="/common/taglibs.jsp"%>
+<%@ page import="org.lamsfoundation.lams.util.Configuration" %>
+<%@ page import="org.lamsfoundation.lams.util.ConfigurationKeys" %>
+<%@ page import="org.lamsfoundation.lams.util.FileValidatorUtil" %>
+<c:set var="UPLOAD_FILE_MAX_SIZE"><%=Configuration.get(ConfigurationKeys.UPLOAD_FILE_LARGE_MAX_SIZE)%></c:set>
+<c:set var="UPLOAD_FILE_MAX_SIZE_AS_USER_STRING"><%=FileValidatorUtil.formatSize(Configuration.getAsInt(ConfigurationKeys.UPLOAD_FILE_LARGE_MAX_SIZE))%></c:set>
+<c:set var="EXE_FILE_TYPES"><%=Configuration.get(ConfigurationKeys.EXE_EXTENSIONS)%></c:set>
+
 <c:set var="tool">
 	<lams:WebAppURL />
 </c:set>
@@ -13,10 +19,10 @@
 	<title><fmt:message key="activity.title" /></title>
 	<lams:css/>
 	
-	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/common.js"></script>
+	<script type="text/javascript" src="${lams}includes/javascript/common.js"></script>
 	<script type="text/javascript" src="${lams}includes/javascript/jquery.js"></script>
 	<script type="text/javascript" src="${lams}includes/javascript/bootstrap.min.js"></script>
-	
+	<script type="text/javascript" src="${lams}includes/javascript/upload.js"></script>
 	<script type="text/javascript">
 		function removeMarkFile() {
 			var answer = confirm("<fmt:message key="message.monitor.mark.confirmDeleteFile"/>");
@@ -24,6 +30,23 @@
 				document.getElementById("method").value = "removeMarkFile";
 				document.getElementById("updateMarkForm").submit();
 			}
+		}
+		
+		function validate() {
+			var fileSelect = document.getElementById('markFile');
+			var files = fileSelect.files;
+			if (files.length > 0) {
+				var file = files[0];
+				if ( ! validateShowErrorNotExecutable(file, '<fmt:message key="error.attachment.executable"/>', false, '${EXE_FILE_TYPES}')
+						 || ! validateShowErrorFileSize(file, '${UPLOAD_FILE_MAX_SIZE}', '<fmt:message key="errors.maxfilesize"/>') ) {
+					return false;
+				}
+			}
+			var div = document.getElementById("attachmentArea_Busy");
+			if(div != null){
+				div.style.display = '';
+			}
+			return true;
 		}
 	</script>
 	
@@ -35,7 +58,7 @@
 
 
 		<c:forEach var="fileInfo" items="${report}" varStatus="status">
-			<html:form action="/mark.do" method="post" styleId="updateMarkForm" enctype="multipart/form-data">
+			<html:form action="/mark.do" method="post" styleId="updateMarkForm" enctype="multipart/form-data" onsubmit="return validate();">
 			
 				<html:hidden property="method" value="updateMark" styleId="method" />
 				<html:hidden property="toolSessionID" />
@@ -69,7 +92,8 @@
 				<c:choose>
 					<c:when test="${empty fileInfo.markFileUUID}">
 						<dd>
-								<html:file property="markFile" />
+							<lams:FileUpload fileFieldname="markFile" fileInputMessageKey="label.learner.filePath"
+									uploadInfoMessageKey="label.learner.uploadMessage" maxFileSize="${UPLOAD_FILE_MAX_SIZE_AS_USER_STRING}"/>
 						</dd>
 					</c:when>
 					<c:otherwise>
@@ -96,11 +120,9 @@
 								</html:link>
 								</div>
 								
-								<div class="offset2">
-									<small>
-									<fmt:message key="label.monitor.mark.replaceFile" />:
-									<html:file property="markFile" />
-									</small>
+								<div class="offset5">
+									<lams:FileUpload fileFieldname="markFile" fileInputMessageKey="label.monitor.mark.replaceFile"
+									uploadInfoMessageKey="label.learner.uploadMessage" maxFileSize="${UPLOAD_FILE_MAX_SIZE_AS_USER_STRING}"/>
 								</div>
 						</dd>		
 					</c:otherwise>
@@ -112,6 +134,8 @@
 						value="${fileInfo.comments}"
 						toolbarSet="DefaultMonitor"></lams:CKEditor>
 				</div>
+
+				<lams:WaitingSpinner id="attachmentArea_Busy"/>
 
 				<hr width="100%" />
 				<div id="buttons" class="pull-right">	
@@ -128,9 +152,9 @@
 					<html:link href="${cancelUrl}" styleClass="btn btn-default">
 						<fmt:message key="label.cancel" />
 					</html:link>
-					<html:link href="javascript:document.getElementById('updateMarkForm').submit()" styleClass="btn  btn-primary loffset10">
+					<button type="submit" class="btn  btn-primary loffset10">
 						<fmt:message key="label.monitoring.saveMarks.button" />
-					</html:link>
+					</button>
 				</div>
 			</html:form>
 		</c:forEach>
