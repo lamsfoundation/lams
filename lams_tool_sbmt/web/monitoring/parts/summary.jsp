@@ -153,7 +153,7 @@
 	</c:if>
 	
 	<!--For release marks feature-->
-	<i class="fa fa-refresh fa-spin fa-fw" style="display:none" id="messageArea_Busy"></i>
+	<lams:WaitingSpinner id="messageArea_Busy"/>
 	<div id="messageArea"></div>
 
 </div>

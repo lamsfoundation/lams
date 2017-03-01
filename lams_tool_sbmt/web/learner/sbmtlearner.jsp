@@ -1,11 +1,18 @@
 <!DOCTYPE html>
 <%@include file="/common/taglibs.jsp"%>
+<%@ page import="org.lamsfoundation.lams.util.Configuration" %>
+<%@ page import="org.lamsfoundation.lams.util.ConfigurationKeys" %>
+<%@ page import="org.lamsfoundation.lams.util.FileValidatorUtil" %>
+<c:set var="UPLOAD_FILE_MAX_SIZE"><%=Configuration.get(ConfigurationKeys.UPLOAD_FILE_MAX_SIZE)%></c:set>
+<c:set var="UPLOAD_FILE_MAX_SIZE_AS_USER_STRING"><%=FileValidatorUtil.formatSize(Configuration.getAsInt(ConfigurationKeys.UPLOAD_FILE_MAX_SIZE))%></c:set>
+<c:set var="EXE_FILE_TYPES"><%=Configuration.get(ConfigurationKeys.EXE_EXTENSIONS)%></c:set>
 <c:set var="sessionMap" value="${sessionScope[sessionMapID]}" />
 
 <lams:html>
 <lams:head>
 	<title><fmt:message key="tool.display.name" /></title>
 	<%@ include file="/common/header.jsp"%>
+	<script type="text/javascript" src="${lams}includes/javascript/upload.js"></script>
 
 	<script type="text/javascript">
 		$(document).ready(function() {
@@ -46,10 +53,48 @@
 			var continueUrl = "<html:rewrite page='/learning/newReflection.do?sessionMapID=${sessionMapID}'/>";
 			return submitCount(continueUrl);
 		}
+		function validate() {
+			var valid = true;
+
+			// check description
+			clearFileError("desc-error-msg");
+			if ( $('#description').val().trim().length == 0 ) {
+				var requiredMsg = '<fmt:message key="errors.required"><fmt:param><fmt:message key="label.learner.fileDescription"/></fmt:param></fmt:message>';
+				showFileError(requiredMsg, "desc-error-msg");
+				valid = false;
+			}
+			
+			// check file
+			var fileSelect = document.getElementById('file');
+			var files = fileSelect.files;
+			if (files.length == 0) {
+				clearFileError();
+				var requiredMsg = '<fmt:message key="errors.required"><fmt:param><fmt:message key="learner.form.filepath.displayname"/></fmt:param></fmt:message>';
+				showFileError(requiredMsg);
+				valid = false;
+			} else {
+				var file = files[0];
+				if ( ! validateShowErrorNotExecutable(file, '<fmt:message key="error.attachment.executable"/>', false, '${EXE_FILE_TYPES}')
+						 || ! validateShowErrorFileSize(file, '${UPLOAD_FILE_MAX_SIZE}', '<fmt:message key="errors.maxfilesize"/>') ) {
+					valid = false;
+				}
+			}
+
+			if ( valid ) {
+				disableButtons();
+			}
+			return valid;
+		}
 		function disableButtons() {
 			// do not disable the file button or the file will be missing on the upload.
 			$('.btn-disable-on-submit').prop('disabled', true);
 			$('a.btn-disable-on-submit').hide(); // links must be hidden, cannot be disabled
+			
+			// show the waiting area during the upload
+			var div = document.getElementById("attachmentArea_Busy");
+			if(div != null){
+				div.style.display = '';
+			}
 		}
 	</script>
 
@@ -216,7 +261,7 @@
 
 			<c:if test="${!displayForm}">
 
-				<html:form action="/learner?method=uploadFile" method="post" enctype="multipart/form-data" onsubmit="disableButtons();" >
+				<html:form action="/learner?method=uploadFile" method="post" enctype="multipart/form-data" onsubmit="return validate();" >
 					<html:hidden property="sessionMapID" />
 
 					<!-- Hidden fields -->
@@ -231,31 +276,28 @@
 
 							<div class="form-group">
 								<label for="file"><fmt:message key="label.learner.filePath" />&nbsp;<span style="color: red">*</span></label>
-								<html:file property="file" styleClass="btn btn-sm btn-file"
-									disabled="${sessionMap.finishLock || sessionMap.arriveLimit}" />
-								<p class="help-block">
-									<fmt:message key="label.learner.uploadMessage">
-										<fmt:param>${sessionMap.uploadMaxFileSize}</fmt:param>
-									</fmt:message>
-								</p>
+								<lams:FileUpload fileFieldname="file" fileInputMessageKey="label.learner.filePath"
+									uploadInfoMessageKey="label.learner.uploadMessage" maxFileSize="${UPLOAD_FILE_MAX_SIZE_AS_USER_STRING}"/>
 							</div>
 							<div class="form-group">
 								<!--File Description row -->
 								<label for="description"><fmt:message key="label.learner.fileDescription" />&nbsp;<span
 									style="color: red">*</span></label>
-								<html:textarea styleClass="form-control" property="description"
-									disabled="${sessionMap.finishLock || sessionMap.arriveLimit}" />
-									<p class="help-block"><small><fmt:message key="errors.required"><fmt:param>*</fmt:param></fmt:message></small></p>
+								<html:textarea styleId="description" styleClass="form-control" property="description"/>
+								<div id="desc-error-msg" class="text-danger" style="display: none;"></div>
 							</div>
+							<p class="help-block"><small><fmt:message key="errors.required"><fmt:param>*</fmt:param></fmt:message></small></p>
 							<div class="form-group">
 								<button id="uploadButton" type="submit" <c:if test="${sessionMap.finishLock || sessionMap.arriveLimit}">disabled="disabled"</c:if>
 									class="btn btn-sm btn-default btn-primary btn-disable-on-submit">
-									<i class="fa fa-xs fa-upload"></i> <fmt:message key="label.learner.upload" />
+									<i class="fa fa-xs fa-plus"></i> <fmt:message key="label.add" />
 								</button>
 							</div>
 						</div>
 					</div>
 				</html:form>
+				
+				<lams:WaitingSpinner id="attachmentArea_Busy"/>
 			</c:if>
 		</c:if>
 		<!-- end form -->
