@@ -2,11 +2,7 @@
 
 <script language="JavaScript" type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery.js"></script>
 <script language="JavaScript" type="text/javascript" src="<lams:LAMSURL/>includes/javascript/bootstrap.min.js"></script>
-
-<script language="JavaScript" type="text/JavaScript">
-	<!--
-	-->		
-</script>
+<script language="JavaScript" type="text/javascript" src="<lams:LAMSURL/>includes/javascript/upload.js"></script>
 
 <h4>
 	<fmt:message key="label.learning.tasks.to.do" />

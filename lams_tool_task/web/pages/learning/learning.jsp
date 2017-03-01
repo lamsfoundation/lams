@@ -1,5 +1,9 @@
 <!DOCTYPE html>
 <%@ include file="/common/taglibs.jsp"%>
+<%@ page import="org.lamsfoundation.lams.util.Configuration" %>
+<%@ page import="org.lamsfoundation.lams.util.ConfigurationKeys" %>
+<%@ page import="org.lamsfoundation.lams.util.FileValidatorUtil" %>
+
 <c:if test="${not empty param.sessionMapID}">
 	<c:set var="sessionMapID" value="${param.sessionMapID}" />
 </c:if>
@@ -8,6 +12,10 @@
 <c:set var="toolSessionID" value="${sessionMap.toolSessionID}" />
 <c:set var="taskList" value="${sessionMap.taskList}" />
 <c:set var="finishedLock" value="${sessionMap.finishedLock}" />
+
+<c:set var="UPLOAD_FILE_MAX_SIZE"><%=Configuration.get(ConfigurationKeys.UPLOAD_FILE_MAX_SIZE)%></c:set>
+<c:set var="UPLOAD_FILE_MAX_SIZE_AS_USER_STRING"><%=FileValidatorUtil.formatSize(Configuration.getAsInt(ConfigurationKeys.UPLOAD_FILE_MAX_SIZE))%></c:set>
+<c:set var="EXE_FILE_TYPES"><%=Configuration.get(ConfigurationKeys.EXE_EXTENSIONS)%></c:set>
 
 <lams:html>
 <lams:head>
@@ -24,7 +32,29 @@
 				if ( addTaskArea && addTaskArea.contentWindow.disableButtons  ) {
 					addTaskArea.contentWindow.disableButtons();
 				}
+				
+				// show the waiting area during the upload
+				var div = document.getElementById("attachmentArea_Busy");
+				if(div != null){
+					div.style.display = '';
+				}
 			} catch(err) {}
+		}
+	
+		function validateFiles() {
+			var fileSelect = document.getElementById('uploadButton');
+			var files = fileSelect.files;
+			if (files.length == 0) {
+				return false;
+			} else {
+				var file = files[0];
+				if ( ! validateShowErrorNotExecutable(file, '<fmt:message key="error.attachment.executable"/>', false, '${EXE_FILE_TYPES}')
+						 || ! validateShowErrorFileSize(file, '${UPLOAD_FILE_MAX_SIZE}', '<fmt:message key="errors.maxfilesize"/>') ) {
+					return false;
+				}
+			}
+			disableButtons();
+			return true;
 		}
 	
 		function checkNew() {
