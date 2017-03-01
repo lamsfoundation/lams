@@ -12,6 +12,8 @@
 
 <%@ attribute name="fileInputNameFieldname" required="false" rtexprvalue="true"%>
 <%@ attribute name="fileInputMessageKey" required="false" rtexprvalue="true"%>
+
+<%-- Set uploadInfoMessageKey to '-' to NOT show the "not exe and max file size" type message. Leave it blank for the default key  label.upload.info --%>
 <%@ attribute name="uploadInfoMessageKey" required="false" rtexprvalue="true"%>
 <%@ attribute name="maxFileSize" required="true" rtexprvalue="true"%> 
 <%@ attribute name="tabindex" required="false" rtexprvalue="true"%>
@@ -63,7 +65,9 @@
 	<input type="file" id="${fileFieldId}" name="${fileFieldname}" style="display:none" class="fileUpload"> 
 	<input type="text" id="${fileInputNameFieldname}" style="display:none" disabled="disabled" placeholder="File not selected" class="form-control file-input-name">
 </div>
+<c:if test="${uploadInfoMessageKey ne '-'}">
 <p class="help-block"><fmt:message key="${uploadInfoMessageKey}"><fmt:param>${maxFileSize}</fmt:param></fmt:message></p>					
+</c:if>
 <div id="${errorMsgDiv}" class="text-danger" style="display:none"></div>			
 
 <script type="text/javascript">
