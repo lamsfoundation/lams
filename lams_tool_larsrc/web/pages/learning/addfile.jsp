@@ -1,7 +1,10 @@
 <%@ include file="/common/taglibs.jsp"%>
 <%@ page import="org.lamsfoundation.lams.util.Configuration" %>
 <%@ page import="org.lamsfoundation.lams.util.ConfigurationKeys" %>
+<%@ page import="org.lamsfoundation.lams.util.FileValidatorUtil" %>
 <c:set var="UPLOAD_FILE_MAX_SIZE"><%=Configuration.get(ConfigurationKeys.UPLOAD_FILE_MAX_SIZE)%></c:set>
+<c:set var="UPLOAD_FILE_MAX_SIZE_AS_USER_STRING"><%=FileValidatorUtil.formatSize(Configuration.getAsInt(ConfigurationKeys.UPLOAD_FILE_MAX_SIZE))%></c:set>
+<c:set var="EXE_FILE_TYPES"><%=Configuration.get(ConfigurationKeys.EXE_EXTENSIONS)%></c:set>
 
 <!-- Add a File Form-->
 <div class="panel panel-default">
@@ -23,34 +26,14 @@
 			<html:text property="title" styleClass="form-control" tabindex="1" styleId="resourcetitle"/>
 	  	</div>	
 
-		<div class="input-group" id="addfile">
-	    <span class="input-group-btn" style="font-size:inherit;">
-				<button tabindex="2" id="fileButtonBrowse" type="button" class="btn btn-sm btn-default">
-					<i class="fa fa-upload"></i> <fmt:message key="label.authoring.basic.resource.file.input"/>
-				</button>
-			</span>
-			<input type="file" id="fileSelector" name="file" style="display:none"> 
-			<input type="text" id="fileInputName" style="display:none;" disabled="disabled" placeholder="File not selected" class="form-control input-sm">
-		</div>
-
-		<script type="text/javascript">
-			// Fake file upload
-			document.getElementById('fileButtonBrowse').addEventListener('click', function() {
-				document.getElementById('fileSelector').click();
-			});
-			
-			document.getElementById('fileSelector').addEventListener('change', function() {
-				$('#fileInputName').show();
-				document.getElementById('fileInputName').value = this.value.replace(/^.*\\/, "");
-				
-			});
-		</script>    
+		<lams:FileUpload fileFieldname="file" maxFileSize="${UPLOAD_FILE_MAX_SIZE_AS_USER_STRING}" tabindex="2"/>
 
 		<div class="form-group voffset10">
 	    	<label for="description"><fmt:message key="label.learning.comment.or.instruction" /></label>
 			<html:text property="description" tabindex="3" styleClass="form-control" maxlength="255"/>
 	  	</div>	
 
+		<lams:WaitingSpinner id="itemAttachmentArea_Busy"/>	
 		<div id="buttons" class="pull-right">
 	 		<html:button property="goback" onclick="javascript:cancel()" styleClass="btn btn-sm btn-default" styleId="cancelButton">
 				<fmt:message key="button.cancel" />
@@ -63,17 +46,19 @@
 	</html:form>
 	
 	<script type="text/javascript">
-	  var UPLOAD_FILE_MAX_SIZE = '<c:out value="${UPLOAD_FILE_MAX_SIZE}"/>';
 
 		$(document).ready(function(){
 			$('#title').focus();
 		});	
 					
-		$.validator.addMethod('filesize', function (value, element, param) {
-		    return this.optional(element) || (element.files[0].size <= param)
-		}, '<fmt:message key="errors.maxfilesize"><fmt:param>{0}</fmt:param></fmt:message>');
+		$.validator.addMethod('validateType', function (value, element, param) {
+			return validateNotExecutable(element.files[0], param);
+		}, '<fmt:message key="error.attachment.executable"/>');
 
-	  
+		$.validator.addMethod('validateSize', function (value, element, param) {
+			return validateFileSize(element.files[0], param);
+		}, '<fmt:message key="errors.maxfilesize"><fmt:param>${UPLOAD_FILE_MAX_SIZE_AS_USER_STRING}</fmt:param></fmt:message>');
+
 		$('#resourceItemForm').submit(submitResourceForm);
 		$('#resourceItemForm').validate({
 			ignore: [],
@@ -82,7 +67,8 @@
 			rules: {
 				file: {
 			    	required: true,
-			    	filesize: UPLOAD_FILE_MAX_SIZE, 
+			    	validateType: '<c:out value="${EXE_FILE_TYPES}"/>',
+			    	validateSize: '<c:out value="${UPLOAD_FILE_MAX_SIZE}"/>', 
 			    },
 			    title: {
 			    	required: true
@@ -96,6 +82,13 @@
 					required : '<fmt:message key="error.resource.item.title.blank"/> '
 				}
 			},
+			errorPlacement: function(error, element) {
+		        if (element.hasClass("fileUpload")) {
+		           error.insertAfter(element.parent());
+		        } else {
+		           error.insertAfter(element);
+		        }
+		    }
 		});	
 	</script>
 	

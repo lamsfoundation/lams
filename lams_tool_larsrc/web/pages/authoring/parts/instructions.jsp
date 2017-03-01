@@ -8,8 +8,6 @@
 
 		<label><fmt:message key="label.authoring.basic.resource.instructions" /></label>
 
-		<i class="fa fa-spinner" style="display: none" id="instructionArea_Busy"></i>
-
 		<table class="table table-condensed table-no-border">
 			<c:forEach var="item" items="${instructionList}" varStatus="status">
 				<tr id="instructionItem${status.index}">
@@ -37,7 +35,9 @@
 				</tr>
 			</c:forEach>
 		</table>
-
+		
+		<lams:WaitingSpinner id="instructionArea_Busy"/>
+		
 		<a href="#nogo" onclick="javascript:addInstruction();" class="btn btn-default btn-sm pull-right">
 			<i class="fa fa-plus"></i>&nbsp;<fmt:message key="label.authoring.basic.resource.add.instruction" /> 
 		</a>
