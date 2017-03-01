@@ -23,6 +23,10 @@
 	</c:when>
 	
 	<c:otherwise>
-		<input type="file" name="file" />
+		<div class="input-group" id="addfile">
+			<input type="file" name="file" id="file" />
+		</div>
+		<p class="help-block"><fmt:message key="label.upload.info"><fmt:param>${UPLOAD_FILE_MAX_SIZE_AS_USER_STRING}</fmt:param></fmt:message></p>					
+		<div id="file-error-msg" class="text-danger" style="display:none"></div>			
 	</c:otherwise>
 </c:choose>
