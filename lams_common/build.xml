@@ -11,7 +11,7 @@
 		<tstamp/>
 		<copy todir="${basedir}/build/sql" overwrite="true" verbose="true">
 			<fileset dir="${db.scripts}/">
-				<include name="${lamsconf.table.sql}" />
+				<include name="insert_lams_config_data.sql" />
                 <include name="create_lams_11_db.sql" />
 			</fileset>
 	        <filterset>
@@ -38,7 +38,7 @@
 			<!-- Create tables for LAMS and other application's integration -->
 			<transaction src="${db.scripts}/insert_lams_users.sql"/> 
 			<transaction src="${db.scripts}/insert_types_data.sql"/>
-			<transaction src="${basedir}/build/sql/${lamsconf.table.sql}"/>
+			<transaction src="${basedir}/build/sql/insert_lams_config_data.sql"/>
 			<!-- Create Quartz table --> 
 	    	<transaction src="${db.scripts}/create_quartz_table.sql"/>
 		</sql>
