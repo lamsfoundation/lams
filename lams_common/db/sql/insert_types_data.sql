@@ -318,4 +318,4 @@ INSERT INTO lams_rating_criteria_type VALUES (3, 'LEARNER_ITEM');
 INSERT INTO lams_rating_criteria_type VALUES (4, 'LESSON');
    
 -- initialise db version
-INSERT INTO patches VALUES ('lams', 3000001, NOW(), 'F');
+INSERT INTO patches VALUES ('lams', 20170101, NOW(), 'F');
