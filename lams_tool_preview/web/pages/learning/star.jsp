@@ -112,7 +112,6 @@
 							
 							var isDisabled = IS_DISABLED || (MAX_RATES > 0) && ( COUNT_RATED_ITEMS >= MAX_RATES) || isMaximumRatesPerUserReached;
 							
-							debugger;
 							var objectId = "${criteriaRatings.ratingCriteria.ratingCriteriaId}-" + itemId;
 							var userRating = userData["userRating"];
 							var isCriteriaNotRatedByUser = userRating == "";
