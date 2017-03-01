@@ -28,6 +28,7 @@
 					return false;
 				}
 			}
+			showBusy("itemAttachmentArea");
 			return true;
 		}
 	</script>
@@ -42,6 +43,7 @@
 		<lams:Page title="${title}" type="learner">
 
 			<%@ include file="/common/messages.jsp"%>
+							
 			<html:hidden property="sessionMapID" />
 			<input type="hidden" name="itemType" id="itemType" value="2" />
 			<html:hidden property="itemIndex" />
@@ -52,12 +54,12 @@
 				</div>
 			</div>		
 		
-			<div class="voffset10">
+			<div class="pull-right voffset10">
 				<a href="#nogo" onclick="javascript:self.parent.tb_remove();" onmousedown="self.focus();" class="btn btn-sm btn-default loffset5">
 					<fmt:message key="label.cancel" /> 
 				</a>
 				<a href="#nogo" onclick="javascript:submitCommonCartridgeItem();" onmousedown="self.focus();" class="btn btn-sm btn-primary">
-					<i class="fa fa-upload"></i> <fmt:message key="button.upload" />
+					<fmt:message key="button.upload" />
 				</a>
 			</div>
 			

@@ -15,18 +15,12 @@
 						<fmt:message key="label.delete" />
 					</a>
 				</td>
-				<td>
-					<i class="fa fa-refresh fa-spin fa-1x fa-fw" style="display:none" id="itemAttachmentArea_Busy"></i>
-				</td>
 			</tr>
 		</table>
 	</c:when>
 	
 	<c:otherwise>
-		<div class="input-group" id="addfile">
-			<input type="file" name="file" id="file" />
-		</div>
-		<p class="help-block"><fmt:message key="label.upload.info"><fmt:param>${UPLOAD_FILE_MAX_SIZE_AS_USER_STRING}</fmt:param></fmt:message></p>					
-		<div id="file-error-msg" class="text-danger" style="display:none"></div>			
+		<lams:FileUpload fileFieldname="file" fileInputMessageKey="label.authoring.basic.resource.file" maxFileSize="${UPLOAD_FILE_MAX_SIZE_AS_USER_STRING}"/>
 	</c:otherwise>
 </c:choose>
+<lams:WaitingSpinner  id="itemAttachmentArea_Busy"/>
