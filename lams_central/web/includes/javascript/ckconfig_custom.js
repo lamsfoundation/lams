@@ -122,11 +122,12 @@ CKEDITOR.config.contentsCss = CKEDITOR.basePath + '../css/defaultHTML_learner.cs
 //CKEDITOR.config.skin = 'office2013' ;
 CKEDITOR.config.disableNativeSpellChecker = false;
 CKEDITOR.config.browserContextMenuOnCtrl = true;
-CKEDITOR.config.templates = CKEDITOR.basePath + '../www/htmltemplates.xml';
+CKEDITOR.config.templates = 'lams_templates';
+CKEDITOR.config.templates_files = [CKEDITOR.basePath + '../www/htmltemplates.js'];
 CKEDITOR.config.format_tags	= 'div;h1;h2;h3;h4;h5;h6;pre;address;p' ;
 CKEDITOR.config.enterMode = 'div';
 CKEDITOR.plugins.addExternal('wikilink', CKEDITOR.basePath + '../tool/lawiki10/wikilink/', 'plugin.js');
-CKEDITOR.config.extraPlugins = 'wikilink,jlatexmath,paint,iframe,lineutils,widget,oembed,sourcedialog';
+CKEDITOR.config.extraPlugins = 'wikilink,jlatexmath,paint,iframe,lineutils,widget,oembed,sourcedialog,dialog,templates';
 CKEDITOR.config.enterMode = CKEDITOR.ENTER_DIV; 
 CKEDITOR.config.removePlugins = 'elementspath';
 CKEDITOR.config.allowedContent = true;
