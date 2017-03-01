@@ -1,28 +1,45 @@
-<%@ page language="java"  pageEncoding="UTF-8" contentType="text/html;charset=utf-8" %>
+<!DOCTYPE html>
 <%@ taglib uri="tags-lams" prefix="lams"%>
 <%@ taglib uri="tags-core" prefix="c"%>
 <%@ taglib uri="tags-fmt" prefix="fmt"%>
+<%@ page import="org.lamsfoundation.lams.util.Configuration" %>
+<%@ page import="org.lamsfoundation.lams.util.ConfigurationKeys" %>
+<%@ page import="org.lamsfoundation.lams.util.FileValidatorUtil" %>
+<c:set var="UPLOAD_FILE_MAX_SIZE"><%=Configuration.get(ConfigurationKeys.UPLOAD_FILE_LARGE_MAX_SIZE)%></c:set>
+<c:set var="UPLOAD_FILE_MAX_SIZE_AS_USER_STRING"><%=FileValidatorUtil.formatSize(Configuration.getAsInt(ConfigurationKeys.UPLOAD_FILE_LARGE_MAX_SIZE))%></c:set>
+<c:set var="EXE_FILE_TYPES"><%=Configuration.get(ConfigurationKeys.EXE_EXTENSIONS)%></c:set>
 
-<!DOCTYPE html>
 <lams:html>
 	<lams:head>
 		<title><fmt:message key="title.import" /></title>
 		
 		<lams:css />
 		
+		<script type="text/javascript" src="/lams/includes/javascript/jquery.js"></script>
+ 		<script type="text/javascript" src="/lams/includes/javascript/upload.js"></script>
+ 	
 		<script type="text/javascript">
 			function closeWin(){
 				window.close();
 			}
 			
 			function verifyAndSubmit() {
-				if (document.getElementById("UPLOAD_FILE").value.length == 0)	{
-					var msg = "<fmt:message key="button.select.importfile"/>";
-					alert(msg);
-					return (false);
+				var fileSelect = document.getElementById('UPLOAD_FILE');
+				var files = fileSelect.files;
+ 				if (files.length == 0) {
+					clearFileError();
+					showFileError('<fmt:message key="button.select.importfile"/>');
+					return false;
 				} else {
-					document.getElementById('importForm').submit();
+					var file = files[0];
+					if ( ! validateShowErrorNotExecutable(file, '<fmt:message key="error.attachment.executable"/>', false, '${EXE_FILE_TYPES}')
+							 || ! validateShowErrorFileSize(file, '${UPLOAD_FILE_MAX_SIZE}', '<fmt:message key="errors.maxfilesize"/>') ) {
+						return false;
+					}
 				}
+
+ 				document.getElementById('itemAttachment_Busy').style.display = '';
+				document.getElementById('importForm').submit();
 			}
 			
 		</script>
@@ -40,13 +57,17 @@
 				</div>
 
 				<form action="<c:url value="/authoring/importToolContent.do"/>" method="post" enctype="multipart/form-data" id="importForm">
-					<p>
+					<div>
 						<label for="UPLOAD_FILE"><fmt:message key="label.ld.zip.file" /></label>
 						<input type="hidden" name="customCSV" id="customCSV" value="${customCSV}" />
-						<input type="file" name="UPLOAD_FILE" id="UPLOAD_FILE"/>
-						<a href="javascript:;" class="btn btn-primary pull-right voffset10" onclick="verifyAndSubmit();"><fmt:message key="button.import" /> 
-						&nbsp;<i class="fa fa-sm fa-upload"></i></a>
-					</p>
+					</div>
+					
+ 					<lams:FileUpload fileFieldname="UPLOAD_FILE" fileInputMessageKey="label.file" maxFileSize="${UPLOAD_FILE_MAX_SIZE_AS_USER_STRING}"/>
+					<lams:WaitingSpinner id="itemAttachment_Busy"/>
+
+					<div class="pull-right voffset10">
+ 						<a href="javascript:;" class="btn btn-primary" onclick="javascript:verifyAndSubmit();"><fmt:message key="button.import" /></a>
+ 					</div>
 				</form>
 
 			</div>
