@@ -4,6 +4,9 @@ SET FOREIGN_KEY_CHECKS=0;
 ----------------------Put all sql statements below here-------------------------
 
 -- LDEV-4180
+ALTER TABLE tl_lavote11_content MODIFY COLUMN maxNominationCount SMALLINT NOT NULL DEFAULT 1,
+								MODIFY COLUMN minNominationCount SMALLINT NOT NULL DEFAULT 1;
+
 UPDATE lams_tool SET tool_version='20170101' WHERE tool_signature='lavote11';
 
 ----------------------Put all sql statements above here-------------------------
