@@ -4,10 +4,10 @@
  */
 
 // Register a templates definition set named "default".
-CKEDITOR.addTemplates( 'default', {
+CKEDITOR.addTemplates( 'lams_templates', {
 	// The name of sub folder which hold the shortcut preview images of the
 	// templates.
-	imagesPath: "/lams/www/images/",
+	imagesPath: "/lams/www/public/ckeditor-templates/images/",
 
 	// The templates definitions.
 	templates: [ {
