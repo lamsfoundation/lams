@@ -1364,6 +1364,37 @@ CREATE TABLE lams_rating_criteria (
   	REFERENCES lams_lesson (lesson_id) ON DELETE NO ACTION ON UPDATE NO ACTION
 );
 
+CREATE TABLE lams_rating (
+  uid bigint(20) NOT NULL AUTO_INCREMENT,
+  rating_criteria_id bigint(20) NOT NULL,
+  item_id bigint(20),
+  user_id bigint(20) NOT NULL,
+  rating float,
+  PRIMARY KEY (uid),
+  KEY rating_criteria_id (rating_criteria_id),
+  KEY user_id (user_id),
+  CONSTRAINT FK_lams_rating_1 FOREIGN KEY (rating_criteria_id)
+  		REFERENCES lams_rating_criteria (rating_criteria_id) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT FK_lams_rating_2 FOREIGN KEY (user_id)
+  		REFERENCES lams_user (user_id) ON DELETE CASCADE ON UPDATE CASCADE
+);
+
+CREATE TABLE lams_rating_comment (
+  uid bigint(20) NOT NULL AUTO_INCREMENT,
+  rating_criteria_id bigint(20) NOT NULL,
+  item_id bigint(20),
+  user_id bigint(20) NOT NULL,
+  comment text,
+  posted_date datetime,
+  PRIMARY KEY (uid),
+  KEY rating_criteria_id (rating_criteria_id),
+  KEY user_id (user_id),
+  CONSTRAINT FK_lams_rating_comment_1 FOREIGN KEY (rating_criteria_id)
+  		REFERENCES lams_rating_criteria (rating_criteria_id) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT FK_lams_rating_comment_2 FOREIGN KEY (user_id)
+  		REFERENCES lams_user (user_id) ON DELETE CASCADE ON UPDATE CASCADE
+);
+
 CREATE TABLE lams_comment_session (
   uid BIGINT(20) NOT NULL AUTO_INCREMENT,
   external_id BIGINT(20),
