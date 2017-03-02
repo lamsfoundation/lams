@@ -110,7 +110,7 @@ ALTER TABLE tl_lamc11_session ADD CONSTRAINT FK_lamc11_session1 FOREIGN KEY (mc_
      		REFERENCES tl_lamc11_que_usr (uid) ON DELETE SET NULL ON UPDATE CASCADE;
 
 
-INSERT INTO tl_lamc11_content(uid, content_id , title, instructions, creation_date , reflect, questions_sequenced, created_by , define_later, retries, show_report, pass_mark) VALUES (1, 2, 'MCQ', 'Instructions', NOW(), 0, 0, 1, 0, 0, 0, 0);
+INSERT INTO tl_lamc11_content(uid, content_id , title, instructions, creation_date , reflect, questions_sequenced, created_by , define_later, retries, show_report, pass_mark) VALUES (1, ${default_content_id}, 'MCQ', 'Instructions', NOW(), 0, 0, 1, 0, 0, 0, 0);
 
 INSERT INTO tl_lamc11_que_content  (uid,question, mark, display_order,  mc_content_id) VALUES (1, 'A Sample question?', 1,1,1);
 	
