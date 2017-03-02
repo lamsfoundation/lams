@@ -104,20 +104,19 @@ public class ImportService implements IImportService {
     private static final short LAST_NAME = 4;
     private static final short AUTH_METHOD = 5;
     private static final short EMAIL = 6;
-    // private static final short FLASH_THEME = 7;
-    private static final short HTML_THEME = 8;
-    private static final short LOCALE = 9;
-    private static final short ADDRESS1 = 10;
-    private static final short ADDRESS2 = 11;
-    private static final short ADDRESS3 = 12;
-    private static final short CITY = 13;
-    private static final short STATE = 14;
-    private static final short POSTCODE = 15;
-    private static final short COUNTRY = 16;
-    private static final short DAY_PHONE = 17;
-    private static final short EVE_PHONE = 18;
-    private static final short MOB_PHONE = 19;
-    private static final short FAX = 20;
+    private static final short THEME = 7;
+    private static final short LOCALE = 8;
+    private static final short ADDRESS1 = 9;
+    private static final short ADDRESS2 = 10;
+    private static final short ADDRESS3 = 11;
+    private static final short CITY = 12;
+    private static final short STATE = 13;
+    private static final short POSTCODE = 14;
+    private static final short COUNTRY = 15;
+    private static final short DAY_PHONE = 16;
+    private static final short EVE_PHONE = 17;
+    private static final short MOB_PHONE = 18;
+    private static final short FAX = 19;
 
     // spreadsheet column indexes for userorgrole spreadsheet
     private static final short ORGANISATION = 1;
@@ -585,14 +584,14 @@ public class ImportService implements IImportService {
 	    user.setEmail(email);
 	}
 
-	String htmlId = parseStringCell(row.getCell(ImportService.HTML_THEME));
-	Theme htmlTheme = getTheme(htmlId);
-	if (htmlTheme == null) {
-	    args[0] = "(" + htmlId + ")";
+	String themeId = parseStringCell(row.getCell(ImportService.THEME));
+	Theme theme = getTheme(themeId);
+	if (theme == null) {
+	    args[0] = "(" + themeId + ")";
 	    rowResult.add(messageService.getMessage("error.theme.invalid", args));
 	    hasError = true;
 	} else {
-	    user.setTheme(htmlTheme);
+	    user.setTheme(theme);
 	}
 
 	String localeId = parseStringCell(row.getCell(ImportService.LOCALE));
