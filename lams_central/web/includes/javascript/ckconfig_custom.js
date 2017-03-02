@@ -123,7 +123,7 @@ CKEDITOR.config.contentsCss = CKEDITOR.basePath + '../css/defaultHTML_learner.cs
 CKEDITOR.config.disableNativeSpellChecker = false;
 CKEDITOR.config.browserContextMenuOnCtrl = true;
 CKEDITOR.config.templates = 'lams_templates';
-CKEDITOR.config.templates_files = [CKEDITOR.basePath + '../www/htmltemplates.js'];
+CKEDITOR.config.templates_files = [CKEDITOR.basePath + '../www/public/ckeditor-templates/htmltemplates.js'];
 CKEDITOR.config.format_tags	= 'div;h1;h2;h3;h4;h5;h6;pre;address;p' ;
 CKEDITOR.config.enterMode = 'div';
 CKEDITOR.plugins.addExternal('wikilink', CKEDITOR.basePath + '../tool/lawiki10/wikilink/', 'plugin.js');
