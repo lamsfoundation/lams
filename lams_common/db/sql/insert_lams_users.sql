@@ -141,7 +141,6 @@ INSERT INTO lams_user_organisation (user_organisation_id, organisation_id, user_
 
 --- all other users belong to Playpen
 INSERT INTO lams_user_organisation (user_organisation_id, organisation_id, user_id) VALUES (2, 2, 2);
-INSERT INTO lams_user_organisation (user_organisation_id, organisation_id, user_id) VALUES (3, 2, 3);
 INSERT INTO lams_user_organisation (user_organisation_id, organisation_id, user_id) VALUES (4, 2, 4);
 INSERT INTO lams_user_organisation (user_organisation_id, organisation_id, user_id) VALUES (5, 2, 5);
 INSERT INTO lams_user_organisation (user_organisation_id, organisation_id, user_id) VALUES (6, 2, 6);
@@ -149,7 +148,6 @@ INSERT INTO lams_user_organisation (user_organisation_id, organisation_id, user_
 INSERT INTO lams_user_organisation (user_organisation_id, organisation_id, user_id) VALUES (8, 2, 8);
 --- all other users belong to Playpen's class Everybody
 INSERT INTO lams_user_organisation (user_organisation_id, organisation_id, user_id) VALUES (9, 3, 2);
-INSERT INTO lams_user_organisation (user_organisation_id, organisation_id, user_id) VALUES (10, 3, 3);
 INSERT INTO lams_user_organisation (user_organisation_id, organisation_id, user_id) VALUES (11, 3, 4);
 INSERT INTO lams_user_organisation (user_organisation_id, organisation_id, user_id) VALUES (12, 3, 5);
 INSERT INTO lams_user_organisation (user_organisation_id, organisation_id, user_id) VALUES (13, 3, 6);
@@ -157,7 +155,6 @@ INSERT INTO lams_user_organisation (user_organisation_id, organisation_id, user_
 INSERT INTO lams_user_organisation (user_organisation_id, organisation_id, user_id) VALUES (15, 3, 8);
 --- all other users belong to MATH111
 INSERT INTO lams_user_organisation (user_organisation_id, organisation_id, user_id) VALUES (16, 4, 2);
-INSERT INTO lams_user_organisation (user_organisation_id, organisation_id, user_id) VALUES (17, 4, 3);
 INSERT INTO lams_user_organisation (user_organisation_id, organisation_id, user_id) VALUES (18, 4, 4);
 INSERT INTO lams_user_organisation (user_organisation_id, organisation_id, user_id) VALUES (19, 4, 5);
 INSERT INTO lams_user_organisation (user_organisation_id, organisation_id, user_id) VALUES (20, 4, 6);
@@ -165,7 +162,6 @@ INSERT INTO lams_user_organisation (user_organisation_id, organisation_id, user_
 INSERT INTO lams_user_organisation (user_organisation_id, organisation_id, user_id) VALUES (22, 4, 8);
 --- all test3, test4 users belong to Tutorial B, the other users belong to Tutorial A
 INSERT INTO lams_user_organisation (user_organisation_id, organisation_id, user_id) VALUES (23, 5, 2);
-INSERT INTO lams_user_organisation (user_organisation_id, organisation_id, user_id) VALUES (24, 5, 3);
 INSERT INTO lams_user_organisation (user_organisation_id, organisation_id, user_id) VALUES (25, 5, 4);
 INSERT INTO lams_user_organisation (user_organisation_id, organisation_id, user_id) VALUES (26, 5, 5);
 INSERT INTO lams_user_organisation (user_organisation_id, organisation_id, user_id) VALUES (27, 5, 6);
@@ -177,13 +173,6 @@ INSERT INTO lams_user_organisation_role (user_organisation_role_id, user_organis
 
 -- test, lamskh01 and mmm are authors, staff and learners in Playpen
 -- test1, test2, test3 and test4 are authors, staff and learners in Playpen
-INSERT INTO lams_user_organisation_role (user_organisation_role_id, user_organisation_id, role_id) VALUES (2, 2, 3);
-INSERT INTO lams_user_organisation_role (user_organisation_role_id, user_organisation_id, role_id) VALUES (3, 3, 3);
-INSERT INTO lams_user_organisation_role (user_organisation_role_id, user_organisation_id, role_id) VALUES (4, 4, 3);
-INSERT INTO lams_user_organisation_role (user_organisation_role_id, user_organisation_id, role_id) VALUES (5, 5, 3);
-INSERT INTO lams_user_organisation_role (user_organisation_role_id, user_organisation_id, role_id) VALUES (6, 6, 3);
-INSERT INTO lams_user_organisation_role (user_organisation_role_id, user_organisation_id, role_id) VALUES (7, 7, 3);
-INSERT INTO lams_user_organisation_role (user_organisation_role_id, user_organisation_id, role_id) VALUES (8, 8, 3);
 INSERT INTO lams_user_organisation_role (user_organisation_role_id, user_organisation_id, role_id) VALUES (9, 2, 4);
 INSERT INTO lams_user_organisation_role (user_organisation_role_id, user_organisation_id, role_id) VALUES (10, 3, 4);
 INSERT INTO lams_user_organisation_role (user_organisation_role_id, user_organisation_id, role_id) VALUES (11, 4, 4);
@@ -220,13 +209,6 @@ INSERT INTO lams_user_organisation_role (user_organisation_role_id, user_organis
 -- test1, test2, test3 and test4 are authors, staff and learners in MATH111
 -- test4 is group manager, mmm is group admin in MATH111
 INSERT INTO lams_user_organisation_role (user_organisation_role_id, user_organisation_id, role_id) VALUES (37, 22, 2);
-INSERT INTO lams_user_organisation_role (user_organisation_role_id, user_organisation_id, role_id) VALUES (38, 16, 3);
-INSERT INTO lams_user_organisation_role (user_organisation_role_id, user_organisation_id, role_id) VALUES (39, 17, 3);
-INSERT INTO lams_user_organisation_role (user_organisation_role_id, user_organisation_id, role_id) VALUES (40, 18, 3);
-INSERT INTO lams_user_organisation_role (user_organisation_role_id, user_organisation_id, role_id) VALUES (41, 19, 3);
-INSERT INTO lams_user_organisation_role (user_organisation_role_id, user_organisation_id, role_id) VALUES (42, 20, 3);
-INSERT INTO lams_user_organisation_role (user_organisation_role_id, user_organisation_id, role_id) VALUES (43, 21, 3);
-INSERT INTO lams_user_organisation_role (user_organisation_role_id, user_organisation_id, role_id) VALUES (44, 22, 3);
 INSERT INTO lams_user_organisation_role (user_organisation_role_id, user_organisation_id, role_id) VALUES (45, 16, 4);
 INSERT INTO lams_user_organisation_role (user_organisation_role_id, user_organisation_id, role_id) VALUES (46, 17, 4);
 INSERT INTO lams_user_organisation_role (user_organisation_role_id, user_organisation_id, role_id) VALUES (47, 18, 4);
