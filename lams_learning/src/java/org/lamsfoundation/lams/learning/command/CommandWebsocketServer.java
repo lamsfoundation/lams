@@ -1,13 +1,13 @@
 package org.lamsfoundation.lams.learning.command;
 
 import java.io.IOException;
-import java.util.Collections;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.TreeMap;
+import java.util.concurrent.ConcurrentHashMap;
 
 import javax.websocket.CloseReason;
 import javax.websocket.OnClose;
@@ -50,19 +50,13 @@ public class CommandWebsocketServer {
 		// websocket communication bypasses standard HTTP filters, so Hibernate session needs to be initialised manually
 		HibernateSessionManager.openSession();
 		try {
-		    // synchronize websockets as a new Learner entering Learner interface could modify this collection
-		    Iterator<Entry<Long, Map<String, Session>>> entryIterator = null;
-		    synchronized (CommandWebsocketServer.websockets) {
-			entryIterator = CommandWebsocketServer.websockets.entrySet().iterator();
-		    }
+		    Iterator<Entry<Long, Map<String, Session>>> entryIterator = CommandWebsocketServer.websockets
+			    .entrySet().iterator();
 
 		    Entry<Long, Map<String, Session>> entry = null;
 		    // go through lessons and update registered learners with messages
 		    do {
-			synchronized (CommandWebsocketServer.websockets) {
-			    entry = entryIterator.hasNext() ? entryIterator.next() : null;
-			}
-
+			entry = entryIterator.hasNext() ? entryIterator.next() : null;
 			if (entry != null) {
 			    Long lessonId = entry.getKey();
 			    Long lastSendTime = lastSendTimes.get(lessonId);
@@ -74,9 +68,7 @@ public class CommandWebsocketServer {
 			    // if all learners left the lesson, remove the obsolete mapping
 			    Map<String, Session> lessonWebsockets = entry.getValue();
 			    if (lessonWebsockets.isEmpty()) {
-				synchronized (CommandWebsocketServer.websockets) {
-				    entryIterator.remove();
-				}
+				entryIterator.remove();
 				lastSendTimes.remove(lessonId);
 			    }
 			}
@@ -123,8 +115,7 @@ public class CommandWebsocketServer {
     private static Logger log = Logger.getLogger(CommandWebsocketServer.class);
 
     private static final SendWorker sendWorker = new SendWorker();
-    private static final Map<Long, Map<String, Session>> websockets = Collections
-	    .synchronizedMap(new TreeMap<Long, Map<String, Session>>());
+    private static final Map<Long, Map<String, Session>> websockets = new ConcurrentHashMap<Long, Map<String, Session>>();
 
     static {
 	// run the singleton thread
@@ -139,7 +130,7 @@ public class CommandWebsocketServer {
 	Long lessonId = Long.valueOf(websocket.getRequestParameterMap().get(AttributeNames.PARAM_LESSON_ID).get(0));
 	Map<String, Session> sessionWebsockets = CommandWebsocketServer.websockets.get(lessonId);
 	if (sessionWebsockets == null) {
-	    sessionWebsockets = Collections.synchronizedMap(new TreeMap<String, Session>());
+	    sessionWebsockets = new ConcurrentHashMap<String, Session>();
 	    CommandWebsocketServer.websockets.put(lessonId, sessionWebsockets);
 	}
 
