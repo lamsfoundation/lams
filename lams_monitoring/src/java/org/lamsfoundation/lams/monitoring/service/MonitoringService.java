@@ -1130,7 +1130,7 @@ public class MonitoringService implements IMonitoringService {
 		    }
 		} else {
 		    // if group already exist
-		    learnerService.completeActivity(learner.getUserId(), activity, lessonId);
+		    learnerService.completeActivity(learner.getUserId(), activity, progress.getLearnerProgressId());
 		    if (MonitoringService.log.isDebugEnabled()) {
 			MonitoringService.log
 				.debug("Grouping activity [" + activity.getActivityId() + "] is completed.");
@@ -1142,7 +1142,7 @@ public class MonitoringService implements IMonitoringService {
 		GateActivityDTO dto = learnerService.knockGate(gate, learner, false);
 		if (dto.getAllowToPass()) {
 		    // the gate is opened, continue to next activity to complete
-		    learnerService.completeActivity(learner.getUserId(), activity, lessonId);
+		    learnerService.completeActivity(learner.getUserId(), activity, progress.getLearnerProgressId());
 		    if (MonitoringService.log.isDebugEnabled()) {
 			MonitoringService.log.debug("Gate activity [" + gate.getActivityId() + "] is completed.");
 		    }
@@ -1174,7 +1174,7 @@ public class MonitoringService implements IMonitoringService {
 
 		    learnerService.completeToolSession(toolSession.getToolSessionId(),
 			    new Long(learner.getUserId().longValue()));
-		    learnerService.completeActivity(learner.getUserId(), activity, lessonId);
+		    learnerService.completeActivity(learner.getUserId(), activity, progress.getLearnerProgressId());
 		    if (MonitoringService.log.isDebugEnabled()) {
 			MonitoringService.log.debug("Tool activity [" + activity.getActivityId() + "] is completed.");
 		    }
@@ -1187,7 +1187,7 @@ public class MonitoringService implements IMonitoringService {
 		// branches are marked as done.
 		// Ditto the two types of optional activities.
 		// Then if the user goes back to them, they will operate normally.
-		learnerService.completeActivity(learner.getUserId(), activity, lessonId);
+		learnerService.completeActivity(learner.getUserId(), activity, progress.getLearnerProgressId());
 
 	    } else if (activity.isComplexActivity()) {
 		// expect it to be a parallel activity
