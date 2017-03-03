@@ -12,7 +12,7 @@
 	function submitForm(methodName) {
 		var f = document.getElementById('learnerForm');
 		var m = document.getElementById('methodVar');
-		m.value = methodName
+		m.value = methodName;
 		f.submit();
 	}
 </script>
@@ -25,14 +25,7 @@
 	<html:form action="/learner" target="_self" onsubmit="disableFinishButton();" styleId="learnerForm">
 		<html:hidden property="toolSessionID" />
 		<html:hidden property="mode" />
-		<c:choose>
-			<c:when test="${reflectOnActivity}">
-				<input type="hidden" id="methodVar" name="method" value="reflect" />
-			</c:when>
-			<c:otherwise>
-				<input type="hidden" id="methodVar" name="method" value="finish" />
-			</c:otherwise>
-		</c:choose>
+		<input type="hidden" id="methodVar" name="method" />
 
 		<c:if test="${userFinished and reflectOnActivity}">
 			<div class="panel">
@@ -62,7 +55,7 @@
 			<c:choose>
 				<c:when test="${reflectOnActivity}">
 
-					<html:button property="continueButton" styleClass="btn btn-sm btn-primary pull-right"
+					<html:button  property="continueButton" styleClass="btn btn-sm btn-primary pull-right"
 						onclick="submitForm('reflect')">
 						<fmt:message key="button.continue" />
 					</html:button>
