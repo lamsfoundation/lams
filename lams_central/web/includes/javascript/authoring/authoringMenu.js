@@ -319,8 +319,14 @@ var MenuLib = {
 			x2 : 0,
 			y2 : 0
 		};
-		$.each(layout.activities.concat(layout.regions).concat(layout.labels), function() {
+		
+		var boxes = layout.activities.concat(layout.regions).concat(layout.labels);
+		if (layout.floatingActivity) {
+			boxes.push(layout.floatingActivity);
+		}
+		$.each(boxes, function() {
 			var box = this.items.getBBox();
+			debugger;
 			if (box.x < result.x) {
 				result.x = box.x;
 			}
