@@ -326,7 +326,6 @@ var MenuLib = {
 		}
 		$.each(boxes, function() {
 			var box = this.items.getBBox();
-			debugger;
 			if (box.x < result.x) {
 				result.x = box.x;
 			}
