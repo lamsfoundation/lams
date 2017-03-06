@@ -5,11 +5,8 @@
 <html:errors />
 
 <html:form action="/loginsave.do?method=save" enctype="multipart/form-data" method="post">
-<p><fmt:message key="sysadmin.login.logo"/></p>
-<p><html:file property="logo" size="40" styleClass="form-control" /></p>
-<br />
 <c:set var="language"><lams:user property="localeLanguage"/></c:set>
-<p><fmt:message key="sysadmin.login.text"/></p>
+<p class="help-block"><fmt:message key="sysadmin.login.text"/></p>
 
 <c:set var="existingContent"><bean:write name='LoginMaintainForm' property='news' filter='false' /></c:set>
 
