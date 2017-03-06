@@ -58,12 +58,12 @@
 
 <div class="input-group" id="addfile">
 	<span class="input-group-btn" style="font-size:inherit"> <%-- font-size:inherit needed for Share Resources authoring or the button is too small --%>
-		<button id="${fileButtonBrowse}" ${tabindexString} type="button" class="btn btn-default">
+		<button id="${fileButtonBrowse}" ${tabindexString} type="button" class="btn btn-sm btn-default">
 			<i class="fa fa-upload"></i> <fmt:message key="${fileInputMessageKey}"/>
 		</button>
 	</span>
 	<input type="file" id="${fileFieldId}" name="${fileFieldname}" style="display:none" class="fileUpload"> 
-	<input type="text" id="${fileInputNameFieldname}" style="display:none" disabled="disabled" placeholder="File not selected" class="form-control file-input-name">
+	<input type="text" id="${fileInputNameFieldname}" style="display:none" disabled="disabled" placeholder="File not selected" class="form-control input-sm file-input-name">
 </div>
 <c:if test="${uploadInfoMessageKey ne '-'}">
 <p class="help-block"><fmt:message key="${uploadInfoMessageKey}"><fmt:param>${maxFileSize}</fmt:param></fmt:message></p>					
