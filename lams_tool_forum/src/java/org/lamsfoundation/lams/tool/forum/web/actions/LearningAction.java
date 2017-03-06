@@ -930,15 +930,14 @@ public class LearningAction extends Action {
      */
     private ActionForward deleteAttachment(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) {
-
 	// only reset not attachment flag.
 	MessageDTO dto = new MessageDTO();
 	dto.setHasAttachment(false);
 	request.setAttribute(ForumConstants.AUTHORING_TOPIC, dto);
-	SessionMap sessionMap = (SessionMap) request.getSession()
-		.getAttribute(WebUtil.readStrParam(request, ForumConstants.ATTR_SESSION_MAP_ID));
+	String sessionMapId = WebUtil.readStrParam(request, ForumConstants.ATTR_SESSION_MAP_ID);
+	SessionMap sessionMap = (SessionMap) request.getSession().getAttribute(sessionMapId);
 	request.setAttribute(ForumConstants.ATTR_ALLOW_UPLOAD, sessionMap.get(ForumConstants.ATTR_ALLOW_UPLOAD));
-
+	request.setAttribute(ForumConstants.ATTR_SESSION_MAP_ID, sessionMapId);
 	return mapping.findForward("success");
     }
 

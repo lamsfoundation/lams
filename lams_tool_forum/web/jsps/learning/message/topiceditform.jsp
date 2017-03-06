@@ -14,29 +14,9 @@
 <c:if test="${topic.hasAttachment || sessionMap.allowUpload}">
 	<c:set var="allowUpload" value="${sessionMap.allowUpload}" />
 
-	 <div class="form-group">
-    	<label><fmt:message key="message.label.attachment" />&nbsp;</label>
-		<div id="itemAttachmentArea">
-			<c:set var="ctxPath" value="${pageContext.request.contextPath}" scope="request"/>
-			<input type="hidden" name="hasAttachment" value="${topic.hasAttachment}"/>
-			<c:if test="${topic.hasAttachment}">
-					<c:forEach var="file" items="${topic.message.attachments}">
-					    <a id="removeAttachmentButton" href="#" onclick="removeAtt('${sessionMapID}')" class="btn btn-default btn-xs"><i class="fa fa-trash-o"></i></a>
-						<fmt:message key="message.label.attachment"/>: 
-						<c:set var="downloadURL">
-							<html:rewrite page="/download/?uuid=${file.fileUuid}&versionID=${file.fileVersionId}&preferDownload=true" /> 
-						</c:set>
-						<a href="<c:out value='${downloadURL}' escapeXml='false'/>"> <c:out value="${file.fileName}" /> </a>
-				  		<BR/>
-			  		</c:forEach>
-				</ul>
-			</c:if>
-			
-			<c:if test="${not topic.hasAttachment && allowUpload}">
-				<lams:FileUpload fileFieldname="attachmentFile" maxFileSize="${sessionMap.uploadMaxFileSize}"/>
-			</c:if>
-		</div>
-	</div>		
+	<div id="itemAttachmentArea">
+		<%@ include file="/jsps/learning/message/msgattachment.jsp"%>
+	</div>
 
 	<lams:WaitingSpinner id="itemAttachmentArea_Busy"/>
 </c:if>
