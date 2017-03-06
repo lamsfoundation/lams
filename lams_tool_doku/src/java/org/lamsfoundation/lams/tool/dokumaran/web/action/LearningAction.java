@@ -54,12 +54,10 @@ import org.lamsfoundation.lams.tool.dokumaran.model.DokumaranSession;
 import org.lamsfoundation.lams.tool.dokumaran.model.DokumaranUser;
 import org.lamsfoundation.lams.tool.dokumaran.service.DokumaranApplicationException;
 import org.lamsfoundation.lams.tool.dokumaran.service.DokumaranConfigurationException;
-import org.lamsfoundation.lams.tool.dokumaran.service.DokumaranService;
 import org.lamsfoundation.lams.tool.dokumaran.service.IDokumaranService;
 import org.lamsfoundation.lams.tool.dokumaran.web.form.ReflectionForm;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
-import org.lamsfoundation.lams.util.HashUtil;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
@@ -124,6 +122,7 @@ public class LearningAction extends Action {
 	Long toolSessionId = new Long(request.getParameter(DokumaranConstants.PARAM_TOOL_SESSION_ID));
 	IDokumaranService service = getDokumaranService();
 	Dokumaran dokumaran = service.getDokumaranBySessionId(toolSessionId);
+	request.setAttribute(DokumaranConstants.ATTR_TOOL_CONTENT_ID, dokumaran.getContentId());
 	DokumaranSession session = service.getDokumaranSessionBySessionId(toolSessionId);
 
 	// get back the dokumaran and item list and display them on page
@@ -166,6 +165,11 @@ public class LearningAction extends Action {
 	    request.setAttribute(DokumaranConstants.ATTR_DOKUMARAN, dokumaran);
 	    return mapping.findForward("waitforleader");
 	}
+	//time limit is set but hasn't yet launched by a teacher - show waitForTimeLimitLaunch page
+	if (dokumaran.getTimeLimit() > 0 && dokumaran.getTimeLimitLaunchedDate() == null) {
+	    return mapping.findForward("waitForTimeLimitLaunch");
+	}
+	
 	boolean isUserLeader = (user != null) && service.isUserLeader(leaders, user.getUserId());
 
 	// check whether finish lock is on/off
@@ -222,9 +226,16 @@ public class LearningAction extends Action {
 	String etherpadServerUrl = etherpadServerUrlConfig.getConfigValue();
 	request.setAttribute(DokumaranConstants.KEY_ETHERPAD_SERVER_URL, etherpadServerUrl);
 	
+	//time limit
+	boolean isTimeLimitEnabled = hasEditRight && !finishedLock && dokumaran.getTimeLimit() != 0;
+	long secondsLeft = isTimeLimitEnabled ? service.getSecondsLeft(dokumaran) : 0;
+	request.setAttribute(DokumaranConstants.ATTR_SECONDS_LEFT, secondsLeft);
+	
+	boolean isTimeLimitExceeded = service.checkTimeLimitExceeded(dokumaran);
+	
 	String padId = session.getPadId();
-	//in case of non-leader or finished lock - show Etherpad in readonly mode
-	if (dokumaran.isUseSelectLeaderToolOuput() && !isUserLeader || finishedLock) {
+	//in case of non-leader or finished lock or isTimeLimitExceeded - show Etherpad in readonly mode
+	if (dokumaran.isUseSelectLeaderToolOuput() && !isUserLeader || finishedLock || isTimeLimitExceeded) {
 	    padId = session.getEtherpadReadOnlyId();
 	    //in case Etherpad didn't have enough time to initialize - show notconfigured.jsp
 	    if (padId == null) {

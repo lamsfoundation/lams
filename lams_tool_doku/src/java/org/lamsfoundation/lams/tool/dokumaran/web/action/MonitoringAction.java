@@ -75,6 +75,10 @@ public class MonitoringAction extends Action {
 	    return summary(mapping, form, request, response);
 	} else if (param.equals("fixFaultySession")) {
 	    return fixFaultySession(mapping, form, request, response);
+	} else if (param.equals("launchTimeLimit")) {
+	    return launchTimeLimit(mapping, form, request, response);
+	} else if (param.equals("addOneMinute")) {
+	    return addOneMinute(mapping, form, request, response);
 	}
 
 	return mapping.findForward(DokumaranConstants.ERROR);
@@ -105,6 +109,11 @@ public class MonitoringAction extends Action {
 	    List<ReflectDTO> relectList = service.getReflectList(contentId);
 	    sessionMap.put(DokumaranConstants.ATTR_REFLECT_LIST, relectList);
 	}
+	
+	//time limit
+	boolean isTimeLimitEnabled = dokumaran.getTimeLimit() != 0;
+	long secondsLeft = isTimeLimitEnabled ? service.getSecondsLeft(dokumaran) : 0;
+	sessionMap.put(DokumaranConstants.ATTR_SECONDS_LEFT, secondsLeft);
 
 	// cache into sessionMap
 	sessionMap.put(DokumaranConstants.ATTR_SUMMARY_LIST, groupList);
@@ -141,7 +150,6 @@ public class MonitoringAction extends Action {
 	IDokumaranService service = getDokumaranService();
 	Long toolSessionId = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_SESSION_ID);
 	DokumaranSession session = service.getDokumaranSessionBySessionId(toolSessionId);
-
 	
 	try {
 	    log.debug("Fixing faulty session (sessionId=" + toolSessionId + ").");
@@ -159,6 +167,36 @@ public class MonitoringAction extends Action {
 	    return null;
 	}
 	
+	return null;
+    }
+    
+    /**
+     * Stores date when user has started activity with time limit
+     * @throws IOException 
+     * @throws JSONException 
+     */
+    private ActionForward launchTimeLimit(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+	    HttpServletResponse response) throws JSONException, IOException {
+	IDokumaranService service = getDokumaranService();
+	Long toolContentId = WebUtil.readLongParam(request, DokumaranConstants.ATTR_TOOL_CONTENT_ID, false);
+	
+	service.launchTimeLimit(toolContentId);
+
+	return null;
+    }
+    
+    /**
+     * Stores date when user has started activity with time limit
+     * @throws IOException 
+     * @throws JSONException 
+     */
+    private ActionForward addOneMinute(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+	    HttpServletResponse response) throws JSONException, IOException {
+	IDokumaranService service = getDokumaranService();
+	Long toolContentId = WebUtil.readLongParam(request, DokumaranConstants.ATTR_TOOL_CONTENT_ID, false);
+	
+	service.addOneMinute(toolContentId);
+
 	return null;
     }
 

@@ -21,6 +21,13 @@
 </lams:SimplePanel>
 
 <lams:SimplePanel titleKey="label.resource.options">
+
+	<div class="form-inline">
+		<label for="timeLimit">
+			<fmt:message key="label.time.limit" />&nbsp;
+			<html:text property="dokumaran.timeLimit" size="3" styleId="timeLimit" styleClass="form-control input-sm"/>
+		</label>
+	</div>
 	
 	<div class="checkbox">
 		<label for="showChat">
