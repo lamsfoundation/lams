@@ -23,6 +23,7 @@
 
 package org.lamsfoundation.lams.tool.dokumaran.service;
 
+import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
@@ -69,6 +70,7 @@ import org.lamsfoundation.lams.tool.dokumaran.model.DokumaranConfigItem;
 import org.lamsfoundation.lams.tool.dokumaran.model.DokumaranSession;
 import org.lamsfoundation.lams.tool.dokumaran.model.DokumaranUser;
 import org.lamsfoundation.lams.tool.dokumaran.util.DokumaranToolContentHandler;
+import org.lamsfoundation.lams.tool.dokumaran.web.action.LearningWebsocketServer;
 import org.lamsfoundation.lams.tool.exception.DataMissingException;
 import org.lamsfoundation.lams.tool.exception.ToolException;
 import org.lamsfoundation.lams.tool.service.ILamsToolService;
@@ -267,6 +269,68 @@ public class DokumaranService implements IDokumaranService, ToolContentManager, 
 	}
 
 	return isLeaderResponseFinalized;
+    }
+    
+    @Override
+    public void launchTimeLimit(Long toolContentId) throws JSONException, IOException {
+	Dokumaran dokumaran = getDokumaranByContentId(toolContentId);
+	dokumaran.setTimeLimitLaunchedDate(new Date());
+	dokumaranDao.saveObject(dokumaran);
+	
+	LearningWebsocketServer.sendPageRefreshRequest(dokumaran.getContentId());
+    }
+    
+    @Override
+    public void addOneMinute(Long toolContentId) throws JSONException, IOException {
+	Dokumaran dokumaran = getDokumaranByContentId(toolContentId);
+	
+	int timeLimit = dokumaran.getTimeLimit();
+	if (timeLimit == 0) {
+	    return;
+	}
+	
+	int newTimeLimit = 0;
+	if (checkTimeLimitExceeded(dokumaran)) {
+	    int minutesPassedSinceStart = (int) ((System.currentTimeMillis() - dokumaran.getTimeLimitLaunchedDate().getTime()) / 1000/60);
+	    newTimeLimit = minutesPassedSinceStart + 1;
+	    // change negative to 0
+	    newTimeLimit = Math.max(0, newTimeLimit);
+	} else {
+	    newTimeLimit = timeLimit + 1;
+	}
+	dokumaran.setTimeLimit(newTimeLimit);
+	dokumaranDao.saveObject(dokumaran);
+	
+	LearningWebsocketServer.sendAddOneMinuteRequest(dokumaran.getContentId());
+    }
+
+    @Override
+    public long getSecondsLeft(Dokumaran dokumaran) {
+
+	long secondsLeft = 0;
+	if (dokumaran.getTimeLimit() != 0) {
+	    // if teacher has started the time limit already - calculate remaining time, and full time otherwise
+	    secondsLeft = dokumaran.getTimeLimitLaunchedDate() == null ? dokumaran.getTimeLimit() * 60
+		    : dokumaran.getTimeLimit() * 60
+			    - (System.currentTimeMillis() - dokumaran.getTimeLimitLaunchedDate().getTime()) / 1000;
+	    // change negative to 0
+	    secondsLeft = Math.max(0, secondsLeft);
+	}
+
+	return secondsLeft;
+    }
+
+    @Override
+    public boolean checkTimeLimitExceeded(Dokumaran dokumaran) {
+	int timeLimit = dokumaran.getTimeLimit();
+	if (timeLimit == 0) {
+	    return false;
+	}
+
+	// check if the time limit is exceeded
+	Date timeLimitLaunchedDate = dokumaran.getTimeLimitLaunchedDate();
+	return (timeLimitLaunchedDate != null)
+		&& timeLimitLaunchedDate.getTime() + timeLimit * 60000 < System.currentTimeMillis();
     }
 
     @Override
@@ -1070,6 +1134,7 @@ public class DokumaranService implements IDokumaranService, ToolContentManager, 
 	dokumaran.setInstructions(toolContentJSON.getString(RestTags.INSTRUCTIONS));
 	dokumaran.setCreated(updateDate);
 
+	dokumaran.setTimeLimit(JsonUtil.opt(toolContentJSON, "timeLimit", 0));
 	dokumaran.setShowChat(JsonUtil.opt(toolContentJSON, "showChat", Boolean.FALSE));
 	dokumaran.setShowLineNumbers(JsonUtil.opt(toolContentJSON, "showLineNumbers", Boolean.FALSE));
 	dokumaran.setSharedPadId(JsonUtil.opt(toolContentJSON, "sharedPadId", (String) null));

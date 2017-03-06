@@ -35,7 +35,7 @@
 						<c:out value="${user.firstName} ${user.lastName}" escapeXml="true" />
 					</div>
 				</c:forEach>
-				</div>
+			</div>
 		</div>
 
 		<div class="voffset10">

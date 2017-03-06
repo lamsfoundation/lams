@@ -90,6 +90,7 @@
 			parameter="start" >
 			<forward name="success" path="/pages/learning/learning.jsp" />
 			<forward name="waitforleader" path="/pages/learning/waitforleader.jsp" />
+			<forward name="waitForTimeLimitLaunch" path="/pages/learning/waitForTimeLimitLaunch.jsp" />
 			<forward name="notconfigured" path="/pages/learning/notconfigured.jsp" />
 			<forward name="defineLater" path="/pages/learning/definelater.jsp" />	
 		</action>
@@ -121,7 +122,6 @@
 			parameter="submitReflection" 
 			scope="request">
 			<forward name="success" path="/pages/learning/finish.jsp" />
-
 		</action>
 		<!-- ========== BEGIN: Monitoring Definitions ============================== -->
 		<action path="/monitoring/summary"
@@ -134,6 +134,15 @@
 			type="org.lamsfoundation.lams.tool.dokumaran.web.action.MonitoringAction"
 			parameter="fixFaultySession" >
 		</action>
+		<action path="/monitoring/launchTimeLimit"
+			type="org.lamsfoundation.lams.tool.dokumaran.web.action.MonitoringAction"
+			parameter="launchTimeLimit">
+		</action>
+		<action path="/monitoring/addOneMinute"
+			type="org.lamsfoundation.lams.tool.dokumaran.web.action.MonitoringAction"
+			parameter="addOneMinute">
+		</action>
+		
 	    <action
 	      path="/ladoku11admin"
 	      type="org.lamsfoundation.lams.tool.dokumaran.web.action.AdminAction"

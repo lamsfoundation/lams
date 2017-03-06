@@ -54,6 +54,11 @@ public class Dokumaran implements Cloneable {
     private boolean useSelectLeaderToolOuput;
     
     private boolean allowMultipleLeaders;
+    
+    private int timeLimit;
+    
+    //date when teacher has started time counter (pressed start button)
+    private Date timeLimitLaunchedDate;
 
     private boolean showChat;
 
@@ -299,6 +304,33 @@ public class Dokumaran implements Cloneable {
     public void setContentId(Long contentId) {
 	this.contentId = contentId;
     }
+    
+    /**
+     * @return Returns the time limitation, that students have to complete an attempt.
+     */
+    public int getTimeLimit() {
+	return timeLimit;
+    }
+
+    /**
+     * @param timeLimit
+     *            the time limitation, that students have to complete an attempt.
+     */
+    public void setTimeLimit(int timeLimit) {
+	this.timeLimit = timeLimit;
+    }
+    
+    /**
+    *
+    * @return date when teacher has started time counter (pressed start button)
+    */
+   public Date getTimeLimitLaunchedDate() {
+	return timeLimitLaunchedDate;
+   }
+
+   public void setTimeLimitLaunchedDate(Date timeLimitLaunchedDate) {
+	this.timeLimitLaunchedDate = timeLimitLaunchedDate;
+   }
 
     /**
      *

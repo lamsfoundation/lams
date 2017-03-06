@@ -23,11 +23,13 @@
 
 package org.lamsfoundation.lams.tool.dokumaran.service;
 
+import java.io.IOException;
 import java.net.URISyntaxException;
 import java.util.List;
 
 import javax.servlet.http.Cookie;
 
+import org.apache.tomcat.util.json.JSONException;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.tool.dokumaran.dto.ReflectDTO;
 import org.lamsfoundation.lams.tool.dokumaran.dto.SessionDTO;
@@ -102,6 +104,31 @@ public interface IDokumaranService {
      * @return
      */
     boolean isLeaderResponseFinalized(Long toolSessionId);
+    
+    /**
+     * Stores date when user has started activity with time limit.
+     * 
+     * @param toolContentId
+     * @throws IOException 
+     * @throws JSONException 
+     */
+    void launchTimeLimit(Long toolContentId) throws JSONException, IOException;
+    
+    void addOneMinute(Long toolContentId) throws JSONException, IOException;
+
+    /**
+     * Calculates how many seconds left till the time limit will expire. 
+     * 
+     * @param assessment
+     * @return
+     */
+    long getSecondsLeft(Dokumaran dokumaran);
+
+    /**
+     * @param assessment
+     * @return whether the time limit is exceeded already
+     */
+    boolean checkTimeLimitExceeded(Dokumaran dokumaran);
     
     Cookie createEtherpadCookieForLearner(DokumaranUser user, DokumaranSession session) throws DokumaranConfigurationException, URISyntaxException, DokumaranApplicationException;
     
