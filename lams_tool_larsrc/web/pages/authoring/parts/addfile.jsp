@@ -99,10 +99,10 @@
 			<div><br/></div>
 			<div><br/></div>
 			<div class="voffset5 pull-right">
-			    <a href="javascript:;" onclick="hideResourceItem()" class="btn btn-default btn-sm">
-					<fmt:message key="label.cancel" /> </a>
-				<a href="#nogo" onclick="submitResourceItem()" class="btn btn-default btn-sm">
-					<i class="fa fa-plus"></i>&nbsp;<fmt:message key="label.authoring.basic.add.file" /> </a>
+			    <button onclick="hideResourceItem(); return false;" class="btn btn-default btn-sm btn-disable-on-submit">
+					<fmt:message key="label.cancel" /> </button>
+				<button onclick="submitResourceItem(); return false;" class="btn btn-default btn-sm btn-disable-on-submit">
+					<i class="fa fa-plus"></i>&nbsp;<fmt:message key="label.authoring.basic.add.file" /> </button>
 			    
 			</div>
 						

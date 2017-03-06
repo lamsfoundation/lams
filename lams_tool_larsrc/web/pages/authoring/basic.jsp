@@ -4,14 +4,15 @@
 
 <c:set var="formBean" value="<%=request.getAttribute(org.apache.struts.taglib.html.Constants.BEAN_KEY)%>" />
 <script lang="javascript">
-
-
 	function showResourceItem(url) {
+		disableButtons();
 		$.ajaxSetup({ cache: true });
 		$("#resourceInputArea").load(url, function() {
 			$(this).show();
 			$("#saveCancelButtons").hide();
+			enableButtons();
 		});
+		return false;
 	}
 	function hideResourceItem(){
 		$("#resourceInputArea").hide();
@@ -94,14 +95,14 @@
 </div>
 
 <div class="form-inline">
-	<a href="javascript:showResourceItem('<html:rewrite page="/authoring/newItemInit.do?sessionMapID=${formBean.sessionMapID}&itemType=1"/>');" class="btn btn-default btn-sm">
-		<i class="fa fa-plus"></i>&nbsp;<fmt:message key="label.authoring.basic.add.url" /></a> 
-	<a href="javascript:showResourceItem('<html:rewrite page="/authoring/newItemInit.do?sessionMapID=${formBean.sessionMapID}&itemType=2"/>');"  class="btn btn-default btn-sm loffset5">
-		<i class="fa fa-plus"></i>&nbsp;<fmt:message key="label.authoring.basic.add.file" /></a>
-	<a href="javascript:showResourceItem('<html:rewrite page="/authoring/newItemInit.do?sessionMapID=${formBean.sessionMapID}&itemType=3"/>');" class="btn btn-default btn-sm loffset5">
-		<i class="fa fa-plus"></i>&nbsp;<fmt:message key="label.authoring.basic.add.website" /></a>
-	<a href="javascript:showResourceItem('<html:rewrite page="/authoring/newItemInit.do?sessionMapID=${formBean.sessionMapID}&itemType=4"/>');" class="btn btn-default btn-sm loffset5">
-		<i class="fa fa-plus"></i>&nbsp;<fmt:message key="label.authoring.basic.add.learning.object" /> </a>
+	<button onClick="showResourceItem('<html:rewrite page="/authoring/newItemInit.do?sessionMapID=${formBean.sessionMapID}&itemType=1"/>');return false;" class="btn btn-default btn-sm btn-disable-on-submit">
+		<i class="fa fa-plus"></i>&nbsp;<fmt:message key="label.authoring.basic.add.url" /></button> 
+	<button onClick="showResourceItem('<html:rewrite page="/authoring/newItemInit.do?sessionMapID=${formBean.sessionMapID}&itemType=2"/>');return false;"  class="btn btn-default btn-sm loffset5 btn-disable-on-submit">
+		<i class="fa fa-plus"></i>&nbsp;<fmt:message key="label.authoring.basic.add.file" /></button>
+	<button onClick="showResourceItem('<html:rewrite page="/authoring/newItemInit.do?sessionMapID=${formBean.sessionMapID}&itemType=3"/>');return false;" class="btn btn-default btn-sm loffset5 btn-disable-on-submit">
+		<i class="fa fa-plus"></i>&nbsp;<fmt:message key="label.authoring.basic.add.website" /></button>
+	<button onClick="showResourceItem('<html:rewrite page="/authoring/newItemInit.do?sessionMapID=${formBean.sessionMapID}&itemType=4"/>');return false;" class="btn btn-default btn-sm loffset5 btn-disable-on-submit">
+		<i class="fa fa-plus"></i>&nbsp;<fmt:message key="label.authoring.basic.add.learning.object" /> </button>
 </div>
 
 <div id="resourceInputArea" name="resourceInputArea" class="voffset10"></div>

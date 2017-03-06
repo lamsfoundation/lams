@@ -37,6 +37,7 @@
 		$('textarea').trigger('change');
 		
 	    var param = $("#instructionForm").serialize();
+	    disableButtons();
 		addInstructionLoading();
 		
 	    $.post(
@@ -44,6 +45,7 @@
 	    	param, 
 	    	function(xml) {
                $('#instructionArea').html(xml);
+               enableButtons();
 	    	}
 	    );
 	    
@@ -109,8 +111,8 @@
 
 		document.getElementById("instructionList").value = $("#instructionForm").serialize();
 		var formData = new FormData(document.getElementById("resourceItemForm"));
+		disableButtons();
 		showBusy(instructionTargetDiv);
-		
 		// after submit, it direct to itemlist.jsp, 
 		// then refresh "basic tab" resource list and close this window.
 	    $.ajax({ // create an AJAX call...
@@ -121,6 +123,9 @@
 			url: $("#resourceItemForm").attr('action'),
 			success: function(data) {
                $('#resourceInputArea').html(data);
+			},
+			complete: function() {
+				enableButtons();
 			}
 	    });
 	    
