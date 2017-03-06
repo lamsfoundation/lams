@@ -38,7 +38,7 @@
 		
 		<lams:WaitingSpinner id="instructionArea_Busy"/>
 		
-		<a href="#nogo" onclick="javascript:addInstruction();" class="btn btn-default btn-sm pull-right">
+		<button onclick="addInstruction(); return false;" class="btn btn-default btn-sm btn-disable-on-submit pull-right">
 			<i class="fa fa-plus"></i>&nbsp;<fmt:message key="label.authoring.basic.resource.add.instruction" /> 
 		</a>
 
