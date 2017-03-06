@@ -54,6 +54,7 @@
 <script type="text/javascript" src="<html:rewrite page='/includes/javascript/etherpad.js'/>"></script>
 <script type="text/javascript" src="${lams}includes/javascript/monitorToolSummaryAdvanced.js" ></script>
 <script type="text/javascript">
+	var isCountdownStarted = ${not empty dokumaran.timeLimitLaunchedDate};
 	
 	$(document).ready(function(){
 		
@@ -135,6 +136,7 @@
                 	
                 	//unpause countdown
                 	$('#countdown').countdown('resume');
+                	isCountdownStarted = true;
 	            },
 	            error: function (request, status, error) {
 	            	button.show();
@@ -156,9 +158,16 @@
 	            success: function (response) {
 	            	var times = $("#countdown").countdown('getTimes');
 	            	var secondsLeft = times[4]*3600 + times[5]*60 + times[6] + 60;
-	            	$('#countdown').countdown('resume');
-	            	$('#countdown').countdown('option', { until: '+' + secondsLeft + 'S' });
-	            	$('#countdown').countdown('pause');
+	            	if (isCountdownStarted) {
+		            	$('#countdown').countdown('option', { until: '+' + secondsLeft + 'S' });
+		            
+		            //fixing countdown bug of not updating it in case if being paused 
+	            	} else {
+	            		$('#countdown').countdown('resume');
+		            	$('#countdown').countdown('option', { until: '+' + secondsLeft + 'S' });
+		            	$('#countdown').countdown('pause');
+	            	}
+	            	
 	            },
 	            error: function (request, status, error) {
 	                alert(request.responseText);
