@@ -93,6 +93,8 @@ public class DokumaranConstants {
     
     public static final String ATTR_PAD_ID = "padId";
     
+    public static final String ATTR_SECONDS_LEFT = "secondsLeft";
+    
     public static final String KEY_ETHERPAD_SERVER_URL = "etherpadServerUrl";
     
     public static final String DEFAULT_PAD_NAME = "LAMS-pad";

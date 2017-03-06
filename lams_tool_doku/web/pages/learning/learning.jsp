@@ -10,13 +10,37 @@
 <c:set var="dokumaran" value="${sessionMap.dokumaran}" />
 <c:set var="finishedLock" value="${sessionMap.finishedLock}" />
 <c:set var="hasEditRight" value="${sessionMap.hasEditRight}"/>
+<c:set var="isTimeLimitEnabled" value="${hasEditRight && assessment.getTimeLimit() != 0 && !finishedLock}" />
 <c:set var="localeLanguage"><lams:user property="localeLanguage" /></c:set>
 	
 <lams:html>
 <lams:head>
 	<title><fmt:message key="label.learning.title" /></title>
 	<%@ include file="/common/header.jsp"%>
+	<link rel="stylesheet" type="text/css" href="${lams}css/jquery.countdown.css" />
+	<style media="screen,projection" type="text/css">
+		#countdown {
+			width: 150px; 
+			font-size: 110%; 
+			font-style: italic; 
+			color:#47bc23;
+			text-align: center;
+		}
+		#countdown-label {
+			font-size: 170%; padding-top:5px; padding-bottom:5px; font-style: italic; color:#47bc23;
+		}
+		
+		<c:if test="${isTimeLimitEnabled}">
+		.panel-body.panel-learner-body {
+			padding-top: 70px;
+		}
+		</c:if>
+		
+	</style>
 
+	<script type="text/javascript" src="${lams}includes/javascript/jquery.plugin.js"></script>
+	<script type="text/javascript" src="${lams}includes/javascript/jquery.countdown.js"></script>
+	<script type="text/javascript" src="${lams}includes/javascript/jquery.blockUI.js"></script>
 	<script type="text/javascript" src="<html:rewrite page='/includes/javascript/etherpad.js'/>"></script>
 	<script type="text/javascript">
 		$(document).ready(function(){
@@ -35,6 +59,10 @@
 			//hide finish button for non-leaders until leader will finish activity 
 			if (${!hasEditRight && !sessionMap.userFinished && !sessionMap.isLeaderResponseFinalized}) {
 				$("#finish-button").hide();
+			}
+			
+			if (${secondsLeft > 0}) {
+				displayCountdown()
 			}
 			
 		});
@@ -67,11 +95,74 @@
 		function continueReflect(){
 			document.location.href='<c:url value="/learning/newReflection.do?sessionMapID=${sessionMapID}"/>';
 		}
+		
+		<c:if test="${isTimeLimitEnabled}">
+			//init the connection with server using server URL but with different protocol
+			var websocket = new WebSocket('<lams:WebAppURL />'.replace('http', 'ws') 
+							+ 'learningWebsocket?toolContentID=' + ${toolContentID});
+			
+			// run when the server pushes new reports and vote statistics
+			websocket.onmessage = function(e) {
+				// create JSON object
+				var input = JSON.parse(e.data);
+				
+				//monitor has added one minute to the total timeLimit time
+				if (input.addOneMinute) {
+					//reload page in order to allow editing the pad again
+					if (!$('#countdown').length) {
+						location.reload();
+					}
+					
+			    	var times = $("#countdown").countdown('getTimes');
+			    	var secondsLeft = times[4]*3600 + times[5]*60 + times[6] + 60;
+			    	$('#countdown').countdown('option', "until", '+' + secondsLeft + 'S');
+					
+					return;
+				}
+			};			
+		</c:if>
+		
+		function displayCountdown() {
+			$.blockUI({
+				message: '<div id="countdown"></div>', 
+				showOverlay: false,
+				focusInput: false,
+				css: { 
+					top: '10px',
+					left: '',
+					right: '1%',
+					width: '150px',
+			        opacity: '.8',
+			        cursor: 'default',
+			        border: 'none'
+		        }   
+			});
+			
+			$('#countdown').countdown({
+				until: '+${secondsLeft}S',
+				format: 'hMS',
+				compact: true,
+				description: "<div id='countdown-label'><fmt:message key='label.time.left' /></div>",
+				onTick: function(periods) {
+					//check for 30 seconds
+					if ((periods[4] == 0) && (periods[5] == 0) && (periods[6] <= 30)) {
+						$('#countdown').css('color', '#FF3333');
+					}					
+				},
+				onExpiry: function(periods) {
+			        $.blockUI({ message: '<h1 id="timelimit-expired"><i class="fa fa-refresh fa-spin fa-1x fa-fw"></i> <fmt:message key="label.time.is.over" /></h1>' }); 
+			        
+			        setTimeout(function() { 
+			        	location.reload();
+			        }, 4000); 
+				}
+			});
+		}
 	</script>
 </lams:head>
 <body class="stripes">
 
-	<lams:Page type="learner" title="${dokumaran.title}">
+	<lams:Page type="learner" title="${dokumaran.title}" style="">
 	
 		<!--  Warnings -->
 		<c:if test="${sessionMap.lockOnFinish and mode != 'teacher'}">

@@ -100,6 +100,22 @@
             column="content_id"
             unique="true"
         />
+        
+       <property
+            name="timeLimit"
+            type="int"
+            update="true"
+            insert="true"
+            column="time_limit"
+        />
+        
+		<property
+            name="timeLimitLaunchedDate"
+            type="java.util.Date"
+            update="true"
+            insert="true"
+            column="time_limit_launched_date"
+        />
 
         <property
             name="showChat"
