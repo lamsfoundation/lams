@@ -199,8 +199,7 @@ public class DokumaranService implements IDokumaranService, ToolContentManager, 
 	} else {
 	    DokumaranUser leader = session.getGroupLeader();
 	    // check leader select tool for a leader only in case Dokumaran tool doesn't know it. As otherwise it will
-	    // screw
-	    // up previous scratches done
+	    // screw up previous scratches done
 	    if (leader == null) {
 
 		Long leaderUserId = toolService.getLeaderUserId(toolSessionId, user.getUserId().intValue());
@@ -221,7 +220,9 @@ public class DokumaranService implements IDokumaranService, ToolContentManager, 
 		}
 	    }
 	    
-	    leaders.add(leader);
+	    if (leader != null) {
+		leaders.add(leader);
+	    }
 	}
 
 	return leaders;
@@ -292,7 +293,7 @@ public class DokumaranService implements IDokumaranService, ToolContentManager, 
 	int newTimeLimit;
 	if (checkTimeLimitExceeded(dokumaran)) {
 	    dokumaran.setTimeLimitLaunchedDate(new Date());
-	    newTimeLimit = 1;
+	    newTimeLimit = 1;//d
 	} else {
 	    newTimeLimit = timeLimit + 1;
 	}
