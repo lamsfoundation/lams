@@ -189,6 +189,8 @@
 				//check for 30 seconds
 				if ((periods[4] == 0) && (periods[5] == 0) && (periods[6] <= 30)) {
 					$('#countdown').css('color', '#FF3333');
+				} else {
+					$('#countdown').css('color', '#47bc23');
 				}					
 			},
 			onExpiry: function(periods) {
