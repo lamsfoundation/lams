@@ -65,7 +65,7 @@
             name="session"
             class="org.lamsfoundation.lams.tool.commonCartridge.model.CommonCartridgeSession"
             cascade="none"
-            outer-join="auto"
+            
             update="true"
             insert="true"
             column="session_uid"
@@ -75,7 +75,7 @@
             name="commonCartridge"
             class="org.lamsfoundation.lams.tool.commonCartridge.model.CommonCartridge"
             cascade="none"
-            outer-join="auto"
+            
             update="true"
             insert="true"
             column="commonCartridge_uid"

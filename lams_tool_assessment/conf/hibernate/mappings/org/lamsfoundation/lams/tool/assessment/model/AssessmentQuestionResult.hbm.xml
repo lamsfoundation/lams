@@ -30,7 +30,7 @@
             name="assessmentQuestion"
             class="org.lamsfoundation.lams.tool.assessment.model.AssessmentQuestion"
             cascade="none"
-            outer-join="auto"
+            
             update="true"
             insert="true"
             column="assessment_question_uid"
@@ -40,7 +40,7 @@
             name="assessmentResult"
             class="org.lamsfoundation.lams.tool.assessment.model.AssessmentResult"
             cascade="none"
-            outer-join="auto"
+            
             update="true"
             insert="true"
             column="result_uid"

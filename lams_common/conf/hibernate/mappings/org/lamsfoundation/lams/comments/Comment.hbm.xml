@@ -40,7 +40,7 @@
             name="createdBy"
             class="org.lamsfoundation.lams.usermanagement.User"
             cascade="none"
-            outer-join="auto"
+            
             update="true"
             insert="true"
             column="create_by"
@@ -58,7 +58,7 @@
             name="updatedBy"
             class="org.lamsfoundation.lams.usermanagement.User"
             cascade="none"
-            outer-join="auto"
+            
             update="true"
             insert="true"
             column="update_by"
@@ -92,7 +92,7 @@
             name="parent"
             class="org.lamsfoundation.lams.comments.Comment"
             cascade="none"
-            outer-join="auto"
+            
             update="true"
             insert="true"
             column="parent_uid"
@@ -103,7 +103,7 @@
             name="session"
             class="org.lamsfoundation.lams.comments.CommentSession"
             cascade="none"
-            outer-join="auto"
+            
             update="true"
             insert="true"
             column="session_id"
@@ -113,7 +113,7 @@
             name="rootComment"
             class="org.lamsfoundation.lams.comments.Comment"
             cascade="none"
-            outer-join="auto"
+            
             update="true"
             insert="true"
             column="root_comment_uid"
@@ -123,7 +123,7 @@
             name="threadComment"
             class="org.lamsfoundation.lams.comments.Comment"
             cascade="none"
-            outer-join="auto"
+            
             update="true"
             insert="true"
             column="thread_comment_uid"

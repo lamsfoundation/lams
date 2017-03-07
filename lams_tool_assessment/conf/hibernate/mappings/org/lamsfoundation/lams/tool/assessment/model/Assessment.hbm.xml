@@ -54,7 +54,7 @@
             name="createdBy"
             class="org.lamsfoundation.lams.tool.assessment.model.AssessmentUser"
             cascade="save-update"
-            outer-join="auto"
+            
             update="true"
             insert="true"
             column="create_by"

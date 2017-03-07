@@ -30,7 +30,7 @@
             name="chatSession"
             class="org.lamsfoundation.lams.tool.chat.model.ChatSession"
             cascade="none"
-            outer-join="auto"
+            
             update="true"
             insert="true"
             column="chat_session_uid"
@@ -41,7 +41,7 @@
             name="fromUser"
             class="org.lamsfoundation.lams.tool.chat.model.ChatUser"
             cascade="none"
-            outer-join="auto"
+            
             update="true"
             insert="true"
         >
@@ -54,7 +54,7 @@
             name="toUser"
             class="org.lamsfoundation.lams.tool.chat.model.ChatUser"
             cascade="none"
-            outer-join="auto"
+            
             update="true"
             insert="true"
         >

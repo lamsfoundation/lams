@@ -58,7 +58,7 @@
             name="session"
             class="org.lamsfoundation.lams.tool.forum.persistence.ForumToolSession"
             cascade="none"
-            outer-join="auto"
+            
             update="true"
             insert="true"
             column="session_id"

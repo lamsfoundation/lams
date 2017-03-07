@@ -38,7 +38,7 @@
             name="event"
             class="org.lamsfoundation.lams.events.Event"
             cascade="none"
-            outer-join="auto"
+            
             update="true"
             insert="true"
         >

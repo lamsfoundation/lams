@@ -46,7 +46,7 @@
             name="createdBy"
             class="org.lamsfoundation.lams.tool.taskList.model.TaskListUser"
             cascade="save-update"
-            outer-join="auto"
+            
             update="true"
             insert="true"
             column="create_by"

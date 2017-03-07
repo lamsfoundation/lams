@@ -37,7 +37,7 @@
             name="ratingCriteria"
             class="org.lamsfoundation.lams.rating.model.RatingCriteria"
             cascade="none"
-            outer-join="auto"
+            
             update="true"
             insert="true"
         >

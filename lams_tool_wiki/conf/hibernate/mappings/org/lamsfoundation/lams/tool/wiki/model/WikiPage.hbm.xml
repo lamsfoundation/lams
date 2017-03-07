@@ -30,7 +30,7 @@
             name="parentWiki"
             class="org.lamsfoundation.lams.tool.wiki.model.Wiki"
             cascade="none"
-            outer-join="auto"
+            
             update="true"
             insert="true"
         >
@@ -90,7 +90,7 @@
             name="currentWikiContent"
             class="org.lamsfoundation.lams.tool.wiki.model.WikiPageContent"
             cascade="none"
-            outer-join="auto"
+            
             update="true"
             insert="true"
         >
@@ -103,7 +103,7 @@
             name="addedBy"
             class="org.lamsfoundation.lams.tool.wiki.model.WikiUser"
             cascade="none"
-            outer-join="auto"
+            
             update="true"
             insert="true"
         >
@@ -116,7 +116,7 @@
             name="wikiSession"
             class="org.lamsfoundation.lams.tool.wiki.model.WikiSession"
             cascade="none"
-            outer-join="auto"
+            
             update="true"
             insert="true"
             column="wiki_session_uid"

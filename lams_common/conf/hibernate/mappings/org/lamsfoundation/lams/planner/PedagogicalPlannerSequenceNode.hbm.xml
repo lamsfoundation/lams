@@ -30,7 +30,7 @@
             name="parent"
             class="org.lamsfoundation.lams.planner.PedagogicalPlannerSequenceNode"
             cascade="save-update"
-            outer-join="auto"
+            
             update="true"
             insert="true"
             foreign-key="FK_lams_planner_node_parent"
@@ -132,7 +132,7 @@
             name="user"
             class="org.lamsfoundation.lams.usermanagement.User"
             cascade="none"
-            outer-join="auto"
+            
             update="true"
             insert="true"
             foreign-key="FK_lams_planner_node_user"

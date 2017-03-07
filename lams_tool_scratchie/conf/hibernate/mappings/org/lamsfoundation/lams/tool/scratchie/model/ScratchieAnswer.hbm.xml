@@ -54,7 +54,7 @@
             name="scratchieItem"
             class="org.lamsfoundation.lams.tool.scratchie.model.ScratchieItem"
             cascade="none"
-            outer-join="auto"
+            
             update="true"
             insert="true"
             column="scratchie_item_uid"

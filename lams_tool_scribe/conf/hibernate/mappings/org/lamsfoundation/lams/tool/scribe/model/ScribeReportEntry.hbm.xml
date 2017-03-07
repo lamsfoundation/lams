@@ -38,7 +38,7 @@
             name="scribeHeading"
             class="org.lamsfoundation.lams.tool.scribe.model.ScribeHeading"
             cascade="none"
-            outer-join="auto"
+            
             update="true"
             insert="true"
         >
@@ -51,7 +51,7 @@
             name="scribeSession"
             class="org.lamsfoundation.lams.tool.scribe.model.ScribeSession"
             cascade="none"
-            outer-join="auto"
+            
             update="true"
             insert="true"
         >

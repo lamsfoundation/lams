@@ -65,7 +65,7 @@
         class="org.lamsfoundation.lams.tool.qa.QaContent"
         not-null="true"        
         cascade="none"
-        outer-join="auto"
+        
         update="true"
         insert="true"
         access="property"
@@ -95,7 +95,7 @@
         class="org.lamsfoundation.lams.tool.qa.QaQueUsr"
         not-null="true"        
         cascade="all"
-        outer-join="auto"
+        
         update="true"
         insert="true"
         access="property"

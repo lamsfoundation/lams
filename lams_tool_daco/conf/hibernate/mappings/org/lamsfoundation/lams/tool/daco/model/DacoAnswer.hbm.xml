@@ -30,7 +30,7 @@
             name="user"
             class="org.lamsfoundation.lams.tool.daco.model.DacoUser"
             cascade="none"
-            outer-join="auto"
+            
             update="true"
             insert="true"
             foreign-key="AnswerToUser"
@@ -57,7 +57,7 @@
             name="question"
             class="org.lamsfoundation.lams.tool.daco.model.DacoQuestion"
             cascade="none"
-            outer-join="auto"
+            
             update="true"
             insert="true"
             foreign-key="AnswerToQuestion"

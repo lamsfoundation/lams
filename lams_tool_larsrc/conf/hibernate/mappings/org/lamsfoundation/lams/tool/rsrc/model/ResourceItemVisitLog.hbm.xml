@@ -46,7 +46,7 @@
             name="resourceItem"
             class="org.lamsfoundation.lams.tool.rsrc.model.ResourceItem"
             cascade="none"
-            outer-join="auto"
+            
             update="true"
             insert="true"
             column="resource_item_uid"
@@ -56,7 +56,7 @@
             name="user"
             class="org.lamsfoundation.lams.tool.rsrc.model.ResourceUser"
             cascade="none"
-            outer-join="auto"
+            
             update="true"
             insert="true"
             column="user_uid"

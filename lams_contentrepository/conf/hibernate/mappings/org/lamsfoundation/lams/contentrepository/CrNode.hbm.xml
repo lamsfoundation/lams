@@ -67,7 +67,7 @@
             name="crWorkspace"
             class="org.lamsfoundation.lams.contentrepository.CrWorkspace"
             cascade="none"
-            outer-join="auto"
+            
             update="true"
             insert="true"
         >
@@ -80,7 +80,7 @@
             name="parentNodeVersion"
             class="org.lamsfoundation.lams.contentrepository.CrNodeVersion"
             cascade="none"
-            outer-join="auto"
+            
             update="true"
             insert="true"
         >

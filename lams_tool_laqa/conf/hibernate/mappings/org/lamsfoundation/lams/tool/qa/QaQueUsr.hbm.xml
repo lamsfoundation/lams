@@ -61,7 +61,7 @@
         class="org.lamsfoundation.lams.tool.qa.QaSession"
         not-null="true"
         cascade="none"
-        outer-join="auto"
+        
         update="true"
         insert="true"
         access="property"

@@ -79,7 +79,7 @@
             name="gmap"
             class="org.lamsfoundation.lams.tool.gmap.model.Gmap"
             cascade="none"
-            outer-join="auto"
+            
             update="true"
             insert="true"
         >
@@ -101,7 +101,7 @@
             name="createdBy"
             class="org.lamsfoundation.lams.tool.gmap.model.GmapUser"
             cascade="none"
-            outer-join="auto"
+            
             update="true"
             insert="true"
             column="created_by"
@@ -111,7 +111,7 @@
             name="updatedBy"
             class="org.lamsfoundation.lams.tool.gmap.model.GmapUser"
             cascade="none"
-            outer-join="auto"
+            
             update="true"
             insert="true"
             column="updated_by"
@@ -121,7 +121,7 @@
             name="gmapSession"
             class="org.lamsfoundation.lams.tool.gmap.model.GmapSession"
             cascade="none"
-            outer-join="auto"
+            
             update="true"
             insert="true"
             column="gmap_session_uid"

@@ -55,7 +55,7 @@
             name="createBy"
             class="org.lamsfoundation.lams.tool.imageGallery.model.ImageGalleryUser"
             cascade="none"
-            outer-join="auto"
+            
             update="true"
             insert="true"
             column="create_by"

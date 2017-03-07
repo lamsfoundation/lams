@@ -65,7 +65,7 @@
             name="session"
             class="org.lamsfoundation.lams.tool.rsrc.model.ResourceSession"
             cascade="none"
-            outer-join="auto"
+            
             update="true"
             insert="true"
             column="session_uid"
@@ -75,7 +75,7 @@
             name="resource"
             class="org.lamsfoundation.lams.tool.rsrc.model.Resource"
             cascade="none"
-            outer-join="auto"
+            
             update="true"
             insert="true"
             column="resource_uid"

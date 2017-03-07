@@ -79,7 +79,7 @@
             name="scribe"
             class="org.lamsfoundation.lams.tool.scribe.model.Scribe"
             cascade="none"
-            outer-join="auto"
+            
             update="true"
             insert="true"
         >
@@ -130,7 +130,7 @@
             name="appointedScribe"
             class="org.lamsfoundation.lams.tool.scribe.model.ScribeUser"
             cascade="none"
-            outer-join="auto"
+            
             update="true"
             insert="true"
         >

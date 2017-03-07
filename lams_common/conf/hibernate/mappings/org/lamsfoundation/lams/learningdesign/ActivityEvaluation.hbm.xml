@@ -30,7 +30,7 @@
             name="activity"
             class="org.lamsfoundation.lams.learningdesign.ToolActivity"
             cascade="save-update"
-            outer-join="auto"
+            
             update="true"
             insert="true"
             column="activity_id"

@@ -24,7 +24,7 @@
             name="comment"
             class="org.lamsfoundation.lams.comments.Comment"
             cascade="none"
-            outer-join="auto"
+            
             update="true"
             insert="true"
             column="comment_uid"

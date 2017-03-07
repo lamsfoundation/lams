@@ -62,7 +62,7 @@
             name="scratchie"
             class="org.lamsfoundation.lams.tool.scratchie.model.Scratchie"
             cascade="none"
-            outer-join="auto"
+            
             update="true"
             insert="true"
             column="scratchie_uid"
@@ -109,7 +109,7 @@
             name="groupLeader"
             class="org.lamsfoundation.lams.tool.scratchie.model.ScratchieUser"
             cascade="none"
-            outer-join="auto"
+            
             update="true"
             insert="true"
         >

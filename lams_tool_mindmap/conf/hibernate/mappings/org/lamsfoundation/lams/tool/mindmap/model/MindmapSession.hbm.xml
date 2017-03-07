@@ -73,7 +73,7 @@
             name="mindmap"
             class="org.lamsfoundation.lams.tool.mindmap.model.Mindmap"
             cascade="none"
-            outer-join="auto"
+            
             update="true"
             insert="true"
         >

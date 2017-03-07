@@ -30,7 +30,7 @@
             name="cognitiveSkill"
             class="org.lamsfoundation.lams.tool.qa.QaWizardCognitiveSkill"
             cascade="none"
-            outer-join="auto"
+            
             update="true"
             insert="true"
             column="cognitive_skill_uid"

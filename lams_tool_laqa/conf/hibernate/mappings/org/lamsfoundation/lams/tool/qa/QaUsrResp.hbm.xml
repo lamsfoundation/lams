@@ -62,7 +62,7 @@
             class="org.lamsfoundation.lams.tool.qa.QaQueContent"
             not-null="true"            
             cascade="none"
-            outer-join="auto"
+            
             update="true"
             insert="true"
             access="property"
@@ -78,7 +78,7 @@
             class="org.lamsfoundation.lams.tool.qa.QaQueUsr"
             not-null="true"            
             cascade="none"
-            outer-join="auto"
+            
             update="true"
             insert="true"
             access="property"

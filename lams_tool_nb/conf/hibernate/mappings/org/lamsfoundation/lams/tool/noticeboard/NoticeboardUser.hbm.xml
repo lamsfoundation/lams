@@ -39,7 +39,7 @@
             name="nbSession"
             class="org.lamsfoundation.lams.tool.noticeboard.NoticeboardSession"
             cascade="none"
-            outer-join="auto"
+            
             update="true"
             insert="true"
         >

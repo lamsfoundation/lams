@@ -47,7 +47,7 @@
             name="createdBy"
             class="org.lamsfoundation.lams.tool.forum.persistence.ForumUser"
             cascade="none"
-            outer-join="auto"
+            
             update="true"
             insert="true"
             column="create_by"

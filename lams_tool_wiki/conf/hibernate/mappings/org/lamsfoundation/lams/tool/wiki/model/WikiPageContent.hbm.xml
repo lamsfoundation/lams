@@ -30,7 +30,7 @@
             name="wikiPage"
             class="org.lamsfoundation.lams.tool.wiki.model.WikiPage"
             cascade="none"
-            outer-join="auto"
+            
             update="true"
             insert="true"
         >
@@ -52,7 +52,7 @@
             name="editor"
             class="org.lamsfoundation.lams.tool.wiki.model.WikiUser"
             cascade="none"
-            outer-join="auto"
+            
             update="true"
             insert="true"
         >

@@ -73,7 +73,7 @@
             name="wiki"
             class="org.lamsfoundation.lams.tool.wiki.model.Wiki"
             cascade="none"
-            outer-join="auto"
+            
             update="true"
             insert="true"
         >
@@ -125,7 +125,7 @@
             name="mainPage"
             class="org.lamsfoundation.lams.tool.wiki.model.WikiPage"
             cascade="none"
-            outer-join="auto"
+            
             update="true"
             insert="true"
         >

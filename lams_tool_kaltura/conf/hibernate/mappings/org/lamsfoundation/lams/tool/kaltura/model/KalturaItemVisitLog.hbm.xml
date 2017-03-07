@@ -38,7 +38,7 @@
             name="kalturaItem"
             class="org.lamsfoundation.lams.tool.kaltura.model.KalturaItem"
             cascade="none"
-            outer-join="auto"
+            
             update="true"
             insert="true"
             column="kaltura_item_uid"
@@ -48,7 +48,7 @@
             name="user"
             class="org.lamsfoundation.lams.tool.kaltura.model.KalturaUser"
             cascade="none"
-            outer-join="auto"
+            
             update="true"
             insert="true"
             column="user_uid"

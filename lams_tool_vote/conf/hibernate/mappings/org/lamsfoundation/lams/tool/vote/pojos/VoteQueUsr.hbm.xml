@@ -79,7 +79,7 @@
         class="org.lamsfoundation.lams.tool.vote.pojos.VoteSession"
         not-null="true"        
         cascade="none"
-        outer-join="auto"
+        
         update="true"
         insert="true"
         access="property"

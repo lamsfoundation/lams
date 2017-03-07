@@ -116,7 +116,7 @@
             name="createdBy"
             class="org.lamsfoundation.lams.tool.sbmt.SubmitUser"
             cascade="save-update"
-            outer-join="auto"
+            
             update="true"
             insert="true"
             column="created_by"

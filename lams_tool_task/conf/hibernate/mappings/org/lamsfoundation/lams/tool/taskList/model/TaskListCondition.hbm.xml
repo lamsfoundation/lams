@@ -51,7 +51,7 @@
             <many-to-many
                 class="org.lamsfoundation.lams.tool.taskList.model.TaskListItem"
                 column="uid"
-                outer-join="auto"
+                
              />
 
         </set>
