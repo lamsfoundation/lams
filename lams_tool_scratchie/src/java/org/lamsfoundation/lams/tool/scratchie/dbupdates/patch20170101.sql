@@ -12,9 +12,8 @@ ALTER TABLE tl_lascrt11_scratchie MODIFY COLUMN extra_point TINYINT(1),
 ALTER TABLE tl_lascrt11_session MODIFY COLUMN status TINYINT(1),
 								MODIFY COLUMN scratching_finished TINYINT(1) DEFAULT 0;
 								
-ALTER TABLE tl_lascrt11_user MODIFY COLUMN session_finished TINYINT(1),
-							 MODIFY COLUMN scratching_finished TINYINT(1);
-	
+ALTER TABLE tl_lascrt11_user MODIFY COLUMN session_finished TINYINT(1);
+
 ALTER TABLE tl_lascrt11_scratchie_answer MODIFY COLUMN correct TINYINT(1);	
 
 ALTER TABLE tl_lascrt11_scratchie_item MODIFY COLUMN create_by_author TINYINT(1);	
