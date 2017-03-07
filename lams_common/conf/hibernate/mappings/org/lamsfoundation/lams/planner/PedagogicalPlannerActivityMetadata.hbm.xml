@@ -68,7 +68,7 @@
             name="activity"
             class="org.lamsfoundation.lams.learningdesign.ToolActivity"
             cascade="none"
-            outer-join="auto"
+            
             constrained="true"
             foreign-key="FK_lams_planner_metadata_primary"
         />

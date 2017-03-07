@@ -62,7 +62,7 @@
             name="crNodeVersion"
             class="org.lamsfoundation.lams.contentrepository.CrNodeVersion"
             cascade="none"
-            outer-join="auto"
+            
             update="true"
             insert="true"
         >

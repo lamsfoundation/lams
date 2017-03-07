@@ -30,7 +30,7 @@
             name="burningQuestion"
             class="org.lamsfoundation.lams.tool.scratchie.model.ScratchieBurningQuestion"
             cascade="none"
-            outer-join="auto"
+            
             update="true"
             insert="true"
             column="burning_question_uid"

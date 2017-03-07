@@ -63,7 +63,7 @@
             class="org.lamsfoundation.lams.tool.qa.QaContent"
             not-null="true"
             cascade="none"
-            outer-join="auto"
+            
             update="true"
             insert="true"
             access="property"

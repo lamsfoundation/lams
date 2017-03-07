@@ -74,7 +74,7 @@
             name="leaderselectionSession"
             class="org.lamsfoundation.lams.tool.leaderselection.model.LeaderselectionSession"
             cascade="none"
-            outer-join="auto"
+            
             update="true"
             insert="true"
         >

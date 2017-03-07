@@ -65,7 +65,7 @@
             name="session"
             class="org.lamsfoundation.lams.tool.spreadsheet.model.SpreadsheetSession"
             cascade="none"
-            outer-join="auto"
+            
             update="true"
             insert="true"
             column="session_uid"
@@ -75,7 +75,7 @@
             name="spreadsheet"
             class="org.lamsfoundation.lams.tool.spreadsheet.model.Spreadsheet"
             cascade="none"
-            outer-join="auto"
+            
             update="true"
             insert="true"
             column="spreadsheet_uid"
@@ -85,7 +85,7 @@
             name="userModifiedSpreadsheet"
             class="org.lamsfoundation.lams.tool.spreadsheet.model.UserModifiedSpreadsheet"
             cascade="all"
-            outer-join="auto"
+            
             update="true"
             insert="true"
             column="user_modified_spreadsheet_uid"

@@ -54,7 +54,7 @@
             name="imageGallery"
             class="org.lamsfoundation.lams.tool.imageGallery.model.ImageGallery"
             cascade="none"
-            outer-join="auto"
+            
             update="true"
             insert="true"
             column="imageGallery_uid"

@@ -30,7 +30,7 @@
             name="lesson"
             class="org.lamsfoundation.lams.lesson.Lesson"
             cascade="none"
-            outer-join="auto"
+            
             update="true"
             insert="true"
         >
@@ -43,7 +43,7 @@
             name="learner"
             class="org.lamsfoundation.lams.usermanagement.User"
             cascade="none"
-            outer-join="auto"
+            
             update="true"
             insert="true"
         >

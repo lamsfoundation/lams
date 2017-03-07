@@ -65,7 +65,7 @@
             name="session"
             class="org.lamsfoundation.lams.tool.assessment.model.AssessmentSession"
             cascade="none"
-            outer-join="auto"
+            
             update="true"
             insert="true"
             column="session_uid"
@@ -75,7 +75,7 @@
             name="assessment"
             class="org.lamsfoundation.lams.tool.assessment.model.Assessment"
             cascade="none"
-            outer-join="auto"
+            
             update="true"
             insert="true"
             column="assessment_uid"

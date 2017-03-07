@@ -74,7 +74,7 @@
         class="org.lamsfoundation.lams.tool.mc.pojos.McContent"
         not-null="true"        
 	    cascade="none"
-	    outer-join="auto"
+	    
 	    update="true"
 	    insert="true"
 	    access="property"

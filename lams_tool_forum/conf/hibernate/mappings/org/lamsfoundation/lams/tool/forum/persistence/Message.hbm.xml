@@ -55,7 +55,7 @@
             name="createdBy"
             class="org.lamsfoundation.lams.tool.forum.persistence.ForumUser"
             cascade="none"
-            outer-join="auto"
+            
             update="true"
             insert="true"
             column="create_by"
@@ -65,7 +65,7 @@
             name="modifiedBy"
             class="org.lamsfoundation.lams.tool.forum.persistence.ForumUser"
             cascade="none"
-            outer-join="auto"
+            
             update="true"
             insert="true"
             column="modified_by"
@@ -115,7 +115,7 @@
             name="toolSession"
             class="org.lamsfoundation.lams.tool.forum.persistence.ForumToolSession"
             cascade="none"
-            outer-join="auto"
+            
             update="true"
             insert="true"
             column="forum_session_uid"
@@ -125,7 +125,7 @@
             name="parent"
             class="org.lamsfoundation.lams.tool.forum.persistence.Message"
             cascade="none"
-            outer-join="auto"
+            
             update="true"
             insert="true"
             column="parent_uid"
@@ -155,7 +155,7 @@
             name="forum"
             class="org.lamsfoundation.lams.tool.forum.persistence.Forum"
             cascade="none"
-            outer-join="auto"
+            
             update="true"
             insert="true"
             column="forum_uid"
@@ -189,7 +189,7 @@
             name="report"
             class="org.lamsfoundation.lams.tool.forum.persistence.ForumReport"
             cascade="all"
-            outer-join="auto"
+            
             update="true"
             insert="true"
             column="report_id"

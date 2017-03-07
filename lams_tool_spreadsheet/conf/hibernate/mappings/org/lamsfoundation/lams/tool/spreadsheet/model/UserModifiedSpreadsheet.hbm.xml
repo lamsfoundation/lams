@@ -38,7 +38,7 @@
             name="mark"
             class="org.lamsfoundation.lams.tool.spreadsheet.model.SpreadsheetMark"
             cascade="all"
-            outer-join="auto"
+            
             update="true"
             insert="true"
             column="mark_id"

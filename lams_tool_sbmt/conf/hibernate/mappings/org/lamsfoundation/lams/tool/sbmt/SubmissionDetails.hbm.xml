@@ -75,7 +75,7 @@
             name="report"
             class="org.lamsfoundation.lams.tool.sbmt.SubmitFilesReport"
             cascade="all"
-            outer-join="auto"
+            
             constrained="false"
             foreign-key="report_id"
         />
@@ -84,7 +84,7 @@
             name="submitFileSession"
             class="org.lamsfoundation.lams.tool.sbmt.SubmitFilesSession"
             cascade="save-update"
-            outer-join="auto"
+            
             update="true"
             insert="true"
             column="session_id"
@@ -94,7 +94,7 @@
             name="learner"
             class="org.lamsfoundation.lams.tool.sbmt.SubmitUser"
             cascade="none"
-            outer-join="auto"
+            
             update="true"
             insert="true"
             column="learner_id"

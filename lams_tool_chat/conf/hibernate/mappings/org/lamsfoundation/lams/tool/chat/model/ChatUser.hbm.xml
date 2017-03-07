@@ -82,7 +82,7 @@
             name="chatSession"
             class="org.lamsfoundation.lams.tool.chat.model.ChatSession"
             cascade="none"
-            outer-join="auto"
+            
             update="true"
             insert="true"
         >

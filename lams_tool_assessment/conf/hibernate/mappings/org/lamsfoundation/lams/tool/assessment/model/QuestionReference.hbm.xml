@@ -30,7 +30,7 @@
             name="question"
             class="org.lamsfoundation.lams.tool.assessment.model.AssessmentQuestion"
             cascade="save-update"
-            outer-join="auto"
+            
             update="true"
             insert="true"
             column="question_uid"

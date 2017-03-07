@@ -54,7 +54,7 @@
             name="spreadsheet"
             class="org.lamsfoundation.lams.tool.spreadsheet.model.Spreadsheet"
             cascade="none"
-            outer-join="auto"
+            
             update="true"
             insert="true"
             column="spreadsheet_uid"

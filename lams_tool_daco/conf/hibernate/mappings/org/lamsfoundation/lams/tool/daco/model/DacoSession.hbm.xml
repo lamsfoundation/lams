@@ -54,7 +54,7 @@
             name="daco"
             class="org.lamsfoundation.lams.tool.daco.model.Daco"
             cascade="none"
-            outer-join="auto"
+            
             update="true"
             insert="true"
             foreign-key="SessionToDaco"

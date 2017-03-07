@@ -81,7 +81,7 @@
             lazy="false"
             cascade="all-delete-orphan"
             sort="unsorted"
-            outer-join="true"
+            fetch="join"
         >
 
             <key

@@ -38,7 +38,7 @@
             name="scratchieAnswer"
             class="org.lamsfoundation.lams.tool.scratchie.model.ScratchieAnswer"
             cascade="none"
-            outer-join="auto"
+            
             update="true"
             insert="true"
             column="scratchie_answer_uid"

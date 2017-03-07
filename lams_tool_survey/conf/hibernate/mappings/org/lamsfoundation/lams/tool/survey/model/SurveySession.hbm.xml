@@ -46,7 +46,7 @@
             name="survey"
             class="org.lamsfoundation.lams.tool.survey.model.Survey"
             cascade="none"
-            outer-join="auto"
+            
             update="true"
             insert="true"
             column="survey_uid"

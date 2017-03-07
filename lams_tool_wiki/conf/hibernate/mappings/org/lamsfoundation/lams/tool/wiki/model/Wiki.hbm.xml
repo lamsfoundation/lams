@@ -226,7 +226,7 @@
             name="mainPage"
             class="org.lamsfoundation.lams.tool.wiki.model.WikiPage"
             cascade="none"
-            outer-join="auto"
+            
             update="true"
             insert="true"
         >

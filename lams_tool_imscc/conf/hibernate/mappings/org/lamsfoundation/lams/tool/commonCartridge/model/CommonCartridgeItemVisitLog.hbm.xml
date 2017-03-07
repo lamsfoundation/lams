@@ -38,7 +38,7 @@
             name="commonCartridgeItem"
             class="org.lamsfoundation.lams.tool.commonCartridge.model.CommonCartridgeItem"
             cascade="none"
-            outer-join="auto"
+            
             update="true"
             insert="true"
             column="commonCartridge_item_uid"
@@ -48,7 +48,7 @@
             name="user"
             class="org.lamsfoundation.lams.tool.commonCartridge.model.CommonCartridgeUser"
             cascade="none"
-            outer-join="auto"
+            
             update="true"
             insert="true"
             column="user_uid"

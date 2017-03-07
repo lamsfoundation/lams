@@ -65,7 +65,7 @@
             name="session"
             class="org.lamsfoundation.lams.tool.daco.model.DacoSession"
             cascade="none"
-            outer-join="auto"
+            
             update="true"
             insert="true"
             foreign-key="UserToSession"
@@ -76,7 +76,7 @@
             name="daco"
             class="org.lamsfoundation.lams.tool.daco.model.Daco"
             cascade="none"
-            outer-join="auto"
+            
             update="true"
             insert="true"
             foreign-key="UserToDaco"
@@ -98,7 +98,7 @@
             cascade="none"
             sort="unsorted"
             order-by="record_id asc, uid asc"
-            outer-join="true"
+            fetch="join"
         >
 
             <key

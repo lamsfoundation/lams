@@ -74,7 +74,7 @@
             name="notebookSession"
             class="org.lamsfoundation.lams.tool.notebook.model.NotebookSession"
             cascade="none"
-            outer-join="auto"
+            
             update="true"
             insert="true"
         >

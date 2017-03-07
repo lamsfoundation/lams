@@ -65,7 +65,7 @@
             name="session"
             class="org.lamsfoundation.lams.tool.scratchie.model.ScratchieSession"
             cascade="none"
-            outer-join="auto"
+            
             update="true"
             insert="true"
             column="session_uid"
@@ -75,7 +75,7 @@
             name="scratchie"
             class="org.lamsfoundation.lams.tool.scratchie.model.Scratchie"
             cascade="none"
-            outer-join="auto"
+            
             update="true"
             insert="true"
             column="scratchie_uid"

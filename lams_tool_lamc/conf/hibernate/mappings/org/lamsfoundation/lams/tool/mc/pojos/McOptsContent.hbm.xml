@@ -65,7 +65,7 @@
         name="mcQueContent"
         class="org.lamsfoundation.lams.tool.mc.pojos.McQueContent"
         cascade="none"
-        outer-join="auto"
+        
         update="true"
         insert="true"
         access="property"

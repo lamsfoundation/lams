@@ -60,7 +60,7 @@
             name="node"
             class="org.lamsfoundation.lams.contentrepository.CrNode"
             cascade="none"
-            outer-join="auto"
+            
             update="true"
             insert="true"
         >

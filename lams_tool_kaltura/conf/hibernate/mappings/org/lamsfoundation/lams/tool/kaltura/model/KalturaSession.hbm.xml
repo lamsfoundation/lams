@@ -73,7 +73,7 @@
             name="kaltura"
             class="org.lamsfoundation.lams.tool.kaltura.model.Kaltura"
             cascade="none"
-            outer-join="auto"
+            
             update="true"
             insert="true"
         >

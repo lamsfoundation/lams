@@ -46,7 +46,7 @@
             name="createdBy"
             class="org.lamsfoundation.lams.tool.daco.model.DacoUser"
             cascade="all"
-            outer-join="auto"
+            
             update="true"
             insert="true"
             foreign-key="DacoToUser"
@@ -83,7 +83,7 @@
             cascade="all"
             sort="unsorted"
             order-by="uid asc"
-            outer-join="true"
+            fetch="join"
         >
 
             <key

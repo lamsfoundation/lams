@@ -54,7 +54,7 @@
             name="resource"
             class="org.lamsfoundation.lams.tool.rsrc.model.Resource"
             cascade="none"
-            outer-join="auto"
+            
             update="true"
             insert="true"
             column="resource_uid"

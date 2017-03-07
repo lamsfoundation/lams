@@ -74,7 +74,7 @@
             name="gmapSession"
             class="org.lamsfoundation.lams.tool.gmap.model.GmapSession"
             cascade="none"
-            outer-join="auto"
+            
             update="true"
             insert="true"
         >

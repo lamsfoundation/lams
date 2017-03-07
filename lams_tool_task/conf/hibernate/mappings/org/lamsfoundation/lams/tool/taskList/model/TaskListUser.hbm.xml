@@ -65,7 +65,7 @@
             name="session"
             class="org.lamsfoundation.lams.tool.taskList.model.TaskListSession"
             cascade="none"
-            outer-join="auto"
+            
             update="true"
             insert="true"
             column="session_uid"
@@ -75,7 +75,7 @@
             name="taskList"
             class="org.lamsfoundation.lams.tool.taskList.model.TaskList"
             cascade="none"
-            outer-join="auto"
+            
             update="true"
             insert="true"
             column="taskList_uid"

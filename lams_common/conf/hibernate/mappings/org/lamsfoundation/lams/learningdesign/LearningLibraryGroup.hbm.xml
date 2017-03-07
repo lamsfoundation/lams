@@ -50,7 +50,7 @@
             <many-to-many
                 class="org.lamsfoundation.lams.learningdesign.LearningLibrary"
                 column="learning_library_id"
-                outer-join="auto"
+                
              />
 
         </set>

@@ -74,7 +74,7 @@
             name="wikiSession"
             class="org.lamsfoundation.lams.tool.wiki.model.WikiSession"
             cascade="none"
-            outer-join="auto"
+            
             update="true"
             insert="true"
         >

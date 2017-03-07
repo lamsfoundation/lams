@@ -38,7 +38,7 @@
             name="parent"
             class="org.lamsfoundation.lams.tool.mindmap.model.MindmapNode"
             cascade="none"
-            outer-join="auto"
+            
             update="true"
             insert="true"
             column="parent_id"
@@ -64,7 +64,7 @@
             name="session"
             class="org.lamsfoundation.lams.tool.mindmap.model.MindmapSession"
             cascade="none"
-            outer-join="auto"
+            
             update="true"
             insert="true"
             column="session_id"
@@ -74,7 +74,7 @@
             name="user"
             class="org.lamsfoundation.lams.tool.mindmap.model.MindmapUser"
             cascade="none"
-            outer-join="auto"
+            
             update="true"
             insert="true"
             column="user_id"
@@ -84,7 +84,7 @@
             name="mindmap"
             class="org.lamsfoundation.lams.tool.mindmap.model.Mindmap"
             cascade="none"
-            outer-join="auto"
+            
             update="true"
             insert="true"
             column="mindmap_id"

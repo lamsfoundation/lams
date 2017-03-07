@@ -30,7 +30,7 @@
             name="activity"
             class="org.lamsfoundation.lams.learningdesign.ToolActivity"
             cascade="none"
-            outer-join="auto"
+            
             update="true"
             insert="true"
         >
@@ -43,7 +43,7 @@
             name="learner"
             class="org.lamsfoundation.lams.usermanagement.User"
             cascade="none"
-            outer-join="auto"
+            
             update="true"
             insert="true"
         >

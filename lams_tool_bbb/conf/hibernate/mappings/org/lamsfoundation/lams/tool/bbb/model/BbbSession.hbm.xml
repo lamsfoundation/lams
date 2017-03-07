@@ -73,7 +73,7 @@
             name="bbb"
             class="org.lamsfoundation.lams.tool.bbb.model.Bbb"
             cascade="none"
-            outer-join="auto"
+            
             update="true"
             insert="true"
             foreign-key="fk_labbb10_bbb_session_to_bbb"

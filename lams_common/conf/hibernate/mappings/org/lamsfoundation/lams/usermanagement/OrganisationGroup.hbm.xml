@@ -58,7 +58,7 @@
             <many-to-many
                 class="org.lamsfoundation.lams.usermanagement.User"
                 column="user_id"
-                outer-join="auto"
+                
              />
 
         </set>

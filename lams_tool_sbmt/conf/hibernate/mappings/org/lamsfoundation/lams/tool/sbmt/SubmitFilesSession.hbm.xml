@@ -59,7 +59,7 @@
             name="content"
             class="org.lamsfoundation.lams.tool.sbmt.SubmitFilesContent"
             cascade="none"
-            outer-join="auto"
+            
             update="true"
             insert="true"
             column="content_id"

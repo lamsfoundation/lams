@@ -47,7 +47,7 @@
             name="extServer"
             class="org.lamsfoundation.lams.integration.ExtServer"
             cascade="none"
-            outer-join="auto"
+            
             update="true"
             insert="true"
         >

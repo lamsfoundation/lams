@@ -53,7 +53,7 @@
             name="peerreview"
             class="org.lamsfoundation.lams.tool.peerreview.model.Peerreview"
             cascade="none"
-            outer-join="auto"
+            
             update="true"
             insert="true"
             column="peerreview_uid"

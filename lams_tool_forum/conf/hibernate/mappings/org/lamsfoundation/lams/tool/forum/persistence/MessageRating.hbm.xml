@@ -31,7 +31,7 @@
             name="user"
             class="org.lamsfoundation.lams.tool.forum.persistence.ForumUser"
             cascade="none"
-            outer-join="auto"
+            
             update="true"
             insert="true"
             column="user_id"
@@ -49,7 +49,7 @@
             name="message"
             class="org.lamsfoundation.lams.tool.forum.persistence.Message"
             cascade="none"
-            outer-join="auto"
+            
             update="true"
             insert="true"
             column="message_id"

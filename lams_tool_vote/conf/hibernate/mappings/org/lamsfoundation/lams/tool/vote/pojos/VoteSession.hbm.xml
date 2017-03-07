@@ -72,7 +72,7 @@
         class="org.lamsfoundation.lams.tool.vote.pojos.VoteContent"
         not-null="true"        
         cascade="none"
-        outer-join="auto"
+        
         update="true"
         insert="true"
         access="property"
@@ -102,7 +102,7 @@
         class="org.lamsfoundation.lams.tool.vote.pojos.VoteQueUsr"
         not-null="true"        
         cascade="all"
-        outer-join="auto"
+        
         update="true"
         insert="true"
         access="property"

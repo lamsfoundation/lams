@@ -54,7 +54,7 @@
             name="commonCartridge"
             class="org.lamsfoundation.lams.tool.commonCartridge.model.CommonCartridge"
             cascade="none"
-            outer-join="auto"
+            
             update="true"
             insert="true"
             column="commonCartridge_uid"

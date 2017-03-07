@@ -54,7 +54,7 @@
             name="assessment"
             class="org.lamsfoundation.lams.tool.assessment.model.Assessment"
             cascade="none"
-            outer-join="auto"
+            
             update="true"
             insert="true"
             column="assessment_uid"
@@ -121,7 +121,7 @@
             name="groupLeader"
             class="org.lamsfoundation.lams.tool.assessment.model.AssessmentUser"
             cascade="all"
-            outer-join="auto"
+            
             update="true"
             insert="true"
             column="group_leader_uid"

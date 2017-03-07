@@ -74,7 +74,7 @@
             name="bbbSession"
             class="org.lamsfoundation.lams.tool.bbb.model.BbbSession"
             cascade="none"
-            outer-join="auto"
+            
             update="true"
             insert="true"
             foreign-key="fk_labbb10_bbb_user_to_bbb_session"

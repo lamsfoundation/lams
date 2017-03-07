@@ -38,7 +38,7 @@
             name="taskListItem"
             class="org.lamsfoundation.lams.tool.taskList.model.TaskListItem"
             cascade="none"
-            outer-join="auto"
+            
             update="true"
             insert="true"
             column="taskList_item_uid"
@@ -48,7 +48,7 @@
             name="user"
             class="org.lamsfoundation.lams.tool.taskList.model.TaskListUser"
             cascade="save-update"
-            outer-join="auto"
+            
             update="true"
             insert="true"
             column="user_uid"

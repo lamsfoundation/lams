@@ -30,7 +30,7 @@
             name="node"
             class="org.lamsfoundation.lams.planner.PedagogicalPlannerSequenceNode"
             cascade="none"
-            outer-join="auto"
+            
             update="true"
             insert="true"
             column="node_uid"
@@ -41,7 +41,7 @@
             name="user"
             class="org.lamsfoundation.lams.usermanagement.User"
             cascade="none"
-            outer-join="auto"
+            
             update="true"
             insert="true"
             column="user_id"
@@ -52,7 +52,7 @@
             name="role"
             class="org.lamsfoundation.lams.usermanagement.Role"
             cascade="none"
-            outer-join="auto"
+            
             update="true"
             insert="true"
             column="role_id"

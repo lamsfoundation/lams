@@ -40,7 +40,7 @@
             name="category"
             class="org.lamsfoundation.lams.tool.qa.QaWizardCategory"
             cascade="none"
-            outer-join="auto"
+            
             update="true"
             insert="true"
             column="category_uid"

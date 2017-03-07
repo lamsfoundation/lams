@@ -29,7 +29,7 @@
             name="organisation"
             class="org.lamsfoundation.lams.usermanagement.Organisation"
             lazy="false"
-            outer-join="auto"
+            
             update="true"
             insert="true"
         >

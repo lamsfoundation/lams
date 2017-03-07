@@ -30,7 +30,7 @@
             name="surveyQuestion"
             class="org.lamsfoundation.lams.tool.survey.model.SurveyQuestion"
             cascade="none"
-            outer-join="auto"
+            
             update="true"
             insert="true"
             column="question_uid"
@@ -40,7 +40,7 @@
             name="user"
             class="org.lamsfoundation.lams.tool.survey.model.SurveyUser"
             cascade="none"
-            outer-join="auto"
+            
             update="true"
             insert="true"
             column="user_uid"

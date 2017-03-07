@@ -30,7 +30,7 @@
             name="dataTransition"
             class="org.lamsfoundation.lams.learningdesign.DataTransition"
             cascade="none"
-            outer-join="auto"
+            
             update="true"
             insert="true"
         >
