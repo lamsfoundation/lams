@@ -289,12 +289,10 @@ public class DokumaranService implements IDokumaranService, ToolContentManager, 
 	    return;
 	}
 	
-	int newTimeLimit = 0;
+	int newTimeLimit;
 	if (checkTimeLimitExceeded(dokumaran)) {
-	    int minutesPassedSinceStart = (int) ((System.currentTimeMillis() - dokumaran.getTimeLimitLaunchedDate().getTime()) / 1000/60);
-	    newTimeLimit = minutesPassedSinceStart + 1;
-	    // change negative to 0
-	    newTimeLimit = Math.max(0, newTimeLimit);
+	    dokumaran.setTimeLimitLaunchedDate(new Date());
+	    newTimeLimit = 1;
 	} else {
 	    newTimeLimit = timeLimit + 1;
 	}
