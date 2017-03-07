@@ -61,6 +61,7 @@ import org.lamsfoundation.lams.learningdesign.Grouping;
 import org.lamsfoundation.lams.learningdesign.GroupingActivity;
 import org.lamsfoundation.lams.learningdesign.LearnerChoiceGrouper;
 import org.lamsfoundation.lams.learningdesign.LearnerChoiceGrouping;
+import org.lamsfoundation.lams.learningdesign.LearningDesign;
 import org.lamsfoundation.lams.learningdesign.OptionsActivity;
 import org.lamsfoundation.lams.learningdesign.SequenceActivity;
 import org.lamsfoundation.lams.learningdesign.ToolActivity;
@@ -354,8 +355,10 @@ public class LearnerService implements ICoreLearnerService {
     public void createToolSessionsIfNecessary(Activity activity, LearnerProgress learnerProgress) {
 	try {
 	    if ((activity != null) && activity.isToolActivity()) {
-		lamsCoreToolService.createToolSession(learnerProgress.getUser(), (ToolActivity) activity,
-			learnerProgress.getLesson());
+		// make sure that the lesson corresponds to the activity
+		LearningDesign learningDesign = activity.getLearningDesign();
+		Lesson lesson = (Lesson) learningDesign.getLessons().iterator().next();
+		lamsCoreToolService.createToolSession(learnerProgress.getUser(), (ToolActivity) activity, lesson);
 	    }
 	} catch (RequiredGroupMissingException e) {
 	    LearnerService.log.warn("error occurred in 'createToolSessionFor':" + e.getMessage());
