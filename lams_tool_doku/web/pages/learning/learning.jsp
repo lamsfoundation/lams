@@ -30,12 +30,9 @@
 			font-size: 170%; padding-top:5px; padding-bottom:5px; font-style: italic; color:#47bc23;
 		}
 		
-		<c:if test="${isTimeLimitEnabled}">
-		.panel-body.panel-learner-body {
-			padding-top: 70px;
+		.lower-to-fit-countdown {
+			margin-top: 70px;
 		}
-		</c:if>
-		
 	</style>
 
 	<script type="text/javascript" src="${lams}includes/javascript/jquery.plugin.js"></script>
@@ -180,7 +177,8 @@
 
 		<%@ include file="/common/messages.jsp"%>
 
-		<div class="panel panel-default">			
+		<div class='panel panel-default 
+				<c:if test="${isTimeLimitEnabled}">lower-to-fit-countdown</c:if>'>			
 			<div id="etherpad-container"></div>
 			<div id="etherpad-containera"></div>
 			<div id="etherpad-containerb"></div>
