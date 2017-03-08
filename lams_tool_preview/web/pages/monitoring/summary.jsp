@@ -36,6 +36,7 @@
 		var url = "<c:url value="/monitoring/sendResultsToSessionUsers.do"/>";
 		$("#messageArea").html("");
 		$("#messageArea_Busy").show();
+		$(".btn-disable-on-submit").prop("disabled", true);
 		$("#messageArea").load(
 			url,
 			{
@@ -46,34 +47,9 @@
 			},
 			function() {
 				$("#messageArea_Busy").hide();
+				$(".btn-disable-on-submit").prop("disabled", false);
 			}
 		);
-		return false;
-	}
-
-	//Detecting the file download dialog in the browser: 
-	//http://geekswithblogs.net/GruffCode/archive/2010/10/28/detecting-the-file-download-dialog-in-the-browser.aspx
-	var fileDownloadCheckTimer;
-
-	function exportResults() {
-		$("#messageArea").html("");
-		$("#messageArea_Busy").show();
-
-		var token = new Date().getTime(); //use the current timestamp as the token value
-
-		fileDownloadCheckTimer = window.setInterval(function () {
-			var cookieValue = $.cookie('fileDownloadToken');
-			if (cookieValue == token) {
-			    //unBlock export button
-				window.clearInterval(fileDownloadCheckTimer);
-				$.cookie('fileDownloadToken', null); //clears this cookie value
-				$("#messageArea").html('File downloaded');
-				$("#messageArea_Busy").hide();
-			}
-		}, 1000);
-				
-		var exportExcelUrl = "exportTeamReport.do?sessionMapID=${sessionMapID}&toolSessionId=${groupSummary.sessionId}&toolContentID=${sessionMap.toolContentID}";
-		document.location.href = exportExcelUrl + "&downloadTokenValue=" + token;
 		return false;
 	}
 	
@@ -83,6 +59,14 @@
 <script type="text/javascript" src="${lams}includes/javascript/monitorToolSummaryAdvanced.js" ></script>
 <script src="${lams}includes/javascript/jquery.jRating.js" type="text/javascript"></script>
 <script src="${lams}includes/javascript/rating.js" type="text/javascript" ></script>
+<script src="${lams}includes/javascript/download.js" type="text/javascript" ></script>
+
+<script type="text/javascript">
+	function exportResults() {
+		var exportExcelUrl = 'exportTeamReport.do?sessionMapID=${sessionMapID}&toolSessionId=${groupSummary.sessionId}&toolContentID=${sessionMap.toolContentID}';
+		return downloadFile(exportExcelUrl, 'messageArea_Busy', '<fmt:message key="label.file.downloaded"/>', 'messageArea', 'btn-disable-on-submit');
+	}
+</script>
 
 <div class="panel">
 	<h4>
@@ -99,8 +83,8 @@
 	</c:if>
 	
 	<!--For send results feature-->
-	<i class="fa fa-spinner" style="display:none" id="messageArea_Busy"></i>
-	<div class="voffset5" id="messageArea"></div>
+	<lams:WaitingSpinner id="messageArea_Busy"></lams:WaitingSpinner>
+	<div class="voffset5 help-block" id="messageArea"></div>
 	
 </div>
 
@@ -136,8 +120,8 @@
 		<c:otherwise>
 			<c:forEach var="criteria" items="${criterias}">
 				<c:set var='url'>criteria.do?sessionMapID=${sessionMapID}&toolSessionId=${groupSummary.sessionId}&criteriaId=${criteria.ratingCriteriaId}</c:set>
-				<a href="javascript:launchPopup('${url}')" class="btn btn-default voffset5 loffset5">
-					<fmt:message key="label.monitoring.view"><fmt:param><c:out value="${criteria.title}" escapeXml="true"/></fmt:param></fmt:message></a>
+				<button onclick="javascript:launchPopup('${url}');return false;" class="btn btn-default btn-disable-on-submit voffset5 loffset5">
+					<fmt:message key="label.monitoring.view"><fmt:param><c:out value="${criteria.title}" escapeXml="true"/></fmt:param></fmt:message></button>
 			</c:forEach>
 		</c:otherwise>
 	</c:choose>
@@ -147,11 +131,11 @@
 		<c:set var="offset"></c:set>
 		<c:if test="${sessionMap.peerreview.reflectOnActivity}">
 			<c:set var='url'>reflections.do?sessionMapID=${sessionMapID}&toolSessionId=${groupSummary.sessionId}&toolContentID=${sessionMap.toolContentID}</c:set>
-			<a href="javascript:launchPopup('${url}')" class="btn btn-default ${offset}"><fmt:message key="title.reflection"/></a>
+			<button onclick="javascript:launchPopup('${url}');return false;" class="btn btn-default  btn-disable-on-submit ${offset}"><fmt:message key="title.reflection"/></button>
 			<c:set var="offset">loffset5</c:set>
 		</c:if>
 		<c:if test="${sessionMap.peerreview.notifyUsersOfResults}">
-			<a href="#nogo" onClick="javascript:sendResults(${groupSummary.sessionId})" class="btn btn-default ${offset}"><fmt:message key="label.notify.user.of.results"/></a>
+			<button onClick="return sendResults(${groupSummary.sessionId});" class="btn btn-default btn-disable-on-submit ${offset}"><fmt:message key="label.notify.user.of.results"/></button>
 		</c:if>
 	</div>
 	</c:if>
@@ -169,19 +153,19 @@
 </c:if>
 
 <div id="common-buttons-area">
-	<a href="#nogo" onClick="javascript:exportResults()" class="btn btn-default loffset5 pull-right">
+	<button onClick="return exportResults()" class="btn btn-default loffset5 pull-right btn-disable-on-submit">
 		<i class="fa fa-download" aria-hidden="true"></i> 
 		<fmt:message key="label.export.team.results" />
-	</a>
+	</button>
 	
 	<c:if test="${!empty summaryList}">
 		<c:set var='url'>
 			<c:url value="/monitoring/manageUsers.do"/>?sessionMapID=${sessionMapID}
 		</c:set>
-		<a href="#nogo" onClick="javascript:launchPopup('${url}');" class="btn btn-default pull-right">
+		<button onClick="javascript:launchPopup('${url}');return false;" class="btn btn-default btn-disable-on-submit pull-right">
 			<i class="fa fa-check-square" aria-hidden="true"></i> 
 			<fmt:message key="label.manage.users" />
-		</a>
+		</button>
 	</c:if>
 </div>
 
