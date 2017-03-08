@@ -167,8 +167,9 @@
 	    var reqIDVar = new Date();
 		var param = "?sessionMapID=${sessionMapID}&reqID="+reqIDVar.getTime();
 		url = url + param;
-		location.href=url;
+		return downloadFile(url, 'messageArea_Busy', '<fmt:message key="label.summary.downloaded"/>', 'messageArea', 'btn-disable-on-submit');
 	};
+	
 </script>
 
 <div class="panel">
@@ -185,16 +186,25 @@
 			<fmt:message key="message.monitoring.summary.no.session" />
 		</lams:Alert>
 	</c:if>
+
+	<lams:WaitingSpinner id="messageArea_Busy"></lams:WaitingSpinner>
+	<div class="voffset5 help-block" id="messageArea"></div>
+			
 </div>
 
 <c:if test="${not empty sessionDtos}">
 	
+	<button onclick="return exportSummary();" class="btn btn-default btn-sm btn-disable-on-submit pull-right">
+		<i class="fa fa-download" aria-hidden="true"></i> 
+		<fmt:message key="label.monitoring.summary.export.summary" />
+	</button>
+			
 	<h5><fmt:message key="label.monitoring.summary.summary" /></h5>
 	
 	<div class="comments">
 		<fmt:message key="label.monitoring.summary.double.click" />
 	</div>
-			
+
 	<div id="masterDetailArea" class="voffset10">
 		<%@ include file="parts/masterDetailLoadUp.jsp"%>
 	</div>
@@ -237,11 +247,7 @@
 	<c:if test="${sessionMap.isGroupedActivity}">
 		</div> <!--  end panel group -->
 	</c:if>
-		
-	<html:link href="javascript:exportSummary();" property="exportExcel" styleClass="btn btn-default btn-xs pull-right">
-		<fmt:message key="label.monitoring.summary.export.summary" />
-	</html:link>
-		
+
 	<!-- Dropdown menu for choosing a question type -->	
 	<h5><fmt:message key="label.monitoring.summary.report.by.question" /></h5>
 	

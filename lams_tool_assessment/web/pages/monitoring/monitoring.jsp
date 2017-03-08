@@ -38,6 +38,10 @@
 		<script type="text/javascript" src="${lams}includes/javascript/jquery.blockUI.js"></script> 
  		<script type="text/javascript" src="${lams}includes/javascript/jquery.jqGrid.locale-en.js"></script>
  		<script type="text/javascript" src="${lams}includes/javascript/jquery.jqGrid.js"></script>
+ 		
+ 		<script type="text/javascript" src="${lams}includes/javascript/jquery.cookie.js"></script>
+ 		<script type="text/javascript" src="${lams}includes/javascript/download.js"></script>
+ 		
 		<script>        
 		    function doSelectTab(tabId) {
 			   	// end optional tab controller stuff
