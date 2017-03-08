@@ -74,7 +74,7 @@ CREATE TABLE tl_lamc11_que_content (
 CREATE TABLE tl_lamc11_options_content (
        uid BIGINT(20) NOT NULL AUTO_INCREMENT
      , correct_option TINYINT(1) NOT NULL DEFAULT 0
-     , mc_que_content_id BIGINT(20) NOT NULL
+     , mc_que_content_id BIGINT(20)
      , mc_que_option_text TEXT
      , displayOrder INT(5)
      , PRIMARY KEY (uid)
