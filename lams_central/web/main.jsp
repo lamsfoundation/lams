@@ -175,119 +175,117 @@
 <div id="page-wrapper">
 
 	<!-- header -->
-	<div class="top_nav">
-		<div class="nav_menu">
-			<nav>
-				<div class="offcanvas-toggle offcanvas-toggle-header">
-					<i class="fa fa-bars tour-course-reveal"></i>
-				</div>
+	<div class="top-nav">
+	
+		<div class="offcanvas-toggle offcanvas-toggle-header">
+			<i class="fa fa-bars tour-course-reveal"></i>
+		</div>
 
-				<ul class="nav navbar-nav navbar-right">
-					<li>
-						<a href="javascript:;" class="user-profile dropdown-toggle tour-user-profile" data-toggle="dropdown" aria-expanded="false">
-	                  		<c:choose>
-	                  			<c:when test="${not empty portraitUuid}">
-	                  				<c:set var="portraitSrc">download/?uuid=${portraitUuid}&preferDownload=false</c:set>
-	                  			</c:when>
-	                  			<c:otherwise>
-	                  				<c:set var="portraitSrc">images/css/john-doe-portrait.jpg</c:set>
-	                  			</c:otherwise>
-	                  		</c:choose>
-			                <img src="${portraitSrc}" alt="">
+		<ul class="nav navbar-nav navbar-right">
+			<li>
+				<a href="javascript:;" class="user-profile dropdown-toggle tour-user-profile" data-toggle="dropdown" aria-expanded="false">
+	           		<c:choose>
+	           			<c:when test="${not empty portraitUuid}">
+	           				<c:set var="portraitSrc">download/?uuid=${portraitUuid}&preferDownload=false</c:set>
+	           			</c:when>
+	           			<c:otherwise>
+	           				<c:set var="portraitSrc">images/css/john-doe-portrait.jpg</c:set>
+	           			</c:otherwise>
+	           		</c:choose>
+		            <img src="${portraitSrc}" alt="">
 			                  
-							<c:set var="firstName">
-								<lams:user property="firstName" />
-							</c:set>
-							<c:set var="lastName">
-								 <lams:user property="lastName" />
-							</c:set>
-							<span class="xs-hidden">
-								<c:out value="${firstName}" escapeXml="true"/>&nbsp;<c:out value="${lastName}" escapeXml="true"/>								
-							</span>
-							<span class=" fa fa-angle-down"></span>
+					<c:set var="firstName">
+						<lams:user property="firstName" />
+					</c:set>
+					<c:set var="lastName">
+						 <lams:user property="lastName" />
+					</c:set>
+					<span class="xs-hidden">
+						<c:out value="${firstName}" escapeXml="true"/>&nbsp;<c:out value="${lastName}" escapeXml="true"/>								
+					</span>
+					<span class=" fa fa-angle-down"></span>
+				</a>
+						
+				<ul class="dropdown-menu dropdown-usermenu pull-right">
+					<li>
+						<a href="#" onclick="javascript:showMyProfileDialog(); return false;">
+							<i class="fa fa-user"></i> <fmt:message key="index.myprofile"/>
 						</a>
-						
-						<ul class="dropdown-menu dropdown-usermenu pull-right">
-							<li>
-								<a href="#" onclick="javascript:showMyProfileDialog(); return false;">
-									<i class="fa fa-user"></i> <fmt:message key="index.myprofile"/>
-								</a>
-							</li>
-							
-							<c:forEach var="adminlink" items="${adminLinks}">
-								
-								<c:choose>
-			                		<c:when test="${adminlink.name == 'index.courseman'}">
-			                			<c:set var="iconClass">fa-users</c:set>
-			                		</c:when>
-			                		<c:when test="${adminlink.name == 'index.sysadmin'}">
-			                			<c:set var="iconClass">fa-gear</c:set>
-			                		</c:when>
-			                	</c:choose>
-									
-								<li>
-									<a href="javascript:;" onclick="<c:out value="${adminlink.url}"/>">
-										<span><i class="fa ${iconClass}"></i> <fmt:message key="${adminlink.name}"/></span>
-									</a>
-								</li>
-							</c:forEach>
-							                  
-							<li>
-								<a href="#nogo" onclick="javascript:closeAllChildren(); document.location.href='home.do?method=logout'">
-									<i class="fa fa-sign-out"></i> <fmt:message key="index.logout" />
-								</a>
-							</li>
-						</ul>
 					</li>
-					
-					<c:forEach var="headerlink" items="${headerLinks}">
-						<c:choose>
-							<c:when test="${fn:startsWith(headerlink.name, 'index')}">
-								<c:set var="headerLinkName"><fmt:message key="${headerlink.name}" /></c:set>
-								<c:set var="headerLinkIcon">fa-edit</c:set>
-							</c:when>
 							
-							<c:otherwise>							
-								<c:set var="headerLinkName"><c:out value="${headerlink.name}" /></c:set>
-								<c:set var="headerLinkIcon">fa-at</c:set>
-							</c:otherwise>
-						</c:choose>
+					<c:forEach var="adminlink" items="${adminLinks}">
 						
 						<c:choose>
-							<c:when test="${fn:length(headerLinkName) > 12}">
-								<c:set var="headerLinkTitle" value="${headerLinkName}"/>
-								<c:set var="headerLinkName" value="${fn:substring(headerLinkName, 0, 12-2)}..."/>
-							</c:when>
-							<c:otherwise>
-								<c:set var="headerLinkName" value="${headerLinkName}"/>
-							</c:otherwise>
-						</c:choose>
-						
-						<li role="presentation">       
-							<a href="<c:out value='${headerlink.url}' />"  class="tour-${headerlink.id}" title="${headerLinkTitle}">
-								<i class="fa ${headerLinkIcon}"></i> 
-								<span class="xs-hidden"><c:out value='${headerLinkName}'/></span>
+		               		<c:when test="${adminlink.name == 'index.courseman'}">
+		               			<c:set var="iconClass">fa-users</c:set>
+		               		</c:when>
+		               		<c:when test="${adminlink.name == 'index.sysadmin'}">
+		               			<c:set var="iconClass">fa-gear</c:set>
+		               		</c:when>
+		               	</c:choose>
+									
+						<li>
+							<a href="javascript:;" onclick="<c:out value="${adminlink.url}"/>">
+								<span><i class="fa ${iconClass}"></i> <fmt:message key="${adminlink.name}"/></span>
 							</a>
 						</li>
 					</c:forEach>
-
-					<li role="presentation" class="dropdown">   
-						<a href="javascript:;" onclick="javascript:showPrivateNotificationsDialog();" class="dropdown-toggle info-number tour-user-notifications" data-toggle="dropdown" aria-expanded="false">
-							<i class="fa fa-envelope-o"></i>
-                    		<span id="notificationsPendingCount" class="btn-default"></span>
+							                  
+					<li>
+						<a href="#nogo" onclick="javascript:closeAllChildren(); document.location.href='home.do?method=logout'">
+							<i class="fa fa-sign-out"></i> <fmt:message key="index.logout" />
 						</a>
 					</li>
-					
-					<li role="presentation" class="dropdown">       
-						<a href="javascript:;" onclick="javascript:startTour();" class="dropdown-toggle info-number" data-toggle="dropdown" aria-expanded="false">
-							<i class="fa fa-question-circle"></i>
-							<span class="xs-hidden"><fmt:message key="label.tour"/></span>
-						</a>
-					</li>
-					
 				</ul>
-			</nav>
-		</div>
+			</li>
+					
+			<c:forEach var="headerlink" items="${headerLinks}">
+				<c:choose>
+					<c:when test="${fn:startsWith(headerlink.name, 'index')}">
+						<c:set var="headerLinkName"><fmt:message key="${headerlink.name}" /></c:set>
+						<c:set var="headerLinkIcon">fa-edit</c:set>
+					</c:when>
+							
+					<c:otherwise>							
+						<c:set var="headerLinkName"><c:out value="${headerlink.name}" /></c:set>
+						<c:set var="headerLinkIcon">fa-at</c:set>
+					</c:otherwise>
+				</c:choose>
+						
+				<c:choose>
+					<c:when test="${fn:length(headerLinkName) > 12}">
+						<c:set var="headerLinkTitle" value="${headerLinkName}"/>
+						<c:set var="headerLinkName" value="${fn:substring(headerLinkName, 0, 12-2)}..."/>
+					</c:when>
+					<c:otherwise>
+						<c:set var="headerLinkName" value="${headerLinkName}"/>
+					</c:otherwise>
+				</c:choose>
+						
+				<li role="presentation">
+					<a href="<c:out value='${headerlink.url}' />"  class="tour-${headerlink.id}" title="${headerLinkTitle}">
+						<i class="fa ${headerLinkIcon}"></i> 
+						<span class="xs-hidden"><c:out value='${headerLinkName}'/></span>
+					</a>
+				</li>
+			</c:forEach>
+
+			<li role="presentation" class="dropdown">
+				<a href="javascript:;" onclick="javascript:showPrivateNotificationsDialog();" class="dropdown-toggle info-number tour-user-notifications" data-toggle="dropdown" aria-expanded="false">
+					<i class="fa fa-envelope-o"></i>
+               		<span id="notificationsPendingCount" class="btn-default"></span>
+				</a>
+			</li>
+					
+			<li role="presentation" class="dropdown">
+				<a href="javascript:;" onclick="javascript:startTour();" class="dropdown-toggle info-number" data-toggle="dropdown" aria-expanded="false">
+					<i class="fa fa-question-circle"></i>
+					<span class="xs-hidden"><fmt:message key="label.tour"/></span>
+				</a>
+			</li>
+					
+		</ul>
+
 	</div>
 	<!-- /header -->
 

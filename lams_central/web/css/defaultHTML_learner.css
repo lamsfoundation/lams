@@ -157,11 +157,11 @@ LAMS Learner Style
   padding: 3px 5px;
 }
 .panel-learner-page {
-  border-radius: 0px;
+  border-radius: 6px;
   box-shadow: 0 1px 1px rgba(8, 8, 8, 0.88);
 }
 .panel-monitor-page {
-  border-radius: 0px;
+  border-radius: 6px;
   box-shadow: 0 1px 1px rgba(8, 8, 8, 0.88);
 }
 .panel-learner-page-title,
@@ -179,7 +179,7 @@ LAMS Learner Style
   min-height: 48px;
 }
 .panel-admin-page {
-  border-radius: 0px;
+  border-radius: 6px;
   box-shadow: 0 1px 1px rgba(8, 8, 8, 0.88);
   margin-top: 20px;
 }
@@ -467,6 +467,11 @@ a.button-add-item:before {
     padding: 8px 15px 8px 15px;
 }
 
+.modal .ui-resizable-handle.ui-resizable-s {
+	border-radius: 6px;
+    border-bottom: 1px solid white;
+}
+
 .table-no-border>thead>tr>th, 
 .table-no-border>tbody>tr>th, 
 .table-no-border>tfoot>tr>th, 
@@ -534,7 +539,7 @@ a.button-add-item:before {
 	
 	/* darker outline than usual */
 	nav.sidebar{
-		  border-radius: 0px;
+		  border-radius: 6px;
 		  box-shadow: 0 1px 1px rgba(8, 8, 8, 0.88);
 		  min-height:300px;
 	}
