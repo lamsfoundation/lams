@@ -21,7 +21,6 @@
  * ****************************************************************
  */
 
-
 package org.lamsfoundation.lams.tool.scribe.web.actions;
 
 import java.io.IOException;
@@ -60,21 +59,7 @@ import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.action.LamsDispatchAction;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
-import org.springframework.orm.ObjectOptimisticLockingFailureException;
 
-/**
- * @author
- * @version
- *
- *
- *
- *
- *
- *
- *
- *
- *
- */
 public class LearningAction extends LamsDispatchAction {
 
     private static Logger log = Logger.getLogger(LearningAction.class);
@@ -96,13 +81,7 @@ public class LearningAction extends LamsDispatchAction {
 	if (scribeService == null) {
 	    scribeService = ScribeServiceProxy.getScribeService(this.getServlet().getServletContext());
 	}
-	//try to clone scribe heading from content. This method will execute
-	//for every new learner enter, but the heading only copied once.
-	try {
-	    scribeService.createReportEntry(toolSessionID);
-	} catch (ObjectOptimisticLockingFailureException e) {
-	    LearningAction.log.debug("Multiple learner get into scribe simultaneously. Cloning report entry skipped");
-	}
+	scribeService.createReportEntry(toolSessionID);
 
 	// Retrieve the session and content.
 	ScribeSession scribeSession = scribeService.getSessionBySessionId(toolSessionID);
@@ -139,15 +118,7 @@ public class LearningAction extends LamsDispatchAction {
 	    } else {
 		// appoint the currentUser as the scribe
 		scribeSession.setAppointedScribe(scribeUser);
-
-		// attempt to update the scribeSession.
-		try {
-		    scribeService.saveOrUpdateScribeSession(scribeSession);
-		} catch (ObjectOptimisticLockingFailureException le) {
-		    // scribeSession has been modified. Reload scribeSession and
-		    // check again.
-		    scribeSession = scribeService.getSessionBySessionId(toolSessionID);
-		}
+		scribeService.saveOrUpdateScribeSession(scribeSession);
 	    }
 	}
 

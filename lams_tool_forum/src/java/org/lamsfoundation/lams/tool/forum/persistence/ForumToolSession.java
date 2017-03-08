@@ -50,9 +50,6 @@ public class ForumToolSession implements Cloneable {
     //content topics copyed (1) or not (0)
     private int status;
 
-    //optimistic lock 
-    private int version;
-
 //  **********************************************************
     //		Function method for ForumToolSession
 //  **********************************************************
@@ -174,16 +171,4 @@ public class ForumToolSession implements Cloneable {
     public void setMarkReleased(boolean markReleased) {
 	this.markReleased = markReleased;
     }
-
-    /**
-     *
-     */
-    public int getVersion() {
-	return version;
-    }
-
-    public void setVersion(int version) {
-	this.version = version;
-    }
-
 }
