@@ -36,23 +36,19 @@
         	document.McMonitoringForm.submit();
         }
 
-		function submitMonitoringMethod(actionMethod) {
-			document.McMonitoringForm.dispatch.value=actionMethod; 
-			document.McMonitoringForm.submit();
-		}
-		
-		function submitMethod(actionMethod) {
-			submitMonitoringMethod(actionMethod);
-		}
-		
-		function submitMonitoringMethod(actionMethod) {
-			document.McMonitoringForm.dispatch.value=actionMethod; 
-			document.McMonitoringForm.submit();
+		function downloadMarks() {
+			var url = "<c:url value='/monitoring.do'/>";
+		    var reqIDVar = new Date();
+			var param = "?validate=false&dispatch=downloadMarks&toolContentID=${mcGeneralMonitoringDTO.toolContentID}&reqID="+reqIDVar.getTime();
+			url = url + param;
+
+			return downloadFile(url, 'message-area-busy', '<fmt:message key="label.summary.downloaded"/>', 'message-area', 'btn-disable-on-submit');
 		}
 		
 		function submitChangeDisplayAnswers(displayAnswers, actionMethod) {
 			document.McMonitoringForm.displayAnswers.value=displayAnswers; 
-			submitMonitoringMethod(actionMethod);
+			document.McMonitoringForm.dispatch.value=actionMethod; 
+			document.McMonitoringForm.submit();
 		}
 	
 	</script>

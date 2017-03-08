@@ -192,7 +192,7 @@
 	</c:if>
 	
 	<!--For release marks feature-->
-	<i class="fa fa-spinner" style="display:none" id="message-area-busy"></i>
+	<lams:WaitingSpinner id="message-area-busy"></lams:WaitingSpinner>
 	<div id="message-area"></div>
 
 </div>
@@ -201,9 +201,10 @@
 
 
 <c:if test="${mcGeneralMonitoringDTO.userExceptionNoToolSessions != 'true'}">
-	<html:link href="#" onclick="javascript:submitMonitoringMethod('downloadMarks');" styleClass="btn btn-default btn-xs pull-right">
+	<button onclick="return downloadMarks()" class="btn btn-default btn-xs btn-disable-on-submit pull-right">
+		<i class="fa fa-download" aria-hidden="true"></i> 
 		<fmt:message key="label.monitoring.downloadMarks.button" />
-	</html:link>
+	</button>
 
 	<h4>    
 		<fmt:message key="label.studentMarks"/>
