@@ -193,7 +193,7 @@
 	
 	<!--For release marks feature-->
 	<lams:WaitingSpinner id="message-area-busy"></lams:WaitingSpinner>
-	<div id="message-area"></div>
+	<div class="voffset5 help-block" id="message-area"></div>
 
 </div>
 
