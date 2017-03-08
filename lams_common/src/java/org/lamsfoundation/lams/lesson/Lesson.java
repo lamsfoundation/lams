@@ -80,9 +80,6 @@ public class Lesson implements Serializable {
     /** identifier field */
     private Long lessonId;
 
-    /** Hibernate managed version field */
-    private Integer version;
-
     /** persistent field */
     private String lessonName;
 
@@ -258,17 +255,6 @@ public class Lesson implements Serializable {
 
     public void setLessonId(Long lessonId) {
 	this.lessonId = lessonId;
-    }
-
-    /**
-     * Hibernate version column - updated automatically
-     */
-    public Integer getVersion() {
-	return this.version;
-    }
-
-    public void setVersion(Integer version) {
-	this.version = version;
     }
 
     /**

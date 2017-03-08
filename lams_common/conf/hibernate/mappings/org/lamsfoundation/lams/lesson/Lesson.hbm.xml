@@ -14,11 +14,6 @@
 		<id name="lessonId" type="java.lang.Long" column="lesson_id">
 			<generator class="native" />
 		</id>
-         <version
-            name="version"
-            column="version"
-            type="java.lang.Integer">
-         </version>
     	<property name="lessonDescription" type="java.lang.String" 
     			 column="description" length="65535">
 	    </property>
