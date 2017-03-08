@@ -25,7 +25,10 @@
 	<script type="text/javascript" src="${lams}includes/javascript/thickbox.js"></script>
 	<script type="text/javascript" src="${lams}includes/javascript/bootstrap.min.js"></script>
 	<script type="text/javascript" src="${lams}includes/javascript/bootstrap.tabcontroller.js"></script>
-
+ 
+ 	<!--  File Download -->
+ 	<script type="text/javascript" src="${lams}includes/javascript/jquery.cookie.js"></script>
+ 	<script type="text/javascript" src="${lams}includes/javascript/download.js"></script>
  
 	 <script>
 			var initialTabId = "${initialTabId}";
