@@ -215,7 +215,8 @@
 	});
 	
 	function exportExcel(){
-		location.href = "<c:url value='/monitoring/exportExcel.do'/>?sessionMapID=${sessionMapID}&reqID=" + (new Date()).getTime();
+		var url = "<c:url value='/monitoring/exportExcel.do'/>?sessionMapID=${sessionMapID}&reqID=" + (new Date()).getTime();
+		return downloadFile(url, 'messageArea_Busy', '<fmt:message key="label.summary.downloaded"/>', 'messageArea', 'btn-disable-on-submit');
 	};
 	
 	// pass settings to monitorToolSummaryAdvanced.js
@@ -233,9 +234,12 @@
 </script>
 <script type="text/javascript" src="<lams:LAMSURL/>/includes/javascript/monitorToolSummaryAdvanced.js" ></script>
 
-	<html:link href="javascript:exportExcel();" styleClass="btn btn-default pull-right">
-		<fmt:message key="label.export.excel" />
-	</html:link>
+	<c:if test="${not empty summaryList}">
+		<button onclick="return exportExcel();" class="btn btn-default btn-sm btn-disable-on-submit pull-right">
+			<i class="fa fa-download" aria-hidden="true"></i> 
+			<fmt:message key="label.export.excel" />
+		</button>
+	</c:if>
 
 	<div class="panel">
 		<h4>
@@ -250,6 +254,9 @@
 				 <fmt:message key="message.monitoring.summary.no.session" />
 			</lams:Alert>
 		</c:if>
+	
+		<lams:WaitingSpinner id="messageArea_Busy"></lams:WaitingSpinner>
+		<div class="voffset5 help-block" id="messageArea"></div>
 	
 	</div>
 
