@@ -45,10 +45,9 @@ import org.scilab.forge.jlatexmath.TeXFormula;
 import org.scilab.forge.jlatexmath.TeXIcon;
 
 /**
+ * Servlet produces LaTex images based on the provided formulas. It's used by CKEditor's JLaTeXMath plugin.
+ * 
  * @author Andrey Balan
- *
- *
- *
  */
 public class JlatexmathServlet extends HttpServlet {
 
@@ -78,9 +77,7 @@ public class JlatexmathServlet extends HttpServlet {
 	    return;
 	}
 
-	TeXIcon icon = formula.new TeXIconBuilder().setStyle(TeXConstants.STYLE_DISPLAY).setSize(fontSize)
-		.setWidth(TeXConstants.UNIT_PIXEL, 256f, TeXConstants.ALIGN_CENTER).setIsMaxWidth(true)
-		.setInterLineSpacing(TeXConstants.UNIT_PIXEL, 20f).build();
+	TeXIcon icon = formula.new TeXIconBuilder().setStyle(TeXConstants.STYLE_DISPLAY).setSize(fontSize).build();
 
 	BufferedImage b = null;
 	// TeXFormula fomule = new TeXFormula(formula);
