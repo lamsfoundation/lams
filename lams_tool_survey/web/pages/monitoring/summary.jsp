@@ -14,7 +14,7 @@
 	    var reqIDVar = new Date();
 		var param = "?toolSessionID=" + sessionId +"&reqID="+reqIDVar.getTime();
 		url = url + param;
-		location.href=url;
+		return downloadFile(url, 'messageArea_Busy', '<fmt:message key="label.summary.downloaded"/>', 'messageArea', 'btn-disable-on-submit');
 	}
 </script>
 
@@ -32,6 +32,8 @@
 		</lams:Alert>
 	</c:if>
 	
+	<lams:WaitingSpinner id="messageArea_Busy"></lams:WaitingSpinner>
+	<div class="voffset5 help-block" id="messageArea"></div>
 
 </div>
 
@@ -48,13 +50,14 @@
 		<c:set var="sessionButtons">
 			<c:if test="${sessionMap.survey.reflectOnActivity}">
 				<c:set var="listReflections"><c:url value="/pages/monitoring/listreflections.jsp?toolSessionID=${surveySession.sessionId}"/></c:set>
-				<html:link href="javascript:launchPopup('${listReflections}')" styleClass="btn btn-default ${sessionButtonSize}">
+				<button onclick="launchPopup('${listReflections}');return false;" class="btn btn-default btn-disable-on-submit ${sessionButtonSize}">
 					<fmt:message key="page.title.monitoring.view.reflection" />
-				</html:link>
+				</button>
 			</c:if>	
-			<html:link href="javascript:exportSurvey(${surveySession.sessionId});" property="exportExcel" styleClass="btn btn-default ${sessionButtonSize} loffset5">
+			<button onclick="return exportSurvey(${surveySession.sessionId});" property="exportExcel" class="btn btn-default btn-disable-on-submit ${sessionButtonSize} loffset5">
+				<i class="fa fa-download" aria-hidden="true"></i>
 				<fmt:message key="label.monitoring.button.export.excel" />
-			</html:link>
+			</button>
 		</c:set>
 
 		<c:choose>

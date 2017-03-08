@@ -19,6 +19,10 @@
 	<script type="text/javascript" src="${lams}includes/javascript/bootstrap.min.js"></script>
 	<script type="text/javascript" src="${lams}includes/javascript/bootstrap.tabcontroller.js"></script>
 	
+	<!--  File Download -->
+ 	<script type="text/javascript" src="${lams}includes/javascript/jquery.cookie.js"></script>
+ 	<script type="text/javascript" src="${lams}includes/javascript/download.js"></script>
+	
 	<script type="text/javascript">
 	//pass settings to monitorToolSummaryAdvanced.js
 	<c:set var="sessionMap" value="${sessionScope[sessionMapID]}"/>
