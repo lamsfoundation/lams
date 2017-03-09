@@ -79,9 +79,6 @@ public class ConfigurationKeys {
      */
     public static String ALLOW_MULTIPLE_LOGIN = "AllowMultipleLogin";
 
-    /** Value for controlling style colour on Canvas Activities */
-    public static String AUTHORING_ACTS_COLOUR = "AuthoringActivitiesColour";
-
     /** Values for client updates */
     public static String AUTHORING_CLIENT_VERSION = "AuthoringClientVersion";
 
@@ -192,11 +189,6 @@ public class ConfigurationKeys {
 
     public static String LDAP_SEARCH_RESULTS_PAGE_SIZE = "LDAPSearchResultsPageSize";
 
-    /**
-     * Number of learners to be displayed on the learner progress screen in monitoring.
-     */
-    public static String LEARNER_PROGRESS_BATCH_SIZE = "LearnerProgressBatchSize";
-
     /** Custom tab for the main page */
     public static String CUSTOM_TAB_LINK = "CustomTabLink";
 
@@ -247,9 +239,6 @@ public class ConfigurationKeys {
 
     // LDEV-2747
     public static String ENABLE_SERVER_REGISTRATION = "EnableServerRegistration";
-
-    // LDEV-2889
-    public static String LEARNER_COLLAPSIBLE_PROGRESS_PANEL = "LearnerCollapsProgressPanel";
 
     // CNG-26 Add to lams_configuration and set to false
     // if you don't want imported LD to have _<timestamp>_<seq_number> appended
