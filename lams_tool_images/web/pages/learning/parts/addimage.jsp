@@ -1,11 +1,19 @@
+<!DOCTYPE html>
 <%@ include file="/common/taglibs.jsp"%>
 <%@ page import="org.lamsfoundation.lams.util.Configuration" %>
 <%@ page import="org.lamsfoundation.lams.util.ConfigurationKeys" %>
 <%@ page import="org.lamsfoundation.lams.util.FileValidatorUtil" %>
-<c:set var="UPLOAD_FILE_MAX_SIZE"><%=Configuration.get(ConfigurationKeys.UPLOAD_FILE_MAX_SIZE)%></c:set>
-<c:set var="UPLOAD_FILE_MAX_SIZE_AS_USER_STRING"><%=FileValidatorUtil.formatSize(Configuration.getAsInt(ConfigurationKeys.UPLOAD_FILE_MAX_SIZE))%></c:set>
-
-<!DOCTYPE html>
+<c:set var="sessionMap" value="${sessionScope[sessionMapID]}"/>
+<c:choose>
+	<c:when test="${sessionMap.mode == 'teacher'}">
+		<c:set var="UPLOAD_FILE_MAX_SIZE"><%=Configuration.get(ConfigurationKeys.UPLOAD_FILE_LARGE_MAX_SIZE)%></c:set>
+		<c:set var="UPLOAD_FILE_MAX_SIZE_AS_USER_STRING"><%=FileValidatorUtil.formatSize(Configuration.getAsInt(ConfigurationKeys.UPLOAD_FILE_LARGE_MAX_SIZE))%></c:set>
+	</c:when>
+	<c:otherwise>
+		<c:set var="UPLOAD_FILE_MAX_SIZE"><%=Configuration.get(ConfigurationKeys.UPLOAD_FILE_MAX_SIZE)%></c:set>
+		<c:set var="UPLOAD_FILE_MAX_SIZE_AS_USER_STRING"><%=FileValidatorUtil.formatSize(Configuration.getAsInt(ConfigurationKeys.UPLOAD_FILE_MAX_SIZE))%></c:set>
+	</c:otherwise>
+</c:choose>
 
 <lams:html>
 	<lams:head>
@@ -16,11 +24,8 @@
  		<script type="text/javascript" src="${lams}includes/javascript/upload.js"></script>
 		
 		<script type="text/javascript">
-		
-
-			$(document).ready(function(){ 
+			$(document).ready(function(){
 				document.getElementById("imageTitle").focus();
-				
 			});
 			
 			function submitImage(){
@@ -61,7 +66,6 @@
 					formData.append('file', file, file.name);
 					$('#uploadButtons').hide();
 					$('#itemAttachmentArea_Busy').show();
-					
 				}
 
  				$.ajax({
@@ -76,7 +80,7 @@
 			    	error: function(jqXHR, textStatus, errorMessage) {
 						$('#uploadButtons').show();
 						$('#itemAttachmentArea_Busy').hide();
-			        	alert(errorMessage);
+			        	alert(jqXHR.responseText);
 			    	}
 				}); 
 			} 		
@@ -135,6 +139,7 @@
 					<fmt:message key="label.authoring.basic.add.image" /> 
 				</a>
 			</div>
+		</div>
 	
 		<div id="footer"></div>
 		<!--closes footer-->

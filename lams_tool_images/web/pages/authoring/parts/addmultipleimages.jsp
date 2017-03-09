@@ -14,8 +14,7 @@
 				<a href="javascript:showMessage('<html:rewrite page="/authoring/newImageInit.do?sessionMapID=${formBean.sessionMapID}"/>');" 
 						class="btn btn-default btn-xs pull-right">
 					<fmt:message key="label.authoring.basic.upload.single.image" />
-				</a>			
-				
+				</a>
 			</div>		
 		</div>
 			

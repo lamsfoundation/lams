@@ -1,18 +1,28 @@
+<!DOCTYPE html>
 <%@ include file="/common/taglibs.jsp"%>
 <%@ page import="org.lamsfoundation.lams.util.Configuration" %>
 <%@ page import="org.lamsfoundation.lams.util.ConfigurationKeys" %>
 <%@ page import="org.lamsfoundation.lams.util.FileValidatorUtil" %>
-<c:set var="UPLOAD_FILE_MAX_SIZE"><%=Configuration.get(ConfigurationKeys.UPLOAD_FILE_MAX_SIZE)%></c:set>
-<c:set var="UPLOAD_FILE_MAX_SIZE_AS_USER_STRING"><%=FileValidatorUtil.formatSize(Configuration.getAsInt(ConfigurationKeys.UPLOAD_FILE_MAX_SIZE))%></c:set>
-<!DOCTYPE html>
+<c:set var="sessionMap" value="${sessionScope[sessionMapID]}"/>
+<c:choose>
+	<c:when test="${sessionMap.mode == 'teacher'}">
+		<c:set var="UPLOAD_FILE_MAX_SIZE"><%=Configuration.get(ConfigurationKeys.UPLOAD_FILE_LARGE_MAX_SIZE)%></c:set>
+		<c:set var="UPLOAD_FILE_MAX_SIZE_AS_USER_STRING"><%=FileValidatorUtil.formatSize(Configuration.getAsInt(ConfigurationKeys.UPLOAD_FILE_LARGE_MAX_SIZE))%></c:set>
+	</c:when>
+	<c:otherwise>
+		<c:set var="UPLOAD_FILE_MAX_SIZE"><%=Configuration.get(ConfigurationKeys.UPLOAD_FILE_MAX_SIZE)%></c:set>
+		<c:set var="UPLOAD_FILE_MAX_SIZE_AS_USER_STRING"><%=FileValidatorUtil.formatSize(Configuration.getAsInt(ConfigurationKeys.UPLOAD_FILE_MAX_SIZE))%></c:set>
+	</c:otherwise>
+</c:choose>
+
 <lams:html>
 	<lams:head>
 		<title>
 			<fmt:message key="label.learning.title" />
 		</title>
 		<%@ include file="/common/header.jsp"%>
-		<script type="text/javascript" src="${lams}includes/javascript/upload.js"></script>
 		
+		<script type="text/javascript" src="${lams}includes/javascript/upload.js"></script>
 		<script type="text/javascript">
 			
 			function submitMultipleImages(){
@@ -77,11 +87,10 @@
 				if ( ! valid ) {
 					return;
 				}
-				
+
 				$('#uploadButtons').hide();
 				$('#itemAttachmentArea_Busy').show();
-			
-			
+
 				$.ajax({
 			    	type: 'POST',
 			    	url: $("#multipleImagesForm").attr('action'),
@@ -92,7 +101,7 @@
 			    		self.parent.checkNew();
 			    	},
 			    	error: function(jqXHR, textStatus, errorMessage) {
-			        	alert(errorMessage);
+			    		alert(jqXHR.responseText);
 			    	}
 				});
 			} 
@@ -148,7 +157,6 @@
 					<div class="voffset5"></div>
 					<lams:FileUpload fileButtonBrowse="fileButtonBrowse5" fileFieldname="file5" errorMsgDiv="fileerror5" uploadInfoMessageKey="-"
 						fileInputNameFieldname="fileInputName5" maxFileSize="${UPLOAD_FILE_MAX_SIZE_AS_USER_STRING}"/>
-
 				</div>
 				
 			</html:form>
@@ -166,7 +174,8 @@
 						<fmt:message key="label.authoring.basic.add.images" /> 
 					</a>
 				</div>
-			</div>	
+			</div>
+		</div>	
 	
 		<div id="footer"></div>
 		<!--closes footer-->

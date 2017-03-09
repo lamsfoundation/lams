@@ -186,8 +186,6 @@
 			name="imageGalleryItemForm" 
 			scope="request" 
 			validate="false">
-			<forward name="image" path="/pages/learning/parts/addimage.jsp" />
-			<forward name="success" path="/pages/learning/start.jsp" />
 		</action>
 		<action path="/learning/initMultipleImages"
 			type="org.lamsfoundation.lams.tool.imageGallery.web.action.LearningAction"
@@ -203,8 +201,6 @@
 			name="multipleImagesForm" 
 			scope="request" 
 			validate="false">
-			<forward name="images" path="/pages/learning/parts/addmultipleimages.jsp" />
-			<forward name="success" path="/pages/learning/start.jsp" />
 		</action>		
 		<action path="/learning/deleteImage"
 			type="org.lamsfoundation.lams.tool.imageGallery.web.action.LearningAction"
@@ -249,41 +245,7 @@
 			type="org.lamsfoundation.lams.tool.imageGallery.web.action.MonitoringAction"
 			parameter="summary" >
 			<forward name="success" path="/pages/monitoring/monitoring.jsp" />
-		</action>
-		<action path="/monitoring/newImageInit"
-			type="org.lamsfoundation.lams.tool.imageGallery.web.action.MonitoringAction"
-			parameter="newImageInit"
-			name="imageGalleryItemForm" 
-			scope="request" 
-			validate="false">
-			<forward name="success" path="/pages/monitoring/parts/addimage.jsp" />
-		</action>
-		<action path="/monitoring/saveNewImage"
-			type="org.lamsfoundation.lams.tool.imageGallery.web.action.MonitoringAction"
-			parameter="saveNewImage"
-			name="imageGalleryItemForm" 
-			scope="request" 
-			validate="false">
-			<forward name="image" path="/pages/monitoring/parts/addimage.jsp" />
-			<forward name="success" path="/pages/monitoring/start.jsp" />
-		</action>		
-		<action path="/monitoring/initMultipleImages"
-			type="org.lamsfoundation.lams.tool.imageGallery.web.action.MonitoringAction"
-			name="multipleImagesForm" 
-			scope="request" 
-			validate="false"			
-			parameter="initMultipleImages">
-			<forward name="success" path="/pages/monitoring/parts/addmultipleimages.jsp" />
-		</action>
-		<action path="/monitoring/saveMultipleImages"
-			type="org.lamsfoundation.lams.tool.imageGallery.web.action.MonitoringAction"
-			parameter="saveMultipleImages"
-			name="multipleImagesForm" 
-			scope="request" 
-			validate="false">
-			<forward name="images" path="/pages/monitoring/parts/addmultipleimages.jsp" />
-			<forward name="success" path="/pages/monitoring/start.jsp" />
-		</action>		
+		</action>	
 		<action path="/monitoring/imageSummary"
 			type="org.lamsfoundation.lams.tool.imageGallery.web.action.MonitoringAction"
 			parameter="imageSummary"
@@ -298,7 +260,7 @@
 			name="imageGalleryItemForm" 
 			scope="request" 
 			validate="false">
-			<forward name="success" path="/pages/monitoring/start.jsp" />
+			<forward name="success" path="/monitoring/summary.do" redirect="true"/>
 		</action>
 		<action path="/monitoring/hideitem"
 			type="org.lamsfoundation.lams.tool.imageGallery.web.action.MonitoringAction"

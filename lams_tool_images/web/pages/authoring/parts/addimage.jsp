@@ -17,7 +17,6 @@
 				</div>
 			</div>
 		</div>
-
 			
 		<div class="panel-body">
 			<%@ include file="/common/messages.jsp"%>
@@ -59,7 +58,6 @@
 				<a href="#nogo" id="addImageBtn" onclick="javascript:submitImageGalleryItem()" class="btn btn-sm btn-default button-add-item">
 					<fmt:message key="label.authoring.basic.add.image" /> 
 				</a>
-				
 			</div>
 			
 		</div>

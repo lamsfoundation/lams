@@ -61,11 +61,11 @@ import org.lamsfoundation.lams.tool.imageGallery.service.IImageGalleryService;
 import org.lamsfoundation.lams.tool.imageGallery.service.ImageGalleryException;
 import org.lamsfoundation.lams.tool.imageGallery.service.UploadImageGalleryFileException;
 import org.lamsfoundation.lams.tool.imageGallery.util.ImageGalleryItemComparator;
+import org.lamsfoundation.lams.tool.imageGallery.util.ImageGalleryUtils;
 import org.lamsfoundation.lams.tool.imageGallery.web.form.ImageGalleryForm;
 import org.lamsfoundation.lams.tool.imageGallery.web.form.ImageGalleryItemForm;
 import org.lamsfoundation.lams.tool.imageGallery.web.form.MultipleImagesForm;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
-import org.lamsfoundation.lams.util.FileValidatorUtil;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
@@ -173,7 +173,7 @@ public class AuthoringAction extends Action {
 	imageGalleryForm.setContentFolderID(contentFolderID);
 
 	// initial Session Map
-	SessionMap sessionMap = new SessionMap();
+	SessionMap<String, Object> sessionMap = new SessionMap<String, Object>();
 	request.getSession().setAttribute(sessionMap.getSessionID(), sessionMap);
 	imageGalleryForm.setSessionMapID(sessionMap.getSessionID());
 
@@ -245,7 +245,7 @@ public class AuthoringAction extends Action {
     private ActionForward initPage(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) throws ServletException {
 	String sessionMapID = WebUtil.readStrParam(request, ImageGalleryConstants.ATTR_SESSION_MAP_ID);
-	SessionMap sessionMap = (SessionMap) request.getSession().getAttribute(sessionMapID);
+	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession().getAttribute(sessionMapID);
 	ImageGalleryForm existForm = (ImageGalleryForm) sessionMap.get(ImageGalleryConstants.ATTR_IMAGE_GALLERY_FORM);
 
 	ImageGalleryForm imageGalleryForm = (ImageGalleryForm) form;
@@ -278,7 +278,7 @@ public class AuthoringAction extends Action {
 	ImageGalleryForm imageGalleryForm = (ImageGalleryForm) (form);
 
 	// get back sessionMAP
-	SessionMap sessionMap = (SessionMap) request.getSession().getAttribute(imageGalleryForm.getSessionMapID());
+	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession().getAttribute(imageGalleryForm.getSessionMapID());
 
 	ToolAccessMode mode = getAccessMode(request);
 
@@ -344,11 +344,11 @@ public class AuthoringAction extends Action {
 
 	// ************************* Handle imageGallery items *******************
 	// Handle imageGallery items
-	Set itemList = new LinkedHashSet();
-	SortedSet imageList = getImageList(sessionMap);
-	Iterator iter = imageList.iterator();
+	Set<ImageGalleryItem> itemList = new LinkedHashSet<ImageGalleryItem>();
+	SortedSet<ImageGalleryItem> imageList = getImageList(sessionMap);
+	Iterator<ImageGalleryItem> iter = imageList.iterator();
 	while (iter.hasNext()) {
-	    ImageGalleryItem item = (ImageGalleryItem) iter.next();
+	    ImageGalleryItem item = iter.next();
 	    if (item != null) {
 		// This flushs user UID info to message if this user is a new user.
 		item.setCreateBy(imageGalleryUser);
@@ -357,20 +357,20 @@ public class AuthoringAction extends Action {
 	}
 	imageGalleryPO.setImageGalleryItems(itemList);
 	// delete instructino file from database.
-	List delImageGalleryItemList = getDeletedImageGalleryItemList(sessionMap);
+	List<ImageGalleryItem> delImageGalleryItemList = getDeletedImageGalleryItemList(sessionMap);
 	iter = delImageGalleryItemList.iterator();
 	while (iter.hasNext()) {
-	    ImageGalleryItem item = (ImageGalleryItem) iter.next();
+	    ImageGalleryItem item = iter.next();
 	    iter.remove();
 	    if (item.getUid() != null) {
 		service.deleteImageGalleryItem(item.getUid());
 	    }
 	}
 	// handle imageGallery item attachment file:
-	List delItemAttList = getDeletedItemAttachmentList(sessionMap);
+	List<ImageGalleryItem> delItemAttList = getDeletedItemAttachmentList(sessionMap);
 	iter = delItemAttList.iterator();
 	while (iter.hasNext()) {
-	    ImageGalleryItem delAtt = (ImageGalleryItem) iter.next();
+	    ImageGalleryItem delAtt = iter.next();
 	    iter.remove();
 	}
 	// **********************************************
@@ -379,9 +379,10 @@ public class AuthoringAction extends Action {
 
 	// ************************* Handle rating criterias *******************
 	if (mode.isAuthor()) {
-	List<RatingCriteria> oldCriterias = (List<RatingCriteria>) sessionMap.get(AttributeNames.ATTR_RATING_CRITERIAS);
-	
-	service.saveRatingCriterias(request, oldCriterias, contentId);
+	    List<RatingCriteria> oldCriterias = (List<RatingCriteria>) sessionMap
+		    .get(AttributeNames.ATTR_RATING_CRITERIAS);
+
+	    service.saveRatingCriterias(request, oldCriterias, contentId);
 	}
 	imageGalleryForm.setImageGallery(imageGalleryPO);
 
@@ -428,7 +429,7 @@ public class AuthoringAction extends Action {
 
 	// get back sessionMAP
 	String sessionMapID = WebUtil.readStrParam(request, ImageGalleryConstants.ATTR_SESSION_MAP_ID);
-	SessionMap sessionMap = (SessionMap) request.getSession().getAttribute(sessionMapID);
+	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession().getAttribute(sessionMapID);
 
 	int itemIdx = NumberUtils.stringToInt(request.getParameter(ImageGalleryConstants.PARAM_IMAGE_INDEX), -1);
 	ImageGalleryItem item = null;
@@ -477,24 +478,23 @@ public class AuthoringAction extends Action {
 	    HttpServletResponse response) {
 
 	ImageGalleryItemForm itemForm = (ImageGalleryItemForm) form;
-	ActionErrors errors = validateImageGalleryItem(itemForm);
+	ActionErrors errors = ImageGalleryUtils.validateImageGalleryItem(itemForm, true);
+
+	try {
+	    if (errors.isEmpty()) {
+		extractFormToImageGalleryItem(request, itemForm);
+	    }
+	} catch (Exception e) {
+	    // any upload exception will display as normal error message rather then throw exception directly
+	    errors.add(ActionMessages.GLOBAL_MESSAGE,
+		    new ActionMessage(ImageGalleryConstants.ERROR_MSG_UPLOAD_FAILED, e.getMessage()));
+	}
 
 	if (!errors.isEmpty()) {
 	    this.addErrors(request, errors);
 	    return mapping.findForward("image");
 	}
-
-	try {
-	    extractFormToImageGalleryItem(request, itemForm);
-	} catch (Exception e) {
-	    // any upload exception will display as normal error message rather then throw exception directly
-	    errors.add(ActionMessages.GLOBAL_MESSAGE,
-		    new ActionMessage(ImageGalleryConstants.ERROR_MSG_UPLOAD_FAILED, e.getMessage()));
-	    if (!errors.isEmpty()) {
-		this.addErrors(request, errors);
-		return mapping.findForward("image");
-	    }
-	}
+	
 	// set session map ID so that itemlist.jsp can get sessionMAP
 	request.setAttribute(ImageGalleryConstants.ATTR_SESSION_MAP_ID, itemForm.getSessionMapID());
 	// return null to close this window
@@ -532,7 +532,7 @@ public class AuthoringAction extends Action {
     private ActionForward switchItem(ActionMapping mapping, HttpServletRequest request, boolean up) {
 	// get back sessionMAP
 	String sessionMapID = WebUtil.readStrParam(request, ImageGalleryConstants.ATTR_SESSION_MAP_ID);
-	SessionMap sessionMap = (SessionMap) request.getSession().getAttribute(sessionMapID);
+	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession().getAttribute(sessionMapID);
 
 	int imageIdx = NumberUtils.stringToInt(request.getParameter(ImageGalleryConstants.PARAM_IMAGE_INDEX), -1);
 	if (imageIdx != -1) {
@@ -593,24 +593,23 @@ public class AuthoringAction extends Action {
 	    HttpServletResponse response) {
 
 	MultipleImagesForm multipleForm = (MultipleImagesForm) form;
-	ActionErrors errors = validateMultipleImages(multipleForm);
+	ActionErrors errors = ImageGalleryUtils.validateMultipleImages(multipleForm, true);
+
+	try {
+	    if (errors.isEmpty()) {
+		extractMultipleFormToImageGalleryItems(request, multipleForm);
+	    }
+	} catch (Exception e) {
+	    // any upload exception will display as normal error message rather then throw exception directly
+	    errors.add(ActionMessages.GLOBAL_MESSAGE,
+		    new ActionMessage(ImageGalleryConstants.ERROR_MSG_UPLOAD_FAILED, e.getMessage()));
+	}
 
 	if (!errors.isEmpty()) {
 	    this.addErrors(request, errors);
 	    return mapping.findForward("images");
 	}
-
-	try {
-	    extractMultipleFormToImageGalleryItems(request, multipleForm);
-	} catch (Exception e) {
-	    // any upload exception will display as normal error message rather then throw exception directly
-	    errors.add(ActionMessages.GLOBAL_MESSAGE,
-		    new ActionMessage(ImageGalleryConstants.ERROR_MSG_UPLOAD_FAILED, e.getMessage()));
-	    if (!errors.isEmpty()) {
-		this.addErrors(request, errors);
-		return mapping.findForward("images");
-	    }
-	}
+	
 	// set session map ID so that itemlist.jsp can get sessionMAP
 	request.setAttribute(ImageGalleryConstants.ATTR_SESSION_MAP_ID, multipleForm.getSessionMapID());
 	// return null to close this window
@@ -632,7 +631,7 @@ public class AuthoringAction extends Action {
 
 	// get back sessionMAP
 	String sessionMapID = WebUtil.readStrParam(request, ImageGalleryConstants.ATTR_SESSION_MAP_ID);
-	SessionMap sessionMap = (SessionMap) request.getSession().getAttribute(sessionMapID);
+	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession().getAttribute(sessionMapID);
 
 	int itemIdx = NumberUtils.stringToInt(request.getParameter(ImageGalleryConstants.PARAM_IMAGE_INDEX), -1);
 	if (itemIdx != -1) {
@@ -642,7 +641,7 @@ public class AuthoringAction extends Action {
 	    imageGalleryList.clear();
 	    imageGalleryList.addAll(rList);
 	    // add to delList
-	    List delList = getDeletedImageGalleryItemList(sessionMap);
+	    List<ImageGalleryItem> delList = getDeletedImageGalleryItemList(sessionMap);
 	    delList.add(item);
 	}
 
@@ -668,7 +667,7 @@ public class AuthoringAction extends Action {
      * @param request
      * @return
      */
-    private SortedSet<ImageGalleryItem> getImageList(SessionMap sessionMap) {
+    private SortedSet<ImageGalleryItem> getImageList(SessionMap<String, Object> sessionMap) {
 	SortedSet<ImageGalleryItem> list = (SortedSet<ImageGalleryItem>) sessionMap
 		.get(ImageGalleryConstants.ATTR_IMAGE_LIST);
 	if (list == null) {
@@ -684,7 +683,7 @@ public class AuthoringAction extends Action {
      * @param request
      * @return
      */
-    private List getDeletedImageGalleryItemList(SessionMap sessionMap) {
+    private List<ImageGalleryItem> getDeletedImageGalleryItemList(SessionMap<String, Object> sessionMap) {
 	return getListFromSession(sessionMap, ImageGalleryConstants.ATTR_DELETED_IMAGE_LIST);
     }
 
@@ -696,7 +695,7 @@ public class AuthoringAction extends Action {
      * @param request
      * @return
      */
-    private List getDeletedItemAttachmentList(SessionMap sessionMap) {
+    private List<ImageGalleryItem> getDeletedItemAttachmentList(SessionMap<String, Object> sessionMap) {
 	return getListFromSession(sessionMap, ImageGalleryConstants.ATTR_DELETED_IMAGE_ATTACHMENT_LIST);
     }
 
@@ -707,10 +706,10 @@ public class AuthoringAction extends Action {
      * @param name
      * @return
      */
-    private List getListFromSession(SessionMap sessionMap, String name) {
-	List list = (List) sessionMap.get(name);
+    private List<ImageGalleryItem> getListFromSession(SessionMap<String, Object> sessionMap, String name) {
+	List<ImageGalleryItem> list = (List<ImageGalleryItem>) sessionMap.get(name);
 	if (list == null) {
-	    list = new ArrayList();
+	    list = new ArrayList<ImageGalleryItem>();
 	    sessionMap.put(name, list);
 	}
 	return list;
@@ -757,7 +756,7 @@ public class AuthoringAction extends Action {
 	 * persisting this imageGallery item.
 	 */
 
-	SessionMap sessionMap = (SessionMap) request.getSession().getAttribute(imageForm.getSessionMapID());
+	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession().getAttribute(imageForm.getSessionMapID());
 	// check whether it is "edit(old item)" or "add(new item)"
 	SortedSet<ImageGalleryItem> imageList = getImageList(sessionMap);
 	int imageIdx = NumberUtils.stringToInt(imageForm.getImageIndex(), -1);
@@ -804,7 +803,7 @@ public class AuthoringAction extends Action {
 	    }
 	    // put it after "upload" to ensure deleted file added into list only no exception happens during upload
 	    if (hasOld) {
-		List delAtt = getDeletedItemAttachmentList(sessionMap);
+		List<ImageGalleryItem> delAtt = getDeletedItemAttachmentList(sessionMap);
 		delAtt.add(delImage);
 	    }
 	}
@@ -833,11 +832,11 @@ public class AuthoringAction extends Action {
     private void extractMultipleFormToImageGalleryItems(HttpServletRequest request, MultipleImagesForm multipleForm)
 	    throws Exception {
 
-	SessionMap sessionMap = (SessionMap) request.getSession().getAttribute(multipleForm.getSessionMapID());
+	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession().getAttribute(multipleForm.getSessionMapID());
 	// check whether it is "edit(old item)" or "add(new item)"
 	SortedSet<ImageGalleryItem> imageList = getImageList(sessionMap);
 
-	List<FormFile> fileList = createFileListFromMultipleForm(multipleForm);
+	List<FormFile> fileList = ImageGalleryUtils.createFileListFromMultipleForm(multipleForm);
 	for (FormFile file : fileList) {
 	    ImageGalleryItem image = new ImageGalleryItem();
 	    image.setCreateDate(new Timestamp(new Date().getTime()));
@@ -888,103 +887,6 @@ public class AuthoringAction extends Action {
 	}
 
 	return errors;
-    }
-
-    /**
-     * Validate imageGallery item.
-     *
-     * @param itemForm
-     * @return
-     */
-    private ActionErrors validateImageGalleryItem(ImageGalleryItemForm itemForm) {
-	ActionErrors errors = new ActionErrors();
-
-	// validate file size
-	FileValidatorUtil.validateFileSize(itemForm.getFile(), true, errors);
-	// for edit validate: file already exist
-	if (!itemForm.isHasFile()
-		&& ((itemForm.getFile() == null) || StringUtils.isEmpty(itemForm.getFile().getFileName()))) {
-	    errors.add(ActionMessages.GLOBAL_MESSAGE, new ActionMessage(ImageGalleryConstants.ERROR_MSG_FILE_BLANK));
-	}
-
-	// check for allowed format : gif, png, jpg
-	if (itemForm.getFile() != null) {
-	    String contentType = itemForm.getFile().getContentType();
-	    if (isContentTypeForbidden(contentType)) {
-		errors.add(ActionMessages.GLOBAL_MESSAGE,
-			new ActionMessage(ImageGalleryConstants.ERROR_MSG_NOT_ALLOWED_FORMAT));
-	    }
-	}
-
-	return errors;
-    }
-
-    /**
-     * Validate imageGallery item.
-     *
-     * @param multipleForm
-     * @return
-     */
-    private ActionErrors validateMultipleImages(MultipleImagesForm multipleForm) {
-	ActionErrors errors = new ActionErrors();
-
-	List<FormFile> fileList = createFileListFromMultipleForm(multipleForm);
-
-	// validate files size
-	for (FormFile file : fileList) {
-	    FileValidatorUtil.validateFileSize(file, true, errors);
-
-	    // check for allowed format : gif, png, jpg
-	    String contentType = file.getContentType();
-	    if (isContentTypeForbidden(contentType)) {
-		errors.add(ActionMessages.GLOBAL_MESSAGE,
-			new ActionMessage(ImageGalleryConstants.ERROR_MSG_NOT_ALLOWED_FORMAT_FOR, file.getFileName()));
-	    }
-	}
-
-	return errors;
-    }
-
-    /**
-     * Create file list from multiple form.
-     *
-     * @param multipleForm
-     * @return
-     */
-    private List<FormFile> createFileListFromMultipleForm(MultipleImagesForm multipleForm) {
-
-	List<FormFile> fileList = new ArrayList<FormFile>();
-	if (multipleForm.getFile1() != null && !StringUtils.isEmpty(multipleForm.getFile1().getFileName())) {
-	    fileList.add(multipleForm.getFile1());
-	}
-	if (multipleForm.getFile2() != null && !StringUtils.isEmpty(multipleForm.getFile2().getFileName())) {
-	    fileList.add(multipleForm.getFile2());
-	}
-	if (multipleForm.getFile3() != null && !StringUtils.isEmpty(multipleForm.getFile3().getFileName())) {
-	    fileList.add(multipleForm.getFile3());
-	}
-	if (multipleForm.getFile4() != null && !StringUtils.isEmpty(multipleForm.getFile4().getFileName())) {
-	    fileList.add(multipleForm.getFile4());
-	}
-	if (multipleForm.getFile5() != null && !StringUtils.isEmpty(multipleForm.getFile5().getFileName())) {
-	    fileList.add(multipleForm.getFile5());
-	}
-
-	return fileList;
-    }
-
-    /**
-     * Checks if the format is allowed.
-     *
-     * @param contentType
-     * @return
-     */
-    private boolean isContentTypeForbidden(String contentType) {
-	boolean isContentTypeForbidden = StringUtils.isEmpty(contentType) || !(contentType.equals("image/gif")
-		|| contentType.equals("image/png") || contentType.equals("image/jpg")
-		|| contentType.equals("image/jpeg") || contentType.equals("image/pjpeg"));
-
-	return isContentTypeForbidden;
     }
 
     /**

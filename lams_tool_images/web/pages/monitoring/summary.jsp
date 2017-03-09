@@ -225,7 +225,7 @@
 </c:if>
 
 <P id="add-image-container">
-	<a href="<html:rewrite page='/monitoring/newImageInit.do?sessionMapID='/>${sessionMapID}&KeepThis=true&TB_iframe=true&modal=true" 
+	<a href="<html:rewrite page='/learning/newImageInit.do?sessionMapID='/>${sessionMapID}&KeepThis=true&TB_iframe=true&modal=true" 
 			class="btn btn-default btn-xs loffset5 voffset10 pull-right thickbox">  
 		<i class="fa fa-plus"></i>&nbsp;<fmt:message key="label.monitoring.summary.add.new.image" />
 	</a>

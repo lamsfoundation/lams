@@ -155,7 +155,6 @@
 		}
 
 		function loadImageData(imageUid) {
-			
 			$("#image-info").load(
 				"<c:url value="/learning/loadImageData.do"/>",
 				{
@@ -166,7 +165,6 @@
 		}
 				
     </script>
-   
 </lams:head>
 <body class="stripes">
 	 <lams:Page type="learner" title="${imageGallery.title}">

@@ -1,12 +1,12 @@
 <%@ include file="/common/taglibs.jsp"%>
+<c:set var="formBean" value="<%=request.getAttribute(org.apache.struts.taglib.html.Constants.BEAN_KEY)%>" />
+
+<link rel="stylesheet" href="<html:rewrite page='/includes/css/lytebox.css'/>"  type="text/css">
 
 <script type="text/javascript"> 
 	var pathToImageFolder = "<html:rewrite page='/includes/images/'/>"; 
 </script>
 <script type="text/javascript" src="<html:rewrite page='/includes/javascript/lytebox.js'/>" ></script>
-<link rel="stylesheet" href="<html:rewrite page='/includes/css/lytebox.css'/>"  type="text/css">
-
-<c:set var="formBean" value="<%=request.getAttribute(org.apache.struts.taglib.html.Constants.BEAN_KEY)%>" />
 <script lang="javascript">
 
 	function hideMessage(){
@@ -76,7 +76,6 @@
 			}
 		);
 	}
-
 </script>
 
 <!-- Basic Tab Content -->
