@@ -11,8 +11,6 @@
 	<title><fmt:message key="label.author.title" /></title>
 
 	<%@ include file="/common/tabbedheader.jsp"%>
-	<script type="text/javascript" src="${lams}includes/javascript/upload.js"></script>
-	
 	<link href="${lams}css/jquery-ui-smoothness-theme.css" rel="stylesheet" type="text/css" >
 
 	<script type="text/javascript">
@@ -25,6 +23,7 @@
 		var LABEL_NOT_ALLOWED_FORMAT = '<fmt:message key="error.resource.image.not.alowed.format"/>';
 	</script>
 	<script type="text/javascript" src="<html:rewrite page='/includes/javascript/imageGalleryitem.js'/>"></script>
+	<script type="text/javascript" src="${lams}includes/javascript/upload.js"></script>
 	<script type="text/javascript" src="${lams}includes/javascript/jquery-ui.js"></script>
 	<script>
         function init(){

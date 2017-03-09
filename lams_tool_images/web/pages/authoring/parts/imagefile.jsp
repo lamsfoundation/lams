@@ -3,8 +3,8 @@
 <%@ page import="org.lamsfoundation.lams.util.ConfigurationKeys" %>
 <%@ page import="org.lamsfoundation.lams.util.FileValidatorUtil" %>
 <c:set var="UPLOAD_FILE_MAX_SIZE_AS_USER_STRING"><%=FileValidatorUtil.formatSize(Configuration.getAsInt(ConfigurationKeys.UPLOAD_FILE_LARGE_MAX_SIZE))%></c:set>
-
 <c:set var="ctxPath" value="${pageContext.request.contextPath}"	scope="request" />
+
 <input type="hidden" name="hasFile" value="${itemAttachment.hasFile}" id="has-file"/>
 <c:choose>
 	<c:when test="${itemAttachment.hasFile}">
