@@ -90,7 +90,7 @@ var paper = null,
 			'containerActivityChildrenPadding' : 10,
 			'regionEmptyWidth'				   : 20,
 			'regionEmptyHeight'				   : 20,
-			'labelDefaultSize'				   : 11,
+			'labelDefaultSize'				   : 10,
 			'labelMinSize'					   : 9,
 			'labelMaxSize'					   : 20,
 			
