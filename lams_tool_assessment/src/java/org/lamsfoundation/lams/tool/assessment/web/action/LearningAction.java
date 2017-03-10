@@ -383,7 +383,7 @@ public class LearningAction extends Action {
 
 	//set attempt started
 	if (!finishedLock && hasEditRight) {
-	    service.setAttemptStarted(assessment, pagedQuestions, user, toolSessionId);
+	    service.setAttemptStarted(assessment, user, toolSessionId);
 	}
 
 	// loadupLastAttempt for display purpose
@@ -471,22 +471,20 @@ public class LearningAction extends Action {
      */
     private ActionForward submitSingleMarkHedgingQuestion(ActionMapping mapping, ActionForm form,
 	    HttpServletRequest request, HttpServletResponse response) throws ServletException {
+	IAssessmentService service = getAssessmentService();
 	String sessionMapID = WebUtil.readStrParam(request, AssessmentConstants.ATTR_SESSION_MAP_ID);
 	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
 		.getAttribute(sessionMapID);
-	List<Set<AssessmentQuestion>> pagedQuestions = (List<Set<AssessmentQuestion>>) sessionMap
-		.get(AssessmentConstants.ATTR_PAGED_QUESTIONS);
-	Assessment assessment = (Assessment) sessionMap.get(AssessmentConstants.ATTR_ASSESSMENT);
 	Long userId = ((AssessmentUser) sessionMap.get(AssessmentConstants.ATTR_USER)).getUserId();
-	IAssessmentService service = getAssessmentService();
+	Long toolSessionId = (Long) sessionMap.get(AssessmentConstants.ATTR_TOOL_SESSION_ID);
+	Assessment assessment = service.getAssessmentBySessionId(toolSessionId);
 
 	//get user answers from request and store them into sessionMap
 	storeUserAnswersIntoSessionMap(request);
 
 	// store results from sessionMap into DB
 	Long singleMarkHedgingQuestionUid = WebUtil.readLongParam(request, "singleMarkHedgingQuestionUid");
-	boolean isResultsStored = service.storeUserAnswers(assessment.getUid(), userId, pagedQuestions,
-		singleMarkHedgingQuestionUid, false);
+	boolean isResultsStored = service.storeUserAnswers(assessment, userId, singleMarkHedgingQuestionUid, false);
 	// result was not stored in case user was prohibited from submitting (or autosubmitting) answers (e.g. when
 	// using 2 browsers). Then show last stored results
 	if (!isResultsStored) {
@@ -495,12 +493,10 @@ public class LearningAction extends Action {
 
 	//find according question in order to get its mark
 	AssessmentQuestion question = null;
-	for (Set<AssessmentQuestion> questionsForOnePage : pagedQuestions) {
-	    for (AssessmentQuestion questionIter : questionsForOnePage) {
-		if (questionIter.getUid().equals(singleMarkHedgingQuestionUid)) {
-		    question = questionIter;
-		    question.setResponseSubmitted(true);
-		}
+	for (AssessmentQuestion questionIter : (Set<AssessmentQuestion>) assessment.getQuestions()) {
+	    if (questionIter.getUid().equals(singleMarkHedgingQuestionUid)) {
+		question = questionIter;
+		question.setResponseSubmitted(true);
 	    }
 	}
 
@@ -583,15 +579,13 @@ public class LearningAction extends Action {
 	String sessionMapID = WebUtil.readStrParam(request, AssessmentConstants.ATTR_SESSION_MAP_ID);
 	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
 		.getAttribute(sessionMapID);
-	Assessment assessment = (Assessment) sessionMap.get(AssessmentConstants.ATTR_ASSESSMENT);
 	Long toolSessionId = (Long) sessionMap.get(AssessmentConstants.ATTR_TOOL_SESSION_ID);
+	Assessment assessment = service.getAssessmentBySessionId(toolSessionId);
 	AssessmentUser assessmentUser = (AssessmentUser) sessionMap.get(AssessmentConstants.ATTR_USER);
 	service.unsetSessionFinished(toolSessionId, assessmentUser.getUserId());
 
 	//set attempt started: create a new one + mark previous as not being the latest any longer
-	List<Set<AssessmentQuestion>> pagedQuestions = (List<Set<AssessmentQuestion>>) sessionMap
-		.get(AssessmentConstants.ATTR_PAGED_QUESTIONS);
-	service.setAttemptStarted(assessment, pagedQuestions, assessmentUser, toolSessionId);
+	service.setAttemptStarted(assessment, assessmentUser, toolSessionId);
 
 	sessionMap.put(AssessmentConstants.ATTR_FINISHED_LOCK, false);
 	sessionMap.put(AssessmentConstants.ATTR_PAGE_NUMBER, 1);
@@ -603,6 +597,27 @@ public class LearningAction extends Action {
 	//time limit feature
 	sessionMap.put(AssessmentConstants.ATTR_IS_TIME_LIMIT_NOT_LAUNCHED, true);
 	request.setAttribute(AssessmentConstants.ATTR_SECONDS_LEFT, assessment.getTimeLimit() * 60);
+	
+	//update all questions with DB data in case assessment was edited in monitor
+	List<Set<AssessmentQuestion>> pagedQuestions = (List<Set<AssessmentQuestion>>) sessionMap
+		.get(AssessmentConstants.ATTR_PAGED_QUESTIONS);
+	List<AssessmentQuestion> dbQuestions = service.getAuthoredQuestions(assessment.getUid());
+	List<Set<AssessmentQuestion>> newPagedQuestions = new ArrayList<Set<AssessmentQuestion>>();
+	for (Set<AssessmentQuestion> questionsForOnePage : pagedQuestions) {
+	    LinkedHashSet<AssessmentQuestion> newQuestionsForOnePage = new LinkedHashSet<AssessmentQuestion>();
+	    
+	    for (AssessmentQuestion question : questionsForOnePage) {
+
+		for (AssessmentQuestion dbQuestion : dbQuestions) {
+		    if (dbQuestion.getUid().equals(question.getUid())) {
+			newQuestionsForOnePage.add(dbQuestion);
+			break;
+		    }
+		}
+	    }
+	    newPagedQuestions.add(newQuestionsForOnePage);
+	}
+	sessionMap.put(AssessmentConstants.ATTR_PAGED_QUESTIONS, newPagedQuestions);
 
 	return mapping.findForward(AssessmentConstants.SUCCESS);
     }
@@ -1161,21 +1176,17 @@ public class LearningAction extends Action {
      * Store user answers in DB in last unfinished attempt and notify teachers about it.
      */
     private boolean storeUserAnswersIntoDatabase(SessionMap<String, Object> sessionMap, boolean isAutosave) {
-
-	List<Set<AssessmentQuestion>> pagedQuestions = (List<Set<AssessmentQuestion>>) sessionMap
-		.get(AssessmentConstants.ATTR_PAGED_QUESTIONS);
-	Long assessmentUid = ((Assessment) sessionMap.get(AssessmentConstants.ATTR_ASSESSMENT)).getUid();
-	Long userId = ((AssessmentUser) sessionMap.get(AssessmentConstants.ATTR_USER)).getUserId();
 	IAssessmentService service = getAssessmentService();
-	boolean isResultsStored = service.storeUserAnswers(assessmentUid, userId, pagedQuestions, null, isAutosave);
+	Long toolSessionId = (Long) sessionMap.get(AssessmentConstants.ATTR_TOOL_SESSION_ID);
+	Long userId = ((AssessmentUser) sessionMap.get(AssessmentConstants.ATTR_USER)).getUserId();
+	ToolAccessMode mode = (ToolAccessMode) sessionMap.get(AttributeNames.ATTR_MODE);
+	Assessment assessment = service.getAssessmentBySessionId(toolSessionId);
+	
+	boolean isResultsStored = service.storeUserAnswers(assessment, userId, null, isAutosave);
 
 	// notify teachers
-	ToolAccessMode mode = (ToolAccessMode) sessionMap.get(AttributeNames.ATTR_MODE);
-	Assessment assessment = (Assessment) sessionMap.get(AssessmentConstants.ATTR_ASSESSMENT);
 	if ((mode != null) && !mode.isTeacher() && !isAutosave && isResultsStored
 		&& assessment.isNotifyTeachersOnAttemptCompletion()) {
-
-	    Long toolSessionId = (Long) sessionMap.get(AttributeNames.PARAM_TOOL_SESSION_ID);
 	    AssessmentUser assessmentUser = getCurrentUser(toolSessionId);
 	    String fullName = assessmentUser.getLastName() + " " + assessmentUser.getFirstName();
 	    service.notifyTeachersOnAttemptCompletion(toolSessionId, fullName);
