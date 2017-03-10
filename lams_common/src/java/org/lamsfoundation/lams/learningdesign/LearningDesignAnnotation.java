@@ -43,6 +43,7 @@ public class LearningDesignAnnotation implements Serializable {
     private Integer endXcoord;
     private Integer endYcoord;
     private String color;
+    private Short size;
 
     public Long getUid() {
 	return uid;
@@ -114,6 +115,14 @@ public class LearningDesignAnnotation implements Serializable {
 
     public void setColor(String color) {
 	this.color = color;
+    }
+
+    public Short getSize() {
+	return size;
+    }
+
+    public void setSize(Short size) {
+	this.size = size;
     }
 
     @Override

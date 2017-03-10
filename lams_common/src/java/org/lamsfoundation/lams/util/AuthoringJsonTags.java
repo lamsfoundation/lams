@@ -167,13 +167,14 @@ public interface AuthoringJsonTags {
     public static final String EXTERNAL_SIG = "externalSignature";
     public static final String ENTRY = "entry";
 
-    /** Branching Activity Specific Tags */
+    /** Annotation Specific Tags */
     public static final String START_XCOORD = "startXCoord";
     public static final String START_YCOORD = "startYCoord";
     public static final String END_XCOORD = "endXCoord";
     public static final String END_YCOORD = "endYCoord";
     public static final String COLOR = "color";
-
+    public static final String SIZE = "size";
+    
     /** Branch Mapping and Tool Condition Tags */
     public static final String BRANCH_ACTIVITY_ENTRY_ID = "entryID";
     public static final String BRANCH_ACTIVITY_ENTRY_UIID = "entryUIID";

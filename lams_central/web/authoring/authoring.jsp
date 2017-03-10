@@ -953,6 +953,23 @@
 					 <input class="propertiesContentFieldTitle" type="text"></input>
 				</td>
 			</tr>
+			<tr height="50px" valign="top">
+				<td>
+					<fmt:message key="authoring.fla.page.prop.color" />
+				</td>
+				<td>
+					 <input class="propertiesContentFieldColor" type="text"></input>
+				</td>
+			</tr>
+			<tr >
+				<td>
+					<fmt:message key="authoring.fla.page.prop.size" />
+				</td>
+				<td>
+					<i class="fa fa-plus labelPlusSize"></i><i class="fa fa-minus labelMinusSize"></i>
+				</td>
+			</tr>
+			
 		</table>
 	</div>
 	
