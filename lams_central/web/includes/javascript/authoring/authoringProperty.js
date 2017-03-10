@@ -404,13 +404,29 @@ var PropertyDefs = {
 			content = label.propertiesContent = $('#propertiesContentLabel').clone().attr('id', null)
 													.show().data('parentObject', label);
 			$('.propertiesContentFieldTitle', content).val(label.title);
+			var color = label.items.shape.attr('fill');
+			// init colour chooser
+			$('.propertiesContentFieldColor', content).val(color)
+													  .simpleColor({
+														'colors' : layout.colors.annotationPalette,
+														'chooserCSS' : {
+															'left'	   : 2,
+															'top'      : '25px',
+															'margin'   : '0'
+														}
+													  });
 			
-			$('input', content).change(function(){
+			var changeFunction = function(){
 				// extract changed properties and redraw the label, if needed
 				var content = $(this).closest('.dialogContents'),
 					label = content.data('parentObject'),
 					redrawNeeded = false,
-					newTitle =  $('.propertiesContentFieldTitle', content).val();
+					newTitle =  $('.propertiesContentFieldTitle', content).val(),
+					color = label.items.shape.attr('fill'),
+					newColor = $('.propertiesContentFieldColor', content).val(),
+					size =  label.items.shape.attr('font-size');
+				size = +size.substring(0, size.indexOf('px'));
+
 				if (newTitle == '') {
 					newTitle = undefined;
 				} 
@@ -424,12 +440,27 @@ var PropertyDefs = {
             		}
 				}
 				
+				redrawNeeded |= newColor != color;
+				redrawNeeded |= label.newSize && (label.newSize <= layout.conf.labelMaxSize
+										|| label.newSize >= layout.conf.labelMinSize);
+				
 				if (redrawNeeded) {
 					ActivityLib.removeSelectEffect(label);
-					label.draw();
+					label.draw(null, null, newColor, label.newSize);
 					ActivityLib.addSelectEffect(label, true);
 					GeneralLib.setModified(true);
 				}
+				
+				label.newSize = null;
+			};
+			
+			$('input', content).change(changeFunction);
+			
+			$('.labelPlusSize, .labelMinusSize', content).click(function(){
+				label.newSize = label.items.shape.attr('font-size');
+				label.newSize = +label.newSize.substring(0, label.newSize.indexOf('px'))
+								+ ($(this).hasClass('labelPlusSize') ? 1 : -1);
+				changeFunction.call(content);
 			});
 		}
 	},

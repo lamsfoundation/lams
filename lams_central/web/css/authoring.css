@@ -137,6 +137,15 @@ select.propertiesContentFieldGradebook {
 	width: 99%;	
 }
 
+.dialogContents .labelPlusSize {
+	cursor: pointer;
+}
+
+.dialogContents .labelMinusSize {
+	margin-left: 15px;
+	cursor: pointer;
+}
+
 div#groupNamingDialog .btn-group,
 div#gtbDialog  .btn-group,
 div#ctbDialog .btn-group,

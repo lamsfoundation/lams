@@ -24,7 +24,7 @@ var DecorationDefs = {
 	/**
 	 * Constructor for label annotation.
 	 */
-	Label : function(id, uiid, x, y, title){
+	Label : function(id, uiid, x, y, title, color, size){
 		this.id = +id || null;
 		this.uiid = +uiid || ++layout.ld.maxUIID;
 		// set a default title, if none provided
@@ -36,7 +36,7 @@ var DecorationDefs = {
 			this.loadPropertiesDialogContent = PropertyDefs.labelProperties;
 		}
 		
-		this.draw(x, y);
+		this.draw(x, y, color || layout.colors.activityText, size || layout.conf.labelDefaultSize);
 	},
 	
 	
@@ -161,9 +161,17 @@ var DecorationDefs = {
 		 * Label methods
 		 */
 		label : {
-			draw : function(x, y) {
+			draw : function(x, y, color, size) {
 				var x = x ? x : this.items.shape.attr('x'),
-					y = y ? y : this.items.shape.attr('y');
+					y = y ? y : this.items.shape.attr('y'),
+					color = color ? color : this.items.shape.attr('fill'),
+					// do not grow/shrink over given limits
+					size = size ? Math.max(layout.conf.labelMinSize, Math.min(layout.conf.labelMaxSize, size)) : null;
+				if (!size) {
+					size = this.items.shape.attr('font-size');
+					size = size.substring(0, size.indexOf('px'));
+				}
+				
 				
 				if (this.items) {
 					this.items.remove();
@@ -174,7 +182,11 @@ var DecorationDefs = {
 				this.items.attr('uiid', this.uiid);
 				this.items.shape = paper.text(x, y, this.title)
 										.attr(layout.defaultTextAttributes)
-										.attr('text-anchor', 'start');
+										.attr({
+											'text-anchor' : 'start',
+											'font-size'   : size,
+											'fill'        : color
+											});
 				this.items.append(this.items.shape);
 				
 				this.items.attr('cursor', 'pointer')
@@ -250,8 +262,8 @@ DecorationLib = {
 	/**
 	 * Adds a string on the canvas
 	 */
-	addLabel : function(x, y, title) {
-		var label = new DecorationDefs.Label(null, null, x, y, title);
+	addLabel : function(x, y, title, color, size) {
+		var label = new DecorationDefs.Label(null, null, x, y, title, color, size);
 		layout.labels.push(label);
 		GeneralLib.setModified(true);
 		return label;

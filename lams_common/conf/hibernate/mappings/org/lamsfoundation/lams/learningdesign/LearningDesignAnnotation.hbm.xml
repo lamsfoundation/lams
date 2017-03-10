@@ -25,6 +25,8 @@
 	<property name="endYcoord" type="java.lang.Integer" column="end_ycoord" length="11" />
 	
 	<property name="color" type="java.lang.String" column="color" length="7" />
+	
+	<property name="size" type="java.lang.Short" column="size" />
 
 </class>
 </hibernate-mapping>

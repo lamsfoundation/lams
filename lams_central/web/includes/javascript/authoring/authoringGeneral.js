@@ -90,6 +90,9 @@ var paper = null,
 			'containerActivityChildrenPadding' : 10,
 			'regionEmptyWidth'				   : 20,
 			'regionEmptyHeight'				   : 20,
+			'labelDefaultSize'				   : 11,
+			'labelMinSize'					   : 9,
+			'labelMaxSize'					   : 20,
 			
 			'groupingEffectPadding'			   : 5,
 			'selectEffectPadding'			   : 7,
@@ -121,9 +124,9 @@ var paper = null,
 			// highlight branching edges on mouse hover
 			'branchingEdgeMatch'  : 'blue',
 			'gate'         		  : 'red',
-                        'gateBorder'              : '#801515',
+            'gateBorder'          : '#801515',
 			'gateText'     		  : 'white',
-			'grouping'		  : '#caddfb',
+			'grouping'		      : '#caddfb',
 			'groupingBorder'	  : '#00007f',
 			'optionalActivity'    : '#caddfb',
 			'optionalActivityBorder'    : '#00007f',
@@ -1958,7 +1961,7 @@ GeneralLib = {
 						DecorationLib.addRegion(this.xcoord, this.ycoord, this.endXcoord, this.endYcoord,
 												this. title, this.color);
 					} else {
-						DecorationLib.addLabel(this.xcoord, this.ycoord, this.title);
+						DecorationLib.addLabel(this.xcoord, this.ycoord, this.title, this.color, this.size);
 					}
 				});
 				
@@ -2422,7 +2425,11 @@ GeneralLib = {
 		// iterate over labels and regions
 		$.each(layout.labels.concat(layout.regions), function(){
 			var box = this.items.shape.getBBox(),
-				isRegion = this instanceof DecorationDefs.Region;
+				isRegion = this instanceof DecorationDefs.Region,
+				size = isRegion ? null : this.items.shape.attr('font-size');
+			if (size) {
+				size = size.substring(0, size.indexOf('px'));
+			}
 			
 			annotations.push({
 				'id'			 : this.id,
@@ -2432,7 +2439,8 @@ GeneralLib = {
 				'yCoord'    	 : parseInt(box.y),
 				'endXCoord' 	 : isRegion ? parseInt(box.x2) : null,
 				'endYCoord' 	 : isRegion ? parseInt(box.y2) : null,
-				'color'	    	 : isRegion ? Snap.color(this.items.shape.attr('fill')).hex : null
+				'color'	    	 : Snap.color(this.items.shape.attr('fill')).hex,
+				'size'			 : size
 			});
 		});
 
