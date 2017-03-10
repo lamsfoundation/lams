@@ -761,8 +761,15 @@ public class MonitoringService implements IMonitoringService {
     public void archiveLesson(long lessonId, Integer userId) {
 	securityService.isLessonMonitor(lessonId, userId, "archive lesson", true);
 	Lesson requestedLesson = lessonDAO.getLesson(new Long(lessonId));
-	if (!Lesson.ARCHIVED_STATE.equals(requestedLesson.getLessonStateId())
-		&& !Lesson.REMOVED_STATE.equals(requestedLesson.getLessonStateId())) {
+	Integer lessonState = requestedLesson.getLessonStateId();
+	
+	// if lesson has 'suspended'('disabled') state - then unsuspend it first so its previous lesson state will be 'started'
+	if (Lesson.SUSPENDED_STATE.equals(lessonState)) {
+	    unsuspendLesson(lessonId, userId);
+	}
+	
+	if (!Lesson.ARCHIVED_STATE.equals(lessonState)
+		&& !Lesson.REMOVED_STATE.equals(lessonState)) {
 	    setLessonState(requestedLesson, Lesson.ARCHIVED_STATE);
 	}
     }
@@ -818,17 +825,21 @@ public class MonitoringService implements IMonitoringService {
      */
     private void revertLessonState(Lesson requestedLesson) {
 	Integer currentStatus = requestedLesson.getLessonStateId();
+	
 	if (requestedLesson.getPreviousLessonStateId() != null) {
 	    if (requestedLesson.getPreviousLessonStateId().equals(Lesson.NOT_STARTED_STATE)
 		    && requestedLesson.getScheduleStartDate().before(new Date())) {
 		requestedLesson.setLessonStateId(Lesson.STARTED_STATE);
+		
 	    } else {
 		requestedLesson.setLessonStateId(requestedLesson.getPreviousLessonStateId());
 	    }
 	    requestedLesson.setPreviousLessonStateId(null);
+	    
 	} else {
 	    if ((requestedLesson.getStartDateTime() != null) && (requestedLesson.getScheduleStartDate() != null)) {
 		requestedLesson.setLessonStateId(Lesson.STARTED_STATE);
+		
 	    } else if (requestedLesson.getScheduleStartDate() != null) {
 		if (requestedLesson.getScheduleStartDate().after(new Date())) {
 		    requestedLesson.setLessonStateId(Lesson.NOT_STARTED_STATE);

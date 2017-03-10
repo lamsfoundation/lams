@@ -172,9 +172,13 @@ function showLessonLearnersDialog() {
  */
 function changeLessonState(){
 	var method = null;
+	
+	//state chosen in the dropdown menu
 	var state = +$('#lessonStateField').val();
 	switch (state) {
-		case 3: //STARTED
+	
+		//'activate' is chosen
+		case 3:
 			switch (lessonStateId) {
 				case 4: //SUSPENDED
 					method = "unsuspendLesson";
@@ -184,13 +188,19 @@ function changeLessonState(){
 					break;
 			}
 			break;
+			
+		//'disable' is chosen
 		case 4: 
 			method = "suspendLesson";
 			break;
+			
+		//'archive' is chosen
 		case 6: 
 			method = "archiveLesson";
 			break;
-		case 7: //FINISHED
+			
+		//'remove' is chosen
+		case 7: 
 			if (confirm(LABELS.LESSON_REMOVE_ALERT)){
 				if (confirm(LABELS.LESSON_REMOVE_DOUBLECHECK_ALERT)) {
 					method = "removeLesson";
