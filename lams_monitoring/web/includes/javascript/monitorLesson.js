@@ -211,7 +211,6 @@ function changeLessonState(){
 	
 	if (method) {
 		$.ajax({
-			dataType : 'xml',
 			url : LAMS_URL + 'monitoring/monitoring.do',
 			cache : false,
 			data : {
