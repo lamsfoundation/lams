@@ -92,8 +92,9 @@
 <lams:SimplePanel panelBodyClass="panel-body-sm">
 
 <div class="form-inline">
-	<label for="timeLimit"><fmt:message key="label.authoring.advance.time.limit" />&nbsp;
-	<html:text property="assessment.timeLimit" size="3" styleId="timeLimit" styleClass="form-control input-sm"/>
+	<label for="timeLimit">
+		<fmt:message key="label.authoring.advance.time.limit" />&nbsp;
+		<html:text property="assessment.timeLimit" size="3" styleId="timeLimit" styleClass="form-control input-sm"/>
 	</label>
 </div>
 
