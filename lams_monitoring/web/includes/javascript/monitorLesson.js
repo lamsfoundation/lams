@@ -1,4 +1,4 @@
-﻿﻿﻿﻿﻿// ********** GLOBAL VARIABLES **********
+﻿﻿﻿﻿﻿﻿// ********** GLOBAL VARIABLES **********
 // copy of lesson SVG so it does no need to be fetched every time
 var originalSequenceCanvas = null,
 // DIV container for lesson SVG
@@ -42,7 +42,7 @@ var originalSequenceCanvas = null,
  * Sets up lesson tab.
  */
 function initLessonTab(){
-	// sets presence availability
+	// sets presence availability. buttons may be temporarily disable by the tour.
 	$('#presenceButton').click(function(){
 		var checked = $(this).toggleClass('btn-success').hasClass('btn-success');
 		$.ajax({
@@ -56,9 +56,9 @@ function initLessonTab(){
 			},
 			success : function() {
 				updatePresenceAvailableCount();
-				
 				if (checked) {
 					$('#imButton').show();
+					$('#imButton').prop('disabled', false);
 					alert(LABELS.LESSON_PRESENCE_ENABLE_ALERT);
 				} else {
 					$('#imButton').removeClass('btn-success').hide();
@@ -83,6 +83,7 @@ function initLessonTab(){
 			success : function() {
 				if (checked) {
 					$('#openImButton').show();
+					$('#openImButton').prop('disabled', false);
 					alert(LABELS.LESSON_IM_ENABLE_ALERT);
 				} else {
 					$('#openImButton').hide();
@@ -811,7 +812,7 @@ function updateSequenceTab() {
 			}
 			
 			var learnerTotalCount = learnerCount + response.completedLearnerCount;
-			$('#learnersStartedPossibleCell').text(learnerTotalCount + ' / ' + response.numberPossibleLearners);
+			$('#learnersStartedPossibleCell').html('<span id="tour-learner-count">'+learnerTotalCount + ' / ' + response.numberPossibleLearners+'</span>');
 			addCompletedLearnerIcons(response.completedLearners, response.completedLearnerCount, learnerTotalCount);
 			
 			$.each(response.activities, function(activityIndex, activity){
@@ -1676,7 +1677,7 @@ function loadLearnerProgressPage(pageNumber, learnersSearchPhrase){
 		  '<tr><td class="active" id="progressBarLabel;00;"><strong>;11;</strong>';
 
 		learnerProgressCellsTemplate +=
-			'<a class="btn btn-xs btn-default pull-right" href="#" onClick="javascript:showEmailDialog(;00;)"><i class="fa fa-envelope-o"></i> '
+			'<a class="btn btn-xs btn-default pull-right tour-email-button" href="#" onClick="javascript:showEmailDialog(;00;)"><i class="fa fa-envelope-o"></i> '
 		+ LABELS.EMAIL_BUTTON
 		+ '</a></td></tr><tr><td class="progressBarCell" id="progressBar;00;"></td></tr>';
 	}
