@@ -12,6 +12,7 @@
 
 	<link rel="stylesheet" href="<lams:LAMSURL/>css/jquery-ui.timepicker.css" type="text/css" media="screen" />
 	<link href="/lams/css/defaultHTML_learner.css" rel="stylesheet" type="text/css">
+	<link rel="stylesheet" href="<lams:LAMSURL />css/bootstrap-tour.min.css"> 
   	<link rel="stylesheet" href="<lams:LAMSURL/>css/jquery-ui-bootstrap-theme.css" type="text/css" media="screen">	
 	<link rel="stylesheet" href="<lams:LAMSURL/>css/progressBar.css" type="text/css" />
 	<link rel="stylesheet" href="<lams:LAMSURL/>/css/chart.css" type="text/css" />
@@ -35,6 +36,7 @@
 	<script type="text/javascript" src="<lams:WebAppURL />includes/javascript/monitorLesson.js"></script>
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/bootstrap.min.js"></script>
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/bootstrap.tabcontroller.js"></script>
+	<script type="text/javascript" src="<lams:LAMSURL />includes/javascript/bootstrap-tour.min.js"></script> 
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/dialog.js"></script>
 
 	
@@ -50,6 +52,7 @@
 			presenceEnabled =  false,
 			hasDialog = false,
 			sequenceTabShowInfo = ${sequenceTabShowInfo eq true},
+			tourInProgress = false;
 			
 			LAMS_URL = '<lams:LAMSURL/>',
 			
@@ -168,7 +171,9 @@
 				<fmt:message key="label.lesson.introduction" var="LESSON_INTRODUCTION_VAR"/>
 				LESSON_INTRODUCTION : '<c:out value="${LESSON_INTRODUCTION_VAR}" />',
 				<fmt:message key="label.email" var="EMAIL_TITLE_VAR"/>
-				EMAIL_TITLE : '<c:out value="${EMAIL_TITLE_VAR}" />'
+				EMAIL_TITLE : '<c:out value="${EMAIL_TITLE_VAR}" />',
+				<fmt:message key="tour.this.is.disabled" var="TOUR_DISABLED_ELEMENT_VAR"/>
+				TOUR_DISABLED_ELEMENT : '<c:out value="${TOUR_DISABLED_ELEMENT_VAR}" />'
 			}
 	    
 		$(document).ready(function(){
@@ -188,6 +193,14 @@
 		});
 			
         function doSelectTab(tabId) {
+        	if ( tourInProgress )  {
+        		alert(LABELS.TOUR_DISABLED_ELEMENT);
+        		return;
+        	}
+        	actualDoSelectTab(tabId);
+        }
+
+        function actualDoSelectTab(tabId) {
 	    	selectTab(tabId);
 			var sequenceInfoDialog = $('#sequenceInfoDialog');
 	    	if ( tabId == '2' ) {
@@ -200,6 +213,8 @@
             }
         }
         
+
+    	<%@ include file="monitorTour.jsp" %> 
 
 	</script>
 	
@@ -225,10 +240,14 @@
 				<lams:TabBody id="1" titleKey="label.basic">
 					<div class="row">
 						<div class="col-xs-12">
-							<a target="_blank" class="btn btn-sm btn-default pull-right" title="<fmt:message key='button.help.tooltip'/>"
+							<a id="tour-help-button" target="_blank" class="btn btn-sm btn-default pull-right" title="<fmt:message key='button.help.tooltip'/>"
 							   href="http://wiki.lamsfoundation.org/display/lamsdocs/monitoringlesson">
 							<i class="fa fa-question-circle"></i> <span class="hidden-xs"><fmt:message key="button.help"/></span></a>
-							<a class="btn btn-sm btn-default pull-right roffset10" title="<fmt:message key='button.refresh.tooltip'/>"
+							
+							<a href="javascript:;" onclick="javascript:startTour();" class="btn btn-sm btn-default pull-right roffset10"> 
+							<i class="fa fa-question-circle"></i> <span class="hidden-xs"><fmt:message key="label.tour"/></span></a>
+							
+							<a id="tour-refresh-button" class="btn btn-sm btn-default pull-right roffset10" title="<fmt:message key='button.refresh.tooltip'/>"
 							   href="#" onClick="javascript:refreshMonitor('lesson')">
 							<i class="fa fa-refresh"></i> <span class="hidden-xs"><fmt:message key="button.refresh"/></span></a>				
 							<p id="tabLessonLessonName">
@@ -332,7 +351,7 @@
 								<!-- IM & Presence -->
 								<dt><fmt:message key="lesson.im"/>:</dt>
 								<dd>
-									<div class="btn-group btn-group-xs" role="group">
+									<div class="btn-group btn-group-xs" role="group" id="tour-lesson-im">
 										<button id="presenceButton" class="btn btn-default roffset10
 											<c:if test="${lesson.learnerPresenceAvailable}">
 												btn-success
@@ -499,7 +518,7 @@
 								   href="#" onClick="javascript:refreshMonitor('learners')">
 								   <i class="fa fa-refresh"></i> <span class="hidden-xs"><fmt:message key="button.refresh"/></span></a>
 								<a class="btn btn-sm btn-default" title="<fmt:message key='button.journal.entries.tooltip'/>"
-						   		   href="#"
+						   		   href="#" id="journalButton"
 						           onClick="javascript:openPopUp('<lams:LAMSURL/>learning/notebook.do?method=viewAllJournals&lessonID=${lesson.lessonID}', 'JournalEntries', 648, 1152, true)">
 						           <i class="fa fa-book"></i> <span class="hidden-xs"><fmt:message key="button.journal.entries"/></span></a>
 							</td>
