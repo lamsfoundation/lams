@@ -242,6 +242,16 @@ public class Assessment implements Cloneable {
 	}
 	this.setUpdated(new Date(now));
     }
+    
+    /**
+     * Checks whether content was modified in monitor and this has happened after attempt was started (and thus this modification can potentially affect attempt results).
+     * 
+     * @param attemptStartingDate
+     * @return
+     */
+    public boolean isContentModifiedInMonitor(Date attemptStartingDate) {
+	return (updated != null) && updated.after(attemptStartingDate);
+    }
 
     // **********************************************************
     // get/set methods

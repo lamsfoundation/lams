@@ -214,6 +214,7 @@ public interface IAssessmentService {
      *
      * @param assessment
      * @param userId
+     * @param pagedQuestions
      * @param singleMarkHedgingQuestionUid
      *            - if provided - means only that current single MarkHedging question needs to be stored
      * @param isAutosave
@@ -221,7 +222,8 @@ public interface IAssessmentService {
      *
      * @return whether storing results is allowed, false otherwise
      */
-    boolean storeUserAnswers(Assessment assessment, Long userId, Long singleMarkHedgingQuestionUid, boolean isAutosave);
+    boolean storeUserAnswers(Assessment assessment, Long userId, List<Set<AssessmentQuestion>> pagedQuestions,
+	    Long singleMarkHedgingQuestionUid, boolean isAutosave);
 
     /**
      * Return the latest result (it can be unfinished).
