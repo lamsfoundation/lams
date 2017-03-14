@@ -80,6 +80,12 @@ public class CompleteActivityAction extends ActivityAction {
 	// live edit, and then the lock flag can't be checked correctly.
 	LearnerProgress progress = learnerService
 		.getProgressById(WebUtil.readLongParam(request, AttributeNames.PARAM_LEARNER_PROGRESS_ID, true));
+	if (!progress.getUser().getUserId().equals(learnerId)) {
+	    response.sendError(HttpServletResponse.SC_FORBIDDEN, "Current learner does not own the given progress");
+	    log.error("Learner " + learnerId + " tried to complete an activity for progress "
+		    + progress.getLearnerProgressId() + " which does not belong to him");
+	    return null;
+	}
 
 	// if user has already completed the lesson - we need to let integrations servers know to come and pick up
 	// updated marks (as it won't happen at lessoncomplete.jsp page)
