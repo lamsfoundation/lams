@@ -35,9 +35,21 @@
 						<fmt:message key="label.learning.summary.grade" />:&thinsp;
 					</th>
 					<td style="padding-left: 5px">
+					
+						<c:choose>
+							<c:when  test="${result.maximumGrade == 0}">
+								<c:set var="resultPercentage" value="0"/>
+							</c:when>
+							<c:otherwise>
+								<c:set var="resultPercentage">
+									<fmt:formatNumber value="${result.grade * 100 / result.maximumGrade}" maxFractionDigits="2"/>
+								</c:set>
+							</c:otherwise>
+						</c:choose>
+					
 						<fmt:formatNumber value="${result.grade}" maxFractionDigits="3"/>
 						&thinsp;<fmt:message key="label.learning.summary.out.of.maximum" />
-						&thinsp;${result.maximumGrade} (<fmt:formatNumber value="${result.grade * 100 / result.maximumGrade}" maxFractionDigits="2"/>%)
+						&thinsp;${result.maximumGrade} (${resultPercentage}%)
 					</td>
 				</tr>
 			</c:if>

@@ -28,7 +28,7 @@
 				</td>		
 			</c:if>			
 			<td class="has-radio-button">
-				<input type="radio" name="question${status.index}" value="${true}" styleClass="noBorder"
+				<input type="radio" name="question${status.index}" value="${true}"
 	 				<c:if test="${question.answerBoolean}">checked="checked"</c:if>
 					<c:if test="${isEditingDisabled}">disabled="disabled"</c:if>					 
 				/>
@@ -58,7 +58,7 @@
 				</td>		
 			</c:if>			
 			<td class="has-radio-button">
-				<input type="radio" name="question${status.index}" value="${false}" styleClass="noBorder"
+				<input type="radio" name="question${status.index}" value="${false}"
 	 				<c:if test="${(!question.answerBoolean) and (question.answerString != null)}">checked="checked"</c:if>
 					<c:if test="${isEditingDisabled}">disabled="disabled"</c:if>
 				/>

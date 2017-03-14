@@ -23,6 +23,7 @@
 
 package org.lamsfoundation.lams.tool.assessment.service;
 
+import java.lang.reflect.InvocationTargetException;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -40,6 +41,7 @@ import java.util.SortedSet;
 import java.util.TreeSet;
 import java.util.regex.Pattern;
 
+import org.apache.commons.beanutils.PropertyUtils;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
@@ -453,7 +455,7 @@ public class AssessmentServiceImpl
 		assessmentResultDao.saveObject(lastResult);
 		return;
 
-		// mark previous attempt as being not the latest any longer
+	    // mark previous attempt as being not the latest any longer
 	    } else {
 		lastResult.setLatest(false);
 		assessmentResultDao.saveObject(lastResult);
@@ -478,7 +480,7 @@ public class AssessmentServiceImpl
     }
 
     /*
-     * Auiliary method for setAttemptStarted(). Simply init new AssessmentQuestionResult object and fills it in with
+     * Auxiliary method for setAttemptStarted(). Simply init new AssessmentQuestionResult object and fills it in with
      * values.
      *
      * @param question
@@ -503,7 +505,7 @@ public class AssessmentServiceImpl
     }
 
     @Override
-    public boolean storeUserAnswers(Assessment assessment, Long userId, Long singleMarkHedgingQuestionUid,
+    public boolean storeUserAnswers(Assessment assessment, Long userId, List<Set<AssessmentQuestion>> pagedQuestions, Long singleMarkHedgingQuestionUid,
 	    boolean isAutosave) {
 
 	int maximumGrade = 0;
@@ -518,44 +520,48 @@ public class AssessmentServiceImpl
 	    return false;
 	}
 
-	// store all answers
-	for (AssessmentQuestion question : questions) {
+	// store all answers (in all pages)
+	for (Set<AssessmentQuestion> questionsForOnePage : pagedQuestions) {
+	    for (AssessmentQuestion question : questionsForOnePage) {
 
-	    // in case single MarkHedging question needs to be stored -- search for that question
-	    if ((singleMarkHedgingQuestionUid != null) && !question.getUid().equals(singleMarkHedgingQuestionUid)) {
-		continue;
-	    }
+		// in case single MarkHedging question needs to be stored -- search for that question
+		if ((singleMarkHedgingQuestionUid != null) && !question.getUid().equals(singleMarkHedgingQuestionUid)) {
+		    continue;
+		}
 
-	    // In case if assessment was updated after result has been started check question still exists in DB as
-	    // it could be deleted if modified in monitor.
-	    if ((assessment.getUpdated() != null) && assessment.getUpdated().after(result.getStartDate())) {
+		//TODO possibly move the next if-clause inside of storeUserAnswer() method
+		// In case if assessment was modified in monitor after result has been started check question still exists in DB as
+		// it could be deleted
+		if (assessment.isContentModifiedInMonitor(result.getStartDate())) {
 
-		Set<QuestionReference> references = assessment.getQuestionReferences();
+		    Set<QuestionReference> references = assessment.getQuestionReferences();
 
-		boolean isQuestionExists = false;
-		for (QuestionReference reference : references) {
-		    if (!reference.isRandomQuestion() && reference.getQuestion().getUid().equals(question.getUid())) {
-			isQuestionExists = true;
-			break;
-		    }
-		    if (reference.isRandomQuestion()) {
-			for (AssessmentQuestion questionDb : questions) {
-			    if (questionDb.getUid().equals(question.getUid())) {
-				isQuestionExists = true;
-				break;
+		    boolean isQuestionExists = false;
+		    for (QuestionReference reference : references) {
+			if (!reference.isRandomQuestion()
+				&& reference.getQuestion().getUid().equals(question.getUid())) {
+			    isQuestionExists = true;
+			    break;
+			}
+			if (reference.isRandomQuestion()) {
+			    for (AssessmentQuestion questionDb : questions) {
+				if (questionDb.getUid().equals(question.getUid())) {
+				    isQuestionExists = true;
+				    break;
+				}
 			    }
 			}
 		    }
+		    if (!isQuestionExists) {
+			continue;
+		    }
 		}
-		if (!isQuestionExists) {
-		    continue;
-		}
+
+		float userQeustionGrade = storeUserAnswer(result, question, isAutosave);
+		grade += userQeustionGrade;
+
+		maximumGrade += question.getGrade();
 	    }
-
-	    float userQeustionGrade = storeUserAnswer(result, question, isAutosave);
-	    grade += userQeustionGrade;
-
-	    maximumGrade += question.getGrade();
 	}
 
 	// store grades and finished date only on user hitting submit all answers button (and not submit mark hedging
@@ -590,9 +596,26 @@ public class AssessmentServiceImpl
 	
 	if (assessmentResult.getFinishDate() == null && questionResult == null) {
 	    //it should get here only in case teacher edited content in monitor which led to removal of autosave questionResult
-	    questionResult = createQuestionResultObject(question);
-	    questionResult.setAssessmentResult(assessmentResult);
-	    assessmentQuestionResultDao.insert(questionResult);
+	    AssessmentQuestion modifiedQuestion = assessmentQuestionDao.getByUid(question.getUid());
+	    try {
+		PropertyUtils.copyProperties(question, modifiedQuestion);
+//		question.getOptions().clear();
+//		question.getOptions().addAll(modifiedQuestion.getOptions());
+	    } catch (IllegalAccessException e) {
+		// TODO Auto-generated catch block
+		e.printStackTrace();
+	    } catch (InvocationTargetException e) {
+		// TODO Auto-generated catch block
+		e.printStackTrace();
+	    } catch (NoSuchMethodException e) {
+		// TODO Auto-generated catch block
+		e.printStackTrace();
+	    }
+	    return 0;
+	    
+//	    questionResult = createQuestionResultObject(question);
+//	    questionResult.setAssessmentResult(assessmentResult);
+//	    assessmentQuestionResultDao.insert(questionResult);
 	}
 
 	// store question answer values
