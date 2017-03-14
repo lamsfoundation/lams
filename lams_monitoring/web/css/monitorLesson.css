@@ -163,6 +163,11 @@ td.sectionHeader {
 	margin: 5px 5px 5px 0;
 }
 
+.topButtonsContainer button {
+	float: right;
+	margin: 5px 5px 5px 0;
+}
+
 .lessonManageField {
 	margin-right: 5px;
 }

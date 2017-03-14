@@ -240,12 +240,8 @@
 				<lams:TabBody id="1" titleKey="label.basic">
 					<div class="row">
 						<div class="col-xs-12">
-							<a id="tour-help-button" target="_blank" class="btn btn-sm btn-default pull-right" title="<fmt:message key='button.help.tooltip'/>"
-							   href="http://wiki.lamsfoundation.org/display/lamsdocs/monitoringlesson">
-							<i class="fa fa-question-circle"></i> <span class="hidden-xs"><fmt:message key="button.help"/></span></a>
-							
-							<a href="javascript:;" onclick="javascript:startTour();" class="btn btn-sm btn-default pull-right roffset10"> 
-							<i class="fa fa-question-circle"></i> <span class="hidden-xs"><fmt:message key="label.tour"/></span></a>
+							<button onclick="javascript:startTour();return false;" class="btn btn-sm btn-default pull-right roffset10 tour-button"> 
+							<i class="fa fa-question-circle"></i> <span class="hidden-xs"><fmt:message key="label.tour"/></span></button>
 							
 							<a id="tour-refresh-button" class="btn btn-sm btn-default pull-right roffset10" title="<fmt:message key='button.refresh.tooltip'/>"
 							   href="#" onClick="javascript:refreshMonitor('lesson')">
@@ -441,10 +437,9 @@
 				</lams:TabBody>
 				<lams:TabBody id="2" titleKey="label.advanced">
 					<div id="sequenceTopButtonsContainer" class="topButtonsContainer">
-						<a id="helpButton" target="_blank" class="btn btn-sm btn-default" title="<fmt:message key='button.help.tooltip'/>"
-						   href="http://wiki.lamsfoundation.org/display/lamsdocs/monitoringsequence">
-							<i class="fa fa-question-circle"></i> <span class="hidden-xs"><fmt:message key="button.help"/></span>
-						</a>
+						<button onclick="javascript:startTour();return false;" class="btn btn-sm btn-default pull-right roffset10 tour-button"> 
+						<i class="fa fa-question-circle"></i> <span class="hidden-xs"><fmt:message key="label.tour"/></span></button>
+
 						<a id="refreshButton" class="btn btn-sm btn-default" title="<fmt:message key='button.refresh.tooltip'/>"
 						   href="#" onClick="javascript:refreshMonitor('sequence')">
 							<i class="fa fa-refresh"></i> <span class="hidden-xs"><fmt:message key="button.refresh"/></span>
@@ -511,9 +506,9 @@
 									   onChange="javascript:loadLearnerProgressPage()" />
 							</td>
 							<td class="topButtonsContainer">
-								<a target="_blank" class="btn btn-sm btn-default" title="<fmt:message key='button.help.tooltip'/>"
-						   		   href="http://wiki.lamsfoundation.org/display/lamsdocs/monitoringlearners">
-						   		   <i class="fa fa-question-circle"></i> <span class="hidden-xs"><fmt:message key="button.help"/></span></a>
+								<button onclick="javascript:startTour();return false;" class="btn btn-sm btn-default pull-right roffset10 tour-button"> 
+								<i class="fa fa-question-circle"></i> <span class="hidden-xs"><fmt:message key="label.tour"/></span></button>
+							
 								<a class="btn btn-sm btn-default" title="<fmt:message key='button.refresh.tooltip'/>"
 								   href="#" onClick="javascript:refreshMonitor('learners')">
 								   <i class="fa fa-refresh"></i> <span class="hidden-xs"><fmt:message key="button.refresh"/></span></a>
