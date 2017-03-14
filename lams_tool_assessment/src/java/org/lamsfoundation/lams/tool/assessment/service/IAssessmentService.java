@@ -221,9 +221,12 @@ public interface IAssessmentService {
      *            indicates whether it's autosave request
      *
      * @return whether storing results is allowed, false otherwise
+     * @throws NoSuchMethodException 
+     * @throws InvocationTargetException 
+     * @throws IllegalAccessException 
      */
     boolean storeUserAnswers(Assessment assessment, Long userId, List<Set<AssessmentQuestion>> pagedQuestions,
-	    Long singleMarkHedgingQuestionUid, boolean isAutosave);
+	    Long singleMarkHedgingQuestionUid, boolean isAutosave) throws IllegalAccessException, InvocationTargetException, NoSuchMethodException;
 
     /**
      * Return the latest result (it can be unfinished).
