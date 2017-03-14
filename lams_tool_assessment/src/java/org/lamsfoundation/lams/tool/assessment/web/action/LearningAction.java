@@ -424,9 +424,12 @@ public class LearningAction extends Action {
 
     /**
      * Shows next page. It's available only to leaders as non-leaders see all questions on one page.
+     * @throws NoSuchMethodException 
+     * @throws InvocationTargetException 
+     * @throws IllegalAccessException 
      */
     private ActionForward nextPage(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws ServletException {
+	    HttpServletResponse response) throws ServletException, IllegalAccessException, InvocationTargetException, NoSuchMethodException {
 	IAssessmentService service = getAssessmentService();
 	String sessionMapID = WebUtil.readStrParam(request, AssessmentConstants.ATTR_SESSION_MAP_ID);
 	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
@@ -469,9 +472,12 @@ public class LearningAction extends Action {
 
     /**
      * Handling submittion of MarkHedging type of Questions (in case of leader aware tool).
+     * @throws NoSuchMethodException 
+     * @throws InvocationTargetException 
+     * @throws IllegalAccessException 
      */
     private ActionForward submitSingleMarkHedgingQuestion(ActionMapping mapping, ActionForm form,
-	    HttpServletRequest request, HttpServletResponse response) throws ServletException {
+	    HttpServletRequest request, HttpServletResponse response) throws ServletException, IllegalAccessException, InvocationTargetException, NoSuchMethodException {
 	IAssessmentService service = getAssessmentService();
 	String sessionMapID = WebUtil.readStrParam(request, AssessmentConstants.ATTR_SESSION_MAP_ID);
 	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
@@ -522,9 +528,12 @@ public class LearningAction extends Action {
 
     /**
      * Display same entire authoring page content from HttpSession variable.
+     * @throws NoSuchMethodException 
+     * @throws InvocationTargetException 
+     * @throws IllegalAccessException 
      */
     private ActionForward submitAll(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws ServletException {
+	    HttpServletResponse response) throws ServletException, IllegalAccessException, InvocationTargetException, NoSuchMethodException {
 	String sessionMapID = WebUtil.readStrParam(request, AssessmentConstants.ATTR_SESSION_MAP_ID);
 	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
 		.getAttribute(sessionMapID);
@@ -714,9 +723,12 @@ public class LearningAction extends Action {
 
     /**
      * auto saves responses
+     * @throws NoSuchMethodException 
+     * @throws InvocationTargetException 
+     * @throws IllegalAccessException 
      */
     private ActionForward autoSaveAnswers(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) {
+	    HttpServletResponse response) throws IllegalAccessException, InvocationTargetException, NoSuchMethodException {
 	IAssessmentService service = getAssessmentService();
 	String sessionMapID = WebUtil.readStrParam(request, AssessmentConstants.ATTR_SESSION_MAP_ID);
 	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
@@ -1178,8 +1190,11 @@ public class LearningAction extends Action {
 
     /**
      * Store user answers in DB in last unfinished attempt and notify teachers about it.
+     * @throws NoSuchMethodException 
+     * @throws InvocationTargetException 
+     * @throws IllegalAccessException 
      */
-    private boolean storeUserAnswersIntoDatabase(SessionMap<String, Object> sessionMap, boolean isAutosave) {
+    private boolean storeUserAnswersIntoDatabase(SessionMap<String, Object> sessionMap, boolean isAutosave) throws IllegalAccessException, InvocationTargetException, NoSuchMethodException {
 	
 	List<Set<AssessmentQuestion>> pagedQuestions = (List<Set<AssessmentQuestion>>) sessionMap
 		.get(AssessmentConstants.ATTR_PAGED_QUESTIONS);

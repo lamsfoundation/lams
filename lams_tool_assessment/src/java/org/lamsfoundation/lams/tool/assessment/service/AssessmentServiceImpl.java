@@ -506,7 +506,7 @@ public class AssessmentServiceImpl
 
     @Override
     public boolean storeUserAnswers(Assessment assessment, Long userId, List<Set<AssessmentQuestion>> pagedQuestions, Long singleMarkHedgingQuestionUid,
-	    boolean isAutosave) {
+	    boolean isAutosave) throws IllegalAccessException, InvocationTargetException, NoSuchMethodException {
 
 	int maximumGrade = 0;
 	float grade = 0;
@@ -583,8 +583,11 @@ public class AssessmentServiceImpl
      * @param isAutosave
      *            in case of autosave there is no need to calculate marks
      * @return grade that user scored by answering that question
+     * @throws NoSuchMethodException 
+     * @throws InvocationTargetException 
+     * @throws IllegalAccessException 
      */
-    private float storeUserAnswer(AssessmentResult assessmentResult, AssessmentQuestion question, boolean isAutosave) {
+    private float storeUserAnswer(AssessmentResult assessmentResult, AssessmentQuestion question, boolean isAutosave) throws IllegalAccessException, InvocationTargetException, NoSuchMethodException {
 
 	AssessmentQuestionResult questionResult = null;
 	// get questionResult from DB instance of AssessmentResult
@@ -597,20 +600,7 @@ public class AssessmentServiceImpl
 	if (assessmentResult.getFinishDate() == null && questionResult == null) {
 	    //it should get here only in case teacher edited content in monitor which led to removal of autosave questionResult
 	    AssessmentQuestion modifiedQuestion = assessmentQuestionDao.getByUid(question.getUid());
-	    try {
-		PropertyUtils.copyProperties(question, modifiedQuestion);
-//		question.getOptions().clear();
-//		question.getOptions().addAll(modifiedQuestion.getOptions());
-	    } catch (IllegalAccessException e) {
-		// TODO Auto-generated catch block
-		e.printStackTrace();
-	    } catch (InvocationTargetException e) {
-		// TODO Auto-generated catch block
-		e.printStackTrace();
-	    } catch (NoSuchMethodException e) {
-		// TODO Auto-generated catch block
-		e.printStackTrace();
-	    }
+	    PropertyUtils.copyProperties(question, modifiedQuestion);
 	    return 0;
 	    
 //	    questionResult = createQuestionResultObject(question);
