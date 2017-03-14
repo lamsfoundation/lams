@@ -1,8 +1,18 @@
 	<%--  The definition of Bootstrap Tour for monitor.jsp. Use storage: false so that it always starts at the first step otherwise the multiple tabs confuses matters. --%>
 	var tour = null;
 	function startTour() {
-	debugger;
+
+		var selectedTabID = getCurrentTabID();
+		var startStep = 0;
+		if ( selectedTabID == 2 ) {
+			startStep = 10;
+		} else if ( selectedTabID == 3 ) {
+			startStep = 18;
+		}
+
 		tourInProgress = true;
+		$('.tour-button').prop('disabled', true);
+
 		if ( tour == null ) {
 			tour = new Tour({
 			  name: "LAMSMonitorTour",
@@ -20,11 +30,6 @@
 			      	element: "#tour-refresh-button",
 			        title: "<fmt:message key="button.refresh"/>",
 			        content: "<fmt:message key="tour.tab.refresh.content"/>",
-		        	placement: "bottom",
-			      }, {
-			      	element: "#tour-help-button",
-			        title: "<fmt:message key="button.help"/>",
-			        content: "<fmt:message key="tour.help.content"/>",
 		        	placement: "left",
 			      },{
 			        element: "#lessonStateLabel:first-child",
@@ -62,7 +67,7 @@
 			        element: "#chartDiv",
 			        title: "<fmt:message key="lesson.chart.title"/>",
 			        content: "<fmt:message key="tour.completion.chart.content"/>",
-			        placement: "bottom",
+			        placement: "left",
 			        onNext: switchToSequence
 			      },{
 			      	title: "<fmt:message key="tab.sequence"/>",
@@ -108,7 +113,7 @@
 			        element: "#liveEditButton",
 			        title: "<fmt:message key="tour.live.edit.title"/>",
 			        content: "<fmt:message key="tour.live.edit.content"/>",
-			        placement: "bottom",
+			        placement: "left",
 			        onNext: switchToLearners
 			      },{
 			        title: "<fmt:message key="tab.learners"/>",
@@ -149,9 +154,11 @@
 			      }		     
 			    ],
 			  onEnd: tourEnd,
-			  debug: true,
+			  debug: false,
 			  backdrop: false,
-			  storage: false
+			  storage: false,
+			  template: '<div class="popover" role="tooltip"> <div class="arrow"></div> <h3 class="popover-title"></h3> <div class="popover-content"></div> <div class="popover-navigation"> <div class="btn-group"> <button class="btn btn-sm btn-default" data-role="prev">&laquo; <fmt:message key="tour.prev"/></button> <button class="btn btn-sm btn-default" data-role="next"><fmt:message key="tour.next"/> &raquo;</button> </div> <button class="btn btn-sm btn-default loffset5" onclick="openWikiHelp()"><fmt:message key="tour.more.help"/></button>  <button class="btn btn-sm btn-default" data-role="end"><fmt:message key="tour.end.tour"/></button> </div>'
+			  
 			});
 
 		    tour.init();
@@ -160,6 +167,7 @@
 		} else {
 			tour.restart();
 		}
+		tour.goTo(startStep);
 	}
 	
  	function revealIM(tour) { 
@@ -202,4 +210,16 @@
 	
 	function tourEnd() {
 		tourInProgress = false;
+		$('.tour-button').prop('disabled', false);
+	}
+	
+	function openWikiHelp() {
+		var selectedTabID = getCurrentTabID();
+		var url = "http://wiki.lamsfoundation.org/display/lamsdocs/monitoringlesson";
+		if ( selectedTabID == 2 ) {
+			url = "http://wiki.lamsfoundation.org/display/lamsdocs/monitoringsequence";
+		} else if ( selectedTabID == 3 ) {
+			url = "http://wiki.lamsfoundation.org/display/lamsdocs/monitoringlearners";
+		}
+		openPopUp(url,'<fmt:message key="button.help"/>', 648, 1152, false);
 	}
