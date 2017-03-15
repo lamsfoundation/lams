@@ -11,7 +11,7 @@ ALTER TABLE tl_ladaco10_contents MODIFY COLUMN lock_on_finished TINYINT(1) DEFAU
 								 MODIFY COLUMN learner_entry_notify TINYINT(1) DEFAULT 0,
 								 MODIFY COLUMN record_submit_notify TINYINT(1) DEFAULT 0;
 								 
-ALTER TABLE tl_ladaco10_questions MODIFY COLUMN s_required tinyint(1) DEFAULT 0;		
+ALTER TABLE tl_ladaco10_questions MODIFY COLUMN is_required tinyint(1) DEFAULT 0;		
 
 UPDATE lams_tool SET tool_version='20170101' WHERE tool_signature='ladaco10';
 
