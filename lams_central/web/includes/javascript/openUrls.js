@@ -67,7 +67,6 @@
 		}
 
 		function openMonitorLesson( lessonID ) {
-			debugger;
 			if (isMac) {
 				if(belowMinRes) {
 					monitorLessonWin = window.open('home.do?method=monitorLesson&lessonID='+lessonID,'mWindow','width=' + monitor_width + ',height=' + monitor_height + ',resizable,scrollbars');
