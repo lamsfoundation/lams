@@ -228,10 +228,14 @@
 	</jsp-config>
 
 	<!-- Security Constraint -->
+	<deny-uncovered-http-methods />
+	
 	<security-constraint>
 		<web-resource-collection>
 			<web-resource-name>Secure content</web-resource-name>
 			<url-pattern>/*</url-pattern>
+			<http-method>GET</http-method>
+ 			<http-method>POST</http-method>
 		</web-resource-collection>
 		<auth-constraint>
 			<role-name>LEARNER</role-name>
@@ -247,6 +251,8 @@
 			<url-pattern>/authoring/*</url-pattern>
 			<url-pattern>/jsps/authoring/*</url-pattern>
 			<url-pattern>/authoring.do</url-pattern>
+			<http-method>GET</http-method>
+ 			<http-method>POST</http-method>
 		</web-resource-collection>
 		<auth-constraint>
 			<role-name>AUTHOR</role-name>
@@ -261,6 +267,8 @@
 			<url-pattern>/jsps/monitoring/*</url-pattern>
 			<url-pattern>/monitoring.do</url-pattern>
 			<url-pattern>/definelater.do</url-pattern>
+			<http-method>GET</http-method>
+ 			<http-method>POST</http-method>
 		</web-resource-collection>
 		<auth-constraint>
 			<role-name>MONITOR</role-name>

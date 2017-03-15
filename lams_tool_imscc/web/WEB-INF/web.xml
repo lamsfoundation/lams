@@ -214,10 +214,14 @@
 	</jsp-config>
 
 	<!-- Security Constraint -->
+	<deny-uncovered-http-methods />
+	
 	<security-constraint>
 		<web-resource-collection>
 			<web-resource-name>Secure Content</web-resource-name>
 			<url-pattern>/*</url-pattern>
+			<http-method>GET</http-method>
+ 			<http-method>POST</http-method>
 		</web-resource-collection>
 		<auth-constraint>
 			<role-name>LEARNER</role-name>
@@ -232,6 +236,8 @@
 			<web-resource-name>Authoring content</web-resource-name>
 			<url-pattern>/authoring/*</url-pattern>
 			<url-pattern>/pages/authoring/*</url-pattern>
+			<http-method>GET</http-method>
+ 			<http-method>POST</http-method>
 		</web-resource-collection>
 		<auth-constraint>
 			<role-name>AUTHOR</role-name>
@@ -245,6 +251,8 @@
 			<url-pattern>/monitoring/*</url-pattern>
 			<url-pattern>/pages/monitoring/*</url-pattern>
 			<url-pattern>/definelater.do</url-pattern>
+			<http-method>GET</http-method>
+ 			<http-method>POST</http-method>
 		</web-resource-collection>
 		<auth-constraint>
 			<role-name>MONITOR</role-name>
@@ -257,6 +265,8 @@
 			<web-resource-name>Admin content</web-resource-name>
 			<url-pattern>/pages/admin/*</url-pattern>
 			<url-pattern>/laimsc11admin/*</url-pattern>
+			<http-method>GET</http-method>
+ 			<http-method>POST</http-method>
 		</web-resource-collection>
 		<auth-constraint>
 			<role-name>SYSADMIN</role-name>
