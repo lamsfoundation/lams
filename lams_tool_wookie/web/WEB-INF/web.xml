@@ -58,10 +58,14 @@
 		<url-pattern>*.do</url-pattern>
 	</servlet-mapping>
 	
+	<deny-uncovered-http-methods />
+	
 	<security-constraint>
 		<web-resource-collection>
 			<web-resource-name>Public Content</web-resource-name>
 			<url-pattern>/*</url-pattern>
+			<http-method>GET</http-method>
+ 			<http-method>POST</http-method>
 		</web-resource-collection>
 	</security-constraint>
 </web-app>

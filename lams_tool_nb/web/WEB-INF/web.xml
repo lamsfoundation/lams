@@ -203,10 +203,14 @@
 	</jsp-config>
 
 	<!-- Security Constraint -->
+	<deny-uncovered-http-methods />
+	
 	<security-constraint>
 		<web-resource-collection>
 			<web-resource-name>Secure content</web-resource-name>
 			<url-pattern>/*</url-pattern>
+			<http-method>GET</http-method>
+ 			<http-method>POST</http-method>
 		</web-resource-collection>
 		<auth-constraint>
 			<role-name>LEARNER</role-name>
@@ -222,6 +226,8 @@
 			<url-pattern>/authoring/*</url-pattern>
 			<url-pattern>/authoring.do</url-pattern>
 			<url-pattern>/pedagogicalPlanner.do</url-pattern>
+			<http-method>GET</http-method>
+ 			<http-method>POST</http-method>
 		</web-resource-collection>
 		<auth-constraint>
 			<role-name>AUTHOR</role-name>
@@ -234,6 +240,8 @@
 			<web-resource-name>Staff content</web-resource-name>
 			<url-pattern>/monitoring/*</url-pattern>
 			<url-pattern>/monitoring.do</url-pattern>
+			<http-method>GET</http-method>
+ 			<http-method>POST</http-method>
 		</web-resource-collection>
 		<auth-constraint>
 			<role-name>MONITOR</role-name>
