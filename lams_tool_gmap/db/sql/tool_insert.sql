@@ -30,7 +30,6 @@ VALUES
 'gmap',
 '@tool_version@',
 0,
-2,
 1,
 'tool/lagmap10/learning.do?mode=learner',
 'tool/lagmap10/learning.do?mode=author',
