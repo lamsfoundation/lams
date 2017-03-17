@@ -26,6 +26,7 @@ package org.lamsfoundation.lams.tool.assessment.service;
 import org.lamsfoundation.lams.learningdesign.service.ToolContentVersionFilter;
 import org.lamsfoundation.lams.tool.assessment.model.Assessment;
 import org.lamsfoundation.lams.tool.assessment.model.AssessmentQuestion;
+import org.lamsfoundation.lams.tool.assessment.model.AssessmentQuestionOption;
 
 /**
  * Import filter class for different version of Assessment content.
@@ -63,5 +64,17 @@ public class AssessmentImportContentVersionFilter extends ToolContentVersionFilt
     public void up20170101To20170315() {
 	this.removeField(AssessmentQuestion.class, "createDate");
 	this.removeField(AssessmentQuestion.class, "createBy");
+	this.removeField(AssessmentQuestion.class, "answerString");
+	this.removeField(AssessmentQuestion.class, "answerFloat");
+	this.removeField(AssessmentQuestion.class, "answerBoolean");
+	this.removeField(AssessmentQuestion.class, "questionFeedback");
+	this.removeField(AssessmentQuestion.class, "responseSubmitted");
+	this.removeField(AssessmentQuestion.class, "grade");
+	this.removeField(AssessmentQuestion.class, "mark");
+	this.removeField(AssessmentQuestion.class, "penalty");
+	this.removeField(AssessmentQuestion.class, "answerTotalGrade");
+	
+	this.removeField(AssessmentQuestionOption.class, "answerInt");
+	this.removeField(AssessmentQuestionOption.class, "answerBoolean");
     }
 }
