@@ -171,24 +171,6 @@
             column="allow_rich_editor"
         />
 
-        <property
-            name="createDate"
-            type="java.util.Date"
-            update="true"
-            insert="true"
-            column="create_date"
-        />
-
-        <many-to-one
-            name="createBy"
-            class="org.lamsfoundation.lams.tool.assessment.model.AssessmentUser"
-            cascade="none"
-            
-            update="true"
-            insert="true"
-            column="create_by"
-        />
-
         <set
             name="options"
             lazy="false"

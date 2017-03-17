@@ -44,43 +44,37 @@ public class AssessmentEscapeUtils {
      * Escapes all characters that may brake JS code on assigning Java value to JS String variable (particularly escapes
      * all quotes in the following way \").
      */
-    public static void escapeQuotes(Object object) {
-	if (object instanceof UserSummary) {
-	    UserSummary userSummary = (UserSummary) object;
-	    for (UserSummaryItem userSummaryItem : userSummary.getUserSummaryItems()) {
-		for (AssessmentQuestionResult questionResult : userSummaryItem.getQuestionResults()) {
-		    AssessmentEscapeUtils.escapeQuotesInQuestionResult(questionResult);
-		}
-	    }
-	} else if (object instanceof QuestionSummary) {
-	    QuestionSummary questionSummary = (QuestionSummary) object;
-
-	    for (List<AssessmentQuestionResult> sessionQuestionResults : questionSummary
-		    .getQuestionResultsPerSession()) {
-		for (AssessmentQuestionResult questionResult : sessionQuestionResults) {
-		    AssessmentEscapeUtils.escapeQuotesInQuestionResult(questionResult);
-		}
-	    }
-	} else if (object instanceof List) {
-	    List<SessionDTO> sessionDtos = (List<SessionDTO>) object;
-
-	    for (SessionDTO sessionDTO : sessionDtos) {
-		for (AssessmentResult result : sessionDTO.getAssessmentResults()) {
-		    for (AssessmentQuestionResult questionResult : result.getQuestionResults()) {
-			AssessmentEscapeUtils.escapeQuotesInQuestionResult(questionResult);
-		    }
-		}
-	    }
-	} else if (object instanceof AssessmentResult) {
-	    AssessmentResult assessmentResult = (AssessmentResult) object;
-
-	    for (AssessmentQuestionResult questionResult : assessmentResult.getQuestionResults()) {
+    public static void escapeQuotes(UserSummary userSummary) {
+	for (UserSummaryItem userSummaryItem : userSummary.getUserSummaryItems()) {
+	    for (AssessmentQuestionResult questionResult : userSummaryItem.getQuestionResults()) {
 		AssessmentEscapeUtils.escapeQuotesInQuestionResult(questionResult);
 	    }
 	}
     }
+    
+    /**
+     * Escapes all characters that may brake JS code on assigning Java value to JS String variable (particularly escapes
+     * all quotes in the following way \").
+     */
+    public static void escapeQuotes(QuestionSummary questionSummary) {
+	for (List<AssessmentQuestionResult> sessionQuestionResults : questionSummary.getQuestionResultsPerSession()) {
+	    for (AssessmentQuestionResult questionResult : sessionQuestionResults) {
+		AssessmentEscapeUtils.escapeQuotesInQuestionResult(questionResult);
+	    }
+	}
+    }
+    
+    /**
+     * Escapes all characters that may brake JS code on assigning Java value to JS String variable (particularly escapes
+     * all quotes in the following way \").
+     */
+    public static void escapeQuotes(AssessmentResult assessmentResult) {
+	for (AssessmentQuestionResult questionResult : assessmentResult.getQuestionResults()) {
+	    AssessmentEscapeUtils.escapeQuotesInQuestionResult(questionResult);
+	}
+    }
 
-    public static void escapeQuotesInQuestionResult(AssessmentQuestionResult questionResult) {
+    private static void escapeQuotesInQuestionResult(AssessmentQuestionResult questionResult) {
 	String answerString = questionResult.getAnswerString();
 	if (answerString != null) {
 	    String answerStringEscaped = StringEscapeUtils.escapeJavaScript(answerString);

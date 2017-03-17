@@ -31,6 +31,7 @@ import java.util.Set;
 
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.tool.assessment.dto.AssessmentUserDTO;
+import org.lamsfoundation.lams.tool.assessment.dto.QuestionDTO;
 import org.lamsfoundation.lams.tool.assessment.dto.QuestionSummary;
 import org.lamsfoundation.lams.tool.assessment.dto.ReflectDTO;
 import org.lamsfoundation.lams.tool.assessment.dto.SessionDTO;
@@ -42,7 +43,6 @@ import org.lamsfoundation.lams.tool.assessment.model.AssessmentResult;
 import org.lamsfoundation.lams.tool.assessment.model.AssessmentSession;
 import org.lamsfoundation.lams.tool.assessment.model.AssessmentUser;
 import org.lamsfoundation.lams.tool.assessment.model.QuestionReference;
-import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.util.ExcelCell;
 
 /**
@@ -139,14 +139,6 @@ public interface IAssessmentService {
      */
     Assessment getDefaultContent(Long contentId) throws AssessmentApplicationException;
 
-    /**
-     * Get list of assessment questions by given assessmentUid. These assessment questions must be created by author.
-     *
-     * @param assessmentUid
-     * @return
-     */
-    List getAuthoredQuestions(Long assessmentUid);
-
     // ********** for user methods *************
     /**
      * Create a new user in database.
@@ -221,12 +213,13 @@ public interface IAssessmentService {
      *            indicates whether it's autosave request
      *
      * @return whether storing results is allowed, false otherwise
-     * @throws NoSuchMethodException 
-     * @throws InvocationTargetException 
-     * @throws IllegalAccessException 
+     * @throws NoSuchMethodException
+     * @throws InvocationTargetException
+     * @throws IllegalAccessException
      */
-    boolean storeUserAnswers(Assessment assessment, Long userId, List<Set<AssessmentQuestion>> pagedQuestions,
-	    Long singleMarkHedgingQuestionUid, boolean isAutosave) throws IllegalAccessException, InvocationTargetException, NoSuchMethodException;
+    boolean storeUserAnswers(Assessment assessment, Long userId, List<Set<QuestionDTO>> pagedQuestions,
+	    Long singleMarkHedgingQuestionUid, boolean isAutosave)
+	    throws IllegalAccessException, InvocationTargetException, NoSuchMethodException;
 
     /**
      * Return the latest result (it can be unfinished).

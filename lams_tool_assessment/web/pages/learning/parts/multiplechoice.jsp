@@ -13,33 +13,20 @@
 
 <div class="table-responsive">
 	<table class="table table-hover table-condensed">
-		<c:forEach var="option" items="${question.options}">
+		<c:forEach var="option" items="${question.optionDtos}">
 			<tr>
-				<c:if test="${finishedLock}">
-					<td class="complete-item-gif">
-					
-						<c:if test="${assessment.allowRightAnswersAfterQuestion && option.answerBoolean && (option.grade > 0)}">
-							<i class="fa fa-check"></i>
-						</c:if>
-						<c:if test="${assessment.allowWrongAnswersAfterQuestion && option.answerBoolean && (option.grade <= 0)}">
-							<i class="fa fa-times"></i>	
-						</c:if>
-							
-					</td>
-				</c:if>
-				
 				<td class="has-radio-button">
 					<c:choose>
 						<c:when test="${question.multipleAnswersAllowed}">
 							<input type="checkbox" name="question${status.index}_${option.sequenceId}" value="${true}"
 		 						<c:if test="${option.answerBoolean}">checked="checked"</c:if>
-								<c:if test="${isEditingDisabled}">disabled="disabled"</c:if>
+								<c:if test="${!hasEditRight}">disabled="disabled"</c:if>
 							/>
 						</c:when>
 						<c:otherwise>
 							<input type="radio" name="question${status.index}" value="${option.sequenceId}"
 		 						<c:if test="${option.answerBoolean}">checked="checked"</c:if>
-		 						<c:if test="${isEditingDisabled}">disabled="disabled"</c:if>
+		 						<c:if test="${!hasEditRight}">disabled="disabled"</c:if>
 							/>
 						</c:otherwise>
 					</c:choose>
@@ -48,35 +35,7 @@
 				<td>
 					<c:out value="${option.optionString}" escapeXml="false" />
 				</td>
-				
-				<c:if test="${finishedLock && assessment.allowQuestionFeedback}">
-	
-					<td width=30%;">
-						<c:if test="${option.answerBoolean}">
-							<c:out value="${option.feedback}" escapeXml="false" />
-						</c:if>
-					</td>		
-				</c:if>
-				
 			</tr>
 		</c:forEach>
 	</table>
-</div>	
-
-<c:if test="${finishedLock && assessment.allowQuestionFeedback}">
-	<div class="feedback">
-		<c:choose>
-			<c:when test="${question.answerTotalGrade >= 1}">
-				<c:out value="${question.feedbackOnCorrect}" escapeXml="false" />
-			</c:when>
-			<c:when test="${question.answerTotalGrade > 0}">
-				<c:out value="${question.feedbackOnPartiallyCorrect}" escapeXml="false" />
-			</c:when>
-			<c:otherwise>
-				<c:out value="${question.feedbackOnIncorrect}" escapeXml="false" />
-			</c:otherwise>		
-		</c:choose>
-	</div>
-</c:if>
-
-<%@ include file="markandpenaltyarea.jsp"%>
+</div>

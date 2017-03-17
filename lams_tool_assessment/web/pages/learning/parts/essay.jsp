@@ -96,9 +96,6 @@
 					<c:when test="${question.allowRichEditor && !isEditingDisabled}">
 						<lams:CKEditor id="question${status.index}" value="${question.answerString}" contentFolderID="${sessionMap.learnerContentFolder}" toolbarSet="DefaultLearner"></lams:CKEditor>
 					</c:when>
-					<c:when test="${question.allowRichEditor && finishedLock}">
-						${question.answerString}
-					</c:when>				
 					<c:otherwise>
 						<lams:STRUTS-textarea property="question${status.index}" styleClass="form-control" value="${question.answerString}" disabled="${isEditingDisabled}" />
 					</c:otherwise>
@@ -115,5 +112,3 @@
 		</c:if>
 	</table>
 </div>
-
-<%@ include file="markandpenaltyarea.jsp"%>

@@ -60,6 +60,8 @@ import org.lamsfoundation.lams.learning.web.util.LearningWebUtil;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.tool.ToolAccessMode;
 import org.lamsfoundation.lams.tool.assessment.AssessmentConstants;
+import org.lamsfoundation.lams.tool.assessment.dto.OptionDTO;
+import org.lamsfoundation.lams.tool.assessment.dto.QuestionDTO;
 import org.lamsfoundation.lams.tool.assessment.model.Assessment;
 import org.lamsfoundation.lams.tool.assessment.model.AssessmentOptionAnswer;
 import org.lamsfoundation.lams.tool.assessment.model.AssessmentOverallFeedback;
@@ -256,17 +258,11 @@ public class LearningAction extends Action {
 	    }
 	}
 
-	int dbResultCount = service.getAssessmentResultCount(assessment.getUid(), user.getUserId());
-	int attemptsAllowed = assessment.getAttemptsAllowed();
-	boolean isResubmitAllowed = ((attemptsAllowed > dbResultCount) | (attemptsAllowed == 0));
-
 	AssessmentResult lastResult = service.getLastAssessmentResult(assessment.getUid(), user.getUserId());
 	boolean hasEditRight = !assessment.isUseSelectLeaderToolOuput()
 		|| assessment.isUseSelectLeaderToolOuput() && isUserLeader;
-	boolean isLastResultFinished = (lastResult != null) && (lastResult.getFinishDate() != null);
-	//finishedLockForMonitor is a lock for displaying results page for teacher only if user see it, and displaying learner page if user see it accordingly
-	boolean finishedLockForMonitor = (mode != null) && mode.isTeacher() && isLastResultFinished;
-	boolean finishedLock = user.isSessionFinished() || finishedLockForMonitor || isLastResultFinished;
+	//showResults if either session or the last result is finished
+	boolean showResults = user.isSessionFinished() || (lastResult != null) && (lastResult.getFinishDate() != null);
 
 	// get notebook entry
 	String entryText = new String();
@@ -279,8 +275,7 @@ public class LearningAction extends Action {
 	// basic information
 	sessionMap.put(AssessmentConstants.ATTR_TITLE, assessment.getTitle());
 	sessionMap.put(AssessmentConstants.ATTR_INSTRUCTIONS, assessment.getInstructions());
-	sessionMap.put(AssessmentConstants.ATTR_IS_RESUBMIT_ALLOWED, isResubmitAllowed);
-	sessionMap.put(AssessmentConstants.ATTR_FINISHED_LOCK, finishedLock);
+	sessionMap.put(AssessmentConstants.ATTR_SHOW_RESULTS, showResults);
 	sessionMap.put(AssessmentConstants.ATTR_HAS_EDIT_RIGHT, hasEditRight);
 	sessionMap.put(AssessmentConstants.ATTR_USER_FINISHED, user.isSessionFinished());
 	sessionMap.put(AttributeNames.ATTR_LEARNER_CONTENT_FOLDER,
@@ -294,7 +289,7 @@ public class LearningAction extends Action {
 	sessionMap.put(AssessmentConstants.ATTR_REFLECTION_ENTRY, entryText);
 	
 	//time limit
-	boolean isTimeLimitEnabled = hasEditRight && !finishedLock && assessment.getTimeLimit() != 0;
+	boolean isTimeLimitEnabled = hasEditRight && !showResults && assessment.getTimeLimit() != 0;
 	long secondsLeft = isTimeLimitEnabled ? service.getSecondsLeft(assessment, user) : 0;
 	request.setAttribute(AssessmentConstants.ATTR_SECONDS_LEFT, secondsLeft);
 	boolean isTimeLimitNotLaunched = (lastResult == null) || (lastResult.getTimeLimitLaunchedDate() == null);
@@ -328,77 +323,74 @@ public class LearningAction extends Action {
 	}
 
 	//sort questions
-	LinkedList<AssessmentQuestion> questions = new LinkedList<AssessmentQuestion>();
+	LinkedList<QuestionDTO> questionDtos = new LinkedList<QuestionDTO>();
 	for (QuestionReference questionReference : questionReferences) {
 	    AssessmentQuestion question = questionToReferenceMap.get(questionReference.getUid());
-	    // initialize login name to avoid session close error in proxy object when displaying on a webpage
-	    if (question.getCreateBy() != null) {
-		question.getCreateBy().getLoginName();
-	    }
-	    question.setGrade(questionReference.getDefaultGrade());
+	    
+	    QuestionDTO questionDto = question.getQuestionDTO();
+	    questionDto.setGrade(questionReference.getDefaultGrade());
 
-	    questions.add(question);
+	    questionDtos.add(questionDto);
 	}
 
 	// shuffling
 	if (assessment.isShuffled()) {
-	    ArrayList<AssessmentQuestion> shuffledList = new ArrayList<AssessmentQuestion>(questions);
+	    ArrayList<QuestionDTO> shuffledList = new ArrayList<QuestionDTO>(questionDtos);
 	    Collections.shuffle(shuffledList);
-	    questions = new LinkedList<AssessmentQuestion>(shuffledList);
+	    questionDtos = new LinkedList<QuestionDTO>(shuffledList);
 	}
-	for (AssessmentQuestion question : questions) {
-	    if (question.isShuffle() || (question.getType() == AssessmentConstants.QUESTION_TYPE_ORDERING)) {
-		ArrayList<AssessmentQuestionOption> shuffledList = new ArrayList<AssessmentQuestionOption>(
-			question.getOptions());
+	for (QuestionDTO questionDto : questionDtos) {	    
+	    if (questionDto.isShuffle() || (questionDto.getType() == AssessmentConstants.QUESTION_TYPE_ORDERING)) {
+		ArrayList<OptionDTO> shuffledList = new ArrayList<OptionDTO>(questionDto.getOptionDtos());
 		Collections.shuffle(shuffledList);
-		question.setOptions(new LinkedHashSet<AssessmentQuestionOption>(shuffledList));
+		questionDto.setOptionDtos(new LinkedHashSet<OptionDTO>(shuffledList));
 	    }
-	    if (question.getType() == AssessmentConstants.QUESTION_TYPE_MATCHING_PAIRS) {
-		ArrayList<AssessmentQuestionOption> shuffledList = new ArrayList<AssessmentQuestionOption>(
-			question.getOptions());
+	    if (questionDto.getType() == AssessmentConstants.QUESTION_TYPE_MATCHING_PAIRS) {
+		ArrayList<OptionDTO> shuffledList = new ArrayList<OptionDTO>(questionDto.getOptionDtos());
 		Collections.shuffle(shuffledList);
-		question.setMatchingPairOptions(new LinkedHashSet<AssessmentQuestionOption>(shuffledList));
+		questionDto.setMatchingPairOptions(new LinkedHashSet<OptionDTO>(shuffledList));
 	    }
 	}
 
 	//paging
-	List<Set<AssessmentQuestion>> pagedQuestions = new ArrayList<Set<AssessmentQuestion>>();
+	List<Set<QuestionDTO>> pagedQuestionDtos = new ArrayList<Set<QuestionDTO>>();
 	int maxQuestionsPerPage = ((assessment.getQuestionsPerPage() != 0) && hasEditRight)
-		? assessment.getQuestionsPerPage() : questions.size();
-	LinkedHashSet<AssessmentQuestion> questionsForOnePage = new LinkedHashSet<AssessmentQuestion>();
-	pagedQuestions.add(questionsForOnePage);
+		? assessment.getQuestionsPerPage() : questionDtos.size();
+	LinkedHashSet<QuestionDTO> questionsForOnePage = new LinkedHashSet<QuestionDTO>();
+	pagedQuestionDtos.add(questionsForOnePage);
 	int count = 0;
-	for (AssessmentQuestion question : questions) {
-	    questionsForOnePage.add(question);
+	for (QuestionDTO questionDto : questionDtos) {
+	    questionsForOnePage.add(questionDto);
 	    count++;
-	    if ((questionsForOnePage.size() == maxQuestionsPerPage) && (count != questions.size())) {
-		questionsForOnePage = new LinkedHashSet<AssessmentQuestion>();
-		pagedQuestions.add(questionsForOnePage);
+	    if ((questionsForOnePage.size() == maxQuestionsPerPage) && (count != questionDtos.size())) {
+		questionsForOnePage = new LinkedHashSet<QuestionDTO>();
+		pagedQuestionDtos.add(questionsForOnePage);
 	    }
 	}
 
-	sessionMap.put(AssessmentConstants.ATTR_PAGED_QUESTIONS, pagedQuestions);
+	sessionMap.put(AssessmentConstants.ATTR_PAGED_QUESTION_DTOS, pagedQuestionDtos);
 	sessionMap.put(AssessmentConstants.ATTR_QUESTION_NUMBERING_OFFSET, 1);
 	sessionMap.put(AssessmentConstants.ATTR_PAGE_NUMBER, 1);
 	sessionMap.put(AssessmentConstants.ATTR_ASSESSMENT, assessment);
 
-	//set attempt started
-	if (!finishedLock && hasEditRight) {
-	    service.setAttemptStarted(assessment, user, toolSessionId);
-	}
-
 	// loadupLastAttempt for display purpose
 	loadupLastAttempt(sessionMap);
+	
+	if (showResults) {
 
-	//check if need to display results page
-	if ((dbResultCount > 0) && finishedLock) {
 	    // display results page
-	    prepareResultsPageData(sessionMap);
+	    return showResults(mapping, sessionMap); 
+
+	} else {
+	    // set attempt started
+	    if (hasEditRight) {
+		service.setAttemptStarted(assessment, user, toolSessionId);
+	    }
+
+	    return mapping.findForward(AssessmentConstants.LEARNING);
 	}
-
-	return mapping.findForward(AssessmentConstants.SUCCESS);
     }
-
+ 
     /**
      * Checks Leader Progress
      */
@@ -437,8 +429,8 @@ public class LearningAction extends Action {
 	Assessment assessment = (Assessment) sessionMap.get(AssessmentConstants.ATTR_ASSESSMENT);
 	AssessmentUser user = (AssessmentUser) sessionMap.get(AssessmentConstants.ATTR_USER);
 
-	boolean finishedLock = (Boolean) sessionMap.get(AssessmentConstants.ATTR_FINISHED_LOCK);
-	if (!finishedLock) {
+	boolean showResults = (Boolean) sessionMap.get(AssessmentConstants.ATTR_SHOW_RESULTS);
+	if (!showResults) {
 	    //get user answers from request and store them into sessionMap
 	    storeUserAnswersIntoSessionMap(request);
 	    // store results from sessionMap into DB
@@ -457,17 +449,21 @@ public class LearningAction extends Action {
 	}
 
 	int questionNumberingOffset = 0;
-	List<Set<AssessmentQuestion>> pagedQuestions = (List<Set<AssessmentQuestion>>) sessionMap
-		.get(AssessmentConstants.ATTR_PAGED_QUESTIONS);
+	List<Set<QuestionDTO>> pagedQuestionDtos = (List<Set<QuestionDTO>>) sessionMap
+		.get(AssessmentConstants.ATTR_PAGED_QUESTION_DTOS);
 	for (int i = 0; i < pageNumber - 1; i++) {
-	    Set<AssessmentQuestion> questionsForOnePage = pagedQuestions.get(i);
+	    Set<QuestionDTO> questionsForOnePage = pagedQuestionDtos.get(i);
 	    questionNumberingOffset += questionsForOnePage.size();
 	}
 	sessionMap.put(AssessmentConstants.ATTR_QUESTION_NUMBERING_OFFSET, ++questionNumberingOffset);
 	sessionMap.put(AssessmentConstants.ATTR_PAGE_NUMBER, pageNumber);
 	request.setAttribute(AssessmentConstants.ATTR_SESSION_MAP_ID, sessionMapID);
 
-	return mapping.findForward(AssessmentConstants.SUCCESS);
+	if (showResults) {
+	    return mapping.findForward(AssessmentConstants.SHOW_RESULTS);
+	} else {
+	    return mapping.findForward(AssessmentConstants.LEARNING);    
+	}
     }
 
     /**
@@ -482,8 +478,8 @@ public class LearningAction extends Action {
 	String sessionMapID = WebUtil.readStrParam(request, AssessmentConstants.ATTR_SESSION_MAP_ID);
 	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
 		.getAttribute(sessionMapID);
-	List<Set<AssessmentQuestion>> pagedQuestions = (List<Set<AssessmentQuestion>>) sessionMap
-		.get(AssessmentConstants.ATTR_PAGED_QUESTIONS);
+	List<Set<QuestionDTO>> pagedQuestionDtos = (List<Set<QuestionDTO>>) sessionMap
+		.get(AssessmentConstants.ATTR_PAGED_QUESTION_DTOS);
 	Long userId = ((AssessmentUser) sessionMap.get(AssessmentConstants.ATTR_USER)).getUserId();
 	Long toolSessionId = (Long) sessionMap.get(AssessmentConstants.ATTR_TOOL_SESSION_ID);
 	Assessment assessment = service.getAssessmentBySessionId(toolSessionId);
@@ -493,7 +489,7 @@ public class LearningAction extends Action {
 
 	// store results from sessionMap into DB
 	Long singleMarkHedgingQuestionUid = WebUtil.readLongParam(request, "singleMarkHedgingQuestionUid");
-	boolean isResultsStored = service.storeUserAnswers(assessment, userId, pagedQuestions, singleMarkHedgingQuestionUid, false);
+	boolean isResultsStored = service.storeUserAnswers(assessment, userId, pagedQuestionDtos, singleMarkHedgingQuestionUid, false);
 	// result was not stored in case user was prohibited from submitting (or autosubmitting) answers (e.g. when
 	// using 2 browsers). Then show last stored results
 	if (!isResultsStored) {
@@ -501,12 +497,12 @@ public class LearningAction extends Action {
 	}
 
 	//find according question in order to get its mark
-	AssessmentQuestion question = null;
-	for (Set<AssessmentQuestion> questionsForOnePage : pagedQuestions) {
-	    for (AssessmentQuestion questionIter : questionsForOnePage) {
-		if (questionIter.getUid().equals(singleMarkHedgingQuestionUid)) {
-		    question = questionIter;
-		    question.setResponseSubmitted(true);
+	QuestionDTO questionDto = null;
+	for (Set<QuestionDTO> questionsForOnePage : pagedQuestionDtos) {
+	    for (QuestionDTO questionDtoIter : questionsForOnePage) {
+		if (questionDtoIter.getUid().equals(singleMarkHedgingQuestionUid)) {
+		    questionDto = questionDtoIter;
+		    questionDto.setResponseSubmitted(true);
 		}
 	    }
 	}
@@ -514,9 +510,8 @@ public class LearningAction extends Action {
 	// populate info for displaying results page
 	//prepareResultsPageData(sessionMap);
 
-	request.setAttribute("finishedLock", false);
 	request.setAttribute("assessment", assessment);
-	request.setAttribute("question", question);
+	request.setAttribute("question", questionDto);
 	long questionIndex = WebUtil.readLongParam(request, "questionIndex");
 	request.setAttribute("questionIndex", questionIndex);
 	request.setAttribute("isEditingDisabled", true);
@@ -537,6 +532,7 @@ public class LearningAction extends Action {
 	String sessionMapID = WebUtil.readStrParam(request, AssessmentConstants.ATTR_SESSION_MAP_ID);
 	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
 		.getAttribute(sessionMapID);
+	request.setAttribute(AssessmentConstants.ATTR_SESSION_MAP_ID, sessionMapID);
 
 	//get user answers from request and store them into sessionMap
 	storeUserAnswersIntoSessionMap(request);
@@ -563,24 +559,10 @@ public class LearningAction extends Action {
 	    loadupLastAttempt(sessionMap);
 	}
 
+	sessionMap.put(AssessmentConstants.ATTR_SHOW_RESULTS, true);
+
 	// populate info for displaying results page
-	prepareResultsPageData(sessionMap);
-
-	Assessment assessment = (Assessment) sessionMap.get(AssessmentConstants.ATTR_ASSESSMENT);
-	//calculate whether isResubmitAllowed
-	IAssessmentService service = getAssessmentService();
-	HttpSession ss = SessionManager.getSession();
-	UserDTO userDTO = (UserDTO) ss.getAttribute(AttributeNames.USER);
-	Long userID = new Long(userDTO.getUserID().longValue());
-	int dbResultCount = service.getAssessmentResultCount(assessment.getUid(), userID);
-	int attemptsAllowed = assessment.getAttemptsAllowed();
-	boolean isResubmitAllowed = ((attemptsAllowed > dbResultCount) | (attemptsAllowed == 0));
-	sessionMap.put(AssessmentConstants.ATTR_IS_RESUBMIT_ALLOWED, isResubmitAllowed);
-
-	sessionMap.put(AssessmentConstants.ATTR_FINISHED_LOCK, true);
-	request.setAttribute(AssessmentConstants.ATTR_SESSION_MAP_ID, sessionMapID);
-
-	return mapping.findForward(AssessmentConstants.SUCCESS);
+	return showResults(mapping, sessionMap);
     }
 
     /**
@@ -607,19 +589,15 @@ public class LearningAction extends Action {
 	
 	// in case of content was modified in monitor - redirect to start.do in order to refresh info from the DB
 	if (assessment.isContentModifiedInMonitor(lastAttemptStartingDate)) {
-	    ActionRedirect redirect = new ActionRedirect(mapping.findForwardConfig("startLearning"));
+	    ActionRedirect redirect = new ActionRedirect(mapping.findForwardConfig("learningStartMethod"));
 	    redirect.addParameter(AttributeNames.PARAM_MODE, mode.toString());
 	    redirect.addParameter(AssessmentConstants.PARAM_TOOL_SESSION_ID, toolSessionId);
 	    return redirect;
 	
 	//otherwise use data from SessionMap
 	} else {
-	    
-//	    List<Set<AssessmentQuestion>> pagedQuestions = (List<Set<AssessmentQuestion>>) sessionMap
-//		    .get(AssessmentConstants.ATTR_PAGED_QUESTIONS);
-//	    service.setAttemptStarted(assessment, pagedQuestions, assessmentUser, toolSessionId);
 
-	    sessionMap.put(AssessmentConstants.ATTR_FINISHED_LOCK, false);
+	    sessionMap.put(AssessmentConstants.ATTR_SHOW_RESULTS, false);
 	    sessionMap.put(AssessmentConstants.ATTR_PAGE_NUMBER, 1);
 	    sessionMap.put(AssessmentConstants.ATTR_QUESTION_NUMBERING_OFFSET, 1);
 	    request.setAttribute(AssessmentConstants.ATTR_SESSION_MAP_ID, sessionMapID);
@@ -630,7 +608,7 @@ public class LearningAction extends Action {
 	    sessionMap.put(AssessmentConstants.ATTR_IS_TIME_LIMIT_NOT_LAUNCHED, true);
 	    request.setAttribute(AssessmentConstants.ATTR_SECONDS_LEFT, assessment.getTimeLimit() * 60);
 
-	    return mapping.findForward(AssessmentConstants.SUCCESS);
+	    return mapping.findForward(AssessmentConstants.LEARNING);
 	}
 
     }
@@ -684,27 +662,27 @@ public class LearningAction extends Action {
 	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
 		.getAttribute(sessionMapID);
 	int pageNumber = (Integer) sessionMap.get(AssessmentConstants.ATTR_PAGE_NUMBER);
-	List<Set<AssessmentQuestion>> pagedQuestions = (List<Set<AssessmentQuestion>>) sessionMap
-		.get(AssessmentConstants.ATTR_PAGED_QUESTIONS);
-	Set<AssessmentQuestion> questionsForOnePage = pagedQuestions.get(pageNumber - 1);
+	List<Set<QuestionDTO>> pagedQuestionDtos = (List<Set<QuestionDTO>>) sessionMap
+		.get(AssessmentConstants.ATTR_PAGED_QUESTION_DTOS);
+	Set<QuestionDTO> questionsForOnePage = pagedQuestionDtos.get(pageNumber - 1);
 	Long questionUid = new Long(request.getParameter(AssessmentConstants.PARAM_QUESTION_UID));
 
-	AssessmentQuestion question = null;
-	for (AssessmentQuestion tempQuestion : questionsForOnePage) {
-	    if (tempQuestion.getUid().equals(questionUid)) {
-		question = tempQuestion;
+	QuestionDTO questionDto = null;
+	for (QuestionDTO questionDtoIter : questionsForOnePage) {
+	    if (questionDtoIter.getUid().equals(questionUid)) {
+		questionDto = questionDtoIter;
 		break;
 	    }
 	}
 
-	Set<AssessmentQuestionOption> optionList = question.getOptions();
+	Set<OptionDTO> optionDtoList = questionDto.getOptionDtos();
 
 	int optionIndex = NumberUtils.stringToInt(request.getParameter(AssessmentConstants.PARAM_OPTION_INDEX), -1);
 	if (optionIndex != -1) {
-	    List<AssessmentQuestionOption> rList = new ArrayList<AssessmentQuestionOption>(optionList);
+	    List<OptionDTO> rList = new ArrayList<OptionDTO>(optionDtoList);
 
 	    // get current and the target item, and switch their sequnece
-	    AssessmentQuestionOption option = rList.remove(optionIndex);
+	    OptionDTO option = rList.remove(optionIndex);
 	    if (up) {
 		rList.add(--optionIndex, option);
 	    } else {
@@ -712,11 +690,11 @@ public class LearningAction extends Action {
 	    }
 
 	    // put back list
-	    optionList = new LinkedHashSet<AssessmentQuestionOption>(rList);
-	    question.setOptions(optionList);
+	    optionDtoList = new LinkedHashSet<OptionDTO>(rList);
+	    questionDto.setOptionDtos(optionDtoList);
 	}
 
-	request.setAttribute(AssessmentConstants.ATTR_QUESTION_FOR_ORDERING, question);
+	request.setAttribute(AssessmentConstants.ATTR_QUESTION_FOR_ORDERING, questionDto);
 	request.setAttribute(AssessmentConstants.ATTR_SESSION_MAP_ID, sessionMapID);
 	return mapping.findForward(AssessmentConstants.SUCCESS);
     }
@@ -836,89 +814,89 @@ public class LearningAction extends Action {
 	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
 		.getAttribute(sessionMapID);
 	int pageNumber = (Integer) sessionMap.get(AssessmentConstants.ATTR_PAGE_NUMBER);
-	List<Set<AssessmentQuestion>> pagedQuestions = (List<Set<AssessmentQuestion>>) sessionMap
-		.get(AssessmentConstants.ATTR_PAGED_QUESTIONS);
-	Set<AssessmentQuestion> questionsForOnePage = pagedQuestions.get(pageNumber - 1);
+	List<Set<QuestionDTO>> pagedQuestionDtos = (List<Set<QuestionDTO>>) sessionMap
+		.get(AssessmentConstants.ATTR_PAGED_QUESTION_DTOS);
+	Set<QuestionDTO> questionsForOnePage = pagedQuestionDtos.get(pageNumber - 1);
 
 	for (int i = 0; i < questionsForOnePage.size(); i++) {
-	    Long assessmentQuestionUid = WebUtil.readLongParam(request, AssessmentConstants.PARAM_QUESTION_UID + i);
-	    AssessmentQuestion question = null;
-	    for (AssessmentQuestion sessionQuestion : questionsForOnePage) {
-		if (sessionQuestion.getUid().equals(assessmentQuestionUid)) {
-		    question = sessionQuestion;
+	    Long questionUid = WebUtil.readLongParam(request, AssessmentConstants.PARAM_QUESTION_UID + i);
+	    QuestionDTO questionDto = null;
+	    for (QuestionDTO sessionQuestion : questionsForOnePage) {
+		if (sessionQuestion.getUid().equals(questionUid)) {
+		    questionDto = sessionQuestion;
 		    break;
 		}
 	    }
 
 	    // in case learner goes to the next page and refreshes it right after this. And thus it's not possible to know
 	    // previous page number in this case. but anyway no need to save answers
-	    if (question == null) {
+	    if (questionDto == null) {
 		break;
 	    }
 
-	    int questionType = question.getType();
+	    int questionType = questionDto.getType();
 	    if (questionType == AssessmentConstants.QUESTION_TYPE_MULTIPLE_CHOICE) {
-		for (AssessmentQuestionOption option : question.getOptions()) {
+		for (OptionDTO optionDto : questionDto.getOptionDtos()) {
 		    boolean answerBoolean = false;
-		    if (question.isMultipleAnswersAllowed()) {
+		    if (questionDto.isMultipleAnswersAllowed()) {
 			String answerString = request.getParameter(
-				AssessmentConstants.ATTR_QUESTION_PREFIX + i + "_" + option.getSequenceId());
+				AssessmentConstants.ATTR_QUESTION_PREFIX + i + "_" + optionDto.getSequenceId());
 			answerBoolean = !StringUtils.isBlank(answerString);
 		    } else {
 			String answerString = request.getParameter(AssessmentConstants.ATTR_QUESTION_PREFIX + i);
 			if (answerString != null) {
 			    int optionSequenceId = Integer.parseInt(answerString);
-			    answerBoolean = (option.getSequenceId() == optionSequenceId);
+			    answerBoolean = (optionDto.getSequenceId() == optionSequenceId);
 			}
 		    }
-		    option.setAnswerBoolean(answerBoolean);
+		    optionDto.setAnswerBoolean(answerBoolean);
 		}
 
 	    } else if (questionType == AssessmentConstants.QUESTION_TYPE_MATCHING_PAIRS) {
-		for (AssessmentQuestionOption option : question.getOptions()) {
+		for (OptionDTO optionDto : questionDto.getOptionDtos()) {
 		    int answerInt = WebUtil.readIntParam(request,
-			    AssessmentConstants.ATTR_QUESTION_PREFIX + i + "_" + option.getSequenceId());
-		    option.setAnswerInt(answerInt);
+			    AssessmentConstants.ATTR_QUESTION_PREFIX + i + "_" + optionDto.getSequenceId());
+		    optionDto.setAnswerInt(answerInt);
 		}
 
 	    } else if (questionType == AssessmentConstants.QUESTION_TYPE_SHORT_ANSWER) {
 		String answerString = request.getParameter(AssessmentConstants.ATTR_QUESTION_PREFIX + i);
-		question.setAnswerString(answerString);
+		questionDto.setAnswerString(answerString);
 
 	    } else if (questionType == AssessmentConstants.QUESTION_TYPE_NUMERICAL) {
 		String answerString = request.getParameter(AssessmentConstants.ATTR_QUESTION_PREFIX + i);
-		question.setAnswerString(answerString);
+		questionDto.setAnswerString(answerString);
 
 	    } else if (questionType == AssessmentConstants.QUESTION_TYPE_TRUE_FALSE) {
 		String answerString = request.getParameter(AssessmentConstants.ATTR_QUESTION_PREFIX + i);
 		if (answerString != null) {
-		    question.setAnswerBoolean(Boolean.parseBoolean(answerString));
-		    question.setAnswerString("answered");
+		    questionDto.setAnswerBoolean(Boolean.parseBoolean(answerString));
+		    questionDto.setAnswerString("answered");
 		}
 
 	    } else if (questionType == AssessmentConstants.QUESTION_TYPE_ESSAY) {
 		String answerString = request.getParameter(AssessmentConstants.ATTR_QUESTION_PREFIX + i);
 		answerString = answerString.replaceAll("[\n\r\f]", "");
-		question.setAnswerString(answerString);
+		questionDto.setAnswerString(answerString);
 
 	    } else if (questionType == AssessmentConstants.QUESTION_TYPE_ORDERING) {
 
 	    } else if (questionType == AssessmentConstants.QUESTION_TYPE_MARK_HEDGING) {
 
 		//store hedging marks
-		for (AssessmentQuestionOption option : question.getOptions()) {
+		for (OptionDTO optionDto : questionDto.getOptionDtos()) {
 		    Integer markHedging = WebUtil.readIntParam(request,
-			    AssessmentConstants.ATTR_QUESTION_PREFIX + i + "_" + option.getSequenceId(), true);
+			    AssessmentConstants.ATTR_QUESTION_PREFIX + i + "_" + optionDto.getSequenceId(), true);
 		    if (markHedging != null) {
-			option.setAnswerInt(markHedging);
+			optionDto.setAnswerInt(markHedging);
 		    }
 		}
 
 		//store justification of hedging if enabled
-		if (question.isHedgingJustificationEnabled()) {
+		if (questionDto.isHedgingJustificationEnabled()) {
 		    String answerString = request.getParameter(AssessmentConstants.ATTR_QUESTION_PREFIX + i);
 		    answerString = answerString.replaceAll("[\n\r\f]", "");
-		    question.setAnswerString(answerString);
+		    questionDto.setAnswerString(answerString);
 		}
 	    }
 	}
@@ -933,8 +911,8 @@ public class LearningAction extends Action {
      */
     private int validateAnswers(SessionMap<String, Object> sessionMap) {
 
-	List<Set<AssessmentQuestion>> pagedQuestions = (List<Set<AssessmentQuestion>>) sessionMap
-		.get(AssessmentConstants.ATTR_PAGED_QUESTIONS);
+	List<Set<QuestionDTO>> pagedQuestionDtos = (List<Set<QuestionDTO>>) sessionMap
+		.get(AssessmentConstants.ATTR_PAGED_QUESTION_DTOS);
 
 	//array of missing required questions
 	boolean isAllQuestionsAnswered = true;
@@ -942,33 +920,33 @@ public class LearningAction extends Action {
 
 	//iterate through all pages to find first that contains missing required questions
 	int pageCount;
-	for (pageCount = 0; pageCount < pagedQuestions.size(); pageCount++) {
-	    Set<AssessmentQuestion> questionsForOnePage = pagedQuestions.get(pageCount);
+	for (pageCount = 0; pageCount < pagedQuestionDtos.size(); pageCount++) {
+	    Set<QuestionDTO> questionsForOnePage = pagedQuestionDtos.get(pageCount);
 
-	    for (AssessmentQuestion question : questionsForOnePage) {
-		int questionType = question.getType();
+	    for (QuestionDTO questionDto : questionsForOnePage) {
+		int questionType = questionDto.getType();
 
 		//enforce all hedging marks question type to be answered as well
-		if (question.isAnswerRequired() || (questionType == AssessmentConstants.QUESTION_TYPE_MARK_HEDGING)) {
+		if (questionDto.isAnswerRequired() || (questionType == AssessmentConstants.QUESTION_TYPE_MARK_HEDGING)) {
 
 		    boolean isAnswered = false;
 
 		    if (questionType == AssessmentConstants.QUESTION_TYPE_MULTIPLE_CHOICE) {
 
-			for (AssessmentQuestionOption option : question.getOptions()) {
-			    isAnswered |= option.getAnswerBoolean();
+			for (OptionDTO optionDto : questionDto.getOptionDtos()) {
+			    isAnswered |= optionDto.getAnswerBoolean();
 			}
 
 		    } else if (questionType == AssessmentConstants.QUESTION_TYPE_MATCHING_PAIRS) {
-			for (AssessmentQuestionOption option : question.getOptions()) {
-			    isAnswered |= option.getAnswerInt() != 0;
+			for (OptionDTO optionDto : questionDto.getOptionDtos()) {
+			    isAnswered |= optionDto.getAnswerInt() != 0;
 			}
 
 		    } else if ((questionType == AssessmentConstants.QUESTION_TYPE_SHORT_ANSWER)
 			    || (questionType == AssessmentConstants.QUESTION_TYPE_NUMERICAL)
 			    || (questionType == AssessmentConstants.QUESTION_TYPE_TRUE_FALSE)
 			    || (questionType == AssessmentConstants.QUESTION_TYPE_ESSAY)) {
-			isAnswered |= StringUtils.isNotBlank(question.getAnswerString());
+			isAnswered |= StringUtils.isNotBlank(questionDto.getAnswerString());
 
 		    } else if (questionType == AssessmentConstants.QUESTION_TYPE_ORDERING) {
 			isAnswered = true;
@@ -977,14 +955,14 @@ public class LearningAction extends Action {
 
 			//verify sum of all hedging marks is equal to question's grade
 			int sumMarkHedging = 0;
-			for (AssessmentQuestionOption option : question.getOptions()) {
-			    sumMarkHedging += option.getAnswerInt();
+			for (OptionDTO optionDto : questionDto.getOptionDtos()) {
+			    sumMarkHedging += optionDto.getAnswerInt();
 			}
-			isAnswered = sumMarkHedging == question.getGrade();
+			isAnswered = sumMarkHedging == questionDto.getGrade();
 
 			//verify justification of hedging is provided if it was enabled
-			if (question.isHedgingJustificationEnabled()) {
-			    isAnswered &= StringUtils.isNotBlank(question.getAnswerString());
+			if (questionDto.isHedgingJustificationEnabled()) {
+			    isAnswered &= StringUtils.isNotBlank(questionDto.getAnswerString());
 			}
 		    }
 
@@ -996,13 +974,13 @@ public class LearningAction extends Action {
 
 		}
 
-		if ((question.getType() == AssessmentConstants.QUESTION_TYPE_ESSAY)
-			&& (question.getMinWordsLimit() > 0)) {
+		if ((questionDto.getType() == AssessmentConstants.QUESTION_TYPE_ESSAY)
+			&& (questionDto.getMinWordsLimit() > 0)) {
 
-		    String answer = new String(question.getAnswerString());
+		    String answer = new String(questionDto.getAnswerString());
 
 		    boolean isMinWordsLimitReached = ValidationUtil.isMinWordsLimitReached(answer,
-			    question.getMinWordsLimit(), question.isAllowRichEditor());
+			    questionDto.getMinWordsLimit(), questionDto.isAllowRichEditor());
 
 		    // check min words limit is reached
 		    if (!isMinWordsLimitReached) {
@@ -1025,87 +1003,99 @@ public class LearningAction extends Action {
     /**
      * Prepare data for displaying results page
      */
-    private void prepareResultsPageData(SessionMap<String, Object> sessionMap) {
-	List<Set<AssessmentQuestion>> pagedQuestions = (List<Set<AssessmentQuestion>>) sessionMap
-		.get(AssessmentConstants.ATTR_PAGED_QUESTIONS);
+    private ActionForward showResults(ActionMapping mapping, SessionMap<String, Object> sessionMap) {
+	List<Set<QuestionDTO>> pagedQuestionDtos = (List<Set<QuestionDTO>>) sessionMap
+		.get(AssessmentConstants.ATTR_PAGED_QUESTION_DTOS);
 	Assessment assessment = (Assessment) sessionMap.get(AssessmentConstants.ATTR_ASSESSMENT);
 	Long userId = ((AssessmentUser) sessionMap.get(AssessmentConstants.ATTR_USER)).getUserId();
 	IAssessmentService service = getAssessmentService();
-	//release object from the cache (it's required when we have modified result object in the same request)
-	AssessmentResult result = service.getLastFinishedAssessmentResultNotFromChache(assessment.getUid(), userId);
+	
+	int dbResultCount = service.getAssessmentResultCount(assessment.getUid(), userId);
+	if (dbResultCount > 0) {
 
-	for (Set<AssessmentQuestion> questionsForOnePage : pagedQuestions) {
-	    for (AssessmentQuestion question : questionsForOnePage) {
+	    // release object from the cache (it's required when we have modified result object in the same request)
+	    AssessmentResult result = service.getLastFinishedAssessmentResultNotFromChache(assessment.getUid(), userId);
 
-		//find corresponding questionResult
-		for (AssessmentQuestionResult questionResult : result.getQuestionResults()) {
-		    if (question.getUid().equals(questionResult.getAssessmentQuestion().getUid())) {
+	    for (Set<QuestionDTO> questionsForOnePage : pagedQuestionDtos) {
+		for (QuestionDTO questionDto : questionsForOnePage) {
 
-			//copy questionResult's info to the question
-			question.setMark(questionResult.getMark());
-			question.setResponseSubmitted(questionResult.getFinishDate() != null);
-			question.setPenalty(questionResult.getPenalty());
-			question.setQuestionFeedback(null);
-			for (AssessmentQuestionOption option : question.getOptions()) {
-			    if (option.getUid().equals(questionResult.getSubmittedOptionUid())) {
-				question.setQuestionFeedback(option.getFeedback());
-				break;
-			    }
-			}
-			//required for showing right/wrong answers icons on results page correctly
-			if (question.getType() == AssessmentConstants.QUESTION_TYPE_SHORT_ANSWER
-				|| question.getType() == AssessmentConstants.QUESTION_TYPE_NUMERICAL) {
-			    boolean isAnsweredCorrectly = false;
-			    for (AssessmentQuestionOption option : question.getOptions()) {
-				if (option.getUid().equals(questionResult.getSubmittedOptionUid())) {
-				    isAnsweredCorrectly = option.getGrade() > 0;
+		    // find corresponding questionResult
+		    for (AssessmentQuestionResult questionResult : result.getQuestionResults()) {
+			if (questionDto.getUid().equals(questionResult.getAssessmentQuestion().getUid())) {
+
+			    // copy questionResult's info to the question
+			    questionDto.setMark(questionResult.getMark());
+			    questionDto.setResponseSubmitted(questionResult.getFinishDate() != null);
+			    questionDto.setPenalty(questionResult.getPenalty());
+			    questionDto.setQuestionFeedback(null);
+			    for (OptionDTO optionDto : questionDto.getOptionDtos()) {
+				if (optionDto.getUid().equals(questionResult.getSubmittedOptionUid())) {
+				    questionDto.setQuestionFeedback(optionDto.getFeedback());
 				    break;
 				}
 			    }
-			    question.setAnswerBoolean(isAnsweredCorrectly);
-			}
+			    // required for showing right/wrong answers icons on results page correctly
+			    if (questionDto.getType() == AssessmentConstants.QUESTION_TYPE_SHORT_ANSWER
+				    || questionDto.getType() == AssessmentConstants.QUESTION_TYPE_NUMERICAL) {
+				boolean isAnsweredCorrectly = false;
+				for (OptionDTO optionDto : questionDto.getOptionDtos()) {
+				    if (optionDto.getUid().equals(questionResult.getSubmittedOptionUid())) {
+					isAnsweredCorrectly = optionDto.getGrade() > 0;
+					break;
+				    }
+				}
+				questionDto.setAnswerBoolean(isAnsweredCorrectly);
+			    }
 
-			//required for markandpenalty area and if it's on - on question's summary page
-			List<Object[]> questionResults = service.getAssessmentQuestionResultList(assessment.getUid(),
-				userId, question.getUid());
-			question.setQuestionResults(questionResults);
+			    // required for markandpenalty area and if it's on - on question's summary page
+			    List<Object[]> questionResults = service
+				    .getAssessmentQuestionResultList(assessment.getUid(), userId, questionDto.getUid());
+			    questionDto.setQuestionResults(questionResults);
+			}
 		    }
 		}
 	    }
-	}
 
-	Date timeTaken = new Date(result.getFinishDate().getTime() - result.getStartDate().getTime());
-	result.setTimeTaken(timeTaken);
-	if (assessment.isAllowOverallFeedbackAfterQuestion()) {
-	    int percentageCorrectAnswers = (int) (result.getGrade() * 100 / result.getMaximumGrade());
-	    ArrayList<AssessmentOverallFeedback> overallFeedbacks = new ArrayList<AssessmentOverallFeedback>(
-		    assessment.getOverallFeedbacks());
-	    int lastBorder = 0;
-	    for (int i = overallFeedbacks.size() - 1; i >= 0; i--) {
-		AssessmentOverallFeedback overallFeedback = overallFeedbacks.get(i);
-		if ((percentageCorrectAnswers >= lastBorder)
-			&& (percentageCorrectAnswers <= overallFeedback.getGradeBoundary())) {
-		    result.setOverallFeedback(overallFeedback.getFeedback());
-		    break;
+	    Date timeTaken = new Date(result.getFinishDate().getTime() - result.getStartDate().getTime());
+	    result.setTimeTaken(timeTaken);
+	    if (assessment.isAllowOverallFeedbackAfterQuestion()) {
+		int percentageCorrectAnswers = (int) (result.getGrade() * 100 / result.getMaximumGrade());
+		ArrayList<AssessmentOverallFeedback> overallFeedbacks = new ArrayList<AssessmentOverallFeedback>(
+			assessment.getOverallFeedbacks());
+		int lastBorder = 0;
+		for (int i = overallFeedbacks.size() - 1; i >= 0; i--) {
+		    AssessmentOverallFeedback overallFeedback = overallFeedbacks.get(i);
+		    if ((percentageCorrectAnswers >= lastBorder)
+			    && (percentageCorrectAnswers <= overallFeedback.getGradeBoundary())) {
+			result.setOverallFeedback(overallFeedback.getFeedback());
+			break;
+		    }
+		    lastBorder = overallFeedback.getGradeBoundary();
 		}
-		lastBorder = overallFeedback.getGradeBoundary();
 	    }
+
+	    // calculate whether user has failed this attempt
+	    int passingMark = assessment.getPassingMark();
+	    double gradeRoundedTo2DecimalPlaces = Math.round(result.getGrade() * 100.0) / 100.0;
+	    boolean isUserFailed = ((passingMark != 0) && (passingMark > gradeRoundedTo2DecimalPlaces));
+	    sessionMap.put(AssessmentConstants.ATTR_IS_USER_FAILED, isUserFailed);
+
+	    sessionMap.put(AssessmentConstants.ATTR_ASSESSMENT_RESULT, result);
 	}
 
-	//calculate whether user has failed this attempt
-	int passingMark = assessment.getPassingMark();
-	double gradeRoundedTo2DecimalPlaces = Math.round(result.getGrade() * 100.0) / 100.0;
-	boolean isUserFailed = ((passingMark != 0) && (passingMark > gradeRoundedTo2DecimalPlaces));
-	sessionMap.put(AssessmentConstants.ATTR_IS_USER_FAILED, isUserFailed);
-
-	sessionMap.put(AssessmentConstants.ATTR_ASSESSMENT_RESULT, result);
+	//calculate whether isResubmitAllowed
+	int attemptsAllowed = assessment.getAttemptsAllowed();
+	boolean isResubmitAllowed = ((attemptsAllowed > dbResultCount) | (attemptsAllowed == 0));
+	sessionMap.put(AssessmentConstants.ATTR_IS_RESUBMIT_ALLOWED, isResubmitAllowed);
+	
+	return mapping.findForward(AssessmentConstants.SHOW_RESULTS);
     }
 
     private void loadupLastAttempt(SessionMap<String, Object> sessionMap) {
 	IAssessmentService service = getAssessmentService();
 
-	List<Set<AssessmentQuestion>> pagedQuestions = (List<Set<AssessmentQuestion>>) sessionMap
-		.get(AssessmentConstants.ATTR_PAGED_QUESTIONS);
+	List<Set<QuestionDTO>> pagedQuestionDtos = (List<Set<QuestionDTO>>) sessionMap
+		.get(AssessmentConstants.ATTR_PAGED_QUESTION_DTOS);
 	Long assessmentUid = ((Assessment) sessionMap.get(AssessmentConstants.ATTR_ASSESSMENT)).getUid();
 	Long userId = ((AssessmentUser) sessionMap.get(AssessmentConstants.ATTR_USER)).getUserId();
 	//get the latest result (it can be unfinished one)
@@ -1121,64 +1111,63 @@ public class LearningAction extends Action {
 	    lastFinishedResult = service.getLastFinishedAssessmentResult(assessmentUid, userId);
 	}
 
-	for (Set<AssessmentQuestion> questionsForOnePage : pagedQuestions) {
-	    for (AssessmentQuestion question : questionsForOnePage) {
+	for (Set<QuestionDTO> questionsForOnePage : pagedQuestionDtos) {
+	    for (QuestionDTO questionDto : questionsForOnePage) {
 
 		//load last finished results for hedging type of questions (in order to prevent retry)
 		Set<AssessmentQuestionResult> questionResults = lastResult.getQuestionResults();
-		if ((question.getType() == AssessmentConstants.QUESTION_TYPE_MARK_HEDGING)
+		if ((questionDto.getType() == AssessmentConstants.QUESTION_TYPE_MARK_HEDGING)
 			&& (lastResult.getFinishDate() == null) && (lastFinishedResult != null)) {
 		    questionResults = lastFinishedResult.getQuestionResults();
 		}
 
 		for (AssessmentQuestionResult questionResult : questionResults) {
-		    if (question.getUid().equals(questionResult.getAssessmentQuestion().getUid())) {
-			question.setAnswerBoolean(questionResult.getAnswerBoolean());
-			question.setAnswerFloat(questionResult.getAnswerFloat());
-			question.setAnswerString(questionResult.getAnswerString());
-			question.setMark(questionResult.getMark());
-			question.setResponseSubmitted(questionResult.getFinishDate() != null);
-			question.setPenalty(questionResult.getPenalty());
+		    if (questionDto.getUid().equals(questionResult.getAssessmentQuestion().getUid())) {
+			questionDto.setAnswerBoolean(questionResult.getAnswerBoolean());
+			questionDto.setAnswerFloat(questionResult.getAnswerFloat());
+			questionDto.setAnswerString(questionResult.getAnswerString());
+			questionDto.setMark(questionResult.getMark());
+			questionDto.setResponseSubmitted(questionResult.getFinishDate() != null);
+			questionDto.setPenalty(questionResult.getPenalty());
 
-			for (AssessmentQuestionOption option : question.getOptions()) {
+			for (OptionDTO optionDto : questionDto.getOptionDtos()) {
 			    
 			    for (AssessmentOptionAnswer optionAnswer : questionResult.getOptionAnswers()) {
-				if (option.getUid().equals(optionAnswer.getOptionUid())) {
-				    option.setAnswerBoolean(optionAnswer.getAnswerBoolean());
-				    option.setAnswerInt(optionAnswer.getAnswerInt());
+				if (optionDto.getUid().equals(optionAnswer.getOptionUid())) {
+				    optionDto.setAnswerBoolean(optionAnswer.getAnswerBoolean());
+				    optionDto.setAnswerInt(optionAnswer.getAnswerInt());
 				    break;
 				}
 			    }
 			}
 
 			//sort ordering type of question in order to show how learner has sorted them
-			if (question.getType() == AssessmentConstants.QUESTION_TYPE_ORDERING) {
+			if (questionDto.getType() == AssessmentConstants.QUESTION_TYPE_ORDERING) {
 			    
 			    //don't sort ordering type of questions that haven't been submitted to not break their shuffled order
 			    boolean isOptionAnswersNeverSubmitted = true;
-			    for (AssessmentQuestionOption option : question.getOptions()) {
-				if (option.getAnswerInt() != 0) {
+			    for (OptionDTO optionDto : questionDto.getOptionDtos()) {
+				if (optionDto.getAnswerInt() != 0) {
 				    isOptionAnswersNeverSubmitted = false;
 				}
 			    }
 
 			    if (!isOptionAnswersNeverSubmitted) {
-				TreeSet<AssessmentQuestionOption> orderedSet = new TreeSet<AssessmentQuestionOption>(
-					new AnswerIntComparator());
-				orderedSet.addAll(question.getOptions());
-				question.setOptions(orderedSet);
+				TreeSet<OptionDTO> orderedSet = new TreeSet<OptionDTO>(new AnswerIntComparator());
+				orderedSet.addAll(questionDto.getOptionDtos());
+				questionDto.setOptionDtos(orderedSet);
 			    }
 			}
 
 			// set answerTotalGrade to let jsp know whether the question was answered correctly/partly/incorrectly even if mark=0
-			if (question.getType() == AssessmentConstants.QUESTION_TYPE_MULTIPLE_CHOICE) {
+			if (questionDto.getType() == AssessmentConstants.QUESTION_TYPE_MULTIPLE_CHOICE) {
 			    float totalGrade = 0;
-			    for (AssessmentQuestionOption option : question.getOptions()) {
-				if (option.getAnswerBoolean()) {
-				    totalGrade += option.getGrade();
+			    for (OptionDTO optionDto : questionDto.getOptionDtos()) {
+				if (optionDto.getAnswerBoolean()) {
+				    totalGrade += optionDto.getGrade();
 				}
 			    }
-			    question.setAnswerTotalGrade(totalGrade);
+			    questionDto.setAnswerTotalGrade(totalGrade);
 			}
 
 			break;
@@ -1196,15 +1185,15 @@ public class LearningAction extends Action {
      */
     private boolean storeUserAnswersIntoDatabase(SessionMap<String, Object> sessionMap, boolean isAutosave) throws IllegalAccessException, InvocationTargetException, NoSuchMethodException {
 	
-	List<Set<AssessmentQuestion>> pagedQuestions = (List<Set<AssessmentQuestion>>) sessionMap
-		.get(AssessmentConstants.ATTR_PAGED_QUESTIONS);
+	List<Set<QuestionDTO>> pagedQuestionDtos = (List<Set<QuestionDTO>>) sessionMap
+		.get(AssessmentConstants.ATTR_PAGED_QUESTION_DTOS);
 	IAssessmentService service = getAssessmentService();
 	Long toolSessionId = (Long) sessionMap.get(AssessmentConstants.ATTR_TOOL_SESSION_ID);
 	Long userId = ((AssessmentUser) sessionMap.get(AssessmentConstants.ATTR_USER)).getUserId();
 	ToolAccessMode mode = (ToolAccessMode) sessionMap.get(AttributeNames.ATTR_MODE);
 	Assessment assessment = service.getAssessmentBySessionId(toolSessionId);
 	
-	boolean isResultsStored = service.storeUserAnswers(assessment, userId, pagedQuestions, null, isAutosave);
+	boolean isResultsStored = service.storeUserAnswers(assessment, userId, pagedQuestionDtos, null, isAutosave);
 
 	// notify teachers
 	if ((mode != null) && !mode.isTeacher() && !isAutosave && isResultsStored

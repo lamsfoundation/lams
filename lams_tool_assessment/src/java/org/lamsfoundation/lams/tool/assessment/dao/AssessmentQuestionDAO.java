@@ -23,19 +23,9 @@
 
 package org.lamsfoundation.lams.tool.assessment.dao;
 
-import java.util.List;
-
 import org.lamsfoundation.lams.tool.assessment.model.AssessmentQuestion;
 
 public interface AssessmentQuestionDAO extends DAO {
-
-    /**
-     * Return all assessment questions which is uploaded by author in given assessmentUid.
-     *
-     * @param assessmentUid
-     * @return
-     */
-    List getAuthoringQuestions(Long assessmentUid);
 
     AssessmentQuestion getByUid(Long assessmentQuestionUid);
 

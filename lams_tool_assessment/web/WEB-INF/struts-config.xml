@@ -218,7 +218,8 @@
 		<action path="/learning/start"
 			type="org.lamsfoundation.lams.tool.assessment.web.action.LearningAction"
 			parameter="start" >
-			<forward name="success" path="/pages/learning/learning.jsp" />
+			<forward name="learning" path="/pages/learning/learning.jsp" />
+			<forward name="showResults" path="/pages/learning/results.jsp" />
 			<forward name="defineLater" path="/pages/learning/definelater.jsp" />
 			<forward name="submissionDeadline" path="/pages/learning/submissionDeadline.jsp" />
 			<forward name="waitForLeader" path="/pages/learning/waitforleader.jsp" />
@@ -227,17 +228,19 @@
 		<action path="/learning/nextPage"
 			type="org.lamsfoundation.lams.tool.assessment.web.action.LearningAction"
 			parameter="nextPage" >
-			<forward name="success" path="/pages/learning/learning.jsp" />
+			<forward name="learning" path="/pages/learning/learning.jsp" />
+			<forward name="showResults" path="/pages/learning/results.jsp" />
 		</action>
 		<action path="/learning/submitAll"
 			type="org.lamsfoundation.lams.tool.assessment.web.action.LearningAction"
 			parameter="submitAll" >
-			<forward name="success" path="/pages/learning/learning.jsp" />
+			<forward name="learning" path="/pages/learning/learning.jsp" />
+			<forward name="showResults" path="/pages/learning/results.jsp" />
 		</action>
 		<action path="/learning/submitSingleMarkHedgingQuestion"
 			type="org.lamsfoundation.lams.tool.assessment.web.action.LearningAction"
 			parameter="submitSingleMarkHedgingQuestion" >
-			<forward name="success" path="/pages/learning/parts/markhedging.jsp" />
+			<forward name="success" path="/pages/learning/results/markhedging.jsp" />
 		</action>
 		<action path="/learning/checkLeaderProgress"
 			type="org.lamsfoundation.lams.tool.assessment.web.action.LearningAction"
@@ -247,8 +250,8 @@
 		<action path="/learning/resubmit"
 			type="org.lamsfoundation.lams.tool.assessment.web.action.LearningAction"
 			parameter="resubmit" >
-			<forward name="success" path="/pages/learning/learning.jsp" />
-			<forward name="startLearning" path="/learning/start.do" redirect="true"/>
+			<forward name="learning" path="/pages/learning/learning.jsp" />
+			<forward name="learningStartMethod" path="/learning/start.do" redirect="true"/>
 		</action>
 		<action path="/learning/finish"
 			type="org.lamsfoundation.lams.tool.assessment.web.action.LearningAction"
