@@ -56,4 +56,12 @@ public class AssessmentImportContentVersionFilter extends ToolContentVersionFilt
 	this.renameField(AssessmentQuestion.class, "questionOptions", "options");
 	this.addField(AssessmentQuestion.class, "answerRequired", "true");
     }
+    
+    /**
+     * Import 20140428 version content to 20140707 version tool server.
+     */
+    public void up20170101To20170315() {
+	this.removeField(AssessmentQuestion.class, "createDate");
+	this.removeField(AssessmentQuestion.class, "createBy");
+    }
 }

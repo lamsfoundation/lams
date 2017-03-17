@@ -9,6 +9,8 @@ ALTER TABLE `tl_laasse10_assessment_question` DROP COLUMN `create_by`, DROP INDE
 
 ALTER TABLE `tl_laasse10_assessment_question` DROP COLUMN `create_date`;
 
+UPDATE lams_tool SET tool_version='20170315' WHERE tool_signature='laasse10';
+
 ----------------------Put all sql statements above here-------------------------
 
 -- If there were no errors, commit and restore autocommit to on
