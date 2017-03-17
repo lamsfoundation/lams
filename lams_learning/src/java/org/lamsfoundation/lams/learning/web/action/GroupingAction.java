@@ -143,6 +143,7 @@ public class GroupingAction extends LamsDispatchAction {
 	DynaActionForm groupForm = (DynaActionForm) form;
 	groupForm.set("previewLesson", learnerProgress.getLesson().isPreviewLesson());
 	groupForm.set("title", activity.getTitle());
+	groupForm.set(AttributeNames.PARAM_ACTIVITY_ID, activity.getActivityId());
 
 	request.setAttribute(AttributeNames.PARAM_LESSON_ID, lessonId);
 	if (groupingDone) {

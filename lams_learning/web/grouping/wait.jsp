@@ -26,22 +26,18 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 <%@ taglib uri="tags-fmt" prefix="fmt"%>
 <%@ taglib uri="tags-lams" prefix="lams"%>
 
-<c:set var="formAction">/grouping.do?method=performGrouping&activityID=${activity.activityId}</c:set>
-<c:if test="${GroupingForm.map.previewLesson == true}">
-	<c:set var="formAction">
-		<c:out value="${formAction}" />&force=true</c:set>
-</c:if>
-
 <lams:Page type="learner" title="${GroupingForm.map.title}">
-	<html:form action="${formAction}" target="_self">
+	<html:form action="/grouping.do" target="_self">
+		<input type="hidden" name="method" value="performGrouping" />
+		<input type="hidden" name="activityID" value="${GroupingForm.map.activityID}" />
+		<input type="hidden" name="force" value="${GroupingForm.map.previewLesson}" />
+		
 
 		<lams:Alert id="waitingGroups" close="false" type="info">
 			<fmt:message key="label.view.view.groups.wait.message" />
 		</lams:Alert>
 
 		<c:if test="${GroupingForm.map.previewLesson == true}">
-			<c:set var="formAction">
-				<c:out value="${formAction}" />&force=true</c:set>
 			<div class="voffset10">
 				<em><fmt:message key="label.grouping.preview.message" /></em>
 			</div>
