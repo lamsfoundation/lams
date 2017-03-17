@@ -25,6 +25,7 @@
    <form-bean name="GroupingForm"  type="org.apache.struts.action.DynaActionForm">
 	<form-property name="title" type="java.lang.String" />
 	<form-property name="previewLesson" type="java.lang.Boolean" />
+	<form-property name="activityID" type="java.lang.Long" />
 	<!--  used for updating the the progress bar -->
 	<form-property name="lessonID" type="java.lang.Long" />
 	<form-property name="version" type="java.lang.Integer" />
