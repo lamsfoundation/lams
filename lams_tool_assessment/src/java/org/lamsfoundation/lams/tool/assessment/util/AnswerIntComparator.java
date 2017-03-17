@@ -25,7 +25,7 @@ package org.lamsfoundation.lams.tool.assessment.util;
 
 import java.util.Comparator;
 
-import org.lamsfoundation.lams.tool.assessment.model.AssessmentQuestionOption;
+import org.lamsfoundation.lams.tool.assessment.dto.OptionDTO;
 
 /**
  * AnswerIntComparator.
@@ -33,10 +33,10 @@ import org.lamsfoundation.lams.tool.assessment.model.AssessmentQuestionOption;
  * @author Andrey Balan
  *
  */
-public class AnswerIntComparator implements Comparator<AssessmentQuestionOption> {
+public class AnswerIntComparator implements Comparator<OptionDTO> {
 
     @Override
-    public int compare(AssessmentQuestionOption o1, AssessmentQuestionOption o2) {
+    public int compare(OptionDTO o1, OptionDTO o2) {
 	if ((o1 != null) && (o2 != null)) {
 	    return o1.getAnswerInt() - o2.getAnswerInt();
 	} else if (o1 != null) {

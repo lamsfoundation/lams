@@ -241,13 +241,6 @@ public class AuthoringAction extends Action {
 	    // if assessment does not exist, try to use default content instead.
 	    if (assessment == null) {
 		assessment = service.getDefaultContent(contentId);
-		if (assessment.getQuestions() != null) {
-		    questions = new ArrayList<AssessmentQuestion>(assessment.getQuestions());
-		} else {
-		    questions = null;
-		}
-	    } else {
-		questions = service.getAuthoredQuestions(assessment.getUid());
 	    }
 
 	    assessmentForm.setAssessment(assessment);
@@ -255,25 +248,13 @@ public class AuthoringAction extends Action {
 	    AuthoringAction.log.error(e);
 	    throw new ServletException(e);
 	}
-
-	// init it to avoid null exception in following handling
-	if (questions == null) {
-	    questions = new ArrayList<AssessmentQuestion>();
+	
+	if (assessment.getQuestions() != null) {
+	    questions = new ArrayList<AssessmentQuestion>(assessment.getQuestions());
 	} else {
-	    AssessmentUser assessmentUser = null;
-	    // handle system default question: createBy is null, now set it to current user
-	    for (AssessmentQuestion question : questions) {
-		if (question.getCreateBy() == null) {
-		    if (assessmentUser == null) {
-			// get back login user DTO
-			HttpSession ss = SessionManager.getSession();
-			UserDTO user = (UserDTO) ss.getAttribute(AttributeNames.USER);
-			assessmentUser = new AssessmentUser(user, assessment);
-		    }
-		    question.setCreateBy(assessmentUser);
-		}
-	    }
+	    questions = new ArrayList<AssessmentQuestion>();
 	}
+
 	// init assessment question list
 	SortedSet<AssessmentQuestion> questionList = getQuestionList(sessionMap);
 	questionList.clear();
@@ -410,8 +391,6 @@ public class AuthoringAction extends Action {
 	Set<AssessmentQuestion> questions = new LinkedHashSet<AssessmentQuestion>();
 	Set<AssessmentQuestion> newQuestions = getQuestionList(sessionMap);
 	for (AssessmentQuestion question : newQuestions) {
-	    // This flushes user UID info to message if this user is a new user.
-	    question.setCreateBy(assessmentUser);
 	    removeNewLineCharacters(question);
 	    questions.add(question);
 	}
@@ -596,7 +575,6 @@ public class AuthoringAction extends Action {
 	Question[] questions = QuestionParser.parseQuestionChoiceForm(request);
 	for (Question question : questions) {
 	    AssessmentQuestion assessmentQuestion = new AssessmentQuestion();
-	    assessmentQuestion.setCreateDate(new Timestamp(new Date().getTime()));
 	    int maxSeq = 1;
 	    if ((questionList != null) && (questionList.size() > 0)) {
 		AssessmentQuestion last = questionList.last();
@@ -1309,7 +1287,6 @@ public class AuthoringAction extends Action {
 		    fullFilePath);
 	    if (questions != null) {
 		for (AssessmentQuestion question : questions) {
-		    question.setCreateDate(new Timestamp(new Date().getTime()));
 		    int maxSeq = 1;
 		    if ((oldQuestions != null) && (oldQuestions.size() > 0)) {
 			AssessmentQuestion last = oldQuestions.last();
@@ -1352,7 +1329,6 @@ public class AuthoringAction extends Action {
 
 		for (AssessmentQuestion question : getQuestionList(sessionMap)) {
 		    AssessmentQuestion clonedQuestion = (AssessmentQuestion) question.clone();
-		    clonedQuestion.setCreateBy(null);
 		    questionsToExport.add(clonedQuestion);
 		}
 		// exporting XML
@@ -1811,7 +1787,7 @@ public class AuthoringAction extends Action {
 	/*
 	 * BE CAREFUL: This method will copy nessary info from request form to an old or new AssessmentQuestion
 	 * instance. It
-	 * gets all info EXCEPT AssessmentQuestion.createDate and AssessmentQuestion.createBy, which need be set when
+	 * gets all info EXCEPT AssessmentQuestion.createDate, which need be set when
 	 * persisting
 	 * this assessment Question.
 	 */
@@ -1824,7 +1800,6 @@ public class AuthoringAction extends Action {
 
 	if (questionIdx == -1) { // add
 	    question = new AssessmentQuestion();
-	    question.setCreateDate(new Timestamp(new Date().getTime()));
 	    int maxSeq = 1;
 	    if ((questionList != null) && (questionList.size() > 0)) {
 		AssessmentQuestion last = questionList.last();
@@ -2040,7 +2015,8 @@ public class AuthoringAction extends Action {
 		String sequenceId = paramMap.get(AssessmentConstants.ATTR_OPTION_SEQUENCE_ID_PREFIX + i);
 		option.setSequenceId(NumberUtils.toInt(sequenceId));
 		option.setOptionString(optionString);
-		option.setAnswerInt(i);
+		//TODO check the following line is not required
+//		option.setAnswerInt(i);
 		optionList.add(option);
 	    } else if (questionType == AssessmentConstants.QUESTION_TYPE_MARK_HEDGING) {
 		String optionString = paramMap.get(AssessmentConstants.ATTR_OPTION_STRING_PREFIX + i);

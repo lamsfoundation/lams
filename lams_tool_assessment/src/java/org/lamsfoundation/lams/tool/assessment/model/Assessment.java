@@ -127,16 +127,6 @@ public class Assessment implements Cloneable {
 	// reset user info as well
 	if (toContent.getCreatedBy() != null) {
 	    toContent.getCreatedBy().setAssessment(toContent);
-	    Set<AssessmentQuestion> questions = toContent.getQuestions();
-	    for (AssessmentQuestion question : questions) {
-		question.setCreateBy(toContent.getCreatedBy());
-	    }
-	    Set<QuestionReference> questionReferences = toContent.getQuestionReferences();
-	    for (QuestionReference questionReference : questionReferences) {
-		if (questionReference.getQuestion() != null) {
-		    questionReference.getQuestion().setCreateBy(toContent.getCreatedBy());
-		}
-	    }
 	}
 	return toContent;
     }

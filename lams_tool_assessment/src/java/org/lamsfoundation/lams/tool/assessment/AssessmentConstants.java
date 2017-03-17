@@ -59,6 +59,10 @@ public class AssessmentConstants {
 
     // for action forward name
     public static final String SUCCESS = "success";
+    
+    public static final String LEARNING = "learning";
+    
+    public static final String SHOW_RESULTS = "showResults";
 
     public static final String ERROR = "error";
 
@@ -201,7 +205,7 @@ public class AssessmentConstants {
 
     public static final String ATTR_PAGE_NUMBER = "pageNumber";
 
-    public static final String ATTR_PAGED_QUESTIONS = "pagedQuestions";
+    public static final String ATTR_PAGED_QUESTION_DTOS = "pagedQuestions";
 
     public static final String ATTR_QUESTION_FOR_ORDERING = "questionForOrdering";
 
@@ -213,7 +217,7 @@ public class AssessmentConstants {
 
     public static final String ATTR_IS_ANSWERS_VALIDATION_FAILED = "isAnswersValidationFailed";
 
-    public static final String ATTR_FINISHED_LOCK = "finishedLock";
+    public static final String ATTR_SHOW_RESULTS = "showResults";
 
     public static final String ATTR_USER_FINISHED = "userFinished";
 

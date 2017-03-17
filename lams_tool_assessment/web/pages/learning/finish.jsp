@@ -4,11 +4,8 @@
 
 <html>
 	<body class="stripes">
-	<script type="text/javascript">
-	<!--
-		document.location.href = "${nextActivityUrl}";
-	-->        
-    </script>
-	
+		<script type="text/javascript">
+			document.location.href = "${nextActivityUrl}";
+	    </script>
 	</body>
 </html>

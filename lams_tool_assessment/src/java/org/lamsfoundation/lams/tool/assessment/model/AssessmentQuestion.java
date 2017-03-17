@@ -23,9 +23,7 @@
 
 package org.lamsfoundation.lams.tool.assessment.model;
 
-import java.util.Date;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
 
@@ -33,6 +31,7 @@ import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.commons.lang.builder.ToStringBuilder;
 import org.apache.log4j.Logger;
+import org.lamsfoundation.lams.tool.assessment.dto.QuestionDTO;
 import org.lamsfoundation.lams.tool.assessment.util.SequencableComparator;
 
 /**
@@ -84,10 +83,6 @@ public class AssessmentQuestion implements Cloneable, Sequencable, Comparable {
 
     private boolean allowRichEditor;
 
-    private Date createDate;
-
-    private AssessmentUser createBy;
-
     private Set<AssessmentQuestionOption> options;
 
     private Set<AssessmentUnit> units;
@@ -100,33 +95,9 @@ public class AssessmentQuestion implements Cloneable, Sequencable, Comparable {
     // only for hedging mark type of question
     private boolean hedgingJustificationEnabled;
 
-    // DTO fields:
-    private String answerString;
-
-    private float answerFloat;
-
-    private boolean answerBoolean;
-
-    private String questionFeedback;
-
+    // *************** NON Persist Fields used in monitoring ********************
+    
     private String titleEscaped;
-
-    private boolean responseSubmitted;
-
-    /**
-     * Grade acquired from QUestionReference in learner.
-     */
-    private int grade;
-
-    private float mark;
-
-    private float penalty;
-
-    private float answerTotalGrade;
-
-    private Set<AssessmentQuestionOption> matchingPairOptions;
-
-    private List<Object[]> questionResults;
 
     public AssessmentQuestion() {
 	options = new TreeSet<AssessmentQuestionOption>(new SequencableComparator());
@@ -205,6 +176,12 @@ public class AssessmentQuestion implements Cloneable, Sequencable, Comparable {
     public int hashCode() {
 	return new HashCodeBuilder().append(getUid()).append(getSequenceId()).toHashCode();
     }
+    
+    public QuestionDTO getQuestionDTO() {
+	QuestionDTO questionDTO = new QuestionDTO(this);
+
+	return questionDTO;
+    }
 
     // **********************************************************
     // Get/Set methods
@@ -225,38 +202,23 @@ public class AssessmentQuestion implements Cloneable, Sequencable, Comparable {
 	this.uid = userID;
     }
 
-    /**
-     *
-     * @return
-     */
     public short getType() {
 	return type;
     }
-
     public void setType(short type) {
 	this.type = type;
     }
 
-    /**
-     *
-     * @return
-     */
     public String getTitle() {
 	return title;
     }
-
     public void setTitle(String title) {
 	this.title = title;
     }
 
-    /**
-     *
-     * @return
-     */
     public String getQuestion() {
 	return question;
     }
-
     public void setQuestion(String question) {
 	this.question = question;
     }
@@ -265,8 +227,6 @@ public class AssessmentQuestion implements Cloneable, Sequencable, Comparable {
      * Returns image sequence number.
      *
      * @return image sequence number
-     *
-     *
      */
     @Override
     public int getSequenceId() {
@@ -286,10 +246,6 @@ public class AssessmentQuestion implements Cloneable, Sequencable, Comparable {
 
     /**
      * Default grade set in author. To be used only in author
-     *
-     *
-     *
-     * @return
      */
     public int getDefaultGrade() {
 	return defaultGrade;
@@ -303,193 +259,98 @@ public class AssessmentQuestion implements Cloneable, Sequencable, Comparable {
 	this.defaultGrade = defaultGrade;
     }
 
-    /**
-     *
-     * @return
-     */
     public float getPenaltyFactor() {
 	return penaltyFactor;
     }
-
     public void setPenaltyFactor(float penaltyFactor) {
 	this.penaltyFactor = penaltyFactor;
     }
 
-    /**
-     *
-     * @return
-     */
     public boolean isAnswerRequired() {
 	return answerRequired;
     }
-
     public void setAnswerRequired(boolean answerRequired) {
 	this.answerRequired = answerRequired;
     }
 
-    /**
-     *
-     * @return
-     */
     public String getGeneralFeedback() {
 	return generalFeedback;
     }
-
     public void setGeneralFeedback(String generalFeedback) {
 	this.generalFeedback = generalFeedback;
     }
 
-    /**
-     *
-     * @return
-     */
     public String getFeedback() {
 	return feedback;
     }
-
     public void setFeedback(String feedback) {
 	this.feedback = feedback;
     }
 
-    /**
-     *
-     * @return
-     */
     public boolean isMultipleAnswersAllowed() {
 	return multipleAnswersAllowed;
     }
-
     public void setMultipleAnswersAllowed(boolean multipleAnswersAllowed) {
 	this.multipleAnswersAllowed = multipleAnswersAllowed;
     }
 
-    /**
-     *
-     * @return
-     */
     public boolean isIncorrectAnswerNullifiesMark() {
 	return incorrectAnswerNullifiesMark;
     }
-
     public void setIncorrectAnswerNullifiesMark(boolean incorrectAnswerNullifiesMark) {
 	this.incorrectAnswerNullifiesMark = incorrectAnswerNullifiesMark;
     }
 
-    /**
-     *
-     * @return
-     */
     public String getFeedbackOnCorrect() {
 	return feedbackOnCorrect;
     }
-
     public void setFeedbackOnCorrect(String feedbackOnCorrect) {
 	this.feedbackOnCorrect = feedbackOnCorrect;
     }
 
-    /**
-     *
-     * @return
-     */
     public String getFeedbackOnPartiallyCorrect() {
 	return feedbackOnPartiallyCorrect;
     }
-
     public void setFeedbackOnPartiallyCorrect(String feedbackOnPartiallyCorrect) {
 	this.feedbackOnPartiallyCorrect = feedbackOnPartiallyCorrect;
     }
 
-    /**
-     *
-     * @return
-     */
     public String getFeedbackOnIncorrect() {
 	return feedbackOnIncorrect;
     }
-
     public void setFeedbackOnIncorrect(String feedbackOnIncorrect) {
 	this.feedbackOnIncorrect = feedbackOnIncorrect;
     }
 
-    /**
-     *
-     * @return
-     */
     public boolean isShuffle() {
 	return shuffle;
     }
-
     public void setShuffle(boolean shuffle) {
 	this.shuffle = shuffle;
     }
 
-    /**
-     *
-     * @return
-     */
     public boolean isCaseSensitive() {
 	return caseSensitive;
     }
-
     public void setCaseSensitive(boolean caseSensitive) {
 	this.caseSensitive = caseSensitive;
     }
 
-    /**
-     *
-     * @return
-     */
     public boolean getCorrectAnswer() {
 	return correctAnswer;
     }
-
     public void setCorrectAnswer(boolean correctAnswer) {
 	this.correctAnswer = correctAnswer;
     }
 
-    /**
-     *
-     * @return
-     */
     public boolean isAllowRichEditor() {
 	return allowRichEditor;
     }
-
     public void setAllowRichEditor(boolean allowRichEditor) {
 	this.allowRichEditor = allowRichEditor;
     }
 
     /**
-     *
-     * @return
-     */
-    public Date getCreateDate() {
-	return createDate;
-    }
-
-    public void setCreateDate(Date createDate) {
-	this.createDate = createDate;
-    }
-
-    /**
-     *
-     *
-     * @return
-     */
-    public AssessmentUser getCreateBy() {
-	return createBy;
-    }
-
-    public void setCreateBy(AssessmentUser createBy) {
-	this.createBy = createBy;
-    }
-
-    /**
-     *
-     *
-     *
-     *
-     *
      * @return a set of options to this AssessmentQuestion.
      */
     public Set<AssessmentQuestionOption> getOptions() {
@@ -505,11 +366,6 @@ public class AssessmentQuestion implements Cloneable, Sequencable, Comparable {
     }
 
     /**
-     *
-     *
-     *
-     *
-     *
      * @return a set of units to this AssessmentQuestion.
      */
     public Set<AssessmentUnit> getUnits() {
@@ -526,10 +382,6 @@ public class AssessmentQuestion implements Cloneable, Sequencable, Comparable {
 
     /**
      * maxWordsLimit set in author. Used only for essay type of questions
-     *
-     *
-     *
-     * @return
      */
     public int getMaxWordsLimit() {
 	return maxWordsLimit;
@@ -545,10 +397,6 @@ public class AssessmentQuestion implements Cloneable, Sequencable, Comparable {
 
     /**
      * minWordsLimit set in author. Used only for essay type of questions
-     *
-     *
-     *
-     * @return
      */
     public int getMinWordsLimit() {
 	return minWordsLimit;
@@ -562,118 +410,19 @@ public class AssessmentQuestion implements Cloneable, Sequencable, Comparable {
 	this.minWordsLimit = minWordsLimit;
     }
 
-    /**
-     *
-     * @return
-     */
     public boolean isHedgingJustificationEnabled() {
 	return hedgingJustificationEnabled;
     }
-
     public void setHedgingJustificationEnabled(boolean hedgingJustificationEnabled) {
 	this.hedgingJustificationEnabled = hedgingJustificationEnabled;
     }
-
-    public String getAnswerString() {
-	return answerString;
-    }
-
-    public void setAnswerString(String answerString) {
-	this.answerString = answerString;
-    }
-
-    public float getAnswerFloat() {
-	return answerFloat;
-    }
-
-    public void setAnswerFloat(float answerFloat) {
-	this.answerFloat = answerFloat;
-    }
-
-    public boolean getAnswerBoolean() {
-	return answerBoolean;
-    }
-
-    public void setAnswerBoolean(boolean answerBoolean) {
-	this.answerBoolean = answerBoolean;
-    }
-
-    public void setQuestionFeedback(String questionFeedback) {
-	this.questionFeedback = questionFeedback;
-    }
-
-    public String getQuestionFeedback() {
-	return questionFeedback;
-    }
+    
+    // *************** NON Persist Fields used in monitoring ********************
 
     public String getTitleEscaped() {
 	return titleEscaped;
     }
-
     public void setTitleEscaped(String titleEscaped) {
 	this.titleEscaped = titleEscaped;
-    }
-
-    /**
-     * @return Grade acquired from QUestionReference in learner.
-     */
-    public int getGrade() {
-	return grade;
-    }
-
-    /**
-     * @param grade
-     *            Grade acquired from QuestionReference in learner.
-     */
-    public void setGrade(int grade) {
-	this.grade = grade;
-    }
-
-    public Float getMark() {
-	return mark;
-    }
-
-    public void setMark(Float mark) {
-	this.mark = mark;
-    }
-
-    public Float getPenalty() {
-	return penalty;
-    }
-
-    public void setPenalty(Float penalty) {
-	this.penalty = penalty;
-    }
-
-    public Set<AssessmentQuestionOption> getMatchingPairOptions() {
-	return matchingPairOptions;
-    }
-
-    public void setMatchingPairOptions(Set<AssessmentQuestionOption> matchingPairOptions) {
-	this.matchingPairOptions = matchingPairOptions;
-    }
-
-    public List<Object[]> getQuestionResults() {
-	return questionResults;
-    }
-
-    public void setQuestionResults(List<Object[]> questionResults2) {
-	this.questionResults = questionResults2;
-    }
-
-    public boolean isResponseSubmitted() {
-	return responseSubmitted;
-    }
-
-    public void setResponseSubmitted(boolean responseSubmitted) {
-	this.responseSubmitted = responseSubmitted;
-    }
-
-    public float getAnswerTotalGrade() {
-	return answerTotalGrade;
-    }
-
-    public void setAnswerTotalGrade(float answerTotalGrade) {
-	this.answerTotalGrade = answerTotalGrade;
     }
 }

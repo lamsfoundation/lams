@@ -33,14 +33,6 @@ import org.springframework.stereotype.Repository;
 @Repository
 public class AssessmentQuestionDAOHibernate extends LAMSBaseDAO implements AssessmentQuestionDAO {
 
-    private static final String FIND_AUTHORING_QUESTIONS = "from " + AssessmentQuestion.class.getName()
-	    + " where assessment_uid = ? order by create_date asc";
-
-    @Override
-    public List getAuthoringQuestions(Long assessmentUid) {
-	return doFind(FIND_AUTHORING_QUESTIONS, assessmentUid);
-    }
-
     @Override
     public AssessmentQuestion getByUid(Long assessmentQuestionUid) {
 	return (AssessmentQuestion) this.getObject(AssessmentQuestion.class, assessmentQuestionUid);

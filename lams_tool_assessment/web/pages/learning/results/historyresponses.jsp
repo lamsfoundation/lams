@@ -1,6 +1,6 @@
 <%@ include file="/common/taglibs.jsp"%>
 
-<c:if test="${finishedLock && (fn:length(question.questionResults) > 1) && assessment.allowHistoryResponses}">
+<c:if test="${assessment.allowHistoryResponses && (fn:length(question.questionResults) > 1)}">
 	<div id="quesion-summary-title">
 		<fmt:message key="label.learning.question.summary.history.responces" />
 	</div>
@@ -37,7 +37,7 @@
 				<td>
 					<c:choose>
 						<c:when test="${question.type == 1}">
-							<c:forEach var="option" items="${question.options}">
+							<c:forEach var="option" items="${question.optionDtos}">
 								<c:forEach var="optionAnswer" items="${questionResult.optionAnswers}">
 									<c:if test="${optionAnswer.answerBoolean && (optionAnswer.optionUid == option.uid)}">
 										${option.optionString}
@@ -47,7 +47,7 @@
 						</c:when>
 						<c:when test="${question.type == 2}">
 							<table style="padding: 0px; margin: 0px; border: none; " cellspacing="0" cellpadding="0">
-								<c:forEach var="option" items="${question.options}">
+								<c:forEach var="option" items="${question.optionDtos}">
 									<tr>
 										<td style="width:40%; background: none; padding: 0px; margin: 0px; border: none;">
 											${option.question}
@@ -56,7 +56,7 @@
 											- 
 											<c:forEach var="optionAnswer" items="${questionResult.optionAnswers}">
 												<c:if test="${option.uid == optionAnswer.optionUid}">
-													<c:forEach var="questionOption2" items="${question.options}">
+													<c:forEach var="questionOption2" items="${question.optionDtos}">
 														<c:if test="${questionOption2.uid == optionAnswer.answerInt}">
 															${questionOption2.optionString}
 														</c:if>
@@ -86,7 +86,7 @@
 							<c:forEach var="i" begin="0" end="${fn:length(questionResult.optionAnswers) - 1}" step="1">
 								<c:forEach var="optionAnswer" items="${questionResult.optionAnswers}">
 									<c:if test="${optionAnswer.answerInt == i}">		
-										<c:forEach var="option" items="${question.options}">
+										<c:forEach var="option" items="${question.optionDtos}">
 											<c:if test="${optionAnswer.optionUid == option.uid}">
 												${option.optionString}
 											</c:if>

@@ -51,10 +51,7 @@ public class AssessmentQuestionOption implements Cloneable, Sequencable {
 
     private String feedback;
 
-    // *************** NON Persist Fields ********************
-    private int answerInt = -1;
-
-    private boolean answerBoolean;
+    // *************** DTO fields (used in monitoring) ********************
 
     private String questionEscaped;
 
@@ -195,22 +192,6 @@ public class AssessmentQuestionOption implements Cloneable, Sequencable {
 
     public void setFeedback(String feedback) {
 	this.feedback = feedback;
-    }
-
-    public int getAnswerInt() {
-	return answerInt;
-    }
-
-    public void setAnswerInt(int answerInt) {
-	this.answerInt = answerInt;
-    }
-
-    public boolean getAnswerBoolean() {
-	return answerBoolean;
-    }
-
-    public void setAnswerBoolean(boolean answerBoolean) {
-	this.answerBoolean = answerBoolean;
     }
 
     public String getQuestionEscaped() {

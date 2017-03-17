@@ -74,6 +74,8 @@ import org.lamsfoundation.lams.tool.assessment.dao.AssessmentResultDAO;
 import org.lamsfoundation.lams.tool.assessment.dao.AssessmentSessionDAO;
 import org.lamsfoundation.lams.tool.assessment.dao.AssessmentUserDAO;
 import org.lamsfoundation.lams.tool.assessment.dto.AssessmentUserDTO;
+import org.lamsfoundation.lams.tool.assessment.dto.OptionDTO;
+import org.lamsfoundation.lams.tool.assessment.dto.QuestionDTO;
 import org.lamsfoundation.lams.tool.assessment.dto.QuestionSummary;
 import org.lamsfoundation.lams.tool.assessment.dto.ReflectDTO;
 import org.lamsfoundation.lams.tool.assessment.dto.SessionDTO;
@@ -361,11 +363,6 @@ public class AssessmentServiceImpl
     }
 
     @Override
-    public List getAuthoredQuestions(Long assessmentUid) {
-	return assessmentQuestionDao.getAuthoringQuestions(assessmentUid);
-    }
-
-    @Override
     public void createUser(AssessmentUser assessmentUser) {
 	// make sure the user was not created in the meantime
 	AssessmentUser user = getUserByIDAndSession(assessmentUser.getUserId(),
@@ -505,8 +502,9 @@ public class AssessmentServiceImpl
     }
 
     @Override
-    public boolean storeUserAnswers(Assessment assessment, Long userId, List<Set<AssessmentQuestion>> pagedQuestions, Long singleMarkHedgingQuestionUid,
-	    boolean isAutosave) throws IllegalAccessException, InvocationTargetException, NoSuchMethodException {
+    public boolean storeUserAnswers(Assessment assessment, Long userId, List<Set<QuestionDTO>> pagedQuestions,
+	    Long singleMarkHedgingQuestionUid, boolean isAutosave)
+	    throws IllegalAccessException, InvocationTargetException, NoSuchMethodException {
 
 	int maximumGrade = 0;
 	float grade = 0;
@@ -521,15 +519,14 @@ public class AssessmentServiceImpl
 	}
 
 	// store all answers (in all pages)
-	for (Set<AssessmentQuestion> questionsForOnePage : pagedQuestions) {
-	    for (AssessmentQuestion question : questionsForOnePage) {
+	for (Set<QuestionDTO> questionsForOnePage : pagedQuestions) {
+	    for (QuestionDTO questionDto : questionsForOnePage) {
 
 		// in case single MarkHedging question needs to be stored -- search for that question
-		if ((singleMarkHedgingQuestionUid != null) && !question.getUid().equals(singleMarkHedgingQuestionUid)) {
+		if ((singleMarkHedgingQuestionUid != null) && !questionDto.getUid().equals(singleMarkHedgingQuestionUid)) {
 		    continue;
 		}
 
-		//TODO possibly move the next if-clause inside of storeUserAnswer() method
 		// In case if assessment was modified in monitor after result has been started check question still exists in DB as
 		// it could be deleted
 		if (assessment.isContentModifiedInMonitor(result.getStartDate())) {
@@ -539,13 +536,13 @@ public class AssessmentServiceImpl
 		    boolean isQuestionExists = false;
 		    for (QuestionReference reference : references) {
 			if (!reference.isRandomQuestion()
-				&& reference.getQuestion().getUid().equals(question.getUid())) {
+				&& reference.getQuestion().getUid().equals(questionDto.getUid())) {
 			    isQuestionExists = true;
 			    break;
 			}
 			if (reference.isRandomQuestion()) {
 			    for (AssessmentQuestion questionDb : questions) {
-				if (questionDb.getUid().equals(question.getUid())) {
+				if (questionDb.getUid().equals(questionDto.getUid())) {
 				    isQuestionExists = true;
 				    break;
 				}
@@ -557,10 +554,10 @@ public class AssessmentServiceImpl
 		    }
 		}
 
-		float userQeustionGrade = storeUserAnswer(result, question, isAutosave);
+		float userQeustionGrade = storeUserAnswer(result, questionDto, isAutosave);
 		grade += userQeustionGrade;
 
-		maximumGrade += question.getGrade();
+		maximumGrade += questionDto.getGrade();
 	    }
 	}
 
@@ -587,20 +584,21 @@ public class AssessmentServiceImpl
      * @throws InvocationTargetException 
      * @throws IllegalAccessException 
      */
-    private float storeUserAnswer(AssessmentResult assessmentResult, AssessmentQuestion question, boolean isAutosave) throws IllegalAccessException, InvocationTargetException, NoSuchMethodException {
-
+    private float storeUserAnswer(AssessmentResult assessmentResult, QuestionDTO questionDto, boolean isAutosave) throws IllegalAccessException, InvocationTargetException, NoSuchMethodException {
+	Assessment assessment = assessmentResult.getAssessment();
+	
 	AssessmentQuestionResult questionResult = null;
 	// get questionResult from DB instance of AssessmentResult
 	for (AssessmentQuestionResult questionResultIter : assessmentResult.getQuestionResults()) {
-	    if (question.getUid().equals(questionResultIter.getAssessmentQuestion().getUid())) {
+	    if (questionDto.getUid().equals(questionResultIter.getAssessmentQuestion().getUid())) {
 		questionResult = questionResultIter;
 	    }
 	}
 	
 	if (assessmentResult.getFinishDate() == null && questionResult == null) {
 	    //it should get here only in case teacher edited content in monitor which led to removal of autosave questionResult
-	    AssessmentQuestion modifiedQuestion = assessmentQuestionDao.getByUid(question.getUid());
-	    PropertyUtils.copyProperties(question, modifiedQuestion);
+	    AssessmentQuestion modifiedQuestion = assessmentQuestionDao.getByUid(questionDto.getUid());
+	    PropertyUtils.copyProperties(questionDto, modifiedQuestion);
 	    return 0;
 	    
 //	    questionResult = createQuestionResultObject(question);
@@ -609,67 +607,67 @@ public class AssessmentServiceImpl
 	}
 
 	// store question answer values
-	questionResult.setAnswerBoolean(question.getAnswerBoolean());
-	questionResult.setAnswerFloat(question.getAnswerFloat());
-	questionResult.setAnswerString(question.getAnswerString());
+	questionResult.setAnswerBoolean(questionDto.getAnswerBoolean());
+	questionResult.setAnswerFloat(questionDto.getAnswerFloat());
+	questionResult.setAnswerString(questionDto.getAnswerString());
 
 	int j = 0;
-	for (AssessmentQuestionOption option : question.getOptions()) {
+	for (OptionDTO optionDto : questionDto.getOptionDtos()) {
 
 	    // find according optionAnswer
 	    AssessmentOptionAnswer optionAnswer = null;
 	    for (AssessmentOptionAnswer optionAnswerIter : questionResult.getOptionAnswers()) {
-		if (option.getUid().equals(optionAnswerIter.getOptionUid())) {
+		if (optionDto.getUid().equals(optionAnswerIter.getOptionUid())) {
 		    optionAnswer = optionAnswerIter;
 		}
 	    }
 
 	    // store option answer values
-	    optionAnswer.setAnswerBoolean(option.getAnswerBoolean());
-	    optionAnswer.setAnswerInt(option.getAnswerInt());
-	    if (question.getType() == AssessmentConstants.QUESTION_TYPE_ORDERING) {
+	    optionAnswer.setAnswerBoolean(optionDto.getAnswerBoolean());
+	    optionAnswer.setAnswerInt(optionDto.getAnswerInt());
+	    if (questionDto.getType() == AssessmentConstants.QUESTION_TYPE_ORDERING) {
 		optionAnswer.setAnswerInt(j++);
 	    }
 	}
 
 	float mark = 0;
-	float maxMark = question.getGrade();
-	if (question.getType() == AssessmentConstants.QUESTION_TYPE_MULTIPLE_CHOICE) {
+	float maxMark = questionDto.getGrade();
+	if (questionDto.getType() == AssessmentConstants.QUESTION_TYPE_MULTIPLE_CHOICE) {
 	    boolean isMarkNullified = false;
 	    float totalGrade = 0;
-	    for (AssessmentQuestionOption option : question.getOptions()) {
-		if (option.getAnswerBoolean()) {
-		    totalGrade += option.getGrade();
-		    mark += option.getGrade() * maxMark;
+	    for (OptionDTO optionDto : questionDto.getOptionDtos()) {
+		if (optionDto.getAnswerBoolean()) {
+		    totalGrade += optionDto.getGrade();
+		    mark += optionDto.getGrade() * maxMark;
 
 		    // if option of "incorrect answer nullifies mark" is ON check if selected answer has a zero grade
 		    // and if so nullify question's mark
-		    if (question.isIncorrectAnswerNullifiesMark() && (option.getGrade() == 0)) {
+		    if (questionDto.isIncorrectAnswerNullifiesMark() && (optionDto.getGrade() == 0)) {
 			isMarkNullified = true;
 		    }
 		}
 	    }
 	    // set answerTotalGrade to let jsp know whether the question was answered correctly/partly/incorrectly even if mark=0
-	    question.setAnswerTotalGrade(totalGrade);
+	    questionDto.setAnswerTotalGrade(totalGrade);
 
 	    if (isMarkNullified) {
 		mark = 0;
 	    }
 
-	} else if (question.getType() == AssessmentConstants.QUESTION_TYPE_MATCHING_PAIRS) {
-	    float maxMarkForCorrectAnswer = maxMark / question.getOptions().size();
-	    for (AssessmentQuestionOption option : question.getOptions()) {
-		if (option.getAnswerInt() == option.getUid()) {
+	} else if (questionDto.getType() == AssessmentConstants.QUESTION_TYPE_MATCHING_PAIRS) {
+	    float maxMarkForCorrectAnswer = maxMark / questionDto.getOptionDtos().size();
+	    for (OptionDTO optionDto : questionDto.getOptionDtos()) {
+		if (optionDto.getAnswerInt() == optionDto.getUid()) {
 		    mark += maxMarkForCorrectAnswer;
 		}
 	    }
 
-	} else if (question.getType() == AssessmentConstants.QUESTION_TYPE_SHORT_ANSWER) {
-	    for (AssessmentQuestionOption option : question.getOptions()) {
+	} else if (questionDto.getType() == AssessmentConstants.QUESTION_TYPE_SHORT_ANSWER) {
+	    for (OptionDTO optionDto : questionDto.getOptionDtos()) {
 
 		//prepare regex which takes into account only * special character
 		String regexWithOnlyAsteriskSymbolActive = "\\Q";
-		String optionString = option.getOptionString().trim();
+		String optionString = optionDto.getOptionString().trim();
 		for (int i = 0; i < optionString.length(); i++) {
 		    //everything in between \\Q and \\E are taken literally no matter which characters it contains
 		    if (optionString.charAt(i) == '*') {
@@ -682,36 +680,36 @@ public class AssessmentServiceImpl
 
 		//check whether answer matches regex
 		Pattern pattern;
-		if (question.isCaseSensitive()) {
+		if (questionDto.isCaseSensitive()) {
 		    pattern = Pattern.compile(regexWithOnlyAsteriskSymbolActive);
 		} else {
 		    pattern = Pattern.compile(regexWithOnlyAsteriskSymbolActive,
 			    java.util.regex.Pattern.CASE_INSENSITIVE | java.util.regex.Pattern.UNICODE_CASE);
 		}
-		boolean isAnswerMatchedCurrentOption = (question.getAnswerString() != null)
-			? pattern.matcher(question.getAnswerString().trim()).matches() : false;
+		boolean isAnswerMatchedCurrentOption = (questionDto.getAnswerString() != null)
+			? pattern.matcher(questionDto.getAnswerString().trim()).matches() : false;
 
 		if (isAnswerMatchedCurrentOption) {
-		    mark = option.getGrade() * maxMark;
-		    questionResult.setSubmittedOptionUid(option.getUid());
+		    mark = optionDto.getGrade() * maxMark;
+		    questionResult.setSubmittedOptionUid(optionDto.getUid());
 		    break;
 		}
 	    }
 
-	} else if (question.getType() == AssessmentConstants.QUESTION_TYPE_NUMERICAL) {
-	    String answerString = question.getAnswerString();
+	} else if (questionDto.getType() == AssessmentConstants.QUESTION_TYPE_NUMERICAL) {
+	    String answerString = questionDto.getAnswerString();
 	    if (answerString != null) {
-		for (AssessmentQuestionOption option : question.getOptions()) {
+		for (OptionDTO optionDto : questionDto.getOptionDtos()) {
 		    boolean isAnswerMatchedCurrentOption = false;
 		    try {
-			float answerFloat = Float.valueOf(question.getAnswerString());
-			isAnswerMatchedCurrentOption = ((answerFloat >= (option.getOptionFloat() - option.getAcceptedError()))
-				&& (answerFloat <= (option.getOptionFloat() + option.getAcceptedError())));
+			float answerFloat = Float.valueOf(questionDto.getAnswerString());
+			isAnswerMatchedCurrentOption = ((answerFloat >= (optionDto.getOptionFloat() - optionDto.getAcceptedError()))
+				&& (answerFloat <= (optionDto.getOptionFloat() + optionDto.getAcceptedError())));
 		    } catch (Exception e) {
 		    }
 
 		    if (!isAnswerMatchedCurrentOption) {
-			for (AssessmentUnit unit : question.getUnits()) {
+			for (AssessmentUnit unit : questionDto.getUnits()) {
 			    String regex = ".*" + unit.getUnit() + "$";
 			    Pattern pattern = Pattern.compile(regex,
 				    java.util.regex.Pattern.CASE_INSENSITIVE | java.util.regex.Pattern.UNICODE_CASE);
@@ -721,9 +719,9 @@ public class AssessmentServiceImpl
 				try {
 				    float answerFloat = Float.valueOf(answerFloatStr);
 				    answerFloat = answerFloat / unit.getMultiplier();
-				    isAnswerMatchedCurrentOption = ((answerFloat >= (option.getOptionFloat()
-					    - option.getAcceptedError()))
-					    && (answerFloat <= (option.getOptionFloat() + option.getAcceptedError())));
+				    isAnswerMatchedCurrentOption = ((answerFloat >= (optionDto.getOptionFloat()
+					    - optionDto.getAcceptedError()))
+					    && (answerFloat <= (optionDto.getOptionFloat() + optionDto.getAcceptedError())));
 				    if (isAnswerMatchedCurrentOption) {
 					break;
 				    }
@@ -733,36 +731,36 @@ public class AssessmentServiceImpl
 			}
 		    }
 		    if (isAnswerMatchedCurrentOption) {
-			mark = option.getGrade() * maxMark;
-			questionResult.setSubmittedOptionUid(option.getUid());
+			mark = optionDto.getGrade() * maxMark;
+			questionResult.setSubmittedOptionUid(optionDto.getUid());
 			break;
 		    }
 		}
 	    }
 
-	} else if (question.getType() == AssessmentConstants.QUESTION_TYPE_TRUE_FALSE) {
-	    if ((question.getAnswerBoolean() == question.getCorrectAnswer()) && (question.getAnswerString() != null)) {
+	} else if (questionDto.getType() == AssessmentConstants.QUESTION_TYPE_TRUE_FALSE) {
+	    if ((questionDto.getAnswerBoolean() == questionDto.getCorrectAnswer()) && (questionDto.getAnswerString() != null)) {
 		mark = maxMark;
 	    }
 
-	} else if (question.getType() == AssessmentConstants.QUESTION_TYPE_ORDERING) {
-	    float maxMarkForCorrectAnswer = maxMark / question.getOptions().size();
-	    TreeSet<AssessmentQuestionOption> correctOptionSet = new TreeSet<AssessmentQuestionOption>(
-		    new SequencableComparator());
-	    correctOptionSet.addAll(question.getOptions());
-	    ArrayList<AssessmentQuestionOption> correctOptionList = new ArrayList<AssessmentQuestionOption>(
-		    correctOptionSet);
+	} else if (questionDto.getType() == AssessmentConstants.QUESTION_TYPE_ORDERING) {
+	    float maxMarkForCorrectAnswer = maxMark / questionDto.getOptionDtos().size();
+	    TreeSet<OptionDTO> correctOptionSet = new TreeSet<OptionDTO>(new SequencableComparator());
+	    correctOptionSet.addAll(questionDto.getOptionDtos());
+	    ArrayList<OptionDTO> correctOptionList = new ArrayList<OptionDTO>(correctOptionSet);
 	    int i = 0;
-	    for (AssessmentQuestionOption option : question.getOptions()) {
-		if (option.getUid() == correctOptionList.get(i++).getUid()) {
+	    for (OptionDTO optionDto : questionDto.getOptionDtos()) {
+		if (optionDto.getUid() == correctOptionList.get(i++).getUid()) {
 		    mark += maxMarkForCorrectAnswer;
 		}
 	    }
 
-	} else if (question.getType() == AssessmentConstants.QUESTION_TYPE_MARK_HEDGING) {
-	    for (AssessmentQuestionOption option : question.getOptions()) {
-		if (option.isCorrect()) {
-		    mark += option.getAnswerInt();
+	} else if (questionDto.getType() == AssessmentConstants.QUESTION_TYPE_MARK_HEDGING) {
+	    for (OptionDTO optionDto : questionDto.getOptionDtos()) {
+		if (optionDto.isCorrect()) {
+		    //if hedgingMark is a default '-1', change it to '0'
+		    int hedgingMark = optionDto.getAnswerInt() == -1 ? 0 : optionDto.getAnswerInt();
+		    mark += hedgingMark;
 		    break;
 		}
 	    }
@@ -787,10 +785,10 @@ public class AssessmentServiceImpl
 		Long assessmentUid = assessmentResult.getAssessment().getUid();
 		Long userId = assessmentResult.getUser().getUserId();
 		int numberWrongAnswers = assessmentQuestionResultDao.getNumberWrongAnswersDoneBefore(assessmentUid,
-			userId, question.getUid());
+			userId, questionDto.getUid());
 
 		// calculate penalty itself
-		float penalty = question.getPenaltyFactor() * numberWrongAnswers;
+		float penalty = questionDto.getPenaltyFactor() * numberWrongAnswers;
 		mark -= penalty;
 		if (penalty > maxMark) {
 		    penalty = maxMark;
@@ -806,7 +804,7 @@ public class AssessmentServiceImpl
 	    questionResult.setMark(mark);
 	    questionResult.setMaxMark(maxMark);
 	    // for displaying purposes in case of submitSingleMarkHedgingQuestion() Ajax call
-	    question.setMark(mark);
+	    questionDto.setMark(mark);
 	}
 
 	return mark;
@@ -991,10 +989,12 @@ public class AssessmentServiceImpl
 	AssessmentResult lastFinishedResult = assessmentResultDao.getLastFinishedAssessmentResultByUser(sessionId,
 		userId);
 	if (lastFinishedResult != null) {
+	    //sorting
 	    SortedSet<AssessmentQuestionResult> questionResults = new TreeSet<AssessmentQuestionResult>(
 		    new AssessmentQuestionResultComparator());
 	    questionResults.addAll(lastFinishedResult.getQuestionResults());
 	    lastFinishedResult.setQuestionResults(questionResults);
+	    //escaping
 	    AssessmentEscapeUtils.escapeQuotes(lastFinishedResult);
 	}
 
@@ -2097,11 +2097,6 @@ public class AssessmentServiceImpl
 	    }
 	    toolContentObj.setCreatedBy(user);
 
-	    // reset all assessmentquestion createBy user
-	    Set<AssessmentQuestion> questions = toolContentObj.getQuestions();
-	    for (AssessmentQuestion question : questions) {
-		question.setCreateBy(user);
-	    }
 	    assessmentDao.saveObject(toolContentObj);
 	} catch (ImportToolContentException e) {
 	    throw new ToolException(e);
@@ -2438,13 +2433,11 @@ public class AssessmentServiceImpl
     public void createRestToolContent(Integer userID, Long toolContentID, JSONObject toolContentJSON)
 	    throws JSONException {
 
-	Date updateDate = new Date();
-
 	Assessment assessment = new Assessment();
 	assessment.setContentId(toolContentID);
 	assessment.setTitle(toolContentJSON.getString(RestTags.TITLE));
 	assessment.setInstructions(toolContentJSON.getString(RestTags.INSTRUCTIONS));
-	assessment.setCreated(updateDate);
+	assessment.setCreated(new Date());
 
 	assessment.setReflectOnActivity(JsonUtil.opt(toolContentJSON, RestTags.REFLECT_ON_ACTIVITY, Boolean.FALSE));
 	assessment.setReflectInstructions(JsonUtil.opt(toolContentJSON, RestTags.REFLECT_INSTRUCTIONS, (String) null));
@@ -2498,8 +2491,6 @@ public class AssessmentServiceImpl
 	    question.setType(type);
 	    question.setTitle(questionJSONData.getString(RestTags.QUESTION_TITLE));
 	    question.setQuestion(questionJSONData.getString(RestTags.QUESTION_TEXT));
-	    question.setCreateBy(assessmentUser);
-	    question.setCreateDate(updateDate);
 	    question.setSequenceId(questionJSONData.getInt(RestTags.DISPLAY_ORDER));
 
 	    question.setAllowRichEditor(JsonUtil.opt(questionJSONData, RestTags.ALLOW_RICH_TEXT_EDITOR, Boolean.FALSE));

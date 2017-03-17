@@ -17,14 +17,12 @@
 	<c:set var="toolSessionID" value="${sessionMap.toolSessionID}" />
 	<c:set var="assessment" value="${sessionMap.assessment}" />
 	<c:set var="pageNumber" value="${sessionMap.pageNumber}" />
-	<c:set var="finishedLock" value="${sessionMap.finishedLock}" />
 	<c:set var="isResubmitAllowed" value="${sessionMap.isResubmitAllowed}" />
 	<c:set var="hasEditRight" value="${sessionMap.hasEditRight}"/>
-	<c:set var="isTimeLimitEnabled" value="${hasEditRight && assessment.getTimeLimit() != 0 && !finishedLock}" />
+	<c:set var="isTimeLimitEnabled" value="${hasEditRight && assessment.getTimeLimit() != 0}" />
 	<c:set var="result" value="${sessionMap.assessmentResult}" />
 	<c:set var="isUserLeader" value="${sessionMap.isUserLeader}"/>
 	<c:set var="isLeadershipEnabled" value="${assessment.useSelectLeaderToolOuput}"/>
-	<c:set var="isEditingDisabled" value="${finishedLock || !hasEditRight}"/>
 		
 	<!-- hasEditRight=${hasEditRight} -->
 	
@@ -65,7 +63,6 @@
 		}
 	</style>
 
-	<script type="text/javascript" src="${lams}includes/javascript/jquery.js"></script>
 	<script type="text/javascript" src="${lams}includes/javascript/jquery.plugin.js"></script>
 	<script type="text/javascript" src="${lams}includes/javascript/jquery.form.js"></script>
 	<script type="text/javascript" src="${lams}includes/javascript/jquery.countdown.js"></script>
@@ -191,7 +188,7 @@
 		</c:if>
 		
 		//autosave feature
-		<c:if test="${!isEditingDisabled && (mode != 'teacher')}">
+		<c:if test="${hasEditRight && (mode != 'teacher')}">
 			
 			var autosaveInterval = "30000"; // 30 seconds interval
 			window.setInterval(
@@ -238,23 +235,6 @@
 			$('.btn').prop('disabled',true);
 		}
 		
-		function finishSession(){
-			if (!validateAnswers()) {
-				return;
-			}
-			disableButtons();
-			document.location.href ='<c:url value="/learning/finish.do?sessionMapID=${sessionMapID}&mode=${mode}&toolSessionID=${toolSessionID}"/>';
-			return false;
-		}
-		
-		function continueReflect(){
-			if (!validateAnswers()) {
-				return;
-			}
-			disableButtons();
-			document.location.href='<c:url value="/learning/newReflection.do?sessionMapID=${sessionMapID}"/>';
-		}
-		
 		function nextPage(pageNumber){
 			if (!validateAnswers()) {
 				return;
@@ -294,13 +274,7 @@
                 	$('#question-area-' + questionIndex).removeClass('bg-warning');
                 }
 			});
-		}		
-		
-		function resubmit(){
-			disableButtons();
-			document.location.href ="<c:url value='/learning/resubmit.do?sessionMapID=${sessionMapID}'/>";
-			return false;			
-		}		
+		}
 
 		function upOption(questionUid, idx){
 			var orderingArea = "#orderingArea" + questionUid;
@@ -327,7 +301,7 @@
 			);		    
 		}		
 		
-		if (${!hasEditRight && mode != "teacher" && !finishedLock}) {
+		if (${!hasEditRight && mode != "teacher"}) {
 			setInterval("checkLeaderProgress();", 15000);// Auto-Refresh every 15 seconds for non-leaders
 		}
 		
@@ -348,7 +322,7 @@
 		
 		function validateAnswers() {
 
-			if (${isEditingDisabled}) {
+			if (${!hasEditRight}) {
 				return true;
 			}
 			
@@ -550,14 +524,6 @@
 			</lams:Alert>
 		</c:if>
 		
-		<c:if test="${sessionMap.isUserFailed}">
-			<lams:Alert id="passing-mark-not-reached" type="warning" close="true">
-				<fmt:message key="label.learning.havent.reached.passing.mark">
-					<fmt:param>${assessment.passingMark}</fmt:param>
-				</fmt:message>
-			</lams:Alert>
-		</c:if>
-		
 		<c:if test="${isLeadershipEnabled}">
 			<h4>
 				<fmt:message key="label.group.leader" >
@@ -566,11 +532,9 @@
 			</h4>
 		</c:if>
 
-		<c:if test="${not finishedLock}">
-			<div class="panel">
-				<c:out value="${assessment.instructions}" escapeXml="false"/>
-			</div>
-		</c:if>
+		<div class="panel">
+			<c:out value="${assessment.instructions}" escapeXml="false"/>
+		</div>
 		
 		<lams:Alert id="warning-answers-required" type="warning" close="true">
 			<fmt:message key="warn.answers.required" />
@@ -600,103 +564,21 @@
 		<%@ include file="/common/messages.jsp"%>
 		<br>
 		
-		<%@ include file="parts/attemptsummary.jsp"%>
-		
-		<c:if test="${!finishedLock || finishedLock && assessment.displaySummary}">
-			<div class="form-group">
-				<%@ include file="parts/allquestions.jsp"%>
-			</div>
-		</c:if>
-		
-		<%-- Reflection entry --%>
-		<c:if test="${sessionMap.reflectOn && (sessionMap.userFinished || !hasEditRight ) && finishedLock}">
-		 	 <div class="panel panel-default">
-	
-				 	<div class="panel-heading panel-title">
-				 		<fmt:message key="label.export.reflection" />
-				 	</div>
-				 	
-				 	<div class="panel-body">
-					 	<div class="panel">
-					 		<lams:out value="${sessionMap.reflectInstructions}" escapeHtml="true"/>
-						</div>
-						
-						<div class="form-group">
-							<c:choose>
-								<c:when test="${empty sessionMap.reflectEntry}">
-									<p>
-										<em> <fmt:message key="message.no.reflection.available" />	</em>
-									</p>
-								</c:when>
-								<c:otherwise>
-									<p>
-										<lams:out escapeHtml="true" value="${sessionMap.reflectEntry}" />
-									</p>
-								</c:otherwise>
-							</c:choose>
+		<div class="form-group">
+			<%@ include file="parts/allquestions.jsp"%>
 			
-							<c:if test="${(mode != 'teacher') && hasEditRight}">
-								<html:button property="FinishButton" onclick="return continueReflect()" 
-										styleClass="btn btn-sm btn-default pull-left voffset10">
-									<fmt:message key="label.edit" />
-								</html:button>
-							</c:if>
-						</div>
-		
-					</div>
-				</div>
-		</c:if>
+			<%@ include file="parts/paging.jsp"%>
+		</div>
 
 		<c:if test="${mode != 'teacher'}">
 			<div class="space-bottom-top align-right">
-				<c:choose>
-					<c:when	test="${not finishedLock && hasEditRight}">					
-						<html:button property="submitAll"
-								onclick="return submitAll(false);" 
-								styleClass="btn btn-primary voffset10 pull-right na">
-							<fmt:message key="label.learning.submit.all" />
-						</html:button>	
-					</c:when>
-					
-					<c:when	test="${not finishedLock && !hasEditRight}">
-					</c:when>
-					
-					<c:otherwise>
-						<c:if test="${isResubmitAllowed && hasEditRight}">
-							<button type="submit" onclick="resubmit()" class="btn btn-default">
-								<fmt:message key="label.learning.resubmit" />
-							</button>
-						</c:if>	
-						
-						<c:if test="${! sessionMap.isUserFailed}">
-						
-							<c:choose>
-								<c:when	test="${sessionMap.reflectOn && (not sessionMap.userFinished) && hasEditRight}">
-									<html:button property="FinishButton" onclick="return continueReflect()" 
-											styleClass="btn btn-primary voffset10 pull-right na">
-										<fmt:message key="label.continue" />
-									</html:button>
-								</c:when>
-								<c:otherwise>
-									<button name="FinishButton"
-											onClick="return finishSession()"
-											class="btn btn-primary voffset10 pull-right na">
-										<span class="nextActivity">
-											<c:choose>
-							 					<c:when test="${sessionMap.activityPosition.last}">
-							 						<fmt:message key="label.submit" />
-							 					</c:when>
-							 					<c:otherwise>
-							 		 				<fmt:message key="label.finished" />
-							 					</c:otherwise>
-							 				</c:choose>
-		 								</span>
-									</button>
-								</c:otherwise>
-							</c:choose>
-						</c:if>
-					</c:otherwise>
-				</c:choose>
+				<c:if test="${hasEditRight}">					
+					<html:button property="submitAll"
+							onclick="return submitAll(false);" 
+							styleClass="btn btn-primary voffset10 pull-right na">
+						<fmt:message key="label.learning.submit.all" />
+					</html:button>
+				</c:if>
 			</div>
 		</c:if>
 
