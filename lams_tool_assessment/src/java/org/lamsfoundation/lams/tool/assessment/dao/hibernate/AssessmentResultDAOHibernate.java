@@ -134,7 +134,9 @@ public class AssessmentResultDAOHibernate extends LAMSBaseDAO implements Assessm
 	Query q = getSession().createQuery(LAST_ASSESSMENT_RESULT_GRADE);
 	q.setParameter(0, userId);
 	q.setParameter(1, assessmentUid);
-	return ((Float) q.uniqueResult());
+	Object lastTotalScore = q.uniqueResult();
+	
+	return (lastTotalScore == null) ? 0 : (Float)lastTotalScore;
     }
 
     @Override
