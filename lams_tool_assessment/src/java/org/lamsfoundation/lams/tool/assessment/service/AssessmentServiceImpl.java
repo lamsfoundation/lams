@@ -595,15 +595,14 @@ public class AssessmentServiceImpl
 	    }
 	}
 	
-	if (assessmentResult.getFinishDate() == null && questionResult == null) {
-	    //it should get here only in case teacher edited content in monitor which led to removal of autosave questionResult
+	//if teacher edited content in monitor (modified question) it led to removal if autosaved questionResult 
+	if (assessment.isContentModifiedInMonitor(assessmentResult.getStartDate())
+		 && questionResult == null) {
+	    //update questionDto
 	    AssessmentQuestion modifiedQuestion = assessmentQuestionDao.getByUid(questionDto.getUid());
-	    PropertyUtils.copyProperties(questionDto, modifiedQuestion);
+	    QuestionDTO updatedQuestionDto = modifiedQuestion.getQuestionDTO();
+	    PropertyUtils.copyProperties(questionDto, updatedQuestionDto);
 	    return 0;
-	    
-//	    questionResult = createQuestionResultObject(question);
-//	    questionResult.setAssessmentResult(assessmentResult);
-//	    assessmentQuestionResultDao.insert(questionResult);
 	}
 
 	// store question answer values
@@ -1920,7 +1919,8 @@ public class AssessmentServiceImpl
 			assessmentResultDao.saveObject(assessmentResult);
 
 			// if this is the last finished assessment result - propagade total mark to Gradebook
-			if (lastFinishedAssessmentResult.getUid().equals(assessmentResult.getUid())) {
+			if (lastFinishedAssessmentResult != null
+				&& lastFinishedAssessmentResult.getUid().equals(assessmentResult.getUid())) {
 			    gradebookService.updateActivityMark(new Double(assessmentMark), null,
 				    user.getUserId().intValue(), toolSessionId, false);
 			}
