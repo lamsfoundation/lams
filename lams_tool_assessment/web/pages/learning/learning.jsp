@@ -221,7 +221,7 @@
 		
 		//check if we came back due to failed answers' validation (missing required question's answer or min words limit not reached)
 		$(document).ready(function(){
-			if (${isAnswersValidationFailed == true}) {
+			if (${param.isAnswersValidationFailed == true}) {
 				validateAnswers();
 			}
 		});
