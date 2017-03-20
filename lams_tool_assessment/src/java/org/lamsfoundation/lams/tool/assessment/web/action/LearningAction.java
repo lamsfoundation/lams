@@ -379,7 +379,8 @@ public class LearningAction extends Action {
 	if (showResults) {
 
 	    // display results page
-	    return showResults(mapping, sessionMap); 
+	    showResults(mapping, sessionMap);
+	    return mapping.findForward(AssessmentConstants.SHOW_RESULTS);
 
 	} else {
 	    // set attempt started
@@ -422,47 +423,67 @@ public class LearningAction extends Action {
      */
     private ActionForward nextPage(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) throws ServletException, IllegalAccessException, InvocationTargetException, NoSuchMethodException {
+	return nextPage(mapping, request, false, -1);
+    }
+    
+    /**
+     * Auxiliary method to be called by nextPage(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+     * HttpServletResponse response) or submitAll. 
+     * 
+     * @param mapping
+     * @param request
+     * @param isAnswersValidationFailed submitAll() method may set it as true in case some of the pages miss required answers
+     * @param pageNumberWithUnasweredQuestions page number with questions required to be answered
+     * @return
+     */
+    private ActionForward nextPage(ActionMapping mapping, HttpServletRequest request, boolean isAnswersValidationFailed,
+	    int pageNumberWithUnasweredQuestions)
+	    throws ServletException, IllegalAccessException, InvocationTargetException, NoSuchMethodException {
 	IAssessmentService service = getAssessmentService();
 	String sessionMapID = WebUtil.readStrParam(request, AssessmentConstants.ATTR_SESSION_MAP_ID);
 	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
 		.getAttribute(sessionMapID);
 	Assessment assessment = (Assessment) sessionMap.get(AssessmentConstants.ATTR_ASSESSMENT);
 	AssessmentUser user = (AssessmentUser) sessionMap.get(AssessmentConstants.ATTR_USER);
+	int oldPageNumber = (Integer) sessionMap.get(AssessmentConstants.ATTR_PAGE_NUMBER);
 
-	boolean showResults = (Boolean) sessionMap.get(AssessmentConstants.ATTR_SHOW_RESULTS);
-	if (!showResults) {
-	    //get user answers from request and store them into sessionMap
-	    storeUserAnswersIntoSessionMap(request);
-	    // store results from sessionMap into DB
-	    storeUserAnswersIntoDatabase(sessionMap, true);
-
-	    long secondsLeft = service.getSecondsLeft(assessment, user);
-	    request.setAttribute(AssessmentConstants.ATTR_SECONDS_LEFT, secondsLeft);
-	}
-
-	//get pageNumber as request parameter in normal case and as attribute in case of submitAll returned it back
-	int pageNumber;
-	if ((request.getAttribute(AssessmentConstants.ATTR_PAGE_NUMBER) == null)) {
-	    pageNumber = WebUtil.readIntParam(request, AssessmentConstants.ATTR_PAGE_NUMBER);
+	//if AnswersValidationFailed - get pageNumber as request parameter and as method parameter otherwise
+	int pageNumberToOpen;
+	if (isAnswersValidationFailed) {
+	    pageNumberToOpen = pageNumberWithUnasweredQuestions;
 	} else {
-	    pageNumber = (Integer) request.getAttribute(AssessmentConstants.ATTR_PAGE_NUMBER);
+	    pageNumberToOpen = WebUtil.readIntParam(request, AssessmentConstants.ATTR_PAGE_NUMBER);
 	}
 
 	int questionNumberingOffset = 0;
 	List<Set<QuestionDTO>> pagedQuestionDtos = (List<Set<QuestionDTO>>) sessionMap
 		.get(AssessmentConstants.ATTR_PAGED_QUESTION_DTOS);
-	for (int i = 0; i < pageNumber - 1; i++) {
+	for (int i = 0; i < pageNumberToOpen - 1; i++) {
 	    Set<QuestionDTO> questionsForOnePage = pagedQuestionDtos.get(i);
 	    questionNumberingOffset += questionsForOnePage.size();
 	}
 	sessionMap.put(AssessmentConstants.ATTR_QUESTION_NUMBERING_OFFSET, ++questionNumberingOffset);
-	sessionMap.put(AssessmentConstants.ATTR_PAGE_NUMBER, pageNumber);
-	request.setAttribute(AssessmentConstants.ATTR_SESSION_MAP_ID, sessionMapID);
+	sessionMap.put(AssessmentConstants.ATTR_PAGE_NUMBER, pageNumberToOpen);
 
+	boolean showResults = (Boolean) sessionMap.get(AssessmentConstants.ATTR_SHOW_RESULTS);
 	if (showResults) {
+	    request.setAttribute(AssessmentConstants.ATTR_SESSION_MAP_ID, sessionMapID);
 	    return mapping.findForward(AssessmentConstants.SHOW_RESULTS);
+	    
 	} else {
-	    return mapping.findForward(AssessmentConstants.LEARNING);    
+	    //get user answers from request and store them into sessionMap
+	    storeUserAnswersIntoSessionMap(request, oldPageNumber);
+	    // store results from sessionMap into DB
+	    storeUserAnswersIntoDatabase(sessionMap, true);
+
+	    long secondsLeft = service.getSecondsLeft(assessment, user);
+	    request.setAttribute(AssessmentConstants.ATTR_SECONDS_LEFT, secondsLeft);
+	    
+	    // use redirect to prevent form resubmission
+	    ActionRedirect redirect = new ActionRedirect(mapping.findForwardConfig(AssessmentConstants.LEARNING));
+	    redirect.addParameter(AssessmentConstants.ATTR_SESSION_MAP_ID, sessionMapID);
+	    redirect.addParameter(AssessmentConstants.ATTR_IS_ANSWERS_VALIDATION_FAILED, isAnswersValidationFailed);
+	    return redirect;
 	}
     }
 
@@ -478,6 +499,7 @@ public class LearningAction extends Action {
 	String sessionMapID = WebUtil.readStrParam(request, AssessmentConstants.ATTR_SESSION_MAP_ID);
 	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
 		.getAttribute(sessionMapID);
+	int pageNumber = (Integer) sessionMap.get(AssessmentConstants.ATTR_PAGE_NUMBER);
 	List<Set<QuestionDTO>> pagedQuestionDtos = (List<Set<QuestionDTO>>) sessionMap
 		.get(AssessmentConstants.ATTR_PAGED_QUESTION_DTOS);
 	Long userId = ((AssessmentUser) sessionMap.get(AssessmentConstants.ATTR_USER)).getUserId();
@@ -485,7 +507,7 @@ public class LearningAction extends Action {
 	Assessment assessment = service.getAssessmentBySessionId(toolSessionId);
 
 	//get user answers from request and store them into sessionMap
-	storeUserAnswersIntoSessionMap(request);
+	storeUserAnswersIntoSessionMap(request, pageNumber);
 
 	// store results from sessionMap into DB
 	Long singleMarkHedgingQuestionUid = WebUtil.readLongParam(request, "singleMarkHedgingQuestionUid");
@@ -532,10 +554,10 @@ public class LearningAction extends Action {
 	String sessionMapID = WebUtil.readStrParam(request, AssessmentConstants.ATTR_SESSION_MAP_ID);
 	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
 		.getAttribute(sessionMapID);
-	request.setAttribute(AssessmentConstants.ATTR_SESSION_MAP_ID, sessionMapID);
+	int pageNumber = (Integer) sessionMap.get(AssessmentConstants.ATTR_PAGE_NUMBER);
 
 	//get user answers from request and store them into sessionMap
-	storeUserAnswersIntoSessionMap(request);
+	storeUserAnswersIntoSessionMap(request, pageNumber);
 
 	boolean isTimelimitExpired = WebUtil.readBooleanParam(request, "isTimelimitExpired", false);
 	if (!isTimelimitExpired) {
@@ -544,10 +566,7 @@ public class LearningAction extends Action {
 	    int pageNumberWithUnasweredQuestions = validateAnswers(sessionMap);
 	    // if some were not then forward to nextPage()
 	    if (pageNumberWithUnasweredQuestions != 0) {
-		request.setAttribute(AssessmentConstants.ATTR_PAGE_NUMBER, pageNumberWithUnasweredQuestions);
-		request.setAttribute(AssessmentConstants.ATTR_IS_ANSWERS_VALIDATION_FAILED, true);
-
-		return nextPage(mapping, form, request, response);
+		return nextPage(mapping, request, true, pageNumberWithUnasweredQuestions);
 	    }
 	}
 
@@ -562,7 +581,12 @@ public class LearningAction extends Action {
 	sessionMap.put(AssessmentConstants.ATTR_SHOW_RESULTS, true);
 
 	// populate info for displaying results page
-	return showResults(mapping, sessionMap);
+	showResults(mapping, sessionMap);
+	
+	//use redirect to prevent form resubmission
+	ActionRedirect redirect = new ActionRedirect(mapping.findForwardConfig(AssessmentConstants.SHOW_RESULTS));
+	redirect.addParameter(AssessmentConstants.ATTR_SESSION_MAP_ID, sessionMapID);
+	return redirect;
     }
 
     /**
@@ -711,9 +735,10 @@ public class LearningAction extends Action {
 	String sessionMapID = WebUtil.readStrParam(request, AssessmentConstants.ATTR_SESSION_MAP_ID);
 	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
 		.getAttribute(sessionMapID);
+	int pageNumber = (Integer) sessionMap.get(AssessmentConstants.ATTR_PAGE_NUMBER);
 
 	//get user answers from request and store them into sessionMap
-	storeUserAnswersIntoSessionMap(request);
+	storeUserAnswersIntoSessionMap(request, pageNumber);
 	//store results from sessionMap into DB
 	storeUserAnswersIntoDatabase(sessionMap, true);
 
@@ -808,12 +833,12 @@ public class LearningAction extends Action {
      * Get back user answers from request and store it into sessionMap.
      *
      * @param request
+     * @param pageNumber number of the page to process
      */
-    private void storeUserAnswersIntoSessionMap(HttpServletRequest request) {
+    private void storeUserAnswersIntoSessionMap(HttpServletRequest request, int pageNumber) {
 	String sessionMapID = WebUtil.readStrParam(request, AssessmentConstants.ATTR_SESSION_MAP_ID);
 	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
 		.getAttribute(sessionMapID);
-	int pageNumber = (Integer) sessionMap.get(AssessmentConstants.ATTR_PAGE_NUMBER);
 	List<Set<QuestionDTO>> pagedQuestionDtos = (List<Set<QuestionDTO>>) sessionMap
 		.get(AssessmentConstants.ATTR_PAGED_QUESTION_DTOS);
 	Set<QuestionDTO> questionsForOnePage = pagedQuestionDtos.get(pageNumber - 1);
@@ -1003,7 +1028,7 @@ public class LearningAction extends Action {
     /**
      * Prepare data for displaying results page
      */
-    private ActionForward showResults(ActionMapping mapping, SessionMap<String, Object> sessionMap) {
+    private void showResults(ActionMapping mapping, SessionMap<String, Object> sessionMap) {
 	List<Set<QuestionDTO>> pagedQuestionDtos = (List<Set<QuestionDTO>>) sessionMap
 		.get(AssessmentConstants.ATTR_PAGED_QUESTION_DTOS);
 	Assessment assessment = (Assessment) sessionMap.get(AssessmentConstants.ATTR_ASSESSMENT);
@@ -1087,8 +1112,6 @@ public class LearningAction extends Action {
 	int attemptsAllowed = assessment.getAttemptsAllowed();
 	boolean isResubmitAllowed = ((attemptsAllowed > dbResultCount) | (attemptsAllowed == 0));
 	sessionMap.put(AssessmentConstants.ATTR_IS_RESUBMIT_ALLOWED, isResubmitAllowed);
-	
-	return mapping.findForward(AssessmentConstants.SHOW_RESULTS);
     }
 
     private void loadupLastAttempt(SessionMap<String, Object> sessionMap) {
