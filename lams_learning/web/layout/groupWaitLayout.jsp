@@ -28,7 +28,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 		<title><fmt:message key="label.view.groups.title"/></title>
 		<lams:css/>
 		<script type="text/javascript" src="<lams:LAMSURL />includes/javascript/jquery.js"></script>
-		<META HTTP-EQUIV="Refresh" CONTENT="300;URL=<lams:WebAppURL/>/grouping.do?method=performGrouping&activityID=${GroupingForm.map.activityID}">
+		<META HTTP-EQUIV="Refresh" CONTENT="60;URL=<lams:WebAppURL/>/grouping.do?method=performGrouping&activityID=${GroupingForm.map.activityID}">
 	  </lams:head>
 
 	<body class="stripes">
