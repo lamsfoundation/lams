@@ -196,15 +196,10 @@
 					if (isWaitingForConfirmation) return;
 					
 					//copy value from CKEditor (only available in essay type of questions) to textarea before ajax submit
-					$("span[id^=cke_question]").each(function() {
-						var questionNumber = "" + this.id.substring("cke_question".length);
-						
-						$("textarea[id=question" + questionNumber + "]").each(function() {
-							
-							var ckeditorData = CKEDITOR.instances[this.name].getData();
-							//skip out empty values
-							this.value = ((ckeditorData == null) || (ckeditorData.replace(/&nbsp;| |<br \/>|\s|<p>|<\/p>|\xa0/g, "").length == 0)) ? "" : ckeditorData;
-						});
+					$("textarea[id^='question']:not([id$='__lamstextarea'])").each(function()  {
+						var ckeditorData = CKEDITOR.instances[this.name].getData();
+						//skip out empty values
+						this.value = ((ckeditorData == null) || (ckeditorData.replace(/&nbsp;| |<br \/>|\s|<p>|<\/p>|\xa0/g, "").length == 0)) ? "" : ckeditorData;						
 					});
 					
 					//fire onchange event for lams:textarea
