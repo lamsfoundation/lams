@@ -24,6 +24,7 @@
 
 package org.lamsfoundation.lams.tool.leaderselection.service;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -67,6 +68,7 @@ import org.lamsfoundation.lams.tool.leaderselection.model.LeaderselectionUser;
 import org.lamsfoundation.lams.tool.leaderselection.util.LeaderselectionConstants;
 import org.lamsfoundation.lams.tool.leaderselection.util.LeaderselectionException;
 import org.lamsfoundation.lams.tool.leaderselection.util.LeaderselectionToolContentHandler;
+import org.lamsfoundation.lams.tool.leaderselection.web.actions.LearningWebsocketServer;
 import org.lamsfoundation.lams.tool.service.ILamsToolService;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
@@ -332,7 +334,7 @@ public class LeaderselectionService
     /* ********** ILeaderselectionService Methods ********************************* */
 
     @Override
-    public void setGroupLeader(Long userUid, Long toolSessionId) {
+    public void setGroupLeader(Long userUid, Long toolSessionId) throws JSONException, IOException {
 	if ((userUid == null) || (toolSessionId == null)) {
 	    return;
 	}
@@ -347,6 +349,8 @@ public class LeaderselectionService
 
 	session.setGroupLeader(newLeader);
 	saveOrUpdateSession(session);
+	
+	LearningWebsocketServer.sendPageRefreshRequest(toolSessionId);
     }
 
     @Override

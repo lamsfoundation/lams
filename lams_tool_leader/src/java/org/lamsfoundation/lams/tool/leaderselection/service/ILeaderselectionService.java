@@ -24,8 +24,10 @@
 
 package org.lamsfoundation.lams.tool.leaderselection.service;
 
+import java.io.IOException;
 import java.util.List;
 
+import org.apache.tomcat.util.json.JSONException;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.tool.leaderselection.model.Leaderselection;
 import org.lamsfoundation.lams.tool.leaderselection.model.LeaderselectionSession;
@@ -50,8 +52,10 @@ public interface ILeaderselectionService {
      *
      * @param userId
      * @param toolSessionId
+     * @throws IOException 
+     * @throws JSONException 
      */
-    void setGroupLeader(Long userId, Long toolSessionId);
+    void setGroupLeader(Long userId, Long toolSessionId) throws JSONException, IOException;
 
     /**
      * Makes a copy of the default content and assigns it a newContentID

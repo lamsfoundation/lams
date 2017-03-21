@@ -24,6 +24,8 @@
 
 package org.lamsfoundation.lams.tool.leaderselection.web.actions;
 
+import java.io.IOException;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -31,6 +33,7 @@ import org.apache.log4j.Logger;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
+import org.apache.tomcat.util.json.JSONException;
 import org.lamsfoundation.lams.tool.leaderselection.dto.LeaderselectionDTO;
 import org.lamsfoundation.lams.tool.leaderselection.dto.LeaderselectionSessionDTO;
 import org.lamsfoundation.lams.tool.leaderselection.model.Leaderselection;
@@ -108,9 +111,11 @@ public class MonitoringAction extends LamsDispatchAction {
 
     /**
      * Save selected users as a leaders
+     * @throws IOException 
+     * @throws JSONException 
      */
     public ActionForward saveLeaders(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) {
+	    HttpServletResponse response) throws JSONException, IOException {
 	String sessionMapID = request.getParameter(LeaderselectionConstants.ATTR_SESSION_MAP_ID);
 	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
 		.getAttribute(sessionMapID);
