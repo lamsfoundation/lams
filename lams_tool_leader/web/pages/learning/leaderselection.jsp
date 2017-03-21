@@ -2,36 +2,49 @@
 
 <script type="text/javascript">
 
-		$(window).load(function(){
-			$("#leaderSelectionDialog").modal({
-				show: ${isSelectLeaderActive},
-				keyboard: true
-			});
-			
+	$(window).load(function(){
+		$("#leaderSelectionDialog").modal({
+			show: ${isSelectLeaderActive},
+			keyboard: true
 		});
+	});
 
-		function leaderSelection() {
-	        $.ajax({
-	        	async: false,
-	            url: '<c:url value="/learning.do"/>',
-	            data: 'dispatch=becomeLeader&toolSessionID=${toolSessionID}',
-	            type: 'post',
-	            success: function (json) {
-	            	location.reload();
-	            }
-	       	});			
-		}
-		
+	function leaderSelection() {
+		$.ajax({
+	    	async: false,
+	        url: '<c:url value="/learning.do"/>',
+	        data: 'dispatch=becomeLeader&toolSessionID=${toolSessionID}',
+	        type: 'post',
+	        success: function (json) {
+	          	location.reload();
+	        }
+	   	});
+	}
 
     function finishActivity(){
     	document.getElementById("finishButton").disabled = true;
 		location.href = '<c:url value="/learning.do"/>?dispatch=finishActivity&toolSessionID=${toolSessionID}';
     }
+    
+ 	//init the connection with server using server URL but with different protocol
+ 	var websocket = new WebSocket('<lams:WebAppURL />'.replace('http', 'ws') 
+ 			+ 'learningWebsocket?toolSessionID=' + ${toolSessionID});
+ 	
+	// run when the leader has just been selected
+	websocket.onmessage = function(e) {
+		// create JSON object
+		var input = JSON.parse(e.data);
+		
+		// The leader has just been selected and all non-leaders should refresh their pages in order
+     	// to see new leader's name and a Finish button.
+		if (input.pageRefresh) {
+			location.reload();
+			return;
+		}
+	};
 </script>
 
-
 <lams:Page type="learner" title="${content.title}">
-
 
 	<h4>
 		<fmt:message key="label.group.leader" />&nbsp;
@@ -60,27 +73,31 @@
 		</c:forEach>
 	</div>
 
-
-<div id="actionbuttons" class="voffset20">
-	<button type="button" onclick="location.reload();" class="btn btn-sm btn-default"><i class="fa fa-refresh"></i> <span class="hidden-xs">Refresh</span></button>
-	<html:link href="#nogo" styleClass="btn btn-primary pull-right na" styleId="finishButton" onclick="finishActivity()">
-		<span class="nextActivity"> <c:choose>
-				<c:when test="${activityPosition.last}">
-					<fmt:message key="button.submit" />
-				</c:when>
-				<c:otherwise>
-					<fmt:message key="button.finish" />
-				</c:otherwise>
-			</c:choose>
-		</span>
-	</html:link>
-</div>
+	<div id="actionbuttons" class="voffset20">
+		<button type="button" onclick="location.reload();" class="btn btn-sm btn-default">
+			<i class="fa fa-refresh"></i> 
+			<span class="hidden-xs">
+				<fmt:message key="label.refresh" />
+			</span>
+		</button>
+		
+		<c:if test="${!isSelectLeaderActive}">
+			<html:link href="#nogo" styleClass="btn btn-primary pull-right na" styleId="finishButton" onclick="finishActivity()">
+				<span class="nextActivity"> <c:choose>
+						<c:when test="${activityPosition.last}">
+							<fmt:message key="button.submit" />
+						</c:when>
+						<c:otherwise>
+							<fmt:message key="button.finish" />
+						</c:otherwise>
+					</c:choose>
+				</span>
+			</html:link>
+		</c:if>
+	</div>
+	
 </lams:Page>
 
-
-<c:set var="title">
-	<c:out value="" escapeXml="true" />
-</c:set>
 <div id="leaderSelectionDialog" class="modal fade">
 	<div class="modal-dialog" role="document">
 		<div class="modal-content">
@@ -113,6 +130,7 @@
 					</c:forEach>
 				</div>
 			</div>
+
 			<div class="modal-footer">
 				<button data-dismiss="modal" class="btn btn-sm btn-default">
 					<fmt:message key="label.no" />
@@ -120,13 +138,7 @@
 				<button onclick="leaderSelection();" class="btn btn-sm btn-primary">
 					<fmt:message key="label.yes.become.leader" />
 				</button>
-
 			</div>
-
-			<!-- ends -->
 		</div>
 	</div>
 </div>
-</div>
-
-

@@ -34,6 +34,7 @@ import org.apache.log4j.Logger;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
+import org.apache.tomcat.util.json.JSONException;
 import org.lamsfoundation.lams.learning.web.util.LearningWebUtil;
 import org.lamsfoundation.lams.tool.ToolAccessMode;
 import org.lamsfoundation.lams.tool.ToolSessionManager;
@@ -123,9 +124,10 @@ public class LearningAction extends LamsDispatchAction {
 
     /**
      * Sets current user as a leader of a group.
+     * @throws JSONException 
      */
     public ActionForward becomeLeader(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws IOException {
+	    HttpServletResponse response) throws IOException, JSONException {
 	initService();
 	Long toolSessionId = new Long(request.getParameter(AttributeNames.PARAM_TOOL_SESSION_ID));
 	LeaderselectionSession session = service.getSessionBySessionId(toolSessionId);
