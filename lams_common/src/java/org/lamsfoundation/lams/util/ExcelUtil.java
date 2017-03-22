@@ -37,6 +37,7 @@ import org.apache.poi.ss.usermodel.IndexedColors;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.ss.util.CellUtil;
 import org.apache.poi.ss.util.WorkbookUtil;
 import org.apache.poi.xssf.streaming.SXSSFWorkbook;
 
@@ -54,8 +55,10 @@ public class ExcelUtil {
     private static CellStyle yellowColor;
 
     private static CellStyle borderStyleLeftThin;
+    private static CellStyle borderStyleLeftThick;
     private static CellStyle borderStyleRightThick;
     private static CellStyle borderStyleLeftThinBoldFont;
+    private static CellStyle borderStyleLeftThickBoldFont;
     private static CellStyle borderStyleRightThickBoldFont;
     private static CellStyle borderStyleBottomThin;
     private static CellStyle borderStyleBottomThinBoldFont;
@@ -120,12 +123,18 @@ public class ExcelUtil {
 	borderStyleLeftThin = workbook.createCellStyle();
 	borderStyleLeftThin.setBorderLeft(CellStyle.BORDER_THIN);
 	borderStyleLeftThin.setFont(defaultFont);
+	borderStyleLeftThick = workbook.createCellStyle();
+	borderStyleLeftThick.setBorderLeft(CellStyle.BORDER_THICK);
+	borderStyleLeftThick.setFont(defaultFont);
 	borderStyleRightThick = workbook.createCellStyle();
 	borderStyleRightThick.setBorderRight(CellStyle.BORDER_THICK);
 	borderStyleRightThick.setFont(defaultFont);
 	borderStyleLeftThinBoldFont = workbook.createCellStyle();
 	borderStyleLeftThinBoldFont.setBorderLeft(CellStyle.BORDER_THIN);
 	borderStyleLeftThinBoldFont.setFont(boldFont);
+	borderStyleLeftThickBoldFont = workbook.createCellStyle();
+	borderStyleLeftThickBoldFont.setBorderLeft(CellStyle.BORDER_THICK);
+	borderStyleLeftThickBoldFont.setFont(boldFont);
 	borderStyleRightThickBoldFont = workbook.createCellStyle();
 	borderStyleRightThickBoldFont.setBorderRight(CellStyle.BORDER_THICK);
 	borderStyleRightThickBoldFont.setFont(boldFont);
@@ -164,16 +173,16 @@ public class ExcelUtil {
 	// Print title in bold, if needed
 	if (!StringUtils.isBlank(sheetTitle)) {
 	    Row row = sheet.createRow(0);
-	    ExcelUtil.createCell(new ExcelCell(sheetTitle, true), 0, row);
+	    ExcelUtil.createCell(new ExcelCell(sheetTitle, true), 0, row, workbook);
 	}
 
 	// Print current date, if needed
 	if (!StringUtils.isBlank(dateHeader)) {
 	    Row row = sheet.createRow(1);
-	    ExcelUtil.createCell(new ExcelCell(dateHeader, false), 0, row);
+	    ExcelUtil.createCell(new ExcelCell(dateHeader, false), 0, row, workbook);
 
 	    SimpleDateFormat titleDateFormat = new SimpleDateFormat(FileUtil.EXPORT_TO_SPREADSHEET_TITLE_DATE_FORMAT);
-	    ExcelUtil.createCell(new ExcelCell(titleDateFormat.format(new Date()), false), 1, row);
+	    ExcelUtil.createCell(new ExcelCell(titleDateFormat.format(new Date()), false), 1, row, workbook);
 	}
 
 	if (data != null) {
@@ -190,7 +199,7 @@ public class ExcelUtil {
 		int columnSize = data[rowIndex].length;
 		for (int columnIndex = 0; columnIndex < columnSize; columnIndex++) {
 		    ExcelCell excelCell = data[rowIndex][columnIndex];
-		    ExcelUtil.createCell(excelCell, columnIndex, row);
+		    ExcelUtil.createCell(excelCell, columnIndex, row, workbook);
 		}
 
 		//calculate max column size
@@ -208,7 +217,7 @@ public class ExcelUtil {
 
     }
 
-    public static void createCell(ExcelCell excelCell, int cellnum, Row row) {
+    public static void createCell(ExcelCell excelCell, int cellnum, Row row, Workbook workbook) {
 
 	if (excelCell != null) {
 	    Cell cell = row.createCell(cellnum);
@@ -261,6 +270,13 @@ public class ExcelUtil {
 			    cell.setCellStyle(borderStyleLeftThin);
 			}
 			break;
+		    case ExcelCell.BORDER_STYLE_LEFT_THICK:
+			if (excelCell.isBold()) {
+			    cell.setCellStyle(borderStyleLeftThickBoldFont);
+			} else {
+			    cell.setCellStyle(borderStyleLeftThick);
+			}
+			break;
 		    case ExcelCell.BORDER_STYLE_RIGHT_THICK:
 			if (excelCell.isBold()) {
 			    cell.setCellStyle(borderStyleRightThickBoldFont);
@@ -280,7 +296,26 @@ public class ExcelUtil {
 		}
 
 	    }
+	    
+	    if (excelCell.getAlignment() != 0) {
+		switch (excelCell.getAlignment()) {
+		    case ExcelCell.ALIGN_GENERAL:
+			CellUtil.setCellStyleProperty(cell, workbook, CellUtil.ALIGNMENT, CellStyle.ALIGN_GENERAL);
+			break;
+		    case ExcelCell.ALIGN_LEFT:
+			CellUtil.setCellStyleProperty(cell, workbook, CellUtil.ALIGNMENT, CellStyle.ALIGN_LEFT);
+			break;
+		    case ExcelCell.ALIGN_CENTER:
+			CellUtil.setCellStyleProperty(cell, workbook, CellUtil.ALIGNMENT, CellStyle.ALIGN_CENTER);
+			break;
+		    case ExcelCell.ALIGN_RIGHT:
+			CellUtil.setCellStyleProperty(cell, workbook, CellUtil.ALIGNMENT, CellStyle.ALIGN_RIGHT);
+			break;
+		    default:
+			break;
+		}
 
+	    }
 	}
     }
 

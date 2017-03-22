@@ -398,7 +398,9 @@
 				    }
 					
 					var areaToBlock = "select-lessons-area";
-					var exportExcelUrl = "<lams:WebAppURL/>/gradebookMonitoring.do?dispatch=exportExcelSelectedLessons&organisationID=${organisationID}" + lessonIds;
+					var simplified = jQuery("#export-selected-simplified").prop('checked');
+					simplified = "&simplified="+simplified;
+					var exportExcelUrl = "<lams:WebAppURL/>/gradebookMonitoring.do?dispatch=exportExcelSelectedLessons"+simplified+"&organisationID=${organisationID}" + lessonIds;
 					blockExportButton(areaToBlock, exportExcelUrl, languageLabelWait);
 				}
 				
@@ -421,7 +423,7 @@
 		});
 		
 		function openSelectLessonsArea() {
-			$("#select-lessons-area").toggle("slow");
+			$("#select-lessons-area").toggle();
 			return false;
 		}
 		
@@ -458,18 +460,18 @@
 				</a>
 			</div>
 			
-			<div id="select-lessons-area" >
-				<table id="lessons-jqgrid" style="text-align: center;"></table>
-				
+			<div id="select-lessons-area" class="text-center">
+				<table id="lessons-jqgrid" class="center-block"></table>
+				<div class="checkbox input-sm"><label><input type="checkbox" id="export-selected-simplified"><fmt:message key="label.simplified.export"/></label></div>
 				<input class="btn btn-sm btn-default" type="button" value="<fmt:message key="label.button.export"/>" id="export-selected-lessons-button" />			
 			</div>
 
 			<div id="datesNotShown"  style="display:none">
-				<a class="pull-right label label-default" href="javascript:toggleLessonDates()"><fmt:message key="gradebook.monitor.show.dates" /></a>
+				<a class="pull-right label label-primary" href="javascript:toggleLessonDates()"><fmt:message key="gradebook.monitor.show.dates" /></a>
 			</div>
 
 			<div id="datesShown">
-				<a class="pull-right label label-default" href="javascript:toggleLessonDates()"><fmt:message key="gradebook.monitor.hide.dates" /></a>
+				<a class="pull-right label label-primary" href="javascript:toggleLessonDates()"><fmt:message key="gradebook.monitor.hide.dates" /></a>
 			</div>			
 					
 			<div class="grid-holder voffset20">

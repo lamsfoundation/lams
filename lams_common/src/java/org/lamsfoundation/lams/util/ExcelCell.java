@@ -31,13 +31,20 @@ import org.apache.poi.ss.usermodel.IndexedColors;
 public class ExcelCell {
 
     public final static int BORDER_STYLE_LEFT_THIN = 1;
+    public final static int BORDER_STYLE_LEFT_THICK = 4;
     public final static int BORDER_STYLE_RIGHT_THICK = 2;
     public final static int BORDER_STYLE_BOTTOM_THIN = 3;
 
+    public final static int ALIGN_GENERAL = 1;
+    public final static int ALIGN_LEFT = 2;
+    public final static int ALIGN_CENTER = 3;
+    public final static int ALIGN_RIGHT = 4;
+    
     private Object cellValue;
     private Boolean isBold;
     private IndexedColors color;
     private int borderStyle = 0;
+    private int alignment = 0;
 
     public ExcelCell() {
     }
@@ -95,5 +102,15 @@ public class ExcelCell {
 
     public void setBorderStyle(int borderStyle) {
 	this.borderStyle = borderStyle;
+    }
+
+    public int getAlignment() {
+	return alignment;
+    }
+
+    // return the current cell to allow chaining.
+    public ExcelCell setAlignment(int alignment) {
+	this.alignment = alignment;
+	return this;
     }
 }
