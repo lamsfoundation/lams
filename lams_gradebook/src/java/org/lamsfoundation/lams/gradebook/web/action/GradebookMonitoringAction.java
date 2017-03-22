@@ -364,6 +364,8 @@ public class GradebookMonitoringAction extends LamsDispatchAction {
 	    response.sendError(HttpServletResponse.SC_FORBIDDEN, "User is not a monitor in the organisation");
 	    return null;
 	}
+	
+	boolean simplified = WebUtil.readBooleanParam(request, "simplified", false);
 
 	Organisation organisation = (Organisation) getUserService().findById(Organisation.class, organisationID);
 	String[] lessonIds = request.getParameterValues(AttributeNames.PARAM_LESSON_ID);
@@ -372,7 +374,7 @@ public class GradebookMonitoringAction extends LamsDispatchAction {
 		    + " from course: " + organisationID);
 	}
 	LinkedHashMap<String, ExcelCell[][]> dataToExport = getGradebookService()
-		.exportSelectedLessonsGradebook(user.getUserID(), organisationID, lessonIds);
+		.exportSelectedLessonsGradebook(user.getUserID(), organisationID, lessonIds, simplified);
 
 	String fileName = organisation.getName().replaceAll(" ", "_") + ".xlsx";
 	fileName = FileUtil.encodeFilenameForDownload(request, fileName);

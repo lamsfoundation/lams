@@ -305,5 +305,5 @@ public interface IGradebookService {
      * @return
      */
     LinkedHashMap<String, ExcelCell[][]> exportSelectedLessonsGradebook(Integer userId, Integer organisationId,
-	    String[] lessonIds);
+	    String[] lessonIds, boolean simplified);
 }
