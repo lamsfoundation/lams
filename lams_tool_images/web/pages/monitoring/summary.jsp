@@ -224,11 +224,17 @@
 	</div> <!--  end panel group -->
 </c:if>
 
-<P id="add-image-container">
-	<a href="<html:rewrite page='/learning/newImageInit.do?sessionMapID='/>${sessionMapID}&KeepThis=true&TB_iframe=true&modal=true" 
-			class="btn btn-default btn-xs loffset5 voffset10 pull-right thickbox">  
-		<i class="fa fa-plus"></i>&nbsp;<fmt:message key="label.monitoring.summary.add.new.image" />
-	</a>
-</P>
-
 <%@ include file="parts/advanceOptions.jsp"%>
+
+<div id="manage-image-buttons">
+	<div class="panel panel-default" >
+		<div class="panel-heading">
+			<button onclick="javascript:newImageInit('<html:rewrite page='/authoring/newImageInit.do'/>?sessionMapID=${sessionMapID}');"
+					class="btn btn-default btn-xs loffset5  " id="">  
+				<i class="fa fa-upload"></i> <fmt:message key="label.learning.add.new.image" />
+			</button>
+		</div>
+	</div>
+</div>
+
+<div id="new-image-input-area" class="voffset20"></div>

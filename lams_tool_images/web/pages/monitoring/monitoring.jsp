@@ -1,6 +1,16 @@
 <!DOCTYPE html>
 <%@ include file="/common/taglibs.jsp"%>
 <%@ page import="org.lamsfoundation.lams.tool.imageGallery.ImageGalleryConstants"%>
+<%@ page import="org.lamsfoundation.lams.util.Configuration" %>
+<%@ page import="org.lamsfoundation.lams.util.ConfigurationKeys" %>
+<c:choose>
+	<c:when test="${sessionMap.mode == 'teacher'}">
+		<c:set var="UPLOAD_FILE_MAX_SIZE"><%=Configuration.get(ConfigurationKeys.UPLOAD_FILE_LARGE_MAX_SIZE)%></c:set>
+	</c:when>
+	<c:otherwise>
+		<c:set var="UPLOAD_FILE_MAX_SIZE"><%=Configuration.get(ConfigurationKeys.UPLOAD_FILE_MAX_SIZE)%></c:set>
+	</c:otherwise>
+</c:choose>
 <c:set var="sessionMap" value="${sessionScope[sessionMapID]}"/>
 
 <lams:html>
@@ -22,7 +32,7 @@
 				padding-bottom: 10px;
 				padding-top: 10px;
 			}
-			#add-image-container {
+			#manage-image-buttons {
 				margin-bottom: 10px;
 				overflow: hidden;
 			}
@@ -44,7 +54,17 @@
 			COMMENT_TEXTAREA_TIP_LABEL = '',
 			WARN_COMMENTS_IS_BLANK_LABEL = '',
 			WARN_MIN_NUMBER_WORDS_LABEL = '';
+
+			<%-- used for  imageGalleryitem.js --%>
+			var saveMultipleImagesUrl = "<c:url value='/learning/saveMultipleImages.do'/>";
+			var UPLOAD_FILE_LARGE_MAX_SIZE = "${UPLOAD_FILE_MAX_SIZE}";
+			var LABEL_ITEM_BLANK = '<fmt:message key="error.resource.item.file.blank"/>';
+			var LABEL_MAX_FILE_SIZE = '<fmt:message key="errors.maxfilesize"><param>{0}</param></fmt:message>';
+			var LABEL_NOT_ALLOWED_FORMAT = '<fmt:message key="error.resource.image.not.alowed.format"/>';
 		</script>
+		<script type="text/javascript" src="<html:rewrite page='/includes/javascript/imageGalleryitem.js'/>"></script>
+		<script type="text/javascript" src="<html:rewrite page='/includes/javascript/uploadImageLearning.js'/>"></script>
+    	<script type="text/javascript" src="${lams}includes/javascript/upload.js"></script>
  		<script type="text/javascript" src="${lams}includes/javascript/thickbox.js"></script>
 		<script type="text/javascript" src="${lams}includes/javascript/monitorToolSummaryAdvanced.js" ></script>
 		<script type="text/javascript" src="${lams}includes/javascript/jquery.tablesorter.js"></script>
@@ -76,9 +96,7 @@
 			}
 			
 			function checkNew(){
-				var monitorURL = window.location.href;
-				document.location.href = monitorURL;
-	 		    return false;
+				location.reload();
 			}			
 			
 			$(document).ready(function(){

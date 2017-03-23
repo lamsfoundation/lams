@@ -99,14 +99,8 @@ public class LearningAction extends Action {
 	if (param.equals("finish")) {
 	    return finish(mapping, form, request, response);
 	}
-	if (param.equals("newImageInit")) {
-	    return newImageInit(mapping, form, request, response);
-	}
 	if (param.equals("saveNewImage")) {
 	    return saveNewImage(mapping, form, request, response);
-	}
-	if (param.equals("initMultipleImages")) {
-	    return initMultipleImages(mapping, form, request, response);
 	}
 	if (param.equals("saveMultipleImages")) {
 	    return saveMultipleImages(mapping, form, request, response);
@@ -298,25 +292,6 @@ public class LearningAction extends Action {
     }
 
     /**
-     * Initial page for add imageGallery item (single file or URL).
-     *
-     * @param mapping
-     * @param form
-     * @param request
-     * @param response
-     * @return
-     */
-    private ActionForward newImageInit(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) {
-	String sessionMapID = WebUtil.readStrParam(request, ImageGalleryConstants.ATTR_SESSION_MAP_ID);
-	request.setAttribute(ImageGalleryConstants.ATTR_SESSION_MAP_ID, sessionMapID);
-
-	ImageGalleryItemForm itemForm = (ImageGalleryItemForm) form;
-	itemForm.setSessionMapID(sessionMapID);
-	return mapping.findForward(ImageGalleryConstants.SUCCESS);
-    }
-
-    /**
      * Save file or url imageGallery item into database.
      *
      * @param mapping
@@ -353,25 +328,6 @@ public class LearningAction extends Action {
 	}
 
 	return null;
-    }
-
-    /**
-     * Initial page for add imageGallery item (single file or URL).
-     *
-     * @param mapping
-     * @param form
-     * @param request
-     * @param response
-     * @return
-     */
-    private ActionForward initMultipleImages(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) {
-	String sessionMapID = WebUtil.readStrParam(request, ImageGalleryConstants.ATTR_SESSION_MAP_ID);
-	request.setAttribute(ImageGalleryConstants.ATTR_SESSION_MAP_ID, sessionMapID);
-
-	MultipleImagesForm multipleForm = (MultipleImagesForm) form;
-	multipleForm.setSessionMapID(sessionMapID);
-	return mapping.findForward(ImageGalleryConstants.SUCCESS);
     }
 
     /**

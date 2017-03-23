@@ -1,5 +1,15 @@
 <!DOCTYPE html>
 <%@ include file="/common/taglibs.jsp"%>
+<%@ page import="org.lamsfoundation.lams.util.Configuration" %>
+<%@ page import="org.lamsfoundation.lams.util.ConfigurationKeys" %>
+<c:choose>
+	<c:when test="${sessionMap.mode == 'teacher'}">
+		<c:set var="UPLOAD_FILE_MAX_SIZE"><%=Configuration.get(ConfigurationKeys.UPLOAD_FILE_LARGE_MAX_SIZE)%></c:set>
+	</c:when>
+	<c:otherwise>
+		<c:set var="UPLOAD_FILE_MAX_SIZE"><%=Configuration.get(ConfigurationKeys.UPLOAD_FILE_MAX_SIZE)%></c:set>
+	</c:otherwise>
+</c:choose>
 
 <lams:html>
 <lams:head>
@@ -20,7 +30,6 @@
 	<c:set var="mediumImageDimensions" value="${sessionMap.mediumImageDimensions}" />
 	<c:set var="thumbnailImageDimensions" value="${empty sessionMap.thumbnailImageDimensions ? 100 : sessionMap.thumbnailImageDimensions}" />
 
-	<link rel="stylesheet" type="text/css" href="${lams}css/thickbox.css">
 	<link rel="stylesheet" type="text/css" href="<html:rewrite page='/includes/css/fotorama.css'/>"/>
 	<style media="screen,projection" type="text/css">
 		@media (max-width: 750px) {
@@ -82,6 +91,17 @@
 	<link rel="stylesheet" type="text/css" href="${lams}css/jquery.tablesorter.theme-blue.css">
 	<link rel="stylesheet" type="text/css" href="${lams}css/jquery.tablesorter.pager.css">
     
+    <script type="text/javascript">
+		<%-- used for  imageGalleryitem.js --%>
+		var saveMultipleImagesUrl = "<c:url value='/learning/saveMultipleImages.do'/>";
+		var UPLOAD_FILE_LARGE_MAX_SIZE = "${UPLOAD_FILE_MAX_SIZE}";
+		var LABEL_ITEM_BLANK = '<fmt:message key="error.resource.item.file.blank"/>';
+		var LABEL_MAX_FILE_SIZE = '<fmt:message key="errors.maxfilesize"><param>{0}</param></fmt:message>';
+		var LABEL_NOT_ALLOWED_FORMAT = '<fmt:message key="error.resource.image.not.alowed.format"/>';
+	</script>
+	<script type="text/javascript" src="<html:rewrite page='/includes/javascript/imageGalleryitem.js'/>"></script>
+	<script type="text/javascript" src="<html:rewrite page='/includes/javascript/uploadImageLearning.js'/>"></script>
+    <script type="text/javascript" src="${lams}includes/javascript/upload.js"></script>
  	<script type="text/javascript" src="${lams}includes/javascript/jquery.form.js"></script>
  	<script type="text/javascript" src="<html:rewrite page='/includes/javascript/fotorama.js'/>"></script>
 	<script type="text/javascript">
