@@ -172,28 +172,12 @@
 			parameter="finish" >
 			<forward name="success" path="/pages/learning/finish.jsp" />
 		</action>
-		<action path="/learning/newImageInit"
-			type="org.lamsfoundation.lams.tool.imageGallery.web.action.LearningAction"
-			parameter="newImageInit"
-			name="imageGalleryItemForm" 
-			scope="request" 
-			validate="false">
-			<forward name="success" path="/pages/learning/parts/addimage.jsp" />
-		</action>
 		<action path="/learning/saveNewImage"
 			type="org.lamsfoundation.lams.tool.imageGallery.web.action.LearningAction"
 			parameter="saveNewImage"
 			name="imageGalleryItemForm" 
 			scope="request" 
 			validate="false">
-		</action>
-		<action path="/learning/initMultipleImages"
-			type="org.lamsfoundation.lams.tool.imageGallery.web.action.LearningAction"
-			name="multipleImagesForm" 
-			scope="request" 
-			validate="false"			
-			parameter="initMultipleImages">
-			<forward name="success" path="/pages/learning/parts/addmultipleimages.jsp" />
 		</action>
 		<action path="/learning/saveMultipleImages"
 			type="org.lamsfoundation.lams.tool.imageGallery.web.action.LearningAction"

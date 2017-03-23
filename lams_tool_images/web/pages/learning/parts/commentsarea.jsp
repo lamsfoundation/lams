@@ -10,7 +10,6 @@
 <c:set var="finishedLock" value="${sessionMap.finishedLock}" />
 <c:set var="isImageSelected" value="${not empty sessionMap.currentImage}" />
 
-<script type="text/javascript" src="${lams}includes/javascript/thickbox.js"></script>
 <script type="text/javascript" src="${lams}includes/javascript/common.js"></script>
 <c:if test="${isImageSelected}">
 	<script type="text/javascript">
@@ -31,6 +30,7 @@
 	</script>
 	<script type="text/javascript" src="${lams}includes/javascript/rating.js"></script>
 </c:if>
+<script type="text/javascript" src="<html:rewrite page='/includes/javascript/uploadImageLearning.js'/>"></script>
 <script type="text/javascript" src="${lams}includes/javascript/jquery.jRating.js"></script>
 <script type="text/javascript">
 	$(document).ready(function(){
@@ -96,17 +96,17 @@
 			
 			<%--"Check for new", "Add new image" and "Delete" buttons---------------%>
 				
-			<div class="btn-group" role="group">	
+			<div id="manage-image-buttons" class="btn-group" role="group">	
 				<c:if test="${imageGallery.allowShareImages}">
-					<button href="#nogo" onclick="return checkNew()" class="btn btn-sm btn-default" id="check-for-new-button"> 
+					<button onclick="return checkNew()" class="btn btn-sm btn-default" id="check-for-new-button"> 
 						<i class="fa fa-refresh"></i> <fmt:message key="label.check.for.new" /> 
 					</button>
 								
 					<c:if test="${not finishedLock}">
-						<a href="<html:rewrite page='/learning/newImageInit.do?sessionMapID='/>${sessionMapID}&KeepThis=true&TB_iframe=true&modal=true" 
-								class="btn btn-default btn-sm thickbox" id="add-new-image-button">  
+						<button onclick="javascript:newImageInit('<html:rewrite page='/authoring/newImageInit.do'/>?sessionMapID=${sessionMapID}');"
+								class="btn btn-default btn-sm" id="add-new-image-button">  
 							<i class="fa fa-upload"></i> <fmt:message key="label.learning.add.new.image" />
-						</a>
+						</button>
 					</c:if>
 					
 					<c:if test="${sessionMap.isAuthor}">
@@ -115,6 +115,10 @@
 						</button>
 					</c:if>
 				</c:if>
-			</div>
+			</div>		
 	</div>
+							
+	<c:if test="${imageGallery.allowShareImages && !finishedLock}">
+		<div id="new-image-input-area" class="voffset20"></div>
+	</c:if>	
 </c:if>

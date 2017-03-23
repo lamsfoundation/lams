@@ -41,6 +41,11 @@
 	    	// end optional tab controller stuff
 	    	selectTab(tabId);
         }
+        
+        //callback method that is invoked after image has been successfully uploaded to the server
+        function imageUploadedCallback() {
+        	$('#new-image-input-area').html(data);
+        }
     </script>
  
 </lams:head>
