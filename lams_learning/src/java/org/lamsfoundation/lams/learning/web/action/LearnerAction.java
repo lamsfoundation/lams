@@ -41,6 +41,7 @@ import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.apache.tomcat.util.json.JSONException;
 import org.apache.tomcat.util.json.JSONObject;
+import org.lamsfoundation.lams.gradebook.service.IGradebookService;
 import org.lamsfoundation.lams.learning.presence.PresenceWebsocketServer;
 import org.lamsfoundation.lams.learning.service.ICoreLearnerService;
 import org.lamsfoundation.lams.learning.service.LearnerServiceProxy;
@@ -54,6 +55,7 @@ import org.lamsfoundation.lams.lesson.LearnerProgress;
 import org.lamsfoundation.lams.lesson.LearnerProgressArchive;
 import org.lamsfoundation.lams.lesson.Lesson;
 import org.lamsfoundation.lams.lesson.service.ILessonService;
+import org.lamsfoundation.lams.monitoring.service.IMonitoringService;
 import org.lamsfoundation.lams.tool.ToolSession;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
@@ -224,13 +226,20 @@ public class LearnerAction extends LamsDispatchAction {
 		attemptID, attemptedActivities, completedActivities, learnerProgress.getCurrentActivity(),
 		learnerProgress.getLessonComplete(), learnerProgress.getStartDate(), learnerProgress.getFinishDate());
 
-	// remove learner progress
-	ILessonService lessonService = LearnerServiceProxy.getLessonService(getServlet().getServletContext());
-	lessonService.removeLearnerProgress(lessonID, userID);
-
 	IUserManagementService userManagementService = LearnerServiceProxy
 		.getUserManagementService(getServlet().getServletContext());
 	userManagementService.save(learnerProgressArchive);
+
+	IGradebookService gradebookService = LearnerServiceProxy.getGradebookService(getServlet().getServletContext());
+	gradebookService.archiveLearnerMarks(lessonID, userID);
+	gradebookService.removeLearnerFromLesson(lessonID, userID);
+
+	IMonitoringService monitoringService = LearnerServiceProxy
+		.getMonitoringService(getServlet().getServletContext());
+	monitoringService.removeLearnerContent(lessonID, userID);
+	// remove learner progress
+	ILessonService lessonService = LearnerServiceProxy.getLessonService(getServlet().getServletContext());
+	lessonService.removeLearnerProgress(lessonID, userID);
 
 	// display Learner interface with updated data
 	return joinLesson(mapping, form, request, response);
