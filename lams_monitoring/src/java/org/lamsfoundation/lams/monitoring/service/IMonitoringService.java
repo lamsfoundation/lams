@@ -649,6 +649,9 @@ public interface IMonitoringService {
     Long cloneLesson(Long lessonId, Integer creatorId, Boolean addAllStaff, Boolean addAllLearners, String[] staffIds,
 	    String[] learnerIds, Organisation group) throws MonitoringServiceException;
 
+
+    void removeLearnerContent(Long lessonId, Integer learnerId);
+    
     /**
      * Get list of users who completed the given lesson.
      */

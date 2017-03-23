@@ -20,7 +20,6 @@
  * ****************************************************************
  */
 
-
 package org.lamsfoundation.lams.gradebook.service;
 
 import java.util.ArrayList;
@@ -118,14 +117,15 @@ public interface IGradebookService {
 	    String sortOrder, String searchString);
 
     int getCountUsersByOrganisation(Integer orgId, String searchString);
-    
+
     /**
-     * Updates all user marks in specified activity. It recalculates all UserActivityGradebooks and UserLessonGradebooks.
+     * Updates all user marks in specified activity. It recalculates all UserActivityGradebooks and
+     * UserLessonGradebooks.
      * 
      * @param activity
      */
     void recalculateGradebookMarksForActivity(Activity activity);
-    
+
     /**
      * Recalculates total marks for all users in a lesson. Then stores that mark in a gradebookUserLesson. Doesn't
      * affect anyhow gradebookUserActivity objects. If total mark is positive but there is no gradebookUserLesson
@@ -271,6 +271,10 @@ public interface IGradebookService {
      * @return
      */
     Activity getActivityById(Long activityID);
+
+    void removeLearnerFromLesson(Long lessonId, Integer learnerId);
+
+    void archiveLearnerMarks(Long lessonId, Integer learnerId);
 
     /**
      * Get a language label
