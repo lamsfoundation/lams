@@ -46,18 +46,19 @@
 
 <lams:Page type="learner" title="${content.title}">
 
-	<h4>
-		<fmt:message key="label.group.leader" />&nbsp;
-		
-		<c:choose>
-			<c:when test="${not empty groupLeader}">
+	<c:choose>
+		<c:when test="${not empty groupLeader}">
+			<h4>
+				<fmt:message key="label.group.leader" /> &nbsp;
 				<mark><c:out value="${groupLeader.firstName} ${groupLeader.lastName}" escapeXml="true" /></mark>
-			</c:when>
-			<c:otherwise>
+			</h4>
+		</c:when>
+		<c:otherwise>
+			<lams:Alert type="info" id="no-leader" close="false">
 				<i><fmt:message key="label.no.leader.yet" /></i>
-			</c:otherwise>
-		</c:choose>
-	</h4>
+			</lams:Alert>
+		</c:otherwise>
+	</c:choose>
 
 	<div>
 		<fmt:message key="label.users.from.group" />
