@@ -179,11 +179,9 @@ public class AuthoringAction extends Action {
 	}
 
 	ToolAccessMode mode = getAccessMode(request);
-	if (mode.isAuthor()) {
-	    return mapping.findForward(PeerreviewConstants.SUCCESS);
-	} else {
-	    return mapping.findForward(PeerreviewConstants.DEFINE_LATER);
-	}
+	request.setAttribute(AttributeNames.ATTR_MODE, mode.toString());
+
+	return mapping.findForward(PeerreviewConstants.SUCCESS);
     }
 
     /**
@@ -206,41 +204,30 @@ public class AuthoringAction extends Action {
 		.getAttribute(peerreviewForm.getSessionMapID());
 
 	ToolAccessMode mode = getAccessMode(request);
-
-	ActionMessages errors = validate(peerreviewForm, mapping, request);
-	if (!errors.isEmpty()) {
-	    saveErrors(request, errors);
-	    if (mode.isAuthor()) {
-		return mapping.findForward("author");
-	    } else {
-		return mapping.findForward("monitor");
-	    }
-	}
+	request.setAttribute(AttributeNames.ATTR_MODE, mode.toString());
 
 	Peerreview peerreview = peerreviewForm.getPeerreview();
 	IPeerreviewService service = getPeerreviewService();
 
-	// **********************************Get Peerreview
-	// PO*********************
+	// **********************************Get Peerreview PO*********************
 	Peerreview peerreviewPO = service.getPeerreviewByContentId(peerreviewForm.getPeerreview().getContentId());
 	if (peerreviewPO == null) {
-	    // new Peerreview, create it.
+	    // new Peerreview, create it
 	    peerreviewPO = peerreview;
 	    peerreviewPO.setCreated(new Timestamp(new Date().getTime()));
 	    peerreviewPO.setUpdated(new Timestamp(new Date().getTime()));
+	    
 	} else {
-	    if (mode.isAuthor()) {
-		Long uid = peerreviewPO.getUid();
-		PropertyUtils.copyProperties(peerreviewPO, peerreview);
-		// get back UID
-		peerreviewPO.setUid(uid);
-	    } else { // if it is Teacher, then just update basic tab content
-		// (definelater)
-		peerreviewPO.setInstructions(peerreview.getInstructions());
-		peerreviewPO.setTitle(peerreview.getTitle());
-		// change define later status
+	    Long uid = peerreviewPO.getUid();
+	    PropertyUtils.copyProperties(peerreviewPO, peerreview);
+	    // get back UID
+	    peerreviewPO.setUid(uid);
+		
+	    // if it's a teacher - change define later status
+	    if (mode.isTeacher()) {
 		peerreviewPO.setDefineLater(false);
 	    }
+	    
 	    peerreviewPO.setUpdated(new Timestamp(new Date().getTime()));
 	}
 
@@ -268,11 +255,7 @@ public class AuthoringAction extends Action {
 	peerreviewForm.setPeerreview(peerreviewPO);
 
 	request.setAttribute(AuthoringConstants.LAMS_AUTHORING_SUCCESS_FLAG, Boolean.TRUE);
-	if (mode.isAuthor()) {
-	    return mapping.findForward("author");
-	} else {
-	    return mapping.findForward("monitor");
-	}
+	return mapping.findForward(PeerreviewConstants.SUCCESS);
     }
 
     // *************************************************************************************
@@ -303,25 +286,6 @@ public class AuthoringAction extends Action {
 	    mode = ToolAccessMode.AUTHOR;
 	}
 	return mode;
-    }
-
-    private ActionMessages validate(PeerreviewForm peerreviewForm, ActionMapping mapping, HttpServletRequest request) {
-	ActionMessages errors = new ActionMessages();
-	// if (StringUtils.isBlank(peerreviewForm.getPeerreview().getTitle())) {
-	// ActionMessage error = new
-	// ActionMessage("error.resource.item.title.blank");
-	// errors.add(ActionMessages.GLOBAL_MESSAGE, error);
-	// }
-
-	// define it later mode(TEACHER) skip below validation.
-	String modeStr = request.getParameter(AttributeNames.ATTR_MODE);
-	if (StringUtils.equals(modeStr, ToolAccessMode.TEACHER.toString())) {
-	    return errors;
-	}
-
-	// Some other validation outside basic Tab.
-
-	return errors;
     }
 
 }

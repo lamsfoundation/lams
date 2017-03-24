@@ -73,6 +73,7 @@
 		<lams:Page title="${title}" type="navbar">
 		
 			<html:hidden property="commonCartridge.contentId" />
+			<html:hidden property="mode" value="${mode}"/>
 			<html:hidden property="sessionMapID" />
 			<html:hidden property="contentFolderID" />
 			<html:hidden property="currentTab" styleId="currentTab" />
@@ -96,7 +97,7 @@
 					<lams:AuthoringButton formID="authoringForm"
 						clearSessionActionUrl="/clearsession.do" toolSignature="<%=CommonCartridgeConstants.TOOL_SIGNATURE%>"
 						toolContentID="${formBean.commonCartridge.contentId}"
-						accessMode="author"
+						accessMode="${mode}" defineLater="${mode=='teacher'}"
 						contentFolderID="${formBean.contentFolderID}" />
 				</div>
 			</lams:TabBodyArea>

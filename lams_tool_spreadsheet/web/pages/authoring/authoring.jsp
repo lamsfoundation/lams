@@ -1,8 +1,7 @@
 <!DOCTYPE html>
-        
+
 <%@ include file="/common/taglibs.jsp"%>
 <%@ page import="org.lamsfoundation.lams.tool.spreadsheet.SpreadsheetConstants"%>
-
 <c:set var="spreadsheetURL"><html:rewrite page="/includes/javascript/simple_spreadsheet/spreadsheet_offline.html"/>?lang=${pageContext.response.locale.language}</c:set>
 
 <lams:html>
@@ -35,19 +34,16 @@
     	}
     	var spreadsheetCode = "${sessionMap.code}";
         
-    </script>
-	<!-- ******************** END CK Editor related javascript & HTML ********************** -->
-
- 
+    </script> 
 </lams:head>
 <body class="stripes" onLoad="init()">
-
-	<html:form action="authoring/update" method="post" styleId="authoringForm" enctype="multipart/form-data" onsubmit="return onSubmitHandler();">
-		<c:set var="formBean" value="<%= request.getAttribute(org.apache.struts.taglib.html.Constants.BEAN_KEY) %>" />
-		<html:hidden property="spreadsheet.contentId" />
-		<html:hidden property="sessionMapID" />
-		<html:hidden property="contentFolderID" />
-		<html:hidden property="currentTab" styleId="currentTab" />
+<html:form action="authoring/update" method="post" styleId="authoringForm" enctype="multipart/form-data" onsubmit="return onSubmitHandler();">
+	<c:set var="formBean" value="<%= request.getAttribute(org.apache.struts.taglib.html.Constants.BEAN_KEY) %>" />
+	<html:hidden property="spreadsheet.contentId" />
+	 <html:hidden property="mode" value="${mode}"/>
+	<html:hidden property="sessionMapID" />
+	<html:hidden property="contentFolderID" />
+	<html:hidden property="currentTab" styleId="currentTab" />
 
 	<c:set var="title"><fmt:message key="activity.title"/> ${lang}</c:set>
 	<lams:Page title="${title}" type="navbar">
@@ -74,13 +70,12 @@
 		<!-- Button Row -->
 		<lams:AuthoringButton formID="authoringForm" clearSessionActionUrl="/clearsession.do" 
 			toolSignature="<%=SpreadsheetConstants.TOOL_SIGNATURE%>" toolContentID="${formBean.spreadsheet.contentId}" 
-			 customiseSessionID="${formBean.sessionMapID}"
+			 customiseSessionID="${formBean.sessionMapID}" accessMode="${mode}" defineLater="${mode=='teacher'}"
 			 contentFolderID="${formBean.contentFolderID}" />
 		</lams:TabBodyArea>
 
 		<div id="footer"></div>
 	</lams:Page>	
-	</html:form>
-
+</html:form>
 </body>
 </lams:html>

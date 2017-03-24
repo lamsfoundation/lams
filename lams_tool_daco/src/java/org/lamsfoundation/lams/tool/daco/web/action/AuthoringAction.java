@@ -75,7 +75,6 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
 
 /**
  * @author Marcin Cieslak
- * @version $Revision$
  */
 public class AuthoringAction extends Action {
 
@@ -153,7 +152,7 @@ public class AuthoringAction extends Action {
 
 	// get back sessionMAP
 	String sessionMapID = WebUtil.readStrParam(request, DacoConstants.ATTR_SESSION_MAP_ID);
-	SessionMap sessionMap = (SessionMap) request.getSession().getAttribute(sessionMapID);
+	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession().getAttribute(sessionMapID);
 	int questionIndex = NumberUtils.stringToInt(request.getParameter(DacoConstants.PARAM_QUESTION_INDEX), -1);
 	DacoQuestion question = null;
 	DacoQuestionForm questionForm = (DacoQuestionForm) form;
@@ -185,7 +184,7 @@ public class AuthoringAction extends Action {
 	 * question.
 	 */
 
-	SessionMap sessionMap = (SessionMap) request.getSession().getAttribute(questionForm.getSessionMapID());
+	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession().getAttribute(questionForm.getSessionMapID());
 	// check whether it is "edit(old question)" or "add(new question)"
 	SortedSet<DacoQuestion> questionSet = getQuestionList(sessionMap);
 	int questionIndex = NumberUtils.stringToInt(questionForm.getQuestionIndex(), -1);
@@ -362,7 +361,7 @@ public class AuthoringAction extends Action {
      * @param request
      * @return
      */
-    protected List getDeletedDacoQuestionList(SessionMap sessionMap) {
+    protected List getDeletedDacoQuestionList(SessionMap<String, Object> sessionMap) {
 	return getListFromSession(sessionMap, DacoConstants.ATTR_DELETED_QUESTION_LIST);
     }
 
@@ -373,7 +372,7 @@ public class AuthoringAction extends Action {
      * @param name
      * @return
      */
-    protected List getListFromSession(SessionMap sessionMap, String name) {
+    protected List getListFromSession(SessionMap<String, Object> sessionMap, String name) {
 	List list = (List) sessionMap.get(name);
 	if (list == null) {
 	    list = new ArrayList();
@@ -406,7 +405,7 @@ public class AuthoringAction extends Action {
      * @param request
      * @return
      */
-    protected SortedSet<DacoQuestion> getQuestionList(SessionMap sessionMap) {
+    protected SortedSet<DacoQuestion> getQuestionList(SessionMap<String, Object> sessionMap) {
 
 	SortedSet<DacoQuestion> list = (SortedSet<DacoQuestion>) sessionMap.get(DacoConstants.ATTR_QUESTION_LIST);
 	if (list == null) {
@@ -429,7 +428,7 @@ public class AuthoringAction extends Action {
     protected ActionForward initPage(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) throws ServletException {
 	String sessionMapID = WebUtil.readStrParam(request, DacoConstants.ATTR_SESSION_MAP_ID);
-	SessionMap sessionMap = (SessionMap) request.getSession().getAttribute(sessionMapID);
+	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession().getAttribute(sessionMapID);
 	DacoForm existForm = (DacoForm) sessionMap.get(DacoConstants.ATTR_DACO_FORM);
 
 	DacoForm dacoForm = (DacoForm) form;
@@ -440,11 +439,9 @@ public class AuthoringAction extends Action {
 	}
 
 	ToolAccessMode mode = getAccessMode(request);
-	if (mode.isAuthor()) {
-	    return mapping.findForward(DacoConstants.SUCCESS);
-	} else {
-	    return mapping.findForward(DacoConstants.DEFINE_LATER);
-	}
+	request.setAttribute(AttributeNames.ATTR_MODE, mode.toString());
+	
+	return mapping.findForward(DacoConstants.SUCCESS);
     }
 
     /**
@@ -594,7 +591,7 @@ public class AuthoringAction extends Action {
 
 	// get back sessionMAP
 	String sessionMapID = WebUtil.readStrParam(request, DacoConstants.ATTR_SESSION_MAP_ID);
-	SessionMap sessionMap = (SessionMap) request.getSession().getAttribute(sessionMapID);
+	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession().getAttribute(sessionMapID);
 
 	int questionIndex = NumberUtils.stringToInt(request.getParameter(DacoConstants.PARAM_QUESTION_INDEX), -1);
 	if (questionIndex != -1) {
@@ -686,7 +683,7 @@ public class AuthoringAction extends Action {
 	DacoForm dacoForm = (DacoForm) form;
 
 	// initial Session Map
-	SessionMap sessionMap = new SessionMap();
+	SessionMap<String, Object> sessionMap = new SessionMap<String, Object>();
 	request.getSession().setAttribute(sessionMap.getSessionID(), sessionMap);
 	dacoForm.setSessionMapID(sessionMap.getSessionID());
 
@@ -764,18 +761,15 @@ public class AuthoringAction extends Action {
 	DacoForm dacoForm = (DacoForm) form;
 
 	// get back sessionMAP
-	SessionMap sessionMap = (SessionMap) request.getSession().getAttribute(dacoForm.getSessionMapID());
+	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession().getAttribute(dacoForm.getSessionMapID());
 
 	ToolAccessMode toolAccessMode = getAccessMode(request);
+	request.setAttribute(AttributeNames.ATTR_MODE, toolAccessMode.toString());
 
 	ActionMessages errors = validateDacoForm(dacoForm, mapping, request);
 	if (!errors.isEmpty()) {
 	    saveErrors(request, errors);
-	    if (toolAccessMode.isAuthor()) {
-		return mapping.findForward("author");
-	    } else {
-		return mapping.findForward("monitor");
-	    }
+	    return mapping.findForward(DacoConstants.SUCCESS);
 	}
 
 	Daco daco = dacoForm.getDaco();
@@ -788,19 +782,17 @@ public class AuthoringAction extends Action {
 	    dacoPO = daco;
 	    dacoPO.setCreated(new Timestamp(new Date().getTime()));
 	    dacoPO.setUpdated(new Timestamp(new Date().getTime()));
+	    
 	} else {
 	    service.releaseDacoFromCache(dacoPO);
-	    if (toolAccessMode.isAuthor()) {
-
-		Long uid = dacoPO.getUid();
-		PropertyUtils.copyProperties(dacoPO, daco);
-		// get back UID
-		dacoPO.setUid(uid);
-	    } else { // if it is Teacher, then just update basic tab content
-			 // (definelater)
-		dacoPO.setInstructions(daco.getInstructions());
-		dacoPO.setTitle(daco.getTitle());
-		// change define later status
+	    
+	    Long uid = dacoPO.getUid();
+	    PropertyUtils.copyProperties(dacoPO, daco);
+	    // get back UID
+	    dacoPO.setUid(uid);
+	    
+	    // if it's a teacher - change define later status
+	    if (toolAccessMode.isTeacher()) {
 		dacoPO.setDefineLater(false);
 	    }
 	    dacoPO.setUpdated(new Timestamp(new Date().getTime()));
@@ -849,12 +841,7 @@ public class AuthoringAction extends Action {
 
 	request.setAttribute(AuthoringConstants.LAMS_AUTHORING_SUCCESS_FLAG, Boolean.TRUE);
 
-	if (toolAccessMode.isAuthor()) {
-	    return mapping.findForward("author");
-	} else {
-	    return mapping.findForward("monitor");
-	}
-
+	return mapping.findForward(DacoConstants.SUCCESS);
     }
 
     protected ActionMessages validateDacoForm(DacoForm dacoForm, ActionMapping mapping, HttpServletRequest request) {
@@ -865,13 +852,6 @@ public class AuthoringAction extends Action {
 	    errors.add(ActionMessages.GLOBAL_MESSAGE,
 		    new ActionMessage(DacoConstants.ERROR_MSG_RECORDLIMIT_MIN_TOOHIGH_MAX));
 	}
-
-	String modeStr = request.getParameter(AttributeNames.ATTR_MODE);
-	if (StringUtils.equals(modeStr, ToolAccessMode.TEACHER.toString())) {
-	    return errors;
-	}
-
-	// Some other validation outside basic Tab.
 
 	return errors;
     }

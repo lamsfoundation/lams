@@ -1,12 +1,7 @@
 <!DOCTYPE html>
-        
 
 <%@ include file="/common/taglibs.jsp"%>
 <%@ page import="org.lamsfoundation.lams.tool.taskList.TaskListConstants"%>
-
-<lams:html>
-	<lams:head>
-	
 		<%-- param has higher level for request attribute --%>
 		<c:if test="${not empty param.sessionMapID}">
 			<c:set var="sessionMapID" value="${param.sessionMapID}" />
@@ -14,6 +9,8 @@
 	
 		<c:set var="sessionMap" value="${sessionScope[sessionMapID]}" />
 		
+<lams:html>
+	<lams:head>
 	
 		<script type="text/javascript">
 			//pass settings to monitorToolSummaryAdvanced.js
@@ -28,7 +25,6 @@
 				messageRestrictionRemoved: '<fmt:message key="monitor.summary.date.restriction.removed" />'
 			};
 		</script>
-	
 		<%@ include file="/common/monitorheader.jsp" %>
 		
 		<style media="screen,projection" type="text/css">
@@ -48,7 +44,6 @@
 		</style>
 		
 		<script>
-
 	        function init(){
 	        	var initialTabId = "${initialTabId}";
 			 	if (initialTabId) {

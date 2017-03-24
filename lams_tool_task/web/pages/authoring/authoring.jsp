@@ -1,9 +1,7 @@
 <!DOCTYPE html>
-        
 
 <%@ include file="/common/taglibs.jsp"%>
 <%@ page import="org.lamsfoundation.lams.tool.taskList.TaskListConstants"%>
-
 
 <lams:html>
 <lams:head>
@@ -18,7 +16,6 @@
 	    		selectTab(tag.value);
             else
                 selectTab(1); //select the default tab;
-          
         }     
         
         function doSelectTab(tabId) {
@@ -67,10 +64,10 @@
 </lams:head>
 
 <body class="stripes" onLoad="init()">
-
-	<html:form action="authoring/update" method="post" styleId="authoringForm" enctype="multipart/form-data">
+<html:form action="authoring/update" method="post" styleId="authoringForm" enctype="multipart/form-data">
 	<c:set var="formBean" value="<%= request.getAttribute(org.apache.struts.taglib.html.Constants.BEAN_KEY) %>" />
 	<html:hidden property="taskList.contentId" />
+	<html:hidden property="mode" value="${mode}"/>
 	<html:hidden property="sessionMapID" />
 	<html:hidden property="contentFolderID" />
 	<html:hidden property="currentTab" styleId="currentTab" />
@@ -111,19 +108,18 @@
 		
 					<lams:AuthoringButton formID="authoringForm" clearSessionActionUrl="/clearsession.do" 
 						toolSignature="<%=TaskListConstants.TOOL_SIGNATURE%>" toolContentID="${formBean.taskList.contentId}" 
-						 customiseSessionID="${formBean.sessionMapID}"
+						 customiseSessionID="${formBean.sessionMapID}" accessMode="${mode}" defineLater="${mode=='teacher'}"
 						 contentFolderID="${formBean.contentFolderID}" />
 			</lams:TabBodyArea>
 	
 			<div id="footer"></div>
 
 		</lams:Page>	
-	</html:form>
+</html:form>
 
 <script type="text/javascript">
 	changeMinTasks(${formBean.taskList.minimumNumberTasks});
 </script>
-
 
 </body>
 </lams:html>

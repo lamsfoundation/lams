@@ -1,5 +1,4 @@
 <!DOCTYPE html>
-        
 
 <%@ include file="/common/taglibs.jsp"%>
 <%@ page import="org.lamsfoundation.lams.tool.peerreview.PeerreviewConstants"%>
@@ -29,18 +28,16 @@
 	    	selectTab(tabId);
         }
     </script>
-    
 </lams:head>
 <body class="stripes" onLoad="init()">
-
-	<html:form action="authoring/update" method="post" styleId="authoringForm" enctype="multipart/form-data">
-		<c:set var="formBean" value="<%= request.getAttribute(org.apache.struts.taglib.html.Constants.BEAN_KEY) %>" />
-		<c:set var="sessionMap" value="${sessionScope[formBean.sessionMapID]}" scope="request"/>
-		
-		<html:hidden property="peerreview.contentId" />
-		<html:hidden property="sessionMapID" />
-		<html:hidden property="contentFolderID" />
-		<html:hidden property="currentTab" styleId="currentTab" />
+<html:form action="authoring/update" method="post" styleId="authoringForm" enctype="multipart/form-data">
+	<c:set var="formBean" value="<%= request.getAttribute(org.apache.struts.taglib.html.Constants.BEAN_KEY) %>" />
+	<c:set var="sessionMap" value="${sessionScope[formBean.sessionMapID]}" scope="request"/>		
+	<html:hidden property="peerreview.contentId" />
+	<html:hidden property="mode" value="${mode}"/>
+	<html:hidden property="sessionMapID" />
+	<html:hidden property="contentFolderID" />
+	<html:hidden property="currentTab" styleId="currentTab" />
 
 	<c:set var="title"><fmt:message key="activity.title" /></c:set>
 	<lams:Page title="${title}" type="navbar">
@@ -73,7 +70,7 @@
 			--%>
 			<lams:AuthoringButton formID="authoringForm" clearSessionActionUrl="/clearsession.do" 
 				toolSignature="<%=PeerreviewConstants.TOOL_SIGNATURE%>" toolContentID="${formBean.peerreview.contentId}" 
-				 customiseSessionID="${formBean.sessionMapID}"
+				 customiseSessionID="${formBean.sessionMapID}" accessMode="${mode}" defineLater="${mode=='teacher'}"
 				 contentFolderID="${formBean.contentFolderID}" />
 		</lams:TabBodyArea>
 
@@ -81,7 +78,6 @@
 		
 	</lams:Page>
 	
-	</html:form>
-
+</html:form>
 </body>
 </lams:html>
