@@ -77,7 +77,6 @@
 			parameter="initPage" 
 			validate="false">
 			<forward name="success" path="/pages/authoring/authoring.jsp" />
-			<forward name="definelater" path="/pages/authoring/definelater.jsp" />
 		</action>
 		<action path="/authoring/update"
 			type="org.lamsfoundation.lams.tool.rsrc.web.action.AuthoringAction"
@@ -85,8 +84,7 @@
 			scope="request" 
 			parameter="updateContent" 
 			validate="false">
-			<forward name="author" path="/pages/authoring/authoring.jsp" />
-			<forward name="monitor" path="/pages/authoring/definelater.jsp" />
+			<forward name="success" path="/pages/authoring/authoring.jsp" />
 		</action>
 		<!-- ==========  Resource Item : URL ========== -->
 		<action path="/authoring/newItemInit"

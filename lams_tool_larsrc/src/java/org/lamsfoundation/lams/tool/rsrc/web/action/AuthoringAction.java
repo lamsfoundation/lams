@@ -81,7 +81,6 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
 
 /**
  * @author Steve.Ni
- * @version $Revision$
  */
 public class AuthoringAction extends Action {
     private static final int INIT_INSTRUCTION_COUNT = 2;
@@ -202,7 +201,7 @@ public class AuthoringAction extends Action {
 
 	// get back sessionMAP
 	String sessionMapID = WebUtil.readStrParam(request, ResourceConstants.ATTR_SESSION_MAP_ID);
-	SessionMap sessionMap = (SessionMap) request.getSession().getAttribute(sessionMapID);
+	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession().getAttribute(sessionMapID);
 
 	int itemIdx = NumberUtils.stringToInt(request.getParameter(ResourceConstants.PARAM_ITEM_INDEX), -1);
 	if (itemIdx != -1) {
@@ -234,7 +233,7 @@ public class AuthoringAction extends Action {
 
 	// get back sessionMAP
 	String sessionMapID = WebUtil.readStrParam(request, ResourceConstants.ATTR_SESSION_MAP_ID);
-	SessionMap sessionMap = (SessionMap) request.getSession().getAttribute(sessionMapID);
+	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession().getAttribute(sessionMapID);
 
 	int itemIdx = NumberUtils.stringToInt(request.getParameter(ResourceConstants.PARAM_ITEM_INDEX), -1);
 	ResourceItem item = null;
@@ -402,7 +401,7 @@ public class AuthoringAction extends Action {
 	resourceForm.setContentFolderID(contentFolderID);
 
 	// initial Session Map
-	SessionMap sessionMap = new SessionMap();
+	SessionMap<String, Object> sessionMap = new SessionMap<String, Object>();
 	request.getSession().setAttribute(sessionMap.getSessionID(), sessionMap);
 	resourceForm.setSessionMapID(sessionMap.getSessionID());
 
@@ -478,7 +477,7 @@ public class AuthoringAction extends Action {
     private ActionForward initPage(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) throws ServletException {
 	String sessionMapID = WebUtil.readStrParam(request, ResourceConstants.ATTR_SESSION_MAP_ID);
-	SessionMap sessionMap = (SessionMap) request.getSession().getAttribute(sessionMapID);
+	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession().getAttribute(sessionMapID);
 	ResourceForm existForm = (ResourceForm) sessionMap.get(ResourceConstants.ATTR_RESOURCE_FORM);
 
 	ResourceForm resourceForm = (ResourceForm) form;
@@ -487,13 +486,11 @@ public class AuthoringAction extends Action {
 	} catch (Exception e) {
 	    throw new ServletException(e);
 	}
-
+	
 	ToolAccessMode mode = getAccessMode(request);
-	if (mode.isAuthor()) {
-	    return mapping.findForward(ResourceConstants.SUCCESS);
-	} else {
-	    return mapping.findForward(ResourceConstants.DEFINE_LATER);
-	}
+	request.setAttribute(AttributeNames.ATTR_MODE, mode.toString());
+
+	return mapping.findForward(ResourceConstants.SUCCESS);
     }
 
     /**
@@ -512,49 +509,44 @@ public class AuthoringAction extends Action {
 	ResourceForm resourceForm = (ResourceForm) form;
 
 	// get back sessionMAP
-	SessionMap sessionMap = (SessionMap) request.getSession().getAttribute(resourceForm.getSessionMapID());
+	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession().getAttribute(resourceForm.getSessionMapID());
 
 	ToolAccessMode mode = getAccessMode(request);
+	request.setAttribute(AttributeNames.ATTR_MODE, mode.toString());
 
 	ActionMessages errors = validate(resourceForm, mapping, request);
 	if (!errors.isEmpty()) {
 	    saveErrors(request, errors);
-	    if (mode.isAuthor()) {
-		return mapping.findForward("author");
-	    } else {
-		return mapping.findForward("monitor");
-	    }
+	    return mapping.findForward(ResourceConstants.SUCCESS);
 	}
 
 	Resource resource = resourceForm.getResource();
 	IResourceService service = getResourceService();
 
-	// **********************************Get Resource
-	// PO*********************
+	// **********************************Get Resource PO*********************
 	Resource resourcePO = service.getResourceByContentId(resource.getContentId());
 	if (resourcePO == null) {
-	    // new Resource, create it.
+	    // new Resource, create it
 	    resourcePO = resource;
 	    resourcePO.setCreated(new Timestamp(new Date().getTime()));
 	    resourcePO.setUpdated(new Timestamp(new Date().getTime()));
+	    
 	} else {
-	    if (mode.isAuthor()) {
-		Long uid = resourcePO.getUid();
-		PropertyUtils.copyProperties(resourcePO, resource);
+	    Long uid = resourcePO.getUid();
+	    PropertyUtils.copyProperties(resourcePO, resource);
 
-		// copyProperties() above may result in "collection assigned to two objects in a session" exception
-		service.evict(resource);
-		resourceForm.setResource(null);
-		resource = null;
-		// get back UID
-		resourcePO.setUid(uid);
-	    } else { // if it is Teacher, then just update basic tab content
-		// (definelater)
-		resourcePO.setInstructions(resource.getInstructions());
-		resourcePO.setTitle(resource.getTitle());
-		// change define later status
+	    // copyProperties() above may result in "collection assigned to two objects in a session" exception
+	    service.evict(resource);
+	    resourceForm.setResource(null);
+	    resource = null;
+	    // set back UID
+	    resourcePO.setUid(uid);
+
+	    // if it's a Teacher (from monitor) - change define later status
+	    if (mode.isTeacher()) {
 		resourcePO.setDefineLater(false);
 	    }
+
 	    resourcePO.setUpdated(new Timestamp(new Date().getTime()));
 	}
 
@@ -616,11 +608,8 @@ public class AuthoringAction extends Action {
 	resourceForm.setResource(resourcePO);
 
 	request.setAttribute(AuthoringConstants.LAMS_AUTHORING_SUCCESS_FLAG, Boolean.TRUE);
-	if (mode.isAuthor()) {
-	    return mapping.findForward("author");
-	} else {
-	    return mapping.findForward("monitor");
-	}
+	
+	return mapping.findForward(ResourceConstants.SUCCESS);
     }
 
     // *************************************************************************************
@@ -641,7 +630,7 @@ public class AuthoringAction extends Action {
      * @param request
      * @return
      */
-    private SortedSet<ResourceItem> getResourceItemList(SessionMap sessionMap) {
+    private SortedSet<ResourceItem> getResourceItemList(SessionMap<String, Object> sessionMap) {
 	SortedSet<ResourceItem> list = (SortedSet<ResourceItem>) sessionMap
 		.get(ResourceConstants.ATTR_RESOURCE_ITEM_LIST);
 	if (list == null) {
@@ -671,7 +660,7 @@ public class AuthoringAction extends Action {
      * @param request
      * @return
      */
-    private List getDeletedItemAttachmentList(SessionMap sessionMap) {
+    private List getDeletedItemAttachmentList(SessionMap<String, Object> sessionMap) {
 	return getListFromSession(sessionMap, ResourceConstants.ATTR_DELETED_RESOURCE_ITEM_ATTACHMENT_LIST);
     }
 
@@ -682,7 +671,7 @@ public class AuthoringAction extends Action {
      * @param name
      * @return
      */
-    private List getListFromSession(SessionMap sessionMap, String name) {
+    private List getListFromSession(SessionMap<String, Object> sessionMap, String name) {
 	List list = (List) sessionMap.get(name);
 	if (list == null) {
 	    list = new ArrayList();
@@ -796,7 +785,6 @@ public class AuthoringAction extends Action {
 	}
 
 	request.setAttribute(ResourceConstants.ATTR_INSTRUCTION_LIST, instructions);
-
     }
 
     /**
@@ -816,7 +804,7 @@ public class AuthoringAction extends Action {
 	 * when persisting this resource item.
 	 */
 
-	SessionMap sessionMap = (SessionMap) request.getSession().getAttribute(itemForm.getSessionMapID());
+	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession().getAttribute(itemForm.getSessionMapID());
 	// check whether it is "edit(old item)" or "add(new item)"
 	SortedSet<ResourceItem> resourceList = getResourceItemList(sessionMap);
 	int itemIdx = NumberUtils.stringToInt(itemForm.getItemIndex(), -1);
@@ -971,19 +959,10 @@ public class AuthoringAction extends Action {
 
     private ActionMessages validate(ResourceForm resourceForm, ActionMapping mapping, HttpServletRequest request) {
 	ActionMessages errors = new ActionMessages();
-	// if (StringUtils.isBlank(resourceForm.getResource().getTitle())) {
-	// ActionMessage error = new
-	// ActionMessage("error.resource.item.title.blank");
-	// errors.add(ActionMessages.GLOBAL_MESSAGE, error);
-	// }
-
-	// define it later mode(TEACHER) skip below validation.
-	String modeStr = request.getParameter(AttributeNames.ATTR_MODE);
-	if (StringUtils.equals(modeStr, ToolAccessMode.TEACHER.toString())) {
-	    return errors;
+	if (StringUtils.isBlank(resourceForm.getResource().getTitle())) {
+	    ActionMessage error = new ActionMessage("error.resource.item.title.blank");
+	    errors.add(ActionMessages.GLOBAL_MESSAGE, error);
 	}
-
-	// Some other validation outside basic Tab.
 
 	return errors;
     }
@@ -1125,7 +1104,7 @@ public class AuthoringAction extends Action {
 	int resourceItemOrderID1 = WebUtil.readIntParam(request, "resourceItemOrderID1");
 	int resourceItemOrderID2 = WebUtil.readIntParam(request, "resourceItemOrderID2");
 
-	SessionMap sessionMap = (SessionMap) request.getSession().getAttribute(sessionMapID);
+	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession().getAttribute(sessionMapID);
 	// check whether it is "edit(old item)" or "add(new item)"
 	SortedSet<ResourceItem> resourceList = getResourceItemList(sessionMap);
 
