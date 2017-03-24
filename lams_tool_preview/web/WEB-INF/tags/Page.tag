@@ -245,7 +245,7 @@
 							<p class="lessonName"></p></a></li>
 						<li><a href="#" onClick="javascript:closeWindow()" ><span id="exitlabel">Exit</span><i class="pull-right fa fa-times"></i></a></li>
 						<li><a href="#" onClick="javascript:viewNotebookEntries(); return false;" ><span id="notebooklabel">Notebook</span><i class="pull-right fa fa-book"></i></a></li>
-						<li id="restartitem" style="display:none"><a href="#" onClick="javascript:restartLesson()"><span id="restartlabel">Restart</span><i class="pull-right fa fa-recycle"></i></a></li>
+						<li id="restartitem" style="display:none"><a href="#" onClick="javascript:restartLesson()"><span id="restartlabel">Restart</span><i class="pull-right fa fa-fast-backward"></i></a></li>
 						<li id="supportitem" style="display:none"><a href="#" class="slidesidemenu" onClick="javascript:toggleSlideMenu(); return false;">
 							<span id="supportlabel">Support Activities</span><i class="pull-right fa fa-th-large"></i></a>
 							<div id="supportPart" class="progressBarContainer"></div>
