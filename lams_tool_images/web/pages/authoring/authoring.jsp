@@ -56,8 +56,8 @@
 	
 		<c:set var="title"><fmt:message key="label.learning.heading" /></c:set>
 		<lams:Page title="${title}" type="navbar">
-		
 			<html:hidden property="imageGallery.contentId"/>
+			<html:hidden property="mode" value="${mode}"/>
 			<html:hidden property="sessionMapID" />
 			<html:hidden property="contentFolderID" />
 			<html:hidden property="currentTab" styleId="currentTab" />
@@ -80,8 +80,7 @@
 				<div id="saveCancelButtons">
 					<lams:AuthoringButton formID="authoringForm"
 						clearSessionActionUrl="/clearsession.do" toolSignature="<%=ImageGalleryConstants.TOOL_SIGNATURE%>"
-						toolContentID="${formBean.imageGallery.contentId}"
-						accessMode="author"
+						toolContentID="${formBean.imageGallery.contentId}" accessMode="${mode}" defineLater="${mode=='teacher'}"
 						contentFolderID="${formBean.contentFolderID}" />
 				</div>
 			</lams:TabBodyArea>

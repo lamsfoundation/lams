@@ -38,7 +38,6 @@ import org.apache.struts.action.Action;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
-import org.apache.struts.action.ActionMessages;
 import org.lamsfoundation.lams.authoring.web.AuthoringConstants;
 import org.lamsfoundation.lams.tool.ToolAccessMode;
 import org.lamsfoundation.lams.tool.spreadsheet.SpreadsheetConstants;
@@ -125,7 +124,7 @@ public class AuthoringAction extends Action {
 	spreadsheetForm.setContentFolderID(contentFolderID);
 
 	// initial Session Map
-	SessionMap sessionMap = new SessionMap();
+	SessionMap<String, Object> sessionMap = new SessionMap<String, Object>();
 	request.getSession().setAttribute(sessionMap.getSessionID(), sessionMap);
 	spreadsheetForm.setSessionMapID(sessionMap.getSessionID());
 
@@ -160,7 +159,7 @@ public class AuthoringAction extends Action {
     private ActionForward initPage(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) throws ServletException {
 	String sessionMapID = WebUtil.readStrParam(request, SpreadsheetConstants.ATTR_SESSION_MAP_ID);
-	SessionMap sessionMap = (SessionMap) request.getSession().getAttribute(sessionMapID);
+	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession().getAttribute(sessionMapID);
 	SpreadsheetForm existForm = (SpreadsheetForm) sessionMap.get(SpreadsheetConstants.ATTR_RESOURCE_FORM);
 
 	SpreadsheetForm spreadsheetForm = (SpreadsheetForm) form;
@@ -171,11 +170,9 @@ public class AuthoringAction extends Action {
 	}
 
 	ToolAccessMode mode = getAccessMode(request);
-	if (mode.isAuthor()) {
-	    return mapping.findForward(SpreadsheetConstants.SUCCESS);
-	} else {
-	    return mapping.findForward(SpreadsheetConstants.DEFINE_LATER);
-	}
+	request.setAttribute(AttributeNames.ATTR_MODE, mode.toString());
+
+	return mapping.findForward(SpreadsheetConstants.SUCCESS);
     }
 
     /**
@@ -192,20 +189,8 @@ public class AuthoringAction extends Action {
 	    HttpServletResponse response) throws Exception {
 	SpreadsheetForm spreadsheetForm = (SpreadsheetForm) (form);
 
-	// get back sessionMAP
-	SessionMap sessionMap = (SessionMap) request.getSession().getAttribute(spreadsheetForm.getSessionMapID());
-
 	ToolAccessMode mode = getAccessMode(request);
-
-	ActionMessages errors = validate(spreadsheetForm, mapping, request);
-	if (!errors.isEmpty()) {
-	    saveErrors(request, errors);
-	    if (mode.isAuthor()) {
-		return mapping.findForward("author");
-	    } else {
-		return mapping.findForward("monitor");
-	    }
-	}
+	request.setAttribute(AttributeNames.ATTR_MODE, mode.toString());
 
 	Spreadsheet spreadsheet = spreadsheetForm.getSpreadsheet();
 	ISpreadsheetService service = getSpreadsheetService();
@@ -217,19 +202,18 @@ public class AuthoringAction extends Action {
 	    spreadsheetPO = spreadsheet;
 	    spreadsheetPO.setCreated(new Timestamp(new Date().getTime()));
 	    spreadsheetPO.setUpdated(new Timestamp(new Date().getTime()));
+	    
 	} else {
-	    if (mode.isAuthor()) {
-		Long uid = spreadsheetPO.getUid();
-		PropertyUtils.copyProperties(spreadsheetPO, spreadsheet);
-		// get back UID
-		spreadsheetPO.setUid(uid);
-	    } else { // if it is Teacher, then just update basic tab content (definelater)
-		spreadsheetPO.setInstructions(spreadsheet.getInstructions());
-		spreadsheetPO.setCode(spreadsheet.getCode());
-		spreadsheetPO.setTitle(spreadsheet.getTitle());
-		// change define later status
+	    Long uid = spreadsheetPO.getUid();
+	    PropertyUtils.copyProperties(spreadsheetPO, spreadsheet);
+	    // get back UID
+	    spreadsheetPO.setUid(uid);
+
+	    // if it's a teacher - change define later status
+	    if (mode.isTeacher()) {
 		spreadsheetPO.setDefineLater(false);
 	    }
+
 	    spreadsheetPO.setUpdated(new Timestamp(new Date().getTime()));
 	}
 
@@ -252,11 +236,7 @@ public class AuthoringAction extends Action {
 	spreadsheetForm.setSpreadsheet(spreadsheetPO);
 
 	request.setAttribute(AuthoringConstants.LAMS_AUTHORING_SUCCESS_FLAG, Boolean.TRUE);
-	if (mode.isAuthor()) {
-	    return mapping.findForward("author");
-	} else {
-	    return mapping.findForward("monitor");
-	}
+	return mapping.findForward(SpreadsheetConstants.SUCCESS);
     }
 
     // *************************************************************************************
@@ -286,25 +266,6 @@ public class AuthoringAction extends Action {
 	    mode = ToolAccessMode.AUTHOR;
 	}
 	return mode;
-    }
-
-    private ActionMessages validate(SpreadsheetForm spreadsheetForm, ActionMapping mapping,
-	    HttpServletRequest request) {
-	ActionMessages errors = new ActionMessages();
-	// if (StringUtils.isBlank(spreadsheetForm.getSpreadsheet().getTitle())) {
-	// ActionMessage error = new ActionMessage("error.resource.item.title.blank");
-	// errors.add(ActionMessages.GLOBAL_MESSAGE, error);
-	// }
-
-	// define it later mode(TEACHER) skip below validation.
-	String modeStr = request.getParameter(AttributeNames.ATTR_MODE);
-	if (StringUtils.equals(modeStr, ToolAccessMode.TEACHER.toString())) {
-	    return errors;
-	}
-
-	// Some other validation outside basic Tab.
-
-	return errors;
     }
 
 }

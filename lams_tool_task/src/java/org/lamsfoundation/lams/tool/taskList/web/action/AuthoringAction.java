@@ -183,7 +183,7 @@ public class AuthoringAction extends Action {
 	taskListForm.setContentFolderID(contentFolderID);
 
 	// initial Session Map
-	SessionMap sessionMap = new SessionMap();
+	SessionMap<String, Object> sessionMap = new SessionMap<String, Object>();
 	request.getSession().setAttribute(sessionMap.getSessionID(), sessionMap);
 	taskListForm.setSessionMapID(sessionMap.getSessionID());
 
@@ -254,7 +254,7 @@ public class AuthoringAction extends Action {
     private ActionForward initPage(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) throws ServletException {
 	String sessionMapID = WebUtil.readStrParam(request, TaskListConstants.ATTR_SESSION_MAP_ID);
-	SessionMap sessionMap = (SessionMap) request.getSession().getAttribute(sessionMapID);
+	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession().getAttribute(sessionMapID);
 	TaskListForm existForm = (TaskListForm) sessionMap.get(TaskListConstants.ATTR_TASKLIST_FORM);
 
 	TaskListForm taskListForm = (TaskListForm) form;
@@ -265,11 +265,9 @@ public class AuthoringAction extends Action {
 	}
 
 	ToolAccessMode mode = getAccessMode(request);
-	if (mode.isAuthor()) {
-	    return mapping.findForward(TaskListConstants.SUCCESS);
-	} else {
-	    return mapping.findForward(TaskListConstants.DEFINE_LATER);
-	}
+	request.setAttribute(AttributeNames.ATTR_MODE, mode.toString());
+	
+	return mapping.findForward(TaskListConstants.SUCCESS);
     }
 
     /**
@@ -287,19 +285,10 @@ public class AuthoringAction extends Action {
 	TaskListForm taskListForm = (TaskListForm) form;
 
 	// get back sessionMAP
-	SessionMap sessionMap = (SessionMap) request.getSession().getAttribute(taskListForm.getSessionMapID());
+	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession().getAttribute(taskListForm.getSessionMapID());
 
 	ToolAccessMode mode = getAccessMode(request);
-
-	ActionMessages errors = validate(taskListForm, mapping, request);
-	if (!errors.isEmpty()) {
-	    saveErrors(request, errors);
-	    if (mode.isAuthor()) {
-		return mapping.findForward("author");
-	    } else {
-		return mapping.findForward("monitor");
-	    }
-	}
+	request.setAttribute(AttributeNames.ATTR_MODE, mode.toString());
 
 	TaskList taskList = taskListForm.getTaskList();
 	ITaskListService service = getTaskListService();
@@ -307,22 +296,22 @@ public class AuthoringAction extends Action {
 	// **********************************Get TaskList PO*********************
 	TaskList taskListPO = service.getTaskListByContentId(taskListForm.getTaskList().getContentId());
 	if (taskListPO == null) {
-	    // new TaskList, create it.
+	    // new TaskList, create it
 	    taskListPO = taskList;
 	    taskListPO.setCreated(new Timestamp(new Date().getTime()));
 	    taskListPO.setUpdated(new Timestamp(new Date().getTime()));
+	    
 	} else {
-	    if (mode.isAuthor()) {
-		Long uid = taskListPO.getUid();
-		PropertyUtils.copyProperties(taskListPO, taskList);
-		// get back UID
-		taskListPO.setUid(uid);
-	    } else { // if it is Teacher, then just update basic tab content (definelater)
-		taskListPO.setInstructions(taskList.getInstructions());
-		taskListPO.setTitle(taskList.getTitle());
-		// change define later status
+	    Long uid = taskListPO.getUid();
+	    PropertyUtils.copyProperties(taskListPO, taskList);
+	    // get back UID
+	    taskListPO.setUid(uid);
+
+	    // if it's a teacher - change define later status
+	    if (mode.isTeacher()) {
 		taskListPO.setDefineLater(false);
 	    }
+
 	    taskListPO.setUpdated(new Timestamp(new Date().getTime()));
 	}
 
@@ -411,11 +400,7 @@ public class AuthoringAction extends Action {
 	taskListForm.setTaskList(taskListPO);
 
 	request.setAttribute(AuthoringConstants.LAMS_AUTHORING_SUCCESS_FLAG, Boolean.TRUE);
-	if (mode.isAuthor()) {
-	    return mapping.findForward("author");
-	} else {
-	    return mapping.findForward("monitor");
-	}
+	return mapping.findForward(TaskListConstants.SUCCESS);
     }
 
     // **********************************************************
@@ -453,7 +438,7 @@ public class AuthoringAction extends Action {
 
 	// get back sessionMAP
 	String sessionMapID = WebUtil.readStrParam(request, TaskListConstants.ATTR_SESSION_MAP_ID);
-	SessionMap sessionMap = (SessionMap) request.getSession().getAttribute(sessionMapID);
+	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession().getAttribute(sessionMapID);
 
 	int itemIdx = NumberUtils.stringToInt(request.getParameter(TaskListConstants.PARAM_ITEM_INDEX), -1);
 	TaskListItem item = null;
@@ -524,7 +509,7 @@ public class AuthoringAction extends Action {
 
 	// get back sessionMAP
 	String sessionMapID = WebUtil.readStrParam(request, TaskListConstants.ATTR_SESSION_MAP_ID);
-	SessionMap sessionMap = (SessionMap) request.getSession().getAttribute(sessionMapID);
+	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession().getAttribute(sessionMapID);
 
 	int itemIdx = NumberUtils.stringToInt(request.getParameter(TaskListConstants.PARAM_ITEM_INDEX), -1);
 	if (itemIdx != -1) {
@@ -583,7 +568,7 @@ public class AuthoringAction extends Action {
     private ActionForward switchItem(ActionMapping mapping, HttpServletRequest request, boolean up) {
 	// get back sessionMAP
 	String sessionMapID = WebUtil.readStrParam(request, TaskListConstants.ATTR_SESSION_MAP_ID);
-	SessionMap sessionMap = (SessionMap) request.getSession().getAttribute(sessionMapID);
+	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession().getAttribute(sessionMapID);
 
 	int itemIdx = NumberUtils.stringToInt(request.getParameter(TaskListConstants.PARAM_ITEM_INDEX), -1);
 	if (itemIdx != -1) {
@@ -628,7 +613,7 @@ public class AuthoringAction extends Action {
      * @param request
      * @return
      */
-    private SortedSet<TaskListItem> getTaskListItemList(SessionMap sessionMap) {
+    private SortedSet<TaskListItem> getTaskListItemList(SessionMap<String, Object> sessionMap) {
 	SortedSet<TaskListItem> list = (SortedSet<TaskListItem>) sessionMap
 		.get(TaskListConstants.ATTR_TASKLIST_ITEM_LIST);
 	if (list == null) {
@@ -644,7 +629,7 @@ public class AuthoringAction extends Action {
      * @param request
      * @return
      */
-    private SortedSet<TaskListCondition> getTaskListConditionList(SessionMap sessionMap) {
+    private SortedSet<TaskListCondition> getTaskListConditionList(SessionMap<String, Object> sessionMap) {
 	SortedSet<TaskListCondition> list = (SortedSet<TaskListCondition>) sessionMap
 		.get(TaskListConstants.ATTR_CONDITION_LIST);
 	if (list == null) {
@@ -660,7 +645,7 @@ public class AuthoringAction extends Action {
      * @param request
      * @return
      */
-    private List getDeletedTaskListConditionList(SessionMap sessionMap) {
+    private List getDeletedTaskListConditionList(SessionMap<String, Object> sessionMap) {
 	return getListFromSession(sessionMap, TaskListConstants.ATTR_DELETED_CONDITION_LIST);
     }
 
@@ -670,7 +655,7 @@ public class AuthoringAction extends Action {
      * @param request
      * @return
      */
-    private List getDeletedTaskListItemList(SessionMap sessionMap) {
+    private List getDeletedTaskListItemList(SessionMap<String, Object> sessionMap) {
 	return getListFromSession(sessionMap, TaskListConstants.ATTR_DELETED_TASKLIST_ITEM_LIST);
     }
 
@@ -681,7 +666,7 @@ public class AuthoringAction extends Action {
      * @param name
      * @return
      */
-    private List getListFromSession(SessionMap sessionMap, String name) {
+    private List getListFromSession(SessionMap<String, Object> sessionMap, String name) {
 	List list = (List) sessionMap.get(name);
 	if (list == null) {
 	    list = new ArrayList();
@@ -731,7 +716,7 @@ public class AuthoringAction extends Action {
 	 * this taskList item.
 	 */
 
-	SessionMap sessionMap = (SessionMap) request.getSession().getAttribute(itemForm.getSessionMapID());
+	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession().getAttribute(itemForm.getSessionMapID());
 	// check whether it is "edit(old item)" or "add(new item)"
 	SortedSet<TaskListItem> taskListList = getTaskListItemList(sessionMap);
 	int itemIdx = NumberUtils.stringToInt(itemForm.getItemIndex(), -1);
@@ -799,24 +784,6 @@ public class AuthoringAction extends Action {
 	    mode = ToolAccessMode.AUTHOR;
 	}
 	return mode;
-    }
-
-    private ActionMessages validate(TaskListForm taskListForm, ActionMapping mapping, HttpServletRequest request) {
-	ActionMessages errors = new ActionMessages();
-	// if (StringUtils.isBlank(taskListForm.getTaskList().getTitle())) {
-	// ActionMessage error = new ActionMessage("error.resource.item.title.blank");
-	// errors.add(ActionMessages.GLOBAL_MESSAGE, error);
-	// }
-
-	// define it later mode(TEACHER) skip below validation.
-	String modeStr = request.getParameter(AttributeNames.ATTR_MODE);
-	if (StringUtils.equals(modeStr, ToolAccessMode.TEACHER.toString())) {
-	    return errors;
-	}
-
-	// Some other validation outside basic Tab.
-
-	return errors;
     }
 
     public ActionForward initPedagogicalPlannerForm(ActionMapping mapping, ActionForm form, HttpServletRequest request,

@@ -256,11 +256,9 @@ public class AuthoringAction extends Action {
 	}
 
 	ToolAccessMode mode = getAccessMode(request);
-	if (mode.isAuthor()) {
-	    return mapping.findForward(ImageGalleryConstants.SUCCESS);
-	} else {
-	    return mapping.findForward(ImageGalleryConstants.DEFINE_LATER);
-	}
+	request.setAttribute(AttributeNames.ATTR_MODE, mode.toString());
+
+	return mapping.findForward(ImageGalleryConstants.SUCCESS);
     }
 
     /**
@@ -281,16 +279,7 @@ public class AuthoringAction extends Action {
 	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession().getAttribute(imageGalleryForm.getSessionMapID());
 
 	ToolAccessMode mode = getAccessMode(request);
-
-	ActionMessages errors = validateImageGallery(imageGalleryForm, request);
-	if (!errors.isEmpty()) {
-	    saveErrors(request, errors);
-	    if (mode.isAuthor()) {
-		return mapping.findForward("author");
-	    } else {
-		return mapping.findForward("monitor");
-	    }
-	}
+	request.setAttribute(AttributeNames.ATTR_MODE, mode.toString());
 
 	ImageGallery imageGallery = imageGalleryForm.getImageGallery();
 	IImageGalleryService service = getImageGalleryService();
@@ -303,16 +292,16 @@ public class AuthoringAction extends Action {
 	    imageGalleryPO = imageGallery;
 	    imageGalleryPO.setCreated(new Timestamp(new Date().getTime()));
 	    imageGalleryPO.setUpdated(new Timestamp(new Date().getTime()));
+	    
 	} else {
-	    if (mode.isAuthor()) {
-		Long uid = imageGalleryPO.getUid();
-		PropertyUtils.copyProperties(imageGalleryPO, imageGallery);
-		// get back UID
-		imageGalleryPO.setUid(uid);
-	    } else { // if it is Teacher, then just update basic tab content (definelater)
-		imageGalleryPO.setInstructions(imageGallery.getInstructions());
-		imageGalleryPO.setTitle(imageGallery.getTitle());
-		// change define later status
+
+	    Long uid = imageGalleryPO.getUid();
+	    PropertyUtils.copyProperties(imageGalleryPO, imageGallery);
+	    // get back UID
+	    imageGalleryPO.setUid(uid);
+
+	    // if it's a teacher - change define later status
+	    if (mode.isTeacher()) {
 		imageGalleryPO.setDefineLater(false);
 	    }
 	    imageGalleryPO.setUpdated(new Timestamp(new Date().getTime()));
@@ -387,11 +376,8 @@ public class AuthoringAction extends Action {
 	imageGalleryForm.setImageGallery(imageGalleryPO);
 
 	request.setAttribute(AuthoringConstants.LAMS_AUTHORING_SUCCESS_FLAG, Boolean.TRUE);
-	if (mode.isAuthor()) {
-	    return mapping.findForward("author");
-	} else {
-	    return mapping.findForward("monitor");
-	}
+	
+	return mapping.findForward(ImageGalleryConstants.SUCCESS);
     }
 
     // **********************************************************
@@ -869,24 +855,6 @@ public class AuthoringAction extends Action {
 	    image.setCreateByAuthor(true);
 	    image.setHide(false);
 	}
-    }
-
-    /**
-     * Validate imageGallery.
-     *
-     * @param imageGalleryForm
-     * @return
-     */
-    private ActionMessages validateImageGallery(ImageGalleryForm imageGalleryForm, HttpServletRequest request) {
-	ActionMessages errors = new ActionMessages();
-
-	// define it later mode(TEACHER) skip below validation.
-	String modeStr = request.getParameter(AttributeNames.ATTR_MODE);
-	if (StringUtils.equals(modeStr, ToolAccessMode.TEACHER.toString())) {
-	    return errors;
-	}
-
-	return errors;
     }
 
     /**
