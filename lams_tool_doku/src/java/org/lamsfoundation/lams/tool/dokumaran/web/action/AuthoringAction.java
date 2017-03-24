@@ -172,11 +172,9 @@ public class AuthoringAction extends Action {
 	}
 
 	ToolAccessMode mode = getAccessMode(request);
-	if (mode.isAuthor()) {
-	    return mapping.findForward(DokumaranConstants.SUCCESS);
-	} else {
-	    return mapping.findForward(DokumaranConstants.DEFINE_LATER);
-	}
+	request.setAttribute(AttributeNames.ATTR_MODE, mode.toString());
+	
+	return mapping.findForward(DokumaranConstants.SUCCESS);
     }
 
     /**
@@ -203,28 +201,26 @@ public class AuthoringAction extends Action {
 	// **********************************Get Dokumaran PO*********************
 	Dokumaran dokumaranPO = service.getDokumaranByContentId(dokumaran.getContentId());
 	if (dokumaranPO == null) {
-	    // new Dokumaran, create it.
+	    // new Dokumaran, create it
 	    dokumaranPO = dokumaran;
 	    dokumaranPO.setCreated(new Timestamp(new Date().getTime()));
 	    dokumaranPO.setUpdated(new Timestamp(new Date().getTime()));
+	    
 	} else {
-	    if (mode.isAuthor()) {
-		Long uid = dokumaranPO.getUid();
-		PropertyUtils.copyProperties(dokumaranPO, dokumaran);
+	    Long uid = dokumaranPO.getUid();
+	    PropertyUtils.copyProperties(dokumaranPO, dokumaran);
 
-		// copyProperties() above may result in "collection assigned to two objects in a session" exception
-		// Below we remove reference to one of Assessment objects,
-		// so maybe there will be just one object in session when save is done
-		// If this fails, we may have to evict the object from session using DAO
-		dokumaranForm.setDokumaran(null);
-		dokumaran = null;
-		// get back UID
-		dokumaranPO.setUid(uid);
-	    } else { // if it is Teacher, then just update basic tab content
-		// (definelater)
-		dokumaranPO.setInstructions(dokumaran.getInstructions());
-		dokumaranPO.setTitle(dokumaran.getTitle());
-		// change define later status
+	    // copyProperties() above may result in "collection assigned to two objects in a session" exception
+	    // Below we remove reference to one of Assessment objects,
+	    // so maybe there will be just one object in session when save is done
+	    // If this fails, we may have to evict the object from session using DAO
+	    dokumaranForm.setDokumaran(null);
+	    dokumaran = null;
+	    // get back UID
+	    dokumaranPO.setUid(uid);
+
+	    // if it's a teacher - change define later status
+	    if (mode.isTeacher()) {
 		dokumaranPO.setDefineLater(false);
 	    }
 	    dokumaranPO.setUpdated(new Timestamp(new Date().getTime()));
@@ -249,11 +245,9 @@ public class AuthoringAction extends Action {
 	dokumaranForm.setDokumaran(dokumaranPO);
 
 	request.setAttribute(AuthoringConstants.LAMS_AUTHORING_SUCCESS_FLAG, Boolean.TRUE);
-	if (mode.isAuthor()) {
-	    return mapping.findForward("author");
-	} else {
-	    return mapping.findForward("monitor");
-	}
+	request.setAttribute(AttributeNames.ATTR_MODE, mode.toString());
+	
+	return mapping.findForward(DokumaranConstants.SUCCESS);
     }
 
     // *************************************************************************************
