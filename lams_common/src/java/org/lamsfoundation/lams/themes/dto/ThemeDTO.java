@@ -23,6 +23,8 @@
 
 package org.lamsfoundation.lams.themes.dto;
 
+import java.io.Serializable;
+
 import org.lamsfoundation.lams.learningdesign.dto.BaseDTO;
 import org.lamsfoundation.lams.themes.Theme;
 
@@ -31,7 +33,7 @@ import org.lamsfoundation.lams.themes.Theme;
  *
  * @author Fiona Malikoff
  */
-public class ThemeDTO extends BaseDTO {
+public class ThemeDTO extends BaseDTO implements Serializable {
     private Long id;
     private String name;
     private String description;
