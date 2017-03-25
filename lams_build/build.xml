@@ -679,12 +679,18 @@
 		<antcall target="_deploy-standalone-config" />
 		<antcall target="_deploy-standalone-config-slimmed" />
 		
-		<!-- DELETE org/wildfly/clustering/web/undertow module. This module is used by default
+		<!-- Backup and DELETE org/wildfly/clustering/web/undertow module. This module is used by default
 		 (no reconfiguration possible) by Wildfly shared-session (LAMS SSO) to store web sessions as
 		 DistributableSessions with Infinispan cache. When this module is not present - InMemorySessionManager
 		 is used instead. DistributableSessions for shared-session are buggy under wildfly 8.2.0, we don't
-		 use them till migration to Wildfly 9.x -->
-		<delete >
+		 use them till migration to Wildfly 9.x
+		 It will be placed back if deploy-cluster is run. -->
+		<copy todir="${server.home}/backup/undertow"
+			  overwrite="false" verbose="true">
+			<fileset dir="${server.home}/modules/system/layers/base/org/wildfly/clustering/web/undertow" />
+		</copy>
+		
+		<delete>
 			<fileset dir="${server.home}/modules/system/layers/base/org/wildfly/clustering/web/undertow" />
 		</delete>
 		
@@ -777,6 +783,52 @@
 	<!-- cruise control task : build lams without tools -->
 	<target name="lams-cruise-min-tools" depends="_build-ear, build-db, deploy-ear, _deploy-resources, deploy-tools-minimal"
 	        description="Builds entire LAMS without tools (used for CruiseControl instance)" />
+	
+	<!-- cruise control task : build lams -->
+	<target name="deploy-cluster" description="Prepare cluster environment">
+		<echo>${ant.project.name}: Restoring clustering library</echo>
+		<copy todir="${server.home}/modules/system/layers/base/org/wildfly/clustering/web/undertow"
+			  overwrite="false" verbose="true">
+			<fileset dir="${server.home}/backup/undertow" />
+		</copy>
+		
+		<echo>${ant.project.name}: Copying configuration files</echo>
+		<copy todir="${server.home}/domain/configuration" overwrite="true" verbose="true">
+			<fileset dir="${conf.dir}">
+				<include name="domain.xml" />
+				<include name="host.xml" />
+			</fileset>
+	        <filterset>
+	        	<filter token="db.url.run" value="${db.url.run}"/>
+	        	<filter token="db.location" value="${db.location}"/>
+                <filter token="db.username" value="${db.username}"/>
+                <filter token="db.password" value="${db.password}"/>
+	        </filterset>
+		</copy>
+		
+		<property name="webappTag" value="&lt;/web-app&gt;" />
+		<property name="distributableTag" value="&lt;distributable/&gt;" />
+		<echo>${ant.project.name}: Making Central sessions distributable</echo>
+		<!-- Remove existing entries first, so it is possible to run target multiple times -->
+		<replaceregexp file="${server.home}/standalone/deployments/lams.ear/lams-central.war/WEB-INF/web.xml"
+					   flags="gi"
+		               match="${distributableTag}" 
+			           replace=""
+		/>
+		<replaceregexp file="${server.home}/standalone/deployments/lams.ear/lams-central.war/WEB-INF/web.xml"
+			 		   flags="gi"
+			           match="(${webappTag})"
+			           replace="${line.separator}    ${distributableTag}${line.separator}${line.separator}\1"
+		/>
+		
+		<echo>${ant.project.name}: Zipping lams.ear into domain/tmp dir</echo>
+		<zip destfile="${server.home}/domain/tmp/lams.ear"
+			 basedir="${server.home}/standalone/deployments/lams.ear"
+			 encoding="UTF8"
+		 	 compress="false"
+			 update="true"
+		/>
+	</target>
 	
 
 	<target name="slim-wildfly" description="Removes unnecessary files from Wildfly 8.2; do not run twice!">
