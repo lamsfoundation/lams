@@ -205,7 +205,7 @@ public class SurveyUserDAOHibernate extends LAMSBaseDAO implements SurveyUserDAO
     private static final String GET_STATISTICS = "SELECT session.*, COUNT(*) numUsers "
 	    + "  FROM tl_lasurv11_session session, tl_lasurv11_survey survey, tl_lasurv11_user user "
 	    + "  WHERE survey.content_id = :contentId and session.survey_uid = survey.uid  and user.session_uid = session.uid "
-	    + "  GROUP BY session.session_id";
+	    + "  GROUP BY session.uid";
 
     @Override
     @SuppressWarnings("unchecked")
