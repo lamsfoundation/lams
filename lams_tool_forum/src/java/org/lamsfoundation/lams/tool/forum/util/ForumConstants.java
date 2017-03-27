@@ -186,7 +186,7 @@ public interface ForumConstants {
     public static final String EVENT_NAME_NOTIFY_LEARNERS_ON_MARK_RELEASE = "notify_learners_on_mark_release";
 
     // for condition management
-    public static final Object ATTR_CONDITION_SET = "conditionList";
+    public static final String ATTR_CONDITION_SET = "conditionList";
     public static final String PARAM_ORDER_ID = "orderId";
     public static final String ATTR_DELETED_CONDITION_LIST = "deletedConditionList";
 

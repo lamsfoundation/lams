@@ -67,7 +67,7 @@
 			scope="request" 
 			validate="false"
 			parameter="defineLater">
-			<forward name="success" path="tiles:/monitoring/forum/defineLater" />
+			<forward name="success" path="tiles:/authoring/forum/main" />
 		</action>
 		<!-- ========== BEGIN: Authroing Definitions ============================== -->
 		<action path="/authoring"
@@ -83,8 +83,7 @@
 			name="forumForm" 
 			scope="request" 			parameter="updateContent" 
 			validate="false">
-			<forward name="author" path="tiles:/authoring/forum/main" />
-			<forward name="monitor" path="tiles:/monitoring/forum/defineLater" />
+			<forward name="success" path="tiles:/authoring/forum/main" />
 		</action>
 
 		<!--  ================= topics  =================  -->	
