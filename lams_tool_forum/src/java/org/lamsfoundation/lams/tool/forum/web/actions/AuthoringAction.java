@@ -81,7 +81,6 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
 
 /**
  * @author Steve.Ni
- * @version $Revision$
  */
 public class AuthoringAction extends Action {
     private static Logger log = Logger.getLogger(AuthoringAction.class);
@@ -106,12 +105,6 @@ public class AuthoringAction extends Action {
 	    forumService = getForumManager();
 	    Long contentId = new Long(WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_CONTENT_ID));
 	    Forum forum = forumService.getForumByContentId(contentId);
-
-	    boolean isForumEditable = ForumWebUtils.isForumEditable(forum);
-	    if (!isForumEditable) {
-		request.setAttribute(ForumConstants.PAGE_EDITABLE, new Boolean(isForumEditable));
-		return mapping.findForward("forbidden");
-	    }
 
 	    if (!forum.isContentInUse()) {
 		forum.setDefineLater(true);
@@ -176,7 +169,7 @@ public class AuthoringAction extends Action {
     protected ActionForward initPage(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) {
 	// initial Session Map
-	SessionMap sessionMap = new SessionMap();
+	SessionMap<String, Object> sessionMap = new SessionMap<String, Object>();
 	request.getSession().setAttribute(sessionMap.getSessionID(), sessionMap);
 
 	Long contentId = new Long(WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_CONTENT_ID));
@@ -258,6 +251,9 @@ public class AuthoringAction extends Action {
 	SortedSet<ForumCondition> conditionSet = getForumConditionSet(sessionMap);
 	conditionSet.clear();
 	conditionSet.addAll(forum.getConditions());
+	
+	ToolAccessMode mode = getAccessMode(request);
+	request.setAttribute(AttributeNames.ATTR_MODE, mode.toString());
 
 	return mapping.findForward("success");
     }
@@ -286,17 +282,15 @@ public class AuthoringAction extends Action {
 	    throws IllegalAccessException, InvocationTargetException, NoSuchMethodException {
 
 	ToolAccessMode mode = getAccessMode(request);
+	request.setAttribute(AttributeNames.ATTR_MODE, mode.toString());
+	
 	ForumForm forumForm = (ForumForm) form;
-	SessionMap sessionMap = (SessionMap) request.getSession().getAttribute(forumForm.getSessionMapID());
+	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession().getAttribute(forumForm.getSessionMapID());
 	// validation
 	ActionMessages errors = validate(forumForm, mapping, request);
 	if (!errors.isEmpty()) {
 	    saveErrors(request, errors);
-	    if (mode.isAuthor()) {
-		return mapping.findForward("author");
-	    } else {
-		return mapping.findForward("monitor");
-	    }
+	    return mapping.findForward("success");
 	}
 
 	Forum forum = forumForm.getForum();
@@ -326,17 +320,15 @@ public class AuthoringAction extends Action {
 	    // new Forum, create it.
 	    forumPO = forum;
 	    forumPO.setContentId(forumForm.getToolContentID());
+	    
 	} else {
-	    if (mode.isAuthor()) {
-		Long uid = forumPO.getUid();
-		PropertyUtils.copyProperties(forumPO, forum);
-		// get back UID
-		forumPO.setUid(uid);
-	    } else {
-		// if it is Teacher, then just update basic tab content (definelater)
-		forumPO.setInstructions(forum.getInstructions());
-		forumPO.setTitle(forum.getTitle());
-		// change define later status
+	    Long uid = forumPO.getUid();
+	    PropertyUtils.copyProperties(forumPO, forum);
+	    // get back UID
+	    forumPO.setUid(uid);
+
+	    // if it's a teacher - change define later status
+	    if (mode.isTeacher()) {
 		forumPO.setDefineLater(false);
 	    }
 	}
@@ -408,11 +400,7 @@ public class AuthoringAction extends Action {
 	forum = forumService.updateForum(forum);
 
 	request.setAttribute(AuthoringConstants.LAMS_AUTHORING_SUCCESS_FLAG, Boolean.TRUE);
-	if (mode.isAuthor()) {
-	    return mapping.findForward("author");
-	} else {
-	    return mapping.findForward("monitor");
-	}
+	return mapping.findForward("success");
     }
 
     // ******************************************************************************************************************
@@ -451,7 +439,7 @@ public class AuthoringAction extends Action {
     public ActionForward createTopic(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) throws IOException, ServletException, PersistenceException {
 	MessageForm messageForm = (MessageForm) form;
-	SessionMap sessionMap = (SessionMap) request.getSession().getAttribute(messageForm.getSessionMapID());
+	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession().getAttribute(messageForm.getSessionMapID());
 	request.setAttribute(ForumConstants.ATTR_SESSION_MAP_ID, messageForm.getSessionMapID());
 
 	SortedSet topics = getTopics(sessionMap);
@@ -533,7 +521,7 @@ public class AuthoringAction extends Action {
 	    HttpServletResponse response) throws PersistenceException {
 	// get SessionMAP
 	String sessionMapID = WebUtil.readStrParam(request, ForumConstants.ATTR_SESSION_MAP_ID);
-	SessionMap sessionMap = (SessionMap) request.getSession().getAttribute(sessionMapID);
+	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession().getAttribute(sessionMapID);
 	request.setAttribute(ForumConstants.ATTR_SESSION_MAP_ID, sessionMapID);
 	String topicIndex = request.getParameter(ForumConstants.AUTHORING_TOPICS_INDEX);
 	int topicIdx = NumberUtils.stringToInt(topicIndex, -1);
@@ -579,7 +567,7 @@ public class AuthoringAction extends Action {
 
 	// get SessionMAP
 	String sessionMapID = WebUtil.readStrParam(request, ForumConstants.ATTR_SESSION_MAP_ID);
-	SessionMap sessionMap = (SessionMap) request.getSession().getAttribute(sessionMapID);
+	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession().getAttribute(sessionMapID);
 
 	MessageForm msgForm = (MessageForm) form;
 	msgForm.setSessionMapID(sessionMapID);
@@ -616,7 +604,7 @@ public class AuthoringAction extends Action {
     public ActionForward updateTopic(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) throws PersistenceException {
 	MessageForm messageForm = (MessageForm) form;
-	SessionMap sessionMap = (SessionMap) request.getSession().getAttribute(messageForm.getSessionMapID());
+	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession().getAttribute(messageForm.getSessionMapID());
 	request.setAttribute(ForumConstants.ATTR_SESSION_MAP_ID, messageForm.getSessionMapID());
 
 	// get param from HttpServletRequest
@@ -707,7 +695,7 @@ public class AuthoringAction extends Action {
     private ActionForward switchTopic(ActionMapping mapping, HttpServletRequest request, boolean up) {
 	// get back sessionMAP
 	String sessionMapID = WebUtil.readStrParam(request, ForumConstants.ATTR_SESSION_MAP_ID);
-	SessionMap sessionMap = (SessionMap) request.getSession().getAttribute(sessionMapID);
+	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession().getAttribute(sessionMapID);
 
 	int itemIdx = NumberUtils.stringToInt(request.getParameter(ForumConstants.AUTHORING_TOPICS_INDEX), -1);
 	if (itemIdx != -1) {
@@ -752,7 +740,7 @@ public class AuthoringAction extends Action {
      * @param request
      * @return
      */
-    private SortedSet<MessageDTO> getTopics(SessionMap sessionMap) {
+    private SortedSet<MessageDTO> getTopics(SessionMap<String, Object> sessionMap) {
 	SortedSet<MessageDTO> topics = (SortedSet<MessageDTO>) sessionMap.get(ForumConstants.AUTHORING_TOPICS_LIST);
 	if (topics == null) {
 	    topics = new TreeSet<MessageDTO>(new MessageDtoComparator());
@@ -765,7 +753,7 @@ public class AuthoringAction extends Action {
      * @param request
      * @return
      */
-    private List getTopicDeletedAttachmentList(SessionMap sessionMap) {
+    private List getTopicDeletedAttachmentList(SessionMap<String, Object> sessionMap) {
 	return getListFromSession(sessionMap, ForumConstants.DELETED_ATTACHMENT_LIST);
     }
 
@@ -773,7 +761,7 @@ public class AuthoringAction extends Action {
      * @param request
      * @return
      */
-    private List getDeletedTopicList(SessionMap sessionMap) {
+    private List getDeletedTopicList(SessionMap<String, Object> sessionMap) {
 	return getListFromSession(sessionMap, ForumConstants.DELETED_AUTHORING_TOPICS_LIST);
     }
 
@@ -784,7 +772,7 @@ public class AuthoringAction extends Action {
      * @param name
      * @return
      */
-    private List getListFromSession(SessionMap sessionMap, String name) {
+    private List getListFromSession(SessionMap<String, Object> sessionMap, String name) {
 	List list = (List) sessionMap.get(name);
 	if (list == null) {
 	    list = new ArrayList();
@@ -818,7 +806,7 @@ public class AuthoringAction extends Action {
 	    javax.servlet.http.HttpServletRequest request) {
 	ActionMessages errors = new ActionMessages();
 
-	SessionMap sessionMap = (SessionMap) request.getSession().getAttribute(form.getSessionMapID());
+	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession().getAttribute(form.getSessionMapID());
 	ActionMessage ae;
 	try {
 	    String modeStr = request.getParameter(AttributeNames.ATTR_MODE);
@@ -908,7 +896,7 @@ public class AuthoringAction extends Action {
      * @param request
      * @return
      */
-    private SortedSet<ForumCondition> getForumConditionSet(SessionMap sessionMap) {
+    private SortedSet<ForumCondition> getForumConditionSet(SessionMap<String, Object> sessionMap) {
 	SortedSet<ForumCondition> list = (SortedSet<ForumCondition>) sessionMap.get(ForumConstants.ATTR_CONDITION_SET);
 	if (list == null) {
 	    list = new TreeSet<ForumCondition>(new TextSearchConditionComparator());
@@ -923,7 +911,7 @@ public class AuthoringAction extends Action {
      * @param request
      * @return
      */
-    private List getDeletedForumConditionList(SessionMap sessionMap) {
+    private List getDeletedForumConditionList(SessionMap<String, Object> sessionMap) {
 	return getListFromSession(sessionMap, ForumConstants.ATTR_DELETED_CONDITION_LIST);
     }
 

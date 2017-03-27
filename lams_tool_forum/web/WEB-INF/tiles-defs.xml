@@ -105,12 +105,6 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 		<put name="header" value="/jsps/monitoring/header.jsp"/>    	
     		<put name="body" value="/jsps/monitoring/monitoring.jsp"/>
 	</definition>
-	<definition name="tiles:/monitoring/forum/defineLater" extends="tiles:tab:layout">
-    		<put name="pageTitleKey" value="page.title.monitoring.definelater"/>
-    		<put name="header" value="/jsps/authoring/definelaterheader.jsp"/>
-    		<put name="body" value="/jsps/authoring/definelater.jsp"/>
-	</definition>
-	
 	<definition name="tiles:/monitoring/forum/viewMark" extends="tiles:layout">
     		<put name="pageTitleKey" value="page.title.monitoring.view.user.mark"/>
     		<put name="body" value="/jsps/monitoring/viewmarks.jsp"/>

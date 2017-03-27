@@ -78,7 +78,6 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
 
 /**
  * @author Steve.Ni
- * @version $Revision$
  */
 public class AuthoringAction extends Action {
     private static final int INIT_INSTRUCTION_COUNT = 2;
@@ -178,7 +177,7 @@ public class AuthoringAction extends Action {
 
 	// get back sessionMAP
 	String sessionMapID = WebUtil.readStrParam(request, SurveyConstants.ATTR_SESSION_MAP_ID);
-	SessionMap sessionMap = (SessionMap) request.getSession().getAttribute(sessionMapID);
+	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession().getAttribute(sessionMapID);
 
 	int itemIdx = NumberUtils.stringToInt(request.getParameter(SurveyConstants.PARAM_ITEM_INDEX), -1);
 	if (itemIdx != -1) {
@@ -240,7 +239,7 @@ public class AuthoringAction extends Action {
     private ActionForward switchItem(ActionMapping mapping, HttpServletRequest request, boolean up) {
 	// get back sessionMAP
 	String sessionMapID = WebUtil.readStrParam(request, SurveyConstants.ATTR_SESSION_MAP_ID);
-	SessionMap sessionMap = (SessionMap) request.getSession().getAttribute(sessionMapID);
+	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession().getAttribute(sessionMapID);
 
 	int itemIdx = NumberUtils.stringToInt(request.getParameter(SurveyConstants.PARAM_ITEM_INDEX), -1);
 	if (itemIdx != -1) {
@@ -282,7 +281,7 @@ public class AuthoringAction extends Action {
 	QuestionForm itemForm = (QuestionForm) form;
 	// get back sessionMAP
 	String sessionMapID = WebUtil.readStrParam(request, SurveyConstants.ATTR_SESSION_MAP_ID);
-	SessionMap sessionMap = (SessionMap) request.getSession().getAttribute(sessionMapID);
+	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession().getAttribute(sessionMapID);
 
 	int itemIdx = NumberUtils.stringToInt(request.getParameter(SurveyConstants.PARAM_ITEM_INDEX), -1);
 	SurveyQuestion item = null;
@@ -333,7 +332,7 @@ public class AuthoringAction extends Action {
 	    HttpServletResponse response) {
 	QuestionForm itemForm = (QuestionForm) form;
 	String sessionMapID = WebUtil.readStrParam(request, SurveyConstants.ATTR_SESSION_MAP_ID);
-	SessionMap sessionMap = (SessionMap) request.getSession().getAttribute(sessionMapID);
+	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession().getAttribute(sessionMapID);
 
 	int itemIdx = NumberUtils.stringToInt(request.getParameter(SurveyConstants.PARAM_ITEM_INDEX), -1);
 	SortedSet<SurveyQuestion> surveyList = getSurveyItemList(sessionMap);
@@ -425,7 +424,7 @@ public class AuthoringAction extends Action {
 	surveyForm.setContentFolderID(contentFolderID);
 
 	// initial Session Map
-	SessionMap sessionMap = new SessionMap();
+	SessionMap<String, Object> sessionMap = new SessionMap<String, Object>();
 	request.getSession().setAttribute(sessionMap.getSessionID(), sessionMap);
 	surveyForm.setSessionMapID(sessionMap.getSessionID());
 
@@ -492,7 +491,7 @@ public class AuthoringAction extends Action {
     private ActionForward initPage(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) throws ServletException {
 	String sessionMapID = WebUtil.readStrParam(request, SurveyConstants.ATTR_SESSION_MAP_ID);
-	SessionMap sessionMap = (SessionMap) request.getSession().getAttribute(sessionMapID);
+	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession().getAttribute(sessionMapID);
 	SurveyForm existForm = (SurveyForm) sessionMap.get(SurveyConstants.ATTR_SURVEY_FORM);
 
 	SurveyForm surveyForm = (SurveyForm) form;
@@ -503,11 +502,9 @@ public class AuthoringAction extends Action {
 	}
 
 	ToolAccessMode mode = getAccessMode(request);
-	if (mode.isAuthor()) {
-	    return mapping.findForward(SurveyConstants.SUCCESS);
-	} else {
-	    return mapping.findForward(SurveyConstants.DEFINE_LATER);
-	}
+	request.setAttribute(AttributeNames.ATTR_MODE, mode.toString());
+
+	return mapping.findForward(SurveyConstants.SUCCESS);
     }
 
     /**
@@ -525,19 +522,10 @@ public class AuthoringAction extends Action {
 	SurveyForm surveyForm = (SurveyForm) form;
 
 	// get back sessionMAP
-	SessionMap sessionMap = (SessionMap) request.getSession().getAttribute(surveyForm.getSessionMapID());
+	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession().getAttribute(surveyForm.getSessionMapID());
 
 	ToolAccessMode mode = getAccessMode(request);
-
-	ActionMessages errors = validate(surveyForm, mapping, request);
-	if (!errors.isEmpty()) {
-	    saveErrors(request, errors);
-	    if (mode.isAuthor()) {
-		return mapping.findForward("author");
-	    } else {
-		return mapping.findForward("monitor");
-	    }
-	}
+	request.setAttribute(AttributeNames.ATTR_MODE, mode.toString());
 
 	Survey survey = surveyForm.getSurvey();
 	ISurveyService service = getSurveyService();
@@ -549,18 +537,18 @@ public class AuthoringAction extends Action {
 	    surveyPO = survey;
 	    surveyPO.setCreated(new Timestamp(new Date().getTime()));
 	    surveyPO.setUpdated(new Timestamp(new Date().getTime()));
+	    
 	} else {
-	    if (mode.isAuthor()) {
-		Long uid = surveyPO.getUid();
-		PropertyUtils.copyProperties(surveyPO, survey);
-		// get back UID
-		surveyPO.setUid(uid);
-	    } else { // if it is Teacher, then just update basic tab content (definelater)
-		surveyPO.setInstructions(survey.getInstructions());
-		surveyPO.setTitle(survey.getTitle());
-		// change define later status
+	    Long uid = surveyPO.getUid();
+	    PropertyUtils.copyProperties(surveyPO, survey);
+	    // get back UID
+	    surveyPO.setUid(uid);
+
+	    // if it's a teacher - change define later status
+	    if (mode.isTeacher()) {
 		surveyPO.setDefineLater(false);
 	    }
+		
 	    surveyPO.setUpdated(new Timestamp(new Date().getTime()));
 	}
 
@@ -637,11 +625,7 @@ public class AuthoringAction extends Action {
 	surveyForm.setSurvey(surveyPO);
 
 	request.setAttribute(AuthoringConstants.LAMS_AUTHORING_SUCCESS_FLAG, Boolean.TRUE);
-	if (mode.isAuthor()) {
-	    return mapping.findForward("author");
-	} else {
-	    return mapping.findForward("monitor");
-	}
+	return mapping.findForward(SurveyConstants.SUCCESS);
     }
 
     // *************************************************************************************
@@ -662,7 +646,7 @@ public class AuthoringAction extends Action {
      * @param request
      * @return
      */
-    private SortedSet<SurveyQuestion> getSurveyItemList(SessionMap sessionMap) {
+    private SortedSet<SurveyQuestion> getSurveyItemList(SessionMap<String, Object> sessionMap) {
 	SortedSet<SurveyQuestion> list = (SortedSet<SurveyQuestion>) sessionMap.get(SurveyConstants.ATTR_QUESTION_LIST);
 	if (list == null) {
 	    list = new TreeSet<SurveyQuestion>(new QuestionsComparator());
@@ -677,7 +661,7 @@ public class AuthoringAction extends Action {
      * @param request
      * @return
      */
-    private SortedSet<SurveyCondition> getSurveyConditionSet(SessionMap sessionMap) {
+    private SortedSet<SurveyCondition> getSurveyConditionSet(SessionMap<String, Object> sessionMap) {
 	SortedSet<SurveyCondition> set = (SortedSet<SurveyCondition>) sessionMap
 		.get(SurveyConstants.ATTR_CONDITION_SET);
 	if (set == null) {
@@ -693,7 +677,7 @@ public class AuthoringAction extends Action {
      * @param request
      * @return
      */
-    private List getDeletedSurveyItemList(SessionMap sessionMap) {
+    private List getDeletedSurveyItemList(SessionMap<String, Object> sessionMap) {
 	return getListFromSession(sessionMap, SurveyConstants.ATTR_DELETED_QUESTION_LIST);
     }
 
@@ -704,7 +688,7 @@ public class AuthoringAction extends Action {
      * @param name
      * @return
      */
-    private List getListFromSession(SessionMap sessionMap, String name) {
+    private List getListFromSession(SessionMap<String, Object> sessionMap, String name) {
 	List list = (List) sessionMap.get(name);
 	if (list == null) {
 	    list = new ArrayList();
@@ -795,7 +779,7 @@ public class AuthoringAction extends Action {
 	 * item.
 	 */
 
-	SessionMap sessionMap = (SessionMap) request.getSession().getAttribute(itemForm.getSessionMapID());
+	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession().getAttribute(itemForm.getSessionMapID());
 	// check whether it is "edit(old item)" or "add(new item)"
 	SortedSet<SurveyQuestion> surveyList = getSurveyItemList(sessionMap);
 	int itemIdx = NumberUtils.stringToInt(itemForm.getItemIndex(), -1);
@@ -901,24 +885,6 @@ public class AuthoringAction extends Action {
 	return mode;
     }
 
-    private ActionMessages validate(SurveyForm surveyForm, ActionMapping mapping, HttpServletRequest request) {
-	ActionMessages errors = new ActionMessages();
-	// if (StringUtils.isBlank(surveyForm.getSurvey().getTitle())) {
-	// ActionMessage error = new ActionMessage("error.title.empty");
-	// errors.add(ActionMessages.GLOBAL_MESSAGE, error);
-	// }
-
-	// define it later mode(TEACHER) skip below validation.
-	String modeStr = request.getParameter(AttributeNames.ATTR_MODE);
-	if (StringUtils.equals(modeStr, ToolAccessMode.TEACHER.toString())) {
-	    return errors;
-	}
-
-	// Some other validation outside basic Tab.
-
-	return errors;
-    }
-
     /**
      * Ajax call, will add one more input line for new survey item instruction.
      *
@@ -979,7 +945,7 @@ public class AuthoringAction extends Action {
      * @param request
      * @return
      */
-    private List getDeletedSurveyConditionList(SessionMap sessionMap) {
+    private List getDeletedSurveyConditionList(SessionMap<String, Object> sessionMap) {
 	return getListFromSession(sessionMap, SurveyConstants.ATTR_DELETED_CONDITION_LIST);
     }
 }

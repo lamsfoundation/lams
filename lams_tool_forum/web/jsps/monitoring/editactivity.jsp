@@ -32,6 +32,7 @@
 	<c:url value="/defineLater.do" var="authoringUrl">
 		<c:param name="contentFolderID" value="${contentFolderID}" />
 		<c:param name="toolContentID" value="${toolContentID}" />
+		<c:param name="mode" value="teacher" />
 	</c:url>
 	<html:link href="javascript:;" onclick="launchPopup('${authoringUrl}','definelater')" styleClass="btn btn-default">
 		<fmt:message key="label.monitoring.edit.activity.edit" />

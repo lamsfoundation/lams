@@ -193,7 +193,7 @@ public class SurveyConstants {
 
     // for condition management use
 
-    public static final Object ATTR_CONDITION_SET = "conditionList";
+    public static final String ATTR_CONDITION_SET = "conditionList";
     public static final String PARAM_ORDER_ID = "orderId";
     public static final String ATTR_DELETED_CONDITION_LIST = "deletedConditionList";
 
