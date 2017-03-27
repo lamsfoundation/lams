@@ -40,6 +40,7 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import org.apache.commons.lang.StringEscapeUtils;
+import org.apache.commons.lang.StringUtils;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
@@ -86,16 +87,6 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
  * </p>
  *
  * @author Andrey Balan
- *
- *
- *
- *
- *
- *
- *
- *
- *
- *
  */
 public class EmailNotificationsAction extends LamsDispatchAction {
 
@@ -121,7 +112,7 @@ public class EmailNotificationsAction extends LamsDispatchAction {
     public ActionForward getLessonView(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) throws IOException, ServletException {
 	long lessonId = WebUtil.readLongParam(request, AttributeNames.PARAM_LESSON_ID);
-	if (!getSecurityService().isLessonMonitor(lessonId, getUser().getUserID(), "show lesson email notifications",
+	if (!getSecurityService().isLessonMonitor(lessonId, getCurrentUser().getUserID(), "show lesson email notifications",
 		false)) {
 	    response.sendError(HttpServletResponse.SC_FORBIDDEN, "User is not a monitor in the lesson");
 	    return null;
@@ -149,7 +140,7 @@ public class EmailNotificationsAction extends LamsDispatchAction {
     public ActionForward getCourseView(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) throws IOException, ServletException {
 	int orgId = WebUtil.readIntParam(request, AttributeNames.PARAM_ORGANISATION_ID);
-	if (!getSecurityService().isGroupMonitor(orgId, getUser().getUserID(), "show course email notifications",
+	if (!getSecurityService().isGroupMonitor(orgId, getCurrentUser().getUserID(), "show course email notifications",
 		false)) {
 	    response.sendError(HttpServletResponse.SC_FORBIDDEN, "User is not a monitor in the organisation");
 	    return null;
@@ -194,13 +185,13 @@ public class EmailNotificationsAction extends LamsDispatchAction {
 	boolean isLessonNotifications = (lessonId != null);
 	Integer organisationId = WebUtil.readIntParam(request, AttributeNames.PARAM_ORGANISATION_ID, true);
 	if (isLessonNotifications) {
-	    if (!getSecurityService().isLessonMonitor(lessonId, getUser().getUserID(),
+	    if (!getSecurityService().isLessonMonitor(lessonId, getCurrentUser().getUserID(),
 		    "show scheduled lesson email notifications", false)) {
 		response.sendError(HttpServletResponse.SC_FORBIDDEN, "The user is not a monitor in the lesson");
 		return null;
 	    }
 	} else {
-	    if (!getSecurityService().isGroupMonitor(organisationId, getUser().getUserID(),
+	    if (!getSecurityService().isGroupMonitor(organisationId, getCurrentUser().getUserID(),
 		    "show scheduled course course email notifications", false)) {
 		response.sendError(HttpServletResponse.SC_FORBIDDEN, "The user is not a monitor in the organisation");
 		return null;
@@ -257,7 +248,7 @@ public class EmailNotificationsAction extends LamsDispatchAction {
 	
 	String inputTriggerName = WebUtil.readStrParam(request, "triggerName");
 	Long lessonId = WebUtil.readLongParam(request, AttributeNames.PARAM_LESSON_ID, true);
-	Integer userId = getUser().getUserID();
+	Integer userId = getCurrentUser().getUserID();
 	boolean isLessonNotifications = (lessonId != null);
 	Integer organisationId = WebUtil.readIntParam(request, AttributeNames.PARAM_ORGANISATION_ID, true);
 
@@ -331,7 +322,9 @@ public class EmailNotificationsAction extends LamsDispatchAction {
 	String emailBody = WebUtil.readStrParam(request, "emailBody");
 	Long scheduleDateParameter = WebUtil.readLongParam(request, "scheduleDate", true);
 
-	// check if we send email instantly
+	String scheduleDateStr = "";
+	String emailClauseStr = "";
+	// check if we need to send email instantly
 	if (scheduleDateParameter == null) {
 	    boolean isSuccessfullySent = true;
 	    String[] userIdStrs = request.getParameterValues("userId");
@@ -345,15 +338,18 @@ public class EmailNotificationsAction extends LamsDispatchAction {
 	    }
 
 	    JSONObject.put("isSuccessfullySent", isSuccessfullySent);
+	    
+	    //prepare data for audit log
+	    scheduleDateStr = "now";
+	    emailClauseStr = "for users (userIds: " + StringUtils.join(userIdStrs,",") + ")";
+	    
 	} else {
 	    try {
 		Calendar now = Calendar.getInstance();
 
 		// calculate scheduleDate
 		Date scheduleDateTeacherTimezone = new Date(scheduleDateParameter);
-		HttpSession ss = SessionManager.getSession();
-		UserDTO teacher = (UserDTO) ss.getAttribute(AttributeNames.USER);
-		TimeZone teacherTimeZone = teacher.getTimeZone();
+		TimeZone teacherTimeZone = getCurrentUser().getTimeZone();
 		Date scheduleDate = DateUtil.convertFromTimeZoneToDefault(teacherTimeZone, scheduleDateTeacherTimezone);
 
 		// build job detail based on the bean class
@@ -371,13 +367,30 @@ public class EmailNotificationsAction extends LamsDispatchAction {
 		Scheduler scheduler = getScheduler();
 		scheduler.scheduleJob(emailScheduleMessageJob, startLessonTrigger);
 		JSONObject.put("isSuccessfullyScheduled", true);
-		LamsDispatchAction.log.debug("Emails have been successfully scheduled to be sent on " + scheduleDate
-			+ " [search type is " + request.getParameter("searchType") + "]");
+		
+		//prepare data for audit log
+		scheduleDateStr = "on " + scheduleDate;
+		Object lessonIdObj = emailScheduleMessageJob.getJobDataMap().get(AttributeNames.PARAM_LESSON_ID);
+		Object lessonIDsObj = emailScheduleMessageJob.getJobDataMap().get("lessonIDs");
+		Object organisationIdObj = emailScheduleMessageJob.getJobDataMap().get(AttributeNames.PARAM_ORGANISATION_ID);
+		if (lessonIdObj != null) {
+		    emailClauseStr = "for lesson (lessonId: " + lessonIdObj + ")";
+		} else if (lessonIDsObj != null) {
+		    emailClauseStr = "for lessons (lessonIDs: " + StringUtils.join((String[])lessonIDsObj,",") + ")";
+		} else if (organisationIdObj != null) {
+		    emailClauseStr = "for organisation (organisationId: " + organisationIdObj + ")";
+		}
+		
 	    } catch (SchedulerException e) {
 		LamsDispatchAction.log.error("Error occurred at " + "[emailScheduleMessage]- fail to email scheduling",
 			e);
 	    }
 	}
+
+	//audit log
+	getAuditService().log(MonitoringConstants.MONITORING_MODULE_NAME,
+		"User " + getCurrentUser().getLogin() + " set a notification "+ emailClauseStr + " " + scheduleDateStr
+			+ " with the following notice:  " + emailBody);
 
 	response.setContentType("application/json;charset=utf-8");
 	response.getWriter().print(JSONObject);
@@ -389,19 +402,19 @@ public class EmailNotificationsAction extends LamsDispatchAction {
      */
     public ActionForward getUsers(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) throws IOException, ServletException, JSONException {
-	Map map = new HashMap();
+	Map<String, Object> map = new HashMap<String, Object>();
 	copySearchParametersFromRequestToMap(request, map);
 	Long lessonId = (Long) map.get(AttributeNames.PARAM_LESSON_ID);
 	Integer orgId = (Integer) map.get(AttributeNames.PARAM_ORGANISATION_ID);
 
 	if (lessonId != null) {
-	    if (!getSecurityService().isLessonMonitor(lessonId, getUser().getUserID(),
+	    if (!getSecurityService().isLessonMonitor(lessonId, getCurrentUser().getUserID(),
 		    "get users for lesson email notifications", false)) {
 		response.sendError(HttpServletResponse.SC_FORBIDDEN, "The user is not a monitor in the lesson");
 		return null;
 	    }
 	} else if (orgId != null) {
-	    if (!getSecurityService().isGroupMonitor(orgId, getUser().getUserID(),
+	    if (!getSecurityService().isGroupMonitor(orgId, getCurrentUser().getUserID(),
 		    "get users for course email notifications", false)) {
 		response.sendError(HttpServletResponse.SC_FORBIDDEN, "The user is not a monitor in the organisation");
 		return null;
@@ -410,7 +423,6 @@ public class EmailNotificationsAction extends LamsDispatchAction {
 
 	IMonitoringService monitoringService = MonitoringServiceProxy
 		.getMonitoringService(getServlet().getServletContext());
-	ICoreLearnerService learnerService = MonitoringServiceProxy.getLearnerService(getServlet().getServletContext());
 
 	int searchType = (Integer) map.get("searchType");
 	Long activityId = (Long) map.get(AttributeNames.PARAM_ACTIVITY_ID);
@@ -450,7 +462,7 @@ public class EmailNotificationsAction extends LamsDispatchAction {
      * @param map
      *            specified map
      */
-    private void copySearchParametersFromRequestToMap(HttpServletRequest request, Map map) {
+    private void copySearchParametersFromRequestToMap(HttpServletRequest request, Map<String, Object> map) {
 	int searchType = WebUtil.readIntParam(request, "searchType");
 	map.put("searchType", searchType);
 
@@ -507,48 +519,46 @@ public class EmailNotificationsAction extends LamsDispatchAction {
 
     }
 
-    private UserDTO getUser() {
+    private UserDTO getCurrentUser() {
 	HttpSession ss = SessionManager.getSession();
 	return (UserDTO) ss.getAttribute(AttributeNames.USER);
     }
 
     private IEventNotificationService getEventNotificationService() {
-	if (EmailNotificationsAction.eventNotificationService == null) {
+	if (eventNotificationService == null) {
 	    WebApplicationContext ctx = WebApplicationContextUtils
 		    .getRequiredWebApplicationContext(getServlet().getServletContext());
-	    EmailNotificationsAction.eventNotificationService = (IEventNotificationService) ctx
-		    .getBean("eventNotificationService");
+	    eventNotificationService = (IEventNotificationService) ctx.getBean("eventNotificationService");
 	}
-	return EmailNotificationsAction.eventNotificationService;
+	return eventNotificationService;
     }
 
     private IUserManagementService getUserManagementService() {
-	if (EmailNotificationsAction.userManagementService == null) {
+	if (userManagementService == null) {
 	    WebApplicationContext ctx = WebApplicationContextUtils
 		    .getRequiredWebApplicationContext(getServlet().getServletContext());
-	    EmailNotificationsAction.userManagementService = (IUserManagementService) ctx
-		    .getBean("userManagementService");
+	    userManagementService = (IUserManagementService) ctx.getBean("userManagementService");
 	}
-	return EmailNotificationsAction.userManagementService;
+	return userManagementService;
     }
 
     private IAuditService getAuditService() {
-	if (EmailNotificationsAction.auditService == null) {
+	if (auditService == null) {
 	    WebApplicationContext ctx = WebApplicationContextUtils
 		    .getRequiredWebApplicationContext(getServlet().getServletContext());
-	    EmailNotificationsAction.auditService = (IAuditService) ctx.getBean("auditService");
+	    auditService = (IAuditService) ctx.getBean("auditService");
 	}
-	return EmailNotificationsAction.auditService;
+	return auditService;
     }
 
     private ISecurityService getSecurityService() {
-	if (EmailNotificationsAction.securityService == null) {
+	if (securityService == null) {
 	    WebApplicationContext webContext = WebApplicationContextUtils
 		    .getRequiredWebApplicationContext(getServlet().getServletContext());
-	    EmailNotificationsAction.securityService = (ISecurityService) webContext.getBean("securityService");
+	    securityService = (ISecurityService) webContext.getBean("securityService");
 	}
 
-	return EmailNotificationsAction.securityService;
+	return securityService;
     }
 
     /**
