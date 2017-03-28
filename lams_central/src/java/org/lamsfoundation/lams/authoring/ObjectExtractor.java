@@ -886,8 +886,11 @@ public class ObjectExtractor implements IObjectExtractor {
 	    annotation.setEndXcoord((Integer) JsonUtil.opt(annotationJSON, AuthoringJsonTags.END_XCOORD));
 	    annotation.setEndYcoord((Integer) JsonUtil.opt(annotationJSON, AuthoringJsonTags.END_YCOORD));
 	    annotation.setColor((String) JsonUtil.opt(annotationJSON, AuthoringJsonTags.COLOR));
-	    annotation.setSize(Short.valueOf((String) JsonUtil.opt(annotationJSON, AuthoringJsonTags.SIZE)));
-
+	    String size = (String) JsonUtil.opt(annotationJSON, AuthoringJsonTags.SIZE);
+	    if (size != null) {
+		annotation.setSize(Short.valueOf(size));
+	    }
+	    
 	    if (found) {
 		baseDAO.update(annotation);
 	    } else {
