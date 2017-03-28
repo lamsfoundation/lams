@@ -1079,7 +1079,7 @@ function addActivityIcons(activity) {
 							'y'          : coord.y,
 							'height'     : 16,
 							'width'      : 16,
-								'xlink:href' : LAMS_URL + 'images/icons/' 
+							'xlink:href' : LAMS_URL + 'images/icons/' 
 											   + (learner.id == sequenceSearchedLearner ? 'user_red.png'
 											      : (learner.leader ? 'user_online.png' : 'user.png')),
 							'style'		 : 'cursor : pointer'
@@ -1122,17 +1122,16 @@ function addActivityIconsHandlers(activity) {
 							  .css('cursor', 'pointer')
 							  // drag learners to force complete activities
 							  .draggable({
-								'appendTo'    : '#tabSequence',
-								'containment' : '#tabSequence',
+								'appendTo'    : '#t2',
+								'containment' : '#t2',
 							    'distance'    : 20,
 							    'scroll'      : false,
 							    'cursorAt'	  : {'left' : 10, 'top' : 15},
-								'helper'      : function(event){
-									// copy of the icon for dragging
-									return $('<img />').attr('src', LAMS_URL + 'images/icons/user.png');
-								},
+							    'helper' : function(){
+							    	return $('<img />').attr('src', LAMS_URL + 'images/icons/user.png');
+							    },
 								'start' : function(){
-									autoRefreshBlocked = true;
+									 autoRefreshBlocked = true;
 								},
 								'stop' : function(event, ui) {
 									var learners = [{
@@ -1208,7 +1207,7 @@ function addCompletedLearnerIcons(learners, learnerCount, learnerTotalCount) {
 				'src' : LAMS_URL + 'images/icons/' 
 				   		+ (learner.id == sequenceSearchedLearner ? 'user_red.png' : 'user.png'),
 				'style'		 : 'cursor : pointer',
-					'title'      : getLearnerDisplayName(learner)
+				'title'      : getLearnerDisplayName(learner)
 			})
 				// drag learners to force complete activities
 				  .draggable({
