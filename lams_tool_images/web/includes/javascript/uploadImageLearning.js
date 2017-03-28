@@ -1,5 +1,5 @@
 //callback method that is invoked after image has been successfully uploaded to the server
-function imageUploadedCallback() {
+function imageUploadedCallback(data) {
    	self.parent.checkNew();
 }
         

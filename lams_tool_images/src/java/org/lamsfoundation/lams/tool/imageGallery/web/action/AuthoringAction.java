@@ -397,6 +397,11 @@ public class AuthoringAction extends Action {
 	    HttpServletResponse response) {
 	String sessionMapID = WebUtil.readStrParam(request, ImageGalleryConstants.ATTR_SESSION_MAP_ID);
 	((ImageGalleryItemForm) form).setSessionMapID(sessionMapID);
+	
+	// saveUsingLearningAction param is true in case request comes from learning or monitor and the we should use
+	// LearningAction's method to save uploaded image
+	boolean saveUsingLearningAction = WebUtil.readBooleanParam(request, "saveUsingLearningAction", false);
+	request.setAttribute("saveUsingLearningAction", saveUsingLearningAction);
 
 	return mapping.findForward("image");
     }

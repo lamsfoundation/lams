@@ -71,7 +71,7 @@ function submitImageGalleryItem(){
         contentType: false,
     	success: function(data) {
     		//invoke callback function in case image was successfully uploaded
-    		imageUploadedCallback();
+    		imageUploadedCallback(data);
     	},
     	error: function(jqXHR, textStatus, errorMessage) {
     		$('#uploadButtons').show();
@@ -150,7 +150,7 @@ function submitMultipleImageGalleryItems(){
         contentType: false,
     	success: function(data) {
     		//invoke callback function in case image was successfully uploaded
-    		imageUploadedCallback();
+    		imageUploadedCallback(data);
     	},
     	error: function(jqXHR, textStatus, errorMessage) {
     		$('#uploadButtons').show();
