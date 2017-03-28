@@ -325,15 +325,17 @@ public class EventNotificationService implements IEventNotificationService {
     /**
      * See {@link IEventNotificationService#trigger(String, String, Long, String, String)
      */
-    private void trigger(Event event, String subject, String message) {
-	final String subjectToSend = subject == null ? event.getSubject() : subject;
-	final String messageToSend = message == null ? event.getMessage() : message;
+    private void trigger(Event eventData, String subject, String message) {
+	final String subjectToSend = subject == null ? eventData.getSubject() : subject;
+	final String messageToSend = message == null ? eventData.getMessage() : message;
 
 	// create a new thread to send the messages as it can take some time
 	new Thread(() -> {
 	    try {
 		HibernateSessionManager.openSession();
 
+		// fetch the event again so it is associated with current session
+		Event event = (Event) eventDAO.find(Event.class, eventData.getUid());
 		Event eventFailCopy = null;
 		Iterator<Subscription> subscriptionIterator = event.getSubscriptions().iterator();
 		while (subscriptionIterator.hasNext()) {
