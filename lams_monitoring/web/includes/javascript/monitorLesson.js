@@ -1211,8 +1211,8 @@ function addCompletedLearnerIcons(learners, learnerCount, learnerTotalCount) {
 			})
 				// drag learners to force complete activities
 				  .draggable({
-					'appendTo'    : '#tabSequence',
-					'containment' : '#tabSequence',
+					'appendTo'    : '#t2',
+					'containment' : '#t2',
 				    'distance'    : 20,
 				    'scroll'      : false,
 				    'cursorAt'	  : {'left' : 10, 'top' : 15},
