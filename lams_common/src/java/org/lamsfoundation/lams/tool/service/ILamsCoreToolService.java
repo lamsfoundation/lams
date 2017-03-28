@@ -283,7 +283,7 @@ public interface ILamsCoreToolService {
     void forceCompleteActivity(ToolSession toolSession, User learner) throws ToolException;
 
     /**
-     * Get activity's max possible mark.
+     * Get activity's max possible mark (which doesn't include marks that are set not to be passed to gradebook).
      *
      * @param activity
      * @return activity's max possible mark if available, null otherwise
