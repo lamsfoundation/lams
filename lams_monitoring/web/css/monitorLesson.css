@@ -129,6 +129,13 @@ span#learnerGroupMultiSelectLabel {
 	margin-top: 10px;
 }
 
+#forceBackwardsDialog .modal-body {
+	padding: 10px;
+}
+#forceBackwardsDialog .ui-resizable-s {
+	bottom: 0px;	
+}
+
 /********** LESSON TAB STYLES **********/
 div#tabLesson {
 /*	height: 540px;*/

@@ -943,7 +943,7 @@ function forceComplete(currentActivityId, learners, x, y) {
 		var targetActivityId = +targetActivity.attr('id');
 		if (currentActivityId != targetActivityId) {
 			var targetActivityName = targetActivity.attr('class') == 'gate' ? "Gate" : targetActivity.children('text').text(),
-				moveBackwards = false;
+				moveBackwards = currentActivityId == null;
 			
 			// check if target activity is before current activity
 			if (currentActivityId) {
@@ -1224,9 +1224,12 @@ function addCompletedLearnerIcons(learners, learnerCount, learnerTotalCount) {
 						autoRefreshBlocked = true;
 					},
 					'stop' : function(event, ui) {
+						var learners = [{
+							'id'   : learner.id,
+							'name' : getLearnerDisplayName(learner, true)
+						}];
 						// jQuery droppable does not work for SVG, so this is a workaround
-						forceComplete(null, learner.id, getLearnerDisplayName(learner, true),
-								      ui.offset.left, ui.offset.top);
+						forceComplete(null, learners, ui.offset.left, ui.offset.top);
 					}
 				})
 				.appendTo(iconsContainer);
