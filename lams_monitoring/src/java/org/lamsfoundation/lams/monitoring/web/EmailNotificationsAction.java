@@ -346,6 +346,9 @@ public class EmailNotificationsAction extends LamsDispatchAction {
 	} else {
 	    try {
 		Calendar now = Calendar.getInstance();
+		
+		Map<String, Object> searchParameters = new HashMap<String, Object>();
+		copySearchParametersFromRequestToMap(request, searchParameters);
 
 		// calculate scheduleDate
 		Date scheduleDateTeacherTimezone = new Date(scheduleDateParameter);
@@ -357,7 +360,7 @@ public class EmailNotificationsAction extends LamsDispatchAction {
 			.withIdentity(EmailNotificationsAction.JOB_PREFIX_NAME + now.getTimeInMillis())
 			.withDescription("schedule email message to user(s)").usingJobData("emailBody", emailBody)
 			.build();
-		copySearchParametersFromRequestToMap(request, emailScheduleMessageJob.getJobDataMap());
+		searchParameters.forEach(emailScheduleMessageJob.getJobDataMap()::putIfAbsent);
 
 		// create customized triggers
 		Trigger startLessonTrigger = TriggerBuilder.newTrigger()
@@ -370,9 +373,9 @@ public class EmailNotificationsAction extends LamsDispatchAction {
 		
 		//prepare data for audit log
 		scheduleDateStr = "on " + scheduleDate;
-		Object lessonIdObj = emailScheduleMessageJob.getJobDataMap().get(AttributeNames.PARAM_LESSON_ID);
-		Object lessonIDsObj = emailScheduleMessageJob.getJobDataMap().get("lessonIDs");
-		Object organisationIdObj = emailScheduleMessageJob.getJobDataMap().get(AttributeNames.PARAM_ORGANISATION_ID);
+		Object lessonIdObj = searchParameters.get(AttributeNames.PARAM_LESSON_ID);
+		Object lessonIDsObj = searchParameters.get("lessonIDs");
+		Object organisationIdObj = searchParameters.get(AttributeNames.PARAM_ORGANISATION_ID);
 		if (lessonIdObj != null) {
 		    emailClauseStr = "for lesson (lessonId: " + lessonIdObj + ")";
 		} else if (lessonIDsObj != null) {
