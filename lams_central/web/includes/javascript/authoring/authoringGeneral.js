@@ -2436,7 +2436,7 @@ GeneralLib = {
 				'annotationUIID' : this.uiid,
 				'title' 		 : this.title,
 				'xCoord'    	 : parseInt(box.x),
-				'yCoord'    	 : parseInt(box.y),
+				'yCoord'    	 : parseInt(box.y) + (size ? +size : 0),
 				'endXCoord' 	 : isRegion ? parseInt(box.x2) : null,
 				'endYCoord' 	 : isRegion ? parseInt(box.y2) : null,
 				'color'	    	 : Snap.color(this.items.shape.attr('fill')).hex,
