@@ -229,7 +229,7 @@
 <div id="manage-image-buttons">
 	<div class="panel panel-default" >
 		<div class="panel-heading">
-			<button onclick="javascript:newImageInit('<html:rewrite page='/authoring/newImageInit.do'/>?sessionMapID=${sessionMapID}');"
+			<button onclick="javascript:newImageInit('<html:rewrite page='/authoring/newImageInit.do'/>?sessionMapID=${sessionMapID}&saveUsingLearningAction=true');"
 					class="btn btn-default btn-xs loffset5  " id="">  
 				<i class="fa fa-upload"></i> <fmt:message key="label.learning.add.new.image" />
 			</button>

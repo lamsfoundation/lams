@@ -43,7 +43,7 @@
         }
         
         //callback method that is invoked after image has been successfully uploaded to the server
-        function imageUploadedCallback() {
+        function imageUploadedCallback(data) {
         	$('#new-image-input-area').html(data);
         }
     </script>

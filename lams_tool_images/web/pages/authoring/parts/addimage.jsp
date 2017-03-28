@@ -1,13 +1,13 @@
 <%@ include file="/common/taglibs.jsp"%>
 <c:choose>
-	<c:when test="${sessionMap.mode == 'author'}">
-		<c:set var="FORM_ACTION" value="/authoring/saveOrUpdateImage"/>
+	<c:when test="${saveUsingLearningAction}">
+		<c:set var="FORM_ACTION" value="/learning/saveNewImage.do"/>
 	</c:when>
 	<c:otherwise>
-		<c:set var="FORM_ACTION" value="/learning/saveNewImage.do"/>
+		<c:set var="FORM_ACTION" value="/authoring/saveOrUpdateImage"/>
 	</c:otherwise>
 </c:choose>
-				
+
 <html:form action="${FORM_ACTION}" method="post" styleId="imageGalleryItemForm" enctype="multipart/form-data">
 	<c:set var="formBean" value="<%=request.getAttribute(org.apache.struts.taglib.html.Constants.BEAN_KEY)%>" />
 	<c:set var="sessionMap"	value="${sessionScope[formBean.sessionMapID]}" />
@@ -54,7 +54,6 @@
 						<lams:STRUTS-textarea rows="5" tabindex="2" styleClass="text-area form-control" property="description" />
 					</c:otherwise>
 				</c:choose>
-				
 			</div>
 				
 			<div class="form-group">
