@@ -629,7 +629,7 @@ public class LearningAction extends Action {
 	ImageGallery imageGallery;
 	Long toolSessionId = null;
 	ImageGalleryUser user = null;
-	if (mode.isLearner()) {
+	if (mode.isLearner() || mode.isAuthor()) {
 	    toolSessionId = (Long) sessionMap.get(ImageGalleryConstants.ATTR_TOOL_SESSION_ID);
 	    imageGallery = service.getImageGalleryBySessionId(toolSessionId);
 	    user = getCurrentUser(service, toolSessionId);
