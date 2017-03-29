@@ -3,15 +3,16 @@
 <%@ page import="org.lamsfoundation.lams.tool.imageGallery.ImageGalleryConstants"%>
 <%@ page import="org.lamsfoundation.lams.util.Configuration" %>
 <%@ page import="org.lamsfoundation.lams.util.ConfigurationKeys" %>
+
+<c:set var="sessionMap" value="${sessionScope[sessionMapID]}"/>
 <c:choose>
-	<c:when test="${sessionMap.mode == 'teacher'}">
-		<c:set var="UPLOAD_FILE_MAX_SIZE"><%=Configuration.get(ConfigurationKeys.UPLOAD_FILE_LARGE_MAX_SIZE)%></c:set>
+	<c:when test="${sessionMap.mode == 'learner'}">
+		<c:set var="UPLOAD_FILE_MAX_SIZE"><%=Configuration.get(ConfigurationKeys.UPLOAD_FILE_MAX_SIZE)%></c:set>
 	</c:when>
 	<c:otherwise>
-		<c:set var="UPLOAD_FILE_MAX_SIZE"><%=Configuration.get(ConfigurationKeys.UPLOAD_FILE_MAX_SIZE)%></c:set>
+		<c:set var="UPLOAD_FILE_MAX_SIZE"><%=Configuration.get(ConfigurationKeys.UPLOAD_FILE_LARGE_MAX_SIZE)%></c:set>
 	</c:otherwise>
 </c:choose>
-<c:set var="sessionMap" value="${sessionScope[sessionMapID]}"/>
 
 <lams:html>
 	<lams:head>

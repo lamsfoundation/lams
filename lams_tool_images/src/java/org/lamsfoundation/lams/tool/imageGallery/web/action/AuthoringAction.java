@@ -563,6 +563,7 @@ public class AuthoringAction extends Action {
 	    HttpServletResponse response) {
 	String sessionMapID = WebUtil.readStrParam(request, ImageGalleryConstants.ATTR_SESSION_MAP_ID);
 	((MultipleImagesForm) form).setSessionMapID(sessionMapID);
+	request.setAttribute(ImageGalleryConstants.ATTR_SESSION_MAP_ID, sessionMapID);
 
 	return mapping.findForward("images");
     }
