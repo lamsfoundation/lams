@@ -1359,6 +1359,10 @@ ActivityLib = {
 						return false;
 					}
 				},
+				'close' : function(){
+					$(this).remove();
+					PropertyLib.validateConditionMappings(activity);
+				},
 				'open' : function() {
 					var dialog = $(this);
 					// load contents after opening the dialog

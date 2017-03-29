@@ -237,6 +237,12 @@
 				LESS_CONDITION_DESCRIPTION : '<c:out value="${LESS_CONDITION_DESCRIPTION_VAR}" />',
 				<fmt:message key="authoring.fla.greater.condition.description" var="GREATER_CONDITION_DESCRIPTION_VAR"/>
 				GREATER_CONDITION_DESCRIPTION : '<c:out value="${GREATER_CONDITION_DESCRIPTION_VAR}" />',
+				<fmt:message key="authoring.fla.activity.unnamed.description" var="ACTIVITY_UNNAMED_DESCRIPTION_VAR"/>
+				ACTIVITY_UNNAMED_DESCRIPTION : decoderDiv.html('<c:out value="${ACTIVITY_UNNAMED_DESCRIPTION_VAR}" />').text(),
+				<fmt:message key="authoring.fla.activity.gate.description" var="ACTIVITY_GATE_DESCRIPTION_VAR"/>
+				ACTIVITY_GATE_DESCRIPTION : decoderDiv.html('<c:out value="${ACTIVITY_GATE_DESCRIPTION_VAR}" />').text(),
+				<fmt:message key="authoring.fla.activity.branching.description" var="ACTIVITY_BRANCHING_DESCRIPTION_VAR"/>
+				ACTIVITY_BRANCHING_DESCRIPTION : decoderDiv.html('<c:out value="${ACTIVITY_BRANCHING_DESCRIPTION_VAR}" />').text(),
 				<fmt:message key="authoring.fla.default.range.condition.title.prefix" var="DEFAULT_RANGE_CONDITION_TITLE_PREFIX_VAR"/>
 				DEFAULT_RANGE_CONDITION_TITLE_PREFIX : '<c:out value="${DEFAULT_RANGE_CONDITION_TITLE_PREFIX_VAR}" />',
 				<fmt:message key="authoring.fla.clear.all.confirm" var="CLEAR_ALL_CONFIRM_VAR"/>
@@ -256,7 +262,9 @@
 				<fmt:message key="authoring.fla.range.condition.add.end.error" var="RANGE_CONDITION_ADD_END_ERROR_VAR"/>
 				RANGE_CONDITION_ADD_END_ERROR : decoderDiv.html('<c:out value="${RANGE_CONDITION_ADD_END_ERROR_VAR}" />').text(),
 				<fmt:message key="authoring.fla.group.title.validation.erorr" var="GROUP_TITLE_VALIDATION_ERORR_VAR"/>
-				GROUP_TITLE_VALIDATION_ERORR : decoderDiv.html('<c:out value="${GROUP_TITLE_VALIDATION_ERORR_VAR}" />').text()
+				GROUP_TITLE_VALIDATION_ERORR : decoderDiv.html('<c:out value="${GROUP_TITLE_VALIDATION_ERORR_VAR}" />').text(),
+				<fmt:message key="authoring.fla.conditions.mapping.broken" var="CONDITIONS_MAPPING_BROKEN_ERROR_VAR"/>
+				CONDITIONS_MAPPING_BROKEN_ERROR : decoderDiv.html('<c:out value="${CONDITIONS_MAPPING_BROKEN_ERROR_VAR}" />').text()
 			},
 			
 			isReadOnlyMode = false,

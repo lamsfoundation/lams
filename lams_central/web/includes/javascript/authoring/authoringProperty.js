@@ -1686,7 +1686,7 @@ PropertyLib = {
 		// fill the branches list
 		$.each(branches, function(){
 			var branchTitle = (isGate ? (this == 'open' ? LABELS.GATE_STATE_OPEN : LABELS.GATE_STATE_CLOSED) : this.title)
-							+ (this == defaultBranch ? LABELS.BRANCH_MAPPING_DEFAULT_BRANCH_SUFFIX : ''),
+							+ (this == defaultBranch ? ' ' + LABELS.BRANCH_MAPPING_DEFAULT_BRANCH_SUFFIX : ''),
 				branchElem = $('<div />').click(PropertyLib.selectBranchMappingListItem).appendTo(branchesCell).text(branchTitle);
 			if (isGate) {
 				branchElem.attr('gateState', this);
@@ -1870,5 +1870,63 @@ PropertyLib = {
 		selectedItem.removeData('boundItem');
 		selectedBranch.remove();
 		$('.branchMappingFreeItemCell', dialog).append(selectedItem);
+	},
+	
+	/**
+	 * Checks whether conditions changed in a tool activity.
+	 * If so, it checks if it did not break existing mappings.
+	 */
+	validateConditionMappings : function(activity) {
+		var conditionIDs = null,
+			brokenActivities = [];
+		
+		// look for broken mappings
+		$.each(layout.activities, function() {
+			var consumer = this.branchingActivity || this;
+			// check if the modified activity is an input for a gate or branching activity
+			if (activity == consumer.input && consumer.conditionsToBranches.length > 0) {
+				if (conditionIDs == null) {
+					// refresh conditions in the modified activity
+					conditionIDs = [];
+					ActivityLib.getOutputDefinitions(activity);
+					$.each(activity.outputDefinitions, function(){
+						if (this.conditions) {
+							$.each(this.conditions, function(){
+								conditionIDs.push(this.conditionId);
+							});
+						}
+					});
+				}
+				
+				var isBroken = false,
+					newMapping = [];
+				$.each(consumer.conditionsToBranches, function(){
+					// a mapped condition is now missing
+					// remove it and inform the user
+					if (conditionIDs.indexOf(this.condition.conditionID) == -1) {
+						isBroken = true;
+					} else {
+						newMapping.push(this);
+					}
+				});
+				if (isBroken) {
+					consumer.conditionsToBranches = newMapping;
+					brokenActivities.push(consumer);
+				}
+			}
+		});
+		
+		// build a message
+		if (brokenActivities.length > 0) {
+			var message = LABELS.CONDITIONS_MAPPING_BROKEN_ERROR + ' ';
+			$.each(brokenActivities, function(){
+				message += (this.title ? '"' + this.title + '"' : LABELS.ACTIVITY_UNNAMED_DESCRIPTION) + ' ' +
+						   (this instanceof ActivityDefs.GateActivity ?
+								   LABELS.ACTIVITY_GATE_DESCRIPTION : LABELS.ACTIVITY_BRANCHING_DESCRIPTION)
+						   + ', ';
+			});
+			message = message.substring(0, message.length - 2);
+			alert(message);
+		}
 	}
 };
