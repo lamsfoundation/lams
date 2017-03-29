@@ -43,15 +43,15 @@
 				<label for="description">
 					<fmt:message key="label.authoring.basic.resource.description.input" />
 				</label>
-				
+
 				<c:choose>
-					<c:when test="${sessionMap.mode == 'author'}">
+					<c:when test="${saveUsingLearningAction}">
+						<lams:STRUTS-textarea rows="5" tabindex="2" styleClass="text-area form-control" property="description" />
+					</c:when>
+					<c:otherwise>
 						<lams:CKEditor id="description" value="${formBean.description}" width="99%" 
 							contentFolderID="${sessionMap.imageGalleryForm.contentFolderID}" 
 							resizeParentFrameName="new-image-input-area" />
-					</c:when>
-					<c:otherwise>
-						<lams:STRUTS-textarea rows="5" tabindex="2" styleClass="text-area form-control" property="description" />
 					</c:otherwise>
 				</c:choose>
 			</div>
