@@ -2,12 +2,18 @@
 <%@ include file="/common/taglibs.jsp"%>
 <%@ page import="org.lamsfoundation.lams.util.Configuration" %>
 <%@ page import="org.lamsfoundation.lams.util.ConfigurationKeys" %>
+
+<%-- param has higher level for request attribute --%>
+<c:if test="${not empty param.sessionMapID}">
+	<c:set var="sessionMapID" value="${param.sessionMapID}" />
+</c:if>
+<c:set var="sessionMap" value="${sessionScope[sessionMapID]}" />
 <c:choose>
-	<c:when test="${sessionMap.mode == 'teacher'}">
-		<c:set var="UPLOAD_FILE_MAX_SIZE"><%=Configuration.get(ConfigurationKeys.UPLOAD_FILE_LARGE_MAX_SIZE)%></c:set>
+	<c:when test="${sessionMap.mode == 'learner'}">
+		<c:set var="UPLOAD_FILE_MAX_SIZE"><%=Configuration.get(ConfigurationKeys.UPLOAD_FILE_MAX_SIZE)%></c:set>
 	</c:when>
 	<c:otherwise>
-		<c:set var="UPLOAD_FILE_MAX_SIZE"><%=Configuration.get(ConfigurationKeys.UPLOAD_FILE_MAX_SIZE)%></c:set>
+		<c:set var="UPLOAD_FILE_MAX_SIZE"><%=Configuration.get(ConfigurationKeys.UPLOAD_FILE_LARGE_MAX_SIZE)%></c:set>
 	</c:otherwise>
 </c:choose>
 
@@ -18,11 +24,6 @@
 	</title>
 	<%@ include file="/common/header.jsp"%>
 
-	<%-- param has higher level for request attribute --%>
-	<c:if test="${not empty param.sessionMapID}">
-		<c:set var="sessionMapID" value="${param.sessionMapID}" />
-	</c:if>
-	<c:set var="sessionMap" value="${sessionScope[sessionMapID]}" />
 	<c:set var="mode" value="${sessionMap.mode}" />
 	<c:set var="toolSessionID" value="${sessionMap.toolSessionID}" />
 	<c:set var="imageGallery" value="${sessionMap.imageGallery}" />
