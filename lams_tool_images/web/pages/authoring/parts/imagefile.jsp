@@ -3,7 +3,8 @@
 <%@ page import="org.lamsfoundation.lams.util.ConfigurationKeys" %>
 <%@ page import="org.lamsfoundation.lams.util.FileValidatorUtil" %>
 <c:choose>
-	<c:when test="${sessionMap.mode == 'learner'}">
+	<c:when test="${sessionMap.mode == 'learner' || sessionMap.mode == 'author'}">
+		<!-- ordinary learner or preview -->
 		<c:set var="UPLOAD_FILE_MAX_SIZE_AS_USER_STRING"><%=FileValidatorUtil.formatSize(Configuration.getAsInt(ConfigurationKeys.UPLOAD_FILE_MAX_SIZE))%></c:set>
 	</c:when>
 	<c:otherwise>

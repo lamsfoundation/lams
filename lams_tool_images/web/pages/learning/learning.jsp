@@ -9,7 +9,8 @@
 </c:if>
 <c:set var="sessionMap" value="${sessionScope[sessionMapID]}" />
 <c:choose>
-	<c:when test="${sessionMap.mode == 'learner'}">
+	<c:when test="${sessionMap.mode == 'learner' || sessionMap.mode == 'author'}">
+		<!-- ordinary learner or preview -->
 		<c:set var="UPLOAD_FILE_MAX_SIZE"><%=Configuration.get(ConfigurationKeys.UPLOAD_FILE_MAX_SIZE)%></c:set>
 	</c:when>
 	<c:otherwise>
