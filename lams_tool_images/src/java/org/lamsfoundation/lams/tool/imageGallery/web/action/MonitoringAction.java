@@ -80,11 +80,8 @@ public class MonitoringAction extends Action {
 	if (param.equals("updateImage")) {
 	    return updateImage(mapping, form, request, response);
 	}
-	if (param.equals("showitem")) {
-	    return showitem(mapping, form, request, response);
-	}
-	if (param.equals("hideitem")) {
-	    return hideitem(mapping, form, request, response);
+	if (param.equals("toggleImageVisibility")) {
+	    return toggleImageVisibility(mapping, form, request, response);
 	}
 	if (param.equals("viewReflection")) {
 	    return viewReflection(mapping, form, request, response);
@@ -169,24 +166,14 @@ public class MonitoringAction extends Action {
     }
 
     /**
-     * This method will get necessary information from imageGallery item form and save or update into
-     * <code>HttpSession</code> ImageGalleryItemList. Notice, this save is not persist them into database, just save
-     * <code>HttpSession</code> temporarily. Only they will be persist when the entire authoring page is being
-     * persisted.
-     *
-     * @param mapping
-     * @param form
-     * @param request
-     * @param response
-     * @return
-     * @throws ServletException
+     * Update image's title and description set by monitor
      */
     private ActionForward updateImage(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) {
 	IImageGalleryService service = getImageGalleryService();
+	ImageGalleryItemForm imageForm = (ImageGalleryItemForm) form;
 	
 	// get back sessionMAP
-	ImageGalleryItemForm imageForm = (ImageGalleryItemForm) form;
 	String sessionMapID = imageForm.getSessionMapID();
 	request.setAttribute(ImageGalleryConstants.ATTR_SESSION_MAP_ID, sessionMapID);
 	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession().getAttribute(imageForm.getSessionMapID());
@@ -198,11 +185,11 @@ public class MonitoringAction extends Action {
 
 	String title = imageForm.getTitle();
 	if (StringUtils.isBlank(title)) {
-	    Long nextConsecutiveImageTitle = imageGallery.getNextImageTitle();
-	    imageGallery.setNextImageTitle(nextConsecutiveImageTitle + 1);
+	    Long nextImageTitleNumber = imageGallery.getNextImageTitle();
+	    imageGallery.setNextImageTitle(nextImageTitleNumber + 1);
 	    service.saveOrUpdateImageGallery(imageGallery);
-	    String imageLocalized = getImageGalleryService().getLocalisedMessage("label.authoring.image", null);
-	    title = imageLocalized + " " + nextConsecutiveImageTitle;
+	    
+	    title = getImageGalleryService().generateNextImageTitle(nextImageTitleNumber);
 	}
 	image.setTitle(title);
 
@@ -217,58 +204,17 @@ public class MonitoringAction extends Action {
     	return redirect;
     }
 
-    private ActionForward showitem(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) {
-	Long itemUid = WebUtil.readLongParam(request, ImageGalleryConstants.PARAM_IMAGE_UID);
-	IImageGalleryService service = getImageGalleryService();
-	service.setItemVisible(itemUid, true);
-
-	// get back SessionMap
-	String sessionMapID = request.getParameter(ImageGalleryConstants.ATTR_SESSION_MAP_ID);
-	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession().getAttribute(sessionMapID);
-	request.setAttribute(ImageGalleryConstants.ATTR_SESSION_MAP_ID, sessionMap.getSessionID());
-
-	// update session value
-	List<List> groupList = (List<List>) sessionMap.get(ImageGalleryConstants.ATTR_SUMMARY_LIST);
-	if (groupList != null) {
-	    for (List<Summary> group : groupList) {
-		for (Summary sum : group) {
-		    if (itemUid.equals(sum.getItemUid())) {
-			sum.setItemHide(false);
-			break;
-		    }
-		}
-	    }
-	}
-	return mapping.findForward(ImageGalleryConstants.SUCCESS);
-    }
-
-    private ActionForward hideitem(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+    /**
+     * Toggle image visibility, i.e. set its hide field to the opposite of the current value
+     */
+    private ActionForward toggleImageVisibility(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) {
 
 	Long itemUid = WebUtil.readLongParam(request, ImageGalleryConstants.PARAM_IMAGE_UID);
 	IImageGalleryService service = getImageGalleryService();
-	service.setItemVisible(itemUid, false);
+	service.toggleImageVisibility(itemUid);
 
-	// get back SessionMap
-	String sessionMapID = request.getParameter(ImageGalleryConstants.ATTR_SESSION_MAP_ID);
-	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession().getAttribute(sessionMapID);
-	request.setAttribute(ImageGalleryConstants.ATTR_SESSION_MAP_ID, sessionMap.getSessionID());
-
-	// update session value
-	List<List> groupList = (List<List>) sessionMap.get(ImageGalleryConstants.ATTR_SUMMARY_LIST);
-	if (groupList != null) {
-	    for (List<Summary> group : groupList) {
-		for (Summary sum : group) {
-		    if (itemUid.equals(sum.getItemUid())) {
-			sum.setItemHide(true);
-			break;
-		    }
-		}
-	    }
-	}
-
-	return mapping.findForward(ImageGalleryConstants.SUCCESS);
+	return null;
     }
 
     private ActionForward viewReflection(ActionMapping mapping, ActionForm form, HttpServletRequest request,

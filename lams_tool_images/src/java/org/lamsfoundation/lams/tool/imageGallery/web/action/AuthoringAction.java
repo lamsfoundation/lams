@@ -743,7 +743,7 @@ public class AuthoringAction extends Action {
     private void extractFormToImageGalleryItem(HttpServletRequest request, ImageGalleryItemForm imageForm)
 	    throws Exception {
 	/*
-	 * BE CAREFUL: This method will copy nessary info from request form to a old or new ImageGalleryItem instance.
+	 * BE CAREFUL: This method will copy necessary info from request form to an old or new ImageGalleryItem instance.
 	 * It gets all info EXCEPT ImageGalleryItem.createDate and ImageGalleryItem.createBy, which need be set when
 	 * persisting this imageGallery item.
 	 */
@@ -802,10 +802,9 @@ public class AuthoringAction extends Action {
 
 	String title = imageForm.getTitle();
 	if (StringUtils.isBlank(title)) {
-	    Long nextConsecutiveImageTitle = (Long) sessionMap.get(ImageGalleryConstants.ATTR_NEXT_IMAGE_TITLE);
-	    sessionMap.put(ImageGalleryConstants.ATTR_NEXT_IMAGE_TITLE, nextConsecutiveImageTitle + 1);
-	    String imageLocalized = getImageGalleryService().getLocalisedMessage("label.authoring.image", null);
-	    title = imageLocalized + " " + nextConsecutiveImageTitle;
+	    Long nextImageTitleNumber = (Long) sessionMap.get(ImageGalleryConstants.ATTR_NEXT_IMAGE_TITLE);
+	    sessionMap.put(ImageGalleryConstants.ATTR_NEXT_IMAGE_TITLE, nextImageTitleNumber + 1);
+	    title = getImageGalleryService().generateNextImageTitle(nextImageTitleNumber);
 	}
 	image.setTitle(title);
 
@@ -851,10 +850,9 @@ public class AuthoringAction extends Action {
 		throw e;
 	    }
 
-	    Long nextConsecutiveImageTitle = (Long) sessionMap.get(ImageGalleryConstants.ATTR_NEXT_IMAGE_TITLE);
-	    sessionMap.put(ImageGalleryConstants.ATTR_NEXT_IMAGE_TITLE, nextConsecutiveImageTitle + 1);
-	    String imageLocalized = getImageGalleryService().getLocalisedMessage("label.authoring.image", null);
-	    String title = imageLocalized + " " + nextConsecutiveImageTitle;
+	    Long nextImageTitleNumber = (Long) sessionMap.get(ImageGalleryConstants.ATTR_NEXT_IMAGE_TITLE);
+	    sessionMap.put(ImageGalleryConstants.ATTR_NEXT_IMAGE_TITLE, nextImageTitleNumber + 1);
+	    String title = getImageGalleryService().generateNextImageTitle(nextImageTitleNumber);
 	    image.setTitle(title);
 
 	    image.setDescription("");

@@ -133,7 +133,7 @@
 				<prop key="get*">PROPAGATION_REQUIRED, -java.lang.Exception</prop>
                 <prop key="resetDefineLater">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
                 <prop key="setItemComplete">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
-                <prop key="setItemVisible">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
+                <prop key="toggleImageVisibility">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
                 <prop key="setItemAccess">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
                 <prop key="notifyTeachersOnImageSumbit">PROPAGATION_REQUIRED,-java.lang.Exception</prop>
                 <prop key="copyToolContent">PROPAGATION_REQUIRED,-java.lang.Exception</prop>

@@ -303,23 +303,21 @@ public class ImageGalleryServiceImpl implements IImageGalleryService, ToolConten
     }
 
     @Override
-    public void setItemVisible(Long itemUid, boolean visible) {
-	ImageGalleryItem item = imageGalleryItemDao.getByUid(itemUid);
-	if (item != null) {
-	    // createBy should be null for system default value.
-	    Long userId = 0L;
-	    String loginName = "No user";
-	    if (item.getCreateBy() != null) {
-		userId = item.getCreateBy().getUserId();
-		loginName = item.getCreateBy().getLoginName();
-	    }
-	    if (visible) {
-		auditService.logShowEntry(ImageGalleryConstants.TOOL_SIGNATURE, userId, loginName, item.toString());
+    public void toggleImageVisibility(Long itemUid) {
+	ImageGalleryItem image = imageGalleryItemDao.getByUid(itemUid);
+	if (image != null) {
+	    boolean isHidden = image.isHide();
+	    image.setHide(!isHidden);
+	    imageGalleryItemDao.saveObject(image);
+	    
+	    // audit log
+	    Long userId = image.getCreateBy() == null ? 0L : image.getCreateBy().getUserId();
+	    String loginName = image.getCreateBy() == null ? "No user" : image.getCreateBy().getLoginName();
+	    if (isHidden) {
+		auditService.logShowEntry(ImageGalleryConstants.TOOL_SIGNATURE, userId, loginName, image.toString());
 	    } else {
-		auditService.logHideEntry(ImageGalleryConstants.TOOL_SIGNATURE, userId, loginName, item.toString());
+		auditService.logHideEntry(ImageGalleryConstants.TOOL_SIGNATURE, userId, loginName, image.toString());
 	    }
-	    item.setHide(!visible);
-	    imageGalleryItemDao.saveObject(item);
 	}
     }
 
@@ -645,7 +643,7 @@ public class ImageGalleryServiceImpl implements IImageGalleryService, ToolConten
     @Override
     public void notifyTeachersOnImageSumbit(Long sessionId, ImageGalleryUser imageGalleryUser) {
 	String userName = imageGalleryUser.getLastName() + " " + imageGalleryUser.getFirstName();
-	String message = getLocalisedMessage("event.imagesubmit.body", new Object[] { userName });
+	String message = messageService.getMessage("event.imagesubmit.body", new Object[] { userName });
 	eventNotificationService.notifyLessonMonitors(sessionId, message, false);
     }
 
@@ -1131,8 +1129,9 @@ public class ImageGalleryServiceImpl implements IImageGalleryService, ToolConten
     }
 
     @Override
-    public String getLocalisedMessage(String key, Object[] args) {
-	return messageService.getMessage(key, args);
+    public String generateNextImageTitle(Long nextImageTitleNumber) {
+	String imageWord = messageService.getMessage("label.authoring.image");
+	return imageWord + " " + nextImageTitleNumber;
     }
 
     public ImageGalleryOutputFactory getImageGalleryOutputFactory() {

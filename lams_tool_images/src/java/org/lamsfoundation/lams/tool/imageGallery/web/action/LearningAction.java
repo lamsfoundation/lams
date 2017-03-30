@@ -657,11 +657,10 @@ public class LearningAction extends Action {
 
 	String title = imageForm.getTitle();
 	if (StringUtils.isBlank(title)) {
-	    Long nextConsecutiveImageTitle = imageGallery.getNextImageTitle();
-	    imageGallery.setNextImageTitle(nextConsecutiveImageTitle + 1);
+	    Long nextImageTitleNumber = imageGallery.getNextImageTitle();
+	    imageGallery.setNextImageTitle(nextImageTitleNumber + 1);
 
-	    String imageLocalized = service.getLocalisedMessage("label.authoring.image", null);
-	    title = imageLocalized + " " + nextConsecutiveImageTitle;
+	    title = service.generateNextImageTitle(nextImageTitleNumber);
 	}
 	image.setTitle(title);
 	
