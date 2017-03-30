@@ -5,7 +5,8 @@
 
 <c:set var="sessionMap" value="${sessionScope[sessionMapID]}" />
 <c:choose>
-	<c:when test="${sessionMap.mode == 'learner'}">
+	<c:when test="${sessionMap.mode == 'learner' || sessionMap.mode == 'author'}">
+		<!-- ordinary learner or preview -->
 		<c:set var="UPLOAD_FILE_MAX_SIZE"><%=Configuration.get(ConfigurationKeys.UPLOAD_FILE_MAX_SIZE)%></c:set>
 		<c:set var="UPLOAD_FILE_MAX_SIZE_AS_USER_STRING"><%=FileValidatorUtil.formatSize(Configuration.getAsInt(ConfigurationKeys.UPLOAD_FILE_MAX_SIZE))%></c:set>
 	</c:when>
@@ -38,13 +39,12 @@
 				<label>
 					<fmt:message key="label.authoring.basic.resource.files.input"/>
 				</label>
-
 				<div class="help-block">
 					<fmt:message key="label.upload.info">
 					<fmt:param>${UPLOAD_FILE_MAX_SIZE_AS_USER_STRING}</fmt:param>
 					</fmt:message>
 				</div>
-				
+	
 				<lams:FileUpload fileButtonBrowse="fileButtonBrowse1" fileFieldname="file1" errorMsgDiv="fileerror1" uploadInfoMessageKey="-"
 					fileInputNameFieldname="fileInputName1" maxFileSize="${UPLOAD_FILE_MAX_SIZE_AS_USER_STRING}"/>
 	
