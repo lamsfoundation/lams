@@ -22,6 +22,7 @@ import org.apache.tomcat.util.json.JSONObject;
 import org.lamsfoundation.lams.tool.ToolAccessMode;
 import org.lamsfoundation.lams.tool.exception.ToolException;
 import org.lamsfoundation.lams.usermanagement.User;
+import org.lamsfoundation.lams.web.util.AttributeNames;
 
 /**
  * helper methods useful for servlets
@@ -353,7 +354,6 @@ public class WebUtil {
      * supports all three ways of looking at a learner screen.
      *
      * @param request
-     * @param param_mode
      * @return the ToolAccessMode object
      */
     public static ToolAccessMode getToolAccessMode(String modeValue) {
@@ -367,6 +367,24 @@ public class WebUtil {
 	    }
 	}
 	throw new IllegalArgumentException("[" + modeValue + "] is not a legal mode" + "in LAMS");
+    }
+    
+    /**
+     * Get ToolAccessMode from HttpRequest parameters. Default value is AUTHOR mode.
+     *
+     * @param request
+     * @return
+     */
+    public static ToolAccessMode readToolAccessModeAuthorDefaulted(HttpServletRequest request) {
+	String modeStr = request.getParameter(AttributeNames.ATTR_MODE);
+	
+	ToolAccessMode mode;
+	if (StringUtils.equalsIgnoreCase(modeStr, ToolAccessMode.TEACHER.toString())) {
+	    mode = ToolAccessMode.TEACHER;
+	} else {
+	    mode = ToolAccessMode.AUTHOR;
+	}
+	return mode;
     }
 
     /**

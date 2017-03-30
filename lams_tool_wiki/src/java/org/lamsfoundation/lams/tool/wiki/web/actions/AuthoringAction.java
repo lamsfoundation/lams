@@ -95,7 +95,7 @@ public class AuthoringAction extends WikiPageAction {
 
 	String contentFolderID = WebUtil.readStrParam(request, AttributeNames.PARAM_CONTENT_FOLDER_ID);
 
-	ToolAccessMode mode = getAccessMode(request);
+	ToolAccessMode mode = WebUtil.readToolAccessModeAuthorDefaulted(request);
 
 	// Set up the authForm.
 	AuthoringForm authForm = (AuthoringForm) form;
@@ -116,7 +116,7 @@ public class AuthoringAction extends WikiPageAction {
 	    // TODO NOTE: this causes DB orphans when LD not saved.
 	}
 
-	if (mode != null && mode.isTeacher()) {
+	if (mode.isTeacher()) {
 	    // Set the defineLater flag so that learners cannot use content
 	    // while we
 	    // are editing. This flag is released when updateContent is called.
@@ -330,20 +330,6 @@ public class AuthoringAction extends WikiPageAction {
 	map.put(AuthoringAction.KEY_TOOL_CONTENT_ID, toolContentID);
 
 	return map;
-    }
-
-    /**
-     * Get ToolAccessMode from HttpRequest parameters. Default value is AUTHOR mode.
-     *
-     * @param request
-     * @return
-     */
-    private ToolAccessMode getAccessMode(HttpServletRequest request) {
-	String modeStr = request.getParameter(AttributeNames.ATTR_MODE);
-	if (StringUtils.equalsIgnoreCase(modeStr, ToolAccessMode.TEACHER.toString())) {
-	    return ToolAccessMode.TEACHER;
-	}
-	return ToolAccessMode.AUTHOR;
     }
 
     /**

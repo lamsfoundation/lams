@@ -87,7 +87,7 @@ public class AuthoringAction extends LamsDispatchAction {
 
 	String contentFolderID = WebUtil.readStrParam(request, AttributeNames.PARAM_CONTENT_FOLDER_ID);
 
-	ToolAccessMode mode = WebUtil.readToolAccessModeParam(request, "mode", true);
+	ToolAccessMode mode = WebUtil.readToolAccessModeAuthorDefaulted(request);
 
 	// set up chatService
 	if (chatService == null) {
@@ -103,7 +103,7 @@ public class AuthoringAction extends LamsDispatchAction {
 	    // TODO NOTE: this causes DB orphans when LD not saved.
 	}
 
-	if (mode != null && mode.isTeacher()) {
+	if (mode.isTeacher()) {
 	    // Set the defineLater flag so that learners cannot use content
 	    // while we
 	    // are editing. This flag is released when updateContent is called.
@@ -116,7 +116,7 @@ public class AuthoringAction extends LamsDispatchAction {
 	updateAuthForm(authForm, chat);
 
 	// Set up sessionMap
-	SessionMap<String, Object> map = createSessionMap(chat, getAccessMode(request), contentFolderID, toolContentID);
+	SessionMap<String, Object> map = createSessionMap(chat, mode, contentFolderID, toolContentID);
 	authForm.setSessionMapID(map.getSessionID());
 
 	// add the sessionMap to HTTPSession.
@@ -239,23 +239,6 @@ public class AuthoringAction extends LamsDispatchAction {
 	}
 	map.put(ChatConstants.ATTR_CONDITION_SET, set);
 	return map;
-    }
-
-    /**
-     * Get ToolAccessMode from HttpRequest parameters. Default value is AUTHOR mode.
-     *
-     * @param request
-     * @return
-     */
-    private ToolAccessMode getAccessMode(HttpServletRequest request) {
-	ToolAccessMode mode;
-	String modeStr = request.getParameter(AttributeNames.ATTR_MODE);
-	if (StringUtils.equalsIgnoreCase(modeStr, ToolAccessMode.TEACHER.toString())) {
-	    mode = ToolAccessMode.TEACHER;
-	} else {
-	    mode = ToolAccessMode.AUTHOR;
-	}
-	return mode;
     }
 
     /**

@@ -131,7 +131,7 @@ public class McAction extends LamsDispatchAction implements McAppConstants {
 	McContent mcContent = mcContentTest;
 	if (errors.isEmpty()) {
 
-	    ToolAccessMode mode = getAccessMode(request);
+	    ToolAccessMode mode = WebUtil.readToolAccessModeAuthorDefaulted(request);
 	    request.setAttribute(AttributeNames.ATTR_MODE, mode.toString());
 
 	    List<McQuestionDTO> deletedQuestionDTOs = (List<McQuestionDTO>) sessionMap.get(LIST_DELETED_QUESTION_DTOS);
@@ -1582,7 +1582,7 @@ public class McAction extends LamsDispatchAction implements McAppConstants {
 	    HttpServletResponse response) throws IOException, ServletException {
 	McAuthoringForm mcAuthoringForm = (McAuthoringForm) form;
 
-	ToolAccessMode mode = getAccessMode(request);
+	ToolAccessMode mode = WebUtil.readToolAccessModeAuthorDefaulted(request);
 	request.setAttribute(AttributeNames.ATTR_MODE, mode.toString());
 
 	IMcService mcService = McServiceProxy.getMcService(getServlet().getServletContext());
@@ -2004,23 +2004,6 @@ public class McAction extends LamsDispatchAction implements McAppConstants {
 	}
 
 	return true;
-    }
-
-    /**
-     * Get ToolAccessMode from HttpRequest parameters. Default value is AUTHOR mode.
-     *
-     * @param request
-     * @return
-     */
-    private ToolAccessMode getAccessMode(HttpServletRequest request) {
-	ToolAccessMode mode;
-	String modeStr = request.getParameter(AttributeNames.ATTR_MODE);
-	if (StringUtils.equalsIgnoreCase(modeStr, ToolAccessMode.TEACHER.toString())) {
-	    mode = ToolAccessMode.TEACHER;
-	} else {
-	    mode = ToolAccessMode.AUTHOR;
-	}
-	return mode;
     }
 
     /**

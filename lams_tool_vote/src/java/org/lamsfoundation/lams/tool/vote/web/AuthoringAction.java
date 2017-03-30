@@ -159,7 +159,7 @@ public class AuthoringAction extends LamsDispatchAction implements VoteAppConsta
 	}
 	voteAuthoringForm.setMaxInputs(new Short(maxInputs));
 
-	ToolAccessMode mode = getAccessMode(request);
+	ToolAccessMode mode = WebUtil.readToolAccessModeAuthorDefaulted(request);
 	request.setAttribute(AttributeNames.ATTR_MODE, mode.toString());
     }
 
@@ -757,7 +757,7 @@ public class AuthoringAction extends LamsDispatchAction implements VoteAppConsta
 	}
 
 	if (errors.isEmpty()) {
-	    ToolAccessMode mode = getAccessMode(request);
+	    ToolAccessMode mode = WebUtil.readToolAccessModeAuthorDefaulted(request);
 	    request.setAttribute(AttributeNames.ATTR_MODE, mode.toString());
 
 	    List<VoteQuestionDTO> deletedQuestionDTOs = (List<VoteQuestionDTO>) sessionMap
@@ -832,23 +832,6 @@ public class AuthoringAction extends LamsDispatchAction implements VoteAppConsta
 	return mapping.findForward(VoteAppConstants.LOAD_QUESTIONS);
     }
 
-    /**
-     * Get ToolAccessMode from HttpRequest parameters. Default value is AUTHOR mode.
-     *
-     * @param request
-     * @return
-     */
-    private ToolAccessMode getAccessMode(HttpServletRequest request) {
-	ToolAccessMode mode;
-	String modeStr = request.getParameter(AttributeNames.ATTR_MODE);
-	if (StringUtils.equalsIgnoreCase(modeStr, ToolAccessMode.TEACHER.toString())) {
-	    mode = ToolAccessMode.TEACHER;
-	} else {
-	    mode = ToolAccessMode.AUTHOR;
-	}
-	return mode;
-    }
-
     public ActionForward start(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) throws IOException, ServletException, VoteApplicationException {
 
@@ -901,7 +884,7 @@ public class AuthoringAction extends LamsDispatchAction implements VoteAppConsta
 	    return mapping.findForward(VoteAppConstants.ERROR_LIST);
 	}
 
-	ToolAccessMode mode = getAccessMode(request);
+	ToolAccessMode mode = WebUtil.readToolAccessModeAuthorDefaulted(request);
 	// request is from monitoring module
 	if (mode.isTeacher()) {
 	    VoteUtils.setDefineLater(request, true, strToolContentId, voteService);

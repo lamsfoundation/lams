@@ -92,7 +92,7 @@ public class AuthoringAction extends LamsDispatchAction {
 
 	String contentFolderID = WebUtil.readStrParam(request, AttributeNames.PARAM_CONTENT_FOLDER_ID);
 
-	ToolAccessMode mode = getAccessMode(request);
+	ToolAccessMode mode = WebUtil.readToolAccessModeAuthorDefaulted(request);
 
 	// set up kalturaService
 	if (kalturaService == null) {
@@ -107,7 +107,7 @@ public class AuthoringAction extends LamsDispatchAction {
 	    kalturaService.saveOrUpdateKaltura(kaltura);
 	}
 
-	if (mode != null && mode.isTeacher()) {
+	if (mode.isTeacher()) {
 	    // Set the defineLater flag so that learners cannot use content
 	    // while we
 	    // are editing. This flag is released when updateContent is called.
@@ -362,20 +362,6 @@ public class AuthoringAction extends LamsDispatchAction {
 	}
 
 	return mapping.findForward(KalturaConstants.ITEM_LIST);
-    }
-
-    /**
-     * Get ToolAccessMode from HttpRequest parameters. Default value is AUTHOR mode.
-     */
-    private ToolAccessMode getAccessMode(HttpServletRequest request) {
-	ToolAccessMode mode;
-	String modeStr = request.getParameter(AttributeNames.ATTR_MODE);
-	if (StringUtils.equalsIgnoreCase(modeStr, ToolAccessMode.TEACHER.toString())) {
-	    mode = ToolAccessMode.TEACHER;
-	} else {
-	    mode = ToolAccessMode.AUTHOR;
-	}
-	return mode;
     }
 
     /**

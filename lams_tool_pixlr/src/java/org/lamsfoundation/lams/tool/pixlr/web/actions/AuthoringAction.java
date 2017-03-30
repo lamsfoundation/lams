@@ -97,11 +97,7 @@ public class AuthoringAction extends LamsDispatchAction {
 
 	AuthoringForm authForm = (AuthoringForm) form;
 
-	ToolAccessMode mode = null;
-	String modeStr = WebUtil.readStrParam(request, "mode", true);
-	if (modeStr != null && !modeStr.trim().equals("")) {
-	    mode = WebUtil.readToolAccessModeParam(request, "mode", true);
-	}
+	ToolAccessMode mode = WebUtil.readToolAccessModeAuthorDefaulted(request);
 
 	// set up pixlrService
 	if (pixlrService == null) {
@@ -117,7 +113,7 @@ public class AuthoringAction extends LamsDispatchAction {
 	    // TODO NOTE: this causes DB orphans when LD not saved.
 	}
 
-	if (mode != null && mode.isTeacher()) {
+	if (mode.isTeacher()) {
 	    // Set the defineLater flag so that learners cannot use content
 	    // while we
 	    // are editing. This flag is released when updateContent is called.
@@ -141,15 +137,11 @@ public class AuthoringAction extends LamsDispatchAction {
 	// Set up the authForm.
 	updateAuthForm(authForm, pixlr);
 	authForm.setToolContentID(toolContentID);
-	if (mode != null) {
-	    authForm.setMode(mode.toString());
-	} else {
-	    authForm.setMode("");
-	}
+	authForm.setMode(mode.toString());
 	authForm.setContentFolderID(contentFolderID);
 
 	// Set up sessionMap
-	SessionMap<String, Object> map = createSessionMap(pixlr, getAccessMode(request), contentFolderID,
+	SessionMap<String, Object> map = createSessionMap(pixlr, mode, contentFolderID,
 		toolContentID);
 	authForm.setSessionMapID(map.getSessionID());
 
@@ -285,24 +277,6 @@ public class AuthoringAction extends LamsDispatchAction {
 	map.put(AuthoringAction.KEY_TOOL_CONTENT_ID, toolContentID);
 
 	return map;
-    }
-
-    /**
-     * Get ToolAccessMode from HttpRequest parameters. Default value is AUTHOR
-     * mode.
-     *
-     * @param request
-     * @return
-     */
-    private ToolAccessMode getAccessMode(HttpServletRequest request) {
-	ToolAccessMode mode;
-	String modeStr = request.getParameter(AttributeNames.ATTR_MODE);
-	if (StringUtils.equalsIgnoreCase(modeStr, ToolAccessMode.TEACHER.toString())) {
-	    mode = ToolAccessMode.TEACHER;
-	} else {
-	    mode = ToolAccessMode.AUTHOR;
-	}
-	return mode;
     }
 
     /**

@@ -76,7 +76,7 @@ public class AuthoringAction extends LamsDispatchAction {
 
 	String contentFolderID = WebUtil.readStrParam(request, AttributeNames.PARAM_CONTENT_FOLDER_ID);
 
-	ToolAccessMode mode = WebUtil.readToolAccessModeParam(request, "mode", true);
+	ToolAccessMode mode = WebUtil.readToolAccessModeAuthorDefaulted(request);
 
 	// set up leaderselectionService
 	if (leaderselectionService == null) {
@@ -93,7 +93,7 @@ public class AuthoringAction extends LamsDispatchAction {
 	    // TODO NOTE: this causes DB orphans when LD not saved.
 	}
 
-	if (mode != null && mode.isTeacher()) {
+	if (mode.isTeacher()) {
 	    // Set the defineLater flag so that learners cannot use content
 	    // while we
 	    // are editing. This flag is released when updateContent is called.
@@ -108,7 +108,7 @@ public class AuthoringAction extends LamsDispatchAction {
 
 	// Set up sessionMap
 	SessionMap<String, Object> map = new SessionMap<String, Object>();
-	map.put(AuthoringAction.KEY_MODE, getAccessMode(request));
+	map.put(AuthoringAction.KEY_MODE, mode);
 	map.put(AuthoringAction.KEY_CONTENT_FOLDER_ID, contentFolderID);
 	map.put(AuthoringAction.KEY_TOOL_CONTENT_ID, toolContentID);
 	authForm.setSessionMapID(map.getSessionID());
@@ -154,24 +154,5 @@ public class AuthoringAction extends LamsDispatchAction {
 	request.setAttribute(LeaderselectionConstants.ATTR_SESSION_MAP, map);
 
 	return mapping.findForward("success");
-    }
-
-    /* ========== Private Methods ********** */
-
-    /**
-     * Get ToolAccessMode from HttpRequest parameters. Default value is AUTHOR mode.
-     *
-     * @param request
-     * @return
-     */
-    private ToolAccessMode getAccessMode(HttpServletRequest request) {
-	ToolAccessMode mode;
-	String modeStr = request.getParameter(AttributeNames.ATTR_MODE);
-	if (StringUtils.equalsIgnoreCase(modeStr, ToolAccessMode.TEACHER.toString())) {
-	    mode = ToolAccessMode.TEACHER;
-	} else {
-	    mode = ToolAccessMode.AUTHOR;
-	}
-	return mode;
     }
 }
