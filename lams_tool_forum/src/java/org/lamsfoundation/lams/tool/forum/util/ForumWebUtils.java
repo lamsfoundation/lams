@@ -54,24 +54,4 @@ public class ForumWebUtils {
 	}
     }
 
-    /**
-     * Get ToolAccessMode from HttpRequest parameters. Default value is AUTHOR mode.
-     * 
-     * @param request
-     * @return
-     */
-    public static ToolAccessMode getAccessMode(HttpServletRequest request) {
-	ToolAccessMode mode = null;
-	String modeStr = request.getParameter(AttributeNames.ATTR_MODE);
-	if (StringUtils.equalsIgnoreCase(modeStr, ToolAccessMode.TEACHER.toString())) {
-	    mode = ToolAccessMode.TEACHER;
-	} else if (StringUtils.equalsIgnoreCase(modeStr, ToolAccessMode.AUTHOR.toString())) {
-	    mode = ToolAccessMode.AUTHOR;
-	} else if (StringUtils.equalsIgnoreCase(modeStr, ToolAccessMode.LEARNER.toString())) {
-	    mode = ToolAccessMode.LEARNER;
-	}
-
-	return mode;
-    }
-
 }

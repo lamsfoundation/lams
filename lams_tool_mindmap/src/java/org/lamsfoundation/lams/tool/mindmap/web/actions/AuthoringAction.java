@@ -84,7 +84,7 @@ public class AuthoringAction extends LamsDispatchAction {
 	// Extract toolContentID from parameters.
 	Long toolContentID = new Long(WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_CONTENT_ID));
 	String contentFolderID = WebUtil.readStrParam(request, AttributeNames.PARAM_CONTENT_FOLDER_ID);
-	ToolAccessMode mode = WebUtil.readToolAccessModeParam(request, "mode", true);
+	ToolAccessMode mode = WebUtil.readToolAccessModeAuthorDefaulted(request);
 
 	// set up mindmapService
 	if (mindmapService == null) {
@@ -111,7 +111,7 @@ public class AuthoringAction extends LamsDispatchAction {
 	    mindmapService.saveMindmapNode(null, rootMindmapNode, 3l, childNodeName2, "ffffff", null, mindmap, null);
 	}
 
-	if (mode != null && mode.isTeacher()) {
+	if (mode.isTeacher()) {
 	    // Set the defineLater flag so that learners cannot use content
 	    // while we are editing. This flag is released when updateContent is called.
 	    mindmap.setDefineLater(true);
@@ -139,7 +139,7 @@ public class AuthoringAction extends LamsDispatchAction {
 	updateAuthForm(authForm, mindmap);
 
 	// Set up sessionMap
-	SessionMap<String, Object> map = createSessionMap(mindmap, getAccessMode(request), contentFolderID,
+	SessionMap<String, Object> map = createSessionMap(mindmap, mode, contentFolderID,
 		toolContentID);
 	authForm.setSessionMapID(map.getSessionID());
 
@@ -334,22 +334,6 @@ public class AuthoringAction extends LamsDispatchAction {
 	map.put(AuthoringAction.KEY_TOOL_CONTENT_ID, toolContentID);
 
 	return map;
-    }
-
-    /**
-     * Gets ToolAccessMode from HttpRequest parameters. Default value is AUTHOR mode.
-     *
-     * @param request
-     */
-    private ToolAccessMode getAccessMode(HttpServletRequest request) {
-	ToolAccessMode mode;
-	String modeStr = request.getParameter(AttributeNames.ATTR_MODE);
-	if (StringUtils.equalsIgnoreCase(modeStr, ToolAccessMode.TEACHER.toString())) {
-	    mode = ToolAccessMode.TEACHER;
-	} else {
-	    mode = ToolAccessMode.AUTHOR;
-	}
-	return mode;
     }
 
     /**

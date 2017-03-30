@@ -123,7 +123,7 @@ public class AuthoringTaskListConditionAction extends Action {
 	    throw new ServletException(e);
 	}
 
-	ToolAccessMode mode = getAccessMode(request);
+	ToolAccessMode mode = WebUtil.readToolAccessModeAuthorDefaulted(request);
 	if (mode.isAuthor()) {
 	    return mapping.findForward(TaskListConstants.SUCCESS);
 	} else {
@@ -531,23 +531,6 @@ public class AuthoringTaskListConditionAction extends Action {
 	}
 
 	return errors;
-    }
-
-    /**
-     * Get ToolAccessMode from HttpRequest parameters. Default value is AUTHOR mode.
-     *
-     * @param request
-     * @return
-     */
-    private ToolAccessMode getAccessMode(HttpServletRequest request) {
-	ToolAccessMode mode;
-	String modeStr = request.getParameter(AttributeNames.ATTR_MODE);
-	if (StringUtils.equalsIgnoreCase(modeStr, ToolAccessMode.TEACHER.toString())) {
-	    mode = ToolAccessMode.TEACHER;
-	} else {
-	    mode = ToolAccessMode.AUTHOR;
-	}
-	return mode;
     }
 
     private ActionMessages validate(TaskListForm taskListForm, ActionMapping mapping, HttpServletRequest request) {

@@ -88,7 +88,7 @@ public class AuthoringAction extends DispatchAction {
 
 	String contentFolderID = WebUtil.readStrParam(request, AttributeNames.PARAM_CONTENT_FOLDER_ID);
 
-	ToolAccessMode mode = WebUtil.readToolAccessModeParam(request, AttributeNames.PARAM_MODE, true);
+	ToolAccessMode mode = WebUtil.readToolAccessModeAuthorDefaulted(request);
 
 	// retrieving Bbb with given toolContentID
 	Bbb bbb = bbbService.getBbbByContentId(toolContentID);
@@ -99,7 +99,7 @@ public class AuthoringAction extends DispatchAction {
 	    // TODO NOTE: this causes DB orphans when LD not saved.
 	}
 
-	if (mode != null && mode.isTeacher()) {
+	if (mode.isTeacher()) {
 	    // Set the defineLater flag so that learners cannot use content
 	    // while we are editing. This flag is released when updateContent is
 	    // called.
@@ -112,7 +112,7 @@ public class AuthoringAction extends DispatchAction {
 	copyProperties(authForm, bbb);
 
 	// Set up sessionMap
-	SessionMap<String, Object> map = createSessionMap(bbb, getAccessMode(request), contentFolderID, toolContentID);
+	SessionMap<String, Object> map = createSessionMap(bbb, mode, contentFolderID, toolContentID);
 	authForm.setSessionMapID(map.getSessionID());
 
 	// add the sessionMap to HTTPSession.
@@ -208,23 +208,6 @@ public class AuthoringAction extends DispatchAction {
 	map.put(Constants.KEY_TOOL_CONTENT_ID, toolContentID);
 
 	return map;
-    }
-
-    /**
-     * Get ToolAccessMode from HttpRequest parameters. Default value is AUTHOR mode.
-     *
-     * @param request
-     * @return
-     */
-    private ToolAccessMode getAccessMode(HttpServletRequest request) {
-	ToolAccessMode mode;
-	String modeStr = request.getParameter(AttributeNames.ATTR_MODE);
-	if (StringUtils.equalsIgnoreCase(modeStr, ToolAccessMode.TEACHER.toString())) {
-	    mode = ToolAccessMode.TEACHER;
-	} else {
-	    mode = ToolAccessMode.AUTHOR;
-	}
-	return mode;
     }
 
     /**

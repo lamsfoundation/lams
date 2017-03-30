@@ -87,13 +87,8 @@ public class AuthoringAction extends Action {
 	String param = mapping.getParameter();
 	// -----------------------ImageGallery Author function ---------------------------
 	if (param.equals("start")) {
-	    ToolAccessMode mode = getAccessMode(request);
-	    // teacher mode "check for new" button enter.
-	    if (mode != null) {
-		request.setAttribute(AttributeNames.ATTR_MODE, mode.toString());
-	    } else {
-		request.setAttribute(AttributeNames.ATTR_MODE, ToolAccessMode.AUTHOR.toString());
-	    }
+	    ToolAccessMode mode = WebUtil.readToolAccessModeAuthorDefaulted(request);
+	    request.setAttribute(AttributeNames.ATTR_MODE, mode.toString());
 	    return start(mapping, form, request, response);
 	}
 	if (param.equals("definelater")) {
@@ -255,7 +250,7 @@ public class AuthoringAction extends Action {
 	    throw new ServletException(e);
 	}
 
-	ToolAccessMode mode = getAccessMode(request);
+	ToolAccessMode mode = WebUtil.readToolAccessModeAuthorDefaulted(request);
 	request.setAttribute(AttributeNames.ATTR_MODE, mode.toString());
 
 	return mapping.findForward(ImageGalleryConstants.SUCCESS);
@@ -278,7 +273,7 @@ public class AuthoringAction extends Action {
 	// get back sessionMAP
 	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession().getAttribute(imageGalleryForm.getSessionMapID());
 
-	ToolAccessMode mode = getAccessMode(request);
+	ToolAccessMode mode = WebUtil.readToolAccessModeAuthorDefaulted(request);
 	request.setAttribute(AttributeNames.ATTR_MODE, mode.toString());
 
 	ImageGallery imageGallery = imageGalleryForm.getImageGallery();
@@ -859,23 +854,6 @@ public class AuthoringAction extends Action {
 	    image.setCreateByAuthor(true);
 	    image.setHide(false);
 	}
-    }
-
-    /**
-     * Get ToolAccessMode from HttpRequest parameters. Default value is AUTHOR mode.
-     *
-     * @param request
-     * @return
-     */
-    private ToolAccessMode getAccessMode(HttpServletRequest request) {
-	ToolAccessMode mode;
-	String modeStr = request.getParameter(AttributeNames.ATTR_MODE);
-	if (StringUtils.equalsIgnoreCase(modeStr, ToolAccessMode.TEACHER.toString())) {
-	    mode = ToolAccessMode.TEACHER;
-	} else {
-	    mode = ToolAccessMode.AUTHOR;
-	}
-	return mode;
     }
 
 }

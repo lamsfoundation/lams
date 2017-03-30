@@ -129,7 +129,7 @@ public class QaAction extends LamsDispatchAction implements QaAppConstants {
 
 	QaContent qaContent = qaService.getQaContent(toolContentID);
 	if (errors.isEmpty()) {
-	    ToolAccessMode mode = getAccessMode(request);
+	    ToolAccessMode mode = WebUtil.readToolAccessModeAuthorDefaulted(request);
 	    request.setAttribute(AttributeNames.ATTR_MODE, mode.toString());
 
 	    List<QaQuestionDTO> deletedQuestionDTOs = (List<QaQuestionDTO>) sessionMap.get(LIST_DELETED_QUESTION_DTOS);
@@ -971,22 +971,5 @@ public class QaAction extends LamsDispatchAction implements QaAppConstants {
 	    sessionMap.put(QaAppConstants.ATTR_DELETED_CONDITION_LIST, list);
 	}
 	return list;
-    }
-
-    /**
-     * Get ToolAccessMode from HttpRequest parameters. Default value is AUTHOR mode.
-     *
-     * @param request
-     * @return
-     */
-    private ToolAccessMode getAccessMode(HttpServletRequest request) {
-	ToolAccessMode mode;
-	String modeStr = request.getParameter(AttributeNames.ATTR_MODE);
-	if (StringUtils.equalsIgnoreCase(modeStr, ToolAccessMode.TEACHER.toString())) {
-	    mode = ToolAccessMode.TEACHER;
-	} else {
-	    mode = ToolAccessMode.AUTHOR;
-	}
-	return mode;
     }
 }
