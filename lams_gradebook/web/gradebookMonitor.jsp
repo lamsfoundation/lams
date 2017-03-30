@@ -135,8 +135,8 @@
 			      {name:'rowNamer',index:'rowName', sortable:true, editable:false, autoencode:true},
 			      {name:'status',index:'status', sortable:false, editable:false, search:false, width:50, align:"center"},
 			      {name:'timeTaken',index:'timeTaken', sortable:true, editable:false, search:false, width:80, align:"center"},
-			      {name:'startDate',index:'startDate', sortable:true, editable:false, search:false, width:85, align:"left"},
-			      {name:'finishDate',index:'finishDate', sortable:false, editable:false, search:false, width:85, align:"left"},
+			      {name:'startDate',index:'startDate', sortable:true, editable:false, hidden:true, search:false, width:85, align:"left"},
+			      {name:'finishDate',index:'finishDate', sortable:false, editable:false, hidden:true, search:false, width:85, align:"left"},
 			      {name:'feedback',index:'feedback', sortable:true, editable:true, edittype:'textarea', editoptions:{rows:'4',cols:'20'}, search:false },
 			      {name:'mark',index:'mark', sortable:true, editable:true, editrules:{number:true}, search:false, width:50, align:"center"}
 			    ],
@@ -177,8 +177,8 @@
 								{name:'rowName',  index:'rowName', sortable:false, editable: false},
 								{name:'status',  index:'status', sortable:false, editable:false, width:50, align:"center"},
 								{name:'timeTaken',index:'timeTaken', sortable:true, editable: false, width:80, align:"center"},
-							    {name:'startDate',index:'startDate', sortable:true, editable:false, search:false, width:85, align:"left"},
-							    {name:'finishDate',index:'finishDate', sortable:false, editable:false, search:false, width:85, align:"left"},
+							    {name:'startDate',index:'startDate', sortable:true, editable:false, hidden:true, search:false, width:85, align:"left"},
+							    {name:'finishDate',index:'finishDate', sortable:false, editable:false, hidden:true, search:false, width:85, align:"left"},
 								{name:'feedback',  index:'feedback', sortable:false, editable: true, edittype:'textarea', editoptions:{rows:'4',cols:'20'}, width:200, hidden:true},
 								{name:'mark', index:'mark', sortable:true, editable: true, editrules:{number:true}, width:50, align:"center" }
 						     ],
@@ -505,12 +505,12 @@
 				</a> 
 			</div>
 			
-			<div id="datesNotShown" style="display:none">
-				<a class="pull-right label label-default" href="javascript:toggleLessonDates()"><fmt:message key="gradebook.monitor.show.dates" /></a>
+			<div id="datesNotShown">
+				<a class="pull-right label label-primary" href="javascript:toggleLessonDates()"><fmt:message key="gradebook.monitor.show.dates" /></a>
 			</div>
 
-			<div id="datesShown">
-				<a class="pull-right label label-default" href="javascript:toggleLessonDates()"><fmt:message key="gradebook.monitor.hide.dates" /></a>
+			<div id="datesShown" style="display:none">
+				<a class="pull-right label label-primary" href="javascript:toggleLessonDates()"><fmt:message key="gradebook.monitor.hide.dates" /></a>
 			</div>
 
 			<div class="grid-holder voffset20">

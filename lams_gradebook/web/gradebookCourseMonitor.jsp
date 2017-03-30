@@ -20,7 +20,7 @@
 
 	<script type="text/javascript">
 	
-		var lessonDatesHidden = false;
+		var lessonDatesHidden = true;
 		
 		// Show/hide the dates for the start and end of the lesson. 
 		function toggleLessonDates() {
@@ -84,7 +84,7 @@
 			      {name:'id', index:'id', sortable:false, editable:false, hidden:true, search:false, hidedlg:true},
 			      {name:'rowName',index:'rowName', sortable:true, editable:false},
 			      {name:'subGroup',index:'subGroup', sortable:false, editable:false, search:false, width:80},
-			      {name:'startDate',index:'startDate', sortable:true, editable:false, search:false, width:80, align:"center"},
+			      {name:'startDate',index:'startDate', sortable:true, editable:false, hidden:true, search:false, width:80, align:"center"},
 			      {name:'avgTimeTaken',index:'avgTimeTaken', sortable:true, editable:false, search:false, width:80, align:"center"},
 			      {name:'avgMark',index:'avgMark', sortable:true, editable:false, search:false, width:50, align:"center"}
 			    ],
@@ -125,8 +125,8 @@
 					     	{name:'rowName',index:'rowName', sortable:true, editable:false},
 					      	{name:'status', index:'status', sortable:false, editable:false, search:false, title:false, width:50, align:"center"},
 					      	{name:'timeTaken', index:'timeTaken', sortable:true, editable:false, search:false, width:80, align:"center"},
-						    {name:'startDate',index:'startDate', sortable:true, editable:false, search:false, width:85, align:"left"},
-						    {name:'finishDate',index:'finishDate', sortable:false, editable:false, search:false, width:85, align:"left"},
+						    {name:'startDate',index:'startDate', sortable:true, editable:false, hidden:true, search:false, width:85, align:"left"},
+						    {name:'finishDate',index:'finishDate', sortable:false, editable:false, hidden:true, search:false, width:85, align:"left"},
 					     	{name:'feedback',index:'feedback', sortable:false, editable:true, edittype:'textarea', editoptions:{rows:'4',cols:'20'} , search:false},
 					     	{name:'mark',index:'mark', sortable:true, editable:true, editrules:{number:true}, search:false, width:50, align:"center"}
 					     ],
@@ -466,11 +466,11 @@
 				<input class="btn btn-sm btn-default" type="button" value="<fmt:message key="label.button.export"/>" id="export-selected-lessons-button" />			
 			</div>
 
-			<div id="datesNotShown"  style="display:none">
+			<div id="datesNotShown">
 				<a class="pull-right label label-primary" href="javascript:toggleLessonDates()"><fmt:message key="gradebook.monitor.show.dates" /></a>
 			</div>
 
-			<div id="datesShown">
+			<div id="datesShown" style="display:none">
 				<a class="pull-right label label-primary" href="javascript:toggleLessonDates()"><fmt:message key="gradebook.monitor.hide.dates" /></a>
 			</div>			
 					
