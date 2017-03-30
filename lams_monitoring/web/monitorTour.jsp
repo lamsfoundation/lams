@@ -24,7 +24,7 @@
 			      }, {
 			        element: "#page-tabs",
 			        title: "<fmt:message key="tour.tab.selection.title"/>",
-			        content: "<fmt:message key="tour.tab.selection.content"/>",
+			        content: "<p><fmt:message key="tour.tab.selection.content.1"/></p><p><fmt:message key="tour.tab.selection.content.2"/></p><p><fmt:message key="tour.tab.selection.content.3"/></p><p><fmt:message key="tour.tab.selection.content.4"/></p>",
 		        	placement: "bottom",
 			      },{
 			      	element: "#tour-refresh-button",
@@ -34,12 +34,12 @@
 			      },{
 			        element: "#lessonStateLabel:first-child",
 			        title: "<fmt:message key="lesson.state"/>",
-			        content: "<fmt:message key="tour.lesson.state.content"/>",
+			        content: "<p><fmt:message key="tour.lesson.state.content.1"/></p><p><fmt:message key="tour.lesson.state.content.2"/></p><p><fmt:message key="tour.lesson.state.content.3"/></p><p><fmt:message key="tour.lesson.state.content.4"/></p><p><fmt:message key="tour.lesson.state.content.5"/></p>",
 			        placement: "right",
 			      },{
 			        element: "#tour-learner-count",
 			        title: "<fmt:message key="lesson.learners"/>",
-			        content: "<fmt:message key="tour.lesson.count.learners.content"/>",
+			        content: "<p><fmt:message key="tour.lesson.count.learners.content.1"/></p><p><fmt:message key="tour.lesson.count.learners.content.2"/></p>",
 			        placement: "right",
 			      },{
 			        element: "#viewLearnersButton",
@@ -59,7 +59,7 @@
 			      },{
 			        element: "#tour-lesson-im",
 			        title: "<fmt:message key="lesson.im"/>",
-			        content: "<fmt:message key="tour.lesson.im.content"/>",
+			        content: "<p><fmt:message key="tour.lesson.im.content.1"/></p><p><fmt:message key="tour.lesson.im.content.2"/></p><p><fmt:message key="tour.lesson.im.content.3"/></p><p><fmt:message key="tour.lesson.im.content.4"/></p>",
 			        placement: "bottom",
 			        onShow: revealIM,
 			        onHide: hideIM
@@ -123,7 +123,7 @@
 			      },{
 			        element: "#tabLearnersContainer",
 			        title: "<fmt:message key="tab.learners"/>",
-			        content: "<fmt:message key="tour.learners.progress.content"/>",
+			        content: "<p><fmt:message key="tour.learners.progress.content.1"/></p><p><fmt:message key="tour.learners.progress.content.2"/></p><p><fmt:message key="tour.learners.progress.content.3"/></p>",
 			        placement: "top",
 			        backdrop: true,
 			      },{
@@ -148,7 +148,7 @@
 			        placement: "left",
 			      },{
 					title: "<fmt:message key="tour.end.title"/>",
-			        content: "<fmt:message key="tour.end.content"/>",
+			        content: "<p><fmt:message key="tour.end.content.1"/></p><p><fmt:message key="tour.end.content.2"/></p>",
 			        placement: "top",
 			        orphan: true
 			      }		     
