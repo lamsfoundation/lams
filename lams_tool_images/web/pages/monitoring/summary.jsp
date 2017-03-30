@@ -152,19 +152,17 @@
 					</c:choose>						
 					
 					<td style="vertical-align:middle; padding-left: 0px; text-align: center;">
-						<c:choose>
-							<c:when test="${summary.itemHide}">
-								<a href="<c:url value='/monitoring/showitem.do'/>?sessionMapID=${sessionMapID}&imageUid=${summary.itemUid}" class="btn btn-default btn-xs loffset5"> 
-									<fmt:message key="monitoring.label.show" /> 
-								</a>
-							</c:when>
-							
-							<c:otherwise>
-								<a href="<c:url value='/monitoring/hideitem.do'/>?sessionMapID=${sessionMapID}&imageUid=${summary.itemUid}" class="btn btn-default btn-xs loffset5"> 
-									<fmt:message key="monitoring.label.hide" /> 
-								</a>
-							</c:otherwise>
-						</c:choose>
+						<a href="#nogo"	class="btn btn-default btn-xs loffset5 toggle-image-visibility" 
+								data-image-uid="${summary.itemUid}" data-is-hidden="${summary.itemHide}">
+							<c:choose>
+								<c:when test="${summary.itemHide}">
+									<fmt:message key="monitoring.label.show" />
+								</c:when>
+								<c:otherwise>
+									<fmt:message key="monitoring.label.hide" />
+								</c:otherwise>
+							</c:choose>
+						</a>
 					</td>
 					
 				</tr>

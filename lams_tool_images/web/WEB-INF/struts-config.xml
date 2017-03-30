@@ -244,15 +244,9 @@
 			validate="false">
 			<forward name="success" path="/monitoring/summary.do" redirect="true"/>
 		</action>
-		<action path="/monitoring/hideitem"
+		<action path="/monitoring/toggleImageVisibility"
 			type="org.lamsfoundation.lams.tool.imageGallery.web.action.MonitoringAction"
-			parameter="hideitem" >
-			<forward name="success" path="/pages/monitoring/monitoring.jsp" />
-		</action>
-		<action path="/monitoring/showitem"
-			type="org.lamsfoundation.lams.tool.imageGallery.web.action.MonitoringAction"
-			parameter="showitem" >
-			<forward name="success" path="/pages/monitoring/monitoring.jsp" />
+			parameter="toggleImageVisibility" >
 		</action>
 		<action path="/monitoring/viewReflection"
 			type="org.lamsfoundation.lams.tool.imageGallery.web.action.MonitoringAction"

@@ -231,13 +231,11 @@ public interface IImageGalleryService extends ToolRatingManager {
     List<ImageGalleryUser> getUserListBySessionId(Long sessionId);
 
     /**
-     * Set a imageGallery item visible or not.
+     * Toggle image visibility, i.e. set its hide field to the opposite of the current value
      *
      * @param itemUid
-     * @param visible
-     *            true, item is visible. False, item is invisible.
      */
-    void setItemVisible(Long itemUid, boolean visible);
+    void toggleImageVisibility(Long itemUid);
 
     /**
      * Create refection entry into notebook tool.
@@ -284,15 +282,13 @@ public interface IImageGalleryService extends ToolRatingManager {
     ImageGalleryUser getUser(Long uid);
 
     /**
-     * Gets a message from imageGallery bundle. Same as <code><fmt:message></code> in JSP pages.
+     * Returns localized next image title.
      *
-     * @param key
-     *            key of the message
-     * @param args
-     *            arguments for the message
-     * @return message content
+     * @param nextImageTitleNumber
+     * 
+     * @return 
      */
-    String getLocalisedMessage(String key, Object[] args);
+    String generateNextImageTitle(Long nextImageTitleNumber);
 
     /**
      * Get the ImageGallery config item by key

@@ -98,7 +98,7 @@
 			
 			function checkNew(){
 				location.reload();
-			}			
+			}
 			
 			$(document).ready(function(){
 
@@ -112,6 +112,30 @@
 			            	, 3: { sorter: false }
 			            </c:if>
 			        } 
+				});
+				
+				$(".toggle-image-visibility").click(function() {
+					var imageToggleLink = $(this);
+					var imageUid = $(this).data("image-uid");
+					
+					$.ajax({
+				    	type: 'POST',
+				    	url: "<c:url value='/monitoring/toggleImageVisibility.do'/>",
+				    	data : {
+							'imageUid' : imageUid
+						},
+				    	success: function(data) {
+				    		var isHidden = imageToggleLink.data("is-hidden");
+				    		imageToggleLink.data("is-hidden", !isHidden);
+				    		
+				    		var imageToggleLinkText = isHidden ? "<fmt:message key='monitoring.label.hide' />" : "<fmt:message key='monitoring.label.show' />";
+				    		imageToggleLink.html(imageToggleLinkText);
+				    	},
+				    	error: function(jqXHR, textStatus, errorMessage) {   		
+				        	alert(errorMessage);
+				    	}
+					});
+					
 				});
 
 				function resizeIframe() {
@@ -131,7 +155,6 @@
 					}
 				};
 				window.onresize = resizeIframe;
-				
 			});
 		</script>		 
 	</lams:head>
