@@ -904,7 +904,6 @@ public class MockLearner extends MockUser implements Runnable {
 	if (hasEditRights) {
 	    // this is a Leader or it is a non-Leader Assessmnt
 	    while (!canFinish) {
-		MockLearner.log.debug("action was " + form.getAttribute("action"));
 		WebResponse nextResp = (WebResponse) new Call(wc, test, username + " submits Assessment form",
 			fillFormArbitrarily(form)).execute();
 		asText = nextResp.getText();
@@ -945,11 +944,8 @@ public class MockLearner extends MockUser implements Runnable {
 	String finishURL = null;
 	m = MockLearner.ASSESSMENT_FINISH_PATTERN.matcher(asText);
 	if (m.find()) {
-	    MockLearner.log.debug(m.group());
-	    MockLearner.log.debug(m.group(1));
 	    finishURL = m.group(1);
 	} else {
-	    MockLearner.log.debug(asText);
 	    throw new TestHarnessException("Finish URL "+MockLearner.ASSESSMENT_FINISH_PATTERN+" was not found in Assessment Tool");
 	}
 
