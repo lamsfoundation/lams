@@ -898,19 +898,13 @@ public class MockLearner extends MockUser implements Runnable {
 	String asText = resp.getText();
 	// check if current user is the leader
 	boolean hasEditRights = asText.contains(MockLearner.ASSESSMENT_HAS_EDIT_RIGHT_SUBSTRING);
-	String finishURL = null;
-	Matcher m = MockLearner.ASSESSMENT_FINISH_PATTERN.matcher(asText);
-	if (m.find()) {
-	    finishURL = m.group(1);
-	} else {
-	    MockLearner.log.debug(asText);
-	    throw new TestHarnessException("Finish URL was not found in Assessment Tool");
-	}
-
+	Matcher m;
+	
 	boolean canFinish = asText.contains(MockLearner.ASSESSMENT_FINISH_BUTTON_SUBSTRING);
 	if (hasEditRights) {
 	    // this is a Leader or it is a non-Leader Assessmnt
 	    while (!canFinish) {
+		MockLearner.log.debug("action was " + form.getAttribute("action"));
 		WebResponse nextResp = (WebResponse) new Call(wc, test, username + " submits Assessment form",
 			fillFormArbitrarily(form)).execute();
 		asText = nextResp.getText();
@@ -946,6 +940,17 @@ public class MockLearner extends MockUser implements Runnable {
 		asText = nextResp.getText();
 		canFinish = asText.contains("true");
 	    }
+	}
+
+	String finishURL = null;
+	m = MockLearner.ASSESSMENT_FINISH_PATTERN.matcher(asText);
+	if (m.find()) {
+	    MockLearner.log.debug(m.group());
+	    MockLearner.log.debug(m.group(1));
+	    finishURL = m.group(1);
+	} else {
+	    MockLearner.log.debug(asText);
+	    throw new TestHarnessException("Finish URL "+MockLearner.ASSESSMENT_FINISH_PATTERN+" was not found in Assessment Tool");
 	}
 
 	return (WebResponse) new Call(wc, test, username + " finishes Assessment", finishURL).execute();
