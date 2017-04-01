@@ -247,7 +247,8 @@ ActivityDefs = {
 	/**
 	 * Constructor for a Tool Activity.
 	 */
-	ToolActivity : function(id, uiid, toolContentID, toolID, learningLibraryID, authorURL, x, y, title, readOnly) {
+	ToolActivity : function(id, uiid, toolContentID, toolID, learningLibraryID, authorURL, x, y, title,
+							readOnly, gradebookToolOutputDefinitionName) {
 		this.id = +id || null;
 		this.uiid = +uiid || ++layout.ld.maxUIID;
 		this.toolContentID = toolContentID;
@@ -256,6 +257,7 @@ ActivityDefs = {
 		this.authorURL = authorURL;
 		this.title = title;
 		this.readOnly = readOnly;
+		this.gradebookToolOutputDefinitionName = gradebookToolOutputDefinitionName;
 		this.transitions = {
 			'from' : [],
 			'to'   : []
@@ -1299,12 +1301,14 @@ ActivityLib = {
 			dataType : 'json',
 			success : function(response) {
 				activity.outputDefinitions = response;
-				$.each(activity.outputDefinitions, function() {
-					if (this.isDefaultGradebookMark){
-						activity.gradebookToolOutputDefinitionName = this.name;
-					return false;
-				}
+				if (!activity.gradebookToolOutputDefinitionName) {
+					$.each(activity.outputDefinitions, function() {
+						if (this.isDefaultGradebookMark){
+							activity.gradebookToolOutputDefinitionName = this.name;
+							return false;
+							}
 					});
+				}
 		}
 		});
 	},

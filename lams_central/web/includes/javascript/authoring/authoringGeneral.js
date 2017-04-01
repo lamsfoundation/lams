@@ -1510,7 +1510,9 @@ GeneralLib = {
 											activityData.xCoord ? activityData.xCoord : 1,
 											activityData.yCoord ? activityData.yCoord : 1,
 											activityData.activityTitle,
-											activityData.readOnly);
+											activityData.readOnly,
+											activityData.activityEvaluations.length > 0
+												? activityData.activityEvaluations[0] : "<NONE>");
 							// for later reference
 							activityData.activity = activity;
 							break;
