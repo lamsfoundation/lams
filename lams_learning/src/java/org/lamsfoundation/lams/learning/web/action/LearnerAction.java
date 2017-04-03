@@ -93,8 +93,6 @@ public class LearnerAction extends LamsDispatchAction {
     // ---------------------------------------------------------------------
     private static Logger log = Logger.getLogger(LearnerAction.class);
 
-    private static JSONObject progressBarMessages = null;
-
     private static final String[] MONITOR_MESSAGE_KEYS = new String[] {
 	    "label.learner.progress.activity.current.tooltip", "label.learner.progress.activity.completed.tooltip",
 	    "label.learner.progress.activity.attempted.tooltip", "label.learner.progress.activity.tostart.tooltip",
@@ -406,19 +404,17 @@ public class LearnerAction extends LamsDispatchAction {
     }
 
     private JSONObject getProgressBarMessages() throws JSONException {
-	if (progressBarMessages == null) {
-	    progressBarMessages = new JSONObject();
-	    MessageService messageService = LearnerServiceProxy
-		    .getMonitoringMessageService(getServlet().getServletContext());
-	    for (String key : MONITOR_MESSAGE_KEYS) {
-		String value = messageService.getMessage(key);
-		progressBarMessages.put(key, value);
-	    }
-	    messageService = LearnerServiceProxy.getMessageService(getServlet().getServletContext());
-	    for (String key : LEARNER_MESSAGE_KEYS) {
-		String value = messageService.getMessage(key);
-		progressBarMessages.put(key, value);
-	    }
+	JSONObject progressBarMessages = new JSONObject();
+	MessageService messageService = LearnerServiceProxy
+		.getMonitoringMessageService(getServlet().getServletContext());
+	for (String key : MONITOR_MESSAGE_KEYS) {
+	    String value = messageService.getMessage(key);
+	    progressBarMessages.put(key, value);
+	}
+	messageService = LearnerServiceProxy.getMessageService(getServlet().getServletContext());
+	for (String key : LEARNER_MESSAGE_KEYS) {
+	    String value = messageService.getMessage(key);
+	    progressBarMessages.put(key, value);
 	}
 	return progressBarMessages;
     }
