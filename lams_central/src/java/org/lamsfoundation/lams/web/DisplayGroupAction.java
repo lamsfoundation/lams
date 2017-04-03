@@ -327,7 +327,7 @@ public class DisplayGroupAction extends Action {
 		    || ((parent != null) && parent.getEnableGradebookForMonitors()))) {
 		String link = "javascript:showGradebookLessonDialog(" + bean.getId() + ")";
 		lessonLinks
-			.addFirst(new IndexLinkBean("index.coursegradebookmonitor", link, "fa fa-fw fa-check-square-o", null));
+			.addFirst(new IndexLinkBean("index.coursegradebookmonitor", link, "fa fa-fw fa-list-ol", null));
 	    }
 
 	    // Add lesson conditions
