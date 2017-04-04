@@ -1287,7 +1287,7 @@ ActivityLib = {
 	getOutputDefinitions : function(activity){
 		if (!activity.toolID) {
 			return;
-			}
+		}
 			
 		$.ajax({
 			url : LAMS_URL + 'authoring/author.do',
@@ -1306,10 +1306,10 @@ ActivityLib = {
 						if (this.isDefaultGradebookMark){
 							activity.gradebookToolOutputDefinitionName = this.name;
 							return false;
-							}
+						}
 					});
 				}
-		}
+			}
 		});
 	},
 	
@@ -1399,6 +1399,40 @@ ActivityLib = {
 				ActivityLib.addTransition(this.fromActivity, activity, true);
 			});
 		}
+	},
+	
+	/**
+	 * Refresh conditions of complex output definitions from Tool activity
+	 */
+	refreshOutputConditions : function(activity){
+		if (!activity.toolID) {
+			return;
+		}
+			
+		$.ajax({
+			url : LAMS_URL + 'authoring/author.do',
+			data : {
+				'method' : 'getToolOutputDefinitions',
+				'toolContentID' : activity.toolContentID 
+								|| layout.toolMetadata[activity.learningLibraryID].defaultToolContentID
+			},
+			cache : false,
+			async: false,
+			dataType : 'json',
+			success : function(response) {
+				// find the matching existing output and replace its conditions
+				$.each(response, function(){
+					var output = this;
+					if (output.conditions) {
+						$.each(activity.outputDefinitions, function(){
+							if (output.name == this.name) {
+								this.conditions = output.conditions;
+							}
+						});
+					}
+				});
+			}
+		});
 	},
 	
 	

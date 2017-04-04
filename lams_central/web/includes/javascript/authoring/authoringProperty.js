@@ -983,12 +983,6 @@ PropertyLib = {
 			}
 		});
 		
-		$('#outputConditionsRefreshButton', outputConditionsDialogContents).click(function(){
-			// get output definitions again
-			$(layout.outputConditionsDialog).data('refreshDefinitions')();
-			$(layout.outputConditionsDialog).data('buildContent')(true);
-		});
-		
 		$('#outputConditionsCancelButton', outputConditionsDialogContents).click(function(){
 			layout.outputConditionsDialog.modal('hide');
 		});
@@ -1040,20 +1034,9 @@ PropertyLib = {
 			'close'  : null,
 			'data' : {
 				/**
-				 * Get output definitions from a Tool activity
-				 */
-				'refreshDefinitions' : function(){
-					var dialog = layout.outputConditionsDialog,
-						activity = dialog.data('parentObject');
-					// sets the output definitions and their default value
-					ActivityLib.getOutputDefinitions(activity.input);
-				},
-				
-				
-				/**
 				 * Link output data to UI widgets
 				 */
-				'buildContent' : function(useDefaultConditions) {
+				'buildContent' : function() {
 					var dialog = layout.outputConditionsDialog,
 						activity = dialog.data('parentObject'),
 						outputSelect = $('#outputSelect', dialog),
@@ -1063,10 +1046,6 @@ PropertyLib = {
 								 	 ? activity.conditionsToBranches[0].condition.name.split('#')[0] : null;
 					// remove all previously defined outputs
 					$('option[value!="none"]', outputSelect).remove();
-					
-					if (!activity.input.outputDefinitions) {
-						dialog.data('refreshDefinitions')();
-					}
 					
 					if (activity.input.outputDefinitions) {
 						// build output dropdown and bind data to each option
@@ -1099,18 +1078,19 @@ PropertyLib = {
 						});
 					}
 					
-					dialog.data('outputChange')(useDefaultConditions);
+					dialog.data('outputChange')();
 				},
 				
 				
 				/**
 				 * Rebuild dialog content based on selected output
 				 */
-				'outputChange' : function(useDefaultConditions){
+				'outputChange' : function(){
 					var dialog = layout.outputConditionsDialog,
 					 	activity = dialog.data('parentObject'),
 					    outputOption = $('#outputSelect option:selected', dialog),
 					    output = outputOption.data('output');
+					
 					
 					$('.outputSelectDependent', dialog).hide();
 					// no output = "none" option was selected
@@ -1127,47 +1107,35 @@ PropertyLib = {
 						complexOutputWidgets.show();
 						// build a list with immutable conditoon names
 						var list =  $('ul', complexConditionNames),
-							entries = [];
-						$('li', list).remove();
+							mappingEntries = {};
 						
-						// see if there are existing mappings; if so, use conditions name from there instead from tool activity's output
-						$.each(activity.conditionsToBranches, function(){
-							if (this.branch && output.name == this.condition.name.split('#')[0]) {
-								entries.push(this);
-							}
-						});
+						// extract existing mappings from the list and remove the list
+						$('li', list).each(function(){
+							var mappingEntry = $(this).data('mappingEntry');
+							mappingEntries[mappingEntry.condition.conditionID] = mappingEntry;
+						}).remove();
 						
-						// if user choosed to refresh the conditions and there are existing mappings, ask him to confirm
-						if (entries.length == 0
-								|| (useDefaultConditions
-										&& confirm(LABELS.REFRESH_CONDITIONS_CONFIRM))) {
-							if (entries.length > 0) {
-								// clear existing mappings
-								entries = [];
-								activity.conditionsToBranches = [];
-							}
-							
-							if (output.conditions) {
-								// build list using conditions from Tool activity output definitions
-								$.each(output.conditions, function(){
-									entries.push({
-										'condition' : {
-											'name' 			  : this.name,
-										    'displayName' 	  : this.displayName,
-										    'type' 			  : 'OUTPUT_COMPLEX',
-										    'conditionID'	  : this.conditionId,
-										    'toolActivityUIID' : output.toolActivityUIID
-										}
-									});
-								});
-							}
+						PropertyLib.validateConditionMappings(activity.input);
+	
+						if (output.conditions) {
+							// build list using conditions from Tool activity output definitions
+							$.each(output.conditions, function(){
+								// use an existing mapping or build a new one
+								var mappingEntry = mappingEntries[this.conditionId] || {};
+								
+								mappingEntry.condition = {
+									'name' 			  : this.name,
+								    'displayName' 	  : this.displayName,
+								    'type' 			  : 'OUTPUT_COMPLEX',
+								    'conditionID'	  : this.conditionId,
+								    'toolActivityUIID' : output.toolActivityUIID
+								};
+								
+								$('<li />').text(this.displayName)
+								   		   .data('mappingEntry', mappingEntry)			   
+								   		   .appendTo(list);
+							});
 						}
-						
-						$.each(entries, function(){
-							$('<li />').text(this.condition.displayName)
-									   .data('mappingEntry', this)			   
-							  		   .appendTo(list);
-						});
 					} else {
 						// show menu and list of range conditions
 						rangeOutputWidgets.show();
@@ -1884,11 +1852,11 @@ PropertyLib = {
 		$.each(layout.activities, function() {
 			var consumer = this.branchingActivity || this;
 			// check if the modified activity is an input for a gate or branching activity
-			if (activity == consumer.input && consumer.conditionsToBranches.length > 0) {
+			if (activity == consumer.input) {
 				if (conditionIDs == null) {
 					// refresh conditions in the modified activity
 					conditionIDs = [];
-					ActivityLib.getOutputDefinitions(activity);
+					ActivityLib.refreshOutputConditions(activity);
 					$.each(activity.outputDefinitions, function(){
 						if (this.conditions) {
 							$.each(this.conditions, function(){
@@ -1903,7 +1871,7 @@ PropertyLib = {
 				$.each(consumer.conditionsToBranches, function(){
 					// a mapped condition is now missing
 					// remove it and inform the user
-					if (conditionIDs.indexOf(this.condition.conditionID) == -1) {
+					if (this.condition.conditionID && conditionIDs.indexOf(this.condition.conditionID) == -1) {
 						isBroken = true;
 					} else {
 						newMapping.push(this);
