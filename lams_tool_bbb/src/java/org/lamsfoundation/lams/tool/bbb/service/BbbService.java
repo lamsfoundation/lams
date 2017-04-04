@@ -445,6 +445,10 @@ public class BbbService implements ToolSessionManager, ToolContentManager, IBbbS
 	return toolService.isGroupedActivity(toolContentID);
     }
 
+    @Override
+    public void auditLogStartEditingActivityInMonitor(long toolContentID) {
+    	toolService.auditLogStartEditingActivityInMonitor(toolContentID);
+    }
 
     @Override
     @SuppressWarnings("unchecked")

@@ -769,6 +769,9 @@ public class AuthoringAction extends LamsDispatchAction implements VoteAppConsta
 		voteService.removeQuestionsFromCache(voteContentTest);
 		VoteUtils.setDefineLater(request, false, strToolContentID, voteService);
 
+		// audit log the teacher has started editing activity in monitor
+		voteService.auditLogStartEditingActivityInMonitor(new Long(strToolContentID));
+
 		// recalculate User Answers
 		voteService.recalculateUserAnswers(voteContentTest, oldQuestions, questionDTOs, deletedQuestionDTOs);
 	    }

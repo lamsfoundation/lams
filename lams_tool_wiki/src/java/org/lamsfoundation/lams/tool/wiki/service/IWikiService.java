@@ -316,6 +316,13 @@ public interface IWikiService {
      * @return
      */
     boolean isGroupedActivity(long toolContentID);
+    
+    /**
+     * Audit log the teacher has started editing activity in monitor.
+     * 
+     * @param toolContentID
+     */
+    void auditLogStartEditingActivityInMonitor(long toolContentID);
 
     /**
      * Return content folder (unique to each learner and lesson) which is used for storing user generated content.

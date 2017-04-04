@@ -119,6 +119,9 @@ public class AuthoringAction extends Action {
 
 	    assessment.setDefineLater(true);
 	    service.saveOrUpdateAssessment(assessment);
+	    
+	    //audit log the teacher has started editing activity in monitor
+	    service.auditLogStartEditingActivityInMonitor(contentId);
 
 	    request.setAttribute(AttributeNames.ATTR_MODE, ToolAccessMode.TEACHER.toString());
 	    return start(mapping, form, request, response);

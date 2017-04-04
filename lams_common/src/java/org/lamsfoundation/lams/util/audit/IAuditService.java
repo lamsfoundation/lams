@@ -116,4 +116,25 @@ public interface IAuditService {
      *            the login of the user who created the text initially
      */
     void logShowEntry(String moduleName, Long originalUserId, String originalUserLogin, String hiddenItem);
+
+    /**
+     * Log teacher has started editing activity in monitor.
+     * 
+     * @param toolContentId
+     */
+    void logStartEditingActivityInMonitor(Long toolContentId);
+
+    /**
+     * Log teacher has pressed Save button when editing activity in monitor.
+     * 
+     * @param toolContentId
+     */
+    void logFinishEditingActivityInMonitor(Long toolContentId);
+
+    /**
+     * Log teacher has pressed Cancel button when editing activity in monitor.
+     * 
+     * @param toolContentId
+     */
+    void logCancelEditingActivityInMonitor(Long toolContentId);
 }

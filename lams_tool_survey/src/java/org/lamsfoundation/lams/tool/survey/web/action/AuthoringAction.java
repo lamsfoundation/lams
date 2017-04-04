@@ -113,6 +113,9 @@ public class AuthoringAction extends Action {
 	    if (!survey.isContentInUse()) {
 		survey.setDefineLater(true);
 		service.saveOrUpdateSurvey(survey);
+
+		// audit log the teacher has started editing activity in monitor
+		service.auditLogStartEditingActivityInMonitor(contentId);
 	    }
 
 	    request.setAttribute(AttributeNames.ATTR_MODE, ToolAccessMode.TEACHER.toString());

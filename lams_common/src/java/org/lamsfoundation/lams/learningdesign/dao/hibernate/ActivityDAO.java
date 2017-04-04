@@ -76,6 +76,17 @@ public class ActivityDAO extends LAMSBaseDAO implements IActivityDAO {
 	Activity act = (Activity) super.find(Activity.class, activityId);
 	return getNonCGLibActivity(act);
     }
+    
+    @Override
+    public ToolActivity getToolActivityByToolContentId(Long toolContentId) {
+
+	final String FIND_BY_TOOL_CONTENT_ID = "from " + ActivityDAO.TABLENAME + " in class " + Activity.class.getName()
+		+ " where toolContentId=?";
+
+	Query query = getSessionFactory().getCurrentSession().createQuery(FIND_BY_TOOL_CONTENT_ID);
+	query.setLong(0, toolContentId);
+	return (ToolActivity) getNonCGLibActivity((Activity) query.uniqueResult());
+    }
 
     /**
      * we must return the real activity, not a Hibernate proxy. So relook

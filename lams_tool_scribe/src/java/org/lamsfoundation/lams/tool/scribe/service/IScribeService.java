@@ -135,6 +135,13 @@ public interface IScribeService {
     public void createReportEntry(Long toolSessionId);
 
     boolean isGroupedActivity(long toolContentID);
+    
+    /**
+     * Audit log the teacher has started editing activity in monitor.
+     * 
+     * @param toolContentID
+     */
+    void auditLogStartEditingActivityInMonitor(long toolContentID);
 
     void submitReport(Long toolSessionId, String userName, JSONObject requestJSON) throws JSONException;
 

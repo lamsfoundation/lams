@@ -276,6 +276,11 @@ public class NoticeboardServicePOJO
     public boolean isGroupedActivity(long toolContentID) {
 	return toolService.isGroupedActivity(toolContentID);
     }
+    
+    @Override
+    public void auditLogStartEditingActivityInMonitor(long toolContentID) {
+    	toolService.auditLogStartEditingActivityInMonitor(toolContentID);
+    }
 
     @Override
     public void copyToolContent(Long fromContentId, Long toContentId) throws ToolException {

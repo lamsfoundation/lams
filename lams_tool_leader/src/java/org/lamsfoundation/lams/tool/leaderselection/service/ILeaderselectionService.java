@@ -159,4 +159,11 @@ public interface ILeaderselectionService {
     void updateEntry(Long uid, String entry);
 
     boolean isGroupedActivity(long toolContentID);
+    
+    /**
+     * Audit log the teacher has started editing activity in monitor.
+     * 
+     * @param toolContentID
+     */
+    void auditLogStartEditingActivityInMonitor(long toolContentID);
 }

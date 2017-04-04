@@ -178,5 +178,12 @@ public interface IGmapService {
      * @return
      */
     boolean isGroupedActivity(long toolContentID);
+    
+    /**
+     * Audit log the teacher has started editing activity in monitor.
+     * 
+     * @param toolContentID
+     */
+    void auditLogStartEditingActivityInMonitor(long toolContentID);
 
 }

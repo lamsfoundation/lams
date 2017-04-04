@@ -627,6 +627,11 @@ public class NotebookService implements ToolSessionManager, ToolContentManager, 
     public boolean isGroupedActivity(long toolContentID) {
 	return toolService.isGroupedActivity(toolContentID);
     }
+    
+    @Override
+    public void auditLogStartEditingActivityInMonitor(long toolContentID) {
+    	toolService.auditLogStartEditingActivityInMonitor(toolContentID);
+    }
 
     @Override
     public String getLearnerContentFolder(Long toolSessionId, Long userId) {

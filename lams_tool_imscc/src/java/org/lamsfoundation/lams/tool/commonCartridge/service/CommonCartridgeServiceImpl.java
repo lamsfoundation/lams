@@ -1013,16 +1013,14 @@ public class CommonCartridgeServiceImpl implements ICommonCartridgeService, Tool
 	this.lessonService = lessonService;
     }
 
-    /**
-     * Finds out which lesson the given tool content belongs to and returns its monitoring users.
-     *
-     * @param sessionId
-     *            tool session ID
-     * @return list of teachers that monitor the lesson which contains the tool with given session ID
-     */
     @Override
     public List<User> getMonitorsByToolSessionId(Long sessionId) {
 	return getLessonService().getMonitorsByToolSessionId(sessionId);
+    }
+    
+    @Override
+    public void auditLogStartEditingActivityInMonitor(long toolContentID) {
+    	toolService.auditLogStartEditingActivityInMonitor(toolContentID);
     }
     
     @Override

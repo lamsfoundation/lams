@@ -99,6 +99,9 @@ public class AuthoringAction extends LamsDispatchAction {
 	    // are editing. This flag is released when updateContent is called.
 	    leaderselection.setDefineLater(true);
 	    leaderselectionService.saveOrUpdateLeaderselection(leaderselection);
+	    
+	    //audit log the teacher has started editing activity in monitor
+	    leaderselectionService.auditLogStartEditingActivityInMonitor(toolContentID);
 	}
 
 	// Set up the authForm.

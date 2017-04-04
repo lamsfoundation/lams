@@ -28,6 +28,7 @@ import java.util.List;
 import org.lamsfoundation.lams.dao.IBaseDAO;
 import org.lamsfoundation.lams.learningdesign.Activity;
 import org.lamsfoundation.lams.learningdesign.LearningDesign;
+import org.lamsfoundation.lams.learningdesign.ToolActivity;
 
 /**
  * @author Manpreet Minhas
@@ -137,5 +138,15 @@ public interface IActivityDAO extends IBaseDAO {
      * @return Activity the template activity for the learning library.
      */
     public Activity getTemplateActivityByLibraryID(Long libraryID);
+
+    /**
+     * Returns ToolActivity by the specified toolContentId
+     * 
+     * @param toolContentId
+     * @throws NonUniqueResultException
+     *             if there is more than one matching result
+     * @return
+     */
+    ToolActivity getToolActivityByToolContentId(Long toolContentId);
 
 }

@@ -260,6 +260,13 @@ public interface IVoteService {
      * @return
      */
     boolean isGroupedActivity(long toolContentID);
+    
+    /**
+     * Audit log the teacher has started editing activity in monitor.
+     * 
+     * @param toolContentID
+     */
+    void auditLogStartEditingActivityInMonitor(long toolContentID);
 
     /**
      * Gets the basic details about an attempt for a nomination. questionUid must not be null, sessionUid may be NULL.

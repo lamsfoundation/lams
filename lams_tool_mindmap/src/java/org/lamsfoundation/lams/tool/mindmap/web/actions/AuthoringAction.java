@@ -116,6 +116,9 @@ public class AuthoringAction extends LamsDispatchAction {
 	    // while we are editing. This flag is released when updateContent is called.
 	    mindmap.setDefineLater(true);
 	    mindmapService.saveOrUpdateMindmap(mindmap);
+	    
+	    //audit log the teacher has started editing activity in monitor
+	    mindmapService.auditLogStartEditingActivityInMonitor(toolContentID);
 	}
 
 	/* Mindmap Attributes */

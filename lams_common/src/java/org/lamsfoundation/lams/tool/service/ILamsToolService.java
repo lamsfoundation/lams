@@ -73,6 +73,13 @@ public interface ILamsToolService {
      * @return
      */
     Boolean isGroupedActivity(long toolContentID);
+    
+    /**
+     * Audit log the teacher has started editing activity in monitor.
+     * 
+     * @param toolContentID
+     */
+    void auditLogStartEditingActivityInMonitor(long toolContentID);
 
     /**
      * Assign tool an ActivityEvaluation (it is an equivalent of doing it manually on authoring canvas). It also updates

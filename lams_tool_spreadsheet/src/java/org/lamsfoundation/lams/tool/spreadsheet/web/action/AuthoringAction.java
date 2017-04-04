@@ -78,6 +78,9 @@ public class AuthoringAction extends Action {
 
 	    spreadsheet.setDefineLater(true);
 	    service.saveOrUpdateSpreadsheet(spreadsheet);
+	    
+	    //audit log the teacher has started editing activity in monitor
+	    service.auditLogStartEditingActivityInMonitor(contentId);
 
 	    request.setAttribute(AttributeNames.ATTR_MODE, ToolAccessMode.TEACHER.toString());
 	    return start(mapping, form, request, response);

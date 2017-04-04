@@ -229,6 +229,13 @@ public interface IPeerreviewService extends ToolRatingManager {
      * @return
      */
     boolean isGroupedActivity(long toolContentID);
+    
+    /**
+     * Audit log the teacher has started editing activity in monitor.
+     * 
+     * @param toolContentID
+     */
+    void auditLogStartEditingActivityInMonitor(long toolContentID);
 
     int getCommentsMinWordsLimit(Long toolContentId);
 

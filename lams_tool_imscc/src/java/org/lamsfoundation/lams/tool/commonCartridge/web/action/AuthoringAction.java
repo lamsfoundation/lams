@@ -101,6 +101,9 @@ public class AuthoringAction extends Action {
 
 	    commonCartridge.setDefineLater(true);
 	    service.saveOrUpdateCommonCartridge(commonCartridge);
+	    
+	    //audit log the teacher has started editing activity in monitor
+	    service.auditLogStartEditingActivityInMonitor(contentId);
 
 	    request.setAttribute(AttributeNames.ATTR_MODE, ToolAccessMode.TEACHER.toString());
 	    return start(mapping, form, request, response);
