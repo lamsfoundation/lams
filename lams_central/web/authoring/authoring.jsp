@@ -249,8 +249,6 @@
 				CLEAR_ALL_CONFIRM : decoderDiv.html('<c:out value="${CLEAR_ALL_CONFIRM_VAR}" />').text(),
 				<fmt:message key="authoring.fla.remove.condition.confirm" var="REMOVE_CONDITION_CONFIRM_VAR"/>
 				REMOVE_CONDITION_CONFIRM : decoderDiv.html('<c:out value="${REMOVE_CONDITION_CONFIRM_VAR}" />').text(),
-				<fmt:message key="authoring.fla.refresh.conditions.confirm" var="REFRESH_CONDITIONS_CONFIRM_VAR"/>
-				REFRESH_CONDITIONS_CONFIRM : decoderDiv.html('<c:out value="${REFRESH_CONDITIONS_CONFIRM_VAR}" />').text(),
 				<fmt:message key="authoring.fla.conditions.to.default.gate.state.confirm" var="CONDITIONS_TO_DEFAULT_GATE_STATE_CONFIRM_VAR"/>
 				CONDITIONS_TO_DEFAULT_GATE_STATE_CONFIRM : decoderDiv.html('<c:out value="${CONDITIONS_TO_DEFAULT_GATE_STATE_CONFIRM_VAR}" />').text(),
 				<fmt:message key="authoring.fla.conditions.to.default.branch.confirm" var="CONDITIONS_TO_DEFAULT_BRANCH_CONFIRM_VAR"/>
@@ -1054,11 +1052,6 @@
 				<button id="outputConditionsRemoveButton" class="btn btn-default outputSelectDependent rangeOutputButton">
 					<i class="fa fa-remove"></i> 
 					<span><fmt:message key="authoring.fla.remove.condition.button" /></span>
-				</button>
-				
-				<button id="outputConditionsRefreshButton" class="btn btn-default outputSelectDependent complexOutputButton">
-					<i class="fa fa-refresh"></i> 
-					<span><fmt:message key="authoring.fla.refresh.button" /></span>
 				</button>
 			</div>
 		 </div>
