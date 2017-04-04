@@ -542,22 +542,14 @@ public class DokumaranService implements IDokumaranService, ToolContentManager, 
 	return contentId;
     }
 
-    /**
-     * Gets a message from dokumaran bundle. Same as <code><fmt:message></code> in JSP pages.
-     *
-     * @param key
-     *            key of the message
-     * @param args
-     *            arguments for the message
-     * @return message content
-     */
-    private String getLocalisedMessage(String key, Object[] args) {
-	return messageService.getMessage(key, args);
-    }
-
     @Override
     public boolean isGroupedActivity(long toolContentID) {
 	return toolService.isGroupedActivity(toolContentID);
+    }
+    
+    @Override
+    public void auditLogStartEditingActivityInMonitor(long toolContentID) {
+    	toolService.auditLogStartEditingActivityInMonitor(toolContentID);
     }
 
     // *******************************************************************************
