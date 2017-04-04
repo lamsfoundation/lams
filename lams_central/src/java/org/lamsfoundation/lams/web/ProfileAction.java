@@ -211,9 +211,6 @@ public class ProfileAction extends LamsDispatchAction {
 	}
 	userForm.set("localeId", locale.getLocaleId());
 	request.setAttribute("locales", locales);
-	if (requestor.isTwoFactorAuthenticationEnabled()) {
-	    request.setAttribute("sharedSecret", requestor.getTwoFactorAuthenticationSecret());    
-	}
 
 	themeService = getThemeService();
 
