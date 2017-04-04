@@ -68,7 +68,7 @@
 					<lams:AuthoringButton formID="authoringForm"
 						clearSessionActionUrl="/clearsession.do" toolSignature="<%=AssessmentConstants.TOOL_SIGNATURE%>"
 						toolContentID="${formBean.assessment.contentId}"
-						accessMode="author"
+						accessMode="${mode}" defineLater="${mode=='teacher'}"
 						contentFolderID="${formBean.contentFolderID}" />
 				</div>
 			</lams:TabBodyArea>
