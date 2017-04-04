@@ -224,13 +224,6 @@
 									</html:select>
 								</div>
 								
-								<c:if test="${not empty sharedSecret}">
-									<div class="form-group">
-										<label><fmt:message key="label.2FA.shared.secret" />:</label>
-										<br>
-										${sharedSecret}
-									</div>
-								</c:if>
 							</c:if>
 							<br />
 
