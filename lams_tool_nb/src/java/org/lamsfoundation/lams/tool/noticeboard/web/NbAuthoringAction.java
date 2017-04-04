@@ -34,6 +34,7 @@ import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.apache.struts.util.MessageResources;
 import org.lamsfoundation.lams.authoring.web.AuthoringConstants;
+import org.lamsfoundation.lams.tool.ToolAccessMode;
 import org.lamsfoundation.lams.tool.noticeboard.NbApplicationException;
 import org.lamsfoundation.lams.tool.noticeboard.NoticeboardConstants;
 import org.lamsfoundation.lams.tool.noticeboard.NoticeboardContent;
@@ -47,38 +48,25 @@ import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 
 /**
+ * <p>
+ * This class is a simple combination of NbAuthoringStarterAction and NbAuthoringAction. It has been created for the
+ * purpose of supporting the new authoring page which is done using DHTML.
+ * </p>
+ *
+ * <p>
+ * The unspecified method, is the same as the execute method for NbAuthoringStarterAction. It will get called when the
+ * method parameter is not specified (that is on first entry into the authoring environment).
+ * </p>
+ *
+ * <p>
+ * The save, upload and delete method is the same as that of NbAuthoringAction, to see its explanation, please see
+ * org.lamsfoundation.lams.tool.noticeboard.web.NbAuthoringAction
+ * </p>
+ * 
  * @author mtruong
- *
- *         <p>
- *         This class is a simple combination of NbAuthoringStarterAction and NbAuthoringAction.
- *         It has been created for the purpose of supporting the new authoring page which is done using
- *         DHTML.
- *         </p>
- *
- *         <p>
- *         The unspecified method, is the same as the execute method for NbAuthoringStarterAction.
- *         It will get called when the method parameter is not specified (that is on first entry
- *         into the authoring environment).
- *         </p>
- *
- *         <p>
- *         The save, upload and delete method is the same as that of NbAuthoringAction, to see its explanation,
- *         please see org.lamsfoundation.lams.tool.noticeboard.web.NbAuthoringAction
- *         </p>
- *
- *
- *
- *
- *
- *
- *
- *
- *
- *
  */
-
 public class NbAuthoringAction extends LamsDispatchAction {
-    static Logger logger = Logger.getLogger(NbAuthoringAction.class.getName());
+    private static Logger logger = Logger.getLogger(NbAuthoringAction.class.getName());
     public final static String FORM = "NbAuthoringForm";
 
     /** Get the user from the shared session */
@@ -98,6 +86,10 @@ public class NbAuthoringAction extends LamsDispatchAction {
     @Override
     public ActionForward unspecified(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) throws NbApplicationException {
+	/*
+	 * Retrieve the Service
+	 */
+	INoticeboardService nbService = NoticeboardServiceProxy.getNbService(getServlet().getServletContext());
 
 	//to ensure that we are working with a new form, not one from previous session
 	NbAuthoringForm nbForm = new NbAuthoringForm();
@@ -112,11 +104,6 @@ public class NbAuthoringAction extends LamsDispatchAction {
 	 * the two tabs {Advanced, Instructions} are not visible.
 	 */
 	nbForm.setDefineLater(request.getParameter(NoticeboardConstants.DEFINE_LATER));
-
-	/*
-	 * Retrieve the Service
-	 */
-	INoticeboardService nbService = NoticeboardServiceProxy.getNbService(getServlet().getServletContext());
 
 	if (!contentExists(nbService, contentId)) {
 	    //	Pre-fill the form with the default content
@@ -138,8 +125,8 @@ public class NbAuthoringAction extends LamsDispatchAction {
 	    nbForm.setTitle(nb.getTitle());
 	    nbForm.setBasicContent(nb.getContent());
 
-	} else //content already exists on the database
-	{
+	//content already exists on the database
+	} else	{
 	    //get the values from the database
 	    NoticeboardContent nb = nbService.retrieveNoticeboard(contentId);
 
@@ -154,9 +141,13 @@ public class NbAuthoringAction extends LamsDispatchAction {
 	     */
 	    nbForm.populateFormWithNbContentValues(nb);
 	    nbForm.setContentFolderID(contentFolderId);
-	    nb.setDefineLater(Boolean.parseBoolean(nbForm.getDefineLater()));
+	    boolean isDefineLater = Boolean.parseBoolean(nbForm.getDefineLater());
+	    nb.setDefineLater(isDefineLater);
 	    nbService.saveNoticeboard(nb);
 
+	    if (isDefineLater) {
+		request.setAttribute(AttributeNames.ATTR_MODE, ToolAccessMode.TEACHER.toString());
+	    }
 	}
 
 	request.setAttribute(FORM, nbForm);
