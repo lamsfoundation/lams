@@ -147,6 +147,9 @@ public class NbAuthoringAction extends LamsDispatchAction {
 
 	    if (isDefineLater) {
 		request.setAttribute(AttributeNames.ATTR_MODE, ToolAccessMode.TEACHER.toString());
+
+		// audit log the teacher has started editing activity in monitor
+		nbService.auditLogStartEditingActivityInMonitor(contentId);
 	    }
 	}
 

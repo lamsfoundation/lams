@@ -1584,6 +1584,11 @@ public class McServicePOJO
     public boolean isGroupedActivity(long toolContentID) {
 	return toolService.isGroupedActivity(toolContentID);
     }
+    
+    @Override
+    public void auditLogStartEditingActivityInMonitor(long toolContentID) {
+    	toolService.auditLogStartEditingActivityInMonitor(toolContentID);
+    }
 
     @Override
     public String getActivityEvaluation(Long toolContentId) {

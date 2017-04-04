@@ -81,6 +81,9 @@ public class AuthoringAction extends Action {
 
 	    peerreview.setDefineLater(true);
 	    service.saveOrUpdatePeerreview(peerreview);
+	    
+	    //audit log the teacher has started editing activity in monitor
+	    service.auditLogStartEditingActivityInMonitor(contentId);
 
 	    request.setAttribute(AttributeNames.ATTR_MODE, ToolAccessMode.TEACHER.toString());
 	    return start(mapping, form, request, response);

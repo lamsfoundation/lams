@@ -27,6 +27,8 @@ package org.lamsfoundation.lams.util.audit;
 import javax.servlet.http.HttpSession;
 
 import org.apache.log4j.Logger;
+import org.lamsfoundation.lams.learningdesign.ToolActivity;
+import org.lamsfoundation.lams.learningdesign.dao.IActivityDAO;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.util.MessageService;
 import org.lamsfoundation.lams.web.session.SessionManager;
@@ -60,7 +62,12 @@ public class AuditService implements IAuditService {
     private final String AUDIT_MARK_CHANGE_I18N_KEY = "audit.change.mark";
     private final String AUDIT_HIDE_I18N_KEY = "audit.hide.entry";
     private final String AUDIT_SHOW_I18N_KEY = "audit.show.entry";
+    private final String AUDIT_STARTED_EDITING_I18N_KEY = "audit.started.editing.activity";
+    private final String AUDIT_FINISHED_EDITING_I18N_KEY = "audit.finished.editing.activity";
+    private final String AUDIT_CANCELLED_EDITING_I18N_KEY = "audit.cancelled.editing.activity";
+	    
     protected MessageService messageService;
+    protected IActivityDAO activityDao;
 
     private String getUserString() {
 	HttpSession ss = SessionManager.getSession();
@@ -126,6 +133,33 @@ public class AuditService implements IAuditService {
 	String message = messageService.getMessage(AUDIT_SHOW_I18N_KEY, args);
 	log(moduleName, message);
     }
+    
+    @Override
+    public void logStartEditingActivityInMonitor(Long toolContentId) {
+	logEditActivityInMonitor(toolContentId, AUDIT_STARTED_EDITING_I18N_KEY);
+    }
+    
+    @Override
+    public void logFinishEditingActivityInMonitor(Long toolContentId) {
+	logEditActivityInMonitor(toolContentId, AUDIT_FINISHED_EDITING_I18N_KEY);
+    }
+    
+    @Override
+    public void logCancelEditingActivityInMonitor(Long toolContentId) {
+	logEditActivityInMonitor(toolContentId, AUDIT_CANCELLED_EDITING_I18N_KEY);
+    }
+    
+    private void logEditActivityInMonitor(Long toolContentId, String messageKey) {
+
+	ToolActivity toolActivity = activityDao.getToolActivityByToolContentId(toolContentId);
+	String toolSignature = toolActivity.getTool().getToolSignature();
+
+	UserDTO user = (UserDTO) SessionManager.getSession().getAttribute(AttributeNames.USER);
+	String[] args = new String[] { user.getLogin() + "(" + user.getUserID() + ")",
+		"(activityId:" + toolActivity.getActivityId() + ")" };
+	String message = messageService.getMessage(messageKey, args);
+	log(toolSignature, message);
+    }
 
     /* *** Spring Injection Methods ************ */
 
@@ -135,6 +169,14 @@ public class AuditService implements IAuditService {
 
     public void setMessageService(MessageService messageService) {
 	this.messageService = messageService;
+    }
+    
+    public IActivityDAO getActivityDao() {
+	return activityDao;
+    }
+
+    public void setActivityDao(IActivityDAO activityDao) {
+	this.activityDao = activityDao;
     }
 
 }

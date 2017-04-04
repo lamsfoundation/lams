@@ -119,6 +119,9 @@ public class AuthoringAction extends LamsDispatchAction {
 	    // are editing. This flag is released when updateContent is called.
 	    pixlr.setDefineLater(true);
 	    pixlrService.saveOrUpdatePixlr(pixlr);
+	    
+	    //audit log the teacher has started editing activity in monitor
+	    pixlrService.auditLogStartEditingActivityInMonitor(toolContentID);
 	}
 
 	String imageUrl = PixlrConstants.LAMS_WWW_PIXLR_FOLDER_URL;

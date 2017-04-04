@@ -56,14 +56,13 @@ import org.lamsfoundation.lams.tool.exception.LamsToolServiceException;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.util.FileUtil;
 import org.lamsfoundation.lams.util.FileUtilException;
+import org.lamsfoundation.lams.util.audit.IAuditService;
 
 /**
- *
  * @author Jacky Fang
  * @since 2005-3-17
  *
  * @author Ozgur Demirtas 24/06/2005
- *
  */
 public class LamsToolService implements ILamsToolService {
     private static Logger log = Logger.getLogger(LamsToolService.class);
@@ -72,6 +71,7 @@ public class LamsToolService implements ILamsToolService {
     private static final String LEADER_SELECTION_TOOL_OUTPUT_NAME_LEADER_USERID = "leader.user.id";
 
     private IActivityDAO activityDAO;
+    private IAuditService auditService;
     private IToolDAO toolDAO;
     private IToolSessionDAO toolSessionDAO;
     private IToolContentDAO toolContentDAO;
@@ -136,26 +136,21 @@ public class LamsToolService implements ILamsToolService {
     @SuppressWarnings("unchecked")
     @Override
     public Boolean isGroupedActivity(long toolContentID) {
-	List<Activity> activities = toolContentDAO.findByProperty(Activity.class, "toolContentId", toolContentID);
-	if (activities.size() == 1) {
-	    Activity activity = activities.get(0);
-	    return activity.getApplyGrouping();
-	} else {
-	    LamsToolService.log.debug("ToolContent contains multiple activities, can't test whether grouping applies.");
-	    return null;
-	}
+	ToolActivity toolActivity = activityDAO.getToolActivityByToolContentId(toolContentID);
+	boolean isGroupedActivity = toolActivity == null ? null : toolActivity.getApplyGrouping();
+	
+	return isGroupedActivity;
     }
+    
+    @Override
+    public void auditLogStartEditingActivityInMonitor(long toolContentID) {
+	auditService.logStartEditingActivityInMonitor(toolContentID);
+    }    
 
     @Override
     public String getActivityEvaluation(Long toolContentId) {
 
-	List<Activity> activities = toolContentDAO.findByProperty(Activity.class, "toolContentId", toolContentId);
-	if (activities.size() != 1) {
-	    log.debug("ToolContent contains multiple activities, can't get ActivityEvaluation.");
-	    return null;
-	}
-
-	ToolActivity toolActivity = (ToolActivity) activities.get(0);
+	ToolActivity toolActivity = activityDAO.getToolActivityByToolContentId(toolContentId);
 	Set<ActivityEvaluation> activityEvaluations = toolActivity.getActivityEvaluations();
 	if (activityEvaluations.isEmpty()) {
 	    return null;
@@ -168,16 +163,11 @@ public class LamsToolService implements ILamsToolService {
     @Override
     public void setActivityEvaluation(Long toolContentId, String toolOutputDefinition) {
 
-	List<Activity> activities = toolContentDAO.findByProperty(Activity.class, "toolContentId", toolContentId);
-	if (activities.size() != 1) {
-	    throw new LamsToolServiceException(
-		    "ToolContent contains multiple activities, can't set ActivityEvaluation.");
-	}
 	if (StringUtils.isEmpty(toolOutputDefinition)) {
 	    return;
 	}
 
-	ToolActivity toolActivity = (ToolActivity) activities.get(0);
+	ToolActivity toolActivity = activityDAO.getToolActivityByToolContentId(toolContentId);
 	Set<ActivityEvaluation> activityEvaluations = toolActivity.getActivityEvaluations();
 
 	// Get the first (only) ActivityEvaluation if it exists
@@ -361,6 +351,10 @@ public class LamsToolService implements ILamsToolService {
 
     public void setActivityDAO(IActivityDAO activityDAO) {
 	this.activityDAO = activityDAO;
+    }
+    
+    public void setAuditService(IAuditService auditService) {
+	this.auditService = auditService;
     }
 
     public void setToolSessionDAO(IToolSessionDAO toolSessionDAO) {

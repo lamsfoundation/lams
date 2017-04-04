@@ -731,6 +731,11 @@ public class KalturaService implements ToolSessionManager, ToolContentManager, I
     public boolean isGroupedActivity(long toolContentID) {
 	return toolService.isGroupedActivity(toolContentID);
     }
+    
+    @Override
+    public void auditLogStartEditingActivityInMonitor(long toolContentID) {
+    	toolService.auditLogStartEditingActivityInMonitor(toolContentID);
+    }
 
     @Override
     public Class[] getSupportedToolOutputDefinitionClasses(int definitionType) {

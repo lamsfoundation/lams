@@ -76,6 +76,13 @@ public interface IMindmapService {
     public void updateEntry(NotebookEntry notebookEntry);
 
     boolean isGroupedActivity(long toolContentID);
+    
+    /**
+     * Audit log the teacher has started editing activity in monitor.
+     * 
+     * @param toolContentID
+     */
+    void auditLogStartEditingActivityInMonitor(long toolContentID);
 
     public void setMindmapMessageService(MessageService mindmapMessageService);
 

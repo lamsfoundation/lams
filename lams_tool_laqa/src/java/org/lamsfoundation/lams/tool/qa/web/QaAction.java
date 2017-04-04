@@ -140,6 +140,9 @@ public class QaAction extends LamsDispatchAction implements QaAppConstants {
 		qaService.removeQuestionsFromCache(qaContent);
 		qaService.setDefineLater(strToolContentID, false);
 
+		// audit log the teacher has started editing activity in monitor
+		qaService.auditLogStartEditingActivityInMonitor(toolContentID);
+
 		// recalculate User Answers
 		qaService.recalculateUserAnswers(qaContent, oldQuestions, questionDTOs, deletedQuestionDTOs);
 	    }

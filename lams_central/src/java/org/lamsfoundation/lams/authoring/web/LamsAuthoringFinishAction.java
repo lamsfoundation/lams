@@ -45,6 +45,7 @@ import org.lamsfoundation.lams.tool.service.ILamsToolService;
 import org.lamsfoundation.lams.util.Configuration;
 import org.lamsfoundation.lams.util.ConfigurationKeys;
 import org.lamsfoundation.lams.util.WebUtil;
+import org.lamsfoundation.lams.util.audit.IAuditService;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.springframework.beans.factory.NoSuchBeanDefinitionException;
 import org.springframework.web.context.WebApplicationContext;
@@ -56,8 +57,6 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
  * cancel/close window, this action will execute clearSession().
  *
  * @author Steve.Ni
- *
- * @version $Revision$
  */
 public abstract class LamsAuthoringFinishAction extends Action {
     private static Logger log = Logger.getLogger(LamsAuthoringFinishAction.class);
@@ -69,8 +68,11 @@ public abstract class LamsAuthoringFinishAction extends Action {
 
     private static final String CONFIRM_ACTION = "confirm";
     private static final String CANCEL_ACTION = "cancel";
+    private static final String DEFINE_LATER_ACTION = "defineLater";
 
     private static final String RE_EDIT_URL = "reEditUrl";
+    
+    private static IAuditService auditService;
 
     /**
      * Action method, will handle save/cancel action.
@@ -82,6 +84,7 @@ public abstract class LamsAuthoringFinishAction extends Action {
 	ToolAccessMode mode = WebUtil.readToolAccessModeParam(request, ACTION_MODE, false);
 	String cSessionID = request.getParameter(CUSTOMISE_SESSION_ID);
 	String notifyCloseURL = (String) request.getSession().getAttribute(AttributeNames.PARAM_NOTIFY_CLOSE_URL);
+	Long toolContentId = new Long(WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_CONTENT_ID));
 
 	// clear session according to the ToolAccessMode.
 	clearSession(cSessionID, request.getSession(), mode);
@@ -90,7 +93,6 @@ public abstract class LamsAuthoringFinishAction extends Action {
 	if (StringUtils.equals(action, CONFIRM_ACTION)) {
 	    String nextUrl = getLamsUrl() + "authoringConfirm.jsp";
 	    String signature = request.getParameter(TOOL_SIGNATURE);
-	    Long toolContentId = new Long(WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_CONTENT_ID));
 
 	    String contentFolderID = "TODO_remove-change_optional_to_false";
 	    contentFolderID = WebUtil.readStrParam(request, AttributeNames.PARAM_CONTENT_FOLDER_ID, true);
@@ -112,12 +114,20 @@ public abstract class LamsAuthoringFinishAction extends Action {
 	    }
 	    response.sendRedirect(nextUrl);
 	}
+	
+	//audit log content has been finished being edited 
+	if (StringUtils.equals(action, DEFINE_LATER_ACTION)) {
+	    getAuditService().logFinishEditingActivityInMonitor(toolContentId);
+	}
+	
+	//reset defineLater task
 	if (StringUtils.equals(action, CANCEL_ACTION) && mode.isTeacher()) {
 	    String signature = request.getParameter(TOOL_SIGNATURE);
-	    Long toolContentId = new Long(WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_CONTENT_ID));
 
 	    ToolContentManager contentManager = (ToolContentManager) findToolService(signature);
 	    contentManager.resetDefineLater(toolContentId);
+	    
+	    getAuditService().logCancelEditingActivityInMonitor(toolContentId);
 	}
 
 	return null;
@@ -153,6 +163,18 @@ public abstract class LamsAuthoringFinishAction extends Action {
 	WebApplicationContext webContext = WebApplicationContextUtils
 		.getRequiredWebApplicationContext(this.getServlet().getServletContext());
 	return (ILamsToolService) webContext.getBean(AuthoringConstants.TOOL_SERVICE_BEAN_NAME);
+    }
+    
+    /**
+     * Get AuditService bean
+     */
+    private IAuditService getAuditService() {
+	if (auditService == null) {
+	    WebApplicationContext ctx = WebApplicationContextUtils
+		    .getRequiredWebApplicationContext(getServlet().getServletContext());
+	    auditService = (IAuditService) ctx.getBean("auditService");
+	}
+	return auditService;
     }
 
     /**

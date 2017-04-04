@@ -107,6 +107,9 @@ public class AuthoringAction extends LamsDispatchAction {
 	    // when updateContent is called.
 	    notebook.setDefineLater(true);
 	    notebookService.saveOrUpdateNotebook(notebook);
+	    
+	    //audit log the teacher has started editing activity in monitor
+	    notebookService.auditLogStartEditingActivityInMonitor(toolContentID);
 	}
 
 	// Set up the authForm.

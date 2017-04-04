@@ -106,6 +106,9 @@ public class AuthoringAction extends LamsDispatchAction {
 	    // are editing. This flag is released when updateContent is called.
 	    gmap.setDefineLater(true);
 	    gmapService.saveOrUpdateGmap(gmap);
+	    
+	    //audit log the teacher has started editing activity in monitor
+	    gmapService.auditLogStartEditingActivityInMonitor(toolContentID);
 	}
 
 	// Set up the authForm.

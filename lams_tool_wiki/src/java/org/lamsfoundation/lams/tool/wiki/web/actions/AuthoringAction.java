@@ -122,6 +122,9 @@ public class AuthoringAction extends WikiPageAction {
 	    // are editing. This flag is released when updateContent is called.
 	    wiki.setDefineLater(true);
 	    wikiService.saveOrUpdateWiki(wiki);
+	    
+	    //audit log the teacher has started editing activity in monitor
+	    wikiService.auditLogStartEditingActivityInMonitor(toolContentID);
 	}
 
 	// update the form

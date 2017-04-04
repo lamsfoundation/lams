@@ -142,6 +142,9 @@ public class McAction extends LamsDispatchAction implements McAppConstants {
 		mcService.releaseQuestionsFromCache(mcContent);
 		mcService.setDefineLater(strToolContentID, false);
 
+		// audit log the teacher has started editing activity in monitor
+		mcService.auditLogStartEditingActivityInMonitor(new Long(strToolContentID));
+
 		// recalculate User Answers
 		mcService.recalculateUserAnswers(mcContent, oldQuestions, questionDTOs, deletedQuestionDTOs);
 	    }

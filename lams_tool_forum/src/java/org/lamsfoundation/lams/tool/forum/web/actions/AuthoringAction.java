@@ -109,6 +109,9 @@ public class AuthoringAction extends Action {
 	    if (!forum.isContentInUse()) {
 		forum.setDefineLater(true);
 		forumService.updateForum(forum);
+
+		// audit log the teacher has started editing activity in monitor
+		forumService.auditLogStartEditingActivityInMonitor(contentId);
 	    }
 
 	    return initPage(mapping, form, request, response);

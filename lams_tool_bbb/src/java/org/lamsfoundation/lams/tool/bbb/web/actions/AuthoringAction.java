@@ -105,6 +105,9 @@ public class AuthoringAction extends DispatchAction {
 	    // called.
 	    bbb.setDefineLater(true);
 	    bbbService.saveOrUpdateBbb(bbb);
+	    
+	    //audit log the teacher has started editing activity in monitor
+	    bbbService.auditLogStartEditingActivityInMonitor(toolContentID);
 	}
 
 	// Set up the authForm.

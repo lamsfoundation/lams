@@ -297,6 +297,13 @@ public interface ISurveyService {
      * @return
      */
     boolean isGroupedActivity(long toolContentID);
+    
+    /**
+     * Audit log the teacher has started editing activity in monitor.
+     * 
+     * @param toolContentID
+     */
+    void auditLogStartEditingActivityInMonitor(long toolContentID);
 
     /**
      * Gets the Answer information for the monitoring listAnswers tablesorter. Will return List<[SurveyUser, String,

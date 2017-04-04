@@ -113,6 +113,9 @@ public class AuthoringAction extends LamsDispatchAction {
 	    // are editing. This flag is released when updateContent is called.
 	    kaltura.setDefineLater(true);
 	    kalturaService.saveOrUpdateKaltura(kaltura);
+	    
+	    //audit log the teacher has started editing activity in monitor
+	    kalturaService.auditLogStartEditingActivityInMonitor(toolContentID);
 	}
 
 	// Set up the authForm.

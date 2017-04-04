@@ -417,6 +417,13 @@ public interface IAssessmentService {
      * @return
      */
     boolean isGroupedActivity(long toolContentID);
+    
+    /**
+     * Audit log the teacher has started editing activity in monitor.
+     * 
+     * @param toolContentID
+     */
+    void auditLogStartEditingActivityInMonitor(long toolContentID);
 
     /**
      * Get the definitions for possible output for an activity, based on the toolContentId. These may be definitions

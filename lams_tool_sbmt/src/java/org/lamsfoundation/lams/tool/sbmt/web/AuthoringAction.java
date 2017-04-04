@@ -87,7 +87,7 @@ public class AuthoringAction extends LamsDispatchAction {
 	    mode = ToolAccessMode.AUTHOR;
 	}
 
-	SessionMap sessionMap = new SessionMap();
+	SessionMap<String, Object> sessionMap = new SessionMap<String, Object>();
 	request.getSession().setAttribute(sessionMap.getSessionID(), sessionMap);
 	sessionMap.put(AttributeNames.PARAM_MODE, mode);
 
@@ -99,10 +99,11 @@ public class AuthoringAction extends LamsDispatchAction {
 	SubmitFilesContent persistContent = submitFilesService.getSubmitFilesContent(contentID);
 
 	if (mode.isTeacher()) {
-
 	    persistContent.setDefineLater(true);
 	    submitFilesService.saveOrUpdateContent(persistContent);
-
+	    
+	    //audit log the teacher has started editing activity in monitor
+	    submitFilesService.auditLogStartEditingActivityInMonitor(contentID);
 	}
 
 	// if this content does not exist(empty without id), create a content by default content record.
@@ -137,7 +138,7 @@ public class AuthoringAction extends LamsDispatchAction {
 	    HttpServletResponse response) throws Exception {
 
 	AuthoringForm authForm = (AuthoringForm) form;
-	SessionMap sessionMap = (SessionMap) request.getSession().getAttribute(authForm.getSessionMapID());
+	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession().getAttribute(authForm.getSessionMapID());
 
 	ToolAccessMode mode = null;
 	try {
