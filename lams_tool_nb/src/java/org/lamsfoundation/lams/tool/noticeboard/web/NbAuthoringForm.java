@@ -33,8 +33,6 @@ import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionMapping;
 import org.lamsfoundation.lams.tool.noticeboard.NoticeboardContent;
 
-//import org.lamsfoundation.lams.tool.noticeboard.NoticeboardConstants;
-
 /**
  * <p>ActionForm which holds the state of the noticeboard form content in the Authoring
  * environment. Stores all values in the session scope.</p>
@@ -47,17 +45,6 @@ import org.lamsfoundation.lams.tool.noticeboard.NoticeboardContent;
  * the maximum filesize that can be uploaded is a property that is in the UploadFileUtil. </p>
  *
  */
-
-/**
- * Creation Date: 19-05-05
- * 
- *
- *
- *
- *
- *
- */
-
 public class NbAuthoringForm extends ActionForm {
 
     private static final long serialVersionUID = -8425012664714570196L;

@@ -54,25 +54,10 @@ import org.lamsfoundation.lams.web.action.LamsDispatchAction;
 import org.lamsfoundation.lams.web.util.AttributeNames;
 
 /**
- * @author mtruong
- *
  * The buttons are a switch between tabs and will forward to a jsp and display
  * the appropriate page.
- *
- *
- */
-
-/**
- * Creation Date: 14-07-05
  * 
- *
- *
- *
- *
- *
- *
- *
- *
+ * @author mtruong
  */
 public class NbMonitoringAction extends LamsDispatchAction {
 
