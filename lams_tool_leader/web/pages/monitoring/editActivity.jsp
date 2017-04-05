@@ -35,7 +35,7 @@
 		<c:param name="mode" value="teacher" />
 		<c:param name="contentFolderID" value="${contentFolderID}" />
 	</c:url>
-	<html:link href="${authoringUrl}" styleClass="btn btn-default" target="_blank">
+	<html:link href="${authoringUrl}" styleClass="btn btn-default">
 		<fmt:message key="button.editActivity" />
 	</html:link>
 </p>

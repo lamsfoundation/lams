@@ -36,7 +36,7 @@
 	</c:url>
 	
 	<c:if test="${dto.contentInUse == false}">
-		<html:link href="${authoringUrl}" styleClass="btn btn-default" target="_blank">
+		<html:link href="${authoringUrl}" styleClass="btn btn-default">
 			<fmt:message key="button.editActivity" />
 		</html:link>
 	</c:if>
