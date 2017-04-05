@@ -35,8 +35,7 @@
 		<c:param name="mode" value="teacher" />
 		<c:param name="contentFolderID" value="${contentFolderID}"></c:param>
 	</c:url>
-	<html:link href="${fn:escapeXml(authoringUrl)}"
-		styleClass="btn btn-default" target="_blank">
+	<html:link href="${fn:escapeXml(authoringUrl)}" styleClass="btn btn-default">
 		<fmt:message key="button.editActivity" />
 	</html:link>
 </c:if>

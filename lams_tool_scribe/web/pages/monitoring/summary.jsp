@@ -163,7 +163,7 @@
 									<c:param name="uid" value="${user.uid}" />
 								</c:url>
 
-								<html:link href="${fn:escapeXml(openNotebook)}" target="_blank">
+								<html:link href="${fn:escapeXml(openNotebook)}">
 									<fmt:message key="link.view" />
 								</html:link>
 							</c:if>

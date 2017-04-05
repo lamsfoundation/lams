@@ -28,7 +28,7 @@
 </table>
 
 <p class="align-right">
-	<html:link forward="forwardToAuthorPage" name="NbMonitoringForm" property="parametersToAppend" styleClass="btn btn-default" target="_blank">
+	<html:link forward="forwardToAuthorPage" name="NbMonitoringForm" property="parametersToAppend" styleClass="btn btn-default">
 		<fmt:message key="button.edit" />
 	</html:link>
 </p>
