@@ -6,19 +6,12 @@
 	<c:set var="formBean" value="<%=request.getAttribute(org.apache.struts.taglib.html.Constants.BEAN_KEY)%>" />
 	<c:set var="sessionMap" value="${sessionScope[formBean.sessionMapID]}" />
 
-	<c:set var="defineLater" value="no" />
-	<c:if test="${sessionMap.mode == 'teacher'}">
-		<c:set var="defineLater" value="yes" />
-	</c:if>
-
 	<c:set var="title"><fmt:message key="activity.title" /></c:set>
 	<lams:Page title="${title}" type="navbar">
 
 		<lams:Tabs control="true" title="${title}" helpToolSignature="<%= ScribeConstants.TOOL_SIGNATURE %>" helpModule="authoring">
-				<lams:Tab id="1" key="button.basic" />
-				<c:if test="${sessionMap.mode == 'author'}">
-					<lams:Tab id="2" key="button.advanced" />
-				</c:if>
+			<lams:Tab id="1" key="button.basic" />
+			<lams:Tab id="2" key="button.advanced" />
 		</lams:Tabs>
 
 		<html:hidden property="currentTab" styleId="currentTab" />
@@ -47,7 +40,7 @@
 				clearSessionActionUrl="/clearsession.do" toolSignature="lascrb11"
 				cancelButtonLabelKey="button.cancel" saveButtonLabelKey="button.save"
 				toolContentID="${sessionMap.toolContentID}"
-				accessMode="${sessionMap.mode}" defineLater="${defineLater}"
+				accessMode="${sessionMap.mode}" defineLater="${sessionMap.mode == 'teacher'}"
 				customiseSessionID="${sessionMap.sessionID}"
 				contentFolderID="${sessionMap.contentFolderID}" />
 		</lams:TabBodyArea>

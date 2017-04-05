@@ -161,20 +161,17 @@ public class AuthoringAction extends LamsDispatchAction {
 	Long toolContentId = (Long) sessionMap.get(AuthoringAction.KEY_TOOL_CONTENT_ID);
 	Kaltura kaltura = kalturaService.getKalturaByContentId(toolContentId);
 
-	// update kaltura content using form inputs.
-	ToolAccessMode mode = (ToolAccessMode) sessionMap.get(AuthoringAction.KEY_MODE);
+	// update kaltura content using form inputs
 	kaltura.setTitle(authForm.getTitle());
 	kaltura.setInstructions(authForm.getInstructions());
-	if (mode.isAuthor()) { // Teacher cannot modify following
-	    kaltura.setLockOnFinished(authForm.isLockOnFinished());
-	    kaltura.setAllowContributeVideos(authForm.isAllowContributeVideos());
-	    kaltura.setLearnerContributionLimit(authForm.getLearnerContributionLimit());
-	    kaltura.setAllowSeeingOtherUsersRecordings(authForm.isAllowSeeingOtherUsersRecordings());
-	    kaltura.setAllowComments(authForm.isAllowComments());
-	    kaltura.setAllowRatings(authForm.isAllowRatings());
-	    kaltura.setReflectOnActivity(authForm.isReflectOnActivity());
-	    kaltura.setReflectInstructions(authForm.getReflectInstructions());
-	}
+	kaltura.setLockOnFinished(authForm.isLockOnFinished());
+	kaltura.setAllowContributeVideos(authForm.isAllowContributeVideos());
+	kaltura.setLearnerContributionLimit(authForm.getLearnerContributionLimit());
+	kaltura.setAllowSeeingOtherUsersRecordings(authForm.isAllowSeeingOtherUsersRecordings());
+	kaltura.setAllowComments(authForm.isAllowComments());
+	kaltura.setAllowRatings(authForm.isAllowRatings());
+	kaltura.setReflectOnActivity(authForm.isReflectOnActivity());
+	kaltura.setReflectInstructions(authForm.getReflectInstructions());
 
 	// *******************************Handle user*******************
 	HttpSession ss = SessionManager.getSession();

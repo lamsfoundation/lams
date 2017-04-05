@@ -234,9 +234,8 @@ public class AuthoringAction extends LamsDispatchAction {
 	// get mindmap content.
 	Mindmap mindmap = mindmapService.getMindmapByContentId((Long) map.get(AuthoringAction.KEY_TOOL_CONTENT_ID));
 
-	// update mindmap content using form inputs.
-	ToolAccessMode mode = (ToolAccessMode) map.get(AuthoringAction.KEY_MODE);
-	updateMindmap(mindmap, authForm, mode);
+	// update mindmap content using form inputs
+	updateMindmap(mindmap, authForm);
 
 	// set the update date
 	mindmap.setUpdateDate(new Date());
@@ -292,16 +291,14 @@ public class AuthoringAction extends LamsDispatchAction {
      * @param authForm
      * @param mode
      */
-    private void updateMindmap(Mindmap mindmap, AuthoringForm authForm, ToolAccessMode mode) {
+    private void updateMindmap(Mindmap mindmap, AuthoringForm authForm) {
 	mindmap.setTitle(authForm.getTitle());
 	mindmap.setInstructions(authForm.getInstructions());
-	if (mode.isAuthor()) { // Teacher cannot modify following
-	    mindmap.setLockOnFinished(authForm.isLockOnFinished());
-	    mindmap.setMultiUserMode(authForm.isMultiUserMode());
-	    // reflection
-	    mindmap.setReflectOnActivity(authForm.isReflectOnActivity());
-	    mindmap.setReflectInstructions(authForm.getReflectInstructions());
-	}
+	mindmap.setLockOnFinished(authForm.isLockOnFinished());
+	mindmap.setMultiUserMode(authForm.isMultiUserMode());
+	// reflection
+	mindmap.setReflectOnActivity(authForm.isReflectOnActivity());
+	mindmap.setReflectInstructions(authForm.getReflectInstructions());
     }
 
     /**

@@ -13,10 +13,8 @@
 
 	<lams:Tabs control="true" title="${title}" helpToolSignature="<%= NotebookConstants.TOOL_SIGNATURE %>" helpModule="authoring">
 		<lams:Tab id="1" key="button.basic" />
-		<c:if test="${sessionMap.mode == 'author'}">
-			<lams:Tab id="2" key="button.advanced" />
-			<lams:Tab id="3" key="button.conditions" />
-		</c:if>
+		<lams:Tab id="2" key="button.advanced" />
+		<lams:Tab id="3" key="button.conditions" />
 	</lams:Tabs>  
 	
 	<lams:TabBodyArea>
@@ -25,10 +23,8 @@
 	    <!--  Set up tabs  -->
 	     <lams:TabBodys>
 			<lams:TabBody id="1" titleKey="button.basic" page="basic.jsp" />
-			<c:if test="${sessionMap.mode == 'author'}">
-				<lams:TabBody id="2" titleKey="button.advanced" page="advanced.jsp" />
-				<lams:TabBody id="3" titleKey="button.conditions" page="conditions.jsp" />
-			</c:if>
+			<lams:TabBody id="2" titleKey="button.advanced" page="advanced.jsp" />
+			<lams:TabBody id="3" titleKey="button.conditions" page="conditions.jsp" />
 	    </lams:TabBodys>
 
 

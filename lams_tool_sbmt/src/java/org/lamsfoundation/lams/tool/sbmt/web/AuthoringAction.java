@@ -77,15 +77,7 @@ public class AuthoringAction extends LamsDispatchAction {
     protected ActionForward unspecified(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) {
 
-	ToolAccessMode mode = null;
-	try {
-	    mode = WebUtil.readToolAccessModeParam(request, AttributeNames.PARAM_MODE, true);
-	} catch (Exception e) {
-	}
-	// when first time open flash icon on authoring page: mode will be null
-	if (mode == null) {
-	    mode = ToolAccessMode.AUTHOR;
-	}
+	ToolAccessMode mode = WebUtil.readToolAccessModeAuthorDefaulted(request);
 
 	SessionMap<String, Object> sessionMap = new SessionMap<String, Object>();
 	request.getSession().setAttribute(sessionMap.getSessionID(), sessionMap);
@@ -117,7 +109,6 @@ public class AuthoringAction extends LamsDispatchAction {
 	// session map
 	authForm.setSessionMapID(sessionMap.getSessionID());
 	authForm.setContentFolderID(contentFolderID);
-	
 
 	return mapping.findForward("success");
     }
@@ -139,16 +130,7 @@ public class AuthoringAction extends LamsDispatchAction {
 
 	AuthoringForm authForm = (AuthoringForm) form;
 	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession().getAttribute(authForm.getSessionMapID());
-
-	ToolAccessMode mode = null;
-	try {
-	    mode = WebUtil.readToolAccessModeParam(request, AttributeNames.PARAM_MODE, true);
-	} catch (Exception e) {
-	}
-	// when first time open flash icon on authoring page: mode will be null
-	if (mode == null) {
-	    mode = ToolAccessMode.AUTHOR;
-	}
+	ToolAccessMode mode = (ToolAccessMode) sessionMap.get(AttributeNames.PARAM_MODE);
 
 	ActionMessages errors = validate(authForm, mapping, request);
 	if (!errors.isEmpty()) {
@@ -166,16 +148,13 @@ public class AuthoringAction extends LamsDispatchAction {
 	    persistContent = content;
 	    content.setCreated(new Date());
 	} else {
-	    // copy web page value into persist content, as above, the "Set" type value kept.
-	    if (mode.isAuthor()) {
-		Long uid = persistContent.getContentID();
-		PropertyUtils.copyProperties(persistContent, content);
-		persistContent.setContentID(uid);
-	    } else {
-		// if it is Teacher, then just update basic tab content (definelater)
-		persistContent.setInstruction(content.getInstruction());
-		persistContent.setTitle(content.getTitle());
-		// change define later status
+
+	    Long uid = persistContent.getContentID();
+	    PropertyUtils.copyProperties(persistContent, content);
+	    persistContent.setContentID(uid);
+
+	    // if it is Teacher (from monitor) - change define later status
+	    if (mode.isTeacher()) {
 		persistContent.setDefineLater(false);
 	    }
 	}
