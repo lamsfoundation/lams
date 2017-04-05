@@ -53,13 +53,6 @@ import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.lamsfoundation.lams.web.util.SessionMap;
 
 /**
- * @author
- * @version
- *
- *
- *
- *
- *
  */
 public class AuthoringAction extends LamsDispatchAction {
 
@@ -77,7 +70,6 @@ public class AuthoringAction extends LamsDispatchAction {
     /**
      * Default method when no dispatch parameter is specified. It is expected that the parameter
      * <code>toolContentID</code> will be passed in. This will be used to retrieve content for this tool.
-     *
      */
     @Override
     protected ActionForward unspecified(ActionMapping mapping, ActionForm form, HttpServletRequest request,
@@ -140,9 +132,8 @@ public class AuthoringAction extends LamsDispatchAction {
 	// get chat content.
 	Chat chat = chatService.getChatByContentId((Long) map.get(AuthoringAction.KEY_TOOL_CONTENT_ID));
 
-	// update chat content using form inputs.
-	ToolAccessMode mode = (ToolAccessMode) map.get(AuthoringAction.KEY_MODE);
-	updateChat(chat, authForm, mode);
+	// update chat content using form inputs
+	updateChat(chat, authForm);
 
 	chatService.releaseConditionsFromCache(chat);
 
@@ -168,7 +159,7 @@ public class AuthoringAction extends LamsDispatchAction {
 	// set the update date
 	chat.setUpdateDate(new Date());
 
-	// releasing defineLater flag so that learner can start using the tool.
+	// releasing defineLater flag so that learners can start using the tool
 	chat.setDefineLater(false);
 
 	chatService.saveOrUpdateChat(chat);
@@ -192,16 +183,14 @@ public class AuthoringAction extends LamsDispatchAction {
      * @param mode
      * @return
      */
-    private void updateChat(Chat chat, AuthoringForm authForm, ToolAccessMode mode) {
+    private void updateChat(Chat chat, AuthoringForm authForm) {
 	chat.setTitle(authForm.getTitle());
 	chat.setInstructions(authForm.getInstructions());
-	if (mode.isAuthor()) { // Teacher cannot modify following
-	    chat.setLockOnFinished(authForm.isLockOnFinished());
-	    chat.setReflectOnActivity(authForm.isReflectOnActivity());
-	    chat.setReflectInstructions(authForm.getReflectInstructions());
-	    chat.setFilteringEnabled(authForm.isFilteringEnabled());
-	    chat.setFilterKeywords(authForm.getFilterKeywords());
-	}
+	chat.setLockOnFinished(authForm.isLockOnFinished());
+	chat.setReflectOnActivity(authForm.isReflectOnActivity());
+	chat.setReflectInstructions(authForm.getReflectInstructions());
+	chat.setFilteringEnabled(authForm.isFilteringEnabled());
+	chat.setFilterKeywords(authForm.getFilterKeywords());
     }
 
     /**
@@ -230,18 +219,18 @@ public class AuthoringAction extends LamsDispatchAction {
     private SessionMap<String, Object> createSessionMap(Chat chat, ToolAccessMode mode, String contentFolderID,
 	    Long toolContentID) {
 
-	SessionMap<String, Object> map = new SessionMap<String, Object>();
+	SessionMap<String, Object> sessionMap = new SessionMap<String, Object>();
 
-	map.put(AuthoringAction.KEY_MODE, mode);
-	map.put(AuthoringAction.KEY_CONTENT_FOLDER_ID, contentFolderID);
-	map.put(AuthoringAction.KEY_TOOL_CONTENT_ID, toolContentID);
+	sessionMap.put(AuthoringAction.KEY_MODE, mode);
+	sessionMap.put(AuthoringAction.KEY_CONTENT_FOLDER_ID, contentFolderID);
+	sessionMap.put(AuthoringAction.KEY_TOOL_CONTENT_ID, toolContentID);
+	
 	SortedSet<ChatCondition> set = new TreeSet<ChatCondition>(new TextSearchConditionComparator());
-
 	if (chat.getConditions() != null) {
 	    set.addAll(chat.getConditions());
 	}
-	map.put(ChatConstants.ATTR_CONDITION_SET, set);
-	return map;
+	sessionMap.put(ChatConstants.ATTR_CONDITION_SET, set);
+	return sessionMap;
     }
 
     /**

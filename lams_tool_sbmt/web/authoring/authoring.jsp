@@ -34,39 +34,34 @@
 	<html:hidden property="toolContentID" />
 	<html:hidden property="contentFolderID" />
 	
-<lams:Page title="${title}" type="navbar">
-	
-	<lams:Tabs control="true" title="${title}" helpToolSignature="<%= SbmtConstants.TOOL_SIGNATURE %>" helpModule="authoring">
-		<lams:Tab id="1" key="label.authoring.heading.basic" />
-		<c:if test="${sessionMap.mode == 'author'}">
+	<lams:Page title="${title}" type="navbar">
+		
+		<lams:Tabs control="true" title="${title}" helpToolSignature="<%= SbmtConstants.TOOL_SIGNATURE %>" helpModule="authoring">
+			<lams:Tab id="1" key="label.authoring.heading.basic" />
 			<lams:Tab id="2" key="label.authoring.heading.advance" />
-		</c:if>
-	</lams:Tabs> 
+		</lams:Tabs> 
+		
+		<lams:TabBodyArea>
+			<%@ include file="/common/messages.jsp"%>
 	
-	<lams:TabBodyArea>
-		<%@ include file="/common/messages.jsp"%>
-
-	     <lams:TabBodys>
-			<lams:TabBody id="1" titleKey="label.authoring.heading.basic.desc" page="basic.jsp" />
-			<c:if test="${sessionMap.mode == 'author'}">
+		     <lams:TabBodys>
+				<lams:TabBody id="1" titleKey="label.authoring.heading.basic.desc" page="basic.jsp" />
 				<lams:TabBody id="2" titleKey="label.authoring.heading.advance.desc" page="advance.jsp" />
-			</c:if>
-	    </lams:TabBodys>
-
-
-		<lams:AuthoringButton formID="authoringForm"
-			clearSessionActionUrl="/clearsession.do"
-			toolSignature="<%=SbmtConstants.TOOL_SIGNATURE%>"
-			accessMode="${sessionMap.mode}"
-			defineLater="${sessionMap.mode == 'teacher'}"
-			toolContentID="${formBean.toolContentID}"
-			customiseSessionID="${formBean.sessionMapID}" 
-			contentFolderID="${formBean.contentFolderID}" />
-	</lams:TabBodyArea>
+		    </lams:TabBodys>
 	
-	<div id="footer"></div>
-	
-</lams:Page>
+			<lams:AuthoringButton formID="authoringForm"
+				clearSessionActionUrl="/clearsession.do"
+				toolSignature="<%=SbmtConstants.TOOL_SIGNATURE%>"
+				accessMode="${sessionMap.mode}"
+				defineLater="${sessionMap.mode == 'teacher'}"
+				toolContentID="${formBean.toolContentID}"
+				customiseSessionID="${formBean.sessionMapID}" 
+				contentFolderID="${formBean.contentFolderID}" />
+		</lams:TabBodyArea>
+		
+		<div id="footer"></div>
+		
+	</lams:Page>
 </html:form>
 </body>
 </lams:html>

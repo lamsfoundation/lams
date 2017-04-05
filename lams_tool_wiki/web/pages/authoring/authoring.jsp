@@ -6,11 +6,6 @@
 
 	<c:set var="formBean" value="<%=request.getAttribute(org.apache.struts.taglib.html.Constants.BEAN_KEY)%>" />
 	<c:set var="sessionMap" value="${sessionScope[formBean.sessionMapID]}" />
-	
-	<c:set var="defineLater" value="no" scope="request" />
-	<c:if test="${sessionMap.mode == 'teacher'}">
-		<c:set var="defineLater" value="yes" scope="request" />
-	</c:if>
 
 	<html:hidden property="currentTab" styleId="currentTab" />
 	<html:hidden property="dispatch" styleId="dispatch" value="updateContent" />
@@ -27,9 +22,7 @@
 
 		 <lams:Tabs control="true" title="${title}" helpToolSignature="<%= WikiConstants.TOOL_SIGNATURE %>" helpModule="authoring">
 			<lams:Tab id="1" key="button.basic" />
-			<c:if test="${sessionMap.mode == 'author'}">
-				<lams:Tab id="2" key="button.advanced" />
-			</c:if>
+			<lams:Tab id="2" key="button.advanced" />
 		</lams:Tabs>
 
 		<c:if test="${currentWikiPage.deleted}">
@@ -50,9 +43,7 @@
 			<%-- Page tabs --%>
 			<lams:TabBodys>
 				<lams:TabBody id="1" titleKey="button.basic" page="basic.jsp" />
-				<c:if test="${sessionMap.mode == 'author'}">
-					<lams:TabBody id="2" titleKey="button.advanced" page="advanced.jsp" />
-				</c:if>
+				<lams:TabBody id="2" titleKey="button.advanced" page="advanced.jsp" />
 			</lams:TabBodys>
 				
 			<div id="finishButtonDiv">
@@ -60,7 +51,7 @@
 					clearSessionActionUrl="/clearsession.do" toolSignature="lawiki10"
 					cancelButtonLabelKey="button.cancel" saveButtonLabelKey="button.save"
 					toolContentID="${sessionMap.toolContentID}"
-					accessMode="${sessionMap.mode}" defineLater="${defineLater}"
+					accessMode="${sessionMap.mode}" defineLater="${sessionMap.mode == 'teacher'}"
 					customiseSessionID="${sessionMap.sessionID}" 
 					contentFolderID="${sessionMap.contentFolderID}" />
 			</div>

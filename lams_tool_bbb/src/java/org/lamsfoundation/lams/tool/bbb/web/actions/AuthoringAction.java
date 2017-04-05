@@ -135,9 +135,8 @@ public class AuthoringAction extends DispatchAction {
 	// get bbb content.
 	Bbb bbb = bbbService.getBbbByContentId((Long) map.get(Constants.KEY_TOOL_CONTENT_ID));
 
-	// update bbb content using form inputs.
-	ToolAccessMode mode = (ToolAccessMode) map.get(Constants.KEY_MODE);
-	copyProperties(bbb, authForm, mode);
+	// update bbb content using form inputs
+	copyProperties(bbb, authForm);
 
 	// set the update date
 	bbb.setUpdateDate(new Date());
@@ -166,15 +165,12 @@ public class AuthoringAction extends DispatchAction {
      * @param mode
      * @return
      */
-    private void copyProperties(Bbb bbb, AuthoringForm authForm, ToolAccessMode mode) {
+    private void copyProperties(Bbb bbb, AuthoringForm authForm) {
 	bbb.setTitle(authForm.getTitle());
 	bbb.setInstructions(authForm.getInstructions());
-	if (mode.isAuthor()) { // Teacher cannot modify following
-	    bbb.setReflectOnActivity(authForm.isReflectOnActivity());
-	    bbb.setReflectInstructions(authForm.getReflectInstructions());
-	    bbb.setLockOnFinished(authForm.isLockOnFinished());
-
-	}
+	bbb.setReflectOnActivity(authForm.isReflectOnActivity());
+	bbb.setReflectInstructions(authForm.getReflectInstructions());
+	bbb.setLockOnFinished(authForm.isLockOnFinished());
     }
 
     /**

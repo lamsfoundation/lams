@@ -54,7 +54,7 @@ import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.lamsfoundation.lams.web.util.SessionMap;
 
 /**
- * @author
+ * 
  */
 public class AuthoringAction extends LamsDispatchAction {
 
@@ -145,13 +145,7 @@ public class AuthoringAction extends LamsDispatchAction {
 	// get gmap content.
 	Gmap gmap = gmapService.getGmapByContentId(toolContentID);
 
-	// update gmap content using form inputs.
-	ToolAccessMode mode = (ToolAccessMode) map.get(KEY_MODE);
-
-	String contentFolderID = (String) map.get(AttributeNames.PARAM_CONTENT_FOLDER_ID);
 	GmapUser gmapUser = null;
-	//check whether it is sysadmin:LDEV-906 
-	//if(!StringUtils.equals(contentFolderID,"-1" )){
 	if (gmap.getCreateBy() == null) {
 	    HttpSession ss = SessionManager.getSession();
 	    UserDTO user = (UserDTO) ss.getAttribute(AttributeNames.USER);
@@ -160,9 +154,9 @@ public class AuthoringAction extends LamsDispatchAction {
 	} else {
 	    gmapUser = gmapService.getUserByUID(gmap.getCreateBy());
 	}
-	//}
 
-	updateGmap(gmap, authForm, mode, gmapUser);
+	// update gmap content using form inputs
+	updateGmap(gmap, authForm, gmapUser);
 
 	// do the same for the gmap markers
 	Set<GmapMarker> markers = gmap.getGmapMarkers();
@@ -203,32 +197,30 @@ public class AuthoringAction extends LamsDispatchAction {
      * @param mode
      * @return
      */
-    private void updateGmap(Gmap gmap, AuthoringForm authForm, ToolAccessMode mode, GmapUser guser) {
+    private void updateGmap(Gmap gmap, AuthoringForm authForm, GmapUser guser) {
 	gmap.setTitle(authForm.getTitle());
 	gmap.setInstructions(authForm.getInstructions());
 
 	//updateMarkerListFromXML(authForm.getMarkersXML(), gmap, guser);
 	gmapService.updateMarkerListFromXML(authForm.getMarkersXML(), gmap, guser, true, null);
 
-	if (mode.isAuthor()) { // Teacher cannot modify following
-	    gmap.setCreateBy(guser.getUid());
-	    gmap.setLockOnFinished(authForm.isLockOnFinished());
-	    gmap.setAllowEditMarkers(authForm.isAllowEditMarkers());
-	    gmap.setAllowShowAllMarkers(authForm.isAllowShowAllMarkers());
-	    gmap.setMaxMarkers(authForm.getMaxMarkers());
-	    gmap.setLimitMarkers(authForm.isLimitMarkers());
-	    gmap.setAllowZoom(authForm.isAllowZoom());
-	    gmap.setAllowTerrain(authForm.isAllowTerrain());
-	    gmap.setAllowSatellite(authForm.isAllowSatellite());
-	    gmap.setAllowHybrid(authForm.isAllowHybrid());
-	    gmap.setMapType(authForm.getMapType());
-	    gmap.setMapZoom(authForm.getMapZoom());
-	    gmap.setMapCenterLatitude(authForm.getMapCenterLatitude());
-	    gmap.setMapCenterLongitude(authForm.getMapCenterLongitude());
-	    gmap.setReflectOnActivity(authForm.isReflectOnActivity());
-	    gmap.setReflectInstructions(authForm.getReflectInstructions());
-	    gmap.setDefaultGeocoderAddress(authForm.getDefaultGeocoderAddress());
-	}
+	gmap.setCreateBy(guser.getUid());
+	gmap.setLockOnFinished(authForm.isLockOnFinished());
+	gmap.setAllowEditMarkers(authForm.isAllowEditMarkers());
+	gmap.setAllowShowAllMarkers(authForm.isAllowShowAllMarkers());
+	gmap.setMaxMarkers(authForm.getMaxMarkers());
+	gmap.setLimitMarkers(authForm.isLimitMarkers());
+	gmap.setAllowZoom(authForm.isAllowZoom());
+	gmap.setAllowTerrain(authForm.isAllowTerrain());
+	gmap.setAllowSatellite(authForm.isAllowSatellite());
+	gmap.setAllowHybrid(authForm.isAllowHybrid());
+	gmap.setMapType(authForm.getMapType());
+	gmap.setMapZoom(authForm.getMapZoom());
+	gmap.setMapCenterLatitude(authForm.getMapCenterLatitude());
+	gmap.setMapCenterLongitude(authForm.getMapCenterLongitude());
+	gmap.setReflectOnActivity(authForm.isReflectOnActivity());
+	gmap.setReflectInstructions(authForm.getReflectInstructions());
+	gmap.setDefaultGeocoderAddress(authForm.getDefaultGeocoderAddress());
     }
 
     /**

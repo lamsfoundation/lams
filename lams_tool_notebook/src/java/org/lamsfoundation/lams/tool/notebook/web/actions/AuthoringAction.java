@@ -139,9 +139,8 @@ public class AuthoringAction extends LamsDispatchAction {
 	// get notebook content.
 	Notebook notebook = notebookService.getNotebookByContentId((Long) map.get(AuthoringAction.KEY_TOOL_CONTENT_ID));
 
-	// update notebook content using form inputs.
-	ToolAccessMode mode = (ToolAccessMode) map.get(AuthoringAction.KEY_MODE);
-	updateNotebook(notebook, authForm, mode);
+	// update notebook content using form inputs
+	updateNotebook(notebook, authForm);
 
 	notebookService.releaseConditionsFromCache(notebook);
 
@@ -193,15 +192,12 @@ public class AuthoringAction extends LamsDispatchAction {
      * @param mode
      * @return
      */
-    private void updateNotebook(Notebook notebook, AuthoringForm authForm, ToolAccessMode mode) {
+    private void updateNotebook(Notebook notebook, AuthoringForm authForm) {
 	notebook.setTitle(authForm.getTitle());
 	notebook.setInstructions(authForm.getInstructions());
-	if (mode.isAuthor()) { // Teacher cannot modify following
-	    notebook.setForceResponse(authForm.isForceResponse());
-	    notebook.setLockOnFinished(authForm.isLockOnFinished());
-	    notebook.setAllowRichEditor(authForm.isAllowRichEditor());
-
-	}
+	notebook.setForceResponse(authForm.isForceResponse());
+	notebook.setLockOnFinished(authForm.isLockOnFinished());
+	notebook.setAllowRichEditor(authForm.isAllowRichEditor());
     }
 
     /**

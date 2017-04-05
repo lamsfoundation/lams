@@ -157,9 +157,8 @@ public class AuthoringAction extends LamsDispatchAction {
 	// get scribe content.
 	Scribe scribe = scribeService.getScribeByContentId((Long) map.get(KEY_TOOL_CONTENT_ID));
 
-	// update scribe content using form inputs.
-	ToolAccessMode mode = (ToolAccessMode) map.get(KEY_MODE);
-	updateScribe(scribe, authForm, mode);
+	// update scribe content using form inputs
+	updateScribe(scribe, authForm);
 
 	// update headings.
 	List<ScribeHeading> updatedHeadings = getHeadingList(map);
@@ -336,15 +335,13 @@ public class AuthoringAction extends LamsDispatchAction {
      * @param mode
      * @return
      */
-    private void updateScribe(Scribe scribe, AuthoringForm authForm, ToolAccessMode mode) {
+    private void updateScribe(Scribe scribe, AuthoringForm authForm) {
 	scribe.setTitle(authForm.getTitle());
 	scribe.setInstructions(authForm.getInstructions());
-	if (mode.isAuthor()) { // Teacher cannot modify following
-	    scribe.setReflectOnActivity(authForm.isReflectOnActivity());
-	    scribe.setReflectInstructions(authForm.getReflectInstructions());
-	    scribe.setAutoSelectScribe(authForm.isAutoSelectScribe());
-	    scribe.setShowAggregatedReports(authForm.isShowAggregatedReports());
-	}
+	scribe.setReflectOnActivity(authForm.isReflectOnActivity());
+	scribe.setReflectInstructions(authForm.getReflectInstructions());
+	scribe.setAutoSelectScribe(authForm.isAutoSelectScribe());
+	scribe.setShowAggregatedReports(authForm.isShowAggregatedReports());
     }
 
     /**

@@ -60,13 +60,6 @@ import org.lamsfoundation.lams.web.util.SessionMap;
  * learner, monitor and author
  *
  * @author lfoxton
- * @version
- *
- *
- *
- *
- *
- *
  */
 public class AuthoringAction extends WikiPageAction {
 
@@ -244,9 +237,8 @@ public class AuthoringAction extends WikiPageAction {
 	// get wiki content.
 	Wiki wiki = wikiService.getWikiByContentId((Long) map.get(AuthoringAction.KEY_TOOL_CONTENT_ID));
 
-	// update wiki content using form inputs.
-	ToolAccessMode mode = (ToolAccessMode) map.get(AuthoringAction.KEY_MODE);
-	updateWiki(wiki, authForm, mode);
+	// update wiki content using form inputs
+	updateWiki(wiki, authForm);
 
 	// set the update date
 	wiki.setUpdateDate(new Date());
@@ -273,7 +265,7 @@ public class AuthoringAction extends WikiPageAction {
      * @param mode
      * @return
      */
-    private void updateWiki(Wiki wiki, AuthoringForm authForm, ToolAccessMode mode) {
+    private void updateWiki(Wiki wiki, AuthoringForm authForm) {
 	// wiki.setTitle(authForm.getTitle());
 	WikiPage mainPage = wiki.getMainPage();
 	// mainPage.setTitle(authForm.getTitle());
@@ -283,18 +275,15 @@ public class AuthoringAction extends WikiPageAction {
 	// mainPage.setCurrentWikiContent(content);
 
 	wiki.setMainPage(mainPage);
-
-	if (mode.isAuthor()) { // Teacher cannot modify following
-	    wiki.setLockOnFinished(authForm.isLockOnFinished());
-	    wiki.setAllowLearnerAttachImages(authForm.isAllowLearnerAttachImages());
-	    wiki.setAllowLearnerCreatePages(authForm.isAllowLearnerCreatePages());
-	    wiki.setAllowLearnerInsertLinks(authForm.isAllowLearnerInsertLinks());
-	    wiki.setReflectOnActivity(authForm.isReflectOnActivity());
-	    wiki.setReflectInstructions(authForm.getReflectInstructions());
-	    wiki.setNotifyUpdates(authForm.isNotifyUpdates());
-	    wiki.setMaximumEdits(authForm.getMaximumEdits());
-	    wiki.setMinimumEdits(authForm.getMinimumEdits());
-	}
+	wiki.setLockOnFinished(authForm.isLockOnFinished());
+	wiki.setAllowLearnerAttachImages(authForm.isAllowLearnerAttachImages());
+	wiki.setAllowLearnerCreatePages(authForm.isAllowLearnerCreatePages());
+	wiki.setAllowLearnerInsertLinks(authForm.isAllowLearnerInsertLinks());
+	wiki.setReflectOnActivity(authForm.isReflectOnActivity());
+	wiki.setReflectInstructions(authForm.getReflectInstructions());
+	wiki.setNotifyUpdates(authForm.isNotifyUpdates());
+	wiki.setMaximumEdits(authForm.getMaximumEdits());
+	wiki.setMinimumEdits(authForm.getMinimumEdits());
     }
 
     /**

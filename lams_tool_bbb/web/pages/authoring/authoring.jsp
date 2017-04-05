@@ -6,21 +6,15 @@
 
 <html:form action="/authoring" styleId="authoringForm" method="post" enctype="multipart/form-data">
 
-	<c:set var="defineLater" value="no" />
-	<c:if test="${sessionMap.mode == 'teacher'}">
-		<c:set var="defineLater" value="yes" />
-	</c:if>
+	<c:set var="title">
+		<fmt:message key="activity.title" />
+	</c:set>
 
-		<c:set var="title">
-			<fmt:message key="activity.title" />
-		</c:set>
-
-		<!--  TITLE KEY PAGE GOES HERE -->
-		<lams:Tabs control="true" title="${title}" helpToolSignature="<%= Constants.TOOL_SIGNATURE %>" helpModule="authoring">
-			<lams:Tab id="1" key="button.basic" />
-			<lams:Tab id="2" key="button.advanced" />
-		</lams:Tabs>
-
+	<!--  TITLE KEY PAGE GOES HERE -->
+	<lams:Tabs control="true" title="${title}" helpToolSignature="<%= Constants.TOOL_SIGNATURE %>" helpModule="authoring">
+		<lams:Tab id="1" key="button.basic" />
+		<lams:Tab id="2" key="button.advanced" />
+	</lams:Tabs>
 	<!--closes header-->
 
 	<html:hidden property="currentTab" styleId="currentTab" />
@@ -37,7 +31,6 @@
 			</lams:Alert>
 		</logic:messagesPresent>
 
-
 		<%-- Page tabs --%>
 		<lams:TabBodys>
 			<lams:TabBody id="1" titleKey="button.basic" page="basic.jsp" />
@@ -46,10 +39,8 @@
 
 		<lams:AuthoringButton formID="authoringForm" clearSessionActionUrl="/clearsession.do" toolSignature="labbb10"
 			cancelButtonLabelKey="button.cancel" saveButtonLabelKey="button.save" toolContentID="${sessionMap.toolContentID}"
-			accessMode="${sessionMap.mode}" defineLater="${defineLater}" customiseSessionID="${sessionMap.sessionID}"
+			accessMode="${sessionMap.mode}" defineLater="${sessionMap.mode == 'teacher'}" customiseSessionID="${sessionMap.sessionID}"
 			contentFolderID="${sessionMap.contentFolderID}" />
-
-
 
 	</lams:TabBodyArea>
 	<div id="footer"></div>

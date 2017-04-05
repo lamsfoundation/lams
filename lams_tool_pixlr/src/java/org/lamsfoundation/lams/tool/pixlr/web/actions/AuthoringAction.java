@@ -167,7 +167,6 @@ public class AuthoringAction extends LamsDispatchAction {
 	// get pixlr content.
 	Pixlr pixlr = pixlrService.getPixlrByContentId((Long) map.get(AuthoringAction.KEY_TOOL_CONTENT_ID));
 	ActionErrors errors = new ActionErrors();
-	;
 
 	try {
 	    // TODO: Need to check if this is an edit, if so, delete the old image
@@ -194,7 +193,7 @@ public class AuthoringAction extends LamsDispatchAction {
 	}
 
 	// update pixlr content using form inputs.
-	updatePixlr(pixlr, authForm, mode);
+	updatePixlr(pixlr, authForm);
 
 	// set the update date
 	pixlr.setUpdateDate(new Date());
@@ -230,15 +229,13 @@ public class AuthoringAction extends LamsDispatchAction {
      * @param mode
      * @return
      */
-    private void updatePixlr(Pixlr pixlr, AuthoringForm authForm, ToolAccessMode mode) {
+    private void updatePixlr(Pixlr pixlr, AuthoringForm authForm) {
 	pixlr.setTitle(authForm.getTitle());
 	pixlr.setInstructions(authForm.getInstructions());
-	if (mode.isAuthor()) { // Teacher cannot modify following
-	    pixlr.setLockOnFinished(authForm.isLockOnFinished());
-	    pixlr.setReflectOnActivity(authForm.isReflectOnActivity());
-	    pixlr.setReflectInstructions(authForm.getReflectInstructions());
-	    pixlr.setAllowViewOthersImages(authForm.isAllowViewOthersImages());
-	}
+	pixlr.setLockOnFinished(authForm.isLockOnFinished());
+	pixlr.setReflectOnActivity(authForm.isReflectOnActivity());
+	pixlr.setReflectInstructions(authForm.getReflectInstructions());
+	pixlr.setAllowViewOthersImages(authForm.isAllowViewOthersImages());
     }
 
     /**
