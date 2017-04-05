@@ -113,7 +113,7 @@ public class AuthoringTaskListConditionAction extends Action {
     private ActionForward showConditions(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) throws ServletException {
 	String sessionMapID = WebUtil.readStrParam(request, TaskListConstants.ATTR_SESSION_MAP_ID);
-	SessionMap sessionMap = (SessionMap) request.getSession().getAttribute(sessionMapID);
+	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession().getAttribute(sessionMapID);
 	TaskListForm existForm = (TaskListForm) sessionMap.get(TaskListConstants.ATTR_TASKLIST_FORM);
 
 	TaskListForm taskListForm = (TaskListForm) form;
@@ -123,12 +123,7 @@ public class AuthoringTaskListConditionAction extends Action {
 	    throw new ServletException(e);
 	}
 
-	ToolAccessMode mode = WebUtil.readToolAccessModeAuthorDefaulted(request);
-	if (mode.isAuthor()) {
-	    return mapping.findForward(TaskListConstants.SUCCESS);
-	} else {
-	    return mapping.findForward(TaskListConstants.DEFINE_LATER);
-	}
+	return mapping.findForward(TaskListConstants.SUCCESS);
     }
 
     /**
@@ -163,7 +158,7 @@ public class AuthoringTaskListConditionAction extends Action {
 
 	// get back sessionMAP
 	String sessionMapID = WebUtil.readStrParam(request, TaskListConstants.ATTR_SESSION_MAP_ID);
-	SessionMap sessionMap = (SessionMap) request.getSession().getAttribute(sessionMapID);
+	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession().getAttribute(sessionMapID);
 
 	int sequenceId = NumberUtils.stringToInt(request.getParameter(TaskListConstants.PARAM_SEQUENCE_ID), -1);
 	TaskListCondition item = null;
@@ -238,7 +233,7 @@ public class AuthoringTaskListConditionAction extends Action {
 
 	// get back sessionMAP
 	String sessionMapID = WebUtil.readStrParam(request, TaskListConstants.ATTR_SESSION_MAP_ID);
-	SessionMap sessionMap = (SessionMap) request.getSession().getAttribute(sessionMapID);
+	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession().getAttribute(sessionMapID);
 
 	int sequenceId = NumberUtils.stringToInt(request.getParameter(TaskListConstants.PARAM_SEQUENCE_ID), -1);
 	if (sequenceId != -1) {
@@ -292,7 +287,7 @@ public class AuthoringTaskListConditionAction extends Action {
     private ActionForward switchItem(ActionMapping mapping, HttpServletRequest request, boolean up) {
 	// get back sessionMAP
 	String sessionMapID = WebUtil.readStrParam(request, TaskListConstants.ATTR_SESSION_MAP_ID);
-	SessionMap sessionMap = (SessionMap) request.getSession().getAttribute(sessionMapID);
+	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession().getAttribute(sessionMapID);
 
 	int sequenceId = NumberUtils.stringToInt(request.getParameter(TaskListConstants.PARAM_SEQUENCE_ID), -1);
 	if (sequenceId != -1) {
@@ -337,7 +332,7 @@ public class AuthoringTaskListConditionAction extends Action {
      * @param request
      * @return
      */
-    private SortedSet<TaskListCondition> getTaskListConditionList(SessionMap sessionMap) {
+    private SortedSet<TaskListCondition> getTaskListConditionList(SessionMap<String, Object> sessionMap) {
 	SortedSet<TaskListCondition> list = (SortedSet<TaskListCondition>) sessionMap
 		.get(TaskListConstants.ATTR_CONDITION_LIST);
 	if (list == null) {
@@ -353,7 +348,7 @@ public class AuthoringTaskListConditionAction extends Action {
      * @param request
      * @return
      */
-    private SortedSet<TaskListItem> getTaskListItemList(SessionMap sessionMap) {
+    private SortedSet<TaskListItem> getTaskListItemList(SessionMap<String, Object> sessionMap) {
 	SortedSet<TaskListItem> list = (SortedSet<TaskListItem>) sessionMap
 		.get(TaskListConstants.ATTR_TASKLIST_ITEM_LIST);
 	if (list == null) {
@@ -369,7 +364,7 @@ public class AuthoringTaskListConditionAction extends Action {
      * @param request
      * @return
      */
-    private List getDeletedTaskListConditionList(SessionMap sessionMap) {
+    private List getDeletedTaskListConditionList(SessionMap<String, Object> sessionMap) {
 	return getListFromSession(sessionMap, TaskListConstants.ATTR_DELETED_CONDITION_LIST);
     }
 
@@ -380,7 +375,7 @@ public class AuthoringTaskListConditionAction extends Action {
      * @param name
      * @return
      */
-    private List getListFromSession(SessionMap sessionMap, String name) {
+    private List getListFromSession(SessionMap<String, Object> sessionMap, String name) {
 	List list = (List) sessionMap.get(name);
 	if (list == null) {
 	    list = new ArrayList();
@@ -425,7 +420,7 @@ public class AuthoringTaskListConditionAction extends Action {
 
 	// get back sessionMAP
 	String sessionMapID = WebUtil.readStrParam(request, TaskListConstants.ATTR_SESSION_MAP_ID);
-	SessionMap sessionMap = (SessionMap) request.getSession().getAttribute(sessionMapID);
+	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession().getAttribute(sessionMapID);
 
 	SortedSet<TaskListItem> itemList = getTaskListItemList(sessionMap);
 
@@ -454,7 +449,7 @@ public class AuthoringTaskListConditionAction extends Action {
 	 * this taskList item.
 	 */
 
-	SessionMap sessionMap = (SessionMap) request.getSession().getAttribute(form.getSessionMapID());
+	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession().getAttribute(form.getSessionMapID());
 	// check whether it is "edit(old item)" or "add(new item)"
 	SortedSet<TaskListCondition> conditionList = getTaskListConditionList(sessionMap);
 	int sequenceId = NumberUtils.stringToInt(form.getSequenceId(), -1);
@@ -511,7 +506,7 @@ public class AuthoringTaskListConditionAction extends Action {
 	    String formConditionSequenceId = conditionForm.getSequenceId();
 
 	    String sessionMapID = conditionForm.getSessionMapID();
-	    SessionMap sessionMap = (SessionMap) request.getSession().getAttribute(sessionMapID);
+	    SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession().getAttribute(sessionMapID);
 	    SortedSet<TaskListCondition> conditionList = getTaskListConditionList(sessionMap);
 	    for (TaskListCondition condition : conditionList) {
 		if (formConditionName.equals(condition.getName())
