@@ -20,9 +20,6 @@
  * http://www.gnu.org/licenses/gpl.txt
  * ****************************************************************
  */
-
-
-
 package org.lamsfoundation.lams.tool.sbmt.web;
 
 import java.io.ByteArrayOutputStream;
@@ -55,7 +52,6 @@ import org.apache.struts.action.DynaActionForm;
 import org.apache.tomcat.util.json.JSONArray;
 import org.apache.tomcat.util.json.JSONException;
 import org.apache.tomcat.util.json.JSONObject;
-import org.lamsfoundation.lams.events.IEventNotificationService;
 import org.lamsfoundation.lams.tool.sbmt.SubmissionDetails;
 import org.lamsfoundation.lams.tool.sbmt.SubmitFilesContent;
 import org.lamsfoundation.lams.tool.sbmt.SubmitFilesSession;
@@ -71,7 +67,6 @@ import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
 import org.lamsfoundation.lams.util.DateUtil;
 import org.lamsfoundation.lams.util.MessageService;
 import org.lamsfoundation.lams.util.WebUtil;
-import org.lamsfoundation.lams.util.audit.IAuditService;
 import org.lamsfoundation.lams.web.action.LamsDispatchAction;
 import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
@@ -122,6 +117,7 @@ public class MonitoringAction extends LamsDispatchAction {
 	submitFilesService = getSubmitFilesService();
 
 	request.setAttribute(AttributeNames.PARAM_CONTENT_FOLDER_ID, contentFolderID);
+	request.setAttribute(AttributeNames.PARAM_TOOL_CONTENT_ID, contentID);
 
 	List submitFilesSessionList = submitFilesService.getSubmitFilesSessionByContentID(contentID);
 	summary(request, submitFilesSessionList);
@@ -138,7 +134,7 @@ public class MonitoringAction extends LamsDispatchAction {
 	request.setAttribute(SbmtConstants.ATTR_IS_GROUPED_ACTIVITY, submitFilesService.isGroupedActivity(contentID));
 	request.setAttribute(SbmtConstants.ATTR_REFLECTION_ON, persistContent.isReflectOnActivity());
 
-	//set SubmissionDeadline, if any
+	// set SubmissionDeadline, if any
 	if (persistContent.getSubmissionDeadline() != null) {
 	    Date submissionDeadline = persistContent.getSubmissionDeadline();
 	    HttpSession ss = SessionManager.getSession();
@@ -146,7 +142,8 @@ public class MonitoringAction extends LamsDispatchAction {
 	    TimeZone teacherTimeZone = teacher.getTimeZone();
 	    Date tzSubmissionDeadline = DateUtil.convertToTimeZoneFromDefault(teacherTimeZone, submissionDeadline);
 	    request.setAttribute(SbmtConstants.ATTR_SUBMISSION_DEADLINE, tzSubmissionDeadline.getTime());
-	    request.setAttribute(SbmtConstants.ATTR_SUBMISSION_DEADLINE_DATESTRING, DateUtil.convertToStringForJSON(submissionDeadline, request.getLocale()));
+	    request.setAttribute(SbmtConstants.ATTR_SUBMISSION_DEADLINE_DATESTRING,
+		    DateUtil.convertToStringForJSON(submissionDeadline, request.getLocale()));
 	}
 
 	DynaActionForm smbtMonitoringForm = (DynaActionForm) form;
@@ -180,7 +177,7 @@ public class MonitoringAction extends LamsDispatchAction {
 	    sorting = sortByMarked.equals(0) ? SbmtConstants.SORT_BY_MARKED_ASC : SbmtConstants.SORT_BY_MARKED_DESC;
 	}
 
-	//return user list according to the given sessionID
+	// return user list according to the given sessionID
 	ISubmitFilesService service = getSubmitFilesService();
 	SubmitFilesContent spreadsheet = service.getSubmitFilesContent(contentId);
 	List<Object[]> users = service.getUsersForTablesorter(sessionID, page, size, sorting, searchString,
@@ -200,8 +197,8 @@ public class MonitoringAction extends LamsDispatchAction {
 	    responseRow.put(SbmtConstants.ATTR_USER_FULLNAME, StringEscapeUtils.escapeHtml(user.getFullName()));
 
 	    if (userAndReflection.length > 2) {
-		responseRow.put(SbmtConstants.ATTR_USER_NUM_FILE, 
-			(Integer)userAndReflection[1] - (Integer)userAndReflection[2]);
+		responseRow.put(SbmtConstants.ATTR_USER_NUM_FILE,
+			(Integer) userAndReflection[1] - (Integer) userAndReflection[2]);
 	    }
 
 	    if (userAndReflection.length > 3) {
@@ -329,7 +326,7 @@ public class MonitoringAction extends LamsDispatchAction {
 
 		while (dtoIter.hasNext()) {
 		    FileDetailsDTO dto = (FileDetailsDTO) dtoIter.next();
-		    if ( ! dto.isRemoved() ) {
+		    if (!dto.isRemoved()) {
 			row = sheet.createRow(idx++);
 
 			int count = 0;
@@ -396,7 +393,7 @@ public class MonitoringAction extends LamsDispatchAction {
      * @param request
      * @param response
      * @return
-     * @throws IOException 
+     * @throws IOException
      */
     public ActionForward setSubmissionDeadline(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) throws IOException {
@@ -512,7 +509,8 @@ public class MonitoringAction extends LamsDispatchAction {
 		    .append("file as file does not exist. Requested by user ").append(currentUser.getUserID())
 		    .append(" for file ").append(detailID).append(" for user ").append(learnerUserID);
 	    log.error(builder.toString());
-	    throw new ServletException("Invalid call to "+(remove ? "remove" : "restore")+" file. See the server log for more details.");
+	    throw new ServletException("Invalid call to " + (remove ? "remove" : "restore")
+		    + " file. See the server log for more details.");
 	} else {
 
 	    if (!fileToProcess.getSubmitFileSession().getSessionID().equals(sessionID)
@@ -522,17 +520,19 @@ public class MonitoringAction extends LamsDispatchAction {
 			.append(currentUser.getUserID()).append(" for file ").append(detailID).append(" for user ")
 			.append(learnerUserID).append(" in session ").append(sessionID);
 		log.error(builder.toString());
-		throw new ServletException("Invalid call to "+(remove ? "remove" : "restore")+" file. See the server log for more details.");
+		throw new ServletException("Invalid call to " + (remove ? "remove" : "restore")
+			+ " file. See the server log for more details.");
 	    } else {
 
 		if (remove) {
 		    submitFilesService.removeLearnerFile(detailID, currentUser);
-		    notifyRemoveRestore(fileToProcess, "event.file.restore.subject", "event.file.restore.body", "restore file");
-
+		    notifyRemoveRestore(fileToProcess, "event.file.restore.subject", "event.file.restore.body",
+			    "restore file");
 
 		} else {
 		    submitFilesService.restoreLearnerFile(detailID, currentUser);
-		    notifyRemoveRestore(fileToProcess, "event.file.delete.subject", "event.file.delete.body", "delete file");
+		    notifyRemoveRestore(fileToProcess, "event.file.delete.subject", "event.file.delete.body",
+			    "delete file");
 		}
 
 	    }
@@ -545,21 +545,23 @@ public class MonitoringAction extends LamsDispatchAction {
 	return mapping.findForward("listMark");
     }
 
-    /** Notify the user by email of the file change. Need to do it here rather than in the service so that any issues are caught and logged
-     * without stuffing up the transaction. 
+    /**
+     * Notify the user by email of the file change. Need to do it here rather than in the service so that any issues are
+     * caught and logged without stuffing up the transaction.
      */
-    private void notifyRemoveRestore(SubmissionDetails detail, String i18nSubjectKey, String i18nBodyKey, String errorSubject) {
+    private void notifyRemoveRestore(SubmissionDetails detail, String i18nSubjectKey, String i18nBodyKey,
+	    String errorSubject) {
 	Long contentID = detail.getSubmitFileSession().getContent().getContentID();
 	Integer learnerID = detail.getLearner().getUserID();
 
-	// Can't just create a new subscription then call triggerForSingleUser() as 
-	// it needs a subscription id, which doesn't exist for a subscription created in the same 
+	// Can't just create a new subscription then call triggerForSingleUser() as
+	// it needs a subscription id, which doesn't exist for a subscription created in the same
 	// transaction. So reuse the existing RELEASE MARKS event and subscription (created when
 	// a file is uploaded) and override both the subject and the message.
 
 	try {
-	    boolean eventExists = submitFilesService.getEventNotificationService().eventExists(SbmtConstants.TOOL_SIGNATURE,
-		    SbmtConstants.EVENT_NAME_NOTIFY_LEARNERS_ON_MARK_RELEASE, contentID);
+	    boolean eventExists = submitFilesService.getEventNotificationService().eventExists(
+		    SbmtConstants.TOOL_SIGNATURE, SbmtConstants.EVENT_NAME_NOTIFY_LEARNERS_ON_MARK_RELEASE, contentID);
 
 	    if (eventExists) {
 		submitFilesService.getEventNotificationService().triggerForSingleUser(SbmtConstants.TOOL_SIGNATURE,
@@ -567,13 +569,15 @@ public class MonitoringAction extends LamsDispatchAction {
 			submitFilesService.getLocalisedMessage(i18nSubjectKey, null),
 			submitFilesService.getLocalisedMessage(i18nBodyKey, new Object[] { detail.getFilePath() }));
 	    } else {
-		log.error("Unable to notify user of "+errorSubject+". contentID="+contentID+" learner="+learnerID+" file "+detail.getFilePath()+" as "+SbmtConstants.EVENT_NAME_NOTIFY_LEARNERS_ON_MARK_RELEASE+" event is missing");
+		log.error("Unable to notify user of " + errorSubject + ". contentID=" + contentID + " learner="
+			+ learnerID + " file " + detail.getFilePath() + " as "
+			+ SbmtConstants.EVENT_NAME_NOTIFY_LEARNERS_ON_MARK_RELEASE + " event is missing");
 	    }
-	}  catch ( Exception e) {
-            log.error("Unable to notify user of "+errorSubject+". contentID="+contentID+" learner="+learnerID+" file "+detail.getFilePath()+" due to exception "+e.getMessage(),e);
-        }
+	} catch (Exception e) {
+	    log.error("Unable to notify user of " + errorSubject + ". contentID=" + contentID + " learner=" + learnerID
+		    + " file " + detail.getFilePath() + " due to exception " + e.getMessage(), e);
+	}
     }
-
 
     // **********************************************************
     // Private methods
@@ -590,20 +594,6 @@ public class MonitoringAction extends LamsDispatchAction {
 	WebApplicationContext wac = WebApplicationContextUtils
 		.getRequiredWebApplicationContext(getServlet().getServletContext());
 	return (MessageService) wac.getBean("sbmtMessageService");
-    }
-
-    /**
-     * Save file mark information into HttpRequest
-     *
-     * @param request
-     * @param sessionID
-     * @param userID
-     * @param detailID
-     * @param updateMode
-     */
-    private void setMarkPage(HttpServletRequest request, Long sessionID, Long userID, Long detailID,
-	    String updateMode) {
-
     }
 
     /**
@@ -630,5 +620,5 @@ public class MonitoringAction extends LamsDispatchAction {
 	// request.setAttribute(AttributeNames.PARAM_TOOL_SESSION_ID,sessionID);
 	request.setAttribute("sessions", sessions);
     }
-    
+
 }
