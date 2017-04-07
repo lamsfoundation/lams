@@ -536,25 +536,25 @@ public class MonitoringAction extends Action {
 	String fileName = peerreview.getTitle().replaceAll(" ", "_") + ".xlsx";
 	
 	try {
-        	fileName = FileUtil.encodeFilenameForDownload(request, fileName);
-        
-        	if (log.isDebugEnabled()) {
-        	    log.debug("Exporting to a spreadsheet for toolContentId: " + toolContentId + "filename "+fileName);
-        	}
-        
-        	response.setContentType("application/x-download");
-        	response.setHeader("Content-Disposition", "attachment;filename=" + fileName);
-        	ServletOutputStream out = response.getOutputStream();
-        
-        	LinkedHashMap<String, ExcelCell[][]> dataToExport = service.exportTeamReportSpreadsheet(toolContentId);
-        
-        	// set cookie that will tell JS script that export has been finished
-        	String downloadTokenValue = WebUtil.readStrParam(request, "downloadTokenValue");
-        	Cookie fileDownloadTokenCookie = new Cookie("fileDownloadToken", downloadTokenValue);
-        	fileDownloadTokenCookie.setPath("/");
-        	response.addCookie(fileDownloadTokenCookie);
-        	
-        	ExcelUtil.createExcel(out, dataToExport, "Exported on:", true);
+	    fileName = FileUtil.encodeFilenameForDownload(request, fileName);
+
+	    if (log.isDebugEnabled()) {
+		log.debug("Exporting to a spreadsheet for toolContentId: " + toolContentId + "filename " + fileName);
+	    }
+
+	    response.setContentType("application/x-download");
+	    response.setHeader("Content-Disposition", "attachment;filename=" + fileName);
+	    ServletOutputStream out = response.getOutputStream();
+
+	    LinkedHashMap<String, ExcelCell[][]> dataToExport = service.exportTeamReportSpreadsheet(toolContentId);
+
+	    // set cookie that will tell JS script that export has been finished
+	    String downloadTokenValue = WebUtil.readStrParam(request, "downloadTokenValue");
+	    Cookie fileDownloadTokenCookie = new Cookie("fileDownloadToken", downloadTokenValue);
+	    fileDownloadTokenCookie.setPath("/");
+	    response.addCookie(fileDownloadTokenCookie);
+
+	    ExcelUtil.createExcel(out, dataToExport, "Exported on:", true);
 
 	} catch (IOException e) {
 	    log.error("exportTeamReportExcelSpreadsheet i/o error occured: "+e.getMessage(), e);
