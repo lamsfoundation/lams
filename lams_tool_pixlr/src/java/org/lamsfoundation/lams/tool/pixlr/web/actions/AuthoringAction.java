@@ -60,14 +60,6 @@ import org.lamsfoundation.lams.web.util.AttributeNames;
 import org.lamsfoundation.lams.web.util.SessionMap;
 
 /**
- * @author
- * @version
- *
- *
- *
- *
- *
- *
  */
 public class AuthoringAction extends LamsDispatchAction {
 
@@ -371,7 +363,6 @@ public class AuthoringAction extends LamsDispatchAction {
 	    HttpServletResponse response) {
 
 	Long toolContentID = new Long(WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_CONTENT_ID));
-	;
 
 	// set up pixlrService
 	if (pixlrService == null) {
