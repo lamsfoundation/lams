@@ -34,19 +34,6 @@ import org.apache.struts.action.ActionMapping;
 
 /**
  * @author mtruong
- *
- * TODO To change the template for this generated type comment go to
- * Window - Preferences - Java - Code Style - Code Templates
- */
-
-/**
- * Creation Date: 12-07-05
- * 
- *
- *
- *
- *
- *
  */
 public class NbMonitoringForm extends ActionForm {
 
@@ -58,32 +45,14 @@ public class NbMonitoringForm extends ActionForm {
 
     private String method;
 
-    private Map parametersToAppend;
-
     private String currentTab;
 
     /* Only valid when form just set up by Java. Values are not returned from jsp page */
     private String title;
     private String basicContent;
-    private String contentEditable;
     private Integer totalLearners;
     private Map groupStatsMap;
     private Map sessionIdMap;
-
-    /**
-     * @return Returns the parametersToAppend.
-     */
-    public Map getParametersToAppend() {
-	return parametersToAppend;
-    }
-
-    /**
-     * @param parametersToAppend
-     *            The parametersToAppend to set.
-     */
-    public void setParametersToAppend(Map parametersToAppend) {
-	this.parametersToAppend = parametersToAppend;
-    }
 
     /**
      * @return Returns the method.
@@ -118,7 +87,6 @@ public class NbMonitoringForm extends ActionForm {
     @Override
     public void reset(ActionMapping mapping, HttpServletRequest request) {
 	this.method = null;
-	this.parametersToAppend = null;
 
     }
 
@@ -138,16 +106,8 @@ public class NbMonitoringForm extends ActionForm {
 	return title;
     }
 
-    public String getContentEditable() {
-	return contentEditable;
-    }
-
     public void setBasicContent(String basicContent) {
 	this.basicContent = basicContent;
-    }
-
-    public void setContentEditable(String contentEditable) {
-	this.contentEditable = contentEditable;
     }
 
     public void setTitle(String title) {

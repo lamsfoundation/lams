@@ -65,10 +65,6 @@ public class NbMonitoringAction extends LamsDispatchAction {
 
     public final static String FORM = "NbMonitoringForm";
 
-    public static final String SUMMARY_TABID = "1";
-    public static final String EDITACTIVITY_TABID = "2";
-    public static final String STATISTICS_TABID = "3";
-
     @Override
     public ActionForward unspecified(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) throws NbApplicationException {
@@ -88,13 +84,8 @@ public class NbMonitoringAction extends LamsDispatchAction {
 	monitorForm.setTitle(content.getTitle());
 	monitorForm.setBasicContent(content.getContent());
 
-	monitorForm.setContentEditable("true");
-	//set up the request parameters to append to the URL
-	Map<String, Object> mapParameters = new HashMap<String, Object>();
-	mapParameters.put(NoticeboardConstants.TOOL_CONTENT_ID, toolContentId.toString());
-	mapParameters.put(NoticeboardConstants.DEFINE_LATER, "true");
-	mapParameters.put(NoticeboardConstants.CONTENT_FOLDER_ID, contentFolderID);
-	monitorForm.setParametersToAppend(mapParameters);
+	request.setAttribute(NoticeboardConstants.TOOL_CONTENT_ID, toolContentId);
+	request.setAttribute(NoticeboardConstants.CONTENT_FOLDER_ID, contentFolderID);
 
 	//Get the total number of learners that have participated in this tool activity
 	monitorForm.setTotalLearners(nbService.calculateTotalNumberOfUsers(toolContentId));
@@ -141,7 +132,7 @@ public class NbMonitoringAction extends LamsDispatchAction {
 	request.setAttribute("allowComments", content.isAllowComments());
 
 	String currentTab = WebUtil.readStrParam(request, AttributeNames.PARAM_CURRENT_TAB, true);
-	monitorForm.setCurrentTab(currentTab != null ? currentTab : SUMMARY_TABID);
+	monitorForm.setCurrentTab(currentTab != null ? currentTab : "1");
 	request.setAttribute(FORM, monitorForm);
 	return mapping.findForward(NoticeboardConstants.MONITOR_PAGE);
     }
