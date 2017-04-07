@@ -8,6 +8,11 @@
 
 <script type="text/javascript">
 	function validate() {
+		//in case image is already uploaded - skip validation
+		if ("${imageExists}" == "true") {
+			return true;
+		}
+		
 		// Get the selected files from the input.
 		var files = document.getElementById('file').files;
 		if (files.length == 0) {
