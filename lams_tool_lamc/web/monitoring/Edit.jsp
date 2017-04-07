@@ -40,6 +40,6 @@
 	<c:param name="contentFolderID" value="${formBean.contentFolderID}" />
 	<c:param name="mode" value="teacher" />
 </c:url>
-<html:link href="javascript:;" onclick="launchPopup('${authoringUrl}','definelater')" styleClass="btn btn-default">
+<html:link href="javascript:;" onclick="launchPopup('${authoringUrl}','definelater')" styleClass="btn btn-default pull-right">
 	<fmt:message key="label.edit"/>
 </html:link>				 		  					

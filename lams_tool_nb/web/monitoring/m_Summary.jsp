@@ -1,17 +1,17 @@
 <%@ include file="/includes/taglibs.jsp"%>
 <script type="text/javascript" src="<lams:LAMSURL/>/includes/javascript/monitorToolSummaryAdvanced.js" ></script>
 	
-	<div class="panel">
+<div class="panel">
 	<h4><c:out value="${formBean.title}" escapeXml="true" /></h4>
 	<div class="voffset5"><c:out value="${formBean.basicContent}" escapeXml="false" /></div>
-	</div>
+</div>
 
-	<H4><fmt:message key="titleHeading.statistics"/></H2>
-	<%@ include file="m_Statistics.jsp"%>
+<H4><fmt:message key="titleHeading.statistics"/></H2>
+<%@ include file="m_Statistics.jsp"%>
 
-	<c:if test="${reflectOnActivity}" >
-		<H4><fmt:message key="titleHeading.reflections"/></H4>
-		<table class="table table-striped">
+<c:if test="${reflectOnActivity}" >
+	<H4><fmt:message key="titleHeading.reflections"/></H4>
+	<table class="table table-striped">
 		<c:forEach var="reflection" items="${reflections}">
 			<logic:empty name="reflections">
 				<tr>
@@ -36,9 +36,8 @@
 				</td>
 			</tr>
 		</c:forEach>
-		</table>
-		
-	</c:if>
+	</table>	
+</c:if>
 	
 <c:set var="adTitle"><fmt:message key="monitor.summary.th.advancedSettings" /></c:set>
 <lams:AdvancedAccordian title="${adTitle}">

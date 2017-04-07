@@ -36,7 +36,7 @@
 	</c:url>
 	
 	<c:if test="${dto.contentInUse == false}">
-		<html:link href="${authoringUrl}" styleClass="btn btn-default">
+		<html:link href="#nogo" onclick="javascript:launchPopup('${authoringUrl}','definelater')" styleClass="btn btn-default pull-right">
 			<fmt:message key="button.editActivity" />
 		</html:link>
 	</c:if>

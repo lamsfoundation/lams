@@ -35,7 +35,7 @@
 		<c:param name="mode" value="teacher" />
 		<c:param name="contentFolderID" value="${contentFolderID}"></c:param>
 	</c:url>
-	<html:link href="${fn:escapeXml(authoringUrl)}" styleClass="btn btn-default">
+	<html:link href="#nogo" onclick="javascript:launchPopup('${fn:escapeXml(authoringUrl)}','definelater')" styleClass="btn btn-default pull-right">
 		<fmt:message key="button.editActivity" />
 	</html:link>
 </c:if>
