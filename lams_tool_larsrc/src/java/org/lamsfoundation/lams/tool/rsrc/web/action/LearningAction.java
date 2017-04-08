@@ -257,6 +257,7 @@ public class LearningAction extends Action {
 	    redirect.addParameter(ResourceConstants.ATTR_SESSION_MAP_ID, sessionMap.getSessionID());
 	    redirect.addParameter(ResourceConstants.ATTR_TOOL_SESSION_ID, sessionId);
 	    redirect.addParameter(ResourceConstants.ATTR_RESOURCE_ITEM_UID, runAutoItemUid);
+	    redirect.addParameter(AttributeNames.ATTR_MODE, mode);
 	    return redirect;
 	    
 	} else {
