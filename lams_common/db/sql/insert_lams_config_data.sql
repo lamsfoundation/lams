@@ -26,10 +26,10 @@ insert into lams_configuration (config_key, config_value, description_key, heade
 values ('ContentRepositoryPath','@contentrepository.directory@', 'config.content.repository.path', 'config.header.uploads', 'STRING', 1);
 
 insert into lams_configuration (config_key, config_value, description_key, header_name, format, required) 
-values ('UploadFileMaxSize','1048576', 'config.upload.file.max.size', 'config.header.uploads', 'LONG', 1);
+values ('UploadFileMaxSize','10485760', 'config.upload.file.max.size', 'config.header.uploads', 'LONG', 1);
 
 insert into lams_configuration (config_key, config_value, description_key, header_name, format, required) 
-values ('UploadLargeFileMaxSize','10485760', 'config.upload.large.file.max.size', 'config.header.uploads', 'LONG', 1);
+values ('UploadLargeFileMaxSize','104857600', 'config.upload.large.file.max.size', 'config.header.uploads', 'LONG', 1);
 
 insert into lams_configuration (config_key, config_value, description_key, header_name, format, required) 
 values ('UploadFileMaxMemorySize','4096', 'config.upload.file.max.memory.size', 'config.header.uploads', 'LONG', 1);
