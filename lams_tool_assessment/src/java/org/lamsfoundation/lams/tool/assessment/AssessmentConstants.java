@@ -245,6 +245,8 @@ public class AssessmentConstants {
 
     public static final String ATTR_TOOL_OUTPUT_DEFINITIONS = "toolOutputDefinitions";
 
+    public static final String ATTR_MARK_SUMMARY = "markSummary";
+
     //output definitions
     public static final String OUTPUT_NAME_LEARNER_TOTAL_SCORE = "learner.total.score";
     public static final String OUTPUT_NAME_LEARNER_TIME_TAKEN = "learner.time.taken";

@@ -6,6 +6,7 @@
 
 <script type="text/javascript">
 	$(document).ready(function(){
+		
 		<c:forEach var="sessionDto" items="${sessionDtos}" varStatus="status">
 		
 			jQuery("#list${sessionDto.sessionId}").jqGrid({
