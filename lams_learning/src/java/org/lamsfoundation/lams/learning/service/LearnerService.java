@@ -609,7 +609,7 @@ public class LearnerService implements ICoreLearnerService {
      * @return the updated learner progress
      */
     @Override
-    public synchronized void completeActivity(Integer learnerId, Activity activity, Long progressID) {
+    public void completeActivity(Integer learnerId, Activity activity, Long progressID) {
 	if (LearnerService.log.isDebugEnabled()) {
 	    LearnerService.log
 		    .debug("Completing activity ID " + activity.getActivityId() + " for learner " + learnerId);
