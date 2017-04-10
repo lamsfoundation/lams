@@ -34,10 +34,12 @@ import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import java.util.SortedMap;
 import java.util.SortedSet;
+import java.util.TreeMap;
 import java.util.TreeSet;
 import java.util.regex.Pattern;
 
@@ -105,6 +107,7 @@ import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
 import org.lamsfoundation.lams.util.ExcelCell;
 import org.lamsfoundation.lams.util.JsonUtil;
 import org.lamsfoundation.lams.util.MessageService;
+import org.lamsfoundation.lams.util.NumberUtil;
 import org.lamsfoundation.lams.util.audit.IAuditService;
 
 /**
@@ -965,7 +968,7 @@ public class AssessmentServiceImpl
     }
 
     @Override
-    public List<SessionDTO> getSessionDtos(Long contentId) {
+    public List<SessionDTO> getSessionDtos(Long contentId, boolean includeStatistics) {
 	List<SessionDTO> sessionDtos = new ArrayList<SessionDTO>();
 
 	List<AssessmentSession> sessionList = assessmentSessionDao.getByContentId(contentId);
@@ -974,8 +977,16 @@ public class AssessmentServiceImpl
 	    SessionDTO sessionDto = new SessionDTO(sessionId, session.getSessionName());
 
 	    //for statistics tab
-	    int countUsers = assessmentUserDao.getCountUsersBySession(sessionId, "");
-	    sessionDto.setNumberLearners(countUsers);
+	    if ( includeStatistics ) {
+		int countUsers = assessmentUserDao.getCountUsersBySession(sessionId, "");
+		sessionDto.setNumberLearners(countUsers);
+		Object[] markStats = assessmentUserDao.getStatsMarksBySession(sessionId);
+		if ( markStats != null ) {
+		    sessionDto.setMinMark(NumberUtil.formatLocalisedNumber((Float)markStats[0], (Locale)null, 2));
+		    sessionDto.setAvgMark(NumberUtil.formatLocalisedNumber((Float)markStats[1], (Locale)null, 2));
+		    sessionDto.setMaxMark(NumberUtil.formatLocalisedNumber((Float)markStats[2], (Locale)null, 2));
+		}
+	    }
 
 	    sessionDtos.add(sessionDto);
 	}
@@ -1175,13 +1186,7 @@ public class AssessmentServiceImpl
 		    ExcelCell[] sessionTitle = new ExcelCell[1];
 		    sessionTitle[0] = new ExcelCell(sessionDTO.getSessionName(), true);
 		    summaryTab.add(sessionTitle);
-
-		    ExcelCell[] summaryRowTitle = new ExcelCell[3];
-		    summaryRowTitle[0] = new ExcelCell(getMessage("label.export.user.id"), true);
-		    summaryRowTitle[1] = new ExcelCell(getMessage("label.monitoring.summary.user.name"), true);
-		    summaryRowTitle[2] = new ExcelCell(getMessage("label.monitoring.summary.total"), true);
-		    summaryTab.add(summaryRowTitle);
-
+		    
 		    List<AssessmentUserDTO> userDtos = new ArrayList<AssessmentUserDTO>();
 		    // in case of UseSelectLeaderToolOuput - display only one user
 		    if (assessment.isUseSelectLeaderToolOuput()) {
@@ -1208,14 +1213,73 @@ public class AssessmentServiceImpl
 			userDtos = getPagedUsersBySession(sessionId, 0, countSessionUsers, "userName", "ASC", "");
 		    }
 
+		    ArrayList<ExcelCell[]> summaryTabLearnerList = new ArrayList<ExcelCell[]>();
+			    
+		    ExcelCell[] summaryRowTitle = new ExcelCell[3];
+		    summaryRowTitle[0] = new ExcelCell(getMessage("label.export.user.id"), true, ExcelCell.BORDER_STYLE_BOTTOM_THIN);
+		    summaryRowTitle[1] = new ExcelCell(getMessage("label.monitoring.summary.user.name"), true, ExcelCell.BORDER_STYLE_BOTTOM_THIN);
+		    summaryRowTitle[2] = new ExcelCell(getMessage("label.monitoring.summary.total"), true, ExcelCell.BORDER_STYLE_BOTTOM_THIN);
+		    summaryTabLearnerList.add(summaryRowTitle);
+
+		    float minGrade = 0;
+		    float maxGrade = 0;
+
 		    for (AssessmentUserDTO userDto : userDtos) {
+			float grade = userDto.getGrade();
+
 			ExcelCell[] userResultRow = new ExcelCell[3];
 			userResultRow[0] = new ExcelCell(userDto.getLogin(), false);
 			userResultRow[1] = new ExcelCell(userDto.getFirstName() + " " + userDto.getLastName(), false);
-			userResultRow[2] = new ExcelCell(userDto.getGrade(), false);
-			summaryTab.add(userResultRow);
+			userResultRow[2] = new ExcelCell(grade, false);
+			summaryTabLearnerList.add(userResultRow);
+
+			if ( minGrade == 0 || grade < minGrade )
+			    minGrade = grade;
+			if ( grade > maxGrade )
+			    maxGrade = grade;
+
 		    }
 
+		    LinkedHashMap<String, Integer> markSummary = getMarksSummaryForSession(userDtos, minGrade, maxGrade, 10);
+		    // work out total marks so we can do percentages. need as float for the correct divisions
+		    int totalNumEntries = 0;
+		    for ( Map.Entry<String, Integer> entry : markSummary.entrySet() ) {
+			totalNumEntries += entry.getValue();
+		    }
+
+		    // Mark Summary Min, Max + Grouped Percentages
+		    summaryTab.add(EMPTY_ROW);
+		    ExcelCell[] minMaxRow = new ExcelCell[2];
+		    minMaxRow[0] = new ExcelCell(getMessage("label.number.learners"), true);
+		    minMaxRow[1] = new ExcelCell(totalNumEntries, false);
+		    summaryTab.add(minMaxRow);
+		    minMaxRow = new ExcelCell[2];
+		    minMaxRow[0] = new ExcelCell(getMessage("label.lowest.mark"), true);
+		    minMaxRow[1] = new ExcelCell((double)minGrade, false);
+		    summaryTab.add(minMaxRow);
+		    minMaxRow = new ExcelCell[2];
+		    minMaxRow[0] = new ExcelCell(getMessage("label.highest.mark"), true);
+		    minMaxRow[1] = new ExcelCell((double)maxGrade, false);
+		    summaryTab.add(minMaxRow);
+		    
+		    summaryTab.add(EMPTY_ROW);
+		    ExcelCell[] binSummaryRow = new ExcelCell[3];
+		    binSummaryRow[0] = new ExcelCell(getMessage("label.authoring.basic.list.header.mark"), true, ExcelCell.BORDER_STYLE_BOTTOM_THIN);
+		    binSummaryRow[1] = new ExcelCell(getMessage("label.number.learners"), true, ExcelCell.BORDER_STYLE_BOTTOM_THIN);
+		    binSummaryRow[2] = new ExcelCell(getMessage("label.percentage"), true, ExcelCell.BORDER_STYLE_BOTTOM_THIN);
+		    summaryTab.add(binSummaryRow);
+		    float totalNumEntriesAsFloat = (float) totalNumEntries; 
+		    for ( Map.Entry<String, Integer> entry : markSummary.entrySet() ) {
+			binSummaryRow = new ExcelCell[3];
+			binSummaryRow[0] = new ExcelCell(entry.getKey(),false);
+			binSummaryRow[1] = new ExcelCell(entry.getValue(),false);
+			binSummaryRow[2] = new ExcelCell(Math.round(entry.getValue() / totalNumEntriesAsFloat * 100),false);
+			summaryTab.add(binSummaryRow);
+		    }
+		    summaryTab.add(EMPTY_ROW);
+
+		    summaryTab.add(EMPTY_ROW);
+		    summaryTab.addAll(summaryTabLearnerList);
 		    summaryTab.add(EMPTY_ROW);
 		}
 	    }
@@ -1241,19 +1305,28 @@ public class AssessmentServiceImpl
 	    int count = 0;
 	    // question row title
 	    ExcelCell[] questionTitleRow = showUserNames ? new ExcelCell[10] : new ExcelCell[9];
-	    questionTitleRow[count++] = new ExcelCell(getMessage("label.monitoring.question.summary.question"), true);
-	    questionTitleRow[count++] = new ExcelCell(getMessage("label.authoring.basic.list.header.type"), true);
-	    questionTitleRow[count++] = new ExcelCell(getMessage("label.authoring.basic.penalty.factor"), true);
+	    questionTitleRow[count++] = new ExcelCell(getMessage("label.monitoring.question.summary.question"), true,
+		    ExcelCell.BORDER_STYLE_BOTTOM_THIN);
+	    questionTitleRow[count++] = new ExcelCell(getMessage("label.authoring.basic.list.header.type"), true,
+		    ExcelCell.BORDER_STYLE_BOTTOM_THIN);
+	    questionTitleRow[count++] = new ExcelCell(getMessage("label.authoring.basic.penalty.factor"), true,
+		    ExcelCell.BORDER_STYLE_BOTTOM_THIN);
 	    questionTitleRow[count++] = new ExcelCell(getMessage("label.monitoring.question.summary.default.mark"),
-		    true);
-	    questionTitleRow[count++] = new ExcelCell(getMessage("label.export.user.id"), true);
+		    true, ExcelCell.BORDER_STYLE_BOTTOM_THIN);
+	    questionTitleRow[count++] = new ExcelCell(getMessage("label.export.user.id"), true,
+		    ExcelCell.BORDER_STYLE_BOTTOM_THIN);
 	    if (showUserNames) {
-		questionTitleRow[count++] = new ExcelCell(getMessage("label.monitoring.user.summary.user.name"), true);
+		questionTitleRow[count++] = new ExcelCell(getMessage("label.monitoring.user.summary.user.name"), true,
+			ExcelCell.BORDER_STYLE_BOTTOM_THIN);
 	    }
-	    questionTitleRow[count++] = new ExcelCell(getMessage("label.export.date.attempted"), true);
-	    questionTitleRow[count++] = new ExcelCell(getMessage("label.authoring.basic.option.answer"), true);
-	    questionTitleRow[count++] = new ExcelCell(getMessage("label.export.time.taken"), true);
-	    questionTitleRow[count++] = new ExcelCell(getMessage("label.export.mark"), true);
+	    questionTitleRow[count++] = new ExcelCell(getMessage("label.export.date.attempted"), true,
+		    ExcelCell.BORDER_STYLE_BOTTOM_THIN);
+	    questionTitleRow[count++] = new ExcelCell(getMessage("label.authoring.basic.option.answer"), true,
+		    ExcelCell.BORDER_STYLE_BOTTOM_THIN);
+	    questionTitleRow[count++] = new ExcelCell(getMessage("label.export.time.taken"), true,
+		    ExcelCell.BORDER_STYLE_BOTTOM_THIN);
+	    questionTitleRow[count++] = new ExcelCell(getMessage("label.export.mark"), true,
+		    ExcelCell.BORDER_STYLE_BOTTOM_THIN);
 
 	    for (AssessmentQuestion question : questions) {
 		int colsNum = showUserNames ? 10 : 9;
@@ -1413,11 +1486,11 @@ public class AssessmentServiceImpl
 	userSummaryTab.add(userSummaryTitle);
 
 	ExcelCell[] summaryRowTitle = new ExcelCell[5];
-	summaryRowTitle[0] = new ExcelCell(getMessage("label.monitoring.question.summary.question"), true);
-	summaryRowTitle[1] = new ExcelCell(getMessage("label.authoring.basic.list.header.type"), true);
-	summaryRowTitle[2] = new ExcelCell(getMessage("label.authoring.basic.penalty.factor"), true);
-	summaryRowTitle[3] = new ExcelCell(getMessage("label.monitoring.question.summary.default.mark"), true);
-	summaryRowTitle[4] = new ExcelCell(getMessage("label.monitoring.question.summary.average.mark"), true);
+	summaryRowTitle[0] = new ExcelCell(getMessage("label.monitoring.question.summary.question"), true, ExcelCell.BORDER_STYLE_BOTTOM_THIN);
+	summaryRowTitle[1] = new ExcelCell(getMessage("label.authoring.basic.list.header.type"), true, ExcelCell.BORDER_STYLE_BOTTOM_THIN);
+	summaryRowTitle[2] = new ExcelCell(getMessage("label.authoring.basic.penalty.factor"), true, ExcelCell.BORDER_STYLE_BOTTOM_THIN);
+	summaryRowTitle[3] = new ExcelCell(getMessage("label.monitoring.question.summary.default.mark"), true, ExcelCell.BORDER_STYLE_BOTTOM_THIN);
+	summaryRowTitle[4] = new ExcelCell(getMessage("label.monitoring.question.summary.average.mark"), true, ExcelCell.BORDER_STYLE_BOTTOM_THIN);
 	userSummaryTab.add(summaryRowTitle);
 	Float totalGradesPossible = new Float(0);
 	Float totalAverage = new Float(0);
@@ -1969,6 +2042,74 @@ public class AssessmentServiceImpl
 	eventNotificationService.notifyLessonMonitors(sessionId, message, false);
     }
 
+    
+    @Override
+    public List<Number> getMarksArray(Long sessionId) {
+	return assessmentUserDao.getRawUserMarksBySession(sessionId);
+    }
+
+    private LinkedHashMap<String, Integer> getMarksSummaryForSession(List<AssessmentUserDTO> userDtos, float minGrade, float maxGrade, Integer numBuckets) {
+
+	LinkedHashMap<String, Integer> summary = new LinkedHashMap<String, Integer>();
+	TreeMap<Integer, Integer> inProgress = new TreeMap<Integer, Integer>();
+	
+	if ( numBuckets == null )
+	    numBuckets = 10;
+	
+	int bucketSize = 1;
+	int intMinGrade = (int)Math.floor(minGrade);
+	float gradeDifference = maxGrade - minGrade;
+	if ( gradeDifference <= 10 ) {
+	    for ( int i= intMinGrade; i <= (int)Math.ceil(maxGrade); i++ ) {
+		inProgress.put(i, 0);
+	    }
+	} else {
+	    int intGradeDifference = (int) Math.ceil(gradeDifference);
+	    bucketSize = (int) Math.ceil(intGradeDifference / numBuckets); 
+	    for ( int i=intMinGrade; i <= maxGrade; i = i+bucketSize ) {
+		inProgress.put(i, 0);
+	    }
+	}
+	
+	// TODO optimise. At least start with the top bucket!
+	for (AssessmentUserDTO userDto : userDtos) {
+	    float grade = userDto.getGrade();
+	    int bucketStart = intMinGrade;
+	    int bucketStop = bucketStart+bucketSize;
+	    boolean looking = true;
+	    while ( bucketStart <= maxGrade && looking ) {
+		if ( grade >= bucketStart && grade < bucketStop ) {
+		    inProgress.put(bucketStart, inProgress.get(bucketStart) + 1);
+		    looking = false;
+		} else {
+		    bucketStart = bucketStop;
+		    bucketStop = bucketStart+bucketSize;
+		}
+	    }
+	}
+	
+	// TODO get locale
+	for ( Map.Entry<Integer, Integer> entry : inProgress.entrySet() ) {
+	    String key;
+	    if ( bucketSize == 1 )
+		key = entry.getKey().toString();
+	    else {
+		if ( maxGrade >= entry.getKey() && maxGrade <= entry.getKey()+bucketSize-1) {
+		    if ( (int)maxGrade == entry.getKey() )
+			key = NumberUtil.formatLocalisedNumber(maxGrade, (Locale)null, 2);    
+		    else 
+			key = new StringBuilder().append(entry.getKey()).append(" - ")
+		    		.append(NumberUtil.formatLocalisedNumber(maxGrade, (Locale)null, 2)).toString();
+		} else {
+		    key = new StringBuilder().append(entry.getKey()).append(" - ").append(entry.getKey()+bucketSize-.01).toString();
+		}
+	    }
+	    summary.put(key, entry.getValue());
+	}
+	
+	return summary;
+    }
+    
     // *****************************************************************************
     // private methods
     // *****************************************************************************

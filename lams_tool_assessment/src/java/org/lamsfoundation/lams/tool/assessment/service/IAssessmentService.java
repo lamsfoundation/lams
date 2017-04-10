@@ -28,6 +28,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.TreeMap;
 
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.tool.assessment.dto.AssessmentUserDTO;
@@ -356,7 +357,7 @@ public interface IAssessmentService {
      * @param contentId
      * @return
      */
-    List<SessionDTO> getSessionDtos(Long contentId);
+    List<SessionDTO> getSessionDtos(Long contentId, boolean includeStatistics);
 
     AssessmentResult getUserMasterDetail(Long sessionId, Long userId);
 
@@ -398,6 +399,14 @@ public interface IAssessmentService {
     LinkedHashMap<String, ExcelCell[][]> exportSummary(Assessment assessment, List<SessionDTO> sessionDtos,
 	    boolean showUserNames);
 
+    /** 
+     * Prepares data for the marks summary graph on the statistics page
+     * @param assessment
+     * @param sessionDtos
+     * @return
+     */
+    List<Number> getMarksArray(Long sessionId);
+    
     void changeQuestionResultMark(Long questionResultUid, float newMark);
 
     void notifyTeachersOnAttemptCompletion(Long sessionId, String userName);

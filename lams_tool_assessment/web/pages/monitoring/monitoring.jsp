@@ -1,6 +1,8 @@
 <!DOCTYPE html>
 <%@ include file="/common/taglibs.jsp"%>
 <%@ page import="org.lamsfoundation.lams.tool.assessment.AssessmentConstants"%>
+<c:set var="sessionMap" value="${sessionScope[sessionMapID]}"/>
+<c:set var="sessionDtos" value="${sessionMap.sessionDtos}"/>
 
 <lams:html>
 	<lams:head>
@@ -15,7 +17,7 @@
 			    height:auto;
 			    vertical-align:text-top;
 			    padding-top:2px;
-			}
+			}	
 		</style>
 
 		<script>
@@ -38,15 +40,36 @@
 		<script type="text/javascript" src="${lams}includes/javascript/jquery.blockUI.js"></script> 
  		<script type="text/javascript" src="${lams}includes/javascript/jquery.jqGrid.locale-en.js"></script>
  		<script type="text/javascript" src="${lams}includes/javascript/jquery.jqGrid.js"></script>
+   		<script type="text/javascript" src="${lams}includes/javascript/d3.js"></script>
+ 		<script type="text/javascript" src="${lams}includes/javascript/chart.js"></script>
  		
  		<script type="text/javascript" src="${lams}includes/javascript/jquery.cookie.js"></script>
  		<script type="text/javascript" src="${lams}includes/javascript/download.js"></script>
  		
 		<script>        
 		    function doSelectTab(tabId) {
-			   	// end optional tab controller stuff
+		    	debugger;
+		    	if ( tabId == 3 )
+		    		doStatistic();
 			   	selectTab(tabId);
-		    } 
+		    }
+		    
+			function doStatistic(){
+				var url = '<c:url value="/monitoring/statistic.do?sessionMapID=${sessionMapID}"/>';
+				$("#statisticArea_Busy").show();
+				$.ajaxSetup({ cache: true });
+				$("#statisticArea").load(
+					url,
+					{
+						toolContentID: ${param.toolContentID}, 
+						reqID: (new Date()).getTime()
+					},
+					function() {
+						$("#statisticArea_Busy").hide();
+					}
+				);
+				
+			}       
 		</script>	  
 	</lams:head>
 	

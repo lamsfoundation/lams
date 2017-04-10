@@ -38,6 +38,9 @@ public class SessionDTO {
     private Long sessionId;
     private String sessionName;
     private int numberLearners;
+    private String minMark;
+    private String maxMark;
+    private String avgMark; 
 
     //used for export purposes only
     private List<AssessmentResult> assessmentResults;
@@ -89,6 +92,30 @@ public class SessionDTO {
 
     public void setNumberLearners(int numberLearners) {
 	this.numberLearners = numberLearners;
+    }
+
+    public String getAvgMark() {
+	return avgMark;
+    }
+
+    public void setAvgMark(String avgMark) {
+	this.avgMark = avgMark;
+    }
+
+    public String getMinMark() {
+	return minMark;
+    }
+
+    public void setMinMark(String minMark) {
+	this.minMark = minMark;
+    }
+
+    public String getMaxMark() {
+	return maxMark;
+    }
+
+    public void setMaxMark(String maxMark) {
+	this.maxMark = maxMark;
     }
 
 }

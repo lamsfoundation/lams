@@ -344,6 +344,15 @@
 			type="org.lamsfoundation.lams.tool.assessment.web.action.MonitoringAction"
 			parameter="exportSummary" >
 		</action>			
+		<action path="/monitoring/getMarkChartData"
+			type="org.lamsfoundation.lams.tool.assessment.web.action.MonitoringAction"
+			parameter="getMarkChartData" >
+		</action>			
+		<action path="/monitoring/statistic"
+			type="org.lamsfoundation.lams.tool.assessment.web.action.MonitoringAction"
+			parameter="statistic" >
+			<forward name="success" path="/pages/monitoring/statisticpart.jsp" />
+		</action>			
 		<!-- ========== Common Definitions ============================== -->
 		<action path="/clearsession"
 			type="org.lamsfoundation.lams.tool.assessment.web.action.ClearSessionAction">

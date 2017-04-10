@@ -29,8 +29,10 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.TimeZone;
+import java.util.TreeMap;
 import java.util.TreeSet;
 
 import javax.servlet.ServletException;
@@ -118,7 +120,13 @@ public class MonitoringAction extends Action {
 	if (param.equals("exportSummary")) {
 	    return exportSummary(mapping, form, request, response);
 	}
-
+	if (param.equals("getMarkChartData")) {
+	    return getMarkChartData(mapping, form, request, response);
+	}
+	if (param.equals("statistic")) {
+	    return statistic(mapping, form, request, response);
+	}
+	
 	return mapping.findForward(AssessmentConstants.ERROR);
     }
 
@@ -132,7 +140,7 @@ public class MonitoringAction extends Action {
 	request.setAttribute(AssessmentConstants.ATTR_SESSION_MAP_ID, sessionMap.getSessionID());
 
 	Long contentId = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_CONTENT_ID);
-	List<SessionDTO> sessionDtos = service.getSessionDtos(contentId);
+	List<SessionDTO> sessionDtos = service.getSessionDtos(contentId, false);
 
 	Assessment assessment = service.getAssessmentByContentId(contentId);
 
@@ -194,7 +202,7 @@ public class MonitoringAction extends Action {
 		WebUtil.readStrParam(request, AttributeNames.PARAM_CONTENT_FOLDER_ID));
 	return mapping.findForward(AssessmentConstants.SUCCESS);
     }
-
+    
     private ActionForward userMasterDetail(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) {
 	initAssessmentService();
@@ -510,6 +518,42 @@ public class MonitoringAction extends Action {
 	return null;
     }
 
+   /**
+     * Get the mark summary with data arranged in bands. Can be displayed graphically or in a table.
+     */
+    public ActionForward getMarkChartData(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+	    HttpServletResponse res) throws IOException, ServletException, JSONException {
+
+	initAssessmentService();
+
+	String sessionMapID = request.getParameter(AssessmentConstants.ATTR_SESSION_MAP_ID);
+	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
+		.getAttribute(sessionMapID);
+	request.setAttribute(AssessmentConstants.ATTR_SESSION_MAP_ID, sessionMap.getSessionID());
+
+	Long sessionId = WebUtil.readLongParam(request, AssessmentConstants.ATTR_TOOL_SESSION_ID);
+	List<Number> results = service.getMarksArray(sessionId);
+//
+//	log.debug("fudging results to get more data for transmission. New results will have "+(origResults.length*50)+" entries");
+//	Float[] results = new Float[origResults.length*50];
+//	for (int i=0; i<50; i++) {
+//	    for ( int j=0; j < origResults.length; j++ ) {
+//		results[i*origResults.length + j] = origResults[j];
+//	    }
+//	}
+	
+	JSONObject responseJSON = new JSONObject();
+	if ( results != null )
+	    responseJSON.put("data", results);
+	else 
+	    responseJSON.put("data", new Float[0]);
+
+	res.setContentType("application/json;charset=utf-8");
+	res.getWriter().write(responseJSON.toString());
+	return null;
+
+    }
+
     /**
      * Excel Summary Export.
      *
@@ -541,7 +585,7 @@ public class MonitoringAction extends Action {
 	    contentId = WebUtil.readLongParam(request, "toolContentID");
 	    fileName = WebUtil.readStrParam(request, "fileName");
 	    showUserNames = false;
-	    sessionDtos = service.getSessionDtos(contentId);
+	    sessionDtos = service.getSessionDtos(contentId, true);
 	}
 
 	Assessment assessment = service.getAssessmentByContentId(contentId);
@@ -572,6 +616,22 @@ public class MonitoringAction extends Action {
 
 	return null;
     }
+    
+    private ActionForward statistic(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+	    HttpServletResponse response) {
+
+	initAssessmentService();
+	String sessionMapID = request.getParameter(AssessmentConstants.ATTR_SESSION_MAP_ID);
+	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
+		.getAttribute(sessionMapID);
+	request.setAttribute(AssessmentConstants.ATTR_SESSION_MAP_ID, sessionMap.getSessionID());
+
+	Long contentId = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_CONTENT_ID);
+	List<SessionDTO> sessionDtos = service.getSessionDtos(contentId, true);
+	sessionMap.put("sessionDtos", sessionDtos);
+	return mapping.findForward(AssessmentConstants.SUCCESS);
+    }
+
 
     // *************************************************************************************
     // Private method
