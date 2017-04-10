@@ -211,9 +211,9 @@ function drawHistogram(chartID, url, xAxisLabel, yAxisLabel){
 		formatCount = d3.format(",.0f"),
 		chartDiv = $('#' + chartID).empty().show(),
 		svgWidth = chartDiv.width(),
-		svgHeightOffset = 10;
+		svgHeightOffset = 10,
 		svgHeight = chartDiv.height() - svgHeightOffset,
-	    margin = {top: 10, right: 40, bottom: 120, left: 0},
+		margin = {top: 10, right: 40, bottom: 120, left: 0},
 	    margin2 = {top: 405, right: 40, bottom: xaxisHeight, left: 0},
 	    width = svgWidth - margin.left - margin.right,
 	    height = svgHeight - margin.top - margin.bottom,
@@ -266,7 +266,7 @@ function drawHistogram(chartID, url, xAxisLabel, yAxisLabel){
 			// forward error to browser
 			throw error;
 		}
-			
+		
 		if (!response || $.isEmptyObject(response)) {
 			// if there is no data to display
 			return;
@@ -421,49 +421,3 @@ function drawHistogram(chartID, url, xAxisLabel, yAxisLabel){
 	}
 }
 
-function displayAsTable(tableID, url, columns, columnNames) {
-	
-	d3.json(url, function(error, response){
-		if (error) {
-			// forward error to browser
-			throw error;
-		}
-		
-		if (!response || $.isEmptyObject(response)) {
-			// if there is no data to display
-			return;
-		}
-
-		var tableDiv = $("#"+tableID);
-		if ( tableDiv.length > 0 ) {
-			var table = d3.select(tableDiv[0])
-				.append('table')
-				.attr('class', 'table table-striped table-bordered table-condensed table-fluid'),
-	        thead = table.append("thead"),
-	        tbody = table.append("tbody");
-				
-		    thead.append("tr")
-		    	.selectAll("th")
-		    	.data(columnNames)
-		    	.enter()
-		    	.append("th")
-		    	.text(function(column) { return column; });
-	
-		    var rows = tbody.selectAll("tr")
-		    	.data(response.data)
-		    	.enter()
-		    	.append("tr");
-	
-		    var cells = rows.selectAll("td")
-		        .data(function(row) {
-		            return columns.map(function(column) {
-		                return {column: column, value: row[column]};
-		            });
-		        })
-		        .enter()
-		        .append("td")
-		            .html(function(d) { return d.value; });
-		}
-	});
-}
-			
