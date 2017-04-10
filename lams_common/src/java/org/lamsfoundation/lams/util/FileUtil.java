@@ -48,7 +48,7 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.hibernate.id.Configurable;
 import org.hibernate.id.IdentifierGenerator;
-import org.hibernate.id.UUIDHexGenerator;
+import org.hibernate.id.UUIDGenerator;
 import org.hibernate.type.StringType;
 import org.lamsfoundation.lams.learningdesign.service.ToolContentVersionFilter;
 import org.lamsfoundation.lams.util.zipfile.ZipFileUtilException;
@@ -626,25 +626,19 @@ public class FileUtil {
 	    filename = unEncodedFilename;
 
 	}
-	
-	// wrap filename in quotes as if it contains comma character Chrome can throw a multiple headers error 
+
+	// wrap filename in quotes as if it contains comma character Chrome can throw a multiple headers error
 	filename = "\"" + filename + "\"";
 
 	return filename;
     }
 
     public static String generateUniqueContentFolderID() {
-
-	String newUniqueContentFolderID = null;
-	Properties props = new Properties();
-
-	IdentifierGenerator uuidGen = new UUIDHexGenerator();
-	((Configurable) uuidGen).configure(StringType.INSTANCE, props, null);
+	IdentifierGenerator uuidGen = new UUIDGenerator();
+	((Configurable) uuidGen).configure(StringType.INSTANCE, new Properties(), null);
 
 	// lowercase to resolve OS issues
-	newUniqueContentFolderID = ((String) uuidGen.generate(null, null)).toLowerCase();
-
-	return newUniqueContentFolderID;
+	return ((String) uuidGen.generate(null, null)).toLowerCase();
     }
 
     /**

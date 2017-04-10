@@ -15,7 +15,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.log4j.Logger;
 import org.hibernate.id.Configurable;
 import org.hibernate.id.IdentifierGenerator;
-import org.hibernate.id.UUIDHexGenerator;
+import org.hibernate.id.UUIDGenerator;
 import org.hibernate.type.StringType;
 import org.lamsfoundation.lams.usermanagement.ForgotPasswordRequest;
 import org.lamsfoundation.lams.usermanagement.User;
@@ -99,7 +99,6 @@ public class ForgotPasswordServlet extends HttpServlet {
      * @throws ServletException
      * @throws IOException
      */
-    @SuppressWarnings("unchecked")
     public void handleEmailRequest(Boolean findByEmail, String param, HttpServletResponse response)
 	    throws ServletException, IOException {
 
@@ -278,7 +277,7 @@ public class ForgotPasswordServlet extends HttpServlet {
     public static String generateUniqueKey() {
 	Properties props = new Properties();
 
-	IdentifierGenerator uuidGen = new UUIDHexGenerator();
+	IdentifierGenerator uuidGen = new UUIDGenerator();
 	((Configurable) uuidGen).configure(StringType.INSTANCE, props, null);
 
 	return ((String) uuidGen.generate(null, null)).toLowerCase();

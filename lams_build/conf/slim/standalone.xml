@@ -209,6 +209,10 @@
             
             <logger category="org.hibernate.engine.internal.StatefulPersistenceContext">
                 <level name="ERROR"/>
+            </logger>            
+            
+             <logger category="org.hibernate.hql.internal.ast.HqlSqlWalker">
+                <level name="ERROR"/>
             </logger>
             
             <logger category="org.jboss">
