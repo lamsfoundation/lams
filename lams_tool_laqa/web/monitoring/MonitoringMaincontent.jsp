@@ -24,7 +24,6 @@
 	<link rel="stylesheet" type="text/css" href="${lams}css/jquery.tablesorter.theme.bootstrap.css">
 	<link rel="stylesheet" type="text/css" href="${lams}css/jquery.tablesorter.pager.css"> 
 	<link type="text/css" rel="stylesheet" href="<html:rewrite page='/includes/qalearning.css'/>">
-	
 	<style media="screen,projection" type="text/css">
 		.rating-stars-div {
 			padding-top: 12px;
@@ -95,9 +94,6 @@
 	<script type="text/javascript" src="${lams}includes/javascript/bootstrap.tabcontroller.js"></script>
 	<script type="text/javascript" src="${lams}includes/javascript/jquery.timeago.js"></script>
 	<script type="text/javascript" src="${lams}includes/javascript/timeagoi18n/jquery.timeago.${fn:toLowerCase(localeLanguage)}.js"></script>
-	
-	
- 	<!-- ******************** FCK Editor related javascript & HTML ********************** -->
 	<script type="text/javascript">
 	
 		var POSTED_BY_LABEL = '<fmt:message key="label.posted.by"><fmt:param>{0}</fmt:param><fmt:param>{1}</fmt:param></fmt:message>';
@@ -366,40 +362,39 @@
 	<html:hidden property="httpSessionID"/>					
 	<html:hidden property="contentFolderID"/>	
 	
-<lams:Page title="${title}" type="navbar">
-
-	<lams:Tabs title="${title}" control="true" helpToolSignature="<%= QaAppConstants.MY_SIGNATURE %>" helpModule="monitoring">
-		<lams:Tab id="1" key="label.summary" />
-		<lams:Tab id="2" key="label.editActivity" />
-		<lams:Tab id="3" key="label.stats" />
-	</lams:Tabs>
-
-
-	<lams:TabBodyArea>
-		<lams:TabBodys>
-			<lams:TabBody id="1" titleKey="label.summary" page="SummaryContent.jsp" />
-			<lams:TabBody id="2" titleKey="label.editActivity" page="Edit.jsp" />
-			<lams:TabBody id="3" titleKey="label.stats" page="Stats.jsp" />
-		</lams:TabBodys>
-	</lams:TabBodyArea>
+	<lams:Page title="${title}" type="navbar">
+	
+		<lams:Tabs title="${title}" control="true" helpToolSignature="<%= QaAppConstants.MY_SIGNATURE %>" helpModule="monitoring">
+			<lams:Tab id="1" key="label.summary" />
+			<lams:Tab id="2" key="label.editActivity" />
+			<lams:Tab id="3" key="label.stats" />
+		</lams:Tabs>
+	
+		<lams:TabBodyArea>
+			<lams:TabBodys>
+				<lams:TabBody id="1" titleKey="label.summary" page="SummaryContent.jsp" />
+				<lams:TabBody id="2" titleKey="label.editActivity" page="Edit.jsp" />
+				<lams:TabBody id="3" titleKey="label.stats" page="Stats.jsp" />
+			</lams:TabBodys>
+		</lams:TabBodyArea>
+			
+		<div id="footer"></div>
 		
-	<div id="footer"></div>
-	
-	<div id="edit-response-dialog" title="<fmt:message key='label.modify.users.response' />" class="dialog">
-		<br>
-	</div>
-	
-	<div id="updated-response-editor" class="dialog">
-		<c:choose>
-			<c:when test="${content.allowRichEditor}">
-				<lams:CKEditor id="updated-response" value="" toolbarSet="DefaultMonitor"/>
-			</c:when>
-			<c:otherwise>
-				<lams:textarea name="updated-response" id="updated-response" rows="16" cols="108"> </lams:textarea>
-			</c:otherwise>
-		</c:choose>
-	</div>
-</lams:Page>
+		<div id="edit-response-dialog" title="<fmt:message key='label.modify.users.response' />" class="dialog">
+			<br>
+		</div>
+		
+		<div id="updated-response-editor" class="dialog">
+			<c:choose>
+				<c:when test="${content.allowRichEditor}">
+					<lams:CKEditor id="updated-response" value="" toolbarSet="DefaultMonitor"/>
+				</c:when>
+				<c:otherwise>
+					<lams:textarea name="updated-response" id="updated-response" rows="16" cols="108"> </lams:textarea>
+				</c:otherwise>
+			</c:choose>
+		</div>
+	</lams:Page>
 </html:form>
 </body>
 </lams:html>
