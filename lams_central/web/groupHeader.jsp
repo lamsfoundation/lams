@@ -9,7 +9,7 @@
 	<div class="course-right-buttons pull-right">
 	<div class="btn-group">
 	  <button type="button" class="btn btn-primary btn-sm dropdown-toggle ${addTourClass?'tour-more-options':''}" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><i class="fa fa-fw fa-sliders" title="<fmt:message key="index.moreActions" />"></i> <span class="hidden-xs"><fmt:message key="index.moreActions" /></span> <span class="caret"></span></button>
-	  <ul class="dropdown-menu" style="padding: 10px;">
+	  <ul id="more-links-menu" class="dropdown-menu">
 		<c:forEach var="link" items="${org.moreLinks}">
 			 <li onClick="${link.url}"
 	                      <c:if test="${not empty link.tooltip}">
