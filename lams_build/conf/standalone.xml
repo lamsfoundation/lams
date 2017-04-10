@@ -208,15 +208,7 @@
                     <handler name="HIBERNATEFILE" />
                 </handlers>
             </logger>
-            
-            <logger category="org.hibernate.engine.StatefulPersistenceContext"
-            	use-parent-handlers="false">
-                <level name="ERROR" />
-                <handlers>
-                    <handler name="HIBERNATEFILE" />
-                </handlers>
-            </logger>
-            
+
             <logger category="org.springframework.beans.factory.support.DefaultListableBeanFactory">
             	<level name="INFO"/>
             </logger>
@@ -226,6 +218,10 @@
             </logger>
             
             <logger category="org.hibernate.engine.internal.StatefulPersistenceContext">
+                <level name="ERROR"/>
+            </logger>
+            
+             <logger category="org.hibernate.hql.internal.ast.HqlSqlWalker">
                 <level name="ERROR"/>
             </logger>
             
