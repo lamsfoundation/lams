@@ -48,4 +48,7 @@ $lamslesson  = $DB->get_record('lamslesson', array('lesson_id' => $lsid), '*', M
 
 $gradebookmark = lamslesson_get_lams_outputs($user->username,$lamslesson,$user->username);
 
+// let LAMS know that mark retrieval process has finished successfully
+echo 'OK';
+
 ?>
