@@ -19,34 +19,52 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
   http://www.gnu.org/licenses/gpl.txt
 --%>
 
-<%@ page language="java" pageEncoding="UTF-8"
-	contentType="text/html;charset=utf-8"%>
+<%@ page language="java" pageEncoding="UTF-8" contentType="text/html;charset=utf-8"%>
 <%@ taglib uri="tags-bean" prefix="bean"%>
 <%@ taglib uri="tags-html" prefix="html"%>
 <%@ taglib uri="tags-core" prefix="c"%>
 <%@ taglib uri="tags-fmt" prefix="fmt"%>
 <%@ taglib uri="tags-lams" prefix="lams"%>
+<c:set var="displayPrintButton"><lams:Configuration key="DisplayPrintButton"/></c:set>
+<c:set var="lastName"><lams:user property="lastName"/></c:set>
+<c:set var="firstName"><lams:user property="firstName"/></c:set>
 
 <script type="text/javascript" src="<lams:LAMSURL />includes/javascript/jquery.js"></script>
 <script type="text/javascript" src="<lams:LAMSURL />includes/javascript/bootstrap.min.js"></script>
-
-<c:set var="displayPrintButton"><lams:Configuration key="DisplayPrintButton"/></c:set>
-
 <script type="text/javascript">
 	function restartLesson(){
 		if (confirm('<fmt:message key="message.learner.progress.restart.confirm"/>')) {
 			window.location.href = "<lams:WebAppURL/>learner.do?method=restartLesson&lessonID=${lessonID}";
 		}
 	}
+	
+	// submit lesson total mark to the integrated server in case request comes from an integrated server
+	if (${not empty lessonFinishUrl}) {
+		$.ajax({ 
+		    url: "${lessonFinishUrl}",
+		    type: "POST",
+		    dataType: 'html',
+			cache: false,
+			async: 'false',
+		    success: function (data) {
+		    	//log mark has been successfullly pushed to the integrated server
+		    	if (data && data == 'OK') {
+		    		$.ajax({ 
+		    		    url: "<lams:WebAppURL/>logLessonMarkPushedToIntegrations",
+		    		    data: {lessonID: "${lessonID}"},
+		    		    type: "POST",
+		    			cache: false
+		    		});		    		
+		    	}
+		    },
+		    error: function (ajaxContext) {
+		        alert("There was an error on trying to submit lesson total mark to the integrated server: " + ajaxContext.responseText)
+		    }
+		});
+	}
 </script>
 
 <lams:Page type="learner">
-	<c:set var="lastName">
-		<lams:user property="lastName"/> 
-	</c:set>
-	<c:set var="firstName">
-	 <lams:user property="firstName"/>
-	</c:set>
 	
 	<div class="lead"><i class="fa fa-lg fa-check-square-o text-success"></i>&nbsp;
 		<fmt:message key="message.lesson.finished">
@@ -95,7 +113,3 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 	</c:if>
 	
 </lams:Page>
-
-<c:if test="${not empty lessonFinishUrl}">
-	<img width="0" height="0" style="border: none;" src="${lessonFinishUrl}" />
-</c:if>

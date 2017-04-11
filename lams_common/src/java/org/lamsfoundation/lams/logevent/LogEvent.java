@@ -47,6 +47,8 @@ public class LogEvent implements Serializable {
     public static final int TYPE_TEACHER_LESSON_CHANGE_STATE = 4;
     public static final int TYPE_LEARNER_ACTIVITY_START = 5;
     public static final int TYPE_LEARNER_ACTIVITY_FINISH = 6;
+    public static final int TYPE_LEARNER_LESSON_COMPLETE = 7;
+    public static final int TYPE_LEARNER_LESSON_MARK_SUBMIT = 8;
     /** *************************************************************** */
 
     /** identifier field */
