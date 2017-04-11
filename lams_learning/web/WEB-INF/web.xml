@@ -103,9 +103,22 @@
 			org.lamsfoundation.lams.learning.web.RepopulateProgressMarksServlet
 		</servlet-class>
 	</servlet>
+	
+	<servlet>
+		<servlet-name>LogLessonMarkPushedToIntegrationsServlet</servlet-name>
+		<servlet-class>
+			org.lamsfoundation.lams.learning.web.LogLessonMarkPushedToIntegrationsServlet
+		</servlet-class>
+	</servlet>	
+	
 	<servlet-mapping>
 		<servlet-name>RepopulateProgressMarksServlet</servlet-name>
 		<url-pattern>/repopulateProgress</url-pattern>
+	</servlet-mapping>
+	
+	<servlet-mapping>
+		<servlet-name>LogLessonMarkPushedToIntegrationsServlet</servlet-name>
+		<url-pattern>/logLessonMarkPushedToIntegrations</url-pattern>
 	</servlet-mapping>
 
 	<!-- Optional Module Placeholder - do not remove -->

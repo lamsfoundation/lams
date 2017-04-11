@@ -370,6 +370,11 @@ public class ProgressEngine {
 	learnerProgress.setCurrentActivity(null);
 	learnerProgress.setNextActivity(null);
 	learnerProgress.setLessonComplete(completionStatus);
+
+	// log learner has completed the current lesson event
+	logEventService.logEvent(LogEvent.TYPE_LEARNER_LESSON_COMPLETE, learnerProgress.getUser().getUserId(), null,
+		learnerProgress.getLesson().getLessonId(), null);
+
 	return learnerProgress;
     }
 
