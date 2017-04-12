@@ -375,6 +375,7 @@ public class LearningAction extends Action {
 	    Boolean onePage = (Boolean) sessionMap.get(SurveyConstants.ATTR_SHOW_ON_ONE_PAGE);
 	    if ( ! onePage && surveyItemList.size() > 0) {
 		answerForm.setQuestionSeqID(surveyItemMap.firstKey());
+		questionSeqID = surveyItemMap.firstKey();
 	    }
 	}
 
