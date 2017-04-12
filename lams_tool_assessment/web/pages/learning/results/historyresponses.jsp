@@ -1,24 +1,22 @@
 <%@ include file="/common/taglibs.jsp"%>
 
 <c:if test="${assessment.allowHistoryResponses && (fn:length(question.questionResults) > 1)}">
-	<div id="quesion-summary-title">
-		<fmt:message key="label.learning.question.summary.history.responces" />
-	</div>
+	<h5 class="text-muted"><fmt:message key="label.learning.question.summary.history.responces" /></h5>
 
-	<table class="forum question-summary-table">
+	<table class="table table-striped text-muted">
 		<tr>
-			<th>
+			<th style="width: 70px">
 				#
 			</th>		
-			<th style="width: 120px;" >
+			<th style="width: 25%">
 				<fmt:message key="label.learning.summary.completed.on" />
 			</th>
 			<th>
 				<fmt:message key="label.learning.question.summary.response" />
 			</th>
 			<c:if test="${assessment.allowGradesAfterAttempt}">			
-				<th style="width: 70px;" >
-					<fmt:message key="label.learning.question.summary.grade" />
+				<th style="width: 70px" >
+					<fmt:message key="label.authoring.basic.list.header.mark" />
 				</th>	
 			</c:if>		
 		</tr>
@@ -31,7 +29,7 @@
 				</td>
 				<td>
 					<div>
-						<lams:Date value="${currentAssessmentResult.finishDate}" /> 
+						<lams:Date value="${currentAssessmentResult.finishDate}" timeago="true"/> 
 					</div>
 				</td>					
 				<td>
