@@ -82,7 +82,7 @@
 						'questionResultUid',
   						'Question',
   						"<fmt:message key="label.monitoring.user.summary.response" />",
-  						"<fmt:message key="label.monitoring.user.summary.grade" />"],
+  						"<fmt:message key="label.authoring.basic.list.header.mark" />"],
 					    
 			   	colModel:[
 	  			   		{name:'id', index:'id', width:20, sorttype:"int"},
