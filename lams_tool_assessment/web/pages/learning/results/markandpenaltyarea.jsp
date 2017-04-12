@@ -12,7 +12,7 @@
 			<fmt:param><fmt:formatNumber value="${question.mark}" maxFractionDigits="3"/></fmt:param>
 			<fmt:param>${question.grade}</fmt:param>
 		</fmt:message>&nbsp;		
-		<c:if test="${(question.mark != question.defaultGrade) && (fn:length(question.questionResults) > 1)}">
+		<c:if test="${(question.penalty ne 0) && (question.mark != question.defaultGrade) && (fn:length(question.questionResults) > 1) }">
 			<fmt:message key="label.learning.penalty" >
 				<fmt:param><fmt:formatNumber value="${question.penalty}" maxFractionDigits="2"/></fmt:param>
 			</fmt:message>
