@@ -6,6 +6,10 @@
 <lams:head>
 	<title><fmt:message key="label.learning.title" /></title>
 	<%@ include file="/common/header.jsp"%>
+	
+	<c:set var="localeLanguage"><lams:user property="localeLanguage" /></c:set>
+	<script type="text/javascript" src="<lams:LAMSURL />/includes/javascript/jquery.timeago.js"></script> 
+	<script type="text/javascript" src="${lams}includes/javascript/timeagoi18n/jquery.timeago.${fn:toLowerCase(localeLanguage)}.js"></script>
 
 	<c:set var="ctxPath" value="${pageContext.request.contextPath}"	scope="request" />
 	<%-- param has higher level for request attribute --%>
@@ -24,6 +28,10 @@
 	<c:set var="isLeadershipEnabled" value="${assessment.useSelectLeaderToolOuput}"/>
 	
 	<script type="text/javascript">
+		$(document).ready(function() {
+			$("time.timeago").timeago();
+		});
+	
 		function disableButtons() {
 			$('.btn').prop('disabled',true);
 		}
