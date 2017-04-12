@@ -1221,7 +1221,7 @@ public class AssessmentServiceImpl
 		    summaryRowTitle[2] = new ExcelCell(getMessage("label.monitoring.summary.total"), true, ExcelCell.BORDER_STYLE_BOTTOM_THIN);
 		    summaryTabLearnerList.add(summaryRowTitle);
 
-		    float minGrade = 0;
+		    float minGrade = -9999999;
 		    float maxGrade = 0;
 
 		    for (AssessmentUserDTO userDto : userDtos) {
@@ -1233,12 +1233,13 @@ public class AssessmentServiceImpl
 			userResultRow[2] = new ExcelCell(grade, false);
 			summaryTabLearnerList.add(userResultRow);
 
-			if ( minGrade == 0 || grade < minGrade )
+			if ( grade < minGrade || minGrade == -9999999  )
 			    minGrade = grade;
 			if ( grade > maxGrade )
 			    maxGrade = grade;
-
 		    }
+		    if ( minGrade == -9999999)
+			minGrade = 0;
 
 		    LinkedHashMap<String, Integer> markSummary = getMarksSummaryForSession(userDtos, minGrade, maxGrade, 10);
 		    // work out total marks so we can do percentages. need as float for the correct divisions
@@ -1296,6 +1297,7 @@ public class AssessmentServiceImpl
 	ExcelCell[] summaryTitle = new ExcelCell[1];
 	summaryTitle[0] = new ExcelCell(getMessage("label.export.question.summary"), true);
 	questionSummaryTab.add(summaryTitle);
+	questionSummaryTab.add(EMPTY_ROW);
 
 	Map<Long, QuestionSummary> questionSummaries = getQuestionSummaryForExport(assessment);
 
@@ -1328,8 +1330,32 @@ public class AssessmentServiceImpl
 	    questionTitleRow[count++] = new ExcelCell(getMessage("label.export.mark"), true,
 		    ExcelCell.BORDER_STYLE_BOTTOM_THIN);
 
+	    int questionNumber = 1;
+	    
 	    for (AssessmentQuestion question : questions) {
 		int colsNum = showUserNames ? 10 : 9;
+
+		ExcelCell[] questionTitle = new ExcelCell[1];
+		questionTitle[0] = new ExcelCell(getMessage("label.monitoring.question.summary.question") + " "
+			+ questionNumber++, true);
+		questionSummaryTab.add(questionTitle);
+
+		// set up the summary table data for the top of the question area.
+		boolean doSummaryTable = question.getType() == AssessmentConstants.QUESTION_TYPE_MULTIPLE_CHOICE
+			|| question.getType() == AssessmentConstants.QUESTION_TYPE_SHORT_ANSWER
+			|| question.getType() == AssessmentConstants.QUESTION_TYPE_NUMERICAL
+			|| question.getType() == AssessmentConstants.QUESTION_TYPE_TRUE_FALSE;
+		// For MC, Numeric & Short Answer Key is optionUid, Value is number of answers
+		// For True/False Key 0 is false and Key 1 is true
+		Map<Long, Integer> summaryOfAnswers = new HashMap<Long, Integer>();
+		Integer summaryNACount = 0;
+		Long trueKey = 1L;
+		Long falseKey = 0L;
+		if (doSummaryTable) {
+		    questionSummaryTab.add(startSummaryTable(question, summaryOfAnswers, trueKey, falseKey));
+		}
+		
+		ArrayList<ExcelCell[]> questionSummaryTabTemp = new ArrayList<ExcelCell[]>();
 
 		//add question title row
 		if (question.getType() == AssessmentConstants.QUESTION_TYPE_MARK_HEDGING) {
@@ -1361,9 +1387,9 @@ public class AssessmentServiceImpl
 		    }
 		    hedgeQuestionTitleRow[count++] = new ExcelCell(getMessage("label.export.time.taken"), true);
 		    hedgeQuestionTitleRow[count++] = new ExcelCell(getMessage("label.export.mark"), true);
-		    questionSummaryTab.add(hedgeQuestionTitleRow);
+		    questionSummaryTabTemp.add(hedgeQuestionTitleRow);
 		} else {
-		    questionSummaryTab.add(questionTitleRow);
+		    questionSummaryTabTemp.add(questionTitleRow);
 		}
 
 		QuestionSummary questionSummary = questionSummaries.get(question.getUid());
@@ -1411,6 +1437,11 @@ public class AssessmentServiceImpl
 			} else {
 			    userResultRow[count++] = new ExcelCell(
 				    AssessmentEscapeUtils.printResponsesForExcelExport(questionResult), false);
+			    
+			    if ( doSummaryTable ) { 
+				summaryNACount = updateSummaryCounts(question, questionResult, summaryOfAnswers, summaryNACount);
+			    }
+
 			}
 			//time taken
 			if (questionResult.getAssessmentResult() != null) {
@@ -1425,7 +1456,7 @@ public class AssessmentServiceImpl
 			}
 			//mark
 			userResultRow[count++] = new ExcelCell(questionResult.getMark(), false);
-			questionSummaryTab.add(userResultRow);
+			questionSummaryTabTemp.add(userResultRow);
 
 			//calculating markCount & markTotal
 			if (questionResult.getMark() != null) {
@@ -1435,6 +1466,11 @@ public class AssessmentServiceImpl
 		    }
 		}
 
+		if (doSummaryTable) {
+		    questionSummaryTab.add(outputSummaryTable(question, summaryOfAnswers, summaryNACount, trueKey, falseKey));
+		    questionSummaryTab.add(EMPTY_ROW);
+		}
+		
 		// Calculating the averages
 		ExcelCell[] averageRow;
 
@@ -1454,7 +1490,7 @@ public class AssessmentServiceImpl
 		    }
 		} else {
 		    averageRow = new ExcelCell[9];
-		    averageRow[6] = new ExcelCell(getMessage("label.export.average"), true);
+		    averageRow[6] = new ExcelCell(getMessage("label.	.average"), true);
 
 		    if (timeTakenTotal > 0) {
 			averageRow[7] = new ExcelCell(new Long(timeTakenTotal / timeTakenCount), false);
@@ -1467,8 +1503,10 @@ public class AssessmentServiceImpl
 		    }
 		}
 
+		questionSummaryTab.addAll(questionSummaryTabTemp);
 		questionSummaryTab.add(averageRow);
 		questionSummaryTab.add(EMPTY_ROW);
+		
 	    }
 
 	}
@@ -1653,6 +1691,136 @@ public class AssessmentServiceImpl
 	return dataToExport;
     }
 
+    private ExcelCell[] startSummaryTable(AssessmentQuestion question, Map<Long, Integer> summaryOfAnswers,
+	    Long trueKey, Long falseKey) {
+	ExcelCell[] summaryTable;
+	int i = 0;
+	if (question.getType() == AssessmentConstants.QUESTION_TYPE_MULTIPLE_CHOICE
+		|| question.getType() == AssessmentConstants.QUESTION_TYPE_SHORT_ANSWER
+		|| question.getType() == AssessmentConstants.QUESTION_TYPE_NUMERICAL) {
+	    summaryTable = new ExcelCell[question.getOptions().size() + 1];
+	    for (AssessmentQuestionOption option : question.getOptions()) {
+		summaryOfAnswers.put(option.getUid(), 0);
+		StringBuilder bldr = new StringBuilder(getMessage("label.authoring.basic.option.answer"))
+			.append(" ")
+			.append(i + 1)
+			.append(" - ");
+		if ( question.getType() == AssessmentConstants.QUESTION_TYPE_NUMERICAL ) {
+		    bldr.append(option.getOptionFloat())
+		    	.append(" +- ")
+		    	.append(option.getAcceptedError());
+		} else {
+		    bldr.append(option.getOptionString().replaceAll("\\<.*?\\>", ""));
+		}
+		summaryTable[i] = new ExcelCell(bldr.toString(), false);
+		i++;
+	    }
+	    if ( question.getType() == AssessmentConstants.QUESTION_TYPE_MULTIPLE_CHOICE ) {
+		summaryTable[i++] = new ExcelCell(getMessage("label.not.answered"), false); 
+	    } else {
+		summaryTable[i++] = new ExcelCell(getMessage("label.other"), false); 
+	    }
+	} else {
+	    summaryTable = new ExcelCell[3];
+	    summaryTable[0] = new ExcelCell(getMessage("label.authoring.true.false.true"), false);
+	    summaryTable[1] = new ExcelCell(getMessage("label.authoring.true.false.false"), false);
+	    summaryTable[2] = new ExcelCell(getMessage("label.not.answered"), false); 
+	    summaryOfAnswers.put(trueKey, 0);
+	    summaryOfAnswers.put(falseKey, 0);
+	}
+	return summaryTable;
+    }
+
+    private Integer updateSummaryCounts(AssessmentQuestion question, AssessmentQuestionResult questionResult,
+	    Map<Long, Integer> summaryOfAnswers, Integer summaryNACount) {
+	if (question.getType() == AssessmentConstants.QUESTION_TYPE_MULTIPLE_CHOICE) {
+	    boolean foundOption = false;
+	    Set<AssessmentOptionAnswer> optionAnswers = questionResult.getOptionAnswers();
+	    if (optionAnswers != null) {
+		for (AssessmentOptionAnswer optionAnswer : optionAnswers) {
+		    if (optionAnswer.getAnswerBoolean()) {
+			Integer currentCount = summaryOfAnswers.get(optionAnswer.getOptionUid());
+			if (currentCount == null) {
+			    log.error("Assessment Export: Unable to count answer in summary, refers to an unexpected option. QuestionResult "
+				    + questionResult.getUid()
+				    + " OptionUid "
+				    + optionAnswer.getOptionUid()
+				    + " question " + question.getUid());
+			} else {
+			    summaryOfAnswers.put(optionAnswer.getOptionUid(), currentCount + 1);
+			    foundOption = true;
+			}
+		    }
+		}
+	    }
+	    if (!foundOption) {
+		summaryNACount++;
+	    }
+	} else if (question.getType() == AssessmentConstants.QUESTION_TYPE_SHORT_ANSWER
+		|| question.getType() == AssessmentConstants.QUESTION_TYPE_NUMERICAL) {
+	    Long submittedUid = questionResult.getSubmittedOptionUid();
+	    if (submittedUid != null) {
+		Integer currentCount = summaryOfAnswers.get(submittedUid);
+		if (currentCount == null) {
+		    log.error("Assessment Export: Unable to count answer in summary, refers to an unexpected option. QuestionResult "
+			    + questionResult.getUid()
+			    + " submittedOptionUid "
+			    + submittedUid
+			    + " question "
+			    + question.getUid());
+		} else {
+		    summaryOfAnswers.put(submittedUid, currentCount + 1);
+		}
+	    } else {
+		summaryNACount++;
+	    }
+	} else if (question.getType() == AssessmentConstants.QUESTION_TYPE_TRUE_FALSE) {
+	    if (questionResult.getAnswerString() == null) {
+		summaryNACount++;
+	    } else {
+		long key = questionResult.getAnswerBoolean() ? 1 : 0;
+		Integer currentCount = summaryOfAnswers.get(key);
+		summaryOfAnswers.put(key, currentCount + 1);
+	    }
+	}
+	return summaryNACount;
+    }
+
+    private String valueAsPercentage(Integer value, int total) {
+	Double percentage = (double) value / total * 100;
+	return NumberUtil.formatLocalisedNumber(percentage, (Locale)null, 2) + "%";
+    } 
+    
+    private ExcelCell[] outputSummaryTable(AssessmentQuestion question, Map<Long, Integer> summaryOfAnswers,
+	    Integer summaryNACount, Long trueKey, Long falseKey) {
+	ExcelCell[] summaryTable = new ExcelCell[summaryOfAnswers.size()+1];
+	int total = summaryNACount;
+	for ( int value : summaryOfAnswers.values() ) {
+	total += value;
+	}
+	int i = 0;
+	if (question.getType() == AssessmentConstants.QUESTION_TYPE_MULTIPLE_CHOICE
+		|| question.getType() == AssessmentConstants.QUESTION_TYPE_SHORT_ANSWER
+		|| question.getType() == AssessmentConstants.QUESTION_TYPE_NUMERICAL ) {
+	for (AssessmentQuestionOption option : question.getOptions()) {
+	    summaryTable[i] = new ExcelCell(valueAsPercentage(summaryOfAnswers.get(option.getUid()), total), false);
+	    if ( option.getGrade() > 0 ) {
+		summaryTable[i].setColor(IndexedColors.GREEN);
+	    }
+	    i++;
+	}
+	summaryTable[i++] = new ExcelCell(valueAsPercentage(summaryNACount, total), false);
+	} else {
+	summaryTable = new ExcelCell[3];
+	summaryTable[0] = new ExcelCell(valueAsPercentage(summaryOfAnswers.get(trueKey), total), false);
+	summaryTable[1] = new ExcelCell(valueAsPercentage(summaryOfAnswers.get(falseKey), total), false);
+	summaryTable[2] = new ExcelCell(valueAsPercentage(summaryNACount,total), false);
+	summaryTable[question.getCorrectAnswer() ? 0 : 1].setColor(IndexedColors.GREEN);
+	}
+	return summaryTable;
+    }
+
+ 
     /**
      * Used only for excell export (for getUserSummaryData() method).
      */
@@ -2071,7 +2239,6 @@ public class AssessmentServiceImpl
 	    }
 	}
 	
-	// TODO optimise. At least start with the top bucket!
 	for (AssessmentUserDTO userDto : userDtos) {
 	    float grade = userDto.getGrade();
 	    int bucketStart = intMinGrade;
@@ -2088,7 +2255,6 @@ public class AssessmentServiceImpl
 	    }
 	}
 	
-	// TODO get locale
 	for ( Map.Entry<Integer, Integer> entry : inProgress.entrySet() ) {
 	    String key;
 	    if ( bucketSize == 1 )
