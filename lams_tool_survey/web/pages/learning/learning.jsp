@@ -67,7 +67,7 @@
 				</c:when>
 				<c:otherwise>
 					<c:set var="question" value="${sessionMap.questionList[questionSeqID]}" />
-					<fmt:message key="label.question" /> ${currentIdx} <fmt:message key="label.of" /> ${sessionMap.totalQuestions}
+					<fmt:message key="label.question" />&nbsp;${currentIdx}&nbsp;<fmt:message key="label.of" />&nbsp;${sessionMap.totalQuestions}
 						<%@ include file="/pages/learning/question.jsp"%>
 				</c:otherwise>
 			</c:choose>
