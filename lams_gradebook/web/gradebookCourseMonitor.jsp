@@ -84,7 +84,7 @@
 			      {name:'id', index:'id', sortable:false, editable:false, hidden:true, search:false, hidedlg:true},
 			      {name:'rowName',index:'rowName', sortable:true, editable:false},
 			      {name:'subGroup',index:'subGroup', sortable:false, editable:false, search:false, width:80},
-			      {name:'startDate',index:'startDate', sortable:true, editable:false, hidden:true, search:false, width:80, align:"center"},
+			      {name:'startDate',index:'startDate', sortable:true, editable:false, search:false, width:80, align:"center"},
 			      {name:'avgTimeTaken',index:'avgTimeTaken', sortable:true, editable:false, search:false, width:80, align:"center"},
 			      {name:'avgMark',index:'avgMark', sortable:true, editable:false, search:false, width:50, align:"center"}
 			    ],
@@ -125,8 +125,8 @@
 					     	{name:'rowName',index:'rowName', sortable:true, editable:false},
 					      	{name:'status', index:'status', sortable:false, editable:false, search:false, title:false, width:50, align:"center"},
 					      	{name:'timeTaken', index:'timeTaken', sortable:true, editable:false, search:false, width:80, align:"center"},
-						    {name:'startDate',index:'startDate', sortable:true, editable:false, hidden:true, search:false, width:85, align:"left"},
-						    {name:'finishDate',index:'finishDate', sortable:false, editable:false, hidden:true, search:false, width:85, align:"left"},
+						    {name:'startDate',index:'startDate', sortable:true, editable:false, search:false, width:85, align:"left"},
+						    {name:'finishDate',index:'finishDate', sortable:false, editable:false, search:false, width:85, align:"left"},
 					     	{name:'feedback',index:'feedback', sortable:false, editable:true, edittype:'textarea', editoptions:{rows:'4',cols:'20'} , search:false},
 					     	{name:'mark',index:'mark', sortable:true, editable:true, editrules:{number:true}, search:false, width:50, align:"center"}
 					     ],
@@ -181,6 +181,7 @@
 					},
 					gridComplete: function(){
 						toolTip($(".jqgrow"));	// enable tooltips for grid
+						processLessonDateFields( lessonDatesHidden, jQuery("#organisationGrid") ); // LDEV-4289 hide dates to start
 					}	
 			}).navGrid("#organisationGridPager", {edit:false,add:false,del:false,search:false})
 				
