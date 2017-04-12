@@ -3,46 +3,6 @@
 	margin-top: 10px;
 }
 
-table.forum th {
-	font-size: inherit;
-	border-left: none;
-}
-table.forum {
-	background:none; 
-	border: 1px solid #cacdd1; 
-	padding-top:0px; 
-	margin-bottom: 10px;
-	border-spacing: 0px;
-    border-collapse: separate;
-}
-table.forum.question-summary-table {
-	width: 83%; 
-	padding: 0px 15px 0px; 
-	font-style: italic; 
-	color:#47bc23; 
-	border: none;
-}
-table.forum.question-summary-table th{
-	padding-top:0px; 
-}
-table.forum.question-summary-table th:first-child{
-	width: 30px; 
-	border-left: none; 
-	padding-left:0px; 
-	text-align: center;
-}
-table.forum.question-summary-table td{
-	padding-left: 15px; 
-	vertical-align: middle; 
-	background: none; 
-}
-table.forum.question-summary-table td:first-child{
-	padding-left: 10px;
-}
-table.forum.question-summary-table tr:last-child td{
-	border-bottom: none;
-}
-
 .innerforms {
 	border: 0px;
 	font-size: small;
@@ -50,26 +10,11 @@ table.forum.question-summary-table tr:last-child td{
 	width:100%;
 }
 
-div.message {
-    background-color: #FFE4C4;
-    border: 1px solid #000;
-    color: #000000;
-    font-family: Arial, Helvetica, sans-serif;
-    font-weight: normal;
-    margin: 10px auto;
-    padding: 8px;
-    text-align: left;
-    vertical-align: bottom;
-}
-
 img.validationWarning, div.errors img.icon, div.messages img.icon {
     border: 0;
     width: 14px;
     height: 13px;
     vertical-align: top;
-}
-div.message img.icon {
-    vertical-align: middle;
 }
 
 div.growlUI h1, div.growlUI h2 {
@@ -109,17 +54,6 @@ div.growlUI h1, div.growlUI h2 {
 .complete-item-gif img {
 	border:1px;
 }
-.question-feedback, div.question-feedback {
-	padding: 10px 15px 0px; 
-	font-style: italic; 
-	color:#47bc23;
-}
-
-#quesion-summary-title {
-	padding: 2px 15px 10px; 
-	font-style: italic; 
-	color:#47bc23;
-}
 
 #pager {
 	text-align: center; 
@@ -156,6 +90,7 @@ table.table-row-spacing {
 	font-size: small; font-style: italic; margin-top: -8px;
 }
 
+/* Chart in Monitoring */
 .chartDiv {
 	margin-top: 10px;
 	margin-left: 10px;
