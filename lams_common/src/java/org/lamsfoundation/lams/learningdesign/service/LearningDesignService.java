@@ -144,8 +144,9 @@ public class LearningDesignService implements ILearningDesignService {
     }
 
     public void setToolDAO(IToolDAO toolDAO) {
-        this.toolDAO = toolDAO;
+	this.toolDAO = toolDAO;
     }
+
     /**********************************************
      * Service Methods
      *******************************************/
@@ -317,8 +318,7 @@ public class LearningDesignService implements ILearningDesignService {
 		}
 		toolDTO.setLearningLibraryId(learningLibrary.getLearningLibraryID());
 		toolDTO.setLearningLibraryTitle(learningLibrary.getTitle());
-		toolDTO.setToolDisplayName(
-			isParallel ? learningLibrary.getTitle() : libraryActivityDTO.getActivityTitle());
+		toolDTO.setToolDisplayName(libraryActivityDTO.getActivityTitle());
 		toolDTO.setActivityCategoryID(
 			isParallel ? Activity.CATEGORY_SPLIT : libraryActivityDTO.getActivityCategoryID());
 		toolDTO.setValid(learningLibrary.getValidFlag());
