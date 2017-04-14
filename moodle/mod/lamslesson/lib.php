@@ -149,6 +149,9 @@ function lamslesson_delete_instance($id) {
     # Delete any dependent records here #
     $DB->delete_records('lamslesson', array('id' => $lamslesson->id));
     
+    // Delete grade item for given lamslesson
+    lamslesson_grade_item_delete($lamslesson);
+    
     // delete the lesson from LAMS server
     lamslesson_delete_lesson($USER->username, $lsId);
 
@@ -167,7 +170,7 @@ function lamslesson_delete_lesson($username,$lsId) {
   global $CFG, $USER;
   if (!isset($CFG->lamslesson_serverid, $CFG->lamslesson_serverkey) || $CFG->lamslesson_serverid == "") {
     print_error(get_string('notsetup', 'lamslesson'));
-    return NULL;
+    return false;
   }
 
   $datetime = lamslesson_get_datetime();
