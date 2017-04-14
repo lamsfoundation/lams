@@ -27,10 +27,11 @@ import java.io.UnsupportedEncodingException;
 import java.net.ConnectException;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.net.URLEncoder;
-import java.text.DecimalFormat;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -47,22 +48,23 @@ import org.lamsfoundation.ld.integration.util.LamsSecurityUtil;
 import org.lamsfoundation.ld.integration.util.LineitemUtil;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
+import blackboard.base.InitializationException;
+import blackboard.data.ValidationException;
 import blackboard.data.course.CourseMembership;
 import blackboard.data.gradebook.Lineitem;
 import blackboard.data.gradebook.Score;
 import blackboard.data.user.User;
 import blackboard.persist.Id;
 import blackboard.persist.KeyNotFoundException;
+import blackboard.persist.PersistenceException;
 import blackboard.persist.course.CourseMembershipDbLoader;
 import blackboard.persist.gradebook.ScoreDbLoader;
-import blackboard.persist.gradebook.ScoreDbPersister;
 import blackboard.persist.user.UserDbLoader;
+import blackboard.platform.BbServiceException;
 import blackboard.platform.BbServiceManager;
 import blackboard.platform.context.ContextManager;
-import blackboard.util.StringUtil;
 
 /**
  * Deals with Blackboard Grade Center.
@@ -172,6 +174,21 @@ public class GradebookServlet extends HttpServlet {
 	    //updates and persists currentScore in the DB
 	    LineitemUtil.updateScoreBasedOnLamsResponse(lesson, learnerResult, currentScore);
 	    
+	    // get LAMS server address
+	    String serverUrlWithLamsWord = LamsSecurityUtil.getServerAddress();
+	    URI uri = new URI(serverUrlWithLamsWord);
+	    //strip out '/lams/' from the end of the URL
+	    String serverUrl = serverUrlWithLamsWord.lastIndexOf(uri.getPath()) == -1 ? serverUrlWithLamsWord
+		    : serverUrlWithLamsWord.substring(0, serverUrlWithLamsWord.lastIndexOf(uri.getPath()));
+	    
+	    //allow lessonComplete.jsp on LAMS side to make an Ajax call to this servlet
+	    response.addHeader("Access-Control-Allow-Origin", serverUrl);
+	    
+	    //notifying LAMS that score has been stored successfully
+	    response.setContentType("text/html");
+	    PrintWriter out = response.getWriter();
+	    out.write("OK");
+	    
 	    //the following paragraph is kept due to the Ernie's request to keep it for potential usage in the future
 //	    NodeList activities = document.getDocumentElement().getFirstChild().getChildNodes();
 //
@@ -217,7 +234,15 @@ public class GradebookServlet extends HttpServlet {
 	    throw new ServletException(e);
 	} catch (SAXException e) {
 	    throw new ServletException(e);
-	} catch (Exception e) {
+	} catch (URISyntaxException e) {
+	    throw new ServletException(e);
+	} catch (PersistenceException e) {
+	    throw new ServletException(e);
+	} catch (ValidationException e) {
+	    throw new ServletException(e);
+	} catch (InitializationException e) {
+	    throw new ServletException(e);
+	} catch (BbServiceException e) {
 	    throw new ServletException(e);
 	} finally {
 	    // make sure context is released
@@ -225,10 +250,7 @@ public class GradebookServlet extends HttpServlet {
 		ctxMgr.releaseContext();
 	    }
 	}
-	
-	response.setContentType("text/html");
-	PrintWriter out = response.getWriter();
-        out.write("OK");
+
     }
 
 }
