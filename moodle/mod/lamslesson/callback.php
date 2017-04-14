@@ -48,7 +48,14 @@ $lamslesson  = $DB->get_record('lamslesson', array('lesson_id' => $lsid), '*', M
 
 $gradebookmark = lamslesson_get_lams_outputs($user->username,$lamslesson,$user->username);
 
-// let LAMS know that mark retrieval process has finished successfully
+//allow lessonComplete.jsp on LAMS side to make an Ajax call to this PHP script
+$parsed_url = parse_url("$CFG->lamslesson_serverurl");
+$lams_server_url = isset($parsed_url['scheme']) ? $parsed_url['scheme'].'://' : '';
+$lams_server_url .= $parsed_url['host'];
+$lams_server_url .= isset($parsed_url['port']) ? ':'.$parsed_url['port'] : '';
+header("Access-Control-Allow-Origin: ".$lams_server_url);
+
+// let LAMS know that mark has been stored successfully
 echo 'OK';
 
 ?>
