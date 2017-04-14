@@ -159,7 +159,7 @@
 			<%@ include file="favoriteOrganisations.jsp"%>
             
 			<div class="form-group offcanvas-search">
-				<input type="text" id="offcanvas-search-input" class="form-control input-sm" placeholder="Search for courses..."
+				<input type="text" id="offcanvas-search-input" class="form-control input-sm" placeholder="<fmt:message key="label.search.for.courses" />..."
 						data-column="1" type="search">
 			</div>
             
