@@ -69,7 +69,7 @@ define('LAMSLESSON_LD_SERVICE_SVG', '/services/LearningDesignSVG');
 define('LAMSLESSON_LESSON_MANAGER', '/services/xml/LessonManager');
 define('LAMSLESSON_LAMS_SERVERTIME', 'services/getServerTime');
 define('LAMSLESSON_POPUP_OPTIONS', 'location=0,toolbar=0,menubar=0,statusbar=0,width=996,height=700,resizable');
-define('LAMSLESSON_OUTPUT_METHOD', 'toolOutputsUser');
+define('LAMSLESSON_OUTPUT_METHOD', 'gradebookMarksUser');
 
 /**
  * If you for some reason need to use global variables instead of constants, do not forget to make them
@@ -671,7 +671,6 @@ function lamslesson_fill_lesson($username,$lsid,$courseid,$country,$lang,$member
 function lamslesson_get_lams_outputs($username,$lamslesson,$foruser) {
   global $CFG, $DB;
 
-  //$datetime = date('F d,Y g:i a');
   $datetime = lamslesson_get_datetime();
   $plaintext = trim($datetime)
     .trim($username)
@@ -681,52 +680,23 @@ function lamslesson_get_lams_outputs($username,$lamslesson,$foruser) {
   $request = $CFG->lamslesson_serverurl. LAMSLESSON_LESSON_MANAGER;
   
   $load = array('serverId'	=> 	$CFG->lamslesson_serverid,
-		'courseId'	=>	$lamslesson->course,
 		'username'	=>	$username,
 		'datetime'	=>	strtolower($datetime),
 		'hashValue'	=>	$hash,
-		'lang'		=>	'en',	
-		'country'	=>	'AU',
 		'method'	=> 	LAMSLESSON_OUTPUT_METHOD,
 		'lsId'		=>	$lamslesson->lesson_id,
 		'outputsUser'	=>	$foruser);
 
   // GET call to LAMS
-
   $xml = lamslesson_http_call_post($request, $load);
 
+  // Get user total mark and lesson max possible mark
   $results = xmlize($xml);
-
-  // Get the outputs from the activities
-  $learneroutputs = $results['ToolOutputs']['#']['LearnerOutput'];
-  $activityoutputs = $learneroutputs['0']['#']['Activity'];
+  $lessonElement = $results['GradebookMarks']['#']['Lesson']['0'];
+  $learnerElement = $lessonElement['#']['Learner']['0'];
   
-  $maxresult = 0;
-  $userresult = 0;
-  
-  // Calculate max and user results (if they exist)
-  
-  foreach ($activityoutputs as $k => $v){
-    // If activities don't have or produce any output then we just ignore them
-    if (!empty($v['#'])) {
-      foreach ($v['#']['ToolOutput'] as $k2 => $v2) {
-	$activityoutputname = $v2['@']['name'];
-	// The only numeric outputs we get from LAMS are for the MCQ and Assessment activities
-	// learner.total.score = Assessment 
-	// learner.mark = MCQ
-	if ($activityoutputname == 'learner.mark' || $activityoutputname == 'learner.total.score') {
-	  $actname = $v2['@']['name'];
-	  $actmaxresult = $v2['@']['marksPossible'];
-	  $actuserresult = $v2['@']['output'];
-	  $userresult += $actuserresult;
-	  $maxresult += $actmaxresult;
-	  
-	}
-      }
-    }
-    
-  }
-
+  $maxresult = $lessonElement['@']['lessonMaxPossibleMark'];
+  $userresult = $learnerElement['@']['userTotalMark'];
   
   // If there's outputs from LAMS, then we process them and add them to the gradebook
   if (!$maxresult == 0) {
@@ -739,7 +709,6 @@ function lamslesson_get_lams_outputs($username,$lamslesson,$foruser) {
     lamslesson_update_grades($lamslesson, $user->id, $gradebookmark);
 
     return $gradebookmark;
-      
   }
     
 }
