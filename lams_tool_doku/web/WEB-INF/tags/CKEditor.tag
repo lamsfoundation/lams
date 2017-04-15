@@ -21,11 +21,11 @@
 </c:set>
 
 <c:if test="${empty toolbarSet}">
-	<c:set var="toolbarSet" value="Default" />
+	<c:set var="toolbarSet" value="DefaultDoku" />
 </c:if>
 
-<c:if test="${fn:containsIgnoreCase(method,'Inline')}">
-	<c:set var="toolbarSet">${toolbarSet}Inline</c:set>
+<c:if test="${fn:containsIgnoreCase(method,'DefaultDoku')}">
+	<c:set var="toolbarSet">${toolbarSet}DefaultDoku</c:set>
 </c:if>
 
 <c:if test="${empty displayExpanded}">
