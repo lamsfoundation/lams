@@ -11,6 +11,9 @@ CKEDITOR.config.toolbar_DefaultInline = [
     ['Paint_Button','oembed','Image','Link','Iframe','Table','HorizontalRule','Smiley','SpecialChar','Templates','Format','Font','FontSize','About']
 ];
 
+CKEDITOR.config.toolbar_DefaultDoku = [
+                                   	['Bold','Italic','Underline','StrikeThrough','NumberedList','BulletedList','Indent','Outdent','Undo','Redo']
+];
 // removing Video Recorder from default tool bar LDEV-2961
 // To include it back, just add 'VideoRecorder' in between the MoviePlayer and Kaltura
 
