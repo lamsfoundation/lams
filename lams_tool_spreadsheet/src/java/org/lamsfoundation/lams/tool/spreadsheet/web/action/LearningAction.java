@@ -176,8 +176,7 @@ public class LearningAction extends Action {
 	}
 	
 	String code;
-	if (spreadsheet.isLearnerAllowedToSave() && !mode.isTeacher()
-		&& (spreadsheetUser.getUserModifiedSpreadsheet() != null)) {
+	if (spreadsheet.isLearnerAllowedToSave() && (spreadsheetUser.getUserModifiedSpreadsheet() != null)) {
 	    code = spreadsheetUser.getUserModifiedSpreadsheet().getUserModifiedSpreadsheet();
 	} else {
 	    code = spreadsheet.getCode();
@@ -228,7 +227,10 @@ public class LearningAction extends Action {
 		&& !(spreadsheet.getLockWhenFinished() && userFinished)) {
 
 	    SpreadsheetUser spreadsheetUser = getCurrentUser(service, sessionId);
-	    UserModifiedSpreadsheet userModifiedSpreadsheet = new UserModifiedSpreadsheet();
+	    UserModifiedSpreadsheet userModifiedSpreadsheet = spreadsheetUser.getUserModifiedSpreadsheet();
+	    if ( userModifiedSpreadsheet == null ) {
+	    	userModifiedSpreadsheet = new UserModifiedSpreadsheet();
+	    }
 	    String code = WebUtil.readStrParam(request, SpreadsheetConstants.ATTR_CODE);
 	    userModifiedSpreadsheet.setUserModifiedSpreadsheet(code);
 	    spreadsheetUser.setUserModifiedSpreadsheet(userModifiedSpreadsheet);
