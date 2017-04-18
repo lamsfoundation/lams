@@ -327,7 +327,7 @@ GeneralInitLib = {
 			if (!title) {
 				return;
 			}
-			if (!GeneralLib.nameValidator.test(title)) {
+			if (!GeneralLib.validateName(title)) {
     			alert(LABELS.TITLE_VALIDATION_ERROR);
     			return;
     		}
@@ -490,7 +490,7 @@ GeneralInitLib = {
 			if (!title || ldNode.label == title) {
 				return;
 			}
-			if (!GeneralLib.nameValidator.test(title)) {
+			if (!GeneralLib.validateName(title)) {
     			alert(LABELS.TITLE_VALIDATION_ERROR);
     			return;
     		}
@@ -549,7 +549,7 @@ GeneralInitLib = {
 				return;
 			}
 			
-			if (!GeneralLib.nameValidator.test(title)) {
+			if (!GeneralLib.validateName(title)) {
 				alert(LABELS.TITLE_VALIDATION_ERROR);
 				return;
 			}
@@ -2828,5 +2828,12 @@ GeneralLib = {
 							});
 			});
 		}
-	}
+	},
+	
+	/**
+	 *  Checks if activity, LD etc. name is correct
+	 */
+	 validateName : function(name) {
+		 return name && GeneralLib.nameValidator.test(name);
+	 }
 };
