@@ -68,11 +68,12 @@ var PropertyDefs = {
 				} 
 				// validate and save the title
 				if (newTitle != branchingActivity.title) {
-					if (GeneralLib.nameValidator.test(newTitle)) {
+					if (GeneralLib.validateName(newTitle)) {
 						branchingActivity.title = newTitle;
 						redrawNeeded = true;
             		} else {
             			alert(LABELS.TITLE_VALIDATION_ERROR);
+            			$('.propertiesContentFieldTitle', content).val(branchingActivity.title);
             		}
 				}
 				branchingActivity.branchingType = $('.propertiesContentFieldBranchingType', content).val();
@@ -198,11 +199,12 @@ var PropertyDefs = {
 				} 
 				// validate and save the title
 				if (newTitle != activity.title) {
-					if (GeneralLib.nameValidator.test(newTitle)) {
+					if (GeneralLib.validateName(newTitle)) {
 						activity.title = newTitle;
 						redrawNeeded = true;
             		} else {
             			alert(LABELS.TITLE_VALIDATION_ERROR);
+            			$('.propertiesContentFieldTitle', content).val(activity.title);
             		}
 				}
 				
@@ -306,11 +308,12 @@ var PropertyDefs = {
 				} 
 				// validate and save the title
 				if (newTitle != activity.title) {
-					if (GeneralLib.nameValidator.test(newTitle)) {
+					if (GeneralLib.validateName(newTitle)) {
 						activity.title = newTitle;
 						redrawNeeded = true;
             		} else {
             			alert(LABELS.TITLE_VALIDATION_ERROR);
+            			$('.propertiesContentFieldTitle', content).val(activity.title);
             		}
 				}
 				
@@ -432,11 +435,12 @@ var PropertyDefs = {
 				} 
 				// validate and save the title
 				if (newTitle != label.title) {
-					if (GeneralLib.nameValidator.test(newTitle)) {
+					if (GeneralLib.validateName(newTitle)) {
 						label.title = newTitle;
 						redrawNeeded = true;
             		} else {
             			alert(LABELS.TITLE_VALIDATION_ERROR);
+            			$('.propertiesContentFieldTitle', content).val(label.title);
             		}
 				}
 				
@@ -492,7 +496,7 @@ var PropertyDefs = {
 				} 
 				// validate and save the title
 				if (newTitle != activity.title) {
-					if (GeneralLib.nameValidator.test(newTitle)) {
+					if (GeneralLib.validateName(newTitle)) {
             			activity.title = newTitle;
     					ActivityLib.removeSelectEffect(activity);
 						activity.draw();
@@ -500,6 +504,7 @@ var PropertyDefs = {
 						GeneralLib.setModified(true);
             		} else {
             			alert(LABELS.TITLE_VALIDATION_ERROR);
+            			$('.propertiesContentFieldTitle', content).val(activity.title);
             		}
 				}
 			});
@@ -563,11 +568,12 @@ var PropertyDefs = {
 				} 
 				// validate and save the title
 				if (newTitle != activity.title) {
-					if (GeneralLib.nameValidator.test(newTitle)) {
+					if (GeneralLib.validateName(newTitle)) {
 						activity.title = newTitle;
 						redrawNeeded = true;
             		} else {
             			alert(LABELS.TITLE_VALIDATION_ERROR);
+            			$('.propertiesContentFieldTitle', content).val(activity.title);
             		}
 				}
 				var newGroupingValue = $('.propertiesContentFieldGrouping option:selected', content)
@@ -630,11 +636,12 @@ var PropertyDefs = {
 				} 
 				// validate and save the title
 				if (newTitle != region.title) {
-					if (GeneralLib.nameValidator.test(newTitle)) {
+					if (GeneralLib.validateName(newTitle)) {
 						region.title = newTitle;
 						redrawNeeded = true;
             		} else {
             			alert(LABELS.TITLE_VALIDATION_ERROR);
+            			$('.propertiesContentFieldTitle', content).val(region.title);
             		}
 				}
 				redrawNeeded |= newColor != color;
@@ -682,11 +689,12 @@ var PropertyDefs = {
 				} 
 				// validate and save the title
 				if (newTitle != activity.title) {
-					if (GeneralLib.nameValidator.test(newTitle)) {
+					if (GeneralLib.validateName(newTitle)) {
 						activity.title = newTitle;
 						redrawNeeded = true;
             		} else {
             			alert(LABELS.TITLE_VALIDATION_ERROR);
+            			$('.propertiesContentFieldTitle', content).val(activity.title);
             		}
 				}
 				
@@ -745,7 +753,7 @@ var PropertyDefs = {
 				
 				// validate and save the title
 				if (newTitle != transition.title) {
-            		if (GeneralLib.nameValidator.test(newTitle)) {
+            		if (GeneralLib.validateName(newTitle)) {
 						transition.title = newTitle;
 						if (transition.branch) {
 							transition.branch.title = newTitle;
@@ -753,6 +761,7 @@ var PropertyDefs = {
 						redrawNeeded = true;
             		} else {
             			alert(LABELS.TITLE_VALIDATION_ERROR);
+            			$('.propertiesContentFieldTitle', content).val(transition.title);
             		}
 				}
 				
@@ -820,7 +829,7 @@ PropertyLib = {
 			// extract group names from text fields and validate them
 			$('input', groupNamingContent).each(function(){
 				var groupName = $(this).val().trim();
-	    		if (GeneralLib.nameValidator.test(groupName)) {
+	    		if (GeneralLib.validateName(groupName)) {
 	    			names.push(groupName);
 	    		} else {
 	    			error = LABELS.GROUP_TITLE_VALIDATION_ERORR;
