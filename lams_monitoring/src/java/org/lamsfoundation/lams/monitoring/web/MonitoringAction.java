@@ -1025,8 +1025,8 @@ public class MonitoringAction extends LamsDispatchAction {
 
 	Integer possibleLearnersCount = getLessonService().getCountLessonLearners(lessonId, null);
 	Integer completedLearnersCount = getMonitoringService().getCountLearnersCompletedLesson(lessonId);
-	Integer startedLearnersCount = getLessonService().getCountActiveLessonLearners(lessonId);
-	Integer notCompletedLearnersCount = possibleLearnersCount - completedLearnersCount;
+	Integer startedLearnersCount = getLessonService().getCountActiveLessonLearners(lessonId)- completedLearnersCount;
+	Integer notCompletedLearnersCount = possibleLearnersCount - completedLearnersCount - startedLearnersCount ;
 
 	JSONObject responseJSON = new JSONObject();
 	JSONObject notStartedJSON = new JSONObject();
@@ -1037,7 +1037,7 @@ public class MonitoringAction extends LamsDispatchAction {
 	JSONObject startedJSON = new JSONObject();
 	startedJSON.put("name", getMessageService().getMessage("lesson.chart.started"));
 	startedJSON.put("value", Math
-		.round((startedLearnersCount - completedLearnersCount.doubleValue()) / possibleLearnersCount * 100));
+		.round((startedLearnersCount.doubleValue()) / possibleLearnersCount * 100));
 	responseJSON.append("data", startedJSON);
 
 	JSONObject completedJSON = new JSONObject();
