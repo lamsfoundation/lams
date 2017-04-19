@@ -68,13 +68,12 @@ public class QaOutputFactory extends OutputFactory {
 	    Class arrayofStringArraysClass = String[][].class;
 	    switch (definitionType) {
 		case ToolOutputDefinition.DATA_OUTPUT_DEFINITION_TYPE_CONDITION:
-//		    ToolOutputDefinition userAnswersDefinition = buildComplexOutputDefinition(
-//			    QaAppConstants.USER_ANSWERS_DEFINITION_NAME, stringArrayClass);
-//
-//		    // adding all existing conditions
-//		    userAnswersDefinition
-//			    .setDefaultConditions(new ArrayList<BranchCondition>(qaContent.getConditions()));
-//		    definitionMap.put(QaAppConstants.USER_ANSWERS_DEFINITION_NAME, userAnswersDefinition);
+		    ToolOutputDefinition userAnswersDefinition = buildComplexOutputDefinition(
+			    QaAppConstants.USER_ANSWERS_DEFINITION_NAME, stringArrayClass);
+
+		    // adding all existing conditions
+		    userAnswersDefinition.setConditions(new ArrayList<BranchCondition>(qaContent.getConditions()));
+		    definitionMap.put(QaAppConstants.USER_ANSWERS_DEFINITION_NAME, userAnswersDefinition);
 
 		    break;
 		case ToolOutputDefinition.DATA_OUTPUT_DEFINITION_TYPE_DATA_FLOW:

@@ -18,7 +18,7 @@
 	            table="tl_laqa11_condition_questions"
 	            lazy="false"
 	            inverse="false"
-	            cascade="all"
+	            cascade="save-update"
 	            sort="unsorted"
 	            order-by="question_uid asc"
 	     >
