@@ -10,13 +10,20 @@
 		border-right-style: none !important;
 		border-bottom-style: none !important;
 	}
-	
 	.ui-jqgrid tr {
 		border-left-style: none !important;
 	}
-	
 	.ui-jqgrid td {
 		border-style: none !important;
+	}
+	.ui-jqgrid tr.jqgrow td {
+	    white-space: normal !important;
+	    height:auto;
+	    vertical-align:text-top;
+	    padding-top:2px;
+	}
+	.ui-jqgrid tr.jqgrow td {
+		vertical-align:middle !important
 	}
 </style>
 
@@ -111,7 +118,7 @@
 			   		{name:'id', index:'id', width:0, sorttype:"int", hidden: true},
 			   		{name:'groupName', index:'groupName', width:150},
 			   		{name:'feedback', index:'feedback', width:520},
-			   		{name:'count', index:'count', width:70}
+			   		{name:'count', index:'count', align:"right", width:70}
 			   	],
 			   	// caption: "${scratchieItem.title}"
 			});

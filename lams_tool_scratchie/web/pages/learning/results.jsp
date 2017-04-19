@@ -35,7 +35,9 @@
 		    vertical-align:text-top;
 		    padding-top:2px;
 		}
-		.ui-jqgrid tr.jqgrow td {vertical-align:middle !important}
+		.ui-jqgrid tr.jqgrow td {
+			vertical-align:middle !important
+		}
 	</style>
 
 	<script type="text/javascript" src="${lams}includes/javascript/jquery.jqGrid.locale-en.js"></script>
