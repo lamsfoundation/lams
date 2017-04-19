@@ -185,12 +185,16 @@ public class LearningAction extends Action {
 	sessionMap.put(SpreadsheetConstants.ATTR_RESOURCE, spreadsheet);
 
 	if ((spreadsheetUser != null) && (spreadsheetUser.getUserModifiedSpreadsheet() != null)
-		&& (spreadsheetUser.getUserModifiedSpreadsheet().getMark() != null)
-		&& (spreadsheetUser.getUserModifiedSpreadsheet().getMark().getDateMarksReleased() != null)) {
+		&& (spreadsheetUser.getUserModifiedSpreadsheet().getMark() != null)) {
+	    request.setAttribute(SpreadsheetConstants.ATTR_USER_IS_MARKED, true);
+	    if ( (spreadsheetUser.getUserModifiedSpreadsheet().getMark().getDateMarksReleased() != null)) {
 	    request.setAttribute(SpreadsheetConstants.ATTR_USER_MARK,
-		    spreadsheetUser.getUserModifiedSpreadsheet().getMark());
+		 spreadsheetUser.getUserModifiedSpreadsheet().getMark());
+	    }
+	} else {
+	    request.setAttribute(SpreadsheetConstants.ATTR_USER_IS_MARKED, false);
 	}
-
+	
 	ActivityPositionDTO activityPosition = LearningWebUtil.putActivityPositionInRequestByToolSessionId(sessionId,
 		request, getServlet().getServletContext());
 	sessionMap.put(AttributeNames.ATTR_ACTIVITY_POSITION, activityPosition);
@@ -228,13 +232,16 @@ public class LearningAction extends Action {
 
 	    SpreadsheetUser spreadsheetUser = getCurrentUser(service, sessionId);
 	    UserModifiedSpreadsheet userModifiedSpreadsheet = spreadsheetUser.getUserModifiedSpreadsheet();
-	    if ( userModifiedSpreadsheet == null ) {
-	    	userModifiedSpreadsheet = new UserModifiedSpreadsheet();
-	    }
-	    String code = WebUtil.readStrParam(request, SpreadsheetConstants.ATTR_CODE);
-	    userModifiedSpreadsheet.setUserModifiedSpreadsheet(code);
-	    spreadsheetUser.setUserModifiedSpreadsheet(userModifiedSpreadsheet);
-	    service.saveOrUpdateUser(spreadsheetUser);
+
+	    if ( spreadsheetUser.getUserModifiedSpreadsheet() == null || spreadsheetUser.getUserModifiedSpreadsheet().getMark() == null ) {
+		if ( userModifiedSpreadsheet == null ) {
+		    userModifiedSpreadsheet = new UserModifiedSpreadsheet();
+		}
+		String code = WebUtil.readStrParam(request, SpreadsheetConstants.ATTR_CODE);
+		userModifiedSpreadsheet.setUserModifiedSpreadsheet(code);
+		spreadsheetUser.setUserModifiedSpreadsheet(userModifiedSpreadsheet);
+		service.saveOrUpdateUser(spreadsheetUser);
+	    } 
 	}
 
 	String typeOfAction = WebUtil.readStrParam(request, "typeOfAction");

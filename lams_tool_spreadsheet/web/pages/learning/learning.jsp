@@ -51,6 +51,12 @@
 				</c:choose>
 			</lams:Alert>
 		</c:if>
+		<c:if test="${userIsMarked && !(sessionMap.lockOnFinish and mode != 'teacher' && sessionMap.userFinished)}">
+			<lams:Alert type="info" id="lockWhenFinished" close="false">
+				<fmt:message key="message.spreadsheet.marked" />
+			</lams:Alert>
+		</c:if>
+		
 
 		<%@ include file="/common/messages.jsp"%>
 		
@@ -109,7 +115,7 @@
 						scrolling="no">
 						</iframe>
 				
-					<c:if test="${(mode != 'teacher') && (spreadsheet.learnerAllowedToSave) && !(sessionMap.lockOnFinish && sessionMap.userFinished)}">
+					<c:if test="${!userIsMarked && (mode != 'teacher') && (spreadsheet.learnerAllowedToSave) && !(sessionMap.lockOnFinish && sessionMap.userFinished)}">
 						<div class="space-bottom-top align-right">
 							<html:button property="SaveButton" onclick="return saveUserSpreadsheet('saveUserSpreadsheet')" styleClass="btn btn-primary voffset10 pull-right">
 								<fmt:message key="label.save" />
