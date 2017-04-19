@@ -48,7 +48,6 @@
  		
 		<script>        
 		    function doSelectTab(tabId) {
-		    	debugger;
 		    	if ( tabId == 3 )
 		    		doStatistic();
 			   	selectTab(tabId);
