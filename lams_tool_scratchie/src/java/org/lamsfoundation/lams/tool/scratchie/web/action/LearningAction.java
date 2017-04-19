@@ -595,6 +595,10 @@ public class LearningAction extends Action {
 
 	service.removeLike(burningQuestionUid, sessionId);
 
+	JSONObject JSONObject = new JSONObject();
+	JSONObject.put("added", true);
+	response.setContentType("application/json;charset=utf-8");
+	response.getWriter().print(JSONObject);
 	return null;
     }
 

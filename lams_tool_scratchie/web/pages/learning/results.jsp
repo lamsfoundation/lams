@@ -43,9 +43,11 @@
 	<script type="text/javascript" src="${lams}includes/javascript/jquery.jqGrid.locale-en.js"></script>
 	<script type="text/javascript" src="${lams}includes/javascript/jquery.jqGrid.js"></script>
 	<script type="text/javascript">
-		function likeEntry(burningQuestionUid) {
-
-			var isLike = $( '#like-'+burningQuestionUid ).hasClass( 'fa-thumbs-o-up' );
+		function likeEntry(scratchieItemUid, rowid, burningQuestionUid) {
+			
+			var jqGrid = $("#burningQuestions" + scratchieItemUid);
+			var likeCell = jqGrid.jqGrid('getCell', rowid, 'like');
+			var isLike = likeCell.includes( 'fa-thumbs-o-up' );
 
 			if (isLike) {
 				$.ajax({
@@ -56,16 +58,18 @@
 					}
 				})
 			    .done(function (response) {	       		
-		    		if ( ! burningQuestionUid ) {
-						alert('<fmt:message key="error.cannot.redisplay.please.refresh"/>');
-		  			} else if ( response.added ) {
-		  				var currentCount = eval($('#count-'+burningQuestionUid).html());
-		  				currentCount += 1;
-			       		$('#count-'+burningQuestionUid).html(currentCount);
+		    		if ( response.added ) {
+		    			//update 'count' column
+		  				var currentCount = eval(jqGrid.jqGrid('getCell', rowid, 'count'));
+		  				jqGrid.jqGrid('setCell', rowid, 'count', currentCount + 1);
+		  				
+		  				//update 'like' column
+		  				jqGrid.jqGrid('setCell',rowid,'like', likeCell.replace("fa-thumbs-o-up", "fa-thumbs-up"));
+		  				
+					} else {
+						alert("Error");
 					}
 				});
-				
-				$( '#like-'+burningQuestionUid ).removeClass( 'fa-thumbs-o-up' ).addClass( 'fa-thumbs-up' );
 				
 			} else {
 				$.ajax({
@@ -76,16 +80,18 @@
 					}
 				})
 			    .done(function (response) {
-		    		if ( ! burningQuestionUid ) {
-						alert('<fmt:message key="error.cannot.redisplay.please.refresh"/>');
+			    	if ( response.added ) {
+			    		//update 'count' column
+		  				var currentCount = eval(jqGrid.jqGrid('getCell', rowid, 'count'));
+		  				jqGrid.jqGrid('setCell', rowid, 'count', currentCount - 1);
+		  				
+		  				//update 'like' column
+		  				jqGrid.jqGrid('setCell',rowid,'like', likeCell.replace("fa-thumbs-up", "fa-thumbs-o-up"));
+			       		
 		  			} else {
-		  				var currentCount = eval($('#count-'+burningQuestionUid).html());
-		  				currentCount -= 1;
-			       		$('#count-'+burningQuestionUid).html(currentCount);
+						alert("Error");
 					}
 				});
-		
-				$( '#like-'+burningQuestionUid ).removeClass( 'fa-thumbs-up' ).addClass( 'fa-thumbs-o-up' );
 			}
 
 		}
@@ -133,14 +139,14 @@
 				   			</c:when>
 							<c:when test="${burningQuestionDto.userLiked}">
 								like:'<span class="fa fa-thumbs-up fa-2x" title="<fmt:message key="label.unlike"/>"' +
-										'onclick="javascript:likeEntry(${burningQuestionDto.burningQuestion.uid});" id="like-${burningQuestionDto.burningQuestion.uid}" />',
+										'onclick="javascript:likeEntry(${scratchieItem.uid}, ${i.index + 1}, ${burningQuestionDto.burningQuestion.uid});" />',
 							</c:when>
 							<c:otherwise>
 								like:'<span class="fa fa-thumbs-o-up fa-2x" title="<fmt:message key="label.like"/>"' +
-										'onclick="javascript:likeEntry(${burningQuestionDto.burningQuestion.uid});" id="like-${burningQuestionDto.burningQuestion.uid}" />',
+										'onclick="javascript:likeEntry(${scratchieItem.uid}, ${i.index + 1}, ${burningQuestionDto.burningQuestion.uid});" />',
 							</c:otherwise>
 						</c:choose>
-				   	 	count:'<span id="count-${burningQuestionDto.burningQuestion.uid}">${burningQuestionDto.likeCount}</span>'
+				   	 	count:'${burningQuestionDto.likeCount}'
 			   	   	});
 		        </c:forEach>
 
