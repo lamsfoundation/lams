@@ -1423,13 +1423,11 @@ ActivityLib = {
 				// find the matching existing output and replace its conditions
 				$.each(response, function(){
 					var output = this;
-					if (output.conditions) {
-						$.each(activity.outputDefinitions, function(){
-							if (output.name == this.name) {
-								this.conditions = output.conditions;
-							}
-						});
-					}
+					$.each(activity.outputDefinitions, function(){
+						if (output.name == this.name) {
+							this.conditions = output.conditions;
+						}
+					});
 				});
 			}
 		});
