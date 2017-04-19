@@ -19,6 +19,7 @@
 	            lazy="false"
 	            inverse="false"
 	            sort="unsorted"
+	            cascade="save-update"
 	            order-by="topic_uid asc"
 	            
 	     >
