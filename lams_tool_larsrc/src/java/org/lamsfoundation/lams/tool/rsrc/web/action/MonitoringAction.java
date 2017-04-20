@@ -36,6 +36,7 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import org.apache.commons.lang.StringEscapeUtils;
+import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.apache.struts.action.Action;
 import org.apache.struts.action.ActionForm;
@@ -149,7 +150,7 @@ public class MonitoringAction extends Action {
 	int rowLimit = WebUtil.readIntParam(request, AttributeNames.PARAM_ROWS);
 	String sortOrder = WebUtil.readStrParam(request, AttributeNames.PARAM_SORD);
 	String sortBy = WebUtil.readStrParam(request, AttributeNames.PARAM_SIDX, true);
-	if (sortBy == "") {
+	if (StringUtils.isEmpty(sortBy)) {
 	    sortBy = "userName";
 	}
 	String searchString = WebUtil.readStrParam(request, "userName", true);
