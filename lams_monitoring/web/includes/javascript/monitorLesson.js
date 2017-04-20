@@ -560,7 +560,7 @@ function initSequenceTab(){
 	var learnerGroupDialog = showDialog('learnerGroupDialog',{
 			'autoOpen'  : false,
 			'width'     : 400,
-			'height'	: 400,
+			'height'	: 430,
 			'resizable' : true,
 			'open'      : function(){
 				autoRefreshBlocked = true;
