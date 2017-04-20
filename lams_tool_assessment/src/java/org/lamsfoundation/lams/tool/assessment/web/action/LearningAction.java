@@ -29,6 +29,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedHashSet;
@@ -78,6 +79,7 @@ import org.lamsfoundation.lams.tool.assessment.util.AnswerIntComparator;
 import org.lamsfoundation.lams.tool.assessment.util.SequencableComparator;
 import org.lamsfoundation.lams.tool.assessment.web.form.ReflectionForm;
 import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
+import org.lamsfoundation.lams.util.AlphanumComparator;
 import org.lamsfoundation.lams.util.DateUtil;
 import org.lamsfoundation.lams.util.ValidationUtil;
 import org.lamsfoundation.lams.util.WebUtil;
@@ -346,9 +348,19 @@ public class LearningAction extends Action {
 		questionDto.setOptionDtos(new LinkedHashSet<OptionDTO>(shuffledList));
 	    }
 	    if (questionDto.getType() == AssessmentConstants.QUESTION_TYPE_MATCHING_PAIRS) {
-		ArrayList<OptionDTO> shuffledList = new ArrayList<OptionDTO>(questionDto.getOptionDtos());
-		Collections.shuffle(shuffledList);
-		questionDto.setMatchingPairOptions(new LinkedHashSet<OptionDTO>(shuffledList));
+		//sort answer options alphanumerically (as per LDEV-4326)
+		ArrayList<OptionDTO> optionsSortedByOptionString = new ArrayList<OptionDTO>(
+			questionDto.getOptionDtos());
+		optionsSortedByOptionString.sort(new Comparator<OptionDTO>() {
+		    @Override
+		    public int compare(OptionDTO o1, OptionDTO o2) {
+			String optionString1 = o1.getOptionString() != null ? o1.getOptionString() : "";
+			String optionString2 = o2.getOptionString() != null ? o2.getOptionString() : "";
+			
+			return AlphanumComparator.compareAlphnumerically(optionString1, optionString2);
+		    }
+		});
+		questionDto.setMatchingPairOptions(new LinkedHashSet<OptionDTO>(optionsSortedByOptionString));
 	    }
 	}
 

@@ -11,11 +11,17 @@
 				<td>
 					<c:out value="${option.question}" escapeXml="false" />
 				</td>
+				
 				<td style="width: 100px;">
 					<html:select property="question${status.index}_${option.sequenceId}" value="${option.answerInt}" disabled="${!hasEditRight}">
-						<html:option value="-1"><fmt:message key="label.learning.matching.pairs.choose" /></html:option>
+						<html:option value="-1">
+							<fmt:message key="label.learning.matching.pairs.choose" />
+						</html:option>
+						
 						<c:forEach var="selectOption" items="${question.matchingPairOptions}">
-							<html:option value="${selectOption.uid}">${selectOption.optionString}</html:option>
+							<html:option value="${selectOption.uid}">
+								${selectOption.optionString}
+							</html:option>
 						</c:forEach>
 					</html:select>
 				</td>
