@@ -337,7 +337,7 @@ public class McMonitoringAction extends LamsDispatchAction implements McAppConst
 	int rowLimit = WebUtil.readIntParam(request, AttributeNames.PARAM_ROWS);
 	String sortOrder = WebUtil.readStrParam(request, AttributeNames.PARAM_SORD);
 	String sortBy = WebUtil.readStrParam(request, AttributeNames.PARAM_SIDX, true);
-	if (sortBy == "") {
+	if (StringUtils.isEmpty(sortBy)) {
 	    sortBy = "userName";
 	}
 	String searchString = WebUtil.readStrParam(request, "userName", true);
