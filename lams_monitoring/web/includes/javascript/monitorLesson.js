@@ -1,4 +1,4 @@
-﻿﻿﻿﻿﻿﻿// ********** GLOBAL VARIABLES **********
+﻿﻿﻿﻿﻿﻿﻿// ********** GLOBAL VARIABLES **********
 // copy of lesson SVG so it does no need to be fetched every time
 var originalSequenceCanvas = null,
 // DIV container for lesson SVG
@@ -103,7 +103,7 @@ function initLessonTab(){
 	// sets up dialog for editing class
 	var classDialog = showDialog('classDialog',{
 		'autoOpen'  : false,
-		'width'     : 700,
+		'width'     : 450,
 		'title' 	: LABELS.LESSON_EDIT_CLASS,
 		'resizable' : true,
 		'open'      : function(){
