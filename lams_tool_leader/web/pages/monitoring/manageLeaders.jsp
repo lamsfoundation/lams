@@ -1,6 +1,4 @@
-<!DOCTYPE html> 
-	
-
+<!DOCTYPE html>
 <%@ include file="/common/taglibs.jsp"%>
 
 <c:set var="lams"><lams:LAMSURL /></c:set>
