@@ -534,10 +534,10 @@
 	
 	<div id="learnerGroupDialogContents" class="dialogContainer">
 		<span id="learnerGroupMultiSelectLabel"><fmt:message key='learner.group.multi.select'/></span>
-		<table>
+		<table id="" class="table table-striped">
 			<tr id="learnerGroupSearchRow">
 				<td>
-					<span class="dialogSearchPhraseIcon ui-icon ui-icon-search"
+					<span class="dialogSearchPhraseIcon fa fa-xs fa-search"
 						  title="<fmt:message key='search.learner.textbox' />"></span>
 				</td>
 				<td colspan="4">
@@ -602,7 +602,7 @@
 	</div>
 		
 	<div id="classDialogContents" class="dialogContainer">
-		<table id="classDialogTable">
+		<table id="classDialogTable" class="table table-striped">
 			<tr>
 				<td>
 					<table id="classLearnerTable">
@@ -613,7 +613,7 @@
 						</tr>
 						<tr>
 							<td>
-								<span class="dialogSearchPhraseIcon ui-icon ui-icon-search"
+								<span class="dialogSearchPhraseIcon fa fa-xs fa-search"
 									  title="<fmt:message key='search.learner.textbox' />"></span>
 							</td>
 							<td colspan="4">
