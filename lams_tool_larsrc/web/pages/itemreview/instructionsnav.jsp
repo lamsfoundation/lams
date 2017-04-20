@@ -1,5 +1,4 @@
 <!DOCTYPE html>
-        
 <%@ include file="/common/taglibs.jsp"%>
 
 <c:set var="sessionMap" value="${sessionScope[sessionMapID]}" />
@@ -32,8 +31,7 @@
 		<c:if test="${not empty param.mode}">
 			<c:set var="mode" value="${param.mode}" />
 		</c:if>
-		<script language="JavaScript" type="text/JavaScript">
-		<!--
+		<script type="text/JavaScript">
 				jQuery.noConflict();
 		
 				function finishIns(){
@@ -96,7 +94,6 @@
 					$.ajaxSetup({ cache: true });
 					$('#headerFrame').load(nextUrl);
 				}
-		//-->
 		</script>
 	</lams:head>
 	<body>
