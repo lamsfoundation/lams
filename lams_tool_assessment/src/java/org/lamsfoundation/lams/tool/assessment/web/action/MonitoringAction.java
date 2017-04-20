@@ -345,7 +345,7 @@ public class MonitoringAction extends Action {
 	int rowLimit = WebUtil.readIntParam(request, GradebookConstants.PARAM_ROWS);
 	String sortOrder = WebUtil.readStrParam(request, GradebookConstants.PARAM_SORD);
 	String sortBy = WebUtil.readStrParam(request, GradebookConstants.PARAM_SIDX, true);
-	if (sortBy == "") {
+	if (StringUtils.isEmpty(sortBy)) {
 	    sortBy = "userName";
 	}
 	String searchString = WebUtil.readStrParam(request, "userName", true);
@@ -429,7 +429,7 @@ public class MonitoringAction extends Action {
 	int rowLimit = WebUtil.readIntParam(request, GradebookConstants.PARAM_ROWS);
 	String sortOrder = WebUtil.readStrParam(request, GradebookConstants.PARAM_SORD);
 	String sortBy = WebUtil.readStrParam(request, GradebookConstants.PARAM_SIDX, true);
-	if (sortBy == "") {
+	if (StringUtils.isEmpty(sortBy)) {
 	    sortBy = "userName";
 	}
 	String searchString = WebUtil.readStrParam(request, "userName", true);
