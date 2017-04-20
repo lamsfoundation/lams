@@ -160,7 +160,6 @@
 		   	    feedback:"<lams:out value='${reflectDTO.reflection}' escapeHtml='true' />"
 	   	   	});
         </c:forEach>
-        
 		
         //jqgrid autowidth (http://stackoverflow.com/a/1610197)
         $(window).bind('resize', function() {
