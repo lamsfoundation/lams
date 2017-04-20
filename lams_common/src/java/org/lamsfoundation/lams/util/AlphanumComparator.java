@@ -49,41 +49,13 @@ import java.util.Comparator;
  *
  */
 public class AlphanumComparator implements Comparator<String> {
-    private final boolean isDigit(char ch) {
-	return ch >= 48 && ch <= 57;
-    }
-
-    /** Length of string is passed in for improved efficiency (only need to calculate it once) **/
-    private final String getChunk(String s, int slength, int marker) {
-	StringBuilder chunk = new StringBuilder();
-	char c = s.charAt(marker);
-	chunk.append(c);
-	marker++;
-	if (isDigit(c)) {
-	    while (marker < slength) {
-		c = s.charAt(marker);
-		if (!isDigit(c)) {
-		    break;
-		}
-		chunk.append(c);
-		marker++;
-	    }
-	} else {
-	    while (marker < slength) {
-		c = s.charAt(marker);
-		if (isDigit(c)) {
-		    break;
-		}
-		chunk.append(c);
-		marker++;
-	    }
-	}
-	return chunk.toString();
-    }
 
     @Override
     public int compare(String s1, String s2) {
-
+	return compareAlphnumerically(s1, s2);
+    }
+    
+    public static int compareAlphnumerically(String s1, String s2) {
 	int thisMarker = 0;
 	int thatMarker = 0;
 	int s1Length = s1.length();
@@ -121,5 +93,37 @@ public class AlphanumComparator implements Comparator<String> {
 	}
 
 	return s1Length - s2Length;
+    }
+    
+    private final static boolean isDigit(char ch) {
+	return ch >= 48 && ch <= 57;
+    }
+
+    /** Length of string is passed in for improved efficiency (only need to calculate it once) **/
+    private static final String getChunk(String s, int slength, int marker) {
+	StringBuilder chunk = new StringBuilder();
+	char c = s.charAt(marker);
+	chunk.append(c);
+	marker++;
+	if (isDigit(c)) {
+	    while (marker < slength) {
+		c = s.charAt(marker);
+		if (!isDigit(c)) {
+		    break;
+		}
+		chunk.append(c);
+		marker++;
+	    }
+	} else {
+	    while (marker < slength) {
+		c = s.charAt(marker);
+		if (isDigit(c)) {
+		    break;
+		}
+		chunk.append(c);
+		marker++;
+	    }
+	}
+	return chunk.toString();
     }
 }
