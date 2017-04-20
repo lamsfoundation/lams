@@ -501,7 +501,7 @@
 								onClick="javascript:learnersPageShift(true)"
 							><span class="ui-icon ui-icon-seek-next"></span></td>
 							<td class="learnersHeaderCell">
-								<fmt:message key='learners.order' /><br />AAA
+								<fmt:message key='learners.order' /><br />
 								<input id="orderByCompletionCheckbox" type="checkbox" 
 									   onChange="javascript:loadLearnerProgressPage()" />
 							</td>
