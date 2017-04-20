@@ -452,7 +452,7 @@
 							</a>
 						</c:if>
 						<span id="sequenceSearchPhraseClear"
-							 class="ui-icon ui-icon-circle-close"
+							 class="fa fa-xs fa-times-circle"
 							 onClick="javascript:sequenceClearSearchPhrase(true)"
 							 title="<fmt:message key='learners.search.phrase.clear.tooltip' />" 
 						></span>
@@ -485,7 +485,7 @@
 								<input id="learnersSearchPhrase" 
 									   title="<fmt:message key='search.learner.textbox' />"/>
 								<span id="learnersSearchPhraseClear"
-									  class="ui-icon ui-icon-circle-close"
+									  class="fa fa-xs fa-times-circle"
 									  onClick="javascript:learnersClearSearchPhrase()"
 									  title="<fmt:message key='learners.search.phrase.clear.tooltip' />" 
 								></span>
@@ -501,7 +501,7 @@
 								onClick="javascript:learnersPageShift(true)"
 							><span class="ui-icon ui-icon-seek-next"></span></td>
 							<td class="learnersHeaderCell">
-								<fmt:message key='learners.order' /><br />
+								<fmt:message key='learners.order' /><br />AAA
 								<input id="orderByCompletionCheckbox" type="checkbox" 
 									   onChange="javascript:loadLearnerProgressPage()" />
 							</td>
@@ -534,7 +534,7 @@
 	
 	<div id="learnerGroupDialogContents" class="dialogContainer">
 		<span id="learnerGroupMultiSelectLabel"><fmt:message key='learner.group.multi.select'/></span>
-		<table id="" class="table table-striped">
+		<table id="listLearners" class="table table-condensed">
 			<tr id="learnerGroupSearchRow">
 				<td>
 					<span class="dialogSearchPhraseIcon fa fa-xs fa-search"
@@ -545,7 +545,7 @@
 						   title="<fmt:message key='search.learner.textbox' />"/>
 				</td>
 				<td>
-					<span class="dialogSearchPhraseClear ui-icon ui-icon-circle-close"
+					<span class="dialogSearchPhraseClear fa fa-xs fa-times-circle"
 						  onClick="javascript:learnerGroupClearSearchPhrase()"
 						  title="<fmt:message key='learners.search.phrase.clear.tooltip' />" 
 					></span>
@@ -602,10 +602,10 @@
 	</div>
 		
 	<div id="classDialogContents" class="dialogContainer">
-		<table id="classDialogTable" class="table table-striped">
+		<table id="classDialogTable" class="table">
 			<tr>
 				<td>
-					<table id="classLearnerTable">
+					<table id="classLearnerTable" class="table table-condensed">
 						<tr>
 							<td class="dialogTitle" colspan="6">
 								<fmt:message key="lesson.learners"/>
@@ -621,7 +621,7 @@
 									   title="<fmt:message key='search.learner.textbox' />"/>
 							</td>
 							<td>
-								<span class="dialogSearchPhraseClear ui-icon ui-icon-circle-close"
+								<span class="dialogSearchPhraseClear fa fa-xs fa-times-circle"
 									  onClick="javascript:classClearSearchPhrase()"
 									  title="<fmt:message key='learners.search.phrase.clear.tooltip' />" 
 								></span>
@@ -672,7 +672,7 @@
 					</table>
 				</td>
 				<td>
-					<table id="classMonitorTable">
+					<table id="classMonitorTable" class="table table-condensed">
 						<tr>
 							<td class="dialogTitle" colspan="6">
 								<fmt:message key="lesson.monitors"/>
