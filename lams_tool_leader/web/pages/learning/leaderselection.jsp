@@ -54,8 +54,8 @@
 			</h4>
 		</c:when>
 		<c:otherwise>
-			<lams:Alert type="info" id="no-leader" close="false">
-				<i><fmt:message key="label.no.leader.yet" /></i>
+			<lams:Alert type="warning" id="no-leader" close="false">
+				<strong><fmt:message key="label.no.leader.yet" /></strong>
 			</lams:Alert>
 		</c:otherwise>
 	</c:choose>
