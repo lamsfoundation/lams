@@ -226,7 +226,6 @@ td.contributeEntryCell a {
 }
 
 #classLearnerTable {
-	width: 320px;
 	border-right: thin solid black;
 }
 
@@ -235,7 +234,6 @@ td.contributeEntryCell a {
 }
 
 #classMonitorTable {
-	width: 320px;
 	margin-left: 10px;
 }
 
