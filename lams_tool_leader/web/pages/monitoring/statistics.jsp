@@ -1,15 +1,16 @@
 <%@ include file="/common/taglibs.jsp"%>
-
 <c:set var="dto" value="${leaderselectionDTO}" />
+
 <c:forEach var="session" items="${dto.sessionDTOs}">
 
 	<c:if test="${isGroupedActivity}">
 		<div class="panel panel-default" >
         <div class="panel-heading" id="headingStats${session.sessionID}">
    	    	<span class="panel-title collapsable-icon-left">
-       		<a role="button" data-toggle="collapse" href="#collapseStats${session.sessionID}" 
-				aria-expanded="false" aria-controls="collapseStats${session.sessionID}" >
-			${session.sessionName}</a>
+	       		<a role="button" data-toggle="collapse" href="#collapseStats${session.sessionID}" 
+						aria-expanded="false" aria-controls="collapseStats${session.sessionID}" >
+					${session.sessionName}
+				</a>
 			</span>
        	</div>
        
