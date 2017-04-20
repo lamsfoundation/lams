@@ -6,7 +6,7 @@
 <link href="${lams}css/jquery.jqGrid.css" rel="stylesheet" type="text/css"/>
 
 <style media="screen,projection" type="text/css">
-	 .ui-jqgrid {
+	.ui-jqgrid {
 		border-left-style: none !important;
 		border-right-style: none !important;
 		border-bottom-style: none !important;

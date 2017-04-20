@@ -1,10 +1,5 @@
 <!DOCTYPE html>
-        
-
 <%@ include file="/common/taglibs.jsp"%>
-
-<%@ page import="java.util.LinkedHashSet" %>
-<%@ page import="java.util.Set" %>
 <%@ page import="org.lamsfoundation.lams.tool.mc.McAppConstants"%>
 
 <lams:html>		
