@@ -52,6 +52,8 @@ import org.lamsfoundation.lams.integration.ExtCourseClassMap;
 import org.lamsfoundation.lams.integration.ExtServer;
 import org.lamsfoundation.lams.integration.service.IIntegrationService;
 import org.lamsfoundation.lams.integration.util.LoginRequestDispatcher;
+import org.lamsfoundation.lams.learningdesign.Activity;
+import org.lamsfoundation.lams.learningdesign.BranchingActivity;
 import org.lamsfoundation.lams.learningdesign.LearningDesign;
 import org.lamsfoundation.lams.learningdesign.LearningDesignAccess;
 import org.lamsfoundation.lams.learningdesign.LearningLibrary;
@@ -189,7 +191,7 @@ public class AuthoringAction extends LamsDispatchAction {
 	if (learningDesignDTO.getWorkspaceFolderID() != null) {
 	    getAuthoringService().storeLearningDesignAccess(learningDesignID, userId);
 	}
-	
+
 	response.setContentType("application/json;charset=utf-8");
 	JSONObject responseJSON = new JSONObject();
 	Gson gson = new GsonBuilder().create();
@@ -395,6 +397,33 @@ public class AuthoringAction extends LamsDispatchAction {
 	String image = request.getParameter("image");
 	boolean saveSuccesful = AuthoringAction.saveLearningDesignImage(learningDesignID, image);
 	if (!saveSuccesful) {
+	    response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+	}
+	return null;
+    }
+
+    /**
+     * Updates an existing activity coordinates.
+     * It is run when SVG gets recreated in Monitoring or Add Lesson dialog
+     * and activities need to be rearranged as one of them is a branching designed in the old Flash Authoring.
+     */
+    public ActionForward saveActivityCoordinates(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+	    HttpServletResponse response) throws IOException {
+	try {
+	    JSONObject activityJSON = new JSONObject(request.getParameter("activity"));
+	    Activity activity = getMonitoringService().getActivityById(activityJSON.getLong("activityID"));
+	    activity.setXcoord(activityJSON.optInt("xCoord"));
+	    activity.setYcoord(activityJSON.optInt("yCoord"));
+	    if (activity.isBranchingActivity()) {
+		BranchingActivity branchingActivity = (BranchingActivity) activity;
+		branchingActivity.setStartXcoord(activityJSON.getInt("startXCoord"));
+		branchingActivity.setEndXcoord(activityJSON.getInt("endXCoord"));
+		branchingActivity.setStartYcoord(activityJSON.getInt("startYCoord"));
+		branchingActivity.setEndYcoord(activityJSON.getInt("endYCoord"));
+	    }
+	    getUserManagementService().save(activity);
+	} catch (Exception e) {
+	    log.error("Exception while saving activity coordinates", e);
 	    response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
 	}
 	return null;

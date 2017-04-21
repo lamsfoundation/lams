@@ -1064,7 +1064,10 @@ GeneralLib = {
 			return;
 		}
 		
-		if (!isReadOnlyMode) {
+		if (isReadOnlyMode) {
+			// set it so activities' coordinates get updated in the DB when SVG get generated
+			layout.wasArranged = true;
+		} else {
 			// just to refresh the state of canvas
 			HandlerLib.resetCanvasMode(true);
 		}
@@ -2000,69 +2003,11 @@ GeneralLib = {
 		});
 	},
 	
-	
 	/**
-	 * Sets new paper dimensions and moves some static elements.
+	 * Constructs LD JSON with all data needed for save.
+     * "displayErrors" in true if we want to display alerts to users
 	 */
-	resizePaper : function(width, height) {
-		if (!paper) {
-			return;
-		}
-		
-		// the inital window height was saved just before templates were displayed
-		var windowHeight = layout.initWindowHeight ? layout.initWindowHeight : $(window).height();
-		// next runs use the regular window height
-		layout.initWindowHeight = null;
-		// height of window minus toolbar, padding...
-		$('.templateContainer').height(windowHeight - 80);
-		$('#canvas').height(windowHeight - 75)
-		// width of window minus templates on the left; minimum is toolbar width so it does not collapse
-					.width(Math.max($('#toolbar').width() - 180, $(window).width() - 190));
-		
-		if (!width || !height) {
-			var width = 0,
-				height = 0;
-			$.each(layout.activities, function(){
-				// find new dimensions of paper
-				var activityBox = this.items.shape.getBBox();
-				if (activityBox.x2 + 30 > width) {
-					width = activityBox.x2 + 30;
-				}
-				if (activityBox.y2 + 30 > height) {
-					height = activityBox.y2 + 30;
-				}
-			});
-		}
-		
-		// -20 so Chrome does not create unnecessary scrollbars when dropping a tool template to canvas
-		// +50 so there is space for rubbish bin
-		width = Math.max(0, width, canvas.width() - 20);
-		height = Math.max(0, height + (isReadOnlyMode ? 20 : 48), canvas.height() - 22);
-		
-		paper.attr({
-			'width'  : width, 
-			'height' : height
-		});
-
-		if (!isReadOnlyMode){
-			if (layout.bin) {
-				layout.bin.remove();
-			}
-			
-			// draw rubbish bin on canvas
-			layout.bin = paper.image(ActivityIcons.bin, width - 55, height - 55, 48, 48);
-			// so it can be found when SVG code gets cloned
-			$(layout.bin.node).attr('id', 'rubbishBin');
-			
-			HandlerLib.resetCanvasMode(true);
-		}
-	},
-	
-	
-	/**
-	 * Stores the sequece in database.
-	 */
-	saveLearningDesign : function(folderID, learningDesignID, title) {
+	prepareLearningDesignData : function(displayErrors) {
 		var activities = [],
 			transitions = [],
 			groupings = [],
@@ -2070,12 +2015,8 @@ GeneralLib = {
 			annotations = [],
 			layoutActivityDefs = [],
 			systemGate = null,
-			title = title.trim(),
-			description = CKEDITOR.instances['ldDescriptionFieldDescription'].getData(),
-			// final success/failure of the save
-			result = false,
 			error = null;
-		
+	
 		$.each(layout.activities, function(){
 			if (this.parentActivity	&& (this.parentActivity instanceof ActivityDefs.BranchingActivity
 							|| this.parentActivity instanceof ActivityDefs.BranchActivity)){
@@ -2390,7 +2331,7 @@ GeneralLib = {
 				'toolActivityUIID'		 : activity.input ? activity.input.uiid : null,
 				'gradebookToolOutputDefinitionName' : activity.gradebookToolOutputDefinitionName
 			});
-
+	
 			var activityTransitions = activity instanceof ActivityDefs.BranchingActivity ?
 					activity.end.transitions : activity.transitions;
 			
@@ -2420,7 +2361,9 @@ GeneralLib = {
 		});
 		
 		if (error) {
-			alert(error);
+			if (displayErrors) {
+				alert(error);
+			}
 			return false;
 		}
 		
@@ -2445,26 +2388,14 @@ GeneralLib = {
 				'size'			 : size
 			});
 		});
-
+	
 		// serialise the sequence
-		var ld = {
-			// it is null if it is a new sequence
-			'learningDesignID'   : learningDesignID,
-			'workspaceFolderID'  : folderID,
+		return {
 			'copyTypeID'         : 1,
-			'originalUserID'     : null,
-			'title'              : title,
-			'description'        : description,
 			'maxID'				 : layout.ld.maxUIID,
 			'readOnly'			 : false,
 			'editOverrideLock'   : false,
-			'dateReadOnly'       : null,
-			'version'        	 : null,
 			'contentFolderID'    : layout.ld.contentFolderID,
-			'saveMode'			 : layout.ld.learningDesignID
-								   && layout.ld.learningDesignID != learningDesignID
-								   ? 1 : 0,
-			'originalLearningDesignID' : null,
 			'licenseID'			 : $('#ldDescriptionLicenseSelect').val(),
 			'licenseText'   	 : $('#ldDescriptionLicenseSelect').val() == "0"
 								   || $('#ldDescriptionLicenseSelect option:selected').attr('url')
@@ -2474,21 +2405,94 @@ GeneralLib = {
 			'transitions'		 : transitions,
 			'groupings'			 : groupings,
 			'branchMappings'     : branchMappings,
-			'annotations'		 : annotations,
-			
-			'helpText'           : null,
-			'duration'			 : null,
+			'annotations'		 : annotations
 		};
-		// get LD details
+	},
+	
+	
+	/**
+	 * Sets new paper dimensions and moves some static elements.
+	 */
+	resizePaper : function(width, height) {
+		if (!paper) {
+			return;
+		}
+		
+		// the inital window height was saved just before templates were displayed
+		var windowHeight = layout.initWindowHeight ? layout.initWindowHeight : $(window).height();
+		// next runs use the regular window height
+		layout.initWindowHeight = null;
+		// height of window minus toolbar, padding...
+		$('.templateContainer').height(windowHeight - 80);
+		$('#canvas').height(windowHeight - 75)
+		// width of window minus templates on the left; minimum is toolbar width so it does not collapse
+					.width(Math.max($('#toolbar').width() - 180, $(window).width() - 190));
+		
+		if (!width || !height) {
+			var width = 0,
+				height = 0;
+			$.each(layout.activities, function(){
+				// find new dimensions of paper
+				var activityBox = this.items.shape.getBBox();
+				if (activityBox.x2 + 30 > width) {
+					width = activityBox.x2 + 30;
+				}
+				if (activityBox.y2 + 30 > height) {
+					height = activityBox.y2 + 30;
+				}
+			});
+		}
+		
+		// -20 so Chrome does not create unnecessary scrollbars when dropping a tool template to canvas
+		// +50 so there is space for rubbish bin
+		width = Math.max(0, width, canvas.width() - 20);
+		height = Math.max(0, height + (isReadOnlyMode ? 20 : 48), canvas.height() - 22);
+		
+		paper.attr({
+			'width'  : width, 
+			'height' : height
+		});
+
+		if (!isReadOnlyMode){
+			if (layout.bin) {
+				layout.bin.remove();
+			}
+			
+			// draw rubbish bin on canvas
+			layout.bin = paper.image(ActivityIcons.bin, width - 55, height - 55, 48, 48);
+			// so it can be found when SVG code gets cloned
+			$(layout.bin.node).attr('id', 'rubbishBin');
+			
+			HandlerLib.resetCanvasMode(true);
+		}
+	},
+	
+	
+	/**
+	 * Stores the sequece in database.
+	 */
+	saveLearningDesign : function(folderID, learningDesignID, title) {
+		var ld = GeneralLib.prepareLearningDesignData(true),
+			// final success/failure of the save
+			result = false;
+		
+		// it is null if it is a new sequence
+		ld.learningDesignID	= learningDesignID;
+		ld.workspaceFolderID = folderID;
+		ld.title = title.trim();
+		ld.description = CKEDITOR.instances['ldDescriptionFieldDescription'].getData();
+		ld.saveMode = layout.ld.learningDesignID && layout.ld.learningDesignID != learningDesignID
+		   			  ? 1 : 0;
+
 		$.ajax({
-			type  : 'POST',
-			cache : false,
-			async : false,
-			url : LAMS_URL + "authoring/author.do",
+			type     : 'POST',
+			cache    : false,
+			async    : false,
+			url      : LAMS_URL + "authoring/author.do",
 			dataType : 'json',
-			data : {
-				'method'          : 'saveLearningDesign',
-				'ld'			  : JSON.stringify(ld)
+			data     : {
+				'method' : 'saveLearningDesign',
+				'ld'     : JSON.stringify(ld)
 			},
 			success : function(response) {
 				layout.ld.folderID = folderID;
@@ -2604,21 +2608,65 @@ GeneralLib = {
 		var svg = MenuLib.exportSVG(),
 			result = false;
 		// check if canvas is not empty
-		if (svg !== undefined) {
-			$.ajax({
-				type : 'POST',
-				url : LAMS_URL + 'authoring/author.do',
-				async: false,
-				data : {
-					'method' : 'saveLearningDesignImage',
-					'learningDesignID' : layout.ld.learningDesignID,
-					'image' : MenuLib.exportSVG()
-				},
-				success : function(){
-					result = true;
+		if (svg === undefined) {
+			return false;
+		}
+		
+		// check if we are in SVG recreation mode (Monitoring, Add Lesson)
+		// and we need to update activities' coordinates on the back end
+		if (isReadOnlyMode && layout.wasArranged) {
+			var ld = GeneralLib.prepareLearningDesignData(false);
+			if (!ld){
+				return false;
+			}
+			
+			var allActivitiesSaved = true;
+			$.each(ld.activities, function() {
+				var activity = this;
+				$.ajax({
+					type : 'POST',
+					url : LAMS_URL + 'authoring/author.do',
+					async: false,
+					data : {
+						'method'   : 'saveActivityCoordinates',
+						'activity' : JSON.stringify({
+							'activityID'  : activity.activityID,
+							'xCoord'      : activity.xCoord,
+							'yCoord'      : activity.yCoord,
+							'startXCoord' : activity.startXCoord,
+							'startYCoord' : activity.startYCoord,
+							'endXCoord'   : activity.endXCoord,
+							'endYCoord'   : activity.endYCoord
+						})
+					},
+					error : function(){
+						allActivitiesSaved = false;
+					}
+				});
+				
+				if (!allActivitiesSaved) {
+					return false;
 				}
 			});
+			
+			if (!allActivitiesSaved) {
+				return false;
+			}
 		}
+		
+		$.ajax({
+			type : 'POST',
+			url : LAMS_URL + 'authoring/author.do',
+			async: false,
+			data : {
+				'method' : 'saveLearningDesignImage',
+				'learningDesignID' : layout.ld.learningDesignID,
+				'image' : MenuLib.exportSVG()
+			},
+			success : function(){
+				result = true;
+			}
+		});
 		return result;
 	},
 	
