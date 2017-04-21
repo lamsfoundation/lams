@@ -11,6 +11,7 @@
 <%@ page import="java.io.PrintWriter"%>
 <%@ page isErrorPage = "true" %>
 <%@ taglib uri="/bbNG" prefix="bbNG"%>
+<%@ taglib uri="/tags-core" prefix="c"%>
 <bbNG:genericPage title="Access Denied">	
     <bbNG:receipt type="FAIL" 
         	iconUrl="/images/ci/icons/receiptfail_u.gif" 

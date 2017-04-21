@@ -32,7 +32,6 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
-import java.text.DecimalFormat;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -53,13 +52,16 @@ import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
 import blackboard.base.BbList;
+import blackboard.base.InitializationException;
+import blackboard.data.ValidationException;
 import blackboard.data.course.CourseMembership;
 import blackboard.data.gradebook.Lineitem;
 import blackboard.data.gradebook.Score;
 import blackboard.persist.Id;
+import blackboard.persist.PersistenceException;
 import blackboard.persist.course.CourseMembershipDbLoader;
 import blackboard.persist.gradebook.ScoreDbLoader;
-import blackboard.persist.gradebook.ScoreDbPersister;
+import blackboard.platform.BbServiceException;
 import blackboard.platform.BbServiceManager;
 import blackboard.platform.context.Context;
 import blackboard.platform.context.ContextManager;
@@ -205,7 +207,13 @@ public class GradebookSyncServlet extends HttpServlet {
 	    throw new ServletException(e);
 	} catch (SAXException e) {
 	    throw new ServletException(e);
-	} catch (Exception e) {
+	} catch (PersistenceException e) {
+	    throw new ServletException(e);
+	} catch (ValidationException e) {
+	    throw new ServletException(e);
+	} catch (InitializationException e) {
+	    throw new ServletException(e);
+	} catch (BbServiceException e) {
 	    throw new ServletException(e);
 	} finally {
 	    // make sure context is released

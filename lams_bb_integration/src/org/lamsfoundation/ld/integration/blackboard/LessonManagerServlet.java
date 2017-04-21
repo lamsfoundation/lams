@@ -52,7 +52,6 @@ import blackboard.persist.PersistenceException;
 import blackboard.persist.PkId;
 import blackboard.persist.content.ContentDbLoader;
 import blackboard.persist.content.ContentDbPersister;
-import blackboard.persist.gradebook.LineitemDbPersister;
 import blackboard.platform.BbServiceException;
 import blackboard.platform.BbServiceManager;
 import blackboard.platform.context.Context;
@@ -65,7 +64,7 @@ import blackboard.portal.data.PortalExtraInfo;
 import blackboard.portal.servlet.PortalUtil;
 
 /**
- * Launches LAMS pages: author, learner and monitor one.
+ * Shows startLesson page and modifyLesson pages, also handles subsequent start and modification of LAMS lessons.
  */
 public class LessonManagerServlet extends HttpServlet {
 
@@ -97,19 +96,21 @@ public class LessonManagerServlet extends HttpServlet {
 	    Context ctx = ctxMgr.getContext();
 
 	    String method = request.getParameter("method");
-	    // -----------------------Assessment Author functions ---------------------------
-	    if (method.equals("configureLessonStart")) {
-		configureLessonStart(request, response, ctx);
+	    // -----------------------Start lesson functions ---------------------------
+	    if (method.equals("showStartLessonPage")) {
+		showStartLessonPage(request, response, ctx);
 		
 	    } else if (method.equals("start")) {
 		start(request, response, ctx);
 		
-	    } else if (method.equals("configureLessonModification")) {
-		configureLessonModification(request, response, ctx);
+	    // -----------------------Modify lesson functions ---------------------------
+	    } else if (method.equals("showModifyLessonPage")) {
+		showModifyLessonPage(request, response, ctx);
 		
 	    } else if (method.equals("modify")) {
 		modify(request, response, ctx);
 
+	    // -----------------------Delete lesson functions ---------------------------
 	    } else if (method.equals("delete")) {
 		delete(request, response, ctx);
 	    }
@@ -141,7 +142,7 @@ public class LessonManagerServlet extends HttpServlet {
     /**
      * Shows preparation page with available learning designs. Preview is available.
      */
-    private void configureLessonStart(HttpServletRequest request, HttpServletResponse response, Context ctx)
+    private void showStartLessonPage(HttpServletRequest request, HttpServletResponse response, Context ctx)
 	    throws InitializationException, BbServiceException, PersistenceException, IOException, ServletException {
 
 	String lamsServerUrl = LamsSecurityUtil.getServerAddress();
@@ -177,7 +178,7 @@ public class LessonManagerServlet extends HttpServlet {
 	request.getRequestDispatcher("/modules/startLessonSuccess.jsp").forward(request, response);
     }
 
-    private void configureLessonModification(HttpServletRequest request, HttpServletResponse response, Context ctx)
+    private void showModifyLessonPage(HttpServletRequest request, HttpServletResponse response, Context ctx)
 	    throws InitializationException, BbServiceException, PersistenceException, IOException, ServletException {
 
 	// retrive the LAMS lesson
@@ -299,7 +300,7 @@ public class LessonManagerServlet extends HttpServlet {
     }
 
     private void delete(HttpServletRequest request, HttpServletResponse response, Context ctx)
-	    throws InitializationException, BbServiceException, PersistenceException, IOException, ServletException {
+	    throws InitializationException, BbServiceException, PersistenceException, IOException, ServletException, ParserConfigurationException, SAXException {
 
 	//remove Lineitem object from Blackboard DB
 	String bbContentId = request.getParameter("content_id");
@@ -324,5 +325,7 @@ public class LessonManagerServlet extends HttpServlet {
 	
 	System.out.println("Lesson (bbContentId:" + bbContentId + ") successfully deleted by userName:" + userName);
     }
+    
+
 
 }

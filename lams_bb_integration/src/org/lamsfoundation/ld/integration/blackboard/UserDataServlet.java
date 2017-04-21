@@ -22,25 +22,21 @@ package org.lamsfoundation.ld.integration.blackboard;
 
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
+
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import org.apache.commons.codec.binary.Hex;
-import org.lamsfoundation.ld.integration.Constants;
-import blackboard.persist.BbPersistenceManager;
-import blackboard.persist.user.UserDbLoader;
-import blackboard.platform.BbServiceManager;
-import blackboard.data.user.User;
-import blackboard.platform.context.ContextManager;
-import blackboard.platform.persistence.PersistenceServiceFactory;
 
 import org.apache.log4j.Logger;
+import org.lamsfoundation.ld.integration.Constants;
 import org.lamsfoundation.ld.integration.util.CSVUtil;
 import org.lamsfoundation.ld.integration.util.LamsPluginUtil;
 import org.lamsfoundation.ld.integration.util.LamsSecurityUtil;
+
+import blackboard.data.user.User;
+import blackboard.persist.PersistenceException;
+import blackboard.persist.user.UserDbLoader;
 
 /**
  * @author <a href="mailto:anthony.xiao@lamsinternational.com">Anthony Xiao</a>
@@ -48,7 +44,7 @@ import org.lamsfoundation.ld.integration.util.LamsSecurityUtil;
 public class UserDataServlet extends HttpServlet {
 
     private static final long serialVersionUID = 2L;
-    static Logger logger = Logger.getLogger(UserDataServlet.class);
+    private static Logger logger = Logger.getLogger(UserDataServlet.class);
 
     /**
      * The doGet method of the servlet. <br>
@@ -64,77 +60,66 @@ public class UserDataServlet extends HttpServlet {
      * @throws IOException
      *             if an error occurred
      */
-    public void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException {
+    public void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 
-	ContextManager ctxMgr = null;
+	// get Parameter values
+	String usernameParam = request.getParameter(Constants.PARAM_USER_ID);
+	String tsParam = request.getParameter(Constants.PARAM_TIMESTAMP);
+	String hashParam = request.getParameter(Constants.PARAM_HASH);
 
-	// get Blackboard context
-	try {
-	    ctxMgr = (ContextManager) BbServiceManager.lookupService(ContextManager.class);
-
-	    // get Parameter values
-	    String usernameParam = request.getParameter(Constants.PARAM_USER_ID);
-	    String tsParam = request.getParameter(Constants.PARAM_TIMESTAMP);
-	    String hashParam = request.getParameter(Constants.PARAM_HASH);
-
-	    // check paramaeters
-	    if (usernameParam == null || tsParam == null || hashParam == null) {
-		response.sendError(HttpServletResponse.SC_BAD_REQUEST, "missing expected parameters");
-		return;
-	    }
-
-	    String secretKey = LamsPluginUtil.getSecretKey();
-	    String serverId = LamsPluginUtil.getServerId();
-
-	    if (!LamsSecurityUtil.sha1(
-		    tsParam.toLowerCase() + usernameParam.toLowerCase() + serverId.toLowerCase()
-			    + secretKey.toLowerCase()).equals(hashParam)) {
-		response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "authentication failed");
-		return;
-	    }
-
-	    // get the persistence manager
-	    BbPersistenceManager bbPm = PersistenceServiceFactory.getInstance().getDbPersistenceManager();
-
-	    // get user list, but no role info since there are no course info
-	    UserDbLoader userLoader = (UserDbLoader) bbPm.getLoader(UserDbLoader.TYPE);
-	    User u = userLoader.loadByUserName(usernameParam);
-
-	    if (u == null) {
-		throw new ServletException("user not found");
-	    }
-
-	    // construct the address
-	    String address = u.getStreet1() + (u.getStreet1().length() == 0 ? "" : " ");
-	    address += u.getStreet2() + (address.length() == 0 ? "" : " ");
-	    address += u.getState() + (address.length() == 0 ? "" : " ");
-	    address += u.getCountry() + (address.length() == 0 ? "" : " ");
-	    address += u.getZipCode();
-	    // String username = u.getUserName().replaceAll();
-
-	    PrintWriter out = response.getWriter();
-
-	    String locale = u.getLocale();
-	    String loc_lang = LamsSecurityUtil.getLanguage(locale);
-	    String loc_cntry = LamsSecurityUtil.getCountry(locale);
-
-	    // The CSV list should be the format below
-	    // <Title>,<First name>,<Last name>,<Address>,<City>,<State>,
-	    // <Postcode>,<Country>,<Day time number>,<Mobile number>,
-	    // <Fax number>,<Email>,<Locale language>,<Locale country>
-	    String[] valList = { u.getTitle(), u.getGivenName(), u.getFamilyName(), u.getStreet1() + u.getStreet2(),
-		    u.getCity(), u.getState(), u.getZipCode(), u.getCountry(), u.getHomePhone1(), u.getMobilePhone(),
-		    u.getBusinessFax(), u.getEmailAddress(), loc_lang, loc_cntry };
-
-	    out.println(CSVUtil.write(valList));
-
-	} catch (Exception e) {
-	    throw new ServletException("Failed to fetch user", e);
-	} finally {
-	    // make sure context is released
-	    if (ctxMgr != null)
-		ctxMgr.releaseContext();
+	// check paramaeters
+	if (usernameParam == null || tsParam == null || hashParam == null) {
+	    response.sendError(HttpServletResponse.SC_BAD_REQUEST, "missing expected parameters");
+	    return;
 	}
+
+	String secretKey = LamsPluginUtil.getSecretKey();
+	String serverId = LamsPluginUtil.getServerId();
+
+	if (!LamsSecurityUtil.sha1(
+		tsParam.toLowerCase() + usernameParam.toLowerCase() + serverId.toLowerCase() + secretKey.toLowerCase())
+		.equals(hashParam)) {
+	    response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "authentication failed");
+	    return;
+	}
+
+	// get user list, but no role info since there are no course info
+	User user;
+	try {
+	    UserDbLoader userLoader = UserDbLoader.Default.getInstance();
+	    user = userLoader.loadByUserName(usernameParam);
+	} catch (PersistenceException e) {
+	    throw new ServletException(e);
+	}
+
+	if (user == null) {
+	    throw new ServletException("user not found");
+	}
+
+	// construct the address
+	String address = user.getStreet1() + (user.getStreet1().length() == 0 ? "" : " ");
+	address += user.getStreet2() + (address.length() == 0 ? "" : " ");
+	address += user.getState() + (address.length() == 0 ? "" : " ");
+	address += user.getCountry() + (address.length() == 0 ? "" : " ");
+	address += user.getZipCode();
+	// String username = u.getUserName().replaceAll();
+
+	PrintWriter out = response.getWriter();
+
+	String locale = user.getLocale();
+	String loc_lang = LamsSecurityUtil.getLanguage(locale);
+	String loc_cntry = LamsSecurityUtil.getCountry(locale);
+
+	// The CSV list should be the format below
+	// <Title>,<First name>,<Last name>,<Address>,<City>,<State>,
+	// <Postcode>,<Country>,<Day time number>,<Mobile number>,
+	// <Fax number>,<Email>,<Locale language>,<Locale country>
+	String[] valList = { user.getTitle(), user.getGivenName(), user.getFamilyName(),
+		user.getStreet1() + user.getStreet2(), user.getCity(), user.getState(), user.getZipCode(),
+		user.getCountry(), user.getHomePhone1(), user.getMobilePhone(), user.getBusinessFax(),
+		user.getEmailAddress(), loc_lang, loc_cntry };
+
+	out.println(CSVUtil.write(valList));
     }
 
 }

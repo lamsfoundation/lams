@@ -22,15 +22,22 @@ package org.lamsfoundation.ld.integration.blackboard;
  */ 
 
 import java.io.IOException;
+import java.text.ParseException;
 
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.xml.parsers.ParserConfigurationException;
 
 import org.apache.log4j.Logger;
 import org.lamsfoundation.ld.integration.util.BlackboardUtil;
+import org.xml.sax.SAXException;
 
+import blackboard.base.InitializationException;
+import blackboard.data.ValidationException;
 import blackboard.data.user.User;
+import blackboard.persist.PersistenceException;
+import blackboard.platform.BbServiceException;
 import blackboard.platform.BbServiceManager;
 import blackboard.platform.context.ContextManager;
 
@@ -78,8 +85,19 @@ public class StartLessonAjaxServlet extends HttpServlet {
 		response.getWriter().print("{\"content_id\":" + bbContentId + "}");
 	    }
 	    
-	} catch (Exception e) {
-	    logger.error("Unable to start lesson "+e.getMessage(), e);
+	} catch (PersistenceException e) {
+	    response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Unable to start lesson "+e.getMessage());
+	} catch (ParseException e) {
+	    response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Unable to start lesson "+e.getMessage());
+	} catch (ValidationException e) {
+	    response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Unable to start lesson "+e.getMessage());
+	} catch (ParserConfigurationException e) {
+	    response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Unable to start lesson "+e.getMessage());
+	} catch (SAXException e) {
+	    response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Unable to start lesson "+e.getMessage());
+	} catch (InitializationException e) {
+	    response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Unable to start lesson "+e.getMessage());
+	} catch (BbServiceException e) {
 	    response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Unable to start lesson "+e.getMessage());
 	} finally {
 	    // make sure context is released

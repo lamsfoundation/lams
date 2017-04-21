@@ -7,16 +7,16 @@
     <description value= "LAMS and Blackboard integration allows LAMS leaning designs to be managed and views in a Blackboard Environment."/>
     <version value= "1.2.20"/>
     <requires>
-      <bbversion value="9.1.0"/>
+    	<bbversion value="9.1.0"/>
     </requires>
     <vendor>
-      <id value="lams"/>
-      <name value="LAMS Lesson"/>
-      <url value="http://lamscommunity.org/" />
-      <description value="Learning Activity Management System" />
+    	<id value="lams"/>
+    	<name value="LAMS Lesson"/>
+    	<url value="http://lamscommunity.org/" />
+    	<description value="Learning Activity Management System" />
     </vendor>
     <http-actions>
-      <config value="admin/config.jsp"/>
+		<config value="/configPlugin?method=showConfigSettings"/>
     </http-actions>
     
     <!-- Custom content types defined by this extension -->
@@ -25,8 +25,8 @@
             <name value="LAMS Lesson" />
             <handle value="resource/x-lams-lamscontent" />
             <http-actions>
-                <create value="/LessonManager?method=configureLessonStart"/>
-                <modify value="/LessonManager?method=configureLessonModification"/>
+                <create value="/LessonManager?method=showStartLessonPage"/>
+                <modify value="/LessonManager?method=showModifyLessonPage"/>
                 <remove value="/LessonManager?method=delete"/>
             </http-actions>
             <icons>
@@ -43,7 +43,7 @@
                 <link>
                     <type value="course_tool"/>
                     <name value="LAMS Admin"/>
-                    <url value="links/admin.jsp" />
+                    <url value="/LinkTools?method=openAdminLinkTool" />
                     <description value="Admin course lessons" />
                     <icons>
                         <listitem value="includes/images/logo.gif"/>
@@ -52,7 +52,7 @@
                 <link>
                     <type value="course_tool" />
                     <name value="LAMS Monitor" />
-                    <url value="links/monitor.jsp" />
+                    <url value="/LinkTools?method=openMonitorLinkTool" />
                     <description value="Monitor the learners' progress" />
                     <icons>
                         <listitem value="includes/images/logo.gif"/>
@@ -61,7 +61,7 @@
                 <link>
                     <type value="course_tool"/>
                     <name value="LAMS Author"/>
-                    <url value="links/author.jsp" />
+                    <url value="/LinkTools?method=openAuthorLinkTool" />
                     <description value="Author new or edit existing LAMS sequences" />
                     <icons>
                         <listitem value="includes/images/logo.gif"/>
