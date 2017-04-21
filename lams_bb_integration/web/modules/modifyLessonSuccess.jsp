@@ -11,6 +11,7 @@
 --%>
 <%@ page errorPage="/error.jsp"%>
 <%@ taglib uri="/bbNG" prefix="bbNG"%>
+<%@ taglib uri="/tags-core" prefix="c"%>
 <bbNG:genericPage title="Modify A LAMS Lesson" ctxId="ctx">
 
     <%-- Breadcrumbs --%>

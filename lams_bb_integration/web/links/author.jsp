@@ -1,21 +1,23 @@
-<%@ page import="java.util.*, java.net.*,
-                 org.lamsfoundation.ld.integration.util.*" errorPage="error.jsp" %>
 <%@ taglib uri="/bbData" prefix="bbData"%>
 <%@ taglib uri="/bbNG" prefix="bbNG"%>
+<%@ taglib uri="/tags-core" prefix="c"%>
 <bbData:context id="ctx">
-<%
-	String authorURL = LamsSecurityUtil.generateRequestURL(ctx, "author", null);
-	authorURL = authorURL + "&isPostMessageToParent=true";
-%>
-<bbNG:learningSystemPage>
-	<bbNG:breadcrumbBar environment="CTRL_PANEL" isContent="false">
-		<bbNG:breadcrumb>LAMS Author</bbNG:breadcrumb>
-	</bbNG:breadcrumbBar>
+	<bbNG:learningSystemPage>
+		<bbNG:jsFile href="includes/javascript/openLamsPage.js" />
+		<bbNG:jsBlock>
+	        <script type="text/javascript">
+	            var authorWin = null;
+			</script>
+		</bbNG:jsBlock>
 	
-	<bbNG:pageHeader>
-		<bbNG:pageTitleBar title="LAMS Author" />
-	</bbNG:pageHeader>
-	
-	To launch LAMS Author, please, click <a href="<%= authorURL %>" target="_blank">here</a>.
-</bbNG:learningSystemPage>
+		<bbNG:breadcrumbBar environment="CTRL_PANEL" isContent="false">
+			<bbNG:breadcrumb>LAMS Author</bbNG:breadcrumb>
+		</bbNG:breadcrumbBar>
+		
+		<bbNG:pageHeader>
+			<bbNG:pageTitleBar title="LAMS Author" />
+		</bbNG:pageHeader>
+		
+		To launch LAMS Author, please, click <a href="#" onclick="openAuthor(); return false;">here</a>.
+	</bbNG:learningSystemPage>
 </bbData:context>

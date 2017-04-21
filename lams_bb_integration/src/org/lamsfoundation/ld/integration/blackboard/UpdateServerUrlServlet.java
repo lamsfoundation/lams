@@ -35,15 +35,20 @@ import org.apache.log4j.Logger;
 import org.lamsfoundation.ld.integration.Constants;
 import org.lamsfoundation.ld.integration.util.BlackboardUtil;
 
+import blackboard.base.InitializationException;
+import blackboard.data.ValidationException;
 import blackboard.data.content.Content;
 import blackboard.data.course.Course;
 import blackboard.persist.BbPersistenceManager;
 import blackboard.persist.Container;
+import blackboard.persist.PersistenceException;
 import blackboard.persist.PkId;
 import blackboard.persist.content.ContentDbPersister;
+import blackboard.platform.BbServiceException;
 import blackboard.platform.BbServiceManager;
 import blackboard.platform.context.ContextManager;
 import blackboard.platform.persistence.PersistenceServiceFactory;
+import blackboard.platform.plugin.PlugInException;
 import blackboard.platform.plugin.PlugInUtil;
 
 /**
@@ -95,7 +100,15 @@ public class UpdateServerUrlServlet extends HttpServlet {
 		out.write("Old Url" + oldUrl + ". New url:" + newUrl + "\n\r");
 	    }
 
-	} catch (Exception e) {
+	} catch (PersistenceException e) {
+	    throw new ServletException(e);
+	} catch (ValidationException e) {
+	    throw new ServletException(e);
+	} catch (InitializationException e) {
+	    throw new ServletException(e);
+	} catch (BbServiceException e) {
+	    throw new ServletException(e);
+	} catch (PlugInException e) {
 	    throw new ServletException(e);
 	} finally {
 	    // make sure context is released

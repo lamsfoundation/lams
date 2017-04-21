@@ -212,8 +212,8 @@ public class OpenLamsPageServlet extends HttpServlet {
 	// Get Course ID and Session User ID
 	BbPersistenceManager bbPm = PersistenceServiceFactory.getInstance().getDbPersistenceManager();
 	CourseMembershipDbLoader sessionCourseMembershipLoader = CourseMembershipDbLoader.Default.getInstance();
-	String course_idstr = request.getParameter("course_id");
-	Id course_id = bbPm.generateId(Course.DATA_TYPE, course_idstr);
+	String _course_id = request.getParameter("course_id");
+	Id course_id = bbPm.generateId(Course.DATA_TYPE, _course_id);
 	User sessionUser = ctx.getUser();
 	Id sessionUserId = sessionUser.getId();
 	// Get the membership data to determine the User's Role
