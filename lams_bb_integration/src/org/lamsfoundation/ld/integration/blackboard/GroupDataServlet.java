@@ -49,7 +49,6 @@ import blackboard.persist.PersistenceException;
 import blackboard.persist.course.CourseDbLoader;
 import blackboard.persist.course.GroupDbLoader;
 import blackboard.persist.user.UserDbLoader;
-import blackboard.platform.BbServiceManager;
 import blackboard.platform.persistence.PersistenceServiceFactory;
 
 /**

@@ -26,8 +26,8 @@
     
     <%-- Form for the LAMS Lesson Attributes --%>
     <form name="lams_form" id="lams_form" action="../LessonManager?method=modify" method="post" onSubmit="return validateModify();">
-        <input type="hidden" name="content_id" value="<%=request.getParameter("content_id")%>">
-        <input type="hidden" name="course_id" value="<%=request.getParameter("course_id")%>">
+        <input type="hidden" name="content_id" value="${param.content_id}">
+        <input type="hidden" name="course_id" value="${param.course_id}">
   		
         <bbNG:dataCollection>
 	
@@ -95,7 +95,7 @@
     </form>
 
     <bbNG:jsBlock>
-        <script language="JavaScript" type="text/javascript">
+        <script type="text/javascript">
         
             // Go back one page if the user clicks the Cancel Button
             function back() {

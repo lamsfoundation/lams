@@ -60,7 +60,6 @@ import blackboard.persist.Id;
 import blackboard.persist.KeyNotFoundException;
 import blackboard.persist.PersistenceException;
 import blackboard.persist.course.CourseMembershipDbLoader;
-import blackboard.persist.user.UserDbLoader;
 import blackboard.platform.context.Context;
 import blackboard.platform.persistence.PersistenceServiceFactory;
 import blackboard.portal.data.ExtraInfo;
@@ -487,7 +486,9 @@ public class LamsSecurityUtil {
 	} catch (IOException e) {
 		    throw new RuntimeException("Unable to start LAMS lesson. " + e.getMessage()
 			    + " Please contact your system administrator.", e);
-	} catch (Exception e) {
+	} catch (ParserConfigurationException e) {
+	    throw new RuntimeException("Unable to start LAMS lesson. Please contact your system administrator.", e);
+	} catch (SAXException e) {
 	    throw new RuntimeException("Unable to start LAMS lesson. Please contact your system administrator.", e);
 	}
 
@@ -504,8 +505,11 @@ public class LamsSecurityUtil {
      *            the lesson id to be deleted
      * 
      * @return boolean whether lesson was successfully deleted
+     * @throws IOException 
+     * @throws ParserConfigurationException 
+     * @throws SAXException 
      */
-    public static Boolean deleteLesson(String userName, String lsId) {
+    public static Boolean deleteLesson(String userName, String lsId) throws IOException, ParserConfigurationException, SAXException {
 
 	String serverId = getServerID();
 	String serverAddr = getServerAddress();
@@ -515,47 +519,22 @@ public class LamsSecurityUtil {
 	    throw new RuntimeException("Unable to delete lesson. One or more LAMS configuration properties are null");
 	}
 
-	try {
-	    String timestamp = new Long(System.currentTimeMillis()).toString();
-	    String hash = generateAuthenticationHash(timestamp, userName, serverId);
+	String timestamp = new Long(System.currentTimeMillis()).toString();
+	String hash = generateAuthenticationHash(timestamp, userName, serverId);
 
-	    String serviceURL = serverAddr + "/services/xml/LessonManager?" + "serverId="
-		    + URLEncoder.encode(serverId, "utf8") + "&datetime=" + timestamp + "&username="
-		    + URLEncoder.encode(userName, "utf8") + "&hashValue=" + hash + "&method=removeLesson" + "&lsId="
-		    + lsId;
+	String serviceURL = serverAddr + "/services/xml/LessonManager?" + "serverId="
+		+ URLEncoder.encode(serverId, "utf8") + "&datetime=" + timestamp + "&username="
+		+ URLEncoder.encode(userName, "utf8") + "&hashValue=" + hash + "&method=removeLesson" + "&lsId=" + lsId;
 
-	    logger.info("LAMS DELETE LESSON Req: " + serviceURL);
+	logger.info("LAMS DELETE LESSON Req: " + serviceURL);
 
-	    // parse xml response and get the lesson id
-	    InputStream is = LamsSecurityUtil.callLamsServerPost(serviceURL);
-	    DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
-	    DocumentBuilder db = dbf.newDocumentBuilder();
-	    Document document = db.parse(is);
-	    return Boolean.parseBoolean(document.getElementsByTagName("Lesson").item(0).getAttributes()
-		    .getNamedItem("deleted").getNodeValue());
-	    
-	} catch (MalformedURLException e) {
-	    throw new RuntimeException("Unable to start LAMS lesson, bad URL: '" + serverAddr
-		    + "', please check lams.properties", e);
-	} catch (IllegalStateException e) {
-	    throw new RuntimeException(
-		    "LAMS Server timeout, did not get a response from the LAMS server. Please contact your systems administrator",
-		    e);
-	} catch (RemoteException e) {
-	    throw new RuntimeException("Unable to start LAMS lesson, RMI Remote Exception", e);
-	} catch (UnsupportedEncodingException e) {
-	    throw new RuntimeException("Unable to start LAMS lesson, Unsupported Encoding Exception", e);
-	} catch (ConnectException e) {
-	    throw new RuntimeException(
-		    "LAMS Server timeout, did not get a response from the LAMS server. Please contact your systems administrator",
-		    e);
-	} catch (IOException e) {
-		    throw new RuntimeException("Unable to start LAMS lesson. " + e.getMessage()
-			    + " Please contact your system administrator.", e);
-	} catch (Exception e) {
-	    throw new RuntimeException("Unable to start LAMS lesson. Please contact your system administrator.", e);
-	}
-
+	// parse xml response and get the lesson id
+	InputStream is = LamsSecurityUtil.callLamsServerPost(serviceURL);
+	DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+	DocumentBuilder db = dbf.newDocumentBuilder();
+	Document document = db.parse(is);
+	return Boolean.parseBoolean(
+		document.getElementsByTagName("Lesson").item(0).getAttributes().getNamedItem("deleted").getNodeValue());
     }
     
     /**
@@ -627,8 +606,6 @@ public class LamsSecurityUtil {
 	} catch (SAXException e) {
 	    throw new RuntimeException(
 		    "Unable to clone LAMS lesson. " + e.getMessage() + " Can't parse LAMS results.", e);
-	} catch (Exception e) {
-	    throw new RuntimeException("Unable to clone LAMS lesson. Please contact your system administrator.", e);
 	}
 
     }
@@ -711,11 +688,6 @@ public class LamsSecurityUtil {
 	} catch (SAXException e) {
 	    throw new LamsServerException("Unable to import LAMS lesson. " + e.getMessage()
 		    + " Can't parse LAMS results. Tried to import file " + filePath, e);
-	} catch (Exception e) {
-	    throw new LamsServerException(
-		    "Unable to import LAMS lesson. Please contact your system administrator. Tried to import file "
-			    + filePath,
-		    e);
 	}
 
     }
@@ -847,9 +819,12 @@ public class LamsSecurityUtil {
 	} catch (IOException e) {
 	    throw new RuntimeException("Unable to preadd users to the lesson. " + e.getMessage()
 		    + " Please contact your system administrator.", e);
-	} catch (Exception e) {
-	    throw new RuntimeException(
-		    "Unable to preadd users to the lesson. Please contact your system administrator.", e);
+	} catch (KeyNotFoundException e) {
+	    throw new RuntimeException("Unable to preadd users to the lesson. " + e.getMessage()
+	    + " Please contact your system administrator.", e);
+	} catch (PersistenceException e) {
+	    throw new RuntimeException("Unable to preadd users to the lesson. " + e.getMessage()
+	    + " Please contact your system administrator.", e);
 	}
 
     }
@@ -952,8 +927,14 @@ public class LamsSecurityUtil {
 	} catch (IOException e) {
 	    throw new RuntimeException("Unable to get LearnerProgress. " + e.getMessage()
 		    + " Please contact your system administrator.", e);
-	} catch (Exception e) {
-	    throw new RuntimeException("Unable to get LearnerProgress. Please contact your system administrator.", e);
+	} catch (ParserConfigurationException e) {
+	    throw new RuntimeException(
+		    "Unable to get LearnerProgress. " + e.getMessage() + " Please contact your system administrator.",
+		    e);
+	} catch (SAXException e) {
+	    throw new RuntimeException(
+		    "Unable to get LearnerProgress. " + e.getMessage() + " Please contact your system administrator.",
+		    e);
 	}
 
     }

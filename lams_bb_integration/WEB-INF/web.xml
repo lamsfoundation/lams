@@ -1,6 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <web-app  xmlns="http://java.sun.com/xml/ns/j2ee" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://java.sun.com/xml/ns/j2ee http://java.sun.com/xml/ns/j2ee/web-app_2_4.xsd" version="2.4">
   <servlet>
+    <servlet-name>ConfigServlet</servlet-name>
+    <servlet-class>org.lamsfoundation.ld.integration.blackboard.ConfigServlet</servlet-class>
+  </servlet>
+  <servlet>
     <servlet-name>UserDataServlet</servlet-name>
     <servlet-class>org.lamsfoundation.ld.integration.blackboard.UserDataServlet</servlet-class>
   </servlet>
@@ -17,16 +21,8 @@
     <servlet-class>org.lamsfoundation.ld.integration.blackboard.LamsLearningDesignDeleteServlet</servlet-class>
   </servlet>
   <servlet>
-    <servlet-name>CloneLessonsServlet</servlet-name>
-    <servlet-class>org.lamsfoundation.ld.integration.blackboard.CloneLessonsServlet</servlet-class>
-  </servlet>
-  <servlet>
-    <servlet-name>ImportLessonsServlet</servlet-name>
-    <servlet-class>org.lamsfoundation.ld.integration.blackboard.ImportLessonsServlet</servlet-class>
-  </servlet> 
-  <servlet>
-    <servlet-name>CorrectLineitemsServlet</servlet-name>
-    <servlet-class>org.lamsfoundation.ld.integration.blackboard.CorrectLineitemsServlet</servlet-class>
+    <servlet-name>LinkToolsServlet</servlet-name>
+    <servlet-class>org.lamsfoundation.ld.integration.blackboard.LinkToolsServlet</servlet-class>
   </servlet>
   <servlet>
     <servlet-name>GradebookServlet</servlet-name>
@@ -39,6 +35,10 @@
   <servlet>
     <servlet-name>LessonManagerServlet</servlet-name>
     <servlet-class>org.lamsfoundation.ld.integration.blackboard.LessonManagerServlet</servlet-class>
+  </servlet>
+  <servlet>
+    <servlet-name>LearnerMonitorServlet</servlet-name>
+    <servlet-class>org.lamsfoundation.ld.integration.blackboard.LearnerMonitorServlet</servlet-class>
   </servlet>
   <servlet>
     <servlet-name>OpenLamsPageServlet</servlet-name>
@@ -58,6 +58,10 @@
   </servlet> 
 
   <servlet-mapping>
+    <servlet-name>ConfigServlet</servlet-name>
+    <url-pattern>/configPlugin</url-pattern>
+  </servlet-mapping> 
+  <servlet-mapping>
     <servlet-name>LamsLearningDesignServlet</servlet-name>
     <url-pattern>/LamsLearningDesign</url-pattern>
   </servlet-mapping>
@@ -66,20 +70,12 @@
     <url-pattern>/LamsLearningDesignDelete</url-pattern>
   </servlet-mapping>
   <servlet-mapping>
-    <servlet-name>UserDataServlet</servlet-name>
-    <url-pattern>/UserData</url-pattern>
+    <servlet-name>LinkToolsServlet</servlet-name>
+    <url-pattern>/LinkTools</url-pattern>
   </servlet-mapping>
   <servlet-mapping>
-    <servlet-name>CloneLessonsServlet</servlet-name>
-    <url-pattern>/CloneLessons</url-pattern>
-  </servlet-mapping> 
-  <servlet-mapping>
-    <servlet-name>ImportLessonsServlet</servlet-name>
-    <url-pattern>/ImportLessons</url-pattern>
-  </servlet-mapping>  
-  <servlet-mapping>
-    <servlet-name>CorrectLineitemsServlet</servlet-name>
-    <url-pattern>/CorrectLineitems</url-pattern>
+    <servlet-name>UserDataServlet</servlet-name>
+    <url-pattern>/UserData</url-pattern>
   </servlet-mapping>
   <servlet-mapping>
     <servlet-name>GroupDataServlet</servlet-name>
@@ -96,6 +92,10 @@
   <servlet-mapping>
     <servlet-name>LessonManagerServlet</servlet-name>
     <url-pattern>/LessonManager</url-pattern>
+  </servlet-mapping>
+  <servlet-mapping>
+    <servlet-name>LearnerMonitorServlet</servlet-name>
+    <url-pattern>/LearnerMonitor</url-pattern>
   </servlet-mapping>
   <servlet-mapping>
     <servlet-name>OpenLamsPageServlet</servlet-name>

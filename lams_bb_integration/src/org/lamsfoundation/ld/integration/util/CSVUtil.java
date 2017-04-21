@@ -24,7 +24,7 @@ package org.lamsfoundation.ld.integration.util;
 
 import java.text.ParseException;
 import java.util.ArrayList;
-import java.util.regex.*;
+import java.util.regex.Pattern;
 
 /**
  * CSVUtil Provides "Comma Seperated Value" writing and parsing.

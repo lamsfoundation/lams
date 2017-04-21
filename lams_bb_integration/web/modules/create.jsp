@@ -10,21 +10,18 @@
     Step 1 - create.jsp
     Step 2 - /LessonManager?method=start
 --%>
-<%@ page import="blackboard.platform.plugin.PlugInUtil"%>
-<%@ page import="blackboard.platform.plugin.PlugInException"%>
-<%@ page import="org.lamsfoundation.ld.integration.Constants"%>
-<%@ page import="org.lamsfoundation.ld.integration.util.LamsSecurityUtil"%>
 <%@ page errorPage="/error.jsp"%>
 <%@ taglib uri="/bbNG" prefix="bbNG"%>
+<%@ taglib uri="/tags-core" prefix="c"%>
 
 <bbNG:genericPage title="Add New LAMS" ctxId="ctx">
-<bbNG:jsFile href="includes/javascript/yahoo-dom-event.js" />
-<bbNG:jsFile href="includes/javascript/treeview-min.js" />
-<bbNG:jsFile href="includes/javascript/jquery.js" />
-
 <bbNG:cssFile href="../includes/css/treeview.css" />
 <bbNG:cssFile href="../includes/css/folders.css" />
 
+<bbNG:jsFile href="includes/javascript/yahoo-dom-event.js" />
+<bbNG:jsFile href="includes/javascript/treeview-min.js" />
+<bbNG:jsFile href="includes/javascript/jquery.js" />
+<bbNG:jsFile href="includes/javascript/openLamsPage.js" />
 <bbNG:jsBlock>
 	<script type="text/javascript">
 	var $j = jQuery.noConflict();
@@ -42,7 +39,7 @@
 			// load subfolder contents
 			$j.ajax({
 				url : '../LamsLearningDesign',
-				data : 'courseId=<%=ctx.getCourse().getCourseId()%>&folderId=' + folderId,
+				data : 'course_id=${param.course_id}&folderId=' + folderId,
 				cache : false,
 				async: false,
 				dataType : 'json',
@@ -114,8 +111,8 @@
     
     <%-- Form to Collect ID of Selected LAMS Sequence --%>
     <form name="lesson_form" id="lesson_form" action="../LessonManager?method=start" method="post" onSubmit="return confirmSubmit();">
-    	<input type="hidden" name="content_id" value="<%=request.getParameter("content_id")%>">
-        <input type="hidden" name="course_id" value="<%=request.getParameter("course_id")%>">
+    	<input type="hidden" name="content_id" value="${param.content_id}">
+        <input type="hidden" name="course_id" value="${param.course_id}">
     	<input type="hidden" name="sequence_id" id="sequence_id" value="0">
     	
     	<bbNG:dataCollection>
@@ -198,39 +195,11 @@
             var authorWin = null;
         	var previewWin = null;
             var isSelected = false;
-        
-            // Open the LAMS Seuence Author Window
-            function openAuthor() {
-                var authorUrl = '../openLamsPage?method=openAuthor&course_id=<%=request.getParameter("course_id")%>&content_id=<%=request.getParameter("content_id")%>';
-                
-                if(authorWin && !authorWin.closed){
-                    try {
-                        authorWin.focus();
-                    }catch(e){
-                        // popups blocked by a 3rd party
-                        alert("Pop-up windows have been blocked by your browser.  Please allow pop-ups for this site and try again");
-                    }
-                }
-                else{
-                    try {
-                        authorWin = window.open(authorUrl,'aWindow','width=1280,height=720,resizable,scrollbars=yes');
-                        authorWin.focus();
-                    }catch(e){
-                        // popups blocked by a 3rd party
-                        alert("Pop-up windows have been blocked by your browser.  Please allow pop-ups for this site and try again");
-                    }
-                }
-                return false;
-            }
-            
-            function unloadHandler(m){
-                
-            }
             
             // Open the LAMS Seuence Preview Window
             function openPreview() {
             	
-                var previewUrl = "../openLamsPage?method=openPreview&course_id=<%=request.getParameter("course_id")%>&ldId=" + document.getElementsByName("sequence_id")[0].value + "&title=" + document.lesson_form.title.value;
+                var previewUrl = "../openLamsPage?method=openPreview&ldId=" + document.getElementsByName("sequence_id")[0].value + "&title=" + document.lesson_form.title.value;
                 
                if (previewWin && !previewWin.closed) {
                     try {

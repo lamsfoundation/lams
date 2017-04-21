@@ -1,24 +1,13 @@
-<%@ page import="java.util.*, java.net.*,
-                java.text.SimpleDateFormat,
-                blackboard.data.*,
-                blackboard.persist.*,
-                blackboard.data.course.*,
-                blackboard.data.user.*,
-				blackboard.data.navigation.*,
-                blackboard.persist.course.*,
-				blackboard.persist.navigation.*,
-                blackboard.data.content.*,
-                blackboard.persist.content.*,
-                blackboard.db.*,
-                blackboard.base.*,
-                blackboard.platform.*,
-                blackboard.platform.plugin.*,
-                org.lamsfoundation.ld.integration.*,
-				org.lamsfoundation.ld.integration.blackboard.*" errorPage="error.jsp" %>
+<%@ page contentType="text/html; charset=utf-8" language="java"%>
+<%@ page isELIgnored="false" %>
+
+<!DOCTYPE HTML>
+<%@ page errorPage="error.jsp"%>
+<%@ page import="blackboard.platform.plugin.*"%>
 <%@ taglib uri="/bbNG" prefix="bbNG"%>
 <%@ taglib uri="/bbData" prefix="bbData"%>
+<%@ taglib uri="/tags-core" prefix="c"%>
 <bbData:context id="ctx">
-
 <%
     //check permission
     if (!PlugInUtil.authorizeForCourseControlPanel(request, response)) {
@@ -27,11 +16,11 @@
 %>
 <bbNG:learningSystemPage contextOverride="CTRL_PANEL">
 	<bbNG:cssBlock> 
-	<style type="text/css">
-		#buttons {
-			float:right;
-		}
-	</style> 
+		<style type="text/css">
+			#buttons {
+				float:right;
+			}
+		</style> 
 	</bbNG:cssBlock>
 
 	<bbNG:jsFile href="includes/javascript/jquery.js" />
@@ -75,8 +64,8 @@
 	    	
 	        $j.ajax({
 	        	async: true,
-	            url: '../CloneLessons',
-	            data : 'courseId=<%=ctx.getCourse().getCourseId()%>',
+	            url: '../LinkTools?method=cloneLessons',
+	            data : 'course_id=${param.course_id}',
 	            type: 'post',
 	            success: function (response) {
 	            	$j("#buttons").unblock();
@@ -99,8 +88,8 @@
 	    	
 	        $j.ajax({
 	        	async: true,
-	            url: '../ImportLessons',
-	            data : 'courseId=<%=ctx.getCourse().getCourseId()%>',
+	            url: '../LinkTools?method=importLessons',
+	            data : 'course_id=${param.course_id}',
 	            type: 'post',
 	            success: function (response) {
 	            	$j("#buttons").unblock();
@@ -121,8 +110,8 @@
 	    	
 	        $j.ajax({
 	        	async: true,
-	            url: '../CorrectLineitems',
-	            data : 'courseId=<%=ctx.getCourse().getCourseId()%>',
+	            url: '../LinkTools?method=correctLineitems',
+	            data : 'course_id=${param.course_id}',
 	            type: 'post',
 	            success: function (response) {
 	            	$j("#buttons").unblock();

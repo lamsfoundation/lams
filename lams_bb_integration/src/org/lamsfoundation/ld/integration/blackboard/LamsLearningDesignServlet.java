@@ -64,7 +64,6 @@ public class LamsLearningDesignServlet extends HttpServlet {
 
 	// get request parameters
 	String folderId = request.getParameter(Constants.PARAM_FOLDER_ID);
-	String courseId = request.getParameter("courseId");
 
 	//paging parameters of tablesorter - used in the LAMS Template Wizard
 	boolean usePaging = false;
@@ -88,6 +87,7 @@ public class LamsLearningDesignServlet extends HttpServlet {
 	    ctxMgr = (ContextManager) BbServiceManager.lookupService(ContextManager.class);
 	    ctx = ctxMgr.setContext(request);
 	    
+	    String courseId = ctx.getCourse().getCourseId();
 	    String method = usePaging ? "getPagedHomeLearningDesignsJSON" : "getLearningDesignsJSON";
 	    String learningDesigns = LamsSecurityUtil.getLearningDesigns(ctx, username, courseId, folderId, method, type, search, page, size, sortName, sortDate);
 	    

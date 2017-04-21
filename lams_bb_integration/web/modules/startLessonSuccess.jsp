@@ -10,6 +10,7 @@
 --%>
 <%@ page errorPage="/error.jsp"%>
 <%@ taglib uri="/bbNG" prefix="bbNG"%>
+<%@ taglib uri="/tags-core" prefix="c"%>
 <bbNG:genericPage title="LAMS Learning Activity Management System" ctxId="ctx">
 
     <%-- Breadcrumbs --%>
