@@ -58,6 +58,7 @@ input[type="checkbox"] {
 .dialogContainer {
 	display: none;
 	-webkit-overflow-scrolling: touch !important;
+	overflow: auto;
 }
 
 .dialogContainer iframe {
@@ -69,12 +70,14 @@ input[type="checkbox"] {
 .dialogContainer .dialogList {
 	overflow: auto;
 	padding: 5px;
+	padding-bottom: 2px;
 }
 
 .dialogContainer .modal-body {
 	height : 100%;
 	max-height: calc(100% - 56px);
 	padding: 10px;
+	overflow: auto;
 }
 
 div.dialogListItem {
@@ -225,16 +228,20 @@ td.contributeEntryCell a {
 	border: none;
 }
 
-#classLearnerTable {
-	border-right: thin solid black;
-}
-
 #classLearnerTable #addAllLearnersButton {
 	margin-right: 10px;
 }
 
-#classMonitorTable {
-	margin-left: 10px;
+#leftLearnerTable {
+	float: left;
+	width: 250px;
+	height: 100%;
+}
+
+#rightMonitorTable {
+	margin-top: 4px;
+	height: 100%;
+	width: 250px;
 }
 
 .dialogSearchPhrase {
