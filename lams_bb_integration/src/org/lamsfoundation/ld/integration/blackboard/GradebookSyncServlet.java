@@ -32,6 +32,7 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
+import java.util.List;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -51,7 +52,6 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
-import blackboard.base.BbList;
 import blackboard.base.InitializationException;
 import blackboard.data.ValidationException;
 import blackboard.data.course.CourseMembership;
@@ -134,8 +134,8 @@ public class GradebookSyncServlet extends HttpServlet {
 	    NodeList learnerResults = lesson.getChildNodes();
 	    
 	    //in order to reduce DB queries we get scores and courseMemberships all at once
-	    BbList<Score> dbScores = scoreLoader.loadByLineitemId(lineitem.getId());
-	    BbList<CourseMembership> courseMemberships = courseMemLoader.loadByCourseId(lineitem.getCourseId(), null, true);
+	    List<Score> dbScores = scoreLoader.loadByLineitemId(lineitem.getId());
+	    List<CourseMembership> courseMemberships = courseMemLoader.loadByCourseId(lineitem.getCourseId(), null, true);
 	    
 	    //update all marks
 	    for (CourseMembership courseMembership: courseMemberships) {
