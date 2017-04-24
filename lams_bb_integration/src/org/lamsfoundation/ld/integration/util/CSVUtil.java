@@ -127,7 +127,7 @@ public class CSVUtil {
      * @return
      */
     public static String[] parse(String str) throws ParseException{
-        ArrayList res = new ArrayList();
+        ArrayList<String> res = new ArrayList<String>();
         int startIndex = 0;
         boolean openQuote = false;
         

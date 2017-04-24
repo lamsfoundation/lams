@@ -36,6 +36,7 @@ import java.rmi.RemoteException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.Date;
+import java.util.List;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -51,7 +52,6 @@ import org.w3c.dom.Document;
 import org.w3c.dom.NamedNodeMap;
 import org.xml.sax.SAXException;
 
-import blackboard.base.BbList;
 import blackboard.data.course.Course;
 import blackboard.data.course.CourseMembership;
 import blackboard.data.user.User;
@@ -730,7 +730,7 @@ public class LamsSecurityUtil {
 	    CourseMembershipDbLoader courseMemLoader = CourseMembershipDbLoader.Default.getInstance();
 
 	    Id courseId = course.getId();
-	    BbList<CourseMembership> studentCourseMemberships = courseMemLoader.loadByCourseIdAndRole(courseId,
+	    List<CourseMembership> studentCourseMemberships = courseMemLoader.loadByCourseIdAndRole(courseId,
 		    CourseMembership.Role.STUDENT, null, true);
 	    for (CourseMembership courseMembership : studentCourseMemberships) {
 		String learnerId = escapeValue(courseMembership.getUser().getUserName());
@@ -746,12 +746,12 @@ public class LamsSecurityUtil {
 		emails += email + ",";
 	    }
 
-	    BbList<CourseMembership> monitorCourseMemberships = courseMemLoader.loadByCourseIdAndRole(courseId,
+	    List<CourseMembership> monitorCourseMemberships = courseMemLoader.loadByCourseIdAndRole(courseId,
 		    CourseMembership.Role.INSTRUCTOR, null, true);
-	    BbList<CourseMembership> teachingAssistantCourseMemberships = courseMemLoader.loadByCourseIdAndRole(courseId,
+	    List<CourseMembership> teachingAssistantCourseMemberships = courseMemLoader.loadByCourseIdAndRole(courseId,
 		    CourseMembership.Role.TEACHING_ASSISTANT, null, true);
 	    monitorCourseMemberships.addAll(teachingAssistantCourseMemberships);
-	    BbList<CourseMembership> courseBuilderCourseMemberships = courseMemLoader.loadByCourseIdAndRole(courseId,
+	    List<CourseMembership> courseBuilderCourseMemberships = courseMemLoader.loadByCourseIdAndRole(courseId,
 		    CourseMembership.Role.COURSE_BUILDER, null, true);
 	    monitorCourseMemberships.addAll(courseBuilderCourseMemberships);
 	    for (CourseMembership courseMembership : monitorCourseMemberships) {
