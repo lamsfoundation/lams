@@ -76,6 +76,7 @@ public class LineitemUtil {
 
     private static Logger logger = Logger.getLogger(LineitemUtil.class);
 
+    @SuppressWarnings("deprecation")
     public static void createLineitem(Content bbContent, String userName)
 	    throws ValidationException, PersistenceException, IOException, ParserConfigurationException, SAXException {
 	LineitemDbPersister linePersister = LineitemDbPersister.Default.getInstance();
@@ -237,8 +238,7 @@ public class LineitemUtil {
 	LineitemDbLoader lineitemLoader = LineitemDbLoader.Default.getInstance();
 	LineitemDbPersister linePersister = LineitemDbPersister.Default.getInstance();
 	
-	PkId contentId = (PkId) bbContent.getId();
-	String _content_id = "_" + contentId.getPk1() + "_" + contentId.getPk2();
+	String _content_id = bbContent.getId().toExternalString();
 	
 	//update only in case grade center is ON
 	if (bbContent.getIsDescribed()) {
@@ -272,17 +272,15 @@ public class LineitemUtil {
      * @throws PersistenceException
      */
     private static void updateLamsLineitemStorage(Content bbContent, Lineitem lineitem) throws PersistenceException {
-	//Construct bbContent id
-	PkId bbContentPkId = (PkId) bbContent.getId();
-	String bbContentId = "_" + bbContentPkId.getPk1() + "_" + bbContentPkId.getPk2();
-	//Construct lineitem id
-	PkId lineitemPkId = (PkId) lineitem.getId();
-	String lineitemId = "_" + lineitemPkId.getPk1() + "_" + lineitemPkId.getPk2();
+	//get bbContent id
+	String _content_id = bbContent.getId().toExternalString();
+	//get lineitem id
+	String _lineitem_id = lineitem.getId().toExternalString();
 	
 	//Store lineitemid to the storage bbContentId -> lineitemid (this storage is available since 1.2.3 version)
 	PortalExtraInfo pei = PortalUtil.loadPortalExtraInfo(null, null, LAMS_LINEITEM_STORAGE);
 	ExtraInfo ei = pei.getExtraInfo();
-	ei.setValue(bbContentId, lineitemId);
+	ei.setValue(_content_id, _lineitem_id);
 	PortalUtil.savePortalExtraInfo(pei);
     }   
 
@@ -301,10 +299,10 @@ public class LineitemUtil {
 	//get lineitemId from the storage (bbContentId -> lineitemId)
 	PortalExtraInfo pei = PortalUtil.loadPortalExtraInfo(null, null, LAMS_LINEITEM_STORAGE);
 	ExtraInfo ei = pei.getExtraInfo();
-	String lineitemIdStr = ei.getValue(bbContentId);
+	String _lineitem_id = ei.getValue(bbContentId);
 
 	// try to get lineitem from any course that user is participating in (for lineitems created in versions after 1.2 and before 1.2.3)
-	if (lineitemIdStr == null) {
+	if (_lineitem_id == null) {
 	    // get stored bbContentId -> lamsLessonId
 	    PortalExtraInfo portalExtraInfo = PortalUtil.loadPortalExtraInfo(null, null, "LamsStorage");
 	    ExtraInfo extraInfo = portalExtraInfo.getExtraInfo();
@@ -341,16 +339,15 @@ public class LineitemUtil {
 	    }
 
 	    // delete lineitem (can't delete it simply doing linePersister.deleteById(lineitem.getId()) due to BB9 bug)
-	    PkId lineitemPkId = (PkId) lineitem.getId();
-	    lineitemIdStr = "_" + lineitemPkId.getPk1() + "_" + lineitemPkId.getPk2();
+	    _lineitem_id = lineitem.getId().toExternalString();
 	}
 
-	if (lineitemIdStr == null) {
+	if (_lineitem_id == null) {
 	    throw new LamsBuildingBlockException("Lineitem was not found for contentId:" + bbContentId
 		    + ". This is despite the fact that isGradecenter option is ON.");
 	}
 
-	Id lineitemId = bbPm.generateId(Lineitem.LINEITEM_DATA_TYPE, lineitemIdStr.trim());
+	Id lineitemId = bbPm.generateId(Lineitem.LINEITEM_DATA_TYPE, _lineitem_id.trim());
 	return lineitemId;
     }
 

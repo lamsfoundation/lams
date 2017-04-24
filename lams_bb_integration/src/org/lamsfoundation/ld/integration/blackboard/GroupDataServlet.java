@@ -39,7 +39,6 @@ import org.lamsfoundation.ld.integration.util.LamsSecurityUtil;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 
-import blackboard.base.BbList;
 import blackboard.data.course.Course;
 import blackboard.data.course.Group;
 import blackboard.data.user.User;
@@ -120,7 +119,7 @@ public class GroupDataServlet extends HttpServlet {
 			JsonArray jsonUsers = new JsonArray();
 			jsonGroup.add("users", jsonUsers);
 
-			BbList<User> users = userDbLoader.loadByGroupId(groupId, null, true);
+			List<User> users = userDbLoader.loadByGroupId(groupId, null, true);
 			for (User user : users) {
 			    JsonObject jsonUser = new JsonObject();
 			    jsonUsers.add(jsonUser);

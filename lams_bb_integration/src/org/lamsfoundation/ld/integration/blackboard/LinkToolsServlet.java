@@ -41,7 +41,6 @@ import org.lamsfoundation.ld.integration.util.LamsServerException;
 import org.lamsfoundation.ld.integration.util.LineitemUtil;
 import org.xml.sax.SAXException;
 
-import blackboard.base.BbList;
 import blackboard.base.FormattedText;
 import blackboard.base.InitializationException;
 import blackboard.data.ValidationException;
@@ -142,7 +141,7 @@ public class LinkToolsServlet extends HttpServlet {
 	    CourseTocDbLoader ctLoader = (CourseTocDbLoader) bbPm.getLoader(CourseTocDbLoader.TYPE);
 
 	    Course course = ctx.getCourse();
-	    BbList<CourseToc> ctList = ctLoader.loadByCourseId(courseId);
+	    List<CourseToc> ctList = ctLoader.loadByCourseId(courseId);
 	    CourseToc[] courseTocs = (CourseToc[]) ctList.toArray(new CourseToc[0]);
 	    
 	    int idx = 0;
@@ -197,7 +196,7 @@ public class LinkToolsServlet extends HttpServlet {
 
 	    if (f.getIsFolder()) {
 
-		BbList<Content> cList = cLoader.loadChildren(f.getId());
+		List<Content> cList = cLoader.loadChildren(f.getId());
 		Content[] cArray = cList.toArray(new Content[0]);
 		//sort content by title
 		Arrays.sort(cArray, new Comparator<Content>() {
@@ -345,8 +344,7 @@ public class LinkToolsServlet extends HttpServlet {
 	List<Content> lamsContents = BlackboardUtil.getLamsLessonsByCourse(courseId);
 	for (Content content : lamsContents) {
 
-	    PkId contentId = (PkId) content.getId();
-	    String _content_id = "_" + contentId.getPk1() + "_" + contentId.getPk2();
+	    String _content_id = content.getId().toExternalString();
 
 	    String url = content.getUrl();
 	    String urlLessonId = getParameterValue(url, "lsid");
@@ -412,8 +410,7 @@ public class LinkToolsServlet extends HttpServlet {
 	    List<Content> lamsContents = BlackboardUtil.getLamsLessonsByCourse(courseId);
 	    for (Content content : lamsContents) {
 
-		PkId contentId = (PkId) content.getId();
-		String _content_id = "_" + contentId.getPk1() + "_" + contentId.getPk2();
+		String _content_id = content.getId().toExternalString();
 
 		String url = content.getUrl();
 		String urlLessonId = getParameterValue(url, "lsid");

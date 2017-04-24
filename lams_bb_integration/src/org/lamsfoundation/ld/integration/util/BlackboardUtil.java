@@ -13,7 +13,6 @@ import javax.xml.parsers.ParserConfigurationException;
 
 import org.xml.sax.SAXException;
 
-import blackboard.base.BbList;
 import blackboard.base.FormattedText;
 import blackboard.data.ValidationException;
 import blackboard.data.content.Content;
@@ -56,14 +55,14 @@ public class BlackboardUtil {
     public static User getCourseTeacher(PkId courseId) throws PersistenceException {
 	// find the main teacher
 	CourseMembershipDbLoader courseMemLoader = CourseMembershipDbLoader.Default.getInstance();
-	BbList<CourseMembership> monitorCourseMemberships = courseMemLoader.loadByCourseIdAndRole(courseId,
+	List<CourseMembership> monitorCourseMemberships = courseMemLoader.loadByCourseIdAndRole(courseId,
 		CourseMembership.Role.INSTRUCTOR, null, true);
 	if (monitorCourseMemberships.isEmpty()) {
-	    BbList<CourseMembership> teachingAssistantCourseMemberships = courseMemLoader
+	    List<CourseMembership> teachingAssistantCourseMemberships = courseMemLoader
 		    .loadByCourseIdAndRole(courseId, CourseMembership.Role.TEACHING_ASSISTANT, null, true);
 	    monitorCourseMemberships.addAll(teachingAssistantCourseMemberships);
 	    if (monitorCourseMemberships.isEmpty()) {
-		BbList<CourseMembership> courseBuilderCourseMemberships = courseMemLoader
+		List<CourseMembership> courseBuilderCourseMemberships = courseMemLoader
 			.loadByCourseIdAndRole(courseId, CourseMembership.Role.COURSE_BUILDER, null, true);
 		monitorCourseMemberships.addAll(courseBuilderCourseMemberships);
 	    }
@@ -92,7 +91,7 @@ public class BlackboardUtil {
 
 	// get a CourseTOC (Table of Contents) loader. We will need this to iterate through all of the "areas"
 	// within the course
-	BbList<CourseToc> courseTocs = cTocDbLoader.loadByCourseId(courseId);
+	List<CourseToc> courseTocs = cTocDbLoader.loadByCourseId(courseId);
 
 	// iterate through the course TOC items
 	List<Content> lamsContents = new ArrayList<Content>();
@@ -103,7 +102,7 @@ public class BlackboardUtil {
 		// we have determined that the TOC item is content, next we need to load the content object and
 		// iterate through it
 		// load the content tree into an object "content" and iterate through it
-		BbList<Content> contents = contentLoader.loadListById(courseToc.getContentId());
+		List<Content> contents = contentLoader.loadListById(courseToc.getContentId());
 		// iterate through the content items in this content object
 		for (Content content : contents) {
 		    // only LAMS content
@@ -201,7 +200,7 @@ public class BlackboardUtil {
 	bbContent.setBody(description);
 
 	// assign LAMS lesson the last position number so it appears at the bottom of the list
-	BbList<Content> contents = contentLoader.loadListById(folderId);
+	List<Content> contents = contentLoader.loadListById(folderId);
 	int countContentsInsideFolder = contents.size();
 	bbContent.setPosition(countContentsInsideFolder);
 	
@@ -224,8 +223,8 @@ public class BlackboardUtil {
 	// Persist the New Lesson Object in Blackboard
 	ContentDbPersister persister = (ContentDbPersister) bbPm.getPersister(ContentDbPersister.TYPE);
 	persister.persist(bbContent);
-	PkId bbContentPkId = (PkId) bbContent.getId();
-	String bbContentId = "_" + bbContentPkId.getPk1() + "_" + bbContentPkId.getPk2();
+	//same as "_" + bbContent.getId().getPk1() + "_" + bbContent.getId().getPk2()
+	String bbContentId = bbContent.getId().toExternalString();
 
 	// Build and set the content URL. Include new lesson id parameter
 	int bbport = request.getServerPort();// Add port to the url if the port is in the blackboard url.
