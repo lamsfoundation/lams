@@ -681,16 +681,16 @@
 	<div id="classDialogContents" class="dialogContainer">
 		<div id="classDialogTable">
 			<div class="row">
-				<div id="leftLearnerTable" class="col-sm-6">
+				<div id="leftLearnerTable" class="col-xs-6">
 					<table id="classLearnerTable" class="table table-condensed">
-						<tr>
+						<tr class="active">
 							<td class="dialogTitle" colspan="6"><fmt:message
 									key="lesson.learners" /></td>
 						</tr>
 						<tr>
 							<td><span class="dialogSearchPhraseIcon fa fa-xs fa-search"
 								title="<fmt:message key='search.learner.textbox' />"></span></td>
-							<td colspan="4"><input class="dialogSearchPhrase"
+							<td colspan="4"><input class="dialogSearchPhrase" style="padding: 0px"
 								title="<fmt:message key='search.learner.textbox' />" /></td>
 							<td><span
 								class="dialogSearchPhraseClear fa fa-xs fa-times-circle"
@@ -728,7 +728,7 @@
 						<tr>
 							<td colspan="6">
 								<button id="addAllLearnersButton"
-									class="btn btn-default pull-right"
+									class="btn btn-sm btn-default pull-right"
 									onClick="javascript:addAllLearners()">
 									<fmt:message key="button.edit.class.add.all" />
 								</button>
@@ -736,9 +736,9 @@
 						</tr>
 					</table>
 				</div>
-				<div id="rightMonitorTable" class="col-sm-6">
+				<div id="rightMonitorTable" class="col-xs-6">
 					<table id="classMonitorTable" class="table table-condensed">
-						<tr>
+						<tr class="active">
 							<td class="dialogTitle" colspan="6"><fmt:message
 									key="lesson.monitors" /></td>
 						</tr>
