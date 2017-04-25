@@ -350,7 +350,7 @@
 									<fmt:message key="lesson.learners" />
 									:
 								</dt>
-								<dd id="learnersStartedPossibleCell"></dd>
+								<dd title="No of learners started / Total no of learners" id="learnersStartedPossibleCell"></dd>
 								<c:set var="showLearnerURL"
 									value="${Configuration.get(ConfigurationKeys.ALLOW_DIRECT_LESSON_LAUNCH)}" />
 								<c:if test="${showLearnerURL}">
