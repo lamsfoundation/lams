@@ -1112,7 +1112,7 @@ public class QaLearningAction extends LamsDispatchAction implements QaAppConstan
 		    }
 		}
 
-		boolean isItemAuthoredByUser = response.getQaQueUser().getUid().equals(userId);
+		boolean isItemAuthoredByUser = response.getQaQueUser().getQueUsrId().equals(userId);
 		responseRow.put("isItemAuthoredByUser", isItemAuthoredByUser);
 
 		JSONArray criteriasRows = new JSONArray();
