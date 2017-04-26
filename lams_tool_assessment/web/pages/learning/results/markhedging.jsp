@@ -28,8 +28,7 @@
 				<td style="width: 100px;">
 				
 					<select name="question${questionIndex}_${option.sequenceId}" class="mark-hedging-select" data-question-index="${questionIndex}"
-						disabled="disabled"
-					>
+							disabled="disabled">
 						
 						<c:forEach var="i" begin="0" end="${question.grade}">
 							<option
@@ -50,17 +49,13 @@
 				
 			</tr>
 		</c:forEach>
-		
-		<c:if test="${question.hedgingJustificationEnabled}">
-			<tr>
-				<td>					
-					<lams:STRUTS-textarea property="question${questionIndex}" rows="4" cols="60" value="${question.answerString}" 
-						disabled="true" styleClass="mark-hedging-select"
-					/>
-				</td>
-			</tr>
-		</c:if>
 	</table>
+		
+	<c:if test="${question.hedgingJustificationEnabled}">			
+		<lams:STRUTS-textarea property="question${questionIndex}" rows="4" cols="60" value="${question.answerString}" 
+				disabled="true" styleClass="mark-hedging-select margin-top-minus-10"/>
+	</c:if>
+	
 </div>
 
 <c:if test="${assessment.allowQuestionFeedback}">

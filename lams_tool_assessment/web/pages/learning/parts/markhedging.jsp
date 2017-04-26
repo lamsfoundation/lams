@@ -10,7 +10,6 @@
 	<table class="table table-hover table-condensed">
 		<c:forEach var="option" items="${question.optionDtos}">
 			<tr>
-				
 				<td>
 					<c:out value="${option.optionString}" escapeXml="false" />
 				</td>
@@ -33,7 +32,7 @@
 		
 		<c:if test="${question.hedgingJustificationEnabled}">
 			<tr>
-				<td>
+				<td colspan="2">
 					<c:if test="${hasEditRight}">
 						<div>
 							<fmt:message key="label.justify.hedging.marks" />
