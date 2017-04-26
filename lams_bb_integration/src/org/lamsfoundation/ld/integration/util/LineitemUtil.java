@@ -176,45 +176,51 @@ public class LineitemUtil {
     /**
      * Removes lineitem. Throws exception if lineitem is not found.
      * 
-     * @param bbContentId
-     * @param courseIdStr
+     * @param _content_id
+     * @param _course_id
      * @throws PersistenceException
      * @throws ServletException
      */
-    public static void removeLineitem(String bbContentId, String courseIdStr)
+    public static void removeLineitem(String _content_id, String _course_id)
 	    throws PersistenceException, ServletException {
 	BbPersistenceManager bbPm = PersistenceServiceFactory.getInstance().getDbPersistenceManager();
 	Container bbContainer = bbPm.getContainer();
 	ContentDbLoader courseDocumentLoader = ContentDbLoader.Default.getInstance();
 	LineitemDbPersister linePersister = LineitemDbPersister.Default.getInstance();
 
-	Id contentId = new PkId(bbContainer, CourseDocument.DATA_TYPE, bbContentId);
+	Id contentId = new PkId(bbContainer, CourseDocument.DATA_TYPE, _content_id);
 	Content bbContent = courseDocumentLoader.loadById(contentId);
-	//check isGradecenter option is ON (isDescribed field is used for storing isGradecenter parameter)
+	//check isGradecenter option is ON and thus there should exist associated lineitem object
 	if (!bbContent.getIsDescribed()) {
 	    return;
 	}
 
-	Id lineitemId = getLineitem(bbContentId, courseIdStr, true);
+	Id lineitemId = getLineitem(_content_id, _course_id, true);
 	linePersister.deleteById(lineitemId);
+	
+	//Remove bbContentId -> lineitemid pair from the storage
+	PortalExtraInfo pei = PortalUtil.loadPortalExtraInfo(null, null, LAMS_LINEITEM_STORAGE);
+	ExtraInfo ei = pei.getExtraInfo();
+	ei.clearEntry(_content_id);
+	PortalUtil.savePortalExtraInfo(pei);
     }
 
     /**
      * Changes lineitem's name. Throws exception if lineitem is not found.
      * 
-     * @param bbContentId
-     * @param courseIdStr
+     * @param _content_id
+     * @param _course_id
      * @param newLineitemName
      * @throws PersistenceException
      * @throws ServletException
      * @throws ValidationException
      */
-    public static void changeLineitemName(String bbContentId, String courseIdStr, String newLineitemName)
+    public static void changeLineitemName(String _content_id, String _course_id, String newLineitemName)
 	    throws PersistenceException, ServletException, ValidationException {
 	LineitemDbLoader lineitemLoader = LineitemDbLoader.Default.getInstance();
 	LineitemDbPersister linePersister = LineitemDbPersister.Default.getInstance();
 
-	Id lineitemId = getLineitem(bbContentId, courseIdStr, true);
+	Id lineitemId = getLineitem(_content_id, _course_id, true);
 	Lineitem lineitem = lineitemLoader.loadById(lineitemId);
 	lineitem.setName(newLineitemName);
 	linePersister.persist(lineitem);
