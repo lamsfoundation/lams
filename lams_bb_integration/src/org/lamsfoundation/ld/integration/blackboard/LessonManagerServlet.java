@@ -205,16 +205,16 @@ public class LessonManagerServlet extends HttpServlet {
 	    throws InitializationException, BbServiceException, PersistenceException, IOException, ValidationException,
 	    ServletException, ParserConfigurationException, SAXException, ParseException {
 
-	String courseIdStr = request.getParameter("course_id");
-	String contentIdStr = request.getParameter("content_id");
+	String _course_id = request.getParameter("course_id");
+	String _content_id = request.getParameter("content_id");
 
         // Retrieve the Db persistence manager from the persistence service
         BbPersistenceManager bbPm = PersistenceServiceFactory.getInstance().getDbPersistenceManager();
         Container bbContainer = bbPm.getContainer();
 
         // Internal Blackboard IDs for the course and parent content item
-        Id courseId = bbPm.generateId(Course.DATA_TYPE, courseIdStr);
-        Id contentId = new PkId( bbContainer, CourseDocument.DATA_TYPE, contentIdStr);
+        Id courseId = bbPm.generateId(Course.DATA_TYPE, _course_id);
+        Id contentId = new PkId( bbContainer, CourseDocument.DATA_TYPE, _content_id);
 
         // Load the content item
         ContentDbLoader courseDocumentLoader = (ContentDbLoader) bbPm.getLoader( ContentDbLoader.TYPE );
@@ -246,17 +246,16 @@ public class LessonManagerServlet extends HttpServlet {
         
         //if teacher turned Gradecenter option ON (and it was OFF previously) - create lineitem
         if (!bbContent.getIsDescribed() && isGradecenter) {
-
-    		String username = ctx.getUser().getUserName();
-            LineitemUtil.createLineitem(bbContent, username);
+	    String username = ctx.getUser().getUserName();
+	    LineitemUtil.createLineitem(bbContent, username);
             
         //if teacher turned Gradecenter option OFF (and it was ON previously) - remove lineitem
         } else if (bbContent.getIsDescribed() && !isGradecenter) {
-            LineitemUtil.removeLineitem(contentIdStr, courseIdStr);
+            LineitemUtil.removeLineitem(_content_id, _course_id);
             
         //change existing lineitem's name if lesson name has been changed
         } else if (isGradecenter && !strTitle.equals(bbContent.getTitle())) {
-            LineitemUtil.changeLineitemName(contentIdStr, courseIdStr, strTitle);
+            LineitemUtil.changeLineitemName(_content_id, _course_id, strTitle);
         }
     
         // Set LAMS content data in Blackboard
@@ -303,27 +302,27 @@ public class LessonManagerServlet extends HttpServlet {
 	    throws InitializationException, BbServiceException, PersistenceException, IOException, ServletException, ParserConfigurationException, SAXException {
 
 	//remove Lineitem object from Blackboard DB
-	String bbContentId = request.getParameter("content_id");
-	String courseId = request.getParameter("course_id");
-	LineitemUtil.removeLineitem(bbContentId, courseId);
+	String _content_id = request.getParameter("content_id");
+	String _course_id = request.getParameter("course_id");
+	LineitemUtil.removeLineitem(_content_id, _course_id);
 	
 	// remove internalContentId -> externalContentId key->value pair (it's used for GradebookServlet)
 	PortalExtraInfo pei = PortalUtil.loadPortalExtraInfo(null, null, "LamsStorage");
 	ExtraInfo ei = pei.getExtraInfo();
-	ei.clearEntry(bbContentId);
+	ei.clearEntry(_content_id);
 	PortalUtil.savePortalExtraInfo(pei);
 	
 	//remove lesson from LAMS server
 	BbPersistenceManager bbPm = PersistenceServiceFactory.getInstance().getDbPersistenceManager();
 	Container bbContainer = bbPm.getContainer();
 	ContentDbLoader courseDocumentLoader = ContentDbLoader.Default.getInstance();
-	Id contentId = new PkId(bbContainer, CourseDocument.DATA_TYPE, bbContentId);
+	Id contentId = new PkId(bbContainer, CourseDocument.DATA_TYPE, _content_id);
 	Content bbContent = courseDocumentLoader.loadById(contentId);
 	String lsId = bbContent.getLinkRef();
 	String userName = ctx.getUser().getUserName();
 	Boolean isDeletedSuccessfully = LamsSecurityUtil.deleteLesson(userName, lsId);
 	
-	System.out.println("Lesson (bbContentId:" + bbContentId + ") successfully deleted by userName:" + userName);
+	System.out.println("Lesson (bbContentId:" + _content_id + ") successfully deleted by userName:" + userName);
     }
     
 
