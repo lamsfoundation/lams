@@ -90,6 +90,10 @@ table.table-row-spacing {
 	font-size: small; font-style: italic; margin-top: -8px;
 }
 
+.margin-top-minus-10 {
+	margin-top: -10px;
+}
+
 /* Chart in Monitoring */
 .chartDiv {
 	margin-top: 10px;
@@ -112,6 +116,4 @@ table.table-row-spacing {
 	fill: none;
 	pointer-events: all;
 }
-			
-
 
