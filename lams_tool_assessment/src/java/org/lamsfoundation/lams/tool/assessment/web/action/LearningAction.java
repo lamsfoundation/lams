@@ -548,7 +548,6 @@ public class LearningAction extends Action {
 	request.setAttribute("question", questionDto);
 	long questionIndex = WebUtil.readLongParam(request, "questionIndex");
 	request.setAttribute("questionIndex", questionIndex);
-	request.setAttribute("isEditingDisabled", true);
 	request.setAttribute("isLeadershipEnabled", assessment.isUseSelectLeaderToolOuput());
 	request.setAttribute("isUserLeader", sessionMap.get(AssessmentConstants.ATTR_IS_USER_LEADER));
 

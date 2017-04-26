@@ -1,5 +1,5 @@
 <%@ include file="/common/taglibs.jsp"%>
-<c:set var="isWordsLimitEnabled" value="${!isEditingDisabled && (question.maxWordsLimit != 0 || question.minWordsLimit != 0)}"/>
+<c:set var="isWordsLimitEnabled" value="${hasEditRight && (question.maxWordsLimit != 0 || question.minWordsLimit != 0)}"/>
 
 <c:if test="${isWordsLimitEnabled}">
 <script type="text/javascript">
@@ -93,11 +93,11 @@
 		<tr>
 			<td>
 				<c:choose>
-					<c:when test="${question.allowRichEditor && !isEditingDisabled}">
+					<c:when test="${question.allowRichEditor && hasEditRight}">
 						<lams:CKEditor id="question${status.index}" value="${question.answerString}" contentFolderID="${sessionMap.learnerContentFolder}" toolbarSet="DefaultLearner"></lams:CKEditor>
 					</c:when>
 					<c:otherwise>
-						<lams:STRUTS-textarea property="question${status.index}" styleClass="form-control" value="${question.answerString}" disabled="${isEditingDisabled}" />
+						<lams:STRUTS-textarea property="question${status.index}" styleClass="form-control" value="${question.answerString}" disabled="${!hasEditRight}" />
 					</c:otherwise>
 				</c:choose>
 			</td>
