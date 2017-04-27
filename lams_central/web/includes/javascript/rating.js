@@ -1,6 +1,6 @@
 
 //Please, set up LAMS_URL, COUNT_RATED_ITEMS, COMMENTS_MIN_WORDS_LIMIT, MAX_RATES and MIN_RATES, MAX_RATINGS_FOR_ITEM,
-//COMMENT_TEXTAREA_TIP_LABEL, WARN_COMMENTS_IS_BLANK_LABEL, WARN_MIN_NUMBER_WORDS_LABEL constants in parent document
+//COMMENT_TEXTAREA_TIP_LABEL, WARN_COMMENTS_IS_BLANK_LABEL, WARN_MIN_NUMBER_WORDS_LABEL, ALLOW_RERATE  constants in parent document
 
 //constant indicating there is rting limits set up
 var HAS_RATING_LIMITS;
@@ -23,7 +23,7 @@ $(document).ready(function(){
 });
 
 //initialize jRating and post comment button. Note: we need the quotes around undefined for the typeof !
-function initializeJRating(allowReRate) {
+function initializeJRating() {
 
 	var maxRatingsForItem;
 	if ( typeof MAX_RATINGS_FOR_ITEM === "undefined" || MAX_RATINGS_FOR_ITEM === undefined )
@@ -37,11 +37,11 @@ function initializeJRating(allowReRate) {
 	else 
 		ratingLimitsByCriteria = LIMIT_BY_CRITERIA;
 
-	var nbRates = 0;
-	var canRateAgain = false; 
-	if ( allowReRate ) {
-		nbRates = 100;
-		canRateAgain = true;
+	var canRateAgain; 
+	if ( typeof ALLOW_RERATE === "undefined" || ALLOW_RERATE === undefined ) {
+		canRateAgain = false; 
+	} else {
+		canRateAgain = ALLOW_RERATE;
 	}
 		
 	$(".rating-stars-new").filter($(".rating-stars")).jRating({
@@ -49,7 +49,7 @@ function initializeJRating(allowReRate) {
 		rateMax : 5,
 		decimalLength : 1,
 		canRateAgain : canRateAgain,
-        nbRates : nbRates,
+        nbRates : canRateAgain ? 100 : 0,
 		onSuccess : function(data, itemId){
 			$("#user-rating-" + itemId).html(data.userRating);
 			$("#average-rating-" + itemId).html(data.averageRating);
