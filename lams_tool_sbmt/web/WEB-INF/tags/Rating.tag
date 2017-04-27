@@ -24,6 +24,7 @@
 <%@ attribute name="averageRatingLabel" required="false" rtexprvalue="true" %>
 <%@ attribute name="minNumberWordsLabel" required="false" rtexprvalue="true" %>
 <%@ attribute name="showComments" required="false" rtexprvalue="true" %>
+<%@ attribute name="allowRetries" required="false" rtexprvalue="true" %>
 
 <%-- Default value for message key --%>
 <c:if test="${empty disabled}">
@@ -61,6 +62,10 @@
 	</c:forEach>
 </c:if>
 
+<c:if test="${empty allowRetries}">
+	<c:set var="allowRetries" value="false" scope="request"/>
+</c:if>
+
 <%--Rating stars area---------------------------------------%>
 
 <div class="extra-controls-inner">
@@ -77,7 +82,7 @@
 		<c:set var="isCriteriaNotRatedByUser" value='${criteriaDto.userRating == ""}'/>
 	
 		<c:choose>
-			<c:when test='${disabled || isItemAuthoredByUser || (maxRates > 0) && (countRatedItems >= maxRates)  && !hasStartedRating || !isCriteriaNotRatedByUser}'>
+			<c:when test='${disabled || isItemAuthoredByUser || ((maxRates > 0) && (countRatedItems >= maxRates)  && !hasStartedRating) || !(isCriteriaNotRatedByUser || allowRetries)}'>
 				<c:set var="ratingStarsClass" value="rating-stars-disabled"/>
 			</c:when>
 			<c:otherwise>
