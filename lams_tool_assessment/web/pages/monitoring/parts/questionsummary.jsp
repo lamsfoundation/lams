@@ -1,4 +1,6 @@
 <!DOCTYPE html>
+		
+
 <%@ include file="/common/taglibs.jsp"%>
 
 <lams:html>
@@ -9,8 +11,8 @@
 		<c:set var="assessment" value="${sessionMap.assessment}"/>
 		<c:set var="sessionDtos" value="${sessionMap.sessionDtos}"/>
 		
-		<link type="text/css" href="${lams}css/jquery-ui-smoothness-theme.css" rel="stylesheet">
-		<link type="text/css" href="${lams}css/jquery.jqGrid.css" rel="stylesheet" />
+		<link type="text/css" href="<lams:LAMSURL />css/jquery-ui-redmond-theme.css" rel="stylesheet">
+		<link type="text/css" href="<lams:LAMSURL />css/jquery.jqGrid.css" rel="stylesheet" />
 		<style media="screen,projection" type="text/css">
 			.ui-jqgrid tr.jqgrow td {
 			    white-space: normal !important;
@@ -20,8 +22,11 @@
 			}
 		</style>
 		
-		<script type="text/javascript" src="${lams}includes/javascript/jquery.jqGrid.locale-en.js"></script>
-	 	<script type="text/javascript" src="${lams}includes/javascript/jquery.jqGrid.js"></script>
+		<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery.js"></script>
+		<%-- *LKC* added the following line --%>
+		<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery-ui.js"></script>
+		<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery.jqGrid.locale-en.js"></script>
+	 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery.jqGrid.js"></script>
   	    <script>
   	    	var isEdited = false;
   	    	var previousCellValue = "";
@@ -47,7 +52,8 @@
 	  				   	colModel:[
 							{name:'questionResultUid', index:'questionResultUid', width:0, hidden: true},
 							{name:'maxMark', index:'maxMark', width:0, hidden: true},
-							{name:'userName',index:'userName', width:120, searchoptions: { clearSearch: false }},
+							<%-- *LKC* modified the following line --%>
+							{name:'userName',index:'userName', width:120, searchoptions: { clearSearch: false }, hidden: ${questionSummary.question.type == 6}},
 	  				   		{name:'response', index:'response', width:427, sortable:false, search:false},
 	  				   		{name:'grade', index:'grade', width:80, sorttype:"float", search:false, editable:true, editoptions: {size:4, maxlength: 4}, align:"right" }		
 	  				   	],
@@ -58,6 +64,10 @@
 	  				  	beforeEditCell: function (rowid,name,val,iRow,iCol){
 	  				  		previousCellValue = val;
 	  				  	},
+	  				  	<%-- *LKC* added the following 3 lines --%>
+	  				  	loadComplete : function (data){
+	  				  		$(".ui-jqgrid-titlebar").hide();
+  						},
 	  					beforeSaveCell : function(rowid, name, val, iRow, iCol) {
 	  						if (isNaN(val)) {
 	  	  						return null;
@@ -116,7 +126,20 @@
 	  		            });
 	  		        }
 	  			});
-	  			setTimeout(function(){ window.dispatchEvent(new Event('resize')); }, 300);
+  				
+  				<%-- *LKC* added the following paragraph --%>
+	  			$("#display-name-column-switcher").button();
+  				$("#display-name-column-switcher").click(function() {
+  					if ($("#display-name-column-switcher").is(':checked')) {
+  						$("table[id^=session]").showCol("userName");
+  					} else {
+  						$("table[id^=session]").hideCol("userName");
+  					}
+  					$("table[id^=session]").trigger("resize");
+  					
+  					$(".ui-jqgrid-titlebar").toggle();
+  				});
+
 	  		});  	    	
 	  		
     		function refreshSummaryPage()  { 
@@ -127,23 +150,22 @@
         		}
     		}
   		</script>
+		
+		
 	</lams:head>
 	
-<body class="stripes">
-
-	<div class="panel panel-default">
-		<div class="panel-heading">
-			<div class="panel-title">
-				<fmt:message key="label.monitoring.question.summary.history.responses" />
-			</div>
-		</div>
-			
-		<div class="panel-body">
+	<body class="stripes">
+		<div id="content" >
+		
+			<h1>
+				XX<fmt:message key="label.monitoring.question.summary.history.responses" />
+			</h1>
+			<br><br>		
 			<%@ include file="/common/messages.jsp"%>
 			
-			<table class="table table-condensed table-striped">
+			<table class="forum">
 				<tr>
-					<th style="width: 180px;" >
+					<th style="width: 180px; border-left: none; padding-top:0px; " >
 						<fmt:message key="label.monitoring.question.summary.title" />
 					</th>
 					<td >
@@ -152,7 +174,7 @@
 				</tr>
 				
 				<tr>
-					<th>
+					<th style="width: 180px;" >
 						<fmt:message key="label.monitoring.question.summary.question" />
 					</th>
 					<td>
@@ -162,7 +184,7 @@
 				
 				<c:if test="${questionSummary.question.type == 1}">
 					<tr>
-						<th>
+						<th style="width: 180px;" >
 							<fmt:message key="label.incorrect.answer.nullifies.mark" />
 						</th>
 						<td>
@@ -171,8 +193,10 @@
 					</tr>
 				</c:if>
 					
+				<%-- *LKC* commented out the following paragraph --%>
+				<!--	
 				<tr>
-					<th>
+					<th style="width: 180px;" >
 						<fmt:message key="label.monitoring.question.summary.default.mark" />
 					</th>
 					<td>
@@ -181,25 +205,44 @@
 				</tr>
 					
 				<tr>
-					<th>
+					<th style="width: 180px;" >
 						<fmt:message key="label.monitoring.question.summary.penalty" />
 					</th>
 					<td>
 						<c:out value="${questionSummary.question.penaltyFactor}" escapeXml="true"/>
 					</td>
 				</tr>			
+-->
 			</table>
+			<br><br>
+			
+			<%-- *LKC* added the following paragraph --%>
+			<c:if test="${questionSummary.question.type == 6}">
+				<p class="float-right" style="margin-top: 0px;">
+					<input type="checkbox" id="display-name-column-switcher" />
+					<label for="display-name-column-switcher">
+						<fmt:message key="label.display.name.column" />
+					</label>
+				</p>
+				<br><br><br>
+			</c:if>
 			
 			<c:forEach var="sessionDto" items="${sessionDtos}" varStatus="status">
-				<div class="voffset20">
-					<table id="session${sessionDto.sessionId}"></table>
-					<div id="pager${sessionDto.sessionId}"></div>
+				<div style="padding-left: 0px; padding-bottom: 30px; width:99%;">
+					<div style="font-size: small; padding-bottom: 5px;">
+						<fmt:message key="label.monitoring.question.summary.group" /> ${sessionDto.sessionName}
+					</div>
+					
+					<table id="session${sessionDto.sessionId}" class="scroll" cellpadding="0" cellspacing="0" ></table>
+					<div id="pager${sessionDto.sessionId}" class="scroll"></div>
 				</div>	
 			</c:forEach>
-			
-			<a href="#nogo" onclick="refreshSummaryPage();" class="btn btn-default btn-sm voffset10 pull-right">
-				<fmt:message key="label.monitoring.question.summary.ok" /> 
-			</a>
+
+			<lams:ImgButtonWrapper>
+				<a href="#" onclick="refreshSummaryPage();" class="button space-left" style="float:right; margin-right:10px; padding-top:5px;">
+					<fmt:message key="label.monitoring.question.summary.ok" /> 
+				</a>
+			</lams:ImgButtonWrapper>
 
 		</div>
 		<!--closes content-->
@@ -207,6 +250,6 @@
 		<div id="footer">
 		</div>
 		<!--closes footer-->		
-	</div>
-</body>
+		
+	</body>
 </lams:html>
