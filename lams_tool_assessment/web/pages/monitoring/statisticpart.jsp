@@ -5,8 +5,6 @@
 <script type="text/javascript">
 	$(document).ready(function(){
 		
-		debugger;
-		
 		$('#activity-evaluation').on('change', function() {
 
 			if (this.value == "dummy") {
@@ -53,9 +51,7 @@
 		
 	<c:otherwise>
 	
-		<p width="90%">In the graph(s) below, click on a bar in the graph and then use your mouse wheel to zoom in and out of the graph. Once you zoom in, 
-		the grey selection in the bottom graph can be dragged 
-			left or right to show a different set of marks.</p>
+		<p width="90%"><fmt:message key="label.graph.help"/></p>
 			
 		<c:forEach var="sessionDto" items="${sessionDtos}">
 
@@ -89,13 +85,13 @@
 				</tr>
 				<tr>
 					<td class="field-name" width="25%">
-						Lowest Mark:
+						<fmt:message key="label.lowest.mark"/>
 					</td>
 					<td>
 						<c:out value="${sessionDto.minMark}" />
 					</td>
 					<td class="field-name" width="25%">
-						Highest Mark:
+						<fmt:message key="label.highest.mark"/>
 					</td>
 					
 					<td>
