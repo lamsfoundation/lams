@@ -267,9 +267,10 @@
 									</dd>
 								</c:if>
 								<dt><fmt:message key="lesson.state"/></dt>
-								<dd><span data-toggle="collapse" data-target="#changeState" id="lessonStateLabel"></span>
+								<dd>
+									<span data-toggle="collapse" data-target="#changeState" id="lessonStateLabel"></span>
 								  
-								  <!--  Change lesson status or start/schedule start -->
+									<!--  Change lesson status or start/schedule start -->
 									<div class="collapse offset10" id="changeState">
 										<div id="lessonScheduler">
 											<form class="form-inline">
@@ -279,34 +280,33 @@
 													
 													<span id="lessonStartDateSpan" class="lessonManageField"></span>
 													<a id="scheduleLessonButton" class="btn btn-xs btn-default lessonManageField" href="#"
-													   onClick="javascript:scheduleLesson()"
-													   title='<fmt:message key="button.schedule.tooltip"/>'>
+														   onClick="javascript:scheduleLesson()"
+														   title='<fmt:message key="button.schedule.tooltip"/>'>
 													   <fmt:message key="button.schedule"/>
 													</a>
+													
 													<a id="startLessonButton" class="btn btn-xs btn-default" href="#"
-													   onClick="javascript:startLesson()"
-													   title='<fmt:message key="button.start.now.tooltip"/>'>
+														   onClick="javascript:startLesson()"
+														   title='<fmt:message key="button.start.now.tooltip"/>'>
 													   <fmt:message key="button.start.now"/>
 													</a>
 												</div>
 											</form>
 										</div>
 										
-										<div id="lessonStateChanger">									
-											<span id="lessonStartDateSpan" class="lessonManageField"></span>
+										<div id="lessonStateChanger">
 											<select id="lessonStateField" class="btn btn-xs">
 												<option value="-1"><fmt:message key="lesson.select.state"/></option>
 											</select>
-											
 											<button type="button" class="btn btn-xs btn-primary"
-										   			onClick="javascript:changeLessonState()"
-										   			title='<fmt:message key="lesson.change.state.tooltip"/>'>
-										   		<i class="fa fa-check"></i> <span class="hidden-xs"><fmt:message key="button.apply"/></span>
+													onClick="javascript:changeLessonState()"
+													title='<fmt:message key="lesson.change.state.tooltip"/>'>
+										   		<i class="fa fa-check"></i> 
+										   		<span class="hidden-xs"><fmt:message key="button.apply"/></span>
 									    	</button>
-								    	</div>						
+								    	</div>					
 									</div>
 								</dd>
-								
 								<dt><fmt:message key="lesson.learners"/>:</dt>
 								<dd title='<fmt:message key="lesson.ratio.learners.tooltip"/>' id="learnersStartedPossibleCell"></dd>
 								<c:set var="showLearnerURL" value="${Configuration.get(ConfigurationKeys.ALLOW_DIRECT_LESSON_LAUNCH)}" />

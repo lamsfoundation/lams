@@ -310,19 +310,24 @@ function updateLessonTab(){
 				lessonStateChanger = $('#lessonStateChanger'),
 				stateLabel = $('#lessonStateLabel');
 			switch (lessonStateId) {
-				 case 1:
-					 scheduleControls.css('display','inline');
-					 startDateField.css('display','none');
-					 lessonStateChanger.css('display','none');
-					 break;
-				 case 2:
-					 scheduleControls.css('display','none');
-					 startDateField.text(response.startDate).add('#startLessonButton').css('display','inline');
-					 lessonStateChanger.css('display','none');
-					 break;
+				//created but not started lesson
+				case 1:
+					scheduleControls.css('display','inline');
+					startDateField.hide();
+					lessonStateChanger.hide();
+					break;
+				//schedules lesson
+				case 2:
+					scheduleControls.css('display','inline');
+					$("#scheduleDatetimeField").hide();
+					$("#scheduleLessonButton").hide();
+					startDateField.text(response.startDate).add('#startLessonButton').css('display','inline');
+					lessonStateChanger.hide();
+					break;
+				//started lesson
 				default: 			
-					scheduleControls.css('display','none');
-				 	startDateField.text(response.startDate).css('display','none');
+					scheduleControls.hide();
+				 	startDateField.text(response.startDate).hide();
 				 	lessonStateChanger.css('display','inline');
 				 	stateLabel.attr('title',response.startDate);
 				 	break;
