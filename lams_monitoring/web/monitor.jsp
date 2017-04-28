@@ -275,7 +275,8 @@
 											<form class="form-inline">
 												<div class="form-group">
 													<label for="scheduleDatetimeField"><fmt:message key="lesson.start"/></label>
-													<input class="lessonManageField input-sm"  id="scheduleDatetimeField"/>
+													<input class="lessonManageField input-sm" id="scheduleDatetimeField" type="text"/>
+													
 													<span id="lessonStartDateSpan" class="lessonManageField"></span>
 													<a id="scheduleLessonButton" class="btn btn-xs btn-default lessonManageField" href="#"
 													   onClick="javascript:scheduleLesson()"

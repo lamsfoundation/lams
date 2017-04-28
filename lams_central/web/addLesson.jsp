@@ -244,7 +244,7 @@
 								<input id="schedulingEnableField" name="schedulingEnable" value="true" type="checkbox"/><fmt:message key="label.tab.advanced.field.scheduling" />
 							</label>
 						</div>		
-						<input id="schedulingDatetimeField" name="schedulingDatetime" /><br />
+						<input id="schedulingDatetimeField" name="schedulingDatetime" type="text" /><br />
 					</div>
 				</lams:TabBody>
 				<lams:TabBody id="4" titleKey="label.tab.conditions">
