@@ -238,12 +238,7 @@ function drawHistogram(chartID, url, xAxisLabel, yAxisLabel){
 	    .extent([[0, 0], [width, height2]])
 	    .on("brush end", _brushed);
 
-	var	zoom = d3.zoom()
-	    .scaleExtent([1, Infinity])
-	    .translateExtent([[0, 0], [width, height]])
-	    .extent([[0, 0], [width, height]])
-	    .on("zoom", _zoomed);
-
+	var	zoom;
 	var x;
 	var x2;
 	var y = d3.scaleLinear()
@@ -276,9 +271,17 @@ function drawHistogram(chartID, url, xAxisLabel, yAxisLabel){
 		data = response.data;
 		var	max = Number(d3.max(data))+1;
 		var min = Number(d3.min(data));
-		if ( min < 0 )
-			min = 0;
-		var buckets = (max-min) <= 11 ? (max-min) : 10;
+		var range = max-min;
+		var buckets = range <= 11 ? range : 10;
+
+		// where the range > 11, aim for a zoom where bucket width is no more than a half a mark
+		var zoomFactor = range <= 11 ? 10 : Math.round(range / 5);
+		console.log("range "+range+" zoomFactor "+zoomFactor);
+		zoom = d3.zoom()
+		    .scaleExtent([1, zoomFactor])
+		    .translateExtent([[0, 0], [width, height]])
+		    .extent([[0, 0], [width, height]])
+		    .on("zoom", _zoomed);
 
 		// x, y are top detailed graph, x2, y2 are the bottom overview graph. x, x2 declared already so that
 		// so that they can be accessed by function
