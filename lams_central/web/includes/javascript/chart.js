@@ -276,7 +276,7 @@ function drawHistogram(chartID, url, xAxisLabel, yAxisLabel){
 
 		// where the range > 11, aim for a zoom where bucket width is no more than a half a mark
 		var zoomFactor = range <= 11 ? 10 : Math.round(range / 5);
-		console.log("range "+range+" zoomFactor "+zoomFactor);
+		// console.log("range "+range+" zoomFactor "+zoomFactor);
 		zoom = d3.zoom()
 		    .scaleExtent([1, zoomFactor])
 		    .translateExtent([[0, 0], [width, height]])
