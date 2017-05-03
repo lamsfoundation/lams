@@ -1318,7 +1318,7 @@ public class LessonManagerServlet extends HttpServlet {
 	for (ToolActivity activity : activities) {
 	    String toolSignature = activity.getTool().getToolSignature();
 	    hasNumericToolOutput |= TOOL_SIGNATURE_ASSESSMENT.equals(toolSignature)
-		    || TOOL_SIGNATURE_ASSESSMENT.equals(toolSignature) || TOOL_SIGNATURE_ASSESSMENT.equals(toolSignature);
+		    || TOOL_SIGNATURE_MCQ.equals(toolSignature) || TOOL_SIGNATURE_SCRATCHIE.equals(toolSignature);
 	}
 
 	// Create the root node of the xml document
