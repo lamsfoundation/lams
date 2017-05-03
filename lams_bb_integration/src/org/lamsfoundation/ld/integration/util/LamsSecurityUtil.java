@@ -119,11 +119,9 @@ public class LamsSecurityUtil {
 	// in case of learnerStrictAuth we should also include lsid value when creating hash: [ts + uid + method + lsid
 	// + serverID + serverKey]
 	// regular case: [ts + uid + method + serverID + serverKey]
-	String plaintext = "learnerStrictAuth".equals(method) ? timestamp.toLowerCase().trim()
-		+ username.toLowerCase().trim() + method.toLowerCase().trim() + lsid.toLowerCase().trim()
-		+ serverId.toLowerCase().trim() + secretkey.toLowerCase().trim() : timestamp.toLowerCase().trim()
-		+ username.toLowerCase().trim() + method.toLowerCase().trim() + serverId.toLowerCase().trim()
-		+ secretkey.toLowerCase().trim();
+	String plaintext = timestamp.toLowerCase().trim() + username.toLowerCase().trim() + method.toLowerCase().trim()
+		+ ("learnerStrictAuth".equals(method) ? lsid.toLowerCase().trim() : "") + serverId.toLowerCase().trim()
+		+ secretkey.toLowerCase().trim();		
 	// generate authentication hash code to validate parameters
 	String hash = sha1(plaintext);
 
