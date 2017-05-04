@@ -23,9 +23,12 @@ $(document).ready(function() {
 	var selectedUser = null,
 		// init the connection with server using server URL but with different protocol
 		chatToolWebsocket = new WebSocket(APP_URL.replace('http', 'ws') + 'learningWebsocket?toolSessionID=' + TOOL_SESSION_ID);
+	
+	chatToolWebsocket.onclose = function(){
+		location.reload();
+	};
 
 	chatToolWebsocket.onmessage = function(e){
-		
 		// create JSON object
 		var input = JSON.parse(e.data);
 		// clear old messages
