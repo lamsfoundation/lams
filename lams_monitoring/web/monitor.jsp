@@ -10,13 +10,16 @@
 <lams:html>
 <lams:head>
 
+	<link rel="stylesheet" href="<lams:LAMSURL/>css/defaultHTML_learner.css" type="text/css">
+	<!-- Need both ui stylesheets or we lose the grey headers on the grids. -->
+	<link type="text/css" href="<lams:LAMSURL/>css/jquery-ui-smoothness-theme.css" rel="stylesheet">
+	<link type="text/css" href="<lams:LAMSURL/>css/jquery-ui-bootstrap-theme.css" rel="stylesheet">
+	<link rel="stylesheet" href="<lams:LAMSURL/>css/jquery.jqGrid.css" type="text/css" />
 	<link rel="stylesheet" href="<lams:LAMSURL/>css/jquery-ui.timepicker.css" type="text/css" media="screen" />
-	<link href="/lams/css/defaultHTML_learner.css" rel="stylesheet" type="text/css">
-	<link rel="stylesheet" href="<lams:LAMSURL />css/bootstrap-tour.min.css"> 
-  	<link rel="stylesheet" href="<lams:LAMSURL/>css/jquery-ui-bootstrap-theme.css" type="text/css" media="screen">	
+	<link rel="stylesheet" href="<lams:LAMSURL/>css/bootstrap-tour.min.css"> 
 	<link rel="stylesheet" href="<lams:LAMSURL/>css/progressBar.css" type="text/css" />
-	<link rel="stylesheet" href="<lams:LAMSURL/>/css/chart.css" type="text/css" />
-	<link rel="stylesheet" href="css/monitorLesson.css" type="text/css" media="screen" />
+	<link rel="stylesheet" href="<lams:LAMSURL/>css/chart.css" type="text/css" />
+	<link rel="stylesheet" href="<lams:WebAppURL/>css/monitorLesson.css" type="text/css" media="screen" />
   
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery.js"></script>
 	<script type="text/javascript" >
@@ -27,13 +30,15 @@
 		});
 	</script>
 	
+	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery.jqGrid.locale-en.js"></script>
+	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery.jqGrid.js"></script>
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery-ui.js"></script>
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery-ui.timepicker.js"></script>
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/snap.svg.js"></script>
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/readmore.min.js"></script>
 	<script type="text/javascript" src="<lams:LAMSURL />includes/javascript/d3.js"></script>
 	<script type="text/javascript" src="<lams:LAMSURL />includes/javascript/chart.js"></script>
-	<script type="text/javascript" src="<lams:WebAppURL />includes/javascript/monitorLesson.js"></script>
+	<script type="text/javascript" src="<lams:WebAppURL/>includes/javascript/monitorLesson.js"></script>
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/bootstrap.min.js"></script>
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/bootstrap.tabcontroller.js"></script>
 	<script type="text/javascript" src="<lams:LAMSURL />includes/javascript/bootstrap-tour.min.js"></script> 
@@ -180,6 +185,7 @@
 			initLessonTab();
 			initSequenceTab();
 			initLearnersTab();
+			initGradebookTab();
 			refreshMonitor();
 			<c:if test="${not empty lesson.lessonDescription}">
 				$('#description').readmore({
@@ -211,6 +217,9 @@
 			} else {
 				sequenceInfoDialog.modal("hide");
             }
+	    	if ( tabId == '4' ) {
+	    		updateGradebookTab();
+	    	}
         }
         
 
@@ -234,6 +243,7 @@
 			<lams:Tab id="1" key="tab.lesson" />
 			<lams:Tab id="2" key="tab.sequence" />
 			<lams:Tab id="3" key="tab.learners" />
+			<lams:Tab id="4" key="tab.gradebook" />
 		</lams:Tabs>
 		<lams:TabBodyArea>
 			<lams:TabBodys>
@@ -526,6 +536,19 @@
 							<table id="tabLearnersTable" class="table table-condensed table-responsive"></table>
 						</div>
 					</div>
+				</lams:TabBody>
+				<lams:TabBody id="4" titleKey="label.gradebook">
+					<div id="gradebookTopButtonsContainer" class="topButtonsContainer pull-right">
+						<button onclick="javascript:startTour();return false;" class="btn btn-sm btn-default pull-right roffset10 tour-button"> 
+						<i class="fa fa-question-circle"></i> <span class="hidden-xs"><fmt:message key="label.tour"/></span></button>
+
+						<a id="refreshButton" class="btn btn-sm btn-default" title="<fmt:message key='button.refresh.tooltip'/>"
+						   href="#" onClick="javascript:refreshMonitor('gradebook')">
+							<i class="fa fa-refresh"></i> <span class="hidden-xs"><fmt:message key="button.refresh"/></span>
+						</a>
+					</div>
+					<div id="gradebookDiv"></div>
+					<img id="gradebookLoading" src="<lams:LAMSURL/>images/ajax-loader-big.gif" />
 				</lams:TabBody>
 		    </lams:TabBodys>
 		 </lams:TabBodyArea>

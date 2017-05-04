@@ -349,6 +349,7 @@ function scheduleLesson(){
 	var date = $('#scheduleDatetimeField').val();
 	if (date) {
 		$.ajax({
+			dataType : 'xml',
 			url : LAMS_URL + 'monitoring/monitoring.do',
 			cache : false,
 			data : {
@@ -368,7 +369,7 @@ function scheduleLesson(){
 
 function startLesson(){
 	$.ajax({
-		dataType : 'text',
+		dataType : 'xml',
 		url : LAMS_URL + 'monitoring/monitoring.do',
 		cache : false,
 		data : {
@@ -1790,7 +1791,24 @@ function learnerGroupClearSearchPhrase(){
 	$('.dialogSearchPhraseClear', dialog).css('visibility', 'hidden');
 }
 
+//********** GRADEBOOK TAB FUNCTIONS **********
 
+/**
+ * Inits Gradebook Tab.
+ */
+function initGradebookTab() {
+	$("#gradebookLoading").hide();
+}
+
+/**
+ * Refreshes Gradebook Tab.
+ */
+function updateGradebookTab() {
+	$("#gradebookLoading").show();
+	$("#gradebookDiv").load(LAMS_URL + 'gradebook/gradebookMonitoring.do?isInTabs=true&lessonID=' + lessonId, function() {
+		  $("#gradebookLoading").hide();
+	});
+}
 
 //********** COMMON FUNCTIONS **********
 
@@ -1826,6 +1844,8 @@ function refreshMonitor(tabName, isAuto){
 	} else if (tabName == 'learners'){
 		updateLessonTab();
 		updateLearnersTab();
+	} else if (tabName == 'gradebook'){
+		updateGradebookTab();
 	}
 }
 

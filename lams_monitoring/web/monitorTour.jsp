@@ -24,7 +24,7 @@
 			      }, {
 			        element: "#page-tabs",
 			        title: "<fmt:message key="tour.tab.selection.title"/>",
-			        content: "<p><fmt:message key="tour.tab.selection.content.1"/></p><p><fmt:message key="tour.tab.selection.content.2"/></p><p><fmt:message key="tour.tab.selection.content.3"/></p><p><fmt:message key="tour.tab.selection.content.4"/></p>",
+			        content: "<p><fmt:message key="tour.tab.selection.content.1"/></p><p><fmt:message key="tour.tab.selection.content.2"/></p><p><fmt:message key="tour.tab.selection.content.3"/></p><p><fmt:message key="tour.tab.selection.content.4"/></p><p><fmt:message key="tour.tab.selection.content.5"/></p>",
 		        	placement: "bottom",
 			      },{
 			      	element: "#tour-refresh-button",
@@ -220,6 +220,8 @@
 			url = "http://wiki.lamsfoundation.org/display/lamsdocs/monitoringsequence";
 		} else if ( selectedTabID == 3 ) {
 			url = "http://wiki.lamsfoundation.org/display/lamsdocs/monitoringlearners";
+		} else if ( selectedTabID == 4 ) {
+			url = "http://wiki.lamsfoundation.org/display/lamsdocs/Gradebook+Lesson+Marking";
 		}
 		openPopUp(url,'<fmt:message key="button.help"/>', 648, 1152, false);
 	}
