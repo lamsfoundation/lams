@@ -272,6 +272,11 @@ function drawHistogram(chartID, url, xAxisLabel, yAxisLabel){
 		var	max = Number(d3.max(data))+1;
 		var min = Number(d3.min(data));
 		var range = max-min;
+		if ( range > 11 ) {
+			// tweak the range to have more space at the top so it charts better for larger numbers
+			range+=3;
+			max+=3;
+		}
 		var buckets = range <= 11 ? range : 10;
 
 		// where the range > 11, aim for a zoom where bucket width is no more than a half a mark

@@ -18,3 +18,18 @@ div.tooltip {
     pointer-events: none;
 	opacity: 0;
 }
+
+/* Histogram Chart */
+.bar rect {
+	fill: steelblue;
+}
+
+.bar text {
+	fill: #fff;
+	font: 14px sans-serif;
+}
+.zoom {
+	cursor: move;
+	fill: none;
+	pointer-events: all;
+}
