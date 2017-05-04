@@ -1,11 +1,9 @@
 package org.lamsfoundation.lams.tool.dokumaran.web.action;
 
 import java.io.IOException;
-import java.util.Collections;
-import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
-import java.util.TreeMap;
+import java.util.concurrent.ConcurrentHashMap;
 
 import javax.websocket.CloseReason;
 import javax.websocket.CloseReason.CloseCodes;
@@ -30,11 +28,10 @@ public class LearningWebsocketServer {
 
     private static Logger log = Logger.getLogger(LearningWebsocketServer.class);
 
-    private static final Map<Long, Set<Session>> websockets = Collections
-	    .synchronizedMap(new TreeMap<Long, Set<Session>>());
+    private static final Map<Long, Set<Session>> websockets = new ConcurrentHashMap<Long, Set<Session>>();
 
     /**
-     * Registeres the Learner for processing by SendWorker.
+     * Registeres the Learner for processing.
      */
     @OnOpen
     public void registerUser(Session websocket) throws JSONException, IOException {
@@ -42,7 +39,7 @@ public class LearningWebsocketServer {
 		.valueOf(websocket.getRequestParameterMap().get(AttributeNames.PARAM_TOOL_CONTENT_ID).get(0));
 	Set<Session> toolContentWebsockets = websockets.get(toolContentID);
 	if (toolContentWebsockets == null) {
-	    toolContentWebsockets = Collections.synchronizedSet(new HashSet<Session>());
+	    toolContentWebsockets = ConcurrentHashMap.newKeySet();
 	    websockets.put(toolContentID, toolContentWebsockets);
 	}
 	toolContentWebsockets.add(websocket);
@@ -73,7 +70,7 @@ public class LearningWebsocketServer {
 				    : ""));
 	}
     }
-    
+
     /**
      * Monitor has added one more minute to the time limit. All learners will need
      * to add +1 minute to their countdown counters.
@@ -83,8 +80,6 @@ public class LearningWebsocketServer {
 	if (toolContentWebsockets == null) {
 	    return;
 	}
-	// make a copy of the websocket collection so it does not get blocked while sending messages
-	toolContentWebsockets = new HashSet<Session>(toolContentWebsockets);
 
 	JSONObject responseJSON = new JSONObject();
 	responseJSON.put("addOneMinute", true);
@@ -106,8 +101,6 @@ public class LearningWebsocketServer {
 	if (toolContentWebsockets == null) {
 	    return;
 	}
-	// make a copy of the websocket collection so it does not get blocked while sending messages
-	toolContentWebsockets = new HashSet<Session>(toolContentWebsockets);
 
 	JSONObject responseJSON = new JSONObject();
 	responseJSON.put("pageRefresh", true);
@@ -119,5 +112,4 @@ public class LearningWebsocketServer {
 	    }
 	}
     }
-
 }
