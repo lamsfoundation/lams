@@ -187,8 +187,7 @@ public class DisplayGroupAction extends Action {
 		}
 
 		// Adding gradebook course monitor links if enabled
-		if (org.getEnableGradebookForMonitors()
-			&& (roles.contains(Role.ROLE_GROUP_MANAGER) || roles.contains(Role.ROLE_GROUP_ADMIN))) {
+		if (roles.contains(Role.ROLE_GROUP_MANAGER) || roles.contains(Role.ROLE_GROUP_ADMIN)) {
 		    String link = "javascript:showGradebookCourseDialog(" + org.getOrganisationId() + ")";
 		    moreLinks.add(new IndexLinkBean("index.coursegradebook", link, "fa fa-fw fa-list-ol",
 			    "index.coursegradebook.tooltip"));
@@ -203,8 +202,7 @@ public class DisplayGroupAction extends Action {
 		}
 
 		// Adding gradebook course monitor links if enabled
-		if (org.getParentOrganisation().getEnableGradebookForMonitors()
-			&& (roles.contains(Role.ROLE_GROUP_MANAGER) || roles.contains(Role.ROLE_GROUP_ADMIN))) {
+		if (roles.contains(Role.ROLE_GROUP_MANAGER) || roles.contains(Role.ROLE_GROUP_ADMIN)) {
 		    String link = "javascript:showGradebookCourseDialog(" + org.getOrganisationId() + ")";
 		    moreLinks.add(new IndexLinkBean("index.coursegradebook.subgroup", link, "fa fa-fw fa-list-ol", null));
 		}
@@ -320,14 +318,6 @@ public class DisplayGroupAction extends Action {
 		lessonLinks.addFirst(new IndexLinkBean("index.emailnotifications",
 			"javascript:showNotificationsDialog(null," + bean.getId() + ")", "fa fa-fw fa-bullhorn",
 			"index.emailnotifications.tooltip"));
-	    }
-
-	    // Adding gradebook course monitor links if enabled
-	    if (isGroupManagerOrMonitor && (org.getEnableGradebookForMonitors()
-		    || ((parent != null) && parent.getEnableGradebookForMonitors()))) {
-		String link = "javascript:showGradebookLessonDialog(" + bean.getId() + ")";
-		lessonLinks
-			.addFirst(new IndexLinkBean("index.coursegradebookmonitor", link, "fa fa-fw fa-list-ol", null));
 	    }
 
 	    // Add lesson conditions

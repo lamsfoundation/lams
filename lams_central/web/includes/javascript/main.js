@@ -480,25 +480,6 @@ function showGradebookCourseDialog(orgID){
 	}, true);
 }
 
-function showGradebookLessonDialog(lessonID){
-	var id = "dialogGradebookLesson" + lessonID;
-	showDialog(id, {
-		'data' : {
-			'lessonID' : lessonID
-		},
-		'height': Math.max(380, Math.min(800, $(window).height() - 30)),
-		'width' : Math.max(380, Math.min(1024, $(window).width() - 60)),
-		'title' : LABELS.GRADEBOOK_LESSON_TITLE,
-		'open' : function() {
-			var lessonID = $(this).data('lessonID');
-			// load contents after opening the dialog
-			$('iframe', this).attr('src', LAMS_URL + 'gradebook/gradebookMonitoring.do?lessonID=' + lessonID);
-		}
-	}, true);
-}
-
-
-
 function showGradebookLearnerDialog(orgID){
 	var id = "dialogGradebookLearner" + orgID;
 	showDialog(id, {
