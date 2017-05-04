@@ -11,7 +11,7 @@ function blockExportButton(areaToBlock, exportExcelUrl, labelWait) {
 		fadeIn:  0, 
 		css: { 
 			border: 'none', 
-		    padding: '20px', 
+		    padding: '10px', 
 		    backgroundColor: '#000', 
 		    '-webkit-border-radius': '10px', 
 		    '-moz-border-radius': '10px', 

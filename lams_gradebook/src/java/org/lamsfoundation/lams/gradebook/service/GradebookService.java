@@ -1989,6 +1989,11 @@ public class GradebookService implements IGradebookService {
 
 	return map;
     }
+    
+    @Override
+    public List<Number> getMarksArray(Long lessonId) {
+	return gradebookDAO.getAllMarksForLesson(lessonId);
+    }
 
     private ICoreLearnerService getLearnerService() {
 	if (GradebookService.learnerService == null) {
