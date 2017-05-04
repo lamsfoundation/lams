@@ -116,7 +116,7 @@ public class Organisation implements Serializable, Comparable {
 	this.courseAdminCanCreateGuestAccounts = Boolean.FALSE;
 	this.enableCourseNotifications = Boolean.FALSE;
 	this.enableGradebookForLearners = Boolean.FALSE;
-	this.enableGradebookForMonitors = Boolean.FALSE;
+	this.enableGradebookForMonitors = Boolean.TRUE;
 	this.enableSingleActivityLessons = Boolean.FALSE;
 	this.enableLiveEdit = Boolean.FALSE;
     }
@@ -339,10 +339,17 @@ public class Organisation implements Serializable, Comparable {
 	this.orderedLessonIds = orderedLessonIds;
     }
 
+    /** getEnableGradebookForMonitors() is now deprecated as we always display gradebook in monitor.
+     * For compatibility with existing code, this will always true
+     * @return
+     */
+    @Deprecated
     public Boolean getEnableGradebookForMonitors() {
-	return enableGradebookForMonitors;
+	return true;
     }
 
+    /** See getEnableGradebookForMonitors() */
+    @Deprecated
     public void setEnableGradebookForMonitors(Boolean enableGradebookForMonitors) {
 	this.enableGradebookForMonitors = enableGradebookForMonitors;
     }

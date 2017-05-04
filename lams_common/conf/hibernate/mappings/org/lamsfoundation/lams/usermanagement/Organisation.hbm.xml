@@ -100,6 +100,7 @@
 			</meta>
 		</property>
 
+		<!--  enableGradebookForMonitors is no longer used - will always return true in the code  -->
 		<property name="enableGradebookForMonitors" type="java.lang.Boolean"
 			column="enable_monitor_gradebook" not-null="true" length="1">
 			<meta attribute="field-description">
