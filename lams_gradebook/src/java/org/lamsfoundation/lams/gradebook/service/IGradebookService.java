@@ -310,4 +310,13 @@ public interface IGradebookService {
      */
     LinkedHashMap<String, ExcelCell[][]> exportSelectedLessonsGradebook(Integer userId, Integer organisationId,
 	    String[] lessonIds, boolean simplified);
+    
+    /**
+     * Get the raw overall marks for a lesson for charting purposes
+     * @param lessonId
+     * @return
+     */
+    List<Number> getMarksArray(Long lessonId);
+
+
 }

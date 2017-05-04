@@ -14,3 +14,50 @@
 .ui-widget-content {
     border: 0px solid #aaaaaa !important;
 }
+
+
+/* Formatting buttons on the Gradebook Lesson screen */
+.topButtonsContainer {
+	height: 30px;
+	padding: 0px !important;
+	float: left;
+}
+
+.topButtonsContainer div {
+	display: inline;
+}
+
+.topButtonsContainer a {
+	margin: 5px 5px 5px 0;
+}
+
+.topButtonsContainer button {
+	margin: 5px 5px 5px 0;
+}
+
+.topButtonsContainerInTab {
+	height: 30px;
+	padding: 0px !important;
+	float: right;
+}
+
+.topButtonsContainerInTab div {
+	display: inline;
+}
+
+.topButtonsContainerInTab a {
+	margin: 5px 5px 5px 0;
+}
+
+.topButtonsContainerInTab button {
+	margin: 5px 5px 5px 0;
+}
+
+.markChartDiv {
+	margin-top: 10px;
+	margin-left: 10px;
+	margin-bottom: 10px;
+	width: 95%;
+	height: 500px;
+}
+

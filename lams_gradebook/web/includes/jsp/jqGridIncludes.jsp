@@ -1,15 +1,21 @@
 <%@ taglib uri="tags-fmt" prefix="fmt"%>
 <%@ taglib uri="tags-lams" prefix="lams" %>
+<%@ taglib uri="tags-core" prefix="c"%>
 
 <!-- 
 Include this jsp in your jqGrid page head to get some jqGrid functionaility
  -->
+ 
+<!-- Do not include these if used within tabs such as monitoring as redeclaring the jquery and jqgrid breaks the tabs.  -->
+<!-- Need both stylesheets or we lose the grey headers on the grids. -->
+<c:if test="${!isInTabs}"> 
 <link type="text/css" href="<lams:LAMSURL/>css/jquery-ui-smoothness-theme.css" rel="stylesheet">
+<link type="text/css" href="<lams:LAMSURL/>css/jquery-ui-bootstrap-theme.css" rel="stylesheet">
 <link type="text/css" href="<lams:LAMSURL />css/jquery.jqGrid.css" rel="stylesheet" />
-
 <script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery.js"></script>
 <script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery.jqGrid.locale-en.js"></script>
 <script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery.jqGrid.js"></script>
+</c:if>
 
 <style>
 	.tooltip{

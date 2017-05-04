@@ -11,17 +11,42 @@
 	<title><fmt:message key="gradebook.title.window.lessonMonitor"/></title>
 	
 	<lams:css/>
-	<link type="text/css" href="includes/css/gradebook.css" rel="stylesheet" />
+	<link type="text/css" href="<lams:LAMSURL />gradebook/includes/css/gradebook.css" rel="stylesheet" />
+	<link type="text/css" href="<lams:LAMSURL/>css/chart.css" rel="stylesheet" />
 	
 	<jsp:include page="includes/jsp/jqGridIncludes.jsp"></jsp:include>
+	
 	<script type="text/javascript" src="<lams:LAMSURL />includes/javascript/jquery.blockUI.js"></script>	
 	<script type="text/javascript" src="<lams:LAMSURL />includes/javascript/jquery.cookie.js"></script>
-	<script type="text/javascript" src="includes/javascript/blockexportbutton.js"></script>
+	<script type="text/javascript" src="<lams:LAMSURL />includes/javascript/d3.js"></script>
+ 	<script type="text/javascript" src="<lams:LAMSURL />includes/javascript/chart.js"></script>
+	<script type="text/javascript" src="<lams:LAMSURL />gradebook/includes/javascript/blockexportbutton.js"></script>
 	
 	<script type="text/javascript">
 	
 		var marksReleased = ${marksReleased};
-		
+		var graphLoaded = false;
+
+		function toggleMarkChart() {
+			if ( $("#markChartDiv").css("display") == "none" ) {
+				$("#markChartDiv").css("display", "block");
+				$("#markChartHidden").css("display", "none");
+				if ( ! graphLoaded ) {
+					$("#markChartBusy").css("display", "block");
+					drawHistogram('markChartDiv',
+							'<lams:LAMSURL/>/gradebook/gradebookMonitoring.do?dispatch=getMarkChartData&lessonID=${lessonDetails.lessonID}',
+							'<fmt:message key="label.marks"/>', '<fmt:message key="label.number.learners.in.mark.range"/>');
+					graphLoaded = true;
+					$("#markChartBusy").css("display", "none");
+				}
+				$("#markChartShown").css("display", "inline");
+			} else {
+				$("#markChartDiv").css("display", "none");
+				$("#markChartShown").css("display", "none");
+				$("#markChartHidden").css("display", "inline");
+			}
+		}
+
 		function toggleRelease() {
 			
 			var conf;
@@ -52,11 +77,11 @@
 		
 		function displayReleaseOption() {
 			if (marksReleased) {
-				document.getElementById("marksReleased").style.display="block";
+				document.getElementById("marksReleased").style.display="inline";
 				document.getElementById("marksNotReleased").style.display="none";
 			} else {
 				document.getElementById("marksReleased").style.display="none";
-				document.getElementById("marksNotReleased").style.display="block";
+				document.getElementById("marksNotReleased").style.display="inline";
 			}
 		}
 		
@@ -78,14 +103,14 @@
             if ( hidden ) {
 				jQuery("#userView").jqGrid('showCol','startDate');
 				jQuery("#userView").jqGrid('showCol','finishDate');
-				document.getElementById("datesShown").style.display="block";
+				document.getElementById("datesShown").style.display="inline";
 				document.getElementById("datesNotShown").style.display="none";
 
             } else { 
 				jQuery("#userView").jqGrid('hideCol','startDate');
 				jQuery("#userView").jqGrid('hideCol','finishDate');
 				document.getElementById("datesShown").style.display="none";
-				document.getElementById("datesNotShown").style.display="block";
+				document.getElementById("datesNotShown").style.display="inline";
             }
 
             resizeJqgrid(jQuery("#userView"));
@@ -477,44 +502,92 @@
 
 <body class="stripes">
 
-	<lams:Page type="admin">
+	<c:choose>
+	<c:when test="${!isInTabs}">
+		<%-- replacement for Page type admin --%>
+		<div class="row no-gutter no-margin">
+		<div class="col-xs-12">
+		<div class="container" id="content">
 
-		<a target="_blank" class="btn btn-sm btn-default pull-right" title="<fmt:message key='button.help.tooltip'/>"
-		   href="http://wiki.lamsfoundation.org/display/lamsdocs/Gradebook+Lesson+Marking">
-		<i class="fa fa-question-circle"></i> <span class="hidden-xs"><fmt:message key="button.help"/></span></a>
+		<div class="panel panel-default panel-admin-page">
+		<div class="panel-body panel-admin-body">
 
 		<h4><fmt:message key="gradebook.title.lessonGradebook">
 					<fmt:param>
 						<c:out value="${lessonDetails.lessonName}" escapeXml="true"/>
 					</fmt:param>
 				</fmt:message></h4>
-			
-			<div id="marksNotReleased" style="display:none">
-				<a href="javascript:toggleRelease()" class="btn btn-xs btn-default">
-					<fmt:message key="gradebook.monitor.releasemarks.1" />&nbsp;<fmt:message key="gradebook.monitor.releasemarks.3" />
-				</a>
-			</div>
-			
-			<div id="marksReleased" style="display:none">
-				<a href="javascript:toggleRelease()" class="btn btn-xs btn-default">
-					<fmt:message key="gradebook.monitor.releasemarks.2" />&nbsp;<fmt:message key="gradebook.monitor.releasemarks.3" />
-				</a> 
-			</div>
 
-			<div id="export-link-area" class="voffset5">
-				<a href="#nogo" id="export-grades-button" class="btn btn-xs btn-default">
+		
+		<a target="_blank" class="btn btn-xs btn-default pull-right loffset5" title="<fmt:message key='button.help.tooltip'/>"
+			   href="http://wiki.lamsfoundation.org/display/lamsdocs/Gradebook+Lesson+Marking">
+		<i class="fa fa-question-circle"></i> <span class="hidden-xs"><fmt:message key="button.help"/></span></a>
+
+		<c:set var="btnclass" value="btn btn-xs btn-default"/>
+		<div class="topButtonsContainer" id="export-link-area" >
+	</c:when>
+	<c:otherwise>
+		<c:set var="btnclass" value="btn btn-sm btn-default"/>
+	 	<div class="topButtonsContainerInTab" id="export-link-area" >
+	</c:otherwise>
+	</c:choose>
+
+			<div>
+				<a href="#nogo" id="export-grades-button" class="${btnclass}">
 					<fmt:message key="gradebook.export.excel" />
 				</a> 
 			</div>
-			
-			<div id="datesNotShown">
-				<a class="pull-right label label-primary" href="javascript:toggleLessonDates()"><fmt:message key="gradebook.monitor.show.dates" /></a>
+	 
+			<div id="marksNotReleased" style="display:none">
+				<a href="javascript:toggleRelease()" class="${btnclass}">
+					<fmt:message key="gradebook.monitor.releasemarks.1" />&nbsp;<fmt:message key="gradebook.monitor.releasemarks.3" />
+				</a>
+			</div>
+			<div id="marksReleased" style="display:none">
+				<a href="javascript:toggleRelease()" class="${btnclass}">
+					<fmt:message key="gradebook.monitor.releasemarks.2" />&nbsp;<fmt:message key="gradebook.monitor.releasemarks.3" />
+				</a> 
+			</div>
+	 	
+ 			<div id="markChartShown" style="display:none">
+				<a href="javascript:toggleMarkChart()" class="${btnclass}">
+					<fmt:message key="label.hide.marks.chart"/>
+				</a> 
+			</div>
+			<div id="markChartHidden">
+				<a href="javascript:toggleMarkChart()" class="${btnclass}">
+					<fmt:message key="label.show.marks.chart"/>
+				</a> 
 			</div>
 
+		<c:if test="${isInTabs}">
+	 		<div id="datesNotShown">
+				<a class="${btnclass}" href="javascript:toggleLessonDates()"><fmt:message key="gradebook.monitor.show.dates" /></a>
+			</div>
 			<div id="datesShown" style="display:none">
-				<a class="pull-right label label-primary" href="javascript:toggleLessonDates()"><fmt:message key="gradebook.monitor.hide.dates" /></a>
+				<a class="${btnclass}" href="javascript:toggleLessonDates()"><fmt:message key="gradebook.monitor.hide.dates" /></a>
 			</div>
+		</c:if>
+		
+		</div> <!-- Closes buttons -->
 
+		<!-- not in tabs? go next to the help button -->
+		<c:if test="${!isInTabs}">
+	 		<div id="datesNotShown">
+				<a class="${btnclass} pull-right btn-primary" href="javascript:toggleLessonDates()"><fmt:message key="gradebook.monitor.show.dates" /></a>
+			</div>
+			<div id="datesShown" style="display:none">
+				<a class="${btnclass} pull-right btn-primary" href="javascript:toggleLessonDates()"><fmt:message key="gradebook.monitor.hide.dates" /></a>
+			</div>
+		</c:if>
+					
+			<div class="row">
+				 <div class="col-xs-12">
+				 <lams:WaitingSpinner id="markChartBusy"/>
+ 				 <div id="markChartDiv" class="markChartDiv" style="display:none"></div>
+				</div>
+			</div>
+		
 			<div class="grid-holder voffset20">
 				<table id="userView" class="scroll" ></table>
 				<div id="userViewPager" class="scroll" ></div>
@@ -528,9 +601,14 @@
 				<div class="tooltip" id="tooltip"></div>
 				
 			</div>
-		</div> <!-- Closes content -->
-	
-		<div id="footer"></div><!--closes footer-->
-	</lams:Page> <!-- Closes page -->
+	 
+	<c:if test="not isInTabs">
+ 		</div>
+ 		</div>
+ 		</div>
+		</div>
+		</div>	
+	</c:if>
+
 </body>
 </lams:html>

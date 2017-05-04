@@ -23,9 +23,12 @@
 
 package org.lamsfoundation.lams.gradebook.web.action;
 
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.LinkedHashMap;
+import java.util.List;
 
+import javax.servlet.ServletException;
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
@@ -36,6 +39,8 @@ import org.apache.log4j.Logger;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
+import org.apache.tomcat.util.json.JSONException;
+import org.apache.tomcat.util.json.JSONObject;
 import org.lamsfoundation.lams.gradebook.service.IGradebookService;
 import org.lamsfoundation.lams.gradebook.util.GBGridView;
 import org.lamsfoundation.lams.gradebook.util.GradebookConstants;
@@ -99,6 +104,8 @@ public class GradebookMonitoringAction extends LamsDispatchAction {
 	    LessonDetailsDTO lessonDetatilsDTO = lesson.getLessonDetails();
 	    request.setAttribute("lessonDetails", lessonDetatilsDTO);
 	    request.setAttribute("marksReleased", marksReleased);
+	    
+	    request.setAttribute("isInTabs", WebUtil.readBooleanParam(request, "isInTabs", false));
 
 	    return mapping.findForward("monitorgradebook");
 	} catch (Exception e) {
@@ -393,6 +400,33 @@ public class GradebookMonitoringAction extends LamsDispatchAction {
 	ExcelUtil.createExcel(out, dataToExport, null, false);
 
 	return null;
+    }
+    
+    /**
+     * Get the raw marks for display in a histogram.
+     */
+    public ActionForward getMarkChartData(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+	    HttpServletResponse response) throws IOException, ServletException, JSONException {
+
+	Long lessonID = WebUtil.readLongParam(request, AttributeNames.PARAM_LESSON_ID);
+	if (!getSecurityService().isLessonMonitor(lessonID, getUser().getUserID(),
+		"export lesson gradebook spreadsheet", false)) {
+	    response.sendError(HttpServletResponse.SC_FORBIDDEN, "User is not a monitor in the lesson");
+	    return null;
+	}
+
+	List<Number> results = getGradebookService().getMarksArray(lessonID);
+	
+	JSONObject responseJSON = new JSONObject();
+	if ( results != null )
+	    responseJSON.put("data", results);
+	else 
+	    responseJSON.put("data", new Float[0]);
+
+	response.setContentType("application/json;charset=utf-8");
+	response.getWriter().write(responseJSON.toString());
+	return null;
+
     }
 
     private UserDTO getUser() {

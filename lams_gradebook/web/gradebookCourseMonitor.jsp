@@ -37,11 +37,11 @@
  				grid.jqGrid('hideCol','startDate');
  				grid.jqGrid('hideCol','finishDate');
 				document.getElementById("datesShown").style.display="none";
-				document.getElementById("datesNotShown").style.display="block";
+				document.getElementById("datesNotShown").style.display="inline";
 	        } else { 
 	        	grid.jqGrid('showCol','startDate');
 	        	grid.jqGrid('showCol','finishDate');
-				document.getElementById("datesShown").style.display="block";
+				document.getElementById("datesShown").style.display="inline";
 				document.getElementById("datesNotShown").style.display="none";
 	        }
 	        resizeJqgrid(grid);
@@ -436,11 +436,6 @@
 
 	<lams:Page type="admin">
 
-		<a target="_blank" class="btn btn-sm btn-default pull-right" title="<fmt:message key='button.help.tooltip'/>"
-		   href="http://wiki.lamsfoundation.org/display/lamsdocs/Gradebook+Course+Monitor">
-			<i class="fa fa-question-circle"></i> <span class="hidden-xs"><fmt:message key="button.help"/></span>
-		</a>
-
 		<h4>
 			<fmt:message key="gradebook.title.courseMonitor">
 				<fmt:param>
@@ -448,33 +443,47 @@
 				</fmt:param>
 			</fmt:message>
 		</h4>
-			
-			<div id="export-link-area">
-				<a href="#nogo" id="export-course-button" class="btn btn-xs btn-default">
-					<fmt:message key="gradebook.export.excel" />
-				</a>
-			</div>
-			
-			<div class="voffset5">
-				<a class="btn btn-xs btn-default" href="#nogo" onclick="return openSelectLessonsArea();" >
-					<fmt:message key="label.select.lessons.to.export" />
-				</a>
-			</div>
-			
+		
+		<c:set var="btnclass" value="btn btn-xs btn-default"/>
+
+		<a target="_blank" class="${btnclass} pull-right loffset5" title="<fmt:message key='button.help.tooltip'/>"
+		   href="http://wiki.lamsfoundation.org/display/lamsdocs/Gradebook+Course+Monitor">
+			<i class="fa fa-question-circle"></i> <span class="hidden-xs"><fmt:message key="button.help"/></span>
+		</a>
+
+		<div id="datesNotShown">
+			<a class="${btnclass} pull-right btn-primary" href="javascript:toggleLessonDates()"><fmt:message key="gradebook.monitor.show.dates" /></a>
+		</div>
+
+		<div id="datesShown" style="display:none">
+			<a class="${btnclass} pull-right btn-primary" href="javascript:toggleLessonDates()"><fmt:message key="gradebook.monitor.hide.dates" /></a>
+		</div>			
+				
+
+		<div id="export-link-area" class="topButtonsContainer">
+		<div>
+			<a href="#nogo" id="export-course-button" class="${btnclass}">
+				<fmt:message key="gradebook.export.excel" />
+			</a>
+		</div>
+		
+		<div>
+			<a class="${btnclass}" href="#nogo" onclick="return openSelectLessonsArea();" >
+				<fmt:message key="label.select.lessons.to.export" />
+			</a>
+		</div>
+		</div>
+
+			<div class="row">
+			<div class="col-xs-12">
 			<div id="select-lessons-area" class="text-center">
 				<table id="lessons-jqgrid" class="center-block"></table>
 				<div class="checkbox input-sm"><label><input type="checkbox" id="export-selected-simplified"><fmt:message key="label.simplified.export"/></label></div>
 				<input class="btn btn-sm btn-default" type="button" value="<fmt:message key="label.button.export"/>" id="export-selected-lessons-button" />			
 			</div>
-
-			<div id="datesNotShown">
-				<a class="pull-right label label-primary" href="javascript:toggleLessonDates()"><fmt:message key="gradebook.monitor.show.dates" /></a>
+			</div>
 			</div>
 
-			<div id="datesShown" style="display:none">
-				<a class="pull-right label label-primary" href="javascript:toggleLessonDates()"><fmt:message key="gradebook.monitor.hide.dates" /></a>
-			</div>			
-					
 			<div class="grid-holder voffset20">
 				<table id="organisationGrid" class="scroll"></table>
 				<div id="organisationGridPager" class="scroll"></div>
