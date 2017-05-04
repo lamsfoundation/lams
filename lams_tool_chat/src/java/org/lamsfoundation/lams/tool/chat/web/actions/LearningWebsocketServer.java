@@ -1,7 +1,6 @@
 package org.lamsfoundation.lams.tool.chat.web.actions;
 
 import java.io.IOException;
-import java.util.Collections;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -11,6 +10,7 @@ import java.util.Map.Entry;
 import java.util.Set;
 import java.util.TreeMap;
 import java.util.TreeSet;
+import java.util.concurrent.ConcurrentHashMap;
 
 import javax.websocket.CloseReason;
 import javax.websocket.CloseReason.CloseCodes;
@@ -78,26 +78,23 @@ public class LearningWebsocketServer {
 		try {
 		    // websocket communication bypasses standard HTTP filters, so Hibernate session needs to be initialised manually
 		    HibernateSessionManager.openSession();
-		    // synchronize websockets as a new Learner entering Chat could modify this collection
-		    synchronized (LearningWebsocketServer.websockets) {
-			Iterator<Entry<Long, Set<Websocket>>> entryIterator = LearningWebsocketServer.websockets
-				.entrySet().iterator();
-			// go throus Tool Session and update registered users with messages and roster
-			while (entryIterator.hasNext()) {
-			    Entry<Long, Set<Websocket>> entry = entryIterator.next();
-			    Long toolSessionId = entry.getKey();
-			    Long lastSendTime = lastSendTimes.get(toolSessionId);
-			    if ((lastSendTime == null)
-				    || ((System.currentTimeMillis() - lastSendTime) >= SendWorker.CHECK_INTERVAL)) {
-				send(toolSessionId);
-			    }
-			    // if all users left the chat, remove the obsolete mapping
-			    Set<Websocket> sessionWebsockets = entry.getValue();
-			    if (sessionWebsockets.isEmpty()) {
-				entryIterator.remove();
-				LearningWebsocketServer.rosters.remove(toolSessionId);
-				lastSendTimes.remove(toolSessionId);
-			    }
+		    Iterator<Entry<Long, Set<Websocket>>> entryIterator = LearningWebsocketServer.websockets.entrySet()
+			    .iterator();
+		    // go throus Tool Session and update registered users with messages and roster
+		    while (entryIterator.hasNext()) {
+			Entry<Long, Set<Websocket>> entry = entryIterator.next();
+			Long toolSessionId = entry.getKey();
+			Long lastSendTime = lastSendTimes.get(toolSessionId);
+			if ((lastSendTime == null)
+				|| ((System.currentTimeMillis() - lastSendTime) >= SendWorker.CHECK_INTERVAL)) {
+			    send(toolSessionId);
+			}
+			// if all users left the chat, remove the obsolete mapping
+			Set<Websocket> sessionWebsockets = entry.getValue();
+			if (sessionWebsockets.isEmpty()) {
+			    entryIterator.remove();
+			    LearningWebsocketServer.rosters.remove(toolSessionId);
+			    lastSendTimes.remove(toolSessionId);
 			}
 		    }
 		} catch (Exception e) {
@@ -125,9 +122,8 @@ public class LearningWebsocketServer {
 	    ChatSession chatSession = LearningWebsocketServer.getChatService().getSessionBySessionId(toolSessionId);
 	    List<ChatMessage> messages = LearningWebsocketServer.getChatService().getLastestMessages(chatSession, null,
 		    true);
-	    // make a copy of the websocket collection so it does not get blocked while sending messages
-	    Set<Websocket> sessionWebsockets = new HashSet<Websocket>(
-		    LearningWebsocketServer.websockets.get(toolSessionId));
+
+	    Set<Websocket> sessionWebsockets = LearningWebsocketServer.websockets.get(toolSessionId);
 	    Roster roster = null;
 	    JSONArray rosterJSON = null;
 	    String rosterString = null;
@@ -227,9 +223,8 @@ public class LearningWebsocketServer {
     private static IChatService chatService;
 
     private static final SendWorker sendWorker = new SendWorker();
-    private static final Map<Long, Roster> rosters = Collections.synchronizedMap(new TreeMap<Long, Roster>());
-    private static final Map<Long, Set<Websocket>> websockets = Collections
-	    .synchronizedMap(new TreeMap<Long, Set<Websocket>>());
+    private static final Map<Long, Roster> rosters = new ConcurrentHashMap<Long, Roster>();
+    private static final Map<Long, Set<Websocket>> websockets = new ConcurrentHashMap<Long, Set<Websocket>>();
 
     static {
 	// run the singleton thread
@@ -245,7 +240,7 @@ public class LearningWebsocketServer {
 		.valueOf(session.getRequestParameterMap().get(AttributeNames.PARAM_TOOL_SESSION_ID).get(0));
 	Set<Websocket> sessionWebsockets = LearningWebsocketServer.websockets.get(toolSessionId);
 	if (sessionWebsockets == null) {
-	    sessionWebsockets = Collections.synchronizedSet(new HashSet<Websocket>());
+	    sessionWebsockets = ConcurrentHashMap.newKeySet();
 	    LearningWebsocketServer.websockets.put(toolSessionId, sessionWebsockets);
 	}
 	final Set<Websocket> finalSessionWebsockets = sessionWebsockets;
@@ -281,14 +276,12 @@ public class LearningWebsocketServer {
 	Long toolSessionId = Long
 		.valueOf(session.getRequestParameterMap().get(AttributeNames.PARAM_TOOL_SESSION_ID).get(0));
 	Set<Websocket> sessionWebsockets = LearningWebsocketServer.websockets.get(toolSessionId);
-	synchronized (sessionWebsockets) {
-	    Iterator<Websocket> websocketIterator = sessionWebsockets.iterator();
-	    while (websocketIterator.hasNext()) {
-		Websocket websocket = websocketIterator.next();
-		if (websocket.session.equals(session)) {
-		    websocketIterator.remove();
-		    break;
-		}
+	Iterator<Websocket> websocketIterator = sessionWebsockets.iterator();
+	while (websocketIterator.hasNext()) {
+	    Websocket websocket = websocketIterator.next();
+	    if (websocket.session.equals(session)) {
+		websocketIterator.remove();
+		break;
 	    }
 	}
 

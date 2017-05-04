@@ -1,14 +1,13 @@
 package org.lamsfoundation.lams.tool.scribe.web.actions;
 
 import java.io.IOException;
-import java.util.Collections;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 import java.util.TreeMap;
 import java.util.TreeSet;
+import java.util.concurrent.ConcurrentHashMap;
 
 import javax.websocket.CloseReason;
 import javax.websocket.CloseReason.CloseCodes;
@@ -62,25 +61,22 @@ public class LearningWebsocketServer {
 		try {
 		    // websocket communication bypasses standard HTTP filters, so Hibernate session needs to be initialised manually
 		    HibernateSessionManager.openSession();
-		    // synchronize websockets as a new Learner entering the activity could modify this collection
-		    synchronized (LearningWebsocketServer.websockets) {
-			Iterator<Entry<Long, Set<Session>>> entryIterator = LearningWebsocketServer.websockets
-				.entrySet().iterator();
-			// go through activities and update registered learners with reports and vote count
-			while (entryIterator.hasNext()) {
-			    Entry<Long, Set<Session>> entry = entryIterator.next();
-			    Long toolSessionId = entry.getKey();
-			    try {
-				send(toolSessionId, null);
-			    } catch (JSONException e) {
-				LearningWebsocketServer.log.error("Error while building Scribe report JSON", e);
-			    }
-			    // if all learners left the activity, remove the obsolete mapping
-			    Set<Session> sessionWebsockets = entry.getValue();
-			    if (sessionWebsockets.isEmpty()) {
-				entryIterator.remove();
-				LearningWebsocketServer.cache.remove(toolSessionId);
-			    }
+		    Iterator<Entry<Long, Set<Session>>> entryIterator = LearningWebsocketServer.websockets.entrySet()
+			    .iterator();
+		    // go through activities and update registered learners with reports and vote count
+		    while (entryIterator.hasNext()) {
+			Entry<Long, Set<Session>> entry = entryIterator.next();
+			Long toolSessionId = entry.getKey();
+			try {
+			    send(toolSessionId, null);
+			} catch (JSONException e) {
+			    LearningWebsocketServer.log.error("Error while building Scribe report JSON", e);
+			}
+			// if all learners left the activity, remove the obsolete mapping
+			Set<Session> sessionWebsockets = entry.getValue();
+			if (sessionWebsockets.isEmpty()) {
+			    entryIterator.remove();
+			    LearningWebsocketServer.cache.remove(toolSessionId);
 			}
 		    }
 		} catch (Exception e) {
@@ -171,10 +167,7 @@ public class LearningWebsocketServer {
 
 	    // either send only to the new user or to everyone
 	    if (newWebsocket == null) {
-		// make a copy of the websocket collection so it does not get blocked while sending messages
-		Set<Session> sessionWebsockets = new HashSet<Session>(
-			LearningWebsocketServer.websockets.get(toolSessionId));
-		// synchronize websockets as a new Learner entering Scribe could modify this collection
+		Set<Session> sessionWebsockets = LearningWebsocketServer.websockets.get(toolSessionId);
 		for (Session websocket : sessionWebsockets) {
 		    String userName = websocket.getUserPrincipal().getName();
 		    responseJSON.put("approved", learnersApproved.contains(userName));
@@ -194,10 +187,8 @@ public class LearningWebsocketServer {
 
     private static final SendWorker sendWorker = new SendWorker();
     // maps toolSessionId -> cached session data
-    private static final Map<Long, ScribeSessionCache> cache = Collections
-	    .synchronizedMap(new TreeMap<Long, ScribeSessionCache>());
-    private static final Map<Long, Set<Session>> websockets = Collections
-	    .synchronizedMap(new TreeMap<Long, Set<Session>>());
+    private static final Map<Long, ScribeSessionCache> cache = new ConcurrentHashMap<Long, ScribeSessionCache>();
+    private static final Map<Long, Set<Session>> websockets = new ConcurrentHashMap<Long, Set<Session>>();
 
     static {
 	// run the singleton thread
@@ -213,7 +204,7 @@ public class LearningWebsocketServer {
 		.valueOf(websocket.getRequestParameterMap().get(AttributeNames.PARAM_TOOL_SESSION_ID).get(0));
 	Set<Session> sessionWebsockets = LearningWebsocketServer.websockets.get(toolSessionId);
 	if (sessionWebsockets == null) {
-	    sessionWebsockets = Collections.synchronizedSet(new HashSet<Session>());
+	    sessionWebsockets = ConcurrentHashMap.newKeySet();
 	    LearningWebsocketServer.websockets.put(toolSessionId, sessionWebsockets);
 	}
 	sessionWebsockets.add(websocket);
@@ -308,8 +299,6 @@ public class LearningWebsocketServer {
 	if (sessionWebsockets == null) {
 	    return;
 	}
-	// make a copy of the websocket collection so it does not get blocked while sending messages
-	sessionWebsockets = new HashSet<Session>(sessionWebsockets);
 
 	JSONObject responseJSON = new JSONObject();
 	responseJSON.put("close", true);

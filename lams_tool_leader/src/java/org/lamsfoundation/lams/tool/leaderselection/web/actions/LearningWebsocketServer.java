@@ -1,11 +1,9 @@
 package org.lamsfoundation.lams.tool.leaderselection.web.actions;
 
 import java.io.IOException;
-import java.util.Collections;
-import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
-import java.util.TreeMap;
+import java.util.concurrent.ConcurrentHashMap;
 
 import javax.websocket.CloseReason;
 import javax.websocket.CloseReason.CloseCodes;
@@ -30,11 +28,10 @@ public class LearningWebsocketServer {
 
     private static Logger log = Logger.getLogger(LearningWebsocketServer.class);
 
-    private static final Map<Long, Set<Session>> websockets = Collections
-	    .synchronizedMap(new TreeMap<Long, Set<Session>>());
+    private static final Map<Long, Set<Session>> websockets = new ConcurrentHashMap<Long, Set<Session>>();
 
     /**
-     * Registeres the Learner for processing by SendWorker.
+     * Registeres the Learner for processing.
      */
     @OnOpen
     public void registerUser(Session websocket) throws JSONException, IOException {
@@ -42,7 +39,7 @@ public class LearningWebsocketServer {
 		.valueOf(websocket.getRequestParameterMap().get(AttributeNames.PARAM_TOOL_SESSION_ID).get(0));
 	Set<Session> sessionWebsockets = websockets.get(toolSessionId);
 	if (sessionWebsockets == null) {
-	    sessionWebsockets = Collections.synchronizedSet(new HashSet<Session>());
+	    sessionWebsockets = ConcurrentHashMap.newKeySet();
 	    websockets.put(toolSessionId, sessionWebsockets);
 	}
 	sessionWebsockets.add(websocket);
@@ -83,8 +80,6 @@ public class LearningWebsocketServer {
 	if (sessionWebsockets == null) {
 	    return;
 	}
-	// make a copy of the websocket collection so it does not get blocked while sending messages
-	sessionWebsockets = new HashSet<Session>(sessionWebsockets);
 
 	JSONObject responseJSON = new JSONObject();
 	responseJSON.put("pageRefresh", true);
@@ -96,5 +91,4 @@ public class LearningWebsocketServer {
 	    }
 	}
     }
-
 }
