@@ -11,13 +11,17 @@
 <script type="text/javascript" src='<lams:LAMSURL/>includes/javascript/jquery.js'></script>
 <script type="text/javascript">
 	//init the connection with server using server URL but with different protocol
-	var websocket = new WebSocket('${tool}'.replace('http', 'ws')
+	var scribeWebsocket = new WebSocket('${tool}'.replace('http', 'ws')
 					+ 'learningWebsocket?toolSessionID=' + ${scribeSessionDTO.sessionID}),
 		agreementPercentageLabel = '<fmt:message key="message.voteStatistics" />',
 		reportSubmitted = ${scribeSessionDTO.reportSubmitted};
-
+		
+	scribeWebsocket.onclose = function(){
+		location.reload();
+	};
+	
 	// run when the server pushes new reports and vote statistics
-	websocket.onmessage = function(e) {
+	scribeWebsocket.onmessage = function(e) {
 		// create JSON object
 		var input = JSON.parse(e.data),
 			agreeButton = $('#agreeButton').parent();
@@ -57,7 +61,7 @@
 			data = {
 				type : 'vote'	
 			};
-		websocket.send(JSON.stringify(data));
+		scribeWebsocket.send(JSON.stringify(data));
 		
 		agreeButton.hide();
 	}

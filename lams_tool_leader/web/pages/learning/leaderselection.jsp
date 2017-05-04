@@ -27,11 +27,15 @@
     }
     
  	//init the connection with server using server URL but with different protocol
- 	var websocket = new WebSocket('<lams:WebAppURL />'.replace('http', 'ws') 
+ 	var leaderWebsocket = new WebSocket('<lams:WebAppURL />'.replace('http', 'ws') 
  			+ 'learningWebsocket?toolSessionID=' + ${toolSessionID});
  	
+ 	leaderWebsocket.onclose = function(){
+ 		location.reload();
+ 	};
+ 	
 	// run when the leader has just been selected
-	websocket.onmessage = function(e) {
+	leaderWebsocket.onmessage = function(e) {
 		// create JSON object
 		var input = JSON.parse(e.data);
 		
