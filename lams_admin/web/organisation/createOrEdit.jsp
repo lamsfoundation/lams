@@ -110,12 +110,6 @@
 			</label>
 		</div>
 		<div class="checkbox">
-			<label for="enableGradebookForMonitors">
-			<html-el:checkbox onclick="unSelectLearnerGradebook();" styleId="enableGradebookForMonitors" property="enableGradebookForMonitors" />
-				<fmt:message key="admin.gradebook.monitor.enable"/>
-			</label>
-		</div>
-		<div class="checkbox">
 			<label for="enableGradebookForLearners">
 			<html-el:checkbox onclick="selectMonitorGradebook();" styleId="enableGradebookForLearners" property="enableGradebookForLearners" />
 				<fmt:message key="admin.gradebook.learner.enable"/>

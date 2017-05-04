@@ -45,7 +45,6 @@
 	<form-property name="courseAdminCanChangeStatusOfCourse" type="java.lang.Boolean" initial="false"/>
 	<form-property name="enableCourseNotifications" type="java.lang.Boolean" initial="false"/>
 	<form-property name="enableGradebookForLearners" type="java.lang.Boolean" initial="false"/>
-	<form-property name="enableGradebookForMonitors" type="java.lang.Boolean" initial="false"/>
 	<form-property name="enableSingleActivityLessons" type="java.lang.Boolean" initial="false"/>
 	<form-property name="enableLiveEdit" type="java.lang.Boolean" initial="true"/>
 </form-bean>
