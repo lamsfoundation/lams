@@ -101,4 +101,6 @@ public interface IGradebookDAO extends IBaseDAO {
     List<GradebookUserLesson> getGradebookUserLessons(Lesson lesson, List<Integer> userIds);
 
     List<GradebookUserLesson> getGradebookUserLessons(List<Long> lessonIds);
+    
+    List<Number> getAllMarksForLesson(Long lessonID);
 }

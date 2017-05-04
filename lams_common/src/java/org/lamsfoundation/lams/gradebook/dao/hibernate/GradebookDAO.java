@@ -63,6 +63,9 @@ public class GradebookDAO extends LAMSBaseDAO implements IGradebookDAO {
     private static final String GET_AVERAGE_MARK_FOR_GROUPED_ACTIVTY = "select avg(gact.mark) from GradebookUserActivity gact, GroupUser gu, Group grp where "
 	    + "gact.activity.activityId=:activityID and grp.groupId=:groupID and gu.user=gact.learner and gu.group=grp";
 
+    private static final String GET_ALL_MARKS_FOR_LESSON = "SELECT gles.mark FROM GradebookUserLesson gles WHERE "
+	    + "gles.lesson.lessonId=:lessonID";
+
     @Override
     @SuppressWarnings("unchecked")
     public GradebookUserActivity getGradebookUserDataForActivity(Long activityID, Integer userID) {
@@ -150,6 +153,12 @@ public class GradebookDAO extends LAMSBaseDAO implements IGradebookDAO {
 	}
 
 	return 0.0;
+    }
+
+    @Override
+    public List<Number> getAllMarksForLesson(Long lessonID) {
+	return (List<Number>) getSessionFactory().getCurrentSession().createQuery(GET_ALL_MARKS_FOR_LESSON)
+		.setLong("lessonID", lessonID.longValue()).list();
     }
 
     @Override
