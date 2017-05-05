@@ -419,10 +419,9 @@ nav.navbar-heading {
 }
 
 
-@media (min-width: 0px) and (max-width: 992px) {
+@media (min-width: 0px) and (max-width: 767px) {
   .btn-primary, .btn-default, .btn-success, .btn-info, .btn-danger {
-    padding:4px 9px 3px;
-    font-size:90%;
+    padding:4px 9px 2px;
   }
 }
 
