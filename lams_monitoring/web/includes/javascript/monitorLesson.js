@@ -349,7 +349,6 @@ function scheduleLesson(){
 	var date = $('#scheduleDatetimeField').val();
 	if (date) {
 		$.ajax({
-			dataType : 'xml',
 			url : LAMS_URL + 'monitoring/monitoring.do',
 			cache : false,
 			data : {
@@ -369,7 +368,7 @@ function scheduleLesson(){
 
 function startLesson(){
 	$.ajax({
-		dataType : 'xml',
+		dataType : 'text',
 		url : LAMS_URL + 'monitoring/monitoring.do',
 		cache : false,
 		data : {
