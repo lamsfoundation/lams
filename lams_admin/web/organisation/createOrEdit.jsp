@@ -1,21 +1,5 @@
 <%@ include file="/taglibs.jsp"%>
 
-<script type="text/javascript">
-	function selectMonitorGradebook() {
-		document.getElementById("enableGradebookForMonitors").checked = true;
-	}
-	
-	function unSelectLearnerGradebook() {
-		var mon = document.getElementById("enableGradebookForMonitors");
-		var lrn = document.getElementById("enableGradebookForLearners");
-		
-		if (lrn.checked) {
-			lrn.checked = mon.checked;
-		}
-	}
-
-</script>
-
 <html-el:form action="/orgsave.do" method="post">
 <html-el:hidden property="orgId" />
 <html-el:hidden property="parentId" />
@@ -111,7 +95,7 @@
 		</div>
 		<div class="checkbox">
 			<label for="enableGradebookForLearners">
-			<html-el:checkbox onclick="selectMonitorGradebook();" styleId="enableGradebookForLearners" property="enableGradebookForLearners" />
+			<html-el:checkbox styleId="enableGradebookForLearners" property="enableGradebookForLearners" />
 				<fmt:message key="admin.gradebook.learner.enable"/>
 			</label>
 		</div>
