@@ -100,16 +100,6 @@
 			</meta>
 		</property>
 
-		<!--  enableGradebookForMonitors is no longer used - will always return true in the code  -->
-		<property name="enableGradebookForMonitors" type="java.lang.Boolean"
-			column="enable_monitor_gradebook" not-null="true" length="1">
-			<meta attribute="field-description">
-				@hibernate.property
-				column="enable_monitor_gradebook"
-				length="1" not-null="true"
-			</meta>
-		</property>
-
 		<property name="enableGradebookForLearners" type="java.lang.Boolean"
 			column="enable_learner_gradebook" not-null="true" length="1">
 			<meta attribute="field-description">
