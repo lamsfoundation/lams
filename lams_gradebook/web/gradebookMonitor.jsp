@@ -524,11 +524,11 @@
 		<i class="fa fa-question-circle"></i> <span class="hidden-xs"><fmt:message key="button.help"/></span></a>
 
 		<c:set var="btnclass" value="btn btn-xs btn-default"/>
-		<div class="topButtonsContainer" id="export-link-area" >
+		<div class="gbTopButtonsContainer" id="export-link-area" >
 	</c:when>
 	<c:otherwise>
 		<c:set var="btnclass" value="btn btn-sm btn-default"/>
-	 	<div class="topButtonsContainerInTab" id="export-link-area" >
+	 	<div class="gbTopButtonsContainerInTab" id="export-link-area" >
 	</c:otherwise>
 	</c:choose>
 
