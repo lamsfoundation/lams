@@ -460,7 +460,7 @@
 		</div>			
 				
 
-		<div id="export-link-area" class="topButtonsContainer">
+		<div id="export-link-area" class="gbTopButtonsContainer">
 		<div>
 			<a href="#nogo" id="export-course-button" class="${btnclass}">
 				<fmt:message key="gradebook.export.excel" />

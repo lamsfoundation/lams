@@ -17,39 +17,39 @@
 
 
 /* Formatting buttons on the Gradebook Lesson screen */
-.topButtonsContainer {
+.gbTopButtonsContainer {
 	height: 30px;
 	padding: 0px !important;
 	float: left;
 }
 
-.topButtonsContainer div {
+.gbTopButtonsContainer div {
 	display: inline;
 }
 
-.topButtonsContainer a {
+.gbTopButtonsContainer a {
 	margin: 5px 5px 5px 0;
 }
 
-.topButtonsContainer button {
+.gbTopButtonsContainer button {
 	margin: 5px 5px 5px 0;
 }
 
-.topButtonsContainerInTab {
+.gbTopButtonsContainerInTab {
 	height: 30px;
 	padding: 0px !important;
 	float: right;
 }
 
-.topButtonsContainerInTab div {
+.gbTopButtonsContainerInTab div {
 	display: inline;
 }
 
-.topButtonsContainerInTab a {
+.gbTopButtonsContainerInTab a {
 	margin: 5px 5px 5px 0;
 }
 
-.topButtonsContainerInTab button {
+.gbTopButtonsContainerInTab button {
 	margin: 5px 5px 5px 0;
 }
 
