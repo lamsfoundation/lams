@@ -28,25 +28,34 @@
 		var graphLoaded = false;
 
 		function toggleMarkChart() {
+			// the two methods showMarkChart and hideMarkChart are used in the Monitoring tour
 			if ( $("#markChartDiv").css("display") == "none" ) {
-				$("#markChartDiv").css("display", "block");
-				$("#markChartHidden").css("display", "none");
-				if ( ! graphLoaded ) {
-					$("#markChartBusy").css("display", "block");
-					drawHistogram('markChartDiv',
-							'<lams:LAMSURL/>/gradebook/gradebookMonitoring.do?dispatch=getMarkChartData&lessonID=${lessonDetails.lessonID}',
-							'<fmt:message key="label.marks"/>', '<fmt:message key="label.number.learners.in.mark.range"/>');
-					graphLoaded = true;
-					$("#markChartBusy").css("display", "none");
-				}
-				$("#markChartShown").css("display", "inline");
+				showMarkChart();
 			} else {
-				$("#markChartDiv").css("display", "none");
-				$("#markChartShown").css("display", "none");
-				$("#markChartHidden").css("display", "inline");
+				hideMarkChart();
 			}
 		}
 
+		function showMarkChart() {
+			$("#markChartDiv").css("display", "block");
+			$("#markChartHidden").css("display", "none");
+			if ( ! graphLoaded ) {
+				$("#markChartBusy").css("display", "block");
+				drawHistogram('markChartDiv',
+						'<lams:LAMSURL/>/gradebook/gradebookMonitoring.do?dispatch=getMarkChartData&lessonID=${lessonDetails.lessonID}',
+						'<fmt:message key="label.marks"/>', '<fmt:message key="label.number.learners.in.mark.range"/>');
+				graphLoaded = true;
+				$("#markChartBusy").css("display", "none");
+			}
+			$("#markChartShown").css("display", "inline");
+		}
+		
+		function hideMarkChart() {
+			$("#markChartDiv").css("display", "none");
+			$("#markChartShown").css("display", "none");
+			$("#markChartHidden").css("display", "inline");
+		}
+		
 		function toggleRelease() {
 			
 			var conf;
@@ -538,17 +547,20 @@
 				</a> 
 			</div>
 	 
+	 		<div id="tour-release-marks">
 			<div id="marksNotReleased" style="display:none">
 				<a href="javascript:toggleRelease()" class="${btnclass}">
 					<fmt:message key="gradebook.monitor.releasemarks.1" />&nbsp;<fmt:message key="gradebook.monitor.releasemarks.3" />
 				</a>
 			</div>
-			<div id="marksReleased" style="display:none">
+			<div id="marksReleased" style="display:none" class="tour-release-marks">
 				<a href="javascript:toggleRelease()" class="${btnclass}">
 					<fmt:message key="gradebook.monitor.releasemarks.2" />&nbsp;<fmt:message key="gradebook.monitor.releasemarks.3" />
 				</a> 
 			</div>
+			</div>
 	 	
+ 			<div id="tour-mark-chart-button">
  			<div id="markChartShown" style="display:none">
 				<a href="javascript:toggleMarkChart()" class="${btnclass}">
 					<fmt:message key="label.hide.marks.chart"/>
@@ -559,13 +571,16 @@
 					<fmt:message key="label.show.marks.chart"/>
 				</a> 
 			</div>
-
+			</div>
+			
 		<c:if test="${isInTabs}">
+			<div id="tour-dates">
 	 		<div id="datesNotShown">
 				<a class="${btnclass}" href="javascript:toggleLessonDates()"><fmt:message key="gradebook.monitor.show.dates" /></a>
 			</div>
 			<div id="datesShown" style="display:none">
 				<a class="${btnclass}" href="javascript:toggleLessonDates()"><fmt:message key="gradebook.monitor.hide.dates" /></a>
+			</div>
 			</div>
 		</c:if>
 		
@@ -573,11 +588,13 @@
 
 		<!-- not in tabs? go next to the help button -->
 		<c:if test="${!isInTabs}">
-	 		<div id="datesNotShown">
+			<div class="tour-dates">
+	 		<div id="datesNotShown" class="tour-dates">
 				<a class="${btnclass} pull-right btn-primary" href="javascript:toggleLessonDates()"><fmt:message key="gradebook.monitor.show.dates" /></a>
 			</div>
-			<div id="datesShown" style="display:none">
+			<div id="datesShown" style="display:none" class="tour-dates">
 				<a class="${btnclass} pull-right btn-primary" href="javascript:toggleLessonDates()"><fmt:message key="gradebook.monitor.hide.dates" /></a>
+			</div>
 			</div>
 		</c:if>
 					
