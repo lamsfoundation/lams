@@ -8,6 +8,8 @@
 			startStep = 10;
 		} else if ( selectedTabID == 3 ) {
 			startStep = 18;
+		}  else if ( selectedTabID == 4 ) {
+			startStep = 24;
 		}
 
 		tourInProgress = true;
@@ -146,6 +148,47 @@
 			        title: "<fmt:message key="label.email"/>",
 			        content: "<fmt:message key="tour.email.content"/>",
 			        placement: "left",
+			        onNext: switchToGradebook
+			      },{
+			        element: "#userView",
+			        title: "<fmt:message key="tour.gradebook.learner.grades"/>",
+			        content: "<fmt:message key="tour.gradebook.learner.grades.content"/>",
+			        placement: "top",
+			        onPrev: switchToLearners
+			      },{
+			        element: "#activityView",
+			        title: "<fmt:message key="tour.gradebook.activity.grades"/>",
+			        content: "<fmt:message key="tour.gradebook.activity.grades.content"/>",
+			        placement: "top"
+			      },{
+			        element: "#export-grades-button",
+			        title: "<fmt:message key="tour.gradebook.export.grades"/>",
+			        content: "<fmt:message key="tour.gradebook.export.grades.content"/>",
+			        placement: "bottom"
+			      },{
+			        element: "#tour-release-marks",
+			        title: "<fmt:message key="tour.gradebook.release.marks"/>",
+			        content: "<fmt:message key="tour.gradebook.release.marks.content"/>",
+			        placement: "bottom"
+			      },{
+			        element: "#tour-mark-chart-button",
+			        title: "<fmt:message key="tour.gradebook.show.marks.chart"/>",
+			        content: "<fmt:message key="tour.gradebook.show.marks.chart.content"/>",
+			        placement: "bottom",
+			        onNext: showMarkChart
+			      },{
+			        element: "#markChartDiv",
+			        title: "<fmt:message key="tour.gradebook.marks.chart"/>",
+			        content: "<fmt:message key="tour.histogram.help.content"/>",
+			        backdrop: true,
+			        placement: "top",
+			        onNext: hideMarkChart
+			      },{
+			        element: "#tour-dates",
+			        title: "<fmt:message key="tour.gradebook.show.dates"/>",
+			        content: "<fmt:message key="tour.gradebook.show.dates.content"/>",
+			        placement: "bottom",
+			        onPrev: showMarkChart
 			      },{
 					title: "<fmt:message key="tour.end.title"/>",
 			        content: "<p><fmt:message key="tour.end.content.1"/></p><p><fmt:message key="tour.end.content.2"/></p>",
@@ -154,7 +197,7 @@
 			      }		     
 			    ],
 			  onEnd: tourEnd,
-			  debug: false,
+			  debug: true,
 			  backdrop: false,
 			  storage: false,
 			  template: '<div class="popover" role="tooltip"> <div class="arrow"></div> <h3 class="popover-title"></h3> <div class="popover-content"></div> <div class="popover-navigation"> <div class="btn-group"> <button class="btn btn-sm btn-default" data-role="prev">&laquo; <fmt:message key="tour.prev"/></button> <button class="btn btn-sm btn-default" data-role="next"><fmt:message key="tour.next"/> &raquo;</button> </div> <button class="btn btn-sm btn-default loffset5" onclick="openWikiHelp()"><fmt:message key="tour.more.help"/></button>  <button class="btn btn-sm btn-default" data-role="end"><fmt:message key="tour.end.tour"/></button> </div>'
@@ -195,6 +238,19 @@
 			$("#openImButton").css('display', 'none');
 		}				
 	}
+
+	// These two functions call functions from gradebook page so do not risk breaking tour if they are missing or broken
+	function showMarkChart() {
+		try{
+			showMarkChart();
+ 		} catch(e){};
+	}
+
+	function hideMarkChart() {
+		try{
+			hideMarkChart();
+ 		} catch(e){};
+	}
 	
 	function switchToLesson() {
 		actualDoSelectTab(1);
@@ -206,6 +262,13 @@
 
 	function switchToLearners() {
 		actualDoSelectTab(3);
+	}
+
+	function switchToGradebook() {
+		actualDoSelectTab(4);
+		var check = 0;
+		
+		"#gradebookLoading"
 	}
 	
 	function tourEnd() {
