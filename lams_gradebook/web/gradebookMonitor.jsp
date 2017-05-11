@@ -88,9 +88,13 @@
 			if (marksReleased) {
 				document.getElementById("marksReleased").style.display="inline";
 				document.getElementById("marksNotReleased").style.display="none";
+				document.getElementById("padlockUnlocked").style.display="inline";
+				document.getElementById("padlockLocked").style.display="none";
 			} else {
 				document.getElementById("marksReleased").style.display="none";
 				document.getElementById("marksNotReleased").style.display="inline";
+				document.getElementById("padlockUnlocked").style.display="none";
+				document.getElementById("padlockLocked").style.display="inline";
 			}
 		}
 		
@@ -483,11 +487,11 @@
 				}).navGrid("#activityViewPager", {edit:false,add:false,del:false,search:false}); // enable refresh button
 				
 				$("#export-grades-button").click(function() {
-					
 					var areaToBlock = "export-link-area";
 					var exportExcelUrl = "<lams:WebAppURL/>/gradebookMonitoring.do?dispatch=exportExcelLessonGradebook&lessonID=${lessonDetails.lessonID}";
 					var languageLabelWait = "<fmt:message key='gradebook.coursemonitor.wait'/>";
-					blockExportButton(areaToBlock, exportExcelUrl, languageLabelWait);
+					// if exportSpan is hidden then icon only mode, use small font.
+					blockExportButton(areaToBlock, exportExcelUrl, languageLabelWait, $("#exportSpan:hidden").length > 0);
 					
 					return false;
 				});
@@ -511,6 +515,73 @@
 
 <body class="stripes">
 
+	<!--  The buttons are formatted and dispayed differently in the pop up vs monitoring version. Popup matches Course Gradebook, 
+	-- Monitoring matches monitoring. So various button settings and the button codes are setup in advance and included where needed later.  -->
+	
+	<c:choose>
+	<c:when test="${!isInTabs}">
+		<c:set var="btnclass" value="btn btn-xs btn-default"/>
+	</c:when>
+	<c:otherwise>
+		<c:set var="btnclass" value="btn btn-sm btn-default"/>
+	</c:otherwise>
+	</c:choose>
+		
+	<c:set var="tourDatesCode">
+		<div id="tour-dates">
+ 		<div id="datesNotShown">
+ 			<a class="${btnclass}" href="javascript:toggleLessonDates()" title="<fmt:message key="gradebook.monitor.show.dates"/>" >
+ 			<i class="fa fa-calendar-check-o"></i> <span class="hidden-xs">
+			<fmt:message key="gradebook.monitor.show.dates" /></a>
+			</span>
+		</div>
+		<div id="datesShown" style="display:none">
+			<a class="${btnclass}" href="javascript:toggleLessonDates()" title="<fmt:message key="gradebook.monitor.hide.dates"/>" >
+ 			<i class="fa fa-calendar-check-o"></i> <span class="hidden-xs">
+			<fmt:message key="gradebook.monitor.hide.dates" /></a>
+			</span>
+		</div>
+		</div>
+	</c:set>
+		
+	<c:set var="lockLabelClass">${isInTabs?"lockLabel":""}</c:set>
+	<c:set var="padlockCode">
+		<div class="visible-xs-inline">
+		<div id="padlockLocked" style="display:none">
+			<span class="${lockLabelClass}">
+			<i class="fa fa-lock"></i>
+			<fmt:message key="label.marks"/>
+			</span>
+		</div>
+		<div id="padlockUnlocked" style="display:none">
+			<span class="${lockLabelClass}">
+			<i class="fa fa-unlock"></i>
+			<fmt:message key="label.marks"/>
+			</span>
+		</div>
+		</div>
+	</c:set>
+			
+			
+	<c:set var="chartButtonCode">
+		<div id="tour-mark-chart-button">
+			<div id="markChartShown" style="display:none">
+			<a href="javascript:toggleMarkChart()" class="${btnclass}" title="<fmt:message key='label.hide.marks.chart'/>" >
+				<i class="fa fa-bar-chart"></i> <span class="hidden-xs">
+				<fmt:message key="label.hide.marks.chart"/>
+				</span>
+			</a> 
+		</div>
+		<div id="markChartHidden">
+			<a href="javascript:toggleMarkChart()" class="${btnclass}" title="<fmt:message key='label.show.marks.chart'/>" >
+				<i class="fa fa-bar-chart"></i> <span class="hidden-xs">
+				<fmt:message key="label.show.marks.chart"/>
+				</span>
+			</a> 
+		</div>
+		</div>
+	</c:set>
+	
 	<c:choose>
 	<c:when test="${!isInTabs}">
 		<%-- replacement for Page type admin --%>
@@ -527,77 +598,63 @@
 					</fmt:param>
 				</fmt:message></h4>
 
-		
-		<a target="_blank" class="btn btn-xs btn-default pull-right loffset5" title="<fmt:message key='button.help.tooltip'/>"
-			   href="http://wiki.lamsfoundation.org/display/lamsdocs/Gradebook+Lesson+Marking">
-		<i class="fa fa-question-circle"></i> <span class="hidden-xs"><fmt:message key="button.help"/></span></a>
+		<div class="gbTopButtonsContainer pull-right">
+			${chartButtonCode}
+			${tourDatesCode}
+			<a target="_blank" class="${btnclass}" title="<fmt:message key='button.help.tooltip'/>"
+				   href="http://wiki.lamsfoundation.org/display/lamsdocs/Gradebook+Lesson+Marking">
+			<i class="fa fa-question-circle"></i> <span class="hidden-xs"><fmt:message key="button.help"/></span></a>
+		</div>
 
-		<c:set var="btnclass" value="btn btn-xs btn-default"/>
-		<div class="gbTopButtonsContainer" id="export-link-area" >
+		<div class="gbTopButtonsContainer pull-left" id="export-link-area">
+			${padlockCode}
+		
 	</c:when>
+	
 	<c:otherwise>
-		<c:set var="btnclass" value="btn btn-sm btn-default"/>
-	 	<div class="gbTopButtonsContainerInTab" id="export-link-area" >
+	 	
+		<div class="gbTopButtonsContainer pull-left">
+			${padlockCode}
+		</div>
+		
+		<div class="gbTopButtonsContainer pull-right" id="export-link-area">
+	 	
 	</c:otherwise>
 	</c:choose>
 
 			<div>
-				<a href="#nogo" id="export-grades-button" class="${btnclass}">
+				<a href="#nogo" id="export-grades-button" class="${btnclass}" title="<fmt:message key='gradebook.export.excel'/>" >
+					<i class="fa fa-download"></i><span id="exportSpan" class="hidden-xs">
 					<fmt:message key="gradebook.export.excel" />
+					</span>
 				</a> 
 			</div>
 	 
 	 		<div id="tour-release-marks">
 			<div id="marksNotReleased" style="display:none">
-				<a href="javascript:toggleRelease()" class="${btnclass}">
+				<a href="javascript:toggleRelease()" class="${btnclass}" 
+					title="<fmt:message key="gradebook.monitor.releasemarks.1" />&nbsp;<fmt:message key="gradebook.monitor.releasemarks.3" />" >
+					<i class="fa fa-share-alt "></i> <span class="hidden-xs">
 					<fmt:message key="gradebook.monitor.releasemarks.1" />&nbsp;<fmt:message key="gradebook.monitor.releasemarks.3" />
+					</span>
 				</a>
 			</div>
 			<div id="marksReleased" style="display:none" class="tour-release-marks">
-				<a href="javascript:toggleRelease()" class="${btnclass}">
-					<fmt:message key="gradebook.monitor.releasemarks.2" />&nbsp;<fmt:message key="gradebook.monitor.releasemarks.3" />
+				<a href="javascript:toggleRelease()" class="${btnclass}" 
+					title="<fmt:message key="gradebook.monitor.releasemarks.2" />&nbsp;<fmt:message key="gradebook.monitor.releasemarks.3" />" >
+					<i class="fa fa-share-alt "></i> <span class="hidden-xs">
+					<fmt:message key="gradebook.monitor.releasemarks.2" />&nbsp;<fmt:message key="gradebook.monitor.releasemarks.3" /></span>
 				</a> 
 			</div>
 			</div>
-	 	
- 			<div id="tour-mark-chart-button">
- 			<div id="markChartShown" style="display:none">
-				<a href="javascript:toggleMarkChart()" class="${btnclass}">
-					<fmt:message key="label.hide.marks.chart"/>
-				</a> 
-			</div>
-			<div id="markChartHidden">
-				<a href="javascript:toggleMarkChart()" class="${btnclass}">
-					<fmt:message key="label.show.marks.chart"/>
-				</a> 
-			</div>
-			</div>
-			
+
 		<c:if test="${isInTabs}">
-			<div id="tour-dates">
-	 		<div id="datesNotShown">
-				<a class="${btnclass}" href="javascript:toggleLessonDates()"><fmt:message key="gradebook.monitor.show.dates" /></a>
-			</div>
-			<div id="datesShown" style="display:none">
-				<a class="${btnclass}" href="javascript:toggleLessonDates()"><fmt:message key="gradebook.monitor.hide.dates" /></a>
-			</div>
-			</div>
+	 		${chartButtonCode}
+			${tourDatesCode}
 		</c:if>
 		
 		</div> <!-- Closes buttons -->
-
-		<!-- not in tabs? go next to the help button -->
-		<c:if test="${!isInTabs}">
-			<div class="tour-dates">
-	 		<div id="datesNotShown" class="tour-dates">
-				<a class="${btnclass} pull-right btn-primary" href="javascript:toggleLessonDates()"><fmt:message key="gradebook.monitor.show.dates" /></a>
-			</div>
-			<div id="datesShown" style="display:none" class="tour-dates">
-				<a class="${btnclass} pull-right btn-primary" href="javascript:toggleLessonDates()"><fmt:message key="gradebook.monitor.hide.dates" /></a>
-			</div>
-			</div>
-		</c:if>
-					
+		
 			<div class="row">
 				 <div class="col-xs-12">
 				 <lams:WaitingSpinner id="markChartBusy"/>

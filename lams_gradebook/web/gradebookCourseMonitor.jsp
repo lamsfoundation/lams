@@ -452,24 +452,34 @@
 		</a>
 
 		<div id="datesNotShown">
-			<a class="${btnclass} pull-right btn-primary" href="javascript:toggleLessonDates()"><fmt:message key="gradebook.monitor.show.dates" /></a>
+			<a class="${btnclass} pull-right btn-primary" href="javascript:toggleLessonDates()" title="<fmt:message key="gradebook.monitor.show.dates" />">
+				<i class="fa fa-calendar-check-o"></i> <span class="hidden-xs">
+				<fmt:message key="gradebook.monitor.show.dates" /></span>
+			</a>
 		</div>
 
 		<div id="datesShown" style="display:none">
-			<a class="${btnclass} pull-right btn-primary" href="javascript:toggleLessonDates()"><fmt:message key="gradebook.monitor.hide.dates" /></a>
+			<a class="${btnclass} pull-right btn-primary" href="javascript:toggleLessonDates()" title="<fmt:message key="gradebook.monitor.hide.dates" />">
+				<i class="fa fa-calendar-check-o"></i> <span class="hidden-xs">
+				<fmt:message key="gradebook.monitor.hide.dates" /></span>
+			</a>
 		</div>			
 				
 
 		<div id="export-link-area" class="gbTopButtonsContainer">
 		<div>
-			<a href="#nogo" id="export-course-button" class="${btnclass}">
+			<a href="#nogo" id="export-course-button" class="${btnclass}" title="<fmt:message key="gradebook.export.excel" />">
+				<i class="fa fa-download"></i><span class="hidden-xs">
 				<fmt:message key="gradebook.export.excel" />
+				</span>
 			</a>
 		</div>
 		
 		<div>
-			<a class="${btnclass}" href="#nogo" onclick="return openSelectLessonsArea();" >
+			<a class="${btnclass}" href="#nogo" onclick="return openSelectLessonsArea();" title="<fmt:message key="label.select.lessons.to.export" />" >
+				<i class="fa fa-square-o"></i><span class="hidden-xs">
 				<fmt:message key="label.select.lessons.to.export" />
+				</span>
 			</a>
 		</div>
 		</div>

@@ -20,7 +20,6 @@
 .gbTopButtonsContainer {
 	height: 30px;
 	padding: 0px !important;
-	float: left;
 }
 
 .gbTopButtonsContainer div {
@@ -35,22 +34,9 @@
 	margin: 5px 5px 5px 0;
 }
 
-.gbTopButtonsContainerInTab {
-	height: 30px;
-	padding: 0px !important;
-	float: right;
-}
-
-.gbTopButtonsContainerInTab div {
-	display: inline;
-}
-
-.gbTopButtonsContainerInTab a {
-	margin: 5px 5px 5px 0;
-}
-
-.gbTopButtonsContainerInTab button {
-	margin: 5px 5px 5px 0;
+.lockLabel {
+	margin: 10px 5px 5px 0;
+	display: block;
 }
 
 .markChartDiv {
