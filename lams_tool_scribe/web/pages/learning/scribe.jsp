@@ -35,7 +35,7 @@
 		// only changed reports will be sent
 		if (input.reports) {
 			$.each(input.reports, function() {
-				$('#reportText-' + this.uid).text(this.text);
+				$('#reportText-' + this.uid).html(this.text);
 			});
 		}
 		

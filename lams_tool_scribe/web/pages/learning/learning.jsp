@@ -36,7 +36,7 @@
 		if (input.reports) {
 			reportSubmitted = true;
 			$.each(input.reports, function() {
-				$('#reportText-' + this.uid).text(this.text);
+				$('#reportText-' + this.uid).html(this.text);
 			});
 		}
 		
