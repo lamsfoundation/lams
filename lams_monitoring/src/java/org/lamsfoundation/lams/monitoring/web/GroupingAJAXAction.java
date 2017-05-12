@@ -25,7 +25,11 @@ package org.lamsfoundation.lams.monitoring.web;
 
 import java.io.IOException;
 import java.util.Comparator;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
@@ -33,6 +37,7 @@ import java.util.TreeSet;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.struts.action.ActionForm;
@@ -49,11 +54,20 @@ import org.lamsfoundation.lams.learningdesign.GroupingActivity;
 import org.lamsfoundation.lams.lesson.service.LessonServiceException;
 import org.lamsfoundation.lams.monitoring.service.IMonitoringService;
 import org.lamsfoundation.lams.monitoring.service.MonitoringServiceProxy;
+import org.lamsfoundation.lams.security.ISecurityService;
+import org.lamsfoundation.lams.usermanagement.OrganisationGroup;
+import org.lamsfoundation.lams.usermanagement.OrganisationGrouping;
+import org.lamsfoundation.lams.usermanagement.Role;
 import org.lamsfoundation.lams.usermanagement.User;
+import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
+import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
 import org.lamsfoundation.lams.usermanagement.util.FirstNameAlphabeticComparator;
 import org.lamsfoundation.lams.util.WebUtil;
 import org.lamsfoundation.lams.web.action.LamsDispatchAction;
+import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
+import org.springframework.web.context.WebApplicationContext;
+import org.springframework.web.context.support.WebApplicationContextUtils;
 
 /**
  * The action servlet that provides the support for the
@@ -78,6 +92,8 @@ public class GroupingAJAXAction extends LamsDispatchAction {
     public static final String PARAM_MAY_DELETE = "mayDelete";
     public static final String PARAM_USED_FOR_BRANCHING = "usedForBranching";
     public static final String PARAM_VIEW_MODE = "viewMode";
+    
+    private static ISecurityService securityService;
 
     /**
      * Start the process of doing the chosen grouping
@@ -145,29 +161,6 @@ public class GroupingAJAXAction extends LamsDispatchAction {
 	request.setAttribute(GroupingAction.GROUPS, groups);
 	// go to a view only screen for random grouping
 	return mapping.findForward(GroupingAJAXAction.VIEW_GROUPS_SCREEN);
-    }
-
-    /**
-     * Remove a list of users from a group. Designed to respond to an AJAX call.
-     *
-     * Input parameters: activityID, name: group name, members: comma separated list of users
-     *
-     * Output format: no data returned - just the header
-     */
-    public ActionForward removeMembers(ActionMapping mapping, ActionForm form, HttpServletRequest request,
-	    HttpServletResponse response) throws IOException, ServletException, LessonServiceException {
-
-	Long activityID = WebUtil.readLongParam(request, AttributeNames.PARAM_ACTIVITY_ID);
-	Long groupID = WebUtil.readLongParam(request, AttributeNames.PARAM_GROUP_ID);
-	String members = WebUtil.readStrParam(request, GroupingAJAXAction.PARAM_MEMBERS, true);
-	if (members != null) {
-	    String[] membersSplit = members.split(",");
-	    IMonitoringService monitoringService = MonitoringServiceProxy
-		    .getMonitoringService(getServlet().getServletContext());
-	    monitoringService.removeUsersFromGroup(activityID, groupID, membersSplit);
-	}
-	writeAJAXOKResponse(response);
-	return null;
     }
 
     /**
@@ -259,6 +252,59 @@ public class GroupingAJAXAction extends LamsDispatchAction {
 	response.getWriter().write(responseJSON.toString());
 	return null;
     }
+    
+    /**
+     * Stores lesson grouping as a course grouping.
+     */
+    public ActionForward saveAsCourseGrouping(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+	    HttpServletResponse response) throws JSONException, IOException {
+	IMonitoringService monitoringService = MonitoringServiceProxy
+		.getMonitoringService(getServlet().getServletContext());
+	IUserManagementService userManagementService = MonitoringServiceProxy
+		.getUserManagementService(getServlet().getServletContext());
+	HttpSession ss = SessionManager.getSession();
+	Integer userId = ((UserDTO) ss.getAttribute(AttributeNames.USER)).getUserID();
+	Integer organisationId = WebUtil.readIntParam(request, AttributeNames.PARAM_ORGANISATION_ID);
+	String newGroupingName = request.getParameter("name");
+	
+	// check if user is allowed to view and edit groupings
+	if (!getSecurityService().hasOrgRole(organisationId, userId,
+		new String[] { Role.GROUP_ADMIN, Role.GROUP_MANAGER, Role.MONITOR, Role.AUTHOR },
+		"view organisation groupings", false)) {
+	    response.sendError(HttpServletResponse.SC_FORBIDDEN, "User is not a participant in the organisation");
+	    return null;
+	}
+
+	Long activityID = WebUtil.readLongParam(request, AttributeNames.PARAM_ACTIVITY_ID);
+	Activity activity = monitoringService.getActivityById(activityID);
+	Grouping grouping = activity.isChosenBranchingActivity() ? activity.getGrouping()
+		: ((GroupingActivity) activity).getCreateGrouping();
+
+	// iterate over groups
+	List<OrganisationGroup> orgGroups = new LinkedList<OrganisationGroup>();
+	for (Group group : grouping.getGroups()) {
+	    OrganisationGroup orgGroup = new OrganisationGroup();
+	    //groupId and GroupingId will be set during  userManagementService.saveOrganisationGrouping() call
+	    orgGroup.setName(group.getGroupName());
+	    HashSet<User> users = new HashSet<User>();
+	    users.addAll(group.getUsers());
+	    orgGroup.setUsers(users);
+
+	    orgGroups.add(orgGroup);
+	}
+
+	OrganisationGrouping orgGrouping = new OrganisationGrouping();
+	orgGrouping.setOrganisationId(organisationId);
+	orgGrouping.setName(newGroupingName);
+
+	userManagementService.saveOrganisationGrouping(orgGrouping, orgGroups);
+
+	response.setContentType("application/json;charset=utf-8");
+	JSONObject responseJSON = new JSONObject();
+	responseJSON.put("result", true);
+	response.getWriter().write(responseJSON.toString());
+	return null;
+    }   
 
     /**
      * Renames the group.
@@ -275,6 +321,31 @@ public class GroupingAJAXAction extends LamsDispatchAction {
 		    .getMonitoringService(getServlet().getServletContext());
 	    monitoringService.setGroupName(groupID, name);
 	}
+	return null;
+    }
+    
+    /**
+     * Checks if a course grouping name is unique inside of this organisation and thus whether the new group can be named using it
+     */
+    public ActionForward checkGroupingNameUnique(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+	    HttpServletResponse response) throws JSONException, IOException {
+	IUserManagementService userManagementService = MonitoringServiceProxy.getUserManagementService(getServlet().getServletContext());
+	
+	Integer organisationId = WebUtil.readIntParam(request, AttributeNames.PARAM_ORGANISATION_ID);
+	String newGroupingName = request.getParameter("name");
+
+	// Checks if a course grouping name is unique inside of this group and thus new group can have it
+	HashMap<String, Object> properties = new HashMap<String, Object>();
+	properties.put("organisationId", organisationId);
+	properties.put("name", newGroupingName);
+	List<OrganisationGrouping> orgGroupings = userManagementService.findByProperties(OrganisationGrouping.class,
+		properties);
+	boolean isGroupingNameUnique = orgGroupings.isEmpty();
+	
+	JSONObject responseJSON = new JSONObject();
+	responseJSON.put("isGroupingNameUnique", isGroupingNameUnique);
+	response.setContentType("application/json;charset=utf-8");
+	response.getWriter().write(responseJSON.toString());
 	return null;
     }
 
@@ -310,5 +381,14 @@ public class GroupingAJAXAction extends LamsDispatchAction {
 	responseJSON.put("result", result);
 	response.getWriter().write(responseJSON.toString());
 	return null;
+    }
+    
+    private ISecurityService getSecurityService() {
+	if (securityService == null) {
+	    WebApplicationContext ctx = WebApplicationContextUtils
+		    .getRequiredWebApplicationContext(getServlet().getServletContext());
+	    securityService = (ISecurityService) ctx.getBean("securityService");
+	}
+	return securityService;
     }
 }

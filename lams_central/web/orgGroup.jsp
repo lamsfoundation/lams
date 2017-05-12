@@ -44,11 +44,30 @@
 				<fmt:message key="label.course.groups.locked" var="GROUP_LOCK_LABEL_VAR"/>
 				GROUP_LOCK_LABEL : decoderDiv.html('<c:out value="${GROUP_LOCK_LABEL_VAR}" />').text(),
 				<fmt:message key="label.course.groups.locked.transfer" var="TRANSFER_LOCKED_LABEL_VAR"/>
-				TRANSFER_LOCKED_LABEL : decoderDiv.html('<c:out value="${TRANSFER_LOCKED_LABEL_VAR}" />').text()
+				TRANSFER_LOCKED_LABEL : decoderDiv.html('<c:out value="${TRANSFER_LOCKED_LABEL_VAR}" />').text(),
+				<fmt:message key="label.save.as.course.grouping" var="SAVE_AS_COURSE_GROUPING_LABEL_VAR"/>
+				SAVE_AS_COURSE_GROUPING_LABEL : decoderDiv.html('<c:out value="${SAVE_AS_COURSE_GROUPING_LABEL_VAR}" />').text(),
+				<fmt:message key="label.course.groups.name.blank" var="NAME_BLANK_LABEL_VAR"/>
+				NAME_BLANK_LABEL : decoderDiv.html('<c:out value="${NAME_BLANK_LABEL_VAR}" />').text(),
+				<fmt:message key="label.course.groups.name.not.unique" var="NAME_NOT_UNIQUE_LABEL_VAR"/>
+				NAME_NOT_UNIQUE_LABEL : decoderDiv.html('<c:out value="${NAME_NOT_UNIQUE_LABEL_VAR}" />').text(),
+				<fmt:message key="label.enter.course.grouping.name" var="ENTER_COURSE_GROUPING_NAME_LABEL_VAR"/>
+				ENTER_COURSE_GROUPING_NAME_LABEL : decoderDiv.html('<c:out value="${ENTER_COURSE_GROUPING_NAME_LABEL_VAR}" />').text(),
+				<fmt:message key="authoring.msg.save.success" var="SAVED_SUCCESSFULLY_LABEL_VAR"/>
+				SAVED_SUCCESSFULLY_LABEL : decoderDiv.html('<c:out value="${SAVED_SUCCESSFULLY_LABEL_VAR}" />').text()
 			};
 	</script>
 </lams:head>
 <body>
+
+<c:if test="${lessonMode}">
+	<div id="save-course-grouping-container">
+		<button class="pull-right btn btn-default" onClick="javascript:saveAsCourseGrouping();">
+			<i class="fa fa-save"></i>
+			<fmt:message key="label.save.as.course.grouping" />
+		</button>
+	</div>
+</c:if>
 
 <c:if test="${not lessonMode and (empty usedForBranching or usedForBranching eq false)}">
 	<div id="titleDiv">
@@ -125,5 +144,26 @@
 	</div>
 	<div class="userContainer"></div>
 </div>
+
+<!-- Inner dialog placeholders -->
+<div id="save-course-grouping-dialog-contents" class="dialogContainer">
+	<span id="span-tooltip">
+		<fmt:message key="label.enter.course.grouping.name"/>
+	</span>
+		
+	<div>
+		<input id="dialog-course-grouping-name" type="text"/>
+	</div>
+			
+	<div class="btn-group pull-right">
+		<button id="dialog-save-button" class="btn btn-default roffset5">
+			<fmt:message key="button.save" />
+		</button>
+		<button id="dialog-close-button" class="btn btn-default">
+			<fmt:message key="label.cancel" />
+		</button>
+	</div>
+</div>
+	
 </body>
 </lams:html>

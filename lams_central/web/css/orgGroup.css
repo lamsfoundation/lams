@@ -121,3 +121,14 @@ td#unassignedUserCell .userContainer {
 	background-color: #5c9ccc !important;
 	color: white !important;
 }
+
+#save-course-grouping-container {
+    display: inline-block;
+    width: 100%;
+    margin-bottom: -7px;
+}
+.dialogContainer {
+    display: none;
+    -webkit-overflow-scrolling: touch !important;
+    overflow: auto;
+}

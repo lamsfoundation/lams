@@ -482,3 +482,113 @@ function markGroupLocked(container) {
 	// $('input', container).attr('readonly', 'readonly');
 	$('div.draggableUser', container).off('click').draggable('disable');
 }
+
+/**
+ * *************** Save as a course grouping dialog ***************
+ */
+
+//open save as a course grouping dialog
+function saveAsCourseGrouping() {
+	$('#saveAsCourseGroupingDialog').modal('show');
+}
+
+$(document).ready(function(){
+
+	// sets up dialog for editing class
+	var saveAsCourseGroupingDialog = showDialog('saveAsCourseGroupingDialog',{
+		'autoOpen'  : false,
+		'width'     : 510,
+		'title' 	: LABELS.SAVE_AS_COURSE_GROUPING_LABEL,
+		'resizable' : true,
+		'open'      : function(){
+			//focus name text field
+			setTimeout(
+				function() { 
+					$('#dialog-course-grouping-name').focus(); 
+				}, 
+				700
+			);
+		},
+		'close' : function(){
+			//reset dialog to its initial state
+			resetSaveGroupingDialog();
+			$('#dialog-course-grouping-name', this).val("");
+		}
+	}, false);
+	
+	$('.modal-body', saveAsCourseGroupingDialog).empty().append($('#save-course-grouping-dialog-contents').show());
+
+	//save button handler
+	$('#dialog-save-button', saveAsCourseGroupingDialog).click(function() {
+		var dialog = $('#saveAsCourseGroupingDialog'),
+			name = $('#dialog-course-grouping-name', dialog).val();
+		
+		//name can't be blank
+		if (!name || /^\s*$/.test(name)) {
+			$('#dialog-course-grouping-name', dialog).addClass("alert-danger");
+			$("#span-tooltip", dialog).addClass("alert-danger").text(LABELS.NAME_BLANK_LABEL);
+			return;
+		}
+		
+		//name should be unique
+		$.ajax({
+			dataType : 'json',
+			url : LAMS_URL + 'monitoring/grouping.do',
+			cache : false,
+			async : false,
+			data : {
+				'method'    : 'checkGroupingNameUnique',
+				'organisationID' : organisationId,
+				'name'  : name
+			},		
+			success : function(response) {
+				if (response.isGroupingNameUnique) {
+					$.ajax({
+						dataType : 'json',
+						url : LAMS_URL + 'monitoring/grouping.do',
+						cache : false,
+						async : false,
+						data : {
+							'method'    : 'saveAsCourseGrouping',
+							'organisationID' : organisationId,
+							'activityID' : groupingActivityId,
+							'name'  : name
+						},
+						success : function(response) {
+							$('#saveAsCourseGroupingDialog').modal('hide');
+							alert(LABELS.SAVED_SUCCESSFULLY_LABEL);
+						}
+					});
+					
+				} else {
+					$('#dialog-course-grouping-name', dialog).addClass("alert-danger");
+					$("#span-tooltip", dialog).addClass("alert-danger").text(LABELS.NAME_NOT_UNIQUE_LABEL);
+				}
+			}
+		});
+	});
+	
+	//close button handler
+	$('#dialog-close-button', saveAsCourseGroupingDialog).click(function(){
+		$('#saveAsCourseGroupingDialog').modal('hide');
+	});
+	
+	// ability to save a grouping on pressing the Enter key in the name input field
+	$('#dialog-course-grouping-name', saveAsCourseGroupingDialog).on('keyup', function (e) {
+		//remove alert class if it was applied
+		if ($("#span-tooltip", saveAsCourseGroupingDialog).hasClass("alert-danger")) {
+			resetSaveGroupingDialog();
+		}
+		
+	    if (e.keyCode == 13) {
+			$('#dialog-save-button', saveAsCourseGroupingDialog).trigger( "click" );
+	    }
+	});
+
+	//reset dialog to its initial state
+	function resetSaveGroupingDialog() {
+		$("#span-tooltip", saveAsCourseGroupingDialog).removeClass("alert-danger").text(LABELS.ENTER_COURSE_GROUPING_NAME_LABEL);
+		$('#dialog-course-grouping-name', saveAsCourseGroupingDialog).removeClass("alert alert-danger");
+	}
+
+});
