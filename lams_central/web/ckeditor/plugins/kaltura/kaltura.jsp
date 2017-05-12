@@ -19,7 +19,7 @@
 <lams:head>
 	<title>Kaltura Contribution Widget</title>
 		
-	<lams:css style="core"/>
+	<lams:css/>
 	<style>
 		body { margin: 10px; overflow:hidden }
 	</style>

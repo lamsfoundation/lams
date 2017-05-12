@@ -1,12 +1,10 @@
 <!DOCTYPE html>
-		
 
 <%@ include file="/common/taglibs.jsp"%>
 <lams:html>
 <lams:head>
 	
-	
-	<lams:css style="core" />
+	<lams:css/>
 	<style type="text/css">
 		a {
 			margin: 10px 2px 0px 0px;
@@ -35,10 +33,9 @@
 		}
 	</style>
 	
-	<script language="JavaScript" type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery.js"></script>
-  	<script language="JavaScript" type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery.form.js"></script>
+	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery.js"></script>
+  	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery.form.js"></script>
   	<script type="text/javascript">
-  		
 	  	function prepareFormData(){
 			//CKeditor content is not submitted when sending by jQuery; we need to do this
 			var content = CKEDITOR.instances.instructions.getData();

@@ -6,8 +6,6 @@
  	<!-- ********************  CSS ********************** -->
 	<link href="<c:url value='/includes/css/daco.css'/>" rel="stylesheet" type="text/css">
 	<lams:css />
-<%-- 	<lams:css style="main"/>
- --%>
 
  	<!-- ********************  javascript ********************** -->
 	<script type="text/javascript" src="${lams}includes/javascript/common.js"></script>

@@ -178,15 +178,6 @@
       <name>css</name>
       <tag-class>org.lamsfoundation.lams.web.tag.CssTag</tag-class>
       <body-content>empty</body-content>
-      
-      <attribute>
-         <description>Output stylesheet based on the user preferences.</description>
-         <name>style</name>
-         <required>false</required>
-
-           <rtexprvalue>true</rtexprvalue>
-
-      </attribute>
 
    </tag>
    <tag>

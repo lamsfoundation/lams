@@ -1,10 +1,9 @@
 <!DOCTYPE html>
-		
 
 <%@ include file="/common/taglibs.jsp"%>
 <lams:html>
 <lams:head>
-	<lams:css style="core" />
+	<lams:css/>
 	<style type="text/css">
 		input.item {
 			margin: 5px 0px 5px 10px;

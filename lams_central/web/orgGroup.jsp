@@ -6,8 +6,7 @@
 <!DOCTYPE html>
 <lams:html>
 <lams:head>
-	<lams:css style="main" />
-	<link rel="stylesheet" href="css/defaultHTML_learner.css" type="text/css" media="screen" />
+	<lams:css/>
 	<link rel="stylesheet" href="css/jquery-ui-bootstrap-theme.css" type="text/css" media="screen" />
 	<link rel="stylesheet" href="css/orgGroup.css" type="text/css" media="screen" />
 

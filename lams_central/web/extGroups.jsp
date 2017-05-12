@@ -10,7 +10,7 @@
 <!DOCTYPE html>
 <lams:html>
 <lams:head>
-	<lams:css style="main" />
+	<lams:css/>
 	<link rel="stylesheet" href="css/jquery-ui-redmond-theme.css" type="text/css" media="screen" />
 	<link rel="stylesheet" href="css/orgGrouping.css" type="text/css" media="screen" />
 	

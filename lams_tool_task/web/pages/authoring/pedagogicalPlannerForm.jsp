@@ -1,10 +1,8 @@
 <!DOCTYPE html>
-		
 
 <%@ include file="/common/taglibs.jsp"%>
 <lams:html>
 <lams:head>
-	
 	
 	<lams:css style="core" />
 	<style type="text/css">
@@ -33,8 +31,8 @@
 		}
 	</style>
 	
-	<script language="JavaScript" type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery.js"></script>
-  	<script language="JavaScript" type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery.form.js"></script>
+	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery.js"></script>
+  	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery.form.js"></script>
   	<script type="text/javascript">
   		function createItem(){
   			$('#pedagogicalPlannerForm').ajaxSubmit({
