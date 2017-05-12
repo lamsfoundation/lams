@@ -13,17 +13,12 @@
 <c:set var="mustHaveSymbols"><%=Configuration.get(ConfigurationKeys.PASSWORD_POLICY_SYMBOLS)%></c:set>
 <c:set var="mustHaveLowercase"><%=Configuration.get(ConfigurationKeys.PASSWORD_POLICY_LOWERCASE)%></c:set>
 
+<lams:css/>
+
 <script type="text/javascript" src="/lams/includes/javascript/jquery.js"></script>
-<script type="text/javascript"
-	src="/lams/includes/javascript/jquery-ui.js"></script>
-<script type="text/javascript"
-	src="/lams/includes/javascript/jquery.validate.js"></script>
-<link rel="stylesheet" href="/lams/css/defaultHTML_learner.css"
-	type="text/css" />
-<script type="text/javascript"
-	src="/lams/includes/javascript/bootstrap.min.js"></script>
-
-
+<script type="text/javascript" src="/lams/includes/javascript/jquery-ui.js"></script>
+<script type="text/javascript" src="/lams/includes/javascript/jquery.validate.js"></script>
+<script type="text/javascript" src="/lams/includes/javascript/bootstrap.min.js"></script>
 <script type="text/javascript">
 	var mustHaveUppercase = ${mustHaveUppercase},
 	mustHaveNumerics  = ${mustHaveNumerics},

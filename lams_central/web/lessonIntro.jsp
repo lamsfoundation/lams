@@ -11,7 +11,7 @@
 <lams:html>
 <lams:head>
 	<TITLE><fmt:message key="title.learner.window"/></TITLE>
-	<link rel="stylesheet" href="css/defaultHTML_learner.css" type="text/css" media="screen" />
+	<lams:css/>
 	
 	<script type="text/javascript" src="includes/javascript/jquery.js"></script>	
 	<c:if test="${displayDesignImage}">

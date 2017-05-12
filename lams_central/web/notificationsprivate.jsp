@@ -1,19 +1,16 @@
 <!DOCTYPE html>
-
 <%@ page language="java" pageEncoding="UTF-8" contentType="text/html;charset=utf-8"%>
-
 <%@ taglib uri="tags-lams" prefix="lams"%>
 <%@ taglib uri="tags-html" prefix="html"%>
 <%@ taglib uri="tags-fmt" prefix="fmt"%>
 <%@ taglib uri="tags-core" prefix="c"%>
 <c:set var="lams" ><lams:LAMSURL/></c:set>
 
-<link rel="stylesheet" href="${lams}css/defaultHTML_learner.css" type="text/css" />
+<lams:css/>
 <link rel="stylesheet" href="${lams}css/main.css" type="text/css" />
 
 <script type="text/javascript" src="${lams}includes/javascript/jquery.js"></script>
 <script type="text/javascript" src="${lams}/includes/javascript/bootstrap.min.js"></script>
-
 <script type="text/javascript">
 
 	var LAMS_URL = '<lams:LAMSURL/>',

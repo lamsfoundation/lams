@@ -19,7 +19,7 @@
 	
 <lams:html>
 <lams:head>
-	<link rel="stylesheet" href="css/defaultHTML_learner.css" type="text/css" />
+	<lams:css/>
 
 	<script type="text/javascript" src="includes/javascript/jquery.js"></script>
 	<script type="text/javascript" src="includes/javascript/jquery-ui.js"></script>

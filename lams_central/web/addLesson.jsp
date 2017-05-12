@@ -6,9 +6,9 @@
 <!DOCTYPE html>
 <lams:html>
 <lams:head>
+	<lams:css/>
 	<link rel="stylesheet" href="css/yui/treeview.css" type="text/css" media="screen" />
 	<link rel="stylesheet" href="css/yui/folders.css" type="text/css" media="screen" />
-	<link rel="stylesheet" href="css/defaultHTML_learner.css" type="text/css" media="screen" />
 	<link rel="stylesheet" href="css/jquery-ui.timepicker.css" type="text/css" media="screen" />
 	<link rel="stylesheet" href="css/jquery-ui-bootstrap-theme.css" type="text/css" media="screen" />
 	<link rel="stylesheet" href="css/addLesson.css" type="text/css" media="screen" />

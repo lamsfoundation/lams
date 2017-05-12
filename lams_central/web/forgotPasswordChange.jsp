@@ -19,20 +19,15 @@
 <lams:html>
 
 <lams:head>
-	<link rel="stylesheet" href="css/defaultHTML_learner.css"
-		type="text/css" />
+	<lams:css/>
 	<script type="text/javascript" src="includes/javascript/jquery.js"></script>
 	<script type="text/javascript" src="includes/javascript/jquery-ui.js"></script>
-	<script type="text/javascript"
-		src="includes/javascript/jquery.validate.js"></script>
-	<lams:css />
+	<script type="text/javascript" src="includes/javascript/jquery.validate.js"></script>
 	<title><fmt:message key="title.forgot.password" /></title>
 	<link rel="icon" href="<lams:LAMSURL/>/favicon.ico" type="image/x-icon" />
-	<link rel="shortcut icon" href="<lams:LAMSURL/>/favicon.ico"
-		type="image/x-icon" />
+	<link rel="shortcut icon" href="<lams:LAMSURL/>/favicon.ico" type="image/x-icon" />
 	<script type="text/javascript">
 		function toHome() {
-
 			window.location = "<lams:LAMSURL/>index.do";
 		};
 
@@ -107,7 +102,6 @@
 <c:set var="title">
 	<fmt:message key="title.forgot.password" />
 </c:set>
-
 
 <body class="stripes">
 	<lams:Page type="admin" title="${title}">
