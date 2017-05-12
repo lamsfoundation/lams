@@ -1,27 +1,21 @@
 <%@ include file="/taglibs.jsp"%>
 <%@ taglib uri="tags-lams" prefix="lams"%>
-<%-- javascript --%>
-<script type="text/javascript"
-	src="<lams:LAMSURL/>includes/javascript/jquery.js"></script>
-<script type="text/javascript"
-	src="<lams:LAMSURL/>includes/javascript/jquery-ui.js"></script>
-<script type="text/javascript"
-	src="<lams:LAMSURL/>includes/javascript/jquery.validate.js"></script>
-<script type="text/javascript"
-	src="<lams:LAMSURL/>includes/javascript/bootstrap.min.js"></script>
-<link href="/lams/css/defaultHTML_learner.css" rel="stylesheet"
-	type="text/css">
 <%@ page import="org.lamsfoundation.lams.util.Configuration"%>
 <%@ page import="org.lamsfoundation.lams.util.ConfigurationKeys"%>
 <%@ page import="org.apache.struts.action.ActionMessages"%>
-
-
 <c:set var="minNumChars"><%=Configuration.get(ConfigurationKeys.PASSWORD_POLICY_MINIMUM_CHARACTERS)%></c:set>
 <c:set var="mustHaveUppercase"><%=Configuration.get(ConfigurationKeys.PASSWORD_POLICY_UPPERCASE)%></c:set>
 <c:set var="mustHaveNumerics"><%=Configuration.get(ConfigurationKeys.PASSWORD_POLICY_NUMERICS)%></c:set>
 <c:set var="mustHaveLowercase"><%=Configuration.get(ConfigurationKeys.PASSWORD_POLICY_LOWERCASE)%></c:set>
 <c:set var="mustHaveSymbols"><%=Configuration.get(ConfigurationKeys.PASSWORD_POLICY_SYMBOLS)%></c:set>
 
+<lams:css/>
+
+<%-- javascript --%>
+<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery.js"></script>
+<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery-ui.js"></script>
+<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery.validate.js"></script>
+<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/bootstrap.min.js"></script>
 <script type="text/javascript">
      var mustHaveUppercase = ${mustHaveUppercase},
      mustHaveNumerics  = ${mustHaveNumerics},

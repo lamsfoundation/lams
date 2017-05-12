@@ -10,7 +10,7 @@
 
 <lams:html>
 <lams:head>
-	<link rel="stylesheet" href="css/defaultHTML_learner.css" type="text/css" />
+	<lams:css/>
 	<style type="text/css">
 		.ui-state-active a, .ui-state-active a:link, .ui-state-active a:visited, .ui-state-active a:hover {
 			color: #47bc23 !important;

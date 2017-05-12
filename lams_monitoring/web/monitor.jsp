@@ -10,7 +10,7 @@
 <lams:html>
 <lams:head>
 
-	<link rel="stylesheet" href="<lams:LAMSURL/>css/defaultHTML_learner.css" type="text/css">
+	<lams:css/>
 	<!-- Need both ui stylesheets or we lose the grey headers on the grids. -->
 	<link type="text/css" href="<lams:LAMSURL/>css/jquery-ui-smoothness-theme.css" rel="stylesheet">
 	<link type="text/css" href="<lams:LAMSURL/>css/jquery-ui-bootstrap-theme.css" rel="stylesheet">

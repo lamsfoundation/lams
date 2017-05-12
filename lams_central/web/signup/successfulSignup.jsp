@@ -2,17 +2,15 @@
 <%@ taglib uri="tags-fmt" prefix="fmt"%>
 <%@ taglib uri="tags-core" prefix="c"%>
 <%@ taglib uri="tags-html" prefix="html"%>
-<%@ page language="java" pageEncoding="UTF-8"
-	contentType="text/html;charset=utf-8"%>
+<%@ page language="java" pageEncoding="UTF-8" contentType="text/html;charset=utf-8"%>
+
+<lams:css/>
+
 <script type="text/javascript" src="/lams/includes/javascript/jquery.js"></script>
-<script type="text/javascript"
-	src="/lams/includes/javascript/jquery-ui.js"></script>
-<script type="text/javascript"
-	src="/lams/includes/javascript/jquery.validate.js"></script>
-<link rel="stylesheet" href="/lams/css/defaultHTML_learner.css"
-	type="text/css" />
-<script type="text/javascript"
-	src="/lams/includes/javascript/bootstrap.min.js"></script>
+<script type="text/javascript" src="/lams/includes/javascript/jquery-ui.js"></script>
+<script type="text/javascript" src="/lams/includes/javascript/jquery.validate.js"></script>
+<script type="text/javascript" src="/lams/includes/javascript/bootstrap.min.js"></script>
+
 <div class="panel-heading text-center">
 	<img src="<lams:LAMSURL/>/images/svg/lams_logo_black.svg" class="img-center" width="200px"></img>
 </div>
