@@ -6,7 +6,7 @@
 <lams:html>
 <lams:head>
 	<html:base/>
-	<lams:css style="learner"/>
+	<lams:css/>
 </lams:head>
 
 <script language="JavaScript" type="text/javascript" src="<lams:LAMSURL/>/includes/javascript/prototype.js"></script>

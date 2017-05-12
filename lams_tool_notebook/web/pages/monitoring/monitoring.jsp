@@ -14,7 +14,6 @@
 		<lams:Tab id="3" key="button.statistics" />
 	</lams:Tabs>
 
-
 	<lams:TabBodyArea>
 		<lams:TabBodys>
 			<lams:TabBody id="1" titleKey="button.summary" page="summary.jsp" />

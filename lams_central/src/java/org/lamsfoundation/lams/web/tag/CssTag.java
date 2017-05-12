@@ -53,9 +53,7 @@ public class CssTag extends TagSupport {
     private static final long serialVersionUID = -3143529984657965761L;
 
     private static final Logger log = Logger.getLogger(CssTag.class);
-    private String style = null;
 
-    private static final String LEARNER_STYLE = "learner"; // expandable
     private static final String RTL_DIR = "rtl"; // right-to-left direction
 
     public CssTag() {
@@ -103,11 +101,7 @@ public class CssTag extends TagSupport {
     private String appendStyle(String stylesheetName, boolean rtl) {
 	String ssName = stylesheetName;
 	if (ssName != null) {
-	    if ((getStyle() == null) || CssTag.LEARNER_STYLE.equalsIgnoreCase(getStyle())) {
-		ssName = rtl ? ssName + "_" + CssTag.RTL_DIR + "_" + "learner" : ssName + "_" + "learner";
-	    } else {
-		ssName = rtl ? ssName + "_" + CssTag.RTL_DIR : ssName;
-	    }
+	    ssName = rtl ? ssName + "_" + CssTag.RTL_DIR + "_" + "learner" : ssName + "_" + "learner";
 	}
 	return ssName;
     }
@@ -125,22 +119,5 @@ public class CssTag extends TagSupport {
     @Override
     public int doEndTag() {
 	return Tag.EVAL_PAGE;
-    }
-
-    /**
-     *
-     * index page use core"
-     *
-     * Sets whether to use blah.css (style="core") or blah_learner.css (style=learner). If this parameter
-     * is left blank, you get blah_learner.css e.g. default_learner.css
-     *
-     * @return Returns style.
-     */
-    public String getStyle() {
-	return style;
-    }
-
-    public void setStyle(String style) {
-	this.style = style;
     }
 }

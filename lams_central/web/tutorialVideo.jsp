@@ -9,7 +9,7 @@
 	
 	<c:url var="tutorialActionUrl" value="tutorial.do" />
 	
-   	<lams:css style="main" />
+   	<lams:css/>
    	
 	<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery.js"></script>
 	<script type="text/javascript">

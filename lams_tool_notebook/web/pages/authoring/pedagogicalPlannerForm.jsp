@@ -1,10 +1,9 @@
 <!DOCTYPE html>
-		
 
 <%@ include file="/common/taglibs.jsp"%>
 <lams:html>
 <lams:head>
-	<lams:css style="core" />
+	<lams:css/>
 	
 	<script type="text/javascript">
 	function prepareFormData(){

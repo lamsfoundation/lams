@@ -29,7 +29,7 @@ License Information: http://lamsfoundation.org/licensing/lams/2.0/
 <lams:html xhtml="true">
 
 	<lams:head>
-		<lams:css style="core"/>
+		<lams:css/>
 		<title></title>
 	</lams:head>
 
