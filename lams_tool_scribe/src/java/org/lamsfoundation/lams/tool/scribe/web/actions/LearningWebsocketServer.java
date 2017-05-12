@@ -17,6 +17,7 @@ import javax.websocket.OnOpen;
 import javax.websocket.Session;
 import javax.websocket.server.ServerEndpoint;
 
+import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.apache.tomcat.util.json.JSONArray;
@@ -134,7 +135,8 @@ public class LearningWebsocketServer {
 		for (ScribeReportEntry storedReport : (Set<ScribeReportEntry>) scribeSession.getScribeReportEntries()) {
 		    Long uid = storedReport.getUid();
 		    String cachedReportText = sessionCache.reports.get(uid);
-		    String storedReportText = storedReport.getEntryText();
+		    String storedReportText = StringEscapeUtils.escapeHtml(storedReport.getEntryText());
+		    storedReportText = storedReportText.replaceAll("\n", "<br>");	
 		    if (cachedReportText == null ? storedReportText != null
 			    : (storedReportText == null) || (cachedReportText.length() != storedReportText.length())
 				    || !cachedReportText.equals(storedReportText)) {
