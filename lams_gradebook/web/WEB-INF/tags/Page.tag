@@ -206,10 +206,12 @@
 							// it is not an obvious place to init the websocket, but we need lesson ID
 							commandWebsocket = new WebSocket(LEARNING_URL.replace('http', 'ws') + 'commandWebsocket?lessonID=' + lessonId);
 
-							commandWebsocket.onclose = function(){
-								// maybe iPad went into sleep mode?
-								// we need this websocket working, so reload
-								location.reload();
+							commandWebsocket.onclose = function(e){
+								if (e.code === 1006) {
+									// maybe iPad went into sleep mode?
+									// we need this websocket working, so init it again
+									initCommandWebsocket();
+								}
 							};
 							// when the server pushes new commands
 							commandWebsocket.onmessage = function(e){

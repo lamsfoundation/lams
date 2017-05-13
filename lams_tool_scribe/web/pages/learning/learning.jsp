@@ -16,8 +16,10 @@
 		agreementPercentageLabel = '<fmt:message key="message.voteStatistics" />',
 		reportSubmitted = ${scribeSessionDTO.reportSubmitted};
 		
-	scribeWebsocket.onclose = function(){
-		location.reload();
+	scribeWebsocket.onclose = function(e){
+		if (e.code === 1006) {
+			location.reload();
+		}
 	};
 	
 	// run when the server pushes new reports and vote statistics
