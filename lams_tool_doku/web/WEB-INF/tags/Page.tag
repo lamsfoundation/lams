@@ -147,6 +147,31 @@
 				$('#sidebar').show();
 			}
 			
+			function initCommandWebsocket(){
+				// it is not an obvious place to init the websocket, but we need lesson ID
+				commandWebsocket = new WebSocket(LEARNING_URL.replace('http', 'ws') + 'commandWebsocket?lessonID=' + lessonId);
+
+				commandWebsocket.onclose = function(e){
+					if (e.code === 1006) {
+						// maybe iPad went into sleep mode?
+						// we need this websocket working, so init it again
+						initCommandWebsocket();
+					}
+				};
+				
+				// when the server pushes new commands
+				commandWebsocket.onmessage = function(e){
+					// read JSON object
+					var command = JSON.parse(e.data);
+					if (command.message) {
+						alert(command.message);
+					}
+					if (command.redirectURL) {
+						window.location.href = command.redirectURL;
+					}
+				};
+			}
+			
 			$(document).ready(function() {
 				var showControlBar = 1; // 0/1/2 none/full/keep space
 				var showIM = true;
@@ -203,19 +228,7 @@
 								});
 							}
 
-							// it is not an obvious place to init the websocket, but we need lesson ID
-							commandWebsocket = new WebSocket(LEARNING_URL.replace('http', 'ws') + 'commandWebsocket?lessonID=' + lessonId);
-							// when the server pushes new commands
-							commandWebsocket.onmessage = function(e){
-								// read JSON object
-								var command = JSON.parse(e.data);
-								if (command.message) {
-									alert(command.message);
-								}
-								if (command.redirectURL) {
-									window.location.href = command.redirectURL;
-								}
-							};
+							initCommandWebsocket();
 						}
 					});
 				}
