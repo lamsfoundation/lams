@@ -24,8 +24,10 @@ $(document).ready(function() {
 		// init the connection with server using server URL but with different protocol
 		chatToolWebsocket = new WebSocket(APP_URL.replace('http', 'ws') + 'learningWebsocket?toolSessionID=' + TOOL_SESSION_ID);
 	
-	chatToolWebsocket.onclose = function(){
-		location.reload();
+	chatToolWebsocket.onclose = function(e){
+		if (e.code === 1006) {
+			location.reload();
+		}
 	};
 
 	chatToolWebsocket.onmessage = function(e){

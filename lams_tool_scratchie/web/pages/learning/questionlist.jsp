@@ -30,8 +30,11 @@
 	//init the connection with server using server URL but with different protocol
 	var scratchieWebsocket = new WebSocket('<lams:WebAppURL />'.replace('http', 'ws') 
 					+ 'learningWebsocket?toolSessionID=' + ${toolSessionID});
-	scratchieWebsocket.onclose = function() {
-		location.reload();		
+	
+	scratchieWebsocket.onclose = function(e) {
+		if (e.code === 1006) {
+			location.reload();		
+		}
 	};
 	
 	// run when the server pushes new reports and vote statistics

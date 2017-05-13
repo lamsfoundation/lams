@@ -30,8 +30,10 @@
  	var leaderWebsocket = new WebSocket('<lams:WebAppURL />'.replace('http', 'ws') 
  			+ 'learningWebsocket?toolSessionID=' + ${toolSessionID});
  	
- 	leaderWebsocket.onclose = function(){
- 		location.reload();
+ 	leaderWebsocket.onclose = function(e){
+ 		if (e.code === 1006) {
+ 	 		location.reload();
+ 		}
  	};
  	
 	// run when the leader has just been selected
