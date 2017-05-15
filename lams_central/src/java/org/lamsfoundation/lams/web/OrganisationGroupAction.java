@@ -417,22 +417,9 @@ public class OrganisationGroupAction extends DispatchAction {
 	    orgGrouping = new OrganisationGrouping();
 	    orgGrouping.setOrganisationId(organisationId);
 	}
-
-	// check if there is no grouping with the same name
+	// update grouping name
 	String orgGroupingName = orgGroupingJSON.getString("name");
-	if (!orgGroupingName.equals(orgGrouping.getName())) {
-	    Map<String, Object> duplicateCheckProperties = new TreeMap<String, Object>();
-	    duplicateCheckProperties.put("organisationId", organisationId);
-	    duplicateCheckProperties.put("name", orgGroupingName);
-
-	    List<OrganisationGrouping> duplicateOrgGrouping = getUserManagementService()
-		    .findByProperties(OrganisationGrouping.class, duplicateCheckProperties);
-	    if (duplicateOrgGrouping.isEmpty()) {
-		orgGrouping.setName(orgGroupingName);
-	    } else {
-		throw new InvalidParameterException("Grouping with name \"" + orgGroupingName + "\" already exists");
-	    }
-	}
+	orgGrouping.setName(orgGroupingName);
 
 	getUserManagementService().saveOrganisationGrouping(orgGrouping, orgGroups);
 	return null;

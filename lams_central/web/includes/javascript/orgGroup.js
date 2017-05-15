@@ -22,6 +22,16 @@ $(document).ready(function(){
 	// initialisation based on mode
 	if (!lessonMode) {
 		$('#groupingName').val(grouping.name);
+		
+		// ability to save a grouping on pressing the Enter key in the name input field
+		$('#groupingName').on('keyup', function (e) {
+			//remove alert class if it was applied
+			$("#grouping-name-blank-error,#grouping-name-non-unique-error").hide();
+			
+		    if (e.keyCode == 13) {
+				saveGroups();
+		    }
+		});
 	}
 	
 	if (canEdit) {
@@ -371,10 +381,33 @@ function saveGroups(){
 	$('.errorMessage').hide();
 	
 	var groupingName = $('#groupingName').val();
+	// course grouping name can not be blank
 	if (!groupingName) {
-		// course grouping name can not be blank
-		$('#groupingNameBlankError').show();
+		$('#grouping-name-blank-error').show();
+		$('#groupingName').focus();
 		return false;
+	}
+	
+	// course grouping name should be unique
+	var isGroupingNameUnique = false;
+	$.ajax({
+		dataType : 'json',
+		url : LAMS_URL + 'monitoring/grouping.do',
+		cache : false,
+		async : false,
+		data : {
+			'method'    : 'checkGroupingNameUnique',
+			'organisationID' : grouping.organisationId,
+			'name'  : groupingName
+		},		
+		success : function(response) {
+			isGroupingNameUnique = response.isGroupingNameUnique;
+		}
+	});
+	if ((grouping.name != groupingName) && !isGroupingNameUnique) {
+		$('#grouping-name-non-unique-error').show();
+		$('#groupingName').focus();
+		return false;		
 	}
 	
 	// ask if removing new, empty groups is OK
