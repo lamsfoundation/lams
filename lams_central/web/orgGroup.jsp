@@ -69,6 +69,17 @@
 </c:if>
 
 <c:if test="${not lessonMode and (empty usedForBranching or usedForBranching eq false)}">
+
+	<!-- It is shown when user tries to save a grouping with empty name -->
+	<span id="grouping-name-blank-error" class="errorMessage">
+		<fmt:message key="label.course.groups.name.blank" />
+	</span>
+
+	<!-- It is shown when user tries to save a grouping with a non unique name -->
+	<span id="grouping-name-non-unique-error" class="errorMessage">
+		<fmt:message key="label.course.groups.name.not.unique" />
+	</span>
+		
 	<div id="titleDiv">
 		<fmt:message key="label.course.groups.name" />
 		<input id="groupingName" type="text"
@@ -76,10 +87,6 @@
 				readonly="readonly"
 			</c:if>
 		/>
-		<!-- It is showed when user tries to save a grouping with empty name -->
-		<span id="groupingNameBlankError" class="errorMessage">
-			<fmt:message key="label.course.groups.name.blank" />
-		</span>
 		
 		<c:if test="${canEdit}">
 			<button class="pull-right btn btn-default" onClick="javascript:saveGroups()">
