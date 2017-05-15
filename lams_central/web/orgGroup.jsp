@@ -59,15 +59,6 @@
 </lams:head>
 <body>
 
-<c:if test="${lessonMode}">
-	<div id="save-course-grouping-container">
-		<button class="pull-right btn btn-default" onClick="javascript:saveAsCourseGrouping();">
-			<i class="fa fa-save"></i>
-			<fmt:message key="label.save.as.course.grouping" />
-		</button>
-	</div>
-</c:if>
-
 <c:if test="${not lessonMode and (empty usedForBranching or usedForBranching eq false)}">
 
 	<!-- It is shown when user tries to save a grouping with empty name -->
@@ -150,6 +141,21 @@
 	</div>
 	<div class="userContainer"></div>
 </div>
+
+<c:if test="${lessonMode}">
+	<c:set var="adTitle"><fmt:message key="label.advanced.settings" /></c:set>
+	<lams:AdvancedAccordian title="${adTitle}">
+	
+		<div id="course-grouping-advanced-settings">
+			<fmt:message key="label.save.as.course.grouping.hint" />
+			<button id="save-course-grouping-button" class="pull-right btn btn-default" onClick="javascript:saveAsCourseGrouping();">
+				<i class="fa fa-save"></i>
+				<fmt:message key="label.save.as.course.grouping" />
+			</button>
+		</div>
+		
+	</lams:AdvancedAccordian>
+</c:if>
 
 <!-- Inner dialog placeholders -->
 <div id="save-course-grouping-dialog-contents" class="dialogContainer">

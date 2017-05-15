@@ -127,12 +127,16 @@ public class OrganisationGroupAction extends DispatchAction {
 	    response.sendError(HttpServletResponse.SC_FORBIDDEN, "User is not a participant in the organisation");
 	    return null;
 	}
-	
+
+	List<OrganisationGrouping> orgGroupings = getUserManagementService().findByProperty(OrganisationGrouping.class,
+		"organisationId", organisationId);
 	Grouping grouping = getLessonGrouping(activityID);
+	
+	// show groups page if this is a lesson mode and user have already chosen a grouping or there is no organisation
+	// groupings available
 	boolean lessonGroupsExist = (grouping != null) && (grouping.getGroups() != null)
 		&& !grouping.getGroups().isEmpty() && !isDefaultChosenGrouping(grouping);
-	if (lessonGroupsExist) {
-	    // this is lesson mode and user have already chosen a grouping before, so show it
+	if (lessonGroupsExist || (activityID!= null &&orgGroupings.isEmpty())) {
 	    return viewGroups(mapping, form, request, response);
 	}
 	
@@ -168,8 +172,6 @@ public class OrganisationGroupAction extends DispatchAction {
 	request.setAttribute("canEdit", isGroupSuperuser || (activityID != null));
 
 	Set<OrganisationGroupingDTO> orgGroupingDTOs = new TreeSet<OrganisationGroupingDTO>();
-	List<OrganisationGrouping> orgGroupings = getUserManagementService().findByProperty(OrganisationGrouping.class,
-		"organisationId", organisationId);
 	for (OrganisationGrouping orgGrouping : orgGroupings) {
 	    orgGroupingDTOs.add(new OrganisationGroupingDTO(orgGrouping));
 	}
