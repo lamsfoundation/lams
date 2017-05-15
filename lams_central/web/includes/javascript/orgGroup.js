@@ -623,5 +623,10 @@ $(document).ready(function(){
 		$("#span-tooltip", saveAsCourseGroupingDialog).removeClass("alert-danger").text(LABELS.ENTER_COURSE_GROUPING_NAME_LABEL);
 		$('#dialog-course-grouping-name', saveAsCourseGroupingDialog).removeClass("alert alert-danger");
 	}
+	
+	//scroll to the botom of the page on opening Advanced settings
+	$('#accordionAdvanced').on('shown.bs.collapse', function () {
+		$("html, body").animate({ scrollTop: 170 }, 1000);
+	});
 
 });

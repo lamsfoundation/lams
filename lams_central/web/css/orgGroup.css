@@ -28,7 +28,7 @@ div#titleDiv button {
 	border-bottom: thin dotted #2E6E9E;
 }
 table#groupsTable {
-	height: calc(100% - 80px);
+	height: calc(100% - 110px);
 }
 table#groupsTable td {
 	vertical-align: top;
@@ -122,10 +122,17 @@ td#unassignedUserCell .userContainer {
 	color: white !important;
 }
 
-#save-course-grouping-container {
+#course-grouping-advanced-settings {
     display: inline-block;
     width: 100%;
-    margin-bottom: -7px;
+    padding: 10px;
+}
+#save-course-grouping-button {
+	margin-top: 10px;
+}
+#accordionAdvanced {
+	margin-bottom: 0px;
+	margin-top: 20px;
 }
 .dialogContainer {
     display: none;
