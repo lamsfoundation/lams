@@ -324,34 +324,54 @@
 									<c:set var="serverURL" value="${Configuration.get(ConfigurationKeys.SERVER_URL)}" />
 									<c:if test="${fn:substring(serverURL, fn:length(serverURL)-1, fn:length(serverURL)) != '/'}">
 										<c:set var="serverURL">${serverURL}/</c:set>
-									</c:if>								
-								  <dt class="voffset5"><fmt:message key="lesson.learner.url"/></dt>
-									<dd class="voffset5"><input id="learnerURLField" class="lessonManageField"
-											       value="${serverURL}r/${lesson.encodedLessonID}"
-											       readonly="readonly" />
+									</c:if>
+									<dt class="voffset5"><fmt:message key="lesson.learner.url"/></dt>
+									
+									<dd class="voffset5">
+										<input id="learnerURLField" class="lessonManageField"
+												value="${serverURL}r/${lesson.encodedLessonID}"
+												readonly="readonly" />
 											<a class="btn btn-sm btn-default lessonManageField" href="#"
-											   onClick="javascript:selectLearnerURL()"><fmt:message key="button.select"/></a>
+													onClick="javascript:selectLearnerURL()">
+												<fmt:message key="button.select"/>
+											</a>
 											<span id="copyLearnerURL"><fmt:message key="lesson.copy.prompt"/></span>
 									</dd>
 								</c:if>
 								<!--  lesson actions -->
 								<dt><fmt:message key="lesson.manage"/>:</dt>
+
 								<dd>
 									<div class="btn-group btn-group-xs" role="group" id="lessonActions">
-									  <button id="viewLearnersButton" class="btn btn-default roffset10" 
-									  	type="button"onClick="javascript:showLessonLearnersDialog()"
-									  	title='<fmt:message key="button.view.learners.tooltip"/>'><i class="fa fa-sm fa-users"></i> <span class="hidden-xs"><fmt:message key="button.view.learners"/></span></button>
-									  <button id="editClassButton" class="btn btn-default roffset10" 
-									  	type="button" onClick="javascript:showClassDialog()" 
-									  	title='<fmt:message key="button.edit.class.tooltip"/>'><i class="fa fa-sm fa-user-times"></i> <span class="hidden-xs"><fmt:message key="button.edit.class"/></span></button>
-									<c:if test="${lesson.enabledLessonNotifications}">	
-									  <button id="notificationButton" class="btn btn-default roffset10" 
-									  	type="button" onClick="javascript:showNotificationsDialog(null,${lesson.lessonID})"><i class="fa fa-sm fa-bullhorn"></i> <span class="hidden-xs"><fmt:message key="email.notifications"/></span></button>
-									</c:if>
-									<c:if test="${lesson.enableLessonIntro}">	
-									  <button id="editIntroButton" class="btn btn-default" 
-									  	type="button" onClick="javascript:showIntroductionDialog(${lesson.lessonID})"><i class="fa fa-sm fa-info"></i> <span class="hidden-xs"><fmt:message key="label.lesson.introduction"/></span></button>
-									</c:if>							  
+										<button id="viewLearnersButton" class="btn btn-default roffset10"
+												type="button"onClick="javascript:showLessonLearnersDialog()"
+												title='<fmt:message key="button.view.learners.tooltip"/>'>
+											<i class="fa fa-sm fa-users"></i>
+											<span class="hidden-xs"><fmt:message key="button.view.learners"/></span>
+										</button>
+										
+										<button id="editClassButton" class="btn btn-default roffset10"
+												type="button" onClick="javascript:showClassDialog()"
+												title='<fmt:message key="button.edit.class.tooltip"/>'>
+											<i class="fa fa-sm fa-user-times"></i>
+											<span class="hidden-xs"><fmt:message key="button.edit.class"/></span>
+										</button>
+										
+										<c:if test="${lesson.enabledLessonNotifications}">
+											<button id="notificationButton" class="btn btn-default roffset10"
+													type="button" onClick="javascript:showNotificationsDialog(null,${lesson.lessonID})">
+												<i class="fa fa-sm fa-bullhorn"></i>
+												<span class="hidden-xs"><fmt:message key="email.notifications"/></span>
+											</button>
+										</c:if>
+										
+										<c:if test="${lesson.enableLessonIntro}">
+											<button id="editIntroButton" class="btn btn-default"
+													type="button" onClick="javascript:showIntroductionDialog(${lesson.lessonID})">
+												<i class="fa fa-sm fa-info"></i>
+												<span class="hidden-xs"><fmt:message key="label.lesson.introduction"/></span>
+											</button>
+										</c:if>							  
 									</div>
 								</dd>
 		
