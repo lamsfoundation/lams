@@ -142,7 +142,7 @@
 			    	
 			    	<span id="authorbutton" class="yui-button yui-link-button">
 			    		<span class="first-child">
-			    			<button onclick="openAuthor(); return false;" >
+			    			<button onclick="openAuthor('${param.course_id}'); return false;" >
 			    				Author new LAMS lessons
 			    			</button>
 			    		</span>
@@ -199,7 +199,7 @@
             // Open the LAMS Seuence Preview Window
             function openPreview() {
             	
-                var previewUrl = "../openLamsPage?method=openPreview&ldId=" + document.getElementsByName("sequence_id")[0].value + "&title=" + document.lesson_form.title.value;
+                var previewUrl = "../openLamsPage?method=openPreview&course_id=${param.course_id}&ldId=" + document.getElementsByName("sequence_id")[0].value + "&title=" + document.lesson_form.title.value;
                 
                if (previewWin && !previewWin.closed) {
                     try {
