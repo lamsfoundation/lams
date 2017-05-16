@@ -1,6 +1,6 @@
 // Open the LAMS Seuence Author Window
-function openAuthor() {
-	var authorUrl = '../openLamsPage?method=openAuthor';
+function openAuthor(courseId) {
+	var authorUrl = '../openLamsPage?method=openAuthor&course_id='  + courseId;
 
 	if(authorWin && !authorWin.closed) {
 		try {
