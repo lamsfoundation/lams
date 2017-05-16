@@ -1927,7 +1927,7 @@ function showLearnerGroupDialog(ajaxProperties, dialogTitle, allowSearch, allowF
 	// hide unnecessary controls
 	togglePagingCells(learnerGroupDialog, pageNumber, maxPageNumber);
 	
-		$.each(learners, function(learnerIndex, learner) {
+	$.each(learners, function(learnerIndex, learner) {
 		var viewUrl = allowView ? LAMS_URL + 'monitoring/monitoring.do?method=getLearnerActivityURL&userID=' 
         				       	  + learner.id + '&activityID=' + ajaxProperties.data.activityID + '&lessonID=' + lessonId
         				        : null,
@@ -1939,7 +1939,7 @@ function showLearnerGroupDialog(ajaxProperties, dialogTitle, allowSearch, allowF
 							      .html(getLearnerDisplayName(learner))
 							      .appendTo(learnerGroupList);
 			
-			if (allowForceComplete || allowView || allowEmail) {
+		if (allowForceComplete || allowView || allowEmail) {
 			learnerDiv.click(function(event){
 				// select the learner
 				var learnerDiv = $(this),
@@ -1967,25 +1967,25 @@ function showLearnerGroupDialog(ajaxProperties, dialogTitle, allowSearch, allowF
 					selectedSiblings.removeClass('dialogListItemSelected');
 				}
 			    });
-				if (allowView){
-					dblTap(learnerDiv, function(){
-						// same as clicking View Learner button
-						openPopUp(viewUrl, "LearnActivity", popupHeight, popupWidth, true);
-					});
-				}
+			if (allowView){
+				dblTap(learnerDiv, function(){
+					// same as clicking View Learner button
+					openPopUp(viewUrl, "LearnActivity", popupHeight, popupWidth, true);
+				});
 			}
-		});
+		}
+	});
 	
 	colorDialogList(learnerGroupDialog);
 	
 	if (!isRefresh) {
 		// show buttons and labels depending on parameters
 		$('span#learnerGroupMultiSelectLabel, button#learnerGroupDialogForceCompleteButton', learnerGroupDialog)
-		.css('display', allowForceComplete ? 'inline' : 'none');
+			.css('display', allowForceComplete ? 'inline' : 'none');
 		$('button#learnerGroupDialogViewButton', learnerGroupDialog)
-		.css('display', allowView ? 'inline' : 'none');
+			.css('display', allowView ? 'inline' : 'none');
 		$('button#learnerGroupDialogEmailButton', learnerGroupDialog)
-		.css('display', allowEmail ? 'inline' : 'none');
+			.css('display', allowEmail ? 'inline' : 'none');
 	
 	$('.modal-title', learnerGroupDialog).text(dialogTitle);
 	learnerGroupDialog.data({
