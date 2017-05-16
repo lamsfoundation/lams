@@ -18,6 +18,6 @@
 			<bbNG:pageTitleBar title="LAMS Author" />
 		</bbNG:pageHeader>
 		
-		To launch LAMS Author, please, click <a href="#" onclick="openAuthor(); return false;">here</a>.
+		To launch LAMS Author, please, click <a href="#" onclick="openAuthor('${param.course_id}'); return false;">here</a>.
 	</bbNG:learningSystemPage>
 </bbData:context>
