@@ -104,6 +104,12 @@ function showDialog(id, initParams, extraButtons, recreate) {
 	}
 	
 	dialog.on('show.bs.modal', initParams.modal ? initParams.open : function(event){
+		
+		// skip all further actions if dialog is already shown (it's required due to bootstrap doesn't fire 'shown.bs.modal' event second time if dialog is currently open)
+		if (dialog.data('shown')) {
+			return;
+		}
+		
 		dialog.css('visibility', 'hidden');
 		if (initParams.open) {
 			initParams.open.call(dialog, event);
@@ -121,6 +127,12 @@ function showDialog(id, initParams, extraButtons, recreate) {
 	if (!initParams.modal) {
 		// make the dialog non-modal
 		dialog.on('shown.bs.modal', function(){
+
+			// store 'shown.bs.modal' event was fired
+			dialog.data({
+				'shown' : true
+			});
+
 			// the main modal div is maximised, we need to shrink it
 			modalDialog.css({
 				'margin' : 0
