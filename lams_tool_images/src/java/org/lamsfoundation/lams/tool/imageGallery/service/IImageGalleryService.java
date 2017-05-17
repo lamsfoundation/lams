@@ -122,7 +122,7 @@ public interface IImageGalleryService extends ToolRatingManager {
      */
     Set<ImageGalleryItem> getImagesForGroup(ImageGallery imageGallery, Long sessionId);
 
-    ItemRatingDTO getRatingCriteriaDtos(Long contentId, Long imageUid, Long userId);
+    ItemRatingDTO getRatingCriteriaDtos(Long contentId, Long toolSessionId, Long imageUid, Long userId);
 
     /**
      * Save/update current ImageGalleryItem.

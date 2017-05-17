@@ -8,17 +8,20 @@
 	<lams:head>
 		<%@ include file="/common/header.jsp"%>
 	</lams:head>
+	<c:set var="sessionMap" value="${sessionScope[sessionMapID]}" />
+	<c:set var="mode" value="${sessionMap.mode}" />
+	<c:set var="toolSessionID" value="${sessionMap.toolSessionID}" />
+	
 	<body class="stripes">
+		<!--  If successful reload all the resources and ratings. -->
  		<script type="text/javascript">
-			var reqIDVar = new Date();
-			window.location.href  = "${tool}/pages/learning/learning.jsp?sessionMapID=${sessionMapID}&mode=${mode}&reqID="+reqIDVar.getTime();
-		</script>
-		<lams:Page type="learner">
+ 			var reqIDVar = new Date();
+ 			document.location.href = '<c:url value="/learning/start.do"/>?mode=${mode}&toolSessionID=${toolSessionID}&reqID='+reqIDVar.getTime();	
+ 		</script>
 		<div style="align:center">
-			<!--  this should never be seen! -->
-			<a href="${tool}/pages/learning/learning.jsp?sessionMapID=${sessionMapID}&mode=${mode}&reqID="+reqIDVar.getTime()" type="button" class="btn btn-primary">
+			<!--  Should never be seen -->
+			<a href="<c:url value="/learning/start.do"/>?mode=${mode}&toolSessionID=${toolSessionID}" type="button" class="btn btn-primary">
 					<i class="fa fa-xm fa-refresh"></i> <fmt:message key="label.check.for.new" /></a>
 		</div>
-		</lams:Page>
 	</body>
 </lams:html>

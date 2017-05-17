@@ -187,6 +187,15 @@
             column="order_id"
         />
 
+        <property
+            name="allowRating"
+            type="boolean"
+            update="true"
+            insert="true"
+            column="is_allow_rating"
+        />
+
+
         <!--
             To add non XDoclet property mappings, create a file named
                 hibernate-properties-ResourceItem.xml

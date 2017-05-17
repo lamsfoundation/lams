@@ -23,12 +23,16 @@
 
 package org.lamsfoundation.lams.tool.rsrc.service;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.SortedSet;
 
 import org.apache.struts.upload.FormFile;
 import org.lamsfoundation.lams.contentrepository.IVersionedNode;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
+import org.lamsfoundation.lams.rating.RatingException;
+import org.lamsfoundation.lams.rating.dto.ItemRatingDTO;
+import org.lamsfoundation.lams.rating.model.LearnerItemRatingCriteria;
 import org.lamsfoundation.lams.tool.rsrc.dto.ReflectDTO;
 import org.lamsfoundation.lams.tool.rsrc.dto.SessionDTO;
 import org.lamsfoundation.lams.tool.rsrc.dto.VisitLogDTO;
@@ -277,4 +281,11 @@ public interface IResourceService {
     void auditLogStartEditingActivityInMonitor(long toolContentID);
     
     void evict(Object object);
+
+    /** Create an anonymous star rating criteria */
+    LearnerItemRatingCriteria createRatingCriteria(Long toolContentId) throws RatingException;
+    /** Delete an anonymous star rating criteria */
+    int deleteRatingCriteria(Long toolContentId);
+    /** Get the actual ratings and the criteria for display */
+    List<ItemRatingDTO> getRatingCriteriaDtos(Long toolContentId, Long toolSessionId, Collection<Long> itemIds, Long userId);
 }

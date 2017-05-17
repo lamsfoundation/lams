@@ -185,6 +185,25 @@
             column="file_upload_notify"
         />
 
+        <set
+            name="ratingCriterias"
+            lazy="true"
+            inverse="false"
+            cascade="all"
+            sort="unsorted"
+            order-by="order_id asc"
+        >
+
+            <key
+                column="tool_content_id"
+				property-ref="contentId"
+            >
+            </key>
+
+            <one-to-many
+                  class="org.lamsfoundation.lams.rating.model.RatingCriteria"
+            />
+		</set>		
         <!--
             To add non XDoclet property mappings, create a file named
                 hibernate-properties-Resource.xml

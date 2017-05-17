@@ -9,6 +9,7 @@
 <c:set var="imageGallery" value="${sessionMap.imageGallery}" />
 <c:set var="finishedLock" value="${sessionMap.finishedLock}" />
 <c:set var="isImageSelected" value="${not empty sessionMap.currentImage}" />
+<c:set var="toolSessionID" value="${sessionMap.toolSessionID}" />
 
 <script type="text/javascript" src="${lams}includes/javascript/common.js"></script>
 <c:if test="${isImageSelected}">
@@ -26,7 +27,9 @@
 		COUNT_RATED_ITEMS = ${sessionMap.countRatedItems},
 		COMMENT_TEXTAREA_TIP_LABEL = '<fmt:message key="label.comment.textarea.tip"/>',
 		WARN_COMMENTS_IS_BLANK_LABEL = '<fmt:message key="error.resource.image.comment.blank"/>',
-		WARN_MIN_NUMBER_WORDS_LABEL = '<fmt:message key="warning.minimum.number.words"><fmt:param value="${sessionMap.commentsMinWordsLimit}"/></fmt:message>';
+		WARN_MIN_NUMBER_WORDS_LABEL = '<fmt:message key="warning.minimum.number.words"><fmt:param value="${sessionMap.commentsMinWordsLimit}"/></fmt:message>',
+		ALLOW_RERATE = false,
+		SESSION_ID = ${toolSessionID};
 	</script>
 	<script type="text/javascript" src="${lams}includes/javascript/rating.js"></script>
 </c:if>

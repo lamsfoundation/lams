@@ -434,9 +434,11 @@ public class LearningAction extends Action {
 	int commentsMinWordsLimit = 0;
 	boolean isCommentsEnabled = false;
 	int countRatedImages = 0;
+	Long toolSessionId = (Long) sessionMap.get(ImageGalleryConstants.ATTR_TOOL_SESSION_ID);
+	
 	if (imageGallery.isAllowRank()) {
 
-	    ItemRatingDTO itemRatingDto = service.getRatingCriteriaDtos(imageGallery.getContentId(), imageUid, userId);
+	    ItemRatingDTO itemRatingDto = service.getRatingCriteriaDtos(imageGallery.getContentId(), toolSessionId, imageUid, userId);
 	    sessionMap.put(AttributeNames.ATTR_ITEM_RATING_DTO, itemRatingDto);
 
 	    if (itemRatingDto != null) {

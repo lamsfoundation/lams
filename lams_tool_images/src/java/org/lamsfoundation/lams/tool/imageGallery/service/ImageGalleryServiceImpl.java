@@ -344,19 +344,19 @@ public class ImageGalleryServiceImpl implements IImageGalleryService, ToolConten
     }
 
     @Override
-    public ItemRatingDTO getRatingCriteriaDtos(Long contentId, Long imageUid, Long userId) {
+    public ItemRatingDTO getRatingCriteriaDtos(Long contentId, Long toolSessionId, Long imageUid, Long userId) {
 
 	LinkedList<Long> itemIds = new LinkedList<Long>();
 	itemIds.add(imageUid);
-	ItemRatingDTO ratingCriteria = getRatingCriteriaDtos(contentId, itemIds, true, userId).get(0);
+	ItemRatingDTO ratingCriteria = getRatingCriteriaDtos(contentId, toolSessionId, itemIds, true, userId).get(0);
 
 	return ratingCriteria;
     }
 
     @Override
-    public List<ItemRatingDTO> getRatingCriteriaDtos(Long contentId, Collection<Long> itemIds,
+    public List<ItemRatingDTO> getRatingCriteriaDtos(Long contentId, Long toolSessionId, Collection<Long> itemIds,
 	    boolean isCommentsByOtherUsersRequired, Long userId) {
-	return ratingService.getRatingCriteriaDtos(contentId, itemIds, isCommentsByOtherUsersRequired, userId);
+	return ratingService.getRatingCriteriaDtos(contentId, toolSessionId, itemIds, isCommentsByOtherUsersRequired, userId);
     }
 
     @Override
@@ -411,7 +411,7 @@ public class ImageGalleryServiceImpl implements IImageGalleryService, ToolConten
 		final boolean IS_COMMENTS_BY_OTHER_USERS_REQUIRED = true;
 		// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!TODO calculate average ratings based on one
 		// session data
-		itemRatingDtos = getRatingCriteriaDtos(contentId, itemIds, IS_COMMENTS_BY_OTHER_USERS_REQUIRED,
+		itemRatingDtos = getRatingCriteriaDtos(contentId, session.getSessionId(), itemIds, IS_COMMENTS_BY_OTHER_USERS_REQUIRED,
 			USER_ID);
 	    }
 

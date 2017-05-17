@@ -29,6 +29,7 @@ import java.util.Iterator;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
+import org.lamsfoundation.lams.rating.dto.ItemRatingDTO;
 
 /**
  * Resource
@@ -76,10 +77,13 @@ public class ResourceItem implements Cloneable {
 
     private Date createDate;
     private ResourceUser createBy;
+    
+    private boolean allowRating;
 
     // ***********************************************
     // DTO fields:
     private boolean complete;
+    private ItemRatingDTO ratingDTO;
 
     @Override
     public Object clone() {
@@ -356,4 +360,21 @@ public class ResourceItem implements Cloneable {
     public boolean isComplete() {
 	return complete;
     }
+
+    public ItemRatingDTO getRatingDTO() {
+	return ratingDTO;
+    }
+
+    public void setRatingDTO(ItemRatingDTO ratingDTO) {
+	this.ratingDTO = ratingDTO;
+    }
+
+    public boolean isAllowRating() {
+	return allowRating;
+    }
+
+    public void setAllowRating(boolean allowRating) {
+	this.allowRating = allowRating;
+    }
+
 }

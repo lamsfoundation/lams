@@ -30,7 +30,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
@@ -66,6 +68,11 @@ import org.lamsfoundation.lams.learningdesign.service.ImportToolContentException
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.notebook.service.CoreNotebookConstants;
 import org.lamsfoundation.lams.notebook.service.ICoreNotebookService;
+import org.lamsfoundation.lams.rating.RatingException;
+import org.lamsfoundation.lams.rating.dto.ItemRatingDTO;
+import org.lamsfoundation.lams.rating.model.LearnerItemRatingCriteria;
+import org.lamsfoundation.lams.rating.model.RatingCriteria;
+import org.lamsfoundation.lams.rating.service.IRatingService;
 import org.lamsfoundation.lams.rest.RestTags;
 import org.lamsfoundation.lams.rest.ToolRestManager;
 import org.lamsfoundation.lams.tool.ToolAccessMode;
@@ -146,6 +153,8 @@ public class ResourceServiceImpl implements IResourceService, ToolContentManager
     private ICoreNotebookService coreNotebookService;
 
     private IEventNotificationService eventNotificationService;
+
+    private IRatingService ratingService;
 
     private ResourceOutputFactory resourceOutputFactory;
 
@@ -439,9 +448,11 @@ public class ResourceServiceImpl implements IResourceService, ToolContentManager
 	    // add this session's resource items
 	    items.addAll(session.getResourceItems());
 
+	    // item ids of items that could be rated.
+	    List<Long> itemsToRate = new ArrayList<Long>();
+
 	    // get all item which is accessed by users in this session
 	    Map<Long, Integer> visitCountMap = resourceItemVisitDao.getSummary(contentId, session.getSessionId());
-
 	    for (ResourceItem item : items) {
 		ResourceItemDTO resourceItemDTO = new ResourceItemDTO(item);
 		// set viewNumber according visit log
@@ -449,6 +460,29 @@ public class ResourceServiceImpl implements IResourceService, ToolContentManager
 		    resourceItemDTO.setViewNumber(visitCountMap.get(item.getUid()).intValue());
 		}
 		group.getItems().add(resourceItemDTO);
+		if ( item.isAllowRating() ) {
+		    itemsToRate.add(item.getUid());
+		}
+	    }
+	    
+	    List<ItemRatingDTO> itemRatingDtos = null;
+	    if ( itemsToRate.size() > 0 ) {
+		itemRatingDtos = ratingService.getRatingCriteriaDtos(contentId, session.getSessionId(), itemsToRate, false, -1L);
+		group.setAllowRating(true);
+	    } else {
+		group.setAllowRating(false);
+	    }
+
+	    for (ResourceItemDTO item: group.getItems()) {
+		if (item.isAllowRating()) {
+		    // find corresponding itemRatingDto
+		    for ( ItemRatingDTO ratingDTO : itemRatingDtos ) {
+			if ( item.getItemUid().equals(ratingDTO.getItemId()) ) {
+			    item.setRatingDTO(ratingDTO);
+			    break;
+			}
+		    }
+		}
 	    }
 
 	    groupList.add(group);
@@ -827,10 +861,20 @@ public class ResourceServiceImpl implements IResourceService, ToolContentManager
 	    toolContentObj.setCreatedBy(user);
 
 	    // reset all resourceItem createBy user
+	    boolean useRatings = false;
 	    Set<ResourceItem> items = toolContentObj.getResourceItems();
 	    for (ResourceItem item : items) {
 		item.setCreateBy(user);
+		useRatings = useRatings || item.isAllowRating();
 	    }
+	    
+	    Set<LearnerItemRatingCriteria> criterias = toolContentObj.getRatingCriterias();
+	    if (criterias != null) {
+		for (LearnerItemRatingCriteria criteria : criterias) {
+		    criteria.setToolContentId(toolContentId);
+		}
+	    } 
+
 	    resourceDao.saveObject(toolContentObj);
 	} catch (ImportToolContentException e) {
 	    throw new ToolException(e);
@@ -1060,6 +1104,26 @@ public class ResourceServiceImpl implements IResourceService, ToolContentManager
 	return getResourceOutputFactory().getSupportedDefinitionClasses(definitionType);
     }
 
+    @Override
+    public LearnerItemRatingCriteria createRatingCriteria(Long toolContentId) throws RatingException {
+	List<RatingCriteria> ratingCriterias = ratingService.getCriteriasByToolContentId(toolContentId);
+	if ( ratingCriterias == null || ratingCriterias.size() == 0 ) {
+	    return ratingService.saveLearnerItemRatingCriteria(toolContentId, null, 1, RatingCriteria.RATING_STYLE_STAR, false, 0);
+	} else {
+	    return (LearnerItemRatingCriteria) ratingCriterias.get(0);
+	}
+    }
+
+    @Override
+    public int deleteRatingCriteria(Long toolContentId) {
+	return ratingService.deleteAllRatingCriterias(toolContentId);
+    }
+    
+    @Override
+    public List<ItemRatingDTO> getRatingCriteriaDtos(Long toolContentId, Long toolSessionId, Collection<Long> itemIds, Long userId) {
+	return ratingService.getRatingCriteriaDtos(toolContentId, toolSessionId, itemIds, false, userId);
+    }
+
     // *****************************************************************************
     // set methods for Spring Bean
     // *****************************************************************************
@@ -1141,6 +1205,14 @@ public class ResourceServiceImpl implements IResourceService, ToolContentManager
 
     public void setEventNotificationService(IEventNotificationService eventNotificationService) {
 	this.eventNotificationService = eventNotificationService;
+    }
+
+    public IRatingService getRatingService() {
+	return ratingService;
+    }
+
+    public void setRatingService(IRatingService ratingService) {
+	this.ratingService = ratingService;
     }
 
     public ResourceOutputFactory getResourceOutputFactory() {

@@ -211,7 +211,7 @@ public class ImageGalleryOutputFactory extends OutputFactory {
 
 	    boolean isCommentsByOtherUsersRequired = user == null;
 	    Long userId = user == null ? -1L : user.getUserId();
-	    List<ItemRatingDTO> ratingCriteriaDtos = imageGalleryService.getRatingCriteriaDtos(contentId, itemIds,
+	    List<ItemRatingDTO> ratingCriteriaDtos = imageGalleryService.getRatingCriteriaDtos(contentId, session.getSessionId(), itemIds,
 		    isCommentsByOtherUsersRequired, userId);
 
 	    if (user != null) {

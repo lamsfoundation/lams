@@ -51,6 +51,7 @@ public class ResourceItemForm extends ActionForm {
     private Long fileVersionId;
     private String fileName;
     private FormFile file;
+    private boolean allowRating;
 
     public String getDescription() {
 	return description;
@@ -154,5 +155,13 @@ public class ResourceItemForm extends ActionForm {
 
     public void setMode(String mode) {
 	this.mode = mode;
+    }
+
+    public boolean isAllowRating() {
+	return allowRating;
+    }
+
+    public void setAllowRating(boolean allowRating) {
+	this.allowRating = allowRating;
     }
 }

@@ -332,13 +332,13 @@ public class PeerreviewServiceImpl
     }
 
     @Override
-    public int rateItems(RatingCriteria ratingCriteria, Integer userId, Map<Long, Float> newRatings) {
-	return ratingService.rateItems(ratingCriteria, userId, newRatings);
+    public int rateItems(RatingCriteria ratingCriteria, Long toolSessionId, Integer userId, Map<Long, Float> newRatings) {
+	return ratingService.rateItems(ratingCriteria, toolSessionId, userId, newRatings);
     }
 
     @Override
-    public void commentItem(RatingCriteria ratingCriteria, Integer userId, Long itemId, String comment) {
-	ratingService.commentItem(ratingCriteria, userId, itemId, comment);
+    public void commentItem(RatingCriteria ratingCriteria, Long toolSessionId, Integer userId, Long itemId, String comment) {
+	ratingService.commentItem(ratingCriteria, toolSessionId, userId, itemId, comment);
     }
 
     @Override
@@ -385,7 +385,7 @@ public class PeerreviewServiceImpl
 	}
 	// if !getByUser -> is get current user's ratings from other users ->
 	// convertToStyledJSON.getAllUsers needs to be true otherwise current user (the only one in the set!) is dropped
-	return ratingService.convertToStyledJSON(criteria, currentUserId, !getByUser || getAllUsers, rawData,
+	return ratingService.convertToStyledJSON(criteria, toolSessionId, currentUserId, !getByUser || getAllUsers, rawData,
 		needRatesPerUser);
     }
 
@@ -589,7 +589,7 @@ public class PeerreviewServiceImpl
 
 	ArrayList<Long> itemIds = new ArrayList<Long>(1);
 	itemIds.add(userId);
-	Map<Long, Long> numRatingsForUserMap = ratingService.countUsersRatedEachItem(toolContentId, itemIds, -1);
+	Map<Long, Long> numRatingsForUserMap = ratingService.countUsersRatedEachItem(toolContentId, toolSessionId, itemIds, -1);
 	Long numRatingsForUser = numRatingsForUserMap.get(userId);
 	retValue[0] = numRatingsForUser != null ? numRatingsForUser.intValue() : 0;
 
@@ -882,20 +882,20 @@ public class PeerreviewServiceImpl
     }
 
     @Override
-    public List<ItemRatingDTO> getRatingCriteriaDtos(Long contentId, Collection<Long> itemIds,
+    public List<ItemRatingDTO> getRatingCriteriaDtos(Long contentId, Long toolSessionId, Collection<Long> itemIds,
 	    boolean isCommentsByOtherUsersRequired, Long userId) {
-	return ratingService.getRatingCriteriaDtos(contentId, itemIds, isCommentsByOtherUsersRequired, userId);
+	return ratingService.getRatingCriteriaDtos(contentId, toolSessionId, itemIds, isCommentsByOtherUsersRequired, userId);
     }
 
     @Override
-    public List<ItemRatingDTO> getRatingCriteriaDtos(Long contentId, Collection<Long> itemIds,
+    public List<ItemRatingDTO> getRatingCriteriaDtos(Long contentId, Long toolSessionId, Collection<Long> itemIds,
 	    boolean isCommentsByOtherUsersRequired, Long userId, boolean isCountUsersRatedEachItem) {
-	List<ItemRatingDTO> itemRatingDTOs = getRatingCriteriaDtos(contentId, itemIds, isCommentsByOtherUsersRequired,
+	List<ItemRatingDTO> itemRatingDTOs = getRatingCriteriaDtos(contentId, toolSessionId, itemIds, isCommentsByOtherUsersRequired,
 		userId);
 
 	if (isCountUsersRatedEachItem) {
-	    Map<Long, Long> itemIdToRatedUsersCountMap = ratingService.countUsersRatedEachItem(contentId, itemIds,
-		    userId.intValue());
+	    Map<Long, Long> itemIdToRatedUsersCountMap = ratingService.countUsersRatedEachItem(contentId, toolSessionId, 
+		    itemIds, userId.intValue());
 
 	    for (ItemRatingDTO itemRatingDTO : itemRatingDTOs) {
 		Long itemId = itemRatingDTO.getItemId();

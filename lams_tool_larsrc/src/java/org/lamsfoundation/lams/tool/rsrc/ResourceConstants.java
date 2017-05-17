@@ -90,6 +90,8 @@ public class ResourceConstants {
 
     public static final String ATTR_RUN_AUTO = "runAuto";
 
+    public static final String ATTR_RATE_ITEMS = "rateItems";
+
     public static final String ATTR_RESOURCE_ITEM_UID = "itemUid";
 
     public static final String ATTR_NEXT_ACTIVITY_URL = "nextActivityUrl";

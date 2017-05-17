@@ -27,6 +27,7 @@ package org.lamsfoundation.lams.tool.rsrc.dto;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.lamsfoundation.lams.rating.dto.ItemRatingDTO;
 import org.lamsfoundation.lams.tool.rsrc.model.ResourceItem;
 
 /**
@@ -54,6 +55,8 @@ public class ResourceItemDTO {
     private List<String> itemInstructions = new ArrayList<String>();
     private String username;
     private int viewNumber;
+    private boolean allowRating;
+    private ItemRatingDTO ratingDTO;
 
     // true: initial group item, false, belong to some group.
     private boolean isInitGroup;
@@ -78,6 +81,7 @@ public class ResourceItemDTO {
 	    this.itemHide = item.isHide();
 	    this.itemTitle = item.getTitle();
 	    this.username = item.getCreateBy() == null ? "" : item.getCreateBy().getLoginName();
+	    this.setAllowRating(item.isAllowRating());
 	} else {
 	    this.itemUid = new Long(-1);
 	}
@@ -153,5 +157,21 @@ public class ResourceItemDTO {
 
     public void setItemInstructions(List<String> itemInstructions) {
 	this.itemInstructions = itemInstructions;
+    }
+
+    public ItemRatingDTO getRatingDTO() {
+	return ratingDTO;
+    }
+
+    public void setRatingDTO(ItemRatingDTO ratingDTO) {
+	this.ratingDTO = ratingDTO;
+    }
+
+    public boolean isAllowRating() {
+	return allowRating;
+    }
+
+    public void setAllowRating(boolean allowRating) {
+	this.allowRating = allowRating;
     }
 }

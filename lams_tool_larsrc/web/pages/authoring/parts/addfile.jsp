@@ -89,9 +89,12 @@
 					<%@ include file="/pages/authoring/parts/itemattachment.jsp"%>
 					</span>
 					<lams:WaitingSpinner id="itemAttachmentArea_Busy"/>
-					</div>			
-				</div>
+				</div>			
 	
+				<div class="form-group">
+					<html:checkbox property="allowRating" styleId="allowRating"/>
+					&nbsp;<label for="allowRating"><fmt:message key="label.enable.rating" /></label>
+				</div>
 			</html:form>
 	
 			<!-- Instructions -->
