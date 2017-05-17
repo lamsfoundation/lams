@@ -374,7 +374,7 @@ public class QaLearningAction extends LamsDispatchAction implements QaAppConstan
 	    generalLearnerFlowDTO.setHttpSessionID(httpSessionID);
 
 	    /** Set up the data for the view all answers screen */
-	    QaLearningAction.refreshSummaryData(request, qaContent, QaLearningAction.qaService, httpSessionID, user,
+	    QaLearningAction.refreshSummaryData(request, qaContent, qaSession, QaLearningAction.qaService, httpSessionID, user,
 		    generalLearnerFlowDTO);
 
 	    generalLearnerFlowDTO.setRequestLearningReport(new Boolean(true).toString());
@@ -456,7 +456,7 @@ public class QaLearningAction extends LamsDispatchAction implements QaAppConstan
 	qaLearningForm.resetUserActions();
 	qaLearningForm.setSubmitAnswersContent(null);
 
-	QaLearningAction.refreshSummaryData(request, qaContent, QaLearningAction.qaService, httpSessionID, user,
+	QaLearningAction.refreshSummaryData(request, qaContent, qaSession, QaLearningAction.qaService, httpSessionID, user,
 		generalLearnerFlowDTO);
 
 	generalLearnerFlowDTO.setRequestLearningReport(new Boolean(true).toString());
@@ -798,7 +798,7 @@ public class QaLearningAction extends LamsDispatchAction implements QaAppConstan
 	generalLearnerFlowDTO.setNotebookEntry(entryText);
 	generalLearnerFlowDTO.setRequestLearningReportProgress(new Boolean(true).toString());
 
-	QaLearningAction.refreshSummaryData(request, qaContent, QaLearningAction.qaService, httpSessionID, qaQueUsr,
+	QaLearningAction.refreshSummaryData(request, qaContent, qaSession, QaLearningAction.qaService, httpSessionID, qaQueUsr,
 		generalLearnerFlowDTO);
 
 	boolean isLearnerFinished = qaQueUsr.isLearnerFinished();
@@ -928,7 +928,7 @@ public class QaLearningAction extends LamsDispatchAction implements QaAppConstan
      * User id is needed if isUserNamesVisible is false && learnerRequest is true, as it is required to work out if the
      * data being analysed is the current user.
      */
-    public static void refreshSummaryData(HttpServletRequest request, QaContent qaContent, IQaService qaService,
+    public static void refreshSummaryData(HttpServletRequest request, QaContent qaContent, QaSession qaSession, IQaService qaService,
 	    String httpSessionID, QaQueUsr user, GeneralLearnerFlowDTO generalLearnerFlowDTO) {
 
 	SessionMap<String, Object> sessionMap = (SessionMap<String, Object>) request.getSession()
@@ -963,7 +963,7 @@ public class QaLearningAction extends LamsDispatchAction implements QaAppConstan
 		    itemIds.add(responseIter.getResponseId());
 		}
 
-		List<ItemRatingDTO> itemRatingDtos = qaService.getRatingCriteriaDtos(qaContent.getQaContentId(), itemIds,
+		List<ItemRatingDTO> itemRatingDtos = qaService.getRatingCriteriaDtos(qaContent.getQaContentId(), qaSession.getQaSessionId(), itemIds,
 			true, userId);
 		sessionMap.put(AttributeNames.ATTR_ITEM_RATING_DTOS, itemRatingDtos);
 
@@ -991,6 +991,9 @@ public class QaLearningAction extends LamsDispatchAction implements QaAppConstan
 		countRatedQuestions = qaService.getCountItemsRatedByUser(qaContent.getQaContentId(), userId.intValue());
 	    }
 	}
+	
+	request.setAttribute(TOOL_SESSION_ID, qaSession.getQaSessionId());
+	
 	sessionMap.put("commentsMinWordsLimit", commentsMinWordsLimit);
 	sessionMap.put("isCommentsEnabled", isCommentsEnabled);
 	sessionMap.put(AttributeNames.ATTR_COUNT_RATED_ITEMS, countRatedQuestions);
@@ -1010,7 +1013,7 @@ public class QaLearningAction extends LamsDispatchAction implements QaAppConstan
 	HttpSession ss = SessionManager.getSession();
 	UserDTO userDto = (UserDTO) ss.getAttribute(AttributeNames.USER);
 	TimeZone userTimeZone = userDto.getTimeZone();
-
+	
 	boolean isAllowRateAnswers = WebUtil.readBooleanParam(request, "isAllowRateAnswers");
 	boolean isAllowRichEditor = WebUtil.readBooleanParam(request, "isAllowRichEditor");
 	boolean isOnlyLeadersIncluded = WebUtil.readBooleanParam(request, "isOnlyLeadersIncluded", false);
@@ -1064,7 +1067,7 @@ public class QaLearningAction extends LamsDispatchAction implements QaAppConstan
 
 	    //all comments required only for monitoring
 	    boolean isCommentsByOtherUsersRequired = isMonitoring;
-	    itemRatingDtos = QaLearningAction.qaService.getRatingCriteriaDtos(qaContentId, itemIds,
+	    itemRatingDtos = QaLearningAction.qaService.getRatingCriteriaDtos(qaContentId, qaSessionId, itemIds,
 		    isCommentsByOtherUsersRequired, userId);
 
 	    // store how many items are rated

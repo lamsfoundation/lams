@@ -9,6 +9,7 @@
 	<title><fmt:message key="label.learning.title" />
 	</title>
 	<%@ include file="/common/header.jsp"%>
+	<link rel="stylesheet" type="text/css" href="${lams}css/jquery.jRating.css">
 
 	<%-- param has higher level for request attribute --%>
 	<c:if test="${not empty param.sessionMapID}">
@@ -25,11 +26,31 @@
 	<script type="text/javascript" src="${lams}includes/javascript/jquery.js"></script>
 	<script type="text/javascript" src="${lams}includes/javascript/jquery.validate.js"></script>
 	<script type="text/javascript" src="${lams}includes/javascript/upload.js"></script>
-	<script type="text/javascript">
 	
+	<c:if test="${sessionMap.rateItems}">
+	<script type="text/javascript">
+		var pathToImageFolder = "${lams}images/css/",
+			LAMS_URL = '${lams}',
+			MAX_RATES = MAX_RATINGS_FOR_ITEM = MIN_RATES = COUNT_RATED_ITEMS = 0, // no restrictions
+			COMMENTS_MIN_WORDS_LIMIT = 0, // comments not used,
+			COMMENT_TEXTAREA_TIP_LABEL = WARN_COMMENTS_IS_BLANK_LABEL = WARN_MIN_NUMBER_WORDS_LABEL = '',
+			AVG_RATING_LABEL = '<fmt:message key="label.average.rating"><fmt:param>@1@</fmt:param><fmt:param>@2@</fmt:param></fmt:message>',
+			YOUR_RATING_LABEL = '<fmt:message key="label.your.rating"><fmt:param>@1@</fmt:param><fmt:param>@2@</fmt:param><fmt:param>@3@</fmt:param></fmt:message>',
+			ALLOW_RERATE = true,
+			SESSION_ID = ${toolSessionID}; 
+
+	</script>
+	<script type="text/javascript" src="${lams}includes/javascript/rating.js"></script>
+	<script type="text/javascript" src="${lams}includes/javascript/jquery.jRating.js"></script>
+	</c:if>
+			
+	<script type="text/javascript">
 		$(document).ready(function(){
+ 			<c:if test="${sessionMap.rateItems}">
+			initializeJRating();
+			</c:if>
 			cancel();
-		});
+ 		});
 
  		function submitResourceForm() {
  			clearFileError();
@@ -50,7 +71,7 @@
 			    		alert(textStatus+": "+errorThrown);
 			    	},
 			    	complete: function(response) {
-			    		hideBusy(itemAttachmentArea_Busy);
+			    		hideBusy('itemAttachmentArea');
 			            $('.btn-disable-on-submit').prop('disabled', false);
 					}
 			    });
@@ -92,7 +113,7 @@
 		
 		function checkNew(){
  		    var reqIDVar = new Date();
-			document.location.href = "<c:url value="/learning/start.do"/>?sessionMapID=${sessionMapID}&mode=${mode}&toolSessionID=${toolSessionID}&reqID="+reqIDVar.getTime();				
+			document.location.href = '<c:url value="/learning/start.do"/>?mode=${mode}&toolSessionID=${toolSessionID}&reqID='+reqIDVar.getTime();				
  		    return false;
 		}
 		function viewItem(itemUid){
@@ -179,6 +200,11 @@
 				<th class="text-center">
 					<fmt:message key="label.completed" />
 				</th>
+				<c:if test="${sessionMap.rateItems}">
+				<th class="text-center">
+					<fmt:message key="label.rating" />
+				</th>
+				</c:if>
 			</tr>
 			<c:forEach var="item" items="${sessionMap.resourceList}">
 				<tr>
@@ -200,6 +226,16 @@
 							</c:otherwise>
 						</c:choose>
 					</td>
+					<c:if test="${sessionMap.rateItems}">
+					<td class="text-center">
+						<c:if test="${item.complete && item.allowRating}">
+							<div style="display: inline-block">
+							<lams:Rating itemRatingDto="${item.ratingDTO}" 
+								disabled="${mode == 'teacher' || mode == 'author' || finishedLock}" allowRetries="true" />
+							</div>
+						</c:if>
+					</td>					
+					</c:if>
 				</tr>
 			</c:forEach>
 

@@ -27,6 +27,7 @@ package org.lamsfoundation.lams.tool.rsrc.web.action;
 import java.io.IOException;
 import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
@@ -53,6 +54,7 @@ import org.lamsfoundation.lams.learning.web.bean.ActivityPositionDTO;
 import org.lamsfoundation.lams.learning.web.util.LearningWebUtil;
 import org.lamsfoundation.lams.notebook.model.NotebookEntry;
 import org.lamsfoundation.lams.notebook.service.CoreNotebookConstants;
+import org.lamsfoundation.lams.rating.dto.ItemRatingDTO;
 import org.lamsfoundation.lams.tool.ToolAccessMode;
 import org.lamsfoundation.lams.tool.rsrc.ResourceConstants;
 import org.lamsfoundation.lams.tool.rsrc.model.Resource;
@@ -170,7 +172,7 @@ public class LearningAction extends Action {
 	items = service.getResourceItemsBySessionId(sessionId);
 	resource = service.getResourceBySessionId(sessionId);
 
-	// check whehter finish lock is on/off
+	// check whether finish lock is on/off
 	boolean lock = resource.getLockWhenFinished() && (resourceUser != null) && resourceUser.isSessionFinished();
 
 	// check whether there is only one resource item and run auto flag is true or not.
@@ -232,10 +234,11 @@ public class LearningAction extends Action {
 	// init resource item list
 	SortedSet<ResourceItem> resourceItemList = getResourceItemList(sessionMap);
 	resourceItemList.clear();
+	Collection<Long> itemsToBeRated = new ArrayList<Long>();
 	if (items != null) {
 	    // remove hidden items.
 	    for (ResourceItem item : items) {
-		// becuase in webpage will use this login name. Here is just
+		// because in webpage will use this login name. Here is just
 		// initial it to avoid session close error in proxy object.
 		if (item.getCreateBy() != null) {
 		    item.getCreateBy().getLoginName();
@@ -243,9 +246,23 @@ public class LearningAction extends Action {
 		if (!item.isHide()) {
 		    resourceItemList.add(item);
 		}
+		if ( item.isAllowRating() ) {
+		    itemsToBeRated.add(item.getUid());
+		}
 	    }
 	}
 
+	List<ItemRatingDTO> ratingDTOs = service.getRatingCriteriaDtos(resource.getContentId(), sessionId, itemsToBeRated,
+		resourceUser.getUserId());
+	for (ItemRatingDTO ratingDTO : ratingDTOs) {
+	    for (ResourceItem item : resourceItemList) {
+		if (item.getUid().equals(ratingDTO.getItemId())) {
+		    item.setRatingDTO(ratingDTO);
+		}
+	    }
+	}
+	sessionMap.put(ResourceConstants.ATTR_RATE_ITEMS, itemsToBeRated.size() > 0);
+	
 	// set complete flag for display purpose
 	if (resourceUser != null) {
 	    service.retrieveComplete(resourceItemList, resourceUser);

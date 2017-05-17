@@ -93,6 +93,7 @@
 		<property name="eventNotificationService">
 			<ref bean="eventNotificationService"/>
 		</property>
+		<property name="ratingService"><ref bean="ratingService"/></property>
 		<property name="resourceOutputFactory"><ref bean="resourceOutputFactory"/></property>
     </bean>
 

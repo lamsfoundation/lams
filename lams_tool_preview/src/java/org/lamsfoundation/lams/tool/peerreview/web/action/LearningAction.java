@@ -671,7 +671,7 @@ public class LearningAction extends Action {
 			countCommentsSaved++;
 			// save the comment to the database.
 			if ( comment.length() > 0 )
-			    service.commentItem(criteria, userId, itemId, comment);
+			    service.commentItem(criteria, toolSessionId, userId, itemId, comment);
 		    }
 		}
 	    }
@@ -780,7 +780,7 @@ public class LearningAction extends Action {
 			(ratings.size() >= service.getCountUsersBySession(toolSessionId, peerreview.isSelfReview() ? -1 : user.getUserId())));
 	    }
 
-	    service.rateItems(criteria, userId, ratings);
+	    service.rateItems(criteria, toolSessionId, userId, ratings);
 	    if (!valid) {
 		request.setAttribute("notcomplete", true);
 		return doEdit(mapping, request, service, sessionMap, toolSessionId, peerreview, criteria);
@@ -789,7 +789,7 @@ public class LearningAction extends Action {
 	    if (criteria.isHedgeStyleRating() && criteria.isCommentsEnabled()) {
 		String justify = request.getParameter("justify");
 		if ( justify != null && justify.length() > 0)
-		    service.commentItem(criteria, userId, criteria.getRatingCriteriaId(), justify);
+		    service.commentItem(criteria, toolSessionId, userId, criteria.getRatingCriteriaId(), justify);
 	    }
 
 	}

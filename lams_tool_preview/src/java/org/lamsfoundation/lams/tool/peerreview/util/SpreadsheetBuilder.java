@@ -110,7 +110,7 @@ public class SpreadsheetBuilder {
 
 	// Process all the criterias and build up rows for each rated user. Store in temporary map.
 	List<ItemRatingDTO> ratingDtos = service.getRatingCriteriaDtos(session.getPeerreview().getContentId(), 
-		userNames.keySet(), true, -1L);
+		session.getSessionId(), userNames.keySet(), true, -1L);
 	for (ItemRatingDTO ratingDto : ratingDtos) {
 	    Double userMarkSum = 0D;
 	    userRow = new ExcelCell[fullColumnCount];

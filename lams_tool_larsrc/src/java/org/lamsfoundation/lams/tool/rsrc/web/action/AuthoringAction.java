@@ -30,6 +30,7 @@ import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
@@ -57,6 +58,7 @@ import org.apache.struts.action.ActionMessage;
 import org.apache.struts.action.ActionMessages;
 import org.apache.struts.upload.FormFile;
 import org.lamsfoundation.lams.authoring.web.AuthoringConstants;
+import org.lamsfoundation.lams.rating.model.LearnerItemRatingCriteria;
 import org.lamsfoundation.lams.tool.ToolAccessMode;
 import org.lamsfoundation.lams.tool.rsrc.ResourceConstants;
 import org.lamsfoundation.lams.tool.rsrc.model.Resource;
@@ -520,7 +522,7 @@ public class AuthoringAction extends Action {
 
 	Resource resource = resourceForm.getResource();
 	IResourceService service = getResourceService();
-
+	
 	// **********************************Get Resource PO*********************
 	Resource resourcePO = service.getResourceByContentId(resource.getContentId());
 	if (resourcePO == null) {
@@ -530,6 +532,7 @@ public class AuthoringAction extends Action {
 	    resourcePO.setUpdated(new Timestamp(new Date().getTime()));
 	    
 	} else {
+	    Set<LearnerItemRatingCriteria> criterias = resourcePO.getRatingCriterias();
 	    Long uid = resourcePO.getUid();
 	    PropertyUtils.copyProperties(resourcePO, resource);
 
@@ -537,8 +540,9 @@ public class AuthoringAction extends Action {
 	    service.evict(resource);
 	    resourceForm.setResource(null);
 	    resource = null;
-	    // set back UID
+	    // set back UID && rating criteria
 	    resourcePO.setUid(uid);
+	    resourcePO.setRatingCriterias(criterias);
 
 	    // if it's a Teacher (from monitor) - change define later status
 	    if (mode.isTeacher()) {
@@ -563,6 +567,7 @@ public class AuthoringAction extends Action {
 
 	// ************************* Handle resource items *******************
 	// Handle resource items
+	boolean useRatings = false;
 	Set itemList = new LinkedHashSet();
 	SortedSet topics = getResourceItemList(sessionMap);
 	Iterator iter = topics.iterator();
@@ -573,10 +578,11 @@ public class AuthoringAction extends Action {
 		// user.
 		item.setCreateBy(resourceUser);
 		itemList.add(item);
+		useRatings = useRatings || item.isAllowRating();
 	    }
 	}
 	resourcePO.setResourceItems(itemList);
-	// delete instructino file from database.
+	// delete instruction file from database.
 	List delResourceItemList = getDeletedResourceItemList(sessionMap);
 	iter = delResourceItemList.iterator();
 	while (iter.hasNext()) {
@@ -601,8 +607,20 @@ public class AuthoringAction extends Action {
 	}
 	// **********************************************
 	// finally persist resourcePO again
+	    
 	service.saveOrUpdateResource(resourcePO);
 
+	// Set up rating criteria. Do not delete existing criteria as this will destroy ratings already done
+	// if the monitor edits the activity and turns of the criteria temporarily.
+	if ( useRatings ) {
+	    if ( resourcePO.getRatingCriterias() == null || resourcePO.getRatingCriterias().size() == 0 ) {
+		LearnerItemRatingCriteria newCriteria = service.createRatingCriteria(resourcePO.getContentId());
+		if ( resourcePO.getRatingCriterias() == null ) {
+		    resourcePO.setRatingCriterias(new HashSet<LearnerItemRatingCriteria>());
+		}
+		resourcePO.getRatingCriterias().add(newCriteria);
+	    }
+	}
 	resourceForm.setResource(resourcePO);
 
 	request.setAttribute(AuthoringConstants.LAMS_AUTHORING_SUCCESS_FLAG, Boolean.TRUE);
@@ -759,6 +777,7 @@ public class AuthoringAction extends Action {
 	form.setTitle(item.getTitle());
 	form.setUrl(item.getUrl());
 	form.setOpenUrlNewWindow(item.isOpenUrlNewWindow());
+	form.setAllowRating(item.isAllowRating());
 	if (itemIdx >= 0) {
 	    form.setItemIndex(new Integer(itemIdx).toString());
 	}
@@ -866,7 +885,8 @@ public class AuthoringAction extends Action {
 	item.setTitle(itemForm.getTitle());
 	item.setCreateByAuthor(true);
 	item.setHide(false);
-	// set instrcutions
+	item.setAllowRating(itemForm.isAllowRating());
+	// set instructions
 	Set instructions = new LinkedHashSet();
 	int idx = 0;
 	for (String ins : instructionList) {

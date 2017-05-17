@@ -93,6 +93,11 @@
 
 				<lams:WaitingSpinner id="itemAttachmentArea_Busy"/>
 	
+				<div class="form-group">
+					<html:checkbox property="allowRating" styleId="allowRating"/>
+					&nbsp;<label for="allowRating"><fmt:message key="label.enable.rating" /></label>
+				</div>
+				
 			</html:form>
 
 			<!-- Instructions -->

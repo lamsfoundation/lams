@@ -3,7 +3,8 @@
 <c:set var="sessionMap" value="${sessionScope[sessionMapID]}"/>
 <c:set var="summaryList" value="${sessionMap.summaryList}"/>
 
-<link type="text/css" href="${lams}css/jquery-ui-smoothness-theme.css" rel="stylesheet">
+<link type="text/css" href="${lams}css/jquery.jRating.css" rel="stylesheet"/>
+<link type="text/css" href="${lams}css/jquery-ui-smoothness-theme.css" rel="stylesheet"/>
 <link type="text/css" href="${lams}css/jquery.jqGrid.css" rel="stylesheet" />
 <style media="screen,projection" type="text/css">
 	 .ui-jqgrid {
@@ -21,12 +22,23 @@
 	}
 </style>
 
+<script type="text/javascript">
+	var pathToImageFolder = "${lams}images/css/",
+		LAMS_URL = '${lams}',
+		MAX_RATES = MAX_RATINGS_FOR_ITEM = MIN_RATES = COUNT_RATED_ITEMS = 0, // no restrictions
+		COMMENTS_MIN_WORDS_LIMIT = 0, // comments not used,
+		COMMENT_TEXTAREA_TIP_LABEL = WARN_COMMENTS_IS_BLANK_LABEL = WARN_MIN_NUMBER_WORDS_LABEL = '',
+		ALLOW_RERATE = false; 
+</script>
+<script type="text/javascript" src="${lams}includes/javascript/jquery.jRating.js"></script>
+<script type="text/javascript" src="${lams}includes/javascript/rating.js"></script>
+
 <script type="text/javascript" src="${lams}includes/javascript/jquery.jqGrid.locale-en.js"></script>
 <script type="text/javascript" src="${lams}includes/javascript/jquery.jqGrid.js"></script>
 <script type="text/javascript" src="${lams}includes/javascript/monitorToolSummaryAdvanced.js" ></script>
 <script type="text/javascript">
 	$(document).ready(function(){
-		
+
 		<c:forEach var="groupSummary" items="${summaryList}" varStatus="status">
 		
 			jQuery("#group${groupSummary.sessionId}").jqGrid({
@@ -41,6 +53,9 @@
 						"<fmt:message key="monitoring.label.type" />",
 					    "<fmt:message key="monitoring.label.suggest" />",
 					    "<fmt:message key="monitoring.label.views" />",
+						<c:if test="${groupSummary.allowRating}">
+					    "<fmt:message key="label.rating" />",
+					   	</c:if>
 					    "<fmt:message key="monitoring.label.actions" />" 
 				],
 			   	colModel:[
@@ -50,6 +65,9 @@
 			   		{name:'type', index:'type', width:90, align:"center"},
 			   		{name:'suggest', index:'suggest', width:160, align:"center"},
 			   		{name:'viewNumber', index:'viewNumber', width:100, align:"center", sorttype:"int"},
+					<c:if test="${groupSummary.allowRating}">
+					{name:'rating', index:'rating', width:200, align:"center"},
+				   	</c:if>
 			   		{name:'actions', index:'actions', width:120, align:"center"}		
 			   	],
 			   	// caption: "${groupSummary.sessionName}",
@@ -125,6 +143,14 @@
 					<c:out value="${item.itemTitle}" escapeXml="true"/>
 				</c:set>
 				
+				<c:if test="${groupSummary.allowRating}">
+				<c:set var="ratingHTML"><div class="rating-stars-holder"></c:set>
+				<c:forEach var="criteriaDto" items="${item.ratingDTO.criteriaDtos}">
+					<c:set var="ratingHTML">${ratingHTML}<div class="rating-stars-new rating-stars-disabled" data-average="${criteriaDto.averageRating}" data-id="${criteriaDto.ratingCriteria.ratingCriteriaId}-${item.itemUid}"></div><div class="rating-stars-caption"><fmt:message key="label.average.rating"><fmt:param>${criteriaDto.averageRating}</fmt:param><fmt:param>${criteriaDto.numberOfVotes}</fmt:param></fmt:message></div></c:set>
+				</c:forEach>
+				<c:set var="ratingHTML">${ratingHTML}</div></c:set>
+				</c:if>
+				
    	     		jQuery("#group${groupSummary.sessionId}").addRowData(${i.index + 1}, {
    	   	     		id:		"${i.index + 1}",
    	   	     		itemUid:	"${item.itemUid}",
@@ -132,12 +158,17 @@
    	   	     		type:	"${itemTypeLabel}",
    	   	     		suggest:	"${item.username}",
    	   	     		viewNumber:"	${item.viewNumber}",
+					<c:if test="${groupSummary.allowRating}">
+					rating: '${ratingHTML}',
+				   	</c:if>
    	   	     		actions:	"${changeItemVisibility}"
    	   	   	    });
 	        </c:forEach>
 			
 		</c:forEach>
-        
+
+		initializeJRating();
+
 		//jqgrid autowidth (http://stackoverflow.com/a/1610197)
 		$(window).bind('resize', function() {
 			var grid;
@@ -150,7 +181,6 @@
 		    }
 		});
 		setTimeout(function(){ window.dispatchEvent(new Event('resize')); }, 300);
-		
 	});
 	
 	function changeItemVisibility(linkObject, itemUid, isHideItem) {
@@ -229,6 +259,8 @@
 	${ !sessionMap.isGroupedActivity || ! status.last ? '<div class="voffset5">&nbsp;</div>' :  ''}
 	
 </c:forEach>
+
+ 
 
 <c:if test="${sessionMap.isGroupedActivity}">
 </div> <!--  end accordianSessions --> 

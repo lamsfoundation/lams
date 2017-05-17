@@ -31,6 +31,7 @@ import java.util.Set;
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.log4j.Logger;
+import org.lamsfoundation.lams.rating.model.LearnerItemRatingCriteria;
 
 /**
  * Resource
@@ -88,6 +89,8 @@ public class Resource implements Cloneable {
 
     private String reflectInstructions;
 
+    private Set<LearnerItemRatingCriteria> ratingCriterias;
+
     // *************** NON Persist Fields ********************
 
     private String miniViewNumberStr;
@@ -116,6 +119,15 @@ public class Resource implements Cloneable {
 		item.setCreateBy(toContent.getCreatedBy());
 	    }
 	}
+	
+	// reset contentId
+	if (toContent.getRatingCriterias() != null) {
+	    Set<LearnerItemRatingCriteria> criterias = toContent.getRatingCriterias();
+	    for (LearnerItemRatingCriteria criteria : criterias) {
+		criteria.setToolContentId(contentId);
+	    }
+	}
+
 	return toContent;
     }
 
@@ -141,6 +153,19 @@ public class Resource implements Cloneable {
 	    if (createdBy != null) {
 		resource.setCreatedBy((ResourceUser) createdBy.clone());
 	    }
+	    
+	    // clone ratingCriterias as well
+	    if (ratingCriterias != null) {
+		Set<LearnerItemRatingCriteria> newCriterias = new HashSet<LearnerItemRatingCriteria>();
+		for (LearnerItemRatingCriteria criteria : ratingCriterias) {
+		    LearnerItemRatingCriteria newCriteria = (LearnerItemRatingCriteria) criteria.clone();
+		    // just clone old file without duplicate it in repository
+		    newCriterias.add(newCriteria);
+		}
+		resource.ratingCriterias = newCriterias;
+	    }
+
+	    
 	} catch (CloneNotSupportedException e) {
 	    Resource.log.error("When clone " + Resource.class + " failed");
 	}
@@ -460,4 +485,17 @@ public class Resource implements Cloneable {
     public void setNotifyTeachersOnFileUpload(boolean notifyTeachersOnFileUpload) {
 	this.notifyTeachersOnFileUpload = notifyTeachersOnFileUpload;
     }
+    
+    /**
+    *
+    * @return
+    */
+   public Set<LearnerItemRatingCriteria> getRatingCriterias() {
+	return ratingCriterias;
+   }
+
+   public void setRatingCriterias(Set<LearnerItemRatingCriteria> ratingCriterias) {
+	this.ratingCriterias = ratingCriterias;
+   }
+
 }

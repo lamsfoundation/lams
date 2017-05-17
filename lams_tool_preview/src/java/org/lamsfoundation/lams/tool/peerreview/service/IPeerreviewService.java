@@ -242,21 +242,21 @@ public interface IPeerreviewService extends ToolRatingManager {
     List<RatingCriteria> getCriteriasByToolContentId(Long toolContentId);
     
     /** Save the ratings for ranking and hedging. */
-    int rateItems(RatingCriteria ratingCriteria, Integer userId, Map<Long, Float> newRatings);
+    int rateItems(RatingCriteria ratingCriteria, Long toolSessionId, Integer userId, Map<Long, Float> newRatings);
 
     /** Save a comment made on a comment only page.  */
-    void commentItem(RatingCriteria ratingCriteria, Integer userId, Long itemId, String comment);
+    void commentItem(RatingCriteria ratingCriteria, Long toolSessionId, Integer userId, Long itemId, String comment);
 
     /** Get the details for a single criteria */
     RatingCriteria getCriteriaByCriteriaId(Long ratingCriteriaId);
     
     /**
      * It's a modification of org.lamsfoundation.lams.rating.ToolRatingManager.getRatingCriteriaDtos(Long contentId,
-     * Collection<Long> itemIds, boolean isCommentsByOtherUsersRequired, Long userId) method, added additional parameter
+     * Long toolSessionId, Collection<Long> itemIds, boolean isCommentsByOtherUsersRequired, Long userId) method, added additional parameter
      * isCountUsersRatedEachItem.
      *
      */
-    List<ItemRatingDTO> getRatingCriteriaDtos(Long contentId, Collection<Long> itemIds,
+    List<ItemRatingDTO> getRatingCriteriaDtos(Long contentId, Long toolSessionId, Collection<Long> itemIds,
 	    boolean isCommentsByOtherUsersRequired, Long userId, boolean isCountUsersRatedEachItem);
 
     /** 

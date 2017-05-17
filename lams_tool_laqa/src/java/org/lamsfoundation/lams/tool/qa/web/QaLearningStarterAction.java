@@ -272,7 +272,7 @@ public class QaLearningStarterAction extends Action implements QaAppConstants {
 	    generalLearnerFlowDTO.setRequestLearningReportProgress(new Boolean(true).toString());
 	    generalLearnerFlowDTO.setTeacherViewOnly(new Boolean(true).toString());
 
-	    QaLearningAction.refreshSummaryData(request, qaContent, qaService, sessionMapId, user,
+	    QaLearningAction.refreshSummaryData(request, qaContent, qaSession, qaService, sessionMapId, user,
 		    generalLearnerFlowDTO);
 	    request.setAttribute(QaAppConstants.GENERAL_LEARNER_FLOW_DTO, generalLearnerFlowDTO);
 
@@ -306,7 +306,7 @@ public class QaLearningStarterAction extends Action implements QaAppConstants {
 		     */
 		    generalLearnerFlowDTO.setRequestLearningReport(new Boolean(true).toString());
 
-		    QaLearningAction.refreshSummaryData(request, qaContent, qaService, sessionMapId, user,
+		    QaLearningAction.refreshSummaryData(request, qaContent, qaSession, qaService, sessionMapId, user,
 			    generalLearnerFlowDTO);
 
 		    if (user.isLearnerFinished()) {
@@ -357,7 +357,7 @@ public class QaLearningStarterAction extends Action implements QaAppConstants {
 		     */
 		    generalLearnerFlowDTO.setRequestLearningReport(new Boolean(true).toString());
 
-		    QaLearningAction.refreshSummaryData(request, qaContent, qaService, sessionMapId, user,
+		    QaLearningAction.refreshSummaryData(request, qaContent, qaSession, qaService, sessionMapId, user,
 			    generalLearnerFlowDTO);
 
 		    if (user.isLearnerFinished()) {
