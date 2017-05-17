@@ -42,6 +42,8 @@ public class Rating implements java.io.Serializable, Cloneable {
     private User learner;
 
     private Float rating;
+    
+    private Long toolSessionId;
 
     public Rating() {
     }
@@ -50,6 +52,14 @@ public class Rating implements java.io.Serializable, Cloneable {
 	this.itemId = itemId;
 	this.ratingCriteria = ratingCriteria;
 	this.learner = learner;
+	this.rating = rating;
+    }
+
+    public Rating(Long itemId, RatingCriteria ratingCriteria, User learner, Long toolSessionId, Float rating) {
+	this.itemId = itemId;
+	this.ratingCriteria = ratingCriteria;
+	this.learner = learner;
+	this.toolSessionId = toolSessionId;
 	this.rating = rating;
     }
 
@@ -101,5 +111,13 @@ public class Rating implements java.io.Serializable, Cloneable {
 
     public Float getRating() {
 	return this.rating;
+    }
+
+    public Long getToolSessionId() {
+	return toolSessionId;
+    }
+
+    public void setToolSessionId(Long toolSessionId) {
+	this.toolSessionId = toolSessionId;
     }
 }

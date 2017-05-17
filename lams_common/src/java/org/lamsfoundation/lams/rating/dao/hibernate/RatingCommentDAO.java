@@ -39,35 +39,35 @@ public class RatingCommentDAO extends LAMSBaseDAO implements IRatingCommentDAO {
 
     private static final String FIND_COMMENTS_BY_CRITERIA_AND_ITEM = "SELECT r.itemId, r.learner.userId, r.comment, CONCAT(r.learner.firstName, ' ', r.learner.lastName), r.postedDate "
 	    + "FROM " + RatingComment.class.getName()
-	    + " AS r where r.ratingCriteria.ratingCriteriaId=? AND r.itemId=?";
+	    + " AS r where r.ratingCriteria.ratingCriteriaId=? AND r.toolSessionId=? AND r.itemId=?";
 
     private static final String FIND_COMMENTS_BY_CRITERIA_AND_ITEMS = "SELECT r.itemId, r.learner.userId, r.comment, CONCAT(r.learner.firstName, ' ', r.learner.lastName), r.postedDate "
 	    + "FROM " + RatingComment.class.getName()
-	    + " AS r where r.ratingCriteria.ratingCriteriaId=:ratingCriteriaId AND r.itemId IN (:itemIds)";
+	    + " AS r where r.ratingCriteria.ratingCriteriaId=:ratingCriteriaId AND r.toolSessionId=:toolSessionId AND r.itemId IN (:itemIds)";
 
     private static final String FIND_COMMENTS_BY_CRITERIA_AND_ITEMS_AND_USER = "SELECT r.itemId, r.learner.userId, r.comment "
 	    + "FROM " + RatingComment.class.getName()
 	    + " AS r where r.ratingCriteria.ratingCriteriaId=:ratingCriteriaId AND r.itemId IN (:itemIds) AND r.learner.userId=:userId";
 
     private static final String FIND_COMMENTS_BY_CRITERIA = "SELECT r.itemId, r.learner.userId, r.comment " + "FROM "
-	    + RatingComment.class.getName() + " AS r where r.ratingCriteria.ratingCriteriaId=?";
+	    + RatingComment.class.getName() + " AS r where r.ratingCriteria.ratingCriteriaId=? AND r.toolSessionId=?";
 
     private static final String FIND_RELATED_COMMENT_BY_CRITERIA_AND_USER = "SELECT r.itemId, r.learner.userId, r.comment FROM " + RatingComment.class.getName()
 	    + " AS r where r.ratingCriteria.ratingCriteriaId=:ratingCriteriaId AND r.learner.userId=:userId";
 
     @Override
-    public List<RatingCommentDTO> getCommentsByCriteriaAndItem(Long ratingCriteriaId, Long itemId) {
+    public List<RatingCommentDTO> getCommentsByCriteriaAndItem(Long ratingCriteriaId, Long toolSessionId, Long itemId) {
 	List<Object[]> results = (List<Object[]>) (doFind(FIND_COMMENTS_BY_CRITERIA_AND_ITEM,
-		new Object[] { ratingCriteriaId, itemId }));
+		new Object[] { ratingCriteriaId, toolSessionId, itemId }));
 
 	return convertIntoCommentDtos(results);
     }
 
     @Override
-    public List<RatingCommentDTO> getCommentsByCriteriaAndItems(Long ratingCriteriaId, Collection<Long> itemIds) {
+    public List<RatingCommentDTO> getCommentsByCriteriaAndItems(Long ratingCriteriaId, Long toolSessionId, Collection<Long> itemIds) {
 
 	List<Object[]> results = getSession().createQuery(FIND_COMMENTS_BY_CRITERIA_AND_ITEMS)
-		.setLong("ratingCriteriaId", ratingCriteriaId).setParameterList("itemIds", itemIds).list();
+		.setLong("ratingCriteriaId", ratingCriteriaId).setLong("toolSessionId", toolSessionId).setParameterList("itemIds", itemIds).list();
 
 	return convertIntoCommentDtos(results);
     }
@@ -84,9 +84,9 @@ public class RatingCommentDAO extends LAMSBaseDAO implements IRatingCommentDAO {
     }
 
     @Override
-    public List<RatingCommentDTO> getCommentsByCriteria(Long ratingCriteriaId) {
+    public List<RatingCommentDTO> getCommentsByCriteria(Long ratingCriteriaId, Long toolSessionId) {
 	List<Object[]> results = (List<Object[]>) (doFind(FIND_COMMENTS_BY_CRITERIA,
-		new Object[] { ratingCriteriaId }));
+		new Object[] { ratingCriteriaId, toolSessionId }));
 
 	return convertIntoCommentDtos(results);
     }

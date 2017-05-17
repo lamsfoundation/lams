@@ -29,7 +29,6 @@ import java.math.BigInteger;
 import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -43,20 +42,20 @@ import org.apache.log4j.Logger;
 import org.apache.tomcat.util.json.JSONArray;
 import org.apache.tomcat.util.json.JSONException;
 import org.apache.tomcat.util.json.JSONObject;
+import org.lamsfoundation.lams.rating.RatingException;
 import org.lamsfoundation.lams.rating.dao.IRatingCommentDAO;
 import org.lamsfoundation.lams.rating.dao.IRatingCriteriaDAO;
 import org.lamsfoundation.lams.rating.dao.IRatingDAO;
 import org.lamsfoundation.lams.rating.dto.ItemRatingCriteriaDTO;
 import org.lamsfoundation.lams.rating.dto.ItemRatingDTO;
 import org.lamsfoundation.lams.rating.dto.RatingCommentDTO;
-import org.lamsfoundation.lams.rating.dto.RatingDTO;
 import org.lamsfoundation.lams.rating.dto.StyledCriteriaRatingDTO;
 import org.lamsfoundation.lams.rating.dto.StyledRatingDTO;
+import org.lamsfoundation.lams.rating.model.AuthoredItemRatingCriteria;
 import org.lamsfoundation.lams.rating.model.LearnerItemRatingCriteria;
 import org.lamsfoundation.lams.rating.model.Rating;
 import org.lamsfoundation.lams.rating.model.RatingComment;
 import org.lamsfoundation.lams.rating.model.RatingCriteria;
-import org.lamsfoundation.lams.rating.model.ToolActivityRatingCriteria;
 import org.lamsfoundation.lams.usermanagement.User;
 import org.lamsfoundation.lams.usermanagement.service.IUserManagementService;
 import org.lamsfoundation.lams.util.MessageService;
@@ -108,26 +107,26 @@ public class RatingService implements IRatingService {
 	    ratingDAO.delete(comment);
 	}
     }
-
-    @Override
-    public Map<Long, Long> countUsersRatedEachItem(final Long contentId, final Collection<Long> itemIds,
-	    Integer excludeUserId) {
-	return ratingDAO.countUsersRatedEachItem(contentId, itemIds, excludeUserId);
-    }
-
-    @Override
-    public Map<Long, Long> countUsersRatedEachItemByCriteria(final Long criteriaId, final Collection<Long> itemIds,
-	    Integer excludeUserId) {
-	return ratingDAO.countUsersRatedEachItemByCriteria(criteriaId, itemIds, excludeUserId);
-    }
     
+    @Override
+    public Map<Long, Long> countUsersRatedEachItem(final Long contentId, final Long toolSessionId, final Collection<Long> itemIds,
+	    Integer excludeUserId) {
+	return ratingDAO.countUsersRatedEachItem(contentId, toolSessionId, itemIds, excludeUserId);
+    }
+
+    @Override
+    public Map<Long, Long> countUsersRatedEachItemByCriteria(final Long criteriaId, final Long toolSessionId, final Collection<Long> itemIds,
+	    Integer excludeUserId) {
+	return ratingDAO.countUsersRatedEachItemByCriteria(criteriaId, toolSessionId, itemIds, excludeUserId);
+    }
+
     @Override
     public void saveOrUpdateRating(Rating rating) {
 	ratingDAO.saveOrUpdate(rating);
     }
 
     @Override
-    public ItemRatingCriteriaDTO rateItem(RatingCriteria ratingCriteria, Integer userId, Long itemId,
+    public ItemRatingCriteriaDTO rateItem(RatingCriteria ratingCriteria, Long toolSessionId, Integer userId, Long itemId,
 	    float ratingFloat) {
 
 	Long ratingCriteriaId = ratingCriteria.getRatingCriteriaId();
@@ -142,17 +141,18 @@ public class RatingService implements IRatingService {
 	    rating.setLearner(learner);
 
 	    rating.setRatingCriteria(ratingCriteria);
+	    rating.setToolSessionId(toolSessionId);
 	}
 
 	rating.setRating(ratingFloat);
 	ratingDAO.saveOrUpdate(rating);
 
 	// to make available new changes be visible on a jsp page
-	return ratingDAO.getRatingAverageDTOByItem(ratingCriteriaId, itemId);
+	return ratingDAO.getRatingAverageDTOByItem(ratingCriteriaId, toolSessionId, itemId);
     }
 
     @Override
-    public int rateItems(RatingCriteria ratingCriteria, Integer userId, Map<Long, Float> newRatings) {
+    public int rateItems(RatingCriteria ratingCriteria, Long toolSessionId, Integer userId, Map<Long, Float> newRatings) {
 
 	User learner = (User) userManagementService.findById(User.class, userId);
 	int numRatings = 0;
@@ -176,6 +176,7 @@ public class RatingService implements IRatingService {
 	    rating.setLearner(learner);
 	    rating.setRatingCriteria(ratingCriteria);
 	    rating.setRating(entry.getValue());
+	    rating.setToolSessionId(toolSessionId);
 	    ratingDAO.saveOrUpdate(rating);
 	    numRatings++;
 	}
@@ -184,7 +185,7 @@ public class RatingService implements IRatingService {
     }
     
     @Override
-    public void commentItem(RatingCriteria ratingCriteria, Integer userId, Long itemId, String comment) {
+    public void commentItem(RatingCriteria ratingCriteria, Long toolSessionId, Integer userId, Long itemId, String comment) {
 	RatingComment ratingComment = ratingCommentDAO.getComment(ratingCriteria.getRatingCriteriaId(), userId, itemId);
 
 	// persist MessageRating changes in DB
@@ -196,6 +197,7 @@ public class RatingService implements IRatingService {
 	    ratingComment.setLearner(learner);
 
 	    ratingComment.setRatingCriteria(ratingCriteria);
+	    ratingComment.setToolSessionId(toolSessionId);
 	}
 
 	ratingComment.setComment(comment);
@@ -203,7 +205,7 @@ public class RatingService implements IRatingService {
     }
 
     @Override
-    public List<ItemRatingDTO> getRatingCriteriaDtos(Long contentId, Collection<Long> itemIds,
+    public List<ItemRatingDTO> getRatingCriteriaDtos(Long contentId, Long toolSessionId, Collection<Long> itemIds,
 	    boolean isCommentsByOtherUsersRequired, Long userId) {
 
 	// fail safe - if there are no items, don't try to look anything up! LDEV-4094
@@ -219,18 +221,18 @@ public class RatingService implements IRatingService {
 	Long singleItemId = isSingleItem ? itemIds.iterator().next() : null;
 
 	//handle comments criteria
-	List<ItemRatingDTO> itemDtos = handleCommentsCriteria(criterias, itemIds, isCommentsByOtherUsersRequired,
+	List<ItemRatingDTO> itemDtos = handleCommentsCriteria(criterias, toolSessionId, itemIds, isCommentsByOtherUsersRequired,
 		userId);
 
 	//get all data from DB
 	List<Rating> userRatings = ratingDAO.getRatingsByUser(contentId, userId.intValue());
 	List<Object[]> itemsStatistics;
 	if (isSingleItem) {
-	    itemsStatistics = ratingDAO.getRatingAverageByContentAndItem(contentId, singleItemId);
+	    itemsStatistics = ratingDAO.getRatingAverageByContentAndItem(contentId, toolSessionId, singleItemId);
 
 	    // query DB using itemIds
 	} else {
-	    itemsStatistics = ratingDAO.getRatingAverageByContentAndItems(contentId, itemIds);
+	    itemsStatistics = ratingDAO.getRatingAverageByContentAndItems(contentId, toolSessionId, itemIds);
 	}
 
 	//handle all criterias except for comments' one
@@ -295,7 +297,7 @@ public class RatingService implements IRatingService {
     /*
      * Fetches all required comments from the DB.
      */
-    private List<ItemRatingDTO> handleCommentsCriteria(List<RatingCriteria> criterias, Collection<Long> itemIds,
+    private List<ItemRatingDTO> handleCommentsCriteria(List<RatingCriteria> criterias, Long toolSessionId, Collection<Long> itemIds,
 	    boolean isCommentsByOtherUsersRequired, Long userId) {
 
 	boolean isSingleItem = itemIds.size() == 1;
@@ -310,11 +312,11 @@ public class RatingService implements IRatingService {
 
 		List<RatingCommentDTO> commentDtos;
 		if (isSingleItem) {
-		    commentDtos = ratingCommentDAO.getCommentsByCriteriaAndItem(commentCriteriaId, singleItemId);
+		    commentDtos = ratingCommentDAO.getCommentsByCriteriaAndItem(commentCriteriaId, toolSessionId, singleItemId);
 
 		    //query DB using itemIds
 		} else if (isCommentsByOtherUsersRequired) {
-		    commentDtos = ratingCommentDAO.getCommentsByCriteriaAndItems(commentCriteriaId, itemIds);
+		    commentDtos = ratingCommentDAO.getCommentsByCriteriaAndItems(commentCriteriaId, toolSessionId, itemIds);
 
 		    // get only comments done by the specified user
 		} else {
@@ -372,9 +374,77 @@ public class RatingService implements IRatingService {
 	return ratingCriteriaDAO.getByRatingCriteriaId(ratingCriteriaId);
     }
 
+    @SuppressWarnings("rawtypes")
     @Override
     public RatingCriteria getCriteriaByCriteriaId(Long ratingCriteriaId, Class clasz) {
 	return ratingCriteriaDAO.getByRatingCriteriaId(ratingCriteriaId, clasz);
+    }
+
+    
+    private LearnerItemRatingCriteria updateLearnerItemRatingCriteria(LearnerItemRatingCriteria oldCriteria, Long toolContentId, String title, Integer orderId, int ratingStyle, boolean withComments, int minWordsInComment){
+	
+	LearnerItemRatingCriteria criteria = oldCriteria != null ? oldCriteria : new LearnerItemRatingCriteria();
+	criteria.setRatingCriteriaTypeId(RatingCriteria.LEARNER_ITEM_CRITERIA_TYPE);
+	criteria.setToolContentId(toolContentId);
+	criteria.setRatingStyle(ratingStyle);
+	criteria.setOrderId(orderId);
+	criteria.setTitle(title);
+	criteria.setCommentsEnabled(withComments);
+	criteria.setCommentsMinWordsLimit(minWordsInComment);
+	criteria.setMinimumRates(null);
+	criteria.setMaximumRates(null);
+	
+	Integer maxRating = null;
+	switch (ratingStyle) {
+	    case RatingCriteria.RATING_STYLE_STAR:
+		maxRating = RatingCriteria.RATING_STYLE_STAR_DEFAULT_MAX;
+		break;
+	    case RatingCriteria.RATING_STYLE_RANKING:
+		maxRating = RatingCriteria.RATING_STYLE_RANKING_DEFAULT_MAX;
+		break;
+	    case RatingCriteria.RATING_STYLE_HEDGING:
+	    case RatingCriteria.RATING_STYLE_COMMENT:
+		maxRating = 0;
+		break;
+	}
+	criteria.setMaxRating(maxRating);
+	return criteria;
+    }
+    
+    @Override
+    public LearnerItemRatingCriteria saveLearnerItemRatingCriteria(Long toolContentId, String title, Integer orderId, int ratingStyle, boolean withComments, int minWordsInComment) throws RatingException {
+	List<RatingCriteria> criterias = ratingCriteriaDAO.getByToolContentId(toolContentId);
+	LearnerItemRatingCriteria criteria = null;
+	if ( criterias.size() > 0 ) {
+	    for ( RatingCriteria c : criterias ) {
+		if ( c.getOrderId().equals(orderId) )
+		    if ( ! c.isLearnerItemRatingCriteria() ) {
+			String msg = new StringBuilder("Wrong type of criteria found - needs to be a AuthoredItemRatingCriteria for toolContentId ")
+					.append(toolContentId)
+					.append("criteriaId ")
+					.append(c.getRatingCriteriaId())
+					.toString();
+			log.error(msg);
+			throw new RatingException(msg);
+		    }
+		criteria = (LearnerItemRatingCriteria)c;
+		break;
+	    }
+	} 
+	criteria = updateLearnerItemRatingCriteria(criteria, toolContentId, title, orderId, ratingStyle, withComments, minWordsInComment);
+	ratingCriteriaDAO.saveOrUpdate(criteria);
+	return criteria;
+    }
+
+    @Override
+    public int deleteAllRatingCriterias(Long toolContentId) {
+	List<RatingCriteria> criterias = ratingCriteriaDAO.getByToolContentId(toolContentId);
+	int count = 0;
+	for ( RatingCriteria criteria : criterias ) {
+	    ratingCriteriaDAO.deleteRatingCriteria(criteria.getRatingCriteriaId());
+	    count++;
+	}
+	return count;
     }
 
     @Override
@@ -593,6 +663,9 @@ public class RatingService implements IRatingService {
      * If includeCurrentUser == true will include the current users' records (used for SelfReview and Monitoring)
      * otherwise skips the current user, so they do not rate themselves!
      * 
+     * toolSessionId is only used to calculate the number of users who have rated an item, so it may be null
+     * if the tool doesn't need to seperate session (Peer Review doesn't need to separate by sessions).
+     * 
      * In JSON for use with tablesorter.
      * Entries in Object array for comment style: 
      *   tool item id (usually user id), rating.item_id, rating_comment.comment, (tool fields)+
@@ -602,7 +675,7 @@ public class RatingService implements IRatingService {
      * @throws JSONException 
      */
     @Override
-    public JSONArray convertToStyledJSON(RatingCriteria ratingCriteria, Long currentUserId, boolean includeCurrentUser, 
+    public JSONArray convertToStyledJSON(RatingCriteria ratingCriteria, Long toolSessionId, Long currentUserId, boolean includeCurrentUser, 
 	    List<Object[]> rawDataRows, boolean needRatesPerUser) throws JSONException {
 
 	JSONArray rows = new JSONArray();
@@ -656,7 +729,7 @@ public class RatingService implements IRatingService {
 	    }
 	    
 	    if ( needRatesPerUser ) {
-		Map<Long, Long> countUsersRatedEachItemMap = ratingDAO.countUsersRatedEachItemByCriteria(ratingCriteria.getRatingCriteriaId(), itemIds, -1);
+		Map<Long, Long> countUsersRatedEachItemMap = ratingDAO.countUsersRatedEachItemByCriteria(ratingCriteria.getRatingCriteriaId(), toolSessionId, itemIds, -1);
 		for ( int i=0; i < rows.length(); i++ ) {
 		    JSONObject row = rows.getJSONObject(i);
 		    Long count = countUsersRatedEachItemMap.get(row.get("itemId"));

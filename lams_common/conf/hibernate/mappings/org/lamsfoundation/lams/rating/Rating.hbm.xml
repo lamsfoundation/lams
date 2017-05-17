@@ -64,6 +64,8 @@
             column="rating"
         />
 
+		<property name="toolSessionId" type="java.lang.Long" column="tool_session_id" length="20" />  
+
         <!--
             To add non XDoclet property mappings, create a file named
                 hibernate-properties-Rating.xml

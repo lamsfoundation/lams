@@ -44,6 +44,8 @@ public class RatingComment implements java.io.Serializable, Cloneable {
     private String comment;
 
     private Date postedDate;
+    
+    private Long toolSessionId;
 
     public RatingComment() {
 	this.postedDate = new Date();
@@ -53,6 +55,15 @@ public class RatingComment implements java.io.Serializable, Cloneable {
 	this.itemId = itemId;
 	this.ratingCriteria = ratingCriteria;
 	this.learner = learner;
+	this.comment = comment;
+	this.postedDate = new Date();
+    }
+
+    public RatingComment(Long itemId, RatingCriteria ratingCriteria, User learner, Long toolSessionId, String comment) {
+	this.itemId = itemId;
+	this.ratingCriteria = ratingCriteria;
+	this.learner = learner;
+	this.toolSessionId = toolSessionId;
 	this.comment = comment;
 	this.postedDate = new Date();
     }
@@ -112,4 +123,13 @@ public class RatingComment implements java.io.Serializable, Cloneable {
     public void setPostedDate(Date postedDate) {
 	this.postedDate = postedDate;
     }
+    
+    public Long getToolSessionId() {
+	return toolSessionId;
+    }
+
+    public void setToolSessionId(Long toolSessionId) {
+	this.toolSessionId = toolSessionId;
+    }
+
 }

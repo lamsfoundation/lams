@@ -65,7 +65,7 @@ public interface ToolRatingManager {
      * @param userId
      * @return
      */
-    List<ItemRatingDTO> getRatingCriteriaDtos(Long contentId, Collection<Long> itemIds,
+    List<ItemRatingDTO> getRatingCriteriaDtos(Long contentId, Long toolSessionId, Collection<Long> itemIds,
 	    boolean isCommentsByOtherUsersRequired, Long userId);
 
     /**
