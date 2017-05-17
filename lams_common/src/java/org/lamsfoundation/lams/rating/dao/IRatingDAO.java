@@ -38,23 +38,27 @@ public interface IRatingDAO {
     
     void delete(Object object);
 
+    /** Not limiting by session as the userId is restrictive enough */
     Rating getRating(Long ratingCriteriaId, Integer userId, Long itemId);
 
-    List<Rating> getRatingsByItem(Long contentId, Long itemId);
+    /** Limiting by tool session */
+    List<Rating> getRatingsByItem(Long contentId, Long toolSessionId, Long itemId);
 
+    /** Not limiting by session as the userId is restrictive enough */
     List<Rating> getRatingsByUser(Long contentId, Integer userId);
 
+    /** Not limiting by session as the userId is restrictive enough */
     List<Rating> getRatingsByUserCriteria(Long criteriaId, Integer userId);
 
     /**
-     * Returns rating statistics by particular item
+     * Returns rating statistics by particular item. Limiting to a single session.
      *
      * @param itemId
      * @return
      */
-    ItemRatingCriteriaDTO getRatingAverageDTOByItem(Long ratingCriteriaId, Long itemId);
+    ItemRatingCriteriaDTO getRatingAverageDTOByItem(Long ratingCriteriaId, Long toolSessionId, Long itemId);
 
-    List<Object[]> getRatingAverageByContentAndItem(Long contentId, Long itemId);
+    List<Object[]> getRatingAverageByContentAndItem(Long contentId, Long toolSessionId, Long itemId);
 
     /**
      * Returns rating statistics for specified itemIds.
@@ -63,7 +67,7 @@ public interface IRatingDAO {
      * @param itemIds
      * @return
      */
-    List<Object[]> getRatingAverageByContentAndItems(Long contentId, Collection<Long> itemIds);
+    List<Object[]> getRatingAverageByContentAndItems(Long contentId, Long toolSessionId, Collection<Long> itemIds);
 
     /**
      * Returns rating statistics for entire tool.
@@ -97,26 +101,29 @@ public interface IRatingDAO {
     int getCountItemsRatedByUserByCriteria(final Long criteriaId, final Integer userId);
 
     /**
-     * Count how many users rated and commented each item.
+     * Count how many users rated and commented each item, limiting to a particular session if toolSessionId is not null
      *
      * @param contentId
      * @param itemIds
      * @param excludeUserId
      * @return
      */
-    Map<Long, Long> countUsersRatedEachItem(final Long contentId, final Collection<Long> itemIds,
+    Map<Long, Long> countUsersRatedEachItem(final Long contentId, final Long toolSessionId, final Collection<Long> itemIds,
 	    Integer excludeUserId);
 
     /**
-     * Count how many users rated and commented each item for a particular criteria.
+     * Count how many users rated and commented each item for a particular criteria, 
+     * limiting to a particular session if toolSessionId is not null
      *
      * @param contentId
      * @param itemIds
      * @param excludeUserId
      * @return
      */
-    Map<Long, Long> countUsersRatedEachItemByCriteria(final Long criteriaId, final Collection<Long> itemIds,
+    Map<Long, Long> countUsersRatedEachItemByCriteria(final Long criteriaId, final Long toolSessionId, final Collection<Long> itemIds,
 	    Integer excludeUserId);
+
+    
     
     /**
      *  Used by tools to get the ratings and comments relating to their items. To be used within SQL and supply the toolContentId as :toolContentId.

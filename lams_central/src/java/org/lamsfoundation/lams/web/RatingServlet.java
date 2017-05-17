@@ -74,10 +74,11 @@ public class RatingServlet extends HttpServlet {
 	Long ratingCriteriaId = Long.parseLong(objectId.split("-")[0]);
 	Long itemId = Long.parseLong(objectId.split("-")[1]);
 	RatingCriteria criteria = ratingService.getCriteriaByCriteriaId(ratingCriteriaId);
+	Long toolSessionId = WebUtil.readLongParam(request, "toolSessionId");
 
 	UserDTO user = (UserDTO) SessionManager.getSession().getAttribute(AttributeNames.USER);
 	Integer userId = user.getUserID();
-
+	
 	// get rating value as either float or comment String
 	try {
 	    boolean doSave = true;
@@ -95,8 +96,8 @@ public class RatingServlet extends HttpServlet {
 		    List<Long> itemIds = new LinkedList<Long>();
 		    itemIds.add(itemId);
 		    Map<Long, Long> itemIdToRatedUsersCountMap = ratingLimitsByCriteria ? 
-			ratingService.countUsersRatedEachItemByCriteria(ratingCriteriaId, itemIds, userId) :
-			ratingService.countUsersRatedEachItem(toolCriteria.getToolContentId(), itemIds, userId);
+			ratingService.countUsersRatedEachItemByCriteria(ratingCriteriaId, toolSessionId, itemIds, userId) :
+			ratingService.countUsersRatedEachItem(toolCriteria.getToolContentId(), toolSessionId, itemIds, userId);
 
 		    Long currentRatings = itemIdToRatedUsersCountMap.get(itemId);
 		    if (currentRatings != null && maxRatingsForItem.compareTo(currentRatings) <= 0) {
@@ -115,7 +116,7 @@ public class RatingServlet extends HttpServlet {
 		    // can have but do not have to have comment
 		    String comment = WebUtil.readStrParam(request, "comment", true);
 		    if ( comment != null ) {
-        		    ratingService.commentItem(criteria, userId, itemId, comment);
+        		    ratingService.commentItem(criteria, toolSessionId, userId, itemId, comment);
         		    JSONObject.put("comment", StringEscapeUtils.escapeCsv(comment));
 		    }
 		} 
@@ -124,7 +125,7 @@ public class RatingServlet extends HttpServlet {
 		if ( floatString != null && floatString.length() > 0 ) {
 		    float rating = Float.parseFloat(request.getParameter("rate"));
 
-		    ItemRatingCriteriaDTO averageRatingDTO = ratingService.rateItem(criteria, userId, itemId, rating);
+		    ItemRatingCriteriaDTO averageRatingDTO = ratingService.rateItem(criteria, toolSessionId, userId, itemId, rating);
 
 		    NumberFormat numberFormat = NumberFormat.getInstance(Locale.US);
 		    numberFormat.setMaximumFractionDigits(1);

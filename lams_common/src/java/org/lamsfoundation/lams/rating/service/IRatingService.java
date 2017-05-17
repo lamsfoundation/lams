@@ -33,9 +33,11 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.apache.tomcat.util.json.JSONArray;
 import org.apache.tomcat.util.json.JSONException;
+import org.lamsfoundation.lams.rating.RatingException;
 import org.lamsfoundation.lams.rating.dto.ItemRatingCriteriaDTO;
 import org.lamsfoundation.lams.rating.dto.ItemRatingDTO;
 import org.lamsfoundation.lams.rating.dto.StyledCriteriaRatingDTO;
+import org.lamsfoundation.lams.rating.model.LearnerItemRatingCriteria;
 import org.lamsfoundation.lams.rating.model.Rating;
 import org.lamsfoundation.lams.rating.model.RatingCriteria;
 
@@ -48,7 +50,7 @@ public interface IRatingService {
      * Returns the number of "real" ratings, which should be newRatings.size.
      * @return
      */
-    public int rateItems(RatingCriteria ratingCriteria, Integer userId, Map<Long, Float> newRatings);
+    public int rateItems(RatingCriteria ratingCriteria, Long toolSessionId, Integer userId, Map<Long, Float> newRatings);
 
     /**
      * Read modified rating criterias from request, then update existing ones/add new ones/delete removed ones. Used on
@@ -61,10 +63,25 @@ public interface IRatingService {
      */
     void saveRatingCriterias(HttpServletRequest request, Collection<RatingCriteria> oldCriterias, Long toolContentId);
 
+    /**
+     * Save an already set up rating criteria. Only used when there will only ever be one anonymous criteria, like in Share Resources
+     * @param criteria
+     * @return
+     */
+    LearnerItemRatingCriteria saveLearnerItemRatingCriteria(Long toolContentId, String title, Integer orderId, int ratingStyle, boolean withComments, int minWordsInComment) throws RatingException;
+    
+    /** 
+     * Delete all the rating criteria linked to a tool content. This allows you to delete criteria created with saveToolStarRatingCriteria
+     * @param toolContentId
+     * @return
+     */
+    public int deleteAllRatingCriterias(Long toolContentId);
+    
     List<RatingCriteria> getCriteriasByToolContentId(Long toolContentId);
 
     RatingCriteria getCriteriaByCriteriaId(Long ratingCriteriaId);
 
+    @SuppressWarnings("rawtypes")
     RatingCriteria getCriteriaByCriteriaId(Long ratingCriteriaId, Class clasz);
 
     /**
@@ -100,9 +117,9 @@ public interface IRatingService {
      */
     List<Rating> getRatingsByItem(Long itemId);
 
-    ItemRatingCriteriaDTO rateItem(RatingCriteria criteria, Integer userId, Long itemId, float ratingFloat);
+    ItemRatingCriteriaDTO rateItem(RatingCriteria criteria, Long toolSessionId, Integer userId, Long itemId, float ratingFloat);
 
-    void commentItem(RatingCriteria ratingCriteria, Integer userId, Long itemId, String comment);
+    void commentItem(RatingCriteria ratingCriteria, Long toolSessionId, Integer userId, Long itemId, String comment);
 
     /**
      * Returns results for all items. If result is needed for only one item provide provide it as a single element in a
@@ -115,7 +132,7 @@ public interface IRatingService {
      * @param userId
      * @return
      */
-    List<ItemRatingDTO> getRatingCriteriaDtos(Long contentId, Collection<Long> itemIds,
+    List<ItemRatingDTO> getRatingCriteriaDtos(Long contentId, Long toolSessionId, Collection<Long> itemIds,
 	    boolean isCommentsByOtherUsersRequired, Long userId);
 
     /**
@@ -138,8 +155,8 @@ public interface IRatingService {
      * to be first in each Object array, and the last item in the array to be an item description (eg formatted user's name)
      * Will go back to the database for the justification comment that would apply to hedging.
      */
-    JSONArray convertToStyledJSON(RatingCriteria ratingCriteria, Long currentUser, boolean includeCurrentUser, List<Object[]> rawDataRows, boolean needRatesPerUser) throws JSONException;
-
+    JSONArray convertToStyledJSON(RatingCriteria ratingCriteria, Long toolSessionId, Long currentUserId, boolean includeCurrentUser, 
+	    List<Object[]> rawDataRows, boolean needRatesPerUser) throws JSONException;
     /**
      * Returns number of images rated by specified user in a current activity. It counts comments as ratings. This
      * method is applicable only for RatingCriterias of LEARNER_ITEM_CRITERIA_TYPE type.
@@ -170,17 +187,18 @@ public interface IRatingService {
     void removeUserCommitsByContent(final Long contentId, final Integer userId);
     
     /**
-     * Count how many users rated and commented each item.
+     * Count how many users rated and commented each item, limiting them to a single session if toolSessionId is not null
+     * Used only if the tool's request it.
      *
      * @param contentId
      * @param itemIds
      * @param excludeUserId
      * @return
      */
-    Map<Long, Long> countUsersRatedEachItem(final Long contentId, final Collection<Long> itemIds,
+    Map<Long, Long> countUsersRatedEachItem(final Long contentId, final Long toolSessionId, final Collection<Long> itemIds,
 	    Integer excludeUserId);
     
-    Map<Long, Long> countUsersRatedEachItemByCriteria(final Long criteriaId, final Collection<Long> itemIds,
+    Map<Long, Long> countUsersRatedEachItemByCriteria(final Long criteriaId, final Long toolSessionId, final Collection<Long> itemIds,
 	    Integer excludeUserId);
 
 }

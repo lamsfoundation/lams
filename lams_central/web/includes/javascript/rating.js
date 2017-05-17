@@ -1,6 +1,6 @@
 
 //Please, set up LAMS_URL, COUNT_RATED_ITEMS, COMMENTS_MIN_WORDS_LIMIT, MAX_RATES and MIN_RATES, MAX_RATINGS_FOR_ITEM,
-//COMMENT_TEXTAREA_TIP_LABEL, WARN_COMMENTS_IS_BLANK_LABEL, WARN_MIN_NUMBER_WORDS_LABEL, ALLOW_RERATE  constants in parent document
+//COMMENT_TEXTAREA_TIP_LABEL, WARN_COMMENTS_IS_BLANK_LABEL, WARN_MIN_NUMBER_WORDS_LABEL, ALLOW_RERATE, SESSION_ID constants in parent document
 
 //constant indicating there is rting limits set up
 var HAS_RATING_LIMITS;
@@ -43,9 +43,18 @@ function initializeJRating() {
 	} else {
 		canRateAgain = ALLOW_RERATE;
 	}
-		
+	
+	// if SESSION_ID is not defined do not allow them to update ratings as the servlet will fail.
+	// But in monitoring we will do initializeJRating to display the ratings properly so then SESSION_ID is undefined.
+	var phpPathValue;
+	if ( typeof SESSION_ID === "undefined" || SESSION_ID === undefined )
+		phpPathValue = "";
+	else 
+		phpPathValue = LAMS_URL + "servlet/rateItem?hasRatingLimits=" + HAS_RATING_LIMITS + "&ratingLimitsByCriteria=" + ratingLimitsByCriteria 
+			+ "&maxRatingsForItem=" + maxRatingsForItem + "&toolSessionId=" + SESSION_ID;
+
 	$(".rating-stars-new").filter($(".rating-stars")).jRating({
-		phpPath : LAMS_URL + "servlet/rateItem?hasRatingLimits=" + HAS_RATING_LIMITS + "&ratingLimitsByCriteria=" + ratingLimitsByCriteria + "&maxRatingsForItem=" + maxRatingsForItem,
+		phpPath : phpPathValue,
 		rateMax : 5,
 		decimalLength : 1,
 		canRateAgain : canRateAgain,
@@ -83,40 +92,43 @@ function initializeJRating() {
 		if ( ! comment )
 			return false;
 
-		//add new comment
-    	$.ajax({
-    		type: "POST",
-    		url: LAMS_URL + 'servlet/rateItem',
-    		data: {
-    			idBox: commentsCriteriaId + '-' + itemId, 
-    			comment: comment,
-    			hasRatingLimits: HAS_RATING_LIMITS,
-    			ratingLimitsByCriteria: ratingLimitsByCriteria,
-    			maxRatingsForItem: maxRatingsForItem
-    		},
-    		success: function(data, textStatus) {
-    			if ( data.error ) {
-    				handleError();
-    			} else {
-	   				//add comment to HTML
-   					jQuery('<div/>', {
-   						'class': "rating-comment",
-   						html: data.comment
-   					}).appendTo('#comments-area-' + itemId);
-   					
- 	 				//hide comments textarea and button
-	   				$("#add-comment-area-" + itemId).hide();
-   			
-	   				//handle rating limits if available
-	  				if (HAS_RATING_LIMITS) {
-	   					handleRatingLimits(data.countRatedItems, itemId);
-	   				}
-	   			}
-    		},
-			onError : function(){
- 				handleError();
- 			}
-    	});
+		if ( ! ( typeof SESSION_ID === "undefined" || SESSION_ID === undefined ) ) {
+			//add new comment
+	    	$.ajax({
+	    		type: "POST",
+	    		url: LAMS_URL + 'servlet/rateItem',
+	    		data: {
+	    			idBox: commentsCriteriaId + '-' + itemId, 
+	    			comment: comment,
+	    			hasRatingLimits: HAS_RATING_LIMITS,
+	    			ratingLimitsByCriteria: ratingLimitsByCriteria,
+	    			maxRatingsForItem: maxRatingsForItem,
+	    			toolSessionId: SESSION_ID
+	    		},
+	    		success: function(data, textStatus) {
+	    			if ( data.error ) {
+	    				handleError();
+	    			} else {
+		   				//add comment to HTML
+	   					jQuery('<div/>', {
+	   						'class': "rating-comment",
+	   						html: data.comment
+	   					}).appendTo('#comments-area-' + itemId);
+	   					
+	 	 				//hide comments textarea and button
+		   				$("#add-comment-area-" + itemId).hide();
+	   			
+		   				//handle rating limits if available
+		  				if (HAS_RATING_LIMITS) {
+		   					handleRatingLimits(data.countRatedItems, itemId);
+		   				}
+		   			}
+	    		},
+				onError : function(){
+	 				handleError();
+	 			}
+	    	});
+		}
     	//apply only once
     }).removeClass("add-comment-new");
 }

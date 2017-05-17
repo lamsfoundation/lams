@@ -37,7 +37,7 @@ public interface IRatingCommentDAO {
      * @param ratingCriteriaId
      * @return
      */
-    List<RatingCommentDTO> getCommentsByCriteria(Long ratingCriteriaId);
+    List<RatingCommentDTO> getCommentsByCriteria(Long ratingCriteriaId, Long toolSessionId);
 
     /**
      * Constructs ItemRatingCriteriaDTO for rating criteria that allows comments.
@@ -47,7 +47,7 @@ public interface IRatingCommentDAO {
      * @param userId
      * @return
      */
-    List<RatingCommentDTO> getCommentsByCriteriaAndItem(Long ratingCriteriaId, Long itemId);
+    List<RatingCommentDTO> getCommentsByCriteriaAndItem(Long ratingCriteriaId, Long toolSessionId, Long itemId);
 
     /**
      * Constructs ItemRatingCriteriaDTO for rating criteria that allows comments. Returns comments only for itemIds
@@ -57,7 +57,7 @@ public interface IRatingCommentDAO {
      * @param itemIds
      * @return
      */
-    List<RatingCommentDTO> getCommentsByCriteriaAndItems(Long ratingCriteriaId, Collection<Long> itemIds);
+    List<RatingCommentDTO> getCommentsByCriteriaAndItems(Long ratingCriteriaId, Long toolSessionId, Collection<Long> itemIds);
 
     List<RatingCommentDTO> getCommentsByCriteriaAndItemsAndUser(Long ratingCriteriaId, Collection<Long> itemIds,
 	    Integer userId);
