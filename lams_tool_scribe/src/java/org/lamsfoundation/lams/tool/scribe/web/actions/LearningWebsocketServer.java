@@ -136,7 +136,7 @@ public class LearningWebsocketServer {
 		    Long uid = storedReport.getUid();
 		    String cachedReportText = sessionCache.reports.get(uid);
 		    String storedReportText = StringEscapeUtils.escapeHtml(storedReport.getEntryText());
-		    storedReportText = storedReportText.replaceAll("\n", "<br>");	
+		    storedReportText = storedReportText != null ? storedReportText.replaceAll("\n", "<br>") : null;	
 		    if (cachedReportText == null ? storedReportText != null
 			    : (storedReportText == null) || (cachedReportText.length() != storedReportText.length())
 				    || !cachedReportText.equals(storedReportText)) {
