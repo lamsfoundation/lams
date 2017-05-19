@@ -67,10 +67,7 @@ public class McPedagogicalPlannerAction extends LamsDispatchAction {
 	Long toolContentID = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_CONTENT_ID);
 	McContent mcContent = getMcService().getMcContent(toolContentID);
 	plannerForm.fillForm(mcContent, getMcService());
-	String contentFolderId = WebUtil.readStrParam(request, AttributeNames.PARAM_CONTENT_FOLDER_ID);
-	plannerForm.setContentFolderID(contentFolderId);
 	return mapping.findForward(McAppConstants.SUCCESS);
-
     }
 
     public ActionForward saveOrUpdatePedagogicalPlannerForm(ActionMapping mapping, ActionForm form,

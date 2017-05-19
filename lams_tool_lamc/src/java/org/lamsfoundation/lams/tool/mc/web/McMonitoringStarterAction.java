@@ -23,13 +23,19 @@
 package org.lamsfoundation.lams.tool.mc.web;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
+import java.util.TimeZone;
+import java.util.TreeSet;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
 import org.apache.log4j.Logger;
 import org.apache.struts.action.Action;
@@ -38,18 +44,19 @@ import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.lamsfoundation.lams.tool.mc.McAppConstants;
 import org.lamsfoundation.lams.tool.mc.McApplicationException;
-import org.lamsfoundation.lams.tool.mc.McGeneralAuthoringDTO;
 import org.lamsfoundation.lams.tool.mc.McGeneralMonitoringDTO;
-import org.lamsfoundation.lams.tool.mc.McQuestionDTO;
-import org.lamsfoundation.lams.tool.mc.McUtils;
 import org.lamsfoundation.lams.tool.mc.ReflectionDTO;
+import org.lamsfoundation.lams.tool.mc.dto.SessionDTO;
 import org.lamsfoundation.lams.tool.mc.pojos.McContent;
-import org.lamsfoundation.lams.tool.mc.pojos.McQueContent;
+import org.lamsfoundation.lams.tool.mc.pojos.McSession;
 import org.lamsfoundation.lams.tool.mc.service.IMcService;
 import org.lamsfoundation.lams.tool.mc.service.McServiceProxy;
+import org.lamsfoundation.lams.tool.mc.util.McSessionComparator;
+import org.lamsfoundation.lams.usermanagement.dto.UserDTO;
+import org.lamsfoundation.lams.util.DateUtil;
 import org.lamsfoundation.lams.util.WebUtil;
+import org.lamsfoundation.lams.web.session.SessionManager;
 import org.lamsfoundation.lams.web.util.AttributeNames;
-import org.lamsfoundation.lams.web.util.SessionMap;
 
 /**
  * Starts up the monitoring module
@@ -65,21 +72,15 @@ public class McMonitoringStarterAction extends Action implements McAppConstants 
     public ActionForward execute(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) throws IOException, ServletException, McApplicationException {
 	initializeMcService();
-	McUtils.cleanUpSessionAbsolute(request);
 
-	McMonitoringForm mcMonitoringForm = (McMonitoringForm) form;
-	McGeneralAuthoringDTO mcGeneralAuthoringDTO = new McGeneralAuthoringDTO();
 	McGeneralMonitoringDTO mcGeneralMonitoringDTO = new McGeneralMonitoringDTO();
 
 	String toolContentID = null;
 	try {
 	    Long toolContentIDLong = WebUtil.readLongParam(request, AttributeNames.PARAM_TOOL_CONTENT_ID, false);
 	    toolContentID = toolContentIDLong.toString();
-	    mcMonitoringForm.setToolContentId(toolContentID);
-	    mcMonitoringForm.setToolContentID(toolContentID);
 	} catch (IllegalArgumentException e) {
 	    logger.error("Unable to start monitoring as tool content id is missing");
-	    McUtils.cleanUpSessionAbsolute(request);
 	    throw (e);
 	}
 
@@ -87,87 +88,89 @@ public class McMonitoringStarterAction extends Action implements McAppConstants 
 	mcGeneralMonitoringDTO.setToolContentID(toolContentID);
 	mcGeneralMonitoringDTO.setActivityTitle(mcContent.getTitle());
 	mcGeneralMonitoringDTO.setActivityInstructions(mcContent.getInstructions());
-	mcGeneralMonitoringDTO.setCurrentMonitoringTab("summary");
-	mcGeneralMonitoringDTO.setRequestLearningReport(new Boolean(false).toString());
-	mcGeneralMonitoringDTO.setUserExceptionNoToolSessions(new Boolean(true).toString());
 
-	/*
-	 * get the questions section is needed for the Edit tab's View Only mode
-	 */
-	List<McQuestionDTO> listQuestionContentDTO = new LinkedList<McQuestionDTO>();
-	Long mapIndex = new Long(1);
-	for (McQueContent question : (Set<McQueContent>) mcContent.getMcQueContents()) {
-	    McQuestionDTO mcContentDTO = new McQuestionDTO();
+	//set up sessionDTOs list
+	Set<McSession> sessions = new TreeSet<McSession>(new McSessionComparator());
+	sessions.addAll(mcContent.getMcSessions());
+	List<SessionDTO> sessionDtos = new LinkedList<SessionDTO>();
+	for (McSession session : sessions) {
+	    SessionDTO sessionDto = new SessionDTO();
+	    sessionDto.setSessionId(session.getMcSessionId());
+	    sessionDto.setSessionName(session.getSession_name());
 
-	    if (question != null) {
+	    sessionDtos.add(sessionDto);
+	}
+	request.setAttribute(SESSION_DTOS, sessionDtos);
 
-		mcContentDTO.setQuestion(question.getQuestion());
-		mcContentDTO.setDisplayOrder(question.getDisplayOrder().toString());
-		listQuestionContentDTO.add(mcContentDTO);
+	// setting up the advanced summary
 
-		mapIndex = new Long(mapIndex.longValue() + 1);
-	    }
+	request.setAttribute(ATTR_CONTENT, mcContent);
+	request.setAttribute("questionsSequenced", mcContent.isQuestionsSequenced());
+	request.setAttribute("showMarks", mcContent.isShowMarks());
+	request.setAttribute("useSelectLeaderToolOuput", mcContent.isUseSelectLeaderToolOuput());
+	request.setAttribute("prefixAnswersWithLetters", mcContent.isPrefixAnswersWithLetters());
+	request.setAttribute("randomize", mcContent.isRandomize());
+	request.setAttribute("displayAnswers", mcContent.isDisplayAnswers());
+	request.setAttribute("retries", mcContent.isRetries());
+	request.setAttribute("reflect", mcContent.isReflect());
+	request.setAttribute("reflectionSubject", mcContent.getReflectionSubject());
+	request.setAttribute("passMark", mcContent.getPassMark());
+	request.setAttribute("toolContentID", mcContent.getMcContentId());
+	request.setAttribute(AttributeNames.PARAM_CONTENT_FOLDER_ID,
+		WebUtil.readStrParam(request, AttributeNames.PARAM_CONTENT_FOLDER_ID));
+
+	// setting up Date and time restriction in activities
+	HttpSession ss = SessionManager.getSession();
+	Date submissionDeadline = mcContent.getSubmissionDeadline();
+	if (submissionDeadline != null) {
+	    UserDTO learnerDto = (UserDTO) ss.getAttribute(AttributeNames.USER);
+	    TimeZone learnerTimeZone = learnerDto.getTimeZone();
+	    Date tzSubmissionDeadline = DateUtil.convertToTimeZoneFromDefault(learnerTimeZone, submissionDeadline);
+	    request.setAttribute(McAppConstants.ATTR_SUBMISSION_DEADLINE, tzSubmissionDeadline.getTime());
+	    // use the unconverted time, as convertToStringForJSON() does the timezone conversion if needed
+	    request.setAttribute(McAppConstants.ATTR_SUBMISSION_DEADLINE_DATESTRING,
+		    DateUtil.convertToStringForJSON(submissionDeadline, request.getLocale()));
 	}
 
-	request.setAttribute(LIST_QUESTION_DTOS, listQuestionContentDTO);
-	request.setAttribute(TOTAL_QUESTION_COUNT, new Integer(listQuestionContentDTO.size()));
+	//prepare toolOutputDefinitions and activityEvaluation
+	List<String> toolOutputDefinitions = new ArrayList<String>();
+	toolOutputDefinitions.add(McAppConstants.OUTPUT_NAME_LEARNER_MARK);
+	toolOutputDefinitions.add(McAppConstants.OUTPUT_NAME_LEARNER_ALL_CORRECT);
+	String activityEvaluation = service.getActivityEvaluation(mcContent.getMcContentId());
+	request.setAttribute(McAppConstants.ATTR_TOOL_OUTPUT_DEFINITIONS, toolOutputDefinitions);
+	request.setAttribute(McAppConstants.ATTR_ACTIVITY_EVALUATION, activityEvaluation);
 
-	mcGeneralMonitoringDTO.setExistsOpenMcs(new Boolean(false).toString());
+	boolean isGroupedActivity = service.isGroupedActivity(new Long(mcContent.getMcContentId()));
+	request.setAttribute("isGroupedActivity", isGroupedActivity);
 
-	MonitoringUtil.setupAllSessionsData(request, mcContent, service);
-	mcGeneralMonitoringDTO.setGroupName("All Groups");
-	mcGeneralMonitoringDTO.setListMonitoredAnswersContainerDto(new LinkedList());
-	mcGeneralMonitoringDTO.setExistsOpenMcs(new Boolean(false).toString());
-
-	// The edit activity code needs a session map
-	SessionMap<String, Object> sessionMap = new SessionMap<String, Object>();
-	mcMonitoringForm.setHttpSessionID(sessionMap.getSessionID());
-	request.getSession().setAttribute(sessionMap.getSessionID(), sessionMap);
-
-	mcMonitoringForm.setCurrentTab("1");
 	mcGeneralMonitoringDTO.setCurrentTab("1");
 
 	/* this section is needed for Edit Activity screen, from here... */
-	mcGeneralAuthoringDTO.setActivityTitle(mcGeneralMonitoringDTO.getActivityTitle());
-	mcGeneralAuthoringDTO.setActivityInstructions(mcGeneralMonitoringDTO.getActivityInstructions());
-	request.setAttribute(MC_GENERAL_AUTHORING_DTO, mcGeneralAuthoringDTO);
 
-	McMonitoringAction monitoringAction = new McMonitoringAction();
-	monitoringAction.repopulateRequestParameters(request, mcMonitoringForm, mcGeneralMonitoringDTO);
-
-	mcGeneralMonitoringDTO.setRequestLearningReport(new Boolean(false).toString());
-
-	mcGeneralMonitoringDTO.setSummaryToolSessions(MonitoringUtil.populateToolSessions(mcContent));
 	mcGeneralMonitoringDTO.setDisplayAnswers(new Boolean(mcContent.isDisplayAnswers()).toString());
 
 	List<ReflectionDTO> reflectionsContainerDTO = service.getReflectionList(mcContent, null);
 	request.setAttribute(REFLECTIONS_CONTAINER_DTO, reflectionsContainerDTO);
 
-	if (!mcContent.getMcSessions().isEmpty()) {
-	    // USER_EXCEPTION_NO_TOOL_SESSIONS is set to false
-	    mcGeneralMonitoringDTO.setUserExceptionNoToolSessions(new Boolean(false).toString());
-	} else {
-	    // USER_EXCEPTION_NO_TOOL_SESSIONS is set to true
-	    mcGeneralMonitoringDTO.setUserExceptionNoToolSessions(new Boolean(true).toString());
-	}
-
 	request.setAttribute(MC_GENERAL_MONITORING_DTO, mcGeneralMonitoringDTO);
+	
+	//count users
+	int countSessionComplete = 0;
+	int countAllUsers = 0;
+	Iterator iteratorSession = mcContent.getMcSessions().iterator();
+	while (iteratorSession.hasNext()) {
+	    McSession mcSession = (McSession) iteratorSession.next();
 
-	// find out if there are any reflection entries
-	if (!reflectionsContainerDTO.isEmpty()) {
-	    request.setAttribute(NOTEBOOK_ENTRIES_EXIST, new Boolean(true).toString());
+	    if (mcSession != null) {
 
-	    String userExceptionNoToolSessions = mcGeneralMonitoringDTO.getUserExceptionNoToolSessions();
-
-	    if (userExceptionNoToolSessions.equals("true")) {
-		// there are no online student activity but there are reflections
-		request.setAttribute(NO_SESSIONS_NOTEBOOK_ENTRIES_EXIST, new Boolean(true).toString());
+		if (mcSession.getSessionStatus().equals(COMPLETED)) {
+		    countSessionComplete++;
+		}
+		countAllUsers += mcSession.getMcQueUsers().size();
 	    }
-	} else {
-	    request.setAttribute(NOTEBOOK_ENTRIES_EXIST, new Boolean(false).toString());
 	}
-
-	MonitoringUtil.setSessionUserCount(mcContent, mcGeneralMonitoringDTO);
+	mcGeneralMonitoringDTO.setCountAllUsers(new Integer(countAllUsers));
+	mcGeneralMonitoringDTO.setCountSessionComplete(new Integer(countSessionComplete));
 
 	return (mapping.findForward(LOAD_MONITORING_CONTENT));
     }

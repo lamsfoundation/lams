@@ -50,7 +50,6 @@ import org.lamsfoundation.lams.tool.mc.AnswerDTO;
 import org.lamsfoundation.lams.tool.mc.McAppConstants;
 import org.lamsfoundation.lams.tool.mc.McComparator;
 import org.lamsfoundation.lams.tool.mc.McGeneralLearnerFlowDTO;
-import org.lamsfoundation.lams.tool.mc.McUtils;
 import org.lamsfoundation.lams.tool.mc.pojos.McContent;
 import org.lamsfoundation.lams.tool.mc.pojos.McOptsContent;
 import org.lamsfoundation.lams.tool.mc.pojos.McQueContent;
@@ -172,9 +171,6 @@ public class McLearningAction extends LamsDispatchAction implements McAppConstan
 
 	HttpSession ss = SessionManager.getSession();
 	UserDTO userDto = (UserDTO) ss.getAttribute(AttributeNames.USER);
-
-	// attempting to leave/complete session with toolSessionId:
-	McUtils.cleanUpSessionAbsolute(request);
 
 	String nextUrl = null;
 	try {

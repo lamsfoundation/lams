@@ -24,19 +24,13 @@
 
 package org.lamsfoundation.lams.tool.mc;
 
-import java.util.Map;
-
 /**
  * DTO that holds authoring properties for authoring jsps
  *
  * @author Ozgur Demirtas
  */
 public class McGeneralAuthoringDTO implements Comparable {
-    protected String toolContentID;
-    protected String currentTab;
 
-    protected String activityTitle;
-    protected String activityInstructions;
     protected String usernameVisible;
     protected String reflect;
     protected String questionsSequenced;
@@ -45,52 +39,16 @@ public class McGeneralAuthoringDTO implements Comparable {
     protected String reflectionSubject;
     protected String showMarks;
 
-    protected String httpSessionID;
-
-    protected String contentFolderID;
     protected String editableQuestionText;
     protected String editableQuestionFeedback;
     protected String sln;
     protected String retries;
 
-    protected Map marksMap;
     protected String markValue;
-    protected Map correctMap;
 
     protected String passMarkValue;
-    protected Map passMarksMap;
 
     protected String totalMarks;
-
-    /**
-     * @return Returns the httpSessionID.
-     */
-    public String getHttpSessionID() {
-	return httpSessionID;
-    }
-
-    /**
-     * @param httpSessionID
-     *            The httpSessionID to set.
-     */
-    public void setHttpSessionID(String httpSessionID) {
-	this.httpSessionID = httpSessionID;
-    }
-
-    /**
-     * @return Returns the toolContentID.
-     */
-    public String getToolContentID() {
-	return toolContentID;
-    }
-
-    /**
-     * @param toolContentID
-     *            The toolContentID to set.
-     */
-    public void setToolContentID(String toolContentID) {
-	this.toolContentID = toolContentID;
-    }
 
     @Override
     public int compareTo(Object o) {
@@ -101,36 +59,6 @@ public class McGeneralAuthoringDTO implements Comparable {
 	} else {
 	    return 0;
 	}
-    }
-
-    /**
-     * @return Returns the activityInstructions.
-     */
-    public String getActivityInstructions() {
-	return activityInstructions;
-    }
-
-    /**
-     * @param activityInstructions
-     *            The activityInstructions to set.
-     */
-    public void setActivityInstructions(String activityInstructions) {
-	this.activityInstructions = activityInstructions;
-    }
-
-    /**
-     * @return Returns the activityTitle.
-     */
-    public String getActivityTitle() {
-	return activityTitle;
-    }
-
-    /**
-     * @param activityTitle
-     *            The activityTitle to set.
-     */
-    public void setActivityTitle(String activityTitle) {
-	this.activityTitle = activityTitle;
     }
 
     /**
@@ -161,36 +89,6 @@ public class McGeneralAuthoringDTO implements Comparable {
      */
     public void setUsernameVisible(String usernameVisible) {
 	this.usernameVisible = usernameVisible;
-    }
-
-    /**
-     * @return Returns the currentTab.
-     */
-    public String getCurrentTab() {
-	return currentTab;
-    }
-
-    /**
-     * @param currentTab
-     *            The currentTab to set.
-     */
-    public void setCurrentTab(String currentTab) {
-	this.currentTab = currentTab;
-    }
-
-    /**
-     * @return Returns the contentFolderID.
-     */
-    public String getContentFolderID() {
-	return contentFolderID;
-    }
-
-    /**
-     * @param contentFolderID
-     *            The contentFolderID to set.
-     */
-    public void setContentFolderID(String contentFolderID) {
-	this.contentFolderID = contentFolderID;
     }
 
     /**
@@ -284,21 +182,6 @@ public class McGeneralAuthoringDTO implements Comparable {
     }
 
     /**
-     * @return Returns the marksMap.
-     */
-    public Map getMarksMap() {
-	return marksMap;
-    }
-
-    /**
-     * @param marksMap
-     *            The marksMap to set.
-     */
-    public void setMarksMap(Map marksMap) {
-	this.marksMap = marksMap;
-    }
-
-    /**
      * @return Returns the markValue.
      */
     public String getMarkValue() {
@@ -314,21 +197,6 @@ public class McGeneralAuthoringDTO implements Comparable {
     }
 
     /**
-     * @return Returns the correctMap.
-     */
-    public Map getCorrectMap() {
-	return correctMap;
-    }
-
-    /**
-     * @param correctMap
-     *            The correctMap to set.
-     */
-    public void setCorrectMap(Map correctMap) {
-	this.correctMap = correctMap;
-    }
-
-    /**
      * @return Returns the passMarkValue.
      */
     public String getPassMarkValue() {
@@ -341,21 +209,6 @@ public class McGeneralAuthoringDTO implements Comparable {
      */
     public void setPassMarkValue(String passMarkValue) {
 	this.passMarkValue = passMarkValue;
-    }
-
-    /**
-     * @return Returns the passMarksMap.
-     */
-    public Map getPassMarksMap() {
-	return passMarksMap;
-    }
-
-    /**
-     * @param passMarksMap
-     *            The passMarksMap to set.
-     */
-    public void setPassMarksMap(Map passMarksMap) {
-	this.passMarksMap = passMarksMap;
     }
 
     /**

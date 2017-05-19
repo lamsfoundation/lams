@@ -34,6 +34,7 @@ import java.util.TreeMap;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.lamsfoundation.lams.tool.mc.McAppConstants;
 import org.lamsfoundation.lams.tool.mc.McComparator;
@@ -204,42 +205,22 @@ public class AuthoringUtil implements McAppConstants {
 	return null;
     }
 
-    public static String getTotalMark(List questionDTOs) {
+    public static String getTotalMark(List<McQuestionDTO> questionDTOs) {
 
-	Map mapMarks = AuthoringUtil.extractMapMarks(questionDTOs);
-
+	Iterator<McQuestionDTO> iter = questionDTOs.iterator();
 	int intTotalMark = 0;
-	Iterator itMap = mapMarks.entrySet().iterator();
-	while (itMap.hasNext()) {
-	    Map.Entry pairs = (Map.Entry) itMap.next();
+	while (iter.hasNext()) {
+	    McQuestionDTO questionDto = iter.next();
 
-	    String mark = (String) pairs.getValue();
+	    String mark = questionDto.getMark();
 
-	    if (mark != null) {
+	    if (StringUtils.isNotBlank(mark)) {
 		int intMark = new Integer(mark).intValue();
 		intTotalMark += intMark;
 	    }
 	}
 
-	String strFinalTotalMark = new Integer(intTotalMark).toString();
-	return strFinalTotalMark;
-    }
-
-    /**
-     * extractMapQuestionContent
-     */
-    public static Map<String, String> extractMapQuestions(List<McQuestionDTO> questionDTOs) {
-	Map<String, String> mapQuestionContent = new TreeMap<String, String>(new McComparator());
-
-	Iterator<McQuestionDTO> iter = questionDTOs.iterator();
-	int queIndex = 0;
-	while (iter.hasNext()) {
-	    McQuestionDTO questionDto = iter.next();
-
-	    queIndex++;
-	    mapQuestionContent.put(new Integer(queIndex).toString(), questionDto.getQuestion());
-	}
-	return mapQuestionContent;
+	return new Integer(intTotalMark).toString();
     }
 
     /**
@@ -257,7 +238,7 @@ public class AuthoringUtil implements McAppConstants {
 
 	    String feedback = questionDto.getFeedback();
 
-	    List optionDtos = questionDto.getListCandidateAnswersDTO();
+	    List<McOptionDTO> optionDtos = questionDto.getListCandidateAnswersDTO();
 
 	    String mark = questionDto.getMark();
 
@@ -298,7 +279,7 @@ public class AuthoringUtil implements McAppConstants {
 
 	    String mark = questionDto.getMark();
 
-	    List optionDtos = questionDto.getListCandidateAnswersDTO();
+	    List<McOptionDTO> optionDtos = questionDto.getListCandidateAnswersDTO();
 
 	    if (displayOrder.equals(editableQuestionIndex)) {
 		questionDto.setQuestion(mcQuestionContentDTONew.getQuestion());
@@ -328,7 +309,15 @@ public class AuthoringUtil implements McAppConstants {
      */
     public static boolean checkDuplicateQuestions(List<McQuestionDTO> questionDTOs, String newQuestion) {
 
-	Map<String, String> mapQuestionContent = AuthoringUtil.extractMapQuestions(questionDTOs);
+	Map<String, String> mapQuestionContent = new TreeMap<String, String>(new McComparator());
+	Iterator<McQuestionDTO> iter = questionDTOs.iterator();
+	int queIndex = 0;
+	while (iter.hasNext()) {
+	    McQuestionDTO questionDto = iter.next();
+
+	    queIndex++;
+	    mapQuestionContent.put(new Integer(queIndex).toString(), questionDto.getQuestion());
+	}
 
 	Iterator<Map.Entry<String, String>> itMap = mapQuestionContent.entrySet().iterator();
 	while (itMap.hasNext()) {
@@ -344,23 +333,6 @@ public class AuthoringUtil implements McAppConstants {
     }
 
     /**
-     * extractMapMarks
-     */
-    public static Map extractMapMarks(List questionDTOs) {
-	Map mapMarks = new TreeMap(new McComparator());
-
-	Iterator iter = questionDTOs.iterator();
-	int queIndex = 0;
-	while (iter.hasNext()) {
-	    McQuestionDTO questionDto = (McQuestionDTO) iter.next();
-
-	    queIndex++;
-	    mapMarks.put(new Integer(queIndex).toString(), questionDto.getMark());
-	}
-	return mapMarks;
-    }
-
-    /**
      * persisting content
      */
     public static McContent saveOrUpdateMcContent(IMcService mcService, HttpServletRequest request, McContent mcContent,
@@ -369,25 +341,15 @@ public class AuthoringUtil implements McAppConstants {
 
 	String richTextTitle = request.getParameter(McAppConstants.TITLE);
 	String richTextInstructions = request.getParameter(McAppConstants.INSTRUCTIONS);
-
 	String sln = request.getParameter("sln");
-
 	String useSelectLeaderToolOuput = request.getParameter("useSelectLeaderToolOuput");
-
 	String prefixAnswersWithLetters = request.getParameter("prefixAnswersWithLetters");
-
 	String questionsSequenced = request.getParameter("questionsSequenced");
-
 	String randomize = request.getParameter("randomize");
-
 	String displayAnswers = request.getParameter("displayAnswers");
-
 	String showMarks = request.getParameter("showMarks");
-
 	String retries = request.getParameter("retries");
-
 	String reflect = request.getParameter(McAppConstants.REFLECT);
-
 	String reflectionSubject = request.getParameter(McAppConstants.REFLECTION_SUBJECT);
 
 	boolean questionsSequencedBoolean = false;
@@ -499,60 +461,6 @@ public class AuthoringUtil implements McAppConstants {
 	mcContent = mcService.getMcContent(new Long(strToolContentID));
 
 	return mcContent;
-    }
-
-    public static Map buildDynamicPassMarkMap(List questionDTOs, boolean initialScreen) {
-
-	Map map = new TreeMap(new McComparator());
-
-	String totalMark = AuthoringUtil.getTotalMark(questionDTOs);
-
-	int intTotalMark = 0;
-	if ((totalMark != null) && (totalMark.length() > 0)) {
-	    intTotalMark = new Integer(totalMark).intValue();
-	}
-
-	Map passMarksMap = AuthoringUtil.buildPassMarkMap(intTotalMark, false);
-	return passMarksMap;
-    }
-
-    public static Map buildPassMarkMap(int intTotalMark, boolean initialScreen) {
-
-	Map map = new TreeMap(new McComparator());
-
-	if (initialScreen) {
-	    return map;
-	}
-
-	for (int i = 1; i <= intTotalMark; i++) {
-	    map.put(new Integer(i).toString(), new Integer(i).toString());
-	}
-	return map;
-    }
-
-    /**
-     * Map buildMarksMap()
-     *
-     * @return
-     */
-    public static Map buildMarksMap() {
-	Map map = new TreeMap(new McComparator());
-
-	for (int i = 1; i <= 10; i++) {
-	    map.put(new Integer(i).toString(), new Integer(i).toString());
-	}
-	return map;
-    }
-
-    /**
-     * Map buildCorrectMap()
-     *
-     * @return
-     */
-    public static Map buildCorrectMap() {
-	Map map = new TreeMap(new McComparator());
-	map.put(new Integer(2).toString(), "Correct");
-	return map;
     }
 
     /**

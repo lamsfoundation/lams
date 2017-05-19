@@ -21,14 +21,14 @@
 		margin: 5px 5px 5px 0px;
 		text-align: center;
 		font-size: 18px;
-}
-</style>
+		}
+	</style>
 
 	<script type="text/javascript" src="${lams}includes/javascript/jquery.js"></script>
 	<script type="text/javascript" src="${lams}includes/javascript/jquery.form.js"></script>
 	<script type="text/javascript" src="${lams}includes/javascript/jquery.blockUI.js"></script>
 	<script type="text/javascript" src="${lams}includes/javascript/bootstrap.min.js"></script>
-	<script language="JavaScript" type="text/JavaScript">
+	<script type="text/javaScript">
 
         //autoSaveAnswers if hasEditRight
         if (${hasEditRight}) {
@@ -103,11 +103,11 @@
             dataType: 'json',
             type: 'post',
             success: function (json) {
-            if (json.isLeaderResponseFinalized) {
-            location.reload();
-          }
-                 }
-                 });
+	            if (json.isLeaderResponseFinalized) {
+	            	location.reload();
+	         	}
+			}
+		  });
         }
 
       </script>

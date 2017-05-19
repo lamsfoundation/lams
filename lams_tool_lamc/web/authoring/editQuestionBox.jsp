@@ -1,14 +1,14 @@
 <!DOCTYPE html>
-        
-
 <%@ include file="/common/taglibs.jsp"%>
+<c:set var="sessionMap" value="${sessionScope[sessionMapId]}" />
+
 <lams:html>
 	<lams:head>
 		<%@ include file="/common/header.jsp"%>
 
 		<script type="text/javascript" src="<lams:LAMSURL/>includes/javascript/jquery.form.js"></script>
 
-		<script language="JavaScript" type="text/JavaScript">
+		<script type="text/JavaScript">
 			
 			function submitMethod(actionMethod) {
 				document.McAuthoringForm.dispatch.value=actionMethod;
@@ -20,13 +20,15 @@
 				
 				$.ajaxSetup({ cache: true });
 	    		$('#newQuestionForm').ajaxSubmit({
-	    			cache: true,
+	    			data: { 
+						sessionMapId: '${sessionMapId}'
+					},
+					cache: true,
     	    		target:  $('#candidateArea')
     		    });
 			}
 			
 			function addItem() {
-				document.McAuthoringForm.dispatch.value="saveSingleQuestion"; 
 				$("#newQuestion").val(CKEDITOR.instances.newQuestion.getData());
 				$("textarea[name^=ca],textarea[name=feedback]").each(function() {
 					var name = $(this).attr("name");
@@ -35,8 +37,10 @@
 				});
 				
 				if (validateSingleCorrectAnswer()) { 
-					$('#newQuestionForm').ajaxSubmit({ 
-						
+					$('#newQuestionForm').ajaxSubmit({
+						data: { 
+							sessionMapId: '${sessionMapId}'
+						},
 	    	    		target:  parent.jQuery('#resourceListArea'), 
 	    	    		success: function() { 
 	    	    			self.parent.refreshThickbox();
@@ -152,18 +156,9 @@
 <body class="stripes">
 
 	<html:form action="/authoring?validate=false" styleId="newQuestionForm" enctype="multipart/form-data" method="POST">
-
 		<html:hidden property="dispatch" value="saveSingleQuestion" />
-		<html:hidden property="currentField"/>
-		<html:hidden property="toolContentID" />
-		<html:hidden property="currentTab" styleId="currentTab" />
-		<html:hidden property="httpSessionID" />
-		<html:hidden property="contentFolderID" />
 		<html:hidden property="editableQuestionIndex" />
 		<html:hidden property="editQuestionBoxRequest" value="true" />
-		<html:hidden property="totalMarks" />
-
-		<c:set var="formBean" value="<%=request.getAttribute(org.apache.struts.taglib.html.Constants.BEAN_KEY)%>" />
 
 		<c:set var="title"><fmt:message key="label.edit.question"/></c:set>
 		<lams:Page title="${title}" type="learner">
@@ -171,7 +166,7 @@
 			<div class="form-group">
 				<lams:CKEditor id="newQuestion"
 					value="${mcGeneralAuthoringDTO.editableQuestionText}"
-					contentFolderID="${mcGeneralAuthoringDTO.contentFolderID}">
+					contentFolderID="${sessionMap.contentFolderID}">
 				</lams:CKEditor>
 			</div>
 
@@ -186,17 +181,12 @@
 			<div id="questions-worth" class="form-group">
 				<fmt:message key="label.questions.worth"/>&nbsp;
 				<select name="mark" class="control-sm">
-					<c:forEach var="markEntry"
-						items="${mcGeneralAuthoringDTO.marksMap}">
-						<c:set var="SELECTED_MARK" value="" />
-						<c:if test="${markEntry.value == mcGeneralAuthoringDTO.markValue}">
-							<c:set var="SELECTED_MARK" value="SELECTED" />
-						</c:if>
-		
-						<option value="<c:out value="${markEntry.value}"/>"	${SELECTED_MARK}>
-							<c:out value="${markEntry.value}" />
+					<c:forEach var="i" begin="1" end="10">
+						<option value="${i}"
+								<c:if test="${i == mcGeneralAuthoringDTO.markValue}">SELECTED</c:if> >
+							${i}
 						</option>
-						</c:forEach>
+					</c:forEach>
 				</select>
 				&nbsp;<fmt:message key="label.marks"></fmt:message>
 			</div>
@@ -206,11 +196,10 @@
 				<div id="feedbackDiv" class="panel-body collapse <c:if test="${not empty mcGeneralAuthoringDTO.editableQuestionFeedback}">in</c:if>">
 					<lams:CKEditor id="feedback"
 						value="${mcGeneralAuthoringDTO.editableQuestionFeedback}"
-						contentFolderID="${mcGeneralAuthoringDTO.contentFolderID}">
+						contentFolderID="${sessionMap.contentFolderID}">
 					</lams:CKEditor>
 				</div>
 			</div>
-
 
 			<div class="pull-right">
 				<a href="#" onclick="javascript:self.parent.tb_remove();" onmousedown="self.focus();" class="btn btn-default btn-sm roffset5"> 

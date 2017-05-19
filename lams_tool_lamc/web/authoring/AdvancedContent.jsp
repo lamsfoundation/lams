@@ -17,7 +17,6 @@
 		</label>
 	</div>
 	
-	
 	<div class="checkbox">
 		<label for="questionsSequenced">
 		<html:checkbox property="questionsSequenced" value="1" styleId="questionsSequenced"/>
@@ -25,14 +24,12 @@
 		</label>
 	</div>
 	
-	
 	<div class="checkbox">
 		<label for="showMarks">
 		<html:checkbox property="showMarks" value="1" styleId="showMarks"/>
 		<fmt:message key="label.showMarks" />
 		</label>
 	</div>
-	
 	
 	<div class="checkbox">
 		<label for="randomize">
@@ -43,11 +40,10 @@
 	
 	<div class="checkbox">
 		<label for="displayAnswers">
-		<html:checkbox property="displayAnswers" value="1" styleId="displayAnswers"/>
-		<fmt:message key="label.displayAnswers" />
+			<html:checkbox property="displayAnswers" value="1" styleId="displayAnswers"/>
+			<fmt:message key="label.displayAnswers" />
 		</label>
 	</div>
-	
 	
 	<div class="checkbox">
 		<label for="retries">
@@ -60,17 +56,10 @@
 	<div class="form-inline loffset20">
 		<div class="form-group">
 		<select name="passmark"  class="form-control input-sm">
-			<c:forEach var="passmarkEntry"
-				items="${mcGeneralAuthoringDTO.passMarksMap}">
-				<c:set var="SELECTED_PASS" scope="request" value="" />
-				<c:if
-					test="${passmarkEntry.value == mcGeneralAuthoringDTO.passMarkValue}">
-					<c:set var="SELECTED_PASS" scope="request" value="SELECTED" />
-				</c:if>
-		
-				<option value="<c:out value="${passmarkEntry.value}"/>"
-					<c:out value="${SELECTED_PASS}"/>>
-					<c:out value="${passmarkEntry.value}" />
+			<c:forEach var="i" begin="1" end="${mcGeneralAuthoringDTO.totalMarks}">
+				<option value="${i}"
+					<c:if test="${i == mcGeneralAuthoringDTO.passMarkValue}">SELECTED</c:if>>
+					${i}
 				</option>
 			</c:forEach>
 		</select>
@@ -92,7 +81,6 @@
 </lams:SimplePanel>
 
 <script type="text/javascript">
-<!--
 //automatically turn on refect option if there are text input in refect instruction area
 	var ra = document.getElementById("reflectInstructions");
 	var rao = document.getElementById("reflect");
@@ -107,6 +95,5 @@
 	}
 
 	ra.onkeyup=turnOnRefect;
-//-->
 </script>
 

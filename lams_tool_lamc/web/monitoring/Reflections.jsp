@@ -1,13 +1,11 @@
 <%@ include file="/common/taglibs.jsp"%>
 
-<c:if test="${notebookEntriesExist == 'true' }"> 		
-
 <div class="panel-group" id="accordionReflection" role="tablist" aria-multiselectable="true"> 
     <div class="panel panel-default" >
         <div class="panel-heading collapsable-icon-left" id="headingReflection">
         	<span class="panel-title">
 	    	<a class="collapsed" role="button" data-toggle="collapse" href="#collapseReflection" aria-expanded="false" aria-controls="collapseReflection" >
-          	<fmt:message key="label.reflection"/>
+          		<fmt:message key="label.reflection"/>
         	</a>
       		</span>
         </div>
@@ -26,8 +24,7 @@
 							<c:param name="uid" value="${reflectionUid}" />
 							<c:param name="userId" value="${userId}" />
 							<c:param name="userName" value="${fn:escapeXml(userName)}" />
-							<c:param name="sessionId" value="${sessionId}" />													
-							<c:param name="contentFolderID" value="${McMonitoringForm.contentFolderID}" />																								
+							<c:param name="sessionId" value="${sessionId}" />																							
 						</c:url>
 			
 						<html:link href="javascript:launchPopup('${fn:escapeXml(openNotebook)}');" styleClass="btn btn-default btn-sm">
@@ -40,6 +37,4 @@
 			</table>
 		</div>
 	</div>
-</div>
-	
-</c:if> 															
+</div>															

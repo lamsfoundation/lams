@@ -72,8 +72,6 @@ public class McAuthoringForm extends McLearningForm implements McAppConstants {
     protected String instructions;
 
     protected String isRemoveContent;
-    protected String toolContentId;
-    protected String toolContentID;
 
     /* advanced content */
     protected String synchInMonitor;
@@ -101,12 +99,9 @@ public class McAuthoringForm extends McLearningForm implements McAppConstants {
     protected String clickedObj;
 
     protected String edit;
-    private String contentFolderID;
     private String editableQuestionIndex;
     private String feedback;
     private String candidateIndex;
-    private String totalMarks;
-    protected String currentField;
 
     public void resetUserAction() {
 	this.editDefaultQuestion = null;
@@ -158,8 +153,6 @@ public class McAuthoringForm extends McLearningForm implements McAppConstants {
 	this.selectedIndex = null;
 	this.deletableOptionIndex = null;
 	this.isRemoveContent = null;
-	this.toolContentId = null;
-	this.toolContentID = null;
 
 	this.endLearningMessage = null;
 	this.synchInMonitor = null;
@@ -311,21 +304,6 @@ public class McAuthoringForm extends McLearningForm implements McAppConstants {
      */
     public void setTitle(String title) {
 	this.title = title;
-    }
-
-    /**
-     * @return Returns the toolContentId.
-     */
-    public String getToolContentId() {
-	return toolContentId;
-    }
-
-    /**
-     * @param toolContentId
-     *            The toolContentId to set.
-     */
-    public void setToolContentId(String toolContentId) {
-	this.toolContentId = toolContentId;
     }
 
     /**
@@ -742,23 +720,6 @@ public class McAuthoringForm extends McLearningForm implements McAppConstants {
     }
 
     /**
-     * @return Returns the toolContentID.
-     */
-    @Override
-    public String getToolContentID() {
-	return toolContentID;
-    }
-
-    /**
-     * @param toolContentID
-     *            The toolContentID to set.
-     */
-    @Override
-    public void setToolContentID(String toolContentID) {
-	this.toolContentID = toolContentID;
-    }
-
-    /**
      * @return Returns the submit.
      */
     public String getSubmit() {
@@ -819,21 +780,6 @@ public class McAuthoringForm extends McLearningForm implements McAppConstants {
     }
 
     /**
-     * @return Returns the contentFolderID.
-     */
-    public String getContentFolderID() {
-	return contentFolderID;
-    }
-
-    /**
-     * @param contentFolderID
-     *            The contentFolderID to set.
-     */
-    public void setContentFolderID(String contentFolderID) {
-	this.contentFolderID = contentFolderID;
-    }
-
-    /**
      * @return Returns the editableQuestionIndex.
      */
     public String getEditableQuestionIndex() {
@@ -879,21 +825,6 @@ public class McAuthoringForm extends McLearningForm implements McAppConstants {
     }
 
     /**
-     * @return Returns the totalMarks.
-     */
-    public String getTotalMarks() {
-	return totalMarks;
-    }
-
-    /**
-     * @param totalMarks
-     *            The totalMarks to set.
-     */
-    public void setTotalMarks(String totalMarks) {
-	this.totalMarks = totalMarks;
-    }
-
-    /**
      * @return Returns the clickedObj.
      */
     public String getClickedObj() {
@@ -906,21 +837,6 @@ public class McAuthoringForm extends McLearningForm implements McAppConstants {
      */
     public void setClickedObj(String clickedObj) {
 	this.clickedObj = clickedObj;
-    }
-
-    /**
-     * @return Returns the currentField.
-     */
-    public String getCurrentField() {
-	return currentField;
-    }
-
-    /**
-     * @param currentField
-     *            The currentField to set.
-     */
-    public void setCurrentField(String currentField) {
-	this.currentField = currentField;
     }
 
     /**
