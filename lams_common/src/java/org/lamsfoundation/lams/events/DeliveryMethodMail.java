@@ -43,6 +43,10 @@ public class DeliveryMethodMail extends AbstractDeliveryMethod {
     @Override
     protected String send(Integer fromUserId, Integer toUserId, String subject, String message, boolean isHtmlFormat)
 	    throws InvalidParameterException {
+	return send(fromUserId, toUserId, subject, message, isHtmlFormat, null);
+    }
+    protected String send(Integer fromUserId, Integer toUserId, String subject, String message, boolean isHtmlFormat, String attachmentFilename)
+	    throws InvalidParameterException {
 	try {
 	    User toUser = (User) DeliveryMethodMail.userManagementService.findById(User.class, toUserId);
 	    if (toUser == null) {
@@ -54,7 +58,7 @@ public class DeliveryMethodMail extends AbstractDeliveryMethod {
 	    }
 
 	    if (fromUserId == null) {
-		Emailer.sendFromSupportEmail(subject, toEmail, message, isHtmlFormat);
+		Emailer.sendFromSupportEmail(subject, toEmail, message, isHtmlFormat, attachmentFilename);
 	    } else {
 		User fromUser = (User) DeliveryMethodMail.userManagementService.findById(User.class, fromUserId);
 		if (fromUser == null) {
@@ -65,7 +69,7 @@ public class DeliveryMethodMail extends AbstractDeliveryMethod {
 		    return "Source user's e-mail address is invalid.";
 		}
 
-		Emailer.send(subject, toEmail, "", fromEmail, "", message, isHtmlFormat);
+		Emailer.send(subject, toEmail, "", fromEmail, "", message, isHtmlFormat, attachmentFilename);
 	    }
 	    return null;
 	} catch (Exception e) {
@@ -107,7 +111,7 @@ public class DeliveryMethodMail extends AbstractDeliveryMethod {
 	    DeliveryMethodMail.log.warn(
 		    "Could not notify admin as his email is blank. The subject: " + subject + ". The message: " + body);
 	} else {
-	    Emailer.sendFromSupportEmail(subject, adminEmail, body, isHtmlFormat);
+	    Emailer.sendFromSupportEmail(subject, adminEmail, body, isHtmlFormat, null);
 	}
     }
 
