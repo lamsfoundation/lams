@@ -55,6 +55,9 @@ public abstract class AbstractDeliveryMethod {
     protected abstract String send(Integer fromUserId, Integer toUserId, String subject, String message,
 	    boolean isHtmlFormat) throws InvalidParameterException;
 
+    protected abstract String send(Integer fromUserId, Integer toUserId, String subject, String message, 
+	    boolean isHtmlFormat, String attachmentFilename) throws InvalidParameterException;
+    
     protected abstract Logger getLog();
 
     protected abstract boolean lastOperationFailed(Subscription subscription);

@@ -35,6 +35,12 @@ public class DeliveryMethodNotification extends AbstractDeliveryMethod {
     }
 
     @Override
+    protected String send(Integer fromUserId, Integer toUserId, String subject, String message, boolean isHtmlFormat, String filename)
+	    throws InvalidParameterException {
+	return DeliveryMethodNotification.LAST_OPERATION_SEEN;
+    }
+
+    @Override
     protected boolean lastOperationFailed(Subscription subscription) {
 	return (subscription.getLastOperationMessage() != null)
 		&& !DeliveryMethodNotification.LAST_OPERATION_SEEN.equals(subscription.getLastOperationMessage());

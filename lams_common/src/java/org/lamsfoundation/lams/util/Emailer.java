@@ -3,13 +3,19 @@ package org.lamsfoundation.lams.util;
 import java.io.UnsupportedEncodingException;
 import java.util.Properties;
 
+import javax.activation.DataHandler;
+import javax.activation.FileDataSource;
 import javax.mail.Message.RecipientType;
 import javax.mail.MessagingException;
+import javax.mail.Multipart;
 import javax.mail.Session;
 import javax.mail.Transport;
 import javax.mail.internet.AddressException;
 import javax.mail.internet.InternetAddress;
+import javax.mail.internet.MimeBodyPart;
 import javax.mail.internet.MimeMessage;
+import javax.mail.internet.MimeMultipart;
+import javax.mail.internet.MimeUtility;
 
 import org.apache.commons.lang.StringUtils;
 
@@ -33,8 +39,13 @@ public class Emailer {
      */
     public static void sendFromSupportEmail(String subject, String to, String body, boolean isHtmlFormat)
 	    throws AddressException, MessagingException, UnsupportedEncodingException {
+	sendFromSupportEmail(subject, to, body, isHtmlFormat, null);
+    }
+
+    public static void sendFromSupportEmail(String subject, String to, String body, boolean isHtmlFormat, String attachmentFilename)
+	    throws AddressException, MessagingException, UnsupportedEncodingException {
 	String supportEmail = Configuration.get(ConfigurationKeys.LAMS_ADMIN_EMAIL);
-	Emailer.send(subject, to, "", supportEmail, "", body, isHtmlFormat);
+	Emailer.send(subject, to, "", supportEmail, "", body, isHtmlFormat, attachmentFilename);
     }
 
     /**
@@ -83,15 +94,62 @@ public class Emailer {
      */
     public static void send(String subject, String to, String toPerson, String from, String fromPerson, String body,
 	    boolean isHtmlFormat) throws AddressException, MessagingException, UnsupportedEncodingException {
+	
+	send(subject, to, toPerson, from, fromPerson, body, isHtmlFormat, null);
+    }
+    
+    /**
+     * Send email to recipients
+     *
+     * @param subject
+     *            the subject of the email
+     * @param to
+     *            the email of the recipient
+     * @param toPerson
+     *            receiver's name
+     * @param from
+     *            the email to source the email from
+     * @param fromPerson
+     *            sender's name
+     * @param body
+     *            the body of the email
+     * @param isHtmlFormat
+     *            whether the message is of HTML content-type or plain text
+     * @param file
+     * 		  file to attach
+     */
+    public static void send(String subject, String to, String toPerson, String from, String fromPerson, String body,
+	    boolean isHtmlFormat, String filename) throws AddressException, MessagingException, UnsupportedEncodingException {
+
 	Session session = Emailer.getMailSession();
 
 	MimeMessage message = new MimeMessage(session);
 	message.setFrom(new InternetAddress(from, fromPerson));
 	message.addRecipient(RecipientType.TO, new InternetAddress(to, toPerson));
 	message.setSubject(subject, "UTF-8");
-	message.setText(body, "UTF-8");
-	String contentType = (isHtmlFormat) ? "text/html;charset=UTF-8" : "text/plain;charset=UTF-8";
-	message.addHeader("Content-Type", contentType);
+
+	if (filename == null) {
+	    message.setText(body, "UTF-8");
+	    String contentType = (isHtmlFormat) ? "text/html;charset=UTF-8" : "text/plain;charset=UTF-8";
+	    message.addHeader("Content-Type", contentType);
+	} else {
+	    MimeBodyPart msgPart = new MimeBodyPart();
+	    msgPart.setText(body, "UTF-8");
+	    String contentType = (isHtmlFormat) ? "text/html;charset=UTF-8" : "text/plain;charset=UTF-8";
+	    msgPart.addHeader("Content-Type", contentType);
+
+	    MimeBodyPart filePart = new MimeBodyPart();
+	    FileDataSource fds = new FileDataSource(filename);
+	    filePart.setDataHandler(new DataHandler(fds));
+	    String encodedFilename = MimeUtility.encodeText(fds.getName());
+	    filePart.setFileName(encodedFilename);
+
+	    Multipart mp = new MimeMultipart();
+	    mp.addBodyPart(msgPart);
+	    mp.addBodyPart(filePart);
+	    message.setContent(mp);
+
+	}
 
 	Transport.send(message);
     }
