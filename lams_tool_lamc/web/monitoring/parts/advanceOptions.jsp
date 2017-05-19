@@ -85,7 +85,6 @@
 		</td>
 	</tr>
 	
-	
 	<tr>
 		<td>
 			<fmt:message key="label.displayAnswers" />
@@ -143,18 +142,16 @@
 		</td>
 	</tr>
 	
-	<c:choose>
-		<c:when test="${reflect}">
-			<tr>
-				<td>
-					<fmt:message key="monitor.summary.td.notebookInstructions" />
-				</td>
-				<td>	
-					<lams:out value="${reflectionSubject}" escapeHtml="true"/>
-				</td>
-			</tr>
-		</c:when>
-	</c:choose>
+	<c:if test="${reflect}">
+		<tr>
+			<td>
+				<fmt:message key="monitor.summary.td.notebookInstructions" />
+			</td>
+			<td>	
+				<lams:out value="${reflectionSubject}" escapeHtml="true"/>
+			</td>
+		</tr>
+	</c:if>
 
 	<tr>
 		<td colspan="2">
@@ -165,8 +162,9 @@
 			<c:when test="${mcGeneralMonitoringDTO.displayAnswers == 'false'}">
 				<fmt:message key="label.monitoring.noDisplayAnswers1"/><br/>
 				<quote>
-					<fmt:message key="label.monitoring.noDisplayAnswers2"/>
-					<input onclick="javascript:submitChangeDisplayAnswers(this.value, 'displayAnswers');" name="displayAnswers" class="btn btn-default btn-xs" value="<fmt:message key='button.monitoring.noDisplayAnswers'/>" type="button">	
+					<fmt:message key="label.monitoring.noDisplayAnswers2"/>&nbsp;
+					<input onclick="javascript:turnOnDisplayAnswers();" name="displayAnswers" 
+							class="btn btn-default btn-xs" value="<fmt:message key='button.monitoring.noDisplayAnswers'/>" type="button">	
 				</quote>
 			</c:when>
 		</c:choose>

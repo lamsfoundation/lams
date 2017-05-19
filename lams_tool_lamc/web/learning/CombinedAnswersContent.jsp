@@ -67,11 +67,6 @@
     </div>
   </div>
 </div>
-
-
-
-
-
 </c:forEach>
 
 <html:hidden property="continueOptionsCombined" value="Continue" />
@@ -83,4 +78,3 @@
 </c:if>
 
 <!--options content ends here-->
-

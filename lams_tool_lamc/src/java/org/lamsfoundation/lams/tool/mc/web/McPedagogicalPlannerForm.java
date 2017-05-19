@@ -49,15 +49,6 @@ public class McPedagogicalPlannerForm extends PedagogicalPlannerActivityForm {
     private List<Integer> candidateAnswerCount;
     private String candidateAnswersString;
     private List<String> correct;
-    private String contentFolderID;
-
-    public String getContentFolderID() {
-	return contentFolderID;
-    }
-
-    public void setContentFolderID(String contentFolderID) {
-	this.contentFolderID = contentFolderID;
-    }
 
     public ActionMessages validate(HttpServletRequest request) {
 	ActionMessages errors = new ActionMessages();
@@ -124,8 +115,6 @@ public class McPedagogicalPlannerForm extends PedagogicalPlannerActivityForm {
 
     public void fillForm(McContent mcContent, IMcService mcService) {
 	if (mcContent != null) {
-	    setToolContentID(mcContent.getMcContentId());
-
 	    List<McQuestionDTO> questionDtos = AuthoringUtil.buildDefaultQuestions(mcContent);
 
 	    StringBuilder candidateAnswersBuilder = new StringBuilder();

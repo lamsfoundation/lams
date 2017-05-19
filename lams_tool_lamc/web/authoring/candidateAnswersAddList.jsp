@@ -1,4 +1,5 @@
 <%@ include file="/common/taglibs.jsp" %>
+
 <div id="candidateArea">
 
 	<c:set var="candidateIndex" >
@@ -50,21 +51,13 @@
 					<td width="90%">
 						<lams:CKEditor id="ca${caIndex}" 
 							value="${currentCandidateDTO.candidateAnswer}"
-							contentFolderID="${mcGeneralAuthoringDTO.contentFolderID}">
+							contentFolderID="${sessionMap.contentFolderID}">
 						</lams:CKEditor>
 					</td>		
 					
-					<td width="20px" class="text-center">
-						<c:forEach var="correctEntry" items="${mcGeneralAuthoringDTO.correctMap}">
-							<c:set var="SELECTED_ANSWER" scope="request" value="" />
-							<c:set var="ISCORRECT" scope="request" value="Incorrect" />
-								
-							<c:if test="${correctEntry.value == currentCandidateDTO.correct}">
-								<c:set var="SELECTED_ANSWER" scope="request" value="CHECKED" />
-								<c:set var="ISCORRECT" scope="request" value="Correct" />
-							</c:if>
-							<input type="radio" name="correct" value="<c:out value="${caIndex}"/>" ${SELECTED_ANSWER} >  
-						</c:forEach>
+					<td width="20px" class="text-center">	
+						<input type="radio" name="correct" value="${caIndex}" 
+								<c:if test="${'Correct' == currentCandidateDTO.correct}">CHECKED</c:if> >
 					</td>		
 					
 					<td width="5%">

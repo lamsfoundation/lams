@@ -6,7 +6,6 @@
 	<form-beans>
 		<form-bean name="McAuthoringForm" type="org.lamsfoundation.lams.tool.mc.web.McAuthoringForm"/>
 		<form-bean name="McLearningForm" type="org.lamsfoundation.lams.tool.mc.web.McLearningForm"/>
-		<form-bean name="McMonitoringForm" type="org.lamsfoundation.lams.tool.mc.web.McMonitoringForm"/>
 		<form-bean name="McPedagogicalPlannerForm" type="org.lamsfoundation.lams.tool.mc.web.McPedagogicalPlannerForm"/>
 	</form-beans>
 	
@@ -37,25 +36,11 @@
 		unknown="false"
 		validate="false"
     >
-
 	    <forward
 			name="authoringTabsHolder"
 			path="/authoring/AuthoringTabsHolder.jsp"
 			redirect="false"
-	    />
-
-	  	<forward
-			name="loadMonitoring"
-			path="/monitoring/MonitoringMaincontent.jsp"
-			redirect="false"
-	  	/>
-	
-	  	<forward
-			name="refreshMonitoring"
-			path="/monitoring/MonitoringMaincontent.jsp"
-			redirect="false"
-	  	/>
-	
+	    />	
 	</action>  
 	
 	<action
@@ -68,24 +53,11 @@
       unknown="false"
       validate="false"
     >
-    
 	  	<forward
 	        name="authoringTabsHolder"
 	        path="/authoring/AuthoringTabsHolder.jsp"
 	        redirect="false"
 		/>
-	
-	  	<forward
-			name="loadMonitoring"
-			path="/monitoring/MonitoringMaincontent.jsp"
-			redirect="false"
-	  	/>
-	
-	  	<forward
-		    name="refreshMonitoring"
-		    path="/monitoring/MonitoringMaincontent.jsp"
-		    redirect="false"
-	  	/>
 	    
 	    <forward
 			name="newQuestionBox"
@@ -116,12 +88,6 @@
 			path="/authoring/candidateAnswersAddList.jsp"
 			redirect="false"
 	    />
-
-	  	<forward
-	        name="starter"
-	        path="/index.jsp"
-	        redirect="false"
-	  	/>
   </action>
 
    <!--Learning Starter Action: initializes the Learning module -->
@@ -278,7 +244,6 @@
    <action 	path="/monitoringStarter" 
    			type="org.lamsfoundation.lams.tool.mc.web.McMonitoringStarterAction" 
 	      	scope="request"
-   			name="McMonitoringForm" 
       		unknown="false"
       		validate="false"
    			input="/monitoringIndex.jsp"> 
@@ -287,13 +252,7 @@
 			name="loadMonitoring"
 			path="/monitoring/MonitoringMaincontent.jsp"
 			redirect="false"
-	  	/>
-	
-	  	<forward
-			name="refreshMonitoring"
-			path="/monitoring/MonitoringMaincontent.jsp"
-			redirect="false"
-	  	/>			
+	  	/>		
    			
 	  	<forward
 		    name="errorList"
@@ -305,8 +264,7 @@
    
    <!--Monitoring Main Action: interacts with the Monitoring module user -->
    <action 	path="/monitoring" 
-   			type="org.lamsfoundation.lams.tool.mc.web.McMonitoringAction" 
-   			name="McMonitoringForm" 
+   			type="org.lamsfoundation.lams.tool.mc.web.McMonitoringAction"
 	      	scope="request"
    			input="/monitoring/MonitoringMaincontent.jsp"
       		parameter="dispatch"
@@ -323,12 +281,6 @@
 		    name="loadMonitoringEditActivity"
 		    path="/monitoring/MonitoringMaincontent.jsp"
 		    redirect="false"
-	  	/>
-	
-	  	<forward
-			name="refreshMonitoring"
-			path="/monitoring/MonitoringMaincontent.jsp"
-			redirect="false"
 	  	/>
 
         <forward
@@ -348,6 +300,13 @@
 	        path="/McErrorBox.jsp"
 		    redirect="false"
 	  	/>
+	  	
+	  	<forward
+		    name="monitoringStarterRedirect"
+	        path="/monitoringStarter.do"
+		    redirect="true"
+	  	/>
+	  	
 	</action>  
 	
    <action 	path="/clearsession" 

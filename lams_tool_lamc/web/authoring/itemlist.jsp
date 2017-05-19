@@ -1,8 +1,9 @@
 <%@ include file="/common/taglibs.jsp"%>
-<c:set var="ctxPath" value="${pageContext.request.contextPath}"	scope="request" />
+
 <div id="itemList">
 
 	<div class="panel panel-default add-file">
+	
 	<div class="panel-heading panel-title">
 		<fmt:message key="label.questions" />
 		<i class="fa fa-spinner" style="display: none" id="resourceListArea_Busy"></i>
@@ -14,10 +15,8 @@
 				<fmt:message key="label.authoring.export.qti" />
 			</a>
 		</div>
-		
 	</div>
 
-	<c:set var="formBean" value="<%=request.getAttribute(org.apache.struts.taglib.html.Constants.BEAN_KEY)%>" />
 	<table id="itemTable" class="table table-striped table-condensed">
 		<c:set var="queIndex" scope="request" value="0" />
 
@@ -37,14 +36,12 @@
 			</c:if>
 		</tr>
 
-		<c:forEach items="${listQuestionContentDTO}" var="currentDTO"
-			varStatus="status">
+		<c:forEach items="${listQuestionContentDTO}" var="currentDTO" varStatus="status">
 			<c:set var="queIndex" scope="request" value="${queIndex +1}" />
 			<c:set var="question" scope="request" value="${currentDTO.question}" />
 			<c:set var="feedback" scope="request" value="${currentDTO.feedback}" />
 			<c:set var="mark" scope="request" value="${currentDTO.mark}" />
-			<c:set var="displayOrder" scope="request"
-				value="${currentDTO.displayOrder}" />
+			<c:set var="displayOrder" scope="request" value="${currentDTO.displayOrder}" />
 
 			<tr>
 				<td>
@@ -52,7 +49,6 @@
 						<c:out value="${question}" escapeXml="false" />
 					</div>					
 				</td>
-
 
 				<td width="70px" class="text-center">
 					<c:out value="${mark}" />
@@ -78,7 +74,7 @@
 
 				<td align="center" style="width:5%">
 					<c:set var="editItemUrl" >
-						<html:rewrite page="/authoring.do"/>?dispatch=newEditableQuestionBox&questionIndex=${queIndex}&contentFolderID=${mcGeneralAuthoringDTO.contentFolderID}&httpSessionID=${mcGeneralAuthoringDTO.httpSessionID}&toolContentID=${mcGeneralAuthoringDTO.toolContentID}&sln=${mcGeneralAuthoringDTO.sln}&showMarks=${mcGeneralAuthoringDTO.showMarks}&randomize=${mcGeneralAuthoringDTO.randomize}&questionsSequenced=${mcGeneralAuthoringDTO.questionsSequenced}&retries=${mcGeneralAuthoringDTO.retries}&reflect=${mcGeneralAuthoringDTO.reflect}&KeepThis=true&TB_iframe=true&modal=true
+						<html:rewrite page="/authoring.do"/>?dispatch=newEditableQuestionBox&questionIndex=${queIndex}&sessionMapId=${sessionMapId}&sln=${mcGeneralAuthoringDTO.sln}&showMarks=${mcGeneralAuthoringDTO.showMarks}&randomize=${mcGeneralAuthoringDTO.randomize}&questionsSequenced=${mcGeneralAuthoringDTO.questionsSequenced}&retries=${mcGeneralAuthoringDTO.retries}&reflect=${mcGeneralAuthoringDTO.reflect}&KeepThis=true&TB_iframe=true&modal=true
 					</c:set>
 					<a href="${editItemUrl}" class="thickbox"> 
 						<i class="fa fa-pencil" title="<fmt:message key='label.tip.editQuestion'/>"></i>
@@ -95,4 +91,3 @@
 	</table>
 	</div>
 </div>
-

@@ -1,15 +1,14 @@
 <!DOCTYPE html>
 <%@ include file="/common/taglibs.jsp"%>
 <%@ page import="org.lamsfoundation.lams.tool.mc.McAppConstants"%>
+<c:set var="sessionMap" value="${sessionScope[sessionMapId]}" />
 
 <lams:html>		
 	<lams:head>
 	<title><fmt:message key="activity.title" /></title>
 	
 	<%@ include file="/common/header.jsp"%>
- 	
- 	<!-- ******************** FCK Editor related javascript & HTML ********************** -->
-	<script language="JavaScript" type="text/JavaScript">
+	<script type="text/JavaScript">
 
 		function submitMethod(actionMethod) {
 			document.McAuthoringForm.dispatch.value=actionMethod; 
@@ -21,7 +20,10 @@
 			document.McAuthoringForm.dispatch.value=actionMethod;
 			
 			$('#authoringForm').ajaxSubmit({ 
-	    		target:  $('#resourceListArea'),
+				data: { 
+					sessionMapId: '${sessionMapId}'
+				},
+				target:  $('#resourceListArea'),
 	    		iframe: true,
 	    		success:    function() { 
 	    			document.McAuthoringForm.dispatch.value="submitAllContent";
@@ -71,13 +73,8 @@
 
 	<html:form  action="/authoring?validate=false" styleId="authoringForm" enctype="multipart/form-data" method="POST" target="_self">
 		<html:hidden property="dispatch" value="submitAllContent"/>
-		<html:hidden property="toolContentID"/>
 		<html:hidden property="currentTab" styleId="currentTab" />
-		<html:hidden property="httpSessionID"/>						
-		<html:hidden property="contentFolderID"/>												
-		<html:hidden property="totalMarks"/>
-		<input type="hidden" name="mode" value="${mode}">
-		<c:set var="formBean" value="<%= request.getAttribute(org.apache.struts.taglib.html.Constants.BEAN_KEY) %>" />
+		<html:hidden property="httpSessionID" value="${sessionMapId}"/>
 			
 	<c:set var="title"><fmt:message key="activity.title" /></c:set>
 	<lams:Page title="${title}" type="navbar">
@@ -97,8 +94,8 @@
                 </lams:TabBodys>
 
 				<lams:AuthoringButton formID="authoringForm" clearSessionActionUrl="/clearsession.do" toolSignature="lamc11" 
-					cancelButtonLabelKey="label.cancel" saveButtonLabelKey="label.save" toolContentID="${formBean.toolContentID}" 
-					contentFolderID="${formBean.contentFolderID}" accessMode="${mode}" defineLater="${mode=='teacher'}"/>
+					cancelButtonLabelKey="label.cancel" saveButtonLabelKey="label.save" toolContentID="${sessionMap.toolContentID}" 
+					contentFolderID="${sessionMap.contentFolderID}" accessMode="${sessionMap.mode}" defineLater="${sessionMap.mode=='teacher'}"/>
 			</lams:TabBodyArea>
 					
 		<div id="footer"></div>

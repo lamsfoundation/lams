@@ -39,7 +39,6 @@ public class McComparator implements Comparator, Serializable {
 
 	int key1 = new Long(s1).intValue();
 	int key2 = new Long(s2).intValue();
-	// logger.debug(logger + " " + this.getClass().getName() + "comparing key1 and key2:" + key1 + " and " + key2);
 	return key1 - key2;
     }
 

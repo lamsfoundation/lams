@@ -11,24 +11,16 @@
 	<script type="text/javascript">
 	
         function init(){
-            var tag = document.getElementById("currentTab");
-	    	if(tag.value != "")
-	    		selectTab(tag.value);
+            var tag = "${mcGeneralMonitoringDTO.currentTab}";
+	    	if(tag != "")
+	    		selectTab(tag);
             else
                 selectTab(1); //select the default tab;
         }     
         
         function doSelectTab(tabId) {
-        	// start optional tab controller stuff
-        	var tag = document.getElementById("currentTab");
-	    	tag.value = tabId;
 	    	// end optional tab controller stuff
 	    	selectTab(tabId);
-        } 
-        
-        function doSubmit(method) {
-        	document.McMonitoringForm.dispatch.value=method;
-        	document.McMonitoringForm.submit();
         }
 
 		function downloadMarks() {
@@ -40,10 +32,8 @@
 			return downloadFile(url, 'message-area-busy', '<fmt:message key="label.summary.downloaded"/>', 'message-area', 'btn-disable-on-submit');
 		}
 		
-		function submitChangeDisplayAnswers(displayAnswers, actionMethod) {
-			document.McMonitoringForm.displayAnswers.value=displayAnswers; 
-			document.McMonitoringForm.dispatch.value=actionMethod; 
-			document.McMonitoringForm.submit();
+		function turnOnDisplayAnswers() {
+			window.open("<c:url value='/monitoring.do'/>?dispatch=displayAnswers&toolContentID=${mcGeneralMonitoringDTO.toolContentID}&contentFolderID=${contentFolderID}","_self")
 		}
 	
 	</script>
@@ -59,24 +49,14 @@
 		<lams:Tab id="2" key="label.editActivity" />
 		<lams:Tab id="3" key="label.stats" />
 	</lams:Tabs>
-
-    <html:form  action="/monitoring?validate=false" enctype="multipart/form-data" method="POST" target="_self" styleId="monitoringForm">		
-		<html:hidden property="dispatch"/>
-		<html:hidden property="toolContentID"/>
-		<html:hidden property="httpSessionID"/>
-		<html:hidden property="currentTab" styleId="currentTab" />
-		<html:hidden property="contentFolderID"/>
-		<html:hidden property="responseId"/>
 	
-		<lams:TabBodyArea>
-			<lams:TabBodys>
-				<lams:TabBody id="1" titleKey="label.summary" page="SummaryContent.jsp"/>
-				<lams:TabBody id="2" titleKey="label.editActivity" page="Edit.jsp" />
-				<lams:TabBody id="3" titleKey="label.stats" page="Stats.jsp" />
-			</lams:TabBodys>
-		</lams:TabBodyArea>
-
-	</html:form>
+	<lams:TabBodyArea>
+		<lams:TabBodys>
+			<lams:TabBody id="1" titleKey="label.summary" page="SummaryContent.jsp"/>
+			<lams:TabBody id="2" titleKey="label.editActivity" page="Edit.jsp" />
+			<lams:TabBody id="3" titleKey="label.stats" page="Stats.jsp" />
+		</lams:TabBodys>
+	</lams:TabBodyArea>
 	
 	<div id="footer" />
 	

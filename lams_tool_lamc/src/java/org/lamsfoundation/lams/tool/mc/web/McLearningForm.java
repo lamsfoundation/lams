@@ -65,7 +65,6 @@ public class McLearningForm extends ActionForm implements McAppConstants {
     protected String nextQuestionSelected;
     protected String httpSessionID;
 
-    protected String responseId;
     protected String sessionId;
 
     public IMcService mcService;
@@ -430,21 +429,6 @@ public class McLearningForm extends ActionForm implements McAppConstants {
      */
     public void setEntryText(String entryText) {
 	this.entryText = entryText;
-    }
-
-    /**
-     * @return Returns the responseId.
-     */
-    public String getResponseId() {
-	return responseId;
-    }
-
-    /**
-     * @param responseId
-     *            The responseId to set.
-     */
-    public void setResponseId(String responseId) {
-	this.responseId = responseId;
     }
 
     /**

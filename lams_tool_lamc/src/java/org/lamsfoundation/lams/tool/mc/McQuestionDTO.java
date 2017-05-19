@@ -42,9 +42,9 @@ public class McQuestionDTO implements Comparable {
 
     @Override
     public int compareTo(Object o) {
-	McMonitoredUserDTO mcMonitoredUserDTO = (McMonitoredUserDTO) o;
+	McQuestionDTO mcQuestionDTO = (McQuestionDTO) o;
 
-	if (mcMonitoredUserDTO == null) {
+	if (mcQuestionDTO == null) {
 	    return 1;
 	} else {
 	    return 0;

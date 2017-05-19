@@ -41,6 +41,9 @@
   			prepareFormData();
   			$('#pedagogicalPlannerForm').ajaxSubmit({
   				url: "<c:url value='/pedagogicalPlanner.do?dispatch=createPedagogicalPlannerQuestion' />",
+  				data: { 
+					sessionMapId: '${sessionMapId}'
+				},
   				success: function(responseText){
  	  				var bodyTag = '<body';
  	  				var selectedBody = responseText.substring(responseText.search(bodyTag) + 1);
@@ -98,8 +101,8 @@
 	<h4 class="space-left"><fmt:message key="label.questions"/></h4>
 	<html:form action="/pedagogicalPlanner.do?dispatch=saveOrUpdatePedagogicalPlannerForm" styleId="pedagogicalPlannerForm" method="post">
 		<c:set var="formBean" value="<%=request.getAttribute(org.apache.struts.taglib.html.Constants.BEAN_KEY)%>" />
+		<c:set var="sessionMap" value="${sessionScope[formBean.httpSessionID]}" />
 		
-		<html:hidden property="toolContentID" styleId="toolContentID" />
 		<html:hidden property="valid" styleId="valid" />
 		<html:hidden property="callID" styleId="callID" />
 		<html:hidden property="activityOrderNumber" styleId="activityOrderNumber" />
@@ -112,7 +115,7 @@
 					<td class="FCKcell">
 						<lams:CKEditor id="question[${questionIndex-1}]"
 							value="${formBean.questionList[questionIndex-1]}"
-							contentFolderID="${formBean.contentFolderID}"
+							contentFolderID="${sessionMap.contentFolderID}"
 			                toolbarSet="CustomPedplanner" height="150px"
 			                width="${param.plannerCKEditorShortWidth}" displayExpanded="false">
 						</lams:CKEditor>

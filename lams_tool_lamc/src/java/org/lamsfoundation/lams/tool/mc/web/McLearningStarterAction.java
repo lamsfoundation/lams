@@ -50,7 +50,6 @@ import org.lamsfoundation.lams.tool.mc.AnswerDTO;
 import org.lamsfoundation.lams.tool.mc.McAppConstants;
 import org.lamsfoundation.lams.tool.mc.McApplicationException;
 import org.lamsfoundation.lams.tool.mc.McGeneralLearnerFlowDTO;
-import org.lamsfoundation.lams.tool.mc.McUtils;
 import org.lamsfoundation.lams.tool.mc.pojos.McContent;
 import org.lamsfoundation.lams.tool.mc.pojos.McQueUsr;
 import org.lamsfoundation.lams.tool.mc.pojos.McSession;
@@ -79,8 +78,6 @@ public class McLearningStarterAction extends Action implements McAppConstants {
     public ActionForward execute(ActionMapping mapping, ActionForm form, HttpServletRequest request,
 	    HttpServletResponse response) throws IOException, ServletException, McApplicationException {
 
-	McUtils.cleanUpSessionAbsolute(request);
-
 	if (mcService == null) {
 	    mcService = McServiceProxy.getMcService(getServlet().getServletContext());
 	}
@@ -105,7 +102,6 @@ public class McLearningStarterAction extends Action implements McAppConstants {
 	 */
 	McSession mcSession = mcService.getMcSessionById(new Long(toolSessionID));
 	if (mcSession == null) {
-	    McUtils.cleanUpSessionAbsolute(request);
 	    return (mapping.findForward(McAppConstants.ERROR_LIST));
 	}
 
@@ -115,7 +111,6 @@ public class McLearningStarterAction extends Action implements McAppConstants {
 	 */
 	McContent mcContent = mcSession.getMcContent();
 	if (mcContent == null) {
-	    McUtils.cleanUpSessionAbsolute(request);
 	    ActionMessages errors = new ActionMessages();
 	    errors.add(Globals.ERROR_KEY, new ActionMessage("error.content.doesNotExist"));
 	    saveErrors(request, errors);

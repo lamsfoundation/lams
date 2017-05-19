@@ -1,7 +1,5 @@
 package org.lamsfoundation.lams.tool.mc.dto;
 
-import org.lamsfoundation.lams.tool.ToolOutputValue;
-
 /**
  * An output for a tool.
  */

@@ -185,7 +185,7 @@
 		</lams:Alert>
 	</c:if>
 	
-	<c:if test="${(mcGeneralMonitoringDTO.userExceptionNoToolSessions == 'true')}">
+	<c:if test="${empty sessionDtos}">
 		<lams:Alert type="info" id="no-session-summary" close="false">
 			<fmt:message key="error.noLearnerActivity"/>
 		</lams:Alert>
@@ -199,8 +199,7 @@
 
 <%@ include file="parts/advanceQuestions.jsp"%>
 
-
-<c:if test="${mcGeneralMonitoringDTO.userExceptionNoToolSessions != 'true'}">
+<c:if test="${not empty sessionDtos}">
 	<button onclick="return downloadMarks()" class="btn btn-default btn-xs btn-disable-on-submit pull-right">
 		<i class="fa fa-download" aria-hidden="true"></i> 
 		<fmt:message key="label.monitoring.downloadMarks.button" />
@@ -256,7 +255,7 @@
 				
 </c:if>
 
-<c:if test="${noSessionsNotebookEntriesExist == 'true'}"> 							
+<c:if test="${not empty reflectionsContainerDTO}"> 							
 	<jsp:include page="/monitoring/Reflections.jsp" />
 </c:if>
 

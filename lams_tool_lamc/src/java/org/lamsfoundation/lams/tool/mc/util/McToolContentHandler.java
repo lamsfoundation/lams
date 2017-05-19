@@ -43,8 +43,6 @@ public class McToolContentHandler extends ToolContentHandler {
     }
 
     /*
-     * (non-Javadoc)
-     *
      * @see org.lamsfoundation.lams.contentrepository.client.ToolContentHandler#getRepositoryWorkspaceName()
      */
     @Override
@@ -53,8 +51,6 @@ public class McToolContentHandler extends ToolContentHandler {
     }
 
     /*
-     * (non-Javadoc)
-     *
      * @see org.lamsfoundation.lams.contentrepository.client.ToolContentHandler#getRepositoryUser()
      */
     @Override
@@ -63,8 +59,6 @@ public class McToolContentHandler extends ToolContentHandler {
     }
 
     /*
-     * (non-Javadoc)
-     *
      * @see org.lamsfoundation.lams.contentrepository.client.ToolContentHandler#getRepositoryId()
      */
     @Override

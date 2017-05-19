@@ -34,19 +34,20 @@
 								<tbody>
 									<c:forEach var="option" varStatus="status" items="${dto.options}">
 										<tr>
-											<td class="text-nowrap" style="vertical-align: top;"><input type="radio"
-												id="${dto.questionUid}-${option.uid}" name="checkedCa" class="noBorder"
-												value="${dto.questionUid}-${option.uid}" <c:if test="${option.selected}">checked="checked"</c:if> /> <c:if
-													test="${isPrefixAnswersWithLetters}">
+											<td class="text-nowrap" style="vertical-align: top;">
+												<input type="radio"	id="${dto.questionUid}-${option.uid}" name="checkedCa" class="noBorder"
+												value="${dto.questionUid}-${option.uid}" <c:if test="${option.selected}">checked="checked"</c:if> /> 
+												<c:if test="${isPrefixAnswersWithLetters}">
 													<c:set var="seqLetter" value="${status.index}" />
-													<%=Character
-									.toChars(97 + (Integer) pageContext
-											.getAttribute("seqLetter"))%>)
-                              </c:if></td>
+													<%=Character.toChars(97 + (Integer) pageContext.getAttribute("seqLetter"))%>)
+                              					</c:if>
+                              				</td>
 
-											<td width="100%"><label for="${dto.questionUid}-${option.uid}"> <c:out
+											<td width="100%">
+												<label for="${dto.questionUid}-${option.uid}"> <c:out
 														value="${option.mcQueOptionText}" escapeXml="false" />
-											</label></td>
+												</label>
+											</td>
 
 										</tr>
 									</c:forEach>
@@ -62,10 +63,9 @@
 	</c:if>
 </c:forEach>
 
-<c:if
-	test="${mcGeneralLearnerFlowDTO.totalCountReached != 'true'  &&  mcGeneralLearnerFlowDTO.totalQuestionCount != '1'}">
+<c:if test="${mcGeneralLearnerFlowDTO.totalCountReached != 'true'  &&  mcGeneralLearnerFlowDTO.totalQuestionCount != '1'}">
 	<html:button property="continueOptionsCombined" onclick="submitNextQuestionSelected();"
-		styleClass="btn btn-sm btn-primary pull-right">
+			styleClass="btn btn-sm btn-primary pull-right">
 		<fmt:message key="button.continue" />
 	</html:button>
 </c:if>
@@ -78,7 +78,7 @@
 
 <c:if test="${mcGeneralLearnerFlowDTO.totalCountReached == 'true'}">
 	<html:button property="continueOptionsCombined" onclick="submitAllAnswers();"
-		styleClass="btn btn-sm btn-primary pull-right">
+			styleClass="btn btn-sm btn-primary pull-right">
 		<fmt:message key="button.submit" />
 	</html:button>
 </c:if>

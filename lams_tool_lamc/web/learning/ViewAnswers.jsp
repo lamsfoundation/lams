@@ -27,8 +27,6 @@
 </lams:head>
 
 <body class="stripes">
-
-
 	<html:form action="/learning?method=displayMc&validate=false" method="POST" target="_self" onsubmit="disableFinishButton();" styleId="Form1">
 
 	<lams:Page type="learner" title="${mcGeneralLearnerFlowDTO.activityTitle}">
@@ -200,7 +198,6 @@
 			</table>
 		</c:if>
 
-
 		<c:if test="${mcGeneralLearnerFlowDTO.reflection && (notebookEntry != null) && hasEditRight}">
 			<div class="row no-gutter">
 				<div class="col-xs-12">
@@ -230,7 +227,6 @@
 			</div>
 		</c:if>
 
-
 		<!--  now really start the form -->
 		<div class="form-group">
 				<html:hidden property="toolContentID" />
@@ -253,7 +249,7 @@
 							<html:hidden property="learnerFinished" value="Finished" />
 
 							<html:link href="#nogo" styleClass="btn btn-primary pull-right na" styleId="finishButton"
-								onclick="submitForm('finish'); return false;">
+									onclick="submitForm('finish'); return false;">
 								<c:choose>
 									<c:when test="${activityPosition.last}">
 										<fmt:message key="label.submit" />
@@ -275,6 +271,6 @@
 
 		</div>
 		</lams:Page>
-			</html:form>
+	</html:form>
 </body>
 </lams:html>
