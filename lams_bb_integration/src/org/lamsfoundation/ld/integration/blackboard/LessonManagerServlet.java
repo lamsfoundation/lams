@@ -236,11 +236,6 @@ public class LessonManagerServlet extends HttpServlet {
         String strStartDate = request.getParameter("lessonAvailability_start_datetime");
         String strEndDate = request.getParameter("lessonAvailability_end_datetime");
         SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-        Calendar startDate = Calendar.getInstance();
-		Calendar endDate = Calendar.getInstance();
-        startDate.setTime(formatter.parse(strStartDate));
-        endDate.setTime(formatter.parse(strEndDate));
-        
         String strStartDateCheckbox = request.getParameter("lessonAvailability_start_checkbox");
         String strEndDateCheckbox = request.getParameter("lessonAvailability_end_checkbox");
         
@@ -266,27 +261,21 @@ public class LessonManagerServlet extends HttpServlet {
         bbContent.setBody(description);
     
         // Set Availability Dates
-        // Clear the date (set to null) if the checkbox is unchecked
-        // Start Date
-        if (strStartDateCheckbox != null){
-            if (strStartDateCheckbox.equals("1")){
-                bbContent.setStartDate(startDate);
-            } else {
-                bbContent.setStartDate(null);
-            }
-        } else {
-            bbContent.setStartDate(null);
-        }
+	// Clear the date (set to null) if the checkbox is unchecked
+	// Start Date
+	Calendar startDate = null;
+	if (strStartDateCheckbox != null && strStartDateCheckbox.equals("1")) {
+	    startDate = Calendar.getInstance();
+	    startDate.setTime(formatter.parse(strStartDate));
+	}
+        bbContent.setStartDate(startDate);
         // End Date
-        if (strEndDateCheckbox != null){
-            if (strEndDateCheckbox.equals("1")){
-                bbContent.setEndDate(endDate);
-            } else {
-                bbContent.setEndDate(null);
-            }
-        } else {
-            bbContent.setEndDate(null);
-        }
+	Calendar endDate = null;
+	if (strEndDateCheckbox != null && (strEndDateCheckbox.equals("1"))) {
+	    endDate = Calendar.getInstance();
+	    endDate.setTime(formatter.parse(strEndDate));
+	}
+	bbContent.setEndDate(endDate);
 
         //Persist the Modified Lesson Object in Blackboard    
         ContentDbPersister persister= (ContentDbPersister) bbPm.getPersister( ContentDbPersister.TYPE );
