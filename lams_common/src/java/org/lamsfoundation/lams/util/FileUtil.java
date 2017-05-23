@@ -32,6 +32,7 @@ import java.io.Reader;
 import java.io.StringWriter;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Properties;
 
@@ -66,8 +67,8 @@ public class FileUtil {
     private static Logger log = Logger.getLogger(FileUtil.class);
 
     public static final String ENCODING_UTF_8 = "UTF8";
-    public static final String EXPORT_TO_SPREADSHEET_TITLE_DATE_FORMAT = "dd.MM.yyyy HH:mm:ss";
-    public static final String EXPORT_TO_SPREADSHEET_CELL_DATE_FORMAT = "dd.MM.yyyy";
+    public static final SimpleDateFormat EXPORT_TO_SPREADSHEET_TITLE_DATE_FORMAT = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
+    public static final SimpleDateFormat EXPORT_TO_SPREADSHEET_CELL_DATE_FORMAT = new SimpleDateFormat("dd/MM/yyyy");
 
     public static final String LAMS_WWW_SECURE_DIR = "secure";
     public static final String LAMS_WWW_DIR = "lams-www.war";
